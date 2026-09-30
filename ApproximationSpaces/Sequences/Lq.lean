@@ -237,6 +237,9 @@ theorem dyadicWeight_neg_mul_self (s : ℝ) (k : ℕ) : dyadicWeight (-s) k * dy
 theorem dyadicWeight_mul_neg_self (s : ℝ) (k : ℕ) : dyadicWeight s k * dyadicWeight (-s) k = 1 := by
   rw [mul_comm, dyadicWeight_neg_mul_self]
 
+theorem dyadicWeight_rpow (s p : ℝ) (k : ℕ) : dyadicWeight s k ^ p = dyadicWeight (s * p) k := by
+  rw [dyadicWeight, dyadicWeight, ← ENNReal.rpow_mul, mul_assoc]
+
 /-- The dyadic weights are a geometric sequence with ratio `2 ^ s`. -/
 theorem dyadicWeight_eq_pow (s : ℝ) (k : ℕ) : dyadicWeight s k = ((2 : ℝ≥0∞) ^ s) ^ k := by
   rw [dyadicWeight, mul_comm, ENNReal.rpow_mul_natCast]

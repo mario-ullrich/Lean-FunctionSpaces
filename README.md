@@ -44,8 +44,23 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   (`ApproximationScheme.approxError_zero_left`, `.approxError_anti`, `.approxError_smul`,
   `.approxError_add_le`, `.abs_approxError_sub_le`). The errors tend to zero exactly on the
   closure of `⋃ A_n` (`ApproximationScheme.tendsto_approxError_zero_iff`).
+* **The dyadic quasi-norm.** For `s ≥ 0` and `1 ≤ q ≤ ∞`,
+  `‖f‖_{A^s_q} ≤ 2^s (‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}) ≤ 4 · 4^s ‖f‖_{A^s_q}`
+  (`ApproximationScheme.approxNorm_le_approxNormDyadic`,
+  `.approxNormDyadic_le_approxNorm`).
+* **Linear structure.** For `s ≥ 0` and `1 ≤ q ≤ ∞`, `A^s_q` is a linear subspace of `X`
+  containing every `A_n`, `‖f‖ ≤ ‖f‖_{A^s_q}`, and
+  `‖f + g‖_{A^s_q} ≤ 8 · 8^s (‖f‖_{A^s_q} + ‖g‖_{A^s_q})`
+  (`ApproximationScheme.approxSpace`, `.memApprox_of_mem`, `.enorm_le_approxNorm`,
+  `.approxNorm_add_le`). For `s > 0` it lies in the closure of `⋃ A_n`
+  (`ApproximationScheme.mem_closure_iUnion_of_memApprox`).
+* **Embeddings.** For `0 ≤ t` and `1 ≤ q, r ≤ ∞`, `A^s_q ⊆ A^t_r` whenever `t < s`, or
+  `t = s` and `q ≤ r` (`ApproximationScheme.MemApprox.mono`); for `t < s` the norm bound is
+  `‖f‖_{A^t_r} ≤ (1 - 2^(t-s))⁻¹ ‖f‖_{A^s_q}` in the dyadic form
+  (`ApproximationScheme.approxNormDyadic_le_of_lt`).
 * **Functoriality.** A bounded linear map `T : X → Y` with `T(A_n) ⊆ B_n` satisfies
-  `E^B_n(T f) ≤ ‖T‖ E^A_n(f)` (`ApproximationScheme.approxError_map_le`).
+  `E^B_n(T f) ≤ ‖T‖ E^A_n(f)` and `‖T f‖_{B^s_q} ≤ ‖T‖ ‖f‖_{A^s_q}`
+  (`ApproximationScheme.approxError_map_le`, `.approxNorm_map_le`).
 * **Sequence spaces.** For `1 ≤ q ≤ r ≤ ∞` and every sequence `a` in `[0, ∞]`,
   `‖a‖_{ℓ_r} ≤ ‖a‖_{ℓ_q}` (`ENNReal.lqNorm_le_lqNorm_of_le`), and the norm of a series of
   sequences is at most the series of the norms (`ENNReal.lqNorm_tsum_le`).
@@ -69,8 +84,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | `ℓ_q` norms of sequences in `ℝ≥0∞`, Minkowski, monotonicity in `q` | ✅ proved | ✗ | `ApproximationSpaces/Sequences/Lq.lean` |
 | Cauchy condensation with power weights | ✅ proved | ✗ | `ApproximationSpaces/Sequences/Dyadic.lean` |
 | Countable Minkowski inequality, discrete Hardy inequalities | ✅ proved | ✗ | `ApproximationSpaces/Sequences/Hardy.lean` |
-| `A^s_q`, its dyadic quasi-norm and linear structure | ⬜ planned | ✗ | `ApproximationSpaces/{Norm,Dyadic,Space}.lean` |
-| Embeddings `A^s_q ↪ A^t_r` and functoriality | ⬜ planned | ✗ | `ApproximationSpaces/{Embedding,Transfer}.lean` |
+| `A^s_q`, its dyadic quasi-norm and linear structure | ✅ proved | ✗ | `ApproximationSpaces/{Norm,Dyadic,Space}.lean` |
+| Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ proved | ✗ | `ApproximationSpaces/{Embedding,Transfer}.lean` |
 | Nikolskii transfer theorem | ⬜ planned | ✗ | `ApproximationSpaces/{Lift,Nikolskii}.lean` |
 | K-functional, real interpolation, representation theorem | ⬜ planned | ✗ | `ApproximationSpaces/{KFunctional,Interpolation,Representation}.lean` |
 | Atomic decompositions, projection schemes | ⬜ planned | ✗ | `ApproximationSpaces/{Decomposition,Projection}.lean` |
