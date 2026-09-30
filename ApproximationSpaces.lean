@@ -17,6 +17,8 @@ public import ApproximationSpaces.Dyadic
 public import ApproximationSpaces.Space
 public import ApproximationSpaces.Embedding
 public import ApproximationSpaces.Transfer
+public import ApproximationSpaces.Lift
+public import ApproximationSpaces.Nikolskii
 
 /-!
 # Approximation spaces
@@ -49,4 +51,9 @@ Nothing in this library mentions functions or measures.
   `ApproximationScheme.approxSpace`.
 * `ApproximationSpaces.Embedding`: the embeddings `A^s_q ↪ A^t_r`.
 * `ApproximationSpaces.Transfer`: functoriality under bounded linear maps.
+* `ApproximationSpaces.Lift`: lifting bounds (Bernstein and Nikolskii inequalities), dyadic
+  near-best approximants and the telescoping construction; a lifting bound of exponent `β`
+  gives `A^β_1 ↪ Y`.
+* `ApproximationSpaces.Nikolskii`: the Nikolskii transfer theorem
+  `A^s_q(X) ↪ B^{s-α}_q(Y)`.
 -/

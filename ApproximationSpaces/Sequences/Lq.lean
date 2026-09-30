@@ -248,6 +248,18 @@ theorem dyadicWeight_mono (hs : 0 ≤ s) : Monotone (dyadicWeight s) := fun _ _ 
   ENNReal.rpow_le_rpow_of_exponent_le one_le_two
     (mul_le_mul_of_nonneg_right (Nat.cast_le.2 hkj) hs)
 
+/-- For a fixed `k`, the weight `2 ^ (k s)` increases with `s`. -/
+theorem dyadicWeight_le_of_le {s t : ℝ} (h : s ≤ t) (k : ℕ) : dyadicWeight s k ≤ dyadicWeight t k :=
+  ENNReal.rpow_le_rpow_of_exponent_le one_le_two (mul_le_mul_of_nonneg_left h (Nat.cast_nonneg k))
+
+/-- For `s ≤ 0` the weights decrease. -/
+theorem dyadicWeight_anti (hs : s ≤ 0) : Antitone (dyadicWeight s) := fun _ _ hkj =>
+  ENNReal.rpow_le_rpow_of_exponent_le one_le_two
+    (mul_le_mul_of_nonpos_right (Nat.cast_le.2 hkj) hs)
+
+theorem one_le_dyadicWeight (hs : 0 ≤ s) (k : ℕ) : 1 ≤ dyadicWeight s k := by
+  simpa using dyadicWeight_mono hs (Nat.zero_le k)
+
 /-- `(2 ^ k) ^ s = 2 ^ (k s)`: the dyadic weight is the power weight at the dyadic point. -/
 theorem natCast_two_pow_rpow (s : ℝ) (k : ℕ) :
     ((2 ^ k : ℕ) : ℝ≥0∞) ^ s = dyadicWeight s k := by
@@ -272,5 +284,15 @@ theorem lqNorm_dyadicWeight_neg_le (hq : 1 ≤ q) (α : ℝ) :
   have : dyadicWeight (-α) = fun k => ((2 : ℝ≥0∞) ^ (-α)) ^ k := funext (dyadicWeight_eq_pow _)
   rw [this]
   exact lqNorm_geometric_le hq _
+
+/-- `∑ₖ 2^(-k) = 2`. -/
+theorem tsum_dyadicWeight_neg_one : ∑' k, dyadicWeight (-1) k = 2 := by
+  simp_rw [dyadicWeight_eq_pow, ENNReal.rpow_neg_one]
+  exact ENNReal.tsum_geometric_two
+
+/-- `‖(2^(-k))ₖ‖_q ≤ 2`. -/
+theorem lqNorm_dyadicWeight_neg_one_le (hq : 1 ≤ q) : lqNorm q (dyadicWeight (-1)) ≤ 2 := by
+  calc lqNorm q (dyadicWeight (-1)) ≤ ∑' k, dyadicWeight (-1) k := lqNorm_le_lqNorm_one hq _
+    _ = 2 := tsum_dyadicWeight_neg_one
 
 end ENNReal

@@ -61,6 +61,15 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 * **Functoriality.** A bounded linear map `T : X → Y` with `T(A_n) ⊆ B_n` satisfies
   `E^B_n(T f) ≤ ‖T‖ E^A_n(f)` and `‖T f‖_{B^s_q} ≤ ‖T‖ ‖f‖_{A^s_q}`
   (`ApproximationScheme.approxError_map_le`, `.approxNorm_map_le`).
+* **Lifting.** Let `ι : Y → X` be a bounded linear map from a Banach space `Y` such that every
+  `a ∈ A_n`, `n ≥ 1`, is `ι y` with `‖y‖ ≤ C n^β ‖a‖` (a Bernstein inequality). If
+  `β ≥ 0` and `∑_k 2^(kβ) E_{2^k}(f) < ∞`, then `f = ι y` for some `y ∈ Y` with
+  `‖y‖ ≤ K (‖f‖ + ∑_k 2^(kβ) E_{2^k}(f))` (`ApproximationScheme.exists_preimage_of_liftBound`).
+* **Nikolskii transfer theorem.** If moreover `ι` is injective and `0 ≤ α < s`, and every
+  `a ∈ A_n` is `ι y` with `‖y‖ ≤ C n^α ‖a‖` (a Nikolskii inequality), then every
+  `f ∈ A^s_q(X)` is `ι y` for some `y` in the approximation space `B^{s-α}_q(Y)` of the
+  pulled-back scheme `B_n = ι⁻¹(A_n)`, with `‖y‖_{B^{s-α}_q} ≤ K ‖f‖_{A^s_q}`
+  (`ApproximationScheme.exists_preimage_of_nikolskii`).
 * **Sequence spaces.** For `1 ≤ q ≤ r ≤ ∞` and every sequence `a` in `[0, ∞]`,
   `‖a‖_{ℓ_r} ≤ ‖a‖_{ℓ_q}` (`ENNReal.lqNorm_le_lqNorm_of_le`), and the norm of a series of
   sequences is at most the series of the norms (`ENNReal.lqNorm_tsum_le`).
@@ -86,7 +95,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Countable Minkowski inequality, discrete Hardy inequalities | ✅ proved | ✗ | `ApproximationSpaces/Sequences/Hardy.lean` |
 | `A^s_q`, its dyadic quasi-norm and linear structure | ✅ proved | ✗ | `ApproximationSpaces/{Norm,Dyadic,Space}.lean` |
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ proved | ✗ | `ApproximationSpaces/{Embedding,Transfer}.lean` |
-| Nikolskii transfer theorem | ⬜ planned | ✗ | `ApproximationSpaces/{Lift,Nikolskii}.lean` |
+| Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ proved | ✗ | `ApproximationSpaces/{Lift,Nikolskii}.lean` |
 | K-functional, real interpolation, representation theorem | ⬜ planned | ✗ | `ApproximationSpaces/{KFunctional,Interpolation,Representation}.lean` |
 | Atomic decompositions, projection schemes | ⬜ planned | ✗ | `ApproximationSpaces/{Decomposition,Projection}.lean` |
 | Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces | ⬜ planned | ✗ | `FunctionSpaces/{Lp,Scheme,Besov}/…` |
