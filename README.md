@@ -98,7 +98,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ proved | ✗ | `ApproximationSpaces/{Lift,Nikolskii}.lean` |
 | K-functional, real interpolation, representation theorem | ⬜ planned | ✗ | `ApproximationSpaces/{KFunctional,Interpolation,Representation}.lean` |
 | Atomic decompositions, projection schemes | ⬜ planned | ✗ | `ApproximationSpaces/{Decomposition,Projection}.lean` |
-| Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces | ⬜ planned | ✗ | `FunctionSpaces/{Lp,Scheme,Besov}/…` |
+| Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces, elementary embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Inclusion,Lp/BoundedContinuous,Scheme,Besov/Basic,Besov/Trivial}.lean` |
 | Besov embeddings from a Nikolskii inequality | ⬜ planned | ✗ | `FunctionSpaces/Besov/Embeddings.lean` |
 | Smoothness spaces and Sobolev embeddings | ⬜ planned | ✗ | `FunctionSpaces/Smoothness/…` |
 | Spectral schemes and `L_2` Sobolev spaces | ⬜ planned | ✗ | `FunctionSpaces/Spectral/…` |

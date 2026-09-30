@@ -6,6 +6,11 @@ Authors: Mario Ullrich
 module
 
 public import ApproximationSpaces
+public import FunctionSpaces.Lp.Inclusion
+public import FunctionSpaces.Lp.BoundedContinuous
+public import FunctionSpaces.Scheme
+public import FunctionSpaces.Besov.Basic
+public import FunctionSpaces.Besov.Trivial
 
 /-!
 # Function spaces
@@ -13,4 +18,15 @@ public import ApproximationSpaces
 Besov and Sobolev spaces on a finite measure space, defined through approximation schemes of
 bounded continuous functions, and their embedding theorems.  The library builds on
 `ApproximationSpaces`.
+
+## Layout
+
+* `FunctionSpaces.Lp.Inclusion`: the bounded linear inclusion `L_r ↪ L_p` for `p ≤ r` and a
+  finite measure, `MeasureTheory.Lp.inclusionOfExponentLe`.
+* `FunctionSpaces.Lp.BoundedContinuous`: bounded continuous functions in `L_p`; for a measure
+  charging open sets, `L_∞` restricted to them is the sup norm.
+* `FunctionSpaces.Scheme`: schemes of functions `FunctionScheme` and their transport
+  `FunctionScheme.toLp` to every `L_p(μ)`, compatible with the inclusions.
+* `FunctionSpaces.Besov.Basic`: the Besov spaces `B^s_{p,q}(Ω, S) = A^s_q(L_p(μ), S)`.
+* `FunctionSpaces.Besov.Trivial`: the embeddings that need no property of the scheme.
 -/
