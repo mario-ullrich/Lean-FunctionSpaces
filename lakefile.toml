@@ -1,0 +1,21 @@
+name = "functionspaces"
+defaultTargets = ["ApproximationSpaces", "FunctionSpaces"]
+
+# Mathlib pinned to the v4.35.0-rc2 tag, matching lean-toolchain: a release tag has a
+# fully-published build cache, so `lake exe cache get` finds every olean.
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+version = "git#v4.35.0-rc2"
+
+# The abstract theory of approximation spaces in the sense of Pietsch: approximation
+# schemes in a normed space, the errors of best approximation, the spaces A^s_q, embeddings,
+# transfer theorems, Jackson and Bernstein inequalities and real interpolation. Nothing here
+# mentions functions or measures.
+[[lean_lib]]
+name = "ApproximationSpaces"
+
+# Besov and Sobolev spaces on a finite measure space, defined through approximation schemes
+# of bounded continuous functions, their embedding theorems, and the torus as first instance.
+[[lean_lib]]
+name = "FunctionSpaces"

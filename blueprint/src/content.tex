@@ -1,0 +1,241 @@
+% !TEX root = print.tex
+
+\chapter{Approximation schemes}
+\label{ch:schemes}
+
+This blueprint follows the formalisation of approximation spaces in the sense of
+Pietsch~\cite{Pietsch}, of Besov and Sobolev spaces defined through them, and of the
+embedding theorems between these spaces. Each statement names the Lean declaration that
+formalises it; a statement marked as formalised compiles without \texttt{sorry}.
+
+Throughout, $X$ and $Y$ are real normed spaces. Complex spaces, such as $L_p$ spaces of
+complex-valued functions, are regarded as real ones.
+
+\begin{definition}[Approximation scheme]
+\label{def:scheme}
+\lean{ApproximationScheme}
+\leanok
+An \emph{approximation scheme} in $X$ is a sequence of subsets
+$A_0 \subseteq A_1 \subseteq A_2 \subseteq \cdots$ of $X$ such that
+\begin{enumerate}
+  \item $A_0 = \{0\}$,
+  \item $c\,a \in A_n$ for all $c \in \R$, $n \in \N$ and $a \in A_n$,
+  \item $a + b \in A_{m+n}$ for all $m, n \in \N$, $a \in A_m$ and $b \in A_n$.
+\end{enumerate}
+\end{definition}
+
+The elements of $A_n$ are the approximants of complexity $n$. The sets need not be linear
+subspaces: in the $n$-term scheme of \Cref{def:nterm} they are unions of subspaces. A family
+indexed by a degree enters with a strict inequality, $A_n = \{\text{degree} < n\}$, so that
+$A_0 = \{0\}$ holds.
+
+\begin{lemma}[Elementary properties]
+\label{lem:scheme-basic}
+\lean{ApproximationScheme.zero_mem, ApproximationScheme.nonempty,
+  ApproximationScheme.neg_mem, ApproximationScheme.sub_mem, ApproximationScheme.sum_mem,
+  ApproximationScheme.smul_set_eq, ApproximationScheme.sub_mem_pow_add_two}
+\leanok
+\uses{def:scheme}
+Let $A$ be an approximation scheme in $X$. Then for all $m, n, k \in \N$:
+\begin{enumerate}
+  \item $0 \in A_n$; in particular $A_n$ is nonempty;
+  \item $a - b \in A_{m+n}$ for all $a \in A_m$ and $b \in A_n$;
+  \item $\sum_{i \in I} a_i \in A_{\sum_{i \in I} n_i}$ for every finite family with
+    $a_i \in A_{n_i}$;
+  \item $c\,A_n = A_n$ for every $c \in \R \setminus \{0\}$;
+  \item $a - b \in A_{2^{k+2}}$ for all $a \in A_{2^{k+1}}$ and $b \in A_{2^k}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first item follows from $A_0 = \{0\} \subseteq A_n$, the second from $-b = (-1)\,b$, and
+the third by induction over $I$. For the fourth, $c^{-1} a \in A_n$ for $a \in A_n$. The last
+follows from the second and $2^{k+1} + 2^k \leq 2^{k+2}$.
+\end{proof}
+
+\begin{definition}[Preimage and image of a scheme]
+\label{def:comap}
+\lean{ApproximationScheme.comap, ApproximationScheme.map}
+\leanok
+\uses{def:scheme}
+Let $A$ be an approximation scheme in $X$. For an injective linear map $\iota : Y \to X$, the
+sets $\iota^{-1}(A_n)$ form an approximation scheme in $Y$. For a linear map $T : X \to Y$, the
+sets $T(A_n)$ form an approximation scheme in $Y$.
+\end{definition}
+
+Injectivity of $\iota$ is what gives $\iota^{-1}(\{0\}) = \{0\}$.
+
+\section{The error of best approximation}
+
+\begin{definition}[Error of best approximation]
+\label{def:error}
+\lean{ApproximationScheme.approxError}
+\leanok
+\uses{def:scheme}
+Let $A$ be an approximation scheme in $X$. For $n \in \N$ and $f \in X$,
+\[
+  E_n(f) = \dist(f, A_n) = \inf_{a \in A_n} \|f - a\|.
+\]
+\end{definition}
+
+\begin{lemma}[Calculus of the error]
+\label{lem:error-basic}
+\lean{ApproximationScheme.approxError_zero_left, ApproximationScheme.approxError_le_norm,
+  ApproximationScheme.approxError_anti, ApproximationScheme.approxError_smul,
+  ApproximationScheme.approxError_add_le, ApproximationScheme.abs_approxError_sub_le}
+\leanok
+\uses{def:error, lem:scheme-basic}
+Let $A$ be an approximation scheme in $X$. For all $f, g \in X$, $c \in \R$ and
+$m, n \in \N$:
+\begin{enumerate}
+  \item $E_0(f) = \|f\|$ and $E_n(f) \leq \|f\|$;
+  \item $E_n(f) \leq E_m(f)$ whenever $m \leq n$;
+  \item $E_n(c f) = |c| \, E_n(f)$;
+  \item $E_{m+n}(f + g) \leq E_m(f) + E_n(g)$;
+  \item $|E_n(f) - E_n(g)| \leq \|f - g\|$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first item holds because $A_0 = \{0\}$ and $0 \in A_n$, the second because the sets
+increase, the third because $c A_n = A_n$ for $c \neq 0$. For the fourth, given
+$\varepsilon > 0$ choose $a \in A_m$ and $b \in A_n$ with $\|f - a\| \leq E_m(f) +
+\varepsilon$ and $\|g - b\| \leq E_n(g) + \varepsilon$; then $a + b \in A_{m+n}$ and the
+triangle inequality gives the bound up to $2\varepsilon$. The last item is the
+$1$-Lipschitz property of the distance to a set.
+\end{proof}
+
+A best approximant, an $a \in A_n$ with $\|f - a\| = E_n(f)$, need not exist, since the sets
+$A_n$ need not be closed. The proofs work with near-best approximants as in the proof of the
+fourth item.
+
+\begin{lemma}[Convergence of the errors]
+\label{lem:error-tendsto}
+\lean{ApproximationScheme.tendsto_approxError_zero_iff}
+\leanok
+\uses{lem:error-basic}
+Let $A$ be an approximation scheme in $X$ and $f \in X$. Then $E_n(f) \to 0$ as
+$n \to \infty$ if and only if $f$ lies in the closure of $\bigcup_n A_n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $\|f - a\| < \varepsilon$ for some $a \in A_m$, then $E_n(f) < \varepsilon$ for all
+$n \geq m$ since the errors decrease. Conversely $E_n(f) < \varepsilon$ gives such an $a$.
+\end{proof}
+
+\begin{lemma}[Functoriality of the error]
+\label{lem:error-map}
+\lean{ApproximationScheme.approxError_map_le}
+\leanok
+\uses{def:error}
+Let $A$ and $B$ be approximation schemes in $X$ and $Y$, and let $T : X \to Y$ be a bounded
+linear map with $T(A_n) \subseteq B_n$ for all $n$. Then for all $n \in \N$ and $f \in X$,
+\[
+  E^B_n(T f) \leq \|T\| \, E^A_n(f).
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $a \in A_n$, $E^B_n(Tf) \leq \|Tf - Ta\| \leq \|T\| \, \|f - a\|$; take the infimum
+over $a$.
+\end{proof}
+
+\section{Two schemes}
+
+\begin{definition}[Linear approximation]
+\label{def:ofspan}
+\lean{ApproximationScheme.ofSpan}
+\leanok
+\uses{def:scheme}
+For a sequence $(e_i)_{i \in \N}$ in $X$, the sets $A_n = \spn\{e_i : i < n\}$ form an
+approximation scheme.
+\end{definition}
+
+\begin{lemma}
+\label{lem:ofspan}
+\lean{ApproximationScheme.isClosed_ofSpan, ApproximationScheme.iUnion_ofSpan,
+  ApproximationScheme.tendsto_approxError_ofSpan_iff}
+\leanok
+\uses{def:ofspan, lem:error-tendsto}
+For the scheme of \Cref{def:ofspan}, every $A_n$ is closed, $\bigcup_n A_n = \spn\{e_i : i
+\in \N\}$, and $E_n(f) \to 0$ if and only if $f$ lies in the closed span of $(e_i)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The sets are finite-dimensional subspaces and therefore closed. The union of an increasing
+family of spans is the span of the union. The last statement is \Cref{lem:error-tendsto}.
+\end{proof}
+
+\begin{definition}[$n$-term approximation]
+\label{def:nterm}
+\lean{ApproximationScheme.nTerm}
+\leanok
+\uses{def:scheme}
+For a set $D \subseteq X$, the \emph{dictionary}, let $A_n$ be the set of linear combinations
+of at most $n$ elements of $D$. These sets form an approximation scheme.
+\end{definition}
+
+The third axiom holds because a combination of $m$ and one of $n$ elements of $D$ together
+use at most $m + n$ elements.
+
+\begin{lemma}
+\label{lem:nterm-ofspan}
+\lean{ApproximationScheme.ofSpan_subset_nTerm, ApproximationScheme.approxError_nTerm_le_ofSpan}
+\leanok
+\uses{def:ofspan, def:nterm, lem:error-basic}
+For a sequence $(e_i)$ in $X$, the linear scheme of $(e_i)$ is contained in the $n$-term
+scheme of the dictionary $\{e_i : i \in \N\}$, and hence the $n$-term errors are at most the
+linear ones.
+\end{lemma}
+
+\begin{proof}
+\leanok
+An element of $\spn\{e_i : i < n\}$ uses the $n$ elements $e_0, \dots, e_{n-1}$.
+\end{proof}
+
+\bpbibheading
+\begin{thebibliography}{99}
+
+\bibitem{BerghLofstrom}
+J.~Bergh, J.~L\"ofstr\"om,
+\emph{Interpolation Spaces. An Introduction},
+Grundlehren der mathematischen Wissenschaften \textbf{223}, Springer-Verlag, Berlin, 1976,
+\href{https://doi.org/10.1007/978-3-642-66451-9}{doi}.
+
+\bibitem{DeVoreLorentz}
+R.~A.~DeVore, G.~G.~Lorentz,
+\emph{Constructive Approximation},
+Grundlehren der mathematischen Wissenschaften \textbf{303}, Springer-Verlag, Berlin, 1993,
+\href{https://doi.org/10.1007/978-3-662-02888-9}{doi}.
+
+\bibitem{Nikolskii}
+S.~M.~Nikol'ski\u{\i},
+\emph{Approximation of Functions of Several Variables and Imbedding Theorems},
+Grundlehren der mathematischen Wissenschaften \textbf{205}, Springer-Verlag, Berlin, 1975,
+\href{https://doi.org/10.1007/978-3-642-65711-5}{doi}.
+
+\bibitem{Pietsch}
+A.~Pietsch,
+\emph{Approximation spaces},
+J.\ Approx.\ Theory \textbf{32} (1981), no.~2, 115--134,
+\href{https://doi.org/10.1016/0021-9045(81)90109-X}{doi}.
+
+\bibitem{Temlyakov}
+V.~Temlyakov,
+\emph{Multivariate Approximation},
+Cambridge Monographs on Applied and Computational Mathematics \textbf{32}, Cambridge
+University Press, Cambridge, 2018,
+\href{https://doi.org/10.1017/9781108689687}{doi}.
+
+\bibitem{Triebel}
+H.~Triebel,
+\emph{Theory of Function Spaces},
+Monographs in Mathematics \textbf{78}, Birkh\"auser, Basel, 1983,
+\href{https://doi.org/10.1007/978-3-0346-0416-1}{doi}.
+
+\end{thebibliography}
