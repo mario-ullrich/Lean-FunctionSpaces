@@ -46,6 +46,13 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   closure of `⋃ A_n` (`ApproximationScheme.tendsto_approxError_zero_iff`).
 * **Functoriality.** A bounded linear map `T : X → Y` with `T(A_n) ⊆ B_n` satisfies
   `E^B_n(T f) ≤ ‖T‖ E^A_n(f)` (`ApproximationScheme.approxError_map_le`).
+* **Sequence spaces.** For `1 ≤ q ≤ r ≤ ∞` and every sequence `a` in `[0, ∞]`,
+  `‖a‖_{ℓ_r} ≤ ‖a‖_{ℓ_q}` (`ENNReal.lqNorm_le_lqNorm_of_le`), and the norm of a series of
+  sequences is at most the series of the norms (`ENNReal.lqNorm_tsum_le`).
+* **Hardy inequalities.** For `α > 0`, `1 ≤ q ≤ ∞` and every sequence `b` in `[0, ∞]`,
+  `‖(2^(kα) ∑_{i ≥ 0} b_{k+i})_k‖_{ℓ_q} ≤ (1 - 2^(-α))⁻¹ ‖(2^(kα) b_k)_k‖_{ℓ_q}` and
+  `‖(2^(-kα) ∑_{j ≤ k} b_j)_k‖_{ℓ_q} ≤ (1 - 2^(-α))⁻¹ ‖(2^(-kα) b_k)_k‖_{ℓ_q}`
+  (`ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`).
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -59,9 +66,9 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Error of best approximation and its calculus | ✅ proved | ✗ | `ApproximationSpaces/Error.lean` |
 | Linear approximation from a sequence | ✅ proved | ✗ | `ApproximationSpaces/Instances/Span.lean` |
 | `n`-term approximation from a dictionary | ✅ proved | ✗ | `ApproximationSpaces/Instances/NTerm.lean` |
-| `ℓ_q` norms of sequences in `ℝ≥0∞`, Minkowski, monotonicity in `q` | ⬜ planned | ✗ | `ApproximationSpaces/Sequences/Lq.lean` |
-| Cauchy condensation with power weights | ⬜ planned | ✗ | `ApproximationSpaces/Sequences/Dyadic.lean` |
-| Discrete Hardy inequalities | ⬜ planned | ✗ | `ApproximationSpaces/Sequences/Hardy.lean` |
+| `ℓ_q` norms of sequences in `ℝ≥0∞`, Minkowski, monotonicity in `q` | ✅ proved | ✗ | `ApproximationSpaces/Sequences/Lq.lean` |
+| Cauchy condensation with power weights | ✅ proved | ✗ | `ApproximationSpaces/Sequences/Dyadic.lean` |
+| Countable Minkowski inequality, discrete Hardy inequalities | ✅ proved | ✗ | `ApproximationSpaces/Sequences/Hardy.lean` |
 | `A^s_q`, its dyadic quasi-norm and linear structure | ⬜ planned | ✗ | `ApproximationSpaces/{Norm,Dyadic,Space}.lean` |
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ⬜ planned | ✗ | `ApproximationSpaces/{Embedding,Transfer}.lean` |
 | Nikolskii transfer theorem | ⬜ planned | ✗ | `ApproximationSpaces/{Lift,Nikolskii}.lean` |

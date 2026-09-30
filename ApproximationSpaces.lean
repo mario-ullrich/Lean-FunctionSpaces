@@ -9,6 +9,9 @@ public import ApproximationSpaces.Scheme
 public import ApproximationSpaces.Error
 public import ApproximationSpaces.Instances.Span
 public import ApproximationSpaces.Instances.NTerm
+public import ApproximationSpaces.Sequences.Lq
+public import ApproximationSpaces.Sequences.Dyadic
+public import ApproximationSpaces.Sequences.Hardy
 
 /-!
 # Approximation spaces
@@ -27,4 +30,10 @@ Nothing in this library mentions functions or measures.
   a sequence, `ApproximationScheme.ofSpan`.
 * `ApproximationSpaces.Instances.NTerm`: nonlinear `n`-term approximation from a
   dictionary, `ApproximationScheme.nTerm`.
+* `ApproximationSpaces.Sequences.Lq`: the `ℓ_q` norm `ENNReal.lqNorm` of a sequence in
+  `ℝ≥0∞`, its monotonicity in `q`, and the dyadic weights `ENNReal.dyadicWeight`.
+* `ApproximationSpaces.Sequences.Dyadic`: Cauchy condensation with power weights, which
+  compares `∑ (n+1)^γ b n` with `∑ 2^(k(γ+1)) b (2^k)` for decreasing `b`.
+* `ApproximationSpaces.Sequences.Hardy`: the countable Minkowski inequality and the two
+  discrete Hardy inequalities.
 -/
