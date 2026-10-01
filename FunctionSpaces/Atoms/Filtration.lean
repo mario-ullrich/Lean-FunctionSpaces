@@ -50,7 +50,7 @@ namespace Lp
 variable (m) in
 
 /-- The **conditional expectation** `E[· | m]` on `L_p(μ)`, as a real-linear map. -/
-noncomputable def condExpLpₗ : Lp ℂ p μ →ₗ[ℝ] Lp ℂ p μ where
+noncomputable def condExpLpLinear : Lp ℂ p μ →ₗ[ℝ] Lp ℂ p μ where
   toFun f := ((Lp.memLp f).condExp Fact.out).toLp (μ[(f : α → ℂ) | m])
   map_add' f g := by
     ext1
@@ -71,21 +71,21 @@ noncomputable def condExpLpₗ : Lp ℂ p μ →ₗ[ℝ] Lp ℂ p μ where
       MemLp.coeFn_toLp ((Lp.memLp f).condExp Fact.out)] with x h1 h2 h3 h4 h5
     rw [h1, h2, h3, RingHom.id_apply, h4, Pi.smul_apply, Pi.smul_apply, h5]
 
-theorem coeFn_condExpLpₗ (f : Lp ℂ p μ) :
-    condExpLpₗ m f =ᵐ[μ] μ[(f : α → ℂ) | m] :=
+theorem coeFn_condExpLpLinear (f : Lp ℂ p μ) :
+    condExpLpLinear m f =ᵐ[μ] μ[(f : α → ℂ) | m] :=
   MemLp.coeFn_toLp ((Lp.memLp f).condExp Fact.out)
 
 variable (m) in
 /-- The **conditional expectation** `E[· | m]` on `L_p(μ)`, a contraction. -/
 noncomputable def condExpLp : Lp ℂ p μ →L[ℝ] Lp ℂ p μ :=
-  LinearMap.mkContinuous (condExpLpₗ m) 1 fun f => by
-    rw [one_mul, Lp.norm_def, Lp.norm_def, eLpNorm_congr_ae (coeFn_condExpLpₗ f)]
+  LinearMap.mkContinuous (condExpLpLinear m) 1 fun f => by
+    rw [one_mul, Lp.norm_def, Lp.norm_def, eLpNorm_congr_ae (coeFn_condExpLpLinear f)]
     exact ENNReal.toReal_mono (Lp.eLpNorm_ne_top f)
       (eLpNorm_condExp_le_eLpNorm _ Fact.out)
 
 theorem coeFn_condExpLp (f : Lp ℂ p μ) :
     condExpLp m f =ᵐ[μ] μ[(f : α → ℂ) | m] :=
-  coeFn_condExpLpₗ f
+  coeFn_condExpLpLinear f
 
 variable (m) in
 theorem norm_condExpLp_le : ‖(condExpLp (μ := μ) (p := p) m)‖ ≤ 1 :=

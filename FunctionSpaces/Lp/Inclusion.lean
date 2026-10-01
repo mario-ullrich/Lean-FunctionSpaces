@@ -41,7 +41,7 @@ section Linear
 variable [IsFiniteMeasure μ]
 
 /-- The inclusion `L_r → L_p` for `p ≤ r` and a finite measure, as a linear map. -/
-noncomputable def inclusionOfExponentLeₗ (μ : Measure α) [IsFiniteMeasure μ] (hpr : p ≤ r) :
+noncomputable def inclusionOfExponentLeLinear (μ : Measure α) [IsFiniteMeasure μ] (hpr : p ≤ r) :
     Lp E r μ →ₗ[𝕜] Lp E p μ where
   toFun f := ((Lp.memLp f).mono_exponent hpr).toLp f
   map_add' f g := by
@@ -52,8 +52,8 @@ noncomputable def inclusionOfExponentLeₗ (μ : Measure α) [IsFiniteMeasure μ
     grw [MemLp.coeFn_toLp, Lp.coeFn_smul, Lp.coeFn_smul, MemLp.coeFn_toLp]
     rfl
 
-theorem coeFn_inclusionOfExponentLeₗ (hpr : p ≤ r) (f : Lp E r μ) :
-    inclusionOfExponentLeₗ (𝕜 := 𝕜) μ hpr f =ᵐ[μ] f :=
+theorem coeFn_inclusionOfExponentLeLinear (hpr : p ≤ r) (f : Lp E r μ) :
+    inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hpr f =ᵐ[μ] f :=
   MemLp.coeFn_toLp ((Lp.memLp f).mono_exponent hpr)
 
 end Linear
@@ -72,8 +72,8 @@ theorem inclusionConst_of_isProbabilityMeasure [IsProbabilityMeasure μ] (p r : 
 
 variable [Fact (1 ≤ p)] [Fact (1 ≤ r)] [IsFiniteMeasure μ]
 
-theorem norm_inclusionOfExponentLeₗ_apply_le (hpr : p ≤ r) (f : Lp E r μ) :
-    ‖inclusionOfExponentLeₗ (𝕜 := 𝕜) μ hpr f‖ ≤ inclusionConst μ p r * ‖f‖ := by
+theorem norm_inclusionOfExponentLeLinear_apply_le (hpr : p ≤ r) (f : Lp E r μ) :
+    ‖inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hpr f‖ ≤ inclusionConst μ p r * ‖f‖ := by
   have hp : 1 ≤ p := Fact.out
   have hexp : 0 ≤ 1 / p.toReal - 1 / r.toReal := by
     rcases eq_or_ne r ∞ with rfl | hr
@@ -84,7 +84,7 @@ theorem norm_inclusionOfExponentLeₗ_apply_le (hpr : p ≤ r) (f : Lp E r μ) :
     exact one_div_le_one_div_of_le hp0 (ENNReal.toReal_mono hr hpr)
   have hM : μ Set.univ ^ (1 / p.toReal - 1 / r.toReal) ≠ ∞ :=
     ENNReal.rpow_ne_top_of_nonneg hexp (measure_ne_top μ _)
-  rw [Lp.norm_def, Lp.norm_def, eLpNorm_congr_ae (coeFn_inclusionOfExponentLeₗ hpr f),
+  rw [Lp.norm_def, Lp.norm_def, eLpNorm_congr_ae (coeFn_inclusionOfExponentLeLinear hpr f),
     inclusionConst, ← ENNReal.toReal_mul, mul_comm]
   exact ENNReal.toReal_mono (ENNReal.mul_ne_top (Lp.eLpNorm_ne_top f) hM)
     (eLpNorm_le_eLpNorm_mul_rpow_measure_univ hpr (Lp.aestronglyMeasurable f))
@@ -93,17 +93,17 @@ theorem norm_inclusionOfExponentLeₗ_apply_le (hpr : p ≤ r) (f : Lp E r μ) :
 map with `‖f‖_p ≤ μ(Ω)^(1/p - 1/r) ‖f‖_r`. -/
 noncomputable def inclusionOfExponentLe (μ : Measure α) [IsFiniteMeasure μ] (hpr : p ≤ r) :
     Lp E r μ →L[𝕜] Lp E p μ :=
-  LinearMap.mkContinuous (inclusionOfExponentLeₗ μ hpr) (inclusionConst μ p r)
-    (norm_inclusionOfExponentLeₗ_apply_le hpr)
+  LinearMap.mkContinuous (inclusionOfExponentLeLinear μ hpr) (inclusionConst μ p r)
+    (norm_inclusionOfExponentLeLinear_apply_le hpr)
 
 /-- The inclusion does not change the function: `inclusionOfExponentLe μ hpr f = f` a.e. -/
 theorem coeFn_inclusionOfExponentLe (hpr : p ≤ r) (f : Lp E r μ) :
     inclusionOfExponentLe (𝕜 := 𝕜) μ hpr f =ᵐ[μ] f :=
-  coeFn_inclusionOfExponentLeₗ hpr f
+  coeFn_inclusionOfExponentLeLinear hpr f
 
 theorem norm_inclusionOfExponentLe_apply_le (hpr : p ≤ r) (f : Lp E r μ) :
     ‖inclusionOfExponentLe (𝕜 := 𝕜) μ hpr f‖ ≤ inclusionConst μ p r * ‖f‖ :=
-  norm_inclusionOfExponentLeₗ_apply_le hpr f
+  norm_inclusionOfExponentLeLinear_apply_le hpr f
 
 theorem norm_inclusionOfExponentLe_le (hpr : p ≤ r) :
     ‖(inclusionOfExponentLe (E := E) (𝕜 := 𝕜) μ hpr)‖ ≤ inclusionConst μ p r :=

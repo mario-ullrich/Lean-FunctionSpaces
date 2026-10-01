@@ -46,11 +46,13 @@ variable {d : Type*} [Fintype d]
 noncomputable def derivSymbol (α : d → ℕ) (k : d → ℤ) : ℂ :=
   ∏ i, (2 * π * Complex.I * (k i : ℂ)) ^ α i
 
+/-- `|2πi a| = 2π |a|` for an integer `a`. -/
 theorem norm_two_pi_I_mul_intCast (a : ℤ) :
     ‖2 * π * Complex.I * (a : ℂ)‖ = 2 * π * |(a : ℝ)| := by
   rw [norm_mul, norm_mul, norm_mul, Complex.norm_I, Complex.norm_intCast, Complex.norm_real,
     Real.norm_eq_abs, abs_of_pos Real.pi_pos, Complex.norm_ofNat, mul_one]
 
+/-- `|(2πi k)^α| = ∏ᵢ (2π |kᵢ|)^(αᵢ)`. -/
 theorem norm_derivSymbol (α : d → ℕ) (k : d → ℤ) :
     ‖derivSymbol α k‖ = ∏ i, (2 * π * |(k i : ℝ)|) ^ α i := by
   simp only [derivSymbol, norm_prod, norm_pow, norm_two_pi_I_mul_intCast]
@@ -66,6 +68,7 @@ theorem derivSymbol_single [DecidableEq d] (j : d) (m : ℕ) (k : d → ℤ) :
   rw [derivSymbol, Fintype.prod_eq_single j fun i hi => by simp [hi]]
   simp
 
+/-- `1 ≤ 2π`. -/
 theorem one_le_two_pi : (1 : ℝ) ≤ 2 * π := by
   have := Real.one_le_pi_div_two; linarith
 
@@ -152,7 +155,7 @@ theorem exists_hasWeakDeriv {α : d → ℕ} {f : Lp ℂ 2 (volume : Measure (Un
   rw [← mFourierBasis_repr, LinearIsometryEquiv.apply_symm_apply]
 
 /-- The coefficients of a weak derivative are square-summable. -/
-theorem HasWeakDeriv.memℓp {α : d → ℕ} {f g : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
+theorem HasWeakDeriv.mem_l2 {α : d → ℕ} {f g : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
     (hg : HasWeakDeriv α f g) : Memℓp (fun k => derivSymbol α k * mFourierCoeff f k) 2 := by
   have h := lp.memℓp (mFourierBasis.repr g)
   convert h using 1
@@ -174,9 +177,9 @@ theorem memSobolev_iff (m : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d
   constructor
   · intro hf
     -- the coefficient sequences of `f` and of the derivatives `∂_j^m f` dominate the weight
-    have h0 := (hf 0 (by simp)).choose_spec.memℓp
+    have h0 := (hf 0 (by simp)).choose_spec.mem_l2
     have hj : ∀ j, Memℓp (fun k => derivSymbol (Pi.single j m) k * mFourierCoeff f k) 2 :=
-      fun j => (hf _ (by simp [Finset.sum_pi_single'])).choose_spec.memℓp
+      fun j => (hf _ (by simp [Finset.sum_pi_single'])).choose_spec.mem_l2
     have hdom : Memℓp (fun k => 2 ^ m * (‖derivSymbol 0 k * mFourierCoeff f k‖ +
         ∑ j, ‖derivSymbol (Pi.single j m) k * mFourierCoeff f k‖)) 2 :=
       ((memℓp_norm_iff.2 h0).add (Memℓp.finsetSum _ fun j _ => memℓp_norm_iff.2 (hj j))).const_mul

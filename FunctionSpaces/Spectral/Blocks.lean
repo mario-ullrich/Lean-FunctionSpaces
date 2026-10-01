@@ -144,7 +144,7 @@ theorem memApprox_iff_blockNorm_lt_top [CompleteSpace H] {s : ℝ} (hs : 0 < s) 
   S.projectionScheme.memApprox_iff_blockNorm_lt_top S.closure_iUnion_toScheme hs hq
 
 /-- Membership in `ℓ²` through the series of squares in `ℝ≥0∞`. -/
-theorem memℓp_two_iff (g : ι → ℂ) : Memℓp g 2 ↔ ∑' i, ‖g i‖ₑ ^ 2 ≠ ∞ := by
+theorem mem_l2_iff (g : ι → ℂ) : Memℓp g 2 ↔ ∑' i, ‖g i‖ₑ ^ 2 ≠ ∞ := by
   rw [memℓp_gen_iff (by norm_num : 0 < (2 : ℝ≥0∞).toReal)]
   have h : ∀ i, ‖g i‖ₑ ^ 2 = ((‖g i‖₊ ^ 2 : NNReal) : ℝ≥0∞) := fun i => by
     rw [ENNReal.coe_pow]; rfl
@@ -243,7 +243,7 @@ theorem memApprox_two_iff [CompleteSpace H] {s : ℝ} (hs : 0 < s) (f : H) :
         ENNReal.rpow_two]
     rw [hB'] at h2
     rw [← h2, ← lt_top_iff_ne_top, ENNReal.rpow_lt_top_iff_of_pos (by norm_num)]
-  rw [memApprox_iff_blockNorm_lt_top S hs one_le_two, hblk, memℓp_two_iff]
+  rw [memApprox_iff_blockNorm_lt_top S hs one_le_two, hblk, mem_l2_iff]
   simp_rw [S.enorm_weight_mul_sq]
   change B ≠ ∞ ↔ T ≠ ∞
   constructor

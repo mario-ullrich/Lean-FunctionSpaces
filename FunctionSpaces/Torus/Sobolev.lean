@@ -84,7 +84,7 @@ noncomputable def sobolevSpace (s : ℝ) (hs : 0 < s) :
 @[simp]
 theorem sobolevSpace_order (s : ℝ) (hs : 0 < s) : (sobolevSpace (d := d) s hs).order = s := rfl
 
-theorem sobolevSpace_ι (s : ℝ) (hs : 0 < s) (c : ℓ²(d → ℤ, ℂ)) :
+theorem sobolevSpace_iota (s : ℝ) (hs : 0 < s) (c : ℓ²(d → ℤ, ℂ)) :
     (sobolevSpace (d := d) s hs).ι c = (fourierScheme d).sobolevEmbed s hs.le c := rfl
 
 /-- **Membership in `H^s(𝕋^d)`** through the Fourier coefficients: `f ∈ L_2(𝕋^d)` lies in the
