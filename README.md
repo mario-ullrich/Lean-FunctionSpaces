@@ -96,6 +96,11 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   has a bounded continuous representative
   (`FunctionScheme.SobolevSpace.exists_boundedContinuous`). The limiting cases are not
   covered.
+* **The torus.** For a trigonometric polynomial `T` of degree `< n` on `𝕋^d`, `n ≥ 1`, and
+  `1 ≤ p < ∞`, `‖T‖_∞ ≤ (2⌈p/2⌉)^(d/p) n^(d/p) ‖T‖_p`
+  (`Torus.norm_le_rpow_mul_eLpNorm`). Hence the trigonometric polynomials have the
+  Nikolskii property of dimension `d` (`Torus.trigScheme_hasNikolskii`), and all the Besov
+  embeddings above hold on `𝕋^d` with `α = d (1/p - 1/r)`.
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -121,7 +126,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Interpolation `L_p`–`L_∞`, Nikolskii property, Besov embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Interpolation,Besov/Nikolskii,Besov/Embeddings}.lean` |
 | Jackson inequality, smoothness spaces, Sobolev embeddings | ✅ proved | ✗ | `ApproximationSpaces/Jackson.lean`, `FunctionSpaces/Sobolev/Embeddings.lean` |
 | Spectral schemes and `L_2` Sobolev spaces | ⬜ planned | ✗ | `FunctionSpaces/Spectral/…` |
-| The torus: Nikolskii inequality, `W^s_2(𝕋^d) ↪ C(𝕋^d)` | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |
+| The torus: trigonometric polynomials, Nikolskii inequality | ✅ proved | ✗ | `FunctionSpaces/Torus/{Measure,Scheme,Nikolskii}.lean` |
+| The torus: `L_2` Sobolev spaces, `W^s_2(𝕋^d) ↪ C(𝕋^d)` | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |
 | Haar wavelets | ⬜ planned | ✗ | `FunctionSpaces/Atoms/Haar.lean` |
 | Classical definitions by derivatives and differences, coincidence | ⬜ planned | ✗ | `FunctionSpaces/Classical/…` |
 

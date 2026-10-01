@@ -15,6 +15,9 @@ public import FunctionSpaces.Lp.Interpolation
 public import FunctionSpaces.Besov.Nikolskii
 public import FunctionSpaces.Besov.Embeddings
 public import FunctionSpaces.Sobolev.Embeddings
+public import FunctionSpaces.Torus.Measure
+public import FunctionSpaces.Torus.Scheme
+public import FunctionSpaces.Torus.Nikolskii
 
 /-!
 # Function spaces
@@ -40,4 +43,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   bounded continuous functions.
 * `FunctionSpaces.Sobolev.Embeddings`: Sobolev spaces as smoothness spaces for a scheme, the
   Sobolev embedding `W^s_p ↪ W^t_r` and the embedding into bounded continuous functions.
+* `FunctionSpaces.Torus.Measure`: Mathlib's normalised Haar measure on the torus as a scoped
+  instance, `open scoped TorusHaar`.
+* `FunctionSpaces.Torus.Scheme`: trigonometric polynomials of degree `< n` and their scheme
+  `Torus.trigScheme`.
+* `FunctionSpaces.Torus.Nikolskii`: the Nikolskii inequality for trigonometric polynomials by
+  the power trick, `Torus.trigScheme_hasNikolskii`.
 -/

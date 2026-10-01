@@ -190,4 +190,20 @@ theorem mem_map {T : X →ₗ[ℝ] Y} {n : ℕ} {y : Y} : y ∈ A.map T n ↔ �
 theorem mem_map_of_mem (T : X →ₗ[ℝ] Y) {n : ℕ} {a : X} (ha : a ∈ A n) : T a ∈ A.map T n :=
   ⟨a, ha, rfl⟩
 
+/-- A scheme made of an increasing sequence of **linear subspaces** starting with `{0}`.  The
+third axiom holds automatically, since `A m` and `A n` both lie in `A (m + n)`. -/
+def ofSubmodules (A : ℕ → Submodule ℝ X) (h0 : A 0 = ⊥) (hA : Monotone A) :
+    ApproximationScheme X where
+  sets n := A n
+  sets_zero := by rw [h0, Submodule.bot_coe]
+  mono _ _ h := hA h
+  smul_mem c _ _ ha := (A _).smul_mem c ha
+  add_subset m n := by
+    rintro _ ⟨a, ha, b, hb, rfl⟩
+    exact (A (m + n)).add_mem (hA (Nat.le_add_right m n) ha) (hA (Nat.le_add_left n m) hb)
+
+@[simp]
+theorem mem_ofSubmodules {A : ℕ → Submodule ℝ X} {h0 : A 0 = ⊥} {hA : Monotone A} {n : ℕ}
+    {x : X} : x ∈ ofSubmodules A h0 hA n ↔ x ∈ A n := Iff.rfl
+
 end ApproximationScheme
