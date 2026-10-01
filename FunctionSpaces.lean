@@ -14,6 +14,7 @@ public import FunctionSpaces.Besov.Trivial
 public import FunctionSpaces.Lp.Interpolation
 public import FunctionSpaces.Besov.Nikolskii
 public import FunctionSpaces.Besov.Embeddings
+public import FunctionSpaces.Sobolev.Embeddings
 
 /-!
 # Function spaces
@@ -37,4 +38,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   inequality `‖a‖_r ≲ n^(D(1/p-1/r)) ‖a‖_p` it implies.
 * `FunctionSpaces.Besov.Embeddings`: the Besov embeddings into `B^{s-α}_{r,q}`, `L_∞` and
   bounded continuous functions.
+* `FunctionSpaces.Sobolev.Embeddings`: Sobolev spaces as smoothness spaces for a scheme, the
+  Sobolev embedding `W^s_p ↪ W^t_r` and the embedding into bounded continuous functions.
 -/

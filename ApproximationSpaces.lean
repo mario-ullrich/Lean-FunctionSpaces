@@ -19,6 +19,7 @@ public import ApproximationSpaces.Embedding
 public import ApproximationSpaces.Transfer
 public import ApproximationSpaces.Lift
 public import ApproximationSpaces.Nikolskii
+public import ApproximationSpaces.Jackson
 
 /-!
 # Approximation spaces
@@ -56,4 +57,6 @@ Nothing in this library mentions functions or measures.
   gives `A^β_1 ↪ Y`.
 * `ApproximationSpaces.Nikolskii`: the Nikolskii transfer theorem
   `A^s_q(X) ↪ B^{s-α}_q(Y)`.
+* `ApproximationSpaces.Jackson`: Jackson's inequality, `ι(Y) ⊆ A^r_∞`, and smoothness spaces
+  `ApproximationScheme.SmoothnessSpace` with `A^r_1 ⊆ Y ⊆ A^r_∞`.
 -/

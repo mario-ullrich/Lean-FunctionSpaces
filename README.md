@@ -86,6 +86,16 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `FunctionScheme.exists_inclusion_eq_of_nikolskii`). If `μ` charges every nonempty open
   set and `s > D/p`, every `f ∈ B^s_{p,q}` has a bounded continuous representative
   (`FunctionScheme.MemBesov.exists_boundedContinuous`).
+* **Sobolev embeddings.** Call a Banach space `V` with an injective bounded map into `L_p(μ)`
+  a Sobolev space of order `s` for `S` if it satisfies Jackson's inequality
+  `E_n(f)_p ≤ C n^(-s) ‖f‖_V` and Bernstein's inequality (every `a ∈ S_n` lies in `V` with
+  `‖a‖_V ≤ C n^s ‖a‖_p`). For `S` with the Nikolskii property of dimension `D ≥ 0`, Sobolev
+  spaces `V` of order `s` in `L_p` and `V'` of order `t` in `L_r`, `p ≤ r` and
+  `t - D/r < s - D/p`, every element of `V` lies in `V'`
+  (`FunctionScheme.SobolevSpace.exists_eq_inclusion'`); for `s > D/p` every element of `V`
+  has a bounded continuous representative
+  (`FunctionScheme.SobolevSpace.exists_boundedContinuous`). The limiting cases are not
+  covered.
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -109,7 +119,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Atomic decompositions, projection schemes | ⬜ planned | ✗ | `ApproximationSpaces/{Decomposition,Projection}.lean` |
 | Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces, elementary embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Inclusion,Lp/BoundedContinuous,Scheme,Besov/Basic,Besov/Trivial}.lean` |
 | Interpolation `L_p`–`L_∞`, Nikolskii property, Besov embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Interpolation,Besov/Nikolskii,Besov/Embeddings}.lean` |
-| Smoothness spaces and Sobolev embeddings | ⬜ planned | ✗ | `FunctionSpaces/Smoothness/…` |
+| Jackson inequality, smoothness spaces, Sobolev embeddings | ✅ proved | ✗ | `ApproximationSpaces/Jackson.lean`, `FunctionSpaces/Sobolev/Embeddings.lean` |
 | Spectral schemes and `L_2` Sobolev spaces | ⬜ planned | ✗ | `FunctionSpaces/Spectral/…` |
 | The torus: Nikolskii inequality, `W^s_2(𝕋^d) ↪ C(𝕋^d)` | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |
 | Haar wavelets | ⬜ planned | ✗ | `FunctionSpaces/Atoms/Haar.lean` |
