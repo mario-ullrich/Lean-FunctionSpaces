@@ -48,6 +48,7 @@ public import FunctionSpaces.Interval.PiecewiseInverse
 public import FunctionSpaces.Interval.Periodic
 public import FunctionSpaces.Interval.PiecewisePeriodic
 public import FunctionSpaces.Interval.LocalProjection
+public import FunctionSpaces.Interval.BSpline
 
 /-!
 # Function spaces
@@ -139,4 +140,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Interval.LocalProjection`: the pairing `∫_0^1 P Q` and its dual basis, local
   projections onto polynomials, and the uniformly bounded projections onto piecewise
   polynomials in `L_p[0, 1]`.
+* `FunctionSpaces.Interval.BSpline`: cardinal B-splines, the B-spline basis of the polynomials on
+  a unit interval, and Marsden's identity.
 -/

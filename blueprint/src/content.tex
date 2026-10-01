@@ -3303,6 +3303,90 @@ characterisation applies. The last statement combines this with \Cref{thm:pp-bes
 The details $P_{k+1} f - P_k f$ are what multiwavelets of degree $< r$ expand at level $k$, and
 the local projections $P_j$ are those of discontinuous Galerkin methods.
 
+\section{Cardinal B-splines}
+
+\begin{definition}[Cardinal B-splines]
+\label{def:bspline}
+\lean{Interval.bsplineCoeff, Interval.bsplinePiece, Interval.bspline, Interval.bspline_eq_piece,
+  Interval.bspline_eq_zero_of_lt, Interval.bspline_eq_zero_of_ge}
+\leanok
+Let $r \geq 1$. For $0 \leq j \leq r$ let
+\[
+  B_j(x) = \frac{1}{(r-1)!} \sum_{l = 0}^{j} (-1)^l \binom{r}{l} (x - l)^{r-1} .
+\]
+The cardinal B-spline of order $r$ is $N_r(x) = B_j(x)$ for $x \in [j, j+1)$, $0 \leq j < r$, and
+$N_r(x) = 0$ for $x \notin [0, r)$.
+\end{definition}
+
+\begin{lemma}[The pieces of the B-spline]
+\label{lem:bspline-pieces}
+\lean{Interval.bsplinePiece_succ, Interval.pow_mem_degreeLT, Interval.natDegree_X_sub_C_le_one,
+  Interval.natDegree_X_add_C_le_one, Interval.bsplinePiece_mem, Interval.neg_one_pow_eq_of_le,
+  Interval.bsplinePiece_top}
+\leanok
+\uses{def:bspline, lem:iter-diff-poly}
+Every $B_j$ is a polynomial of degree $< r$, $B_{j+1} - B_j$ is a multiple of $(x - j - 1)^{r-1}$, and
+$B_r = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first two statements are immediate. $B_r(z)$ is $\pm 1/(r-1)!$ times the $r$-th difference
+of the polynomial $t \mapsto (z - t)^{r-1}$ of degree $< r$, which vanishes by
+\Cref{lem:iter-diff-poly}.
+\end{proof}
+
+So consecutive pieces of $N_r$, including the zero pieces outside $[0, r)$, agree to order $r - 2$
+at the knots: $N_r$ is a spline of order $r$.
+
+\begin{lemma}[B-splines on a unit interval]
+\label{lem:bspline-basis}
+\lean{Interval.bsplineLocal, Interval.bsplineLocal_eq, Interval.bsplineLocal_mem,
+  Interval.finiteDimensional_degreeLT, Interval.finrank_degreeLT,
+  Interval.linearIndependent_X_add_C_pow, Interval.shiftedPow, Interval.top_le_span_shiftedPow,
+  Interval.bsplineVec, Interval.bsplineVec_eq, Interval.top_le_span_bsplineVec,
+  Interval.bsplineBasis, Interval.bsplineBasis_apply}
+\leanok
+\uses{lem:bspline-pieces}
+The $r$ B-splines $N_r(\cdot + j)$, $0 \leq j < r$, restricted to $[0, 1)$ are the polynomials
+$\beta_j(x) = B_j(x + j)$, and these form a basis of the polynomials of degree $< r$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The shifted powers $(x + m)^{r-1}$, $0 \leq m < r$, are linearly independent: the coefficients
+of a vanishing combination $\sum_m g_m (x + m)^{r-1}$ give $\sum_m g_m m^e = 0$ for $e < r$, a
+Vandermonde system. They form a basis, since there are $r$ of them. In this basis
+$\beta_j = \frac{1}{(r-1)!} (x + j)^{r-1} + \sum_{m < j} (\ldots) (x + m)^{r-1}$ is triangular,
+so the $\beta_j$ span as well.
+\end{proof}
+
+\begin{theorem}[Marsden's identity]
+\label{thm:marsden}
+\lean{Interval.sum_range_eq_add_last, Interval.sum_range_eq_first_add, Interval.bcoord,
+  Interval.sum_bcoord, Interval.bcoord_eq_of_sum, Interval.bsplineLocal_comp_add_one,
+  Interval.bsplineLocal_zero, Interval.bsplineLocal_top, Interval.bcoord_comp_add_one,
+  Interval.comp_X_add_C_mem, Interval.bsplineCoef, Interval.bcoord_comp_eq_bsplineCoef,
+  Interval.bspline_sub_eq, Interval.polyFun_eq_sum_bsplineCoef}
+\leanok
+\uses{lem:bspline-basis}
+Let $r \geq 1$. For every polynomial $P$ of degree $< r$ there are coefficients
+$c_n(P) \in \C$, $n \in \Z$, such that for all $i \in \Z$ and $x \in [i, i+1)$
+\[
+  P(x) = \sum_{j < r} c_{i - j}(P) \, N_r(x - (i - j)) ,
+\]
+that is, $P = \sum_{n \in \Z} c_n(P) N_r(\cdot - n)$ on $\R$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+On $[i, i+1)$ expand $P(\cdot + i)$ in the basis of \Cref{lem:bspline-basis}; let $c_i(P)$ be the
+coordinate of $\beta_0$ there. Since $\beta_j(x + 1) = \beta_{j+1}(x) - c\, x^{r-1}$ with
+$\beta_r = 0$ and $x^{r-1} = (r-1)! \beta_0$, the coordinate $j + 1$ of $P(\cdot + i + 1)$ is the
+coordinate $j$ of $P(\cdot + i)$. By induction the coordinate $j$ on $[i, i+1)$ is
+$c_{i-j}(P)$, and $\beta_j(x - i) = N_r(x - (i - j))$ there.
+\end{proof}
+
 \bpbibheading
 \begin{thebibliography}{99}
 
