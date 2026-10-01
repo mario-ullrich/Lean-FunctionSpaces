@@ -28,6 +28,7 @@ public import FunctionSpaces.Classical.Translation
 public import FunctionSpaces.Classical.Modulus
 public import FunctionSpaces.Classical.BesovModuli
 public import FunctionSpaces.Classical.SobolevDeriv
+public import FunctionSpaces.Traces.Examples.Torus
 
 /-!
 # Function spaces
@@ -79,4 +80,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   the coincidence theorem with `B^s_{2,q}(𝕋^d)` for `0 < s < 1`.
 * `FunctionSpaces.Classical.SobolevDeriv`: weak derivatives on the torus through Fourier
   coefficients and `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)`.
+* `FunctionSpaces.Traces.Examples.Torus`: the trace on the face `{x_0 = 0}` of `𝕋^(n+1)`,
+  `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)`, bounded and onto.
 -/

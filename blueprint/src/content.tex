@@ -1763,6 +1763,111 @@ and $\Besov{s}{2}{2}(\T^d) = H^s(\T^d)$.
 $k = 0$.
 \end{proof}
 
+\section{Traces on the torus}
+
+The trace of a function on $\T^{n+1}$ is its restriction to the face $\{x_0 = 0\} \cong \T^n$,
+$f \mapsto f(0, \cdot)$. It is defined on continuous functions and not on $L_p$; the abstract
+trace theorems of \Cref{ch:traces-abstract} extend it to Besov spaces.
+
+\begin{definition}[Restriction to the face]
+\label{def:face-restriction}
+\lean{Torus.face, Torus.restrictFace, Torus.compLinear, Torus.lineThrough,
+  Torus.restrictFace_trigMonomial, Torus.restrictFace_mem_trigPoly,
+  Torus.compLinear_lineThrough_mem_trigPoly}
+\leanok
+\uses{def:trig-poly}
+For a bounded continuous $a$ on $\T^{n+1}$, its restriction to the face is
+$a(0, \cdot) : x' \mapsto a(0, x')$ on $\T^n$. It maps $\mathcal{T}_m$ on $\T^{n+1}$ into
+$\mathcal{T}_m$ on $\T^n$, since $e_k(0, x') = e_{(k_1, \dots, k_n)}(x')$; so does the
+restriction to every line $t \mapsto a(t, x')$, onto $\mathcal{T}_m$ on $\T^1$.
+\end{definition}
+
+\begin{lemma}[Fubini on $\T^{n+1} = \T \times \T^n$]
+\label{lem:fubini-cons}
+\lean{Torus.lintegral_eq_lintegral_cons}
+\leanok
+For every measurable $F : \T^{n+1} \to [0, \infty]$,
+$\int_{\T^{n+1}} F = \int_{\T^n} \int_{\T} F(t, x') \, dt \, dx'$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The map $(t, x') \mapsto (t, x')$ is measure preserving from the product measure, and Tonelli's
+theorem applies.
+\end{proof}
+
+\begin{theorem}[Trace inequality on the torus]
+\label{thm:trace-inequality-torus}
+\lean{Torus.eLpNorm_restrictFace_le, Torus.enorm_rpow_le_lintegral}
+\leanok
+\uses{def:face-restriction, lem:fubini-cons, thm:torus-nikolskii}
+For all $m \in \N$, $a \in \mathcal{T}_m$ on $\T^{n+1}$ and $1 \leq p < \infty$,
+\[
+  \|a(0, \cdot)\|_{L_p(\T^n)} \leq \bigl(2 \lceil p/2 \rceil m\bigr)^{1/p} \,
+  \|a\|_{L_p(\T^{n+1})} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+For fixed $x'$ the line $t \mapsto a(t, x')$ is a trigonometric polynomial of degree $< m$ in
+one variable, so \Cref{thm:torus-nikolskii} with $d = 1$ gives
+$|a(0, x')|^p \leq 2 \lceil p/2 \rceil m \int_\T |a(t, x')|^p \, dt$. Integrate over $x'$ and
+apply \Cref{lem:fubini-cons}.
+\end{proof}
+
+The opposite direction needs a polynomial in $x_0$ that equals $1$ at $0$ and is small in
+$L_p$. The normalised Fejér kernel serves, and Parseval's identity replaces the usual pointwise
+kernel estimates.
+
+\begin{lemma}[Extension by the Fejér kernel]
+\label{lem:fejer-extension}
+\lean{Torus.dirichletSum, Torus.fejerFace, Torus.extendFace, Torus.tailMap,
+  Torus.fejerFace_cons_zero, Torus.enorm_fejerFace_le, Torus.lintegral_enorm_fejerFace,
+  Torus.lintegral_enorm_dirichletSum_sq, Torus.extendFace_mem_trigPoly,
+  Torus.restrictFace_extendFace, Torus.eLpNorm_extendFace_le}
+\leanok
+\uses{def:face-restriction, lem:fubini-cons, lem:trig-products}
+Let $m \geq 1$ and $\varphi_m(x) = m^{-2} \bigl|\sum_{j<m} e^{2\pi i j x_0}\bigr|^2$ on
+$\T^{n+1}$. For every $b \in \mathcal{T}_m$ on $\T^n$, the function
+$E b : x \mapsto \varphi_m(x) \, b(x_1, \dots, x_n)$ lies in $\mathcal{T}_{3m}$, satisfies
+$(E b)(0, \cdot) = b$, and for every $1 \leq p < \infty$,
+\[
+  \|E b\|_{L_p(\T^{n+1})} \leq m^{-1/p} \, \|b\|_{L_p(\T^n)} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Dirichlet sum has degree $< m$ and modulus at most $m$, so $\varphi_m$ has degree $< 2m$,
+$0 \leq \varphi_m \leq 1$ and $\varphi_m(0, \cdot) = 1$. By Parseval,
+$\int \varphi_m = m^{-2} \cdot m = 1/m$, hence $\int \varphi_m^p \leq \int \varphi_m = 1/m$,
+and \Cref{lem:fubini-cons} gives $\int |E b|^p = \int \varphi_m^p \cdot \int |b|^p$.
+\end{proof}
+
+\begin{theorem}[Traces of Besov spaces on the torus]
+\label{thm:trace-torus}
+\lean{Torus.traceBound, Torus.traceOnApprox, Torus.traceBound_ext_toLp,
+  Torus.traceBound_rightInverse, Torus.trace_besov}
+\leanok
+\uses{thm:trace-inequality-torus, lem:fejer-extension, thm:trace-transfer,
+  thm:trace-surjective}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $s > 0$. The restriction to the face
+extends from trigonometric polynomials to a map $\operatorname{Tr}$ from
+$\Besov{s+1/p}{p}{q}(\T^{n+1})$ into $\Besov{s}{p}{q}(\T^n)$, and every
+$g \in \Besov{s}{p}{q}(\T^n)$ is $\operatorname{Tr} f$ for some
+$f \in \Besov{s+1/p}{p}{q}(\T^{n+1})$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:trace-inequality-torus} the restriction is a trace bound of exponent $1/p$ from
+the trigonometric scheme of $\T^{n+1}$ to that of $\T^n$ in $L_p$, and by
+\Cref{lem:fejer-extension} with $m = 2^k$ it has a right inverse bound with $\gamma = 2$ and
+$C' = 1$. Apply \Cref{thm:trace-transfer} with $s + 1/p$ in place of $s$, and
+\Cref{thm:trace-surjective}.
+\end{proof}
+
 \chapter{Filtrations and martingale differences}
 \label{ch:filtrations}
 
