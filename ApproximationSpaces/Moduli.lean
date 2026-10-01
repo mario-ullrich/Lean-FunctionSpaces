@@ -14,7 +14,7 @@ public import ApproximationSpaces.Sequences.Hardy
 Classical function spaces are defined by a **modulus of smoothness** `ω(f, 2^(-k))`, approximation
 spaces by the errors `E_{2^k}(f)`.  They coincide when the scheme and the modulus are linked by
 
-* a **Jackson inequality** `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for `k ≥ 1`, and
+* a **Jackson inequality** `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for `k ≥ k₀`, and
 * an **inverse inequality** of order `θ`: `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`
   (with `k - j` truncated at `0`, so for `k < j` this is a bound by `‖a‖`).
 
@@ -22,7 +22,9 @@ A `ModulusData A θ` bundles the modulus (sampled at dyadic scales, `modulus f k
 subadditivity and bound `ω(f) ≤ C₀ ‖f‖`, and the two inequalities.  With the classical
 quasi-norm `‖f‖ + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q}` (`ModulusData.modNorm`):
 
-* `‖f‖_{A^s_q} ≤ (2 + C_J) ‖f‖^ω_{s,q}` for all `s ≥ 0` (`ModulusData.approxNormDyadic_le_modNorm`);
+* `‖f‖_{A^s_q} ≤ (1 + ∑_{k<k₀} 2^(ks) + C_J) ‖f‖^ω_{s,q}` for all `s ≥ 0`
+  (`ModulusData.approxNormDyadic_le_modNorm`): the finitely many levels `k < k₀` are bounded by
+  `E_{2^k}(f) ≤ ‖f‖`, so Jackson is needed only from `k₀` on;
 * `‖f‖^ω_{s,q} ≤ K ‖f‖_{A^s_q}` for `0 ≤ s < θ` (`ModulusData.modNorm_le_approxNormDyadic`),
   by writing `f` as `(f - a_k) + a_0 + ∑_{j<k} (a_{j+1} - a_j)` with near-best approximants and
   applying the inverse inequality to each block and Hardy's inequality to the sum.
@@ -46,7 +48,7 @@ variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 
 /-- A **modulus of smoothness compatible with the scheme `A`**, with inverse order `θ`: the
 modulus at the dyadic scales `modulus f k = ω(f, 2^(-k))`, subadditive and bounded by `C₀ ‖f‖`, with a
-Jackson inequality `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for `k ≥ 1` and an inverse inequality
+Jackson inequality `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for `k ≥ k₀` and an inverse inequality
 `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. -/
 structure ModulusData (A : ApproximationScheme X) (θ : ℝ) where
   /-- The modulus at the dyadic scales. -/
@@ -56,10 +58,12 @@ structure ModulusData (A : ApproximationScheme X) (θ : ℝ) where
   C0 : ℝ≥0∞
   C0_ne_top : C0 ≠ ∞
   le_enorm : ∀ f k, modulus f k ≤ C0 * ‖f‖ₑ
+  /-- The level `k₀` from which on the Jackson inequality holds. -/
+  jacksonStart : ℕ
   /-- The Jackson constant. -/
   CJ : ℝ≥0∞
   CJ_ne_top : CJ ≠ ∞
-  jackson : ∀ f k, 1 ≤ k → A.approxSeq f (2 ^ k) ≤ CJ * modulus f k
+  jackson : ∀ f k, jacksonStart ≤ k → A.approxSeq f (2 ^ k) ≤ CJ * modulus f k
   /-- The constant of the inverse inequality. -/
   CB : ℝ≥0∞
   CB_ne_top : CB ≠ ∞
@@ -87,30 +91,49 @@ theorem modulus_sum_le {ι : Type*} (t : Finset ι) (g : ι → X) (k : ℕ) :
     rw [Finset.sum_insert hi, Finset.sum_insert hi]
     exact (M.add_le _ _ k).trans (add_le_add le_rfl ih)
 
-/-- **Jackson's direction**: `‖f‖_{A^s_q} ≤ (2 + C_J) ‖f‖^ω_{s,q}`. -/
+/-- The constant of Jackson's direction, `1 + ∑_{k<k₀} 2^(ks) + C_J`. -/
+noncomputable def directConst (s : ℝ) : ℝ≥0∞ :=
+  1 + ∑ k ∈ range M.jacksonStart, dyadicWeight s k + M.CJ
+
+/-- The constant of Jackson's direction is finite. -/
+theorem directConst_ne_top (s : ℝ) : M.directConst s ≠ ∞ :=
+  ENNReal.add_ne_top.2 ⟨ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
+    ENNReal.sum_ne_top.2 fun k _ => ENNReal.dyadicWeight_ne_top s k⟩, M.CJ_ne_top⟩
+
+/-- **Jackson's direction**: `‖f‖_{A^s_q} ≤ (1 + ∑_{k<k₀} 2^(ks) + C_J) ‖f‖^ω_{s,q}`. -/
 theorem approxNormDyadic_le_modNorm (hq : 1 ≤ q) (f : X) :
-    A.approxNormDyadic s q f ≤ (2 + M.CJ) * M.modNorm s q f := by
+    A.approxNormDyadic s q f ≤ M.directConst s * M.modNorm s q f := by
   set L := lqNorm q (fun k => dyadicWeight s k * M.modulus f k)
-  have hshift : lqNorm q (fun k => A.approxSeqDyadic s f (k + 1)) ≤ M.CJ * L := by
-    rw [← ENNReal.lqNorm_const_mul]
-    refine (ENNReal.lqNorm_mono fun k => ?_).trans (ENNReal.lqNorm_shift_le _)
-    rw [approxSeqDyadic, mul_left_comm]
-    gcongr
-    exact M.jackson f (k + 1) (Nat.succ_pos k)
+  set W := ∑ k ∈ range M.jacksonStart, dyadicWeight s k
+  -- the levels below `k₀` and from `k₀` on
+  have hpt : ∀ k, A.approxSeqDyadic s f k ≤
+      (if k < M.jacksonStart then dyadicWeight s k * ‖f‖ₑ else 0) +
+        M.CJ * (dyadicWeight s k * M.modulus f k) := fun k => by
+    rw [approxSeqDyadic]
+    split_ifs with hk
+    · exact le_add_right (by gcongr; exact approxSeq_le_enorm f _)
+    · rw [zero_add, mul_left_comm]
+      gcongr
+      exact M.jackson f k (not_lt.1 hk)
+  have hlow : lqNorm q (fun k => if k < M.jacksonStart then dyadicWeight s k * ‖f‖ₑ else 0) ≤
+      W * ‖f‖ₑ := by
+    refine (ENNReal.lqNorm_le_lqNorm_of_le le_rfl hq _).trans_eq ?_
+    rw [ENNReal.lqNorm_one, tsum_eq_sum (s := range M.jacksonStart) fun k hk => by
+      rw [mem_range] at hk; simp only [hk, ↓reduceIte], Finset.sum_mul]
+    exact Finset.sum_congr rfl fun k hk => by rw [mem_range] at hk; simp only [hk, ↓reduceIte]
   calc A.approxNormDyadic s q f = ‖f‖ₑ + lqNorm q (A.approxSeqDyadic s f) := rfl
-    _ ≤ ‖f‖ₑ + (A.approxSeqDyadic s f 0 + lqNorm q fun k => A.approxSeqDyadic s f (k + 1)) := by
-        gcongr; exact ENNReal.lqNorm_le_head_add_shift hq _
-    _ ≤ ‖f‖ₑ + (‖f‖ₑ + M.CJ * L) := by
+    _ ≤ ‖f‖ₑ + (W * ‖f‖ₑ + M.CJ * L) := by
         gcongr
-        rw [approxSeqDyadic_zero]
-        exact approxSeq_le_enorm f 1
-    _ ≤ (2 + M.CJ) * (‖f‖ₑ + L) := by
-        calc ‖f‖ₑ + (‖f‖ₑ + M.CJ * L) = 2 * ‖f‖ₑ + M.CJ * L := by ring
-          _ ≤ (2 * ‖f‖ₑ + M.CJ * ‖f‖ₑ) + (2 * L + M.CJ * L) := by
+        refine (ENNReal.lqNorm_mono hpt).trans ((ENNReal.lqNorm_add_le hq _ _).trans ?_)
+        rw [ENNReal.lqNorm_const_mul]
+        gcongr
+    _ ≤ (1 + W + M.CJ) * (‖f‖ₑ + L) := by
+        calc ‖f‖ₑ + (W * ‖f‖ₑ + M.CJ * L) = (1 + W) * ‖f‖ₑ + M.CJ * L := by ring
+          _ ≤ ((1 + W) * ‖f‖ₑ + M.CJ * ‖f‖ₑ) + ((1 + W) * L + M.CJ * L) := by
               gcongr
               · exact le_self_add
               · exact le_add_self
-          _ = (2 + M.CJ) * (‖f‖ₑ + L) := by ring
+          _ = (1 + W + M.CJ) * (‖f‖ₑ + L) := by ring
 
 /-- `2^(-(n-2)θ) ≤ 2^(2θ) 2^(-nθ)` for truncated subtraction and `θ ≥ 0`. -/
 theorem dyadicWeight_neg_sub_two_le {θ : ℝ} (hθ : 0 ≤ θ) (n : ℕ) :
@@ -276,7 +299,7 @@ theorem memApprox_iff_modNorm_lt_top (hq : 1 ≤ q) (hs : 0 ≤ s) (hsθ : s < �
       (ENNReal.mul_lt_top (M.inverseConst_ne_top hsθ).lt_top h)
   · intro h
     exact (M.approxNormDyadic_le_modNorm hq f).trans_lt
-      (ENNReal.mul_lt_top (ENNReal.add_lt_top.2 ⟨by norm_num, M.CJ_ne_top.lt_top⟩) h)
+      (ENNReal.mul_lt_top (M.directConst_ne_top s).lt_top h)
 
 end ModulusData
 

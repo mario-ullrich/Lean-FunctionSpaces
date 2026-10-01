@@ -181,6 +181,7 @@ noncomputable def ppPerModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
   C0 := 2 ^ r
   C0_ne_top := by simp
   le_enorm := lpPerModulus_le hp r
+  jacksonStart := 1
   CJ := 2 * jacksonConst r
   CJ_ne_top := ENNReal.mul_ne_top (by norm_num) (jacksonConst_ne_top r)
   jackson f _ hk := approxSeq_ppScheme_le_per hr hp f hk

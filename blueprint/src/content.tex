@@ -1256,13 +1256,13 @@ piecewise polynomials, splines and wavelets.
 \uses{def:scheme, def:error}
 Let $\theta \in \R$. A \emph{modulus compatible with $A$ of inverse order $\theta$} is a family
 $\omega(f, k) \in [0, \infty]$, $f \in X$, $k \in \N$ (the modulus of smoothness at the scale
-$2^{-k}$), together with constants $C_0, C_J, C_B < \infty$ such that for all $f, g \in X$ and
-$j, k \in \N$
+$2^{-k}$), together with a level $k_0 \in \N$ and constants $C_0, C_J, C_B < \infty$ such that for
+all $f, g \in X$ and $j, k \in \N$
 \[
   \omega(f + g, k) \leq \omega(f, k) + \omega(g, k), \qquad \omega(f, k) \leq C_0 \|f\|,
 \]
 \[
-  E_{2^k}(f) \leq C_J \, \omega(f, k) \quad (k \geq 1), \qquad
+  E_{2^k}(f) \leq C_J \, \omega(f, k) \quad (k \geq k_0), \qquad
   \omega(a, k) \leq C_B \, 2^{-(k - j)_+ \theta} \|a\| \quad (a \in A_{2^j}) .
 \]
 The \emph{classical quasi-norm} is
@@ -1271,7 +1271,9 @@ $\|f\|^{\omega}_{s,q} = \|f\| + \|(2^{ks} \omega(f, k))_k\|_{\ell_q}$.
 
 \begin{theorem}[Coincidence of approximation and moduli]
 \label{thm:modulus-coincidence}
-\lean{ApproximationScheme.ModulusData.approxNormDyadic_le_modNorm,
+\lean{ApproximationScheme.ModulusData.directConst,
+  ApproximationScheme.ModulusData.directConst_ne_top,
+  ApproximationScheme.ModulusData.approxNormDyadic_le_modNorm,
   ApproximationScheme.ModulusData.dyadicWeight_neg_sub_two_le,
   ApproximationScheme.ModulusData.inverseConst,
   ApproximationScheme.ModulusData.inverseConst_ne_top,
@@ -1281,7 +1283,8 @@ $\|f\|^{\omega}_{s,q} = \|f\| + \|(2^{ks} \omega(f, k))_k\|_{\ell_q}$.
 \uses{def:modulus-data, def:dyadic-norm, lem:hardy}
 Let $\omega$ be a modulus compatible with $A$ of inverse order $\theta$ and $1 \leq q \leq
 \infty$. Then for every $f \in X$ and $s \geq 0$,
-$\|f\|^{\mathrm{dy}}_{A^s_q} \leq (2 + C_J) \|f\|^{\omega}_{s,q}$, and for $0 \leq s < \theta$,
+$\|f\|^{\mathrm{dy}}_{A^s_q} \leq (1 + \sum_{k < k_0} 2^{ks} + C_J) \|f\|^{\omega}_{s,q}$, and
+for $0 \leq s < \theta$,
 \[
   \|f\|^{\omega}_{s,q} \leq \bigl(1 + 3 C_0 + C_B (3 + 6 \cdot 4^{\theta})
   (1 - 2^{-(\theta - s)})^{-1}\bigr) \|f\|^{\mathrm{dy}}_{A^s_q} .
@@ -1291,7 +1294,8 @@ In particular $f \in A^s_q$ if and only if $\|f\|^{\omega}_{s,q} < \infty$, for 
 
 \begin{proof}
 \leanok
-The first bound is Jackson's inequality for $k \geq 1$ and $E_1(f) \leq \|f\|$. For the second,
+The first bound is Jackson's inequality for $k \geq k_0$ and $E_{2^k}(f) \leq \|f\|$ for
+$k < k_0$. For the second,
 let $a_k \in A_{2^k}$ be near-best approximants and write
 $f = (f - a_k) + a_0 + \sum_{j < k} (a_{j+1} - a_j)$, where $a_{j+1} - a_j \in A_{2^{j+2}}$. Then
 \[
