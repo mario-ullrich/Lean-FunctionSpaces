@@ -111,6 +111,12 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `A_{2^j}` expands stably in atoms of level `j`, then conversely every `f ∈ A^s_q` has such a
   decomposition, and `A^s_q` is the space of atomic sums with coefficients in `b^s_{p,q}`
   (`ApproximationScheme.AtomicSystem.memApprox_iff_exists_atomic`).
+* **Lipschitz atoms on the torus.** Call `a` a Lipschitz atom of level `j` at the grid point
+  `2^(-j) m` of `𝕋^d` if `|a| ≤ 1`, `|a(x) - a(y)| ≤ 2^j ‖x - y‖` and `a = 0` outside the ball
+  of radius `D 2^(-j)` around `2^(-j) m`. For `0 < s < 1` and `1 ≤ q ≤ ∞`, every sum
+  `f = ∑_j ∑_m λ_{j,m} a_{j,m}` of such atoms, converging in `L_2(𝕋^d)`, with
+  `‖(2^(j(s-d/2)) ‖λ_{j,·}‖_{ℓ_2})_j‖_{ℓ_q} < ∞` lies in `B^s_{2,q}(𝕋^d)`
+  (`Torus.memBesov_of_lipAtoms`).
 * **The trace theorem.** Let `T` be linear with `T(A_n) ⊆ B_n` and `‖T a‖ ≤ C n^β ‖a‖` for
   `a ∈ A_n`, `n ≥ 1`, as for the restriction of functions to a hyperplane. Then `T` extends to
   `A^β_1`, and for `0 ≤ β < s` it maps `A^s_q` into `B^{s-β}_q` with
@@ -213,6 +219,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Haar coefficients of the dyadic filtration on `[0, 1)` | ⬜ planned | ✗ | `FunctionSpaces/Wavelets/Examples/…` |
 | Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ proved | ✗ | `FunctionSpaces/Classical/{Translation,Modulus,BesovModuli}.lean` |
 | Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ proved | ✗ | `FunctionSpaces/Traces/Examples/Torus.lean` |
+| Lipschitz atoms on the torus, synthesis into `B^s_{2,q}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Atoms/Examples/Torus.lean` |
 | Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Classical/SobolevDeriv.lean` |
 | Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Classical/…` |
 
@@ -226,11 +233,12 @@ file resets its rows to ✗.
 Two libraries. `ApproximationSpaces` holds the abstract theory: approximation schemes in a
 real normed space, the approximation spaces and their embeddings, lifting and the Nikolskii
 transfer theorem, the K-functional and the representation theorem, block and atomic
-decompositions, projection schemes, traces and intrinsic norms. Nothing in it mentions functions or measures. `FunctionSpaces` holds the
-Besov and Sobolev spaces built on it: schemes of bounded continuous functions on a finite
-measure space and their embedding theorems, spectral schemes in Hilbert spaces, the torus,
-filtration schemes for wavelets, and the classical definitions through moduli of smoothness and weak
-derivatives. [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
+decompositions, projection schemes, traces and intrinsic norms. Nothing in it mentions
+functions or measures. `FunctionSpaces` holds the Besov and Sobolev spaces built on it:
+schemes of bounded continuous functions on a finite measure space and their embedding
+theorems, spectral schemes in Hilbert spaces, the torus with its traces and Lipschitz atoms,
+filtration schemes for wavelets, and the classical definitions through moduli of smoothness
+and weak derivatives. [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 `blueprint/` holds the LaTeX source of the blueprint and the scripts that check and link its
 `\lean` references.
 

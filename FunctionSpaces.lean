@@ -29,6 +29,7 @@ public import FunctionSpaces.Classical.Modulus
 public import FunctionSpaces.Classical.BesovModuli
 public import FunctionSpaces.Classical.SobolevDeriv
 public import FunctionSpaces.Traces.Examples.Torus
+public import FunctionSpaces.Atoms.Examples.Torus
 
 /-!
 # Function spaces
@@ -82,4 +83,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   coefficients and `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)`.
 * `FunctionSpaces.Traces.Examples.Torus`: the trace on the face `{x_0 = 0}` of `𝕋^(n+1)`,
   `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)`, bounded and onto.
+* `FunctionSpaces.Atoms.Examples.Torus`: Lipschitz atoms on `𝕋^d` as an atomic system for the
+  trigonometric scheme in `L_2`, and synthesis `b^s_{2,q} → B^s_{2,q}(𝕋^d)` for `0 < s < 1`.
 -/

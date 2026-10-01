@@ -126,7 +126,8 @@ theorem compLinear_lineThrough_mem_trigPoly (x' : UnitAddTorus (Fin n)) {m : ℕ
 /-- **Fubini on `𝕋^(n+1) = 𝕋 × 𝕋^n`**, with the first factor written as `𝕋^1`:
 `∫ F = ∫_{x'} ∫_v F(v_0, x')`. -/
 theorem lintegral_eq_lintegral_cons {F : UnitAddTorus (Fin (n + 1)) → ℝ≥0∞} (hF : Measurable F) :
-    ∫⁻ x, F x = ∫⁻ x' : UnitAddTorus (Fin n), ∫⁻ v : UnitAddTorus (Fin 1), F (Fin.cons (v 0) x') := by
+    ∫⁻ x, F x =
+      ∫⁻ x' : UnitAddTorus (Fin n), ∫⁻ v : UnitAddTorus (Fin 1), F (Fin.cons (v 0) x') := by
   set e := MeasurableEquiv.piFinSuccAbove (fun _ : Fin (n + 1) => UnitAddCircle) 0
   have he : MeasurePreserving e := volume_preserving_piFinSuccAbove (fun _ => UnitAddCircle) 0
   have he' : ∀ y : UnitAddCircle × UnitAddTorus (Fin n), e.symm y = Fin.cons y.1 y.2 := fun y => by
@@ -305,7 +306,8 @@ theorem lintegral_enorm_dirichletSum_sq (m : ℕ) :
   have hfin : eLpNorm (dirichletSum n m) 2 volume ≠ ∞ :=
     (((dirichletSum n m).memLp_top (μ := volume)).mono_exponent le_top).eLpNorm_ne_top
   rw [BoundedContinuousFunction.norm_toLp_eq_toReal_eLpNorm] at h2
-  have he : eLpNorm (dirichletSum n m) 2 volume ^ (2 : ℝ) = ∫⁻ x, ‖dirichletSum n m x‖ₑ ^ (2 : ℝ) := by
+  have he : eLpNorm (dirichletSum n m) 2 volume ^ (2 : ℝ) =
+      ∫⁻ x, ‖dirichletSum n m x‖ₑ ^ (2 : ℝ) := by
     rw [eLpNorm_eq_lintegral_rpow_enorm_toReal (by norm_num) (by norm_num)
       (dirichletSum n m).continuous.aestronglyMeasurable]
     simp only [ENNReal.toReal_ofNat, one_div]
@@ -505,7 +507,8 @@ noncomputable def traceBound (n : ℕ) (hp : p ≠ ∞) :
 theorem traceBound_T_toLp (hp : p ≠ ∞) {m : ℕ} {a : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ}
     (ha : a ∈ trigPoly (Fin (n + 1)) m) :
     (traceBound p n hp).T (toLpR p (Fin (n + 1)) a) = toLpR p (Fin n) (restrictFace n a) := by
-  have hmem : toLpR p (Fin (n + 1)) a ∈ ((trigScheme (Fin (n + 1))).toLp volume p).iUnionSubmodule :=
+  have hmem : toLpR p (Fin (n + 1)) a ∈
+      ((trigScheme (Fin (n + 1))).toLp volume p).iUnionSubmodule :=
     ApproximationScheme.mem_iUnionSubmodule (FunctionScheme.toLp_mem_toLp (n := m) ha)
   unfold traceBound
   exact (ApproximationScheme.TraceBound.ofSubmodule_T _ _ _ _ _ ⟨_, hmem⟩).trans

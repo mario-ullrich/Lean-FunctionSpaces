@@ -49,6 +49,13 @@ theorem isLinear_ofSubmodules (V : ℕ → Submodule ℝ X) (h0 : V 0 = ⊥) (hV
   rw [mem_ofSubmodules] at ha hb ⊢
   exact (V n).add_mem ha hb
 
+/-- The image of a linear scheme under a linear map is linear. -/
+theorem IsLinear.map {Y : Type*} [NormedAddCommGroup Y] [NormedSpace ℝ Y] (hA : A.IsLinear)
+    (T : X →ₗ[ℝ] Y) : (A.map T).IsLinear := fun n a ha b hb => by
+  obtain ⟨a', ha', rfl⟩ := A.mem_map.1 ha
+  obtain ⟨b', hb', rfl⟩ := A.mem_map.1 hb
+  exact A.mem_map.2 ⟨a' + b', hA n a' ha' b' hb', map_add T a' b'⟩
+
 /-- For a linear scheme the error is subadditive at a fixed complexity:
 `E_n(f + g) ≤ E_n(f) + E_n(g)`. -/
 theorem approxError_add_le_of_isLinear (hA : A.IsLinear) (n : ℕ) (f g : X) :

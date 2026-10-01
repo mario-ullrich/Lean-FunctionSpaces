@@ -2156,6 +2156,131 @@ $((2\pi i k)^\alpha \hat f(k))_k$ is square-summable for $|\alpha| \leq m$, and
 That the weak derivative of a smooth function is its classical derivative is integration
 by parts on the torus; it is not formalised.
 
+\section{Lipschitz atoms}
+\label{sec:lip-atoms}
+
+The atoms of Schneider and Vyb\'{\i}ral~\cite{SchneiderVybiral} need no smoothness beyond a
+Lipschitz bound. On $L_2(\T^d)$ they form an atomic system in the sense of
+\Cref{def:atomic-system} for the trigonometric scheme, with $\delta = \#d/2$ and $\sigma = 1$.
+The positions of level $j$ are the points of $\{0, \dots, 2^j - 1\}^d$.
+
+\begin{definition}[Lipschitz atoms]
+\label{def:lip-atom}
+\lean{Torus.gridPoint, Torus.IsLipAtom, Torus.isLipAtom_zero}
+\leanok
+\uses{def:trig-poly}
+Let $D, j \in \N$ and $m \in \{0, \dots, 2^j - 1\}^d$. The grid point of level $j$ at $m$ is
+$2^{-j} m \in \T^d$. A \emph{Lipschitz atom} of level $j$ at $m$ with support radius $D$ is a
+bounded continuous function $a : \T^d \to \C$ with $|a(x)| \leq 1$ and
+$|a(x) - a(y)| \leq 2^j \|x - y\|$ for all $x, y \in \T^d$, and $a(x) = 0$ whenever
+$\|x - 2^{-j} m\| > D \, 2^{-j}$.
+\end{definition}
+
+The balls of the norm of $\T^d$ are cubes; Schneider and Vyb\'{\i}ral use dilated dyadic cubes
+of $\R^d$, which amounts to the same up to the choice of $D$.
+
+\begin{lemma}[Bounded overlap]
+\label{lem:grid-overlap}
+\lean{Torus.card_filter_norm_sub_le, Torus.card_filter_norm_sub_gridPoint_le,
+  Torus.volume_closedBall_circle_le, Torus.volume_closedBall_le,
+  Torus.volume_closedBall_gridPoint_le}
+\leanok
+\uses{def:lip-atom}
+Let $j, R \in \N$ and $x \in \T^d$. At most $(2R + 1)^{\#d}$ positions
+$m \in \{0, \dots, 2^j - 1\}^d$ satisfy $\|x - 2^{-j} m\| \leq R \, 2^{-j}$. For every
+$\rho \geq 0$, every ball of radius $\rho$ in $\T^d$ has measure at most $(2\rho)^{\#d}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both statements reduce to one coordinate. Let $N = 2^j$ and let $y \in \R$ represent $x_i$. Every
+$l$ with $\dist(y - l/N, \Z) \leq R/N$ is congruent modulo $N$ to an integer in
+$[Ny - R, Ny + R]$, and distinct $l < N$ give distinct integers; an interval of length $2R$
+contains at most $2R + 1$ integers. A ball of radius $\rho$ in $\T$ is an arc of length at most
+$2\rho$, and a ball in $\T^d$ is the product of balls in the coordinates.
+\end{proof}
+
+\begin{lemma}[$L_2$ norms of sums with bounded overlap]
+\label{lem:overlap-l2}
+\lean{Torus.lintegral_enorm_sum_sq_le, Torus.finLqNorm_two_eq, Torus.eLpNorm_le_of_overlap}
+\leanok
+\uses{lem:grid-overlap}
+Let $j, R \in \N$, $\tau \geq 0$ and $c_m \in \R$, and let $F_m : \T^d \to \C$,
+$m \in \{0, \dots, 2^j - 1\}^d$, satisfy $|F_m| \leq |c_m| \, \tau$ and $F_m(x) = 0$ whenever
+$\|x - 2^{-j} m\| > R \, 2^{-j}$. If $G = \sum_m F_m$ is measurable, then
+\[
+  \|G\|_2 \leq \bigl((2R + 1)^{\#d} (2R)^{\#d}\bigr)^{1/2} \, \tau \, 2^{-j \#d/2} \,
+  \|c\|_{\ell_2} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Let $S_m$ be the closed ball of radius $R \, 2^{-j}$ around $2^{-j} m$. At every point at most
+$N = (2R + 1)^{\#d}$ of the $F_m$ are nonzero, so the Cauchy--Schwarz inequality gives
+$|G(x)|^2 \leq N \sum_m c_m^2 \tau^2 \mathbf{1}_{S_m}(x)$. Integrate and use
+$|S_m| \leq (2R)^{\#d} 2^{-j\#d}$.
+\end{proof}
+
+\begin{proposition}[Lipschitz atoms form an atomic system]
+\label{prop:lip-atomic-system}
+\lean{Torus.enorm_translate_toLp_sub, Torus.eLpNorm_sum_lipAtoms_le,
+  Torus.enorm_translate_sum_lipAtoms_sub_le, Torus.lipConst, Torus.lipConst_ne_top,
+  Torus.trigScheme_toLp_isLinear, Torus.lipAtomicSystem}
+\leanok
+\uses{def:atomic-system, def:lip-atom, lem:overlap-l2, thm:torus-jackson}
+Let $D \in \N$. The Lipschitz atoms of support radius $D$ form an atomic system for the
+trigonometric scheme in $L_2(\T^d)$ with $p = 2$, $\delta = \#d/2$, $\sigma = 1$ and the
+constant
+\[
+  C = \bigl((2D + 1)^{\#d} (2D)^{\#d}\bigr)^{1/2}
+    + (\#d + 1) \bigl((2D + 3)^{\#d} (2D + 2)^{\#d}\bigr)^{1/2} .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+Let $g = \sum_m c_m a_m$ with atoms $a_m$ of level $j$. The size bound is \Cref{lem:overlap-l2}
+with $R = D$ and $\tau = 1$. For the decay let $k \geq j$ and $\|h\| \leq 2^{-k}$. The function
+$g(\cdot + h) - g = \sum_m c_m (a_m(\cdot + h) - a_m)$ has terms bounded by
+$|c_m| \, 2^{j-k}$ and vanishing outside the ball of radius $(D + 1) 2^{-j}$ around
+$2^{-j} m$, so \Cref{lem:overlap-l2} gives
+\[
+  \|\tau_h g - g\|_2 \leq \bigl((2D + 3)^{\#d} (2D + 2)^{\#d}\bigr)^{1/2} \, 2^{-(k-j)} \,
+  2^{-j\#d/2} \|c\|_{\ell_2} .
+\]
+Taking the supremum over $h$ bounds $\omega(g, 2^{-k})_2$, and Jackson's theorem
+$E_{2^k}(g)_2 \leq (\#d + 1) \, \omega(g, 2^{-k})_2$ (\Cref{thm:torus-jackson}) gives the
+decay bound.
+\end{proof}
+
+\begin{theorem}[Synthesis with Lipschitz atoms]
+\label{thm:lip-synthesis}
+\lean{Torus.approxNormDyadic_le_of_lipAtoms, Torus.memBesov_of_lipAtoms}
+\leanok
+\uses{prop:lip-atomic-system, thm:atomic-synthesis}
+Let $D \in \N$, $0 < s < 1$ and $1 \leq q \leq \infty$. Let $a_{j,m}$ be Lipschitz atoms of
+level $j$ at $m$ with support radius $D$, let $\lambda_{j,m} \in \R$, and let
+$f = \sum_j \sum_m \lambda_{j,m} a_{j,m}$, the series over $j$ converging in $L_2(\T^d)$. If
+$\|(2^{j(s - \#d/2)} \|\lambda_{j,\cdot}\|_{\ell_2})_j\|_{\ell_q} < \infty$, then
+$f \in \Besov{s}{2}{q}(\T^d)$, and
+\[
+  \|f\|^{\mathrm{dy}}_{\Besov{s}{2}{q}} \leq \bigl(2 (1 - 2^{-s})^{-1} + (1 - 2^{-(1 - s)})^{-1}
+  \bigr) \, C \, \|\lambda\|_{b^s_{2,q}}
+\]
+with $C$ from \Cref{prop:lip-atomic-system}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:atomic-synthesis} for the atomic system of \Cref{prop:lip-atomic-system}; the
+trigonometric scheme is linear.
+\end{proof}
+
+The converse, that every $f \in \Besov{s}{2}{q}(\T^d)$ is such a sum, needs an expansion of
+trigonometric polynomials in atoms of their level as in \Cref{thm:atomic-analysis}, for instance
+by interpolation with hat functions on the grid; it is not formalised.
+
 \bpbibheading
 \begin{thebibliography}{99}
 
