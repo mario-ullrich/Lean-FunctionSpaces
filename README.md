@@ -96,6 +96,28 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
   (`ApproximationScheme.memApprox_iff_blockDecompNorm_lt_top`).
+* **Atomic decompositions.** Let `A` be a linear scheme with atoms `a_{j,m}` at finitely many
+  positions `m` of level `j`, such that `‖∑_m c_m a_m‖ ≤ C 2^(-jδ) ‖c‖_{ℓ_p}` and
+  `E_{2^k}(∑_m c_m a_m) ≤ C 2^(-(k-j)σ) 2^(-jδ) ‖c‖_{ℓ_p}` for `k ≥ j`. For `0 < s < σ`,
+  every `f = ∑_j ∑_m λ_{j,m} a_{j,m}` satisfies `‖f‖_{A^s_q} ≲ ‖λ‖_{b^s_{p,q}}`, where
+  `‖λ‖_{b^s_{p,q}} = ‖(2^(j(s-δ)) ‖λ_{j,·}‖_{ℓ_p})_j‖_{ℓ_q}`
+  (`ApproximationScheme.AtomicSystem.approxNormDyadic_le_bNorm`). If every approximant of
+  `A_{2^j}` expands stably in atoms of level `j`, then conversely every `f ∈ A^s_q` has such a
+  decomposition, and `A^s_q` is the space of atomic sums with coefficients in `b^s_{p,q}`
+  (`ApproximationScheme.AtomicSystem.memApprox_iff_exists_atomic`).
+* **The trace theorem.** Let `T` be linear with `T(A_n) ⊆ B_n` and `‖T a‖ ≤ C n^β ‖a‖` for
+  `a ∈ A_n`, `n ≥ 1`, as for the restriction of functions to a hyperplane. Then `T` extends to
+  `A^β_1`, and for `0 ≤ β < s` it maps `A^s_q` into `B^{s-β}_q` with
+  `‖Tr f‖_{B^{s-β}_q} ≲ ‖f‖_{A^s_q}` (`ApproximationScheme.TraceBound.approxNormDyadic_ext_le`).
+  If every `b ∈ B_{2^k}` is `T a` with `a ∈ A_{2^(k+γ)}` and `‖a‖ ≤ C' 2^(-kβ) ‖b‖`, then every
+  `g ∈ B^s_q`, `s > 0`, is the trace of some `f ∈ A^{s+β}_q` with `‖f‖ ≲ ‖g‖`
+  (`ApproximationScheme.TraceBound.exists_ext_eq`).
+* **Intrinsic norms.** Let `R` be bounded linear with `R(A_n) ⊆ B_n`, as for the restriction
+  to a domain, and let `E` be a possibly nonlinear map with `R(E g) = g`, `‖E g‖ ≤ C ‖g‖` and
+  `E^A_{2^(k+γ)}(E g) ≤ C E^B_{2^k}(g)`. Then the intrinsic quasi-norm of `B^s_q` and the
+  restriction quasi-norm `inf {‖f‖_{A^s_q} : R f = g}` are equivalent, and `B^s_q = R(A^s_q)`
+  (`ApproximationScheme.approxNormDyadic_extension_le`,
+  `ApproximationScheme.memApprox_iff_exists_restrict`).
 * **Dyadic blocks.** If the scheme has projections `P_n` onto `A_n` with `‖P_n‖ ≤ M` and
   `⋃ A_n` is dense, then for `s > 0`, `f ∈ A^s_q` iff
   `‖P_1 f‖ + ‖(2^(ks) ‖P_{2^(k+1)} f - P_{2^k} f‖)_k‖_{ℓ_q} < ∞`
@@ -171,6 +193,9 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ proved | ✗ | `ApproximationSpaces/{Lift,Nikolskii}.lean` |
 | K-functional, real interpolation, representation theorem | ✅ proved | ✗ | `ApproximationSpaces/{KFunctional,Representation}.lean` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
+| Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Synthesis,Atomic}.lean` |
+| Trace theorem: extension, transfer, surjectivity | ✅ proved | ✗ | `ApproximationSpaces/Trace.lean` |
+| Intrinsic and restriction quasi-norms (retract theorem) | ✅ proved | ✗ | `ApproximationSpaces/Retract.lean` |
 | Coefficient characterisations, `H^s = B^s_{2,2}` (spectral schemes, torus) | ✅ proved | ✗ | `FunctionSpaces/Spectral/Blocks.lean`, `FunctionSpaces/Torus/Coefficients.lean` |
 | Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces, elementary embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Inclusion,Lp/BoundedContinuous,Scheme,Besov/Basic,Besov/Trivial}.lean` |
 | Interpolation `L_p`–`L_∞`, Nikolskii property, Besov embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Interpolation,Besov/Nikolskii,Besov/Embeddings}.lean` |
@@ -193,8 +218,8 @@ file resets its rows to ✗.
 
 Two libraries. `ApproximationSpaces` holds the abstract theory: approximation schemes in a
 real normed space, the approximation spaces and their embeddings, lifting and the Nikolskii
-transfer theorem, the K-functional and the representation theorem, block decompositions and
-projection schemes. Nothing in it mentions functions or measures. `FunctionSpaces` holds the
+transfer theorem, the K-functional and the representation theorem, block and atomic
+decompositions, projection schemes, traces and intrinsic norms. Nothing in it mentions functions or measures. `FunctionSpaces` holds the
 Besov and Sobolev spaces built on it: schemes of bounded continuous functions on a finite
 measure space and their embedding theorems, spectral schemes in Hilbert spaces, the torus,
 filtration schemes for wavelets, and the classical definitions through moduli of smoothness and weak

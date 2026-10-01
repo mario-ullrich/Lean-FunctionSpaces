@@ -24,6 +24,10 @@ public import ApproximationSpaces.KFunctional
 public import ApproximationSpaces.Representation
 public import ApproximationSpaces.Decompositions.Projection
 public import ApproximationSpaces.Decompositions.Blocks
+public import ApproximationSpaces.Decompositions.Synthesis
+public import ApproximationSpaces.Decompositions.Atomic
+public import ApproximationSpaces.Trace
+public import ApproximationSpaces.Retract
 
 /-!
 # Approximation spaces
@@ -71,4 +75,12 @@ Nothing in this library mentions functions or measures.
   and the characterisation of `A^s_q` by dyadic blocks.
 * `ApproximationSpaces.Decompositions.Blocks`: the characterisation of `A^s_q` by block
   decompositions `f = ∑ g_k`, `g_k ∈ A (2^k)`.
+* `ApproximationSpaces.Decompositions.Synthesis`: linear schemes and synthesis from blocks that
+  are approximable at rate `σ`.
+* `ApproximationSpaces.Decompositions.Atomic`: atomic systems, the sequence spaces `b^s_{p,q}`
+  and the atomic characterisation of `A^s_q`.
+* `ApproximationSpaces.Trace`: maps defined on approximants (traces), their extension to
+  `A^β_1`, the transfer `A^s_q → B^{s-β}_q` and its surjectivity.
+* `ApproximationSpaces.Retract`: approximation-preserving extensions and the equivalence of
+  intrinsic and restriction quasi-norms.
 -/

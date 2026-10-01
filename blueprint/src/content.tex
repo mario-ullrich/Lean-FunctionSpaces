@@ -947,6 +947,299 @@ $f - P_{2^k} f = \sum_{i \geq 0} \Delta_{k+i} f$, so $E_{2^k}(f) \leq \sum_{i \g
 Hardy inequality concludes.
 \end{proof}
 
+\section{Synthesis with decay and atoms}
+
+Atoms of a function space lie in no fixed set of approximants. Their blocks satisfy a weaker
+condition: they are small and approximable at a rate $\sigma$ from their own level on.
+
+\begin{definition}[Linear scheme]
+\label{def:linear-scheme}
+\lean{ApproximationScheme.IsLinear, ApproximationScheme.isLinear_ofSubmodules,
+  ApproximationScheme.approxSeq_add_le_of_isLinear,
+  ApproximationScheme.approxSeq_sum_le_of_isLinear}
+\leanok
+\uses{def:scheme, def:error}
+An approximation scheme is \emph{linear} if $a + b \in A_n$ for all $n \in \N$ and
+$a, b \in A_n$. For a linear scheme, $E_n(f + g) \leq E_n(f) + E_n(g)$ for all $n$, $f$, $g$.
+\end{definition}
+
+\begin{theorem}[Synthesis with decay]
+\label{thm:synthesis-decay}
+\lean{ApproximationScheme.approxNormDyadic_le_of_hasSum_decay,
+  ApproximationScheme.dyadicWeight_mul_dyadicWeight_sub,
+  ApproximationScheme.approxSeq_le_approxSeq_add_enorm}
+\leanok
+\uses{def:linear-scheme, def:dyadic-norm, lem:hardy}
+Let $A$ be a linear scheme, $\sigma \in \R$, $C \in [0, \infty]$ and $1 \leq q \leq \infty$.
+Let $f = \sum_j g_j$ in $X$, and let $(\varepsilon_j)_j$ in $[0, \infty]$ satisfy
+$\|g_j\| \leq \varepsilon_j$ for every $j$ and $E_{2^k}(g_j) \leq C \, 2^{-(k-j)\sigma}
+\varepsilon_j$ for all $j \leq k$. Then for every $s \in \R$,
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_q} \leq \bigl(2 (1 - 2^{-s})^{-1} + C (1 - 2^{-(\sigma - s)})^{-1}\bigr)
+  \bigl\|(2^{js} \varepsilon_j)_j\bigr\|_{\ell_q} ,
+\]
+a finite constant for $0 < s < \sigma$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Split $f$ at level $k$: $E_{2^k}(f) \leq \sum_{j \leq k} E_{2^k}(g_j) + \|\sum_{j > k} g_j\|$
+by linearity. The first sum is at most $C \, 2^{-k\sigma} \sum_{j \leq k} 2^{j\sigma}
+\varepsilon_j$, and after multiplication by $2^{ks}$ the second Hardy inequality with exponent
+$\sigma - s$ applies. The second term is at most $\sum_{i \geq 0} \varepsilon_{k+i}$, and the
+first Hardy inequality with exponent $s$ applies; it also bounds $\|f\| \leq \sum_j
+\varepsilon_j$.
+\end{proof}
+
+This is the pattern of the proof of \Cref{thm:moduli-coincidence}. For atoms the size
+$\varepsilon_j$ is that of a whole level, measured by the coefficients.
+
+\begin{definition}[Atomic system and the sequence space $b^s_{p,q}$]
+\label{def:atomic-system}
+\lean{ApproximationScheme.AtomicSystem, ApproximationScheme.bNorm, ENNReal.finLqNorm}
+\leanok
+\uses{def:scheme, def:error, def:lq-norm}
+Let $M_j$ be finite sets, $1 \leq p \leq \infty$ and $\delta, \sigma \in \R$. An \emph{atomic
+system} for $A$ consists of sets $\mathcal{A}_{j,m} \subseteq X$ of admissible atoms, $j \in
+\N$, $m \in M_j$, each containing $0$, and a constant $C < \infty$ such that for every $j$,
+every choice $a_m \in \mathcal{A}_{j,m}$ and all real coefficients $c = (c_m)_{m \in M_j}$,
+\[
+  \Bigl\| \sum_m c_m a_m \Bigr\| \leq C \, 2^{-j\delta} \|c\|_{\ell_p}
+\]
+and, for every $k \geq j$,
+\[
+  E_{2^k}\Bigl(\sum_m c_m a_m\Bigr) \leq 2^{-(k-j)\sigma} \, C \, 2^{-j\delta} \|c\|_{\ell_p} .
+\]
+For coefficients $\lambda = (\lambda_{j,m})$ and $s, q$ as before,
+$\|\lambda\|_{b^s_{p,q}} = \|(2^{j(s-\delta)} \|\lambda_{j,\cdot}\|_{\ell_p})_j\|_{\ell_q}$.
+\end{definition}
+
+On a domain of dimension $d$ in $L_p$, the positions are the dyadic cubes of side $2^{-j}$ and
+$\delta = d/p$. The size bound expresses the normalisation and the bounded overlap of the
+supports, the decay bound the smoothness $\sigma$ of the atoms relative to the scheme, and
+$b^s_{p,q}$ is the sequence space of Schneider and Vyb\'{\i}ral~\cite{SchneiderVybiral}.
+
+\begin{theorem}[Atomic synthesis]
+\label{thm:atomic-synthesis}
+\lean{ApproximationScheme.AtomicSystem.approxNormDyadic_le_bNorm,
+  ApproximationScheme.AtomicSystem.memApprox_of_bNorm_lt_top,
+  ApproximationScheme.AtomicSystem.synthConst}
+\leanok
+\uses{def:atomic-system, thm:synthesis-decay}
+Let $A$ be a linear scheme with an atomic system as in \Cref{def:atomic-system}, let
+$0 < s < \sigma$ and $1 \leq q \leq \infty$. Let $a_{j,m} \in \mathcal{A}_{j,m}$, let
+$\lambda_{j,m} \in \R$, and let $f = \sum_j \sum_m \lambda_{j,m} a_{j,m}$, the series over $j$
+converging in $X$. Then
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_q} \leq \bigl(2 (1 - 2^{-s})^{-1} + (1 - 2^{-(\sigma - s)})^{-1}\bigr)
+  \, C \, \|\lambda\|_{b^s_{p,q}} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Apply \Cref{thm:synthesis-decay} to the levels $g_j = \sum_m \lambda_{j,m} a_{j,m}$ with
+$\varepsilon_j = C \, 2^{-j\delta} \|\lambda_{j,\cdot}\|_{\ell_p}$; then
+$2^{js} \varepsilon_j = C \, 2^{j(s - \delta)} \|\lambda_{j,\cdot}\|_{\ell_p}$.
+\end{proof}
+
+\begin{lemma}[Block decompositions with bounds]
+\label{lem:exists-blocks}
+\lean{ApproximationScheme.exists_blocks, ApproximationScheme.DyadicApprox.hasSum_blocks,
+  ApproximationScheme.DyadicApprox.lqNorm_blocks_le,
+  ApproximationScheme.DyadicApprox.tsum_enorm_blocks_ne_top}
+\leanok
+\uses{thm:block-decomposition}
+Let $X$ be a Banach space, $s > 0$, $1 \leq q \leq \infty$ and $f \in A^s_q$. There are
+$g_k \in A_{2^k}$ with $f = \sum_k g_k$, $\sum_k \|g_k\| < \infty$ and
+$\|(2^{ks} \|g_k\|)_k\|_{\ell_q} \leq (3 \cdot 2^s + 4 \cdot 4^s) \|f\|^{\mathrm{dy}}_{A^s_q}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+These are the blocks of near-best approximants from the proof of
+\Cref{thm:block-decomposition}.
+\end{proof}
+
+\begin{theorem}[Atomic analysis]
+\label{thm:atomic-analysis}
+\lean{ApproximationScheme.AtomicSystem.StableExpansion,
+  ApproximationScheme.AtomicSystem.exists_atomic_decomposition,
+  ApproximationScheme.AtomicSystem.memApprox_iff_exists_atomic}
+\leanok
+\uses{def:atomic-system, lem:exists-blocks, thm:atomic-synthesis}
+Let $X$ be a Banach space with an atomic system for $A$, and let $C' \geq 0$ be such that every
+$x \in A_{2^j}$ is $\sum_m c_m a_m$ with $a_m \in \mathcal{A}_{j,m}$ and
+$\|c\|_{\ell_p} \leq C' \, 2^{j\delta} \|x\|$. Let $s > 0$ and $1 \leq q \leq \infty$. Then
+every $f \in A^s_q$ is $\sum_j \sum_m \lambda_{j,m} a_{j,m}$ with $a_{j,m} \in
+\mathcal{A}_{j,m}$ and
+\[
+  \|\lambda\|_{b^s_{p,q}} \leq C' (3 \cdot 2^s + 4 \cdot 4^s) \|f\|^{\mathrm{dy}}_{A^s_q} .
+\]
+If moreover $A$ is linear, $C' < \infty$ and $s < \sigma$, then $f \in A^s_q$ if and only if
+$f$ is such an atomic sum with $\|\lambda\|_{b^s_{p,q}} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Expand every block of \Cref{lem:exists-blocks} in atoms of its level; then
+$2^{j(s-\delta)} \|\lambda_{j,\cdot}\|_{\ell_p} \leq C' \, 2^{js} \|g_j\|$. The converse is
+\Cref{thm:atomic-synthesis}.
+\end{proof}
+
+Local bases such as Haar functions and hat functions on dyadic grids have the expansion property
+of \Cref{thm:atomic-analysis}.
+
+\chapter{Traces and intrinsic norms}
+\label{ch:traces-abstract}
+
+Throughout, $A$ is an approximation scheme in $X$ and $B$ one in $Y$. Two questions about
+function spaces on domains become statements about approximation spaces: the restriction of
+functions to a hypersurface, a map defined only on smooth functions, and the comparison of the
+intrinsic norm of a domain with the norm of restrictions.
+
+\begin{definition}[Trace bound]
+\label{def:trace-bound}
+\lean{ApproximationScheme.TraceBound, ApproximationScheme.TraceBound.ofSubmodule,
+  ApproximationScheme.TraceBound.ofSubmodule_T}
+\leanok
+\uses{def:scheme}
+Let $\beta \in \R$. A \emph{trace bound} of exponent $\beta$ is a linear map $T : X \to Y$ with
+$T(A_n) \subseteq B_n$ for every $n$ and a constant $C < \infty$ with
+$\|T a\| \leq C n^\beta \|a\|$ for all $n \geq 1$ and $a \in A_n$.
+\end{definition}
+
+Only the values of $T$ on $\bigcup_n A_n$ matter, and a linear map defined on the span of the
+approximants extends linearly to $X$. The model is the restriction of functions to a
+hyperplane, defined on continuous functions and unbounded on $L_p$, with $\beta = 1/p$.
+
+\begin{lemma}[The trace]
+\label{lem:trace-ext}
+\lean{ApproximationScheme.TraceBound.ext, ApproximationScheme.canonicalApprox,
+  ApproximationScheme.TraceBound.tendsto_ext, ApproximationScheme.TraceBound.tendsto_edist_apply,
+  ApproximationScheme.TraceBound.cauchySeq_apply, ApproximationScheme.TraceBound.ext_eq_of_mem,
+  ApproximationScheme.TraceBound.ext_add, ApproximationScheme.TraceBound.ext_smul,
+  ApproximationScheme.TraceBound.extLinear, ApproximationScheme.TraceBound.enorm_ext_le}
+\leanok
+\uses{def:trace-bound, lem:near-best, def:dyadic-norm}
+Let $T$ be a trace bound of exponent $\beta \geq 0$ and let $Y$ be a Banach space. For every
+$f \in A^\beta_1$ there is $\operatorname{Tr} f \in Y$ such that $T c_k \to \operatorname{Tr} f$
+for all $\gamma \in \N$ and all $c_k \in A_{2^{k+\gamma}}$ with
+$2^{k\beta} \|f - c_k\| \to 0$. The map $\operatorname{Tr}$ is linear on $A^\beta_1$, agrees
+with $T$ on every $A_m$, and
+$\|\operatorname{Tr} f\| \leq (3C + 6C \cdot 4^\beta) \|f\|^{\mathrm{dy}}_{A^\beta_1}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For near-best approximants $a_k$, $\|T a_{k+1} - T a_k\| \leq C \, 2^{(k+2)\beta} \cdot
+2 (E_{2^k}(f) + t_k)$, which is summable; so $T a_k$ is a Cauchy sequence. Two admissible
+sequences differ by $c_k - c'_k \in A_{2^{k+\gamma+\gamma'+1}}$ with
+$\|T(c_k - c'_k)\| \lesssim 2^{k\beta} (\|f - c_k\| + \|f - c'_k\|) \to 0$. Linearity follows
+by applying this to $a_k(f) + a_k(g)$ and $r a_k(f)$; on $A_m$ take $c_k = a$. The bound is the
+telescoping sum, as in \Cref{thm:lift}.
+\end{proof}
+
+\begin{theorem}[Trace transfer]
+\label{thm:trace-transfer}
+\lean{ApproximationScheme.TraceBound.approxNormDyadic_ext_le,
+  ApproximationScheme.TraceBound.memApprox_ext, ApproximationScheme.traceTransferConst,
+  ApproximationScheme.TraceBound.edist_apply_ext_le}
+\leanok
+\uses{lem:trace-ext, lem:hardy}
+Let $T$ be a trace bound of exponent $\beta$ with constant $C$, let $Y$ be a Banach space, and
+let $0 \leq \beta < s$ and $1 \leq q \leq \infty$. For every $f \in A^s_q$,
+\[
+  \|\operatorname{Tr} f\|^{\mathrm{dy}}_{B^{s-\beta}_q} \leq
+  \bigl(3C + 6C \cdot 4^\beta (1 - 2^{-(s-\beta)})^{-1} + 4C \cdot 4^\beta\bigr)
+  \|f\|^{\mathrm{dy}}_{A^s_q} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Since $T a_k \in B_{2^k}$, $E^B_{2^k}(\operatorname{Tr} f) \leq \sum_{i \geq 0}
+\|T a_{k+i+1} - T a_{k+i}\|$. The proof of \Cref{thm:nikolskii-transfer} then applies word for
+word; that theorem is the case $T = \iota^{-1}$ on the approximants.
+\end{proof}
+
+\begin{theorem}[Surjectivity of the trace]
+\label{thm:trace-surjective}
+\lean{ApproximationScheme.TraceBound.RightInverseBound,
+  ApproximationScheme.TraceBound.exists_ext_eq, ApproximationScheme.traceSurjConst}
+\leanok
+\uses{thm:trace-transfer, lem:exists-blocks, thm:block-decomposition}
+Let $X$ and $Y$ be Banach spaces, $T$ a trace bound of exponent $\beta \geq 0$, and let
+$\gamma \in \N$ and $C' < \infty$ be such that every $b \in B_{2^k}$ is $T a$ for some
+$a \in A_{2^{k+\gamma}}$ with $\|a\| \leq C' \, 2^{-k\beta} \|b\|$. Let $s > 0$ and
+$1 \leq q \leq \infty$. For every $g \in B^s_q$ there is $f \in A^{s+\beta}_q$ with
+$\operatorname{Tr} f = g$ and
+\[
+  \|f\|^{\mathrm{dy}}_{A^{s+\beta}_q} \leq 2 (1 - 2^{-(s+\beta)})^{-1} \, 2^{\gamma(s+\beta)}
+  \, C' \, (3 \cdot 2^s + 4 \cdot 4^s) \, \|g\|^{\mathrm{dy}}_{B^s_q} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Lift the blocks $b_j \in B_{2^j}$ of \Cref{lem:exists-blocks} for $g$ to $a_j \in
+A_{2^{j+\gamma}}$ and put $f = \sum_j a_j$. The blocks $a_j$, placed at level $j + \gamma$,
+form a block decomposition of $f$, and $2^{(j+\gamma)(s+\beta)} \|a_j\| \leq
+2^{\gamma(s+\beta)} C' \, 2^{js} \|b_j\|$, so \Cref{thm:block-decomposition} gives the bound.
+The partial sums $c_K = \sum_{j < K} a_j$ satisfy $2^{K\beta} \|f - c_K\| \leq C' \sum_{m \geq 0}
+\|b_{m+K}\| \to 0$, so $T c_K \to \operatorname{Tr} f$ by \Cref{lem:trace-ext}, while
+$T c_K = \sum_{j < K} b_j \to g$.
+\end{proof}
+
+This is where block decompositions are used: they turn the right inverse on approximants into
+a right inverse of the trace.
+
+\begin{definition}[Approximation-preserving extension]
+\label{def:approx-extension}
+\lean{ApproximationScheme.ApproxExtension, ApproximationScheme.restrictionNorm}
+\leanok
+\uses{def:error}
+Let $R : X \to Y$ be a bounded linear map. An \emph{approximation-preserving extension} is a
+map $E : Y \to X$, not necessarily linear, with $R(E g) = g$, $\|E g\| \leq C \|g\|$ and
+$E^A_{2^{k+\gamma}}(E g) \leq C \, E^B_{2^k}(g)$ for all $g \in Y$ and $k \in \N$, for some
+$C < \infty$ and $\gamma \in \N$. The \emph{restriction quasi-norm} of $g \in Y$ is
+$\inf\{\|f\|^{\mathrm{dy}}_{A^s_q} : R f = g\}$.
+\end{definition}
+
+\begin{theorem}[Intrinsic and restriction quasi-norms]
+\label{thm:retract}
+\lean{ApproximationScheme.approxNormDyadic_extension_le, ApproximationScheme.extensionConst,
+  ApproximationScheme.approxNormDyadic_le_iInf_restrict,
+  ApproximationScheme.restrictionNorm_le_approxNormDyadic,
+  ApproximationScheme.memApprox_iff_exists_restrict}
+\leanok
+\uses{def:approx-extension, lem:approx-functorial}
+Let $R : X \to Y$ be a bounded linear map with $R(A_n) \subseteq B_n$ for every $n$, with an
+approximation-preserving extension $E$. Let $s \geq 0$ and $1 \leq q \leq \infty$. Then for
+every $g \in Y$,
+\[
+  \|g\|^{\mathrm{dy}}_{B^s_q} \leq \inf_{R f = g} \|R\| \, \|f\|^{\mathrm{dy}}_{A^s_q}
+  \qquad \text{and} \qquad
+  \|E g\|^{\mathrm{dy}}_{A^s_q} \leq C \bigl(1 + (\gamma + 1) 2^{\gamma s}\bigr)
+  \|g\|^{\mathrm{dy}}_{B^s_q} ,
+\]
+and $g \in B^s_q$ if and only if $g = R f$ for some $f \in A^s_q$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first inequality is \Cref{lem:approx-functorial}. For the second, the terms $k < \gamma$
+are at most $2^{\gamma s} C \|g\|$, and for $k = j + \gamma$,
+$2^{ks} E^A_{2^k}(E g) \leq 2^{\gamma s} C \, 2^{js} E^B_{2^j}(g)$.
+\end{proof}
+
+For a domain $\Omega \subseteq \R^d$, $X = L_p(\R^d)$, $Y = L_p(\Omega)$ and $R$ the restriction,
+the quasi-norm of $B^s_q$ uses only $g$ on $\Omega$: it is intrinsic. The theorem reduces the
+existence of an intrinsic norm to an approximation-preserving extension, which DeVore and
+Sharpley~\cite{DeVoreSharpley} construct on Lipschitz domains from near-best local
+polynomials. The extension may be
+nonlinear on purpose: in parts of the quasi-Banach range no linear extension exists.
+
 \chapter{Besov spaces and their embeddings}
 \label{ch:besov}
 
@@ -1773,6 +2066,11 @@ R.~A.~DeVore, G.~G.~Lorentz,
 Grundlehren der mathematischen Wissenschaften \textbf{303}, Springer-Verlag, Berlin, 1993,
 \href{https://doi.org/10.1007/978-3-662-02888-9}{doi}.
 
+\bibitem{DeVoreSharpley}
+R.~A.~DeVore, R.~C.~Sharpley,
+\emph{Besov spaces on domains in $\R^d$},
+Trans.\ Amer.\ Math.\ Soc.\ \textbf{335} (1993), no.~2, 843--864.
+
 \bibitem{Nikolskii}
 S.~M.~Nikol'ski\u{\i},
 \emph{Approximation of Functions of Several Variables and Imbedding Theorems},
@@ -1784,6 +2082,12 @@ A.~Pietsch,
 \emph{Approximation spaces},
 J.\ Approx.\ Theory \textbf{32} (1981), no.~2, 115--134,
 \href{https://doi.org/10.1016/0021-9045(81)90109-X}{doi}.
+
+\bibitem{SchneiderVybiral}
+C.~Schneider, J.~Vyb\'{\i}ral,
+\emph{Non-smooth atomic decompositions, traces on Lipschitz domains, and pointwise multipliers
+in function spaces}, preprint, 2012,
+\href{https://arxiv.org/abs/1201.2280}{arXiv:1201.2280}.
 
 \bibitem{Temlyakov}
 V.~Temlyakov,

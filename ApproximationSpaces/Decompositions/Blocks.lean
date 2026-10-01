@@ -137,24 +137,13 @@ theorem DyadicApprox.sum_range_blocks {f : X} {t : ℕ → ℝ≥0∞} (D : A.Dy
     simp only [DyadicApprox.blocks]
     abel
 
-/-- **The block decomposition of near-best approximants**: for tolerances `t` that decrease, tend to
-`0`, start at most at `‖f‖` and satisfy `∑ t_k ≤ 2 ‖f‖` and `‖(2^(ks) t_k)_k‖_q ≤ 2 ‖f‖`, the
-blocks of a dyadic approximation of `f ∈ A^s_q` form a block decomposition of `f` with
-`‖(2^(ks) ‖g_k‖)_k‖_q ≤ 3·2^s ‖f‖ + 2·4^s (‖(2^(ks) E_{2^k}(f))_k‖_q + 2 ‖f‖)`. -/
-theorem DyadicApprox.blockDecompNorm_le [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ q) {f : X}
+/-- The blocks of near-best approximants are summable in norm: for `f ∈ A^s_q` with `s > 0`
+and tolerances with `∑ t_k ≤ 2 ‖f‖`, `∑_k ‖g_k‖ < ∞`. -/
+theorem DyadicApprox.tsum_enorm_blocks_ne_top (hs : 0 < s) (hq : 1 ≤ q) {f : X}
     (hf : A.MemApprox s q f) {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (ht : Antitone t)
-    (ht0 : t 0 ≤ ‖f‖ₑ) (htend : Tendsto t atTop (𝓝 0)) (htsum : ∑' k, t k ≤ 2 * ‖f‖ₑ)
-    (htq : lqNorm q (fun k => dyadicWeight s k * t k) ≤ 2 * ‖f‖ₑ) :
-    A.blockDecompNorm s q f ≤ 2 ^ s * (3 * ‖f‖ₑ) +
-      2 * dyadicWeight s 2 * (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ) := by
+    (htsum : ∑' k, t k ≤ 2 * ‖f‖ₑ) : ∑' k, ‖D.blocks k‖ₑ ≠ ∞ := by
   have hg : ∀ k, ‖D.blocks (k + 2)‖ₑ ≤ 2 * (A.approxSeq f (2 ^ k) + t k) := fun k =>
     D.enorm_sub_succ_le ht k
-  have hg1 : ‖D.blocks 1‖ₑ ≤ 3 * ‖f‖ₑ :=
-    calc ‖D.blocks 1‖ₑ = ‖D.a 0‖ₑ := rfl
-      _ ≤ 2 * ‖f‖ₑ + t 0 := D.enorm_zero_le
-      _ ≤ 2 * ‖f‖ₑ + ‖f‖ₑ := by gcongr
-      _ = 3 * ‖f‖ₑ := by ring
-  -- summability of the blocks
   have hE1 : lqNorm 1 (A.approxSeqDyadic 0 f) < ∞ := hf.lqNorm_one_lt_top hq le_rfl hs
   have htail : ∑' k, ‖D.blocks (k + 2)‖ₑ ≠ ∞ := by
     have hfin : 2 * (lqNorm 1 (A.approxSeqDyadic 0 f) + 2 * ‖f‖ₑ) ≠ ∞ :=
@@ -167,20 +156,42 @@ theorem DyadicApprox.blockDecompNorm_le [CompleteSpace X] (hs : 0 < s) (hq : 1 �
           rw [ENNReal.tsum_mul_left, ENNReal.tsum_add]; simp [approxSeqDyadic]
       _ ≤ 2 * (lqNorm 1 (A.approxSeqDyadic 0 f) + 2 * ‖f‖ₑ) := by
           rw [ENNReal.lqNorm_one]; gcongr
-  have hsum : Summable D.blocks :=
-    (summable_nat_add_iff 2).1 (Summable.of_norm (by simpa using ENNReal.summable_toReal htail))
-  -- the blocks add up to `f`
+  rw [← Summable.sum_add_tsum_nat_add' (f := fun k => ‖D.blocks k‖ₑ) (k := 2) ENNReal.summable]
+  exact ENNReal.add_ne_top.2 ⟨ENNReal.sum_ne_top.2 fun j _ => enorm_ne_top, htail⟩
+
+/-- **The blocks of near-best approximants add up to `f`**: in a Banach space, for
+`f ∈ A^s_q` with `s > 0` and tolerances that decrease, tend to `0` and satisfy
+`∑ t_k ≤ 2 ‖f‖`. -/
+theorem DyadicApprox.hasSum_blocks [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ q) {f : X}
+    (hf : A.MemApprox s q f) {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (ht : Antitone t)
+    (htend : Tendsto t atTop (𝓝 0)) (htsum : ∑' k, t k ≤ 2 * ‖f‖ₑ) :
+    HasSum D.blocks f := by
+  have hsum : Summable D.blocks := Summable.of_norm (by
+    simpa using ENNReal.summable_toReal (D.tsum_enorm_blocks_ne_top hs hq hf ht htsum))
   have he : Tendsto (fun k => A.approxSeq f (2 ^ k)) atTop (𝓝 0) := by
     have := ENNReal.tendsto_ofReal (tendsto_approxError_pow_zero_of_memApprox hq hs hf)
     simpa [approxSeq] using this
-  have hlim : HasSum D.blocks f := by
-    have h2 : Tendsto (fun K => ∑ j ∈ range (K + 2), D.blocks j) atTop (𝓝 (∑' k, D.blocks k)) :=
-      hsum.hasSum.tendsto_sum_nat.comp (tendsto_add_atTop_nat 2)
-    simp_rw [D.sum_range_blocks] at h2
-    have hfeq : f = ∑' k, D.blocks k := tendsto_nhds_unique (D.tendsto he htend) h2
-    exact (congrArg (HasSum D.blocks) hfeq).mpr hsum.hasSum
-  -- the norm of the decomposition
-  refine (ApproximationScheme.blockDecompNorm_le D.blocks_mem hlim).trans ?_
+  have h2 : Tendsto (fun K => ∑ j ∈ range (K + 2), D.blocks j) atTop (𝓝 (∑' k, D.blocks k)) :=
+    hsum.hasSum.tendsto_sum_nat.comp (tendsto_add_atTop_nat 2)
+  simp_rw [D.sum_range_blocks] at h2
+  have hfeq : f = ∑' k, D.blocks k := tendsto_nhds_unique (D.tendsto he htend) h2
+  exact (congrArg (HasSum D.blocks) hfeq).mpr hsum.hasSum
+
+/-- **The weighted blocks of near-best approximants**: for decreasing tolerances with
+`t_0 ≤ ‖f‖` and `‖(2^(ks) t_k)_k‖_q ≤ 2 ‖f‖`,
+`‖(2^(ks) ‖g_k‖)_k‖_q ≤ 3·2^s ‖f‖ + 2·4^s (‖(2^(ks) E_{2^k}(f))_k‖_q + 2 ‖f‖)`. -/
+theorem DyadicApprox.lqNorm_blocks_le (hq : 1 ≤ q) {f : X} {t : ℕ → ℝ≥0∞}
+    (D : A.DyadicApprox f t) (ht : Antitone t) (ht0 : t 0 ≤ ‖f‖ₑ)
+    (htq : lqNorm q (fun k => dyadicWeight s k * t k) ≤ 2 * ‖f‖ₑ) :
+    lqNorm q (fun k => dyadicWeight s k * ‖D.blocks k‖ₑ) ≤ 2 ^ s * (3 * ‖f‖ₑ) +
+      2 * dyadicWeight s 2 * (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ) := by
+  have hg : ∀ k, ‖D.blocks (k + 2)‖ₑ ≤ 2 * (A.approxSeq f (2 ^ k) + t k) := fun k =>
+    D.enorm_sub_succ_le ht k
+  have hg1 : ‖D.blocks 1‖ₑ ≤ 3 * ‖f‖ₑ :=
+    calc ‖D.blocks 1‖ₑ = ‖D.a 0‖ₑ := rfl
+      _ ≤ 2 * ‖f‖ₑ + t 0 := D.enorm_zero_le
+      _ ≤ 2 * ‖f‖ₑ + ‖f‖ₑ := by gcongr
+      _ = 3 * ‖f‖ₑ := by ring
   refine ((ENNReal.lqNorm_le_head_add_shift hq _).trans (add_le_add le_rfl
     (ENNReal.lqNorm_le_head_add_shift hq _))).trans ?_
   have h0 : dyadicWeight s 0 * ‖D.blocks 0‖ₑ = 0 := by simp [DyadicApprox.blocks]
@@ -206,8 +217,21 @@ theorem DyadicApprox.blockDecompNorm_le [CompleteSpace X] (hs : 0 < s) (hq : 1 �
   rw [h0, zero_add]
   exact add_le_add h1 h2
 
-/-- **The approximation norm controls the block decomposition quasi-norm**: in a Banach space and for
-`s > 0`, `inf ‖(2^(ks) ‖g_k‖)_k‖_q ≤ (3·2^s + 4·4^s) ‖f‖^dyadic`. -/
+/-- **The block decomposition of near-best approximants**: for tolerances `t` that decrease, tend to
+`0`, start at most at `‖f‖` and satisfy `∑ t_k ≤ 2 ‖f‖` and `‖(2^(ks) t_k)_k‖_q ≤ 2 ‖f‖`, the
+blocks of a dyadic approximation of `f ∈ A^s_q` form a block decomposition of `f` with
+`‖(2^(ks) ‖g_k‖)_k‖_q ≤ 3·2^s ‖f‖ + 2·4^s (‖(2^(ks) E_{2^k}(f))_k‖_q + 2 ‖f‖)`. -/
+theorem DyadicApprox.blockDecompNorm_le [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ q) {f : X}
+    (hf : A.MemApprox s q f) {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (ht : Antitone t)
+    (ht0 : t 0 ≤ ‖f‖ₑ) (htend : Tendsto t atTop (𝓝 0)) (htsum : ∑' k, t k ≤ 2 * ‖f‖ₑ)
+    (htq : lqNorm q (fun k => dyadicWeight s k * t k) ≤ 2 * ‖f‖ₑ) :
+    A.blockDecompNorm s q f ≤ 2 ^ s * (3 * ‖f‖ₑ) +
+      2 * dyadicWeight s 2 * (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ) :=
+  (ApproximationScheme.blockDecompNorm_le D.blocks_mem
+    (D.hasSum_blocks hs hq hf ht htend htsum)).trans (D.lqNorm_blocks_le hq ht ht0 htq)
+
+/-- **The approximation norm controls the block decomposition quasi-norm**: in a Banach space
+and for `s > 0`, `inf ‖(2^(ks) ‖g_k‖)_k‖_q ≤ (3·2^s + 4·4^s) ‖f‖^dyadic`. -/
 theorem blockDecompNorm_le_approxNormDyadic [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ q) (f : X) :
     A.blockDecompNorm s q f ≤ (3 * 2 ^ s + 4 * dyadicWeight s 2) * A.approxNormDyadic s q f := by
   by_cases hf : A.MemApprox s q f
@@ -218,20 +242,38 @@ theorem blockDecompNorm_le_approxNormDyadic [CompleteSpace X] (hs : 0 < s) (hq :
   · refine (blockDecompNorm_le (g := fun _ => 0) (fun k => A.zero_mem _) hasSum_zero).trans ?_
     simp
   obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s) (tolerance_ne_top f s)
-  have htend : Tendsto (tolerance f s) atTop (𝓝 0) := by
-    have hr : (2 : ℝ≥0∞) ^ (-(s + 1)) < 1 := ENNReal.two_rpow_neg_lt_one (by linarith)
-    have hgeo := ENNReal.Tendsto.const_mul (a := ‖f‖ₑ)
-      (ENNReal.tendsto_pow_atTop_nhds_zero_of_lt_one hr) (Or.inr enorm_ne_top)
-    rw [mul_zero] at hgeo
-    refine hgeo.congr fun k => ?_
-    rw [tolerance, ENNReal.dyadicWeight_eq_pow]
-  have htsum : ∑' k, tolerance f s k ≤ 2 * ‖f‖ₑ := by
-    have := tsum_dyadicWeight_mul_tolerance_le (σ := s) (τ := 0) f hs.le
-    simp only [ENNReal.dyadicWeight_zero_left, one_mul] at this
-    exact this
-  have h := D.blockDecompNorm_le hs hq hf (tolerance_anti f hs.le) (tolerance_zero f s).le htend htsum
+  have h := D.blockDecompNorm_le hs hq hf (tolerance_anti f hs.le) (tolerance_zero f s).le
+    (tendsto_tolerance f (by linarith)) (tsum_tolerance_le f hs.le)
     (lqNorm_dyadicWeight_mul_tolerance_le hq f le_rfl)
   refine h.trans ?_
+  have hfN : ‖f‖ₑ ≤ A.approxNormDyadic s q f := enorm_le_approxNormDyadic f
+  have hDN : lqNorm q (A.approxSeqDyadic s f) + ‖f‖ₑ = A.approxNormDyadic s q f := by
+    rw [approxNormDyadic, add_comm]
+  calc 2 ^ s * (3 * ‖f‖ₑ) + 2 * dyadicWeight s 2 * (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ)
+      = 2 ^ s * (3 * ‖f‖ₑ) + 2 * dyadicWeight s 2 *
+          ((lqNorm q (A.approxSeqDyadic s f) + ‖f‖ₑ) + ‖f‖ₑ) := by ring
+    _ ≤ 2 ^ s * (3 * A.approxNormDyadic s q f) + 2 * dyadicWeight s 2 *
+          (A.approxNormDyadic s q f + A.approxNormDyadic s q f) := by
+        rw [hDN]; gcongr
+    _ = (3 * 2 ^ s + 4 * dyadicWeight s 2) * A.approxNormDyadic s q f := by ring
+
+/-- **Existence of a block decomposition with bounds**: in a Banach space, for `s > 0` and
+`f ∈ A^s_q`, there are blocks `g_k ∈ A (2^k)` with `f = ∑ g_k`, `∑_k ‖g_k‖ < ∞` and
+`‖(2^(ks) ‖g_k‖)_k‖_q ≤ (3·2^s + 4·4^s) ‖f‖^dyadic`. -/
+theorem exists_blocks [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ q) {f : X}
+    (hf : A.MemApprox s q f) :
+    ∃ g : ℕ → X, (∀ k, g k ∈ A (2 ^ k)) ∧ HasSum g f ∧ ∑' k, ‖g k‖ₑ ≠ ∞ ∧
+      lqNorm q (fun k => dyadicWeight s k * ‖g k‖ₑ) ≤
+        (3 * 2 ^ s + 4 * dyadicWeight s 2) * A.approxNormDyadic s q f := by
+  rcases eq_or_ne f 0 with rfl | hf0
+  · exact ⟨fun _ => 0, fun k => A.zero_mem _, hasSum_zero, by simp, by simp⟩
+  obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s) (tolerance_ne_top f s)
+  have ht := tolerance_anti f hs.le
+  have htsum := tsum_tolerance_le f hs.le
+  refine ⟨D.blocks, D.blocks_mem, D.hasSum_blocks hs hq hf ht (tendsto_tolerance f (by linarith))
+    htsum, D.tsum_enorm_blocks_ne_top hs hq hf ht htsum, ?_⟩
+  refine (D.lqNorm_blocks_le hq ht (tolerance_zero f s).le
+    (lqNorm_dyadicWeight_mul_tolerance_le hq f le_rfl)).trans ?_
   have hfN : ‖f‖ₑ ≤ A.approxNormDyadic s q f := enorm_le_approxNormDyadic f
   have hDN : lqNorm q (A.approxSeqDyadic s f) + ‖f‖ₑ = A.approxNormDyadic s q f := by
     rw [approxNormDyadic, add_comm]
