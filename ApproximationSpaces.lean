@@ -22,6 +22,8 @@ public import ApproximationSpaces.Nikolskii
 public import ApproximationSpaces.Jackson
 public import ApproximationSpaces.KFunctional
 public import ApproximationSpaces.Representation
+public import ApproximationSpaces.Projection
+public import ApproximationSpaces.Decomposition
 
 /-!
 # Approximation spaces
@@ -65,4 +67,8 @@ Nothing in this library mentions functions or measures.
   spaces `(X, Y)_{θ,q}`.
 * `ApproximationSpaces.Representation`: the representation theorem `A^s_q = (X, Y)_{s/r,q}`
   under Jackson's and Bernstein's inequalities of order `r`.
+* `ApproximationSpaces.Projection`: schemes with uniformly bounded projections and the
+  characterisation of `A^s_q` by dyadic blocks.
+* `ApproximationSpaces.Decomposition`: the characterisation of `A^s_q` by atomic
+  decompositions `f = ∑ g_k`, `g_k ∈ A (2^k)`.
 -/

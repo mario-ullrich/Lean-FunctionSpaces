@@ -79,6 +79,17 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `.interpNorm_le_approxNormDyadic_of_bernstein`). In particular two schemes with Jackson and
   Bernstein inequalities of the same order for the same `ι` have the same approximation
   spaces (`ApproximationScheme.approxSpace_eq_of_jackson_bernstein`).
+* **Atomic decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
+  `f = ∑_k g_k` with atoms `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
+  such decompositions is an equivalent quasi-norm
+  (`ApproximationScheme.memApprox_iff_decompNorm_lt_top`).
+* **Dyadic blocks.** If the scheme has projections `P_n` onto `A_n` with `‖P_n‖ ≤ M` and
+  `⋃ A_n` is dense, then for `s > 0`, `f ∈ A^s_q` iff
+  `‖P_1 f‖ + ‖(2^(ks) ‖P_{2^(k+1)} f - P_{2^k} f‖)_k‖_{ℓ_q} < ∞`
+  (`ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top`). For the Fourier
+  basis on `𝕋^d` this is the Littlewood–Paley characterisation of `B^s_{2,q}(𝕋^d)`
+  (`Torus.memBesov_two_iff_blockNorm_lt_top`), and for `q = 2` it gives
+  `B^s_{2,2}(𝕋^d) = H^s(𝕋^d)` (`Torus.memBesov_two_two_iff`).
 * **Sequence spaces.** For `1 ≤ q ≤ r ≤ ∞` and every sequence `a` in `[0, ∞]`,
   `‖a‖_{ℓ_r} ≤ ‖a‖_{ℓ_q}` (`ENNReal.lqNorm_le_lqNorm_of_le`), and the norm of a series of
   sequences is at most the series of the norms (`ENNReal.lqNorm_tsum_le`).
@@ -139,7 +150,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ proved | ✗ | `ApproximationSpaces/{Embedding,Transfer}.lean` |
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ proved | ✗ | `ApproximationSpaces/{Lift,Nikolskii}.lean` |
 | K-functional, real interpolation, representation theorem | ✅ proved | ✗ | `ApproximationSpaces/{KFunctional,Representation}.lean` |
-| Atomic decompositions, projection schemes | ⬜ planned | ✗ | `ApproximationSpaces/{Decomposition,Projection}.lean` |
+| Atomic decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/{Decomposition,Projection}.lean` |
+| Coefficient characterisations, `H^s = B^s_{2,2}` (spectral schemes, torus) | ✅ proved | ✗ | `FunctionSpaces/Spectral/Blocks.lean`, `FunctionSpaces/Torus/Coefficients.lean` |
 | Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces, elementary embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Inclusion,Lp/BoundedContinuous,Scheme,Besov/Basic,Besov/Trivial}.lean` |
 | Interpolation `L_p`–`L_∞`, Nikolskii property, Besov embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Interpolation,Besov/Nikolskii,Besov/Embeddings}.lean` |
 | Jackson inequality, smoothness spaces, Sobolev embeddings | ✅ proved | ✗ | `ApproximationSpaces/Jackson.lean`, `FunctionSpaces/Sobolev/Embeddings.lean` |

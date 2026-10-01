@@ -21,6 +21,8 @@ public import FunctionSpaces.Torus.Nikolskii
 public import FunctionSpaces.Spectral.Basic
 public import FunctionSpaces.Torus.Sobolev
 public import FunctionSpaces.Torus.Embeddings
+public import FunctionSpaces.Spectral.Blocks
+public import FunctionSpaces.Torus.Coefficients
 
 /-!
 # Function spaces
@@ -57,4 +59,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Torus.Sobolev`: the Fourier basis of `L_2(𝕋^d)` as a spectral scheme and
   the Sobolev spaces `H^s(𝕋^d)`.
 * `FunctionSpaces.Torus.Embeddings`: the embedding theorems on the torus.
+* `FunctionSpaces.Spectral.Blocks`: spectral schemes as projection schemes, the coefficient
+  characterisation of their approximation spaces and `H^s = A^s_2`.
+* `FunctionSpaces.Torus.Coefficients`: `B^s_{2,2}(𝕋^d) = H^s(𝕋^d)` and the Littlewood–Paley
+  characterisation of `B^s_{2,q}(𝕋^d)`.
 -/

@@ -285,6 +285,12 @@ theorem lqNorm_dyadicWeight_neg_le (hq : 1 ≤ q) (α : ℝ) :
   rw [this]
   exact lqNorm_geometric_le hq _
 
+/-- `∑ₖ 2^(-kα) = (1 - 2^(-α))⁻¹`. -/
+theorem tsum_dyadicWeight_neg (α : ℝ) :
+    ∑' k, dyadicWeight (-α) k = (1 - (2 : ℝ≥0∞) ^ (-α))⁻¹ := by
+  simp_rw [dyadicWeight_eq_pow]
+  exact ENNReal.tsum_geometric _
+
 /-- `∑ₖ 2^(-k) = 2`. -/
 theorem tsum_dyadicWeight_neg_one : ∑' k, dyadicWeight (-1) k = 2 := by
   simp_rw [dyadicWeight_eq_pow, ENNReal.rpow_neg_one]
