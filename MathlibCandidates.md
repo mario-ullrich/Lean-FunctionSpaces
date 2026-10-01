@@ -34,7 +34,7 @@ declarations.
 * **`L_∞` norm of bounded continuous functions** (`FunctionSpaces/Lp/BoundedContinuous.lean`):
   for a measure charging open sets, `‖toLp ∞ μ a‖ = ‖a‖`, and the range is closed
   (`BoundedContinuousFunction.norm_toLp_top`, `.isClosed_range_toLp_top`).
-* **Conditional expectation on `L_p`** (`FunctionSpaces/Atoms/Filtration.lean`): for a finite
+* **Conditional expectation on `L_p`** (`FunctionSpaces/Wavelets/Filtration.lean`): for a finite
   measure and `1 ≤ p ≤ ∞`, `E[· | m]` as a contraction `Lp E p μ →L Lp E p μ`
   (`MeasureTheory.Lp.condExpLp`); Mathlib bundles it only on `L_1` and `L_2`.
 * **Fourier analysis on the torus** (`FunctionSpaces/Classical/Translation.lean`): the Fourier

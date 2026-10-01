@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import ApproximationSpaces.Projection
+public import ApproximationSpaces.Decompositions.Projection
 public import FunctionSpaces.Lp.Inclusion
 public import Mathlib.MeasureTheory.Function.ConditionalExpectation.Real
 public import Mathlib.MeasureTheory.Function.ConditionalExpectation.AEMeasurable

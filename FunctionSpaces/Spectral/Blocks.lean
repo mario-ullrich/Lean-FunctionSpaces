@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Spectral.Basic
-public import ApproximationSpaces.Projection
+public import ApproximationSpaces.Decompositions.Projection
 
 /-!
 # Coefficient characterisation of Besov spaces for spectral schemes
@@ -19,7 +19,7 @@ union of the approximants is dense.  The dyadic block
 `Δ_k f = P (2^(k+1)) f - P (2^k) f = ∑_{2^k ≤ lvl i < 2^(k+1)} ⟨e_i, f⟩ e_i`
 
 has `‖Δ_k f‖² = ∑_{2^k ≤ lvl i < 2^(k+1)} |⟨e_i, f⟩|²`.  The general block characterisation
-of `ApproximationSpaces.Projection` then gives, for `s > 0`:
+of `ApproximationSpaces.Decompositions.Projection` then gives, for `s > 0`:
 
 * **the coefficient characterisation of `A^s_q`** (`memApprox_iff_blockNorm_lt_top`):
   `f ∈ A^s_q` iff `(2^(ks) (∑_{2^k ≤ lvl i < 2^(k+1)} |⟨e_i, f⟩|²)^(1/2))_k ∈ ℓ_q`; on the

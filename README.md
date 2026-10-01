@@ -92,10 +92,10 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `L_2`. Then `f ∈ W^m_2(𝕋^d)` iff `∑_k (1 + max_i |k_i|)^(2m) |f̂(k)|² < ∞`
   (`Torus.memSobolev_iff`), and for `m ≥ 1`, `W^m_2(𝕋^d) = B^m_{2,2}(𝕋^d)`
   (`Torus.memSobolev_iff_memBesov`).
-* **Atomic decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
-  `f = ∑_k g_k` with atoms `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
+* **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
+  `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
-  (`ApproximationScheme.memApprox_iff_decompNorm_lt_top`).
+  (`ApproximationScheme.memApprox_iff_blockDecompNorm_lt_top`).
 * **Dyadic blocks.** If the scheme has projections `P_n` onto `A_n` with `‖P_n‖ ≤ M` and
   `⋃ A_n` is dense, then for `s > 0`, `f ∈ A^s_q` iff
   `‖P_1 f‖ + ‖(2^(ks) ‖P_{2^(k+1)} f - P_{2^k} f‖)_k‖_{ℓ_q} < ∞`
@@ -170,7 +170,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ proved | ✗ | `ApproximationSpaces/{Embedding,Transfer}.lean` |
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ proved | ✗ | `ApproximationSpaces/{Lift,Nikolskii}.lean` |
 | K-functional, real interpolation, representation theorem | ✅ proved | ✗ | `ApproximationSpaces/{KFunctional,Representation}.lean` |
-| Atomic decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/{Decomposition,Projection}.lean` |
+| Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
 | Coefficient characterisations, `H^s = B^s_{2,2}` (spectral schemes, torus) | ✅ proved | ✗ | `FunctionSpaces/Spectral/Blocks.lean`, `FunctionSpaces/Torus/Coefficients.lean` |
 | Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces, elementary embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Inclusion,Lp/BoundedContinuous,Scheme,Besov/Basic,Besov/Trivial}.lean` |
 | Interpolation `L_p`–`L_∞`, Nikolskii property, Besov embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Interpolation,Besov/Nikolskii,Besov/Embeddings}.lean` |
@@ -178,8 +178,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ proved | ✗ | `FunctionSpaces/Spectral/Basic.lean` |
 | The torus: trigonometric polynomials, Nikolskii inequality | ✅ proved | ✗ | `FunctionSpaces/Torus/{Measure,Scheme,Nikolskii}.lean` |
 | The torus: `H^s(𝕋^d)`, Besov and Sobolev embeddings, `H^s(𝕋^d) ↪ C(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Torus/{Sobolev,Embeddings}.lean` |
-| Filtration schemes (Haar), martingale-difference characterisation | ✅ proved | ✗ | `FunctionSpaces/Atoms/Filtration.lean` |
-| Haar coefficients of the dyadic filtration on `[0, 1)` | ⬜ planned | ✗ | `FunctionSpaces/Atoms/…` |
+| Filtration schemes (Haar), martingale-difference characterisation | ✅ proved | ✗ | `FunctionSpaces/Wavelets/Filtration.lean` |
+| Haar coefficients of the dyadic filtration on `[0, 1)` | ⬜ planned | ✗ | `FunctionSpaces/Wavelets/Examples/…` |
 | Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ proved | ✗ | `FunctionSpaces/Classical/{Translation,Modulus,BesovModuli}.lean` |
 | Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Classical/SobolevDeriv.lean` |
 | Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Classical/…` |
@@ -193,11 +193,11 @@ file resets its rows to ✗.
 
 Two libraries. `ApproximationSpaces` holds the abstract theory: approximation schemes in a
 real normed space, the approximation spaces and their embeddings, lifting and the Nikolskii
-transfer theorem, the K-functional and the representation theorem, atomic decompositions and
+transfer theorem, the K-functional and the representation theorem, block decompositions and
 projection schemes. Nothing in it mentions functions or measures. `FunctionSpaces` holds the
 Besov and Sobolev spaces built on it: schemes of bounded continuous functions on a finite
 measure space and their embedding theorems, spectral schemes in Hilbert spaces, the torus,
-filtration schemes, and the classical definitions through moduli of smoothness and weak
+filtration schemes for wavelets, and the classical definitions through moduli of smoothness and weak
 derivatives. [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 `blueprint/` holds the LaTeX source of the blueprint and the scripts that check and link its
 `\lean` references.

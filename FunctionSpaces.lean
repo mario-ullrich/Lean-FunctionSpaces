@@ -23,7 +23,7 @@ public import FunctionSpaces.Torus.Sobolev
 public import FunctionSpaces.Torus.Embeddings
 public import FunctionSpaces.Spectral.Blocks
 public import FunctionSpaces.Torus.Coefficients
-public import FunctionSpaces.Atoms.Filtration
+public import FunctionSpaces.Wavelets.Filtration
 public import FunctionSpaces.Classical.Translation
 public import FunctionSpaces.Classical.Modulus
 public import FunctionSpaces.Classical.BesovModuli
@@ -68,7 +68,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   characterisation of their approximation spaces and `H^s = A^s_2`.
 * `FunctionSpaces.Torus.Coefficients`: `B^s_{2,2}(𝕋^d) = H^s(𝕋^d)` and the Littlewood–Paley
   characterisation of `B^s_{2,q}(𝕋^d)`.
-* `FunctionSpaces.Atoms.Filtration`: conditional expectations as contractions on `L_p`,
+* `FunctionSpaces.Wavelets.Filtration`: conditional expectations as contractions on `L_p`,
   filtration schemes (the Haar system for the dyadic filtration) and the characterisation of
   their approximation spaces by martingale differences.
 * `FunctionSpaces.Classical.Translation`: translations on `L_2(𝕋^d)` and their Fourier

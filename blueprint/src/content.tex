@@ -818,16 +818,17 @@ Both are $(X, Y)_{s/r, q}$ by \Cref{thm:representation}.
 This is how approximation by trigonometric polynomials, splines and wavelets are seen to
 define the same spaces.
 
-\chapter{Decompositions and projections}
+\chapter{Block decompositions and projections}
 \label{ch:decompositions}
 
 Throughout, $A$ is an approximation scheme in $X$. Approximation spaces can be described by
-decompositions $f = \sum_k g_k$ into pieces $g_k \in A_{2^k}$, the form that wavelet and
-atomic characterisations of function spaces take~\cite[Chapter~7]{DeVoreLorentz}.
+block decompositions $f = \sum_k g_k$ into blocks $g_k \in A_{2^k}$~\cite[Chapter~7]{DeVoreLorentz}.
+Each block is a whole level; atomic decompositions refine the blocks into localised atoms with
+coefficients, and wavelet decompositions expand them in a basis.
 
-\begin{definition}[Decomposition norm]
-\label{def:decomposition}
-\lean{ApproximationScheme.decompNorm}
+\begin{definition}[Block decomposition norm]
+\label{def:block-decomposition}
+\lean{ApproximationScheme.blockDecompNorm}
 \leanok
 \uses{def:scheme, def:lq-norm}
 Let $s \in \R$ and $1 \leq q \leq \infty$. For $f \in X$, $\|f\|^{\mathrm{dec}}_{s,q}$ is
@@ -835,15 +836,15 @@ the infimum of $\|(2^{ks} \|g_k\|)_k\|_{\ell_q}$ over all sequences $(g_k)_k$ wi
 $g_k \in A_{2^k}$ for every $k$ and $\sum_k g_k = f$, the series converging in $X$.
 \end{definition}
 
-\begin{theorem}[Atomic decompositions]
-\label{thm:decomposition}
+\begin{theorem}[Block decompositions]
+\label{thm:block-decomposition}
 \lean{ApproximationScheme.approxNormDyadic_le_of_hasSum,
-  ApproximationScheme.approxNormDyadic_le_decompNorm,
-  ApproximationScheme.decompNorm_le_approxNormDyadic,
-  ApproximationScheme.memApprox_iff_decompNorm_lt_top,
-  ApproximationScheme.DyadicApprox.atoms}
+  ApproximationScheme.approxNormDyadic_le_blockDecompNorm,
+  ApproximationScheme.blockDecompNorm_le_approxNormDyadic,
+  ApproximationScheme.memApprox_iff_blockDecompNorm_lt_top,
+  ApproximationScheme.DyadicApprox.blocks}
 \leanok
-\uses{def:decomposition, def:dyadic-norm, lem:hardy, lem:near-best, lem:approx-closure}
+\uses{def:block-decomposition, def:dyadic-norm, lem:hardy, lem:near-best, lem:approx-closure}
 Let $s > 0$ and $1 \leq q \leq \infty$. For every $f \in X$,
 \[
   \|f\|^{\mathrm{dy}}_{A^s_q} \leq 2 (1 - 2^{-s})^{-1} \, \|f\|^{\mathrm{dec}}_{s,q} .
@@ -862,7 +863,7 @@ Let $f = \sum_k g_k$ with $g_k \in A_{2^k}$. Since $\sum_{j<k} 2^j < 2^k$, the p
 $\sum_{j<k} g_j$ lies in $A_{2^k}$, so $E_{2^k}(f) \leq T_k = \sum_{i \geq 0} \|g_{k+i}\|$,
 and also $\|f\| \leq T_0$. The first Hardy inequality bounds $\|(2^{ks} T_k)_k\|_{\ell_q}$,
 which gives the first inequality. Conversely, take near-best approximants $a_k$ with
-tolerances $\|f\| 2^{-k(s+1)}$ and the atoms $g_0 = 0$, $g_1 = a_0$, $g_{k+2} =
+tolerances $\|f\| 2^{-k(s+1)}$ and the blocks $g_0 = 0$, $g_1 = a_0$, $g_{k+2} =
 a_{k+1} - a_k \in A_{2^{k+2}}$. Their partial sums are the $a_k$, which converge to $f$ by
 \Cref{lem:approx-closure}, and $\|g_{k+2}\| \leq 2(E_{2^k}(f) + t_k)$ gives the bound.
 \end{proof}
