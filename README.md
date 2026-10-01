@@ -90,6 +90,13 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   basis on `𝕋^d` this is the Littlewood–Paley characterisation of `B^s_{2,q}(𝕋^d)`
   (`Torus.memBesov_two_iff_blockNorm_lt_top`), and for `q = 2` it gives
   `B^s_{2,2}(𝕋^d) = H^s(𝕋^d)` (`Torus.memBesov_two_two_iff`).
+* **Martingale differences.** For a filtration `ℱ_0 ≤ ℱ_1 ≤ ⋯` on a finite measure space,
+  let `A_n ⊆ L_p` be the `ℱ_⌊log₂ n⌋`-measurable functions (for the dyadic filtration of
+  `[0, 1)`, the step functions of the Haar system). If these are dense in `L_p`, then for
+  `s > 0`, `f ∈ A^s_q` iff
+  `‖E[f | ℱ_0]‖_p + ‖(2^(ks) ‖E[f | ℱ_{k+1}] - E[f | ℱ_k]‖_p)_k‖_{ℓ_q} < ∞`
+  (`MeasureTheory.Filtration.memApprox_iff_martingale`), using the conditional expectation
+  as a contraction of `L_p` (`MeasureTheory.Lp.condExpLp`).
 * **Sequence spaces.** For `1 ≤ q ≤ r ≤ ∞` and every sequence `a` in `[0, ∞]`,
   `‖a‖_{ℓ_r} ≤ ‖a‖_{ℓ_q}` (`ENNReal.lqNorm_le_lqNorm_of_le`), and the norm of a series of
   sequences is at most the series of the norms (`ENNReal.lqNorm_tsum_le`).
@@ -158,7 +165,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ proved | ✗ | `FunctionSpaces/Spectral/Basic.lean` |
 | The torus: trigonometric polynomials, Nikolskii inequality | ✅ proved | ✗ | `FunctionSpaces/Torus/{Measure,Scheme,Nikolskii}.lean` |
 | The torus: `H^s(𝕋^d)`, Besov and Sobolev embeddings, `H^s(𝕋^d) ↪ C(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Torus/{Sobolev,Embeddings}.lean` |
-| Haar wavelets | ⬜ planned | ✗ | `FunctionSpaces/Atoms/Haar.lean` |
+| Filtration schemes (Haar), martingale-difference characterisation | ✅ proved | ✗ | `FunctionSpaces/Atoms/Filtration.lean` |
+| Haar coefficients of the dyadic filtration on `[0, 1)` | ⬜ planned | ✗ | `FunctionSpaces/Atoms/…` |
 | Classical definitions by derivatives and differences, coincidence | ⬜ planned | ✗ | `FunctionSpaces/Classical/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
