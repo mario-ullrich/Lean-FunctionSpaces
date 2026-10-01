@@ -37,6 +37,14 @@ namespace Interval
 /-- The function `x ↦ P(x)` on `ℝ` of a complex polynomial `P`. -/
 noncomputable def polyFun (P : ℂ[X]) (x : ℝ) : ℂ := P.eval (x : ℂ)
 
+/-- Evaluation is additive. -/
+theorem polyFun_add (P Q : ℂ[X]) (x : ℝ) : polyFun (P + Q) x = polyFun P x + polyFun Q x := by
+  simp [polyFun]
+
+/-- Evaluation is homogeneous. -/
+theorem polyFun_smul (c : ℂ) (P : ℂ[X]) (x : ℝ) : polyFun (c • P) x = c * polyFun P x := by
+  simp [polyFun]
+
 /-- Polynomials are continuous. -/
 theorem continuous_polyFun (P : ℂ[X]) : Continuous (polyFun P) :=
   (Polynomial.continuous P).comp Complex.continuous_ofReal

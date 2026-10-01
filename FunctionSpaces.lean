@@ -50,6 +50,7 @@ public import FunctionSpaces.Interval.PiecewisePeriodic
 public import FunctionSpaces.Interval.LocalProjection
 public import FunctionSpaces.Interval.BSpline
 public import FunctionSpaces.Interval.Splines
+public import FunctionSpaces.Interval.SplineInverse
 
 /-!
 # Function spaces
@@ -145,4 +146,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   a unit interval, and Marsden's identity.
 * `FunctionSpaces.Interval.Splines`: dyadic splines on `[0, 1]` in jump form, their scheme, and the
   dyadic B-splines as splines.
+* `FunctionSpaces.Interval.SplineInverse`: the inverse inequality of order `r - 1 + 1/p` for
+  dyadic splines.
 -/

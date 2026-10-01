@@ -3438,6 +3438,83 @@ of $(2^k x - m)^{r-1}$ by \Cref{lem:bspline-pieces}; at the ends of the support 
 pieces is $0$ and the other is $B_0$ or $B_{r-1} = B_{r-1} - B_r$.
 \end{proof}
 
+\section{The inverse inequality for splines}
+
+\begin{lemma}[Tools for the inverse inequality]
+\label{lem:spline-inverse-tools}
+\lean{Interval.enorm_polyFun_le_two, Interval.truncPow, Interval.enorm_iterDiff_truncPow_le,
+  Interval.eLpNorm_le_of_strip}
+\leanok
+\uses{lem:interval-nikolskii, lem:pp-local}
+Let $1 \leq p < \infty$ and $r \geq 1$.
+\begin{enumerate}
+  \item There is $K$ with $|P(x)| \leq K L^{-1/p} \|P\|_{L_p[u, u+L]}$ for $x \in [u, u + 2L]$ and
+    every polynomial $P$ of degree $< r$.
+  \item For $x < \xi$ and $h \geq 0$,
+    $|\Delta_h^r (\cdot - \xi)_+^{r-1}(x)| \leq 2^r (rh)^{r-1}$.
+  \item If $|F|^p \leq G^p M_n$ on the strips $[(n+1) 2^{-j} - rh, (n+1) 2^{-j})$, $F = 0$ elsewhere
+    on $S \subseteq [0, 1]$, and $\sum_{n < 2^j} M_n \leq (r + 1) B^p$, then
+    $\|F\|_{L_p(S)} \leq G (rh (r + 1))^{1/p} B$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) as \Cref{lem:interval-nikolskii}, with the norm on $[0, \tfrac12]$ bounding the values on
+$[0, 1]$. (2) $0 \leq (x + ih - \xi)_+ \leq rh$ and $\sum_i \binom{r}{i} = 2^r$. (3) as in
+\Cref{thm:pp-inverse}.
+\end{proof}
+
+\begin{lemma}[Splines across the knots]
+\label{lem:spline-across}
+\lean{Interval.eq_add_sum_Ioc_sub, Interval.jumpCoeff, Interval.sub_eq_jumpCoeff,
+  Interval.polyFun_eq_add_sum_jumps, Interval.iterDiff_ppFun_eq_sum_jumps,
+  Interval.eLpNorm_piece_eq_localMass, Interval.enorm_jumpCoeff_le}
+\leanok
+\uses{def:spline-space, lem:spline-inverse-tools, lem:iter-diff-poly}
+Let $u \in S_j$ have pieces $Q_n$ with $Q_m - Q_{m-1} = c_m (x - \xi_m)^{r-1}$, $\xi_m = m 2^{-j}$,
+and let $m_n = \int_{I_{j,n}} |u|^p$. For $0 \leq h \leq 2^{-j}$ and $0 \leq x$ with $x + rh < 1$,
+$n_0 = \lfloor 2^j x \rfloor$,
+\[
+  \Delta_h^r u(x) = \sum_{n_0 < m \leq n_0 + r} c_m \, \Delta_h^r (\cdot - \xi_m)_+^{r-1}(x),
+\]
+and $|c_m| 2^{-j(r-1)} \leq K 2^{j/p} (m_m^{1/p} + m_{m-1}^{1/p})$ for $0 < m < 2^j$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $[x, x + rh]$, $u = Q_{n_0} + \sum_m c_m (\cdot - \xi_m)_+^{r-1}$ by telescoping, and
+$\Delta_h^r Q_{n_0} = 0$. With $L = 2^{-j}$,
+$c_m L^{r-1} = Q_m(\xi_m + L) - Q_{m-1}(\xi_m + L)$; the first value is bounded by Nikolskii's
+inequality on $I_{j,m}$, the second by part (1) of \Cref{lem:spline-inverse-tools} on
+$I_{j,m-1}$.
+\end{proof}
+
+\begin{theorem}[Inverse inequality for splines]
+\label{thm:spline-inverse}
+\lean{Interval.splineStripConst, Interval.enorm_iterDiff_spline_le,
+  Interval.eLpNorm_iterDiff_spline_le, Interval.splineInverseConst,
+  Interval.splineStripConst_mul_eq, Interval.ofReal_two_pow_mul_pow_le,
+  Interval.exists_inverse_splineScheme}
+\leanok
+\uses{lem:spline-across, lem:spline-inverse-tools, lem:pp-local}
+Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_B < \infty$ such that for all $j, k \in \N$ and
+every spline $a \in S_j$ of order $r$,
+\[
+  \omega_r(a, 2^{-k}, [0, 1])_p \leq C_B \, 2^{-\max(k - j, 0)(r - 1 + 1/p)} \|a\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $k \geq j$ and $0 \leq h \leq 2^{-k}$, \Cref{lem:spline-across} and
+part (2) of \Cref{lem:spline-inverse-tools} give
+$|\Delta_h^r a(x)| \leq C (2^j h)^{r-1} 2^{j/p} (\sum_{l \leq r} m_{n_0 + l})^{1/p}$ on the
+strips, and $\Delta_h^r a = 0$ off them (\Cref{lem:pp-local}). Part (3) gives
+$\|\Delta_h^r a\|_{L_p[0, 1 - rh]} \leq C' (2^j h)^{r - 1 + 1/p} \|a\|_p$, and
+$2^j h \leq 2^{-(k-j)}$.
+\end{proof}
+
 \bpbibheading
 \begin{thebibliography}{99}
 

@@ -46,14 +46,6 @@ theorem integrableOn_polyFun_mul (P Q : ℂ[X]) :
     IntegrableOn (fun x => polyFun P x * polyFun Q x) (Icc (0 : ℝ) 1) :=
   ((continuous_polyFun P).mul (continuous_polyFun Q)).integrableOn_Icc
 
-/-- Evaluation is additive. -/
-theorem polyFun_add (P Q : ℂ[X]) (x : ℝ) : polyFun (P + Q) x = polyFun P x + polyFun Q x := by
-  simp [polyFun]
-
-/-- Evaluation is homogeneous. -/
-theorem polyFun_smul (c : ℂ) (P : ℂ[X]) (x : ℝ) : polyFun (c • P) x = c * polyFun P x := by
-  simp [polyFun]
-
 /-- The **pairing** `⟨P, Q⟩ = ∫_0^1 P Q` of polynomials of degree `< r`, a bilinear form. -/
 noncomputable def polyPairing (r : ℕ) : LinearMap.BilinForm ℂ (degreeLT ℂ r) :=
   LinearMap.mk₂ ℂ (fun P Q => ∫ x in Icc (0 : ℝ) 1, polyFun P x * polyFun Q x)
