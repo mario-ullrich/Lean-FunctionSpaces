@@ -175,7 +175,10 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   (`Haar.memApprox_iff_haarCoeff`). The proof computes `E[f | ℱ_k]` as averages over dyadic
   intervals, from the formula for the conditional expectation onto a countable partition
   (`MeasureTheory.condExp_comap_ae_eq`), and uses
-  `‖∑_m c_m h_{k,m}‖_p = 2^(k(1/2-1/p)) ‖c‖_{ℓ_p}` (`Haar.eLpNorm_sum_haar`).
+  `‖∑_m c_m h_{k,m}‖_p = 2^(k(1/2-1/p)) ‖c‖_{ℓ_p}` (`Haar.eLpNorm_sum_haar`). The Haar scheme is
+  the scheme of piecewise constants, so for `0 < s < 1/p` the Haar condition is also equivalent
+  to `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞` and to its periodic version
+  (`Haar.lqNorm_modulus_lt_top_iff_haarCoeff`, `Haar.lqNorm_perModulus_lt_top_iff_haarCoeff`).
 * **Sequence spaces.** For `1 ≤ q ≤ r ≤ ∞` and every sequence `a` in `[0, ∞]`,
   `‖a‖_{ℓ_r} ≤ ‖a‖_{ℓ_q}` (`ENNReal.lqNorm_le_lqNorm_of_le`), and the norm of a series of
   sequences is at most the series of the norms (`ENNReal.lqNorm_tsum_le`).
@@ -253,6 +256,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | The torus: `H^s(𝕋^d)`, Besov and Sobolev embeddings, `H^s(𝕋^d) ↪ C(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Torus/{Sobolev,Embeddings}.lean` |
 | Filtration schemes (Haar), martingale-difference characterisation | ✅ proved | ✗ | `FunctionSpaces/Wavelets/Filtration.lean` |
 | Haar system on `[0, 1)`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ proved | ✗ | `FunctionSpaces/Wavelets/{Partition,Examples/Haar}.lean` |
+| Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Wavelets/Examples/HaarBesov.lean` |
 | Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ proved | ✗ | `FunctionSpaces/Classical/{Translation,Modulus,BesovModuli}.lean` |
 | Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ proved | ✗ | `FunctionSpaces/Traces/Examples/Torus.lean` |
 | Lipschitz atoms on the torus: synthesis, quasi-interpolants with hat functions, characterisation of `B^s_{2,q}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Atoms/Examples/{Torus,TorusHat,TorusAnalysis}.lean` |

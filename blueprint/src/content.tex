@@ -2156,7 +2156,7 @@ $E[f \mid \mathcal{F}_0]$ from \Cref{lem:dyadic-condexp}, and
 
 For $0 < s < 1/p$ this approximation space is the classical Besov space
 $\Besov{s}{p}{q}[0, 1)$; for larger $s$ it is strictly smaller, since the Haar functions are
-discontinuous. The comparison is not formalised.
+discontinuous. The comparison with moduli of smoothness is \Cref{cor:haar-besov}.
 
 
 \chapter{Classical definitions on the torus}
@@ -3145,6 +3145,41 @@ By \Cref{thm:pp-besov} and \Cref{thm:pp-besov-per} both conditions say $f \in A^
 
 So $\Besov{s}{p}{q}[0,1] = \Besov{s}{p}{q}(\T)$ for $0 < s < 1/p$: below smoothness $1/p$ a jump
 between the ends of the interval costs nothing.
+
+\section{Haar coefficients}
+
+\begin{corollary}[Besov spaces through Haar coefficients]
+\label{cor:haar-besov}
+\lean{Haar.vol_eq_unitVol, Haar.measurePreserving_id_vol, Haar.measurePreserving_id_unitVol,
+  Haar.ae_eq_unitVol_of_vol, Haar.ae_eq_vol_of_unitVol, Haar.toHaar, Haar.ofHaar,
+  Haar.coeFn_toHaar, Haar.coeFn_ofHaar, Haar.ofHaar_toHaar, Haar.polyFun_of_mem_degreeLT_one,
+  Haar.dyadicIndex_eq_floor, Haar.dyadicIndex_natCast_div, Haar.ppFun_ae_eq_stepFun,
+  Haar.ae_eq_ppFun_of_stronglyMeasurable, Haar.toHaar_mem_scheme, Haar.ofHaar_mem_ppScheme,
+  Haar.memApprox_ppScheme_one_iff, Haar.haarCoeff_toHaar, Haar.integral_toHaar,
+  Haar.lqNorm_modulus_lt_top_iff_haarCoeff, Haar.lqNorm_perModulus_lt_top_iff_haarCoeff}
+\leanok
+\uses{thm:haar, thm:pp-besov, thm:pp-besov-per}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $0 < s < 1/p$. For $f \in L_p[0,1]$ the
+following are equivalent.
+\begin{enumerate}
+  \item $\|f\|_p + \bigl\| \bigl( 2^{ks} \omega_1(f, 2^{-k}, [0,1])_p \bigr)_k \bigr\|_{\ell_q}
+    < \infty$.
+  \item $\|f\|_p + \bigl\| \bigl( 2^{ks} \omega_1^{\mathrm{per}}(f, 2^{-k})_p \bigr)_k
+    \bigr\|_{\ell_q} < \infty$.
+  \item $\bigl| \int_0^1 f \bigr| + \Bigl\| \Bigl(2^{k(s + 1/2 - 1/p)}
+    \bigl\| (\langle f, h_{k,m} \rangle)_{0 \leq m < 2^k} \bigr\|_{\ell_p} \Bigr)_k
+    \Bigr\|_{\ell_q} < \infty$.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+\leanok
+Lebesgue measure on $[0, 1)$ and on $[0, 1]$ is the same measure, and a function measurable
+for the dyadic $\sigma$-algebra $\mathcal{F}_j$ is constant on every $I_{j,n}$. So the Haar
+scheme is the scheme of dyadic piecewise polynomials of degree $< 1$, and each of the three
+conditions says $f \in A^s_q$, by \Cref{thm:pp-besov}, \Cref{thm:pp-besov-per} and
+\Cref{thm:haar}.
+\end{proof}
 
 \bpbibheading
 \begin{thebibliography}{99}
