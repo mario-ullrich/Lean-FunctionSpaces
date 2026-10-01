@@ -18,6 +18,9 @@ public import FunctionSpaces.Sobolev.Embeddings
 public import FunctionSpaces.Torus.Measure
 public import FunctionSpaces.Torus.Scheme
 public import FunctionSpaces.Torus.Nikolskii
+public import FunctionSpaces.Spectral.Basic
+public import FunctionSpaces.Torus.Sobolev
+public import FunctionSpaces.Torus.Embeddings
 
 /-!
 # Function spaces
@@ -49,4 +52,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `Torus.trigScheme`.
 * `FunctionSpaces.Torus.Nikolskii`: the Nikolskii inequality for trigonometric polynomials by
   the power trick, `Torus.trigScheme_hasNikolskii`.
+* `FunctionSpaces.Spectral.Basic`: spectral schemes in a Hilbert space and their `L_2` Sobolev
+  spaces, with Jackson and Bernstein inequalities from Parseval's identity.
+* `FunctionSpaces.Torus.Sobolev`: the Fourier basis of `L_2(𝕋^d)` as a spectral scheme and
+  the Sobolev spaces `H^s(𝕋^d)`.
+* `FunctionSpaces.Torus.Embeddings`: the embedding theorems on the torus.
 -/

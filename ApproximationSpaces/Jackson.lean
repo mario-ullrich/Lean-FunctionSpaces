@@ -120,6 +120,21 @@ theorem exists_eq_of_lt [CompleteSpace Y] {s : ℝ} {q : ℝ≥0∞} (hs : W.ord
   let ⟨y, hy, _⟩ := W.exists_eq_of_memApprox_one (hf.of_lt hq le_rfl W.order_pos.le hs)
   ⟨y, hy⟩
 
+/-- Transport of a smoothness space to an equal scheme, keeping the embedding, the order and
+the constants. -/
+def congr {B : ApproximationScheme X} (h : A = B) (W : SmoothnessSpace A Y) :
+    SmoothnessSpace B Y where
+  ι := W.ι
+  injective := W.injective
+  order := W.order
+  order_pos := W.order_pos
+  jacksonConst := W.jacksonConst
+  jacksonConst_nonneg := W.jacksonConst_nonneg
+  bernsteinConst := W.bernsteinConst
+  bernsteinConst_nonneg := W.bernsteinConst_nonneg
+  jackson := h ▸ W.jackson
+  bernstein := h ▸ W.bernstein
+
 end SmoothnessSpace
 
 end ApproximationScheme

@@ -100,7 +100,16 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `1 ≤ p < ∞`, `‖T‖_∞ ≤ (2⌈p/2⌉)^(d/p) n^(d/p) ‖T‖_p`
   (`Torus.norm_le_rpow_mul_eLpNorm`). Hence the trigonometric polynomials have the
   Nikolskii property of dimension `d` (`Torus.trigScheme_hasNikolskii`), and all the Besov
-  embeddings above hold on `𝕋^d` with `α = d (1/p - 1/r)`.
+  embeddings above hold on `𝕋^d` with `α = d (1/p - 1/r)`
+  (`Torus.memBesov_exists_inclusion_eq`, `Torus.memBesov_exists_continuous`).
+* **The Sobolev embedding on the torus.** Let `s > d/2` and `f ∈ L_2(𝕋^d)` with
+  `∑_{k ∈ ℤ^d} (1 + max_i |k_i|)^(2s) |f̂(k)|² < ∞`. Then `f` has a continuous representative
+  (`Torus.sobolev_exists_continuous`). The space `H^s(𝕋^d)` of these functions satisfies
+  Jackson's and Bernstein's inequalities with constant `1` (`Torus.sobolevSpace`), so
+  `H^s(𝕋^d) ⊆ B^s_{2,∞}(𝕋^d)`, `B^t_{2,q}(𝕋^d) ⊆ H^s(𝕋^d)` for `t > s`, and
+  `H^s(𝕋^d) ⊆ L_r(𝕋^d)` for `2 ≤ r ≤ ∞` and `s > d(1/2 - 1/r)`
+  (`Torus.sobolev_memBesov_top`, `Torus.exists_sobolev_of_memBesov`,
+  `Torus.sobolev_exists_inclusion_eq`).
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -125,9 +134,9 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces, elementary embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Inclusion,Lp/BoundedContinuous,Scheme,Besov/Basic,Besov/Trivial}.lean` |
 | Interpolation `L_p`–`L_∞`, Nikolskii property, Besov embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Interpolation,Besov/Nikolskii,Besov/Embeddings}.lean` |
 | Jackson inequality, smoothness spaces, Sobolev embeddings | ✅ proved | ✗ | `ApproximationSpaces/Jackson.lean`, `FunctionSpaces/Sobolev/Embeddings.lean` |
-| Spectral schemes and `L_2` Sobolev spaces | ⬜ planned | ✗ | `FunctionSpaces/Spectral/…` |
+| Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ proved | ✗ | `FunctionSpaces/Spectral/Basic.lean` |
 | The torus: trigonometric polynomials, Nikolskii inequality | ✅ proved | ✗ | `FunctionSpaces/Torus/{Measure,Scheme,Nikolskii}.lean` |
-| The torus: `L_2` Sobolev spaces, `W^s_2(𝕋^d) ↪ C(𝕋^d)` | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |
+| The torus: `H^s(𝕋^d)`, Besov and Sobolev embeddings, `H^s(𝕋^d) ↪ C(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Torus/{Sobolev,Embeddings}.lean` |
 | Haar wavelets | ⬜ planned | ✗ | `FunctionSpaces/Atoms/Haar.lean` |
 | Classical definitions by derivatives and differences, coincidence | ⬜ planned | ✗ | `FunctionSpaces/Classical/…` |
 
