@@ -256,6 +256,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Cardinal B-splines, B-spline basis on a unit interval, Marsden's identity | ✅ proved | ✗ | `FunctionSpaces/Interval/BSpline.lean` |
 | Dyadic splines (jump form = `C^(r-2)`), spline scheme, dyadic B-splines | ✅ proved | ✗ | `FunctionSpaces/Interval/Splines.lean` |
 | Inverse inequality of order `r - 1 + 1/p` for splines | ✅ proved | ✗ | `FunctionSpaces/Interval/SplineInverse.lean` |
+| Spline quasi-interpolant: local reproduction of polynomials, local bounds | ✅ proved | ✗ | `FunctionSpaces/Interval/QuasiInterp.lean` |
 | Density of piecewise polynomials, multiscale characterisation of `A^s_q` and of `B^s_{p,q}` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Wavelets/Examples/Multiscale.lean` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Synthesis,Atomic}.lean` |

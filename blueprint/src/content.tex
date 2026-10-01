@@ -3515,6 +3515,52 @@ $\|\Delta_h^r a\|_{L_p[0, 1 - rh]} \leq C' (2^j h)^{r - 1 + 1/p} \|a\|_p$, and
 $2^j h \leq 2^{-(k-j)}$.
 \end{proof}
 
+\section{A spline quasi-interpolant}
+
+\begin{definition}[Quasi-interpolant]
+\label{def:quasi-interp}
+\lean{Interval.eq_of_polyFun_eq, Interval.locProjScaled, Interval.qiIdx, Interval.qiCoeff,
+  Interval.qiPieces, Interval.qiPieces_apply, Interval.qiPieces_mem,
+  Interval.splineJoins_qiPieces, Interval.polyFun_qiPieces}
+\leanok
+\uses{thm:marsden, def:loc-proj, lem:bspline-dyadic}
+Let $r \geq 1$ and $k \in \N$. For $-r < n < 2^k$ let $J(n) = I_{k, \max(n, 0)}$, an interval of
+the support of $N_r(2^k x - n)$ in $[0, 1)$, and let $\lambda_n(g) = c_n(\tilde P)$ be the
+coefficient of \Cref{thm:marsden} of the rescaled local projection
+$\tilde P(y) = \Pi_{J(n)} g(y 2^{-k})$. The quasi-interpolant is
+\[
+  Q_k g(x) = \sum_{-r < n < 2^k} \lambda_n(g) \, N_r(2^k x - n) ,
+\]
+a spline of order $r$ and level $k$ by \Cref{lem:bspline-dyadic}.
+\end{definition}
+
+\begin{lemma}[Properties of the quasi-interpolant]
+\label{lem:quasi-interp}
+\lean{Interval.bspline_eq_zero_of_not_mem, Interval.polyFun_qiPieces_of_eq,
+  Interval.exists_enorm_bspline_le, Interval.exists_enorm_bcoord_le, Interval.qiCoeff_eq_bcoord,
+  Interval.enorm_qiCoeff_le, Interval.polyFun_qiPieces_eq_sum_Ioc, Interval.eLpNorm_qiPieces_le}
+\leanok
+\uses{def:quasi-interp, lem:loc-proj, lem:bspline-basis}
+Let $1 \leq p < \infty$, $r \geq 1$, $k \in \N$ and $i < 2^k$.
+\begin{enumerate}
+  \item If $g$ agrees on the intervals $J(n)$, $i - r < n \leq i$, with a polynomial $T$ of
+    degree $< r$, then $Q_k g = T$ on $I_{k,i}$.
+  \item There is $C$, independent of $k$ and $i$, with
+    $\|Q_k g\|_{L_p(I_{k,i})} \leq C \sum_{i - r < n \leq i} \|g\|_{L_p(J(n))}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The local projections reproduce $T$ (\Cref{lem:loc-proj}), so $\lambda_n(g) = c_n(T(\cdot
+2^{-k}))$, and on $I_{k,i}$ only the B-splines $i - r < n \leq i$ are nonzero; Marsden's
+identity sums them to $T$. (2) The coordinates in the B-spline basis of \Cref{lem:bspline-basis}
+are linear functionals on a space of dimension $r$, hence bounded by $C_b \|\cdot\|_{L_p[0,1]}$;
+by the coordinate consistency of \Cref{thm:marsden}, $\lambda_n(g)$ is such a coordinate of
+$\tilde P(\cdot + \max(n, 0))$, whose norm on $[0, 1]$ is $2^{k/p} \|\Pi_{J(n)} g\|_{L_p(J(n))}
+\leq 2^{k/p} r M^2 \|g\|_{L_p(J(n))}$. With $|N_r| \leq M_N$ and $|I_{k,i}| = 2^{-k}$ this gives (2).
+\end{proof}
+
 \bpbibheading
 \begin{thebibliography}{99}
 

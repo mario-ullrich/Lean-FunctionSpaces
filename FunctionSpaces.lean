@@ -51,6 +51,7 @@ public import FunctionSpaces.Interval.LocalProjection
 public import FunctionSpaces.Interval.BSpline
 public import FunctionSpaces.Interval.Splines
 public import FunctionSpaces.Interval.SplineInverse
+public import FunctionSpaces.Interval.QuasiInterp
 
 /-!
 # Function spaces
@@ -148,4 +149,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   dyadic B-splines as splines.
 * `FunctionSpaces.Interval.SplineInverse`: the inverse inequality of order `r - 1 + 1/p` for
   dyadic splines.
+* `FunctionSpaces.Interval.QuasiInterp`: a spline quasi-interpolant through local projections and
+  B-spline coefficients, its local reproduction of polynomials and its local bounds.
 -/
