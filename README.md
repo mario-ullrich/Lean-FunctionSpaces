@@ -98,6 +98,11 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `L_2`. Then `f ∈ W^m_2(𝕋^d)` iff `∑_k (1 + max_i |k_i|)^(2m) |f̂(k)|² < ∞`
   (`Torus.memSobolev_iff`), and for `m ≥ 1`, `W^m_2(𝕋^d) = B^m_{2,2}(𝕋^d)`
   (`Torus.memSobolev_iff_memBesov`).
+* **Moduli of smoothness and approximation.** Let `ω(f, 2^(-k))` be subadditive with
+  `ω(f, t) ≤ C₀ ‖f‖`, and assume a Jackson inequality `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for
+  `k ≥ 1` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
+  for `0 ≤ s < θ` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff `‖f‖ + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q} < ∞`,
+  with equivalent quasi-norms (`ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top`).
 * **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
@@ -214,6 +219,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ proved | ✗ | `ApproximationSpaces/{Embedding,Transfer}.lean` |
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ proved | ✗ | `ApproximationSpaces/{Lift,Nikolskii}.lean` |
 | K-functional, real interpolation, representation theorem | ✅ proved | ✗ | `ApproximationSpaces/{KFunctional,Representation}.lean` |
+| Moduli compatible with a scheme, coincidence with the classical space | ✅ proved | ✗ | `ApproximationSpaces/Moduli.lean` |
+| One variable: differences, moduli on intervals, Nikolskii for polynomials, Taylor in `L_p`, Steklov smoothing | ✅ proved | ✗ | `FunctionSpaces/Interval/{Differences,Modulus,Polynomials,Taylor,Steklov,Smoothing}.lean` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Synthesis,Atomic}.lean` |
 | Trace theorem: extension, transfer, surjectivity | ✅ proved | ✗ | `ApproximationSpaces/Trace.lean` |
@@ -243,12 +250,13 @@ file resets its rows to ✗.
 Two libraries. `ApproximationSpaces` holds the abstract theory: approximation schemes in a
 real normed space, the approximation spaces and their embeddings, lifting and the Nikolskii
 transfer theorem, the K-functional and the representation theorem, block and atomic
-decompositions, projection schemes, traces and intrinsic norms. Nothing in it mentions
+decompositions, projection schemes, traces and intrinsic norms, and the coincidence of
+approximation spaces with spaces defined by moduli of smoothness. Nothing in it mentions
 functions or measures. `FunctionSpaces` holds the Besov and Sobolev spaces built on it:
 schemes of bounded continuous functions on a finite measure space and their embedding
 theorems, spectral schemes in Hilbert spaces, the torus with its traces and Lipschitz atoms,
-filtration schemes for wavelets, and the classical definitions through moduli of smoothness
-and weak derivatives. [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
+filtration schemes for wavelets, the classical definitions through moduli of smoothness
+and weak derivatives, and polynomial approximation on intervals. [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 `blueprint/` holds the LaTeX source of the blueprint and the scripts that check and link its
 `\lean` references.
 

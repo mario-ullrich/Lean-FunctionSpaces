@@ -1240,6 +1240,69 @@ Sharpley~\cite{DeVoreSharpley} construct on Lipschitz domains from near-best loc
 polynomials. The extension may be
 nonlinear on purpose: in parts of the quasi-Banach range no linear extension exists.
 
+\chapter{Moduli of smoothness and approximation}
+\label{ch:moduli-abstract}
+
+Classical function spaces are defined by moduli of smoothness, approximation spaces by errors
+of approximation. A Jackson inequality and an inverse inequality make them coincide. This
+chapter states this once for every scheme; the examples are the trigonometric polynomials, the
+piecewise polynomials, splines and wavelets.
+
+\begin{definition}[Modulus compatible with a scheme]
+\label{def:modulus-data}
+\lean{ApproximationScheme.ModulusData, ApproximationScheme.ModulusData.modNorm,
+  ApproximationScheme.ModulusData.modulus_zero, ApproximationScheme.ModulusData.modulus_sum_le}
+\leanok
+\uses{def:scheme, def:error}
+Let $\theta \in \R$. A \emph{modulus compatible with $A$ of inverse order $\theta$} is a family
+$\omega(f, k) \in [0, \infty]$, $f \in X$, $k \in \N$ (the modulus of smoothness at the scale
+$2^{-k}$), together with constants $C_0, C_J, C_B < \infty$ such that for all $f, g \in X$ and
+$j, k \in \N$
+\[
+  \omega(f + g, k) \leq \omega(f, k) + \omega(g, k), \qquad \omega(f, k) \leq C_0 \|f\|,
+\]
+\[
+  E_{2^k}(f) \leq C_J \, \omega(f, k) \quad (k \geq 1), \qquad
+  \omega(a, k) \leq C_B \, 2^{-(k - j)_+ \theta} \|a\| \quad (a \in A_{2^j}) .
+\]
+The \emph{classical quasi-norm} is
+$\|f\|^{\omega}_{s,q} = \|f\| + \|(2^{ks} \omega(f, k))_k\|_{\ell_q}$.
+\end{definition}
+
+\begin{theorem}[Coincidence of approximation and moduli]
+\label{thm:modulus-coincidence}
+\lean{ApproximationScheme.ModulusData.approxNormDyadic_le_modNorm,
+  ApproximationScheme.ModulusData.dyadicWeight_neg_sub_two_le,
+  ApproximationScheme.ModulusData.inverseConst,
+  ApproximationScheme.ModulusData.inverseConst_ne_top,
+  ApproximationScheme.ModulusData.modNorm_le_approxNormDyadic,
+  ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top}
+\leanok
+\uses{def:modulus-data, def:dyadic-norm, lem:hardy}
+Let $\omega$ be a modulus compatible with $A$ of inverse order $\theta$ and $1 \leq q \leq
+\infty$. Then for every $f \in X$ and $s \geq 0$,
+$\|f\|^{\mathrm{dy}}_{A^s_q} \leq (2 + C_J) \|f\|^{\omega}_{s,q}$, and for $0 \leq s < \theta$,
+\[
+  \|f\|^{\omega}_{s,q} \leq \bigl(1 + 3 C_0 + C_B (3 + 6 \cdot 4^{\theta})
+  (1 - 2^{-(\theta - s)})^{-1}\bigr) \|f\|^{\mathrm{dy}}_{A^s_q} .
+\]
+In particular $f \in A^s_q$ if and only if $\|f\|^{\omega}_{s,q} < \infty$, for $0 \leq s < \theta$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first bound is Jackson's inequality for $k \geq 1$ and $E_1(f) \leq \|f\|$. For the second,
+let $a_k \in A_{2^k}$ be near-best approximants and write
+$f = (f - a_k) + a_0 + \sum_{j < k} (a_{j+1} - a_j)$, where $a_{j+1} - a_j \in A_{2^{j+2}}$. Then
+\[
+  2^{ks} \omega(f, k) \leq C_0 \, 2^{ks} \|f - a_k\| + C_B \, 2^{-k(\theta - s)} \|a_0\|
+  + 2 C_B 4^{\theta} \, 2^{-k(\theta - s)} \sum_{j \leq k} 2^{j(\theta - s)} \,
+  2^{js} (E_{2^j}(f) + t_j),
+\]
+and the last sum is bounded in $\ell_q$ by Hardy's inequality (\Cref{lem:hardy}) with exponent
+$\theta - s > 0$.
+\end{proof}
+
 \chapter{Besov spaces and their embeddings}
 \label{ch:besov}
 
@@ -2645,6 +2708,197 @@ the converse.
 
 This is the characterisation of Schneider and Vyb\'{\i}ral~\cite{SchneiderVybiral} on $\T^d$
 for $p = 2$.
+
+\chapter{Polynomial approximation on intervals}
+\label{ch:interval}
+
+This chapter prepares the approximation by piecewise polynomials on an interval $[a, b]$,
+for all $1 \leq p \leq \infty$ and without Fourier analysis. Functions are complex-valued and
+measurable on $\R$; norms are taken on subintervals with Lebesgue measure.
+
+\section{Differences and moduli}
+
+\begin{definition}[Differences of higher order]
+\label{def:iter-diff}
+\lean{Interval.iterDiff, Interval.iterDiff_apply, Interval.iterDiff_zero, Interval.iterDiff_succ,
+  Interval.iterDiff_succ', Interval.iterDiff_add, Interval.iterDiff_sub,
+  Interval.iterDiff_const_mul, Interval.iterDiff_comp_add, Interval.iterDiff_reflect}
+\leanok
+For $f : \R \to \C$, $r \in \N$ and $h \in \R$ the difference of order $r$ is
+$\Delta_h^r f(x) = \sum_{k=0}^r (-1)^{r-k} \binom{r}{k} f(x + k h)$, the $r$-fold iterate of
+$\Delta_h f(x) = f(x + h) - f(x)$.
+\end{definition}
+
+\begin{lemma}[Differences annihilate polynomials]
+\label{lem:iter-diff-poly}
+\lean{Interval.iterDiff_polynomial}
+\leanok
+\uses{def:iter-diff}
+For every polynomial $P$ of degree $< r$ and every $h \in \R$, $\Delta_h^r P = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib proves this for the step $1$; the polynomial $y \mapsto P(x + h y)$ has degree $< r$ and
+its differences with step $1$ at $0$ are those of $P$ with step $h$ at $x$.
+\end{proof}
+
+\begin{definition}[Modulus of smoothness on an interval]
+\label{def:interval-modulus}
+\lean{Interval.modulus, Interval.eLpNorm_iterDiff_le_modulus, Interval.modulus_mono,
+  Interval.eLpNorm_comp_add_Icc, Interval.eLpNorm_comp_sub_Icc, Interval.eLpNorm_Icc_mono,
+  Interval.measurable_iterDiff}
+\leanok
+\uses{def:iter-diff}
+For $1 \leq p \leq \infty$, $r \in \N$ and $t \geq 0$ the modulus of smoothness of $f$ on
+$[a, b]$ is
+\[
+  \omega_r(f, t, [a, b])_p = \sup_{0 \leq h \leq t} \|\Delta_h^r f\|_{L_p[a, b - r h]} .
+\]
+\end{definition}
+
+\begin{lemma}[Properties of the modulus]
+\label{lem:interval-modulus}
+\lean{Interval.eLpNorm_iterDiff_le, Interval.modulus_le, Interval.modulus_add_le,
+  Interval.modulus_const_mul, Interval.modulus_polynomial, Interval.modulus_congr_ae,
+  Interval.modulus_reflect}
+\leanok
+\uses{def:interval-modulus, lem:iter-diff-poly}
+The modulus $\omega_r(f, t, [a, b])_p$ increases in $t$, is subadditive and homogeneous in $f$,
+satisfies $\omega_r(f, t, [a, b])_p \leq 2^r \|f\|_{L_p[a, b]}$, vanishes for polynomials of
+degree $< r$, depends only on the restriction of $f$ to $[a, b]$ up to null sets, and is
+invariant under $f \mapsto f(a + b - \cdot)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Each term $f(\cdot + k h)$ is a translate of $f$ restricted to a subinterval of $[a, b]$, and
+$\sum_k \binom{r}{k} = 2^r$. Reflection maps $\Delta_h^r$ to $\pm \Delta_h^r$ at the reflected
+point.
+\end{proof}
+
+\section{Polynomials on intervals}
+
+\begin{lemma}[Nikolskii inequality for polynomials on intervals]
+\label{lem:interval-nikolskii}
+\lean{Interval.polyFun, Interval.continuous_polyFun, Interval.measurable_polyFun,
+  Interval.comp_affine_mem_degreeLT, Interval.polyFun_comp_affine, Interval.eq_zero_of_ae_eq_zero,
+  Interval.memLp_polyFun, Interval.polyFun_degreeLTEquiv_symm, Interval.coeffToLp,
+  Interval.enorm_coeffToLp, Interval.coeffToLp_injective, Interval.exists_enorm_le_eLpNorm,
+  Interval.eLpNorm_comp_affine, Interval.enorm_polyFun_le}
+\leanok
+Let $r \in \N$ and $1 \leq p < \infty$. There is $K < \infty$ such that for every polynomial $P$ of
+degree $< r$, every interval $[u, u + L]$ with $L > 0$ and every $x \in [u, u + L]$,
+\[
+  |P(x)| \leq K L^{-1/p} \|P\|_{L_p[u, u + L]} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $[0, 1]$ the map from the $r$ coefficients to $L_p[0, 1]$ is injective, since a nonzero
+polynomial has finitely many zeros, hence bounded below in finite dimension; this bounds the
+coefficients and so $|P(x)|$ by $\|P\|_{L_p[0,1]}$. The general interval follows by the affine
+change of variables $x = u + L y$, which multiplies the $L_p$ norm by $L^{-1/p}$.
+\end{proof}
+
+\begin{lemma}[Polynomial approximation of smooth functions]
+\label{lem:taylor-lp}
+\lean{Interval.exists_derivative_eq, Interval.hasDerivAt_polyFun,
+  Interval.exists_eLpNorm_sub_polyFun_le}
+\leanok
+Let $1 \leq p \leq \infty$, $r \in \N$, $g \in C^r(\R)$ and $u \leq v$. There is a polynomial $Q$
+of degree $< r$ with
+$\|g - Q\|_{L_p[u, v]} \leq (v - u)^r \|g^{(r)}\|_{L_p[u, v]}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Induction on $r$. Approximate $g'$ by $Q'$ of degree $< r - 1$ and let $Q$ be an antiderivative of
+$Q'$ with $Q(u) = g(u)$. By the fundamental theorem of calculus and Hölder's inequality,
+$|(g - Q)(x)| \leq \int_u^v |g' - Q'| \leq (v - u)^{1 - 1/p} \|g' - Q'\|_{L_p[u, v]}$, and the
+$L_p$ norm of a function bounded by $M$ is at most $(v - u)^{1/p} M$.
+\end{proof}
+
+\section{Steklov smoothing}
+
+\begin{definition}[Steklov averages]
+\label{def:steklov}
+\lean{Interval.steklov, Interval.steklov_eq, Interval.steklovIter, Interval.steklovIter_succ}
+\leanok
+For $g : \R \to \C$ and $\eta > 0$ the Steklov average is
+$M_\eta g(x) = \eta^{-1} \int_0^\eta g(x + \tau) \, d\tau$, and $M_\eta^m$ is its $m$-fold
+iterate.
+\end{definition}
+
+\begin{lemma}[Averages gain derivatives]
+\label{lem:steklov-deriv}
+\lean{Interval.hasDerivAt_steklov, Interval.differentiable_steklov, Interval.deriv_steklov,
+  Interval.steklov_comp_add, Interval.steklov_sub, Interval.steklov_fwdDiff,
+  Interval.continuous_steklov, Interval.continuous_fwdDiff, Interval.contDiff_fwdDiff,
+  Interval.contDiff_steklov, Interval.contDiff_steklovIter, Interval.continuous_steklovIter,
+  Interval.steklovIter_fwdDiff, Interval.iteratedDeriv_steklovIter_add,
+  Interval.iteratedDeriv_steklovIter}
+\leanok
+\uses{def:steklov, def:iter-diff}
+For continuous $g$, $(M_\eta g)' = \eta^{-1} \Delta_\eta g$. Hence $M_\eta^m g \in C^m$ and
+$(M_\eta^r g)^{(r)} = \eta^{-r} \Delta_\eta^r g$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$M_\eta g(x) = \eta^{-1} (G(x + \eta) - G(x))$ with a primitive $G$ of $g$. Averages commute with
+translations and differences, so each further average adds one derivative.
+\end{proof}
+
+\begin{lemma}[Minkowski's inequality for averages]
+\label{lem:minkowski-avg}
+\lean{Interval.eLpNorm_rpow_eq, Interval.enorm_avg_rpow_le, Interval.eLpNorm_avg_le,
+  Interval.avgStep, Interval.avgStepIter, Interval.avgStepIter_succ, Interval.continuous_avgStep,
+  Interval.continuous_avgStepIter, Interval.eLpNorm_avgStepIter_le}
+\leanok
+Let $K : \R \times \R \to \C$ be continuous, $\delta > 0$, $1 \leq p < \infty$ and $S \subseteq \R$.
+Then
+\[
+  \Bigl\| \delta^{-1} \int_0^\delta K(t, \cdot) \, dt \Bigr\|_{L_p(S)}
+  \leq \sup_{0 \leq t \leq \delta} \|K(t, \cdot)\|_{L_p(S)} .
+\]
+Iterating $m$ times, an average over $v \in [0, \delta]^m$ of $G(\sigma + v_1 + \cdots + v_m, \cdot)$
+has $L_p(S)$ norm at most $\sup_{\sigma \leq h \leq \sigma + m \delta} \|G(h, \cdot)\|_{L_p(S)}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Hölder's inequality gives
+$|\delta^{-1} \int_0^\delta K(t, x) \, dt|^p \leq \delta^{-1} \int_0^\delta |K(t, x)|^p \, dt$;
+integrate over $x \in S$ and exchange the integrals by Tonelli's theorem.
+\end{proof}
+
+\begin{theorem}[Steklov smoothing]
+\label{thm:steklov-smoothing}
+\lean{Interval.avgStepIter_const, Interval.avgStepIter_shift, Interval.avgStepIter_sum,
+  Interval.smooth, Interval.sub_smooth_eq, Interval.contDiff_smooth, Interval.iteratedDeriv_smooth,
+  Interval.continuous_iterDiff_uncurry, Interval.eLpNorm_sub_smooth_le,
+  Interval.eLpNorm_iteratedDeriv_smooth_le}
+\leanok
+\uses{lem:steklov-deriv, lem:minkowski-avg, def:interval-modulus}
+Let $f$ be continuous, $r \in \N$, $\delta > 0$ and
+$S_\delta f = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} M_{k\delta}^r f$. Then $S_\delta f \in C^r$, and for
+$1 \leq p < \infty$ and $[u, w]$ with $a \leq u$ and $w + r^2 \delta \leq b$,
+\[
+  \|f - S_\delta f\|_{L_p[u, w]} \leq \omega_r(f, r\delta, [a, b])_p, \qquad
+  \|(S_\delta f)^{(r)}\|_{L_p[u, w]} \leq 2^r \delta^{-r} \omega_r(f, r\delta, [a, b])_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Averaging $f(x + k h)$ over $h = v_1 + \cdots + v_r$, $v \in [0, \delta]^r$, gives
+$M_{k\delta}^r f(x)$, so $f - S_\delta f = (-1)^r$ times the average of $\Delta_h^r f$, which
+\Cref{lem:minkowski-avg} bounds. The derivative is
+$(S_\delta f)^{(r)} = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta_{k\delta}^r f$ by
+\Cref{lem:steklov-deriv}.
+\end{proof}
 
 \bpbibheading
 \begin{thebibliography}{99}

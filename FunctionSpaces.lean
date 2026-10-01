@@ -34,6 +34,12 @@ public import FunctionSpaces.Traces.Examples.Torus
 public import FunctionSpaces.Atoms.Examples.Torus
 public import FunctionSpaces.Atoms.Examples.TorusHat
 public import FunctionSpaces.Atoms.Examples.TorusAnalysis
+public import FunctionSpaces.Interval.Differences
+public import FunctionSpaces.Interval.Modulus
+public import FunctionSpaces.Interval.Polynomials
+public import FunctionSpaces.Interval.Taylor
+public import FunctionSpaces.Interval.Steklov
+public import FunctionSpaces.Interval.Smoothing
 
 /-!
 # Function spaces
@@ -97,4 +103,12 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   partitions of unity.
 * `FunctionSpaces.Atoms.Examples.TorusAnalysis`: decomposition of `f ∈ B^s_{2,q}(𝕋^d)` into
   Lipschitz atoms through quasi-interpolants, and the Lipschitz-atomic characterisation.
+* `FunctionSpaces.Interval.Differences`: differences of order `r` and their action on polynomials.
+* `FunctionSpaces.Interval.Modulus`: the modulus of smoothness `ω_r(f, t, [a, b])_p` on an interval.
+* `FunctionSpaces.Interval.Polynomials`: polynomials of degree `< r` on intervals, equivalence of
+  norms and the Nikolskii inequality.
+* `FunctionSpaces.Interval.Taylor`: approximation of `C^r` functions by polynomials in `L_p`.
+* `FunctionSpaces.Interval.Steklov`: Steklov averages and their derivatives.
+* `FunctionSpaces.Interval.Smoothing`: the Steklov smoothing `S_δ f`, Minkowski's inequality for
+  averages, and the bounds of `f - S_δ f` and `(S_δ f)^(r)` by the modulus.
 -/

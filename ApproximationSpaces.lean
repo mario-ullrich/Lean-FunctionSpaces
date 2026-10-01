@@ -28,6 +28,7 @@ public import ApproximationSpaces.Decompositions.Synthesis
 public import ApproximationSpaces.Decompositions.Atomic
 public import ApproximationSpaces.Trace
 public import ApproximationSpaces.Retract
+public import ApproximationSpaces.Moduli
 
 /-!
 # Approximation spaces
@@ -83,4 +84,6 @@ Nothing in this library mentions functions or measures.
   `A^β_1`, the transfer `A^s_q → B^{s-β}_q` and its surjectivity.
 * `ApproximationSpaces.Retract`: approximation-preserving extensions and the equivalence of
   intrinsic and restriction quasi-norms.
+* `ApproximationSpaces.Moduli`: moduli of smoothness compatible with a scheme (Jackson and
+  inverse inequalities) and the coincidence of `A^s_q` with the classical space for `0 < s < θ`.
 -/
