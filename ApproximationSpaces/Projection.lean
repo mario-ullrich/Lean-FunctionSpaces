@@ -59,8 +59,10 @@ namespace ProjectionScheme
 
 variable {A : ApproximationScheme X} (PS : ProjectionScheme A)
 
+/-- The bound of a projection scheme is nonnegative. -/
 theorem bound_nonneg : 0 ≤ PS.bound := (norm_nonneg _).trans (PS.norm_le 0)
 
+/-- `‖P_n f‖ ≤ M ‖f‖`. -/
 theorem enorm_apply_le (n : ℕ) (f : X) : ‖PS.P n f‖ₑ ≤ ENNReal.ofReal PS.bound * ‖f‖ₑ := by
   refine ((PS.P n).le_opENorm f).trans ?_
   gcongr

@@ -44,6 +44,7 @@ theorem approxNormDyadic_mono_exponent (hq : 1 ≤ q) (hqr : q ≤ r) (f : X) :
   gcongr
   exact ENNReal.lqNorm_le_lqNorm_of_le hq hqr _
 
+/-- Changing the smoothness index multiplies the dyadic terms by `2^(k(t-s))`. -/
 theorem approxSeqDyadic_eq_mul (s t : ℝ) (f : X) (k : ℕ) :
     A.approxSeqDyadic t f k = dyadicWeight (t - s) k * A.approxSeqDyadic s f k := by
   rw [approxSeqDyadic, approxSeqDyadic, ← mul_assoc, ← ENNReal.dyadicWeight_add, sub_add_cancel]
@@ -90,12 +91,14 @@ theorem approxNorm_le_of_lt (hq : 1 ≤ q) (hr : 1 ≤ r) (ht : 0 ≤ t) (hts : 
         gcongr; exact approxNormDyadic_le_approxNorm hq (ht.trans hts.le) f
     _ = _ := by ring
 
+/-- `A^s_q ⊆ A^s_r` for `1 ≤ q ≤ r` and `s ≥ 0`. -/
 theorem MemApprox.mono_exponent (hq : 1 ≤ q) (hqr : q ≤ r) (hs : 0 ≤ s) {f : X}
     (hf : A.MemApprox s q f) : A.MemApprox s r f := by
   rw [memApprox_iff_approxNormDyadic_lt_top hq hs] at hf
   rw [memApprox_iff_approxNormDyadic_lt_top (hq.trans hqr) hs]
   exact (approxNormDyadic_mono_exponent hq hqr f).trans_lt hf
 
+/-- `A^s_q ⊆ A^t_r` for `0 ≤ t < s` and all `1 ≤ q, r ≤ ∞`. -/
 theorem MemApprox.of_lt (hq : 1 ≤ q) (hr : 1 ≤ r) (ht : 0 ≤ t) (hts : t < s) {f : X}
     (hf : A.MemApprox s q f) : A.MemApprox t r f := by
   rw [memApprox_iff_approxNormDyadic_lt_top hq (ht.trans hts.le)] at hf
@@ -111,6 +114,7 @@ theorem MemApprox.mono (hq : 1 ≤ q) (hr : 1 ≤ r) (ht : 0 ≤ t)
   · exact hf.of_lt hq hr ht h
   · exact hf.mono_exponent hq hqr ht
 
+/-- The approximation spaces decrease in `s` and increase in `q`, as submodules. -/
 theorem approxSpace_mono (hq : 1 ≤ q) (hr : 1 ≤ r) (ht : 0 ≤ t) (hs : 0 ≤ s)
     (h : t < s ∨ (t = s ∧ q ≤ r)) : A.approxSpace s q hs hq ≤ A.approxSpace t r ht hr :=
   fun _ hf => MemApprox.mono hq hr ht h hf

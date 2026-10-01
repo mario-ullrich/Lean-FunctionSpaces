@@ -81,9 +81,11 @@ noncomputable def sobolevSpace (s : ℝ) (hs : 0 < s) :
   ApproximationScheme.SmoothnessSpace.congr (toLp_trigScheme_eq d).symm
     ((fourierScheme d).toSmoothnessSpace s hs)
 
+/-- `H^s(𝕋^d)` has order `s`. -/
 @[simp]
 theorem sobolevSpace_order (s : ℝ) (hs : 0 < s) : (sobolevSpace (d := d) s hs).order = s := rfl
 
+/-- The embedding of `H^s(𝕋^d)` is `J_s`. -/
 theorem sobolevSpace_iota (s : ℝ) (hs : 0 < s) (c : ℓ²(d → ℤ, ℂ)) :
     (sobolevSpace (d := d) s hs).ι c = (fourierScheme d).sobolevEmbed s hs.le c := rfl
 

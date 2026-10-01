@@ -46,6 +46,7 @@ def ofSpan (e : ℕ → X) : ApproximationScheme X where
 
 variable (e : ℕ → X)
 
+/-- `A_n = span {e_i : i < n}`. -/
 theorem ofSpan_apply (n : ℕ) : ofSpan e n = (Submodule.span ℝ (e '' Set.Iio n) : Set X) := rfl
 
 /-- The sets of `ofSpan e` are finite-dimensional. -/

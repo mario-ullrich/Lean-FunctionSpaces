@@ -88,10 +88,12 @@ theorem mFourier_add_apply (k : d → ℤ) (x h : UnitAddTorus d) :
   simp only [mFourier, ContinuousMap.coe_mk, Pi.add_apply, fourier_apply, smul_add,
     AddCircle.toCircle_add, Circle.coe_mul, Finset.prod_mul_distrib]
 
+/-- `e_k(0) = 1`. -/
 @[simp]
 theorem mFourier_apply_zero (k : d → ℤ) : mFourier k (0 : UnitAddTorus d) = 1 := by
   simp [mFourier]
 
+/-- `e_{-k}(-h) = e_k(h)`. -/
 theorem mFourier_neg_neg (k : d → ℤ) (h : UnitAddTorus d) : mFourier (-k) (-h) = mFourier k h := by
   simp only [mFourier, ContinuousMap.coe_mk, Pi.neg_apply, fourier_apply, neg_smul_neg]
 
@@ -100,6 +102,7 @@ noncomputable def translate (h : UnitAddTorus d) :
     Lp ℂ 2 (volume : Measure (UnitAddTorus d)) →+ Lp ℂ 2 (volume : Measure (UnitAddTorus d)) :=
   Lp.compMeasurePreserving (· + h) (measurePreserving_add_right volume h)
 
+/-- `τ_h f` is a.e. the function `x ↦ f(x + h)`. -/
 theorem coeFn_translate (h : UnitAddTorus d) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
     translate h f =ᵐ[volume] fun x => f (x + h) :=
   Lp.coeFn_compMeasurePreserving f _
@@ -125,6 +128,7 @@ theorem mFourierCoeff_translate (h : UnitAddTorus d)
     _ = mFourier k h * ∫ y, mFourier (-k) y • f y := by
         rw [← integral_const_mul]; congr 1; funext y; simp only [smul_eq_mul]; ring
 
+/-- The coefficients of `τ_h f` in the Fourier basis are `e_k(h) f̂(k)`. -/
 theorem repr_translate (h : UnitAddTorus d) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d)))
     (k : d → ℤ) :
     mFourierBasis.repr (translate h f) k = mFourier k h * mFourierBasis.repr f k := by

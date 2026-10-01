@@ -58,6 +58,7 @@ def nTerm (D : Set X) : ApproximationScheme X where
 
 variable {D : Set X}
 
+/-- `x ∈ A_n` iff `x` is a linear combination of at most `n` elements of `D`. -/
 theorem mem_nTerm {n : ℕ} {x : X} : x ∈ nTerm D n ↔
     ∃ S : Finset X, (S : Set X) ⊆ D ∧ S.card ≤ n ∧ x ∈ Submodule.span ℝ (S : Set X) := Iff.rfl
 

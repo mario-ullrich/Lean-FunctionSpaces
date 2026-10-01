@@ -46,6 +46,7 @@ noncomputable def approxError (n : ℕ) (f : X) : ℝ := Metric.infDist f (A n)
 
 variable {A}
 
+/-- `E_n(f) ≥ 0`. -/
 theorem approxError_nonneg (n : ℕ) (f : X) : 0 ≤ A.approxError n f := Metric.infDist_nonneg
 
 /-- Every approximant gives an upper bound for the error. -/
@@ -57,6 +58,7 @@ theorem approxError_le_norm_sub {n : ℕ} {a : X} (ha : a ∈ A n) (f : X) :
 theorem approxError_le_norm (n : ℕ) (f : X) : A.approxError n f ≤ ‖f‖ := by
   simpa using approxError_le_norm_sub (A.zero_mem n) f
 
+/-- `E_n(0) = 0`. -/
 @[simp]
 theorem approxError_zero_right (n : ℕ) : A.approxError n 0 = 0 :=
   Metric.infDist_zero_of_mem (A.zero_mem n)
@@ -66,9 +68,11 @@ theorem approxError_zero_right (n : ℕ) : A.approxError n 0 = 0 :=
 theorem approxError_zero_left (f : X) : A.approxError 0 f = ‖f‖ := by
   simp [approxError, A.coe_zero, Metric.infDist_singleton]
 
+/-- `E_n(f) = 0` for `f ∈ A_n`. -/
 theorem approxError_eq_zero_of_mem {n : ℕ} {f : X} (hf : f ∈ A n) : A.approxError n f = 0 :=
   Metric.infDist_zero_of_mem hf
 
+/-- `E_n(f) = 0` for `f` in the closure of `A_n`. -/
 theorem approxError_eq_zero_of_mem_closure {n : ℕ} {f : X} (hf : f ∈ closure (A n)) :
     A.approxError n f = 0 :=
   Metric.infDist_zero_of_mem_closure hf
@@ -82,6 +86,7 @@ theorem approxError_anti_scheme {A' : ApproximationScheme X} (h : ∀ n, A n ⊆
     (f : X) : A'.approxError n f ≤ A.approxError n f :=
   Metric.infDist_le_infDist_of_subset (h n) (A.nonempty n)
 
+/-- `r ≤ E_n(f)` iff `r ≤ ‖f - a‖` for every `a ∈ A_n`. -/
 theorem le_approxError_iff {n : ℕ} {f : X} {r : ℝ} :
     r ≤ A.approxError n f ↔ ∀ a ∈ A n, r ≤ ‖f - a‖ := by
   simp only [approxError, Metric.le_infDist (A.nonempty n), dist_eq_norm]
@@ -139,10 +144,12 @@ theorem approxError_smul (n : ℕ) (c : ℝ) (f : X) :
     rw [A.smul_set_eq hc n, Real.norm_eq_abs] at this
     exact this
 
+/-- `E_n(-f) = E_n(f)`. -/
 @[simp]
 theorem approxError_neg (n : ℕ) (f : X) : A.approxError n (-f) = A.approxError n f := by
   simpa using approxError_smul (A := A) n (-1) f
 
+/-- `E_n(f) ≤ E_n(g) + ‖f - g‖`. -/
 theorem approxError_le_approxError_add_norm (n : ℕ) (f g : X) :
     A.approxError n f ≤ A.approxError n g + ‖f - g‖ := by
   rw [← dist_eq_norm]; exact Metric.infDist_le_infDist_add_dist
@@ -155,6 +162,7 @@ theorem abs_approxError_sub_le (n : ℕ) (f g : X) :
   · linarith [approxError_le_approxError_add_norm (A := A) n f g]
   · linarith [approxError_le_approxError_add_norm (A := A) n g f, norm_sub_rev f g]
 
+/-- `E_n` is continuous, being `1`-Lipschitz. -/
 theorem continuous_approxError (n : ℕ) : Continuous (A.approxError n) :=
   Metric.continuous_infDist_pt _
 

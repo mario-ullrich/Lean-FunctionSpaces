@@ -60,10 +60,12 @@ namespace ApproximationScheme
 variable {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
   [NormedAddCommGroup Y] [NormedSpace ℝ Y]
 
+/-- A scheme is used as its sequence of sets `n ↦ A_n`. -/
 instance : CoeFun (ApproximationScheme X) (fun _ => ℕ → Set X) := ⟨ApproximationScheme.sets⟩
 
 variable (A : ApproximationScheme X)
 
+/-- `A_0 = {0}`. -/
 theorem coe_zero : A 0 = {0} := A.sets_zero
 
 /-- Two schemes with the same sets are equal. -/
@@ -81,14 +83,18 @@ theorem nonempty (n : ℕ) : (A n).Nonempty := ⟨0, A.zero_mem n⟩
 
 variable {A}
 
+/-- The sets increase: `A_m ⊆ A_n` for `m ≤ n`. -/
 theorem mem_of_le {m n : ℕ} (h : m ≤ n) {a : X} (ha : a ∈ A m) : a ∈ A n := A.mono h ha
 
+/-- `a + b ∈ A_{m+n}` for `a ∈ A_m` and `b ∈ A_n`. -/
 theorem add_mem {m n : ℕ} {a b : X} (ha : a ∈ A m) (hb : b ∈ A n) : a + b ∈ A (m + n) :=
   A.add_subset m n (Set.add_mem_add ha hb)
 
+/-- `-a ∈ A_n` for `a ∈ A_n`. -/
 theorem neg_mem {n : ℕ} {a : X} (ha : a ∈ A n) : -a ∈ A n := by
   simpa using A.smul_mem (-1) ha
 
+/-- `a - b ∈ A_{m+n}` for `a ∈ A_m` and `b ∈ A_n`. -/
 theorem sub_mem {m n : ℕ} {a b : X} (ha : a ∈ A m) (hb : b ∈ A n) : a - b ∈ A (m + n) := by
   simpa [sub_eq_add_neg] using add_mem ha (neg_mem hb)
 
@@ -98,6 +104,7 @@ theorem add_mem_pow_succ {k : ℕ} {a b : X} (ha : a ∈ A (2 ^ k)) (hb : b ∈ 
   have := add_mem ha hb
   rwa [← two_mul, ← pow_succ'] at this
 
+/-- `a - b ∈ A_{2^(k+1)}` for `a, b ∈ A_{2^k}`. -/
 theorem sub_mem_pow_succ {k : ℕ} {a b : X} (ha : a ∈ A (2 ^ k)) (hb : b ∈ A (2 ^ k)) :
     a - b ∈ A (2 ^ (k + 1)) := by
   have := sub_mem ha hb
@@ -144,6 +151,7 @@ def iUnionSubmodule : Submodule ℝ X where
     rintro c a ⟨_, ⟨n, rfl⟩, ha⟩
     exact Set.mem_iUnion.2 ⟨n, A.smul_mem c ha⟩
 
+/-- The submodule `iUnionSubmodule` has the carrier `⋃ n, A_n`. -/
 @[simp]
 theorem coe_iUnionSubmodule : (A.iUnionSubmodule : Set X) = ⋃ n, A n := rfl
 
@@ -167,6 +175,7 @@ def comap (ι : Y →ₗ[ℝ] X) (hι : Function.Injective ι) : ApproximationSc
     simp only [Set.mem_preimage, map_add] at ha hb ⊢
     exact add_mem ha hb
 
+/-- Membership in the preimage scheme: `y ∈ ι⁻¹(A_n)` iff `ι y ∈ A_n`. -/
 @[simp]
 theorem mem_comap {ι : Y →ₗ[ℝ] X} {hι : Function.Injective ι} {n : ℕ} {y : Y} :
     y ∈ A.comap ι hι n ↔ ι y ∈ A n := Iff.rfl
@@ -183,10 +192,12 @@ def map (T : X →ₗ[ℝ] Y) : ApproximationScheme Y where
     rintro _ ⟨_, ⟨a, ha, rfl⟩, _, ⟨b, hb, rfl⟩, rfl⟩
     exact ⟨a + b, add_mem ha hb, map_add T a b⟩
 
+/-- Membership in the image scheme: `y ∈ T(A_n)` iff `y = T a` for some `a ∈ A_n`. -/
 @[simp]
 theorem mem_map {T : X →ₗ[ℝ] Y} {n : ℕ} {y : Y} : y ∈ A.map T n ↔ ∃ a ∈ A n, T a = y :=
   Iff.rfl
 
+/-- `T a ∈ T(A_n)` for `a ∈ A_n`. -/
 theorem mem_map_of_mem (T : X →ₗ[ℝ] Y) {n : ℕ} {a : X} (ha : a ∈ A n) : T a ∈ A.map T n :=
   ⟨a, ha, rfl⟩
 
@@ -202,6 +213,7 @@ def ofSubmodules (A : ℕ → Submodule ℝ X) (h0 : A 0 = ⊥) (hA : Monotone A
     rintro _ ⟨a, ha, b, hb, rfl⟩
     exact (A (m + n)).add_mem (hA (Nat.le_add_right m n) ha) (hA (Nat.le_add_left n m) hb)
 
+/-- Membership in the scheme of an increasing sequence of subspaces. -/
 @[simp]
 theorem mem_ofSubmodules {A : ℕ → Submodule ℝ X} {h0 : A 0 = ⊥} {hA : Monotone A} {n : ℕ}
     {x : X} : x ∈ ofSubmodules A h0 hA n ↔ x ∈ A n := Iff.rfl

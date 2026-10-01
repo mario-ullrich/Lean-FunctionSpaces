@@ -89,16 +89,19 @@ theorem approxNorm_add_le (hq : 1 ≤ q) (hs : 0 ≤ s) (f g : X) :
         gcongr <;> exact approxNormDyadic_le_approxNorm hq hs _
     _ = 8 * (2 ^ s) ^ 3 * (A.approxNorm s q f + A.approxNorm s q g) := by ring
 
+/-- For `s ≥ 0` and `q ≥ 1`, `A^s_q` is closed under addition. -/
 theorem MemApprox.add (hq : 1 ≤ q) (hs : 0 ≤ s) {f g : X} (hf : A.MemApprox s q f)
     (hg : A.MemApprox s q g) : A.MemApprox s q (f + g) := by
   rw [memApprox_iff_approxNormDyadic_lt_top hq hs] at hf hg ⊢
   exact (approxNormDyadic_add_le hq hs f g).trans_lt (ENNReal.mul_lt_top
     (ENNReal.mul_lt_top (by norm_num) (two_rpow_ne_top s).lt_top) (ENNReal.add_lt_top.2 ⟨hf, hg⟩))
 
+/-- For `s ≥ 0` and `q ≥ 1`, `A^s_q` is closed under subtraction. -/
 theorem MemApprox.sub (hq : 1 ≤ q) (hs : 0 ≤ s) {f g : X} (hf : A.MemApprox s q f)
     (hg : A.MemApprox s q g) : A.MemApprox s q (f - g) := by
   simpa [sub_eq_add_neg] using hf.add hq hs hg.neg
 
+/-- For `s ≥ 0` and `q ≥ 1`, `A^s_q` is closed under finite sums. -/
 theorem MemApprox.sum (hq : 1 ≤ q) (hs : 0 ≤ s) {ι : Type*} (t : Finset ι) {f : ι → X}
     (hf : ∀ i ∈ t, A.MemApprox s q (f i)) : A.MemApprox s q (∑ i ∈ t, f i) := by
   classical
@@ -135,6 +138,7 @@ def approxSpace (s : ℝ) (q : ℝ≥0∞) (hs : 0 ≤ s) (hq : 1 ≤ q) : Submo
 
 variable {A}
 
+/-- Membership in the approximation space as a submodule. -/
 @[simp]
 theorem mem_approxSpace {hs : 0 ≤ s} {hq : 1 ≤ q} {f : X} :
     f ∈ A.approxSpace s q hs hq ↔ A.MemApprox s q f := Iff.rfl

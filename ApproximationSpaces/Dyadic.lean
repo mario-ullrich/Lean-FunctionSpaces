@@ -56,31 +56,39 @@ noncomputable def approxNormDyadic (s : ℝ) (q : ℝ≥0∞) (f : X) : ℝ≥0�
 
 variable {A} {s : ℝ} {q : ℝ≥0∞}
 
+/-- Each term `2^(ks) E_{2^k}(f)` is at most the `ℓ_q` norm of the dyadic sequence. -/
 theorem approxSeqDyadic_le_lqNorm (hq : 1 ≤ q) (f : X) (k : ℕ) :
     A.approxSeqDyadic s f k ≤ lqNorm q (A.approxSeqDyadic s f) :=
   ENNReal.le_lqNorm (zero_lt_one.trans_le hq).ne' _ k
 
+/-- `‖f‖ ≤ ‖f‖^dyadic_{A^s_q}`. -/
 theorem enorm_le_approxNormDyadic (f : X) : ‖f‖ₑ ≤ A.approxNormDyadic s q f := le_self_add
 
+/-- The `ℓ_q` part of the dyadic quasi-norm is at most the quasi-norm. -/
 theorem lqNorm_le_approxNormDyadic (f : X) :
     lqNorm q (A.approxSeqDyadic s f) ≤ A.approxNormDyadic s q f := le_add_self
 
+/-- Powers of the dyadic terms: `(2^(ks) E_{2^k}(f))^p = 2^(ksp) E_{2^k}(f)^p` for `p ≥ 0`. -/
 theorem approxSeqDyadic_rpow {p : ℝ} (hp : 0 ≤ p) (f : X) (k : ℕ) :
     A.approxSeqDyadic s f k ^ p = dyadicWeight (s * p) k * A.approxSeq f (2 ^ k) ^ p := by
   rw [approxSeqDyadic, ENNReal.mul_rpow_of_nonneg _ _ hp, ENNReal.dyadicWeight_rpow]
 
+/-- The first dyadic term is `E_1(f)`. -/
 theorem approxSeqDyadic_zero (f : X) : A.approxSeqDyadic s f 0 = A.approxSeq f 1 := by
   simp [approxSeqDyadic]
 
+/-- The dyadic quasi-norm of `0` is `0`. -/
 @[simp]
 theorem approxNormDyadic_zero (s : ℝ) (q : ℝ≥0∞) : A.approxNormDyadic s q 0 = 0 := by
   have : A.approxSeqDyadic s 0 = fun _ => 0 := by funext k; simp [approxSeqDyadic]
   simp [approxNormDyadic, this]
 
+/-- The dyadic terms are homogeneous: `2^(ks) E_{2^k}(c f) = |c| 2^(ks) E_{2^k}(f)`. -/
 theorem approxSeqDyadic_smul (c : ℝ) (f : X) :
     A.approxSeqDyadic s (c • f) = fun k => ‖c‖ₑ * A.approxSeqDyadic s f k := by
   funext k; rw [approxSeqDyadic, approxSeqDyadic, approxSeq_smul, mul_left_comm]
 
+/-- The dyadic quasi-norm is homogeneous: `‖c f‖^dyadic = |c| ‖f‖^dyadic`. -/
 theorem approxNormDyadic_smul (c : ℝ) (f : X) :
     A.approxNormDyadic s q (c • f) = ‖c‖ₑ * A.approxNormDyadic s q f := by
   rw [approxNormDyadic, approxNormDyadic, approxSeqDyadic_smul, ENNReal.lqNorm_const_mul,
@@ -90,6 +98,7 @@ theorem approxNormDyadic_smul (c : ℝ) (f : X) :
 theorem one_le_two_rpow (hs : 0 ≤ s) : 1 ≤ (2 : ℝ≥0∞) ^ s := by
   simpa using ENNReal.rpow_le_rpow_of_exponent_le one_le_two hs
 
+/-- `2^s` is finite in `ℝ≥0∞`. -/
 theorem two_rpow_ne_top (s : ℝ) : (2 : ℝ≥0∞) ^ s ≠ ∞ :=
   ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top
 
@@ -196,6 +205,7 @@ theorem approxNormDyadic_le_approxNorm (hq : 1 ≤ q) (hs : 0 ≤ s) (f : X) :
         gcongr; exact le_mul_of_one_le_right' h2s
     _ = 4 * 2 ^ s * P := by ring
 
+/-- For `s ≥ 0`, `f ∈ A^s_q` iff its dyadic quasi-norm is finite. -/
 theorem memApprox_iff_approxNormDyadic_lt_top (hq : 1 ≤ q) (hs : 0 ≤ s) {f : X} :
     A.MemApprox s q f ↔ A.approxNormDyadic s q f < ∞ := by
   constructor
@@ -206,6 +216,7 @@ theorem memApprox_iff_approxNormDyadic_lt_top (hq : 1 ≤ q) (hs : 0 ≤ s) {f :
     exact (approxNorm_le_approxNormDyadic hq hs f).trans_lt
       (ENNReal.mul_lt_top (two_rpow_ne_top s).lt_top hf)
 
+/-- For `s ≥ 0`, `f ∈ A^s_q` iff `(2^(ks) E_{2^k}(f))_k ∈ ℓ_q`. -/
 theorem memApprox_iff_lqNorm_dyadic_lt_top (hq : 1 ≤ q) (hs : 0 ≤ s) {f : X} :
     A.MemApprox s q f ↔ lqNorm q (A.approxSeqDyadic s f) < ∞ := by
   rw [memApprox_iff_approxNormDyadic_lt_top hq hs, approxNormDyadic, ENNReal.add_lt_top]

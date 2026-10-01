@@ -52,6 +52,7 @@ noncomputable def decompNorm (s : ℝ) (q : ℝ≥0∞) (f : X) : ℝ≥0∞ :=
   ⨅ (g : ℕ → X) (_ : ∀ k, g k ∈ A (2 ^ k)) (_ : HasSum g f),
     lqNorm q (fun k => dyadicWeight s k * ‖g k‖ₑ)
 
+/-- Every decomposition `f = ∑ g_k` with `g_k ∈ A_{2^k}` bounds the decomposition norm. -/
 theorem decompNorm_le {f : X} {g : ℕ → X} (hg : ∀ k, g k ∈ A (2 ^ k)) (hf : HasSum g f) :
     A.decompNorm s q f ≤ lqNorm q (fun k => dyadicWeight s k * ‖g k‖ₑ) :=
   iInf₂_le_of_le g hg (iInf_le_of_le hf le_rfl)
@@ -116,6 +117,7 @@ noncomputable def DyadicApprox.atoms {f : X} {t : ℕ → ℝ≥0∞} (D : A.Dya
   | 1 => D.a 0
   | k + 2 => D.a (k + 1) - D.a k
 
+/-- The atoms of a dyadic approximation lie in the right sets: `g_k ∈ A_{2^k}`. -/
 theorem DyadicApprox.atoms_mem {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (k : ℕ) :
     D.atoms k ∈ A (2 ^ k) := by
   match k with
@@ -123,6 +125,7 @@ theorem DyadicApprox.atoms_mem {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApp
   | 1 => exact A.mem_of_le (by norm_num) (D.mem 0)
   | k + 2 => exact D.sub_mem k
 
+/-- The partial sums of the atoms are the approximants: `∑_{j < K+2} g_j = a_K`. -/
 theorem DyadicApprox.sum_range_atoms {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (K : ℕ) :
     ∑ j ∈ range (K + 2), D.atoms j = D.a K := by
   induction K with

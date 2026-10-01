@@ -237,6 +237,7 @@ noncomputable def coincidenceConst (d : Type*) [Fintype d] (s : ℝ) : ℝ≥0�
   1 + 5 * (2 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ +
     ENNReal.ofReal (4 * π * Fintype.card d) * (1 - (2 : ℝ≥0∞) ^ (-(1 - s)))⁻¹)
 
+/-- The constant of the coincidence theorem is finite for `0 < s < 1`. -/
 theorem coincidenceConst_ne_top (hs : 0 < s) (hs1 : s < 1) : coincidenceConst d s ≠ ∞ := by
   unfold coincidenceConst
   have h1 := ENNReal.one_sub_two_rpow_neg_inv_ne_top hs

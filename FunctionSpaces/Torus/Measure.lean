@@ -49,6 +49,7 @@ namespace TorusHaar
 
 variable (d : Type*) [Fintype d]
 
+/-- The scoped measure on the circle is Mathlib's normalised Haar measure. -/
 theorem volume_eq_haarAddCircle : (volume : Measure UnitAddCircle) = AddCircle.haarAddCircle :=
   rfl
 

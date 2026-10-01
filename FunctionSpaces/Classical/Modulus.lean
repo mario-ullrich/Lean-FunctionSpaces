@@ -42,10 +42,12 @@ noncomputable def modulus (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) (t 
 
 variable {f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
 
+/-- `‖τ_h f - f‖_2 ≤ ω(f, t)_2` for `‖h‖ ≤ t`. -/
 theorem enorm_translate_sub_le_modulus {t : ℝ} {h : UnitAddTorus d} (hh : ‖h‖ ≤ t) :
     ‖translate h f - f‖ₑ ≤ modulus f t :=
   le_iSup₂ (f := fun (h : UnitAddTorus d) (_ : ‖h‖ ≤ t) => ‖translate h f - f‖ₑ) h hh
 
+/-- The modulus of smoothness increases in `t`. -/
 theorem modulus_mono (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) : Monotone (modulus f) :=
   fun _ _ hst => iSup₂_le fun _ hh => enorm_translate_sub_le_modulus (hh.trans hst)
 
@@ -53,6 +55,7 @@ theorem modulus_mono (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) : Monoto
 theorem norm_coe_le_abs (u : ℝ) : ‖(u : UnitAddCircle)‖ ≤ |u| := by
   simpa using QuotientAddGroup.norm_mk_le_norm (S := AddSubgroup.zmultiples (1 : ℝ)) (m := u)
 
+/-- `|e^(ix) - 1|² = 2 - 2 cos x`. -/
 theorem norm_exp_I_mul_sub_one_sq (x : ℝ) :
     ‖Complex.exp (Complex.I * x) - 1‖ ^ 2 = 2 - 2 * Real.cos x := by
   rw [Complex.norm_exp_I_mul_ofReal_sub_one, norm_mul, Real.norm_eq_abs, Real.norm_eq_abs,
@@ -63,10 +66,12 @@ theorem norm_exp_I_mul_sub_one_sq (x : ℝ) :
   norm_num
   nlinarith
 
+/-- The character `e_a` at the point `u ∈ ℝ` of the circle is `exp(2πi a u)`. -/
 theorem fourier_coe_eq_exp (a : ℤ) (u : ℝ) :
     fourier a (u : UnitAddCircle) = Complex.exp (Complex.I * ((2 * π * a * u : ℝ) : ℂ)) := by
   rw [fourier_coe_apply]; congr 1; push_cast; ring
 
+/-- `|e_a(u) - 1|² = 2 - 2 cos(2π a u)`. -/
 theorem norm_fourier_sub_one_sq (a : ℤ) (u : ℝ) :
     ‖fourier a (u : UnitAddCircle) - 1‖ ^ 2 = 2 - 2 * Real.cos (2 * π * a * u) := by
   rw [fourier_coe_eq_exp, norm_exp_I_mul_sub_one_sq]

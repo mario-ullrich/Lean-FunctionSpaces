@@ -42,6 +42,7 @@ open scoped ENNReal BoundedContinuousFunction
 `0⁻¹ = 0`) it is `D/p` for `r = ∞`. -/
 noncomputable def nikolskiiExponent (D : ℝ) (p r : ℝ≥0∞) : ℝ := D * (p.toReal⁻¹ - r.toReal⁻¹)
 
+/-- `D(1/p - 1/r) ≥ 0` for `D ≥ 0` and `1 ≤ p ≤ r`. -/
 theorem nikolskiiExponent_nonneg {D : ℝ} (hD : 0 ≤ D) {p r : ℝ≥0∞} (hp : 1 ≤ p) (hpr : p ≤ r) :
     0 ≤ nikolskiiExponent D p r := by
   unfold nikolskiiExponent
@@ -52,10 +53,12 @@ theorem nikolskiiExponent_nonneg {D : ℝ} (hD : 0 ≤ D) {p r : ℝ≥0∞} (hp
   exact inv_anti₀ (ENNReal.toReal_pos (zero_lt_one.trans_le hp).ne' hp')
     (ENNReal.toReal_mono hr hpr)
 
+/-- `α(D, p, ∞) = D/p`. -/
 @[simp]
 theorem nikolskiiExponent_top (D : ℝ) (p : ℝ≥0∞) : nikolskiiExponent D p ∞ = D * p.toReal⁻¹ := by
   simp [nikolskiiExponent]
 
+/-- `α(D, p, p) = 0`. -/
 @[simp]
 theorem nikolskiiExponent_self (D : ℝ) (p : ℝ≥0∞) : nikolskiiExponent D p p = 0 := by
   simp [nikolskiiExponent]

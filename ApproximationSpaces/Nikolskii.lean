@@ -53,6 +53,7 @@ variable {ι : Y →L[ℝ] X} {A : ApproximationScheme X} {α C s : ℝ} {q : �
 noncomputable def nikolskiiConst (C α s : ℝ) : ℝ≥0∞ :=
   3 * ENNReal.ofReal C + 3 * liftConst C α * (1 - (2 : ℝ≥0∞) ^ (-(s - α)))⁻¹ + 2 * liftConst C α
 
+/-- The constant of the Nikolskii transfer theorem is finite for `α < s`. -/
 theorem nikolskiiConst_ne_top (C : ℝ) (h : α < s) : nikolskiiConst C α s ≠ ∞ := by
   have h1 : liftConst C α ≠ ∞ := liftConst_ne_top C α
   have h2 := ENNReal.one_sub_two_rpow_neg_inv_ne_top (sub_pos.2 h)

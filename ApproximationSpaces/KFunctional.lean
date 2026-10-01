@@ -45,6 +45,7 @@ noncomputable def kFunctional (ι : Y →L[ℝ] X) (t : ℝ≥0∞) (f : X) : �
 
 variable {ι : Y →L[ℝ] X} {t u : ℝ≥0∞}
 
+/-- Every `y ∈ Y` bounds the K-functional: `K(t, f) ≤ ‖f - ι y‖ + t ‖y‖`. -/
 theorem kFunctional_le (y : Y) (f : X) : kFunctional ι t f ≤ ‖f - ι y‖ₑ + t * ‖y‖ₑ :=
   iInf_le (fun y => ‖f - ι y‖ₑ + t * ‖y‖ₑ) y
 
@@ -52,6 +53,7 @@ theorem kFunctional_le (y : Y) (f : X) : kFunctional ι t f ≤ ‖f - ι y‖�
 theorem kFunctional_le_enorm (f : X) : kFunctional ι t f ≤ ‖f‖ₑ := by
   simpa using kFunctional_le (ι := ι) (t := t) 0 f
 
+/-- `K(t, 0) = 0`. -/
 @[simp]
 theorem kFunctional_zero_right : kFunctional ι t 0 = 0 :=
   le_antisymm ((kFunctional_le_enorm 0).trans_eq enorm_zero) bot_le
@@ -143,6 +145,7 @@ theorem interpNorm_add_le (hq : 1 ≤ q) (f g : X) :
       add_le_add (enorm_add_le f g) hseq
     _ = _ := by rw [interpNorm, interpNorm]; ring
 
+/-- The interpolation norm is homogeneous: `‖c f‖_{θ,q} ≤ |c| ‖f‖_{θ,q}`. -/
 theorem interpNorm_smul_le (c : ℝ) (f : X) :
     interpNorm ι θ ρ q (c • f) ≤ ‖c‖ₑ * interpNorm ι θ ρ q f := by
   rw [interpNorm, interpNorm, mul_add, enorm_smul, ← ENNReal.lqNorm_const_mul]
@@ -152,6 +155,7 @@ theorem interpNorm_smul_le (c : ℝ) (f : X) :
   gcongr
   exact kFunctional_smul_le c f
 
+/-- `‖f‖ ≤ ‖f‖_{θ,q}`. -/
 theorem enorm_le_interpNorm (f : X) : ‖f‖ₑ ≤ interpNorm ι θ ρ q f := le_self_add
 
 variable (ι) in
@@ -165,6 +169,7 @@ def interpSpace (θ ρ : ℝ) (q : ℝ≥0∞) (hq : 1 ≤ q) : Submodule ℝ X 
   add_mem' hf hg := (interpNorm_add_le hq _ _).trans_lt (ENNReal.add_lt_top.2 ⟨hf, hg⟩)
   smul_mem' c _ hf := (interpNorm_smul_le c _).trans_lt (ENNReal.mul_lt_top enorm_lt_top hf)
 
+/-- Membership in the interpolation space as a submodule. -/
 @[simp]
 theorem mem_interpSpace {hq : 1 ≤ q} {f : X} :
     f ∈ interpSpace ι θ ρ q hq ↔ MemInterp ι θ ρ q f := Iff.rfl

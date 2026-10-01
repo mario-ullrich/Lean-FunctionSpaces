@@ -73,6 +73,7 @@ theorem LiftBound.exists_enorm_le (hB : LiftBound ι A β C) (hC : 0 ≤ C) {n :
 /-- The constant `2 C 4^β` by which a lifted dyadic block exceeds `2^(kβ)` times its error. -/
 noncomputable def liftConst (C β : ℝ) : ℝ≥0∞ := 2 * ENNReal.ofReal C * dyadicWeight β 2
 
+/-- The lifting constant is finite. -/
 theorem liftConst_ne_top (C β : ℝ) : liftConst C β ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num) ENNReal.ofReal_ne_top)
     (ENNReal.dyadicWeight_ne_top β 2)
@@ -119,6 +120,7 @@ theorem enorm_sub_succ_le (ht : Antitone t) (k : ℕ) :
         · exact ht (Nat.le_succ k)
     _ = 2 * (A.approxSeq f (2 ^ k) + t k) := by ring
 
+/-- The first approximant is bounded: `‖a_0‖ ≤ 2 ‖f‖ + t_0`. -/
 theorem enorm_zero_le : ‖D.a 0‖ₑ ≤ 2 * ‖f‖ₑ + t 0 := by
   calc ‖D.a 0‖ₑ = ‖f - (f - D.a 0)‖ₑ := by rw [sub_sub_cancel]
     _ ≤ ‖f‖ₑ + ‖f - D.a 0‖ₑ := _root_.enorm_sub_le
@@ -254,17 +256,21 @@ variable {E : Type*} [NormedAddCommGroup E]
 `σ ≥ -1`, and small against every weight `2^(kτ)` with `τ ≤ σ`. -/
 noncomputable def tolerance (f : E) (σ : ℝ) (k : ℕ) : ℝ≥0∞ := ‖f‖ₑ * dyadicWeight (-(σ + 1)) k
 
+/-- For `f ≠ 0` the tolerances are positive. -/
 theorem tolerance_ne_zero {f : E} (hf : f ≠ 0) (σ : ℝ) (k : ℕ) : tolerance f σ k ≠ 0 :=
   mul_ne_zero (enorm_ne_zero.2 hf) (ENNReal.dyadicWeight_ne_zero _ k)
 
+/-- The tolerances are finite. -/
 theorem tolerance_ne_top (f : E) (σ : ℝ) (k : ℕ) : tolerance f σ k ≠ ∞ :=
   ENNReal.mul_ne_top enorm_ne_top (ENNReal.dyadicWeight_ne_top _ k)
 
+/-- For `σ ≥ 0` the tolerances decrease. -/
 theorem tolerance_anti (f : E) {σ : ℝ} (hσ : 0 ≤ σ) : Antitone (tolerance f σ) := fun _ _ h => by
   unfold tolerance
   gcongr
   exact ENNReal.dyadicWeight_anti (by linarith) h
 
+/-- The first tolerance is `‖f‖`. -/
 @[simp]
 theorem tolerance_zero (f : E) (σ : ℝ) : tolerance f σ 0 = ‖f‖ₑ := by simp [tolerance]
 
@@ -275,12 +281,14 @@ theorem dyadicWeight_mul_tolerance_le (f : E) {σ τ : ℝ} (h : τ ≤ σ) (k :
   gcongr
   exact ENNReal.dyadicWeight_le_of_le (by linarith) k
 
+/-- For `τ ≤ σ`, `∑_k 2^(kτ) ‖f‖ 2^(-k(σ+1)) ≤ 2 ‖f‖`. -/
 theorem tsum_dyadicWeight_mul_tolerance_le (f : E) {σ τ : ℝ} (h : τ ≤ σ) :
     ∑' k, dyadicWeight τ k * tolerance f σ k ≤ 2 * ‖f‖ₑ := by
   calc ∑' k, dyadicWeight τ k * tolerance f σ k ≤ ∑' k, ‖f‖ₑ * dyadicWeight (-1) k :=
         ENNReal.tsum_le_tsum fun k => dyadicWeight_mul_tolerance_le f h k
     _ = 2 * ‖f‖ₑ := by rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg_one, mul_comm]
 
+/-- For `τ ≤ σ`, `‖(2^(kτ) ‖f‖ 2^(-k(σ+1)))_k‖_{ℓ_q} ≤ 2 ‖f‖`. -/
 theorem lqNorm_dyadicWeight_mul_tolerance_le {q : ℝ≥0∞} (hq : 1 ≤ q) (f : E) {σ τ : ℝ}
     (h : τ ≤ σ) : lqNorm q (fun k => dyadicWeight τ k * tolerance f σ k) ≤ 2 * ‖f‖ₑ := by
   calc lqNorm q (fun k => dyadicWeight τ k * tolerance f σ k)

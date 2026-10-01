@@ -71,6 +71,7 @@ noncomputable def condExpLpLinear : Lp ℂ p μ →ₗ[ℝ] Lp ℂ p μ where
       MemLp.coeFn_toLp ((Lp.memLp f).condExp Fact.out)] with x h1 h2 h3 h4 h5
     rw [h1, h2, h3, RingHom.id_apply, h4, Pi.smul_apply, Pi.smul_apply, h5]
 
+/-- The linear conditional expectation agrees a.e. with Mathlib's `μ[f | m]`. -/
 theorem coeFn_condExpLpLinear (f : Lp ℂ p μ) :
     condExpLpLinear m f =ᵐ[μ] μ[(f : α → ℂ) | m] :=
   MemLp.coeFn_toLp ((Lp.memLp f).condExp Fact.out)
@@ -83,11 +84,13 @@ noncomputable def condExpLp : Lp ℂ p μ →L[ℝ] Lp ℂ p μ :=
     exact ENNReal.toReal_mono (Lp.eLpNorm_ne_top f)
       (eLpNorm_condExp_le_eLpNorm _ Fact.out)
 
+/-- `E[f | m]` on `L_p` agrees a.e. with Mathlib's `μ[f | m]`. -/
 theorem coeFn_condExpLp (f : Lp ℂ p μ) :
     condExpLp m f =ᵐ[μ] μ[(f : α → ℂ) | m] :=
   coeFn_condExpLpLinear f
 
 variable (m) in
+/-- **The conditional expectation is a contraction** on `L_p`. -/
 theorem norm_condExpLp_le : ‖(condExpLp (μ := μ) (p := p) m)‖ ≤ 1 :=
   LinearMap.mkContinuous_norm_le _ zero_le_one _
 
@@ -120,6 +123,7 @@ noncomputable def approximants (n : ℕ) : Submodule ℝ (Lp ℂ p μ) :=
   if n = 0 then ⊥ else lpMeas ℂ ℝ (ℱ (Nat.log 2 n)) p μ
 
 omit [Fact (1 ≤ p)] [IsFiniteMeasure μ] in
+/-- The approximants of the filtration scheme increase. -/
 theorem approximants_mono : Monotone (ℱ.approximants p μ) := by
   intro a b hab f hf
   by_cases ha : a = 0

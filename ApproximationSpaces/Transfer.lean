@@ -35,6 +35,7 @@ variable {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 
 variable {A : ApproximationScheme X} {B : ApproximationScheme Y} {s : ℝ} {q : ℝ≥0∞}
 
+/-- `E^B_n(T f) ≤ ‖T‖ E^A_n(f)` when `T(A_n) ⊆ B_n`. -/
 theorem approxSeq_map_le (T : X →L[ℝ] Y) (hT : ∀ n, ∀ a ∈ A n, T a ∈ B n) (f : X) (n : ℕ) :
     B.approxSeq (T f) n ≤ ‖T‖ₑ * A.approxSeq f n := by
   rw [approxSeq, approxSeq, ← ofReal_norm, ← ENNReal.ofReal_mul (norm_nonneg T)]
@@ -58,6 +59,7 @@ theorem approxNormDyadic_map_le (T : X →L[ℝ] Y) (hT : ∀ n, ∀ a ∈ A n, 
   gcongr
   exact approxSeq_map_le T hT f _
 
+/-- A bounded linear map with `T(A_n) ⊆ B_n` maps `A^s_q` into `B^s_q`. -/
 theorem MemApprox.map (T : X →L[ℝ] Y) (hT : ∀ n, ∀ a ∈ A n, T a ∈ B n) {f : X}
     (hf : A.MemApprox s q f) : B.MemApprox s q (T f) :=
   (approxNorm_map_le T hT f).trans_lt (ENNReal.mul_lt_top enorm_lt_top hf)

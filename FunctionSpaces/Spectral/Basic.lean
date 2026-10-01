@@ -59,9 +59,11 @@ variable {ι H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H]
 /-- The approximants of complexity `n`: combinations of basis elements of level `< n`. -/
 noncomputable def span (n : ℕ) : Submodule ℂ H := Submodule.span ℂ (S.basis '' {i | S.level i < n})
 
+/-- `A_0 = {0}`: no basis element has level `< 0`. -/
 @[simp]
 theorem span_zero : S.span 0 = ⊥ := by simp [span]
 
+/-- The spans increase with `n`. -/
 theorem span_mono : Monotone S.span := fun _ _ h =>
   Submodule.span_mono (Set.image_mono fun _ hi => lt_of_lt_of_le hi h)
 
@@ -70,6 +72,7 @@ noncomputable def toScheme : ApproximationScheme H :=
   ApproximationScheme.ofSubmodules (fun n => (S.span n).restrictScalars ℝ) (by simp)
     (fun _ _ h => S.span_mono h)
 
+/-- The approximants of the spectral scheme are the spans. -/
 @[simp]
 theorem mem_toScheme {n : ℕ} {a : H} : a ∈ S.toScheme n ↔ a ∈ S.span n := Iff.rfl
 
@@ -90,6 +93,7 @@ theorem repr_eq_zero_of_mem_span {n : ℕ} {a : H} (ha : a ∈ S.span n) {i : ι
 noncomputable def truncate (n : ℕ) (f : H) : H :=
   ∑ i ∈ (S.finite_level n).toFinset, S.basis.repr f i • S.basis i
 
+/-- The truncation `P_n f` lies in `A_n`. -/
 theorem truncate_mem_span (n : ℕ) (f : H) : S.truncate n f ∈ S.span n :=
   Submodule.sum_mem _ fun i hi => Submodule.smul_mem _ _
     (Submodule.subset_span ⟨i, by simpa using hi, rfl⟩)
@@ -111,19 +115,24 @@ theorem repr_sub_truncate (n : ℕ) (f : H) (i : ι) :
 /-- The **weight** `(1 + lvl i)^s`. -/
 noncomputable def weight (s : ℝ) (i : ι) : ℝ := ((1 + S.level i : ℕ) : ℝ) ^ s
 
+/-- The weights `(1 + λ(i))^s` are positive. -/
 theorem weight_pos (s : ℝ) (i : ι) : 0 < S.weight s i :=
   Real.rpow_pos_of_pos (by positivity) s
 
+/-- For `s ≥ 0` the weights are at least `1`. -/
 theorem one_le_weight {s : ℝ} (hs : 0 ≤ s) (i : ι) : 1 ≤ S.weight s i :=
   Real.one_le_rpow (by simp) hs
 
+/-- The inverse weight as a complex number has modulus `(1 + λ(i))^(-s)`. -/
 theorem norm_ofReal_inv_weight (s : ℝ) (i : ι) : ‖((S.weight s i)⁻¹ : ℂ)‖ = (S.weight s i)⁻¹ := by
   rw [← Complex.ofReal_inv, Complex.norm_real, Real.norm_eq_abs,
     abs_of_pos (inv_pos.2 (S.weight_pos s i))]
 
+/-- The weight as a complex number has modulus `(1 + λ(i))^s`. -/
 theorem norm_ofReal_weight (s : ℝ) (i : ι) : ‖(S.weight s i : ℂ)‖ = S.weight s i := by
   rw [Complex.norm_real, Real.norm_eq_abs, abs_of_pos (S.weight_pos s i)]
 
+/-- The weights are nonzero. -/
 theorem ofReal_weight_ne_zero (s : ℝ) (i : ι) : (S.weight s i : ℂ) ≠ 0 := by
   simpa using (S.weight_pos s i).ne'
 
@@ -164,6 +173,7 @@ noncomputable def diagInvWeight (s : ℝ) (hs : 0 ≤ s) : ℓ²(ι, ℂ) →L[�
       rw [norm_mul, S.norm_ofReal_inv_weight]
       exact mul_le_of_le_one_left (norm_nonneg _) (inv_le_one_of_one_le₀ (S.one_le_weight hs i))
 
+/-- The diagonal operator multiplies the `i`-th coordinate by `(1 + λ(i))^(-s)`. -/
 theorem diagInvWeight_apply (s : ℝ) (hs : 0 ≤ s) (c : ℓ²(ι, ℂ)) (i : ι) :
     S.diagInvWeight s hs c i = ((S.weight s i)⁻¹ : ℂ) * c i := rfl
 
@@ -172,11 +182,13 @@ range is the Sobolev space of order `s`. -/
 noncomputable def sobolevEmbed (s : ℝ) (hs : 0 ≤ s) : ℓ²(ι, ℂ) →L[ℂ] H :=
   (S.basis.repr.symm.toLinearIsometry.toContinuousLinearMap).comp (S.diagInvWeight s hs)
 
+/-- The coefficients of `J_s c` are `(1 + λ(i))^(-s) c_i`. -/
 theorem repr_sobolevEmbed (s : ℝ) (hs : 0 ≤ s) (c : ℓ²(ι, ℂ)) (i : ι) :
     S.basis.repr (S.sobolevEmbed s hs c) i = ((S.weight s i)⁻¹ : ℂ) * c i := by
   change S.basis.repr (S.basis.repr.symm (S.diagInvWeight s hs c)) i = _
   rw [LinearIsometryEquiv.apply_symm_apply, diagInvWeight_apply]
 
+/-- `J_s` is injective. -/
 theorem sobolevEmbed_injective (s : ℝ) (hs : 0 ≤ s) :
     Function.Injective (S.sobolevEmbed s hs) := fun c c' h => by
   ext i

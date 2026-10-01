@@ -40,13 +40,16 @@ open ApproximationScheme ENNReal
 
 variable {ι H : Type*} [NormedAddCommGroup H] [InnerProductSpace ℂ H] (S : SpectralScheme ι H)
 
+/-- Truncation is additive. -/
 theorem truncate_add (n : ℕ) (f g : H) : S.truncate n (f + g) = S.truncate n f + S.truncate n g := by
   simp only [truncate, map_add, lp.coeFn_add, Pi.add_apply, add_smul, Finset.sum_add_distrib]
 
+/-- Truncation is homogeneous. -/
 theorem truncate_smul (n : ℕ) (c : ℂ) (f : H) : S.truncate n (c • f) = c • S.truncate n f := by
   simp only [truncate, map_smul, lp.coeFn_smul, Pi.smul_apply, smul_eq_mul, mul_smul,
     Finset.smul_sum]
 
+/-- Truncation does not increase the norm, by Bessel's inequality. -/
 theorem norm_truncate_le (n : ℕ) (f : H) : ‖S.truncate n f‖ ≤ ‖f‖ := by
   rw [← S.basis.repr.norm_map, ← S.basis.repr.norm_map f]
   refine lp.norm_mono (by norm_num) fun i => ?_
@@ -61,6 +64,7 @@ noncomputable def truncateCLM (n : ℕ) : H →L[ℂ] H :=
       map_smul' := S.truncate_smul n }
     1 fun f => by rw [one_mul]; exact S.norm_truncate_le n f
 
+/-- The bounded linear truncation is the truncation. -/
 theorem truncateCLM_apply (n : ℕ) (f : H) : S.truncateCLM n f = S.truncate n f := rfl
 
 /-- The truncation fixes the approximants. -/
@@ -82,6 +86,7 @@ noncomputable def projectionScheme : S.toScheme.ProjectionScheme where
     rw [ContinuousLinearMap.norm_restrictScalars]
     exact LinearMap.mkContinuous_norm_le _ zero_le_one _
 
+/-- The projections of the spectral projection scheme are the truncations. -/
 theorem projectionScheme_P (n : ℕ) (f : H) : S.projectionScheme.P n f = S.truncate n f := rfl
 
 /-- The approximants of all complexities span the span of the basis. -/

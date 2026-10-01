@@ -52,6 +52,7 @@ noncomputable def inclusionOfExponentLeLinear (μ : Measure α) [IsFiniteMeasure
     grw [MemLp.coeFn_toLp, Lp.coeFn_smul, Lp.coeFn_smul, MemLp.coeFn_toLp]
     rfl
 
+/-- The inclusion does not change the function, up to null sets. -/
 theorem coeFn_inclusionOfExponentLeLinear (hpr : p ≤ r) (f : Lp E r μ) :
     inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hpr f =ᵐ[μ] f :=
   MemLp.coeFn_toLp ((Lp.memLp f).mono_exponent hpr)
@@ -62,9 +63,11 @@ end Linear
 noncomputable def inclusionConst (μ : Measure α) (p r : ℝ≥0∞) : ℝ :=
   (μ Set.univ ^ (1 / p.toReal - 1 / r.toReal)).toReal
 
+/-- The constant `μ(Ω)^(1/p - 1/r)` is nonnegative. -/
 theorem inclusionConst_nonneg (μ : Measure α) (p r : ℝ≥0∞) : 0 ≤ inclusionConst μ p r :=
   ENNReal.toReal_nonneg
 
+/-- For a probability measure the constant is `1`. -/
 @[simp]
 theorem inclusionConst_of_isProbabilityMeasure [IsProbabilityMeasure μ] (p r : ℝ≥0∞) :
     inclusionConst μ p r = 1 := by
@@ -72,6 +75,7 @@ theorem inclusionConst_of_isProbabilityMeasure [IsProbabilityMeasure μ] (p r : 
 
 variable [Fact (1 ≤ p)] [Fact (1 ≤ r)] [IsFiniteMeasure μ]
 
+/-- Hölder's inequality: `‖f‖_p ≤ μ(Ω)^(1/p - 1/r) ‖f‖_r`. -/
 theorem norm_inclusionOfExponentLeLinear_apply_le (hpr : p ≤ r) (f : Lp E r μ) :
     ‖inclusionOfExponentLeLinear (𝕜 := 𝕜) μ hpr f‖ ≤ inclusionConst μ p r * ‖f‖ := by
   have hp : 1 ≤ p := Fact.out
@@ -101,10 +105,12 @@ theorem coeFn_inclusionOfExponentLe (hpr : p ≤ r) (f : Lp E r μ) :
     inclusionOfExponentLe (𝕜 := 𝕜) μ hpr f =ᵐ[μ] f :=
   coeFn_inclusionOfExponentLeLinear hpr f
 
+/-- Hölder's inequality: `‖f‖_p ≤ μ(Ω)^(1/p - 1/r) ‖f‖_r`. -/
 theorem norm_inclusionOfExponentLe_apply_le (hpr : p ≤ r) (f : Lp E r μ) :
     ‖inclusionOfExponentLe (𝕜 := 𝕜) μ hpr f‖ ≤ inclusionConst μ p r * ‖f‖ :=
   norm_inclusionOfExponentLeLinear_apply_le hpr f
 
+/-- The inclusion has norm at most `μ(Ω)^(1/p - 1/r)`. -/
 theorem norm_inclusionOfExponentLe_le (hpr : p ≤ r) :
     ‖(inclusionOfExponentLe (E := E) (𝕜 := 𝕜) μ hpr)‖ ≤ inclusionConst μ p r :=
   LinearMap.mkContinuous_norm_le _ (inclusionConst_nonneg μ p r) _

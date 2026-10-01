@@ -52,10 +52,12 @@ noncomputable def toLp (p : ℝ≥0∞) [Fact (1 ≤ p)] : ApproximationScheme (
 
 variable {S μ} {p r : ℝ≥0∞} [Fact (1 ≤ p)] [Fact (1 ≤ r)]
 
+/-- `g ∈ S^(p)_n` iff `g` is the class in `L_p` of some `a ∈ S_n`. -/
 theorem mem_toLp {n : ℕ} {g : Lp ℂ p μ} :
     g ∈ S.toLp μ p n ↔ ∃ a ∈ S n, BoundedContinuousFunction.toLp (E := ℂ) p μ ℝ a = g :=
   Iff.rfl
 
+/-- The class in `L_p` of `a ∈ S_n` lies in `S^(p)_n`. -/
 theorem toLp_mem_toLp {n : ℕ} {a : Ω →ᵇ ℂ} (ha : a ∈ S n) :
     BoundedContinuousFunction.toLp (E := ℂ) p μ ℝ a ∈ S.toLp μ p n :=
   ⟨a, ha, rfl⟩

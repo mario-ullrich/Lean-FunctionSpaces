@@ -69,6 +69,7 @@ theorem approxNormDyadic_le_interpNorm_of_jackson (hJ : JacksonBound ι A r C) (
 noncomputable def reprConst (C r s : ℝ) : ℝ≥0∞ :=
   3 + (3 * ENNReal.ofReal C + 2 * liftConst C r) * (1 - (2 : ℝ≥0∞) ^ (-(r - s)))⁻¹
 
+/-- The constant of the representation theorem is finite for `s < r`. -/
 theorem reprConst_ne_top (C : ℝ) (h : s < r) : reprConst C r s ≠ ∞ := by
   unfold reprConst
   refine ENNReal.add_ne_top.2 ⟨by norm_num, ENNReal.mul_ne_top (ENNReal.add_ne_top.2

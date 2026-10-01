@@ -42,16 +42,20 @@ variable {d : Type*} [Fintype d]
 /-- The **degree** `max_i |k_i|` of a frequency `k ∈ ℤ^d`. -/
 def deg (k : d → ℤ) : ℕ := Finset.univ.sup fun i => (k i).natAbs
 
+/-- `|k_i| ≤ deg k`. -/
 theorem natAbs_le_deg (k : d → ℤ) (i : d) : (k i).natAbs ≤ deg k :=
   Finset.le_sup (f := fun i => (k i).natAbs) (Finset.mem_univ i)
 
+/-- `deg k ≤ n` iff `|k_i| ≤ n` for every `i`. -/
 theorem deg_le_iff {k : d → ℤ} {n : ℕ} : deg k ≤ n ↔ ∀ i, (k i).natAbs ≤ n := by
   simp [deg, Finset.sup_le_iff]
 
+/-- `deg (k + l) ≤ deg k + deg l`. -/
 theorem deg_add_le (k l : d → ℤ) : deg (k + l) ≤ deg k + deg l :=
   deg_le_iff.2 fun i => (Int.natAbs_add_le _ _).trans
     (add_le_add (natAbs_le_deg k i) (natAbs_le_deg l i))
 
+/-- `deg 0 = 0`. -/
 @[simp]
 theorem deg_zero : deg (0 : d → ℤ) = 0 := by simp [deg]
 
@@ -61,16 +65,19 @@ open Classical in
 noncomputable def boxLt (n : ℕ) : Finset (d → ℤ) :=
   (Fintype.piFinset fun _ => Finset.Ioo (-(n : ℤ)) n).filter fun k => deg k < n
 
+/-- `k` lies in the box of size `n` iff `deg k < n`. -/
 theorem mem_boxLt {n : ℕ} {k : d → ℤ} : k ∈ boxLt d n ↔ deg k < n := by
   simp only [boxLt, Finset.mem_filter, Fintype.mem_piFinset, Finset.mem_Ioo]
   refine ⟨fun h => h.2, fun h => ⟨fun i => ?_, h⟩⟩
   have := (natAbs_le_deg k i).trans_lt h
   omega
 
+/-- The box of size `0` is empty. -/
 @[simp]
 theorem boxLt_zero : boxLt d 0 = ∅ := by
   ext k; simp [mem_boxLt]
 
+/-- The boxes increase with `n`. -/
 theorem boxLt_mono : Monotone (boxLt d) := fun _ _ h _ hk =>
   mem_boxLt.2 ((mem_boxLt.1 hk).trans_le h)
 
@@ -92,14 +99,17 @@ function on the torus. -/
 noncomputable def trigMonomial (k : d → ℤ) : UnitAddTorus d →ᵇ ℂ :=
   BoundedContinuousFunction.mkOfCompact (mFourier k)
 
+/-- The monomial `e_k` as a bounded continuous function is Mathlib's `mFourier k`. -/
 @[simp]
 theorem trigMonomial_apply (k : d → ℤ) (x : UnitAddTorus d) : trigMonomial k x = mFourier k x :=
   rfl
 
+/-- `e_{k+l} = e_k e_l`. -/
 theorem trigMonomial_add (k l : d → ℤ) :
     trigMonomial (k + l) = trigMonomial k * trigMonomial l := by
   ext x; simp [mFourier_add]
 
+/-- `e_0 = 1`. -/
 @[simp]
 theorem trigMonomial_zero : trigMonomial (0 : d → ℤ) = 1 := by
   ext x; simp [mFourier_zero]
@@ -113,12 +123,15 @@ variable (d) in
 noncomputable def trigPoly (n : ℕ) : Submodule ℂ (UnitAddTorus d →ᵇ ℂ) :=
   Submodule.span ℂ (trigMonomial '' (boxLt d n : Set (d → ℤ)))
 
+/-- There are no nonzero trigonometric polynomials of degree `< 0`. -/
 @[simp]
 theorem trigPoly_zero : trigPoly d 0 = ⊥ := by simp [trigPoly]
 
+/-- The spaces of trigonometric polynomials increase with the degree. -/
 theorem trigPoly_mono : Monotone (trigPoly d) := fun _ _ h =>
   Submodule.span_mono (Set.image_mono (by exact_mod_cast boxLt_mono h))
 
+/-- `e_k` has degree `< n` when `deg k < n`. -/
 theorem trigMonomial_mem_trigPoly {n : ℕ} {k : d → ℤ} (hk : deg k < n) :
     trigMonomial k ∈ trigPoly d n :=
   Submodule.subset_span ⟨k, by simpa using mem_boxLt.2 hk, rfl⟩
@@ -133,6 +146,7 @@ theorem trigPoly_mul_le (m n : ℕ) : trigPoly d m * trigPoly d n ≤ trigPoly d
   have hl' := mem_boxLt.1 (by simpa using hl)
   simpa using mem_boxLt.2 ((deg_add_le k l).trans_lt (by omega))
 
+/-- The product of polynomials of degree `< m` and `< n` has degree `< m + n`. -/
 theorem mul_mem_trigPoly {m n : ℕ} {S T : UnitAddTorus d →ᵇ ℂ} (hS : S ∈ trigPoly d m)
     (hT : T ∈ trigPoly d n) : S * T ∈ trigPoly d (m + n) :=
   trigPoly_mul_le m n (Submodule.mul_mem_mul hS hT)
@@ -154,6 +168,7 @@ noncomputable def trigScheme : FunctionScheme (UnitAddTorus d) :=
   ApproximationScheme.ofSubmodules (fun n => (trigPoly d n).restrictScalars ℝ)
     (by simp) (fun _ _ h => trigPoly_mono h)
 
+/-- The approximants of the trigonometric scheme are the trigonometric polynomials. -/
 @[simp]
 theorem mem_trigScheme {n : ℕ} {T : UnitAddTorus d →ᵇ ℂ} :
     T ∈ trigScheme d n ↔ T ∈ trigPoly d n := Iff.rfl

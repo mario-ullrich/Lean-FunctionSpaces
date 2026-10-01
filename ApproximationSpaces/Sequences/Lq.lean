@@ -51,15 +51,18 @@ Mathlib lemmas on `eLpNorm`. -/
 theorem aestronglyMeasurable_count (a : ℕ → ℝ≥0∞) : AEStronglyMeasurable a Measure.count :=
   measurable_from_nat.aestronglyMeasurable
 
+/-- `‖a‖_{ℓ_∞} = sup_n a_n`. -/
 theorem lqNorm_top (a : ℕ → ℝ≥0∞) : lqNorm ∞ a = ⨆ n, a n := by
   simp [lqNorm, eLpNorm_exponent_top (aestronglyMeasurable_count a)]
 
+/-- `‖a‖_{ℓ_q} = (∑_n a_n^q)^(1/q)` for `0 < q < ∞`. -/
 theorem lqNorm_eq_tsum (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ℕ → ℝ≥0∞) :
     lqNorm q a = (∑' n, a n ^ q.toReal) ^ (1 / q.toReal) := by
   rw [lqNorm, eLpNorm_eq_lintegral_rpow_enorm_toReal hq0 hq (aestronglyMeasurable_count a),
     lintegral_count]
   rfl
 
+/-- `‖a‖_{ℓ_1} = ∑_n a_n`. -/
 theorem lqNorm_one (a : ℕ → ℝ≥0∞) : lqNorm 1 a = ∑' n, a n := by
   simp [lqNorm_eq_tsum one_ne_zero one_ne_top]
 
@@ -73,6 +76,7 @@ theorem lqNorm_rpow (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ℕ → ℝ≥0∞) :
   have hp : q.toReal ≠ 0 := (ENNReal.toReal_pos hq0 hq).ne'
   rw [lqNorm_eq_tsum hq0 hq, one_div, ENNReal.rpow_inv_rpow hp]
 
+/-- The zero sequence has norm `0`. -/
 @[simp]
 theorem lqNorm_zero_right (q : ℝ≥0∞) : lqNorm q (fun _ => 0) = 0 := eLpNorm_fun_zero
 
@@ -86,6 +90,7 @@ theorem lqNorm_zero_left (a : ℕ → ℝ≥0∞) : lqNorm 0 a = 0 :=
 theorem le_lqNorm (hq : q ≠ 0) (a : ℕ → ℝ≥0∞) (n : ℕ) : a n ≤ lqNorm q a :=
   enorm_le_eLpNorm_count a n hq
 
+/-- The `ℓ_q` norm is monotone in the sequence. -/
 theorem lqNorm_mono (h : ∀ n, a n ≤ b n) : lqNorm q a ≤ lqNorm q b :=
   eLpNorm_mono_enorm (aestronglyMeasurable_count a) h
 
@@ -187,6 +192,7 @@ theorem lqNorm_geometric_le (hq : 1 ≤ q) (r : ℝ≥0∞) :
   calc lqNorm q (fun k => r ^ k) ≤ lqNorm 1 (fun k => r ^ k) := lqNorm_le_lqNorm_of_le le_rfl hq _
     _ = (1 - r)⁻¹ := by rw [lqNorm_one, ENNReal.tsum_geometric]
 
+/-- `‖a‖_{ℓ_q} ≤ ‖a‖_{ℓ_1}` for `q ≥ 1`. -/
 theorem lqNorm_le_lqNorm_one (hq : 1 ≤ q) (a : ℕ → ℝ≥0∞) : lqNorm q a ≤ ∑' n, a n := by
   simpa [lqNorm_one] using lqNorm_le_lqNorm_of_le le_rfl hq a
 
@@ -198,45 +204,58 @@ noncomputable def dyadicWeight (s : ℝ) (k : ℕ) : ℝ≥0∞ := (2 : ℝ≥0�
 
 variable {s t : ℝ}
 
+/-- `2^(0·s) = 1`. -/
 @[simp]
 theorem dyadicWeight_zero_right (s : ℝ) : dyadicWeight s 0 = 1 := by simp [dyadicWeight]
 
+/-- `2^(k·0) = 1`. -/
 @[simp]
 theorem dyadicWeight_zero_left (k : ℕ) : dyadicWeight 0 k = 1 := by simp [dyadicWeight]
 
+/-- The dyadic weights are finite. -/
 theorem dyadicWeight_ne_top (s : ℝ) (k : ℕ) : dyadicWeight s k ≠ ∞ :=
   ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top
 
+/-- The dyadic weights are finite. -/
 theorem dyadicWeight_lt_top (s : ℝ) (k : ℕ) : dyadicWeight s k < ∞ :=
   (dyadicWeight_ne_top s k).lt_top
 
+/-- The dyadic weights are positive. -/
 theorem dyadicWeight_pos (s : ℝ) (k : ℕ) : 0 < dyadicWeight s k :=
   ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top
 
+/-- The dyadic weights are nonzero. -/
 theorem dyadicWeight_ne_zero (s : ℝ) (k : ℕ) : dyadicWeight s k ≠ 0 := (dyadicWeight_pos s k).ne'
 
+/-- `2^(k(s+t)) = 2^(ks) 2^(kt)`. -/
 theorem dyadicWeight_add (s t : ℝ) (k : ℕ) :
     dyadicWeight (s + t) k = dyadicWeight s k * dyadicWeight t k := by
   rw [dyadicWeight, mul_add, ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top]; rfl
 
+/-- `2^((k+j)s) = 2^(ks) 2^(js)`. -/
 theorem dyadicWeight_add_nat (s : ℝ) (k j : ℕ) :
     dyadicWeight s (k + j) = dyadicWeight s k * dyadicWeight s j := by
   rw [dyadicWeight, Nat.cast_add, add_mul, ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top]
   rfl
 
+/-- `2^((k+1)s) = 2^s 2^(ks)`. -/
 theorem dyadicWeight_succ (s : ℝ) (k : ℕ) :
     dyadicWeight s (k + 1) = 2 ^ s * dyadicWeight s k := by
   rw [dyadicWeight_add_nat, mul_comm]; simp [dyadicWeight]
 
+/-- `2^(-ks) = (2^(ks))⁻¹`. -/
 theorem dyadicWeight_neg (s : ℝ) (k : ℕ) : dyadicWeight (-s) k = (dyadicWeight s k)⁻¹ := by
   rw [dyadicWeight, mul_neg, ENNReal.rpow_neg]; rfl
 
+/-- `2^(-ks) 2^(ks) = 1`. -/
 theorem dyadicWeight_neg_mul_self (s : ℝ) (k : ℕ) : dyadicWeight (-s) k * dyadicWeight s k = 1 := by
   rw [dyadicWeight_neg, ENNReal.inv_mul_cancel (dyadicWeight_ne_zero s k) (dyadicWeight_ne_top s k)]
 
+/-- `2^(ks) 2^(-ks) = 1`. -/
 theorem dyadicWeight_mul_neg_self (s : ℝ) (k : ℕ) : dyadicWeight s k * dyadicWeight (-s) k = 1 := by
   rw [mul_comm, dyadicWeight_neg_mul_self]
 
+/-- `(2^(ks))^p = 2^(k s p)`. -/
 theorem dyadicWeight_rpow (s p : ℝ) (k : ℕ) : dyadicWeight s k ^ p = dyadicWeight (s * p) k := by
   rw [dyadicWeight, dyadicWeight, ← ENNReal.rpow_mul, mul_assoc]
 
@@ -244,6 +263,7 @@ theorem dyadicWeight_rpow (s p : ℝ) (k : ℕ) : dyadicWeight s k ^ p = dyadicW
 theorem dyadicWeight_eq_pow (s : ℝ) (k : ℕ) : dyadicWeight s k = ((2 : ℝ≥0∞) ^ s) ^ k := by
   rw [dyadicWeight, mul_comm, ENNReal.rpow_mul_natCast]
 
+/-- For `s ≥ 0` the dyadic weights increase in `k`. -/
 theorem dyadicWeight_mono (hs : 0 ≤ s) : Monotone (dyadicWeight s) := fun _ _ hkj =>
   ENNReal.rpow_le_rpow_of_exponent_le one_le_two
     (mul_le_mul_of_nonneg_right (Nat.cast_le.2 hkj) hs)
@@ -257,6 +277,7 @@ theorem dyadicWeight_anti (hs : s ≤ 0) : Antitone (dyadicWeight s) := fun _ _ 
   ENNReal.rpow_le_rpow_of_exponent_le one_le_two
     (mul_le_mul_of_nonpos_right (Nat.cast_le.2 hkj) hs)
 
+/-- For `s ≥ 0`, `1 ≤ 2^(ks)`. -/
 theorem one_le_dyadicWeight (hs : 0 ≤ s) (k : ℕ) : 1 ≤ dyadicWeight s k := by
   simpa using dyadicWeight_mono hs (Nat.zero_le k)
 
