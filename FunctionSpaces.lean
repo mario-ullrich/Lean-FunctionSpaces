@@ -27,6 +27,7 @@ public import FunctionSpaces.Atoms.Filtration
 public import FunctionSpaces.Classical.Translation
 public import FunctionSpaces.Classical.Modulus
 public import FunctionSpaces.Classical.BesovModuli
+public import FunctionSpaces.Classical.SobolevDeriv
 
 /-!
 # Function spaces
@@ -76,4 +77,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   theorem `E_n(f)_2 ≤ √d ω(f, 1/n)_2`.
 * `FunctionSpaces.Classical.BesovModuli`: the classical Besov norm through the modulus and
   the coincidence theorem with `B^s_{2,q}(𝕋^d)` for `0 < s < 1`.
+* `FunctionSpaces.Classical.SobolevDeriv`: weak derivatives on the torus through Fourier
+  coefficients and `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)`.
 -/

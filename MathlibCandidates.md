@@ -24,3 +24,23 @@ declarations.
   `ENNReal.rpow_le_rpow_of_nonpos`, which exists for `ℝ` and `ℝ≥0` but not for `ℝ≥0∞`.
 * **Discrete Hardy inequalities** (`ApproximationSpaces/Sequences/Hardy.lean`):
   `ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`.
+* **The inclusion `L_r ↪ L_p`** (`FunctionSpaces/Lp/Inclusion.lean`): for a finite measure
+  and `p ≤ r`, the bounded linear injection `MeasureTheory.Lp.inclusionOfExponentLe`, with
+  its norm bound and compatibility with `BoundedContinuousFunction.toLp`. Mathlib has the
+  subgroup inclusion `MeasureTheory.Lp.antitone` but no bundled map.
+* **Interpolation between `L_p` and `L_∞`** (`FunctionSpaces/Lp/Interpolation.lean`):
+  `eLpNorm f r μ ≤ M^(1-p/r) eLpNorm f p μ^(p/r)` for `‖f‖ ≤ M` a.e.
+  (`MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow`).
+* **`L_∞` norm of bounded continuous functions** (`FunctionSpaces/Lp/BoundedContinuous.lean`):
+  for a measure charging open sets, `‖toLp ∞ μ a‖ = ‖a‖`, and the range is closed
+  (`BoundedContinuousFunction.norm_toLp_top`, `.isClosed_range_toLp_top`).
+* **Conditional expectation on `L_p`** (`FunctionSpaces/Atoms/Filtration.lean`): for a finite
+  measure and `1 ≤ p ≤ ∞`, `E[· | m]` as a contraction `Lp E p μ →L Lp E p μ`
+  (`MeasureTheory.Lp.condExpLp`); Mathlib bundles it only on `L_1` and `L_2`.
+* **Fourier analysis on the torus** (`FunctionSpaces/Classical/Translation.lean`): the Fourier
+  coefficients of a translate, `(τ_h f)^(k) = e_k(h) f̂(k)`
+  (`Torus.mFourierCoeff_translate`), and `|∏ aᵢ - 1| ≤ ∑ |aᵢ - 1|` for unimodular `aᵢ`
+  (`Torus.norm_prod_sub_one_le`). Mathlib's measure on `UnitAddCircle` is a local instance
+  in `Mathlib/Analysis/Fourier/AddCircleMulti.lean`, so `mFourierBasis` cannot be used
+  outside that file without re-declaring it (`FunctionSpaces/Torus/Measure.lean`); worth
+  reporting upstream.

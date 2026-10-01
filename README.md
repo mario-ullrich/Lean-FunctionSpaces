@@ -86,6 +86,12 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `‖f‖_2 + ‖(2^(js) ω(f, 2^(-j))_2)_j‖_{ℓ_q} < ∞`, with equivalent norms
   (`Torus.memBesov_iff_modulusNorm_lt_top`, `Torus.approxNormDyadic_le_modulusNorm`,
   `Torus.modulusNorm_le_approxNormDyadic`).
+* **Sobolev spaces through weak derivatives.** Call `g ∈ L_2(𝕋^d)` the weak derivative
+  `∂^α f` of `f ∈ L_2(𝕋^d)` if `ĝ(k) = (2πi k)^α f̂(k)` for all `k ∈ ℤ^d`, and let
+  `W^m_2(𝕋^d)` consist of the `f` all of whose weak derivatives of order `|α| ≤ m` lie in
+  `L_2`. Then `f ∈ W^m_2(𝕋^d)` iff `∑_k (1 + max_i |k_i|)^(2m) |f̂(k)|² < ∞`
+  (`Torus.memSobolev_iff`), and for `m ≥ 1`, `W^m_2(𝕋^d) = B^m_{2,2}(𝕋^d)`
+  (`Torus.memSobolev_iff_memBesov`).
 * **Atomic decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with atoms `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
@@ -175,7 +181,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Filtration schemes (Haar), martingale-difference characterisation | ✅ proved | ✗ | `FunctionSpaces/Atoms/Filtration.lean` |
 | Haar coefficients of the dyadic filtration on `[0, 1)` | ⬜ planned | ✗ | `FunctionSpaces/Atoms/…` |
 | Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ proved | ✗ | `FunctionSpaces/Classical/{Translation,Modulus,BesovModuli}.lean` |
-| Classical definitions for `p ≠ 2`, higher differences, weak derivatives | ⬜ planned | ✗ | `FunctionSpaces/Classical/…` |
+| Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Classical/SobolevDeriv.lean` |
+| Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Classical/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author ·
@@ -185,10 +192,13 @@ file resets its rows to ✗.
 ## Organisation
 
 Two libraries. `ApproximationSpaces` holds the abstract theory: approximation schemes in a
-real normed space, the error of best approximation, and the two basic schemes, linear
-approximation from a sequence and `n`-term approximation from a dictionary. Nothing in it
-mentions functions or measures. `FunctionSpaces` will hold the Besov and Sobolev spaces built
-on it. [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
+real normed space, the approximation spaces and their embeddings, lifting and the Nikolskii
+transfer theorem, the K-functional and the representation theorem, atomic decompositions and
+projection schemes. Nothing in it mentions functions or measures. `FunctionSpaces` holds the
+Besov and Sobolev spaces built on it: schemes of bounded continuous functions on a finite
+measure space and their embedding theorems, spectral schemes in Hilbert spaces, the torus,
+filtration schemes, and the classical definitions through moduli of smoothness and weak
+derivatives. [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 `blueprint/` holds the LaTeX source of the blueprint and the scripts that check and link its
 `\lean` references.
 
@@ -196,8 +206,8 @@ on it. [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstream
 
 * **Reiteration** for approximation and interpolation spaces.
 * **Function spaces beyond the torus**: `ℝ^d`, compact manifolds, bounded domains.
-* **Classical definitions**: Sobolev spaces by weak derivatives and Besov spaces by moduli
-  of smoothness for all `p`, with the coincidence theorems of Triebel's school.
+* **Classical definitions for all `p`**: Sobolev spaces by weak derivatives and Besov spaces
+  by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
 
 ## Building
 
