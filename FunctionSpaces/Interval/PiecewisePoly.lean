@@ -1,0 +1,303 @@
+/-
+Copyright (c) 2026 Mario Ullrich. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Mario Ullrich
+-/
+module
+
+public import FunctionSpaces.Interval.Polynomials
+public import ApproximationSpaces.Decompositions.Synthesis
+public import Mathlib.Algebra.Order.Floor.Semifield
+
+/-!
+# Dyadic piecewise polynomials on `[0, 1]`
+
+A **piecewise polynomial of level `k` and degree `< r`** agrees on each dyadic interval
+`I_{k,n} = [n 2^(-k), (n + 1) 2^(-k))` with a polynomial of degree `< r`
+(`Interval.ppFun`).  Their classes in `L_p[0, 1]` form subspaces `V_k` increasing in `k`
+(`Interval.ppSpace`), and the scheme with approximants `V_{⌊log₂ n⌋}` of complexity `n`
+(`Interval.ppScheme`) has `V_k` as approximants of complexity `2^k`.
+
+This file sets up the spaces, the bookkeeping for the pieces (on `I_{k,m}` a piecewise
+polynomial is the polynomial `Q_m`, and `0` beyond `[0, 1)`, `Interval.ppFun_eq_polyFun`) and
+for integrals over unions of dyadic intervals (`Interval.lintegral_Icc_le_sum`).
+Jackson's inequality is in `FunctionSpaces.Interval.PiecewiseJackson`, the inverse inequality and
+the identification of the approximation spaces in `FunctionSpaces.Interval.PiecewiseInverse`.
+-/
+
+@[expose] public section
+
+open MeasureTheory Set Polynomial
+open scoped ENNReal BoundedContinuousFunction
+open ENNReal (dyadicWeight)
+
+namespace Interval
+
+/-- Lebesgue measure on `[0, 1]`. -/
+noncomputable abbrev unitVol : Measure ℝ := volume.restrict (Icc (0 : ℝ) 1)
+
+/-- Almost every point of `[0, 1]` lies in `[0, 1)`. -/
+theorem ae_mem_Ico_unitVol : ∀ᵐ x ∂unitVol, x ∈ Ico (0 : ℝ) 1 := by
+  rw [unitVol, ← Measure.restrict_congr_set Ico_ae_eq_Icc]
+  exact ae_restrict_mem measurableSet_Ico
+
+/-- The dyadic interval `I_{k,n} = [n 2^(-k), (n + 1) 2^(-k))`. -/
+def dyadicIco (k n : ℕ) : Set ℝ := Ico ((n : ℝ) / 2 ^ k) ((n + 1) / 2 ^ k)
+
+/-- Dyadic intervals are measurable. -/
+theorem measurableSet_dyadicIco (k n : ℕ) : MeasurableSet (dyadicIco k n) := measurableSet_Ico
+
+/-- `x ∈ I_{k,n}` iff `n ≤ 2^k x < n + 1`. -/
+theorem mem_dyadicIco {k n : ℕ} {x : ℝ} :
+    x ∈ dyadicIco k n ↔ (n : ℝ) ≤ 2 ^ k * x ∧ 2 ^ k * x < n + 1 := by
+  have h : (0 : ℝ) < 2 ^ k := by positivity
+  rw [dyadicIco, mem_Ico, div_le_iff₀ h, lt_div_iff₀ h, mul_comm x]
+
+/-- Dyadic intervals of one level are disjoint. -/
+theorem eq_of_mem_dyadicIco {k n m : ℕ} {x : ℝ} (hn : x ∈ dyadicIco k n)
+    (hm : x ∈ dyadicIco k m) : n = m := by
+  rw [mem_dyadicIco] at hn hm
+  by_contra hne
+  rcases Nat.lt_or_gt_of_ne hne with h | h
+  · have : (n : ℝ) + 1 ≤ m := by exact_mod_cast h
+    linarith [hn.2, hm.1]
+  · have : (m : ℝ) + 1 ≤ n := by exact_mod_cast h
+    linarith [hm.2, hn.1]
+
+/-- A point of `[0, 1)` lies in the dyadic interval `I_{k, ⌊2^k x⌋}`, of index `< 2^k`. -/
+theorem mem_dyadicIco_floor {k : ℕ} {x : ℝ} (hx : x ∈ Ico (0 : ℝ) 1) :
+    x ∈ dyadicIco k ⌊2 ^ k * x⌋₊ ∧ ⌊2 ^ k * x⌋₊ < 2 ^ k := by
+  have h0 : 0 ≤ 2 ^ k * x := mul_nonneg (by positivity) hx.1
+  refine ⟨mem_dyadicIco.2 ⟨Nat.floor_le h0, Nat.lt_floor_add_one _⟩, ?_⟩
+  have : 2 ^ k * x < (2 ^ k : ℕ) := by
+    push_cast
+    exact mul_lt_of_lt_one_right (by positivity) hx.2
+  exact (Nat.floor_lt h0).2 this
+
+/-- The parent dyadic interval: `⌊2^k x⌋ = ⌊2^(k+1) x⌋ / 2`. -/
+theorem floor_two_pow_succ_div (k : ℕ) (x : ℝ) :
+    ⌊2 ^ (k + 1) * x⌋₊ / 2 = ⌊2 ^ k * x⌋₊ := by
+  rw [← Nat.floor_div_natCast]
+  congr 1
+  push_cast
+  ring
+
+/-- The **piecewise polynomial** `∑_n 1_{I_{k,n}} Q_n` of level `k`. -/
+noncomputable def ppFun (k : ℕ) (Q : ℕ → ℂ[X]) (x : ℝ) : ℂ :=
+  ∑ n ∈ Finset.range (2 ^ k), (dyadicIco k n).indicator (polyFun (Q n)) x
+
+/-- On `I_{k,n}` the piecewise polynomial is `Q_n`. -/
+theorem ppFun_eq_of_mem {k n : ℕ} (Q : ℕ → ℂ[X]) {x : ℝ} (hn : n < 2 ^ k)
+    (hx : x ∈ dyadicIco k n) : ppFun k Q x = polyFun (Q n) x := by
+  rw [ppFun, Finset.sum_eq_single n (fun m _ hmn => indicator_of_notMem
+    (fun hm => hmn (eq_of_mem_dyadicIco hm hx)) _)
+    (fun h => absurd (Finset.mem_range.2 hn) h), indicator_of_mem hx]
+
+/-- Piecewise polynomials are measurable. -/
+theorem measurable_ppFun (k : ℕ) (Q : ℕ → ℂ[X]) : Measurable (ppFun k Q) :=
+  Finset.measurable_sum _ fun n _ =>
+    (measurable_polyFun (Q n)).indicator (measurableSet_dyadicIco k n)
+
+/-- Piecewise polynomials lie in `L_p[0, 1]`. -/
+theorem memLp_ppFun (k : ℕ) (Q : ℕ → ℂ[X]) (p : ℝ≥0∞) : MemLp (ppFun k Q) p unitVol := by
+  have : ppFun k Q = ∑ n ∈ Finset.range (2 ^ k), (dyadicIco k n).indicator (polyFun (Q n)) := by
+    funext x; rw [ppFun, Finset.sum_apply]
+  rw [this]
+  exact memLp_finsetSum' _ fun n _ =>
+    (memLp_polyFun (Q n) p 0 1).indicator (measurableSet_dyadicIco k n)
+
+/-- Piecewise polynomials are additive in the pieces. -/
+theorem ppFun_add (k : ℕ) (Q Q' : ℕ → ℂ[X]) :
+    ppFun k (Q + Q') = ppFun k Q + ppFun k Q' := by
+  funext x
+  simp only [ppFun, Pi.add_apply, ← Finset.sum_add_distrib]
+  refine Finset.sum_congr rfl fun n _ => ?_
+  by_cases hx : x ∈ dyadicIco k n
+  · simp [indicator_of_mem hx, polyFun]
+  · simp [indicator_of_notMem hx]
+
+/-- Piecewise polynomials are homogeneous in the pieces. -/
+theorem ppFun_const_mul (k : ℕ) (c : ℂ) (Q : ℕ → ℂ[X]) :
+    ppFun k (fun n => C c * Q n) = fun x => c * ppFun k Q x := by
+  funext x
+  simp only [ppFun, Finset.mul_sum]
+  refine Finset.sum_congr rfl fun n _ => ?_
+  by_cases hx : x ∈ dyadicIco k n
+  · simp [indicator_of_mem hx, polyFun]
+  · simp [indicator_of_notMem hx]
+
+/-- The zero polynomial. -/
+theorem polyFun_zero : polyFun 0 = 0 := funext fun x => by simp [polyFun]
+
+/-- The piecewise polynomials of level `k` with zero pieces vanish. -/
+theorem ppFun_zero (k : ℕ) : ppFun k 0 = 0 := by
+  funext x
+  simp [ppFun, polyFun_zero]
+
+/-- **Refinement**: a piecewise polynomial of level `k` is one of level `k + 1` with the pieces
+`Q_{⌊n/2⌋}`, almost everywhere on `[0, 1]`. -/
+theorem ppFun_refine (k : ℕ) (Q : ℕ → ℂ[X]) :
+    ppFun (k + 1) (fun n => Q (n / 2)) =ᵐ[unitVol] ppFun k Q := by
+  filter_upwards [ae_mem_Ico_unitVol] with x hx
+  obtain ⟨h1, h1'⟩ := mem_dyadicIco_floor (k := k + 1) hx
+  obtain ⟨h2, h2'⟩ := mem_dyadicIco_floor (k := k) hx
+  rw [ppFun_eq_of_mem _ h1' h1, ppFun_eq_of_mem _ h2' h2, floor_two_pow_succ_div]
+
+variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
+
+variable (p) in
+/-- The space `V_k` of **piecewise polynomials of level `k` and degree `< r`** in `L_p[0, 1]`. -/
+noncomputable def ppSpace (r k : ℕ) : Submodule ℝ (Lp ℂ p unitVol) where
+  carrier := {g | ∃ Q : ℕ → ℂ[X], (∀ n, Q n ∈ degreeLT ℂ r) ∧
+    (g : ℝ → ℂ) =ᵐ[unitVol] ppFun k Q}
+  add_mem' := by
+    rintro g g' ⟨Q, hQ, hg⟩ ⟨Q', hQ', hg'⟩
+    refine ⟨Q + Q', fun n => Submodule.add_mem _ (hQ n) (hQ' n), ?_⟩
+    filter_upwards [Lp.coeFn_add g g', hg, hg'] with x h1 h2 h3
+    rw [h1, Pi.add_apply, h2, h3, ppFun_add, Pi.add_apply]
+  zero_mem' := ⟨0, fun n => Submodule.zero_mem _, by
+    filter_upwards [Lp.coeFn_zero ℂ p unitVol] with x hx
+    rw [hx, ppFun_zero]⟩
+  smul_mem' := by
+    rintro c g ⟨Q, hQ, hg⟩
+    refine ⟨fun n => C (c : ℂ) * Q n, fun n => ?_, ?_⟩
+    · show C (c : ℂ) * Q n ∈ degreeLT ℂ r
+      rw [← smul_eq_C_mul]; exact Submodule.smul_mem _ _ (hQ n)
+    · filter_upwards [Lp.coeFn_smul c g, hg] with x h1 h2
+      rw [h1, Pi.smul_apply, h2, ppFun_const_mul, Complex.real_smul]
+
+omit [Fact (1 ≤ p)] in
+/-- The spaces of piecewise polynomials increase with the level. -/
+theorem ppSpace_mono (r : ℕ) : Monotone (ppSpace p r) := by
+  refine monotone_nat_of_le_succ fun k g hg => ?_
+  obtain ⟨Q, hQ, hgQ⟩ := hg
+  exact ⟨fun n => Q (n / 2), fun n => hQ _, hgQ.trans (ppFun_refine k Q).symm⟩
+
+variable (p) in
+/-- The approximants of complexity `n`: `{0}` for `n = 0`, `V_{⌊log₂ n⌋}` for `n ≥ 1`. -/
+noncomputable def ppApproximants (r n : ℕ) : Submodule ℝ (Lp ℂ p unitVol) :=
+  if n = 0 then ⊥ else ppSpace p r (Nat.log 2 n)
+
+omit [Fact (1 ≤ p)] in
+/-- The approximants of the piecewise polynomial scheme increase. -/
+theorem ppApproximants_mono (r : ℕ) : Monotone (ppApproximants p r) := by
+  intro a b hab f hf
+  by_cases ha : a = 0
+  · simp only [ppApproximants, ha, ↓reduceIte, Submodule.mem_bot] at hf
+    rw [hf]; exact Submodule.zero_mem _
+  · have hb : b ≠ 0 := by omega
+    simp only [ppApproximants, ha, hb, ↓reduceIte] at hf ⊢
+    exact ppSpace_mono r (Nat.log_mono_right hab) hf
+
+variable (p) in
+/-- The **scheme of dyadic piecewise polynomials** of degree `< r` in `L_p[0, 1]`. -/
+noncomputable def ppScheme (r : ℕ) : ApproximationScheme (Lp ℂ p unitVol) :=
+  ApproximationScheme.ofSubmodules (ppApproximants p r) (by simp [ppApproximants])
+    (ppApproximants_mono r)
+
+/-- The approximants of complexity `2^k` are the piecewise polynomials of level `k`. -/
+theorem mem_ppScheme_two_pow {r k : ℕ} {g : Lp ℂ p unitVol} :
+    g ∈ ppScheme p r (2 ^ k) ↔ g ∈ ppSpace p r k := by
+  show g ∈ ppApproximants p r (2 ^ k) ↔ _
+  simp [ppApproximants, Nat.log_pow Nat.one_lt_two]
+
+/-- The piecewise polynomial scheme is linear. -/
+theorem ppScheme_isLinear (r : ℕ) : (ppScheme p r).IsLinear :=
+  ApproximationScheme.isLinear_ofSubmodules _ _ _
+
+/-- **Integrals over a union of intervals**: `∫_{[u, u + mL]} G ≤ ∑_{n < m} ∫_{[u + nL, u + (n+1)L]} G`
+for `L ≥ 0`. -/
+theorem lintegral_Icc_le_sum (G : ℝ → ℝ≥0∞) (u : ℝ) {L : ℝ} (hL : 0 ≤ L) (m : ℕ) :
+    ∫⁻ x in Icc u (u + m * L), G x ≤
+      ∑ n ∈ Finset.range m, ∫⁻ x in Icc (u + n * L) (u + (n + 1) * L), G x := by
+  induction m with
+  | zero =>
+    simp only [CharP.cast_eq_zero, zero_mul, add_zero, Finset.range_zero, Finset.sum_empty]
+    rw [Icc_self, setLIntegral_measure_zero _ _ (Real.volume_singleton)]
+  | succ m ih =>
+    rw [Finset.sum_range_succ]
+    have hsplit : Icc u (u + ((m + 1 : ℕ) : ℝ) * L) =
+        Icc u (u + m * L) ∪ Icc (u + m * L) (u + (m + 1) * L) := by
+      push_cast
+      exact (Icc_union_Icc_eq_Icc (by nlinarith [Nat.cast_nonneg (α := ℝ) m])
+        (by nlinarith)).symm
+    rw [hsplit]
+    exact (lintegral_union_le _ _ _).trans (add_le_add ih le_rfl)
+
+/-- **Integrals over a union of intervals, reverse inequality**: for measurable `G` and `L ≥ 0`,
+`∑_{n < m} ∫_{[u + nL, u + (n+1)L]} G ≤ ∫_{[u, u + mL]} G`, the intervals meeting in single
+points. -/
+theorem sum_le_lintegral_Icc {G : ℝ → ℝ≥0∞} (u : ℝ) {L : ℝ} (hL : 0 ≤ L) (m : ℕ) :
+    ∑ n ∈ Finset.range m, ∫⁻ x in Icc (u + n * L) (u + (n + 1) * L), G x ≤
+      ∫⁻ x in Icc u (u + m * L), G x := by
+  have hIco : ∀ a b : ℝ, ∫⁻ x in Icc a b, G x = ∫⁻ x in Ico a b, G x := fun a b =>
+    (setLIntegral_congr Ico_ae_eq_Icc).symm
+  simp_rw [hIco]
+  refine le_of_eq ?_
+  induction m with
+  | zero => simp
+  | succ m ih =>
+    rw [Finset.sum_range_succ, ih]
+    have hsplit : Ico u (u + ((m + 1 : ℕ) : ℝ) * L) =
+        Ico u (u + m * L) ∪ Ico (u + m * L) (u + (m + 1) * L) := by
+      push_cast
+      exact (Ico_union_Ico_eq_Ico (by nlinarith [Nat.cast_nonneg (α := ℝ) m])
+        (by nlinarith)).symm
+    rw [hsplit, lintegral_union measurableSet_Ico (Ico_disjoint_Ico_same.mono_left
+      (fun _ h => h) |>.mono_right (fun _ h => h))]
+
+/-- Floor of `2^k x` on a dyadic interval: `x ∈ I_{k,n}` gives `⌊2^k x⌋ = n`. -/
+theorem floor_eq_of_mem_dyadicIco {k n : ℕ} {x : ℝ} (hx : x ∈ dyadicIco k n) :
+    ⌊2 ^ k * x⌋₊ = n := by
+  rw [mem_dyadicIco] at hx
+  exact (Nat.floor_eq_iff ((Nat.cast_nonneg n).trans hx.1)).2 hx
+
+/-- The dyadic intervals `I_{k,n}`, `n < 2^k`, lie in `[0, 1)`. -/
+theorem dyadicIco_subset {k n : ℕ} (hn : n < 2 ^ k) : dyadicIco k n ⊆ Ico 0 1 := by
+  intro x hx
+  rw [mem_dyadicIco] at hx
+  have h2 : (0 : ℝ) < 2 ^ k := by positivity
+  have hn' : (n : ℝ) + 1 ≤ 2 ^ k := by exact_mod_cast Nat.succ_le_of_lt hn
+  have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
+  constructor
+  · nlinarith
+  · nlinarith
+
+/-- The dyadic intervals of one level are pairwise disjoint. -/
+theorem pairwise_disjoint_dyadicIco (k : ℕ) : Pairwise (Function.onFun Disjoint (dyadicIco k)) :=
+  fun _ _ hnm => Set.disjoint_left.2 fun _ hn hm => hnm (eq_of_mem_dyadicIco hn hm)
+
+/-- A piecewise polynomial vanishes outside `[0, 1)`. -/
+theorem ppFun_eq_zero {k : ℕ} (Q : ℕ → ℂ[X]) {x : ℝ} (hx : x ∉ Ico (0 : ℝ) 1) :
+    ppFun k Q x = 0 :=
+  Finset.sum_eq_zero fun _ hn =>
+    indicator_of_notMem (fun h => hx (dyadicIco_subset (Finset.mem_range.1 hn) h)) _
+
+/-- On `I_{k,m}` a piecewise polynomial of level `k` is a polynomial: `Q_m` for `m < 2^k`, and
+`0` for the intervals beyond `[0, 1)`. -/
+theorem ppFun_eq_polyFun {k m : ℕ} (Q : ℕ → ℂ[X]) {x : ℝ} (hx : x ∈ dyadicIco k m) :
+    ppFun k Q x = polyFun (if m < 2 ^ k then Q m else 0) x := by
+  split_ifs with hm
+  · exact ppFun_eq_of_mem Q hm hx
+  · rw [polyFun_zero, Pi.zero_apply]
+    exact Finset.sum_eq_zero fun n hn => indicator_of_notMem
+      (fun h => hm (eq_of_mem_dyadicIco h hx ▸ Finset.mem_range.1 hn)) _
+
+/-- The piece `Q_m` (or `0` beyond `[0, 1)`) has degree `< r`. -/
+theorem ite_mem_degreeLT {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r) (k m : ℕ) :
+    (if m < 2 ^ k then Q m else 0) ∈ degreeLT ℂ r := by
+  split_ifs
+  · exact hQ m
+  · exact zero_mem _
+
+/-- The `L_p` norm through the integral of the `p`-th power, as an inequality. -/
+theorem eLpNorm_le_of_lintegral_le {α : Type*} [MeasurableSpace α] {μ : Measure α} {g : α → ℂ}
+    (hg : AEStronglyMeasurable g μ) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {B : ℝ≥0∞}
+    (h : ∫⁻ x, ‖g x‖ₑ ^ p.toReal ∂μ ≤ B ^ p.toReal) : eLpNorm g p μ ≤ B := by
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hg]
+  calc (∫⁻ x, ‖g x‖ₑ ^ p.toReal ∂μ) ^ (1 / p.toReal) ≤ (B ^ p.toReal) ^ (1 / p.toReal) :=
+        ENNReal.rpow_le_rpow h (by positivity)
+    _ = B := by rw [one_div, ENNReal.rpow_rpow_inv hq.ne']
+
+end Interval

@@ -2712,9 +2712,10 @@ for $p = 2$.
 \chapter{Polynomial approximation on intervals}
 \label{ch:interval}
 
-This chapter prepares the approximation by piecewise polynomials on an interval $[a, b]$,
-for all $1 \leq p \leq \infty$ and without Fourier analysis. Functions are complex-valued and
-measurable on $\R$; norms are taken on subintervals with Lebesgue measure.
+This chapter treats the approximation by piecewise polynomials on an interval without
+Fourier analysis and identifies their approximation spaces with Besov spaces defined by
+moduli of smoothness. Functions are complex-valued and measurable on $\R$; norms are taken
+on subintervals with Lebesgue measure.
 
 \section{Differences and moduli}
 
@@ -2899,6 +2900,145 @@ $M_{k\delta}^r f(x)$, so $f - S_\delta f = (-1)^r$ times the average of $\Delta_
 $(S_\delta f)^{(r)} = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta_{k\delta}^r f$ by
 \Cref{lem:steklov-deriv}.
 \end{proof}
+
+\section{Dyadic piecewise polynomials}
+
+\begin{definition}[Dyadic piecewise polynomials]
+\label{def:pp-scheme}
+\lean{Interval.unitVol, Interval.ae_mem_Ico_unitVol, Interval.dyadicIco,
+  Interval.measurableSet_dyadicIco, Interval.mem_dyadicIco, Interval.eq_of_mem_dyadicIco,
+  Interval.mem_dyadicIco_floor, Interval.floor_two_pow_succ_div, Interval.ppFun,
+  Interval.ppFun_eq_of_mem, Interval.measurable_ppFun, Interval.memLp_ppFun, Interval.ppFun_add,
+  Interval.ppFun_const_mul, Interval.polyFun_zero, Interval.ppFun_zero, Interval.ppFun_refine,
+  Interval.ppSpace, Interval.ppSpace_mono, Interval.ppApproximants, Interval.ppApproximants_mono,
+  Interval.ppScheme, Interval.mem_ppScheme_two_pow, Interval.ppScheme_isLinear}
+\leanok
+Let $r \geq 1$ and $1 \leq p < \infty$. For $k \in \N$ the dyadic intervals of level $k$ are
+$I_{k,n} = [n 2^{-k}, (n+1) 2^{-k})$, $n < 2^k$. The space $V_k \subseteq L_p[0,1]$ consists of
+the classes of functions that agree on every $I_{k,n}$ with a polynomial of degree $< r$. The
+scheme of dyadic piecewise polynomials has $A_0 = \{0\}$ and $A_n = V_{\lfloor \log_2 n \rfloor}$
+for $n \geq 1$.
+\end{definition}
+
+\begin{lemma}[Bookkeeping for dyadic intervals]
+\label{lem:pp-bookkeeping}
+\lean{Interval.floor_eq_of_mem_dyadicIco, Interval.dyadicIco_subset,
+  Interval.pairwise_disjoint_dyadicIco, Interval.ppFun_eq_zero, Interval.ppFun_eq_polyFun,
+  Interval.ite_mem_degreeLT, Interval.lintegral_Icc_le_sum, Interval.sum_le_lintegral_Icc,
+  Interval.eLpNorm_le_of_lintegral_le}
+\leanok
+\uses{def:pp-scheme}
+For $x \in I_{k,n}$, $\lfloor 2^k x \rfloor = n$. A piecewise polynomial of level $k$ vanishes
+outside $[0, 1)$. For $u \in \R$, $L \geq 0$, $m \in \N$ and every $G : \R \to [0, \infty]$,
+$\int_{[u, u + mL]} G = \sum_{n < m} \int_{[u + nL, u + (n+1)L]} G$.
+\end{lemma}
+
+\begin{theorem}[Jackson's inequality for piecewise polynomials]
+\label{thm:pp-jackson}
+\lean{Interval.jacksonConst, Interval.jacksonConst_ne_top, Interval.exists_left_approx,
+  Interval.exists_right_approx, Interval.eLpNorm_Icc_split, Interval.exists_ppFun_approx,
+  Interval.lpModulus, Interval.lpModulus_add_le, Interval.lpModulus_le,
+  Interval.approxSeq_ppScheme_le}
+\leanok
+\uses{def:pp-scheme, lem:pp-bookkeeping, thm:steklov-smoothing, lem:taylor-lp,
+  lem:interval-modulus}
+Let $1 \leq p < \infty$ and $r \geq 1$. For every $f \in L_p[0,1]$ and $k \geq 1$,
+\[
+  E_{2^k}(f)_p \leq 2 (1 + 2^r r^{2r}) \, \omega_r(f, 2^{-k}, [0,1])_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+First let $f$ be continuous, $L = 2^{-k}$ and $\delta = L / r^2$. Since
+$\tfrac12 + r^2 \delta \leq 1$, the smoothing $g = S_\delta f$ of \Cref{thm:steklov-smoothing}
+satisfies $\|f - g\|_{L_p[0,1/2]} \leq \omega_r(f, L, [0,1])_p$ and
+$\|g^{(r)}\|_{L_p[0,1/2]} \leq 2^r \delta^{-r} \omega_r(f, L, [0,1])_p$. By \Cref{lem:taylor-lp}
+there is on each $I_{k,n} \subseteq [0, \tfrac12]$ a polynomial $Q_n$ of degree $< r$ with
+$\|g - Q_n\|_{L_p(I_{k,n})} \leq L^r \|g^{(r)}\|_{L_p(I_{k,n})}$. Summing $p$-th powers, the
+piecewise polynomial $S$ made of the $Q_n$ satisfies
+$\|g - S\|_{L_p[0,1/2]} \leq L^r 2^r \delta^{-r} \omega_r(f, L, [0,1])_p
+= 2^r r^{2r} \omega_r(f, L, [0,1])_p$. On $[\tfrac12, 1]$ apply the same to $f(1 - \cdot)$, which
+has the same modulus by \Cref{lem:interval-modulus}; $\tfrac12$ is a knot since $k \geq 1$.
+For general $f$ take a bounded continuous $g$ close to $f$ in $L_p$: then
+$E_{2^k}(f)_p \leq E_{2^k}(g)_p + \|f - g\|_p$ and
+$\omega_r(g, t)_p \leq \omega_r(f, t)_p + 2^r \|f - g\|_p$.
+\end{proof}
+
+\begin{lemma}[Local estimates for piecewise polynomials]
+\label{lem:pp-local}
+\lean{Interval.localMass, Interval.tsum_localMass_ppFun_le, Interval.enorm_ppFun_le,
+  Interval.iterDiff_ppFun_eq_zero, Interval.enorm_iterDiff_ppFun_le, Interval.stripBound,
+  Interval.lintegral_stripBound_le, Interval.sum_sum_localMass_le}
+\leanok
+\uses{def:pp-scheme, lem:pp-bookkeeping, lem:interval-nikolskii, lem:iter-diff-poly}
+Let $1 \leq p < \infty$, let $a$ be a piecewise polynomial of level $j$ and degree $< r$, and
+$m_n = \int_{I_{j,n}} |a|^p$ for $n \in \N$. Let $0 \leq h \leq 2^{-j}$, $x \geq 0$ and
+$n = \lfloor 2^j x \rfloor$. If $x + rh < (n+1) 2^{-j}$, then $\Delta_h^r a(x) = 0$. In every
+case
+\[
+  |\Delta_h^r a(x)| \leq 2^r K 2^{j/p} \Bigl( \sum_{l=0}^r m_{n+l} \Bigr)^{1/p}
+\]
+with the constant $K$ of \Cref{lem:interval-nikolskii}. Moreover
+$\sum_{n < 2^j} \sum_{l = 0}^r m_{n+l} \leq (r+1) \|a\|_p^p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+In the first case $x, x + h, \dots, x + rh$ lie in $I_{j,n}$, where $a$ is a polynomial of
+degree $< r$, so \Cref{lem:iter-diff-poly} applies. In general $x + ih \in I_{j, n+l}$ with
+$0 \leq l \leq r$, where $|a| \leq K 2^{j/p} m_{n+l}^{1/p}$ by \Cref{lem:interval-nikolskii}, and
+$\sum_i \binom{r}{i} = 2^r$. In the double sum every $m_n$ occurs at most $r + 1$ times.
+\end{proof}
+
+\begin{theorem}[Inverse inequality for piecewise polynomials]
+\label{thm:pp-inverse}
+\lean{Interval.eLpNorm_iterDiff_ppFun_le, Interval.ofReal_two_pow_mul_rpow_le,
+  Interval.exists_inverse_ppScheme}
+\leanok
+\uses{lem:pp-local}
+Let $1 \leq p < \infty$ and $r \in \N$. There is $C_B < \infty$ such that for all $j, k \in \N$
+and every $a \in V_j$,
+\[
+  \omega_r(a, 2^{-k}, [0, 1])_p \leq C_B \, 2^{-\max(k - j, 0)/p} \|a\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $k < j$ this is $\omega_r(a, t, [0,1])_p \leq 2^r \|a\|_p$. Let $k \geq j$ and
+$0 \leq h \leq 2^{-k}$. By \Cref{lem:pp-local}, $|\Delta_h^r a|^p$ vanishes on $I_{j,n}$ outside
+the strip $[(n+1)2^{-j} - rh, (n+1)2^{-j})$ and is bounded on it by
+$(2^r K)^p 2^j \sum_{l=0}^r m_{n+l}$. The strips have width $rh$, so
+$\|\Delta_h^r a\|_{L_p[0, 1-rh]}^p \leq (2^r K)^p \, r (r+1) \, 2^j h \, \|a\|_p^p$, and
+$2^j h \leq 2^{-(k-j)}$.
+\end{proof}
+
+\begin{theorem}[Approximation spaces of dyadic piecewise polynomials]
+\label{thm:pp-besov}
+\lean{Interval.ppModulusData, Interval.memApprox_ppScheme_iff}
+\leanok
+\uses{thm:pp-jackson, thm:pp-inverse, def:modulus-data, thm:modulus-coincidence}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $r \geq 1$ and $0 \leq s < 1/p$. A function
+$f \in L_p[0,1]$ lies in the approximation space $A^s_q$ of the scheme of dyadic piecewise
+polynomials of degree $< r$ if and only if
+\[
+  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_r(f, 2^{-k}, [0,1])_p \bigr)_k \bigr\|_{\ell_q} < \infty .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:pp-jackson}, \Cref{thm:pp-inverse} and $\omega_r(f, t, [0,1])_p \leq 2^r \|f\|_p$
+(\Cref{lem:interval-modulus}), $\omega_r(\cdot, 2^{-k}, [0,1])_p$ is a modulus compatible with
+the scheme of inverse order $\theta = 1/p$ in the sense of \Cref{def:modulus-data}. Apply
+\Cref{thm:modulus-coincidence}.
+\end{proof}
+
+For $0 < s < 1/p$ the condition says that $f$ lies in the Besov space $\Besov{s}{p}{q}[0,1]$
+defined by moduli of smoothness. The bound $s < 1/p$ comes from the jumps at the knots: the
+indicator of $[0, \tfrac12)$ lies in $V_1$, and its modulus is of order $t^{1/p}$. Higher
+smoothness needs piecewise polynomials that are smooth across the knots, that is, splines.
 
 \bpbibheading
 \begin{thebibliography}{99}

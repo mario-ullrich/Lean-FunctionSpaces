@@ -103,6 +103,16 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `k ≥ 1` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
   for `0 ≤ s < θ` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff `‖f‖ + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q} < ∞`,
   with equivalent quasi-norms (`ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top`).
+* **Piecewise polynomials on an interval.** Let `V_k ⊆ L_p[0, 1]` consist of the functions that
+  agree on each dyadic interval `[n 2^(-k), (n+1) 2^(-k))` with a polynomial of degree `< r`,
+  and let `ω_r(f, t, [0, 1])_p = sup_{0 ≤ h ≤ t} ‖Δ_h^r f‖_{L_p[0, 1-rh]}`. For `1 ≤ p < ∞`
+  and `r ≥ 1`, `E_{2^k}(f)_p ≤ 2 (1 + 2^r r^(2r)) ω_r(f, 2^(-k), [0, 1])_p` for `k ≥ 1`
+  (`Interval.approxSeq_ppScheme_le`), and there is `C` with
+  `ω_r(a, 2^(-k), [0, 1])_p ≤ C 2^(-(k-j)/p) ‖a‖_p` for all `a ∈ V_j` and `k ≥ j`
+  (`Interval.exists_inverse_ppScheme`). Hence for `1 ≤ q ≤ ∞` and `0 ≤ s < 1/p`, `f ∈ A^s_q`
+  iff `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`
+  (`Interval.memApprox_ppScheme_iff`), so the approximation space is `B^s_{p,q}[0, 1]` for
+  `0 < s < 1/p`.
 * **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
@@ -221,6 +231,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | K-functional, real interpolation, representation theorem | ✅ proved | ✗ | `ApproximationSpaces/{KFunctional,Representation}.lean` |
 | Moduli compatible with a scheme, coincidence with the classical space | ✅ proved | ✗ | `ApproximationSpaces/Moduli.lean` |
 | One variable: differences, moduli on intervals, Nikolskii for polynomials, Taylor in `L_p`, Steklov smoothing | ✅ proved | ✗ | `FunctionSpaces/Interval/{Differences,Modulus,Polynomials,Taylor,Steklov,Smoothing}.lean` |
+| Dyadic piecewise polynomials on `[0, 1]`: Jackson and inverse inequalities, `A^s_q = B^s_{p,q}[0, 1]` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/{PiecewisePoly,PiecewiseJackson,PiecewiseInverse}.lean` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Synthesis,Atomic}.lean` |
 | Trace theorem: extension, transfer, surjectivity | ✅ proved | ✗ | `ApproximationSpaces/Trace.lean` |
@@ -256,7 +267,7 @@ functions or measures. `FunctionSpaces` holds the Besov and Sobolev spaces built
 schemes of bounded continuous functions on a finite measure space and their embedding
 theorems, spectral schemes in Hilbert spaces, the torus with its traces and Lipschitz atoms,
 filtration schemes for wavelets, the classical definitions through moduli of smoothness
-and weak derivatives, and polynomial approximation on intervals. [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
+and weak derivatives, and polynomial and piecewise polynomial approximation on intervals. [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 `blueprint/` holds the LaTeX source of the blueprint and the scripts that check and link its
 `\lean` references.
 
@@ -266,6 +277,8 @@ and weak derivatives, and polynomial approximation on intervals. [MathlibCandida
 * **Function spaces beyond the torus**: `ℝ^d`, compact manifolds, bounded domains.
 * **Classical definitions for all `p`**: Sobolev spaces by weak derivatives and Besov spaces
   by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
+* **Higher smoothness**: smooth splines and compactly supported wavelets such as Daubechies',
+  on intervals and then on domains.
 
 ## Building
 
