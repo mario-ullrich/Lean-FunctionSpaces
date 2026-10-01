@@ -27,6 +27,7 @@ public import FunctionSpaces.Wavelets.Filtration
 public import FunctionSpaces.Wavelets.Partition
 public import FunctionSpaces.Wavelets.Examples.Haar
 public import FunctionSpaces.Wavelets.Examples.HaarBesov
+public import FunctionSpaces.Wavelets.Examples.Multiscale
 public import FunctionSpaces.Classical.Translation
 public import FunctionSpaces.Classical.Modulus
 public import FunctionSpaces.Classical.BesovModuli
@@ -46,6 +47,7 @@ public import FunctionSpaces.Interval.PiecewiseJackson
 public import FunctionSpaces.Interval.PiecewiseInverse
 public import FunctionSpaces.Interval.Periodic
 public import FunctionSpaces.Interval.PiecewisePeriodic
+public import FunctionSpaces.Interval.LocalProjection
 
 /-!
 # Function spaces
@@ -96,6 +98,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Wavelets.Examples.HaarBesov`: the Haar scheme as the scheme of piecewise
   constants, and Besov spaces on the interval and the circle through Haar coefficients for
   `0 < s < 1/p`.
+* `FunctionSpaces.Wavelets.Examples.Multiscale`: density of piecewise polynomials and the
+  characterisation of their approximation spaces, and of `B^s_{p,q}[0, 1]` and `B^s_{p,q}(𝕋)` for
+  `0 < s < 1/p`, by the details `P_{k+1} f - P_k f` of local polynomial projections.
 * `FunctionSpaces.Classical.Translation`: translations on `L_2(𝕋^d)` and their Fourier
   multipliers.
 * `FunctionSpaces.Classical.Modulus`: the modulus of smoothness `ω(f, t)_2` and Jackson's
@@ -131,4 +136,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Interval.PiecewisePeriodic`: piecewise polynomials on the circle, their
   approximation spaces `B^s_{p,q}(𝕋)` for `0 < s < 1/p`, and `B^s_{p,q}[0, 1] = B^s_{p,q}(𝕋)` in
   that range.
+* `FunctionSpaces.Interval.LocalProjection`: the pairing `∫_0^1 P Q` and its dual basis, local
+  projections onto polynomials, and the uniformly bounded projections onto piecewise
+  polynomials in `L_p[0, 1]`.
 -/

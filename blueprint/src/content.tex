@@ -3181,6 +3181,124 @@ conditions says $f \in A^s_q$, by \Cref{thm:pp-besov}, \Cref{thm:pp-besov-per} a
 \Cref{thm:haar}.
 \end{proof}
 
+\section{Local projections and multiscale details}
+
+\begin{lemma}[Dual basis for polynomials]
+\label{lem:poly-dual-basis}
+\lean{Interval.integrableOn_polyFun_mul, Interval.polyFun_add, Interval.polyFun_smul,
+  Interval.polyPairing, Interval.polyPairing_apply, Interval.polyPairing_comm,
+  Interval.polyFun_map_conj, Interval.polyPairing_separatingLeft,
+  Interval.polyPairing_nondegenerate, Interval.monoBasis, Interval.dualPoly,
+  Interval.sum_polyPairing_smul_dualPoly, Interval.polyFun_eq_sum_dualPoly}
+\leanok
+Let $r \in \N$ and $b_i(t) = t^i$, $i < r$. There are polynomials $d_0, \dots, d_{r-1}$ of degree
+$< r$ such that every polynomial $P$ of degree $< r$ satisfies
+\[
+  P = \sum_{i < r} \Bigl( \int_0^1 P \, b_i \Bigr) d_i .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The pairing $\langle P, Q \rangle = \int_0^1 P Q$ on polynomials of degree $< r$ is
+nondegenerate: $\langle P, \bar P \rangle = \int_0^1 |P|^2$, where $\bar P$ has the conjugate
+coefficients, vanishes only for $P = 0$. So $(b_i)$ has a dual basis $(d_i)$ with
+$\langle d_i, b_k \rangle = \delta_{ik}$, and the coordinates of $P$ in it are
+$\langle P, b_i \rangle$.
+\end{proof}
+
+\begin{definition}[Local projections]
+\label{def:loc-proj}
+\lean{Interval.exists_enorm_polyFun_le_of_fintype, Interval.locCoeff, Interval.locProj,
+  Interval.locProj_mem, Interval.polyFun_locProj, Interval.integrableOn_mul_monoBasis,
+  Interval.locCoeff_add, Interval.locCoeff_const_mul, Interval.locCoeff_congr,
+  Interval.locProj_add, Interval.locProj_const_mul, Interval.locProj_congr}
+\leanok
+\uses{lem:poly-dual-basis, def:pp-scheme}
+For $g \in L_1(I_{j,m})$ the local projection of $g$ on $I_{j,m}$ is the polynomial
+\[
+  \Pi_{j,m} g(x) = \sum_{i < r} c_i \, d_i(2^j x - m), \qquad
+  c_i = 2^j \int_{I_{j,m}} g(y) \, b_i(2^j y - m) \, dy .
+\]
+It is linear in $g$ and depends only on the class of $g$ in $L_1(I_{j,m})$.
+\end{definition}
+
+\begin{lemma}[Properties of the local projections]
+\label{lem:loc-proj}
+\lean{Interval.integral_dyadicIco_eq, Interval.polyFun_locProj_of_eqOn,
+  Interval.ofReal_two_pow_mul_inv_rpow, Interval.volume_dyadicIco, Interval.enorm_locCoeff_le,
+  Interval.enorm_polyFun_locProj_le, Interval.eLpNorm_locProj_le}
+\leanok
+\uses{def:loc-proj}
+Let $1 \leq p < \infty$ and let $M$ bound all $|b_i|$ and $|d_i|$ on $[0, 1]$. If $g$ agrees on
+$I_{j,m}$ with a polynomial $Q$ of degree $< r$, then $\Pi_{j,m} g = Q$. For every
+$g \in L_p(I_{j,m})$,
+\[
+  \|\Pi_{j,m} g\|_{L_p(I_{j,m})} \leq r M^2 \|g\|_{L_p(I_{j,m})} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+With $y = (m + t) 2^{-j}$ the coefficients of $Q$ are $c_i = \int_0^1 \tilde Q \, b_i$ for
+$\tilde Q(t) = Q((m + t) 2^{-j})$, so $\Pi_{j,m} Q(x) = \tilde Q(2^j x - m) = Q(x)$ by
+\Cref{lem:poly-dual-basis}. Hölder's inequality on an interval of length $2^{-j}$ gives
+$|c_i| \leq M 2^{j/p} \|g\|_{L_p(I_{j,m})}$, hence
+$|\Pi_{j,m} g| \leq r M^2 2^{j/p} \|g\|_{L_p(I_{j,m})}$ on $I_{j,m}$, and the $L_p$ norm of a
+function bounded by $B$ on $I_{j,m}$ is at most $2^{-j/p} B$.
+\end{proof}
+
+\begin{theorem}[Projections onto piecewise polynomials]
+\label{thm:pp-proj}
+\lean{Interval.ppFun_congr, Interval.ae_dyadicIco_of_unitVol, Interval.integrableOn_dyadicIco,
+  Interval.basisBound, Interval.basisBound_ne_top, Interval.enorm_monoBasis_le,
+  Interval.enorm_dualPoly_le, Interval.ppProjConst, Interval.ppProjConst_ne_top,
+  Interval.eLpNorm_ppFun_locProj_le, Interval.ppProjLinear, Interval.ppProj,
+  Interval.coeFn_ppProj, Interval.norm_ppProj_le, Interval.ppProj_mem, Interval.ppProj_of_mem,
+  Interval.ppProjectionScheme, Interval.ppProjectionScheme_two_pow}
+\leanok
+\uses{lem:loc-proj, lem:pp-bookkeeping}
+Let $1 \leq p < \infty$ and $r \in \N$. For $j \in \N$ let $P_j f = \Pi_{j,m} f$ on every
+$I_{j,m}$, $m < 2^j$. Then $P_j$ is a bounded projection of $L_p[0,1]$ onto $V_j$, and
+$\|P_j\| \leq r M^2$ for all $j$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$P_j f \in V_j$ by construction, and $P_j a = a$ for $a \in V_j$ by \Cref{lem:loc-proj}. Summing
+the $p$-th powers of the local bounds of \Cref{lem:loc-proj} over the intervals of level $j$
+gives $\|P_j f\|_p \leq r M^2 \|f\|_p$.
+\end{proof}
+
+\begin{theorem}[Multiscale characterisation]
+\label{thm:pp-multiscale}
+\lean{Interval.ppScheme_mono_degree, Interval.closure_iUnion_ppScheme,
+  Interval.memApprox_ppScheme_iff_block, Interval.lqNorm_modulus_lt_top_iff_block,
+  Interval.lqNorm_perModulus_lt_top_iff_block}
+\leanok
+\uses{thm:pp-proj, lem:haar-density, cor:haar-besov, thm:pp-besov, thm:pp-besov-per}
+Let $1 \leq p < \infty$, $r \geq 1$, $s > 0$ and $1 \leq q \leq \infty$. A function
+$f \in L_p[0,1]$ lies in the approximation space $A^s_q$ of the scheme of dyadic piecewise
+polynomials of degree $< r$ if and only if
+\[
+  \|P_0 f\|_p + \bigl\| \bigl( 2^{ks} \|P_{k+1} f - P_k f\|_p \bigr)_k \bigr\|_{\ell_q} < \infty .
+\]
+For $0 < s < 1/p$ this condition is equivalent to $f \in \Besov{s}{p}{q}[0,1]$ and to
+$f \in \Besov{s}{p}{q}(\T)$, defined by $\omega_r$ and $\omega_r^{\mathrm{per}}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The piecewise polynomials are dense in $L_p[0,1]$, since they contain the step functions of
+the Haar system (\Cref{lem:haar-density}, transported by \Cref{cor:haar-besov}). The
+projections of \Cref{thm:pp-proj} form a projection scheme, and the abstract block
+characterisation applies. The last statement combines this with \Cref{thm:pp-besov} and
+\Cref{thm:pp-besov-per}.
+\end{proof}
+
+The details $P_{k+1} f - P_k f$ are what multiwavelets of degree $< r$ expand at level $k$, and
+the local projections $P_j$ are those of discontinuous Galerkin methods.
+
 \bpbibheading
 \begin{thebibliography}{99}
 

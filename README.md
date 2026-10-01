@@ -120,6 +120,15 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `‖f‖_p + ‖(2^(ks) ω_r^per(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Interval.memApprox_ppScheme_iff_per`).
   In particular `B^s_{p,q}[0, 1]` and `B^s_{p,q}(𝕋)` contain the same functions for
   `0 < s < 1/p` (`Interval.lqNorm_modulus_lt_top_iff_perModulus`).
+* **Local projections and multiscale details.** Let `P_k` be the projection of `L_p[0, 1]`
+  onto the piecewise polynomials of degree `< r` on the dyadic intervals of level `k` that is
+  the `L_2`-orthogonal projection on every interval. For `1 ≤ p < ∞` there is `C` with
+  `‖P_k f‖_p ≤ C ‖f‖_p` for all `k` and `f` (`Interval.ppProj`, `Interval.norm_ppProj_le`), and
+  for `s > 0`, `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
+  `‖P_0 f‖_p + ‖(2^(ks) ‖P_{k+1} f - P_k f‖_p)_k‖_{ℓ_q} < ∞`
+  (`Interval.memApprox_ppScheme_iff_block`). For `0 < s < 1/p` this characterises
+  `B^s_{p,q}[0, 1]` and `B^s_{p,q}(𝕋)` (`Interval.lqNorm_modulus_lt_top_iff_block`,
+  `Interval.lqNorm_perModulus_lt_top_iff_block`).
 * **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
@@ -243,6 +252,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | One variable: differences, moduli on intervals, Nikolskii for polynomials, Taylor in `L_p`, Steklov smoothing | ✅ proved | ✗ | `FunctionSpaces/Interval/{Differences,Modulus,Polynomials,Taylor,Steklov,Smoothing}.lean` |
 | Dyadic piecewise polynomials on `[0, 1]`: Jackson and inverse inequalities, `A^s_q = B^s_{p,q}[0, 1]` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/{PiecewisePoly,PiecewiseJackson,PiecewiseInverse}.lean` |
 | Periodic modulus, piecewise polynomials on the circle, `A^s_q = B^s_{p,q}(𝕋) = B^s_{p,q}[0, 1]` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/{Periodic,PiecewisePeriodic}.lean` |
+| Dual basis for `∫_0^1 P Q`, local projections, bounded projections onto piecewise polynomials | ✅ proved | ✗ | `FunctionSpaces/Interval/LocalProjection.lean` |
+| Density of piecewise polynomials, multiscale characterisation of `A^s_q` and of `B^s_{p,q}` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Wavelets/Examples/Multiscale.lean` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Synthesis,Atomic}.lean` |
 | Trace theorem: extension, transfer, surjectivity | ✅ proved | ✗ | `ApproximationSpaces/Trace.lean` |
