@@ -24,6 +24,8 @@ public import FunctionSpaces.Torus.Embeddings
 public import FunctionSpaces.Spectral.Blocks
 public import FunctionSpaces.Torus.Coefficients
 public import FunctionSpaces.Wavelets.Filtration
+public import FunctionSpaces.Wavelets.Partition
+public import FunctionSpaces.Wavelets.Examples.Haar
 public import FunctionSpaces.Classical.Translation
 public import FunctionSpaces.Classical.Modulus
 public import FunctionSpaces.Classical.BesovModuli
@@ -73,6 +75,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Wavelets.Filtration`: conditional expectations as contractions on `L_p`,
   filtration schemes (the Haar system for the dyadic filtration) and the characterisation of
   their approximation spaces by martingale differences.
+* `FunctionSpaces.Wavelets.Partition`: the conditional expectation onto the σ-algebra of a
+  countable partition is the average over the cells.
+* `FunctionSpaces.Wavelets.Examples.Haar`: the Haar system on `[0, 1)` and the characterisation
+  of its approximation spaces by Haar coefficients.
 * `FunctionSpaces.Classical.Translation`: translations on `L_2(𝕋^d)` and their Fourier
   multipliers.
 * `FunctionSpaces.Classical.Modulus`: the modulus of smoothness `ω(f, t)_2` and Jackson's
