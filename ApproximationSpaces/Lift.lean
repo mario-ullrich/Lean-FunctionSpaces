@@ -154,6 +154,26 @@ theorem exists_lift (hB : LiftBound ι A β C) (hC : 0 ≤ C) :
   exact hdle k
 
 include D in
+/-- **The lifted partial sums.**  There are `y_0` and `d_k` in `Y` whose partial sums
+`z_n = y_0 + ∑_{j<n} d_j` lift the approximants, `ι z_n = a_n`, with
+`‖y_0‖ ≤ C (2 ‖f‖ + t_0)` and `‖d_k‖ ≤ K 2^(kβ) (E_{2^k}(f) + t_k)`, `K = liftConst C β`.
+No completeness of `Y` is needed. -/
+theorem exists_lift_partial (ht : Antitone t) (hB : LiftBound ι A β C) (hC : 0 ≤ C) :
+    ∃ y0 : Y, ∃ d : ℕ → Y, (∀ n, ι (y0 + ∑ j ∈ range n, d j) = D.a n) ∧
+      ‖y0‖ₑ ≤ ENNReal.ofReal C * (2 * ‖f‖ₑ + t 0) ∧
+      ∀ k, ‖d k‖ₑ ≤ liftConst C β * (dyadicWeight β k * (A.approxSeq f (2 ^ k) + t k)) := by
+  obtain ⟨y0, d, hy0, hd, hy0le, hdle⟩ := D.exists_lift hB hC
+  refine ⟨y0, d, fun n => ?_, hy0le.trans (by gcongr; exact D.enorm_zero_le), fun k => ?_⟩
+  · rw [map_add, map_sum, hy0]
+    simp_rw [hd]
+    rw [Finset.sum_range_sub (fun k => D.a k) n]
+    abel
+  · calc ‖d k‖ₑ ≤ ENNReal.ofReal C * dyadicWeight β (k + 2) * ‖D.a (k + 1) - D.a k‖ₑ := hdle k
+      _ ≤ ENNReal.ofReal C * dyadicWeight β (k + 2) * (2 * (A.approxSeq f (2 ^ k) + t k)) := by
+          gcongr; exact D.enorm_sub_succ_le ht k
+      _ = _ := by simp only [liftConst, ENNReal.dyadicWeight_add_nat]; ring
+
+include D in
 /-- **The telescoping lift.**  If `∑_k 2^(kβ) (E_{2^k}(f) + t_k) < ∞`, then `f = ι y` for some
 `y ∈ Y` with
 

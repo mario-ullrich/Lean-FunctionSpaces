@@ -70,6 +70,15 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `f ∈ A^s_q(X)` is `ι y` for some `y` in the approximation space `B^{s-α}_q(Y)` of the
   pulled-back scheme `B_n = ι⁻¹(A_n)`, with `‖y‖_{B^{s-α}_q} ≤ K ‖f‖_{A^s_q}`
   (`ApproximationScheme.exists_preimage_of_nikolskii`).
+* **The representation theorem.** Let `ι : Y → X` satisfy Jackson's inequality
+  `E_n(ι y) ≤ C n^(-r) ‖y‖` and Bernstein's inequality (every `a ∈ A_n` is `ι y` with
+  `‖y‖ ≤ C n^r ‖a‖`) of order `r`. Then for `0 < s < r` and `1 ≤ q ≤ ∞`, `A^s_q` is the real
+  interpolation space `(X, Y)_{s/r, q}`, with equivalent norms
+  (`ApproximationScheme.memApprox_iff_memInterp`,
+  `.approxNormDyadic_le_interpNorm_of_jackson`,
+  `.interpNorm_le_approxNormDyadic_of_bernstein`). In particular two schemes with Jackson and
+  Bernstein inequalities of the same order for the same `ι` have the same approximation
+  spaces (`ApproximationScheme.approxSpace_eq_of_jackson_bernstein`).
 * **Sequence spaces.** For `1 ≤ q ≤ r ≤ ∞` and every sequence `a` in `[0, ∞]`,
   `‖a‖_{ℓ_r} ≤ ‖a‖_{ℓ_q}` (`ENNReal.lqNorm_le_lqNorm_of_le`), and the norm of a series of
   sequences is at most the series of the norms (`ENNReal.lqNorm_tsum_le`).
@@ -129,7 +138,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | `A^s_q`, its dyadic quasi-norm and linear structure | ✅ proved | ✗ | `ApproximationSpaces/{Norm,Dyadic,Space}.lean` |
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ proved | ✗ | `ApproximationSpaces/{Embedding,Transfer}.lean` |
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ proved | ✗ | `ApproximationSpaces/{Lift,Nikolskii}.lean` |
-| K-functional, real interpolation, representation theorem | ⬜ planned | ✗ | `ApproximationSpaces/{KFunctional,Interpolation,Representation}.lean` |
+| K-functional, real interpolation, representation theorem | ✅ proved | ✗ | `ApproximationSpaces/{KFunctional,Representation}.lean` |
 | Atomic decompositions, projection schemes | ⬜ planned | ✗ | `ApproximationSpaces/{Decomposition,Projection}.lean` |
 | Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces, elementary embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Inclusion,Lp/BoundedContinuous,Scheme,Besov/Basic,Besov/Trivial}.lean` |
 | Interpolation `L_p`–`L_∞`, Nikolskii property, Besov embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Interpolation,Besov/Nikolskii,Besov/Embeddings}.lean` |
@@ -157,8 +166,7 @@ on it. [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstream
 
 ## What is left to do
 
-* **Real interpolation**: the representation theorem `A^s_q = (X, Y)_{s/r, q}` under Jackson
-  and Bernstein inequalities, and reiteration.
+* **Reiteration** for approximation and interpolation spaces.
 * **Function spaces beyond the torus**: `ℝ^d`, compact manifolds, bounded domains.
 * **Classical definitions**: Sobolev spaces by weak derivatives and Besov spaces by moduli
   of smoothness for all `p`, with the coincidence theorems of Triebel's school.

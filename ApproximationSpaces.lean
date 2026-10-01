@@ -20,6 +20,8 @@ public import ApproximationSpaces.Transfer
 public import ApproximationSpaces.Lift
 public import ApproximationSpaces.Nikolskii
 public import ApproximationSpaces.Jackson
+public import ApproximationSpaces.KFunctional
+public import ApproximationSpaces.Representation
 
 /-!
 # Approximation spaces
@@ -59,4 +61,8 @@ Nothing in this library mentions functions or measures.
   `A^s_q(X) ↪ B^{s-α}_q(Y)`.
 * `ApproximationSpaces.Jackson`: Jackson's inequality, `ι(Y) ⊆ A^r_∞`, and smoothness spaces
   `ApproximationScheme.SmoothnessSpace` with `A^r_1 ⊆ Y ⊆ A^r_∞`.
+* `ApproximationSpaces.KFunctional`: the Peetre K-functional and the real interpolation
+  spaces `(X, Y)_{θ,q}`.
+* `ApproximationSpaces.Representation`: the representation theorem `A^s_q = (X, Y)_{s/r,q}`
+  under Jackson's and Bernstein's inequalities of order `r`.
 -/
