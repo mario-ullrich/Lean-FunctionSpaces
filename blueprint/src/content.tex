@@ -2967,19 +2967,21 @@ $\omega_r(g, t)_p \leq \omega_r(f, t)_p + 2^r \|f - g\|_p$.
 
 \begin{lemma}[Local estimates for piecewise polynomials]
 \label{lem:pp-local}
-\lean{Interval.localMass, Interval.tsum_localMass_ppFun_le, Interval.enorm_ppFun_le,
-  Interval.iterDiff_ppFun_eq_zero, Interval.enorm_iterDiff_ppFun_le, Interval.stripBound,
-  Interval.lintegral_stripBound_le, Interval.sum_sum_localMass_le}
+\lean{Interval.localMass, Interval.tsum_localMass_ppFun_le, Interval.IsPiecewisePoly,
+  Interval.isPiecewisePoly_ppFun, Interval.enorm_le_localMass,
+  Interval.iterDiff_eq_zero_of_isPiecewisePoly, Interval.enorm_iterDiff_le_of_isPiecewisePoly,
+  Interval.stripBound, Interval.lintegral_stripBound_le, Interval.sum_sum_localMass_le}
 \leanok
 \uses{def:pp-scheme, lem:pp-bookkeeping, lem:interval-nikolskii, lem:iter-diff-poly}
-Let $1 \leq p < \infty$, let $a$ be a piecewise polynomial of level $j$ and degree $< r$, and
-$m_n = \int_{I_{j,n}} |a|^p$ for $n \in \N$. Let $0 \leq h \leq 2^{-j}$, $x \geq 0$ and
+Let $1 \leq p < \infty$, and let $a$ be a piecewise polynomial of level $j$ and degree $< r$
+on $[0, \infty)$: on every $I_{j,n}$, $n \in \N$, it agrees with a polynomial of degree $< r$.
+Let $m_n = \int_{I_{j,n}} |a|^p$ for $n \in \N$, $0 \leq h \leq 2^{-j}$, $x \geq 0$ and
 $n = \lfloor 2^j x \rfloor$. If $x + rh < (n+1) 2^{-j}$, then $\Delta_h^r a(x) = 0$. In every
 case
 \[
   |\Delta_h^r a(x)| \leq 2^r K 2^{j/p} \Bigl( \sum_{l=0}^r m_{n+l} \Bigr)^{1/p}
 \]
-with the constant $K$ of \Cref{lem:interval-nikolskii}. Moreover
+with the constant $K$ of \Cref{lem:interval-nikolskii}. If $a$ vanishes outside $[0, 1)$, then
 $\sum_{n < 2^j} \sum_{l = 0}^r m_{n+l} \leq (r+1) \|a\|_p^p$.
 \end{lemma}
 
@@ -2993,7 +2995,9 @@ $\sum_i \binom{r}{i} = 2^r$. In the double sum every $m_n$ occurs at most $r + 1
 
 \begin{theorem}[Inverse inequality for piecewise polynomials]
 \label{thm:pp-inverse}
-\lean{Interval.eLpNorm_iterDiff_ppFun_le, Interval.ofReal_two_pow_mul_rpow_le,
+\lean{Interval.eLpNorm_iterDiff_le_of_isPiecewisePoly, Interval.eLpNorm_iterDiff_ppFun_le,
+  Interval.ofReal_two_pow_mul_rpow_le, Interval.ppInverseConst, Interval.ppInverseConst_ne_top,
+  Interval.two_pow_le_ppInverseConst, Interval.le_ppInverseConst_mul,
   Interval.exists_inverse_ppScheme}
 \leanok
 \uses{lem:pp-local}
@@ -3009,9 +3013,11 @@ and every $a \in V_j$,
 For $k < j$ this is $\omega_r(a, t, [0,1])_p \leq 2^r \|a\|_p$. Let $k \geq j$ and
 $0 \leq h \leq 2^{-k}$. By \Cref{lem:pp-local}, $|\Delta_h^r a|^p$ vanishes on $I_{j,n}$ outside
 the strip $[(n+1)2^{-j} - rh, (n+1)2^{-j})$ and is bounded on it by
-$(2^r K)^p 2^j \sum_{l=0}^r m_{n+l}$. The strips have width $rh$, so
-$\|\Delta_h^r a\|_{L_p[0, 1-rh]}^p \leq (2^r K)^p \, r (r+1) \, 2^j h \, \|a\|_p^p$, and
-$2^j h \leq 2^{-(k-j)}$.
+$(2^r K)^p 2^j \sum_{l=0}^r m_{n+l}$. The strips have width $rh$, so for every piecewise
+polynomial $a$ of level $j$ on $[0, \infty)$ with
+$\sum_{n < 2^j} \sum_{l=0}^r m_{n+l} \leq (r+1) B^p$,
+$\|\Delta_h^r a\|_{L_p[0, 1]}^p \leq (2^r K)^p \, r (r+1) \, 2^j h \, B^p$. Here $B = \|a\|_p$,
+and $2^j h \leq 2^{-(k-j)}$.
 \end{proof}
 
 \begin{theorem}[Approximation spaces of dyadic piecewise polynomials]
@@ -3039,6 +3045,106 @@ For $0 < s < 1/p$ the condition says that $f$ lies in the Besov space $\Besov{s}
 defined by moduli of smoothness. The bound $s < 1/p$ comes from the jumps at the knots: the
 indicator of $[0, \tfrac12)$ lies in $V_1$, and its modulus is of order $t^{1/p}$. Higher
 smoothness needs piecewise polynomials that are smooth across the knots, that is, splines.
+
+\section{Piecewise polynomials on the circle}
+
+\begin{definition}[Periodic modulus of smoothness]
+\label{def:per-modulus}
+\lean{Interval.perExt, Interval.perExt_periodic, Interval.perExt_of_mem,
+  Interval.measurable_perExt, Interval.perExt_add, Interval.perModulus,
+  Interval.eLpNorm_iterDiff_le_perModulus, Interval.perModulus_mono}
+\leanok
+\uses{def:interval-modulus}
+For $f : \R \to \C$ the periodic extension of $f|_{[0,1)}$ is
+$\tilde f(x) = f(x - \lfloor x \rfloor)$. For $1 \leq p \leq \infty$, $r \in \N$ and $t \geq 0$
+the periodic modulus of smoothness is
+\[
+  \omega_r^{\mathrm{per}}(f, t)_p = \sup_{0 \leq h \leq t} \|\Delta_h^r \tilde f\|_{L_p[0,1]} .
+\]
+\end{definition}
+
+Through $\tilde f$, functions on $[0, 1)$ are the functions on the circle $\T = \R / \Z$, and
+$L_p[0,1]$ is $L_p(\T)$. Unlike $\omega_r(f, t, [0,1])_p$, the periodic modulus compares values
+near $1$ with values near $0$.
+
+\begin{lemma}[Properties of the periodic modulus]
+\label{lem:per-modulus}
+\lean{Interval.perExt_ae_eq, Interval.iterDiff_perExt_ae_eq, Interval.lintegral_Icc_periodic,
+  Interval.perModulus_congr_ae, Interval.perModulus_add_le, Interval.eLpNorm_perExt_Icc,
+  Interval.perModulus_le, Interval.modulus_le_perModulus}
+\leanok
+\uses{def:per-modulus, lem:interval-modulus}
+Let $1 \leq p < \infty$, $r \in \N$ and $t \geq 0$. The periodic modulus depends only on the class
+of $f$ in $L_p[0,1]$, is subadditive in $f$, and for measurable $f$
+\[
+  \omega_r(f, t, [0,1])_p \leq \omega_r^{\mathrm{per}}(f, t)_p \leq 2^r \|f\|_{L_p[0,1]} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $f = g$ almost everywhere on $[0, 1]$, then $\{\tilde f \neq \tilde g\}$ is contained in the
+union of the integer translates of a null set. The integral of a $1$-periodic function over
+$[c, c + 1]$ is its integral over the circle, so it does not depend on $c$; hence each term
+$\tilde f(\cdot + kh)$ of $\Delta_h^r \tilde f$ has $L_p[0,1]$ norm $\|f\|_{L_p[0,1]}$, and
+$\sum_k \binom{r}{k} = 2^r$. For $x \in [0, 1 - rh)$ the points $x, \dots, x + rh$ lie in
+$[0, 1)$, where $\tilde f = f$.
+\end{proof}
+
+\begin{theorem}[Approximation spaces on the circle]
+\label{thm:pp-besov-per}
+\lean{Interval.isPiecewisePoly_perExt_ppFun, Interval.sum_localMass_perExt_le,
+  Interval.sum_sum_localMass_perExt_le, Interval.lpPerModulus, Interval.lpPerModulus_add_le,
+  Interval.lpPerModulus_le, Interval.lpModulus_le_lpPerModulus,
+  Interval.approxSeq_ppScheme_le_per, Interval.exists_inverse_ppScheme_per,
+  Interval.ppPerModulusData, Interval.memApprox_ppScheme_iff_per}
+\leanok
+\uses{thm:pp-jackson, thm:pp-inverse, lem:pp-local, lem:per-modulus, def:modulus-data,
+  thm:modulus-coincidence}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $r \geq 1$ and $0 \leq s < 1/p$. A function
+$f \in L_p[0,1]$ lies in the approximation space $A^s_q$ of the scheme of dyadic piecewise
+polynomials of degree $< r$ if and only if
+\[
+  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_r^{\mathrm{per}}(f, 2^{-k})_p \bigr)_k \bigr\|_{\ell_q}
+  < \infty .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Jackson's inequality for $\omega_r^{\mathrm{per}}$ follows from \Cref{thm:pp-jackson} and
+$\omega_r(f, t, [0,1])_p \leq \omega_r^{\mathrm{per}}(f, t)_p$. For the inverse inequality, the
+periodic extension $\tilde a$ of $a \in V_j$ is a piecewise polynomial of level $j$ on
+$[0, \infty)$: on $I_{j, m' + 2^j c}$ with $m' < 2^j$ it is the piece of $a$ on $I_{j, m'}$
+shifted by $c$. Any $2^j$ consecutive pieces of $\tilde a$ make up one period, so
+$\sum_{n < 2^j} \sum_{l = 0}^r m_{n+l} \leq (r + 1) \|a\|_p^p$, and the estimate in the proof of
+\Cref{thm:pp-inverse} gives
+$\omega_r^{\mathrm{per}}(a, 2^{-k})_p \leq C_B 2^{-\max(k-j, 0)/p} \|a\|_p$. Apply
+\Cref{thm:modulus-coincidence} with $\theta = 1/p$.
+\end{proof}
+
+\begin{corollary}[Interval and circle]
+\label{cor:interval-circle}
+\lean{Interval.lqNorm_modulus_lt_top_iff_perModulus}
+\leanok
+\uses{thm:pp-besov, thm:pp-besov-per}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $r \geq 1$ and $0 \leq s < 1/p$. For every
+$f \in L_p[0,1]$,
+\[
+  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_r(f, 2^{-k}, [0,1])_p \bigr)_k \bigr\|_{\ell_q} < \infty
+  \iff
+  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_r^{\mathrm{per}}(f, 2^{-k})_p \bigr)_k \bigr\|_{\ell_q}
+  < \infty .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+By \Cref{thm:pp-besov} and \Cref{thm:pp-besov-per} both conditions say $f \in A^s_q$.
+\end{proof}
+
+So $\Besov{s}{p}{q}[0,1] = \Besov{s}{p}{q}(\T)$ for $0 < s < 1/p$: below smoothness $1/p$ a jump
+between the ends of the interval costs nothing.
 
 \bpbibheading
 \begin{thebibliography}{99}

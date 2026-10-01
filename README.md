@@ -113,6 +113,13 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   iff `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`
   (`Interval.memApprox_ppScheme_iff`), so the approximation space is `B^s_{p,q}[0, 1]` for
   `0 < s < 1/p`.
+* **Piecewise polynomials on the circle.** Identify `L_p(𝕋)` with `L_p[0, 1]` through the
+  periodic extension `f̃(x) = f(x - ⌊x⌋)`, and let
+  `ω_r^per(f, t)_p = sup_{0 ≤ h ≤ t} ‖Δ_h^r f̃‖_{L_p[0, 1]}`. For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`,
+  `r ≥ 1` and `0 ≤ s < 1/p`, `f ∈ A^s_q` of the dyadic piecewise polynomials iff
+  `‖f‖_p + ‖(2^(ks) ω_r^per(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Interval.memApprox_ppScheme_iff_per`).
+  In particular `B^s_{p,q}[0, 1]` and `B^s_{p,q}(𝕋)` contain the same functions for
+  `0 < s < 1/p` (`Interval.lqNorm_modulus_lt_top_iff_perModulus`).
 * **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
@@ -232,6 +239,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Moduli compatible with a scheme, coincidence with the classical space | ✅ proved | ✗ | `ApproximationSpaces/Moduli.lean` |
 | One variable: differences, moduli on intervals, Nikolskii for polynomials, Taylor in `L_p`, Steklov smoothing | ✅ proved | ✗ | `FunctionSpaces/Interval/{Differences,Modulus,Polynomials,Taylor,Steklov,Smoothing}.lean` |
 | Dyadic piecewise polynomials on `[0, 1]`: Jackson and inverse inequalities, `A^s_q = B^s_{p,q}[0, 1]` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/{PiecewisePoly,PiecewiseJackson,PiecewiseInverse}.lean` |
+| Periodic modulus, piecewise polynomials on the circle, `A^s_q = B^s_{p,q}(𝕋) = B^s_{p,q}[0, 1]` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/{Periodic,PiecewisePeriodic}.lean` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Synthesis,Atomic}.lean` |
 | Trace theorem: extension, transfer, surjectivity | ✅ proved | ✗ | `ApproximationSpaces/Trace.lean` |

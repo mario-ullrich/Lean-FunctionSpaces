@@ -15,10 +15,14 @@ For a piecewise polynomial `a` of level `j` and degree `< r` and every `k`,
 `ω_r(a, 2^(-k), [0, 1])_p ≤ C_B 2^(-(k-j)/p) ‖a‖_p`, with `k - j` truncated at `0`
 (`Interval.exists_inverse_ppScheme`). For `0 ≤ h ≤ 2^(-k)` the difference `Δ_h^r a(x)` vanishes
 when `x, …, x + rh` lie in one dyadic interval, since there `a` is a polynomial of degree `< r`
-(`Interval.iterDiff_ppFun_eq_zero`). The other points form strips of width `rh` left of the
-knots. There Nikolskii's inequality bounds `|a|` by `2^(j/p)` times the local `L_p` norm of a
-piece (`Interval.enorm_ppFun_le`), and the points `x, …, x + rh` meet only `r + 1` consecutive
-pieces, so each piece is counted at most `r + 1` times (`Interval.sum_sum_localMass_le`).
+(`Interval.iterDiff_eq_zero_of_isPiecewisePoly`). The other points form strips of width `rh`
+left of the knots. There Nikolskii's inequality bounds `|a|` by `2^(j/p)` times the local `L_p`
+norm of a piece (`Interval.enorm_le_localMass`), and the points `x, …, x + rh` meet only `r + 1`
+consecutive pieces, so each piece is counted at most `r + 1` times
+(`Interval.sum_sum_localMass_le`).
+These local estimates hold for every piecewise polynomial on `[0, ∞)`
+(`Interval.IsPiecewisePoly`, `Interval.eLpNorm_iterDiff_le_of_isPiecewisePoly`), so they serve
+the periodic extensions of `FunctionSpaces.Interval.PiecewisePeriodic` as well.
 
 With Jackson's inequality this is a modulus compatible with the scheme, of inverse order
 `θ = 1/p` (`Interval.ppModulusData`), and the abstract coincidence theorem gives, for
@@ -62,15 +66,28 @@ theorem tsum_localMass_ppFun_le (hp : p ≠ ∞) (k : ℕ) (Q : ℕ → ℂ[X]) 
   rw [ppFun_eq_zero Q (fun h => hx' (Ico_subset_Icc_self h)), enorm_zero,
     ENNReal.zero_rpow_of_pos hq]
 
+/-- `u` is a **piecewise polynomial of level `k` and degree `< r` on `[0, ∞)`**: on every dyadic
+interval `I_{k,m}`, `m ∈ ℕ`, it agrees with a polynomial of degree `< r`. The local estimates
+below need only this, so they serve the piecewise polynomials on `[0, 1)` and their periodic
+extensions alike. -/
+def IsPiecewisePoly (r k : ℕ) (u : ℝ → ℂ) : Prop :=
+  ∀ m : ℕ, ∃ P ∈ degreeLT ℂ r, ∀ x ∈ dyadicIco k m, u x = polyFun P x
+
+/-- A piecewise polynomial on `[0, 1)`, extended by `0`, is a piecewise polynomial on
+`[0, ∞)`. -/
+theorem isPiecewisePoly_ppFun {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r) (k : ℕ) :
+    IsPiecewisePoly r k (ppFun k Q) := fun m =>
+  ⟨_, ite_mem_degreeLT hQ k m, fun _ hx => ppFun_eq_polyFun Q hx⟩
+
 /-- **Pointwise bound** for a piecewise polynomial by its local mass (Nikolskii's inequality on
 `I_{k,m}`): `|u(y)| ≤ K 2^(k/p) (∫_{I_{k,m}} |u|^p)^(1/p)` for `y ∈ I_{k,m}`. -/
-theorem enorm_ppFun_le {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r) {K : ℝ≥0∞}
+theorem enorm_le_localMass {r k : ℕ} {u : ℝ → ℂ} (hu : IsPiecewisePoly r k u) {K : ℝ≥0∞}
     (hK : ∀ P ∈ degreeLT ℂ r, ∀ (u : ℝ) {L : ℝ}, 0 < L → ∀ x ∈ Icc u (u + L),
       ‖polyFun P x‖ₑ ≤ K * ENNReal.ofReal L⁻¹ ^ (1 / p).toReal *
         eLpNorm (polyFun P) p (volume.restrict (Icc u (u + L))))
-    (hp : p ≠ ∞) (k m : ℕ) {y : ℝ} (hy : y ∈ dyadicIco k m) :
-    ‖ppFun k Q y‖ₑ ≤ K * ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal *
-      localMass p k (ppFun k Q) m ^ (1 / p.toReal) := by
+    (hp : p ≠ ∞) (m : ℕ) {y : ℝ} (hy : y ∈ dyadicIco k m) :
+    ‖u y‖ₑ ≤ K * ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal * localMass p k u m ^ (1 / p.toReal) := by
+  obtain ⟨P, hP, hPu⟩ := hu m
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
   have hL : (0 : ℝ) < 1 / 2 ^ k := by positivity
   have hIco : dyadicIco k m = Ico ((m : ℝ) / 2 ^ k) (m / 2 ^ k + 1 / 2 ^ k) := by
@@ -78,8 +95,8 @@ theorem enorm_ppFun_le {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degre
   have hy' : y ∈ Icc ((m : ℝ) / 2 ^ k) (m / 2 ^ k + 1 / 2 ^ k) := by
     rw [hIco] at hy
     exact Ico_subset_Icc_self hy
-  rw [ppFun_eq_polyFun Q hy]
-  refine (hK _ (ite_mem_degreeLT hQ k m) _ hL y hy').trans (le_of_eq ?_)
+  rw [hPu y hy]
+  refine (hK P hP _ hL y hy').trans (le_of_eq ?_)
   have h2 : (1 / (2 : ℝ) ^ k)⁻¹ = 2 ^ k := by rw [one_div, inv_inv]
   rw [h2]
   congr 1
@@ -89,14 +106,15 @@ theorem enorm_ppFun_le {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degre
   refine setLIntegral_congr_fun (measurableSet_Ico :
     MeasurableSet (Ico ((m : ℝ) / 2 ^ k) (m / 2 ^ k + 1 / 2 ^ k))) fun x hx => ?_
   have hx' : x ∈ dyadicIco k m := by rw [hIco]; exact hx
-  rw [ppFun_eq_polyFun Q hx']
+  rw [hPu x hx']
 
 /-- **Differences vanish inside a piece**: if `x, x + h, …, x + rh` lie in the dyadic interval of
 `x`, then `Δ_h^r u(x) = 0`, since there `u` is a polynomial of degree `< r`. -/
-theorem iterDiff_ppFun_eq_zero {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r) (k : ℕ)
+theorem iterDiff_eq_zero_of_isPiecewisePoly {r k : ℕ} {u : ℝ → ℂ} (hu : IsPiecewisePoly r k u)
     {h x : ℝ} (hh0 : 0 ≤ h) (hx : 0 ≤ x)
     (hgood : x + r * h < ((⌊2 ^ k * x⌋₊ : ℝ) + 1) / 2 ^ k) :
-    iterDiff r h (ppFun k Q) x = 0 := by
+    iterDiff r h u x = 0 := by
+  obtain ⟨P, hP, hPu⟩ := hu ⌊2 ^ k * x⌋₊
   have hpos : (0 : ℝ) < 2 ^ k := by positivity
   have hmem : ∀ i ∈ Finset.range (r + 1), x + i * h ∈ dyadicIco k ⌊2 ^ k * x⌋₊ := fun i hi => by
     have hi' : (i : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)
@@ -107,33 +125,31 @@ theorem iterDiff_ppFun_eq_zero {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n �
       nlinarith [mul_nonneg (Nat.cast_nonneg i) hh0]
     · calc x + i * h ≤ x + r * h := by nlinarith
         _ < _ := hgood
-  have h1 : iterDiff r h (ppFun k Q) x =
-      iterDiff r h (polyFun (if ⌊2 ^ k * x⌋₊ < 2 ^ k then Q ⌊2 ^ k * x⌋₊ else 0)) x := by
+  have h1 : iterDiff r h u x = iterDiff r h (polyFun P) x := by
     rw [iterDiff_apply, iterDiff_apply]
-    exact Finset.sum_congr rfl fun i hi => by rw [ppFun_eq_polyFun Q (hmem i hi)]
+    exact Finset.sum_congr rfl fun i hi => by rw [hPu _ (hmem i hi)]
   rw [h1]
-  exact congrFun (iterDiff_polynomial (ite_mem_degreeLT hQ k _) h) x
+  exact congrFun (iterDiff_polynomial hP h) x
 
 /-- **Pointwise bound for differences**: for `0 ≤ h ≤ 2^(-k)` and `x ≥ 0`,
 `|Δ_h^r u(x)| ≤ 2^r K 2^(k/p) (∑_{l ≤ r} ∫_{I_{k,n+l}} |u|^p)^(1/p)` with `n = ⌊2^k x⌋`, since
 `x, …, x + rh` meet only the intervals `I_{k,n}, …, I_{k,n+r}`. -/
-theorem enorm_iterDiff_ppFun_le {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r)
+theorem enorm_iterDiff_le_of_isPiecewisePoly {r k : ℕ} {u : ℝ → ℂ} (hu : IsPiecewisePoly r k u)
     {K : ℝ≥0∞}
     (hK : ∀ P ∈ degreeLT ℂ r, ∀ (u : ℝ) {L : ℝ}, 0 < L → ∀ x ∈ Icc u (u + L),
       ‖polyFun P x‖ₑ ≤ K * ENNReal.ofReal L⁻¹ ^ (1 / p).toReal *
         eLpNorm (polyFun P) p (volume.restrict (Icc u (u + L))))
-    (hp : p ≠ ∞) (k : ℕ) {h x : ℝ} (hh0 : 0 ≤ h) (hh : h ≤ 1 / 2 ^ k) (hx : 0 ≤ x) :
-    ‖iterDiff r h (ppFun k Q) x‖ₑ ≤ 2 ^ r * (K * ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal *
-      (∑ l ∈ Finset.range (r + 1), localMass p k (ppFun k Q) (⌊2 ^ k * x⌋₊ + l)) ^
-        (1 / p.toReal)) := by
+    (hp : p ≠ ∞) {h x : ℝ} (hh0 : 0 ≤ h) (hh : h ≤ 1 / 2 ^ k) (hx : 0 ≤ x) :
+    ‖iterDiff r h u x‖ₑ ≤ 2 ^ r * (K * ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal *
+      (∑ l ∈ Finset.range (r + 1), localMass p k u (⌊2 ^ k * x⌋₊ + l)) ^ (1 / p.toReal)) := by
   have hpos : (0 : ℝ) < 2 ^ k := by positivity
   have hkh : (2 : ℝ) ^ k * h ≤ 1 := by
     rw [le_div_iff₀ hpos] at hh
     linarith
-  have hpt : ∀ i ∈ Finset.range (r + 1), ‖ppFun k Q (x + i * h)‖ₑ ≤
+  have hpt : ∀ i ∈ Finset.range (r + 1), ‖u (x + i * h)‖ₑ ≤
       K * ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal *
-        (∑ l ∈ Finset.range (r + 1), localMass p k (ppFun k Q) (⌊2 ^ k * x⌋₊ + l)) ^
-          (1 / p.toReal) := fun i hi => by
+        (∑ l ∈ Finset.range (r + 1), localMass p k u (⌊2 ^ k * x⌋₊ + l)) ^ (1 / p.toReal) :=
+    fun i hi => by
     have hi' : (i : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)
     have h0 : 0 ≤ 2 ^ k * (x + i * h) := by positivity
     have hm : x + i * h ∈ dyadicIco k ⌊2 ^ k * (x + i * h)⌋₊ :=
@@ -149,23 +165,22 @@ theorem enorm_iterDiff_ppFun_le {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n 
         linarith
       calc ⌊2 ^ k * (x + i * h)⌋₊ ≤ ⌊2 ^ k * x + (r : ℝ)⌋₊ := Nat.floor_mono this
         _ = ⌊2 ^ k * x⌋₊ + r := Nat.floor_add_natCast (by positivity) r
-    refine (enorm_ppFun_le hQ hK hp k _ hm).trans ?_
+    refine (enorm_le_localMass hu hK hp _ hm).trans ?_
     gcongr
-    calc localMass p k (ppFun k Q) ⌊2 ^ k * (x + i * h)⌋₊ =
-        localMass p k (ppFun k Q) (⌊2 ^ k * x⌋₊ + (⌊2 ^ k * (x + i * h)⌋₊ - ⌊2 ^ k * x⌋₊)) := by
+    calc localMass p k u ⌊2 ^ k * (x + i * h)⌋₊ =
+        localMass p k u (⌊2 ^ k * x⌋₊ + (⌊2 ^ k * (x + i * h)⌋₊ - ⌊2 ^ k * x⌋₊)) := by
           rw [Nat.add_sub_cancel' hnm]
-      _ ≤ _ := Finset.single_le_sum (f := fun l => localMass p k (ppFun k Q) (⌊2 ^ k * x⌋₊ + l))
+      _ ≤ _ := Finset.single_le_sum (f := fun l => localMass p k u (⌊2 ^ k * x⌋₊ + l))
           (fun _ _ => zero_le) (Finset.mem_range.2 (by omega))
   have hc : ∀ i : ℕ, ‖(-1 : ℂ) ^ (r - i) * (r.choose i : ℂ)‖ₑ = (r.choose i : ℝ≥0∞) := fun i => by
     rw [enorm_mul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul, ← ofReal_norm,
       Complex.norm_natCast, ENNReal.ofReal_natCast]
   rw [iterDiff_apply]
   refine (enorm_sum_le _ _).trans ?_
-  calc ∑ i ∈ Finset.range (r + 1), ‖(-1 : ℂ) ^ (r - i) * (r.choose i : ℂ) *
-        ppFun k Q (x + i * h)‖ₑ
+  calc ∑ i ∈ Finset.range (r + 1), ‖(-1 : ℂ) ^ (r - i) * (r.choose i : ℂ) * u (x + i * h)‖ₑ
       ≤ ∑ i ∈ Finset.range (r + 1), (r.choose i : ℝ≥0∞) *
           (K * ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal *
-            (∑ l ∈ Finset.range (r + 1), localMass p k (ppFun k Q) (⌊2 ^ k * x⌋₊ + l)) ^
+            (∑ l ∈ Finset.range (r + 1), localMass p k u (⌊2 ^ k * x⌋₊ + l)) ^
               (1 / p.toReal)) :=
         Finset.sum_le_sum fun i hi => by
           rw [enorm_mul, hc]
@@ -237,40 +252,44 @@ theorem sum_sum_localMass_le (hp : p ≠ ∞) (j r : ℕ) (Q : ℕ → ℂ[X]) :
         gcongr
         exact tsum_localMass_ppFun_le hp j Q
 
-/-- **The local inverse estimate** for a piecewise polynomial `u` of level `j`: for
-`0 ≤ h ≤ 2^(-j)`,
-`‖Δ_h^r u‖_{L_p[0, 1 - rh]} ≤ 2^r K (r (r + 1) 2^j h)^(1/p) ‖u‖_{L_p[0,1]}`.
+/-- **The local inverse estimate** for a piecewise polynomial `u` of level `j` on `[0, ∞)`: if
+the local masses of `r + 1` consecutive pieces, summed over the pieces in `[0, 1)`, are at most
+`(r + 1) B^p`, then for `0 ≤ h ≤ 2^(-j)`,
+`‖Δ_h^r u‖_{L_p[0, 1]} ≤ 2^r K (r (r + 1) 2^j h)^(1/p) B`.
 The difference vanishes except on strips of width `rh` left of the knots, and there it is
 bounded by the local masses of at most `r + 1` neighbouring pieces. -/
-theorem eLpNorm_iterDiff_ppFun_le {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r)
-    {K : ℝ≥0∞}
+theorem eLpNorm_iterDiff_le_of_isPiecewisePoly {r j : ℕ} {u : ℝ → ℂ}
+    (hu : IsPiecewisePoly r j u) (hum : Measurable u) {K : ℝ≥0∞}
     (hK : ∀ P ∈ degreeLT ℂ r, ∀ (u : ℝ) {L : ℝ}, 0 < L → ∀ x ∈ Icc u (u + L),
       ‖polyFun P x‖ₑ ≤ K * ENNReal.ofReal L⁻¹ ^ (1 / p).toReal *
         eLpNorm (polyFun P) p (volume.restrict (Icc u (u + L))))
-    (hp : p ≠ ∞) (j : ℕ) {h : ℝ} (hh0 : 0 ≤ h) (hh : h ≤ 1 / 2 ^ j) :
-    eLpNorm (iterDiff r h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - r * h))) ≤
+    (hp : p ≠ ∞) {h : ℝ} (hh0 : 0 ≤ h) (hh : h ≤ 1 / 2 ^ j) {B : ℝ≥0∞}
+    (hB : ∑ n ∈ Finset.range (2 ^ j), ∑ l ∈ Finset.range (r + 1), localMass p j u (n + l) ≤
+      (r + 1) * B ^ p.toReal) :
+    eLpNorm (iterDiff r h u) p (volume.restrict (Icc 0 1)) ≤
       2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^ (1 / p.toReal) *
-        eLpNorm (ppFun j Q) p unitVol := by
+        B := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   -- the `p`-th power of the difference is dominated by the strip function
-  have hpt : ∀ x ∈ Icc (0 : ℝ) (1 - r * h), ‖iterDiff r h (ppFun j Q) x‖ₑ ^ p.toReal ≤
+  have hpt : ∀ x ∈ Icc (0 : ℝ) 1, ‖iterDiff r h u x‖ₑ ^ p.toReal ≤
       stripBound j r h ((2 ^ r * K * ENNReal.ofReal (2 ^ j) ^ (1 / p).toReal) ^ p.toReal)
-        (fun n => ∑ l ∈ Finset.range (r + 1), localMass p j (ppFun j Q) (n + l)) x :=
+        (fun n => ∑ l ∈ Finset.range (r + 1), localMass p j u (n + l)) x :=
     fun x hx => by
       rw [stripBound]
       split_ifs with hbad
-      · calc ‖iterDiff r h (ppFun j Q) x‖ₑ ^ p.toReal
+      · calc ‖iterDiff r h u x‖ₑ ^ p.toReal
             ≤ (2 ^ r * (K * ENNReal.ofReal (2 ^ j) ^ (1 / p).toReal *
-              (∑ l ∈ Finset.range (r + 1), localMass p j (ppFun j Q) (⌊2 ^ j * x⌋₊ + l)) ^
+              (∑ l ∈ Finset.range (r + 1), localMass p j u (⌊2 ^ j * x⌋₊ + l)) ^
                 (1 / p.toReal))) ^ p.toReal :=
-              ENNReal.rpow_le_rpow (enorm_iterDiff_ppFun_le hQ hK hp j hh0 hh hx.1) hq.le
+              ENNReal.rpow_le_rpow (enorm_iterDiff_le_of_isPiecewisePoly hu hK hp hh0 hh hx.1)
+                hq.le
           _ = _ := by
               rw [← mul_assoc, ← mul_assoc, ENNReal.mul_rpow_of_nonneg _ _ hq.le,
                 ← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one]
       · push Not at hbad
-        rw [iterDiff_ppFun_eq_zero hQ j hh0 hx.1 hbad, enorm_zero, ENNReal.zero_rpow_of_pos hq]
-  have hrh : (0 : ℝ) ≤ r * h := by positivity
+        rw [iterDiff_eq_zero_of_isPiecewisePoly hu hh0 hx.1 hbad, enorm_zero,
+          ENNReal.zero_rpow_of_pos hq]
   have hinv : (1 / p).toReal * p.toReal = 1 := by
     rw [ENNReal.toReal_div, ENNReal.toReal_one, one_div_mul_cancel hq.ne']
   have hof : ENNReal.ofReal (2 ^ j) * ENNReal.ofReal (r * h) =
@@ -279,38 +298,51 @@ theorem eLpNorm_iterDiff_ppFun_le {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q 
       ← ENNReal.ofReal_mul (Nat.cast_nonneg r)]
     congr 1
     ring
-  refine eLpNorm_le_of_lintegral_le
-    (measurable_iterDiff (measurable_ppFun j Q) r h).aestronglyMeasurable hp0 hp ?_
-  calc ∫⁻ x in Icc (0 : ℝ) (1 - r * h), ‖iterDiff r h (ppFun j Q) x‖ₑ ^ p.toReal
+  refine eLpNorm_le_of_lintegral_le (measurable_iterDiff hum r h).aestronglyMeasurable hp0 hp ?_
+  calc ∫⁻ x in Icc (0 : ℝ) 1, ‖iterDiff r h u x‖ₑ ^ p.toReal
       ≤ ∫⁻ x in Icc (0 : ℝ) 1,
           stripBound j r h ((2 ^ r * K * ENNReal.ofReal (2 ^ j) ^ (1 / p).toReal) ^ p.toReal)
-            (fun n => ∑ l ∈ Finset.range (r + 1), localMass p j (ppFun j Q) (n + l)) x :=
-        (setLIntegral_mono' measurableSet_Icc hpt).trans
-          (lintegral_mono_set (Icc_subset_Icc le_rfl (by linarith)))
+            (fun n => ∑ l ∈ Finset.range (r + 1), localMass p j u (n + l)) x :=
+        setLIntegral_mono' measurableSet_Icc hpt
     _ ≤ (2 ^ r * K * ENNReal.ofReal (2 ^ j) ^ (1 / p).toReal) ^ p.toReal *
           ENNReal.ofReal (r * h) * ∑ n ∈ Finset.range (2 ^ j),
-            ∑ l ∈ Finset.range (r + 1), localMass p j (ppFun j Q) (n + l) :=
+            ∑ l ∈ Finset.range (r + 1), localMass p j u (n + l) :=
         lintegral_stripBound_le j r h _ _
     _ ≤ (2 ^ r * K * ENNReal.ofReal (2 ^ j) ^ (1 / p).toReal) ^ p.toReal *
-          ENNReal.ofReal (r * h) * ((r + 1) * eLpNorm (ppFun j Q) p unitVol ^ p.toReal) := by
+          ENNReal.ofReal (r * h) * ((r + 1) * B ^ p.toReal) := by
         gcongr
-        exact sum_sum_localMass_le hp j r Q
     _ = (2 ^ r * K) ^ p.toReal * (ENNReal.ofReal (2 ^ j) * ENNReal.ofReal (r * h)) *
-          ((r + 1) * eLpNorm (ppFun j Q) p unitVol ^ p.toReal) := by
+          ((r + 1) * B ^ p.toReal) := by
         rw [ENNReal.mul_rpow_of_nonneg (2 ^ r * K) _ hq.le, ← ENNReal.rpow_mul, hinv,
           ENNReal.rpow_one]
         ring
     _ = (2 ^ r * K) ^ p.toReal * (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) *
-          eLpNorm (ppFun j Q) p unitVol ^ p.toReal := by
+          B ^ p.toReal := by
         rw [hof]
         push_cast
         ring
     _ = (2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^
-          (1 / p.toReal) * eLpNorm (ppFun j Q) p unitVol) ^ p.toReal := by
+          (1 / p.toReal) * B) ^ p.toReal := by
         rw [ENNReal.mul_rpow_of_nonneg (2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) *
             ENNReal.ofReal (2 ^ j * h)) ^ (1 / p.toReal)) _ hq.le,
           ENNReal.mul_rpow_of_nonneg (2 ^ r * K) _ hq.le, ← ENNReal.rpow_mul,
           one_div_mul_cancel hq.ne', ENNReal.rpow_one]
+
+/-- **The local inverse estimate on `[0, 1]`** for a piecewise polynomial `u` of level `j`: for
+`0 ≤ h ≤ 2^(-j)`,
+`‖Δ_h^r u‖_{L_p[0, 1 - rh]} ≤ 2^r K (r (r + 1) 2^j h)^(1/p) ‖u‖_{L_p[0,1]}`. -/
+theorem eLpNorm_iterDiff_ppFun_le {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r)
+    {K : ℝ≥0∞}
+    (hK : ∀ P ∈ degreeLT ℂ r, ∀ (u : ℝ) {L : ℝ}, 0 < L → ∀ x ∈ Icc u (u + L),
+      ‖polyFun P x‖ₑ ≤ K * ENNReal.ofReal L⁻¹ ^ (1 / p).toReal *
+        eLpNorm (polyFun P) p (volume.restrict (Icc u (u + L))))
+    (hp : p ≠ ∞) (j : ℕ) {h : ℝ} (hh0 : 0 ≤ h) (hh : h ≤ 1 / 2 ^ j) :
+    eLpNorm (iterDiff r h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - r * h))) ≤
+      2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^ (1 / p.toReal) *
+        eLpNorm (ppFun j Q) p unitVol :=
+  (eLpNorm_Icc_mono _ p le_rfl (by linarith [mul_nonneg (Nat.cast_nonneg r) hh0])).trans
+    (eLpNorm_iterDiff_le_of_isPiecewisePoly (isPiecewisePoly_ppFun hQ j)
+      (measurable_ppFun j Q) hK hp hh0 hh (sum_sum_localMass_le hp j r Q))
 
 /-- `(2^j h)^θ ≤ 2^(-(k-j)θ)` for `0 ≤ h ≤ 2^(-k)`, `j ≤ k` and `θ ≥ 0`. -/
 theorem ofReal_two_pow_mul_rpow_le {j k : ℕ} (hjk : j ≤ k) {h : ℝ} (hh : h ≤ 1 / 2 ^ k) {θ : ℝ}
@@ -328,6 +360,48 @@ theorem ofReal_two_pow_mul_rpow_le {j k : ℕ} (hjk : j ≤ k) {h : ℝ} (hh : h
           ENNReal.ofReal_ofNat, ENNReal.inv_rpow, ← ENNReal.rpow_natCast, ← ENNReal.rpow_mul,
           dyadicWeight, mul_neg, ENNReal.rpow_neg]
 
+variable (p) in
+/-- The constant of the inverse inequality, `2^r (1 + K (r (r + 1))^(1/p))`, with the Nikolskii
+constant `K`. -/
+noncomputable def ppInverseConst (r : ℕ) (K : ℝ≥0∞) : ℝ≥0∞ :=
+  2 ^ r * (1 + K * ((r * (r + 1) : ℕ) : ℝ≥0∞) ^ (1 / p.toReal))
+
+omit [Fact (1 ≤ p)] in
+/-- The constant of the inverse inequality is finite. -/
+theorem ppInverseConst_ne_top (r : ℕ) {K : ℝ≥0∞} (hK : K ≠ ∞) : ppInverseConst p r K ≠ ∞ :=
+  ENNReal.mul_ne_top (by simp) (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
+    ENNReal.mul_ne_top hK (ENNReal.rpow_ne_top_of_nonneg (by positivity)
+      (ENNReal.natCast_ne_top _))⟩)
+
+omit [Fact (1 ≤ p)] in
+/-- `2^r` is at most the constant of the inverse inequality. -/
+theorem two_pow_le_ppInverseConst (r : ℕ) (K : ℝ≥0∞) : 2 ^ r ≤ ppInverseConst p r K :=
+  le_mul_of_one_le_right zero_le le_self_add
+
+omit [Fact (1 ≤ p)] in
+/-- The local inverse estimate in dyadic form: for `j ≤ k` and `h ≤ 2^(-k)`,
+`2^r K (r (r + 1) 2^j h)^(1/p) B ≤ C_B 2^(-(k-j)/p) B`. -/
+theorem le_ppInverseConst_mul {r j k : ℕ} (hjk : j ≤ k) (K : ℝ≥0∞) {h : ℝ} (hh : h ≤ 1 / 2 ^ k)
+    (B : ℝ≥0∞) :
+    2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^ (1 / p.toReal) * B ≤
+      ppInverseConst p r K * dyadicWeight (-(1 / p.toReal)) (k - j) * B := by
+  have hθ : 0 ≤ 1 / p.toReal := by positivity
+  have hw : (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^ (1 / p.toReal) ≤
+      ((r * (r + 1) : ℕ) : ℝ≥0∞) ^ (1 / p.toReal) * dyadicWeight (-(1 / p.toReal)) (k - j) := by
+    rw [ENNReal.mul_rpow_of_nonneg _ _ hθ]
+    exact mul_le_mul' le_rfl (ofReal_two_pow_mul_rpow_le hjk hh hθ)
+  calc 2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^
+        (1 / p.toReal) * B
+      ≤ 2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) ^ (1 / p.toReal) *
+          dyadicWeight (-(1 / p.toReal)) (k - j)) * B :=
+        mul_le_mul' (mul_le_mul' le_rfl hw) le_rfl
+    _ = 2 ^ r * (K * ((r * (r + 1) : ℕ) : ℝ≥0∞) ^ (1 / p.toReal)) *
+          dyadicWeight (-(1 / p.toReal)) (k - j) * B := by ring
+    _ ≤ ppInverseConst p r K * dyadicWeight (-(1 / p.toReal)) (k - j) * B := by
+        unfold ppInverseConst
+        gcongr
+        exact le_add_self
+
 /-- **The inverse inequality for dyadic piecewise polynomials**, of order `θ = 1/p`: there is
 `C_B < ∞` with `ω_r(a, 2^(-k), [0, 1])_p ≤ C_B 2^(-(k-j)/p) ‖a‖_p` for every piecewise polynomial
 `a` of level `j` (and `k - j` truncated at `0`). The order `1/p` reflects the jumps at the knots:
@@ -336,19 +410,11 @@ theorem exists_inverse_ppScheme {r : ℕ} (hp : p ≠ ∞) :
     ∃ CB : ℝ≥0∞, CB ≠ ∞ ∧ ∀ j k : ℕ, ∀ a ∈ ppScheme p r (2 ^ j),
       lpModulus p r a k ≤ CB * dyadicWeight (-(1 / p.toReal)) (k - j) * ‖a‖ₑ := by
   obtain ⟨K, hK, hKb⟩ := enorm_polyFun_le (p := p) r hp
-  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  have hθ : 0 ≤ 1 / p.toReal := by positivity
-  refine ⟨2 ^ r * (1 + K * ((r * (r + 1) : ℕ) : ℝ≥0∞) ^ (1 / p.toReal)),
-    ENNReal.mul_ne_top (by simp) (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
-      ENNReal.mul_ne_top hK (ENNReal.rpow_ne_top_of_nonneg hθ (ENNReal.natCast_ne_top _))⟩),
-    fun j k a ha => ?_⟩
+  refine ⟨ppInverseConst p r K, ppInverseConst_ne_top r hK, fun j k a ha => ?_⟩
   obtain ⟨Q, hQ, hae⟩ := mem_ppScheme_two_pow.1 ha
   rcases lt_or_ge k j with hkj | hjk
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
-    refine (lpModulus_le r a k).trans ?_
-    gcongr
-    exact le_mul_of_one_le_right zero_le le_self_add
+    exact (lpModulus_le r a k).trans (by gcongr; exact two_pow_le_ppInverseConst r K)
   · have hnorm : ‖a‖ₑ = eLpNorm (ppFun j Q) p unitVol := by
       rw [Lp.enorm_def]
       exact eLpNorm_congr_ae hae
@@ -356,23 +422,8 @@ theorem exists_inverse_ppScheme {r : ℕ} (hp : p ≠ ∞) :
     refine iSup₂_le fun h hh => ?_
     have hhj : h ≤ 1 / 2 ^ j := hh.2.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ (by norm_num) hjk))
-    have hw : (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^ (1 / p.toReal) ≤
-        ((r * (r + 1) : ℕ) : ℝ≥0∞) ^ (1 / p.toReal) * dyadicWeight (-(1 / p.toReal)) (k - j) := by
-      rw [ENNReal.mul_rpow_of_nonneg _ _ hθ]
-      exact mul_le_mul' le_rfl (ofReal_two_pow_mul_rpow_le hjk hh.2 hθ)
-    calc eLpNorm (iterDiff r h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - r * h)))
-        ≤ 2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^
-            (1 / p.toReal) * eLpNorm (ppFun j Q) p unitVol :=
-          eLpNorm_iterDiff_ppFun_le hQ hKb hp j hh.1 hhj
-      _ ≤ 2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) ^ (1 / p.toReal) *
-            dyadicWeight (-(1 / p.toReal)) (k - j)) * eLpNorm (ppFun j Q) p unitVol :=
-          mul_le_mul' (mul_le_mul' le_rfl hw) le_rfl
-      _ = 2 ^ r * (K * ((r * (r + 1) : ℕ) : ℝ≥0∞) ^ (1 / p.toReal)) *
-            dyadicWeight (-(1 / p.toReal)) (k - j) * eLpNorm (ppFun j Q) p unitVol := by ring
-      _ ≤ 2 ^ r * (1 + K * ((r * (r + 1) : ℕ) : ℝ≥0∞) ^ (1 / p.toReal)) *
-            dyadicWeight (-(1 / p.toReal)) (k - j) * eLpNorm (ppFun j Q) p unitVol := by
-          gcongr
-          exact le_add_self
+    exact (eLpNorm_iterDiff_ppFun_le hQ hKb hp j hh.1 hhj).trans
+      (le_ppInverseConst_mul hjk K hh.2 _)
 
 /-! ### The coincidence theorem -/
 

@@ -43,6 +43,8 @@ public import FunctionSpaces.Interval.Smoothing
 public import FunctionSpaces.Interval.PiecewisePoly
 public import FunctionSpaces.Interval.PiecewiseJackson
 public import FunctionSpaces.Interval.PiecewiseInverse
+public import FunctionSpaces.Interval.Periodic
+public import FunctionSpaces.Interval.PiecewisePeriodic
 
 /-!
 # Function spaces
@@ -120,4 +122,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   polynomials.
 * `FunctionSpaces.Interval.PiecewiseInverse`: the inverse inequality of order `1/p` and the
   identification of their approximation spaces with `B^s_{p,q}[0, 1]` for `0 < s < 1/p`.
+* `FunctionSpaces.Interval.Periodic`: periodic extensions from `[0, 1)` and the periodic modulus
+  of smoothness on the circle.
+* `FunctionSpaces.Interval.PiecewisePeriodic`: piecewise polynomials on the circle, their
+  approximation spaces `B^s_{p,q}(𝕋)` for `0 < s < 1/p`, and `B^s_{p,q}[0, 1] = B^s_{p,q}(𝕋)` in
+  that range.
 -/
