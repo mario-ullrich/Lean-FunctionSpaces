@@ -15,7 +15,9 @@ The **modulus of smoothness** (of first order) of `f ∈ L_2(𝕋^d)` is
 
 `ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`   (`Torus.modulus`),
 
-with the sup norm `‖h‖ = max_i ‖h_i‖` on `𝕋^d`.  This file proves **Jackson's theorem**
+with the sup norm `‖h‖ = max_i ‖h_i‖` on `𝕋^d`.  It grows at most linearly,
+`ω(f, n t)_2 ≤ n ω(f, t)_2` (`Torus.modulus_natCast_mul_le`).  This file proves
+**Jackson's theorem**
 
 `E_n(f)_2² ≤ d · ω(f, 1/n)_2²`   (`Torus.approxSeq_sq_le_card_mul_modulus_sq`),
 
@@ -54,6 +56,66 @@ theorem modulus_mono (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) : Monoto
 /-- The norm on the circle is at most the absolute value of a representative. -/
 theorem norm_coe_le_abs (u : ℝ) : ‖(u : UnitAddCircle)‖ ≤ |u| := by
   simpa using QuotientAddGroup.norm_mk_le_norm (S := AddSubgroup.zmultiples (1 : ℝ)) (m := u)
+
+/-- Translation is an isometry of `L_2(𝕋^d)`. -/
+theorem enorm_translate (h : UnitAddTorus d) (g : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
+    ‖translate h g‖ₑ = ‖g‖ₑ := by
+  rw [← ofReal_norm, ← ofReal_norm, translate, Lp.norm_compMeasurePreserving]
+
+/-- `τ_0 = id`. -/
+theorem translate_zero (g : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) : translate 0 g = g := by
+  ext1
+  filter_upwards [coeFn_translate 0 g] with x hx
+  rw [hx, add_zero]
+
+/-- `τ_{a+b} = τ_a τ_b`. -/
+theorem translate_add (a b : UnitAddTorus d) (g : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
+    translate (a + b) g = translate a (translate b g) := by
+  ext1
+  filter_upwards [coeFn_translate (a + b) g, coeFn_translate a (translate b g),
+    (measurePreserving_add_right volume a).quasiMeasurePreserving.ae_eq_comp
+      (coeFn_translate b g)] with x h1 h2 h3
+  simp only [Function.comp_apply] at h3
+  rw [h1, h2, h3, add_assoc]
+
+/-- `‖τ_{n h} f - f‖_2 ≤ n ‖τ_h f - f‖_2`, by telescoping. -/
+theorem enorm_translate_nsmul_sub_le (n : ℕ) (h : UnitAddTorus d)
+    (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
+    ‖translate (n • h) f - f‖ₑ ≤ n * ‖translate h f - f‖ₑ := by
+  induction n with
+  | zero => simp [translate_zero]
+  | succ n ih =>
+    rw [succ_nsmul', translate_add, ← sub_add_sub_cancel _ (translate h f), ← map_sub,
+      Nat.cast_succ, add_mul, one_mul]
+    exact (enorm_add_le _ _).trans (add_le_add_left ((enorm_translate _ _).trans_le ih) _)
+
+/-- Every point of the circle has a representative `x ∈ ℝ` with `|x| = ‖u‖`. -/
+theorem exists_coe_eq_abs_eq_norm (u : UnitAddCircle) :
+    ∃ x : ℝ, (x : UnitAddCircle) = u ∧ |x| = ‖u‖ := by
+  induction u using QuotientAddGroup.induction_on with
+  | H y =>
+  refine ⟨y - round y, ?_, UnitAddCircle.norm_eq.symm⟩
+  rw [AddCircle.coe_sub,
+    (AddCircle.coe_eq_zero_iff 1 (x := ((round y : ℤ) : ℝ))).2 ⟨round y, by simp⟩, sub_zero]
+
+/-- **The modulus grows at most linearly**: `ω(f, n t)_2 ≤ n ω(f, t)_2` for `n ≥ 1`, since every
+`h` with `‖h‖ ≤ n t` is `n h'` with `‖h'‖ ≤ t`. -/
+theorem modulus_natCast_mul_le {n : ℕ} (hn : 0 < n)
+    (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) {t : ℝ} (ht : 0 ≤ t) :
+    modulus f (n * t) ≤ n * modulus f t := by
+  refine iSup₂_le fun h hh => ?_
+  have hn' : (0 : ℝ) < n := by exact_mod_cast hn
+  choose x hx1 hx2 using fun i => exists_coe_eq_abs_eq_norm (h i)
+  set h' : UnitAddTorus d := fun i => ((x i / n : ℝ) : UnitAddCircle)
+  have hh' : ‖h'‖ ≤ t := (pi_norm_le_iff_of_nonneg ht).2 fun i => (norm_coe_le_abs _).trans (by
+    rw [abs_div, Nat.abs_cast, div_le_iff₀ hn', hx2, mul_comm]
+    exact (norm_le_pi_norm h i).trans hh)
+  have hnh : n • h' = h := funext fun i => by
+    rw [Pi.smul_apply, ← hx1 i, ← AddCircle.coe_nsmul, nsmul_eq_mul,
+      mul_div_cancel₀ _ hn'.ne']
+  rw [← hnh]
+  exact (enorm_translate_nsmul_sub_le n h' f).trans
+    (mul_le_mul_right (enorm_translate_sub_le_modulus hh') _)
 
 /-- `|e^(ix) - 1|² = 2 - 2 cos x`. -/
 theorem norm_exp_I_mul_sub_one_sq (x : ℝ) :

@@ -113,10 +113,12 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   (`ApproximationScheme.AtomicSystem.memApprox_iff_exists_atomic`).
 * **Lipschitz atoms on the torus.** Call `a` a Lipschitz atom of level `j` at the grid point
   `2^(-j) m` of `𝕋^d` if `|a| ≤ 1`, `|a(x) - a(y)| ≤ 2^j ‖x - y‖` and `a = 0` outside the ball
-  of radius `D 2^(-j)` around `2^(-j) m`. For `0 < s < 1` and `1 ≤ q ≤ ∞`, every sum
-  `f = ∑_j ∑_m λ_{j,m} a_{j,m}` of such atoms, converging in `L_2(𝕋^d)`, with
-  `‖(2^(j(s-d/2)) ‖λ_{j,·}‖_{ℓ_2})_j‖_{ℓ_q} < ∞` lies in `B^s_{2,q}(𝕋^d)`
-  (`Torus.memBesov_of_lipAtoms`).
+  of radius `D 2^(-j)` around `2^(-j) m`. For `0 < s < 1` and `1 ≤ q ≤ ∞`, `f ∈ B^s_{2,q}(𝕋^d)`
+  iff `f = ∑_j ∑_m λ_{j,m} a_{j,m}` in `L_2(𝕋^d)` with Lipschitz atoms of support radius `1` and
+  `‖(2^(j(s-d/2)) ‖λ_{j,·}‖_{ℓ_2})_j‖_{ℓ_q} < ∞` (`Torus.memBesov_iff_exists_lipAtoms`). Every
+  such sum with atoms of any support radius `D` lies in `B^s_{2,q}(𝕋^d)`
+  (`Torus.memBesov_of_lipAtoms`), and the atoms of a given `f` come from quasi-interpolants
+  with hat functions (`Torus.exists_lipAtoms`).
 * **The trace theorem.** Let `T` be linear with `T(A_n) ⊆ B_n` and `‖T a‖ ≤ C n^β ‖a‖` for
   `a ∈ A_n`, `n ≥ 1`, as for the restriction of functions to a hyperplane. Then `T` extends to
   `A^β_1`, and for `0 ≤ β < s` it maps `A^s_q` into `B^{s-β}_q` with
@@ -227,7 +229,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Haar system on `[0, 1)`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ proved | ✗ | `FunctionSpaces/Wavelets/{Partition,Examples/Haar}.lean` |
 | Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ proved | ✗ | `FunctionSpaces/Classical/{Translation,Modulus,BesovModuli}.lean` |
 | Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ proved | ✗ | `FunctionSpaces/Traces/Examples/Torus.lean` |
-| Lipschitz atoms on the torus, synthesis into `B^s_{2,q}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Atoms/Examples/Torus.lean` |
+| Lipschitz atoms on the torus: synthesis, quasi-interpolants with hat functions, characterisation of `B^s_{2,q}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Atoms/Examples/{Torus,TorusHat,TorusAnalysis}.lean` |
 | Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Classical/SobolevDeriv.lean` |
 | Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Classical/…` |
 

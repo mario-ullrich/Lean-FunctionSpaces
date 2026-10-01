@@ -2143,6 +2143,23 @@ For $f \in L_2(\T^d)$ and $t \in \R$,
 $\omega(f, t)_2 = \sup_{\|h\| \leq t} \|\tau_h f - f\|_2$.
 \end{definition}
 
+\begin{lemma}[Growth of the modulus]
+\label{lem:modulus-linear}
+\lean{Torus.enorm_translate, Torus.translate_zero, Torus.translate_add,
+  Torus.enorm_translate_nsmul_sub_le, Torus.exists_coe_eq_abs_eq_norm,
+  Torus.modulus_natCast_mul_le}
+\leanok
+\uses{def:modulus}
+For $f \in L_2(\T^d)$, $n \geq 1$ and $t \geq 0$, $\omega(f, n t)_2 \leq n \, \omega(f, t)_2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Every $h$ with $\|h\| \leq n t$ is $n h'$ with $\|h'\| \leq t$, and
+$\tau_{n h'} f - f = \sum_{i < n} \tau_{i h'} (\tau_{h'} f - f)$, where translations are
+isometries.
+\end{proof}
+
 The classical Jackson theorem bounds the error of trigonometric approximation by the modulus
 of smoothness. For $p = 2$ it follows from Parseval's identity by averaging over
 translations along the coordinate axes.
@@ -2437,9 +2454,197 @@ with $C$ from \Cref{prop:lip-atomic-system}.
 trigonometric scheme is linear.
 \end{proof}
 
-The converse, that every $f \in \Besov{s}{2}{q}(\T^d)$ is such a sum, needs an expansion of
-trigonometric polynomials in atoms of their level as in \Cref{thm:atomic-analysis}, for instance
-by interpolation with hat functions on the grid; it is not formalised.
+The converse decomposes $f$ through quasi-interpolants with hat functions, which split into
+pieces near the grid points; no expansion of trigonometric polynomials is needed.
+
+\begin{lemma}[Hat functions]
+\label{lem:hat}
+\lean{Torus.circleHat, Torus.circleHat_nonneg, Torus.circleHat_le_one, Torus.circleHat_eq_zero,
+  Torus.abs_circleHat_sub_le, Torus.continuous_circleHat, Torus.coe_sub_div_eq,
+  Torus.natCast_mul_norm_coe_sub_div, Torus.natCast_eq_emod, Torus.sum_circleHat,
+  Torus.abs_prod_sub_prod_le, Torus.torusHat, Torus.torusHat_nonneg, Torus.torusHat_le_one,
+  Torus.sum_torusHat, Torus.abs_torusHat_sub_le, Torus.norm_le_half, Torus.torusHat_eq_zero,
+  Torus.continuous_torusHat}
+\leanok
+\uses{def:lip-atom}
+For $N \geq 1$ and $0 \leq l < N$ let $\Lambda_{N,l}(u) = \max(0, 1 - N \|u - l/N\|)$ on $\T$.
+For $j \geq 1$ and $m \in \{0, \dots, 2^j - 1\}^d$ let
+$\varphi_{j,m}(x) = \prod_i \Lambda_{2^j, m_i}(x_i)$, and let $\varphi_{0,0} = 1$. Then
+$0 \leq \varphi_{j,m} \leq 1$, $\varphi_{j,m}$ vanishes outside the open ball of radius $2^{-j}$
+around $2^{-j} m$, $|\varphi_{j,m}(x) - \varphi_{j,m}(y)| \leq \#d \, 2^j \|x - y\|$, and
+$\sum_m \varphi_{j,m} = 1$ for every $j$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $N \geq 2$, $y \in \R$, $t = N y$ and $k = \lfloor t \rfloor$, only the hats at the classes
+of $k$ and $k + 1$ modulo $N$ are nonzero at $y$, with values $1 - (t - k)$ and $t - k$. The
+partition of unity of $\T^d$ is the product of those of the coordinates, and
+$|\prod_i a_i - \prod_i b_i| \leq \sum_i |a_i - b_i|$ for numbers in $[0, 1]$.
+\end{proof}
+
+\begin{lemma}[Oscillation over pairs of sets]
+\label{lem:pair-oscillation}
+\lean{Torus.eLpNorm_two_sq, Torus.enorm_sq_eq_lintegral, Torus.enorm_translate_sub_sq_eq,
+  Torus.sum_lintegral_le_lintegral_sum, Torus.sum_lintegral_pair_le}
+\leanok
+\uses{def:modulus}
+Let $(S_i, S'_i)_{i \in I}$ be finitely many pairs of measurable subsets of $\T^d$ with
+$\|z - y\| \leq \rho$ for all $y \in S_i$ and $z \in S'_i$, such that every pair $(y, z)$ lies in
+at most $N$ of the products $S_i \times S'_i$. Then for every $f \in L_2(\T^d)$,
+\[
+  \sum_i \int_{S_i} \int_{S'_i} |f(z) - f(y)|^2 \, dz \, dy
+  \leq N \, |B(0, \rho)| \, \omega(f, \rho)_2^2 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The sum is at most $N \int \int_{\|h\| \leq \rho} |f(y + h) - f(y)|^2 \, dh \, dy$ after the
+substitution $z = y + h$. Exchanging the integrals gives
+$N \int_{\|h\| \leq \rho} \|\tau_h f - f\|_2^2 \, dh$.
+\end{proof}
+
+\begin{definition}[Quasi-interpolants]
+\label{def:quasi-interpolant}
+\lean{Torus.dyadicBall, Torus.measurableSet_dyadicBall, Torus.ballAverage, Torus.quasiInterp,
+  Torus.continuous_quasiInterp, Torus.quasiInterpBCF, Torus.quasiInterpBCF_apply,
+  Torus.sum_torusHat_complex, Torus.quasiInterp_sub_const}
+\leanok
+\uses{lem:hat}
+Let $B_{j,m}$ be the closed ball of radius $2^{-j}$ around $2^{-j} m$ and
+$\mu_{j,m}(f) = |B_{j,m}|^{-1} \int_{B_{j,m}} f$ for $f \in L_2(\T^d)$. The
+\emph{quasi-interpolant} of level $j$ is $Q_j f = \sum_m \mu_{j,m}(f) \, \varphi_{j,m}$.
+\end{definition}
+
+\begin{lemma}[Jackson's inequality for quasi-interpolants]
+\label{lem:quasi-jackson}
+\lean{Torus.volume_closedBall_circle, Torus.volume_closedBall_eq,
+  Torus.dyadicWeight_le_volume_dyadicBall, Torus.inv_volume_dyadicBall_le,
+  Torus.volume_dyadicBall_ne_zero, Torus.enorm_average_sq_le, Torus.enorm_ballAverage_sub_sq_le,
+  Torus.mem_dyadicBall_of_torusHat_ne_zero, Torus.card_filter_mem_dyadicBall_le,
+  Torus.enorm_sub_quasiInterp_sq_le, Torus.enorm_sub_quasiInterp_sq_le',
+  Torus.enorm_sub_toLp_quasiInterp_le}
+\leanok
+\uses{def:quasi-interpolant, lem:pair-oscillation, lem:modulus-linear}
+For every $f \in L_2(\T^d)$ and $j \in \N$,
+$\|f - Q_j f\|_2 \leq 2 \cdot 6^{\#d} \, \omega(f, 2^{-j})_2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By the partition of unity, $f - Q_j f = \sum_m \varphi_{j,m} (f - \mu_{j,m})$, and at most
+$3^{\#d}$ terms are nonzero at each point. Jensen's inequality gives
+$|f(x) - \mu_{j,m}|^2 \leq |B_{j,m}|^{-1} \int_{B_{j,m}} |f(z) - f(x)|^2 \, dz$, and
+\Cref{lem:pair-oscillation} with the pairs $(B_{j,m}, B_{j,m})$ and $\rho = 2^{1-j}$ bounds
+$\|f - Q_j f\|_2^2$ by $36^{\#d} \, \omega(f, 2^{1-j})_2^2$. Finish with
+\Cref{lem:modulus-linear}.
+\end{proof}
+
+\begin{lemma}[The pieces of the levels]
+\label{lem:pieces}
+\lean{Torus.norm_sub_gridPoint_lt, Torus.nbr, Torus.mem_nbr, Torus.localOsc,
+  Torus.localOsc_nonneg, Torus.piece, Torus.continuous_piece, Torus.sum_piece,
+  Torus.sum_le_sum_nbr, Torus.norm_quasiInterp_sub_le, Torus.norm_quasiInterp_sub_quasiInterp_le,
+  Torus.norm_piece_le, Torus.norm_piece_sub_le, Torus.piece_eq_zero, Torus.pieceCoeff,
+  Torus.pieceAtom, Torus.pieceAtom_apply, Torus.isLipAtom_pieceAtom,
+  Torus.pieceCoeff_mul_pieceAtom, Torus.meanAtom, Torus.isLipAtom_meanAtom,
+  Torus.norm_mul_meanAtom}
+\leanok
+\uses{def:quasi-interpolant, def:lip-atom}
+For $k \in \N$ and a position $m'$ of level $k + 1$ let $N(m')$ be the set of positions $m$ of
+level $k$ with $\|2^{-k} m - 2^{-(k+1)} m'\| < 3 \cdot 2^{-(k+1)}$, and let
+$M_{k+1,m'} = \sum_{m \in N(m')} |\mu_{k,m} - \mu_{k+1,m'}|$. Then
+\[
+  Q_{k+1} f - Q_k f = \sum_{m'} p_{k+1,m'}, \qquad
+  p_{k+1,m'} = \varphi_{k+1,m'} \, (\mu_{k+1,m'} - Q_k f),
+\]
+and $p_{k+1,m'} = \lambda_{k+1,m'} \, a_{k+1,m'}$ with a Lipschitz atom $a_{k+1,m'}$ of support
+radius $1$ and $\lambda_{k+1,m'} = (2 \#d + 1) M_{k+1,m'}$. Moreover $Q_0 f = \mu_{0,0}$ is
+$|\mu_{0,0}|$ times a Lipschitz atom of level $0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On the support of $\varphi_{k+1,m'}$ only the hats $\varphi_{k,m}$ with $m \in N(m')$ are
+nonzero, and $Q_k f - \mu_{k+1,m'} = \sum_m \varphi_{k,m} (\mu_{k,m} - \mu_{k+1,m'})$. So
+$|p_{k+1,m'}| \leq M_{k+1,m'}$, and $p_{k+1,m'}$ is Lipschitz with constant
+$2 \#d \, 2^{k+1} M_{k+1,m'}$.
+\end{proof}
+
+\begin{lemma}[Coefficients of the levels]
+\label{lem:piece-coefficients}
+\lean{Torus.card_nbr_le, Torus.enorm_pieceCoeff_sq_le, Torus.enorm_ballAverage_sub_sq_le',
+  Torus.sum_nbr_lintegral_le, Torus.sum_enorm_pieceCoeff_sq_le, Torus.sum_enorm_mean_sq_le}
+\leanok
+\uses{lem:pieces, lem:pair-oscillation, lem:modulus-linear}
+For every $f \in L_2(\T^d)$ and $k \in \N$,
+\[
+  \Bigl( \sum_{m'} \lambda_{k+1,m'}^2 \Bigr)^{1/2}
+  \leq (2 \#d + 1) \cdot 3 \cdot 24^{\#d} \, 2^{k \#d / 2} \, \omega(f, 2^{-k})_2 ,
+\]
+and $|\mu_{0,0}| \leq \|f\|_2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The set $N(m')$ has at most $5^{\#d}$ elements, so by the Cauchy--Schwarz inequality and
+Jensen's inequality $\lambda_{k+1,m'}^2$ is at most $(2 \#d + 1)^2 \, 5^{\#d}$ times
+\[
+  \sum_{m \in N(m')} |B_{k,m}|^{-1} |B_{k+1,m'}|^{-1}
+  \int_{B_{k+1,m'}} \int_{B_{k,m}} |f(y) - f(z)|^2 \, dy \, dz .
+\]
+\Cref{lem:pair-oscillation} with $\rho = 3 \cdot 2^{-k}$ and overlap $9^{\#d}$ bounds the sum over
+$m'$, and $5 \cdot 2 \cdot 9 \cdot 6 \leq 24^2$.
+\end{proof}
+
+\begin{theorem}[Analysis with Lipschitz atoms]
+\label{thm:lip-analysis}
+\lean{Torus.lipAtomOf, Torus.lipCoeffOf, Torus.isLipAtom_lipAtomOf, Torus.levelBCF,
+  Torus.torusHat_zero, Torus.sum_lipCoeff_smul_lipAtom, Torus.sum_lipCoeff_smul_toLp,
+  Torus.sum_range_levelBCF, Torus.dyadicWeight_mul_modulus_le_modulusNorm,
+  Torus.modulus_le_dyadicWeight_mul, Torus.enorm_toLp_levelBCF_succ_le, Torus.hasSum_levels,
+  Torus.finLqNorm_two_le, Torus.analysisConst, Torus.analysisConst_ne_top,
+  Torus.bNorm_lipCoeffOf_le, Torus.exists_lipAtoms}
+\leanok
+\uses{lem:quasi-jackson, lem:piece-coefficients, def:modulus-norm}
+Let $s > 0$, $1 \leq q \leq \infty$ and $f \in L_2(\T^d)$ with $\|f\|^{\omega}_{s,q} < \infty$.
+Then $f = \sum_j \sum_m \lambda_{j,m} a_{j,m}$ in $L_2(\T^d)$ with Lipschitz atoms $a_{j,m}$ of
+level $j$ at $m$ with support radius $1$ and
+\[
+  \|\lambda\|_{b^s_{2,q}} \leq \bigl(1 + (2 \#d + 1) \cdot 3 \cdot 24^{\#d} \, 2^{s - \#d/2}\bigr)
+  \|f\|^{\omega}_{s,q} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The levels $Q_0 f$ and $Q_{k+1} f - Q_k f$ add up to $Q_J f$, which tends to $f$ by
+\Cref{lem:quasi-jackson}; their norms are summable since
+$\omega(f, 2^{-k})_2 \leq 2^{-ks} \|f\|^{\omega}_{s,q}$. By \Cref{lem:piece-coefficients} the
+level $k + 1$ contributes
+$2^{(k+1)(s - \#d/2)} \|\lambda_{k+1,\cdot}\|_{\ell_2} \leq (2 \#d + 1) \cdot 3 \cdot 24^{\#d} \,
+2^{s - \#d/2} \, 2^{ks} \omega(f, 2^{-k})_2$, and the level $0$ at most $\|f\|_2$.
+\end{proof}
+
+\begin{theorem}[Lipschitz-atomic characterisation]
+\label{thm:lip-characterisation}
+\lean{Torus.memBesov_iff_exists_lipAtoms}
+\leanok
+\uses{thm:lip-analysis, thm:lip-synthesis, thm:moduli-coincidence}
+Let $0 < s < 1$ and $1 \leq q \leq \infty$. Then $f \in \Besov{s}{2}{q}(\T^d)$ if and only if
+$f = \sum_j \sum_m \lambda_{j,m} a_{j,m}$ in $L_2(\T^d)$ with Lipschitz atoms of support radius
+$1$ and $\|\lambda\|_{b^s_{2,q}} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:lip-analysis} with \Cref{thm:moduli-coincidence}, and \Cref{thm:lip-synthesis} for
+the converse.
+\end{proof}
+
+This is the characterisation of Schneider and Vyb\'{\i}ral~\cite{SchneiderVybiral} on $\T^d$
+for $p = 2$.
 
 \bpbibheading
 \begin{thebibliography}{99}

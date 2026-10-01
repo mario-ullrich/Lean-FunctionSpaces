@@ -32,6 +32,8 @@ public import FunctionSpaces.Classical.BesovModuli
 public import FunctionSpaces.Classical.SobolevDeriv
 public import FunctionSpaces.Traces.Examples.Torus
 public import FunctionSpaces.Atoms.Examples.Torus
+public import FunctionSpaces.Atoms.Examples.TorusHat
+public import FunctionSpaces.Atoms.Examples.TorusAnalysis
 
 /-!
 # Function spaces
@@ -91,4 +93,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)`, bounded and onto.
 * `FunctionSpaces.Atoms.Examples.Torus`: Lipschitz atoms on `𝕋^d` as an atomic system for the
   trigonometric scheme in `L_2`, and synthesis `b^s_{2,q} → B^s_{2,q}(𝕋^d)` for `0 < s < 1`.
+* `FunctionSpaces.Atoms.Examples.TorusHat`: hat functions on the circle and the torus and their
+  partitions of unity.
+* `FunctionSpaces.Atoms.Examples.TorusAnalysis`: decomposition of `f ∈ B^s_{2,q}(𝕋^d)` into
+  Lipschitz atoms through quasi-interpolants, and the Lipschitz-atomic characterisation.
 -/
