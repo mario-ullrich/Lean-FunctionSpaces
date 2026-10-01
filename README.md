@@ -79,6 +79,13 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `.interpNorm_le_approxNormDyadic_of_bernstein`). In particular two schemes with Jackson and
   Bernstein inequalities of the same order for the same `ι` have the same approximation
   spaces (`ApproximationScheme.approxSpace_eq_of_jackson_bernstein`).
+* **Besov spaces through moduli of smoothness.** For `f ∈ L_2(𝕋^d)` let
+  `ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`. Jackson's theorem
+  `E_n(f)_2² ≤ d ω(f, 1/n)_2²` holds (`Torus.approxSeq_sq_le_card_mul_modulus_sq`), and for
+  `0 < s < 1` and `1 ≤ q ≤ ∞`, `f ∈ B^s_{2,q}(𝕋^d)` iff
+  `‖f‖_2 + ‖(2^(js) ω(f, 2^(-j))_2)_j‖_{ℓ_q} < ∞`, with equivalent norms
+  (`Torus.memBesov_iff_modulusNorm_lt_top`, `Torus.approxNormDyadic_le_modulusNorm`,
+  `Torus.modulusNorm_le_approxNormDyadic`).
 * **Atomic decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with atoms `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
@@ -167,7 +174,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | The torus: `H^s(𝕋^d)`, Besov and Sobolev embeddings, `H^s(𝕋^d) ↪ C(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Torus/{Sobolev,Embeddings}.lean` |
 | Filtration schemes (Haar), martingale-difference characterisation | ✅ proved | ✗ | `FunctionSpaces/Atoms/Filtration.lean` |
 | Haar coefficients of the dyadic filtration on `[0, 1)` | ⬜ planned | ✗ | `FunctionSpaces/Atoms/…` |
-| Classical definitions by derivatives and differences, coincidence | ⬜ planned | ✗ | `FunctionSpaces/Classical/…` |
+| Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ proved | ✗ | `FunctionSpaces/Classical/{Translation,Modulus,BesovModuli}.lean` |
+| Classical definitions for `p ≠ 2`, higher differences, weak derivatives | ⬜ planned | ✗ | `FunctionSpaces/Classical/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author ·

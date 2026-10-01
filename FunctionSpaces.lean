@@ -24,6 +24,9 @@ public import FunctionSpaces.Torus.Embeddings
 public import FunctionSpaces.Spectral.Blocks
 public import FunctionSpaces.Torus.Coefficients
 public import FunctionSpaces.Atoms.Filtration
+public import FunctionSpaces.Classical.Translation
+public import FunctionSpaces.Classical.Modulus
+public import FunctionSpaces.Classical.BesovModuli
 
 /-!
 # Function spaces
@@ -67,4 +70,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Atoms.Filtration`: conditional expectations as contractions on `L_p`,
   filtration schemes (the Haar system for the dyadic filtration) and the characterisation of
   their approximation spaces by martingale differences.
+* `FunctionSpaces.Classical.Translation`: translations on `L_2(𝕋^d)` and their Fourier
+  multipliers.
+* `FunctionSpaces.Classical.Modulus`: the modulus of smoothness `ω(f, t)_2` and Jackson's
+  theorem `E_n(f)_2 ≤ √d ω(f, 1/n)_2`.
+* `FunctionSpaces.Classical.BesovModuli`: the classical Besov norm through the modulus and
+  the coincidence theorem with `B^s_{2,q}(𝕋^d)` for `0 < s < 1`.
 -/
