@@ -49,6 +49,7 @@ public import FunctionSpaces.Interval.Periodic
 public import FunctionSpaces.Interval.PiecewisePeriodic
 public import FunctionSpaces.Interval.LocalProjection
 public import FunctionSpaces.Interval.BSpline
+public import FunctionSpaces.Interval.Splines
 
 /-!
 # Function spaces
@@ -142,4 +143,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   polynomials in `L_p[0, 1]`.
 * `FunctionSpaces.Interval.BSpline`: cardinal B-splines, the B-spline basis of the polynomials on
   a unit interval, and Marsden's identity.
+* `FunctionSpaces.Interval.Splines`: dyadic splines on `[0, 1]` in jump form, their scheme, and the
+  dyadic B-splines as splines.
 -/

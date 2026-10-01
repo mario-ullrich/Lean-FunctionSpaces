@@ -3387,6 +3387,57 @@ coordinate $j$ of $P(\cdot + i)$. By induction the coordinate $j$ on $[i, i+1)$ 
 $c_{i-j}(P)$, and $\beta_j(x - i) = N_r(x - (i - j))$ there.
 \end{proof}
 
+\section{Dyadic splines}
+
+\begin{lemma}[Spline joins]
+\label{lem:spline-joins}
+\lean{Interval.exists_eq_C_mul_pow_iff}
+\leanok
+Let $r \geq 1$, $\xi \in \C$ and $P$ a polynomial of degree $< r$. Then
+$P = c (x - \xi)^{r-1}$ for some $c \in \C$ if and only if $P^{(i)}(\xi) = 0$ for all $i < r - 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If the derivatives vanish, $\xi$ is a root of multiplicity $\geq r - 1$, so $(x - \xi)^{r-1}$
+divides $P$, and the quotient has degree $0$.
+\end{proof}
+
+\begin{definition}[Dyadic splines]
+\label{def:spline-space}
+\lean{Interval.SplineJoins, Interval.splineJoins_zero, Interval.SplineJoins.add,
+  Interval.SplineJoins.const_mul, Interval.SplineJoins.sum, Interval.SplineJoins.refine,
+  Interval.splineSpace, Interval.splineSpace_le_ppSpace, Interval.splineSpace_mono,
+  Interval.splineApproximants, Interval.splineApproximants_mono, Interval.splineScheme,
+  Interval.mem_splineScheme_two_pow, Interval.splineScheme_isLinear}
+\leanok
+\uses{def:pp-scheme, lem:spline-joins}
+Let $r \geq 1$. The space $S_k \subseteq V_k$ of splines of order $r$ and level $k$ consists of
+the piecewise polynomials of degree $< r$ on the intervals $I_{k,n}$ whose pieces $Q_n$ satisfy
+$Q_n - Q_{n-1} = c_n (x - n 2^{-k})^{r-1}$ at every interior knot, $0 < n < 2^k$. By
+\Cref{lem:spline-joins} these are the piecewise polynomials that are $(r-2)$ times continuously
+differentiable. The spaces $S_k$ increase in $k$, and the spline scheme has $A_n = S_{\lfloor
+\log_2 n \rfloor}$ for $n \geq 1$.
+\end{definition}
+
+\begin{lemma}[Dyadic B-splines are splines]
+\label{lem:bspline-dyadic}
+\lean{Interval.bsplinePieces, Interval.bsplinePieces_mem, Interval.X_sub_C_pow_comp_affine,
+  Interval.bsplinePiece_zero, Interval.splineJoins_bsplinePieces, Interval.polyFun_bsplinePieces}
+\leanok
+\uses{def:spline-space, lem:bspline-pieces}
+For $n \in \Z$ the B-spline $N_r(2^k x - n)$ is on $I_{k,m}$ the polynomial
+$B_{m-n}(2^k x - n)$ if $0 \leq m - n \leq r$ and $0$ otherwise, and these pieces have spline
+joins.
+\end{lemma}
+
+\begin{proof}
+\leanok
+At the knot $m 2^{-k}$ the pieces differ by $(B_d - B_{d-1})(2^k x - n)$, $d = m - n$, a multiple
+of $(2^k x - m)^{r-1}$ by \Cref{lem:bspline-pieces}; at the ends of the support one of the two
+pieces is $0$ and the other is $B_0$ or $B_{r-1} = B_{r-1} - B_r$.
+\end{proof}
+
 \bpbibheading
 \begin{thebibliography}{99}
 
