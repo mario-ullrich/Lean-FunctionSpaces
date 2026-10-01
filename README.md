@@ -77,6 +77,15 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `‖(2^(kα) ∑_{i ≥ 0} b_{k+i})_k‖_{ℓ_q} ≤ (1 - 2^(-α))⁻¹ ‖(2^(kα) b_k)_k‖_{ℓ_q}` and
   `‖(2^(-kα) ∑_{j ≤ k} b_j)_k‖_{ℓ_q} ≤ (1 - 2^(-α))⁻¹ ‖(2^(-kα) b_k)_k‖_{ℓ_q}`
   (`ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`).
+* **Besov embeddings.** Let `μ` be a finite measure on `Ω` and `S` a scheme of bounded
+  continuous functions with the Nikolskii property of dimension `D ≥ 0`: for every
+  `1 ≤ p ≤ ∞` there is `C` with `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all `a ∈ S_n`, `n ≥ 1`. Let
+  `1 ≤ p ≤ r ≤ ∞`, `1 ≤ q ≤ ∞` and `α = D (1/p - 1/r) < s`. Then every `f ∈ B^s_{p,q}`
+  belongs to `L_r` and to `B^{s-α}_{r,q}`, with `‖f‖_{B^{s-α}_{r,q}} ≤ K ‖f‖_{B^s_{p,q}}`
+  (`FunctionScheme.MemBesov.exists_inclusion_eq_of_nikolskii`,
+  `FunctionScheme.exists_inclusion_eq_of_nikolskii`). If `μ` charges every nonempty open
+  set and `s > D/p`, every `f ∈ B^s_{p,q}` has a bounded continuous representative
+  (`FunctionScheme.MemBesov.exists_boundedContinuous`).
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -99,7 +108,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | K-functional, real interpolation, representation theorem | ⬜ planned | ✗ | `ApproximationSpaces/{KFunctional,Interpolation,Representation}.lean` |
 | Atomic decompositions, projection schemes | ⬜ planned | ✗ | `ApproximationSpaces/{Decomposition,Projection}.lean` |
 | Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces, elementary embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Inclusion,Lp/BoundedContinuous,Scheme,Besov/Basic,Besov/Trivial}.lean` |
-| Besov embeddings from a Nikolskii inequality | ⬜ planned | ✗ | `FunctionSpaces/Besov/Embeddings.lean` |
+| Interpolation `L_p`–`L_∞`, Nikolskii property, Besov embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Interpolation,Besov/Nikolskii,Besov/Embeddings}.lean` |
 | Smoothness spaces and Sobolev embeddings | ⬜ planned | ✗ | `FunctionSpaces/Smoothness/…` |
 | Spectral schemes and `L_2` Sobolev spaces | ⬜ planned | ✗ | `FunctionSpaces/Spectral/…` |
 | The torus: Nikolskii inequality, `W^s_2(𝕋^d) ↪ C(𝕋^d)` | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |

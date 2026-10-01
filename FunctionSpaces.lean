@@ -11,6 +11,9 @@ public import FunctionSpaces.Lp.BoundedContinuous
 public import FunctionSpaces.Scheme
 public import FunctionSpaces.Besov.Basic
 public import FunctionSpaces.Besov.Trivial
+public import FunctionSpaces.Lp.Interpolation
+public import FunctionSpaces.Besov.Nikolskii
+public import FunctionSpaces.Besov.Embeddings
 
 /-!
 # Function spaces
@@ -29,4 +32,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `FunctionScheme.toLp` to every `L_p(μ)`, compatible with the inclusions.
 * `FunctionSpaces.Besov.Basic`: the Besov spaces `B^s_{p,q}(Ω, S) = A^s_q(L_p(μ), S)`.
 * `FunctionSpaces.Besov.Trivial`: the embeddings that need no property of the scheme.
+* `FunctionSpaces.Lp.Interpolation`: `‖f‖_r ≤ ‖f‖_∞^(1-p/r) ‖f‖_p^(p/r)`.
+* `FunctionSpaces.Besov.Nikolskii`: the Nikolskii property of a scheme and the Nikolskii
+  inequality `‖a‖_r ≲ n^(D(1/p-1/r)) ‖a‖_p` it implies.
+* `FunctionSpaces.Besov.Embeddings`: the Besov embeddings into `B^{s-α}_{r,q}`, `L_∞` and
+  bounded continuous functions.
 -/
