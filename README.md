@@ -367,6 +367,30 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   Rychkov's extension (`Rd.LocalMeansBump.exists_local_extension`) with a smooth resolution of
   unity; smooth functions with bounded derivatives are pointwise multipliers of the Besov spaces
   by differences (`Rd.modNorm_mulLp_le`).
+* **Atomic decompositions.** Let `1 ≤ p < ∞`. A regular atom of level `j`, order `r` and
+  exponent `σ` with centre `c` vanishes outside `B(c, d 2^(-j))` and has `‖a‖_p ≤ C 2^(-jn/p)` and
+  `‖Δ_h^r a‖_p ≤ C 2^(-jn/p) min(1, (2^j ‖h‖)^σ)` (`Rd.IsRegularAtom`). If at every level at most
+  `N` centres of atoms with nonzero coefficients lie in a ball of radius `(d + r) 2^(-j)`, and
+  `F = ∑_j ∑_m λ_{j,m} a_{j,m}` in `L_p(V)`, then for `0 < s < σ` and `1 ≤ q ≤ ∞`,
+  `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ K ‖(2^(j(s - n/p)) ‖λ_{j,·}‖_{ℓ_p})_j‖_{ℓ_q}`
+  (`Rd.modNorm_le_coeffNorm`). Conversely, the terms `η_j ⋆ (k_j ⋆ F)` of the reproducing formula
+  split along the dyadic cells `P_{j,m}` into regular atoms of every order, with the coefficients
+  `λ_{j,m} = 2^(jn/p) ‖1_{P_{j,m}} (k_j ⋆ F)‖_p` (`Rd.LocalMeansBump.atomic_decomposition`). Hence
+  for `0 < s < L`, `F ∈ L_p(V)` has `‖F‖_p + ‖(2^(ks) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff it has
+  such an atomic decomposition with atoms of order and exponent `L` and finite coefficient
+  quasi-norm (`Rd.LocalMeansBump.besov_iff_atomic`).
+* **Traces on Lipschitz graph domains.** Let `Ω` be a Lipschitz graph domain as above, with
+  Lipschitz constant `M`, and `H = e^⊥`. The boundary of `Ω` is the image of the graph map
+  `γ(x') = x' + φ(x') e`, `x' ∈ H` (`Rd.LipschitzGraph.graphMap`). For `f ∈ L_p(V)` the trace
+  `Tr f = ∑_j (η_j ⋆ 1_Ω (k_j ⋆ f)) ∘ γ`, with the kernels of the cone bump, is a function in
+  `L_p(H)` (`Rd.LipschitzGraph.trace`). For `1 ≤ p < ∞`, `0 < s < 1` and `1 ≤ q ≤ ∞` there is
+  `K < ∞` with
+  `‖Tr f‖_{L_p(H)} + ‖(2^(ks) ω_1(Tr f, 2^(-k))_p)_k‖_{ℓ_q} ≤ K (‖f‖_{L_p(Ω)} +
+  ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})` (`Rd.LipschitzGraph.modNorm_trace_le`), and
+  `Tr f = G ∘ γ` almost everywhere if `f` has a continuous representative `G`
+  (`Rd.LipschitzGraph.trace_ae_eq_comp_graphMap`). The cell atoms of the terms restrict to atoms of
+  order `1` on `H` (`Rd.LipschitzGraph.isRegularAtom_comp_graphMap`), and the atomic synthesis on
+  `H` gives the bound.
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -446,6 +470,11 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Pointwise multipliers on `ℝ^d`: Leibniz's rule for differences, moduli of lower order | ✅ proved | ✗ | `FunctionSpaces/Rd/Multipliers.lean` |
 | Local versions of Rychkov's extension: boundary and inner patches | ✅ proved | ✗ | `FunctionSpaces/Rd/LocalExtension.lean` |
 | Bounded Lipschitz domains: restrictions by intrinsic differences | ✅ proved | ✗ | `FunctionSpaces/Rd/BoundedLipschitz.lean` |
+| Dyadic cells of `ℝ^d` and the counting of their centres | ✅ proved | ✗ | `FunctionSpaces/Rd/DyadicGrid.lean` |
+| Atomic synthesis: bounded overlap, regular atoms, coefficient quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/AtomSynthesis.lean` |
+| Atomic decomposition by cell atoms, atomic characterisation of Besov spaces | ✅ proved | ✗ | `FunctionSpaces/Rd/AtomAnalysis.lean` |
+| Graph map of a Lipschitz graph domain, restrictions of atoms to the graph | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphParametrization.lean` |
+| Traces on Lipschitz graph domains: boundedness, trace of continuous functions | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTrace.lean` |
 | Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
@@ -465,7 +494,8 @@ schemes of bounded continuous functions on a finite measure space and their embe
 theorems, spectral schemes in Hilbert spaces, the torus with its traces and Lipschitz atoms,
 `ℝ^d` with convolution, approximate identities, Littlewood–Paley decompositions, moduli of
 smoothness and local means, Lipschitz graph domains and bounded Lipschitz domains with Rychkov's
-extension and pointwise multipliers, filtration schemes for wavelets and multiwavelets, the
+extension and pointwise multipliers, atomic decompositions, traces on Lipschitz graph domains,
+filtration schemes for wavelets and multiwavelets, the
 classical definitions through moduli of smoothness and weak derivatives, and polynomial and
 piecewise polynomial approximation on intervals and on the cube `[0, 1]^d`.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
@@ -538,6 +568,10 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * V. S. Rychkov, *On restrictions and extensions of the Besov and Triebel–Lizorkin spaces with
   respect to Lipschitz domains*, J. London Math. Soc. (2) **60** (1999), no. 1, 237–257. The
   universal extension operator for Lipschitz domains.
+* C. Schneider, J. Vybíral, *Non-smooth atomic decompositions, traces on Lipschitz domains, and
+  pointwise multipliers in function spaces*, preprint, 2012,
+  [arXiv:1201.2280](https://arxiv.org/abs/1201.2280). Atoms with bounds instead of smoothness, and
+  traces on Lipschitz domains through atoms.
 * V. Temlyakov, *Multivariate Approximation*, Cambridge University Press, 2018. Periodic
   function spaces and trigonometric approximation.
 * H. Triebel, *Theory of Function Spaces*, Birkhäuser, 1983. Besov and Sobolev spaces and

@@ -6652,6 +6652,515 @@ cover $\overline\Omega$, \Cref{lem:bounded-patches} gives the local extensions, 
 \Cref{lem:pasting} pastes them. (2) and (3) agree by \Cref{thm:rd-besov}.
 \end{proof}
 
+\section{Atoms}
+
+Atoms are functions of small support with size bounds at a dyadic scale. As in Schneider and
+Vyb\'{\i}ral~\cite{SchneiderVybiral}, they need no moment conditions and no smoothness beyond the
+order of the differences that measure them.
+
+\begin{definition}[Dyadic cells]
+\label{def:dyadic-cells}
+\lean{Rd.gridBasis, Rd.cellIndex, Rd.cell, Rd.cellCenter, Rd.mem_cell_cellIndex,
+  Rd.repr_cellCenter, Rd.measurable_cellIndex, Rd.measurableSet_cell}
+\leanok
+Let $(b_i)$ be an orthonormal basis of $V$. For $j \in \N$ and $m \in \Z^n$ the dyadic cell of
+level $j$ and index $m$ is
+$P_{j,m} = \{x \in V : \lfloor 2^j \langle b_i, x \rangle \rfloor = m_i \text{ for all } i\}$,
+with centre $c_{j,m} = \sum_i (m_i + 1/2) 2^{-j} b_i$. Every $x$ lies in the cell of index
+$(\lfloor 2^j \langle b_i, x \rangle \rfloor)_i$, and the cells are measurable.
+\end{definition}
+
+\begin{lemma}[Cells and centres]
+\label{lem:dyadic-cells}
+\lean{Rd.abs_repr_le_norm, Rd.abs_repr_sub_cellCenter_le, Rd.norm_sub_cellCenter_le,
+  Rd.card_le_of_norm_cellCenter_sub_le}
+\leanok
+\uses{def:dyadic-cells}
+For $x \in P_{j,m}$ every coordinate of $x - c_{j,m}$ is at most $2^{-j}/2$ in modulus, and
+$\|x - c_{j,m}\| \leq n 2^{-j}$. For $\rho \geq 0$ at most $(2\rho + 2)^n$ centres of level $j$ lie
+in a closed ball of radius $\rho 2^{-j}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The coordinates of the centres in such a ball lie in intervals of length $2 \rho 2^{-j}$, and such
+an interval contains at most $2\rho + 2$ points of $(\Z + 1/2) 2^{-j}$.
+\end{proof}
+
+\begin{lemma}[Bounded overlap]
+\label{lem:bounded-overlap}
+\lean{Rd.exists_finset_of_card_le, Rd.enorm_tsum_rpow_le_of_overlap, Rd.eLpNorm_rpow_le_of_overlap}
+\leanok
+Let $1 \leq p < \infty$ and let $g_m$, $m$ in a countable set, be measurable functions such that at
+every point at most $N$ of them are nonzero. If $F = \sum_m g_m$ almost everywhere, then
+$\|F\|_p^p \leq N^{p-1} \sum_m \|g_m\|_p^p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+At every point the sum has at most $N$ nonzero terms, and
+$|\sum_{m \in T} a_m|^p \leq |T|^{p-1} \sum_{m \in T} |a_m|^p$ by H\"older's inequality. Integrate
+and exchange the sum with the integral.
+\end{proof}
+
+\begin{definition}[Regular atoms and the coefficient quasi-norm]
+\label{def:regular-atoms}
+\lean{Rd.IsRegularAtom, Rd.levelNorm, Rd.levelNorm_mono, Rd.coeffNorm}
+\leanok
+Let $1 \leq p < \infty$, $\sigma \geq 0$, $r \in \N$ and $d, C \geq 0$. A regular atom of level
+$j$, exponent $\sigma$ and order $r$ with centre $c$ is a measurable $a : V \to \C$ with $a = 0$
+outside $\overline{B}(c, d 2^{-j})$,
+\[
+  \|a\|_p \leq C 2^{-jn/p} \quad\text{and}\quad
+  \|\Delta_h^r a\|_p \leq C 2^{-jn/p} \min(1, (2^j \|h\|)^\sigma) \quad (h \in V).
+\]
+For coefficients $\lambda = (\lambda_{j,m})$ let
+$\|\lambda_{j,\cdot}\|_{\ell_p} = (\sum_m |\lambda_{j,m}|^p)^{1/p}$ and
+$\|\lambda\|_{b^s_{p,q}} = \|(2^{j(s - n/p)} \|\lambda_{j,\cdot}\|_{\ell_p})_j\|_{\ell_q}$.
+\end{definition}
+
+The Lip atoms of \cite[Definition 2.1]{SchneiderVybiral}, with $|a| \leq 1$ and
+$|a(x) - a(y)| \leq 2^j |x - y|$, are regular atoms with $\sigma = r = 1$, and their smooth atoms of
+\cite[Definition 1.3]{SchneiderVybiral} are regular atoms with $\sigma = r = K$
+(\Cref{lem:pointwise-atoms}).
+
+\begin{lemma}[Level sums]
+\label{lem:level-sums}
+\lean{Rd.iterDiff_tsum_apply, Rd.le_of_rpow_le_overlap, Rd.one_sub_one_div_toReal_nonneg,
+  Rd.summable_levelSum, Rd.eLpNorm_levelSum_le, Rd.modulus_levelSum_le}
+\leanok
+\uses{lem:bounded-overlap, def:regular-atoms, lem:rd-modulus}
+Let $1 \leq p < \infty$, and let $a_m$ be regular atoms of level $j$ with centres $c_m$ and
+coefficients $\lambda_m$, such that at most $N$ of the centres $c_m$ with $\lambda_m \neq 0$ lie in a
+ball of radius $(d + r) 2^{-j}$. Then $f = \sum_m \lambda_m a_m$ converges at every point, and
+\[
+  \|f\|_p \leq N^{1-1/p} C 2^{-jn/p} \|\lambda\|_{\ell_p}, \qquad
+  \omega_r(f, 2^{-k})_p \leq 2^r N^{1-1/p} C 2^{-jn/p} \|\lambda\|_{\ell_p} c_{kj},
+\]
+with $c_{kj} = 2^{-(k-j)\sigma}$ for $j \leq k$ and $c_{kj} = 1$ for $j > k$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+At every point at most $N$ of the terms are nonzero, and \Cref{lem:bounded-overlap} applies. For
+$j \leq k$ and $\|h\| \leq 2^{-k}$ the differences $\Delta_h^r a_m$ vanish outside
+$B(c_m, (d + r) 2^{-j})$, and \Cref{lem:bounded-overlap} applies to
+$\Delta_h^r f = \sum_m \lambda_m \Delta_h^r a_m$ with $(2^j \|h\|)^\sigma \leq 2^{-(k-j)\sigma}$; for
+$j > k$, $\omega_r(f, t)_p \leq 2^r \|f\|_p$.
+\end{proof}
+
+\begin{theorem}[Atomic synthesis]
+\label{thm:atomic-synthesis}
+\lean{Rd.atomSynthConst, Rd.atomSynthConst_ne_top, Rd.modNorm_le_coeffNorm}
+\leanok
+\uses{lem:level-sums, lem:almost-diagonal}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $0 < s < \sigma$. Let $a_{j,m}$ be regular atoms
+of level $j$ such that the centres of the atoms with $\lambda_{j,m} \neq 0$ satisfy the overlap
+condition of \Cref{lem:level-sums} at every level, and let $F = \sum_j f_j$ in $L_p$ with
+$f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere. Then
+\[
+  \|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq K \|\lambda\|_{b^s_{p,q}},
+\]
+with $K = N^{1-1/p} C \bigl((1 - 2^{-s})^{-1} + 2^r ((1 - 2^{-(\sigma - s)})^{-1} +
+(1 - 2^{-s})^{-1})\bigr)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+This is \cite[Theorem 2.6 and Corollary 2.8, direction $\Leftarrow$]{SchneiderVybiral} for
+$p \geq 1$. The norm and the moduli are subadditive and bounded on $L_p$, so they are bounded by the
+sums over the levels. With \Cref{lem:level-sums} and $b_j = 2^{-jn/p} \|\lambda_{j,\cdot}\|_{\ell_p}$,
+the almost diagonal lemma (\Cref{lem:almost-diagonal}) with exponent $\sigma$ sums the levels,
+since $2^{js} b_j = 2^{j(s - n/p)} \|\lambda_{j,\cdot}\|_{\ell_p}$.
+\end{proof}
+
+\begin{lemma}[Atoms from pointwise bounds]
+\label{lem:pointwise-atoms}
+\lean{Rd.eLpNorm_le_of_bound_of_support, Rd.volume_closedBall_div_two_pow,
+  Rd.rpow_mul_dyadicWeight_neg, Rd.isRegularAtom_of_pointwise,
+  Rd.enorm_iterDiff_le_of_iteratedFDeriv}
+\leanok
+\uses{def:regular-atoms, lem:smooth-differences}
+Let $a$ be measurable with $a = 0$ outside $\overline{B}(c, d 2^{-j})$, $|a| \leq A$ and
+$|\Delta_h^r a| \leq A \min(1, (2^j \|h\|)^\sigma)$. Then $a$ is a regular atom with the constant
+$A ((r + 1) d^n |B_1|)^{1/p}$. A smooth $a$ with $\|D^l a\| \leq A 2^{jl}$ for $l \leq r$ has
+$|\Delta_h^r a| \leq 2^r A \min(1, (2^j \|h\|)^r)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+A function with $|g| \leq B$ that vanishes outside $S$ has $\|g\|_p \leq B |S|^{1/p}$. The
+difference $\Delta_h^r a$ vanishes outside $r + 1$ translates of the ball, and
+$|\overline{B}(c, d 2^{-j})| = d^n |B_1| 2^{-jn}$. For smooth $a$, \Cref{lem:smooth-differences}
+gives $|\Delta_h^r a| \leq A (2^j \|h\|)^r$, and $|\Delta_h^r a| \leq 2^r \sup |a|$.
+\end{proof}
+
+\section{Atomic decompositions}
+
+\begin{lemma}[The cells partition the space]
+\label{lem:cells-partition}
+\lean{Rd.cell_disjoint, Rd.iUnion_cell, Rd.lintegral_eq_tsum_cell, Rd.eLpNorm_rpow_eq_tsum_cell,
+  Rd.card_le_of_norm_sub_cellCenter_le}
+\leanok
+\uses{def:dyadic-cells, lem:dyadic-cells}
+The cells of one level are disjoint and cover $V$. Hence $\int F = \sum_m \int_{P_{j,m}} F$ for
+$F \geq 0$ and $\|g\|_p^p = \sum_m \|1_{P_{j,m}} g\|_p^p$. At most
+$\lceil (2\rho + 2)^n \rceil$ centres of level $j$ lie in a ball of radius $\rho 2^{-j}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Countable additivity of the integral, and \Cref{lem:dyadic-cells}.
+\end{proof}
+
+\begin{lemma}[Pointwise bounds of convolutions]
+\label{lem:conv-pointwise}
+\lean{Rd.lintegral_closedBall_le, Rd.lintegral_kernel_mul_le, Rd.enorm_conv_le_of_bound,
+  Rd.integrable_translate_mul, Rd.conv_add_apply, Rd.iterDiff_conv_apply,
+  Rd.enorm_iterDiff_le_of_bound}
+\leanok
+\uses{def:conv}
+Let $1 \leq p < \infty$, $g \in L_p$, and $|K| \leq A$ with $K = 0$ outside $\overline{B}(0, \rho)$.
+Then $\int_{\overline{B}(x, \rho)} |g| \leq |\overline{B}(x, \rho)|^{1 - 1/p} \|g\|_p$ and
+\[
+  |(K * g)(x)| \leq A |\overline{B}(0, \rho)|^{1-1/p} \|g\|_p \quad (x \in V).
+\]
+For a continuous $K$ with compact support the integrals $\int K(y + v) g(x - y) \, dy$ converge
+absolutely, they equal $(K * g)(x + v)$, and $\Delta_h^r (K * g) = (\Delta_h^r K) * g$ at every point.
+If $|f| \leq B$, then $|\Delta_h^r f| \leq 2^r B$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+H\"older's inequality on the ball, and the translation invariance of the Lebesgue measure; the
+differences are finite sums of translates.
+\end{proof}
+
+\begin{definition}[Cell atoms]
+\label{def:cell-atoms}
+\lean{Rd.cellCoef, Rd.cellAtom, Rd.enorm_cellCoef, Rd.cellCoef_mul_cellAtom}
+\leanok
+\uses{def:dyadic-cells}
+For $1 \leq p < \infty$, a kernel $K$ and $g \in L_p$, the coefficients of the cells of level $j$
+are $\lambda_{j,m} = 2^{jn/p} \|1_{P_{j,m}} g\|_p$, and the cell atoms are
+$a_{j,m} = \lambda_{j,m}^{-1} K * (1_{P_{j,m}} g)$, with $a_{j,m} = 0$ if $\lambda_{j,m} = 0$.
+Then $\lambda_{j,m} a_{j,m} = K * (1_{P_{j,m}} g)$.
+\end{definition}
+
+\begin{lemma}[Cell decomposition of a convolution]
+\label{lem:cell-decomposition}
+\lean{Rd.conv_eq_tsum_cellAtom, Rd.continuous_cellAtom}
+\leanok
+\uses{def:cell-atoms, lem:cells-partition, lem:conv-pointwise}
+Let $K$ be continuous with $K = 0$ outside $\overline{B}(0, \rho)$, and $g \in L_p$. Then
+$(K * g)(x) = \sum_m \lambda_{j,m} a_{j,m}(x)$ at every $x \in V$, with finitely many nonzero terms,
+and the cell atoms are continuous.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Only the finitely many cells that meet $\overline{B}(x, \rho)$ contribute, and on this ball their
+indicators add up to $1$.
+\end{proof}
+
+\begin{lemma}[Cell atoms are atoms]
+\label{lem:cell-atoms-regular}
+\lean{Rd.cellAtom_eq_zero, Rd.volume_closedBall_div_two_pow_rpow,
+  Rd.enorm_inv_cellCoef_mul_conv_le, Rd.enorm_cellAtom_le, Rd.enorm_iterDiff_cellAtom_le,
+  Rd.cellAtomConst, Rd.cellAtomConst_ne_top, Rd.isRegularAtom_cellAtom}
+\leanok
+\uses{lem:cell-decomposition, lem:conv-pointwise, lem:pointwise-atoms}
+Let $K$ be continuous with $K = 0$ outside $\overline{B}(0, \rho 2^{-j})$ and
+$|\Delta_h^l K| \leq A 2^{jn} \min(1, (2^j \|h\|)^l)$ for $l \in \{0, r\}$. Then the cell atoms of
+level $j$ vanish outside $\overline{B}(c_{j,m}, (\rho + n) 2^{-j})$,
+\begin{gather*}
+  |a_{j,m}| \leq A (\rho^n |B_1|)^{1 - 1/p}, \\
+  |\Delta_h^r a_{j,m}| \leq 2^r A ((\rho + r)^n |B_1|)^{1 - 1/p} \min(1, (2^j \|h\|)^r),
+\end{gather*}
+so they are regular atoms of order and exponent $r$ with radius factor $\rho + n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:conv-pointwise} with $\lambda_{j,m} = 2^{jn/p} \|1_{P_{j,m}} g\|_p$: the factors
+$2^{jn}$, $|\overline{B}(0, \rho 2^{-j})|^{1-1/p} = (\rho^n |B_1|)^{1-1/p} 2^{-jn(1-1/p)}$ and
+$2^{-jn/p}$ cancel. For $\|h\| \leq 2^{-j}$ the kernel $\Delta_h^r K$ of $\Delta_h^r a_{j,m}$
+vanishes outside $\overline{B}(0, (\rho + r) 2^{-j})$; for larger $h$,
+$|\Delta_h^r a_{j,m}| \leq 2^r \sup |a_{j,m}|$. \Cref{lem:pointwise-atoms} concludes.
+\end{proof}
+
+\begin{lemma}[The coefficients of the cells]
+\label{lem:cell-coefficients}
+\lean{Rd.levelNorm_cellCoef, Rd.coeffNorm_cellCoef}
+\leanok
+\uses{lem:cells-partition, def:cell-atoms}
+$\|\lambda_{j,\cdot}\|_{\ell_p} = 2^{jn/p} \|g\|_p$. Hence the cell coefficients of $g_j \in L_p$
+have $\|\lambda\|_{b^s_{p,q}} = \|(2^{js} \|g_j\|_p)_j\|_{\ell_q}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:cells-partition}.
+\end{proof}
+
+\begin{lemma}[Bounds of the dual kernels]
+\label{lem:dual-kernel-bounds}
+\lean{Rd.ofReal_two_pow_pow, Rd.LocalMeansBump.scaled_eq_zero_of_lt,
+  Rd.LocalMeansBump.dual_eq_zero_of_lt, Rd.LocalMeansBump.hasCompactSupport_dual,
+  Rd.LocalMeansBump.continuous_dual, Rd.LocalMeansBump.exists_iterDiff_dual_bound}
+\leanok
+\uses{def:local-means, lem:smooth-differences, lem:resolution-of-unity, lem:rd-differences}
+For a bump $g$ of radius $R$ and $L, r \in \N$, the kernels $m_{2^j}$ and $\eta_j$ are continuous
+and vanish outside $\overline{B}(0, L R 2^{-j})$ and $\overline{B}(0, 2 L R 2^{-j})$, and there is
+$A < \infty$ with $|\Delta_h^l \eta_j| \leq A 2^{jn} \min(1, (2^j \|h\|)^l)$ for all $l \leq r$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The moment kernel is smooth with compact support, so its derivatives are bounded
+(\Cref{lem:resolution-of-unity}). \Cref{lem:smooth-differences} bounds its differences, and
+$\Delta_h^l (\Phi_c) = (\Delta_{ch}^l \Phi)_c$ for the dilations (\Cref{lem:rd-differences}).
+\end{proof}
+
+\begin{theorem}[Atomic decomposition]
+\label{thm:atomic-decomposition}
+\lean{Rd.LocalMeansBump.atomic_decomposition}
+\leanok
+\uses{lem:reproducing-formula, lem:cell-decomposition, lem:cell-atoms-regular,
+  lem:cell-coefficients, lem:dual-kernel-bounds}
+Let $g$ be a bump of radius $R$, $1 \leq p < \infty$ and $L, r \in \N$. There is $C < \infty$ such
+that for every $F \in L_p$ the terms of the reproducing formula $F = \sum_j \eta_j * (k_j * F)$
+(\Cref{lem:reproducing-formula}) are $\eta_j * (k_j * F) = \sum_m \lambda_{j,m} a_{j,m}$ almost
+everywhere, with the cell atoms of $k_j * F$; these are regular atoms of order and exponent $r$
+with radius factor $2LR + n$ and constant $C$, and
+$\|\lambda\|_{b^s_{p,q}} = \|(2^{js} \|k_j * F\|_p)_j\|_{\ell_q}$ for all $s$ and $q$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{lem:cell-decomposition} for the kernels $\eta_j$, whose bounds
+(\Cref{lem:dual-kernel-bounds}) make the cell atoms regular (\Cref{lem:cell-atoms-regular}), and
+\Cref{lem:cell-coefficients} for the coefficients.
+\end{proof}
+
+\begin{theorem}[Atomic characterisation of Besov spaces]
+\label{thm:atomic-characterisation}
+\lean{Rd.LocalMeansBump.besov_iff_atomic}
+\leanok
+\uses{thm:atomic-decomposition, thm:atomic-synthesis, thm:local-means, lem:cells-partition}
+Let $1 \leq p < \infty$, $L \geq 1$, $0 < s < L$, $1 \leq q \leq \infty$ and $F \in L_p$. Then
+$\|F\|_p + \|(2^{ks} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$ if and only if
+$F = \sum_j f_j$ in $L_p$ with $f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, for regular
+atoms of order and exponent $L$ whose centres satisfy the overlap condition of
+\Cref{lem:level-sums}, and $\|\lambda\|_{b^s_{p,q}} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+This is \cite[Theorem 2.6]{SchneiderVybiral} for $p \geq 1$. If the norm is finite, so is the local
+means quasi-norm (\Cref{thm:local-means}), and \Cref{thm:atomic-decomposition} with $r = L$ gives
+the decomposition, with the overlap of \Cref{lem:cells-partition}. The converse is
+\Cref{thm:atomic-synthesis} with $\sigma = r = L$.
+\end{proof}
+
+\section{Traces on Lipschitz graph domains}
+
+Let $\Omega = \{x : \phi(x) < \langle x, e \rangle\}$ be a Lipschitz graph domain
+(\Cref{def:lipschitz-graph}) with Lipschitz constant $M$. Its boundary is the graph of $\phi$ over
+the hyperplane $H = e^\perp$, of dimension $n - 1$ with its Lebesgue measure, and the trace is a
+function on $H$.
+
+\begin{definition}[The graph map]
+\label{def:graph-map}
+\lean{Rd.LipschitzGraph.hyperplane, Rd.LipschitzGraph.e_ne_zero, Rd.LipschitzGraph.inner_e_self,
+  Rd.LipschitzGraph.inner_coe_e, Rd.LipschitzGraph.sub_inner_smul_mem,
+  Rd.LipschitzGraph.finrank_hyperplane_add_one, Rd.LipschitzGraph.finrank_hyperplane_eq,
+  Rd.LipschitzGraph.proj, Rd.LipschitzGraph.coe_proj, Rd.LipschitzGraph.norm_proj_le,
+  Rd.LipschitzGraph.proj_coe, Rd.LipschitzGraph.proj_e, Rd.LipschitzGraph.graphMap,
+  Rd.LipschitzGraph.proj_graphMap, Rd.LipschitzGraph.inner_graphMap,
+  Rd.LipschitzGraph.phi_graphMap, Rd.LipschitzGraph.norm_graphMap_sub_le,
+  Rd.LipschitzGraph.continuous_graphMap, Rd.LipschitzGraph.norm_sub_proj_le,
+  Rd.LipschitzGraph.graphMap_add_mem}
+\leanok
+\uses{def:lipschitz-graph, lem:graph-cone}
+Let $P x = x - \langle x, e \rangle e$ be the orthogonal projection onto $H$ and
+$\gamma(x') = x' + \phi(x') e$ for $x' \in H$. Then $P \gamma(x') = x'$,
+$\langle \gamma(x'), e \rangle = \phi(x') = \phi(\gamma(x'))$,
+$\|\gamma(x') - \gamma(y')\| \leq (1 + M) \|x' - y'\|$, $\|x' - Pc\| \leq \|\gamma(x') - c\|$, and
+$\gamma(x') + K \subseteq \Omega$ for the cone $K$ of \Cref{lem:graph-cone}.
+\end{definition}
+
+The last property holds since a step $y \in K$ raises $\langle \cdot, e \rangle$ by more than
+$M \|Py\|$ and $\phi$ by at most $M \|Py\|$.
+
+\begin{lemma}[Traces of atoms]
+\label{lem:atom-traces}
+\lean{Rd.min_one_mul_le, Rd.LipschitzGraph.isRegularAtom_comp_graphMap}
+\leanok
+\uses{def:graph-map, lem:pointwise-atoms}
+Let $a$ be continuous with $a = 0$ outside $\overline{B}(c, d 2^{-j})$, $|a| \leq A$ and
+$|a(x + h) - a(x)| \leq A \min(1, 2^j \|h\|)$. Then $a \circ \gamma$ is a regular atom on $H$ of
+level $j$, order and exponent $1$, centre $Pc$, radius factor $d$ and constant
+$(1 + M) A (2 d^{n-1} |B_1|)^{1/p}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+As in the proof of \cite[Theorem 4.2]{SchneiderVybiral}: $\|\gamma(x' + h') - \gamma(x')\| \leq
+(1 + M) \|h'\|$, and $\min(1, K t) \leq K \min(1, t)$ for $K \geq 1$; \Cref{lem:pointwise-atoms} on
+$H$.
+\end{proof}
+
+\begin{definition}[Traces of the terms]
+\label{def:trace-terms}
+\lean{Rd.LipschitzGraph.traceFun, Rd.LipschitzGraph.traceCoef,
+  Rd.LipschitzGraph.continuous_traceFun, Rd.LipschitzGraph.traceFun_eq_tsum,
+  Rd.LipschitzGraph.enorm_traceCoef_le, Rd.LipschitzGraph.levelNorm_traceCoef_le}
+\leanok
+\uses{def:graph-map, lem:cell-decomposition, lem:cell-coefficients}
+For a bump, $L \in \N$ and $h \in L_p$, the trace of the term $\eta_j * h$ is the continuous
+function $x' \mapsto (\eta_j * h)(\gamma(x'))$ on $H$. With the coefficients $\lambda'_{j,m}$ equal
+to $\lambda_{j,m}$ for the cells whose atoms meet the graph and $0$ otherwise,
+$(\eta_j * h)(\gamma(x')) = \sum_m \lambda'_{j,m} a_{j,m}(\gamma(x'))$ and
+$\|\lambda'_{j,\cdot}\|_{\ell_p} \leq 2^{jn/p} \|h\|_p$.
+\end{definition}
+
+\begin{lemma}[The trace atoms]
+\label{lem:trace-atoms}
+\lean{Rd.LipschitzGraph.exists_trace_atoms}
+\leanok
+\uses{def:trace-terms, lem:cell-atoms-regular, lem:dual-kernel-bounds, lem:atom-traces,
+  lem:cells-partition}
+There are $d \geq 0$, $C < \infty$ and $N$ such that for every level $j$ and $h \in L_p$ the
+restrictions $a_{j,m} \circ \gamma$ of the cell atoms of $\eta_j * h$ are regular atoms on $H$ of
+order and exponent $1$ with centres $P c_{j,m}$, and the centres $P c_{j,m}$ with
+$\lambda'_{j,m} \neq 0$ have overlap at most $N$ on balls of radius $(d + 1) 2^{-j}$ in $H$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The cell atoms satisfy the pointwise bounds of \Cref{lem:atom-traces} by
+\Cref{lem:cell-atoms-regular} and \Cref{lem:dual-kernel-bounds}. If $\lambda'_{j,m} \neq 0$, the
+atom meets the graph at some $\gamma(y')$ with $\|\gamma(y') - c_{j,m}\| \leq d 2^{-j}$; if moreover
+$\|x' - P c_{j,m}\| \leq (d + 1) 2^{-j}$, then
+$\|\gamma(x') - c_{j,m}\| \leq (d + (1 + M)(2d + 1)) 2^{-j}$, and \Cref{lem:cells-partition} counts
+these centres.
+\end{proof}
+
+\begin{lemma}[The traces of the terms in $L_p(H)$]
+\label{lem:trace-terms-lp}
+\lean{Rd.LipschitzGraph.eLpNorm_traceFun_le, Rd.LipschitzGraph.memLp_traceFun,
+  Rd.LipschitzGraph.traceTerm, Rd.LipschitzGraph.traceTerm_ae}
+\leanok
+\uses{lem:trace-atoms, lem:level-sums}
+There is $K < \infty$ with $\|(\eta_j * h) \circ \gamma\|_{L_p(H)} \leq K 2^{j/p} \|h\|_p$ for all
+$j$ and $h \in L_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:level-sums} on $H$, of dimension $n - 1$, with \Cref{lem:trace-atoms}:
+$2^{-j(n-1)/p} \|\lambda'_{j,\cdot}\|_{\ell_p} \leq 2^{-j(n-1)/p} 2^{jn/p} \|h\|_p$.
+\end{proof}
+
+\begin{theorem}[The trace of a series]
+\label{thm:trace-series}
+\lean{Rd.LipschitzGraph.traceSeries, Rd.LipschitzGraph.summable_traceTerm,
+  Rd.LipschitzGraph.tendsto_sum_traceTerm, Rd.LipschitzGraph.modNorm_traceSeries_le}
+\leanok
+\uses{lem:trace-terms-lp, lem:trace-atoms, thm:atomic-synthesis}
+Let $1 \leq p < \infty$, $0 < s < 1$ and $1 \leq q \leq \infty$. There is $K < \infty$ such that for
+$h_j \in L_p$ with $X = \|(2^{j(s + 1/p)} \|h_j\|_p)_j\|_{\ell_q} < \infty$ the series
+$\operatorname{Tr} = \sum_j (\eta_j * h_j) \circ \gamma$ converges absolutely in $L_p(H)$ and
+\[
+  \|\operatorname{Tr}\|_{L_p(H)} + \|(2^{ks} \omega_1(\operatorname{Tr}, 2^{-k})_p)_k\|_{\ell_q}
+  \leq K X.
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The terms have $\|(\eta_j * h_j) \circ \gamma\|_{L_p(H)} \leq K 2^{j/p} \|h_j\|_p \leq K X 2^{-js}$
+(\Cref{lem:trace-terms-lp}). \Cref{thm:atomic-synthesis} on $H$ with the atoms of
+\Cref{lem:trace-atoms} and $\sigma = r = 1 > s$ bounds the left side by the coefficient
+quasi-norm on $H$, and since $s - (n - 1)/p = (s + 1/p) - n/p$,
+$2^{j(s - (n-1)/p)} \|\lambda'_{j,\cdot}\|_{\ell_p} \leq 2^{j(s + 1/p)} \|h_j\|_p$.
+\end{proof}
+
+\begin{theorem}[The trace theorem on Lipschitz graph domains]
+\label{thm:trace-graph}
+\lean{Rd.LipschitzGraph.trace, Rd.LipschitzGraph.modNorm_trace_le}
+\leanok
+\uses{thm:trace-series, lem:intrinsic-upper}
+The trace of $f \in L_p$ is
+$\operatorname{Tr} f = \sum_j (\eta_j * 1_\Omega (k_j * f)) \circ \gamma$, with the kernels of the
+cone bump. Let $1 \leq p < \infty$, $0 < s < 1$, $1 \leq q \leq \infty$ and $L \in \N$. There is
+$K < \infty$ such that
+\begin{multline*}
+  \|\operatorname{Tr} f\|_{L_p(H)} + \|(2^{ks} \omega_1(\operatorname{Tr} f, 2^{-k})_p)_k\|_{\ell_q}
+  \\ \leq K \bigl( \|f\|_{L_p(\Omega)} +
+    \|(2^{k(s + 1/p)} \omega_L(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} \bigr)
+\end{multline*}
+whenever the right side is finite.
+\end{theorem}
+
+\begin{proof}
+\leanok
+This is \cite[Theorem 4.2]{SchneiderVybiral} for $p \geq 1$. \Cref{thm:trace-series} with
+$h_j = 1_\Omega (k_j * f)$, and \Cref{lem:intrinsic-upper} with smoothness $s + 1/p$.
+\end{proof}
+
+\begin{lemma}[Approximate identities at points of continuity]
+\label{lem:approx-identity-points}
+\lean{Rd.conv_dilate_near}
+\leanok
+\uses{lem:dilate}
+Let $\Phi$ be integrable with $\int \Phi = 1$ and $\Phi = 0$ outside $\overline{B}(0, R)$, and let
+$F_J(z) \to z_0$ as $J \to \infty$ and $z \to y$. Then $(\Phi_{2^J} * F_J)(z) \to z_0$ as
+$J \to \infty$ and $z \to y$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$(\Phi_{2^J} * F_J)(z) - z_0 = \int \Phi_{2^J}(w) (F_J(z - w) - z_0) \, dw$, only
+$\|w\| \leq R 2^{-J}$ enters, and $\|\Phi_{2^J}\|_1 = \|\Phi\|_1$.
+\end{proof}
+
+\begin{lemma}[The reproducing formula at every point]
+\label{lem:reproducing-pointwise}
+\lean{Rd.LocalMeansBump.hasCompactSupport_scaled, Rd.LocalMeansBump.continuous_scaled,
+  Rd.LocalMeansBump.sum_conv_dual_localMean_apply}
+\leanok
+\uses{lem:reproducing-formula, lem:dual-kernel-bounds}
+For $f \in L_p$ and every $y \in V$,
+$\sum_{j \leq J} (\eta_j * (k_j * f))(y) = (m_{2^J} * (m_{2^J} * f))(y)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both sides are continuous and agree almost everywhere by \Cref{lem:reproducing-formula}.
+\end{proof}
+
+\begin{theorem}[The trace of continuous functions]
+\label{thm:trace-continuous}
+\lean{Rd.LipschitzGraph.sum_traceFun_eq, Rd.LipschitzGraph.trace_ae_eq_comp_graphMap}
+\leanok
+\uses{thm:trace-graph, lem:approx-identity-points, lem:reproducing-pointwise,
+  lem:support-principle-two, def:graph-map}
+Let $L \geq 1$, $s > 0$, and let $f \in L_p$ have a finite norm as in \Cref{thm:trace-graph} and a
+continuous representative $G$. Then $\operatorname{Tr} f = G \circ \gamma$ almost everywhere on $H$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+At $\gamma(x')$ the cut-off does not matter, since the kernels are supported in $-K$ and
+$\gamma(x') + K \subseteq \Omega$ (\Cref{def:graph-map}, \Cref{lem:support-principle-two}), so the
+partial sums of the trace at $x'$ are $(m_{2^J} * (m_{2^J} * G))(\gamma(x'))$ by
+\Cref{lem:reproducing-pointwise}. By \Cref{lem:approx-identity-points}, applied twice, they converge
+to $G(\gamma(x'))$ for every $x'$, and a subsequence converges to $\operatorname{Tr} f$ almost
+everywhere.
+\end{proof}
+
 \bpbibheading
 \begin{thebibliography}{99}
 

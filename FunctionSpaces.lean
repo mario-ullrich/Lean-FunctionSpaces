@@ -91,6 +91,11 @@ public import FunctionSpaces.Rd.LipschitzGraphBesov
 public import FunctionSpaces.Rd.Multipliers
 public import FunctionSpaces.Rd.LocalExtension
 public import FunctionSpaces.Rd.BoundedLipschitz
+public import FunctionSpaces.Rd.DyadicGrid
+public import FunctionSpaces.Rd.AtomSynthesis
+public import FunctionSpaces.Rd.AtomAnalysis
+public import FunctionSpaces.Rd.GraphParametrization
+public import FunctionSpaces.Rd.GraphTrace
 
 /-!
 # Function spaces
@@ -277,4 +282,14 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   of Lipschitz graph domains and for inner patches.
 * `FunctionSpaces.Rd.BoundedLipschitz`: bounded Lipschitz domains, smooth resolutions of unity, and
   the restrictions of Besov spaces described by intrinsic differences.
+* `FunctionSpaces.Rd.DyadicGrid`: the dyadic cells of a finite-dimensional inner product space,
+  their centres, and the counting of centres in balls.
+* `FunctionSpaces.Rd.AtomSynthesis`: bounded overlap, regular atoms, the coefficient quasi-norm, and
+  the atomic synthesis of Besov spaces by differences.
+* `FunctionSpaces.Rd.AtomAnalysis`: cell atoms of convolutions, the atomic decomposition by local
+  means, and the atomic characterisation of Besov spaces.
+* `FunctionSpaces.Rd.GraphParametrization`: the hyperplane and the graph map of a Lipschitz graph
+  domain, and the restrictions of atoms to the graph.
+* `FunctionSpaces.Rd.GraphTrace`: the trace on the boundary of a Lipschitz graph domain, its
+  boundedness from the intrinsic Besov spaces, and the trace of continuous functions.
 -/

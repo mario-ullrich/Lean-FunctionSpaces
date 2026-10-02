@@ -48,7 +48,7 @@ open ENNReal (lqNorm dyadicWeight)
 
 namespace Rd
 
-/-! ### Resolutions of unity and bounded derivatives -/
+/-! ### Resolutions of unity -/
 
 section Partition
 
@@ -65,20 +65,6 @@ theorem exists_smooth_partition {ι : Type*} [Fintype ι] {s : Set V} (hs : IsCl
   refine ⟨fun i => f i, fun i => contMDiff_iff_contDiff.1 (f i).contMDiff, hf, fun x hx => ?_⟩
   rw [← finsum_eq_sum_of_fintype]
   exact f.sum_eq_one hx
-
-omit [FiniteDimensional ℝ V] in
-/-- **Smooth functions with compact support have bounded derivatives** up to every order. -/
-theorem exists_iteratedFDeriv_bound {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
-    {G : V → E} (hG : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) G) (hcs : HasCompactSupport G)
-    (r : ℕ) : ∃ C : ℝ, ∀ l ≤ r, ∀ x, ‖iteratedFDeriv ℝ l G x‖ ≤ C := by
-  have hb : ∀ l : ℕ, ∃ C : ℝ, ∀ x, ‖iteratedFDeriv ℝ l G x‖ ≤ C := fun l =>
-    (hG.continuous_iteratedFDeriv (WithTop.coe_le_coe.2 le_top)).bounded_above_of_compact_support
-      (hcs.iteratedFDeriv l)
-  choose C hC using hb
-  refine ⟨∑ l ∈ Finset.range (r + 1), |C l|, fun l hl x => (hC l x).trans ((le_abs_self _).trans
-    ?_)⟩
-  exact Finset.single_le_sum (f := fun l => |C l|) (fun _ _ => abs_nonneg _)
-    (Finset.mem_range.2 (Nat.lt_succ_of_le hl))
 
 end Partition
 

@@ -89,7 +89,7 @@ declarations.
 * **Smooth resolutions of unity in a finite-dimensional space**
   (`FunctionSpaces/Rd/BoundedLipschitz.lean`): `Rd.exists_smooth_partition`, with `ContDiff`
   functions, from Mathlib's manifold version, and bounded derivatives of compactly supported smooth
-  functions (`Rd.exists_iteratedFDeriv_bound`).
+  functions (`Rd.exists_iteratedFDeriv_bound`, `FunctionSpaces/Rd/Multipliers.lean`).
 * **Multiplication by an indicator on `L_p`** (`FunctionSpaces/Rd/LipschitzGraph.lean`): for a
   measurable set `s`, `g ↦ 1_s g` as a continuous linear operator of norm at most `1` on
   `Lp ℂ p μ` (`Rd.indicatorLp`). Mathlib has `indicatorConstLp` for constant functions.
@@ -97,3 +97,19 @@ declarations.
   `‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1` (`Rd.lintegral_enorm_iterDiff_schwartz_le`), from
   `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1` (`Rd.lintegral_enorm_fwdDiff_le`) and the commutation of differences
   with line derivatives (`Rd.lineDerivOp_fwdDiffSchwartz`).
+* **Bounded overlap in `L_p`** (`FunctionSpaces/Rd/AtomSynthesis.lean`): if at every point at most
+  `N` of the functions `g_m` are nonzero, then `‖∑_m g_m‖_p^p ≤ N^(p-1) ∑_m ‖g_m‖_p^p`
+  (`Rd.eLpNorm_rpow_le_of_overlap`); a set all of whose finite subsets have at most `N` elements is
+  finite with at most `N` elements (`Rd.exists_finset_of_card_le`).
+* **Dyadic cells of a finite-dimensional inner product space** (`FunctionSpaces/Rd/DyadicGrid.lean`):
+  the cells `⌊2^j ⟪b_i, x⟫⌋ = m_i`, their centres, and the count of at most `(2ρ + 2)^n` centres in
+  a ball of radius `ρ 2^(-j)` (`Rd.card_le_of_norm_cellCenter_sub_le`).
+* **Pointwise bounds of convolutions** (`FunctionSpaces/Rd/AtomAnalysis.lean`): Hölder's inequality
+  on a ball `∫_B |g| ≤ |B|^(1-1/p) ‖g‖_p` (`Rd.lintegral_closedBall_le`),
+  `|(K ⋆ g)(x)| ≤ sup |K| |B(0, ρ)|^(1-1/p) ‖g‖_p` for `K` vanishing outside `B(0, ρ)`
+  (`Rd.enorm_conv_le_of_bound`), and `Δ_h^r (K ⋆ g) = (Δ_h^r K) ⋆ g` at every point
+  (`Rd.iterDiff_conv_apply`).
+* **Approximate identities at points of continuity** (`FunctionSpaces/Rd/GraphTrace.lean`): for
+  integrable `Φ` with `∫ Φ = 1` and bounded support, `(Φ_{2^J} ⋆ F_J)(z) → z₀` as `J → ∞` and
+  `z → y` whenever `F_J(z) → z₀` (`Rd.conv_dilate_near`). Mathlib's `convolution_tendsto_right`
+  needs nonnegative kernels.
