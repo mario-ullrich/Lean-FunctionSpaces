@@ -12,12 +12,13 @@ public import FunctionSpaces.Interval.LocalProjection
 # A spline quasi-interpolant
 
 The **quasi-interpolant** of level `k` is `Q_k g = ∑_n λ_n(g) N_r(2^k x - n)`, summed over the
-B-splines `-r < n < 2^k` that meet `[0, 1)` (`Interval.qiPieces`). Its coefficient
+B-splines `-r < n < N` that meet `[0, N 2^(-k))` (`Interval.qiPieces`); on `[0, 1)` the index bound
+is `N = 2^k`, and larger `N` serve periodic extensions. Its coefficient
 `λ_n(g) = c_n(Π g(· 2^(-k)))` (`Interval.qiCoeff`) is the B-spline coefficient (Marsden's identity,
 `Interval.polyFun_eq_sum_bsplineCoef`) of the local projection `Π g` of `g` on one interval
 `J(n) = I_{k, max(n, 0)}` of the support of `N_r(2^k x - n)` in `[0, 1)`.
 
-* `Q_k g` is a spline (`Interval.splineJoins_qiPieces`).
+* `Q_k g` is a spline, with joins at every knot (`Interval.qiPieces_join`).
 * **Local reproduction**: if `g` is a polynomial `T` of degree `< r` on the intervals `J(n)`,
   `i - r < n ≤ i`, then `Q_k g = T` on `I_{k,i}` (`Interval.polyFun_qiPieces_of_eq`): the local
   projections reproduce `T`, so the coefficients are those of `T`, and Marsden's identity sums
@@ -46,8 +47,8 @@ theorem eq_of_polyFun_eq {P Q : ℂ[X]} (h : ∀ x : ℝ, polyFun P x = polyFun 
 noncomputable def locProjScaled (r k : ℕ) (g : ℝ → ℂ) (m : ℕ) : ℂ[X] :=
   (locProj r k g m).comp (C (((0 : ℝ) : ℝ) : ℂ) + C (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * X)
 
-/-- The indices `-r < n < 2^k` of the B-splines of level `k` that meet `[0, 1)`. -/
-def qiIdx (r k : ℕ) : Finset ℤ := Finset.Ioo (-(r : ℤ)) (2 ^ k)
+/-- The indices `-r < n < N` of the B-splines of level `k` that meet `[0, N 2^(-k))`. -/
+def qiIdx (r N : ℕ) : Finset ℤ := Finset.Ioo (-(r : ℤ)) N
 
 /-- The **quasi-interpolant coefficients** `λ_n(g) = c_n(Π_{k, J(n)} g(· 2^(-k)))`, with
 `J(n) = I_{k, max(n, 0)}`. -/
@@ -55,32 +56,42 @@ noncomputable def qiCoeff {r : ℕ} (hr : 1 ≤ r) (k : ℕ) (g : ℝ → ℂ) (
   bsplineCoef hr (locProjScaled r k g n.toNat) n
 
 /-- The pieces of the **quasi-interpolant** `Q_k g = ∑_n λ_n(g) N_r(2^k x - n)`. -/
-noncomputable def qiPieces {r : ℕ} (hr : 1 ≤ r) (k : ℕ) (g : ℝ → ℂ) : ℕ → ℂ[X] :=
-  ∑ n ∈ qiIdx r k, fun m => C (qiCoeff hr k g n) * bsplinePieces r k n m
+noncomputable def qiPieces {r : ℕ} (hr : 1 ≤ r) (k N : ℕ) (g : ℝ → ℂ) : ℕ → ℂ[X] :=
+  ∑ n ∈ qiIdx r N, fun m => C (qiCoeff hr k g n) * bsplinePieces r k n m
 
 /-- The pieces of the quasi-interpolant. -/
-theorem qiPieces_apply {r : ℕ} (hr : 1 ≤ r) (k : ℕ) (g : ℝ → ℂ) (m : ℕ) :
-    qiPieces hr k g m = ∑ n ∈ qiIdx r k, C (qiCoeff hr k g n) * bsplinePieces r k n m := by
+theorem qiPieces_apply {r : ℕ} (hr : 1 ≤ r) (k N : ℕ) (g : ℝ → ℂ) (m : ℕ) :
+    qiPieces hr k N g m = ∑ n ∈ qiIdx r N, C (qiCoeff hr k g n) * bsplinePieces r k n m := by
   rw [qiPieces, Finset.sum_apply]
 
 /-- The quasi-interpolant has pieces of degree `< r`. -/
-theorem qiPieces_mem {r : ℕ} (hr : 1 ≤ r) (k : ℕ) (g : ℝ → ℂ) (m : ℕ) :
-    qiPieces hr k g m ∈ degreeLT ℂ r := by
+theorem qiPieces_mem {r : ℕ} (hr : 1 ≤ r) (k N : ℕ) (g : ℝ → ℂ) (m : ℕ) :
+    qiPieces hr k N g m ∈ degreeLT ℂ r := by
   rw [qiPieces_apply]
   exact Submodule.sum_mem _ fun n _ => by
     rw [← smul_eq_C_mul]
     exact Submodule.smul_mem _ _ (bsplinePieces_mem hr k n m)
 
+/-- **The quasi-interpolant has spline joins at every knot** `m 2^(-k)`, `m ≥ 1`. -/
+theorem qiPieces_join {r : ℕ} (hr : 1 ≤ r) (k N : ℕ) (g : ℝ → ℂ) {m : ℕ} (hm : 0 < m) :
+    ∃ c : ℂ, qiPieces hr k N g m - qiPieces hr k N g (m - 1) =
+      C c * (X - C ((((m : ℝ) / 2 ^ k : ℝ)) : ℂ)) ^ (r - 1) := by
+  choose c hc using fun n : ℤ => bsplinePieces_join hr k n hm
+  refine ⟨∑ n ∈ qiIdx r N, qiCoeff hr k g n * c n, ?_⟩
+  rw [qiPieces_apply, qiPieces_apply, ← Finset.sum_sub_distrib, map_sum, Finset.sum_mul]
+  refine Finset.sum_congr rfl fun n _ => ?_
+  rw [← mul_sub, hc n, C_mul]
+  ring
+
 /-- **The quasi-interpolant is a spline.** -/
-theorem splineJoins_qiPieces {r : ℕ} (hr : 1 ≤ r) (k : ℕ) (g : ℝ → ℂ) :
-    SplineJoins r k (qiPieces hr k g) :=
-  SplineJoins.sum _ fun n _ => (splineJoins_bsplinePieces hr k n).const_mul _
+theorem splineJoins_qiPieces {r : ℕ} (hr : 1 ≤ r) (k N : ℕ) (g : ℝ → ℂ) :
+    SplineJoins r k (qiPieces hr k N g) := fun _ hm _ => qiPieces_join hr k N g hm
 
 /-- The values of the quasi-interpolant on `I_{k,m}`: `Q_k g(x) = ∑_n λ_n(g) N_r(2^k x - n)`. -/
-theorem polyFun_qiPieces {r : ℕ} (hr : 1 ≤ r) (k : ℕ) (g : ℝ → ℂ) {m : ℕ} {x : ℝ}
+theorem polyFun_qiPieces {r : ℕ} (hr : 1 ≤ r) (k N : ℕ) (g : ℝ → ℂ) {m : ℕ} {x : ℝ}
     (hx : x ∈ dyadicIco k m) :
-    polyFun (qiPieces hr k g m) x =
-      ∑ n ∈ qiIdx r k, qiCoeff hr k g n * bspline r (2 ^ k * x - n) := by
+    polyFun (qiPieces hr k N g m) x =
+      ∑ n ∈ qiIdx r N, qiCoeff hr k g n * bspline r (2 ^ k * x - n) := by
   rw [qiPieces_apply, polyFun, eval_finsetSum]
   refine Finset.sum_congr rfl fun n _ => ?_
   rw [eval_mul, eval_C, ← polyFun, polyFun_bsplinePieces hr k n hx]
@@ -99,10 +110,10 @@ theorem bspline_eq_zero_of_not_mem {r k i : ℕ} {x : ℝ} (hx : x ∈ dyadicIco
 
 /-- **Local reproduction of polynomials**: if `g = T` on the intervals `J(n)`, `i - r < n ≤ i`,
 for a polynomial `T` of degree `< r`, then `Q_k g = T` on `I_{k,i}`. -/
-theorem polyFun_qiPieces_of_eq {r : ℕ} (hr : 1 ≤ r) {k : ℕ} {g : ℝ → ℂ} {T : ℂ[X]}
-    (hT : T ∈ degreeLT ℂ r) {i : ℕ} (hi : i < 2 ^ k)
+theorem polyFun_qiPieces_of_eq {r : ℕ} (hr : 1 ≤ r) {k N : ℕ} {g : ℝ → ℂ} {T : ℂ[X]}
+    (hT : T ∈ degreeLT ℂ r) {i : ℕ} (hi : i < N)
     (hg : ∀ n : ℤ, (i : ℤ) - r < n → n ≤ i → ∀ y ∈ dyadicIco k n.toNat, g y = polyFun T y)
-    {x : ℝ} (hx : x ∈ dyadicIco k i) : polyFun (qiPieces hr k g i) x = polyFun T x := by
+    {x : ℝ} (hx : x ∈ dyadicIco k i) : polyFun (qiPieces hr k N g i) x = polyFun T x := by
   set Ts := T.comp (C (((0 : ℝ) : ℝ) : ℂ) + C (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * X)
   have hTs : Ts ∈ degreeLT ℂ r := comp_affine_mem_degreeLT hT _ _
   -- the coefficients are those of `T`
@@ -111,10 +122,10 @@ theorem polyFun_qiPieces_of_eq {r : ℕ} (hr : 1 ≤ r) {k : ℕ} {g : ℝ → �
       have hloc : locProj r k g n.toNat = T := eq_of_polyFun_eq fun y =>
         polyFun_locProj_of_eqOn hT (hg n hn1 hn2) y
       rw [qiCoeff, locProjScaled, hloc]
-  have hik : (i : ℤ) < (2 : ℤ) ^ k := by exact_mod_cast hi
-  rw [polyFun_qiPieces hr k g hx]
+  have hik : (i : ℤ) < N := by exact_mod_cast hi
+  rw [polyFun_qiPieces hr k N g hx]
   -- only the B-splines `i - r < n ≤ i` contribute
-  have hsub : ∑ n ∈ qiIdx r k, qiCoeff hr k g n * bspline r (2 ^ k * x - n) =
+  have hsub : ∑ n ∈ qiIdx r N, qiCoeff hr k g n * bspline r (2 ^ k * x - n) =
       ∑ n ∈ Finset.Ioc ((i : ℤ) - r) i, bsplineCoef hr Ts n * bspline r (2 ^ k * x - n) := by
     rw [← Finset.sum_subset (s₁ := Finset.Ioc ((i : ℤ) - r) i) (fun n hn => by
         rw [Finset.mem_Ioc] at hn
@@ -263,12 +274,12 @@ theorem enorm_qiCoeff_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
     _ = _ := by ring
 
 /-- On `I_{k,i}` the quasi-interpolant is the sum over the B-splines `i - r < n ≤ i`. -/
-theorem polyFun_qiPieces_eq_sum_Ioc {r : ℕ} (hr : 1 ≤ r) {k i : ℕ} (hi : i < 2 ^ k)
+theorem polyFun_qiPieces_eq_sum_Ioc {r : ℕ} (hr : 1 ≤ r) {k N i : ℕ} (hi : i < N)
     (g : ℝ → ℂ) {x : ℝ} (hx : x ∈ dyadicIco k i) :
-    polyFun (qiPieces hr k g i) x =
+    polyFun (qiPieces hr k N g i) x =
       ∑ n ∈ Finset.Ioc ((i : ℤ) - r) i, qiCoeff hr k g n * bspline r (2 ^ k * x - n) := by
-  have hik : (i : ℤ) < (2 : ℤ) ^ k := by exact_mod_cast hi
-  rw [polyFun_qiPieces hr k g hx]
+  have hik : (i : ℤ) < N := by exact_mod_cast hi
+  rw [polyFun_qiPieces hr k N g hx]
   exact (Finset.sum_subset (fun n hn => by
       rw [Finset.mem_Ioc] at hn
       rw [qiIdx, Finset.mem_Ioo]
@@ -283,19 +294,16 @@ the B-spline. -/
 theorem eLpNorm_qiPieces_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
     (hCb : ∀ R ∈ degreeLT ℂ r, ∀ j : ℕ,
       ‖bcoord hr R j‖ₑ ≤ Cb * eLpNorm (polyFun R) p (volume.restrict (Icc 0 1)))
-    {MN : ℝ≥0∞} (hMN : ∀ y, ‖bspline r y‖ₑ ≤ MN) (hp : p ≠ ∞) {k i : ℕ} (hi : i < 2 ^ k)
-    {g : ℝ → ℂ} (hg : AEStronglyMeasurable g unitVol) :
-    eLpNorm (polyFun (qiPieces hr k g i)) p (volume.restrict (dyadicIco k i)) ≤
+    {MN : ℝ≥0∞} (hMN : ∀ y, ‖bspline r y‖ₑ ≤ MN) (hp : p ≠ ∞) {k N i : ℕ} (hi : i < N)
+    {g : ℝ → ℂ} (hg : AEStronglyMeasurable g volume) :
+    eLpNorm (polyFun (qiPieces hr k N g i)) p (volume.restrict (dyadicIco k i)) ≤
       MN * (Cb * ppProjConst r) * ∑ n ∈ Finset.Ioc ((i : ℤ) - r) i,
         eLpNorm g p (volume.restrict (dyadicIco k n.toNat)) := by
   have hθ : 0 ≤ 1 / p.toReal := by positivity
   have hθ' : 1 / p.toReal = p.toReal⁻¹ := one_div _
   have hgI : ∀ n ∈ Finset.Ioc ((i : ℤ) - r) i,
-      AEStronglyMeasurable g (volume.restrict (dyadicIco k n.toNat)) := fun n hn => by
-    rw [Finset.mem_Ioc] at hn
-    exact hg.mono_measure (Measure.restrict_mono
-      ((dyadicIco_subset (by omega)).trans Ico_subset_Icc_self) le_rfl)
-  have hpt : ∀ x ∈ dyadicIco k i, ‖polyFun (qiPieces hr k g i) x‖ₑ ≤
+      AEStronglyMeasurable g (volume.restrict (dyadicIco k n.toNat)) := fun _ _ => hg.restrict
+  have hpt : ∀ x ∈ dyadicIco k i, ‖polyFun (qiPieces hr k N g i) x‖ₑ ≤
       MN * (Cb * ppProjConst r) * ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
         ∑ n ∈ Finset.Ioc ((i : ℤ) - r) i, eLpNorm g p (volume.restrict (dyadicIco k n.toNat)) :=
     fun x hx => by

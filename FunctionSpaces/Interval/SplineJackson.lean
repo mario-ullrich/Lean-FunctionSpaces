@@ -139,21 +139,18 @@ theorem qiCoeff_add_const_mul {r : ℕ} (hr : 1 ≤ r) (k : ℕ) {g₁ g₂ : �
 
 /-- **The error of the quasi-interpolant through a polynomial**: on `I_{k,i}`,
 `g - Q_k g = (g - T) - Q_k(g - T)` for every polynomial `T` of degree `< r`. -/
-theorem polyFun_qiPieces_sub {r : ℕ} (hr : 1 ≤ r) {k i : ℕ} (hi : i < 2 ^ k) {g : ℝ → ℂ}
-    (hg : IntegrableOn g (Icc 0 1)) {T : ℂ[X]} (hT : T ∈ degreeLT ℂ r) {x : ℝ}
+theorem polyFun_qiPieces_sub {r : ℕ} (hr : 1 ≤ r) {k N i : ℕ} (hi : i < N) {g : ℝ → ℂ}
+    (hg : ∀ m < N, IntegrableOn g (dyadicIco k m)) {T : ℂ[X]} (hT : T ∈ degreeLT ℂ r) {x : ℝ}
     (hx : x ∈ dyadicIco k i) :
-    polyFun (qiPieces hr k (fun y => g y - polyFun T y) i) x =
-      polyFun (qiPieces hr k g i) x - polyFun T x := by
+    polyFun (qiPieces hr k N (fun y => g y - polyFun T y) i) x =
+      polyFun (qiPieces hr k N g i) x - polyFun T x := by
   have hT' := polyFun_qiPieces_of_eq hr (g := polyFun T) hT hi (fun _ _ _ _ _ => rfl) hx
   rw [← hT', polyFun_qiPieces_eq_sum_Ioc hr hi _ hx, polyFun_qiPieces_eq_sum_Ioc hr hi _ hx,
     polyFun_qiPieces_eq_sum_Ioc hr hi _ hx, ← Finset.sum_sub_distrib]
   refine Finset.sum_congr rfl fun n hn => ?_
   rw [Finset.mem_Ioc] at hn
-  have hnk : n.toNat < 2 ^ k := by omega
-  have hJ : dyadicIco k n.toNat ⊆ Icc 0 1 :=
-    (dyadicIco_subset hnk).trans Ico_subset_Icc_self
-  have h := qiCoeff_add_const_mul hr k (-1) (n := n) (hg.mono_set hJ)
-    ((continuous_polyFun T).integrableOn_Icc.mono_set (hJ.trans le_rfl))
+  have h := qiCoeff_add_const_mul hr k (-1) (n := n) (hg n.toNat (by omega))
+    (integrableOn_dyadicIco_of_continuous (continuous_polyFun T) k n.toNat)
   simp only [neg_one_mul, ← sub_eq_add_neg] at h
   rw [h, sub_mul]
 
@@ -189,28 +186,28 @@ theorem dyadicIco_subset_qiWindow_self {r : ℕ} (hr : 1 ≤ r) (k i : ℕ) :
 theorem eLpNorm_sub_qiPieces_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
     (hCb : ∀ R ∈ degreeLT ℂ r, ∀ j : ℕ,
       ‖bcoord hr R j‖ₑ ≤ Cb * eLpNorm (polyFun R) p (volume.restrict (Icc 0 1)))
-    {MN : ℝ≥0∞} (hMN : ∀ y, ‖bspline r y‖ₑ ≤ MN) (hp : p ≠ ∞) {k i : ℕ} (hi : i < 2 ^ k)
-    {g : ℝ → ℂ} (hgm : Measurable g) (hg : IntegrableOn g (Icc 0 1)) {T : ℂ[X]}
+    {MN : ℝ≥0∞} (hMN : ∀ y, ‖bspline r y‖ₑ ≤ MN) (hp : p ≠ ∞) {k N i : ℕ} (hi : i < N)
+    {g : ℝ → ℂ} (hgm : Measurable g) (hg : ∀ m < N, IntegrableOn g (dyadicIco k m)) {T : ℂ[X]}
     (hT : T ∈ degreeLT ℂ r) :
-    eLpNorm (fun x => g x - polyFun (qiPieces hr k g i) x) p (volume.restrict (dyadicIco k i)) ≤
+    eLpNorm (fun x => g x - polyFun (qiPieces hr k N g i) x) p (volume.restrict (dyadicIco k i)) ≤
       (1 + r * (MN * (Cb * ppProjConst r))) *
         eLpNorm (fun x => g x - polyFun T x) p (volume.restrict (qiWindow r k i)) := by
   have hp1 : 1 ≤ p := Fact.out
   set h : ℝ → ℂ := fun y => g y - polyFun T y
   have hhm : Measurable h := hgm.sub (measurable_polyFun T)
-  have hfun : (fun x => g x - polyFun (qiPieces hr k g i) x) =ᵐ[volume.restrict (dyadicIco k i)]
-      fun x => h x - polyFun (qiPieces hr k h i) x := by
+  have hfun : (fun x => g x - polyFun (qiPieces hr k N g i) x) =ᵐ[volume.restrict (dyadicIco k i)]
+      fun x => h x - polyFun (qiPieces hr k N h i) x := by
     filter_upwards [ae_restrict_mem (measurableSet_dyadicIco k i)] with x hx
     simp only [h]
     rw [polyFun_qiPieces_sub hr hi hg hT hx]
     ring
-  have hloc := eLpNorm_qiPieces_le hr hCb hMN hp hi (g := h) hhm.aestronglyMeasurable
+  have hloc := eLpNorm_qiPieces_le hr hCb hMN hp (k := k) hi (g := h) hhm.aestronglyMeasurable
   have hcard : (Finset.Ioc ((i : ℤ) - r) i).card = r := by
     rw [Int.card_Ioc]; omega
   rw [eLpNorm_congr_ae hfun]
-  calc eLpNorm (fun x => h x - polyFun (qiPieces hr k h i) x) p (volume.restrict (dyadicIco k i))
+  calc eLpNorm (fun x => h x - polyFun (qiPieces hr k N h i) x) p (volume.restrict (dyadicIco k i))
       ≤ eLpNorm h p (volume.restrict (dyadicIco k i)) +
-          eLpNorm (polyFun (qiPieces hr k h i)) p (volume.restrict (dyadicIco k i)) :=
+          eLpNorm (polyFun (qiPieces hr k N h i)) p (volume.restrict (dyadicIco k i)) :=
         eLpNorm_sub_le hp1
     _ ≤ eLpNorm h p (volume.restrict (qiWindow r k i)) + MN * (Cb * ppProjConst r) *
           ∑ _n ∈ Finset.Ioc ((i : ℤ) - r) i, eLpNorm h p (volume.restrict (qiWindow r k i)) := by
@@ -292,7 +289,7 @@ theorem lintegral_sub_ppFun_le_sum (hp : p ≠ ∞) {F : ℝ → ℂ} (hFm : Mea
 `‖F - Q_k F‖_{L_p[0,1]} ≤ C ω_r(F, 2^(-k), [0, 1])_p` for every continuous `F` and `k ≥ r + 2`. -/
 theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ F : ℝ → ℂ, Continuous F → ∀ k : ℕ, r + 2 ≤ k →
-      eLpNorm (fun x => F x - ppFun k (qiPieces hr k F) x) p unitVol ≤
+      eLpNorm (fun x => F x - ppFun k (qiPieces hr k (2 ^ k) F) x) p unitVol ≤
         C * modulus r p 0 1 F (1 / 2 ^ k) := by
   obtain ⟨Cb, hCb, hCbb⟩ := exists_enorm_bcoord_le p hr
   obtain ⟨MN, hMN, hMNb⟩ := exists_enorm_bspline_le r
@@ -337,7 +334,7 @@ theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     (Icc (1 / 4 : ℝ) 1).indicator Hr x
   -- the error on one interval
   have hint : ∀ i ∈ Finset.range (2 ^ k),
-      eLpNorm (fun x => F x - polyFun (qiPieces hr k F i) x) p
+      eLpNorm (fun x => F x - polyFun (qiPieces hr k (2 ^ k) F i) x) p
         (volume.restrict (dyadicIco k i)) ^ p.toReal ≤
       Cq ^ p.toReal * (2 ^ (p.toReal - 1) *
         ∫⁻ x in Icc (((i : ℝ) + 1 - r) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k), Hbar x) := by
@@ -393,13 +390,14 @@ theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
           simp only [Hbar, indicator_of_mem hx']
         rw [hb']
         exact le_add_self
-    calc eLpNorm (fun x => F x - polyFun (qiPieces hr k F i) x) p
+    calc eLpNorm (fun x => F x - polyFun (qiPieces hr k (2 ^ k) F i) x) p
           (volume.restrict (dyadicIco k i)) ^ p.toReal
         ≤ (Cq * eLpNorm (fun x => F x - polyFun T x) p
             (volume.restrict (Icc (((i + 1 - r : ℕ) : ℝ) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k)))) ^
               p.toReal :=
           ENNReal.rpow_le_rpow ((eLpNorm_sub_qiPieces_le hr hCbb hMNb hp hi' hF.measurable
-            hF.integrableOn_Icc hT).trans_eq (by rw [hW])) hq.le
+            (fun m _ => integrableOn_dyadicIco_of_continuous hF k m) hT).trans_eq
+              (by rw [hW])) hq.le
       _ = Cq ^ p.toReal * eLpNorm (fun x => F x - polyFun T x) p
             (volume.restrict (Icc (((i + 1 - r : ℕ) : ℝ) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k))) ^
               p.toReal := ENNReal.mul_rpow_of_nonneg _ _ hq.le
@@ -441,8 +439,8 @@ theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
   -- assembling
   refine eLpNorm_le_of_lintegral_le ((hF.measurable.sub
     (measurable_ppFun _ _)).aestronglyMeasurable) hp0 hp ?_
-  calc ∫⁻ x, ‖F x - ppFun k (qiPieces hr k F) x‖ₑ ^ p.toReal ∂unitVol
-      ≤ ∑ i ∈ Finset.range (2 ^ k), eLpNorm (fun x => F x - polyFun (qiPieces hr k F i) x) p
+  calc ∫⁻ x, ‖F x - ppFun k (qiPieces hr k (2 ^ k) F) x‖ₑ ^ p.toReal ∂unitVol
+      ≤ ∑ i ∈ Finset.range (2 ^ k), eLpNorm (fun x => F x - polyFun (qiPieces hr k (2 ^ k) F i) x) p
           (volume.restrict (dyadicIco k i)) ^ p.toReal :=
         lintegral_sub_ppFun_le_sum hp hF.measurable k _
     _ ≤ ∑ i ∈ Finset.range (2 ^ k), Cq ^ p.toReal * (2 ^ (p.toReal - 1) *
@@ -504,9 +502,9 @@ theorem exists_approxSeq_splineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ �
   · -- the fine levels: the quasi-interpolant
     refine (approxSeq_le_of_continuous hp hC (fun g => ?_) f).trans
       (mul_le_mul' le_add_self le_rfl)
-    exact ⟨ppFun k (qiPieces hr k g), ⟨(memLp_ppFun k (qiPieces hr k g) p).toLp _,
-      mem_splineScheme_two_pow.2 ⟨qiPieces hr k g, qiPieces_mem hr k g,
-        splineJoins_qiPieces hr k g, MemLp.coeFn_toLp _⟩, MemLp.coeFn_toLp _⟩,
+    exact ⟨ppFun k (qiPieces hr k (2 ^ k) g), ⟨(memLp_ppFun k (qiPieces hr k (2 ^ k) g) p).toLp _,
+      mem_splineScheme_two_pow.2 ⟨qiPieces hr k (2 ^ k) g, qiPieces_mem hr k (2 ^ k) g,
+        splineJoins_qiPieces hr k (2 ^ k) g, MemLp.coeFn_toLp _⟩, MemLp.coeFn_toLp _⟩,
       hCb g g.continuous k hk⟩
 
 /-- The modulus `ω_r(f, 2^(-k), [0, 1])_p` is compatible with the scheme of dyadic splines of

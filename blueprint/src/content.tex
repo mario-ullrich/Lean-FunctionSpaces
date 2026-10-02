@@ -2925,8 +2925,8 @@ $(S_\delta f)^{(r)} = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta
 \lean{Interval.exists_left_smoothing, Interval.exists_right_smoothing}
 \leanok
 \uses{thm:steklov-smoothing, lem:taylor-lp, lem:interval-modulus}
-Let $F$ be continuous, $r \geq 1$, $1 \leq p < \infty$, $L > 0$, $w + L \leq 1$ and
-$\omega = \omega_r(F, L, [0, 1])_p$. On $P = [0, w]$ and on $P = [1 - w, 1]$ there are functions
+Let $F$ be continuous, $r \geq 1$, $1 \leq p < \infty$, $L > 0$, $w + L \leq b$ and
+$\omega = \omega_r(F, L, [0, b])_p$. On $P = [0, w]$ and on $P = [b - w, b]$ there are functions
 $g$ and $D$ with $\|F - g\|_{L_p(P)} \leq \omega$, $\|D\|_{L_p(P)} \leq L^{-r} 2^r r^{2r} \omega$, and
 for all $a \leq b$ a polynomial $T$ of degree $< r$ with
 $\|g - T\|_{L_p[a,b]} \leq (b - a)^r \|D\|_{L_p[a,b]}$.
@@ -2936,7 +2936,7 @@ $\|g - T\|_{L_p[a,b]} \leq (b - a)^r \|D\|_{L_p[a,b]}$.
 \leanok
 On $[0, w]$ take the Steklov smoothing $g = S_\delta F$, $\delta = L/r^2$, so that
 $r^2 \delta = L$, and $D = g^{(r)}$ (\Cref{thm:steklov-smoothing}, \Cref{lem:taylor-lp}). On
-$[1 - w, 1]$ apply this to $F(1 - \cdot)$, which has the same modulus, and reflect back.
+$[b - w, b]$ apply this to $F(b - \cdot)$, which has the same modulus, and reflect back.
 \end{proof}
 
 \section{Whitney's inequality}
@@ -3010,7 +3010,8 @@ $A_n = V_{\lfloor \log_2 n \rfloor}$ for $n \geq 1$.
 \label{lem:pp-bookkeeping}
 \lean{Interval.floor_eq_of_mem_dyadicIco, Interval.dyadicIco_subset,
   Interval.pairwise_disjoint_dyadicIco, Interval.ppFun_eq_zero, Interval.ppFun_eq_polyFun,
-  Interval.ite_mem_degreeLT, Interval.lintegral_Icc_le_sum, Interval.sum_le_lintegral_Icc,
+  Interval.ite_mem_degreeLT, Interval.integrableOn_dyadicIco_of_continuous,
+  Interval.lintegral_Icc_le_sum, Interval.sum_le_lintegral_Icc,
   Interval.lintegral_Icc_eq_dyadicIco, Interval.zero_add_two_pow_mul_eq_one,
   Interval.lintegral_Icc_le_sum_dyadicIco, Interval.sum_lintegral_dyadicIco_le,
   Interval.eLpNorm_le_of_lintegral_le}
@@ -3499,7 +3500,8 @@ divides $P$, and the quotient has degree $0$.
 
 \begin{definition}[Dyadic splines]
 \label{def:spline-space}
-\lean{Interval.SplineJoins, Interval.splineJoins_zero, Interval.SplineJoins.add,
+\lean{Interval.SplineJoins, Interval.SplineJoinsBelow, Interval.SplineJoins.below,
+  Interval.splineJoins_zero, Interval.SplineJoins.add,
   Interval.SplineJoins.const_mul, Interval.SplineJoins.sum, Interval.SplineJoins.refine,
   Interval.splineSpace, Interval.splineSpace_le_ppSpace, Interval.splineSpace_zero,
   Interval.splineSpace_mono, Interval.splineScheme, Interval.mem_splineScheme_zero,
@@ -3518,12 +3520,12 @@ $n \geq 1$.
 \begin{lemma}[Dyadic B-splines are splines]
 \label{lem:bspline-dyadic}
 \lean{Interval.bsplinePieces, Interval.bsplinePieces_mem, Interval.X_sub_C_pow_comp_affine,
-  Interval.splineJoins_bsplinePieces, Interval.polyFun_bsplinePieces}
+  Interval.bsplinePieces_join, Interval.splineJoins_bsplinePieces, Interval.polyFun_bsplinePieces}
 \leanok
 \uses{def:spline-space, lem:bspline-pieces}
-For $n \in \Z$ the B-spline $N_r(2^k x - n)$ is on $I_{k,m}$ the polynomial
+For $n \in \Z$ the B-spline $N_r(2^k x - n)$ is on $I_{k,m}$, $m \in \N$, the polynomial
 $B_{m-n}(2^k x - n)$ if $0 \leq m - n \leq r$ and $0$ otherwise, and these pieces have spline
-joins.
+joins at every knot $m 2^{-k}$, $m \geq 1$.
 \end{lemma}
 
 \begin{proof}
@@ -3552,17 +3554,19 @@ $0 \leq (x + ih - \xi)_+ \leq rh$ for $i \leq r$, and $\sum_i \binom{r}{i} = 2^r
 \begin{lemma}[Splines across the knots]
 \label{lem:spline-across}
 \lean{Interval.eq_add_sum_Ioc_sub, Interval.jumpCoeff, Interval.sub_eq_jumpCoeff,
-  Interval.polyFun_eq_add_sum_jumps, Interval.iterDiff_ppFun_eq_sum_jumps,
+  Interval.polyFun_eq_add_sum_jumps, Interval.iterDiff_eq_sum_jumps,
   Interval.enorm_jumpCoeff_le}
 \leanok
 \uses{def:spline-space, lem:interval-nikolskii, lem:pp-local, lem:iter-diff-poly}
-Let $u \in S_j$ have pieces $Q_n$ with $Q_m - Q_{m-1} = c_m (x - \xi_m)^{r-1}$, $\xi_m = m 2^{-j}$,
-and let $m_n = \int_{I_{j,n}} |u|^p$. For $0 \leq h \leq 2^{-j}$ and $0 \leq x$ with $x + rh < 1$,
+Let $N \in \N$ and let $u$ agree on $I_{j,m}$, $m < N$, with polynomials $P_m$ of degree $< r$ such
+that $P_m - P_{m-1} = c_m (x - \xi_m)^{r-1}$, $\xi_m = m 2^{-j}$, for $0 < m < N$; let
+$m_n = \int_{I_{j,n}} |u|^p$. For $0 \leq h \leq 2^{-j}$ and $0 \leq x$ with $x + rh < N 2^{-j}$,
 $n_0 = \lfloor 2^j x \rfloor$,
 \[
   \Delta_h^r u(x) = \sum_{n_0 < m \leq n_0 + r} c_m \, \Delta_h^r (\cdot - \xi_m)_+^{r-1}(x),
 \]
-and $|c_m| 2^{-j(r-1)} \leq K 2^{j/p} (m_m^{1/p} + m_{m-1}^{1/p})$ for $0 < m < 2^j$.
+and $|c_m| 2^{-j(r-1)} \leq K 2^{j/p} (m_m^{1/p} + m_{m-1}^{1/p})$ for $0 < m < N$. For a spline in
+$S_j$, $N = 2^j$.
 \end{lemma}
 
 \begin{proof}
@@ -3578,7 +3582,9 @@ the doubled interval of $I_{j,m-1}$.
 \label{thm:spline-inverse}
 \lean{Interval.splineStripConst, Interval.enorm_iterDiff_spline_le,
   Interval.eLpNorm_iterDiff_spline_le, Interval.splineInverseConst,
-  Interval.splineStripConst_mul_eq, Interval.exists_inverse_splineScheme}
+  Interval.splineInverseConst_ne_top, Interval.splineStripConst_mul_eq,
+  Interval.splineStripConst_mul_le, Interval.two_pow_le_two_pow_mul_one_add,
+  Interval.le_two_pow_mul_one_add, Interval.exists_inverse_splineScheme}
 \leanok
 \uses{lem:spline-across, lem:spline-inverse-tools, lem:pp-local}
 Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_B < \infty$ such that for all $j, k \in \N$ and
@@ -3603,18 +3609,19 @@ $2^j h \leq 2^{-(k-j)}$.
 \begin{definition}[Quasi-interpolant]
 \label{def:quasi-interp}
 \lean{Interval.eq_of_polyFun_eq, Interval.locProjScaled, Interval.qiIdx, Interval.qiCoeff,
-  Interval.qiPieces, Interval.qiPieces_apply, Interval.qiPieces_mem,
+  Interval.qiPieces, Interval.qiPieces_apply, Interval.qiPieces_mem, Interval.qiPieces_join,
   Interval.splineJoins_qiPieces, Interval.polyFun_qiPieces}
 \leanok
 \uses{thm:marsden, def:loc-proj, lem:bspline-dyadic}
-Let $r \geq 1$ and $k \in \N$. For $-r < n < 2^k$ let $J(n) = I_{k, \max(n, 0)}$, an interval of
-the support of $N_r(2^k x - n)$ in $[0, 1)$, and let $\lambda_n(g) = c_n(\tilde P)$ be the
+Let $r \geq 1$ and $k, N \in \N$. For $-r < n < N$ let $J(n) = I_{k, \max(n, 0)}$, an interval of
+the support of $N_r(2^k x - n)$ in $[0, \infty)$, and let $\lambda_n(g) = c_n(\tilde P)$ be the
 coefficient of \Cref{thm:marsden} of the rescaled local projection
 $\tilde P(y) = \Pi_{J(n)} g(y 2^{-k})$. The quasi-interpolant is
 \[
-  Q_k g(x) = \sum_{-r < n < 2^k} \lambda_n(g) \, N_r(2^k x - n) ,
+  Q_k g(x) = \sum_{-r < n < N} \lambda_n(g) \, N_r(2^k x - n) ,
 \]
-a spline of order $r$ and level $k$ by \Cref{lem:bspline-dyadic}.
+with spline joins at every knot by \Cref{lem:bspline-dyadic}. On $[0, 1)$, $N = 2^k$, it is a
+spline of order $r$ and level $k$.
 \end{definition}
 
 \begin{lemma}[Properties of the quasi-interpolant]
@@ -3624,7 +3631,7 @@ a spline of order $r$ and level $k$ by \Cref{lem:bspline-dyadic}.
   Interval.enorm_qiCoeff_le, Interval.polyFun_qiPieces_eq_sum_Ioc, Interval.eLpNorm_qiPieces_le}
 \leanok
 \uses{def:quasi-interp, lem:loc-proj, lem:bspline-basis}
-Let $1 \leq p < \infty$, $r \geq 1$, $k \in \N$ and $i < 2^k$.
+Let $1 \leq p < \infty$, $r \geq 1$, $k, N \in \N$ and $i < N$.
 \begin{enumerate}
   \item If $g$ agrees on the intervals $J(n)$, $i - r < n \leq i$, with a polynomial $T$ of
     degree $< r$, then $Q_k g = T$ on $I_{k,i}$.

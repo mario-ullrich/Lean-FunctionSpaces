@@ -269,6 +269,11 @@ theorem sum_lintegral_dyadicIco_le (G : ℝ → ℝ≥0∞) (k : ℕ) :
   rw [zero_add_two_pow_mul_eq_one] at hsum
   exact (Finset.sum_congr rfl fun n _ => (lintegral_Icc_eq_dyadicIco G k n).symm).trans_le hsum
 
+/-- Continuous functions are integrable on the dyadic intervals. -/
+theorem integrableOn_dyadicIco_of_continuous {F : ℝ → ℂ} (hF : Continuous F) (k m : ℕ) :
+    IntegrableOn F (dyadicIco k m) :=
+  hF.integrableOn_Icc.mono_set Ico_subset_Icc_self
+
 /-- Floor of `2^k x` on a dyadic interval: `x ∈ I_{k,n}` gives `⌊2^k x⌋ = n`. -/
 theorem floor_eq_of_mem_dyadicIco {k n : ℕ} {x : ℝ} (hx : x ∈ dyadicIco k n) :
     ⌊2 ^ k * x⌋₊ = n := by

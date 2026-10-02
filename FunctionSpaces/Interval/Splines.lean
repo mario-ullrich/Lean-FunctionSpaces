@@ -69,6 +69,18 @@ def SplineJoins (r k : ℕ) (Q : ℕ → ℂ[X]) : Prop :=
   ∀ n, 0 < n → n < 2 ^ k → ∃ c : ℂ,
     Q n - Q (n - 1) = C c * (X - C ((((n : ℝ) / 2 ^ k : ℝ)) : ℂ)) ^ (r - 1)
 
+/-- The pieces `P` have **spline joins of order `r` below `N`** at the knots of level `k`: at
+`ξ = n 2^(-k)`, `0 < n < N`, consecutive pieces differ by a multiple of `(x - ξ)^(r-1)`. With
+`N = 2^k` these are the interior knots of `[0, 1]`; larger `N` describe splines on
+`[0, N 2^(-k))`, such as periodic extensions. -/
+def SplineJoinsBelow (r k N : ℕ) (P : ℕ → ℂ[X]) : Prop :=
+  ∀ n, 0 < n → n < N → ∃ c : ℂ,
+    P n - P (n - 1) = C c * (X - C ((((n : ℝ) / 2 ^ k : ℝ)) : ℂ)) ^ (r - 1)
+
+/-- Spline joins at the interior knots of `[0, 1]` are spline joins below `2^k`. -/
+theorem SplineJoins.below {r k : ℕ} {Q : ℕ → ℂ[X]} (h : SplineJoins r k Q) :
+    SplineJoinsBelow r k (2 ^ k) Q := h
+
 /-- The zero pieces have spline joins. -/
 theorem splineJoins_zero (r k : ℕ) : SplineJoins r k 0 := fun _ _ _ => ⟨0, by simp⟩
 
@@ -219,11 +231,11 @@ theorem X_sub_C_pow_comp_affine (r k : ℕ) (n : ℝ) (d : ℂ) :
   rw [mul_sub, ← C_mul, mul_div_cancel₀ _ h2, C_add, Complex.ofReal_neg, C_neg]
   ring
 
-/-- **The B-splines have spline joins**: at the knot `m 2^(-k)` the pieces of `N_r(2^k x - n)`
-jump by `(-1)^d C(r, d)/(r-1)! 2^(k(r-1)) (x - m 2^(-k))^(r-1)`, `d = m - n`. -/
-theorem splineJoins_bsplinePieces {r : ℕ} (hr : 1 ≤ r) (k : ℕ) (n : ℤ) :
-    SplineJoins r k (bsplinePieces r k n) := by
-  intro m hm _
+/-- **The B-splines have spline joins at every knot**: at the knot `m 2^(-k)`, `m ≥ 1`, the pieces
+of `N_r(2^k x - n)` jump by `(-1)^d C(r, d)/(r-1)! 2^(k(r-1)) (x - m 2^(-k))^(r-1)`, `d = m - n`. -/
+theorem bsplinePieces_join {r : ℕ} (hr : 1 ≤ r) (k : ℕ) (n : ℤ) {m : ℕ} (hm : 0 < m) :
+    ∃ c : ℂ, bsplinePieces r k n m - bsplinePieces r k n (m - 1) =
+      C c * (X - C ((((m : ℝ) / 2 ^ k : ℝ)) : ℂ)) ^ (r - 1) := by
   have hm1 : ((m - 1 : ℕ) : ℤ) = (m : ℤ) - 1 := by rw [Nat.cast_sub hm]; rfl
   have hknot : ∀ e : ℕ, (m : ℤ) - n = e →
       ((n : ℝ) : ℂ) + (e : ℂ) = (((m : ℝ)) : ℂ) := fun e he => by
@@ -284,6 +296,10 @@ theorem splineJoins_bsplinePieces {r : ℕ} (hr : 1 ≤ r) (k : ℕ) (n : ℤ) :
     rw [hpm, h2, hsucc, add_comp, add_sub_cancel_left, mul_comp, C_comp,
       X_sub_C_pow_comp_affine, hknot e he, hcast, C_mul]
     ring
+
+/-- **The B-splines have spline joins** at the interior knots of `[0, 1]`. -/
+theorem splineJoins_bsplinePieces {r : ℕ} (hr : 1 ≤ r) (k : ℕ) (n : ℤ) :
+    SplineJoins r k (bsplinePieces r k n) := fun _ hm _ => bsplinePieces_join hr k n hm
 
 /-- On `I_{k,m}` the pieces are the B-spline: `Q_m(x) = N_r(2^k x - n)`. -/
 theorem polyFun_bsplinePieces {r : ℕ} (hr : 1 ≤ r) (k : ℕ) (n : ℤ) {m : ℕ} {x : ℝ}

@@ -28,11 +28,11 @@ The average over the cube `[0, δ]^r` is built as the `r`-fold average in the st
 `‖δ^(-1) ∫_0^δ K(t, ·) dt‖_p ≤ sup_t ‖K(t, ·)‖_p` (`Interval.eLpNorm_avg_le`), from Hölder's
 inequality pointwise and Tonelli's theorem.  Here `1 ≤ p < ∞`.
 
-With `δ = L / r²` the smoothing at `x` looks at `[x, x + L]`. On a left part `[0, w]` of `[0, 1]`
-with `w + L ≤ 1` this gives `‖f - S_δ f‖_p ≤ ω_r(f, L)_p` and
-`‖(S_δ f)^(r)‖_p ≤ L^(-r) 2^r r^(2r) ω_r(f, L)_p`, and with Taylor's theorem polynomial
+With `δ = L / r²` the smoothing at `x` looks at `[x, x + L]`. On a left part `[0, w]` of `[0, b]`
+with `w + L ≤ b` this gives `‖f - S_δ f‖_p ≤ ω_r(f, L, [0, b])_p` and
+`‖(S_δ f)^(r)‖_p ≤ L^(-r) 2^r r^(2r) ω_r(f, L, [0, b])_p`, and with Taylor's theorem polynomial
 approximations of `S_δ f` on all subintervals (`Interval.exists_left_smoothing`); the reflection
-`x ↦ 1 - x` gives the same on a right part `[1 - w, 1]` (`Interval.exists_right_smoothing`).
+`x ↦ b - x` gives the same on a right part `[b - w, b]` (`Interval.exists_right_smoothing`).
 These are the local estimates behind Jackson's and Whitney's inequalities.
 -/
 
@@ -404,20 +404,20 @@ theorem eLpNorm_iteratedDeriv_smooth_le {f : ℝ → ℂ} (hf : Continuous f) (r
     exact_mod_cast h'
   exact h2
 
-/-- **Smoothing on a left part**: for continuous `F`, `r ≥ 1`, a scale `L > 0` and `w + L ≤ 1`,
+/-- **Smoothing on a left part**: for continuous `F`, `r ≥ 1`, a scale `L > 0` and `w + L ≤ b`,
 the Steklov smoothing `g = S_δ F`, `δ = L/r²`, and its derivative `D = g^(r)` satisfy
-`‖F - g‖_{L_p[0,w]} ≤ ω_r(F, L, [0, 1])_p` and
-`‖D‖_{L_p[0,w]} ≤ L^(-r) 2^r r^(2r) ω_r(F, L, [0, 1])_p`, and for every `a ≤ b` there is `T` of
-degree `< r` with `‖g - T‖_{L_p[a,b]} ≤ (b - a)^r ‖D‖_{L_p[a,b]}` (Taylor). -/
+`‖F - g‖_{L_p[0,w]} ≤ ω_r(F, L, [0, b])_p` and
+`‖D‖_{L_p[0,w]} ≤ L^(-r) 2^r r^(2r) ω_r(F, L, [0, b])_p`, and for every `u ≤ v` there is `T` of
+degree `< r` with `‖g - T‖_{L_p[u,v]} ≤ (v - u)^r ‖D‖_{L_p[u,v]}` (Taylor). -/
 theorem exists_left_smoothing {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr : 1 ≤ r)
-    {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) {L w : ℝ} (hL : 0 < L) (hwL : w + L ≤ 1) :
+    {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) {b L w : ℝ} (hL : 0 < L) (hwL : w + L ≤ b) :
     ∃ g D : ℝ → ℂ, Measurable g ∧ Measurable D ∧
-      eLpNorm (fun x => F x - g x) p (volume.restrict (Icc 0 w)) ≤ modulus r p 0 1 F L ∧
+      eLpNorm (fun x => F x - g x) p (volume.restrict (Icc 0 w)) ≤ modulus r p 0 b F L ∧
       eLpNorm D p (volume.restrict (Icc 0 w)) ≤
-        ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * modulus r p 0 1 F L ∧
-      ∀ a b : ℝ, a ≤ b → ∃ T ∈ degreeLT ℂ r,
-        eLpNorm (fun x => g x - polyFun T x) p (volume.restrict (Icc a b)) ≤
-          ENNReal.ofReal (b - a) ^ r * eLpNorm D p (volume.restrict (Icc a b)) := by
+        ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * modulus r p 0 b F L ∧
+      ∀ u v : ℝ, u ≤ v → ∃ T ∈ degreeLT ℂ r,
+        eLpNorm (fun x => g x - polyFun T x) p (volume.restrict (Icc u v)) ≤
+          ENNReal.ofReal (v - u) ^ r * eLpNorm D p (volume.restrict (Icc u v)) := by
   have hr' : (0 : ℝ) < r := by exact_mod_cast hr
   set δ : ℝ := L / r ^ 2 with hδdef
   have hδ : 0 < δ := by positivity
@@ -425,63 +425,63 @@ theorem exists_left_smoothing {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (h
     rw [hδdef, show (r : ℝ) * (L / r ^ 2) = L / r by field_simp]
     exact div_le_self hL.le (by exact_mod_cast hr)
   have hrrδ : (r : ℝ) * (r * δ) = L := by rw [hδdef]; field_simp
-  have hwb : w + r * (r * δ) ≤ 1 := by rw [hrrδ]; exact hwL
+  have hwb : w + r * (r * δ) ≤ b := by rw [hrrδ]; exact hwL
   have hg := contDiff_smooth hF r δ
   refine ⟨smooth r δ F, iteratedDeriv r (smooth r δ F), hg.continuous.measurable,
-    (hg.continuous_iteratedDeriv r le_rfl).measurable, ?_, ?_, fun a b hab =>
-      exists_eLpNorm_sub_polyFun_le hp r hg hab⟩
-  · exact (eLpNorm_sub_smooth_le hF r hδ hp hp' le_rfl hwb).trans (modulus_mono r p 0 1 F hrδ)
+    (hg.continuous_iteratedDeriv r le_rfl).measurable, ?_, ?_, fun u v huv =>
+      exists_eLpNorm_sub_polyFun_le hp r hg huv⟩
+  · exact (eLpNorm_sub_smooth_le hF r hδ hp hp' le_rfl hwb).trans (modulus_mono r p 0 b F hrδ)
   · refine (eLpNorm_iteratedDeriv_smooth_le hF r hδ hp le_rfl hwb).trans ?_
     have hinv : (ENNReal.ofReal δ)⁻¹ = (r : ℝ≥0∞) ^ 2 * ENNReal.ofReal L⁻¹ := by
       rw [← ENNReal.ofReal_inv_of_pos hδ, hδdef, show (L / (r : ℝ) ^ 2)⁻¹ = (r : ℝ) ^ 2 * L⁻¹ by
         field_simp, ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_pow (Nat.cast_nonneg r),
         ENNReal.ofReal_natCast]
     rw [hinv, mul_pow, ← pow_mul]
-    calc 2 ^ r * ((r : ℝ≥0∞) ^ (2 * r) * ENNReal.ofReal L⁻¹ ^ r) * modulus r p 0 1 F (r * δ)
-        ≤ 2 ^ r * ((r : ℝ≥0∞) ^ (2 * r) * ENNReal.ofReal L⁻¹ ^ r) * modulus r p 0 1 F L := by
+    calc 2 ^ r * ((r : ℝ≥0∞) ^ (2 * r) * ENNReal.ofReal L⁻¹ ^ r) * modulus r p 0 b F (r * δ)
+        ≤ 2 ^ r * ((r : ℝ≥0∞) ^ (2 * r) * ENNReal.ofReal L⁻¹ ^ r) * modulus r p 0 b F L := by
           gcongr
-          exact modulus_mono r p 0 1 F hrδ
+          exact modulus_mono r p 0 b F hrδ
       _ = _ := by ring
 
-/-- **Smoothing on a right part**: the same on `[1 - w, 1]`, by the reflection `x ↦ 1 - x`, which
-preserves the modulus (`Interval.modulus_reflect`). -/
+/-- **Smoothing on a right part**: the same on `[b - w, b]`, by the reflection `x ↦ b - x`, which
+preserves the modulus on `[0, b]` (`Interval.modulus_reflect`). -/
 theorem exists_right_smoothing {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr : 1 ≤ r)
-    {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) {L w : ℝ} (hL : 0 < L) (hwL : w + L ≤ 1) :
+    {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) {b L w : ℝ} (hL : 0 < L) (hwL : w + L ≤ b) :
     ∃ g D : ℝ → ℂ, Measurable g ∧ Measurable D ∧
-      eLpNorm (fun x => F x - g x) p (volume.restrict (Icc (1 - w) 1)) ≤ modulus r p 0 1 F L ∧
-      eLpNorm D p (volume.restrict (Icc (1 - w) 1)) ≤
-        ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * modulus r p 0 1 F L ∧
-      ∀ a b : ℝ, a ≤ b → ∃ T ∈ degreeLT ℂ r,
-        eLpNorm (fun x => g x - polyFun T x) p (volume.restrict (Icc a b)) ≤
-          ENNReal.ofReal (b - a) ^ r * eLpNorm D p (volume.restrict (Icc a b)) := by
-  have hF' : Continuous fun x => F (1 - x) := hF.comp (continuous_const.sub continuous_id)
+      eLpNorm (fun x => F x - g x) p (volume.restrict (Icc (b - w) b)) ≤ modulus r p 0 b F L ∧
+      eLpNorm D p (volume.restrict (Icc (b - w) b)) ≤
+        ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * modulus r p 0 b F L ∧
+      ∀ u v : ℝ, u ≤ v → ∃ T ∈ degreeLT ℂ r,
+        eLpNorm (fun x => g x - polyFun T x) p (volume.restrict (Icc u v)) ≤
+          ENNReal.ofReal (v - u) ^ r * eLpNorm D p (volume.restrict (Icc u v)) := by
+  have hF' : Continuous fun x => F (b - x) := hF.comp (continuous_const.sub continuous_id)
   obtain ⟨G, DG, hGm, hDm, h1, h2, h3⟩ := exists_left_smoothing hF' hr hp hp' hL hwL
-  have hmod : modulus r p 0 1 (fun x => F (1 - x)) L = modulus r p 0 1 F L := by
-    simpa using modulus_reflect hF.measurable r p 0 1 L
+  have hmod : modulus r p 0 b (fun x => F (b - x)) L = modulus r p 0 b F L := by
+    simpa using modulus_reflect hF.measurable r p 0 b L
   rw [hmod] at h1 h2
-  refine ⟨fun x => G (1 - x), fun x => DG (1 - x), hGm.comp (measurable_const.sub measurable_id),
-    hDm.comp (measurable_const.sub measurable_id), ?_, ?_, fun a b hab => ?_⟩
-  · have h := eLpNorm_comp_sub_Icc (f := fun y => F (1 - y) - G y)
-      ((hF'.measurable).sub hGm) p 1 (1 - w) 1
+  refine ⟨fun x => G (b - x), fun x => DG (b - x), hGm.comp (measurable_const.sub measurable_id),
+    hDm.comp (measurable_const.sub measurable_id), ?_, ?_, fun u v huv => ?_⟩
+  · have h := eLpNorm_comp_sub_Icc (f := fun y => F (b - y) - G y)
+      ((hF'.measurable).sub hGm) p b (b - w) b
     simp only [sub_sub_cancel, sub_self] at h
     rw [h]
     exact h1
-  · have h := eLpNorm_comp_sub_Icc hDm p 1 (1 - w) 1
+  · have h := eLpNorm_comp_sub_Icc hDm p b (b - w) b
     simp only [sub_sub_cancel, sub_self] at h
     rw [h]
     exact h2
-  · obtain ⟨T, hT, hTb⟩ := h3 (1 - b) (1 - a) (by linarith)
-    refine ⟨T.comp (C (((1 : ℝ) : ℝ) : ℂ) + C (((-1 : ℝ) : ℝ) : ℂ) * X),
+  · obtain ⟨T, hT, hTb⟩ := h3 (b - v) (b - u) (by linarith)
+    refine ⟨T.comp (C ((b : ℝ) : ℂ) + C (((-1 : ℝ) : ℝ) : ℂ) * X),
       comp_affine_mem_degreeLT hT _ _, ?_⟩
-    have hfun : (fun x => G (1 - x) - polyFun (T.comp (C (((1 : ℝ) : ℝ) : ℂ) +
-        C (((-1 : ℝ) : ℝ) : ℂ) * X)) x) = fun x => (fun y => G y - polyFun T y) (1 - x) := by
+    have hfun : (fun x => G (b - x) - polyFun (T.comp (C ((b : ℝ) : ℂ) +
+        C (((-1 : ℝ) : ℝ) : ℂ) * X)) x) = fun x => (fun y => G y - polyFun T y) (b - x) := by
       funext x
       rw [polyFun_comp_affine]
       congr 2
       ring
     rw [hfun, eLpNorm_comp_sub_Icc (f := fun y => G y - polyFun T y)
-      (hGm.sub (measurable_polyFun T)) p 1 a b, eLpNorm_comp_sub_Icc hDm p 1 a b]
-    rw [show (1 - a) - (1 - b) = b - a by ring] at hTb
+      (hGm.sub (measurable_polyFun T)) p b u v, eLpNorm_comp_sub_Icc hDm p b u v]
+    rw [show (b - u) - (b - v) = v - u by ring] at hTb
     exact hTb
 
 end Interval
