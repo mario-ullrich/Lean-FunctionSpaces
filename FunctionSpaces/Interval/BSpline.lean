@@ -30,7 +30,13 @@ and on `[j, j + 1)`, `0 ≤ j < r`, is the polynomial
   coordinates of a polynomial in these bases on neighbouring unit intervals agree
   (`Interval.bcoord_comp_add_one`, `Interval.bcoord_comp_eq_bsplineCoef`): **every polynomial `P`
   of degree `< r` is `∑_n c_n(P) N_r(x - n)` on all of `ℝ`**, with one coefficient `c_n(P)` per
-  B-spline (`Interval.polyFun_eq_sum_bsplineCoef`).
+  B-spline (`Interval.polyFun_eq_sum_bsplineCoef`). The coefficients are linear in `P`
+  (`Interval.bsplineCoef_sum`).
+* Since `B_r = 0`, every piece also has a right-sided form, `B_j = -∑_{j < l ≤ r} (…) (X - l)^(r-1)`
+  (`Interval.bsplinePiece_eq_neg_sum`). Hence the powers `(X - a)^(r-1)`, `0 < a < r`, are
+  combinations of `β_1, …, β_{r-1}`, and **`c_n((X - m)^(r-1)) = 0` for `n < m < n + r`**
+  (`Interval.bsplineCoef_X_sub_C_pow`): the B-splines that contain a knot `m` in the interior of
+  their support do not see the jump `(x - m)_+^(r-1)` there.
 -/
 
 @[expose] public section
@@ -390,5 +396,158 @@ theorem polyFun_eq_sum_bsplineCoef {r : ℕ} (hr : 1 ≤ r) {P : ℂ[X]} (hP : P
   refine sum_congr rfl fun j hj => ?_
   rw [bcoord_comp_eq_bsplineCoef hr hP i (mem_range.1 hj), bspline_sub_eq (mem_range.1 hj) hx,
     polyFun]
+
+/-! ### Linearity of the coefficients -/
+
+/-- The B-spline coordinates are additive. -/
+theorem bcoord_add {r : ℕ} (hr : 1 ≤ r) {P Q : ℂ[X]} (hP : P ∈ degreeLT ℂ r)
+    (hQ : Q ∈ degreeLT ℂ r) (j : ℕ) : bcoord hr (P + Q) j = bcoord hr P j + bcoord hr Q j := by
+  by_cases hj : j < r
+  · have h1 : P + Q ∈ degreeLT ℂ r ∧ j < r := ⟨Submodule.add_mem _ hP hQ, hj⟩
+    have h2 : P ∈ degreeLT ℂ r ∧ j < r := ⟨hP, hj⟩
+    have h3 : Q ∈ degreeLT ℂ r ∧ j < r := ⟨hQ, hj⟩
+    simp only [bcoord, h1, h2, h3, and_self, ↓reduceDIte]
+    rw [show (⟨P + Q, h1.1⟩ : degreeLT ℂ r) = ⟨P, hP⟩ + ⟨Q, hQ⟩ from rfl, map_add,
+      Finsupp.add_apply]
+  · have h : ∀ R : ℂ[X], ¬ (R ∈ degreeLT ℂ r ∧ j < r) := fun R h => hj h.2
+    simp only [bcoord, h, ↓reduceDIte, add_zero]
+
+/-- The B-spline coordinates are homogeneous. -/
+theorem bcoord_C_mul {r : ℕ} (hr : 1 ≤ r) (c : ℂ) {P : ℂ[X]} (hP : P ∈ degreeLT ℂ r) (j : ℕ) :
+    bcoord hr (C c * P) j = c * bcoord hr P j := by
+  by_cases hj : j < r
+  · have hcP : C c * P ∈ degreeLT ℂ r := by
+      rw [← smul_eq_C_mul]; exact Submodule.smul_mem _ _ hP
+    have h1 : C c * P ∈ degreeLT ℂ r ∧ j < r := ⟨hcP, hj⟩
+    have h2 : P ∈ degreeLT ℂ r ∧ j < r := ⟨hP, hj⟩
+    simp only [bcoord, h1, h2, and_self, ↓reduceDIte]
+    rw [show (⟨C c * P, h1.1⟩ : degreeLT ℂ r) = c • ⟨P, hP⟩ from
+      Subtype.ext (by simp [smul_eq_C_mul]), map_smul, Finsupp.smul_apply, smul_eq_mul]
+  · have h : ∀ R : ℂ[X], ¬ (R ∈ degreeLT ℂ r ∧ j < r) := fun R h => hj h.2
+    simp only [bcoord, h, ↓reduceDIte, mul_zero]
+
+/-- The B-spline coefficients are additive. -/
+theorem bsplineCoef_add {r : ℕ} (hr : 1 ≤ r) {P Q : ℂ[X]} (hP : P ∈ degreeLT ℂ r)
+    (hQ : Q ∈ degreeLT ℂ r) (n : ℤ) :
+    bsplineCoef hr (P + Q) n = bsplineCoef hr P n + bsplineCoef hr Q n := by
+  rw [bsplineCoef, add_comp, bcoord_add hr (comp_X_add_C_mem hP _) (comp_X_add_C_mem hQ _)]
+  rfl
+
+/-- The B-spline coefficients are homogeneous. -/
+theorem bsplineCoef_C_mul {r : ℕ} (hr : 1 ≤ r) (c : ℂ) {P : ℂ[X]} (hP : P ∈ degreeLT ℂ r)
+    (n : ℤ) : bsplineCoef hr (C c * P) n = c * bsplineCoef hr P n := by
+  rw [bsplineCoef, mul_comp, C_comp, bcoord_C_mul hr c (comp_X_add_C_mem hP _)]
+  rfl
+
+/-- The B-spline coefficients of finite combinations of polynomials of degree `< r`. -/
+theorem bsplineCoef_sum {r : ℕ} (hr : 1 ≤ r) {ι : Type*} (s : Finset ι) (c : ι → ℂ)
+    {P : ι → ℂ[X]} (hP : ∀ i ∈ s, P i ∈ degreeLT ℂ r) (n : ℤ) :
+    bsplineCoef hr (∑ i ∈ s, c i • P i) n = ∑ i ∈ s, c i * bsplineCoef hr (P i) n := by
+  classical
+  induction s using Finset.induction_on with
+  | empty =>
+    have h := bsplineCoef_C_mul hr 0 (Submodule.zero_mem (degreeLT ℂ r)) n
+    simpa using h
+  | insert j s hj ih =>
+    have hj' : P j ∈ degreeLT ℂ r := hP j (Finset.mem_insert_self j s)
+    have hs : ∀ i ∈ s, P i ∈ degreeLT ℂ r := fun i hi => hP i (Finset.mem_insert_of_mem hi)
+    rw [Finset.sum_insert hj, Finset.sum_insert hj,
+      bsplineCoef_add hr (Submodule.smul_mem _ _ hj')
+        (Submodule.sum_mem _ fun i hi => Submodule.smul_mem _ _ (hs i hi)),
+      smul_eq_C_mul, bsplineCoef_C_mul hr _ hj', ih hs]
+
+/-! ### Coefficients of shifted powers -/
+
+/-- **The right-sided form of the pieces**: since `B_r = 0` (`Interval.bsplinePiece_top`),
+`B_j = -∑_{j < l ≤ r} (-1)^l C(r, l) (X - l)^(r-1) / (r-1)!` for `j ≤ r`. -/
+theorem bsplinePiece_eq_neg_sum {r : ℕ} (hr : 1 ≤ r) {j : ℕ} (hj : j ≤ r) :
+    bsplinePiece r j =
+      -∑ l ∈ Ico (j + 1) (r + 1), C (bsplineCoeff r l) * (X - C (l : ℂ)) ^ (r - 1) := by
+  have h := bsplinePiece_top hr
+  rw [bsplinePiece, ← sum_range_add_sum_Ico _ (show j + 1 ≤ r + 1 by omega), ← bsplinePiece] at h
+  exact eq_neg_of_add_eq_zero_left h
+
+/-- The B-splines on `[0, 1)` in right-sided form:
+`β_j = -∑_{j < l ≤ r} (-1)^l C(r, l) (X - (l - j))^(r-1) / (r-1)!` for `j ≤ r`. -/
+theorem bsplineLocal_eq_neg_sum {r : ℕ} (hr : 1 ≤ r) {j : ℕ} (hj : j ≤ r) :
+    bsplineLocal r j = -∑ l ∈ Ico (j + 1) (r + 1),
+      C (bsplineCoeff r l) * (X - C ((l - j : ℕ) : ℂ)) ^ (r - 1) := by
+  rw [bsplineLocal, bsplinePiece_eq_neg_sum hr hj, neg_comp, Polynomial.sum_comp]
+  congr 1
+  refine sum_congr rfl fun l hl => ?_
+  have hl' : j ≤ l := by have := (mem_Ico.1 hl).1; omega
+  rw [mul_comp, C_comp, pow_comp, sub_comp, X_comp, C_comp, Nat.cast_sub hl', C_sub]
+  ring
+
+/-- **The powers `(X - a)^(r-1)`, `1 ≤ a < r`, are combinations of `β_1, …, β_{r-1}`**: by the
+right-sided form, `β_{r-a}` is a nonzero multiple of `(X - a)^(r-1)` plus multiples of the powers
+`(X - b)^(r-1)`, `1 ≤ b < a`, so induction on `a` applies. -/
+theorem X_sub_C_pow_mem_span_bsplineLocal {r : ℕ} (hr : 1 ≤ r) {a : ℕ} (ha1 : 1 ≤ a)
+    (ha : a < r) :
+    (X - C (a : ℂ)) ^ (r - 1) ∈ Submodule.span ℂ (bsplineLocal r '' Set.Ico 1 r) := by
+  induction a using Nat.strong_induction_on with
+  | _ a ih =>
+    have hc : bsplineCoeff r r ≠ 0 := by simp [bsplineCoeff, Nat.factorial_ne_zero]
+    have hβ := bsplineLocal_eq_neg_sum hr (show r - a ≤ r by omega)
+    rw [sum_Ico_succ_top (show r - a + 1 ≤ r by omega), show r - (r - a) = a by omega] at hβ
+    have hrepr : (X - C (a : ℂ)) ^ (r - 1) = (bsplineCoeff r r)⁻¹ • (-bsplineLocal r (r - a) -
+        ∑ l ∈ Ico (r - a + 1) r,
+          C (bsplineCoeff r l) * (X - C ((l - (r - a) : ℕ) : ℂ)) ^ (r - 1)) := by
+      rw [hβ, smul_eq_C_mul, neg_neg, add_sub_cancel_left, ← mul_assoc, ← C_mul,
+        inv_mul_cancel₀ hc, C_1, one_mul]
+    rw [hrepr]
+    refine Submodule.smul_mem _ _ (Submodule.sub_mem _ (Submodule.neg_mem _
+      (Submodule.subset_span ⟨r - a, ⟨by omega, by omega⟩, rfl⟩))
+      (Submodule.sum_mem _ fun l hl => ?_))
+    have hl := mem_Ico.1 hl
+    rw [← smul_eq_C_mul]
+    exact Submodule.smul_mem _ _ (ih (l - (r - a)) (by omega) (by omega) (by omega))
+
+/-- The coordinates of the B-splines on `[0, 1)` in their own basis: `β_j` has coordinate `1` at
+`j` and `0` elsewhere. -/
+theorem bcoord_bsplineLocal {r : ℕ} (hr : 1 ≤ r) {j l : ℕ} (hj : j < r) (hl : l < r) :
+    bcoord hr (bsplineLocal r j) l = if l = j then 1 else 0 := by
+  refine bcoord_eq_of_sum hr (fun m => if m = j then 1 else 0) ?_ hl
+  rw [sum_eq_single j (fun m _ hm => by simp [hm]) (fun h => absurd (mem_range.2 hj) h)]
+  simp
+
+/-- **Combinations of `β_1, …, β_{r-1}` have coordinate `0` at `β_0`.** -/
+theorem bcoord_zero_of_mem_span {r : ℕ} (hr : 1 ≤ r) {P : ℂ[X]}
+    (hP : P ∈ Submodule.span ℂ (bsplineLocal r '' Set.Ico 1 r)) : bcoord hr P 0 = 0 := by
+  have key : P ∈ degreeLT ℂ r ∧ bcoord hr P 0 = 0 := by
+    induction hP using Submodule.span_induction with
+    | mem Q hQ =>
+      obtain ⟨j, hj, rfl⟩ := hQ
+      have hj0 : (0 : ℕ) ≠ j := by have := hj.1; omega
+      refine ⟨bsplineLocal_mem hr j, ?_⟩
+      rw [bcoord_bsplineLocal hr hj.2 (by omega)]
+      simp only [hj0, ↓reduceIte]
+    | zero =>
+      exact ⟨Submodule.zero_mem _,
+        bcoord_eq_of_sum hr (P := 0) (fun _ => (0 : ℂ)) (by simp) (by omega : 0 < r)⟩
+    | add Q R _ _ hQ hR =>
+      exact ⟨Submodule.add_mem _ hQ.1 hR.1, by rw [bcoord_add hr hQ.1 hR.1, hQ.2, hR.2, add_zero]⟩
+    | smul c Q _ hQ =>
+      exact ⟨Submodule.smul_mem _ c hQ.1, by
+        rw [smul_eq_C_mul, bcoord_C_mul hr c hQ.1, hQ.2, mul_zero]⟩
+  exact key.2
+
+/-- **Vanishing coefficients of shifted powers**: `c_n((X - m)^(r-1)) = 0` for `n < m < n + r`.
+On `[n, n + 1)` the coefficient `c_n` is the coordinate at `β_0`, and `(X - m)^(r-1)` becomes
+`(X - a)^(r-1)` with `a = m - n`, a combination of `β_1, …, β_{r-1}`
+(`Interval.X_sub_C_pow_mem_span_bsplineLocal`). In the spline expansion of `(x - m)_+^(r-1)` this
+is why the B-splines that start left of the knot `m` but contain it get the coefficient `0`. -/
+theorem bsplineCoef_X_sub_C_pow {r : ℕ} (hr : 1 ≤ r) {m n : ℤ} (hnm : n < m) (hmn : m < n + r) :
+    bsplineCoef hr ((X - C (m : ℂ)) ^ (r - 1)) n = 0 := by
+  obtain ⟨a, ha⟩ : ∃ a : ℕ, m - n = a := ⟨(m - n).toNat, (Int.toNat_of_nonneg (by omega)).symm⟩
+  have hcomp : ((X - C (m : ℂ)) ^ (r - 1)).comp (X + C (n : ℂ)) = (X - C (a : ℂ)) ^ (r - 1) := by
+    have hm : ((m : ℤ) : ℂ) = (n : ℂ) + (a : ℂ) := by
+      have h := congrArg (fun z : ℤ => (z : ℂ)) ha
+      push_cast at h
+      linear_combination h
+    rw [pow_comp, sub_comp, X_comp, C_comp, hm, C_add]
+    ring
+  rw [bsplineCoef, hcomp]
+  exact bcoord_zero_of_mem_span hr (X_sub_C_pow_mem_span_bsplineLocal hr (by omega) (by omega))
 
 end Interval

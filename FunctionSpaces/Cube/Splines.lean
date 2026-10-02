@@ -25,6 +25,12 @@ increasing in `k` (`Cube.cubeSplineSpace`) and the scheme `Cube.cubeSplineScheme
 they contain the polynomials of degree `< r` in each variable (`Cube.IsCubePP.isCubeSpline_zero`).
 The **tensor quasi-interpolant** `Q_k^{(0)} ⋯ Q_k^{(d-1)} g` (`Cube.cubeQI`) has the form of `Q_k`
 in every coordinate, so its slices are combinations of B-splines (`Cube.isCubeSpline_cubeQI`).
+
+Since `Q_k` reproduces the splines (`Interval.ppFun_qiPieces_ppFun`), in particular its own
+B-splines (`Cube.qiKernel_reproduces`), the splines on the cube are the **tensor products** of the
+splines in one variable: the combinations of products `∏_i u_i(x_i)` of dyadic splines `u_i` on
+`[0, 1]` (`Cube.isCubeSpline_iff_mem_span_prod_ppFun`), or of products of B-splines
+(`Cube.isCubeSpline_iff_mem_span`).
 -/
 
 @[expose] public section
@@ -169,24 +175,99 @@ noncomputable def cubeQI {r : ℕ} (hr : 1 ≤ r) (k : ℕ) (g : (Fin d → ℝ)
     (Fin d → ℝ) → ℂ :=
   (qiKernel hr k).foldSlicewise (List.finRange d) g
 
-/-- **The tensor quasi-interpolant is a spline on the cube**: it has the form of `Q_k` in every
-coordinate, so its slices are combinations of B-splines. -/
-theorem isCubeSpline_cubeQI {r : ℕ} (hr : 1 ≤ r) (k : ℕ) {g : (Fin d → ℝ) → ℂ}
-    (hg : BddMeas g) : IsCubeSpline r k (cubeQI hr k g) := by
-  refine ⟨(qiKernel hr k).bddMeas_foldSlicewise _ hg, fun i x => ?_⟩
-  obtain ⟨a, ha⟩ :=
-    ((qiKernel hr k).isForm_foldSlicewise _ hg (List.mem_finRange i)).slice_eq _ x
+/-- **The forms of the quasi-interpolant are splines on the cube**: a bounded measurable function
+with the form of `Q_k` in every coordinate has slices that are combinations of B-splines. -/
+theorem isCubeSpline_of_isForm {r : ℕ} (hr : 1 ≤ r) {k : ℕ} {g : (Fin d → ℝ) → ℂ}
+    (hg : BddMeas g) (hform : ∀ i, (qiKernel hr k).IsForm i g) : IsCubeSpline r k g := by
+  refine ⟨hg, fun i x => ?_⟩
+  obtain ⟨a, ha⟩ := (hform i).slice_eq _ x
   refine ⟨∑ n : qiIdx r (2 ^ k), fun m => C (a n) * bsplinePieces r k n m, fun m => ?_, ?_, ?_⟩
   · rw [Finset.sum_apply]
     exact Submodule.sum_mem _ fun n _ => by
       rw [← smul_eq_C_mul]; exact Submodule.smul_mem _ _ (bsplinePieces_mem hr k n m)
   · exact SplineJoins.sum _ fun n _ => (splineJoins_bsplinePieces hr k n).const_mul (a n)
-  · rw [cubeQI, ha, ppFun_sum]
+  · rw [ha, ppFun_sum]
     funext t
     rw [Finset.sum_apply]
     refine Finset.sum_congr rfl fun n _ => ?_
     rw [ppFun_const_mul]
     rfl
+
+/-- **The tensor quasi-interpolant is a spline on the cube**: it has the form of `Q_k` in every
+coordinate, so its slices are combinations of B-splines. -/
+theorem isCubeSpline_cubeQI {r : ℕ} (hr : 1 ≤ r) (k : ℕ) {g : (Fin d → ℝ) → ℂ}
+    (hg : BddMeas g) : IsCubeSpline r k (cubeQI hr k g) :=
+  isCubeSpline_of_isForm hr ((qiKernel hr k).bddMeas_foldSlicewise _ hg)
+    fun i => (qiKernel hr k).isForm_foldSlicewise _ hg (List.mem_finRange i)
+
+/-! ### Tensor products -/
+
+/-- The quasi-interpolant reproduces its B-splines `N_r(2^k x - n)`. -/
+theorem qiKernel_reproduces {r : ℕ} (hr : 1 ≤ r) (k : ℕ) : (qiKernel hr k).Reproduces :=
+  fun n => by
+    show (qiKernel hr k).apply (ppFun k (bsplinePieces r k n)) = ppFun k (bsplinePieces r k n)
+    rw [qiKernel_apply hr k (bddMeas_ppFun k _).integrableOn_Icc,
+      ppFun_qiPieces_ppFun hr (bsplinePieces_mem hr k n) (splineJoins_bsplinePieces hr k n)]
+
+/-- **The quasi-interpolant reproduces splines on the cube**: `Q_k^{(i)} g = g` in every
+coordinate `i`, since it reproduces the slices. -/
+theorem IsCubeSpline.slicewise_qiKernel {r k : ℕ} (hr : 1 ≤ r) {g : (Fin d → ℝ) → ℂ}
+    (hg : IsCubeSpline r k g) (i : Fin d) : (qiKernel hr k).slicewise i g = g := by
+  funext x
+  obtain ⟨Q, hQ, hJ, hs⟩ := hg.2 i x
+  rw [KernelOp.slicewise, hs, qiKernel_apply hr k (bddMeas_ppFun k Q).integrableOn_Icc,
+    ppFun_qiPieces_ppFun hr hQ hJ, ← hs]
+  simp only [slice, Function.update_eq_self]
+
+/-- Splines on the cube have the form of `Q_k` in every coordinate. -/
+theorem IsCubeSpline.isForm {r k : ℕ} (hr : 1 ≤ r) {g : (Fin d → ℝ) → ℂ}
+    (hg : IsCubeSpline r k g) (i : Fin d) : (qiKernel hr k).IsForm i g :=
+  KernelOp.IsForm.congr (qiKernel hr k) ((qiKernel hr k).isForm_slicewise hg.1 i)
+    (hg.slicewise_qiKernel hr i)
+
+/-- **Splines on the cube are tensor products of B-splines**: `g` is a spline of order `r` and
+level `k` in each variable iff it is a combination of the products `∏_i N_r(2^k x_i - n_i)` of the
+B-splines that meet `[0, 1)`. -/
+theorem isCubeSpline_iff_mem_span {r k : ℕ} (hr : 1 ≤ r) {g : (Fin d → ℝ) → ℂ} :
+    IsCubeSpline r k g ↔ g ∈ Submodule.span ℂ (Set.range fun j : Fin d → qiIdx r (2 ^ k) =>
+      fun x => ∏ i, (qiKernel hr k).rangeFn (j i) (x i)) := by
+  have : Nonempty (qiIdx r (2 ^ k)) := ⟨⟨0, by
+    rw [qiIdx, Finset.mem_Ioo]
+    exact ⟨by omega, by exact_mod_cast Nat.two_pow_pos k⟩⟩⟩
+  exact ⟨fun h => (qiKernel hr k).mem_span_prod_of_isForm (qiKernel_reproduces hr k) h.1
+      (h.isForm hr),
+    fun h => isCubeSpline_of_isForm hr ((qiKernel hr k).isForm_of_mem_span_prod h).1
+      ((qiKernel hr k).isForm_of_mem_span_prod h).2⟩
+
+/-- **Splines on the cube are the tensor products of splines in one variable**: the splines of
+order `r` and level `k` in each variable are the combinations of products `∏_i u_i(x_i)` of dyadic
+splines `u_i` of order `r` and level `k` on `[0, 1]`. -/
+theorem isCubeSpline_iff_mem_span_prod_ppFun {r k : ℕ} (hr : 1 ≤ r) {g : (Fin d → ℝ) → ℂ} :
+    IsCubeSpline r k g ↔ g ∈ Submodule.span ℂ {G | ∃ Q : Fin d → ℕ → ℂ[X],
+      (∀ i n, Q i n ∈ degreeLT ℂ r) ∧ (∀ i, SplineJoins r k (Q i)) ∧
+        G = fun x => ∏ i, ppFun k (Q i) (x i)} := by
+  rw [isCubeSpline_iff_mem_span hr]
+  constructor
+  · refine fun h => Submodule.span_mono ?_ h
+    rintro _ ⟨j, rfl⟩
+    exact ⟨fun i => bsplinePieces r k (j i), fun i n => bsplinePieces_mem hr k _ n,
+      fun i => splineJoins_bsplinePieces hr k _, rfl⟩
+  · refine fun h => (Submodule.span_le.2 ?_) h
+    rintro _ ⟨Q, hQ, hJ, rfl⟩
+    have hexp : ∀ i (t : ℝ), ppFun k (Q i) t =
+        ∑ m, (qiKernel hr k).coef (ppFun k (Q i)) m * (qiKernel hr k).rangeFn m t := fun i t => by
+      have h := congrFun (qiKernel_apply hr k (bddMeas_ppFun k (Q i)).integrableOn_Icc) t
+      rw [ppFun_qiPieces_ppFun hr (hQ i) (hJ i)] at h
+      rw [← h]
+      rfl
+    have hG : (fun x : Fin d → ℝ => ∏ i, ppFun k (Q i) (x i)) =
+        ∑ j : Fin d → qiIdx r (2 ^ k), (∏ i, (qiKernel hr k).coef (ppFun k (Q i)) (j i)) •
+          fun x : Fin d → ℝ => ∏ i, (qiKernel hr k).rangeFn (j i) (x i) := by
+      funext x
+      simp only [hexp, Finset.prod_univ_sum, Fintype.piFinset_univ, Finset.sum_apply,
+        Pi.smul_apply, smul_eq_mul, Finset.prod_mul_distrib]
+    rw [hG]
+    exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 

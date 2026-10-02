@@ -3680,7 +3680,9 @@ so the $\beta_j$ span as well.
   Interval.sum_bcoord, Interval.bcoord_eq_of_sum, Interval.bsplineLocal_comp_add_one,
   Interval.bsplineLocal_zero, Interval.bsplineLocal_top, Interval.bcoord_comp_add_one,
   Interval.comp_X_add_C_mem, Interval.bsplineCoef, Interval.bcoord_comp_eq_bsplineCoef,
-  Interval.bspline_sub_eq, Interval.polyFun_eq_sum_bsplineCoef}
+  Interval.bspline_sub_eq, Interval.polyFun_eq_sum_bsplineCoef, Interval.bcoord_add,
+  Interval.bcoord_C_mul, Interval.bsplineCoef_add, Interval.bsplineCoef_C_mul,
+  Interval.bsplineCoef_sum}
 \leanok
 \uses{lem:bspline-basis}
 Let $r \geq 1$. For every polynomial $P$ of degree $< r$ there are coefficients
@@ -3688,7 +3690,8 @@ $c_n(P) \in \C$, $n \in \Z$, such that for all $i \in \Z$ and $x \in [i, i+1)$
 \[
   P(x) = \sum_{j < r} c_{i - j}(P) \, N_r(x - (i - j)) ,
 \]
-that is, $P = \sum_{n \in \Z} c_n(P) N_r(\cdot - n)$ on $\R$.
+that is, $P = \sum_{n \in \Z} c_n(P) N_r(\cdot - n)$ on $\R$. The coefficients $c_n(P)$ depend
+linearly on $P$.
 \end{theorem}
 
 \begin{proof}
@@ -3697,7 +3700,31 @@ On $[i, i+1)$ expand $P(\cdot + i)$ in the basis of \Cref{lem:bspline-basis}; le
 coordinate of $\beta_0$ there. Since $\beta_j(x + 1) = \beta_{j+1}(x) - c\, x^{r-1}$ with
 $\beta_r = 0$ and $x^{r-1} = (r-1)! \beta_0$, the coordinate $j + 1$ of $P(\cdot + i + 1)$ is the
 coordinate $j$ of $P(\cdot + i)$. By induction the coordinate $j$ on $[i, i+1)$ is
-$c_{i-j}(P)$, and $\beta_j(x - i) = N_r(x - (i - j))$ there.
+$c_{i-j}(P)$, and $\beta_j(x - i) = N_r(x - (i - j))$ there. Coordinates in a basis are linear.
+\end{proof}
+
+\begin{lemma}[Coefficients of shifted powers]
+\label{lem:bspline-coef-powers}
+\lean{Interval.bsplinePiece_eq_neg_sum, Interval.bsplineLocal_eq_neg_sum,
+  Interval.X_sub_C_pow_mem_span_bsplineLocal, Interval.bcoord_bsplineLocal,
+  Interval.bcoord_zero_of_mem_span, Interval.bsplineCoef_X_sub_C_pow}
+\leanok
+\uses{thm:marsden, lem:bspline-pieces}
+Let $r \geq 1$ and $m, n \in \Z$ with $n < m < n + r$. Then $c_n\bigl((x - m)^{r-1}\bigr) = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By definition $c_n(P)$ is the coordinate of $\beta_0$ in the expansion of $P(\cdot + n)$, and
+$(x + n - m)^{r-1} = (x - a)^{r-1}$ with $a = m - n \in \{1, \dots, r - 1\}$. Since $B_r = 0$
+(\Cref{lem:bspline-pieces}), $B_j = -\sum_{j < l \leq r} \frac{(-1)^l}{(r-1)!} \binom{r}{l}
+(x - l)^{r-1}$, so
+\[
+  \beta_{r-a}(x) = -\frac{(-1)^r}{(r-1)!} (x - a)^{r-1}
+    - \sum_{1 \leq b < a} \frac{(-1)^{b + r - a}}{(r-1)!} \binom{r}{b + r - a} (x - b)^{r-1} .
+\]
+By induction on $a$, $(x - a)^{r-1}$ is a combination of $\beta_1, \dots, \beta_{r-1}$, so its
+coordinate at $\beta_0$ vanishes.
 \end{proof}
 
 \section{Dyadic splines}
@@ -3751,6 +3778,23 @@ joins at every knot $m 2^{-k}$, $m \geq 1$.
 At the knot $m 2^{-k}$ the pieces differ by $(B_d - B_{d-1})(2^k x - n)$, $d = m - n$, a multiple
 of $(2^k x - m)^{r-1}$ by \Cref{lem:bspline-pieces}; at the ends of the support one of the two
 pieces is $0$ and the other is $B_0$ or $B_{r-1} = B_{r-1} - B_r$.
+\end{proof}
+
+\begin{lemma}[B-spline coefficients of the pieces of a spline]
+\label{lem:spline-coef-pieces}
+\lean{Interval.X_sub_C_pow_comp_scale, Interval.bsplineCoef_comp_eq_of_splineJoins}
+\leanok
+\uses{def:spline-space, lem:bspline-coef-powers}
+Let $r \geq 1$, let $s \in S_k$ have the pieces $Q_m$, and let $\tilde Q_m(y) = Q_m(y 2^{-k})$. For
+$n \in \Z$ and $j \leq i < 2^k$ with $n \leq j$ and $i < n + r$,
+$c_n(\tilde Q_i) = c_n(\tilde Q_j)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\tilde Q_{m} - \tilde Q_{m-1}$ is a multiple of $(y - m)^{r-1}$, and for $j < m \leq i$ we have
+$n < m < n + r$, so \Cref{lem:bspline-coef-powers} and the linearity of $c_n$ give
+$c_n(\tilde Q_m) = c_n(\tilde Q_{m-1})$.
 \end{proof}
 
 \section{The inverse inequality for splines}
@@ -3845,7 +3889,8 @@ spline of order $r$ and level $k$.
 
 \begin{lemma}[Properties of the quasi-interpolant]
 \label{lem:quasi-interp}
-\lean{Interval.bspline_eq_zero_of_not_mem, Interval.polyFun_qiPieces_of_eq,
+\lean{Interval.bspline_eq_zero_of_not_mem, Interval.polyFun_qiPieces_of_coeff,
+  Interval.polyFun_qiPieces_of_eq,
   Interval.exists_enorm_bspline_le, Interval.exists_enorm_bcoord_le, Interval.qiCoeff_eq_bcoord,
   Interval.enorm_qiCoeff_le, Interval.bsplinePieces_eq_zero_of_not_mem,
   Interval.qiPieces_eq_sum_Ioc, Interval.polyFun_qiPieces_eq_sum_Ioc, Interval.eLpNorm_qiPieces_le}
@@ -3853,8 +3898,9 @@ spline of order $r$ and level $k$.
 \uses{def:quasi-interp, lem:loc-proj, lem:bspline-basis}
 Let $1 \leq p < \infty$, $r \geq 1$, $k, N \in \N$ and $i < N$.
 \begin{enumerate}
-  \item If $g$ agrees on the intervals $J(n)$, $i - r < n \leq i$, with a polynomial $T$ of
-    degree $< r$, then $Q_k g = T$ on $I_{k,i}$.
+  \item If $\lambda_n(g) = c_n(T(\cdot 2^{-k}))$ for $i - r < n \leq i$ and a polynomial $T$ of
+    degree $< r$, then $Q_k g = T$ on $I_{k,i}$. This holds in particular if $g$ agrees on the
+    intervals $J(n)$, $i - r < n \leq i$, with $T$.
   \item There is $C$, independent of $k$ and $i$, with
     $\|Q_k g\|_{L_p(I_{k,i})} \leq C \sum_{i - r < n \leq i} \|g\|_{L_p(J(n))}$.
 \end{enumerate}
@@ -3862,29 +3908,48 @@ Let $1 \leq p < \infty$, $r \geq 1$, $k, N \in \N$ and $i < N$.
 
 \begin{proof}
 \leanok
-(1) The local projections reproduce $T$ (\Cref{lem:loc-proj}), so $\lambda_n(g) = c_n(T(\cdot
-2^{-k}))$, and on $I_{k,i}$ only the B-splines $i - r < n \leq i$ are nonzero; Marsden's
-identity sums them to $T$. (2) The coordinates in the B-spline basis of \Cref{lem:bspline-basis}
+(1) On $I_{k,i}$ only the B-splines $i - r < n \leq i$ are nonzero, and Marsden's identity sums
+them to $T$. If $g = T$ on $J(n)$, the local projections reproduce $T$ (\Cref{lem:loc-proj}), so
+$\lambda_n(g) = c_n(T(\cdot 2^{-k}))$. (2) The coordinates in the B-spline basis of \Cref{lem:bspline-basis}
 are linear functionals on a space of dimension $r$, hence bounded by $C_b \|\cdot\|_{L_p[0,1]}$;
 by the coordinate consistency of \Cref{thm:marsden}, $\lambda_n(g)$ is such a coordinate of
 $\tilde P(\cdot + \max(n, 0))$, whose norm on $[0, 1]$ is $2^{k/p} \|\Pi_{J(n)} g\|_{L_p(J(n))}
 \leq 2^{k/p} r M^2 \|g\|_{L_p(J(n))}$. With $|N_r| \leq M_N$ and $|I_{k,i}| = 2^{-k}$ this gives (2).
 \end{proof}
 
+\begin{theorem}[The quasi-interpolant reproduces splines]
+\label{thm:qi-splines}
+\lean{Interval.polyFun_qiPieces_ppFun, Interval.ppFun_qiPieces_ppFun,
+  Interval.ppFun_eq_sum_bsplinePieces}
+\leanok
+\uses{lem:quasi-interp, lem:spline-coef-pieces, lem:loc-proj}
+Let $r \geq 1$ and $k \in \N$. Then $Q_k s = s$ for every $s \in S_k$, with $N = 2^k$. In
+particular, every spline $s \in S_k$ is a combination
+$s = \sum_{-r < n < 2^k} \lambda_n(s) N_r(2^k x - n)$ of the B-splines that meet $[0, 1)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $s$ have the pieces $Q_m$ and let $i < 2^k$ and $i - r < n \leq i$. The local projection on
+$J(n) = I_{k, \max(n, 0)}$ reproduces the piece $Q_{\max(n,0)}$ (\Cref{lem:loc-proj}), and
+$n \leq \max(n, 0) \leq i < n + r$, so \Cref{lem:spline-coef-pieces} gives
+$\lambda_n(s) = c_n(\tilde Q_{\max(n,0)}) = c_n(\tilde Q_i)$. By part (1) of
+\Cref{lem:quasi-interp}, $Q_k s = Q_i$ on $I_{k,i}$.
+\end{proof}
+
 \section{Jackson's inequality for splines and the coincidence theorem}
 
 \begin{lemma}[The local error of the quasi-interpolant]
 \label{lem:qi-local-error}
-\lean{Interval.sum_lintegral_window_le, Interval.bcoord_add, Interval.bcoord_C_mul,
-  Interval.bsplineCoef_add, Interval.bsplineCoef_C_mul, Interval.locProjScaled_mem,
+\lean{Interval.sum_lintegral_window_le, Interval.locProjScaled_mem,
   Interval.qiCoeff_add_const_mul, Interval.polyFun_qiPieces_sub, Interval.qiWindow,
   Interval.dyadicIco_subset_qiWindow, Interval.dyadicIco_subset_qiWindow_self,
   Interval.natCast_add_one_sub_le, Interval.qiWindow_subset, Interval.eLpNorm_sub_qiPieces_le,
   Interval.sum_eLpNorm_sub_qiPieces_le, Interval.exists_window_poly, Interval.exists_qiWindow_poly,
-  Interval.bsplineCoef_sum, Interval.qiBasisPoly, Interval.qiBasisPoly_mem,
-  Interval.locProjScaled_eq_sum, Interval.qiCoeff_eq_sum}
+  Interval.qiBasisPoly, Interval.qiBasisPoly_mem, Interval.locProjScaled_eq_sum,
+  Interval.qiCoeff_eq_sum}
 \leanok
-\uses{lem:quasi-interp}
+\uses{lem:quasi-interp, thm:marsden}
 The coefficients $\lambda_n(g)$ are linear combinations of the coefficients of the local
 projection of $g$ on $J(n)$. Let $W_i = [(i + 1 - r) 2^{-k}, (i + 1) 2^{-k}]$ (truncated at
 $0$). There is $C$ with
@@ -4619,7 +4684,8 @@ bound is \Cref{lem:qi-taylor} when $u \in L_p[0,1]$, and trivial otherwise.
 \label{def:cube-spline}
 \lean{Cube.IsCubeSpline, Cube.IsCubeSpline.succ, Cube.IsCubeSpline.add,
   Cube.IsCubeSpline.const_mul, Cube.isCubeSpline_zero, Cube.IsCubePP.isCubeSpline_zero,
-  Cube.cubeQI, Cube.isCubeSpline_cubeQI, Cube.cubeSplineSpace, Cube.cubeSplineSpace_mono,
+  Cube.isCubeSpline_of_isForm, Cube.cubeQI, Cube.isCubeSpline_cubeQI, Cube.cubeSplineSpace,
+  Cube.cubeSplineSpace_mono,
   Cube.cubeSplineScheme, Cube.mem_cubeSplineScheme_two_pow, Cube.cubeSplineScheme_isLinear,
   Cube.approxSeq_cubeSplineScheme_one_le}
 \leanok
@@ -4636,6 +4702,32 @@ $k$ on the cube.
 
 The tensor quasi-interpolant has the form of $Q_k$ in every coordinate
 (\Cref{lem:kernel-forms}), so its slices are combinations of B-splines, hence splines.
+
+\begin{lemma}[Splines on the cube are tensor products]
+\label{lem:cube-spline-tensor}
+\lean{Cube.qiKernel_reproduces, Cube.IsCubeSpline.slicewise_qiKernel, Cube.IsCubeSpline.isForm,
+  Cube.isCubeSpline_iff_mem_span, Cube.isCubeSpline_iff_mem_span_prod_ppFun}
+\leanok
+\uses{def:cube-spline, thm:qi-splines, lem:kernel-tensor, lem:bspline-dyadic}
+Let $r \geq 1$ and $k \in \N$. For a function $g$ on $\R^d$ the following are equivalent:
+\begin{enumerate}
+  \item $g$ is a spline of order $r$ and level $k$ in each variable;
+  \item $g$ is a linear combination of products $\prod_{i=1}^d N_r(2^k x_i - n_i)|_{[0,1)}$ of the
+    B-splines with $-r < n_i < 2^k$;
+  \item $g$ is a linear combination of products $\prod_{i=1}^d u_i(x_i)$ of dyadic splines
+    $u_i \in S_k$ of order $r$ on $[0, 1]$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+$Q_k$ reproduces the splines (\Cref{thm:qi-splines}), in particular its functions
+$N_r(2^k x - n)$. So $Q_k^{(i)} g = g$ for a spline $g$ on the cube, and $g$ has the form of $Q_k$
+in every coordinate (\Cref{lem:kernel-forms}). \Cref{lem:kernel-tensor} gives the equivalence of
+(1) and (2). The B-splines are splines (\Cref{lem:bspline-dyadic}), which gives (2)
+$\Rightarrow$ (3). For the converse, $u_i = Q_k u_i$ is a combination of B-splines, and the
+product of these combinations expands into a combination of products of B-splines.
+\end{proof}
 
 \begin{theorem}[Jackson's inequality for tensor splines]
 \label{thm:cube-spline-jackson}

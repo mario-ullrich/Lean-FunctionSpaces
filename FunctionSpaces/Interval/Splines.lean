@@ -24,7 +24,10 @@ The classes of splines in `L_p[0, 1]` form subspaces `S_k` increasing in `k`
 (`Interval.splineSpace`), and the scheme `Interval.splineScheme` (an
 `ApproximationScheme.ofMonotoneSubmodules`) has them as approximants of complexity `2^k`. The
 B-splines `N_r(2^k x - n)` (`Interval.bsplinePieces`) have spline joins
-(`Interval.splineJoins_bsplinePieces`), so their combinations are splines.
+(`Interval.splineJoins_bsplinePieces`), so their combinations are splines. Conversely, the pieces
+`Q_j` of a spline with `n ≤ j < n + r` have the same B-spline coefficient `c_n` in the coordinate
+`2^k x` (`Interval.bsplineCoef_comp_eq_of_splineJoins`), which makes the quasi-interpolant a
+projection onto the splines (`Interval.ppFun_qiPieces_ppFun`).
 -/
 
 @[expose] public section
@@ -132,6 +135,48 @@ theorem SplineJoins.refine {r k : ℕ} {Q : ℕ → ℂ[X]} (h : SplineJoins r k
     simp only
     rw [show (2 * n + 1) / 2 = n by omega, show (2 * n + 1 - 1) / 2 = n by omega]
     simp
+
+/-- The jumps in the coordinate `y = 2^k x`: `(x - m 2^(-k))^(r-1)` becomes
+`2^(-k(r-1)) (y - m)^(r-1)`. -/
+theorem X_sub_C_pow_comp_scale (r k m : ℕ) :
+    ((X - C ((((m : ℝ) / 2 ^ k : ℝ)) : ℂ)) ^ (r - 1)).comp
+        (C (((0 : ℝ) : ℝ) : ℂ) + C (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * X) =
+      C ((((1 / 2 ^ k : ℝ) : ℝ) : ℂ) ^ (r - 1)) * (X - C (((m : ℤ) : ℂ))) ^ (r - 1) := by
+  rw [pow_comp, sub_comp, X_comp, C_comp, C_pow, ← mul_pow]
+  congr 1
+  have hm : ((((m : ℝ) / 2 ^ k : ℝ)) : ℂ) = (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * ((m : ℤ) : ℂ) := by
+    push_cast
+    ring
+  rw [hm, C_mul, Complex.ofReal_zero, C_0, zero_add]
+  ring
+
+/-- **The B-spline coefficients of the pieces of a spline agree near the knots**: in the
+coordinate `y = 2^k x` consecutive pieces differ by multiples of `(y - m)^(r-1)`, whose
+coefficient `c_n` vanishes for `n < m < n + r` (`Interval.bsplineCoef_X_sub_C_pow`). So all pieces
+`Q_j`, `n ≤ j < n + r`, have the same coefficient `c_n`. -/
+theorem bsplineCoef_comp_eq_of_splineJoins {r k : ℕ} (hr : 1 ≤ r) {Q : ℕ → ℂ[X]}
+    (hQ : ∀ m, Q m ∈ degreeLT ℂ r) (hJ : SplineJoins r k Q) {n : ℤ} {j i : ℕ} (hji : j ≤ i)
+    (hi : i < 2 ^ k) (hnj : n ≤ j) (hin : (i : ℤ) < n + r) :
+    bsplineCoef hr ((Q i).comp (C (((0 : ℝ) : ℝ) : ℂ) + C (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * X)) n =
+      bsplineCoef hr ((Q j).comp (C (((0 : ℝ) : ℝ) : ℂ) + C (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * X)) n := by
+  induction i, hji using Nat.le_induction with
+  | base => rfl
+  | succ i hji ih =>
+    obtain ⟨c, hc⟩ := hJ (i + 1) (Nat.succ_pos i) hi
+    rw [Nat.add_sub_cancel] at hc
+    have hpow : (X - C ((((i + 1 : ℕ) : ℤ) : ℂ))) ^ (r - 1) ∈ degreeLT ℂ r :=
+      pow_mem_degreeLT hr (natDegree_X_sub_C_le _)
+    have hstep : (Q (i + 1)).comp (C (((0 : ℝ) : ℝ) : ℂ) + C (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * X) =
+        (Q i).comp (C (((0 : ℝ) : ℝ) : ℂ) + C (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * X) +
+          C (c * (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) ^ (r - 1)) *
+            (X - C ((((i + 1 : ℕ) : ℤ) : ℂ))) ^ (r - 1) := by
+      rw [show Q (i + 1) = Q i + (Q (i + 1) - Q i) by ring, hc, add_comp, mul_comp, C_comp,
+        X_sub_C_pow_comp_scale, ← mul_assoc, ← C_mul]
+    rw [hstep, bsplineCoef_add hr (comp_affine_mem_degreeLT (hQ i) _ _)
+        (by rw [← smul_eq_C_mul]; exact Submodule.smul_mem _ _ hpow),
+      bsplineCoef_C_mul hr _ hpow, bsplineCoef_X_sub_C_pow hr (by push_cast; omega) hin,
+      mul_zero, add_zero]
+    exact ih (by omega) (by omega)
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 

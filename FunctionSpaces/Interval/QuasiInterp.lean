@@ -23,6 +23,11 @@ is `N = 2^k`, and larger `N` serve periodic extensions. Its coefficient
   `i - r < n ≤ i`, then `Q_k g = T` on `I_{k,i}` (`Interval.polyFun_qiPieces_of_eq`): the local
   projections reproduce `T`, so the coefficients are those of `T`, and Marsden's identity sums
   them back to `T`.
+* **Reproduction of splines**: `Q_k s = s` for every spline `s` of order `r` and level `k`
+  (`Interval.ppFun_qiPieces_ppFun`), since the pieces of `s` in the support of a B-spline have the
+  same coefficient for it (`Interval.bsplineCoef_comp_eq_of_splineJoins`). So the B-splines
+  `N_r(2^k x - n)`, `-r < n < 2^k`, span the splines on `[0, 1)`
+  (`Interval.ppFun_eq_sum_bsplinePieces`).
 * **Local bounds**: `|λ_n(g)| ≤ C 2^(k/p) ‖g‖_{L_p(J(n))}` (`Interval.enorm_qiCoeff_le`), since the
   coordinates in the B-spline basis are bounded functionals on the polynomials
   (`Interval.exists_enorm_bcoord_le`) and the local projection is bounded, and hence
@@ -108,20 +113,17 @@ theorem bspline_eq_zero_of_not_mem {r k i : ℕ} {x : ℝ} (hx : x ∈ dyadicIco
     have : (i : ℝ) + 1 ≤ n := by exact_mod_cast (by omega : (i : ℤ) + 1 ≤ n)
     linarith [hx.2]
 
-/-- **Local reproduction of polynomials**: if `g = T` on the intervals `J(n)`, `i - r < n ≤ i`,
-for a polynomial `T` of degree `< r`, then `Q_k g = T` on `I_{k,i}`. -/
-theorem polyFun_qiPieces_of_eq {r : ℕ} (hr : 1 ≤ r) {k N : ℕ} {g : ℝ → ℂ} {T : ℂ[X]}
+/-- **The quasi-interpolant from its coefficients**: if the coefficients `λ_n(g)`,
+`i - r < n ≤ i`, are the B-spline coefficients `c_n` of `T(· 2^(-k))` for a polynomial `T` of
+degree `< r`, then `Q_k g = T` on `I_{k,i}`, by Marsden's identity for `T(· 2^(-k))` on
+`[i, i + 1)`. -/
+theorem polyFun_qiPieces_of_coeff {r : ℕ} (hr : 1 ≤ r) {k N : ℕ} {g : ℝ → ℂ} {T : ℂ[X]}
     (hT : T ∈ degreeLT ℂ r) {i : ℕ} (hi : i < N)
-    (hg : ∀ n : ℤ, (i : ℤ) - r < n → n ≤ i → ∀ y ∈ dyadicIco k n.toNat, g y = polyFun T y)
+    (hcoeff : ∀ n : ℤ, (i : ℤ) - r < n → n ≤ i → qiCoeff hr k g n =
+      bsplineCoef hr (T.comp (C (((0 : ℝ) : ℝ) : ℂ) + C (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * X)) n)
     {x : ℝ} (hx : x ∈ dyadicIco k i) : polyFun (qiPieces hr k N g i) x = polyFun T x := by
   set Ts := T.comp (C (((0 : ℝ) : ℝ) : ℂ) + C (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * X)
   have hTs : Ts ∈ degreeLT ℂ r := comp_affine_mem_degreeLT hT _ _
-  -- the coefficients are those of `T`
-  have hcoeff : ∀ n : ℤ, (i : ℤ) - r < n → n ≤ i → qiCoeff hr k g n = bsplineCoef hr Ts n :=
-    fun n hn1 hn2 => by
-      have hloc : locProj r k g n.toNat = T := eq_of_polyFun_eq fun y =>
-        polyFun_locProj_of_eqOn hT (hg n hn1 hn2) y
-      rw [qiCoeff, locProjScaled, hloc]
   have hik : (i : ℤ) < N := by exact_mod_cast hi
   rw [polyFun_qiPieces hr k N g hx]
   -- only the B-splines `i - r < n ≤ i` contribute
@@ -164,6 +166,58 @@ theorem polyFun_qiPieces_of_eq {r : ℕ} (hr : 1 ≤ r) {k N : ℕ} {g : ℝ →
   · intro n hn
     simp only [Finset.mem_Ioc] at hn
     rw [show (i : ℤ) - (((i : ℤ) - n).toNat : ℤ) = n by omega]
+
+/-- **Local reproduction of polynomials**: if `g = T` on the intervals `J(n)`, `i - r < n ≤ i`,
+for a polynomial `T` of degree `< r`, then `Q_k g = T` on `I_{k,i}`: the local projections
+reproduce `T`, so the coefficients are those of `T`. -/
+theorem polyFun_qiPieces_of_eq {r : ℕ} (hr : 1 ≤ r) {k N : ℕ} {g : ℝ → ℂ} {T : ℂ[X]}
+    (hT : T ∈ degreeLT ℂ r) {i : ℕ} (hi : i < N)
+    (hg : ∀ n : ℤ, (i : ℤ) - r < n → n ≤ i → ∀ y ∈ dyadicIco k n.toNat, g y = polyFun T y)
+    {x : ℝ} (hx : x ∈ dyadicIco k i) : polyFun (qiPieces hr k N g i) x = polyFun T x :=
+  polyFun_qiPieces_of_coeff hr hT hi (fun n hn1 hn2 => by
+    have hloc : locProj r k g n.toNat = T := eq_of_polyFun_eq fun y =>
+      polyFun_locProj_of_eqOn hT (hg n hn1 hn2) y
+    rw [qiCoeff, locProjScaled, hloc]) hx
+
+/-! ### Reproduction of splines -/
+
+/-- **The quasi-interpolant reproduces splines, piece by piece**: for a spline with pieces `Q_m` of
+degree `< r`, `Q_k s = Q_i` on `I_{k,i}`. The coefficient `λ_n(s)` is `c_n` of the piece of `s` on
+`J(n)`, and this is `c_n` of `Q_i` (`Interval.bsplineCoef_comp_eq_of_splineJoins`), since the
+pieces between `J(n)` and `I_{k,i}` differ by powers `(x - m 2^(-k))^(r-1)` with `n < m < n + r`. -/
+theorem polyFun_qiPieces_ppFun {r : ℕ} (hr : 1 ≤ r) {k : ℕ} {Q : ℕ → ℂ[X]}
+    (hQ : ∀ m, Q m ∈ degreeLT ℂ r) (hJ : SplineJoins r k Q) {i : ℕ} (hi : i < 2 ^ k) {x : ℝ}
+    (hx : x ∈ dyadicIco k i) :
+    polyFun (qiPieces hr k (2 ^ k) (ppFun k Q) i) x = polyFun (Q i) x := by
+  refine polyFun_qiPieces_of_coeff hr (hQ i) hi (fun n hn1 hn2 => ?_) hx
+  have hn : n.toNat ≤ i := by omega
+  have hloc : locProj r k (ppFun k Q) n.toNat = Q n.toNat := eq_of_polyFun_eq fun y =>
+    polyFun_locProj_of_eqOn (hQ _) (fun z hz => ppFun_eq_of_mem Q (hn.trans_lt hi) hz) y
+  rw [qiCoeff, locProjScaled, hloc]
+  exact (bsplineCoef_comp_eq_of_splineJoins hr hQ hJ hn hi (Int.self_le_toNat n)
+    (by omega)).symm
+
+/-- **The quasi-interpolant is a projection onto the splines**: `Q_k s = s` for every spline `s` of
+order `r` and level `k` on `[0, 1)`. -/
+theorem ppFun_qiPieces_ppFun {r : ℕ} (hr : 1 ≤ r) {k : ℕ} {Q : ℕ → ℂ[X]}
+    (hQ : ∀ m, Q m ∈ degreeLT ℂ r) (hJ : SplineJoins r k Q) :
+    ppFun k (qiPieces hr k (2 ^ k) (ppFun k Q)) = ppFun k Q := by
+  funext x
+  by_cases hx : x ∈ Ico (0 : ℝ) 1
+  · obtain ⟨h1, h1'⟩ := mem_dyadicIco_floor (k := k) hx
+    rw [ppFun_eq_of_mem _ h1' h1, ppFun_eq_of_mem _ h1' h1, polyFun_qiPieces_ppFun hr hQ hJ h1' h1]
+  · rw [ppFun_eq_zero _ hx, ppFun_eq_zero _ hx]
+
+/-- **The B-splines span the splines**: every spline of order `r` and level `k` on `[0, 1)` is
+`∑_n λ_n N_r(2^k x - n)`, summed over the B-splines `-r < n < 2^k` that meet `[0, 1)`, with the
+quasi-interpolant coefficients `λ_n`. -/
+theorem ppFun_eq_sum_bsplinePieces {r : ℕ} (hr : 1 ≤ r) {k : ℕ} {Q : ℕ → ℂ[X]}
+    (hQ : ∀ m, Q m ∈ degreeLT ℂ r) (hJ : SplineJoins r k Q) :
+    ppFun k Q = ∑ n ∈ qiIdx r (2 ^ k),
+      fun x => qiCoeff hr k (ppFun k Q) n * ppFun k (bsplinePieces r k n) x := by
+  conv_lhs => rw [← ppFun_qiPieces_ppFun hr hQ hJ]
+  rw [qiPieces, ppFun_sum]
+  exact Finset.sum_congr rfl fun n _ => ppFun_const_mul k _ _
 
 /-! ### Bounds -/
 

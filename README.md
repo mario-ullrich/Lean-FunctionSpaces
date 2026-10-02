@@ -138,7 +138,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `f ∈ A^s_q` iff `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`
   (`Interval.memApprox_splineScheme_iff`). The proof uses cardinal B-splines with Marsden's
   identity (`Interval.polyFun_eq_sum_bsplineCoef`) and a quasi-interpolant built from local
-  projections.
+  projections, which reproduces every spline in `S_k` (`Interval.ppFun_qiPieces_ppFun`); so the
+  B-splines `N_r(2^k x - n)`, `-r < n < 2^k`, span `S_k` (`Interval.ppFun_eq_sum_bsplinePieces`).
 * **Splines on the circle.** Let `S_k(𝕋) ⊆ L_p(𝕋) = L_p[0, 1]` consist of the periodic splines
   of order `r ≥ 1` and level `k`, the splines whose periodic extension is a spline on `ℝ`. For
   `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `0 ≤ s < r - 1 + 1/p`, `f ∈ A^s_q` of the periodic splines iff
@@ -180,7 +181,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   products of the projections in one variable, applied to the slices one coordinate at a time.
 * **Tensor splines on the cube.** Let `S_k^d ⊆ L_p(Q)` consist of the bounded measurable functions
   whose slices, in every coordinate and through every point, are dyadic splines of order `r` and
-  level `k` on `[0, 1]`. For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `r ≥ 1` and `0 ≤ s < r - 1 + 1/p`,
+  level `k` on `[0, 1]`; these are exactly the combinations of products `∏_i u_i(x_i)` of such
+  splines `u_i` (`Cube.isCubeSpline_iff_mem_span_prod_ppFun`). For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `r ≥ 1` and `0 ≤ s < r - 1 + 1/p`,
   `f ∈ A^s_q` of these spaces iff `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
   (`Cube.memApprox_cubeSplineScheme_iff`), with Jackson's inequality at every level through the
   tensor quasi-interpolant (`Cube.exists_approxSeq_cubeSplineScheme_le`) and the inverse
@@ -310,10 +312,10 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Dyadic piecewise polynomials on `[0, 1]`: Jackson and inverse inequalities, `A^s_q = B^s_{p,q}[0, 1]` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/{PiecewisePoly,PiecewiseJackson,PiecewiseInverse}.lean` |
 | Periodic modulus, piecewise polynomials on the circle, `A^s_q = B^s_{p,q}(𝕋) = B^s_{p,q}[0, 1]` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/{Periodic,PiecewisePeriodic}.lean` |
 | Dual basis for `∫_0^1 P Q`, local projections, bounded projections onto piecewise polynomials | ✅ proved | ✗ | `FunctionSpaces/Interval/LocalProjection.lean` |
-| Cardinal B-splines, B-spline basis on a unit interval, Marsden's identity | ✅ proved | ✗ | `FunctionSpaces/Interval/BSpline.lean` |
-| Dyadic splines (jump form = `C^(r-2)`), spline scheme, dyadic B-splines | ✅ proved | ✗ | `FunctionSpaces/Interval/Splines.lean` |
+| Cardinal B-splines, B-spline basis on a unit interval, Marsden's identity, vanishing coefficients of shifted powers | ✅ proved | ✗ | `FunctionSpaces/Interval/BSpline.lean` |
+| Dyadic splines (jump form = `C^(r-2)`), spline scheme, dyadic B-splines, B-spline coefficients of the pieces | ✅ proved | ✗ | `FunctionSpaces/Interval/Splines.lean` |
 | Inverse inequality of order `r - 1 + 1/p` for splines | ✅ proved | ✗ | `FunctionSpaces/Interval/SplineInverse.lean` |
-| Spline quasi-interpolant: local reproduction of polynomials, local bounds | ✅ proved | ✗ | `FunctionSpaces/Interval/QuasiInterp.lean` |
+| Spline quasi-interpolant: local reproduction of polynomials, reproduction of splines, B-splines span the splines, local bounds | ✅ proved | ✗ | `FunctionSpaces/Interval/QuasiInterp.lean` |
 | Jackson's inequality for splines, `A^s_q(splines) = B^s_{p,q}[0, 1]` for `0 < s < r - 1 + 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/SplineJackson.lean` |
 | Periodic splines, their inverse inequality | ✅ proved | ✗ | `FunctionSpaces/Interval/SplinePeriodic.lean` |
 | Periodic quasi-interpolant, Jackson's inequality for periodic splines, `A^s_q(periodic splines) = B^s_{p,q}(𝕋)` for `0 < s < r - 1 + 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/SplinePeriodicJackson.lean` |
@@ -323,7 +325,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Steklov smoothing in one coordinate near both ends of the cube | ✅ proved | ✗ | `FunctionSpaces/Cube/Smoothing.lean` |
 | Kernel operators of finite rank on slices, their forms, tensor products, telescoping over the coordinates | ✅ proved | ✗ | `FunctionSpaces/Cube/Kernel.lean` |
 | Piecewise polynomials on the cube: tensor projection, tensor-product description, Whitney, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{PiecewisePoly,PiecewiseJackson,PiecewiseInverse}.lean` |
-| Tensor splines on the cube: quasi-interpolant as a kernel operator, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < r - 1 + 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{Splines,SplineJackson,SplineInverse}.lean` |
+| Tensor splines on the cube: quasi-interpolant as a kernel operator, tensor-product description, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < r - 1 + 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{Splines,SplineJackson,SplineInverse}.lean` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Synthesis,Atomic}.lean` |
 | Trace theorem: extension, transfer, surjectivity | ✅ proved | ✗ | `ApproximationSpaces/Trace.lean` |

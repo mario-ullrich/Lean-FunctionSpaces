@@ -78,63 +78,6 @@ theorem sum_lintegral_window_le (r k N : ℕ) (G : ℝ → ℝ≥0∞) :
 
 /-! ### Linearity of the quasi-interpolant -/
 
-/-- The B-spline coordinates are additive. -/
-theorem bcoord_add {r : ℕ} (hr : 1 ≤ r) {P Q : ℂ[X]} (hP : P ∈ degreeLT ℂ r)
-    (hQ : Q ∈ degreeLT ℂ r) (j : ℕ) : bcoord hr (P + Q) j = bcoord hr P j + bcoord hr Q j := by
-  by_cases hj : j < r
-  · have h1 : P + Q ∈ degreeLT ℂ r ∧ j < r := ⟨Submodule.add_mem _ hP hQ, hj⟩
-    have h2 : P ∈ degreeLT ℂ r ∧ j < r := ⟨hP, hj⟩
-    have h3 : Q ∈ degreeLT ℂ r ∧ j < r := ⟨hQ, hj⟩
-    simp only [bcoord, h1, h2, h3, and_self, ↓reduceDIte]
-    rw [show (⟨P + Q, h1.1⟩ : degreeLT ℂ r) = ⟨P, hP⟩ + ⟨Q, hQ⟩ from rfl, map_add,
-      Finsupp.add_apply]
-  · have h : ∀ R : ℂ[X], ¬ (R ∈ degreeLT ℂ r ∧ j < r) := fun R h => hj h.2
-    simp only [bcoord, h, ↓reduceDIte, add_zero]
-
-/-- The B-spline coordinates are homogeneous. -/
-theorem bcoord_C_mul {r : ℕ} (hr : 1 ≤ r) (c : ℂ) {P : ℂ[X]} (hP : P ∈ degreeLT ℂ r) (j : ℕ) :
-    bcoord hr (C c * P) j = c * bcoord hr P j := by
-  by_cases hj : j < r
-  · have hcP : C c * P ∈ degreeLT ℂ r := by
-      rw [← smul_eq_C_mul]; exact Submodule.smul_mem _ _ hP
-    have h1 : C c * P ∈ degreeLT ℂ r ∧ j < r := ⟨hcP, hj⟩
-    have h2 : P ∈ degreeLT ℂ r ∧ j < r := ⟨hP, hj⟩
-    simp only [bcoord, h1, h2, and_self, ↓reduceDIte]
-    rw [show (⟨C c * P, h1.1⟩ : degreeLT ℂ r) = c • ⟨P, hP⟩ from
-      Subtype.ext (by simp [smul_eq_C_mul]), map_smul, Finsupp.smul_apply, smul_eq_mul]
-  · have h : ∀ R : ℂ[X], ¬ (R ∈ degreeLT ℂ r ∧ j < r) := fun R h => hj h.2
-    simp only [bcoord, h, ↓reduceDIte, mul_zero]
-
-/-- The B-spline coefficients are additive. -/
-theorem bsplineCoef_add {r : ℕ} (hr : 1 ≤ r) {P Q : ℂ[X]} (hP : P ∈ degreeLT ℂ r)
-    (hQ : Q ∈ degreeLT ℂ r) (n : ℤ) :
-    bsplineCoef hr (P + Q) n = bsplineCoef hr P n + bsplineCoef hr Q n := by
-  rw [bsplineCoef, add_comp, bcoord_add hr (comp_X_add_C_mem hP _) (comp_X_add_C_mem hQ _)]
-  rfl
-
-/-- The B-spline coefficients are homogeneous. -/
-theorem bsplineCoef_C_mul {r : ℕ} (hr : 1 ≤ r) (c : ℂ) {P : ℂ[X]} (hP : P ∈ degreeLT ℂ r)
-    (n : ℤ) : bsplineCoef hr (C c * P) n = c * bsplineCoef hr P n := by
-  rw [bsplineCoef, mul_comp, C_comp, bcoord_C_mul hr c (comp_X_add_C_mem hP _)]
-  rfl
-
-/-- The B-spline coefficients of finite combinations of polynomials of degree `< r`. -/
-theorem bsplineCoef_sum {r : ℕ} (hr : 1 ≤ r) {ι : Type*} (s : Finset ι) (c : ι → ℂ)
-    {P : ι → ℂ[X]} (hP : ∀ i ∈ s, P i ∈ degreeLT ℂ r) (n : ℤ) :
-    bsplineCoef hr (∑ i ∈ s, c i • P i) n = ∑ i ∈ s, c i * bsplineCoef hr (P i) n := by
-  classical
-  induction s using Finset.induction_on with
-  | empty =>
-    have h := bsplineCoef_C_mul hr 0 (Submodule.zero_mem (degreeLT ℂ r)) n
-    simpa using h
-  | insert j s hj ih =>
-    have hj' : P j ∈ degreeLT ℂ r := hP j (Finset.mem_insert_self j s)
-    have hs : ∀ i ∈ s, P i ∈ degreeLT ℂ r := fun i hi => hP i (Finset.mem_insert_of_mem hi)
-    rw [Finset.sum_insert hj, Finset.sum_insert hj,
-      bsplineCoef_add hr (Submodule.smul_mem _ _ hj')
-        (Submodule.sum_mem _ fun i hi => Submodule.smul_mem _ _ (hs i hi)),
-      smul_eq_C_mul, bsplineCoef_C_mul hr _ hj', ih hs]
-
 /-- The rescaled local projections have degree `< r`. -/
 theorem locProjScaled_mem (r k : ℕ) (g : ℝ → ℂ) (m : ℕ) : locProjScaled r k g m ∈ degreeLT ℂ r :=
   comp_affine_mem_degreeLT (locProj_mem r k g m) _ _
