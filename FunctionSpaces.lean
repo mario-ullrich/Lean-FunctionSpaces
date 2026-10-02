@@ -85,6 +85,9 @@ public import FunctionSpaces.Rd.BandJackson
 public import FunctionSpaces.Rd.BandInverse
 public import FunctionSpaces.Rd.BesovDifferences
 public import FunctionSpaces.Rd.LocalMeans
+public import FunctionSpaces.Rd.LipschitzGraph
+public import FunctionSpaces.Rd.RychkovExtension
+public import FunctionSpaces.Rd.LipschitzGraphBesov
 
 /-!
 # Function spaces
@@ -259,4 +262,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   Littlewood–Paley blocks and by differences.
 * `FunctionSpaces.Rd.LocalMeans`: local means with moment kernels, the reproducing formula, and
   the characterisation of Besov spaces by local means.
+* `FunctionSpaces.Rd.LipschitzGraph`: Lipschitz graph domains, their cones, the cone bump, the
+  support principle and the cut-off on `L_p`.
+* `FunctionSpaces.Rd.RychkovExtension`: intrinsic local means on a Lipschitz graph domain,
+  Rychkov's extension, and the restrictions of Besov spaces described by intrinsic local means.
+* `FunctionSpaces.Rd.LipschitzGraphBesov`: the restrictions of Besov spaces to Lipschitz graph
+  domains described by intrinsic differences.
 -/

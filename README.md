@@ -335,6 +335,26 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   (`Rd.ae_sub_conv_dilate_momentKernel_eq`) and the reproducing formula
   `∑_{j ≤ J} η_j ⋆ k_j ⋆ f = m_{2^J} ⋆ m_{2^J} ⋆ f → f` with `η_0 = m`,
   `η_j = m_{2^j} + m_{2^(j-1)}` (`Rd.LocalMeansBump.tendsto_sum_dual_localMean`).
+* **Rychkov's extension for Lipschitz graph domains.** Let `Ω = {x ∈ V : φ(x) < ⟪x, e⟫}` for a
+  unit vector `e` and a Lipschitz function `φ` that is constant along `e`
+  (`Rd.LipschitzGraph`), and let `k_j`, `η_j` be the kernels above for a bump `g` that vanishes
+  outside `-K ∩ B(0, 1/2)`, where `K` is a cone with `Ω + K ⊆ Ω`
+  (`Rd.LipschitzGraph.coneBump`). For `0 < s < L`, `1 ≤ q ≤ ∞` and `f ∈ L_p(V)`, `f` agrees on
+  `Ω` with some `F ∈ L_p(V)` with `‖F‖_p + ‖(2^(ks) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
+  `‖(2^(js) ‖k_j ⋆ f‖_{L_p(Ω)})_j‖_{ℓ_q} < ∞` (`Rd.LipschitzGraph.exists_besov_extension_iff`).
+  Then `Ext f = ∑_j η_j ⋆ (1_Ω (k_j ⋆ f))` is such an `F`, the same operator for all
+  `0 < s < L` (`Rd.LipschitzGraph.extension`, `Rd.LipschitzGraph.cutoff_extension`,
+  `Rd.LipschitzGraph.modNorm_extension_le`).
+* **Besov spaces on Lipschitz graph domains by intrinsic differences.** With `Ω` as above, let
+  `ω_r(f, t, Ω)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_{L_p(Ω_{rh})}`, where
+  `Ω_{rh} = {x : x, x + h, …, x + rh ∈ Ω}`, be the modulus of smoothness on `Ω`
+  (`Rd.modulusOn`). For `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`, `f ∈ L_p(V)` agrees on `Ω`
+  with some `F ∈ L_p(V)` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
+  `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, with equivalent quasi-norms, and
+  `Ext f` is such an `F` (`Rd.LipschitzGraph.exists_besov_extension_iff_modulusOn`,
+  `Rd.LipschitzGraph.modNormOn_le_modNorm`, `Rd.LipschitzGraph.modNorm_extension_le_modNormOn`).
+  The same condition describes the restrictions to `Ω` of the band-limited approximation spaces
+  `A^s_q(L_p(V), (E_k))` (`Rd.LipschitzGraph.exists_memApprox_extension_iff`).
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -408,6 +428,9 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Moduli of smoothness on subsets of `ℝ^d` | ✅ proved | ✗ | `FunctionSpaces/Rd/DomainModuli.lean` |
 | Moment kernels: averaged differences, approximation with the modulus, also on subsets | ✅ proved | ✗ | `FunctionSpaces/Rd/MomentKernels.lean` |
 | Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L` | ✅ proved | ✗ | `FunctionSpaces/Rd/LocalMeans.lean` |
+| Lipschitz graph domains: cone, cone bump, support principle | ✅ proved | ✗ | `FunctionSpaces/Rd/LipschitzGraph.lean` |
+| Rychkov's extension, restrictions to Lipschitz graph domains by intrinsic local means | ✅ proved | ✗ | `FunctionSpaces/Rd/RychkovExtension.lean` |
+| Restrictions to Lipschitz graph domains by intrinsic differences | ✅ proved | ✗ | `FunctionSpaces/Rd/LipschitzGraphBesov.lean` |
 | Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
@@ -426,7 +449,7 @@ functions or measures. `FunctionSpaces` holds the Besov and Sobolev spaces built
 schemes of bounded continuous functions on a finite measure space and their embedding
 theorems, spectral schemes in Hilbert spaces, the torus with its traces and Lipschitz atoms,
 `ℝ^d` with convolution, approximate identities, Littlewood–Paley decompositions, moduli of
-smoothness and local means, filtration schemes for wavelets and multiwavelets, the classical definitions
+smoothness and local means, Lipschitz graph domains with Rychkov's extension, filtration schemes for wavelets and multiwavelets, the classical definitions
 through moduli of smoothness and weak derivatives, and polynomial and piecewise polynomial
 approximation on intervals and on the cube `[0, 1]^d`. [MathlibCandidates.md](MathlibCandidates.md) lists what
 could be upstreamed.
@@ -437,7 +460,7 @@ could be upstreamed.
 
 * **Reiteration** for approximation and interpolation spaces.
 * **Function spaces beyond the torus**: dominating mixed smoothness on `ℝ^d`, compact
-  manifolds, bounded domains.
+  manifolds, bounded Lipschitz domains and traces on their boundaries.
 * **Classical definitions for all `p`**: Sobolev spaces by weak derivatives and Besov spaces
   by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
 * **Higher smoothness**: splines on domains, and compactly supported wavelets such as
@@ -496,6 +519,9 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   The Nikolskii inequality and the embedding theorems it yields.
 * A. Pietsch, *Approximation spaces*, J. Approx. Theory **32** (1981), no. 2, 115–134.
   The definition of approximation schemes and spaces followed here.
+* V. S. Rychkov, *On restrictions and extensions of the Besov and Triebel–Lizorkin spaces with
+  respect to Lipschitz domains*, J. London Math. Soc. (2) **60** (1999), no. 1, 237–257. The
+  universal extension operator for Lipschitz domains.
 * V. Temlyakov, *Multivariate Approximation*, Cambridge University Press, 2018. Periodic
   function spaces and trigonometric approximation.
 * H. Triebel, *Theory of Function Spaces*, Birkhäuser, 1983. Besov and Sobolev spaces and

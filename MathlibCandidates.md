@@ -82,6 +82,9 @@ declarations.
   `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost everywhere (`Rd.iterDiff_conv_ae`); the modulus on a
   subset `U`, with the differences restricted to the points `x` with `x, …, x + rh ∈ U`
   (`Rd.modulusOn`, `FunctionSpaces/Rd/DomainModuli.lean`).
+* **Multiplication by an indicator on `L_p`** (`FunctionSpaces/Rd/LipschitzGraph.lean`): for a
+  measurable set `s`, `g ↦ 1_s g` as a continuous linear operator of norm at most `1` on
+  `Lp ℂ p μ` (`Rd.indicatorLp`). Mathlib has `indicatorConstLp` for constant functions.
 * **Differences of Schwartz functions in `L_1`** (`FunctionSpaces/Rd/BandInverse.lean`):
   `‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1` (`Rd.lintegral_enorm_iterDiff_schwartz_le`), from
   `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1` (`Rd.lintegral_enorm_fwdDiff_le`) and the commutation of differences

@@ -6040,6 +6040,269 @@ Every estimate runs through the averaged differences of \Cref{lem:averaged-diffe
 to $f$ or to the smooth kernels. With \Cref{thm:rd-besov}, local means are a fourth description of
 $\Besov{s}{p}{q}(V)$ for $0 < s < L$.
 
+\section{Lipschitz graph domains}
+
+\begin{definition}[Lipschitz graph domains]
+\label{def:lipschitz-graph}
+\lean{Rd.LipschitzGraph, Rd.LipschitzGraph.domain, Rd.LipschitzGraph.cone,
+  Rd.LipschitzGraph.continuous_phi, Rd.LipschitzGraph.isOpen_domain,
+  Rd.LipschitzGraph.measurableSet_domain}
+\leanok
+Let $e \in V$ be a unit vector, $M \geq 0$, and $\varphi : V \to \R$ with
+$|\varphi(x) - \varphi(y)| \leq M \|x - y\|$ and $\varphi(x + t e) = \varphi(x)$ for all
+$x, y \in V$ and $t \in \R$. The Lipschitz graph domain and its cone are
+\[
+  \Omega = \{x \in V : \varphi(x) < \langle x, e \rangle\}, \qquad
+  K = \{y \in V : M \|y - \langle y, e \rangle e\| < \langle y, e \rangle\} .
+\]
+The set $\Omega$ is open.
+\end{definition}
+
+For $V = \R^d$ and $e = e_d$ this is $\Omega = \{x : x_d > \varphi(x_1, \dots, x_{d-1})\}$.
+
+\begin{lemma}[The cone]
+\label{lem:graph-cone}
+\lean{Rd.LipschitzGraph.add_mem, Rd.LipschitzGraph.smul_mem_cone,
+  Rd.LipschitzGraph.add_nsmul_mem, Rd.LipschitzGraph.coneRadius,
+  Rd.LipschitzGraph.coneRadius_pos, Rd.LipschitzGraph.coneRadius_le,
+  Rd.LipschitzGraph.two_mul_add_one_mul_coneRadius_le, Rd.LipschitzGraph.ball_subset_cone}
+\leanok
+\uses{def:lipschitz-graph}
+$\Omega + K \subseteq \Omega$ and $c K \subseteq K$ for $c > 0$, so $x + l h \in \Omega$ for
+$x \in \Omega$, $h \in K$ and $l \in \N$. The cone $K$ contains the ball of radius
+$\rho = 1/(8(M + 1))$ around $e/4$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Write $y = d + \langle y, e \rangle e$ with $d \perp e$. Since $\varphi$ is constant along $e$,
+$\varphi(x + y) = \varphi(x + d) \leq \varphi(x) + M \|d\| < \langle x, e \rangle + \langle y, e \rangle$
+for $x \in \Omega$ and $y \in K$. For $\|y - e/4\| < \rho$, $\langle y, e \rangle > 1/4 - \rho$ and
+$\|y - \langle y, e \rangle e\| < 2\rho$, and $2 M \rho \leq 1/4 - \rho$.
+\end{proof}
+
+\begin{definition}[Kernels supported in the reflected cone]
+\label{def:cone-supported}
+\lean{Rd.LipschitzGraph.ConeSupported, Rd.LipschitzGraph.ConeSupported.add,
+  Rd.LipschitzGraph.ConeSupported.sub, Rd.LipschitzGraph.ConeSupported.dilate,
+  Rd.LipschitzGraph.ConeSupported.finsetSum}
+\leanok
+\uses{lem:graph-cone, lem:dilate}
+A function $k : V \to \C$ is supported in $-K$ if $k(y) \neq 0$ implies $-y \in K$. Linear
+combinations of such functions and their dilations $k_c$, $c > 0$, are supported in $-K$.
+\end{definition}
+
+\begin{lemma}[The cone bump]
+\label{lem:cone-bump}
+\lean{Rd.LipschitzGraph.coneBumpBase, Rd.LipschitzGraph.coneBump,
+  Rd.LipschitzGraph.coneBump_radius, Rd.LipschitzGraph.coneSupported_coneBump,
+  Rd.LipschitzGraph.coneSupported_momentKernel, Rd.LipschitzGraph.coneSupported_scaled,
+  Rd.LipschitzGraph.coneSupported_kernel, Rd.LipschitzGraph.coneSupported_dual}
+\leanok
+\uses{lem:graph-cone, def:cone-supported, def:local-means}
+There is a smooth $g : V \to \C$ with $\int_V g = 1$ that vanishes outside the ball of radius
+$1/2$ and is supported in $-K$. For every $L \geq 1$ the kernels $m_{2^j}$, $k_j$ and $\eta_j$
+of \Cref{def:local-means} built from $g$ are supported in $-K$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Take the normalised smooth bump of radius $\rho$ around $-e/4$ (\Cref{lem:graph-cone}). It
+vanishes outside the ball of radius $1/4 + \rho \leq 1/2$, and $g(y) \neq 0$ gives
+$\|y + e/4\| < \rho$, so $-y$ lies in the ball of radius $\rho$ around $e/4$ and in $K$. The kernels are linear combinations of dilations of $g$.
+\end{proof}
+
+\begin{lemma}[Multiplication by an indicator]
+\label{lem:indicator-lp}
+\lean{Rd.memLp_indicator_coe, Rd.norm_toLp_indicator_le, Rd.indicatorLp,
+  Rd.indicatorLp_apply_ae, Rd.enorm_indicatorLp_le}
+\leanok
+Let $\mu$ be a measure on $X$, $S \subseteq X$ measurable and $1 \leq p \leq \infty$. Then
+$h \mapsto 1_S h$ is a bounded linear operator on $L_p(\mu)$ of norm at most $1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$|1_S h| \leq |h|$ pointwise.
+\end{proof}
+
+\begin{lemma}[The support principle]
+\label{lem:support-principle}
+\lean{Rd.LipschitzGraph.conv_indicator_eq, Rd.LipschitzGraph.cutoff,
+  Rd.LipschitzGraph.cutoff_apply_ae, Rd.LipschitzGraph.enorm_cutoff,
+  Rd.LipschitzGraph.enorm_cutoff_le, Rd.LipschitzGraph.indicator_ae_eq_of_cutoff_eq,
+  Rd.LipschitzGraph.cutoff_convLp_cutoff, Rd.LipschitzGraph.cutoff_convLp_eq}
+\leanok
+\uses{def:cone-supported, lem:graph-cone, lem:indicator-lp, lem:conv-op}
+Let $k \in L_1$ be supported in $-K$ and $1 \leq p < \infty$. For $x \in \Omega$ and
+$f : V \to \C$, $(k * (1_\Omega f))(x) = (k * f)(x)$. Hence
+$1_\Omega (k * (1_\Omega h)) = 1_\Omega (k * h)$ for $h \in L_p$, and
+$1_\Omega (k * F) = 1_\Omega (k * f)$ whenever $F, f \in L_p$ agree almost everywhere on
+$\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $k(y) \neq 0$, then $-y \in K$ and $x - y \in x + K \subseteq \Omega$, so
+$k(y) (1_\Omega f)(x - y) = k(y) f(x - y)$.
+\end{proof}
+
+\section{The extension operator for Lipschitz graph domains}
+
+In this section $\Omega$ is a Lipschitz graph domain, $g$ the bump of \Cref{lem:cone-bump},
+$L \geq 1$, and $m$, $k_j$, $\eta_j$ are the kernels of \Cref{def:local-means} built from $g$.
+The extension operator is Rychkov's universal extension \cite{Rychkov}, written with these
+kernels.
+
+\begin{definition}[Intrinsic local means]
+\label{def:intrinsic-local-means}
+\lean{Rd.LipschitzGraph.intrinsicNorm, Rd.LipschitzGraph.intrinsicNorm_congr,
+  Rd.LipschitzGraph.intrinsicNorm_le_localMeansNorm}
+\leanok
+\uses{lem:cone-bump, lem:support-principle}
+For $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p$, the intrinsic local
+means quasi-norm is $\|(2^{js} \|k_j * f\|_{L_p(\Omega)})_j\|_{\ell_q}$. It depends only on the
+class of $f|_\Omega$ and is at most the local means quasi-norm
+$\|(2^{js} \|k_j * f\|_p)_j\|_{\ell_q}$.
+\end{definition}
+
+\begin{theorem}[The extension operator]
+\label{thm:graph-extension}
+\lean{Rd.LipschitzGraph.extTerm, Rd.LipschitzGraph.summable_extTerm,
+  Rd.LipschitzGraph.extension, Rd.LipschitzGraph.tendsto_sum_extTerm,
+  Rd.LipschitzGraph.cutoff_extension, Rd.LipschitzGraph.modNorm_extension_le}
+\leanok
+\uses{def:intrinsic-local-means, lem:support-principle, lem:reproducing-formula,
+  lem:local-means-synthesis}
+Let $1 \leq p < \infty$, $s > 0$, $1 \leq q \leq \infty$, and let $f \in L_p$ have a finite
+intrinsic local means quasi-norm. Then the series
+\[
+  \operatorname{Ext} f = \sum_{j=0}^\infty \eta_j * (1_\Omega (k_j * f))
+\]
+converges absolutely in $L_p$, and $\operatorname{Ext} f = f$ almost everywhere on $\Omega$. For
+$s < L$ there is $C < \infty$, independent of $f$, with
+\[
+  \|\operatorname{Ext} f\|_p + \|(2^{is} \omega_L(\operatorname{Ext} f, 2^{-i})_p)_i\|_{\ell_q}
+  \leq C \, \|(2^{js} \|k_j * f\|_{L_p(\Omega)})_j\|_{\ell_q} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\|\eta_j * (1_\Omega (k_j * f))\|_p \leq 2 \|m\|_1 \, 2^{-js}
+\|(2^{is} \|k_i * f\|_{L_p(\Omega)})_i\|_{\ell_q}$, which is summable for $s > 0$. By
+\Cref{lem:support-principle},
+$1_\Omega (\eta_j * (1_\Omega (k_j * f))) = 1_\Omega (\eta_j * k_j * f)$, so on $\Omega$ the
+partial sums are those of \Cref{lem:reproducing-formula}, which converge to $f$. The bound is
+\Cref{lem:local-means-synthesis} with $h_j = 1_\Omega (k_j * f)$.
+\end{proof}
+
+\begin{theorem}[Restrictions by intrinsic local means]
+\label{thm:restriction-local-means}
+\lean{Rd.LipschitzGraph.exists_besov_extension_iff}
+\leanok
+\uses{thm:graph-extension, def:intrinsic-local-means, lem:local-means-upper}
+Let $1 \leq p < \infty$, $0 < s < L$, $1 \leq q \leq \infty$ and $f \in L_p$. There is
+$F \in L_p$ with $F = f$ almost everywhere on $\Omega$ and
+$\|F\|_p + \|(2^{ks} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$ if and only if
+$\|(2^{js} \|k_j * f\|_{L_p(\Omega)})_j\|_{\ell_q} < \infty$, and then
+$F = \operatorname{Ext} f$ is such a function.
+\end{theorem}
+
+\begin{proof}
+\leanok
+If $F$ exists, the intrinsic quasi-norm of $f$ equals that of $F$ and is at most the local means
+quasi-norm of $F$, which is finite by \Cref{lem:local-means-upper}. The converse is
+\Cref{thm:graph-extension}.
+\end{proof}
+
+\section{Intrinsic differences on Lipschitz graph domains}
+
+The notation is that of the previous section.
+
+\begin{lemma}[Steps in the cone]
+\label{lem:cone-steps}
+\lean{Rd.LipschitzGraph.subset_stepSet, Rd.LipschitzGraph.subset_stepSet_of_coneSupported,
+  Rd.LipschitzGraph.enorm_cutoff_sub_convLp_scaled_le}
+\leanok
+\uses{lem:graph-cone, def:rd-modulus-on, thm:moment-approx, lem:cone-bump}
+For $h \in K$ and $r \in \N$, $\Omega \subseteq \Omega_{rh}$. Consequently, for
+$1 \leq p < \infty$, $j \in \N$ and $f \in L_p$,
+\[
+  \|f - m_{2^j} * f\|_{L_p(\Omega)} \leq \|g\|_1 \, \omega_L(f, 2^{-(j+1)}, \Omega)_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first statement is \Cref{lem:graph-cone}. For $g(z) \neq 0$ the step
+$-2^{-j} z = 2^{-j} (-z)$ lies in $K$ and has length at most $2^{-(j+1)}$; apply
+\Cref{thm:moment-approx} with $U = \Omega$, $R = 1/2$ and $c = 2^j$.
+\end{proof}
+
+\begin{lemma}[Intrinsic local means and moduli on $\Omega$]
+\label{lem:intrinsic-upper}
+\lean{Rd.LipschitzGraph.enorm_cutoff_localMean_zero_le,
+  Rd.LipschitzGraph.enorm_cutoff_localMean_succ_le, Rd.LipschitzGraph.intrinsicConst,
+  Rd.LipschitzGraph.intrinsicConst_ne_top, Rd.LipschitzGraph.intrinsicNorm_le,
+  Rd.LipschitzGraph.intrinsicNorm_lt_top}
+\leanok
+\uses{lem:cone-steps, lem:support-principle, lem:rd-modulus-on, def:intrinsic-local-means}
+Let $1 \leq p < \infty$ and $f \in L_p$. Then
+$\|k_0 * f\|_{L_p(\Omega)} \leq \|m\|_1 \|f\|_{L_p(\Omega)}$ and
+$\|k_{j+1} * f\|_{L_p(\Omega)} \leq 2 \|g\|_1 \, \omega_L(f, 2^{-(j+1)}, \Omega)_p$ for
+$j \in \N$. Hence, for $s \in \R$ and $1 \leq q \leq \infty$,
+\begin{multline*}
+  \|(2^{js} \|k_j * f\|_{L_p(\Omega)})_j\|_{\ell_q} \\
+  \leq (\|m\|_1 + 2 \|g\|_1) \bigl( \|f\|_{L_p(\Omega)}
+  + \|(2^{js} \omega_L(f, 2^{-j}, \Omega)_p)_j\|_{\ell_q} \bigr) .
+\end{multline*}
+\end{lemma}
+
+\begin{proof}
+\leanok
+$1_\Omega (k_0 * f) = 1_\Omega (k_0 * (1_\Omega f))$ by \Cref{lem:support-principle}. For
+$j \in \N$, $k_{j+1} * f = (f - m_{2^j} * f) - (f - m_{2^{j+1}} * f)$, and \Cref{lem:cone-steps}
+bounds both terms by $\|g\|_1 \, \omega_L(f, 2^{-(j+1)}, \Omega)_p$, since the modulus
+increases in $t$.
+\end{proof}
+
+\begin{theorem}[Besov spaces on Lipschitz graph domains by intrinsic differences]
+\label{thm:graph-besov}
+\lean{Rd.LipschitzGraph.modNormOn_le_modNorm, Rd.LipschitzGraph.cutoff_extension_of_modNormOn,
+  Rd.LipschitzGraph.modNorm_extension_le_modNormOn,
+  Rd.LipschitzGraph.exists_besov_extension_iff_modulusOn,
+  Rd.LipschitzGraph.exists_memApprox_extension_iff}
+\leanok
+\uses{lem:intrinsic-upper, thm:graph-extension, lem:rd-modulus-on, thm:rd-besov}
+Let $1 \leq p < \infty$, $0 < s < r$, $1 \leq q \leq \infty$ and $f \in L_p$. The following are
+equivalent:
+\begin{enumerate}
+  \item $\|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$;
+  \item there is $F \in L_p$ with $F = f$ almost everywhere on $\Omega$ and
+    $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$;
+  \item there is $F$ in the approximation space $A^s_q$ of the band-limited scheme with
+    $F = f$ almost everywhere on $\Omega$.
+\end{enumerate}
+For every $F$ as in (2), the quantity in (1) is at most
+$\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q}$. Under (1), $F = \operatorname{Ext} f$
+with $L = r$ satisfies (2), and there is $C < \infty$, independent of $f$, with
+\begin{multline*}
+  \|\operatorname{Ext} f\|_p + \|(2^{ks} \omega_r(\operatorname{Ext} f, 2^{-k})_p)_k\|_{\ell_q} \\
+  \leq C \bigl( \|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q}
+  \bigr) .
+\end{multline*}
+\end{theorem}
+
+\begin{proof}
+\leanok
+If $F = f$ on $\Omega$, then $\|f\|_{L_p(\Omega)} = \|F\|_{L_p(\Omega)} \leq \|F\|_p$ and
+$\omega_r(f, t, \Omega)_p = \omega_r(F, t, \Omega)_p \leq \omega_r(F, t)_p$ by
+\Cref{lem:rd-modulus-on}. Conversely, (1) bounds the intrinsic local means by
+\Cref{lem:intrinsic-upper}, and \Cref{thm:graph-extension} gives (2) with the bound for
+$\operatorname{Ext} f$. The equivalence of (2) and (3) is \Cref{thm:rd-besov}.
+\end{proof}
+
 \bpbibheading
 \begin{thebibliography}{99}
 
@@ -6071,6 +6334,12 @@ A.~Pietsch,
 \emph{Approximation spaces},
 J.\ Approx.\ Theory \textbf{32} (1981), no.~2, 115--134,
 \href{https://doi.org/10.1016/0021-9045(81)90109-X}{doi}.
+
+\bibitem{Rychkov}
+V.~S.~Rychkov,
+\emph{On restrictions and extensions of the Besov and Triebel--Lizorkin spaces with respect to
+Lipschitz domains},
+J.\ London Math.\ Soc.\ (2) \textbf{60} (1999), no.~1, 237--257.
 
 \bibitem{SchneiderVybiral}
 C.~Schneider, J.~Vyb\'{\i}ral,
