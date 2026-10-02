@@ -5159,7 +5159,8 @@ is integrable for integrable $K$ and $L$.
 \begin{lemma}[Weighted Jensen inequality]
 \label{lem:weighted-jensen}
 \lean{Rd.lintegral_mul_rpow_le, Rd.enorm_conv_le_lintegral, Rd.lintegral_rpow_lintegral_mul_le,
-  Rd.aemeasurable_kernel_rpow, Rd.aemeasurable_lintegral_kernel, Rd.lintegral_rpow_lintegral_le}
+  Rd.aemeasurable_kernel_rpow, Rd.aemeasurable_lintegral_kernel, Rd.lintegral_rpow_lintegral_le,
+  Rd.eLpNorm_integral_kernel_le}
 \leanok
 Let $1 \leq p < \infty$. For every measure $\mu$ and all measurable $a, g \geq 0$,
 \[
@@ -5168,7 +5169,12 @@ Let $1 \leq p < \infty$. For every measure $\mu$ and all measurable $a, g \geq 0
 For all measurable $a, b \geq 0$ on $V$,
 \[
   \int_V \Bigl( \int_V a(y) \, b(x - y) \, dy \Bigr)^p dx
-  \leq \Bigl( \int_V a \Bigr)^p \int_V b^p .
+  \leq \Bigl( \int_V a \Bigr)^p \int_V b^p ,
+\]
+and for every measurable $\Phi : V \to \C$ and every measurable $G : V \times V \to \C$,
+\[
+  \Bigl\| \int_V \Phi(z) \, G(\cdot, z) \, dz \Bigr\|_p^p
+  \leq \|\Phi\|_1^{p-1} \int_V |\Phi(z)| \, \|G(\cdot, z)\|_p^p \, dz .
 \]
 \end{lemma}
 
@@ -5177,6 +5183,7 @@ For all measurable $a, b \geq 0$ on $V$,
 The first inequality is Hölder's inequality with the conjugate exponent $p'$ for
 $a g = a^{1/p'} \cdot a^{1/p} g$. For the second apply the first for fixed $x$, integrate over
 $x$, exchange the integrals by Tonelli's theorem, and use $\int_V b(x - y)^p \, dx = \int_V b^p$.
+The third follows in the same way from the first with $a = |\Phi|$ and $g = |G(x, \cdot)|$.
 \end{proof}
 
 \begin{theorem}[Young's inequality]
@@ -5240,13 +5247,14 @@ Linearity and the identities hold almost everywhere by \Cref{lem:conv-assoc}, an
 \begin{lemma}[Dilations]
 \label{lem:dilate}
 \lean{Rd.dilate, Rd.integrable_dilate, Rd.integral_dilate, Rd.eLpNorm_dilate_one,
-  Rd.conv_dilate_apply, Rd.continuous_dilate, Rd.bddAbove_dilate}
+  Rd.conv_dilate_apply, Rd.ae_integrable_dilate_mul, Rd.continuous_dilate, Rd.bddAbove_dilate}
 \leanok
 \uses{def:conv}
 For $c > 0$ and $\Phi : V \to \C$ let $\Phi_c(x) = c^n \Phi(c x)$. If $\Phi$ is integrable, then
 $\Phi_c$ is integrable with $\int \Phi_c = \int \Phi$ and $\|\Phi_c\|_1 = \|\Phi\|_1$. For all
-$f : V \to \C$ and $x \in V$, $(\Phi_c * f)(x) = \int_V \Phi(z) f(x - c^{-1} z) \, dz$. Dilations
-of continuous functions are continuous, and dilations of bounded functions are bounded.
+$f : V \to \C$ and $x \in V$, $(\Phi_c * f)(x) = \int_V \Phi(z) f(x - c^{-1} z) \, dz$, and for
+$f \in L_p$, $1 \leq p < \infty$, the integrand is integrable for almost every $x$. Dilations of
+continuous functions are continuous, and dilations of bounded functions are bounded.
 \end{lemma}
 
 \begin{proof}
@@ -5431,10 +5439,10 @@ distributions.
 
 \begin{lemma}[The band-limited classes]
 \label{lem:band-space}
-\lean{Rd.isClosed_bandSpace, Rd.bandSpace_mono}
+\lean{Rd.smul_mem_bandSpace, Rd.isClosed_bandSpace, Rd.bandSpace_mono}
 \leanok
 \uses{def:band-space, thm:kernel-identities}
-Let $1 \leq p < \infty$. Every $E_k$ is a closed linear subspace of $L_p$, and
+Let $1 \leq p < \infty$. Every $E_k$ is a closed complex linear subspace of $L_p$, and
 $E_k \subseteq E_{k+1}$ for every $k \in \N$. The band-limited scheme is an approximation scheme
 with $A_{2^k} = E_k$.
 \end{lemma}
@@ -5525,6 +5533,202 @@ E_{2^j}(f)$ by \Cref{lem:lp-blocks-band}.
 
 With the Besov space $\Besov{s}{p}{q}(V)$ defined through Littlewood--Paley blocks,
 \Cref{thm:lp-band} identifies it with the approximation space of the band-limited scheme.
+
+\section{Differences and moduli of smoothness}
+
+\begin{definition}[Differences and the modulus of smoothness]
+\label{def:rd-modulus}
+\lean{Rd.fwdDiff_eq_sub, Rd.iterDiff_apply, Rd.modulus, Rd.lpModulus}
+\leanok
+For $f : V \to \C$, $h \in V$ and $r \in \N$ let $\Delta_h f = f(\cdot + h) - f$ and
+$\Delta_h^r = (\Delta_h)^r$, so that
+$\Delta_h^r f(x) = \sum_{l=0}^r (-1)^{r-l} \binom{r}{l} f(x + l h)$. For $1 \leq p < \infty$ and
+$t \in \R$, the modulus of smoothness is
+$\omega_r(f, t)_p = \sup_{\|h\| \leq t} \|\Delta_h^r f\|_p$.
+\end{definition}
+
+\begin{lemma}[Properties of differences]
+\label{lem:rd-differences}
+\lean{Rd.iterDiff_comp_add, Rd.fwdDiff_nsmul, Rd.aestronglyMeasurable_comp_add,
+  Rd.eLpNorm_comp_add_right, Rd.ae_comp_add_right, Rd.aestronglyMeasurable_iterDiff,
+  Rd.iterDiff_congr_ae, Rd.eLpNorm_iterDiff_le, Rd.integrable_iterDiff, Rd.conv_comp_add,
+  Rd.iterDiff_conv_ae, Rd.iterDiff_dilate}
+\leanok
+\uses{def:rd-modulus, lem:conv-assoc, lem:dilate}
+Let $1 \leq p < \infty$, $f \in L_p$, $K \in L_1$, $\Phi : V \to \C$, $h, c \in V$, $m, r \in \N$
+and $\lambda > 0$. Then:
+\begin{enumerate}
+  \item $\Delta_h^r (f(\cdot + c)) = (\Delta_h^r f)(\cdot + c)$ and
+    $\Delta_{mh} f = \sum_{i<m} (\Delta_h f)(\cdot + i h)$;
+  \item $\|f(\cdot + c)\|_p = \|f\|_p$ and $\|\Delta_h^r f\|_p \leq 2^r \|f\|_p$;
+  \item $\Delta_h^r K$ is integrable, and $\Delta_h^r (K * f) = (\Delta_h^r K) * f$ almost
+    everywhere;
+  \item $\Delta_h^r (\Phi_\lambda) = (\Delta_{\lambda h}^r \Phi)_\lambda$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+Parts (1) and (4) follow by induction on $r$, and (2) holds since translations preserve Lebesgue
+measure. For (3), $(K * f)(x + c) = (K(\cdot + c) * f)(x)$ by the substitution $y \mapsto y + c$,
+and \Cref{lem:conv-assoc} gives the linearity in the kernel.
+\end{proof}
+
+\begin{lemma}[Properties of the modulus]
+\label{lem:rd-modulus}
+\lean{Rd.eLpNorm_iterDiff_nsmul_iterDiff_le, Rd.eLpNorm_iterDiff_le_modulus, Rd.modulus_mono,
+  Rd.modulus_add_le, Rd.modulus_le, Rd.modulus_congr_ae, Rd.modulus_nat_mul_le,
+  Rd.modulus_mul_le, Rd.lpModulus_add_le, Rd.lpModulus_le}
+\leanok
+\uses{def:rd-modulus, lem:rd-differences}
+Let $1 \leq p < \infty$, $r \in \N$ and $f, g \in L_p$. The modulus $\omega_r(f, t)_p$ increases
+in $t$, depends only on the class of $f$ modulo null sets, and satisfies
+$\omega_r(f + g, t)_p \leq \omega_r(f, t)_p + \omega_r(g, t)_p$ and
+$\omega_r(f, t)_p \leq 2^r \|f\|_p$. For all $c, t \geq 0$,
+\[
+  \omega_r(f, c t)_p \leq (1 + c)^r \, \omega_r(f, t)_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For an integer $m \geq 1$, part (1) of \Cref{lem:rd-differences} gives
+$\Delta_{mh}^{a+1} \Delta_h^b f = \sum_{i<m} (\Delta_{mh}^a \Delta_h^{b+1} f)(\cdot + i h)$, and
+induction on $a$ yields $\|\Delta_{mh}^r f\|_p \leq m^r \|\Delta_h^r f\|_p$, so
+$\omega_r(f, m t)_p \leq m^r \omega_r(f, t)_p$. For real $c$ take
+$m = \lfloor c \rfloor + 1 \leq 1 + c$.
+\end{proof}
+
+\section{Jackson's inequality}
+
+\begin{lemma}[The Jackson approximant]
+\label{lem:jackson-approx}
+\lean{Rd.conv_Theta_dilate_lpKernel, Rd.jacksonCoeff, Rd.jacksonScale, Rd.jacksonScale_pos,
+  Rd.jacksonScale_le, Rd.jacksonApprox, Rd.jacksonApprox_mem_bandSpace,
+  Rd.neg_one_pow_mul_neg_one_pow_sub, Rd.neg_one_pow_mul_sum_iterDiff_coeff,
+  Rd.ae_sub_jacksonApprox_eq}
+\leanok
+\uses{lem:rd-differences, lem:lp-kernels-frequency, lem:conv-of-fourier, lem:band-space,
+  lem:dilate}
+Let $1 \leq p < \infty$, $r, k \in \N$ and $f \in L_p$, and let
+\[
+  J_k f = \sum_{l=1}^r (-1)^{l+1} \binom{r}{l} \, \Phi_{2^k/l} * f .
+\]
+Then $J_k f \in E_k$, and for almost every $x \in V$,
+\[
+  f(x) - J_k f(x) = (-1)^r \int_V \Phi(z) \, \Delta^r_{-2^{-k} z} f(x) \, dz .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The transform $\widehat{\Phi_c} = \chi_{1,2}(c^{-1} \cdot)$ vanishes outside the ball of radius $2c$,
+and $\widehat{\Theta_k} = 1$ on the ball of radius $2^{k+1}$, so $\Theta_k * \Phi_c = \Phi_c$ for
+$c \leq 2^k$ by \Cref{lem:conv-of-fourier}. For the identity, write
+$(\Phi_{2^k/l} * f)(x) = \int_V \Phi(z) f(x - l 2^{-k} z) \, dz$ and
+$f(x) = \int_V \Phi(z) f(x) \, dz$; the coefficients $(-1)^{l+1} \binom{r}{l}$ are those of
+$-(-1)^r \Delta^r$ with the step $-2^{-k} z$, without the term $l = 0$.
+\end{proof}
+
+\begin{theorem}[Jackson's inequality]
+\label{thm:band-jackson}
+\lean{Rd.one_add_pow_le_two_pow_mul, Rd.jacksonConst, Rd.jacksonConst_ne_top,
+  Rd.enorm_sub_jacksonApprox_le, Rd.approxSeq_bandScheme_le}
+\leanok
+\uses{lem:jackson-approx, lem:rd-modulus, lem:weighted-jensen, lem:lp-kernels-basic}
+Let $1 \leq p < \infty$ and $r \in \N$. There is $C < \infty$ with
+\[
+  \inf_{g \in E_k} \|f - g\|_p \leq \|f - J_k f\|_p \leq C \, \omega_r(f, 2^{-k})_p
+\]
+for all $f \in L_p$ and $k \in \N$; one can take
+$C^p = \|\Phi\|_1^{p-1} \int_V |\Phi(z)| (1 + |z|)^{rp} \, dz$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:jackson-approx} and \Cref{lem:weighted-jensen},
+\[
+  \|f - J_k f\|_p^p \leq \|\Phi\|_1^{p-1} \int_V |\Phi(z)| \, \|\Delta^r_{-2^{-k} z} f\|_p^p \, dz ,
+\]
+and $\|\Delta^r_{-2^{-k} z} f\|_p \leq \omega_r(f, 2^{-k} |z|)_p \leq (1 + |z|)^r
+\omega_r(f, 2^{-k})_p$ by \Cref{lem:rd-modulus}. The constant is finite, since $\Phi$ is a Schwartz
+function and $|\Phi(z)| (1 + |z|)^N$ is integrable for every $N$.
+\end{proof}
+
+\section{The inverse inequality}
+
+\begin{lemma}[Differences of Schwartz functions]
+\label{lem:schwartz-differences}
+\lean{Rd.fwdDiffSchwartz, Rd.coe_fwdDiffSchwartz, Rd.lineDerivOp_fwdDiffSchwartz,
+  Rd.iteratedLineDerivOp_fwdDiffSchwartz, Rd.lintegral_enorm_fwdDiff_le,
+  Rd.lintegral_enorm_iterDiff_le, Rd.enorm_iteratedLineDerivOp_le,
+  Rd.lintegral_enorm_iterDiff_schwartz_le, Rd.lintegral_enorm_iteratedFDeriv_ne_top}
+\leanok
+\uses{def:rd-modulus}
+For every Schwartz function $G$ on $V$, $v \in V$ and $r \in \N$,
+\[
+  \|\Delta_v^r G\|_1 \leq \|v\|^r \int_V \|D^r G(x)\| \, dx < \infty .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By the fundamental theorem of calculus, $G(x + v) - G(x) = \int_0^1 \partial_v G(x + t v) \, dt$,
+so $\|\Delta_v G\|_1 \leq \|\partial_v G\|_1$ by Tonelli's theorem and translation invariance. The
+difference $\Delta_v$ and the line derivative $\partial_v$ commute and preserve Schwartz
+functions; induction gives $\|\Delta_v^r G\|_1 \leq \|\partial_v^r G\|_1$, and
+$|\partial_v^r G(x)| \leq \|v\|^r \|D^r G(x)\|$.
+\end{proof}
+
+\begin{theorem}[The inverse inequality for band-limited functions]
+\label{thm:band-inverse}
+\lean{Rd.bandInverseConst, Rd.bandInverseConst_ne_top, Rd.eLpNorm_iterDiff_Theta_le,
+  Rd.lpModulus_le_of_mem_bandSpace}
+\leanok
+\uses{lem:schwartz-differences, lem:rd-differences, lem:rd-modulus, thm:young, def:band-space}
+Let $1 \leq p < \infty$, $r \in \N$ and $C = 2^r + \int_V \|D^r \Theta(x)\| \, dx$. For all
+$j, k \in \N$ and $a \in E_j$,
+\[
+  \omega_r(a, 2^{-k})_p \leq C \, 2^{-\max(k - j, 0) r} \, \|a\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $k < j$ use $\omega_r(a, t)_p \leq 2^r \|a\|_p$. For $k \geq j$ and $\|h\| \leq 2^{-k}$,
+$a = \Theta_j * a$ gives $\Delta_h^r a = (\Delta_h^r \Theta_j) * a$ almost everywhere, and
+$\Delta_h^r \Theta_j = (\Delta_{2^j h}^r \Theta)_{2^j}$ (\Cref{lem:rd-differences}). Young's
+inequality and \Cref{lem:schwartz-differences} give
+$\|\Delta_h^r a\|_p \leq (2^j \|h\|)^r \|D^r \Theta\|_1 \|a\|_p$, and $2^j \|h\| \leq 2^{-(k-j)}$.
+\end{proof}
+
+\section{Besov spaces by differences}
+
+\begin{theorem}[Approximation, Littlewood--Paley blocks and differences]
+\label{thm:rd-besov}
+\lean{Rd.bandModulusData, Rd.memApprox_bandScheme_iff_modulus,
+  Rd.littlewoodPaleyNorm_lt_top_iff_modulus}
+\leanok
+\uses{thm:band-jackson, thm:band-inverse, lem:rd-modulus, def:modulus-data,
+  thm:modulus-coincidence, thm:lp-band}
+Let $1 \leq p < \infty$, $r \geq 1$, $1 \leq q \leq \infty$ and $f \in L_p$.
+\begin{enumerate}
+  \item For $0 \leq s < r$, $f$ lies in the approximation space $A^s_q$ of the band-limited
+    scheme if and only if $\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+  \item For $0 < s < r$, $\|f\|^{\mathrm{LP}}_{s,q} < \infty$ if and only if
+    $\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:band-jackson} and \Cref{thm:band-inverse} make the modulus compatible with the
+band-limited scheme, with inverse order $r$; apply \Cref{thm:modulus-coincidence}. Part (2)
+combines (1) with \Cref{thm:lp-band}.
+\end{proof}
+
+For $0 < s < r$ the Besov space $\Besov{s}{p}{q}(V)$ thus has three equivalent descriptions: by
+approximation with band-limited functions, by Littlewood--Paley blocks, and by differences.
 
 \bpbibheading
 \begin{thebibliography}{99}

@@ -46,6 +46,12 @@ theorem mem_bandSpace {hp : p ≠ ∞} {k : ℕ} {g : Lp ℂ p (volume : Measure
   rw [bandSpace, LinearMap.mem_ker, LinearMap.sub_apply, sub_eq_zero]
   rfl
 
+/-- The band-limited classes are closed under complex scalars. -/
+theorem smul_mem_bandSpace {hp : p ≠ ∞} {k : ℕ} (c : ℂ) {g : Lp ℂ p (volume : Measure V)}
+    (hg : g ∈ bandSpace hp k) : c • g ∈ bandSpace hp k := by
+  rw [mem_bandSpace] at hg ⊢
+  rw [map_smul, hg]
+
 /-- The band-limited classes are closed in `L_p`. -/
 theorem isClosed_bandSpace (hp : p ≠ ∞) (k : ℕ) :
     IsClosed (bandSpace (V := V) hp k : Set (Lp ℂ p (volume : Measure V))) := by

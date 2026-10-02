@@ -185,6 +185,48 @@ theorem eLpNorm_conv_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K f :
   exact (lintegral_mono fun x => ENNReal.rpow_le_rpow (enorm_conv_le_lintegral K f x)
     hq.le).trans (lintegral_rpow_lintegral_le hp1 hp hK hf)
 
+omit [BorelSpace V] in
+/-- **Weighted averages in `L_p`** (Minkowski's integral inequality, in the form of the weighted
+Jensen inequality): for `1 ≤ p < ∞`, a weight `Φ` and a jointly measurable `G`,
+`‖∫ Φ(z) G(·, z) dz‖_p^p ≤ ‖Φ‖_1^(p-1) ∫ |Φ(z)| ‖G(·, z)‖_p^p dz`. -/
+theorem eLpNorm_integral_kernel_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {Φ : V → ℂ}
+    (hΦ : AEStronglyMeasurable Φ μ) {G : V → V → ℂ} (hG : Measurable (Function.uncurry G)) :
+    eLpNorm (fun x => ∫ z, Φ z * G x z ∂μ) p μ ^ p.toReal ≤
+      (∫⁻ z, ‖Φ z‖ₑ ∂μ) ^ (p.toReal - 1) *
+        ∫⁻ z, ‖Φ z‖ₑ * eLpNorm (fun x => G x z) p μ ^ p.toReal ∂μ := by
+  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  have hq1 : 1 ≤ p.toReal := by
+    have h := ENNReal.toReal_mono hp hp1
+    rwa [ENNReal.toReal_one] at h
+  have hprod : AEMeasurable (Function.uncurry fun x z => ‖Φ z‖ₑ * ‖G x z‖ₑ ^ p.toReal)
+      (μ.prod μ) :=
+    hΦ.enorm.comp_snd.mul (hG.enorm.pow_const _).aemeasurable
+  have hint : AEStronglyMeasurable (fun x => ∫ z, Φ z * G x z ∂μ) μ :=
+    (hΦ.comp_snd.mul hG.aestronglyMeasurable).integral_prod_right'
+  rw [Interval.eLpNorm_rpow_eq hint hp0 hp]
+  calc ∫⁻ x, ‖∫ z, Φ z * G x z ∂μ‖ₑ ^ p.toReal ∂μ
+      ≤ ∫⁻ x, (∫⁻ z, ‖Φ z‖ₑ * ‖G x z‖ₑ ∂μ) ^ p.toReal ∂μ := lintegral_mono fun x => by
+        refine ENNReal.rpow_le_rpow ((enorm_integral_le_lintegral_enorm _).trans_eq ?_) hq.le
+        simp_rw [enorm_mul]
+    _ ≤ ∫⁻ x, (∫⁻ z, ‖Φ z‖ₑ ∂μ) ^ (p.toReal - 1) *
+          ∫⁻ z, ‖Φ z‖ₑ * ‖G x z‖ₑ ^ p.toReal ∂μ ∂μ :=
+        lintegral_mono fun x => lintegral_mul_rpow_le hq1 hΦ.enorm
+          (hG.comp measurable_prodMk_left).enorm.aemeasurable
+    _ = (∫⁻ z, ‖Φ z‖ₑ ∂μ) ^ (p.toReal - 1) *
+          ∫⁻ x, ∫⁻ z, ‖Φ z‖ₑ * ‖G x z‖ₑ ^ p.toReal ∂μ ∂μ :=
+        lintegral_const_mul'' _ hprod.lintegral_prod_right'
+    _ = (∫⁻ z, ‖Φ z‖ₑ ∂μ) ^ (p.toReal - 1) *
+          ∫⁻ z, ∫⁻ x, ‖Φ z‖ₑ * ‖G x z‖ₑ ^ p.toReal ∂μ ∂μ := by
+        rw [lintegral_lintegral_swap hprod]
+    _ = (∫⁻ z, ‖Φ z‖ₑ ∂μ) ^ (p.toReal - 1) *
+          ∫⁻ z, ‖Φ z‖ₑ * eLpNorm (fun x => G x z) p μ ^ p.toReal ∂μ := by
+        congr 1
+        refine lintegral_congr fun z => ?_
+        have hGz : AEStronglyMeasurable (fun x => G x z) μ :=
+          (hG.comp measurable_prodMk_right).aestronglyMeasurable
+        rw [lintegral_const_mul' _ _ enorm_ne_top, Interval.eLpNorm_rpow_eq hGz hp0 hp]
+
 /-- Convolution of an integrable kernel with an `L_p` function is in `L_p`. -/
 theorem memLp_conv {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K f : V → ℂ} (hK : Integrable K μ)
     (hf : MemLp f p μ) : MemLp (conv K f μ) p μ :=

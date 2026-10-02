@@ -78,6 +78,10 @@ public import FunctionSpaces.Rd.ApproxIdentity
 public import FunctionSpaces.Rd.LittlewoodPaleyKernels
 public import FunctionSpaces.Rd.BandLimited
 public import FunctionSpaces.Rd.LittlewoodPaley
+public import FunctionSpaces.Rd.Differences
+public import FunctionSpaces.Rd.BandJackson
+public import FunctionSpaces.Rd.BandInverse
+public import FunctionSpaces.Rd.BesovDifferences
 
 /-!
 # Function spaces
@@ -237,4 +241,13 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   scheme.
 * `FunctionSpaces.Rd.LittlewoodPaley`: the Littlewood–Paley blocks, reconstruction, and the
   characterisation of band-limited approximation spaces by Littlewood–Paley blocks.
+* `FunctionSpaces.Rd.Differences`: differences and the modulus of smoothness on a
+  finite-dimensional space, dilation of the scale, differences of convolutions and dilations.
+* `FunctionSpaces.Rd.BandJackson`: the Jackson approximant and Jackson's inequality for
+  band-limited approximation.
+* `FunctionSpaces.Rd.BandInverse`: differences of Schwartz functions in `L_1` and the inverse
+  inequality for band-limited functions.
+* `FunctionSpaces.Rd.BesovDifferences`: the modulus of smoothness as a modulus compatible with the
+  band-limited scheme, and the agreement of the Besov conditions by approximation, by
+  Littlewood–Paley blocks and by differences.
 -/

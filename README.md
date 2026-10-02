@@ -311,6 +311,17 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `‖K ⋆ f‖_p ≤ ‖K‖_1 ‖f‖_p` (`Rd.eLpNorm_conv_le`), approximate identities in `L_p`
   (`Rd.tendsto_convLp_dilate`), and identities between the kernels such as `ψ_j ⋆ Θ_k = 0`
   for `j ≥ k + 3`, proved by Fourier inversion (`Rd.conv_psi_Theta`).
+* **Besov spaces on `ℝ^d` by differences.** With `V`, `p`, `E_k` and `ψ_j` as above, let
+  `ω_r(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_p` be the modulus of smoothness of order `r ≥ 1`. For
+  `0 < s < r` and `1 ≤ q ≤ ∞`, the following are equivalent for `f ∈ L_p(V)`:
+  `f ∈ A^s_q(L_p(V), (E_k))`; `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q} < ∞`; and
+  `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
+  (`Rd.memApprox_bandScheme_iff_modulus`, `Rd.littlewoodPaleyNorm_lt_top_iff_modulus`). The
+  proof combines Jackson's inequality `E(f, E_k)_p ≤ C ω_r(f, 2^(-k))_p`, through the approximant
+  `∑_{l=1}^r (-1)^(l+1) C(r, l) Φ_{2^k/l} ⋆ f` (`Rd.enorm_sub_jacksonApprox_le`), with the inverse
+  inequality `ω_r(a, 2^(-k))_p ≤ C 2^(-(k-j) r) ‖a‖_p` for `a ∈ E_j`
+  (`Rd.lpModulus_le_of_mem_bandSpace`), which rests on `‖Δ_v^r G‖_1 ≤ |v|^r ‖D^r G‖_1` for
+  Schwartz functions `G` (`Rd.lintegral_enorm_iterDiff_schwartz_le`).
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -377,6 +388,10 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Dilations, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ proved | ✗ | `FunctionSpaces/Rd/ApproxIdentity.lean` |
 | Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, kernel identities by Fourier inversion | ✅ proved | ✗ | `FunctionSpaces/Rd/LittlewoodPaleyKernels.lean` |
 | Band-limited classes on `ℝ^d`, Littlewood–Paley blocks, `A^s_q(band-limited)` characterised by Littlewood–Paley blocks for `s > 0` | ✅ proved | ✗ | `FunctionSpaces/Rd/{BandLimited,LittlewoodPaley}.lean` |
+| Differences and the modulus of smoothness on `ℝ^d`: dilation of the scale, differences of convolutions and dilations | ✅ proved | ✗ | `FunctionSpaces/Rd/Differences.lean` |
+| Jackson's inequality for band-limited approximation | ✅ proved | ✗ | `FunctionSpaces/Rd/BandJackson.lean` |
+| Differences of Schwartz functions in `L_1`, inverse inequality for band-limited functions | ✅ proved | ✗ | `FunctionSpaces/Rd/BandInverse.lean` |
+| Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ proved | ✗ | `FunctionSpaces/Rd/BesovDifferences.lean` |
 | Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Classical/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
@@ -394,10 +409,10 @@ approximation spaces with spaces defined by moduli of smoothness. Nothing in it 
 functions or measures. `FunctionSpaces` holds the Besov and Sobolev spaces built on it:
 schemes of bounded continuous functions on a finite measure space and their embedding
 theorems, spectral schemes in Hilbert spaces, the torus with its traces and Lipschitz atoms,
-`ℝ^d` with convolution, approximate identities and Littlewood–Paley decompositions,
-filtration schemes for wavelets and multiwavelets, the classical definitions through moduli
-of smoothness and weak derivatives, and polynomial and piecewise polynomial approximation on
-intervals and on the cube `[0, 1]^d`. [MathlibCandidates.md](MathlibCandidates.md) lists what
+`ℝ^d` with convolution, approximate identities, Littlewood–Paley decompositions and moduli of
+smoothness, filtration schemes for wavelets and multiwavelets, the classical definitions
+through moduli of smoothness and weak derivatives, and polynomial and piecewise polynomial
+approximation on intervals and on the cube `[0, 1]^d`. [MathlibCandidates.md](MathlibCandidates.md) lists what
 could be upstreamed.
 `blueprint/` holds the LaTeX source of the blueprint and the scripts that check and link its
 `\lean` references.
@@ -405,8 +420,8 @@ could be upstreamed.
 ## What is left to do
 
 * **Reiteration** for approximation and interpolation spaces.
-* **Function spaces beyond the torus**: moduli of smoothness and dominating mixed smoothness on
-  `ℝ^d`, compact manifolds, bounded domains.
+* **Function spaces beyond the torus**: dominating mixed smoothness on `ℝ^d`, compact
+  manifolds, bounded domains.
 * **Classical definitions for all `p`**: Sobolev spaces by weak derivatives and Besov spaces
   by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
 * **Higher smoothness**: splines on domains, and compactly supported wavelets such as

@@ -119,22 +119,27 @@ theorem conv_dilate_apply (Φ f : V → ℂ) {c : ℝ} (hc : 0 < c) (x : V) :
 
 /-! ### Approximate identities -/
 
+/-- **The averaged translates are integrable**: for integrable `Φ`, `f ∈ L_p`, `c > 0` and almost
+every `x`, `z ↦ Φ(z) f(x - c^(-1) z)` is integrable; its integral is `(Φ_c ⋆ f)(x)`. -/
+theorem ae_integrable_dilate_mul {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {Φ f : V → ℂ}
+    (hΦ : Integrable Φ μ) (hf : MemLp f p μ) {c : ℝ} (hc : 0 < c) :
+    ∀ᵐ x ∂μ, Integrable (fun z => Φ z * f (x - c⁻¹ • z)) μ := by
+  have hpow : (0 : ℝ) < c ^ finrank ℝ V := pow_pos hc _
+  filter_upwards [ae_convolutionExistsAt hp1 hp (integrable_dilate hΦ hc.ne') hf] with x hx
+  have hx' : Integrable (fun y => dilate c Φ y * f (x - y)) μ := hx
+  have h2 := (hx'.comp_smul (inv_ne_zero hc.ne')).const_mul ((((c ^ finrank ℝ V)⁻¹ : ℝ)) : ℂ)
+  refine h2.congr (Eventually.of_forall fun z => ?_)
+  simp only [dilate, smul_inv_smul₀ hc.ne']
+  rw [← mul_assoc, ← mul_assoc, ← Complex.ofReal_mul, inv_mul_cancel₀ hpow.ne',
+    Complex.ofReal_one, one_mul]
+
 /-- **The local bound of an approximate identity**: for `∫ Φ = 1`, `c > 0` and almost every
 `x`, `|(Φ_c ⋆ f)(x) - f(x)| ≤ ∫ |Φ(z)| |f(x - c^(-1) z) - f(x)| dz`. -/
 theorem ae_enorm_conv_dilate_sub_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {Φ f : V → ℂ}
     (hΦ : Integrable Φ μ) (h1 : ∫ x, Φ x ∂μ = 1) (hf : MemLp f p μ) {c : ℝ} (hc : 0 < c) :
     ∀ᵐ x ∂μ, ‖conv (dilate c Φ) f μ x - f x‖ₑ ≤
       ∫⁻ z, ‖Φ z‖ₑ * ‖f (x - c⁻¹ • z) - f x‖ₑ ∂μ := by
-  have hpow : (0 : ℝ) < c ^ finrank ℝ V := pow_pos hc _
-  filter_upwards [ae_convolutionExistsAt hp1 hp (integrable_dilate hΦ hc.ne') hf] with x hx
-  have hx' : Integrable (fun y => dilate c Φ y * f (x - y)) μ := hx
-  have hint : Integrable (fun z => Φ z * f (x - c⁻¹ • z)) μ := by
-    have h2 := (hx'.comp_smul (inv_ne_zero hc.ne')).const_mul
-      ((((c ^ finrank ℝ V)⁻¹ : ℝ)) : ℂ)
-    refine h2.congr (Eventually.of_forall fun z => ?_)
-    simp only [dilate, smul_inv_smul₀ hc.ne']
-    rw [← mul_assoc, ← mul_assoc, ← Complex.ofReal_mul, inv_mul_cancel₀ hpow.ne',
-      Complex.ofReal_one, one_mul]
+  filter_upwards [ae_integrable_dilate_mul hp1 hp hΦ hf hc] with x hint
   have hconst : Integrable (fun z => Φ z * f x) μ := hΦ.mul_const (f x)
   calc ‖conv (dilate c Φ) f μ x - f x‖ₑ
       = ‖∫ z, (Φ z * f (x - c⁻¹ • z) - Φ z * f x) ∂μ‖ₑ := by
