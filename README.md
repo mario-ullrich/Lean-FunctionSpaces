@@ -335,7 +335,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Multiwavelets (orthonormal, `r` vanishing moments), stability, coefficient characterisation of `A^s_q` and of `B^s_{p,q}` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Wavelets/Examples/Alpert.lean` |
 | The cube `[0, 1]^d`: slices, integration through slices, moduli in the coordinates | ✅ proved | ✗ | `FunctionSpaces/Cube/{Basic,Modulus}.lean` |
 | Steklov smoothing in one coordinate near both ends of the cube | ✅ proved | ✗ | `FunctionSpaces/Cube/Smoothing.lean` |
-| Kernel operators of finite rank on slices, their forms, tensor products, telescoping over the coordinates | ✅ proved | ✗ | `FunctionSpaces/Cube/Kernel.lean` |
+| Kernel operators of finite rank on slices, their forms, tensor products, telescoping over the coordinates | ✅ proved | ✗ | `FunctionSpaces/Cube/SlicewiseOperators.lean` |
 | Piecewise polynomials on the cube: tensor projection, tensor-product description, Whitney, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{PiecewisePoly,PiecewiseJackson,PiecewiseInverse}.lean` |
 | Tensor splines on the cube: quasi-interpolant as a kernel operator, tensor-product description, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < r - 1 + 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{Splines,SplineJackson,SplineInverse}.lean` |
 | Differences of every order: difference bound for polynomials, piecewise polynomials (gain `1/p`), splines (gain `m` below order `r`), steps of either sign | ✅ proved | ✗ | `FunctionSpaces/Interval/{PolyDifferences,LowerDifferences}.lean` |

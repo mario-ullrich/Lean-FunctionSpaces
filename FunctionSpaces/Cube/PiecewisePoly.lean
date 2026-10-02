@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Cube.Kernel
+public import FunctionSpaces.Cube.SlicewiseOperators
 public import FunctionSpaces.Interval.LocalProjection
 
 /-!

@@ -62,7 +62,7 @@ public import FunctionSpaces.Interval.LowerDifferences
 public import FunctionSpaces.Cube.Basic
 public import FunctionSpaces.Cube.Modulus
 public import FunctionSpaces.Cube.Smoothing
-public import FunctionSpaces.Cube.Kernel
+public import FunctionSpaces.Cube.SlicewiseOperators
 public import FunctionSpaces.Cube.PiecewisePoly
 public import FunctionSpaces.Cube.PiecewiseJackson
 public import FunctionSpaces.Cube.PiecewiseInverse
@@ -197,8 +197,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   coordinates, and their sum, the modulus on the cube.
 * `FunctionSpaces.Cube.Smoothing`: the Steklov smoothing in one coordinate and its bounds by the
   coordinate modulus near the two ends of the coordinate.
-* `FunctionSpaces.Cube.Kernel`: finite-rank kernel operators on `[0, 1]`, their action on the
-  slices in one coordinate, the forms they produce, and telescoping over the coordinates.
+* `FunctionSpaces.Cube.SlicewiseOperators`: finite-rank kernel operators on `[0, 1]`, their
+  action on the slices in one coordinate, the forms they produce, and telescoping over the
+  coordinates.
 * `FunctionSpaces.Cube.PiecewisePoly`: the local projection as a kernel operator, the piecewise
   polynomials of degree `< r` in each variable on dyadic cubes, their scheme, and the tensor
   projection.
