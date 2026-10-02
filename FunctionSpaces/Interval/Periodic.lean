@@ -52,6 +52,18 @@ theorem measurable_perExt {f : ℝ → ℂ} (hf : Measurable f) : Measurable (pe
 /-- The periodic extension is additive. -/
 theorem perExt_add (f g : ℝ → ℂ) : perExt (f + g) = perExt f + perExt g := rfl
 
+/-- A `1`-periodic function is its own periodic extension. -/
+theorem perExt_eq_of_periodic {f : ℝ → ℂ} (hf : Function.Periodic f 1) : perExt f = f := by
+  funext x
+  rw [perExt, ← Int.self_sub_floor, ← mul_one ((⌊x⌋ : ℤ) : ℝ), hf.sub_int_mul_eq]
+
+/-- The differences of a `1`-periodic function are `1`-periodic. -/
+theorem iterDiff_periodic {f : ℝ → ℂ} (hf : Function.Periodic f 1) (r : ℕ) (h : ℝ) :
+    Function.Periodic (iterDiff r h f) 1 := fun x => by
+  rw [iterDiff_apply, iterDiff_apply]
+  refine Finset.sum_congr rfl fun k _ => ?_
+  rw [show x + 1 + k * h = x + k * h + 1 by ring, hf]
+
 /-- **Periodic extensions of almost equal functions**: if `f = g` almost everywhere on `[0, 1]`,
 then `f̃ = g̃` almost everywhere on `ℝ`, since `{f̃ ≠ g̃}` is the union of the integer translates
 of `{f ≠ g} ∩ [0, 1)`. -/
@@ -88,6 +100,27 @@ theorem lintegral_Icc_periodic {G : ℝ → ℝ≥0∞} (hG : Function.Periodic 
     rw [← setLIntegral_congr Ioc_ae_eq_Icc, ← UnitAddCircle.lintegral_preimage t]
     simp only [Function.Periodic.lift_coe]
   rw [key c, ← key 0, zero_add]
+
+/-- **Integrals of periodic functions over `n` periods**: `∫_{[0, n]} G ≤ n ∫_{[0, 1]} G` for
+`1`-periodic `G`, since `[0, n]` is covered by the unit intervals `[i, i + 1]`, `i < n`. -/
+theorem lintegral_Icc_nat_le {G : ℝ → ℝ≥0∞} (hG : Function.Periodic G 1) (n : ℕ) :
+    ∫⁻ x in Icc 0 (n : ℝ), G x ≤ n * ∫⁻ x in Icc 0 1, G x := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    have hsub : Icc (0 : ℝ) ((n + 1 : ℕ) : ℝ) ⊆ Icc 0 (n : ℝ) ∪ Icc (n : ℝ) (n + 1) := by
+      intro x hx
+      push_cast at hx
+      rcases le_or_gt x n with h | h
+      · exact Or.inl ⟨hx.1, h⟩
+      · exact Or.inr ⟨h.le, hx.2⟩
+    calc ∫⁻ x in Icc 0 ((n + 1 : ℕ) : ℝ), G x
+        ≤ ∫⁻ x in Icc 0 (n : ℝ) ∪ Icc (n : ℝ) (n + 1), G x := lintegral_mono_set hsub
+      _ ≤ (∫⁻ x in Icc 0 (n : ℝ), G x) + ∫⁻ x in Icc (n : ℝ) (n + 1), G x :=
+          lintegral_union_le _ _ _
+      _ ≤ n * (∫⁻ x in Icc 0 1, G x) + ∫⁻ x in Icc 0 1, G x :=
+          add_le_add ih (le_of_eq (lintegral_Icc_periodic hG n))
+      _ = ((n + 1 : ℕ) : ℝ≥0∞) * ∫⁻ x in Icc 0 1, G x := by push_cast; ring
 
 /-- The **periodic modulus of smoothness**
 `ω_r^per(f, t)_p = sup_{0 ≤ h ≤ t} ‖Δ_h^r f̃‖_{L_p[0, 1]}` of the periodic extension `f̃`. -/
@@ -164,5 +197,29 @@ theorem modulus_le_perModulus (r : ℕ) (p : ℝ≥0∞) (f : ℝ → ℂ) (t : 
       by linarith [hx.2]⟩]
   rw [eLpNorm_congr_ae hae]
   exact (eLpNorm_Icc_mono _ p le_rfl (by linarith)).trans (eLpNorm_iterDiff_le_perModulus hh)
+
+/-- **The modulus of a periodic extension over `n` periods**:
+`ω_r(f̃, t, [0, n])_p ≤ n^(1/p) ω_r^per(f, t)_p`, since `Δ_h^r f̃` is `1`-periodic
+(`Interval.lintegral_Icc_nat_le`). -/
+theorem modulus_perExt_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp0 : p ≠ 0)
+    (hp : p ≠ ∞) (r n : ℕ) (t : ℝ) :
+    modulus r p 0 n (perExt f) t ≤ (n : ℝ≥0∞) ^ (1 / p.toReal) * perModulus r p f t := by
+  have hθ : (0 : ℝ) ≤ 1 / p.toReal := by positivity
+  refine iSup₂_le fun h hh => ?_
+  have hm := measurable_iterDiff (measurable_perExt hf) r h
+  have hrh : (0 : ℝ) ≤ r * h := mul_nonneg (Nat.cast_nonneg r) hh.1
+  have hper : Function.Periodic (fun x => ‖iterDiff r h (perExt f) x‖ₑ ^ p.toReal) 1 :=
+    fun x => by simp only [iterDiff_periodic (perExt_periodic f) r h x]
+  calc eLpNorm (iterDiff r h (perExt f)) p (volume.restrict (Icc 0 (n - r * h)))
+      ≤ eLpNorm (iterDiff r h (perExt f)) p (volume.restrict (Icc 0 n)) :=
+        eLpNorm_Icc_mono _ p le_rfl (by linarith)
+    _ ≤ (n : ℝ≥0∞) ^ (1 / p.toReal) *
+          eLpNorm (iterDiff r h (perExt f)) p (volume.restrict (Icc 0 1)) := by
+        rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hm.aestronglyMeasurable,
+          eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hm.aestronglyMeasurable,
+          ← ENNReal.mul_rpow_of_nonneg _ _ hθ]
+        exact ENNReal.rpow_le_rpow (lintegral_Icc_nat_le hper n) hθ
+    _ ≤ (n : ℝ≥0∞) ^ (1 / p.toReal) * perModulus r p f t :=
+        mul_le_mul' le_rfl (eLpNorm_iterDiff_le_perModulus hh)
 
 end Interval

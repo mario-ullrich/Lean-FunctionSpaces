@@ -273,6 +273,30 @@ theorem enorm_qiCoeff_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
         exact eLpNorm_locProj_le (enorm_monoBasis_le r) (enorm_dualPoly_le r) Fact.out k m hg
     _ = _ := by ring
 
+/-- On `I_{k,m}` only the B-splines `m - r < n ≤ m` have nonzero pieces; the piece with
+`m - n = r` is `B_r = 0` (`Interval.bsplinePiece_top`). -/
+theorem bsplinePieces_eq_zero_of_not_mem {r : ℕ} (hr : 1 ≤ r) (k : ℕ) {n : ℤ} {m : ℕ}
+    (hn : ¬ ((m : ℤ) - r < n ∧ n ≤ m)) : bsplinePieces r k n m = 0 := by
+  unfold bsplinePieces
+  split_ifs with h
+  · rw [show ((m : ℤ) - n).toNat = r by omega, bsplinePiece_top hr, zero_comp]
+  · rfl
+
+/-- The pieces of the quasi-interpolant on `I_{k,i}`, `i < N`, as the sum over the B-splines
+`i - r < n ≤ i`. -/
+theorem qiPieces_eq_sum_Ioc {r : ℕ} (hr : 1 ≤ r) (k : ℕ) {N i : ℕ} (hi : i < N) (g : ℝ → ℂ) :
+    qiPieces hr k N g i =
+      ∑ n ∈ Finset.Ioc ((i : ℤ) - r) i, C (qiCoeff hr k g n) * bsplinePieces r k n i := by
+  have hik : (i : ℤ) < N := by exact_mod_cast hi
+  rw [qiPieces_apply]
+  exact (Finset.sum_subset (fun n hn => by
+      rw [Finset.mem_Ioc] at hn
+      rw [qiIdx, Finset.mem_Ioo]
+      constructor <;> omega)
+    (fun n _ hn => by
+      rw [Finset.mem_Ioc] at hn
+      rw [bsplinePieces_eq_zero_of_not_mem hr k hn, mul_zero])).symm
+
 /-- On `I_{k,i}` the quasi-interpolant is the sum over the B-splines `i - r < n ≤ i`. -/
 theorem polyFun_qiPieces_eq_sum_Ioc {r : ℕ} (hr : 1 ≤ r) {k N i : ℕ} (hi : i < N)
     (g : ℝ → ℂ) {x : ℝ} (hx : x ∈ dyadicIco k i) :

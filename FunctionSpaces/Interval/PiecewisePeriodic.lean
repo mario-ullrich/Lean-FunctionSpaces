@@ -45,21 +45,38 @@ namespace Interval
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
-/-- **The periodic extension of a piecewise polynomial** of level `k` is a piecewise polynomial
-of level `k` on `[0, ∞)`: on `I_{k,m}` with `m = m' + 2^k c`, `m' < 2^k`, it is `Q_{m'}` shifted
-by `c`. -/
-theorem isPiecewisePoly_perExt_ppFun {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r)
-    (k : ℕ) : IsPiecewisePoly r k (perExt (ppFun k Q)) := by
-  intro m
-  obtain ⟨c, m', hm', hdecomp⟩ : ∃ c m' : ℕ, m' < 2 ^ k ∧ m = m' + 2 ^ k * c :=
+/-- The **pieces of the periodic extension** of a piecewise polynomial of level `k`: on `I_{k,m}`
+with `m = m' + 2^k c`, `m' < 2^k`, the piece `Q_{m'}` shifted by `c`, `Q_{m'}(x - c)`. -/
+noncomputable def perPieces (k : ℕ) (Q : ℕ → ℂ[X]) (m : ℕ) : ℂ[X] :=
+  (Q (m % 2 ^ k)).comp (X - C ((((m / 2 ^ k : ℕ) : ℝ) : ℝ) : ℂ))
+
+/-- The pieces of the periodic extension in a given decomposition `m = m' + 2^k c`, `m' < 2^k`. -/
+theorem perPieces_eq (k : ℕ) (Q : ℕ → ℂ[X]) {m' : ℕ} (hm' : m' < 2 ^ k) (c : ℕ) :
+    perPieces k Q (m' + 2 ^ k * c) = (Q m').comp (X - C (((c : ℝ) : ℝ) : ℂ)) := by
+  have hpos : 0 < 2 ^ k := by positivity
+  rw [perPieces, Nat.add_mul_div_left _ _ hpos, Nat.div_eq_of_lt hm', zero_add,
+    Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt hm']
+
+/-- The pieces of the periodic extension have degree `< r`. -/
+theorem perPieces_mem {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r) (k m : ℕ) :
+    perPieces k Q m ∈ degreeLT ℂ r := by
+  have h : (X - C ((((m / 2 ^ k : ℕ) : ℝ) : ℝ) : ℂ) : ℂ[X]) =
+      C (-((((m / 2 ^ k : ℕ) : ℝ) : ℝ) : ℂ)) + C 1 * X := by
+    rw [C_neg, C_1, one_mul]; ring
+  rw [perPieces, h]
+  exact comp_affine_mem_degreeLT (hQ _) _ _
+
+/-- **The periodic extension of a piecewise polynomial** of level `k` is the piece
+`Interval.perPieces k Q m` on every `I_{k,m}`, `m ∈ ℕ`. -/
+theorem perExt_ppFun_eq (k : ℕ) (Q : ℕ → ℂ[X]) {m : ℕ} {x : ℝ} (hx : x ∈ dyadicIco k m) :
+    perExt (ppFun k Q) x = polyFun (perPieces k Q m) x := by
+  obtain ⟨c, m', hm', rfl⟩ : ∃ c m' : ℕ, m' < 2 ^ k ∧ m = m' + 2 ^ k * c :=
     ⟨m / 2 ^ k, m % 2 ^ k, Nat.mod_lt _ (by positivity), (Nat.mod_add_div m (2 ^ k)).symm⟩
-  refine ⟨(Q m').comp (C ((-(c : ℝ) : ℝ) : ℂ) + C ((1 : ℝ) : ℂ) * X),
-    comp_affine_mem_degreeLT (hQ m') _ _, fun x hx => ?_⟩
   have hpos : (0 : ℝ) < 2 ^ k := by positivity
-  have hdiv : (m : ℝ) = m' + 2 ^ k * c := by rw [hdecomp]; push_cast; ring
   have hm'R : (m' : ℝ) + 1 ≤ 2 ^ k := by exact_mod_cast hm'
   have hm'0 : (0 : ℝ) ≤ m' := Nat.cast_nonneg m'
   rw [mem_dyadicIco] at hx
+  push_cast at hx
   have hfl : ⌊x⌋ = (c : ℤ) := by
     rw [Int.floor_eq_iff]
     push_cast
@@ -73,9 +90,16 @@ theorem isPiecewisePoly_perExt_ppFun {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n,
   have hmem : x - c ∈ dyadicIco k m' := by
     rw [mem_dyadicIco]
     constructor <;> nlinarith
-  rw [perExt, hfract, ppFun_eq_of_mem Q hm' hmem, polyFun_comp_affine]
-  congr 1
-  ring
+  rw [perExt, hfract, ppFun_eq_of_mem Q hm' hmem, perPieces_eq k Q hm' c]
+  simp only [polyFun, eval_comp, eval_sub, eval_X, eval_C]
+  push_cast
+  ring_nf
+
+/-- **The periodic extension of a piecewise polynomial** of level `k` is a piecewise polynomial
+of level `k` on `[0, ∞)`, with the pieces `Interval.perPieces k Q`. -/
+theorem isPiecewisePoly_perExt_ppFun {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r)
+    (k : ℕ) : IsPiecewisePoly r k (perExt (ppFun k Q)) := fun m =>
+  ⟨perPieces k Q m, perPieces_mem hQ k m, fun _ hx => perExt_ppFun_eq k Q hx⟩
 
 /-- **The local masses of a periodic extension**: `2^k` consecutive pieces of the periodic
 extension `ũ` make up one period, so `∑_{n < 2^k} ∫_{I_{k,n+l}} |ũ|^p ≤ ‖u‖_p^p`. -/

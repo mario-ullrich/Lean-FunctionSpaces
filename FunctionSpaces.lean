@@ -54,6 +54,8 @@ public import FunctionSpaces.Interval.Splines
 public import FunctionSpaces.Interval.SplineInverse
 public import FunctionSpaces.Interval.QuasiInterp
 public import FunctionSpaces.Interval.SplineJackson
+public import FunctionSpaces.Interval.SplinePeriodic
+public import FunctionSpaces.Interval.SplinePeriodicJackson
 
 /-!
 # Function spaces
@@ -159,4 +161,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   B-spline coefficients, its local reproduction of polynomials and its local bounds.
 * `FunctionSpaces.Interval.SplineJackson`: Jackson's inequality for dyadic splines and the
   identification of their approximation spaces with `B^s_{p,q}[0, 1]` for `0 < s < r - 1 + 1/p`.
+* `FunctionSpaces.Interval.SplinePeriodic`: periodic splines on the circle, their scheme, and
+  their inverse inequality of order `r - 1 + 1/p`.
+* `FunctionSpaces.Interval.SplinePeriodicJackson`: the periodic quasi-interpolant, Jackson's
+  inequality for periodic splines, density of continuous periodic functions, and the
+  identification of their approximation spaces with `B^s_{p,q}(𝕋)` for `0 < s < r - 1 + 1/p`.
 -/

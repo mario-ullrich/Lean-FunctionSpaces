@@ -3190,13 +3190,16 @@ near $1$ with values near $0$.
 \label{lem:per-modulus}
 \lean{Interval.perExt_ae_eq, Interval.iterDiff_perExt_ae_eq, Interval.lintegral_Icc_periodic,
   Interval.perModulus_congr_ae, Interval.perModulus_add_le, Interval.eLpNorm_perExt_Icc,
-  Interval.perModulus_le, Interval.modulus_le_perModulus}
+  Interval.perModulus_le, Interval.modulus_le_perModulus, Interval.perExt_eq_of_periodic,
+  Interval.iterDiff_periodic, Interval.lintegral_Icc_nat_le, Interval.modulus_perExt_le}
 \leanok
 \uses{def:per-modulus, lem:interval-modulus}
 Let $1 \leq p < \infty$, $r \in \N$ and $t \geq 0$. The periodic modulus depends only on the class
-of $f$ in $L_p[0,1]$, is subadditive in $f$, and for measurable $f$
+of $f$ in $L_p[0,1]$, is subadditive in $f$, and for measurable $f$ and every $n \in \N$
 \[
-  \omega_r(f, t, [0,1])_p \leq \omega_r^{\mathrm{per}}(f, t)_p \leq 2^r \|f\|_{L_p[0,1]} .
+  \omega_r(f, t, [0,1])_p \leq \omega_r^{\mathrm{per}}(f, t)_p \leq 2^r \|f\|_{L_p[0,1]} ,
+  \qquad
+  \omega_r(\tilde f, t, [0, n])_p \leq n^{1/p} \, \omega_r^{\mathrm{per}}(f, t)_p .
 \]
 \end{lemma}
 
@@ -3207,12 +3210,15 @@ union of the integer translates of a null set. The integral of a $1$-periodic fu
 $[c, c + 1]$ is its integral over the circle, so it does not depend on $c$; hence each term
 $\tilde f(\cdot + kh)$ of $\Delta_h^r \tilde f$ has $L_p[0,1]$ norm $\|f\|_{L_p[0,1]}$, and
 $\sum_k \binom{r}{k} = 2^r$. For $x \in [0, 1 - rh)$ the points $x, \dots, x + rh$ lie in
-$[0, 1)$, where $\tilde f = f$.
+$[0, 1)$, where $\tilde f = f$. Finally $\Delta_h^r \tilde f$ is $1$-periodic and $[0, n]$ is
+covered by the $n$ intervals $[i, i + 1]$, so
+$\|\Delta_h^r \tilde f\|_{L_p[0, n]}^p \leq n \|\Delta_h^r \tilde f\|_{L_p[0, 1]}^p$.
 \end{proof}
 
 \begin{theorem}[Approximation spaces on the circle]
 \label{thm:pp-besov-per}
-\lean{Interval.isPiecewisePoly_perExt_ppFun, Interval.sum_localMass_perExt_le,
+\lean{Interval.perPieces, Interval.perPieces_eq, Interval.perPieces_mem,
+  Interval.perExt_ppFun_eq, Interval.isPiecewisePoly_perExt_ppFun, Interval.sum_localMass_perExt_le,
   Interval.sum_sum_localMass_perExt_le, Interval.lpPerModulus, Interval.lpPerModulus_add_le,
   Interval.lpPerModulus_le, Interval.lpModulus_le_lpPerModulus,
   Interval.exists_approxSeq_ppScheme_le_per, Interval.exists_inverse_ppScheme_per,
@@ -3646,7 +3652,8 @@ spline of order $r$ and level $k$.
 \label{lem:quasi-interp}
 \lean{Interval.bspline_eq_zero_of_not_mem, Interval.polyFun_qiPieces_of_eq,
   Interval.exists_enorm_bspline_le, Interval.exists_enorm_bcoord_le, Interval.qiCoeff_eq_bcoord,
-  Interval.enorm_qiCoeff_le, Interval.polyFun_qiPieces_eq_sum_Ioc, Interval.eLpNorm_qiPieces_le}
+  Interval.enorm_qiCoeff_le, Interval.bsplinePieces_eq_zero_of_not_mem,
+  Interval.qiPieces_eq_sum_Ioc, Interval.polyFun_qiPieces_eq_sum_Ioc, Interval.eLpNorm_qiPieces_le}
 \leanok
 \uses{def:quasi-interp, lem:loc-proj, lem:bspline-basis}
 Let $1 \leq p < \infty$, $r \geq 1$, $k, N \in \N$ and $i < N$.
@@ -3677,12 +3684,16 @@ $\tilde P(\cdot + \max(n, 0))$, whose norm on $[0, 1]$ is $2^{k/p} \|\Pi_{J(n)} 
   Interval.bsplineCoef_add, Interval.bsplineCoef_C_mul, Interval.locProjScaled_mem,
   Interval.qiCoeff_add_const_mul, Interval.polyFun_qiPieces_sub, Interval.qiWindow,
   Interval.dyadicIco_subset_qiWindow, Interval.dyadicIco_subset_qiWindow_self,
-  Interval.eLpNorm_sub_qiPieces_le, Interval.exists_window_poly}
+  Interval.natCast_add_one_sub_le, Interval.qiWindow_subset, Interval.eLpNorm_sub_qiPieces_le,
+  Interval.sum_eLpNorm_sub_qiPieces_le, Interval.exists_window_poly, Interval.exists_qiWindow_poly}
 \leanok
 \uses{lem:quasi-interp}
 Let $W_i = [(i + 1 - r) 2^{-k}, (i + 1) 2^{-k}]$ (truncated at $0$). There is $C$ with
-$\|g - Q_k g\|_{L_p(I_{k,i})} \leq C \|g - T\|_{L_p(W_i)}$ for every polynomial $T$ of degree
-$< r$, and the windows $W_i$, $i < 2^k$, cover every point at most $r$ times.
+$\|g - Q_k g\|_{L_p(I_{k,i})} \leq C \|g - T\|_{L_p(W_i)}$ for every $i < N$ and every polynomial
+$T$ of degree $< r$, and the windows $W_i$, $i < N$, cover every point at most $r$ times. Hence,
+if for every $i$ in a set $s \subseteq \{0, \dots, N - 1\}$ some $T_i$ has
+$\|g - T_i\|_{L_p(W_i)}^p \leq \int_{W_i} H$, then
+$\sum_{i \in s} \|g - Q_k g\|_{L_p(I_{k,i})}^p \leq C^p r \int H$.
 \end{lemma}
 
 \begin{proof}
@@ -3693,8 +3704,10 @@ and part (2) of \Cref{lem:quasi-interp} applies with $J(n) \subseteq W_i$.
 
 \begin{theorem}[Jackson's inequality for splines]
 \label{thm:spline-jackson}
-\lean{Interval.splineJacksonConst, Interval.lintegral_sub_ppFun_le_sum,
-  Interval.exists_eLpNorm_sub_qi_le, Interval.approxSeq_splineScheme_one,
+\lean{Interval.lintegral_smoothing_le, Interval.splineJacksonConst,
+  Interval.splineJacksonConst_ne_top, Interval.splineJacksonConst_rpow_eq,
+  Interval.lintegral_sub_ppFun_le_sum, Interval.exists_eLpNorm_sub_qi_le,
+  Interval.approxSeq_splineScheme_one,
   Interval.exists_approxSeq_splineScheme_le}
 \leanok
 \uses{lem:two-sided-smoothing, lem:qi-local-error, def:spline-space, thm:whitney,
@@ -3741,6 +3754,142 @@ $\theta = r - 1 + 1/p$; apply \Cref{thm:modulus-coincidence}.
 For $0 < s < r - 1 + 1/p$ the condition says $f \in \Besov{s}{p}{q}[0, 1]$. For $r = 1$ the
 splines are the step functions and this is \Cref{thm:pp-besov}; for $r \geq 2$ it reaches
 smoothness above $1$, for example $s < \tfrac32$ for continuous piecewise linear splines in $L_2$.
+
+\section{Splines on the circle}
+
+\begin{definition}[Periodic splines]
+\label{def:per-spline-space}
+\lean{Interval.PerJoin, Interval.perJoin_zero, Interval.PerJoin.add, Interval.PerJoin.const_mul,
+  Interval.PerJoin.refine, Interval.perSplineSpace, Interval.perSplineSpace_le_splineSpace,
+  Interval.perSplineSpace_mono, Interval.perSplineScheme, Interval.mem_perSplineScheme_zero,
+  Interval.mem_perSplineScheme, Interval.mem_perSplineScheme_two_pow,
+  Interval.perSplineScheme_isLinear}
+\leanok
+\uses{def:spline-space, def:per-modulus}
+Let $r \geq 1$ and $k \in \N$. A spline $u \in S_k$ with pieces $Q_0, \dots, Q_{2^k - 1}$ is
+\emph{periodic} if in addition $Q_0(x - 1) - Q_{2^k - 1}(x) = c (x - 1)^{r-1}$ for some
+$c \in \C$. The periodic splines form subspaces $S_k(\T) \subseteq S_k$ of $L_p(\T) = L_p[0,1]$
+increasing in $k$, and the scheme of periodic dyadic splines has the approximants $\{0\}$ at
+complexity $0$ and $S_{\lfloor \log_2 n \rfloor}(\T)$ at complexity $n \geq 1$.
+\end{definition}
+
+The additional join is the spline join at the point $0 = 1$ of the circle: the periodic extension
+$\tilde u$ has the piece $Q_0(x - 1)$ on $[1, 1 + 2^{-k})$.
+
+\begin{lemma}[Periodic extensions of periodic splines]
+\label{lem:per-spline-ext}
+\lean{Interval.perPieces_join, Interval.splineJoinsBelow_perPieces}
+\leanok
+\uses{def:per-spline-space, thm:pp-besov-per}
+Let $u \in S_k(\T)$ have pieces $Q_0, \dots, Q_{2^k - 1}$. On $I_{k, m' + 2^k c}$, $m' < 2^k$,
+$c \in \N$, the periodic extension $\tilde u$ is the polynomial $P_{m' + 2^k c}(x) = Q_{m'}(x - c)$,
+and $P_m - P_{m-1} = c_m (x - m 2^{-k})^{r-1}$ for every $m \geq 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $m = e + 2^k d$ with $0 < e < 2^k$ this is the join of $Q_e$ and $Q_{e-1}$ shifted by $d$;
+for $m = 2^k d$, $d \geq 1$, it is the join across $0 = 1$ shifted by $d - 1$.
+\end{proof}
+
+\begin{theorem}[The inverse inequality for periodic splines]
+\label{thm:per-spline-inverse}
+\lean{Interval.exists_inverse_perSplineScheme}
+\leanok
+\uses{lem:per-spline-ext, lem:spline-across, thm:spline-inverse, thm:pp-besov-per}
+Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_B$ with
+\[
+  \omega_r^{\mathrm{per}}(a, 2^{-k})_p \leq C_B \, 2^{-\max(k - j, 0)(r - 1 + 1/p)} \|a\|_p
+\]
+for all $j, k \in \N$ and every $a \in S_j(\T)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:per-spline-ext}, $\tilde a$ satisfies the hypotheses of \Cref{lem:spline-across}
+with $N = 2^j + r + 1$, and $x + rh < N 2^{-j}$ for $x \in [0, 1]$ and $h \leq 2^{-j}$. Any $2^j$
+consecutive pieces of $\tilde a$ make up one period, so the proof of \Cref{thm:spline-inverse}
+runs on all of $[0, 1]$.
+\end{proof}
+
+\begin{lemma}[Quasi-interpolants of periodic functions]
+\label{lem:per-qi}
+\lean{Interval.locCoeff_add_two_pow, Interval.locProj_add_two_pow,
+  Interval.locProjScaled_add_two_pow, Interval.bsplineCoef_comp_sub, Interval.qiCoeff_add_two_pow,
+  Interval.bsplinePieces_add_two_pow_comp, Interval.qiPieces_add_two_pow_comp,
+  Interval.perQiPieces, Interval.perQiPieces_mem, Interval.polyFun_perQiPieces,
+  Interval.splineJoins_perQiPieces, Interval.perJoin_perQiPieces}
+\leanok
+\uses{def:quasi-interp, lem:quasi-interp, def:per-spline-space}
+Let $r \geq 1$, $k \in \N$ and let $g$ be $1$-periodic. Then $\lambda_{n + 2^k}(g) = \lambda_n(g)$
+for $n \geq 0$, and the pieces of the quasi-interpolant on $[0, 2)$, $N = 2^{k+1}$, satisfy
+$Q_{i + 2^k}(x + 1) = Q_i(x)$ for $r - 1 \leq i < 2^k$. The \emph{periodic quasi-interpolant}
+$Q_k^{\mathrm{per}} g(x) = Q_k g(x + 1)$, $x \in [0, 1)$, is a spline of order $r$ and level $k$,
+and a periodic one when $r \leq 2^k$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The local projections of $g$ on $I_{k, m + 2^k} = I_{k,m} + 1$ and on $I_{k,m}$ are translates,
+and B-spline coefficients and B-spline pieces move with the translation. On $I_{k, i + 2^k}$ only
+the coefficients $\lambda_n$, $i + 2^k - r < n \leq i + 2^k$, enter, all with $n - 2^k \geq 0$. The
+joins of $Q_k^{\mathrm{per}} g$ inside $[0, 1)$ are those of $Q_k g$ inside $[1, 2)$. Across
+$0 = 1$, its first piece moved back by $1$ is the piece of $Q_k g$ on $I_{k, 2^k}$, and its last
+piece is the piece on $I_{k, 2^{k+1} - 1}$ moved by $1$, which is the piece on $I_{k, 2^k - 1}$;
+so the join is that of $Q_k g$ at the knot $1$.
+\end{proof}
+
+\begin{theorem}[Jackson's inequality for periodic splines]
+\label{thm:per-spline-jackson}
+\lean{Interval.eLpNorm_comp_add_one_dyadicIco, Interval.exists_eLpNorm_sub_perQi_le,
+  Interval.cutoff, Interval.continuous_cutoff, Interval.cutoff_zero, Interval.cutoff_one,
+  Interval.cutoff_nonneg, Interval.cutoff_le_one, Interval.cutoff_eq_one, Interval.dense_periodic,
+  Interval.exists_approxSeq_perSplineScheme_le}
+\leanok
+\uses{lem:per-qi, lem:qi-local-error, lem:two-sided-smoothing, lem:per-modulus, lem:error-dense}
+Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_J$ with
+$E_{2^k}(f)_p \leq C_J \, \omega_r^{\mathrm{per}}(f, 2^{-k})_p$ for every $f \in L_p(\T)$ and
+every $k \geq r$, where $E_{2^k}$ is the error of best approximation by periodic splines of order
+$r$ and level $k$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+First let $f$ be continuous and $1$-periodic. On $[0, 1)$ the error of $Q_k^{\mathrm{per}} f$ is
+the error of $Q_k f$ on $[1, 2)$, whose windows $W_i$, $2^k \leq i < 2^{k+1}$, lie in $[0, 2]$.
+\Cref{lem:two-sided-smoothing} on $[0, 2]$ with $L = 2^{-k}$ and $b = 3$ gives polynomials on all
+windows, and \Cref{lem:qi-local-error} and \Cref{lem:per-modulus} give
+$\|f - Q_k^{\mathrm{per}} f\|_p \leq C \omega_r(f, 2^{-k}, [0, 3])_p
+\leq 3^{1/p} C \omega_r^{\mathrm{per}}(f, 2^{-k})_p$. The continuous $1$-periodic functions are
+dense in $L_p[0,1]$: for a bounded continuous $g$ and a continuous cut-off $\varphi_\delta$ with
+values in $[0, 1]$, equal to $1$ on $[\delta, 1 - \delta]$ and to $0$ at $0$ and $1$, the function
+$\varphi_\delta g$ extends to a continuous $1$-periodic function, and
+$\|g - \varphi_\delta g\|_p \leq \|g\|_\infty (2\delta)^{1/p}$. \Cref{lem:error-dense} gives the
+bound for all $f$, since $Q_k^{\mathrm{per}} f \in S_k(\T)$ for $k \geq r$ by \Cref{lem:per-qi}.
+\end{proof}
+
+\begin{theorem}[Approximation spaces of periodic splines]
+\label{thm:per-spline-besov}
+\lean{Interval.perSplineModulusData, Interval.memApprox_perSplineScheme_iff}
+\leanok
+\uses{thm:per-spline-jackson, thm:per-spline-inverse, def:modulus-data, thm:modulus-coincidence}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $r \geq 1$ and $0 \leq s < r - 1 + 1/p$. A
+function $f \in L_p(\T)$ lies in the approximation space $A^s_q$ of the scheme of periodic dyadic
+splines of order $r$ if and only if
+\[
+  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_r^{\mathrm{per}}(f, 2^{-k})_p \bigr)_k \bigr\|_{\ell_q}
+  < \infty .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:per-spline-jackson}, from level $k_0 = r$ on, and \Cref{thm:per-spline-inverse} make
+$\omega_r^{\mathrm{per}}(\cdot, 2^{-k})_p$ a modulus compatible with the periodic spline scheme of
+inverse order $\theta = r - 1 + 1/p$; apply \Cref{thm:modulus-coincidence}.
+\end{proof}
+
+For $0 < s < r - 1 + 1/p$ the condition says $f \in \Besov{s}{p}{q}(\T)$.
 
 \bpbibheading
 \begin{thebibliography}{99}

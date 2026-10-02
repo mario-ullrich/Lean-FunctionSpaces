@@ -47,9 +47,9 @@ open ENNReal (dyadicWeight)
 namespace Interval
 
 /-- **Bounded overlap of the windows**: the windows `[(i + 1 - r) 2^(-k), (i + 1) 2^(-k)]`,
-`i < 2^k`, cover every point at most `r` times: `∑_i ∫_{W_i} G ≤ r ∫ G`. -/
-theorem sum_lintegral_window_le (r k : ℕ) (G : ℝ → ℝ≥0∞) :
-    ∑ i ∈ Finset.range (2 ^ k), ∫⁻ x in Icc (((i : ℝ) + 1 - r) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k),
+`i < N`, cover every point at most `r` times: `∑_i ∫_{W_i} G ≤ r ∫ G`. -/
+theorem sum_lintegral_window_le (r k N : ℕ) (G : ℝ → ℝ≥0∞) :
+    ∑ i ∈ Finset.range N, ∫⁻ x in Icc (((i : ℝ) + 1 - r) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k),
       G x ≤ r * ∫⁻ x, G x := by
   have hL : (0 : ℝ) ≤ 1 / 2 ^ k := by positivity
   have hwin : ∀ i : ℕ, ∫⁻ x in Icc (((i : ℝ) + 1 - r) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k), G x ≤
@@ -62,18 +62,18 @@ theorem sum_lintegral_window_le (r k : ℕ) (G : ℝ → ℝ≥0∞) :
     congr 2
     field_simp
     ring_nf
-  calc ∑ i ∈ Finset.range (2 ^ k), ∫⁻ x in Icc (((i : ℝ) + 1 - r) / 2 ^ k)
+  calc ∑ i ∈ Finset.range N, ∫⁻ x in Icc (((i : ℝ) + 1 - r) / 2 ^ k)
         (((i : ℝ) + 1) / 2 ^ k), G x
-      ≤ ∑ i ∈ Finset.range (2 ^ k), ∑ n ∈ Finset.range r,
+      ≤ ∑ i ∈ Finset.range N, ∑ n ∈ Finset.range r,
           ∫⁻ x in Icc ((1 - (r : ℝ) + n) / 2 ^ k + i * (1 / 2 ^ k))
             ((1 - (r : ℝ) + n) / 2 ^ k + (i + 1) * (1 / 2 ^ k)), G x :=
         Finset.sum_le_sum fun i _ => hwin i
-    _ = ∑ n ∈ Finset.range r, ∑ i ∈ Finset.range (2 ^ k),
+    _ = ∑ n ∈ Finset.range r, ∑ i ∈ Finset.range N,
           ∫⁻ x in Icc ((1 - (r : ℝ) + n) / 2 ^ k + i * (1 / 2 ^ k))
             ((1 - (r : ℝ) + n) / 2 ^ k + (i + 1) * (1 / 2 ^ k)), G x := Finset.sum_comm
     _ ≤ ∑ _n ∈ Finset.range r, ∫⁻ x, G x :=
         Finset.sum_le_sum fun n _ =>
-          (sum_le_lintegral_Icc _ hL (2 ^ k)).trans (setLIntegral_le_lintegral _ _)
+          (sum_le_lintegral_Icc _ hL N).trans (setLIntegral_le_lintegral _ _)
     _ = r * ∫⁻ x, G x := by rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul]
 
 /-! ### Linearity of the quasi-interpolant -/
@@ -181,6 +181,19 @@ theorem dyadicIco_subset_qiWindow_self {r : ℕ} (hr : 1 ≤ r) (k i : ℕ) :
   have h1 : ((i + 1 - r : ℕ) : ℝ) ≤ (i : ℝ) := by exact_mod_cast (by omega : i + 1 - r ≤ i)
   exact ⟨(div_le_div_of_nonneg_right h1 hpos.le).trans hx.1, hx.2.le⟩
 
+/-- `i + 1 - r ≤ (i + 1 - r : ℕ)` in `ℝ`, the natural subtraction truncating at `0`. -/
+theorem natCast_add_one_sub_le (i r : ℕ) : (i : ℝ) + 1 - r ≤ ((i + 1 - r : ℕ) : ℝ) := by
+  rcases le_or_gt r (i + 1) with h | h
+  · rw [Nat.cast_sub h]; push_cast; rfl
+  · have : ((i + 1 : ℕ) : ℝ) < r := by exact_mod_cast h
+    push_cast at this
+    linarith [(Nat.cast_nonneg (i + 1 - r) : (0 : ℝ) ≤ _)]
+
+/-- The window lies in `[(i + 1 - r) 2^(-k), (i + 1) 2^(-k)]`, with real subtraction. -/
+theorem qiWindow_subset (r k i : ℕ) :
+    qiWindow r k i ⊆ Icc (((i : ℝ) + 1 - r) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k) :=
+  Icc_subset_Icc (div_le_div_of_nonneg_right (natCast_add_one_sub_le i r) (by positivity)) le_rfl
+
 /-- **The local error of the quasi-interpolant**: for every polynomial `T` of degree `< r`,
 `‖g - Q_k g‖_{L_p(I_{k,i})} ≤ (1 + r M_N C_b r M²) ‖g - T‖_{L_p(W_i)}`. -/
 theorem eLpNorm_sub_qiPieces_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
@@ -219,6 +232,53 @@ theorem eLpNorm_sub_qiPieces_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
     _ = _ := by
         rw [Finset.sum_const, hcard, nsmul_eq_mul]
         ring
+
+/-- **Summing the local errors of the quasi-interpolant**: let `F` be measurable and integrable on
+the intervals `I_{k,m}`, `m < N`, and let `s ⊆ {0, …, N - 1}`. If on the window `W_i` of every
+`i ∈ s` some polynomial `T` of degree `< r` has `‖F - T‖_{L_p(W_i)}^p ≤ ∫_{W_i} H`, then
+`∑_{i ∈ s} ‖F - Q_k F‖_{L_p(I_{k,i})}^p ≤ C_q^p r ∫ H` with `C_q = 1 + r M_N C_b r M²`, since the
+windows overlap at most `r` times (`Interval.sum_lintegral_window_le`). -/
+theorem sum_eLpNorm_sub_qiPieces_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
+    (hCb : ∀ R ∈ degreeLT ℂ r, ∀ j : ℕ,
+      ‖bcoord hr R j‖ₑ ≤ Cb * eLpNorm (polyFun R) p (volume.restrict (Icc 0 1)))
+    {MN : ℝ≥0∞} (hMN : ∀ y, ‖bspline r y‖ₑ ≤ MN) (hp : p ≠ ∞) {k N : ℕ} {F : ℝ → ℂ}
+    (hFm : Measurable F) (hF : ∀ m < N, IntegrableOn F (dyadicIco k m)) {s : Finset ℕ}
+    (hs : s ⊆ Finset.range N) (H : ℝ → ℝ≥0∞)
+    (hT : ∀ i ∈ s, ∃ T ∈ degreeLT ℂ r, eLpNorm (fun x => F x - polyFun T x) p
+      (volume.restrict (qiWindow r k i)) ^ p.toReal ≤ ∫⁻ x in qiWindow r k i, H x) :
+    ∑ i ∈ s, eLpNorm (fun x => F x - polyFun (qiPieces hr k N F i) x) p
+      (volume.restrict (dyadicIco k i)) ^ p.toReal ≤
+        (1 + r * (MN * (Cb * ppProjConst r))) ^ p.toReal * (r * ∫⁻ x, H x) := by
+  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  set Cq := 1 + r * (MN * (Cb * ppProjConst r))
+  have hloc : ∀ i ∈ s, eLpNorm (fun x => F x - polyFun (qiPieces hr k N F i) x) p
+      (volume.restrict (dyadicIco k i)) ^ p.toReal ≤ Cq ^ p.toReal *
+        ∫⁻ x in Icc (((i : ℝ) + 1 - r) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k), H x := by
+    intro i hi
+    obtain ⟨T, hTm, hTb⟩ := hT i hi
+    calc eLpNorm (fun x => F x - polyFun (qiPieces hr k N F i) x) p
+          (volume.restrict (dyadicIco k i)) ^ p.toReal
+        ≤ (Cq * eLpNorm (fun x => F x - polyFun T x) p
+            (volume.restrict (qiWindow r k i))) ^ p.toReal :=
+          ENNReal.rpow_le_rpow (eLpNorm_sub_qiPieces_le hr hCb hMN hp
+            (Finset.mem_range.1 (hs hi)) hFm hF hTm) hq.le
+      _ = Cq ^ p.toReal * eLpNorm (fun x => F x - polyFun T x) p
+            (volume.restrict (qiWindow r k i)) ^ p.toReal := ENNReal.mul_rpow_of_nonneg _ _ hq.le
+      _ ≤ Cq ^ p.toReal * ∫⁻ x in qiWindow r k i, H x := mul_le_mul' le_rfl hTb
+      _ ≤ _ := mul_le_mul' le_rfl (lintegral_mono_set (qiWindow_subset r k i))
+  calc ∑ i ∈ s, eLpNorm (fun x => F x - polyFun (qiPieces hr k N F i) x) p
+        (volume.restrict (dyadicIco k i)) ^ p.toReal
+      ≤ ∑ i ∈ s, Cq ^ p.toReal *
+          ∫⁻ x in Icc (((i : ℝ) + 1 - r) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k), H x :=
+        Finset.sum_le_sum hloc
+    _ ≤ ∑ i ∈ Finset.range N, Cq ^ p.toReal *
+          ∫⁻ x in Icc (((i : ℝ) + 1 - r) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k), H x :=
+        Finset.sum_le_sum_of_subset hs
+    _ = Cq ^ p.toReal * ∑ i ∈ Finset.range N,
+          ∫⁻ x in Icc (((i : ℝ) + 1 - r) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k), H x := by
+        rw [Finset.mul_sum]
+    _ ≤ Cq ^ p.toReal * (r * ∫⁻ x, H x) := mul_le_mul' le_rfl (sum_lintegral_window_le r k N H)
 
 /-! ### Jackson's inequality for continuous functions -/
 
@@ -266,11 +326,102 @@ theorem exists_window_poly {F g D : ℝ → ℂ} (hFm : Measurable F) (hgm : Mea
           eLpNorm_rpow_eq hDm.aestronglyMeasurable hp0 hp, lintegral_add_left hm1,
           lintegral_const_mul _ hm2]
 
+/-- **A polynomial on a window from a smoothing**: if `g` has the Taylor polynomials
+`‖g - T‖_{L_p[u,v]} ≤ (v - u)^r ‖D‖_{L_p[u,v]}` on all intervals, then on the window `W_i` some
+polynomial `T` of degree `< r` satisfies
+`‖F - T‖_{L_p(W_i)}^p ≤ 2^(p-1) ∫_{W_i} (|F - g|^p + c^p |D|^p)` with `c = (r 2^(-k))^r`, since
+`W_i` has length at most `r 2^(-k)`. -/
+theorem exists_qiWindow_poly {F g D : ℝ → ℂ} (hFm : Measurable F) (hgm : Measurable g)
+    (hDm : Measurable D) (hp : p ≠ ∞) {r : ℕ}
+    (hT : ∀ u v : ℝ, u ≤ v → ∃ T ∈ degreeLT ℂ r,
+      eLpNorm (fun x => g x - polyFun T x) p (volume.restrict (Icc u v)) ≤
+        ENNReal.ofReal (v - u) ^ r * eLpNorm D p (volume.restrict (Icc u v))) (k i : ℕ) :
+    ∃ T ∈ degreeLT ℂ r, eLpNorm (fun x => F x - polyFun T x) p
+      (volume.restrict (qiWindow r k i)) ^ p.toReal ≤ 2 ^ (p.toReal - 1) *
+        ∫⁻ x in qiWindow r k i, (‖F x - g x‖ₑ ^ p.toReal +
+          (ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r) ^ p.toReal * ‖D x‖ₑ ^ p.toReal) := by
+  have hpos : (0 : ℝ) < 2 ^ k := by positivity
+  have hab : ((i + 1 - r : ℕ) : ℝ) / 2 ^ k ≤ ((i : ℝ) + 1) / 2 ^ k := by
+    have : ((i + 1 - r : ℕ) : ℝ) ≤ (i : ℝ) + 1 := by
+      exact_mod_cast (by omega : i + 1 - r ≤ i + 1)
+    exact div_le_div_of_nonneg_right this hpos.le
+  have hlen : ((i : ℝ) + 1) / 2 ^ k - ((i + 1 - r : ℕ) : ℝ) / 2 ^ k ≤ (r : ℝ) / 2 ^ k := by
+    rw [← sub_div]
+    exact div_le_div_of_nonneg_right (by linarith [natCast_add_one_sub_le i r]) hpos.le
+  exact exists_window_poly hFm hgm hDm hp (hT _ _ hab)
+    (pow_le_pow_left₀ zero_le (ENNReal.ofReal_le_ofReal hlen) r)
+
+/-- **The smoothing errors integrate to the modulus**: if `‖F - g‖_{L_p(P)} ≤ ω` and
+`‖D‖_{L_p(P)} ≤ 2^(kr) 2^r r^(2r) ω`, then with `c = (r 2^(-k))^r`,
+`∫_P (|F - g|^p + c^p |D|^p) ≤ (1 + (r^r 2^r r^(2r))^p) ω^p`, since `c 2^(kr) = r^r`. -/
+theorem lintegral_smoothing_le (hp : p ≠ ∞) {F g D : ℝ → ℂ} (hFm : Measurable F)
+    (hgm : Measurable g) (hDm : Measurable D) {r k : ℕ} {P : Set ℝ} {ω : ℝ≥0∞}
+    (h1 : eLpNorm (fun x => F x - g x) p (volume.restrict P) ≤ ω)
+    (h2 : eLpNorm D p (volume.restrict P) ≤
+      ENNReal.ofReal (2 ^ k) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω) :
+    ∫⁻ x in P, (‖F x - g x‖ₑ ^ p.toReal +
+        (ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r) ^ p.toReal * ‖D x‖ₑ ^ p.toReal) ≤
+      (1 + ((r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^ p.toReal) * ω ^ p.toReal := by
+  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  have hpos : (0 : ℝ) < 2 ^ k := by positivity
+  set c : ℝ≥0∞ := ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r
+  rw [lintegral_add_left (f := fun x => ‖F x - g x‖ₑ ^ p.toReal)
+    ((hFm.sub hgm).enorm.pow_const _),
+    lintegral_const_mul _ (hDm.enorm.pow_const _),
+    ← eLpNorm_rpow_eq (g := fun x => F x - g x) ((hFm.sub hgm).aestronglyMeasurable) hp0 hp,
+    ← eLpNorm_rpow_eq hDm.aestronglyMeasurable hp0 hp]
+  have hcc : c * ENNReal.ofReal (2 ^ k) ^ r = (r : ℝ≥0∞) ^ r := by
+    rw [← mul_pow, ← ENNReal.ofReal_mul (by positivity), div_mul_cancel₀ _ hpos.ne',
+      ENNReal.ofReal_natCast]
+  calc eLpNorm (fun x => F x - g x) p (volume.restrict P) ^ p.toReal +
+        c ^ p.toReal * eLpNorm D p (volume.restrict P) ^ p.toReal
+      ≤ ω ^ p.toReal + c ^ p.toReal *
+          (ENNReal.ofReal (2 ^ k) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω) ^ p.toReal := by
+        gcongr
+    _ = (1 + ((r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^ p.toReal) * ω ^ p.toReal := by
+        rw [← ENNReal.mul_rpow_of_nonneg _ _ hq.le, ← mul_assoc, ← mul_assoc, hcc,
+          ENNReal.mul_rpow_of_nonneg _ _ hq.le]
+        ring
+
 /-- The constant of Jackson's inequality for splines,
 `C_q (2^p r (1 + (r^r 2^r r^(2r))^p))^(1/p)` with `C_q = 1 + r M_N C_b r M²`. -/
 noncomputable def splineJacksonConst (r : ℕ) (Cq p : ℝ≥0∞) : ℝ≥0∞ :=
   Cq * (2 ^ p.toReal * r * (1 + ((r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^ p.toReal)) ^
     (1 / p.toReal)
+
+omit [Fact (1 ≤ p)] in
+/-- The constant of Jackson's inequality for splines is finite. -/
+theorem splineJacksonConst_ne_top (r : ℕ) {Cq : ℝ≥0∞} (hCq : Cq ≠ ∞) :
+    splineJacksonConst r Cq p ≠ ∞ := by
+  have hq : 0 ≤ p.toReal := ENNReal.toReal_nonneg
+  unfold splineJacksonConst
+  refine ENNReal.mul_ne_top hCq (ENNReal.rpow_ne_top_of_nonneg (by positivity) ?_)
+  refine ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg hq
+    ENNReal.ofNat_ne_top) (ENNReal.natCast_ne_top r)) (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
+      ENNReal.rpow_ne_top_of_nonneg hq ?_⟩)
+  exact ENNReal.mul_ne_top (ENNReal.pow_ne_top (ENNReal.natCast_ne_top r))
+    (ENNReal.mul_ne_top (by simp) (ENNReal.pow_ne_top (ENNReal.natCast_ne_top r)))
+
+/-- The `p`-th power of the bound of Jackson's inequality:
+`C_q^p r 2^(p-1) 2 K ω^p = (C ω)^p` for `C = Interval.splineJacksonConst r C_q p` and
+`K = 1 + (r^r 2^r r^(2r))^p`. -/
+theorem splineJacksonConst_rpow_eq (hp : p ≠ ∞) (r : ℕ) (Cq ω : ℝ≥0∞) :
+    Cq ^ p.toReal * (r * (2 ^ (p.toReal - 1) * (2 * ((1 + ((r : ℝ≥0∞) ^ r *
+      (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^ p.toReal) * ω ^ p.toReal)))) =
+        (splineJacksonConst r Cq p * ω) ^ p.toReal := by
+  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  have h2 : (2 : ℝ≥0∞) ^ (p.toReal - 1) * 2 = 2 ^ p.toReal := by
+    calc (2 : ℝ≥0∞) ^ (p.toReal - 1) * 2 = 2 ^ (p.toReal - 1) * 2 ^ (1 : ℝ) := by
+          rw [ENNReal.rpow_one]
+      _ = 2 ^ (p.toReal - 1 + 1) :=
+          (ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top).symm
+      _ = 2 ^ p.toReal := by rw [sub_add_cancel]
+  unfold splineJacksonConst
+  rw [ENNReal.mul_rpow_of_nonneg (Cq * _) ω hq.le, ENNReal.mul_rpow_of_nonneg Cq _ hq.le,
+    ← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one, ← h2]
+  ring
 
 /-- The `p`-th power of the error over `[0, 1]` is the sum over the dyadic intervals. -/
 theorem lintegral_sub_ppFun_le_sum (hp : p ≠ ∞) {F : ℝ → ℂ} (hFm : Measurable F) (k : ℕ)
@@ -286,7 +437,9 @@ theorem lintegral_sub_ppFun_le_sum (hp : p ≠ ∞) {F : ℝ → ℂ} (hFm : Mea
     rw [ppFun_eq_of_mem Q (Finset.mem_range.1 hi) hx]
 
 /-- **Jackson's inequality for splines, continuous functions**: there is `C` with
-`‖F - Q_k F‖_{L_p[0,1]} ≤ C ω_r(F, 2^(-k), [0, 1])_p` for every continuous `F` and `k ≥ r + 2`. -/
+`‖F - Q_k F‖_{L_p[0,1]} ≤ C ω_r(F, 2^(-k), [0, 1])_p` for every continuous `F` and `k ≥ r + 2`.
+Every window has length at most `1/4`, so it lies in `[0, 3/4]` or in `[1/4, 1]`, where the
+smoothing of `F` from the left, respectively from the right, gives the polynomial. -/
 theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ F : ℝ → ℂ, Continuous F → ∀ k : ℕ, r + 2 ≤ k →
       eLpNorm (fun x => F x - ppFun k (qiPieces hr k (2 ^ k) F) x) p unitVol ≤
@@ -295,18 +448,11 @@ theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
   obtain ⟨MN, hMN, hMNb⟩ := exists_enorm_bspline_le r
   have hp1 : 1 ≤ p := Fact.out
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   have hCq : 1 + r * (MN * (Cb * ppProjConst r)) ≠ ∞ :=
     ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top (ENNReal.natCast_ne_top r)
       (ENNReal.mul_ne_top hMN (ENNReal.mul_ne_top hCb (ppProjConst_ne_top r)))⟩
-  refine ⟨splineJacksonConst r (1 + r * (MN * (Cb * ppProjConst r))) p, ?_, fun F hF k hk => ?_⟩
-  · unfold splineJacksonConst
-    refine ENNReal.mul_ne_top hCq (ENNReal.rpow_ne_top_of_nonneg (by positivity) ?_)
-    refine ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg hq.le
-      ENNReal.ofNat_ne_top) (ENNReal.natCast_ne_top r)) (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
-        ENNReal.rpow_ne_top_of_nonneg hq.le ?_⟩)
-    exact ENNReal.mul_ne_top (ENNReal.pow_ne_top (ENNReal.natCast_ne_top r))
-      (ENNReal.mul_ne_top (by simp) (ENNReal.pow_ne_top (ENNReal.natCast_ne_top r)))
+  refine ⟨splineJacksonConst r (1 + r * (MN * (Cb * ppProjConst r))) p,
+    splineJacksonConst_ne_top r hCq, fun F hF k hk => ?_⟩
   set Cq := 1 + r * (MN * (Cb * ppProjConst r))
   set ω := modulus r p 0 1 F (1 / 2 ^ k)
   have hk2 : 2 ≤ k := by omega
@@ -332,141 +478,62 @@ theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
   set Hr : ℝ → ℝ≥0∞ := fun x => ‖F x - gr x‖ₑ ^ p.toReal + c ^ p.toReal * ‖Dr x‖ₑ ^ p.toReal
   set Hbar : ℝ → ℝ≥0∞ := fun x => (Icc (0 : ℝ) (3 / 4)).indicator Hl x +
     (Icc (1 / 4 : ℝ) 1).indicator Hr x
-  -- the error on one interval
-  have hint : ∀ i ∈ Finset.range (2 ^ k),
-      eLpNorm (fun x => F x - polyFun (qiPieces hr k (2 ^ k) F i) x) p
-        (volume.restrict (dyadicIco k i)) ^ p.toReal ≤
-      Cq ^ p.toReal * (2 ^ (p.toReal - 1) *
-        ∫⁻ x in Icc (((i : ℝ) + 1 - r) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k), Hbar x) := by
+  have h2top : (2 : ℝ≥0∞) ^ (p.toReal - 1) ≠ ∞ :=
+    ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top
+  -- a polynomial on every window, from the smoothing on the part that contains it
+  have hT : ∀ i ∈ Finset.range (2 ^ k), ∃ T ∈ degreeLT ℂ r, eLpNorm (fun x => F x - polyFun T x)
+      p (volume.restrict (qiWindow r k i)) ^ p.toReal ≤
+        ∫⁻ x in qiWindow r k i, 2 ^ (p.toReal - 1) * Hbar x := by
     intro i hi
     have hi' := Finset.mem_range.1 hi
-    have hcast : (i : ℝ) + 1 - r ≤ ((i + 1 - r : ℕ) : ℝ) := by
-      rcases le_or_gt r (i + 1) with h | h
-      · rw [Nat.cast_sub h]; push_cast; rfl
-      · have : (i : ℝ) + 1 - r < 0 := by
-          have : ((i + 1 : ℕ) : ℝ) < r := by exact_mod_cast h
-          push_cast at this; linarith
-        exact this.le.trans (Nat.cast_nonneg _)
-    have hab : ((i + 1 - r : ℕ) : ℝ) / 2 ^ k ≤ ((i : ℝ) + 1) / 2 ^ k := by
-      have : ((i + 1 - r : ℕ) : ℝ) ≤ (i : ℝ) + 1 := by
-        exact_mod_cast (by omega : i + 1 - r ≤ i + 1)
-      exact div_le_div_of_nonneg_right this hpos.le
-    have hlen : ((i : ℝ) + 1) / 2 ^ k - ((i + 1 - r : ℕ) : ℝ) / 2 ^ k ≤ (r : ℝ) / 2 ^ k := by
-      rw [← sub_div]
-      exact div_le_div_of_nonneg_right (by linarith) hpos.le
-    have hc' : ENNReal.ofReal (((i : ℝ) + 1) / 2 ^ k - ((i + 1 - r : ℕ) : ℝ) / 2 ^ k) ^ r ≤ c :=
-      pow_le_pow_left₀ zero_le (ENNReal.ofReal_le_ofReal hlen) r
-    have ha0 : 0 ≤ ((i + 1 - r : ℕ) : ℝ) / 2 ^ k := by positivity
-    have hwin : qiWindow r k i ⊆ Icc (((i : ℝ) + 1 - r) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k) :=
-      Icc_subset_Icc (div_le_div_of_nonneg_right hcast hpos.le) le_rfl
-    have hW : qiWindow r k i =
-        Icc (((i + 1 - r : ℕ) : ℝ) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k) := rfl
-    obtain ⟨T, hT, hTb⟩ : ∃ T ∈ degreeLT ℂ r, eLpNorm (fun x => F x - polyFun T x) p
-        (volume.restrict (Icc (((i + 1 - r : ℕ) : ℝ) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k))) ^
-          p.toReal ≤ 2 ^ (p.toReal - 1) *
-        ∫⁻ x in Icc (((i + 1 - r : ℕ) : ℝ) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k), Hbar x := by
-      by_cases hleft : ((i : ℝ) + 1) / 2 ^ k ≤ 3 / 4
-      · obtain ⟨T, hT, h⟩ := exists_window_poly hF.measurable hglm hDlm hp (hl3 _ _ hab) hc'
-        refine ⟨T, hT, h.trans (mul_le_mul' le_rfl ?_)⟩
-        refine setLIntegral_mono' measurableSet_Icc fun x hx => ?_
-        have hx' : x ∈ Icc (0 : ℝ) (3 / 4) := ⟨ha0.trans hx.1, hx.2.trans hleft⟩
-        have hb : Hbar x = Hl x + (Icc (1 / 4 : ℝ) 1).indicator Hr x := by
-          simp only [Hbar, indicator_of_mem hx']
-        rw [hb]
-        exact le_self_add
-      · push Not at hleft
-        have ha : 1 / 4 ≤ ((i + 1 - r : ℕ) : ℝ) / 2 ^ k := by
-          have : ((i : ℝ) + 1 - r) / 2 ^ k = ((i : ℝ) + 1) / 2 ^ k - (r : ℝ) / 2 ^ k := by ring
-          linarith [div_le_div_of_nonneg_right hcast hpos.le]
-        have hb : ((i : ℝ) + 1) / 2 ^ k ≤ 1 := by
-          rw [div_le_one hpos]
-          have : ((i + 1 : ℕ) : ℝ) ≤ 2 ^ k := by exact_mod_cast hi'
-          push_cast at this; linarith
-        obtain ⟨T, hT, h⟩ := exists_window_poly hF.measurable hgrm hDrm hp (hr3 _ _ hab) hc'
-        refine ⟨T, hT, h.trans (mul_le_mul' le_rfl ?_)⟩
-        refine setLIntegral_mono' measurableSet_Icc fun x hx => ?_
-        have hx' : x ∈ Icc (1 / 4 : ℝ) 1 := ⟨ha.trans hx.1, hx.2.trans hb⟩
-        have hb' : Hbar x = (Icc (0 : ℝ) (3 / 4)).indicator Hl x + Hr x := by
-          simp only [Hbar, indicator_of_mem hx']
-        rw [hb']
-        exact le_add_self
-    calc eLpNorm (fun x => F x - polyFun (qiPieces hr k (2 ^ k) F i) x) p
-          (volume.restrict (dyadicIco k i)) ^ p.toReal
-        ≤ (Cq * eLpNorm (fun x => F x - polyFun T x) p
-            (volume.restrict (Icc (((i + 1 - r : ℕ) : ℝ) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k)))) ^
-              p.toReal :=
-          ENNReal.rpow_le_rpow ((eLpNorm_sub_qiPieces_le hr hCbb hMNb hp hi' hF.measurable
-            (fun m _ => integrableOn_dyadicIco_of_continuous hF k m) hT).trans_eq
-              (by rw [hW])) hq.le
-      _ = Cq ^ p.toReal * eLpNorm (fun x => F x - polyFun T x) p
-            (volume.restrict (Icc (((i + 1 - r : ℕ) : ℝ) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k))) ^
-              p.toReal := ENNReal.mul_rpow_of_nonneg _ _ hq.le
-      _ ≤ Cq ^ p.toReal * (2 ^ (p.toReal - 1) *
-            ∫⁻ x in Icc (((i + 1 - r : ℕ) : ℝ) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k), Hbar x) :=
-          mul_le_mul' le_rfl hTb
-      _ ≤ _ := mul_le_mul' le_rfl (mul_le_mul' le_rfl (lintegral_mono_set (hW ▸ hwin)))
+    rw [lintegral_const_mul' _ _ h2top]
+    by_cases hleft : ((i : ℝ) + 1) / 2 ^ k ≤ 3 / 4
+    · obtain ⟨T, hT, h⟩ := exists_qiWindow_poly hF.measurable hglm hDlm hp hl3 k i
+      refine ⟨T, hT, h.trans (mul_le_mul' le_rfl
+        (setLIntegral_mono' measurableSet_Icc fun x hx => ?_))⟩
+      have hx' : x ∈ Icc (0 : ℝ) (3 / 4) := ⟨(by positivity : (0 : ℝ) ≤
+        ((i + 1 - r : ℕ) : ℝ) / 2 ^ k).trans hx.1, hx.2.trans hleft⟩
+      simp only [Hbar, indicator_of_mem hx']
+      exact le_self_add
+    · push Not at hleft
+      have ha : 1 / 4 ≤ ((i + 1 - r : ℕ) : ℝ) / 2 ^ k := by
+        have h1 := div_le_div_of_nonneg_right (natCast_add_one_sub_le i r) hpos.le
+        have : ((i : ℝ) + 1 - r) / 2 ^ k = ((i : ℝ) + 1) / 2 ^ k - (r : ℝ) / 2 ^ k := by ring
+        linarith
+      have hb : ((i : ℝ) + 1) / 2 ^ k ≤ 1 := by
+        rw [div_le_one hpos]
+        have : ((i + 1 : ℕ) : ℝ) ≤ 2 ^ k := by exact_mod_cast hi'
+        push_cast at this; linarith
+      obtain ⟨T, hT, h⟩ := exists_qiWindow_poly hF.measurable hgrm hDrm hp hr3 k i
+      refine ⟨T, hT, h.trans (mul_le_mul' le_rfl
+        (setLIntegral_mono' measurableSet_Icc fun x hx => ?_))⟩
+      have hx' : x ∈ Icc (1 / 4 : ℝ) 1 := ⟨ha.trans hx.1, hx.2.trans hb⟩
+      simp only [Hbar, indicator_of_mem hx']
+      exact le_add_self
   -- the integral of the dominating function
   have hHl : Measurable Hl := ((hF.measurable.sub hglm).enorm.pow_const _).add
     (measurable_const.mul (hDlm.enorm.pow_const _))
-  have hHr : Measurable Hr := ((hF.measurable.sub hgrm).enorm.pow_const _).add
-    (measurable_const.mul (hDrm.enorm.pow_const _))
-  have hside : ∀ {G D : ℝ → ℂ} {s : Set ℝ}, Measurable G → Measurable D →
-      eLpNorm (fun x => F x - G x) p (volume.restrict s) ≤ ω →
-      eLpNorm D p (volume.restrict s) ≤ ENNReal.ofReal (2 ^ k) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω →
-      ∫⁻ x in s, (‖F x - G x‖ₑ ^ p.toReal + c ^ p.toReal * ‖D x‖ₑ ^ p.toReal) ≤
-        (1 + ((r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^ p.toReal) * ω ^ p.toReal := by
-    intro G D s hGm hDm h1 h2
-    rw [lintegral_add_left (f := fun x => ‖F x - G x‖ₑ ^ p.toReal)
-      ((hF.measurable.sub hGm).enorm.pow_const _),
-      lintegral_const_mul _ (hDm.enorm.pow_const _),
-      ← eLpNorm_rpow_eq (g := fun x => F x - G x) ((hF.measurable.sub hGm).aestronglyMeasurable)
-        hp0 hp, ← eLpNorm_rpow_eq hDm.aestronglyMeasurable hp0 hp]
-    have hcc : c * ENNReal.ofReal (2 ^ k) ^ r = (r : ℝ≥0∞) ^ r := by
-      rw [← mul_pow, ← ENNReal.ofReal_mul (by positivity), div_mul_cancel₀ _ hpos.ne',
-        ENNReal.ofReal_natCast]
-    calc eLpNorm (fun x => F x - G x) p (volume.restrict s) ^ p.toReal +
-          c ^ p.toReal * eLpNorm D p (volume.restrict s) ^ p.toReal
-        ≤ ω ^ p.toReal + c ^ p.toReal * (ENNReal.ofReal (2 ^ k) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω) ^ p.toReal := by
-          gcongr
-      _ = (1 + ((r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^ p.toReal) * ω ^ p.toReal := by
-          rw [← ENNReal.mul_rpow_of_nonneg _ _ hq.le, ← mul_assoc, ← mul_assoc, hcc,
-            ENNReal.mul_rpow_of_nonneg _ _ hq.le]
-          ring
-  have hHbar : ∫⁻ x, Hbar x ≤ 2 * ((1 + ((r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^ p.toReal) * ω ^ p.toReal) := by
+  have hHbar : ∫⁻ x, Hbar x ≤ 2 * ((1 + ((r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^
+      p.toReal) * ω ^ p.toReal) := by
     rw [lintegral_add_left ((hHl.indicator measurableSet_Icc)),
       lintegral_indicator measurableSet_Icc, lintegral_indicator measurableSet_Icc, two_mul]
-    exact add_le_add (hside hglm hDlm hl1 hl2) (hside hgrm hDrm hr1 hr2)
+    exact add_le_add (lintegral_smoothing_le hp hF.measurable hglm hDlm hl1 hl2)
+      (lintegral_smoothing_le hp hF.measurable hgrm hDrm hr1 hr2)
   -- assembling
   refine eLpNorm_le_of_lintegral_le ((hF.measurable.sub
     (measurable_ppFun _ _)).aestronglyMeasurable) hp0 hp ?_
   calc ∫⁻ x, ‖F x - ppFun k (qiPieces hr k (2 ^ k) F) x‖ₑ ^ p.toReal ∂unitVol
-      ≤ ∑ i ∈ Finset.range (2 ^ k), eLpNorm (fun x => F x - polyFun (qiPieces hr k (2 ^ k) F i) x) p
-          (volume.restrict (dyadicIco k i)) ^ p.toReal :=
+      ≤ ∑ i ∈ Finset.range (2 ^ k), eLpNorm (fun x => F x -
+          polyFun (qiPieces hr k (2 ^ k) F i) x) p (volume.restrict (dyadicIco k i)) ^ p.toReal :=
         lintegral_sub_ppFun_le_sum hp hF.measurable k _
-    _ ≤ ∑ i ∈ Finset.range (2 ^ k), Cq ^ p.toReal * (2 ^ (p.toReal - 1) *
-          ∫⁻ x in Icc (((i : ℝ) + 1 - r) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k), Hbar x) :=
-        Finset.sum_le_sum hint
-    _ = Cq ^ p.toReal * 2 ^ (p.toReal - 1) * ∑ i ∈ Finset.range (2 ^ k),
-          ∫⁻ x in Icc (((i : ℝ) + 1 - r) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k), Hbar x := by
-        rw [Finset.mul_sum]
-        refine Finset.sum_congr rfl fun i _ => ?_
-        ring
-    _ ≤ Cq ^ p.toReal * 2 ^ (p.toReal - 1) * (r * ∫⁻ x, Hbar x) := by
+    _ ≤ Cq ^ p.toReal * (r * ∫⁻ x, 2 ^ (p.toReal - 1) * Hbar x) :=
+        sum_eLpNorm_sub_qiPieces_le hr hCbb hMNb hp hF.measurable
+          (fun m _ => integrableOn_dyadicIco_of_continuous hF k m) subset_rfl _ hT
+    _ ≤ Cq ^ p.toReal * (r * (2 ^ (p.toReal - 1) * (2 * ((1 + ((r : ℝ≥0∞) ^ r *
+          (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^ p.toReal) * ω ^ p.toReal)))) := by
+        rw [lintegral_const_mul' _ _ h2top]
         gcongr
-        exact sum_lintegral_window_le r k Hbar
-    _ ≤ Cq ^ p.toReal * 2 ^ (p.toReal - 1) *
-          (r * (2 * ((1 + ((r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^ p.toReal) * ω ^ p.toReal))) := by gcongr
-    _ = (splineJacksonConst r Cq p * ω) ^ p.toReal := by
-        have h2 : (2 : ℝ≥0∞) ^ (p.toReal - 1) * 2 = 2 ^ p.toReal := by
-          calc (2 : ℝ≥0∞) ^ (p.toReal - 1) * 2 = 2 ^ (p.toReal - 1) * 2 ^ (1 : ℝ) := by
-                rw [ENNReal.rpow_one]
-            _ = 2 ^ (p.toReal - 1 + 1) :=
-                (ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top).symm
-            _ = 2 ^ p.toReal := by rw [sub_add_cancel]
-        unfold splineJacksonConst
-        rw [ENNReal.mul_rpow_of_nonneg (Cq * _) ω hq.le, ENNReal.mul_rpow_of_nonneg Cq _ hq.le,
-          ← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one, ← h2]
-        ring
+    _ = (splineJacksonConst r Cq p * ω) ^ p.toReal := splineJacksonConst_rpow_eq hp r Cq ω
 
 /-! ### Jackson's inequality in `L_p` and the coincidence theorem -/
 

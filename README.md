@@ -139,6 +139,13 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   (`Interval.memApprox_splineScheme_iff`). The proof uses cardinal B-splines with Marsden's
   identity (`Interval.polyFun_eq_sum_bsplineCoef`) and a quasi-interpolant built from local
   projections.
+* **Splines on the circle.** Let `S_k(𝕋) ⊆ L_p(𝕋) = L_p[0, 1]` consist of the periodic splines
+  of order `r ≥ 1` and level `k`, the splines whose periodic extension is a spline on `ℝ`. For
+  `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `0 ≤ s < r - 1 + 1/p`, `f ∈ A^s_q` of the periodic splines iff
+  `‖f‖_p + ‖(2^(ks) ω_r^per(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
+  (`Interval.memApprox_perSplineScheme_iff`), with Jackson's inequality from level `r` on
+  (`Interval.exists_approxSeq_perSplineScheme_le`) and the inverse inequality of order
+  `r - 1 + 1/p` (`Interval.exists_inverse_perSplineScheme`).
 * **Local projections and multiscale details.** Let `P_k` be the projection of `L_p[0, 1]`
   onto the piecewise polynomials of degree `< r` on the dyadic intervals of level `k` that is
   the `L_2`-orthogonal projection on every interval. For `1 ≤ p < ∞` there is `C` with
@@ -278,6 +285,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Inverse inequality of order `r - 1 + 1/p` for splines | ✅ proved | ✗ | `FunctionSpaces/Interval/SplineInverse.lean` |
 | Spline quasi-interpolant: local reproduction of polynomials, local bounds | ✅ proved | ✗ | `FunctionSpaces/Interval/QuasiInterp.lean` |
 | Jackson's inequality for splines, `A^s_q(splines) = B^s_{p,q}[0, 1]` for `0 < s < r - 1 + 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/SplineJackson.lean` |
+| Periodic splines, their inverse inequality | ✅ proved | ✗ | `FunctionSpaces/Interval/SplinePeriodic.lean` |
+| Periodic quasi-interpolant, Jackson's inequality for periodic splines, `A^s_q(periodic splines) = B^s_{p,q}(𝕋)` for `0 < s < r - 1 + 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/SplinePeriodicJackson.lean` |
 | Density of piecewise polynomials, multiscale characterisation of `A^s_q` and of `B^s_{p,q}` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Wavelets/Examples/Multiscale.lean` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Synthesis,Atomic}.lean` |
@@ -325,8 +334,8 @@ and weak derivatives, and polynomial and piecewise polynomial approximation on i
 * **Function spaces beyond the torus**: `ℝ^d`, compact manifolds, bounded domains.
 * **Classical definitions for all `p`**: Sobolev spaces by weak derivatives and Besov spaces
   by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
-* **Higher smoothness**: splines on the circle and on domains, and compactly supported wavelets
-  such as Daubechies'.
+* **Higher smoothness**: splines on domains, and compactly supported wavelets such as
+  Daubechies'.
 
 ## Building
 
