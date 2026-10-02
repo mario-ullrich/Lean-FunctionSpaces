@@ -298,6 +298,19 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `H^s(𝕋^d) ⊆ L_r(𝕋^d)` for `2 ≤ r ≤ ∞` and `s > d(1/2 - 1/r)`
   (`Torus.sobolev_memBesov_top`, `Torus.exists_sobolev_of_memBesov`,
   `Torus.sobolev_exists_inclusion_eq`).
+* **Littlewood–Paley blocks on `ℝ^d`.** Let `V` be a finite-dimensional real inner product
+  space, such as `ℝ^d`, and `1 ≤ p < ∞`. Let `χ` be a smooth cut-off, `1` on the unit ball and
+  `0` outside the ball of radius `2`, and `ψ_j` the kernels with `𝓕ψ_0 = χ` and
+  `𝓕ψ_j = χ(2^(-j) ·) - χ(2^(1-j) ·)`; let `Θ_k` be a kernel with `𝓕Θ_k = 1` on the ball of
+  radius `2^(k+1)` and `0` outside the ball of radius `2^(k+2)`, and
+  `E_k = {g ∈ L_p(V) : Θ_k ⋆ g = g}` the band-limited classes, the approximants of complexity
+  `2^k`. For `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q(L_p(V), (E_k))` iff
+  `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q} < ∞`, with equivalent quasi-norms
+  (`Rd.memApprox_bandScheme_iff`, `Rd.approxNormDyadic_bandScheme_le`,
+  `Rd.littlewoodPaleyNorm_le_approxNormDyadic`). The ingredients are Young's inequality
+  `‖K ⋆ f‖_p ≤ ‖K‖_1 ‖f‖_p` (`Rd.eLpNorm_conv_le`), approximate identities in `L_p`
+  (`Rd.tendsto_convLp_dilate`), and identities between the kernels such as `ψ_j ⋆ Θ_k = 0`
+  for `j ≥ k + 3`, proved by Fourier inversion (`Rd.conv_psi_Theta`).
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -360,6 +373,10 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ proved | ✗ | `FunctionSpaces/Traces/Examples/Torus.lean` |
 | Lipschitz atoms on the torus: synthesis, quasi-interpolants with hat functions, characterisation of `B^s_{2,q}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Atoms/Examples/{Torus,TorusHat,TorusAnalysis}.lean` |
 | Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Classical/SobolevDeriv.lean` |
+| Convolution with integrable kernels on `ℝ^d`: Young's inequality, associativity, operators on `L_p` | ✅ proved | ✗ | `FunctionSpaces/Rd/Convolution.lean` |
+| Dilations, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ proved | ✗ | `FunctionSpaces/Rd/ApproxIdentity.lean` |
+| Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, kernel identities by Fourier inversion | ✅ proved | ✗ | `FunctionSpaces/Rd/LittlewoodPaleyKernels.lean` |
+| Band-limited classes on `ℝ^d`, Littlewood–Paley blocks, `A^s_q(band-limited)` characterised by Littlewood–Paley blocks for `s > 0` | ✅ proved | ✗ | `FunctionSpaces/Rd/{BandLimited,LittlewoodPaley}.lean` |
 | Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Classical/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
@@ -377,17 +394,19 @@ approximation spaces with spaces defined by moduli of smoothness. Nothing in it 
 functions or measures. `FunctionSpaces` holds the Besov and Sobolev spaces built on it:
 schemes of bounded continuous functions on a finite measure space and their embedding
 theorems, spectral schemes in Hilbert spaces, the torus with its traces and Lipschitz atoms,
-filtration schemes for wavelets and multiwavelets, the classical definitions through moduli of smoothness
-and weak derivatives, and polynomial and piecewise polynomial approximation on intervals and
-on the cube `[0, 1]^d`. [MathlibCandidates.md](MathlibCandidates.md) lists what could be
-upstreamed.
+`ℝ^d` with convolution, approximate identities and Littlewood–Paley decompositions,
+filtration schemes for wavelets and multiwavelets, the classical definitions through moduli
+of smoothness and weak derivatives, and polynomial and piecewise polynomial approximation on
+intervals and on the cube `[0, 1]^d`. [MathlibCandidates.md](MathlibCandidates.md) lists what
+could be upstreamed.
 `blueprint/` holds the LaTeX source of the blueprint and the scripts that check and link its
 `\lean` references.
 
 ## What is left to do
 
 * **Reiteration** for approximation and interpolation spaces.
-* **Function spaces beyond the torus**: `ℝ^d`, compact manifolds, bounded domains.
+* **Function spaces beyond the torus**: moduli of smoothness and dominating mixed smoothness on
+  `ℝ^d`, compact manifolds, bounded domains.
 * **Classical definitions for all `p`**: Sobolev spaces by weak derivatives and Besov spaces
   by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
 * **Higher smoothness**: splines on domains, and compactly supported wavelets such as

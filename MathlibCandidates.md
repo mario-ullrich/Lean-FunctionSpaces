@@ -12,7 +12,8 @@ declarations.
 * **`ℓ_q` norms of sequences in `ℝ≥0∞`** (`ApproximationSpaces/Sequences/Lq.lean`), as the
   `L_q` norm for the counting measure on `ℕ`: the norm bound `‖a‖_r ≤ ‖a‖_q` for
   `1 ≤ q ≤ r` behind `lp.monotone` (`ENNReal.lqNorm_le_lqNorm_of_le`), homogeneity for
-  `ℝ≥0∞` scalars, and splitting off the first term.
+  `ℝ≥0∞` scalars, and splitting off the first terms (`ENNReal.lqNorm_le_head_add_shift`,
+  `ENNReal.lqNorm_le_sum_range_add_shift`).
 * **Monotone convergence and countable Minkowski for `eLpNorm`**
   (`ApproximationSpaces/Sequences/Hardy.lean`): `ENNReal.lqNorm_iSup` and
   `ENNReal.lqNorm_tsum_le`, stated for the counting measure; the same proof works for
@@ -57,3 +58,18 @@ declarations.
   `(fwdDiff h)^[r] = (δ_h - 1)^r` and the expansion of an isotropic difference into mixed
   coordinate differences (`Cube.isoDiff_eq_sum`); Mathlib's `fwdDiff` has no such link to the
   group algebra.
+* **Young's inequality and convolution operators** (`FunctionSpaces/Rd/Convolution.lean`): for a
+  Haar measure on a finite-dimensional space, `1 ≤ p < ∞`, integrable `K` and `f ∈ L_p`,
+  `‖K ⋆ f‖_p ≤ ‖K‖_1 ‖f‖_p` (`Rd.eLpNorm_conv_le`), from the weighted Jensen inequality
+  `(∫ a g)^p ≤ (∫ a)^(p-1) ∫ a g^p` (`Rd.lintegral_mul_rpow_le`); associativity
+  `(K ⋆ L) ⋆ f = K ⋆ (L ⋆ f)` a.e. (`Rd.conv_conv_ae`), and convolution as a bounded operator on
+  `L_p` (`Rd.convLp`). Mathlib has only pointwise bounds of convolutions.
+* **Approximate identities in `L_p`** (`FunctionSpaces/Rd/ApproxIdentity.lean`): for integrable
+  `Φ` with `∫ Φ = 1`, `‖Φ_c ⋆ f - f‖_p → 0` as `c → ∞`, `Φ_c = c^n Φ(c ·)`
+  (`Rd.tendsto_eLpNorm_conv_dilate_sub`, `Rd.tendsto_convLp_dilate`), and the continuity of
+  `w ↦ ‖f(· - w) - f‖_p` (`Rd.continuous_eLpNorm_comp_sub_sub`). Mathlib has the pointwise
+  convergence of mollifiers for continuous functions.
+* **The Fourier transform of dilations and kernel identities**
+  (`FunctionSpaces/Rd/LittlewoodPaleyKernels.lean`): `𝓕(c^n Φ(c ·))(ξ) = 𝓕Φ(c⁻¹ ξ)`
+  (`Rd.fourier_dilate`), `𝓕(f - g) = 𝓕f - 𝓕g` for integrable functions (`Rd.fourier_sub_apply`),
+  and `K ⋆ L = M` from `𝓕K · 𝓕L = 𝓕M` by Fourier inversion (`Rd.conv_eq_of_fourier`).

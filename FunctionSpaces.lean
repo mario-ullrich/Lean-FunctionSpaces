@@ -73,6 +73,11 @@ public import FunctionSpaces.Cube.Translation
 public import FunctionSpaces.Cube.IsoModulus
 public import FunctionSpaces.Cube.IsoInverse
 public import FunctionSpaces.Cube.IsoCoincidence
+public import FunctionSpaces.Rd.Convolution
+public import FunctionSpaces.Rd.ApproxIdentity
+public import FunctionSpaces.Rd.LittlewoodPaleyKernels
+public import FunctionSpaces.Rd.BandLimited
+public import FunctionSpaces.Rd.LittlewoodPaley
 
 /-!
 # Function spaces
@@ -222,4 +227,14 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Cube.IsoCoincidence`: the inverse inequalities with the isotropic modulus, the
   identification of the approximation spaces with the isotropic Besov spaces, and the agreement
   of the coordinate and the isotropic Besov conditions for `0 < s < r - 1 + 1/p`.
+* `FunctionSpaces.Rd.Convolution`: convolution with integrable kernels on a finite-dimensional
+  space, Young's inequality, associativity, and the convolution operators on `L_p`.
+* `FunctionSpaces.Rd.ApproxIdentity`: dilations, continuity of translation in `L_p`, and
+  approximate identities.
+* `FunctionSpaces.Rd.LittlewoodPaleyKernels`: smooth frequency cut-offs, the kernels `Φ_k`,
+  `Θ_k`, `ψ_j` of the Littlewood–Paley decomposition, and their identities by Fourier inversion.
+* `FunctionSpaces.Rd.BandLimited`: the band-limited classes `E_k` in `L_p(ℝ^d)` and their
+  scheme.
+* `FunctionSpaces.Rd.LittlewoodPaley`: the Littlewood–Paley blocks, reconstruction, and the
+  characterisation of band-limited approximation spaces by Littlewood–Paley blocks.
 -/

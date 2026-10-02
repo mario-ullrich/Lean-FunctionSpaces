@@ -200,6 +200,23 @@ theorem lqNorm_le_head_add_shift (hq : 1 ≤ q) (a : ℕ → ℝ≥0∞) :
     _ ≤ lqNorm q e + lqNorm q b := lqNorm_add_le hq e b
     _ ≤ a 0 + lqNorm q (fun n => a (n + 1)) := by rw [hb]; gcongr
 
+/-- **Splitting off the first `m` terms**: `‖a‖_q ≤ a 0 + ⋯ + a (m - 1) + ‖(a (n + m))ₙ‖_q`. -/
+theorem lqNorm_le_sum_range_add_shift (hq : 1 ≤ q) (a : ℕ → ℝ≥0∞) (m : ℕ) :
+    lqNorm q a ≤ ∑ j ∈ Finset.range m, a j + lqNorm q (fun n => a (n + m)) := by
+  induction m with
+  | zero => simp
+  | succ m ih =>
+    have hshift : (fun n => a (n + 1 + m)) = fun n => a (n + (m + 1)) := by
+      funext n
+      congr 1
+      omega
+    calc lqNorm q a ≤ ∑ j ∈ Finset.range m, a j + lqNorm q (fun n => a (n + m)) := ih
+      _ ≤ ∑ j ∈ Finset.range m, a j + (a (0 + m) + lqNorm q (fun n => a (n + 1 + m))) := by
+          gcongr
+          exact lqNorm_le_head_add_shift hq (fun n => a (n + m))
+      _ = ∑ j ∈ Finset.range (m + 1), a j + lqNorm q (fun n => a (n + (m + 1))) := by
+          rw [hshift, Finset.sum_range_succ, zero_add, add_assoc]
+
 /-- The norm of a geometric sequence: `‖(r ^ k)ₖ‖_q ≤ (1 - r)⁻¹`, the value of the series
 for `q = 1`. -/
 theorem lqNorm_geometric_le (hq : 1 ≤ q) (r : ℝ≥0∞) :

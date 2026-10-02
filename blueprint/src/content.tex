@@ -265,7 +265,8 @@ In Lean, $\|a\|_{\ell_q}$ is the $L_q$ norm of $a$ for the counting measure on $
 \label{lem:lq-basic}
 \lean{ENNReal.lqNorm_mono, ENNReal.le_lqNorm, ENNReal.lqNorm_const_mul,
   ENNReal.lqNorm_add_le, ENNReal.lqNorm_le_lqNorm_of_le, ENNReal.lqNorm_le_head_add_shift,
-  ENNReal.lqNorm_le_lqNorm_one, ENNReal.lqNorm_geometric_le}
+  ENNReal.lqNorm_le_sum_range_add_shift, ENNReal.lqNorm_le_lqNorm_one,
+  ENNReal.lqNorm_geometric_le}
 \leanok
 \uses{def:lq-norm}
 Let $1 \leq q \leq r \leq \infty$. For all sequences $a, b$ in $[0, \infty]$, all
@@ -275,7 +276,8 @@ $c, \rho \in [0, \infty]$ and all $n \in \N$:
   \item $a_n \leq \|a\|_{\ell_q}$ and $\|c\,a\|_{\ell_q} = c \, \|a\|_{\ell_q}$;
   \item $\|a + b\|_{\ell_q} \leq \|a\|_{\ell_q} + \|b\|_{\ell_q}$;
   \item $\|a\|_{\ell_r} \leq \|a\|_{\ell_q} \leq \|a\|_{\ell_1}$;
-  \item $\|a\|_{\ell_q} \leq a_0 + \|(a_{k+1})_k\|_{\ell_q}$;
+  \item $\|a\|_{\ell_q} \leq a_0 + \|(a_{k+1})_k\|_{\ell_q}$, and
+    $\|a\|_{\ell_q} \leq a_0 + \cdots + a_{m-1} + \|(a_{k+m})_k\|_{\ell_q}$ for every $m \in \N$;
   \item $\|(\rho^k)_k\|_{\ell_q} \leq (1 - \rho)^{-1}$.
 \end{enumerate}
 \end{lemma}
@@ -285,8 +287,8 @@ $c, \rho \in [0, \infty]$ and all $n \in \N$:
 The first two items are immediate. The third is Minkowski's inequality for the finite
 partial sums, followed by the supremum over them. For the fourth put $M = \|a\|_{\ell_q}$;
 then $a_k^r = a_k^{r-q} a_k^q \leq M^{r-q} a_k^q$, and summation gives
-$\|a\|_{\ell_r}^r \leq M^r$. The fifth is the third applied to $a_0 \delta_0$ and the rest.
-The last is the fourth and the geometric series.
+$\|a\|_{\ell_r}^r \leq M^r$. The fifth is the third applied to $a_0 \delta_0$ and the rest,
+and induction on $m$. The last is the fourth and the geometric series.
 \end{proof}
 
 \begin{lemma}[Countable Minkowski inequality]
@@ -5131,6 +5133,398 @@ isotropic modulus by \Cref{lem:iso-modulus}, at the cost of a factor $d$. With
 
 For $0 < s < r - 1 + 1/p$ the Besov spaces $\Besov{s}{p}{q}(Q)$ defined by the moduli in the
 coordinates and by the isotropic modulus therefore coincide.
+
+\chapter{Function spaces on $\R^d$}
+\label{ch:rd}
+
+This chapter works on a finite-dimensional real inner product space $V$ of dimension $n$, such
+as $\R^d$, with Lebesgue measure, and with $L_p = L_p(V)$ for $1 \leq p < \infty$. Convolution
+with integrable kernels takes the place of the Fourier multipliers of the classical theory: for
+$s > 0$ the Besov spaces lie in $L_p$, and every statement about frequencies becomes an identity
+between integrable kernels, proved by Fourier inversion. The Fourier transform is
+$\widehat f(\xi) = \int_V e^{-2\pi i \langle x, \xi \rangle} f(x) \, dx$.
+
+\section{Convolution and Young's inequality}
+
+\begin{definition}[Convolution]
+\label{def:conv}
+\lean{Rd.conv, Rd.conv_apply, Rd.aestronglyMeasurable_conv, Rd.conv_smul, Rd.smul_conv,
+  Rd.conv_congr_ae, Rd.integrable_conv}
+\leanok
+For $K, f : V \to \C$ the convolution is $(K * f)(x) = \int_V K(y) f(x - y) \, dy$. It depends
+on $f$ only through its class modulo null sets, it is homogeneous in $K$ and in $f$, and $K * L$
+is integrable for integrable $K$ and $L$.
+\end{definition}
+
+\begin{lemma}[Weighted Jensen inequality]
+\label{lem:weighted-jensen}
+\lean{Rd.lintegral_mul_rpow_le, Rd.enorm_conv_le_lintegral, Rd.lintegral_rpow_lintegral_mul_le,
+  Rd.aemeasurable_kernel_rpow, Rd.aemeasurable_lintegral_kernel, Rd.lintegral_rpow_lintegral_le}
+\leanok
+Let $1 \leq p < \infty$. For every measure $\mu$ and all measurable $a, g \geq 0$,
+\[
+  \Bigl( \int a g \, d\mu \Bigr)^p \leq \Bigl( \int a \, d\mu \Bigr)^{p-1} \int a g^p \, d\mu .
+\]
+For all measurable $a, b \geq 0$ on $V$,
+\[
+  \int_V \Bigl( \int_V a(y) \, b(x - y) \, dy \Bigr)^p dx
+  \leq \Bigl( \int_V a \Bigr)^p \int_V b^p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first inequality is Hölder's inequality with the conjugate exponent $p'$ for
+$a g = a^{1/p'} \cdot a^{1/p} g$. For the second apply the first for fixed $x$, integrate over
+$x$, exchange the integrals by Tonelli's theorem, and use $\int_V b(x - y)^p \, dx = \int_V b^p$.
+\end{proof}
+
+\begin{theorem}[Young's inequality]
+\label{thm:young}
+\lean{Rd.eLpNorm_conv_le, Rd.memLp_conv, Rd.ae_convolutionExistsAt}
+\leanok
+\uses{def:conv, lem:weighted-jensen}
+Let $1 \leq p < \infty$, $K \in L_1$ and $f \in L_p$. The integral defining $(K * f)(x)$
+converges absolutely for almost every $x \in V$, and
+\[
+  \|K * f\|_p \leq \|K\|_1 \|f\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+$|(K * f)(x)| \leq \int_V |K(y)| |f(x - y)| \, dy$; apply \Cref{lem:weighted-jensen} with
+$a = |K|$ and $b = |f|$. The same bound shows that $\int_V |K(y)| |f(x - y)| \, dy$ is finite
+for almost every $x$.
+\end{proof}
+
+\begin{lemma}[Linearity and associativity]
+\label{lem:conv-assoc}
+\lean{Rd.conv_add_ae, Rd.add_conv_ae, Rd.sub_conv_ae, Rd.ae_integrable_conv_conv,
+  Rd.conv_conv_ae}
+\leanok
+\uses{thm:young}
+Let $1 \leq p < \infty$, $K, K', L \in L_1$ and $f, g \in L_p$. Almost everywhere on $V$,
+$K * (f + g) = K * f + K * g$, $(K + K') * f = K * f + K' * f$,
+$(K - K') * f = K * f - K' * f$ and $(K * L) * f = K * (L * f)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first three follow from the absolute convergence in \Cref{thm:young}. For the last, for
+almost every $x$ the function $(y, z) \mapsto K(z) L(y - z) f(x - y)$ is integrable on
+$V \times V$, by \Cref{thm:young} applied to $|L| * |f|$, and Fubini's theorem exchanges the
+integrations.
+\end{proof}
+
+\begin{lemma}[Convolution operators]
+\label{lem:conv-op}
+\lean{Rd.norm_toLp_conv_le, Rd.convLp, Rd.convLp_apply_ae, Rd.norm_convLp_le,
+  Rd.enorm_convLp_le, Rd.convLp_convLp, Rd.convLp_convLp_of_eq, Rd.convLp_of_eq_zero,
+  Rd.convLp_sub_kernel}
+\leanok
+\uses{thm:young, lem:conv-assoc}
+Let $1 \leq p < \infty$. For $K \in L_1$, $T_K f = K * f$ defines a bounded linear operator on
+$L_p$ with $\|T_K\| \leq \|K\|_1$. For $K, L \in L_1$, $T_K T_L = T_{K * L}$ and
+$T_{K - L} = T_K - T_L$, and $T_0 = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Linearity and the identities hold almost everywhere by \Cref{lem:conv-assoc}, and the bound is
+\Cref{thm:young}.
+\end{proof}
+
+\section{Approximate identities}
+
+\begin{lemma}[Dilations]
+\label{lem:dilate}
+\lean{Rd.dilate, Rd.integrable_dilate, Rd.integral_dilate, Rd.eLpNorm_dilate_one,
+  Rd.conv_dilate_apply, Rd.continuous_dilate, Rd.bddAbove_dilate}
+\leanok
+\uses{def:conv}
+For $c > 0$ and $\Phi : V \to \C$ let $\Phi_c(x) = c^n \Phi(c x)$. If $\Phi$ is integrable, then
+$\Phi_c$ is integrable with $\int \Phi_c = \int \Phi$ and $\|\Phi_c\|_1 = \|\Phi\|_1$. For all
+$f : V \to \C$ and $x \in V$, $(\Phi_c * f)(x) = \int_V \Phi(z) f(x - c^{-1} z) \, dz$. Dilations
+of continuous functions are continuous, and dilations of bounded functions are bounded.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Substitute $y = c x$, which multiplies Lebesgue measure by $c^{-n}$.
+\end{proof}
+
+\begin{lemma}[Continuity of translation]
+\label{lem:translation-continuity}
+\lean{Rd.continuous_eLpNorm_comp_sub_sub, Rd.eLpNorm_comp_sub_right}
+\leanok
+Let $1 \leq p < \infty$ and $f \in L_p$. For every $w \in V$, $\|f(\cdot - w)\|_p = \|f\|_p$,
+and $w \mapsto \|f(\cdot - w) - f\|_p$ is continuous on $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Translations preserve Lebesgue measure, and the action of $V$ on $L_p$ by translation of the
+domain is continuous.
+\end{proof}
+
+\begin{theorem}[Approximate identities]
+\label{thm:approx-identity}
+\lean{Rd.ae_enorm_conv_dilate_sub_le, Rd.tendsto_eLpNorm_conv_dilate_sub,
+  Rd.tendsto_convLp_dilate}
+\leanok
+\uses{lem:dilate, lem:translation-continuity, lem:weighted-jensen, lem:conv-op}
+Let $1 \leq p < \infty$, $\Phi \in L_1$ with $\int \Phi = 1$, and $f \in L_p$. Then
+$\|\Phi_c * f - f\|_p \to 0$ as $c \to \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Since $\int \Phi = 1$, $(\Phi_c * f)(x) - f(x) = \int_V \Phi(z) (f(x - c^{-1} z) - f(x)) \, dz$,
+and \Cref{lem:weighted-jensen} gives
+\[
+  \|\Phi_c * f - f\|_p^p
+  \leq \|\Phi\|_1^{p-1} \int_V |\Phi(z)| \, \|f(\cdot - c^{-1} z) - f\|_p^p \, dz .
+\]
+By \Cref{lem:translation-continuity} the integrand tends to $0$ for every $z$, and it is bounded
+by $|\Phi(z)| (2 \|f\|_p)^p$; dominated convergence concludes.
+\end{proof}
+
+\section{Littlewood--Paley kernels}
+
+\begin{lemma}[Fourier transform of dilations]
+\label{lem:fourier-dilate}
+\lean{Rd.fourier_dilate, Rd.integrable_fourier_dilate, Rd.fourier_sub_apply}
+\leanok
+\uses{lem:dilate}
+For $c > 0$, $\Phi : V \to \C$ and $\xi \in V$, $\widehat{\Phi_c}(\xi) = \widehat\Phi(c^{-1} \xi)$.
+If $\widehat\Phi$ is integrable, so is $\widehat{\Phi_c}$. For integrable $f$ and $g$,
+$\widehat{f - g} = \widehat f - \widehat g$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Substitute $y = c x$ and use $\langle c x, c^{-1} \xi \rangle = \langle x, \xi \rangle$.
+\end{proof}
+
+\begin{definition}[Cut-offs and kernels]
+\label{def:lp-kernels}
+\lean{Rd.cutoff, Rd.cutoffSchwartz, Rd.coe_cutoffSchwartz, Rd.lpKernelS, Rd.bandKernelS,
+  Rd.lpKernel, Rd.bandKernel, Rd.Phi, Rd.Theta, Rd.psi}
+\leanok
+\uses{lem:dilate}
+For $0 < a < b$ let $\chi_{a,b}$ be a smooth function on $V$ with values in $[0, 1]$, equal to
+$1$ on the closed ball of radius $a$ and to $0$ outside the ball of radius $b$. The
+Littlewood--Paley kernel is $\Phi = \mathcal F^{-1} \chi_{1,2}$ and the band-limiting kernel is
+$\Theta = \mathcal F^{-1} \chi_{2,4}$. For $k \in \N$ let $\Phi_k = \Phi_{2^k}$ and
+$\Theta_k = \Theta_{2^k}$ be their dilations, and let $\psi_0 = \Phi_0$ and
+$\psi_j = \Phi_j - \Phi_{j-1}$ for $j \geq 1$.
+\end{definition}
+
+\begin{lemma}[Properties of the kernels]
+\label{lem:lp-kernels-basic}
+\lean{Rd.cutoff_eq_one, Rd.cutoff_eq_zero, Rd.norm_lt_of_cutoff_ne_zero, Rd.contDiff_cutoff,
+  Rd.hasCompactSupport_cutoff, Rd.bddAbove_schwartz, Rd.fourier_lpKernel, Rd.fourier_bandKernel,
+  Rd.integrable_lpKernel, Rd.integrable_bandKernel, Rd.continuous_lpKernel,
+  Rd.continuous_bandKernel, Rd.bddAbove_lpKernel, Rd.bddAbove_bandKernel,
+  Rd.integrable_fourier_lpKernel, Rd.integrable_fourier_bandKernel, Rd.integral_lpKernel,
+  Rd.sum_psi, Rd.integrable_Phi, Rd.integrable_Theta, Rd.integrable_psi, Rd.continuous_Phi,
+  Rd.continuous_Theta, Rd.continuous_psi, Rd.bddAbove_Phi, Rd.bddAbove_Theta, Rd.bddAbove_psi,
+  Rd.eLpNorm_Phi_one, Rd.eLpNorm_Theta_one, Rd.eLpNorm_psi_one_le, Rd.integral_Phi}
+\leanok
+\uses{def:lp-kernels, lem:dilate}
+The cut-offs are Schwartz functions, $\widehat\Phi = \chi_{1,2}$ and $\widehat\Theta = \chi_{2,4}$,
+and $\Phi$, $\Theta$, $\widehat\Phi$, $\widehat\Theta$ are integrable. For all $j, k, J \in \N$, the
+kernels $\Phi_k$, $\Theta_k$ and $\psi_j$ are integrable, continuous and bounded,
+$\int \Phi_k = 1$, $\|\Phi_k\|_1 = \|\Phi\|_1$, $\|\Theta_k\|_1 = \|\Theta\|_1$,
+$\|\psi_j\|_1 \leq 2 \|\Phi\|_1$, and $\sum_{j=0}^J \psi_j = \Phi_J$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Schwartz functions are integrable, continuous and bounded, and $\mathcal F$ inverts
+$\mathcal F^{-1}$ on Schwartz functions. $\int \Phi = \widehat\Phi(0) = \chi_{1,2}(0) = 1$. The
+remaining claims follow from \Cref{lem:dilate} and the triangle inequality; the sum telescopes.
+\end{proof}
+
+\begin{lemma}[The kernels on the frequency side]
+\label{lem:lp-kernels-frequency}
+\lean{Rd.norm_two_pow_inv_smul, Rd.fourier_Phi, Rd.fourier_Theta, Rd.fourier_psi_succ,
+  Rd.integrable_fourier_Phi, Rd.integrable_fourier_Theta, Rd.integrable_fourier_psi,
+  Rd.norm_lt_of_fourier_Phi_ne_zero, Rd.norm_lt_of_fourier_Theta_ne_zero,
+  Rd.fourier_Theta_eq_one, Rd.norm_lt_of_fourier_psi_ne_zero, Rd.fourier_psi_succ_eq_zero,
+  Rd.fourier_Theta_succ_mul, Rd.fourier_Theta_mul_psi, Rd.fourier_psi_mul_Theta}
+\leanok
+\uses{lem:fourier-dilate, lem:lp-kernels-basic}
+For all $j, k \in \N$ and $\xi \in V$, $\widehat{\Phi_k}(\xi) = \chi_{1,2}(2^{-k} \xi)$ and
+$\widehat{\Theta_k}(\xi) = \chi_{2,4}(2^{-k} \xi)$, and $\widehat{\Phi_k}$, $\widehat{\Theta_k}$,
+$\widehat{\psi_j}$ are integrable. Moreover:
+\begin{enumerate}
+  \item $\widehat{\Phi_k}(\xi) = \widehat{\psi_k}(\xi) = 0$ if $|\xi| \geq 2^{k+1}$, and
+    $\widehat{\Theta_k}(\xi) = 0$ if $|\xi| \geq 2^{k+2}$;
+  \item $\widehat{\Theta_k}(\xi) = 1$ if $|\xi| \leq 2^{k+1}$;
+  \item $\widehat{\psi_{j+1}}(\xi) = 0$ if $|\xi| \leq 2^j$;
+  \item $\widehat{\Theta_{k+1}} \widehat{\Theta_k} = \widehat{\Theta_k}$,
+    $\widehat{\Theta_j} \widehat{\psi_j} = \widehat{\psi_j}$, and
+    $\widehat{\psi_j} \widehat{\Theta_k} = 0$ if $j \geq k + 3$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The formulas follow from \Cref{lem:fourier-dilate}, with
+$\widehat{\psi_{j+1}} = \widehat{\Phi_{j+1}} - \widehat{\Phi_j}$, and (1)--(3) from the
+properties of the cut-offs; for (3), $\chi_{1,2}(2^{-j-1} \xi) = \chi_{1,2}(2^{-j} \xi) = 1$ if
+$|\xi| \leq 2^j$. For (4): where $\widehat{\Theta_k}(\xi) \neq 0$, $|\xi| < 2^{k+2}$ and
+$\widehat{\Theta_{k+1}}(\xi) = 1$; where $\widehat{\psi_j}(\xi) \neq 0$, $|\xi| < 2^{j+1}$ and
+$\widehat{\Theta_j}(\xi) = 1$; where $\widehat{\Theta_k}(\xi) \neq 0$ and $j \geq k + 3$,
+$|\xi| < 2^{k+2} \leq 2^{j-1}$ and $\widehat{\psi_j}(\xi) = 0$.
+\end{proof}
+
+\begin{lemma}[Kernel identities by Fourier inversion]
+\label{lem:conv-of-fourier}
+\lean{Rd.conv_eq_of_fourier}
+\leanok
+\uses{def:conv}
+Let $K, L, M \in L_1(V)$, with $L$ bounded and continuous, $M$ continuous and $\widehat M$
+integrable. If $\widehat K \widehat L = \widehat M$, then $K * L = M$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$K * L$ is integrable and continuous, and $\widehat{K * L} = \widehat K \widehat L = \widehat M$ is
+integrable. The inversion theorem for continuous integrable functions with integrable Fourier
+transform gives $K * L = \mathcal F^{-1} \widehat{K * L} = \mathcal F^{-1} \widehat M = M$.
+\end{proof}
+
+\begin{theorem}[Kernel identities]
+\label{thm:kernel-identities}
+\lean{Rd.conv_Theta_succ, Rd.conv_Theta_psi, Rd.conv_psi_Theta}
+\leanok
+\uses{lem:conv-of-fourier, lem:lp-kernels-frequency, lem:lp-kernels-basic}
+For all $j, k \in \N$, $\Theta_{k+1} * \Theta_k = \Theta_k$ and $\Theta_j * \psi_j = \psi_j$,
+and $\psi_j * \Theta_k = 0$ if $j \geq k + 3$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Combine \Cref{lem:conv-of-fourier} with part (4) of \Cref{lem:lp-kernels-frequency}.
+\end{proof}
+
+\section{Band-limited approximation}
+
+\begin{definition}[Band-limited classes]
+\label{def:band-space}
+\lean{Rd.bandSpace, Rd.mem_bandSpace, Rd.bandScheme, Rd.mem_bandScheme_two_pow}
+\leanok
+\uses{def:lp-kernels, lem:conv-op, def:comap}
+Let $1 \leq p < \infty$. The band-limited class of level $k \in \N$ is
+$E_k = \{ g \in L_p : \Theta_k * g = g \}$. The band-limited scheme has $A_0 = \{0\}$ and
+$A_n = E_{\lfloor \log_2 n \rfloor}$ for $n \geq 1$.
+\end{definition}
+
+On the Fourier side $\Theta_k * g = g$ says $\widehat g = \widehat{\Theta_k} \widehat g$: the
+spectrum of $g$ lies in the ball of radius $2^{k+2}$, and every $g$ with spectrum in the ball of
+radius $2^{k+1}$ belongs to $E_k$. These are the functions of exponential type of
+\cite{Nikolskii}, described by a kernel, so that the definition works in every $L_p$ without
+distributions.
+
+\begin{lemma}[The band-limited classes]
+\label{lem:band-space}
+\lean{Rd.isClosed_bandSpace, Rd.bandSpace_mono}
+\leanok
+\uses{def:band-space, thm:kernel-identities}
+Let $1 \leq p < \infty$. Every $E_k$ is a closed linear subspace of $L_p$, and
+$E_k \subseteq E_{k+1}$ for every $k \in \N$. The band-limited scheme is an approximation scheme
+with $A_{2^k} = E_k$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$E_k$ is the kernel of $T_{\Theta_k} - I$. For $g \in E_k$,
+$\Theta_{k+1} * g = \Theta_{k+1} * (\Theta_k * g) = (\Theta_{k+1} * \Theta_k) * g
+= \Theta_k * g = g$ by \Cref{lem:conv-op} and \Cref{thm:kernel-identities}. The last claim is
+\Cref{def:comap}.
+\end{proof}
+
+\section{The Littlewood--Paley decomposition}
+
+\begin{definition}[Littlewood--Paley blocks]
+\label{def:lp-blocks}
+\lean{Rd.lpBlock, Rd.littlewoodPaleyNorm}
+\leanok
+\uses{def:lp-kernels, lem:conv-op, def:lq-norm}
+Let $1 \leq p < \infty$, $s \in \R$ and $1 \leq q \leq \infty$. The Littlewood--Paley blocks of
+$f \in L_p$ are $\Delta_j f = \psi_j * f$, $j \in \N$, and the Littlewood--Paley quasi-norm is
+$\|f\|^{\mathrm{LP}}_{s,q} = \|(2^{js} \|\Delta_j f\|_p)_j\|_{\ell_q}$.
+\end{definition}
+
+\begin{lemma}[Bounds and reconstruction]
+\label{lem:lp-blocks}
+\lean{Rd.enorm_lpBlock_le, Rd.lpBlock_succ, Rd.sum_lpBlock, Rd.tendsto_sum_lpBlock,
+  Rd.hasSum_lpBlock}
+\leanok
+\uses{def:lp-blocks, lem:lp-kernels-basic, thm:approx-identity}
+Let $1 \leq p < \infty$ and $f \in L_p$. For all $j, J \in \N$,
+$\|\Delta_j f\|_p \leq 2 \|\Phi\|_1 \|f\|_p$ and $\sum_{j=0}^J \Delta_j f = \Phi_J * f$, and
+$\sum_{j=0}^J \Delta_j f \to f$ in $L_p$ as $J \to \infty$. If $s > 0$, $1 \leq q \leq \infty$
+and $\|f\|^{\mathrm{LP}}_{s,q} < \infty$, then $\sum_j \Delta_j f$ converges absolutely to $f$
+in $L_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bound is \Cref{lem:conv-op} with $\|\psi_j\|_1 \leq 2 \|\Phi\|_1$, the sum telescopes by
+\Cref{lem:lp-kernels-basic}, and $\Phi_J * f \to f$ by \Cref{thm:approx-identity}. For the last
+claim, $\|\Delta_j f\|_p \leq 2^{-js} \|f\|^{\mathrm{LP}}_{s,q}$ is summable.
+\end{proof}
+
+\begin{lemma}[Blocks and band-limited functions]
+\label{lem:lp-blocks-band}
+\lean{Rd.lpBlock_mem_bandSpace, Rd.lpBlock_eq_zero_of_mem, Rd.enorm_lpBlock_le_approxSeq}
+\leanok
+\uses{lem:lp-blocks, lem:band-space, thm:kernel-identities}
+Let $1 \leq p < \infty$, $f \in L_p$ and $i, j \in \N$. Then $\Delta_j f \in E_j$. If
+$j \geq i + 3$, then $\Delta_j g = 0$ for every $g \in E_i$, and
+$\|\Delta_j f\|_p \leq 2 \|\Phi\|_1 \inf_{g \in E_i} \|f - g\|_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\Theta_j * (\psi_j * f) = (\Theta_j * \psi_j) * f = \psi_j * f$ and
+$\psi_j * g = \psi_j * (\Theta_i * g) = (\psi_j * \Theta_i) * g = 0$ by
+\Cref{thm:kernel-identities}. Hence $\Delta_j f = \Delta_j (f - g)$ for $g \in E_i$, and
+\Cref{lem:lp-blocks} bounds it by $2 \|\Phi\|_1 \|f - g\|_p$.
+\end{proof}
+
+\begin{theorem}[Band-limited approximation and Littlewood--Paley blocks]
+\label{thm:lp-band}
+\lean{Rd.approxNormDyadic_bandScheme_le, Rd.littlewoodPaleyNorm_le_approxNormDyadic,
+  Rd.memApprox_bandScheme_iff}
+\leanok
+\uses{lem:lp-blocks, lem:lp-blocks-band, thm:block-decomposition, def:dyadic-norm, lem:lq-basic}
+Let $1 \leq p < \infty$, $s > 0$ and $1 \leq q \leq \infty$, and let $A$ be the band-limited
+scheme. For every $f \in L_p$,
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_q} \leq 2 (1 - 2^{-s})^{-1} \, \|f\|^{\mathrm{LP}}_{s,q}
+  \quad \text{and} \quad
+  \|f\|^{\mathrm{LP}}_{s,q} \leq 8 \cdot 8^s \, \|\Phi\|_1 \, \|f\|^{\mathrm{dy}}_{A^s_q},
+\]
+and $f \in A^s_q$ if and only if $\|f\|^{\mathrm{LP}}_{s,q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:lp-blocks-band}, $\Delta_j f \in E_j = A_{2^j}$, and by \Cref{lem:lp-blocks} a
+finite Littlewood--Paley quasi-norm makes $f = \sum_j \Delta_j f$ a block decomposition, so
+\Cref{thm:block-decomposition} gives the first inequality. For the second, split off the first
+three terms (\Cref{lem:lq-basic}): $2^{js} \|\Delta_j f\|_p \leq 8^s \cdot 2 \|\Phi\|_1 \|f\|_p$
+for $j < 3$, and $2^{(j+3)s} \|\Delta_{j+3} f\|_p \leq 8^s \cdot 2 \|\Phi\|_1 \, 2^{js}
+E_{2^j}(f)$ by \Cref{lem:lp-blocks-band}.
+\end{proof}
+
+With the Besov space $\Besov{s}{p}{q}(V)$ defined through Littlewood--Paley blocks,
+\Cref{thm:lp-band} identifies it with the approximation space of the band-limited scheme.
 
 \bpbibheading
 \begin{thebibliography}{99}
