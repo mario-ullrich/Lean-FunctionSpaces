@@ -48,3 +48,12 @@ declarations.
   in `Mathlib/Analysis/Fourier/AddCircleMulti.lean`, so `mFourierBasis` cannot be used
   outside that file without re-declaring it (`FunctionSpaces/Torus/Measure.lean`); worth
   reporting upstream.
+* **Differences of polynomials by derivatives** (`FunctionSpaces/Interval/PolyDifferences.lean`):
+  `|Δ_σ^m P(y)| ≤ σ^m sup_{[y, y+mσ]} |P^(m)|` (`Interval.norm_iterDiff_polyFun_le`), and the
+  boundedness of every linear map of the polynomials of degree `< r` by the `L_p` norm on an
+  interval (`Interval.exists_enorm_linearMap_le_eLpNorm`), a form of Markov's inequality.
+* **The translation algebra** (`FunctionSpaces/Cube/Translation.lean`): `ℂ[ℝ^d]` acting on
+  functions on `ℝ^d` by translations (`Cube.diffAct`, from `AddMonoidAlgebra.lift`), with
+  `(fwdDiff h)^[r] = (δ_h - 1)^r` and the expansion of an isotropic difference into mixed
+  coordinate differences (`Cube.isoDiff_eq_sum`); Mathlib's `fwdDiff` has no such link to the
+  group algebra.

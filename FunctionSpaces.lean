@@ -57,6 +57,8 @@ public import FunctionSpaces.Interval.QuasiInterp
 public import FunctionSpaces.Interval.SplineJackson
 public import FunctionSpaces.Interval.SplinePeriodic
 public import FunctionSpaces.Interval.SplinePeriodicJackson
+public import FunctionSpaces.Interval.PolyDifferences
+public import FunctionSpaces.Interval.LowerDifferences
 public import FunctionSpaces.Cube.Basic
 public import FunctionSpaces.Cube.Modulus
 public import FunctionSpaces.Cube.Smoothing
@@ -67,6 +69,10 @@ public import FunctionSpaces.Cube.PiecewiseInverse
 public import FunctionSpaces.Cube.Splines
 public import FunctionSpaces.Cube.SplineJackson
 public import FunctionSpaces.Cube.SplineInverse
+public import FunctionSpaces.Cube.Translation
+public import FunctionSpaces.Cube.IsoModulus
+public import FunctionSpaces.Cube.IsoInverse
+public import FunctionSpaces.Cube.IsoCoincidence
 
 /-!
 # Function spaces
@@ -181,6 +187,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Interval.SplinePeriodicJackson`: the periodic quasi-interpolant, Jackson's
   inequality for periodic splines, density of continuous periodic functions, and the
   identification of their approximation spaces with `B^s_{p,q}(𝕋)` for `0 < s < r - 1 + 1/p`.
+* `FunctionSpaces.Interval.PolyDifferences`: differences of every order of polynomials by their
+  derivatives, and the difference bound `|Δ_t^m P| ≤ K (t/L)^m L^(-1/p) ‖P‖_p`.
+* `FunctionSpaces.Interval.LowerDifferences`: differences of every order `m ≤ r` of piecewise
+  polynomials and splines, and steps of either sign.
 * `FunctionSpaces.Cube.Basic`: the unit cube `[0, 1]^d` with Lebesgue measure, slices in one
   coordinate, and `L_p` norms through slices.
 * `FunctionSpaces.Cube.Modulus`: differences in one coordinate, the moduli of smoothness in the
@@ -202,4 +212,13 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Cube.SplineInverse`: the inverse inequality of order `r - 1 + 1/p` for tensor
   splines and the identification of their approximation spaces with `B^s_{p,q}([0, 1]^d)` for
   `0 < s < r - 1 + 1/p`.
+* `FunctionSpaces.Cube.Translation`: the translation algebra `ℂ[ℝ^d]` acting on functions, the
+  isotropic difference `Δ_h^r`, and its expansion into mixed coordinate differences.
+* `FunctionSpaces.Cube.IsoModulus`: the isotropic modulus of smoothness on the cube and its
+  comparison with the moduli in the coordinates.
+* `FunctionSpaces.Cube.IsoInverse`: isotropic differences of functions whose slices lie in a
+  class with bounds for differences of every order.
+* `FunctionSpaces.Cube.IsoCoincidence`: the inverse inequalities with the isotropic modulus, the
+  identification of the approximation spaces with the isotropic Besov spaces, and the agreement
+  of the coordinate and the isotropic Besov conditions for `0 < s < r - 1 + 1/p`.
 -/

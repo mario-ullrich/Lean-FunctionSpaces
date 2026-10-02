@@ -4183,6 +4183,132 @@ inverse order $\theta = r - 1 + 1/p$; apply \Cref{thm:modulus-coincidence}.
 
 For $0 < s < r - 1 + 1/p$ the condition says $f \in \Besov{s}{p}{q}(\T)$.
 
+\section{Differences of every order}
+
+The isotropic modulus on the cube (\Cref{sec:iso-modulus}) needs, in each variable, differences of
+every order $m \leq r$ of the approximants, also of order below the order of the pieces, where
+they do not vanish inside a piece.
+
+\begin{lemma}[Differences of polynomials by derivatives]
+\label{lem:poly-diff-deriv}
+\lean{Interval.iterate_derivative_mem_degreeLT, Interval.hasDerivAt_iterDiff_polyFun,
+  Interval.norm_iterDiff_polyFun_le}
+\leanok
+\uses{def:iter-diff}
+Let $P$ be a polynomial, $m \in \N$, $\sigma \geq 0$, $y \in \R$ and $M \geq 0$ with
+$|P^{(m)}(z)| \leq M$ for all $z \in [y, y + m \sigma]$. Then
+$|\Delta_\sigma^m P(y)| \leq \sigma^m M$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Induction on $m$. The derivative of $\Delta_\sigma^m P$ is $\Delta_\sigma^m P'$, and
+$\Delta_\sigma^{m+1} P(y) = \Delta_\sigma^m P(y + \sigma) - \Delta_\sigma^m P(y)$, so the mean
+value theorem and the induction hypothesis for $P'$ at the points of $[y, y + \sigma]$ give the
+bound $\sigma \cdot \sigma^m M$.
+\end{proof}
+
+\begin{lemma}[Difference bound for polynomials]
+\label{lem:diff-bound}
+\lean{Interval.norm_polyFun_degreeLTEquiv_symm_le, Interval.exists_enorm_linearMap_le_eLpNorm,
+  Interval.DiffBound, Interval.pow_derivative_mem_degreeLT, Interval.exists_diffBound}
+\leanok
+\uses{lem:poly-diff-deriv, lem:interval-nikolskii}
+Let $1 \leq p < \infty$ and $r, m \in \N$. There is $K$ such that for every polynomial $P$ of
+degree $< r$, all $u \in \R$, $L > 0$, $t \geq 0$ and $x$ with $u \leq x$ and
+$x + mt \leq u + 2L$,
+\[
+  |\Delta_t^m P(x)| \leq K \Bigl(\frac{t}{L}\Bigr)^m L^{-1/p} \, \|P\|_{L_p[u, u + L]} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Every linear map of the polynomials of degree $< r$ into themselves, in particular
+$P \mapsto P^{(m)}$, satisfies $|\Phi P(x)| \leq K \|P\|_{L_p[0, 1/2]}$ for $x \in [0, 1]$: in
+coordinates it is a linear map of $\C^r$, and the coordinates are bounded by the $L_p$ norm on an
+interval of positive length, as in \Cref{lem:interval-nikolskii}. With
+\Cref{lem:poly-diff-deriv}, $|\Delta_\sigma^m Q(y)| \leq \sigma^m K \|Q\|_{L_p[0,1/2]}$ for
+$y, y + m\sigma \in [0, 1]$; the substitution $x = u + 2Ly$ rescales.
+\end{proof}
+
+\begin{lemma}[Steps of either sign]
+\label{lem:step-regions}
+\lean{Interval.iterDiff_neg, Interval.stepRegion, Interval.mem_stepRegion,
+  Interval.stepRegion_of_nonneg, Interval.stepRegion_of_neg, Interval.eLpNorm_iterDiff_stepRegion_eq}
+\leanok
+\uses{def:iter-diff}
+For $m \in \N$ and $t \in \R$ let $J(m, t) = \{x \in [0, 1] : x + mt \in [0, 1]\}$. Then
+$\Delta_{-t}^m f(x) = (-1)^m \Delta_t^m f(x - mt)$, and for measurable $f$
+\[
+  \|\Delta_t^m f\|_{L_p(J(m,t))} = \|\Delta_{|t|}^m f\|_{L_p[0, 1 - m|t|]} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Reindex $k \mapsto m - k$ in the sum of the difference. For $t < 0$, $J(m, t) = [-mt, 1]$, and the
+translation by $mt$ maps it onto $[0, 1 + mt]$.
+\end{proof}
+
+\begin{theorem}[Differences of every order of piecewise polynomials]
+\label{thm:pp-lower-diff}
+\lean{Interval.eLpNorm_le_of_lintegral_le_mul, Interval.mul_rpow_one_div_rpow,
+  Interval.lintegral_localBound_le, Interval.sum_localMass_ppFun_le,
+  Interval.enorm_iterDiff_le_of_isPiecewisePoly_of_le, Interval.enorm_iterDiff_le_of_mem_piece,
+  Interval.exists_eLpNorm_iterDiff_ppFun_le}
+\leanok
+\uses{lem:diff-bound, thm:pp-inverse, lem:pp-local}
+Let $1 \leq p < \infty$ and $1 \leq m \leq r$. There is $C$ such that for every $j \in \N$, every
+piecewise polynomial $u$ of level $j$ and degree $< r$ on $[0, 1]$ and $0 \leq h \leq 2^{-j}$,
+\[
+  \|\Delta_h^m u\|_{L_p[0, 1 - mh]} \leq C (2^j h)^{1/p} \|u\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+If $x + mh$ lies right of the right end of the dyadic interval of $x$, then $|\Delta_h^m u(x)|$ is
+bounded by the local masses of the $r + 1$ neighbouring pieces, as in the proof of
+\Cref{thm:pp-inverse}; these points form strips of width $\leq rh$ left of the knots. Otherwise
+$x, \dots, x + mh$ lie in one piece $I_{j,n}$, and \Cref{lem:diff-bound} gives
+$|\Delta_h^m u(x)| \leq K (2^j h)^m 2^{j/p} \|u\|_{L_p(I_{j,n})}$. Integrating,
+$\int |\Delta_h^m u|^p \leq C (2^j h + (2^j h)^{mp}) \|u\|_p^p$, and $(2^j h)^{mp} \leq 2^j h$
+since $2^j h \leq 1$ and $mp \geq 1$.
+\end{proof}
+
+\begin{theorem}[Differences of lower order of splines]
+\label{thm:spline-lower-diff}
+\lean{Interval.enorm_iterDiff_truncPow_le_of_lt, Interval.iterDiff_eq_add_sum_jumps,
+  Interval.enorm_iterDiff_spline_le_of_lt, Interval.exists_eLpNorm_iterDiff_spline_le_of_lt}
+\leanok
+\uses{lem:diff-bound, lem:spline-across, lem:spline-inverse-tools}
+Let $1 \leq p < \infty$ and $1 \leq m < r$. There is $C$ such that for every $j \in \N$, every
+spline $u$ of order $r$ and level $j$ on $[0, 1]$ and $0 \leq h \leq 2^{-j}$,
+\[
+  \|\Delta_h^m u\|_{L_p[0, 1 - mh]} \leq C (2^j h)^m \|u\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let first $mh \leq 2^{-j}$ and $n_0 = \lfloor 2^j x \rfloor$. On $[x, x + mh]$ the spline is the
+piece $Q_{n_0}$ plus jumps $c_l (\cdot - \xi_l)_+^{r-1}$ at knots $\xi_l > x$
+(\Cref{lem:spline-across}). The piece contributes
+$|\Delta_h^m Q_{n_0}(x)| \leq K_m (2^j h)^m 2^{j/p} \|u\|_{L_p(I_{j,n_0})}$ by
+\Cref{lem:diff-bound}, since $x, x + mh$ lie in the doubled interval of $I_{j, n_0}$. A jump
+contributes $|c_l| \, 2^m (mh)^{r-1}$ (as in \Cref{lem:spline-inverse-tools}), with
+$|c_l| 2^{-j(r-1)} \leq K 2^{j/p} (\dots)^{1/p}$ by \Cref{lem:spline-across}, and
+$(2^j h)^{r-1} \leq (2^j h)^m$. So
+$|\Delta_h^m u(x)| \leq C (2^j h)^m 2^{j/p} (\sum_{l \leq r} \int_{I_{j,n_0+l}} |u|^p)^{1/p}$ at
+every point, and integrating gives the claim. For $mh > 2^{-j}$,
+$\|\Delta_h^m u\|_p \leq 2^m \|u\|_p \leq 2^m (m 2^j h)^m \|u\|_p$.
+\end{proof}
+
+The jump of $u^{(r-1)}$ at a knot limits the gain for $m = r$ to $(2^j h)^{r-1+1/p}$
+(\Cref{thm:spline-inverse}); below order $r$ the smoothness $C^{r-2}$ of splines gives the full
+order $m$.
+
 \chapter{Approximation on the cube}
 \label{ch:cube}
 
@@ -4797,6 +4923,214 @@ order $\theta = r - 1 + 1/p$; apply \Cref{thm:modulus-coincidence}.
 
 For $0 < s < r - 1 + 1/p$ the condition says $f \in \Besov{s}{p}{q}(Q)$; for $r \geq 2$ this
 reaches smoothness beyond $1$.
+
+\section{The isotropic modulus}
+\label{sec:iso-modulus}
+
+\begin{definition}[Isotropic differences and the translation algebra]
+\label{def:iso-diff}
+\lean{Cube.transl, Cube.transl_apply, Cube.translHom, Cube.diffAct, Cube.diffAct_single,
+  Cube.diffAct_single_one, Cube.isoDiff, Cube.isoDiff_apply, Cube.isoDiff_eq_diffAct,
+  Cube.isoDiff_add, Cube.isoDiff_single, Cube.measurable_isoDiff}
+\leanok
+\uses{def:cube-modulus}
+For $h \in \R^d$ and $r \in \N$ the isotropic difference is
+\[
+  \Delta_h^r f(x) = \sum_{k=0}^r (-1)^{r-k} \binom{r}{k} f(x + kh) .
+\]
+The algebra $\C[\R^d]$ of finite formal combinations of the translations $\delta_v$, $v \in \R^d$,
+acts on functions on $\R^d$ by $\delta_v f(x) = f(x + v)$; this is an algebra homomorphism, and
+$\Delta_h^r f = (\delta_h - 1)^r f$. For $h = t e_i$ the isotropic difference is the difference
+$\Delta^r_{t e_i}$ in coordinate $i$ of \Cref{def:cube-modulus}.
+\end{definition}
+
+The algebra $\C[\R^d]$ is commutative, so identities between differences are ring identities.
+
+\begin{lemma}[Expansion into mixed coordinate differences]
+\label{lem:iso-expansion}
+\lean{Cube.mixedDiff, Cube.mixedDiff_nil, Cube.mixedDiff_cons, Cube.measurable_mixedDiff,
+  Cube.coordElem, Cube.diffAct_coordElem_pow, Cube.diffAct_list_prod, Cube.count, Cube.sum_count,
+  Cube.count_le, Cube.lowerVec, Cube.shiftVec, Cube.shiftVec_apply, Cube.card_lt_add_count_le,
+  Cube.single_add_one, Cube.single_sum_one, Cube.prod_lt_single, Cube.single_sub_one_eq_sum,
+  Cube.single_sub_one_pow_eq_sum, Cube.isoDiff_eq_sum, Cube.slice_cubeDiff_of_ne,
+  Cube.slice_mixedDiff_mem}
+\leanok
+\uses{def:iso-diff}
+For a word $\alpha \colon \{1, \dots, r\} \to \{1, \dots, d\}$ let $m_i(\alpha) = \#\alpha^{-1}(i)$
+and $(s_\alpha)_i = h_i \, \#\{l : i < \alpha_l\}$, and let
+$M_m f = \Delta^{m_1}_{h_1 e_1} \cdots \Delta^{m_d}_{h_d e_d} f$ be the mixed coordinate
+difference. Then $\sum_i m_i(\alpha) = r$, $\#\{l : i < \alpha_l\} + m_i(\alpha) \leq r$, and
+\[
+  \Delta_h^r f(x) = \sum_{\alpha} M_{m(\alpha)} f(x + s_\alpha) .
+\]
+If every slice of $f$ in coordinate $i$ lies in a subspace $V$ of functions of one variable, so
+does every slice in coordinate $i$ of a mixed difference in the other coordinates.
+\end{lemma}
+
+\begin{proof}
+\leanok
+With $\delta_i = \delta_{h_i e_i}$, $\delta_h = \prod_i \delta_i = \prod_i (1 + (\delta_i - 1))$, so
+$\delta_h - 1 = \sum_i (\delta_i - 1) \prod_{j < i} \delta_j$. Expanding the $r$-th power of this
+sum gives one term $\prod_l (\delta_{\alpha_l} - 1) \prod_{j < \alpha_l} \delta_j
+= \delta_{s_\alpha} \prod_i (\delta_i - 1)^{m_i(\alpha)}$ per word $\alpha$. A difference in
+coordinate $c \neq i$ is a combination of values at points shifted in coordinate $c$, so it
+combines slices in coordinate $i$.
+\end{proof}
+
+\begin{definition}[The isotropic modulus]
+\label{def:iso-modulus}
+\lean{Cube.cubeSet, Cube.measurableSet_cubeSet, Cube.cubeVol_eq_restrict,
+  Cube.cubeVol_restrict_congr, Cube.isoRegion, Cube.measurableSet_isoRegion, Cube.isoModulus,
+  Cube.eLpNorm_isoDiff_le_isoModulus, Cube.lpIsoModulus}
+\leanok
+\uses{def:iso-diff, def:cube}
+Let $Q_{rh} = \{x \in Q : x + rh \in Q\}$. The isotropic modulus of smoothness on the cube is
+\[
+  \omega^{\mathrm{iso}}_r(f, t)_p = \sup_{\|h\|_\infty \leq t} \|\Delta_h^r f\|_{L_p(Q_{rh})} ,
+\]
+the supremum over steps of every direction and sign.
+\end{definition}
+
+\begin{lemma}[Properties of the isotropic modulus]
+\label{lem:iso-modulus}
+\lean{Cube.eLpNorm_comp_add_le, Cube.ae_comp_add_of_ae, Cube.add_mul_mem_Icc,
+  Cube.add_smul_mem_cubeSet, Cube.isoModulus_mono, Cube.isoModulus_add_le, Cube.eLpNorm_isoDiff_le,
+  Cube.isoModulus_le, Cube.isoModulus_congr_ae, Cube.diffRegion_eq_isoRegion,
+  Cube.coordModulus_le_isoModulus, Cube.cubeModulus_le_isoModulus, Cube.lpIsoModulus_add_le,
+  Cube.lpIsoModulus_le, Cube.lpIsoModulus_anti, Cube.lpCubeModulus_le_lpIsoModulus}
+\leanok
+\uses{def:iso-modulus, lem:cube-modulus}
+Let $1 \leq p < \infty$. The isotropic modulus increases in $t$, is subadditive in $f$, satisfies
+$\omega^{\mathrm{iso}}_r(f, t)_p \leq 2^r \|f\|_p$ and depends only on the class of $f$ in
+$L_p(Q)$. The moduli in the coordinates satisfy
+$\omega_r^{(i)}(f, t)_p \leq \omega^{\mathrm{iso}}_r(f, t)_p$, so
+$\omega_r(f, t)_p \leq d \, \omega^{\mathrm{iso}}_r(f, t)_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $x \in Q_{rh}$ and $0 \leq n \leq r$ the point $x + nh$ lies in $Q$, since each coordinate
+$x_i + n h_i$ lies between $x_i$ and $x_i + r h_i$. Translations that stay in $Q$ preserve
+$L_p$ norms and null sets. For the coordinate moduli take $h = s e_i$ with $0 \leq s \leq t$; on
+$Q$ the region $Q_{r s e_i}$ is $\{x_i \leq 1 - rs\}$.
+\end{proof}
+
+\begin{theorem}[Isotropic differences from the coordinates]
+\label{thm:iso-diff-bound}
+\lean{Cube.lintegral_inter_eq_slice, Cube.eLpNorm_cubeDiff_inter_le, Cube.listRegion,
+  Cube.listRegion_nil, Cube.listRegion_cons, Cube.measurableSet_listRegion,
+  Cube.update_mem_listRegion_iff, Cube.eLpNorm_mixedDiff_le, Cube.eLpNorm_shift_mixedDiff_le,
+  Cube.eLpNorm_isoDiff_le_sum, Cube.prod_rpow_eq_rpow_sum, Cube.eLpNorm_isoDiff_le_of_exponents}
+\leanok
+\uses{lem:iso-expansion, lem:iso-modulus, lem:cube-slices, lem:step-regions}
+Let $1 \leq p < \infty$, $r, j \in \N$, and let $V$ be a subspace of functions of one variable with
+\[
+  \|\Delta_t^m u\|_{L_p(J(m,t))} \leq C (2^j |t|)^{\theta_m} \|u\|_p
+  \qquad (u \in V, \ m \leq r, \ |t| \leq 2^{-j})
+\]
+for exponents $\theta_m \geq 0$, with $J(m, t)$ as in \Cref{lem:step-regions}. Let
+$\Theta \leq \sum_i \theta_{m_i}$ for all $m \in \N^d$ with $\sum_i m_i = r$. Then for every
+measurable $f$ whose slices all lie in $V$ and every $h$ with $\|h\|_\infty \leq 2^{-j}$,
+\[
+  \|\Delta_h^r f\|_{L_p(Q_{rh})} \leq d^r C^d (2^j \|h\|_\infty)^{\Theta} \|f\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:iso-expansion} it suffices to bound each of the $d^r$ terms. For $x \in Q_{rh}$
+the point $x + s_\alpha$ lies in $Q$ and in the box $\{y : y_i + m_i h_i \in [0, 1] \ \forall i\}$,
+since $\#\{l : i < \alpha_l\} + m_i \leq r$; by translation invariance the term is bounded by the
+norm of $M_m f$ on the box. Apply the coordinate differences one at a time: the box constraint in
+the other coordinates does not depend on the coordinate of the step, so Tonelli's theorem in that
+coordinate (\Cref{lem:cube-slices}) and the bound on the slices, which stay in $V$, give the factor
+$C (2^j |h_i|)^{\theta_{m_i}}$. The product is at most
+$C^d (2^j \|h\|_\infty)^{\sum_i \theta_{m_i}} \leq C^d (2^j \|h\|_\infty)^\Theta$, since
+$2^j \|h\|_\infty \leq 1$.
+\end{proof}
+
+\begin{lemma}[The gains of piecewise polynomials and splines]
+\label{lem:iso-exponents}
+\lean{Cube.ppSubmodule, Cube.splineSubmodule, Cube.IsCubePP.slice_mem_ppSubmodule,
+  Cube.IsCubeSpline.slice_mem_splineSubmodule, Cube.ppExponent, Cube.splineExponent,
+  Cube.ppExponent_nonneg, Cube.splineExponent_nonneg, Cube.le_sum_ppExponent,
+  Cube.le_sum_splineExponent, Cube.exists_eLpNorm_iterDiff_stepRegion_pp_le,
+  Cube.exists_eLpNorm_iterDiff_stepRegion_spline_le}
+\leanok
+\uses{thm:pp-lower-diff, thm:spline-lower-diff, thm:spline-inverse, lem:step-regions,
+  def:cube-pp, def:cube-spline}
+Let $1 \leq p < \infty$ and $r \geq 1$.
+\begin{enumerate}
+  \item The piecewise polynomials of level $j$ and degree $< r$ on $[0, 1)$ satisfy the hypothesis
+    of \Cref{thm:iso-diff-bound} with $\theta_0 = 0$ and $\theta_m = 1/p$ for $m \geq 1$, and
+    $\Theta = 1/p$ is admissible.
+  \item The splines of order $r$ and level $j$ satisfy it with $\theta_m = m$ for $m < r$ and
+    $\theta_r = r - 1 + 1/p$, and $\Theta = r - 1 + 1/p$ is admissible.
+\end{enumerate}
+The slices of piecewise polynomials (splines) on the cube are piecewise polynomials (splines).
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bounds are \Cref{thm:pp-lower-diff}, \Cref{thm:spline-lower-diff} and \Cref{thm:spline-inverse}
+for steps $t \geq 0$, and \Cref{lem:step-regions} for $t < 0$. If $\sum_i m_i = r \geq 1$, some
+$m_i \geq 1$, which gives (1). For (2), either some $m_i = r$, or all $m_i < r$ and
+$\sum_i \theta_{m_i} = \sum_i m_i = r \geq r - 1 + 1/p$.
+\end{proof}
+
+\begin{theorem}[The inverse inequalities with the isotropic modulus]
+\label{thm:iso-inverse}
+\lean{Cube.exists_inverse_cubePPScheme_iso, Cube.exists_inverse_cubeSplineScheme_iso}
+\leanok
+\uses{thm:iso-diff-bound, lem:iso-exponents, lem:iso-modulus}
+Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_B$ with
+\[
+  \omega^{\mathrm{iso}}_r(a, 2^{-k})_p \leq C_B \, 2^{-\max(k - j, 0)\theta} \|a\|_p
+\]
+for all $j, k \in \N$ and every piecewise polynomial $a$ of level $j$ and degree $< r$ on the cube,
+with $\theta = 1/p$, and likewise for every spline $a$ of order $r$ and level $j$ on the cube, with
+$\theta = r - 1 + 1/p$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $k \geq j$ and $\|h\|_\infty \leq 2^{-k}$, \Cref{thm:iso-diff-bound} and
+\Cref{lem:iso-exponents} give $\|\Delta_h^r a\|_{L_p(Q_{rh})} \leq d^r C^d (2^j \|h\|_\infty)^\theta
+\|a\|_p$ and $2^j \|h\|_\infty \leq 2^{-(k-j)}$. For $k < j$ use
+$\omega^{\mathrm{iso}}_r(a, t)_p \leq 2^r \|a\|_p$.
+\end{proof}
+
+\begin{theorem}[Approximation spaces on the cube and the isotropic modulus]
+\label{thm:iso-besov}
+\lean{Cube.cubePPIsoModulusData, Cube.memApprox_cubePPScheme_iff_iso,
+  Cube.cubeSplineIsoModulusData, Cube.memApprox_cubeSplineScheme_iff_iso,
+  Cube.lqNorm_cubeModulus_lt_top_iff_iso}
+\leanok
+\uses{thm:iso-inverse, lem:iso-modulus, thm:cube-jackson, thm:cube-spline-jackson,
+  thm:cube-besov, thm:cube-spline-besov, def:modulus-data, thm:modulus-coincidence}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $r \geq 1$.
+\begin{enumerate}
+  \item For $0 \leq s < 1/p$, $f \in L_p(Q)$ lies in the approximation space $A^s_q$ of the
+    piecewise polynomials of degree $< r$ in each variable if and only if
+    $\|f\|_p + \| ( 2^{ks} \omega^{\mathrm{iso}}_r(f, 2^{-k})_p )_k \|_{\ell_q} < \infty$.
+  \item For $0 \leq s < r - 1 + 1/p$, $f$ lies in the approximation space $A^s_q$ of the tensor
+    splines of order $r$ if and only if the same condition holds.
+  \item For $0 \leq s < r - 1 + 1/p$,
+    $\|f\|_p + \| ( 2^{ks} \omega_r(f, 2^{-k})_p )_k \|_{\ell_q} < \infty$ with the coordinate
+    moduli if and only if the same holds with the isotropic modulus.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+Jackson's inequalities \Cref{thm:cube-jackson} and \Cref{thm:cube-spline-jackson} hold with the
+isotropic modulus by \Cref{lem:iso-modulus}, at the cost of a factor $d$. With
+\Cref{thm:iso-inverse} the isotropic modulus is compatible with both schemes; apply
+\Cref{thm:modulus-coincidence}. Part (3) combines (2) with \Cref{thm:cube-spline-besov}.
+\end{proof}
+
+For $0 < s < r - 1 + 1/p$ the Besov spaces $\Besov{s}{p}{q}(Q)$ defined by the moduli in the
+coordinates and by the isotropic modulus therefore coincide.
 
 \bpbibheading
 \begin{thebibliography}{99}

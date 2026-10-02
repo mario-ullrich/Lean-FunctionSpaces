@@ -20,8 +20,10 @@ smoothness in coordinate `i`** on the cube `Q = [0, 1]^d` is
 (`Cube.coordModulus`), and the **modulus on the cube** is their sum
 `ω_r(f, t)_p = ∑_i ω_r^{(i)}(f, t)_p` (`Cube.cubeModulus`).
 
-**Design.** These are the coordinatewise moduli of Nikol'skii's definition of Besov spaces; they
-are equivalent to the isotropic modulus `sup_{|h| ≤ t} ‖Δ_h^r f‖_p`, which is not formalised here.
+**Design.** These are the coordinatewise moduli of Nikol'skii's definition of Besov spaces. The
+isotropic modulus `sup_{|h| ≤ t} ‖Δ_h^r f‖_p` is in `FunctionSpaces.Cube.IsoModulus`, and for
+`0 < s < r - 1 + 1/p` both give the same Besov spaces on the cube
+(`Cube.lqNorm_cubeModulus_lt_top_iff_iso`).
 The supremum over `h` stays outside the integral over the other coordinates. Through the slices
 (`Cube.eLpNorm_rpow_cubeDiff_eq_slice`), every bound of `Δ_h^r` in one variable for a fixed step
 `h` carries over to the cube.

@@ -187,6 +187,18 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   (`Cube.memApprox_cubeSplineScheme_iff`), with Jackson's inequality at every level through the
   tensor quasi-interpolant (`Cube.exists_approxSeq_cubeSplineScheme_le`) and the inverse
   inequality of order `r - 1 + 1/p` (`Cube.exists_inverse_cubeSplineScheme`).
+* **The isotropic modulus on the cube.** Let
+  `ω_r^iso(f, t)_p = sup_{‖h‖_∞ ≤ t} ‖Δ_h^r f‖_{L_p({x ∈ Q : x + rh ∈ Q})}` with
+  `Δ_h^r f(x) = ∑_k (-1)^(r-k) C(r,k) f(x + kh)` for steps `h ∈ ℝ^d` of every direction. For
+  `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `r ≥ 1`, `f ∈ A^s_q` of the piecewise polynomials iff
+  `‖f‖_p + ‖(2^(ks) ω_r^iso(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` for `0 ≤ s < 1/p`
+  (`Cube.memApprox_cubePPScheme_iff_iso`), and likewise for the tensor splines of order `r` and
+  `0 ≤ s < r - 1 + 1/p` (`Cube.memApprox_cubeSplineScheme_iff_iso`). Hence the Besov conditions
+  with the coordinate moduli and with the isotropic modulus agree for `0 ≤ s < r - 1 + 1/p`
+  (`Cube.lqNorm_cubeModulus_lt_top_iff_iso`). The proof expands `Δ_h^r` into `d^r` mixed
+  coordinate differences in the translation algebra `ℂ[ℝ^d]` (`Cube.isoDiff_eq_sum`) and bounds
+  them by differences of every order in one variable
+  (`Interval.exists_eLpNorm_iterDiff_ppFun_le`, `Interval.exists_eLpNorm_iterDiff_spline_le_of_lt`).
 * **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
@@ -326,6 +338,10 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Kernel operators of finite rank on slices, their forms, tensor products, telescoping over the coordinates | ✅ proved | ✗ | `FunctionSpaces/Cube/Kernel.lean` |
 | Piecewise polynomials on the cube: tensor projection, tensor-product description, Whitney, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{PiecewisePoly,PiecewiseJackson,PiecewiseInverse}.lean` |
 | Tensor splines on the cube: quasi-interpolant as a kernel operator, tensor-product description, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < r - 1 + 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{Splines,SplineJackson,SplineInverse}.lean` |
+| Differences of every order: difference bound for polynomials, piecewise polynomials (gain `1/p`), splines (gain `m` below order `r`), steps of either sign | ✅ proved | ✗ | `FunctionSpaces/Interval/{PolyDifferences,LowerDifferences}.lean` |
+| Isotropic differences: translation algebra, expansion into mixed coordinate differences | ✅ proved | ✗ | `FunctionSpaces/Cube/Translation.lean` |
+| Isotropic modulus on the cube, comparison with the moduli in the coordinates | ✅ proved | ✗ | `FunctionSpaces/Cube/IsoModulus.lean` |
+| Isotropic inverse inequalities, `A^s_q` with the isotropic modulus, coordinate and isotropic Besov conditions agree for `0 < s < r - 1 + 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{IsoInverse,IsoCoincidence}.lean` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Synthesis,Atomic}.lean` |
 | Trace theorem: extension, transfer, surjectivity | ✅ proved | ✗ | `ApproximationSpaces/Trace.lean` |
