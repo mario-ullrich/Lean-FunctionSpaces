@@ -28,6 +28,7 @@ public import FunctionSpaces.Wavelets.Partition
 public import FunctionSpaces.Wavelets.Examples.Haar
 public import FunctionSpaces.Wavelets.Examples.HaarBesov
 public import FunctionSpaces.Wavelets.Examples.Multiscale
+public import FunctionSpaces.Wavelets.Examples.Alpert
 public import FunctionSpaces.Classical.Translation
 public import FunctionSpaces.Classical.Modulus
 public import FunctionSpaces.Classical.BesovModuli
@@ -109,6 +110,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Wavelets.Examples.Multiscale`: density of piecewise polynomials and the
   characterisation of their approximation spaces, and of `B^s_{p,q}[0, 1]` and `B^s_{p,q}(𝕋)` for
   `0 < s < 1/p`, by the details `P_{k+1} f - P_k f` of local polynomial projections.
+* `FunctionSpaces.Wavelets.Examples.Alpert`: multiwavelets of Alpert type, an orthonormal basis
+  of the detail space, and the characterisation of `A^s_q` of piecewise polynomials, and of
+  `B^s_{p,q}` for `0 < s < 1/p`, by multiwavelet coefficients.
 * `FunctionSpaces.Classical.Translation`: translations on `L_2(𝕋^d)` and their Fourier
   multipliers.
 * `FunctionSpaces.Classical.Modulus`: the modulus of smoothness `ω(f, t)_2` and Jackson's

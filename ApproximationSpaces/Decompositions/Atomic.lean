@@ -53,6 +53,64 @@ namespace ENNReal
 noncomputable def finLqNorm {ι : Type*} [Fintype ι] (p : ℝ≥0∞) (a : ι → ℝ≥0∞) : ℝ≥0∞ :=
   if p = ∞ then ⨆ i, a i else (∑ i, a i ^ p.toReal) ^ (1 / p.toReal)
 
+/-- Every entry of a finite family is at most its `ℓ_p` norm, `p ≠ 0`. -/
+theorem le_finLqNorm {ι : Type*} [Fintype ι] {p : ℝ≥0∞} (hp0 : p ≠ 0) (a : ι → ℝ≥0∞) (i : ι) :
+    a i ≤ finLqNorm p a := by
+  unfold finLqNorm
+  split_ifs with hp
+  · exact le_iSup a i
+  · have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+    calc a i = (a i ^ p.toReal) ^ (1 / p.toReal) := by
+          rw [← ENNReal.rpow_mul, mul_one_div_cancel hq.ne', ENNReal.rpow_one]
+      _ ≤ (∑ j, a j ^ p.toReal) ^ (1 / p.toReal) := by
+          gcongr
+          exact Finset.single_le_sum (f := fun j => a j ^ p.toReal) (fun _ _ => zero_le)
+            (Finset.mem_univ i)
+
+/-- The `ℓ_p` norm of a finite family bounded by `B` is at most `(#ι)^(1/p) B`, `p ≠ 0`. -/
+theorem finLqNorm_le_of_le {ι : Type*} [Fintype ι] {p : ℝ≥0∞} (hp0 : p ≠ 0) {a : ι → ℝ≥0∞}
+    {B : ℝ≥0∞} (h : ∀ i, a i ≤ B) :
+    finLqNorm p a ≤ (Fintype.card ι : ℝ≥0∞) ^ (1 / p.toReal) * B := by
+  unfold finLqNorm
+  split_ifs with hp
+  · have h1 : (Fintype.card ι : ℝ≥0∞) ^ (1 / p.toReal) = 1 := by
+      subst hp
+      simp
+    rw [h1, one_mul]
+    exact iSup_le h
+  · have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+    calc (∑ j, a j ^ p.toReal) ^ (1 / p.toReal)
+        ≤ (∑ _j : ι, B ^ p.toReal) ^ (1 / p.toReal) := by
+          gcongr with j
+          exact h j
+      _ = ((Fintype.card ι : ℝ≥0∞) * B ^ p.toReal) ^ (1 / p.toReal) := by
+          rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+      _ = (Fintype.card ι : ℝ≥0∞) ^ (1 / p.toReal) * B := by
+          rw [ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_mul,
+            mul_one_div_cancel hq.ne', ENNReal.rpow_one]
+
+/-- The `ℓ_p` norm of a finite family is homogeneous, `p ≠ 0`. -/
+theorem finLqNorm_const_mul {ι : Type*} [Fintype ι] {p : ℝ≥0∞} (hp0 : p ≠ 0) (c : ℝ≥0∞)
+    (a : ι → ℝ≥0∞) : finLqNorm p (fun i => c * a i) = c * finLqNorm p a := by
+  unfold finLqNorm
+  split_ifs with hp
+  · rw [ENNReal.mul_iSup]
+  · have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+    simp only [ENNReal.mul_rpow_of_nonneg _ _ hq.le, ← Finset.mul_sum]
+    rw [ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_mul,
+      mul_one_div_cancel hq.ne', ENNReal.rpow_one]
+
+/-- **The `ℓ_p` norm on a product**: `‖a‖_{ℓ_p(M × N)}^p = ∑_m ‖a_{m,·}‖_{ℓ_p(N)}^p` for
+`0 < p < ∞`. -/
+theorem finLqNorm_prod_rpow {M N : Type*} [Fintype M] [Fintype N] {p : ℝ≥0∞} (hp0 : p ≠ 0)
+    (hp : p ≠ ∞) (a : M × N → ℝ≥0∞) :
+    finLqNorm p a ^ p.toReal = ∑ m, finLqNorm p (fun n => a (m, n)) ^ p.toReal := by
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  simp only [finLqNorm, hp, ↓reduceIte]
+  rw [← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one, Fintype.sum_prod_type]
+  refine Finset.sum_congr rfl fun m _ => ?_
+  rw [← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one]
+
 end ENNReal
 
 namespace ApproximationScheme

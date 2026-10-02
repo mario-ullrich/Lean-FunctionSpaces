@@ -112,6 +112,21 @@ theorem lqNorm_const_mul (c : ℝ≥0∞) (a : ℕ → ℝ≥0∞) :
   rw [ENNReal.tsum_mul_left, ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_mul,
     mul_one_div_cancel hp.ne', ENNReal.rpow_one]
 
+/-- **Comparable sequences have finite `ℓ_q` norms together**: if `a ≤ M b` and `b ≤ K a` with
+finite `K, M`, then `‖a‖_q < ∞ ↔ ‖b‖_q < ∞`. -/
+theorem lqNorm_lt_top_iff_of_le_mul {a b : ℕ → ℝ≥0∞} {K M : ℝ≥0∞} (hK : K ≠ ∞) (hM : M ≠ ∞)
+    (hab : ∀ n, a n ≤ M * b n) (hba : ∀ n, b n ≤ K * a n) :
+    lqNorm q a < ∞ ↔ lqNorm q b < ∞ := by
+  constructor
+  · intro h
+    calc lqNorm q b ≤ lqNorm q (fun n => K * a n) := lqNorm_mono hba
+      _ = K * lqNorm q a := lqNorm_const_mul K a
+      _ < ∞ := ENNReal.mul_lt_top hK.lt_top h
+  · intro h
+    calc lqNorm q a ≤ lqNorm q (fun n => M * b n) := lqNorm_mono hab
+      _ = M * lqNorm q b := lqNorm_const_mul M b
+      _ < ∞ := ENNReal.mul_lt_top hM.lt_top h
+
 /-- **Monotonicity in the exponent**: for `1 ≤ q ≤ r`, `‖a‖_r ≤ ‖a‖_q`.  Proof: with
 `M = ‖a‖_q`, each term satisfies `a n ^ r ≤ M ^ (r - q) a n ^ q`; sum over `n`. -/
 theorem lqNorm_le_lqNorm_of_le (hq : 1 ≤ q) (hqr : q ≤ r) (a : ℕ → ℝ≥0∞) :

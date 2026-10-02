@@ -1321,11 +1321,11 @@ The first bound is Jackson's inequality for $k \geq k_0$ and $E_{2^k}(f) \leq \|
 $k < k_0$. For the second,
 let $a_k \in A_{2^k}$ be near-best approximants and write
 $f = (f - a_k) + a_0 + \sum_{j < k} (a_{j+1} - a_j)$, where $a_{j+1} - a_j \in A_{2^{j+2}}$. Then
-\[
-  2^{ks} \omega(f, k) \leq C_0 \, 2^{ks} \|f - a_k\| + C_B \, 2^{-k(\theta - s)} \|a_0\|
+\begin{multline*}
+  2^{ks} \omega(f, k) \leq C_0 \, 2^{ks} \|f - a_k\| + C_B \, 2^{-k(\theta - s)} \|a_0\| \\
   + 2 C_B 4^{\theta} \, 2^{-k(\theta - s)} \sum_{j \leq k} 2^{j(\theta - s)} \,
   2^{js} (E_{2^j}(f) + t_j),
-\]
+\end{multline*}
 and the last sum is bounded in $\ell_q$ by Hardy's inequality (\Cref{lem:hardy}) with exponent
 $\theta - s > 0$.
 \end{proof}
@@ -2924,7 +2924,10 @@ Let $f$ be continuous, $r \in \N$, $\delta > 0$ and
 $S_\delta f = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} M_{k\delta}^r f$. Then $S_\delta f \in C^r$, and for
 $1 \leq p < \infty$ and $[u, w]$ with $a \leq u$ and $w + r^2 \delta \leq b$,
 \[
-  \|f - S_\delta f\|_{L_p[u, w]} \leq \omega_r(f, r\delta, [a, b])_p, \qquad
+  \|f - S_\delta f\|_{L_p[u, w]} \leq \omega_r(f, r\delta, [a, b])_p
+\]
+and
+\[
   \|(S_\delta f)^{(r)}\|_{L_p[u, w]} \leq 2^r \delta^{-r} \omega_r(f, r\delta, [a, b])_p .
 \]
 \end{theorem}
@@ -3197,8 +3200,10 @@ near $1$ with values near $0$.
 Let $1 \leq p < \infty$, $r \in \N$ and $t \geq 0$. The periodic modulus depends only on the class
 of $f$ in $L_p[0,1]$, is subadditive in $f$, and for measurable $f$ and every $n \in \N$
 \[
-  \omega_r(f, t, [0,1])_p \leq \omega_r^{\mathrm{per}}(f, t)_p \leq 2^r \|f\|_{L_p[0,1]} ,
-  \qquad
+  \omega_r(f, t, [0,1])_p \leq \omega_r^{\mathrm{per}}(f, t)_p \leq 2^r \|f\|_{L_p[0,1]}
+\]
+and
+\[
   \omega_r(\tilde f, t, [0, n])_p \leq n^{1/p} \, \omega_r^{\mathrm{per}}(f, t)_p .
 \]
 \end{lemma}
@@ -3255,12 +3260,12 @@ $\omega_r^{\mathrm{per}}(a, 2^{-k})_p \leq C_B 2^{-\max(k-j, 0)/p} \|a\|_p$. App
 \uses{thm:pp-besov, thm:pp-besov-per}
 Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $r \geq 1$ and $0 \leq s < 1/p$. For every
 $f \in L_p[0,1]$,
-\[
-  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_r(f, 2^{-k}, [0,1])_p \bigr)_k \bigr\|_{\ell_q} < \infty
+\begin{multline*}
+  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_r(f, 2^{-k}, [0,1])_p \bigr)_k \bigr\|_{\ell_q} < \infty \\
   \iff
   \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_r^{\mathrm{per}}(f, 2^{-k})_p \bigr)_k \bigr\|_{\ell_q}
   < \infty .
-\]
+\end{multline*}
 \end{corollary}
 
 \begin{proof}
@@ -3352,15 +3357,18 @@ It is linear in $g$ and depends only on the class of $g$ in $L_1(I_{j,m})$.
 \label{lem:loc-proj}
 \lean{Interval.integral_dyadicIco_eq, Interval.polyFun_locProj_of_eqOn,
   Interval.ofReal_two_pow_mul_inv_rpow, Interval.volume_dyadicIco, Interval.enorm_locCoeff_le,
-  Interval.enorm_polyFun_locProj_le, Interval.eLpNorm_locProj_le}
+  Interval.enorm_polyFun_locProj_le, Interval.eLpNorm_locProj_le,
+  Interval.integral_locProj_mul_monoBasis, Interval.integral_sub_locProj_mul}
 \leanok
 \uses{def:loc-proj}
 Let $1 \leq p < \infty$ and let $M$ bound all $|b_i|$ and $|d_i|$ on $[0, 1]$. If $g$ agrees on
 $I_{j,m}$ with a polynomial $Q$ of degree $< r$, then $\Pi_{j,m} g = Q$. For every
 $g \in L_p(I_{j,m})$,
 \[
-  \|\Pi_{j,m} g\|_{L_p(I_{j,m})} \leq r M^2 \|g\|_{L_p(I_{j,m})} .
+  \|\Pi_{j,m} g\|_{L_p(I_{j,m})} \leq r M^2 \|g\|_{L_p(I_{j,m})} ,
 \]
+and $\int_{I_{j,m}} (g - \Pi_{j,m} g) Q = 0$ for every polynomial $Q$ of degree $< r$: the local
+projection is the $L_2(I_{j,m})$-orthogonal projection.
 \end{lemma}
 
 \begin{proof}
@@ -3370,7 +3378,9 @@ $\tilde Q(t) = Q((m + t) 2^{-j})$, so $\Pi_{j,m} Q(x) = \tilde Q(2^j x - m) = Q(
 \Cref{lem:poly-dual-basis}. Hölder's inequality on an interval of length $2^{-j}$ gives
 $|c_i| \leq M 2^{j/p} \|g\|_{L_p(I_{j,m})}$, hence
 $|\Pi_{j,m} g| \leq r M^2 2^{j/p} \|g\|_{L_p(I_{j,m})}$ on $I_{j,m}$, and the $L_p$ norm of a
-function bounded by $B$ on $I_{j,m}$ is at most $2^{-j/p} B$.
+function bounded by $B$ on $I_{j,m}$ is at most $2^{-j/p} B$. For the orthogonality, $\Pi_{j,m} g$
+and $g$ have the same moments against $b_l(2^j x - m)$, since
+$\langle d_i, b_l \rangle = \delta_{il}$, and $Q$ is a combination of the $b_l(2^j x - m)$.
 \end{proof}
 
 \begin{theorem}[Projections onto piecewise polynomials]
@@ -3423,6 +3433,138 @@ characterisation applies. The last statement combines this with \Cref{thm:pp-bes
 
 The details $P_{k+1} f - P_k f$ are what multiwavelets of degree $< r$ expand at level $k$, and
 the local projections $P_j$ are those of discontinuous Galerkin methods.
+
+\section{Multiwavelets}
+
+\begin{definition}[Detail space and multiwavelets]
+\label{def:multiwavelets}
+\lean{Alpert.pieceOf, Alpert.pieceOf_mem, Alpert.pieceOf_add, Alpert.pieceOf_smul,
+  Alpert.pieceOf_degreeLTEquiv, Alpert.twoPieces, Alpert.twoPieces_mem, Alpert.twoPieces_add,
+  Alpert.twoPieces_smul, Alpert.levelOne, Alpert.coeFn_levelOne, Alpert.eq_zero_of_ae_dyadicIco,
+  Alpert.levelOne_injective, Alpert.polyL2, Alpert.range_polyL2_le, Alpert.finrank_range_polyL2,
+  Alpert.finrank_range_levelOne, Alpert.detail, Alpert.finiteDimensional_detail,
+  Alpert.finrank_detail, Alpert.detailBasis, Alpert.detailBasis_mem_range, Alpert.psiPieces,
+  Alpert.levelOne_psiPieces, Alpert.psi, Alpert.coeFn_detailBasis, Alpert.inner_eq_integral}
+\leanok
+\uses{def:pp-scheme, lem:poly-dual-basis}
+Let $r \geq 1$. The \emph{detail space} $W \subseteq L_2[0,1]$ consists of the piecewise
+polynomials of degree $< r$ on $[0, \tfrac12)$ and $[\tfrac12, 1)$ that are $L_2$-orthogonal to the
+polynomials of degree $< r$. It has dimension $2r - r = r$. The \emph{multiwavelets}
+$\psi_1, \dots, \psi_r$ are an orthonormal basis of $W$, and
+$\psi_{k,m,i}(x) = 2^{k/2} \psi_i(2^k x - m)$ for $k \in \N$, $m < 2^k$.
+\end{definition}
+
+B.~Alpert chose such a basis explicitly through Legendre polynomials; any orthonormal basis of
+$W$ serves. For $r = 1$, $\psi_1$ is the Haar function.
+
+\begin{lemma}[Properties of the multiwavelets]
+\label{lem:multiwavelets}
+\lean{Alpert.integral_conj_psi_mul_psi, Alpert.integral_conj_polyFun_mul_psi,
+  Alpert.integral_polyFun_mul_psi, Alpert.ppFun_ae_eq_sum_psi, Alpert.conj_ppFun,
+  Alpert.integrable_conj_psi_mul, Alpert.integral_conj_psi_mul_sum, Alpert.memLp_sum_psi,
+  Alpert.sumPsi, Alpert.coeFn_sumPsi, Alpert.sumPsi_injective, Alpert.exists_stable,
+  ENNReal.le_finLqNorm, ENNReal.finLqNorm_le_of_le, ENNReal.finLqNorm_const_mul,
+  ENNReal.finLqNorm_prod_rpow}
+\leanok
+\uses{def:multiwavelets}
+The multiwavelets are orthonormal in $L_2[0,1]$, have $r$ vanishing moments,
+$\int_0^1 \psi_i(x) x^l \, dx = 0$ for $l < r$, and every $u \in W$ is
+$u = \sum_i \langle u, \psi_i \rangle \psi_i$. For $1 \leq p \leq \infty$ there are $K, M$ with
+\[
+  \|\beta\|_{\ell_p} \leq K \Bigl\| \sum_i \beta_i \psi_i \Bigr\|_{L_p[0,1]} \leq K M \|\beta\|_{\ell_p}
+\]
+for all $\beta \in \C^r$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first three statements hold in $W$. The map $\beta \mapsto \sum_i \beta_i \psi_i$ into
+$L_p[0,1]$ is injective, since $\beta_j = \int_0^1 \overline{\psi_j} \sum_i \beta_i \psi_i$, and
+it is defined on a space of dimension $r$, so its inverse is bounded; the upper bound is the
+triangle inequality.
+\end{proof}
+
+\begin{lemma}[Details in the multiwavelets]
+\label{lem:multiwavelet-details}
+\lean{Alpert.integrableOn_mul_polyFun, Alpert.dyadicIco_eq_union,
+  Alpert.disjoint_dyadicIco_halves, Alpert.integral_sub_ppFun_succ_mul, Alpert.detailFun,
+  Alpert.integral_detailFun_mul, Alpert.exists_conj_psi_eq_polyFun,
+  Alpert.integral_ppFun_mul_conj_psi, Alpert.integral_detailFun_mul_conj_psi, Alpert.coeff,
+  Alpert.detailPieces, Alpert.ppFun_detailPieces, Alpert.levelOne_detailPieces_mem,
+  Alpert.integral_conj_psi_mul_detailPieces, Alpert.ppFun_detailPieces_ae_eq}
+\leanok
+\uses{lem:multiwavelets, lem:loc-proj, thm:pp-proj}
+Let $g \in L_1[0,1]$, $k \in \N$ and $m < 2^k$. On $I_{k,m}$,
+\[
+  P_{k+1} g - P_k g = \sum_{i \leq r} \langle g, \psi_{k,m,i} \rangle \, \psi_{k,m,i}
+  \qquad \text{almost everywhere,}
+\]
+with $\langle g, \psi_{k,m,i} \rangle = 2^{k/2} \int_{I_{k,m}} g(x) \,
+\overline{\psi_i(2^k x - m)} \, dx$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $I_{k,m}$ the detail $\Delta_k g = P_{k+1} g - P_k g$ is a polynomial of degree $< r$ on each
+half, and it is orthogonal to the polynomials of degree $< r$: on each half
+$P_{k+1} g - g$ is, and on $I_{k,m}$ so is $g - P_k g$ (\Cref{lem:loc-proj}). Moved to $[0, 1]$
+it therefore lies in $W$ and expands in the $\psi_i$. Its coefficients are those of $g$: the
+moved multiwavelet is a polynomial on each half, so $\int_{I_{k,m}} (P_{k+1} g - g)
+\overline{\psi_i(2^k \cdot - m)} = 0$, and $\int_{I_{k,m}} P_k g \, \overline{\psi_i(2^k \cdot - m)} =
+0$ by the vanishing moments.
+\end{proof}
+
+\begin{lemma}[Norms of the details]
+\label{lem:multiwavelet-norms}
+\lean{Alpert.lintegral_unit_eq_sum_dyadicIco, Alpert.enorm_two_rpow_half,
+  Alpert.ofReal_two_pow_eq, Alpert.eLpNorm_detailFun_dyadicIco,
+  Alpert.exists_eLpNorm_detailFun_equiv, Alpert.enorm_ppProj_sub}
+\leanok
+\uses{lem:multiwavelet-details, lem:multiwavelets}
+Let $1 \leq p < \infty$. There are $K, M$ with
+\[
+  2^{k(1/2 - 1/p)} \bigl\| (\langle g, \psi_{k,m,i} \rangle)_{m,i} \bigr\|_{\ell_p}
+  \leq K \|P_{k+1} g - P_k g\|_p
+\]
+and
+\[
+  \|P_{k+1} g - P_k g\|_p
+  \leq M \, 2^{k(1/2 - 1/p)} \bigl\| (\langle g, \psi_{k,m,i} \rangle)_{m,i} \bigr\|_{\ell_p}
+\]
+for every $g \in L_p[0,1]$ and every $k \in \N$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:multiwavelet-details} and a change of variables,
+$2^{k/p} \|P_{k+1} g - P_k g\|_{L_p(I_{k,m})} = \|\sum_i 2^{k/2} \langle g, \psi_{k,m,i} \rangle
+\psi_i\|_{L_p[0,1]}$. Apply \Cref{lem:multiwavelets} on each interval and sum the $p$-th powers
+over $m < 2^k$.
+\end{proof}
+
+\begin{theorem}[Multiwavelet characterisation]
+\label{thm:multiwavelet-besov}
+\lean{ENNReal.lqNorm_lt_top_iff_of_le_mul, Alpert.memApprox_ppScheme_iff_coeff,
+  Alpert.lqNorm_modulus_lt_top_iff_coeff, Alpert.lqNorm_perModulus_lt_top_iff_coeff}
+\leanok
+\uses{thm:pp-multiscale, lem:multiwavelet-norms, thm:pp-besov, thm:pp-besov-per}
+Let $1 \leq p < \infty$, $r \geq 1$, $s > 0$ and $1 \leq q \leq \infty$. A function
+$f \in L_p[0,1]$ lies in the approximation space $A^s_q$ of the scheme of dyadic piecewise
+polynomials of degree $< r$ if and only if
+\[
+  \|P_0 f\|_p + \Bigl\| \Bigl( 2^{k(s + 1/2 - 1/p)} \bigl\| (\langle f, \psi_{k,m,i} \rangle)_{m < 2^k,
+  i \leq r} \bigr\|_{\ell_p} \Bigr)_k \Bigr\|_{\ell_q} < \infty .
+\]
+For $0 < s < 1/p$ this condition is equivalent to $f \in \Besov{s}{p}{q}[0,1]$ and to
+$f \in \Besov{s}{p}{q}(\T)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:multiwavelet-norms} the sequences $(2^{ks} \|P_{k+1} f - P_k f\|_p)_k$ and
+$(2^{k(s + 1/2 - 1/p)} \|(\langle f, \psi_{k,m,i} \rangle)_{m,i}\|_{\ell_p})_k$ are comparable, so
+their $\ell_q$ norms are finite together; apply \Cref{thm:pp-multiscale}.
+\end{proof}
 
 \section{Cardinal B-splines}
 

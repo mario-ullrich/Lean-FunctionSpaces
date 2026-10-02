@@ -370,6 +370,71 @@ theorem locProj_congr {r j m : ℕ} {g₁ g₂ : ℝ → ℂ}
     (h : g₁ =ᵐ[volume.restrict (dyadicIco j m)] g₂) : locProj r j g₁ m = locProj r j g₂ m := by
   simp only [locProj, locCoeff_congr h]
 
+/-! ### Orthogonality of the local projection -/
+
+/-- **The moments of the local projection**: `Π g` and `g` have the same moments
+`∫_{I_{j,m}} · b_l(2^j x - m)` against the monomials `b_l` in the coordinate of the interval,
+since `⟨d_i, b_l⟩ = δ_{il}`. -/
+theorem integral_locProj_mul_monoBasis (r j m : ℕ) (g : ℝ → ℂ) (l : Fin r) :
+    ∫ x in dyadicIco j m, polyFun (locProj r j g m) x *
+        polyFun (monoBasis r l) (-(m : ℝ) + 2 ^ j * x) =
+      ∫ x in dyadicIco j m, g x * polyFun (monoBasis r l) (-(m : ℝ) + 2 ^ j * x) := by
+  have h2 : (((2 : ℝ) ^ j : ℝ) : ℂ) ≠ 0 := by rw [Complex.ofReal_ne_zero]; positivity
+  refine mul_left_cancel₀ h2 ?_
+  rw [show (((2 : ℝ) ^ j : ℝ) : ℂ) * ∫ x in dyadicIco j m, g x *
+      polyFun (monoBasis r l) (-(m : ℝ) + 2 ^ j * x) = locCoeff r j g m l from rfl,
+    integral_dyadicIco_eq]
+  have ht : ∀ t : ℝ, -(m : ℝ) + 2 ^ j * (t / 2 ^ j + m / 2 ^ j) = t := fun t => by
+    field_simp
+    ring
+  simp only [polyFun_locProj, ht, Finset.sum_mul]
+  have hdual : ∀ i, ∫ t in Icc (0 : ℝ) 1, polyFun (dualPoly r i) t * polyFun (monoBasis r l) t =
+      if l = i then 1 else 0 := fun i =>
+    LinearMap.BilinForm.apply_dualBasis_left (polyPairing_nondegenerate r) (monoBasis r) i l
+  rw [integral_finsetSum _ fun i _ => by
+    simpa only [mul_assoc] using (integrableOn_polyFun_mul (dualPoly r i : ℂ[X])
+      (monoBasis r l : ℂ[X])).const_mul (locCoeff r j g m i)]
+  simp only [mul_assoc, integral_const_mul, hdual, mul_ite, mul_one, mul_zero,
+    Finset.sum_ite_eq, Finset.mem_univ, ↓reduceIte]
+
+/-- **The local projection is the `L_2(I_{j,m})`-orthogonal projection** onto the polynomials of
+degree `< r`: `∫_{I_{j,m}} (g - Π g) Q = 0` for every polynomial `Q` of degree `< r`, since `Q`
+is a combination of the monomials in the coordinate of the interval. -/
+theorem integral_sub_locProj_mul {r j m : ℕ} {g : ℝ → ℂ} (hg : IntegrableOn g (dyadicIco j m))
+    {Q : ℂ[X]} (hQ : Q ∈ degreeLT ℂ r) :
+    ∫ x in dyadicIco j m, (g x - polyFun (locProj r j g m) x) * polyFun Q x = 0 := by
+  set R : ℂ[X] := Q.comp (C ((((m : ℝ) / 2 ^ j : ℝ)) : ℂ) + C (((1 / 2 ^ j : ℝ)) : ℂ) * X)
+  have hR : R ∈ degreeLT ℂ r := comp_affine_mem_degreeLT hQ _ _
+  set a := (monoBasis r).repr ⟨R, hR⟩
+  have hQx : ∀ x : ℝ, polyFun Q x =
+      ∑ l, a l * polyFun (monoBasis r l) (-(m : ℝ) + 2 ^ j * x) := fun x => by
+    have hval : polyFun R (-(m : ℝ) + 2 ^ j * x) = polyFun Q x := by
+      rw [polyFun_comp_affine]
+      congr 1
+      field_simp
+      ring
+    rw [← hval]
+    conv_lhs => rw [show R = ((⟨R, hR⟩ : degreeLT ℂ r) : ℂ[X]) from rfl,
+      ← (monoBasis r).sum_repr ⟨R, hR⟩]
+    simp only [Submodule.coe_sum, Submodule.coe_smul, polyFun, eval_finsetSum, eval_smul,
+      smul_eq_mul, a]
+  have hPg : IntegrableOn (polyFun (locProj r j g m)) (dyadicIco j m) :=
+    integrableOn_dyadicIco_of_continuous (continuous_polyFun _) j m
+  have hint : ∀ l, IntegrableOn (fun x => (g x - polyFun (locProj r j g m) x) *
+      polyFun (monoBasis r l) (-(m : ℝ) + 2 ^ j * x)) (dyadicIco j m) := fun l => by
+    simp only [sub_mul]
+    exact (integrableOn_mul_monoBasis hg l).sub (integrableOn_mul_monoBasis hPg l)
+  simp only [hQx, Finset.mul_sum]
+  rw [integral_finsetSum _ fun l _ => by
+    simpa only [mul_left_comm _ (a l)] using (hint l).const_mul (a l)]
+  refine Finset.sum_eq_zero fun l _ => ?_
+  simp only [mul_left_comm _ (a l)]
+  rw [integral_const_mul, mul_eq_zero]
+  right
+  simp only [sub_mul]
+  rw [integral_sub (integrableOn_mul_monoBasis hg l) (integrableOn_mul_monoBasis hPg l),
+    integral_locProj_mul_monoBasis, sub_self]
+
 /-- Piecewise polynomials only depend on the pieces in `[0, 1)`. -/
 theorem ppFun_congr {k : ℕ} {Q Q' : ℕ → ℂ[X]} (h : ∀ n < 2 ^ k, polyFun (Q n) = polyFun (Q' n)) :
     ppFun k Q = ppFun k Q' := by
