@@ -129,13 +129,15 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Interval.Taylor`: approximation of `C^r` functions by polynomials in `L_p`.
 * `FunctionSpaces.Interval.Steklov`: Steklov averages and their derivatives.
 * `FunctionSpaces.Interval.Smoothing`: the Steklov smoothing `S_δ f`, Minkowski's inequality for
-  averages, and the bounds of `f - S_δ f` and `(S_δ f)^(r)` by the modulus.
+  averages, and the bounds of `f - S_δ f` and `(S_δ f)^(r)` by the modulus, on a left and a right
+  part of `[0, 1]`.
 * `FunctionSpaces.Interval.PiecewisePoly`: dyadic piecewise polynomials on `[0, 1]` and their
   scheme in `L_p[0, 1]`.
 * `FunctionSpaces.Interval.PiecewiseJackson`: Jackson's inequality for dyadic piecewise
-  polynomials.
-* `FunctionSpaces.Interval.PiecewiseInverse`: the inverse inequality of order `1/p` and the
-  identification of their approximation spaces with `B^s_{p,q}[0, 1]` for `0 < s < 1/p`.
+  polynomials, and the passage from continuous functions to `L_p` by density.
+* `FunctionSpaces.Interval.PiecewiseInverse`: local estimates for piecewise polynomials on
+  `[0, ∞)` and the strip integral, the inverse inequality of order `1/p`, and the identification
+  of their approximation spaces with `B^s_{p,q}[0, 1]` for `0 < s < 1/p`.
 * `FunctionSpaces.Interval.Periodic`: periodic extensions from `[0, 1)` and the periodic modulus
   of smoothness on the circle.
 * `FunctionSpaces.Interval.PiecewisePeriodic`: piecewise polynomials on the circle, their

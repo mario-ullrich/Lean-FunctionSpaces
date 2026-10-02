@@ -21,9 +21,10 @@ The approximant is the quasi-interpolant `Q_k f` of `FunctionSpaces.Interval.Qua
 the window `W_i = [(i + 1 - r) 2^(-k), (i + 1) 2^(-k)]` of `r` intervals, so
 `‖f - Q_k f‖_{L_p(I_{k,i})} ≤ C ‖f - T_i‖_{L_p(W_i)}`. For continuous `f`, `T_i` is a Taylor
 polynomial of the Steklov smoothing of `f`, forward on `[0, 3/4]` and backward on `[1/4, 1]`
-(`Interval.exists_left_smoothing`, `Interval.exists_right_smoothing`); every window lies in one of
-the two parts, and the windows overlap at most `r` times (`Interval.sum_lintegral_window_le`).
-General `f ∈ L_p` follow by density (`Interval.exists_approxSeq_splineScheme_le`).
+(`Interval.exists_left_smoothing`, `Interval.exists_right_smoothing` with `L = 2^(-k)`); every
+window lies in one of the two parts, and the windows overlap at most `r` times
+(`Interval.sum_lintegral_window_le`). General `f ∈ L_p` follow by density
+(`Interval.approxSeq_le_of_continuous`, `Interval.exists_approxSeq_splineScheme_le`).
 
 With the inverse inequality of order `r - 1 + 1/p` (`Interval.exists_inverse_splineScheme`) this
 is a modulus compatible with the spline scheme (`Interval.splineModulusData`), and for
@@ -40,96 +41,6 @@ open scoped ENNReal BoundedContinuousFunction
 open ENNReal (dyadicWeight)
 
 namespace Interval
-
-/-- **Smoothing on the left part**: for continuous `F`, `r ≥ 1` and `k ≥ 2`, the Steklov smoothing
-`g = S_δ F`, `δ = 2^(-k)/r²`, and its derivative `D = g^(r)` satisfy on `[0, 3/4]`
-`‖F - g‖_p ≤ ω_r(F, 2^(-k))_p` and `‖D‖_p ≤ 2^(kr) 2^r r^(2r) ω_r(F, 2^(-k))_p`, and on every
-`[a, b] ⊆ [0, 3/4]` there is `T` of degree `< r` with `‖g - T‖_{L_p[a,b]} ≤ (b - a)^r ‖D‖_{L_p[a,b]}`. -/
-theorem exists_left_smoothing {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr : 1 ≤ r)
-    {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) {k : ℕ} (hk : 2 ≤ k) :
-    ∃ g D : ℝ → ℂ, Measurable g ∧ Measurable D ∧
-      eLpNorm (fun x => F x - g x) p (volume.restrict (Icc 0 (3 / 4))) ≤
-        modulus r p 0 1 F (1 / 2 ^ k) ∧
-      eLpNorm D p (volume.restrict (Icc 0 (3 / 4))) ≤
-        ENNReal.ofReal (2 ^ k) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * modulus r p 0 1 F (1 / 2 ^ k) ∧
-      ∀ a b : ℝ, 0 ≤ a → a ≤ b → b ≤ 3 / 4 → ∃ T ∈ degreeLT ℂ r,
-        eLpNorm (fun x => g x - polyFun T x) p (volume.restrict (Icc a b)) ≤
-          ENNReal.ofReal (b - a) ^ r * eLpNorm D p (volume.restrict (Icc a b)) := by
-  have hr' : (0 : ℝ) < r := by exact_mod_cast hr
-  have hL : (0 : ℝ) < 1 / 2 ^ k := by positivity
-  set δ : ℝ := (1 / 2 ^ k) / r ^ 2 with hδdef
-  have hδ : 0 < δ := by positivity
-  have hrδ : (r : ℝ) * δ ≤ 1 / 2 ^ k := by
-    rw [hδdef, show (r : ℝ) * (1 / 2 ^ k / r ^ 2) = (1 / 2 ^ k) / r by field_simp]
-    exact div_le_self hL.le (by exact_mod_cast hr)
-  have hrrδ : (r : ℝ) * (r * δ) = 1 / 2 ^ k := by rw [hδdef]; field_simp
-  have hk4 : (1 : ℝ) / 2 ^ k ≤ 1 / 4 := by
-    rw [div_le_div_iff₀ (by positivity) (by norm_num), one_mul, one_mul]
-    calc (4 : ℝ) = 2 ^ 2 := by norm_num
-      _ ≤ 2 ^ k := pow_le_pow_right₀ (by norm_num) hk
-  have hwb : (3 / 4 : ℝ) + r * (r * δ) ≤ 1 := by rw [hrrδ]; linarith
-  have hg := contDiff_smooth hF r δ
-  refine ⟨smooth r δ F, iteratedDeriv r (smooth r δ F), hg.continuous.measurable,
-    (hg.continuous_iteratedDeriv r le_rfl).measurable, ?_, ?_, fun a b ha hab hb =>
-      exists_eLpNorm_sub_polyFun_le hp r hg hab⟩
-  · exact (eLpNorm_sub_smooth_le hF r hδ hp hp' le_rfl hwb).trans
-      (modulus_mono r p 0 1 F hrδ)
-  · refine (eLpNorm_iteratedDeriv_smooth_le hF r hδ hp le_rfl hwb).trans ?_
-    have hinv : (ENNReal.ofReal δ)⁻¹ = (r : ℝ≥0∞) ^ 2 * ENNReal.ofReal (2 ^ k) := by
-      rw [← ENNReal.ofReal_inv_of_pos hδ, hδdef, show ((1 / 2 ^ k) / (r : ℝ) ^ 2)⁻¹ =
-        (r : ℝ) ^ 2 * 2 ^ k by field_simp, ENNReal.ofReal_mul (by positivity),
-        ENNReal.ofReal_pow (Nat.cast_nonneg r), ENNReal.ofReal_natCast]
-    rw [hinv, mul_pow, ← pow_mul]
-    calc 2 ^ r * ((r : ℝ≥0∞) ^ (2 * r) * ENNReal.ofReal (2 ^ k) ^ r) *
-          modulus r p 0 1 F (r * δ)
-        ≤ 2 ^ r * ((r : ℝ≥0∞) ^ (2 * r) * ENNReal.ofReal (2 ^ k) ^ r) *
-            modulus r p 0 1 F (1 / 2 ^ k) := by
-          gcongr
-          exact modulus_mono r p 0 1 F hrδ
-      _ = _ := by ring
-
-/-- **Smoothing on the right part**: the same on `[1/4, 1]`, by the reflection `x ↦ 1 - x`, which
-preserves the modulus. -/
-theorem exists_right_smoothing {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr : 1 ≤ r)
-    {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) {k : ℕ} (hk : 2 ≤ k) :
-    ∃ g D : ℝ → ℂ, Measurable g ∧ Measurable D ∧
-      eLpNorm (fun x => F x - g x) p (volume.restrict (Icc (1 / 4) 1)) ≤
-        modulus r p 0 1 F (1 / 2 ^ k) ∧
-      eLpNorm D p (volume.restrict (Icc (1 / 4) 1)) ≤
-        ENNReal.ofReal (2 ^ k) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * modulus r p 0 1 F (1 / 2 ^ k) ∧
-      ∀ a b : ℝ, 1 / 4 ≤ a → a ≤ b → b ≤ 1 → ∃ T ∈ degreeLT ℂ r,
-        eLpNorm (fun x => g x - polyFun T x) p (volume.restrict (Icc a b)) ≤
-          ENNReal.ofReal (b - a) ^ r * eLpNorm D p (volume.restrict (Icc a b)) := by
-  have hF' : Continuous fun x => F (1 - x) := hF.comp (continuous_const.sub continuous_id)
-  obtain ⟨G, DG, hGm, hDm, h1, h2, h3⟩ := exists_left_smoothing hF' hr hp hp' hk
-  have hmod : modulus r p 0 1 (fun x => F (1 - x)) (1 / 2 ^ k) = modulus r p 0 1 F (1 / 2 ^ k) := by
-    have := modulus_reflect hF.measurable r p 0 1 (1 / 2 ^ k)
-    simpa using this
-  rw [hmod] at h1 h2
-  refine ⟨fun x => G (1 - x), fun x => DG (1 - x), hGm.comp (measurable_const.sub measurable_id),
-    hDm.comp (measurable_const.sub measurable_id), ?_, ?_, fun a b ha hab hb => ?_⟩
-  · have h := eLpNorm_comp_sub_Icc (f := fun y => F (1 - y) - G y)
-      ((hF'.measurable).sub hGm) p 1 (1 / 4) 1
-    simp only [sub_sub_cancel] at h
-    rw [h, show (1 : ℝ) - 1 = 0 by ring, show (1 : ℝ) - 1 / 4 = 3 / 4 by norm_num]
-    exact h1
-  · rw [eLpNorm_comp_sub_Icc hDm p 1 (1 / 4) 1, show (1 : ℝ) - 1 = 0 by ring,
-      show (1 : ℝ) - 1 / 4 = 3 / 4 by norm_num]
-    exact h2
-  · obtain ⟨T, hT, hTb⟩ := h3 (1 - b) (1 - a) (by linarith) (by linarith) (by linarith)
-    refine ⟨T.comp (C (((1 : ℝ) : ℝ) : ℂ) + C (((-1 : ℝ) : ℝ) : ℂ) * X),
-      comp_affine_mem_degreeLT hT _ _, ?_⟩
-    have hfun : (fun x => G (1 - x) - polyFun (T.comp (C (((1 : ℝ) : ℝ) : ℂ) +
-        C (((-1 : ℝ) : ℝ) : ℂ) * X)) x) = fun x => (fun y => G y - polyFun T y) (1 - x) := by
-      funext x
-      rw [polyFun_comp_affine]
-      congr 2
-      ring
-    rw [hfun, eLpNorm_comp_sub_Icc (f := fun y => G y - polyFun T y)
-      (hGm.sub (measurable_polyFun T)) p 1 a b,
-      eLpNorm_comp_sub_Icc hDm p 1 a b]
-    rw [show (1 - a) - (1 - b) = b - a by ring] at hTb
-    exact hTb
 
 /-- **Bounded overlap of the windows**: the windows `[(i + 1 - r) 2^(-k), (i + 1) 2^(-k)]`,
 `i < 2^k`, cover every point at most `r` times: `∑_i ∫_{W_i} G ≤ r ∫ G`. -/
@@ -367,18 +278,9 @@ theorem lintegral_sub_ppFun_le_sum (hp : p ≠ ∞) {F : ℝ → ℂ} (hFm : Mea
       ∑ i ∈ Finset.range (2 ^ k), eLpNorm (fun x => F x - polyFun (Q i) x) p
         (volume.restrict (dyadicIco k i)) ^ p.toReal := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
-  have hL : (0 : ℝ) ≤ 1 / 2 ^ k := by positivity
-  have h1 : (0 : ℝ) + ((2 ^ k : ℕ) : ℝ) * (1 / 2 ^ k) = 1 := by
-    rw [zero_add]; push_cast; field_simp
-  have hsplit := lintegral_Icc_le_sum (fun x => ‖F x - ppFun k Q x‖ₑ ^ p.toReal) 0 hL (2 ^ k)
-  rw [h1] at hsplit
-  refine hsplit.trans (Finset.sum_le_sum fun i hi => le_of_eq ?_)
-  have hIco : Ico ((0 : ℝ) + i * (1 / 2 ^ k)) ((0 : ℝ) + (i + 1) * (1 / 2 ^ k)) = dyadicIco k i := by
-    rw [dyadicIco]
-    congr 1 <;> ring
+  refine (lintegral_Icc_le_sum_dyadicIco _ k).trans (Finset.sum_le_sum fun i hi => le_of_eq ?_)
   rw [eLpNorm_rpow_eq (g := fun x => F x - polyFun (Q i) x)
-    ((hFm.sub (measurable_polyFun _)).aestronglyMeasurable) hp0 hp,
-    ← setLIntegral_congr Ico_ae_eq_Icc, hIco]
+    ((hFm.sub (measurable_polyFun _)).aestronglyMeasurable) hp0 hp]
   exact setLIntegral_congr_fun (measurableSet_dyadicIco k i) fun x hx => by
     rw [ppFun_eq_of_mem Q (Finset.mem_range.1 hi) hx]
 
@@ -413,8 +315,17 @@ theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     have h2 : (2 : ℝ) ^ (r + 2) ≤ 2 ^ k := pow_le_pow_right₀ (by norm_num) hk
     rw [div_le_div_iff₀ hpos (by norm_num), pow_add] at *
     nlinarith
-  obtain ⟨gl, Dl, hglm, hDlm, hl1, hl2, hl3⟩ := exists_left_smoothing hF hr hp1 hp hk2
-  obtain ⟨gr, Dr, hgrm, hDrm, hr1, hr2, hr3⟩ := exists_right_smoothing hF hr hp1 hp hk2
+  have hL : (0 : ℝ) < 1 / 2 ^ k := by positivity
+  have hwL : (3 / 4 : ℝ) + 1 / 2 ^ k ≤ 1 := by
+    have : (1 : ℝ) / 2 ^ k ≤ 1 / 4 := by
+      rw [div_le_div_iff₀ (by positivity) (by norm_num), one_mul, one_mul]
+      calc (4 : ℝ) = 2 ^ 2 := by norm_num
+        _ ≤ 2 ^ k := pow_le_pow_right₀ (by norm_num) hk2
+    linarith
+  obtain ⟨gl, Dl, hglm, hDlm, hl1, hl2, hl3⟩ := exists_left_smoothing hF hr hp1 hp hL hwL
+  obtain ⟨gr, Dr, hgrm, hDrm, hr1, hr2, hr3⟩ := exists_right_smoothing hF hr hp1 hp hL hwL
+  rw [show (1 / (2 : ℝ) ^ k)⁻¹ = 2 ^ k by rw [one_div, inv_inv] ] at hl2 hr2
+  rw [show (1 : ℝ) - 3 / 4 = 1 / 4 by norm_num] at hr1 hr2
   set c : ℝ≥0∞ := ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r
   set Hl : ℝ → ℝ≥0∞ := fun x => ‖F x - gl x‖ₑ ^ p.toReal + c ^ p.toReal * ‖Dl x‖ₑ ^ p.toReal
   set Hr : ℝ → ℝ≥0∞ := fun x => ‖F x - gr x‖ₑ ^ p.toReal + c ^ p.toReal * ‖Dr x‖ₑ ^ p.toReal
@@ -454,8 +365,7 @@ theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
           p.toReal ≤ 2 ^ (p.toReal - 1) *
         ∫⁻ x in Icc (((i + 1 - r : ℕ) : ℝ) / 2 ^ k) (((i : ℝ) + 1) / 2 ^ k), Hbar x := by
       by_cases hleft : ((i : ℝ) + 1) / 2 ^ k ≤ 3 / 4
-      · obtain ⟨T, hT, h⟩ := exists_window_poly hF.measurable hglm hDlm hp
-          (hl3 _ _ ha0 hab hleft) hc'
+      · obtain ⟨T, hT, h⟩ := exists_window_poly hF.measurable hglm hDlm hp (hl3 _ _ hab) hc'
         refine ⟨T, hT, h.trans (mul_le_mul' le_rfl ?_)⟩
         refine setLIntegral_mono' measurableSet_Icc fun x hx => ?_
         have hx' : x ∈ Icc (0 : ℝ) (3 / 4) := ⟨ha0.trans hx.1, hx.2.trans hleft⟩
@@ -471,8 +381,7 @@ theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
           rw [div_le_one hpos]
           have : ((i + 1 : ℕ) : ℝ) ≤ 2 ^ k := by exact_mod_cast hi'
           push_cast at this; linarith
-        obtain ⟨T, hT, h⟩ := exists_window_poly hF.measurable hgrm hDrm hp
-          (hr3 _ _ ha hab hb) hc'
+        obtain ⟨T, hT, h⟩ := exists_window_poly hF.measurable hgrm hDrm hp (hr3 _ _ hab) hc'
         refine ⟨T, hT, h.trans (mul_le_mul' le_rfl ?_)⟩
         refine setLIntegral_mono' measurableSet_Icc fun x hx => ?_
         have hx' : x ∈ Icc (1 / 4 : ℝ) 1 := ⟨ha.trans hx.1, hx.2.trans hb⟩
@@ -565,48 +474,10 @@ theorem exists_approxSeq_splineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ �
     ∃ CJ : ℝ≥0∞, CJ ≠ ∞ ∧ ∀ (f : Lp ℂ p unitVol) (k : ℕ), r + 2 ≤ k →
       (splineScheme p r).approxSeq f (2 ^ k) ≤ CJ * lpModulus p r f k := by
   obtain ⟨C, hC, hCb⟩ := exists_eLpNorm_sub_qi_le hr hp
-  refine ⟨C, hC, fun f k hk => ?_⟩
-  -- continuous functions
-  have hcont : ∀ g : ℝ →ᵇ ℂ, (splineScheme p r).approxSeq
-      (BoundedContinuousFunction.toLp (E := ℂ) p unitVol ℝ g) (2 ^ k) ≤
-        C * lpModulus p r (BoundedContinuousFunction.toLp (E := ℂ) p unitVol ℝ g) k := by
-    intro g
-    set a := (memLp_ppFun k (qiPieces hr k g) p).toLp (ppFun k (qiPieces hr k g))
-    have ha : a ∈ splineScheme p r (2 ^ k) :=
-      mem_splineScheme_two_pow.2 ⟨qiPieces hr k g, qiPieces_mem hr k g,
-        splineJoins_qiPieces hr k g, MemLp.coeFn_toLp _⟩
-    have hg := BoundedContinuousFunction.coeFn_toLp (E := ℂ) p unitVol ℝ g
-    refine ((splineScheme p r).approxSeq_le_of_mem ha _).trans ?_
-    rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hg.sub (MemLp.coeFn_toLp _))),
-      lpModulus, modulus_congr_ae hg]
-    exact hCb g g.continuous k hk
-  set b := C * lpModulus p r f k
-  refine ENNReal.le_of_forall_pos_le_add fun ε hε _ => ?_
-  set K : ℝ≥0∞ := C * 2 ^ r + 1
-  have hK : K ≠ ∞ := ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top hC (by simp), ENNReal.one_ne_top⟩
-  have hK0 : K ≠ 0 := by simp [K]
-  have hη : 0 < (ε / K).toReal := ENNReal.toReal_pos (by
-    simpa using ⟨ne_of_gt (by exact_mod_cast hε), hK⟩) (ENNReal.div_ne_top ENNReal.coe_ne_top hK0)
-  obtain ⟨g, hg⟩ := Metric.denseRange_iff.1
-    (BoundedContinuousFunction.toLp_denseRange ℂ unitVol ℝ hp) f _ hη
-  set fg := BoundedContinuousFunction.toLp (E := ℂ) p unitVol ℝ g
-  have hdist : ‖f - fg‖ₑ ≤ ε / K := by
-    rw [← edist_eq_enorm_sub, edist_dist, ← ENNReal.ofReal_toReal
-      (ENNReal.div_ne_top ENNReal.coe_ne_top hK0)]
-    exact ENNReal.ofReal_le_ofReal hg.le
-  have hmod : lpModulus p r fg k ≤ lpModulus p r f k + 2 ^ r * ‖f - fg‖ₑ := by
-    have h := lpModulus_add_le r f (fg - f) k
-    rw [add_sub_cancel] at h
-    refine h.trans (add_le_add le_rfl ((lpModulus_le r _ _).trans ?_))
-    rw [← enorm_neg, neg_sub]
-  calc (splineScheme p r).approxSeq f (2 ^ k)
-      ≤ (splineScheme p r).approxSeq fg (2 ^ k) + ‖f - fg‖ₑ :=
-        ApproximationScheme.approxSeq_le_approxSeq_add_enorm _ f fg
-    _ ≤ C * (lpModulus p r f k + 2 ^ r * ‖f - fg‖ₑ) + ‖f - fg‖ₑ :=
-        add_le_add ((hcont g).trans (by gcongr)) le_rfl
-    _ = b + K * ‖f - fg‖ₑ := by simp only [b, K]; ring
-    _ ≤ b + K * (ε / K) := by gcongr
-    _ = b + ε := by rw [ENNReal.mul_div_cancel hK0 hK]
+  refine ⟨C, hC, fun f k hk => approxSeq_le_of_continuous hp hC (fun g => ?_) f⟩
+  exact ⟨ppFun k (qiPieces hr k g), ⟨(memLp_ppFun k (qiPieces hr k g) p).toLp _,
+    mem_splineScheme_two_pow.2 ⟨qiPieces hr k g, qiPieces_mem hr k g, splineJoins_qiPieces hr k g,
+      MemLp.coeFn_toLp _⟩, MemLp.coeFn_toLp _⟩, hCb g g.continuous k hk⟩
 
 /-- The modulus `ω_r(f, 2^(-k), [0, 1])_p` is compatible with the scheme of dyadic splines of
 order `r`, with inverse order `θ = r - 1 + 1/p` and Jackson's inequality from level `r + 2` on. -/

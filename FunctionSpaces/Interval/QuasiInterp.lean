@@ -230,7 +230,7 @@ theorem enorm_qiCoeff_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
       ‖bcoord hr R j‖ₑ ≤ Cb * eLpNorm (polyFun R) p (volume.restrict (Icc 0 1)))
     (hp : p ≠ ∞) (k : ℕ) {g : ℝ → ℂ} {n : ℤ} (hn : -(r : ℤ) < n)
     (hg : AEStronglyMeasurable g (volume.restrict (dyadicIco k n.toNat))) :
-    ‖qiCoeff hr k g n‖ₑ ≤ Cb * ppProjConst r * ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal *
+    ‖qiCoeff hr k g n‖ₑ ≤ Cb * ppProjConst r * ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
       eLpNorm g p (volume.restrict (dyadicIco k n.toNat)) := by
   have hL : (0 : ℝ) < 1 / 2 ^ k := by positivity
   set m := n.toNat
@@ -244,7 +244,7 @@ theorem enorm_qiCoeff_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
     push_cast
     ring
   have hnorm : eLpNorm (polyFun R) p (volume.restrict (Icc 0 1)) =
-      ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal *
+      ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
         eLpNorm (polyFun (locProj r k g m)) p (volume.restrict (dyadicIco k m)) := by
     rw [hRfun, eLpNorm_comp_affine (measurable_polyFun _) hp _ hL, mul_zero, add_zero, mul_one,
       one_div ((2 : ℝ) ^ k), inv_inv, dyadicIco]
@@ -254,9 +254,9 @@ theorem enorm_qiCoeff_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
   rw [qiCoeff_eq_bcoord hr k g hn]
   refine (hCb R hR _).trans ?_
   rw [hnorm]
-  calc Cb * (ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal *
+  calc Cb * (ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
         eLpNorm (polyFun (locProj r k g m)) p (volume.restrict (dyadicIco k m)))
-      ≤ Cb * (ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal *
+      ≤ Cb * (ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
           (ppProjConst r * eLpNorm g p (volume.restrict (dyadicIco k m)))) := by
         gcongr
         exact eLpNorm_locProj_le (enorm_monoBasis_le r) (enorm_dualPoly_le r) Fact.out k m hg
@@ -289,15 +289,14 @@ theorem eLpNorm_qiPieces_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
       MN * (Cb * ppProjConst r) * ∑ n ∈ Finset.Ioc ((i : ℤ) - r) i,
         eLpNorm g p (volume.restrict (dyadicIco k n.toNat)) := by
   have hθ : 0 ≤ 1 / p.toReal := by positivity
-  have hθ' : (1 / p).toReal = p.toReal⁻¹ := by
-    rw [ENNReal.toReal_div, ENNReal.toReal_one, one_div]
+  have hθ' : 1 / p.toReal = p.toReal⁻¹ := one_div _
   have hgI : ∀ n ∈ Finset.Ioc ((i : ℤ) - r) i,
       AEStronglyMeasurable g (volume.restrict (dyadicIco k n.toNat)) := fun n hn => by
     rw [Finset.mem_Ioc] at hn
     exact hg.mono_measure (Measure.restrict_mono
       ((dyadicIco_subset (by omega)).trans Ico_subset_Icc_self) le_rfl)
   have hpt : ∀ x ∈ dyadicIco k i, ‖polyFun (qiPieces hr k g i) x‖ₑ ≤
-      MN * (Cb * ppProjConst r) * ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal *
+      MN * (Cb * ppProjConst r) * ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
         ∑ n ∈ Finset.Ioc ((i : ℤ) - r) i, eLpNorm g p (volume.restrict (dyadicIco k n.toNat)) :=
     fun x hx => by
       rw [polyFun_qiPieces_eq_sum_Ioc hr hi g hx]
@@ -307,22 +306,22 @@ theorem eLpNorm_qiPieces_le {r : ℕ} (hr : 1 ≤ r) {Cb : ℝ≥0∞}
       have hn' := (Finset.mem_Ioc.1 hn).1
       rw [enorm_mul]
       calc ‖qiCoeff hr k g n‖ₑ * ‖bspline r (2 ^ k * x - n)‖ₑ
-          ≤ (Cb * ppProjConst r * ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal *
+          ≤ (Cb * ppProjConst r * ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
               eLpNorm g p (volume.restrict (dyadicIco k n.toNat))) * MN :=
             mul_le_mul' (enorm_qiCoeff_le hr hCb hp k (by omega) (hgI n hn)) (hMN _)
         _ = _ := by ring
   refine (eLpNorm_le_of_ae_enorm_bound (measurable_polyFun _).aestronglyMeasurable
     ((ae_restrict_iff' (measurableSet_dyadicIco k i)).2 (Filter.Eventually.of_forall hpt))).trans_eq ?_
   rw [Measure.restrict_apply_univ, volume_dyadicIco, smul_eq_mul, ← hθ']
-  have h1 : ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal * ENNReal.ofReal (1 / 2 ^ k) ^ (1 / p).toReal =
+  have h1 : ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) * ENNReal.ofReal (1 / 2 ^ k) ^ (1 / p.toReal) =
       1 := by
-    rw [← ENNReal.mul_rpow_of_nonneg _ _ ENNReal.toReal_nonneg, ← ENNReal.ofReal_mul (by positivity),
+    rw [← ENNReal.mul_rpow_of_nonneg _ _ hθ, ← ENNReal.ofReal_mul (by positivity),
       mul_one_div_cancel (by positivity), ENNReal.ofReal_one, ENNReal.one_rpow]
-  calc MN * (Cb * ppProjConst r) * ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal *
+  calc MN * (Cb * ppProjConst r) * ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
         (∑ n ∈ Finset.Ioc ((i : ℤ) - r) i, eLpNorm g p (volume.restrict (dyadicIco k n.toNat))) *
-        ENNReal.ofReal (1 / 2 ^ k) ^ (1 / p).toReal
-      = MN * (Cb * ppProjConst r) * (ENNReal.ofReal (2 ^ k) ^ (1 / p).toReal *
-          ENNReal.ofReal (1 / 2 ^ k) ^ (1 / p).toReal) *
+        ENNReal.ofReal (1 / 2 ^ k) ^ (1 / p.toReal)
+      = MN * (Cb * ppProjConst r) * (ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
+          ENNReal.ofReal (1 / 2 ^ k) ^ (1 / p.toReal)) *
           ∑ n ∈ Finset.Ioc ((i : ℤ) - r) i, eLpNorm g p (volume.restrict (dyadicIco k n.toNat)) := by
         ring
     _ = _ := by rw [h1, mul_one]

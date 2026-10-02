@@ -40,13 +40,10 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 theorem ppScheme_mono_degree {r r' : ℕ} (hrr' : r ≤ r') (n : ℕ) :
     ppScheme p r n ⊆ ppScheme p r' n := by
   intro a ha
-  change a ∈ ppApproximants p r n at ha
-  show a ∈ ppApproximants p r' n
-  unfold ppApproximants at ha ⊢
-  split_ifs at ha ⊢ with hn
-  · exact ha
-  · obtain ⟨Q, hQ, hae⟩ := ha
-    exact ⟨Q, fun m => degreeLT_mono hrr' (hQ m), hae⟩
+  rcases eq_or_ne n 0 with rfl | hn
+  · exact mem_ppScheme_zero.2 (mem_ppScheme_zero.1 ha)
+  · obtain ⟨Q, hQ, hae⟩ := (mem_ppScheme hn).1 ha
+    exact (mem_ppScheme hn).2 ⟨Q, fun m => degreeLT_mono hrr' (hQ m), hae⟩
 
 /-- **The piecewise polynomials are dense** in `L_p[0, 1]` for `1 ≤ p < ∞` and `r ≥ 1`: they
 contain the step functions of the Haar system. -/

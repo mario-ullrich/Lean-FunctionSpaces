@@ -142,26 +142,9 @@ theorem eLpNorm_perExt_Icc {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞
 theorem perModulus_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞)
     (r : ℕ) (t : ℝ) : perModulus r p f t ≤ 2 ^ r * eLpNorm f p (volume.restrict (Icc 0 1)) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp).ne'
-  refine iSup₂_le fun h _ => ?_
-  have hsum : iterDiff r h (perExt f) = ∑ k ∈ Finset.range (r + 1), fun x =>
-      ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * perExt f (x + k * h) := by
-    funext x
-    rw [iterDiff_apply, Finset.sum_apply]
-  rw [hsum]
-  refine (eLpNorm_sum_le hp).trans ?_
-  have hk : ∀ k ∈ Finset.range (r + 1), eLpNorm (fun x =>
-      ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * perExt f (x + k * h)) p
-        (volume.restrict (Icc 0 1)) =
-      (r.choose k : ℝ≥0∞) * eLpNorm f p (volume.restrict (Icc 0 1)) := fun k _ => by
-    rw [show (fun x => ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * perExt f (x + k * h)) =
-        ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) • fun x => perExt f (x + k * h) from rfl,
-      eLpNorm_const_smul, eLpNorm_comp_add_Icc (measurable_perExt hf), zero_add,
-      add_comm (1 : ℝ), eLpNorm_perExt_Icc hf hp0 hp']
-    rw [enorm_mul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul, ← ofReal_norm,
-      Complex.norm_natCast, ENNReal.ofReal_natCast]
-  rw [Finset.sum_congr rfl hk, ← Finset.sum_mul, ← Nat.cast_sum, Nat.sum_range_choose]
-  push_cast
-  rfl
+  refine iSup₂_le fun h _ => eLpNorm_iterDiff_le_of_forall hp fun k _ => le_of_eq ?_
+  rw [eLpNorm_comp_add_Icc (measurable_perExt hf), zero_add, add_comm (1 : ℝ),
+    eLpNorm_perExt_Icc hf hp0 hp']
 
 /-- **The periodic modulus dominates the modulus on `[0, 1]`**: on `[0, 1 - rh)` the differences
 of `f̃` and of `f` agree, since `x, …, x + rh` stay in `[0, 1)`. -/

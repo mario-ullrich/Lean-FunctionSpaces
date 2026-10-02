@@ -9,6 +9,7 @@ public import Mathlib.Analysis.Normed.Module.Basic
 public import Mathlib.Algebra.Module.Submodule.Map
 public import Mathlib.Algebra.Group.Pointwise.Set.Basic
 public import Mathlib.Algebra.BigOperators.Group.Finset.Basic
+public import Mathlib.Data.Nat.Log
 
 /-!
 # Approximation schemes
@@ -217,5 +218,36 @@ def ofSubmodules (A : ℕ → Submodule ℝ X) (h0 : A 0 = ⊥) (hA : Monotone A
 @[simp]
 theorem mem_ofSubmodules {A : ℕ → Submodule ℝ X} {h0 : A 0 = ⊥} {hA : Monotone A} {n : ℕ}
     {x : X} : x ∈ ofSubmodules A h0 hA n ↔ x ∈ A n := Iff.rfl
+
+/-- The **dyadic scheme of an increasing sequence of subspaces** `V_0 ⊆ V_1 ⊆ ⋯`: `{0}` at
+complexity `0` and `V_k`, `k = ⌊log₂ n⌋`, at complexity `n ≥ 1`, so that the level `V_k` is the
+set of approximants of complexity `2^k`. Piecewise polynomials and splines on dyadic partitions
+are schemes of this form. -/
+def ofMonotoneSubmodules (V : ℕ → Submodule ℝ X) (hV : Monotone V) : ApproximationScheme X :=
+  ofSubmodules (fun n => if n = 0 then ⊥ else V (Nat.log 2 n)) (by simp) (by
+    intro a b hab
+    by_cases ha : a = 0
+    · simp only [ha, ↓reduceIte]
+      exact bot_le
+    · have hb : b ≠ 0 := by omega
+      simp only [ha, hb, ↓reduceIte]
+      exact hV (Nat.log_mono_right hab))
+
+/-- The dyadic scheme of a sequence of subspaces is `{0}` at complexity `0`. -/
+theorem mem_ofMonotoneSubmodules_zero {V : ℕ → Submodule ℝ X} {hV : Monotone V} {x : X} :
+    x ∈ ofMonotoneSubmodules V hV 0 ↔ x = 0 := by
+  rw [ofMonotoneSubmodules, mem_ofSubmodules]
+  simp
+
+/-- The dyadic scheme of a sequence of subspaces is `V_⌊log₂ n⌋` at complexity `n ≥ 1`. -/
+theorem mem_ofMonotoneSubmodules {V : ℕ → Submodule ℝ X} {hV : Monotone V} {n : ℕ}
+    (hn : n ≠ 0) {x : X} : x ∈ ofMonotoneSubmodules V hV n ↔ x ∈ V (Nat.log 2 n) := by
+  rw [ofMonotoneSubmodules, mem_ofSubmodules]
+  simp only [hn, ↓reduceIte]
+
+/-- The dyadic scheme of a sequence of subspaces is `V_k` at complexity `2^k`. -/
+theorem mem_ofMonotoneSubmodules_two_pow {V : ℕ → Submodule ℝ X} {hV : Monotone V} {k : ℕ}
+    {x : X} : x ∈ ofMonotoneSubmodules V hV (2 ^ k) ↔ x ∈ V k := by
+  rw [mem_ofMonotoneSubmodules (pow_ne_zero k two_ne_zero), Nat.log_pow Nat.one_lt_two]
 
 end ApproximationScheme

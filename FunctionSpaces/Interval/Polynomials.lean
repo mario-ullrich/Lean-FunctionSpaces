@@ -10,21 +10,25 @@ public import Mathlib.Analysis.Normed.Module.FiniteDimension
 public import Mathlib.MeasureTheory.Function.LpSpace.Basic
 public import Mathlib.Algebra.Polynomial.Roots
 public import Mathlib.Topology.Algebra.Polynomial
+public import Mathlib.RingTheory.Polynomial.DegreeLT
 
 /-!
 # Polynomials on intervals
 
 The polynomials of degree `< r` with complex coefficients, `Polynomial.degreeLT ℂ r`, evaluated
-at real points (`Interval.polyFun`), form a space of dimension `r`.  On such a space all norms are
+at real points (`Interval.polyFun`), form a space of dimension `r` (`Interval.finrank_degreeLT`,
+from Mathlib's monomial basis `Polynomial.degreeLT.basis`).  On such a space all norms are
 equivalent, and with an affine change of variables this gives the **Nikolskii inequality for
 polynomials on intervals** (`Interval.enorm_polyFun_le`): for `1 ≤ p < ∞` there is `K` with
 
-`|P(x)| ≤ K L^(-1/p) ‖P‖_{L_p[u, u + L]}`   for `x ∈ [u, u + L]`, `P` of degree `< r`.
+`|P(x)| ≤ K L^(-1/p) ‖P‖_{L_p[u, u + L]}`   for `x ∈ [u, u + 2L]`, `P` of degree `< r`
+
+(`Interval.NikolskiiBound`).  The bound reaches the doubled interval, so that one piece of a
+piecewise polynomial also controls its values on the neighbouring interval.
 
 The equivalence of norms is Mathlib's `LinearMap.injective_iff_antilipschitz` for the injective
 map from the coefficients to `L_p[α, β]` (a nonzero polynomial has only finitely many zeros,
-`Polynomial.eq_zero_of_infinite_isRoot`).  Polynomials of degree `< r` stay of degree `< r` under
-affine changes of variable (`Interval.comp_affine_mem_degreeLT`).
+`Polynomial.eq_zero_of_infinite_isRoot`).
 -/
 
 @[expose] public section
@@ -53,23 +57,10 @@ theorem continuous_polyFun (P : ℂ[X]) : Continuous (polyFun P) :=
 theorem measurable_polyFun (P : ℂ[X]) : Measurable (polyFun P) :=
   (continuous_polyFun P).measurable
 
-/-- **Affine changes of variable** keep the degree `< r`. -/
-theorem comp_affine_mem_degreeLT {r : ℕ} {P : ℂ[X]} (hP : P ∈ degreeLT ℂ r) (u v : ℂ) :
-    P.comp (C u + C v * X) ∈ degreeLT ℂ r := by
-  rcases eq_or_ne P 0 with rfl | hP0
-  · simp
-  rw [mem_degreeLT] at hP ⊢
-  have h1 : (C u + C v * X).natDegree ≤ 1 := by
-    refine (natDegree_add_le _ _).trans (max_le (by simp) ?_)
-    exact (natDegree_C_mul_le _ _).trans (by simp)
-  have h2 : P.natDegree < r := (natDegree_lt_iff_degree_lt hP0).2 hP
-  refine (degree_le_natDegree).trans_lt ?_
-  have : (P.comp (C u + C v * X)).natDegree < r :=
-    calc (P.comp (C u + C v * X)).natDegree ≤ P.natDegree * (C u + C v * X).natDegree :=
-          natDegree_comp_le
-      _ ≤ P.natDegree * 1 := Nat.mul_le_mul_left _ h1
-      _ < r := by rw [mul_one]; exact h2
-  exact_mod_cast this
+/-- The polynomials of degree `< r` form a space of dimension `r` (with Mathlib's monomial basis
+`Polynomial.degreeLT.basis`). -/
+theorem finrank_degreeLT (r : ℕ) : Module.finrank ℂ (degreeLT ℂ r) = r := by
+  rw [Module.finrank_eq_card_basis (degreeLT.basis ℂ r), Fintype.card_fin]
 
 /-- `(P ∘ (u + v X))(y) = P(u + v y)`. -/
 theorem polyFun_comp_affine (P : ℂ[X]) (u v y : ℝ) :
@@ -106,10 +97,12 @@ theorem memLp_polyFun (P : ℂ[X]) (p : ℝ≥0∞) (α β : ℝ) :
   refine MemLp.of_bound (measurable_polyFun P).aestronglyMeasurable C ?_
   filter_upwards [ae_restrict_mem measurableSet_Icc] with x hx using hC x hx
 
-/-- The value of the polynomial with coefficients `c`: `∑_i c_i x^i`. -/
+/-- The value of the polynomial with coefficients `c`: `∑_i c_i x^i` (Mathlib's
+`Polynomial.eval_eq_sum_degreeLTEquiv`). -/
 theorem polyFun_degreeLTEquiv_symm (r : ℕ) (c : Fin r → ℂ) (x : ℝ) :
     polyFun ((degreeLTEquiv ℂ r).symm c : ℂ[X]) x = ∑ i : Fin r, c i * (x : ℂ) ^ (i : ℕ) := by
-  simp [polyFun, degreeLTEquiv, eval_finsetSum]
+  rw [polyFun, eval_eq_sum_degreeLTEquiv ((degreeLTEquiv ℂ r).symm c).2, Subtype.coe_eta,
+    LinearEquiv.apply_symm_apply]
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
@@ -202,7 +195,7 @@ theorem exists_enorm_le_eLpNorm (r : ℕ) {α β : ℝ} (hαβ : α < β) :
 theorem eLpNorm_comp_affine {g : ℝ → ℂ} (hg : Measurable g) {q : ℝ≥0∞} (hq : q ≠ ∞)
     (u : ℝ) {L : ℝ} (hL : 0 < L) (α β : ℝ) :
     eLpNorm (fun y => g (u + L * y)) q (volume.restrict (Icc α β)) =
-      ENNReal.ofReal L⁻¹ ^ (1 / q).toReal *
+      ENNReal.ofReal L⁻¹ ^ (1 / q.toReal) *
         eLpNorm g q (volume.restrict (Icc (u + L * α) (u + L * β))) := by
   set φ : ℝ → ℝ := fun y => u + L * y
   have hφ : Measurable φ := (measurable_const_mul L).const_add u
@@ -225,32 +218,55 @@ theorem eLpNorm_comp_affine {g : ℝ → ℂ} (hg : Measurable g) {q : ℝ≥0�
     rw [← hpre, ← Measure.restrict_map hφ measurableSet_Icc, hmap, Measure.restrict_smul]
   have h := eLpNorm_map_measure (g := g) (p := q) (f := φ) (μ := volume.restrict (Icc α β))
     hg.aestronglyMeasurable hφ.aemeasurable
-  rw [hres, eLpNorm_smul_measure_of_ne_top hq _ _ hg.aestronglyMeasurable, smul_eq_mul] at h
+  rw [hres, eLpNorm_smul_measure_of_ne_top hq _ _ hg.aestronglyMeasurable, smul_eq_mul,
+    ENNReal.toReal_div, ENNReal.toReal_one] at h
   exact h.symm
 
+omit [Fact (1 ≤ p)] in
+variable (p) in
+/-- **Nikolskii's bound** with constant `K` for the polynomials of degree `< r`:
+`|P(x)| ≤ K L^(-1/p) ‖P‖_{L_p[u, u + L]}` for `x ∈ [u, u + 2L]`. -/
+def NikolskiiBound (r : ℕ) (K : ℝ≥0∞) : Prop :=
+  ∀ P ∈ degreeLT ℂ r, ∀ (u : ℝ) {L : ℝ}, 0 < L → ∀ x ∈ Icc u (u + 2 * L),
+    ‖polyFun P x‖ₑ ≤ K * ENNReal.ofReal L⁻¹ ^ (1 / p.toReal) *
+      eLpNorm (polyFun P) p (volume.restrict (Icc u (u + L)))
+
+omit [Fact (1 ≤ p)] in
+/-- Nikolskii's bound on the interval `[u, u + L]` itself. -/
+theorem NikolskiiBound.enorm_le {r : ℕ} {K : ℝ≥0∞} (hK : NikolskiiBound p r K) {P : ℂ[X]}
+    (hP : P ∈ degreeLT ℂ r) (u : ℝ) {L : ℝ} (hL : 0 < L) {x : ℝ} (hx : x ∈ Icc u (u + L)) :
+    ‖polyFun P x‖ₑ ≤ K * ENNReal.ofReal L⁻¹ ^ (1 / p.toReal) *
+      eLpNorm (polyFun P) p (volume.restrict (Icc u (u + L))) :=
+  hK P hP u hL x ⟨hx.1, by linarith [hx.2]⟩
+
 /-- **Nikolskii inequality for polynomials on intervals**: for `1 ≤ p < ∞` there is `K` with
-`|P(x)| ≤ K L^(-1/p) ‖P‖_{L_p[u, u + L]}` for `x ∈ [u, u + L]` and `P` of degree `< r`. -/
-theorem enorm_polyFun_le (r : ℕ) (hp : p ≠ ∞) :
-    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ P ∈ degreeLT ℂ r, ∀ (u : ℝ) {L : ℝ}, 0 < L → ∀ x ∈ Icc u (u + L),
-      ‖polyFun P x‖ₑ ≤ K * ENNReal.ofReal L⁻¹ ^ (1 / p).toReal *
-        eLpNorm (polyFun P) p (volume.restrict (Icc u (u + L))) := by
-  obtain ⟨K, hK, hP⟩ := exists_enorm_le_eLpNorm (p := p) r (zero_lt_one' ℝ)
+`|P(x)| ≤ K L^(-1/p) ‖P‖_{L_p[u, u + L]}` for `x ∈ [u, u + 2L]` and `P` of degree `< r`. The values
+on `[0, 1]` are bounded by the norm on `[0, 1/2]`, and `x ↦ u + 2L x` rescales. -/
+theorem enorm_polyFun_le (r : ℕ) (hp : p ≠ ∞) : ∃ K : ℝ≥0∞, K ≠ ∞ ∧ NikolskiiBound p r K := by
+  obtain ⟨K, hK, hP⟩ := exists_enorm_le_eLpNorm (p := p) r (by norm_num : (0 : ℝ) < 1 / 2)
   refine ⟨K, hK, fun P hPr u L hL x hx => ?_⟩
-  set Q := P.comp (C (u : ℂ) + C (L : ℂ) * X)
+  have h2L : 0 < 2 * L := by positivity
+  set Q := P.comp (C (u : ℂ) + C ((2 * L : ℝ) : ℂ) * X)
   have hQ : Q ∈ degreeLT ℂ r := comp_affine_mem_degreeLT hPr _ _
-  have hy : (x - u) / L ∈ Icc (0 : ℝ) 1 := by
+  have hy : (x - u) / (2 * L) ∈ Icc (0 : ℝ) 1 := by
     constructor
-    · exact div_nonneg (by linarith [hx.1]) hL.le
-    · rw [div_le_one hL]; linarith [hx.2]
-  have hQx : polyFun Q ((x - u) / L) = polyFun P x := by
+    · exact div_nonneg (by linarith [hx.1]) h2L.le
+    · rw [div_le_one h2L]; linarith [hx.2]
+  have hQx : polyFun Q ((x - u) / (2 * L)) = polyFun P x := by
     rw [polyFun_comp_affine]; congr 1; field_simp; ring
-  have hnorm := eLpNorm_comp_affine (measurable_polyFun P) hp u hL 0 1
-  rw [mul_zero, add_zero, mul_one] at hnorm
-  have hQfun : (fun y => polyFun P (u + L * y)) = polyFun Q :=
-    funext fun y => (polyFun_comp_affine P u L y).symm
+  have hnorm := eLpNorm_comp_affine (measurable_polyFun P) hp u h2L 0 (1 / 2)
+  rw [mul_zero, add_zero, show 2 * L * (1 / 2) = L by ring] at hnorm
+  have hQfun : (fun y => polyFun P (u + 2 * L * y)) = polyFun Q :=
+    funext fun y => (polyFun_comp_affine P u (2 * L) y).symm
   rw [hQfun] at hnorm
-  calc ‖polyFun P x‖ₑ = ‖polyFun Q ((x - u) / L)‖ₑ := by rw [hQx]
-    _ ≤ K * eLpNorm (polyFun Q) p (volume.restrict (Icc 0 1)) := hP Q hQ _ hy
-    _ = _ := by rw [hnorm, mul_assoc]
+  calc ‖polyFun P x‖ₑ = ‖polyFun Q ((x - u) / (2 * L))‖ₑ := by rw [hQx]
+    _ ≤ K * eLpNorm (polyFun Q) p (volume.restrict (Icc 0 (1 / 2))) := hP Q hQ _ hy
+    _ = K * ENNReal.ofReal (2 * L)⁻¹ ^ (1 / p.toReal) *
+          eLpNorm (polyFun P) p (volume.restrict (Icc u (u + L))) := by
+        rw [hnorm, mul_assoc]
+    _ ≤ K * ENNReal.ofReal L⁻¹ ^ (1 / p.toReal) *
+          eLpNorm (polyFun P) p (volume.restrict (Icc u (u + L))) := by
+        gcongr
+        linarith
 
 end Interval

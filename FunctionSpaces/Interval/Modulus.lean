@@ -80,37 +80,39 @@ theorem measurable_iterDiff {f : ℝ → ℂ} (hf : Measurable f) (r : ℕ) (h :
   rw [this]
   exact Finset.measurable_sum _ fun k _ => measurable_const.mul (hf.comp (measurable_add_const _))
 
+/-- **Differences in `L_p`**: if `‖f(· + k h)‖_{L_p(μ)} ≤ B` for `k ≤ r`, then
+`‖Δ_h^r f‖_{L_p(μ)} ≤ 2^r B`, by the triangle inequality and `∑_k C(r, k) = 2^r`. -/
+theorem eLpNorm_iterDiff_le_of_forall {f : ℝ → ℂ} {p : ℝ≥0∞} (hp : 1 ≤ p) {μ : Measure ℝ}
+    {r : ℕ} {h : ℝ} {B : ℝ≥0∞}
+    (hB : ∀ k ∈ Finset.range (r + 1), eLpNorm (fun x => f (x + k * h)) p μ ≤ B) :
+    eLpNorm (iterDiff r h f) p μ ≤ 2 ^ r * B := by
+  have hsum : iterDiff r h f = ∑ k ∈ Finset.range (r + 1),
+      ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) • fun x => f (x + k * h) := by
+    funext x
+    rw [iterDiff_apply, Finset.sum_apply]
+    rfl
+  rw [hsum]
+  refine (eLpNorm_sum_le hp).trans ?_
+  calc ∑ k ∈ Finset.range (r + 1),
+        eLpNorm (((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) • fun x => f (x + k * h)) p μ
+      ≤ ∑ k ∈ Finset.range (r + 1), (r.choose k : ℝ≥0∞) * B :=
+        Finset.sum_le_sum fun k hk => by
+          rw [eLpNorm_const_smul, enorm_iterDiff_coeff]
+          exact mul_le_mul_right (hB k hk) _
+    _ = 2 ^ r * B := by
+        rw [← Finset.sum_mul, ← Nat.cast_sum, Nat.sum_range_choose]
+        push_cast
+        rfl
+
 /-- **`‖Δ_h^r f‖_{L_p[a, b - rh]} ≤ 2^r ‖f‖_{L_p[a,b]}`** for `h ≥ 0`. -/
 theorem eLpNorm_iterDiff_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ)
     {h : ℝ} (hh : 0 ≤ h) (a b : ℝ) :
     eLpNorm (iterDiff r h f) p (volume.restrict (Icc a (b - r * h))) ≤
       2 ^ r * eLpNorm f p (volume.restrict (Icc a b)) := by
-  have hsum : iterDiff r h f = ∑ k ∈ Finset.range (r + 1), fun x =>
-      ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (x + k * h) := by
-    funext x
-    rw [iterDiff_apply, Finset.sum_apply]
-  rw [hsum]
-  refine (eLpNorm_sum_le hp).trans ?_
-  have hk : ∀ k ∈ Finset.range (r + 1), eLpNorm (fun x =>
-      ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (x + k * h)) p
-        (volume.restrict (Icc a (b - r * h))) ≤
-      (r.choose k : ℝ≥0∞) * eLpNorm f p (volume.restrict (Icc a b)) := fun k hk => by
-    have hkr : (k : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)
-    rw [show (fun x => ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (x + k * h)) =
-        ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) • fun x => f (x + k * h) from rfl,
-      eLpNorm_const_smul, eLpNorm_comp_add_Icc hf]
-    have hc : ‖(-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)‖ₑ = (r.choose k : ℝ≥0∞) := by
-      rw [enorm_mul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul, ← ofReal_norm,
-        Complex.norm_natCast, ENNReal.ofReal_natCast]
-    rw [hc]
-    exact mul_le_mul_right (eLpNorm_Icc_mono f p (by nlinarith)
-      (by nlinarith [mul_le_mul_of_nonneg_right hkr hh])) _
-  refine (Finset.sum_le_sum hk).trans_eq ?_
-  rw [← Finset.sum_mul]
-  congr 1
-  rw [← Nat.cast_sum, Nat.sum_range_choose]
-  push_cast
-  rfl
+  refine eLpNorm_iterDiff_le_of_forall hp fun k hk => ?_
+  have hkr : (k : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)
+  rw [eLpNorm_comp_add_Icc hf]
+  exact eLpNorm_Icc_mono f p (by nlinarith) (by nlinarith [mul_le_mul_of_nonneg_right hkr hh])
 
 /-- The **modulus of smoothness of order `r`** on `[a, b]` in `L_p`:
 `ω_r(f, t, [a, b])_p = sup_{0 ≤ h ≤ t} ‖Δ_h^r f‖_{L_p[a, b - r h]}`. -/

@@ -95,7 +95,7 @@ theorem sum_localMass_perExt_le {u : ℝ → ℂ} (hu : Measurable u) (hp : p �
     rw [localMass, ← setLIntegral_congr Ico_ae_eq_Icc, dyadicIco]
     congr 2
     push_cast
-    ring
+    ring_nf
   rw [Finset.sum_congr rfl fun n _ => hpieces n]
   refine hsum.trans (le_of_eq ?_)
   rw [eLpNorm_rpow_eq hu.aestronglyMeasurable hp0 hp, ← setLIntegral_congr Ico_ae_eq_Icc]

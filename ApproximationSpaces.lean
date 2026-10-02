@@ -41,7 +41,8 @@ Nothing in this library mentions functions or measures.
 ## Layout
 
 * `ApproximationSpaces.Scheme`: the structure `ApproximationScheme`, its elementary
-  consequences, and the preimage and image of a scheme under a linear map.
+  consequences, the preimage and image of a scheme under a linear map, and the dyadic scheme of
+  an increasing sequence of subspaces.
 * `ApproximationSpaces.Error`: the error `ApproximationScheme.approxError` and its calculus.
 * `ApproximationSpaces.Instances.Span`: linear approximation from the first `n` elements of
   a sequence, `ApproximationScheme.ofSpan`.

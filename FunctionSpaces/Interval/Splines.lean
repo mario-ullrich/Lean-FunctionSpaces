@@ -21,8 +21,9 @@ functions, for `r = 2` the continuous piecewise linear functions. The jump form 
 inequality uses: across a knot a spline is a polynomial plus `c (x - ξ)_+^(r-1)`.
 
 The classes of splines in `L_p[0, 1]` form subspaces `S_k` increasing in `k`
-(`Interval.splineSpace`), and the scheme `Interval.splineScheme` has them as approximants of
-complexity `2^k`. The B-splines `N_r(2^k x - n)` (`Interval.bsplinePieces`) have spline joins
+(`Interval.splineSpace`), and the scheme `Interval.splineScheme` (an
+`ApproximationScheme.ofMonotoneSubmodules`) has them as approximants of complexity `2^k`. The
+B-splines `N_r(2^k x - n)` (`Interval.bsplinePieces`) have spline joins
 (`Interval.splineJoins_bsplinePieces`), so their combinations are splines.
 -/
 
@@ -34,7 +35,11 @@ open scoped ENNReal
 namespace Interval
 
 /-- **Splines in jump form are `C^(r-2)`**: a polynomial `P` of degree `< r` is a multiple of
-`(X - ξ)^(r-1)` iff `P` and its derivatives up to order `r - 2` vanish at `ξ`. -/
+`(X - ξ)^(r-1)` iff `P` and its derivatives up to order `r - 2` vanish at `ξ`. The vanishing
+derivatives give the root multiplicity `≥ r - 1`
+(`Polynomial.lt_rootMultiplicity_of_isRoot_iterate_derivative`), hence divisibility
+(`Polynomial.le_rootMultiplicity_iff`), and a monic divisor of the same degree leaves only the
+leading coefficient (`Polynomial.eq_leadingCoeff_mul_of_monic_of_dvd_of_natDegree_le`). -/
 theorem exists_eq_C_mul_pow_iff {r : ℕ} (hr : 1 ≤ r) {P : ℂ[X]} (hP : P ∈ degreeLT ℂ r)
     (ξ : ℂ) :
     (∃ c, P = C c * (X - C ξ) ^ (r - 1)) ↔ ∀ i < r - 1, (derivative^[i] P).eval ξ = 0 := by
@@ -45,24 +50,18 @@ theorem exists_eq_C_mul_pow_iff {r : ℕ} (hr : 1 ≤ r) {P : ℂ[X]} (hP : P �
   · intro h
     rcases eq_or_ne P 0 with rfl | hP0
     · exact ⟨0, by simp⟩
-    rcases Nat.lt_or_ge r 2 with hr2 | hr2
-    · -- `r = 1`: polynomials of degree `< 1` are constants
-      have h1 : r = 1 := by omega
-      subst h1
-      refine ⟨P.coeff 0, ?_⟩
-      rw [Nat.sub_self, pow_zero, mul_one]
-      exact eq_C_of_degree_le_zero (Nat.WithBot.lt_one_iff_le_zero.1 (mem_degreeLT.1 hP))
-    · have hroot : r - 2 < P.rootMultiplicity ξ :=
-        lt_rootMultiplicity_of_isRoot_iterate_derivative hP0 fun m hm => h m (by omega)
-      obtain ⟨Q, hQ⟩ := (pow_dvd_pow (X - C ξ) (by omega : r - 1 ≤ P.rootMultiplicity ξ)).trans
-        (pow_rootMultiplicity_dvd P ξ)
-      have hQ0 : Q ≠ 0 := by rintro rfl; simp at hQ; exact hP0 hQ
-      have hdeg : P.natDegree < r :=
-        (natDegree_lt_iff_degree_lt hP0).2 (mem_degreeLT.1 hP)
-      rw [hQ, natDegree_mul (pow_ne_zero _ (X_sub_C_ne_zero ξ)) hQ0, natDegree_pow,
-        natDegree_X_sub_C, mul_one] at hdeg
-      refine ⟨Q.coeff 0, ?_⟩
-      rw [hQ, eq_C_of_natDegree_eq_zero (by omega : Q.natDegree = 0), mul_comm, coeff_C_zero]
+    have hmult : r - 1 ≤ P.rootMultiplicity ξ := by
+      rcases Nat.lt_or_ge r 2 with hr2 | hr2
+      · omega
+      · have : r - 2 < P.rootMultiplicity ξ :=
+          lt_rootMultiplicity_of_isRoot_iterate_derivative hP0 fun m hm => h m (by omega)
+        omega
+    have hdeg : P.natDegree ≤ ((X - C ξ) ^ (r - 1)).natDegree := by
+      rw [natDegree_pow, natDegree_X_sub_C, mul_one]
+      have := (natDegree_lt_iff_degree_lt hP0).2 (mem_degreeLT.1 hP)
+      omega
+    exact ⟨P.leadingCoeff, eq_leadingCoeff_mul_of_monic_of_dvd_of_natDegree_le
+      ((monic_X_sub_C ξ).pow _) ((le_rootMultiplicity_iff hP0).1 hmult) hdeg⟩
 
 /-- The pieces `Q` have **spline joins of order `r`** at the interior knots of level `k`: at
 `ξ = n 2^(-k)`, `0 < n < 2^k`, consecutive pieces differ by a multiple of `(x - ξ)^(r-1)`. -/
@@ -159,36 +158,19 @@ theorem splineSpace_mono (r : ℕ) : Monotone (splineSpace p r) := by
   exact ⟨fun n => Q (n / 2), fun n => hQ _, hj.refine, hgQ.trans (ppFun_refine k Q).symm⟩
 
 variable (p) in
-/-- The approximants of complexity `n`: `{0}` for `n = 0`, `S_{⌊log₂ n⌋}` for `n ≥ 1`. -/
-noncomputable def splineApproximants (r n : ℕ) : Submodule ℝ (Lp ℂ p unitVol) :=
-  if n = 0 then ⊥ else splineSpace p r (Nat.log 2 n)
-
-omit [Fact (1 ≤ p)] in
-/-- The approximants of the spline scheme increase. -/
-theorem splineApproximants_mono (r : ℕ) : Monotone (splineApproximants p r) := by
-  intro a b hab f hf
-  by_cases ha : a = 0
-  · simp only [splineApproximants, ha, ↓reduceIte, Submodule.mem_bot] at hf
-    rw [hf]; exact Submodule.zero_mem _
-  · have hb : b ≠ 0 := by omega
-    simp only [splineApproximants, ha, hb, ↓reduceIte] at hf ⊢
-    exact splineSpace_mono r (Nat.log_mono_right hab) hf
-
-variable (p) in
-/-- The **scheme of dyadic splines** of order `r` in `L_p[0, 1]`. -/
+/-- The **scheme of dyadic splines** of order `r` in `L_p[0, 1]`: `{0}` at complexity `0` and
+`S_{⌊log₂ n⌋}` at complexity `n ≥ 1`. -/
 noncomputable def splineScheme (r : ℕ) : ApproximationScheme (Lp ℂ p unitVol) :=
-  ApproximationScheme.ofSubmodules (splineApproximants p r) (by simp [splineApproximants])
-    (splineApproximants_mono r)
+  ApproximationScheme.ofMonotoneSubmodules (splineSpace p r) (splineSpace_mono r)
 
 /-- The approximants of complexity `2^k` are the splines of level `k`. -/
 theorem mem_splineScheme_two_pow {r k : ℕ} {g : Lp ℂ p unitVol} :
-    g ∈ splineScheme p r (2 ^ k) ↔ g ∈ splineSpace p r k := by
-  show g ∈ splineApproximants p r (2 ^ k) ↔ _
-  simp [splineApproximants, Nat.log_pow Nat.one_lt_two]
+    g ∈ splineScheme p r (2 ^ k) ↔ g ∈ splineSpace p r k :=
+  ApproximationScheme.mem_ofMonotoneSubmodules_two_pow
 
 /-- The spline scheme is linear. -/
 theorem splineScheme_isLinear (r : ℕ) : (splineScheme p r).IsLinear :=
-  ApproximationScheme.isLinear_ofSubmodules _ _ _
+  ApproximationScheme.isLinear_ofMonotoneSubmodules _ _
 
 /-! ### B-splines on the dyadic grid -/
 
@@ -220,10 +202,6 @@ theorem X_sub_C_pow_comp_affine (r k : ℕ) (n : ℝ) (d : ℂ) :
   congr 1
   rw [mul_sub, ← C_mul, mul_div_cancel₀ _ h2, C_add, Complex.ofReal_neg, C_neg]
   ring
-
-/-- The first piece `B_0 = X^(r-1)/(r-1)!`. -/
-theorem bsplinePiece_zero (r : ℕ) : bsplinePiece r 0 = C (bsplineCoeff r 0) * (X - C 0) ^ (r - 1) := by
-  simp [bsplinePiece]
 
 /-- **The B-splines have spline joins**: at the knot `m 2^(-k)` the pieces of `N_r(2^k x - n)`
 jump by `(-1)^d C(r, d)/(r-1)! 2^(k(r-1)) (x - m 2^(-k))^(r-1)`, `d = m - n`. -/

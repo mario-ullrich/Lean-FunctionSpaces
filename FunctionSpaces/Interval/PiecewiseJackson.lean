@@ -17,14 +17,14 @@ piecewise polynomials of level `k` and degree `< r` is bounded by the modulus of
 `E_{2^k}(f)_p ≤ 2 (1 + 2^r r^(2r)) ω_r(f, 2^(-k), [0, 1])_p`
 (`Interval.approxSeq_ppScheme_le`).
 
-The proof uses no Whitney theorem. For continuous `f`, the Steklov smoothing `S_δ f` with
-`δ = 2^(-k) / r²` is close to `f` and its `r`-th derivative is bounded by `δ^(-r)` times the
-modulus (`Interval.eLpNorm_sub_smooth_le`, `Interval.eLpNorm_iteratedDeriv_smooth_le`); on each
-dyadic interval it is approximated by a polynomial (`Interval.exists_eLpNorm_sub_polyFun_le`).
-The smoothing looks to the right of `x`, so this argument covers `[0, 1/2]`
+The proof uses no Whitney theorem. For continuous `f`, the Steklov smoothing of
+`Interval.exists_left_smoothing` is close to `f`, its `r`-th derivative is bounded by `2^(kr)`
+times the modulus, and on each dyadic interval it is approximated by a Taylor polynomial. The
+smoothing looks to the right of `x`, so this argument covers `[0, 1/2]`
 (`Interval.exists_left_approx`); the reflection `x ↦ 1 - x` preserves the modulus and gives
 `[1/2, 1]` (`Interval.exists_right_approx`). The point `1/2` is a knot of every level `k ≥ 1`,
-which is why `k ≥ 1`. General `f ∈ L_p` follow by density of bounded continuous functions.
+which is why `k ≥ 1`. General `f ∈ L_p` follow by density of bounded continuous functions
+(`Interval.approxSeq_le_of_continuous`, which serves every scheme in `L_p[0, 1]`).
 -/
 
 @[expose] public section
@@ -50,8 +50,8 @@ theorem jacksonConst_ne_top (r : ℕ) : jacksonConst r ≠ ∞ := by
 of degree `< r` such that every function `S` equal to `Q_n` on the open dyadic intervals of level
 `k + 1` in `[0, 1/2]` satisfies
 `‖F - S‖_{L_p[0, 1/2]} ≤ (1 + 2^r r^(2r)) ω_r(F, 2^(-(k+1)), [0, 1])_p`.
-The proof smooths `F` by `S_δ`, `δ = 2^(-(k+1)) / r²`, and approximates `S_δ F` by Taylor
-polynomials on each dyadic interval. -/
+The proof smooths `F` (`Interval.exists_left_smoothing` with `L = 2^(-(k+1))`) and approximates
+the smoothing by Taylor polynomials on each dyadic interval. -/
 theorem exists_left_approx {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr : 1 ≤ r) {p : ℝ≥0∞}
     (hp : 1 ≤ p) (hp' : p ≠ ∞) (k : ℕ) :
     ∃ Q : ℕ → ℂ[X], (∀ n, Q n ∈ degreeLT ℂ r) ∧ ∀ S : ℝ → ℂ, Measurable S →
@@ -63,46 +63,21 @@ theorem exists_left_approx {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr :
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp'
   set L : ℝ := 1 / 2 ^ (k + 1) with hLdef
   have hL : 0 < L := by positivity
-  have hr' : (0 : ℝ) < r := by exact_mod_cast hr
-  set δ : ℝ := L / r ^ 2 with hδdef
-  have hδ : 0 < δ := by positivity
-  have hrδ : (r : ℝ) * δ ≤ L := by
-    have hr1 : (1 : ℝ) ≤ r := by exact_mod_cast hr
-    have hrr : (r : ℝ) ≤ r ^ 2 := by nlinarith
-    rw [hδdef, mul_div_assoc', div_le_iff₀ (by positivity)]
-    nlinarith
   have hL2 : (2 ^ k : ℕ) * L = 1 / 2 := by
     rw [hLdef]; push_cast; field_simp; ring
-  set g := smooth r δ F
-  have hg : ContDiff ℝ r g := contDiff_smooth hF r δ
-  choose Q hQ hQb using fun n : ℕ => exists_eLpNorm_sub_polyFun_le hp r hg
-    (u := n * L) (v := (n + 1) * L) (by nlinarith)
+  have hwL : (1 / 2 : ℝ) + L ≤ 1 := by
+    have : L ≤ 1 / 2 := by
+      rw [hLdef, div_le_div_iff₀ (by positivity) (by norm_num), one_mul, one_mul]
+      calc (2 : ℝ) = 2 ^ 1 := by norm_num
+        _ ≤ 2 ^ (k + 1) := pow_le_pow_right₀ (by norm_num) (by omega)
+    linarith
+  obtain ⟨g, D, hgm, hDm, h1, h2, hT⟩ := exists_left_smoothing hF hr hp hp' hL hwL
+  choose Q hQ hQb using fun n : ℕ => hT (n * L) ((n + 1) * L) (by nlinarith)
   refine ⟨Q, hQ, fun S hS hSQ => ?_⟩
   set ω := modulus r p 0 1 F L
-  have hdom : (1 / 2 : ℝ) + r * (r * δ) ≤ 1 := by
-    have : (r : ℝ) * (r * δ) = L := by rw [hδdef]; field_simp
-    rw [this, hLdef]
-    have : (1 : ℝ) / 2 ^ (k + 1) ≤ 1 / 2 := by
-      rw [div_le_div_iff₀ (by positivity) (by norm_num)]
-      have : (2 : ℝ) ≤ 2 ^ (k + 1) := by
-        calc (2 : ℝ) = 2 ^ 1 := by norm_num
-          _ ≤ 2 ^ (k + 1) := pow_le_pow_right₀ (by norm_num) (by omega)
-      linarith
-    linarith
-  have hmod : modulus r p 0 1 F (r * δ) ≤ ω := modulus_mono r p 0 1 F hrδ
-  -- the smoothing error
-  have h1 : eLpNorm (fun x => F x - g x) p (volume.restrict (Icc 0 (1 / 2))) ≤ ω :=
-    (eLpNorm_sub_smooth_le hF r hδ hp hp' le_rfl hdom).trans hmod
-  -- the derivative of the smoothing
-  have h2 : eLpNorm (iteratedDeriv r g) p (volume.restrict (Icc 0 (1 / 2))) ≤
-      2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * ω :=
-    (eLpNorm_iteratedDeriv_smooth_le hF r hδ hp le_rfl hdom).trans (by gcongr)
-  have hgm : Measurable g := hg.continuous.measurable
-  have hderm : Measurable (iteratedDeriv r g) :=
-    (hg.continuous_iteratedDeriv r le_rfl).measurable
   -- the Taylor error, summed over the dyadic intervals
   have h3 : eLpNorm (fun x => g x - S x) p (volume.restrict (Icc 0 (1 / 2))) ≤
-      ENNReal.ofReal L ^ r * eLpNorm (iteratedDeriv r g) p (volume.restrict (Icc 0 (1 / 2))) := by
+      ENNReal.ofReal L ^ r * eLpNorm D p (volume.restrict (Icc 0 (1 / 2))) := by
     refine eLpNorm_le_of_lintegral_le (hgm.sub hS).aestronglyMeasurable hp0 hp' ?_
     have hsplit := lintegral_Icc_le_sum (fun x => ‖g x - S x‖ₑ ^ p.toReal) 0 hL.le (2 ^ k)
     rw [zero_add, hL2] at hsplit
@@ -110,7 +85,7 @@ theorem exists_left_approx {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr :
     have hpiece : ∀ n ∈ Finset.range (2 ^ k),
         ∫⁻ x in Icc (0 + n * L) (0 + (n + 1) * L), ‖g x - S x‖ₑ ^ p.toReal ≤
           (ENNReal.ofReal L ^ r) ^ p.toReal *
-            ∫⁻ x in Icc (0 + n * L) (0 + (n + 1) * L), ‖iteratedDeriv r g x‖ₑ ^ p.toReal :=
+            ∫⁻ x in Icc (0 + n * L) (0 + (n + 1) * L), ‖D x‖ₑ ^ p.toReal :=
       fun n hn => by
         simp only [zero_add]
         have hae : ∀ᵐ x ∂volume.restrict (Icc (n * L) ((n + 1) * L)),
@@ -123,7 +98,7 @@ theorem exists_left_approx {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr :
             · rw [hLdef] at hx; have := hx.2; field_simp at this ⊢; linarith)]
         rw [lintegral_congr_ae hae, ← eLpNorm_rpow_eq (g := fun x => g x - polyFun (Q n) x)
           ((hgm.sub (measurable_polyFun _)).aestronglyMeasurable) hp0 hp',
-          ← eLpNorm_rpow_eq hderm.aestronglyMeasurable hp0 hp',
+          ← eLpNorm_rpow_eq hDm.aestronglyMeasurable hp0 hp',
           ← ENNReal.mul_rpow_of_nonneg _ _ hq.le]
         have hlen : ((n : ℝ) + 1) * L - n * L = L := by ring
         have hb := hQb n
@@ -131,29 +106,24 @@ theorem exists_left_approx {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr :
         exact ENNReal.rpow_le_rpow hb hq.le
     refine (Finset.sum_le_sum hpiece).trans ?_
     rw [← Finset.mul_sum, ENNReal.mul_rpow_of_nonneg _ _ hq.le,
-      eLpNorm_rpow_eq hderm.aestronglyMeasurable hp0 hp']
+      eLpNorm_rpow_eq hDm.aestronglyMeasurable hp0 hp']
     gcongr
-    have := sum_le_lintegral_Icc (G := fun x => ‖iteratedDeriv r g x‖ₑ ^ p.toReal) 0 hL.le (2 ^ k)
+    have := sum_le_lintegral_Icc (G := fun x => ‖D x‖ₑ ^ p.toReal) 0 hL.le (2 ^ k)
     rw [zero_add, hL2] at this
     exact this
-  have hLδ : ENNReal.ofReal L ^ r * (2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * ω) =
-      2 ^ r * (r : ℝ≥0∞) ^ (2 * r) * ω := by
-    have : ENNReal.ofReal L * (ENNReal.ofReal δ)⁻¹ = (r : ℝ≥0∞) ^ 2 := by
-      rw [← ENNReal.ofReal_inv_of_pos hδ, ← ENNReal.ofReal_mul hL.le, hδdef]
-      rw [show L * (L / (r : ℝ) ^ 2)⁻¹ = (r : ℝ) ^ 2 by field_simp]
-      rw [ENNReal.ofReal_pow (Nat.cast_nonneg r), ENNReal.ofReal_natCast]
-    calc ENNReal.ofReal L ^ r * (2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * ω)
-        = 2 ^ r * (ENNReal.ofReal L * (ENNReal.ofReal δ)⁻¹) ^ r * ω := by rw [mul_pow]; ring
-      _ = _ := by rw [this, ← pow_mul]
+  have hLL : ENNReal.ofReal L * ENNReal.ofReal L⁻¹ = 1 := by
+    rw [← ENNReal.ofReal_mul hL.le, mul_inv_cancel₀ hL.ne', ENNReal.ofReal_one]
   calc eLpNorm (fun x => F x - S x) p (volume.restrict (Icc 0 (1 / 2)))
       = eLpNorm ((fun x => F x - g x) + fun x => g x - S x) p
           (volume.restrict (Icc 0 (1 / 2))) := by congr 1; funext x; simp
     _ ≤ eLpNorm (fun x => F x - g x) p (volume.restrict (Icc 0 (1 / 2))) +
           eLpNorm (fun x => g x - S x) p (volume.restrict (Icc 0 (1 / 2))) :=
         eLpNorm_add_le hp
-    _ ≤ ω + ENNReal.ofReal L ^ r * (2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * ω) :=
+    _ ≤ ω + ENNReal.ofReal L ^ r * (ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω) :=
         add_le_add h1 (h3.trans (by gcongr))
-    _ = jacksonConst r * ω := by rw [hLδ, jacksonConst]; ring
+    _ = ω + (ENNReal.ofReal L * ENNReal.ofReal L⁻¹) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω := by
+        rw [mul_pow]; ring
+    _ = jacksonConst r * ω := by rw [hLL, one_pow, one_mul, jacksonConst]; ring
 
 /-- **Local Jackson estimate on the right half**, by reflection: for continuous `F` there are
 polynomials `Q_n` of degree `< r` such that every `S` with `S(1 - x) = Q_n(x)` on the open
@@ -276,31 +246,29 @@ theorem lpModulus_le (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
   rw [Lp.enorm_def]
   exact modulus_le (Lp.stronglyMeasurable f).measurable Fact.out r 0 1 _
 
-/-- **Jackson's inequality for dyadic piecewise polynomials**: for `1 ≤ p < ∞`, `r ≥ 1` and
-`k ≥ 1`, `E_{2^k}(f)_p ≤ 2 (1 + 2^r r^(2r)) ω_r(f, 2^(-k), [0, 1])_p`; first for continuous
-functions, then by density. -/
-theorem approxSeq_ppScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) (f : Lp ℂ p unitVol) {k : ℕ}
-    (hk : 1 ≤ k) :
-    (ppScheme p r).approxSeq f (2 ^ k) ≤ 2 * jacksonConst r * lpModulus p r f k := by
-  obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le' hk
-  have hp1 : 1 ≤ p := Fact.out
-  set C := 2 * jacksonConst r
-  have hC : C ≠ ∞ := ENNReal.mul_ne_top (by norm_num) (jacksonConst_ne_top r)
+/-- **From continuous functions to `L_p` by density**: a bound `E_n(g) ≤ C ω_r(g, 2^(-k))_p`
+for every bounded continuous `g`, given by an approximant `u ∈ A_n` of `g`, holds for every
+`f ∈ L_p[0, 1]`, `p < ∞`. The bounded continuous functions are dense in `L_p` (Mathlib's
+`BoundedContinuousFunction.toLp_denseRange`), and both sides move by at most a multiple of
+`‖f - g‖_p`. -/
+theorem approxSeq_le_of_continuous {A : ApproximationScheme (Lp ℂ p unitVol)} (hp : p ≠ ∞)
+    {r n k : ℕ} {C : ℝ≥0∞} (hC : C ≠ ∞)
+    (h : ∀ g : ℝ →ᵇ ℂ, ∃ u : ℝ → ℂ, (∃ a ∈ A n, (a : ℝ → ℂ) =ᵐ[unitVol] u) ∧
+      eLpNorm (fun x => g x - u x) p unitVol ≤ C * modulus r p 0 1 g (1 / 2 ^ k))
+    (f : Lp ℂ p unitVol) : A.approxSeq f n ≤ C * lpModulus p r f k := by
   -- continuous functions
-  have hcont : ∀ g : ℝ →ᵇ ℂ, (ppScheme p r).approxSeq
-      (BoundedContinuousFunction.toLp (E := ℂ) p unitVol ℝ g) (2 ^ (k + 1)) ≤
-        C * lpModulus p r (BoundedContinuousFunction.toLp (E := ℂ) p unitVol ℝ g) (k + 1) := by
+  have hcont : ∀ g : ℝ →ᵇ ℂ, A.approxSeq
+      (BoundedContinuousFunction.toLp (E := ℂ) p unitVol ℝ g) n ≤
+        C * lpModulus p r (BoundedContinuousFunction.toLp (E := ℂ) p unitVol ℝ g) k := by
     intro g
-    obtain ⟨Q, hQ, hbound⟩ := exists_ppFun_approx g.continuous hr hp1 hp k
-    set a := (memLp_ppFun (k + 1) Q p).toLp (ppFun (k + 1) Q)
-    have ha : a ∈ ppScheme p r (2 ^ (k + 1)) :=
-      mem_ppScheme_two_pow.2 ⟨Q, hQ, MemLp.coeFn_toLp _⟩
+    obtain ⟨u, ⟨a, ha, hau⟩, hbound⟩ := h g
     have hg := BoundedContinuousFunction.coeFn_toLp (E := ℂ) p unitVol ℝ g
-    refine ((ppScheme p r).approxSeq_le_of_mem ha _).trans ?_
-    rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hg.sub (MemLp.coeFn_toLp _))),
-      lpModulus, modulus_congr_ae hg]
+    refine (A.approxSeq_le_of_mem ha _).trans ?_
+    rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hg.sub hau)), lpModulus,
+      modulus_congr_ae hg]
     exact hbound
-  set b := C * lpModulus p r f (k + 1)
+  -- density
+  set b := C * lpModulus p r f k
   refine ENNReal.le_of_forall_pos_le_add fun ε hε _ => ?_
   set K : ℝ≥0∞ := C * 2 ^ r + 1
   have hK : K ≠ ∞ := ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top hC (by simp), ENNReal.one_ne_top⟩
@@ -314,18 +282,31 @@ theorem approxSeq_ppScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) (f : Lp 
     rw [← edist_eq_enorm_sub, edist_dist, ← ENNReal.ofReal_toReal
       (ENNReal.div_ne_top ENNReal.coe_ne_top hK0)]
     exact ENNReal.ofReal_le_ofReal hg.le
-  have hmod : lpModulus p r fg (k + 1) ≤ lpModulus p r f (k + 1) + 2 ^ r * ‖f - fg‖ₑ := by
-    have h := lpModulus_add_le r f (fg - f) (k + 1)
+  have hmod : lpModulus p r fg k ≤ lpModulus p r f k + 2 ^ r * ‖f - fg‖ₑ := by
+    have h := lpModulus_add_le r f (fg - f) k
     rw [add_sub_cancel] at h
     refine h.trans (add_le_add le_rfl ((lpModulus_le r _ _).trans ?_))
     rw [← enorm_neg, neg_sub]
-  calc (ppScheme p r).approxSeq f (2 ^ (k + 1))
-      ≤ (ppScheme p r).approxSeq fg (2 ^ (k + 1)) + ‖f - fg‖ₑ :=
-        ApproximationScheme.approxSeq_le_approxSeq_add_enorm _ f fg
-    _ ≤ C * (lpModulus p r f (k + 1) + 2 ^ r * ‖f - fg‖ₑ) + ‖f - fg‖ₑ :=
+  calc A.approxSeq f n
+      ≤ A.approxSeq fg n + ‖f - fg‖ₑ := ApproximationScheme.approxSeq_le_approxSeq_add_enorm _ f fg
+    _ ≤ C * (lpModulus p r f k + 2 ^ r * ‖f - fg‖ₑ) + ‖f - fg‖ₑ :=
         add_le_add ((hcont g).trans (by gcongr)) le_rfl
     _ = b + K * ‖f - fg‖ₑ := by simp only [b, K]; ring
     _ ≤ b + K * (ε / K) := by gcongr
     _ = b + ε := by rw [ENNReal.mul_div_cancel hK0 hK]
+
+/-- **Jackson's inequality for dyadic piecewise polynomials**: for `1 ≤ p < ∞`, `r ≥ 1` and
+`k ≥ 1`, `E_{2^k}(f)_p ≤ 2 (1 + 2^r r^(2r)) ω_r(f, 2^(-k), [0, 1])_p`; first for continuous
+functions (`Interval.exists_ppFun_approx`), then by density
+(`Interval.approxSeq_le_of_continuous`). -/
+theorem approxSeq_ppScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) (f : Lp ℂ p unitVol) {k : ℕ}
+    (hk : 1 ≤ k) :
+    (ppScheme p r).approxSeq f (2 ^ k) ≤ 2 * jacksonConst r * lpModulus p r f k := by
+  obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le' hk
+  refine approxSeq_le_of_continuous hp (ENNReal.mul_ne_top (by norm_num) (jacksonConst_ne_top r))
+    (fun g => ?_) f
+  obtain ⟨Q, hQ, hbound⟩ := exists_ppFun_approx g.continuous hr Fact.out hp k
+  exact ⟨ppFun (k + 1) Q, ⟨(memLp_ppFun (k + 1) Q p).toLp _,
+    mem_ppScheme_two_pow.2 ⟨Q, hQ, MemLp.coeFn_toLp _⟩, MemLp.coeFn_toLp _⟩, hbound⟩
 
 end Interval

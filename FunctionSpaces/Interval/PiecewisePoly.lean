@@ -16,11 +16,13 @@ A **piecewise polynomial of level `k` and degree `< r`** agrees on each dyadic i
 `I_{k,n} = [n 2^(-k), (n + 1) 2^(-k))` with a polynomial of degree `< r`
 (`Interval.ppFun`).  Their classes in `L_p[0, 1]` form subspaces `V_k` increasing in `k`
 (`Interval.ppSpace`), and the scheme with approximants `V_{⌊log₂ n⌋}` of complexity `n`
-(`Interval.ppScheme`) has `V_k` as approximants of complexity `2^k`.
+(`Interval.ppScheme`, an `ApproximationScheme.ofMonotoneSubmodules`) has `V_k` as approximants
+of complexity `2^k`.
 
 This file sets up the spaces, the bookkeeping for the pieces (on `I_{k,m}` a piecewise
 polynomial is the polynomial `Q_m`, and `0` beyond `[0, 1)`, `Interval.ppFun_eq_polyFun`) and
-for integrals over unions of dyadic intervals (`Interval.lintegral_Icc_le_sum`).
+for integrals over unions of dyadic intervals (`Interval.lintegral_Icc_le_sum`,
+`Interval.lintegral_Icc_le_sum_dyadicIco`).
 Jackson's inequality is in `FunctionSpaces.Interval.PiecewiseJackson`, the inverse inequality and
 the identification of the approximation spaces in `FunctionSpaces.Interval.PiecewiseInverse`.
 -/
@@ -174,36 +176,28 @@ theorem ppSpace_mono (r : ℕ) : Monotone (ppSpace p r) := by
   exact ⟨fun n => Q (n / 2), fun n => hQ _, hgQ.trans (ppFun_refine k Q).symm⟩
 
 variable (p) in
-/-- The approximants of complexity `n`: `{0}` for `n = 0`, `V_{⌊log₂ n⌋}` for `n ≥ 1`. -/
-noncomputable def ppApproximants (r n : ℕ) : Submodule ℝ (Lp ℂ p unitVol) :=
-  if n = 0 then ⊥ else ppSpace p r (Nat.log 2 n)
-
-omit [Fact (1 ≤ p)] in
-/-- The approximants of the piecewise polynomial scheme increase. -/
-theorem ppApproximants_mono (r : ℕ) : Monotone (ppApproximants p r) := by
-  intro a b hab f hf
-  by_cases ha : a = 0
-  · simp only [ppApproximants, ha, ↓reduceIte, Submodule.mem_bot] at hf
-    rw [hf]; exact Submodule.zero_mem _
-  · have hb : b ≠ 0 := by omega
-    simp only [ppApproximants, ha, hb, ↓reduceIte] at hf ⊢
-    exact ppSpace_mono r (Nat.log_mono_right hab) hf
-
-variable (p) in
-/-- The **scheme of dyadic piecewise polynomials** of degree `< r` in `L_p[0, 1]`. -/
+/-- The **scheme of dyadic piecewise polynomials** of degree `< r` in `L_p[0, 1]`: `{0}` at
+complexity `0` and `V_{⌊log₂ n⌋}` at complexity `n ≥ 1`. -/
 noncomputable def ppScheme (r : ℕ) : ApproximationScheme (Lp ℂ p unitVol) :=
-  ApproximationScheme.ofSubmodules (ppApproximants p r) (by simp [ppApproximants])
-    (ppApproximants_mono r)
+  ApproximationScheme.ofMonotoneSubmodules (ppSpace p r) (ppSpace_mono r)
+
+/-- The approximants of complexity `0` are `{0}`. -/
+theorem mem_ppScheme_zero {r : ℕ} {g : Lp ℂ p unitVol} : g ∈ ppScheme p r 0 ↔ g = 0 :=
+  ApproximationScheme.mem_ofMonotoneSubmodules_zero
+
+/-- The approximants of complexity `n ≥ 1` are the piecewise polynomials of level `⌊log₂ n⌋`. -/
+theorem mem_ppScheme {r n : ℕ} (hn : n ≠ 0) {g : Lp ℂ p unitVol} :
+    g ∈ ppScheme p r n ↔ g ∈ ppSpace p r (Nat.log 2 n) :=
+  ApproximationScheme.mem_ofMonotoneSubmodules hn
 
 /-- The approximants of complexity `2^k` are the piecewise polynomials of level `k`. -/
 theorem mem_ppScheme_two_pow {r k : ℕ} {g : Lp ℂ p unitVol} :
-    g ∈ ppScheme p r (2 ^ k) ↔ g ∈ ppSpace p r k := by
-  show g ∈ ppApproximants p r (2 ^ k) ↔ _
-  simp [ppApproximants, Nat.log_pow Nat.one_lt_two]
+    g ∈ ppScheme p r (2 ^ k) ↔ g ∈ ppSpace p r k :=
+  ApproximationScheme.mem_ofMonotoneSubmodules_two_pow
 
 /-- The piecewise polynomial scheme is linear. -/
 theorem ppScheme_isLinear (r : ℕ) : (ppScheme p r).IsLinear :=
-  ApproximationScheme.isLinear_ofSubmodules _ _ _
+  ApproximationScheme.isLinear_ofMonotoneSubmodules _ _
 
 /-- **Integrals over a union of intervals**: `∫_{[u, u + mL]} G ≤ ∑_{n < m} ∫_{[u + nL, u + (n+1)L]} G`
 for `L ≥ 0`. -/
@@ -245,6 +239,35 @@ theorem sum_le_lintegral_Icc {G : ℝ → ℝ≥0∞} (u : ℝ) {L : ℝ} (hL : 
         (by nlinarith)).symm
     rw [hsplit, lintegral_union measurableSet_Ico (Ico_disjoint_Ico_same.mono_left
       (fun _ h => h) |>.mono_right (fun _ h => h))]
+
+/-- The closed intervals `[0 + n 2^(-k), 0 + (n + 1) 2^(-k)]` of `Interval.lintegral_Icc_le_sum`
+agree with the dyadic intervals up to a null set. -/
+theorem lintegral_Icc_eq_dyadicIco (G : ℝ → ℝ≥0∞) (k n : ℕ) :
+    ∫⁻ x in Icc ((0 : ℝ) + n * (1 / 2 ^ k)) ((0 : ℝ) + (n + 1) * (1 / 2 ^ k)), G x =
+      ∫⁻ x in dyadicIco k n, G x := by
+  have hIco :
+      Ico ((0 : ℝ) + n * (1 / 2 ^ k)) ((0 : ℝ) + (n + 1) * (1 / 2 ^ k)) = dyadicIco k n := by
+    rw [dyadicIco]
+    congr 1 <;> ring
+  rw [← setLIntegral_congr Ico_ae_eq_Icc, hIco]
+
+/-- `[0, 1]` is the union of the `2^k` intervals of length `2^(-k)` starting at `0`. -/
+theorem zero_add_two_pow_mul_eq_one (k : ℕ) : (0 : ℝ) + ((2 ^ k : ℕ) : ℝ) * (1 / 2 ^ k) = 1 := by
+  rw [zero_add]; push_cast; field_simp
+
+/-- **`[0, 1]` against the dyadic intervals**: `∫_{[0,1]} G ≤ ∑_{n < 2^k} ∫_{I_{k,n}} G`. -/
+theorem lintegral_Icc_le_sum_dyadicIco (G : ℝ → ℝ≥0∞) (k : ℕ) :
+    ∫⁻ x in Icc (0 : ℝ) 1, G x ≤ ∑ n ∈ Finset.range (2 ^ k), ∫⁻ x in dyadicIco k n, G x := by
+  have hsplit := lintegral_Icc_le_sum G 0 (by positivity : (0 : ℝ) ≤ 1 / 2 ^ k) (2 ^ k)
+  rw [zero_add_two_pow_mul_eq_one] at hsplit
+  exact hsplit.trans_eq (Finset.sum_congr rfl fun n _ => lintegral_Icc_eq_dyadicIco G k n)
+
+/-- **The dyadic intervals against `[0, 1]`**: `∑_{n < 2^k} ∫_{I_{k,n}} G ≤ ∫_{[0,1]} G`. -/
+theorem sum_lintegral_dyadicIco_le (G : ℝ → ℝ≥0∞) (k : ℕ) :
+    ∑ n ∈ Finset.range (2 ^ k), ∫⁻ x in dyadicIco k n, G x ≤ ∫⁻ x in Icc (0 : ℝ) 1, G x := by
+  have hsum := sum_le_lintegral_Icc (G := G) 0 (by positivity : (0 : ℝ) ≤ 1 / 2 ^ k) (2 ^ k)
+  rw [zero_add_two_pow_mul_eq_one] at hsum
+  exact (Finset.sum_congr rfl fun n _ => (lintegral_Icc_eq_dyadicIco G k n).symm).trans_le hsum
 
 /-- Floor of `2^k x` on a dyadic interval: `x ∈ I_{k,n}` gives `⌊2^k x⌋ = n`. -/
 theorem floor_eq_of_mem_dyadicIco {k n : ℕ} {x : ℝ} (hx : x ∈ dyadicIco k n) :

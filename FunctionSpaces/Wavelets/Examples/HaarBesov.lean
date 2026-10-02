@@ -128,14 +128,12 @@ theorem ae_eq_ppFun_of_stronglyMeasurable {j : ℕ} {g : ℝ → ℂ}
 /-- `toHaar` maps the piecewise constant approximants into the Haar approximants. -/
 theorem toHaar_mem_scheme {n : ℕ} {a : Lp ℂ p unitVol} (ha : a ∈ ppScheme p 1 n) :
     toHaar p a ∈ scheme p n := by
-  change a ∈ ppApproximants p 1 n at ha
   show toHaar p a ∈ dyadicFiltration.approximants p vol n
-  unfold ppApproximants at ha
   unfold Filtration.approximants
-  split_ifs at ha ⊢ with hn
-  · rw [Submodule.mem_bot] at ha ⊢
-    rw [ha, map_zero]
-  · obtain ⟨Q, hQ, hae⟩ := ha
+  split_ifs with hn
+  · subst hn
+    rw [Submodule.mem_bot, mem_ppScheme_zero.1 ha, map_zero]
+  · obtain ⟨Q, hQ, hae⟩ := (mem_ppScheme hn).1 ha
     rw [mem_lpMeas_iff_aestronglyMeasurable]
     exact ⟨stepFun (ppFun (Nat.log 2 n) Q) (Nat.log 2 n), stronglyMeasurable_stepFun _ _,
       (coeFn_toHaar a).trans ((ae_eq_vol_of_unitVol hae).trans (ppFun_ae_eq_stepFun hQ _))⟩
@@ -144,13 +142,13 @@ theorem toHaar_mem_scheme {n : ℕ} {a : Lp ℂ p unitVol} (ha : a ∈ ppScheme 
 theorem ofHaar_mem_ppScheme {n : ℕ} {a : Lp ℂ p vol} (ha : a ∈ scheme p n) :
     ofHaar p a ∈ ppScheme p 1 n := by
   change a ∈ dyadicFiltration.approximants p vol n at ha
-  show ofHaar p a ∈ ppApproximants p 1 n
   unfold Filtration.approximants at ha
-  unfold ppApproximants
-  split_ifs at ha ⊢ with hn
-  · rw [Submodule.mem_bot] at ha ⊢
-    rw [ha, map_zero]
-  · rw [mem_lpMeas_iff_aestronglyMeasurable] at ha
+  split_ifs at ha with hn
+  · subst hn
+    rw [Submodule.mem_bot] at ha
+    rw [mem_ppScheme_zero, ha, map_zero]
+  · rw [mem_ppScheme hn]
+    rw [mem_lpMeas_iff_aestronglyMeasurable] at ha
     obtain ⟨g, hg, hag⟩ := ha
     refine ⟨fun m => C (g ((m : ℝ) / 2 ^ Nat.log 2 n)), fun m =>
       mem_degreeLT.2 (degree_C_le.trans_lt (by norm_num)), ?_⟩

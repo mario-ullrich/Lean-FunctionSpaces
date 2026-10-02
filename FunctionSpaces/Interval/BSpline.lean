@@ -20,16 +20,17 @@ and on `[j, j + 1)`, `0 ≤ j < r`, is the polynomial
 
 * Consecutive pieces differ by a multiple of `(X - j)^(r-1)` (`Interval.bsplinePiece_succ`),
   and `B_r = 0` (`Interval.bsplinePiece_top`), the `r`-th difference of a polynomial of degree
-  `< r`. So `N_r` is a spline: its pieces agree to order `r - 2` at the knots.
+  `< r` (Mathlib's `Polynomial.fwdDiff_iter_eq_zero_of_degree_lt`). So `N_r` is a spline: its
+  pieces agree to order `r - 2` at the knots.
 * On `[0, 1)` the `r` B-splines `N_r(· + j)`, `j < r`, are the polynomials
   `β_j(X) = B_j(X + j)` (`Interval.bsplineLocal`), and these form a basis of the polynomials of
   degree `< r` (`Interval.bsplineBasis`): in terms of the shifted powers `(X + m)^(r-1)`, which
   are linearly independent by a Vandermonde argument, the change of basis is triangular.
 * `β_j(X + 1) = β_{j+1} - (const) X^(r-1)` (`Interval.bsplineLocal_comp_add_one`). Hence the
   coordinates of a polynomial in these bases on neighbouring unit intervals agree
-  (`Interval.bsplineBasis_repr_comp_succ`): **every polynomial `P` of degree `< r` is
-  `∑_n c_n(P) N_r(x - n)` on all of `ℝ`**, with one coefficient `c_n(P)` per B-spline
-  (`Interval.polyFun_eq_sum_bsplineCoord`).
+  (`Interval.bcoord_comp_add_one`, `Interval.bcoord_comp_eq_bsplineCoef`): **every polynomial `P`
+  of degree `< r` is `∑_n c_n(P) N_r(x - n)` on all of `ℝ`**, with one coefficient `c_n(P)` per
+  B-spline (`Interval.polyFun_eq_sum_bsplineCoef`).
 -/
 
 @[expose] public section
@@ -53,56 +54,51 @@ theorem bsplinePiece_succ (r j : ℕ) :
       bsplinePiece r j + C (bsplineCoeff r (j + 1)) * (X - C ((j + 1 : ℕ) : ℂ)) ^ (r - 1) := by
   rw [bsplinePiece, sum_range_succ, ← bsplinePiece]
 
-/-- The power of a polynomial of degree `≤ 1` to the `r - 1` has degree `< r`. -/
+/-- The first piece `B_0 = X^(r-1)/(r-1)!`. -/
+theorem bsplinePiece_zero (r : ℕ) :
+    bsplinePiece r 0 = C (bsplineCoeff r 0) * (X - C 0) ^ (r - 1) := by
+  simp [bsplinePiece]
+
+/-- The power of a polynomial of degree `≤ 1` to the `r - 1` has degree `< r` (Mathlib's
+`Polynomial.natDegree_pow_le_of_le`). -/
 theorem pow_mem_degreeLT {r : ℕ} (hr : 1 ≤ r) {P : ℂ[X]} (hP : P.natDegree ≤ 1) :
     P ^ (r - 1) ∈ degreeLT ℂ r := by
   rw [mem_degreeLT]
-  have h : (P ^ (r - 1)).natDegree < r :=
-    calc (P ^ (r - 1)).natDegree ≤ (r - 1) * P.natDegree := natDegree_pow_le
-      _ ≤ (r - 1) * 1 := Nat.mul_le_mul_left _ hP
-      _ < r := by omega
+  have h : (P ^ (r - 1)).natDegree < r := (natDegree_pow_le_of_le (r - 1) hP).trans_lt (by omega)
   exact (degree_le_natDegree).trans_lt (by exact_mod_cast h)
-
-/-- `X - a` has degree `≤ 1`. -/
-theorem natDegree_X_sub_C_le_one (a : ℂ) : (X - C a).natDegree ≤ 1 :=
-  (natDegree_X_sub_C a).le
-
-/-- `X + a` has degree `≤ 1`. -/
-theorem natDegree_X_add_C_le_one (a : ℂ) : (X + C a).natDegree ≤ 1 :=
-  (natDegree_X_add_C a).le
 
 /-- The pieces have degree `< r`. -/
 theorem bsplinePiece_mem {r : ℕ} (hr : 1 ≤ r) (j : ℕ) : bsplinePiece r j ∈ degreeLT ℂ r :=
   Submodule.sum_mem _ fun l _ => by
     rw [← smul_eq_C_mul]
-    exact Submodule.smul_mem _ _ (pow_mem_degreeLT hr (natDegree_X_sub_C_le_one _))
+    exact Submodule.smul_mem _ _ (pow_mem_degreeLT hr (natDegree_X_sub_C_le _))
 
-/-- `(-1)^l = (-1)^r (-1)^(r-l)` for `l ≤ r`. -/
-theorem neg_one_pow_eq_of_le {l r : ℕ} (h : l ≤ r) :
-    (-1 : ℂ) ^ l = (-1) ^ r * (-1) ^ (r - l) := by
-  rw [← pow_add, show r + (r - l) = l + 2 * (r - l) by omega, pow_add, pow_mul, neg_one_sq,
-    one_pow, mul_one]
-
-/-- **The last piece vanishes**, `B_r = 0`: `∑_{l ≤ r} (-1)^l C(r, l) (z - l)^(r-1) = 0` is an
-`r`-th difference of a polynomial of degree `< r`. -/
+/-- **The last piece vanishes**, `B_r = 0`: `∑_{l ≤ r} (-1)^l C(r, l) (z - l)^(r-1) = 0` is the
+`r`-th difference of the polynomial `(z - X)^(r-1)` of degree `< r` at `0` (Mathlib's
+`Polynomial.fwdDiff_iter_eq_zero_of_degree_lt` and `fwdDiff_iter_eq_sum_shift`). -/
 theorem bsplinePiece_top {r : ℕ} (hr : 1 ≤ r) : bsplinePiece r r = 0 := by
   refine Polynomial.funext fun z => ?_
-  have hpoly : (C z - X) ^ (r - 1) ∈ degreeLT ℂ r :=
-    pow_mem_degreeLT hr ((natDegree_sub_le _ _).trans (by simp))
-  have h := congrFun (iterDiff_polynomial hpoly 1) 0
-  rw [iterDiff_apply] at h
-  simp only [eval_pow, eval_sub, eval_C, eval_X, zero_add, mul_one, Pi.zero_apply] at h
+  have hdeg : ((C z - X) ^ (r - 1)).natDegree < r :=
+    (natDegree_pow_le_of_le (m := 1) (r - 1) ((natDegree_sub_le _ _).trans (by simp))).trans_lt
+      (by omega)
+  have hsum : ∑ k ∈ range (r + 1),
+      (-1 : ℂ) ^ (r - k) * (r.choose k : ℂ) * (z - k) ^ (r - 1) = 0 := by
+    have h := congrFun (Polynomial.fwdDiff_iter_eq_zero_of_degree_lt hdeg) 0
+    rw [fwdDiff_iter_eq_sum_shift, Pi.zero_apply] at h
+    refine (sum_congr rfl fun k _ => ?_).trans h
+    simp only [eval_pow, eval_sub, eval_C, eval_X, zero_add, nsmul_eq_mul, mul_one, zsmul_eq_mul]
+    push_cast
+    ring
   rw [eval_zero, bsplinePiece, eval_finsetSum]
   simp only [eval_mul, eval_C, eval_pow, eval_sub, eval_X]
   calc ∑ l ∈ range (r + 1), bsplineCoeff r l * (z - l) ^ (r - 1)
       = ((-1 : ℂ) ^ r / ((r - 1).factorial : ℂ)) * ∑ k ∈ range (r + 1),
-          ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * (z - ((k : ℝ) : ℂ)) ^ (r - 1) := by
+          (-1 : ℂ) ^ (r - k) * (r.choose k : ℂ) * (z - k) ^ (r - 1) := by
         rw [mul_sum]
         refine sum_congr rfl fun l hl => ?_
-        have hl' : l ≤ r := Nat.lt_succ_iff.1 (mem_range.1 hl)
-        rw [bsplineCoeff, neg_one_pow_eq_of_le hl', Complex.ofReal_natCast]
+        rw [bsplineCoeff, neg_one_pow_eq_of_le (Nat.lt_succ_iff.1 (mem_range.1 hl))]
         ring
-    _ = 0 := by rw [h, mul_zero]
+    _ = 0 := by rw [hsum, mul_zero]
 
 /-! ### The B-spline basis on a unit interval -/
 
@@ -124,15 +120,7 @@ theorem bsplineLocal_mem {r : ℕ} (hr : 1 ≤ r) (j : ℕ) : bsplineLocal r j �
   rw [bsplineLocal_eq]
   exact Submodule.sum_mem _ fun l _ => by
     rw [← smul_eq_C_mul]
-    exact Submodule.smul_mem _ _ (pow_mem_degreeLT hr (natDegree_X_add_C_le_one _))
-
-/-- The polynomials of degree `< r` form a finite-dimensional space. -/
-instance finiteDimensional_degreeLT (r : ℕ) : FiniteDimensional ℂ (degreeLT ℂ r) :=
-  LinearEquiv.finiteDimensional (degreeLTEquiv ℂ r).symm
-
-/-- The polynomials of degree `< r` form a space of dimension `r`. -/
-theorem finrank_degreeLT (r : ℕ) : Module.finrank ℂ (degreeLT ℂ r) = r :=
-  (degreeLTEquiv ℂ r).finrank_eq.trans (Module.finrank_fin_fun ℂ)
+    exact Submodule.smul_mem _ _ (pow_mem_degreeLT hr (natDegree_X_add_C _).le)
 
 /-- **The shifted powers `(X + m)^(r-1)`, `m < r`, are linearly independent**: their
 coefficients give the system `∑_m g_m m^e = 0`, `e < r`, with a Vandermonde matrix. -/
@@ -161,7 +149,7 @@ theorem linearIndependent_X_add_C_pow (r : ℕ) :
 
 /-- The shifted powers as elements of the polynomials of degree `< r`. -/
 noncomputable def shiftedPow {r : ℕ} (hr : 1 ≤ r) (m : Fin r) : degreeLT ℂ r :=
-  ⟨(X + C ((m : ℕ) : ℂ)) ^ (r - 1), pow_mem_degreeLT hr (natDegree_X_add_C_le_one _)⟩
+  ⟨(X + C ((m : ℕ) : ℂ)) ^ (r - 1), pow_mem_degreeLT hr (natDegree_X_add_C _).le⟩
 
 /-- The shifted powers span the polynomials of degree `< r`. -/
 theorem top_le_span_shiftedPow {r : ℕ} (hr : 1 ≤ r) :
@@ -318,12 +306,12 @@ theorem bcoord_comp_add_one {r : ℕ} (hr : 1 ≤ r) {P : ℂ[X]} (hP : P ∈ de
 
 /-! ### B-spline coefficients of polynomials -/
 
-/-- Translates of polynomials of degree `< r` have degree `< r`. -/
+/-- Translates of polynomials of degree `< r` have degree `< r`: Mathlib's
+`Polynomial.taylor_mem_degreeLT`, since `taylor a P = P.comp (X + C a)` (`Polynomial.taylor_apply`),
+stated in the `comp` form that the rewrites below need. -/
 theorem comp_X_add_C_mem {r : ℕ} {P : ℂ[X]} (hP : P ∈ degreeLT ℂ r) (a : ℂ) :
-    P.comp (X + C a) ∈ degreeLT ℂ r := by
-  have h : X + C a = C a + C 1 * X := by rw [C_1, one_mul, add_comm]
-  rw [h]
-  exact comp_affine_mem_degreeLT hP a 1
+    P.comp (X + C a) ∈ degreeLT ℂ r :=
+  (taylor_mem_degreeLT (r := a)).2 hP
 
 /-- The **B-spline coefficient** `c_n(P)` of a polynomial `P`: the coordinate of `N_r(· - n)` in
 the expansion of `P` on `[n, n + 1)`. -/

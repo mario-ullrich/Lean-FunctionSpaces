@@ -433,29 +433,14 @@ theorem eLpNorm_ppFun_locProj_le (hp : 1 ≤ p) (hp' : p ≠ ∞) (r j : ℕ) {g
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp'
   refine eLpNorm_le_of_lintegral_le (measurable_ppFun _ _).aestronglyMeasurable hp0 hp' ?_
-  have hL : (0 : ℝ) ≤ 1 / 2 ^ j := by positivity
-  have h1 : (0 : ℝ) + ((2 ^ j : ℕ) : ℝ) * (1 / 2 ^ j) = 1 := by
-    rw [zero_add]; push_cast; field_simp
-  have hsplit := lintegral_Icc_le_sum (fun x => ‖ppFun j (locProj r j g) x‖ₑ ^ p.toReal) 0 hL (2 ^ j)
-  rw [h1] at hsplit
-  have hsum := sum_le_lintegral_Icc (G := fun x => ‖g x‖ₑ ^ p.toReal) 0 hL (2 ^ j)
-  rw [h1] at hsum
-  have hIco : ∀ n : ℕ, Ico ((0 : ℝ) + n * (1 / 2 ^ j)) ((0 : ℝ) + (n + 1) * (1 / 2 ^ j)) =
-      dyadicIco j n := fun n => by
-    rw [dyadicIco]
-    congr 1 <;> ring
   have hpiece : ∀ n ∈ Finset.range (2 ^ j),
-      ∫⁻ x in Icc ((0 : ℝ) + n * (1 / 2 ^ j)) ((0 : ℝ) + (n + 1) * (1 / 2 ^ j)),
-        ‖ppFun j (locProj r j g) x‖ₑ ^ p.toReal ≤
-      ppProjConst r ^ p.toReal *
-        ∫⁻ x in Icc ((0 : ℝ) + n * (1 / 2 ^ j)) ((0 : ℝ) + (n + 1) * (1 / 2 ^ j)),
-          ‖g x‖ₑ ^ p.toReal := fun n hn => by
+      ∫⁻ x in dyadicIco j n, ‖ppFun j (locProj r j g) x‖ₑ ^ p.toReal ≤
+        ppProjConst r ^ p.toReal * ∫⁻ x in dyadicIco j n, ‖g x‖ₑ ^ p.toReal := fun n hn => by
     have hn' := Finset.mem_range.1 hn
     have hgI : AEStronglyMeasurable g (volume.restrict (dyadicIco j n)) :=
       hg.mono_measure (Measure.restrict_mono
         ((dyadicIco_subset hn').trans Ico_subset_Icc_self) le_rfl)
-    rw [← setLIntegral_congr Ico_ae_eq_Icc, ← setLIntegral_congr Ico_ae_eq_Icc, hIco,
-      setLIntegral_congr_fun (measurableSet_dyadicIco j n)
+    rw [setLIntegral_congr_fun (measurableSet_dyadicIco j n)
         (fun x hx => by rw [ppFun_eq_of_mem _ hn' hx]),
       ← eLpNorm_rpow_eq (measurable_polyFun _).aestronglyMeasurable hp0 hp',
       ← eLpNorm_rpow_eq hgI hp0 hp', ← ENNReal.mul_rpow_of_nonneg _ _ hq.le]
@@ -463,14 +448,14 @@ theorem eLpNorm_ppFun_locProj_le (hp : 1 ≤ p) (hp' : p ≠ ∞) (r j : ℕ) {g
       hp j n hgI) hq.le
   calc ∫⁻ x, ‖ppFun j (locProj r j g) x‖ₑ ^ p.toReal ∂unitVol
       ≤ ∑ n ∈ Finset.range (2 ^ j),
-          ∫⁻ x in Icc ((0 : ℝ) + n * (1 / 2 ^ j)) ((0 : ℝ) + (n + 1) * (1 / 2 ^ j)),
-            ‖ppFun j (locProj r j g) x‖ₑ ^ p.toReal := hsplit
+          ∫⁻ x in dyadicIco j n, ‖ppFun j (locProj r j g) x‖ₑ ^ p.toReal :=
+        lintegral_Icc_le_sum_dyadicIco _ j
     _ ≤ ∑ n ∈ Finset.range (2 ^ j), ppProjConst r ^ p.toReal *
-          ∫⁻ x in Icc ((0 : ℝ) + n * (1 / 2 ^ j)) ((0 : ℝ) + (n + 1) * (1 / 2 ^ j)),
-            ‖g x‖ₑ ^ p.toReal := Finset.sum_le_sum hpiece
+          ∫⁻ x in dyadicIco j n, ‖g x‖ₑ ^ p.toReal := Finset.sum_le_sum hpiece
     _ ≤ ppProjConst r ^ p.toReal * ∫⁻ x in Icc (0 : ℝ) 1, ‖g x‖ₑ ^ p.toReal := by
         rw [← Finset.mul_sum]
         gcongr
+        exact sum_lintegral_dyadicIco_le _ j
     _ = (ppProjConst r * eLpNorm g p unitVol) ^ p.toReal := by
         rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, eLpNorm_rpow_eq hg hp0 hp']
 
@@ -539,18 +524,14 @@ projection of complexity `n ≥ 1` is the one onto the piecewise polynomials of 
 noncomputable def ppProjectionScheme (hp : p ≠ ∞) (r : ℕ) : (ppScheme p r).ProjectionScheme where
   P n := if n = 0 then 0 else ppProj p hp r (Nat.log 2 n)
   mem n f := by
-    show _ ∈ ppApproximants p r n
-    unfold ppApproximants
     split_ifs with hn
-    · simp
-    · exact ppProj_mem hp r _ f
+    · rw [hn, zero_apply, mem_ppScheme_zero]
+    · exact (mem_ppScheme hn).2 (ppProj_mem hp r _ f)
   proj n a ha := by
-    change a ∈ ppApproximants p r n at ha
-    unfold ppApproximants at ha
-    split_ifs at ha ⊢ with hn
-    · rw [Submodule.mem_bot] at ha
-      simp [ha]
-    · exact ppProj_of_mem hp ha
+    split_ifs with hn
+    · subst hn
+      rw [mem_ppScheme_zero.1 ha, zero_apply]
+    · exact ppProj_of_mem hp ((mem_ppScheme hn).1 ha)
   bound := (ppProjConst r).toReal
   norm_le n := by
     split_ifs

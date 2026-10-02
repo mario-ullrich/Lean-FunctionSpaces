@@ -67,13 +67,18 @@ follows from the second and $2^{k+1} + 2^k \leq 2^{k+2}$.
 
 \begin{definition}[Preimage and image of a scheme]
 \label{def:comap}
-\lean{ApproximationScheme.comap, ApproximationScheme.map, ApproximationScheme.ofSubmodules}
+\lean{ApproximationScheme.comap, ApproximationScheme.map, ApproximationScheme.ofSubmodules,
+  ApproximationScheme.ofMonotoneSubmodules, ApproximationScheme.mem_ofMonotoneSubmodules_zero,
+  ApproximationScheme.mem_ofMonotoneSubmodules, ApproximationScheme.mem_ofMonotoneSubmodules_two_pow}
 \leanok
 \uses{def:scheme}
 Let $A$ be an approximation scheme in $X$. For an injective linear map $\iota : Y \to X$, the
 sets $\iota^{-1}(A_n)$ form an approximation scheme in $Y$. For a linear map $T : X \to Y$, the
 sets $T(A_n)$ form an approximation scheme in $Y$. An increasing sequence of linear subspaces
-$V_0 \subseteq V_1 \subseteq \cdots$ of $X$ with $V_0 = \{0\}$ is an approximation scheme.
+$V_0 \subseteq V_1 \subseteq \cdots$ of $X$ with $V_0 = \{0\}$ is an approximation scheme. For
+every increasing sequence of linear subspaces $V_0 \subseteq V_1 \subseteq \cdots$, the sets
+$A_0 = \{0\}$ and $A_n = V_{\lfloor \log_2 n \rfloor}$, $n \geq 1$, form an approximation scheme,
+the \emph{dyadic scheme} of $(V_k)_k$, with $A_{2^k} = V_k$.
 \end{definition}
 
 Injectivity of $\iota$ is what gives $\iota^{-1}(\{0\}) = \{0\}$.
@@ -955,7 +960,7 @@ condition: they are small and approximable at a rate $\sigma$ from their own lev
 \begin{definition}[Linear scheme]
 \label{def:linear-scheme}
 \lean{ApproximationScheme.IsLinear, ApproximationScheme.isLinear_ofSubmodules,
-  ApproximationScheme.approxSeq_add_le_of_isLinear,
+  ApproximationScheme.isLinear_ofMonotoneSubmodules, ApproximationScheme.approxSeq_add_le_of_isLinear,
   ApproximationScheme.approxSeq_sum_le_of_isLinear}
 \leanok
 \uses{def:scheme, def:error}
@@ -2727,19 +2732,23 @@ on subintervals with Lebesgue measure.
 \label{def:iter-diff}
 \lean{Interval.iterDiff, Interval.iterDiff_apply, Interval.iterDiff_zero, Interval.iterDiff_succ,
   Interval.iterDiff_succ', Interval.iterDiff_add, Interval.iterDiff_sub,
-  Interval.iterDiff_const_mul, Interval.iterDiff_comp_add, Interval.iterDiff_reflect}
+  Interval.iterDiff_const_mul, Interval.iterDiff_comp_add, Interval.neg_one_pow_eq_of_le,
+  Interval.iterDiff_reflect, Interval.enorm_iterDiff_coeff, Interval.enorm_iterDiff_le_of_forall}
 \leanok
 For $f : \R \to \C$, $r \in \N$ and $h \in \R$ the difference of order $r$ is
 $\Delta_h^r f(x) = \sum_{k=0}^r (-1)^{r-k} \binom{r}{k} f(x + k h)$, the $r$-fold iterate of
-$\Delta_h f(x) = f(x + h) - f(x)$.
+$\Delta_h f(x) = f(x + h) - f(x)$. Since $\sum_k \binom{r}{k} = 2^r$,
+$|\Delta_h^r f(x)| \leq 2^r \max_{k \leq r} |f(x + k h)|$.
 \end{definition}
 
 \begin{lemma}[Differences annihilate polynomials]
 \label{lem:iter-diff-poly}
-\lean{Interval.iterDiff_polynomial}
+\lean{Interval.natDegree_comp_affine_le, Interval.comp_affine_mem_degreeLT,
+  Interval.iterDiff_polynomial}
 \leanok
 \uses{def:iter-diff}
-For every polynomial $P$ of degree $< r$ and every $h \in \R$, $\Delta_h^r P = 0$.
+Affine substitutions $x \mapsto u + v x$ do not raise the degree of a polynomial. For every
+polynomial $P$ of degree $< r$ and every $h \in \R$, $\Delta_h^r P = 0$.
 \end{lemma}
 
 \begin{proof}
@@ -2764,7 +2773,8 @@ $[a, b]$ is
 
 \begin{lemma}[Properties of the modulus]
 \label{lem:interval-modulus}
-\lean{Interval.eLpNorm_iterDiff_le, Interval.modulus_le, Interval.modulus_add_le,
+\lean{Interval.eLpNorm_iterDiff_le_of_forall, Interval.eLpNorm_iterDiff_le, Interval.modulus_le,
+  Interval.modulus_add_le,
   Interval.modulus_const_mul, Interval.modulus_polynomial, Interval.modulus_congr_ae,
   Interval.modulus_reflect}
 \leanok
@@ -2787,13 +2797,14 @@ point.
 \begin{lemma}[Nikolskii inequality for polynomials on intervals]
 \label{lem:interval-nikolskii}
 \lean{Interval.polyFun, Interval.continuous_polyFun, Interval.measurable_polyFun,
-  Interval.comp_affine_mem_degreeLT, Interval.polyFun_comp_affine, Interval.eq_zero_of_ae_eq_zero,
+  Interval.finrank_degreeLT, Interval.polyFun_comp_affine, Interval.eq_zero_of_ae_eq_zero,
   Interval.memLp_polyFun, Interval.polyFun_degreeLTEquiv_symm, Interval.coeffToLp,
   Interval.enorm_coeffToLp, Interval.coeffToLp_injective, Interval.exists_enorm_le_eLpNorm,
-  Interval.eLpNorm_comp_affine, Interval.enorm_polyFun_le}
+  Interval.eLpNorm_comp_affine, Interval.NikolskiiBound, Interval.NikolskiiBound.enorm_le,
+  Interval.enorm_polyFun_le}
 \leanok
 Let $r \in \N$ and $1 \leq p < \infty$. There is $K < \infty$ such that for every polynomial $P$ of
-degree $< r$, every interval $[u, u + L]$ with $L > 0$ and every $x \in [u, u + L]$,
+degree $< r$, every interval $[u, u + L]$ with $L > 0$ and every $x \in [u, u + 2L]$,
 \[
   |P(x)| \leq K L^{-1/p} \|P\|_{L_p[u, u + L]} .
 \]
@@ -2801,11 +2812,15 @@ degree $< r$, every interval $[u, u + L]$ with $L > 0$ and every $x \in [u, u + 
 
 \begin{proof}
 \leanok
-On $[0, 1]$ the map from the $r$ coefficients to $L_p[0, 1]$ is injective, since a nonzero
-polynomial has finitely many zeros, hence bounded below in finite dimension; this bounds the
-coefficients and so $|P(x)|$ by $\|P\|_{L_p[0,1]}$. The general interval follows by the affine
-change of variables $x = u + L y$, which multiplies the $L_p$ norm by $L^{-1/p}$.
+The polynomials of degree $< r$ form a space of dimension $r$. The map from the coefficients to
+$L_p[0, \tfrac12]$ is injective, since a nonzero polynomial has finitely many zeros, hence bounded
+below in finite dimension; this bounds the coefficients and so $|P(x)|$, $x \in [0, 1]$, by
+$\|P\|_{L_p[0,1/2]}$. The general interval follows by the affine change of variables
+$x = u + 2L y$, which multiplies the $L_p$ norm by $(2L)^{-1/p} \leq L^{-1/p}$.
 \end{proof}
+
+The bound on the doubled interval lets one piece of a piecewise polynomial control its values on
+the neighbouring interval, which the inverse inequality for splines needs.
 
 \begin{lemma}[Polynomial approximation of smooth functions]
 \label{lem:taylor-lp}
@@ -2905,6 +2920,25 @@ $(S_\delta f)^{(r)} = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta
 \Cref{lem:steklov-deriv}.
 \end{proof}
 
+\begin{lemma}[Smoothing on a left and a right part]
+\label{lem:two-sided-smoothing}
+\lean{Interval.exists_left_smoothing, Interval.exists_right_smoothing}
+\leanok
+\uses{thm:steklov-smoothing, lem:taylor-lp, lem:interval-modulus}
+Let $F$ be continuous, $r \geq 1$, $1 \leq p < \infty$, $L > 0$, $w + L \leq 1$ and
+$\omega = \omega_r(F, L, [0, 1])_p$. On $P = [0, w]$ and on $P = [1 - w, 1]$ there are functions
+$g$ and $D$ with $\|F - g\|_{L_p(P)} \leq \omega$, $\|D\|_{L_p(P)} \leq L^{-r} 2^r r^{2r} \omega$, and
+for all $a \leq b$ a polynomial $T$ of degree $< r$ with
+$\|g - T\|_{L_p[a,b]} \leq (b - a)^r \|D\|_{L_p[a,b]}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $[0, w]$ take the Steklov smoothing $g = S_\delta F$, $\delta = L/r^2$, so that
+$r^2 \delta = L$, and $D = g^{(r)}$ (\Cref{thm:steklov-smoothing}, \Cref{lem:taylor-lp}). On
+$[1 - w, 1]$ apply this to $F(1 - \cdot)$, which has the same modulus, and reflect back.
+\end{proof}
+
 \section{Dyadic piecewise polynomials}
 
 \begin{definition}[Dyadic piecewise polynomials]
@@ -2914,14 +2948,15 @@ $(S_\delta f)^{(r)} = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta
   Interval.mem_dyadicIco_floor, Interval.floor_two_pow_succ_div, Interval.ppFun,
   Interval.ppFun_eq_of_mem, Interval.measurable_ppFun, Interval.memLp_ppFun, Interval.ppFun_add,
   Interval.ppFun_const_mul, Interval.polyFun_zero, Interval.ppFun_zero, Interval.ppFun_refine,
-  Interval.ppSpace, Interval.ppSpace_mono, Interval.ppApproximants, Interval.ppApproximants_mono,
-  Interval.ppScheme, Interval.mem_ppScheme_two_pow, Interval.ppScheme_isLinear}
+  Interval.ppSpace, Interval.ppSpace_mono, Interval.ppScheme, Interval.mem_ppScheme_zero,
+  Interval.mem_ppScheme, Interval.mem_ppScheme_two_pow, Interval.ppScheme_isLinear}
 \leanok
+\uses{def:comap}
 Let $r \geq 1$ and $1 \leq p < \infty$. For $k \in \N$ the dyadic intervals of level $k$ are
 $I_{k,n} = [n 2^{-k}, (n+1) 2^{-k})$, $n < 2^k$. The space $V_k \subseteq L_p[0,1]$ consists of
 the classes of functions that agree on every $I_{k,n}$ with a polynomial of degree $< r$. The
-scheme of dyadic piecewise polynomials has $A_0 = \{0\}$ and $A_n = V_{\lfloor \log_2 n \rfloor}$
-for $n \geq 1$.
+scheme of dyadic piecewise polynomials is the dyadic scheme of $(V_k)_k$: $A_0 = \{0\}$ and
+$A_n = V_{\lfloor \log_2 n \rfloor}$ for $n \geq 1$.
 \end{definition}
 
 \begin{lemma}[Bookkeeping for dyadic intervals]
@@ -2929,12 +2964,15 @@ for $n \geq 1$.
 \lean{Interval.floor_eq_of_mem_dyadicIco, Interval.dyadicIco_subset,
   Interval.pairwise_disjoint_dyadicIco, Interval.ppFun_eq_zero, Interval.ppFun_eq_polyFun,
   Interval.ite_mem_degreeLT, Interval.lintegral_Icc_le_sum, Interval.sum_le_lintegral_Icc,
+  Interval.lintegral_Icc_eq_dyadicIco, Interval.zero_add_two_pow_mul_eq_one,
+  Interval.lintegral_Icc_le_sum_dyadicIco, Interval.sum_lintegral_dyadicIco_le,
   Interval.eLpNorm_le_of_lintegral_le}
 \leanok
 \uses{def:pp-scheme}
 For $x \in I_{k,n}$, $\lfloor 2^k x \rfloor = n$. A piecewise polynomial of level $k$ vanishes
 outside $[0, 1)$. For $u \in \R$, $L \geq 0$, $m \in \N$ and every $G : \R \to [0, \infty]$,
-$\int_{[u, u + mL]} G = \sum_{n < m} \int_{[u + nL, u + (n+1)L]} G$.
+$\int_{[u, u + mL]} G = \sum_{n < m} \int_{[u + nL, u + (n+1)L]} G$; in particular
+$\int_{[0, 1]} G = \sum_{n < 2^k} \int_{I_{k,n}} G$.
 \end{lemma}
 
 \begin{theorem}[Jackson's inequality for piecewise polynomials]
@@ -2942,10 +2980,9 @@ $\int_{[u, u + mL]} G = \sum_{n < m} \int_{[u + nL, u + (n+1)L]} G$.
 \lean{Interval.jacksonConst, Interval.jacksonConst_ne_top, Interval.exists_left_approx,
   Interval.exists_right_approx, Interval.eLpNorm_Icc_split, Interval.exists_ppFun_approx,
   Interval.lpModulus, Interval.lpModulus_add_le, Interval.lpModulus_le,
-  Interval.approxSeq_ppScheme_le}
+  Interval.approxSeq_le_of_continuous, Interval.approxSeq_ppScheme_le}
 \leanok
-\uses{def:pp-scheme, lem:pp-bookkeeping, thm:steklov-smoothing, lem:taylor-lp,
-  lem:interval-modulus}
+\uses{def:pp-scheme, lem:pp-bookkeeping, lem:two-sided-smoothing, lem:interval-modulus}
 Let $1 \leq p < \infty$ and $r \geq 1$. For every $f \in L_p[0,1]$ and $k \geq 1$,
 \[
   E_{2^k}(f)_p \leq 2 (1 + 2^r r^{2r}) \, \omega_r(f, 2^{-k}, [0,1])_p .
@@ -2954,27 +2991,28 @@ Let $1 \leq p < \infty$ and $r \geq 1$. For every $f \in L_p[0,1]$ and $k \geq 1
 
 \begin{proof}
 \leanok
-First let $f$ be continuous, $L = 2^{-k}$ and $\delta = L / r^2$. Since
-$\tfrac12 + r^2 \delta \leq 1$, the smoothing $g = S_\delta f$ of \Cref{thm:steklov-smoothing}
-satisfies $\|f - g\|_{L_p[0,1/2]} \leq \omega_r(f, L, [0,1])_p$ and
-$\|g^{(r)}\|_{L_p[0,1/2]} \leq 2^r \delta^{-r} \omega_r(f, L, [0,1])_p$. By \Cref{lem:taylor-lp}
-there is on each $I_{k,n} \subseteq [0, \tfrac12]$ a polynomial $Q_n$ of degree $< r$ with
-$\|g - Q_n\|_{L_p(I_{k,n})} \leq L^r \|g^{(r)}\|_{L_p(I_{k,n})}$. Summing $p$-th powers, the
+First let $f$ be continuous and $L = 2^{-k}$. Since $\tfrac12 + L \leq 1$,
+\Cref{lem:two-sided-smoothing} on $[0, \tfrac12]$ gives $g$ and $D$ with
+$\|f - g\|_{L_p[0,1/2]} \leq \omega_r(f, L, [0,1])_p$,
+$\|D\|_{L_p[0,1/2]} \leq L^{-r} 2^r r^{2r} \omega_r(f, L, [0,1])_p$, and on each
+$I_{k,n} \subseteq [0, \tfrac12]$ a polynomial $Q_n$ of degree $< r$ with
+$\|g - Q_n\|_{L_p(I_{k,n})} \leq L^r \|D\|_{L_p(I_{k,n})}$. Summing $p$-th powers, the
 piecewise polynomial $S$ made of the $Q_n$ satisfies
-$\|g - S\|_{L_p[0,1/2]} \leq L^r 2^r \delta^{-r} \omega_r(f, L, [0,1])_p
-= 2^r r^{2r} \omega_r(f, L, [0,1])_p$. On $[\tfrac12, 1]$ apply the same to $f(1 - \cdot)$, which
-has the same modulus by \Cref{lem:interval-modulus}; $\tfrac12$ is a knot since $k \geq 1$.
-For general $f$ take a bounded continuous $g$ close to $f$ in $L_p$: then
-$E_{2^k}(f)_p \leq E_{2^k}(g)_p + \|f - g\|_p$ and
+$\|g - S\|_{L_p[0,1/2]} \leq 2^r r^{2r} \omega_r(f, L, [0,1])_p$. On $[\tfrac12, 1]$ apply the
+same to $f(1 - \cdot)$, which has the same modulus by \Cref{lem:interval-modulus}; $\tfrac12$ is a
+knot since $k \geq 1$. For general $f$, and for every scheme in $L_p[0,1]$, take a bounded
+continuous $g$ close to $f$ in $L_p$: then $E_{2^k}(f)_p \leq E_{2^k}(g)_p + \|f - g\|_p$ and
 $\omega_r(g, t)_p \leq \omega_r(f, t)_p + 2^r \|f - g\|_p$.
 \end{proof}
 
 \begin{lemma}[Local estimates for piecewise polynomials]
 \label{lem:pp-local}
 \lean{Interval.localMass, Interval.tsum_localMass_ppFun_le, Interval.IsPiecewisePoly,
-  Interval.isPiecewisePoly_ppFun, Interval.enorm_le_localMass,
+  Interval.isPiecewisePoly_ppFun, Interval.eLpNorm_piece_eq_localMass, Interval.enorm_le_localMass,
+  Interval.floor_add_mul_le, Interval.localMass_le_sum_range,
   Interval.iterDiff_eq_zero_of_isPiecewisePoly, Interval.enorm_iterDiff_le_of_isPiecewisePoly,
-  Interval.stripBound, Interval.lintegral_stripBound_le, Interval.sum_sum_localMass_le}
+  Interval.stripBound, Interval.lintegral_stripBound_le, Interval.eLpNorm_le_of_strip,
+  Interval.eLpNorm_iterDiff_le_of_pointwise, Interval.sum_sum_localMass_le}
 \leanok
 \uses{def:pp-scheme, lem:pp-bookkeeping, lem:interval-nikolskii, lem:iter-diff-poly}
 Let $1 \leq p < \infty$, and let $a$ be a piecewise polynomial of level $j$ and degree $< r$
@@ -2986,7 +3024,10 @@ case
   |\Delta_h^r a(x)| \leq 2^r K 2^{j/p} \Bigl( \sum_{l=0}^r m_{n+l} \Bigr)^{1/p}
 \]
 with the constant $K$ of \Cref{lem:interval-nikolskii}. If $a$ vanishes outside $[0, 1)$, then
-$\sum_{n < 2^j} \sum_{l = 0}^r m_{n+l} \leq (r+1) \|a\|_p^p$.
+$\sum_{n < 2^j} \sum_{l = 0}^r m_{n+l} \leq (r+1) \|a\|_p^p$. Finally, let $S \subseteq [0, 1]$ be
+measurable. If $|\Delta_h^r a(x)| \leq G (\sum_{l=0}^r m_{n+l})^{1/p}$ for almost every $x \in S$
+with $(n+1) 2^{-j} \leq x + rh$, and $\sum_{n < 2^j} \sum_{l = 0}^r m_{n+l} \leq (r+1) B^p$, then
+$\|\Delta_h^r a\|_{L_p(S)} \leq G (rh (r + 1))^{1/p} B$.
 \end{lemma}
 
 \begin{proof}
@@ -2994,13 +3035,17 @@ $\sum_{n < 2^j} \sum_{l = 0}^r m_{n+l} \leq (r+1) \|a\|_p^p$.
 In the first case $x, x + h, \dots, x + rh$ lie in $I_{j,n}$, where $a$ is a polynomial of
 degree $< r$, so \Cref{lem:iter-diff-poly} applies. In general $x + ih \in I_{j, n+l}$ with
 $0 \leq l \leq r$, where $|a| \leq K 2^{j/p} m_{n+l}^{1/p}$ by \Cref{lem:interval-nikolskii}, and
-$\sum_i \binom{r}{i} = 2^r$. In the double sum every $m_n$ occurs at most $r + 1$ times.
+$\sum_i \binom{r}{i} = 2^r$. In the double sum every $m_n$ occurs at most $r + 1$ times. For
+the last statement, $|\Delta_h^r a|^p$ vanishes on $I_{j,n}$ outside the strip
+$[(n+1)2^{-j} - rh, (n+1)2^{-j})$ of width $rh$ and is bounded on it by
+$G^p \sum_{l=0}^r m_{n+l}$.
 \end{proof}
 
 \begin{theorem}[Inverse inequality for piecewise polynomials]
 \label{thm:pp-inverse}
-\lean{Interval.eLpNorm_iterDiff_le_of_isPiecewisePoly, Interval.eLpNorm_iterDiff_ppFun_le,
-  Interval.ofReal_two_pow_mul_rpow_le, Interval.ppInverseConst, Interval.ppInverseConst_ne_top,
+\lean{Interval.ofReal_two_pow_rpow_mul_eq, Interval.eLpNorm_iterDiff_le_of_isPiecewisePoly,
+  Interval.eLpNorm_iterDiff_ppFun_le, Interval.ofReal_two_pow_mul_rpow_le, Interval.ppInverseConst,
+  Interval.ppInverseConst_ne_top,
   Interval.two_pow_le_ppInverseConst, Interval.le_ppInverseConst_mul,
   Interval.exists_inverse_ppScheme}
 \leanok
@@ -3015,12 +3060,10 @@ and every $a \in V_j$,
 \begin{proof}
 \leanok
 For $k < j$ this is $\omega_r(a, t, [0,1])_p \leq 2^r \|a\|_p$. Let $k \geq j$ and
-$0 \leq h \leq 2^{-k}$. By \Cref{lem:pp-local}, $|\Delta_h^r a|^p$ vanishes on $I_{j,n}$ outside
-the strip $[(n+1)2^{-j} - rh, (n+1)2^{-j})$ and is bounded on it by
-$(2^r K)^p 2^j \sum_{l=0}^r m_{n+l}$. The strips have width $rh$, so for every piecewise
+$0 \leq h \leq 2^{-k}$. By \Cref{lem:pp-local} with $G = 2^r K 2^{j/p}$, for every piecewise
 polynomial $a$ of level $j$ on $[0, \infty)$ with
 $\sum_{n < 2^j} \sum_{l=0}^r m_{n+l} \leq (r+1) B^p$,
-$\|\Delta_h^r a\|_{L_p[0, 1]}^p \leq (2^r K)^p \, r (r+1) \, 2^j h \, B^p$. Here $B = \|a\|_p$,
+$\|\Delta_h^r a\|_{L_p[0, 1]} \leq 2^r K (r (r+1) \, 2^j h)^{1/p} B$. Here $B = \|a\|_p$,
 and $2^j h \leq 2^{-(k-j)}$.
 \end{proof}
 
@@ -3320,9 +3363,8 @@ $N_r(x) = 0$ for $x \notin [0, r)$.
 
 \begin{lemma}[The pieces of the B-spline]
 \label{lem:bspline-pieces}
-\lean{Interval.bsplinePiece_succ, Interval.pow_mem_degreeLT, Interval.natDegree_X_sub_C_le_one,
-  Interval.natDegree_X_add_C_le_one, Interval.bsplinePiece_mem, Interval.neg_one_pow_eq_of_le,
-  Interval.bsplinePiece_top}
+\lean{Interval.bsplinePiece_succ, Interval.bsplinePiece_zero, Interval.pow_mem_degreeLT,
+  Interval.bsplinePiece_mem, Interval.bsplinePiece_top}
 \leanok
 \uses{def:bspline, lem:iter-diff-poly}
 Every $B_j$ is a polynomial of degree $< r$, $B_{j+1} - B_j$ is a multiple of $(x - j - 1)^{r-1}$, and
@@ -3332,8 +3374,8 @@ $B_r = 0$.
 \begin{proof}
 \leanok
 The first two statements are immediate. $B_r(z)$ is $\pm 1/(r-1)!$ times the $r$-th difference
-of the polynomial $t \mapsto (z - t)^{r-1}$ of degree $< r$, which vanishes by
-\Cref{lem:iter-diff-poly}.
+with step $1$ at $0$ of the polynomial $t \mapsto (z - t)^{r-1}$ of degree $< r$, which vanishes
+(\Cref{lem:iter-diff-poly}, here directly Mathlib's statement for the step $1$).
 \end{proof}
 
 So consecutive pieces of $N_r$, including the zero pieces outside $[0, r)$, agree to order $r - 2$
@@ -3342,7 +3384,6 @@ at the knots: $N_r$ is a spline of order $r$.
 \begin{lemma}[B-splines on a unit interval]
 \label{lem:bspline-basis}
 \lean{Interval.bsplineLocal, Interval.bsplineLocal_eq, Interval.bsplineLocal_mem,
-  Interval.finiteDimensional_degreeLT, Interval.finrank_degreeLT,
   Interval.linearIndependent_X_add_C_pow, Interval.shiftedPow, Interval.top_le_span_shiftedPow,
   Interval.bsplineVec, Interval.bsplineVec_eq, Interval.top_le_span_bsplineVec,
   Interval.bsplineBasis, Interval.bsplineBasis_apply}
@@ -3408,22 +3449,21 @@ divides $P$, and the quotient has degree $0$.
 \lean{Interval.SplineJoins, Interval.splineJoins_zero, Interval.SplineJoins.add,
   Interval.SplineJoins.const_mul, Interval.SplineJoins.sum, Interval.SplineJoins.refine,
   Interval.splineSpace, Interval.splineSpace_le_ppSpace, Interval.splineSpace_mono,
-  Interval.splineApproximants, Interval.splineApproximants_mono, Interval.splineScheme,
-  Interval.mem_splineScheme_two_pow, Interval.splineScheme_isLinear}
+  Interval.splineScheme, Interval.mem_splineScheme_two_pow, Interval.splineScheme_isLinear}
 \leanok
 \uses{def:pp-scheme, lem:spline-joins}
 Let $r \geq 1$. The space $S_k \subseteq V_k$ of splines of order $r$ and level $k$ consists of
 the piecewise polynomials of degree $< r$ on the intervals $I_{k,n}$ whose pieces $Q_n$ satisfy
 $Q_n - Q_{n-1} = c_n (x - n 2^{-k})^{r-1}$ at every interior knot, $0 < n < 2^k$. By
 \Cref{lem:spline-joins} these are the piecewise polynomials that are $(r-2)$ times continuously
-differentiable. The spaces $S_k$ increase in $k$, and the spline scheme has $A_n = S_{\lfloor
-\log_2 n \rfloor}$ for $n \geq 1$.
+differentiable. The spaces $S_k$ increase in $k$, and the spline scheme is their dyadic scheme,
+$A_n = S_{\lfloor \log_2 n \rfloor}$ for $n \geq 1$.
 \end{definition}
 
 \begin{lemma}[Dyadic B-splines are splines]
 \label{lem:bspline-dyadic}
 \lean{Interval.bsplinePieces, Interval.bsplinePieces_mem, Interval.X_sub_C_pow_comp_affine,
-  Interval.bsplinePiece_zero, Interval.splineJoins_bsplinePieces, Interval.polyFun_bsplinePieces}
+  Interval.splineJoins_bsplinePieces, Interval.polyFun_bsplinePieces}
 \leanok
 \uses{def:spline-space, lem:bspline-pieces}
 For $n \in \Z$ the B-spline $N_r(2^k x - n)$ is on $I_{k,m}$ the polynomial
@@ -3440,38 +3480,27 @@ pieces is $0$ and the other is $B_0$ or $B_{r-1} = B_{r-1} - B_r$.
 
 \section{The inverse inequality for splines}
 
-\begin{lemma}[Tools for the inverse inequality]
+\begin{lemma}[Differences of truncated powers]
 \label{lem:spline-inverse-tools}
-\lean{Interval.enorm_polyFun_le_two, Interval.truncPow, Interval.enorm_iterDiff_truncPow_le,
-  Interval.eLpNorm_le_of_strip}
+\lean{Interval.truncPow, Interval.enorm_iterDiff_truncPow_le}
 \leanok
-\uses{lem:interval-nikolskii, lem:pp-local}
-Let $1 \leq p < \infty$ and $r \geq 1$.
-\begin{enumerate}
-  \item There is $K$ with $|P(x)| \leq K L^{-1/p} \|P\|_{L_p[u, u+L]}$ for $x \in [u, u + 2L]$ and
-    every polynomial $P$ of degree $< r$.
-  \item For $x < \xi$ and $h \geq 0$,
-    $|\Delta_h^r (\cdot - \xi)_+^{r-1}(x)| \leq 2^r (rh)^{r-1}$.
-  \item If $|F|^p \leq G^p M_n$ on the strips $[(n+1) 2^{-j} - rh, (n+1) 2^{-j})$, $F = 0$ elsewhere
-    on $S \subseteq [0, 1]$, and $\sum_{n < 2^j} M_n \leq (r + 1) B^p$, then
-    $\|F\|_{L_p(S)} \leq G (rh (r + 1))^{1/p} B$.
-\end{enumerate}
+\uses{def:iter-diff}
+Let $r \geq 1$, $x < \xi$ and $h \geq 0$. Then
+$|\Delta_h^r (\cdot - \xi)_+^{r-1}(x)| \leq 2^r (rh)^{r-1}$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-(1) as \Cref{lem:interval-nikolskii}, with the norm on $[0, \tfrac12]$ bounding the values on
-$[0, 1]$. (2) $0 \leq (x + ih - \xi)_+ \leq rh$ and $\sum_i \binom{r}{i} = 2^r$. (3) as in
-\Cref{thm:pp-inverse}.
+$0 \leq (x + ih - \xi)_+ \leq rh$ for $i \leq r$, and $\sum_i \binom{r}{i} = 2^r$.
 \end{proof}
 
 \begin{lemma}[Splines across the knots]
 \label{lem:spline-across}
 \lean{Interval.eq_add_sum_Ioc_sub, Interval.jumpCoeff, Interval.sub_eq_jumpCoeff,
   Interval.polyFun_eq_add_sum_jumps, Interval.iterDiff_ppFun_eq_sum_jumps,
-  Interval.eLpNorm_piece_eq_localMass, Interval.enorm_jumpCoeff_le}
+  Interval.enorm_jumpCoeff_le}
 \leanok
-\uses{def:spline-space, lem:spline-inverse-tools, lem:iter-diff-poly}
+\uses{def:spline-space, lem:interval-nikolskii, lem:pp-local, lem:iter-diff-poly}
 Let $u \in S_j$ have pieces $Q_n$ with $Q_m - Q_{m-1} = c_m (x - \xi_m)^{r-1}$, $\xi_m = m 2^{-j}$,
 and let $m_n = \int_{I_{j,n}} |u|^p$. For $0 \leq h \leq 2^{-j}$ and $0 \leq x$ with $x + rh < 1$,
 $n_0 = \lfloor 2^j x \rfloor$,
@@ -3486,16 +3515,15 @@ and $|c_m| 2^{-j(r-1)} \leq K 2^{j/p} (m_m^{1/p} + m_{m-1}^{1/p})$ for $0 < m < 
 On $[x, x + rh]$, $u = Q_{n_0} + \sum_m c_m (\cdot - \xi_m)_+^{r-1}$ by telescoping, and
 $\Delta_h^r Q_{n_0} = 0$. With $L = 2^{-j}$,
 $c_m L^{r-1} = Q_m(\xi_m + L) - Q_{m-1}(\xi_m + L)$; the first value is bounded by Nikolskii's
-inequality on $I_{j,m}$, the second by part (1) of \Cref{lem:spline-inverse-tools} on
-$I_{j,m-1}$.
+inequality (\Cref{lem:interval-nikolskii}) on $I_{j,m}$, the second by the same inequality on
+the doubled interval of $I_{j,m-1}$.
 \end{proof}
 
 \begin{theorem}[Inverse inequality for splines]
 \label{thm:spline-inverse}
 \lean{Interval.splineStripConst, Interval.enorm_iterDiff_spline_le,
   Interval.eLpNorm_iterDiff_spline_le, Interval.splineInverseConst,
-  Interval.splineStripConst_mul_eq, Interval.ofReal_two_pow_mul_pow_le,
-  Interval.exists_inverse_splineScheme}
+  Interval.splineStripConst_mul_eq, Interval.exists_inverse_splineScheme}
 \leanok
 \uses{lem:spline-across, lem:spline-inverse-tools, lem:pp-local}
 Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_B < \infty$ such that for all $j, k \in \N$ and
@@ -3508,9 +3536,9 @@ every spline $a \in S_j$ of order $r$,
 \begin{proof}
 \leanok
 For $k \geq j$ and $0 \leq h \leq 2^{-k}$, \Cref{lem:spline-across} and
-part (2) of \Cref{lem:spline-inverse-tools} give
+\Cref{lem:spline-inverse-tools} give
 $|\Delta_h^r a(x)| \leq C (2^j h)^{r-1} 2^{j/p} (\sum_{l \leq r} m_{n_0 + l})^{1/p}$ on the
-strips, and $\Delta_h^r a = 0$ off them (\Cref{lem:pp-local}). Part (3) gives
+strips. The last statement of \Cref{lem:pp-local} gives
 $\|\Delta_h^r a\|_{L_p[0, 1 - rh]} \leq C' (2^j h)^{r - 1 + 1/p} \|a\|_p$, and
 $2^j h \leq 2^{-(k-j)}$.
 \end{proof}
@@ -3563,25 +3591,6 @@ $\tilde P(\cdot + \max(n, 0))$, whose norm on $[0, 1]$ is $2^{k/p} \|\Pi_{J(n)} 
 
 \section{Jackson's inequality for splines and the coincidence theorem}
 
-\begin{lemma}[Smoothing on the two parts]
-\label{lem:two-sided-smoothing}
-\lean{Interval.exists_left_smoothing, Interval.exists_right_smoothing}
-\leanok
-\uses{thm:steklov-smoothing, lem:taylor-lp, lem:interval-modulus}
-Let $F$ be continuous, $r \geq 1$, $1 \leq p < \infty$, $k \geq 2$ and
-$\omega = \omega_r(F, 2^{-k}, [0, 1])_p$. On $P = [0, \tfrac34]$ and on $P = [\tfrac14, 1]$ there
-are functions $g$ and $D$ with $\|F - g\|_{L_p(P)} \leq \omega$,
-$\|D\|_{L_p(P)} \leq 2^{kr} 2^r r^{2r} \omega$, and for every $[a, b] \subseteq P$ a polynomial $T$
-of degree $< r$ with $\|g - T\|_{L_p[a,b]} \leq (b - a)^r \|D\|_{L_p[a,b]}$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-On $[0, \tfrac34]$ take the Steklov smoothing $g = S_\delta F$, $\delta = 2^{-k}/r^2$, and
-$D = g^{(r)}$ (\Cref{thm:steklov-smoothing}, \Cref{lem:taylor-lp}). On $[\tfrac14, 1]$ apply this
-to $F(1 - \cdot)$, which has the same modulus, and reflect back.
-\end{proof}
-
 \begin{lemma}[The local error of the quasi-interpolant]
 \label{lem:qi-local-error}
 \lean{Interval.sum_lintegral_window_le, Interval.bcoord_add, Interval.bcoord_C_mul,
@@ -3617,7 +3626,7 @@ where $E_{2^k}$ is the error of best approximation by splines of order $r$ and l
 \leanok
 For continuous $f$ and $k \geq r + 2$ every window $W_i$ has length $\leq r 2^{-k} \leq \tfrac14$,
 so it lies in $[0, \tfrac34]$ or in $[\tfrac14, 1]$. Take $T_i$ from \Cref{lem:two-sided-smoothing}
-on $W_i$. By \Cref{lem:qi-local-error},
+with $L = 2^{-k}$ and $w = \tfrac34$ on $W_i$. By \Cref{lem:qi-local-error},
 $\|f - Q_k f\|_{L_p(I_{k,i})}^p \leq C^p 2^{p-1} \int_{W_i}
 (|f - g|^p + (r 2^{-k})^{rp} |D|^p)$, and summing over $i$ with overlap $r$ gives
 $\|f - Q_k f\|_p \leq C' \omega_r(f, 2^{-k}, [0,1])_p$, since $(r 2^{-k})^r 2^{kr} = r^r$. General

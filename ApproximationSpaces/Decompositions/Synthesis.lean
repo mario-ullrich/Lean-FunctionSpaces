@@ -49,6 +49,11 @@ theorem isLinear_ofSubmodules (V : ℕ → Submodule ℝ X) (h0 : V 0 = ⊥) (hV
   rw [mem_ofSubmodules] at ha hb ⊢
   exact (V n).add_mem ha hb
 
+/-- The dyadic scheme of an increasing sequence of subspaces is linear. -/
+theorem isLinear_ofMonotoneSubmodules (V : ℕ → Submodule ℝ X) (hV : Monotone V) :
+    (ofMonotoneSubmodules V hV).IsLinear :=
+  isLinear_ofSubmodules _ _ _
+
 /-- The image of a linear scheme under a linear map is linear. -/
 theorem IsLinear.map {Y : Type*} [NormedAddCommGroup Y] [NormedSpace ℝ Y] (hA : A.IsLinear)
     (T : X →ₗ[ℝ] Y) : (A.map T).IsLinear := fun n a ha b hb => by
