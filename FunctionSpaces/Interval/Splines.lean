@@ -158,7 +158,8 @@ theorem bsplineCoef_comp_eq_of_splineJoins {r k : ℕ} (hr : 1 ≤ r) {Q : ℕ �
     (hQ : ∀ m, Q m ∈ degreeLT ℂ r) (hJ : SplineJoins r k Q) {n : ℤ} {j i : ℕ} (hji : j ≤ i)
     (hi : i < 2 ^ k) (hnj : n ≤ j) (hin : (i : ℤ) < n + r) :
     bsplineCoef hr ((Q i).comp (C (((0 : ℝ) : ℝ) : ℂ) + C (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * X)) n =
-      bsplineCoef hr ((Q j).comp (C (((0 : ℝ) : ℝ) : ℂ) + C (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * X)) n := by
+      bsplineCoef hr ((Q j).comp (C (((0 : ℝ) : ℝ) : ℂ) + C (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * X))
+        n := by
   induction i, hji using Nat.le_induction with
   | base => rfl
   | succ i hji ih =>

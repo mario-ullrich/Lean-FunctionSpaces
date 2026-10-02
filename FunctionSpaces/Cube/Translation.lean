@@ -25,9 +25,9 @@ With `δ_i = δ_{h_i e_i}`, `δ_h = ∏_i δ_i`, and `δ_h - 1 = ∑_i (δ_i - 1
 `(δ_h - 1)^r = ∑_α δ_{s_α} ∏_i (δ_i - 1)^{m_i(α)}` with `m_i(α) = #α⁻¹(i)`
 (`Cube.single_sub_one_pow_eq_sum`), so
 `Δ_h^r f(x) = ∑_α M_{m(α)} f(x + s_α)` (`Cube.isoDiff_eq_sum`): a sum of `d^r` mixed coordinate
-differences `M_m f = Δ^{m_0}_{h_0 e_0} ⋯ Δ^{m_{d-1}}_{h_{d-1} e_{d-1}} f` (`Cube.mixedDiff`) of total
-order `∑_i m_i(α) = r` (`Cube.sum_count`), at points shifted by `(s_α)_i = h_i #{l : i < α_l}`
-(`Cube.shiftVec`, `Cube.shiftVec_apply`).
+differences `M_m f = Δ^{m_0}_{h_0 e_0} ⋯ Δ^{m_{d-1}}_{h_{d-1} e_{d-1}} f` (`Cube.mixedDiff`) of
+total order `∑_i m_i(α) = r` (`Cube.sum_count`), at points shifted by
+`(s_α)_i = h_i #{l : i < α_l}` (`Cube.shiftVec`, `Cube.shiftVec_apply`).
 
 The slices in coordinate `i` of a mixed difference in other coordinates are combinations of
 slices of `f` (`Cube.slice_mixedDiff_mem`), so they stay in every subspace of functions of one
@@ -117,8 +117,8 @@ theorem isoDiff_add (r : ℕ) (h : Fin d → ℝ) (f g : (Fin d → ℝ) → ℂ
     isoDiff r h (f + g) = isoDiff r h f + isoDiff r h g := by
   rw [isoDiff_eq_diffAct, isoDiff_eq_diffAct, isoDiff_eq_diffAct, map_add]
 
-/-- **Isotropic differences in a coordinate direction** are the coordinate differences:
-`Δ^r_{t e_i} f = Δ^r_{t e_i} f` of `Cube.cubeDiff`. -/
+/-- **Isotropic differences in a coordinate direction** are the coordinate differences: the
+isotropic difference with step `t e_i` is the difference `Cube.cubeDiff r t i` in coordinate `i`. -/
 theorem isoDiff_single (r : ℕ) (i : Fin d) (t : ℝ) (f : (Fin d → ℝ) → ℂ) :
     isoDiff r (Pi.single i t) f = cubeDiff r t i f := by
   funext x

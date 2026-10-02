@@ -203,7 +203,8 @@ theorem enorm_iterDiff_le_of_mem_piece {r k m : ℕ} {u : ℝ → ℂ} (hu : IsP
   have hL : (0 : ℝ) < 1 / 2 ^ k := by positivity
   have hux : (⌊2 ^ k * x⌋₊ : ℝ) / 2 ^ k ≤ x := by rw [div_le_iff₀ hpos]; linarith
   have hxu : x + m * h ≤ (⌊2 ^ k * x⌋₊ : ℝ) / 2 ^ k + 2 * (1 / 2 ^ k) := by
-    have : ((⌊2 ^ k * x⌋₊ : ℝ) + 1) / 2 ^ k = (⌊2 ^ k * x⌋₊ : ℝ) / 2 ^ k + 1 / 2 ^ k := add_div _ _ _
+    have : ((⌊2 ^ k * x⌋₊ : ℝ) + 1) / 2 ^ k = (⌊2 ^ k * x⌋₊ : ℝ) / 2 ^ k + 1 / 2 ^ k :=
+      add_div _ _ _
     linarith
   have hb := hK P hP ((⌊2 ^ k * x⌋₊ : ℝ) / 2 ^ k) hL hh0 x hux hxu
   rw [h1]

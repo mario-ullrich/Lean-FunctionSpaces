@@ -154,7 +154,8 @@ def DiffBound (r m : ℕ) (K : ℝ≥0∞) : Prop :=
   ∀ P ∈ degreeLT ℂ r, ∀ (u : ℝ) {L : ℝ}, 0 < L → ∀ {t : ℝ}, 0 ≤ t → ∀ x, u ≤ x →
     x + m * t ≤ u + 2 * L →
       ‖iterDiff m t (polyFun P) x‖ₑ ≤ K * ENNReal.ofReal (t / L) ^ m *
-        ENNReal.ofReal L⁻¹ ^ (1 / p.toReal) * eLpNorm (polyFun P) p (volume.restrict (Icc u (u + L)))
+        ENNReal.ofReal L⁻¹ ^ (1 / p.toReal) *
+          eLpNorm (polyFun P) p (volume.restrict (Icc u (u + L)))
 
 /-- The `m`-th derivative as a linear map preserves the degree bound `< r`. -/
 theorem pow_derivative_mem_degreeLT {r : ℕ} (m : ℕ) {P : ℂ[X]} (hP : P ∈ degreeLT ℂ r) :

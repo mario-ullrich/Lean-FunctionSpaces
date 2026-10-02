@@ -23,8 +23,9 @@ the slices (`Cube.ppSubmodule`, `Cube.splineSubmodule`):
 * piecewise polynomials: the gain `(2^j |t|)^(1/p)` for every difference of order `m ≥ 1`
   (`Interval.exists_eLpNorm_iterDiff_ppFun_le`), so every word of total order `r ≥ 1` gains
   `(2^j ‖h‖)^(1/p)` (`Cube.le_sum_ppExponent`);
-* splines of order `r`: the gain `(2^j |t|)^m` for `m < r` (`Interval.exists_eLpNorm_iterDiff_spline_le_of_lt`)
-  and `(2^j |t|)^(r - 1 + 1/p)` for `m = r` (`Interval.eLpNorm_iterDiff_ppFun_spline_le`), so
+* splines of order `r`: the gain `(2^j |t|)^m` for `m < r`
+  (`Interval.exists_eLpNorm_iterDiff_spline_le_of_lt`) and `(2^j |t|)^(r - 1 + 1/p)` for
+  `m = r` (`Interval.eLpNorm_iterDiff_ppFun_spline_le`), so
   every word gains `(2^j ‖h‖)^(r - 1 + 1/p)` (`Cube.le_sum_splineExponent`): either one
   coordinate carries all `r` differences, or all coordinates carry fewer and their orders add up
   to `r ≥ r - 1 + 1/p`.

@@ -134,25 +134,18 @@ theorem enorm_translate_sub_sq_le {h : UnitAddTorus d} {t : ℝ} (hh : ‖h‖ �
         ENNReal.le_tsum (f := fun K => blockMult d K t ^ 2 * (if 2 ^ K ≤ deg k ∧
           deg k < 2 ^ (K + 1) then ‖mFourierCoeff f k‖ₑ ^ 2 else 0)) K0
 
-/-- `(∑ a_K²)^(1/2) ≤ ∑ a_K` in `ℝ≥0∞`. -/
-theorem le_tsum_of_sq_le_tsum_sq {x : ℝ≥0∞} {a : ℕ → ℝ≥0∞} (h : x ^ 2 ≤ ∑' K, a K ^ 2) :
-    x ≤ ∑' K, a K := by
-  have h2 : lqNorm 2 a ^ (2 : ℝ≥0∞).toReal = ∑' K, a K ^ (2 : ℝ≥0∞).toReal :=
-    ENNReal.lqNorm_rpow (by norm_num) (by norm_num) a
-  simp only [ENNReal.toReal_ofNat, ENNReal.rpow_two] at h2
-  have hx : x ≤ lqNorm 2 a := by
-    rw [← h2] at h
-    rw [← ENNReal.rpow_two, ← ENNReal.rpow_two] at h
-    exact (ENNReal.rpow_le_rpow_iff (by norm_num)).1 h
-  exact hx.trans (ENNReal.lqNorm_le_lqNorm_one (by norm_num) a)
-
 /-- **The modulus is controlled by the dyadic blocks**:
-`ω(f, t) ≤ ∑_K min(2, 2πd 2^(K+1) t) ‖Δ_K f‖`. -/
+`ω(f, t) ≤ ∑_K min(2, 2πd 2^(K+1) t) ‖Δ_K f‖`. The square-sum bound
+`enorm_translate_sub_sq_le` passes to the sum through `∑ b_K² ≤ (∑ b_K)²`. -/
 theorem modulus_le_tsum_block (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) (t : ℝ) :
     modulus f t ≤ ∑' K, blockMult d K t * ‖fourierBlock K f‖ₑ := by
-  refine iSup₂_le fun h hh => le_tsum_of_sq_le_tsum_sq ?_
-  simp_rw [mul_pow]
-  exact enorm_translate_sub_sq_le hh f
+  refine iSup₂_le fun h hh => (ENNReal.pow_le_pow_left_iff two_ne_zero).1 ?_
+  calc ‖translate h f - f‖ₑ ^ 2 ≤ ∑' K, (blockMult d K t * ‖fourierBlock K f‖ₑ) ^ 2 := by
+        simpa only [mul_pow] using enorm_translate_sub_sq_le hh f
+    _ ≤ (∑' K, blockMult d K t * ‖fourierBlock K f‖ₑ) ^ 2 := by
+        simp only [sq, ← ENNReal.tsum_mul_right]
+        exact ENNReal.tsum_le_tsum fun K => by
+          gcongr; exact ENNReal.le_tsum (f := fun K => blockMult d K t * ‖fourierBlock K f‖ₑ) K
 
 /-- `∑_K [j ≤ K] g K = ∑_i g (j + i)`. -/
 theorem tsum_ite_le_eq (j : ℕ) (g : ℕ → ℝ≥0∞) :
