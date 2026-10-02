@@ -3039,7 +3039,8 @@ are the polynomials of degree $< r$.
   Interval.measurableSet_dyadicIco, Interval.mem_dyadicIco, Interval.eq_of_mem_dyadicIco,
   Interval.mem_dyadicIco_floor, Interval.floor_two_pow_succ_div, Interval.ppFun,
   Interval.ppFun_eq_of_mem, Interval.measurable_ppFun, Interval.memLp_ppFun, Interval.ppFun_add,
-  Interval.ppFun_const_mul, Interval.polyFun_zero, Interval.ppFun_zero, Interval.ppFun_refine,
+  Interval.ppFun_const_mul, Interval.polyFun_zero, Interval.ppFun_zero, Interval.ppFun_sum,
+  Interval.ppFun_refine,
   Interval.ppSpace, Interval.ppSpace_mono, Interval.ppScheme, Interval.mem_ppScheme_zero,
   Interval.mem_ppScheme, Interval.mem_ppScheme_two_pow, Interval.ppScheme_isLinear}
 \leanok
@@ -3798,7 +3799,8 @@ the doubled interval of $I_{j,m-1}$.
 \begin{theorem}[Inverse inequality for splines]
 \label{thm:spline-inverse}
 \lean{Interval.splineStripConst, Interval.enorm_iterDiff_spline_le,
-  Interval.eLpNorm_iterDiff_spline_le, Interval.splineInverseConst,
+  Interval.eLpNorm_iterDiff_spline_le, Interval.eLpNorm_iterDiff_ppFun_spline_le,
+  Interval.splineInverseConst,
   Interval.splineInverseConst_ne_top, Interval.splineStripConst_mul_eq,
   Interval.splineStripConst_mul_le, Interval.two_pow_le_two_pow_mul_one_add,
   Interval.le_two_pow_mul_one_add, Interval.exists_inverse_splineScheme}
@@ -3878,10 +3880,14 @@ $\tilde P(\cdot + \max(n, 0))$, whose norm on $[0, 1]$ is $2^{k/p} \|\Pi_{J(n)} 
   Interval.qiCoeff_add_const_mul, Interval.polyFun_qiPieces_sub, Interval.qiWindow,
   Interval.dyadicIco_subset_qiWindow, Interval.dyadicIco_subset_qiWindow_self,
   Interval.natCast_add_one_sub_le, Interval.qiWindow_subset, Interval.eLpNorm_sub_qiPieces_le,
-  Interval.sum_eLpNorm_sub_qiPieces_le, Interval.exists_window_poly, Interval.exists_qiWindow_poly}
+  Interval.sum_eLpNorm_sub_qiPieces_le, Interval.exists_window_poly, Interval.exists_qiWindow_poly,
+  Interval.bsplineCoef_sum, Interval.qiBasisPoly, Interval.qiBasisPoly_mem,
+  Interval.locProjScaled_eq_sum, Interval.qiCoeff_eq_sum}
 \leanok
 \uses{lem:quasi-interp}
-Let $W_i = [(i + 1 - r) 2^{-k}, (i + 1) 2^{-k}]$ (truncated at $0$). There is $C$ with
+The coefficients $\lambda_n(g)$ are linear combinations of the coefficients of the local
+projection of $g$ on $J(n)$. Let $W_i = [(i + 1 - r) 2^{-k}, (i + 1) 2^{-k}]$ (truncated at
+$0$). There is $C$ with
 $\|g - Q_k g\|_{L_p(I_{k,i})} \leq C \|g - T\|_{L_p(W_i)}$ for every $i < N$ and every polynomial
 $T$ of degree $< r$, and the windows $W_i$, $i < N$, cover every point at most $r$ times. Hence,
 if for every $i$ in a set $s \subseteq \{0, \dots, N - 1\}$ some $T_i$ has
@@ -3895,15 +3901,45 @@ $Q_k$ is linear and reproduces $T$ on $I_{k,i}$, so $g - Q_k g = (g - T) - Q_k(g
 and part (2) of \Cref{lem:quasi-interp} applies with $J(n) \subseteq W_i$.
 \end{proof}
 
+\begin{lemma}[Spline approximation from two smoothings]
+\label{lem:qi-taylor}
+\lean{Interval.lintegral_sub_ppFun_le_sum, Interval.natCast_div_two_pow_le,
+  Interval.exists_eLpNorm_sub_qi_le_of_taylor, Interval.add_ofReal_div_pow_mul_le,
+  Interval.exists_eLpNorm_qi_le}
+\leanok
+\uses{lem:qi-local-error}
+Let $1 \leq p < \infty$ and $r \geq 1$. There is $A < \infty$ such that for $k \geq r + 2$, every
+measurable $u$ integrable on the dyadic intervals of level $k$, and measurable
+$g_1, D_1, g_2, D_2$ such that for all $a \leq b$ and $\nu = 1, 2$ some polynomial $T$ of degree
+$< r$ has $\|g_\nu - T\|_{L_p[a,b]} \leq (b - a)^r \|D_\nu\|_{L_p[a,b]}$,
+\begin{multline*}
+  \|u - Q_k u\|_{L_p[0,1]} \leq A \bigl( \bigl( \|u - g_1\|_{L_p[0,3/4]}
+    + c \|D_1\|_{L_p[0,3/4]} \bigr) \\
+  + \bigl( \|u - g_2\|_{L_p[1/4,1]} + c \|D_2\|_{L_p[1/4,1]} \bigr) \bigr) ,
+  \qquad c = (r 2^{-k})^r .
+\end{multline*}
+There is $C < \infty$ with $\|Q_k u\|_{L_p[0,1]} \leq C \|u\|_{L_p[0,1]}$ for every $k$ and every
+such $u$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Every window $W_i$ has length $\leq r 2^{-k} \leq \tfrac14$, so it lies in $[0, \tfrac34]$ or in
+$[\tfrac14, 1]$; take $T_i$ from $g_1$ or $g_2$. \Cref{lem:qi-local-error} with
+$H = 2^{p-1} (|u - g_\nu|^p + c^p |D_\nu|^p)$ on the two parts bounds the $p$-th power of the
+error by $C^p r 2^{p-1}$ times
+$\|u - g_1\|^p + (c \|D_1\|)^p + \|u - g_2\|^p + (c \|D_2\|)^p$, and $a^p + b^p \leq (a + b)^p$
+gives the bound. For the second statement take $T_i = 0$ and $H = |u|^p$ on $[0, 1]$.
+\end{proof}
+
 \begin{theorem}[Jackson's inequality for splines]
 \label{thm:spline-jackson}
 \lean{Interval.lintegral_smoothing_le, Interval.splineJacksonConst,
   Interval.splineJacksonConst_ne_top, Interval.splineJacksonConst_rpow_eq,
-  Interval.lintegral_sub_ppFun_le_sum, Interval.exists_eLpNorm_sub_qi_le,
-  Interval.approxSeq_splineScheme_one,
+  Interval.exists_eLpNorm_sub_qi_le, Interval.approxSeq_splineScheme_one,
   Interval.exists_approxSeq_splineScheme_le}
 \leanok
-\uses{lem:two-sided-smoothing, lem:qi-local-error, def:spline-space, thm:whitney,
+\uses{lem:two-sided-smoothing, lem:qi-taylor, def:spline-space, thm:whitney,
   thm:pp-jackson}
 Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_J$ with
 $E_{2^k}(f)_p \leq C_J \, \omega_r(f, 2^{-k}, [0, 1])_p$ for every $f \in L_p[0,1]$ and $k \geq 0$,
@@ -3912,12 +3948,10 @@ where $E_{2^k}$ is the error of best approximation by splines of order $r$ and l
 
 \begin{proof}
 \leanok
-For continuous $f$ and $k \geq r + 2$ every window $W_i$ has length $\leq r 2^{-k} \leq \tfrac14$,
-so it lies in $[0, \tfrac34]$ or in $[\tfrac14, 1]$. Take $T_i$ from \Cref{lem:two-sided-smoothing}
-with $L = 2^{-k}$ and $w = \tfrac34$ on $W_i$. By \Cref{lem:qi-local-error},
-$\|f - Q_k f\|_{L_p(I_{k,i})}^p \leq C^p 2^{p-1} \int_{W_i}
-(|f - g|^p + (r 2^{-k})^{rp} |D|^p)$, and summing over $i$ with overlap $r$ gives
-$\|f - Q_k f\|_p \leq C' \omega_r(f, 2^{-k}, [0,1])_p$, since $(r 2^{-k})^r 2^{kr} = r^r$. General
+For continuous $f$ and $k \geq r + 2$ take the smoothings of \Cref{lem:two-sided-smoothing} with
+$L = 2^{-k}$ and $w = \tfrac34$ on $[0, \tfrac34]$ and on $[\tfrac14, 1]$. \Cref{lem:qi-taylor}
+with $u = f$ gives $\|f - Q_k f\|_p \leq C' \omega_r(f, 2^{-k}, [0,1])_p$, since
+$(r 2^{-k})^r 2^{kr} = r^r$. General
 $f$ follow by density of the bounded continuous functions, as in \Cref{thm:pp-jackson}. For
 $k \leq r + 1$, $E_{2^k}(f)_p \leq E_1(f)_p$, the splines of level $0$ are the polynomials of
 degree $< r$, and \Cref{thm:whitney} with $t = 2^{-(r+1)}$, passed to $L_p$ as in
@@ -4337,6 +4371,7 @@ $g - T^{(i)} h = (g - T^{(i)} g) + T^{(i)} (g - h)$; induction on $m$.
 \label{lem:pp-kernel}
 \lean{Cube.norm_indicator_polyFun_le, Cube.ppKernel, Cube.ppKernel_coef, Cube.ppKernel_apply,
   Cube.eLpNorm_ppKernel_apply_le, Cube.ppKernel_apply_ppFun, Cube.integrableOn_ppFun,
+  Cube.bddMeas_ppFun,
   Cube.ppKernel_rangeFn_eq_ppFun, Cube.ppKernel_rangeFn_eq_sum, Cube.eLpNorm_sub_ppKernel_apply_le}
 \leanok
 \uses{def:kernel-op, def:loc-proj, thm:pp-proj, lem:pp-bookkeeping}
@@ -4389,7 +4424,8 @@ $P_k$ are forms of $P_{k+1}$ (\Cref{lem:pp-kernel}, \Cref{lem:kernel-forms}).
 
 \begin{lemma}[From slices to the cube]
 \label{lem:slices-to-cube}
-\lean{Cube.eLpNorm_le_of_slice_le, Cube.slice_sub_slicewise, Cube.eLpNorm_sub_cubeProj_le_of_coord}
+\lean{Cube.eLpNorm_le_of_slice_le, Cube.slice_sub_slicewise,
+  Cube.KernelOp.eLpNorm_sub_foldSlicewise_le_of_coord, Cube.eLpNorm_sub_cubeProj_le_of_coord}
 \leanok
 \uses{lem:minkowski-bounds, lem:cube-slices, lem:kernel-telescoping}
 Let $1 \leq p < \infty$, $c, M < \infty$, and let $F, G_1, D_1, G_2, D_2$ be measurable on $\R^d$
@@ -4398,16 +4434,19 @@ and $[a_\nu, b_\nu] \subseteq [0, 1]$. If for every $x$
   \|F_{x,i}\|_{L_p[0,1]} \leq c \sum_{\nu = 1}^2 \bigl( \|(G_\nu)_{x,i}\|_{L_p[a_\nu, b_\nu]}
     + M \|(D_\nu)_{x,i}\|_{L_p[a_\nu, b_\nu]} \bigr) ,
 \]
-then the same bound holds for $\|F\|_{L_p(Q)}$ with the norms on $Q_i[a_\nu, b_\nu]$. If
-$\|f - P_k^{(i)} f\|_{L_p(Q)} \leq B \, \omega_r^{(i)}(f, t)_p$ for every coordinate $i$ and a
-bounded measurable $f$, then $\|f - P^d_k f\|_{L_p(Q)} \leq (1 + C_r)^d B \, \omega_r(f, t)_p$.
+then the same bound holds for $\|F\|_{L_p(Q)}$ with the norms on $Q_i[a_\nu, b_\nu]$. Let $T$
+be a kernel operator with $\|T u\|_{L_p[0,1]} \leq C \|u\|_{L_p[0,1]}$ for measurable $u$. If
+$\|f - T^{(i)} f\|_{L_p(Q)} \leq B \, \omega_r^{(i)}(f, t)_p$ for every coordinate $i$ and a
+bounded measurable $f$, then
+$\|f - T^{(1)} \cdots T^{(d)} f\|_{L_p(Q)} \leq (1 + C)^d B \, \omega_r(f, t)_p$; for $T = P_k$
+this is $\|f - P^d_k f\|_{L_p(Q)} \leq (1 + C_r)^d B \, \omega_r(f, t)_p$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 The norms of the slices are measurable functions of $x$ (\Cref{lem:cube-slices}); raise the bound
 to the power $p$, integrate over $x$, and apply \Cref{lem:minkowski-bounds} three times. The
-second statement is \Cref{lem:kernel-telescoping} with $C = C_r$.
+second statement is \Cref{lem:kernel-telescoping}.
 \end{proof}
 
 \begin{theorem}[Jackson's inequality on the cube]
@@ -4498,6 +4537,119 @@ apply \Cref{thm:modulus-coincidence}.
 
 For $0 < s < 1/p$ the condition says $f \in \Besov{s}{p}{q}(Q)$, with the Besov space defined by
 the moduli in the coordinates.
+
+\section{Tensor splines}
+
+\begin{lemma}[The quasi-interpolant as a kernel operator]
+\label{lem:qi-kernel}
+\lean{Cube.toNat_lt_of_mem_qiIdx, Cube.qiKernel, Cube.qiKernel_coef, Cube.qiKernel_apply,
+  Cube.exists_eLpNorm_qiKernel_apply_le}
+\leanok
+\uses{def:quasi-interp, lem:qi-local-error, lem:pp-kernel, lem:qi-taylor}
+Let $r \geq 1$ and $k \in \N$. The quasi-interpolant $Q_k$ of \Cref{def:quasi-interp} with
+$N = 2^k$ is a kernel operator with index set $\{n \in \Z : -r < n < 2^k\}$: the kernel
+$\kappa_n$ is a combination of the kernels of the local projection on $J(n)$, and $\varphi_n$ is the
+B-spline $N_r(2^k x - n)$ on $[0, 1)$. For $1 \leq p < \infty$ there is $C < \infty$ with
+$\|Q_k u\|_{L_p[0,1]} \leq C \|u\|_{L_p[0,1]}$ for every $k$ and every measurable $u$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The coefficients $\lambda_n(g)$ are combinations of the local coefficients on $J(n)$
+(\Cref{lem:qi-local-error}), which are integrals against the kernels of \Cref{lem:pp-kernel}. The
+bound is \Cref{lem:qi-taylor} when $u \in L_p[0,1]$, and trivial otherwise.
+\end{proof}
+
+\begin{definition}[Splines on the cube]
+\label{def:cube-spline}
+\lean{Cube.IsCubeSpline, Cube.IsCubeSpline.succ, Cube.IsCubeSpline.add,
+  Cube.IsCubeSpline.const_mul, Cube.isCubeSpline_zero, Cube.IsCubePP.isCubeSpline_zero,
+  Cube.cubeQI, Cube.isCubeSpline_cubeQI, Cube.cubeSplineSpace, Cube.cubeSplineSpace_mono,
+  Cube.cubeSplineScheme, Cube.mem_cubeSplineScheme_two_pow, Cube.cubeSplineScheme_isLinear,
+  Cube.approxSeq_cubeSplineScheme_one_le}
+\leanok
+\uses{def:spline-space, lem:qi-kernel, lem:kernel-forms, def:cube-pp}
+Let $r \geq 1$ and $k \in \N$. A function on $\R^d$ is a spline of order $r$ and level $k$ in
+each variable if it is bounded and measurable and each of its slices, in every coordinate and
+through every point, is a dyadic spline of order $r$ and level $k$ on $[0, 1]$. Their classes form
+subspaces of $L_p(Q)$ increasing in $k$, and the scheme of tensor splines has the approximants
+$\{0\}$ at complexity $0$ and the splines of level $\lfloor \log_2 n \rfloor$ at complexity
+$n \geq 1$. At level $0$ they contain the polynomials of degree $< r$ in each variable. The tensor
+quasi-interpolant $Q_k^{(1)} \cdots Q_k^{(d)} g$ of a bounded measurable $g$ is a spline of level
+$k$ on the cube.
+\end{definition}
+
+The tensor quasi-interpolant has the form of $Q_k$ in every coordinate
+(\Cref{lem:kernel-forms}), so its slices are combinations of B-splines, hence splines.
+
+\begin{theorem}[Jackson's inequality for tensor splines]
+\label{thm:cube-spline-jackson}
+\lean{Cube.exists_eLpNorm_sub_slicewise_qiKernel_le, Cube.exists_approxSeq_cubeSplineScheme_le}
+\leanok
+\uses{def:cube-spline, lem:qi-taylor, lem:qi-kernel, lem:cube-two-sided-smoothing,
+  lem:slices-to-cube, thm:cube-jackson, lem:error-dense}
+Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_J < \infty$ with
+$E_{2^k}(f)_p \leq C_J \, \omega_r(f, 2^{-k})_p$ for every $f \in L_p(Q)$ and every $k \geq 0$,
+where $E$ is the error of best approximation by the scheme of tensor splines.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $f$ be bounded and continuous and $k \geq r + 2$. In coordinate $i$,
+\Cref{lem:cube-two-sided-smoothing} with $L = 2^{-k}$ on $Q_i[0, \tfrac34]$ and $Q_i[\tfrac14, 1]$
+and \Cref{lem:qi-taylor} on every slice give, through \Cref{lem:slices-to-cube},
+$\|f - Q_k^{(i)} f\|_{L_p(Q)} \leq B \, \omega_r^{(i)}(f, 2^{-k})_p$, and the second part of
+\Cref{lem:slices-to-cube} with the bound of \Cref{lem:qi-kernel} sums over the coordinates. General
+$f$ follow by \Cref{lem:error-dense}. For $k \leq r + 1$, $E_{2^k}(f)_p$ is at most the error of
+the polynomials of degree $< r$ in each variable, and \Cref{thm:cube-jackson} at level $0$, with
+Whitney's estimate at the scale $2^{-(r+1)}$, bounds it by $W \omega_r(f, 2^{-(r+1)})_p \leq
+W \omega_r(f, 2^{-k})_p$.
+\end{proof}
+
+\begin{theorem}[The inverse inequality for tensor splines]
+\label{thm:cube-spline-inverse}
+\lean{Cube.splineStripConst_ne_top, Cube.eLpNorm_cubeDiff_le_of_isCubeSpline,
+  Cube.exists_inverse_cubeSplineScheme}
+\leanok
+\uses{def:cube-spline, thm:spline-inverse, lem:cube-modulus}
+Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_B$ with
+\[
+  \omega_r(a, 2^{-k})_p \leq C_B \, 2^{-\max(k - j, 0)(r - 1 + 1/p)} \|a\|_p
+\]
+for all $j, k \in \N$ and every spline $a$ of order $r$ and level $j$ on the cube.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Every slice is a spline of level $j$, so the local estimate in the proof of
+\Cref{thm:spline-inverse} holds on every slice for each step $0 \leq h \leq 2^{-j}$; integrate
+over the point (\Cref{lem:cube-modulus}), take the supremum over $h \leq 2^{-k}$ and sum over the
+coordinates. For $k < j$ use $\omega_r(a, t)_p \leq d \, 2^r \|a\|_p$.
+\end{proof}
+
+\begin{theorem}[Approximation spaces of tensor splines]
+\label{thm:cube-spline-besov}
+\lean{Cube.cubeSplineModulusData, Cube.memApprox_cubeSplineScheme_iff}
+\leanok
+\uses{thm:cube-spline-jackson, thm:cube-spline-inverse, def:modulus-data,
+  thm:modulus-coincidence}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $r \geq 1$ and $0 \leq s < r - 1 + 1/p$. A
+function $f \in L_p(Q)$ lies in the approximation space $A^s_q$ of the scheme of tensor splines of
+order $r$ if and only if
+\[
+  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_r(f, 2^{-k})_p \bigr)_k \bigr\|_{\ell_q} < \infty .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:cube-spline-jackson} and \Cref{thm:cube-spline-inverse} make
+$\omega_r(\cdot, 2^{-k})_p$ a modulus compatible with the scheme of tensor splines of inverse
+order $\theta = r - 1 + 1/p$; apply \Cref{thm:modulus-coincidence}.
+\end{proof}
+
+For $0 < s < r - 1 + 1/p$ the condition says $f \in \Besov{s}{p}{q}(Q)$; for $r \geq 2$ this
+reaches smoothness beyond $1$.
 
 \bpbibheading
 \begin{thebibliography}{99}

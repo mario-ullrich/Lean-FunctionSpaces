@@ -117,6 +117,20 @@ theorem ppKernel_apply_ppFun {r k : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n �
 theorem integrableOn_ppFun (k : ℕ) (Q : ℕ → ℂ[X]) : IntegrableOn (ppFun k Q) (Icc (0 : ℝ) 1) :=
   memLp_one_iff_integrable.1 (memLp_ppFun k Q 1)
 
+/-- Piecewise polynomials are bounded and measurable: each piece is bounded on `[0, 1]`. -/
+theorem bddMeas_ppFun (k : ℕ) (Q : ℕ → ℂ[X]) : BddMeas (ppFun k Q) := by
+  refine ⟨measurable_ppFun k Q, ?_⟩
+  choose M hM using fun n : ℕ => (isCompact_Icc (a := (0 : ℝ)) (b := 1)).exists_bound_of_continuousOn
+    (continuous_polyFun (Q n)).continuousOn
+  refine ⟨∑ n ∈ Finset.range (2 ^ k), M n, fun x => ?_⟩
+  rw [ppFun]
+  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun n hn => ?_)
+  by_cases hx : x ∈ dyadicIco k n
+  · rw [indicator_of_mem hx]
+    exact hM n x (Ico_subset_Icc_self (dyadicIco_subset (Finset.mem_range.1 hn) hx))
+  · rw [indicator_of_notMem hx, norm_zero]
+    exact (norm_nonneg _).trans (hM n 0 ⟨le_rfl, zero_le_one⟩)
+
 /-- **Lebesgue's inequality for the local projection**: for `u` integrable on `[0, 1]` and every
 piecewise polynomial `S` of level `k` and degree `< r`,
 `‖u - P_k u‖_{L_p[0,1]} ≤ (1 + C_r) ‖u - S‖_{L_p[0,1]}`. Since `P_k S = S`, the error is

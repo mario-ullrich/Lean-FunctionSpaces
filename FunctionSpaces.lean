@@ -64,6 +64,9 @@ public import FunctionSpaces.Cube.Kernel
 public import FunctionSpaces.Cube.PiecewisePoly
 public import FunctionSpaces.Cube.PiecewiseJackson
 public import FunctionSpaces.Cube.PiecewiseInverse
+public import FunctionSpaces.Cube.Splines
+public import FunctionSpaces.Cube.SplineJackson
+public import FunctionSpaces.Cube.SplineInverse
 
 /-!
 # Function spaces
@@ -193,4 +196,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   cube.
 * `FunctionSpaces.Cube.PiecewiseInverse`: the inverse inequality of order `1/p` on the cube and
   the identification of the approximation spaces with `B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p`.
+* `FunctionSpaces.Cube.Splines`: the spline quasi-interpolant as a kernel operator, the splines of
+  order `r` in each variable on the cube, their scheme, and the tensor quasi-interpolant.
+* `FunctionSpaces.Cube.SplineJackson`: Jackson's inequality for tensor splines on the cube.
+* `FunctionSpaces.Cube.SplineInverse`: the inverse inequality of order `r - 1 + 1/p` for tensor
+  splines and the identification of their approximation spaces with `B^s_{p,q}([0, 1]^d)` for
+  `0 < s < r - 1 + 1/p`.
 -/

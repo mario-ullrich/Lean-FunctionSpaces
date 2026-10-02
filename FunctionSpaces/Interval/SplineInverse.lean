@@ -348,6 +348,26 @@ omit [Fact (1 ≤ p)] in
 theorem le_two_pow_mul_one_add (r : ℕ) (c : ℝ≥0∞) : c ≤ 2 ^ r * (1 + c) :=
   le_add_self.trans (le_mul_of_one_le_left zero_le (one_le_pow₀ one_le_two))
 
+/-- **The local inverse estimate for splines on `[0, 1]`**: for the pieces `Q` of a spline of
+level `j` and `0 ≤ h ≤ 2^(-j)`,
+`‖Δ_h^r (ppFun j Q)‖_{L_p[0, 1 - rh]} ≤ S_j(h) (r h (r + 1))^(1/p) ‖ppFun j Q‖_{L_p[0,1]}` with the
+strip constant `S_j(h)` of `Interval.splineStripConst`. -/
+theorem eLpNorm_iterDiff_ppFun_spline_le {r j : ℕ} {Q : ℕ → ℂ[X]}
+    (hQ : ∀ n, Q n ∈ degreeLT ℂ r) (hJ : SplineJoins r j Q) {K : ℝ≥0∞}
+    (hKb : NikolskiiBound p r K) (hp : p ≠ ∞) {h : ℝ} (hh0 : 0 ≤ h) (hhj : h ≤ 1 / 2 ^ j) :
+    eLpNorm (iterDiff r h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - r * h))) ≤
+      splineStripConst r j K h p * (ENNReal.ofReal (r * h) * (r + 1)) ^ (1 / p.toReal) *
+        eLpNorm (ppFun j Q) p unitVol := by
+  have hrh : (0 : ℝ) ≤ r * h := mul_nonneg (Nat.cast_nonneg r) hh0
+  have hSN : ∀ᵐ x ∂volume.restrict (Icc 0 (1 - r * h)), x + r * h < (2 ^ j : ℕ) / 2 ^ j := by
+    rw [← Measure.restrict_congr_set Ico_ae_eq_Icc]
+    filter_upwards [ae_restrict_mem measurableSet_Ico] with x hx
+    rw [show ((2 ^ j : ℕ) : ℝ) / 2 ^ j = 1 by push_cast; field_simp]
+    linarith [hx.2]
+  exact eLpNorm_iterDiff_spline_le hQ hJ.below (fun m hm x hx => ppFun_eq_of_mem Q hm hx)
+    (isPiecewisePoly_ppFun hQ j) (measurable_ppFun j Q) hKb hp hh0 hhj measurableSet_Icc
+    (Icc_subset_Icc le_rfl (by linarith)) hSN (sum_sum_localMass_le hp j r Q)
+
 /-- **The inverse inequality for dyadic splines**, of order `θ = r - 1 + 1/p`: there is
 `C_B < ∞` with `ω_r(a, 2^(-k), [0, 1])_p ≤ C_B 2^(-(k-j)θ) ‖a‖_p` for every spline `a` of order `r`
 and level `j` (and `k - j` truncated at `0`). -/
@@ -370,18 +390,10 @@ theorem exists_inverse_splineScheme {r : ℕ} (hp : p ≠ ∞) :
     refine iSup₂_le fun h hh => ?_
     have hhj : h ≤ 1 / 2 ^ j := hh.2.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ (by norm_num) hjk))
-    have hrh : (0 : ℝ) ≤ r * h := mul_nonneg (Nat.cast_nonneg r) hh.1
-    have hSN : ∀ᵐ x ∂volume.restrict (Icc 0 (1 - r * h)), x + r * h < (2 ^ j : ℕ) / 2 ^ j := by
-      rw [← Measure.restrict_congr_set Ico_ae_eq_Icc]
-      filter_upwards [ae_restrict_mem measurableSet_Ico] with x hx
-      rw [show ((2 ^ j : ℕ) : ℝ) / 2 ^ j = 1 by push_cast; field_simp]
-      linarith [hx.2]
     calc eLpNorm (iterDiff r h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - r * h)))
         ≤ splineStripConst r j K h p * (ENNReal.ofReal (r * h) * (r + 1)) ^
             (1 / p.toReal) * eLpNorm (ppFun j Q) p unitVol :=
-          eLpNorm_iterDiff_spline_le hQ hJ.below (fun m hm x hx => ppFun_eq_of_mem Q hm hx)
-            (isPiecewisePoly_ppFun hQ j) (measurable_ppFun j Q) hKb hp hh.1 hhj measurableSet_Icc
-            (Icc_subset_Icc le_rfl (by linarith)) hSN (sum_sum_localMass_le hp j r Q)
+          eLpNorm_iterDiff_ppFun_spline_le hQ hJ hKb hp hh.1 hhj
       _ ≤ splineInverseConst r K p * dyadicWeight (-(((r - 1 : ℕ) : ℝ) + 1 / p.toReal)) (k - j) *
             eLpNorm (ppFun j Q) p unitVol := splineStripConst_mul_le hjk K hh.2 _
       _ ≤ 2 ^ r * (1 + splineInverseConst r K p) *

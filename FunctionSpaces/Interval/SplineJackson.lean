@@ -118,9 +118,51 @@ theorem bsplineCoef_C_mul {r : ℕ} (hr : 1 ≤ r) (c : ℂ) {P : ℂ[X]} (hP : 
   rw [bsplineCoef, mul_comp, C_comp, bcoord_C_mul hr c (comp_X_add_C_mem hP _)]
   rfl
 
+/-- The B-spline coefficients of finite combinations of polynomials of degree `< r`. -/
+theorem bsplineCoef_sum {r : ℕ} (hr : 1 ≤ r) {ι : Type*} (s : Finset ι) (c : ι → ℂ)
+    {P : ι → ℂ[X]} (hP : ∀ i ∈ s, P i ∈ degreeLT ℂ r) (n : ℤ) :
+    bsplineCoef hr (∑ i ∈ s, c i • P i) n = ∑ i ∈ s, c i * bsplineCoef hr (P i) n := by
+  classical
+  induction s using Finset.induction_on with
+  | empty =>
+    have h := bsplineCoef_C_mul hr 0 (Submodule.zero_mem (degreeLT ℂ r)) n
+    simpa using h
+  | insert j s hj ih =>
+    have hj' : P j ∈ degreeLT ℂ r := hP j (Finset.mem_insert_self j s)
+    have hs : ∀ i ∈ s, P i ∈ degreeLT ℂ r := fun i hi => hP i (Finset.mem_insert_of_mem hi)
+    rw [Finset.sum_insert hj, Finset.sum_insert hj,
+      bsplineCoef_add hr (Submodule.smul_mem _ _ hj')
+        (Submodule.sum_mem _ fun i hi => Submodule.smul_mem _ _ (hs i hi)),
+      smul_eq_C_mul, bsplineCoef_C_mul hr _ hj', ih hs]
+
 /-- The rescaled local projections have degree `< r`. -/
 theorem locProjScaled_mem (r k : ℕ) (g : ℝ → ℂ) (m : ℕ) : locProjScaled r k g m ∈ degreeLT ℂ r :=
   comp_affine_mem_degreeLT (locProj_mem r k g m) _ _
+
+/-- The dual polynomial `d_i` of the interval `I_{k,m}` in the coordinate `y = 2^k x`, so that
+the rescaled local projection is `∑_i c_i(g) d_i(y - m)` (`Interval.locProjScaled_eq_sum`). -/
+noncomputable def qiBasisPoly (r k m : ℕ) (i : Fin r) : ℂ[X] :=
+  ((dualPoly r i : ℂ[X]).comp (C ((-(m : ℝ) : ℝ) : ℂ) + C (((2 : ℝ) ^ k : ℝ) : ℂ) * X)).comp
+    (C (((0 : ℝ) : ℝ) : ℂ) + C (((1 / 2 ^ k : ℝ) : ℝ) : ℂ) * X)
+
+/-- These polynomials have degree `< r`. -/
+theorem qiBasisPoly_mem (r k m : ℕ) (i : Fin r) : qiBasisPoly r k m i ∈ degreeLT ℂ r :=
+  comp_affine_mem_degreeLT (comp_affine_mem_degreeLT (dualPoly r i).2 _ _) _ _
+
+/-- The rescaled local projection in terms of the local coefficients. -/
+theorem locProjScaled_eq_sum (r k : ℕ) (g : ℝ → ℂ) (m : ℕ) :
+    locProjScaled r k g m = ∑ i, locCoeff r k g m i • qiBasisPoly r k m i := by
+  rw [locProjScaled, locProj, Polynomial.sum_comp]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  rw [Polynomial.smul_comp, qiBasisPoly]
+
+/-- **The quasi-interpolant coefficients are combinations of the local coefficients**:
+`λ_n(g) = ∑_i c_i(g) β_{n,i}` with the coefficients `c_i(g)` of the local projection on `J(n)` and
+the B-spline coefficients `β_{n,i}` of the rescaled dual polynomials. -/
+theorem qiCoeff_eq_sum {r : ℕ} (hr : 1 ≤ r) (k : ℕ) (g : ℝ → ℂ) (n : ℤ) :
+    qiCoeff hr k g n =
+      ∑ i, locCoeff r k g n.toNat i * bsplineCoef hr (qiBasisPoly r k n.toNat i) n := by
+  rw [qiCoeff, locProjScaled_eq_sum, bsplineCoef_sum hr _ _ fun i _ => qiBasisPoly_mem r k _ i]
 
 /-- **The quasi-interpolant coefficients are linear** on functions integrable on `J(n)`. -/
 theorem qiCoeff_add_const_mul {r : ℕ} (hr : 1 ≤ r) (k : ℕ) {g₁ g₂ : ℝ → ℂ} (c : ℂ) {n : ℤ}
@@ -436,59 +478,91 @@ theorem lintegral_sub_ppFun_le_sum (hp : p ≠ ∞) {F : ℝ → ℂ} (hFm : Mea
   exact setLIntegral_congr_fun (measurableSet_dyadicIco k i) fun x hx => by
     rw [ppFun_eq_of_mem Q (Finset.mem_range.1 hi) hx]
 
-/-- **Jackson's inequality for splines, continuous functions**: there is `C` with
-`‖F - Q_k F‖_{L_p[0,1]} ≤ C ω_r(F, 2^(-k), [0, 1])_p` for every continuous `F` and `k ≥ r + 2`.
-Every window has length at most `1/4`, so it lies in `[0, 3/4]` or in `[1/4, 1]`, where the
-smoothing of `F` from the left, respectively from the right, gives the polynomial. -/
-theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ F : ℝ → ℂ, Continuous F → ∀ k : ℕ, r + 2 ≤ k →
-      eLpNorm (fun x => F x - ppFun k (qiPieces hr k (2 ^ k) F) x) p unitVol ≤
-        C * modulus r p 0 1 F (1 / 2 ^ k) := by
+/-- At the scale `L = 2^(-k)` the factor `c = (r 2^(-k))^r` of the Taylor remainders on the
+windows and the bound `L^(-r) 2^r r^(2r)` of the derivative combine to `r^r 2^r r^(2r)`:
+`a ≤ ω` and `b ≤ L^(-r) 2^r r^(2r) ω` give `a + c b ≤ (1 + r^r 2^r r^(2r)) ω`. -/
+theorem add_ofReal_div_pow_mul_le (r k : ℕ) {a b ω : ℝ≥0∞} (ha : a ≤ ω)
+    (hb : b ≤ ENNReal.ofReal (1 / 2 ^ k : ℝ)⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω) :
+    a + ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r * b ≤
+      (1 + (r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) * ω := by
+  have hcc : ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r * ENNReal.ofReal (1 / 2 ^ k : ℝ)⁻¹ ^ r =
+      (r : ℝ≥0∞) ^ r := by
+    rw [← mul_pow, ← ENNReal.ofReal_mul (by positivity),
+      show (r : ℝ) / 2 ^ k * (1 / 2 ^ k)⁻¹ = r by field_simp, ENNReal.ofReal_natCast]
+  calc a + ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r * b
+      ≤ ω + ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r *
+          (ENNReal.ofReal (1 / 2 ^ k : ℝ)⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω) :=
+        add_le_add ha (mul_le_mul' le_rfl hb)
+    _ = ω + (ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r * ENNReal.ofReal (1 / 2 ^ k : ℝ)⁻¹ ^ r) *
+          (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω := by ring
+    _ = _ := by rw [hcc]; ring
+
+/-- `r 2^(-k) ≤ 1/4` for `k ≥ r + 2`: the windows of the quasi-interpolant have length at most
+`1/4`. -/
+theorem natCast_div_two_pow_le {r k : ℕ} (hk : r + 2 ≤ k) : (r : ℝ) / 2 ^ k ≤ 1 / 4 := by
+  have hpos : (0 : ℝ) < 2 ^ k := by positivity
+  have h1 : (r : ℝ) < 2 ^ r := by exact_mod_cast Nat.lt_two_pow_self
+  have h2 : (2 : ℝ) ^ (r + 2) ≤ 2 ^ k := pow_le_pow_right₀ (by norm_num) hk
+  rw [div_le_div_iff₀ hpos (by norm_num), pow_add] at *
+  nlinarith
+
+/-- **Jackson's estimate for splines from two smoothings**: there is `A < ∞` such that for
+`k ≥ r + 2`, every measurable `u` integrable on the dyadic intervals of level `k`, and measurable
+`g₁, D₁` and `g₂, D₂` such that `g_ν` has Taylor polynomials
+`‖g_ν - T‖_{L_p[a,b]} ≤ (b - a)^r ‖D_ν‖_{L_p[a,b]}` on all intervals,
+`‖u - Q_k u‖_{L_p[0,1]} ≤ A ((‖u - g₁‖_{L_p[0,3/4]} + c ‖D₁‖_{L_p[0,3/4]}) + (‖u - g₂‖_{L_p[1/4,1]} + c ‖D₂‖_{L_p[1/4,1]}))`
+with `c = (r 2^(-k))^r`. Every window of the quasi-interpolant has length at most `1/4`, so it
+lies in `[0, 3/4]` or in `[1/4, 1]`; the `p`-th powers of the local errors add up, and
+`a^p + b^p ≤ (a + b)^p` turns them back into norms. -/
+theorem exists_eLpNorm_sub_qi_le_of_taylor {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
+    ∃ A : ℝ≥0∞, A ≠ ∞ ∧ ∀ {k : ℕ}, r + 2 ≤ k → ∀ {u g₁ D₁ g₂ D₂ : ℝ → ℂ}, Measurable u →
+      (∀ m < 2 ^ k, IntegrableOn u (dyadicIco k m)) → Measurable g₁ → Measurable D₁ →
+      Measurable g₂ → Measurable D₂ →
+      (∀ a b : ℝ, a ≤ b → ∃ T ∈ degreeLT ℂ r,
+        eLpNorm (fun x => g₁ x - polyFun T x) p (volume.restrict (Icc a b)) ≤
+          ENNReal.ofReal (b - a) ^ r * eLpNorm D₁ p (volume.restrict (Icc a b))) →
+      (∀ a b : ℝ, a ≤ b → ∃ T ∈ degreeLT ℂ r,
+        eLpNorm (fun x => g₂ x - polyFun T x) p (volume.restrict (Icc a b)) ≤
+          ENNReal.ofReal (b - a) ^ r * eLpNorm D₂ p (volume.restrict (Icc a b))) →
+      eLpNorm (fun x => u x - ppFun k (qiPieces hr k (2 ^ k) u) x) p unitVol ≤
+        A * ((eLpNorm (fun x => u x - g₁ x) p (volume.restrict (Icc 0 (3 / 4))) +
+            ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r *
+              eLpNorm D₁ p (volume.restrict (Icc 0 (3 / 4)))) +
+          (eLpNorm (fun x => u x - g₂ x) p (volume.restrict (Icc (1 / 4) 1)) +
+            ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r *
+              eLpNorm D₂ p (volume.restrict (Icc (1 / 4) 1)))) := by
   obtain ⟨Cb, hCb, hCbb⟩ := exists_enorm_bcoord_le p hr
   obtain ⟨MN, hMN, hMNb⟩ := exists_enorm_bspline_le r
   have hp1 : 1 ≤ p := Fact.out
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
-  have hCq : 1 + r * (MN * (Cb * ppProjConst r)) ≠ ∞ :=
-    ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top (ENNReal.natCast_ne_top r)
-      (ENNReal.mul_ne_top hMN (ENNReal.mul_ne_top hCb (ppProjConst_ne_top r)))⟩
-  refine ⟨splineJacksonConst r (1 + r * (MN * (Cb * ppProjConst r))) p,
-    splineJacksonConst_ne_top r hCq, fun F hF k hk => ?_⟩
-  set Cq := 1 + r * (MN * (Cb * ppProjConst r))
-  set ω := modulus r p 0 1 F (1 / 2 ^ k)
-  have hk2 : 2 ≤ k := by omega
-  have hpos : (0 : ℝ) < 2 ^ k := by positivity
-  have hrk : (r : ℝ) / 2 ^ k ≤ 1 / 4 := by
-    have h1 : (r : ℝ) < 2 ^ r := by exact_mod_cast Nat.lt_two_pow_self
-    have h2 : (2 : ℝ) ^ (r + 2) ≤ 2 ^ k := pow_le_pow_right₀ (by norm_num) hk
-    rw [div_le_div_iff₀ hpos (by norm_num), pow_add] at *
-    nlinarith
-  have hL : (0 : ℝ) < 1 / 2 ^ k := by positivity
-  have hwL : (3 / 4 : ℝ) + 1 / 2 ^ k ≤ 1 := by
-    have : (1 : ℝ) / 2 ^ k ≤ 1 / 4 := by
-      rw [div_le_div_iff₀ (by positivity) (by norm_num), one_mul, one_mul]
-      calc (4 : ℝ) = 2 ^ 2 := by norm_num
-        _ ≤ 2 ^ k := pow_le_pow_right₀ (by norm_num) hk2
-    linarith
-  obtain ⟨gl, Dl, hglm, hDlm, hl1, hl2, hl3⟩ := exists_left_smoothing hF hr hp1 hp hL hwL
-  obtain ⟨gr, Dr, hgrm, hDrm, hr1, hr2, hr3⟩ := exists_right_smoothing hF hr hp1 hp hL hwL
-  rw [show (1 / (2 : ℝ) ^ k)⁻¹ = 2 ^ k by rw [one_div, inv_inv] ] at hl2 hr2
-  rw [show (1 : ℝ) - 3 / 4 = 1 / 4 by norm_num] at hr1 hr2
-  set c : ℝ≥0∞ := ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r
-  set Hl : ℝ → ℝ≥0∞ := fun x => ‖F x - gl x‖ₑ ^ p.toReal + c ^ p.toReal * ‖Dl x‖ₑ ^ p.toReal
-  set Hr : ℝ → ℝ≥0∞ := fun x => ‖F x - gr x‖ₑ ^ p.toReal + c ^ p.toReal * ‖Dr x‖ₑ ^ p.toReal
-  set Hbar : ℝ → ℝ≥0∞ := fun x => (Icc (0 : ℝ) (3 / 4)).indicator Hl x +
-    (Icc (1 / 4 : ℝ) 1).indicator Hr x
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  have hq1 : 1 ≤ p.toReal := by
+    have := ENNReal.toReal_mono hp hp1; rwa [ENNReal.toReal_one] at this
   have h2top : (2 : ℝ≥0∞) ^ (p.toReal - 1) ≠ ∞ :=
     ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top
+  set Cq := 1 + r * (MN * (Cb * ppProjConst r))
+  have hCq : Cq ≠ ∞ := ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top
+    (ENNReal.natCast_ne_top r) (ENNReal.mul_ne_top hMN (ENNReal.mul_ne_top hCb
+      (ppProjConst_ne_top r)))⟩
+  refine ⟨Cq * ((r : ℝ≥0∞) * 2 ^ (p.toReal - 1)) ^ (1 / p.toReal), ENNReal.mul_ne_top hCq
+    (ENNReal.rpow_ne_top_of_nonneg (by positivity)
+      (ENNReal.mul_ne_top (ENNReal.natCast_ne_top r) h2top)),
+    fun {k} hk {u g₁ D₁ g₂ D₂} hum hui hg₁ hD₁ hg₂ hD₂ hT₁ hT₂ => ?_⟩
+  have hpos : (0 : ℝ) < 2 ^ k := by positivity
+  set c : ℝ≥0∞ := ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r
+  set Hl : ℝ → ℝ≥0∞ := fun x => ‖u x - g₁ x‖ₑ ^ p.toReal + c ^ p.toReal * ‖D₁ x‖ₑ ^ p.toReal
+  set Hr : ℝ → ℝ≥0∞ := fun x => ‖u x - g₂ x‖ₑ ^ p.toReal + c ^ p.toReal * ‖D₂ x‖ₑ ^ p.toReal
+  set Hbar : ℝ → ℝ≥0∞ := fun x => (Icc (0 : ℝ) (3 / 4)).indicator Hl x +
+    (Icc (1 / 4 : ℝ) 1).indicator Hr x
   -- a polynomial on every window, from the smoothing on the part that contains it
-  have hT : ∀ i ∈ Finset.range (2 ^ k), ∃ T ∈ degreeLT ℂ r, eLpNorm (fun x => F x - polyFun T x)
+  have hT : ∀ i ∈ Finset.range (2 ^ k), ∃ T ∈ degreeLT ℂ r, eLpNorm (fun x => u x - polyFun T x)
       p (volume.restrict (qiWindow r k i)) ^ p.toReal ≤
         ∫⁻ x in qiWindow r k i, 2 ^ (p.toReal - 1) * Hbar x := by
     intro i hi
     have hi' := Finset.mem_range.1 hi
     rw [lintegral_const_mul' _ _ h2top]
     by_cases hleft : ((i : ℝ) + 1) / 2 ^ k ≤ 3 / 4
-    · obtain ⟨T, hT, h⟩ := exists_qiWindow_poly hF.measurable hglm hDlm hp hl3 k i
+    · obtain ⟨T, hT, h⟩ := exists_qiWindow_poly hum hg₁ hD₁ hp hT₁ k i
       refine ⟨T, hT, h.trans (mul_le_mul' le_rfl
         (setLIntegral_mono' measurableSet_Icc fun x hx => ?_))⟩
       have hx' : x ∈ Icc (0 : ℝ) (3 / 4) := ⟨(by positivity : (0 : ℝ) ≤
@@ -499,41 +573,150 @@ theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
       have ha : 1 / 4 ≤ ((i + 1 - r : ℕ) : ℝ) / 2 ^ k := by
         have h1 := div_le_div_of_nonneg_right (natCast_add_one_sub_le i r) hpos.le
         have : ((i : ℝ) + 1 - r) / 2 ^ k = ((i : ℝ) + 1) / 2 ^ k - (r : ℝ) / 2 ^ k := by ring
-        linarith
+        linarith [natCast_div_two_pow_le hk]
       have hb : ((i : ℝ) + 1) / 2 ^ k ≤ 1 := by
         rw [div_le_one hpos]
         have : ((i + 1 : ℕ) : ℝ) ≤ 2 ^ k := by exact_mod_cast hi'
         push_cast at this; linarith
-      obtain ⟨T, hT, h⟩ := exists_qiWindow_poly hF.measurable hgrm hDrm hp hr3 k i
+      obtain ⟨T, hT, h⟩ := exists_qiWindow_poly hum hg₂ hD₂ hp hT₂ k i
       refine ⟨T, hT, h.trans (mul_le_mul' le_rfl
         (setLIntegral_mono' measurableSet_Icc fun x hx => ?_))⟩
       have hx' : x ∈ Icc (1 / 4 : ℝ) 1 := ⟨ha.trans hx.1, hx.2.trans hb⟩
       simp only [Hbar, indicator_of_mem hx']
       exact le_add_self
-  -- the integral of the dominating function
-  have hHl : Measurable Hl := ((hF.measurable.sub hglm).enorm.pow_const _).add
-    (measurable_const.mul (hDlm.enorm.pow_const _))
-  have hHbar : ∫⁻ x, Hbar x ≤ 2 * ((1 + ((r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^
-      p.toReal) * ω ^ p.toReal) := by
+  -- the integral of the dominating function is a `p`-th power of norms
+  set X := (eLpNorm (fun x => u x - g₁ x) p (volume.restrict (Icc 0 (3 / 4))) +
+      c * eLpNorm D₁ p (volume.restrict (Icc 0 (3 / 4)))) +
+    (eLpNorm (fun x => u x - g₂ x) p (volume.restrict (Icc (1 / 4) 1)) +
+      c * eLpNorm D₂ p (volume.restrict (Icc (1 / 4) 1)))
+  have hpart : ∀ {g D : ℝ → ℂ}, Measurable g → Measurable D → ∀ a b : ℝ,
+      ∫⁻ x in Icc a b, (‖u x - g x‖ₑ ^ p.toReal + c ^ p.toReal * ‖D x‖ₑ ^ p.toReal) =
+        eLpNorm (fun x => u x - g x) p (volume.restrict (Icc a b)) ^ p.toReal +
+          (c * eLpNorm D p (volume.restrict (Icc a b))) ^ p.toReal := fun {g D} hg hD a b => by
+    rw [lintegral_add_left (f := fun x => ‖u x - g x‖ₑ ^ p.toReal)
+      ((hum.sub hg).enorm.pow_const _), lintegral_const_mul _ (hD.enorm.pow_const _),
+      ← eLpNorm_rpow_eq (g := fun x => u x - g x) ((hum.sub hg).aestronglyMeasurable) hp0 hp,
+      ← eLpNorm_rpow_eq hD.aestronglyMeasurable hp0 hp, ENNReal.mul_rpow_of_nonneg _ _ hq.le]
+  have hHl : Measurable Hl := ((hum.sub hg₁).enorm.pow_const _).add
+    (measurable_const.mul (hD₁.enorm.pow_const _))
+  have hHbar : ∫⁻ x, Hbar x ≤ X ^ p.toReal := by
     rw [lintegral_add_left ((hHl.indicator measurableSet_Icc)),
-      lintegral_indicator measurableSet_Icc, lintegral_indicator measurableSet_Icc, two_mul]
-    exact add_le_add (lintegral_smoothing_le hp hF.measurable hglm hDlm hl1 hl2)
-      (lintegral_smoothing_le hp hF.measurable hgrm hDrm hr1 hr2)
+      lintegral_indicator measurableSet_Icc, lintegral_indicator measurableSet_Icc,
+      hpart hg₁ hD₁, hpart hg₂ hD₂]
+    exact (add_le_add (ENNReal.add_rpow_le_rpow_add _ _ hq1)
+      (ENNReal.add_rpow_le_rpow_add _ _ hq1)).trans (ENNReal.add_rpow_le_rpow_add _ _ hq1)
   -- assembling
-  refine eLpNorm_le_of_lintegral_le ((hF.measurable.sub
-    (measurable_ppFun _ _)).aestronglyMeasurable) hp0 hp ?_
-  calc ∫⁻ x, ‖F x - ppFun k (qiPieces hr k (2 ^ k) F) x‖ₑ ^ p.toReal ∂unitVol
-      ≤ ∑ i ∈ Finset.range (2 ^ k), eLpNorm (fun x => F x -
-          polyFun (qiPieces hr k (2 ^ k) F i) x) p (volume.restrict (dyadicIco k i)) ^ p.toReal :=
-        lintegral_sub_ppFun_le_sum hp hF.measurable k _
+  refine eLpNorm_le_of_lintegral_le ((hum.sub (measurable_ppFun _ _)).aestronglyMeasurable)
+    hp0 hp ?_
+  calc ∫⁻ x, ‖u x - ppFun k (qiPieces hr k (2 ^ k) u) x‖ₑ ^ p.toReal ∂unitVol
+      ≤ ∑ i ∈ Finset.range (2 ^ k), eLpNorm (fun x => u x -
+          polyFun (qiPieces hr k (2 ^ k) u i) x) p (volume.restrict (dyadicIco k i)) ^ p.toReal :=
+        lintegral_sub_ppFun_le_sum hp hum k _
     _ ≤ Cq ^ p.toReal * (r * ∫⁻ x, 2 ^ (p.toReal - 1) * Hbar x) :=
-        sum_eLpNorm_sub_qiPieces_le hr hCbb hMNb hp hF.measurable
-          (fun m _ => integrableOn_dyadicIco_of_continuous hF k m) subset_rfl _ hT
-    _ ≤ Cq ^ p.toReal * (r * (2 ^ (p.toReal - 1) * (2 * ((1 + ((r : ℝ≥0∞) ^ r *
-          (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^ p.toReal) * ω ^ p.toReal)))) := by
+        sum_eLpNorm_sub_qiPieces_le hr hCbb hMNb hp hum hui subset_rfl _ hT
+    _ ≤ Cq ^ p.toReal * (r * (2 ^ (p.toReal - 1) * X ^ p.toReal)) := by
         rw [lintegral_const_mul' _ _ h2top]
         gcongr
-    _ = (splineJacksonConst r Cq p * ω) ^ p.toReal := splineJacksonConst_rpow_eq hp r Cq ω
+    _ = (Cq * ((r : ℝ≥0∞) * 2 ^ (p.toReal - 1)) ^ (1 / p.toReal) * X) ^ p.toReal := by
+        rw [ENNReal.mul_rpow_of_nonneg _ X hq.le, ENNReal.mul_rpow_of_nonneg Cq _ hq.le,
+          ← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one]
+        ring
+
+/-- **Jackson's inequality for splines, continuous functions**: there is `C` with
+`‖F - Q_k F‖_{L_p[0,1]} ≤ C ω_r(F, 2^(-k), [0, 1])_p` for every continuous `F` and `k ≥ r + 2`:
+the smoothings of `F` from the left on `[0, 3/4]` and from the right on `[1/4, 1]` enter
+`Interval.exists_eLpNorm_sub_qi_le_of_taylor`. -/
+theorem exists_eLpNorm_sub_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ F : ℝ → ℂ, Continuous F → ∀ k : ℕ, r + 2 ≤ k →
+      eLpNorm (fun x => F x - ppFun k (qiPieces hr k (2 ^ k) F) x) p unitVol ≤
+        C * modulus r p 0 1 F (1 / 2 ^ k) := by
+  obtain ⟨A, hA, hAb⟩ := exists_eLpNorm_sub_qi_le_of_taylor (p := p) hr hp
+  have hJ : 1 + (r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) ≠ ∞ :=
+    ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top
+      (ENNReal.pow_ne_top (ENNReal.natCast_ne_top r))
+      (ENNReal.mul_ne_top (by simp) (ENNReal.pow_ne_top (ENNReal.natCast_ne_top r)))⟩
+  refine ⟨A * (2 * (1 + (r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)))),
+    ENNReal.mul_ne_top hA (ENNReal.mul_ne_top (by simp) hJ), fun F hF k hk => ?_⟩
+  have hp1 : 1 ≤ p := Fact.out
+  have hL : (0 : ℝ) < 1 / 2 ^ k := by positivity
+  have hk2 : 2 ≤ k := by omega
+  have hwL : (3 / 4 : ℝ) + 1 / 2 ^ k ≤ 1 := by
+    have : (1 : ℝ) / 2 ^ k ≤ 1 / 4 := by
+      rw [div_le_div_iff₀ (by positivity) (by norm_num), one_mul, one_mul]
+      calc (4 : ℝ) = 2 ^ 2 := by norm_num
+        _ ≤ 2 ^ k := pow_le_pow_right₀ (by norm_num) hk2
+    linarith
+  obtain ⟨gl, Dl, hglm, hDlm, hl1, hl2, hl3⟩ := exists_left_smoothing hF hr hp1 hp hL hwL
+  obtain ⟨gr, Dr, hgrm, hDrm, hr1, hr2, hr3⟩ := exists_right_smoothing hF hr hp1 hp hL hwL
+  rw [show (1 : ℝ) - 3 / 4 = 1 / 4 by norm_num] at hr1 hr2
+  refine (hAb hk hF.measurable (fun m _ => integrableOn_dyadicIco_of_continuous hF k m) hglm
+    hDlm hgrm hDrm hl3 hr3).trans ?_
+  rw [mul_assoc]
+  refine mul_le_mul' le_rfl ?_
+  rw [two_mul, add_mul]
+  exact add_le_add (add_ofReal_div_pow_mul_le r k hl1 hl2) (add_ofReal_div_pow_mul_le r k hr1 hr2)
+
+/-- **The quasi-interpolant is bounded on `L_p[0, 1]`**: there is `C < ∞` with
+`‖Q_k u‖_{L_p[0,1]} ≤ C ‖u‖_{L_p[0,1]}` for every level `k` and every measurable `u` integrable
+on the dyadic intervals, from the local error estimate with the polynomial `0`. -/
+theorem exists_eLpNorm_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ (k : ℕ) {u : ℝ → ℂ}, Measurable u →
+      (∀ m < 2 ^ k, IntegrableOn u (dyadicIco k m)) →
+      eLpNorm (ppFun k (qiPieces hr k (2 ^ k) u)) p unitVol ≤ C * eLpNorm u p unitVol := by
+  obtain ⟨Cb, hCb, hCbb⟩ := exists_enorm_bcoord_le p hr
+  obtain ⟨MN, hMN, hMNb⟩ := exists_enorm_bspline_le r
+  have hp1 : 1 ≤ p := Fact.out
+  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  set Cq := 1 + r * (MN * (Cb * ppProjConst r))
+  have hCq : Cq ≠ ∞ := ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top
+    (ENNReal.natCast_ne_top r) (ENNReal.mul_ne_top hMN (ENNReal.mul_ne_top hCb
+      (ppProjConst_ne_top r)))⟩
+  refine ⟨1 + Cq * (r : ℝ≥0∞) ^ (1 / p.toReal), ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
+    ENNReal.mul_ne_top hCq (ENNReal.rpow_ne_top_of_nonneg (by positivity)
+      (ENNReal.natCast_ne_top r))⟩, fun k {u} hum hui => ?_⟩
+  set H : ℝ → ℝ≥0∞ := (Icc (0 : ℝ) 1).indicator fun x => ‖u x‖ₑ ^ p.toReal
+  -- the polynomial `0` on every window
+  have hT : ∀ i ∈ Finset.range (2 ^ k), ∃ T ∈ degreeLT ℂ r, eLpNorm (fun x => u x - polyFun T x)
+      p (volume.restrict (qiWindow r k i)) ^ p.toReal ≤ ∫⁻ x in qiWindow r k i, H x := by
+    intro i hi
+    have hsub : qiWindow r k i ⊆ Icc 0 1 := by
+      intro x hx
+      refine ⟨(by positivity : (0 : ℝ) ≤ ((i + 1 - r : ℕ) : ℝ) / 2 ^ k).trans hx.1,
+        hx.2.trans ?_⟩
+      rw [div_le_one (by positivity)]
+      have : ((i + 1 : ℕ) : ℝ) ≤ 2 ^ k := by exact_mod_cast Finset.mem_range.1 hi
+      push_cast at this; linarith
+    refine ⟨0, Submodule.zero_mem _, le_of_eq ?_⟩
+    rw [eLpNorm_rpow_eq (g := fun x => u x - polyFun 0 x)
+      ((hum.sub (measurable_polyFun 0)).aestronglyMeasurable) hp0 hp]
+    refine setLIntegral_congr_fun measurableSet_Icc fun x hx => ?_
+    simp only [H, indicator_of_mem (hsub hx), polyFun_zero, Pi.zero_apply, sub_zero]
+  have hH : ∫⁻ x, H x = eLpNorm u p unitVol ^ p.toReal := by
+    rw [lintegral_indicator measurableSet_Icc, eLpNorm_rpow_eq hum.aestronglyMeasurable hp0 hp]
+  have herr : eLpNorm (fun x => u x - ppFun k (qiPieces hr k (2 ^ k) u) x) p unitVol ≤
+      Cq * (r : ℝ≥0∞) ^ (1 / p.toReal) * eLpNorm u p unitVol := by
+    refine eLpNorm_le_of_lintegral_le ((hum.sub (measurable_ppFun _ _)).aestronglyMeasurable)
+      hp0 hp ?_
+    calc ∫⁻ x, ‖u x - ppFun k (qiPieces hr k (2 ^ k) u) x‖ₑ ^ p.toReal ∂unitVol
+        ≤ ∑ i ∈ Finset.range (2 ^ k), eLpNorm (fun x => u x -
+            polyFun (qiPieces hr k (2 ^ k) u i) x) p (volume.restrict (dyadicIco k i)) ^
+              p.toReal := lintegral_sub_ppFun_le_sum hp hum k _
+      _ ≤ Cq ^ p.toReal * (r * ∫⁻ x, H x) :=
+          sum_eLpNorm_sub_qiPieces_le hr hCbb hMNb hp hum hui subset_rfl _ hT
+      _ = (Cq * (r : ℝ≥0∞) ^ (1 / p.toReal) * eLpNorm u p unitVol) ^ p.toReal := by
+          rw [hH, ENNReal.mul_rpow_of_nonneg _ _ hq.le, ENNReal.mul_rpow_of_nonneg _ _ hq.le,
+            ← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one]
+          ring
+  calc eLpNorm (ppFun k (qiPieces hr k (2 ^ k) u)) p unitVol
+      = eLpNorm (u - fun x => u x - ppFun k (qiPieces hr k (2 ^ k) u) x) p unitVol := by
+        congr 1; funext x; simp
+    _ ≤ eLpNorm u p unitVol +
+          eLpNorm (fun x => u x - ppFun k (qiPieces hr k (2 ^ k) u) x) p unitVol :=
+        eLpNorm_sub_le hp1
+    _ ≤ eLpNorm u p unitVol + Cq * (r : ℝ≥0∞) ^ (1 / p.toReal) * eLpNorm u p unitVol :=
+        add_le_add le_rfl herr
+    _ = (1 + Cq * (r : ℝ≥0∞) ^ (1 / p.toReal)) * eLpNorm u p unitVol := by ring
 
 /-! ### Jackson's inequality in `L_p` and the coincidence theorem -/
 

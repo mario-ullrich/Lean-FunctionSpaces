@@ -136,6 +136,14 @@ theorem ppFun_zero (k : ℕ) : ppFun k 0 = 0 := by
   funext x
   simp [ppFun, polyFun_zero]
 
+/-- Piecewise polynomials are additive in the pieces, for finite sums. -/
+theorem ppFun_sum {ι : Type*} (k : ℕ) (s : Finset ι) (Q : ι → ℕ → ℂ[X]) :
+    ppFun k (∑ i ∈ s, Q i) = ∑ i ∈ s, ppFun k (Q i) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp [ppFun_zero]
+  | insert j s hj ih => rw [Finset.sum_insert hj, Finset.sum_insert hj, ppFun_add, ih]
+
 /-- **Refinement**: a piecewise polynomial of level `k` is one of level `k + 1` with the pieces
 `Q_{⌊n/2⌋}`, almost everywhere on `[0, 1]`. -/
 theorem ppFun_refine (k : ℕ) (Q : ℕ → ℂ[X]) :
