@@ -24,7 +24,8 @@ declarations.
   generalising `ENNReal.le_tsum_condensed` / `ENNReal.tsum_condensed_le`; and
   `ENNReal.rpow_le_rpow_of_nonpos`, which exists for `ℝ` and `ℝ≥0` but not for `ℝ≥0∞`.
 * **Discrete Hardy inequalities** (`ApproximationSpaces/Sequences/Hardy.lean`):
-  `ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`.
+  `ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`, and the almost diagonal estimate that
+  combines both (`ENNReal.lqNorm_almostDiagonal_le`, in `FunctionSpaces/Rd/LocalMeans.lean`).
 * **The inclusion `L_r ↪ L_p`** (`FunctionSpaces/Lp/Inclusion.lean`): for a finite measure
   and `p ≤ r`, the bounded linear injection `MeasureTheory.Lp.inclusionOfExponentLe`, with
   its norm bound and compatibility with `BoundedContinuousFunction.toLp`. Mathlib has the
@@ -78,7 +79,9 @@ declarations.
 * **Moduli of smoothness on finite-dimensional spaces** (`FunctionSpaces/Rd/Differences.lean`):
   for Mathlib's `fwdDiff` and a Haar measure, `‖Δ_h^r f‖_p ≤ 2^r ‖f‖_p`, the dilation property
   `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` (`Rd.modulus_mul_le`), and
-  `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost everywhere (`Rd.iterDiff_conv_ae`).
+  `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost everywhere (`Rd.iterDiff_conv_ae`); the modulus on a
+  subset `U`, with the differences restricted to the points `x` with `x, …, x + rh ∈ U`
+  (`Rd.modulusOn`, `FunctionSpaces/Rd/DomainModuli.lean`).
 * **Differences of Schwartz functions in `L_1`** (`FunctionSpaces/Rd/BandInverse.lean`):
   `‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1` (`Rd.lintegral_enorm_iterDiff_schwartz_le`), from
   `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1` (`Rd.lintegral_enorm_fwdDiff_le`) and the commutation of differences

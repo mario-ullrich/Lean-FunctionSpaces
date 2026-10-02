@@ -327,4 +327,20 @@ theorem lpModulus_le (r : ℕ) (f : Lp ℂ p μ) (k : ℕ) : lpModulus p r f k �
   rw [Lp.enorm_def]
   exact modulus_le (Lp.aestronglyMeasurable f) Fact.out r _
 
+omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
+/-- The modulus of `0` vanishes. -/
+theorem lpModulus_zero (r k : ℕ) : lpModulus p r (0 : Lp ℂ p μ) k = 0 :=
+  le_antisymm ((lpModulus_le r 0 k).trans (by simp)) bot_le
+
+/-- **The modulus of a convolution**: if `‖Δ_v^r K‖_1 ≤ B` for `‖v‖ ≤ 2^(-k)`, then
+`ω_r(K ⋆ h, 2^(-k))_p ≤ B ‖h‖_p`, since `Δ_v^r (K ⋆ h) = (Δ_v^r K) ⋆ h` (Young's inequality). -/
+theorem lpModulus_convLp_le (hp : p ≠ ∞) {K : V → ℂ} (hK : Integrable K μ) (r k : ℕ)
+    {B : ℝ≥0∞} (hB : ∀ v : V, ‖v‖ ≤ 1 / 2 ^ k → eLpNorm ((fwdDiff v)^[r] K) 1 μ ≤ B)
+    (h : Lp ℂ p μ) : lpModulus p r (convLp hp hK h) k ≤ B * ‖h‖ₑ := by
+  rw [lpModulus, modulus_congr_ae (convLp_apply_ae hp hK h)]
+  refine iSup₂_le fun v hv => ?_
+  rw [eLpNorm_congr_ae (iterDiff_conv_ae Fact.out hp hK (Lp.memLp h) r v), Lp.enorm_def]
+  exact (eLpNorm_conv_le Fact.out hp (integrable_iterDiff hK r v).aestronglyMeasurable
+    (Lp.aestronglyMeasurable h)).trans (by gcongr; exact hB v hv)
+
 end Rd

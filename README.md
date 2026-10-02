@@ -322,6 +322,19 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   inequality `ω_r(a, 2^(-k))_p ≤ C 2^(-(k-j) r) ‖a‖_p` for `a ∈ E_j`
   (`Rd.lpModulus_le_of_mem_bandSpace`), which rests on `‖Δ_v^r G‖_1 ≤ |v|^r ‖D^r G‖_1` for
   Schwartz functions `G` (`Rd.lintegral_enorm_iterDiff_schwartz_le`).
+* **Local means on `ℝ^d`.** With `V` and `p` as above, let `g` be a smooth function with
+  `∫ g = 1` that vanishes outside a ball, `g_c = c^n g(c ·)` its dilations (`n = dim V`),
+  `L ≥ 1`, `m = ∑_{l=1}^L (-1)^(l+1) C(L, l) g_{1/l}` the moment kernel, and `k_0 = m`,
+  `k_j = m_{2^j} - m_{2^(j-1)}` the local means kernels. For `0 < s < L` and `1 ≤ q ≤ ∞`,
+  `‖f‖_p + ‖(2^(ks) ω_L(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff `‖(2^(js) ‖k_j ⋆ f‖_p)_j‖_{ℓ_q} < ∞`,
+  with equivalent quasi-norms (`Rd.LocalMeansBump.besov_iff_localMeans`,
+  `Rd.LocalMeansBump.localMeansNorm_le`, `Rd.LocalMeansBump.modNorm_le_localMeansNorm`), so
+  local means describe the same spaces as band-limited approximation
+  (`Rd.LocalMeansBump.memApprox_bandScheme_iff_localMeans`). Every estimate runs through the
+  averaged differences `f - m_c ⋆ f = (-1)^L ∫ g(z) Δ^L_{-z/c} f dz`
+  (`Rd.ae_sub_conv_dilate_momentKernel_eq`) and the reproducing formula
+  `∑_{j ≤ J} η_j ⋆ k_j ⋆ f = m_{2^J} ⋆ m_{2^J} ⋆ f → f` with `η_0 = m`,
+  `η_j = m_{2^j} + m_{2^(j-1)}` (`Rd.LocalMeansBump.tendsto_sum_dual_localMean`).
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -392,6 +405,9 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Jackson's inequality for band-limited approximation | ✅ proved | ✗ | `FunctionSpaces/Rd/BandJackson.lean` |
 | Differences of Schwartz functions in `L_1`, inverse inequality for band-limited functions | ✅ proved | ✗ | `FunctionSpaces/Rd/BandInverse.lean` |
 | Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ proved | ✗ | `FunctionSpaces/Rd/BesovDifferences.lean` |
+| Moduli of smoothness on subsets of `ℝ^d` | ✅ proved | ✗ | `FunctionSpaces/Rd/DomainModuli.lean` |
+| Moment kernels: averaged differences, approximation with the modulus, also on subsets | ✅ proved | ✗ | `FunctionSpaces/Rd/MomentKernels.lean` |
+| Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L` | ✅ proved | ✗ | `FunctionSpaces/Rd/LocalMeans.lean` |
 | Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
@@ -409,8 +425,8 @@ approximation spaces with spaces defined by moduli of smoothness. Nothing in it 
 functions or measures. `FunctionSpaces` holds the Besov and Sobolev spaces built on it:
 schemes of bounded continuous functions on a finite measure space and their embedding
 theorems, spectral schemes in Hilbert spaces, the torus with its traces and Lipschitz atoms,
-`ℝ^d` with convolution, approximate identities, Littlewood–Paley decompositions and moduli of
-smoothness, filtration schemes for wavelets and multiwavelets, the classical definitions
+`ℝ^d` with convolution, approximate identities, Littlewood–Paley decompositions, moduli of
+smoothness and local means, filtration schemes for wavelets and multiwavelets, the classical definitions
 through moduli of smoothness and weak derivatives, and polynomial and piecewise polynomial
 approximation on intervals and on the cube `[0, 1]^d`. [MathlibCandidates.md](MathlibCandidates.md) lists what
 could be upstreamed.
@@ -473,6 +489,8 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * R. A. DeVore, G. G. Lorentz, *Constructive Approximation*, Grundlehren der
   mathematischen Wissenschaften **303**, Springer-Verlag, 1993. Chapter 7: approximation
   spaces, Jackson and Bernstein inequalities, and their relation to interpolation.
+* R. A. DeVore, R. C. Sharpley, *Besov spaces on domains in ℝ^d*, Trans. Amer. Math. Soc.
+  **335** (1993), no. 2, 843–864. The modulus of smoothness on a domain.
 * S. M. Nikol'skii, *Approximation of Functions of Several Variables and Imbedding
   Theorems*, Grundlehren der mathematischen Wissenschaften **205**, Springer-Verlag, 1975.
   The Nikolskii inequality and the embedding theorems it yields.

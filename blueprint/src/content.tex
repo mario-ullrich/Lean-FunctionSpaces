@@ -5208,12 +5208,13 @@ for almost every $x$.
 \begin{lemma}[Linearity and associativity]
 \label{lem:conv-assoc}
 \lean{Rd.conv_add_ae, Rd.add_conv_ae, Rd.sub_conv_ae, Rd.ae_integrable_conv_conv,
-  Rd.conv_conv_ae}
+  Rd.conv_conv_ae, Rd.flip_mul_complex, Rd.conv_comm}
 \leanok
 \uses{thm:young}
 Let $1 \leq p < \infty$, $K, K', L \in L_1$ and $f, g \in L_p$. Almost everywhere on $V$,
 $K * (f + g) = K * f + K * g$, $(K + K') * f = K * f + K' * f$,
-$(K - K') * f = K * f - K' * f$ and $(K * L) * f = K * (L * f)$.
+$(K - K') * f = K * f - K' * f$ and $(K * L) * f = K * (L * f)$. For all $K, L : V \to \C$,
+$K * L = L * K$.
 \end{lemma}
 
 \begin{proof}
@@ -5221,19 +5222,19 @@ $(K - K') * f = K * f - K' * f$ and $(K * L) * f = K * (L * f)$.
 The first three follow from the absolute convergence in \Cref{thm:young}. For the last, for
 almost every $x$ the function $(y, z) \mapsto K(z) L(y - z) f(x - y)$ is integrable on
 $V \times V$, by \Cref{thm:young} applied to $|L| * |f|$, and Fubini's theorem exchanges the
-integrations.
+integrations. Commutativity is the substitution $y \mapsto x - y$.
 \end{proof}
 
 \begin{lemma}[Convolution operators]
 \label{lem:conv-op}
 \lean{Rd.norm_toLp_conv_le, Rd.convLp, Rd.convLp_apply_ae, Rd.norm_convLp_le,
   Rd.enorm_convLp_le, Rd.convLp_convLp, Rd.convLp_convLp_of_eq, Rd.convLp_of_eq_zero,
-  Rd.convLp_sub_kernel}
+  Rd.convLp_sub_kernel, Rd.convLp_comm, Rd.convLp_add_kernel}
 \leanok
 \uses{thm:young, lem:conv-assoc}
 Let $1 \leq p < \infty$. For $K \in L_1$, $T_K f = K * f$ defines a bounded linear operator on
-$L_p$ with $\|T_K\| \leq \|K\|_1$. For $K, L \in L_1$, $T_K T_L = T_{K * L}$ and
-$T_{K - L} = T_K - T_L$, and $T_0 = 0$.
+$L_p$ with $\|T_K\| \leq \|K\|_1$. For $K, L \in L_1$, $T_K T_L = T_{K * L} = T_L T_K$,
+$T_{K + L} = T_K + T_L$ and $T_{K - L} = T_K - T_L$, and $T_0 = 0$.
 \end{lemma}
 
 \begin{proof}
@@ -5578,7 +5579,7 @@ and \Cref{lem:conv-assoc} gives the linearity in the kernel.
 \label{lem:rd-modulus}
 \lean{Rd.eLpNorm_iterDiff_nsmul_iterDiff_le, Rd.eLpNorm_iterDiff_le_modulus, Rd.modulus_mono,
   Rd.modulus_add_le, Rd.modulus_le, Rd.modulus_congr_ae, Rd.modulus_nat_mul_le,
-  Rd.modulus_mul_le, Rd.lpModulus_add_le, Rd.lpModulus_le}
+  Rd.modulus_mul_le, Rd.lpModulus_add_le, Rd.lpModulus_le, Rd.lpModulus_zero}
 \leanok
 \uses{def:rd-modulus, lem:rd-differences}
 Let $1 \leq p < \infty$, $r \in \N$ and $f, g \in L_p$. The modulus $\omega_r(f, t)_p$ increases
@@ -5599,16 +5600,156 @@ $\omega_r(f, m t)_p \leq m^r \omega_r(f, t)_p$. For real $c$ take
 $m = \lfloor c \rfloor + 1 \leq 1 + c$.
 \end{proof}
 
+\begin{lemma}[Moduli of convolutions]
+\label{lem:rd-modulus-conv}
+\lean{Rd.lpModulus_convLp_le}
+\leanok
+\uses{lem:rd-differences, thm:young}
+Let $1 \leq p < \infty$, $r, k \in \N$, $B \geq 0$ and $K \in L_1$ with
+$\|\Delta_v^r K\|_1 \leq B$ for all $\|v\| \leq 2^{-k}$. Then
+$\omega_r(K * h, 2^{-k})_p \leq B \, \|h\|_p$ for every $h \in L_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\Delta_v^r (K * h) = (\Delta_v^r K) * h$ almost everywhere by \Cref{lem:rd-differences}, and
+Young's inequality gives $\|\Delta_v^r (K * h)\|_p \leq \|\Delta_v^r K\|_1 \|h\|_p$.
+\end{proof}
+
+\section{Moduli of smoothness on subsets}
+
+\begin{definition}[The modulus of smoothness on a subset]
+\label{def:rd-modulus-on}
+\lean{Rd.stepSet, Rd.stepSet_subset, Rd.stepSet_univ, Rd.modulusOn, Rd.lpModulusOn}
+\leanok
+\uses{def:rd-modulus}
+For $U \subseteq V$, $h \in V$ and $r \in \N$ let
+$U_{rh} = \{x \in V : x, x + h, \dots, x + rh \in U\}$, so that $U_{rh} \subseteq U$ and
+$V_{rh} = V$. For $f : V \to \C$, $1 \leq p < \infty$ and $t \in \R$, the modulus of smoothness
+on $U$ is
+\[
+  \omega_r(f, t, U)_p = \sup_{\|h\| \leq t} \|\Delta_h^r f\|_{L_p(U_{rh})} .
+\]
+\end{definition}
+
+This is the modulus of \cite[(2.1)]{DeVoreSharpley}, written with the restricted differences
+$\Delta_h^r(f, x, U) = \Delta_h^r f(x)$ for $x \in U_{rh}$ and $\Delta_h^r(f, x, U) = 0$ otherwise.
+
+\begin{lemma}[Properties of the modulus on a subset]
+\label{lem:rd-modulus-on}
+\lean{Rd.indicator_stepSet_iterDiff_indicator, Rd.measurableSet_stepSet,
+  Rd.eLpNorm_indicator_iterDiff_le_modulusOn, Rd.modulusOn_mono, Rd.modulusOn_univ,
+  Rd.modulusOn_indicator, Rd.modulusOn_add_le, Rd.modulusOn_le_modulus, Rd.modulusOn_le,
+  Rd.modulusOn_congr_ae, Rd.lpModulusOn_succ_le, Rd.lpModulusOn_le_lpModulus,
+  Rd.lpModulusOn_congr}
+\leanok
+\uses{def:rd-modulus-on, lem:rd-modulus}
+Let $U \subseteq V$ be measurable, $1 \leq p < \infty$, $r \in \N$ and $f, g \in L_p$. Then
+$\omega_r(f, t, U)_p$ increases in $t$, depends only on the class of $f|_U$ modulo null sets,
+and satisfies $\omega_r(f + g, t, U)_p \leq \omega_r(f, t, U)_p + \omega_r(g, t, U)_p$,
+\[
+  \omega_r(f, t, U)_p \leq \omega_r(f, t)_p
+  \qquad\text{and}\qquad
+  \omega_r(f, t, U)_p \leq 2^r \|f\|_{L_p(U)} .
+\]
+Moreover $\omega_r(f, t, V)_p = \omega_r(f, t)_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $x \in U_{rh}$ all points $x + lh$, $l \leq r$, lie in $U$, so $\Delta_h^r (1_U f) = \Delta_h^r f$
+on $U_{rh}$. Hence $\omega_r(f, t, U)_p = \omega_r(1_U f, t, U)_p \leq \omega_r(1_U f, t)_p \leq
+2^r \|1_U f\|_p$ by \Cref{lem:rd-modulus}; the other statements follow from the definition.
+\end{proof}
+
+\section{Moment kernels}
+
+\begin{lemma}[The coefficients of the moment kernels]
+\label{lem:moment-coefficients}
+\lean{Rd.jacksonCoeff, Rd.neg_one_pow_mul_neg_one_pow_sub, Rd.neg_one_pow_mul_sum_iterDiff_coeff,
+  Rd.sum_jacksonCoeff}
+\leanok
+Let $L \in \N$ and $c_l = (-1)^{l+1} \binom{L}{l}$ for $1 \leq l \leq L$. For all
+$F_0, \dots, F_L \in \C$,
+\[
+  (-1)^L \sum_{l=0}^L (-1)^{L-l} \binom{L}{l} F_l = F_0 - \sum_{l=1}^L c_l F_l ,
+\]
+and $\sum_{l=1}^L c_l = 1$ for $L \geq 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$(-1)^L (-1)^{L-l} = (-1)^l$ for $l \leq L$, and $\sum_{l=0}^L (-1)^l \binom{L}{l} = (1 - 1)^L = 0$
+for $L \geq 1$.
+\end{proof}
+
+\begin{definition}[Moment kernels]
+\label{def:moment-kernel}
+\lean{Rd.momentKernel, Rd.dilate_dilate, Rd.dilate_momentKernel, Rd.integrable_momentKernel,
+  Rd.integral_momentKernel, Rd.lintegral_enorm_ne_zero_of_integral_eq_one}
+\leanok
+\uses{lem:moment-coefficients, lem:dilate}
+Let $g \in L_1$ with $\int_V g = 1$ and $L \in \N$. The moment kernel of order $L$ is
+\[
+  m = \sum_{l=1}^L (-1)^{l+1} \binom{L}{l} \, g_{1/l} .
+\]
+Its dilations are $m_c = \sum_{l=1}^L (-1)^{l+1} \binom{L}{l} \, g_{c/l}$ for $c > 0$, and
+$\int_V m = 1$ for $L \geq 1$.
+\end{definition}
+
+\begin{lemma}[Averaged differences]
+\label{lem:averaged-differences}
+\lean{Rd.conv_finsetSum_kernel_ae, Rd.ae_sub_sum_conv_dilate_eq,
+  Rd.ae_sub_conv_dilate_momentKernel_eq}
+\leanok
+\uses{def:moment-kernel, lem:conv-assoc, def:rd-modulus}
+Let $1 \leq p < \infty$, $g \in L_1$ with $\int_V g = 1$, $L \in \N$, $c > 0$ and $f \in L_p$.
+For almost every $x \in V$,
+\[
+  f(x) - (m_c * f)(x) = (-1)^L \int_V g(z) \, \Delta^L_{-c^{-1} z} f(x) \, dz .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Write $(g_{c/l} * f)(x) = \int_V g(z) f(x - l c^{-1} z) \, dz$ and $f(x) = \int_V g(z) f(x) \, dz$,
+and apply \Cref{lem:moment-coefficients} with $F_l = f(x - l c^{-1} z)$.
+\end{proof}
+
+\begin{theorem}[Moment kernels approximate with the modulus]
+\label{thm:moment-approx}
+\lean{Rd.eLpNorm_indicator_sub_convLp_momentKernel_le, Rd.enorm_sub_convLp_momentKernel_le}
+\leanok
+\uses{lem:averaged-differences, lem:weighted-jensen, lem:rd-modulus-on}
+Let $1 \leq p < \infty$, $L \in \N$, $c > 0$, and let $g \in L_1$ with $\int_V g = 1$ vanish
+outside the ball of radius $R$. Let $U \subseteq V$ be measurable with $U \subseteq U_{Lh}$ for
+every $h = -c^{-1} z$ with $g(z) \neq 0$. Then for every $f \in L_p$,
+\[
+  \|f - m_c * f\|_{L_p(U)} \leq \|g\|_1 \, \omega_L(f, R/c, U)_p ,
+\]
+and in particular $\|f - m_c * f\|_p \leq \|g\|_1 \, \omega_L(f, R/c)_p$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:averaged-differences},
+$1_U (f - m_c * f) = (-1)^L \int_V g(z) \, 1_U \Delta^L_{-c^{-1} z} f \, dz$ almost everywhere,
+and $1_U \Delta^L_h f = 1_{U_{Lh}} \Delta^L_h f$ for the steps $h = -c^{-1} z$ with
+$g(z) \neq 0$, which have length at most $R/c$. The weighted Jensen inequality
+(\Cref{lem:weighted-jensen}) gives
+$\|f - m_c * f\|_{L_p(U)}^p \leq \|g\|_1^{p-1} \int_V |g(z)| \, \omega_L(f, R/c, U)_p^p \, dz$.
+The case $U = V$ is the second statement, by \Cref{lem:rd-modulus-on}.
+\end{proof}
+
 \section{Jackson's inequality}
 
 \begin{lemma}[The Jackson approximant]
 \label{lem:jackson-approx}
-\lean{Rd.conv_Theta_dilate_lpKernel, Rd.jacksonCoeff, Rd.jacksonScale, Rd.jacksonScale_pos,
+\lean{Rd.conv_Theta_dilate_lpKernel, Rd.jacksonScale, Rd.jacksonScale_pos,
   Rd.jacksonScale_le, Rd.jacksonApprox, Rd.jacksonApprox_mem_bandSpace,
-  Rd.neg_one_pow_mul_neg_one_pow_sub, Rd.neg_one_pow_mul_sum_iterDiff_coeff,
   Rd.ae_sub_jacksonApprox_eq}
 \leanok
-\uses{lem:rd-differences, lem:lp-kernels-frequency, lem:conv-of-fourier, lem:band-space,
+\uses{lem:averaged-differences, lem:lp-kernels-frequency, lem:conv-of-fourier, lem:band-space,
   lem:dilate}
 Let $1 \leq p < \infty$, $r, k \in \N$ and $f \in L_p$, and let
 \[
@@ -5624,10 +5765,8 @@ Then $J_k f \in E_k$, and for almost every $x \in V$,
 \leanok
 The transform $\widehat{\Phi_c} = \chi_{1,2}(c^{-1} \cdot)$ vanishes outside the ball of radius $2c$,
 and $\widehat{\Theta_k} = 1$ on the ball of radius $2^{k+1}$, so $\Theta_k * \Phi_c = \Phi_c$ for
-$c \leq 2^k$ by \Cref{lem:conv-of-fourier}. For the identity, write
-$(\Phi_{2^k/l} * f)(x) = \int_V \Phi(z) f(x - l 2^{-k} z) \, dz$ and
-$f(x) = \int_V \Phi(z) f(x) \, dz$; the coefficients $(-1)^{l+1} \binom{r}{l}$ are those of
-$-(-1)^r \Delta^r$ with the step $-2^{-k} z$, without the term $l = 0$.
+$c \leq 2^k$ by \Cref{lem:conv-of-fourier}. The identity is \Cref{lem:averaged-differences} for
+$g = \Phi$, $L = r$ and $c = 2^k$, since $\int_V \Phi = \widehat{\Phi}(0) = 1$.
 \end{proof}
 
 \begin{theorem}[Jackson's inequality]
@@ -5729,6 +5868,177 @@ combines (1) with \Cref{thm:lp-band}.
 
 For $0 < s < r$ the Besov space $\Besov{s}{p}{q}(V)$ thus has three equivalent descriptions: by
 approximation with band-limited functions, by Littlewood--Paley blocks, and by differences.
+
+\section{Local means}
+
+\begin{definition}[Local means]
+\label{def:local-means}
+\lean{Rd.LocalMeansBump, Rd.LocalMeansBump.hasCompactSupport, Rd.LocalMeansBump.integrable,
+  Rd.LocalMeansBump.contDiff_momentKernel, Rd.LocalMeansBump.momentKernel_eq_zero,
+  Rd.LocalMeansBump.hasCompactSupport_momentKernel, Rd.LocalMeansBump.momentSchwartz,
+  Rd.LocalMeansBump.derivNorm, Rd.LocalMeansBump.scaled, Rd.LocalMeansBump.kernel,
+  Rd.LocalMeansBump.dual, Rd.LocalMeansBump.integrable_scaled,
+  Rd.LocalMeansBump.integrable_kernel, Rd.LocalMeansBump.integrable_dual,
+  Rd.LocalMeansBump.localMean, Rd.LocalMeansBump.localMeansNorm}
+\leanok
+\uses{def:moment-kernel, lem:conv-op}
+Let $g : V \to \C$ be smooth with $\int_V g = 1$ and $g = 0$ outside the ball of radius $R$, let
+$L \geq 1$ and let $m$ be the moment kernel of order $L$. The local means kernels and the dual
+kernels are
+\[
+  k_0 = \eta_0 = m, \qquad k_j = m_{2^j} - m_{2^{j-1}}, \qquad \eta_j = m_{2^j} + m_{2^{j-1}}
+  \qquad (j \geq 1) .
+\]
+For $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p$, the local means
+quasi-norm is $\|(2^{js} \|k_j * f\|_p)_j\|_{\ell_q}$.
+\end{definition}
+
+\begin{lemma}[The reproducing formula]
+\label{lem:reproducing-formula}
+\lean{Rd.LocalMeansBump.sum_dual_localMean, Rd.LocalMeansBump.tendsto_sum_dual_localMean}
+\leanok
+\uses{def:local-means, lem:conv-op, lem:conv-assoc, thm:approx-identity}
+With the notation of \Cref{def:local-means}, for every $J \in \N$ and $f \in L_p$,
+\[
+  \sum_{j=0}^J \eta_j * k_j * f = m_{2^J} * m_{2^J} * f ,
+\]
+and $\sum_{j=0}^J \eta_j * k_j * f \to f$ in $L_p$ as $J \to \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The convolution operators commute (\Cref{lem:conv-op}), so
+$T_{\eta_j} T_{k_j} = T_{m_{2^j}}^2 - T_{m_{2^{j-1}}}^2$ for $j \geq 1$, from
+$a^2 - b^2 = (a + b)(a - b)$, and the sum telescopes. Since $m_{2^J} * f \to f$
+(\Cref{thm:approx-identity}) and $\|m_{2^J} * h\|_p \leq \|m\|_1 \|h\|_p$, also
+$m_{2^J} * m_{2^J} * f \to f$.
+\end{proof}
+
+\begin{lemma}[Local means are bounded by the modulus]
+\label{lem:local-means-upper}
+\lean{Rd.LocalMeansBump.enorm_localMean_zero_le, Rd.LocalMeansBump.enorm_localMean_succ_le,
+  Rd.LocalMeansBump.upperConst, Rd.LocalMeansBump.upperConst_ne_top,
+  Rd.LocalMeansBump.localMeansNorm_le}
+\leanok
+\uses{def:local-means, thm:moment-approx, lem:rd-modulus}
+With the notation of \Cref{def:local-means}, for $f \in L_p$ and $j \in \N$,
+$\|k_0 * f\|_p \leq \|m\|_1 \|f\|_p$ and
+\[
+  \|k_{j+1} * f\|_p \leq 2 \|g\|_1 (1 + R)^L \, \omega_L(f, 2^{-j})_p .
+\]
+Hence for all $s \in \R$ and $1 \leq q \leq \infty$ there is $C < \infty$ with
+\[
+  \|(2^{js} \|k_j * f\|_p)_j\|_{\ell_q}
+  \leq C \bigl( \|f\|_p + \|(2^{js} \omega_L(f, 2^{-j})_p)_j\|_{\ell_q} \bigr)
+\]
+for every $f \in L_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$k_{j+1} * f = (f - m_{2^j} * f) - (f - m_{2^{j+1}} * f)$, and \Cref{thm:moment-approx} bounds
+both terms by $\|g\|_1 \omega_L(f, R 2^{-j})_p \leq \|g\|_1 (1 + R)^L \omega_L(f, 2^{-j})_p$
+(\Cref{lem:rd-modulus}).
+\end{proof}
+
+\begin{lemma}[Moduli of the reproducing terms]
+\label{lem:dual-kernel-moduli}
+\lean{Rd.LocalMeansBump.eLpNorm_scaled_one, Rd.LocalMeansBump.eLpNorm_dual_one_le,
+  Rd.LocalMeansBump.eLpNorm_iterDiff_scaled_le, Rd.LocalMeansBump.eLpNorm_iterDiff_scaled_le',
+  Rd.LocalMeansBump.dualConst, Rd.LocalMeansBump.dualConst_ne_top,
+  Rd.LocalMeansBump.eLpNorm_iterDiff_scaled_le_dyadic,
+  Rd.LocalMeansBump.eLpNorm_iterDiff_dual_le, Rd.LocalMeansBump.lpModulus_dual_le}
+\leanok
+\uses{def:local-means, lem:schwartz-differences, lem:rd-differences, lem:rd-modulus-conv}
+With the notation of \Cref{def:local-means}, $\|\eta_j\|_1 \leq 2 \|m\|_1$, and there is
+$C < \infty$ with
+\[
+  \omega_L(\eta_j * h, 2^{-i})_p \leq C \, \min\bigl(1, 2^{-(i - j) L}\bigr) \, \|h\|_p
+\]
+for all $i, j \in \N$ and $h \in L_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The moment kernel $m$ is smooth with compact support, so
+$\|\Delta_v^L m_{2^j}\|_1 \leq (2^j \|v\|)^L \|D^L m\|_1$ by \Cref{lem:rd-differences} and
+\Cref{lem:schwartz-differences}, and $\|\Delta_v^L m_{2^j}\|_1 \leq 2^L \|m\|_1$. For
+$\|v\| \leq 2^{-i}$ this gives $\|\Delta_v^L \eta_j\|_1 \leq C \min(1, 2^{-(i-j)L})$, and
+\Cref{lem:rd-modulus-conv} concludes.
+\end{proof}
+
+\begin{lemma}[An almost diagonal estimate]
+\label{lem:almost-diagonal}
+\lean{ENNReal.lqNorm_almostDiagonal_le}
+\leanok
+\uses{lem:hardy}
+Let $1 \leq q \leq \infty$, $0 < s < L$, and let $c_{ij} = 2^{-(i-j)L}$ for $j \leq i$ and
+$c_{ij} = 1$ for $j > i$. For every sequence $a$ in $[0, \infty]$,
+\[
+  \Bigl\| \Bigl( 2^{is} \sum_j c_{ij} \, a_j \Bigr)_i \Bigr\|_{\ell_q}
+  \leq \bigl( (1 - 2^{-(L-s)})^{-1} + (1 - 2^{-s})^{-1} \bigr) \, \|(2^{js} a_j)_j\|_{\ell_q} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Split the sum at $j = i$: the part $j \leq i$ is a partial sum with the weights $2^{-i(L-s)}$,
+the part $j > i$ a tail sum with the weights $2^{is}$, and \Cref{lem:hardy} bounds both.
+\end{proof}
+
+\begin{lemma}[The synthesis estimate]
+\label{lem:local-means-synthesis}
+\lean{Rd.le_tsum_of_tendsto_sum, Rd.LocalMeansBump.synthConst,
+  Rd.LocalMeansBump.synthConst_ne_top, Rd.LocalMeansBump.modNorm_le_of_tendsto,
+  Rd.LocalMeansBump.modNorm_le_localMeansNorm}
+\leanok
+\uses{lem:dual-kernel-moduli, lem:almost-diagonal, lem:reproducing-formula, lem:rd-modulus}
+With the notation of \Cref{def:local-means}, let $0 < s < L$ and $1 \leq q \leq \infty$. There is
+$C < \infty$ such that for all $h_j \in L_p$ and $F \in L_p$ with
+$\sum_{j=0}^J \eta_j * h_j \to F$ in $L_p$,
+\[
+  \|F\|_p + \|(2^{is} \omega_L(F, 2^{-i})_p)_i\|_{\ell_q}
+  \leq C \, \|(2^{js} \|h_j\|_p)_j\|_{\ell_q} .
+\]
+In particular $\|f\|_p + \|(2^{is} \omega_L(f, 2^{-i})_p)_i\|_{\ell_q}
+\leq C \|(2^{js} \|k_j * f\|_p)_j\|_{\ell_q}$ for every $f \in L_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The norm and the modulus $\omega_L(\cdot, 2^{-i})_p$ are subadditive and bounded by multiples of
+$\|\cdot\|_p$, so they pass to the series:
+$\omega_L(F, 2^{-i})_p \leq \sum_j \omega_L(\eta_j * h_j, 2^{-i})_p \leq C \sum_j c_{ij}
+\|h_j\|_p$ by \Cref{lem:dual-kernel-moduli}, and \Cref{lem:almost-diagonal} bounds the
+$\ell_q$ norm. Likewise $\|F\|_p \leq 2 \|m\|_1 \sum_j \|h_j\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1}
+\|(2^{js} \|h_j\|_p)_j\|_{\ell_q}$. The case $h_j = k_j * f$ is \Cref{lem:reproducing-formula}.
+\end{proof}
+
+\begin{theorem}[Local means and differences]
+\label{thm:local-means}
+\lean{Rd.LocalMeansBump.besov_iff_localMeans,
+  Rd.LocalMeansBump.memApprox_bandScheme_iff_localMeans}
+\leanok
+\uses{lem:local-means-upper, lem:local-means-synthesis, thm:rd-besov}
+With the notation of \Cref{def:local-means}, let $0 < s < L$, $1 \leq q \leq \infty$ and
+$f \in L_p$. Then
+\[
+  \|f\|_p + \|(2^{ks} \omega_L(f, 2^{-k})_p)_k\|_{\ell_q} < \infty
+  \iff \|(2^{js} \|k_j * f\|_p)_j\|_{\ell_q} < \infty ,
+\]
+and both hold if and only if $f$ lies in the approximation space $A^s_q$ of the band-limited
+scheme.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{lem:local-means-upper} and \Cref{lem:local-means-synthesis}; the last statement is
+\Cref{thm:rd-besov}.
+\end{proof}
+
+Every estimate runs through the averaged differences of \Cref{lem:averaged-differences}, applied
+to $f$ or to the smooth kernels. With \Cref{thm:rd-besov}, local means are a fourth description of
+$\Besov{s}{p}{q}(V)$ for $0 < s < L$.
 
 \bpbibheading
 \begin{thebibliography}{99}

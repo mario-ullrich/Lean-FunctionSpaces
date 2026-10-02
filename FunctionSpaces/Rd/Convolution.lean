@@ -391,6 +391,15 @@ theorem sub_conv_ae {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K K' f : 
 theorem conv_congr_ae {K f g : V → ℂ} (hfg : f =ᵐ[μ] g) : conv K f μ = conv K g μ :=
   convolution_congr (ContinuousLinearMap.mul ℂ ℂ) (Filter.EventuallyEq.refl _ K) hfg
 
+/-- The multiplication of `ℂ` is symmetric. -/
+theorem flip_mul_complex : (ContinuousLinearMap.mul ℂ ℂ).flip = ContinuousLinearMap.mul ℂ ℂ := by
+  ext
+  simp
+
+/-- **Convolution is commutative**: `K ⋆ L = L ⋆ K` (Mathlib's `convolution_flip`). -/
+theorem conv_comm (K L : V → ℂ) : conv K L μ = conv L K μ := by
+  rw [conv, conv, ← convolution_flip, flip_mul_complex]
+
 /-- Convolutions of integrable functions are integrable (Mathlib's
 `Integrable.integrable_convolution`). -/
 theorem integrable_conv {K L : V → ℂ} (hK : Integrable K μ) (hL : Integrable L μ) :
@@ -479,6 +488,22 @@ theorem convLp_of_eq_zero (hp : p ≠ ∞) {K : V → ℂ} (hK : Integrable K μ
   filter_upwards [convLp_apply_ae hp hK f] with x hx
   rw [hx, conv_apply]
   simp
+
+/-- **Convolution operators commute**: `K ⋆ (L ⋆ f) = L ⋆ (K ⋆ f)` in `L_p`. -/
+theorem convLp_comm (hp : p ≠ ∞) {K L : V → ℂ} (hK : Integrable K μ) (hL : Integrable L μ)
+    (f : Lp ℂ p μ) : convLp hp hK (convLp hp hL f) = convLp hp hL (convLp hp hK f) := by
+  rw [convLp_convLp_of_eq hp hK hL (integrable_conv hL hK) (conv_comm K L), convLp_convLp]
+
+/-- **Convolution operators are additive in the kernel**: `(K + K') ⋆ f = K ⋆ f + K' ⋆ f` in
+`L_p`. -/
+theorem convLp_add_kernel (hp : p ≠ ∞) {K K' : V → ℂ} (hK : Integrable K μ)
+    (hK' : Integrable K' μ) (f : Lp ℂ p μ) :
+    convLp hp (hK.add hK') f = convLp hp hK f + convLp hp hK' f := by
+  refine Lp.ext ?_
+  filter_upwards [convLp_apply_ae hp (hK.add hK') f, convLp_apply_ae hp hK f,
+    convLp_apply_ae hp hK' f, Lp.coeFn_add (convLp hp hK f) (convLp hp hK' f),
+    add_conv_ae Fact.out hp hK hK' (Lp.memLp f)] with x h1 h2 h3 h4 h5
+  rw [h1, h4, Pi.add_apply, h2, h3, h5, Pi.add_apply]
 
 /-- **Convolution operators are subtractive in the kernel**: `(K - K') ⋆ f = K ⋆ f - K' ⋆ f`
 in `L_p`. -/

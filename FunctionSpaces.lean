@@ -79,9 +79,12 @@ public import FunctionSpaces.Rd.LittlewoodPaleyKernels
 public import FunctionSpaces.Rd.BandLimited
 public import FunctionSpaces.Rd.LittlewoodPaley
 public import FunctionSpaces.Rd.Differences
+public import FunctionSpaces.Rd.DomainModuli
+public import FunctionSpaces.Rd.MomentKernels
 public import FunctionSpaces.Rd.BandJackson
 public import FunctionSpaces.Rd.BandInverse
 public import FunctionSpaces.Rd.BesovDifferences
+public import FunctionSpaces.Rd.LocalMeans
 
 /-!
 # Function spaces
@@ -243,6 +246,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   characterisation of band-limited approximation spaces by Littlewood–Paley blocks.
 * `FunctionSpaces.Rd.Differences`: differences and the modulus of smoothness on a
   finite-dimensional space, dilation of the scale, differences of convolutions and dilations.
+* `FunctionSpaces.Rd.DomainModuli`: differences and moduli of smoothness on subsets of a
+  finite-dimensional space.
+* `FunctionSpaces.Rd.MomentKernels`: moment kernels built from dilations, convolution with them as
+  an average of differences, and approximation with the modulus, also on subsets.
 * `FunctionSpaces.Rd.BandJackson`: the Jackson approximant and Jackson's inequality for
   band-limited approximation.
 * `FunctionSpaces.Rd.BandInverse`: differences of Schwartz functions in `L_1` and the inverse
@@ -250,4 +257,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.BesovDifferences`: the modulus of smoothness as a modulus compatible with the
   band-limited scheme, and the agreement of the Besov conditions by approximation, by
   Littlewood–Paley blocks and by differences.
+* `FunctionSpaces.Rd.LocalMeans`: local means with moment kernels, the reproducing formula, and
+  the characterisation of Besov spaces by local means.
 -/

@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Rd.Differences
+public import FunctionSpaces.Rd.MomentKernels
 public import FunctionSpaces.Rd.BandLimited
 
 /-!
@@ -18,8 +18,8 @@ For `f ∈ L_p(V)`, `1 ≤ p < ∞`, and `r, k ∈ ℕ` the **Jackson approximan
 (`Rd.jacksonApprox`), with the Littlewood–Paley kernel `Φ` of `Rd.lpKernel` and its dilations
 `Φ_c = c^n Φ(c ·)`. The transform of `Φ_{2^k/l}` lives in the ball of radius `2^(k+1)/l`, where
 `𝓕Θ_k = 1`, so `Θ_k ⋆ Φ_{2^k/l} = Φ_{2^k/l}` and `J_k f ∈ E_k` (`Rd.jacksonApprox_mem_bandSpace`).
-Since `∫ Φ = 1` and the coefficients are those of `(-1)^r Δ^r` without the term `l = 0`
-(`Rd.neg_one_pow_mul_sum_iterDiff_coeff`),
+Since `∫ Φ = 1`, the averaged differences of the moment kernels (`Rd.ae_sub_sum_conv_dilate_eq`)
+give
 
 `f(x) - J_k f(x) = ∫ Φ(z) (-1)^r Δ^r_{-2^(-k) z} f(x) dz`
 
@@ -63,9 +63,6 @@ theorem conv_Theta_dilate_lpKernel {k : ℕ} {c : ℝ} (hc : 0 < c) (hck : c ≤
       linarith
     rw [fourier_Theta_eq_one hξ, one_mul]
 
-/-- The coefficients `a_l = (-1)^l C(r, l + 1)` of the Jackson approximant. -/
-noncomputable def jacksonCoeff (r l : ℕ) : ℂ := (-1) ^ l * (r.choose (l + 1) : ℂ)
-
 /-- The scales `2^k / (l + 1)` of the Jackson approximant. -/
 noncomputable def jacksonScale (k l : ℕ) : ℝ := 2 ^ k / (l + 1)
 
@@ -97,27 +94,6 @@ theorem jacksonApprox_mem_bandSpace (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (
   exact convLp_convLp_of_eq hp _ _ _
     (conv_Theta_dilate_lpKernel (jacksonScale_pos k l) (jacksonScale_le k l)) f
 
-/-- `(-1)^r (-1)^(r-m) = (-1)^m` for `m ≤ r`. -/
-theorem neg_one_pow_mul_neg_one_pow_sub {r m : ℕ} (hm : m ≤ r) :
-    (-1 : ℂ) ^ r * (-1) ^ (r - m) = (-1) ^ m := by
-  obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hm
-  rw [Nat.add_sub_cancel_left, pow_add, mul_assoc, ← pow_add, ← two_mul, pow_mul, neg_one_sq,
-    one_pow, mul_one]
-
-/-- **The coefficients of the Jackson approximant** are those of `(-1)^r Δ^r` without its term
-`l = 0`: `(-1)^r ∑_{l ≤ r} (-1)^(r-l) C(r, l) F(l) = F(0) - ∑_{l<r} a_l F(l + 1)`. -/
-theorem neg_one_pow_mul_sum_iterDiff_coeff (r : ℕ) (F : ℕ → ℂ) :
-    (-1 : ℂ) ^ r * ∑ l ∈ Finset.range (r + 1), ((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) * F l =
-      F 0 - ∑ l ∈ Finset.range r, jacksonCoeff r l * F (l + 1) := by
-  rw [Finset.sum_range_succ', mul_add, Finset.mul_sum, sub_eq_neg_add, ← Finset.sum_neg_distrib]
-  congr 1
-  · refine Finset.sum_congr rfl fun l hl => ?_
-    have hl' : l + 1 ≤ r := Finset.mem_range.1 hl
-    rw [jacksonCoeff, ← mul_assoc, ← mul_assoc, neg_one_pow_mul_neg_one_pow_sub hl', pow_succ]
-    ring
-  · rw [← mul_assoc, ← mul_assoc, neg_one_pow_mul_neg_one_pow_sub (Nat.zero_le r)]
-    simp
-
 /-- **The Jackson approximant as an averaged difference**: for almost every `x`,
 `f(x) - J_k f(x) = ∫ Φ(z) (-1)^r Δ^r_{-2^(-k) z} f(x) dz`. -/
 theorem ae_sub_jacksonApprox_eq (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (volume : Measure V)) :
@@ -141,39 +117,11 @@ theorem ae_sub_jacksonApprox_eq (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (volu
       with x hx hx'
     rw [hx]
     exact Finset.sum_congr rfl hx'
-  have hint : ∀ᵐ x ∂volume, ∀ l ∈ Finset.range r,
-      Integrable (fun z => lpKernel z * (f : V → ℂ) (x - (jacksonScale k l)⁻¹ • z)) :=
-    (Filter.eventually_all_finset _).2 fun l _ =>
-      ae_integrable_dilate_mul Fact.out hp integrable_lpKernel (Lp.memLp f) (jacksonScale_pos k l)
-  have hsmul : ∀ (z : V) (l : ℕ), ((l + 1 : ℕ) : ℝ) • (-((2 : ℝ) ^ k)⁻¹ • z) =
-      -((jacksonScale k l)⁻¹ • z) := fun z l => by
-    rw [jacksonScale, inv_div, smul_smul, mul_neg, neg_smul, div_eq_mul_inv, Nat.cast_succ]
-  filter_upwards [Lp.coeFn_sub f (jacksonApprox hp r k f), hJ, hint] with x h1 h2 h3
+  filter_upwards [Lp.coeFn_sub f (jacksonApprox hp r k f), hJ,
+    ae_sub_sum_conv_dilate_eq Fact.out hp integrable_lpKernel integral_lpKernel (Lp.memLp f) r
+      (c := (2 : ℝ) ^ k) (by positivity)] with x h1 h2 h3
   rw [h1, Pi.sub_apply, h2]
-  have hexp : ∀ z, (-1 : ℂ) ^ r * (fwdDiff (-((2 : ℝ) ^ k)⁻¹ • z))^[r] (f : V → ℂ) x =
-      (f : V → ℂ) x - ∑ l ∈ Finset.range r,
-        jacksonCoeff r l * (f : V → ℂ) (x - (jacksonScale k l)⁻¹ • z) := fun z => by
-    rw [iterDiff_apply, neg_one_pow_mul_sum_iterDiff_coeff]
-    congr 1
-    · simp
-    · refine Finset.sum_congr rfl fun l _ => ?_
-      rw [hsmul z l, ← sub_eq_add_neg]
-  have hsum : ∑ l ∈ Finset.range r,
-      jacksonCoeff r l * conv (dilate (jacksonScale k l) lpKernel) (f : V → ℂ) volume x =
-      ∑ l ∈ Finset.range r,
-        ∫ z, jacksonCoeff r l * (lpKernel z * (f : V → ℂ) (x - (jacksonScale k l)⁻¹ • z)) :=
-    Finset.sum_congr rfl fun l _ => by
-      rw [conv_dilate_apply _ _ (jacksonScale_pos k l), integral_const_mul]
-  have hf0 : (f : V → ℂ) x = ∫ z, lpKernel (V := V) z * (f : V → ℂ) x := by
-    rw [integral_mul_const, integral_lpKernel, one_mul]
-  rw [hsum, hf0, ← integral_finsetSum _ fun l hl => (h3 l hl).const_mul _,
-    ← integral_sub (integrable_lpKernel.mul_const _)
-      (integrable_finsetSum _ fun l hl => (h3 l hl).const_mul _)]
-  congr 1
-  funext z
-  rw [hexp z, mul_sub, Finset.mul_sum]
-  congr 1
-  exact Finset.sum_congr rfl fun l _ => by ring
+  exact h3
 
 /-! ### Jackson's inequality -/
 
