@@ -26,8 +26,9 @@ These local estimates hold for every piecewise polynomial on `[0, ∞)`
 (`Interval.IsPiecewisePoly`, `Interval.eLpNorm_iterDiff_le_of_isPiecewisePoly`), so they serve
 the periodic extensions of `FunctionSpaces.Interval.PiecewisePeriodic` as well.
 
-With Jackson's inequality this is a modulus compatible with the scheme, of inverse order
-`θ = 1/p` (`Interval.ppModulusData`), and the abstract coincidence theorem gives, for
+With Jackson's inequality at every level (`Interval.exists_approxSeq_ppScheme_le`) this is a
+modulus compatible with the scheme, of inverse order `θ = 1/p` (`Interval.ppModulusData`), and the
+abstract coincidence theorem gives, for
 `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `r ≥ 1` and `0 ≤ s < 1/p`,
 `f ∈ A^s_q ↔ ‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`
 (`Interval.memApprox_ppScheme_iff`). For `0 < s < 1/p` the approximation space of dyadic
@@ -424,7 +425,8 @@ theorem exists_inverse_ppScheme {r : ℕ} (hp : p ≠ ∞) :
 /-! ### The coincidence theorem -/
 
 /-- The modulus `ω_r(f, 2^(-k), [0, 1])_p` is compatible with the scheme of dyadic piecewise
-polynomials of degree `< r`, with inverse order `θ = 1/p`. -/
+polynomials of degree `< r`, with inverse order `θ = 1/p` and Jackson's inequality at every
+level (Whitney's inequality at level `0`). -/
 noncomputable def ppModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ApproximationScheme.ModulusData (ppScheme p r) (1 / p.toReal) where
   modulus := lpModulus p r
@@ -432,10 +434,10 @@ noncomputable def ppModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
   C0 := 2 ^ r
   C0_ne_top := by simp
   le_enorm := lpModulus_le r
-  jacksonStart := 1
-  CJ := 2 * jacksonConst r
-  CJ_ne_top := ENNReal.mul_ne_top (by norm_num) (jacksonConst_ne_top r)
-  jackson f _ hk := approxSeq_ppScheme_le hr hp f hk
+  jacksonStart := 0
+  CJ := (exists_approxSeq_ppScheme_le (p := p) hr hp).choose
+  CJ_ne_top := (exists_approxSeq_ppScheme_le hr hp).choose_spec.1
+  jackson f k _ := (exists_approxSeq_ppScheme_le hr hp).choose_spec.2 f k
   CB := (exists_inverse_ppScheme (r := r) hp).choose
   CB_ne_top := (exists_inverse_ppScheme hp).choose_spec.1
   inverse := (exists_inverse_ppScheme hp).choose_spec.2

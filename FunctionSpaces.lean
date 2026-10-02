@@ -42,6 +42,7 @@ public import FunctionSpaces.Interval.Polynomials
 public import FunctionSpaces.Interval.Taylor
 public import FunctionSpaces.Interval.Steklov
 public import FunctionSpaces.Interval.Smoothing
+public import FunctionSpaces.Interval.Whitney
 public import FunctionSpaces.Interval.PiecewisePoly
 public import FunctionSpaces.Interval.PiecewiseJackson
 public import FunctionSpaces.Interval.PiecewiseInverse
@@ -131,6 +132,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Interval.Smoothing`: the Steklov smoothing `S_δ f`, Minkowski's inequality for
   averages, and the bounds of `f - S_δ f` and `(S_δ f)^(r)` by the modulus, on a left and a right
   part of `[0, 1]`.
+* `FunctionSpaces.Interval.Whitney`: Whitney's inequality on `[0, 1]`, the best polynomial
+  approximation bounded by the modulus at one scale.
 * `FunctionSpaces.Interval.PiecewisePoly`: dyadic piecewise polynomials on `[0, 1]` and their
   scheme in `L_p[0, 1]`.
 * `FunctionSpaces.Interval.PiecewiseJackson`: Jackson's inequality for dyadic piecewise

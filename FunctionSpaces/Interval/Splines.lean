@@ -151,6 +151,13 @@ theorem splineSpace_le_ppSpace (r k : ℕ) : splineSpace p r k ≤ ppSpace p r k
   fun _ ⟨Q, hQ, _, hg⟩ => ⟨Q, hQ, hg⟩
 
 omit [Fact (1 ≤ p)] in
+/-- **At level `0` the splines are the polynomials of degree `< r`**: there are no interior
+knots. -/
+theorem splineSpace_zero (r : ℕ) : splineSpace p r 0 = ppSpace p r 0 :=
+  le_antisymm (splineSpace_le_ppSpace r 0) fun _ ⟨Q, hQ, hg⟩ =>
+    ⟨Q, hQ, fun n hn hn1 => by rw [pow_zero] at hn1; exact absurd hn1 (by omega), hg⟩
+
+omit [Fact (1 ≤ p)] in
 /-- The spline spaces increase with the level. -/
 theorem splineSpace_mono (r : ℕ) : Monotone (splineSpace p r) := by
   refine monotone_nat_of_le_succ fun k g hg => ?_
@@ -162,6 +169,15 @@ variable (p) in
 `S_{⌊log₂ n⌋}` at complexity `n ≥ 1`. -/
 noncomputable def splineScheme (r : ℕ) : ApproximationScheme (Lp ℂ p unitVol) :=
   ApproximationScheme.ofMonotoneSubmodules (splineSpace p r) (splineSpace_mono r)
+
+/-- The approximants of complexity `0` are `{0}`. -/
+theorem mem_splineScheme_zero {r : ℕ} {g : Lp ℂ p unitVol} : g ∈ splineScheme p r 0 ↔ g = 0 :=
+  ApproximationScheme.mem_ofMonotoneSubmodules_zero
+
+/-- The approximants of complexity `n ≥ 1` are the splines of level `⌊log₂ n⌋`. -/
+theorem mem_splineScheme {r n : ℕ} (hn : n ≠ 0) {g : Lp ℂ p unitVol} :
+    g ∈ splineScheme p r n ↔ g ∈ splineSpace p r (Nat.log 2 n) :=
+  ApproximationScheme.mem_ofMonotoneSubmodules hn
 
 /-- The approximants of complexity `2^k` are the splines of level `k`. -/
 theorem mem_splineScheme_two_pow {r k : ℕ} {g : Lp ℂ p unitVol} :

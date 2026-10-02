@@ -2939,6 +2939,53 @@ $r^2 \delta = L$, and $D = g^{(r)}$ (\Cref{thm:steklov-smoothing}, \Cref{lem:tay
 $[1 - w, 1]$ apply this to $F(1 - \cdot)$, which has the same modulus, and reflect back.
 \end{proof}
 
+\section{Whitney's inequality}
+
+\begin{lemma}[Polynomials and their middle third]
+\label{lem:middle-third}
+\lean{Interval.exists_eLpNorm_le_middle}
+\leanok
+\uses{lem:interval-nikolskii}
+Let $1 \leq p < \infty$ and $r \in \N$. There is $K' < \infty$ with
+$\|P\|_{L_p[0,1]} \leq K' \|P\|_{L_p[1/3, 2/3]}$ for every polynomial $P$ of degree $< r$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+All norms on the space of polynomials of degree $< r$ are equivalent, so
+$|P(x)| \leq K' \|P\|_{L_p[1/3,2/3]}$ for $x \in [0, 1]$, and $[0, 1]$ has length $1$.
+\end{proof}
+
+\begin{theorem}[Whitney's inequality]
+\label{thm:whitney}
+\lean{Interval.eLpNorm_Icc_split, Interval.eLpNorm_sub_polyFun_le_of_smoothing,
+  Interval.exists_eLpNorm_sub_polyFun_le_modulus}
+\leanok
+\uses{lem:two-sided-smoothing, lem:middle-third, lem:interval-modulus}
+Let $1 \leq p < \infty$, $r \geq 1$ and $0 < t \leq \tfrac13$. There is $W < \infty$ such that
+every continuous $F$ has a polynomial $P$ of degree $< r$ with
+\[
+  \|F - P\|_{L_p[0, 1]} \leq W \, \omega_r(F, t, [0, 1])_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $\omega = \omega_r(F, t, [0,1])_p$ and $A = 1 + t^{-r} 2^r r^{2r}$. By
+\Cref{lem:two-sided-smoothing} with $L = t$ and $w = 1 - t$, each on one interval of length at
+most $1$, there are polynomials $T_1$, $T_2$ of degree $< r$ with
+$\|F - T_1\|_{L_p[0, 1-t]} \leq A \omega$ and $\|F - T_2\|_{L_p[t, 1]} \leq A \omega$. Both
+intervals contain $[\tfrac13, \tfrac23]$, so $\|T_1 - T_2\|_{L_p[1/3, 2/3]} \leq 2 A \omega$ and
+$\|T_1 - T_2\|_{L_p[0, 1]} \leq 2 K' A \omega$ by \Cref{lem:middle-third}. On $[0, \tfrac12]$,
+$\|F - T_1\| \leq A \omega$; on $[\tfrac12, 1]$,
+$\|F - T_1\| \leq \|F - T_2\| + \|T_1 - T_2\| \leq A\omega + 2K'A\omega$. Hence
+$\|F - T_1\|_{L_p[0,1]} \leq (2 + 2K') A \omega$.
+\end{proof}
+
+Whitney's inequality bounds the best approximation by a single polynomial on the whole interval.
+For the dyadic schemes below it is the Jackson inequality at level $0$, where the approximants
+are the polynomials of degree $< r$.
+
 \section{Dyadic piecewise polynomials}
 
 \begin{definition}[Dyadic piecewise polynomials]
@@ -2978,15 +3025,19 @@ $\int_{[0, 1]} G = \sum_{n < 2^k} \int_{I_{k,n}} G$.
 \begin{theorem}[Jackson's inequality for piecewise polynomials]
 \label{thm:pp-jackson}
 \lean{Interval.jacksonConst, Interval.jacksonConst_ne_top, Interval.exists_left_approx,
-  Interval.exists_right_approx, Interval.eLpNorm_Icc_split, Interval.exists_ppFun_approx,
-  Interval.lpModulus, Interval.lpModulus_add_le, Interval.lpModulus_le,
-  Interval.approxSeq_le_of_continuous, Interval.approxSeq_ppScheme_le}
+  Interval.exists_right_approx, Interval.exists_ppFun_approx, Interval.lpModulus,
+  Interval.lpModulus_add_le, Interval.lpModulus_le, Interval.lpModulus_anti,
+  Interval.approxSeq_le_of_continuous, Interval.approxSeq_ppScheme_le,
+  Interval.exists_approxSeq_ppScheme_one_le, Interval.exists_approxSeq_ppScheme_le}
 \leanok
-\uses{def:pp-scheme, lem:pp-bookkeeping, lem:two-sided-smoothing, lem:interval-modulus}
+\uses{def:pp-scheme, lem:pp-bookkeeping, lem:two-sided-smoothing, lem:interval-modulus,
+  thm:whitney}
 Let $1 \leq p < \infty$ and $r \geq 1$. For every $f \in L_p[0,1]$ and $k \geq 1$,
 \[
-  E_{2^k}(f)_p \leq 2 (1 + 2^r r^{2r}) \, \omega_r(f, 2^{-k}, [0,1])_p .
+  E_{2^k}(f)_p \leq 2 (1 + 2^r r^{2r}) \, \omega_r(f, 2^{-k}, [0,1])_p ,
 \]
+and there is $C_J < \infty$ with $E_{2^k}(f)_p \leq C_J \, \omega_r(f, 2^{-k}, [0,1])_p$ for
+every $f \in L_p[0,1]$ and every $k \geq 0$.
 \end{theorem}
 
 \begin{proof}
@@ -3002,7 +3053,9 @@ $\|g - S\|_{L_p[0,1/2]} \leq 2^r r^{2r} \omega_r(f, L, [0,1])_p$. On $[\tfrac12,
 same to $f(1 - \cdot)$, which has the same modulus by \Cref{lem:interval-modulus}; $\tfrac12$ is a
 knot since $k \geq 1$. For general $f$, and for every scheme in $L_p[0,1]$, take a bounded
 continuous $g$ close to $f$ in $L_p$: then $E_{2^k}(f)_p \leq E_{2^k}(g)_p + \|f - g\|_p$ and
-$\omega_r(g, t)_p \leq \omega_r(f, t)_p + 2^r \|f - g\|_p$.
+$\omega_r(g, t)_p \leq \omega_r(f, t)_p + 2^r \|f - g\|_p$. For $k = 0$ the approximants are the
+polynomials of degree $< r$, and \Cref{thm:whitney} with $t = \tfrac14$, passed to $L_p$ in the
+same way, gives $E_1(f)_p \leq W \omega_r(f, \tfrac14, [0,1])_p \leq W \omega_r(f, 1, [0,1])_p$.
 \end{proof}
 
 \begin{lemma}[Local estimates for piecewise polynomials]
@@ -3143,7 +3196,7 @@ $[0, 1)$, where $\tilde f = f$.
 \lean{Interval.isPiecewisePoly_perExt_ppFun, Interval.sum_localMass_perExt_le,
   Interval.sum_sum_localMass_perExt_le, Interval.lpPerModulus, Interval.lpPerModulus_add_le,
   Interval.lpPerModulus_le, Interval.lpModulus_le_lpPerModulus,
-  Interval.approxSeq_ppScheme_le_per, Interval.exists_inverse_ppScheme_per,
+  Interval.exists_approxSeq_ppScheme_le_per, Interval.exists_inverse_ppScheme_per,
   Interval.ppPerModulusData, Interval.memApprox_ppScheme_iff_per}
 \leanok
 \uses{thm:pp-jackson, thm:pp-inverse, lem:pp-local, lem:per-modulus, def:modulus-data,
@@ -3159,8 +3212,8 @@ polynomials of degree $< r$ if and only if
 
 \begin{proof}
 \leanok
-Jackson's inequality for $\omega_r^{\mathrm{per}}$ follows from \Cref{thm:pp-jackson} and
-$\omega_r(f, t, [0,1])_p \leq \omega_r^{\mathrm{per}}(f, t)_p$. For the inverse inequality, the
+Jackson's inequality for $\omega_r^{\mathrm{per}}$ at every level follows from
+\Cref{thm:pp-jackson} and $\omega_r(f, t, [0,1])_p \leq \omega_r^{\mathrm{per}}(f, t)_p$. For the inverse inequality, the
 periodic extension $\tilde a$ of $a \in V_j$ is a piecewise polynomial of level $j$ on
 $[0, \infty)$: on $I_{j, m' + 2^j c}$ with $m' < 2^j$ it is the piece of $a$ on $I_{j, m'}$
 shifted by $c$. Any $2^j$ consecutive pieces of $\tilde a$ make up one period, so
@@ -3448,16 +3501,18 @@ divides $P$, and the quotient has degree $0$.
 \label{def:spline-space}
 \lean{Interval.SplineJoins, Interval.splineJoins_zero, Interval.SplineJoins.add,
   Interval.SplineJoins.const_mul, Interval.SplineJoins.sum, Interval.SplineJoins.refine,
-  Interval.splineSpace, Interval.splineSpace_le_ppSpace, Interval.splineSpace_mono,
-  Interval.splineScheme, Interval.mem_splineScheme_two_pow, Interval.splineScheme_isLinear}
+  Interval.splineSpace, Interval.splineSpace_le_ppSpace, Interval.splineSpace_zero,
+  Interval.splineSpace_mono, Interval.splineScheme, Interval.mem_splineScheme_zero,
+  Interval.mem_splineScheme, Interval.mem_splineScheme_two_pow, Interval.splineScheme_isLinear}
 \leanok
 \uses{def:pp-scheme, lem:spline-joins}
 Let $r \geq 1$. The space $S_k \subseteq V_k$ of splines of order $r$ and level $k$ consists of
 the piecewise polynomials of degree $< r$ on the intervals $I_{k,n}$ whose pieces $Q_n$ satisfy
 $Q_n - Q_{n-1} = c_n (x - n 2^{-k})^{r-1}$ at every interior knot, $0 < n < 2^k$. By
 \Cref{lem:spline-joins} these are the piecewise polynomials that are $(r-2)$ times continuously
-differentiable. The spaces $S_k$ increase in $k$, and the spline scheme is their dyadic scheme,
-$A_n = S_{\lfloor \log_2 n \rfloor}$ for $n \geq 1$.
+differentiable. At level $0$ there is no interior knot, so $S_0 = V_0$. The spaces $S_k$ increase
+in $k$, and the spline scheme is their dyadic scheme, $A_n = S_{\lfloor \log_2 n \rfloor}$ for
+$n \geq 1$.
 \end{definition}
 
 \begin{lemma}[Dyadic B-splines are splines]
@@ -3614,11 +3669,13 @@ and part (2) of \Cref{lem:quasi-interp} applies with $J(n) \subseteq W_i$.
 \begin{theorem}[Jackson's inequality for splines]
 \label{thm:spline-jackson}
 \lean{Interval.splineJacksonConst, Interval.lintegral_sub_ppFun_le_sum,
-  Interval.exists_eLpNorm_sub_qi_le, Interval.exists_approxSeq_splineScheme_le}
+  Interval.exists_eLpNorm_sub_qi_le, Interval.approxSeq_splineScheme_one,
+  Interval.exists_approxSeq_splineScheme_le}
 \leanok
-\uses{lem:two-sided-smoothing, lem:qi-local-error, def:spline-space}
+\uses{lem:two-sided-smoothing, lem:qi-local-error, def:spline-space, thm:whitney,
+  thm:pp-jackson}
 Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_J$ with
-$E_{2^k}(f)_p \leq C_J \, \omega_r(f, 2^{-k}, [0, 1])_p$ for every $f \in L_p[0,1]$ and $k \geq r + 2$,
+$E_{2^k}(f)_p \leq C_J \, \omega_r(f, 2^{-k}, [0, 1])_p$ for every $f \in L_p[0,1]$ and $k \geq 0$,
 where $E_{2^k}$ is the error of best approximation by splines of order $r$ and level $k$.
 \end{theorem}
 
@@ -3630,7 +3687,10 @@ with $L = 2^{-k}$ and $w = \tfrac34$ on $W_i$. By \Cref{lem:qi-local-error},
 $\|f - Q_k f\|_{L_p(I_{k,i})}^p \leq C^p 2^{p-1} \int_{W_i}
 (|f - g|^p + (r 2^{-k})^{rp} |D|^p)$, and summing over $i$ with overlap $r$ gives
 $\|f - Q_k f\|_p \leq C' \omega_r(f, 2^{-k}, [0,1])_p$, since $(r 2^{-k})^r 2^{kr} = r^r$. General
-$f$ follow by density of the bounded continuous functions, as in \Cref{thm:pp-jackson}.
+$f$ follow by density of the bounded continuous functions, as in \Cref{thm:pp-jackson}. For
+$k \leq r + 1$, $E_{2^k}(f)_p \leq E_1(f)_p$, the splines of level $0$ are the polynomials of
+degree $< r$, and \Cref{thm:whitney} with $t = 2^{-(r+1)}$, passed to $L_p$ as in
+\Cref{thm:pp-jackson}, gives $E_1(f)_p \leq W \omega_r(f, 2^{-(r+1)}, [0,1])_p \leq W \omega_r(f, 2^{-k}, [0,1])_p$.
 \end{proof}
 
 \begin{theorem}[Approximation spaces of dyadic splines]
@@ -3648,7 +3708,7 @@ order $r$ if and only if
 
 \begin{proof}
 \leanok
-\Cref{thm:spline-jackson} (from level $k_0 = r + 2$ on) and \Cref{thm:spline-inverse} make
+\Cref{thm:spline-jackson} and \Cref{thm:spline-inverse} make
 $\omega_r(\cdot, 2^{-k}, [0,1])_p$ a modulus compatible with the spline scheme of inverse order
 $\theta = r - 1 + 1/p$; apply \Cref{thm:modulus-coincidence}.
 \end{proof}

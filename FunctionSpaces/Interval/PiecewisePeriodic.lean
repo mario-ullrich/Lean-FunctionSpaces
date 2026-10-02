@@ -17,8 +17,9 @@ so their scheme is `Interval.ppScheme` in `L_p[0, 1] = L_p(𝕋)`. Only the modu
 periodic modulus `ω_r^per(f, t)_p` of `FunctionSpaces.Interval.Periodic` also sees the knot
 `0 = 1` of the circle.
 
-* **Jackson's inequality** `E_{2^k}(f)_p ≤ C ω_r^per(f, 2^(-k))_p` follows from the one on
-  `[0, 1]`, since the periodic modulus is the larger one (`Interval.approxSeq_ppScheme_le_per`).
+* **Jackson's inequality** `E_{2^k}(f)_p ≤ C ω_r^per(f, 2^(-k))_p` at every level follows from
+  the one on `[0, 1]`, since the periodic modulus is the larger one
+  (`Interval.exists_approxSeq_ppScheme_le_per`).
 * **The inverse inequality** `ω_r^per(a, 2^(-k))_p ≤ C_B 2^(-(k-j)/p) ‖a‖_p` for `a ∈ V_j`
   (`Interval.exists_inverse_ppScheme_per`) is the local inverse estimate for the periodic
   extension, which is a piecewise polynomial on `[0, ∞)` (`Interval.isPiecewisePoly_perExt_ppFun`)
@@ -141,12 +142,14 @@ theorem lpModulus_le_lpPerModulus (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
     lpModulus p r f k ≤ lpPerModulus p r f k :=
   modulus_le_perModulus r p _ _
 
-/-- **Jackson's inequality on the circle**: for `1 ≤ p < ∞`, `r ≥ 1` and `k ≥ 1`,
-`E_{2^k}(f)_p ≤ 2 (1 + 2^r r^(2r)) ω_r^per(f, 2^(-k))_p`. -/
-theorem approxSeq_ppScheme_le_per {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) (f : Lp ℂ p unitVol)
-    {k : ℕ} (hk : 1 ≤ k) :
-    (ppScheme p r).approxSeq f (2 ^ k) ≤ 2 * jacksonConst r * lpPerModulus p r f k :=
-  (approxSeq_ppScheme_le hr hp f hk).trans (mul_le_mul' le_rfl (lpModulus_le_lpPerModulus r f k))
+/-- **Jackson's inequality on the circle**: for `1 ≤ p < ∞` and `r ≥ 1` there is `C_J < ∞` with
+`E_{2^k}(f)_p ≤ C_J ω_r^per(f, 2^(-k))_p` for all `f` and all `k ≥ 0`, since the periodic modulus
+dominates the modulus on `[0, 1]`. -/
+theorem exists_approxSeq_ppScheme_le_per {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
+    ∃ CJ : ℝ≥0∞, CJ ≠ ∞ ∧ ∀ (f : Lp ℂ p unitVol) (k : ℕ),
+      (ppScheme p r).approxSeq f (2 ^ k) ≤ CJ * lpPerModulus p r f k := by
+  obtain ⟨CJ, hCJ, h⟩ := exists_approxSeq_ppScheme_le (p := p) hr hp
+  exact ⟨CJ, hCJ, fun f k => (h f k).trans (mul_le_mul' le_rfl (lpModulus_le_lpPerModulus r f k))⟩
 
 /-- **The inverse inequality on the circle**, of order `1/p`: there is `C_B < ∞` with
 `ω_r^per(a, 2^(-k))_p ≤ C_B 2^(-(k-j)/p) ‖a‖_p` for every piecewise polynomial `a` of level `j`
@@ -181,10 +184,10 @@ noncomputable def ppPerModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
   C0 := 2 ^ r
   C0_ne_top := by simp
   le_enorm := lpPerModulus_le hp r
-  jacksonStart := 1
-  CJ := 2 * jacksonConst r
-  CJ_ne_top := ENNReal.mul_ne_top (by norm_num) (jacksonConst_ne_top r)
-  jackson f _ hk := approxSeq_ppScheme_le_per hr hp f hk
+  jacksonStart := 0
+  CJ := (exists_approxSeq_ppScheme_le_per (p := p) hr hp).choose
+  CJ_ne_top := (exists_approxSeq_ppScheme_le_per hr hp).choose_spec.1
+  jackson f k _ := (exists_approxSeq_ppScheme_le_per hr hp).choose_spec.2 f k
   CB := (exists_inverse_ppScheme_per (r := r) hp).choose
   CB_ne_top := (exists_inverse_ppScheme_per hp).choose_spec.1
   inverse := (exists_inverse_ppScheme_per hp).choose_spec.2

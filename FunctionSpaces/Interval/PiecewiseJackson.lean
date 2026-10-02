@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Interval.PiecewisePoly
-public import FunctionSpaces.Interval.Smoothing
+public import FunctionSpaces.Interval.Whitney
 public import Mathlib.MeasureTheory.Function.ContinuousMapDense
 
 /-!
@@ -15,16 +15,20 @@ public import Mathlib.MeasureTheory.Function.ContinuousMapDense
 For `1 ≤ p < ∞`, `r ≥ 1` and `k ≥ 1`, the error of best approximation in `L_p[0, 1]` by
 piecewise polynomials of level `k` and degree `< r` is bounded by the modulus of smoothness,
 `E_{2^k}(f)_p ≤ 2 (1 + 2^r r^(2r)) ω_r(f, 2^(-k), [0, 1])_p`
-(`Interval.approxSeq_ppScheme_le`).
+(`Interval.approxSeq_ppScheme_le`). At level `0` the approximants are the polynomials of degree
+`< r`, and Whitney's inequality of `FunctionSpaces.Interval.Whitney` gives the bound there
+(`Interval.exists_approxSeq_ppScheme_one_le`), so Jackson's inequality holds at every level
+(`Interval.exists_approxSeq_ppScheme_le`).
 
-The proof uses no Whitney theorem. For continuous `f`, the Steklov smoothing of
+For `k ≥ 1` the proof needs no Whitney theorem. For continuous `f`, the Steklov smoothing of
 `Interval.exists_left_smoothing` is close to `f`, its `r`-th derivative is bounded by `2^(kr)`
 times the modulus, and on each dyadic interval it is approximated by a Taylor polynomial. The
 smoothing looks to the right of `x`, so this argument covers `[0, 1/2]`
 (`Interval.exists_left_approx`); the reflection `x ↦ 1 - x` preserves the modulus and gives
 `[1/2, 1]` (`Interval.exists_right_approx`). The point `1/2` is a knot of every level `k ≥ 1`,
-which is why `k ≥ 1`. General `f ∈ L_p` follow by density of bounded continuous functions
-(`Interval.approxSeq_le_of_continuous`, which serves every scheme in `L_p[0, 1]`).
+which is why `k ≥ 1` in this part of the argument. General `f ∈ L_p` follow by density of
+bounded continuous functions (`Interval.approxSeq_le_of_continuous`, which serves every scheme in
+`L_p[0, 1]`).
 -/
 
 @[expose] public section
@@ -152,25 +156,6 @@ theorem exists_right_approx {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr 
   rw [hrefl, ← hmod]
   exact h
 
-/-- Splitting `[a, c]` at `b`: `‖G‖_{L_p[a,c]} ≤ ‖G‖_{L_p[a,b]} + ‖G‖_{L_p[b,c]}`. -/
-theorem eLpNorm_Icc_split {G : ℝ → ℂ} (hG : Measurable G) {p : ℝ≥0∞} (hp : 1 ≤ p)
-    (hp' : p ≠ ∞) {a b c : ℝ} (hab : a ≤ b) (hbc : b ≤ c) :
-    eLpNorm G p (volume.restrict (Icc a c)) ≤
-      eLpNorm G p (volume.restrict (Icc a b)) + eLpNorm G p (volume.restrict (Icc b c)) := by
-  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp).ne'
-  have hq1 : 1 ≤ p.toReal := by
-    have := ENNReal.toReal_mono hp' hp; rwa [ENNReal.toReal_one] at this
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' hG.aestronglyMeasurable,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' hG.aestronglyMeasurable,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' hG.aestronglyMeasurable,
-    ← Icc_union_Icc_eq_Icc hab hbc]
-  refine le_trans (ENNReal.rpow_le_rpow (lintegral_union_le _ _ _) (by positivity)) ?_
-  have := ENNReal.rpow_add_rpow_le_add
-    ((∫⁻ x in Icc a b, ‖G x‖ₑ ^ p.toReal) ^ (1 / p.toReal))
-    ((∫⁻ x in Icc b c, ‖G x‖ₑ ^ p.toReal) ^ (1 / p.toReal)) hq1
-  rwa [← ENNReal.rpow_mul, ← ENNReal.rpow_mul, one_div_mul_cancel (by linarith),
-    ENNReal.rpow_one, ENNReal.rpow_one] at this
-
 /-- **Jackson's estimate for continuous functions**: for continuous `F` and `k ≥ 0` there is a
 piecewise polynomial `S` of level `k + 1` and degree `< r` with
 `‖F - S‖_{L_p[0,1]} ≤ 2 (1 + 2^r r^(2r)) ω_r(F, 2^(-(k+1)), [0, 1])_p`. -/
@@ -246,6 +231,12 @@ theorem lpModulus_le (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
   rw [Lp.enorm_def]
   exact modulus_le (Lp.stronglyMeasurable f).measurable Fact.out r 0 1 _
 
+omit [Fact (1 ≤ p)] in
+/-- The modulus at the dyadic scales decreases with the level. -/
+theorem lpModulus_anti (r : ℕ) (f : Lp ℂ p unitVol) : Antitone (lpModulus p r f) := fun _ _ hjk =>
+  modulus_mono r p 0 1 _ (one_div_le_one_div_of_le (by positivity)
+    (pow_le_pow_right₀ (by norm_num) hjk))
+
 /-- **From continuous functions to `L_p` by density**: a bound `E_n(g) ≤ C ω_r(g, 2^(-k))_p`
 for every bounded continuous `g`, given by an approximant `u ∈ A_n` of `g`, holds for every
 `f ∈ L_p[0, 1]`, `p < ∞`. The bounded continuous functions are dense in `L_p` (Mathlib's
@@ -308,5 +299,43 @@ theorem approxSeq_ppScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) (f : Lp 
   obtain ⟨Q, hQ, hbound⟩ := exists_ppFun_approx g.continuous hr Fact.out hp k
   exact ⟨ppFun (k + 1) Q, ⟨(memLp_ppFun (k + 1) Q p).toLp _,
     mem_ppScheme_two_pow.2 ⟨Q, hQ, MemLp.coeFn_toLp _⟩, MemLp.coeFn_toLp _⟩, hbound⟩
+
+/-- **Whitney's inequality in `L_p[0, 1]`**: for `1 ≤ p < ∞`, `r ≥ 1` and `m ≥ 2` there is
+`W < ∞` with `E_1(f)_p ≤ W ω_r(f, 2^(-m), [0, 1])_p` for every `f ∈ L_p[0, 1]`, where `E_1` is the
+error of best approximation by the polynomials of degree `< r` (the approximants of
+complexity `1`). -/
+theorem exists_approxSeq_ppScheme_one_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) {m : ℕ} (hm : 2 ≤ m) :
+    ∃ W : ℝ≥0∞, W ≠ ∞ ∧ ∀ f : Lp ℂ p unitVol,
+      (ppScheme p r).approxSeq f 1 ≤ W * lpModulus p r f m := by
+  have ht : (0 : ℝ) < 1 / 2 ^ m := by positivity
+  have ht3 : (1 : ℝ) / 2 ^ m ≤ 1 / 3 := by
+    rw [div_le_div_iff₀ (by positivity) (by norm_num), one_mul, one_mul]
+    calc (3 : ℝ) ≤ 2 ^ 2 := by norm_num
+      _ ≤ 2 ^ m := pow_le_pow_right₀ (by norm_num) hm
+  obtain ⟨W, hW, hWb⟩ := exists_eLpNorm_sub_polyFun_le_modulus hr hp ht ht3
+  refine ⟨W, hW, fun f => approxSeq_le_of_continuous hp hW (fun g => ?_) f⟩
+  obtain ⟨P, hP, hbound⟩ := hWb g g.continuous
+  have hae : (fun x => g x - ppFun 0 (fun _ => P) x) =ᵐ[unitVol] fun x => g x - polyFun P x := by
+    filter_upwards [ae_mem_Ico_unitVol] with x hx
+    obtain ⟨hmem, hlt⟩ := mem_dyadicIco_floor (k := 0) hx
+    rw [ppFun_eq_of_mem _ hlt hmem]
+  refine ⟨ppFun 0 (fun _ => P), ⟨(memLp_ppFun 0 (fun _ => P) p).toLp _, ?_, MemLp.coeFn_toLp _⟩,
+    (eLpNorm_congr_ae hae).trans_le hbound⟩
+  rw [mem_ppScheme one_ne_zero, Nat.log_one_right]
+  exact ⟨fun _ => P, fun _ => hP, MemLp.coeFn_toLp _⟩
+
+/-- **Jackson's inequality for dyadic piecewise polynomials at every level**: for `1 ≤ p < ∞` and
+`r ≥ 1` there is `C_J < ∞` with `E_{2^k}(f)_p ≤ C_J ω_r(f, 2^(-k), [0, 1])_p` for every
+`f ∈ L_p[0, 1]` and every `k ≥ 0`; level `0` is Whitney's inequality. -/
+theorem exists_approxSeq_ppScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
+    ∃ CJ : ℝ≥0∞, CJ ≠ ∞ ∧ ∀ (f : Lp ℂ p unitVol) (k : ℕ),
+      (ppScheme p r).approxSeq f (2 ^ k) ≤ CJ * lpModulus p r f k := by
+  obtain ⟨W, hW, hWb⟩ := exists_approxSeq_ppScheme_one_le (p := p) hr hp (le_refl 2)
+  refine ⟨W + 2 * jacksonConst r, ENNReal.add_ne_top.2 ⟨hW, ENNReal.mul_ne_top (by norm_num)
+    (jacksonConst_ne_top r)⟩, fun f k => ?_⟩
+  rcases Nat.eq_zero_or_pos k with rfl | hk
+  · rw [pow_zero]
+    exact (hWb f).trans (mul_le_mul' le_self_add (lpModulus_anti r f (Nat.zero_le 2)))
+  · exact (approxSeq_ppScheme_le hr hp f hk).trans (mul_le_mul' le_add_self le_rfl)
 
 end Interval

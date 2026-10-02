@@ -72,6 +72,25 @@ theorem eLpNorm_Icc_mono (f : ℝ → ℂ) (p : ℝ≥0∞) {u v u' v' : ℝ} (h
     eLpNorm f p (volume.restrict (Icc u v)) ≤ eLpNorm f p (volume.restrict (Icc u' v')) :=
   eLpNorm_mono_measure _ (Measure.restrict_mono (Icc_subset_Icc hu hv) le_rfl)
 
+/-- Splitting `[a, c]` at `b`: `‖G‖_{L_p[a,c]} ≤ ‖G‖_{L_p[a,b]} + ‖G‖_{L_p[b,c]}`. -/
+theorem eLpNorm_Icc_split {G : ℝ → ℂ} (hG : Measurable G) {p : ℝ≥0∞} (hp : 1 ≤ p)
+    (hp' : p ≠ ∞) {a b c : ℝ} (hab : a ≤ b) (hbc : b ≤ c) :
+    eLpNorm G p (volume.restrict (Icc a c)) ≤
+      eLpNorm G p (volume.restrict (Icc a b)) + eLpNorm G p (volume.restrict (Icc b c)) := by
+  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp).ne'
+  have hq1 : 1 ≤ p.toReal := by
+    have := ENNReal.toReal_mono hp' hp; rwa [ENNReal.toReal_one] at this
+  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' hG.aestronglyMeasurable,
+    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' hG.aestronglyMeasurable,
+    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' hG.aestronglyMeasurable,
+    ← Icc_union_Icc_eq_Icc hab hbc]
+  refine le_trans (ENNReal.rpow_le_rpow (lintegral_union_le _ _ _) (by positivity)) ?_
+  have := ENNReal.rpow_add_rpow_le_add
+    ((∫⁻ x in Icc a b, ‖G x‖ₑ ^ p.toReal) ^ (1 / p.toReal))
+    ((∫⁻ x in Icc b c, ‖G x‖ₑ ^ p.toReal) ^ (1 / p.toReal)) hq1
+  rwa [← ENNReal.rpow_mul, ← ENNReal.rpow_mul, one_div_mul_cancel (by linarith),
+    ENNReal.rpow_one, ENNReal.rpow_one] at this
+
 /-- Differences of a measurable function are measurable. -/
 theorem measurable_iterDiff {f : ℝ → ℂ} (hf : Measurable f) (r : ℕ) (h : ℝ) :
     Measurable (iterDiff r h f) := by

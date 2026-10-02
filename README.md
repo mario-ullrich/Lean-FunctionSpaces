@@ -103,11 +103,19 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `k ≥ k₀` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
   for `0 ≤ s < θ` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff `‖f‖ + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q} < ∞`,
   with equivalent quasi-norms (`ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top`).
+* **Whitney's inequality.** For `1 ≤ p < ∞`, `r ≥ 1` and `0 < t ≤ 1/3` there is `W` such that
+  every continuous `F` has a polynomial `P` of degree `< r` with
+  `‖F - P‖_{L_p[0, 1]} ≤ W ω_r(F, t, [0, 1])_p` (`Interval.exists_eLpNorm_sub_polyFun_le_modulus`),
+  with the modulus `ω_r` of the next item. In `L_p[0, 1]` the error of best approximation by the
+  polynomials of degree `< r` satisfies `E_1(f)_p ≤ W ω_r(f, 2^(-m), [0, 1])_p` for `m ≥ 2`
+  (`Interval.exists_approxSeq_ppScheme_one_le`).
 * **Piecewise polynomials on an interval.** Let `V_k ⊆ L_p[0, 1]` consist of the functions that
   agree on each dyadic interval `[n 2^(-k), (n+1) 2^(-k))` with a polynomial of degree `< r`,
   and let `ω_r(f, t, [0, 1])_p = sup_{0 ≤ h ≤ t} ‖Δ_h^r f‖_{L_p[0, 1-rh]}`. For `1 ≤ p < ∞`
   and `r ≥ 1`, `E_{2^k}(f)_p ≤ 2 (1 + 2^r r^(2r)) ω_r(f, 2^(-k), [0, 1])_p` for `k ≥ 1`
-  (`Interval.approxSeq_ppScheme_le`), and there is `C` with
+  (`Interval.approxSeq_ppScheme_le`), with Whitney's inequality a bound
+  `E_{2^k}(f)_p ≤ C_J ω_r(f, 2^(-k), [0, 1])_p` for all `k ≥ 0`
+  (`Interval.exists_approxSeq_ppScheme_le`), and there is `C` with
   `ω_r(a, 2^(-k), [0, 1])_p ≤ C 2^(-(k-j)/p) ‖a‖_p` for all `a ∈ V_j` and `k ≥ j`
   (`Interval.exists_inverse_ppScheme`). Hence for `1 ≤ q ≤ ∞` and `0 ≤ s < 1/p`, `f ∈ A^s_q`
   iff `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`
@@ -123,7 +131,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 * **Splines and higher smoothness.** Let `S_k ⊆ L_p[0, 1]` consist of the splines of order
   `r ≥ 1` on the dyadic grid of level `k`: piecewise polynomials of degree `< r` that are `r - 2`
   times continuously differentiable. For `1 ≤ p < ∞` there is `C` with
-  `E_{2^k}(f)_p ≤ C ω_r(f, 2^(-k), [0, 1])_p` for `k ≥ r + 2`
+  `E_{2^k}(f)_p ≤ C ω_r(f, 2^(-k), [0, 1])_p` for all `k ≥ 0`
   (`Interval.exists_approxSeq_splineScheme_le`) and with
   `ω_r(a, 2^(-k), [0, 1])_p ≤ C 2^(-(k-j)(r-1+1/p)) ‖a‖_p` for `a ∈ S_j`, `k ≥ j`
   (`Interval.exists_inverse_splineScheme`). Hence for `1 ≤ q ≤ ∞` and `0 ≤ s < r - 1 + 1/p`,
@@ -261,6 +269,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | K-functional, real interpolation, representation theorem | ✅ proved | ✗ | `ApproximationSpaces/{KFunctional,Representation}.lean` |
 | Moduli compatible with a scheme, coincidence with the classical space | ✅ proved | ✗ | `ApproximationSpaces/Moduli.lean` |
 | One variable: differences, moduli on intervals, Nikolskii for polynomials, Taylor in `L_p`, Steklov smoothing | ✅ proved | ✗ | `FunctionSpaces/Interval/{Differences,Modulus,Polynomials,Taylor,Steklov,Smoothing}.lean` |
+| Whitney's inequality on `[0, 1]` | ✅ proved | ✗ | `FunctionSpaces/Interval/Whitney.lean` |
 | Dyadic piecewise polynomials on `[0, 1]`: Jackson and inverse inequalities, `A^s_q = B^s_{p,q}[0, 1]` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/{PiecewisePoly,PiecewiseJackson,PiecewiseInverse}.lean` |
 | Periodic modulus, piecewise polynomials on the circle, `A^s_q = B^s_{p,q}(𝕋) = B^s_{p,q}[0, 1]` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/{Periodic,PiecewisePeriodic}.lean` |
 | Dual basis for `∫_0^1 P Q`, local projections, bounded projections onto piecewise polynomials | ✅ proved | ✗ | `FunctionSpaces/Interval/LocalProjection.lean` |
@@ -316,8 +325,8 @@ and weak derivatives, and polynomial and piecewise polynomial approximation on i
 * **Function spaces beyond the torus**: `ℝ^d`, compact manifolds, bounded domains.
 * **Classical definitions for all `p`**: Sobolev spaces by weak derivatives and Besov spaces
   by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
-* **Higher smoothness**: smooth splines and compactly supported wavelets such as Daubechies',
-  on intervals and then on domains.
+* **Higher smoothness**: splines on the circle and on domains, and compactly supported wavelets
+  such as Daubechies'.
 
 ## Building
 
