@@ -172,7 +172,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   polynomials of degree `< r` in each variable separately. For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`,
   `r ≥ 1` and `0 ≤ s < 1/p`, `f ∈ A^s_q` of these spaces iff
   `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Cube.memApprox_cubePPScheme_iff`), with
-  Jackson's inequality from level `1` on (`Cube.approxSeq_cubePPScheme_le`) and the inverse
+  Jackson's inequality at every level (`Cube.exists_approxSeq_cubePPScheme_le`; level `0` is
+  Whitney's inequality on the cube, `Cube.exists_approxSeq_cubePPScheme_one_le`) and the inverse
   inequality of order `1/p` (`Cube.exists_inverse_cubePPScheme`). The approximants are tensor
   products of the projections in one variable, applied to the slices one coordinate at a time.
 * **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
@@ -312,7 +313,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | The cube `[0, 1]^d`: slices, integration through slices, moduli in the coordinates | ✅ proved | ✗ | `FunctionSpaces/Cube/{Basic,Modulus}.lean` |
 | Steklov smoothing in one coordinate near both ends of the cube | ✅ proved | ✗ | `FunctionSpaces/Cube/Smoothing.lean` |
 | Kernel operators of finite rank on slices, their forms, telescoping over the coordinates | ✅ proved | ✗ | `FunctionSpaces/Cube/Kernel.lean` |
-| Piecewise polynomials on the cube: tensor projection, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{PiecewisePoly,PiecewiseJackson,PiecewiseInverse}.lean` |
+| Piecewise polynomials on the cube: tensor projection, Whitney, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{PiecewisePoly,PiecewiseJackson,PiecewiseInverse}.lean` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Synthesis,Atomic}.lean` |
 | Trace theorem: extension, transfer, surjectivity | ✅ proved | ✗ | `ApproximationSpaces/Trace.lean` |

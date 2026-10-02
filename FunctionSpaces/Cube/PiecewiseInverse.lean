@@ -19,8 +19,9 @@ point, bounds the differences in each coordinate:
 `0 ≤ h ≤ 2^(-j)` (`Cube.eLpNorm_cubeDiff_le_of_isCubePP`). Summed over the coordinates this is the
 **inverse inequality of order `1/p`** (`Cube.exists_inverse_cubePPScheme`).
 
-With Jackson's inequality (`Cube.approxSeq_cubePPScheme_le`, from level `1` on) the modulus on the
-cube is compatible with the scheme (`Cube.cubePPModulusData`), and the coincidence theorem of
+With Jackson's inequality at every level (`Cube.exists_approxSeq_cubePPScheme_le`, Whitney's
+inequality at level `0`) the modulus on the cube is compatible with the scheme
+(`Cube.cubePPModulusData`), and the coincidence theorem of
 `ApproximationSpaces.Moduli` gives `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 ≤ s < 1/p`
 (`Cube.memApprox_cubePPScheme_iff`), with the Besov space defined by the moduli in the
 coordinates.
@@ -97,8 +98,8 @@ theorem exists_inverse_cubePPScheme {r : ℕ} (hp : p ≠ ∞) :
           ring
 
 /-- The modulus `ω_r(f, 2^(-k))_p` on the cube is compatible with the scheme of piecewise
-polynomials on the cube, with inverse order `θ = 1/p` and Jackson's inequality from level `1`
-on. -/
+polynomials on the cube, with inverse order `θ = 1/p` and Jackson's inequality at every level
+(Whitney's inequality at level `0`). -/
 noncomputable def cubePPModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ApproximationScheme.ModulusData (cubePPScheme p d r) (1 / p.toReal) where
   modulus := lpCubeModulus p r
@@ -106,10 +107,10 @@ noncomputable def cubePPModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
   C0 := d * 2 ^ r
   C0_ne_top := ENNReal.mul_ne_top (ENNReal.natCast_ne_top d) (by simp)
   le_enorm := lpCubeModulus_le hp r
-  jacksonStart := 1
-  CJ := cubeJacksonConst d r
-  CJ_ne_top := cubeJacksonConst_ne_top d r
-  jackson f _ hk := approxSeq_cubePPScheme_le hr hp f hk
+  jacksonStart := 0
+  CJ := (exists_approxSeq_cubePPScheme_le (d := d) (p := p) hr hp).choose
+  CJ_ne_top := (exists_approxSeq_cubePPScheme_le hr hp).choose_spec.1
+  jackson f k _ := (exists_approxSeq_cubePPScheme_le hr hp).choose_spec.2 f k
   CB := (exists_inverse_cubePPScheme (d := d) (r := r) hp).choose
   CB_ne_top := (exists_inverse_cubePPScheme hp).choose_spec.1
   inverse := (exists_inverse_cubePPScheme hp).choose_spec.2

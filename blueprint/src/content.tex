@@ -2979,12 +2979,36 @@ All norms on the space of polynomials of degree $< r$ are equivalent, so
 $|P(x)| \leq K' \|P\|_{L_p[1/3,2/3]}$ for $x \in [0, 1]$, and $[0, 1]$ has length $1$.
 \end{proof}
 
+\begin{lemma}[Gluing two polynomial approximations]
+\label{lem:poly-glue}
+\lean{Interval.exists_eLpNorm_sub_polyFun_le_glue, Interval.eLpNorm_sub_polyFun_le_add}
+\leanok
+\uses{lem:middle-third}
+Let $1 \leq p < \infty$ and $r \in \N$. There is $K < \infty$ such that for every measurable $u$
+and all polynomials $T_1$, $T_2$ of degree $< r$,
+\[
+  \|u - T_1\|_{L_p[0,1]}
+  \leq (1 + K) \bigl( \|u - T_1\|_{L_p[0, 2/3]} + \|u - T_2\|_{L_p[1/3, 1]} \bigr) .
+\]
+If $b - a \leq 1$ and $\|g - T\|_{L_p[a,b]} \leq (b - a)^r \|D\|_{L_p[a,b]}$, then
+$\|u - T\|_{L_p[a,b]} \leq \|u - g\|_{L_p[a,b]} + \|D\|_{L_p[a,b]}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $[\tfrac13, \tfrac23]$,
+$\|T_1 - T_2\| \leq \|u - T_1\|_{L_p[0,2/3]} + \|u - T_2\|_{L_p[1/3,1]}$, and
+\Cref{lem:middle-third} extends this bound to $[0, 1]$ with the factor $K$. On $[0, \tfrac12]$
+keep $T_1$; on $[\tfrac12, 1]$ write $u - T_1 = (u - T_2) - (T_1 - T_2)$. The second statement is
+the triangle inequality.
+\end{proof}
+
 \begin{theorem}[Whitney's inequality]
 \label{thm:whitney}
 \lean{Interval.eLpNorm_Icc_split, Interval.eLpNorm_sub_polyFun_le_of_smoothing,
   Interval.exists_eLpNorm_sub_polyFun_le_modulus}
 \leanok
-\uses{lem:two-sided-smoothing, lem:middle-third, lem:interval-modulus}
+\uses{lem:two-sided-smoothing, lem:poly-glue, lem:interval-modulus}
 Let $1 \leq p < \infty$, $r \geq 1$ and $0 < t \leq \tfrac13$. There is $W < \infty$ such that
 every continuous $F$ has a polynomial $P$ of degree $< r$ with
 \[
@@ -2997,12 +3021,10 @@ every continuous $F$ has a polynomial $P$ of degree $< r$ with
 Let $\omega = \omega_r(F, t, [0,1])_p$ and $A = 1 + t^{-r} 2^r r^{2r}$. By
 \Cref{lem:two-sided-smoothing} with $L = t$ and $w = 1 - t$, each on one interval of length at
 most $1$, there are polynomials $T_1$, $T_2$ of degree $< r$ with
-$\|F - T_1\|_{L_p[0, 1-t]} \leq A \omega$ and $\|F - T_2\|_{L_p[t, 1]} \leq A \omega$. Both
-intervals contain $[\tfrac13, \tfrac23]$, so $\|T_1 - T_2\|_{L_p[1/3, 2/3]} \leq 2 A \omega$ and
-$\|T_1 - T_2\|_{L_p[0, 1]} \leq 2 K' A \omega$ by \Cref{lem:middle-third}. On $[0, \tfrac12]$,
-$\|F - T_1\| \leq A \omega$; on $[\tfrac12, 1]$,
-$\|F - T_1\| \leq \|F - T_2\| + \|T_1 - T_2\| \leq A\omega + 2K'A\omega$. Hence
-$\|F - T_1\|_{L_p[0,1]} \leq (2 + 2K') A \omega$.
+$\|F - T_1\|_{L_p[0, 1-t]} \leq A \omega$ and $\|F - T_2\|_{L_p[t, 1]} \leq A \omega$
+(\Cref{lem:poly-glue}, second statement). Since $[0, \tfrac23] \subseteq [0, 1 - t]$ and
+$[\tfrac13, 1] \subseteq [t, 1]$, \Cref{lem:poly-glue} gives
+$\|F - T_1\|_{L_p[0,1]} \leq 2 (1 + K) A \omega$.
 \end{proof}
 
 Whitney's inequality bounds the best approximation by a single polynomial on the whole interval.
@@ -4365,40 +4387,70 @@ The definition is coordinatewise: on every dyadic cube of level $k$ such a funct
 polynomial of degree $< r$ in each variable separately. The spaces increase since the forms of
 $P_k$ are forms of $P_{k+1}$ (\Cref{lem:pp-kernel}, \Cref{lem:kernel-forms}).
 
+\begin{lemma}[From slices to the cube]
+\label{lem:slices-to-cube}
+\lean{Cube.eLpNorm_le_of_slice_le, Cube.slice_sub_slicewise, Cube.eLpNorm_sub_cubeProj_le_of_coord}
+\leanok
+\uses{lem:minkowski-bounds, lem:cube-slices, lem:kernel-telescoping}
+Let $1 \leq p < \infty$, $c, M < \infty$, and let $F, G_1, D_1, G_2, D_2$ be measurable on $\R^d$
+and $[a_\nu, b_\nu] \subseteq [0, 1]$. If for every $x$
+\[
+  \|F_{x,i}\|_{L_p[0,1]} \leq c \sum_{\nu = 1}^2 \bigl( \|(G_\nu)_{x,i}\|_{L_p[a_\nu, b_\nu]}
+    + M \|(D_\nu)_{x,i}\|_{L_p[a_\nu, b_\nu]} \bigr) ,
+\]
+then the same bound holds for $\|F\|_{L_p(Q)}$ with the norms on $Q_i[a_\nu, b_\nu]$. If
+$\|f - P_k^{(i)} f\|_{L_p(Q)} \leq B \, \omega_r^{(i)}(f, t)_p$ for every coordinate $i$ and a
+bounded measurable $f$, then $\|f - P^d_k f\|_{L_p(Q)} \leq (1 + C_r)^d B \, \omega_r(f, t)_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The norms of the slices are measurable functions of $x$ (\Cref{lem:cube-slices}); raise the bound
+to the power $p$, integrate over $x$, and apply \Cref{lem:minkowski-bounds} three times. The
+second statement is \Cref{lem:kernel-telescoping} with $C = C_r$.
+\end{proof}
+
 \begin{theorem}[Jackson's inequality on the cube]
 \label{thm:cube-jackson}
 \lean{Cube.eLpNorm_sub_slicewise_ppKernel_le, Cube.cubeJacksonConst, Cube.cubeJacksonConst_ne_top,
-  Cube.eLpNorm_sub_cubeProj_le, Cube.approxSeq_le_of_continuous, Cube.approxSeq_cubePPScheme_le}
+  Cube.eLpNorm_sub_cubeProj_le, Cube.approxSeq_le_of_continuous, Cube.approxSeq_cubePPScheme_le,
+  Cube.exists_eLpNorm_sub_slicewise_ppKernel_zero_le, Cube.exists_approxSeq_cubePPScheme_one_le,
+  Cube.exists_approxSeq_cubePPScheme_le}
 \leanok
-\uses{def:cube-pp, lem:pp-kernel, lem:pp-taylor, lem:cube-two-sided-smoothing,
-  lem:minkowski-bounds, lem:cube-slices, lem:kernel-telescoping, lem:cube-modulus, lem:error-dense}
+\uses{def:cube-pp, lem:pp-kernel, lem:pp-taylor, lem:poly-glue, lem:cube-two-sided-smoothing,
+  lem:slices-to-cube, lem:cube-modulus, lem:error-dense}
 Let $1 \leq p < \infty$ and $r \geq 1$. For every $f \in L_p(Q)$ and $k \geq 1$,
 \[
   E_{2^k}(f)_p \leq (1 + C_r)^{d+1} \, 2 (1 + 2^r r^{2r}) \, \omega_r(f, 2^{-k})_p ,
 \]
-where $E$ is the error of best approximation by the scheme of \Cref{def:cube-pp}.
+where $E$ is the error of best approximation by the scheme of \Cref{def:cube-pp}, and there is
+$C_J < \infty$ with $E_{2^k}(f)_p \leq C_J \, \omega_r(f, 2^{-k})_p$ for every $f \in L_p(Q)$ and
+every $k \geq 0$.
 \end{theorem}
 
 \begin{proof}
 \leanok
-First let $f$ be bounded and continuous, and $L = 2^{-k}$. In coordinate $i$,
+First let $f$ be bounded and continuous, $k \geq 1$ and $L = 2^{-k}$. In coordinate $i$,
 \Cref{lem:cube-two-sided-smoothing} on $Q_i[0, \tfrac12]$ and on $Q_i[\tfrac12, 1]$ gives
 $G_1, D_1$ and $G_2, D_2$. For every $x$, \Cref{lem:pp-taylor} for the slices of $f$, $G_\nu$ and
 $D_\nu$ through $x$ gives a piecewise polynomial $S_x$ of level $k$; it need not depend
 measurably on $x$, since only the bound enters. With \Cref{lem:pp-kernel},
 $\|f_{x,i} - P_k f_{x,i}\|_{L_p[0,1]}$ is at most $1 + C_r$ times the sum of
-$\|(f - G_\nu)_{x,i}\|$ and $L^r \|(D_\nu)_{x,i}\|$ on the two halves. \Cref{lem:minkowski-bounds}
-in $x$ and \Cref{lem:cube-slices} give
+$\|(f - G_\nu)_{x,i}\|$ and $L^r \|(D_\nu)_{x,i}\|$ on the two halves, and
+\Cref{lem:slices-to-cube} gives
 \begin{multline*}
   \|f - P_k^{(i)} f\|_{L_p(Q)}
   \leq (1 + C_r) \sum_{\nu = 1}^2 \bigl( \|f - G_\nu\| + L^r \|D_\nu\| \bigr) \\
   \leq (1 + C_r) \, 2 (1 + 2^r r^{2r}) \, \omega_r^{(i)}(f, L)_p ,
 \end{multline*}
-the norms on the respective halves of $Q$. \Cref{lem:kernel-telescoping} with $C = C_r$ sums these
-bounds over the coordinates, and $P^d_k f \in V^d_k$. General $f$ follow by
-\Cref{lem:error-dense}: the bounded continuous functions are dense in $L_p(Q)$, and
-$\omega_r(\cdot, t)_p$ is subadditive with $\omega_r(f, t)_p \leq d \, 2^r \|f\|_p$
-(\Cref{lem:cube-modulus}).
+the norms on the respective halves of $Q$. The second part of \Cref{lem:slices-to-cube} sums
+these bounds over the coordinates, and $P^d_k f \in V^d_k$. For $k = 0$ take the smoothings on
+$Q_i[0, \tfrac34]$ and $Q_i[\tfrac14, 1]$ with $L = \tfrac14$; on every slice their Taylor
+polynomials on $[0, \tfrac34]$ and $[\tfrac14, 1]$ glue by \Cref{lem:poly-glue} to one
+polynomial, and the same steps give $\|f - P_0^d f\|_{L_p(Q)} \leq W \omega_r(f, \tfrac14)_p
+\leq W \omega_r(f, 1)_p$. General $f$ follow by \Cref{lem:error-dense}: the bounded continuous
+functions are dense in $L_p(Q)$, and $\omega_r(\cdot, t)_p$ is subadditive with
+$\omega_r(f, t)_p \leq d \, 2^r \|f\|_p$ (\Cref{lem:cube-modulus}).
 \end{proof}
 
 \begin{theorem}[The inverse inequality on the cube]
@@ -4439,7 +4491,7 @@ polynomials of degree $< r$ in each variable on the cube if and only if
 
 \begin{proof}
 \leanok
-\Cref{thm:cube-jackson}, from level $k_0 = 1$ on, and \Cref{thm:cube-inverse} make
+\Cref{thm:cube-jackson}, at every level, and \Cref{thm:cube-inverse} make
 $\omega_r(\cdot, 2^{-k})_p$ a modulus compatible with the scheme of inverse order $\theta = 1/p$;
 apply \Cref{thm:modulus-coincidence}.
 \end{proof}
