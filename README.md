@@ -120,6 +120,17 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `‖f‖_p + ‖(2^(ks) ω_r^per(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Interval.memApprox_ppScheme_iff_per`).
   In particular `B^s_{p,q}[0, 1]` and `B^s_{p,q}(𝕋)` contain the same functions for
   `0 < s < 1/p` (`Interval.lqNorm_modulus_lt_top_iff_perModulus`).
+* **Splines and higher smoothness.** Let `S_k ⊆ L_p[0, 1]` consist of the splines of order
+  `r ≥ 1` on the dyadic grid of level `k`: piecewise polynomials of degree `< r` that are `r - 2`
+  times continuously differentiable. For `1 ≤ p < ∞` there is `C` with
+  `E_{2^k}(f)_p ≤ C ω_r(f, 2^(-k), [0, 1])_p` for `k ≥ r + 2`
+  (`Interval.exists_approxSeq_splineScheme_le`) and with
+  `ω_r(a, 2^(-k), [0, 1])_p ≤ C 2^(-(k-j)(r-1+1/p)) ‖a‖_p` for `a ∈ S_j`, `k ≥ j`
+  (`Interval.exists_inverse_splineScheme`). Hence for `1 ≤ q ≤ ∞` and `0 ≤ s < r - 1 + 1/p`,
+  `f ∈ A^s_q` iff `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`
+  (`Interval.memApprox_splineScheme_iff`). The proof uses cardinal B-splines with Marsden's
+  identity (`Interval.polyFun_eq_sum_bsplineCoef`) and a quasi-interpolant built from local
+  projections.
 * **Local projections and multiscale details.** Let `P_k` be the projection of `L_p[0, 1]`
   onto the piecewise polynomials of degree `< r` on the dyadic intervals of level `k` that is
   the `L_2`-orthogonal projection on every interval. For `1 ≤ p < ∞` there is `C` with
@@ -257,6 +268,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Dyadic splines (jump form = `C^(r-2)`), spline scheme, dyadic B-splines | ✅ proved | ✗ | `FunctionSpaces/Interval/Splines.lean` |
 | Inverse inequality of order `r - 1 + 1/p` for splines | ✅ proved | ✗ | `FunctionSpaces/Interval/SplineInverse.lean` |
 | Spline quasi-interpolant: local reproduction of polynomials, local bounds | ✅ proved | ✗ | `FunctionSpaces/Interval/QuasiInterp.lean` |
+| Jackson's inequality for splines, `A^s_q(splines) = B^s_{p,q}[0, 1]` for `0 < s < r - 1 + 1/p` | ✅ proved | ✗ | `FunctionSpaces/Interval/SplineJackson.lean` |
 | Density of piecewise polynomials, multiscale characterisation of `A^s_q` and of `B^s_{p,q}` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Wavelets/Examples/Multiscale.lean` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Synthesis,Atomic}.lean` |

@@ -3561,6 +3561,93 @@ $\tilde P(\cdot + \max(n, 0))$, whose norm on $[0, 1]$ is $2^{k/p} \|\Pi_{J(n)} 
 \leq 2^{k/p} r M^2 \|g\|_{L_p(J(n))}$. With $|N_r| \leq M_N$ and $|I_{k,i}| = 2^{-k}$ this gives (2).
 \end{proof}
 
+\section{Jackson's inequality for splines and the coincidence theorem}
+
+\begin{lemma}[Smoothing on the two parts]
+\label{lem:two-sided-smoothing}
+\lean{Interval.exists_left_smoothing, Interval.exists_right_smoothing}
+\leanok
+\uses{thm:steklov-smoothing, lem:taylor-lp, lem:interval-modulus}
+Let $F$ be continuous, $r \geq 1$, $1 \leq p < \infty$, $k \geq 2$ and
+$\omega = \omega_r(F, 2^{-k}, [0, 1])_p$. On $P = [0, \tfrac34]$ and on $P = [\tfrac14, 1]$ there
+are functions $g$ and $D$ with $\|F - g\|_{L_p(P)} \leq \omega$,
+$\|D\|_{L_p(P)} \leq 2^{kr} 2^r r^{2r} \omega$, and for every $[a, b] \subseteq P$ a polynomial $T$
+of degree $< r$ with $\|g - T\|_{L_p[a,b]} \leq (b - a)^r \|D\|_{L_p[a,b]}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $[0, \tfrac34]$ take the Steklov smoothing $g = S_\delta F$, $\delta = 2^{-k}/r^2$, and
+$D = g^{(r)}$ (\Cref{thm:steklov-smoothing}, \Cref{lem:taylor-lp}). On $[\tfrac14, 1]$ apply this
+to $F(1 - \cdot)$, which has the same modulus, and reflect back.
+\end{proof}
+
+\begin{lemma}[The local error of the quasi-interpolant]
+\label{lem:qi-local-error}
+\lean{Interval.sum_lintegral_window_le, Interval.bcoord_add, Interval.bcoord_C_mul,
+  Interval.bsplineCoef_add, Interval.bsplineCoef_C_mul, Interval.locProjScaled_mem,
+  Interval.qiCoeff_add_const_mul, Interval.polyFun_qiPieces_sub, Interval.qiWindow,
+  Interval.dyadicIco_subset_qiWindow, Interval.dyadicIco_subset_qiWindow_self,
+  Interval.eLpNorm_sub_qiPieces_le, Interval.exists_window_poly}
+\leanok
+\uses{lem:quasi-interp}
+Let $W_i = [(i + 1 - r) 2^{-k}, (i + 1) 2^{-k}]$ (truncated at $0$). There is $C$ with
+$\|g - Q_k g\|_{L_p(I_{k,i})} \leq C \|g - T\|_{L_p(W_i)}$ for every polynomial $T$ of degree
+$< r$, and the windows $W_i$, $i < 2^k$, cover every point at most $r$ times.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$Q_k$ is linear and reproduces $T$ on $I_{k,i}$, so $g - Q_k g = (g - T) - Q_k(g - T)$ there,
+and part (2) of \Cref{lem:quasi-interp} applies with $J(n) \subseteq W_i$.
+\end{proof}
+
+\begin{theorem}[Jackson's inequality for splines]
+\label{thm:spline-jackson}
+\lean{Interval.splineJacksonConst, Interval.lintegral_sub_ppFun_le_sum,
+  Interval.exists_eLpNorm_sub_qi_le, Interval.exists_approxSeq_splineScheme_le}
+\leanok
+\uses{lem:two-sided-smoothing, lem:qi-local-error, def:spline-space}
+Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_J$ with
+$E_{2^k}(f)_p \leq C_J \, \omega_r(f, 2^{-k}, [0, 1])_p$ for every $f \in L_p[0,1]$ and $k \geq r + 2$,
+where $E_{2^k}$ is the error of best approximation by splines of order $r$ and level $k$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For continuous $f$ and $k \geq r + 2$ every window $W_i$ has length $\leq r 2^{-k} \leq \tfrac14$,
+so it lies in $[0, \tfrac34]$ or in $[\tfrac14, 1]$. Take $T_i$ from \Cref{lem:two-sided-smoothing}
+on $W_i$. By \Cref{lem:qi-local-error},
+$\|f - Q_k f\|_{L_p(I_{k,i})}^p \leq C^p 2^{p-1} \int_{W_i}
+(|f - g|^p + (r 2^{-k})^{rp} |D|^p)$, and summing over $i$ with overlap $r$ gives
+$\|f - Q_k f\|_p \leq C' \omega_r(f, 2^{-k}, [0,1])_p$, since $(r 2^{-k})^r 2^{kr} = r^r$. General
+$f$ follow by density of the bounded continuous functions, as in \Cref{thm:pp-jackson}.
+\end{proof}
+
+\begin{theorem}[Approximation spaces of dyadic splines]
+\label{thm:spline-besov}
+\lean{Interval.splineModulusData, Interval.memApprox_splineScheme_iff}
+\leanok
+\uses{thm:spline-jackson, thm:spline-inverse, def:modulus-data, thm:modulus-coincidence}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $r \geq 1$ and $0 \leq s < r - 1 + 1/p$. A function
+$f \in L_p[0,1]$ lies in the approximation space $A^s_q$ of the scheme of dyadic splines of
+order $r$ if and only if
+\[
+  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_r(f, 2^{-k}, [0,1])_p \bigr)_k \bigr\|_{\ell_q} < \infty .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:spline-jackson} (from level $k_0 = r + 2$ on) and \Cref{thm:spline-inverse} make
+$\omega_r(\cdot, 2^{-k}, [0,1])_p$ a modulus compatible with the spline scheme of inverse order
+$\theta = r - 1 + 1/p$; apply \Cref{thm:modulus-coincidence}.
+\end{proof}
+
+For $0 < s < r - 1 + 1/p$ the condition says $f \in \Besov{s}{p}{q}[0, 1]$. For $r = 1$ the
+splines are the step functions and this is \Cref{thm:pp-besov}; for $r \geq 2$ it reaches
+smoothness above $1$, for example $s < \tfrac32$ for continuous piecewise linear splines in $L_2$.
+
 \bpbibheading
 \begin{thebibliography}{99}
 

@@ -52,6 +52,7 @@ public import FunctionSpaces.Interval.BSpline
 public import FunctionSpaces.Interval.Splines
 public import FunctionSpaces.Interval.SplineInverse
 public import FunctionSpaces.Interval.QuasiInterp
+public import FunctionSpaces.Interval.SplineJackson
 
 /-!
 # Function spaces
@@ -151,4 +152,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   dyadic splines.
 * `FunctionSpaces.Interval.QuasiInterp`: a spline quasi-interpolant through local projections and
   B-spline coefficients, its local reproduction of polynomials and its local bounds.
+* `FunctionSpaces.Interval.SplineJackson`: Jackson's inequality for dyadic splines and the
+  identification of their approximation spaces with `B^s_{p,q}[0, 1]` for `0 < s < r - 1 + 1/p`.
 -/

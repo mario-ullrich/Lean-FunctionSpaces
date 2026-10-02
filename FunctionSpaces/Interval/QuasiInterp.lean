@@ -170,7 +170,7 @@ theorem exists_enorm_bspline_le (r : ℕ) : ∃ M : ℝ≥0∞, M ≠ ∞ ∧ �
     simp only [polyFun]
     convert h using 2
     push_cast
-    ring
+    ring_nf
   · simp only [bspline, hy, ↓reduceIte, enorm_zero, zero_le]
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
