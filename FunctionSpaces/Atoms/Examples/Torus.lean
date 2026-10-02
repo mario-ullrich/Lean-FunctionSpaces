@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Classical.BesovModuli
+public import FunctionSpaces.Torus.BesovModuli
 public import ApproximationSpaces.Decompositions.Atomic
 public import Mathlib.Algebra.Order.Chebyshev
 

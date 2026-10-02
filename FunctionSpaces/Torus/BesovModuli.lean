@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Classical.Modulus
+public import FunctionSpaces.Torus.Modulus
 
 /-!
 # Besov spaces through moduli of smoothness: the coincidence theorem in `L_2(𝕋^d)`

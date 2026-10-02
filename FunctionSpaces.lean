@@ -29,10 +29,10 @@ public import FunctionSpaces.Wavelets.Examples.Haar
 public import FunctionSpaces.Wavelets.Examples.HaarBesov
 public import FunctionSpaces.Wavelets.Examples.Multiscale
 public import FunctionSpaces.Wavelets.Examples.Alpert
-public import FunctionSpaces.Classical.Translation
-public import FunctionSpaces.Classical.Modulus
-public import FunctionSpaces.Classical.BesovModuli
-public import FunctionSpaces.Classical.SobolevDeriv
+public import FunctionSpaces.Torus.Translation
+public import FunctionSpaces.Torus.Modulus
+public import FunctionSpaces.Torus.BesovModuli
+public import FunctionSpaces.Torus.WeakDerivatives
 public import FunctionSpaces.Traces.Examples.Torus
 public import FunctionSpaces.Atoms.Examples.Torus
 public import FunctionSpaces.Atoms.Examples.TorusHat
@@ -138,13 +138,13 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Wavelets.Examples.Alpert`: multiwavelets of Alpert type, an orthonormal basis
   of the detail space, and the characterisation of `A^s_q` of piecewise polynomials, and of
   `B^s_{p,q}` for `0 < s < 1/p`, by multiwavelet coefficients.
-* `FunctionSpaces.Classical.Translation`: translations on `L_2(𝕋^d)` and their Fourier
+* `FunctionSpaces.Torus.Translation`: translations on `L_2(𝕋^d)` and their Fourier
   multipliers.
-* `FunctionSpaces.Classical.Modulus`: the modulus of smoothness `ω(f, t)_2` and Jackson's
+* `FunctionSpaces.Torus.Modulus`: the modulus of smoothness `ω(f, t)_2` and Jackson's
   theorem `E_n(f)_2 ≤ √d ω(f, 1/n)_2`.
-* `FunctionSpaces.Classical.BesovModuli`: the classical Besov norm through the modulus and
+* `FunctionSpaces.Torus.BesovModuli`: the classical Besov norm through the modulus and
   the coincidence theorem with `B^s_{2,q}(𝕋^d)` for `0 < s < 1`.
-* `FunctionSpaces.Classical.SobolevDeriv`: weak derivatives on the torus through Fourier
+* `FunctionSpaces.Torus.WeakDerivatives`: weak derivatives on the torus through Fourier
   coefficients and `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)`.
 * `FunctionSpaces.Traces.Examples.Torus`: the trace on the face `{x_0 = 0}` of `𝕋^(n+1)`,
   `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)`, bounded and onto.

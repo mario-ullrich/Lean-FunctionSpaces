@@ -380,10 +380,10 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Filtration schemes (Haar), martingale-difference characterisation | ✅ proved | ✗ | `FunctionSpaces/Wavelets/Filtration.lean` |
 | Haar system on `[0, 1)`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ proved | ✗ | `FunctionSpaces/Wavelets/{Partition,Examples/Haar}.lean` |
 | Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Wavelets/Examples/HaarBesov.lean` |
-| Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ proved | ✗ | `FunctionSpaces/Classical/{Translation,Modulus,BesovModuli}.lean` |
+| Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ proved | ✗ | `FunctionSpaces/Torus/{Translation,Modulus,BesovModuli}.lean` |
 | Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ proved | ✗ | `FunctionSpaces/Traces/Examples/Torus.lean` |
 | Lipschitz atoms on the torus: synthesis, quasi-interpolants with hat functions, characterisation of `B^s_{2,q}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Atoms/Examples/{Torus,TorusHat,TorusAnalysis}.lean` |
-| Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Classical/SobolevDeriv.lean` |
+| Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Torus/WeakDerivatives.lean` |
 | Convolution with integrable kernels on `ℝ^d`: Young's inequality, associativity, operators on `L_p` | ✅ proved | ✗ | `FunctionSpaces/Rd/Convolution.lean` |
 | Dilations, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ proved | ✗ | `FunctionSpaces/Rd/ApproxIdentity.lean` |
 | Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, kernel identities by Fourier inversion | ✅ proved | ✗ | `FunctionSpaces/Rd/LittlewoodPaleyKernels.lean` |
@@ -392,7 +392,7 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Jackson's inequality for band-limited approximation | ✅ proved | ✗ | `FunctionSpaces/Rd/BandJackson.lean` |
 | Differences of Schwartz functions in `L_1`, inverse inequality for band-limited functions | ✅ proved | ✗ | `FunctionSpaces/Rd/BandInverse.lean` |
 | Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ proved | ✗ | `FunctionSpaces/Rd/BesovDifferences.lean` |
-| Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Classical/…` |
+| Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author ·

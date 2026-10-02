@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Classical.Translation
+public import FunctionSpaces.Torus.Translation
 public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
 /-!

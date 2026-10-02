@@ -23,7 +23,7 @@ so by Parseval
 
 The multiplier is controlled by `|e_k(h) - 1| ≤ 2π · d · deg k · ‖h‖`
 (`Torus.norm_mFourier_sub_one_le`), from `|e^(iθ) - 1| ≤ |θ|` in each coordinate.  These are the
-facts behind the moduli of smoothness of `FunctionSpaces.Classical.Modulus`.
+facts behind the moduli of smoothness of `FunctionSpaces.Torus.Modulus`.
 -/
 
 @[expose] public section

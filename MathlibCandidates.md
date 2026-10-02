@@ -42,7 +42,7 @@ declarations.
   (`FunctionSpaces/Wavelets/Partition.lean`): for `φ : α → ι` with `ι` countable, measurable
   fibres and a finite measure, `μ[f | MeasurableSpace.comap φ ⊤]` is a.e. the average of `f`
   over the fibre through the point (`MeasureTheory.condExp_comap_ae_eq`).
-* **Fourier analysis on the torus** (`FunctionSpaces/Classical/Translation.lean`): the Fourier
+* **Fourier analysis on the torus** (`FunctionSpaces/Torus/Translation.lean`): the Fourier
   coefficients of a translate, `(τ_h f)^(k) = e_k(h) f̂(k)`
   (`Torus.mFourierCoeff_translate`), and `|∏ aᵢ - 1| ≤ ∑ |aᵢ - 1|` for unimodular `aᵢ`
   (`Torus.norm_prod_sub_one_le`). Mathlib's measure on `UnitAddCircle` is a local instance
