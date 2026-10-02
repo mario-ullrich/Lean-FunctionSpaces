@@ -240,51 +240,24 @@ theorem lpModulus_anti (r : ℕ) (f : Lp ℂ p unitVol) : Antitone (lpModulus p 
 /-- **From continuous functions to `L_p` by density**: a bound `E_n(g) ≤ C ω_r(g, 2^(-k))_p`
 for every bounded continuous `g`, given by an approximant `u ∈ A_n` of `g`, holds for every
 `f ∈ L_p[0, 1]`, `p < ∞`. The bounded continuous functions are dense in `L_p` (Mathlib's
-`BoundedContinuousFunction.toLp_denseRange`), and both sides move by at most a multiple of
-`‖f - g‖_p`. -/
+`BoundedContinuousFunction.toLp_denseRange`), so `ApproximationScheme.approxSeq_le_of_dense`
+applies. -/
 theorem approxSeq_le_of_continuous {A : ApproximationScheme (Lp ℂ p unitVol)} (hp : p ≠ ∞)
     {r n k : ℕ} {C : ℝ≥0∞} (hC : C ≠ ∞)
     (h : ∀ g : ℝ →ᵇ ℂ, ∃ u : ℝ → ℂ, (∃ a ∈ A n, (a : ℝ → ℂ) =ᵐ[unitVol] u) ∧
       eLpNorm (fun x => g x - u x) p unitVol ≤ C * modulus r p 0 1 g (1 / 2 ^ k))
     (f : Lp ℂ p unitVol) : A.approxSeq f n ≤ C * lpModulus p r f k := by
-  -- continuous functions
-  have hcont : ∀ g : ℝ →ᵇ ℂ, A.approxSeq
-      (BoundedContinuousFunction.toLp (E := ℂ) p unitVol ℝ g) n ≤
-        C * lpModulus p r (BoundedContinuousFunction.toLp (E := ℂ) p unitVol ℝ g) k := by
-    intro g
-    obtain ⟨u, ⟨a, ha, hau⟩, hbound⟩ := h g
-    have hg := BoundedContinuousFunction.coeFn_toLp (E := ℂ) p unitVol ℝ g
-    refine (A.approxSeq_le_of_mem ha _).trans ?_
-    rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hg.sub hau)), lpModulus,
-      modulus_congr_ae hg]
-    exact hbound
-  -- density
-  set b := C * lpModulus p r f k
-  refine ENNReal.le_of_forall_pos_le_add fun ε hε _ => ?_
-  set K : ℝ≥0∞ := C * 2 ^ r + 1
-  have hK : K ≠ ∞ := ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top hC (by simp), ENNReal.one_ne_top⟩
-  have hK0 : K ≠ 0 := by simp [K]
-  have hη : 0 < (ε / K).toReal := ENNReal.toReal_pos (by
-    simpa using ⟨ne_of_gt (by exact_mod_cast hε), hK⟩) (ENNReal.div_ne_top ENNReal.coe_ne_top hK0)
-  obtain ⟨g, hg⟩ := Metric.denseRange_iff.1
-    (BoundedContinuousFunction.toLp_denseRange ℂ unitVol ℝ hp) f _ hη
-  set fg := BoundedContinuousFunction.toLp (E := ℂ) p unitVol ℝ g
-  have hdist : ‖f - fg‖ₑ ≤ ε / K := by
-    rw [← edist_eq_enorm_sub, edist_dist, ← ENNReal.ofReal_toReal
-      (ENNReal.div_ne_top ENNReal.coe_ne_top hK0)]
-    exact ENNReal.ofReal_le_ofReal hg.le
-  have hmod : lpModulus p r fg k ≤ lpModulus p r f k + 2 ^ r * ‖f - fg‖ₑ := by
-    have h := lpModulus_add_le r f (fg - f) k
-    rw [add_sub_cancel] at h
-    refine h.trans (add_le_add le_rfl ((lpModulus_le r _ _).trans ?_))
-    rw [← enorm_neg, neg_sub]
-  calc A.approxSeq f n
-      ≤ A.approxSeq fg n + ‖f - fg‖ₑ := ApproximationScheme.approxSeq_le_approxSeq_add_enorm _ f fg
-    _ ≤ C * (lpModulus p r f k + 2 ^ r * ‖f - fg‖ₑ) + ‖f - fg‖ₑ :=
-        add_le_add ((hcont g).trans (by gcongr)) le_rfl
-    _ = b + K * ‖f - fg‖ₑ := by simp only [b, K]; ring
-    _ ≤ b + K * (ε / K) := by gcongr
-    _ = b + ε := by rw [ENNReal.mul_div_cancel hK0 hK]
+  refine ApproximationScheme.approxSeq_le_of_dense
+    (BoundedContinuousFunction.toLp_denseRange ℂ unitVol ℝ hp)
+    (fun f g => lpModulus_add_le r f g k) (C0 := 2 ^ r) (by simp) (fun f => lpModulus_le r f k) hC
+    ?_ f
+  rintro _ ⟨g, rfl⟩
+  obtain ⟨u, ⟨a, ha, hau⟩, hbound⟩ := h g
+  have hg := BoundedContinuousFunction.coeFn_toLp (E := ℂ) p unitVol ℝ g
+  refine (A.approxSeq_le_of_mem ha _).trans ?_
+  rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hg.sub hau)), lpModulus,
+    modulus_congr_ae hg]
+  exact hbound
 
 /-- **Jackson's inequality for dyadic piecewise polynomials**: for `1 ≤ p < ∞`, `r ≥ 1` and
 `k ≥ 1`, `E_{2^k}(f)_p ≤ 2 (1 + 2^r r^(2r)) ω_r(f, 2^(-k), [0, 1])_p`; first for continuous

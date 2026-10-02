@@ -91,13 +91,6 @@ theorem approxSeq_sum_le_of_isLinear (hA : A.IsLinear) (n : ℕ) {ι : Type*} (t
     rw [Finset.sum_insert hi, Finset.sum_insert hi]
     exact (approxSeq_add_le_of_isLinear hA n _ _).trans (add_le_add le_rfl ih)
 
-/-- `E_n(f) ≤ E_n(h) + ‖f - h‖`, in `ℝ≥0∞`. -/
-theorem approxSeq_le_approxSeq_add_enorm (n : ℕ) (f h : X) :
-    A.approxSeq f n ≤ A.approxSeq h n + ‖f - h‖ₑ := by
-  rw [approxSeq, approxSeq, ← ofReal_norm, ← ENNReal.ofReal_add (approxError_nonneg _ _)
-    (norm_nonneg _)]
-  exact ENNReal.ofReal_le_ofReal (approxError_le_approxError_add_norm n f h)
-
 /-- The algebra of the weights: `2^(ks) 2^(-(k-j)σ) = 2^(-k(σ-s)) 2^(jσ)` for `j ≤ k`. -/
 theorem dyadicWeight_mul_dyadicWeight_sub {σ : ℝ} {j k : ℕ} (hjk : j ≤ k) (c e : ℝ≥0∞) :
     dyadicWeight s k * (c * dyadicWeight (-σ) (k - j) * e) =

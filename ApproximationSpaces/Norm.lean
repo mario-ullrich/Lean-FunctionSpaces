@@ -73,6 +73,13 @@ theorem approxSeq_le_of_mem {n : ℕ} {a : X} (ha : a ∈ A n) (f : X) :
     A.approxSeq f n ≤ ‖f - a‖ₑ := by
   rw [← ofReal_norm]; exact ENNReal.ofReal_le_ofReal (approxError_le_norm_sub ha f)
 
+/-- `E_n(f) ≤ E_n(h) + ‖f - h‖`, in `ℝ≥0∞`. -/
+theorem approxSeq_le_approxSeq_add_enorm (n : ℕ) (f h : X) :
+    A.approxSeq f n ≤ A.approxSeq h n + ‖f - h‖ₑ := by
+  rw [approxSeq, approxSeq, ← ofReal_norm, ← ENNReal.ofReal_add (approxError_nonneg _ _)
+    (norm_nonneg _)]
+  exact ENNReal.ofReal_le_ofReal (approxError_le_approxError_add_norm n f h)
+
 /-- `E_n(f) = 0` for `f ∈ A_n`. -/
 theorem approxSeq_eq_zero_of_mem {n : ℕ} {f : X} (hf : f ∈ A n) : A.approxSeq f n = 0 := by
   simp [approxSeq, approxError_eq_zero_of_mem hf]
@@ -105,6 +112,37 @@ theorem approxSeq_neg (f : X) (n : ℕ) : A.approxSeq (-f) n = A.approxSeq f n :
 theorem approxSeq_anti_scheme {A' : ApproximationScheme X} (h : ∀ n, A n ⊆ A' n) (f : X)
     (n : ℕ) : A'.approxSeq f n ≤ A.approxSeq f n :=
   ENNReal.ofReal_le_ofReal (approxError_anti_scheme h n f)
+
+/-- **Bounds by a modulus pass from a dense set to all of `X`**: if `ω` is subadditive with
+`ω(f) ≤ C₀ ‖f‖` and `E_n(g) ≤ C ω(g)` for all `g` in a dense set, then `E_n(f) ≤ C ω(f)` for every
+`f`, since both sides move by at most a multiple of `‖f - g‖`
+(`ApproximationScheme.approxSeq_le_approxSeq_add_enorm`). -/
+theorem approxSeq_le_of_dense {D : Set X} (hD : Dense D)
+    {ω : X → ℝ≥0∞} (hadd : ∀ f g, ω (f + g) ≤ ω f + ω g) {C0 : ℝ≥0∞} (hC0 : C0 ≠ ∞)
+    (hle : ∀ f, ω f ≤ C0 * ‖f‖ₑ) {n : ℕ} {C : ℝ≥0∞} (hC : C ≠ ∞)
+    (h : ∀ g ∈ D, A.approxSeq g n ≤ C * ω g) (f : X) : A.approxSeq f n ≤ C * ω f := by
+  refine ENNReal.le_of_forall_pos_le_add fun ε hε _ => ?_
+  set K : ℝ≥0∞ := C * C0 + 1
+  have hK : K ≠ ∞ := ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top hC hC0, ENNReal.one_ne_top⟩
+  have hK0 : K ≠ 0 := by simp [K]
+  have hη : 0 < (ε / K).toReal := ENNReal.toReal_pos (by
+    simpa using ⟨ne_of_gt (by exact_mod_cast hε), hK⟩) (ENNReal.div_ne_top ENNReal.coe_ne_top hK0)
+  obtain ⟨g, hgf, hgD⟩ := Metric.dense_iff.1 hD f _ hη
+  have hdist : ‖f - g‖ₑ ≤ ε / K := by
+    rw [← edist_eq_enorm_sub, edist_comm, edist_dist, ← ENNReal.ofReal_toReal
+      (ENNReal.div_ne_top ENNReal.coe_ne_top hK0)]
+    exact ENNReal.ofReal_le_ofReal (Metric.mem_ball.1 hgf).le
+  have hmod : ω g ≤ ω f + C0 * ‖f - g‖ₑ := by
+    have h1 := hadd f (g - f)
+    rw [add_sub_cancel] at h1
+    refine h1.trans (add_le_add le_rfl ((hle _).trans ?_))
+    rw [← enorm_neg, neg_sub]
+  calc A.approxSeq f n
+      ≤ A.approxSeq g n + ‖f - g‖ₑ := approxSeq_le_approxSeq_add_enorm n f g
+    _ ≤ C * (ω f + C0 * ‖f - g‖ₑ) + ‖f - g‖ₑ := add_le_add ((h g hgD).trans (by gcongr)) le_rfl
+    _ = C * ω f + K * ‖f - g‖ₑ := by simp only [K]; ring
+    _ ≤ C * ω f + K * (ε / K) := by gcongr
+    _ = C * ω f + ε := by rw [ENNReal.mul_div_cancel hK0 hK]
 
 variable (A)
 

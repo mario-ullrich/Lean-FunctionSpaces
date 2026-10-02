@@ -100,7 +100,8 @@ Let $A$ be an approximation scheme in $X$. For $n \in \N$ and $f \in X$,
 \label{lem:error-basic}
 \lean{ApproximationScheme.approxError_zero_left, ApproximationScheme.approxError_le_norm,
   ApproximationScheme.approxError_anti, ApproximationScheme.approxError_smul,
-  ApproximationScheme.approxError_add_le, ApproximationScheme.abs_approxError_sub_le}
+  ApproximationScheme.approxError_add_le, ApproximationScheme.abs_approxError_sub_le,
+  ApproximationScheme.approxSeq_le_approxSeq_add_enorm}
 \leanok
 \uses{def:error, lem:scheme-basic}
 Let $A$ be an approximation scheme in $X$. For all $f, g \in X$, $c \in \R$ and
@@ -144,6 +145,24 @@ soon as $E_{2^k}(f) \to 0$ as $k \to \infty$.
 If $\|f - a\| < \varepsilon$ for some $a \in A_m$, then $E_n(f) < \varepsilon$ for all
 $n \geq m$ since the errors decrease. Conversely $E_n(f) < \varepsilon$ gives such an $a$.
 The errors decrease, so convergence along $2^k$ gives convergence.
+\end{proof}
+
+\begin{lemma}[Bounds by a modulus extend from a dense set]
+\label{lem:error-dense}
+\lean{ApproximationScheme.approxSeq_le_of_dense}
+\leanok
+\uses{lem:error-basic}
+Let $A$ be an approximation scheme in $X$, $n \in \N$, $D \subseteq X$ dense,
+$C, C_0 \in [0, \infty)$, and let $\omega : X \to [0, \infty]$ satisfy
+$\omega(f + g) \leq \omega(f) + \omega(g)$ and $\omega(f) \leq C_0 \|f\|$ for all
+$f, g \in X$. If $E_n(g) \leq C \omega(g)$ for every $g \in D$, then $E_n(f) \leq C \omega(f)$
+for every $f \in X$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $g \in D$, $E_n(f) \leq E_n(g) + \|f - g\|$ and $\omega(g) \leq \omega(f) + C_0 \|f - g\|$,
+so $E_n(f) \leq C \omega(f) + (C C_0 + 1) \|f - g\|$, and $\|f - g\|$ is arbitrarily small.
 \end{proof}
 
 \begin{lemma}[Functoriality of the error]
@@ -971,10 +990,9 @@ $a, b \in A_n$. For a linear scheme, $E_n(f + g) \leq E_n(f) + E_n(g)$ for all $
 \begin{theorem}[Synthesis with decay]
 \label{thm:synthesis-decay}
 \lean{ApproximationScheme.approxNormDyadic_le_of_hasSum_decay,
-  ApproximationScheme.dyadicWeight_mul_dyadicWeight_sub,
-  ApproximationScheme.approxSeq_le_approxSeq_add_enorm}
+  ApproximationScheme.dyadicWeight_mul_dyadicWeight_sub}
 \leanok
-\uses{def:linear-scheme, def:dyadic-norm, lem:hardy}
+\uses{def:linear-scheme, def:dyadic-norm, lem:hardy, lem:error-basic}
 Let $A$ be a linear scheme, $\sigma \in \R$, $C \in [0, \infty]$ and $1 \leq q \leq \infty$.
 Let $f = \sum_j g_j$ in $X$, and let $(\varepsilon_j)_j$ in $[0, \infty]$ satisfy
 $\|g_j\| \leq \varepsilon_j$ for every $j$ and $E_{2^k}(g_j) \leq C \, 2^{-(k-j)\sigma}
@@ -3032,7 +3050,7 @@ $\int_{[0, 1]} G = \sum_{n < 2^k} \int_{I_{k,n}} G$.
   Interval.exists_approxSeq_ppScheme_one_le, Interval.exists_approxSeq_ppScheme_le}
 \leanok
 \uses{def:pp-scheme, lem:pp-bookkeeping, lem:two-sided-smoothing, lem:interval-modulus,
-  thm:whitney}
+  thm:whitney, lem:error-dense}
 Let $1 \leq p < \infty$ and $r \geq 1$. For every $f \in L_p[0,1]$ and $k \geq 1$,
 \[
   E_{2^k}(f)_p \leq 2 (1 + 2^r r^{2r}) \, \omega_r(f, 2^{-k}, [0,1])_p ,
@@ -3052,9 +3070,9 @@ $\|g - Q_n\|_{L_p(I_{k,n})} \leq L^r \|D\|_{L_p(I_{k,n})}$. Summing $p$-th power
 piecewise polynomial $S$ made of the $Q_n$ satisfies
 $\|g - S\|_{L_p[0,1/2]} \leq 2^r r^{2r} \omega_r(f, L, [0,1])_p$. On $[\tfrac12, 1]$ apply the
 same to $f(1 - \cdot)$, which has the same modulus by \Cref{lem:interval-modulus}; $\tfrac12$ is a
-knot since $k \geq 1$. For general $f$, and for every scheme in $L_p[0,1]$, take a bounded
-continuous $g$ close to $f$ in $L_p$: then $E_{2^k}(f)_p \leq E_{2^k}(g)_p + \|f - g\|_p$ and
-$\omega_r(g, t)_p \leq \omega_r(f, t)_p + 2^r \|f - g\|_p$. For $k = 0$ the approximants are the
+knot since $k \geq 1$. General $f$ follow, for every scheme in $L_p[0,1]$, by
+\Cref{lem:error-dense}: the bounded continuous functions are dense in $L_p$, and
+$\omega_r(\cdot, t)_p$ is subadditive with $\omega_r(f, t)_p \leq 2^r \|f\|_p$. For $k = 0$ the approximants are the
 polynomials of degree $< r$, and \Cref{thm:whitney} with $t = \tfrac14$, passed to $L_p$ in the
 same way, gives $E_1(f)_p \leq W \omega_r(f, \tfrac14, [0,1])_p \leq W \omega_r(f, 1, [0,1])_p$.
 \end{proof}
