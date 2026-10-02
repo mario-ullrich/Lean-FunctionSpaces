@@ -26,6 +26,12 @@ functions form subspaces `V_k^d` of `L_p(Q)` increasing in `k` (`Cube.cubePPSpac
 `Cube.cubePPScheme`. Applying `P_k` in all coordinates (`Cube.cubeProj`) maps bounded measurable
 functions into `V_k^d` (`Cube.isCubePP_cubeProj`), and the slices of a function in `V_k^d` are
 piecewise polynomials of level `k` on `[0, 1]` (`Cube.IsCubePP.exists_slice_eq_ppFun`).
+
+Since `P_k` reproduces the piecewise polynomials (`Cube.ppKernel_reproduces`), `V_k^d` is the
+**tensor product** of the one-dimensional spaces: its functions are the combinations of products
+`∏_i u_i(x_i)` of piecewise polynomials `u_i` of level `k` and degree `< r` on `[0, 1]`
+(`Cube.isCubePP_iff_mem_span_prod_ppFun`, `Cube.isCubePP_iff_mem_span`). The definition through
+slices is the one used in the proofs: it describes `V_k^d` without choosing a basis.
 -/
 
 @[expose] public section
@@ -287,5 +293,62 @@ theorem isCubePP_cubeProj (r k : ℕ) {g : (Fin d → ℝ) → ℂ} (hg : BddMea
     IsCubePP r k (cubeProj r k g) :=
   ⟨(ppKernel r k).bddMeas_foldSlicewise _ hg,
     fun i => (ppKernel r k).isForm_foldSlicewise _ hg (List.mem_finRange i)⟩
+
+/-! ### Tensor products -/
+
+omit [Fact (1 ≤ p)] in
+/-- The local projection reproduces its functions `φ_{n,l}`. -/
+theorem ppKernel_reproduces (r k : ℕ) : (ppKernel r k).Reproduces := fun j => by
+  rw [ppKernel_rangeFn_eq_ppFun, ppKernel_apply_ppFun fun m => ?_]
+  split_ifs
+  · exact comp_affine_mem_degreeLT (dualPoly r j.2).2 _ _
+  · exact Submodule.zero_mem _
+
+omit [Fact (1 ≤ p)] in
+/-- **Piecewise polynomials on the cube are tensor products**: `g` is a piecewise polynomial of
+level `k` and degree `< r` in each variable iff it is a combination of the products
+`∏_i φ_{j_i}(x_i)` of the functions `φ_{n,l}(t) = 1_{I_{k,n}}(t) d_l(2^k t - n)` of the local
+projection. -/
+theorem isCubePP_iff_mem_span {r k : ℕ} (hr : 1 ≤ r) {g : (Fin d → ℝ) → ℂ} :
+    IsCubePP r k g ↔ g ∈ Submodule.span ℂ (Set.range fun j : Fin d → Fin (2 ^ k) × Fin r =>
+      fun x => ∏ i, (ppKernel r k).rangeFn (j i) (x i)) := by
+  have : Nonempty (Fin (2 ^ k) × Fin r) := ⟨(⟨0, Nat.two_pow_pos k⟩, ⟨0, hr⟩)⟩
+  exact ⟨fun h => (ppKernel r k).mem_span_prod_of_isForm (ppKernel_reproduces r k) h.1 h.2,
+    fun h => (ppKernel r k).isForm_of_mem_span_prod h⟩
+
+omit [Fact (1 ≤ p)] in
+/-- **Piecewise polynomials on the cube are the tensor products of those in one variable**: the
+piecewise polynomials of level `k` and degree `< r` in each variable are the combinations of
+products `∏_i u_i(x_i)` of piecewise polynomials `u_i` of level `k` and degree `< r` on
+`[0, 1]`. -/
+theorem isCubePP_iff_mem_span_prod_ppFun {r k : ℕ} (hr : 1 ≤ r) {g : (Fin d → ℝ) → ℂ} :
+    IsCubePP r k g ↔ g ∈ Submodule.span ℂ {G | ∃ Q : Fin d → ℕ → ℂ[X],
+      (∀ i n, Q i n ∈ degreeLT ℂ r) ∧ G = fun x => ∏ i, ppFun k (Q i) (x i)} := by
+  rw [isCubePP_iff_mem_span hr]
+  constructor
+  · refine fun h => Submodule.span_mono ?_ h
+    rintro _ ⟨j, rfl⟩
+    refine ⟨fun i m => if m = ((j i).1 : ℕ) then (dualPoly r (j i).2 : ℂ[X]).comp
+      (C ((-((j i).1 : ℝ) : ℝ) : ℂ) + C (((2 : ℝ) ^ k : ℝ) : ℂ) * X) else 0,
+      fun i n => ?_, ?_⟩
+    · dsimp only
+      split_ifs
+      · exact comp_affine_mem_degreeLT (dualPoly r (j i).2).2 _ _
+      · exact Submodule.zero_mem _
+    · funext x
+      exact Finset.prod_congr rfl fun i _ => congrFun (ppKernel_rangeFn_eq_ppFun r k (j i)) (x i)
+  · refine fun h => (Submodule.span_le.2 ?_) h
+    rintro _ ⟨Q, hQ, rfl⟩
+    have hexp : ∀ i (t : ℝ), ppFun k (Q i) t =
+        ∑ m, (ppKernel r k).coef (ppFun k (Q i)) m * (ppKernel r k).rangeFn m t := fun i t =>
+      (congrFun (ppKernel_apply_ppFun (r := r) (k := k) (hQ i)) t).symm
+    have hG : (fun x : Fin d → ℝ => ∏ i, ppFun k (Q i) (x i)) =
+        ∑ j : Fin d → Fin (2 ^ k) × Fin r, (∏ i, (ppKernel r k).coef (ppFun k (Q i)) (j i)) •
+          fun x : Fin d → ℝ => ∏ i, (ppKernel r k).rangeFn (j i) (x i) := by
+      funext x
+      simp only [hexp, Finset.prod_univ_sum, Fintype.piFinset_univ, Finset.sum_apply,
+        Pi.smul_apply, smul_eq_mul, Finset.prod_mul_distrib]
+    rw [hG]
+    exact Submodule.sum_mem _ fun j _ => Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
 
 end Cube

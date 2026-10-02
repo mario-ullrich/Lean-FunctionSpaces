@@ -168,7 +168,9 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   in coordinate `i` and `ω_r = ∑_i ω_r^(i)`. Let `V_k^d ⊆ L_p(Q)` consist of the bounded
   measurable functions that have in every coordinate `i` the form `∑_j c_j(x) φ_j(x_i)` of the
   projection onto the piecewise polynomials of level `k` and degree `< r` in one variable, with
-  coefficients `c_j` not depending on `x_i`; on each dyadic cube of level `k` they are
+  coefficients `c_j` not depending on `x_i`; these are exactly the combinations of products
+  `∏_i u_i(x_i)` of piecewise polynomials `u_i` of level `k` and degree `< r` on `[0, 1]`
+  (`Cube.isCubePP_iff_mem_span_prod_ppFun`), and on each dyadic cube of level `k` they are
   polynomials of degree `< r` in each variable separately. For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`,
   `r ≥ 1` and `0 ≤ s < 1/p`, `f ∈ A^s_q` of these spaces iff
   `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Cube.memApprox_cubePPScheme_iff`), with
@@ -319,8 +321,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Multiwavelets (orthonormal, `r` vanishing moments), stability, coefficient characterisation of `A^s_q` and of `B^s_{p,q}` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Wavelets/Examples/Alpert.lean` |
 | The cube `[0, 1]^d`: slices, integration through slices, moduli in the coordinates | ✅ proved | ✗ | `FunctionSpaces/Cube/{Basic,Modulus}.lean` |
 | Steklov smoothing in one coordinate near both ends of the cube | ✅ proved | ✗ | `FunctionSpaces/Cube/Smoothing.lean` |
-| Kernel operators of finite rank on slices, their forms, telescoping over the coordinates | ✅ proved | ✗ | `FunctionSpaces/Cube/Kernel.lean` |
-| Piecewise polynomials on the cube: tensor projection, Whitney, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{PiecewisePoly,PiecewiseJackson,PiecewiseInverse}.lean` |
+| Kernel operators of finite rank on slices, their forms, tensor products, telescoping over the coordinates | ✅ proved | ✗ | `FunctionSpaces/Cube/Kernel.lean` |
+| Piecewise polynomials on the cube: tensor projection, tensor-product description, Whitney, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{PiecewisePoly,PiecewiseJackson,PiecewiseInverse}.lean` |
 | Tensor splines on the cube: quasi-interpolant as a kernel operator, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < r - 1 + 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{Splines,SplineJackson,SplineInverse}.lean` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Synthesis,Atomic}.lean` |

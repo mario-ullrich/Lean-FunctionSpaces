@@ -4345,6 +4345,37 @@ $S^{(j)} g(x) = \sum_a S^{(j)} c_a(x) \varphi_a(x_i)$, and $S^{(j)} c_a$ does no
 (3) Regroup the double sum. The last statement follows by induction on $m$.
 \end{proof}
 
+\begin{lemma}[Tensor products of a kernel operator]
+\label{lem:kernel-tensor}
+\lean{Cube.bddMeas_prod_coord, Cube.KernelOp.Reproduces, Cube.KernelOp.Reproduces.apply_sum,
+  Cube.KernelOp.IsForm.slicewise_self, Cube.KernelOp.IsForm.coef_slice,
+  Cube.KernelOp.partialTensor, Cube.KernelOp.partialTensor_subset_span,
+  Cube.KernelOp.mem_span_prod_of_isForm, Cube.KernelOp.isForm_prod,
+  Cube.KernelOp.isForm_of_mem_span_prod}
+\leanok
+\uses{lem:kernel-forms}
+Let $T$ be a kernel operator with $T \varphi_j = \varphi_j$ for every $j$. A function $g$ on $\R^d$
+is bounded, measurable and has the form of $T$ in every coordinate if and only if it is a linear
+combination of the products $x \mapsto \prod_{i=1}^d \varphi_{j_i}(x_i)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+A product has the form of $T$ in coordinate $i$: the coefficient of $\varphi_{j_i}(x_i)$ is the
+product of the other factors, and the other coefficients vanish. Conversely, $T$ is the identity
+on the combinations of the $\varphi_j$, so $T^{(i)} c = c$ for every $c$ of the form of $T$ in
+coordinate $i$, that is,
+$c(x) = \sum_m c_m(x) \varphi_m(x_i)$ with $c_m(x) = \int_0^1 c_{x,i}(s) \kappa_m(s) \, ds$. For a
+set $S$ of coordinates call $c(x) \prod_{i \in S} \varphi_{j_i}(x_i)$ a partial tensor product if
+$c$ is bounded, measurable, does not depend on the coordinates in $S$ and has the form of $T$ in
+every coordinate outside $S$. For $i_0 \notin S$ the expansion of $c$ in coordinate $i_0$ writes a
+partial tensor product for $S$ as a combination of partial tensor products for $S \cup \{i_0\}$:
+the coefficients $c_m$ do not depend on $x_{i_0}$ or on the coordinates in $S$, and they keep the
+form of $T$ in the coordinates $i \neq i_0$, since integration in coordinate $i_0$ acts on the
+coefficients of that form. Starting from $g$ itself with $S = \emptyset$, induction over the
+coordinates ends with $S = \{1, \dots, d\}$, where $c$ is constant.
+\end{proof}
+
 \begin{lemma}[Telescoping over the coordinates]
 \label{lem:kernel-telescoping}
 \lean{Cube.KernelOp.eLpNorm_slicewise_le, Cube.KernelOp.eLpNorm_sub_foldSlicewise_le}
@@ -4421,6 +4452,30 @@ polynomials of level $k$ and degree $< r$ on $[0, 1]$.
 The definition is coordinatewise: on every dyadic cube of level $k$ such a function is a
 polynomial of degree $< r$ in each variable separately. The spaces increase since the forms of
 $P_k$ are forms of $P_{k+1}$ (\Cref{lem:pp-kernel}, \Cref{lem:kernel-forms}).
+
+\begin{lemma}[Piecewise polynomials on the cube are tensor products]
+\label{lem:cube-pp-tensor}
+\lean{Cube.ppKernel_reproduces, Cube.isCubePP_iff_mem_span, Cube.isCubePP_iff_mem_span_prod_ppFun}
+\leanok
+\uses{def:cube-pp, lem:kernel-tensor, thm:pp-proj}
+Let $r \geq 1$ and $k \in \N$. For a function $g$ on $\R^d$ the following are equivalent:
+\begin{enumerate}
+  \item $g$ is a piecewise polynomial of level $k$ and degree $< r$ in each variable;
+  \item $g$ is a linear combination of products $\prod_{i=1}^d \varphi_{n_i, l_i}(x_i)$ of the
+    functions of $P_k$ (\Cref{lem:pp-kernel});
+  \item $g$ is a linear combination of products $\prod_{i=1}^d u_i(x_i)$ of piecewise polynomials
+    $u_i$ of level $k$ and degree $< r$ on $[0, 1]$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+$P_k$ reproduces the piecewise polynomials of level $k$ (\Cref{thm:pp-proj}), in particular its
+functions $\varphi_{n,l}$, so \Cref{lem:kernel-tensor} gives the equivalence of (1) and (2). The
+$\varphi_{n,l}$ are piecewise polynomials of level $k$, which gives (2) $\Rightarrow$ (3). For the
+converse, $u_i = P_k u_i$ is a combination of the $\varphi_{n,l}$, and the product of these
+combinations expands into a combination of products of the $\varphi_{n,l}$.
+\end{proof}
 
 \begin{lemma}[From slices to the cube]
 \label{lem:slices-to-cube}

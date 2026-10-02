@@ -25,6 +25,14 @@ coordinates one after another (`Cube.KernelOp.foldSlicewise`) therefore gives a 
 form of `T` in every coordinate (`Cube.KernelOp.isForm_foldSlicewise`). This replaces
 multidimensional Fubini arguments in the construction of tensor approximants.
 
+If `T` reproduces its functions, `T φ_j = φ_j` (`Cube.KernelOp.Reproduces`), then the bounded
+measurable functions with the form of `T` in every coordinate are exactly the combinations of the
+tensor products `∏_i φ_{j_i}(x_i)` (`Cube.KernelOp.mem_span_prod_of_isForm`,
+`Cube.KernelOp.isForm_of_mem_span_prod`). The proof expands the coefficients one coordinate at a
+time (`Cube.KernelOp.partialTensor_subset_span`): a form in coordinate `i` is reproduced by
+`T^{(i)}` (`Cube.KernelOp.IsForm.slicewise_self`), which writes its coefficient as a combination of
+the `φ_j(x_i)`.
+
 On `L_p(Q)` the slicewise action inherits the bounds of `T` on `L_p[0, 1]` slice by slice
 (`Cube.KernelOp.eLpNorm_slicewise_le`). By linearity, the error of the action in all coordinates
 telescopes into the errors in the single coordinates
@@ -72,6 +80,21 @@ theorem bddMeas_sum {α ι : Type*} [MeasurableSpace α] (s : Finset ι) {f : ι
     simp only [Finset.sum_insert hj]
     exact (hf j (Finset.mem_insert_self j s)).add (ih fun j' hj' => hf j'
       (Finset.mem_insert_of_mem hj'))
+
+/-- Products `∏_{i ∈ s} u_i(x_i)` of bounded measurable functions of single coordinates are
+bounded and measurable. -/
+theorem bddMeas_prod_coord {d : ℕ} (s : Finset (Fin d)) {u : Fin d → ℝ → ℂ}
+    (hu : ∀ i ∈ s, BddMeas (u i)) : BddMeas (fun x : Fin d → ℝ => ∏ i ∈ s, u i (x i)) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => exact ⟨measurable_const, 1, fun _ => by simp⟩
+  | insert a s ha ih =>
+    simp only [Finset.prod_insert ha]
+    obtain ⟨hm, M, hM⟩ := hu a (Finset.mem_insert_self a s)
+    obtain ⟨hm', M', hM'⟩ := ih fun i hi => hu i (Finset.mem_insert_of_mem hi)
+    refine ⟨(hm.comp (measurable_pi_apply a)).mul hm', M * M', fun x => ?_⟩
+    rw [norm_mul]
+    exact mul_le_mul (hM (x a)) (hM' x) (norm_nonneg _) ((norm_nonneg (u a (x a))).trans (hM (x a)))
 
 /-- A bounded measurable function is integrable on `[0, 1]`. -/
 theorem BddMeas.integrableOn_Icc {g : ℝ → ℂ} (hg : BddMeas g) :
@@ -313,6 +336,190 @@ theorem IsForm.refine {κι : Type*} [Fintype κι] {T' : KernelOp κι} {i : Fi
   rw [Finset.sum_comm]
   refine Finset.sum_congr rfl fun j' _ => Finset.sum_congr rfl fun j _ => ?_
   ring
+
+/-! ### Tensor products -/
+
+/-- A kernel operator **reproduces its functions** if `T φ_m = φ_m` for every `m`. -/
+def Reproduces : Prop := ∀ m, T.apply (T.rangeFn m) = T.rangeFn m
+
+/-- A reproducing operator is the identity on the combinations of its functions. -/
+theorem Reproduces.apply_sum (hT : T.Reproduces) (a : ι → ℂ) (t : ℝ) :
+    T.apply (fun s => ∑ m, a m * T.rangeFn m s) t = ∑ m, a m * T.rangeFn m t := by
+  have hcoef : ∀ j, T.coef (fun s => ∑ m, a m * T.rangeFn m s) j =
+      ∑ m, a m * T.coef (T.rangeFn m) j := fun j => by
+    rw [T.coef_sum (g := fun m s => a m * T.rangeFn m s) _
+      fun m _ => ((T.bddMeas_rangeFn m).const_mul (a m)).integrableOn_Icc]
+    exact Finset.sum_congr rfl fun m _ => T.coef_const_mul _ _ _
+  simp only [apply, hcoef, Finset.sum_mul]
+  rw [Finset.sum_comm]
+  refine Finset.sum_congr rfl fun m _ => ?_
+  have h := congrFun (hT m) t
+  simp only [apply] at h
+  rw [← h, Finset.mul_sum]
+  exact Finset.sum_congr rfl fun j _ => by ring
+
+/-- **A reproducing operator acts as the identity on its forms**: `T^{(i)} g = g` if `g` has
+the form of `T` in coordinate `i`. -/
+theorem IsForm.slicewise_self (hT : T.Reproduces) {i : Fin d} {g : (Fin d → ℝ) → ℂ}
+    (hg : T.IsForm i g) : T.slicewise i g = g := by
+  funext x
+  obtain ⟨a, ha⟩ := KernelOp.IsForm.slice_eq T hg x
+  rw [KernelOp.slicewise, ha, KernelOp.Reproduces.apply_sum T hT a (x i)]
+  have h := congrFun ha (x i)
+  simp only [slice, Function.update_eq_self] at h
+  exact h.symm
+
+/-- **The coefficients of slices keep the forms in other coordinates**: if `g` has the form of
+`T` in coordinate `i` and `j ≠ i`, then `x ↦ ∫_0^1 g(x with s in place j) κ'_m(s) ds` has the
+form of `T` in coordinate `i`. -/
+theorem IsForm.coef_slice {κι : Type*} [Fintype κι] (S : KernelOp κι) {i j : Fin d}
+    (hij : i ≠ j) {g : (Fin d → ℝ) → ℂ} (hg : T.IsForm i g) (m : κι) :
+    T.IsForm i (fun x => S.coef (slice g x j) m) := by
+  obtain ⟨c, hcb, hci, hgc⟩ := hg
+  refine ⟨fun a x => S.coef (slice (c a) x j) m, fun a => ?_, fun a x t => ?_, fun x => ?_⟩
+  · obtain ⟨hcm, M, hM⟩ := hcb a
+    exact ⟨S.measurable_coef_slice hcm j m, M * (S.bddMeas_kernel m).2.choose,
+      fun x => S.norm_coef_le (g := slice (c a) x j) (fun s => hM _) m⟩
+  · have hs : slice (c a) (Function.update x i t) j = slice (c a) x j := by
+      funext s
+      simp only [slice]
+      rw [Function.update_comm hij, hci]
+    simp only [hs]
+  · show S.coef (slice g x j) m = ∑ a, S.coef (slice (c a) x j) m * T.rangeFn a (x i)
+    have hslice : slice g x j = fun s => ∑ a, c a (Function.update x j s) * T.rangeFn a (x i) := by
+      funext s
+      simp only [slice, hgc, Function.update_of_ne hij]
+    rw [hslice]
+    have hb : ∀ a ∈ (Finset.univ : Finset ι), IntegrableOn
+        (fun s => c a (Function.update x j s) * T.rangeFn a (x i)) (Icc (0 : ℝ) 1) := fun a _ => by
+      obtain ⟨hcm, M, hM⟩ := hcb a
+      exact BddMeas.integrableOn_Icc ⟨(hcm.comp (measurable_update x)).mul measurable_const,
+        M * ‖T.rangeFn a (x i)‖, fun s => by
+          rw [norm_mul]; exact mul_le_mul_of_nonneg_right (hM _) (norm_nonneg _)⟩
+    rw [S.coef_sum (g := fun a s => c a (Function.update x j s) * T.rangeFn a (x i)) _ hb]
+    refine Finset.sum_congr rfl fun a _ => ?_
+    simp only [mul_comm _ (T.rangeFn a (x i))]
+    rw [S.coef_const_mul]
+    rfl
+
+/-- The **partial tensor products** for a set `S` of coordinates: `c(x) ∏_{i ∈ S} φ_{j_i}(x_i)`
+with `c` bounded and measurable, independent of the coordinates in `S`, and with the form of `T`
+in every coordinate outside `S`. -/
+def partialTensor (S : Finset (Fin d)) : Set ((Fin d → ℝ) → ℂ) :=
+  {G | ∃ (c : (Fin d → ℝ) → ℂ) (j : Fin d → ι), BddMeas c ∧
+    (∀ x, ∀ i ∈ S, ∀ t, c (Function.update x i t) = c x) ∧ (∀ i ∉ S, T.IsForm i c) ∧
+    G = fun x => c x * ∏ i ∈ S, T.rangeFn (j i) (x i)}
+
+/-- **One more coordinate**: for a reproducing operator, every partial tensor product for `S` is a
+combination of partial tensor products for `S ∪ {i₀}`, by expanding its coefficient in
+coordinate `i₀`. -/
+theorem partialTensor_subset_span (hT : T.Reproduces) {S : Finset (Fin d)} {i₀ : Fin d}
+    (hi₀ : i₀ ∉ S) : T.partialTensor S ⊆ Submodule.span ℂ (T.partialTensor (insert i₀ S)) := by
+  classical
+  rintro G ⟨c, j, hcb, hci, hcf, rfl⟩
+  have hc : ∀ x, c x = ∑ m, T.coef (slice c x i₀) m * T.rangeFn m (x i₀) := fun x =>
+    (congrFun (KernelOp.IsForm.slicewise_self T hT (hcf i₀ hi₀)) x).symm
+  have hG : (fun x => c x * ∏ i ∈ S, T.rangeFn (j i) (x i)) = ∑ m, fun x =>
+      T.coef (slice c x i₀) m *
+        ∏ i ∈ insert i₀ S, T.rangeFn (Function.update j i₀ m i) (x i) := by
+    funext x
+    rw [Finset.sum_apply, hc x, Finset.sum_mul]
+    refine Finset.sum_congr rfl fun m _ => ?_
+    rw [Finset.prod_insert hi₀, Function.update_self]
+    have hprod : ∏ i ∈ S, T.rangeFn (Function.update j i₀ m i) (x i) =
+        ∏ i ∈ S, T.rangeFn (j i) (x i) :=
+      Finset.prod_congr rfl fun i hi => by
+        rw [Function.update_of_ne (ne_of_mem_of_not_mem hi hi₀)]
+    rw [hprod]
+    ring
+  rw [hG]
+  refine Submodule.sum_mem _ fun m _ => Submodule.subset_span
+    ⟨fun x => T.coef (slice c x i₀) m, Function.update j i₀ m, ?_, ?_, ?_, rfl⟩
+  · obtain ⟨hcm, M, hM⟩ := hcb
+    exact ⟨T.measurable_coef_slice hcm i₀ m, M * (T.bddMeas_kernel m).2.choose,
+      fun x => T.norm_coef_le (g := slice c x i₀) (fun s => hM _) m⟩
+  · intro x i hi t
+    rcases Finset.mem_insert.1 hi with rfl | hi'
+    · simp only [slice_update]
+    · have hs : slice c (Function.update x i t) i₀ = slice c x i₀ := by
+        funext s
+        simp only [slice]
+        rw [Function.update_comm (ne_of_mem_of_not_mem hi' hi₀), hci _ i hi']
+      simp only [hs]
+  · intro i hi
+    have hi' : i ∉ S := fun h => hi (Finset.mem_insert_of_mem h)
+    have hne : i ≠ i₀ := fun h => hi (h ▸ Finset.mem_insert_self i₀ S)
+    exact KernelOp.IsForm.coef_slice T T hne (hcf i hi') m
+
+/-- **Forms in every coordinate are tensor products**: for a reproducing operator, a bounded
+measurable function with the form of `T` in every coordinate is a combination of the products
+`∏_i φ_{j_i}(x_i)`. -/
+theorem mem_span_prod_of_isForm [Nonempty ι] (hT : T.Reproduces) {g : (Fin d → ℝ) → ℂ}
+    (hg : BddMeas g) (hform : ∀ i, T.IsForm i g) :
+    g ∈ Submodule.span ℂ
+      (Set.range fun j : Fin d → ι => fun x => ∏ i, T.rangeFn (j i) (x i)) := by
+  classical
+  have hS : ∀ S : Finset (Fin d), g ∈ Submodule.span ℂ (T.partialTensor S) := by
+    intro S
+    induction S using Finset.induction_on with
+    | empty =>
+      refine Submodule.subset_span ⟨g, fun _ => Classical.arbitrary ι, hg,
+        fun x i hi => absurd hi (Finset.notMem_empty i), fun i _ => hform i, ?_⟩
+      funext x
+      simp
+    | insert a S ha ih => exact Submodule.span_le.2 (T.partialTensor_subset_span hT ha) ih
+  refine Submodule.span_le.2 ?_ (hS Finset.univ)
+  rintro G ⟨c, j, -, hci, -, rfl⟩
+  have hconst : ∀ x, c x = c 0 := fun x => by
+    have key : ∀ S : Finset (Fin d), c (S.piecewise 0 x) = c x := by
+      intro S
+      induction S using Finset.induction_on with
+      | empty => simp
+      | insert a S ha ih => rw [Finset.piecewise_insert, hci _ a (Finset.mem_univ a), ih]
+    have h := key Finset.univ
+    rw [Finset.piecewise_univ] at h
+    exact h.symm
+  have hG : (fun x => c x * ∏ i ∈ Finset.univ, T.rangeFn (j i) (x i)) =
+      c 0 • fun x => ∏ i, T.rangeFn (j i) (x i) := by
+    funext x
+    rw [hconst x]
+    rfl
+  rw [hG]
+  exact Submodule.smul_mem _ _ (Submodule.subset_span ⟨j, rfl⟩)
+
+/-- Products `∏_l φ_{j_l}(x_l)` have the form of `T` in every coordinate. -/
+theorem isForm_prod (j : Fin d → ι) (i : Fin d) :
+    T.IsForm i (fun x => ∏ l, T.rangeFn (j l) (x l)) := by
+  classical
+  refine ⟨fun m => if m = j i then (fun x => ∏ l ∈ Finset.univ.erase i, T.rangeFn (j l) (x l))
+    else 0, fun m => ?_, fun m x t => ?_, fun x => ?_⟩
+  · dsimp only
+    split_ifs
+    · exact bddMeas_prod_coord _ fun l _ => T.bddMeas_rangeFn (j l)
+    · exact bddMeas_zero
+  · dsimp only
+    split_ifs
+    · exact Finset.prod_congr rfl fun l hl => by
+        rw [Function.update_of_ne (Finset.ne_of_mem_erase hl)]
+    · rfl
+  · rw [Finset.sum_eq_single (j i) (fun m _ hm => by simp [hm])
+      (fun h => absurd (Finset.mem_univ _) h)]
+    simp only [↓reduceIte]
+    rw [Finset.prod_erase_mul _ _ (Finset.mem_univ i)]
+
+/-- **Tensor products have the forms**: combinations of products `∏_i φ_{j_i}(x_i)` are bounded
+and measurable and have the form of `T` in every coordinate. -/
+theorem isForm_of_mem_span_prod {g : (Fin d → ℝ) → ℂ}
+    (hg : g ∈ Submodule.span ℂ
+      (Set.range fun j : Fin d → ι => fun x => ∏ i, T.rangeFn (j i) (x i))) :
+    BddMeas g ∧ ∀ i, T.IsForm i g := by
+  induction hg using Submodule.span_induction with
+  | mem G hG =>
+    obtain ⟨j, rfl⟩ := hG
+    exact ⟨bddMeas_prod_coord _ fun l _ => T.bddMeas_rangeFn (j l), fun i => T.isForm_prod j i⟩
+  | zero => exact ⟨bddMeas_zero, fun i => T.isForm_zero i⟩
+  | add f g _ _ hf hg => exact ⟨hf.1.add hg.1, fun i => (hf.2 i).add _ (hg.2 i)⟩
+  | smul a f _ hf => exact ⟨hf.1.const_mul a, fun i => (hf.2 i).const_mul _ a⟩
 
 /-! ### Action in all coordinates -/
 
