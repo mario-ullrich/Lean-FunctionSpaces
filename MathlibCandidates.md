@@ -82,6 +82,14 @@ declarations.
   `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost everywhere (`Rd.iterDiff_conv_ae`); the modulus on a
   subset `U`, with the differences restricted to the points `x` with `x, …, x + rh ∈ U`
   (`Rd.modulusOn`, `FunctionSpaces/Rd/DomainModuli.lean`).
+* **Leibniz's rule for iterated forward differences** (`FunctionSpaces/Rd/Multipliers.lean`):
+  `Δ_h^r(u v)(x) = ∑_{l ≤ r} C(r, l) Δ_h^l u(x) Δ_h^(r-l) v(x + l h)` (`Rd.iterDiff_mul`); Mathlib
+  has only the one-step `fwdDiff_smul`. Also `‖Δ_h^l G(x)‖ ≤ ‖h‖^l sup ‖D^l G‖` for smooth `G`
+  (`Rd.norm_iterDiff_le_of_iteratedFDeriv`).
+* **Smooth resolutions of unity in a finite-dimensional space**
+  (`FunctionSpaces/Rd/BoundedLipschitz.lean`): `Rd.exists_smooth_partition`, with `ContDiff`
+  functions, from Mathlib's manifold version, and bounded derivatives of compactly supported smooth
+  functions (`Rd.exists_iteratedFDeriv_bound`).
 * **Multiplication by an indicator on `L_p`** (`FunctionSpaces/Rd/LipschitzGraph.lean`): for a
   measurable set `s`, `g ↦ 1_s g` as a continuous linear operator of norm at most `1` on
   `Lp ℂ p μ` (`Rd.indicatorLp`). Mathlib has `indicatorConstLp` for constant functions.

@@ -355,6 +355,18 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `Rd.LipschitzGraph.modNormOn_le_modNorm`, `Rd.LipschitzGraph.modNorm_extension_le_modNormOn`).
   The same condition describes the restrictions to `Ω` of the band-limited approximation spaces
   `A^s_q(L_p(V), (E_k))` (`Rd.LipschitzGraph.exists_memApprox_extension_iff`).
+* **Besov spaces on bounded Lipschitz domains by intrinsic differences.** Let `Ω ⊆ V` be a bounded
+  Lipschitz domain: a bounded open set whose boundary is covered by finitely many open balls `B_j`,
+  centred on the boundary, with `B_j ∩ Ω = B_j ∩ Ω_j` for Lipschitz graph domains `Ω_j`
+  (`Rd.BoundedLipschitzDomain`). For `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`, `f ∈ L_p(V)` agrees
+  on `Ω` with some `F ∈ L_p(V)` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
+  `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, and the same condition describes the
+  restrictions of the band-limited approximation spaces
+  (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`,
+  `Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff`). The proof pastes local versions of
+  Rychkov's extension (`Rd.LocalMeansBump.exists_local_extension`) with a smooth resolution of
+  unity; smooth functions with bounded derivatives are pointwise multipliers of the Besov spaces
+  by differences (`Rd.modNorm_mulLp_le`).
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -431,6 +443,9 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Lipschitz graph domains: cone, cone bump, support principle | ✅ proved | ✗ | `FunctionSpaces/Rd/LipschitzGraph.lean` |
 | Rychkov's extension, restrictions to Lipschitz graph domains by intrinsic local means | ✅ proved | ✗ | `FunctionSpaces/Rd/RychkovExtension.lean` |
 | Restrictions to Lipschitz graph domains by intrinsic differences | ✅ proved | ✗ | `FunctionSpaces/Rd/LipschitzGraphBesov.lean` |
+| Pointwise multipliers on `ℝ^d`: Leibniz's rule for differences, moduli of lower order | ✅ proved | ✗ | `FunctionSpaces/Rd/Multipliers.lean` |
+| Local versions of Rychkov's extension: boundary and inner patches | ✅ proved | ✗ | `FunctionSpaces/Rd/LocalExtension.lean` |
+| Bounded Lipschitz domains: restrictions by intrinsic differences | ✅ proved | ✗ | `FunctionSpaces/Rd/BoundedLipschitz.lean` |
 | Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
@@ -449,10 +464,11 @@ functions or measures. `FunctionSpaces` holds the Besov and Sobolev spaces built
 schemes of bounded continuous functions on a finite measure space and their embedding
 theorems, spectral schemes in Hilbert spaces, the torus with its traces and Lipschitz atoms,
 `ℝ^d` with convolution, approximate identities, Littlewood–Paley decompositions, moduli of
-smoothness and local means, Lipschitz graph domains with Rychkov's extension, filtration schemes for wavelets and multiwavelets, the classical definitions
-through moduli of smoothness and weak derivatives, and polynomial and piecewise polynomial
-approximation on intervals and on the cube `[0, 1]^d`. [MathlibCandidates.md](MathlibCandidates.md) lists what
-could be upstreamed.
+smoothness and local means, Lipschitz graph domains and bounded Lipschitz domains with Rychkov's
+extension and pointwise multipliers, filtration schemes for wavelets and multiwavelets, the
+classical definitions through moduli of smoothness and weak derivatives, and polynomial and
+piecewise polynomial approximation on intervals and on the cube `[0, 1]^d`.
+[MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 `blueprint/` holds the LaTeX source of the blueprint and the scripts that check and link its
 `\lean` references.
 
@@ -460,7 +476,7 @@ could be upstreamed.
 
 * **Reiteration** for approximation and interpolation spaces.
 * **Function spaces beyond the torus**: dominating mixed smoothness on `ℝ^d`, compact
-  manifolds, bounded Lipschitz domains and traces on their boundaries.
+  manifolds, traces on the boundaries of Lipschitz domains.
 * **Classical definitions for all `p`**: Sobolev spaces by weak derivatives and Besov spaces
   by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
 * **Higher smoothness**: splines on domains, and compactly supported wavelets such as

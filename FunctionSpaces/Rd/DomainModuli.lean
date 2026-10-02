@@ -42,6 +42,10 @@ def stepSet (U : Set V) (r : ℕ) (h : V) : Set V := {x | ∀ l ≤ r, x + (l : 
 theorem stepSet_subset (U : Set V) (r : ℕ) (h : V) : stepSet U r h ⊆ U := fun x hx => by
   simpa using hx 0 (Nat.zero_le r)
 
+/-- `U_{rh} ⊆ O_{rh}` for `U ⊆ O`. -/
+theorem stepSet_mono {U O : Set V} (hUO : U ⊆ O) (r : ℕ) (h : V) : stepSet U r h ⊆ stepSet O r h :=
+  fun _ hx l hl => hUO (hx l hl)
+
 /-- `V_{rh} = V`. -/
 @[simp]
 theorem stepSet_univ (r : ℕ) (h : V) : stepSet (Set.univ : Set V) r h = Set.univ :=
@@ -115,6 +119,14 @@ theorem modulusOn_le_modulus {U : Set V} (hU : MeasurableSet U) (r : ℕ) (p : �
 
 variable [μ.IsAddHaarMeasure]
 
+/-- **The modulus on a set grows with the set**: `ω_r(f, t, U)_p ≤ ω_r(f, t, O)_p` for `U ⊆ O`. -/
+theorem modulusOn_mono_set {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {U O : Set V}
+    (hU : MeasurableSet U) (hUO : U ⊆ O) (r : ℕ) (p : ℝ≥0∞) (t : ℝ) :
+    modulusOn μ U r p f t ≤ modulusOn μ O r p f t :=
+  iSup₂_mono fun h _ => eLpNorm_mono
+    ((aestronglyMeasurable_iterDiff hf r h).indicator (measurableSet_stepSet hU r h))
+    fun x => norm_indicator_le_of_subset (stepSet_mono hUO r h) _ x
+
 /-- `ω_r(f, t, U)_p ≤ 2^r ‖f‖_{L_p(U)}`. -/
 theorem modulusOn_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {U : Set V}
     (hU : MeasurableSet U) {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) (t : ℝ) :
@@ -159,6 +171,11 @@ omit [μ.IsAddHaarMeasure] in
 theorem lpModulusOn_le_lpModulus [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet U) (r : ℕ)
     (f : Lp ℂ p μ) (k : ℕ) : lpModulusOn p U r f k ≤ lpModulus p r f k :=
   modulusOn_le_modulus hU r p _ _
+
+/-- The modulus on a set at the dyadic scales grows with the set. -/
+theorem lpModulusOn_mono_set {U O : Set V} (hU : MeasurableSet U) (hUO : U ⊆ O) (r : ℕ)
+    (f : Lp ℂ p μ) (k : ℕ) : lpModulusOn p U r f k ≤ lpModulusOn p O r f k :=
+  modulusOn_mono_set (Lp.aestronglyMeasurable f) hU hUO r p _
 
 /-- Elements of `L_p` that agree on `U` have the same moduli on `U`. -/
 theorem lpModulusOn_congr {U : Set V} {f g : Lp ℂ p μ}

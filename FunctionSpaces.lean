@@ -88,6 +88,9 @@ public import FunctionSpaces.Rd.LocalMeans
 public import FunctionSpaces.Rd.LipschitzGraph
 public import FunctionSpaces.Rd.RychkovExtension
 public import FunctionSpaces.Rd.LipschitzGraphBesov
+public import FunctionSpaces.Rd.Multipliers
+public import FunctionSpaces.Rd.LocalExtension
+public import FunctionSpaces.Rd.BoundedLipschitz
 
 /-!
 # Function spaces
@@ -268,4 +271,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   Rychkov's extension, and the restrictions of Besov spaces described by intrinsic local means.
 * `FunctionSpaces.Rd.LipschitzGraphBesov`: the restrictions of Besov spaces to Lipschitz graph
   domains described by intrinsic differences.
+* `FunctionSpaces.Rd.Multipliers`: Leibniz's rule for differences and pointwise multipliers of
+  the Besov spaces by differences.
+* `FunctionSpaces.Rd.LocalExtension`: local versions of Rychkov's extension, for boundary patches
+  of Lipschitz graph domains and for inner patches.
+* `FunctionSpaces.Rd.BoundedLipschitz`: bounded Lipschitz domains, smooth resolutions of unity, and
+  the restrictions of Besov spaces described by intrinsic differences.
 -/

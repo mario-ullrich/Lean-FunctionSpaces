@@ -26,9 +26,9 @@ order `L`:
 for `f ∈ L_p` and almost every `x` (`Rd.ae_sub_conv_dilate_momentKernel_eq`). The moments of `m`
 of the orders `1, …, L - 1` vanish; the estimates below go through the averaged differences
 instead. If `g` vanishes outside the ball of radius `R`, then
-`‖f - m_c ⋆ f‖_p ≤ ‖g‖_1 ω_L(f, R/c)_p` (`Rd.enorm_sub_convLp_momentKernel_le`), and on a set `U`
-that the steps `-c^(-1) z`, `g(z) ≠ 0`, keep inside, `‖1_U (f - m_c ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, R/c, U)_p`
-(`Rd.eLpNorm_indicator_sub_convLp_momentKernel_le`).
+`‖f - m_c ⋆ f‖_p ≤ ‖g‖_1 ω_L(f, R/c)_p` (`Rd.enorm_sub_convLp_momentKernel_le`), and if the steps
+`-c^(-1) z`, `g(z) ≠ 0`, take a set `U` into a set `T`, then
+`‖1_U (f - m_c ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, R/c, T)_p` (`Rd.eLpNorm_indicator_sub_convLp_momentKernel_le`).
 -/
 
 @[expose] public section
@@ -219,23 +219,23 @@ theorem ae_sub_conv_dilate_momentKernel_eq {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp 
 
 /-- **Moment kernels approximate with the modulus on a set**: let `g` have integral `1` and vanish
 outside the ball of radius `R`, and let `U` be a measurable set that the steps of the averaged
-differences keep inside, `U ⊆ U_{L h}` for `h = -c^(-1) z` and `g(z) ≠ 0`. Then
-`‖1_U (f - m_c ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, R/c, U)_p`, by the averaged differences and the weighted
-Jensen inequality. -/
+differences take into a measurable set `T`, `U ⊆ T_{L h}` for `h = -c^(-1) z` and
+`g(z) ≠ 0`. Then `‖1_U (f - m_c ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, R/c, T)_p`, by the averaged differences
+and the weighted Jensen inequality. -/
 theorem eLpNorm_indicator_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞)
     {g : V → ℂ} (hg : Integrable g μ) (h1 : ∫ x, g x ∂μ = 1) {R : ℝ}
     (hgR : ∀ z, R < ‖z‖ → g z = 0) (L : ℕ) {c : ℝ} (hc : 0 < c) {U : Set V}
-    (hU : MeasurableSet U) (hstep : ∀ z, g z ≠ 0 → U ⊆ stepSet U L (-c⁻¹ • z))
+    (hU : MeasurableSet U) {T : Set V} (hstep : ∀ z, g z ≠ 0 → U ⊆ stepSet T L (-c⁻¹ • z))
     (f : Lp ℂ p μ) :
     eLpNorm (U.indicator
         ⇑(f - convLp hp (integrable_dilate (integrable_momentKernel hg L) hc.ne') f)) p μ ≤
-      (∫⁻ z, ‖g z‖ₑ ∂μ) * modulusOn μ U L p (f : V → ℂ) (R / c) := by
+      (∫⁻ z, ‖g z‖ₑ ∂μ) * modulusOn μ T L p (f : V → ℂ) (R / c) := by
   have hp1 : 1 ≤ p := Fact.out
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   have hfm : Measurable (f : V → ℂ) := (Lp.stronglyMeasurable f).measurable
   set A := ∫⁻ z, ‖g z‖ₑ ∂μ with hA
-  set ω := modulusOn μ U L p (f : V → ℂ) (R / c)
+  set ω := modulusOn μ T L p (f : V → ℂ) (R / c)
   set G : V → V → ℂ := fun x z =>
     U.indicator (fun x => (-1 : ℂ) ^ L * (fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ) x) x with hGdef
   have hG : Measurable (Function.uncurry G) := by
@@ -276,8 +276,6 @@ theorem eLpNorm_indicator_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 �
       have hnorm : ‖-c⁻¹ • z‖ ≤ R / c := by
         rw [norm_smul, norm_neg, norm_inv, Real.norm_of_nonneg hc.le, inv_mul_eq_div]
         exact div_le_div_of_nonneg_right hzR hc.le
-      have hS : stepSet U L (-c⁻¹ • z) = U :=
-        Set.Subset.antisymm (stepSet_subset U L _) (hstep z hz)
       have hD := (aestronglyMeasurable_iterDiff (Lp.aestronglyMeasurable f) L
         (-c⁻¹ • z)).indicator hU
       have heq : eLpNorm (fun x => G x z) p μ =
@@ -289,8 +287,10 @@ theorem eLpNorm_indicator_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 �
         · simp [G, Set.indicator_of_notMem hx]
       gcongr
       calc eLpNorm (fun x => G x z) p μ
-          = eLpNorm ((stepSet U L (-c⁻¹ • z)).indicator
-              ((fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ))) p μ := by rw [heq, hS]
+          = eLpNorm (U.indicator ((fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ))) p μ := heq
+        _ ≤ eLpNorm ((stepSet T L (-c⁻¹ • z)).indicator
+              ((fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ))) p μ :=
+            eLpNorm_mono hD fun x => norm_indicator_le_of_subset (hstep z hz) _ x
         _ ≤ ω := eLpNorm_indicator_iterDiff_le_modulusOn hnorm
   have hA0 : A ≠ 0 := lintegral_enorm_ne_zero_of_integral_eq_one hg h1
   have hAt : A ≠ ∞ := hg.2.ne
@@ -313,7 +313,7 @@ theorem enorm_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp :
     ‖f - convLp hp (integrable_dilate (integrable_momentKernel hg L) hc.ne') f‖ₑ ≤
       (∫⁻ z, ‖g z‖ₑ ∂μ) * modulus μ L p (f : V → ℂ) (R / c) := by
   have h := eLpNorm_indicator_sub_convLp_momentKernel_le hp hg h1 hgR L hc MeasurableSet.univ
-    (fun _ _ => by rw [stepSet_univ]) f
+    (T := Set.univ) (fun _ _ => by rw [stepSet_univ]) f
   rwa [Set.indicator_univ, modulusOn_univ, ← Lp.enorm_def] at h
 
 end Rd
