@@ -22,13 +22,15 @@ piecewise polynomials of level `k` and degree `< r` is bounded by the modulus of
 
 For `k ≥ 1` the proof needs no Whitney theorem. For continuous `f`, the Steklov smoothing of
 `Interval.exists_left_smoothing` is close to `f`, its `r`-th derivative is bounded by `2^(kr)`
-times the modulus, and on each dyadic interval it is approximated by a Taylor polynomial. The
-smoothing looks to the right of `x`, so this argument covers `[0, 1/2]`
-(`Interval.exists_left_approx`); the reflection `x ↦ 1 - x` preserves the modulus and gives
-`[1/2, 1]` (`Interval.exists_right_approx`). The point `1/2` is a knot of every level `k ≥ 1`,
-which is why `k ≥ 1` in this part of the argument. General `f ∈ L_p` follow by density of
-bounded continuous functions (`Interval.approxSeq_le_of_continuous`, which serves every scheme in
-`L_p[0, 1]`).
+times the modulus, and on each dyadic interval it is approximated by a Taylor polynomial
+(`Interval.exists_taylor_pieces`). The smoothing looks to the right of `x`, so it serves
+`[0, 1/2]`; its reflection `Interval.exists_right_smoothing` serves `[1/2, 1]`. The Taylor
+polynomials of both halves form one piecewise polynomial
+(`Interval.exists_ppFun_approx_of_taylor`, stated for any function and any two smoothings, so
+that the slices of functions on the cube use it too). The point `1/2` is a knot of every level
+`k ≥ 1`, which is why `k ≥ 1` in this part of the argument. General `f ∈ L_p` follow by density
+of bounded continuous functions (`Interval.approxSeq_le_of_continuous`, which serves every scheme
+in `L_p[0, 1]`).
 -/
 
 @[expose] public section
@@ -50,168 +52,170 @@ theorem jacksonConst_ne_top (r : ℕ) : jacksonConst r ≠ ∞ := by
   exact ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top (by simp)
     (ENNReal.pow_ne_top (ENNReal.natCast_ne_top r))⟩
 
-/-- **Local Jackson estimate on the left half**: for continuous `F` there are polynomials `Q_n`
-of degree `< r` such that every function `S` equal to `Q_n` on the open dyadic intervals of level
-`k + 1` in `[0, 1/2]` satisfies
-`‖F - S‖_{L_p[0, 1/2]} ≤ (1 + 2^r r^(2r)) ω_r(F, 2^(-(k+1)), [0, 1])_p`.
-The proof smooths `F` (`Interval.exists_left_smoothing` with `L = 2^(-(k+1))`) and approximates
-the smoothing by Taylor polynomials on each dyadic interval. -/
-theorem exists_left_approx {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr : 1 ≤ r) {p : ℝ≥0∞}
-    (hp : 1 ≤ p) (hp' : p ≠ ∞) (k : ℕ) :
-    ∃ Q : ℕ → ℂ[X], (∀ n, Q n ∈ degreeLT ℂ r) ∧ ∀ S : ℝ → ℂ, Measurable S →
-      (∀ n : ℕ, n < 2 ^ k → ∀ x ∈ Ioo ((n : ℝ) / 2 ^ (k + 1)) ((n + 1) / 2 ^ (k + 1)),
-        S x = polyFun (Q n) x) →
-      eLpNorm (fun x => F x - S x) p (volume.restrict (Icc 0 (1 / 2))) ≤
-        jacksonConst r * modulus r p 0 1 F (1 / 2 ^ (k + 1)) := by
-  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp).ne'
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp'
-  set L : ℝ := 1 / 2 ^ (k + 1) with hLdef
-  have hL : 0 < L := by positivity
-  have hL2 : (2 ^ k : ℕ) * L = 1 / 2 := by
-    rw [hLdef]; push_cast; field_simp; ring
-  have hwL : (1 / 2 : ℝ) + L ≤ 1 := by
-    have : L ≤ 1 / 2 := by
-      rw [hLdef, div_le_div_iff₀ (by positivity) (by norm_num), one_mul, one_mul]
-      calc (2 : ℝ) = 2 ^ 1 := by norm_num
-        _ ≤ 2 ^ (k + 1) := pow_le_pow_right₀ (by norm_num) (by omega)
-    linarith
-  obtain ⟨g, D, hgm, hDm, h1, h2, hT⟩ := exists_left_smoothing hF hr hp hp' hL hwL
-  choose Q hQ hQb using fun n : ℕ => hT (n * L) ((n + 1) * L) (by nlinarith)
-  refine ⟨Q, hQ, fun S hS hSQ => ?_⟩
-  set ω := modulus r p 0 1 F L
-  -- the Taylor error, summed over the dyadic intervals
-  have h3 : eLpNorm (fun x => g x - S x) p (volume.restrict (Icc 0 (1 / 2))) ≤
-      ENNReal.ofReal L ^ r * eLpNorm D p (volume.restrict (Icc 0 (1 / 2))) := by
-    refine eLpNorm_le_of_lintegral_le (hgm.sub hS).aestronglyMeasurable hp0 hp' ?_
-    have hsplit := lintegral_Icc_le_sum (fun x => ‖g x - S x‖ₑ ^ p.toReal) 0 hL.le (2 ^ k)
-    rw [zero_add, hL2] at hsplit
-    refine hsplit.trans ?_
-    have hpiece : ∀ n ∈ Finset.range (2 ^ k),
-        ∫⁻ x in Icc (0 + n * L) (0 + (n + 1) * L), ‖g x - S x‖ₑ ^ p.toReal ≤
-          (ENNReal.ofReal L ^ r) ^ p.toReal *
-            ∫⁻ x in Icc (0 + n * L) (0 + (n + 1) * L), ‖D x‖ₑ ^ p.toReal :=
-      fun n hn => by
-        simp only [zero_add]
-        have hae : ∀ᵐ x ∂volume.restrict (Icc (n * L) ((n + 1) * L)),
-            ‖g x - S x‖ₑ ^ p.toReal = ‖g x - polyFun (Q n) x‖ₑ ^ p.toReal := by
-          rw [← Measure.restrict_congr_set Ioo_ae_eq_Icc]
-          filter_upwards [ae_restrict_mem measurableSet_Ioo] with x hx
-          rw [hSQ n (Finset.mem_range.1 hn) x (by
-            constructor
-            · rw [hLdef] at hx; have := hx.1; field_simp at this ⊢; linarith
-            · rw [hLdef] at hx; have := hx.2; field_simp at this ⊢; linarith)]
-        rw [lintegral_congr_ae hae, ← eLpNorm_rpow_eq (g := fun x => g x - polyFun (Q n) x)
-          ((hgm.sub (measurable_polyFun _)).aestronglyMeasurable) hp0 hp',
-          ← eLpNorm_rpow_eq hDm.aestronglyMeasurable hp0 hp',
-          ← ENNReal.mul_rpow_of_nonneg _ _ hq.le]
-        have hlen : ((n : ℝ) + 1) * L - n * L = L := by ring
-        have hb := hQb n
-        rw [hlen] at hb
-        exact ENNReal.rpow_le_rpow hb hq.le
-    refine (Finset.sum_le_sum hpiece).trans ?_
-    rw [← Finset.mul_sum, ENNReal.mul_rpow_of_nonneg _ _ hq.le,
-      eLpNorm_rpow_eq hDm.aestronglyMeasurable hp0 hp']
-    gcongr
-    have := sum_le_lintegral_Icc (G := fun x => ‖D x‖ₑ ^ p.toReal) 0 hL.le (2 ^ k)
-    rw [zero_add, hL2] at this
-    exact this
+/-- The bound of a smoothing and of its Taylor remainders at scale `L` combine to the local
+Jackson constant: `a ≤ ω` and `b ≤ L^(-r) 2^r r^(2r) ω` give `a + L^r b ≤ (1 + 2^r r^(2r)) ω`. -/
+theorem add_ofReal_pow_mul_le_jacksonConst {L : ℝ} (hL : 0 < L) (r : ℕ) {a b ω : ℝ≥0∞}
+    (ha : a ≤ ω) (hb : b ≤ ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω) :
+    a + ENNReal.ofReal L ^ r * b ≤ jacksonConst r * ω := by
   have hLL : ENNReal.ofReal L * ENNReal.ofReal L⁻¹ = 1 := by
     rw [← ENNReal.ofReal_mul hL.le, mul_inv_cancel₀ hL.ne', ENNReal.ofReal_one]
-  calc eLpNorm (fun x => F x - S x) p (volume.restrict (Icc 0 (1 / 2)))
-      = eLpNorm ((fun x => F x - g x) + fun x => g x - S x) p
-          (volume.restrict (Icc 0 (1 / 2))) := by congr 1; funext x; simp
-    _ ≤ eLpNorm (fun x => F x - g x) p (volume.restrict (Icc 0 (1 / 2))) +
-          eLpNorm (fun x => g x - S x) p (volume.restrict (Icc 0 (1 / 2))) :=
-        eLpNorm_add_le hp
-    _ ≤ ω + ENNReal.ofReal L ^ r * (ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω) :=
-        add_le_add h1 (h3.trans (by gcongr))
+  calc a + ENNReal.ofReal L ^ r * b
+      ≤ ω + ENNReal.ofReal L ^ r * (ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω) :=
+        add_le_add ha (mul_le_mul' le_rfl hb)
     _ = ω + (ENNReal.ofReal L * ENNReal.ofReal L⁻¹) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω := by
         rw [mul_pow]; ring
     _ = jacksonConst r * ω := by rw [hLL, one_pow, one_mul, jacksonConst]; ring
 
-/-- **Local Jackson estimate on the right half**, by reflection: for continuous `F` there are
-polynomials `Q_n` of degree `< r` such that every `S` with `S(1 - x) = Q_n(x)` on the open
-dyadic intervals of level `k + 1` in `[0, 1/2]` satisfies
-`‖F - S‖_{L_p[1/2, 1]} ≤ (1 + 2^r r^(2r)) ω_r(F, 2^(-(k+1)), [0, 1])_p`. -/
-theorem exists_right_approx {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr : 1 ≤ r) {p : ℝ≥0∞}
-    (hp : 1 ≤ p) (hp' : p ≠ ∞) (k : ℕ) :
+/-- The half `[0, 1/2]` and the scale `2^(-(k+1))` fit into `[0, 1]`: `1/2 + 2^(-(k+1)) ≤ 1`. -/
+theorem one_half_add_le_one (k : ℕ) : (1 / 2 : ℝ) + 1 / 2 ^ (k + 1) ≤ 1 := by
+  have : (1 : ℝ) / 2 ^ (k + 1) ≤ 1 / 2 := by
+    rw [div_le_div_iff₀ (by positivity) (by norm_num), one_mul, one_mul]
+    calc (2 : ℝ) = 2 ^ 1 := by norm_num
+      _ ≤ 2 ^ (k + 1) := pow_le_pow_right₀ (by norm_num) (by omega)
+  linarith
+
+/-- **Taylor polynomials on consecutive intervals**: let `g` have on every interval `[u, v]` a
+polynomial `T` of degree `< r` with `‖g - T‖_{L_p[u, v]} ≤ (v - u)^r ‖D‖_{L_p[u, v]}`. For the
+intervals `[a + nL, a + (n + 1)L]`, `n < N`, there are such polynomials `Q_n`, and every
+measurable `S` equal to `Q_n` on the open intervals satisfies
+`‖g - S‖_{L_p[a, a + NL]} ≤ L^r ‖D‖_{L_p[a, a + NL]}`: the `p`-th powers of the local errors add
+up. -/
+theorem exists_taylor_pieces {g D : ℝ → ℂ} (hg : Measurable g) (hD : Measurable D) {r : ℕ}
+    {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp' : p ≠ ∞)
+    (hT : ∀ u v : ℝ, u ≤ v → ∃ T ∈ degreeLT ℂ r,
+      eLpNorm (fun x => g x - polyFun T x) p (volume.restrict (Icc u v)) ≤
+        ENNReal.ofReal (v - u) ^ r * eLpNorm D p (volume.restrict (Icc u v)))
+    (a : ℝ) {L : ℝ} (hL : 0 ≤ L) (N : ℕ) :
     ∃ Q : ℕ → ℂ[X], (∀ n, Q n ∈ degreeLT ℂ r) ∧ ∀ S : ℝ → ℂ, Measurable S →
-      (∀ n : ℕ, n < 2 ^ k → ∀ x ∈ Ioo ((n : ℝ) / 2 ^ (k + 1)) ((n + 1) / 2 ^ (k + 1)),
-        S (1 - x) = polyFun (Q n) x) →
-      eLpNorm (fun x => F x - S x) p (volume.restrict (Icc (1 / 2) 1)) ≤
-        jacksonConst r * modulus r p 0 1 F (1 / 2 ^ (k + 1)) := by
-  have hF' : Continuous fun x => F (1 - x) := hF.comp (continuous_const.sub continuous_id)
-  obtain ⟨Q, hQ, hQS⟩ := exists_left_approx hF' hr hp hp' k
+      (∀ n < N, ∀ x ∈ Ioo (a + n * L) (a + (n + 1) * L), S x = polyFun (Q n) x) →
+      eLpNorm (fun x => g x - S x) p (volume.restrict (Icc a (a + N * L))) ≤
+        ENNReal.ofReal L ^ r * eLpNorm D p (volume.restrict (Icc a (a + N * L))) := by
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp'
+  choose Q hQ hQb using fun n : ℕ => hT (a + n * L) (a + (n + 1) * L) (by nlinarith)
   refine ⟨Q, hQ, fun S hS hSQ => ?_⟩
-  have hS' : Measurable fun x => S (1 - x) := hS.comp (measurable_const.sub measurable_id)
-  have h := hQS (fun x => S (1 - x)) hS' hSQ
-  have hrefl : eLpNorm (fun x => F x - S x) p (volume.restrict (Icc (1 / 2) 1)) =
-      eLpNorm (fun x => F (1 - x) - S (1 - x)) p (volume.restrict (Icc 0 (1 / 2))) := by
-    rw [eLpNorm_comp_sub_Icc (f := fun x => F x - S x) (hF.measurable.sub hS) p 1 0 (1 / 2)]
-    norm_num
-  have hmod : modulus r p 0 1 (fun x => F (1 - x)) (1 / 2 ^ (k + 1)) =
-      modulus r p 0 1 F (1 / 2 ^ (k + 1)) := by
-    have := modulus_reflect hF.measurable r p 0 1 (1 / 2 ^ (k + 1))
-    simpa using this
-  rw [hrefl, ← hmod]
-  exact h
+  refine eLpNorm_le_of_lintegral_le (hg.sub hS).aestronglyMeasurable hp0 hp' ?_
+  refine (lintegral_Icc_le_sum (fun x => ‖g x - S x‖ₑ ^ p.toReal) a hL N).trans ?_
+  have hpiece : ∀ n ∈ Finset.range N,
+      ∫⁻ x in Icc (a + n * L) (a + (n + 1) * L), ‖g x - S x‖ₑ ^ p.toReal ≤
+        (ENNReal.ofReal L ^ r) ^ p.toReal *
+          ∫⁻ x in Icc (a + n * L) (a + (n + 1) * L), ‖D x‖ₑ ^ p.toReal := fun n hn => by
+    have hae : ∀ᵐ x ∂volume.restrict (Icc (a + n * L) (a + (n + 1) * L)),
+        ‖g x - S x‖ₑ ^ p.toReal = ‖g x - polyFun (Q n) x‖ₑ ^ p.toReal := by
+      rw [← Measure.restrict_congr_set Ioo_ae_eq_Icc]
+      filter_upwards [ae_restrict_mem measurableSet_Ioo] with x hx
+      rw [hSQ n (Finset.mem_range.1 hn) x hx]
+    rw [lintegral_congr_ae hae, ← eLpNorm_rpow_eq (g := fun x => g x - polyFun (Q n) x)
+      ((hg.sub (measurable_polyFun _)).aestronglyMeasurable) hp0 hp',
+      ← eLpNorm_rpow_eq hD.aestronglyMeasurable hp0 hp', ← ENNReal.mul_rpow_of_nonneg _ _ hq.le]
+    have hb := hQb n
+    rw [show a + (n + 1) * L - (a + n * L) = L by ring] at hb
+    exact ENNReal.rpow_le_rpow hb hq.le
+  refine (Finset.sum_le_sum hpiece).trans ?_
+  rw [← Finset.mul_sum, ENNReal.mul_rpow_of_nonneg _ _ hq.le,
+    eLpNorm_rpow_eq hD.aestronglyMeasurable hp0 hp']
+  gcongr
+  exact sum_le_lintegral_Icc a hL N
+
+/-- **Piecewise Taylor approximation on the two halves of `[0, 1]`**: let `g_L` and `g_R` have
+Taylor polynomials of degree `< r` on every interval, with remainders controlled by `D_L` and
+`D_R` as in `Interval.exists_taylor_pieces`. For every measurable `u` and every `k` there is a
+piecewise polynomial `S` of level `k + 1` and degree `< r`, made of Taylor polynomials of `g_L`
+on `[0, 1/2]` and of `g_R` on `[1/2, 1]`, with
+`‖u - S‖_{L_p[0, 1]} ≤ (‖u - g_L‖_{L_p[0, 1/2]} + L^r ‖D_L‖_{L_p[0, 1/2]}) + (‖u - g_R‖_{L_p[1/2, 1]} + L^r ‖D_R‖_{L_p[1/2, 1]})`,
+`L = 2^(-(k+1))`. The point `1/2` is a knot of level `k + 1`. -/
+theorem exists_ppFun_approx_of_taylor {u gL DL gR DR : ℝ → ℂ} (hu : Measurable u)
+    (hgL : Measurable gL) (hDL : Measurable DL) (hgR : Measurable gR) (hDR : Measurable DR)
+    {r : ℕ} {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞)
+    (hTL : ∀ a b : ℝ, a ≤ b → ∃ T ∈ degreeLT ℂ r,
+      eLpNorm (fun x => gL x - polyFun T x) p (volume.restrict (Icc a b)) ≤
+        ENNReal.ofReal (b - a) ^ r * eLpNorm DL p (volume.restrict (Icc a b)))
+    (hTR : ∀ a b : ℝ, a ≤ b → ∃ T ∈ degreeLT ℂ r,
+      eLpNorm (fun x => gR x - polyFun T x) p (volume.restrict (Icc a b)) ≤
+        ENNReal.ofReal (b - a) ^ r * eLpNorm DR p (volume.restrict (Icc a b)))
+    (k : ℕ) :
+    ∃ Q : ℕ → ℂ[X], (∀ n, Q n ∈ degreeLT ℂ r) ∧
+      eLpNorm (fun x => u x - ppFun (k + 1) Q x) p unitVol ≤
+        (eLpNorm (fun x => u x - gL x) p (volume.restrict (Icc 0 (1 / 2))) +
+          ENNReal.ofReal (1 / 2 ^ (k + 1)) ^ r * eLpNorm DL p (volume.restrict (Icc 0 (1 / 2)))) +
+        (eLpNorm (fun x => u x - gR x) p (volume.restrict (Icc (1 / 2) 1)) +
+          ENNReal.ofReal (1 / 2 ^ (k + 1)) ^ r * eLpNorm DR p (volume.restrict (Icc (1 / 2) 1))) := by
+  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp).ne'
+  set L : ℝ := 1 / 2 ^ (k + 1) with hLdef
+  have hL : 0 < L := by positivity
+  have hL2 : ((2 ^ k : ℕ) : ℝ) * L = 1 / 2 := by
+    rw [hLdef]; push_cast; rw [pow_succ]; field_simp
+  obtain ⟨Ql, hQl, hl⟩ := exists_taylor_pieces hgL hDL hp0 hp' hTL 0 hL.le (2 ^ k)
+  obtain ⟨Qr, hQr, hrt⟩ := exists_taylor_pieces hgR hDR hp0 hp' hTR (1 / 2) hL.le (2 ^ k)
+  rw [zero_add, hL2] at hl
+  rw [hL2, show (1 / 2 : ℝ) + 1 / 2 = 1 by norm_num] at hrt
+  set Q : ℕ → ℂ[X] := fun m => if m < 2 ^ k then Ql m else Qr (m - 2 ^ k)
+  have hQ : ∀ m, Q m ∈ degreeLT ℂ r := fun m => by
+    simp only [Q]
+    split_ifs
+    · exact hQl m
+    · exact hQr _
+  refine ⟨Q, hQ, ?_⟩
+  have hSm : Measurable (ppFun (k + 1) Q) := measurable_ppFun _ _
+  have hleft : ∀ n : ℕ, n < 2 ^ k → ∀ x ∈ Ioo (0 + n * L) (0 + (n + 1) * L),
+      ppFun (k + 1) Q x = polyFun (Ql n) x := fun n hn x hx => by
+    have hn' : n < 2 ^ (k + 1) := lt_of_lt_of_le hn (Nat.pow_le_pow_right two_pos (Nat.le_succ k))
+    have hmem : x ∈ dyadicIco (k + 1) n := by
+      rw [hLdef, zero_add, zero_add, mul_one_div, mul_one_div] at hx
+      exact Ioo_subset_Ico_self hx
+    rw [ppFun_eq_of_mem Q hn' hmem]
+    simp only [Q, hn, ↓reduceIte]
+  have hright : ∀ n : ℕ, n < 2 ^ k → ∀ x ∈ Ioo (1 / 2 + n * L) (1 / 2 + (n + 1) * L),
+      ppFun (k + 1) Q x = polyFun (Qr n) x := fun n hn x hx => by
+    have hm : 2 ^ k + n < 2 ^ (k + 1) := by rw [pow_succ]; omega
+    have hmem : x ∈ dyadicIco (k + 1) (2 ^ k + n) := by
+      have e1 : (1 / 2 : ℝ) + n * L = ((2 ^ k + n : ℕ) : ℝ) / 2 ^ (k + 1) := by
+        rw [hLdef]; push_cast; rw [pow_succ]; field_simp
+      have e2 : (1 / 2 : ℝ) + (n + 1) * L = (((2 ^ k + n : ℕ) : ℝ) + 1) / 2 ^ (k + 1) := by
+        rw [hLdef]; push_cast; rw [pow_succ]; field_simp; ring
+      rw [e1, e2] at hx
+      exact Ioo_subset_Ico_self hx
+    rw [ppFun_eq_of_mem Q hm hmem]
+    simp only [Q, show ¬ (2 ^ k + n < 2 ^ k) by omega, ↓reduceIte, Nat.add_sub_cancel_left]
+  have hL' := hl _ hSm hleft
+  have hR' := hrt _ hSm hright
+  have hsplit : ∀ {a b : ℝ} {g : ℝ → ℂ}, Measurable g →
+      eLpNorm (fun x => u x - ppFun (k + 1) Q x) p (volume.restrict (Icc a b)) ≤
+        eLpNorm (fun x => u x - g x) p (volume.restrict (Icc a b)) +
+          eLpNorm (fun x => g x - ppFun (k + 1) Q x) p (volume.restrict (Icc a b)) :=
+    fun {a b g} _ => by
+      calc eLpNorm (fun x => u x - ppFun (k + 1) Q x) p (volume.restrict (Icc a b))
+          = eLpNorm ((fun x => u x - g x) + fun x => g x - ppFun (k + 1) Q x) p
+              (volume.restrict (Icc a b)) := by congr 1; funext x; simp
+        _ ≤ _ := eLpNorm_add_le hp
+  calc eLpNorm (fun x => u x - ppFun (k + 1) Q x) p unitVol
+      ≤ eLpNorm (fun x => u x - ppFun (k + 1) Q x) p (volume.restrict (Icc 0 (1 / 2))) +
+          eLpNorm (fun x => u x - ppFun (k + 1) Q x) p (volume.restrict (Icc (1 / 2) 1)) :=
+        eLpNorm_Icc_split (hu.sub hSm) hp hp' (by norm_num) (by norm_num)
+    _ ≤ _ := add_le_add ((hsplit hgL).trans (add_le_add le_rfl hL'))
+        ((hsplit hgR).trans (add_le_add le_rfl hR'))
 
 /-- **Jackson's estimate for continuous functions**: for continuous `F` and `k ≥ 0` there is a
 piecewise polynomial `S` of level `k + 1` and degree `< r` with
-`‖F - S‖_{L_p[0,1]} ≤ 2 (1 + 2^r r^(2r)) ω_r(F, 2^(-(k+1)), [0, 1])_p`. -/
+`‖F - S‖_{L_p[0,1]} ≤ 2 (1 + 2^r r^(2r)) ω_r(F, 2^(-(k+1)), [0, 1])_p`. The smoothings of
+`Interval.exists_left_smoothing` and `Interval.exists_right_smoothing` with `L = 2^(-(k+1))`
+enter `Interval.exists_ppFun_approx_of_taylor`. -/
 theorem exists_ppFun_approx {F : ℝ → ℂ} (hF : Continuous F) {r : ℕ} (hr : 1 ≤ r) {p : ℝ≥0∞}
     (hp : 1 ≤ p) (hp' : p ≠ ∞) (k : ℕ) :
     ∃ Q : ℕ → ℂ[X], (∀ n, Q n ∈ degreeLT ℂ r) ∧
       eLpNorm (fun x => F x - ppFun (k + 1) Q x) p unitVol ≤
         2 * jacksonConst r * modulus r p 0 1 F (1 / 2 ^ (k + 1)) := by
-  obtain ⟨Ql, hQl, hl⟩ := exists_left_approx hF hr hp hp' k
-  obtain ⟨Qr, hQr, hrt⟩ := exists_right_approx hF hr hp hp' k
-  set Q : ℕ → ℂ[X] := fun m => if m < 2 ^ k then Ql m else
-    (Qr (2 ^ (k + 1) - 1 - m)).comp (C ((1 : ℝ) : ℂ) + C ((-1 : ℝ) : ℂ) * X)
-  have hQ : ∀ m, Q m ∈ degreeLT ℂ r := fun m => by
-    simp only [Q]
-    split_ifs
-    · exact hQl m
-    · exact comp_affine_mem_degreeLT (hQr _) _ _
-  refine ⟨Q, hQ, ?_⟩
-  have hSm : Measurable (ppFun (k + 1) Q) := measurable_ppFun _ _
-  have h2 : (2 : ℝ) ^ (k + 1) = 2 * 2 ^ k := by ring
-  have hleft : ∀ n : ℕ, n < 2 ^ k → ∀ x ∈ Ioo ((n : ℝ) / 2 ^ (k + 1)) ((n + 1) / 2 ^ (k + 1)),
-      ppFun (k + 1) Q x = polyFun (Ql n) x := fun n hn x hx => by
-    have hn' : n < 2 ^ (k + 1) := lt_of_lt_of_le hn (Nat.pow_le_pow_right two_pos (Nat.le_succ k))
-    rw [ppFun_eq_of_mem Q hn' (Ioo_subset_Ico_self hx)]
-    simp [Q, hn]
-  have hright : ∀ n : ℕ, n < 2 ^ k → ∀ x ∈ Ioo ((n : ℝ) / 2 ^ (k + 1)) ((n + 1) / 2 ^ (k + 1)),
-      ppFun (k + 1) Q (1 - x) = polyFun (Qr n) x := fun n hn x hx => by
-    have hk2 : 2 ^ (k + 1) = 2 * 2 ^ k := by ring
-    have hm : 2 ^ (k + 1) - 1 - n < 2 ^ (k + 1) := by omega
-    have hm' : ¬ (2 ^ (k + 1) - 1 - n < 2 ^ k) := by omega
-    have hmn : 2 ^ (k + 1) - 1 - (2 ^ (k + 1) - 1 - n) = n := by omega
-    have hpos : (0 : ℝ) < 2 ^ (k + 1) := by positivity
-    have hmem : 1 - x ∈ dyadicIco (k + 1) (2 ^ (k + 1) - 1 - n) := by
-      rw [mem_dyadicIco]
-      have hcast : ((2 ^ (k + 1) - 1 - n : ℕ) : ℝ) = 2 ^ (k + 1) - 1 - n := by
-        rw [Nat.cast_sub (by omega), Nat.cast_sub (by omega)]; push_cast; ring
-      rw [hcast]
-      have h1 := hx.1
-      have h2' := hx.2
-      rw [div_lt_iff₀ hpos] at h1
-      rw [lt_div_iff₀ hpos] at h2'
-      constructor <;> nlinarith
-    rw [ppFun_eq_of_mem Q hm hmem]
-    simp only [Q, hm', ↓reduceIte, hmn]
-    rw [polyFun_comp_affine]
-    congr 1
-    ring
-  have hL := hl _ hSm hleft
-  have hR := hrt _ hSm hright
-  calc eLpNorm (fun x => F x - ppFun (k + 1) Q x) p unitVol
-      ≤ eLpNorm (fun x => F x - ppFun (k + 1) Q x) p (volume.restrict (Icc 0 (1 / 2))) +
-          eLpNorm (fun x => F x - ppFun (k + 1) Q x) p (volume.restrict (Icc (1 / 2) 1)) :=
-        eLpNorm_Icc_split (hF.measurable.sub hSm) hp hp' (by norm_num) (by norm_num)
-    _ ≤ jacksonConst r * modulus r p 0 1 F (1 / 2 ^ (k + 1)) +
-          jacksonConst r * modulus r p 0 1 F (1 / 2 ^ (k + 1)) := add_le_add hL hR
-    _ = 2 * jacksonConst r * modulus r p 0 1 F (1 / 2 ^ (k + 1)) := by ring
+  have hL : (0 : ℝ) < 1 / 2 ^ (k + 1) := by positivity
+  obtain ⟨gL, DL, hgL, hDL, h1L, h2L, hTL⟩ :=
+    exists_left_smoothing hF hr hp hp' hL (one_half_add_le_one k)
+  obtain ⟨gR, DR, hgR, hDR, h1R, h2R, hTR⟩ :=
+    exists_right_smoothing hF hr hp hp' hL (one_half_add_le_one k)
+  rw [show (1 : ℝ) - 1 / 2 = 1 / 2 by norm_num] at h1R h2R
+  obtain ⟨Q, hQ, hbound⟩ :=
+    exists_ppFun_approx_of_taylor hF.measurable hgL hDL hgR hDR hp hp' hTL hTR k
+  refine ⟨Q, hQ, hbound.trans ?_⟩
+  rw [two_mul, add_mul]
+  exact add_le_add (add_ofReal_pow_mul_le_jacksonConst hL r h1L h2L)
+    (add_ofReal_pow_mul_le_jacksonConst hL r h1R h2R)
 
 variable (p) in
 /-- The modulus of an element of `L_p[0, 1]` at the dyadic scale `2^(-k)`,

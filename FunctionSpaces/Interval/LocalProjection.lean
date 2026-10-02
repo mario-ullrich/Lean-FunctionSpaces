@@ -441,6 +441,14 @@ theorem ppFun_congr {k : ℕ} {Q Q' : ℕ → ℂ[X]} (h : ∀ n < 2 ^ k, polyFu
   funext x
   exact Finset.sum_congr rfl fun n hn => by rw [h n (Finset.mem_range.1 hn)]
 
+/-- **The local projections reproduce piecewise polynomials exactly**:
+`P_j (ppFun j Q) = ppFun j Q` as functions, for pieces of degree `< r`. -/
+theorem ppFun_locProj_ppFun {r j : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r) :
+    ppFun j (locProj r j (ppFun j Q)) = ppFun j Q :=
+  ppFun_congr fun n hn => by
+    funext x
+    exact polyFun_locProj_of_eqOn (hQ n) (fun y hy => ppFun_eq_of_mem Q hn hy) x
+
 /-! ### The projections onto piecewise polynomials -/
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]

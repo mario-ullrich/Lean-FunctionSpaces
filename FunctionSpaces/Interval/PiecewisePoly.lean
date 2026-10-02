@@ -301,6 +301,18 @@ theorem ppFun_eq_zero {k : ℕ} (Q : ℕ → ℂ[X]) {x : ℝ} (hx : x ∉ Ico (
   Finset.sum_eq_zero fun _ hn =>
     indicator_of_notMem (fun h => hx (dyadicIco_subset (Finset.mem_range.1 hn) h)) _
 
+/-- **Refinement of piecewise polynomials, everywhere**: the pieces `Q_{⌊n/2⌋}` of level `k + 1`
+give the same function as the pieces `Q_n` of level `k`, on all of `ℝ` (`Interval.ppFun_refine`
+is the statement almost everywhere on `[0, 1]`). -/
+theorem ppFun_refine_eq (k : ℕ) (Q : ℕ → ℂ[X]) :
+    ppFun (k + 1) (fun n => Q (n / 2)) = ppFun k Q := by
+  funext x
+  by_cases hx : x ∈ Ico (0 : ℝ) 1
+  · obtain ⟨h1, h1'⟩ := mem_dyadicIco_floor (k := k + 1) hx
+    obtain ⟨h2, h2'⟩ := mem_dyadicIco_floor (k := k) hx
+    rw [ppFun_eq_of_mem _ h1' h1, ppFun_eq_of_mem _ h2' h2, floor_two_pow_succ_div]
+  · rw [ppFun_eq_zero _ hx, ppFun_eq_zero _ hx]
+
 /-- On `I_{k,m}` a piecewise polynomial of level `k` is a polynomial: `Q_m` for `m < 2^k`, and
 `0` for the intervals beyond `[0, 1)`. -/
 theorem ppFun_eq_polyFun {k m : ℕ} (Q : ℕ → ℂ[X]) {x : ℝ} (hx : x ∈ dyadicIco k m) :

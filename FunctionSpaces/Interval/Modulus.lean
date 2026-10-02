@@ -177,15 +177,13 @@ theorem modulus_polynomial {r : ℕ} {P : Polynomial ℂ} (hP : P ∈ Polynomial
     (p : ℝ≥0∞) (a b t : ℝ) : modulus r p a b (fun x => P.eval (x : ℂ)) t = 0 := by
   simp [modulus, iterDiff_polynomial hP]
 
-/-- **The modulus depends only on the class in `L_p[a, b]`**: functions that agree almost
-everywhere on `[a, b]` have the same modulus. -/
-theorem modulus_congr_ae {f g : ℝ → ℂ} {a b : ℝ} (hfg : f =ᵐ[volume.restrict (Icc a b)] g) (r : ℕ) (p : ℝ≥0∞) (t : ℝ) :
-    modulus r p a b f t = modulus r p a b g t := by
-  simp only [modulus]
-  congr 1
-  funext h
-  congr 1
-  funext hh
+/-- **Differences depend only on the class in `L_p[a, b]`**: for `h ≥ 0`, functions that agree
+almost everywhere on `[a, b]` have differences of step `h` that agree almost everywhere on
+`[a, b - rh]`, hence the same `L_p` norm there. -/
+theorem eLpNorm_iterDiff_congr_ae {f g : ℝ → ℂ} {a b : ℝ}
+    (hfg : f =ᵐ[volume.restrict (Icc a b)] g) (r : ℕ) (p : ℝ≥0∞) {h : ℝ} (hh : 0 ≤ h) :
+    eLpNorm (iterDiff r h f) p (volume.restrict (Icc a (b - r * h))) =
+      eLpNorm (iterDiff r h g) p (volume.restrict (Icc a (b - r * h))) := by
   refine eLpNorm_congr_ae ?_
   have hk : ∀ k ∈ Finset.range (r + 1), (fun x => f (x + k * h)) =ᵐ[volume.restrict
       (Icc a (b - r * h))] fun x => g (x + k * h) := fun k hk => by
@@ -201,20 +199,31 @@ theorem modulus_congr_ae {f g : ℝ → ℂ} {a b : ℝ} (hfg : f =ᵐ[volume.re
         (measurableSet_Icc (a := a + k * h) (b := b - r * h + k * h))
       rwa [hpre] at this
     have hsub : Icc (a + k * h) (b - r * h + k * h) ⊆ Icc a b :=
-      Icc_subset_Icc (by nlinarith [hh.1]) (by nlinarith [hh.1])
+      Icc_subset_Icc (by nlinarith) (by nlinarith)
     exact hmp.quasiMeasurePreserving.ae_eq_comp (ae_restrict_of_ae_restrict_of_subset hsub hfg)
   filter_upwards [(Filter.eventually_all_finset _).2 hk] with x hx
   rw [iterDiff_apply, iterDiff_apply]
   exact Finset.sum_congr rfl fun k hk' => by rw [hx k hk']
 
-/-- **Reflection**: `ω_r(f(a + b - ·), t, [a, b]) = ω_r(f, t, [a, b])`. -/
-theorem modulus_reflect {f : ℝ → ℂ} (hf : Measurable f) (r : ℕ) (p : ℝ≥0∞) (a b t : ℝ) :
-    modulus r p a b (fun x => f (a + b - x)) t = modulus r p a b f t := by
+/-- **The modulus depends only on the class in `L_p[a, b]`**: functions that agree almost
+everywhere on `[a, b]` have the same modulus. -/
+theorem modulus_congr_ae {f g : ℝ → ℂ} {a b : ℝ} (hfg : f =ᵐ[volume.restrict (Icc a b)] g)
+    (r : ℕ) (p : ℝ≥0∞) (t : ℝ) :
+    modulus r p a b f t = modulus r p a b g t := by
   simp only [modulus]
   congr 1
   funext h
   congr 1
-  funext _
+  funext hh
+  exact eLpNorm_iterDiff_congr_ae hfg r p hh.1
+
+/-- **Reflection of a difference**:
+`‖Δ_h^r f(a + b - ·)‖_{L_p[a, b - rh]} = ‖Δ_h^r f‖_{L_p[a, b - rh]}`, since
+`Δ_h^r f(a + b - ·)(x) = (-1)^r Δ_h^r f(a + b - rh - x)`. -/
+theorem eLpNorm_iterDiff_reflect {f : ℝ → ℂ} (hf : Measurable f) (r : ℕ) (p : ℝ≥0∞)
+    (a b h : ℝ) :
+    eLpNorm (iterDiff r h fun x => f (a + b - x)) p (volume.restrict (Icc a (b - r * h))) =
+      eLpNorm (iterDiff r h f) p (volume.restrict (Icc a (b - r * h))) := by
   have hfun : iterDiff r h (fun x => f (a + b - x)) =
       fun x => (-1 : ℂ) ^ r * iterDiff r h f (a + b - r * h - x) := by
     funext x
@@ -226,5 +235,15 @@ theorem modulus_reflect {f : ℝ → ℂ} (hf : Measurable f) (r : ℕ) (p : ℝ
     eLpNorm_comp_sub_Icc (measurable_iterDiff hf r h)]
   simp only [enorm_pow, enorm_neg, enorm_one, one_pow, one_mul]
   congr 3 <;> ring
+
+/-- **Reflection**: `ω_r(f(a + b - ·), t, [a, b]) = ω_r(f, t, [a, b])`. -/
+theorem modulus_reflect {f : ℝ → ℂ} (hf : Measurable f) (r : ℕ) (p : ℝ≥0∞) (a b t : ℝ) :
+    modulus r p a b (fun x => f (a + b - x)) t = modulus r p a b f t := by
+  simp only [modulus]
+  congr 1
+  funext h
+  congr 1
+  funext _
+  exact eLpNorm_iterDiff_reflect hf r p a b h
 
 end Interval

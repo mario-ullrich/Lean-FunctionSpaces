@@ -57,6 +57,13 @@ public import FunctionSpaces.Interval.QuasiInterp
 public import FunctionSpaces.Interval.SplineJackson
 public import FunctionSpaces.Interval.SplinePeriodic
 public import FunctionSpaces.Interval.SplinePeriodicJackson
+public import FunctionSpaces.Cube.Basic
+public import FunctionSpaces.Cube.Modulus
+public import FunctionSpaces.Cube.Smoothing
+public import FunctionSpaces.Cube.Kernel
+public import FunctionSpaces.Cube.PiecewisePoly
+public import FunctionSpaces.Cube.PiecewiseJackson
+public import FunctionSpaces.Cube.PiecewiseInverse
 
 /-!
 # Function spaces
@@ -142,8 +149,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   approximation bounded by the modulus at one scale.
 * `FunctionSpaces.Interval.PiecewisePoly`: dyadic piecewise polynomials on `[0, 1]` and their
   scheme in `L_p[0, 1]`.
-* `FunctionSpaces.Interval.PiecewiseJackson`: Jackson's inequality for dyadic piecewise
-  polynomials, and the passage from continuous functions to `L_p` by density.
+* `FunctionSpaces.Interval.PiecewiseJackson`: piecewise Taylor approximation from two
+  smoothings, Jackson's inequality for dyadic piecewise polynomials, and the passage from
+  continuous functions to `L_p` by density.
 * `FunctionSpaces.Interval.PiecewiseInverse`: local estimates for piecewise polynomials on
   `[0, ∞)` and the strip integral, the inverse inequality of order `1/p`, and the identification
   of their approximation spaces with `B^s_{p,q}[0, 1]` for `0 < s < 1/p`.
@@ -170,4 +178,19 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Interval.SplinePeriodicJackson`: the periodic quasi-interpolant, Jackson's
   inequality for periodic splines, density of continuous periodic functions, and the
   identification of their approximation spaces with `B^s_{p,q}(𝕋)` for `0 < s < r - 1 + 1/p`.
+* `FunctionSpaces.Cube.Basic`: the unit cube `[0, 1]^d` with Lebesgue measure, slices in one
+  coordinate, and `L_p` norms through slices.
+* `FunctionSpaces.Cube.Modulus`: differences in one coordinate, the moduli of smoothness in the
+  coordinates, and their sum, the modulus on the cube.
+* `FunctionSpaces.Cube.Smoothing`: the Steklov smoothing in one coordinate and its bounds by the
+  coordinate modulus near the two ends of the coordinate.
+* `FunctionSpaces.Cube.Kernel`: finite-rank kernel operators on `[0, 1]`, their action on the
+  slices in one coordinate, the forms they produce, and telescoping over the coordinates.
+* `FunctionSpaces.Cube.PiecewisePoly`: the local projection as a kernel operator, the piecewise
+  polynomials of degree `< r` in each variable on dyadic cubes, their scheme, and the tensor
+  projection.
+* `FunctionSpaces.Cube.PiecewiseJackson`: Jackson's inequality for piecewise polynomials on the
+  cube.
+* `FunctionSpaces.Cube.PiecewiseInverse`: the inverse inequality of order `1/p` on the cube and
+  the identification of the approximation spaces with `B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p`.
 -/

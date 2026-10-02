@@ -43,31 +43,47 @@ open scoped ENNReal
 
 namespace Interval
 
-/-- Averaging a function of `(h, x)` in the step: `δ^(-1) ∫_0^δ G(σ + t, x) dt`. -/
-noncomputable def avgStep (δ : ℝ) (G : ℝ → ℝ → ℂ) (σ x : ℝ) : ℂ :=
+variable {α : Type*}
+
+/-- Averaging a function of `(h, x)` in the step: `δ^(-1) ∫_0^δ G(σ + t, x) dt`. The point `x`
+lies in any space `α`: the real line for the interval, the cube for slices in one coordinate. -/
+noncomputable def avgStep (δ : ℝ) (G : ℝ → α → ℂ) (σ : ℝ) (x : α) : ℂ :=
   ((δ : ℂ))⁻¹ * ∫ t in (0 : ℝ)..δ, G (σ + t) x
 
 /-- The `m`-fold average in the step. -/
-noncomputable def avgStepIter (m : ℕ) (δ : ℝ) (G : ℝ → ℝ → ℂ) : ℝ → ℝ → ℂ := (avgStep δ)^[m] G
+noncomputable def avgStepIter (m : ℕ) (δ : ℝ) (G : ℝ → α → ℂ) : ℝ → α → ℂ := (avgStep δ)^[m] G
 
 /-- `avgStepIter (m+1) = avgStep ∘ avgStepIter m`. -/
-theorem avgStepIter_succ (m : ℕ) (δ : ℝ) (G : ℝ → ℝ → ℂ) :
+theorem avgStepIter_succ (m : ℕ) (δ : ℝ) (G : ℝ → α → ℂ) :
     avgStepIter (m + 1) δ G = avgStep δ (avgStepIter m δ G) := by
   rw [avgStepIter, Function.iterate_succ_apply']
   rfl
 
+/-- The iterated average at a point only sees the values at that point: if `G(h, x) = G'(h, x')`
+for all steps `h`, the averages at `x` and at `x'` agree. -/
+theorem avgStepIter_congr_point {β : Type*} {G : ℝ → α → ℂ} {G' : ℝ → β → ℂ} {x : α} {x' : β}
+    (h : ∀ s, G s x = G' s x') (m : ℕ) (δ σ : ℝ) :
+    avgStepIter m δ G σ x = avgStepIter m δ G' σ x' := by
+  induction m generalizing σ with
+  | zero => exact h σ
+  | succ m ih =>
+    rw [avgStepIter_succ, avgStepIter_succ]
+    simp only [avgStep, ih]
+
 /-- Averages of jointly continuous functions are jointly continuous. -/
-theorem continuous_avgStep {G : ℝ → ℝ → ℂ} (hG : Continuous (Function.uncurry G)) (δ : ℝ) :
+theorem continuous_avgStep [TopologicalSpace α] {G : ℝ → α → ℂ}
+    (hG : Continuous (Function.uncurry G)) (δ : ℝ) :
     Continuous (Function.uncurry (avgStep δ G)) := by
-  have hc : Continuous (Function.uncurry fun (q : ℝ × ℝ) (t : ℝ) => G (q.1 + t) q.2) :=
-    hG.comp (by fun_prop : Continuous fun p : (ℝ × ℝ) × ℝ => (p.1.1 + p.2, p.1.2))
-  have h : Continuous fun q : ℝ × ℝ => ∫ t in (0 : ℝ)..δ, G (q.1 + t) q.2 :=
+  have hc : Continuous (Function.uncurry fun (q : ℝ × α) (t : ℝ) => G (q.1 + t) q.2) :=
+    hG.comp (by fun_prop : Continuous fun p : (ℝ × α) × ℝ => (p.1.1 + p.2, p.1.2))
+  have h : Continuous fun q : ℝ × α => ∫ t in (0 : ℝ)..δ, G (q.1 + t) q.2 :=
     intervalIntegral.continuous_parametric_intervalIntegral_of_continuous' hc 0 δ
   exact continuous_const.mul h
 
 /-- Iterated averages of jointly continuous functions are jointly continuous. -/
-theorem continuous_avgStepIter {G : ℝ → ℝ → ℂ} (hG : Continuous (Function.uncurry G))
-    (m : ℕ) (δ : ℝ) : Continuous (Function.uncurry (avgStepIter m δ G)) := by
+theorem continuous_avgStepIter [TopologicalSpace α] {G : ℝ → α → ℂ}
+    (hG : Continuous (Function.uncurry G)) (m : ℕ) (δ : ℝ) :
+    Continuous (Function.uncurry (avgStepIter m δ G)) := by
   induction m with
   | zero => exact hG
   | succ m ih => rw [avgStepIter_succ]; exact continuous_avgStep ih δ
@@ -114,12 +130,14 @@ theorem enorm_avg_rpow_le {k : ℝ → ℂ} (hk : Continuous k) {δ : ℝ} (hδ 
           ← ENNReal.rpow_add _ _ hD0 hDt, show -q + (1 - 1 / q) * q = -1 by field_simp; ring,
           ENNReal.rpow_neg_one]
 
-/-- **Minkowski's inequality for averages**: for jointly continuous `K`, `δ > 0` and
-`1 ≤ p < ∞`, `‖δ^(-1) ∫_0^δ K(t, ·) dt‖_{L_p(μ)} ≤ sup_{0 ≤ t ≤ δ} ‖K(t, ·)‖_{L_p(μ)}`. -/
-theorem eLpNorm_avg_le {K : ℝ → ℝ → ℂ} (hK : Continuous (Function.uncurry K)) {δ : ℝ}
-    (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (s : Set ℝ) :
-    eLpNorm (fun x => ((δ : ℂ))⁻¹ * ∫ t in (0 : ℝ)..δ, K t x) p (volume.restrict s) ≤
-      ⨆ t ∈ Icc 0 δ, eLpNorm (K t) p (volume.restrict s) := by
+/-- **Minkowski's inequality for averages**: for jointly continuous `K`, `δ > 0`,
+`1 ≤ p < ∞` and an s-finite measure `μ` on the point space,
+`‖δ^(-1) ∫_0^δ K(t, ·) dt‖_{L_p(μ)} ≤ sup_{0 ≤ t ≤ δ} ‖K(t, ·)‖_{L_p(μ)}`. -/
+theorem eLpNorm_avg_le [TopologicalSpace α] [MeasurableSpace α] [OpensMeasurableSpace α]
+    [SecondCountableTopology α] {K : ℝ → α → ℂ} (hK : Continuous (Function.uncurry K)) {δ : ℝ}
+    (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (μ : Measure α) [SFinite μ] :
+    eLpNorm (fun x => ((δ : ℂ))⁻¹ * ∫ t in (0 : ℝ)..δ, K t x) p μ ≤
+      ⨆ t ∈ Icc 0 δ, eLpNorm (K t) p μ := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp'
   have hD0 : ENNReal.ofReal δ ≠ 0 := by simpa using hδ
@@ -127,59 +145,58 @@ theorem eLpNorm_avg_le {K : ℝ → ℝ → ℂ} (hK : Continuous (Function.uncu
   have hKx : ∀ x, Continuous fun t => K t x := fun x =>
     hK.comp (continuous_id.prodMk continuous_const)
   have hKt : ∀ t, Continuous (K t) := fun t => hK.comp (continuous_const.prodMk continuous_id)
-  have hswap : Continuous (Function.uncurry fun (x t : ℝ) => K t x) :=
-    hK.comp (by fun_prop : Continuous fun p : ℝ × ℝ => (p.2, p.1))
+  have hswap : Continuous (Function.uncurry fun (x : α) (t : ℝ) => K t x) :=
+    hK.comp (by fun_prop : Continuous fun p : α × ℝ => (p.2, p.1))
   have havg : Continuous fun x => ((δ : ℂ))⁻¹ * ∫ t in (0 : ℝ)..δ, K t x :=
     continuous_const.mul
       (intervalIntegral.continuous_parametric_intervalIntegral_of_continuous' hswap 0 δ)
-  have hmeas : Measurable (Function.uncurry fun (x t : ℝ) => ‖K t x‖ₑ ^ p.toReal) :=
+  have hmeas : Measurable (Function.uncurry fun (x : α) (t : ℝ) => ‖K t x‖ₑ ^ p.toReal) :=
     hswap.measurable.enorm.pow_const p.toReal
-  have hB : ∀ t ∈ Icc 0 δ, ∫⁻ x, ‖K t x‖ₑ ^ p.toReal ∂volume.restrict s ≤
-      (⨆ t ∈ Icc 0 δ, eLpNorm (K t) p (volume.restrict s)) ^ p.toReal := fun t ht => by
+  have hB : ∀ t ∈ Icc 0 δ, ∫⁻ x, ‖K t x‖ₑ ^ p.toReal ∂μ ≤
+      (⨆ t ∈ Icc 0 δ, eLpNorm (K t) p μ) ^ p.toReal := fun t ht => by
     rw [← eLpNorm_rpow_eq (hKt t).aestronglyMeasurable hp0 hp']
     exact ENNReal.rpow_le_rpow
-      (le_iSup₂ (f := fun t (_ : t ∈ Icc 0 δ) => eLpNorm (K t) p (volume.restrict s)) t ht) hq.le
-  have hint : ∫⁻ x, ‖((δ : ℂ))⁻¹ * ∫ t in (0 : ℝ)..δ, K t x‖ₑ ^ p.toReal ∂volume.restrict s ≤
-      (⨆ t ∈ Icc 0 δ, eLpNorm (K t) p (volume.restrict s)) ^ p.toReal := by
-    calc ∫⁻ x, ‖((δ : ℂ))⁻¹ * ∫ t in (0 : ℝ)..δ, K t x‖ₑ ^ p.toReal ∂volume.restrict s
-        ≤ ∫⁻ x, (ENNReal.ofReal δ)⁻¹ * (∫⁻ t in Ioc 0 δ, ‖K t x‖ₑ ^ p.toReal)
-            ∂volume.restrict s :=
+      (le_iSup₂ (f := fun t (_ : t ∈ Icc 0 δ) => eLpNorm (K t) p μ) t ht) hq.le
+  have hint : ∫⁻ x, ‖((δ : ℂ))⁻¹ * ∫ t in (0 : ℝ)..δ, K t x‖ₑ ^ p.toReal ∂μ ≤
+      (⨆ t ∈ Icc 0 δ, eLpNorm (K t) p μ) ^ p.toReal := by
+    calc ∫⁻ x, ‖((δ : ℂ))⁻¹ * ∫ t in (0 : ℝ)..δ, K t x‖ₑ ^ p.toReal ∂μ
+        ≤ ∫⁻ x, (ENNReal.ofReal δ)⁻¹ * (∫⁻ t in Ioc 0 δ, ‖K t x‖ₑ ^ p.toReal) ∂μ :=
           lintegral_mono fun x => enorm_avg_rpow_le (hKx x) hδ hp hp'
-      _ = (ENNReal.ofReal δ)⁻¹ * ∫⁻ t in Ioc 0 δ, ∫⁻ x, ‖K t x‖ₑ ^ p.toReal ∂volume.restrict s := by
+      _ = (ENNReal.ofReal δ)⁻¹ * ∫⁻ t in Ioc 0 δ, ∫⁻ x, ‖K t x‖ₑ ^ p.toReal ∂μ := by
           rw [lintegral_const_mul' _ _ (ENNReal.inv_ne_top.2 hD0)]
           congr 1
           exact lintegral_lintegral_swap
-            (hmeas.aemeasurable (μ := (volume.restrict s).prod (volume.restrict (Ioc 0 δ))))
+            (hmeas.aemeasurable (μ := μ.prod (volume.restrict (Ioc 0 δ))))
       _ ≤ (ENNReal.ofReal δ)⁻¹ *
-            ∫⁻ _ in Ioc 0 δ, (⨆ t ∈ Icc 0 δ, eLpNorm (K t) p (volume.restrict s)) ^ p.toReal :=
+            ∫⁻ _ in Ioc 0 δ, (⨆ t ∈ Icc 0 δ, eLpNorm (K t) p μ) ^ p.toReal :=
           mul_le_mul_right (setLIntegral_mono measurable_const
             fun t ht => hB t (Ioc_subset_Icc_self ht)) _
-      _ = (⨆ t ∈ Icc 0 δ, eLpNorm (K t) p (volume.restrict s)) ^ p.toReal := by
+      _ = (⨆ t ∈ Icc 0 δ, eLpNorm (K t) p μ) ^ p.toReal := by
           rw [setLIntegral_const, Real.volume_Ioc, sub_zero, mul_comm _ (ENNReal.ofReal δ),
             ← mul_assoc, ENNReal.inv_mul_cancel hD0 hDt, one_mul]
   rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' havg.aestronglyMeasurable]
-  calc (∫⁻ x, ‖((δ : ℂ))⁻¹ * ∫ t in (0 : ℝ)..δ, K t x‖ₑ ^ p.toReal ∂volume.restrict s) ^ (1 / p.toReal)
-      ≤ ((⨆ t ∈ Icc 0 δ, eLpNorm (K t) p (volume.restrict s)) ^ p.toReal) ^ (1 / p.toReal) :=
+  calc (∫⁻ x, ‖((δ : ℂ))⁻¹ * ∫ t in (0 : ℝ)..δ, K t x‖ₑ ^ p.toReal ∂μ) ^ (1 / p.toReal)
+      ≤ ((⨆ t ∈ Icc 0 δ, eLpNorm (K t) p μ) ^ p.toReal) ^ (1 / p.toReal) :=
         ENNReal.rpow_le_rpow hint (by positivity)
-    _ = ⨆ t ∈ Icc 0 δ, eLpNorm (K t) p (volume.restrict s) := by rw [one_div, ENNReal.rpow_rpow_inv hq.ne']
+    _ = ⨆ t ∈ Icc 0 δ, eLpNorm (K t) p μ := by rw [one_div, ENNReal.rpow_rpow_inv hq.ne']
 
 /-- **Iterated averages are bounded by the sup over the steps**:
 `‖avg^m G(σ, ·)‖_{L_p(μ)} ≤ sup_{σ ≤ h ≤ σ + mδ} ‖G(h, ·)‖_{L_p(μ)}`. -/
-theorem eLpNorm_avgStepIter_le {G : ℝ → ℝ → ℂ} (hG : Continuous (Function.uncurry G)) {δ : ℝ}
-    (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (s : Set ℝ) (m : ℕ) (σ : ℝ) :
-    eLpNorm (avgStepIter m δ G σ) p (volume.restrict s) ≤
-      ⨆ h ∈ Icc σ (σ + m * δ), eLpNorm (G h) p (volume.restrict s) := by
+theorem eLpNorm_avgStepIter_le [TopologicalSpace α] [MeasurableSpace α] [OpensMeasurableSpace α]
+    [SecondCountableTopology α] {G : ℝ → α → ℂ} (hG : Continuous (Function.uncurry G)) {δ : ℝ}
+    (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (μ : Measure α) [SFinite μ] (m : ℕ)
+    (σ : ℝ) :
+    eLpNorm (avgStepIter m δ G σ) p μ ≤ ⨆ h ∈ Icc σ (σ + m * δ), eLpNorm (G h) p μ := by
   induction m generalizing σ with
   | zero =>
-    exact le_iSup₂ (f := fun h (_ : h ∈ Icc σ (σ + (0 : ℕ) * δ)) =>
-      eLpNorm (G h) p (volume.restrict s)) σ
+    exact le_iSup₂ (f := fun h (_ : h ∈ Icc σ (σ + (0 : ℕ) * δ)) => eLpNorm (G h) p μ) σ
       ⟨le_rfl, by simp⟩
   | succ m ih =>
     rw [avgStepIter_succ]
     have hK : Continuous (Function.uncurry fun t x => avgStepIter m δ G (σ + t) x) :=
       (continuous_avgStepIter hG m δ).comp
-        (by fun_prop : Continuous fun p : ℝ × ℝ => (σ + p.1, p.2))
-    refine (eLpNorm_avg_le hK hδ hp hp' s).trans (iSup₂_le fun t ht => (ih (σ + t)).trans ?_)
+        (by fun_prop : Continuous fun p : ℝ × α => (σ + p.1, p.2))
+    refine (eLpNorm_avg_le hK hδ hp hp' μ).trans (iSup₂_le fun t ht => (ih (σ + t)).trans ?_)
     refine iSup₂_le fun h hh => le_iSup₂_of_le h ⟨?_, ?_⟩ le_rfl
     · linarith [ht.1, hh.1]
     · have := hh.2; push_cast at this ⊢; nlinarith [ht.2]

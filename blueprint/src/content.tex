@@ -2793,8 +2793,8 @@ $[a, b]$ is
 \label{lem:interval-modulus}
 \lean{Interval.eLpNorm_iterDiff_le_of_forall, Interval.eLpNorm_iterDiff_le, Interval.modulus_le,
   Interval.modulus_add_le,
-  Interval.modulus_const_mul, Interval.modulus_polynomial, Interval.modulus_congr_ae,
-  Interval.modulus_reflect}
+  Interval.modulus_const_mul, Interval.modulus_polynomial, Interval.eLpNorm_iterDiff_congr_ae,
+  Interval.modulus_congr_ae, Interval.eLpNorm_iterDiff_reflect, Interval.modulus_reflect}
 \leanok
 \uses{def:interval-modulus, lem:iter-diff-poly}
 The modulus $\omega_r(f, t, [a, b])_p$ increases in $t$, is subadditive and homogeneous in $f$,
@@ -2893,16 +2893,18 @@ translations and differences, so each further average adds one derivative.
 \label{lem:minkowski-avg}
 \lean{Interval.eLpNorm_rpow_eq, Interval.enorm_avg_rpow_le, Interval.eLpNorm_avg_le,
   Interval.avgStep, Interval.avgStepIter, Interval.avgStepIter_succ, Interval.continuous_avgStep,
-  Interval.continuous_avgStepIter, Interval.eLpNorm_avgStepIter_le}
+  Interval.continuous_avgStepIter, Interval.eLpNorm_avgStepIter_le,
+  Interval.avgStepIter_congr_point}
 \leanok
-Let $K : \R \times \R \to \C$ be continuous, $\delta > 0$, $1 \leq p < \infty$ and $S \subseteq \R$.
-Then
+Let $X$ be a second countable topological space with an $s$-finite Borel measure $\mu$, let
+$K : \R \times X \to \C$ be continuous, $\delta > 0$ and $1 \leq p < \infty$. Then
 \[
-  \Bigl\| \delta^{-1} \int_0^\delta K(t, \cdot) \, dt \Bigr\|_{L_p(S)}
-  \leq \sup_{0 \leq t \leq \delta} \|K(t, \cdot)\|_{L_p(S)} .
+  \Bigl\| \delta^{-1} \int_0^\delta K(t, \cdot) \, dt \Bigr\|_{L_p(\mu)}
+  \leq \sup_{0 \leq t \leq \delta} \|K(t, \cdot)\|_{L_p(\mu)} .
 \]
 Iterating $m$ times, an average over $v \in [0, \delta]^m$ of $G(\sigma + v_1 + \cdots + v_m, \cdot)$
-has $L_p(S)$ norm at most $\sup_{\sigma \leq h \leq \sigma + m \delta} \|G(h, \cdot)\|_{L_p(S)}$.
+has $L_p(\mu)$ norm at most $\sup_{\sigma \leq h \leq \sigma + m \delta} \|G(h, \cdot)\|_{L_p(\mu)}$.
+The average at a point $x$ depends only on the values $G(\cdot, x)$.
 \end{lemma}
 
 \begin{proof}
@@ -3030,7 +3032,8 @@ $A_n = V_{\lfloor \log_2 n \rfloor}$ for $n \geq 1$.
 \begin{lemma}[Bookkeeping for dyadic intervals]
 \label{lem:pp-bookkeeping}
 \lean{Interval.floor_eq_of_mem_dyadicIco, Interval.dyadicIco_subset,
-  Interval.pairwise_disjoint_dyadicIco, Interval.ppFun_eq_zero, Interval.ppFun_eq_polyFun,
+  Interval.pairwise_disjoint_dyadicIco, Interval.ppFun_eq_zero, Interval.ppFun_refine_eq,
+  Interval.ppFun_eq_polyFun,
   Interval.ite_mem_degreeLT, Interval.integrableOn_dyadicIco_of_continuous,
   Interval.lintegral_Icc_le_sum, Interval.sum_le_lintegral_Icc,
   Interval.lintegral_Icc_eq_dyadicIco, Interval.zero_add_two_pow_mul_eq_one,
@@ -3039,21 +3042,49 @@ $A_n = V_{\lfloor \log_2 n \rfloor}$ for $n \geq 1$.
 \leanok
 \uses{def:pp-scheme}
 For $x \in I_{k,n}$, $\lfloor 2^k x \rfloor = n$. A piecewise polynomial of level $k$ vanishes
-outside $[0, 1)$. For $u \in \R$, $L \geq 0$, $m \in \N$ and every $G : \R \to [0, \infty]$,
+outside $[0, 1)$, and the pieces $Q_{\lfloor n/2 \rfloor}$ of level $k + 1$ give the same function
+as the pieces $Q_n$ of level $k$. For $u \in \R$, $L \geq 0$, $m \in \N$ and every
+$G : \R \to [0, \infty]$,
 $\int_{[u, u + mL]} G = \sum_{n < m} \int_{[u + nL, u + (n+1)L]} G$; in particular
 $\int_{[0, 1]} G = \sum_{n < 2^k} \int_{I_{k,n}} G$.
 \end{lemma}
 
+\begin{lemma}[Piecewise Taylor approximation]
+\label{lem:pp-taylor}
+\lean{Interval.exists_taylor_pieces, Interval.exists_ppFun_approx_of_taylor,
+  Interval.one_half_add_le_one}
+\leanok
+\uses{def:pp-scheme, lem:pp-bookkeeping}
+Let $1 \leq p < \infty$, $r \geq 1$, $k \geq 1$ and $L = 2^{-k}$. Let $g_1, D_1, g_2, D_2$ be
+measurable, and such that for all $a \leq b$ and $\nu = 1, 2$ there is a polynomial $T$ of degree
+$< r$ with $\|g_\nu - T\|_{L_p[a,b]} \leq (b - a)^r \|D_\nu\|_{L_p[a,b]}$. For every measurable $u$
+there is a piecewise polynomial $S$ of level $k$ and degree $< r$ with
+\begin{multline*}
+  \|u - S\|_{L_p[0,1]} \leq \bigl( \|u - g_1\|_{L_p[0,1/2]} + L^r \|D_1\|_{L_p[0,1/2]} \bigr) \\
+    + \bigl( \|u - g_2\|_{L_p[1/2,1]} + L^r \|D_2\|_{L_p[1/2,1]} \bigr) .
+\end{multline*}
+\end{lemma}
+
+\begin{proof}
+\leanok
+On each $I_{k,n} \subseteq [0, \tfrac12]$ take the polynomial $T$ of $g_1$ on the closure of
+$I_{k,n}$, so that $\|g_1 - S\|_{L_p(I_{k,n})} \leq L^r \|D_1\|_{L_p(I_{k,n})}$; the $p$-th powers
+add up over the $2^{k-1}$ intervals of $[0, \tfrac12]$. The same with $g_2$ on $[\tfrac12, 1]$,
+where $\tfrac12$ is a knot since $k \geq 1$. The triangle inequality on each half gives the bound.
+\end{proof}
+
+The lemma asks nothing of $u$, $g_\nu$ and $D_\nu$ beyond measurability, so it applies to the
+slices of functions on a cube as well (\Cref{thm:cube-jackson}).
+
 \begin{theorem}[Jackson's inequality for piecewise polynomials]
 \label{thm:pp-jackson}
-\lean{Interval.jacksonConst, Interval.jacksonConst_ne_top, Interval.exists_left_approx,
-  Interval.exists_right_approx, Interval.exists_ppFun_approx, Interval.lpModulus,
+\lean{Interval.jacksonConst, Interval.jacksonConst_ne_top,
+  Interval.add_ofReal_pow_mul_le_jacksonConst, Interval.exists_ppFun_approx, Interval.lpModulus,
   Interval.lpModulus_add_le, Interval.lpModulus_le, Interval.lpModulus_anti,
   Interval.approxSeq_le_of_continuous, Interval.approxSeq_ppScheme_le,
   Interval.exists_approxSeq_ppScheme_one_le, Interval.exists_approxSeq_ppScheme_le}
 \leanok
-\uses{def:pp-scheme, lem:pp-bookkeeping, lem:two-sided-smoothing, lem:interval-modulus,
-  thm:whitney, lem:error-dense}
+\uses{def:pp-scheme, lem:pp-taylor, lem:two-sided-smoothing, thm:whitney, lem:error-dense}
 Let $1 \leq p < \infty$ and $r \geq 1$. For every $f \in L_p[0,1]$ and $k \geq 1$,
 \[
   E_{2^k}(f)_p \leq 2 (1 + 2^r r^{2r}) \, \omega_r(f, 2^{-k}, [0,1])_p ,
@@ -3064,16 +3095,13 @@ every $f \in L_p[0,1]$ and every $k \geq 0$.
 
 \begin{proof}
 \leanok
-First let $f$ be continuous and $L = 2^{-k}$. Since $\tfrac12 + L \leq 1$,
-\Cref{lem:two-sided-smoothing} on $[0, \tfrac12]$ gives $g$ and $D$ with
-$\|f - g\|_{L_p[0,1/2]} \leq \omega_r(f, L, [0,1])_p$,
-$\|D\|_{L_p[0,1/2]} \leq L^{-r} 2^r r^{2r} \omega_r(f, L, [0,1])_p$, and on each
-$I_{k,n} \subseteq [0, \tfrac12]$ a polynomial $Q_n$ of degree $< r$ with
-$\|g - Q_n\|_{L_p(I_{k,n})} \leq L^r \|D\|_{L_p(I_{k,n})}$. Summing $p$-th powers, the
-piecewise polynomial $S$ made of the $Q_n$ satisfies
-$\|g - S\|_{L_p[0,1/2]} \leq 2^r r^{2r} \omega_r(f, L, [0,1])_p$. On $[\tfrac12, 1]$ apply the
-same to $f(1 - \cdot)$, which has the same modulus by \Cref{lem:interval-modulus}; $\tfrac12$ is a
-knot since $k \geq 1$. General $f$ follow, for every scheme in $L_p[0,1]$, by
+First let $f$ be continuous, $L = 2^{-k}$ and $\omega = \omega_r(f, L, [0,1])_p$. Since
+$\tfrac12 + L \leq 1$, \Cref{lem:two-sided-smoothing} on $[0, \tfrac12]$ and on $[\tfrac12, 1]$
+gives $g_1, D_1$ and $g_2, D_2$ with $\|f - g_\nu\| \leq \omega$ and
+$\|D_\nu\| \leq L^{-r} 2^r r^{2r} \omega$ on the respective half, and Taylor polynomials on all
+intervals. \Cref{lem:pp-taylor} with $u = f$ gives a piecewise polynomial $S$ of level $k$ with
+$\|f - S\|_{L_p[0,1]} \leq 2 (1 + 2^r r^{2r}) \omega$. General $f$ follow, for every scheme in
+$L_p[0,1]$, by
 \Cref{lem:error-dense}: the bounded continuous functions are dense in $L_p$, and
 $\omega_r(\cdot, t)_p$ is subadditive with $\omega_r(f, t)_p \leq 2^r \|f\|_p$. For $k = 0$ the approximants are the
 polynomials of degree $< r$, and \Cref{thm:whitney} with $t = \tfrac14$, passed to $L_p$ in the
@@ -3390,12 +3418,13 @@ $\langle d_i, b_l \rangle = \delta_{il}$, and $Q$ is a combination of the $b_l(2
   Interval.enorm_dualPoly_le, Interval.ppProjConst, Interval.ppProjConst_ne_top,
   Interval.eLpNorm_ppFun_locProj_le, Interval.ppProjLinear, Interval.ppProj,
   Interval.coeFn_ppProj, Interval.norm_ppProj_le, Interval.ppProj_mem, Interval.ppProj_of_mem,
-  Interval.ppProjectionScheme, Interval.ppProjectionScheme_two_pow}
+  Interval.ppProjectionScheme, Interval.ppProjectionScheme_two_pow, Interval.ppFun_locProj_ppFun}
 \leanok
 \uses{lem:loc-proj, lem:pp-bookkeeping}
 Let $1 \leq p < \infty$ and $r \in \N$. For $j \in \N$ let $P_j f = \Pi_{j,m} f$ on every
 $I_{j,m}$, $m < 2^j$. Then $P_j$ is a bounded projection of $L_p[0,1]$ onto $V_j$, and
-$\|P_j\| \leq r M^2$ for all $j$.
+$\|P_j\| \leq r M^2$ for all $j$. As functions, $P_j a = a$ for every piecewise polynomial $a$ of
+level $j$ and degree $< r$.
 \end{theorem}
 
 \begin{proof}
@@ -4032,6 +4061,391 @@ inverse order $\theta = r - 1 + 1/p$; apply \Cref{thm:modulus-coincidence}.
 \end{proof}
 
 For $0 < s < r - 1 + 1/p$ the condition says $f \in \Besov{s}{p}{q}(\T)$.
+
+\chapter{Approximation on the cube}
+\label{ch:cube}
+
+This chapter carries the approximation by piecewise polynomials from the interval to the cube
+$Q = [0, 1]^d$. Everything passes through slices: a bound in one variable for a fixed step passes
+to the cube by Tonelli's theorem in one coordinate. The tensor approximants are built from
+operators of finite rank that act on the slices in one coordinate at a time, which avoids
+Fubini arguments in several variables.
+
+\section{The cube and slices}
+
+\begin{definition}[Cube and slices]
+\label{def:cube}
+\lean{Cube.isProbabilityMeasure_unitVol, Cube.cubeVol, Cube.slice, Cube.measurable_slice,
+  Cube.measurable_slice_uncurry, Cube.slice_update, Cube.regionVol,
+  Cube.unitVol_restrict_Icc_of_subset}
+\leanok
+The cube $Q = [0, 1]^d$ carries the product $\lambda_d$ of Lebesgue measure on $[0, 1]$, a
+probability measure on $\R^d$. For $f : \R^d \to \C$, $x \in \R^d$ and a coordinate $i$, the
+slice of $f$ through $x$ in coordinate $i$ is $f_{x,i}(t) = f(x_1, \dots, x_{i-1}, t, x_{i+1},
+\dots, x_d)$; it does not depend on $x_i$. For $[a, b] \subseteq [0, 1]$ let
+$Q_i[a, b] = \{x \in Q : x_i \in [a, b]\}$.
+\end{definition}
+
+\begin{lemma}[Integration through slices]
+\label{lem:cube-slices}
+\lean{Cube.lintegral_cubeVol_eq_slice, Cube.lintegral_region_eq_slice,
+  Cube.eLpNorm_rpow_region_eq_slice, Cube.eLpNorm_rpow_cubeVol_eq_slice,
+  Cube.eLpNorm_rpow_regionVol_eq_slice, Cube.measurable_eLpNorm_slice, Cube.ae_slice_ae_eq}
+\leanok
+\uses{def:cube}
+Let $G : \R^d \to [0, \infty]$ and $f : \R^d \to \C$ be measurable, $i$ a coordinate,
+$0 < p < \infty$ and $[a, b] \subseteq [0, 1]$. Then
+\begin{gather*}
+  \int_Q G \, d\lambda_d = \int_Q \int_0^1 G_{x,i}(t) \, dt \, d\lambda_d(x) , \\
+  \|f\|_{L_p(Q_i[a,b])}^p = \int_Q \|f_{x,i}\|_{L_p[a,b]}^p \, d\lambda_d(x) ,
+\end{gather*}
+and $x \mapsto \|f_{x,i}\|_{L_p(\mu)}$ is measurable for every $s$-finite measure $\mu$ on $\R$.
+If $f = g$ almost everywhere on $Q$, then for almost every $x \in Q$ the slices $f_{x,i}$ and
+$g_{x,i}$ agree almost everywhere on $[0, 1]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first identity is Tonelli's theorem for the coordinate $i$, in the form of marginals; the
+inner integral does not depend on $x_i$, and $\lambda_d$ is a probability measure. The second
+applies it to $|f|^p$ times the indicator of $Q_i[a, b]$. For the last statement apply the first to
+the indicator of $\{f \neq g\}$.
+\end{proof}
+
+\begin{lemma}[Minkowski's inequality in the form of bounds]
+\label{lem:minkowski-bounds}
+\lean{Cube.lintegral_add_rpow_le, Cube.lintegral_const_mul_rpow_le}
+\leanok
+Let $q \geq 1$ and let $\varphi, \psi$ be measurable functions with values in $[0, \infty]$. If
+$\int \varphi^q \leq a^q$ and $\int \psi^q \leq b^q$, then $\int (\varphi + \psi)^q \leq (a + b)^q$,
+and $\int (c \varphi)^q \leq (c a)^q$ for every $c < \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Minkowski's inequality for functions with values in $[0, \infty]$.
+\end{proof}
+
+The norms of the slices are such functions of the point, so the lemma combines bounds of slices.
+
+\section{Moduli in the coordinates}
+
+\begin{definition}[Moduli of smoothness on the cube]
+\label{def:cube-modulus}
+\lean{Cube.cubeDiff, Cube.cubeDiff_eq, Cube.measurable_cubeDiff, Cube.slice_cubeDiff,
+  Cube.cubeDiff_add, Cube.diffRegion, Cube.unitVol_restrict_Icc, Cube.coordModulus,
+  Cube.cubeModulus, Cube.lpCubeModulus}
+\leanok
+\uses{def:cube, def:iter-diff}
+For $r \in \N$, $h \geq 0$ and a coordinate $i$, the difference in coordinate $i$ is
+$\Delta^r_{h e_i} f(x) = \Delta_h^r f_{x,i}(x_i) = \sum_{k=0}^r (-1)^{r-k} \binom{r}{k}
+f(x + k h e_i)$. For $1 \leq p < \infty$ and $t \geq 0$ the modulus in coordinate $i$ and the
+modulus on the cube are
+\[
+  \omega_r^{(i)}(f, t)_p = \sup_{0 \leq h \leq t} \|\Delta^r_{h e_i} f\|_{L_p(Q_i[0, 1 - rh])} ,
+  \qquad
+  \omega_r(f, t)_p = \sum_{i=1}^d \omega_r^{(i)}(f, t)_p .
+\]
+\end{definition}
+
+These are the moduli in the coordinates of Nikol'ski\u{\i}'s definition of Besov spaces
+\cite{Nikolskii}; they are equivalent to the isotropic modulus
+$\sup_{|h| \leq t} \|\Delta_h^r f\|_p$, which is not formalised here. The supremum over the step
+stays outside the integral over the other coordinates.
+
+\begin{lemma}[Properties of the moduli on the cube]
+\label{lem:cube-modulus}
+\lean{Cube.eLpNorm_rpow_cubeDiff_eq_slice, Cube.eLpNorm_cubeDiff_le_coordModulus,
+  Cube.coordModulus_mono, Cube.coordModulus_add_le, Cube.eLpNorm_cubeDiff_le, Cube.coordModulus_le,
+  Cube.coordModulus_congr_ae, Cube.cubeModulus_mono, Cube.cubeModulus_add_le, Cube.cubeModulus_le,
+  Cube.cubeModulus_congr_ae, Cube.lpCubeModulus_add_le, Cube.lpCubeModulus_le,
+  Cube.lpCubeModulus_anti}
+\leanok
+\uses{def:cube-modulus, lem:cube-slices, lem:interval-modulus}
+Let $f$ be measurable, $1 \leq p < \infty$ and $h \geq 0$. Then
+\[
+  \|\Delta^r_{h e_i} f\|_{L_p(Q_i[0, 1 - rh])}^p
+  = \int_Q \|\Delta_h^r f_{x,i}\|_{L_p[0, 1 - rh]}^p \, d\lambda_d(x) .
+\]
+The moduli $\omega_r^{(i)}(f, t)_p$ and $\omega_r(f, t)_p$ increase in $t$, are subadditive in $f$,
+satisfy $\omega_r^{(i)}(f, t)_p \leq 2^r \|f\|_{L_p(Q)}$ and
+$\omega_r(f, t)_p \leq d \, 2^r \|f\|_{L_p(Q)}$, and depend only on the class of $f$ in $L_p(Q)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The identity is \Cref{lem:cube-slices} for the difference, whose slices in coordinate $i$ are the
+differences of the slices. The bounds hold slice by slice by \Cref{lem:interval-modulus}, and
+\Cref{lem:cube-slices} passes them to $Q$.
+\end{proof}
+
+\section{Smoothing in one coordinate}
+
+\begin{lemma}[Steklov smoothing in one coordinate]
+\label{lem:cube-smoothing}
+\lean{Cube.continuous_slice, Cube.continuous_cubeDiff_uncurry, Cube.continuous_cubeDiff,
+  Cube.cubeSmooth, Cube.cubeSmoothDeriv, Cube.slice_cubeSmooth, Cube.slice_cubeSmoothDeriv,
+  Cube.sub_cubeSmooth_eq, Cube.cubeSmoothDeriv_eq, Cube.continuous_cubeSmooth,
+  Cube.continuous_cubeSmoothDeriv, Cube.eLpNorm_sub_cubeSmooth_le, Cube.eLpNorm_cubeSmoothDeriv_le}
+\leanok
+\uses{thm:steklov-smoothing, lem:minkowski-avg, def:cube-modulus}
+Let $f$ be continuous on $\R^d$, $r \in \N$, $\delta > 0$, and let
+$S^{(i)}_\delta f(x) = S_\delta f_{x,i}(x_i)$ with the smoothing $S_\delta$ of
+\Cref{thm:steklov-smoothing}. For $1 \leq p < \infty$ and $w + r^2 \delta \leq 1$,
+\begin{gather*}
+  \|f - S^{(i)}_\delta f\|_{L_p(Q_i[0, w])} \leq \omega_r^{(i)}(f, r\delta)_p , \\
+  \|\partial_i^r S^{(i)}_\delta f\|_{L_p(Q_i[0, w])} \leq 2^r \delta^{-r} \omega_r^{(i)}(f, r\delta)_p .
+\end{gather*}
+\end{lemma}
+
+\begin{proof}
+\leanok
+Slice by slice, \Cref{thm:steklov-smoothing} gives $f - S^{(i)}_\delta f = (-1)^r$ times the
+average over $v \in [0, \delta]^r$ of $\Delta^r_{(v_1 + \cdots + v_r) e_i} f$, and
+\[
+  \partial_i^r S^{(i)}_\delta f
+  = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta^r_{k\delta e_i} f ,
+\]
+with the averages over the steps only. \Cref{lem:minkowski-avg} with
+the point space $\R^d$ and the cube measure on $Q_i[0, w]$ bounds the average by
+$\sup_h \|\Delta^r_{h e_i} f\|_{L_p(Q_i[0, w])}$, and $Q_i[0, w] \subseteq Q_i[0, 1 - rh]$ for
+$h \leq r \delta$.
+\end{proof}
+
+\begin{lemma}[Smoothing near the two ends of a coordinate]
+\label{lem:cube-two-sided-smoothing}
+\lean{Cube.exists_left_cubeSmoothing, Cube.reflect, Cube.reflect_reflect, Cube.continuous_reflect,
+  Cube.slice_reflect, Cube.coordModulus_reflect, Cube.eLpNorm_reflect_regionVol,
+  Cube.exists_right_cubeSmoothing}
+\leanok
+\uses{lem:cube-smoothing, lem:taylor-lp, lem:interval-modulus}
+Let $f$ be continuous on $\R^d$, $r \geq 1$, $1 \leq p < \infty$, $L > 0$, $w + L \leq 1$ and
+$\omega = \omega_r^{(i)}(f, L)_p$. On $R = Q_i[0, w]$ and on $R = Q_i[1 - w, 1]$ there are measurable
+$G$ and $D$ with $\|f - G\|_{L_p(R)} \leq \omega$, $\|D\|_{L_p(R)} \leq L^{-r} 2^r r^{2r} \omega$,
+and for every $x$ and all $a \leq b$ a polynomial $T$ of degree $< r$ with
+$\|G_{x,i} - T\|_{L_p[a,b]} \leq (b - a)^r \|D_{x,i}\|_{L_p[a,b]}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $Q_i[0, w]$ take $G = S^{(i)}_\delta f$ with $\delta = L/r^2$, $D = \partial_i^r G$, and
+\Cref{lem:taylor-lp} on every slice. On $Q_i[1 - w, 1]$ apply this to $f$ composed with the
+reflection $x_i \mapsto 1 - x_i$, which preserves $\omega_r^{(i)}$ slice by slice
+(\Cref{lem:interval-modulus}), and reflect back.
+\end{proof}
+
+\section{Operators of finite rank on slices}
+
+\begin{definition}[Kernel operators and their action in one coordinate]
+\label{def:kernel-op}
+\lean{Cube.BddMeas, Cube.BddMeas.add, Cube.BddMeas.const_mul, Cube.bddMeas_zero, Cube.bddMeas_sum,
+  Cube.BddMeas.integrableOn_Icc, Cube.BddMeas.memLp, Cube.BddMeas.slice, Cube.KernelOp,
+  Cube.KernelOp.kernel, Cube.KernelOp.rangeFn, Cube.KernelOp.bddMeas_kernel,
+  Cube.KernelOp.bddMeas_rangeFn, Cube.KernelOp.coef, Cube.KernelOp.apply,
+  Cube.KernelOp.integrableOn_mul_kernel, Cube.KernelOp.coef_add, Cube.KernelOp.coef_sub,
+  Cube.KernelOp.coef_const_mul, Cube.KernelOp.coef_sum, Cube.KernelOp.apply_sub,
+  Cube.KernelOp.norm_coef_le, Cube.KernelOp.slicewise, Cube.KernelOp.slicewise_eq,
+  Cube.KernelOp.slice_slicewise, Cube.KernelOp.measurable_coef_slice,
+  Cube.KernelOp.measurable_slicewise, Cube.KernelOp.bddMeas_slicewise,
+  Cube.KernelOp.slicewise_sub}
+\leanok
+\uses{def:cube}
+A kernel operator on $[0, 1]$ is $T g = \sum_{j \in J} \bigl( \int_0^1 g \, \kappa_j \bigr)
+\varphi_j$ with a finite index set $J$ and bounded measurable $\kappa_j$, $\varphi_j$. Its action in
+coordinate $i$ on functions on $\R^d$ is $T^{(i)} g(x) = T g_{x,i}(x_i)$. For bounded measurable
+$g$, $T^{(i)} g$ is bounded and measurable, its slices in coordinate $i$ are the $T g_{x,i}$, and
+$T^{(i)}$ is linear on bounded measurable functions.
+\end{definition}
+
+\begin{lemma}[Forms of kernel operators]
+\label{lem:kernel-forms}
+\lean{Cube.KernelOp.IsForm, Cube.KernelOp.isForm_slicewise, Cube.KernelOp.IsForm.slice_eq,
+  Cube.KernelOp.IsForm.slicewise, Cube.KernelOp.IsForm.add, Cube.KernelOp.IsForm.const_mul,
+  Cube.KernelOp.isForm_zero, Cube.KernelOp.IsForm.congr, Cube.KernelOp.IsForm.refine,
+  Cube.KernelOp.foldSlicewise, Cube.KernelOp.foldSlicewise_nil, Cube.KernelOp.foldSlicewise_cons,
+  Cube.KernelOp.bddMeas_foldSlicewise, Cube.KernelOp.isForm_foldSlicewise}
+\leanok
+\uses{def:kernel-op}
+A function $g$ on $\R^d$ has the form of $T$ in coordinate $i$ if
+$g(x) = \sum_j c_j(x) \varphi_j(x_i)$ with bounded measurable $c_j$ that do not depend on $x_i$.
+These functions form a linear space, and their slices in coordinate $i$ are combinations of the
+$\varphi_j$. For bounded measurable $g$:
+\begin{enumerate}
+  \item $T^{(i)} g$ has the form of $T$ in coordinate $i$;
+  \item if $g$ has the form of $T$ in coordinate $i$ and $j \neq i$, then $S^{(j)} g$ has the form
+    of $T$ in coordinate $i$ for every kernel operator $S$;
+  \item if every $\varphi_j$ is a combination of the functions $\varphi'_{j'}$ of a kernel operator
+    $T'$, then every function of the form of $T$ in coordinate $i$ has the form of $T'$ there.
+\end{enumerate}
+In particular, $T^{(i_1)} \cdots T^{(i_m)} g$ has the form of $T$ in each of the coordinates
+$i_1, \dots, i_m$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Take $c_j(x) = \int_0^1 g_{x,i}(s) \kappa_j(s) \, ds$. (2) The factors $\varphi_a(x_i)$ are
+constant along coordinate $j$, so by linearity of the integral over the finite sum
+$S^{(j)} g(x) = \sum_a S^{(j)} c_a(x) \varphi_a(x_i)$, and $S^{(j)} c_a$ does not depend on $x_i$.
+(3) Regroup the double sum. The last statement follows by induction on $m$.
+\end{proof}
+
+\begin{lemma}[Telescoping over the coordinates]
+\label{lem:kernel-telescoping}
+\lean{Cube.KernelOp.eLpNorm_slicewise_le, Cube.KernelOp.eLpNorm_sub_foldSlicewise_le}
+\leanok
+\uses{def:kernel-op, lem:cube-slices}
+Let $1 \leq p < \infty$ and $C < \infty$ with $\|T u\|_{L_p[0,1]} \leq C \|u\|_{L_p[0,1]}$ for every
+measurable $u$. Then $\|T^{(i)} g\|_{L_p(Q)} \leq C \|g\|_{L_p(Q)}$ for measurable $g$, and for
+bounded measurable $g$ and coordinates $i_1, \dots, i_m$,
+\[
+  \bigl\| g - T^{(i_1)} \cdots T^{(i_m)} g \bigr\|_{L_p(Q)}
+  \leq (1 + C)^m \sum_{l=1}^m \|g - T^{(i_l)} g\|_{L_p(Q)} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first bound holds slice by slice, and \Cref{lem:cube-slices} passes it to $Q$. For the second,
+$g - T^{(i)} h = (g - T^{(i)} g) + T^{(i)} (g - h)$; induction on $m$.
+\end{proof}
+
+\section{Piecewise polynomials on the cube}
+
+\begin{lemma}[The local projection as a kernel operator]
+\label{lem:pp-kernel}
+\lean{Cube.norm_indicator_polyFun_le, Cube.ppKernel, Cube.ppKernel_coef, Cube.ppKernel_apply,
+  Cube.eLpNorm_ppKernel_apply_le, Cube.ppKernel_apply_ppFun, Cube.integrableOn_ppFun,
+  Cube.ppKernel_rangeFn_eq_ppFun, Cube.ppKernel_rangeFn_eq_sum, Cube.eLpNorm_sub_ppKernel_apply_le}
+\leanok
+\uses{def:kernel-op, def:loc-proj, thm:pp-proj, lem:pp-bookkeeping}
+Let $r \geq 1$, $k \in \N$, and let $b_l$ and $d_l$ be the monomials and their dual basis of
+\Cref{lem:poly-dual-basis}. The projection $P_k$ of \Cref{thm:pp-proj} is the kernel operator with
+index set $\{(n, l) : n < 2^k, l < r\}$ and
+\[
+  \kappa_{n,l}(s) = \mathbf{1}_{I_{k,n}}(s) \, 2^k b_l(2^k s - n) ,
+  \qquad
+  \varphi_{n,l}(t) = \mathbf{1}_{I_{k,n}}(t) \, d_l(2^k t - n) .
+\]
+Every $\varphi_{n,l}$ of level $k$ is a combination of the functions $\varphi$ of level $k + 1$.
+For $1 \leq p < \infty$, every $u$ integrable on $[0, 1]$ and every piecewise polynomial $S$ of
+level $k$ and degree $< r$,
+\[
+  \|u - P_k u\|_{L_p[0,1]} \leq (1 + C_r) \|u - S\|_{L_p[0,1]} ,
+\]
+with the bound $C_r = r M^2$ of \Cref{thm:pp-proj}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The coefficient of $(n, l)$ is the local coefficient of \Cref{def:loc-proj}. The function
+$\varphi_{n,l}$ is a piecewise polynomial of level $k$, hence of level $k + 1$
+(\Cref{lem:pp-bookkeeping}), and $P_{k+1}$ reproduces it (\Cref{thm:pp-proj}). Since $P_k S = S$,
+$u - P_k u = (u - S) - P_k (u - S)$.
+\end{proof}
+
+\begin{definition}[Piecewise polynomials on the cube]
+\label{def:cube-pp}
+\lean{Cube.IsCubePP, Cube.IsCubePP.succ, Cube.IsCubePP.add, Cube.IsCubePP.const_mul,
+  Cube.isCubePP_zero, Cube.IsCubePP.exists_slice_eq_ppFun, Cube.cubePPSpace, Cube.cubePPSpace_mono,
+  Cube.cubePPScheme, Cube.mem_cubePPScheme_two_pow, Cube.cubePPScheme_isLinear, Cube.cubeProj,
+  Cube.isCubePP_cubeProj}
+\leanok
+\uses{lem:pp-kernel, lem:kernel-forms}
+Let $r \geq 1$ and $k \in \N$. A function on $\R^d$ is a piecewise polynomial of level $k$ and
+degree $< r$ in each variable if it is bounded, measurable, and has the form of $P_k$ in every
+coordinate. Their classes form subspaces $V^d_k \subseteq L_p(Q)$ increasing in $k$, and the
+scheme of dyadic piecewise polynomials on the cube has the approximants $\{0\}$ at complexity $0$
+and $V^d_{\lfloor \log_2 n \rfloor}$ at complexity $n \geq 1$. The tensor projection
+$P^d_k g = P_k^{(1)} \cdots P_k^{(d)} g$ of a bounded measurable $g$ is a piecewise polynomial of
+level $k$, and the slices of a piecewise polynomial of level $k$ on the cube are piecewise
+polynomials of level $k$ and degree $< r$ on $[0, 1]$.
+\end{definition}
+
+The definition is coordinatewise: on every dyadic cube of level $k$ such a function is a
+polynomial of degree $< r$ in each variable separately. The spaces increase since the forms of
+$P_k$ are forms of $P_{k+1}$ (\Cref{lem:pp-kernel}, \Cref{lem:kernel-forms}).
+
+\begin{theorem}[Jackson's inequality on the cube]
+\label{thm:cube-jackson}
+\lean{Cube.eLpNorm_sub_slicewise_ppKernel_le, Cube.cubeJacksonConst, Cube.cubeJacksonConst_ne_top,
+  Cube.eLpNorm_sub_cubeProj_le, Cube.approxSeq_le_of_continuous, Cube.approxSeq_cubePPScheme_le}
+\leanok
+\uses{def:cube-pp, lem:pp-kernel, lem:pp-taylor, lem:cube-two-sided-smoothing,
+  lem:minkowski-bounds, lem:cube-slices, lem:kernel-telescoping, lem:cube-modulus, lem:error-dense}
+Let $1 \leq p < \infty$ and $r \geq 1$. For every $f \in L_p(Q)$ and $k \geq 1$,
+\[
+  E_{2^k}(f)_p \leq (1 + C_r)^{d+1} \, 2 (1 + 2^r r^{2r}) \, \omega_r(f, 2^{-k})_p ,
+\]
+where $E$ is the error of best approximation by the scheme of \Cref{def:cube-pp}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+First let $f$ be bounded and continuous, and $L = 2^{-k}$. In coordinate $i$,
+\Cref{lem:cube-two-sided-smoothing} on $Q_i[0, \tfrac12]$ and on $Q_i[\tfrac12, 1]$ gives
+$G_1, D_1$ and $G_2, D_2$. For every $x$, \Cref{lem:pp-taylor} for the slices of $f$, $G_\nu$ and
+$D_\nu$ through $x$ gives a piecewise polynomial $S_x$ of level $k$; it need not depend
+measurably on $x$, since only the bound enters. With \Cref{lem:pp-kernel},
+$\|f_{x,i} - P_k f_{x,i}\|_{L_p[0,1]}$ is at most $1 + C_r$ times the sum of
+$\|(f - G_\nu)_{x,i}\|$ and $L^r \|(D_\nu)_{x,i}\|$ on the two halves. \Cref{lem:minkowski-bounds}
+in $x$ and \Cref{lem:cube-slices} give
+\begin{multline*}
+  \|f - P_k^{(i)} f\|_{L_p(Q)}
+  \leq (1 + C_r) \sum_{\nu = 1}^2 \bigl( \|f - G_\nu\| + L^r \|D_\nu\| \bigr) \\
+  \leq (1 + C_r) \, 2 (1 + 2^r r^{2r}) \, \omega_r^{(i)}(f, L)_p ,
+\end{multline*}
+the norms on the respective halves of $Q$. \Cref{lem:kernel-telescoping} with $C = C_r$ sums these
+bounds over the coordinates, and $P^d_k f \in V^d_k$. General $f$ follow by
+\Cref{lem:error-dense}: the bounded continuous functions are dense in $L_p(Q)$, and
+$\omega_r(\cdot, t)_p$ is subadditive with $\omega_r(f, t)_p \leq d \, 2^r \|f\|_p$
+(\Cref{lem:cube-modulus}).
+\end{proof}
+
+\begin{theorem}[The inverse inequality on the cube]
+\label{thm:cube-inverse}
+\lean{Cube.eLpNorm_cubeDiff_le_of_isCubePP, Cube.exists_inverse_cubePPScheme}
+\leanok
+\uses{def:cube-pp, thm:pp-inverse, lem:cube-modulus}
+Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_B$ with
+\[
+  \omega_r(a, 2^{-k})_p \leq C_B \, 2^{-\max(k - j, 0)/p} \|a\|_p
+\]
+for all $j, k \in \N$ and every $a \in V^d_j$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $0 \leq h \leq 2^{-j}$. Every slice $a_{x,i}$ is a piecewise polynomial of level $j$ on
+$[0, 1]$ (\Cref{def:cube-pp}), so the local estimate in the proof of \Cref{thm:pp-inverse} gives
+$\|\Delta_h^r a_{x,i}\|_{L_p[0, 1 - rh]} \leq 2^r K (r (r + 1) 2^j h)^{1/p} \|a_{x,i}\|_{L_p[0,1]}$,
+with the Nikolskii constant $K$ of \Cref{lem:interval-nikolskii}. Integrating over $x$
+(\Cref{lem:cube-modulus}) gives the same bound for $\Delta^r_{h e_i} a$ on the cube; take the
+supremum over $h \leq 2^{-k}$ and sum over $i$. For $k < j$ use
+$\omega_r(a, t)_p \leq d \, 2^r \|a\|_p$.
+\end{proof}
+
+\begin{theorem}[Approximation spaces of piecewise polynomials on the cube]
+\label{thm:cube-besov}
+\lean{Cube.cubePPModulusData, Cube.memApprox_cubePPScheme_iff}
+\leanok
+\uses{thm:cube-jackson, thm:cube-inverse, def:modulus-data, thm:modulus-coincidence}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $r \geq 1$ and $0 \leq s < 1/p$. A function
+$f \in L_p(Q)$ lies in the approximation space $A^s_q$ of the scheme of dyadic piecewise
+polynomials of degree $< r$ in each variable on the cube if and only if
+\[
+  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_r(f, 2^{-k})_p \bigr)_k \bigr\|_{\ell_q} < \infty .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:cube-jackson}, from level $k_0 = 1$ on, and \Cref{thm:cube-inverse} make
+$\omega_r(\cdot, 2^{-k})_p$ a modulus compatible with the scheme of inverse order $\theta = 1/p$;
+apply \Cref{thm:modulus-coincidence}.
+\end{proof}
+
+For $0 < s < 1/p$ the condition says $f \in \Besov{s}{p}{q}(Q)$, with the Besov space defined by
+the moduli in the coordinates.
 
 \bpbibheading
 \begin{thebibliography}{99}
