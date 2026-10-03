@@ -7,6 +7,7 @@ module
 
 public import FunctionSpaces.Rd.MomentKernels
 public import FunctionSpaces.Rd.BesovDifferences
+public import Mathlib.Analysis.Calculus.BumpFunction.Normed
 
 /-!
 # Local means
@@ -37,7 +38,8 @@ quasi-norm is finite, with equivalent quasi-norms:
   (`Rd.LocalMeansBump.modNorm_le_localMeansNorm`).
 
 Local means therefore describe the same spaces as band-limited approximation, Littlewood–Paley
-blocks and differences (`Rd.LocalMeansBump.memApprox_bandScheme_iff_localMeans`).
+blocks and differences (`Rd.LocalMeansBump.memApprox_bandScheme_iff_localMeans`). Every radius
+`R > 0` has a bump: the normalised smooth bump function around `0` (`Rd.LocalMeansBump.centered`).
 -/
 
 @[expose] public section
@@ -273,6 +275,65 @@ theorem eLpNorm_dual_one_le (L j : ℕ) :
           eLpNorm_add_le le_rfl
       _ = 2 * eLpNorm (momentKernel b.toFun L) 1 volume := by
           rw [b.eLpNorm_scaled_one, b.eLpNorm_scaled_one, two_mul]
+
+/-- The dilated moment kernels vanish outside `B̄(0, L R 2^(-j))`. -/
+theorem scaled_eq_zero_of_lt (L j : ℕ) {y : V} (hy : L * b.radius / 2 ^ j < ‖y‖) :
+    b.scaled L j y = 0 := by
+  rw [scaled, dilate, b.momentKernel_eq_zero L, mul_zero]
+  rw [norm_smul, Real.norm_of_nonneg (by positivity)]
+  rw [div_lt_iff₀ (by positivity)] at hy
+  linarith
+
+/-- The dual kernels vanish outside `B̄(0, 2 L R 2^(-j))`. -/
+theorem dual_eq_zero_of_lt (L j : ℕ) {y : V} (hy : 2 * L * b.radius / 2 ^ j < ‖y‖) :
+    b.dual L j y = 0 := by
+  have hLR : 0 ≤ (L : ℝ) * b.radius := mul_nonneg (Nat.cast_nonneg L) b.radius_nonneg
+  cases j with
+  | zero =>
+    refine b.scaled_eq_zero_of_lt L 0 (lt_of_le_of_lt ?_ hy)
+    simp only [pow_zero, div_one]
+    linarith
+  | succ j =>
+    show b.scaled L (j + 1) y + b.scaled L j y = 0
+    have h1 : (L : ℝ) * b.radius / 2 ^ (j + 1) ≤ 2 * L * b.radius / 2 ^ (j + 1) :=
+      div_le_div_of_nonneg_right (by linarith) (by positivity)
+    have h2 : 2 * (L : ℝ) * b.radius / 2 ^ (j + 1) = L * b.radius / 2 ^ j := by
+      rw [pow_succ, mul_comm ((2 : ℝ) ^ j) 2, mul_assoc, mul_div_mul_left _ _ two_ne_zero]
+    rw [b.scaled_eq_zero_of_lt L (j + 1) (h1.trans_lt hy),
+      b.scaled_eq_zero_of_lt L j (h2 ▸ hy), add_zero]
+
+/-- The dual kernels have compact support. -/
+theorem hasCompactSupport_dual (L j : ℕ) : HasCompactSupport (b.dual L j) :=
+  HasCompactSupport.intro (isCompact_closedBall 0 (2 * L * b.radius / 2 ^ j)) fun y hy =>
+    b.dual_eq_zero_of_lt L j (by simpa [Metric.mem_closedBall, dist_zero_right, not_le] using hy)
+
+/-- The dual kernels are continuous. -/
+theorem continuous_dual (L j : ℕ) : Continuous (b.dual L j) := by
+  have hm : Continuous (momentKernel b.toFun L) := (b.contDiff_momentKernel L).continuous
+  cases j with
+  | zero => exact continuous_dilate hm _
+  | succ j => exact (continuous_dilate hm _).add (continuous_dilate hm _)
+
+/-- The dilated moment kernels have compact support. -/
+theorem hasCompactSupport_scaled (L j : ℕ) : HasCompactSupport (b.scaled L j) :=
+  HasCompactSupport.intro (isCompact_closedBall 0 (L * b.radius / 2 ^ j)) fun y hy =>
+    b.scaled_eq_zero_of_lt L j (by simpa [Metric.mem_closedBall, dist_zero_right, not_le] using hy)
+
+/-- The dilated moment kernels are continuous. -/
+theorem continuous_scaled (L j : ℕ) : Continuous (b.scaled L j) :=
+  continuous_dilate (b.contDiff_momentKernel L).continuous _
+
+/-- The local means kernels have compact support. -/
+theorem hasCompactSupport_kernel (L j : ℕ) : HasCompactSupport (b.kernel L j) := by
+  cases j with
+  | zero => exact b.hasCompactSupport_scaled L 0
+  | succ j => exact (b.hasCompactSupport_scaled L (j + 1)).sub (b.hasCompactSupport_scaled L j)
+
+/-- The local means kernels are continuous. -/
+theorem continuous_kernel (L j : ℕ) : Continuous (b.kernel L j) := by
+  cases j with
+  | zero => exact b.continuous_scaled L 0
+  | succ j => exact (b.continuous_scaled L (j + 1)).sub (b.continuous_scaled L j)
 
 /-- **Differences of the dilated moment kernels in `L_1`**:
 `‖Δ_v^L m_{2^j}‖_1 ≤ (2^j ‖v‖)^L ‖D^L m‖_1`. -/
@@ -631,5 +692,38 @@ theorem memApprox_bandScheme_iff_localMeans (hp : p ≠ ∞) {L : ℕ} (hL : 1 �
   rw [memApprox_bandScheme_iff_modulus hp hs.le hsL hq f, b.besov_iff_localMeans hp hL hs hsL hq f]
 
 end LocalMeansBump
+
+/-! ### The centred bump -/
+
+section Centered
+
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+  [MeasurableSpace V] [BorelSpace V]
+
+/-- The smooth bump around `0` with outer radius `R`. -/
+noncomputable def centeredBumpBase {R : ℝ} (hR : 0 < R) : ContDiffBump (0 : V) :=
+  ⟨R / 2, R, by positivity, by linarith⟩
+
+/-- The **centred bump** of radius `R > 0`: the normalised smooth bump function around `0`. -/
+noncomputable def LocalMeansBump.centered {R : ℝ} (hR : 0 < R) : LocalMeansBump V where
+  toFun z := (((centeredBumpBase (V := V) hR).normed volume z : ℝ) : ℂ)
+  radius := R
+  radius_nonneg := hR.le
+  contDiff := Complex.ofRealCLM.contDiff.comp
+    ((centeredBumpBase (V := V) hR).contDiff_normed (n := ⊤))
+  eq_zero z hz := by
+    have hz' : z ∉ Function.support ((centeredBumpBase (V := V) hR).normed volume) := by
+      rw [(centeredBumpBase (V := V) hR).support_normed_eq, Metric.mem_ball, dist_zero_right]
+      exact fun h => (lt_irrefl _ (hz.trans h))
+    rw [Function.notMem_support.1 hz', Complex.ofReal_zero]
+  integral_eq_one := by
+    rw [integral_complex_ofReal, (centeredBumpBase (V := V) hR).integral_normed,
+      Complex.ofReal_one]
+
+/-- The centred bump has radius `R`. -/
+theorem LocalMeansBump.centered_radius {R : ℝ} (hR : 0 < R) :
+    (LocalMeansBump.centered (V := V) hR).radius = R := rfl
+
+end Centered
 
 end Rd

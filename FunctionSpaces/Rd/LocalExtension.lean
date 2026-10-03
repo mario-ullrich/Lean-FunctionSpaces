@@ -133,30 +133,6 @@ theorem kernel_eq_zero (L j : ℕ) {y : V} (hy : L * b.radius < ‖y‖) : b.ker
 
 end LocalMeansBump
 
-/-- The smooth bump around `0` with outer radius `R`. -/
-noncomputable def centeredBumpBase {R : ℝ} (hR : 0 < R) : ContDiffBump (0 : V) :=
-  ⟨R / 2, R, by positivity, by linarith⟩
-
-/-- The **centred bump** of radius `R > 0`: the normalised smooth bump function around `0`. -/
-noncomputable def LocalMeansBump.centered {R : ℝ} (hR : 0 < R) : LocalMeansBump V where
-  toFun z := (((centeredBumpBase (V := V) hR).normed volume z : ℝ) : ℂ)
-  radius := R
-  radius_nonneg := hR.le
-  contDiff := Complex.ofRealCLM.contDiff.comp
-    ((centeredBumpBase (V := V) hR).contDiff_normed (n := ⊤))
-  eq_zero z hz := by
-    have hz' : z ∉ Function.support ((centeredBumpBase (V := V) hR).normed volume) := by
-      rw [(centeredBumpBase (V := V) hR).support_normed_eq, Metric.mem_ball, dist_zero_right]
-      exact fun h => (lt_irrefl _ (hz.trans h))
-    rw [Function.notMem_support.1 hz', Complex.ofReal_zero]
-  integral_eq_one := by
-    rw [integral_complex_ofReal, (centeredBumpBase (V := V) hR).integral_normed,
-      Complex.ofReal_one]
-
-/-- The centred bump has radius `R`. -/
-theorem LocalMeansBump.centered_radius {R : ℝ} (hR : 0 < R) :
-    (LocalMeansBump.centered (V := V) hR).radius = R := rfl
-
 /-! ### Kernels supported in the reflected cone -/
 
 namespace LipschitzGraph

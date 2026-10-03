@@ -144,15 +144,6 @@ namespace LocalMeansBump
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V] (b : LocalMeansBump V)
 
-/-- The dilated moment kernels have compact support. -/
-theorem hasCompactSupport_scaled (L j : ℕ) : HasCompactSupport (b.scaled L j) :=
-  HasCompactSupport.intro (isCompact_closedBall 0 (L * b.radius / 2 ^ j)) fun y hy =>
-    b.scaled_eq_zero_of_lt L j (by simpa [mem_closedBall, dist_zero_right, not_le] using hy)
-
-/-- The dilated moment kernels are continuous. -/
-theorem continuous_scaled (L j : ℕ) : Continuous (b.scaled L j) :=
-  continuous_dilate (b.contDiff_momentKernel L).continuous _
-
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-- **The reproducing formula at every point**: `∑_{j ≤ J} (η_j ⋆ (k_j ⋆ f))(y) =

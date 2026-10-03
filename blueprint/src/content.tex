@@ -7179,6 +7179,7 @@ $\|w\| \leq R 2^{-J}$ enters, and $\|\Phi_{2^J}\|_1 = \|\Phi\|_1$.
 \begin{lemma}[The reproducing formula at every point]
 \label{lem:reproducing-pointwise}
 \lean{Rd.LocalMeansBump.hasCompactSupport_scaled, Rd.LocalMeansBump.continuous_scaled,
+  Rd.LocalMeansBump.hasCompactSupport_kernel, Rd.LocalMeansBump.continuous_kernel,
   Rd.LocalMeansBump.sum_conv_dual_localMean_apply}
 \leanok
 \uses{lem:reproducing-formula, lem:dual-kernel-bounds}
@@ -7794,6 +7795,470 @@ functions with a finite intrinsic norm on $\Omega$ are the restrictions of such 
 and the boundary traces agree almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}).
 \end{proof}
 
+\chapter{Dominating mixed smoothness on $\R^d$}
+
+This chapter works on $\R^d$ with Lebesgue measure, for functions of $d$ real variables
+$x = (x_1, \dots, x_d)$. The spaces of dominating mixed smoothness measure smoothness in each
+coordinate separately: their quasi-norms are $\ell_q$ norms over $k \in \N^d$ with the weights
+$2^{s|k|_1}$, $|k|_1 = k_1 + \dots + k_d$. All kernels are tensor products of the one-dimensional
+kernels of the previous chapter with $V = \R$, and every convolution is a $d$-dimensional
+convolution, so Young's inequality and the approximate identities apply to them. Three
+descriptions are shown to agree, mixed differences after T.~Ullrich \cite{UllrichT}, mixed local
+means, and tensor Littlewood--Paley blocks after Vyb\'{\i}ral \cite{Vybiral}; the last gives the
+rate of approximation on hyperbolic crosses.
+
+\section{Tensor kernels}
+
+\begin{definition}[Tensor kernels]
+\label{def:tensor-kernel}
+\lean{Rd.tensorKernel, Rd.tensorKernel_apply, Rd.integrable_tensorKernel,
+  Rd.continuous_tensorKernel}
+\leanok
+For one-dimensional kernels $K_1, \dots, K_d$ the tensor product is
+$(\otimes K)(x) = \prod_i K_i(x_i)$. Tensor products of integrable (continuous) kernels are
+integrable (continuous).
+\end{definition}
+
+\begin{lemma}[Integrals and convolutions of tensor kernels]
+\label{lem:tensor-kernel-fubini}
+\lean{Rd.integral_tensorKernel, Rd.lintegral_enorm_tensorKernel, Rd.eLpNorm_tensorKernel_one,
+  Rd.conv_tensorKernel, Rd.dilate_tensorKernel, Rd.sum_tensorKernel_piFinset}
+\leanok
+\uses{def:tensor-kernel, thm:young}
+$\int \otimes K = \prod_i \int K_i$, $\|\otimes K\|_1 = \prod_i \|K_i\|_1$,
+$(\otimes K) * (\otimes K') = \otimes (K_i * K'_i)$, $(\otimes K)_c = \otimes (K_i)_c$, and
+$\sum_{k \in T_1 \times \dots \times T_d} \otimes (K_i(k_i)) = \otimes \bigl(\sum_{j \in T_i} K_i(j)\bigr)$
+for finite sets $T_i$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Fubini's theorem for product measures, and $\prod_i \sum_j = \sum \prod$ for finite sums.
+\end{proof}
+
+\begin{lemma}[Diagonal changes of variables]
+\label{lem:diagonal-substitution}
+\lean{Rd.diagMap, Rd.diagMap_apply, Rd.det_diagMap, Rd.diagEquiv, Rd.diagEquiv_apply,
+  Rd.integral_comp_diagMap, Rd.integral_tensorKernel_mul_comp_eq_conv, Rd.integrable_comp_diag}
+\leanok
+\uses{lem:tensor-kernel-fubini}
+For $a_1, \dots, a_d > 0$, $\int F((a_i z_i)_i) \, dz = (\prod_i a_i)^{-1} \int F$, the map
+$F \mapsto F((a_i \cdot_i)_i)$ keeps integrability, and
+\[
+  \int (\otimes\varphi)(z) f(x - (a_i z_i)_i) \, dz = ((\otimes \varphi_i^{(1/a_i)}) * f)(x),
+  \qquad \varphi^{(c)}(t) = c \, \varphi(ct).
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The diagonal map scales Lebesgue measure by its determinant $\prod_i a_i$.
+\end{proof}
+
+\section{Sequences on $\N^d$}
+
+\begin{definition}[$\ell_q$ norms on $\N^d$]
+\label{def:mixed-lq}
+\lean{Rd.mixedLqNorm, Rd.aestronglyMeasurable_mixed, Rd.mixedLqNorm_top, Rd.mixedLqNorm_eq_tsum,
+  Rd.mixedLqNorm_rpow, Rd.mixedLqNorm_one, Rd.le_mixedLqNorm, Rd.mixedLqNorm_mono,
+  Rd.mixedLqNorm_add_le, Rd.mixedLqNorm_const_mul, Rd.mixedLqNorm_le_tsum, Rd.mixedWeight,
+  Rd.mixedWeight_ne_top, Rd.mixedWeight_neg_mul_self}
+\leanok
+\uses{def:lq-norm}
+For $a : \N^d \to [0, \infty]$, $\|a\|_{\ell_q} = (\sum_k a_k^q)^{1/q}$ for $q < \infty$ and
+$\|a\|_{\ell_\infty} = \sup_k a_k$, the $L_q$ norm for the counting measure. It is monotone,
+homogeneous, satisfies Minkowski's inequality, and is at most $\sum_k a_k$ for $q \geq 1$. The
+mixed weights are $2^{s|k|_1} = \prod_i 2^{s k_i}$.
+\end{definition}
+
+\begin{lemma}[The Schur test]
+\label{lem:schur-test}
+\lean{Rd.mixedLqNorm_schur_le, Rd.tsum_prod_le_prod_tsum}
+\leanok
+\uses{def:mixed-lq, lem:weighted-jensen}
+Let $w \geq 0$ on $\N^d \times \N^d$ with $\sum_k w(m, k) \leq A$ for every $m$ and
+$\sum_m w(m, k) \leq A$ for every $k$. Then for $1 \leq q \leq \infty$ and every $b \geq 0$,
+$\|(\sum_k w(m, k) b_k)_m\|_{\ell_q} \leq A \|b\|_{\ell_q}$. Moreover
+$\sum_{k \in \N^d} \prod_i f_i(k_i) \leq \prod_i \sum_j f_i(j)$ for $f_i \geq 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By the weighted Jensen inequality (\Cref{lem:weighted-jensen}) for the counting measure,
+$(\sum_k w(m, k) b_k)^q \leq A^{q-1} \sum_k w(m, k) b_k^q$; summing over $m$ and exchanging the sums
+gives at most $A^q \sum_k b_k^q$. The product bound holds on the finite boxes.
+\end{proof}
+
+\begin{lemma}[The almost diagonal lemma on $\N^d$]
+\label{lem:mixed-almost-diagonal}
+\lean{Rd.almostDiagCoeff, Rd.almostDiagProfile, Rd.dyadicWeight_mul_almostDiagCoeff_mul,
+  Rd.tsum_almostDiagProfile_le, Rd.almostDiagConst, Rd.almostDiagConst_ne_top,
+  Rd.mixedLqNorm_almostDiagonal_le}
+\leanok
+\uses{lem:schur-test, lem:almost-diagonal}
+Let $c(i, j) = 2^{-(i - j)L}$ for $j \leq i$ and $c(i, j) = 1$ for $j > i$, let $s \geq 0$ and
+$1 \leq q \leq \infty$. Then for every $a \geq 0$
+\[
+  \bigl\|\bigl(2^{s|m|_1} \textstyle\sum_k \prod_i c(m_i, k_i) \, a_k\bigr)_m\bigr\|_{\ell_q}
+  \leq C^d \, \|(2^{s|k|_1} a_k)_k\|_{\ell_q}
+\]
+with $C = (1 - 2^{-(L-s)})^{-1} + (1 - 2^{-s})^{-1}$, and $C < \infty$ for $0 < s < L$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$2^{s|m|_1} \prod_i c(m_i, k_i) \, 2^{-s|k|_1} = \prod_i u(m_i - k_i)$ with $u(l) = 2^{-(L-s)l}$
+for $l \geq 0$ and $u(l) = 2^{sl}$ for $l < 0$, and $\sum_{l \in \Z} u(l) \leq C$. All row and
+column sums are therefore at most $C^d$ (\Cref{lem:schur-test}). This replaces the
+one-dimensional Hardy inequalities of \Cref{lem:almost-diagonal}, which do not iterate over the
+coordinates.
+\end{proof}
+
+\section{Mixed differences}
+
+\begin{definition}[Mixed differences]
+\label{def:mixed-differences}
+\lean{Rd.mixedDiff, Rd.diffAct_coordElem_pow_eq_iterDiff, Rd.mixedDiff_empty, Rd.mixedDiff_insert,
+  Rd.mixedDiff_add, Rd.mixedDiff_sub}
+\leanok
+\uses{def:iso-diff}
+For $e \subseteq \{1, \dots, d\}$ and steps $h \in \R^d$ the mixed difference of order $L$ is
+$\Delta^{L,e}_h f = (\prod_{i \in e} \Delta^L_{h_i e_i}) f$, the action of
+$\prod_{i \in e} (\delta_{h_i e_i} - 1)^L$ in the commutative algebra of translations; a further
+coordinate $i \notin e$ applies $\Delta^L_{h_i e_i}$.
+\end{definition}
+
+\begin{lemma}[Properties of mixed differences]
+\label{lem:mixed-differences}
+\lean{Rd.aestronglyMeasurable_mixedDiff, Rd.integrable_mixedDiff, Rd.mixedDiff_congr_ae,
+  Rd.eLpNorm_mixedDiff_le, Rd.mixedDiff_conv_ae, Rd.fwdDiff_single_tensorKernel,
+  Rd.iterDiff_single_tensorKernel, Rd.mixedDiff_tensorKernel}
+\leanok
+\uses{def:mixed-differences, lem:rd-differences, def:tensor-kernel}
+Mixed differences keep measurability and integrability, depend only on the class of $f$, satisfy
+$\|\Delta^{L,e}_h f\|_p \leq 2^{L|e|} \|f\|_p$ and
+$\Delta^{L,e}_h (K * f) = (\Delta^{L,e}_h K) * f$ almost everywhere, and act on tensor kernels
+factorwise: $\Delta^{L,e}_h (\otimes K) = \otimes K'$ with $K'_i = \Delta^L_{h_i} K_i$ for
+$i \in e$ and $K'_i = K_i$ otherwise.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Induction over $e$ with the one-dimensional properties (\Cref{lem:rd-differences}).
+\end{proof}
+
+\begin{definition}[Mixed moduli and the mixed Besov quasi-norm]
+\label{def:mixed-moduli}
+\lean{Rd.mixedModulus, Rd.eLpNorm_mixedDiff_le_mixedModulus, Rd.mixedModulus_mono,
+  Rd.mixedModulus_empty, Rd.mixedModulus_add_le, Rd.mixedModulus_le, Rd.mixedModulus_congr_ae,
+  Rd.mixedSupp, Rd.mixedSupp_zero, Rd.lpMixedModulus, Rd.lpMixedModulus_zero,
+  Rd.lpMixedModulus_add_le, Rd.lpMixedModulus_le, Rd.lpMixedModulus_zero_left, Rd.mixedModNorm,
+  Rd.enorm_le_mixedModNorm}
+\leanok
+\uses{lem:mixed-differences, def:mixed-lq}
+The mixed modulus of smoothness is
+$\Omega^e_L(f, t)_p = \sup \{\|\Delta^{L,e}_h f\|_p : |h_i| \leq t_i \text{ for } i \in e\}$. For
+$k \in \N^d$ let $e(k) = \{i : k_i \neq 0\}$. The Besov quasi-norm of dominating mixed smoothness
+by differences is $\|(2^{s|k|_1} \Omega^{e(k)}_L(f, 2^{-k})_p)_{k \in \N^d}\|_{\ell_q}$; its term
+$k = 0$ is $\|f\|_p$. The mixed modulus increases in $t$, is subadditive, is at most
+$2^{L|e|} \|f\|_p$, and depends only on the class of $f$.
+\end{definition}
+
+\section{Averaged mixed differences}
+
+\begin{lemma}[Bounded polynomials in translations]
+\label{lem:acts-bounded}
+\lean{Rd.ActsBounded, Rd.ActsBounded.one, Rd.ActsBounded.single, Rd.ActsBounded.mono,
+  Rd.ActsBounded.add, Rd.ActsBounded.mul, Rd.ActsBounded.smul, Rd.ActsBounded.neg,
+  Rd.ActsBounded.sub, Rd.ActsBounded.pow, Rd.ActsBounded.prod, Rd.actsBounded_momentPoly,
+  Rd.actsBounded_addPoly}
+\leanok
+\uses{def:mixed-differences}
+An element $a$ of the algebra of translations acts boundedly with constant $C$ if $a G$ stays
+measurable and $\|a G\|_p \leq C \|G\|_p$. Translations $c \, \delta_v$ act with $|c|$, and sums,
+products and powers add and multiply the constants. In particular $1 - (-1)^L (Y - 1)^L$ and
+$(-1)^L ((Y + 1)^L - 1)$ act with $2^L + 1$ for every translation $Y$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Translations preserve $L_p$ norms; the triangle inequality and composition.
+\end{proof}
+
+\begin{lemma}[The moment kernel polynomial]
+\label{lem:moment-polynomial}
+\lean{Rd.sum_jacksonCoeff_smul_pow}
+\leanok
+\uses{def:moment-kernel}
+In every commutative $\C$-algebra,
+$\sum_{l=1}^L (-1)^{l+1} \binom{L}{l} Y^l = 1 - (-1)^L (Y - 1)^L$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The binomial theorem.
+\end{proof}
+
+\begin{theorem}[Tensor products of dilated bumps average translates]
+\label{thm:tensor-averaged-differences}
+\lean{Rd.diffAct_prod_sum_pow_apply, Rd.conv_tensorKernel_sum_dilate_ae}
+\leanok
+\uses{lem:diagonal-substitution, lem:tensor-kernel-fubini, lem:acts-bounded}
+Let $\kappa_i = \sum_{t \in T} q_i(t) \, g_{c_i/\nu(t)}$ with integers $\nu(t) \geq 1$, scales
+$c_i > 0$ and an integrable $g$ on $\R$, and let $Y_i = \delta_{-z_i e_i / c_i}$. For $f \in L_p$
+and almost every $x$,
+\[
+  ((\otimes\kappa) * f)(x) = \int (\otimes g)(z)
+    \Bigl(\prod_i \textstyle\sum_t q_i(t) Y_i^{\nu(t)}\Bigr) f(x) \, dz .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The product expands into the translates $f(x - (\nu(n_i) z_i / c_i)_i)$ with the coefficients
+$\prod_i q_i(n_i)$, and each translate integrates to a convolution with an anisotropic dilation
+of $\otimes g$ (\Cref{lem:diagonal-substitution}).
+\end{proof}
+
+\section{Mixed local means}
+
+\begin{definition}[Mixed local means]
+\label{def:mixed-local-means}
+\lean{Rd.LocalMeansBump.mixedKernel, Rd.LocalMeansBump.mixedDual,
+  Rd.LocalMeansBump.integrable_mixedKernel, Rd.LocalMeansBump.integrable_mixedDual,
+  Rd.LocalMeansBump.mixedLocalMean, Rd.LocalMeansBump.mixedLocalMeansNorm}
+\leanok
+\uses{def:local-means, def:tensor-kernel}
+For a bump $g$ on $\R$ with the kernels $k_j$ and $\eta_j$ of \Cref{def:local-means}, the mixed
+kernels are $k_k = \otimes_i k_{k_i}$ and $\eta_k = \otimes_i \eta_{k_i}$, $k \in \N^d$, the mixed
+local means of $f$ are $k_k * f$, and the mixed local means quasi-norm is
+$\|(2^{s|k|_1} \|k_k * f\|_p)_k\|_{\ell_q}$.
+\end{definition}
+
+\begin{lemma}[Local means kernels as sums of dilated bumps]
+\label{lem:kernel-dilation-sum}
+\lean{Rd.LocalMeansBump.lmExp, Rd.LocalMeansBump.lmCoeff, Rd.LocalMeansBump.one_le_lmExp,
+  Rd.LocalMeansBump.kernel_eq_sum_dilate, Rd.LocalMeansBump.sum_lmCoeff_smul_pow}
+\leanok
+\uses{def:moment-kernel, lem:moment-polynomial}
+With $a_l = (-1)^l \binom{L}{l+1}$, $k_0 = \sum_{l < L} a_l g_{1/(l+1)}$ and
+$k_j = \sum_{l < L} a_l (g_{2^j/(l+1)} - g_{2^j/(2(l+1))})$ for $j \geq 1$. The corresponding
+polynomials are $P(Y) = 1 - (-1)^L (Y - 1)^L$ and
+$P(Y) - P(Y^2) = (Y - 1)^L (-1)^L ((Y + 1)^L - 1)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$m_c = \sum_l a_l g_{c/(l+1)}$ and $g_{2^j/(2(l+1))} = g_{2^{j-1}/(l+1)}$; the factorisation from
+$Y^2 - 1 = (Y - 1)(Y + 1)$ and \Cref{lem:moment-polynomial}.
+\end{proof}
+
+\begin{theorem}[Mixed local means are bounded by the mixed modulus]
+\label{thm:mixed-local-means-upper}
+\lean{Rd.LocalMeansBump.enorm_mixedLocalMean_le, Rd.LocalMeansBump.mixedLocalMeansNorm_le}
+\leanok
+\uses{lem:kernel-dilation-sum, thm:tensor-averaged-differences, lem:acts-bounded,
+  lem:weighted-jensen, def:mixed-moduli}
+If the bump vanishes outside $[-1, 1]$, then
+$\|k_k * f\|_p \leq (\|g\|_1 (2^L + 1))^d \, \Omega^{e(k)}_L(f, 2^{-k})_p$. Hence the mixed local
+means quasi-norm is at most $(\|g\|_1 (2^L + 1))^d$ times the quasi-norm by differences.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:kernel-dilation-sum} and \Cref{thm:tensor-averaged-differences},
+\[
+  (k_k * f)(x) = \int (\otimes g)(z) \, B(z) \, \Delta^{L, e(k)}_{h(z)} f(x) \, dz
+\]
+with $h(z)_i = -z_i 2^{-k_i}$, so $|h(z)_i| \leq 2^{-k_i}$ on the support of $\otimes g$, and with
+polynomials $B(z)$ in the translations that act with constant $(2^L + 1)^d$
+(\Cref{lem:acts-bounded}). Minkowski's inequality (\Cref{lem:weighted-jensen}) concludes.
+\end{proof}
+
+\begin{lemma}[The mixed reproducing formula]
+\label{lem:mixed-reproducing}
+\lean{Rd.conv_dilate_dilate, Rd.convLp_congr, Rd.convLp_finsetSum_kernel, Rd.conv_add_conv_sub,
+  Rd.LocalMeansBump.sum_conv_dual_kernel, Rd.LocalMeansBump.sum_conv_mixedDual_mixedKernel,
+  Rd.LocalMeansBump.integral_conv_momentKernel,
+  Rd.LocalMeansBump.tendsto_sum_mixedDual_mixedLocalMean}
+\leanok
+\uses{lem:reproducing-formula, lem:reproducing-pointwise, lem:tensor-kernel-fubini,
+  thm:approx-identity}
+In one variable $\sum_{j \leq J} \eta_j * k_j = m_{2^J} * m_{2^J}$ at every point. Over the boxes
+$\{k : k_i \leq J\}$, $\sum_k \eta_k * k_k = (\otimes (m * m))_{2^J}$, and
+$\sum_k \eta_k * k_k * f \to f$ in $L_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$(a + b) * (a - b) = a * a - b * b$ for the commuting continuous kernels with compact support;
+tensor products and dilations commute with convolution (\Cref{lem:tensor-kernel-fubini}), and
+$\otimes (m * m)$ has integral $1$, so \Cref{thm:approx-identity} applies.
+\end{proof}
+
+\begin{lemma}[Mixed moduli of the reproducing terms]
+\label{lem:mixed-dual-moduli}
+\lean{Rd.LocalMeansBump.lpMixedModulus_convLp_mixedDual_le}
+\leanok
+\uses{lem:dual-kernel-moduli, lem:mixed-differences, lem:tensor-kernel-fubini}
+$\Omega^{e(m)}_L(\eta_k * h, 2^{-m})_p \leq C_\eta^d \prod_i c(m_i, k_i) \, \|h\|_p$ with the
+coefficients $c$ of \Cref{lem:mixed-almost-diagonal}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\Delta^{L, e(m)}_v (\eta_k * h) = (\Delta^{L, e(m)}_v \eta_k) * h$, a convolution with a tensor
+product whose factors have $L_1$ norms at most $C_\eta c(m_i, k_i)$
+(\Cref{lem:dual-kernel-moduli}).
+\end{proof}
+
+\begin{theorem}[Mixed local means and mixed differences]
+\label{thm:mixed-local-means}
+\lean{Rd.le_tsum_of_tendsto_finsetSum, Rd.LocalMeansBump.mixedModNorm_le_of_tendsto,
+  Rd.LocalMeansBump.mixedModNorm_le_mixedLocalMeansNorm,
+  Rd.LocalMeansBump.mixedBesov_iff_mixedLocalMeans}
+\leanok
+\uses{thm:mixed-local-means-upper, lem:mixed-reproducing, lem:mixed-dual-moduli,
+  lem:mixed-almost-diagonal}
+Let $1 \leq p < \infty$, $0 < s < L$, $1 \leq q \leq \infty$, and let the bump vanish outside
+$[-1, 1]$. Then $\|(2^{s|k|_1} \Omega^{e(k)}_L(f, 2^{-k})_p)_k\|_{\ell_q} < \infty$ if and only if
+$\|(2^{s|k|_1} \|k_k * f\|_p)_k\|_{\ell_q} < \infty$, with equivalent quasi-norms.
+\end{theorem}
+
+\begin{proof}
+\leanok
+One direction is \Cref{thm:mixed-local-means-upper}. Conversely
+$f = \sum_k \eta_k * (k_k * f)$ (\Cref{lem:mixed-reproducing}), and the mixed modulus is
+subadditive and bounded on $L_p$, so
+$\Omega^{e(m)}_L(f, 2^{-m})_p \leq C_\eta^d \sum_k \prod_i c(m_i, k_i) \|k_k * f\|_p$
+(\Cref{lem:mixed-dual-moduli}); \Cref{lem:mixed-almost-diagonal} sums over $k$.
+\end{proof}
+
+\section{Tensor Littlewood--Paley blocks}
+
+\begin{definition}[Tensor Littlewood--Paley blocks]
+\label{def:mixed-lp}
+\lean{Rd.mixedPsi, Rd.mixedTheta, Rd.integrable_mixedPsi, Rd.integrable_mixedTheta,
+  Rd.conv_mixedTheta_mixedPsi, Rd.sum_mixedPsi, Rd.mixedBlock, Rd.mixedLPNorm,
+  Rd.tendsto_sum_mixedBlock}
+\leanok
+\uses{def:lp-kernels, thm:kernel-identities, lem:tensor-kernel-fubini, thm:approx-identity}
+The tensor blocks are $\delta_k = \otimes_i \psi_{k_i}$, so that
+$\delta_k * f = \mathcal{F}^{-1}(\varphi_k \mathcal{F} f)$ for the tensor decomposition of unity
+$\varphi_k = \otimes_i \mathcal{F}\psi_{k_i}$. Vyb\'{\i}ral's quasi-norm is
+$\|(2^{s|k|_1} \|\delta_k * f\|_p)_k\|_{\ell_q}$. The blocks satisfy
+$(\otimes_i \Theta_{k_i}) * \delta_k = \delta_k$, sum over the boxes $\{k : k_i \leq J\}$ to
+$(\otimes \Phi)_{2^J}$, and $\sum_k \delta_k * f = f$ in $L_p$.
+\end{definition}
+
+\begin{lemma}[One-dimensional estimates in $L_1$]
+\label{lem:mixed-lp-kernels}
+\lean{Rd.eLpNorm_conv_eq_enorm_convLp, Rd.one_le_dyadicWeight_mul_almostDiagCoeff,
+  Rd.LocalMeansBump.eLpNorm_kernel_one_le, Rd.LocalMeansBump.exists_eLpNorm_conv_psi_dual_le,
+  Rd.LocalMeansBump.exists_eLpNorm_conv_kernel_Theta_le}
+\leanok
+\uses{thm:band-jackson, thm:kernel-identities, lem:local-means-upper, thm:band-inverse,
+  lem:dual-kernel-moduli}
+There is $C < \infty$ with $\|\psi_m * \eta_k\|_1 \leq C c(m, k)$ and
+$\|k_m * \Theta_k\|_1 \leq C c(m, k)$ for all $m, k \in \N$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $k + 3 \leq m$, $\psi_m$ annihilates the band-limited Jackson approximant $J_{m-3} \eta_k$
+(\Cref{thm:kernel-identities}), so
+$\|\psi_m * \eta_k\|_1 \leq \|\psi_m\|_1 \|\eta_k - J_{m-3} \eta_k\|_1
+\leq C \omega_L(\eta_k, 2^{-(m-3)})_1$ (\Cref{thm:band-jackson}), and
+\Cref{lem:dual-kernel-moduli} bounds the modulus. For $k < m$,
+$\|k_m * \Theta_k\|_1 \leq C \omega_L(\Theta_k, 2^{1-m})_1$ (\Cref{lem:local-means-upper}), and the
+differences of $\Theta_k$ give the decay (\Cref{thm:band-inverse}). In the remaining cases Young's
+inequality suffices.
+\end{proof}
+
+\begin{theorem}[Littlewood--Paley blocks, local means and differences]
+\label{thm:mixed-lp}
+\lean{Rd.LocalMeansBump.enorm_mixedBlock_convLp_mixedDual_le,
+  Rd.LocalMeansBump.enorm_mixedLocalMean_mixedBlock_le, Rd.LocalMeansBump.exists_mixedLPNorm_le,
+  Rd.LocalMeansBump.exists_mixedLocalMeansNorm_le, Rd.mixedBesov_iff_mixedLP}
+\leanok
+\uses{def:mixed-lp, lem:mixed-lp-kernels, lem:mixed-reproducing, thm:mixed-local-means,
+  lem:mixed-almost-diagonal, lem:bumps-every-radius}
+Let $1 \leq p < \infty$, $0 < s < L$ and $1 \leq q \leq \infty$. Then
+$\|(2^{s|k|_1} \Omega^{e(k)}_L(f, 2^{-k})_p)_k\|_{\ell_q} < \infty$ if and only if
+$\|(2^{s|k|_1} \|\delta_k * f\|_p)_k\|_{\ell_q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\delta_m * f = \sum_k (\delta_m * \eta_k) * (k_k * f)$ and
+$k_m * f = \sum_k (k_m * \otimes_i \Theta_{k_i}) * (\delta_k * f)$, and the tensor kernels have
+$L_1$ norms at most $C^d \prod_i c(m_i, k_i)$ (\Cref{lem:mixed-lp-kernels}), so
+\Cref{lem:mixed-almost-diagonal} compares Vyb\'{\i}ral's quasi-norm with the mixed local means.
+\Cref{thm:mixed-local-means} for the centred bump of radius $1$ concludes.
+\end{proof}
+
+\section{Hyperbolic crosses}
+
+\begin{definition}[Levels and hyperbolic crosses]
+\label{def:hyperbolic-cross}
+\lean{Rd.level, Rd.le_level, Rd.levelSet, Rd.mem_levelSet, Rd.mixedWeight_eq_dyadicWeight_level,
+  Rd.hyperbolicCross, Rd.mem_hyperbolicCross, Rd.hyperbolicSum}
+\leanok
+\uses{def:mixed-lp}
+The level of $k \in \N^d$ is $|k|_1 = \sum_i k_i$, the hyperbolic cross of level $N$ is
+$\{k : |k|_1 \leq N\}$, and $S_N f = \sum_{|k|_1 \leq N} \delta_k * f$ is band-limited to the union
+of the dyadic rectangles of these blocks.
+\end{definition}
+
+\begin{lemma}[Counting and Hölder's inequality on levels]
+\label{lem:level-count}
+\lean{Rd.card_levelSet_le, Rd.tsum_le_tsum_levelSet, Rd.sum_le_card_rpow_mul_mixedLqNorm}
+\leanok
+\uses{def:hyperbolic-cross, def:mixed-lq}
+$\#\{k \in \N^d : |k|_1 = n\} \leq (n + 1)^{d-1}$; sums over $\N^d$ are at most the sums over the
+levels of the sums on each level; and $\sum_{k \in S} x_k \leq (\# S)^{1 - 1/q} \|x\|_{\ell_q}$ for
+finite $S$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+An index of level $n$ is determined by its first $d - 1$ coordinates; Hölder's inequality on $S$.
+\end{proof}
+
+\begin{lemma}[The rate series]
+\label{lem:rate-series}
+\lean{Rd.tsum_dyadicWeight_mul_rpow_ne_top, Rd.tsum_tail_le}
+\leanok
+For $s > 0$ and $a \geq 0$, $C = \sum_l 2^{-sl} (l + 1)^a < \infty$ and
+$\sum_{n > N} 2^{-sn} (n + 1)^a \leq C \, 2^{-sN} (N + 1)^a$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$(l + 1)^a \leq (l + 1)^{\lceil a \rceil}$ and $\sum_l l^K r^l < \infty$ for $r < 1$;
+$n + 1 \leq (n - N + 1)(N + 1)$ for $n \geq N$.
+\end{proof}
+
+\begin{theorem}[Hyperbolic cross approximation]
+\label{thm:hyperbolic-cross}
+\lean{Rd.enorm_sub_hyperbolicSum_le, Rd.enorm_sub_hyperbolicSum_le_mixedLPNorm}
+\leanok
+\uses{def:hyperbolic-cross, lem:level-count, lem:rate-series, def:mixed-lp}
+For $s > 0$, $1 \leq q \leq \infty$ and $N \in \N$,
+\[
+  \|f - S_N f\|_p \leq C \, 2^{-sN} (N + 1)^{(d-1)(1 - 1/q)} \,
+    \|(2^{s|k|_1} \|\delta_k * f\|_p)_k\|_{\ell_q}
+\]
+with the constant $C$ of \Cref{lem:rate-series} for $a = (d - 1)(1 - 1/q)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\|f - S_N f\|_p \leq \sum_{|k|_1 > N} \|\delta_k * f\|_p$, since $\sum_k \delta_k * f = f$. On the
+level $n$, Hölder's inequality costs $(n + 1)^{(d-1)(1 - 1/q)}$ (\Cref{lem:level-count}), and
+\Cref{lem:rate-series} sums over $n > N$.
+\end{proof}
+
 \bpbibheading
 \begin{thebibliography}{99}
 
@@ -7850,5 +8315,16 @@ H.~Triebel,
 \emph{Theory of Function Spaces},
 Monographs in Mathematics \textbf{78}, Birkh\"auser, Basel, 1983,
 \href{https://doi.org/10.1007/978-3-0346-0416-1}{doi}.
+
+\bibitem{UllrichT}
+T.~Ullrich,
+\emph{Function spaces with dominating mixed smoothness; characterization by differences},
+Jenaer Schriften zur Mathematik und Informatik Math/Inf/05/06, Friedrich-Schiller-Universit\"at
+Jena, 2006.
+
+\bibitem{Vybiral}
+J.~Vyb\'{\i}ral,
+\emph{Function spaces with dominating mixed smoothness},
+Dissertationes Math.\ \textbf{436} (2006).
 
 \end{thebibliography}

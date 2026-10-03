@@ -122,3 +122,10 @@ declarations.
   between finite-dimensional inner product spaces of the same dimension maps null sets to null sets
   (`Rd.volume_image_eq_zero_of_lipschitzWith`), through the Hausdorff measure, a Haar measure in
   finite dimension.
+* **Tensor products of functions** (`FunctionSpaces/Rd/TensorKernels.lean`): for
+  `(⊗K)(x) = ∏_i K_i(x_i)` on `ℝ^d`, `‖⊗K‖_1 = ∏_i ‖K_i‖_1` (`Rd.lintegral_enorm_tensorKernel`),
+  `(⊗K) ⋆ (⊗K') = ⊗(K_i ⋆ K'_i)` (`Rd.conv_tensorKernel`), and diagonal changes of variables
+  `∫ F((a_i z_i)_i) dz = (∏_i a_i)⁻¹ ∫ F` (`Rd.integral_comp_diagMap`).
+* **The Schur test on `ℓ_q`** (`FunctionSpaces/Rd/MixedSequences.lean`): row and column sums at most
+  `A` give `‖(∑_k w(m, k) b_k)_m‖_{ℓ_q} ≤ A ‖b‖_{ℓ_q}` for `1 ≤ q ≤ ∞` (`Rd.mixedLqNorm_schur_le`),
+  stated on `ℕ^d`; `∑_k ∏_i f_i(k_i) ≤ ∏_i ∑_j f_i(j)` (`Rd.tsum_prod_le_prod_tsum`).

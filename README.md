@@ -421,6 +421,27 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_of_boundaryPartition`). The proof rests on the
   change of chart for the traces of graph domains (`Rd.LipschitzGraph.trace_ae_eq_trace_comp`),
   whose Lipschitz chart maps keep null sets (`Rd.volume_image_eq_zero_of_lipschitzWith`).
+* **Dominating mixed smoothness on `ℝ^d`.** On `ℝ^d = Fin d → ℝ` let
+  `Δ^{L,e}_h f = (∏_{i ∈ e} Δ^L_{h_i e_i}) f` be the mixed differences (`Rd.mixedDiff`) and
+  `Ω^e_L(f, t)_p = sup_{|h_i| ≤ t_i, i ∈ e} ‖Δ^{L,e}_h f‖_p` the mixed moduli (`Rd.mixedModulus`),
+  used for `k ∈ ℕ^d` in the coordinates `e(k) = {i : k_i ≠ 0}` at the scale `2^(-k)`. Let
+  `k_k = ⊗_i k_{k_i}` be the tensor products of the one-dimensional local means kernels of a bump
+  vanishing outside `[-1, 1]` (`Rd.LocalMeansBump.mixedKernel`) and `δ_k = ⊗_i ψ_{k_i}` those of the
+  one-dimensional Littlewood–Paley blocks (`Rd.mixedPsi`), so that `δ_k ⋆ f = 𝓕⁻¹(φ_k 𝓕 f)` for the
+  tensor decomposition of unity. For `1 ≤ p < ∞`, `0 < s < L`, `1 ≤ q ≤ ∞` and `f ∈ L_p(ℝ^d)`,
+  `‖(2^(s|k|_1) Ω^{e(k)}_L(f, 2^(-k))_p)_{k ∈ ℕ^d}‖_{ℓ_q} < ∞` iff
+  `‖(2^(s|k|_1) ‖k_k ⋆ f‖_p)_k‖_{ℓ_q} < ∞` (`Rd.LocalMeansBump.mixedBesov_iff_mixedLocalMeans`) iff
+  `‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q} < ∞` (`Rd.mixedBesov_iff_mixedLP`), the last being Vybíral's
+  quasi-norm. The local means average mixed differences
+  (`Rd.LocalMeansBump.enorm_mixedLocalMean_le`), the reproducing formulas give the converse, and
+  the almost diagonal lemma on `ℕ^d` (`Rd.mixedLqNorm_almostDiagonal_le`, by the Schur test) sums
+  the levels.
+* **Hyperbolic cross approximation.** With `S_N f = ∑_{|k|_1 ≤ N} δ_k ⋆ f`, `|k|_1 = ∑_i k_i`
+  (`Rd.hyperbolicSum`), for `s > 0`, `1 ≤ q ≤ ∞` and `N ∈ ℕ`,
+  `‖f - S_N f‖_p ≤ C 2^(-sN) (N + 1)^((d-1)(1-1/q)) ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}`
+  (`Rd.enorm_sub_hyperbolicSum_le_mixedLPNorm`), with `C < ∞`
+  (`Rd.tsum_dyadicWeight_mul_rpow_ne_top`) and `#{k : |k|_1 = n} ≤ (n + 1)^(d-1)`
+  (`Rd.card_levelSet_le`).
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -509,6 +530,13 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Extension from the boundary of a Lipschitz graph domain, its trace space | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTraceExtension.lean` |
 | Traces in charts: locality, approximation, change of chart, products, finite sums | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTraceCharts.lean` |
 | Traces on bounded Lipschitz domains: Besov spaces on the boundary, the trace space | ✅ proved | ✗ | `FunctionSpaces/Rd/LipschitzBoundaryTrace.lean` |
+| Tensor kernels on `ℝ^d`: integrals, convolutions, dilations, diagonal changes of variables | ✅ proved | ✗ | `FunctionSpaces/Rd/TensorKernels.lean` |
+| Sequences on `ℕ^d`: `ℓ_q` norms, Schur test, almost diagonal lemma | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedSequences.lean` |
+| Mixed differences, mixed moduli, the mixed Besov quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedDifferences.lean` |
+| Averaged mixed differences, bounded polynomials in translations | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedAveragedDifferences.lean` |
+| Mixed local means and mixed differences | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedLocalMeans.lean` |
+| Tensor Littlewood–Paley blocks, Vybíral's quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedLittlewoodPaley.lean` |
+| Hyperbolic cross approximation | ✅ proved | ✗ | `FunctionSpaces/Rd/HyperbolicCross.lean` |
 | Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
@@ -529,7 +557,8 @@ theorems, spectral schemes in Hilbert spaces, the torus with its traces and Lips
 `ℝ^d` with convolution, approximate identities, Littlewood–Paley decompositions, moduli of
 smoothness and local means, Lipschitz graph domains and bounded Lipschitz domains with Rychkov's
 extension and pointwise multipliers, atomic decompositions, traces on Lipschitz graph domains and
-on the boundaries of bounded Lipschitz domains,
+on the boundaries of bounded Lipschitz domains, dominating mixed smoothness with hyperbolic cross
+approximation,
 filtration schemes for wavelets and multiwavelets, the
 classical definitions through moduli of smoothness and weak derivatives, and polynomial and
 piecewise polynomial approximation on intervals and on the cube `[0, 1]^d`.
@@ -540,8 +569,7 @@ piecewise polynomial approximation on intervals and on the cube `[0, 1]^d`.
 ## What is left to do
 
 * **Reiteration** for approximation and interpolation spaces.
-* **Function spaces beyond the torus**: dominating mixed smoothness on `ℝ^d`, compact
-  manifolds.
+* **Function spaces beyond the torus**: compact manifolds.
 * **Classical definitions for all `p`**: Sobolev spaces by weak derivatives and Besov spaces
   by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
 * **Higher smoothness**: splines on domains, and compactly supported wavelets such as
@@ -611,3 +639,8 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   function spaces and trigonometric approximation.
 * H. Triebel, *Theory of Function Spaces*, Birkhäuser, 1983. Besov and Sobolev spaces and
   the equivalence of their definitions.
+* T. Ullrich, *Function spaces with dominating mixed smoothness; characterization by
+  differences*, Jenaer Schriften zur Mathematik und Informatik Math/Inf/05/06, 2006. Mixed
+  differences and mixed local means.
+* J. Vybíral, *Function spaces with dominating mixed smoothness*, Dissertationes Math. **436**
+  (2006). Tensor Littlewood–Paley decompositions of spaces of dominating mixed smoothness.

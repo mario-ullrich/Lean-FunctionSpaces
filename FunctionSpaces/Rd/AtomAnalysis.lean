@@ -515,44 +515,6 @@ namespace LocalMeansBump
 
 variable (b : LocalMeansBump V)
 
-/-- The dilated moment kernels vanish outside `B̄(0, L R 2^(-j))`. -/
-theorem scaled_eq_zero_of_lt (L j : ℕ) {y : V} (hy : L * b.radius / 2 ^ j < ‖y‖) :
-    b.scaled L j y = 0 := by
-  rw [scaled, dilate, b.momentKernel_eq_zero L, mul_zero]
-  rw [norm_smul, Real.norm_of_nonneg (by positivity)]
-  rw [div_lt_iff₀ (by positivity)] at hy
-  linarith
-
-/-- The dual kernels vanish outside `B̄(0, 2 L R 2^(-j))`. -/
-theorem dual_eq_zero_of_lt (L j : ℕ) {y : V} (hy : 2 * L * b.radius / 2 ^ j < ‖y‖) :
-    b.dual L j y = 0 := by
-  have hLR : 0 ≤ (L : ℝ) * b.radius := mul_nonneg (Nat.cast_nonneg L) b.radius_nonneg
-  cases j with
-  | zero =>
-    refine b.scaled_eq_zero_of_lt L 0 (lt_of_le_of_lt ?_ hy)
-    simp only [pow_zero, div_one]
-    linarith
-  | succ j =>
-    show b.scaled L (j + 1) y + b.scaled L j y = 0
-    have h1 : (L : ℝ) * b.radius / 2 ^ (j + 1) ≤ 2 * L * b.radius / 2 ^ (j + 1) :=
-      div_le_div_of_nonneg_right (by linarith) (by positivity)
-    have h2 : 2 * (L : ℝ) * b.radius / 2 ^ (j + 1) = L * b.radius / 2 ^ j := by
-      rw [pow_succ, mul_comm ((2 : ℝ) ^ j) 2, mul_assoc, mul_div_mul_left _ _ two_ne_zero]
-    rw [b.scaled_eq_zero_of_lt L (j + 1) (h1.trans_lt hy),
-      b.scaled_eq_zero_of_lt L j (h2 ▸ hy), add_zero]
-
-/-- The dual kernels have compact support. -/
-theorem hasCompactSupport_dual (L j : ℕ) : HasCompactSupport (b.dual L j) :=
-  HasCompactSupport.intro (isCompact_closedBall 0 (2 * L * b.radius / 2 ^ j)) fun y hy =>
-    b.dual_eq_zero_of_lt L j (by simpa [mem_closedBall, dist_zero_right, not_le] using hy)
-
-/-- The dual kernels are continuous. -/
-theorem continuous_dual (L j : ℕ) : Continuous (b.dual L j) := by
-  have hm : Continuous (momentKernel b.toFun L) := (b.contDiff_momentKernel L).continuous
-  cases j with
-  | zero => exact continuous_dilate hm _
-  | succ j => exact (continuous_dilate hm _).add (continuous_dilate hm _)
-
 /-- **Pointwise bounds of the dual kernels**: for every order `r` there is `A < ∞` with
 `|Δ_h^l η_j| ≤ A 2^(jn) min(1, (2^j ‖h‖)^l)` for `l ≤ r`, from the bounded derivatives of the
 moment kernel (`Rd.enorm_iterDiff_le_of_iteratedFDeriv`) and the scaling of differences of

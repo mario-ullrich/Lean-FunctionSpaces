@@ -100,6 +100,13 @@ public import FunctionSpaces.Rd.MollifiedGraph
 public import FunctionSpaces.Rd.GraphTraceExtension
 public import FunctionSpaces.Rd.GraphTraceCharts
 public import FunctionSpaces.Rd.LipschitzBoundaryTrace
+public import FunctionSpaces.Rd.TensorKernels
+public import FunctionSpaces.Rd.MixedSequences
+public import FunctionSpaces.Rd.MixedDifferences
+public import FunctionSpaces.Rd.MixedAveragedDifferences
+public import FunctionSpaces.Rd.MixedLocalMeans
+public import FunctionSpaces.Rd.MixedLittlewoodPaley
+public import FunctionSpaces.Rd.HyperbolicCross
 
 /-!
 # Function spaces
@@ -305,4 +312,19 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   sums.
 * `FunctionSpaces.Rd.LipschitzBoundaryTrace`: almost everywhere on the boundary of a bounded
   Lipschitz domain, Besov spaces on the boundary, the boundary trace and its trace space.
+* `FunctionSpaces.Rd.TensorKernels`: tensor products of one-dimensional kernels on `ℝ^d`, their
+  integrals, convolutions, dilations, and diagonal changes of variables.
+* `FunctionSpaces.Rd.MixedSequences`: `ℓ_q` norms on `ℕ^d`, the mixed weights `2^(s|k|_1)`, the
+  Schur test and the almost diagonal lemma on `ℕ^d`.
+* `FunctionSpaces.Rd.MixedDifferences`: mixed differences through the algebra of translations,
+  mixed moduli of smoothness, and the Besov quasi-norm of dominating mixed smoothness.
+* `FunctionSpaces.Rd.MixedAveragedDifferences`: bounded action of polynomials in translations,
+  the moment kernel polynomial, and convolutions with tensor products of dilated bumps as averages
+  of translates.
+* `FunctionSpaces.Rd.MixedLocalMeans`: mixed local means, their bound by the mixed modulus, the
+  mixed reproducing formula, and the equivalence of mixed local means and mixed differences.
+* `FunctionSpaces.Rd.MixedLittlewoodPaley`: tensor Littlewood–Paley blocks, Vybíral's
+  quasi-norm, and its equivalence with mixed local means and mixed differences.
+* `FunctionSpaces.Rd.HyperbolicCross`: levels, hyperbolic crosses, and the rate of approximation by
+  the hyperbolic cross partial sums.
 -/
