@@ -113,3 +113,8 @@ declarations.
   integrable `Φ` with `∫ Φ = 1` and bounded support, `(Φ_{2^J} ⋆ F_J)(z) → z₀` as `J → ∞` and
   `z → y` whenever `F_J(z) → z₀` (`Rd.conv_dilate_near`). Mathlib's `convolution_tendsto_right`
   needs nonnegative kernels.
+* **Convolution with Lipschitz functions** (`FunctionSpaces/Rd/MollifiedGraph.lean`): for an
+  integrable kernel `K` with bounded support and an `M`-Lipschitz `u`, `K ⋆ u` is Lipschitz with
+  constant `M ‖K‖_1` (`Rd.norm_conv_sub_conv_le`), `|K ⋆ u - u| ≤ M R ‖K‖_1` for `∫ K = 1`
+  (`Rd.norm_conv_sub_self_le`), and `|Δ_h^2 (K ⋆ u)| ≤ M (R + 2‖h‖) ‖Δ_h^2 K‖_1`
+  (`Rd.norm_iterDiff_two_conv_le`); `∫ Δ_h^r K = 0` for `r ≥ 1` (`Rd.integral_iterDiff_eq_zero`).

@@ -96,6 +96,8 @@ public import FunctionSpaces.Rd.AtomSynthesis
 public import FunctionSpaces.Rd.AtomAnalysis
 public import FunctionSpaces.Rd.GraphParametrization
 public import FunctionSpaces.Rd.GraphTrace
+public import FunctionSpaces.Rd.MollifiedGraph
+public import FunctionSpaces.Rd.GraphTraceExtension
 
 /-!
 # Function spaces
@@ -291,5 +293,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.GraphParametrization`: the hyperplane and the graph map of a Lipschitz graph
   domain, and the restrictions of atoms to the graph.
 * `FunctionSpaces.Rd.GraphTrace`: the trace on the boundary of a Lipschitz graph domain, its
-  boundedness from the intrinsic Besov spaces, and the trace of continuous functions.
+  boundedness from the intrinsic Besov spaces, its linearity, and the trace of continuous functions.
+* `FunctionSpaces.Rd.MollifiedGraph`: the mollified graph function and the vertical cut-off, with
+  bounds of their differences.
+* `FunctionSpaces.Rd.GraphTraceExtension`: the extension from the boundary by extended atoms and the
+  trace space of a Lipschitz graph domain.
 -/

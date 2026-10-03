@@ -609,6 +609,31 @@ theorem exists_iterDiff_dual_bound (L r : ℕ) : ∃ A : ℝ≥0∞, A ≠ ∞ �
           add_le_add (hscaled l hl _ _ le_rfl h y) (hscaled l hl _ _ (Nat.le_succ j) h y)
       _ = _ := by ring
 
+/-- **Uniform pointwise bounds of the cell atoms**: for every order `r` there is `A < ∞` such that
+the cell atoms of `η_j ⋆ g`, `g ∈ L_p`, satisfy `|Δ_h^l a_{j,m}| ≤ A min(1, (2^j ‖h‖)^l)` for all
+`l ≤ r`, `j`, `m`. -/
+theorem exists_cellAtom_pointwise_bound {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L r : ℕ) :
+    ∃ A : ℝ≥0∞, A ≠ ∞ ∧ ∀ (j : ℕ) {g : V → ℂ}, MemLp g p volume → ∀ m, ∀ l ≤ r, ∀ h x,
+      ‖(fwdDiff h)^[l] (cellAtom p (b.dual L j) j g m) x‖ₑ ≤
+        A * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (l : ℝ)) := by
+  obtain ⟨A, hA, hb⟩ := b.exists_iterDiff_dual_bound L r
+  have ht : 0 ≤ 1 - 1 / p.toReal := one_sub_one_div_toReal_nonneg hp1
+  set ρ := 2 * (L : ℝ) * b.radius
+  have hρ : 0 ≤ ρ := mul_nonneg (mul_nonneg zero_le_two (Nat.cast_nonneg L)) b.radius_nonneg
+  refine ⟨2 ^ r * A * (ENNReal.ofReal ((ρ + r) ^ finrank ℝ V) * volume (ball (0 : V) 1)) ^
+      (1 - 1 / p.toReal), ENNReal.mul_ne_top (ENNReal.mul_ne_top (by simp) hA)
+        (ENNReal.rpow_ne_top_of_nonneg ht (ENNReal.mul_ne_top ENNReal.ofReal_ne_top
+          measure_ball_lt_top.ne)), fun j g hg m l hl h x => ?_⟩
+  have hK : ∀ y, ‖b.dual L j y‖ₑ ≤ A * dyadicWeight (finrank ℝ V) j := fun y => by
+    simpa using hb 0 (Nat.zero_le r) j 0 y
+  have h1 := enorm_iterDiff_cellAtom_le hp1 (b.continuous_dual L j) hg m hK (hb l hl j) hρ
+    (fun y hy => b.dual_eq_zero_of_lt L j hy) h x
+  refine h1.trans (mul_le_mul' ?_ le_rfl)
+  refine mul_le_mul' (mul_le_mul' (pow_le_pow_right₀ one_le_two hl) le_rfl)
+    (ENNReal.rpow_le_rpow (mul_le_mul' (ENNReal.ofReal_le_ofReal
+      (pow_le_pow_left₀ (add_nonneg hρ (Nat.cast_nonneg l)) ?_ _)) le_rfl) ht)
+  exact add_le_add_right (Nat.cast_le.2 hl) ρ
+
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-- **Atomic decomposition** (Schneider–Vybíral, Theorem 2.6, direction ⇒): for every order `r`

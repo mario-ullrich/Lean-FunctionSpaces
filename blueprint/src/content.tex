@@ -6774,6 +6774,23 @@ the almost diagonal lemma (\Cref{lem:almost-diagonal}) with exponent $\sigma$ su
 since $2^{js} b_j = 2^{j(s - n/p)} \|\lambda_{j,\cdot}\|_{\ell_p}$.
 \end{proof}
 
+\begin{lemma}[Synthesis of one level]
+\label{lem:single-level}
+\lean{Rd.lqNorm_ite_eq, Rd.isRegularAtom_zero, Rd.modNorm_level_le}
+\leanok
+\uses{thm:atomic-synthesis}
+For regular atoms of level $j$ with the overlap of \Cref{lem:level-sums}, $F = \sum_m \lambda_m a_m$
+in $L_p$ and $0 < s < \sigma$,
+$\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq K 2^{j(s - n/p)} \|\lambda\|_{\ell_p}$,
+with the constant $K$ of \Cref{thm:atomic-synthesis}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{thm:atomic-synthesis} with the coefficients and atoms of the other levels equal to $0$; the
+zero function is a regular atom, and a sequence with one nonzero term $x$ has $\ell_q$-norm $x$.
+\end{proof}
+
 \begin{lemma}[Atoms from pointwise bounds]
 \label{lem:pointwise-atoms}
 \lean{Rd.eLpNorm_le_of_bound_of_support, Rd.volume_closedBall_div_two_pow,
@@ -6920,6 +6937,20 @@ $A < \infty$ with $|\Delta_h^l \eta_j| \leq A 2^{jn} \min(1, (2^j \|h\|)^l)$ for
 The moment kernel is smooth with compact support, so its derivatives are bounded
 (\Cref{lem:resolution-of-unity}). \Cref{lem:smooth-differences} bounds its differences, and
 $\Delta_h^l (\Phi_c) = (\Delta_{ch}^l \Phi)_c$ for the dilations (\Cref{lem:rd-differences}).
+\end{proof}
+
+\begin{lemma}[The cell atoms of the dual kernels]
+\label{lem:cell-atoms-dual}
+\lean{Rd.LocalMeansBump.exists_cellAtom_pointwise_bound}
+\leanok
+\uses{lem:cell-atoms-regular, lem:dual-kernel-bounds}
+For every order $r$ there is $A < \infty$ such that the cell atoms of $\eta_j * g$, $g \in L_p$,
+satisfy $|\Delta_h^l a_{j,m}| \leq A \min(1, (2^j \|h\|)^l)$ for all $l \leq r$, $j$ and $m$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:cell-atoms-regular} with the bounds of \Cref{lem:dual-kernel-bounds}, for each $l \leq r$.
 \end{proof}
 
 \begin{theorem}[Atomic decomposition]
@@ -7110,6 +7141,25 @@ This is \cite[Theorem 4.2]{SchneiderVybiral} for $p \geq 1$. \Cref{thm:trace-ser
 $h_j = 1_\Omega (k_j * f)$, and \Cref{lem:intrinsic-upper} with smoothness $s + 1/p$.
 \end{proof}
 
+\begin{lemma}[Linearity and continuity of the trace]
+\label{lem:trace-linear}
+\lean{Rd.LipschitzGraph.traceTerm_sub, Rd.LipschitzGraph.trace_sub,
+  Rd.LipschitzGraph.enorm_trace_le}
+\leanok
+\uses{thm:trace-graph, lem:trace-terms-lp, lem:local-means-upper}
+The trace is linear on the functions with a finite intrinsic norm of smoothness $s + 1/p$, $s > 0$,
+and there is $K < \infty$ with
+$\|\operatorname{Tr} f\|_{L_p(H)} \leq K (\|f\|_p + \sum_k 2^{k/p} \omega_L(f, 2^{-k})_p)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The terms are linear in $h_j$, and the series converge. The bound:
+$\|\operatorname{Tr} f\|_{L_p(H)} \leq \sum_j K 2^{j/p} \|k_j * f\|_p$
+(\Cref{lem:trace-terms-lp}), and the local means are bounded by the moduli
+(\Cref{lem:local-means-upper}).
+\end{proof}
+
 \begin{lemma}[Approximate identities at points of continuity]
 \label{lem:approx-identity-points}
 \lean{Rd.conv_dilate_near}
@@ -7159,6 +7209,223 @@ partial sums of the trace at $x'$ are $(m_{2^J} * (m_{2^J} * G))(\gamma(x'))$ by
 \Cref{lem:reproducing-pointwise}. By \Cref{lem:approx-identity-points}, applied twice, they converge
 to $G(\gamma(x'))$ for every $x'$, and a subsequence converges to $\operatorname{Tr} f$ almost
 everywhere.
+\end{proof}
+
+\section{The trace space of a Lipschitz graph domain}
+
+To extend functions from $H$ into $V$ with smoothness above $1$, the graph is smoothed at each
+scale: the extended atoms need second differences of order $(2^j \|h\|)^2$, which a merely
+Lipschitz graph does not give.
+
+\begin{lemma}[Convolution with Lipschitz functions]
+\label{lem:conv-lipschitz}
+\lean{Rd.iterDiff_one_apply, Rd.iterDiff_two_apply, Rd.integral_iterDiff_eq_zero,
+  Rd.integrable_translate_mul_of_locallyIntegrable, Rd.norm_conv_sub_conv_le,
+  Rd.norm_conv_sub_self_le, Rd.norm_iterDiff_two_conv_le,
+  Rd.LocalMeansBump.integral_norm_scaled, Rd.LocalMeansBump.integral_norm_iterDiff_scaled_le}
+\leanok
+\uses{lem:conv-pointwise, lem:dual-kernel-bounds}
+Let $u$ satisfy $|u(x) - u(y)| \leq M \|x - y\|$, and let $K$ be integrable, continuous, with
+compact support and $K = 0$ outside $\overline{B}(0, R)$. Then
+$|(K * u)(x) - (K * u)(y)| \leq M \|K\|_1 \|x - y\|$; if $\int K = 1$, then
+$|(K * u)(x) - u(x)| \leq M R \|K\|_1$; and
+$|\Delta_h^2 (K * u)(x)| \leq M (R + 2\|h\|) \|\Delta_h^2 K\|_1$. For the dilated moment kernels,
+$\|\Delta_v^L m_{2^j}\|_1 \leq (2^j \|v\|)^L \|D^L m\|_1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Differences integrate to $0$, and $\Delta_h^2 (K * u) = (\Delta_h^2 K) * u$
+(\Cref{lem:conv-pointwise}), so
+$\Delta_h^2 (K * u)(x) = \int \Delta_h^2 K(z) (u(x - z) - u(x)) \, dz$ with
+$\|z\| \leq R + 2\|h\|$ on the support of $\Delta_h^2 K$.
+\end{proof}
+
+\begin{definition}[The mollified graph]
+\label{def:mollified-graph}
+\lean{Rd.LipschitzGraph.graphFun, Rd.LipschitzGraph.norm_graphFun_sub_le,
+  Rd.LipschitzGraph.continuous_graphFun, Rd.LipschitzGraph.graphBump,
+  Rd.LipschitzGraph.graphBump_radius, Rd.LipschitzGraph.graphBumpNorm,
+  Rd.LipschitzGraph.graphBumpNorm_nonneg, Rd.LipschitzGraph.graphBumpDeriv,
+  Rd.LipschitzGraph.graphBumpDeriv_nonneg, Rd.LipschitzGraph.graphBump_scaled_eq_zero,
+  Rd.LipschitzGraph.integrable_graphBump_mul, Rd.LipschitzGraph.smoothGraph,
+  Rd.LipschitzGraph.continuous_smoothGraph}
+\leanok
+\uses{def:graph-map, def:moment-kernel}
+Let $\rho$ be the moment kernel of order $2$ of a bump of radius $1$ on $H$. The mollified graph at
+scale $2^{-j}$ is $\phi_j = \operatorname{Re} (\rho_{2^j} * \phi)$ on $H$.
+\end{definition}
+
+\begin{lemma}[Bounds of the mollified graph]
+\label{lem:mollified-graph}
+\lean{Rd.LipschitzGraph.abs_smoothGraph_sub_le, Rd.LipschitzGraph.abs_smoothGraph_sub_phi_le,
+  Rd.LipschitzGraph.abs_second_smoothGraph_le}
+\leanok
+\uses{def:mollified-graph, lem:conv-lipschitz}
+$\phi_j$ is Lipschitz with constant $M \|\rho\|_1$, $|\phi_j - \phi| \leq 2 M \|\rho\|_1 2^{-j}$, and
+$|\phi_j(x' + 2h') - 2\phi_j(x' + h') + \phi_j(x')| \leq 4 M \|D^2 \rho\|_1 2^j \|h'\|^2$ for
+$\|h'\| \leq 2^{-j}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:conv-lipschitz} with $R = 2 \cdot 2^{-j}$.
+\end{proof}
+
+\begin{definition}[The vertical cut-off]
+\label{def:vertical-cutoff}
+\lean{Rd.LipschitzGraph.cutoffLevel, Rd.LipschitzGraph.cutoffLevel_pos,
+  Rd.LipschitzGraph.profileBump, Rd.LipschitzGraph.profile, Rd.LipschitzGraph.contDiff_profile,
+  Rd.LipschitzGraph.hasCompactSupport_profile, Rd.LipschitzGraph.norm_profile_le,
+  Rd.LipschitzGraph.profile_eq_one, Rd.LipschitzGraph.profile_eq_zero,
+  Rd.LipschitzGraph.exists_profile_bound, Rd.LipschitzGraph.profileConst,
+  Rd.LipschitzGraph.norm_iteratedFDeriv_profile_le, Rd.LipschitzGraph.profileConst_nonneg,
+  Rd.LipschitzGraph.vertCoord, Rd.LipschitzGraph.vertCutoff, Rd.LipschitzGraph.norm_vertCutoff_le,
+  Rd.LipschitzGraph.vertCutoff_graphMap, Rd.LipschitzGraph.vertCutoff_eq_zero,
+  Rd.LipschitzGraph.continuous_vertCutoff}
+\leanok
+\uses{lem:mollified-graph}
+Let $c = 2 M \|\rho\|_1 + 1$ and let $\chi$ be a smooth bump on $\R$ with $0 \leq \chi \leq 1$,
+$\chi = 1$ on $[-c, c]$ and $\chi = 0$ outside $(-(c + 1), c + 1)$. The vertical cut-off is
+$v_j(x) = \chi(\psi_j(x))$ with $\psi_j(x) = 2^j (\langle x, e \rangle - \phi_j(Px))$. Then
+$v_j(\gamma(x')) = 1$, since $|\psi_j(\gamma(x'))| = 2^j |\phi(x') - \phi_j(x')| < c$, and
+$v_j(x) = 0$ if $|\langle x, e \rangle - \phi_j(Px)| \geq (c + 1) 2^{-j}$.
+\end{definition}
+
+\begin{lemma}[Differences of the vertical cut-off]
+\label{lem:vertical-cutoff}
+\lean{Rd.LipschitzGraph.norm_profile_sub_le, Rd.LipschitzGraph.norm_profile_second_le,
+  Rd.LipschitzGraph.abs_vertCoord_sub_le, Rd.LipschitzGraph.abs_second_vertCoord_le,
+  Rd.LipschitzGraph.vertCutoffConst, Rd.LipschitzGraph.four_le_vertCutoffConst,
+  Rd.LipschitzGraph.norm_iterDiff_vertCutoff_le, Rd.LipschitzGraph.enorm_iterDiff_vertCutoff_le}
+\leanok
+\uses{def:vertical-cutoff, lem:mollified-graph, lem:smooth-differences}
+There is $B < \infty$ with $|\Delta_h^m v_j| \leq B \min(1, (2^j \|h\|)^m)$ for $m \leq 2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\psi_j$ is Lipschitz with constant $2^j (1 + M \|\rho\|_1)$ and has second differences at most
+$4 M \|D^2 \rho\|_1 (2^j \|h\|)^2$ for $\|h\| \leq 2^{-j}$ (\Cref{lem:mollified-graph}); the linear
+part $\langle x, e \rangle$ has none. With $\psi_l = \psi_j(x + lh)$ and $t = \psi_1 - \psi_0$,
+\[
+  \Delta_h^2 v_j(x) = [\chi(\psi_2) - \chi(2\psi_1 - \psi_0)] + \Delta_t^2 \chi(\psi_0),
+\]
+and \Cref{lem:smooth-differences} bounds both terms by the derivatives of $\chi$. For
+$\|h\| > 2^{-j}$, $|\Delta_h^m v_j| \leq 4$.
+\end{proof}
+
+\begin{lemma}[Extended atoms]
+\label{lem:extended-atoms}
+\lean{Rd.min_one_rpow_mul_le, Rd.LipschitzGraph.extendAtom, Rd.LipschitzGraph.extendAtom_graphMap,
+  Rd.LipschitzGraph.continuous_extendAtom, Rd.LipschitzGraph.iterDiff_comp_proj,
+  Rd.LipschitzGraph.enorm_extendAtom_le, Rd.LipschitzGraph.enorm_iterDiff_two_extendAtom_le,
+  Rd.LipschitzGraph.extendRadius, Rd.LipschitzGraph.extendCenter,
+  Rd.LipschitzGraph.proj_extendCenter, Rd.LipschitzGraph.extendAtom_eq_zero,
+  Rd.LipschitzGraph.isRegularAtom_extendAtom}
+\leanok
+\uses{lem:vertical-cutoff, lem:leibniz-differences, lem:pointwise-atoms}
+Let $a$ be continuous on $H$, $a = 0$ outside $\overline{B}(c', d 2^{-j})$, and
+$|\Delta_h^l a| \leq A_0 \min(1, (2^j \|h\|)^l)$ for $l \leq 2$. Then $A(x) = a(Px) v_j(x)$ has
+$A \circ \gamma = a$, vanishes outside
+$\overline{B}(c' + \phi_j(c') e, (d (1 + M \|\rho\|_1) + c + 1) 2^{-j})$, and
+$|\Delta_h^2 A| \leq 4 A_0 B \min(1, (2^j \|h\|)^2)$; so $A$ is a regular atom of order and exponent
+$2$ on $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By Leibniz's rule for differences (\Cref{lem:leibniz-differences}),
+$\Delta_h^2 A(x) = \sum_{l \leq 2} \binom{2}{l} \Delta_{Ph}^l a(Px) \, \Delta_h^{2 - l} v_j(x + lh)$,
+and $\min(1, t^l) \min(1, t^{2-l}) \leq \min(1, t^2)$. \Cref{lem:pointwise-atoms} concludes.
+\end{proof}
+
+\begin{theorem}[The extension from the boundary]
+\label{thm:graph-trace-extension}
+\lean{Rd.LipschitzGraph.extLevelH, Rd.LipschitzGraph.continuous_extLevelH,
+  Rd.LipschitzGraph.extRadiusH, Rd.LipschitzGraph.extRadiusH_nonneg,
+  Rd.LipschitzGraph.exists_extension_atoms, Rd.LipschitzGraph.extLevel,
+  Rd.LipschitzGraph.extLevel_eq_tsum, Rd.LipschitzGraph.continuous_extLevel,
+  Rd.LipschitzGraph.eLpNorm_extLevel_le, Rd.LipschitzGraph.memLp_extLevel,
+  Rd.LipschitzGraph.traceExtTerm, Rd.LipschitzGraph.traceExtTerm_ae,
+  Rd.LipschitzGraph.graphExtension, Rd.LipschitzGraph.summable_traceExtTerm,
+  Rd.LipschitzGraph.modNorm_graphExtension_le}
+\leanok
+\uses{lem:extended-atoms, thm:atomic-decomposition, lem:cell-atoms-dual, thm:atomic-synthesis,
+  thm:local-means}
+Let $1 \leq p < \infty$, $0 < s < 1$ and $1 \leq q \leq \infty$. For $g \in L_p(H)$ let
+$g_j = \eta_j * (k_j * g)$ be the terms of the reproducing formula on $H$, with moment order $1$,
+and $F_j(x) = g_j(Px) v_j(x)$. There is $K < \infty$ such that $E g = \sum_j F_j$ satisfies
+\begin{multline*}
+  \|E g\|_p + \|(2^{k(s + 1/p)} \omega_2(E g, 2^{-k})_p)_k\|_{\ell_q}
+  \\ \leq K \bigl( \|g\|_{L_p(H)} + \|(2^{ks} \omega_1(g, 2^{-k})_p)_k\|_{\ell_q} \bigr).
+\end{multline*}
+\end{theorem}
+
+\begin{proof}
+\leanok
+This is \cite[Theorem 4.10]{SchneiderVybiral} for $p \geq 1$. $F_j = \sum_m \lambda_{j,m} A_{j,m}$
+with the extensions of the cell atoms of $g_j$ (\Cref{lem:extended-atoms}), whose centres project to
+the cell centres of $H$ and so have bounded overlap. The atomic synthesis on $V$
+(\Cref{thm:atomic-synthesis}) with exponent $2 > s + 1/p$ bounds the left side by the coefficient
+quasi-norm with smoothness $s + 1/p$ on $V$, which is the one with smoothness $s$ on $H$ since
+$(s + 1/p) - n/p = s - (n-1)/p$, that is, the local means quasi-norm of $g$
+(\Cref{lem:cell-coefficients}, \Cref{thm:local-means}).
+\end{proof}
+
+\begin{lemma}[Moduli of different orders]
+\label{lem:moduli-orders}
+\lean{Rd.lpModulus_add_order_le, Rd.modNorm_order_le,
+  Rd.LipschitzGraph.intrinsicNorm_lt_top_of_modNorm}
+\leanok
+\uses{lem:rd-modulus, lem:intrinsic-upper}
+$\omega_{r + l}(f, t)_p \leq 2^l \omega_r(f, t)_p$. Hence a finite norm with moduli of order $2$ on
+$V$ gives a finite intrinsic norm of every order $L \geq 2$ on $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\Delta_h^{r + l} f = \Delta_h^l \Delta_h^r f$ and $\|\Delta_h^l g\|_p \leq 2^l \|g\|_p$.
+\end{proof}
+
+\begin{theorem}[The trace of the extension]
+\label{thm:trace-extension}
+\lean{Rd.LipschitzGraph.trace_graphExtension}
+\leanok
+\uses{thm:graph-trace-extension, thm:trace-continuous, lem:trace-linear, lem:moduli-orders,
+  lem:reproducing-formula}
+Let $1 \leq p < \infty$, $0 < s < 1$, $1 \leq q \leq \infty$, $L \geq 2$, and $g \in L_p(H)$ with
+$\|g\|_p + \|(2^{ks} \omega_1(g, 2^{-k})_p)_k\|_{\ell_q} < \infty$. Then
+$\operatorname{Tr}(E g) = g$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The partial sums $\sum_{j \leq J} F_j$ are continuous, so their traces are
+$\sum_{j \leq J} F_j \circ \gamma = \sum_{j \leq J} g_j$ (\Cref{thm:trace-continuous}), which converge
+to $g$ (\Cref{lem:reproducing-formula}). They converge to $E g$ in the norm
+$\|\cdot\|_p + \sum_k 2^{k/p} \omega_L(\cdot, 2^{-k})_p$, since each level has norm at most a constant
+times $\|k_j * g\|_p$ by \Cref{lem:single-level} and \Cref{lem:moduli-orders}, and
+$\sum_j \|k_j * g\|_p < \infty$; there the trace is linear and continuous (\Cref{lem:trace-linear}).
+\end{proof}
+
+\begin{theorem}[The trace space of a Lipschitz graph domain]
+\label{thm:graph-trace-space}
+\lean{Rd.LipschitzGraph.exists_trace_eq_iff}
+\leanok
+\uses{thm:trace-graph, thm:trace-extension, lem:moduli-orders}
+Let $1 \leq p < \infty$, $0 < s < 1$, $1 \leq q \leq \infty$ and $L \geq 2$. A function
+$g \in L_p(H)$ is the trace of some $f$ with
+$\|f\|_{L_p(\Omega)} + \|(2^{k(s + 1/p)} \omega_L(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$ if and
+only if $\|g\|_p + \|(2^{ks} \omega_1(g, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+This is \cite[Theorem 4.11]{SchneiderVybiral} for one Lipschitz graph domain and $p \geq 1$. The
+trace is bounded (\Cref{thm:trace-graph}), and $E g$ has the trace $g$
+(\Cref{thm:trace-extension}) and a finite intrinsic norm (\Cref{thm:graph-trace-extension},
+\Cref{lem:moduli-orders}).
 \end{proof}
 
 \bpbibheading

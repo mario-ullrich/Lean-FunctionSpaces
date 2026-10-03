@@ -613,6 +613,67 @@ theorem trace_ae_eq_comp_graphMap (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s :
   simp_rw [hx1, Ω.sum_traceFun_eq hp L _ hfG x']
   exact (hlim (Ω.graphMap x')).comp hns.tendsto_atTop
 
+/-! ### Linearity and continuity of the trace -/
+
+/-- The traces of the terms are linear in `h`. -/
+theorem traceTerm_sub (b : LocalMeansBump V) (hp : p ≠ ∞) (L j : ℕ)
+    (h₁ h₂ : Lp ℂ p (volume : Measure V)) :
+    Ω.traceTerm b hp L j (h₁ - h₂) = Ω.traceTerm b hp L j h₁ - Ω.traceTerm b hp L j h₂ := by
+  have hp1 : 1 ≤ p := Fact.out
+  have hint : ∀ (h : Lp ℂ p (volume : Measure V)) (y : V),
+      Integrable (fun z => b.dual L j z * h (y - z)) volume := fun h y => by
+    simpa using integrable_translate_mul hp1 (b.continuous_dual L j) (b.hasCompactSupport_dual L j)
+      (Lp.memLp h) 0 y
+  refine Lp.ext ?_
+  filter_upwards [Ω.traceTerm_ae b hp L j (h₁ - h₂), Ω.traceTerm_ae b hp L j h₁,
+    Ω.traceTerm_ae b hp L j h₂, Lp.coeFn_sub (Ω.traceTerm b hp L j h₁)
+      (Ω.traceTerm b hp L j h₂)] with x' hx hx₁ hx₂ hxs
+  rw [hx, hxs, Pi.sub_apply, hx₁, hx₂, traceFun, traceFun, traceFun,
+    conv_congr_ae (Lp.coeFn_sub h₁ h₂), conv_apply, conv_apply, conv_apply,
+    ← integral_sub (hint h₁ _) (hint h₂ _)]
+  congr 1
+  funext z
+  simp only [Pi.sub_apply]
+  ring
+
+/-- **The trace is linear** on the functions with a finite intrinsic norm of smoothness `> 1/p`. -/
+theorem trace_sub (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
+    {f₁ f₂ : Lp ℂ p (volume : Measure V)}
+    (h₁ : Ω.intrinsicNorm hp L (s + 1 / p.toReal) q f₁ < ∞)
+    (h₂ : Ω.intrinsicNorm hp L (s + 1 / p.toReal) q f₂ < ∞) :
+    Ω.trace hp L (f₁ - f₂) = Ω.trace hp L f₁ - Ω.trace hp L f₂ := by
+  simp only [trace, traceSeries, map_sub]
+  simp_rw [Ω.traceTerm_sub]
+  exact Summable.tsum_sub (Ω.summable_traceTerm Ω.coneBump hp L hs hq
+      (h := fun j => Ω.cutoff (Ω.coneBump.localMean hp L j f₁)) h₁)
+    (Ω.summable_traceTerm Ω.coneBump hp L hs hq
+      (h := fun j => Ω.cutoff (Ω.coneBump.localMean hp L j f₂)) h₂)
+
+/-- **The trace in `L_p(H)` is bounded by the `B^{1/p}_{p,1}`-norm**:
+`‖Tr f‖_{L_p(H)} ≤ K (‖f‖_p + ∑_k 2^(k/p) ω_L(f, 2^(-k))_p)`, by the bounds of the terms
+(`Rd.LipschitzGraph.eLpNorm_traceFun_le`) and of the local means by the moduli. -/
+theorem enorm_trace_le (hp : p ≠ ∞) (L : ℕ) :
+    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
+      ‖Ω.trace hp L f‖ₑ ≤
+        K * (‖f‖ₑ + lqNorm 1 (fun k => dyadicWeight (1 / p.toReal) k * lpModulus p L f k)) := by
+  obtain ⟨K, hK, hle⟩ := Ω.eLpNorm_traceFun_le Ω.coneBump Fact.out hp L
+  refine ⟨K * Ω.coneBump.upperConst L (1 / p.toReal),
+    ENNReal.mul_ne_top hK (Ω.coneBump.upperConst_ne_top L _), fun f => ?_⟩
+  calc ‖Ω.trace hp L f‖ₑ ≤ ∑' j, ‖Ω.traceTerm Ω.coneBump hp L j
+        (Ω.cutoff (Ω.coneBump.localMean hp L j f))‖ₑ := enorm_tsum_le_tsum_enorm
+    _ ≤ ∑' j, K * (dyadicWeight (1 / p.toReal) j * ‖Ω.coneBump.localMean hp L j f‖ₑ) :=
+        ENNReal.tsum_le_tsum fun j => by
+          rw [Lp.enorm_def, eLpNorm_congr_ae (Ω.traceTerm_ae Ω.coneBump hp L j _)]
+          refine (hle j (Lp.memLp _)).trans ?_
+          rw [← Lp.enorm_def, mul_assoc]
+          exact mul_le_mul' le_rfl (mul_le_mul' le_rfl (Ω.enorm_cutoff_le _))
+    _ = K * Ω.coneBump.localMeansNorm hp L (1 / p.toReal) 1 f := by
+        rw [ENNReal.tsum_mul_left, LocalMeansBump.localMeansNorm, ENNReal.lqNorm_one]
+    _ ≤ K * (Ω.coneBump.upperConst L (1 / p.toReal) * (‖f‖ₑ +
+          lqNorm 1 (fun k => dyadicWeight (1 / p.toReal) k * lpModulus p L f k))) :=
+        mul_le_mul' le_rfl (Ω.coneBump.localMeansNorm_le hp L _ le_rfl f)
+    _ = _ := by ring
+
 end LipschitzGraph
 
 end Rd

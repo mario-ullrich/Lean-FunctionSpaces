@@ -415,6 +415,96 @@ theorem modNorm_le_coeffNorm {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) 
         simp only [atomSynthConst, K0]
         ring
 
+/-- `‖(…, 0, x, 0, …)‖_{ℓ_q} = x` for a sequence with one nonzero term. -/
+theorem lqNorm_ite_eq {q : ℝ≥0∞} (hq : 1 ≤ q) (j : ℕ) (x : ℝ≥0∞) :
+    lqNorm q (fun i => if i = j then x else 0) = x := by
+  rcases eq_or_ne q ∞ with rfl | hqt
+  · rw [ENNReal.lqNorm_top]
+    refine le_antisymm (iSup_le fun i => ?_) (le_iSup_of_le j (by simp))
+    split_ifs <;> simp
+  · have hq0 : q ≠ 0 := (zero_lt_one.trans_le hq).ne'
+    have hpos : 0 < q.toReal := ENNReal.toReal_pos hq0 hqt
+    rw [ENNReal.lqNorm_eq_tsum hq0 hqt]
+    have h : (fun i => (if i = j then x else 0) ^ q.toReal) =
+        fun i => if i = j then x ^ q.toReal else 0 := funext fun i => by
+      split_ifs <;> simp [ENNReal.zero_rpow_of_pos hpos]
+    rw [h, tsum_ite_eq, one_div, ENNReal.rpow_rpow_inv hpos.ne']
+
+/-- The zero function is a regular atom at every level. -/
+theorem isRegularAtom_zero {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : ℝ} {C : ℝ≥0∞} {j : ℕ} {c : V} :
+    IsRegularAtom p σ r d C j c (0 : V → ℂ) where
+  aestronglyMeasurable := aestronglyMeasurable_const
+  eq_zero _ _ := rfl
+  eLpNorm_le := by simp
+  eLpNorm_iterDiff_le h := by
+    have h0 : (fwdDiff h)^[r] (0 : V → ℂ) = 0 := by
+      induction r with
+      | zero => rfl
+      | succ r ih =>
+        rw [Function.iterate_succ_apply', ih, fwdDiff_eq_sub]
+        funext x
+        simp
+    simp [h0]
+
+/-- **Synthesis of one level**: for regular atoms of level `j` with overlap `N` and
+`F = ∑_m λ_m a_m` in `L_p`, `0 < s < σ`:
+`‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ K 2^(j(s - n/p)) ‖λ‖_{ℓ_p}`, the case of
+`Rd.modNorm_le_coeffNorm` with one nonzero level. -/
+theorem modNorm_level_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {ι : Type*} [Countable ι]
+    {σ : ℝ} {r : ℕ} {d : ℝ} {C : ℝ≥0∞} {N : ℕ} (j : ℕ) (c : ι → V) (a : ι → V → ℂ)
+    (coef : ι → ℂ)
+    (hN : ∀ x (S : Finset ι), (∀ m ∈ S, coef m ≠ 0 ∧ ‖x - c m‖ ≤ (d + r) / 2 ^ j) → S.card ≤ N)
+    (ha : ∀ m, IsRegularAtom p σ r d C j (c m) (a m)) {F : Lp ℂ p (volume : Measure V)}
+    (hF : ∀ᵐ x ∂volume, F x = ∑' m, coef m * a m x) {s : ℝ} (hs : 0 < s) (hsσ : s < σ)
+    {q : ℝ≥0∞} (hq : 1 ≤ q) :
+    ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) ≤
+      atomSynthConst p N C r s σ *
+        (dyadicWeight (s - finrank ℝ V / p.toReal) j * levelNorm p coef) := by
+  classical
+  have hp1 : 1 ≤ p := Fact.out
+  have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
+  have hpos : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  set coef' : ℕ → ι → ℂ := fun i m => if i = j then coef m else 0
+  set a' : ℕ → ι → V → ℂ := fun i m => if i = j then a m else 0
+  set f' : ℕ → Lp ℂ p (volume : Measure V) := fun i => if i = j then F else 0
+  have hN' : ∀ i x (S : Finset ι), (∀ m ∈ S, coef' i m ≠ 0 ∧ ‖x - c m‖ ≤ (d + r) / 2 ^ i) →
+      S.card ≤ N := fun i x S hS => by
+    by_cases hij : i = j
+    · subst hij
+      exact hN x S fun m hm => by simpa [coef'] using hS m hm
+    · have hS0 : S = ∅ := Finset.eq_empty_of_forall_notMem fun m hm =>
+        (hS m hm).1 (by simp [coef', hij])
+      simp [hS0]
+  have ha' : ∀ i m, IsRegularAtom p σ r d C i (c m) (a' i m) := fun i m => by
+    by_cases hij : i = j
+    · subst hij
+      simpa [a'] using ha m
+    · simpa [a', hij] using (isRegularAtom_zero : IsRegularAtom p σ r d C i (c m) 0)
+  have hf' : ∀ i, ∀ᵐ x ∂volume, f' i x = ∑' m, coef' i m * a' i m x := fun i => by
+    by_cases hij : i = j
+    · subst hij
+      simpa [f', coef', a'] using hF
+    · filter_upwards [Lp.coeFn_zero ℂ p (volume : Measure V)] with x hx
+      simp [f', coef', a', hij]
+  have hF' : Tendsto (fun J => ∑ i ∈ Finset.range (J + 1), f' i) atTop (𝓝 F) := by
+    refine tendsto_atTop_of_eventually_const (i₀ := j) fun J hJ => ?_
+    rw [Finset.sum_ite_eq' (Finset.range (J + 1)) j (fun _ => F)]
+    simp [Finset.mem_range, Nat.lt_succ_of_le hJ]
+  refine (modNorm_le_coeffNorm hp (fun _ => c) (fun i => a' i) coef' hN' ha' hf' hF' hs hsσ
+    hq).trans_eq ?_
+  congr 1
+  rw [coeffNorm]
+  have hseq : (fun i => dyadicWeight (s - finrank ℝ V / p.toReal) i * levelNorm p (coef' i)) =
+      fun i => if i = j then dyadicWeight (s - finrank ℝ V / p.toReal) j * levelNorm p coef
+        else 0 := funext fun i => by
+    by_cases hij : i = j
+    · subst hij
+      simp [coef']
+    · have h0 : levelNorm p (coef' i) = 0 := by
+        simp [levelNorm, coef', hij, ENNReal.zero_rpow_of_pos hpos, hpos]
+      simp [hij, h0]
+  rw [hseq, lqNorm_ite_eq hq]
+
 /-! ### Atoms from pointwise bounds -/
 
 omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in

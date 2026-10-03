@@ -391,6 +391,14 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   (`Rd.LipschitzGraph.trace_ae_eq_comp_graphMap`). The cell atoms of the terms restrict to atoms of
   order `1` on `H` (`Rd.LipschitzGraph.isRegularAtom_comp_graphMap`), and the atomic synthesis on
   `H` gives the bound.
+* **The trace space of a Lipschitz graph domain.** For `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞` and
+  `L ≥ 2`, `g ∈ L_p(H)` is the trace of some `f ∈ L_p(V)` with
+  `‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` iff
+  `‖g‖_p + ‖(2^(ks) ω_1(g, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Rd.LipschitzGraph.exists_trace_eq_iff`). The
+  extension `E g` (`Rd.LipschitzGraph.graphExtension`) extends the atoms of `g` by
+  `A(x) = a(Px) χ(2^j (⟪x, e⟫ - φ_j(Px)))` with a graph `φ_j` mollified at scale `2^(-j)`; it has a
+  finite `B^{s+1/p}_{p,q}`-norm on `V` (`Rd.LipschitzGraph.modNorm_graphExtension_le`) and the trace
+  `g` (`Rd.LipschitzGraph.trace_graphExtension`).
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -474,7 +482,9 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Atomic synthesis: bounded overlap, regular atoms, coefficient quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/AtomSynthesis.lean` |
 | Atomic decomposition by cell atoms, atomic characterisation of Besov spaces | ✅ proved | ✗ | `FunctionSpaces/Rd/AtomAnalysis.lean` |
 | Graph map of a Lipschitz graph domain, restrictions of atoms to the graph | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphParametrization.lean` |
-| Traces on Lipschitz graph domains: boundedness, trace of continuous functions | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTrace.lean` |
+| Traces on Lipschitz graph domains: boundedness, linearity, trace of continuous functions | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTrace.lean` |
+| Mollified graph and vertical cut-off with bounds of their differences | ✅ proved | ✗ | `FunctionSpaces/Rd/MollifiedGraph.lean` |
+| Extension from the boundary of a Lipschitz graph domain, its trace space | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTraceExtension.lean` |
 | Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
