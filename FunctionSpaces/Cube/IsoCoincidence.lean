@@ -17,15 +17,15 @@ The approximation spaces of the piecewise polynomials and of the tensor splines 
 (`Cube.memApprox_cubePPScheme_iff_iso`, `Cube.memApprox_cubeSplineScheme_iff_iso`). Jackson's
 inequality carries over from the coordinate moduli (`Cube.lpCubeModulus_le_lpIsoModulus`); the
 inverse inequality comes from the bound of the isotropic difference by the gains in the single
-coordinates (`Cube.eLpNorm_isoDiff_le_of_exponents`), applied to the one-dimensional classes of
+coordinates (`Cube.eLpNorm_higherDiff_le_of_exponents`), applied to the one-dimensional classes of
 the slices (`Cube.ppSubmodule`, `Cube.splineSubmodule`):
 
 * piecewise polynomials: the gain `(2^j |t|)^(1/p)` for every difference of order `m ≥ 1`
-  (`Interval.exists_eLpNorm_iterDiff_ppFun_le`), so every word of total order `r ≥ 1` gains
+  (`Interval.exists_eLpNorm_higherDiff_ppFun_le`), so every word of total order `r ≥ 1` gains
   `(2^j ‖h‖)^(1/p)` (`Cube.le_sum_ppExponent`);
 * splines of order `r`: the gain `(2^j |t|)^m` for `m < r`
-  (`Interval.exists_eLpNorm_iterDiff_spline_le_of_lt`) and `(2^j |t|)^(r - 1 + 1/p)` for
-  `m = r` (`Interval.eLpNorm_iterDiff_ppFun_spline_le`), so
+  (`Interval.exists_eLpNorm_higherDiff_spline_le_of_lt`) and `(2^j |t|)^(r - 1 + 1/p)` for
+  `m = r` (`Interval.eLpNorm_higherDiff_ppFun_spline_le`), so
   every word gains `(2^j ‖h‖)^(r - 1 + 1/p)` (`Cube.le_sum_splineExponent`): either one
   coordinate carries all `r` differences, or all coordinates carry fewer and their orders add up
   to `r ≥ r - 1 + 1/p`.
@@ -38,6 +38,7 @@ approximation space of the tensor splines of order `r`.
 @[expose] public section
 
 open MeasureTheory Set Polynomial
+open Rd (higherDiff)
 open scoped ENNReal
 open ENNReal (dyadicWeight)
 
@@ -171,30 +172,30 @@ theorem le_sum_splineExponent {r : ℕ} (hr : 1 ≤ r) (m : Fin d → ℕ) (hm :
 every piecewise polynomial `u` of level `j` and degree `< r`, every order `m ≤ r` and
 `|t| ≤ 2^(-j)`, `‖Δ_t^m u‖_{L_p(J(m,t))} ≤ C (2^j |t|)^{θ_m} ‖u‖_p` with the exponent
 `θ_m = Cube.ppExponent p m`. -/
-theorem exists_eLpNorm_iterDiff_stepRegion_pp_le (r : ℕ) (hp : p ≠ ∞) :
+theorem exists_eLpNorm_higherDiff_stepRegion_pp_le (r : ℕ) (hp : p ≠ ∞) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ j : ℕ, ∀ u ∈ ppSubmodule r j, ∀ m ≤ r, ∀ t : ℝ, |t| ≤ 1 / 2 ^ j →
-      eLpNorm (iterDiff m t u) p (volume.restrict (stepRegion m t)) ≤
+      eLpNorm (higherDiff m t u) p (volume.restrict (stepRegion m t)) ≤
         C * ENNReal.ofReal (2 ^ j * |t|) ^ ppExponent p m * eLpNorm u p unitVol := by
   classical
   have hex : ∀ m : ℕ, ∃ C : ℝ≥0∞, C ≠ ∞ ∧ (1 ≤ m → m ≤ r → ∀ (j : ℕ) (Q : ℕ → ℂ[X]),
       (∀ n, Q n ∈ degreeLT ℂ r) → ∀ {h : ℝ}, 0 ≤ h → h ≤ 1 / 2 ^ j →
-        eLpNorm (iterDiff m h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - m * h))) ≤
+        eLpNorm (higherDiff m h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - m * h))) ≤
           C * ENNReal.ofReal (2 ^ j * h) ^ (1 / p.toReal) * eLpNorm (ppFun j Q) p unitVol) :=
     fun m => by
       by_cases hm : 1 ≤ m ∧ m ≤ r
-      · obtain ⟨C, hC, hb⟩ := exists_eLpNorm_iterDiff_ppFun_le (p := p) hm.1 hm.2 hp
+      · obtain ⟨C, hC, hb⟩ := exists_eLpNorm_higherDiff_ppFun_le (p := p) hm.1 hm.2 hp
         exact ⟨C, hC, fun _ _ => hb⟩
       · exact ⟨0, ENNReal.zero_ne_top, fun h1 h2 => absurd ⟨h1, h2⟩ hm⟩
   choose Cm hCm hCmb using hex
   refine ⟨1 + ∑ m ∈ Finset.range (r + 1), Cm m, ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
     ENNReal.sum_ne_top.2 fun m _ => hCm m⟩, fun j u hu m hmr t ht => ?_⟩
   obtain ⟨Q, hQ, rfl⟩ := hu
-  rw [eLpNorm_iterDiff_stepRegion_eq (measurable_ppFun j Q) p m t]
+  rw [eLpNorm_higherDiff_stepRegion_eq (measurable_ppFun j Q) p m t]
   have hCle : Cm m ≤ 1 + ∑ m ∈ Finset.range (r + 1), Cm m :=
     le_add_left (Finset.single_le_sum (f := Cm) (fun _ _ => zero_le)
       (Finset.mem_range.2 (Nat.lt_succ_of_le hmr)))
   rcases Nat.eq_zero_or_pos m with rfl | hm
-  · simp only [ppExponent, ↓reduceIte, ENNReal.rpow_zero, mul_one, iterDiff_zero,
+  · simp only [ppExponent, ↓reduceIte, ENNReal.rpow_zero, mul_one, higherDiff_zero,
       Nat.cast_zero, zero_mul, sub_zero]
     exact le_mul_of_one_le_left zero_le le_self_add
   · have hb := hCmb m hm hmr j Q hQ (abs_nonneg t) ht
@@ -205,20 +206,20 @@ theorem exists_eLpNorm_iterDiff_stepRegion_pp_le (r : ℕ) (hp : p ≠ ∞) :
 `u` of order `r` and level `j`, every order `m ≤ r` and `|t| ≤ 2^(-j)`,
 `‖Δ_t^m u‖_{L_p(J(m,t))} ≤ C (2^j |t|)^{θ_m} ‖u‖_p` with the exponent
 `θ_m = Cube.splineExponent p r m`. -/
-theorem exists_eLpNorm_iterDiff_stepRegion_spline_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
+theorem exists_eLpNorm_higherDiff_stepRegion_spline_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ j : ℕ, ∀ u ∈ splineSubmodule r j, ∀ m ≤ r, ∀ t : ℝ,
       |t| ≤ 1 / 2 ^ j →
-        eLpNorm (iterDiff m t u) p (volume.restrict (stepRegion m t)) ≤
+        eLpNorm (higherDiff m t u) p (volume.restrict (stepRegion m t)) ≤
           C * ENNReal.ofReal (2 ^ j * |t|) ^ splineExponent p r m * eLpNorm u p unitVol := by
   classical
   obtain ⟨K, hK, hKb⟩ := enorm_polyFun_le (p := p) r hp
   have hex : ∀ m : ℕ, ∃ C : ℝ≥0∞, C ≠ ∞ ∧ (1 ≤ m → m < r → ∀ (j : ℕ) (Q : ℕ → ℂ[X]),
       (∀ n, Q n ∈ degreeLT ℂ r) → SplineJoins r j Q → ∀ {h : ℝ}, 0 ≤ h → h ≤ 1 / 2 ^ j →
-        eLpNorm (iterDiff m h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - m * h))) ≤
+        eLpNorm (higherDiff m h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - m * h))) ≤
           C * ENNReal.ofReal (2 ^ j * h) ^ m * eLpNorm (ppFun j Q) p unitVol) :=
     fun m => by
       by_cases hm : 1 ≤ m ∧ m < r
-      · obtain ⟨C, hC, hb⟩ := exists_eLpNorm_iterDiff_spline_le_of_lt (p := p) hm.1 hm.2 hp
+      · obtain ⟨C, hC, hb⟩ := exists_eLpNorm_higherDiff_spline_le_of_lt (p := p) hm.1 hm.2 hp
         exact ⟨C, hC, fun _ _ => hb⟩
       · exact ⟨0, ENNReal.zero_ne_top, fun h1 h2 => absurd ⟨h1, h2⟩ hm⟩
   choose Cm hCm hCmb using hex
@@ -227,18 +228,18 @@ theorem exists_eLpNorm_iterDiff_stepRegion_spline_le {r : ℕ} (hr : 1 ≤ r) (h
     ENNReal.sum_ne_top.2 fun m _ => hCm m⟩, splineInverseConst_ne_top r hK⟩,
     fun j u hu m hmr t ht => ?_⟩
   obtain ⟨Q, hQ, hJ, rfl⟩ := hu
-  rw [eLpNorm_iterDiff_stepRegion_eq (measurable_ppFun j Q) p m t]
+  rw [eLpNorm_higherDiff_stepRegion_eq (measurable_ppFun j Q) p m t]
   have hCle : Cm m ≤ C := le_add_right (le_add_left (Finset.single_le_sum (f := Cm)
     (fun _ _ => zero_le) (Finset.mem_range.2 (Nat.lt_succ_of_le hmr))))
   rcases lt_or_eq_of_le hmr with hmr' | rfl
   · rcases Nat.eq_zero_or_pos m with rfl | hm
     · simp only [splineExponent, hmr', ↓reduceIte, Nat.cast_zero, ENNReal.rpow_zero, mul_one,
-        iterDiff_zero, zero_mul, sub_zero]
+        higherDiff_zero, zero_mul, sub_zero]
       exact le_mul_of_one_le_left zero_le (le_add_right le_self_add)
     · have hb := hCmb m hm hmr' j Q hQ hJ (abs_nonneg t) ht
       simp only [splineExponent, hmr', ↓reduceIte, ENNReal.rpow_natCast]
       exact hb.trans (by gcongr)
-  · have hb := eLpNorm_iterDiff_ppFun_spline_le hQ hJ hKb hp (abs_nonneg t) ht
+  · have hb := eLpNorm_higherDiff_ppFun_spline_le hQ hJ hKb hp (abs_nonneg t) ht
     rw [splineStripConst_mul_eq m j K |t|] at hb
     simp only [splineExponent, lt_irrefl, ↓reduceIte]
     exact hb.trans (by gcongr; exact le_add_self)
@@ -250,7 +251,7 @@ modulus**, of order `θ = 1/p`. -/
 theorem exists_inverse_cubePPScheme_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ∃ CB : ℝ≥0∞, CB ≠ ∞ ∧ ∀ j k : ℕ, ∀ a ∈ cubePPScheme p d r (2 ^ j),
       lpIsoModulus p r a k ≤ CB * dyadicWeight (-(1 / p.toReal)) (k - j) * ‖a‖ₑ := by
-  obtain ⟨C, hC, hCb⟩ := exists_eLpNorm_iterDiff_stepRegion_pp_le (p := p) r hp
+  obtain ⟨C, hC, hCb⟩ := exists_eLpNorm_higherDiff_stepRegion_pp_le (p := p) r hp
   refine ⟨(d : ℝ≥0∞) ^ r * C ^ d + 2 ^ r, ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top
     (ENNReal.pow_ne_top (ENNReal.natCast_ne_top d)) (ENNReal.pow_ne_top hC), by simp⟩,
     fun j k a ha => ?_⟩
@@ -265,10 +266,10 @@ theorem exists_inverse_cubePPScheme_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞
   · refine iSup₂_le fun h hh => ?_
     have hhj : ‖h‖ ≤ 1 / 2 ^ j := hh.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ (by norm_num) hjk))
-    calc eLpNorm (isoDiff r h g) p ((cubeVol d).restrict (isoRegion r h))
+    calc eLpNorm (higherDiff r h g) p ((cubeVol d).restrict (isoRegion r h))
         ≤ (d : ℝ≥0∞) ^ r * C ^ d * ENNReal.ofReal (2 ^ j * ‖h‖) ^ (1 / p.toReal) *
             eLpNorm g p (cubeVol d) :=
-          eLpNorm_isoDiff_le_of_exponents (ppSubmodule r j) Fact.out hp r j hC (ppExponent p)
+          eLpNorm_higherDiff_le_of_exponents (ppSubmodule r j) Fact.out hp r j hC (ppExponent p)
             ppExponent_nonneg (fun m hm => le_sum_ppExponent hr m hm) (hCb j) hg.1.1
             (fun i x => hg.slice_mem_ppSubmodule i x) hhj
       _ ≤ (d : ℝ≥0∞) ^ r * C ^ d * dyadicWeight (-(1 / p.toReal)) (k - j) *
@@ -283,7 +284,7 @@ theorem exists_inverse_cubeSplineScheme_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠
     ∃ CB : ℝ≥0∞, CB ≠ ∞ ∧ ∀ j k : ℕ, ∀ a ∈ cubeSplineScheme p d r (2 ^ j),
       lpIsoModulus p r a k ≤
         CB * dyadicWeight (-(((r - 1 : ℕ) : ℝ) + 1 / p.toReal)) (k - j) * ‖a‖ₑ := by
-  obtain ⟨C, hC, hCb⟩ := exists_eLpNorm_iterDiff_stepRegion_spline_le (p := p) hr hp
+  obtain ⟨C, hC, hCb⟩ := exists_eLpNorm_higherDiff_stepRegion_spline_le (p := p) hr hp
   have hθ : 0 ≤ ((r - 1 : ℕ) : ℝ) + 1 / p.toReal := by positivity
   refine ⟨(d : ℝ≥0∞) ^ r * C ^ d + 2 ^ r, ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top
     (ENNReal.pow_ne_top (ENNReal.natCast_ne_top d)) (ENNReal.pow_ne_top hC), by simp⟩,
@@ -299,11 +300,11 @@ theorem exists_inverse_cubeSplineScheme_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠
   · refine iSup₂_le fun h hh => ?_
     have hhj : ‖h‖ ≤ 1 / 2 ^ j := hh.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ (by norm_num) hjk))
-    calc eLpNorm (isoDiff r h g) p ((cubeVol d).restrict (isoRegion r h))
+    calc eLpNorm (higherDiff r h g) p ((cubeVol d).restrict (isoRegion r h))
         ≤ (d : ℝ≥0∞) ^ r * C ^ d *
             ENNReal.ofReal (2 ^ j * ‖h‖) ^ (((r - 1 : ℕ) : ℝ) + 1 / p.toReal) *
               eLpNorm g p (cubeVol d) :=
-          eLpNorm_isoDiff_le_of_exponents (splineSubmodule r j) Fact.out hp r j hC
+          eLpNorm_higherDiff_le_of_exponents (splineSubmodule r j) Fact.out hp r j hC
             (splineExponent p r) (splineExponent_nonneg r)
             (fun m hm => le_sum_splineExponent hr m hm) (hCb j) hg.1.1
             (fun i x => hg.slice_mem_splineSubmodule i x) hhj

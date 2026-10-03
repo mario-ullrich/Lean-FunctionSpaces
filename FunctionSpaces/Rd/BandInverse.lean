@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Rd.Differences
+public import FunctionSpaces.Rd.DilatedDifferences
 public import FunctionSpaces.Rd.BandLimited
 public import ApproximationSpaces.Sequences.Lq
 
@@ -13,12 +13,12 @@ public import ApproximationSpaces.Sequences.Lq
 # The inverse inequality for band-limited functions
 
 For a band-limited `a ∈ E_j`, `a = Θ_j ⋆ a`, so every difference of `a` is the convolution of `a`
-with a difference of the kernel: `Δ_h^r a = (Δ_h^r Θ_j) ⋆ a` (`Rd.iterDiff_conv_ae`). By Young's
-inequality and the dilation `Δ_h^r Θ_j = (Δ_{2^j h}^r Θ)_{2^j}` (`Rd.iterDiff_dilate`),
+with a difference of the kernel: `Δ_h^r a = (Δ_h^r Θ_j) ⋆ a` (`Rd.higherDiff_conv_ae`). By Young's
+inequality and the dilation `Δ_h^r Θ_j = (Δ_{2^j h}^r Θ)_{2^j}` (`Rd.higherDiff_dilate`),
 
 `‖Δ_h^r a‖_p ≤ ‖Δ_{2^j h}^r Θ‖_1 ‖a‖_p`.
 
-**Differences of Schwartz functions in `L_1`** (`Rd.lintegral_enorm_iterDiff_schwartz_le`):
+**Differences of Schwartz functions in `L_1`** (`Rd.lintegral_enorm_higherDiff_schwartz_le`):
 `‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1`. The fundamental theorem of calculus along the segment from `x`
 to `x + v` gives `G(x + v) - G(x) = ∫_0^1 ∂_v G(x + t v) dt`, hence `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1`
 (`Rd.lintegral_enorm_fwdDiff_le`); differences commute with line derivatives
@@ -119,7 +119,7 @@ theorem lintegral_enorm_fwdDiff_le (v : V) (G : 𝓢(V, ℂ)) :
 
 /-- **Differences of order `r` are bounded by line derivatives of order `r` in `L_1`**:
 `‖Δ_v^r G‖_1 ≤ ‖∂_v^r G‖_1`. -/
-theorem lintegral_enorm_iterDiff_le (v : V) (r : ℕ) (G : 𝓢(V, ℂ)) :
+theorem lintegral_enorm_higherDiff_le (v : V) (r : ℕ) (G : 𝓢(V, ℂ)) :
     ∫⁻ x, ‖(fwdDiff v)^[r] (G : V → ℂ) x‖ₑ ≤
       ∫⁻ x, ‖(∂^{fun _ : Fin r => v} G : 𝓢(V, ℂ)) x‖ₑ := by
   induction r generalizing G with
@@ -152,11 +152,11 @@ theorem enorm_iteratedLineDerivOp_le (v : V) (r : ℕ) (G : 𝓢(V, ℂ)) (x : V
           ofReal_norm]
 
 /-- **`L_1` norms of differences of Schwartz functions**: `‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1`. -/
-theorem lintegral_enorm_iterDiff_schwartz_le (v : V) (r : ℕ) (G : 𝓢(V, ℂ)) :
+theorem lintegral_enorm_higherDiff_schwartz_le (v : V) (r : ℕ) (G : 𝓢(V, ℂ)) :
     ∫⁻ x, ‖(fwdDiff v)^[r] (G : V → ℂ) x‖ₑ ≤
       ‖v‖ₑ ^ r * ∫⁻ x, ‖iteratedFDeriv ℝ r (G : V → ℂ) x‖ₑ := by
   calc ∫⁻ x, ‖(fwdDiff v)^[r] (G : V → ℂ) x‖ₑ
-      ≤ ∫⁻ x, ‖(∂^{fun _ : Fin r => v} G : 𝓢(V, ℂ)) x‖ₑ := lintegral_enorm_iterDiff_le v r G
+      ≤ ∫⁻ x, ‖(∂^{fun _ : Fin r => v} G : 𝓢(V, ℂ)) x‖ₑ := lintegral_enorm_higherDiff_le v r G
     _ ≤ ∫⁻ x, ‖v‖ₑ ^ r * ‖iteratedFDeriv ℝ r (G : V → ℂ) x‖ₑ :=
         lintegral_mono fun x => enorm_iteratedLineDerivOp_le v r G x
     _ = ‖v‖ₑ ^ r * ∫⁻ x, ‖iteratedFDeriv ℝ r (G : V → ℂ) x‖ₑ :=
@@ -182,15 +182,15 @@ theorem bandInverseConst_ne_top (r : ℕ) : bandInverseConst V r ≠ ∞ :=
 
 /-- **Differences of the band-limiting kernels in `L_1`**: `‖Δ_h^r Θ_j‖_1 ≤ (2^j ‖h‖)^r ‖D^r Θ‖_1`,
 by the dilation `Δ_h^r Θ_j = (Δ_{2^j h}^r Θ)_{2^j}`. -/
-theorem eLpNorm_iterDiff_Theta_le (r j : ℕ) (h : V) :
+theorem eLpNorm_higherDiff_Theta_le (r j : ℕ) (h : V) :
     eLpNorm ((fwdDiff h)^[r] (Theta (V := V) j)) 1 volume ≤
       ENNReal.ofReal (2 ^ j * ‖h‖) ^ r *
         ∫⁻ x, ‖iteratedFDeriv ℝ r (bandKernelS (V := V) : V → ℂ) x‖ₑ := by
   have hint : Integrable ((fwdDiff ((2 : ℝ) ^ j • h))^[r] (bandKernel (V := V))) :=
-    integrable_iterDiff integrable_bandKernel r _
-  rw [Theta, iterDiff_dilate, eLpNorm_dilate_one hint (by positivity),
+    integrable_higherDiff integrable_bandKernel r _
+  rw [Theta, higherDiff_dilate, eLpNorm_dilate_one hint (by positivity),
     eLpNorm_one_eq_lintegral_enorm hint.aestronglyMeasurable]
-  refine (lintegral_enorm_iterDiff_schwartz_le _ r bandKernelS).trans_eq ?_
+  refine (lintegral_enorm_higherDiff_schwartz_le _ r bandKernelS).trans_eq ?_
   rw [← ofReal_norm, norm_smul, Real.norm_of_nonneg (by positivity)]
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
@@ -215,17 +215,17 @@ theorem lpModulus_le_of_mem_bandSpace (hp : p ≠ ∞) (r : ℕ) {j k : ℕ}
     refine iSup₂_le fun h hh => ?_
     have h1 : eLpNorm ((fwdDiff h)^[r] (conv (Theta j) (a : V → ℂ) volume)) p volume ≤
         eLpNorm ((fwdDiff h)^[r] (Theta (V := V) j)) 1 volume * ‖a‖ₑ := by
-      rw [eLpNorm_congr_ae (iterDiff_conv_ae Fact.out hp (integrable_Theta j) (Lp.memLp a) r h),
+      rw [eLpNorm_congr_ae (higherDiff_conv_ae Fact.out hp (integrable_Theta j) (Lp.memLp a) r h),
         Lp.enorm_def]
       exact eLpNorm_conv_le Fact.out hp
-        (integrable_iterDiff (integrable_Theta j) r h).aestronglyMeasurable
+        (integrable_higherDiff (integrable_Theta j) r h).aestronglyMeasurable
         (Lp.aestronglyMeasurable a)
     have h2 : ENNReal.ofReal (2 ^ j * ‖h‖) ^ r ≤ dyadicWeight (-(r : ℝ)) (k - j) := by
       rw [← ENNReal.rpow_natCast]
       exact ENNReal.ofReal_two_pow_mul_rpow_le hjk hh (Nat.cast_nonneg r)
     calc eLpNorm ((fwdDiff h)^[r] (conv (Theta j) (a : V → ℂ) volume)) p volume
         ≤ ENNReal.ofReal (2 ^ j * ‖h‖) ^ r * D * ‖a‖ₑ :=
-          h1.trans (by gcongr; exact eLpNorm_iterDiff_Theta_le r j h)
+          h1.trans (by gcongr; exact eLpNorm_higherDiff_Theta_le r j h)
       _ ≤ dyadicWeight (-(r : ℝ)) (k - j) * D * ‖a‖ₑ := by gcongr
       _ ≤ bandInverseConst V r * dyadicWeight (-(r : ℝ)) (k - j) * ‖a‖ₑ := by
           rw [mul_comm (dyadicWeight _ _) D]

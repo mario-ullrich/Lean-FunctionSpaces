@@ -6,28 +6,23 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Cube.Modulus
-public import Mathlib.Algebra.MonoidAlgebra.Basic
+public import FunctionSpaces.TranslationAlgebra
 
 /-!
 # Isotropic differences and their expansion into coordinate differences
 
 The **isotropic difference** of order `r` with step `h ∈ ℝ^d`,
-`Δ_h^r f(x) = ∑_k (-1)^(r-k) C(r,k) f(x + kh)` (`Cube.isoDiff`, `Cube.isoDiff_apply`), moves all
-coordinates at once. It is expanded into differences in single coordinates through the algebra
-of translations: the commutative algebra `ℂ[ℝ^d]` (Mathlib's `AddMonoidAlgebra`) acts on
-functions on `ℝ^d` by an algebra homomorphism (`Cube.diffAct`, from Mathlib's
-`AddMonoidAlgebra.lift`), the generator `δ_v` by the translation `τ_v f(x) = f(x + v)`
-(`Cube.transl`). Then `Δ_h^r = (δ_h - 1)^r` (`Cube.isoDiff_eq_diffAct`), and identities between
-differences become ring identities in `ℂ[ℝ^d]`.
-
-With `δ_i = δ_{h_i e_i}`, `δ_h = ∏_i δ_i`, and `δ_h - 1 = ∑_i (δ_i - 1) ∏_{j<i} δ_j` (Mathlib's
-`Finset.prod_add_ordered`). The `r`-th power is a sum over `α : Fin r → Fin d`,
-`(δ_h - 1)^r = ∑_α δ_{s_α} ∏_i (δ_i - 1)^{m_i(α)}` with `m_i(α) = #α⁻¹(i)`
-(`Cube.single_sub_one_pow_eq_sum`), so
-`Δ_h^r f(x) = ∑_α M_{m(α)} f(x + s_α)` (`Cube.isoDiff_eq_sum`): a sum of `d^r` mixed coordinate
-differences `M_m f = Δ^{m_0}_{h_0 e_0} ⋯ Δ^{m_{d-1}}_{h_{d-1} e_{d-1}} f` (`Cube.mixedDiff`) of
-total order `∑_i m_i(α) = r` (`Cube.sum_count`), at points shifted by
-`(s_α)_i = h_i #{l : i < α_l}` (`Cube.shiftVec`, `Cube.shiftVec_apply`).
+`Δ_h^r f(x) = ∑_k (-1)^(r-k) C(r,k) f(x + kh)` (`Rd.higherDiff`, `Cube.higherDiff_apply`), moves
+all coordinates at once; with the step `t e_i` it is the difference in coordinate `i`
+(`Cube.higherDiff_single`). The translation algebra `ℂ[ℝ^d]` of
+`FunctionSpaces.TranslationAlgebra` expands it into differences in single coordinates: the
+element `(δ_{h_i e_i} - 1)^m` acts by the coordinate difference `Δ^m_{h_i e_i}`
+(`Cube.diffAct_coordElem_pow`), a product of such elements along a list of coordinates by the
+mixed coordinate difference `M_m f = Δ^{m_0}_{h_0 e_0} ⋯ Δ^{m_{d-1}}_{h_{d-1} e_{d-1}} f`
+(`Cube.mixedDiff`, `Cube.diffAct_list_prod`), and the expansion
+`(δ_h - 1)^r = ∑_α δ_{s_α} ∏_i (δ_i - 1)^{m_i(α)}` (`TranslationAlgebra.single_sub_one_pow_eq_sum`)
+gives `Δ_h^r f(x) = ∑_α M_{m(α)} f(x + s_α)` (`Cube.higherDiff_eq_sum`): a sum of `d^r` mixed
+coordinate differences of total order `r`, at points shifted by `s_α`.
 
 The slices in coordinate `i` of a mixed difference in other coordinates are combinations of
 slices of `f` (`Cube.slice_mixedDiff_mem`), so they stay in every subspace of functions of one
@@ -37,92 +32,34 @@ variable that contains the slices of `f`.
 @[expose] public section
 
 open MeasureTheory Set
+open Rd (higherDiff)
 open scoped ENNReal
 
 namespace Cube
 
-open Interval
+open Interval TranslationAlgebra
 
 variable {d : ℕ}
 
-/-! ### Translations and the translation algebra -/
-
-/-- The **translation** `τ_v f(x) = f(x + v)`, a linear map of functions on `ℝ^d`. -/
-def transl (v : Fin d → ℝ) : Module.End ℂ ((Fin d → ℝ) → ℂ) where
-  toFun f x := f (x + v)
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
-
-/-- `τ_v f(x) = f(x + v)`. -/
-@[simp] theorem transl_apply (v : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
-    transl v f x = f (x + v) := rfl
-
-/-- The translations form a monoid homomorphism from `ℝ^d`, written multiplicatively. -/
-def translHom : Multiplicative (Fin d → ℝ) →* Module.End ℂ ((Fin d → ℝ) → ℂ) where
-  toFun v := transl v.toAdd
-  map_one' := by
-    ext f x
-    simp
-  map_mul' v w := by
-    ext f x
-    simp [Module.End.mul_apply, add_assoc]
-
-/-- The **action of the translation algebra** `ℂ[ℝ^d]` on functions on `ℝ^d`: `δ_v` acts by the
-translation `τ_v` (Mathlib's `AddMonoidAlgebra.lift`). -/
-noncomputable def diffAct :
-    AddMonoidAlgebra ℂ (Fin d → ℝ) →ₐ[ℂ] Module.End ℂ ((Fin d → ℝ) → ℂ) :=
-  AddMonoidAlgebra.lift ℂ (Module.End ℂ ((Fin d → ℝ) → ℂ)) (Fin d → ℝ) translHom
-
-/-- `c δ_v` acts by `c τ_v`. -/
-theorem diffAct_single (v : Fin d → ℝ) (c : ℂ) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
-    diffAct (AddMonoidAlgebra.single v c) f x = c * f (x + v) := by
-  rw [diffAct, AddMonoidAlgebra.lift_single]
-  rfl
-
-/-- `δ_v` acts by the translation `τ_v`. -/
-theorem diffAct_single_one (v : Fin d → ℝ) :
-    diffAct (AddMonoidAlgebra.single v (1 : ℂ)) = transl v := by
-  ext f x
-  rw [diffAct_single, one_mul, transl_apply]
-
 /-! ### Isotropic differences -/
 
-/-- The **isotropic difference** of order `r` with step `h ∈ ℝ^d`, the `r`-fold iterate of the
-forward difference `f ↦ f(· + h) - f` (Mathlib's `fwdDiff`). -/
-noncomputable def isoDiff (r : ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) : (Fin d → ℝ) → ℂ :=
-  (fwdDiff h)^[r] f
-
 /-- `Δ_h^r f(x) = ∑_{k ≤ r} (-1)^(r-k) C(r,k) f(x + kh)`. -/
-theorem isoDiff_apply (r : ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
-    isoDiff r h f x = ∑ k ∈ Finset.range (r + 1),
-      ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (x + (k : ℝ) • h) := by
-  rw [isoDiff, fwdDiff_iter_eq_sum_shift]
-  refine Finset.sum_congr rfl fun k _ => ?_
-  rw [zsmul_eq_mul, Nat.cast_smul_eq_nsmul]
-  push_cast
-  ring
-
-/-- **The isotropic difference is a power in the translation algebra**: `Δ_h^r = (δ_h - 1)^r`. -/
-theorem isoDiff_eq_diffAct (r : ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) :
-    isoDiff r h f = diffAct ((AddMonoidAlgebra.single h (1 : ℂ) - 1) ^ r) f := by
-  have hfwd : ⇑(diffAct (AddMonoidAlgebra.single h (1 : ℂ) - 1)) = fwdDiff h := by
-    funext g x
-    rw [map_sub, map_one, diffAct_single_one, LinearMap.sub_apply, Pi.sub_apply, transl_apply,
-      Module.End.one_apply]
-    rfl
-  rw [map_pow, Module.End.pow_apply, hfwd, isoDiff]
+theorem higherDiff_apply (r : ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
+    higherDiff r h f x = ∑ k ∈ Finset.range (r + 1),
+      ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (x + (k : ℝ) • h) :=
+  Rd.higherDiff_apply r h f x
 
 /-- Isotropic differences are linear. -/
-theorem isoDiff_add (r : ℕ) (h : Fin d → ℝ) (f g : (Fin d → ℝ) → ℂ) :
-    isoDiff r h (f + g) = isoDiff r h f + isoDiff r h g := by
-  rw [isoDiff_eq_diffAct, isoDiff_eq_diffAct, isoDiff_eq_diffAct, map_add]
+theorem higherDiff_add (r : ℕ) (h : Fin d → ℝ) (f g : (Fin d → ℝ) → ℂ) :
+    higherDiff r h (f + g) = higherDiff r h f + higherDiff r h g :=
+  fwdDiff_iter_add h f g r
 
 /-- **Isotropic differences in a coordinate direction** are the coordinate differences: the
 isotropic difference with step `t e_i` is the difference `Cube.cubeDiff r t i` in coordinate `i`. -/
-theorem isoDiff_single (r : ℕ) (i : Fin d) (t : ℝ) (f : (Fin d → ℝ) → ℂ) :
-    isoDiff r (Pi.single i t) f = cubeDiff r t i f := by
+theorem higherDiff_single (r : ℕ) (i : Fin d) (t : ℝ) (f : (Fin d → ℝ) → ℂ) :
+    higherDiff r (Pi.single i t) f = cubeDiff r t i f := by
   funext x
-  rw [isoDiff_apply, cubeDiff_eq]
+  rw [higherDiff_apply, cubeDiff_eq]
   refine Finset.sum_congr rfl fun k _ => ?_
   congr 2
   funext c
@@ -130,15 +67,6 @@ theorem isoDiff_single (r : ℕ) (i : Fin d) (t : ℝ) (f : (Fin d → ℝ) → 
   · subst hc
     simp
   · simp [hc]
-
-/-- Isotropic differences of measurable functions are measurable. -/
-theorem measurable_isoDiff {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (r : ℕ)
-    (h : Fin d → ℝ) : Measurable (isoDiff r h f) := by
-  have : isoDiff r h f = fun x => ∑ k ∈ Finset.range (r + 1),
-      ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (x + (k : ℝ) • h) :=
-    funext fun x => isoDiff_apply r h f x
-  rw [this]
-  exact Finset.measurable_sum _ fun k _ => measurable_const.mul (hf.comp (measurable_add_const _))
 
 /-! ### Mixed coordinate differences -/
 
@@ -164,15 +92,10 @@ theorem measurable_mixedDiff (m : Fin d → ℕ) (h : Fin d → ℝ) (l : List (
   | nil => exact hf
   | cons i l ih => exact measurable_cubeDiff ih _ _ i
 
-/-- The element `δ_{h_i e_i} - 1` of the translation algebra, the first difference in
-coordinate `i`. -/
-noncomputable def coordElem (h : Fin d → ℝ) (i : Fin d) : AddMonoidAlgebra ℂ (Fin d → ℝ) :=
-  AddMonoidAlgebra.single (Pi.single i (h i)) 1 - 1
-
 /-- `(δ_{h_i e_i} - 1)^m` acts by the coordinate difference `Δ^m_{h_i e_i}`. -/
 theorem diffAct_coordElem_pow (h : Fin d → ℝ) (i : Fin d) (m : ℕ) (f : (Fin d → ℝ) → ℂ) :
     diffAct (coordElem h i ^ m) f = cubeDiff m (h i) i f := by
-  rw [coordElem, ← isoDiff_eq_diffAct, isoDiff_single]
+  rw [coordElem, ← higherDiff_eq_diffAct, higherDiff_single]
 
 /-- **Products of coordinate elements act by mixed differences**. -/
 theorem diffAct_list_prod (m : Fin d → ℕ) (h : Fin d → ℝ) (l : List (Fin d))
@@ -186,97 +109,13 @@ theorem diffAct_list_prod (m : Fin d → ℕ) (h : Fin d → ℝ) (l : List (Fin
 
 /-! ### The expansion -/
 
-/-- The multiplicities `m_i(α) = #{l : α_l = i}` of a word `α : Fin r → Fin d`. -/
-def count {r : ℕ} (α : Fin r → Fin d) (i : Fin d) : ℕ :=
-  (Finset.univ.filter fun l => α l = i).card
-
-/-- The multiplicities of a word add up to its length. -/
-theorem sum_count {r : ℕ} (α : Fin r → Fin d) : ∑ i, count α i = r := by
-  simp only [count]
-  rw [← Finset.card_eq_sum_card_fiberwise (fun l _ => Finset.mem_univ (α l)), Finset.card_univ,
-    Fintype.card_fin]
-
-/-- The vector `∑_{j < i} h_j e_j`. -/
-def lowerVec (h : Fin d → ℝ) (i : Fin d) : Fin d → ℝ := fun c => if c < i then h c else 0
-
-/-- The shift `s_α = ∑_l ∑_{j < α_l} h_j e_j` of the term of a word `α`. -/
-def shiftVec {r : ℕ} (h : Fin d → ℝ) (α : Fin r → Fin d) : Fin d → ℝ := ∑ l, lowerVec h (α l)
-
-/-- The coordinates of the shift: `(s_α)_c = #{l : c < α_l} h_c`. -/
-theorem shiftVec_apply {r : ℕ} (h : Fin d → ℝ) (α : Fin r → Fin d) (c : Fin d) :
-    shiftVec h α c = (Finset.univ.filter fun l => c < α l).card * h c := by
-  simp only [shiftVec, lowerVec, Finset.sum_apply]
-  rw [← Finset.sum_filter, Finset.sum_const, nsmul_eq_mul]
-
-/-- The shift and the multiplicity of a coordinate add up to at most the length of the word:
-`#{l : c < α_l} + #{l : α_l = c} ≤ r`. -/
-theorem card_lt_add_count_le {r : ℕ} (α : Fin r → Fin d) (c : Fin d) :
-    (Finset.univ.filter fun l => c < α l).card + count α c ≤ r := by
-  rw [count, ← Finset.card_union_of_disjoint]
-  · calc _ ≤ (Finset.univ : Finset (Fin r)).card := Finset.card_le_univ _
-      _ = r := by rw [Finset.card_univ, Fintype.card_fin]
-  · rw [Finset.disjoint_filter]
-    intro l _ hl heq
-    rw [heq] at hl
-    exact lt_irrefl c hl
-
-/-- `δ_{∑ v_i} = ∏ δ_{v_i}` (Mathlib's `AddMonoidAlgebra.prod_single`). -/
-theorem single_sum_one {ι : Type*} (s : Finset ι) (v : ι → Fin d → ℝ) :
-    AddMonoidAlgebra.single (∑ i ∈ s, v i) (1 : ℂ) = ∏ i ∈ s, AddMonoidAlgebra.single (v i) 1 := by
-  rw [AddMonoidAlgebra.prod_single, Finset.prod_const_one]
-
-/-- The lower products: `∏_{j < i} δ_{h_j e_j} = δ_{∑_{j<i} h_j e_j}`. -/
-theorem prod_lt_single (h : Fin d → ℝ) (i : Fin d) :
-    ∏ j ∈ Finset.univ.filter (· < i), AddMonoidAlgebra.single (Pi.single j (h j)) (1 : ℂ) =
-      AddMonoidAlgebra.single (lowerVec h i) 1 := by
-  rw [← single_sum_one]
-  congr 1
-  funext c
-  simp only [lowerVec, Finset.sum_apply, Pi.single_apply]
-  rw [Finset.sum_ite_eq]
-  simp
-
-/-- **The first-order telescoping**: `δ_h - 1 = ∑_i (δ_{h_i e_i} - 1) δ_{∑_{j<i} h_j e_j}`
-(Mathlib's `Finset.prod_add_ordered` for `∏_i (1 + (δ_{h_i e_i} - 1))`). -/
-theorem single_sub_one_eq_sum (h : Fin d → ℝ) :
-    AddMonoidAlgebra.single h (1 : ℂ) - 1 =
-      ∑ i, coordElem h i * AddMonoidAlgebra.single (lowerVec h i) 1 := by
-  have hprod : AddMonoidAlgebra.single h (1 : ℂ) =
-      ∏ i, (1 + coordElem h i) := by
-    conv_lhs => rw [← Finset.univ_sum_single h]
-    rw [single_sum_one]
-    exact Finset.prod_congr rfl fun i _ => by rw [coordElem, add_sub_cancel]
-  rw [hprod, Finset.prod_add_ordered]
-  simp only [Finset.prod_const_one, mul_one, add_sub_cancel_left]
-  refine Finset.sum_congr rfl fun i _ => ?_
-  rw [← prod_lt_single]
-  congr 1
-  exact Finset.prod_congr rfl fun j _ => by rw [coordElem, add_sub_cancel]
-
-/-- **The expansion in the translation algebra**:
-`(δ_h - 1)^r = ∑_α δ_{s_α} ∏_i (δ_{h_i e_i} - 1)^{m_i(α)}`, summed over the words
-`α : Fin r → Fin d`. -/
-theorem single_sub_one_pow_eq_sum (r : ℕ) (h : Fin d → ℝ) :
-    (AddMonoidAlgebra.single h (1 : ℂ) - 1) ^ r = ∑ α : Fin r → Fin d,
-      AddMonoidAlgebra.single (shiftVec h α) 1 * ∏ i, coordElem h i ^ count α i := by
-  classical
-  rw [single_sub_one_eq_sum, ← Fin.prod_const, Finset.prod_univ_sum, Fintype.piFinset_univ]
-  refine Finset.sum_congr rfl fun α _ => ?_
-  rw [Finset.prod_mul_distrib, mul_comm]
-  congr 1
-  · rw [shiftVec, single_sum_one]
-  · rw [← Finset.prod_fiberwise Finset.univ α fun l => coordElem h (α l)]
-    refine Finset.prod_congr rfl fun i _ => ?_
-    rw [Finset.prod_congr rfl fun l hl => by rw [(Finset.mem_filter.1 hl).2],
-      Finset.prod_const, count]
-
 /-- **The isotropic difference as a sum of mixed coordinate differences**:
 `Δ_h^r f(x) = ∑_α M_{m(α)} f(x + s_α)`, summed over the words `α : Fin r → Fin d`, with the
 multiplicities `m_i(α)` and the shifts `s_α`. -/
-theorem isoDiff_eq_sum (r : ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
-    isoDiff r h f x = ∑ α : Fin r → Fin d,
+theorem higherDiff_eq_sum (r : ℕ) (h : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
+    higherDiff r h f x = ∑ α : Fin r → Fin d,
       mixedDiff (count α) h (List.finRange d) f (x + shiftVec h α) := by
-  rw [isoDiff_eq_diffAct, single_sub_one_pow_eq_sum, map_sum, LinearMap.sum_apply,
+  rw [higherDiff_eq_diffAct, single_sub_one_pow_eq_sum, map_sum, LinearMap.sum_apply,
     Finset.sum_apply]
   refine Finset.sum_congr rfl fun α _ => ?_
   rw [map_mul, Module.End.mul_apply, diffAct_single_one, transl_apply, Fin.prod_univ_def,

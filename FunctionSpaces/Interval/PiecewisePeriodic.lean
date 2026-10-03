@@ -194,7 +194,7 @@ theorem exists_inverse_ppScheme_per {r : ℕ} (hp : p ≠ ∞) :
     refine iSup₂_le fun h hh => ?_
     have hhj : h ≤ 1 / 2 ^ j := hh.2.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ (by norm_num) hjk))
-    exact (eLpNorm_iterDiff_le_of_isPiecewisePoly (isPiecewisePoly_perExt_ppFun hQ j)
+    exact (eLpNorm_higherDiff_le_of_isPiecewisePoly (isPiecewisePoly_perExt_ppFun hQ j)
       (measurable_perExt (measurable_ppFun j Q)) hKb hp hh.1 hhj
       (sum_sum_localMass_perExt_le (measurable_ppFun j Q) hp j r)).trans
       (le_ppInverseConst_mul hjk K hh.2 _)

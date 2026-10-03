@@ -19,7 +19,7 @@ and 4.11, for `p ≥ 1`). The atoms `a` of `g` on the hyperplane `H` (the cell a
 
 with the vertical cut-off `v_j` of the mollified graph (`Rd.LipschitzGraph.vertCutoff`): `A ∘ γ = a`,
 and by Leibniz's rule for differences `|Δ_h^2 A| ≤ 4 A_0 B min(1, (2^j ‖h‖)^2)`
-(`Rd.LipschitzGraph.enorm_iterDiff_two_extendAtom_le`), so the extended atoms are regular atoms of
+(`Rd.LipschitzGraph.enorm_higherDiff_two_extendAtom_le`), so the extended atoms are regular atoms of
 order and exponent `2` on `V` (`Rd.LipschitzGraph.isRegularAtom_extendAtom`). The levels of the
 extension are `F_j(x) = g_j(Px) v_j(x)` (`Rd.LipschitzGraph.extLevel`), and
 `E g = ∑_j F_j` (`Rd.LipschitzGraph.graphExtension`) has a finite `B^{s+1/p}_{p,q}`-norm on `V`
@@ -73,8 +73,8 @@ theorem lpModulus_add_order_le (r l : ℕ) (f : Lp ℂ p (volume : Measure V))
     2 ^ l * modulus volume r p (f : V → ℂ) (1 / 2 ^ k)
   refine iSup₂_le fun h hh => ?_
   rw [add_comm r l, Function.iterate_add_apply]
-  exact (eLpNorm_iterDiff_le (aestronglyMeasurable_iterDiff (Lp.aestronglyMeasurable f) r h)
-    Fact.out l h).trans (mul_le_mul' le_rfl (eLpNorm_iterDiff_le_modulus hh))
+  exact (eLpNorm_higherDiff_le (aestronglyMeasurable_higherDiff (Lp.aestronglyMeasurable f) r h)
+    Fact.out l h).trans (mul_le_mul' le_rfl (eLpNorm_higherDiff_le_modulus hh))
 
 /-- The norm with moduli of order `L ≥ 2` is at most `2^(L-2)` times that with order `2`. -/
 theorem modNorm_order_le {L : ℕ} (hL : 2 ≤ L) (σ : ℝ) (q : ℝ≥0∞)
@@ -118,9 +118,9 @@ theorem continuous_extendAtom (j : ℕ) {a : Ω.hyperplane → ℂ} (hac : Conti
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- `Δ_h^l (a ∘ P)(x) = Δ_{Ph}^l a(Px)`. -/
-theorem iterDiff_comp_proj (l : ℕ) (h : V) (a : Ω.hyperplane → ℂ) (x : V) :
+theorem higherDiff_comp_proj (l : ℕ) (h : V) (a : Ω.hyperplane → ℂ) (x : V) :
     (fwdDiff h)^[l] (fun y => a (Ω.proj y)) x = (fwdDiff (Ω.proj h))^[l] a (Ω.proj x) := by
-  rw [iterDiff_apply, iterDiff_apply]
+  rw [higherDiff_apply, higherDiff_apply]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [map_add, map_smul]
 
@@ -134,8 +134,8 @@ theorem enorm_extendAtom_le (j : ℕ) {a : Ω.hyperplane → ℂ} {A : ℝ≥0�
 
 /-- **Second differences of extended atoms**: if `|Δ_h^l a| ≤ A_0 min(1, (2^j ‖h‖)^l)` for
 `l ≤ 2`, then `|Δ_h^2 A| ≤ 4 A_0 B min(1, (2^j ‖h‖)^2)`, by Leibniz's rule for differences
-(`Rd.iterDiff_mul`) and the bounds of the vertical cut-off. -/
-theorem enorm_iterDiff_two_extendAtom_le (j : ℕ) {a : Ω.hyperplane → ℂ} {A : ℝ≥0∞}
+(`Rd.higherDiff_mul`) and the bounds of the vertical cut-off. -/
+theorem enorm_higherDiff_two_extendAtom_le (j : ℕ) {a : Ω.hyperplane → ℂ} {A : ℝ≥0∞}
     (ha : ∀ l ≤ 2, ∀ h y, ‖(fwdDiff h)^[l] a y‖ₑ ≤
       A * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (l : ℝ))) (h x : V) :
     ‖(fwdDiff h)^[2] (Ω.extendAtom j a) x‖ₑ ≤
@@ -145,12 +145,12 @@ theorem enorm_iterDiff_two_extendAtom_le (j : ℕ) {a : Ω.hyperplane → ℂ} {
   set B := ENNReal.ofReal Ω.vertCutoffConst
   have hu : ∀ l ≤ 2, ‖(fwdDiff h)^[l] (fun y => a (Ω.proj y)) x‖ₑ ≤
       A * min 1 (t ^ (l : ℝ)) := fun l hl => by
-    rw [Ω.iterDiff_comp_proj]
+    rw [Ω.higherDiff_comp_proj]
     refine (ha l hl _ _).trans (mul_le_mul' le_rfl (min_le_min le_rfl
       (ENNReal.rpow_le_rpow (ENNReal.ofReal_le_ofReal ?_) (Nat.cast_nonneg l))))
     exact mul_le_mul_of_nonneg_left (Ω.norm_proj_le h) (by positivity)
   have hv : ∀ m ≤ 2, ∀ y, ‖(fwdDiff h)^[m] (Ω.vertCutoff j) y‖ₑ ≤ B * min 1 (t ^ (m : ℝ)) :=
-    fun m hm y => Ω.enorm_iterDiff_vertCutoff_le j hm h y
+    fun m hm y => Ω.enorm_higherDiff_vertCutoff_le j hm h y
   have hterm : ∀ l ∈ Finset.range (2 + 1), ‖(Nat.choose 2 l : ℂ) *
       ((fwdDiff h)^[l] (fun y => a (Ω.proj y)) x *
         (fwdDiff h)^[2 - l] (Ω.vertCutoff j) (x + (l : ℝ) • h))‖ₑ ≤
@@ -172,7 +172,7 @@ theorem enorm_iterDiff_two_extendAtom_le (j : ℕ) {a : Ω.hyperplane → ℂ} {
   have hsum : ∑ l ∈ Finset.range (2 + 1), (Nat.choose 2 l : ℝ≥0∞) = 4 := by
     simp [Finset.sum_range_succ]
     norm_num
-  rw [show Ω.extendAtom j a = fun y => a (Ω.proj y) * Ω.vertCutoff j y from rfl, iterDiff_mul]
+  rw [show Ω.extendAtom j a = fun y => a (Ω.proj y) * Ω.vertCutoff j y from rfl, higherDiff_mul]
   calc ‖∑ l ∈ Finset.range (2 + 1), (Nat.choose 2 l : ℂ) *
         ((fwdDiff h)^[l] (fun y => a (Ω.proj y)) x *
           (fwdDiff h)^[2 - l] (Ω.vertCutoff j) (x + (l : ℝ) • h))‖ₑ
@@ -260,7 +260,7 @@ theorem isRegularAtom_extendAtom {p : ℝ≥0∞} (j : ℕ) {a : Ω.hyperplane �
     calc A = 1 * A := (one_mul A).symm
       _ ≤ 4 * ENNReal.ofReal Ω.vertCutoffConst * A := mul_le_mul' hB le_rfl
       _ = 4 * A * ENNReal.ofReal Ω.vertCutoffConst := by ring
-  · have h2 := Ω.enorm_iterDiff_two_extendAtom_le j ha h x
+  · have h2 := Ω.enorm_higherDiff_two_extendAtom_le j ha h x
     simpa using h2
 
 /-! ### The extension operator -/

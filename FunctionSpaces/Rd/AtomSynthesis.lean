@@ -34,7 +34,7 @@ The proof: by bounded overlap (`Rd.eLpNorm_rpow_le_of_overlap`),
 `ω_r(f_j, 2^(-k))_p ≲ 2^(-jn/p) ‖λ_{j,·}‖_{ℓ_p} min(1, 2^(-(k-j)σ))`
 (`Rd.eLpNorm_levelSum_le`, `Rd.modulus_levelSum_le`); the almost diagonal lemma with exponent `σ`
 sums the levels. Smooth functions with `‖D^l a‖ ≤ A 2^(jl)` for `l ≤ r` satisfy the pointwise
-bounds with `σ = r` (`Rd.enorm_iterDiff_le_of_iteratedFDeriv`).
+bounds with `σ = r` (`Rd.enorm_higherDiff_le_of_iteratedFDeriv`).
 -/
 
 @[expose] public section
@@ -117,7 +117,7 @@ structure IsRegularAtom (p : ℝ≥0∞) (σ : ℝ) (r : ℕ) (d : ℝ) (C : ℝ
   aestronglyMeasurable : AEStronglyMeasurable a volume
   eq_zero : ∀ x, d / 2 ^ j < ‖x - c‖ → a x = 0
   eLpNorm_le : eLpNorm a p volume ≤ C * dyadicWeight (-(finrank ℝ V / p.toReal)) j
-  eLpNorm_iterDiff_le : ∀ h : V, eLpNorm ((fwdDiff h)^[r] a) p volume ≤
+  eLpNorm_higherDiff_le : ∀ h : V, eLpNorm ((fwdDiff h)^[r] a) p volume ≤
     C * dyadicWeight (-(finrank ℝ V / p.toReal)) j * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ)
 
 /-- The `ℓ_p`-norm `‖λ_{j,·}‖_{ℓ_p}` of the coefficients of one level. -/
@@ -156,10 +156,10 @@ noncomputable def coeffNorm (p : ℝ≥0∞) (n : ℕ) (s : ℝ) (q : ℝ≥0∞
 omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- Differences of a pointwise convergent sum are the sums of the differences, if the sums
 converge at all the points of the difference. -/
-theorem iterDiff_tsum_apply [NormedSpace ℝ V] {ι : Type*} (g : ι → V → ℂ)
+theorem higherDiff_tsum_apply [NormedSpace ℝ V] {ι : Type*} (g : ι → V → ℂ)
     (hg : ∀ y, Summable fun m => g m y) (r : ℕ) (h x : V) :
     (fwdDiff h)^[r] (fun y => ∑' m, g m y) x = ∑' m, (fwdDiff h)^[r] (g m) x := by
-  simp_rw [iterDiff_apply]
+  simp_rw [higherDiff_apply]
   rw [Summable.tsum_finsetSum fun l _ => (hg _).mul_left _]
   exact Finset.sum_congr rfl fun l _ => (tsum_mul_left).symm
 
@@ -241,20 +241,20 @@ theorem modulus_levelSum_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {�
   · refine iSup₂_le fun h hh => ?_
     have hsum : ∀ y, Summable fun m => coef m * a m y := summable_levelSum c a coef hN ha
     have hae : (fwdDiff h)^[r] F =ᵐ[volume] fun x => ∑' m, coef m * (fwdDiff h)^[r] (a m) x := by
-      filter_upwards [iterDiff_congr_ae hFa r h] with x hx
-      rw [hx, iterDiff_tsum_apply _ hsum]
+      filter_upwards [higherDiff_congr_ae hFa r h] with x hx
+      rw [hx, higherDiff_tsum_apply _ hsum]
       refine tsum_congr fun m => ?_
       rw [show (fun y => coef m * a m y) = coef m • a m from rfl, fwdDiff_iter_const_smul]
       rfl
     have hg : ∀ m, AEStronglyMeasurable (fun x => coef m * (fwdDiff h)^[r] (a m) x) volume :=
       fun m => aestronglyMeasurable_const.mul
-        (aestronglyMeasurable_iterDiff (ha m).aestronglyMeasurable r h)
+        (aestronglyMeasurable_higherDiff (ha m).aestronglyMeasurable r h)
     have hhk : ‖h‖ ≤ 1 / 2 ^ j := hh.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ one_le_two hjk))
     have hover : ∀ x (S : Finset ι), (∀ m ∈ S, coef m * (fwdDiff h)^[r] (a m) x ≠ 0) →
         S.card ≤ N := fun x S hS => hN x S fun m hm => by
       have hne : (fwdDiff h)^[r] (a m) x ≠ 0 := right_ne_zero_of_mul (hS m hm)
-      rw [iterDiff_apply] at hne
+      rw [higherDiff_apply] at hne
       obtain ⟨l, hl, hl0⟩ : ∃ l ∈ Finset.range (r + 1), a m (x + (l : ℝ) • h) ≠ 0 := by
         by_contra hcon
         push Not at hcon
@@ -273,7 +273,7 @@ theorem modulus_levelSum_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {�
         _ ≤ d / 2 ^ j + r / 2 ^ j := add_le_add h1 h2
         _ = (d + r) / 2 ^ j := by ring
     have hbound := eLpNorm_rpow_le_of_overlap hp1 hp hg hover
-      (aestronglyMeasurable_iterDiff hF r h) hae
+      (aestronglyMeasurable_higherDiff hF r h) hae
     have hmin : min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ) ≤ dyadicWeight (-σ) (k - j) := by
       refine (min_le_right _ _).trans ?_
       have hk : (2 : ℝ) ^ j * ‖h‖ ≤ (1 / 2 ^ (k - j)) := by
@@ -294,7 +294,7 @@ theorem modulus_levelSum_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {�
     calc eLpNorm ((fwdDiff h)^[r] F) p volume
         ≤ (N : ℝ≥0∞) ^ (1 - 1 / p.toReal) * (C * dyadicWeight (-(finrank ℝ V / p.toReal)) j *
             dyadicWeight (-σ) (k - j)) * levelNorm p coef :=
-          le_of_rpow_le_overlap hp1 hp (fun m => ((ha m).eLpNorm_iterDiff_le h).trans
+          le_of_rpow_le_overlap hp1 hp (fun m => ((ha m).eLpNorm_higherDiff_le h).trans
             (mul_le_mul' le_rfl hmin)) coef (hbound.trans_eq (by
               congr 2
               funext m
@@ -447,7 +447,7 @@ theorem isRegularAtom_zero {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : ℝ} {C : 
   aestronglyMeasurable := aestronglyMeasurable_const
   eq_zero _ _ := rfl
   eLpNorm_le := by simp
-  eLpNorm_iterDiff_le h := by
+  eLpNorm_higherDiff_le h := by
     have h0 : (fwdDiff h)^[r] (0 : V → ℂ) = 0 := by
       induction r with
       | zero => rfl
@@ -576,7 +576,7 @@ theorem isRegularAtom_of_pointwise {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : �
       exact mul_le_mul' le_rfl (hball c)
   · set T := ⋃ l ∈ Finset.range (r + 1), closedBall (c - (l : ℝ) • h) (d / 2 ^ j)
     have hT : ∀ x ∉ T, (fwdDiff h)^[r] a x = 0 := fun x hx => by
-      rw [iterDiff_apply]
+      rw [higherDiff_apply]
       refine Finset.sum_eq_zero fun l hl => ?_
       have hxl : x ∉ closedBall (c - (l : ℝ) • h) (d / 2 ^ j) := fun hx' =>
         hx (Set.mem_biUnion hl hx')
@@ -592,7 +592,7 @@ theorem isRegularAtom_of_pointwise {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : �
       simp only [K]
       push_cast
       ring
-    refine (eLpNorm_le_of_bound_of_support (aestronglyMeasurable_iterDiff hm r h) hT
+    refine (eLpNorm_le_of_bound_of_support (aestronglyMeasurable_higherDiff hm r h) hT
       (hdiff h)).trans ?_
     calc A * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ) * volume T ^ (1 / p.toReal)
         ≤ A * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ) * ((((r + 1 : ℕ) : ℝ≥0∞) * K) ^
@@ -605,15 +605,15 @@ omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 `‖D^l a‖ ≤ A 2^(jl)` for `l ≤ r` satisfies the pointwise bounds of `Rd.isRegularAtom_of_pointwise`
 with exponent `σ = r` and the constant `2^r A`: `|Δ_h^r a| ≤ A (2^j ‖h‖)^r` by the mean value
 theorem and `|Δ_h^r a| ≤ 2^r A`. -/
-theorem enorm_iterDiff_le_of_iteratedFDeriv {a : V → ℂ}
+theorem enorm_higherDiff_le_of_iteratedFDeriv {a : V → ℂ}
     (ha : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) a) {r j : ℕ} {A : ℝ} (hA : 0 ≤ A)
     (hD : ∀ l ≤ r, ∀ x, ‖iteratedFDeriv ℝ l a x‖ ≤ A * 2 ^ (j * l)) (h x : V) :
     ‖(fwdDiff h)^[r] a x‖ₑ ≤
       ENNReal.ofReal (2 ^ r * A) * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (r : ℝ)) := by
   have h1 : ‖(fwdDiff h)^[r] a x‖ ≤ A * 2 ^ (j * r) * ‖h‖ ^ r :=
-    norm_iterDiff_le_of_iteratedFDeriv ha (hD r le_rfl) h x
+    norm_higherDiff_le_of_iteratedFDeriv ha (hD r le_rfl) h x
   have h2 : ‖(fwdDiff h)^[r] a x‖ ≤ 2 ^ r * A := by
-    rw [iterDiff_apply]
+    rw [higherDiff_apply]
     calc ‖∑ l ∈ Finset.range (r + 1), ((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) *
           a (x + (l : ℝ) • h)‖
         ≤ ∑ l ∈ Finset.range (r + 1), ‖((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) *

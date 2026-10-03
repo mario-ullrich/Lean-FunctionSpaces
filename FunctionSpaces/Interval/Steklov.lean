@@ -30,6 +30,7 @@ functions in Jackson's inequality.
 @[expose] public section
 
 open MeasureTheory Set Polynomial
+open Rd (higherDiff)
 open scoped ENNReal
 
 namespace Interval
@@ -156,20 +157,20 @@ theorem steklovIter_fwdDiff {g : ℝ → ℂ} (hg : Continuous g) (m : ℕ) (η 
 `(M_η^(m+k) g)^(k) = η^(-k) M_η^m (Δ_η^k g)` for continuous `g`. -/
 theorem iteratedDeriv_steklovIter_add {g : ℝ → ℂ} (hg : Continuous g) (m k : ℕ) (η : ℝ) :
     iteratedDeriv k (steklovIter (m + k) η g) =
-      fun x => ((η : ℂ))⁻¹ ^ k * steklovIter m η (iterDiff k η g) x := by
+      fun x => ((η : ℂ))⁻¹ ^ k * steklovIter m η (higherDiff k η g) x := by
   induction k generalizing g with
-  | zero => funext x; simp [iterDiff]
+  | zero => funext x; simp [higherDiff]
   | succ k ih =>
     rw [iteratedDeriv_succ', show m + (k + 1) = m + k + 1 by ring, steklovIter_succ,
       deriv_steklov (continuous_steklovIter hg (m + k) η),
       ← steklovIter_fwdDiff hg (m + k) η η]
     funext x
-    rw [iteratedDeriv_const_mul_field, ih (continuous_fwdDiff hg η), iterDiff_succ', pow_succ]
+    rw [iteratedDeriv_const_mul_field, ih (continuous_fwdDiff hg η), higherDiff_succ', pow_succ]
     ring
 
 /-- **`(M_η^r g)^(r) = η^(-r) Δ_η^r g`** for continuous `g`. -/
 theorem iteratedDeriv_steklovIter {g : ℝ → ℂ} (hg : Continuous g) (r : ℕ) (η : ℝ) :
-    iteratedDeriv r (steklovIter r η g) = fun x => ((η : ℂ))⁻¹ ^ r * iterDiff r η g x := by
+    iteratedDeriv r (steklovIter r η g) = fun x => ((η : ℂ))⁻¹ ^ r * higherDiff r η g x := by
   have h := iteratedDeriv_steklovIter_add hg 0 r η
   rw [zero_add] at h
   rw [h]

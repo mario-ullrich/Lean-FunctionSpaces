@@ -33,6 +33,7 @@ over the steps outside the integral over the cube (`Cube.eLpNorm_sub_cubeSmooth_
 @[expose] public section
 
 open MeasureTheory Set Polynomial
+open Rd (higherDiff)
 open scoped ENNReal
 
 namespace Cube
@@ -116,7 +117,7 @@ theorem sub_cubeSmooth_eq {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r :
   rw [show slice f x i (x i) = f x by simp [slice] ] at h
   rw [cubeSmooth, h]
   congr 1
-  exact avgStepIter_congr_point (G := fun h y => iterDiff r h (slice f x i) y)
+  exact avgStepIter_congr_point (G := fun h y => higherDiff r h (slice f x i) y)
     (G' := fun h y => cubeDiff r h i f y) (x := x i) (x' := x) (fun s => rfl) r δ 0
 
 /-- **The derivative of the smoothing is a combination of coordinate differences**:
@@ -283,7 +284,7 @@ theorem slice_reflect (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) (i : Fin
   simp [slice, reflect]
 
 /-- **Reflection preserves the coordinate modulus**: `ω_r^{(i)}(f(reflect_i ·), t) = ω_r^{(i)}(f, t)`,
-slice by slice (`Interval.eLpNorm_iterDiff_reflect`). -/
+slice by slice (`Interval.eLpNorm_higherDiff_reflect`). -/
 theorem coordModulus_reflect {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp0 : p ≠ 0)
     (hp : p ≠ ∞) (r : ℕ) (i : Fin d) (t : ℝ) :
     coordModulus r p i (fun y => f (reflect i y)) t = coordModulus r p i f t := by
@@ -299,7 +300,7 @@ theorem coordModulus_reflect {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {
     eLpNorm_rpow_cubeDiff_eq_slice hf hp0 hp r hh.1 i]
   refine lintegral_congr fun x => ?_
   rw [slice_reflect]
-  have h := eLpNorm_iterDiff_reflect (measurable_slice hf x i) r p 0 1 h
+  have h := eLpNorm_higherDiff_reflect (measurable_slice hf x i) r p 0 1 h
   simp only [zero_add] at h
   rw [h]
 

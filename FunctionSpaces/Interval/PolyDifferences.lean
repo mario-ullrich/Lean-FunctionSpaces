@@ -12,10 +12,10 @@ public import Mathlib.Analysis.Calculus.MeanValue
 # Differences of polynomials of every order
 
 For a polynomial `P` of degree `< r` the difference of order `m ≥ r` vanishes
-(`Interval.iterDiff_polynomial`); differences of lower order are small instead. If
+(`Interval.higherDiff_polynomial`); differences of lower order are small instead. If
 `|P^(m)| ≤ M` on `[y, y + mσ]`, `σ ≥ 0`, then `|Δ_σ^m P(y)| ≤ σ^m M`
-(`Interval.norm_iterDiff_polyFun_le`), by induction on `m` with the mean value theorem, since the
-derivative of `Δ_σ^m P` is `Δ_σ^m P'` (`Interval.hasDerivAt_iterDiff_polyFun`).
+(`Interval.norm_higherDiff_polyFun_le`), by induction on `m` with the mean value theorem, since the
+derivative of `Δ_σ^m P` is `Δ_σ^m P'` (`Interval.hasDerivAt_higherDiff_polyFun`).
 
 On the finite-dimensional space of polynomials of degree `< r` every linear map is bounded by
 the `L_p` norm on an interval (`Interval.exists_enorm_linearMap_le_eLpNorm`); for the `m`-th
@@ -28,6 +28,7 @@ this is Nikolskii's bound (`Interval.NikolskiiBound`).
 @[expose] public section
 
 open MeasureTheory Set Polynomial
+open Rd (higherDiff)
 open scoped ENNReal
 
 namespace Interval
@@ -104,12 +105,12 @@ theorem exists_enorm_linearMap_le_eLpNorm (r : ℕ) (Φ : ℂ[X] →ₗ[ℂ] ℂ
 
 /-- The derivative of a difference of a polynomial is the difference of its derivative:
 `(Δ_σ^m P)' = Δ_σ^m P'`. -/
-theorem hasDerivAt_iterDiff_polyFun (m : ℕ) (σ : ℝ) (P : ℂ[X]) (z : ℝ) :
-    HasDerivAt (iterDiff m σ (polyFun P)) (iterDiff m σ (polyFun (derivative P)) z) z := by
-  have h : iterDiff m σ (polyFun P) = fun z => ∑ k ∈ Finset.range (m + 1),
+theorem hasDerivAt_higherDiff_polyFun (m : ℕ) (σ : ℝ) (P : ℂ[X]) (z : ℝ) :
+    HasDerivAt (higherDiff m σ (polyFun P)) (higherDiff m σ (polyFun (derivative P)) z) z := by
+  have h : higherDiff m σ (polyFun P) = fun z => ∑ k ∈ Finset.range (m + 1),
       ((-1 : ℂ) ^ (m - k) * (m.choose k : ℂ)) * polyFun P (z + k * σ) :=
-    funext fun z => iterDiff_apply m σ _ z
-  rw [h, iterDiff_apply]
+    funext fun z => higherDiff_apply m σ _ z
+  rw [h, higherDiff_apply]
   exact HasDerivAt.fun_sum fun k _ =>
     ((hasDerivAt_polyFun P (z + k * σ)).comp_add_const z (k * σ)).const_mul _
 
@@ -118,20 +119,20 @@ theorem hasDerivAt_iterDiff_polyFun (m : ℕ) (σ : ℝ) (P : ℂ[X]) (z : ℝ) 
 Δ_σ^m P(y)`, and the mean value theorem (Mathlib's
 `norm_image_sub_le_of_norm_deriv_le_segment'`) applies to `Δ_σ^m P` with derivative
 `Δ_σ^m P'`. -/
-theorem norm_iterDiff_polyFun_le (m : ℕ) {σ : ℝ} (hσ : 0 ≤ σ) {M : ℝ} :
+theorem norm_higherDiff_polyFun_le (m : ℕ) {σ : ℝ} (hσ : 0 ≤ σ) {M : ℝ} :
     ∀ (P : ℂ[X]) (y : ℝ), (∀ z ∈ Icc y (y + m * σ), ‖polyFun (derivative^[m] P) z‖ ≤ M) →
-      ‖iterDiff m σ (polyFun P) y‖ ≤ σ ^ m * M := by
+      ‖higherDiff m σ (polyFun P) y‖ ≤ σ ^ m * M := by
   induction m with
   | zero =>
     intro P y h
     simpa using h y ⟨le_rfl, by simp⟩
   | succ m ih =>
     intro P y h
-    rw [iterDiff_succ]
-    have hd : ∀ z ∈ Icc y (y + σ), HasDerivWithinAt (iterDiff m σ (polyFun P))
-        (iterDiff m σ (polyFun (derivative P)) z) (Icc y (y + σ)) z :=
-      fun z _ => (hasDerivAt_iterDiff_polyFun m σ P z).hasDerivWithinAt
-    have hb : ∀ z ∈ Ico y (y + σ), ‖iterDiff m σ (polyFun (derivative P)) z‖ ≤ σ ^ m * M :=
+    rw [higherDiff_succ]
+    have hd : ∀ z ∈ Icc y (y + σ), HasDerivWithinAt (higherDiff m σ (polyFun P))
+        (higherDiff m σ (polyFun (derivative P)) z) (Icc y (y + σ)) z :=
+      fun z _ => (hasDerivAt_higherDiff_polyFun m σ P z).hasDerivWithinAt
+    have hb : ∀ z ∈ Ico y (y + σ), ‖higherDiff m σ (polyFun (derivative P)) z‖ ≤ σ ^ m * M :=
       fun z hz => ih (derivative P) z fun w hw => by
         have hw' : w ∈ Icc y (y + ((m + 1 : ℕ) : ℝ) * σ) := by
           push_cast
@@ -140,7 +141,7 @@ theorem norm_iterDiff_polyFun_le (m : ℕ) {σ : ℝ} (hσ : 0 ≤ σ) {M : ℝ}
         rwa [Function.iterate_succ_apply] at this
     have hmvt := norm_image_sub_le_of_norm_deriv_le_segment' hd hb (y + σ)
       ⟨by linarith, le_rfl⟩
-    calc ‖iterDiff m σ (polyFun P) (y + σ) - iterDiff m σ (polyFun P) y‖
+    calc ‖higherDiff m σ (polyFun P) (y + σ) - higherDiff m σ (polyFun P) y‖
         ≤ σ ^ m * M * (y + σ - y) := hmvt
       _ = σ ^ (m + 1) * M := by ring
 
@@ -153,14 +154,14 @@ variable (p) in
 def DiffBound (r m : ℕ) (K : ℝ≥0∞) : Prop :=
   ∀ P ∈ degreeLT ℂ r, ∀ (u : ℝ) {L : ℝ}, 0 < L → ∀ {t : ℝ}, 0 ≤ t → ∀ x, u ≤ x →
     x + m * t ≤ u + 2 * L →
-      ‖iterDiff m t (polyFun P) x‖ₑ ≤ K * ENNReal.ofReal (t / L) ^ m *
+      ‖higherDiff m t (polyFun P) x‖ₑ ≤ K * ENNReal.ofReal (t / L) ^ m *
         ENNReal.ofReal L⁻¹ ^ (1 / p.toReal) *
           eLpNorm (polyFun P) p (volume.restrict (Icc u (u + L)))
 
 /-- **Differences of polynomials are small**: for `1 ≤ p < ∞` and every order `m` there is a
 difference bound for the polynomials of degree `< r`. On `[0, 1]` the derivative `P^(m)` is
 bounded by `K ‖P‖_{L_p[0, 1/2]}` (`Interval.exists_enorm_linearMap_le_eLpNorm`), so
-`|Δ_σ^m P(y)| ≤ σ^m K ‖P‖_{L_p[0, 1/2]}` (`Interval.norm_iterDiff_polyFun_le`); the substitution
+`|Δ_σ^m P(y)| ≤ σ^m K ‖P‖_{L_p[0, 1/2]}` (`Interval.norm_higherDiff_polyFun_le`); the substitution
 `x = u + 2L y` rescales. -/
 theorem exists_diffBound (r m : ℕ) (hp : p ≠ ∞) : ∃ K : ℝ≥0∞, K ≠ ∞ ∧ DiffBound p r m K := by
   obtain ⟨K, hK, hKb⟩ := exists_enorm_linearMap_le_eLpNorm (p := p) r
@@ -174,8 +175,8 @@ theorem exists_diffBound (r m : ℕ) (hp : p ≠ ∞) : ∃ K : ℝ≥0∞, K �
   set y := (x - u) / (2 * L)
   have hσ : 0 ≤ σ := div_nonneg ht h2L.le
   -- the difference in the new variable
-  have hdiff : iterDiff m t (polyFun P) x = iterDiff m σ (polyFun Q) y := by
-    rw [iterDiff_apply, iterDiff_apply]
+  have hdiff : higherDiff m t (polyFun P) x = higherDiff m σ (polyFun Q) y := by
+    rw [higherDiff_apply, higherDiff_apply]
     refine Finset.sum_congr rfl fun k _ => ?_
     rw [polyFun_comp_affine]
     congr 2
@@ -200,7 +201,7 @@ theorem exists_diffBound (r m : ℕ) (hp : p ≠ ∞) : ∃ K : ℝ≥0∞, K �
     rw [Module.End.pow_apply] at h
     rw [← ofReal_norm] at h
     exact (ENNReal.ofReal_le_iff_le_toReal hKQ).1 h
-  have hval := norm_iterDiff_polyFun_le m hσ Q y hder
+  have hval := norm_higherDiff_polyFun_le m hσ Q y hder
   -- the norm of `Q` on `[0, 1/2]`
   have hnorm := eLpNorm_comp_affine (measurable_polyFun P) hp u h2L 0 (1 / 2)
   rw [mul_zero, add_zero, show 2 * L * (1 / 2) = L by ring] at hnorm
@@ -209,7 +210,7 @@ theorem exists_diffBound (r m : ℕ) (hp : p ≠ ∞) : ∃ K : ℝ≥0∞, K �
   rw [hQfun] at hnorm
   have hσL : σ ≤ t / L := div_le_div_of_nonneg_left ht hL (by linarith)
   rw [hdiff, ← ofReal_norm]
-  calc ENNReal.ofReal ‖iterDiff m σ (polyFun Q) y‖
+  calc ENNReal.ofReal ‖higherDiff m σ (polyFun Q) y‖
       ≤ ENNReal.ofReal (σ ^ m * (K * eLpNorm (polyFun Q) p
           (volume.restrict (Icc 0 (1 / 2)))).toReal) := ENNReal.ofReal_le_ofReal hval
     _ = ENNReal.ofReal σ ^ m * (K * eLpNorm (polyFun Q) p (volume.restrict (Icc 0 (1 / 2)))) := by

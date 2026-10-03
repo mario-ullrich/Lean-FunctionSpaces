@@ -32,6 +32,7 @@ norm `1`, and sums, products and powers add and multiply the bounds.
 @[expose] public section
 
 open MeasureTheory Filter
+open TranslationAlgebra (diffAct diffAct_single)
 open scoped ENNReal
 
 namespace Rd
@@ -44,8 +45,8 @@ variable {d : ℕ}
 `a` keeps a.e. strong measurability and `‖a G‖_p ≤ C ‖G‖_p`. -/
 def ActsBounded (p : ℝ≥0∞) (a : AddMonoidAlgebra ℂ (Fin d → ℝ)) (C : ℝ≥0∞) : Prop :=
   ∀ G : (Fin d → ℝ) → ℂ, AEStronglyMeasurable G volume →
-    AEStronglyMeasurable (Cube.diffAct a G) volume ∧
-      eLpNorm (Cube.diffAct a G) p volume ≤ C * eLpNorm G p volume
+    AEStronglyMeasurable (diffAct a G) volume ∧
+      eLpNorm (diffAct a G) p volume ≤ C * eLpNorm G p volume
 
 namespace ActsBounded
 
@@ -59,8 +60,8 @@ theorem one : ActsBounded p (1 : AddMonoidAlgebra ℂ (Fin d → ℝ)) 1 := fun 
 /-- `c δ_v` acts with norm `|c|`: translations preserve `L_p` norms. -/
 theorem single (v : Fin d → ℝ) (c : ℂ) :
     ActsBounded p (AddMonoidAlgebra.single v c) ‖c‖ₑ := fun G hG => by
-  have h : Cube.diffAct (AddMonoidAlgebra.single v c) G = c • fun x => G (x + v) :=
-    funext fun x => Cube.diffAct_single v c G x
+  have h : diffAct (AddMonoidAlgebra.single v c) G = c • fun x => G (x + v) :=
+    funext fun x => diffAct_single v c G x
   rw [h, eLpNorm_const_smul, eLpNorm_comp_add_right hG]
   exact ⟨(aestronglyMeasurable_comp_add hG v).const_smul c, le_rfl⟩
 
@@ -181,7 +182,7 @@ theorem actsBounded_addPoly {p : ℝ≥0∞} (hp : 1 ≤ p) (L : ℕ) (v : Fin d
 the translations `Y_i = δ_{w_i e_i}`. -/
 theorem diffAct_prod_sum_pow_apply {τ : Type*} (T : Finset τ) (ν : τ → ℕ) (q : Fin d → τ → ℂ)
     (w : Fin d → ℝ) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
-    Cube.diffAct (∏ i, ∑ t ∈ T,
+    diffAct (∏ i, ∑ t ∈ T,
         q i t • AddMonoidAlgebra.single (Pi.single i (w i)) (1 : ℂ) ^ ν t) f x =
       ∑ n ∈ Fintype.piFinset fun _ => T,
         (∏ i, q i (n i)) * f (x + fun i => (ν (n i) : ℝ) * w i) := by
@@ -199,7 +200,7 @@ theorem diffAct_prod_sum_pow_apply {τ : Type*} (T : Finset τ) (ν : τ → ℕ
   simp_rw [AddMonoidAlgebra.prod_single]
   rw [map_sum, LinearMap.sum_apply, Finset.sum_apply]
   refine Finset.sum_congr rfl fun n _ => ?_
-  rw [Cube.diffAct_single]
+  rw [diffAct_single]
   congr 2
   funext j
   simp [Finset.sum_apply, Pi.single_apply]
@@ -232,7 +233,7 @@ theorem conv_tensorKernel_sum_dilate_ae {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p
     (q : Fin d → τ → ℂ) {c : Fin d → ℝ} (hc : ∀ i, 0 < c i) {f : (Fin d → ℝ) → ℂ}
     (hf : MemLp f p volume) :
     conv (tensorKernel fun i => ∑ t ∈ T, q i t • dilate (c i / ν t) g) f volume =ᵐ[volume]
-      fun x => ∫ z, tensorKernel (fun _ => g) z * Cube.diffAct (∏ i, ∑ t ∈ T,
+      fun x => ∫ z, tensorKernel (fun _ => g) z * diffAct (∏ i, ∑ t ∈ T,
         q i t • AddMonoidAlgebra.single (Pi.single i (-z i / c i)) (1 : ℂ) ^ ν t) f x := by
   set S := Fintype.piFinset fun _ : Fin d => T
   set K : (Fin d → τ) → (Fin d → ℝ) → ℂ := fun n =>

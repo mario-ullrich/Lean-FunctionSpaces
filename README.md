@@ -205,9 +205,10 @@ explains how they differ.
   `0 ≤ s < r - 1 + 1/p` (`Cube.memApprox_cubeSplineScheme_iff_iso`). Hence the Besov conditions
   with the coordinate moduli and with the isotropic modulus agree for `0 ≤ s < r - 1 + 1/p`
   (`Cube.lqNorm_cubeModulus_lt_top_iff_iso`). The proof expands `Δ_h^r` into `d^r` mixed
-  coordinate differences in the translation algebra `ℂ[ℝ^d]` (`Cube.isoDiff_eq_sum`) and bounds
+  coordinate differences in the translation algebra `ℂ[ℝ^d]` (`Cube.higherDiff_eq_sum`) and bounds
   them by differences of every order in one variable
-  (`Interval.exists_eLpNorm_iterDiff_ppFun_le`, `Interval.exists_eLpNorm_iterDiff_spline_le_of_lt`).
+  (`Interval.exists_eLpNorm_higherDiff_ppFun_le`,
+  `Interval.exists_eLpNorm_higherDiff_spline_le_of_lt`).
 * **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
@@ -322,7 +323,7 @@ explains how they differ.
   `∑_{l=1}^r (-1)^(l+1) C(r, l) Φ_{2^k/l} ⋆ f` (`Rd.enorm_sub_jacksonApprox_le`), with the inverse
   inequality `ω_r(a, 2^(-k))_p ≤ C 2^(-(k-j) r) ‖a‖_p` for `a ∈ E_j`
   (`Rd.lpModulus_le_of_mem_bandSpace`), which rests on `‖Δ_v^r G‖_1 ≤ |v|^r ‖D^r G‖_1` for
-  Schwartz functions `G` (`Rd.lintegral_enorm_iterDiff_schwartz_le`).
+  Schwartz functions `G` (`Rd.lintegral_enorm_higherDiff_schwartz_le`).
 * **Local means on `ℝ^d`.** With `V` and `p` as above, let `g` be a smooth function with
   `∫ g = 1` that vanishes outside a ball, `g_c = c^n g(c ·)` its dilations (`n = dim V`),
   `L ≥ 1`, `m = ∑_{l=1}^L (-1)^(l+1) C(L, l) g_{1/l}` the moment kernel, and `k_0 = m`,
@@ -484,7 +485,7 @@ explains how they differ.
 | Piecewise polynomials on the cube: tensor projection, tensor-product description, Whitney, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{PiecewisePoly,PiecewiseJackson,PiecewiseInverse}.lean` |
 | Tensor splines on the cube: quasi-interpolant as a kernel operator, tensor-product description, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < r - 1 + 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{Splines,SplineJackson,SplineInverse}.lean` |
 | Differences of every order: difference bound for polynomials, piecewise polynomials (gain `1/p`), splines (gain `m` below order `r`), steps of either sign | ✅ proved | ✗ | `FunctionSpaces/Interval/{PolyDifferences,LowerDifferences}.lean` |
-| Isotropic differences: translation algebra, expansion into mixed coordinate differences | ✅ proved | ✗ | `FunctionSpaces/Cube/Translation.lean` |
+| Translation algebra of an additive monoid, differences as its powers; isotropic differences and their expansion into mixed coordinate differences | ✅ proved | ✗ | `FunctionSpaces/TranslationAlgebra.lean`, `FunctionSpaces/Cube/Translation.lean` |
 | Isotropic modulus on the cube, comparison with the moduli in the coordinates | ✅ proved | ✗ | `FunctionSpaces/Cube/IsoModulus.lean` |
 | Isotropic inverse inequalities, `A^s_q` with the isotropic modulus, coordinate and isotropic Besov conditions agree for `0 < s < r - 1 + 1/p` | ✅ proved | ✗ | `FunctionSpaces/Cube/{IsoInverse,IsoCoincidence}.lean` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ proved | ✗ | `ApproximationSpaces/Decompositions/{Blocks,Projection}.lean` |
@@ -508,7 +509,7 @@ explains how they differ.
 | Dilations, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ proved | ✗ | `FunctionSpaces/Rd/ApproxIdentity.lean` |
 | Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, kernel identities by Fourier inversion | ✅ proved | ✗ | `FunctionSpaces/Rd/LittlewoodPaleyKernels.lean` |
 | Band-limited classes on `ℝ^d`, Littlewood–Paley blocks, `A^s_q(band-limited)` characterised by Littlewood–Paley blocks for `s > 0` | ✅ proved | ✗ | `FunctionSpaces/Rd/{BandLimited,LittlewoodPaley}.lean` |
-| Differences and the modulus of smoothness on `ℝ^d`: dilation of the scale, differences of convolutions and dilations | ✅ proved | ✗ | `FunctionSpaces/Rd/Differences.lean` |
+| Differences `higherDiff` on any additive monoid, steps of either sign; the modulus of smoothness on `ℝ^d`, dilation of the scale, differences of convolutions and dilations | ✅ proved | ✗ | `FunctionSpaces/Rd/{Differences,DilatedDifferences}.lean` |
 | Jackson's inequality for band-limited approximation | ✅ proved | ✗ | `FunctionSpaces/Rd/BandJackson.lean` |
 | Differences of Schwartz functions in `L_1`, inverse inequality for band-limited functions | ✅ proved | ✗ | `FunctionSpaces/Rd/BandInverse.lean` |
 | Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ proved | ✗ | `FunctionSpaces/Rd/BesovDifferences.lean` |

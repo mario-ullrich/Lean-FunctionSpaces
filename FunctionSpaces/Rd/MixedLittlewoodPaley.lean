@@ -33,7 +33,7 @@ comparisons with the mixed local means use a reproducing formula, a one-dimensio
 * `‖k_m ⋆ Θ_k‖_1 ≤ C 2^(-(m-k)L)` for `k < m`
   (`Rd.LocalMeansBump.exists_eLpNorm_conv_kernel_Theta_le`): local means are bounded by the
   modulus (`Rd.LocalMeansBump.enorm_localMean_succ_le`), and `Θ_k` is smooth at the scale `2^(-k)`
-  (`Rd.eLpNorm_iterDiff_Theta_le`).
+  (`Rd.eLpNorm_higherDiff_Theta_le`).
 -/
 
 @[expose] public section
@@ -196,7 +196,7 @@ theorem exists_eLpNorm_conv_psi_dual_le (L : ℕ) :
       exact convLp_of_eq_zero h1 _ (conv_psi_Theta (by omega)) P
     have hmod : lpModulus 1 L η (m - 3) ≤ b.dualConst L * almostDiagCoeff L (m - 3) k := by
       rw [lpModulus, modulus_congr_ae (MemLp.coeFn_toLp _)]
-      exact iSup₂_le fun v hv => b.eLpNorm_iterDiff_dual_le L hv
+      exact iSup₂_le fun v hv => b.eLpNorm_higherDiff_dual_le L hv
     have hc : almostDiagCoeff L (m - 3) k = almostDiagCoeff L m k * dyadicWeight L 3 := by
       have hk : k ≤ m - 3 := by omega
       have hk' : k ≤ m := by omega
@@ -253,7 +253,7 @@ theorem exists_eLpNorm_conv_kernel_Theta_le (L : ℕ) :
     have hmod : lpModulus 1 L Θ j ≤ dyadicWeight (-(L : ℝ)) (j - k) * D := by
       rw [lpModulus, modulus_congr_ae (MemLp.coeFn_toLp _)]
       refine iSup₂_le fun v hv => ?_
-      refine (eLpNorm_iterDiff_Theta_le L k v).trans (mul_le_mul' ?_ le_rfl)
+      refine (eLpNorm_higherDiff_Theta_le L k v).trans (mul_le_mul' ?_ le_rfl)
       rw [← ENNReal.rpow_natCast]
       exact ENNReal.ofReal_two_pow_mul_rpow_le hkj hv (Nat.cast_nonneg L)
     have hc : dyadicWeight (-(L : ℝ)) (j - k) = almostDiagCoeff L (j + 1) k * dyadicWeight L 1 := by

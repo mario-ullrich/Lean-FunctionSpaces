@@ -5,6 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
+public import FunctionSpaces.Rd.DilatedDifferences
 public import FunctionSpaces.Rd.DomainModuli
 
 /-!
@@ -18,7 +19,7 @@ For an integrable `g` with `∫ g = 1` and an order `L ≥ 1`, the **moment kern
 `m_c = ∑_l (-1)^(l+1) C(L, l) g_{c/l}` (`Rd.dilate_momentKernel`), and `∫ m = 1`
 (`Rd.integral_momentKernel`), since `∑_{l=1}^L (-1)^(l+1) C(L, l) = 1` (`Rd.sum_jacksonCoeff`).
 The coefficients are those of `-(-1)^L Δ^L` without the term `l = 0`
-(`Rd.neg_one_pow_mul_sum_iterDiff_coeff`), so convolution with `m_c` averages differences of
+(`Rd.neg_one_pow_mul_sum_higherDiff_coeff`), so convolution with `m_c` averages differences of
 order `L`:
 
 `f(x) - (m_c ⋆ f)(x) = (-1)^L ∫ g(z) Δ^L_{-c^(-1) z} f(x) dz`
@@ -44,16 +45,9 @@ namespace Rd
 Jackson approximant: those of `-(-1)^r Δ^r` without its term of order `0`. -/
 noncomputable def jacksonCoeff (r l : ℕ) : ℂ := (-1) ^ l * (r.choose (l + 1) : ℂ)
 
-/-- `(-1)^r (-1)^(r-m) = (-1)^m` for `m ≤ r`. -/
-theorem neg_one_pow_mul_neg_one_pow_sub {r m : ℕ} (hm : m ≤ r) :
-    (-1 : ℂ) ^ r * (-1) ^ (r - m) = (-1) ^ m := by
-  obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hm
-  rw [Nat.add_sub_cancel_left, pow_add, mul_assoc, ← pow_add, ← two_mul, pow_mul, neg_one_sq,
-    one_pow, mul_one]
-
 /-- **The coefficients of the moment kernels** are those of `(-1)^r Δ^r` without its term
 `l = 0`: `(-1)^r ∑_{l ≤ r} (-1)^(r-l) C(r, l) F(l) = F(0) - ∑_{l<r} a_l F(l + 1)`. -/
-theorem neg_one_pow_mul_sum_iterDiff_coeff (r : ℕ) (F : ℕ → ℂ) :
+theorem neg_one_pow_mul_sum_higherDiff_coeff (r : ℕ) (F : ℕ → ℂ) :
     (-1 : ℂ) ^ r * ∑ l ∈ Finset.range (r + 1), ((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) * F l =
       F 0 - ∑ l ∈ Finset.range r, jacksonCoeff r l * F (l + 1) := by
   rw [Finset.sum_range_succ', mul_add, Finset.mul_sum, sub_eq_neg_add, ← Finset.sum_neg_distrib]
@@ -73,7 +67,7 @@ theorem sum_jacksonCoeff {r : ℕ} (hr : 1 ≤ r) : ∑ l ∈ Finset.range r, ja
     rw [add_neg_cancel, zero_pow (by omega)] at hb
     rw [hb]
     exact Finset.sum_congr rfl fun l _ => by ring
-  have h := neg_one_pow_mul_sum_iterDiff_coeff r (fun _ => 1)
+  have h := neg_one_pow_mul_sum_higherDiff_coeff r (fun _ => 1)
   simp only [mul_one] at h
   rw [h0, mul_zero] at h
   linear_combination h
@@ -181,7 +175,7 @@ theorem ae_sub_sum_conv_dilate_eq {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ �
   have hexp : ∀ z, (-1 : ℂ) ^ L * (fwdDiff (-c⁻¹ • z))^[L] f x =
       f x - ∑ l ∈ Finset.range L, jacksonCoeff L l * f (x - (c / ((l : ℝ) + 1))⁻¹ • z) :=
     fun z => by
-      rw [iterDiff_apply, neg_one_pow_mul_sum_iterDiff_coeff]
+      rw [higherDiff_apply, neg_one_pow_mul_sum_higherDiff_coeff]
       congr 1
       · simp
       · refine Finset.sum_congr rfl fun l _ => ?_
@@ -248,7 +242,7 @@ theorem eLpNorm_indicator_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 �
       · rw [Function.uncurry_apply_pair,
           Set.indicator_of_mem (Set.mk_mem_prod hx (Set.mem_univ z))]
         simp only [G, Set.indicator_of_mem hx]
-        exact congrArg _ (iterDiff_apply L (-c⁻¹ • z) _ x)
+        exact congrArg _ (higherDiff_apply L (-c⁻¹ • z) _ x)
       · rw [Function.uncurry_apply_pair,
           Set.indicator_of_notMem fun h => hx (Set.mem_prod.1 h).1]
         simp only [G, Set.indicator_of_notMem hx]
@@ -276,7 +270,7 @@ theorem eLpNorm_indicator_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 �
       have hnorm : ‖-c⁻¹ • z‖ ≤ R / c := by
         rw [norm_smul, norm_neg, norm_inv, Real.norm_of_nonneg hc.le, inv_mul_eq_div]
         exact div_le_div_of_nonneg_right hzR hc.le
-      have hD := (aestronglyMeasurable_iterDiff (Lp.aestronglyMeasurable f) L
+      have hD := (aestronglyMeasurable_higherDiff (Lp.aestronglyMeasurable f) L
         (-c⁻¹ • z)).indicator hU
       have heq : eLpNorm (fun x => G x z) p μ =
           eLpNorm (U.indicator ((fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ))) p μ := by
@@ -291,7 +285,7 @@ theorem eLpNorm_indicator_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 �
         _ ≤ eLpNorm ((stepSet T L (-c⁻¹ • z)).indicator
               ((fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ))) p μ :=
             eLpNorm_mono hD fun x => norm_indicator_le_of_subset (hstep z hz) _ x
-        _ ≤ ω := eLpNorm_indicator_iterDiff_le_modulusOn hnorm
+        _ ≤ ω := eLpNorm_indicator_higherDiff_le_modulusOn hnorm
   have hA0 : A ≠ 0 := lintegral_enorm_ne_zero_of_integral_eq_one hg h1
   have hAt : A ≠ ∞ := hg.2.ne
   rw [eLpNorm_congr_ae hae, ← ENNReal.rpow_le_rpow_iff hq]

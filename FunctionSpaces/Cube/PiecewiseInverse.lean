@@ -13,7 +13,7 @@ public import FunctionSpaces.Interval.PiecewiseInverse
 
 The slices of a piecewise polynomial of level `j` on the cube are piecewise polynomials of level
 `j` on `[0, 1]` (`Cube.IsCubePP.exists_slice_eq_ppFun`). So the local inverse estimate in one
-variable (`Interval.eLpNorm_iterDiff_ppFun_le`), applied to every slice and integrated over the
+variable (`Interval.eLpNorm_higherDiff_ppFun_le`), applied to every slice and integrated over the
 point, bounds the differences in each coordinate:
 `‖Δ^r_{h e_i} g‖_{L_p({x_i ≤ 1 - rh})} ≤ 2^r K (r (r + 1) 2^j h)^(1/p) ‖g‖_{L_p(Q)}` for
 `0 ≤ h ≤ 2^(-j)` (`Cube.eLpNorm_cubeDiff_le_of_isCubePP`). Summed over the coordinates this is the
@@ -43,7 +43,7 @@ variable {d : ℕ} {p : ℝ≥0∞} [Fact (1 ≤ p)]
 the cube and `0 ≤ h ≤ 2^(-j)`,
 `‖Δ^r_{h e_i} g‖_{L_p({x_i ≤ 1 - rh})} ≤ 2^r K (r (r + 1) 2^j h)^(1/p) ‖g‖_{L_p(Q)}`, with the
 Nikolskii constant `K` of the polynomials of degree `< r`. Each slice satisfies the estimate in
-one variable (`Interval.eLpNorm_iterDiff_ppFun_le`). -/
+one variable (`Interval.eLpNorm_higherDiff_ppFun_le`). -/
 theorem eLpNorm_cubeDiff_le_of_isCubePP {r j : ℕ} {g : (Fin d → ℝ) → ℂ} (hg : IsCubePP r j g)
     {K : ℝ≥0∞} (hK : K ≠ ∞) (hKb : NikolskiiBound p r K) (hp : p ≠ ∞) (i : Fin d) {h : ℝ}
     (hh0 : 0 ≤ h) (hh : h ≤ 1 / 2 ^ j) :
@@ -63,7 +63,7 @@ theorem eLpNorm_cubeDiff_le_of_isCubePP {r j : ℕ} {g : (Fin d → ℝ) → ℂ
   refine lintegral_mono fun x => ?_
   obtain ⟨Q, hQ, hs⟩ := hg.exists_slice_eq_ppFun i x
   rw [← ENNReal.mul_rpow_of_nonneg _ _ hq.le, hs]
-  exact ENNReal.rpow_le_rpow (eLpNorm_iterDiff_ppFun_le hQ hKb hp j hh0 hh) hq.le
+  exact ENNReal.rpow_le_rpow (eLpNorm_higherDiff_ppFun_le hQ hKb hp j hh0 hh) hq.le
 
 /-- **The inverse inequality for piecewise polynomials on the cube**, of order `θ = 1/p`: there is
 `C_B < ∞` with `ω_r(a, 2^(-k))_p ≤ C_B 2^(-(k-j)/p) ‖a‖_p` for every piecewise polynomial `a` of

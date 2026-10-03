@@ -53,12 +53,12 @@ theorem stepSet_univ (r : ℕ) (h : V) : stepSet (Set.univ : Set V) r h = Set.un
 
 /-- **Restricted differences use only the values on `U`**:
 `1_{U_{rh}} Δ_h^r (1_U f) = 1_{U_{rh}} Δ_h^r f`. -/
-theorem indicator_stepSet_iterDiff_indicator (U : Set V) (r : ℕ) (h : V) (f : V → ℂ) :
+theorem indicator_stepSet_higherDiff_indicator (U : Set V) (r : ℕ) (h : V) (f : V → ℂ) :
     (stepSet U r h).indicator ((fwdDiff h)^[r] (U.indicator f)) =
       (stepSet U r h).indicator ((fwdDiff h)^[r] f) := by
   funext x
   by_cases hx : x ∈ stepSet U r h
-  · rw [Set.indicator_of_mem hx, Set.indicator_of_mem hx, iterDiff_apply, iterDiff_apply]
+  · rw [Set.indicator_of_mem hx, Set.indicator_of_mem hx, higherDiff_apply, higherDiff_apply]
     refine Finset.sum_congr rfl fun l hl => ?_
     rw [Set.indicator_of_mem (hx l (Nat.lt_succ_iff.1 (Finset.mem_range.1 hl)))]
   · rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem hx]
@@ -74,7 +74,7 @@ noncomputable def modulusOn (U : Set V) (r : ℕ) (p : ℝ≥0∞) (f : V → �
   ⨆ (h : V) (_ : ‖h‖ ≤ t), eLpNorm ((stepSet U r h).indicator ((fwdDiff h)^[r] f)) p μ
 
 /-- `‖Δ_h^r(f, ·, U)‖_p ≤ ω_r(f, t, U)_p` for `‖h‖ ≤ t`. -/
-theorem eLpNorm_indicator_iterDiff_le_modulusOn {U : Set V} {r : ℕ} {p : ℝ≥0∞} {f : V → ℂ}
+theorem eLpNorm_indicator_higherDiff_le_modulusOn {U : Set V} {r : ℕ} {p : ℝ≥0∞} {f : V → ℂ}
     {t : ℝ} {h : V} (hh : ‖h‖ ≤ t) :
     eLpNorm ((stepSet U r h).indicator ((fwdDiff h)^[r] f)) p μ ≤ modulusOn μ U r p f t :=
   le_iSup₂ (f := fun (h : V) (_ : ‖h‖ ≤ t) =>
@@ -83,7 +83,7 @@ theorem eLpNorm_indicator_iterDiff_le_modulusOn {U : Set V} {r : ℕ} {p : ℝ�
 /-- The modulus on `U` increases in `t`. -/
 theorem modulusOn_mono (U : Set V) (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) :
     Monotone (modulusOn μ U r p f) :=
-  fun _ _ hst => iSup₂_le fun _ hh => eLpNorm_indicator_iterDiff_le_modulusOn (hh.trans hst)
+  fun _ _ hst => iSup₂_le fun _ hh => eLpNorm_indicator_higherDiff_le_modulusOn (hh.trans hst)
 
 /-- The modulus on `V` is the modulus. -/
 @[simp]
@@ -94,15 +94,15 @@ theorem modulusOn_univ (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) (t : ℝ) :
 /-- **The modulus on `U` uses only the values on `U`**: `ω_r(1_U f, t, U)_p = ω_r(f, t, U)_p`. -/
 theorem modulusOn_indicator (U : Set V) (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) (t : ℝ) :
     modulusOn μ U r p (U.indicator f) t = modulusOn μ U r p f t := by
-  simp only [modulusOn, indicator_stepSet_iterDiff_indicator]
+  simp only [modulusOn, indicator_stepSet_higherDiff_indicator]
 
 /-- The modulus on `U` is subadditive. -/
 theorem modulusOn_add_le {p : ℝ≥0∞} (hp : 1 ≤ p) (U : Set V) (r : ℕ) (f g : V → ℂ) (t : ℝ) :
     modulusOn μ U r p (f + g) t ≤ modulusOn μ U r p f t + modulusOn μ U r p g t := by
   refine iSup₂_le fun h hh => ?_
   rw [fwdDiff_iter_add, Set.indicator_add']
-  exact (eLpNorm_add_le hp).trans (add_le_add (eLpNorm_indicator_iterDiff_le_modulusOn hh)
-    (eLpNorm_indicator_iterDiff_le_modulusOn hh))
+  exact (eLpNorm_add_le hp).trans (add_le_add (eLpNorm_indicator_higherDiff_le_modulusOn hh)
+    (eLpNorm_indicator_higherDiff_le_modulusOn hh))
 
 variable [BorelSpace V]
 
@@ -124,7 +124,7 @@ theorem modulusOn_mono_set {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {U O
     (hU : MeasurableSet U) (hUO : U ⊆ O) (r : ℕ) (p : ℝ≥0∞) (t : ℝ) :
     modulusOn μ U r p f t ≤ modulusOn μ O r p f t :=
   iSup₂_mono fun h _ => eLpNorm_mono
-    ((aestronglyMeasurable_iterDiff hf r h).indicator (measurableSet_stepSet hU r h))
+    ((aestronglyMeasurable_higherDiff hf r h).indicator (measurableSet_stepSet hU r h))
     fun x => norm_indicator_le_of_subset (stepSet_mono hUO r h) _ x
 
 /-- `ω_r(f, t, U)_p ≤ 2^r ‖f‖_{L_p(U)}`. -/
@@ -145,7 +145,7 @@ theorem modulusOn_congr_ae {U : Set V} {f g : V → ℂ} (hfg : U.indicator f =�
   congr 1
   funext _
   refine eLpNorm_congr_ae ?_
-  filter_upwards [iterDiff_congr_ae hfg r h] with x hx
+  filter_upwards [higherDiff_congr_ae hfg r h] with x hx
   by_cases hxU : x ∈ stepSet U r h
   · rw [Set.indicator_of_mem hxU, Set.indicator_of_mem hxU, hx]
   · rw [Set.indicator_of_notMem hxU, Set.indicator_of_notMem hxU]

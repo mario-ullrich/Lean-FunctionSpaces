@@ -15,15 +15,15 @@ For a piecewise polynomial `a` of level `j` and degree `< r` and every `k`,
 `ω_r(a, 2^(-k), [0, 1])_p ≤ C_B 2^(-(k-j)/p) ‖a‖_p`, with `k - j` truncated at `0`
 (`Interval.exists_inverse_ppScheme`). For `0 ≤ h ≤ 2^(-k)` the difference `Δ_h^r a(x)` vanishes
 when `x, …, x + rh` lie in one dyadic interval, since there `a` is a polynomial of degree `< r`
-(`Interval.iterDiff_eq_zero_of_isPiecewisePoly`). The other points form strips of width `rh`
+(`Interval.higherDiff_eq_zero_of_isPiecewisePoly`). The other points form strips of width `rh`
 left of the knots. There Nikolskii's inequality bounds `|a|` by `2^(j/p)` times the local `L_p`
 norm of a piece (`Interval.enorm_le_localMass`), and the points `x, …, x + rh` meet only `r + 1`
 consecutive pieces (`Interval.floor_add_mul_le`), so each piece is counted at most `r + 1` times
 (`Interval.sum_sum_localMass_le`). The strip integral (`Interval.eLpNorm_le_of_strip`) turns a
-pointwise bound on the strips into the `L_p` bound (`Interval.eLpNorm_iterDiff_le_of_pointwise`);
+pointwise bound on the strips into the `L_p` bound (`Interval.eLpNorm_higherDiff_le_of_pointwise`);
 the splines of `FunctionSpaces.Interval.SplineInverse` use it with their own pointwise bound.
 These local estimates hold for every piecewise polynomial on `[0, ∞)`
-(`Interval.IsPiecewisePoly`, `Interval.eLpNorm_iterDiff_le_of_isPiecewisePoly`), so they serve
+(`Interval.IsPiecewisePoly`, `Interval.eLpNorm_higherDiff_le_of_isPiecewisePoly`), so they serve
 the periodic extensions of `FunctionSpaces.Interval.PiecewisePeriodic` as well.
 
 With Jackson's inequality at every level (`Interval.exists_approxSeq_ppScheme_le`) this is a
@@ -41,6 +41,7 @@ piecewise polynomials that are smooth across the knots, that is, splines.
 @[expose] public section
 
 open MeasureTheory Set Polynomial
+open Rd (higherDiff measurable_higherDiff)
 open scoped ENNReal BoundedContinuousFunction
 open ENNReal (dyadicWeight)
 
@@ -139,10 +140,10 @@ theorem localMass_le_sum_range (k : ℕ) (u : ℝ → ℂ) (n : ℕ) {r l : ℕ}
 
 /-- **Differences vanish inside a piece**: if `x, x + h, …, x + rh` lie in the dyadic interval of
 `x`, then `Δ_h^r u(x) = 0`, since there `u` is a polynomial of degree `< r`. -/
-theorem iterDiff_eq_zero_of_isPiecewisePoly {r k : ℕ} {u : ℝ → ℂ} (hu : IsPiecewisePoly r k u)
+theorem higherDiff_eq_zero_of_isPiecewisePoly {r k : ℕ} {u : ℝ → ℂ} (hu : IsPiecewisePoly r k u)
     {h x : ℝ} (hh0 : 0 ≤ h) (hx : 0 ≤ x)
     (hgood : x + r * h < ((⌊2 ^ k * x⌋₊ : ℝ) + 1) / 2 ^ k) :
-    iterDiff r h u x = 0 := by
+    higherDiff r h u x = 0 := by
   obtain ⟨P, hP, hPu⟩ := hu ⌊2 ^ k * x⌋₊
   have hpos : (0 : ℝ) < 2 ^ k := by positivity
   have hmem : ∀ i ∈ Finset.range (r + 1), x + i * h ∈ dyadicIco k ⌊2 ^ k * x⌋₊ := fun i hi => by
@@ -154,24 +155,24 @@ theorem iterDiff_eq_zero_of_isPiecewisePoly {r k : ℕ} {u : ℝ → ℂ} (hu : 
       nlinarith [mul_nonneg (Nat.cast_nonneg i) hh0]
     · calc x + i * h ≤ x + r * h := by nlinarith
         _ < _ := hgood
-  have h1 : iterDiff r h u x = iterDiff r h (polyFun P) x := by
-    rw [iterDiff_apply, iterDiff_apply]
+  have h1 : higherDiff r h u x = higherDiff r h (polyFun P) x := by
+    rw [higherDiff_apply, higherDiff_apply]
     exact Finset.sum_congr rfl fun i hi => by rw [hPu _ (hmem i hi)]
   rw [h1]
-  exact congrFun (iterDiff_polynomial hP h) x
+  exact congrFun (higherDiff_polynomial hP h) x
 
 /-- **Pointwise bound for differences**: for `0 ≤ h ≤ 2^(-k)` and `x ≥ 0`,
 `|Δ_h^r u(x)| ≤ 2^r K 2^(k/p) (∑_{l ≤ r} ∫_{I_{k,n+l}} |u|^p)^(1/p)` with `n = ⌊2^k x⌋`, since
 `x, …, x + rh` meet only the intervals `I_{k,n}, …, I_{k,n+r}`. -/
-theorem enorm_iterDiff_le_of_isPiecewisePoly {r k : ℕ} {u : ℝ → ℂ} (hu : IsPiecewisePoly r k u)
+theorem enorm_higherDiff_le_of_isPiecewisePoly {r k : ℕ} {u : ℝ → ℂ} (hu : IsPiecewisePoly r k u)
     {K : ℝ≥0∞} (hK : NikolskiiBound p r K) (hp : p ≠ ∞) {h x : ℝ} (hh0 : 0 ≤ h)
     (hh : h ≤ 1 / 2 ^ k) (hx : 0 ≤ x) :
-    ‖iterDiff r h u x‖ₑ ≤ 2 ^ r * (K * ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
+    ‖higherDiff r h u x‖ₑ ≤ 2 ^ r * (K * ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
       (∑ l ∈ Finset.range (r + 1), localMass p k u (⌊2 ^ k * x⌋₊ + l)) ^ (1 / p.toReal)) := by
   have hkh : (2 : ℝ) ^ k * h ≤ 1 := by
     rw [le_div_iff₀ (by positivity)] at hh
     linarith
-  refine enorm_iterDiff_le_of_forall fun i hi => ?_
+  refine enorm_higherDiff_le_of_forall fun i hi => ?_
   have hi' : i ≤ r := Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)
   have h0 : 0 ≤ 2 ^ k * (x + i * h) := by positivity
   have hm : x + i * h ∈ dyadicIco k ⌊2 ^ k * (x + i * h)⌋₊ :=
@@ -247,32 +248,32 @@ level `j` on `[0, ∞)`, `S ⊆ [0, 1]` measurable and `h ≥ 0`. If on the stri
 of the knots `|Δ_h^r u(x)| ≤ G (∑_{l ≤ r} ∫_{I_{j,n+l}} |u|^p)^(1/p)`, `n = ⌊2^j x⌋`, for almost
 every `x ∈ S`, and these local masses add up to at most `(r + 1) B^p` over `n < 2^j`, then
 `‖Δ_h^r u‖_{L_p(S)} ≤ G (rh (r + 1))^(1/p) B`. Off the strips the difference vanishes
-(`Interval.iterDiff_eq_zero_of_isPiecewisePoly`). -/
-theorem eLpNorm_iterDiff_le_of_pointwise (hp : p ≠ ∞) {r j : ℕ} {u : ℝ → ℂ}
+(`Interval.higherDiff_eq_zero_of_isPiecewisePoly`). -/
+theorem eLpNorm_higherDiff_le_of_pointwise (hp : p ≠ ∞) {r j : ℕ} {u : ℝ → ℂ}
     (hu : IsPiecewisePoly r j u) (hum : Measurable u) {S : Set ℝ} (hSm : MeasurableSet S)
     (hS : S ⊆ Icc 0 1) {h : ℝ} (hh0 : 0 ≤ h) {G B : ℝ≥0∞}
     (hpt : ∀ᵐ x ∂volume.restrict S, ((⌊2 ^ j * x⌋₊ : ℝ) + 1) / 2 ^ j ≤ x + r * h →
-      ‖iterDiff r h u x‖ₑ ≤
+      ‖higherDiff r h u x‖ₑ ≤
         G * (∑ l ∈ Finset.range (r + 1), localMass p j u (⌊2 ^ j * x⌋₊ + l)) ^ (1 / p.toReal))
     (hB : ∑ n ∈ Finset.range (2 ^ j), ∑ l ∈ Finset.range (r + 1), localMass p j u (n + l) ≤
       (r + 1) * B ^ p.toReal) :
-    eLpNorm (iterDiff r h u) p (volume.restrict S) ≤
+    eLpNorm (higherDiff r h u) p (volume.restrict S) ≤
       G * (ENNReal.ofReal (r * h) * (r + 1)) ^ (1 / p.toReal) * B := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  refine eLpNorm_le_of_strip hp hS (measurable_iterDiff hum r h).aestronglyMeasurable
+  refine eLpNorm_le_of_strip hp hS (measurable_higherDiff hum r h).aestronglyMeasurable
     (M := fun n => ∑ l ∈ Finset.range (r + 1), localMass p j u (n + l)) ?_ hB
   filter_upwards [hpt, ae_restrict_mem hSm] with x hx hxS
   rw [stripBound]
   split_ifs with hbad
-  · calc ‖iterDiff r h u x‖ₑ ^ p.toReal
+  · calc ‖higherDiff r h u x‖ₑ ^ p.toReal
         ≤ (G * (∑ l ∈ Finset.range (r + 1), localMass p j u (⌊2 ^ j * x⌋₊ + l)) ^
             (1 / p.toReal)) ^ p.toReal := ENNReal.rpow_le_rpow (hx hbad) hq.le
       _ = _ := by
           rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, ← ENNReal.rpow_mul, one_div_mul_cancel hq.ne',
             ENNReal.rpow_one]
   · push Not at hbad
-    rw [iterDiff_eq_zero_of_isPiecewisePoly hu hh0 (hS hxS).1 hbad, enorm_zero,
+    rw [higherDiff_eq_zero_of_isPiecewisePoly hu hh0 (hS hxS).1 hbad, enorm_zero,
       ENNReal.zero_rpow_of_pos hq]
 
 /-- **Bounded overlap**: summing the local masses of `r + 1` consecutive pieces over all starting
@@ -314,31 +315,31 @@ the local masses of `r + 1` consecutive pieces, summed over the pieces in `[0, 1
 `‖Δ_h^r u‖_{L_p[0, 1]} ≤ 2^r K (r (r + 1) 2^j h)^(1/p) B`.
 The difference vanishes except on strips of width `rh` left of the knots, and there it is
 bounded by the local masses of at most `r + 1` neighbouring pieces. -/
-theorem eLpNorm_iterDiff_le_of_isPiecewisePoly {r j : ℕ} {u : ℝ → ℂ}
+theorem eLpNorm_higherDiff_le_of_isPiecewisePoly {r j : ℕ} {u : ℝ → ℂ}
     (hu : IsPiecewisePoly r j u) (hum : Measurable u) {K : ℝ≥0∞} (hK : NikolskiiBound p r K)
     (hp : p ≠ ∞) {h : ℝ} (hh0 : 0 ≤ h) (hh : h ≤ 1 / 2 ^ j) {B : ℝ≥0∞}
     (hB : ∑ n ∈ Finset.range (2 ^ j), ∑ l ∈ Finset.range (r + 1), localMass p j u (n + l) ≤
       (r + 1) * B ^ p.toReal) :
-    eLpNorm (iterDiff r h u) p (volume.restrict (Icc 0 1)) ≤
+    eLpNorm (higherDiff r h u) p (volume.restrict (Icc 0 1)) ≤
       2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^ (1 / p.toReal) *
         B := by
-  refine (eLpNorm_iterDiff_le_of_pointwise hp hu hum measurableSet_Icc le_rfl hh0
+  refine (eLpNorm_higherDiff_le_of_pointwise hp hu hum measurableSet_Icc le_rfl hh0
     (G := 2 ^ r * K * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal)) ?_ hB).trans_eq ?_
   · filter_upwards [ae_restrict_mem measurableSet_Icc] with x hx _
-    exact (enorm_iterDiff_le_of_isPiecewisePoly hu hK hp hh0 hh hx.1).trans_eq (by ring)
+    exact (enorm_higherDiff_le_of_isPiecewisePoly hu hK hp hh0 hh hx.1).trans_eq (by ring)
   · rw [mul_assoc (2 ^ r * K), ofReal_two_pow_rpow_mul_eq r j h (by positivity)]
 
 /-- **The local inverse estimate on `[0, 1]`** for a piecewise polynomial `u` of level `j`: for
 `0 ≤ h ≤ 2^(-j)`,
 `‖Δ_h^r u‖_{L_p[0, 1 - rh]} ≤ 2^r K (r (r + 1) 2^j h)^(1/p) ‖u‖_{L_p[0,1]}`. -/
-theorem eLpNorm_iterDiff_ppFun_le {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r)
+theorem eLpNorm_higherDiff_ppFun_le {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r)
     {K : ℝ≥0∞} (hK : NikolskiiBound p r K) (hp : p ≠ ∞) (j : ℕ) {h : ℝ} (hh0 : 0 ≤ h)
     (hh : h ≤ 1 / 2 ^ j) :
-    eLpNorm (iterDiff r h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - r * h))) ≤
+    eLpNorm (higherDiff r h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - r * h))) ≤
       2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^ (1 / p.toReal) *
         eLpNorm (ppFun j Q) p unitVol :=
   (eLpNorm_Icc_mono _ p le_rfl (by linarith [mul_nonneg (Nat.cast_nonneg r) hh0])).trans
-    (eLpNorm_iterDiff_le_of_isPiecewisePoly (isPiecewisePoly_ppFun hQ j)
+    (eLpNorm_higherDiff_le_of_isPiecewisePoly (isPiecewisePoly_ppFun hQ j)
       (measurable_ppFun j Q) hK hp hh0 hh (sum_sum_localMass_le hp j r Q))
 
 variable (p) in
@@ -403,7 +404,7 @@ theorem exists_inverse_ppScheme {r : ℕ} (hp : p ≠ ∞) :
     refine iSup₂_le fun h hh => ?_
     have hhj : h ≤ 1 / 2 ^ j := hh.2.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ (by norm_num) hjk))
-    exact (eLpNorm_iterDiff_ppFun_le hQ hKb hp j hh.1 hhj).trans
+    exact (eLpNorm_higherDiff_ppFun_le hQ hKb hp j hh.1 hhj).trans
       (le_ppInverseConst_mul hjk K hh.2 _)
 
 /-! ### The coincidence theorem -/

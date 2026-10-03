@@ -180,7 +180,7 @@ theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (v
     have heq : Function.uncurry G = fun y : V × V => (-1 : ℂ) ^ r * ∑ l ∈ Finset.range (r + 1),
         ((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) * (f : V → ℂ) (y.1 + (l : ℝ) • w y.2) := by
       funext y
-      exact congrArg _ (iterDiff_apply r (w y.2) _ y.1)
+      exact congrArg _ (higherDiff_apply r (w y.2) _ y.1)
     rw [heq]
     exact measurable_const.mul (Finset.measurable_sum _ fun l _ => measurable_const.mul
       (hfm.comp (measurable_fst.add ((measurable_snd.const_smul _).const_smul _))))
@@ -193,14 +193,14 @@ theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (v
       show ‖-((2 : ℝ) ^ k)⁻¹ • z‖ ≤ _
       rw [norm_smul, norm_neg, norm_inv, Real.norm_of_nonneg (by positivity), one_div,
         mul_comm]
-    have hD := aestronglyMeasurable_iterDiff (Lp.aestronglyMeasurable f) r (w z)
+    have hD := aestronglyMeasurable_higherDiff (Lp.aestronglyMeasurable f) r (w z)
     calc eLpNorm (fun x => G x z) p volume
         = eLpNorm ((fwdDiff (w z))^[r] (f : V → ℂ)) p volume := by
           refine eLpNorm_congr_norm_ae ((hG.comp measurable_prodMk_right).aestronglyMeasurable)
             hD (Eventually.of_forall fun x => ?_)
           simp [G]
       _ ≤ modulus volume r p (f : V → ℂ) (‖z‖ * (1 / 2 ^ k)) :=
-          eLpNorm_iterDiff_le_modulus hnorm
+          eLpNorm_higherDiff_le_modulus hnorm
       _ ≤ ENNReal.ofReal (1 + ‖z‖) ^ r * modulus volume r p (f : V → ℂ) (1 / 2 ^ k) :=
           modulus_mul_le (Lp.aestronglyMeasurable f) hp1 r (norm_nonneg z) (by positivity)
   have hlhs : ‖f - jacksonApprox hp r k f‖ₑ =

@@ -19,8 +19,8 @@ differences into themselves (`Rd.exists_modNorm_mulLp_le`): for `1 ≤ p < ∞`,
 The ingredients:
 
 * **differences of smooth functions**: `‖Δ_h^l G(x)‖ ≤ C ‖h‖^l` if `‖D^l G‖ ≤ C`
-  (`Rd.norm_iterDiff_le_of_iteratedFDeriv`), by the mean value inequality;
-* **Leibniz's rule for differences** (`Rd.iterDiff_mul`):
+  (`Rd.norm_higherDiff_le_of_iteratedFDeriv`), by the mean value inequality;
+* **Leibniz's rule for differences** (`Rd.higherDiff_mul`):
   `Δ_h^r(u v)(x) = ∑_{l ≤ r} C(r, l) Δ_h^l u(x) Δ_h^(r-l) v(x + l h)`, hence
   `ω_r(ψ f, t)_p ≤ ∑_{l ≤ r} C(r, l) C t^l ω_(r-l)(f, t)_p` (`Rd.modulus_mul_smooth_le`);
 * **moduli of lower order** (`Rd.lqNorm_lpModulus_sub_le`): for `1 ≤ l ≤ s`, the quasi-norm with
@@ -46,7 +46,7 @@ variable {V E : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddComm
 /-- **Differences of smooth functions**: if `‖D^l G‖ ≤ C`, then `‖Δ_h^l G(x)‖ ≤ C ‖h‖^l`, by
 induction on `l`: the derivatives of order `l` of `Δ_h G` are those of `G` at `x + h` minus those
 at `x`, and the mean value inequality bounds their difference by `C ‖h‖`. -/
-theorem norm_iterDiff_le_of_iteratedFDeriv {G : V → E}
+theorem norm_higherDiff_le_of_iteratedFDeriv {G : V → E}
     (hG : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) G) {l : ℕ} {C : ℝ}
     (hC : ∀ x, ‖iteratedFDeriv ℝ l G x‖ ≤ C) (h x : V) :
     ‖(fwdDiff h)^[l] G x‖ ≤ C * ‖h‖ ^ l := by
@@ -116,7 +116,7 @@ variable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
 /-- **Leibniz's rule for differences**:
 `Δ_h^r(u v)(x) = ∑_{l ≤ r} C(r, l) Δ_h^l u(x) Δ_h^(r-l) v(x + l h)`, by induction from
 `Δ_h(u v)(x) = Δ_h u(x) v(x + h) + u(x) Δ_h v(x)` and Pascal's rule. -/
-theorem iterDiff_mul (r : ℕ) (h : V) (u v : V → ℂ) (x : V) :
+theorem higherDiff_mul (r : ℕ) (h : V) (u v : V → ℂ) (x : V) :
     (fwdDiff h)^[r] (fun y => u y * v y) x = ∑ l ∈ Finset.range (r + 1),
       (r.choose l : ℂ) * ((fwdDiff h)^[l] u x * (fwdDiff h)^[r - l] v (x + (l : ℝ) • h)) := by
   induction r generalizing u v x with
@@ -132,7 +132,7 @@ theorem iterDiff_mul (r : ℕ) (h : V) (u v : V → ℂ) (x : V) :
           (fwdDiff h)^[r + 1 - (l + 1)] v (x + ((l + 1 : ℕ) : ℝ) • h)) := by
       rw [ih]
       refine Finset.sum_congr rfl fun l _ => ?_
-      rw [Function.iterate_succ_apply, iterDiff_comp_add, Nat.add_sub_add_right]
+      rw [Function.iterate_succ_apply, higherDiff_comp_add, Nat.add_sub_add_right]
       congr 3
       push_cast
       rw [add_smul, one_smul, add_assoc]
@@ -157,7 +157,7 @@ variable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] [MeasurableSpace
 
 /-- **Differences of products**: for a smooth `ψ` with `‖D^l ψ‖ ≤ C` for `l ≤ r`,
 `‖Δ_h^r(ψ F)‖_p ≤ ∑_{l ≤ r} C(r, l) C ‖h‖^l ‖Δ_h^(r-l) F‖_p`. -/
-theorem eLpNorm_iterDiff_mul_le {ψ F : V → ℂ} (hψ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) ψ)
+theorem eLpNorm_higherDiff_mul_le {ψ F : V → ℂ} (hψ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) ψ)
     {r : ℕ} {C : ℝ} (hC : ∀ l ≤ r, ∀ x, ‖iteratedFDeriv ℝ l ψ x‖ ≤ C)
     (hF : AEStronglyMeasurable F μ) {p : ℝ≥0∞} (hp : 1 ≤ p) (h : V) :
     eLpNorm ((fwdDiff h)^[r] (fun x => ψ x * F x)) p μ ≤
@@ -167,18 +167,18 @@ theorem eLpNorm_iterDiff_mul_le {ψ F : V → ℂ} (hψ : ContDiff ℝ ((⊤ : �
   set g : ℕ → V → ℝ := fun l x =>
     (r.choose l : ℝ) * (C * ‖h‖ ^ l) * ‖(fwdDiff h)^[r - l] F (x + (l : ℝ) • h)‖
   have hmeas : ∀ l, AEStronglyMeasurable (fun x => (fwdDiff h)^[r - l] F (x + (l : ℝ) • h)) μ :=
-    fun l => aestronglyMeasurable_comp_add (aestronglyMeasurable_iterDiff hF _ h) _
+    fun l => aestronglyMeasurable_comp_add (aestronglyMeasurable_higherDiff hF _ h) _
   have hpt : ∀ x, ‖(fwdDiff h)^[r] (fun x => ψ x * F x) x‖ ≤ ∑ l ∈ Finset.range (r + 1), g l x :=
     fun x => by
-      rw [iterDiff_mul]
+      rw [higherDiff_mul]
       refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun l hl => ?_)
       rw [norm_mul, norm_mul, Complex.norm_natCast, ← mul_assoc]
       have hl' : l ≤ r := Nat.lt_succ_iff.1 (Finset.mem_range.1 hl)
-      have := norm_iterDiff_le_of_iteratedFDeriv hψ (hC l hl') h x
+      have := norm_higherDiff_le_of_iteratedFDeriv hψ (hC l hl') h x
       exact mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_left this (by positivity))
         (norm_nonneg _)
   have hmeasL : AEStronglyMeasurable ((fwdDiff h)^[r] (fun x => ψ x * F x)) μ :=
-    aestronglyMeasurable_iterDiff (hψ.continuous.aestronglyMeasurable.mul hF) r h
+    aestronglyMeasurable_higherDiff (hψ.continuous.aestronglyMeasurable.mul hF) r h
   calc eLpNorm ((fwdDiff h)^[r] (fun x => ψ x * F x)) p μ
       ≤ eLpNorm (fun x => ∑ l ∈ Finset.range (r + 1), g l x) p μ := eLpNorm_mono_real hmeasL hpt
     _ = eLpNorm (∑ l ∈ Finset.range (r + 1), g l) p μ := by
@@ -196,7 +196,7 @@ theorem eLpNorm_iterDiff_mul_le {ψ F : V → ℂ} (hψ : ContDiff ℝ ((⊤ : �
           funext x
           simp [g, smul_eq_mul]
         rw [this, eLpNorm_const_smul, eLpNorm_norm _ (hmeas l),
-          eLpNorm_comp_add_right (aestronglyMeasurable_iterDiff hF _ h), Real.enorm_eq_ofReal hc,
+          eLpNorm_comp_add_right (aestronglyMeasurable_higherDiff hF _ h), Real.enorm_eq_ofReal hc,
           ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_natCast]
 
 /-- **The modulus of a product**:
@@ -207,10 +207,10 @@ theorem modulus_mul_smooth_le {ψ F : V → ℂ} (hψ : ContDiff ℝ ((⊤ : ℕ
     modulus μ r p (fun x => ψ x * F x) t ≤ ∑ l ∈ Finset.range (r + 1),
       (r.choose l : ℝ≥0∞) * ENNReal.ofReal (C * t ^ l) * modulus μ (r - l) p F t := by
   have hC0 : 0 ≤ C := (norm_nonneg _).trans (hC 0 (Nat.zero_le r) 0)
-  refine iSup₂_le fun h hh => (eLpNorm_iterDiff_mul_le hψ hC hF hp h).trans
+  refine iSup₂_le fun h hh => (eLpNorm_higherDiff_mul_le hψ hC hF hp h).trans
     (Finset.sum_le_sum fun l _ => ?_)
   gcongr
-  exact eLpNorm_iterDiff_le_modulus hh
+  exact eLpNorm_higherDiff_le_modulus hh
 
 end Lp
 

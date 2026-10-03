@@ -35,6 +35,7 @@ every coordinate, and depends only on the class of `f` in `L_p(Q)`, `1 ≤ p < �
 @[expose] public section
 
 open MeasureTheory Set
+open Rd (higherDiff)
 open scoped ENNReal
 
 namespace Cube
@@ -47,13 +48,13 @@ variable {d : ℕ}
 `Δ^r_{h e_i} f(x) = Δ_h^r (slice f x i)(x_i)`. -/
 noncomputable def cubeDiff (r : ℕ) (h : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ)
     (x : Fin d → ℝ) : ℂ :=
-  iterDiff r h (slice f x i) (x i)
+  higherDiff r h (slice f x i) (x i)
 
 /-- The coordinate difference as a sum: `Δ^r_{h e_i} f(x) = ∑_k (-1)^(r-k) C(r,k) f(x + k h e_i)`. -/
 theorem cubeDiff_eq (r : ℕ) (h : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
     cubeDiff r h i f x = ∑ k ∈ Finset.range (r + 1),
       ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (Function.update x i (x i + k * h)) := by
-  rw [cubeDiff, iterDiff_apply]
+  rw [cubeDiff, Interval.higherDiff_apply]
   rfl
 
 /-- Coordinate differences of measurable functions are measurable. -/
@@ -68,7 +69,7 @@ theorem measurable_cubeDiff {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (r
 
 /-- The slice of a coordinate difference in its own coordinate is the difference of the slice. -/
 theorem slice_cubeDiff (r : ℕ) (h : ℝ) (i : Fin d) (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) :
-    slice (cubeDiff r h i f) x i = iterDiff r h (slice f x i) := by
+    slice (cubeDiff r h i f) x i = higherDiff r h (slice f x i) := by
   funext t
   simp only [slice, cubeDiff]
   rw [slice_update, Function.update_self]
@@ -78,7 +79,7 @@ theorem cubeDiff_add (r : ℕ) (h : ℝ) (i : Fin d) (f g : (Fin d → ℝ) → 
     cubeDiff r h i (f + g) = cubeDiff r h i f + cubeDiff r h i g := by
   funext x
   simp only [cubeDiff, Pi.add_apply]
-  rw [show slice (f + g) x i = slice f x i + slice g x i from rfl, iterDiff_add]
+  rw [show slice (f + g) x i = slice f x i + slice g x i from rfl, Interval.higherDiff_add]
   rfl
 
 /-- The region `{x ∈ Q : x_i ≤ 1 - r h}` of the differences of step `h` in coordinate `i`, as a
@@ -91,7 +92,7 @@ noncomputable abbrev diffRegion (d : ℕ) (r : ℕ) (h : ℝ) (i : Fin d) : Meas
 theorem eLpNorm_rpow_cubeDiff_eq_slice {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞}
     (hp0 : p ≠ 0) (hp : p ≠ ∞) (r : ℕ) {h : ℝ} (hh : 0 ≤ h) (i : Fin d) :
     eLpNorm (cubeDiff r h i f) p (diffRegion d r h i) ^ p.toReal =
-      ∫⁻ x, eLpNorm (iterDiff r h (slice f x i)) p (volume.restrict (Icc 0 (1 - r * h))) ^
+      ∫⁻ x, eLpNorm (higherDiff r h (slice f x i)) p (volume.restrict (Icc 0 (1 - r * h))) ^
         p.toReal ∂cubeVol d := by
   rw [diffRegion, eLpNorm_rpow_region_eq_slice (measurable_cubeDiff hf r h i) hp0 hp i
     measurableSet_Icc]
@@ -139,7 +140,8 @@ theorem eLpNorm_cubeDiff_le {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p
       (ENNReal.rpow_ne_top_of_nonneg hq.le (by simp))]
   refine lintegral_mono fun x => ?_
   rw [← ENNReal.mul_rpow_of_nonneg _ _ hq.le]
-  exact ENNReal.rpow_le_rpow (eLpNorm_iterDiff_le (measurable_slice hf x i) hp r hh 0 1) hq.le
+  exact ENNReal.rpow_le_rpow
+    (Interval.eLpNorm_higherDiff_le (measurable_slice hf x i) hp r hh 0 1) hq.le
 
 /-- `ω_r^{(i)}(f, t)_p ≤ 2^r ‖f‖_{L_p(Q)}`. -/
 theorem coordModulus_le {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p)
@@ -164,7 +166,7 @@ theorem coordModulus_congr_ae {f g : (Fin d → ℝ) → ℂ} (hf : Measurable f
     eLpNorm_rpow_cubeDiff_eq_slice hg hp0 hp r hh.1 i]
   refine lintegral_congr_ae ?_
   filter_upwards [ae_slice_ae_eq hf hg hfg i] with x hx
-  rw [eLpNorm_iterDiff_congr_ae (a := 0) (b := 1) hx r p hh.1]
+  rw [eLpNorm_higherDiff_congr_ae (a := 0) (b := 1) hx r p hh.1]
 
 /-- The **modulus of smoothness on the cube**, `ω_r(f, t)_p = ∑_i ω_r^{(i)}(f, t)_p`. -/
 noncomputable def cubeModulus (r : ℕ) (p : ℝ≥0∞) (f : (Fin d → ℝ) → ℂ) (t : ℝ) : ℝ≥0∞ :=

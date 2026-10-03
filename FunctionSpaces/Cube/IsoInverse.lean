@@ -19,8 +19,8 @@ all of whose slices lie in `V`,
 
 `‖Δ_h^r f‖_{L_p(Q_{rh})} ≤ (∑_{α : Fin r → Fin d} ∏_i β(m_i(α), h_i)) ‖f‖_{L_p(Q)}`
 
-(`Cube.eLpNorm_isoDiff_le_sum`). The isotropic difference is a sum of `d^r` translated mixed
-coordinate differences (`Cube.isoDiff_eq_sum`). A translate stays in the cube on `Q_{rh}`, so its
+(`Cube.eLpNorm_higherDiff_le_sum`). The isotropic difference is a sum of `d^r` translated mixed
+coordinate differences (`Cube.higherDiff_eq_sum`). A translate stays in the cube on `Q_{rh}`, so its
 norm is at most the norm of the mixed difference on a box (`Cube.eLpNorm_shift_mixedDiff_le`),
 and the mixed difference is bounded one coordinate at a time by Tonelli's theorem
 (`Cube.eLpNorm_cubeDiff_inter_le`, `Cube.eLpNorm_mixedDiff_le`): the box constraint in the other
@@ -29,18 +29,19 @@ the slices of the intermediate functions stay in `V` (`Cube.slice_mixedDiff_mem`
 
 If `β(m, t) = C (2^j |t|)^{θ_m}` for `|t| ≤ 2^(-j)` and `Θ ≤ ∑_i θ_{m_i}` whenever `∑_i m_i = r`,
 this gives `‖Δ_h^r f‖ ≤ d^r C^d (2^j ‖h‖_∞)^Θ ‖f‖` for `‖h‖_∞ ≤ 2^(-j)`
-(`Cube.eLpNorm_isoDiff_le_of_exponents`): every word `α` carries the total order `r`, and the
+(`Cube.eLpNorm_higherDiff_le_of_exponents`): every word `α` carries the total order `r`, and the
 gains in the single coordinates multiply.
 -/
 
 @[expose] public section
 
 open MeasureTheory Set
+open Rd (higherDiff measurable_higherDiff)
 open scoped ENNReal
 
 namespace Cube
 
-open Interval
+open Interval TranslationAlgebra
 
 variable {d : ℕ}
 
@@ -78,7 +79,7 @@ theorem eLpNorm_cubeDiff_inter_le {F : (Fin d → ℝ) → ℂ} (hF : Measurable
     (hp0 : p ≠ 0) (hp : p ≠ ∞) (m : ℕ) (t : ℝ) (i : Fin d) {R : Set (Fin d → ℝ)}
     (hR : MeasurableSet R) (hRi : ∀ x s, Function.update x i s ∈ R ↔ x ∈ R) {β : ℝ≥0∞}
     (hβfin : β ≠ ∞)
-    (hβ : ∀ x, eLpNorm (iterDiff m t (slice F x i)) p (volume.restrict (stepRegion m t)) ≤
+    (hβ : ∀ x, eLpNorm (higherDiff m t (slice F x i)) p (volume.restrict (stepRegion m t)) ≤
       β * eLpNorm (slice F x i) p unitVol) :
     eLpNorm (cubeDiff m t i F) p
         ((cubeVol d).restrict (R ∩ {x | x i + m * t ∈ Icc (0 : ℝ) 1})) ≤
@@ -114,9 +115,9 @@ theorem eLpNorm_cubeDiff_inter_le {F : (Fin d → ℝ) → ℂ} (hF : Measurable
     ← lintegral_const_mul' _ _ (ENNReal.rpow_ne_top_of_nonneg hq.le hβfin)]
   refine setLIntegral_mono' hR fun x _ => ?_
   have h1 : ∫⁻ s in S, ‖cubeDiff m t i F (Function.update x i s)‖ₑ ^ p.toReal ∂unitVol =
-      eLpNorm (iterDiff m t (slice F x i)) p (volume.restrict (stepRegion m t)) ^ p.toReal := by
+      eLpNorm (higherDiff m t (slice F x i)) p (volume.restrict (stepRegion m t)) ^ p.toReal := by
     rw [← hstep, eLpNorm_rpow_eq
-      (measurable_iterDiff (measurable_slice hF x i) m t).aestronglyMeasurable hp0 hp]
+      (measurable_higherDiff (measurable_slice hF x i) m t).aestronglyMeasurable hp0 hp]
     refine lintegral_congr fun s => ?_
     rw [← slice_cubeDiff]
     rfl
@@ -165,7 +166,7 @@ step regions, then the mixed difference along a list of distinct coordinates sat
 `‖M f‖_{L_p(box)} ≤ (∏_{i ∈ l} β_i) ‖f‖_{L_p(Q)}`. -/
 theorem eLpNorm_mixedDiff_le (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
     (m : Fin d → ℕ) (h : Fin d → ℝ) (β : Fin d → ℝ≥0∞) (hβfin : ∀ i, β i ≠ ∞)
-    (hβ : ∀ u ∈ V, ∀ i, eLpNorm (iterDiff (m i) (h i) u) p
+    (hβ : ∀ u ∈ V, ∀ i, eLpNorm (higherDiff (m i) (h i) u) p
       (volume.restrict (stepRegion (m i) (h i))) ≤ β i * eLpNorm u p unitVol)
     {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (hfV : ∀ i x, slice f x i ∈ V) :
     ∀ l : List (Fin d), l.Nodup →
@@ -218,18 +219,18 @@ theorem count_le {r : ℕ} (α : Fin r → Fin d) (i : Fin d) : count α i ≤ r
 and every slice of `f` lies in `V`, then
 `‖Δ_h^r f‖_{L_p(Q_{rh})} ≤ (∑_α ∏_i β(m_i(α), h_i)) ‖f‖_{L_p(Q)}`, summed over the words
 `α : Fin r → Fin d`. -/
-theorem eLpNorm_isoDiff_le_sum (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0∞} (hp1 : 1 ≤ p)
+theorem eLpNorm_higherDiff_le_sum (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0∞} (hp1 : 1 ≤ p)
     (hp : p ≠ ∞) (r : ℕ) (h : Fin d → ℝ) (β : ℕ → ℝ → ℝ≥0∞) (hβfin : ∀ m t, β m t ≠ ∞)
-    (hβ : ∀ u ∈ V, ∀ m ≤ r, ∀ i : Fin d, eLpNorm (iterDiff m (h i) u) p
+    (hβ : ∀ u ∈ V, ∀ m ≤ r, ∀ i : Fin d, eLpNorm (higherDiff m (h i) u) p
       (volume.restrict (stepRegion m (h i))) ≤ β m (h i) * eLpNorm u p unitVol)
     {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (hfV : ∀ i x, slice f x i ∈ V) :
-    eLpNorm (isoDiff r h f) p ((cubeVol d).restrict (isoRegion r h)) ≤
+    eLpNorm (higherDiff r h f) p ((cubeVol d).restrict (isoRegion r h)) ≤
       (∑ α : Fin r → Fin d, ∏ i, β (count α i) (h i)) * eLpNorm f p (cubeVol d) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
-  have hsum : isoDiff r h f = ∑ α : Fin r → Fin d,
+  have hsum : higherDiff r h f = ∑ α : Fin r → Fin d,
       fun x => mixedDiff (count α) h (List.finRange d) f (x + shiftVec h α) := by
     funext x
-    rw [isoDiff_eq_sum, Finset.sum_apply]
+    rw [higherDiff_eq_sum, Finset.sum_apply]
   rw [hsum, Finset.sum_mul]
   refine (eLpNorm_sum_le hp1).trans (Finset.sum_le_sum fun α _ => ?_)
   refine (eLpNorm_shift_mixedDiff_le h α hf p).trans ?_
@@ -255,15 +256,15 @@ theorem prod_rpow_eq_rpow_sum {ι : Type*} (s : Finset ι) (A : ℝ≥0∞) {θ 
 `|t| ≤ 2^(-j)`, with `θ_m ≥ 0`, and let `Θ ≤ ∑_i θ_{m_i}` whenever `∑_i m_i = r`. Then for every
 `f` with slices in `V` and `‖h‖_∞ ≤ 2^(-j)`,
 `‖Δ_h^r f‖_{L_p(Q_{rh})} ≤ d^r C^d (2^j ‖h‖_∞)^Θ ‖f‖_{L_p(Q)}`. -/
-theorem eLpNorm_isoDiff_le_of_exponents (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0∞} (hp1 : 1 ≤ p)
+theorem eLpNorm_higherDiff_le_of_exponents (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0∞} (hp1 : 1 ≤ p)
     (hp : p ≠ ∞) (r j : ℕ) {C : ℝ≥0∞} (hC : C ≠ ∞) (θ : ℕ → ℝ) (hθ : ∀ m, 0 ≤ θ m) {Θ : ℝ}
     (hΘ : ∀ m : Fin d → ℕ, ∑ i, m i = r → Θ ≤ ∑ i, θ (m i))
     (hV : ∀ u ∈ V, ∀ m ≤ r, ∀ t : ℝ, |t| ≤ 1 / 2 ^ j →
-      eLpNorm (iterDiff m t u) p (volume.restrict (stepRegion m t)) ≤
+      eLpNorm (higherDiff m t u) p (volume.restrict (stepRegion m t)) ≤
         C * ENNReal.ofReal (2 ^ j * |t|) ^ θ m * eLpNorm u p unitVol)
     {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (hfV : ∀ i x, slice f x i ∈ V)
     {h : Fin d → ℝ} (hh : ‖h‖ ≤ 1 / 2 ^ j) :
-    eLpNorm (isoDiff r h f) p ((cubeVol d).restrict (isoRegion r h)) ≤
+    eLpNorm (higherDiff r h f) p ((cubeVol d).restrict (isoRegion r h)) ≤
       (d : ℝ≥0∞) ^ r * C ^ d * ENNReal.ofReal (2 ^ j * ‖h‖) ^ Θ * eLpNorm f p (cubeVol d) := by
   have hpos : (0 : ℝ) < 2 ^ j := by positivity
   have hhi : ∀ i, |h i| ≤ ‖h‖ := fun i => by
@@ -278,7 +279,7 @@ theorem eLpNorm_isoDiff_le_of_exponents (V : Submodule ℂ (ℝ → ℂ)) {p : �
   set β : ℕ → ℝ → ℝ≥0∞ := fun m t => C * ENNReal.ofReal (2 ^ j * |t|) ^ θ m
   have hβfin : ∀ m t, β m t ≠ ∞ := fun m t =>
     ENNReal.mul_ne_top hC (ENNReal.rpow_ne_top_of_nonneg (hθ m) ENNReal.ofReal_ne_top)
-  refine (eLpNorm_isoDiff_le_sum V hp1 hp r h β hβfin
+  refine (eLpNorm_higherDiff_le_sum V hp1 hp r h β hβfin
     (fun u hu m hm i => hV u hu m hm (h i) ((hhi i).trans hh)) hf hfV).trans ?_
   -- each word contributes at most `C^d A^Θ`
   have hword : ∀ α : Fin r → Fin d, ∏ i, β (count α i) (h i) ≤ C ^ d * A ^ Θ := fun α => by

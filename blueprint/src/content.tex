@@ -2570,21 +2570,23 @@ on subintervals with Lebesgue measure.
 
 \begin{definition}[Differences of higher order]
 \label{def:iter-diff}
-\lean{Interval.iterDiff, Interval.iterDiff_apply, Interval.iterDiff_zero, Interval.iterDiff_succ,
-  Interval.iterDiff_succ', Interval.iterDiff_add, Interval.iterDiff_sub,
-  Interval.iterDiff_const_mul, Interval.iterDiff_comp_add, Interval.neg_one_pow_eq_of_le,
-  Interval.iterDiff_reflect, Interval.enorm_iterDiff_coeff, Interval.enorm_iterDiff_le_of_forall}
+\lean{Rd.higherDiff, Rd.higherDiff_def, Rd.measurable_higherDiff, Interval.higherDiff_apply,
+  Interval.higherDiff_zero, Interval.higherDiff_succ, Interval.higherDiff_succ',
+  Interval.higherDiff_add, Interval.higherDiff_sub, Interval.higherDiff_const_mul,
+  Interval.higherDiff_comp_add, Interval.higherDiff_reflect, Interval.enorm_higherDiff_coeff,
+  Interval.enorm_higherDiff_le_of_forall}
 \leanok
 For $f : \R \to \C$, $r \in \N$ and $h \in \R$ the difference of order $r$ is
 $\Delta_h^r f(x) = \sum_{k=0}^r (-1)^{r-k} \binom{r}{k} f(x + k h)$, the $r$-fold iterate of
-$\Delta_h f(x) = f(x + h) - f(x)$. Since $\sum_k \binom{r}{k} = 2^r$,
-$|\Delta_h^r f(x)| \leq 2^r \max_{k \leq r} |f(x + k h)|$.
+$\Delta_h f(x) = f(x + h) - f(x)$. The same definition applies to functions on any additive
+group, such as $\R^d$, and differences of measurable functions are measurable. Since
+$\sum_k \binom{r}{k} = 2^r$, $|\Delta_h^r f(x)| \leq 2^r \max_{k \leq r} |f(x + k h)|$.
 \end{definition}
 
 \begin{lemma}[Differences annihilate polynomials]
 \label{lem:iter-diff-poly}
 \lean{Interval.natDegree_comp_affine_le, Interval.comp_affine_mem_degreeLT,
-  Interval.iterDiff_polynomial}
+  Interval.higherDiff_polynomial}
 \leanok
 \uses{def:iter-diff}
 Affine substitutions $x \mapsto u + v x$ do not raise the degree of a polynomial. For every
@@ -2599,9 +2601,8 @@ its differences with step $1$ at $0$ are those of $P$ with step $h$ at $x$.
 
 \begin{definition}[Modulus of smoothness on an interval]
 \label{def:interval-modulus}
-\lean{Interval.modulus, Interval.eLpNorm_iterDiff_le_modulus, Interval.modulus_mono,
-  Interval.eLpNorm_comp_add_Icc, Interval.eLpNorm_comp_sub_Icc, Interval.eLpNorm_Icc_mono,
-  Interval.measurable_iterDiff}
+\lean{Interval.modulus, Interval.eLpNorm_higherDiff_le_modulus, Interval.modulus_mono,
+  Interval.eLpNorm_comp_add_Icc, Interval.eLpNorm_comp_sub_Icc, Interval.eLpNorm_Icc_mono}
 \leanok
 \uses{def:iter-diff}
 For $1 \leq p \leq \infty$, $r \in \N$ and $t \geq 0$ the modulus of smoothness of $f$ on
@@ -2613,10 +2614,10 @@ $[a, b]$ is
 
 \begin{lemma}[Properties of the modulus]
 \label{lem:interval-modulus}
-\lean{Interval.eLpNorm_iterDiff_le_of_forall, Interval.eLpNorm_iterDiff_le, Interval.modulus_le,
+\lean{Interval.eLpNorm_higherDiff_le_of_forall, Interval.eLpNorm_higherDiff_le, Interval.modulus_le,
   Interval.modulus_add_le,
-  Interval.modulus_const_mul, Interval.modulus_polynomial, Interval.eLpNorm_iterDiff_congr_ae,
-  Interval.modulus_congr_ae, Interval.eLpNorm_iterDiff_reflect, Interval.modulus_reflect}
+  Interval.modulus_const_mul, Interval.modulus_polynomial, Interval.eLpNorm_higherDiff_congr_ae,
+  Interval.modulus_congr_ae, Interval.eLpNorm_higherDiff_reflect, Interval.modulus_reflect}
 \leanok
 \uses{def:interval-modulus, lem:iter-diff-poly}
 The modulus $\omega_r(f, t, [a, b])_p$ increases in $t$, is subadditive and homogeneous in $f$,
@@ -2740,7 +2741,7 @@ integrate over $x \in S$ and exchange the integrals by Tonelli's theorem.
 \label{thm:steklov-smoothing}
 \lean{Interval.avgStepIter_const, Interval.avgStepIter_shift, Interval.avgStepIter_sum,
   Interval.smooth, Interval.sub_smooth_eq, Interval.contDiff_smooth, Interval.iteratedDeriv_smooth,
-  Interval.continuous_iterDiff_uncurry, Interval.eLpNorm_sub_smooth_le,
+  Interval.continuous_higherDiff_uncurry, Interval.eLpNorm_sub_smooth_le,
   Interval.eLpNorm_iteratedDeriv_smooth_le}
 \leanok
 \uses{lem:steklov-deriv, lem:minkowski-avg, def:interval-modulus}
@@ -2958,9 +2959,9 @@ same way, gives $E_1(f)_p \leq W \omega_r(f, \tfrac14, [0,1])_p \leq W \omega_r(
 \lean{Interval.localMass, Interval.tsum_localMass_ppFun_le, Interval.IsPiecewisePoly,
   Interval.isPiecewisePoly_ppFun, Interval.eLpNorm_piece_eq_localMass, Interval.enorm_le_localMass,
   Interval.floor_add_mul_le, Interval.localMass_le_sum_range,
-  Interval.iterDiff_eq_zero_of_isPiecewisePoly, Interval.enorm_iterDiff_le_of_isPiecewisePoly,
+  Interval.higherDiff_eq_zero_of_isPiecewisePoly, Interval.enorm_higherDiff_le_of_isPiecewisePoly,
   Interval.stripBound, Interval.lintegral_stripBound_le, Interval.eLpNorm_le_of_strip,
-  Interval.eLpNorm_iterDiff_le_of_pointwise, Interval.sum_sum_localMass_le}
+  Interval.eLpNorm_higherDiff_le_of_pointwise, Interval.sum_sum_localMass_le}
 \leanok
 \uses{def:pp-scheme, lem:pp-bookkeeping, lem:interval-nikolskii, lem:iter-diff-poly}
 Let $1 \leq p < \infty$, and let $a$ be a piecewise polynomial of level $j$ and degree $< r$
@@ -2991,8 +2992,8 @@ $G^p \sum_{l=0}^r m_{n+l}$.
 
 \begin{theorem}[Inverse inequality for piecewise polynomials]
 \label{thm:pp-inverse}
-\lean{Interval.ofReal_two_pow_rpow_mul_eq, Interval.eLpNorm_iterDiff_le_of_isPiecewisePoly,
-  Interval.eLpNorm_iterDiff_ppFun_le, ENNReal.ofReal_two_pow_mul_rpow_le, Interval.ppInverseConst,
+\lean{Interval.ofReal_two_pow_rpow_mul_eq, Interval.eLpNorm_higherDiff_le_of_isPiecewisePoly,
+  Interval.eLpNorm_higherDiff_ppFun_le, ENNReal.ofReal_two_pow_mul_rpow_le, Interval.ppInverseConst,
   Interval.ppInverseConst_ne_top,
   Interval.two_pow_le_ppInverseConst, Interval.le_ppInverseConst_mul,
   Interval.exists_inverse_ppScheme}
@@ -3047,7 +3048,7 @@ smoothness needs piecewise polynomials that are smooth across the knots, that is
 \label{def:per-modulus}
 \lean{Interval.perExt, Interval.perExt_periodic, Interval.perExt_of_mem,
   Interval.measurable_perExt, Interval.perExt_add, Interval.perModulus,
-  Interval.eLpNorm_iterDiff_le_perModulus, Interval.perModulus_mono}
+  Interval.eLpNorm_higherDiff_le_perModulus, Interval.perModulus_mono}
 \leanok
 \uses{def:interval-modulus}
 For $f : \R \to \C$ the periodic extension of $f|_{[0,1)}$ is
@@ -3064,10 +3065,10 @@ near $1$ with values near $0$.
 
 \begin{lemma}[Properties of the periodic modulus]
 \label{lem:per-modulus}
-\lean{Interval.perExt_ae_eq, Interval.iterDiff_perExt_ae_eq, Interval.lintegral_Icc_periodic,
+\lean{Interval.perExt_ae_eq, Interval.higherDiff_perExt_ae_eq, Interval.lintegral_Icc_periodic,
   Interval.perModulus_congr_ae, Interval.perModulus_add_le, Interval.eLpNorm_perExt_Icc,
   Interval.perModulus_le, Interval.modulus_le_perModulus, Interval.perExt_eq_of_periodic,
-  Interval.iterDiff_periodic, Interval.lintegral_Icc_nat_le, Interval.modulus_perExt_le}
+  Interval.higherDiff_periodic, Interval.lintegral_Icc_nat_le, Interval.modulus_perExt_le}
 \leanok
 \uses{def:per-modulus, lem:interval-modulus}
 Let $1 \leq p < \infty$, $r \in \N$ and $t \geq 0$. The periodic modulus depends only on the class
@@ -3621,7 +3622,7 @@ $c_n(\tilde Q_m) = c_n(\tilde Q_{m-1})$.
 
 \begin{lemma}[Differences of truncated powers]
 \label{lem:spline-inverse-tools}
-\lean{Interval.truncPow, Interval.enorm_iterDiff_truncPow_le}
+\lean{Interval.truncPow, Interval.enorm_higherDiff_truncPow_le}
 \leanok
 \uses{def:iter-diff}
 Let $r \geq 1$, $x < \xi$ and $h \geq 0$. Then
@@ -3636,7 +3637,7 @@ $0 \leq (x + ih - \xi)_+ \leq rh$ for $i \leq r$, and $\sum_i \binom{r}{i} = 2^r
 \begin{lemma}[Splines across the knots]
 \label{lem:spline-across}
 \lean{Interval.eq_add_sum_Ioc_sub, Interval.jumpCoeff, Interval.sub_eq_jumpCoeff,
-  Interval.polyFun_eq_add_sum_jumps, Interval.iterDiff_eq_sum_jumps,
+  Interval.polyFun_eq_add_sum_jumps, Interval.higherDiff_eq_sum_jumps,
   Interval.enorm_jumpCoeff_le}
 \leanok
 \uses{def:spline-space, lem:interval-nikolskii, lem:pp-local, lem:iter-diff-poly}
@@ -3662,8 +3663,8 @@ the doubled interval of $I_{j,m-1}$.
 
 \begin{theorem}[Inverse inequality for splines]
 \label{thm:spline-inverse}
-\lean{Interval.splineStripConst, Interval.enorm_iterDiff_spline_le,
-  Interval.eLpNorm_iterDiff_spline_le, Interval.eLpNorm_iterDiff_ppFun_spline_le,
+\lean{Interval.splineStripConst, Interval.enorm_higherDiff_spline_le,
+  Interval.eLpNorm_higherDiff_spline_le, Interval.eLpNorm_higherDiff_ppFun_spline_le,
   Interval.splineInverseConst,
   Interval.splineInverseConst_ne_top, Interval.splineStripConst_mul_eq,
   Interval.splineStripConst_mul_le, Interval.two_pow_le_two_pow_mul_one_add,
@@ -4011,8 +4012,8 @@ they do not vanish inside a piece.
 
 \begin{lemma}[Differences of polynomials by derivatives]
 \label{lem:poly-diff-deriv}
-\lean{Interval.iterate_derivative_mem_degreeLT, Interval.hasDerivAt_iterDiff_polyFun,
-  Interval.norm_iterDiff_polyFun_le}
+\lean{Interval.iterate_derivative_mem_degreeLT, Interval.hasDerivAt_higherDiff_polyFun,
+  Interval.norm_higherDiff_polyFun_le}
 \leanok
 \uses{def:iter-diff}
 Let $P$ be a polynomial, $m \in \N$, $\sigma \geq 0$, $y \in \R$ and $M \geq 0$ with
@@ -4054,8 +4055,9 @@ $y, y + m\sigma \in [0, 1]$; the substitution $x = u + 2Ly$ rescales.
 
 \begin{lemma}[Steps of either sign]
 \label{lem:step-regions}
-\lean{Interval.iterDiff_neg, Interval.stepRegion, Interval.mem_stepRegion,
-  Interval.stepRegion_of_nonneg, Interval.stepRegion_of_neg, Interval.eLpNorm_iterDiff_stepRegion_eq}
+\lean{Interval.higherDiff_neg, Interval.stepRegion, Interval.mem_stepRegion,
+  Interval.stepRegion_of_nonneg, Interval.stepRegion_of_neg,
+  Interval.eLpNorm_higherDiff_stepRegion_eq}
 \leanok
 \uses{def:iter-diff}
 For $m \in \N$ and $t \in \R$ let $J(m, t) = \{x \in [0, 1] : x + mt \in [0, 1]\}$. Then
@@ -4075,8 +4077,8 @@ translation by $mt$ maps it onto $[0, 1 + mt]$.
 \label{thm:pp-lower-diff}
 \lean{Interval.eLpNorm_le_of_lintegral_le_mul, Interval.mul_rpow_one_div_rpow,
   Interval.lintegral_localBound_le, Interval.sum_localMass_ppFun_le,
-  Interval.enorm_iterDiff_le_of_isPiecewisePoly_of_le, Interval.enorm_iterDiff_le_of_mem_piece,
-  Interval.exists_eLpNorm_iterDiff_ppFun_le}
+  Interval.enorm_higherDiff_le_of_isPiecewisePoly_of_le, Interval.enorm_higherDiff_le_of_mem_piece,
+  Interval.exists_eLpNorm_higherDiff_ppFun_le}
 \leanok
 \uses{lem:diff-bound, thm:pp-inverse, lem:pp-local}
 Let $1 \leq p < \infty$ and $1 \leq m \leq r$. There is $C$ such that for every $j \in \N$, every
@@ -4099,8 +4101,8 @@ since $2^j h \leq 1$ and $mp \geq 1$.
 
 \begin{theorem}[Differences of lower order of splines]
 \label{thm:spline-lower-diff}
-\lean{Interval.enorm_iterDiff_truncPow_le_of_lt, Interval.iterDiff_eq_add_sum_jumps,
-  Interval.enorm_iterDiff_spline_le_of_lt, Interval.exists_eLpNorm_iterDiff_spline_le_of_lt}
+\lean{Interval.enorm_higherDiff_truncPow_le_of_lt, Interval.higherDiff_eq_add_sum_jumps,
+  Interval.enorm_higherDiff_spline_le_of_lt, Interval.exists_eLpNorm_higherDiff_spline_le_of_lt}
 \leanok
 \uses{lem:diff-bound, lem:spline-across, lem:spline-inverse-tools}
 Let $1 \leq p < \infty$ and $1 \leq m < r$. There is $C$ such that for every $j \in \N$, every
@@ -4747,33 +4749,45 @@ reaches smoothness beyond $1$.
 \section{The isotropic modulus}
 \label{sec:iso-modulus}
 
-\begin{definition}[Isotropic differences and the translation algebra]
-\label{def:iso-diff}
-\lean{Cube.transl, Cube.transl_apply, Cube.translHom, Cube.diffAct, Cube.diffAct_single,
-  Cube.diffAct_single_one, Cube.isoDiff, Cube.isoDiff_apply, Cube.isoDiff_eq_diffAct,
-  Cube.isoDiff_add, Cube.isoDiff_single, Cube.measurable_isoDiff}
+\begin{definition}[The translation algebra]
+\label{def:translation-algebra}
+\lean{TranslationAlgebra.transl, TranslationAlgebra.transl_apply, TranslationAlgebra.translHom,
+  TranslationAlgebra.diffAct, TranslationAlgebra.diffAct_single,
+  TranslationAlgebra.diffAct_single_one, TranslationAlgebra.higherDiff_eq_diffAct,
+  TranslationAlgebra.single_sum_one}
 \leanok
-\uses{def:cube-modulus}
-For $h \in \R^d$ and $r \in \N$ the isotropic difference is
-\[
-  \Delta_h^r f(x) = \sum_{k=0}^r (-1)^{r-k} \binom{r}{k} f(x + kh) .
-\]
-The algebra $\C[\R^d]$ of finite formal combinations of the translations $\delta_v$, $v \in \R^d$,
-acts on functions on $\R^d$ by $\delta_v f(x) = f(x + v)$; this is an algebra homomorphism, and
-$\Delta_h^r f = (\delta_h - 1)^r f$. For $h = t e_i$ the isotropic difference is the difference
-$\Delta^r_{t e_i}$ in coordinate $i$ of \Cref{def:cube-modulus}.
+\uses{def:iter-diff}
+Let $G$ be an additive commutative monoid. The algebra $\C[G]$ of finite formal combinations of
+the translations $\delta_v$, $v \in G$, acts on functions on $G$ by $\delta_v f(x) = f(x + v)$.
+This action is an algebra homomorphism, $\delta_{v + w} = \delta_v \delta_w$, and
+$\Delta_h^r f = (\delta_h - 1)^r f$.
 \end{definition}
 
-The algebra $\C[\R^d]$ is commutative, so identities between differences are ring identities.
+The algebra $\C[G]$ is commutative, so identities between differences are ring identities.
+
+\begin{definition}[Isotropic differences]
+\label{def:iso-diff}
+\lean{Cube.higherDiff_apply, Cube.higherDiff_add, Cube.higherDiff_single}
+\leanok
+\uses{def:cube-modulus, def:translation-algebra}
+For $h \in \R^d$ and $r \in \N$ the isotropic difference is
+\[
+  \Delta_h^r f(x) = \sum_{k=0}^r (-1)^{r-k} \binom{r}{k} f(x + kh) ,
+\]
+the difference of \Cref{def:iter-diff} on $\R^d$, and $\Delta_h^r f = (\delta_h - 1)^r f$ in the
+translation algebra $\C[\R^d]$. For $h = t e_i$ the isotropic difference is the difference
+$\Delta^r_{t e_i}$ in coordinate $i$ of \Cref{def:cube-modulus}.
+\end{definition}
 
 \begin{lemma}[Expansion into mixed coordinate differences]
 \label{lem:iso-expansion}
 \lean{Cube.mixedDiff, Cube.mixedDiff_nil, Cube.mixedDiff_cons, Cube.measurable_mixedDiff,
-  Cube.coordElem, Cube.diffAct_coordElem_pow, Cube.diffAct_list_prod, Cube.count, Cube.sum_count,
-  Cube.count_le, Cube.lowerVec, Cube.shiftVec, Cube.shiftVec_apply, Cube.card_lt_add_count_le,
-  Cube.single_sum_one, Cube.prod_lt_single, Cube.single_sub_one_eq_sum,
-  Cube.single_sub_one_pow_eq_sum, Cube.isoDiff_eq_sum, Cube.slice_cubeDiff_of_ne,
-  Cube.slice_mixedDiff_mem}
+  TranslationAlgebra.coordElem, Cube.diffAct_coordElem_pow, Cube.diffAct_list_prod,
+  TranslationAlgebra.count, TranslationAlgebra.sum_count, Cube.count_le,
+  TranslationAlgebra.lowerVec, TranslationAlgebra.shiftVec, TranslationAlgebra.shiftVec_apply,
+  TranslationAlgebra.card_lt_add_count_le, TranslationAlgebra.prod_lt_single,
+  TranslationAlgebra.single_sub_one_eq_sum, TranslationAlgebra.single_sub_one_pow_eq_sum,
+  Cube.higherDiff_eq_sum, Cube.slice_cubeDiff_of_ne, Cube.slice_mixedDiff_mem}
 \leanok
 \uses{def:iso-diff}
 For a word $\alpha \colon \{1, \dots, r\} \to \{1, \dots, d\}$ let $m_i(\alpha) = \#\alpha^{-1}(i)$
@@ -4801,7 +4815,7 @@ combines slices in coordinate $i$.
 \label{def:iso-modulus}
 \lean{Cube.cubeSet, Cube.measurableSet_cubeSet, Cube.cubeVol_eq_restrict,
   Cube.cubeVol_restrict_congr, Cube.isoRegion, Cube.measurableSet_isoRegion, Cube.isoModulus,
-  Cube.eLpNorm_isoDiff_le_isoModulus, Cube.lpIsoModulus}
+  Cube.eLpNorm_higherDiff_le_isoModulus, Cube.lpIsoModulus}
 \leanok
 \uses{def:iso-diff, def:cube}
 Let $Q_{rh} = \{x \in Q : x + rh \in Q\}$. The isotropic modulus of smoothness on the cube is
@@ -4814,10 +4828,11 @@ the supremum over steps of every direction and sign.
 \begin{lemma}[Properties of the isotropic modulus]
 \label{lem:iso-modulus}
 \lean{Cube.eLpNorm_comp_add_le, Cube.ae_comp_add_of_ae, Cube.add_mul_mem_Icc,
-  Cube.add_smul_mem_cubeSet, Cube.isoModulus_mono, Cube.isoModulus_add_le, Cube.eLpNorm_isoDiff_le,
-  Cube.isoModulus_le, Cube.isoModulus_congr_ae, Cube.diffRegion_eq_isoRegion,
-  Cube.coordModulus_le_isoModulus, Cube.cubeModulus_le_isoModulus, Cube.lpIsoModulus_add_le,
-  Cube.lpIsoModulus_le, Cube.lpIsoModulus_anti, Cube.lpCubeModulus_le_lpIsoModulus}
+  Cube.add_smul_mem_cubeSet, Cube.isoModulus_mono, Cube.isoModulus_add_le,
+  Cube.eLpNorm_higherDiff_le, Cube.isoModulus_le, Cube.isoModulus_congr_ae,
+  Cube.diffRegion_eq_isoRegion, Cube.coordModulus_le_isoModulus, Cube.cubeModulus_le_isoModulus,
+  Cube.lpIsoModulus_add_le, Cube.lpIsoModulus_le, Cube.lpIsoModulus_anti,
+  Cube.lpCubeModulus_le_lpIsoModulus}
 \leanok
 \uses{def:iso-modulus, lem:cube-modulus}
 Let $1 \leq p < \infty$. The isotropic modulus increases in $t$, is subadditive in $f$, satisfies
@@ -4840,7 +4855,8 @@ $Q$ the region $Q_{r s e_i}$ is $\{x_i \leq 1 - rs\}$.
 \lean{Cube.lintegral_inter_eq_slice, Cube.eLpNorm_cubeDiff_inter_le, Cube.listRegion,
   Cube.listRegion_nil, Cube.listRegion_cons, Cube.measurableSet_listRegion,
   Cube.update_mem_listRegion_iff, Cube.eLpNorm_mixedDiff_le, Cube.eLpNorm_shift_mixedDiff_le,
-  Cube.eLpNorm_isoDiff_le_sum, Cube.prod_rpow_eq_rpow_sum, Cube.eLpNorm_isoDiff_le_of_exponents}
+  Cube.eLpNorm_higherDiff_le_sum, Cube.prod_rpow_eq_rpow_sum,
+  Cube.eLpNorm_higherDiff_le_of_exponents}
 \leanok
 \uses{lem:iso-expansion, lem:iso-modulus, lem:cube-slices, lem:step-regions}
 Let $1 \leq p < \infty$, $r, j \in \N$, and let $V$ be a subspace of functions of one variable with
@@ -4874,8 +4890,8 @@ $2^j \|h\|_\infty \leq 1$.
 \lean{Cube.ppSubmodule, Cube.splineSubmodule, Cube.IsCubePP.slice_mem_ppSubmodule,
   Cube.IsCubeSpline.slice_mem_splineSubmodule, Cube.ppExponent, Cube.splineExponent,
   Cube.ppExponent_nonneg, Cube.splineExponent_nonneg, Cube.le_sum_ppExponent,
-  Cube.le_sum_splineExponent, Cube.exists_eLpNorm_iterDiff_stepRegion_pp_le,
-  Cube.exists_eLpNorm_iterDiff_stepRegion_spline_le}
+  Cube.le_sum_splineExponent, Cube.exists_eLpNorm_higherDiff_stepRegion_pp_le,
+  Cube.exists_eLpNorm_higherDiff_stepRegion_spline_le}
 \leanok
 \uses{thm:pp-lower-diff, thm:spline-lower-diff, thm:spline-inverse, lem:step-regions,
   def:cube-pp, def:cube-spline}
@@ -5357,7 +5373,7 @@ With the Besov space $\Besov{s}{p}{q}(V)$ defined through Littlewood--Paley bloc
 
 \begin{definition}[Differences and the modulus of smoothness]
 \label{def:rd-modulus}
-\lean{Rd.fwdDiff_eq_sub, Rd.iterDiff_apply, Rd.modulus, Rd.lpModulus}
+\lean{Rd.fwdDiff_eq_sub, Rd.higherDiff_apply, Rd.modulus, Rd.lpModulus}
 \leanok
 For $f : V \to \C$, $h \in V$ and $r \in \N$ let $\Delta_h f = f(\cdot + h) - f$ and
 $\Delta_h^r = (\Delta_h)^r$, so that
@@ -5368,10 +5384,10 @@ $\omega_r(f, t)_p = \sup_{\|h\| \leq t} \|\Delta_h^r f\|_p$.
 
 \begin{lemma}[Properties of differences]
 \label{lem:rd-differences}
-\lean{Rd.iterDiff_comp_add, Rd.fwdDiff_nsmul, Rd.aestronglyMeasurable_comp_add,
-  Rd.eLpNorm_comp_add_right, Rd.ae_comp_add_right, Rd.aestronglyMeasurable_iterDiff,
-  Rd.iterDiff_congr_ae, Rd.eLpNorm_iterDiff_le, Rd.integrable_iterDiff, Rd.conv_comp_add,
-  Rd.iterDiff_conv_ae, Rd.iterDiff_dilate}
+\lean{Rd.higherDiff_comp_add, Rd.fwdDiff_nsmul, Rd.aestronglyMeasurable_comp_add,
+  Rd.eLpNorm_comp_add_right, Rd.ae_comp_add_right, Rd.aestronglyMeasurable_higherDiff,
+  Rd.higherDiff_congr_ae, Rd.eLpNorm_higherDiff_le, Rd.integrable_higherDiff, Rd.conv_comp_add,
+  Rd.higherDiff_conv_ae, Rd.higherDiff_dilate, Rd.higherDiff_neg}
 \leanok
 \uses{def:rd-modulus, lem:conv-assoc, lem:dilate}
 Let $1 \leq p < \infty$, $f \in L_p$, $K \in L_1$, $\Phi : V \to \C$, $h, c \in V$, $m, r \in \N$
@@ -5382,7 +5398,8 @@ and $\lambda > 0$. Then:
   \item $\|f(\cdot + c)\|_p = \|f\|_p$ and $\|\Delta_h^r f\|_p \leq 2^r \|f\|_p$;
   \item $\Delta_h^r K$ is integrable, and $\Delta_h^r (K * f) = (\Delta_h^r K) * f$ almost
     everywhere;
-  \item $\Delta_h^r (\Phi_\lambda) = (\Delta_{\lambda h}^r \Phi)_\lambda$.
+  \item $\Delta_h^r (\Phi_\lambda) = (\Delta_{\lambda h}^r \Phi)_\lambda$;
+  \item $\Delta_{-h}^r f(x) = (-1)^r \Delta_h^r f(x - r h)$ for every $x \in V$.
 \end{enumerate}
 \end{lemma}
 
@@ -5390,12 +5407,13 @@ and $\lambda > 0$. Then:
 \leanok
 Parts (1) and (4) follow by induction on $r$, and (2) holds since translations preserve Lebesgue
 measure. For (3), $(K * f)(x + c) = (K(\cdot + c) * f)(x)$ by the substitution $y \mapsto y + c$,
-and \Cref{lem:conv-assoc} gives the linearity in the kernel.
+and \Cref{lem:conv-assoc} gives the linearity in the kernel. Part (5) reflects the sum of
+\Cref{def:rd-modulus} at $l \mapsto r - l$, with $(-1)^r (-1)^{r-l} = (-1)^l$.
 \end{proof}
 
 \begin{lemma}[Properties of the modulus]
 \label{lem:rd-modulus}
-\lean{Rd.eLpNorm_iterDiff_nsmul_iterDiff_le, Rd.eLpNorm_iterDiff_le_modulus, Rd.modulus_mono,
+\lean{Rd.eLpNorm_higherDiff_nsmul_higherDiff_le, Rd.eLpNorm_higherDiff_le_modulus, Rd.modulus_mono,
   Rd.modulus_add_le, Rd.modulus_le, Rd.modulus_congr_ae, Rd.modulus_nat_mul_le,
   Rd.modulus_mul_le, Rd.lpModulus_add_le, Rd.lpModulus_le, Rd.lpModulus_zero}
 \leanok
@@ -5455,8 +5473,8 @@ $\Delta_h^r(f, x, U) = \Delta_h^r f(x)$ for $x \in U_{rh}$ and $\Delta_h^r(f, x,
 
 \begin{lemma}[Properties of the modulus on a subset]
 \label{lem:rd-modulus-on}
-\lean{Rd.indicator_stepSet_iterDiff_indicator, Rd.measurableSet_stepSet, Rd.stepSet_mono,
-  Rd.eLpNorm_indicator_iterDiff_le_modulusOn, Rd.modulusOn_mono, Rd.modulusOn_univ,
+\lean{Rd.indicator_stepSet_higherDiff_indicator, Rd.measurableSet_stepSet, Rd.stepSet_mono,
+  Rd.eLpNorm_indicator_higherDiff_le_modulusOn, Rd.modulusOn_mono, Rd.modulusOn_univ,
   Rd.modulusOn_indicator, Rd.modulusOn_add_le, Rd.modulusOn_le_modulus, Rd.modulusOn_le,
   Rd.modulusOn_congr_ae, Rd.modulusOn_mono_set, Rd.lpModulusOn_succ_le,
   Rd.lpModulusOn_le_lpModulus, Rd.lpModulusOn_mono_set, Rd.lpModulusOn_congr}
@@ -5485,7 +5503,7 @@ on $U_{rh}$. Hence $\omega_r(f, t, U)_p = \omega_r(1_U f, t, U)_p \leq \omega_r(
 
 \begin{lemma}[The coefficients of the moment kernels]
 \label{lem:moment-coefficients}
-\lean{Rd.jacksonCoeff, Rd.neg_one_pow_mul_neg_one_pow_sub, Rd.neg_one_pow_mul_sum_iterDiff_coeff,
+\lean{Rd.jacksonCoeff, Rd.neg_one_pow_mul_neg_one_pow_sub, Rd.neg_one_pow_mul_sum_higherDiff_coeff,
   Rd.sum_jacksonCoeff}
 \leanok
 Let $L \in \N$ and $c_l = (-1)^{l+1} \binom{L}{l}$ for $1 \leq l \leq L$. For all
@@ -5619,8 +5637,8 @@ function and $|\Phi(z)| (1 + |z|)^N$ is integrable for every $N$.
 \label{lem:schwartz-differences}
 \lean{Rd.fwdDiffSchwartz, Rd.coe_fwdDiffSchwartz, Rd.lineDerivOp_fwdDiffSchwartz,
   Rd.iteratedLineDerivOp_fwdDiffSchwartz, Rd.lintegral_enorm_fwdDiff_le,
-  Rd.lintegral_enorm_iterDiff_le, Rd.enorm_iteratedLineDerivOp_le,
-  Rd.lintegral_enorm_iterDiff_schwartz_le, Rd.lintegral_enorm_iteratedFDeriv_ne_top}
+  Rd.lintegral_enorm_higherDiff_le, Rd.enorm_iteratedLineDerivOp_le,
+  Rd.lintegral_enorm_higherDiff_schwartz_le, Rd.lintegral_enorm_iteratedFDeriv_ne_top}
 \leanok
 \uses{def:rd-modulus}
 For every Schwartz function $G$ on $V$, $v \in V$ and $r \in \N$,
@@ -5640,7 +5658,7 @@ $|\partial_v^r G(x)| \leq \|v\|^r \|D^r G(x)\|$.
 
 \begin{theorem}[The inverse inequality for band-limited functions]
 \label{thm:band-inverse}
-\lean{Rd.bandInverseConst, Rd.bandInverseConst_ne_top, Rd.eLpNorm_iterDiff_Theta_le,
+\lean{Rd.bandInverseConst, Rd.bandInverseConst_ne_top, Rd.eLpNorm_higherDiff_Theta_le,
   Rd.lpModulus_le_of_mem_bandSpace}
 \leanok
 \uses{lem:schwartz-differences, lem:rd-differences, lem:rd-modulus, thm:young, def:band-space}
@@ -5763,10 +5781,10 @@ both terms by $\|g\|_1 \omega_L(f, R 2^{-j})_p \leq \|g\|_1 (1 + R)^L \omega_L(f
 \begin{lemma}[Moduli of the reproducing terms]
 \label{lem:dual-kernel-moduli}
 \lean{Rd.LocalMeansBump.eLpNorm_scaled_one, Rd.LocalMeansBump.eLpNorm_dual_one_le,
-  Rd.LocalMeansBump.eLpNorm_iterDiff_scaled_le, Rd.LocalMeansBump.eLpNorm_iterDiff_scaled_le',
+  Rd.LocalMeansBump.eLpNorm_higherDiff_scaled_le, Rd.LocalMeansBump.eLpNorm_higherDiff_scaled_le',
   Rd.LocalMeansBump.dualConst, Rd.LocalMeansBump.dualConst_ne_top,
-  Rd.LocalMeansBump.eLpNorm_iterDiff_scaled_le_dyadic,
-  Rd.LocalMeansBump.eLpNorm_iterDiff_dual_le, Rd.LocalMeansBump.lpModulus_dual_le}
+  Rd.LocalMeansBump.eLpNorm_higherDiff_scaled_le_dyadic,
+  Rd.LocalMeansBump.eLpNorm_higherDiff_dual_le, Rd.LocalMeansBump.lpModulus_dual_le}
 \leanok
 \uses{def:local-means, lem:schwartz-differences, lem:rd-differences, lem:rd-modulus-conv}
 With the notation of \Cref{def:local-means}, $\|\eta_j\|_1 \leq 2 \|m\|_1$, and there is
@@ -6126,7 +6144,7 @@ $\operatorname{Ext} f$. The equivalence of (2) and (3) is \Cref{thm:rd-besov}.
 
 \begin{lemma}[Differences of smooth functions]
 \label{lem:smooth-differences}
-\lean{Rd.norm_iterDiff_le_of_iteratedFDeriv, Rd.norm_le_of_iteratedFDeriv_le}
+\lean{Rd.norm_higherDiff_le_of_iteratedFDeriv, Rd.norm_le_of_iteratedFDeriv_le}
 \leanok
 \uses{def:rd-modulus}
 Let $E$ be a normed space, $l \in \N$, $C \geq 0$ and $G : V \to E$ smooth with
@@ -6141,7 +6159,7 @@ the mean value inequality bounds them by $C \|h\|$.
 
 \begin{lemma}[Leibniz's rule for differences]
 \label{lem:leibniz-differences}
-\lean{Rd.sum_choose_mul_succ_add, Rd.iterDiff_mul}
+\lean{Rd.sum_choose_mul_succ_add, Rd.higherDiff_mul}
 \leanok
 \uses{def:rd-modulus}
 For $u, v : V \to \C$, $h, x \in V$ and $r \in \N$,
@@ -6158,7 +6176,7 @@ Pascal's rule.
 
 \begin{lemma}[The modulus of a product]
 \label{lem:product-modulus}
-\lean{Rd.eLpNorm_iterDiff_mul_le, Rd.modulus_mul_smooth_le, ENNReal.ofReal_one_div_two_pow_pow,
+\lean{Rd.eLpNorm_higherDiff_mul_le, Rd.modulus_mul_smooth_le, ENNReal.ofReal_one_div_two_pow_pow,
   Rd.memLp_mul_of_bound, Rd.mulLp, Rd.mulLp_apply_ae, Rd.mulLp_sub, Rd.enorm_mulLp_le}
 \leanok
 \uses{lem:smooth-differences, lem:leibniz-differences, lem:rd-differences}
@@ -6544,7 +6562,7 @@ $|a(x) - a(y)| \leq 2^j |x - y|$, are regular atoms with $\sigma = r = 1$, and t
 
 \begin{lemma}[Level sums]
 \label{lem:level-sums}
-\lean{Rd.iterDiff_tsum_apply, Rd.le_of_rpow_le_overlap, Rd.one_sub_one_div_toReal_nonneg,
+\lean{Rd.higherDiff_tsum_apply, Rd.le_of_rpow_le_overlap, Rd.one_sub_one_div_toReal_nonneg,
   Rd.summable_levelSum, Rd.eLpNorm_levelSum_le, Rd.modulus_levelSum_le}
 \leanok
 \uses{lem:bounded-overlap, def:regular-atoms, lem:rd-modulus}
@@ -6613,7 +6631,7 @@ zero function is a regular atom, and a sequence with one nonzero term $x$ has $\
 \label{lem:pointwise-atoms}
 \lean{Rd.eLpNorm_le_of_bound_of_support, Rd.volume_closedBall_div_two_pow,
   Rd.rpow_mul_dyadicWeight_neg, Rd.isRegularAtom_of_pointwise,
-  Rd.enorm_iterDiff_le_of_iteratedFDeriv}
+  Rd.enorm_higherDiff_le_of_iteratedFDeriv}
 \leanok
 \uses{def:regular-atoms, lem:smooth-differences}
 Let $a$ be measurable with $a = 0$ outside $\overline{B}(c, d 2^{-j})$, $|a| \leq A$ and
@@ -6651,8 +6669,8 @@ Countable additivity of the integral, and \Cref{lem:dyadic-cells}.
 \begin{lemma}[Pointwise bounds of convolutions]
 \label{lem:conv-pointwise}
 \lean{Rd.lintegral_closedBall_le, Rd.lintegral_kernel_mul_le, Rd.enorm_conv_le_of_bound,
-  Rd.integrable_translate_mul_of_locallyIntegrable, Rd.conv_add_apply, Rd.iterDiff_conv_apply,
-  Rd.enorm_iterDiff_le_of_bound}
+  Rd.integrable_translate_mul_of_locallyIntegrable, Rd.conv_add_apply, Rd.higherDiff_conv_apply,
+  Rd.enorm_higherDiff_le_of_bound}
 \leanok
 \uses{def:conv}
 Let $1 \leq p < \infty$, $g \in L_p$, and $|K| \leq A$ with $K = 0$ outside $\overline{B}(0, \rho)$.
@@ -6701,7 +6719,7 @@ indicators add up to $1$.
 \begin{lemma}[Cell atoms are atoms]
 \label{lem:cell-atoms-regular}
 \lean{Rd.cellAtom_eq_zero, Rd.volume_closedBall_div_two_pow_rpow,
-  Rd.enorm_inv_cellCoef_mul_conv_le, Rd.enorm_cellAtom_le, Rd.enorm_iterDiff_cellAtom_le,
+  Rd.enorm_inv_cellCoef_mul_conv_le, Rd.enorm_cellAtom_le, Rd.enorm_higherDiff_cellAtom_le,
   Rd.cellAtomConst, Rd.cellAtomConst_ne_top, Rd.isRegularAtom_cellAtom}
 \leanok
 \uses{lem:cell-decomposition, lem:conv-pointwise, lem:pointwise-atoms}
@@ -6742,7 +6760,7 @@ have $\|\lambda\|_{b^s_{p,q}} = \|(2^{js} \|g_j\|_p)_j\|_{\ell_q}$.
 \label{lem:dual-kernel-bounds}
 \lean{ENNReal.ofReal_two_pow_pow, Rd.LocalMeansBump.scaled_eq_zero_of_lt,
   Rd.LocalMeansBump.dual_eq_zero_of_lt, Rd.LocalMeansBump.hasCompactSupport_dual,
-  Rd.LocalMeansBump.continuous_dual, Rd.LocalMeansBump.exists_iterDiff_dual_bound}
+  Rd.LocalMeansBump.continuous_dual, Rd.LocalMeansBump.exists_higherDiff_dual_bound}
 \leanok
 \uses{def:local-means, lem:smooth-differences, lem:resolution-of-unity, lem:rd-differences}
 For a bump $g$ of radius $R$ and $L, r \in \N$, the kernels $m_{2^j}$ and $\eta_j$ are continuous
@@ -7053,10 +7071,10 @@ Lipschitz graph does not give.
 
 \begin{lemma}[Convolution with Lipschitz functions]
 \label{lem:conv-lipschitz}
-\lean{Rd.iterDiff_one_apply, Rd.iterDiff_two_apply, Rd.integral_iterDiff_eq_zero,
+\lean{Rd.higherDiff_one_apply, Rd.higherDiff_two_apply, Rd.integral_higherDiff_eq_zero,
   Rd.norm_conv_sub_conv_le,
-  Rd.norm_conv_sub_self_le, Rd.norm_iterDiff_two_conv_le,
-  Rd.LocalMeansBump.integral_norm_scaled, Rd.LocalMeansBump.integral_norm_iterDiff_scaled_le}
+  Rd.norm_conv_sub_self_le, Rd.norm_higherDiff_two_conv_le,
+  Rd.LocalMeansBump.integral_norm_scaled, Rd.LocalMeansBump.integral_norm_higherDiff_scaled_le}
 \leanok
 \uses{lem:conv-pointwise, lem:dual-kernel-bounds}
 Let $u$ satisfy $|u(x) - u(y)| \leq M \|x - y\|$, and let $K$ be integrable, continuous, with
@@ -7131,7 +7149,7 @@ $v_j(x) = 0$ if $|\langle x, e \rangle - \phi_j(Px)| \geq (c + 1) 2^{-j}$.
 \lean{Rd.LipschitzGraph.norm_profile_sub_le, Rd.LipschitzGraph.norm_profile_second_le,
   Rd.LipschitzGraph.abs_vertCoord_sub_le, Rd.LipschitzGraph.abs_second_vertCoord_le,
   Rd.LipschitzGraph.vertCutoffConst, Rd.LipschitzGraph.four_le_vertCutoffConst,
-  Rd.LipschitzGraph.norm_iterDiff_vertCutoff_le, Rd.LipschitzGraph.enorm_iterDiff_vertCutoff_le}
+  Rd.LipschitzGraph.norm_higherDiff_vertCutoff_le, Rd.LipschitzGraph.enorm_higherDiff_vertCutoff_le}
 \leanok
 \uses{def:vertical-cutoff, lem:mollified-graph, lem:smooth-differences}
 There is $B < \infty$ with $|\Delta_h^m v_j| \leq B \min(1, (2^j \|h\|)^m)$ for $m \leq 2$.
@@ -7152,8 +7170,8 @@ $\|h\| > 2^{-j}$, $|\Delta_h^m v_j| \leq 4$.
 \begin{lemma}[Extended atoms]
 \label{lem:extended-atoms}
 \lean{Rd.min_one_rpow_mul_le, Rd.LipschitzGraph.extendAtom, Rd.LipschitzGraph.extendAtom_graphMap,
-  Rd.LipschitzGraph.continuous_extendAtom, Rd.LipschitzGraph.iterDiff_comp_proj,
-  Rd.LipschitzGraph.enorm_extendAtom_le, Rd.LipschitzGraph.enorm_iterDiff_two_extendAtom_le,
+  Rd.LipschitzGraph.continuous_extendAtom, Rd.LipschitzGraph.higherDiff_comp_proj,
+  Rd.LipschitzGraph.enorm_extendAtom_le, Rd.LipschitzGraph.enorm_higherDiff_two_extendAtom_le,
   Rd.LipschitzGraph.extendRadius, Rd.LipschitzGraph.extendCenter,
   Rd.LipschitzGraph.proj_extendCenter, Rd.LipschitzGraph.extendAtom_eq_zero,
   Rd.LipschitzGraph.isRegularAtom_extendAtom}
@@ -7318,7 +7336,8 @@ means quasi-norm is finite (\Cref{lem:intrinsic-upper}).
 
 \begin{lemma}[The traces of the partial sums]
 \label{lem:trace-partial-sums}
-\lean{Rd.LipschitzGraph.intrinsicNorm_lt_top_of_modNorm', Rd.LipschitzGraph.tendsto_trace_partialSum}
+\lean{Rd.LipschitzGraph.intrinsicNorm_lt_top_of_modNorm',
+  Rd.LipschitzGraph.tendsto_trace_partialSum}
 \leanok
 \uses{lem:partial-sums-approx, lem:trace-linear, lem:restriction-moduli}
 Let $s > 0$, $s + 1/p < L$ and
@@ -7349,8 +7368,9 @@ Lebesgue measure, and a $K$-Lipschitz map $f$ has $\mu_H^k(f(N)) \leq K^k \mu_H^
 
 \begin{theorem}[Change of chart]
 \label{thm:change-of-chart}
-\lean{Rd.LipschitzGraph.lipschitzWith_proj_graphMap, Rd.LipschitzGraph.finrank_hyperplane_eq_finrank,
-  Rd.LipschitzGraph.ae_proj_graphMap, Rd.LipschitzGraph.trace_ae_eq_trace_comp}
+\lean{Rd.LipschitzGraph.lipschitzWith_proj_graphMap,
+  Rd.LipschitzGraph.finrank_hyperplane_eq_finrank, Rd.LipschitzGraph.ae_proj_graphMap,
+  Rd.LipschitzGraph.trace_ae_eq_trace_comp}
 \leanok
 \uses{lem:trace-partial-sums, thm:trace-continuous, lem:lipschitz-null}
 Let $s > 0$, $s + 1/p < L$ and
@@ -7732,10 +7752,10 @@ coordinates.
 
 \begin{definition}[Mixed differences]
 \label{def:mixed-differences}
-\lean{Rd.mixedDiff, Rd.diffAct_coordElem_pow_eq_iterDiff, Rd.mixedDiff_empty, Rd.mixedDiff_insert,
+\lean{Rd.mixedDiff, Rd.diffAct_coordElem_pow_eq_higherDiff, Rd.mixedDiff_empty, Rd.mixedDiff_insert,
   Rd.mixedDiff_add, Rd.mixedDiff_sub}
 \leanok
-\uses{def:iso-diff}
+\uses{def:translation-algebra}
 For $e \subseteq \{1, \dots, d\}$ and steps $h \in \R^d$ the mixed difference of order $L$ is
 $\Delta^{L,e}_h f = (\prod_{i \in e} \Delta^L_{h_i e_i}) f$, the action of
 $\prod_{i \in e} (\delta_{h_i e_i} - 1)^L$ in the commutative algebra of translations; a further
@@ -7746,7 +7766,7 @@ coordinate $i \notin e$ applies $\Delta^L_{h_i e_i}$.
 \label{lem:mixed-differences}
 \lean{Rd.aestronglyMeasurable_mixedDiff, Rd.integrable_mixedDiff, Rd.mixedDiff_congr_ae,
   Rd.eLpNorm_mixedDiff_le, Rd.mixedDiff_conv_ae, Rd.fwdDiff_single_tensorKernel,
-  Rd.iterDiff_single_tensorKernel, Rd.mixedDiff_tensorKernel}
+  Rd.higherDiff_single_tensorKernel, Rd.mixedDiff_tensorKernel}
 \leanok
 \uses{def:mixed-differences, lem:rd-differences, def:tensor-kernel}
 Mixed differences keep measurability and integrability, depend only on the class of $f$, satisfy

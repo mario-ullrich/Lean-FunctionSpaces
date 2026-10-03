@@ -19,45 +19,39 @@ variable, and these do not vanish inside the pieces.
 
 * **Piecewise polynomials**, `1 ≤ m ≤ r`, `0 ≤ h ≤ 2^(-j)`:
   `‖Δ_h^m u‖_{L_p[0, 1 - mh]} ≤ C (2^j h)^(1/p) ‖u‖_p`
-  (`Interval.exists_eLpNorm_iterDiff_ppFun_le`). On the strips of width `rh` left of the knots
+  (`Interval.exists_eLpNorm_higherDiff_ppFun_le`). On the strips of width `rh` left of the knots
   the difference is bounded by the neighbouring pieces, as for `m = r`; inside a piece the
   difference bound of the polynomials (`Interval.DiffBound`) gives the factor `(2^j h)^m ≤ 2^j h`.
 * **Splines** of order `r`, `1 ≤ m ≤ r - 1`, `0 ≤ h ≤ 2^(-j)`:
   `‖Δ_h^m u‖_{L_p[0, 1 - mh]} ≤ C (2^j h)^m ‖u‖_p`
-  (`Interval.exists_eLpNorm_iterDiff_spline_le_of_lt`). On `[x, x + mh]` the spline is the
+  (`Interval.exists_eLpNorm_higherDiff_spline_le_of_lt`). On `[x, x + mh]` the spline is the
   piece at `x` plus jumps `c (y - ξ)_+^(r-1)` at knots `ξ > x`
-  (`Interval.iterDiff_eq_add_sum_jumps`); the piece contributes `(2^j h)^m` by the difference
+  (`Interval.higherDiff_eq_add_sum_jumps`); the piece contributes `(2^j h)^m` by the difference
   bound, and a jump `|c| 2^m (mh)^(r-1)`, which is of order `(2^j h)^(r-1) ≤ (2^j h)^m` by the
   bound of the jump coefficients (`Interval.enorm_jumpCoeff_le`). So the bound holds at every
-  point (`Interval.enorm_iterDiff_spline_le_of_lt`), not only on strips; this is the smoothness
+  point (`Interval.enorm_higherDiff_spline_le_of_lt`), not only on strips; this is the smoothness
   `C^(r-2)` of splines.
 
 For steps `t` of either sign the difference lives on `{x ∈ [0, 1] : x + mt ∈ [0, 1]}`
 (`Interval.stepRegion`), and its norm there depends only on `|t|`
-(`Interval.eLpNorm_iterDiff_stepRegion_eq`), since `Δ_{-t}^m f(x) = (-1)^m Δ_t^m f(x - mt)`
-(`Interval.iterDiff_neg`).
+(`Interval.eLpNorm_higherDiff_stepRegion_eq`), since `Δ_{-t}^m f(x) = (-1)^m Δ_t^m f(x - mt)`
+(`Interval.higherDiff_neg`).
 -/
 
 @[expose] public section
 
 open MeasureTheory Set Polynomial
+open Rd (higherDiff higherDiff_def measurable_higherDiff)
 open scoped ENNReal
 
 namespace Interval
 
 /-! ### Steps of either sign -/
 
-/-- **Negative steps**: `Δ_{-t}^m f(x) = (-1)^m Δ_t^m f(x - mt)`. -/
-theorem iterDiff_neg (m : ℕ) (t : ℝ) (f : ℝ → ℂ) (x : ℝ) :
-    iterDiff m (-t) f x = (-1 : ℂ) ^ m * iterDiff m t f (x - m * t) := by
-  simp only [iterDiff_apply, Finset.mul_sum]
-  rw [← Finset.sum_range_reflect]
-  refine Finset.sum_congr rfl fun k hk => ?_
-  have hk' : k ≤ m := Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)
-  rw [show m + 1 - 1 - k = m - k by omega, Nat.choose_symm hk', show m - (m - k) = k by omega]
-  have hx : x + ((m - k : ℕ) : ℝ) * -t = x - m * t + k * t := by rw [Nat.cast_sub hk']; ring
-  rw [hx, neg_one_pow_eq_of_le hk']
-  ring
+/-- **Negative steps**: `Δ_{-t}^m f(x) = (-1)^m Δ_t^m f(x - mt)` (`Rd.higherDiff_neg` on `ℝ`). -/
+theorem higherDiff_neg (m : ℕ) (t : ℝ) (f : ℝ → ℂ) (x : ℝ) :
+    higherDiff m (-t) f x = (-1 : ℂ) ^ m * higherDiff m t f (x - m * t) := by
+  rw [higherDiff_def, higherDiff_def, Rd.higherDiff_neg, nsmul_eq_mul]
 
 /-- The **step region** of a difference of order `m` and step `t`: the points `x ∈ [0, 1]` with
 `x + mt ∈ [0, 1]`, for `t` of either sign. -/
@@ -85,22 +79,22 @@ theorem stepRegion_of_neg (m : ℕ) {t : ℝ} (ht : t < 0) : stepRegion m t = Ic
 
 /-- **The norm of a difference depends only on the size of the step**:
 `‖Δ_t^m u‖_{L_p(step region)} = ‖Δ_{|t|}^m u‖_{L_p[0, 1 - m|t|]}`. -/
-theorem eLpNorm_iterDiff_stepRegion_eq {u : ℝ → ℂ} (hu : Measurable u) (p : ℝ≥0∞) (m : ℕ)
+theorem eLpNorm_higherDiff_stepRegion_eq {u : ℝ → ℂ} (hu : Measurable u) (p : ℝ≥0∞) (m : ℕ)
     (t : ℝ) :
-    eLpNorm (iterDiff m t u) p (volume.restrict (stepRegion m t)) =
-      eLpNorm (iterDiff m |t| u) p (volume.restrict (Icc 0 (1 - m * |t|))) := by
+    eLpNorm (higherDiff m t u) p (volume.restrict (stepRegion m t)) =
+      eLpNorm (higherDiff m |t| u) p (volume.restrict (Icc 0 (1 - m * |t|))) := by
   rcases le_or_gt 0 t with ht | ht
   · rw [abs_of_nonneg ht, stepRegion_of_nonneg m ht]
   · rw [abs_of_neg ht, stepRegion_of_neg m ht]
-    have h1 : iterDiff m t u = ((-1 : ℂ) ^ m) • fun x => iterDiff m (-t) u (x + m * t) := by
+    have h1 : higherDiff m t u = ((-1 : ℂ) ^ m) • fun x => higherDiff m (-t) u (x + m * t) := by
       funext x
-      have h := iterDiff_neg m (-t) u x
+      have h := higherDiff_neg m (-t) u x
       rw [neg_neg] at h
       rw [h, Pi.smul_apply, smul_eq_mul]
       congr 2
       ring
     rw [h1, eLpNorm_const_smul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul,
-      eLpNorm_comp_add_Icc (measurable_iterDiff hu m (-t))]
+      eLpNorm_comp_add_Icc (measurable_higherDiff hu m (-t))]
     congr 3 <;> ring
 
 /-! ### Tools for the local estimates -/
@@ -155,15 +149,15 @@ theorem sum_localMass_ppFun_le (hp : p ≠ ∞) (j : ℕ) (Q : ℕ → ℂ[X]) :
 /-- **Pointwise bound for differences of order `m ≤ r`**: for `0 ≤ h ≤ 2^(-k)` and `x ≥ 0`,
 `|Δ_h^m u(x)| ≤ 2^m K 2^(k/p) (∑_{l ≤ r} M_{n+l})^(1/p)` with `n = ⌊2^k x⌋`, since
 `x, …, x + mh` meet only the intervals `I_{k,n}, …, I_{k,n+r}`. -/
-theorem enorm_iterDiff_le_of_isPiecewisePoly_of_le {r k m : ℕ} (hmr : m ≤ r) {u : ℝ → ℂ}
+theorem enorm_higherDiff_le_of_isPiecewisePoly_of_le {r k m : ℕ} (hmr : m ≤ r) {u : ℝ → ℂ}
     (hu : IsPiecewisePoly r k u) {K : ℝ≥0∞} (hK : NikolskiiBound p r K) (hp : p ≠ ∞) {h x : ℝ}
     (hh0 : 0 ≤ h) (hh : h ≤ 1 / 2 ^ k) (hx : 0 ≤ x) :
-    ‖iterDiff m h u x‖ₑ ≤ 2 ^ m * (K * ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
+    ‖higherDiff m h u x‖ₑ ≤ 2 ^ m * (K * ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
       (∑ l ∈ Finset.range (r + 1), localMass p k u (⌊2 ^ k * x⌋₊ + l)) ^ (1 / p.toReal)) := by
   have hkh : (2 : ℝ) ^ k * h ≤ 1 := by
     rw [le_div_iff₀ (by positivity)] at hh
     linarith
-  refine enorm_iterDiff_le_of_forall fun i hi => ?_
+  refine enorm_higherDiff_le_of_forall fun i hi => ?_
   have hi' : i ≤ r := (Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)).trans hmr
   have h0 : 0 ≤ 2 ^ k * (x + i * h) := by positivity
   have hm : x + i * h ∈ dyadicIco k ⌊2 ^ k * (x + i * h)⌋₊ :=
@@ -181,10 +175,10 @@ theorem enorm_iterDiff_le_of_isPiecewisePoly_of_le {r k m : ℕ} (hmr : m ≤ r)
 /-- **Differences inside a piece**: if `x, …, x + mh` lie in the dyadic interval `I_{k,n}` of `x`,
 `n = ⌊2^k x⌋`, then `|Δ_h^m u(x)| ≤ K (2^k h)^m 2^(k/p) M_n^(1/p)`, by the difference bound of
 the polynomial piece (`Interval.DiffBound`). -/
-theorem enorm_iterDiff_le_of_mem_piece {r k m : ℕ} {u : ℝ → ℂ} (hu : IsPiecewisePoly r k u)
+theorem enorm_higherDiff_le_of_mem_piece {r k m : ℕ} {u : ℝ → ℂ} (hu : IsPiecewisePoly r k u)
     {K : ℝ≥0∞} (hK : DiffBound p r m K) (hp : p ≠ ∞) {h x : ℝ} (hh0 : 0 ≤ h) (hx : 0 ≤ x)
     (hgood : x + m * h < ((⌊2 ^ k * x⌋₊ : ℝ) + 1) / 2 ^ k) :
-    ‖iterDiff m h u x‖ₑ ≤ K * ENNReal.ofReal (2 ^ k * h) ^ m *
+    ‖higherDiff m h u x‖ₑ ≤ K * ENNReal.ofReal (2 ^ k * h) ^ m *
       ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) * localMass p k u ⌊2 ^ k * x⌋₊ ^ (1 / p.toReal) := by
   obtain ⟨P, hP, hPu⟩ := hu ⌊2 ^ k * x⌋₊
   have hpos : (0 : ℝ) < 2 ^ k := by positivity
@@ -197,8 +191,8 @@ theorem enorm_iterDiff_le_of_mem_piece {r k m : ℕ} {u : ℝ → ℂ} (hu : IsP
       nlinarith [mul_nonneg (Nat.cast_nonneg i) hh0]
     · calc x + i * h ≤ x + m * h := by nlinarith
         _ < _ := hgood
-  have h1 : iterDiff m h u x = iterDiff m h (polyFun P) x := by
-    rw [iterDiff_apply, iterDiff_apply]
+  have h1 : higherDiff m h u x = higherDiff m h (polyFun P) x := by
+    rw [higherDiff_apply, higherDiff_apply]
     exact Finset.sum_congr rfl fun i hi => by rw [hPu _ (hmem i hi)]
   have hL : (0 : ℝ) < 1 / 2 ^ k := by positivity
   have hux : (⌊2 ^ k * x⌋₊ : ℝ) / 2 ^ k ≤ x := by rw [div_le_iff₀ hpos]; linarith
@@ -218,12 +212,12 @@ theorem enorm_iterDiff_le_of_mem_piece {r k m : ℕ} {u : ℝ → ℂ} (hu : IsP
 `C` such that for every level `j`, every piecewise polynomial `u` of level `j` and degree `< r` and
 `0 ≤ h ≤ 2^(-j)`, `‖Δ_h^m u‖_{L_p[0, 1 - mh]} ≤ C (2^j h)^(1/p) ‖u‖_p`. On the strips of width
 `rh` left of the knots the difference is bounded by the neighbouring pieces
-(`Interval.enorm_iterDiff_le_of_isPiecewisePoly_of_le`), inside a piece by `(2^j h)^m` times the
-piece (`Interval.enorm_iterDiff_le_of_mem_piece`), and `(2^j h)^(mp) ≤ 2^j h`. -/
-theorem exists_eLpNorm_iterDiff_ppFun_le {r m : ℕ} (hm : 1 ≤ m) (hmr : m ≤ r) (hp : p ≠ ∞) :
+(`Interval.enorm_higherDiff_le_of_isPiecewisePoly_of_le`), inside a piece by `(2^j h)^m` times the
+piece (`Interval.enorm_higherDiff_le_of_mem_piece`), and `(2^j h)^(mp) ≤ 2^j h`. -/
+theorem exists_eLpNorm_higherDiff_ppFun_le {r m : ℕ} (hm : 1 ≤ m) (hmr : m ≤ r) (hp : p ≠ ∞) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ (j : ℕ) (Q : ℕ → ℂ[X]), (∀ n, Q n ∈ degreeLT ℂ r) → ∀ {h : ℝ},
       0 ≤ h → h ≤ 1 / 2 ^ j →
-        eLpNorm (iterDiff m h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - m * h))) ≤
+        eLpNorm (higherDiff m h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - m * h))) ≤
           C * ENNReal.ofReal (2 ^ j * h) ^ (1 / p.toReal) * eLpNorm (ppFun j Q) p unitVol := by
   obtain ⟨K, hK, hKb⟩ := enorm_polyFun_le (p := p) r hp
   obtain ⟨Km, hKm, hKmb⟩ := exists_diffBound (p := p) r m hp
@@ -253,7 +247,7 @@ theorem exists_eLpNorm_iterDiff_ppFun_le {r m : ℕ} (hm : 1 ≤ m) (hmr : m ≤
   set G₁ := 2 ^ m * K * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal)
   set G₂ := Km * σ ^ m * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal)
   -- the pointwise bound: strip part plus interior part
-  have hpt : ∀ x ∈ Icc (0 : ℝ) (1 - m * h), ‖iterDiff m h u x‖ₑ ^ p.toReal ≤
+  have hpt : ∀ x ∈ Icc (0 : ℝ) (1 - m * h), ‖higherDiff m h u x‖ₑ ^ p.toReal ≤
       stripBound j r h (G₁ ^ p.toReal) Mw x + G₂ ^ p.toReal * localMass p j u ⌊2 ^ j * x⌋₊ := by
     intro x hx
     by_cases hbad : ((⌊2 ^ j * x⌋₊ : ℝ) + 1) / 2 ^ j ≤ x + m * h
@@ -266,12 +260,12 @@ theorem exists_eLpNorm_iterDiff_ppFun_le {r m : ℕ} (hm : 1 ≤ m) (hmr : m ≤
       refine le_add_right ?_
       rw [hs, ← mul_rpow_one_div_rpow hp0 hp]
       refine ENNReal.rpow_le_rpow ?_ hq.le
-      exact (enorm_iterDiff_le_of_isPiecewisePoly_of_le hmr hu hKb hp hh0 hh hx.1).trans_eq
+      exact (enorm_higherDiff_le_of_isPiecewisePoly_of_le hmr hu hKb hp hh0 hh hx.1).trans_eq
         (by simp only [G₁, Mw]; ring)
     · push Not at hbad
       refine le_add_left ?_
       rw [← mul_rpow_one_div_rpow hp0 hp]
-      exact ENNReal.rpow_le_rpow (enorm_iterDiff_le_of_mem_piece hu hKmb hp hh0 hx.1 hbad) hq.le
+      exact ENNReal.rpow_le_rpow (enorm_higherDiff_le_of_mem_piece hu hKmb hp hh0 hx.1 hbad) hq.le
   -- the integral
   have hmeas : Measurable fun x : ℝ => G₂ ^ p.toReal * localMass p j u ⌊2 ^ j * x⌋₊ :=
     measurable_const.mul ((measurable_from_nat (f := localMass p j u)).comp
@@ -299,10 +293,10 @@ theorem exists_eLpNorm_iterDiff_ppFun_le {r m : ℕ} (hm : 1 ≤ m) (hmr : m ≤
           ENNReal.rpow_le_rpow (pow_le_of_le_one zero_le hσ1 (by omega)) hq.le
       _ ≤ σ := ENNReal.rpow_le_self_of_le_one hσ1 hq1
   refine eLpNorm_le_of_lintegral_le_mul hp
-    (measurable_iterDiff (measurable_ppFun j Q) m h).aestronglyMeasurable
+    (measurable_higherDiff (measurable_ppFun j Q) m h).aestronglyMeasurable
     (A := C₀ ^ (1 / p.toReal)) ?_
   rw [← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one]
-  calc ∫⁻ x in Icc (0 : ℝ) (1 - m * h), ‖iterDiff m h u x‖ₑ ^ p.toReal
+  calc ∫⁻ x in Icc (0 : ℝ) (1 - m * h), ‖higherDiff m h u x‖ₑ ^ p.toReal
       ≤ ∫⁻ x in Icc (0 : ℝ) (1 - m * h), (stripBound j r h (G₁ ^ p.toReal) Mw x +
           G₂ ^ p.toReal * localMass p j u ⌊2 ^ j * x⌋₊) := setLIntegral_mono' measurableSet_Icc hpt
     _ ≤ ∫⁻ x in Icc (0 : ℝ) 1, (stripBound j r h (G₁ ^ p.toReal) Mw x +
@@ -329,9 +323,9 @@ theorem exists_eLpNorm_iterDiff_ppFun_le {r m : ℕ} (hm : 1 ≤ m) (hmr : m ≤
 
 /-- **Differences of any order of a truncated power left of its knot**: for `x < ξ` and
 `h ≥ 0`, `|Δ_h^m (· - ξ)_+^(r-1)(x)| ≤ 2^m (mh)^(r-1)`, since `0 ≤ (x + ih - ξ)_+ ≤ mh`. -/
-theorem enorm_iterDiff_truncPow_le_of_lt (r m : ℕ) {ξ h x : ℝ} (hh : 0 ≤ h) (hx : x < ξ) :
-    ‖iterDiff m h (truncPow r ξ) x‖ₑ ≤ 2 ^ m * ENNReal.ofReal (m * h) ^ (r - 1) := by
-  refine enorm_iterDiff_le_of_forall fun i hi => ?_
+theorem enorm_higherDiff_truncPow_le_of_lt (r m : ℕ) {ξ h x : ℝ} (hh : 0 ≤ h) (hx : x < ξ) :
+    ‖higherDiff m h (truncPow r ξ) x‖ₑ ≤ 2 ^ m * ENNReal.ofReal (m * h) ^ (r - 1) := by
+  refine enorm_higherDiff_le_of_forall fun i hi => ?_
   have hi' : (i : ℝ) ≤ m := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)
   unfold truncPow
   split_ifs with hξ
@@ -345,13 +339,13 @@ theorem enorm_iterDiff_truncPow_le_of_lt (r m : ℕ) {ξ h x : ℝ} (hh : 0 ≤ 
 `x ≥ 0` and `x + mh < N 2^(-j)`,
 `Δ_h^m u(x) = Δ_h^m P_{n₀}(x) + ∑_{n₀ < l ≤ n₀ + r} c_l Δ_h^m (· - ξ_l)_+^(r-1)(x)`, with
 `n₀ = ⌊2^j x⌋` (`Interval.polyFun_eq_add_sum_jumps` at every point `x + ih`). -/
-theorem iterDiff_eq_add_sum_jumps {r j N m : ℕ} (hmr : m ≤ r) {P : ℕ → ℂ[X]}
+theorem higherDiff_eq_add_sum_jumps {r j N m : ℕ} (hmr : m ≤ r) {P : ℕ → ℂ[X]}
     (hJ : SplineJoinsBelow r j N P) {u : ℝ → ℂ}
     (hu : ∀ n < N, ∀ x ∈ dyadicIco j n, u x = polyFun (P n) x) {h x : ℝ} (hh0 : 0 ≤ h)
     (hh : h ≤ 1 / 2 ^ j) (hx : 0 ≤ x) (hxm : x + m * h < N / 2 ^ j) :
-    iterDiff m h u x = iterDiff m h (polyFun (P ⌊2 ^ j * x⌋₊)) x +
+    higherDiff m h u x = higherDiff m h (polyFun (P ⌊2 ^ j * x⌋₊)) x +
       ∑ l ∈ Finset.Ioc ⌊2 ^ j * x⌋₊ (⌊2 ^ j * x⌋₊ + r),
-        jumpCoeff r N P l * iterDiff m h (truncPow r ((l : ℝ) / 2 ^ j)) x := by
+        jumpCoeff r N P l * higherDiff m h (truncPow r ((l : ℝ) / 2 ^ j)) x := by
   have hkh : (2 : ℝ) ^ j * h ≤ 1 := by
     rw [le_div_iff₀ (by positivity)] at hh
     linarith
@@ -362,13 +356,13 @@ theorem iterDiff_eq_add_sum_jumps {r j N m : ℕ} (hmr : m ≤ r) {P : ℕ → �
     have hih : (i : ℝ) * h ≤ m * h := mul_le_mul_of_nonneg_right (by exact_mod_cast hi') hh0
     exact polyFun_eq_add_sum_jumps hJ hu hx (le_add_of_nonneg_right (mul_nonneg
       (Nat.cast_nonneg i) hh0)) (by linarith) (floor_add_mul_le hx hh0 hkh (hi'.trans hmr))
-  rw [iterDiff_apply, Finset.sum_congr rfl fun i hi => by rw [hdec i hi] ]
+  rw [higherDiff_apply, Finset.sum_congr rfl fun i hi => by rw [hdec i hi] ]
   simp only [mul_add, Finset.sum_add_distrib, Finset.mul_sum]
   congr 1
-  · exact (iterDiff_apply _ _ _ _).symm
+  · exact (higherDiff_apply _ _ _ _).symm
   · rw [Finset.sum_comm]
     refine Finset.sum_congr rfl fun l _ => ?_
-    rw [iterDiff_apply, Finset.mul_sum]
+    rw [higherDiff_apply, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => by ring
 
 /-- **Pointwise bound for differences of lower order of splines**: for `1 ≤ m < r`, `h ≥ 0` with
@@ -377,12 +371,12 @@ theorem iterDiff_eq_add_sum_jumps {r j N m : ℕ} (hmr : m ≤ r) {P : ℕ → �
 piece contributes by the difference bound `K_m` of the polynomials, a jump
 `c_l (· - ξ_l)_+^(r-1)` by `|c_l| 2^m (mh)^(r-1)` with
 `|c_l| 2^(-j(r-1)) ≤ 2 K 2^(j/p) (…)^(1/p)`, and `(2^j h)^(r-1) ≤ (2^j h)^m`. -/
-theorem enorm_iterDiff_spline_le_of_lt {r j N m : ℕ} (hm : 1 ≤ m) (hmr : m < r)
+theorem enorm_higherDiff_spline_le_of_lt {r j N m : ℕ} (hm : 1 ≤ m) (hmr : m < r)
     {P : ℕ → ℂ[X]} (hP : ∀ n, P n ∈ degreeLT ℂ r) (hJ : SplineJoinsBelow r j N P) {u : ℝ → ℂ}
     (hu : ∀ n < N, ∀ x ∈ dyadicIco j n, u x = polyFun (P n) x) {K Km : ℝ≥0∞}
     (hK : NikolskiiBound p r K) (hKm : DiffBound p r m Km) (hp : p ≠ ∞) {h x : ℝ}
     (hh0 : 0 ≤ h) (hmh : m * h ≤ 1 / 2 ^ j) (hx : 0 ≤ x) (hxm : x + m * h < N / 2 ^ j) :
-    ‖iterDiff m h u x‖ₑ ≤ (Km + 2 * r * 2 ^ m * (m : ℝ≥0∞) ^ (r - 1) * K) *
+    ‖higherDiff m h u x‖ₑ ≤ (Km + 2 * r * 2 ^ m * (m : ℝ≥0∞) ^ (r - 1) * K) *
       ENNReal.ofReal (2 ^ j * h) ^ m * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal) *
         (∑ l ∈ Finset.range (r + 1), localMass p j u (⌊2 ^ j * x⌋₊ + l)) ^ (1 / p.toReal) := by
   have hpos : (0 : ℝ) < 2 ^ j := by positivity
@@ -408,7 +402,7 @@ theorem enorm_iterDiff_spline_le_of_lt {r j N m : ℕ} (hm : 1 ≤ m) (hmr : m <
     rw [lt_div_iff₀ hpos] at hxm
     nlinarith [mul_nonneg (Nat.cast_nonneg m) hh0]
   -- the piece
-  have hpiece : ‖iterDiff m h (polyFun (P n₀)) x‖ₑ ≤
+  have hpiece : ‖higherDiff m h (polyFun (P n₀)) x‖ₑ ≤
       Km * σ ^ m * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal) * S ^ (1 / p.toReal) := by
     have hux : (n₀ : ℝ) / 2 ^ j ≤ x := by rw [div_le_iff₀ hpos]; linarith
     have hxu : x + m * h ≤ (n₀ : ℝ) / 2 ^ j + 2 * (1 / 2 ^ j) := by
@@ -431,7 +425,7 @@ theorem enorm_iterDiff_spline_le_of_lt {r j N m : ℕ} (hm : 1 ≤ m) (hmr : m <
     field_simp
   have hσr : σ ^ (r - 1) ≤ σ ^ m := pow_le_pow_of_le_one zero_le hσ1 (by omega)
   have hterm : ∀ l ∈ Finset.Ioc n₀ (n₀ + r), ‖jumpCoeff r N P l *
-      iterDiff m h (truncPow r ((l : ℝ) / 2 ^ j)) x‖ₑ ≤
+      higherDiff m h (truncPow r ((l : ℝ) / 2 ^ j)) x‖ₑ ≤
         2 * 2 ^ m * (m : ℝ≥0∞) ^ (r - 1) * K * σ ^ m * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal) *
           S ^ (1 / p.toReal) := fun l hl => by
     obtain ⟨hl1, hl2⟩ := Finset.mem_Ioc.1 hl
@@ -440,7 +434,7 @@ theorem enorm_iterDiff_spline_le_of_lt {r j N m : ℕ} (hm : 1 ≤ m) (hmr : m <
       have : (n₀ : ℝ) + 1 ≤ l := by exact_mod_cast hl1
       linarith
     rw [enorm_mul]
-    refine (mul_le_mul' le_rfl (enorm_iterDiff_truncPow_le_of_lt r m hh0 hxl)).trans ?_
+    refine (mul_le_mul' le_rfl (enorm_higherDiff_truncPow_le_of_lt r m hh0 hxl)).trans ?_
     rcases lt_or_ge l N with hlN | hlN
     · have hc := enorm_jumpCoeff_le hP hJ hu hK hp (by omega) hlN
       have hS : localMass p j u l ^ (1 / p.toReal) + localMass p j u (l - 1) ^ (1 / p.toReal) ≤
@@ -461,7 +455,7 @@ theorem enorm_iterDiff_spline_le_of_lt {r j N m : ℕ} (hm : 1 ≤ m) (hmr : m <
         simp only [jumpCoeff, show ¬ (0 < l ∧ l < N) by omega, ↓reduceIte]
       rw [h0, enorm_zero, zero_mul]
       exact zero_le
-  rw [iterDiff_eq_add_sum_jumps hmr.le hJ hu hh0 hh hx hxm]
+  rw [higherDiff_eq_add_sum_jumps hmr.le hJ hu hh0 hh hx hxm]
   refine (enorm_add_le _ _).trans ((add_le_add hpiece ((enorm_sum_le _ _).trans
     (Finset.sum_le_sum hterm))).trans ?_)
   rw [Finset.sum_const, Nat.card_Ioc, show n₀ + r - n₀ = r by omega, nsmul_eq_mul]
@@ -470,14 +464,14 @@ theorem enorm_iterDiff_spline_le_of_lt {r j N m : ℕ} (hm : 1 ≤ m) (hmr : m <
 /-- **Differences of lower order of splines**: for `1 ≤ m < r` there is `C` such that for every
 level `j`, every spline `u` of order `r` and level `j` and `0 ≤ h ≤ 2^(-j)`,
 `‖Δ_h^m u‖_{L_p[0, 1 - mh]} ≤ C (2^j h)^m ‖u‖_p`. For `mh ≤ 2^(-j)` the pointwise bound
-(`Interval.enorm_iterDiff_spline_le_of_lt`) holds at almost every point, and the local masses
+(`Interval.enorm_higherDiff_spline_le_of_lt`) holds at almost every point, and the local masses
 of `r + 1` consecutive pieces add up to at most `(r + 1) ‖u‖_p^p`; for `mh > 2^(-j)` the trivial
 bound `2^m ‖u‖_p ≤ 2^m (m 2^j h)^m ‖u‖_p` suffices. -/
-theorem exists_eLpNorm_iterDiff_spline_le_of_lt {r m : ℕ} (hm : 1 ≤ m) (hmr : m < r)
+theorem exists_eLpNorm_higherDiff_spline_le_of_lt {r m : ℕ} (hm : 1 ≤ m) (hmr : m < r)
     (hp : p ≠ ∞) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ (j : ℕ) (Q : ℕ → ℂ[X]), (∀ n, Q n ∈ degreeLT ℂ r) →
       SplineJoins r j Q → ∀ {h : ℝ}, 0 ≤ h → h ≤ 1 / 2 ^ j →
-        eLpNorm (iterDiff m h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - m * h))) ≤
+        eLpNorm (higherDiff m h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - m * h))) ≤
           C * ENNReal.ofReal (2 ^ j * h) ^ m * eLpNorm (ppFun j Q) p unitVol := by
   obtain ⟨K, hK, hKb⟩ := enorm_polyFun_le (p := p) r hp
   obtain ⟨Km, hKm, hKmb⟩ := exists_diffBound (p := p) r m hp
@@ -505,22 +499,22 @@ theorem exists_eLpNorm_iterDiff_spline_le_of_lt {r m : ℕ} (hm : 1 ≤ m) (hmr 
       rw [← Measure.restrict_congr_set Ico_ae_eq_Icc]
       exact ae_restrict_mem measurableSet_Ico
     have hpt : ∀ᵐ x ∂volume.restrict (Icc (0 : ℝ) (1 - m * h)),
-        ‖iterDiff m h u x‖ₑ ^ p.toReal ≤ G ^ p.toReal * Mw ⌊2 ^ j * x⌋₊ := by
+        ‖higherDiff m h u x‖ₑ ^ p.toReal ≤ G ^ p.toReal * Mw ⌊2 ^ j * x⌋₊ := by
       filter_upwards [hae] with x hx
       have hxm : x + m * h < ((2 ^ j : ℕ) : ℝ) / 2 ^ j := by
         rw [Nat.cast_pow, Nat.cast_ofNat, div_self hpos.ne']
         linarith [hx.2]
       rw [← mul_rpow_one_div_rpow hp0 hp]
-      exact ENNReal.rpow_le_rpow (enorm_iterDiff_spline_le_of_lt hm hmr hQ hJ.below hu hKb hKmb
+      exact ENNReal.rpow_le_rpow (enorm_higherDiff_spline_le_of_lt hm hmr hQ hJ.below hu hKb hKmb
         hp hh0 hmh hx.1 hxm) hq.le
     have hG : G ^ p.toReal * ENNReal.ofReal (1 / 2 ^ j) = (C₁ * σ ^ m) ^ p.toReal := by
       simp only [G]
       rw [mul_rpow_one_div_rpow hp0 hp, mul_assoc, ← ENNReal.ofReal_mul (by positivity),
         show (2 : ℝ) ^ j * (1 / 2 ^ j) = 1 by field_simp, ENNReal.ofReal_one, mul_one]
     refine (eLpNorm_le_of_lintegral_le_mul hp
-      (measurable_iterDiff (measurable_ppFun j Q) m h).aestronglyMeasurable
+      (measurable_higherDiff (measurable_ppFun j Q) m h).aestronglyMeasurable
       (A := C₁ * σ ^ m) (σ := (r : ℝ≥0∞) + 1) (B := B) ?_).trans ?_
-    · calc ∫⁻ x in Icc (0 : ℝ) (1 - m * h), ‖iterDiff m h u x‖ₑ ^ p.toReal
+    · calc ∫⁻ x in Icc (0 : ℝ) (1 - m * h), ‖higherDiff m h u x‖ₑ ^ p.toReal
           ≤ ∫⁻ x in Icc (0 : ℝ) (1 - m * h), G ^ p.toReal * Mw ⌊2 ^ j * x⌋₊ :=
             lintegral_mono_ae hpt
         _ ≤ ∫⁻ x in Icc (0 : ℝ) 1, G ^ p.toReal * Mw ⌊2 ^ j * x⌋₊ :=
@@ -539,14 +533,14 @@ theorem exists_eLpNorm_iterDiff_spline_le_of_lt {r m : ℕ} (hm : 1 ≤ m) (hmr 
             gcongr
             exact le_self_add
   · -- `mh > 2^(-j)`: the trivial bound
-    have h1 := eLpNorm_iterDiff_le (measurable_ppFun j Q) (Fact.out : 1 ≤ p) m hh0 0 1
+    have h1 := eLpNorm_higherDiff_le (measurable_ppFun j Q) (Fact.out : 1 ≤ p) m hh0 0 1
     have hmσ : 1 ≤ (m : ℝ≥0∞) * σ := by
       rw [← ENNReal.ofReal_natCast, ← ENNReal.ofReal_mul (Nat.cast_nonneg _),
         ← ENNReal.ofReal_one]
       refine ENNReal.ofReal_le_ofReal ?_
       rw [div_lt_iff₀ hpos] at hmh
       nlinarith
-    calc eLpNorm (iterDiff m h u) p (volume.restrict (Icc 0 (1 - m * h)))
+    calc eLpNorm (higherDiff m h u) p (volume.restrict (Icc 0 (1 - m * h)))
         ≤ 2 ^ m * B := h1
       _ ≤ 2 ^ m * ((m : ℝ≥0∞) * σ) ^ m * B := by
           gcongr

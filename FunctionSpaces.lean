@@ -67,6 +67,7 @@ public import FunctionSpaces.Cube.PiecewiseInverse
 public import FunctionSpaces.Cube.Splines
 public import FunctionSpaces.Cube.SplineJackson
 public import FunctionSpaces.Cube.SplineInverse
+public import FunctionSpaces.TranslationAlgebra
 public import FunctionSpaces.Cube.Translation
 public import FunctionSpaces.Cube.IsoModulus
 public import FunctionSpaces.Cube.IsoInverse
@@ -77,6 +78,7 @@ public import FunctionSpaces.Rd.LittlewoodPaleyKernels
 public import FunctionSpaces.Rd.BandLimited
 public import FunctionSpaces.Rd.LittlewoodPaley
 public import FunctionSpaces.Rd.Differences
+public import FunctionSpaces.Rd.DilatedDifferences
 public import FunctionSpaces.Rd.DomainModuli
 public import FunctionSpaces.Rd.MomentKernels
 public import FunctionSpaces.Rd.BandJackson
@@ -240,8 +242,11 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Cube.SplineInverse`: the inverse inequality of order `r - 1 + 1/p` for tensor
   splines and the identification of their approximation spaces with `B^s_{p,q}([0, 1]^d)` for
   `0 < s < r - 1 + 1/p`.
-* `FunctionSpaces.Cube.Translation`: the translation algebra `ℂ[ℝ^d]` acting on functions, the
-  isotropic difference `Δ_h^r`, and its expansion into mixed coordinate differences.
+* `FunctionSpaces.TranslationAlgebra`: the translation algebra `ℂ[G]` acting on functions on an
+  additive commutative monoid `G`, differences as its powers, and the expansion of `(δ_h - 1)^r`
+  on `ℝ^d` along the coordinates.
+* `FunctionSpaces.Cube.Translation`: the isotropic difference `Δ_h^r` on `ℝ^d` and its expansion
+  into mixed coordinate differences.
 * `FunctionSpaces.Cube.IsoModulus`: the isotropic modulus of smoothness on the cube and its
   comparison with the moduli in the coordinates.
 * `FunctionSpaces.Cube.IsoInverse`: isotropic differences of functions whose slices lie in a
@@ -259,8 +264,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   scheme.
 * `FunctionSpaces.Rd.LittlewoodPaley`: the Littlewood–Paley blocks, reconstruction, and the
   characterisation of band-limited approximation spaces by Littlewood–Paley blocks.
-* `FunctionSpaces.Rd.Differences`: differences and the modulus of smoothness on a
-  finite-dimensional space, dilation of the scale, differences of convolutions and dilations.
+* `FunctionSpaces.Rd.Differences`: differences on any additive group, and the modulus of
+  smoothness on a finite-dimensional space with the dilation of the scale.
+* `FunctionSpaces.Rd.DilatedDifferences`: differences of convolutions and dilations, and the
+  modulus of a convolution.
 * `FunctionSpaces.Rd.DomainModuli`: differences and moduli of smoothness on subsets of a
   finite-dimensional space.
 * `FunctionSpaces.Rd.MomentKernels`: moment kernels built from dilations, convolution with them as

@@ -13,7 +13,7 @@ public import FunctionSpaces.Interval.SplineInverse
 
 The slices of a spline of level `j` on the cube are dyadic splines of level `j` on `[0, 1]`
 (`Cube.IsCubeSpline`), so the local inverse estimate for splines in one variable
-(`Interval.eLpNorm_iterDiff_ppFun_spline_le`), applied to every slice and integrated over the
+(`Interval.eLpNorm_higherDiff_ppFun_spline_le`), applied to every slice and integrated over the
 point, bounds the differences in each coordinate (`Cube.eLpNorm_cubeDiff_le_of_isCubeSpline`).
 Summed over the coordinates this is the **inverse inequality of order `r - 1 + 1/p`**
 (`Cube.exists_inverse_cubeSplineScheme`).
@@ -49,7 +49,7 @@ theorem splineStripConst_ne_top (r j : ℕ) {K : ℝ≥0∞} (hK : K ≠ ∞) (h
 /-- **The local inverse estimate for tensor splines**: for a spline `g` of level `j` on the cube
 and `0 ≤ h ≤ 2^(-j)`,
 `‖Δ^r_{h e_i} g‖_{L_p({x_i ≤ 1 - rh})} ≤ S_j(h) (r h (r + 1))^(1/p) ‖g‖_{L_p(Q)}`, from the
-estimate in one variable on every slice (`Interval.eLpNorm_iterDiff_ppFun_spline_le`). -/
+estimate in one variable on every slice (`Interval.eLpNorm_higherDiff_ppFun_spline_le`). -/
 theorem eLpNorm_cubeDiff_le_of_isCubeSpline {r j : ℕ} {g : (Fin d → ℝ) → ℂ}
     (hg : IsCubeSpline r j g) {K : ℝ≥0∞} (hK : K ≠ ∞) (hKb : NikolskiiBound p r K)
     (hp : p ≠ ∞) (i : Fin d) {h : ℝ} (hh0 : 0 ≤ h) (hh : h ≤ 1 / 2 ^ j) :
@@ -69,7 +69,7 @@ theorem eLpNorm_cubeDiff_le_of_isCubeSpline {r j : ℕ} {g : (Fin d → ℝ) →
   refine lintegral_mono fun x => ?_
   obtain ⟨Q, hQ, hJ, hs⟩ := hg.2 i x
   rw [← ENNReal.mul_rpow_of_nonneg _ _ hq.le, hs]
-  exact ENNReal.rpow_le_rpow (eLpNorm_iterDiff_ppFun_spline_le hQ hJ hKb hp hh0 hh) hq.le
+  exact ENNReal.rpow_le_rpow (eLpNorm_higherDiff_ppFun_spline_le hQ hJ hKb hp hh0 hh) hq.le
 
 /-- **The inverse inequality for tensor splines**, of order `θ = r - 1 + 1/p`: there is
 `C_B < ∞` with `ω_r(a, 2^(-k))_p ≤ C_B 2^(-(k-j)θ) ‖a‖_p` for every spline `a` of order `r` and

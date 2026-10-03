@@ -5,15 +5,22 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Rd.ApproxIdentity
 public import Mathlib.Algebra.Group.ForwardDiff
+public import Mathlib.MeasureTheory.Constructions.BorelSpace.Complex
+public import Mathlib.MeasureTheory.Function.LpSpace.Basic
+public import Mathlib.MeasureTheory.Group.Integral
+public import Mathlib.MeasureTheory.Measure.Haar.Unique
 
 /-!
-# Differences and the modulus of smoothness on `V`
+# Differences and the modulus of smoothness
 
 For `f : V → ℂ`, a step `h ∈ V` and `r ∈ ℕ`, the **difference** of order `r` is
-`Δ_h^r f = (Δ_h)^r f` with `Δ_h f(x) = f(x + h) - f(x)` (Mathlib's `fwdDiff`), and
-`Δ_h^r f(x) = ∑_{l ≤ r} (-1)^(r-l) C(r, l) f(x + l h)` (`Rd.iterDiff_apply`). For a Haar
+`Δ_h^r f = (Δ_h)^r f` with `Δ_h f(x) = f(x + h) - f(x)` (Mathlib's `fwdDiff`), named
+`Rd.higherDiff r h f` on every additive monoid.  The statements on `V` use the iterate
+`(fwdDiff h)^[r] f` itself, for which Mathlib has its lemmas; the files on intervals and cubes use
+the name.  Expanded, `Δ_h^r f(x) = ∑_{l ≤ r} (-1)^(r-l) C(r, l) f(x + l h)`
+(`Rd.higherDiff_apply`), and a negative step reflects the difference:
+`Δ_{-h}^r f(x) = (-1)^r Δ_h^r f(x - r h)` (`Rd.higherDiff_neg`). For a Haar
 measure `μ` the **modulus of smoothness** in `L_p(μ)` is
 `ω_r(f, t)_p = sup_{‖h‖ ≤ t} ‖Δ_h^r f‖_p` (`Rd.modulus`). It increases in `t`, is subadditive in
 `f`, is bounded by `2^r ‖f‖_p` (`Rd.modulus_le`), and depends only on the class of `f` modulo
@@ -22,10 +29,12 @@ null sets (`Rd.modulus_congr_ae`).
 **Dilating the step** (`Rd.modulus_mul_le`): `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` for
 `c, t ≥ 0`. For an integer `m ≥ 1`, `Δ_{mh} = ∑_{i<m} τ_{ih} Δ_h` with the translations
 `τ_a g = g(· + a)` (`Rd.fwdDiff_nsmul`), translations commute with differences
-(`Rd.iterDiff_comp_add`), and translations keep `L_p` norms, so
-`‖Δ_{mh}^r f‖_p ≤ m^r ‖Δ_h^r f‖_p` (`Rd.eLpNorm_iterDiff_nsmul_iterDiff_le`).
+(`Rd.higherDiff_comp_add`), and translations keep `L_p` norms, so
+`‖Δ_{mh}^r f‖_p ≤ m^r ‖Δ_h^r f‖_p` (`Rd.eLpNorm_higherDiff_nsmul_higherDiff_le`).
 
-`Rd.lpModulus` samples the modulus of `f ∈ L_p` at the dyadic scales `2^(-k)`.
+`Rd.lpModulus` samples the modulus of `f ∈ L_p` at the dyadic scales `2^(-k)`.  The file needs
+only Mathlib; differences of convolutions and dilations are in
+`FunctionSpaces.Rd.DilatedDifferences`.
 -/
 
 @[expose] public section
@@ -40,6 +49,51 @@ variable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimension
 
 /-! ### Differences and translations -/
 
+/-- The **difference of order `r`** with step `h`: `Δ_h^r f = (Δ_h)^r f`, the `r`-th iterate of
+Mathlib's forward difference `fwdDiff h`. -/
+noncomputable def higherDiff {W : Type*} [AddCommMonoid W] (r : ℕ) (h : W) (f : W → ℂ) : W → ℂ :=
+  (fwdDiff h)^[r] f
+
+/-- The difference of order `r` is the `r`-th iterate of `fwdDiff h`. -/
+theorem higherDiff_def {W : Type*} [AddCommMonoid W] (r : ℕ) (h : W) (f : W → ℂ) :
+    higherDiff r h f = (fwdDiff h)^[r] f :=
+  rfl
+
+/-- Differences of measurable functions are measurable. -/
+theorem measurable_higherDiff {W : Type*} [AddCommMonoid W] [MeasurableSpace W]
+    [MeasurableAdd W] {f : W → ℂ} (hf : Measurable f) (r : ℕ) (h : W) :
+    Measurable (higherDiff r h f) := by
+  induction r with
+  | zero => exact hf
+  | succ r ih =>
+    rw [higherDiff_def, Function.iterate_succ_apply']
+    exact (ih.comp (measurable_add_const h)).sub ih
+
+/-- `(-1)^r (-1)^(r-m) = (-1)^m` for `m ≤ r`. -/
+theorem neg_one_pow_mul_neg_one_pow_sub {r m : ℕ} (hm : m ≤ r) :
+    (-1 : ℂ) ^ r * (-1) ^ (r - m) = (-1) ^ m := by
+  obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le hm
+  rw [Nat.add_sub_cancel_left, pow_add, mul_assoc, ← pow_add, ← two_mul, pow_mul, neg_one_sq,
+    one_pow, mul_one]
+
+/-- **Negative steps**: `Δ_{-h}^r f(x) = (-1)^r Δ_h^r f(x - r h)`, by reflecting the sum
+`∑_{l ≤ r} (-1)^(r-l) C(r, l) f(x + l h)` at `l ↦ r - l`. -/
+theorem higherDiff_neg {W : Type*} [AddCommGroup W] (r : ℕ) (h : W) (f : W → ℂ) (x : W) :
+    (fwdDiff (-h))^[r] f x = (-1 : ℂ) ^ r * (fwdDiff h)^[r] f (x - r • h) := by
+  rw [fwdDiff_iter_eq_sum_shift, fwdDiff_iter_eq_sum_shift, Finset.mul_sum,
+    ← Finset.sum_range_reflect]
+  refine Finset.sum_congr rfl fun k hk => ?_
+  have hk' : k ≤ r := Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)
+  have hx : x + (r - k) • -h = x - r • h + k • h := by
+    obtain ⟨j, rfl⟩ := Nat.exists_eq_add_of_le hk'
+    rw [Nat.add_sub_cancel_left, smul_neg, add_nsmul]
+    abel
+  rw [show r + 1 - 1 - k = r - k by omega, Nat.choose_symm hk', show r - (r - k) = k by omega, hx]
+  simp only [zsmul_eq_mul]
+  push_cast
+  rw [← neg_one_pow_mul_neg_one_pow_sub hk']
+  ring
+
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- `Δ_h f = f(· + h) - f`. -/
 theorem fwdDiff_eq_sub (h : V) (f : V → ℂ) : fwdDiff h f = (fun x => f (x + h)) - f :=
@@ -48,7 +102,7 @@ theorem fwdDiff_eq_sub (h : V) (f : V → ℂ) : fwdDiff h f = (fun x => f (x + 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- `Δ_h^r f(x) = ∑_{l ≤ r} (-1)^(r-l) C(r, l) f(x + l h)` (Mathlib's
 `fwdDiff_iter_eq_sum_shift`). -/
-theorem iterDiff_apply (r : ℕ) (h : V) (f : V → ℂ) (x : V) :
+theorem higherDiff_apply (r : ℕ) (h : V) (f : V → ℂ) (x : V) :
     (fwdDiff h)^[r] f x = ∑ l ∈ Finset.range (r + 1),
       ((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) * f (x + (l : ℝ) • h) := by
   rw [fwdDiff_iter_eq_sum_shift]
@@ -59,7 +113,7 @@ theorem iterDiff_apply (r : ℕ) (h : V) (f : V → ℂ) (x : V) :
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Differences commute with translations**: `Δ_h^r (f(· + c)) = (Δ_h^r f)(· + c)`. -/
-theorem iterDiff_comp_add (r : ℕ) (h c : V) (f : V → ℂ) :
+theorem higherDiff_comp_add (r : ℕ) (h c : V) (f : V → ℂ) :
     (fwdDiff h)^[r] (fun x => f (x + c)) = fun x => (fwdDiff h)^[r] f (x + c) :=
   funext fun x => fwdDiff_iter_comp_add h f c r x
 
@@ -97,7 +151,7 @@ theorem ae_comp_add_right {f g : V → ℂ} (hfg : f =ᵐ[μ] g) (c : V) :
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- Differences of a.e. strongly measurable functions are a.e. strongly measurable. -/
-theorem aestronglyMeasurable_iterDiff {f : V → ℂ} (hf : AEStronglyMeasurable f μ) (r : ℕ)
+theorem aestronglyMeasurable_higherDiff {f : V → ℂ} (hf : AEStronglyMeasurable f μ) (r : ℕ)
     (h : V) : AEStronglyMeasurable ((fwdDiff h)^[r] f) μ := by
   induction r with
   | zero => exact hf
@@ -107,7 +161,7 @@ theorem aestronglyMeasurable_iterDiff {f : V → ℂ} (hf : AEStronglyMeasurable
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- Differences of functions that agree almost everywhere agree almost everywhere. -/
-theorem iterDiff_congr_ae {f g : V → ℂ} (hfg : f =ᵐ[μ] g) (r : ℕ) (h : V) :
+theorem higherDiff_congr_ae {f g : V → ℂ} (hfg : f =ᵐ[μ] g) (r : ℕ) (h : V) :
     (fwdDiff h)^[r] f =ᵐ[μ] (fwdDiff h)^[r] g := by
   induction r with
   | zero => exact hfg
@@ -118,7 +172,7 @@ theorem iterDiff_congr_ae {f g : V → ℂ} (hfg : f =ᵐ[μ] g) (r : ℕ) (h : 
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- **`‖Δ_h^r f‖_p ≤ 2^r ‖f‖_p`**, from `‖Δ_h g‖_p ≤ ‖g(· + h)‖_p + ‖g‖_p = 2 ‖g‖_p`. -/
-theorem eLpNorm_iterDiff_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞}
+theorem eLpNorm_higherDiff_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞}
     (hp : 1 ≤ p) (r : ℕ) (h : V) :
     eLpNorm ((fwdDiff h)^[r] f) p μ ≤ 2 ^ r * eLpNorm f p μ := by
   induction r with
@@ -129,14 +183,14 @@ theorem eLpNorm_iterDiff_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p 
         ≤ eLpNorm (fun x => (fwdDiff h)^[r] f (x + h)) p μ + eLpNorm ((fwdDiff h)^[r] f) p μ :=
           eLpNorm_sub_le hp
       _ = 2 * eLpNorm ((fwdDiff h)^[r] f) p μ := by
-          rw [eLpNorm_comp_add_right (aestronglyMeasurable_iterDiff hf r h), two_mul]
+          rw [eLpNorm_comp_add_right (aestronglyMeasurable_higherDiff hf r h), two_mul]
       _ ≤ 2 * (2 ^ r * eLpNorm f p μ) := by gcongr
       _ = 2 ^ (r + 1) * eLpNorm f p μ := by rw [pow_succ]; ring
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- **Multiples of the step**: `‖Δ_{mh}^a Δ_h^b f‖_p ≤ m^a ‖Δ_h^(a+b) f‖_p`, by induction on
 `a`, with `Δ_{mh} = ∑_{i<m} τ_{ih} Δ_h`. -/
-theorem eLpNorm_iterDiff_nsmul_iterDiff_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ)
+theorem eLpNorm_higherDiff_nsmul_higherDiff_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ)
     {p : ℝ≥0∞} (hp : 1 ≤ p) (m : ℕ) (h : V) (a : ℕ) :
     ∀ b, eLpNorm ((fwdDiff (m • h))^[a] ((fwdDiff h)^[b] f)) p μ ≤
       (m : ℝ≥0∞) ^ a * eLpNorm ((fwdDiff h)^[a + b] f) p μ := by
@@ -149,9 +203,9 @@ theorem eLpNorm_iterDiff_nsmul_iterDiff_le {f : V → ℂ} (hf : AEStronglyMeasu
           fun x => (fwdDiff (m • h))^[a] ((fwdDiff h)^[b + 1] f) (x + i • h) := by
       rw [Function.iterate_succ_apply, fwdDiff_nsmul, fwdDiff_iter_finsetSum]
       refine Finset.sum_congr rfl fun i _ => ?_
-      rw [iterDiff_comp_add, ← Function.iterate_succ_apply' (fwdDiff h) b f]
+      rw [higherDiff_comp_add, ← Function.iterate_succ_apply' (fwdDiff h) b f]
     have hmeas : AEStronglyMeasurable ((fwdDiff (m • h))^[a] ((fwdDiff h)^[b + 1] f)) μ :=
-      aestronglyMeasurable_iterDiff (aestronglyMeasurable_iterDiff hf (b + 1) h) a (m • h)
+      aestronglyMeasurable_higherDiff (aestronglyMeasurable_higherDiff hf (b + 1) h) a (m • h)
     rw [hsplit]
     calc eLpNorm (∑ i ∈ Finset.range m,
           fun x => (fwdDiff (m • h))^[a] ((fwdDiff h)^[b + 1] f) (x + i • h)) p μ
@@ -171,53 +225,13 @@ theorem eLpNorm_iterDiff_nsmul_iterDiff_le {f : V → ℂ} (hf : AEStronglyMeasu
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- Differences of integrable functions are integrable. -/
-theorem integrable_iterDiff {K : V → ℂ} (hK : Integrable K μ) (r : ℕ) (h : V) :
+theorem integrable_higherDiff {K : V → ℂ} (hK : Integrable K μ) (r : ℕ) (h : V) :
     Integrable ((fwdDiff h)^[r] K) μ := by
   induction r with
   | zero => exact hK
   | succ r ih =>
     rw [Function.iterate_succ_apply', fwdDiff_eq_sub]
     exact (ih.comp_add_right h).sub ih
-
-omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
-/-- **Translates of convolutions**: `(K ⋆ f)(x + c) = (K(· + c) ⋆ f)(x)`, by the substitution
-`y ↦ y + c`. -/
-theorem conv_comp_add (K f : V → ℂ) (c x : V) :
-    conv K f μ (x + c) = conv (fun y => K (y + c)) f μ x := by
-  rw [conv_apply, conv_apply, ← integral_add_right_eq_self (fun y => K y * f (x + c - y)) c]
-  congr 1
-  funext y
-  rw [show x + c - (y + c) = x - y by abel]
-
-/-- **Differences of convolutions**: `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost everywhere, for an
-integrable `K` and `f ∈ L_p`, `1 ≤ p < ∞`. -/
-theorem iterDiff_conv_ae {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K f : V → ℂ}
-    (hK : Integrable K μ) (hf : MemLp f p μ) (r : ℕ) (h : V) :
-    (fwdDiff h)^[r] (conv K f μ) =ᵐ[μ] conv ((fwdDiff h)^[r] K) f μ := by
-  induction r with
-  | zero => exact Filter.EventuallyEq.rfl
-  | succ r ih =>
-    rw [Function.iterate_succ_apply', Function.iterate_succ_apply', fwdDiff_eq_sub,
-      fwdDiff_eq_sub]
-    have hKr : Integrable ((fwdDiff h)^[r] K) μ := integrable_iterDiff hK r h
-    have h1 : (fun x => (fwdDiff h)^[r] (conv K f μ) (x + h)) =ᵐ[μ]
-        conv (fun y => (fwdDiff h)^[r] K (y + h)) f μ := by
-      refine (ae_comp_add_right ih h).trans (Filter.EventuallyEq.of_eq ?_)
-      funext x
-      exact conv_comp_add _ _ h x
-    exact (h1.sub ih).trans (sub_conv_ae hp1 hp (hKr.comp_add_right h) hKr hf).symm
-
-omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
-/-- **Differences of dilations**: `Δ_h^r (Φ_c) = (Δ_{ch}^r Φ)_c`. -/
-theorem iterDiff_dilate (r : ℕ) (c : ℝ) (h : V) (Φ : V → ℂ) :
-    (fwdDiff h)^[r] (dilate c Φ) = dilate c ((fwdDiff (c • h))^[r] Φ) := by
-  induction r with
-  | zero => rfl
-  | succ r ih =>
-    rw [Function.iterate_succ_apply', Function.iterate_succ_apply', ih]
-    funext x
-    simp only [fwdDiff, dilate, smul_add]
-    ring
 
 /-! ### The modulus of smoothness -/
 
@@ -228,7 +242,7 @@ noncomputable def modulus (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) (t : ℝ) :
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] [μ.IsAddHaarMeasure] in
 /-- `‖Δ_h^r f‖_p ≤ ω_r(f, t)_p` for `‖h‖ ≤ t`. -/
-theorem eLpNorm_iterDiff_le_modulus {r : ℕ} {p : ℝ≥0∞} {f : V → ℂ} {t : ℝ}
+theorem eLpNorm_higherDiff_le_modulus {r : ℕ} {p : ℝ≥0∞} {f : V → ℂ} {t : ℝ}
     {h : V} (hh : ‖h‖ ≤ t) : eLpNorm ((fwdDiff h)^[r] f) p μ ≤ modulus μ r p f t :=
   le_iSup₂ (f := fun (h : V) (_ : ‖h‖ ≤ t) => eLpNorm ((fwdDiff h)^[r] f) p μ) h hh
 
@@ -236,7 +250,7 @@ omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] [μ.IsAddHaarM
 /-- The modulus increases in `t`. -/
 theorem modulus_mono (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ) :
     Monotone (modulus μ r p f) :=
-  fun _ _ hst => iSup₂_le fun _ hh => eLpNorm_iterDiff_le_modulus (hh.trans hst)
+  fun _ _ hst => iSup₂_le fun _ hh => eLpNorm_higherDiff_le_modulus (hh.trans hst)
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] [μ.IsAddHaarMeasure] in
 /-- The modulus is subadditive. -/
@@ -245,13 +259,13 @@ theorem modulus_add_le {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) (f g : V → �
   refine iSup₂_le fun h hh => ?_
   rw [fwdDiff_iter_add]
   exact (eLpNorm_add_le hp).trans
-    (add_le_add (eLpNorm_iterDiff_le_modulus hh) (eLpNorm_iterDiff_le_modulus hh))
+    (add_le_add (eLpNorm_higherDiff_le_modulus hh) (eLpNorm_higherDiff_le_modulus hh))
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- `ω_r(f, t)_p ≤ 2^r ‖f‖_p`. -/
 theorem modulus_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞} (hp : 1 ≤ p)
     (r : ℕ) (t : ℝ) : modulus μ r p f t ≤ 2 ^ r * eLpNorm f p μ :=
-  iSup₂_le fun h _ => eLpNorm_iterDiff_le hf hp r h
+  iSup₂_le fun h _ => eLpNorm_higherDiff_le hf hp r h
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- **The modulus depends only on the class modulo null sets.** -/
@@ -262,7 +276,7 @@ theorem modulus_congr_ae {f g : V → ℂ} (hfg : f =ᵐ[μ] g) (r : ℕ) (p : �
   funext h
   congr 1
   funext _
-  exact eLpNorm_congr_ae (iterDiff_congr_ae hfg r h)
+  exact eLpNorm_congr_ae (higherDiff_congr_ae hfg r h)
 
 omit [FiniteDimensional ℝ V] in
 /-- **Integer multiples of the scale**: `ω_r(f, m t)_p ≤ m^r ω_r(f, t)_p` for `m ≥ 1`. -/
@@ -276,9 +290,9 @@ theorem modulus_nat_mul_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p :
     · rw [norm_smul, Real.norm_of_nonneg (inv_nonneg.2 hm0.le), inv_mul_le_iff₀ hm0]
       exact hh
     · rw [← Nat.cast_smul_eq_nsmul ℝ, smul_inv_smul₀ hm0.ne']
-  have h1 := eLpNorm_iterDiff_nsmul_iterDiff_le hf hp m h' r 0
+  have h1 := eLpNorm_higherDiff_nsmul_higherDiff_le hf hp m h' r 0
   simp only [Function.iterate_zero, id_eq, add_zero] at h1
-  exact h1.trans (by gcongr; exact eLpNorm_iterDiff_le_modulus hh')
+  exact h1.trans (by gcongr; exact eLpNorm_higherDiff_le_modulus hh')
 
 omit [FiniteDimensional ℝ V] in
 /-- **Dilating the scale**: `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` for `c, t ≥ 0`, with the
@@ -326,16 +340,5 @@ omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- The modulus of `0` vanishes. -/
 theorem lpModulus_zero (r k : ℕ) : lpModulus p r (0 : Lp ℂ p μ) k = 0 :=
   le_antisymm ((lpModulus_le r 0 k).trans (by simp)) bot_le
-
-/-- **The modulus of a convolution**: if `‖Δ_v^r K‖_1 ≤ B` for `‖v‖ ≤ 2^(-k)`, then
-`ω_r(K ⋆ h, 2^(-k))_p ≤ B ‖h‖_p`, since `Δ_v^r (K ⋆ h) = (Δ_v^r K) ⋆ h` (Young's inequality). -/
-theorem lpModulus_convLp_le (hp : p ≠ ∞) {K : V → ℂ} (hK : Integrable K μ) (r k : ℕ)
-    {B : ℝ≥0∞} (hB : ∀ v : V, ‖v‖ ≤ 1 / 2 ^ k → eLpNorm ((fwdDiff v)^[r] K) 1 μ ≤ B)
-    (h : Lp ℂ p μ) : lpModulus p r (convLp hp hK h) k ≤ B * ‖h‖ₑ := by
-  rw [lpModulus, modulus_congr_ae (convLp_apply_ae hp hK h)]
-  refine iSup₂_le fun v hv => ?_
-  rw [eLpNorm_congr_ae (iterDiff_conv_ae Fact.out hp hK (Lp.memLp h) r v), Lp.enorm_def]
-  exact (eLpNorm_conv_le Fact.out hp (integrable_iterDiff hK r v).aestronglyMeasurable
-    (Lp.aestronglyMeasurable h)).trans (by gcongr; exact hB v hv)
 
 end Rd

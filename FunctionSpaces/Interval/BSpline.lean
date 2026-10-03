@@ -102,7 +102,7 @@ theorem bsplinePiece_top {r : ℕ} (hr : 1 ≤ r) : bsplinePiece r r = 0 := by
           (-1 : ℂ) ^ (r - k) * (r.choose k : ℂ) * (z - k) ^ (r - 1) := by
         rw [mul_sum]
         refine sum_congr rfl fun l hl => ?_
-        rw [bsplineCoeff, neg_one_pow_eq_of_le (Nat.lt_succ_iff.1 (mem_range.1 hl))]
+        rw [bsplineCoeff, ← Rd.neg_one_pow_mul_neg_one_pow_sub (Nat.lt_succ_iff.1 (mem_range.1 hl))]
         ring
     _ = 0 := by rw [hsum, mul_zero]
 

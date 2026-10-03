@@ -19,16 +19,17 @@ For `0 ≤ h ≤ 2^(-k)` the difference `Δ_h^r a(x)` vanishes when `x, …, x +
 interval. Otherwise, on `[x, x + rh]` the spline is `Q(y) + ∑_m c_m (y - ξ_m)_+^(r-1)`, with `Q` the
 piece at `x` and `ξ_m` the knots in reach (`Interval.polyFun_eq_add_sum_jumps`). The polynomial
 part has `Δ_h^r Q = 0`, and `|Δ_h^r (· - ξ)_+^(r-1)(x)| ≤ 2^r (rh)^(r-1)` for `x < ξ`
-(`Interval.enorm_iterDiff_truncPow_le`). The jump `c_m L^(r-1) = Q_m(ξ_m + L) - Q_{m-1}(ξ_m + L)`,
+(`Interval.enorm_higherDiff_truncPow_le`). The jump `c_m L^(r-1) = Q_m(ξ_m + L) - Q_{m-1}(ξ_m + L)`,
 `L = 2^(-j)`, is bounded by Nikolskii's inequality on the two neighbouring pieces, which reaches
 the doubled interval (`Interval.NikolskiiBound`, `Interval.enorm_jumpCoeff_le`). The strip
 integral of the piecewise polynomials turns this pointwise bound into the `L_p` bound
-(`Interval.eLpNorm_iterDiff_le_of_pointwise`).
+(`Interval.eLpNorm_higherDiff_le_of_pointwise`).
 -/
 
 @[expose] public section
 
 open MeasureTheory Set Polynomial
+open Rd (higherDiff)
 open scoped ENNReal
 open ENNReal (dyadicWeight)
 
@@ -42,9 +43,9 @@ noncomputable def truncPow (r : ℕ) (ξ : ℝ) (y : ℝ) : ℂ :=
 
 /-- **Differences of a truncated power left of its knot**: for `x < ξ` and `h ≥ 0`,
 `|Δ_h^r (· - ξ)_+^(r-1)(x)| ≤ 2^r (rh)^(r-1)`, since `0 ≤ (x + ih - ξ)_+ ≤ rh`. -/
-theorem enorm_iterDiff_truncPow_le (r : ℕ) {ξ h x : ℝ} (hh : 0 ≤ h) (hx : x < ξ) :
-    ‖iterDiff r h (truncPow r ξ) x‖ₑ ≤ 2 ^ r * ENNReal.ofReal (r * h) ^ (r - 1) := by
-  refine enorm_iterDiff_le_of_forall fun i hi => ?_
+theorem enorm_higherDiff_truncPow_le (r : ℕ) {ξ h x : ℝ} (hh : 0 ≤ h) (hx : x < ξ) :
+    ‖higherDiff r h (truncPow r ξ) x‖ₑ ≤ 2 ^ r * ENNReal.ofReal (r * h) ^ (r - 1) := by
+  refine enorm_higherDiff_le_of_forall fun i hi => ?_
   have hi' : (i : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)
   unfold truncPow
   split_ifs with hξ
@@ -130,12 +131,12 @@ theorem polyFun_eq_add_sum_jumps {r j N : ℕ} {P : ℕ → ℂ[X]} (hJ : Spline
 /-- **Differences of a spline are differences of its jumps**: on `[x, x + rh]` with
 `x + rh < N 2^(-j)` and `h ≤ 2^(-j)`,
 `Δ_h^r u(x) = ∑_{n₀ < m ≤ n₀ + r} c_m Δ_h^r (· - ξ_m)_+^(r-1)(x)`. -/
-theorem iterDiff_eq_sum_jumps {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ m, P m ∈ degreeLT ℂ r)
+theorem higherDiff_eq_sum_jumps {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ m, P m ∈ degreeLT ℂ r)
     (hJ : SplineJoinsBelow r j N P) {u : ℝ → ℂ}
     (hu : ∀ m < N, ∀ x ∈ dyadicIco j m, u x = polyFun (P m) x) {h x : ℝ} (hh0 : 0 ≤ h)
     (hh : h ≤ 1 / 2 ^ j) (hx : 0 ≤ x) (hxr : x + r * h < N / 2 ^ j) :
-    iterDiff r h u x = ∑ m ∈ Finset.Ioc ⌊2 ^ j * x⌋₊ (⌊2 ^ j * x⌋₊ + r),
-      jumpCoeff r N P m * iterDiff r h (truncPow r ((m : ℝ) / 2 ^ j)) x := by
+    higherDiff r h u x = ∑ m ∈ Finset.Ioc ⌊2 ^ j * x⌋₊ (⌊2 ^ j * x⌋₊ + r),
+      jumpCoeff r N P m * higherDiff r h (truncPow r ((m : ℝ) / 2 ^ j)) x := by
   have hkh : (2 : ℝ) ^ j * h ≤ 1 := by
     rw [le_div_iff₀ (by positivity)] at hh
     linarith
@@ -146,15 +147,15 @@ theorem iterDiff_eq_sum_jumps {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ m, P 
     have hih : (i : ℝ) * h ≤ r * h := mul_le_mul_of_nonneg_right (by exact_mod_cast hi') hh0
     exact polyFun_eq_add_sum_jumps hJ hu hx (le_add_of_nonneg_right (mul_nonneg
       (Nat.cast_nonneg i) hh0)) (by linarith) (floor_add_mul_le hx hh0 hkh hi')
-  rw [iterDiff_apply, Finset.sum_congr rfl fun i hi => by rw [hdec i hi] ]
+  rw [higherDiff_apply, Finset.sum_congr rfl fun i hi => by rw [hdec i hi] ]
   simp only [mul_add, Finset.sum_add_distrib, Finset.mul_sum]
   have hpoly : ∑ i ∈ Finset.range (r + 1), ((-1 : ℂ) ^ (r - i) * (r.choose i : ℂ)) *
       polyFun (P ⌊2 ^ j * x⌋₊) (x + i * h) = 0 := by
-    rw [← iterDiff_apply]
-    exact congrFun (iterDiff_polynomial (hP _) h) x
+    rw [← higherDiff_apply]
+    exact congrFun (higherDiff_polynomial (hP _) h) x
   rw [hpoly, zero_add, Finset.sum_comm]
   refine Finset.sum_congr rfl fun m _ => ?_
-  rw [iterDiff_apply, Finset.mul_sum]
+  rw [higherDiff_apply, Finset.mul_sum]
   exact Finset.sum_congr rfl fun i _ => by ring
 
 /-! ### The local estimate -/
@@ -213,12 +214,12 @@ noncomputable def splineStripConst (r j : ℕ) (K : ℝ≥0∞) (h : ℝ) (p : �
 
 /-- **Pointwise bound for differences of splines**: on the strips left of the knots,
 `|Δ_h^r u(x)| ≤ G (∑_{l ≤ r} m_{n₀+l})^(1/p)` for `x + rh < N 2^(-j)`. -/
-theorem enorm_iterDiff_spline_le {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ m, P m ∈ degreeLT ℂ r)
+theorem enorm_higherDiff_spline_le {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ m, P m ∈ degreeLT ℂ r)
     (hJ : SplineJoinsBelow r j N P) {u : ℝ → ℂ}
     (hu : ∀ m < N, ∀ x ∈ dyadicIco j m, u x = polyFun (P m) x) {K : ℝ≥0∞}
     (hK : NikolskiiBound p r K) (hp : p ≠ ∞) {h x : ℝ} (hh0 : 0 ≤ h) (hh : h ≤ 1 / 2 ^ j)
     (hx : 0 ≤ x) (hxr : x + r * h < N / 2 ^ j) :
-    ‖iterDiff r h u x‖ₑ ≤ splineStripConst r j K h p *
+    ‖higherDiff r h u x‖ₑ ≤ splineStripConst r j K h p *
       (∑ l ∈ Finset.range (r + 1), localMass p j u (⌊2 ^ j * x⌋₊ + l)) ^ (1 / p.toReal) := by
   have hpos : (0 : ℝ) < 2 ^ j := by positivity
   set n₀ := ⌊2 ^ j * x⌋₊
@@ -234,7 +235,7 @@ theorem enorm_iterDiff_spline_le {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ m,
     field_simp
   -- each jump contributes at most `2 · 2^r K (r 2^j h)^(r-1) 2^(j/p) S^(1/p)`
   have hterm : ∀ m ∈ Finset.Ioc n₀ (n₀ + r), ‖jumpCoeff r N P m *
-      iterDiff r h (truncPow r ((m : ℝ) / 2 ^ j)) x‖ₑ ≤
+      higherDiff r h (truncPow r ((m : ℝ) / 2 ^ j)) x‖ₑ ≤
         2 * 2 ^ r * K * ENNReal.ofReal (r * (2 ^ j * h)) ^ (r - 1) *
           ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal) * S ^ (1 / p.toReal) := fun m hm => by
     obtain ⟨hm1, hm2⟩ := Finset.mem_Ioc.1 hm
@@ -243,7 +244,7 @@ theorem enorm_iterDiff_spline_le {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ m,
       have : (n₀ : ℝ) + 1 ≤ m := by exact_mod_cast hm1
       linarith [Nat.lt_floor_add_one (2 ^ j * x)]
     rw [enorm_mul]
-    refine (mul_le_mul_right (enorm_iterDiff_truncPow_le r hh0 hxm) _).trans ?_
+    refine (mul_le_mul_right (enorm_higherDiff_truncPow_le r hh0 hxm) _).trans ?_
     rcases lt_or_ge m N with hmN | hmN
     · have hc := enorm_jumpCoeff_le hP hJ hu hK hp (by omega) hmN
       have hS : localMass p j u m ^ (1 / p.toReal) + localMass p j u (m - 1) ^ (1 / p.toReal) ≤
@@ -264,7 +265,7 @@ theorem enorm_iterDiff_spline_le {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ m,
         simp only [jumpCoeff, show ¬ (0 < m ∧ m < N) by omega, ↓reduceIte]
       rw [h0, enorm_zero, zero_mul]
       exact zero_le
-  rw [iterDiff_eq_sum_jumps hP hJ hu hh0 hh hx hxr]
+  rw [higherDiff_eq_sum_jumps hP hJ hu hh0 hh hx hxr]
   refine (enorm_sum_le _ _).trans ((Finset.sum_le_sum hterm).trans ?_)
   rw [Finset.sum_const, Nat.card_Ioc, show n₀ + r - n₀ = r by omega, nsmul_eq_mul,
     splineStripConst]
@@ -276,7 +277,7 @@ theorem enorm_iterDiff_spline_le {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ m,
 piecewise polynomial on `[0, ∞)`, and `0 ≤ h ≤ 2^(-j)`. On a measurable `S ⊆ [0, 1]` with
 `x + rh < N 2^(-j)` for almost every `x ∈ S`, and if the local masses of `r + 1` consecutive
 pieces add up to at most `(r + 1) B^p`, then `‖Δ_h^r u‖_{L_p(S)} ≤ G (rh (r + 1))^(1/p) B`. -/
-theorem eLpNorm_iterDiff_spline_le {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ m, P m ∈ degreeLT ℂ r)
+theorem eLpNorm_higherDiff_spline_le {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ m, P m ∈ degreeLT ℂ r)
     (hJ : SplineJoinsBelow r j N P) {u : ℝ → ℂ}
     (hu : ∀ m < N, ∀ x ∈ dyadicIco j m, u x = polyFun (P m) x) (hpp : IsPiecewisePoly r j u)
     (hum : Measurable u) {K : ℝ≥0∞} (hK : NikolskiiBound p r K) (hp : p ≠ ∞) {h : ℝ}
@@ -284,11 +285,11 @@ theorem eLpNorm_iterDiff_spline_le {r j N : ℕ} {P : ℕ → ℂ[X]} (hP : ∀ 
     (hSN : ∀ᵐ x ∂volume.restrict S, x + r * h < N / 2 ^ j) {B : ℝ≥0∞}
     (hB : ∑ n ∈ Finset.range (2 ^ j), ∑ l ∈ Finset.range (r + 1), localMass p j u (n + l) ≤
       (r + 1) * B ^ p.toReal) :
-    eLpNorm (iterDiff r h u) p (volume.restrict S) ≤
+    eLpNorm (higherDiff r h u) p (volume.restrict S) ≤
       splineStripConst r j K h p * (ENNReal.ofReal (r * h) * (r + 1)) ^ (1 / p.toReal) * B := by
-  refine eLpNorm_iterDiff_le_of_pointwise hp hpp hum hSm hS hh0 ?_ hB
+  refine eLpNorm_higherDiff_le_of_pointwise hp hpp hum hSm hS hh0 ?_ hB
   filter_upwards [hSN, ae_restrict_mem hSm] with x hxN hxS _
-  exact enorm_iterDiff_spline_le hP hJ hu hK hp hh0 hh (hS hxS).1 hxN
+  exact enorm_higherDiff_spline_le hP hJ hu hK hp hh0 hh (hS hxS).1 hxN
 
 /-- The constant of the inverse inequality for splines,
 `2 r 2^r K r^(r-1) (r (r + 1))^(1/p)`. -/
@@ -352,10 +353,10 @@ theorem le_two_pow_mul_one_add (r : ℕ) (c : ℝ≥0∞) : c ≤ 2 ^ r * (1 + c
 level `j` and `0 ≤ h ≤ 2^(-j)`,
 `‖Δ_h^r (ppFun j Q)‖_{L_p[0, 1 - rh]} ≤ S_j(h) (r h (r + 1))^(1/p) ‖ppFun j Q‖_{L_p[0,1]}` with the
 strip constant `S_j(h)` of `Interval.splineStripConst`. -/
-theorem eLpNorm_iterDiff_ppFun_spline_le {r j : ℕ} {Q : ℕ → ℂ[X]}
+theorem eLpNorm_higherDiff_ppFun_spline_le {r j : ℕ} {Q : ℕ → ℂ[X]}
     (hQ : ∀ n, Q n ∈ degreeLT ℂ r) (hJ : SplineJoins r j Q) {K : ℝ≥0∞}
     (hKb : NikolskiiBound p r K) (hp : p ≠ ∞) {h : ℝ} (hh0 : 0 ≤ h) (hhj : h ≤ 1 / 2 ^ j) :
-    eLpNorm (iterDiff r h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - r * h))) ≤
+    eLpNorm (higherDiff r h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - r * h))) ≤
       splineStripConst r j K h p * (ENNReal.ofReal (r * h) * (r + 1)) ^ (1 / p.toReal) *
         eLpNorm (ppFun j Q) p unitVol := by
   have hrh : (0 : ℝ) ≤ r * h := mul_nonneg (Nat.cast_nonneg r) hh0
@@ -364,7 +365,7 @@ theorem eLpNorm_iterDiff_ppFun_spline_le {r j : ℕ} {Q : ℕ → ℂ[X]}
     filter_upwards [ae_restrict_mem measurableSet_Ico] with x hx
     rw [show ((2 ^ j : ℕ) : ℝ) / 2 ^ j = 1 by push_cast; field_simp]
     linarith [hx.2]
-  exact eLpNorm_iterDiff_spline_le hQ hJ.below (fun m hm x hx => ppFun_eq_of_mem Q hm hx)
+  exact eLpNorm_higherDiff_spline_le hQ hJ.below (fun m hm x hx => ppFun_eq_of_mem Q hm hx)
     (isPiecewisePoly_ppFun hQ j) (measurable_ppFun j Q) hKb hp hh0 hhj measurableSet_Icc
     (Icc_subset_Icc le_rfl (by linarith)) hSN (sum_sum_localMass_le hp j r Q)
 
@@ -390,10 +391,10 @@ theorem exists_inverse_splineScheme {r : ℕ} (hp : p ≠ ∞) :
     refine iSup₂_le fun h hh => ?_
     have hhj : h ≤ 1 / 2 ^ j := hh.2.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ (by norm_num) hjk))
-    calc eLpNorm (iterDiff r h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - r * h)))
+    calc eLpNorm (higherDiff r h (ppFun j Q)) p (volume.restrict (Icc 0 (1 - r * h)))
         ≤ splineStripConst r j K h p * (ENNReal.ofReal (r * h) * (r + 1)) ^
             (1 / p.toReal) * eLpNorm (ppFun j Q) p unitVol :=
-          eLpNorm_iterDiff_ppFun_spline_le hQ hJ hKb hp hh.1 hhj
+          eLpNorm_higherDiff_ppFun_spline_le hQ hJ hKb hp hh.1 hhj
       _ ≤ splineInverseConst r K p * dyadicWeight (-(((r - 1 : ℕ) : ℝ) + 1 / p.toReal)) (k - j) *
             eLpNorm (ppFun j Q) p unitVol := splineStripConst_mul_le hjk K hh.2 _
       _ ≤ 2 ^ r * (1 + splineInverseConst r K p) *

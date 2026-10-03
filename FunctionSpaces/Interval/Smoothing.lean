@@ -40,6 +40,7 @@ These are the local estimates behind Jackson's and Whitney's inequalities.
 @[expose] public section
 
 open MeasureTheory Set Polynomial
+open Rd (higherDiff)
 open scoped ENNReal
 
 namespace Interval
@@ -271,10 +272,10 @@ noncomputable def smooth (r : ℕ) (δ : ℝ) (f : ℝ → ℂ) (x : ℝ) : ℂ 
 `f - S_δ f = (-1)^r avg^r_{h} Δ_h^r f` at step `0`. -/
 theorem sub_smooth_eq {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ} (hδ : δ ≠ 0) (x : ℝ) :
     f x - smooth r δ f x =
-      (-1 : ℂ) ^ r * avgStepIter r δ (fun h y => iterDiff r h f y) 0 x := by
-  have hrepr : (fun h y => iterDiff r h f y) = fun h y => ∑ k ∈ Finset.range (r + 1),
+      (-1 : ℂ) ^ r * avgStepIter r δ (fun h y => higherDiff r h f y) 0 x := by
+  have hrepr : (fun h y => higherDiff r h f y) = fun h y => ∑ k ∈ Finset.range (r + 1),
       ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (y + k * h) :=
-    funext fun h => funext fun y => iterDiff_apply r h f y
+    funext fun h => funext fun y => higherDiff_apply r h f y
   have hcont : ∀ k ∈ Finset.range (r + 1),
       Continuous (Function.uncurry fun (h y : ℝ) => f (y + k * h)) := fun k _ =>
     hf.comp (by fun_prop)
@@ -326,7 +327,7 @@ theorem contDiff_smooth {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) (δ : �
 theorem iteratedDeriv_smooth {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ) :
     iteratedDeriv r (smooth r δ f) = fun x => ∑ k ∈ Finset.range r,
       ((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
-        ((((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r * iterDiff r ((k + 1 : ℕ) * δ) f x) := by
+        ((((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r * higherDiff r ((k + 1 : ℕ) * δ) f x) := by
   have : smooth r δ f = ∑ k ∈ Finset.range r, fun x =>
       ((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) * steklovIter r ((k + 1 : ℕ) * δ) f x := by
     funext x; simp [smooth, Finset.sum_apply]
@@ -338,11 +339,11 @@ theorem iteratedDeriv_smooth {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) (δ
   rw [iteratedDeriv_const_mul_field, iteratedDeriv_steklovIter hf]
 
 /-- Differences of a continuous function are jointly continuous in the step and the point. -/
-theorem continuous_iterDiff_uncurry {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) :
-    Continuous (Function.uncurry fun (h y : ℝ) => iterDiff r h f y) := by
-  have : (Function.uncurry fun (h y : ℝ) => iterDiff r h f y) = fun q : ℝ × ℝ =>
+theorem continuous_higherDiff_uncurry {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) :
+    Continuous (Function.uncurry fun (h y : ℝ) => higherDiff r h f y) := by
+  have : (Function.uncurry fun (h y : ℝ) => higherDiff r h f y) = fun q : ℝ × ℝ =>
       ∑ k ∈ Finset.range (r + 1), ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (q.2 + k * q.1) :=
-    funext fun q => iterDiff_apply r q.1 f q.2
+    funext fun q => higherDiff_apply r q.1 f q.2
   rw [this]
   exact continuous_finsetSum _ fun k _ => continuous_const.mul (hf.comp (by fun_prop))
 
@@ -354,15 +355,15 @@ theorem eLpNorm_sub_smooth_le {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) {�
     eLpNorm (fun x => f x - smooth r δ f x) p (volume.restrict (Icc u w)) ≤
       modulus r p a b f (r * δ) := by
   have heq : (fun x => f x - smooth r δ f x) = ((-1 : ℂ) ^ r) •
-      avgStepIter r δ (fun h y => iterDiff r h f y) 0 := by
+      avgStepIter r δ (fun h y => higherDiff r h f y) 0 := by
     funext x
     rw [sub_smooth_eq hf r hδ.ne' x]
     rfl
   rw [heq, eLpNorm_const_smul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul]
-  refine (eLpNorm_avgStepIter_le (continuous_iterDiff_uncurry hf r) hδ hp hp' _ r 0).trans ?_
+  refine (eLpNorm_avgStepIter_le (continuous_higherDiff_uncurry hf r) hδ hp hp' _ r 0).trans ?_
   refine iSup₂_le fun h hh => ?_
   rw [zero_add] at hh
-  refine (eLpNorm_Icc_mono _ p hau ?_).trans (eLpNorm_iterDiff_le_modulus ⟨hh.1, hh.2⟩)
+  refine (eLpNorm_Icc_mono _ p hau ?_).trans (eLpNorm_higherDiff_le_modulus ⟨hh.1, hh.2⟩)
   have : (r : ℝ) * h ≤ r * (r * δ) := mul_le_mul_of_nonneg_left hh.2 (Nat.cast_nonneg r)
   linarith
 
@@ -375,9 +376,9 @@ theorem eLpNorm_iteratedDeriv_smooth_le {f : ℝ → ℂ} (hf : Continuous f) (r
       2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * modulus r p a b f (r * δ) := by
   rw [iteratedDeriv_smooth hf r δ]
   have hsum : (fun x => ∑ k ∈ Finset.range r, ((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
-      ((((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r * iterDiff r ((k + 1 : ℕ) * δ) f x)) =
+      ((((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r * higherDiff r ((k + 1 : ℕ) * δ) f x)) =
       ∑ k ∈ Finset.range r, (((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
-        (((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r) • iterDiff r ((k + 1 : ℕ) * δ) f := by
+        (((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r) • higherDiff r ((k + 1 : ℕ) * δ) f := by
     funext x
     rw [Finset.sum_apply]
     refine Finset.sum_congr rfl fun k _ => ?_
@@ -386,7 +387,7 @@ theorem eLpNorm_iteratedDeriv_smooth_le {f : ℝ → ℂ} (hf : Continuous f) (r
   rw [hsum]
   refine (eLpNorm_sum_le hp).trans ?_
   have hk : ∀ k ∈ Finset.range r, eLpNorm ((((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
-      (((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r) • iterDiff r ((k + 1 : ℕ) * δ) f) p
+      (((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r) • higherDiff r ((k + 1 : ℕ) * δ) f) p
         (volume.restrict (Icc u w)) ≤
       (r.choose (k + 1) : ℝ≥0∞) * ((ENNReal.ofReal δ)⁻¹ ^ r * modulus r p a b f (r * δ)) :=
     fun k hk => by
@@ -401,7 +402,7 @@ theorem eLpNorm_iteratedDeriv_smooth_le {f : ℝ → ℂ} (hf : Continuous f) (r
         gcongr
         exact le_mul_of_one_le_left hδ.le hk1
       · refine (eLpNorm_Icc_mono _ p hau ?_).trans
-          (eLpNorm_iterDiff_le_modulus ⟨by positivity, ?_⟩)
+          (eLpNorm_higherDiff_le_modulus ⟨by positivity, ?_⟩)
         · have : (r : ℝ) * ((k + 1 : ℕ) * δ) ≤ r * (r * δ) :=
             mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right hkr hδ.le) (Nat.cast_nonneg r)
           linarith

@@ -32,6 +32,7 @@ Minkowski's inequality (`Rd.eLpNorm_integral_kernel_le`) gives the bound.
 @[expose] public section
 
 open MeasureTheory Filter Topology
+open TranslationAlgebra (coordElem diffAct)
 open scoped ENNReal
 
 open ENNReal (dyadicWeight lqNorm)
@@ -231,7 +232,7 @@ theorem enorm_mixedLocalMean_le (hp : p ≠ ∞) (L : ℕ) (hR : b.radius ≤ 1)
     ∏ i, ∑ t ∈ T, lmCoeff L (k i) t •
       AddMonoidAlgebra.single (Pi.single i (-z i / c i)) (1 : ℂ) ^ lmExp t
   set G : (Fin d → ℝ) → (Fin d → ℝ) → ℂ := fun x z =>
-    Cube.diffAct (A z) (f : (Fin d → ℝ) → ℂ) x
+    diffAct (A z) (f : (Fin d → ℝ) → ℂ) x
   set Φ : (Fin d → ℝ) → ℂ := tensorKernel fun _ => b.toFun
   set ω := lpMixedModulus p L f k
   -- the local means average the translates
@@ -264,16 +265,16 @@ theorem enorm_mixedLocalMean_le (hp : p ≠ ∞) (L : ℕ) (hR : b.radius ≤ 1)
   -- the polynomials factor through the mixed difference
   set B : (Fin d → ℝ) → AddMonoidAlgebra ℂ (Fin d → ℝ) := fun z => ∏ i,
     if k i = 0 then 1 - (-1) ^ L * (Y z i - 1) ^ L else (-1) ^ L * ((Y z i + 1) ^ L - 1)
-  have hfactor : ∀ z, A z = B z * ∏ i ∈ e, Cube.coordElem (h z) i ^ L := fun z => by
+  have hfactor : ∀ z, A z = B z * ∏ i ∈ e, coordElem (h z) i ^ L := fun z => by
     have hfac : ∀ i, ∑ t ∈ T, lmCoeff L (k i) t •
         AddMonoidAlgebra.single (Pi.single i (-z i / c i)) (1 : ℂ) ^ lmExp t =
         (if k i = 0 then 1 - (-1) ^ L * (Y z i - 1) ^ L else (-1) ^ L * ((Y z i + 1) ^ L - 1)) *
-          (if k i = 0 then 1 else Cube.coordElem (h z) i ^ L) := fun i => by
+          (if k i = 0 then 1 else coordElem (h z) i ^ L) := fun i => by
       rw [sum_lmCoeff_smul_pow]
       simp only [Y, h]
       by_cases hk : k i = 0
       · simp [hk]
-      · simp only [hk, ↓reduceIte, Cube.coordElem]
+      · simp only [hk, ↓reduceIte, coordElem]
         ring
     simp only [A, B]
     rw [Finset.prod_congr rfl fun i _ => hfac i, Finset.prod_mul_distrib]
@@ -281,7 +282,7 @@ theorem enorm_mixedLocalMean_le (hp : p ≠ ∞) (L : ℕ) (hR : b.radius ≤ 1)
     rw [Finset.prod_ite, Finset.prod_const_one, one_mul]
     rfl
   have hGz : ∀ z, (fun x => G x z) =
-      Cube.diffAct (B z) (mixedDiff L e (h z) (f : (Fin d → ℝ) → ℂ)) := fun z => by
+      diffAct (B z) (mixedDiff L e (h z) (f : (Fin d → ℝ) → ℂ)) := fun z => by
     funext x
     simp only [G]
     rw [hfactor z, map_mul, Module.End.mul_apply]
@@ -436,7 +437,7 @@ theorem tendsto_sum_mixedDual_mixedLocalMean (hp : p ≠ ∞) {L : ℕ} (hL : 1 
 
 /-- **The mixed moduli of the reproducing terms**:
 `Ω^{e(m)}_L(η_k ⋆ h, 2^(-m))_p ≤ C_η^d ∏_i c(m_i, k_i) ‖h‖_p`, by the differences of the
-one-dimensional dual kernels in `L_1` (`Rd.LocalMeansBump.eLpNorm_iterDiff_dual_le`). -/
+one-dimensional dual kernels in `L_1` (`Rd.LocalMeansBump.eLpNorm_higherDiff_dual_le`). -/
 theorem lpMixedModulus_convLp_mixedDual_le (hp : p ≠ ∞) (L : ℕ) (m k : Fin d → ℕ)
     (h : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
     lpMixedModulus p L (convLp hp (b.integrable_mixedDual L k) h) m ≤
@@ -450,7 +451,7 @@ theorem lpMixedModulus_convLp_mixedDual_le (hp : p ≠ ∞) (L : ℕ) (m k : Fin
   have hfac : ∀ i, Integrable (if i ∈ e then (fwdDiff (v i))^[L] (b.dual L (k i))
       else b.dual L (k i)) := fun i => by
     split_ifs
-    · exact integrable_iterDiff (b.integrable_dual L (k i)) L _
+    · exact integrable_higherDiff (b.integrable_dual L (k i)) L _
     · exact b.integrable_dual L (k i)
   refine (eLpNorm_conv_le hp1 hp
     (integrable_mixedDiff (b.integrable_mixedDual L k) L e v).aestronglyMeasurable
@@ -465,7 +466,7 @@ theorem lpMixedModulus_convLp_mixedDual_le (hp : p ≠ ∞) (L : ℕ) (m k : Fin
     have hvi : ‖v i‖ ≤ 1 / 2 ^ m i := by
       rw [Real.norm_eq_abs]
       exact hv i hi
-    exact b.eLpNorm_iterDiff_dual_le L hvi
+    exact b.eLpNorm_higherDiff_dual_le L hvi
   · simp only [hi, ↓reduceIte]
     have hm0 : m i = 0 := by
       by_contra h0

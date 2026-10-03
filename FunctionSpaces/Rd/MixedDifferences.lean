@@ -7,8 +7,8 @@ module
 
 public import FunctionSpaces.Rd.TensorKernels
 public import FunctionSpaces.Rd.MixedSequences
-public import FunctionSpaces.Rd.Differences
-public import FunctionSpaces.Cube.Translation
+public import FunctionSpaces.Rd.DilatedDifferences
+public import FunctionSpaces.TranslationAlgebra
 
 /-!
 # Mixed differences and mixed moduli of smoothness on `ℝ^d`
@@ -19,8 +19,8 @@ with steps `h_i` is
 `Δ^{L,e}_h f = (∏_{i ∈ e} Δ^L_{h_i e_i}) f`
 
 (`Rd.mixedDiff`), the action of `∏_{i ∈ e} (δ_{h_i e_i} - 1)^L` in the commutative algebra of
-translations (`Cube.diffAct`), so the order of the coordinates does not matter. Adding a coordinate
-applies one more difference (`Rd.mixedDiff_insert`). Mixed differences are linear, keep
+translations (`TranslationAlgebra.diffAct`), so the order of the coordinates does not matter.
+Adding a coordinate applies one more difference (`Rd.mixedDiff_insert`). Mixed differences are linear, keep
 measurability and integrability, satisfy `‖Δ^{L,e}_h f‖_p ≤ 2^(L|e|) ‖f‖_p`, act on each factor of a
 tensor kernel (`Rd.mixedDiff_tensorKernel`) and move from a convolution onto its kernel,
 `Δ^{L,e}_h (K ⋆ f) = (Δ^{L,e}_h K) ⋆ f` almost everywhere (`Rd.mixedDiff_conv_ae`).
@@ -40,6 +40,7 @@ means.
 @[expose] public section
 
 open MeasureTheory Filter
+open TranslationAlgebra (coordElem diffAct higherDiff_eq_diffAct)
 open scoped ENNReal
 
 open ENNReal (dyadicWeight lqNorm)
@@ -54,13 +55,13 @@ variable {d : ℕ}
 `∏_{i ∈ e} (δ_{h_i e_i} - 1)^L` in the algebra of translations. -/
 noncomputable def mixedDiff (L : ℕ) (e : Finset (Fin d)) (h : Fin d → ℝ)
     (f : (Fin d → ℝ) → ℂ) : (Fin d → ℝ) → ℂ :=
-  Cube.diffAct (∏ i ∈ e, Cube.coordElem h i ^ L) f
+  diffAct (∏ i ∈ e, coordElem h i ^ L) f
 
 /-- `(δ_{h_i e_i} - 1)^L` acts by the difference `Δ^L_{h_i e_i}`. -/
-theorem diffAct_coordElem_pow_eq_iterDiff (L : ℕ) (h : Fin d → ℝ) (i : Fin d)
+theorem diffAct_coordElem_pow_eq_higherDiff (L : ℕ) (h : Fin d → ℝ) (i : Fin d)
     (f : (Fin d → ℝ) → ℂ) :
-    Cube.diffAct (Cube.coordElem h i ^ L) f = (fwdDiff (Pi.single i (h i)))^[L] f := by
-  rw [Cube.coordElem, ← Cube.isoDiff_eq_diffAct]
+    diffAct (coordElem h i ^ L) f = (fwdDiff (Pi.single i (h i)))^[L] f := by
+  rw [coordElem, ← higherDiff_eq_diffAct]
   rfl
 
 /-- The mixed difference in no coordinate is the function itself. -/
@@ -73,7 +74,7 @@ theorem mixedDiff_insert (L : ℕ) {e : Finset (Fin d)} {i : Fin d} (hi : i ∉ 
     (f : (Fin d → ℝ) → ℂ) :
     mixedDiff L (insert i e) h f = (fwdDiff (Pi.single i (h i)))^[L] (mixedDiff L e h f) := by
   rw [mixedDiff, Finset.prod_insert hi, map_mul, Module.End.mul_apply,
-    diffAct_coordElem_pow_eq_iterDiff]
+    diffAct_coordElem_pow_eq_higherDiff]
   rfl
 
 /-- Mixed differences are additive. -/
@@ -94,7 +95,7 @@ theorem aestronglyMeasurable_mixedDiff {f : (Fin d → ℝ) → ℂ} (hf : AEStr
   | empty => rwa [mixedDiff_empty]
   | insert i e hi ih =>
     rw [mixedDiff_insert L hi]
-    exact aestronglyMeasurable_iterDiff ih L _
+    exact aestronglyMeasurable_higherDiff ih L _
 
 /-- Mixed differences of integrable functions are integrable. -/
 theorem integrable_mixedDiff {K : (Fin d → ℝ) → ℂ} (hK : Integrable K) (L : ℕ)
@@ -103,7 +104,7 @@ theorem integrable_mixedDiff {K : (Fin d → ℝ) → ℂ} (hK : Integrable K) (
   | empty => rwa [mixedDiff_empty]
   | insert i e hi ih =>
     rw [mixedDiff_insert L hi]
-    exact integrable_iterDiff ih L _
+    exact integrable_higherDiff ih L _
 
 /-- **Mixed differences depend only on the class modulo null sets.** -/
 theorem mixedDiff_congr_ae {f g : (Fin d → ℝ) → ℂ} (hfg : f =ᵐ[volume] g) (L : ℕ)
@@ -113,7 +114,7 @@ theorem mixedDiff_congr_ae {f g : (Fin d → ℝ) → ℂ} (hfg : f =ᵐ[volume]
   | empty => rwa [mixedDiff_empty, mixedDiff_empty]
   | insert i e hi ih =>
     rw [mixedDiff_insert L hi, mixedDiff_insert L hi]
-    exact iterDiff_congr_ae ih L _
+    exact higherDiff_congr_ae ih L _
 
 /-- `‖Δ^{L,e}_h f‖_p ≤ 2^(L|e|) ‖f‖_p`. -/
 theorem eLpNorm_mixedDiff_le {f : (Fin d → ℝ) → ℂ} (hf : AEStronglyMeasurable f volume)
@@ -125,7 +126,7 @@ theorem eLpNorm_mixedDiff_le {f : (Fin d → ℝ) → ℂ} (hf : AEStronglyMeasu
     rw [mixedDiff_insert L hi, Finset.card_insert_of_notMem hi]
     calc eLpNorm ((fwdDiff (Pi.single i (h i)))^[L] (mixedDiff L e h f)) p volume
         ≤ 2 ^ L * eLpNorm (mixedDiff L e h f) p volume :=
-          eLpNorm_iterDiff_le (aestronglyMeasurable_mixedDiff hf L e h) hp L _
+          eLpNorm_higherDiff_le (aestronglyMeasurable_mixedDiff hf L e h) hp L _
       _ ≤ 2 ^ L * (2 ^ (L * e.card) * eLpNorm f p volume) := mul_le_mul' le_rfl ih
       _ = 2 ^ (L * (e.card + 1)) * eLpNorm f p volume := by
           rw [← mul_assoc, ← pow_add]
@@ -140,8 +141,8 @@ theorem mixedDiff_conv_ae {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K f
   | empty => rw [mixedDiff_empty, mixedDiff_empty]
   | insert i e hi ih =>
     rw [mixedDiff_insert L hi, mixedDiff_insert L hi]
-    exact (iterDiff_congr_ae ih L _).trans
-      (iterDiff_conv_ae hp1 hp (integrable_mixedDiff hK L e h) hf L _)
+    exact (higherDiff_congr_ae ih L _).trans
+      (higherDiff_conv_ae hp1 hp (integrable_mixedDiff hK L e h) hf L _)
 
 /-! ### Mixed differences of tensor kernels -/
 
@@ -169,7 +170,7 @@ theorem fwdDiff_single_tensorKernel (K : Fin d → ℝ → ℂ) (i : Fin d) (t :
 
 /-- **Differences of order `L` in coordinate `i` of a tensor product** act on the `i`-th
 factor. -/
-theorem iterDiff_single_tensorKernel (L : ℕ) (K : Fin d → ℝ → ℂ) (i : Fin d) (t : ℝ) :
+theorem higherDiff_single_tensorKernel (L : ℕ) (K : Fin d → ℝ → ℂ) (i : Fin d) (t : ℝ) :
     (fwdDiff (Pi.single i t))^[L] (tensorKernel K) =
       tensorKernel (Function.update K i ((fwdDiff t)^[L] (K i))) := by
   induction L with
@@ -187,7 +188,7 @@ theorem mixedDiff_tensorKernel (L : ℕ) (e : Finset (Fin d)) (h : Fin d → ℝ
   induction e using Finset.induction_on with
   | empty => simp [mixedDiff_empty]
   | insert i e hi ih =>
-    rw [mixedDiff_insert L hi, ih, iterDiff_single_tensorKernel]
+    rw [mixedDiff_insert L hi, ih, higherDiff_single_tensorKernel]
     congr 1
     funext j
     by_cases hj : j = i

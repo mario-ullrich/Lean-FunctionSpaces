@@ -254,7 +254,7 @@ theorem exists_trace_atoms {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L : ℕ) :
       ∀ x' (S : Finset (Fin (finrank ℝ V) → ℤ)),
         (∀ m ∈ S, Ω.traceCoef b p L j h m ≠ 0 ∧ ‖x' - Ω.proj (cellCenter j m)‖ ≤ (d + 1) / 2 ^ j) →
           S.card ≤ N := by
-  obtain ⟨A, hA, hb⟩ := b.exists_iterDiff_dual_bound L 1
+  obtain ⟨A, hA, hb⟩ := b.exists_higherDiff_dual_bound L 1
   have ht : 0 ≤ 1 - 1 / p.toReal := one_sub_one_div_toReal_nonneg hp1
   set ρ := 2 * (L : ℝ) * b.radius
   have hρ : 0 ≤ ρ := mul_nonneg (mul_nonneg zero_le_two (Nat.cast_nonneg L)) b.radius_nonneg
@@ -296,7 +296,7 @@ theorem exists_trace_atoms {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L : ℕ) :
             simp only [A1]
             rw [mul_assoc]
             exact mul_le_mul' (by norm_num) le_rfl
-    · have h1 := enorm_iterDiff_cellAtom_le hp1 (b.continuous_dual L j) hh m hK
+    · have h1 := enorm_higherDiff_cellAtom_le hp1 (b.continuous_dual L j) hh m hK
         (hb 1 le_rfl j) hρ (hKρ j) v x
       rw [Nat.cast_one, ENNReal.rpow_one] at h1
       simpa only [Function.iterate_one, fwdDiff] using h1

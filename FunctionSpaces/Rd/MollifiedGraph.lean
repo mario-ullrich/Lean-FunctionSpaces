@@ -26,7 +26,7 @@ The **vertical cut-off** `v_j(x) = χ(2^j (⟪x, e⟫ - φ_j(Px)))` (`Rd.Lipschi
 with a smooth profile `χ` equal to `1` on `[-c, c]`, `c > 2 M ‖ρ‖_1`, equals `1` on the boundary
 (`Rd.LipschitzGraph.vertCutoff_graphMap`), vanishes at distance `(c + 1) 2^(-j)` above or below the
 smoothed graph, and has `|Δ_h^m v_j| ≤ B min(1, (2^j ‖h‖)^m)` for `m ≤ 2`
-(`Rd.LipschitzGraph.enorm_iterDiff_vertCutoff_le`): by the chain rule for differences,
+(`Rd.LipschitzGraph.enorm_higherDiff_vertCutoff_le`): by the chain rule for differences,
 `Δ_h^2 (χ ∘ ψ) = [χ(ψ_2) - χ(2ψ_1 - ψ_0)] + Δ_t^2 χ(ψ_0)` with `t = ψ_1 - ψ_0`.
 -/
 
@@ -47,14 +47,14 @@ variable {W : Type*} [NormedAddCommGroup W] [NormedSpace ℝ W]
 
 omit [NormedSpace ℝ W] in
 /-- `Δ_h f(x) = f(x + h) - f(x)`. -/
-theorem iterDiff_one_apply (h : W) (f : W → ℂ) (x : W) :
+theorem higherDiff_one_apply (h : W) (f : W → ℂ) (x : W) :
     (fwdDiff h)^[1] f x = f (x + h) - f x := by
   rw [Function.iterate_one, fwdDiff_eq_sub, Pi.sub_apply]
 
 /-- `Δ_h^2 f(x) = f(x + 2h) - 2 f(x + h) + f(x)`. -/
-theorem iterDiff_two_apply (h : W) (f : W → ℂ) (x : W) :
+theorem higherDiff_two_apply (h : W) (f : W → ℂ) (x : W) :
     (fwdDiff h)^[2] f x = f (x + (2 : ℝ) • h) - 2 * f (x + h) + f x := by
-  rw [iterDiff_apply]
+  rw [higherDiff_apply]
   simp [Finset.sum_range_succ]
   ring
 
@@ -68,10 +68,10 @@ variable {W : Type*} [NormedAddCommGroup W] [InnerProductSpace ℝ W] [FiniteDim
   [MeasurableSpace W] [BorelSpace W]
 
 /-- `∫ Δ_h^r K = 0` for integrable `K` and `r ≥ 1`: a difference integrates to `0`. -/
-theorem integral_iterDiff_eq_zero {K : W → ℂ} (hK : Integrable K) {r : ℕ} (hr : 1 ≤ r) (h : W) :
+theorem integral_higherDiff_eq_zero {K : W → ℂ} (hK : Integrable K) {r : ℕ} (hr : 1 ≤ r) (h : W) :
     ∫ x, (fwdDiff h)^[r] K x = 0 := by
   obtain ⟨r', rfl⟩ : ∃ r', r = r' + 1 := ⟨r - 1, by omega⟩
-  have hg := integrable_iterDiff hK r' h
+  have hg := integrable_higherDiff hK r' h
   have heq : ∀ x, (fwdDiff h)^[r' + 1] K x =
       (fwdDiff h)^[r'] K (x + h) - (fwdDiff h)^[r'] K x := fun x => by
     rw [Function.iterate_succ_apply', fwdDiff_eq_sub, Pi.sub_apply]
@@ -120,31 +120,31 @@ theorem norm_conv_sub_self_le {K u : W → ℂ} (hK : Integrable K) (h1 : ∫ z,
 /-- **Second differences of convolutions with Lipschitz functions**: for `K = 0` outside
 `B̄(0, R)`, `‖Δ_h^2 (K ⋆ u)(x)‖ ≤ M (R + 2‖h‖) ‖Δ_h^2 K‖_1`, since
 `Δ_h^2 (K ⋆ u) = (Δ_h^2 K) ⋆ u` and `∫ Δ_h^2 K = 0`. -/
-theorem norm_iterDiff_two_conv_le {K u : W → ℂ} (hK : Integrable K) {R : ℝ}
+theorem norm_higherDiff_two_conv_le {K u : W → ℂ} (hK : Integrable K) {R : ℝ}
     (hKR : ∀ z, R < ‖z‖ → K z = 0) {M : ℝ} (hM : 0 ≤ M)
     (hu : ∀ x y, ‖u x - u y‖ ≤ M * ‖x - y‖)
     (htr : ∀ v x, Integrable (fun z => K (z + v) * u (x - z))) (h x : W) :
     ‖(fwdDiff h)^[2] (conv K u volume) x‖ ≤ M * (R + 2 * ‖h‖) * ∫ z, ‖(fwdDiff h)^[2] K z‖ := by
-  rw [iterDiff_conv_apply htr 2 h x, conv_apply]
+  rw [higherDiff_conv_apply htr 2 h x, conv_apply]
   have hint2 : Integrable (fun z => (fwdDiff h)^[2] K z * u (x - z)) := by
-    simp_rw [iterDiff_apply, Finset.sum_mul]
+    simp_rw [higherDiff_apply, Finset.sum_mul]
     exact integrable_finsetSum _ fun l _ =>
       ((htr ((l : ℝ) • h) x).const_mul ((-1 : ℂ) ^ (2 - l) * (Nat.choose 2 l : ℂ))).congr
         (Eventually.of_forall fun z => by ring)
   have h0 : ∫ z, (fwdDiff h)^[2] K z * u x = 0 := by
-    rw [integral_mul_const, integral_iterDiff_eq_zero hK (by norm_num), zero_mul]
+    rw [integral_mul_const, integral_higherDiff_eq_zero hK (by norm_num), zero_mul]
   rw [← sub_zero (∫ z, (fwdDiff h)^[2] K z * u (x - z)), ← h0,
-    ← integral_sub hint2 ((integrable_iterDiff hK 2 h).mul_const _)]
+    ← integral_sub hint2 ((integrable_higherDiff hK 2 h).mul_const _)]
   calc ‖∫ z, ((fwdDiff h)^[2] K z * u (x - z) - (fwdDiff h)^[2] K z * u x)‖
       ≤ ∫ z, ‖(fwdDiff h)^[2] K z‖ * (M * (R + 2 * ‖h‖)) :=
-        norm_integral_le_of_norm_le ((integrable_iterDiff hK 2 h).norm.mul_const _)
+        norm_integral_le_of_norm_le ((integrable_higherDiff hK 2 h).norm.mul_const _)
           (Eventually.of_forall fun z => by
             rw [← mul_sub, norm_mul]
             by_cases hz : (fwdDiff h)^[2] K z = 0
             · simp [hz]
             refine mul_le_mul_of_nonneg_left ?_ (norm_nonneg _)
             have hzR : ‖z‖ ≤ R + 2 * ‖h‖ := by
-              rw [iterDiff_apply] at hz
+              rw [higherDiff_apply] at hz
               obtain ⟨l, hl, hl0⟩ : ∃ l ∈ Finset.range (2 + 1), K (z + (l : ℝ) • h) ≠ 0 := by
                 by_contra hcon
                 push Not at hcon
@@ -182,13 +182,13 @@ theorem integral_norm_scaled (L j : ℕ) :
     ← eLpNorm_one_eq_lintegral_enorm hm.aestronglyMeasurable, b.eLpNorm_scaled_one]
 
 /-- `∫ |Δ_v^L m_{2^j}| ≤ (2^j ‖v‖)^L ‖D^L m‖_1`, as real numbers. -/
-theorem integral_norm_iterDiff_scaled_le (L j : ℕ) (v : W) :
+theorem integral_norm_higherDiff_scaled_le (L j : ℕ) (v : W) :
     ∫ z, ‖(fwdDiff v)^[L] (b.scaled L j) z‖ ≤ (2 ^ j * ‖v‖) ^ L * (b.derivNorm L).toReal := by
-  have hint := integrable_iterDiff (b.integrable_scaled L j) L v
+  have hint := integrable_higherDiff (b.integrable_scaled L j) L v
   have hD : b.derivNorm L ≠ ∞ := lintegral_enorm_iteratedFDeriv_ne_top L _
   rw [integral_norm_eq_lintegral_enorm hint.aestronglyMeasurable,
     ← eLpNorm_one_eq_lintegral_enorm hint.aestronglyMeasurable]
-  have h := b.eLpNorm_iterDiff_scaled_le L j v
+  have h := b.eLpNorm_higherDiff_scaled_le L j v
   calc (eLpNorm ((fwdDiff v)^[L] (b.scaled L j)) 1 volume).toReal
       ≤ (ENNReal.ofReal (2 ^ j * ‖v‖) ^ L * b.derivNorm L).toReal :=
         ENNReal.toReal_mono (ENNReal.mul_ne_top (ENNReal.pow_ne_top ENNReal.ofReal_ne_top) hD) h
@@ -285,13 +285,13 @@ theorem abs_second_smoothGraph_le (j : ℕ) {h' : Ω.hyperplane} (hh : ‖h'‖ 
     (x' : Ω.hyperplane) :
     |Ω.smoothGraph j (x' + (2 : ℝ) • h') - 2 * Ω.smoothGraph j (x' + h') + Ω.smoothGraph j x'| ≤
       4 * Ω.M * Ω.graphBumpDeriv * 2 ^ j * ‖h'‖ ^ 2 := by
-  have h := norm_iterDiff_two_conv_le (Ω.graphBump.integrable_scaled 2 j)
+  have h := norm_higherDiff_two_conv_le (Ω.graphBump.integrable_scaled 2 j)
     (Ω.graphBump_scaled_eq_zero j) Ω.M_nonneg Ω.norm_graphFun_sub_le
     (Ω.integrable_graphBump_mul j) h' x'
-  have hD := Ω.graphBump.integral_norm_iterDiff_scaled_le 2 j h'
+  have hD := Ω.graphBump.integral_norm_higherDiff_scaled_le 2 j h'
   have hre : Ω.smoothGraph j (x' + (2 : ℝ) • h') - 2 * Ω.smoothGraph j (x' + h') +
       Ω.smoothGraph j x' = ((fwdDiff h')^[2] (conv (Ω.graphBump.scaled 2 j) Ω.graphFun volume) x').re := by
-    rw [iterDiff_two_apply]
+    rw [higherDiff_two_apply]
     simp [smoothGraph]
   rw [hre]
   have hR : 2 / 2 ^ j + 2 * ‖h'‖ ≤ 4 / 2 ^ j := by
@@ -380,16 +380,16 @@ theorem profileConst_nonneg : 0 ≤ Ω.profileConst :=
 
 /-- `|χ(b) - χ(a)| ≤ C |b - a|`. -/
 theorem norm_profile_sub_le (a b : ℝ) : ‖Ω.profile b - Ω.profile a‖ ≤ Ω.profileConst * |b - a| := by
-  have h := norm_iterDiff_le_of_iteratedFDeriv Ω.contDiff_profile (l := 1)
+  have h := norm_higherDiff_le_of_iteratedFDeriv Ω.contDiff_profile (l := 1)
     (fun x => Ω.norm_iteratedFDeriv_profile_le (by norm_num) x) (b - a) a
-  rwa [iterDiff_one_apply, add_sub_cancel, pow_one, Real.norm_eq_abs] at h
+  rwa [higherDiff_one_apply, add_sub_cancel, pow_one, Real.norm_eq_abs] at h
 
 /-- `|χ(a + 2t) - 2 χ(a + t) + χ(a)| ≤ C t^2`. -/
 theorem norm_profile_second_le (a t : ℝ) :
     ‖Ω.profile (a + 2 * t) - 2 * Ω.profile (a + t) + Ω.profile a‖ ≤ Ω.profileConst * t ^ 2 := by
-  have h := norm_iterDiff_le_of_iteratedFDeriv Ω.contDiff_profile (l := 2)
+  have h := norm_higherDiff_le_of_iteratedFDeriv Ω.contDiff_profile (l := 2)
     (fun x => Ω.norm_iteratedFDeriv_profile_le le_rfl x) t a
-  rw [iterDiff_two_apply, Real.norm_eq_abs, sq_abs, smul_eq_mul] at h
+  rw [higherDiff_two_apply, Real.norm_eq_abs, sq_abs, smul_eq_mul] at h
   exact h
 
 /-- The **vertical coordinate** `ψ_j(x) = 2^j (⟪x, e⟫ - φ_j(Px))`. -/
@@ -496,7 +496,7 @@ theorem four_le_vertCutoffConst : 4 ≤ Ω.vertCutoffConst := by
 /-- **Differences of the vertical cut-off**: `|Δ_h^m v_j| ≤ B min(1, (2^j ‖h‖)^m)` for
 `m ≤ 2`. For `m = 2` and `t = ψ_j(x + h) - ψ_j(x)`,
 `Δ_h^2 v_j(x) = [χ(ψ_2) - χ(2ψ_1 - ψ_0)] + Δ_t^2 χ(ψ_0)` with `ψ_l = ψ_j(x + lh)`. -/
-theorem norm_iterDiff_vertCutoff_le (j : ℕ) {m : ℕ} (hm : m ≤ 2) (h x : V) :
+theorem norm_higherDiff_vertCutoff_le (j : ℕ) {m : ℕ} (hm : m ≤ 2) (h x : V) :
     ‖(fwdDiff h)^[m] (Ω.vertCutoff j) x‖ ≤ Ω.vertCutoffConst * min 1 ((2 ^ j * ‖h‖) ^ m) := by
   have hB := Ω.four_le_vertCutoffConst
   have hC := Ω.profileConst_nonneg
@@ -508,7 +508,7 @@ theorem norm_iterDiff_vertCutoff_le (j : ℕ) {m : ℕ} (hm : m ≤ 2) (h x : V)
   rcases (show m = 0 ∨ m = 1 ∨ m = 2 by omega) with rfl | rfl | rfl
   · rw [Function.iterate_zero, id, pow_zero, min_self, mul_one]
     exact (Ω.norm_vertCutoff_le j x).trans (by linarith)
-  · rw [iterDiff_one_apply, pow_one]
+  · rw [higherDiff_one_apply, pow_one]
     rcases le_total t 1 with ht1 | ht1
     · rw [min_eq_right ht1]
       calc ‖Ω.vertCutoff j (x + h) - Ω.vertCutoff j x‖
@@ -528,7 +528,7 @@ theorem norm_iterDiff_vertCutoff_le (j : ℕ) {m : ℕ} (hm : m ≤ 2) (h x : V)
           ≤ ‖Ω.vertCutoff j (x + h)‖ + ‖Ω.vertCutoff j x‖ := norm_sub_le _ _
         _ ≤ 1 + 1 := add_le_add (Ω.norm_vertCutoff_le j _) (Ω.norm_vertCutoff_le j x)
         _ ≤ Ω.vertCutoffConst := by linarith
-  · rw [iterDiff_two_apply]
+  · rw [higherDiff_two_apply]
     rcases le_total t 1 with ht1 | ht1
     · rw [min_eq_right (pow_le_one₀ ht ht1)]
       have hh : ‖h‖ ≤ 1 / 2 ^ j := by
@@ -581,14 +581,14 @@ theorem norm_iterDiff_vertCutoff_le (j : ℕ) {m : ℕ} (hm : m ≤ 2) (h x : V)
         _ ≤ Ω.vertCutoffConst := by linarith
 
 /-- The differences of the vertical cut-off in `ℝ≥0∞`. -/
-theorem enorm_iterDiff_vertCutoff_le (j : ℕ) {m : ℕ} (hm : m ≤ 2) (h x : V) :
+theorem enorm_higherDiff_vertCutoff_le (j : ℕ) {m : ℕ} (hm : m ≤ 2) (h x : V) :
     ‖(fwdDiff h)^[m] (Ω.vertCutoff j) x‖ₑ ≤
       ENNReal.ofReal Ω.vertCutoffConst * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (m : ℝ)) := by
   have hB : 0 ≤ Ω.vertCutoffConst := by linarith [Ω.four_le_vertCutoffConst]
   rw [← ofReal_norm, ENNReal.ofReal_rpow_of_nonneg (by positivity) (Nat.cast_nonneg m),
     Real.rpow_natCast, ← ENNReal.ofReal_one, ← ENNReal.ofReal_mono.map_min,
     ← ENNReal.ofReal_mul hB]
-  exact ENNReal.ofReal_le_ofReal (Ω.norm_iterDiff_vertCutoff_le j hm h x)
+  exact ENNReal.ofReal_le_ofReal (Ω.norm_higherDiff_vertCutoff_le j hm h x)
 
 end LipschitzGraph
 

@@ -30,6 +30,7 @@ gives the **inverse inequality** `ω_r^per(a, 2^(-k))_p ≤ C_B 2^(-(k-j)(r-1+1/
 @[expose] public section
 
 open MeasureTheory Set Polynomial
+open Rd (higherDiff)
 open scoped ENNReal
 open ENNReal (dyadicWeight)
 
@@ -239,10 +240,10 @@ theorem exists_inverse_perSplineScheme {r : ℕ} (hp : p ≠ ∞) :
       have h0 : (0 : ℝ) < 1 / 2 ^ j := by positivity
       rw [hN]
       linarith [hx.2]
-    calc eLpNorm (iterDiff r h (perExt (ppFun j Q))) p (volume.restrict (Icc 0 1))
+    calc eLpNorm (higherDiff r h (perExt (ppFun j Q))) p (volume.restrict (Icc 0 1))
         ≤ splineStripConst r j K h p * (ENNReal.ofReal (r * h) * (r + 1)) ^
             (1 / p.toReal) * eLpNorm (ppFun j Q) p unitVol :=
-          eLpNorm_iterDiff_spline_le (perPieces_mem hQ j) (splineJoinsBelow_perPieces hJ hP _)
+          eLpNorm_higherDiff_spline_le (perPieces_mem hQ j) (splineJoinsBelow_perPieces hJ hP _)
             (fun _ _ _ hx => perExt_ppFun_eq j Q hx) (isPiecewisePoly_perExt_ppFun hQ j)
             (measurable_perExt (measurable_ppFun j Q)) hKb hp hh.1 hhj measurableSet_Icc
             subset_rfl hSN (sum_sum_localMass_perExt_le (measurable_ppFun j Q) hp j r)

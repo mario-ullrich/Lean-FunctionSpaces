@@ -33,6 +33,7 @@ functions on `ℝ`, as the representatives of elements of `L_p` are.
 @[expose] public section
 
 open MeasureTheory Set
+open Rd (higherDiff measurable_higherDiff)
 open scoped ENNReal
 
 namespace Interval
@@ -91,24 +92,16 @@ theorem eLpNorm_Icc_split {G : ℝ → ℂ} (hG : Measurable G) {p : ℝ≥0∞}
   rwa [← ENNReal.rpow_mul, ← ENNReal.rpow_mul, one_div_mul_cancel (by linarith),
     ENNReal.rpow_one, ENNReal.rpow_one] at this
 
-/-- Differences of a measurable function are measurable. -/
-theorem measurable_iterDiff {f : ℝ → ℂ} (hf : Measurable f) (r : ℕ) (h : ℝ) :
-    Measurable (iterDiff r h f) := by
-  have : iterDiff r h f = fun x => ∑ k ∈ Finset.range (r + 1),
-      ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) * f (x + k * h) := funext (iterDiff_apply r h f)
-  rw [this]
-  exact Finset.measurable_sum _ fun k _ => measurable_const.mul (hf.comp (measurable_add_const _))
-
 /-- **Differences in `L_p`**: if `‖f(· + k h)‖_{L_p(μ)} ≤ B` for `k ≤ r`, then
 `‖Δ_h^r f‖_{L_p(μ)} ≤ 2^r B`, by the triangle inequality and `∑_k C(r, k) = 2^r`. -/
-theorem eLpNorm_iterDiff_le_of_forall {f : ℝ → ℂ} {p : ℝ≥0∞} (hp : 1 ≤ p) {μ : Measure ℝ}
+theorem eLpNorm_higherDiff_le_of_forall {f : ℝ → ℂ} {p : ℝ≥0∞} (hp : 1 ≤ p) {μ : Measure ℝ}
     {r : ℕ} {h : ℝ} {B : ℝ≥0∞}
     (hB : ∀ k ∈ Finset.range (r + 1), eLpNorm (fun x => f (x + k * h)) p μ ≤ B) :
-    eLpNorm (iterDiff r h f) p μ ≤ 2 ^ r * B := by
-  have hsum : iterDiff r h f = ∑ k ∈ Finset.range (r + 1),
+    eLpNorm (higherDiff r h f) p μ ≤ 2 ^ r * B := by
+  have hsum : higherDiff r h f = ∑ k ∈ Finset.range (r + 1),
       ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) • fun x => f (x + k * h) := by
     funext x
-    rw [iterDiff_apply, Finset.sum_apply]
+    rw [higherDiff_apply, Finset.sum_apply]
     rfl
   rw [hsum]
   refine (eLpNorm_sum_le hp).trans ?_
@@ -116,7 +109,7 @@ theorem eLpNorm_iterDiff_le_of_forall {f : ℝ → ℂ} {p : ℝ≥0∞} (hp : 1
         eLpNorm (((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) • fun x => f (x + k * h)) p μ
       ≤ ∑ k ∈ Finset.range (r + 1), (r.choose k : ℝ≥0∞) * B :=
         Finset.sum_le_sum fun k hk => by
-          rw [eLpNorm_const_smul, enorm_iterDiff_coeff]
+          rw [eLpNorm_const_smul, enorm_higherDiff_coeff]
           exact mul_le_mul_right (hB k hk) _
     _ = 2 ^ r * B := by
         rw [← Finset.sum_mul, ← Nat.cast_sum, Nat.sum_range_choose]
@@ -124,11 +117,11 @@ theorem eLpNorm_iterDiff_le_of_forall {f : ℝ → ℂ} {p : ℝ≥0∞} (hp : 1
         rfl
 
 /-- **`‖Δ_h^r f‖_{L_p[a, b - rh]} ≤ 2^r ‖f‖_{L_p[a,b]}`** for `h ≥ 0`. -/
-theorem eLpNorm_iterDiff_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ)
+theorem eLpNorm_higherDiff_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ)
     {h : ℝ} (hh : 0 ≤ h) (a b : ℝ) :
-    eLpNorm (iterDiff r h f) p (volume.restrict (Icc a (b - r * h))) ≤
+    eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) ≤
       2 ^ r * eLpNorm f p (volume.restrict (Icc a b)) := by
-  refine eLpNorm_iterDiff_le_of_forall hp fun k hk => ?_
+  refine eLpNorm_higherDiff_le_of_forall hp fun k hk => ?_
   have hkr : (k : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)
   rw [eLpNorm_comp_add_Icc hf]
   exact eLpNorm_Icc_mono f p (by nlinarith) (by nlinarith [mul_le_mul_of_nonneg_right hkr hh])
@@ -136,54 +129,54 @@ theorem eLpNorm_iterDiff_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0�
 /-- The **modulus of smoothness of order `r`** on `[a, b]` in `L_p`:
 `ω_r(f, t, [a, b])_p = sup_{0 ≤ h ≤ t} ‖Δ_h^r f‖_{L_p[a, b - r h]}`. -/
 noncomputable def modulus (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (f : ℝ → ℂ) (t : ℝ) : ℝ≥0∞ :=
-  ⨆ (h : ℝ) (_ : h ∈ Icc 0 t), eLpNorm (iterDiff r h f) p (volume.restrict (Icc a (b - r * h)))
+  ⨆ (h : ℝ) (_ : h ∈ Icc 0 t), eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h)))
 
 /-- `‖Δ_h^r f‖_{L_p[a, b - rh]} ≤ ω_r(f, t)` for `0 ≤ h ≤ t`. -/
-theorem eLpNorm_iterDiff_le_modulus {r : ℕ} {p : ℝ≥0∞} {a b : ℝ} {f : ℝ → ℂ} {t h : ℝ}
+theorem eLpNorm_higherDiff_le_modulus {r : ℕ} {p : ℝ≥0∞} {a b : ℝ} {f : ℝ → ℂ} {t h : ℝ}
     (hh : h ∈ Icc 0 t) :
-    eLpNorm (iterDiff r h f) p (volume.restrict (Icc a (b - r * h))) ≤ modulus r p a b f t :=
+    eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) ≤ modulus r p a b f t :=
   le_iSup₂ (f := fun (h : ℝ) (_ : h ∈ Icc 0 t) =>
-    eLpNorm (iterDiff r h f) p (volume.restrict (Icc a (b - r * h)))) h hh
+    eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h)))) h hh
 
 /-- The modulus increases in `t`. -/
 theorem modulus_mono (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (f : ℝ → ℂ) : Monotone (modulus r p a b f) :=
-  fun _ _ hst => iSup₂_le fun _ hh => eLpNorm_iterDiff_le_modulus ⟨hh.1, hh.2.trans hst⟩
+  fun _ _ hst => iSup₂_le fun _ hh => eLpNorm_higherDiff_le_modulus ⟨hh.1, hh.2.trans hst⟩
 
 /-- `ω_r(f, t) ≤ 2^r ‖f‖_{L_p[a,b]}`. -/
 theorem modulus_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) (a b t : ℝ) :
     modulus r p a b f t ≤ 2 ^ r * eLpNorm f p (volume.restrict (Icc a b)) :=
-  iSup₂_le fun _ hh => eLpNorm_iterDiff_le hf hp r hh.1 a b
+  iSup₂_le fun _ hh => eLpNorm_higherDiff_le hf hp r hh.1 a b
 
 /-- The modulus is subadditive. -/
 theorem modulus_add_le {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) (a b : ℝ) (f g : ℝ → ℂ) (t : ℝ) :
     modulus r p a b (f + g) t ≤ modulus r p a b f t + modulus r p a b g t := by
   refine iSup₂_le fun h hh => ?_
-  rw [iterDiff_add]
+  rw [higherDiff_add]
   exact (eLpNorm_add_le hp).trans
-    (add_le_add (eLpNorm_iterDiff_le_modulus hh) (eLpNorm_iterDiff_le_modulus hh))
+    (add_le_add (eLpNorm_higherDiff_le_modulus hh) (eLpNorm_higherDiff_le_modulus hh))
 
 /-- The modulus is homogeneous. -/
 theorem modulus_const_mul (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (c : ℂ) (f : ℝ → ℂ) (t : ℝ) :
     modulus r p a b (fun x => c * f x) t = ‖c‖ₑ * modulus r p a b f t := by
-  simp only [modulus, iterDiff_const_mul, ENNReal.mul_iSup]
+  simp only [modulus, higherDiff_const_mul, ENNReal.mul_iSup]
   congr 1
   funext h
   congr 1
   funext _
-  exact eLpNorm_const_smul c (iterDiff r h f) p _
+  exact eLpNorm_const_smul c (higherDiff r h f) p _
 
 /-- The modulus vanishes on polynomials of degree `< r`. -/
 theorem modulus_polynomial {r : ℕ} {P : Polynomial ℂ} (hP : P ∈ Polynomial.degreeLT ℂ r)
     (p : ℝ≥0∞) (a b t : ℝ) : modulus r p a b (fun x => P.eval (x : ℂ)) t = 0 := by
-  simp [modulus, iterDiff_polynomial hP]
+  simp [modulus, higherDiff_polynomial hP]
 
 /-- **Differences depend only on the class in `L_p[a, b]`**: for `h ≥ 0`, functions that agree
 almost everywhere on `[a, b]` have differences of step `h` that agree almost everywhere on
 `[a, b - rh]`, hence the same `L_p` norm there. -/
-theorem eLpNorm_iterDiff_congr_ae {f g : ℝ → ℂ} {a b : ℝ}
+theorem eLpNorm_higherDiff_congr_ae {f g : ℝ → ℂ} {a b : ℝ}
     (hfg : f =ᵐ[volume.restrict (Icc a b)] g) (r : ℕ) (p : ℝ≥0∞) {h : ℝ} (hh : 0 ≤ h) :
-    eLpNorm (iterDiff r h f) p (volume.restrict (Icc a (b - r * h))) =
-      eLpNorm (iterDiff r h g) p (volume.restrict (Icc a (b - r * h))) := by
+    eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) =
+      eLpNorm (higherDiff r h g) p (volume.restrict (Icc a (b - r * h))) := by
   refine eLpNorm_congr_ae ?_
   have hk : ∀ k ∈ Finset.range (r + 1), (fun x => f (x + k * h)) =ᵐ[volume.restrict
       (Icc a (b - r * h))] fun x => g (x + k * h) := fun k hk => by
@@ -202,7 +195,7 @@ theorem eLpNorm_iterDiff_congr_ae {f g : ℝ → ℂ} {a b : ℝ}
       Icc_subset_Icc (by nlinarith) (by nlinarith)
     exact hmp.quasiMeasurePreserving.ae_eq_comp (ae_restrict_of_ae_restrict_of_subset hsub hfg)
   filter_upwards [(Filter.eventually_all_finset _).2 hk] with x hx
-  rw [iterDiff_apply, iterDiff_apply]
+  rw [higherDiff_apply, higherDiff_apply]
   exact Finset.sum_congr rfl fun k hk' => by rw [hx k hk']
 
 /-- **The modulus depends only on the class in `L_p[a, b]`**: functions that agree almost
@@ -215,24 +208,24 @@ theorem modulus_congr_ae {f g : ℝ → ℂ} {a b : ℝ} (hfg : f =ᵐ[volume.re
   funext h
   congr 1
   funext hh
-  exact eLpNorm_iterDiff_congr_ae hfg r p hh.1
+  exact eLpNorm_higherDiff_congr_ae hfg r p hh.1
 
 /-- **Reflection of a difference**:
 `‖Δ_h^r f(a + b - ·)‖_{L_p[a, b - rh]} = ‖Δ_h^r f‖_{L_p[a, b - rh]}`, since
 `Δ_h^r f(a + b - ·)(x) = (-1)^r Δ_h^r f(a + b - rh - x)`. -/
-theorem eLpNorm_iterDiff_reflect {f : ℝ → ℂ} (hf : Measurable f) (r : ℕ) (p : ℝ≥0∞)
+theorem eLpNorm_higherDiff_reflect {f : ℝ → ℂ} (hf : Measurable f) (r : ℕ) (p : ℝ≥0∞)
     (a b h : ℝ) :
-    eLpNorm (iterDiff r h fun x => f (a + b - x)) p (volume.restrict (Icc a (b - r * h))) =
-      eLpNorm (iterDiff r h f) p (volume.restrict (Icc a (b - r * h))) := by
-  have hfun : iterDiff r h (fun x => f (a + b - x)) =
-      fun x => (-1 : ℂ) ^ r * iterDiff r h f (a + b - r * h - x) := by
+    eLpNorm (higherDiff r h fun x => f (a + b - x)) p (volume.restrict (Icc a (b - r * h))) =
+      eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) := by
+  have hfun : higherDiff r h (fun x => f (a + b - x)) =
+      fun x => (-1 : ℂ) ^ r * higherDiff r h f (a + b - r * h - x) := by
     funext x
-    rw [iterDiff_reflect]
+    rw [higherDiff_reflect]
     congr 2
     ring
-  rw [hfun, show (fun x => (-1 : ℂ) ^ r * iterDiff r h f (a + b - r * h - x)) =
-      ((-1 : ℂ) ^ r) • fun x => iterDiff r h f (a + b - r * h - x) from rfl, eLpNorm_const_smul,
-    eLpNorm_comp_sub_Icc (measurable_iterDiff hf r h)]
+  rw [hfun, show (fun x => (-1 : ℂ) ^ r * higherDiff r h f (a + b - r * h - x)) =
+      ((-1 : ℂ) ^ r) • fun x => higherDiff r h f (a + b - r * h - x) from rfl, eLpNorm_const_smul,
+    eLpNorm_comp_sub_Icc (measurable_higherDiff hf r h)]
   simp only [enorm_pow, enorm_neg, enorm_one, one_pow, one_mul]
   congr 3 <;> ring
 
@@ -244,6 +237,6 @@ theorem modulus_reflect {f : ℝ → ℂ} (hf : Measurable f) (r : ℕ) (p : ℝ
   funext h
   congr 1
   funext _
-  exact eLpNorm_iterDiff_reflect hf r p a b h
+  exact eLpNorm_higherDiff_reflect hf r p a b h
 
 end Interval

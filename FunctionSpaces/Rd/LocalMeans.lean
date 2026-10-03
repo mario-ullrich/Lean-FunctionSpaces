@@ -303,23 +303,23 @@ theorem continuous_kernel (L j : ℕ) : Continuous (b.kernel L j) := by
 
 /-- **Differences of the dilated moment kernels in `L_1`**:
 `‖Δ_v^L m_{2^j}‖_1 ≤ (2^j ‖v‖)^L ‖D^L m‖_1`. -/
-theorem eLpNorm_iterDiff_scaled_le (L j : ℕ) (v : V) :
+theorem eLpNorm_higherDiff_scaled_le (L j : ℕ) (v : V) :
     eLpNorm ((fwdDiff v)^[L] (b.scaled L j)) 1 volume ≤
       ENNReal.ofReal (2 ^ j * ‖v‖) ^ L * b.derivNorm L := by
   have hint : Integrable ((fwdDiff ((2 : ℝ) ^ j • v))^[L] (momentKernel b.toFun L)) :=
-    integrable_iterDiff (integrable_momentKernel b.integrable L) L _
-  rw [scaled, iterDiff_dilate, eLpNorm_dilate_one hint (by positivity),
+    integrable_higherDiff (integrable_momentKernel b.integrable L) L _
+  rw [scaled, higherDiff_dilate, eLpNorm_dilate_one hint (by positivity),
     eLpNorm_one_eq_lintegral_enorm hint.aestronglyMeasurable]
-  refine (lintegral_enorm_iterDiff_schwartz_le _ L (b.momentSchwartz L)).trans_eq ?_
+  refine (lintegral_enorm_higherDiff_schwartz_le _ L (b.momentSchwartz L)).trans_eq ?_
   rw [← ofReal_norm, norm_smul, Real.norm_of_nonneg (by positivity)]
   rfl
 
 /-- `‖Δ_v^L m_{2^j}‖_1 ≤ 2^L ‖m‖_1`. -/
-theorem eLpNorm_iterDiff_scaled_le' (L j : ℕ) (v : V) :
+theorem eLpNorm_higherDiff_scaled_le' (L j : ℕ) (v : V) :
     eLpNorm ((fwdDiff v)^[L] (b.scaled L j)) 1 volume ≤
       2 ^ L * eLpNorm (momentKernel b.toFun L) 1 volume := by
   rw [← b.eLpNorm_scaled_one L j]
-  exact eLpNorm_iterDiff_le (b.integrable_scaled L j).aestronglyMeasurable le_rfl L v
+  exact eLpNorm_higherDiff_le (b.integrable_scaled L j).aestronglyMeasurable le_rfl L v
 
 /-- The constant `2 (‖D^L m‖_1 + 2^L ‖m‖_1)` of the differences of the dual kernels. -/
 noncomputable def dualConst (L : ℕ) : ℝ≥0∞ :=
@@ -333,7 +333,7 @@ theorem dualConst_ne_top (L : ℕ) : b.dualConst L ≠ ∞ :=
 
 /-- One dilated kernel at a scale at most `2^j`: `‖Δ_v^L m_{2^l}‖_1 ≤ C 2^(-(i-j)L)` for
 `l ≤ j ≤ i` and `‖v‖ ≤ 2^(-i)`, and `≤ C` always. -/
-theorem eLpNorm_iterDiff_scaled_le_dyadic (L : ℕ) {i j l : ℕ} (hlj : l ≤ j) {v : V}
+theorem eLpNorm_higherDiff_scaled_le_dyadic (L : ℕ) {i j l : ℕ} (hlj : l ≤ j) {v : V}
     (hv : ‖v‖ ≤ 1 / 2 ^ i) :
     eLpNorm ((fwdDiff v)^[L] (b.scaled L l)) 1 volume ≤
       (b.derivNorm L + 2 ^ L * eLpNorm (momentKernel b.toFun L) 1 volume) *
@@ -344,7 +344,7 @@ theorem eLpNorm_iterDiff_scaled_le_dyadic (L : ℕ) {i j l : ℕ} (hlj : l ≤ j
       exact (ENNReal.ofReal_two_pow_mul_rpow_le (hlj.trans hji) hv (Nat.cast_nonneg L)).trans
         (ENNReal.dyadicWeight_anti (by simp) (by omega))
     calc eLpNorm ((fwdDiff v)^[L] (b.scaled L l)) 1 volume
-        ≤ ENNReal.ofReal (2 ^ l * ‖v‖) ^ L * b.derivNorm L := b.eLpNorm_iterDiff_scaled_le L l v
+        ≤ ENNReal.ofReal (2 ^ l * ‖v‖) ^ L * b.derivNorm L := b.eLpNorm_higherDiff_scaled_le L l v
       _ ≤ dyadicWeight (-(L : ℝ)) (i - j) * b.derivNorm L := by gcongr
       _ ≤ (b.derivNorm L + 2 ^ L * eLpNorm (momentKernel b.toFun L) 1 volume) *
             dyadicWeight (-(L : ℝ)) (i - j) := by
@@ -352,11 +352,11 @@ theorem eLpNorm_iterDiff_scaled_le_dyadic (L : ℕ) {i j l : ℕ} (hlj : l ≤ j
           gcongr
           exact le_self_add
   · rw [mul_one]
-    exact (b.eLpNorm_iterDiff_scaled_le' L l v).trans le_add_self
+    exact (b.eLpNorm_higherDiff_scaled_le' L l v).trans le_add_self
 
 /-- **Differences of the dual kernels in `L_1`**: for `‖v‖ ≤ 2^(-i)`,
 `‖Δ_v^L η_j‖_1 ≤ C 2^(-(i-j)L)` if `j ≤ i`, and `‖Δ_v^L η_j‖_1 ≤ C` if `j > i`. -/
-theorem eLpNorm_iterDiff_dual_le (L : ℕ) {i j : ℕ} {v : V} (hv : ‖v‖ ≤ 1 / 2 ^ i) :
+theorem eLpNorm_higherDiff_dual_le (L : ℕ) {i j : ℕ} {v : V} (hv : ‖v‖ ≤ 1 / 2 ^ i) :
     eLpNorm ((fwdDiff v)^[L] (b.dual L j)) 1 volume ≤
       b.dualConst L * (if j ≤ i then dyadicWeight (-(L : ℝ)) (i - j) else 1) := by
   set B := (b.derivNorm L + 2 ^ L * eLpNorm (momentKernel b.toFun L) 1 volume) *
@@ -366,13 +366,13 @@ theorem eLpNorm_iterDiff_dual_le (L : ℕ) {i j : ℕ} {v : V} (hv : ‖v‖ ≤
   rw [h2]
   cases j with
   | zero =>
-    exact (b.eLpNorm_iterDiff_scaled_le_dyadic L le_rfl hv).trans le_self_add
+    exact (b.eLpNorm_higherDiff_scaled_le_dyadic L le_rfl hv).trans le_self_add
   | succ j =>
     show eLpNorm ((fwdDiff v)^[L] (b.scaled L (j + 1) + b.scaled L j)) 1 volume ≤ B + B
     rw [fwdDiff_iter_add]
     exact (eLpNorm_add_le le_rfl).trans (add_le_add
-      (b.eLpNorm_iterDiff_scaled_le_dyadic L le_rfl hv)
-      (b.eLpNorm_iterDiff_scaled_le_dyadic L (Nat.le_succ j) hv))
+      (b.eLpNorm_higherDiff_scaled_le_dyadic L le_rfl hv)
+      (b.eLpNorm_higherDiff_scaled_le_dyadic L (Nat.le_succ j) hv))
 
 /-! ### Local means and the reproducing formula -/
 
@@ -537,7 +537,8 @@ theorem localMeansNorm_le (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0∞} 
 theorem lpModulus_dual_le (hp : p ≠ ∞) (L i j : ℕ) (h : Lp ℂ p (volume : Measure V)) :
     lpModulus p L (convLp hp (b.integrable_dual L j) h) i ≤
       b.dualConst L * (if j ≤ i then dyadicWeight (-(L : ℝ)) (i - j) else 1) * ‖h‖ₑ :=
-  lpModulus_convLp_le hp (b.integrable_dual L j) L i (fun _ hv => b.eLpNorm_iterDiff_dual_le L hv) h
+  lpModulus_convLp_le hp (b.integrable_dual L j) L i
+    (fun _ hv => b.eLpNorm_higherDiff_dual_le L hv) h
 
 /-- The constant of the synthesis estimate,
 `2 ‖m‖_1 (1 - 2^(-s))⁻¹ + C_η ((1 - 2^(-(L-s)))⁻¹ + (1 - 2^(-s))⁻¹)`. -/

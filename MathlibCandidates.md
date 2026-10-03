@@ -52,14 +52,15 @@ declarations.
   outside that file without re-declaring it (`FunctionSpaces/Torus/Measure.lean`); worth
   reporting upstream.
 * **Differences of polynomials by derivatives** (`FunctionSpaces/Interval/PolyDifferences.lean`):
-  `|Δ_σ^m P(y)| ≤ σ^m sup_{[y, y+mσ]} |P^(m)|` (`Interval.norm_iterDiff_polyFun_le`), and the
+  `|Δ_σ^m P(y)| ≤ σ^m sup_{[y, y+mσ]} |P^(m)|` (`Interval.norm_higherDiff_polyFun_le`), and the
   boundedness of every linear map of the polynomials of degree `< r` by the `L_p` norm on an
   interval (`Interval.exists_enorm_linearMap_le_eLpNorm`), a form of Markov's inequality.
-* **The translation algebra** (`FunctionSpaces/Cube/Translation.lean`): `ℂ[ℝ^d]` acting on
-  functions on `ℝ^d` by translations (`Cube.diffAct`, from `AddMonoidAlgebra.lift`), with
-  `(fwdDiff h)^[r] = (δ_h - 1)^r` and the expansion of an isotropic difference into mixed
-  coordinate differences (`Cube.isoDiff_eq_sum`); Mathlib's `fwdDiff` has no such link to the
-  group algebra.
+* **The translation algebra** (`FunctionSpaces/TranslationAlgebra.lean`): `ℂ[G]` acting on
+  functions on an additive commutative monoid `G` by translations (`TranslationAlgebra.diffAct`,
+  from `AddMonoidAlgebra.lift`), with `(fwdDiff h)^[r] = (δ_h - 1)^r`
+  (`TranslationAlgebra.higherDiff_eq_diffAct`), and the expansion of an isotropic difference on
+  `ℝ^d` into mixed coordinate differences (`Cube.higherDiff_eq_sum`); Mathlib's `fwdDiff` has no
+  such link to the group algebra.
 * **Young's inequality and convolution operators** (`FunctionSpaces/Rd/Convolution.lean`): for a
   Haar measure on a finite-dimensional space, `1 ≤ p < ∞`, integrable `K` and `f ∈ L_p`,
   `‖K ⋆ f‖_p ≤ ‖K‖_1 ‖f‖_p` (`Rd.eLpNorm_conv_le`), from the weighted Jensen inequality
@@ -80,13 +81,13 @@ declarations.
 * **Moduli of smoothness on finite-dimensional spaces** (`FunctionSpaces/Rd/Differences.lean`):
   for Mathlib's `fwdDiff` and a Haar measure, `‖Δ_h^r f‖_p ≤ 2^r ‖f‖_p`, the dilation property
   `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` (`Rd.modulus_mul_le`), and
-  `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost everywhere (`Rd.iterDiff_conv_ae`); the modulus on a
+  `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost everywhere (`Rd.higherDiff_conv_ae`); the modulus on a
   subset `U`, with the differences restricted to the points `x` with `x, …, x + rh ∈ U`
   (`Rd.modulusOn`, `FunctionSpaces/Rd/DomainModuli.lean`).
 * **Leibniz's rule for iterated forward differences** (`FunctionSpaces/Rd/Multipliers.lean`):
-  `Δ_h^r(u v)(x) = ∑_{l ≤ r} C(r, l) Δ_h^l u(x) Δ_h^(r-l) v(x + l h)` (`Rd.iterDiff_mul`); Mathlib
+  `Δ_h^r(u v)(x) = ∑_{l ≤ r} C(r, l) Δ_h^l u(x) Δ_h^(r-l) v(x + l h)` (`Rd.higherDiff_mul`); Mathlib
   has only the one-step `fwdDiff_smul`. Also `‖Δ_h^l G(x)‖ ≤ ‖h‖^l sup ‖D^l G‖` for smooth `G`
-  (`Rd.norm_iterDiff_le_of_iteratedFDeriv`).
+  (`Rd.norm_higherDiff_le_of_iteratedFDeriv`).
 * **Smooth resolutions of unity in a finite-dimensional space**
   (`FunctionSpaces/Rd/BoundedLipschitz.lean`): `Rd.exists_smooth_partition`, with `ContDiff`
   functions, from Mathlib's manifold version, and bounded derivatives of compactly supported smooth
@@ -95,7 +96,7 @@ declarations.
   measurable set `s`, `g ↦ 1_s g` as a continuous linear operator of norm at most `1` on
   `Lp ℂ p μ` (`Rd.indicatorLp`). Mathlib has `indicatorConstLp` for constant functions.
 * **Differences of Schwartz functions in `L_1`** (`FunctionSpaces/Rd/BandInverse.lean`):
-  `‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1` (`Rd.lintegral_enorm_iterDiff_schwartz_le`), from
+  `‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1` (`Rd.lintegral_enorm_higherDiff_schwartz_le`), from
   `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1` (`Rd.lintegral_enorm_fwdDiff_le`) and the commutation of differences
   with line derivatives (`Rd.lineDerivOp_fwdDiffSchwartz`).
 * **Bounded overlap in `L_p`** (`FunctionSpaces/Rd/AtomSynthesis.lean`): if at every point at most
@@ -109,7 +110,7 @@ declarations.
   on a ball `∫_B |g| ≤ |B|^(1-1/p) ‖g‖_p` (`Rd.lintegral_closedBall_le`),
   `|(K ⋆ g)(x)| ≤ sup |K| |B(0, ρ)|^(1-1/p) ‖g‖_p` for `K` vanishing outside `B(0, ρ)`
   (`Rd.enorm_conv_le_of_bound`), and `Δ_h^r (K ⋆ g) = (Δ_h^r K) ⋆ g` at every point
-  (`Rd.iterDiff_conv_apply`).
+  (`Rd.higherDiff_conv_apply`).
 * **Approximate identities at points of continuity** (`FunctionSpaces/Rd/GraphTrace.lean`): for
   integrable `Φ` with `∫ Φ = 1` and bounded support, `(Φ_{2^J} ⋆ F_J)(z) → z₀` as `J → ∞` and
   `z → y` whenever `F_J(z) → z₀` (`Rd.conv_dilate_near`). Mathlib's `convolution_tendsto_right`
@@ -118,7 +119,8 @@ declarations.
   integrable kernel `K` with bounded support and an `M`-Lipschitz `u`, `K ⋆ u` is Lipschitz with
   constant `M ‖K‖_1` (`Rd.norm_conv_sub_conv_le`), `|K ⋆ u - u| ≤ M R ‖K‖_1` for `∫ K = 1`
   (`Rd.norm_conv_sub_self_le`), and `|Δ_h^2 (K ⋆ u)| ≤ M (R + 2‖h‖) ‖Δ_h^2 K‖_1`
-  (`Rd.norm_iterDiff_two_conv_le`); `∫ Δ_h^r K = 0` for `r ≥ 1` (`Rd.integral_iterDiff_eq_zero`).
+  (`Rd.norm_higherDiff_two_conv_le`); `∫ Δ_h^r K = 0` for `r ≥ 1`
+  (`Rd.integral_higherDiff_eq_zero`).
 * **Lipschitz images of null sets** (`FunctionSpaces/Rd/GraphTraceCharts.lean`): a Lipschitz map
   between finite-dimensional inner product spaces of the same dimension maps null sets to null sets
   (`Rd.volume_image_eq_zero_of_lipschitzWith`), through the Hausdorff measure, a Haar measure in
