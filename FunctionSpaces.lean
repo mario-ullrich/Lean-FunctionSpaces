@@ -98,6 +98,8 @@ public import FunctionSpaces.Rd.GraphParametrization
 public import FunctionSpaces.Rd.GraphTrace
 public import FunctionSpaces.Rd.MollifiedGraph
 public import FunctionSpaces.Rd.GraphTraceExtension
+public import FunctionSpaces.Rd.GraphTraceCharts
+public import FunctionSpaces.Rd.LipschitzBoundaryTrace
 
 /-!
 # Function spaces
@@ -298,4 +300,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   bounds of their differences.
 * `FunctionSpaces.Rd.GraphTraceExtension`: the extension from the boundary by extended atoms and the
   trace space of a Lipschitz graph domain.
+* `FunctionSpaces.Rd.GraphTraceCharts`: locality of the trace, approximation by the partial sums of
+  the reproducing formula, change of chart, traces of products with smooth functions and of finite
+  sums.
+* `FunctionSpaces.Rd.LipschitzBoundaryTrace`: almost everywhere on the boundary of a bounded
+  Lipschitz domain, Besov spaces on the boundary, the boundary trace and its trace space.
 -/

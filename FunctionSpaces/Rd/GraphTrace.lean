@@ -524,15 +524,15 @@ theorem modNorm_trace_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) (hs1 
 
 /-! ### The trace of continuous functions -/
 
-/-- **The partial sums of the trace at a boundary point**: for a continuous representative `G`
-of `f`, `∑_{j ≤ J} (η_j ⋆ 1_Ω (k_j ⋆ f))(γ x') = (m_{2^J} ⋆ (m_{2^J} ⋆ G))(γ x')`: at boundary
-points the cut-off does not matter (the kernels are supported in `-K` and `γ x' + K ⊆ Ω`), and the
-partial sums of the reproducing formula are `m_{2^J} ⋆ m_{2^J} ⋆ f` at every point. -/
-theorem sum_traceFun_eq (hp : p ≠ ∞) (L J : ℕ) {f : Lp ℂ p (volume : Measure V)} {G : V → ℂ}
-    (hfG : (f : V → ℂ) =ᵐ[volume] G) (x' : Ω.hyperplane) :
+/-- **The partial sums of the trace at a boundary point**:
+`∑_{j ≤ J} (η_j ⋆ 1_Ω (k_j ⋆ f))(γ x') = (m_{2^J} ⋆ (m_{2^J} ⋆ f))(γ x')`: at boundary points the
+cut-off does not matter (the kernels are supported in `-K` and `γ x' + K ⊆ Ω`), and the partial
+sums of the reproducing formula are `m_{2^J} ⋆ m_{2^J} ⋆ f` at every point. -/
+theorem sum_traceFun_eq_conv (hp : p ≠ ∞) (L J : ℕ) (f : Lp ℂ p (volume : Measure V))
+    (x' : Ω.hyperplane) :
     ∑ j ∈ Finset.range (J + 1),
         Ω.traceFun Ω.coneBump L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)) x' =
-      conv (Ω.coneBump.scaled L J) (conv (Ω.coneBump.scaled L J) G volume) volume
+      conv (Ω.coneBump.scaled L J) (convLp hp (Ω.coneBump.integrable_scaled L J) f) volume
         (Ω.graphMap x') := by
   have hcut : ∀ j, Ω.traceFun Ω.coneBump L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)) x' =
       conv (Ω.coneBump.dual L j) (Ω.coneBump.localMean hp L j f) volume (Ω.graphMap x') :=
@@ -543,31 +543,39 @@ theorem sum_traceFun_eq (hp : p ≠ ∞) (L J : ℕ) {f : Lp ℂ p (volume : Mea
       exact Ω.graphMap_add_mem x' (Ω.coneSupported_dual L j z hz)
   simp_rw [hcut]
   rw [Ω.coneBump.sum_conv_dual_localMean_apply hp L J f]
+
+/-- The partial sums of the trace for a representative `G` of `f`:
+`(m_{2^J} ⋆ (m_{2^J} ⋆ G))(γ x')`. -/
+theorem sum_traceFun_eq (hp : p ≠ ∞) (L J : ℕ) {f : Lp ℂ p (volume : Measure V)} {G : V → ℂ}
+    (hfG : (f : V → ℂ) =ᵐ[volume] G) (x' : Ω.hyperplane) :
+    ∑ j ∈ Finset.range (J + 1),
+        Ω.traceFun Ω.coneBump L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)) x' =
+      conv (Ω.coneBump.scaled L J) (conv (Ω.coneBump.scaled L J) G volume) volume
+        (Ω.graphMap x') := by
+  rw [Ω.sum_traceFun_eq_conv hp L J f]
   have hG : ⇑(convLp hp (Ω.coneBump.integrable_scaled L J) f) =ᵐ[volume]
       conv (Ω.coneBump.scaled L J) G volume :=
     (convLp_apply_ae hp _ f).trans (Filter.EventuallyEq.of_eq (conv_congr_ae hfG))
   rw [conv_congr_ae hG]
 
-/-- **The trace of continuous functions**: if `f ∈ L_p(V)` has a continuous representative `G`
-and a finite intrinsic `B^{s+1/p}_{p,q}`-norm on `Ω`, then `Tr f = G ∘ γ` almost everywhere on
-`H`: the partial sums of the trace converge at every point to `G(γ x')`
-(`Rd.conv_dilate_near`, twice) and a subsequence converges almost everywhere to `Tr f`. -/
-theorem trace_ae_eq_comp_graphMap (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
-    {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
-    (hf : ‖Ω.cutoff f‖ₑ + lqNorm q (fun k =>
-      dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p Ω.domain L f k) < ∞)
-    {G : V → ℂ} (hG : Continuous G) (hfG : (f : V → ℂ) =ᵐ[volume] G) :
-    Ω.trace hp L f =ᵐ[volume] G ∘ Ω.graphMap := by
+/-- **The trace is an almost everywhere limit of mollified restrictions**: for a finite intrinsic
+norm of smoothness `s + 1/p`, `s > 0`, a subsequence of `(m_{2^J} ⋆ (m_{2^J} ⋆ f))(γ x')` converges to
+`Tr f(x')` for almost every `x'`, since the partial sums of the trace series converge in `L_p(H)`. -/
+theorem exists_subseq_tendsto_trace (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
+    (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
+    (hX : Ω.intrinsicNorm hp L (s + 1 / p.toReal) q f < ∞) :
+    ∃ ns : ℕ → ℕ, StrictMono ns ∧ ∀ᵐ x' ∂(volume : Measure Ω.hyperplane),
+      Tendsto (fun k => conv (Ω.coneBump.scaled L (ns k))
+        (convLp hp (Ω.coneBump.integrable_scaled L (ns k)) f) volume (Ω.graphMap x')) atTop
+          (𝓝 (Ω.trace hp L f x')) := by
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne'
-  have hX := Ω.intrinsicNorm_lt_top hp L (s + 1 / p.toReal) hq hf
   have hS := Ω.tendsto_sum_traceTerm Ω.coneBump hp L hs hq
     (h := fun j => Ω.cutoff (Ω.coneBump.localMean hp L j f)) hX
-  -- the representatives of the partial sums
   have hSae : ∀ᵐ x' ∂(volume : Measure Ω.hyperplane), ∀ J,
       (∑ j ∈ Finset.range (J + 1), Ω.traceTerm Ω.coneBump hp L j
         (Ω.cutoff (Ω.coneBump.localMean hp L j f))) x' =
-      ∑ j ∈ Finset.range (J + 1),
-        Ω.traceFun Ω.coneBump L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)) x' := by
+      conv (Ω.coneBump.scaled L J) (convLp hp (Ω.coneBump.integrable_scaled L J) f) volume
+        (Ω.graphMap x') := by
     rw [ae_all_iff]
     intro J
     have h1 := Lp.coeFn_fun_finsetSum (Finset.range (J + 1))
@@ -577,12 +585,27 @@ theorem trace_ae_eq_comp_graphMap (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s :
           Ω.traceFun Ω.coneBump L j (Ω.cutoff (Ω.coneBump.localMean hp L j f)) x' :=
       ae_all_iff.2 fun j => Ω.traceTerm_ae Ω.coneBump hp L j _
     filter_upwards [h1, h2] with x' hx1 hx2
-    rw [hx1]
+    rw [hx1, ← Ω.sum_traceFun_eq_conv hp L J f x']
     exact Finset.sum_congr rfl fun j _ => hx2 j
-  -- a subsequence converges almost everywhere
   obtain ⟨ns, hns, hns_ae⟩ := (tendstoInMeasure_of_tendsto_eLpNorm hp0
     ((Lp.tendsto_Lp_iff_tendsto_eLpNorm' _ _).1 hS)).exists_seq_tendsto_ae
-  -- the pointwise limit of the partial sums
+  refine ⟨ns, hns, ?_⟩
+  filter_upwards [hSae, hns_ae] with x' hx1 hx2
+  simp only [hx1] at hx2
+  exact hx2
+
+/-- **The trace of continuous functions**: if `f ∈ L_p(V)` has a continuous representative `G`
+and a finite intrinsic `B^{s+1/p}_{p,q}`-norm on `Ω`, then `Tr f = G ∘ γ` almost everywhere on
+`H`: the mollified restrictions converge at every point to `G(γ x')`
+(`Rd.conv_dilate_near`, twice), and a subsequence converges almost everywhere to `Tr f`. -/
+theorem trace_ae_eq_comp_graphMap (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
+    {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
+    (hf : ‖Ω.cutoff f‖ₑ + lqNorm q (fun k =>
+      dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p Ω.domain L f k) < ∞)
+    {G : V → ℂ} (hG : Continuous G) (hfG : (f : V → ℂ) =ᵐ[volume] G) :
+    Ω.trace hp L f =ᵐ[volume] G ∘ Ω.graphMap := by
+  obtain ⟨ns, hns, hae⟩ := Ω.exists_subseq_tendsto_trace hp L hs hq
+    (Ω.intrinsicNorm_lt_top hp L (s + 1 / p.toReal) hq hf)
   have hΦ := integrable_momentKernel Ω.coneBump.integrable L
   have hone := integral_momentKernel Ω.coneBump.integrable Ω.coneBump.integral_eq_one hL
   have hR : 0 ≤ (L : ℝ) * Ω.coneBump.radius :=
@@ -608,9 +631,14 @@ theorem trace_ae_eq_comp_graphMap (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s :
     exact ⟨J₀, fun J hJ0 => by
       rw [dist_eq_norm]
       exact hJ J hJ0 y (by simpa using hδ)⟩
-  filter_upwards [hSae, hns_ae] with x' hx1 hx2
-  refine tendsto_nhds_unique hx2 ?_
-  simp_rw [hx1, Ω.sum_traceFun_eq hp L _ hfG x']
+  filter_upwards [hae] with x' hx
+  refine tendsto_nhds_unique hx ?_
+  have hJ : ∀ J, conv (Ω.coneBump.scaled L J) (convLp hp (Ω.coneBump.integrable_scaled L J) f)
+      volume (Ω.graphMap x') = conv (Ω.coneBump.scaled L J)
+        (conv (Ω.coneBump.scaled L J) G volume) volume (Ω.graphMap x') := fun J => by
+    rw [conv_congr_ae ((convLp_apply_ae hp _ f).trans
+      (Filter.EventuallyEq.of_eq (conv_congr_ae hfG)))]
+  simp_rw [hJ]
   exact (hlim (Ω.graphMap x')).comp hns.tendsto_atTop
 
 /-! ### Linearity and continuity of the trace -/

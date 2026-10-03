@@ -6341,7 +6341,7 @@ Pascal's rule.
 \begin{lemma}[The modulus of a product]
 \label{lem:product-modulus}
 \lean{Rd.eLpNorm_iterDiff_mul_le, Rd.modulus_mul_smooth_le, Rd.ofReal_one_div_two_pow_pow,
-  Rd.memLp_mul_of_bound, Rd.mulLp, Rd.mulLp_apply_ae, Rd.enorm_mulLp_le}
+  Rd.memLp_mul_of_bound, Rd.mulLp, Rd.mulLp_apply_ae, Rd.mulLp_sub, Rd.enorm_mulLp_le}
 \leanok
 \uses{lem:smooth-differences, lem:leibniz-differences, lem:rd-differences}
 Let $1 \leq p < \infty$, $r \in \N$, $C \geq 0$ and $\psi : V \to \C$ smooth with
@@ -7191,24 +7191,39 @@ $\sum_{j \leq J} (\eta_j * (k_j * f))(y) = (m_{2^J} * (m_{2^J} * f))(y)$.
 Both sides are continuous and agree almost everywhere by \Cref{lem:reproducing-formula}.
 \end{proof}
 
+\begin{lemma}[The trace as a limit of mollified restrictions]
+\label{lem:trace-mollified}
+\lean{Rd.LipschitzGraph.sum_traceFun_eq_conv, Rd.LipschitzGraph.exists_subseq_tendsto_trace}
+\leanok
+\uses{thm:trace-series, lem:reproducing-pointwise, lem:support-principle-two, def:graph-map}
+Let $s > 0$ and let $f \in L_p$ have a finite intrinsic norm of smoothness $s + 1/p$. The partial
+sums of the trace at $x' \in H$ are $(m_{2^J} * (m_{2^J} * f))(\gamma(x'))$, and a subsequence of
+them converges to $\operatorname{Tr} f(x')$ for almost every $x' \in H$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+At $\gamma(x')$ the cut-off does not matter, since the kernels are supported in $-K$ and
+$\gamma(x') + K \subseteq \Omega$ (\Cref{def:graph-map}, \Cref{lem:support-principle-two}), so
+\Cref{lem:reproducing-pointwise} gives the partial sums. They converge to $\operatorname{Tr} f$ in
+$L_p(H)$ (\Cref{thm:trace-series}), and a subsequence converges almost everywhere.
+\end{proof}
+
 \begin{theorem}[The trace of continuous functions]
 \label{thm:trace-continuous}
 \lean{Rd.LipschitzGraph.sum_traceFun_eq, Rd.LipschitzGraph.trace_ae_eq_comp_graphMap}
 \leanok
-\uses{thm:trace-graph, lem:approx-identity-points, lem:reproducing-pointwise,
-  lem:support-principle-two, def:graph-map}
+\uses{lem:trace-mollified, lem:approx-identity-points}
 Let $L \geq 1$, $s > 0$, and let $f \in L_p$ have a finite norm as in \Cref{thm:trace-graph} and a
 continuous representative $G$. Then $\operatorname{Tr} f = G \circ \gamma$ almost everywhere on $H$.
 \end{theorem}
 
 \begin{proof}
 \leanok
-At $\gamma(x')$ the cut-off does not matter, since the kernels are supported in $-K$ and
-$\gamma(x') + K \subseteq \Omega$ (\Cref{def:graph-map}, \Cref{lem:support-principle-two}), so the
-partial sums of the trace at $x'$ are $(m_{2^J} * (m_{2^J} * G))(\gamma(x'))$ by
-\Cref{lem:reproducing-pointwise}. By \Cref{lem:approx-identity-points}, applied twice, they converge
-to $G(\gamma(x'))$ for every $x'$, and a subsequence converges to $\operatorname{Tr} f$ almost
-everywhere.
+The partial sums of the trace at $x'$ are $(m_{2^J} * (m_{2^J} * G))(\gamma(x'))$, and a subsequence
+converges to $\operatorname{Tr} f$ almost everywhere (\Cref{lem:trace-mollified}). By
+\Cref{lem:approx-identity-points}, applied twice, the whole sequence converges to $G(\gamma(x'))$
+for every $x'$.
 \end{proof}
 
 \section{The trace space of a Lipschitz graph domain}
@@ -7426,6 +7441,357 @@ This is \cite[Theorem 4.11]{SchneiderVybiral} for one Lipschitz graph domain and
 trace is bounded (\Cref{thm:trace-graph}), and $E g$ has the trace $g$
 (\Cref{thm:trace-extension}) and a finite intrinsic norm (\Cref{thm:graph-trace-extension},
 \Cref{lem:moduli-orders}).
+\end{proof}
+
+\section{Traces in charts}
+
+Three properties make the trace a function on the boundary, independent of the graph domain that
+describes the boundary near a point: locality, approximation by continuous functions, and the
+change of chart. In this section $\Omega$, $\Omega_1$ and $\Omega_2$ are Lipschitz graph domains,
+with hyperplanes $H$, $H_1$, $H_2$, graph maps $\gamma$, $\gamma_1$, $\gamma_2$ and projections $P$,
+$P_1$, $P_2$.
+
+\begin{lemma}[Locality of the trace]
+\label{lem:trace-locality}
+\lean{Rd.LipschitzGraph.conv_scaled_convLp_eq_zero,
+  Rd.LipschitzGraph.trace_ae_eq_zero_of_ae_eq_zero, Rd.LipschitzGraph.intrinsicNorm_sub_le,
+  Rd.LipschitzGraph.trace_ae_eq_of_ae_eq}
+\leanok
+\uses{lem:trace-mollified, lem:trace-linear, lem:support-principle-two}
+Let $s > 0$, let $f_1, f_2 \in L_p$ have finite intrinsic norms of smoothness $s + 1/p$, and let
+$U \subseteq V$ be open with $f_1 = f_2$ almost everywhere on $\Omega \cap U$. Then
+$\operatorname{Tr} f_1 = \operatorname{Tr} f_2$ almost everywhere on $\gamma^{-1}(U)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By linearity (\Cref{lem:trace-linear}) it suffices to treat $f = f_1 - f_2$, whose intrinsic norm is
+at most the sum of the two. The mollified restriction $(m_{2^J} * (m_{2^J} * f))(\gamma(x'))$ only
+sees $f$ on $\Omega \cap B(\gamma(x'), 2 L R 2^{-J})$, since the kernels are supported in the cone
+(\Cref{lem:support-principle-two}); so it vanishes for large $J$ if $\gamma(x') \in U$, and a
+subsequence converges to $\operatorname{Tr} f(x')$ almost everywhere (\Cref{lem:trace-mollified}).
+\end{proof}
+
+\begin{lemma}[Approximation by the partial sums of the reproducing formula]
+\label{lem:partial-sums-approx}
+\lean{Rd.LocalMeansBump.partialSum, Rd.LocalMeansBump.partialSum_ae,
+  Rd.LocalMeansBump.continuous_partialSum_rep, Rd.LocalMeansBump.sum_range_ite_lt,
+  Rd.LocalMeansBump.tendsto_modNorm_sub_partialSum, Rd.LocalMeansBump.modNorm_partialSum_lt_top}
+\leanok
+\uses{lem:reproducing-formula, lem:local-means-synthesis, lem:intrinsic-upper}
+The partial sums $G_J = \sum_{j \leq J} \eta_j * (k_j * f)$ are continuous and, for $0 < \sigma < L$,
+have finite norms $\|G_J\|_p + \|(2^{k\sigma} \omega_L(G_J, 2^{-k})_p)_k\|_{\ell_q}$. If
+$\|f\|_p + \|(2^{k\sigma} \omega_L(f, 2^{-k})_p)_k\|_{\ell_q} < \infty$ and $0 < \sigma' < \sigma$,
+$\sigma' < L$, then
+\[
+  \|f - G_J\|_p + \sum_k 2^{k\sigma'} \omega_L(f - G_J, 2^{-k})_p \to 0 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The tail $f - G_J = \sum_{j > J} \eta_j * (k_j * f)$ is bounded by the synthesis estimate
+(\Cref{lem:local-means-synthesis}) by
+$\sum_{j > J} 2^{j\sigma'} \|k_j * f\|_p \leq
+\sum_{j > J} 2^{-j(\sigma - \sigma')} \|(2^{i\sigma} \|k_i * f\|_p)_i\|_{\ell_q}$, and the local
+means quasi-norm is finite (\Cref{lem:intrinsic-upper}).
+\end{proof}
+
+\begin{lemma}[The traces of the partial sums]
+\label{lem:trace-partial-sums}
+\lean{Rd.LipschitzGraph.intrinsicNorm_lt_top_of_modNorm', Rd.LipschitzGraph.tendsto_trace_partialSum}
+\leanok
+\uses{lem:partial-sums-approx, lem:trace-linear, lem:restriction-moduli}
+Let $s > 0$, $s + 1/p < L$ and
+$\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$. Then $F$ and the $G_J$
+have finite intrinsic norms on every Lipschitz graph domain, and
+$\operatorname{Tr} G_J \to \operatorname{Tr} F$ in $L_p(H)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The trace is linear and bounded by $\|\cdot\|_p + \sum_k 2^{k/p} \omega_L(\cdot, 2^{-k})_p$
+(\Cref{lem:trace-linear}), and \Cref{lem:partial-sums-approx} with $\sigma' = 1/p$.
+\end{proof}
+
+\begin{lemma}[Lipschitz images of null sets]
+\label{lem:lipschitz-null}
+\lean{Rd.volume_image_eq_zero_of_lipschitzWith}
+\leanok
+A Lipschitz map between finite-dimensional inner product spaces of the same dimension maps null
+sets to null sets.
+\end{lemma}
+
+\begin{proof}
+\leanok
+In dimension $k$ the Hausdorff measure $\mu_H^k$ is a Haar measure, so it has the null sets of
+Lebesgue measure, and a $K$-Lipschitz map $f$ has $\mu_H^k(f(N)) \leq K^k \mu_H^k(N)$.
+\end{proof}
+
+\begin{theorem}[Change of chart]
+\label{thm:change-of-chart}
+\lean{Rd.LipschitzGraph.lipschitzWith_proj_graphMap, Rd.LipschitzGraph.finrank_hyperplane_eq_finrank,
+  Rd.LipschitzGraph.ae_proj_graphMap, Rd.LipschitzGraph.trace_ae_eq_trace_comp}
+\leanok
+\uses{lem:trace-partial-sums, thm:trace-continuous, lem:lipschitz-null}
+Let $s > 0$, $s + 1/p < L$ and
+$\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$. For almost every
+$x' \in H_1$ such that $\gamma_1(x')$ lies on the graph of $\Omega_2$, that is
+$\gamma_2(P_2 \gamma_1(x')) = \gamma_1(x')$,
+\[
+  \operatorname{Tr}_1 F(x') = \operatorname{Tr}_2 F(P_2 \gamma_1(x')) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The traces of the continuous $G_J$ are $G_J \circ \gamma_1$ and $G_J \circ \gamma_2$
+(\Cref{thm:trace-continuous}), and they converge to $\operatorname{Tr}_1 F$ and $\operatorname{Tr}_2 F$
+(\Cref{lem:trace-partial-sums}); a common subsequence converges almost everywhere on $H_1$ and on
+$H_2$. The map $P_1 \circ \gamma_2$ is Lipschitz with constant $1 + M_2$, and $H_1$, $H_2$ both have
+dimension $n - 1$, so it maps the exceptional null set of $H_2$ to a null set of $H_1$
+(\Cref{lem:lipschitz-null}). Outside of it, $G_J(\gamma_1(x')) = G_J(\gamma_2(P_2 \gamma_1(x')))$
+converges to both values.
+\end{proof}
+
+\begin{lemma}[Traces of products with smooth functions]
+\label{lem:trace-products}
+\lean{Rd.LipschitzGraph.trace_mulLp_ae}
+\leanok
+\uses{thm:change-of-chart, thm:multipliers, thm:trace-continuous, lem:trace-partial-sums}
+Let $s > 0$, $s + 1/p < L$, $F$ as in \Cref{thm:change-of-chart}, and $\psi$ smooth with bounded
+derivatives up to order $L$. Then $\operatorname{Tr}(\psi F) = (\psi \circ \gamma) \operatorname{Tr} F$
+almost everywhere on $H$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\operatorname{Tr}(\psi G_J) = (\psi G_J) \circ \gamma$ and $\operatorname{Tr} G_J = G_J \circ \gamma$
+(\Cref{thm:trace-continuous}); $\psi G_J \to \psi F$ in the norm with smoothness $1/p$ by
+\Cref{thm:multipliers} and \Cref{lem:partial-sums-approx}, and subsequences converge almost
+everywhere.
+\end{proof}
+
+\begin{lemma}[Traces of finite sums]
+\label{lem:trace-sums}
+\lean{Rd.LipschitzGraph.trace_zero, Rd.LipschitzGraph.trace_finsetSum}
+\leanok
+\uses{lem:trace-linear, lem:pasting}
+For $s > 0$ and summands $F_i$ with finite norms
+$\|F_i\|_p + \|(2^{k(s + 1/p)} \omega_L(F_i, 2^{-k})_p)_k\|_{\ell_q}$,
+$\operatorname{Tr} \sum_i F_i = \sum_i \operatorname{Tr} F_i$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Induction on the number of summands with \Cref{lem:trace-linear}; finite sums keep the norms finite
+(\Cref{lem:pasting}).
+\end{proof}
+
+\section{Traces on bounded Lipschitz domains}
+
+In this section $\Omega$ is a bounded Lipschitz domain with boundary $\Gamma$, boundary balls
+$B_j$ and graph domains $\Omega_j$ (\Cref{def:bounded-lipschitz}), with hyperplanes $H_j$, graph
+maps $\gamma_j$, projections $P_j$ and traces $\operatorname{Tr}_j$.
+
+\begin{lemma}[The boundary in the charts]
+\label{lem:boundary-charts}
+\lean{Rd.LipschitzGraph.phi_proj, Rd.LipschitzGraph.graphMap_proj_eq_iff,
+  Rd.LipschitzGraph.mem_frontier_domain_iff, Rd.BoundedLipschitzDomain.mem_frontier_iff,
+  Rd.BoundedLipschitzDomain.graphMap_mem_frontier, Rd.BoundedLipschitzDomain.graphMap_proj_graphMap}
+\leanok
+\uses{def:bounded-lipschitz, def:graph-map}
+The boundary of a Lipschitz graph domain is its graph
+$\{y : \langle y, e \rangle = \phi(y)\} = \{y : \gamma(Py) = y\}$. For $y \in B_j$,
+$y \in \Gamma$ if and only if $\gamma_j(P_j y) = y$. Hence a boundary point $\gamma_j(x')$ in
+$B_j \cap B_k$ satisfies $\gamma_k(P_k \gamma_j(x')) = \gamma_j(x')$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+A point of the graph is the limit of the points $y + te \in \Omega$, $t > 0$, since
+$\phi(y + te) = \phi(y)$, and it is not in the open set $\Omega$. The boundary is local in open sets,
+and $\Omega \cap B_j = \Omega_j \cap B_j$.
+\end{proof}
+
+\begin{definition}[Resolutions of unity on the boundary]
+\label{def:boundary-partition}
+\lean{Rd.BoundedLipschitzDomain.BoundaryPartition,
+  Rd.BoundedLipschitzDomain.BoundaryPartition.toComplex,
+  Rd.BoundedLipschitzDomain.BoundaryPartition.contDiff_toComplex,
+  Rd.BoundedLipschitzDomain.BoundaryPartition.mem_ball_of_ne_zero,
+  Rd.BoundedLipschitzDomain.BoundaryPartition.toComplex_of_eq_zero,
+  Rd.BoundedLipschitzDomain.BoundaryPartition.sum_toComplex_eq_one,
+  Rd.BoundedLipschitzDomain.BoundaryPartition.hasCompactSupport_toComplex,
+  Rd.BoundedLipschitzDomain.nonempty_boundaryPartition}
+\leanok
+\uses{lem:resolution-of-unity}
+A resolution of unity on the boundary consists of smooth $\psi_j$ with
+$\operatorname{supp} \psi_j \subseteq B_j$ and $\sum_j \psi_j = 1$ on $\Gamma$. It exists by
+\Cref{lem:resolution-of-unity}, and the $\psi_j$ have compact support.
+\end{definition}
+
+\begin{lemma}[Cut-offs]
+\label{lem:boundary-cutoffs}
+\lean{Rd.BoundedLipschitzDomain.BoundaryPartition.exists_cutoff}
+\leanok
+\uses{def:boundary-partition}
+For each $j$ there is a smooth $\zeta_j$ with compact support, $\zeta_j \neq 0$ only in $B_j$, and
+$\zeta_j = 1$ where $\psi_j \neq 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\operatorname{supp} \psi_j$ is closed in $B_j = B(c_j, \rho_j)$, so it lies in some $B(c_j, r)$ with
+$r < \rho_j$; take a bump function equal to $1$ on $\overline{B}(c_j, r)$ with support $B_j$.
+\end{proof}
+
+\begin{definition}[Almost everywhere on the boundary]
+\label{def:ae-boundary}
+\lean{Rd.BoundedLipschitzDomain.aeBoundary, Rd.BoundedLipschitzDomain.eventually_aeBoundary_iff,
+  Rd.BoundedLipschitzDomain.eventually_aeBoundary_of_chart}
+\leanok
+\uses{lem:boundary-charts, thm:change-of-chart}
+A property holds almost everywhere on $\Gamma$ if for every $j$ it holds at $\gamma_j(x')$ for almost
+every $x' \in H_j$ with $\gamma_j(x') \in B_j$. A property of $\gamma_k(x')$ for almost every
+$x' \in H_k$ with $\gamma_k(x') \in B_k$ holds almost everywhere on $\Gamma \cap B_k$.
+\end{definition}
+
+\begin{definition}[Besov spaces on the boundary]
+\label{def:boundary-besov}
+\lean{Rd.BoundedLipschitzDomain.MemBoundaryBesov, Rd.BoundedLipschitzDomain.MemBoundaryBesov.congr}
+\leanok
+\uses{def:boundary-partition, def:ae-boundary}
+A function $g$ belongs to $B^s_{p,q}(\Gamma)$ if for every $j$ the chart piece
+$(\psi_j g) \circ \gamma_j$ agrees almost everywhere on $H_j$ with some $G_j \in L_p(H_j)$ with
+$\|G_j\|_p + \|(2^{ks} \omega_1(G_j, 2^{-k})_p)_k\|_{\ell_q} < \infty$. This only depends on $g$
+almost everywhere on $\Gamma$.
+\end{definition}
+
+This is \cite[Definition 3.3]{SchneiderVybiral} with Lebesgue measure on the hyperplanes and first
+differences, which describe $B^s_{p,q}(H_j)$ for $0 < s < 1$.
+
+\begin{definition}[The boundary trace]
+\label{def:boundary-trace}
+\lean{Rd.BoundedLipschitzDomain.boundaryTrace}
+\leanok
+\uses{def:boundary-partition, thm:trace-graph}
+The boundary trace of $F \in L_p(V)$ is
+$\operatorname{Tr}_\Gamma F(y) = \sum_k \psi_k(y) \operatorname{Tr}_k F(P_k y)$.
+\end{definition}
+
+\begin{theorem}[The boundary trace in the charts]
+\label{thm:boundary-trace-charts}
+\lean{Rd.BoundedLipschitzDomain.boundaryTrace_graphMap,
+  Rd.BoundedLipschitzDomain.boundaryTrace_eventuallyEq,
+  Rd.BoundedLipschitzDomain.boundaryTrace_eventuallyEq_of_continuous}
+\leanok
+\uses{def:boundary-trace, thm:change-of-chart, lem:boundary-charts, def:ae-boundary,
+  thm:trace-continuous}
+Let $s > 0$, $s + 1/p < L$ and
+$\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$. Then
+$\operatorname{Tr}_\Gamma F(\gamma_j(x')) = \operatorname{Tr}_j F(x')$ for almost every $x' \in H_j$
+with $\gamma_j(x') \in B_j$. Hence $\operatorname{Tr}_\Gamma F$ does not depend on the resolution of
+unity up to null sets of $\Gamma$, and $\operatorname{Tr}_\Gamma F = G$ almost everywhere on $\Gamma$
+if $F$ has a continuous representative $G$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+If $\psi_k(\gamma_j(x')) \neq 0$, then $\gamma_j(x') \in B_k$ lies on the graph of $\Omega_k$
+(\Cref{lem:boundary-charts}), and
+$\operatorname{Tr}_k F(P_k \gamma_j(x')) = \operatorname{Tr}_j F(x')$ for almost every such $x'$
+(\Cref{thm:change-of-chart}); and $\sum_k \psi_k = 1$ on $\Gamma$. For continuous $F$,
+\Cref{thm:trace-continuous}.
+\end{proof}
+
+\begin{lemma}[Locality of the boundary trace]
+\label{lem:boundary-trace-locality}
+\lean{Rd.BoundedLipschitzDomain.boundaryTrace_congr}
+\leanok
+\uses{thm:boundary-trace-charts, lem:trace-locality}
+For $F_1$, $F_2$ as in \Cref{thm:boundary-trace-charts} with $F_1 = F_2$ almost everywhere on
+$\Omega$, $\operatorname{Tr}_\Gamma F_1 = \operatorname{Tr}_\Gamma F_2$ almost everywhere on $\Gamma$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+In the chart $j$ both are the traces on $\Omega_j$ (\Cref{thm:boundary-trace-charts}), and
+$F_1 = F_2$ on $\Omega_j \cap B_j = \Omega \cap B_j$, so \Cref{lem:trace-locality} with $U = B_j$.
+\end{proof}
+
+\begin{theorem}[The boundary trace is bounded]
+\label{thm:boundary-trace-bounded}
+\lean{Rd.BoundedLipschitzDomain.trace_mulLp_ae_boundaryTrace,
+  Rd.BoundedLipschitzDomain.memBoundaryBesov_boundaryTrace}
+\leanok
+\uses{thm:boundary-trace-charts, lem:trace-products, thm:trace-graph, thm:multipliers,
+  def:boundary-besov}
+Let $1 \leq p < \infty$, $0 < s < 1$, $1 \leq q \leq \infty$, $s + 1/p < L$ and
+$\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$. Then
+$\operatorname{Tr}_\Gamma F \in B^s_{p,q}(\Gamma)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The chart piece $(\psi_j \operatorname{Tr}_\Gamma F) \circ \gamma_j$ is
+$(\psi_j \circ \gamma_j) \operatorname{Tr}_j F = \operatorname{Tr}_j (\psi_j F)$ almost everywhere
+(\Cref{thm:boundary-trace-charts}, \Cref{lem:trace-products}), and $\psi_j F$ has a finite norm
+(\Cref{thm:multipliers}), so \Cref{thm:trace-graph} applies.
+\end{proof}
+
+\begin{theorem}[The extension from the boundary]
+\label{thm:boundary-trace-extension}
+\lean{Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq}
+\leanok
+\uses{def:boundary-besov, lem:boundary-cutoffs, thm:graph-trace-extension, thm:trace-extension,
+  lem:moduli-orders, lem:trace-products, thm:change-of-chart, lem:trace-sums,
+  thm:boundary-trace-charts}
+Let $1 \leq p < \infty$, $0 < s < 1$, $1 \leq q \leq \infty$ and $L \geq 2$. Every
+$g \in B^s_{p,q}(\Gamma)$ is $\operatorname{Tr}_\Gamma F$ almost everywhere on $\Gamma$ for some $F$
+with $\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $G_j$ be the chart pieces of $g$, $E_j$ the extensions of the graph domains
+(\Cref{thm:graph-trace-extension}, \Cref{lem:moduli-orders}) and $\zeta_j$ the cut-offs of
+\Cref{lem:boundary-cutoffs}, and $F = \sum_j \zeta_j E_j G_j$. In the chart $k$, at almost every
+$x'$ with $y = \gamma_k(x') \in B_k$,
+$\operatorname{Tr}_k(\zeta_j E_j G_j)(x') = \zeta_j(y) \operatorname{Tr}_k(E_j G_j)(x')$
+(\Cref{lem:trace-products}). If $\zeta_j(y) \neq 0$, then $y \in B_j$, and by the change of chart
+(\Cref{thm:change-of-chart}) and \Cref{thm:trace-extension} this is
+$\zeta_j(y) G_j(P_j y) = \zeta_j(y) \psi_j(y) g(y) = \psi_j(y) g(y)$; otherwise $\psi_j(y) = 0$.
+Summing (\Cref{lem:trace-sums}), $\operatorname{Tr}_k F(x') = g(y)$, and
+\Cref{thm:boundary-trace-charts} concludes.
+\end{proof}
+
+\begin{theorem}[The trace space of a bounded Lipschitz domain]
+\label{thm:boundary-trace-space}
+\lean{Rd.add_one_div_toReal_lt, Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq_iff,
+  Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_of_boundaryPartition,
+  Rd.BoundedLipschitzDomain.IsBoundaryTrace, Rd.ae_eq_of_indicatorLp_eq,
+  Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_isBoundaryTrace}
+\leanok
+\uses{thm:boundary-trace-bounded, thm:boundary-trace-extension, lem:boundary-trace-locality,
+  thm:bounded-lipschitz-besov, lem:restriction-moduli}
+Let $1 \leq p < \infty$, $0 < s < 1$, $1 \leq q \leq \infty$ and $L \geq 2$. Then
+$g \in B^s_{p,q}(\Gamma)$ if and only if $g = \operatorname{Tr}_\Gamma F$ almost everywhere on $\Gamma$
+for some $F$ with $\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$, if and
+only if $g$ is the boundary trace of some $f$ with
+$\|f\|_{L_p(\Omega)} + \|(2^{k(s + 1/p)} \omega_L(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$, that
+is, $g = \operatorname{Tr}_\Gamma F$ almost everywhere on $\Gamma$ for every such $F$ that agrees with
+$f$ on $\Omega$. In particular $B^s_{p,q}(\Gamma)$ does not depend on the resolution of unity.
+\end{theorem}
+
+\begin{proof}
+\leanok
+This is \cite[Theorem 4.11]{SchneiderVybiral} for $p \geq 1$. The first equivalence is
+\Cref{thm:boundary-trace-bounded} and \Cref{thm:boundary-trace-extension}. For the second, the
+functions with a finite intrinsic norm on $\Omega$ are the restrictions of such $F$
+(\Cref{thm:bounded-lipschitz-besov}), and all of them have the same boundary trace
+(\Cref{lem:boundary-trace-locality}). Both resolutions of unity give the space of boundary traces,
+and the boundary traces agree almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}).
 \end{proof}
 
 \bpbibheading

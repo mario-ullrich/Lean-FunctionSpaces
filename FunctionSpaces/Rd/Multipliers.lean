@@ -248,6 +248,17 @@ theorem mulLp_apply_ae {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : 
     (F : Lp ℂ p (volume : Measure V)) : mulLp hψ hψC F =ᵐ[volume] fun x => ψ x * F x :=
   MemLp.coeFn_toLp _
 
+omit [Fact (1 ≤ p)] in
+/-- Multiplication by `ψ` is additive: `ψ (F - G) = ψ F - ψ G` in `L_p`. -/
+theorem mulLp_sub {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : ∀ x, ‖ψ x‖ ≤ C)
+    (F G : Lp ℂ p (volume : Measure V)) :
+    mulLp hψ hψC (F - G) = mulLp hψ hψC F - mulLp hψ hψC G := by
+  refine Lp.ext ?_
+  filter_upwards [mulLp_apply_ae hψ hψC (F - G), mulLp_apply_ae hψ hψC F,
+    mulLp_apply_ae hψ hψC G, Lp.coeFn_sub F G,
+    Lp.coeFn_sub (mulLp hψ hψC F) (mulLp hψ hψC G)] with x h1 h2 h3 h4 h5
+  rw [h1, h5, Pi.sub_apply, h2, h3, h4, Pi.sub_apply, mul_sub]
+
 /-- `‖ψ F‖_p ≤ C ‖F‖_p`. -/
 theorem enorm_mulLp_le {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : ∀ x, ‖ψ x‖ ≤ C)
     (F : Lp ℂ p (volume : Measure V)) : ‖mulLp hψ hψC F‖ₑ ≤ ENNReal.ofReal C * ‖F‖ₑ := by

@@ -399,6 +399,28 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
   `A(x) = a(Px) χ(2^j (⟪x, e⟫ - φ_j(Px)))` with a graph `φ_j` mollified at scale `2^(-j)`; it has a
   finite `B^{s+1/p}_{p,q}`-norm on `V` (`Rd.LipschitzGraph.modNorm_graphExtension_le`) and the trace
   `g` (`Rd.LipschitzGraph.trace_graphExtension`).
+* **Traces on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`,
+  boundary balls `B_j` and graph domains `Ω_j` as above, and `(ψ_j)` a smooth resolution of unity on
+  `Γ` with `tsupport ψ_j ⊆ B_j` (`Rd.BoundedLipschitzDomain.BoundaryPartition`). A property holds
+  almost everywhere on `Γ` if for every `j` it holds at `γ_j(x')` for almost every `x' ∈ H_j` with
+  `γ_j(x') ∈ B_j` (`Rd.BoundedLipschitzDomain.aeBoundary`), and `g ∈ B^s_{p,q}(Γ)` if every chart
+  piece `(ψ_j g) ∘ γ_j` agrees almost everywhere with some `G_j ∈ L_p(H_j)` with
+  `‖G_j‖_p + ‖(2^(ks) ω_1(G_j, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
+  (`Rd.BoundedLipschitzDomain.MemBoundaryBesov`). The boundary trace is
+  `Tr_Γ F(y) = ∑_k ψ_k(y) Tr_k F(P_k y)` (`Rd.BoundedLipschitzDomain.boundaryTrace`). For
+  `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞` and `L ≥ 2`, `g ∈ B^s_{p,q}(Γ)` iff `g = Tr_Γ F` almost
+  everywhere on `Γ` for some `F ∈ L_p(V)` with
+  `‖F‖_p + ‖(2^(k(s+1/p)) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
+  (`Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq_iff`), and iff `g` is the boundary trace of
+  some `f` with `‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
+  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_isBoundaryTrace`). The boundary trace
+  depends only on `F` on `Ω` (`Rd.BoundedLipschitzDomain.boundaryTrace_congr`), it is the
+  restriction for continuous `F` (`Rd.BoundedLipschitzDomain.boundaryTrace_eventuallyEq_of_continuous`),
+  and neither the trace nor `B^s_{p,q}(Γ)` depends on the resolution of unity
+  (`Rd.BoundedLipschitzDomain.boundaryTrace_eventuallyEq`,
+  `Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_of_boundaryPartition`). The proof rests on the
+  change of chart for the traces of graph domains (`Rd.LipschitzGraph.trace_ae_eq_trace_comp`),
+  whose Lipschitz chart maps keep null sets (`Rd.volume_image_eq_zero_of_lipschitzWith`).
 * **Two schemes.** Linear approximation from the first `n` elements of a sequence
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
@@ -485,6 +507,8 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 | Traces on Lipschitz graph domains: boundedness, linearity, trace of continuous functions | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTrace.lean` |
 | Mollified graph and vertical cut-off with bounds of their differences | ✅ proved | ✗ | `FunctionSpaces/Rd/MollifiedGraph.lean` |
 | Extension from the boundary of a Lipschitz graph domain, its trace space | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTraceExtension.lean` |
+| Traces in charts: locality, approximation, change of chart, products, finite sums | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTraceCharts.lean` |
+| Traces on bounded Lipschitz domains: Besov spaces on the boundary, the trace space | ✅ proved | ✗ | `FunctionSpaces/Rd/LipschitzBoundaryTrace.lean` |
 | Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
@@ -504,7 +528,8 @@ schemes of bounded continuous functions on a finite measure space and their embe
 theorems, spectral schemes in Hilbert spaces, the torus with its traces and Lipschitz atoms,
 `ℝ^d` with convolution, approximate identities, Littlewood–Paley decompositions, moduli of
 smoothness and local means, Lipschitz graph domains and bounded Lipschitz domains with Rychkov's
-extension and pointwise multipliers, atomic decompositions, traces on Lipschitz graph domains,
+extension and pointwise multipliers, atomic decompositions, traces on Lipschitz graph domains and
+on the boundaries of bounded Lipschitz domains,
 filtration schemes for wavelets and multiwavelets, the
 classical definitions through moduli of smoothness and weak derivatives, and polynomial and
 piecewise polynomial approximation on intervals and on the cube `[0, 1]^d`.
@@ -516,7 +541,7 @@ piecewise polynomial approximation on intervals and on the cube `[0, 1]^d`.
 
 * **Reiteration** for approximation and interpolation spaces.
 * **Function spaces beyond the torus**: dominating mixed smoothness on `ℝ^d`, compact
-  manifolds, traces on the boundaries of Lipschitz domains.
+  manifolds.
 * **Classical definitions for all `p`**: Sobolev spaces by weak derivatives and Besov spaces
   by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
 * **Higher smoothness**: splines on domains, and compactly supported wavelets such as
