@@ -6750,7 +6750,7 @@ $j > k$, $\omega_r(f, t)_p \leq 2^r \|f\|_p$.
 \end{proof}
 
 \begin{theorem}[Atomic synthesis]
-\label{thm:atomic-synthesis}
+\label{thm:rd-atomic-synthesis}
 \lean{Rd.atomSynthConst, Rd.atomSynthConst_ne_top, Rd.modNorm_le_coeffNorm}
 \leanok
 \uses{lem:level-sums, lem:almost-diagonal}
@@ -6778,16 +6778,16 @@ since $2^{js} b_j = 2^{j(s - n/p)} \|\lambda_{j,\cdot}\|_{\ell_p}$.
 \label{lem:single-level}
 \lean{Rd.lqNorm_ite_eq, Rd.isRegularAtom_zero, Rd.modNorm_level_le}
 \leanok
-\uses{thm:atomic-synthesis}
+\uses{thm:rd-atomic-synthesis}
 For regular atoms of level $j$ with the overlap of \Cref{lem:level-sums}, $F = \sum_m \lambda_m a_m$
 in $L_p$ and $0 < s < \sigma$,
 $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq K 2^{j(s - n/p)} \|\lambda\|_{\ell_p}$,
-with the constant $K$ of \Cref{thm:atomic-synthesis}.
+with the constant $K$ of \Cref{thm:rd-atomic-synthesis}.
 \end{lemma}
 
 \begin{proof}
 \leanok
-\Cref{thm:atomic-synthesis} with the coefficients and atoms of the other levels equal to $0$; the
+\Cref{thm:rd-atomic-synthesis} with the coefficients and atoms of the other levels equal to $0$; the
 zero function is a regular atom, and a sequence with one nonzero term $x$ has $\ell_q$-norm $x$.
 \end{proof}
 
@@ -6978,7 +6978,7 @@ $\|\lambda\|_{b^s_{p,q}} = \|(2^{js} \|k_j * F\|_p)_j\|_{\ell_q}$ for all $s$ an
 \label{thm:atomic-characterisation}
 \lean{Rd.LocalMeansBump.besov_iff_atomic}
 \leanok
-\uses{thm:atomic-decomposition, thm:atomic-synthesis, thm:local-means, lem:cells-partition}
+\uses{thm:atomic-decomposition, thm:rd-atomic-synthesis, thm:local-means, lem:cells-partition}
 Let $1 \leq p < \infty$, $L \geq 1$, $0 < s < L$, $1 \leq q \leq \infty$ and $F \in L_p$. Then
 $\|F\|_p + \|(2^{ks} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$ if and only if
 $F = \sum_j f_j$ in $L_p$ with $f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, for regular
@@ -6991,7 +6991,7 @@ atoms of order and exponent $L$ whose centres satisfy the overlap condition of
 This is \cite[Theorem 2.6]{SchneiderVybiral} for $p \geq 1$. If the norm is finite, so is the local
 means quasi-norm (\Cref{thm:local-means}), and \Cref{thm:atomic-decomposition} with $r = L$ gives
 the decomposition, with the overlap of \Cref{lem:cells-partition}. The converse is
-\Cref{thm:atomic-synthesis} with $\sigma = r = L$.
+\Cref{thm:rd-atomic-synthesis} with $\sigma = r = L$.
 \end{proof}
 
 \section{Traces on Lipschitz graph domains}
@@ -7099,7 +7099,7 @@ $2^{-j(n-1)/p} \|\lambda'_{j,\cdot}\|_{\ell_p} \leq 2^{-j(n-1)/p} 2^{jn/p} \|h\|
 \lean{Rd.LipschitzGraph.traceSeries, Rd.LipschitzGraph.summable_traceTerm,
   Rd.LipschitzGraph.tendsto_sum_traceTerm, Rd.LipschitzGraph.modNorm_traceSeries_le}
 \leanok
-\uses{lem:trace-terms-lp, lem:trace-atoms, thm:atomic-synthesis}
+\uses{lem:trace-terms-lp, lem:trace-atoms, thm:rd-atomic-synthesis}
 Let $1 \leq p < \infty$, $0 < s < 1$ and $1 \leq q \leq \infty$. There is $K < \infty$ such that for
 $h_j \in L_p$ with $X = \|(2^{j(s + 1/p)} \|h_j\|_p)_j\|_{\ell_q} < \infty$ the series
 $\operatorname{Tr} = \sum_j (\eta_j * h_j) \circ \gamma$ converges absolutely in $L_p(H)$ and
@@ -7112,7 +7112,7 @@ $\operatorname{Tr} = \sum_j (\eta_j * h_j) \circ \gamma$ converges absolutely in
 \begin{proof}
 \leanok
 The terms have $\|(\eta_j * h_j) \circ \gamma\|_{L_p(H)} \leq K 2^{j/p} \|h_j\|_p \leq K X 2^{-js}$
-(\Cref{lem:trace-terms-lp}). \Cref{thm:atomic-synthesis} on $H$ with the atoms of
+(\Cref{lem:trace-terms-lp}). \Cref{thm:rd-atomic-synthesis} on $H$ with the atoms of
 \Cref{lem:trace-atoms} and $\sigma = r = 1 > s$ bounds the left side by the coefficient
 quasi-norm on $H$, and since $s - (n - 1)/p = (s + 1/p) - n/p$,
 $2^{j(s - (n-1)/p)} \|\lambda'_{j,\cdot}\|_{\ell_p} \leq 2^{j(s + 1/p)} \|h_j\|_p$.
@@ -7366,7 +7366,7 @@ and $\min(1, t^l) \min(1, t^{2-l}) \leq \min(1, t^2)$. \Cref{lem:pointwise-atoms
   Rd.LipschitzGraph.graphExtension, Rd.LipschitzGraph.summable_traceExtTerm,
   Rd.LipschitzGraph.modNorm_graphExtension_le}
 \leanok
-\uses{lem:extended-atoms, thm:atomic-decomposition, lem:cell-atoms-dual, thm:atomic-synthesis,
+\uses{lem:extended-atoms, thm:atomic-decomposition, lem:cell-atoms-dual, thm:rd-atomic-synthesis,
   thm:local-means}
 Let $1 \leq p < \infty$, $0 < s < 1$ and $1 \leq q \leq \infty$. For $g \in L_p(H)$ let
 $g_j = \eta_j * (k_j * g)$ be the terms of the reproducing formula on $H$, with moment order $1$,
@@ -7382,7 +7382,7 @@ and $F_j(x) = g_j(Px) v_j(x)$. There is $K < \infty$ such that $E g = \sum_j F_j
 This is \cite[Theorem 4.10]{SchneiderVybiral} for $p \geq 1$. $F_j = \sum_m \lambda_{j,m} A_{j,m}$
 with the extensions of the cell atoms of $g_j$ (\Cref{lem:extended-atoms}), whose centres project to
 the cell centres of $H$ and so have bounded overlap. The atomic synthesis on $V$
-(\Cref{thm:atomic-synthesis}) with exponent $2 > s + 1/p$ bounds the left side by the coefficient
+(\Cref{thm:rd-atomic-synthesis}) with exponent $2 > s + 1/p$ bounds the left side by the coefficient
 quasi-norm with smoothness $s + 1/p$ on $V$, which is the one with smoothness $s$ on $H$ since
 $(s + 1/p) - n/p = s - (n-1)/p$, that is, the local means quasi-norm of $g$
 (\Cref{lem:cell-coefficients}, \Cref{thm:local-means}).
