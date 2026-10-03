@@ -98,39 +98,6 @@ theorem conv_add_conv_sub {A B : ℝ → ℂ} (hA : Continuous A) (hAc : HasComp
   rw [h1, h2 A hA hAc, h2 B hB hBc, conv_comm B A]
   abel
 
-/-- **Subadditive functionals and multiple series**: if `Q` is subadditive, `Q a ≤ C ‖a‖` with
-`C < ∞`, and the partial sums of `∑ u_k` over finite sets `S_J` converge to `F`, then
-`Q F ≤ ∑_k Q(u_k)`. -/
-theorem le_tsum_of_tendsto_finsetSum {E ι : Type*} [NormedAddCommGroup E] {Q : E → ℝ≥0∞}
-    {C : ℝ≥0∞} (hC : C ≠ ∞) (hadd : ∀ a b, Q (a + b) ≤ Q a + Q b) (hle : ∀ a, Q a ≤ C * ‖a‖ₑ)
-    {S : ℕ → Finset ι} {u : ι → E} {F : E}
-    (hu : Tendsto (fun J => ∑ k ∈ S J, u k) atTop (𝓝 F)) :
-    Q F ≤ ∑' k, Q (u k) := by
-  have hsum : ∀ s : Finset ι, Q (∑ k ∈ s, u k) ≤ ∑ k ∈ s, Q (u k) := fun s => by
-    classical
-    induction s using Finset.induction_on with
-    | empty => simpa using hle 0
-    | insert i s hi ih =>
-      rw [Finset.sum_insert hi, Finset.sum_insert hi]
-      exact (hadd _ _).trans (add_le_add le_rfl ih)
-  have hJ : ∀ J, Q F ≤ ∑' k, Q (u k) + C * ‖F - ∑ k ∈ S J, u k‖ₑ := fun J => by
-    calc Q F = Q (∑ k ∈ S J, u k + (F - ∑ k ∈ S J, u k)) := by rw [add_sub_cancel]
-      _ ≤ Q (∑ k ∈ S J, u k) + Q (F - ∑ k ∈ S J, u k) := hadd _ _
-      _ ≤ ∑' k, Q (u k) + C * ‖F - ∑ k ∈ S J, u k‖ₑ :=
-          add_le_add ((hsum _).trans (ENNReal.sum_le_tsum _)) (hle _)
-  have h1 : Tendsto (fun J => F - ∑ k ∈ S J, u k) atTop (𝓝 0) := by
-    have := (tendsto_const_nhds (x := F)).sub hu
-    rwa [sub_self] at this
-  have h2 : Tendsto (fun J => ‖F - ∑ k ∈ S J, u k‖ₑ) atTop (𝓝 0) := by
-    have h3 := (continuous_enorm.tendsto (0 : E)).comp h1
-    rw [enorm_zero] at h3
-    exact h3
-  have hlim : Tendsto (fun J => ∑' k, Q (u k) + C * ‖F - ∑ k ∈ S J, u k‖ₑ) atTop
-      (𝓝 (∑' k, Q (u k) + C * 0)) :=
-    tendsto_const_nhds.add (ENNReal.Tendsto.const_mul h2 (Or.inr hC))
-  rw [mul_zero, add_zero] at hlim
-  exact ge_of_tendsto hlim (Eventually.of_forall hJ)
-
 end Helpers
 
 namespace LocalMeansBump
@@ -529,7 +496,7 @@ theorem mixedModNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 
       ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ := fun m => by
     have h1 : lpMixedModulus p L F m ≤
         ∑' k, lpMixedModulus p L (convLp hp (b.integrable_mixedDual L k) (h k)) m :=
-      le_tsum_of_tendsto_finsetSum (C := 2 ^ (L * d)) (by simp)
+      ENNReal.le_tsum_of_tendsto_finsetSum (C := 2 ^ (L * d)) (by simp)
         (fun x y => lpMixedModulus_add_le L x y m) (fun x => lpMixedModulus_le L x m) hrep
     refine h1.trans ?_
     rw [← ENNReal.tsum_mul_left]

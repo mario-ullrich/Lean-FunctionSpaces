@@ -335,7 +335,7 @@ theorem splineStripConst_mul_le {r j k : ℕ} (hjk : j ≤ k) (K : ℝ≥0∞) {
       splineInverseConst r K p * dyadicWeight (-(((r - 1 : ℕ) : ℝ) + 1 / p.toReal)) (k - j) *
         B := by
   rw [splineStripConst_mul_eq r j K h]
-  exact mul_le_mul' (mul_le_mul' le_rfl (ofReal_two_pow_mul_rpow_le hjk hh (by positivity)))
+  exact mul_le_mul' (mul_le_mul' le_rfl (ENNReal.ofReal_two_pow_mul_rpow_le hjk hh (by positivity)))
     le_rfl
 
 omit [Fact (1 ≤ p)] in

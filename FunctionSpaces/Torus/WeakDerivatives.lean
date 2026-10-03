@@ -93,16 +93,6 @@ theorem norm_derivSymbol_le {m : ℕ} {α : d → ℕ} (hα : ∑ i, α i ≤ m)
     _ = (2 * π * (1 + deg k)) ^ ∑ i, α i := Finset.prod_pow_eq_pow_sum _ _ _
     _ ≤ (2 * π * (1 + deg k)) ^ m := pow_le_pow_right₀ hx hα
 
-/-- `(1 + x)^m ≤ 2^m (1 + x^m)` for `x ≥ 0`. -/
-theorem one_add_pow_le {x : ℝ} (hx : 0 ≤ x) (m : ℕ) : (1 + x) ^ m ≤ 2 ^ m * (1 + x ^ m) := by
-  rcases le_total x 1 with h | h
-  · calc (1 + x) ^ m ≤ 2 ^ m := pow_le_pow_left₀ (by positivity) (by linarith) m
-      _ ≤ 2 ^ m * (1 + x ^ m) := le_mul_of_one_le_right (by positivity)
-          (by have := pow_nonneg hx m; linarith)
-  · calc (1 + x) ^ m ≤ (2 * x) ^ m := pow_le_pow_left₀ (by positivity) (by linarith) m
-      _ = 2 ^ m * x ^ m := mul_pow _ _ _
-      _ ≤ 2 ^ m * (1 + x ^ m) := by gcongr; linarith
-
 /-- **The Sobolev weight is dominated by symbols**: `(1 + max_i |k_i|)^m ≤ 2^m (1 + ∑_j |k_j|^m)`,
 and `|k_j|^m ≤ |(2πi k_j)^m|` is the symbol of `∂_j^m`. -/
 theorem one_add_deg_pow_le [DecidableEq d] (m : ℕ) (k : d → ℤ) :
@@ -120,7 +110,7 @@ theorem one_add_deg_pow_le [DecidableEq d] (m : ℕ) (k : d → ℤ) :
   · obtain ⟨j, -, hj⟩ := Finset.exists_mem_eq_sup _ hne fun i => (k i).natAbs
     have hdeg : (deg k : ℝ) = |(k j : ℝ)| := by
       rw [deg, hj, ← Int.cast_abs, ← Int.natCast_natAbs, Int.cast_natCast]
-    refine (one_add_pow_le (Nat.cast_nonneg _) m).trans ?_
+    refine (one_add_pow_le_two_pow_mul (Nat.cast_nonneg _) m).trans ?_
     gcongr
     rw [hdeg]
     exact (hsym j).trans

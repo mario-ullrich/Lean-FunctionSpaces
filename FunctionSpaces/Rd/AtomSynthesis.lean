@@ -368,7 +368,7 @@ theorem modNorm_le_coeffNorm {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) 
   -- the norm
   have hnorm : ‖F‖ₑ ≤ K0 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
     have h1 : ‖F‖ₑ ≤ ∑' j, ‖f j‖ₑ :=
-      le_tsum_of_tendsto_sum (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y)
+      ENNReal.le_tsum_of_tendsto_sum (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y)
         (fun x => by rw [one_mul]) hF
     have h2 : ∀ j, ‖f j‖ₑ ≤ K0 * (dyadicWeight (-s) j * X) := fun j => by
       have hXj : dyadicWeight s j * b j ≤ X :=
@@ -385,7 +385,7 @@ theorem modNorm_le_coeffNorm {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) 
   have hmod : ∀ k, lpModulus p r F k ≤ 2 ^ r * K0 *
       ∑' j, (if j ≤ k then dyadicWeight (-σ) (k - j) else 1) * b j := fun k => by
     have h1 : lpModulus p r F k ≤ ∑' j, lpModulus p r (f j) k :=
-      le_tsum_of_tendsto_sum (C := 2 ^ r) (by simp) (fun x y => lpModulus_add_le r x y k)
+      ENNReal.le_tsum_of_tendsto_sum (C := 2 ^ r) (by simp) (fun x y => lpModulus_add_le r x y k)
         (fun x => lpModulus_le r x k) hF
     refine h1.trans ?_
     rw [← ENNReal.tsum_mul_left]
@@ -525,7 +525,7 @@ theorem volume_closedBall_div_two_pow {d : ℝ} (hd : 0 ≤ d) (j : ℕ) (z : V)
     volume (closedBall z (d / 2 ^ j)) = ENNReal.ofReal (d ^ finrank ℝ V) *
       volume (ball (0 : V) 1) * dyadicWeight (-(finrank ℝ V : ℝ)) j := by
   rw [Measure.addHaar_closedBall _ _ (by positivity), div_eq_mul_one_div, mul_pow,
-    ENNReal.ofReal_mul (by positivity), ofReal_one_div_two_pow_pow]
+    ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_one_div_two_pow_pow]
   ring
 
 /-- `(X 2^(-jn))^(1/p) = X^(1/p) 2^(-jn/p)`. -/

@@ -341,22 +341,6 @@ theorem eLpNorm_iterDiff_ppFun_le {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q 
     (eLpNorm_iterDiff_le_of_isPiecewisePoly (isPiecewisePoly_ppFun hQ j)
       (measurable_ppFun j Q) hK hp hh0 hh (sum_sum_localMass_le hp j r Q))
 
-/-- `(2^j h)^θ ≤ 2^(-(k-j)θ)` for `0 ≤ h ≤ 2^(-k)`, `j ≤ k` and `θ ≥ 0`. -/
-theorem ofReal_two_pow_mul_rpow_le {j k : ℕ} (hjk : j ≤ k) {h : ℝ} (hh : h ≤ 1 / 2 ^ k) {θ : ℝ}
-    (hθ : 0 ≤ θ) : ENNReal.ofReal (2 ^ j * h) ^ θ ≤ dyadicWeight (-θ) (k - j) := by
-  obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le hjk
-  rw [Nat.add_sub_cancel_left]
-  have h1 : (2 : ℝ) ^ j * h ≤ ((2 : ℝ) ^ m)⁻¹ := by
-    rw [pow_add] at hh
-    calc (2 : ℝ) ^ j * h ≤ 2 ^ j * (1 / (2 ^ j * 2 ^ m)) := by gcongr
-      _ = ((2 : ℝ) ^ m)⁻¹ := by field_simp
-  calc ENNReal.ofReal (2 ^ j * h) ^ θ ≤ ENNReal.ofReal (((2 : ℝ) ^ m)⁻¹) ^ θ :=
-        ENNReal.rpow_le_rpow (ENNReal.ofReal_le_ofReal h1) hθ
-    _ = dyadicWeight (-θ) m := by
-        rw [ENNReal.ofReal_inv_of_pos (by positivity), ENNReal.ofReal_pow (by norm_num),
-          ENNReal.ofReal_ofNat, ENNReal.inv_rpow, ← ENNReal.rpow_natCast, ← ENNReal.rpow_mul,
-          dyadicWeight, mul_neg, ENNReal.rpow_neg]
-
 variable (p) in
 /-- The constant of the inverse inequality, `2^r (1 + K (r (r + 1))^(1/p))`, with the Nikolskii
 constant `K`. -/
@@ -386,7 +370,7 @@ theorem le_ppInverseConst_mul {r j k : ℕ} (hjk : j ≤ k) (K : ℝ≥0∞) {h 
   have hw : (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^ (1 / p.toReal) ≤
       ((r * (r + 1) : ℕ) : ℝ≥0∞) ^ (1 / p.toReal) * dyadicWeight (-(1 / p.toReal)) (k - j) := by
     rw [ENNReal.mul_rpow_of_nonneg _ _ hθ]
-    exact mul_le_mul' le_rfl (ofReal_two_pow_mul_rpow_le hjk hh hθ)
+    exact mul_le_mul' le_rfl (ENNReal.ofReal_two_pow_mul_rpow_le hjk hh hθ)
   calc 2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^
         (1 / p.toReal) * B
       ≤ 2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) ^ (1 / p.toReal) *

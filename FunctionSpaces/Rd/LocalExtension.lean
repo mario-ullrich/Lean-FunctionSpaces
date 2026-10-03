@@ -337,62 +337,12 @@ theorem indicatorLp_localExtension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {U 
 
 /-! ### Local means and moduli on a set -/
 
-/-- **Moment kernels approximate with the modulus on `T`**: if the steps take `W` into `T`,
-`‖1_W (f - m_{2^j} ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, R 2^(-j), T)_p`. -/
-theorem enorm_indicatorLp_sub_convLp_scaled_le (hp : p ≠ ∞) {W T : Set V}
-    (hW : MeasurableSet W) (L j : ℕ)
-    (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
-    (f : Lp ℂ p (volume : Measure V)) :
-    ‖indicatorLp hW (f - convLp hp (b.integrable_scaled L j) f)‖ₑ ≤
-      (∫⁻ z, ‖b.toFun z‖ₑ) * modulusOn volume T L p (f : V → ℂ) (b.radius / 2 ^ j) := by
-  rw [Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hW _)]
-  exact eLpNorm_indicator_sub_convLp_momentKernel_le hp b.integrable b.integral_eq_one b.eq_zero L
-    (c := 2 ^ j) (by positivity) hW (hstep _ (one_le_pow₀ one_le_two)) f
-
 /-- `‖1_W (k_0 ⋆ f)‖_p ≤ ‖m‖_1 ‖f‖_p`. -/
 theorem enorm_indicatorLp_localMean_zero_le (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W)
     (L : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     ‖indicatorLp hW (b.localMean hp L 0 f)‖ₑ ≤
       eLpNorm (momentKernel b.toFun L) 1 volume * ‖f‖ₑ :=
   (enorm_indicatorLp_le hW _).trans (b.enorm_localMean_zero_le hp L f)
-
-/-- **Local means are bounded by the modulus on `T`**: for a bump of radius `R ≤ 1/2` whose steps
-take `W` into `T`, `‖1_W (k_{j+1} ⋆ f)‖_p ≤ 2 ‖g‖_1 ω_L(f, 2^(-(j+1)), T)_p`. -/
-theorem enorm_indicatorLp_localMean_succ_le (hp : p ≠ ∞) {W T : Set V} (hW : MeasurableSet W)
-    (L j : ℕ) (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
-    (hR : b.radius ≤ 1 / 2) (f : Lp ℂ p (volume : Measure V)) :
-    ‖indicatorLp hW (b.localMean hp L (j + 1) f)‖ₑ ≤
-      2 * (∫⁻ z, ‖b.toFun z‖ₑ) * lpModulusOn p T L f (j + 1) := by
-  set A := ∫⁻ z, ‖b.toFun z‖ₑ
-  have hk : b.localMean hp L (j + 1) f = (f - convLp hp (b.integrable_scaled L j) f) -
-      (f - convLp hp (b.integrable_scaled L (j + 1)) f) := by
-    rw [show b.localMean hp L (j + 1) f = convLp hp (b.integrable_scaled L (j + 1)) f -
-        convLp hp (b.integrable_scaled L j) f from
-      convLp_sub_kernel hp (b.integrable_scaled L (j + 1)) (b.integrable_scaled L j) f]
-    abel
-  have hmono : ∀ i, j ≤ i →
-      modulusOn volume T L p (f : V → ℂ) (b.radius / 2 ^ i) ≤ lpModulusOn p T L f (j + 1) :=
-    fun i hi => modulusOn_mono _ _ _ _ (by
-      calc b.radius / 2 ^ i ≤ (1 / 2) / 2 ^ i :=
-            div_le_div_of_nonneg_right hR (by positivity)
-        _ ≤ (1 / 2) / 2 ^ j :=
-            div_le_div_of_nonneg_left (by norm_num) (by positivity)
-              (pow_le_pow_right₀ one_le_two hi)
-        _ = 1 / 2 ^ (j + 1) := by
-            rw [pow_succ]
-            ring)
-  calc ‖indicatorLp hW (b.localMean hp L (j + 1) f)‖ₑ
-      ≤ ‖indicatorLp hW (f - convLp hp (b.integrable_scaled L j) f)‖ₑ +
-          ‖indicatorLp hW (f - convLp hp (b.integrable_scaled L (j + 1)) f)‖ₑ := by
-        rw [hk, map_sub]
-        exact enorm_sub_le
-    _ ≤ A * lpModulusOn p T L f (j + 1) + A * lpModulusOn p T L f (j + 1) :=
-        add_le_add
-          ((b.enorm_indicatorLp_sub_convLp_scaled_le hp hW L j hstep f).trans
-            (mul_le_mul' le_rfl (hmono j le_rfl)))
-          ((b.enorm_indicatorLp_sub_convLp_scaled_le hp hW L (j + 1) hstep f).trans
-            (mul_le_mul' le_rfl (hmono (j + 1) (Nat.le_succ j))))
-    _ = 2 * A * lpModulusOn p T L f (j + 1) := by ring
 
 /-- **The local means on `W` are bounded by the moduli on `T`**:
 `‖(2^(js) ‖1_W (k_j ⋆ f)‖_p)_j‖_{ℓ_q} ≤

@@ -57,9 +57,8 @@ theorem repr_cellCenter (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) (i : Fin (fi
 
 /-- A coordinate is at most the norm. -/
 theorem abs_repr_le_norm (y : V) (i : Fin (finrank ℝ V)) : |(gridBasis V).repr y i| ≤ ‖y‖ := by
-  rw [OrthonormalBasis.repr_apply_apply]
-  calc |inner ℝ ((gridBasis V) i) y| ≤ ‖(gridBasis V) i‖ * ‖y‖ := abs_real_inner_le_norm _ _
-    _ = ‖y‖ := by rw [(gridBasis V).orthonormal.1 i, one_mul]
+  rw [← Real.norm_eq_abs, ← (gridBasis V).repr.norm_map y]
+  exact PiLp.norm_apply_le _ i
 
 /-- On a cell, every coordinate differs from that of the centre by at most `2^(-j)/2`. -/
 theorem abs_repr_sub_cellCenter_le {j : ℕ} {m : Fin (finrank ℝ V) → ℤ} {x : V}

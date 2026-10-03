@@ -78,16 +78,6 @@ theorem integral_iterDiff_eq_zero {K : W → ℂ} (hK : Integrable K) {r : ℕ} 
   simp_rw [heq]
   rw [integral_sub (hg.comp_add_right h) hg, integral_add_right_eq_self, sub_self]
 
-/-- The convolution integrals of a continuous kernel with compact support and a locally integrable
-function converge absolutely. -/
-theorem integrable_translate_mul_of_locallyIntegrable {K g : W → ℂ} (hKc : Continuous K)
-    (hKs : HasCompactSupport K) (hg : LocallyIntegrable g volume) (v x : W) :
-    Integrable (fun y => K (y + v) * g (x - y)) volume := by
-  have hc : HasCompactSupport fun y => K (y + v) :=
-    hKs.comp_homeomorph (Homeomorph.addRight v)
-  exact (hc.convolutionExists_left (ContinuousLinearMap.mul ℂ ℂ)
-    (hKc.comp (continuous_id.add continuous_const)) hg) x
-
 /-- **Convolution keeps Lipschitz bounds**: for `u` with `‖u(x) - u(y)‖ ≤ M ‖x - y‖`,
 `‖(K ⋆ u)(x) - (K ⋆ u)(y)‖ ≤ M ‖K‖_1 ‖x - y‖`. -/
 theorem norm_conv_sub_conv_le {K u : W → ℂ} (hK : Integrable K) {M : ℝ}

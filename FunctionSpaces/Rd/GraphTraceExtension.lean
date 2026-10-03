@@ -589,7 +589,7 @@ theorem trace_graphExtension (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ}
       (hsumJ.hasSum.tendsto_sum_nat).comp (tendsto_add_atTop_nat 1)
     have hmod : ∀ k, lpModulus p L (∑' i, T (i + (J + 1))) k ≤
         ∑' i, lpModulus p L (T (i + (J + 1))) k := fun k =>
-      le_tsum_of_tendsto_sum (C := 2 ^ L) (by simp) (fun x y => lpModulus_add_le L x y k)
+      ENNReal.le_tsum_of_tendsto_sum (C := 2 ^ L) (by simp) (fun x y => lpModulus_add_le L x y k)
         (fun x => lpModulus_le L x k) htend
     calc Q (∑' i, T (i + (J + 1)))
         ≤ ∑' i, ‖T (i + (J + 1))‖ₑ + ∑' i, lqNorm 1

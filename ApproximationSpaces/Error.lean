@@ -157,10 +157,8 @@ theorem approxError_le_approxError_add_norm (n : ℕ) (f g : X) :
 /-- The error is `1`-Lipschitz in `f`. -/
 theorem abs_approxError_sub_le (n : ℕ) (f g : X) :
     |A.approxError n f - A.approxError n g| ≤ ‖f - g‖ := by
-  rw [abs_sub_le_iff]
-  constructor
-  · linarith [approxError_le_approxError_add_norm (A := A) n f g]
-  · linarith [approxError_le_approxError_add_norm (A := A) n g f, norm_sub_rev f g]
+  simpa [approxError, Real.dist_eq, dist_eq_norm] using
+    (Metric.lipschitz_infDist_pt (A n)).dist_le_mul f g
 
 /-- `E_n` is continuous, being `1`-Lipschitz. -/
 theorem continuous_approxError (n : ℕ) : Continuous (A.approxError n) :=

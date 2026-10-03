@@ -759,13 +759,6 @@ theorem enorm_two_rpow_half (k : ℕ) :
   congr 1
   ring
 
-/-- `2^k` as a dyadic weight. -/
-theorem ofReal_two_pow_eq (k : ℕ) : ENNReal.ofReal (2 ^ k) = dyadicWeight 1 k := by
-  rw [← ENNReal.natCast_two_pow_rpow, ENNReal.rpow_one, ENNReal.ofReal_pow zero_le_two,
-    ENNReal.ofReal_ofNat]
-  push_cast
-  rfl
-
 omit [Fact (1 ≤ p)] in
 /-- **The detail on one interval through the multiwavelets**:
 `2^(k/p) ‖Δ_k g‖_{L_p(I_{k,m})} = ‖∑_i 2^(k/2) ⟨g, ψ_{k,m,i}⟩ ψ_i‖_{L_p[0, 1]}`. -/
@@ -788,7 +781,7 @@ theorem eLpNorm_detailFun_dyadicIco (hp : p ≠ ∞) {g : ℝ → ℂ} (hg : Int
     rw [dyadicIco, show ((m : ℝ) + 1) / 2 ^ k = m / 2 ^ k + 1 / 2 ^ k by ring]
     exact (Measure.restrict_congr_set Ico_ae_eq_Icc).symm
   have hw : ENNReal.ofReal (1 / 2 ^ k)⁻¹ ^ (1 / p.toReal) = dyadicWeight (1 / p.toReal) k := by
-    rw [one_div ((2 : ℝ) ^ k), inv_inv, ofReal_two_pow_eq, ENNReal.dyadicWeight_rpow, one_mul]
+    rw [one_div ((2 : ℝ) ^ k), inv_inv, ENNReal.ofReal_two_pow_eq, ENNReal.dyadicWeight_rpow, one_mul]
   rw [← hL, show (unitVol : Measure ℝ) = volume.restrict (Icc 0 1) from rfl, h, hR, hw]
 
 /-- **The norm of a detail through its multiwavelet coefficients**: for `1 ≤ p < ∞` there are

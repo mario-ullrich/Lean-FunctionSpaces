@@ -222,7 +222,7 @@ theorem lpModulus_le_of_mem_bandSpace (hp : p ≠ ∞) (r : ℕ) {j k : ℕ}
         (Lp.aestronglyMeasurable a)
     have h2 : ENNReal.ofReal (2 ^ j * ‖h‖) ^ r ≤ dyadicWeight (-(r : ℝ)) (k - j) := by
       rw [← ENNReal.rpow_natCast]
-      exact Interval.ofReal_two_pow_mul_rpow_le hjk hh (Nat.cast_nonneg r)
+      exact ENNReal.ofReal_two_pow_mul_rpow_le hjk hh (Nat.cast_nonneg r)
     calc eLpNorm ((fwdDiff h)^[r] (conv (Theta j) (a : V → ℂ) volume)) p volume
         ≤ ENNReal.ofReal (2 ^ j * ‖h‖) ^ r * D * ‖a‖ₑ :=
           h1.trans (by gcongr; exact eLpNorm_iterDiff_Theta_le r j h)

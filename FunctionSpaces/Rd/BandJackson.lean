@@ -125,17 +125,6 @@ theorem ae_sub_jacksonApprox_eq (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (volu
 
 /-! ### Jackson's inequality -/
 
-/-- `(1 + t)^N ≤ 2^N (1 + t^N)` for `t ≥ 0`. -/
-theorem one_add_pow_le_two_pow_mul {t : ℝ} (ht : 0 ≤ t) (N : ℕ) :
-    (1 + t) ^ N ≤ 2 ^ N * (1 + t ^ N) := by
-  rcases le_total t 1 with h | h
-  · calc (1 + t) ^ N ≤ 2 ^ N := pow_le_pow_left₀ (by linarith) (by linarith) N
-      _ ≤ 2 ^ N * (1 + t ^ N) :=
-          le_mul_of_one_le_right (by positivity) (by linarith [pow_nonneg ht N])
-  · calc (1 + t) ^ N ≤ (2 * t) ^ N := pow_le_pow_left₀ (by linarith) (by linarith) N
-      _ = 2 ^ N * t ^ N := mul_pow 2 t N
-      _ ≤ 2 ^ N * (1 + t ^ N) := by gcongr; linarith
-
 variable (V) in
 /-- The **constant of Jackson's inequality**,
 `C = (‖Φ‖_1^(p-1) ∫ |Φ(z)| (1 + |z|)^(rp) dz)^(1/p)`. -/

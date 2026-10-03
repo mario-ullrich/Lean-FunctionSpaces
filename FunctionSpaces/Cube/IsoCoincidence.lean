@@ -274,7 +274,7 @@ theorem exists_inverse_cubePPScheme_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞
       _ ≤ (d : ℝ≥0∞) ^ r * C ^ d * dyadicWeight (-(1 / p.toReal)) (k - j) *
             eLpNorm g p (cubeVol d) := by
           gcongr
-          exact ofReal_two_pow_mul_rpow_le hjk hh (by positivity)
+          exact ENNReal.ofReal_two_pow_mul_rpow_le hjk hh (by positivity)
       _ ≤ _ := by gcongr; exact le_self_add
 
 /-- **The inverse inequality for tensor splines on the cube with the isotropic modulus**, of
@@ -310,7 +310,7 @@ theorem exists_inverse_cubeSplineScheme_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠
       _ ≤ (d : ℝ≥0∞) ^ r * C ^ d * dyadicWeight (-(((r - 1 : ℕ) : ℝ) + 1 / p.toReal)) (k - j) *
             eLpNorm g p (cubeVol d) := by
           gcongr
-          exact ofReal_two_pow_mul_rpow_le hjk hh hθ
+          exact ENNReal.ofReal_two_pow_mul_rpow_le hjk hh hθ
       _ ≤ _ := by gcongr; exact le_self_add
 
 /-! ### The coincidence theorems -/

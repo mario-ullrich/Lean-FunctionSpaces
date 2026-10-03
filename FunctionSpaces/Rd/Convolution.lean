@@ -391,14 +391,9 @@ theorem sub_conv_ae {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K K' f : 
 theorem conv_congr_ae {K f g : V → ℂ} (hfg : f =ᵐ[μ] g) : conv K f μ = conv K g μ :=
   convolution_congr (ContinuousLinearMap.mul ℂ ℂ) (Filter.EventuallyEq.refl _ K) hfg
 
-/-- The multiplication of `ℂ` is symmetric. -/
-theorem flip_mul_complex : (ContinuousLinearMap.mul ℂ ℂ).flip = ContinuousLinearMap.mul ℂ ℂ := by
-  ext
-  simp
-
 /-- **Convolution is commutative**: `K ⋆ L = L ⋆ K` (Mathlib's `convolution_flip`). -/
 theorem conv_comm (K L : V → ℂ) : conv K L μ = conv L K μ := by
-  rw [conv, conv, ← convolution_flip, flip_mul_complex]
+  rw [conv, conv, ← convolution_flip, ContinuousLinearMap.flip_mul]
 
 /-- Convolutions of integrable functions are integrable (Mathlib's
 `Integrable.integrable_convolution`). -/

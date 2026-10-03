@@ -2510,7 +2510,7 @@ trigonometric monomials form a Hilbert basis.
 
 \begin{lemma}[Symbols and the Sobolev weight]
 \label{lem:symbol-bounds}
-\lean{Torus.norm_derivSymbol, Torus.norm_derivSymbol_le, Torus.one_add_pow_le,
+\lean{Torus.norm_derivSymbol, Torus.norm_derivSymbol_le,
   Torus.one_add_deg_pow_le, Torus.derivSymbol_zero, Torus.derivSymbol_single, Torus.one_le_two_pi,
   Torus.abs_le_one_add_deg}
 \leanok
@@ -2989,7 +2989,7 @@ $G^p \sum_{l=0}^r m_{n+l}$.
 \begin{theorem}[Inverse inequality for piecewise polynomials]
 \label{thm:pp-inverse}
 \lean{Interval.ofReal_two_pow_rpow_mul_eq, Interval.eLpNorm_iterDiff_le_of_isPiecewisePoly,
-  Interval.eLpNorm_iterDiff_ppFun_le, Interval.ofReal_two_pow_mul_rpow_le, Interval.ppInverseConst,
+  Interval.eLpNorm_iterDiff_ppFun_le, ENNReal.ofReal_two_pow_mul_rpow_le, Interval.ppInverseConst,
   Interval.ppInverseConst_ne_top,
   Interval.two_pow_le_ppInverseConst, Interval.le_ppInverseConst_mul,
   Interval.exists_inverse_ppScheme}
@@ -3388,7 +3388,7 @@ moved multiwavelet is a polynomial on each half, so $\int_{I_{k,m}} (P_{k+1} g -
 \begin{lemma}[Norms of the details]
 \label{lem:multiwavelet-norms}
 \lean{Alpert.lintegral_unit_eq_sum_dyadicIco, Alpert.enorm_two_rpow_half,
-  Alpert.ofReal_two_pow_eq, Alpert.eLpNorm_detailFun_dyadicIco,
+  ENNReal.ofReal_two_pow_eq, Alpert.eLpNorm_detailFun_dyadicIco,
   Alpert.exists_eLpNorm_detailFun_equiv, Alpert.enorm_ppProj_sub}
 \leanok
 \uses{lem:multiwavelet-details, lem:multiwavelets}
@@ -4030,7 +4030,7 @@ bound $\sigma \cdot \sigma^m M$.
 \begin{lemma}[Difference bound for polynomials]
 \label{lem:diff-bound}
 \lean{Interval.norm_polyFun_degreeLTEquiv_symm_le, Interval.exists_enorm_linearMap_le_eLpNorm,
-  Interval.DiffBound, Interval.pow_derivative_mem_degreeLT, Interval.exists_diffBound}
+  Interval.DiffBound, Interval.exists_diffBound}
 \leanok
 \uses{lem:poly-diff-deriv, lem:interval-nikolskii}
 Let $1 \leq p < \infty$ and $r, m \in \N$. There is $K$ such that for every polynomial $P$ of
@@ -4199,7 +4199,7 @@ The norms of the slices are such functions of the point, so the lemma combines b
 \begin{definition}[Moduli of smoothness on the cube]
 \label{def:cube-modulus}
 \lean{Cube.cubeDiff, Cube.cubeDiff_eq, Cube.measurable_cubeDiff, Cube.slice_cubeDiff,
-  Cube.cubeDiff_add, Cube.diffRegion, Cube.unitVol_restrict_Icc, Cube.coordModulus,
+  Cube.cubeDiff_add, Cube.diffRegion, Cube.coordModulus,
   Cube.cubeModulus, Cube.lpCubeModulus}
 \leanok
 \uses{def:cube, def:iter-diff}
@@ -4770,7 +4770,7 @@ The algebra $\C[\R^d]$ is commutative, so identities between differences are rin
 \lean{Cube.mixedDiff, Cube.mixedDiff_nil, Cube.mixedDiff_cons, Cube.measurable_mixedDiff,
   Cube.coordElem, Cube.diffAct_coordElem_pow, Cube.diffAct_list_prod, Cube.count, Cube.sum_count,
   Cube.count_le, Cube.lowerVec, Cube.shiftVec, Cube.shiftVec_apply, Cube.card_lt_add_count_le,
-  Cube.single_add_one, Cube.single_sum_one, Cube.prod_lt_single, Cube.single_sub_one_eq_sum,
+  Cube.single_sum_one, Cube.prod_lt_single, Cube.single_sub_one_eq_sum,
   Cube.single_sub_one_pow_eq_sum, Cube.isoDiff_eq_sum, Cube.slice_cubeDiff_of_ne,
   Cube.slice_mixedDiff_mem}
 \leanok
@@ -5025,7 +5025,7 @@ for almost every $x$.
 \begin{lemma}[Linearity and associativity]
 \label{lem:conv-assoc}
 \lean{Rd.conv_add_ae, Rd.add_conv_ae, Rd.sub_conv_ae, Rd.ae_integrable_conv_conv,
-  Rd.conv_conv_ae, Rd.flip_mul_complex, Rd.conv_comm}
+  Rd.conv_conv_ae, Rd.conv_comm}
 \leanok
 \uses{thm:young}
 Let $1 \leq p < \infty$, $K, K', L \in L_1$ and $f, g \in L_p$. Almost everywhere on $V$,
@@ -5589,7 +5589,7 @@ $g = \Phi$, $L = r$ and $c = 2^k$, since $\int_V \Phi = \widehat{\Phi}(0) = 1$.
 
 \begin{theorem}[Jackson's inequality]
 \label{thm:band-jackson}
-\lean{Rd.one_add_pow_le_two_pow_mul, Rd.jacksonConst, Rd.jacksonConst_ne_top,
+\lean{one_add_pow_le_two_pow_mul, Rd.jacksonConst, Rd.jacksonConst_ne_top,
   Rd.enorm_sub_jacksonApprox_le, Rd.approxSeq_bandScheme_le}
 \leanok
 \uses{lem:jackson-approx, lem:rd-modulus, lem:weighted-jensen, lem:lp-kernels-basic}
@@ -5806,7 +5806,7 @@ the part $j > i$ a tail sum with the weights $2^{is}$, and \Cref{lem:hardy} boun
 
 \begin{lemma}[The synthesis estimate]
 \label{lem:local-means-synthesis}
-\lean{Rd.le_tsum_of_tendsto_sum, Rd.LocalMeansBump.synthConst,
+\lean{ENNReal.le_tsum_of_tendsto_sum, Rd.LocalMeansBump.synthConst,
   Rd.LocalMeansBump.synthConst_ne_top, Rd.LocalMeansBump.modNorm_le_of_tendsto,
   Rd.LocalMeansBump.modNorm_le_localMeansNorm}
 \leanok
@@ -6157,7 +6157,7 @@ Pascal's rule.
 
 \begin{lemma}[The modulus of a product]
 \label{lem:product-modulus}
-\lean{Rd.eLpNorm_iterDiff_mul_le, Rd.modulus_mul_smooth_le, Rd.ofReal_one_div_two_pow_pow,
+\lean{Rd.eLpNorm_iterDiff_mul_le, Rd.modulus_mul_smooth_le, ENNReal.ofReal_one_div_two_pow_pow,
   Rd.memLp_mul_of_bound, Rd.mulLp, Rd.mulLp_apply_ae, Rd.mulLp_sub, Rd.enorm_mulLp_le}
 \leanok
 \uses{lem:smooth-differences, lem:leibniz-differences, lem:rd-differences}
@@ -6650,7 +6650,7 @@ Countable additivity of the integral, and \Cref{lem:dyadic-cells}.
 \begin{lemma}[Pointwise bounds of convolutions]
 \label{lem:conv-pointwise}
 \lean{Rd.lintegral_closedBall_le, Rd.lintegral_kernel_mul_le, Rd.enorm_conv_le_of_bound,
-  Rd.integrable_translate_mul, Rd.conv_add_apply, Rd.iterDiff_conv_apply,
+  Rd.integrable_translate_mul_of_locallyIntegrable, Rd.conv_add_apply, Rd.iterDiff_conv_apply,
   Rd.enorm_iterDiff_le_of_bound}
 \leanok
 \uses{def:conv}
@@ -6739,7 +6739,7 @@ have $\|\lambda\|_{b^s_{p,q}} = \|(2^{js} \|g_j\|_p)_j\|_{\ell_q}$.
 
 \begin{lemma}[Bounds of the dual kernels]
 \label{lem:dual-kernel-bounds}
-\lean{Rd.ofReal_two_pow_pow, Rd.LocalMeansBump.scaled_eq_zero_of_lt,
+\lean{ENNReal.ofReal_two_pow_pow, Rd.LocalMeansBump.scaled_eq_zero_of_lt,
   Rd.LocalMeansBump.dual_eq_zero_of_lt, Rd.LocalMeansBump.hasCompactSupport_dual,
   Rd.LocalMeansBump.continuous_dual, Rd.LocalMeansBump.exists_iterDiff_dual_bound}
 \leanok
@@ -7053,7 +7053,7 @@ Lipschitz graph does not give.
 \begin{lemma}[Convolution with Lipschitz functions]
 \label{lem:conv-lipschitz}
 \lean{Rd.iterDiff_one_apply, Rd.iterDiff_two_apply, Rd.integral_iterDiff_eq_zero,
-  Rd.integrable_translate_mul_of_locallyIntegrable, Rd.norm_conv_sub_conv_le,
+  Rd.norm_conv_sub_conv_le,
   Rd.norm_conv_sub_self_le, Rd.norm_iterDiff_two_conv_le,
   Rd.LocalMeansBump.integral_norm_scaled, Rd.LocalMeansBump.integral_norm_iterDiff_scaled_le}
 \leanok
@@ -7931,7 +7931,7 @@ product whose factors have $L_1$ norms at most $C_\eta c(m_i, k_i)$
 
 \begin{theorem}[Mixed local means and mixed differences]
 \label{thm:mixed-local-means}
-\lean{Rd.le_tsum_of_tendsto_finsetSum, Rd.LocalMeansBump.mixedModNorm_le_of_tendsto,
+\lean{ENNReal.le_tsum_of_tendsto_finsetSum, Rd.LocalMeansBump.mixedModNorm_le_of_tendsto,
   Rd.LocalMeansBump.mixedModNorm_le_mixedLocalMeansNorm,
   Rd.LocalMeansBump.mixedBesov_iff_mixedLocalMeans}
 \leanok

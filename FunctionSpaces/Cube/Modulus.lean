@@ -86,13 +86,6 @@ restriction of the cube measure. -/
 noncomputable abbrev diffRegion (d : ℕ) (r : ℕ) (h : ℝ) (i : Fin d) : Measure (Fin d → ℝ) :=
   (cubeVol d).restrict {x | x i ∈ Icc 0 (1 - r * h)}
 
-/-- Lebesgue measure on `[0, 1]` restricted to `[0, 1 - rh]` is Lebesgue measure on
-`[0, 1 - rh]`, for `rh ≥ 0`. -/
-theorem unitVol_restrict_Icc {r : ℕ} {h : ℝ} (hh : 0 ≤ h) :
-    unitVol.restrict (Icc 0 (1 - r * h)) = volume.restrict (Icc 0 (1 - r * h)) := by
-  rw [Measure.restrict_restrict measurableSet_Icc, Set.inter_eq_left.2
-    (Icc_subset_Icc le_rfl (by nlinarith [mul_nonneg (Nat.cast_nonneg r) hh]))]
-
 /-- **Coordinate differences through slices**: for measurable `f`, `h ≥ 0` and `0 < p < ∞`,
 `‖Δ^r_{h e_i} f‖_{L_p({x_i ≤ 1 - rh})}^p = ∫_Q ‖Δ_h^r (slice f x i)‖_{L_p[0, 1-rh]}^p dx`. -/
 theorem eLpNorm_rpow_cubeDiff_eq_slice {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞}
@@ -103,7 +96,8 @@ theorem eLpNorm_rpow_cubeDiff_eq_slice {f : (Fin d → ℝ) → ℂ} (hf : Measu
   rw [diffRegion, eLpNorm_rpow_region_eq_slice (measurable_cubeDiff hf r h i) hp0 hp i
     measurableSet_Icc]
   refine lintegral_congr fun x => ?_
-  rw [slice_cubeDiff, unitVol_restrict_Icc hh]
+  rw [slice_cubeDiff, unitVol_restrict_Icc_of_subset le_rfl
+    (sub_le_self _ (mul_nonneg (Nat.cast_nonneg r) hh))]
 
 /-- The **modulus of smoothness in coordinate `i`** on the cube:
 `ω_r^{(i)}(f, t)_p = sup_{0 ≤ h ≤ t} ‖Δ^r_{h e_i} f‖_{L_p({x ∈ Q : x_i ≤ 1 - rh})}`. -/

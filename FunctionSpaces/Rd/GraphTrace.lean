@@ -641,8 +641,8 @@ theorem traceTerm_sub (b : LocalMeansBump V) (hp : p ≠ ∞) (L j : ℕ)
   have hp1 : 1 ≤ p := Fact.out
   have hint : ∀ (h : Lp ℂ p (volume : Measure V)) (y : V),
       Integrable (fun z => b.dual L j z * h (y - z)) volume := fun h y => by
-    simpa using integrable_translate_mul hp1 (b.continuous_dual L j) (b.hasCompactSupport_dual L j)
-      (Lp.memLp h) 0 y
+    simpa using integrable_translate_mul_of_locallyIntegrable (b.continuous_dual L j)
+      (b.hasCompactSupport_dual L j) ((Lp.memLp h).locallyIntegrable hp1) 0 y
   refine Lp.ext ?_
   filter_upwards [Ω.traceTerm_ae b hp L j (h₁ - h₂), Ω.traceTerm_ae b hp L j h₁,
     Ω.traceTerm_ae b hp L j h₂, Lp.coeFn_sub (Ω.traceTerm b hp L j h₁)

@@ -50,6 +50,65 @@ open ENNReal (lqNorm dyadicWeight)
 
 namespace Rd
 
+namespace LocalMeansBump
+
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+  [MeasurableSpace V] [BorelSpace V] {p : ℝ≥0∞} [Fact (1 ≤ p)] (b : LocalMeansBump V)
+
+/-! ### Local means and moduli on a set -/
+
+/-- **Moment kernels approximate with the modulus on `T`**: if the steps take `W` into `T`,
+`‖1_W (f - m_{2^j} ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, R 2^(-j), T)_p`. -/
+theorem enorm_indicatorLp_sub_convLp_scaled_le (hp : p ≠ ∞) {W T : Set V}
+    (hW : MeasurableSet W) (L j : ℕ)
+    (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
+    (f : Lp ℂ p (volume : Measure V)) :
+    ‖indicatorLp hW (f - convLp hp (b.integrable_scaled L j) f)‖ₑ ≤
+      (∫⁻ z, ‖b.toFun z‖ₑ) * modulusOn volume T L p (f : V → ℂ) (b.radius / 2 ^ j) := by
+  rw [Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hW _)]
+  exact eLpNorm_indicator_sub_convLp_momentKernel_le hp b.integrable b.integral_eq_one b.eq_zero L
+    (c := 2 ^ j) (by positivity) hW (hstep _ (one_le_pow₀ one_le_two)) f
+
+/-- **Local means are bounded by the modulus on `T`**: for a bump of radius `R ≤ 1/2` whose steps
+take `W` into `T`, `‖1_W (k_{j+1} ⋆ f)‖_p ≤ 2 ‖g‖_1 ω_L(f, 2^(-(j+1)), T)_p`. -/
+theorem enorm_indicatorLp_localMean_succ_le (hp : p ≠ ∞) {W T : Set V} (hW : MeasurableSet W)
+    (L j : ℕ) (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
+    (hR : b.radius ≤ 1 / 2) (f : Lp ℂ p (volume : Measure V)) :
+    ‖indicatorLp hW (b.localMean hp L (j + 1) f)‖ₑ ≤
+      2 * (∫⁻ z, ‖b.toFun z‖ₑ) * lpModulusOn p T L f (j + 1) := by
+  set A := ∫⁻ z, ‖b.toFun z‖ₑ
+  have hk : b.localMean hp L (j + 1) f = (f - convLp hp (b.integrable_scaled L j) f) -
+      (f - convLp hp (b.integrable_scaled L (j + 1)) f) := by
+    rw [show b.localMean hp L (j + 1) f = convLp hp (b.integrable_scaled L (j + 1)) f -
+        convLp hp (b.integrable_scaled L j) f from
+      convLp_sub_kernel hp (b.integrable_scaled L (j + 1)) (b.integrable_scaled L j) f]
+    abel
+  have hmono : ∀ i, j ≤ i →
+      modulusOn volume T L p (f : V → ℂ) (b.radius / 2 ^ i) ≤ lpModulusOn p T L f (j + 1) :=
+    fun i hi => modulusOn_mono _ _ _ _ (by
+      calc b.radius / 2 ^ i ≤ (1 / 2) / 2 ^ i :=
+            div_le_div_of_nonneg_right hR (by positivity)
+        _ ≤ (1 / 2) / 2 ^ j :=
+            div_le_div_of_nonneg_left (by norm_num) (by positivity)
+              (pow_le_pow_right₀ one_le_two hi)
+        _ = 1 / 2 ^ (j + 1) := by
+            rw [pow_succ]
+            ring)
+  calc ‖indicatorLp hW (b.localMean hp L (j + 1) f)‖ₑ
+      ≤ ‖indicatorLp hW (f - convLp hp (b.integrable_scaled L j) f)‖ₑ +
+          ‖indicatorLp hW (f - convLp hp (b.integrable_scaled L (j + 1)) f)‖ₑ := by
+        rw [hk, map_sub]
+        exact enorm_sub_le
+    _ ≤ A * lpModulusOn p T L f (j + 1) + A * lpModulusOn p T L f (j + 1) :=
+        add_le_add
+          ((b.enorm_indicatorLp_sub_convLp_scaled_le hp hW L j hstep f).trans
+            (mul_le_mul' le_rfl (hmono j le_rfl)))
+          ((b.enorm_indicatorLp_sub_convLp_scaled_le hp hW L (j + 1) hstep f).trans
+            (mul_le_mul' le_rfl (hmono (j + 1) (Nat.le_succ j))))
+    _ = 2 * A * lpModulusOn p T L f (j + 1) := by ring
+
+end LocalMeansBump
+
 namespace LipschitzGraph
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] (Ω : LipschitzGraph V)
@@ -77,16 +136,13 @@ theorem enorm_cutoff_sub_convLp_scaled_le (hp : p ≠ ∞) (L j : ℕ)
     (f : Lp ℂ p (volume : Measure V)) :
     ‖Ω.cutoff (f - convLp hp (Ω.coneBump.integrable_scaled L j) f)‖ₑ ≤
       (∫⁻ z, ‖Ω.coneBump.toFun z‖ₑ) * lpModulusOn p Ω.domain L f (j + 1) := by
-  have h := eLpNorm_indicator_sub_convLp_momentKernel_le hp Ω.coneBump.integrable
-    Ω.coneBump.integral_eq_one Ω.coneBump.eq_zero L (c := 2 ^ j) (by positivity)
-    Ω.measurableSet_domain
-    (fun z hz => Ω.subset_stepSet_of_coneSupported Ω.coneSupported_coneBump (by positivity) L hz)
-    f
   have hR : Ω.coneBump.radius / 2 ^ j = 1 / 2 ^ (j + 1) := by
     rw [Ω.coneBump_radius, pow_succ]
     ring
-  rw [Ω.enorm_cutoff, lpModulusOn, ← hR]
-  exact h
+  rw [lpModulusOn, ← hR]
+  exact Ω.coneBump.enorm_indicatorLp_sub_convLp_scaled_le hp Ω.measurableSet_domain L j
+    (fun c hc z hz => Ω.subset_stepSet_of_coneSupported Ω.coneSupported_coneBump
+      (lt_of_lt_of_le one_pos hc) L hz) f
 
 /-- `‖1_Ω (k_0 ⋆ f)‖_p ≤ ‖m‖_1 ‖f‖_{L_p(Ω)}`, by the support principle. -/
 theorem enorm_cutoff_localMean_zero_le (hp : p ≠ ∞) (L : ℕ) (f : Lp ℂ p (volume : Measure V)) :
@@ -106,27 +162,10 @@ theorem enorm_cutoff_localMean_zero_le (hp : p ≠ ∞) (L : ℕ) (f : Lp ℂ p 
 theorem enorm_cutoff_localMean_succ_le (hp : p ≠ ∞) (L j : ℕ)
     (f : Lp ℂ p (volume : Measure V)) :
     ‖Ω.cutoff (Ω.coneBump.localMean hp L (j + 1) f)‖ₑ ≤
-      2 * (∫⁻ z, ‖Ω.coneBump.toFun z‖ₑ) * lpModulusOn p Ω.domain L f (j + 1) := by
-  set A := ∫⁻ z, ‖Ω.coneBump.toFun z‖ₑ
-  have hk : Ω.coneBump.localMean hp L (j + 1) f =
-      (f - convLp hp (Ω.coneBump.integrable_scaled L j) f) -
-        (f - convLp hp (Ω.coneBump.integrable_scaled L (j + 1)) f) := by
-    rw [show Ω.coneBump.localMean hp L (j + 1) f =
-        convLp hp (Ω.coneBump.integrable_scaled L (j + 1)) f -
-          convLp hp (Ω.coneBump.integrable_scaled L j) f from
-      convLp_sub_kernel hp (Ω.coneBump.integrable_scaled L (j + 1))
-        (Ω.coneBump.integrable_scaled L j) f]
-    abel
-  calc ‖Ω.cutoff (Ω.coneBump.localMean hp L (j + 1) f)‖ₑ
-      ≤ ‖Ω.cutoff (f - convLp hp (Ω.coneBump.integrable_scaled L j) f)‖ₑ +
-          ‖Ω.cutoff (f - convLp hp (Ω.coneBump.integrable_scaled L (j + 1)) f)‖ₑ := by
-        rw [hk, map_sub]
-        exact enorm_sub_le
-    _ ≤ A * lpModulusOn p Ω.domain L f (j + 1) + A * lpModulusOn p Ω.domain L f (j + 1) :=
-        add_le_add (Ω.enorm_cutoff_sub_convLp_scaled_le hp L j f)
-          ((Ω.enorm_cutoff_sub_convLp_scaled_le hp L (j + 1) f).trans
-            (mul_le_mul' le_rfl (lpModulusOn_succ_le _ _ _ _)))
-    _ = 2 * A * lpModulusOn p Ω.domain L f (j + 1) := by ring
+      2 * (∫⁻ z, ‖Ω.coneBump.toFun z‖ₑ) * lpModulusOn p Ω.domain L f (j + 1) :=
+  Ω.coneBump.enorm_indicatorLp_localMean_succ_le hp Ω.measurableSet_domain L j
+    (fun c hc z hz => Ω.subset_stepSet_of_coneSupported Ω.coneSupported_coneBump
+      (lt_of_lt_of_le one_pos hc) L hz) Ω.coneBump_radius.le f
 
 /-- The constant `‖m‖_1 + 2 ‖g‖_1` of the intrinsic upper bound. -/
 noncomputable def intrinsicConst (L : ℕ) : ℝ≥0∞ :=

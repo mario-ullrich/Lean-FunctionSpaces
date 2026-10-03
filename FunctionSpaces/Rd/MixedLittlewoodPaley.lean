@@ -255,7 +255,7 @@ theorem exists_eLpNorm_conv_kernel_Theta_le (L : ℕ) :
       refine iSup₂_le fun v hv => ?_
       refine (eLpNorm_iterDiff_Theta_le L k v).trans (mul_le_mul' ?_ le_rfl)
       rw [← ENNReal.rpow_natCast]
-      exact Interval.ofReal_two_pow_mul_rpow_le hkj hv (Nat.cast_nonneg L)
+      exact ENNReal.ofReal_two_pow_mul_rpow_le hkj hv (Nat.cast_nonneg L)
     have hc : dyadicWeight (-(L : ℝ)) (j - k) = almostDiagCoeff L (j + 1) k * dyadicWeight L 1 := by
       have hk' : k ≤ j + 1 := by omega
       simp only [almostDiagCoeff, hk', ↓reduceIte]
@@ -336,7 +336,7 @@ theorem exists_mixedLPNorm_le (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) :
     have hrep := ((mixedBlock hp m).continuous.tendsto f).comp
       (b.tendsto_sum_mixedDual_mixedLocalMean hp hL f)
     simp only [Function.comp_def, map_sum] at hrep
-    have h1 := le_tsum_of_tendsto_finsetSum (Q := fun x : Lp ℂ p (volume : Measure (Fin d → ℝ)) =>
+    have h1 := ENNReal.le_tsum_of_tendsto_finsetSum (Q := fun x : Lp ℂ p (volume : Measure (Fin d → ℝ)) =>
       ‖x‖ₑ) (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y) (fun x => (one_mul _).ge)
       hrep
     refine h1.trans ?_
@@ -375,7 +375,7 @@ theorem exists_mixedLocalMeansNorm_le (hp : p ≠ ∞) (L : ℕ) :
     have hrep := ((b.mixedLocalMean hp L m).continuous.tendsto f).comp
       (tendsto_sum_mixedBlock hp f)
     simp only [Function.comp_def, map_sum] at hrep
-    have h1 := le_tsum_of_tendsto_finsetSum (Q := fun x : Lp ℂ p (volume : Measure (Fin d → ℝ)) =>
+    have h1 := ENNReal.le_tsum_of_tendsto_finsetSum (Q := fun x : Lp ℂ p (volume : Measure (Fin d → ℝ)) =>
       ‖x‖ₑ) (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y) (fun x => (one_mul _).ge)
       hrep
     refine h1.trans ?_

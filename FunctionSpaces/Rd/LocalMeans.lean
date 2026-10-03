@@ -131,40 +131,6 @@ theorem ENNReal.lqNorm_almostDiagonal_le {q : ℝ≥0∞} (hq : 1 ≤ q) (s L : 
 
 namespace Rd
 
-/-- **Subadditive functionals and series**: if `Q` is subadditive, `Q a ≤ C ‖a‖` with `C < ∞`, and
-the partial sums of `∑ u_j` converge to `f`, then `Q f ≤ ∑_j Q(u_j)`. -/
-theorem le_tsum_of_tendsto_sum {E : Type*} [NormedAddCommGroup E] {Q : E → ℝ≥0∞} {C : ℝ≥0∞}
-    (hC : C ≠ ∞) (hadd : ∀ a b, Q (a + b) ≤ Q a + Q b) (hle : ∀ a, Q a ≤ C * ‖a‖ₑ)
-    {u : ℕ → E} {f : E}
-    (hu : Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), u j) atTop (𝓝 f)) :
-    Q f ≤ ∑' j, Q (u j) := by
-  have hsum : ∀ s : Finset ℕ, Q (∑ j ∈ s, u j) ≤ ∑ j ∈ s, Q (u j) := fun s => by
-    classical
-    induction s using Finset.induction_on with
-    | empty => simpa using hle 0
-    | insert i s hi ih =>
-      rw [Finset.sum_insert hi, Finset.sum_insert hi]
-      exact (hadd _ _).trans (add_le_add le_rfl ih)
-  have hJ : ∀ J, Q f ≤ ∑' j, Q (u j) + C * ‖f - ∑ j ∈ Finset.range (J + 1), u j‖ₑ := fun J => by
-    calc Q f = Q (∑ j ∈ Finset.range (J + 1), u j + (f - ∑ j ∈ Finset.range (J + 1), u j)) := by
-          rw [add_sub_cancel]
-      _ ≤ Q (∑ j ∈ Finset.range (J + 1), u j) + Q (f - ∑ j ∈ Finset.range (J + 1), u j) :=
-          hadd _ _
-      _ ≤ ∑' j, Q (u j) + C * ‖f - ∑ j ∈ Finset.range (J + 1), u j‖ₑ :=
-          add_le_add ((hsum _).trans (ENNReal.sum_le_tsum _)) (hle _)
-  have h1 : Tendsto (fun J => f - ∑ j ∈ Finset.range (J + 1), u j) atTop (𝓝 0) := by
-    have := (tendsto_const_nhds (x := f)).sub hu
-    rwa [sub_self] at this
-  have h2 : Tendsto (fun J => ‖f - ∑ j ∈ Finset.range (J + 1), u j‖ₑ) atTop (𝓝 0) := by
-    have h3 := (continuous_enorm.tendsto (0 : E)).comp h1
-    rw [enorm_zero] at h3
-    exact h3
-  have hlim : Tendsto (fun J => ∑' j, Q (u j) + C * ‖f - ∑ j ∈ Finset.range (J + 1), u j‖ₑ)
-      atTop (𝓝 (∑' j, Q (u j) + C * 0)) :=
-    tendsto_const_nhds.add (ENNReal.Tendsto.const_mul h2 (Or.inr hC))
-  rw [mul_zero, add_zero] at hlim
-  exact ge_of_tendsto hlim (Eventually.of_forall hJ)
-
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
 
@@ -375,7 +341,7 @@ theorem eLpNorm_iterDiff_scaled_le_dyadic (L : ℕ) {i j l : ℕ} (hlj : l ≤ j
   split_ifs with hji
   · have hw : ENNReal.ofReal (2 ^ l * ‖v‖) ^ L ≤ dyadicWeight (-(L : ℝ)) (i - j) := by
       rw [← ENNReal.rpow_natCast]
-      exact (Interval.ofReal_two_pow_mul_rpow_le (hlj.trans hji) hv (Nat.cast_nonneg L)).trans
+      exact (ENNReal.ofReal_two_pow_mul_rpow_le (hlj.trans hji) hv (Nat.cast_nonneg L)).trans
         (ENNReal.dyadicWeight_anti (by simp) (by omega))
     calc eLpNorm ((fwdDiff v)^[L] (b.scaled L l)) 1 volume
         ≤ ENNReal.ofReal (2 ^ l * ‖v‖) ^ L * b.derivNorm L := b.eLpNorm_iterDiff_scaled_le L l v
@@ -604,7 +570,7 @@ theorem modNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0�
   -- the norm of `f`
   have hnorm : ‖F‖ₑ ≤ 2 * M * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
     have h1 : ‖F‖ₑ ≤ ∑' j, ‖convLp hp (b.integrable_dual L j) (h j)‖ₑ :=
-      le_tsum_of_tendsto_sum (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y)
+      ENNReal.le_tsum_of_tendsto_sum (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y)
         (fun x => by rw [one_mul]) hrep
     have h2 : ∀ j, ‖convLp hp (b.integrable_dual L j) (h j)‖ₑ ≤
         2 * M * (dyadicWeight (-s) j * X) := fun j => by
@@ -626,7 +592,7 @@ theorem modNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0�
       ∑' j, (if j ≤ i then dyadicWeight (-(L : ℝ)) (i - j) else 1) * a j := fun i => by
     have h1 : lpModulus p L F i ≤
         ∑' j, lpModulus p L (convLp hp (b.integrable_dual L j) (h j)) i :=
-      le_tsum_of_tendsto_sum (C := 2 ^ L) (by simp) (fun x y => lpModulus_add_le L x y i)
+      ENNReal.le_tsum_of_tendsto_sum (C := 2 ^ L) (by simp) (fun x y => lpModulus_add_le L x y i)
         (fun x => lpModulus_le L x i) hrep
     refine h1.trans ?_
     rw [← ENNReal.tsum_mul_left]

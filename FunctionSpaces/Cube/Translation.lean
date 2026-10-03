@@ -220,19 +220,10 @@ theorem card_lt_add_count_le {r : ℕ} (α : Fin r → Fin d) (c : Fin d) :
     rw [heq] at hl
     exact lt_irrefl c hl
 
-/-- `δ_{v + w} = δ_v δ_w`. -/
-theorem single_add_one (v w : Fin d → ℝ) :
-    AddMonoidAlgebra.single (v + w) (1 : ℂ) =
-      AddMonoidAlgebra.single v 1 * AddMonoidAlgebra.single w 1 := by
-  rw [AddMonoidAlgebra.single_mul_single, one_mul]
-
-/-- `δ_{∑ v_i} = ∏ δ_{v_i}`. -/
+/-- `δ_{∑ v_i} = ∏ δ_{v_i}` (Mathlib's `AddMonoidAlgebra.prod_single`). -/
 theorem single_sum_one {ι : Type*} (s : Finset ι) (v : ι → Fin d → ℝ) :
     AddMonoidAlgebra.single (∑ i ∈ s, v i) (1 : ℂ) = ∏ i ∈ s, AddMonoidAlgebra.single (v i) 1 := by
-  classical
-  induction s using Finset.induction_on with
-  | empty => rw [Finset.sum_empty, Finset.prod_empty, AddMonoidAlgebra.one_def]
-  | insert i s hi ih => rw [Finset.sum_insert hi, Finset.prod_insert hi, single_add_one, ih]
+  rw [AddMonoidAlgebra.prod_single, Finset.prod_const_one]
 
 /-- The lower products: `∏_{j < i} δ_{h_j e_j} = δ_{∑_{j<i} h_j e_j}`. -/
 theorem prod_lt_single (h : Fin d → ℝ) (i : Fin d) :

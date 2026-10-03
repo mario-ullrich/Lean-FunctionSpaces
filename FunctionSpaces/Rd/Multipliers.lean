@@ -214,15 +214,6 @@ theorem modulus_mul_smooth_le {ψ F : V → ℂ} (hψ : ContDiff ℝ ((⊤ : ℕ
 
 end Lp
 
-/-- `(2^(-k))^l = 2^(-kl)` as a dyadic weight. -/
-theorem ofReal_one_div_two_pow_pow (k l : ℕ) :
-    ENNReal.ofReal ((1 / 2 ^ k) ^ l) = dyadicWeight (-(l : ℝ)) k := by
-  have h : (1 / 2 ^ k : ℝ) ^ l = ((2 : ℝ) ^ (-(l : ℝ))) ^ k := by
-    rw [Real.rpow_neg (by norm_num), Real.rpow_natCast, one_div, inv_pow, inv_pow, ← pow_mul,
-      ← pow_mul, mul_comm]
-  rw [ENNReal.dyadicWeight_eq_pow, h, ENNReal.ofReal_pow (by positivity),
-    ← ENNReal.ofReal_rpow_of_pos (by norm_num), ENNReal.ofReal_ofNat]
-
 section Multiplier
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
@@ -373,7 +364,7 @@ theorem modNorm_mulLp_le (hp : p ≠ ∞) {ψ : V → ℂ} (hψ : ContDiff ℝ (
     rw [lpModulus, modulus_congr_ae (mulLp_apply_ae _ _ F)]
     refine (modulus_mul_smooth_le hψ hC (Lp.aestronglyMeasurable F) Fact.out).trans_eq ?_
     refine Finset.sum_congr rfl fun l _ => ?_
-    rw [ENNReal.ofReal_mul hC0, ofReal_one_div_two_pow_pow, lpModulus]
+    rw [ENNReal.ofReal_mul hC0, ENNReal.ofReal_one_div_two_pow_pow, lpModulus]
     ring
   have hseq : lqNorm q (fun k => dyadicWeight s k * lpModulus p r G k) ≤
       ∑ l ∈ Finset.range (r + 1), (r.choose l : ℝ≥0∞) * ENNReal.ofReal C *

@@ -47,17 +47,13 @@ def level (k : Fin d → ℕ) : ℕ := ∑ i, k i
 theorem le_level (k : Fin d → ℕ) (i : Fin d) : k i ≤ level k :=
   Finset.single_le_sum (fun j _ => Nat.zero_le (k j)) (Finset.mem_univ i)
 
-/-- The indices of level `n`, `{k ∈ ℕ^d : |k|_1 = n}`. -/
-def levelSet (n : ℕ) : Finset (Fin d → ℕ) :=
-  (Fintype.piFinset fun _ => Finset.range (n + 1)).filter fun k => level k = n
+/-- The indices of level `n`, `{k ∈ ℕ^d : |k|_1 = n}`: Mathlib's
+`Finset.Nat.antidiagonalTuple d n`. -/
+def levelSet (n : ℕ) : Finset (Fin d → ℕ) := Finset.Nat.antidiagonalTuple d n
 
 /-- `k` lies in the level set of `n` iff `|k|_1 = n`. -/
-theorem mem_levelSet {n : ℕ} {k : Fin d → ℕ} : k ∈ levelSet n ↔ level k = n := by
-  simp only [levelSet, Finset.mem_filter, Fintype.mem_piFinset, Finset.mem_range]
-  constructor
-  · exact fun h => h.2
-  · intro h
-    exact ⟨fun i => Nat.lt_succ_of_le (h ▸ le_level k i), h⟩
+theorem mem_levelSet {n : ℕ} {k : Fin d → ℕ} : k ∈ levelSet n ↔ level k = n :=
+  Finset.Nat.mem_antidiagonalTuple
 
 /-- **Counting**: `#{k ∈ ℕ^d : |k|_1 = n} ≤ (n + 1)^(d-1)`, since an index of level `n` is
 determined by its first `d - 1` coordinates. -/
@@ -66,7 +62,7 @@ theorem card_levelSet_le (n : ℕ) : (levelSet (d := d) n).card ≤ (n + 1) ^ (d
   | zero =>
     calc (levelSet (d := 0) n).card
         ≤ (Fintype.piFinset fun _ : Fin 0 => Finset.range (n + 1)).card :=
-          Finset.card_le_card (Finset.filter_subset _ _)
+          Finset.card_le_card fun k _ => Fintype.mem_piFinset.2 fun i => i.elim0
       _ = (n + 1) ^ (0 - 1) := by simp
   | succ e =>
     refine (Finset.card_le_card_of_injOn (fun k : Fin (e + 1) → ℕ => fun i : Fin e => k i.castSucc)
@@ -246,7 +242,7 @@ theorem enorm_sub_hyperbolicSum_le (hp : p ≠ ∞) (N : ℕ)
     simp only [u, hyperbolicSum]
     rw [Finset.sum_ite, Finset.sum_const_zero, zero_add, ← hcross, eq_comm, eq_sub_iff_add_eq,
       add_comm, Finset.sum_filter_add_sum_filter_not]
-  refine (le_tsum_of_tendsto_finsetSum (Q := fun x : Lp ℂ p (volume : Measure (Fin d → ℝ)) =>
+  refine (ENNReal.le_tsum_of_tendsto_finsetSum (Q := fun x : Lp ℂ p (volume : Measure (Fin d → ℝ)) =>
     ‖x‖ₑ) (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y) (fun x => (one_mul _).ge)
     hrep).trans (le_of_eq ?_)
   refine tsum_congr fun k => ?_

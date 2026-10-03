@@ -136,15 +136,15 @@ theorem enorm_conv_le_of_bound {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V → ℂ
       A * volume (closedBall (0 : V) ρ) ^ (1 - 1 / p.toReal) * eLpNorm g p volume :=
   (enorm_conv_le_lintegral K g x).trans (lintegral_kernel_mul_le hp1 hg hK hKρ x)
 
-/-- The convolution integrals with the translates of a continuous kernel with compact support
-converge absolutely. -/
-theorem integrable_translate_mul {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V → ℂ} (hKc : Continuous K)
-    (hKs : HasCompactSupport K) (hg : MemLp g p volume) (v x : V) :
+/-- The convolution integrals of a continuous kernel with compact support and a locally integrable
+function converge absolutely. -/
+theorem integrable_translate_mul_of_locallyIntegrable {K g : V → ℂ} (hKc : Continuous K)
+    (hKs : HasCompactSupport K) (hg : LocallyIntegrable g volume) (v x : V) :
     Integrable (fun y => K (y + v) * g (x - y)) volume := by
   have hc : HasCompactSupport fun y => K (y + v) :=
     hKs.comp_homeomorph (Homeomorph.addRight v)
   exact (hc.convolutionExists_left (ContinuousLinearMap.mul ℂ ℂ)
-    (hKc.comp (continuous_id.add continuous_const)) (hg.locallyIntegrable hp1)) x
+    (hKc.comp (continuous_id.add continuous_const)) hg) x
 
 /-- `(K ⋆ g)(x + v) = ∫ K(y + v) g(x - y) dy`, by translation invariance. -/
 theorem conv_add_apply (K g : V → ℂ) (x v : V) :
@@ -266,7 +266,8 @@ theorem conv_eq_tsum_cellAtom {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V → ℂ}
   rw [tsum_eq_sum hzero]
   simp_rw [cellCoef_mul_cellAtom hp0 hg, conv_apply]
   rw [← integral_finsetSum _ fun m _ => by
-    simpa using integrable_translate_mul hp1 hKc hKs (hg.indicator (measurableSet_cell j m)) 0 x]
+    simpa using integrable_translate_mul_of_locallyIntegrable hKc hKs
+      ((hg.indicator (measurableSet_cell j m)).locallyIntegrable hp1) 0 x]
   congr 1
   funext y
   rw [← Finset.mul_sum]
@@ -392,8 +393,8 @@ theorem enorm_iterDiff_cellAtom_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V →
       rw [show cellAtom p K j g m =
           (cellCoef p j g m)⁻¹ • conv K ((cell j m).indicator g) volume from rfl,
         fwdDiff_iter_const_smul, Pi.smul_apply, smul_eq_mul,
-        iterDiff_conv_apply (fun v x => integrable_translate_mul hp1 hKc hKs
-          (hg.indicator (measurableSet_cell j m)) v x)]
+        iterDiff_conv_apply (fun v x => integrable_translate_mul_of_locallyIntegrable hKc hKs
+          ((hg.indicator (measurableSet_cell j m)).locallyIntegrable hp1) v x)]
     have hsupp : ∀ y, (ρ + r) / 2 ^ j < ‖y‖ → (fwdDiff h)^[r] K y = 0 := fun y hy => by
       rw [iterDiff_apply]
       refine Finset.sum_eq_zero fun l hl => ?_
@@ -505,12 +506,6 @@ theorem coeffNorm_cellCoef {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {g 
 
 /-! ### The dual kernels -/
 
-/-- `(2^i)^n = 2^(in)` as a dyadic weight. -/
-theorem ofReal_two_pow_pow (i n : ℕ) :
-    ENNReal.ofReal (((2 : ℝ) ^ i) ^ n) = dyadicWeight n i := by
-  rw [ENNReal.dyadicWeight_eq_pow, ENNReal.rpow_natCast, ENNReal.ofReal_pow (by positivity),
-    ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat, ← pow_mul, ← pow_mul, mul_comm]
-
 namespace LocalMeansBump
 
 variable (b : LocalMeansBump V)
@@ -535,7 +530,7 @@ theorem exists_iterDiff_dual_bound (L r : ℕ) : ∃ A : ℝ≥0∞, A ≠ ∞ �
       ((2 : ℝ) ^ i • y)
     have h2 : ‖((((2 : ℝ) ^ i) ^ finrank ℝ V : ℝ) : ℂ)‖ₑ ≤ dyadicWeight (finrank ℝ V) j := by
       rw [← ofReal_norm, Complex.norm_real, Real.norm_of_nonneg (by positivity),
-        ofReal_two_pow_pow]
+        ENNReal.ofReal_two_pow_pow]
       exact ENNReal.dyadicWeight_mono (Nat.cast_nonneg _) hij
     have h3 : min 1 (ENNReal.ofReal (2 ^ 0 * ‖(2 : ℝ) ^ i • h‖) ^ (l : ℝ)) ≤
         min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (l : ℝ)) := by

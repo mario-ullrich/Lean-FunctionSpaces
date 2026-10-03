@@ -157,12 +157,6 @@ def DiffBound (r m : ℕ) (K : ℝ≥0∞) : Prop :=
         ENNReal.ofReal L⁻¹ ^ (1 / p.toReal) *
           eLpNorm (polyFun P) p (volume.restrict (Icc u (u + L)))
 
-/-- The `m`-th derivative as a linear map preserves the degree bound `< r`. -/
-theorem pow_derivative_mem_degreeLT {r : ℕ} (m : ℕ) {P : ℂ[X]} (hP : P ∈ degreeLT ℂ r) :
-    ((derivative : ℂ[X] →ₗ[ℂ] ℂ[X]) ^ m) P ∈ degreeLT ℂ r := by
-  rw [Module.End.pow_apply]
-  exact iterate_derivative_mem_degreeLT hP m
-
 /-- **Differences of polynomials are small**: for `1 ≤ p < ∞` and every order `m` there is a
 difference bound for the polynomials of degree `< r`. On `[0, 1]` the derivative `P^(m)` is
 bounded by `K ‖P‖_{L_p[0, 1/2]}` (`Interval.exists_enorm_linearMap_le_eLpNorm`), so
@@ -170,7 +164,7 @@ bounded by `K ‖P‖_{L_p[0, 1/2]}` (`Interval.exists_enorm_linearMap_le_eLpNor
 `x = u + 2L y` rescales. -/
 theorem exists_diffBound (r m : ℕ) (hp : p ≠ ∞) : ∃ K : ℝ≥0∞, K ≠ ∞ ∧ DiffBound p r m K := by
   obtain ⟨K, hK, hKb⟩ := exists_enorm_linearMap_le_eLpNorm (p := p) r
-    ((derivative : ℂ[X] →ₗ[ℂ] ℂ[X]) ^ m) (fun P hP => pow_derivative_mem_degreeLT m hP)
+    ((derivative : ℂ[X] →ₗ[ℂ] ℂ[X]) ^ m) (fun P hP => by rw [Module.End.pow_apply]; exact iterate_derivative_mem_degreeLT hP m)
     (by norm_num : (0 : ℝ) < 1 / 2)
   refine ⟨K, hK, fun P hPr u L hL t ht x hux hxu => ?_⟩
   have h2L : 0 < 2 * L := by positivity

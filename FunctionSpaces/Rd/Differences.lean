@@ -60,13 +60,8 @@ theorem iterDiff_apply (r : ℕ) (h : V) (f : V → ℂ) (x : V) :
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Differences commute with translations**: `Δ_h^r (f(· + c)) = (Δ_h^r f)(· + c)`. -/
 theorem iterDiff_comp_add (r : ℕ) (h c : V) (f : V → ℂ) :
-    (fwdDiff h)^[r] (fun x => f (x + c)) = fun x => (fwdDiff h)^[r] f (x + c) := by
-  induction r with
-  | zero => rfl
-  | succ r ih =>
-    rw [Function.iterate_succ_apply', Function.iterate_succ_apply', ih]
-    funext x
-    simp only [fwdDiff, add_right_comm x h c]
+    (fwdDiff h)^[r] (fun x => f (x + c)) = fun x => (fwdDiff h)^[r] f (x + c) :=
+  funext fun x => fwdDiff_iter_comp_add h f c r x
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Differences with a multiple step telescope**: `Δ_{mh} f = ∑_{i<m} (Δ_h f)(· + i h)`. -/

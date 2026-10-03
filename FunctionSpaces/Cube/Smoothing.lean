@@ -45,12 +45,6 @@ variable {d : ℕ}
 noncomputable abbrev regionVol (d : ℕ) (i : Fin d) (a b : ℝ) : Measure (Fin d → ℝ) :=
   (cubeVol d).restrict {x | x i ∈ Icc a b}
 
-/-- On `[a, b] ⊆ [0, 1]`, Lebesgue measure on `[0, 1]` restricted to `[a, b]` is Lebesgue measure
-on `[a, b]`. -/
-theorem unitVol_restrict_Icc_of_subset {a b : ℝ} (ha : 0 ≤ a) (hb : b ≤ 1) :
-    unitVol.restrict (Icc a b) = volume.restrict (Icc a b) := by
-  rw [Measure.restrict_restrict measurableSet_Icc, Set.inter_eq_left.2 (Icc_subset_Icc ha hb)]
-
 /-- **`L_p` norms over a region through slices**, with Lebesgue measure on the slices:
 `‖f‖_{L_p({x_i ∈ [a, b]})}^p = ∫_Q ‖slice f x i‖_{L_p[a, b]}^p dx` for `[a, b] ⊆ [0, 1]`. -/
 theorem eLpNorm_rpow_regionVol_eq_slice {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞}

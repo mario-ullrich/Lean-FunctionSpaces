@@ -42,6 +42,12 @@ open Interval
 instance isProbabilityMeasure_unitVol : IsProbabilityMeasure unitVol :=
   ⟨by simp [unitVol, Real.volume_Icc]⟩
 
+/-- On `[a, b] ⊆ [0, 1]`, Lebesgue measure on `[0, 1]` restricted to `[a, b]` is Lebesgue measure
+on `[a, b]`. -/
+theorem unitVol_restrict_Icc_of_subset {a b : ℝ} (ha : 0 ≤ a) (hb : b ≤ 1) :
+    unitVol.restrict (Icc a b) = volume.restrict (Icc a b) := by
+  rw [Measure.restrict_restrict measurableSet_Icc, Set.inter_eq_left.2 (Icc_subset_Icc ha hb)]
+
 /-- **Lebesgue measure on the unit cube** `[0, 1]^d`, the product of Lebesgue measure on
 `[0, 1]`. -/
 noncomputable abbrev cubeVol (d : ℕ) : Measure (Fin d → ℝ) := Measure.pi fun _ : Fin d => unitVol
