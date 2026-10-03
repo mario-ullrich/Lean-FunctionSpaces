@@ -579,6 +579,7 @@ approximation on intervals and on the cube `[0, 1]^d`.
   by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
 * **Higher smoothness**: splines on domains, and compactly supported wavelets such as
   Daubechies'.
+* **The quasi-Banach range** `0 < p, q < 1`, the setting of nonlinear `n`-term approximation.
 
 ## Building
 
