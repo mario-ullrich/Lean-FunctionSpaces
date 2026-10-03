@@ -69,11 +69,11 @@ theorem eLpNorm_rpow_eq_tsum_cell {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ �
     (hg : AEStronglyMeasurable g volume) (j : ℕ) :
     eLpNorm g p volume ^ p.toReal =
       ∑' m, eLpNorm ((cell j m).indicator g) p volume ^ p.toReal := by
-  rw [Interval.eLpNorm_rpow_eq hg hp0 hp, lintegral_eq_tsum_cell j]
+  rw [eLpNorm_rpow_eq hg hp0 hp, lintegral_eq_tsum_cell j]
   congr 1
   funext m
   rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_cell j m),
-    Interval.eLpNorm_rpow_eq hg.restrict hp0 hp]
+    eLpNorm_rpow_eq hg.restrict hp0 hp]
 
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- **Bounded overlap of the centres**: at most `⌈(2ρ + 2)^n⌉` centres of level `j` lie in a

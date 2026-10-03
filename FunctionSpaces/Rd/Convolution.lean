@@ -5,9 +5,10 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Interval.Smoothing
-public import FunctionSpaces.Interval.PiecewisePoly
+public import FunctionSpaces.Lp.LintegralForm
+public import ApproximationSpaces.Sequences.Lq
 public import Mathlib.Analysis.Convolution
+public import Mathlib.MeasureTheory.Measure.Haar.Unique
 
 /-!
 # Convolution with integrable kernels in `L_p`
@@ -173,7 +174,7 @@ theorem lintegral_rpow_lintegral_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠
     rwa [ENNReal.toReal_one] at h
   refine (lintegral_rpow_lintegral_mul_le hq1 hK.enorm hf.enorm).trans_eq ?_
   rw [ENNReal.mul_rpow_of_nonneg _ _ (by linarith), eLpNorm_one_eq_lintegral_enorm hK,
-    Interval.eLpNorm_rpow_eq hf hp0 hp]
+    eLpNorm_rpow_eq hf hp0 hp]
 
 /-- **Young's inequality** for an integrable kernel: `‖K ⋆ f‖_p ≤ ‖K‖_1 ‖f‖_p`, `1 ≤ p < ∞`. -/
 theorem eLpNorm_conv_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K f : V → ℂ}
@@ -181,7 +182,7 @@ theorem eLpNorm_conv_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K f :
     eLpNorm (conv K f μ) p μ ≤ eLpNorm K 1 μ * eLpNorm f p μ := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  refine Interval.eLpNorm_le_of_lintegral_le (aestronglyMeasurable_conv hK hf) hp0 hp ?_
+  refine eLpNorm_le_of_lintegral_le (aestronglyMeasurable_conv hK hf) hp0 hp ?_
   exact (lintegral_mono fun x => ENNReal.rpow_le_rpow (enorm_conv_le_lintegral K f x)
     hq.le).trans (lintegral_rpow_lintegral_le hp1 hp hK hf)
 
@@ -204,7 +205,7 @@ theorem eLpNorm_integral_kernel_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ 
     hΦ.enorm.comp_snd.mul (hG.enorm.pow_const _).aemeasurable
   have hint : AEStronglyMeasurable (fun x => ∫ z, Φ z * G x z ∂μ) μ :=
     (hΦ.comp_snd.mul hG.aestronglyMeasurable).integral_prod_right'
-  rw [Interval.eLpNorm_rpow_eq hint hp0 hp]
+  rw [eLpNorm_rpow_eq hint hp0 hp]
   calc ∫⁻ x, ‖∫ z, Φ z * G x z ∂μ‖ₑ ^ p.toReal ∂μ
       ≤ ∫⁻ x, (∫⁻ z, ‖Φ z‖ₑ * ‖G x z‖ₑ ∂μ) ^ p.toReal ∂μ := lintegral_mono fun x => by
         refine ENNReal.rpow_le_rpow ((enorm_integral_le_lintegral_enorm _).trans_eq ?_) hq.le
@@ -225,7 +226,7 @@ theorem eLpNorm_integral_kernel_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ 
         refine lintegral_congr fun z => ?_
         have hGz : AEStronglyMeasurable (fun x => G x z) μ :=
           (hG.comp measurable_prodMk_right).aestronglyMeasurable
-        rw [lintegral_const_mul' _ _ enorm_ne_top, Interval.eLpNorm_rpow_eq hGz hp0 hp]
+        rw [lintegral_const_mul' _ _ enorm_ne_top, eLpNorm_rpow_eq hGz hp0 hp]
 
 /-- Convolution of an integrable kernel with an `L_p` function is in `L_p`. -/
 theorem memLp_conv {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K f : V → ℂ} (hK : Integrable K μ)
@@ -327,7 +328,7 @@ theorem ae_integrable_conv_conv {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞
   have hK1 : ∫⁻ y, ‖K y‖ₑ ∂μ ≠ ∞ := hK.2.ne
   have hL1 : ∫⁻ y, ‖L y‖ₑ ∂μ ≠ ∞ := hL.2.ne
   have hfq : ∫⁻ x, ‖f x‖ₑ ^ p.toReal ∂μ ≠ ∞ := by
-    rw [← Interval.eLpNorm_rpow_eq hfm hp0 hp]
+    rw [← eLpNorm_rpow_eq hfm hp0 hp]
     exact ENNReal.rpow_ne_top_of_nonneg hq.le hf.eLpNorm_ne_top
   have hGfin : ∫⁻ x₀, G x₀ ^ p.toReal ∂μ ≠ ∞ := by
     refine ne_top_of_le_ne_top ?_ ((lintegral_rpow_lintegral_mul_le hq1

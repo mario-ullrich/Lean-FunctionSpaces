@@ -7,7 +7,7 @@ module
 
 public import FunctionSpaces.Rd.Differences
 public import FunctionSpaces.Rd.BandLimited
-public import FunctionSpaces.Interval.PiecewiseInverse
+public import ApproximationSpaces.Sequences.Lq
 
 /-!
 # The inverse inequality for band-limited functions

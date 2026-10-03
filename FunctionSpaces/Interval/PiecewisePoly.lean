@@ -5,6 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
+public import FunctionSpaces.Lp.LintegralForm
 public import FunctionSpaces.Interval.Polynomials
 public import ApproximationSpaces.Decompositions.Synthesis
 public import Mathlib.Algebra.Order.Floor.Semifield
@@ -337,15 +338,5 @@ theorem ite_mem_degreeLT {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ deg
   split_ifs
   · exact hQ m
   · exact zero_mem _
-
-/-- The `L_p` norm through the integral of the `p`-th power, as an inequality. -/
-theorem eLpNorm_le_of_lintegral_le {α : Type*} [MeasurableSpace α] {μ : Measure α} {g : α → ℂ}
-    (hg : AEStronglyMeasurable g μ) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {B : ℝ≥0∞}
-    (h : ∫⁻ x, ‖g x‖ₑ ^ p.toReal ∂μ ≤ B ^ p.toReal) : eLpNorm g p μ ≤ B := by
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hg]
-  calc (∫⁻ x, ‖g x‖ₑ ^ p.toReal ∂μ) ^ (1 / p.toReal) ≤ (B ^ p.toReal) ^ (1 / p.toReal) :=
-        ENNReal.rpow_le_rpow h (by positivity)
-    _ = B := by rw [one_div, ENNReal.rpow_rpow_inv hq.ne']
 
 end Interval

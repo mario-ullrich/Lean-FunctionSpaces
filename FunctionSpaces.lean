@@ -6,6 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import ApproximationSpaces
+public import FunctionSpaces.Lp.LintegralForm
 public import FunctionSpaces.Lp.Inclusion
 public import FunctionSpaces.Lp.BoundedContinuous
 public import FunctionSpaces.Scheme
@@ -114,6 +115,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 
 ## Layout
 
+* `FunctionSpaces.Lp.LintegralForm`: `L_p` norms through integrals of powers.
 * `FunctionSpaces.Lp.Inclusion`: the bounded linear inclusion `L_r ↪ L_p` for `p ≤ r` and a
   finite measure, `MeasureTheory.Lp.inclusionOfExponentLe`.
 * `FunctionSpaces.Lp.BoundedContinuous`: bounded continuous functions in `L_p`; for a measure

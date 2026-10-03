@@ -7,6 +7,7 @@ module
 
 public import FunctionSpaces.Rd.MomentKernels
 public import FunctionSpaces.Rd.BandLimited
+public import ApproximationSpaces.Norm
 
 /-!
 # Jackson's inequality for band-limited approximation

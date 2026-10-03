@@ -182,7 +182,7 @@ theorem tendsto_eLpNorm_conv_dilate_sub {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : 
     have hconvm : AEStronglyMeasurable (conv (dilate c Φ) g μ - g) μ :=
       (aestronglyMeasurable_conv (integrable_dilate hΦ hc.ne').aestronglyMeasurable
         hg.aestronglyMeasurable).sub hgm.aestronglyMeasurable
-    refine Interval.eLpNorm_le_of_lintegral_le hconvm hp0 hp ?_
+    refine eLpNorm_le_of_lintegral_le hconvm hp0 hp ?_
     rw [← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one]
     have hprod : AEMeasurable (Function.uncurry fun x z =>
         ‖Φ z‖ₑ * ‖g (x - c⁻¹ • z) - g x‖ₑ ^ q) (μ.prod μ) :=
@@ -214,7 +214,7 @@ theorem tendsto_eLpNorm_conv_dilate_sub {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : 
             ((hgm.comp_measurable (measurable_id.sub_const _)).sub hgm).aestronglyMeasurable
           rw [lintegral_const_mul _ hm]
           congr 1
-          exact (Interval.eLpNorm_rpow_eq hsm hp0 hp).symm
+          exact (eLpNorm_rpow_eq hsm hp0 hp).symm
   -- dominated convergence for `I`
   have hI : Tendsto I atTop (𝓝 0) := by
     have hlim := tendsto_lintegral_filter_of_dominated_convergence'

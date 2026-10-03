@@ -89,7 +89,7 @@ theorem eLpNorm_rpow_le_of_overlap {α : Type*} [MeasurableSpace α] {μ : Measu
   have hpr : 1 ≤ p.toReal := by
     rw [← ENNReal.toReal_one]
     exact ENNReal.toReal_mono hp hp1
-  rw [Interval.eLpNorm_rpow_eq hF hp0 hp]
+  rw [eLpNorm_rpow_eq hF hp0 hp]
   calc ∫⁻ x, ‖F x‖ₑ ^ p.toReal ∂μ
       ≤ ∫⁻ x, (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, ‖g m x‖ₑ ^ p.toReal ∂μ := by
         refine lintegral_mono_ae ?_
@@ -102,7 +102,7 @@ theorem eLpNorm_rpow_le_of_overlap {α : Type*} [MeasurableSpace α] {μ : Measu
     _ = (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, eLpNorm (g m) p μ ^ p.toReal := by
         congr 2
         funext m
-        rw [Interval.eLpNorm_rpow_eq (hg m) hp0 hp]
+        rw [eLpNorm_rpow_eq (hg m) hp0 hp]
 
 /-! ### Regular atoms -/
 
