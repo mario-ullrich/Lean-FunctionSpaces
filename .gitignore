@@ -28,6 +28,9 @@ blueprint/src/web.pdf
 # Working documents (plans, reviews) are not part of the repository
 refs/*.md
 
+# Archive of deleted files, a local working aid (see old/README.md)
+old/
+
 # LaTeX intermediate files
 *.aux
 *.bbl

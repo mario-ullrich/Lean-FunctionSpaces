@@ -31,8 +31,9 @@ import re
 import sys
 from pathlib import Path
 
-# Directories that must not contribute declarations: the dependencies.
-SKIP_DIRS = {".lake"}
+# Directories that must not contribute declarations: the dependencies and the local archive
+# of deleted files.
+SKIP_DIRS = {".lake", "old"}
 
 DECL_RE = re.compile(
     r"^\s*(?:@\[[^\]]*\]\s*)?"
