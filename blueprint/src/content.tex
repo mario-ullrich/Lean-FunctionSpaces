@@ -24,7 +24,7 @@ complex-valued functions, are regarded as real ones.
 
 \begin{definition}[Approximation scheme]
 \label{def:scheme}
-\lean{ApproximationScheme}
+\lean{ApproximationScheme, ApproximationScheme.coe_zero, ApproximationScheme.ext}
 \leanok
 An \emph{approximation scheme} in $X$ is a sequence of subsets
 $A_0 \subseteq A_1 \subseteq A_2 \subseteq \cdots$ of $X$ such that
@@ -42,9 +42,12 @@ $A_0 = \{0\}$ holds.
 
 \begin{lemma}[Elementary properties]
 \label{lem:scheme-basic}
-\lean{ApproximationScheme.zero_mem, ApproximationScheme.nonempty,
-  ApproximationScheme.neg_mem, ApproximationScheme.sub_mem, ApproximationScheme.sum_mem,
-  ApproximationScheme.smul_set_eq, ApproximationScheme.sub_mem_pow_add_two}
+\lean{ApproximationScheme.zero_mem, ApproximationScheme.nonempty, ApproximationScheme.neg_mem,
+  ApproximationScheme.sub_mem, ApproximationScheme.sum_mem, ApproximationScheme.smul_set_eq,
+  ApproximationScheme.sub_mem_pow_add_two, ApproximationScheme.mem_of_le,
+  ApproximationScheme.add_mem, ApproximationScheme.add_mem_pow_succ,
+  ApproximationScheme.sub_mem_pow_succ, ApproximationScheme.iUnionSubmodule,
+  ApproximationScheme.coe_iUnionSubmodule}
 \leanok
 \uses{def:scheme}
 Let $A$ be an approximation scheme in $X$. Then for all $m, n, k \in \N$:
@@ -54,22 +57,27 @@ Let $A$ be an approximation scheme in $X$. Then for all $m, n, k \in \N$:
   \item $\sum_{i \in I} a_i \in A_{\sum_{i \in I} n_i}$ for every finite family with
     $a_i \in A_{n_i}$;
   \item $c\,A_n = A_n$ for every $c \in \R \setminus \{0\}$;
-  \item $a - b \in A_{2^{k+2}}$ for all $a \in A_{2^{k+1}}$ and $b \in A_{2^k}$.
+  \item $a - b \in A_{2^{k+2}}$ for all $a \in A_{2^{k+1}}$ and $b \in A_{2^k}$;
+  \item $\bigcup_n A_n$ is a linear subspace of $X$.
 \end{enumerate}
 \end{lemma}
 
 \begin{proof}
 \leanok
 The first item follows from $A_0 = \{0\} \subseteq A_n$, the second from $-b = (-1)\,b$, and
-the third by induction over $I$. For the fourth, $c^{-1} a \in A_n$ for $a \in A_n$. The last
-follows from the second and $2^{k+1} + 2^k \leq 2^{k+2}$.
+the third by induction over $I$. For the fourth, $c^{-1} a \in A_n$ for $a \in A_n$. The fifth
+follows from the second and $2^{k+1} + 2^k \leq 2^{k+2}$, and the last from the axioms
+$A_m + A_n \subseteq A_{m+n}$ and $c\,A_n \subseteq A_n$.
 \end{proof}
 
 \begin{definition}[Preimage and image of a scheme]
 \label{def:comap}
 \lean{ApproximationScheme.comap, ApproximationScheme.map, ApproximationScheme.ofSubmodules,
   ApproximationScheme.ofMonotoneSubmodules, ApproximationScheme.mem_ofMonotoneSubmodules_zero,
-  ApproximationScheme.mem_ofMonotoneSubmodules, ApproximationScheme.mem_ofMonotoneSubmodules_two_pow}
+  ApproximationScheme.mem_ofMonotoneSubmodules,
+  ApproximationScheme.mem_ofMonotoneSubmodules_two_pow, ApproximationScheme.mem_comap,
+  ApproximationScheme.mem_map, ApproximationScheme.mem_map_of_mem,
+  ApproximationScheme.mem_ofSubmodules}
 \leanok
 \uses{def:scheme}
 Let $A$ be an approximation scheme in $X$. For an injective linear map $\iota : Y \to X$, the
@@ -87,7 +95,8 @@ Injectivity of $\iota$ is what gives $\iota^{-1}(\{0\}) = \{0\}$.
 
 \begin{definition}[Error of best approximation]
 \label{def:error}
-\lean{ApproximationScheme.approxError}
+\lean{ApproximationScheme.approxError, ApproximationScheme.approxError_nonneg,
+  ApproximationScheme.approxError_le_norm_sub}
 \leanok
 \uses{def:scheme}
 Let $A$ be an approximation scheme in $X$. For $n \in \N$ and $f \in X$,
@@ -101,7 +110,21 @@ Let $A$ be an approximation scheme in $X$. For $n \in \N$ and $f \in X$,
 \lean{ApproximationScheme.approxError_zero_left, ApproximationScheme.approxError_le_norm,
   ApproximationScheme.approxError_anti, ApproximationScheme.approxError_smul,
   ApproximationScheme.approxError_add_le, ApproximationScheme.abs_approxError_sub_le,
-  ApproximationScheme.approxSeq_le_approxSeq_add_enorm}
+  ApproximationScheme.approxSeq_le_approxSeq_add_enorm, ApproximationScheme.approxError_zero_right,
+  ApproximationScheme.approxError_eq_zero_of_mem,
+  ApproximationScheme.approxError_eq_zero_of_mem_closure,
+  ApproximationScheme.approxError_anti_scheme, ApproximationScheme.le_approxError_iff,
+  ApproximationScheme.exists_mem_norm_sub_lt, ApproximationScheme.exists_mem_norm_sub_le_add,
+  ApproximationScheme.le_mul_approxError_of_forall_mem,
+  ApproximationScheme.approxError_add_le_pow_succ, ApproximationScheme.approxError_neg,
+  ApproximationScheme.approxError_le_approxError_add_norm,
+  ApproximationScheme.continuous_approxError, ApproximationScheme.approxSeq_anti,
+  ApproximationScheme.approxSeq_zero_left, ApproximationScheme.approxSeq_zero_right,
+  ApproximationScheme.approxSeq_le_enorm, ApproximationScheme.approxSeq_ne_top,
+  ApproximationScheme.approxSeq_le_of_mem, ApproximationScheme.approxSeq_eq_zero_of_mem,
+  ApproximationScheme.approxSeq_add_le, ApproximationScheme.approxSeq_add_le_pow_succ,
+  ApproximationScheme.approxSeq_smul, ApproximationScheme.approxSeq_neg,
+  ApproximationScheme.approxSeq_anti_scheme}
 \leanok
 \uses{def:error, lem:scheme-basic}
 Let $A$ be an approximation scheme in $X$. For all $f, g \in X$, $c \in \R$ and
@@ -111,8 +134,14 @@ $m, n \in \N$:
   \item $E_n(f) \leq E_m(f)$ whenever $m \leq n$;
   \item $E_n(c f) = |c| \, E_n(f)$;
   \item $E_{m+n}(f + g) \leq E_m(f) + E_n(g)$;
-  \item $|E_n(f) - E_n(g)| \leq \|f - g\|$.
+  \item $|E_n(f) - E_n(g)| \leq \|f - g\|$, so $E_n$ is continuous;
+  \item $E_n(f) = 0$ for $f$ in the closure of $A_n$, in particular $E_n(0) = 0$;
+  \item a scheme with larger sets has smaller errors;
+  \item for every $\varepsilon > 0$ there is $a \in A_n$ with
+    $\|f - a\| \leq E_n(f) + \varepsilon$.
 \end{enumerate}
+The same statements hold for the errors as elements of $[0, \infty]$, the form used by the
+approximation spaces.
 \end{lemma}
 
 \begin{proof}
@@ -121,8 +150,10 @@ The first item holds because $A_0 = \{0\}$ and $0 \in A_n$, the second because t
 increase, the third because $c A_n = A_n$ for $c \neq 0$. For the fourth, given
 $\varepsilon > 0$ choose $a \in A_m$ and $b \in A_n$ with $\|f - a\| \leq E_m(f) +
 \varepsilon$ and $\|g - b\| \leq E_n(g) + \varepsilon$; then $a + b \in A_{m+n}$ and the
-triangle inequality gives the bound up to $2\varepsilon$. The last item is the
-$1$-Lipschitz property of the distance to a set.
+triangle inequality gives the bound up to $2\varepsilon$. The fifth item is the
+$1$-Lipschitz property of the distance to a set, the sixth holds because the distance to a set
+equals the distance to its closure, the seventh because the infimum over a larger set is
+smaller, and the last is the definition of the infimum.
 \end{proof}
 
 A best approximant, an $a \in A_n$ with $\|f - a\| = E_n(f)$, need not exist, since the sets
@@ -187,7 +218,8 @@ over $a$.
 
 \begin{definition}[Linear approximation]
 \label{def:ofspan}
-\lean{ApproximationScheme.ofSpan}
+\lean{ApproximationScheme.ofSpan, ApproximationScheme.ofSpan_apply,
+  ApproximationScheme.finiteDimensional_span_ofSpan}
 \leanok
 \uses{def:scheme}
 For a sequence $(e_i)_{i \in \N}$ in $X$, the sets $A_n = \spn\{e_i : i < n\}$ form an
@@ -212,7 +244,8 @@ family of spans is the span of the union. The last statement is \Cref{lem:error-
 
 \begin{definition}[$n$-term approximation]
 \label{def:nterm}
-\lean{ApproximationScheme.nTerm}
+\lean{ApproximationScheme.nTerm, ApproximationScheme.mem_nTerm,
+  ApproximationScheme.mem_nTerm_of_mem}
 \leanok
 \uses{def:scheme}
 For a set $D \subseteq X$, the \emph{dictionary}, let $A_n$ be the set of linear combinations
@@ -248,7 +281,18 @@ With these, a constant $(1 - 2^{-\alpha})^{-1}$ is finite exactly for $\alpha > 
 
 \begin{definition}[$\ell_q$ norm and dyadic weights]
 \label{def:lq-norm}
-\lean{ENNReal.lqNorm, ENNReal.lqNorm_top, ENNReal.lqNorm_eq_tsum, ENNReal.dyadicWeight}
+\lean{ENNReal.lqNorm, ENNReal.lqNorm_top, ENNReal.lqNorm_eq_tsum, ENNReal.dyadicWeight,
+  ENNReal.aestronglyMeasurable_count, ENNReal.lqNorm_one, ENNReal.one_le_toReal_of_one_le,
+  ENNReal.lqNorm_rpow, ENNReal.lqNorm_zero_right, ENNReal.lqNorm_zero_left,
+  ENNReal.dyadicWeight_zero_right, ENNReal.dyadicWeight_zero_left, ENNReal.dyadicWeight_ne_top,
+  ENNReal.dyadicWeight_lt_top, ENNReal.dyadicWeight_pos, ENNReal.dyadicWeight_ne_zero,
+  ENNReal.dyadicWeight_add, ENNReal.dyadicWeight_add_nat, ENNReal.dyadicWeight_succ,
+  ENNReal.dyadicWeight_neg, ENNReal.dyadicWeight_neg_mul_self, ENNReal.dyadicWeight_mul_neg_self,
+  ENNReal.dyadicWeight_rpow, ENNReal.dyadicWeight_eq_pow, ENNReal.dyadicWeight_mono,
+  ENNReal.dyadicWeight_le_of_le, ENNReal.dyadicWeight_anti, ENNReal.one_le_dyadicWeight,
+  ENNReal.natCast_two_pow_rpow, ENNReal.two_rpow_neg_lt_one,
+  ENNReal.one_sub_two_rpow_neg_inv_ne_top, ENNReal.one_le_one_sub_two_rpow_neg_inv,
+  ENNReal.lqNorm_dyadicWeight_neg_le}
 \leanok
 For $q \in (0, \infty)$ and a sequence $a = (a_n)_{n \in \N}$ in $[0, \infty]$,
 \[
@@ -263,10 +307,10 @@ In Lean, $\|a\|_{\ell_q}$ is the $L_q$ norm of $a$ for the counting measure on $
 
 \begin{lemma}[Properties of the $\ell_q$ norm]
 \label{lem:lq-basic}
-\lean{ENNReal.lqNorm_mono, ENNReal.le_lqNorm, ENNReal.lqNorm_const_mul,
-  ENNReal.lqNorm_add_le, ENNReal.lqNorm_le_lqNorm_of_le, ENNReal.lqNorm_le_head_add_shift,
-  ENNReal.lqNorm_le_sum_range_add_shift, ENNReal.lqNorm_le_lqNorm_one,
-  ENNReal.lqNorm_geometric_le}
+\lean{ENNReal.lqNorm_mono, ENNReal.le_lqNorm, ENNReal.lqNorm_const_mul, ENNReal.lqNorm_add_le,
+  ENNReal.lqNorm_le_lqNorm_of_le, ENNReal.lqNorm_le_head_add_shift,
+  ENNReal.lqNorm_le_sum_range_add_shift, ENNReal.lqNorm_le_lqNorm_one, ENNReal.lqNorm_geometric_le,
+  ENNReal.lqNorm_shift_le}
 \leanok
 \uses{def:lq-norm}
 Let $1 \leq q \leq r \leq \infty$. For all sequences $a, b$ in $[0, \infty]$, all
@@ -316,7 +360,8 @@ sum are controlled in a dyadically weighted $\ell_q$ norm.
 \begin{lemma}[Hardy inequalities]
 \label{lem:hardy}
 \lean{ENNReal.hardy_tail_le, ENNReal.hardy_sum_le, ENNReal.lqNorm_shift_le',
-  ENNReal.lqNorm_shiftRight_le, ENNReal.tsum_dyadicWeight_neg}
+  ENNReal.lqNorm_shiftRight_le, ENNReal.tsum_dyadicWeight_neg, ENNReal.tsum_dyadicWeight_neg_one,
+  ENNReal.lqNorm_dyadicWeight_neg_one_le}
 \leanok
 \uses{lem:countable-minkowski}
 Let $\alpha \in \R$ and $1 \leq q \leq \infty$. For every sequence $b$ in $[0, \infty]$,
@@ -347,8 +392,10 @@ test with power weights.
 \begin{lemma}[Cauchy condensation with power weights]
 \label{lem:condensation}
 \lean{ENNReal.tsum_pow_mul_le_dyadic, ENNReal.dyadic_le_tsum_pow_mul,
-  ENNReal.iSup_pow_mul_le_dyadic, ENNReal.dyadic_le_iSup_pow_mul,
-  ENNReal.sum_range_two_pow_eq}
+  ENNReal.iSup_pow_mul_le_dyadic, ENNReal.dyadic_le_iSup_pow_mul, ENNReal.sum_range_two_pow_eq,
+  ENNReal.rpow_le_rpow_of_nonpos, ENNReal.natCast_two_pow_eq, ENNReal.card_Ico_two_pow,
+  ENNReal.natCast_succ_rpow_le, ENNReal.dyadicWeight_le_natCast_succ_rpow,
+  ENNReal.sum_Ico_pow_mul_le, ENNReal.le_sum_Ico_pow_mul}
 \leanok
 \uses{def:lq-norm}
 Let $b$ be a decreasing sequence in $[0, \infty]$, let $\gamma \in \R$, and put
@@ -386,9 +433,9 @@ from $0$.
 
 \begin{definition}[Approximation space]
 \label{def:approx-space}
-\lean{ApproximationScheme.approxSeq, ApproximationScheme.approxNorm,
-  ApproximationScheme.MemApprox, ApproximationScheme.approxNorm_top,
-  ApproximationScheme.approxNorm_rpow}
+\lean{ApproximationScheme.approxSeq, ApproximationScheme.approxNorm, ApproximationScheme.MemApprox,
+  ApproximationScheme.approxNorm_top, ApproximationScheme.approxNorm_rpow,
+  ApproximationScheme.memApprox_iff, ApproximationScheme.MemApprox.approxNorm_ne_top}
 \leanok
 \uses{def:error, def:lq-norm}
 Let $s \in \R$ and $1 \leq q \leq \infty$. For $f \in X$,
@@ -402,7 +449,12 @@ $\|f\|_{A^s_q} < \infty$.
 
 \begin{definition}[Dyadic quasi-norm]
 \label{def:dyadic-norm}
-\lean{ApproximationScheme.approxSeqDyadic, ApproximationScheme.approxNormDyadic}
+\lean{ApproximationScheme.approxSeqDyadic, ApproximationScheme.approxNormDyadic,
+  ApproximationScheme.approxSeqDyadic_le_lqNorm, ApproximationScheme.enorm_le_approxNormDyadic,
+  ApproximationScheme.lqNorm_le_approxNormDyadic, ApproximationScheme.approxSeqDyadic_rpow,
+  ApproximationScheme.approxSeqDyadic_zero, ApproximationScheme.approxNormDyadic_zero,
+  ApproximationScheme.approxSeqDyadic_smul, ApproximationScheme.approxNormDyadic_smul,
+  ApproximationScheme.one_le_two_rpow, ApproximationScheme.two_rpow_ne_top}
 \leanok
 \uses{def:error, def:lq-norm}
 Let $s \in \R$ and $1 \leq q \leq \infty$. For $f \in X$,
@@ -420,7 +472,9 @@ transports it to Pietsch's definition.
 \label{thm:dyadic-norm}
 \lean{ApproximationScheme.approxNorm_le_approxNormDyadic,
   ApproximationScheme.approxNormDyadic_le_approxNorm,
-  ApproximationScheme.memApprox_iff_approxNormDyadic_lt_top}
+  ApproximationScheme.memApprox_iff_approxNormDyadic_lt_top,
+  ApproximationScheme.lqNorm_dyadic_succ_le,
+  ApproximationScheme.memApprox_iff_lqNorm_dyadic_lt_top}
 \leanok
 \uses{def:approx-space, def:dyadic-norm, lem:condensation, lem:lq-basic}
 Let $s \geq 0$ and $1 \leq q \leq \infty$. For every $f \in X$,
@@ -429,7 +483,8 @@ Let $s \geq 0$ and $1 \leq q \leq \infty$. For every $f \in X$,
   \qquad \text{and} \qquad
   \|f\|^{\mathrm{dy}}_{A^s_q} \leq 4 \cdot 2^s \, \|f\|_{A^s_q} .
 \]
-In particular $f \in A^s_q$ if and only if $\|f\|^{\mathrm{dy}}_{A^s_q} < \infty$.
+In particular $f \in A^s_q$ if and only if $\|f\|^{\mathrm{dy}}_{A^s_q} < \infty$, that is, if and
+only if $(2^{ks} E_{2^k}(f))_k \in \ell_q$.
 \end{theorem}
 
 \begin{proof}
@@ -449,7 +504,13 @@ $2^{(k+1)s} = 2^s 2^{ks}$ and $E_1(f) \leq \|f\|$. For $q = \infty$ use the supr
 \lean{ApproximationScheme.approxNorm_smul, ApproximationScheme.enorm_le_approxNorm,
   ApproximationScheme.approxNorm_eq_zero_iff, ApproximationScheme.approxNormDyadic_add_le,
   ApproximationScheme.approxNorm_add_le, ApproximationScheme.memApprox_of_mem,
-  ApproximationScheme.approxSpace, ApproximationScheme.mem_approxSpace}
+  ApproximationScheme.approxSpace, ApproximationScheme.mem_approxSpace,
+  ApproximationScheme.approxNorm_zero, ApproximationScheme.memApprox_zero,
+  ApproximationScheme.MemApprox.smul, ApproximationScheme.MemApprox.neg,
+  ApproximationScheme.approxNorm_anti_scheme, ApproximationScheme.MemApprox.of_subset_scheme,
+  ApproximationScheme.approxSeqDyadic_add_le_succ, ApproximationScheme.MemApprox.add,
+  ApproximationScheme.MemApprox.sub, ApproximationScheme.MemApprox.sum,
+  ApproximationScheme.iUnion_subset_approxSpace}
 \leanok
 \uses{thm:dyadic-norm, lem:error-basic}
 Let $s \geq 0$ and $1 \leq q \leq \infty$. For all $f, g \in X$, $c \in \R$ and $m \in \N$:
@@ -459,7 +520,8 @@ Let $s \geq 0$ and $1 \leq q \leq \infty$. For all $f, g \in X$, $c \in \R$ and 
   \item $\|f + g\|^{\mathrm{dy}}_{A^s_q} \leq 2 \cdot 2^s \bigl(\|f\|^{\mathrm{dy}}_{A^s_q} +
     \|g\|^{\mathrm{dy}}_{A^s_q}\bigr)$ and
     $\|f + g\|_{A^s_q} \leq 8 \cdot 8^s \bigl(\|f\|_{A^s_q} + \|g\|_{A^s_q}\bigr)$;
-  \item $A_m \subseteq A^s_q$.
+  \item $A_m \subseteq A^s_q$;
+  \item a scheme with larger sets has smaller quasi-norms and larger approximation spaces.
 \end{enumerate}
 In particular $A^s_q$ is a linear subspace of $X$.
 \end{proposition}
@@ -502,7 +564,10 @@ and \Cref{lem:error-tendsto} applies.
 \label{thm:approx-embedding}
 \lean{ApproximationScheme.approxNormDyadic_mono_exponent,
   ApproximationScheme.approxNormDyadic_le_of_lt, ApproximationScheme.MemApprox.mono,
-  ApproximationScheme.approxSpace_mono, ApproximationScheme.MemApprox.lqNorm_one_lt_top}
+  ApproximationScheme.approxSpace_mono, ApproximationScheme.MemApprox.lqNorm_one_lt_top,
+  ApproximationScheme.approxSeqDyadic_eq_mul, ApproximationScheme.approxNorm_le_of_exponent_le,
+  ApproximationScheme.approxNorm_le_of_lt, ApproximationScheme.MemApprox.mono_exponent,
+  ApproximationScheme.MemApprox.of_lt}
 \leanok
 \uses{def:dyadic-norm, lem:lq-basic, thm:dyadic-norm}
 Let $1 \leq q, r \leq \infty$, let $s, t \in \R$ and $f \in X$.
@@ -511,6 +576,9 @@ Let $1 \leq q, r \leq \infty$, let $s, t \in \R$ and $f \in X$.
   \item If $t < s$, then $\|f\|^{\mathrm{dy}}_{A^t_r} \leq (1 - 2^{-(s-t)})^{-1}
     \|f\|^{\mathrm{dy}}_{A^s_q}$.
   \item If $0 \leq t$, and $t < s$ or $t = s$ and $q \leq r$, then $A^s_q \subseteq A^t_r$.
+  \item For Pietsch's quasi-norm: if $s \geq 0$ and $q \leq r$, then
+    $\|f\|_{A^s_r} \leq 2^s \cdot 4 \cdot 2^s \, \|f\|_{A^s_q}$; if $0 \leq t < s$, then
+    $\|f\|_{A^t_r} \leq 2^t (1 - 2^{-(s-t)})^{-1} \cdot 4 \cdot 2^s \, \|f\|_{A^s_q}$.
 \end{enumerate}
 \end{theorem}
 
@@ -520,14 +588,15 @@ The first item is the monotonicity of the $\ell_q$ norms in $q$, since the dyadi
 not depend on $q$; Pietsch's weights do, which is why the dyadic form is used. For the
 second, $2^{kt} E_{2^k}(f) = 2^{-k(s-t)} \, 2^{ks} E_{2^k}(f) \leq 2^{-k(s-t)}
 \|(2^{js} E_{2^j}(f))_j\|_{\ell_q}$, and $\|(2^{-k(s-t)})_k\|_{\ell_r} \leq (1 -
-2^{-(s-t)})^{-1}$. The third follows by \Cref{thm:dyadic-norm}.
+2^{-(s-t)})^{-1}$. The third follows by \Cref{thm:dyadic-norm}, and the fourth from the first
+two and the two comparisons of \Cref{thm:dyadic-norm}.
 \end{proof}
 
 \begin{lemma}[Functoriality]
 \label{lem:approx-functorial}
 \lean{ApproximationScheme.approxSeq_map_le, ApproximationScheme.approxNorm_map_le,
   ApproximationScheme.approxNormDyadic_map_le, ApproximationScheme.MemApprox.map,
-  ApproximationScheme.approxSpace_map_le}
+  ApproximationScheme.approxSpace_map_le, ApproximationScheme.mem_map_of_mem'}
 \leanok
 \uses{lem:error-map, def:approx-space, def:dyadic-norm}
 Let $A$ and $B$ be approximation schemes in $X$ and $Y$, and let $T : X \to Y$ be a bounded
@@ -555,7 +624,7 @@ $L_r \hookrightarrow L_p$, it is a Nikolskii inequality.
 
 \begin{definition}[Lifting bound]
 \label{def:lift-bound}
-\lean{ApproximationScheme.LiftBound}
+\lean{ApproximationScheme.LiftBound, ApproximationScheme.LiftBound.exists_enorm_le}
 \leanok
 \uses{def:scheme}
 Let $\beta, C \in \R$. The map $\iota$ satisfies the \emph{lifting bound} of exponent $\beta$
@@ -566,9 +635,8 @@ $\iota y = a$ and $\|y\| \leq C \, n^\beta \, \|a\|$.
 \begin{lemma}[Near-best dyadic approximants]
 \label{lem:near-best}
 \lean{ApproximationScheme.DyadicApprox, ApproximationScheme.exists_dyadicApprox,
-  ApproximationScheme.DyadicApprox.sub_mem,
-  ApproximationScheme.DyadicApprox.enorm_sub_succ_le,
-  ApproximationScheme.DyadicApprox.tendsto}
+  ApproximationScheme.DyadicApprox.sub_mem, ApproximationScheme.DyadicApprox.enorm_sub_succ_le,
+  ApproximationScheme.DyadicApprox.tendsto, ApproximationScheme.DyadicApprox.enorm_zero_le}
 \leanok
 \uses{lem:error-basic, lem:scheme-basic}
 Let $f \in X$ and let $(t_k)_k$ be a sequence in $(0, \infty)$. There are $a_k \in A_{2^k}$
@@ -591,8 +659,13 @@ $\sum_k 2^{k\sigma} t_k \leq 2 \|f\|$.
 \begin{theorem}[Lifting theorem]
 \label{thm:lift}
 \lean{ApproximationScheme.exists_preimage_of_liftBound, ApproximationScheme.liftConst,
-  ApproximationScheme.DyadicApprox.exists_lift,
-  ApproximationScheme.DyadicApprox.exists_preimage, ApproximationScheme.tolerance}
+  ApproximationScheme.DyadicApprox.exists_lift, ApproximationScheme.DyadicApprox.exists_preimage,
+  ApproximationScheme.tolerance, ApproximationScheme.liftConst_ne_top,
+  ApproximationScheme.DyadicApprox.exists_lift_partial, ApproximationScheme.tolerance_ne_zero,
+  ApproximationScheme.tolerance_ne_top, ApproximationScheme.tolerance_anti,
+  ApproximationScheme.tolerance_zero, ApproximationScheme.dyadicWeight_mul_tolerance_le,
+  ApproximationScheme.tsum_dyadicWeight_mul_tolerance_le, ApproximationScheme.tendsto_tolerance,
+  ApproximationScheme.tsum_tolerance_le, ApproximationScheme.lqNorm_dyadicWeight_mul_tolerance_le}
 \leanok
 \uses{def:lift-bound, lem:near-best, def:dyadic-norm}
 Let $Y$ be a Banach space, let $\beta \geq 0$ and $C \geq 0$, and let $\iota$ satisfy the
@@ -622,8 +695,8 @@ injective map with a Nikolskii inequality.
 \begin{theorem}[Nikolskii transfer theorem]
 \label{thm:nikolskii-transfer}
 \lean{ApproximationScheme.exists_preimage_of_nikolskii,
-  ApproximationScheme.MemApprox.exists_preimage_of_nikolskii,
-  ApproximationScheme.nikolskiiConst}
+  ApproximationScheme.MemApprox.exists_preimage_of_nikolskii, ApproximationScheme.nikolskiiConst,
+  ApproximationScheme.nikolskiiConst_ne_top}
 \leanok
 \uses{thm:lift, lem:hardy, thm:approx-embedding, def:comap}
 Let $Y$ be a Banach space, let $\iota$ be injective, let $C \geq 0$ and $0 \leq \alpha < s$,
@@ -656,7 +729,7 @@ and $\|(2^{ks} t_k)_k\|_{\ell_q} \leq 2\|f\|$.
 
 \begin{definition}[Jackson inequality]
 \label{def:jackson}
-\lean{ApproximationScheme.JacksonBound}
+\lean{ApproximationScheme.JacksonBound, ApproximationScheme.JacksonBound.approxSeq_le}
 \leanok
 \uses{def:error}
 Let $r, C \in \R$. The map $\iota$ satisfies \emph{Jackson's inequality} of order $r$ and
@@ -697,7 +770,7 @@ $a \in A_n$. Sobolev spaces of order $r$ inside $L_p$ are the motivating example
 \label{prop:smoothness}
 \lean{ApproximationScheme.SmoothnessSpace.memApprox_top,
   ApproximationScheme.SmoothnessSpace.exists_eq_of_memApprox_one,
-  ApproximationScheme.SmoothnessSpace.exists_eq_of_lt}
+  ApproximationScheme.SmoothnessSpace.exists_eq_of_lt, ApproximationScheme.SmoothnessSpace.congr}
 \leanok
 \uses{def:smoothness, lem:jackson-top, thm:lift, thm:approx-embedding}
 Let $(Y, \iota)$ be a smoothness space of order $r$ for $A$. Then $\iota(Y) \subseteq
@@ -720,7 +793,7 @@ interpolation spaces are defined from it~\cite{BerghLofstrom}.
 
 \begin{definition}[$K$-functional]
 \label{def:k-functional}
-\lean{ApproximationScheme.kFunctional}
+\lean{ApproximationScheme.kFunctional, ApproximationScheme.kFunctional_le}
 \leanok
 For $t \in [0, \infty]$ and $f \in X$,
 \[
@@ -731,7 +804,8 @@ For $t \in [0, \infty]$ and $f \in X$,
 \begin{lemma}[Properties of the $K$-functional]
 \label{lem:k-functional}
 \lean{ApproximationScheme.kFunctional_le_enorm, ApproximationScheme.kFunctional_mono,
-  ApproximationScheme.kFunctional_add_le, ApproximationScheme.kFunctional_smul_le}
+  ApproximationScheme.kFunctional_add_le, ApproximationScheme.kFunctional_smul_le,
+  ApproximationScheme.kFunctional_zero_right}
 \leanok
 \uses{def:k-functional}
 For all $t \leq u$ in $[0, \infty]$, $f, g \in X$ and $c \in \R$: $K(t, f) \leq \|f\|$,
@@ -746,9 +820,10 @@ Take $y = 0$ for the first bound; the others hold for each $y$ before the infimu
 
 \begin{definition}[Real interpolation space]
 \label{def:interpolation}
-\lean{ApproximationScheme.interpSeq, ApproximationScheme.interpNorm,
-  ApproximationScheme.MemInterp, ApproximationScheme.interpSpace,
-  ApproximationScheme.interpNorm_add_le, ApproximationScheme.enorm_le_interpNorm}
+\lean{ApproximationScheme.interpSeq, ApproximationScheme.interpNorm, ApproximationScheme.MemInterp,
+  ApproximationScheme.interpSpace, ApproximationScheme.interpNorm_add_le,
+  ApproximationScheme.enorm_le_interpNorm, ApproximationScheme.interpNorm_smul_le,
+  ApproximationScheme.mem_interpSpace}
 \leanok
 \uses{def:k-functional, def:lq-norm, lem:k-functional}
 Let $\theta, \rho \in \R$ and $1 \leq q \leq \infty$. For $f \in X$,
@@ -790,10 +865,10 @@ DeVore and Lorentz~\cite[Chapter~7]{DeVoreLorentz}.
 \begin{theorem}[Representation theorem]
 \label{thm:representation}
 \lean{ApproximationScheme.approxNormDyadic_le_interpNorm_of_jackson,
-  ApproximationScheme.interpNorm_le_approxNormDyadic_of_bernstein,
-  ApproximationScheme.reprConst, ApproximationScheme.memApprox_iff_memInterp,
-  ApproximationScheme.approxSpace_eq_interpSpace,
-  ApproximationScheme.SmoothnessSpace.memApprox_iff_memInterp}
+  ApproximationScheme.interpNorm_le_approxNormDyadic_of_bernstein, ApproximationScheme.reprConst,
+  ApproximationScheme.memApprox_iff_memInterp, ApproximationScheme.approxSpace_eq_interpSpace,
+  ApproximationScheme.SmoothnessSpace.memApprox_iff_memInterp,
+  ApproximationScheme.reprConst_ne_top}
 \leanok
 \uses{lem:error-k-functional, def:interpolation, lem:near-best, lem:hardy,
   def:lift-bound, def:dyadic-norm}
@@ -854,7 +929,8 @@ coefficients, and wavelet decompositions expand them in a basis.
 
 \begin{definition}[Block decomposition norm]
 \label{def:block-decomposition}
-\lean{ApproximationScheme.blockDecompNorm}
+\lean{ApproximationScheme.blockDecompNorm, ApproximationScheme.sum_range_two_pow_lt,
+  ApproximationScheme.blockDecompNorm_le, ApproximationScheme.sum_range_mem}
 \leanok
 \uses{def:scheme, def:lq-norm}
 Let $s \in \R$ and $1 \leq q \leq \infty$. For $f \in X$, $\|f\|^{\mathrm{dec}}_{s,q}$ is
@@ -898,7 +974,8 @@ a_{k+1} - a_k \in A_{2^{k+2}}$. Their partial sums are the $a_k$, which converge
 
 \begin{definition}[Projection scheme]
 \label{def:projection-scheme}
-\lean{ApproximationScheme.ProjectionScheme}
+\lean{ApproximationScheme.ProjectionScheme, ApproximationScheme.ProjectionScheme.bound_nonneg,
+  ApproximationScheme.ProjectionScheme.enorm_apply_le}
 \leanok
 \uses{def:scheme}
 A \emph{projection scheme} for $A$ is a sequence of bounded linear maps $P_n : X \to X$ with
@@ -947,7 +1024,8 @@ $\Delta_k f = P_{2^{k+1}} f - P_{2^k} f$. For $s \in \R$ and $1 \leq q \leq \inf
   ApproximationScheme.ProjectionScheme.blockNorm_le_approxNormDyadic,
   ApproximationScheme.ProjectionScheme.enorm_sub_le_tsum_block,
   ApproximationScheme.ProjectionScheme.approxNormDyadic_le_blockNorm,
-  ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top}
+  ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top,
+  ApproximationScheme.ProjectionScheme.sum_block}
 \leanok
 \uses{def:blocks, lem:lebesgue, lem:hardy, def:dyadic-norm}
 Let $(P_n)$ be a projection scheme for $A$ with bound $M$, let $s \in \R$ and
@@ -981,8 +1059,10 @@ condition: they are small and approximable at a rate $\sigma$ from their own lev
 \begin{definition}[Linear scheme]
 \label{def:linear-scheme}
 \lean{ApproximationScheme.IsLinear, ApproximationScheme.isLinear_ofSubmodules,
-  ApproximationScheme.isLinear_ofMonotoneSubmodules, ApproximationScheme.approxSeq_add_le_of_isLinear,
-  ApproximationScheme.approxSeq_sum_le_of_isLinear}
+  ApproximationScheme.isLinear_ofMonotoneSubmodules,
+  ApproximationScheme.approxSeq_add_le_of_isLinear,
+  ApproximationScheme.approxSeq_sum_le_of_isLinear, ApproximationScheme.IsLinear.map,
+  ApproximationScheme.approxError_add_le_of_isLinear}
 \leanok
 \uses{def:scheme, def:error}
 An approximation scheme is \emph{linear} if $a + b \in A_n$ for all $n \in \N$ and
@@ -1048,7 +1128,7 @@ $b^s_{p,q}$ is the sequence space of Schneider and Vyb\'{\i}ral~\cite{SchneiderV
 \label{thm:atomic-synthesis}
 \lean{ApproximationScheme.AtomicSystem.approxNormDyadic_le_bNorm,
   ApproximationScheme.AtomicSystem.memApprox_of_bNorm_lt_top,
-  ApproximationScheme.AtomicSystem.synthConst}
+  ApproximationScheme.AtomicSystem.synthConst, ApproximationScheme.AtomicSystem.synthConst_ne_top}
 \leanok
 \uses{def:atomic-system, thm:synthesis-decay}
 Let $A$ be a linear scheme with an atomic system as in \Cref{def:atomic-system}, let
@@ -1072,7 +1152,9 @@ $2^{js} \varepsilon_j = C \, 2^{j(s - \delta)} \|\lambda_{j,\cdot}\|_{\ell_p}$.
 \label{lem:exists-blocks}
 \lean{ApproximationScheme.exists_blocks, ApproximationScheme.DyadicApprox.hasSum_blocks,
   ApproximationScheme.DyadicApprox.lqNorm_blocks_le,
-  ApproximationScheme.DyadicApprox.tsum_enorm_blocks_ne_top}
+  ApproximationScheme.DyadicApprox.tsum_enorm_blocks_ne_top,
+  ApproximationScheme.DyadicApprox.blocks_mem, ApproximationScheme.DyadicApprox.sum_range_blocks,
+  ApproximationScheme.DyadicApprox.blockDecompNorm_le}
 \leanok
 \uses{thm:block-decomposition}
 Let $X$ be a Banach space, $s > 0$, $1 \leq q \leq \infty$ and $f \in A^s_q$. There are
@@ -1112,8 +1194,8 @@ $2^{j(s-\delta)} \|\lambda_{j,\cdot}\|_{\ell_p} \leq C' \, 2^{js} \|g_j\|$. The 
 \Cref{thm:atomic-synthesis}.
 \end{proof}
 
-Local bases such as Haar functions and hat functions on dyadic grids have the expansion property
-of \Cref{thm:atomic-analysis}.
+Local bases on dyadic grids, such as the Haar functions, have the expansion property of
+\Cref{thm:atomic-analysis}.
 
 \chapter{Traces and intrinsic norms}
 \label{ch:traces-abstract}
@@ -1126,7 +1208,10 @@ intrinsic norm of a domain with the norm of restrictions.
 \begin{definition}[Trace bound]
 \label{def:trace-bound}
 \lean{ApproximationScheme.TraceBound, ApproximationScheme.TraceBound.ofSubmodule,
-  ApproximationScheme.TraceBound.ofSubmodule_T}
+  ApproximationScheme.TraceBound.ofSubmodule_T, ApproximationScheme.traceConst,
+  ApproximationScheme.traceConst_ne_top, ApproximationScheme.TraceBound.enorm_apply_le,
+  ApproximationScheme.TraceBound.enorm_apply_sub_succ_le,
+  ApproximationScheme.TraceBound.edist_apply_succ_le}
 \leanok
 \uses{def:scheme}
 Let $\beta \in \R$. A \emph{trace bound} of exponent $\beta$ is a linear map $T : X \to Y$ with
@@ -1144,7 +1229,11 @@ hyperplane, defined on continuous functions and unbounded on $L_p$, with $\beta 
   ApproximationScheme.TraceBound.tendsto_ext, ApproximationScheme.TraceBound.tendsto_edist_apply,
   ApproximationScheme.TraceBound.cauchySeq_apply, ApproximationScheme.TraceBound.ext_eq_of_mem,
   ApproximationScheme.TraceBound.ext_add, ApproximationScheme.TraceBound.ext_smul,
-  ApproximationScheme.TraceBound.extLinear, ApproximationScheme.TraceBound.enorm_ext_le}
+  ApproximationScheme.TraceBound.extLinear, ApproximationScheme.TraceBound.enorm_ext_le,
+  ApproximationScheme.mem_iUnionSubmodule,
+  ApproximationScheme.DyadicApprox.tendsto_dyadicWeight_mul_enorm_sub,
+  ApproximationScheme.tsum_canonical_ne_top, ApproximationScheme.TraceBound.tendsto_canonical,
+  ApproximationScheme.TraceBound.ext_zero}
 \leanok
 \uses{def:trace-bound, lem:near-best, def:dyadic-norm}
 Let $T$ be a trace bound of exponent $\beta \geq 0$ and let $Y$ be a Banach space. For every
@@ -1169,7 +1258,8 @@ telescoping sum, as in \Cref{thm:lift}.
 \label{thm:trace-transfer}
 \lean{ApproximationScheme.TraceBound.approxNormDyadic_ext_le,
   ApproximationScheme.TraceBound.memApprox_ext, ApproximationScheme.traceTransferConst,
-  ApproximationScheme.TraceBound.edist_apply_ext_le}
+  ApproximationScheme.TraceBound.edist_apply_ext_le, ApproximationScheme.traceTransferConst_ne_top,
+  ApproximationScheme.TraceBound.enorm_ext_le_of_dyadicApprox}
 \leanok
 \uses{lem:trace-ext, lem:hardy}
 Let $T$ be a trace bound of exponent $\beta$ with constant $C$, let $Y$ be a Banach space, and
@@ -1191,7 +1281,8 @@ word; that theorem is the case $T = \iota^{-1}$ on the approximants.
 \begin{theorem}[Surjectivity of the trace]
 \label{thm:trace-surjective}
 \lean{ApproximationScheme.TraceBound.RightInverseBound,
-  ApproximationScheme.TraceBound.exists_ext_eq, ApproximationScheme.traceSurjConst}
+  ApproximationScheme.TraceBound.exists_ext_eq, ApproximationScheme.traceSurjConst,
+  ApproximationScheme.traceSurjConst_ne_top}
 \leanok
 \uses{thm:trace-transfer, lem:exists-blocks, thm:block-decomposition}
 Let $X$ and $Y$ be Banach spaces, $T$ a trace bound of exponent $\beta \geq 0$, and let
@@ -1236,7 +1327,7 @@ $\inf\{\|f\|^{\mathrm{dy}}_{A^s_q} : R f = g\}$.
 \lean{ApproximationScheme.approxNormDyadic_extension_le, ApproximationScheme.extensionConst,
   ApproximationScheme.approxNormDyadic_le_iInf_restrict,
   ApproximationScheme.restrictionNorm_le_approxNormDyadic,
-  ApproximationScheme.memApprox_iff_exists_restrict}
+  ApproximationScheme.memApprox_iff_exists_restrict, ApproximationScheme.extensionConst_ne_top}
 \leanok
 \uses{def:approx-extension, lem:approx-functorial}
 Let $R : X \to Y$ be a bounded linear map with $R(A_n) \subseteq B_n$ for every $n$, with an
@@ -1345,10 +1436,14 @@ complex-valued functions with the supremum norm.
 \begin{lemma}[The inclusion $L_r \hookrightarrow L_p$]
 \label{lem:inclusion}
 \lean{MeasureTheory.Lp.inclusionOfExponentLe, MeasureTheory.Lp.inclusionConst,
-  MeasureTheory.Lp.coeFn_inclusionOfExponentLe,
-  MeasureTheory.Lp.norm_inclusionOfExponentLe_le,
+  MeasureTheory.Lp.coeFn_inclusionOfExponentLe, MeasureTheory.Lp.norm_inclusionOfExponentLe_le,
   MeasureTheory.Lp.norm_inclusionOfExponentLe_apply_le_of_prob,
-  MeasureTheory.Lp.inclusionOfExponentLe_injective, MeasureTheory.Lp.inclusionOfExponentLe_comp}
+  MeasureTheory.Lp.inclusionOfExponentLe_injective, MeasureTheory.Lp.inclusionOfExponentLe_comp,
+  MeasureTheory.Lp.inclusionOfExponentLeLinear, MeasureTheory.Lp.coeFn_inclusionOfExponentLeLinear,
+  MeasureTheory.Lp.inclusionConst_nonneg, MeasureTheory.Lp.inclusionConst_of_isProbabilityMeasure,
+  MeasureTheory.Lp.norm_inclusionOfExponentLeLinear_apply_le,
+  MeasureTheory.Lp.norm_inclusionOfExponentLe_apply_le,
+  MeasureTheory.Lp.inclusionOfExponentLe_self}
 \leanok
 Let $1 \leq p \leq r \leq \infty$. The identity of functions defines an injective bounded
 linear map $\iota_{r,p} : L_r \to L_p$ with $\|\iota_{r,p}\| \leq
@@ -1399,7 +1494,8 @@ its range is complete, hence closed.
 
 \begin{definition}[Scheme of functions]
 \label{def:function-scheme}
-\lean{FunctionScheme, FunctionScheme.toLp, FunctionScheme.mem_toLp}
+\lean{FunctionScheme, FunctionScheme.toLp, FunctionScheme.mem_toLp, FunctionScheme.toLp_mem_toLp,
+  FunctionScheme.inclusion_mem_toLp}
 \leanok
 \uses{def:scheme, def:comap}
 A \emph{scheme of functions} on $\Omega$ is an approximation scheme $S$ in $C_b(\Omega)$. For
@@ -1413,7 +1509,9 @@ so that one scheme serves all exponents.
 \begin{lemma}[Compatibility with the inclusions]
 \label{lem:function-scheme-inclusion}
 \lean{FunctionScheme.image_toLp_of_le, FunctionScheme.comap_toLp_of_le,
-  BoundedContinuousFunction.inclusionOfExponentLe_toLp}
+  BoundedContinuousFunction.inclusionOfExponentLe_toLp,
+  BoundedContinuousFunction.norm_toLp_eq_toReal_eLpNorm, FunctionScheme.mem_toLp_of_inclusion_mem,
+  FunctionScheme.exists_toLp_of_mem}
 \leanok
 \uses{def:function-scheme, lem:inclusion}
 Let $S$ be a scheme of functions and $1 \leq p \leq r \leq \infty$. For every $n \in \N$,
@@ -1428,13 +1526,14 @@ injective.
 
 \begin{definition}[Besov space]
 \label{def:besov}
-\lean{FunctionScheme.besovError, FunctionScheme.besovNorm, FunctionScheme.MemBesov,
-  FunctionScheme.besovSpace, FunctionScheme.besovSpaceSup}
+\lean{FunctionScheme.besovNorm, FunctionScheme.MemBesov, FunctionScheme.besovSpace,
+  FunctionScheme.besovSpaceSup}
 \leanok
 \uses{def:function-scheme, def:approx-space, prop:approx-linear}
 Let $S$ be a scheme of functions, $s \geq 0$ and $1 \leq p, q \leq \infty$. The
 \emph{Besov space} is $\Besov{s}{p}{q}(\Omega, S) = A^s_q(L_p, S^{(p)})$, the approximation
-space of $L_p$ for the scheme $S^{(p)}$.
+space of $L_p$ for the scheme $S^{(p)}$. Its errors $E_n(f)_p$ are the errors of best
+approximation of \Cref{def:error} for the scheme $S^{(p)}$.
 \end{definition}
 
 On the torus $\T^d$ with $S_n$ the trigonometric polynomials of degree $< n$, these are the
@@ -1470,7 +1569,8 @@ $C_b(\Omega) \to L_p$, of norm at most $\mu(\Omega)^{1/p}$.
 
 \begin{definition}[Nikolskii property]
 \label{def:nikolskii-property}
-\lean{FunctionScheme.HasNikolskii, nikolskiiExponent, nikolskiiExponent_nonneg}
+\lean{FunctionScheme.HasNikolskii, nikolskiiExponent, nikolskiiExponent_nonneg,
+  nikolskiiExponent_top, nikolskiiExponent_self, FunctionScheme.toReal_eLpNorm_top_le_norm}
 \leanok
 \uses{def:function-scheme}
 Let $S$ be a scheme of functions and $D \in \R$. The scheme has the \emph{Nikolskii property}
@@ -1593,7 +1693,11 @@ $\hat f(i) = \langle e_i, f \rangle$ are the coefficients of $f \in H$.
 
 \begin{definition}[Spectral scheme]
 \label{def:spectral}
-\lean{SpectralScheme, SpectralScheme.span, SpectralScheme.toScheme, SpectralScheme.weight}
+\lean{SpectralScheme, SpectralScheme.span, SpectralScheme.toScheme, SpectralScheme.weight,
+  SpectralScheme.span_zero, SpectralScheme.span_mono, SpectralScheme.mem_toScheme,
+  SpectralScheme.weight_pos, SpectralScheme.one_le_weight, SpectralScheme.norm_ofReal_inv_weight,
+  SpectralScheme.norm_ofReal_weight, SpectralScheme.ofReal_weight_ne_zero,
+  SpectralScheme.inv_weight_le, SpectralScheme.weight_le}
 \leanok
 \uses{def:comap}
 A \emph{level function} is a map $\lambda : I \to \N$ such that $\{i : \lambda(i) < n\}$ is
@@ -1608,7 +1712,8 @@ eigenvalue.
 \begin{definition}[Sobolev embedding of $\ell_2$]
 \label{def:sobolev-embed}
 \lean{SpectralScheme.sobolevEmbed, SpectralScheme.repr_sobolevEmbed,
-  SpectralScheme.sobolevEmbed_injective, SpectralScheme.diagInvWeight}
+  SpectralScheme.sobolevEmbed_injective, SpectralScheme.diagInvWeight,
+  SpectralScheme.diagInvWeight_apply}
 \leanok
 \uses{def:spectral}
 For $s \geq 0$ let $J_s : \ell_2(I) \to H$ be the bounded injective linear map
@@ -1634,7 +1739,8 @@ The preimage is $c_i = (1 + \lambda(i))^s \hat f(i)$.
 \begin{proposition}[Jackson and Bernstein inequalities]
 \label{prop:spectral-jackson-bernstein}
 \lean{SpectralScheme.jacksonBound, SpectralScheme.liftBound, SpectralScheme.toSmoothnessSpace,
-  SpectralScheme.truncate, SpectralScheme.repr_eq_zero_of_mem_span}
+  SpectralScheme.truncate, SpectralScheme.repr_eq_zero_of_mem_span,
+  SpectralScheme.truncate_mem_span, SpectralScheme.repr_truncate, SpectralScheme.repr_sub_truncate}
 \leanok
 \uses{def:sobolev-embed, def:jackson, def:lift-bound, def:smoothness}
 Let $s \geq 0$. For every $n \geq 1$ and $c \in \ell_2(I)$, $E_n(J_s c) \leq n^{-s} \|c\|$;
@@ -1655,8 +1761,10 @@ $|c_i| \leq n^s |\hat a(i)|$.
 \begin{proposition}[Spectral projections]
 \label{prop:spectral-projections}
 \lean{SpectralScheme.projectionScheme, SpectralScheme.truncateCLM,
-  SpectralScheme.closure_iUnion_toScheme, SpectralScheme.repr_block,
-  SpectralScheme.enorm_block_sq}
+  SpectralScheme.closure_iUnion_toScheme, SpectralScheme.repr_block, SpectralScheme.enorm_block_sq,
+  SpectralScheme.truncate_add, SpectralScheme.truncate_smul, SpectralScheme.norm_truncate_le,
+  SpectralScheme.truncateCLM_apply, SpectralScheme.truncate_of_mem,
+  SpectralScheme.projectionScheme_P, SpectralScheme.iUnion_span, SpectralScheme.enorm_sq_eq_tsum}
 \leanok
 \uses{def:spectral, def:projection-scheme, def:blocks}
 The truncations $P_n$ form a projection scheme with bound $1$ for the spectral scheme, the
@@ -1677,7 +1785,7 @@ basis, which is dense. The formulas are Parseval's identity.
 \begin{theorem}[Coefficient characterisation]
 \label{thm:spectral-coefficients}
 \lean{SpectralScheme.memApprox_iff_blockNorm_lt_top, SpectralScheme.memApprox_two_iff,
-  SpectralScheme.mem_l2_iff, SpectralScheme.tsum_ite_block_eq}
+  SpectralScheme.mem_l2_iff, SpectralScheme.tsum_ite_block_eq, SpectralScheme.enorm_weight_mul_sq}
 \leanok
 \uses{prop:spectral-projections, thm:blocks, lem:sobolev-range}
 Let $s > 0$ and $1 \leq q \leq \infty$. An element $f \in H$ lies in $A^s_q$ if and only if
@@ -1714,7 +1822,10 @@ a local instance of one file; the project re-declares it as a scoped instance.
 \begin{definition}[Trigonometric polynomials]
 \label{def:trig-poly}
 \lean{Torus.deg, Torus.boxLt, Torus.card_boxLt_le, Torus.trigMonomial, Torus.trigPoly,
-  Torus.trigScheme, TorusHaar.volume_eq_haarAddCircle}
+  Torus.trigScheme, TorusHaar.volume_eq_haarAddCircle, TorusHaar.isAddHaarMeasure,
+  TorusHaar.isProbabilityMeasure, Torus.natAbs_le_deg, Torus.deg_le_iff, Torus.deg_add_le,
+  Torus.deg_zero, Torus.mem_boxLt, Torus.boxLt_zero, Torus.boxLt_mono, Torus.trigMonomial_apply,
+  Torus.trigPoly_zero, Torus.trigPoly_mono, Torus.trigMonomial_mem_trigPoly, Torus.mem_trigScheme}
 \leanok
 \uses{def:function-scheme}
 The degree of $k \in \Z^d$ is $\deg k = \max_j |k_j|$, with $\deg k = 0$ for $d = \emptyset$.
@@ -1726,7 +1837,7 @@ $\mathcal{T}_n$ form a scheme of functions on $\T^d$, the \emph{trigonometric sc
 \begin{lemma}[Products of trigonometric polynomials]
 \label{lem:trig-products}
 \lean{Torus.trigPoly_mul_le, Torus.mul_mem_trigPoly, Torus.pow_mem_trigPoly,
-  Torus.trigMonomial_add}
+  Torus.trigMonomial_add, Torus.trigMonomial_zero, Torus.norm_trigMonomial_apply}
 \leanok
 \uses{def:trig-poly}
 For all $m, n \in \N$, $S \in \mathcal{T}_m$ and $T \in \mathcal{T}_n$: $S T \in
@@ -1741,7 +1852,7 @@ $e_k e_l = e_{k+l}$ and $\deg(k + l) \leq \deg k + \deg l$.
 \begin{lemma}[Supremum norm and $L_2$ norm]
 \label{lem:trig-sup-l2}
 \lean{Torus.norm_sq_le_card_mul_norm_toLp_sq, Torus.exists_sum_of_mem_trigPoly,
-  Torus.norm_toLp_sum_sq}
+  Torus.norm_toLp_sum_sq, Torus.toLp_trigMonomial}
 \leanok
 \uses{def:trig-poly}
 For every $n \in \N$ and $T \in \mathcal{T}_n$, $\sup |T|^2 \leq (2n)^d \, \|T\|_{L_2}^2$.
@@ -1786,7 +1897,7 @@ Divide by $(\sup|T|)^{2m-p}$ and take $p$-th roots. For $p = \infty$ the constan
 \begin{definition}[Sobolev space $H^s(\T^d)$]
 \label{def:torus-sobolev}
 \lean{Torus.fourierScheme, Torus.toLp_trigScheme_eq, Torus.sobolevSpace,
-  Torus.mem_range_sobolev_iff}
+  Torus.mem_range_sobolev_iff, Torus.sobolevSpace_order, Torus.sobolevSpace_iota}
 \leanok
 \uses{def:spectral, def:sobolev-embed, prop:spectral-jackson-bernstein, def:sobolev-scheme}
 The Fourier basis $(e_k)_{k \in \Z^d}$ of $L_2(\T^d)$ with the level $\deg$ is a spectral
@@ -1806,8 +1917,8 @@ polynomials.
 \begin{theorem}[Embeddings on the torus]
 \label{thm:torus-embeddings}
 \lean{Torus.memBesov_exists_inclusion_eq, Torus.memBesov_exists_continuous,
-  Torus.sobolev_memBesov_top, Torus.exists_sobolev_of_memBesov,
-  Torus.sobolev_exists_inclusion_eq, Torus.sobolev_exists_continuous}
+  Torus.sobolev_memBesov_top, Torus.exists_sobolev_of_memBesov, Torus.sobolev_exists_inclusion_eq,
+  Torus.sobolev_exists_continuous, Torus.toLp_toContinuousMap}
 \leanok
 \uses{thm:torus-nikolskii, thm:besov-embedding, def:torus-sobolev, prop:smoothness}
 Let $1 \leq p \leq r \leq \infty$ and $1 \leq q \leq \infty$.
@@ -1865,7 +1976,9 @@ trace theorems of \Cref{ch:traces-abstract} extend it to Besov spaces.
 \label{def:face-restriction}
 \lean{Torus.face, Torus.restrictFace, Torus.compLinear, Torus.lineThrough,
   Torus.restrictFace_trigMonomial, Torus.restrictFace_mem_trigPoly,
-  Torus.compLinear_lineThrough_mem_trigPoly}
+  Torus.compLinear_lineThrough_mem_trigPoly, Torus.face_apply, Torus.lineThrough_apply,
+  Torus.compLinear_apply, Torus.deg_tail_le, Torus.deg_const_le,
+  Torus.compLinear_lineThrough_trigMonomial}
 \leanok
 \uses{def:trig-poly}
 For a bounded continuous $a$ on $\T^{n+1}$, its restriction to the face is
@@ -1917,7 +2030,13 @@ kernel estimates.
 \lean{Torus.dirichletSum, Torus.fejerFace, Torus.extendFace, Torus.tailMap,
   Torus.fejerFace_cons_zero, Torus.enorm_fejerFace_le, Torus.lintegral_enorm_fejerFace,
   Torus.lintegral_enorm_dirichletSum_sq, Torus.extendFace_mem_trigPoly,
-  Torus.restrictFace_extendFace, Torus.eLpNorm_extendFace_le}
+  Torus.restrictFace_extendFace, Torus.eLpNorm_extendFace_le, Torus.tailMap_apply,
+  Torus.deg_cons_zero_le, Torus.compLinear_tailMap_trigMonomial,
+  Torus.compLinear_tailMap_mem_trigPoly, Torus.trigMonomial_single_cons, Torus.deg_single_le,
+  Torus.star_trigMonomial, Torus.star_mem_trigPoly, Torus.dirichletSum_cons,
+  Torus.dirichletSum_mem_trigPoly, Torus.norm_dirichletSum_le, Torus.fejerFace_apply,
+  Torus.fejerFace_mem_trigPoly, Torus.toLpR, Torus.toLpR_injective, Torus.enorm_toLpR,
+  Torus.iUnionSubmodule_le_range}
 \leanok
 \uses{def:face-restriction, lem:fubini-cons, lem:trig-products}
 Let $m \geq 1$ and $\varphi_m(x) = m^{-2} \bigl|\sum_{j<m} e^{2\pi i j x_0}\bigr|^2$ on
@@ -1940,7 +2059,8 @@ and \Cref{lem:fubini-cons} gives $\int |E b|^p = \int \varphi_m^p \cdot \int |b|
 \begin{theorem}[Traces of Besov spaces on the torus]
 \label{thm:trace-torus}
 \lean{Torus.traceBound, Torus.traceOnApprox, Torus.traceBound_ext_toLp,
-  Torus.traceBound_rightInverse, Torus.trace_besov}
+  Torus.traceBound_rightInverse, Torus.trace_besov, Torus.traceOnApprox_apply,
+  Torus.traceConstTorus, Torus.traceBound_T_toLp}
 \leanok
 \uses{thm:trace-inequality-torus, lem:fejer-extension, thm:trace-transfer,
   thm:trace-surjective}
@@ -1971,7 +2091,8 @@ gives a projection scheme.
 \label{lem:condexp-lp}
 \lean{MeasureTheory.Lp.condExpLp, MeasureTheory.Lp.coeFn_condExpLp,
   MeasureTheory.Lp.norm_condExpLp_le, MeasureTheory.Lp.condExpLp_mem_lpMeas,
-  MeasureTheory.Lp.condExpLp_of_mem}
+  MeasureTheory.Lp.condExpLp_of_mem, MeasureTheory.Lp.condExpLpLinear,
+  MeasureTheory.Lp.coeFn_condExpLpLinear}
 \leanok
 Let $\mathcal{G} \subseteq \mathcal{F}$ be a sub-$\sigma$-algebra. The conditional
 expectation $f \mapsto E[f \mid \mathcal{G}]$ is a bounded linear map $L_p \to L_p$ of norm at
@@ -1989,7 +2110,7 @@ which Mathlib provides; linearity holds almost everywhere.
 \label{def:filtration-scheme}
 \lean{MeasureTheory.Filtration.approximants, MeasureTheory.Filtration.scheme,
   MeasureTheory.Filtration.proj, MeasureTheory.Filtration.projectionScheme,
-  MeasureTheory.Filtration.proj_two_pow}
+  MeasureTheory.Filtration.proj_two_pow, MeasureTheory.Filtration.approximants_mono}
 \leanok
 \uses{lem:condexp-lp, def:projection-scheme, def:comap}
 Let $\mathcal{F}_0 \subseteq \mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}$ be a
@@ -2060,8 +2181,11 @@ The fibres of measure $0$ are countably many, so their union is a null set.
 \begin{definition}[Dyadic intervals and the dyadic filtration]
 \label{def:dyadic-filtration}
 \lean{Haar.vol, Haar.dyadicIndex, Haar.dyadicInterval, Haar.dyadicInterval_eq_Ico,
-  Haar.dyadicInterval_eq_union, Haar.vol_dyadicInterval, Haar.dyadicSigma,
-  Haar.dyadicFiltration, Haar.scheme}
+  Haar.dyadicInterval_eq_union, Haar.vol_dyadicInterval, Haar.dyadicSigma, Haar.dyadicFiltration,
+  Haar.scheme, Haar.vol_univ, Haar.mem_dyadicInterval, Haar.measurable_dyadicIndex,
+  Haar.measurableSet_dyadicInterval, Haar.disjoint_dyadicInterval, Haar.dyadicIndex_nonneg,
+  Haar.dyadicIndex_lt, Haar.dyadicInterval_subset, Haar.vol_real_dyadicInterval,
+  Haar.dyadicIndex_succ_div, Haar.dyadicSigma_mono}
 \leanok
 \uses{def:filtration-scheme}
 For $j \in \N$ and $n \in \Z$ let $I_{j,n} = [n 2^{-j}, (n + 1) 2^{-j})$, the set of $x \in \R$
@@ -2208,7 +2332,8 @@ $(\tau_h f)(x) = f(x + h)$.
 \begin{lemma}[Fourier coefficients of translates]
 \label{lem:translation-fourier}
 \lean{Torus.mFourierCoeff_translate, Torus.mFourier_add_apply, Torus.enorm_translate_sub_sq,
-  Torus.norm_mFourier_sub_one_le, Torus.norm_prod_sub_one_le, Torus.norm_fourier_sub_one_le}
+  Torus.norm_mFourier_sub_one_le, Torus.norm_prod_sub_one_le, Torus.norm_fourier_sub_one_le,
+  Torus.mFourier_apply_zero, Torus.mFourier_neg_neg, Torus.repr_translate}
 \leanok
 \uses{def:translation}
 For every $h \in \T^d$, $f \in L_2(\T^d)$ and $k \in \Z^d$,
@@ -2228,7 +2353,8 @@ complex numbers of modulus $1$, and $|e^{i\theta} - 1| \leq |\theta|$.
 
 \begin{definition}[Modulus of smoothness]
 \label{def:modulus}
-\lean{Torus.modulus, Torus.modulus_mono, Torus.enorm_translate_sub_le_modulus}
+\lean{Torus.modulus, Torus.modulus_mono, Torus.enorm_translate_sub_le_modulus,
+  Torus.norm_coe_le_abs}
 \leanok
 \uses{def:translation}
 For $f \in L_2(\T^d)$ and $t \in \R$,
@@ -2239,7 +2365,8 @@ $\omega(f, t)_2 = \sup_{\|h\| \leq t} \|\tau_h f - f\|_2$.
 \label{lem:modulus-linear}
 \lean{Torus.enorm_translate, Torus.translate_zero, Torus.translate_add,
   Torus.enorm_translate_nsmul_sub_le, Torus.exists_coe_eq_abs_eq_norm,
-  Torus.modulus_natCast_mul_le}
+  Torus.modulus_natCast_mul_le, Torus.norm_exp_I_mul_sub_one_sq, Torus.fourier_coe_eq_exp,
+  Torus.norm_fourier_sub_one_sq}
 \leanok
 \uses{def:modulus}
 For $f \in L_2(\T^d)$, $n \geq 1$ and $t \geq 0$, $\omega(f, n t)_2 \leq n \, \omega(f, t)_2$.
@@ -2260,7 +2387,8 @@ translations along the coordinate axes.
 \label{thm:torus-jackson}
 \lean{Torus.approxSeq_sq_le_card_mul_modulus_sq, Torus.approxSeq_sq_le_tsum,
   Torus.integral_norm_fourier_sub_one_sq, Torus.le_integral_norm_fourier_sub_one_sq,
-  Torus.approxSeq_le_modulus}
+  Torus.approxSeq_le_modulus, Torus.ofReal_le_lintegral_enorm_fourier_sub_one_sq,
+  Torus.mFourier_single}
 \leanok
 \uses{def:modulus, lem:translation-fourier, def:torus-sobolev}
 For every $n \geq 1$ and $f \in L_2(\T^d)$, the error of approximation by $\mathcal{T}_n$ in
@@ -2305,7 +2433,8 @@ For $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_2(\T^d)$,
 \lean{Torus.approxNormDyadic_le_modulusNorm, Torus.modulusNorm_le_approxNormDyadic,
   Torus.coincidenceConst, Torus.coincidenceConst_ne_top, Torus.memBesov_iff_modulusNorm_lt_top,
   Torus.blockMult, Torus.modulus_le_tsum_block, Torus.blockMult_le,
-  Torus.dyadicWeight_mul_modulus_le}
+  Torus.dyadicWeight_mul_modulus_le, Torus.enorm_mFourier_sub_one_le_blockMult,
+  Torus.enorm_translate_sub_sq_le, Torus.tsum_ite_le_eq, Torus.tsum_ite_ge_eq}
 \leanok
 \uses{def:modulus-norm, thm:torus-jackson, thm:torus-coefficients, thm:blocks, lem:hardy,
   lem:translation-fourier}
@@ -2351,7 +2480,7 @@ the smooth functions. Mathlib has no distributions on the torus.
 
 \begin{definition}[Weak derivatives and $W^m_2(\T^d)$]
 \label{def:weak-derivative}
-\lean{Torus.derivSymbol, Torus.HasWeakDeriv, Torus.MemSobolev}
+\lean{Torus.derivSymbol, Torus.HasWeakDeriv, Torus.MemSobolev, Torus.norm_two_pi_I_mul_intCast}
 \leanok
 For $\alpha \in \N^d$ put $|\alpha| = \sum_j \alpha_j$ and $(2\pi i k)^\alpha = \prod_j
 (2\pi i k_j)^{\alpha_j}$ for $k \in \Z^d$. An element $g \in L_2(\T^d)$ is the \emph{weak
@@ -2382,7 +2511,8 @@ trigonometric monomials form a Hilbert basis.
 \begin{lemma}[Symbols and the Sobolev weight]
 \label{lem:symbol-bounds}
 \lean{Torus.norm_derivSymbol, Torus.norm_derivSymbol_le, Torus.one_add_pow_le,
-  Torus.one_add_deg_pow_le}
+  Torus.one_add_deg_pow_le, Torus.derivSymbol_zero, Torus.derivSymbol_single, Torus.one_le_two_pi,
+  Torus.abs_le_one_add_deg}
 \leanok
 \uses{def:weak-derivative, def:trig-poly}
 Let $m \in \N$ and $k \in \Z^d$. For every $\alpha \in \N^d$ with $|\alpha| \leq m$,
@@ -2424,319 +2554,6 @@ $((2\pi i k)^\alpha \hat f(k))_k$ is square-summable for $|\alpha| \leq m$, and
 
 That the weak derivative of a smooth function is its classical derivative is integration
 by parts on the torus; it is not formalised.
-
-\section{Lipschitz atoms}
-\label{sec:lip-atoms}
-
-The atoms of Schneider and Vyb\'{\i}ral~\cite{SchneiderVybiral} need no smoothness beyond a
-Lipschitz bound. On $L_2(\T^d)$ they form an atomic system in the sense of
-\Cref{def:atomic-system} for the trigonometric scheme, with $\delta = \#d/2$ and $\sigma = 1$.
-The positions of level $j$ are the points of $\{0, \dots, 2^j - 1\}^d$.
-
-\begin{definition}[Lipschitz atoms]
-\label{def:lip-atom}
-\lean{Torus.gridPoint, Torus.IsLipAtom, Torus.isLipAtom_zero}
-\leanok
-\uses{def:trig-poly}
-Let $D, j \in \N$ and $m \in \{0, \dots, 2^j - 1\}^d$. The grid point of level $j$ at $m$ is
-$2^{-j} m \in \T^d$. A \emph{Lipschitz atom} of level $j$ at $m$ with support radius $D$ is a
-bounded continuous function $a : \T^d \to \C$ with $|a(x)| \leq 1$ and
-$|a(x) - a(y)| \leq 2^j \|x - y\|$ for all $x, y \in \T^d$, and $a(x) = 0$ whenever
-$\|x - 2^{-j} m\| > D \, 2^{-j}$.
-\end{definition}
-
-The balls of the norm of $\T^d$ are cubes; Schneider and Vyb\'{\i}ral use dilated dyadic cubes
-of $\R^d$, which amounts to the same up to the choice of $D$.
-
-\begin{lemma}[Bounded overlap]
-\label{lem:grid-overlap}
-\lean{Torus.card_filter_norm_sub_le, Torus.card_filter_norm_sub_gridPoint_le,
-  Torus.volume_closedBall_circle_le, Torus.volume_closedBall_le,
-  Torus.volume_closedBall_gridPoint_le}
-\leanok
-\uses{def:lip-atom}
-Let $j, R \in \N$ and $x \in \T^d$. At most $(2R + 1)^{\#d}$ positions
-$m \in \{0, \dots, 2^j - 1\}^d$ satisfy $\|x - 2^{-j} m\| \leq R \, 2^{-j}$. For every
-$\rho \geq 0$, every ball of radius $\rho$ in $\T^d$ has measure at most $(2\rho)^{\#d}$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-Both statements reduce to one coordinate. Let $N = 2^j$ and let $y \in \R$ represent $x_i$. Every
-$l$ with $\dist(y - l/N, \Z) \leq R/N$ is congruent modulo $N$ to an integer in
-$[Ny - R, Ny + R]$, and distinct $l < N$ give distinct integers; an interval of length $2R$
-contains at most $2R + 1$ integers. A ball of radius $\rho$ in $\T$ is an arc of length at most
-$2\rho$, and a ball in $\T^d$ is the product of balls in the coordinates.
-\end{proof}
-
-\begin{lemma}[$L_2$ norms of sums with bounded overlap]
-\label{lem:overlap-l2}
-\lean{Torus.lintegral_enorm_sum_sq_le, Torus.finLqNorm_two_eq, Torus.eLpNorm_le_of_overlap}
-\leanok
-\uses{lem:grid-overlap}
-Let $j, R \in \N$, $\tau \geq 0$ and $c_m \in \R$, and let $F_m : \T^d \to \C$,
-$m \in \{0, \dots, 2^j - 1\}^d$, satisfy $|F_m| \leq |c_m| \, \tau$ and $F_m(x) = 0$ whenever
-$\|x - 2^{-j} m\| > R \, 2^{-j}$. If $G = \sum_m F_m$ is measurable, then
-\[
-  \|G\|_2 \leq \bigl((2R + 1)^{\#d} (2R)^{\#d}\bigr)^{1/2} \, \tau \, 2^{-j \#d/2} \,
-  \|c\|_{\ell_2} .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-Let $S_m$ be the closed ball of radius $R \, 2^{-j}$ around $2^{-j} m$. At every point at most
-$N = (2R + 1)^{\#d}$ of the $F_m$ are nonzero, so the Cauchy--Schwarz inequality gives
-$|G(x)|^2 \leq N \sum_m c_m^2 \tau^2 \mathbf{1}_{S_m}(x)$. Integrate and use
-$|S_m| \leq (2R)^{\#d} 2^{-j\#d}$.
-\end{proof}
-
-\begin{proposition}[Lipschitz atoms form an atomic system]
-\label{prop:lip-atomic-system}
-\lean{Torus.enorm_translate_toLp_sub, Torus.eLpNorm_sum_lipAtoms_le,
-  Torus.enorm_translate_sum_lipAtoms_sub_le, Torus.lipConst, Torus.lipConst_ne_top,
-  Torus.trigScheme_toLp_isLinear, Torus.lipAtomicSystem}
-\leanok
-\uses{def:atomic-system, def:lip-atom, lem:overlap-l2, thm:torus-jackson}
-Let $D \in \N$. The Lipschitz atoms of support radius $D$ form an atomic system for the
-trigonometric scheme in $L_2(\T^d)$ with $p = 2$, $\delta = \#d/2$, $\sigma = 1$ and the
-constant
-\[
-  C = \bigl((2D + 1)^{\#d} (2D)^{\#d}\bigr)^{1/2}
-    + (\#d + 1) \bigl((2D + 3)^{\#d} (2D + 2)^{\#d}\bigr)^{1/2} .
-\]
-\end{proposition}
-
-\begin{proof}
-\leanok
-Let $g = \sum_m c_m a_m$ with atoms $a_m$ of level $j$. The size bound is \Cref{lem:overlap-l2}
-with $R = D$ and $\tau = 1$. For the decay let $k \geq j$ and $\|h\| \leq 2^{-k}$. The function
-$g(\cdot + h) - g = \sum_m c_m (a_m(\cdot + h) - a_m)$ has terms bounded by
-$|c_m| \, 2^{j-k}$ and vanishing outside the ball of radius $(D + 1) 2^{-j}$ around
-$2^{-j} m$, so \Cref{lem:overlap-l2} gives
-\[
-  \|\tau_h g - g\|_2 \leq \bigl((2D + 3)^{\#d} (2D + 2)^{\#d}\bigr)^{1/2} \, 2^{-(k-j)} \,
-  2^{-j\#d/2} \|c\|_{\ell_2} .
-\]
-Taking the supremum over $h$ bounds $\omega(g, 2^{-k})_2$, and Jackson's theorem
-$E_{2^k}(g)_2 \leq (\#d + 1) \, \omega(g, 2^{-k})_2$ (\Cref{thm:torus-jackson}) gives the
-decay bound.
-\end{proof}
-
-\begin{theorem}[Synthesis with Lipschitz atoms]
-\label{thm:lip-synthesis}
-\lean{Torus.approxNormDyadic_le_of_lipAtoms, Torus.memBesov_of_lipAtoms}
-\leanok
-\uses{prop:lip-atomic-system, thm:atomic-synthesis}
-Let $D \in \N$, $0 < s < 1$ and $1 \leq q \leq \infty$. Let $a_{j,m}$ be Lipschitz atoms of
-level $j$ at $m$ with support radius $D$, let $\lambda_{j,m} \in \R$, and let
-$f = \sum_j \sum_m \lambda_{j,m} a_{j,m}$, the series over $j$ converging in $L_2(\T^d)$. If
-$\|(2^{j(s - \#d/2)} \|\lambda_{j,\cdot}\|_{\ell_2})_j\|_{\ell_q} < \infty$, then
-$f \in \Besov{s}{2}{q}(\T^d)$, and
-\[
-  \|f\|^{\mathrm{dy}}_{\Besov{s}{2}{q}} \leq \bigl(2 (1 - 2^{-s})^{-1} + (1 - 2^{-(1 - s)})^{-1}
-  \bigr) \, C \, \|\lambda\|_{b^s_{2,q}}
-\]
-with $C$ from \Cref{prop:lip-atomic-system}.
-\end{theorem}
-
-\begin{proof}
-\leanok
-\Cref{thm:atomic-synthesis} for the atomic system of \Cref{prop:lip-atomic-system}; the
-trigonometric scheme is linear.
-\end{proof}
-
-The converse decomposes $f$ through quasi-interpolants with hat functions, which split into
-pieces near the grid points; no expansion of trigonometric polynomials is needed.
-
-\begin{lemma}[Hat functions]
-\label{lem:hat}
-\lean{Torus.circleHat, Torus.circleHat_nonneg, Torus.circleHat_le_one, Torus.circleHat_eq_zero,
-  Torus.abs_circleHat_sub_le, Torus.continuous_circleHat, Torus.coe_sub_div_eq,
-  Torus.natCast_mul_norm_coe_sub_div, Torus.natCast_eq_emod, Torus.sum_circleHat,
-  Torus.abs_prod_sub_prod_le, Torus.torusHat, Torus.torusHat_nonneg, Torus.torusHat_le_one,
-  Torus.sum_torusHat, Torus.abs_torusHat_sub_le, Torus.norm_le_half, Torus.torusHat_eq_zero,
-  Torus.continuous_torusHat}
-\leanok
-\uses{def:lip-atom}
-For $N \geq 1$ and $0 \leq l < N$ let $\Lambda_{N,l}(u) = \max(0, 1 - N \|u - l/N\|)$ on $\T$.
-For $j \geq 1$ and $m \in \{0, \dots, 2^j - 1\}^d$ let
-$\varphi_{j,m}(x) = \prod_i \Lambda_{2^j, m_i}(x_i)$, and let $\varphi_{0,0} = 1$. Then
-$0 \leq \varphi_{j,m} \leq 1$, $\varphi_{j,m}$ vanishes outside the open ball of radius $2^{-j}$
-around $2^{-j} m$, $|\varphi_{j,m}(x) - \varphi_{j,m}(y)| \leq \#d \, 2^j \|x - y\|$, and
-$\sum_m \varphi_{j,m} = 1$ for every $j$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-For $N \geq 2$, $y \in \R$, $t = N y$ and $k = \lfloor t \rfloor$, only the hats at the classes
-of $k$ and $k + 1$ modulo $N$ are nonzero at $y$, with values $1 - (t - k)$ and $t - k$. The
-partition of unity of $\T^d$ is the product of those of the coordinates, and
-$|\prod_i a_i - \prod_i b_i| \leq \sum_i |a_i - b_i|$ for numbers in $[0, 1]$.
-\end{proof}
-
-\begin{lemma}[Oscillation over pairs of sets]
-\label{lem:pair-oscillation}
-\lean{Torus.eLpNorm_two_sq, Torus.enorm_sq_eq_lintegral, Torus.enorm_translate_sub_sq_eq,
-  Torus.sum_lintegral_le_lintegral_sum, Torus.sum_lintegral_pair_le}
-\leanok
-\uses{def:modulus}
-Let $(S_i, S'_i)_{i \in I}$ be finitely many pairs of measurable subsets of $\T^d$ with
-$\|z - y\| \leq \rho$ for all $y \in S_i$ and $z \in S'_i$, such that every pair $(y, z)$ lies in
-at most $N$ of the products $S_i \times S'_i$. Then for every $f \in L_2(\T^d)$,
-\[
-  \sum_i \int_{S_i} \int_{S'_i} |f(z) - f(y)|^2 \, dz \, dy
-  \leq N \, |B(0, \rho)| \, \omega(f, \rho)_2^2 .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-The sum is at most $N \int \int_{\|h\| \leq \rho} |f(y + h) - f(y)|^2 \, dh \, dy$ after the
-substitution $z = y + h$. Exchanging the integrals gives
-$N \int_{\|h\| \leq \rho} \|\tau_h f - f\|_2^2 \, dh$.
-\end{proof}
-
-\begin{definition}[Quasi-interpolants]
-\label{def:quasi-interpolant}
-\lean{Torus.dyadicBall, Torus.measurableSet_dyadicBall, Torus.ballAverage, Torus.quasiInterp,
-  Torus.continuous_quasiInterp, Torus.quasiInterpBCF, Torus.quasiInterpBCF_apply,
-  Torus.sum_torusHat_complex, Torus.quasiInterp_sub_const}
-\leanok
-\uses{lem:hat}
-Let $B_{j,m}$ be the closed ball of radius $2^{-j}$ around $2^{-j} m$ and
-$\mu_{j,m}(f) = |B_{j,m}|^{-1} \int_{B_{j,m}} f$ for $f \in L_2(\T^d)$. The
-\emph{quasi-interpolant} of level $j$ is $Q_j f = \sum_m \mu_{j,m}(f) \, \varphi_{j,m}$.
-\end{definition}
-
-\begin{lemma}[Jackson's inequality for quasi-interpolants]
-\label{lem:quasi-jackson}
-\lean{Torus.volume_closedBall_circle, Torus.volume_closedBall_eq,
-  Torus.dyadicWeight_le_volume_dyadicBall, Torus.inv_volume_dyadicBall_le,
-  Torus.volume_dyadicBall_ne_zero, Torus.enorm_average_sq_le, Torus.enorm_ballAverage_sub_sq_le,
-  Torus.mem_dyadicBall_of_torusHat_ne_zero, Torus.card_filter_mem_dyadicBall_le,
-  Torus.enorm_sub_quasiInterp_sq_le, Torus.enorm_sub_quasiInterp_sq_le',
-  Torus.enorm_sub_toLp_quasiInterp_le}
-\leanok
-\uses{def:quasi-interpolant, lem:pair-oscillation, lem:modulus-linear}
-For every $f \in L_2(\T^d)$ and $j \in \N$,
-$\|f - Q_j f\|_2 \leq 2 \cdot 6^{\#d} \, \omega(f, 2^{-j})_2$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-By the partition of unity, $f - Q_j f = \sum_m \varphi_{j,m} (f - \mu_{j,m})$, and at most
-$3^{\#d}$ terms are nonzero at each point. Jensen's inequality gives
-$|f(x) - \mu_{j,m}|^2 \leq |B_{j,m}|^{-1} \int_{B_{j,m}} |f(z) - f(x)|^2 \, dz$, and
-\Cref{lem:pair-oscillation} with the pairs $(B_{j,m}, B_{j,m})$ and $\rho = 2^{1-j}$ bounds
-$\|f - Q_j f\|_2^2$ by $36^{\#d} \, \omega(f, 2^{1-j})_2^2$. Finish with
-\Cref{lem:modulus-linear}.
-\end{proof}
-
-\begin{lemma}[The pieces of the levels]
-\label{lem:pieces}
-\lean{Torus.norm_sub_gridPoint_lt, Torus.nbr, Torus.mem_nbr, Torus.localOsc,
-  Torus.localOsc_nonneg, Torus.piece, Torus.continuous_piece, Torus.sum_piece,
-  Torus.sum_le_sum_nbr, Torus.norm_quasiInterp_sub_le, Torus.norm_quasiInterp_sub_quasiInterp_le,
-  Torus.norm_piece_le, Torus.norm_piece_sub_le, Torus.piece_eq_zero, Torus.pieceCoeff,
-  Torus.pieceAtom, Torus.pieceAtom_apply, Torus.isLipAtom_pieceAtom,
-  Torus.pieceCoeff_mul_pieceAtom, Torus.meanAtom, Torus.isLipAtom_meanAtom,
-  Torus.norm_mul_meanAtom}
-\leanok
-\uses{def:quasi-interpolant, def:lip-atom}
-For $k \in \N$ and a position $m'$ of level $k + 1$ let $N(m')$ be the set of positions $m$ of
-level $k$ with $\|2^{-k} m - 2^{-(k+1)} m'\| < 3 \cdot 2^{-(k+1)}$, and let
-$M_{k+1,m'} = \sum_{m \in N(m')} |\mu_{k,m} - \mu_{k+1,m'}|$. Then
-\[
-  Q_{k+1} f - Q_k f = \sum_{m'} p_{k+1,m'}, \qquad
-  p_{k+1,m'} = \varphi_{k+1,m'} \, (\mu_{k+1,m'} - Q_k f),
-\]
-and $p_{k+1,m'} = \lambda_{k+1,m'} \, a_{k+1,m'}$ with a Lipschitz atom $a_{k+1,m'}$ of support
-radius $1$ and $\lambda_{k+1,m'} = (2 \#d + 1) M_{k+1,m'}$. Moreover $Q_0 f = \mu_{0,0}$ is
-$|\mu_{0,0}|$ times a Lipschitz atom of level $0$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-On the support of $\varphi_{k+1,m'}$ only the hats $\varphi_{k,m}$ with $m \in N(m')$ are
-nonzero, and $Q_k f - \mu_{k+1,m'} = \sum_m \varphi_{k,m} (\mu_{k,m} - \mu_{k+1,m'})$. So
-$|p_{k+1,m'}| \leq M_{k+1,m'}$, and $p_{k+1,m'}$ is Lipschitz with constant
-$2 \#d \, 2^{k+1} M_{k+1,m'}$.
-\end{proof}
-
-\begin{lemma}[Coefficients of the levels]
-\label{lem:piece-coefficients}
-\lean{Torus.card_nbr_le, Torus.enorm_pieceCoeff_sq_le, Torus.enorm_ballAverage_sub_sq_le',
-  Torus.sum_nbr_lintegral_le, Torus.sum_enorm_pieceCoeff_sq_le, Torus.sum_enorm_mean_sq_le}
-\leanok
-\uses{lem:pieces, lem:pair-oscillation, lem:modulus-linear}
-For every $f \in L_2(\T^d)$ and $k \in \N$,
-\[
-  \Bigl( \sum_{m'} \lambda_{k+1,m'}^2 \Bigr)^{1/2}
-  \leq (2 \#d + 1) \cdot 3 \cdot 24^{\#d} \, 2^{k \#d / 2} \, \omega(f, 2^{-k})_2 ,
-\]
-and $|\mu_{0,0}| \leq \|f\|_2$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The set $N(m')$ has at most $5^{\#d}$ elements, so by the Cauchy--Schwarz inequality and
-Jensen's inequality $\lambda_{k+1,m'}^2$ is at most $(2 \#d + 1)^2 \, 5^{\#d}$ times
-\[
-  \sum_{m \in N(m')} |B_{k,m}|^{-1} |B_{k+1,m'}|^{-1}
-  \int_{B_{k+1,m'}} \int_{B_{k,m}} |f(y) - f(z)|^2 \, dy \, dz .
-\]
-\Cref{lem:pair-oscillation} with $\rho = 3 \cdot 2^{-k}$ and overlap $9^{\#d}$ bounds the sum over
-$m'$, and $5 \cdot 2 \cdot 9 \cdot 6 \leq 24^2$.
-\end{proof}
-
-\begin{theorem}[Analysis with Lipschitz atoms]
-\label{thm:lip-analysis}
-\lean{Torus.lipAtomOf, Torus.lipCoeffOf, Torus.isLipAtom_lipAtomOf, Torus.levelBCF,
-  Torus.torusHat_zero, Torus.sum_lipCoeff_smul_lipAtom, Torus.sum_lipCoeff_smul_toLp,
-  Torus.sum_range_levelBCF, Torus.dyadicWeight_mul_modulus_le_modulusNorm,
-  Torus.modulus_le_dyadicWeight_mul, Torus.enorm_toLp_levelBCF_succ_le, Torus.hasSum_levels,
-  Torus.finLqNorm_two_le, Torus.analysisConst, Torus.analysisConst_ne_top,
-  Torus.bNorm_lipCoeffOf_le, Torus.exists_lipAtoms}
-\leanok
-\uses{lem:quasi-jackson, lem:piece-coefficients, def:modulus-norm}
-Let $s > 0$, $1 \leq q \leq \infty$ and $f \in L_2(\T^d)$ with $\|f\|^{\omega}_{s,q} < \infty$.
-Then $f = \sum_j \sum_m \lambda_{j,m} a_{j,m}$ in $L_2(\T^d)$ with Lipschitz atoms $a_{j,m}$ of
-level $j$ at $m$ with support radius $1$ and
-\[
-  \|\lambda\|_{b^s_{2,q}} \leq \bigl(1 + (2 \#d + 1) \cdot 3 \cdot 24^{\#d} \, 2^{s - \#d/2}\bigr)
-  \|f\|^{\omega}_{s,q} .
-\]
-\end{theorem}
-
-\begin{proof}
-\leanok
-The levels $Q_0 f$ and $Q_{k+1} f - Q_k f$ add up to $Q_J f$, which tends to $f$ by
-\Cref{lem:quasi-jackson}; their norms are summable since
-$\omega(f, 2^{-k})_2 \leq 2^{-ks} \|f\|^{\omega}_{s,q}$. By \Cref{lem:piece-coefficients} the
-level $k + 1$ contributes
-$2^{(k+1)(s - \#d/2)} \|\lambda_{k+1,\cdot}\|_{\ell_2} \leq (2 \#d + 1) \cdot 3 \cdot 24^{\#d} \,
-2^{s - \#d/2} \, 2^{ks} \omega(f, 2^{-k})_2$, and the level $0$ at most $\|f\|_2$.
-\end{proof}
-
-\begin{theorem}[Lipschitz-atomic characterisation]
-\label{thm:lip-characterisation}
-\lean{Torus.memBesov_iff_exists_lipAtoms}
-\leanok
-\uses{thm:lip-analysis, thm:lip-synthesis, thm:moduli-coincidence}
-Let $0 < s < 1$ and $1 \leq q \leq \infty$. Then $f \in \Besov{s}{2}{q}(\T^d)$ if and only if
-$f = \sum_j \sum_m \lambda_{j,m} a_{j,m}$ in $L_2(\T^d)$ with Lipschitz atoms of support radius
-$1$ and $\|\lambda\|_{b^s_{2,q}} < \infty$.
-\end{theorem}
-
-\begin{proof}
-\leanok
-\Cref{thm:lip-analysis} with \Cref{thm:moduli-coincidence}, and \Cref{thm:lip-synthesis} for
-the converse.
-\end{proof}
-
-This is the characterisation of Schneider and Vyb\'{\i}ral~\cite{SchneiderVybiral} on $\T^d$
-for $p = 2$.
 
 \chapter{Polynomial approximation on intervals}
 \label{ch:interval}
@@ -8297,7 +8114,7 @@ The dimension of the underlying space is $n$.
   \item \emph{Local means} (\Cref{def:local-means}).
     $\|(2^{js} \|k_j * f\|_p)_j\|_{\ell_q}$ with kernels $k_j$ supported in balls of radius
     $C 2^{-j}$, all built from one bump.
-  \item \emph{Atoms} (\Cref{def:atomic-system,def:lip-atom,def:regular-atoms}).
+  \item \emph{Atoms} (\Cref{def:atomic-system,def:regular-atoms}).
     Decompositions into atoms $a_{j,m}$ of level $j$, supported near a cube of side $2^{-j}$,
     $f = \sum_j \sum_m \lambda_{j,m} a_{j,m}$, measured by
     \[
@@ -8369,8 +8186,6 @@ Descriptions & Range & Result \\
   & \Cref{thm:moduli-coincidence} \\
 \raggedright Weak derivatives, Fourier coefficients and approximation: $\Sob{m}{2} = H^m = \Besov{m}{2}{2}$
   & $m \geq 1$ & \Cref{thm:weak-sobolev} \\
-\raggedright Trigonometric approximation and Lipschitz atoms, $p = 2$ & $0 < s < 1$
-  & \Cref{thm:lip-characterisation} \\
 \hline
 \end{tabular}
 \end{center}
@@ -8503,9 +8318,8 @@ the local means on $\R^n$ (\Cref{thm:atomic-decomposition}), where every term
 $\lambda_{j,m} a_{j,m} = \eta_j * (1_{P_{j,m}} (k_j * f))$ is linear in $f$.
 
 \paragraph{The range of smoothness.} Every description detects smoothness only up to a bound.
-Differences of order $r$ detect $s < r$, local means of order $L$ and atoms of order $L$ detect
-$s < L$, and Lipschitz atoms detect $s < 1$. Littlewood--Paley blocks and Fourier coefficients have
-no such bound. The approximation space of a scheme is defined for every $s$, and it is the Besov
+Differences of order $r$ detect $s < r$, and local means and atoms of order $L$ detect $s < L$.
+Littlewood--Paley blocks and Fourier coefficients have no such bound. The approximation space of a scheme is defined for every $s$, and it is the Besov
 space below the inverse order $\theta$ of the scheme: $\theta = 1/p$ for piecewise polynomials and
 step functions, $\theta = r - 1 + 1/p$ for splines of order $r$, and every $\theta$ for
 band-limited functions (\Cref{thm:rd-besov}). A scheme of piecewise polynomials contains

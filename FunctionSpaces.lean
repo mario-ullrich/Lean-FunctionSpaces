@@ -34,9 +34,6 @@ public import FunctionSpaces.Torus.Modulus
 public import FunctionSpaces.Torus.BesovModuli
 public import FunctionSpaces.Torus.WeakDerivatives
 public import FunctionSpaces.Traces.Examples.Torus
-public import FunctionSpaces.Atoms.Examples.Torus
-public import FunctionSpaces.Atoms.Examples.TorusHat
-public import FunctionSpaces.Atoms.Examples.TorusAnalysis
 public import FunctionSpaces.Interval.Differences
 public import FunctionSpaces.Interval.Modulus
 public import FunctionSpaces.Interval.Polynomials
@@ -173,12 +170,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   coefficients and `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)`.
 * `FunctionSpaces.Traces.Examples.Torus`: the trace on the face `{x_0 = 0}` of `𝕋^(n+1)`,
   `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)`, bounded and onto.
-* `FunctionSpaces.Atoms.Examples.Torus`: Lipschitz atoms on `𝕋^d` as an atomic system for the
-  trigonometric scheme in `L_2`, and synthesis `b^s_{2,q} → B^s_{2,q}(𝕋^d)` for `0 < s < 1`.
-* `FunctionSpaces.Atoms.Examples.TorusHat`: hat functions on the circle and the torus and their
-  partitions of unity.
-* `FunctionSpaces.Atoms.Examples.TorusAnalysis`: decomposition of `f ∈ B^s_{2,q}(𝕋^d)` into
-  Lipschitz atoms through quasi-interpolants, and the Lipschitz-atomic characterisation.
 * `FunctionSpaces.Interval.Differences`: differences of order `r` and their action on polynomials.
 * `FunctionSpaces.Interval.Modulus`: the modulus of smoothness `ω_r(f, t, [a, b])_p` on an interval.
 * `FunctionSpaces.Interval.Polynomials`: polynomials of degree `< r` on intervals, equivalence of

@@ -25,8 +25,8 @@ one level, for all coefficients `c`:
 * **size**: `‖∑_m c_m a_m‖ ≤ C 2^(-jδ) ‖c‖_{ℓ_p}`, which expresses the normalisation and the
   bounded overlap of the supports;
 * **decay**: `E_{2^k}(∑_m c_m a_m) ≤ C 2^(-(k-j)σ) 2^(-jδ) ‖c‖_{ℓ_p}` for `k ≥ j`, which
-  expresses the smoothness `σ` of the atoms relative to the scheme (`σ = 1` for Lipschitz
-  atoms).
+  expresses the smoothness `σ` of the atoms relative to the scheme (for instance `σ = 1` for
+  atoms with a Lipschitz bound and trigonometric approximation in `L_2`).
 
 **Synthesis** (`AtomicSystem.approxNormDyadic_le_bNorm`): for a linear scheme and `0 < s < σ`,
 every atomic sum lies in `A^s_q` with `‖f‖_{A^s_q} ≲ ‖λ‖_{b^s_{p,q}}`; this is synthesis with
@@ -34,7 +34,7 @@ decay (`ApproximationSpaces.Decompositions.Synthesis`) with `ε_j = C 2^(-jδ) �
 
 **Analysis** (`AtomicSystem.exists_atomic_decomposition`): if every approximant
 `x ∈ A (2^j)` expands in atoms of level `j` with `‖c‖_{ℓ_p} ≤ C' 2^(jδ) ‖x‖`
-(`AtomicSystem.StableExpansion`, a stable local basis such as Haar or hat functions), then every
+(`AtomicSystem.StableExpansion`, a stable local basis such as the Haar functions), then every
 `f ∈ A^s_q`, `s > 0`, has an atomic decomposition with `‖λ‖_{b^s_{p,q}} ≲ ‖f‖_{A^s_q}`: expand
 the blocks of a block decomposition of `f`.  Together:
 `A^s_q` is the space of atomic sums with coefficients in `b^s_{p,q}`
@@ -190,8 +190,8 @@ theorem memApprox_of_bNorm_lt_top (hA : A.IsLinear) (hs : 0 < s) (hsσ : s < σ)
       (ENNReal.mul_lt_top (AS.synthConst_ne_top hs hsσ).lt_top hc))
 
 /-- **Stable expansion in atoms**: every approximant `x ∈ A (2^j)` is `∑_m c_m a_m` with atoms
-`a_m ∈ adm j m` of the same level and `‖c‖_{ℓ_p} ≤ C' 2^(jδ) ‖x‖`.  Local bases such as Haar
-functions or hat functions have this property. -/
+`a_m ∈ adm j m` of the same level and `‖c‖_{ℓ_p} ≤ C' 2^(jδ) ‖x‖`.  Local bases such as the
+Haar functions have this property. -/
 def StableExpansion (C' : ℝ≥0∞) : Prop :=
   ∀ j, ∀ x ∈ A (2 ^ j), ∃ a : M j → X, (∀ m, a m ∈ AS.adm j m) ∧ ∃ c : M j → ℝ,
     x = ∑ m, c m • a m ∧ finLqNorm p (fun m => ‖c m‖ₑ) ≤ C' * dyadicWeight δ j * ‖x‖ₑ

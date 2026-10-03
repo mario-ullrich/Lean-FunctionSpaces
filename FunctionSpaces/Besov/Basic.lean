@@ -15,7 +15,8 @@ Let `S` be a scheme of functions on `Ω` and `μ` a finite measure.  The **Besov
 
 `B^s_{p,q} = A^s_q(L_p(μ), S)`,   `‖f‖_{B^s_{p,q}} = ‖(n^(s-1/q) E_{n-1}(f)_p)_n‖_{ℓ_q}`,
 
-where `E_n(f)_p` is the error of best `L_p` approximation of `f` from `S n`.  On the torus with
+where `E_n(f)_p` is the error of best `L_p` approximation of `f` from `S n`, the
+`ApproximationScheme.approxError` of the transported scheme `S.toLp μ p`.  On the torus with
 `S n` the trigonometric polynomials of degree `< n` these are the classical periodic Besov
 spaces; for other schemes (splines, wavelets, eigenfunctions) one obtains the Besov spaces
 adapted to the scheme.  Whether they agree with a definition through moduli of smoothness is
@@ -34,9 +35,6 @@ namespace FunctionScheme
 
 variable {Ω : Type*} [TopologicalSpace Ω] [MeasurableSpace Ω] [BorelSpace Ω]
   (S : FunctionScheme Ω) (μ : Measure Ω) [IsFiniteMeasure μ] (p : ℝ≥0∞) [Fact (1 ≤ p)]
-
-/-- The error `E_n(f)_p` of best approximation in `L_p(μ)` from `S n`. -/
-noncomputable abbrev besovError (n : ℕ) (f : Lp ℂ p μ) : ℝ := (S.toLp μ p).approxError n f
 
 /-- The **Besov quasi-norm** `‖f‖_{B^s_{p,q}}`, Pietsch's quasi-norm of `A^s_q(L_p(μ), S)`. -/
 noncomputable abbrev besovNorm (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p μ) : ℝ≥0∞ :=
