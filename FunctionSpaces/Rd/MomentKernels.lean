@@ -225,10 +225,7 @@ theorem eLpNorm_indicator_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 �
         ⇑(f - convLp hp (integrable_dilate (integrable_momentKernel hg L) hc.ne') f)) p μ ≤
       (∫⁻ z, ‖g z‖ₑ ∂μ) * modulusOn μ T L p (f : V → ℂ) (R / c) := by
   have hp1 : 1 ≤ p := Fact.out
-  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   have hfm : Measurable (f : V → ℂ) := (Lp.stronglyMeasurable f).measurable
-  set A := ∫⁻ z, ‖g z‖ₑ ∂μ with hA
   set ω := modulusOn μ T L p (f : V → ℂ) (R / c)
   set G : V → V → ℂ := fun x z =>
     U.indicator (fun x => (-1 : ℂ) ^ L * (fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ) x) x with hGdef
@@ -262,41 +259,29 @@ theorem eLpNorm_indicator_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 �
       rw [h1', Pi.sub_apply, h2]
       exact h3
     · simp [G, Set.indicator_of_notMem hx]
-  have hbound : ∀ z, ‖g z‖ₑ * eLpNorm (fun x => G x z) p μ ^ p.toReal ≤
-      ‖g z‖ₑ * ω ^ p.toReal := fun z => by
-    by_cases hz : g z = 0
-    · simp [hz]
-    · have hzR : ‖z‖ ≤ R := not_lt.1 fun h => hz (hgR z h)
-      have hnorm : ‖-c⁻¹ • z‖ ≤ R / c := by
-        rw [norm_smul, norm_neg, norm_inv, Real.norm_of_nonneg hc.le, inv_mul_eq_div]
-        exact div_le_div_of_nonneg_right hzR hc.le
-      have hD := (aestronglyMeasurable_higherDiff (Lp.aestronglyMeasurable f) L
-        (-c⁻¹ • z)).indicator hU
-      have heq : eLpNorm (fun x => G x z) p μ =
-          eLpNorm (U.indicator ((fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ))) p μ := by
-        refine eLpNorm_congr_norm_ae ((hG.comp measurable_prodMk_right).aestronglyMeasurable)
-          hD (Eventually.of_forall fun x => ?_)
-        by_cases hx : x ∈ U
-        · simp [G, Set.indicator_of_mem hx]
-        · simp [G, Set.indicator_of_notMem hx]
-      gcongr
-      calc eLpNorm (fun x => G x z) p μ
-          = eLpNorm (U.indicator ((fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ))) p μ := heq
-        _ ≤ eLpNorm ((stepSet T L (-c⁻¹ • z)).indicator
-              ((fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ))) p μ :=
-            eLpNorm_mono hD fun x => norm_indicator_le_of_subset (hstep z hz) _ x
-        _ ≤ ω := eLpNorm_indicator_higherDiff_le_modulusOn hnorm
-  have hA0 : A ≠ 0 := lintegral_enorm_ne_zero_of_integral_eq_one hg h1
-  have hAt : A ≠ ∞ := hg.2.ne
-  rw [eLpNorm_congr_ae hae, ← ENNReal.rpow_le_rpow_iff hq]
-  refine (eLpNorm_integral_kernel_le hp1 hp hg.aestronglyMeasurable hG).trans ?_
-  calc A ^ (p.toReal - 1) * ∫⁻ z, ‖g z‖ₑ * eLpNorm (fun x => G x z) p μ ^ p.toReal ∂μ
-      ≤ A ^ (p.toReal - 1) * ∫⁻ z, ‖g z‖ₑ * ω ^ p.toReal ∂μ :=
-        mul_le_mul' le_rfl (lintegral_mono hbound)
-    _ = A ^ (p.toReal - 1) * A ^ (1 : ℝ) * ω ^ p.toReal := by
-        rw [lintegral_mul_const'' _ hg.aestronglyMeasurable.enorm, ENNReal.rpow_one, mul_assoc]
-    _ = (A * ω) ^ p.toReal := by
-        rw [← ENNReal.rpow_add _ _ hA0 hAt, sub_add_cancel, ENNReal.mul_rpow_of_nonneg _ _ hq.le]
+  have hbound : ∀ z, g z ≠ 0 → eLpNorm (fun x => G x z) p μ ≤ ω := fun z hz => by
+    have hzR : ‖z‖ ≤ R := not_lt.1 fun h => hz (hgR z h)
+    have hnorm : ‖-c⁻¹ • z‖ ≤ R / c := by
+      rw [norm_smul, norm_neg, norm_inv, Real.norm_of_nonneg hc.le, inv_mul_eq_div]
+      exact div_le_div_of_nonneg_right hzR hc.le
+    have hD := (aestronglyMeasurable_higherDiff (Lp.aestronglyMeasurable f) L
+      (-c⁻¹ • z)).indicator hU
+    have heq : eLpNorm (fun x => G x z) p μ =
+        eLpNorm (U.indicator ((fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ))) p μ := by
+      refine eLpNorm_congr_norm_ae ((hG.comp measurable_prodMk_right).aestronglyMeasurable)
+        hD (Eventually.of_forall fun x => ?_)
+      by_cases hx : x ∈ U
+      · simp [G, Set.indicator_of_mem hx]
+      · simp [G, Set.indicator_of_notMem hx]
+    calc eLpNorm (fun x => G x z) p μ
+        = eLpNorm (U.indicator ((fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ))) p μ := heq
+      _ ≤ eLpNorm ((stepSet T L (-c⁻¹ • z)).indicator
+            ((fwdDiff (-c⁻¹ • z))^[L] (f : V → ℂ))) p μ :=
+          eLpNorm_mono hD fun x => norm_indicator_le_of_subset (hstep z hz) _ x
+      _ ≤ ω := eLpNorm_indicator_higherDiff_le_modulusOn hnorm
+  rw [eLpNorm_congr_ae hae]
+  exact eLpNorm_integral_kernel_le_of_bound hp1 hp hg.aestronglyMeasurable
+    (lintegral_enorm_ne_zero_of_integral_eq_one hg h1) hg.2.ne hG hbound
 
 /-- **Moment kernels approximate with the modulus of smoothness**: if `g` has integral `1` and
 vanishes outside the ball of radius `R`, then `‖f - m_c ⋆ f‖_p ≤ ‖g‖_1 ω_L(f, R/c)_p` (the case

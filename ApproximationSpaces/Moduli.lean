@@ -162,6 +162,98 @@ theorem inverseConst_ne_top (hsθ : s < θ) : M.inverseConst s ≠ ∞ := by
       M.CB_ne_top (ENNReal.add_ne_top.2 ⟨by norm_num, ENNReal.mul_ne_top (by norm_num)
         (ENNReal.dyadicWeight_ne_top _ _)⟩)) (ENNReal.inv_ne_top.2 (tsub_pos_of_lt hr).ne')⟩
 
+/-- **The modulus at one scale from near-best approximants**: for near-best approximants
+`a_k ∈ A_{2^k}` of `f` with an antitone tolerance `t` and `t_0 = ‖f‖`, the telescoping
+`f = (f - a_k) + a_0 + ∑_{j<k} (a_{j+1} - a_j)` and the inverse inequality give
+`ω(f, 2^(-k)) ≤ C₀ (E_{2^k}(f) + t_k) + 3 C_B 2^(-kθ) ‖f‖
+  + ∑_{j<k} 2 C_B 4^θ 2^(-(k-j)θ) (E_{2^j}(f) + t_j)`. -/
+theorem modulus_le_of_dyadicApprox (hθ : 0 ≤ θ) {f : X} {t : ℕ → ℝ≥0∞}
+    (D : A.DyadicApprox f t) (ht : Antitone t) (ht0 : t 0 = ‖f‖ₑ) (k : ℕ) :
+    M.modulus f k ≤ M.C0 * (A.approxSeq f (2 ^ k) + t k) +
+      M.CB * dyadicWeight (-θ) k * (3 * ‖f‖ₑ) + ∑ j ∈ range k,
+        M.CB * (2 * dyadicWeight θ 2) * (dyadicWeight (-θ) (k - j) *
+          (A.approxSeq f (2 ^ j) + t j)) := by
+  have htel : f = (f - D.a k) + (D.a 0 + ∑ j ∈ range k, (D.a (j + 1) - D.a j)) := by
+    rw [sum_range_sub (fun j => D.a j) k]; abel
+  have h1 : M.modulus (f - D.a k) k ≤ M.C0 * (A.approxSeq f (2 ^ k) + t k) :=
+    (M.le_enorm _ k).trans (by gcongr; exact D.enorm_sub_le k)
+  have h2 : M.modulus (D.a 0) k ≤ M.CB * dyadicWeight (-θ) k * (3 * ‖f‖ₑ) := by
+    refine (M.inverse 0 k _ (by simpa using D.mem 0)).trans ?_
+    rw [Nat.sub_zero]
+    gcongr
+    calc ‖D.a 0‖ₑ ≤ 2 * ‖f‖ₑ + t 0 := D.enorm_zero_le
+      _ = 3 * ‖f‖ₑ := by rw [ht0]; ring
+  have h3 : ∀ j ∈ range k, M.modulus (D.a (j + 1) - D.a j) k ≤
+      M.CB * (2 * dyadicWeight θ 2) * (dyadicWeight (-θ) (k - j) *
+        (A.approxSeq f (2 ^ j) + t j)) := fun j _ => by
+    refine (M.inverse (j + 2) k _ (D.sub_mem j)).trans ?_
+    calc M.CB * dyadicWeight (-θ) (k - (j + 2)) * ‖D.a (j + 1) - D.a j‖ₑ
+        ≤ M.CB * (dyadicWeight θ 2 * dyadicWeight (-θ) (k - j)) *
+            (2 * (A.approxSeq f (2 ^ j) + t j)) := by
+          gcongr
+          · rw [show k - (j + 2) = k - j - 2 by omega]
+            exact dyadicWeight_neg_sub_two_le hθ (k - j)
+          · exact D.enorm_sub_succ_le ht j
+      _ = _ := by ring
+  calc M.modulus f k
+      = M.modulus ((f - D.a k) + (D.a 0 + ∑ j ∈ range k, (D.a (j + 1) - D.a j))) k := by
+        rw [← htel]
+    _ ≤ M.modulus (f - D.a k) k +
+          (M.modulus (D.a 0) k + ∑ j ∈ range k, M.modulus (D.a (j + 1) - D.a j) k) :=
+        (M.add_le _ _ k).trans (add_le_add le_rfl ((M.add_le _ _ k).trans
+          (add_le_add le_rfl (M.modulus_sum_le _ _ k))))
+    _ ≤ _ := by
+        rw [← add_assoc]
+        exact add_le_add (add_le_add h1 h2) (Finset.sum_le_sum h3)
+
+/-- **The weighted modulus at one scale**: with `E_k = 2^(ks) (E_{2^k}(f) + t_k)` and
+`α = θ - s`, `ModulusData.modulus_le_of_dyadicApprox` multiplied by `2^(ks)` reads
+`2^(ks) ω(f, 2^(-k)) ≤ C₀ E_k + 3 C_B ‖f‖ 2^(-kα) + 2 C_B 4^θ 2^(-kα) ∑_{j ≤ k} 2^(jα) E_j`. -/
+theorem dyadicWeight_mul_modulus_le_of_dyadicApprox (hθ : 0 ≤ θ) {f : X} {t : ℕ → ℝ≥0∞}
+    (D : A.DyadicApprox f t) (ht : Antitone t) (ht0 : t 0 = ‖f‖ₑ) (k : ℕ) :
+    dyadicWeight s k * M.modulus f k ≤
+      M.C0 * (dyadicWeight s k * (A.approxSeq f (2 ^ k) + t k)) +
+        M.CB * 3 * ‖f‖ₑ * dyadicWeight (-(θ - s)) k +
+        M.CB * (2 * dyadicWeight θ 2) * (dyadicWeight (-(θ - s)) k *
+          ∑ j ∈ range (k + 1), dyadicWeight (θ - s) j *
+            (dyadicWeight s j * (A.approxSeq f (2 ^ j) + t j))) := by
+  have hw : ∀ j ∈ range k, dyadicWeight s k * dyadicWeight (-θ) (k - j) =
+      dyadicWeight (-(θ - s)) k * dyadicWeight (θ - s) j * dyadicWeight s j := fun j hj => by
+    have hjk : j ≤ k := (Finset.mem_range.1 hj).le
+    simp only [ENNReal.dyadicWeight]
+    rw [← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top,
+      ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top,
+      ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top, Nat.cast_sub hjk]
+    congr 1
+    ring
+  have hw0 : dyadicWeight s k * dyadicWeight (-θ) k = dyadicWeight (-(θ - s)) k := by
+    rw [← ENNReal.dyadicWeight_add]; congr 1; ring
+  calc dyadicWeight s k * M.modulus f k
+      ≤ dyadicWeight s k * (M.C0 * (A.approxSeq f (2 ^ k) + t k) +
+          M.CB * dyadicWeight (-θ) k * (3 * ‖f‖ₑ) + ∑ j ∈ range k,
+            M.CB * (2 * dyadicWeight θ 2) * (dyadicWeight (-θ) (k - j) *
+              (A.approxSeq f (2 ^ j) + t j))) := by
+        gcongr
+        exact M.modulus_le_of_dyadicApprox hθ D ht ht0 k
+    _ = M.C0 * (dyadicWeight s k * (A.approxSeq f (2 ^ k) + t k)) +
+          M.CB * 3 * ‖f‖ₑ * (dyadicWeight s k * dyadicWeight (-θ) k) +
+          M.CB * (2 * dyadicWeight θ 2) * ∑ j ∈ range k,
+            (dyadicWeight s k * dyadicWeight (-θ) (k - j)) *
+              (A.approxSeq f (2 ^ j) + t j) := by
+        simp only [mul_add, Finset.mul_sum]; ring_nf
+    _ ≤ _ := by
+        rw [hw0, Finset.sum_congr rfl fun j hj => by rw [hw j hj]]
+        have hsum : ∑ j ∈ range k, dyadicWeight (-(θ - s)) k * dyadicWeight (θ - s) j *
+            dyadicWeight s j * (A.approxSeq f (2 ^ j) + t j) =
+              dyadicWeight (-(θ - s)) k * ∑ j ∈ range k, dyadicWeight (θ - s) j *
+                (dyadicWeight s j * (A.approxSeq f (2 ^ j) + t j)) := by
+          rw [Finset.mul_sum]
+          refine Finset.sum_congr rfl fun j _ => ?_
+          ring
+        rw [hsum]
+        exact add_le_add le_rfl (mul_le_mul_right (mul_le_mul_right
+          (Finset.sum_le_sum_of_subset (Finset.range_mono (Nat.le_succ k))) _) _)
+
 /-- **The inverse direction**: for `0 ≤ s < θ`, `‖f‖^ω_{s,q} ≤ K ‖f‖_{A^s_q}` with
 `K = M.inverseConst s`. -/
 theorem modNorm_le_approxNormDyadic (hq : 1 ≤ q) (hs : 0 ≤ s) (hsθ : s < θ) (f : X) :
@@ -187,78 +279,8 @@ theorem modNorm_le_approxNormDyadic (hq : 1 ≤ q) (hs : 0 ≤ s) (hsθ : s < θ
   have hpt : ∀ k, dyadicWeight s k * M.modulus f k ≤
       M.C0 * E k + M.CB * 3 * ‖f‖ₑ * dyadicWeight (-α) k +
         M.CB * (2 * dyadicWeight θ 2) * (dyadicWeight (-α) k *
-          ∑ j ∈ range (k + 1), dyadicWeight α j * E j) := fun k => by
-    have htel : f = (f - D.a k) + (D.a 0 + ∑ j ∈ range k, (D.a (j + 1) - D.a j)) := by
-      rw [sum_range_sub (fun j => D.a j) k]; abel
-    have h1 : M.modulus (f - D.a k) k ≤ M.C0 * (A.approxSeq f (2 ^ k) + t k) :=
-      (M.le_enorm _ k).trans (by gcongr; exact D.enorm_sub_le k)
-    have h2 : M.modulus (D.a 0) k ≤ M.CB * dyadicWeight (-θ) k * (3 * ‖f‖ₑ) := by
-      refine (M.inverse 0 k _ (by simpa using D.mem 0)).trans ?_
-      rw [Nat.sub_zero]
-      gcongr
-      calc ‖D.a 0‖ₑ ≤ 2 * ‖f‖ₑ + t 0 := D.enorm_zero_le
-        _ = 3 * ‖f‖ₑ := by rw [show t 0 = ‖f‖ₑ from tolerance_zero f s]; ring
-    have h3 : ∀ j ∈ range k, M.modulus (D.a (j + 1) - D.a j) k ≤
-        M.CB * (2 * dyadicWeight θ 2) * (dyadicWeight (-θ) (k - j) *
-          (A.approxSeq f (2 ^ j) + t j)) := fun j _ => by
-      refine (M.inverse (j + 2) k _ (D.sub_mem j)).trans ?_
-      calc M.CB * dyadicWeight (-θ) (k - (j + 2)) * ‖D.a (j + 1) - D.a j‖ₑ
-          ≤ M.CB * (dyadicWeight θ 2 * dyadicWeight (-θ) (k - j)) *
-              (2 * (A.approxSeq f (2 ^ j) + t j)) := by
-            gcongr
-            · rw [show k - (j + 2) = k - j - 2 by omega]
-              exact dyadicWeight_neg_sub_two_le hθ (k - j)
-            · exact D.enorm_sub_succ_le ht j
-        _ = _ := by ring
-    have hω : M.modulus f k ≤ M.C0 * (A.approxSeq f (2 ^ k) + t k) +
-        M.CB * dyadicWeight (-θ) k * (3 * ‖f‖ₑ) + ∑ j ∈ range k,
-          M.CB * (2 * dyadicWeight θ 2) * (dyadicWeight (-θ) (k - j) *
-            (A.approxSeq f (2 ^ j) + t j)) := by
-      calc M.modulus f k = M.modulus ((f - D.a k) + (D.a 0 + ∑ j ∈ range k, (D.a (j + 1) - D.a j))) k := by
-            rw [← htel]
-        _ ≤ M.modulus (f - D.a k) k + (M.modulus (D.a 0) k + ∑ j ∈ range k, M.modulus (D.a (j + 1) - D.a j) k) :=
-            (M.add_le _ _ k).trans (add_le_add le_rfl ((M.add_le _ _ k).trans
-              (add_le_add le_rfl (M.modulus_sum_le _ _ k))))
-        _ ≤ _ := by
-            rw [← add_assoc]
-            exact add_le_add (add_le_add h1 h2) (Finset.sum_le_sum h3)
-    -- multiply by the weight
-    have hw : ∀ j ∈ range k, dyadicWeight s k * dyadicWeight (-θ) (k - j) =
-        dyadicWeight (-α) k * dyadicWeight α j * dyadicWeight s j := fun j hj => by
-      have hjk : j ≤ k := (Finset.mem_range.1 hj).le
-      simp only [ENNReal.dyadicWeight]
-      rw [← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top,
-        ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top,
-        ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top, Nat.cast_sub hjk]
-      congr 1
-      simp only [α]
-      ring
-    have hw0 : dyadicWeight s k * dyadicWeight (-θ) k = dyadicWeight (-α) k := by
-      rw [← ENNReal.dyadicWeight_add]; congr 1; simp only [α]; ring
-    calc dyadicWeight s k * M.modulus f k
-        ≤ dyadicWeight s k * (M.C0 * (A.approxSeq f (2 ^ k) + t k) +
-            M.CB * dyadicWeight (-θ) k * (3 * ‖f‖ₑ) + ∑ j ∈ range k,
-              M.CB * (2 * dyadicWeight θ 2) * (dyadicWeight (-θ) (k - j) *
-                (A.approxSeq f (2 ^ j) + t j))) := by gcongr
-      _ = M.C0 * E k + M.CB * 3 * ‖f‖ₑ * (dyadicWeight s k * dyadicWeight (-θ) k) +
-            M.CB * (2 * dyadicWeight θ 2) * ∑ j ∈ range k,
-              (dyadicWeight s k * dyadicWeight (-θ) (k - j)) *
-                (A.approxSeq f (2 ^ j) + t j) := by
-          simp only [E, mul_add, Finset.mul_sum]; ring_nf
-      _ ≤ M.C0 * E k + M.CB * 3 * ‖f‖ₑ * dyadicWeight (-α) k +
-            M.CB * (2 * dyadicWeight θ 2) * (dyadicWeight (-α) k *
-              ∑ j ∈ range (k + 1), dyadicWeight α j * E j) := by
-          rw [hw0, Finset.sum_congr rfl fun j hj => by rw [hw j hj]]
-          have hsum : ∑ j ∈ range k, dyadicWeight (-α) k * dyadicWeight α j * dyadicWeight s j *
-              (A.approxSeq f (2 ^ j) + t j) =
-                dyadicWeight (-α) k * ∑ j ∈ range k, dyadicWeight α j * E j := by
-            rw [Finset.mul_sum]
-            refine Finset.sum_congr rfl fun j _ => ?_
-            simp only [E]
-            ring
-          rw [hsum]
-          exact add_le_add le_rfl (mul_le_mul_right (mul_le_mul_right
-            (Finset.sum_le_sum_of_subset (Finset.range_mono (Nat.le_succ k))) _) _)
+          ∑ j ∈ range (k + 1), dyadicWeight α j * E j) := fun k =>
+    M.dyadicWeight_mul_modulus_le_of_dyadicApprox hθ D ht (tolerance_zero f s) k
   -- the ℓ_q norm
   have hr : (2 : ℝ≥0∞) ^ (-α) < 1 := ENNReal.two_rpow_neg_lt_one (by simp only [α]; linarith)
   have hgeo : lqNorm q (dyadicWeight (-α)) ≤ (1 - (2 : ℝ≥0∞) ^ (-α))⁻¹ :=

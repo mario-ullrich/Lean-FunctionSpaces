@@ -70,15 +70,6 @@ theorem polyPairing_apply (r : ℕ) (P Q : degreeLT ℂ r) :
 theorem polyPairing_comm (r : ℕ) (P Q : degreeLT ℂ r) : polyPairing r P Q = polyPairing r Q P := by
   simp only [polyPairing_apply, mul_comm]
 
-/-- The polynomial `P̄` with conjugate coefficients takes the values `P̄(x) = conj P(x)` at real
-points. -/
-theorem polyFun_map_conj (P : ℂ[X]) (x : ℝ) :
-    polyFun (P.map (starRingEnd ℂ)) x = starRingEnd ℂ (polyFun P x) := by
-  have h : (x : ℂ) = starRingEnd ℂ (x : ℂ) := (Complex.conj_ofReal x).symm
-  calc polyFun (P.map (starRingEnd ℂ)) x = P.eval₂ (starRingEnd ℂ) (starRingEnd ℂ (x : ℂ)) := by
-        rw [polyFun, eval_map, ← h]
-    _ = starRingEnd ℂ (polyFun P x) := eval₂_at_apply _ _
-
 /-- **The pairing separates points**: if `∫_0^1 P Q = 0` for all `Q`, then `P = 0`; take
 `Q = P̄`, so that `∫_0^1 |P|² = 0`. -/
 theorem polyPairing_separatingLeft (r : ℕ) : (polyPairing r).SeparatingLeft := by
@@ -160,25 +151,6 @@ theorem polyFun_locProj (r j : ℕ) (g : ℝ → ℂ) (m : ℕ) (x : ℝ) :
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [eval_smul, smul_eq_mul, ← polyFun, polyFun_comp_affine]
 
-/-- **Change of variables** on a dyadic interval: `2^j ∫_{I_{j,m}} φ = ∫_0^1 φ(t 2^(-j) + m 2^(-j))`. -/
-theorem integral_dyadicIco_eq (j m : ℕ) (φ : ℝ → ℂ) :
-    (((2 : ℝ) ^ j : ℝ) : ℂ) * ∫ y in dyadicIco j m, φ y =
-      ∫ t in Icc (0 : ℝ) 1, φ (t / 2 ^ j + m / 2 ^ j) := by
-  have h2 : (2 : ℝ) ^ j ≠ 0 := by positivity
-  have hle : (m : ℝ) / 2 ^ j ≤ (m + 1) / 2 ^ j := by
-    have : (0 : ℝ) < 2 ^ j := by positivity
-    rw [div_le_div_iff_of_pos_right this]
-    linarith
-  have hL : ∫ y in dyadicIco j m, φ y = ∫ y in ((m : ℝ) / 2 ^ j)..((m + 1) / 2 ^ j), φ y := by
-    rw [intervalIntegral.integral_of_le hle, dyadicIco, integral_Ico_eq_integral_Ioo,
-      integral_Ioc_eq_integral_Ioo]
-  have hR : ∫ t in Icc (0 : ℝ) 1, φ (t / 2 ^ j + m / 2 ^ j) =
-      ∫ t in (0 : ℝ)..1, φ (t / 2 ^ j + m / 2 ^ j) := by
-    rw [intervalIntegral.integral_of_le zero_le_one, integral_Icc_eq_integral_Ioc]
-  have hb1 : (0 : ℝ) / 2 ^ j + m / 2 ^ j = m / 2 ^ j := by rw [zero_div, zero_add]
-  have hb2 : (1 : ℝ) / 2 ^ j + m / 2 ^ j = (m + 1) / 2 ^ j := by ring
-  rw [hL, hR, intervalIntegral.integral_comp_div_add φ h2, hb1, hb2, Complex.real_smul]
-
 /-- **Polynomials are reproduced**: if `g = Q` on `I_{j,m}` with `Q` of degree `< r`, then the
 local projection of `g` on `I_{j,m}` is `Q`. -/
 theorem polyFun_locProj_of_eqOn {r j m : ℕ} {g : ℝ → ℂ} {Q : ℂ[X]} (hQ : Q ∈ degreeLT ℂ r)
@@ -219,12 +191,6 @@ theorem ofReal_two_pow_mul_inv_rpow (j : ℕ) (θ : ℝ) :
         rw [ENNReal.rpow_one]
     _ = ENNReal.ofReal (2 ^ j) ^ (1 + -(1 - θ)) := (ENNReal.rpow_add _ _ hx0 hxt).symm
     _ = ENNReal.ofReal (2 ^ j) ^ θ := by congr 1; ring
-
-/-- `I_{j,m}` has length `2^(-j)`. -/
-theorem volume_dyadicIco (j m : ℕ) : volume (dyadicIco j m) = ENNReal.ofReal (1 / 2 ^ j) := by
-  rw [dyadicIco, Real.volume_Ico]
-  congr 1
-  ring
 
 /-- **Bound for the local coefficients**: `|c_i| ≤ M 2^(j/p) ‖g‖_{L_p(I_{j,m})}` when the
 monomials are bounded by `M` on `[0, 1]`. -/
@@ -435,12 +401,6 @@ theorem integral_sub_locProj_mul {r j m : ℕ} {g : ℝ → ℂ} (hg : Integrabl
   rw [integral_sub (integrableOn_mul_monoBasis hg l) (integrableOn_mul_monoBasis hPg l),
     integral_locProj_mul_monoBasis, sub_self]
 
-/-- Piecewise polynomials only depend on the pieces in `[0, 1)`. -/
-theorem ppFun_congr {k : ℕ} {Q Q' : ℕ → ℂ[X]} (h : ∀ n < 2 ^ k, polyFun (Q n) = polyFun (Q' n)) :
-    ppFun k Q = ppFun k Q' := by
-  funext x
-  exact Finset.sum_congr rfl fun n hn => by rw [h n (Finset.mem_range.1 hn)]
-
 /-- **The local projections reproduce piecewise polynomials exactly**:
 `P_j (ppFun j Q) = ppFun j Q` as functions, for pieces of degree `< r`. -/
 theorem ppFun_locProj_ppFun {r j : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ degreeLT ℂ r) :
@@ -452,18 +412,6 @@ theorem ppFun_locProj_ppFun {r j : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n �
 /-! ### The projections onto piecewise polynomials -/
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
-
-omit [Fact (1 ≤ p)] in
-/-- Almost everywhere on `[0, 1]` gives almost everywhere on the dyadic intervals in `[0, 1)`. -/
-theorem ae_dyadicIco_of_unitVol {F G : ℝ → ℂ} (h : F =ᵐ[unitVol] G) {j m : ℕ} (hm : m < 2 ^ j) :
-    F =ᵐ[volume.restrict (dyadicIco j m)] G :=
-  ae_restrict_of_ae_restrict_of_subset ((dyadicIco_subset hm).trans Ico_subset_Icc_self) h
-
-/-- Elements of `L_p[0, 1]` are integrable on the dyadic intervals in `[0, 1)`. -/
-theorem integrableOn_dyadicIco (f : Lp ℂ p unitVol) {j m : ℕ} (hm : m < 2 ^ j) :
-    IntegrableOn f (dyadicIco j m) :=
-  IntegrableOn.mono_set ((Lp.memLp f).integrable Fact.out)
-    ((dyadicIco_subset hm).trans Ico_subset_Icc_self)
 
 /-- A common bound for the monomials and the dual basis on `[0, 1]`. -/
 noncomputable def basisBound (r : ℕ) : ℝ≥0∞ :=

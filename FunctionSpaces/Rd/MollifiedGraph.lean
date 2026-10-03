@@ -493,11 +493,42 @@ theorem four_le_vertCutoffConst : 4 ≤ Ω.vertCutoffConst := by
   rw [vertCutoffConst]
   linarith
 
-/-- **Differences of the vertical cut-off**: `|Δ_h^m v_j| ≤ B min(1, (2^j ‖h‖)^m)` for
-`m ≤ 2`. For `m = 2` and `t = ψ_j(x + h) - ψ_j(x)`,
-`Δ_h^2 v_j(x) = [χ(ψ_2) - χ(2ψ_1 - ψ_0)] + Δ_t^2 χ(ψ_0)` with `ψ_l = ψ_j(x + lh)`. -/
-theorem norm_higherDiff_vertCutoff_le (j : ℕ) {m : ℕ} (hm : m ≤ 2) (h x : V) :
-    ‖(fwdDiff h)^[m] (Ω.vertCutoff j) x‖ ≤ Ω.vertCutoffConst * min 1 ((2 ^ j * ‖h‖) ^ m) := by
+/-- **First differences of the vertical cut-off**: `|v_j(x + h) - v_j(x)| ≤ B min(1, 2^j ‖h‖)`,
+from the Lipschitz bounds of the profile and of the vertical coordinate. -/
+theorem norm_vertCutoff_add_sub_le (j : ℕ) (h x : V) :
+    ‖Ω.vertCutoff j (x + h) - Ω.vertCutoff j x‖ ≤ Ω.vertCutoffConst * min 1 (2 ^ j * ‖h‖) := by
+  have hB := Ω.four_le_vertCutoffConst
+  have hC := Ω.profileConst_nonneg
+  have hMD : 0 ≤ 4 * Ω.M * Ω.graphBumpDeriv :=
+    mul_nonneg (mul_nonneg (by norm_num) Ω.M_nonneg) Ω.graphBumpDeriv_nonneg
+  set t := 2 ^ j * ‖h‖ with ht_def
+  have ht : 0 ≤ t := by positivity
+  rcases le_total t 1 with ht1 | ht1
+  · rw [min_eq_right ht1]
+    calc ‖Ω.vertCutoff j (x + h) - Ω.vertCutoff j x‖
+        ≤ Ω.profileConst * |Ω.vertCoord j (x + h) - Ω.vertCoord j x| :=
+          Ω.norm_profile_sub_le _ _
+      _ ≤ Ω.profileConst * ((1 + Ω.M * Ω.graphBumpNorm) * t) := by
+          refine mul_le_mul_of_nonneg_left ((Ω.abs_vertCoord_sub_le j x h).trans_eq ?_) hC
+          rw [ht_def]
+          ring
+      _ ≤ Ω.vertCutoffConst * t := by
+          rw [← mul_assoc]
+          refine mul_le_mul_of_nonneg_right ?_ ht
+          rw [vertCutoffConst]
+          nlinarith [mul_nonneg hC hMD, mul_nonneg hC (sq_nonneg (1 + Ω.M * Ω.graphBumpNorm))]
+  · rw [min_eq_left ht1, mul_one]
+    calc ‖Ω.vertCutoff j (x + h) - Ω.vertCutoff j x‖
+        ≤ ‖Ω.vertCutoff j (x + h)‖ + ‖Ω.vertCutoff j x‖ := norm_sub_le _ _
+      _ ≤ 1 + 1 := add_le_add (Ω.norm_vertCutoff_le j _) (Ω.norm_vertCutoff_le j x)
+      _ ≤ Ω.vertCutoffConst := by linarith
+
+/-- **Second differences of the vertical cut-off**:
+`|v_j(x + 2h) - 2 v_j(x + h) + v_j(x)| ≤ B min(1, (2^j ‖h‖)^2)`. For `t = ψ_1 - ψ_0` with
+`ψ_l = ψ_j(x + lh)`, `Δ_h^2 v_j(x) = [χ(ψ_2) - χ(2ψ_1 - ψ_0)] + Δ_t^2 χ(ψ_0)`. -/
+theorem norm_vertCutoff_second_le (j : ℕ) (h x : V) :
+    ‖Ω.vertCutoff j (x + (2 : ℝ) • h) - 2 * Ω.vertCutoff j (x + h) + Ω.vertCutoff j x‖ ≤
+      Ω.vertCutoffConst * min 1 ((2 ^ j * ‖h‖) ^ 2) := by
   have hB := Ω.four_le_vertCutoffConst
   have hC := Ω.profileConst_nonneg
   have hMK : 0 ≤ Ω.M * Ω.graphBumpNorm := mul_nonneg Ω.M_nonneg Ω.graphBumpNorm_nonneg
@@ -505,80 +536,69 @@ theorem norm_higherDiff_vertCutoff_le (j : ℕ) {m : ℕ} (hm : m ≤ 2) (h x : 
     mul_nonneg (mul_nonneg (by norm_num) Ω.M_nonneg) Ω.graphBumpDeriv_nonneg
   set t := 2 ^ j * ‖h‖ with ht_def
   have ht : 0 ≤ t := by positivity
+  rcases le_total t 1 with ht1 | ht1
+  · rw [min_eq_right (pow_le_one₀ ht ht1)]
+    have hh : ‖h‖ ≤ 1 / 2 ^ j := by
+      rw [le_div_iff₀ (by positivity), mul_comm]
+      exact ht1
+    set a₀ := Ω.vertCoord j x
+    set a₁ := Ω.vertCoord j (x + h)
+    set a₂ := Ω.vertCoord j (x + (2 : ℝ) • h)
+    have hsplit : Ω.vertCutoff j (x + (2 : ℝ) • h) - 2 * Ω.vertCutoff j (x + h) +
+        Ω.vertCutoff j x = (Ω.profile a₂ - Ω.profile (a₀ + 2 * (a₁ - a₀))) +
+          (Ω.profile (a₀ + 2 * (a₁ - a₀)) - 2 * Ω.profile (a₀ + (a₁ - a₀)) +
+            Ω.profile a₀) := by
+      simp only [vertCutoff, a₀, a₁, a₂, add_sub_cancel]
+      ring
+    have hfirst : ‖Ω.profile a₂ - Ω.profile (a₀ + 2 * (a₁ - a₀))‖ ≤
+        Ω.profileConst * (4 * Ω.M * Ω.graphBumpDeriv * t ^ 2) := by
+      refine (Ω.norm_profile_sub_le _ _).trans (mul_le_mul_of_nonneg_left ?_ hC)
+      have h2 := Ω.abs_second_vertCoord_le j hh x
+      rw [show a₂ - (a₀ + 2 * (a₁ - a₀)) = a₂ - 2 * a₁ + a₀ by ring]
+      exact h2
+    have hsecond : ‖Ω.profile (a₀ + 2 * (a₁ - a₀)) - 2 * Ω.profile (a₀ + (a₁ - a₀)) +
+        Ω.profile a₀‖ ≤ Ω.profileConst * ((1 + Ω.M * Ω.graphBumpNorm) ^ 2 * t ^ 2) := by
+      refine (Ω.norm_profile_second_le a₀ (a₁ - a₀)).trans (mul_le_mul_of_nonneg_left ?_ hC)
+      have h1 := Ω.abs_vertCoord_sub_le j x h
+      rw [← sq_abs]
+      calc |a₁ - a₀| ^ 2 ≤ (2 ^ j * (1 + Ω.M * Ω.graphBumpNorm) * ‖h‖) ^ 2 :=
+            pow_le_pow_left₀ (abs_nonneg _) h1 2
+        _ = (1 + Ω.M * Ω.graphBumpNorm) ^ 2 * t ^ 2 := by rw [ht_def]; ring
+    rw [hsplit]
+    calc ‖(Ω.profile a₂ - Ω.profile (a₀ + 2 * (a₁ - a₀))) +
+          (Ω.profile (a₀ + 2 * (a₁ - a₀)) - 2 * Ω.profile (a₀ + (a₁ - a₀)) + Ω.profile a₀)‖
+        ≤ Ω.profileConst * (4 * Ω.M * Ω.graphBumpDeriv * t ^ 2) +
+            Ω.profileConst * ((1 + Ω.M * Ω.graphBumpNorm) ^ 2 * t ^ 2) :=
+          (norm_add_le _ _).trans (add_le_add hfirst hsecond)
+      _ ≤ Ω.vertCutoffConst * t ^ 2 := by
+          rw [vertCutoffConst]
+          nlinarith [mul_nonneg hC hMK, sq_nonneg t, mul_nonneg hC (sq_nonneg t),
+            mul_nonneg (mul_nonneg hC (add_nonneg zero_le_one hMK)) (sq_nonneg t)]
+  · rw [min_eq_left (one_le_pow₀ ht1), mul_one]
+    calc ‖Ω.vertCutoff j (x + (2 : ℝ) • h) - 2 * Ω.vertCutoff j (x + h) + Ω.vertCutoff j x‖
+        ≤ ‖Ω.vertCutoff j (x + (2 : ℝ) • h)‖ + ‖2 * Ω.vertCutoff j (x + h)‖ +
+            ‖Ω.vertCutoff j x‖ :=
+          (norm_add_le _ _).trans (add_le_add_left (norm_sub_le _ _) _)
+      _ ≤ 1 + 2 * 1 + 1 := by
+          rw [norm_mul, Complex.norm_ofNat]
+          gcongr
+          · exact Ω.norm_vertCutoff_le j _
+          · exact Ω.norm_vertCutoff_le j _
+          · exact Ω.norm_vertCutoff_le j x
+      _ ≤ Ω.vertCutoffConst := by linarith
+
+/-- **Differences of the vertical cut-off**: `|Δ_h^m v_j| ≤ B min(1, (2^j ‖h‖)^m)` for
+`m ≤ 2` (`Rd.LipschitzGraph.norm_vertCutoff_add_sub_le`,
+`Rd.LipschitzGraph.norm_vertCutoff_second_le`). -/
+theorem norm_higherDiff_vertCutoff_le (j : ℕ) {m : ℕ} (hm : m ≤ 2) (h x : V) :
+    ‖(fwdDiff h)^[m] (Ω.vertCutoff j) x‖ ≤ Ω.vertCutoffConst * min 1 ((2 ^ j * ‖h‖) ^ m) := by
   rcases (show m = 0 ∨ m = 1 ∨ m = 2 by omega) with rfl | rfl | rfl
   · rw [Function.iterate_zero, id, pow_zero, min_self, mul_one]
-    exact (Ω.norm_vertCutoff_le j x).trans (by linarith)
+    exact (Ω.norm_vertCutoff_le j x).trans (by linarith [Ω.four_le_vertCutoffConst])
   · rw [higherDiff_one_apply, pow_one]
-    rcases le_total t 1 with ht1 | ht1
-    · rw [min_eq_right ht1]
-      calc ‖Ω.vertCutoff j (x + h) - Ω.vertCutoff j x‖
-          ≤ Ω.profileConst * |Ω.vertCoord j (x + h) - Ω.vertCoord j x| :=
-            Ω.norm_profile_sub_le _ _
-        _ ≤ Ω.profileConst * ((1 + Ω.M * Ω.graphBumpNorm) * t) := by
-            refine mul_le_mul_of_nonneg_left ((Ω.abs_vertCoord_sub_le j x h).trans_eq ?_) hC
-            rw [ht_def]
-            ring
-        _ ≤ Ω.vertCutoffConst * t := by
-            rw [← mul_assoc]
-            refine mul_le_mul_of_nonneg_right ?_ ht
-            rw [vertCutoffConst]
-            nlinarith [mul_nonneg hC hMD, mul_nonneg hC (sq_nonneg (1 + Ω.M * Ω.graphBumpNorm))]
-    · rw [min_eq_left ht1, mul_one]
-      calc ‖Ω.vertCutoff j (x + h) - Ω.vertCutoff j x‖
-          ≤ ‖Ω.vertCutoff j (x + h)‖ + ‖Ω.vertCutoff j x‖ := norm_sub_le _ _
-        _ ≤ 1 + 1 := add_le_add (Ω.norm_vertCutoff_le j _) (Ω.norm_vertCutoff_le j x)
-        _ ≤ Ω.vertCutoffConst := by linarith
+    exact Ω.norm_vertCutoff_add_sub_le j h x
   · rw [higherDiff_two_apply]
-    rcases le_total t 1 with ht1 | ht1
-    · rw [min_eq_right (pow_le_one₀ ht ht1)]
-      have hh : ‖h‖ ≤ 1 / 2 ^ j := by
-        rw [le_div_iff₀ (by positivity), mul_comm]
-        exact ht1
-      set a₀ := Ω.vertCoord j x
-      set a₁ := Ω.vertCoord j (x + h)
-      set a₂ := Ω.vertCoord j (x + (2 : ℝ) • h)
-      have hsplit : Ω.vertCutoff j (x + (2 : ℝ) • h) - 2 * Ω.vertCutoff j (x + h) +
-          Ω.vertCutoff j x = (Ω.profile a₂ - Ω.profile (a₀ + 2 * (a₁ - a₀))) +
-            (Ω.profile (a₀ + 2 * (a₁ - a₀)) - 2 * Ω.profile (a₀ + (a₁ - a₀)) +
-              Ω.profile a₀) := by
-        simp only [vertCutoff, a₀, a₁, a₂, add_sub_cancel]
-        ring
-      have hfirst : ‖Ω.profile a₂ - Ω.profile (a₀ + 2 * (a₁ - a₀))‖ ≤
-          Ω.profileConst * (4 * Ω.M * Ω.graphBumpDeriv * t ^ 2) := by
-        refine (Ω.norm_profile_sub_le _ _).trans (mul_le_mul_of_nonneg_left ?_ hC)
-        have h2 := Ω.abs_second_vertCoord_le j hh x
-        rw [show a₂ - (a₀ + 2 * (a₁ - a₀)) = a₂ - 2 * a₁ + a₀ by ring]
-        exact h2
-      have hsecond : ‖Ω.profile (a₀ + 2 * (a₁ - a₀)) - 2 * Ω.profile (a₀ + (a₁ - a₀)) +
-          Ω.profile a₀‖ ≤ Ω.profileConst * ((1 + Ω.M * Ω.graphBumpNorm) ^ 2 * t ^ 2) := by
-        refine (Ω.norm_profile_second_le a₀ (a₁ - a₀)).trans (mul_le_mul_of_nonneg_left ?_ hC)
-        have h1 := Ω.abs_vertCoord_sub_le j x h
-        rw [← sq_abs]
-        calc |a₁ - a₀| ^ 2 ≤ (2 ^ j * (1 + Ω.M * Ω.graphBumpNorm) * ‖h‖) ^ 2 :=
-              pow_le_pow_left₀ (abs_nonneg _) h1 2
-          _ = (1 + Ω.M * Ω.graphBumpNorm) ^ 2 * t ^ 2 := by rw [ht_def]; ring
-      rw [hsplit]
-      calc ‖(Ω.profile a₂ - Ω.profile (a₀ + 2 * (a₁ - a₀))) +
-            (Ω.profile (a₀ + 2 * (a₁ - a₀)) - 2 * Ω.profile (a₀ + (a₁ - a₀)) + Ω.profile a₀)‖
-          ≤ Ω.profileConst * (4 * Ω.M * Ω.graphBumpDeriv * t ^ 2) +
-              Ω.profileConst * ((1 + Ω.M * Ω.graphBumpNorm) ^ 2 * t ^ 2) :=
-            (norm_add_le _ _).trans (add_le_add hfirst hsecond)
-        _ ≤ Ω.vertCutoffConst * t ^ 2 := by
-            rw [vertCutoffConst]
-            nlinarith [mul_nonneg hC hMK, sq_nonneg t, mul_nonneg hC (sq_nonneg t),
-              mul_nonneg (mul_nonneg hC (add_nonneg zero_le_one hMK)) (sq_nonneg t)]
-    · rw [min_eq_left (one_le_pow₀ ht1), mul_one]
-      calc ‖Ω.vertCutoff j (x + (2 : ℝ) • h) - 2 * Ω.vertCutoff j (x + h) + Ω.vertCutoff j x‖
-          ≤ ‖Ω.vertCutoff j (x + (2 : ℝ) • h)‖ + ‖2 * Ω.vertCutoff j (x + h)‖ +
-              ‖Ω.vertCutoff j x‖ :=
-            (norm_add_le _ _).trans (add_le_add_left (norm_sub_le _ _) _)
-        _ ≤ 1 + 2 * 1 + 1 := by
-            rw [norm_mul, Complex.norm_ofNat]
-            gcongr
-            · exact Ω.norm_vertCutoff_le j _
-            · exact Ω.norm_vertCutoff_le j _
-            · exact Ω.norm_vertCutoff_le j x
-        _ ≤ Ω.vertCutoffConst := by linarith
+    exact Ω.norm_vertCutoff_second_le j h x
 
 /-- The differences of the vertical cut-off in `ℝ≥0∞`. -/
 theorem enorm_higherDiff_vertCutoff_le (j : ℕ) {m : ℕ} (hm : m ≤ 2) (h x : V) :

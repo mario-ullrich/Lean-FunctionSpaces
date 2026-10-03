@@ -49,86 +49,6 @@ open scoped ENNReal SchwartzMap
 
 open ENNReal (lqNorm dyadicWeight)
 
-/-! ### Two lemmas on series -/
-
-/-- **An almost diagonal sum in weighted `ℓ_q`**:
-`‖(2^(is) ∑_j c_{ij} a_j)_i‖_{ℓ_q} ≤ ((1 - 2^(-(L-s)))⁻¹ + (1 - 2^(-s))⁻¹) ‖(2^(js) a_j)_j‖_{ℓ_q}`
-with `c_{ij} = 2^(-(i-j)L)` for `j ≤ i` and `c_{ij} = 1` for `j > i`, by Hardy's inequalities for
-the sum below and the tail above the diagonal (finite for `0 < s < L`). -/
-theorem ENNReal.lqNorm_almostDiagonal_le {q : ℝ≥0∞} (hq : 1 ≤ q) (s L : ℝ) (a : ℕ → ℝ≥0∞) :
-    lqNorm q (fun i => dyadicWeight s i *
-      ∑' j, (if j ≤ i then dyadicWeight (-L) (i - j) else 1) * a j) ≤
-      ((1 - (2 : ℝ≥0∞) ^ (-(L - s)))⁻¹ + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹) *
-        lqNorm q (fun j => dyadicWeight s j * a j) := by
-  set X := lqNorm q (fun j => dyadicWeight s j * a j)
-  have hsplit : ∀ i, ∑' j, (if j ≤ i then dyadicWeight (-L) (i - j) else 1) * a j =
-      ∑ j ∈ Finset.range (i + 1), dyadicWeight (-L) (i - j) * a j + ∑' t, a (t + (i + 1)) :=
-    fun i => by
-      rw [← Summable.sum_add_tsum_nat_add' (k := i + 1) ENNReal.summable]
-      congr 1
-      · refine Finset.sum_congr rfl fun j hj => ?_
-        have hji : j ≤ i := Nat.lt_succ_iff.1 (Finset.mem_range.1 hj)
-        simp only [hji, ↓reduceIte]
-      · refine tsum_congr fun t => ?_
-        have hti : ¬(t + (i + 1) ≤ i) := by omega
-        simp only [hti, ↓reduceIte, one_mul]
-  have hw : ∀ i j, j ≤ i → dyadicWeight s i * dyadicWeight (-L) (i - j) =
-      dyadicWeight (-(L - s)) i * (dyadicWeight (L - s) j * dyadicWeight s j) := by
-    intro i j hji
-    simp only [dyadicWeight]
-    rw [← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top,
-      ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top,
-      ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top, Nat.cast_sub hji]
-    congr 1
-    ring
-  have hP : lqNorm q (fun i => dyadicWeight s i *
-      ∑ j ∈ Finset.range (i + 1), dyadicWeight (-L) (i - j) * a j) ≤
-      (1 - (2 : ℝ≥0∞) ^ (-(L - s)))⁻¹ * X := by
-    have h := ENNReal.hardy_sum_le hq (L - s)
-      (fun j => dyadicWeight (L - s) j * (dyadicWeight s j * a j))
-    have h1 : (fun i => dyadicWeight s i *
-          ∑ j ∈ Finset.range (i + 1), dyadicWeight (-L) (i - j) * a j) =
-        fun i => dyadicWeight (-(L - s)) i *
-          ∑ j ∈ Finset.range (i + 1), dyadicWeight (L - s) j * (dyadicWeight s j * a j) := by
-      funext i
-      rw [Finset.mul_sum, Finset.mul_sum]
-      refine Finset.sum_congr rfl fun j hj => ?_
-      rw [← mul_assoc, hw i j (Nat.lt_succ_iff.1 (Finset.mem_range.1 hj))]
-      ring
-    have h2 : (fun k => dyadicWeight (-(L - s)) k *
-        (dyadicWeight (L - s) k * (dyadicWeight s k * a k))) = fun k => dyadicWeight s k * a k := by
-      funext k
-      rw [← mul_assoc, ENNReal.dyadicWeight_neg_mul_self, one_mul]
-    rw [h1]
-    rw [h2] at h
-    exact h
-  have hT : lqNorm q (fun i => dyadicWeight s i * ∑' t, a (t + (i + 1))) ≤
-      (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
-    refine (ENNReal.lqNorm_mono fun i => ?_).trans (ENNReal.hardy_tail_le hq s a)
-    have hinj : Function.Injective fun t : ℕ => t + 1 := add_left_injective 1
-    have htail : ∑' t, a (t + (i + 1)) ≤ ∑' n, a (i + n) :=
-      calc ∑' t, a (t + (i + 1)) = ∑' t, (fun n => a (i + n)) (t + 1) := by
-            congr 1
-            funext t
-            congr 1
-            omega
-        _ ≤ ∑' n, a (i + n) := ENNReal.tsum_comp_le_tsum_of_injective hinj (fun n => a (i + n))
-    exact mul_le_mul' le_rfl htail
-  calc lqNorm q (fun i => dyadicWeight s i *
-        ∑' j, (if j ≤ i then dyadicWeight (-L) (i - j) else 1) * a j)
-      = lqNorm q (fun i => dyadicWeight s i *
-          ∑ j ∈ Finset.range (i + 1), dyadicWeight (-L) (i - j) * a j +
-          dyadicWeight s i * ∑' t, a (t + (i + 1))) := by
-        congr 1
-        funext i
-        rw [hsplit i, mul_add]
-    _ ≤ lqNorm q (fun i => dyadicWeight s i *
-          ∑ j ∈ Finset.range (i + 1), dyadicWeight (-L) (i - j) * a j) +
-        lqNorm q (fun i => dyadicWeight s i * ∑' t, a (t + (i + 1))) :=
-        ENNReal.lqNorm_add_le hq _ _
-    _ ≤ (1 - (2 : ℝ≥0∞) ^ (-(L - s)))⁻¹ * X + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := add_le_add hP hT
-    _ = _ := by ring
-
 namespace Rd
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
@@ -404,6 +324,37 @@ theorem sum_dual_localMean (hp : p ≠ ∞) (L J : ℕ) (f : Lp ℂ p (volume : 
     rw [Finset.sum_range_succ, ih, hd, hk, map_sub, map_sub,
       convLp_comm hp (b.integrable_scaled L (J + 1)) (b.integrable_scaled L J)]
     abel
+
+/-- **The reproducing formula at every point**: `∑_{j ≤ J} (η_j ⋆ (k_j ⋆ f))(y) =
+(m_{2^J} ⋆ (m_{2^J} ⋆ f))(y)` for all `y`, since both sides are continuous and agree almost
+everywhere (`Rd.LocalMeansBump.sum_dual_localMean`). -/
+theorem sum_conv_dual_localMean_apply (hp : p ≠ ∞) (L J : ℕ)
+    (f : Lp ℂ p (volume : Measure V)) (y : V) :
+    ∑ j ∈ Finset.range (J + 1), conv (b.dual L j) (b.localMean hp L j f) volume y =
+      conv (b.scaled L J) (convLp hp (b.integrable_scaled L J) f) volume y := by
+  have hp1 : 1 ≤ p := Fact.out
+  have hcont1 : Continuous fun y =>
+      ∑ j ∈ Finset.range (J + 1), conv (b.dual L j) (b.localMean hp L j f) volume y :=
+    continuous_finsetSum _ fun j _ => (b.hasCompactSupport_dual L j).continuous_convolution_left
+      (ContinuousLinearMap.mul ℂ ℂ) (b.continuous_dual L j) ((Lp.memLp _).locallyIntegrable hp1)
+  have hcont2 : Continuous (conv (b.scaled L J) (convLp hp (b.integrable_scaled L J) f) volume) :=
+    (b.hasCompactSupport_scaled L J).continuous_convolution_left (ContinuousLinearMap.mul ℂ ℂ)
+      (b.continuous_scaled L J) ((Lp.memLp _).locallyIntegrable hp1)
+  have hae : (fun y => ∑ j ∈ Finset.range (J + 1),
+      conv (b.dual L j) (b.localMean hp L j f) volume y) =ᵐ[volume]
+        conv (b.scaled L J) (convLp hp (b.integrable_scaled L J) f) volume := by
+    have h1 := Lp.coeFn_fun_finsetSum (Finset.range (J + 1))
+      (fun j => convLp hp (b.integrable_dual L j) (b.localMean hp L j f))
+    rw [b.sum_dual_localMean hp L J f] at h1
+    have h2 := convLp_apply_ae hp (b.integrable_scaled L J)
+      (convLp hp (b.integrable_scaled L J) f)
+    have h3 : ∀ᵐ y ∂volume, ∀ j, convLp hp (b.integrable_dual L j) (b.localMean hp L j f) y =
+        conv (b.dual L j) (b.localMean hp L j f) volume y :=
+      ae_all_iff.2 fun j => convLp_apply_ae hp _ _
+    filter_upwards [h1, h2, h3] with y hy1 hy2 hy3
+    rw [← hy2, hy1]
+    exact Finset.sum_congr rfl fun j _ => (hy3 j).symm
+  exact congrFun ((Continuous.ae_eq_iff_eq volume hcont1 hcont2).1 hae) y
 
 /-- **The reproducing formula**: `∑_j η_j ⋆ k_j ⋆ f = f` in `L_p`, since
 `m_{2^J} ⋆ m_{2^J} ⋆ f → f` (`m` is an approximate identity, `Rd.tendsto_convLp_dilate`). -/

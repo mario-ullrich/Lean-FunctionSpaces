@@ -23,7 +23,8 @@ splines of order `r` and level `k ≥ r` is bounded by the periodic modulus of s
   (`Interval.perQiPieces`), form a periodic spline once `r ≤ 2^k`
   (`Interval.perJoin_perQiPieces`).
 * **Jackson's inequality for continuous periodic functions.** On `[1, 2)` the quasi-interpolant
-  has the local error estimates of the interval case, on windows inside `[0, 2]`. One Steklov
+  has the local error estimates of the interval case (`Interval.eLpNorm_sub_perQiPieces_eq`), on
+  windows inside `[0, 2]` (`Interval.qiWindow_subset_Icc_zero_two`). One Steklov
   smoothing of `G` on `[0, 2]`, with the modulus on `[0, 3]`, gives polynomials on all windows,
   and `ω_r(G, t, [0, 3])_p ≤ 3^(1/p) ω_r^per(G, t)_p` (`Interval.modulus_perExt_le`). Hence
   `‖G - Q_k^per G‖_p ≤ C ω_r^per(G, 2^(-k))_p` (`Interval.exists_eLpNorm_sub_perQi_le`).
@@ -221,6 +222,35 @@ theorem eLpNorm_comp_add_one_dyadicIco {f : ℝ → ℂ} (hf : Measurable f) (p 
     field_simp
     ring
 
+/-- **The windows of the cells of `[0, 2)` lie in `[0, 2]`**: `W_{k,i} ⊆ [0, 2]` for
+`i < 2^(k+1)`. -/
+theorem qiWindow_subset_Icc_zero_two {r k i : ℕ} (hi : i < 2 ^ (k + 1)) :
+    qiWindow r k i ⊆ Icc 0 2 := fun x hx => by
+  have hpos : (0 : ℝ) < 2 ^ k := by positivity
+  refine ⟨(by positivity : (0 : ℝ) ≤ ((i + 1 - r : ℕ) : ℝ) / 2 ^ k).trans hx.1, hx.2.trans ?_⟩
+  rw [div_le_iff₀ hpos]
+  have : ((i + 1 : ℕ) : ℝ) ≤ 2 ^ (k + 1) := by exact_mod_cast hi
+  push_cast at this
+  rw [pow_succ] at this
+  linarith
+
+/-- **The periodic quasi-interpolant is the quasi-interpolant one period to the right**: for
+continuous `1`-periodic `G`, the error of `Q_k^per G` on `I_{k,m}` equals the error of the
+quasi-interpolant on `[0, 2)` on `I_{k,m+2^k} = I_{k,m} + 1`. -/
+theorem eLpNorm_sub_perQiPieces_eq {r : ℕ} (hr : 1 ≤ r) {G : ℝ → ℂ} (hG : Continuous G)
+    (hGp : Function.Periodic G 1) (p : ℝ≥0∞) (k m : ℕ) :
+    eLpNorm (fun x => G x - polyFun (perQiPieces hr k G m) x) p
+        (volume.restrict (dyadicIco k m)) =
+      eLpNorm (fun x => G x - polyFun (qiPieces hr k (2 ^ (k + 1)) G (m + 2 ^ k)) x) p
+        (volume.restrict (dyadicIco k (m + 2 ^ k))) := by
+  rw [← eLpNorm_comp_add_one_dyadicIco (f := fun x => G x -
+    polyFun (qiPieces hr k (2 ^ (k + 1)) G (m + 2 ^ k)) x)
+    (hG.measurable.sub (measurable_polyFun _)) p k m]
+  congr 1
+  funext x
+  simp only [polyFun_perQiPieces]
+  rw [hGp x]
+
 /-- **Jackson's inequality for periodic splines, continuous functions**: there is `C` with
 `‖G - Q_k^per G‖_{L_p[0,1]} ≤ C ω_r^per(G, 2^(-k))_p` for every continuous `1`-periodic `G` and
 every `k`. -/
@@ -253,28 +283,6 @@ theorem exists_eLpNorm_sub_perQi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     rw [Finset.mem_range] at hm ⊢
     rw [addRightEmbedding_apply, pow_succ]
     omega
-  -- the windows of the intervals in `[1, 2)` lie in `[0, 2]`
-  have hW : ∀ i ∈ s, qiWindow r k i ⊆ Icc 0 2 := fun i hi x hx => by
-    have hi2 : i < 2 ^ (k + 1) := Finset.mem_range.1 (hs hi)
-    refine ⟨(by positivity : (0 : ℝ) ≤ ((i + 1 - r : ℕ) : ℝ) / 2 ^ k).trans hx.1, hx.2.trans ?_⟩
-    rw [div_le_iff₀ hpos]
-    have : ((i + 1 : ℕ) : ℝ) ≤ 2 ^ (k + 1) := by exact_mod_cast hi2
-    push_cast at this
-    rw [pow_succ] at this
-    linarith
-  -- the error on `[0, 1)` is the error of the quasi-interpolant on `[1, 2)`
-  have hshift : ∀ m : ℕ, eLpNorm (fun x => G x - polyFun (perQiPieces hr k G m) x) p
-      (volume.restrict (dyadicIco k m)) = eLpNorm (fun x => G x -
-        polyFun (qiPieces hr k (2 ^ (k + 1)) G (m + 2 ^ k)) x) p
-          (volume.restrict (dyadicIco k (m + 2 ^ k))) := by
-    intro m
-    rw [← eLpNorm_comp_add_one_dyadicIco (f := fun x => G x -
-      polyFun (qiPieces hr k (2 ^ (k + 1)) G (m + 2 ^ k)) x)
-      (hG.measurable.sub (measurable_polyFun _)) p k m]
-    congr 1
-    funext x
-    simp only [polyFun_perQiPieces]
-    rw [hGp x]
   have hmain : eLpNorm (fun x => G x - ppFun k (perQiPieces hr k G) x) p unitVol ≤
       A * (J * ω) := by
     refine eLpNorm_le_of_lintegral_le ((hG.measurable.sub
@@ -286,12 +294,13 @@ theorem exists_eLpNorm_sub_perQi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
       _ = ∑ i ∈ s, eLpNorm (fun x => G x - polyFun (qiPieces hr k (2 ^ (k + 1)) G i) x) p
             (volume.restrict (dyadicIco k i)) ^ p.toReal := by
           rw [Finset.sum_map]
-          exact Finset.sum_congr rfl fun m _ => congrArg (· ^ p.toReal) (hshift m)
+          exact Finset.sum_congr rfl fun m _ =>
+            congrArg (· ^ p.toReal) (eLpNorm_sub_perQiPieces_eq hr hG hGp p k m)
       _ ≤ (A * (eLpNorm (fun x => G x - g x) p (volume.restrict (Icc 0 2)) +
             ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r * eLpNorm D p (volume.restrict (Icc 0 2)))) ^
               p.toReal :=
-          hAb hs hW hG.measurable (fun m _ => integrableOn_dyadicIco_of_continuous hG k m)
-            hgm hDm h3
+          hAb hs (fun i hi => qiWindow_subset_Icc_zero_two (Finset.mem_range.1 (hs hi)))
+            hG.measurable (fun m _ => integrableOn_dyadicIco_of_continuous hG k m) hgm hDm h3
       _ ≤ (A * (J * ω)) ^ p.toReal := by
           gcongr
           exact add_ofReal_div_pow_mul_le r k h1 h2

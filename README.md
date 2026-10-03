@@ -460,7 +460,7 @@ explains how they differ.
 | `n`-term approximation from a dictionary | ✅ proved | ✗ | `ApproximationSpaces/Instances/NTerm.lean` |
 | `ℓ_q` norms of sequences in `ℝ≥0∞`, Minkowski, monotonicity in `q` | ✅ proved | ✗ | `ApproximationSpaces/Sequences/Lq.lean` |
 | Cauchy condensation with power weights | ✅ proved | ✗ | `ApproximationSpaces/Sequences/Dyadic.lean` |
-| Countable Minkowski inequality, discrete Hardy inequalities | ✅ proved | ✗ | `ApproximationSpaces/Sequences/Hardy.lean` |
+| Countable Minkowski inequality, discrete Hardy inequalities, almost diagonal sums | ✅ proved | ✗ | `ApproximationSpaces/Sequences/Hardy.lean` |
 | `A^s_q`, its dyadic quasi-norm and linear structure | ✅ proved | ✗ | `ApproximationSpaces/{Norm,Dyadic,Space}.lean` |
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ proved | ✗ | `ApproximationSpaces/{Embedding,Transfer}.lean` |
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ proved | ✗ | `ApproximationSpaces/{Lift,Nikolskii}.lean` |
@@ -506,7 +506,7 @@ explains how they differ.
 | Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ proved | ✗ | `FunctionSpaces/Torus/{Translation,Modulus,BesovModuli}.lean` |
 | Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ proved | ✗ | `FunctionSpaces/Traces/Examples/Torus.lean` |
 | Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Torus/WeakDerivatives.lean` |
-| Convolution with integrable kernels on `ℝ^d`: Young's inequality, associativity, operators on `L_p` | ✅ proved | ✗ | `FunctionSpaces/Rd/Convolution.lean` |
+| Convolution with integrable kernels on `ℝ^d`: Young's inequality, pointwise bounds, associativity, operators on `L_p` | ✅ proved | ✗ | `FunctionSpaces/Rd/Convolution.lean` |
 | Dilations, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ proved | ✗ | `FunctionSpaces/Rd/ApproxIdentity.lean` |
 | Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, kernel identities by Fourier inversion | ✅ proved | ✗ | `FunctionSpaces/Rd/LittlewoodPaleyKernels.lean` |
 | Band-limited classes on `ℝ^d`, Littlewood–Paley blocks, `A^s_q(band-limited)` characterised by Littlewood–Paley blocks for `s > 0` | ✅ proved | ✗ | `FunctionSpaces/Rd/{BandLimited,LittlewoodPaley}.lean` |
@@ -523,7 +523,7 @@ explains how they differ.
 | Pointwise multipliers on `ℝ^d`: Leibniz's rule for differences, moduli of lower order | ✅ proved | ✗ | `FunctionSpaces/Rd/Multipliers.lean` |
 | Local versions of Rychkov's extension: boundary and inner patches | ✅ proved | ✗ | `FunctionSpaces/Rd/LocalExtension.lean` |
 | Bounded Lipschitz domains: restrictions by intrinsic differences | ✅ proved | ✗ | `FunctionSpaces/Rd/BoundedLipschitz.lean` |
-| Dyadic cells of `ℝ^d` and the counting of their centres | ✅ proved | ✗ | `FunctionSpaces/Rd/DyadicGrid.lean` |
+| Dyadic cells of `ℝ^d`: partition, counting of their centres, bounded overlap | ✅ proved | ✗ | `FunctionSpaces/Rd/DyadicGrid.lean` |
 | Atomic synthesis: bounded overlap, regular atoms, coefficient quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/AtomSynthesis.lean` |
 | Atomic decomposition by cell atoms, atomic characterisation of Besov spaces | ✅ proved | ✗ | `FunctionSpaces/Rd/AtomAnalysis.lean` |
 | Graph map of a Lipschitz graph domain, restrictions of atoms to the graph | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphParametrization.lean` |

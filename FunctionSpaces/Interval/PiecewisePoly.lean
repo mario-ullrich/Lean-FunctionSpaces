@@ -7,6 +7,7 @@ module
 
 public import FunctionSpaces.Lp.LintegralForm
 public import FunctionSpaces.Interval.Polynomials
+public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 public import ApproximationSpaces.Decompositions.Synthesis
 public import Mathlib.Algebra.Order.Floor.Semifield
 
@@ -23,7 +24,9 @@ of complexity `2^k`.
 This file sets up the spaces, the bookkeeping for the pieces (on `I_{k,m}` a piecewise
 polynomial is the polynomial `Q_m`, and `0` beyond `[0, 1)`, `Interval.ppFun_eq_polyFun`) and
 for integrals over unions of dyadic intervals (`Interval.lintegral_Icc_le_sum`,
-`Interval.lintegral_Icc_le_sum_dyadicIco`).
+`Interval.lintegral_Icc_le_sum_dyadicIco`, `Interval.lintegral_unit_eq_sum_dyadicIco`); a dyadic
+interval is the disjoint union of its two halves (`Interval.dyadicIco_eq_union`,
+`Interval.disjoint_dyadicIco_halves`).
 Jackson's inequality is in `FunctionSpaces.Interval.PiecewiseJackson`, the inverse inequality and
 the identification of the approximation spaces in `FunctionSpaces.Interval.PiecewiseInverse`.
 -/
@@ -31,7 +34,7 @@ the identification of the approximation spaces in `FunctionSpaces.Interval.Piece
 @[expose] public section
 
 open MeasureTheory Set Polynomial
-open scoped ENNReal BoundedContinuousFunction
+open scoped ENNReal BoundedContinuousFunction ComplexConjugate
 open ENNReal (dyadicWeight)
 
 namespace Interval
@@ -338,5 +341,97 @@ theorem ite_mem_degreeLT {r : ℕ} {Q : ℕ → ℂ[X]} (hQ : ∀ n, Q n ∈ deg
   split_ifs
   · exact hQ m
   · exact zero_mem _
+
+/-! ### Halves, lengths and integrals of the dyadic intervals -/
+
+/-- The integral over `[0, 1]` is the sum over the dyadic intervals of level `k`. -/
+theorem lintegral_unit_eq_sum_dyadicIco (G : ℝ → ℝ≥0∞) (k : ℕ) :
+    ∫⁻ x in Icc (0 : ℝ) 1, G x = ∑ n ∈ Finset.range (2 ^ k), ∫⁻ x in dyadicIco k n, G x :=
+  le_antisymm (lintegral_Icc_le_sum_dyadicIco G k) (sum_lintegral_dyadicIco_le G k)
+
+/-- A function integrable on a measurable bounded set, times a polynomial, is integrable there. -/
+theorem integrableOn_mul_polyFun {g : ℝ → ℂ} {s : Set ℝ} (hg : IntegrableOn g s)
+    (hsm : MeasurableSet s) {a b : ℝ} (hs : s ⊆ Icc a b) (Q : ℂ[X]) :
+    IntegrableOn (fun x => g x * polyFun Q x) s := by
+  obtain ⟨M, hM⟩ := (isCompact_Icc (a := a) (b := b)).exists_bound_of_continuousOn
+    (continuous_polyFun Q).continuousOn
+  exact hg.mul_bdd (c := M) (continuous_polyFun Q).aestronglyMeasurable
+    ((ae_restrict_iff' hsm).2 (Filter.Eventually.of_forall fun x hx => hM x (hs hx)))
+
+/-- The dyadic interval `I_{k,m}` is the union of its halves `I_{k+1,2m}` and `I_{k+1,2m+1}`. -/
+theorem dyadicIco_eq_union (k m : ℕ) :
+    dyadicIco k m = dyadicIco (k + 1) (2 * m) ∪ dyadicIco (k + 1) (2 * m + 1) := by
+  have h2 : (2 : ℝ) ^ k ≠ 0 := by positivity
+  have e1 : ((2 * m : ℕ) : ℝ) / 2 ^ (k + 1) = (m : ℝ) / 2 ^ k := by
+    push_cast; rw [pow_succ]; field_simp
+  have e2 : (((2 * m + 1 : ℕ) : ℝ) + 1) / 2 ^ (k + 1) = ((m : ℝ) + 1) / 2 ^ k := by
+    push_cast; rw [pow_succ]; field_simp; ring
+  have e3 : ((2 * m : ℕ) : ℝ) + 1 = ((2 * m + 1 : ℕ) : ℝ) := by push_cast; ring
+  rw [dyadicIco, dyadicIco, dyadicIco, e1, e2, e3, Ico_union_Ico_eq_Ico]
+  · rw [← e1]
+    gcongr
+    exact_mod_cast Nat.le_succ _
+  · rw [← e2]
+    gcongr
+    linarith
+
+/-- The halves of a dyadic interval are disjoint. -/
+theorem disjoint_dyadicIco_halves (k m : ℕ) :
+    Disjoint (dyadicIco (k + 1) (2 * m)) (dyadicIco (k + 1) (2 * m + 1)) :=
+  pairwise_disjoint_dyadicIco (k + 1) (by omega)
+
+/-- `I_{j,m}` has length `2^(-j)`. -/
+theorem volume_dyadicIco (j m : ℕ) : volume (dyadicIco j m) = ENNReal.ofReal (1 / 2 ^ j) := by
+  rw [dyadicIco, Real.volume_Ico]
+  congr 1
+  ring
+
+/-- **Change of variables** on a dyadic interval:
+`2^j ∫_{I_{j,m}} φ = ∫_0^1 φ(t 2^(-j) + m 2^(-j))`. -/
+theorem integral_dyadicIco_eq (j m : ℕ) (φ : ℝ → ℂ) :
+    (((2 : ℝ) ^ j : ℝ) : ℂ) * ∫ y in dyadicIco j m, φ y =
+      ∫ t in Icc (0 : ℝ) 1, φ (t / 2 ^ j + m / 2 ^ j) := by
+  have h2 : (2 : ℝ) ^ j ≠ 0 := by positivity
+  have hle : (m : ℝ) / 2 ^ j ≤ (m + 1) / 2 ^ j := by
+    have : (0 : ℝ) < 2 ^ j := by positivity
+    rw [div_le_div_iff_of_pos_right this]
+    linarith
+  have hL : ∫ y in dyadicIco j m, φ y = ∫ y in ((m : ℝ) / 2 ^ j)..((m + 1) / 2 ^ j), φ y := by
+    rw [intervalIntegral.integral_of_le hle, dyadicIco, integral_Ico_eq_integral_Ioo,
+      integral_Ioc_eq_integral_Ioo]
+  have hR : ∫ t in Icc (0 : ℝ) 1, φ (t / 2 ^ j + m / 2 ^ j) =
+      ∫ t in (0 : ℝ)..1, φ (t / 2 ^ j + m / 2 ^ j) := by
+    rw [intervalIntegral.integral_of_le zero_le_one, integral_Icc_eq_integral_Ioc]
+  have hb1 : (0 : ℝ) / 2 ^ j + m / 2 ^ j = m / 2 ^ j := by rw [zero_div, zero_add]
+  have hb2 : (1 : ℝ) / 2 ^ j + m / 2 ^ j = (m + 1) / 2 ^ j := by ring
+  rw [hL, hR, intervalIntegral.integral_comp_div_add φ h2, hb1, hb2, Complex.real_smul]
+
+/-- Piecewise polynomials only depend on the pieces in `[0, 1)`. -/
+theorem ppFun_congr {k : ℕ} {Q Q' : ℕ → ℂ[X]} (h : ∀ n < 2 ^ k, polyFun (Q n) = polyFun (Q' n)) :
+    ppFun k Q = ppFun k Q' := by
+  funext x
+  exact Finset.sum_congr rfl fun n hn => by rw [h n (Finset.mem_range.1 hn)]
+
+/-- The conjugate of a piecewise polynomial is the piecewise polynomial with the conjugate
+pieces. -/
+theorem conj_ppFun (k : ℕ) (Q : ℕ → ℂ[X]) (x : ℝ) :
+    conj (ppFun k Q x) = ppFun k (fun n => (Q n).map (starRingEnd ℂ)) x := by
+  simp only [ppFun, map_sum]
+  refine Finset.sum_congr rfl fun n _ => ?_
+  by_cases hx : x ∈ dyadicIco k n
+  · rw [indicator_of_mem hx, indicator_of_mem hx, polyFun_map_conj]
+  · rw [indicator_of_notMem hx, indicator_of_notMem hx, map_zero]
+
+omit [Fact (1 ≤ p)] in
+/-- Almost everywhere on `[0, 1]` gives almost everywhere on the dyadic intervals in `[0, 1)`. -/
+theorem ae_dyadicIco_of_unitVol {F G : ℝ → ℂ} (h : F =ᵐ[unitVol] G) {j m : ℕ} (hm : m < 2 ^ j) :
+    F =ᵐ[volume.restrict (dyadicIco j m)] G :=
+  ae_restrict_of_ae_restrict_of_subset ((dyadicIco_subset hm).trans Ico_subset_Icc_self) h
+
+/-- Elements of `L_p[0, 1]` are integrable on the dyadic intervals in `[0, 1)`. -/
+theorem integrableOn_dyadicIco (f : Lp ℂ p unitVol) {j m : ℕ} (hm : m < 2 ^ j) :
+    IntegrableOn f (dyadicIco j m) :=
+  IntegrableOn.mono_set ((Lp.memLp f).integrable Fact.out)
+    ((dyadicIco_subset hm).trans Ico_subset_Icc_self)
 
 end Interval

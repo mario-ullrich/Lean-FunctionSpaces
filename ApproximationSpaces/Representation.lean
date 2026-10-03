@@ -77,6 +77,42 @@ theorem reprConst_ne_top (C : ℝ) (h : s < r) : reprConst C r s ≠ ∞ := by
       ENNReal.mul_ne_top (by norm_num) (liftConst_ne_top C r)⟩)
     (ENNReal.one_sub_two_rpow_neg_inv_ne_top (sub_pos.2 h))⟩
 
+/-- **The interpolation sequence at one scale from lifted approximants**: if `y_0` and `d_j`
+lift near-best approximants `a_k` of `f`, `ι(y_0 + ∑_{j<k} d_j) = a_k`, with `‖y_0‖ ≤ B` and
+`‖d_j‖ ≤ K b_j`, then for `r ≠ 0`
+`2^(ks) K(2^(-kr), f) ≤ 2^(ks) (E_{2^k}(f) + t_k) + B 2^(-k(r-s)) + K 2^(-k(r-s)) ∑_{j ≤ k} b_j`,
+from `K(2^(-kr), f) ≤ ‖f - a_k‖ + 2^(-kr) ‖y_0 + ∑_{j<k} d_j‖`. -/
+theorem interpSeq_le_of_lift (hr : r ≠ 0) {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t)
+    {y0 : Y} {d : ℕ → Y} (hpart : ∀ n, ι (y0 + ∑ j ∈ range n, d j) = D.a n) {B K : ℝ≥0∞}
+    {b : ℕ → ℝ≥0∞} (hy0 : ‖y0‖ₑ ≤ B) (hd : ∀ j, ‖d j‖ₑ ≤ K * b j) (k : ℕ) :
+    interpSeq ι (s / r) r f k ≤ (A.approxSeqDyadic s f k + dyadicWeight s k * t k) +
+      (B * dyadicWeight (-(r - s)) k +
+        K * (dyadicWeight (-(r - s)) k * ∑ j ∈ range (k + 1), b j)) := by
+  have hz : ‖y0 + ∑ j ∈ range k, d j‖ₑ ≤ B + K * ∑ j ∈ range (k + 1), b j := by
+    calc ‖y0 + ∑ j ∈ range k, d j‖ₑ ≤ ‖y0‖ₑ + ∑ j ∈ range k, ‖d j‖ₑ :=
+          (enorm_add_le _ _).trans (by gcongr; exact enorm_sum_le _ _)
+      _ ≤ B + ∑ j ∈ range k, K * b j := by
+          gcongr with j; exact hd j
+      _ ≤ B + ∑ j ∈ range (k + 1), K * b j := by
+          gcongr; exact Nat.le_succ k
+      _ = _ := by rw [Finset.mul_sum]
+  have hkf : kFunctional ι (dyadicWeight (-r) k) f ≤
+      (A.approxSeq f (2 ^ k) + t k) + dyadicWeight (-r) k *
+        (B + K * ∑ j ∈ range (k + 1), b j) := by
+    refine (kFunctional_le (y0 + ∑ j ∈ range k, d j) f).trans ?_
+    rw [hpart k]
+    gcongr
+    exact D.enorm_sub_le k
+  rw [interpSeq, mul_div_cancel₀ s hr]
+  calc dyadicWeight s k * kFunctional ι (dyadicWeight (-r) k) f
+      ≤ dyadicWeight s k * ((A.approxSeq f (2 ^ k) + t k) + dyadicWeight (-r) k *
+        (B + K * ∑ j ∈ range (k + 1), b j)) := by gcongr
+    _ = _ := by
+        have hw : dyadicWeight s k * dyadicWeight (-r) k = dyadicWeight (-(r - s)) k := by
+          rw [← ENNReal.dyadicWeight_add]; congr 1; ring
+        simp only [approxSeqDyadic, mul_add, ← mul_assoc, hw]
+        ring
+
 /-- **Bernstein's half of the representation theorem**: for `0 < s < r`,
 `‖f‖_{(X,Y)_{s/r,q}} ≤ reprConst C r s · ‖f‖_{A^s_q}` (dyadic quasi-norm). -/
 theorem interpNorm_le_approxNormDyadic_of_bernstein (hB : LiftBound ι A r C) (hC : 0 ≤ C)
@@ -102,32 +138,8 @@ theorem interpNorm_le_approxNormDyadic_of_bernstein (hB : LiftBound ι A r C) (h
   have hK : ∀ k, interpSeq ι (s / r) r f k ≤
       (A.approxSeqDyadic s f k + dyadicWeight s k * t k) +
         (3 * ENNReal.ofReal C * ‖f‖ₑ * dyadicWeight (-(r - s)) k +
-          K * (dyadicWeight (-(r - s)) k * ∑ j ∈ range (k + 1), b j)) := fun k => by
-    have hz : ‖y0 + ∑ j ∈ range k, d j‖ₑ ≤ 3 * ENNReal.ofReal C * ‖f‖ₑ +
-        K * ∑ j ∈ range (k + 1), b j := by
-      calc ‖y0 + ∑ j ∈ range k, d j‖ₑ ≤ ‖y0‖ₑ + ∑ j ∈ range k, ‖d j‖ₑ :=
-            (enorm_add_le _ _).trans (by gcongr; exact enorm_sum_le _ _)
-        _ ≤ 3 * ENNReal.ofReal C * ‖f‖ₑ + ∑ j ∈ range k, K * b j := by
-            gcongr with j; exact hd j
-        _ ≤ 3 * ENNReal.ofReal C * ‖f‖ₑ + ∑ j ∈ range (k + 1), K * b j := by
-            gcongr; exact Nat.le_succ k
-        _ = _ := by rw [Finset.mul_sum]
-    have hkf : kFunctional ι (dyadicWeight (-r) k) f ≤
-        (A.approxSeq f (2 ^ k) + t k) + dyadicWeight (-r) k *
-          (3 * ENNReal.ofReal C * ‖f‖ₑ + K * ∑ j ∈ range (k + 1), b j) := by
-      refine (kFunctional_le (y0 + ∑ j ∈ range k, d j) f).trans ?_
-      rw [hpart k]
-      gcongr
-      exact D.enorm_sub_le k
-    rw [interpSeq, mul_div_cancel₀ s hr]
-    calc dyadicWeight s k * kFunctional ι (dyadicWeight (-r) k) f
-        ≤ dyadicWeight s k * ((A.approxSeq f (2 ^ k) + t k) + dyadicWeight (-r) k *
-          (3 * ENNReal.ofReal C * ‖f‖ₑ + K * ∑ j ∈ range (k + 1), b j)) := by gcongr
-      _ = _ := by
-          have hw : dyadicWeight s k * dyadicWeight (-r) k = dyadicWeight (-(r - s)) k := by
-            rw [← ENNReal.dyadicWeight_add]; congr 1; ring
-          simp only [approxSeqDyadic, mul_add, ← mul_assoc, hw]
-          ring
+          K * (dyadicWeight (-(r - s)) k * ∑ j ∈ range (k + 1), b j)) :=
+    interpSeq_le_of_lift hr D hpart hy0' hd
   -- the four sequences
   have hsplit : ∀ k, dyadicWeight (-(r - s)) k * b k =
       A.approxSeqDyadic s f k + dyadicWeight s k * t k := fun k => by

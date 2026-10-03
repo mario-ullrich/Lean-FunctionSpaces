@@ -296,37 +296,6 @@ theorem ppFun_ae_eq_sum_psi {u : Fin 2 → Fin r → ℂ}
 
 /-! ### Details on a dyadic interval -/
 
-/-- A function integrable on a measurable bounded set, times a polynomial, is integrable there. -/
-theorem integrableOn_mul_polyFun {g : ℝ → ℂ} {s : Set ℝ} (hg : IntegrableOn g s)
-    (hsm : MeasurableSet s) {a b : ℝ} (hs : s ⊆ Icc a b) (Q : ℂ[X]) :
-    IntegrableOn (fun x => g x * polyFun Q x) s := by
-  obtain ⟨M, hM⟩ := (isCompact_Icc (a := a) (b := b)).exists_bound_of_continuousOn
-    (continuous_polyFun Q).continuousOn
-  exact hg.mul_bdd (c := M) (continuous_polyFun Q).aestronglyMeasurable
-    ((ae_restrict_iff' hsm).2 (Filter.Eventually.of_forall fun x hx => hM x (hs hx)))
-
-/-- The dyadic interval `I_{k,m}` is the union of its halves `I_{k+1,2m}` and `I_{k+1,2m+1}`. -/
-theorem dyadicIco_eq_union (k m : ℕ) :
-    dyadicIco k m = dyadicIco (k + 1) (2 * m) ∪ dyadicIco (k + 1) (2 * m + 1) := by
-  have h2 : (2 : ℝ) ^ k ≠ 0 := by positivity
-  have e1 : ((2 * m : ℕ) : ℝ) / 2 ^ (k + 1) = (m : ℝ) / 2 ^ k := by
-    push_cast; rw [pow_succ]; field_simp
-  have e2 : (((2 * m + 1 : ℕ) : ℝ) + 1) / 2 ^ (k + 1) = ((m : ℝ) + 1) / 2 ^ k := by
-    push_cast; rw [pow_succ]; field_simp; ring
-  have e3 : ((2 * m : ℕ) : ℝ) + 1 = ((2 * m + 1 : ℕ) : ℝ) := by push_cast; ring
-  rw [dyadicIco, dyadicIco, dyadicIco, e1, e2, e3, Ico_union_Ico_eq_Ico]
-  · rw [← e1]
-    gcongr
-    exact_mod_cast Nat.le_succ _
-  · rw [← e2]
-    gcongr
-    linarith
-
-/-- The halves of a dyadic interval are disjoint. -/
-theorem disjoint_dyadicIco_halves (k m : ℕ) :
-    Disjoint (dyadicIco (k + 1) (2 * m)) (dyadicIco (k + 1) (2 * m + 1)) :=
-  pairwise_disjoint_dyadicIco (k + 1) (by omega)
-
 /-- **The fine projection is orthogonal on a coarse interval**: on `I_{k,m}`,
 `∫ (g - P_{k+1} g) φ = 0` for every `φ` that is a polynomial of degree `< r` on each half. -/
 theorem integral_sub_ppFun_succ_mul {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1)) {k m : ℕ}
@@ -628,16 +597,6 @@ theorem ppFun_detailPieces_ae_eq {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1
 
 /-! ### Stability and the norms of the details -/
 
-/-- The conjugate of a piecewise polynomial is the piecewise polynomial with the conjugate
-pieces. -/
-theorem conj_ppFun (k : ℕ) (Q : ℕ → ℂ[X]) (x : ℝ) :
-    conj (ppFun k Q x) = ppFun k (fun n => (Q n).map (starRingEnd ℂ)) x := by
-  simp only [ppFun, map_sum]
-  refine Finset.sum_congr rfl fun n _ => ?_
-  by_cases hx : x ∈ dyadicIco k n
-  · rw [indicator_of_mem hx, indicator_of_mem hx, polyFun_map_conj]
-  · rw [indicator_of_notMem hx, indicator_of_notMem hx, map_zero]
-
 variable (r) in
 /-- `conj ψ_j · F` is integrable on `[0, 1]` for bounded `F`. -/
 theorem integrable_conj_psi_mul (j : Fin r) {F : ℝ → ℂ} (hF : MemLp F ∞ unitVol) :
@@ -746,11 +705,6 @@ theorem exists_stable : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ β
           gcongr with i
           exact ENNReal.le_lqNorm hp0 (fun i => ‖β i‖ₑ) i
       _ = _ := by rw [← Finset.mul_sum, mul_comm]
-
-/-- The integral over `[0, 1]` is the sum over the dyadic intervals of level `k`. -/
-theorem lintegral_unit_eq_sum_dyadicIco (G : ℝ → ℝ≥0∞) (k : ℕ) :
-    ∫⁻ x in Icc (0 : ℝ) 1, G x = ∑ n ∈ Finset.range (2 ^ k), ∫⁻ x in dyadicIco k n, G x :=
-  le_antisymm (lintegral_Icc_le_sum_dyadicIco G k) (sum_lintegral_dyadicIco_le G k)
 
 /-- `|2^(k/2)| = 2^(k/2)`, as a dyadic weight. -/
 theorem enorm_two_rpow_half (k : ℕ) :

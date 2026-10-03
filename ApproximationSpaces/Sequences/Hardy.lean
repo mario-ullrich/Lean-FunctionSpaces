@@ -25,6 +25,10 @@ geometric kernel `w i = 2^(-iα)`.  The proof writes the convolution as a series
 copies of `c` and uses the **countable Minkowski inequality** `lqNorm_tsum_le`, which follows
 from Mathlib's finite version (`MeasureTheory.eLpNorm_sum_le`) by monotone convergence
 (`lqNorm_iSup`).
+
+Together they bound an **almost diagonal sum**: with `c_{ij} = 2^(-(i-j)L)` for `j ≤ i` and
+`c_{ij} = 1` for `j > i`, `‖(2^(is) ∑_j c_{ij} a_j)_i‖_q ≤ C ‖(2^(js) a_j)_j‖_q` for `0 < s < L`
+(`lqNorm_almostDiagonal_le`).
 -/
 
 @[expose] public section
@@ -155,5 +159,85 @@ theorem hardy_sum_le (hq : 1 ≤ q) (α : ℝ) (b : ℕ → ℝ≥0∞) :
         rw [ENNReal.tsum_mul_right]
         simp_rw [dyadicWeight_eq_pow]
         rw [ENNReal.tsum_geometric]
+
+/-! ### Almost diagonal sums -/
+
+/-- **An almost diagonal sum in weighted `ℓ_q`**:
+`‖(2^(is) ∑_j c_{ij} a_j)_i‖_{ℓ_q} ≤ ((1 - 2^(-(L-s)))⁻¹ + (1 - 2^(-s))⁻¹) ‖(2^(js) a_j)_j‖_{ℓ_q}`
+with `c_{ij} = 2^(-(i-j)L)` for `j ≤ i` and `c_{ij} = 1` for `j > i`, by Hardy's inequalities for
+the sum below and the tail above the diagonal (finite for `0 < s < L`). -/
+theorem lqNorm_almostDiagonal_le (hq : 1 ≤ q) (s L : ℝ) (a : ℕ → ℝ≥0∞) :
+    lqNorm q (fun i => dyadicWeight s i *
+      ∑' j, (if j ≤ i then dyadicWeight (-L) (i - j) else 1) * a j) ≤
+      ((1 - (2 : ℝ≥0∞) ^ (-(L - s)))⁻¹ + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹) *
+        lqNorm q (fun j => dyadicWeight s j * a j) := by
+  set X := lqNorm q (fun j => dyadicWeight s j * a j)
+  have hsplit : ∀ i, ∑' j, (if j ≤ i then dyadicWeight (-L) (i - j) else 1) * a j =
+      ∑ j ∈ Finset.range (i + 1), dyadicWeight (-L) (i - j) * a j + ∑' t, a (t + (i + 1)) :=
+    fun i => by
+      rw [← Summable.sum_add_tsum_nat_add' (k := i + 1) ENNReal.summable]
+      congr 1
+      · refine Finset.sum_congr rfl fun j hj => ?_
+        have hji : j ≤ i := Nat.lt_succ_iff.1 (Finset.mem_range.1 hj)
+        simp only [hji, ↓reduceIte]
+      · refine tsum_congr fun t => ?_
+        have hti : ¬(t + (i + 1) ≤ i) := by omega
+        simp only [hti, ↓reduceIte, one_mul]
+  have hw : ∀ i j, j ≤ i → dyadicWeight s i * dyadicWeight (-L) (i - j) =
+      dyadicWeight (-(L - s)) i * (dyadicWeight (L - s) j * dyadicWeight s j) := by
+    intro i j hji
+    simp only [dyadicWeight]
+    rw [← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top,
+      ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top,
+      ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top, Nat.cast_sub hji]
+    congr 1
+    ring
+  have hP : lqNorm q (fun i => dyadicWeight s i *
+      ∑ j ∈ Finset.range (i + 1), dyadicWeight (-L) (i - j) * a j) ≤
+      (1 - (2 : ℝ≥0∞) ^ (-(L - s)))⁻¹ * X := by
+    have h := ENNReal.hardy_sum_le hq (L - s)
+      (fun j => dyadicWeight (L - s) j * (dyadicWeight s j * a j))
+    have h1 : (fun i => dyadicWeight s i *
+          ∑ j ∈ Finset.range (i + 1), dyadicWeight (-L) (i - j) * a j) =
+        fun i => dyadicWeight (-(L - s)) i *
+          ∑ j ∈ Finset.range (i + 1), dyadicWeight (L - s) j * (dyadicWeight s j * a j) := by
+      funext i
+      rw [Finset.mul_sum, Finset.mul_sum]
+      refine Finset.sum_congr rfl fun j hj => ?_
+      rw [← mul_assoc, hw i j (Nat.lt_succ_iff.1 (Finset.mem_range.1 hj))]
+      ring
+    have h2 : (fun k => dyadicWeight (-(L - s)) k *
+        (dyadicWeight (L - s) k * (dyadicWeight s k * a k))) = fun k => dyadicWeight s k * a k := by
+      funext k
+      rw [← mul_assoc, ENNReal.dyadicWeight_neg_mul_self, one_mul]
+    rw [h1]
+    rw [h2] at h
+    exact h
+  have hT : lqNorm q (fun i => dyadicWeight s i * ∑' t, a (t + (i + 1))) ≤
+      (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
+    refine (ENNReal.lqNorm_mono fun i => ?_).trans (ENNReal.hardy_tail_le hq s a)
+    have hinj : Function.Injective fun t : ℕ => t + 1 := add_left_injective 1
+    have htail : ∑' t, a (t + (i + 1)) ≤ ∑' n, a (i + n) :=
+      calc ∑' t, a (t + (i + 1)) = ∑' t, (fun n => a (i + n)) (t + 1) := by
+            congr 1
+            funext t
+            congr 1
+            omega
+        _ ≤ ∑' n, a (i + n) := ENNReal.tsum_comp_le_tsum_of_injective hinj (fun n => a (i + n))
+    exact mul_le_mul' le_rfl htail
+  calc lqNorm q (fun i => dyadicWeight s i *
+        ∑' j, (if j ≤ i then dyadicWeight (-L) (i - j) else 1) * a j)
+      = lqNorm q (fun i => dyadicWeight s i *
+          ∑ j ∈ Finset.range (i + 1), dyadicWeight (-L) (i - j) * a j +
+          dyadicWeight s i * ∑' t, a (t + (i + 1))) := by
+        congr 1
+        funext i
+        rw [hsplit i, mul_add]
+    _ ≤ lqNorm q (fun i => dyadicWeight s i *
+          ∑ j ∈ Finset.range (i + 1), dyadicWeight (-L) (i - j) * a j) +
+        lqNorm q (fun i => dyadicWeight s i * ∑' t, a (t + (i + 1))) :=
+        ENNReal.lqNorm_add_le hq _ _
+    _ ≤ (1 - (2 : ℝ≥0∞) ^ (-(L - s)))⁻¹ * X + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := add_le_add hP hT
+    _ = _ := by ring
 
 end ENNReal

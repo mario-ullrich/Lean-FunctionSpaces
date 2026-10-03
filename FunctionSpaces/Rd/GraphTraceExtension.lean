@@ -27,8 +27,9 @@ extension are `F_j(x) = g_j(Px) v_j(x)` (`Rd.LipschitzGraph.extLevel`), and
 `s + 1/p` on `V` is the one with smoothness `s` on `H`: `(s + 1/p) - n/p = s - (n-1)/p`.
 
 **The trace of the extension is `g`** (`Rd.LipschitzGraph.trace_graphExtension`): the partial sums
-`∑_{j ≤ J} F_j` are continuous with traces `∑_{j ≤ J} g_j → g`, and they converge to `E g` in
-`B^{1/p}_{p,1}`, where the trace is linear and continuous (`Rd.LipschitzGraph.trace_sub`,
+`∑_{j ≤ J} F_j` are continuous with traces `∑_{j ≤ J} g_j → g`
+(`Rd.LipschitzGraph.trace_sum_traceExtTerm`), and they converge to `E g` in `B^{1/p}_{p,1}`,
+where the trace is linear and continuous (`Rd.LipschitzGraph.trace_sub`,
 `Rd.LipschitzGraph.enorm_trace_le`). Together with the boundedness of the trace this describes the
 trace space (`Rd.LipschitzGraph.exists_trace_eq_iff`; Schneider–Vybíral, Theorem 4.11 for graph
 domains and `p ≥ 1`): `g` is the trace of a function with finite intrinsic
@@ -60,40 +61,6 @@ theorem min_one_rpow_mul_le (s : ℝ≥0∞) {a b : ℝ} (ha : 0 ≤ a) (hb : 0 
       (ENNReal.one_rpow _).symm.le.trans (ENNReal.rpow_le_rpow hs (add_nonneg ha hb))
     rw [min_eq_left hsab]
     exact (mul_le_mul' (min_le_left _ _) (min_le_left _ _)).trans_eq (one_mul 1)
-
-section Orders
-
-variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
-  [MeasurableSpace V] [BorelSpace V] {p : ℝ≥0∞} [Fact (1 ≤ p)]
-
-/-- `ω_{r+l}(f, t)_p ≤ 2^l ω_r(f, t)_p`. -/
-theorem lpModulus_add_order_le (r l : ℕ) (f : Lp ℂ p (volume : Measure V))
-    (k : ℕ) : lpModulus p (r + l) f k ≤ 2 ^ l * lpModulus p r f k := by
-  show modulus volume (r + l) p (f : V → ℂ) (1 / 2 ^ k) ≤
-    2 ^ l * modulus volume r p (f : V → ℂ) (1 / 2 ^ k)
-  refine iSup₂_le fun h hh => ?_
-  rw [add_comm r l, Function.iterate_add_apply]
-  exact (eLpNorm_higherDiff_le (aestronglyMeasurable_higherDiff (Lp.aestronglyMeasurable f) r h)
-    Fact.out l h).trans (mul_le_mul' le_rfl (eLpNorm_higherDiff_le_modulus hh))
-
-/-- The norm with moduli of order `L ≥ 2` is at most `2^(L-2)` times that with order `2`. -/
-theorem modNorm_order_le {L : ℕ} (hL : 2 ≤ L) (σ : ℝ) (q : ℝ≥0∞)
-    (G : Lp ℂ p (volume : Measure V)) :
-    ‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p L G k) ≤
-      2 ^ (L - 2) * (‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p 2 G k)) := by
-  have hL' : L = 2 + (L - 2) := by omega
-  rw [mul_add]
-  refine add_le_add (le_mul_of_one_le_left' (one_le_pow₀ one_le_two)) ?_
-  rw [← ENNReal.lqNorm_const_mul]
-  refine ENNReal.lqNorm_mono fun k => ?_
-  calc dyadicWeight σ k * lpModulus p L G k
-      ≤ dyadicWeight σ k * (2 ^ (L - 2) * lpModulus p 2 G k) := by
-        refine mul_le_mul' le_rfl ?_
-        conv_lhs => rw [hL']
-        exact lpModulus_add_order_le 2 (L - 2) G k
-    _ = 2 ^ (L - 2) * (dyadicWeight σ k * lpModulus p 2 G k) := by ring
-
-end Orders
 
 namespace LipschitzGraph
 
@@ -517,17 +484,79 @@ theorem intrinsicNorm_lt_top_of_modNorm (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L
       (ENNReal.mul_lt_top (by simp) hG)
   exact ⟨h1, Ω.intrinsicNorm_lt_top hp L σ hq h1⟩
 
+/-- **One level of the extension**: there are `C < ∞` and `N` such that for `0 < σ < 2`,
+`1 ≤ q ≤ ∞`, `g ∈ L_p(H)` and every level `j`,
+`‖F_j‖_p + ‖(2^(kσ) ω_2(F_j, 2^(-k))_p)_k‖_{ℓ_q} ≤ K_σ 2^(j(σ - 1/p)) ‖k_j ⋆ g‖_p` with
+`K_σ = Rd.atomSynthConst p N C 2 σ 2`: the level is a sum of the extended atoms
+(`Rd.LipschitzGraph.exists_extension_atoms`, `Rd.modNorm_level_le`). -/
+theorem exists_modNorm_traceExtTerm_le (hp : p ≠ ∞) :
+    ∃ (C : ℝ≥0∞) (N : ℕ), C ≠ ∞ ∧ ∀ {σ : ℝ}, 0 < σ → σ < 2 → ∀ {q : ℝ≥0∞}, 1 ≤ q →
+      ∀ (g : Lp ℂ p (volume : Measure Ω.hyperplane)) (j : ℕ),
+        ‖Ω.traceExtTerm hp j g‖ₑ + lqNorm q (fun k =>
+            dyadicWeight σ k * lpModulus p 2 (Ω.traceExtTerm hp j g) k) ≤
+          atomSynthConst p N C 2 σ 2 *
+            (dyadicWeight (σ - 1 / p.toReal) j * ‖Ω.graphBump.localMean hp 1 j g‖ₑ) := by
+  have hp0 : p ≠ 0 := (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne'
+  obtain ⟨C, N, hC, hatoms⟩ := Ω.exists_extension_atoms (p := p)
+  refine ⟨C, N, hC, fun {σ'} hσ' hσ'2 {q'} hq' g j => ?_⟩
+  obtain ⟨hat, hN⟩ := hatoms j (Lp.memLp (Ω.graphBump.localMean hp 1 j g))
+  refine (modNorm_level_le hp j (fun m => Ω.extendCenter j (cellCenter j m))
+    (fun m => Ω.extendAtom j (cellAtom p (Ω.graphBump.dual 1 j) j
+      (Ω.graphBump.localMean hp 1 j g) m)) (cellCoef p j (Ω.graphBump.localMean hp 1 j g))
+    (fun x S hS => hN x S fun m hm => ⟨(hS m hm).1, by simpa using (hS m hm).2⟩) hat
+    ((Ω.traceExtTerm_ae hp j g).mono fun x hx => hx.trans (Ω.extLevel_eq_tsum hp j g x))
+    hσ' hσ'2 hq').trans_eq ?_
+  rw [levelNorm_cellCoef hp0 hp (Lp.memLp _) j, ← Lp.enorm_def]
+  congr 1
+  rw [← mul_assoc, ← ENNReal.dyadicWeight_add, Ω.finrank_hyperplane_eq]
+  congr 2
+  ring
+
+/-- **The traces of the partial sums of the extension** are the partial sums of the reproducing
+formula on `H`: `Tr (∑_{j ≤ J} F_j) = ∑_{j ≤ J} η_j ⋆ (k_j ⋆ g)`, since the partial sums are
+continuous with the values `∑_{j ≤ J} (η_j ⋆ (k_j ⋆ g))(x')` on the graph
+(`Rd.LipschitzGraph.trace_ae_eq_comp_graphMap`). -/
+theorem trace_sum_traceExtTerm (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s)
+    {q : ℝ≥0∞} (hq : 1 ≤ q) (g : Lp ℂ p (volume : Measure Ω.hyperplane)) (J : ℕ)
+    (hFJ : ‖∑ j ∈ Finset.range (J + 1), Ω.traceExtTerm hp j g‖ₑ + lqNorm q (fun k =>
+      dyadicWeight (s + 1 / p.toReal) k *
+        lpModulus p 2 (∑ j ∈ Finset.range (J + 1), Ω.traceExtTerm hp j g) k) < ∞) :
+    Ω.trace hp L (∑ j ∈ Finset.range (J + 1), Ω.traceExtTerm hp j g) =
+      ∑ j ∈ Finset.range (J + 1),
+        convLp hp (Ω.graphBump.integrable_dual 1 j) (Ω.graphBump.localMean hp 1 j g) := by
+  have hcont : Continuous fun x => ∑ j ∈ Finset.range (J + 1), Ω.extLevel hp j g x :=
+    continuous_finsetSum _ fun j _ => Ω.continuous_extLevel hp j g
+  have hae : ((∑ j ∈ Finset.range (J + 1), Ω.traceExtTerm hp j g :
+      Lp ℂ p (volume : Measure V)) : V → ℂ) =ᵐ[volume]
+        fun x => ∑ j ∈ Finset.range (J + 1), Ω.extLevel hp j g x := by
+    filter_upwards [Lp.coeFn_fun_finsetSum (Finset.range (J + 1))
+      (fun j => Ω.traceExtTerm hp j g), ae_all_iff.2 fun j => Ω.traceExtTerm_ae hp j g]
+      with x hx1 hx2
+    rw [hx1]
+    exact Finset.sum_congr rfl fun j _ => hx2 j
+  have htr := Ω.trace_ae_eq_comp_graphMap hp (by omega) hs hq
+    (Ω.intrinsicNorm_lt_top_of_modNorm hp hL hq hFJ).1 hcont hae
+  refine Lp.ext ?_
+  filter_upwards [htr, Lp.coeFn_fun_finsetSum (Finset.range (J + 1))
+    (fun j => convLp hp (Ω.graphBump.integrable_dual 1 j) (Ω.graphBump.localMean hp 1 j g)),
+    ae_all_iff.2 fun j => convLp_apply_ae hp (Ω.graphBump.integrable_dual 1 j)
+      (Ω.graphBump.localMean hp 1 j g)] with x' h1 h2 h3
+  rw [h1, h2, Function.comp_apply]
+  refine Finset.sum_congr rfl fun j _ => ?_
+  rw [h3 j, extLevel, Ω.extendAtom_graphMap]
+  rfl
+
 /-- **The trace of the extension** (Schneider–Vybíral, Theorem 4.11, for `p ≥ 1`): for
 `0 < s < 1`, `L ≥ 2` and `g ∈ L_p(H)` with `‖g‖_p + ‖(2^(ks) ω_1(g, 2^(-k))_p)_k‖_{ℓ_q} < ∞`,
 `Tr (E g) = g`. The partial sums `∑_{j ≤ J} F_j` are continuous with traces
 `∑_{j ≤ J} η_j ⋆ (k_j ⋆ g) → g` (`Rd.LipschitzGraph.trace_ae_eq_comp_graphMap`), and they converge
-to `E g` in `B^{1/p}_{p,1}`, where the trace is continuous (`Rd.LipschitzGraph.enorm_trace_le`). -/
+to `E g` in `B^{1/p}_{p,1}`, where the trace is continuous
+(`Rd.LipschitzGraph.tendsto_trace_of_modNorm_sub_le`). -/
 theorem trace_graphExtension (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1)
     {q : ℝ≥0∞} (hq : 1 ≤ q) {g : Lp ℂ p (volume : Measure Ω.hyperplane)}
     (hg : ‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 g k) < ∞) :
     Ω.trace hp L (Ω.graphExtension hp g) = g := by
   have hp1 : 1 ≤ p := Fact.out
-  have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
   have hpr : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp1 hp
   have hpinv0 : 0 < 1 / p.toReal := by positivity
   have hpinv1 : 1 / p.toReal ≤ 1 := by rw [div_le_one (by linarith)]; exact hpr
@@ -538,28 +567,10 @@ theorem trace_graphExtension (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ}
     (ENNReal.mul_lt_top (Ω.graphBump.upperConst_ne_top 1 s).lt_top hg)
   set T : ℕ → Lp ℂ p (volume : Measure V) := fun j => Ω.traceExtTerm hp j g
   have hsum : Summable T := Ω.summable_traceExtTerm hp hs hq hX
-  obtain ⟨C, N, hC, hatoms⟩ := Ω.exists_extension_atoms (p := p)
-  -- the bounds of one level
-  have hlevel : ∀ {σ' : ℝ}, 0 < σ' → σ' < 2 → ∀ {q' : ℝ≥0∞}, 1 ≤ q' → ∀ j,
-      ‖T j‖ₑ + lqNorm q' (fun k => dyadicWeight σ' k * lpModulus p 2 (T j) k) ≤
-        atomSynthConst p N C 2 σ' 2 *
-          (dyadicWeight (σ' - 1 / p.toReal) j * ‖Ω.graphBump.localMean hp 1 j g‖ₑ) := by
-    intro σ' hσ' hσ'2 q' hq' j
-    obtain ⟨hat, hN⟩ := hatoms j (Lp.memLp (Ω.graphBump.localMean hp 1 j g))
-    refine (modNorm_level_le hp j (fun m => Ω.extendCenter j (cellCenter j m))
-      (fun m => Ω.extendAtom j (cellAtom p (Ω.graphBump.dual 1 j) j
-        (Ω.graphBump.localMean hp 1 j g) m)) (cellCoef p j (Ω.graphBump.localMean hp 1 j g))
-      (fun x S hS => hN x S fun m hm => ⟨(hS m hm).1, by simpa using (hS m hm).2⟩) hat
-      ((Ω.traceExtTerm_ae hp j g).mono fun x hx => hx.trans (Ω.extLevel_eq_tsum hp j g x))
-      hσ' hσ'2 hq').trans_eq ?_
-    rw [levelNorm_cellCoef hp0 hp (Lp.memLp _) j, ← Lp.enorm_def]
-    congr 1
-    rw [← mul_assoc, ← ENNReal.dyadicWeight_add, Ω.finrank_hyperplane_eq]
-    congr 2
-    ring
+  obtain ⟨C, N, hC, hlevel⟩ := Ω.exists_modNorm_traceExtTerm_le hp
   have hfinT : ∀ j, ‖T j‖ₑ + lqNorm q
       (fun k => dyadicWeight (s + 1 / p.toReal) k * lpModulus p 2 (T j) k) < ∞ := fun j =>
-    (hlevel hσ0 hσ2 hq j).trans_lt (ENNReal.mul_lt_top
+    (hlevel hσ0 hσ2 hq g j).trans_lt (ENNReal.mul_lt_top
       (atomSynthConst_ne_top hp1 N hC 2 hσ0 hσ2).lt_top (ENNReal.mul_lt_top
         (ENNReal.dyadicWeight_lt_top _ _) enorm_lt_top))
   -- the finite norms of the extension and of its partial sums
@@ -579,99 +590,37 @@ theorem trace_graphExtension (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ}
   have hQT : ∀ j, Q (T j) ≤ 2 ^ (L - 2) * K1 * ‖Ω.graphBump.localMean hp 1 j g‖ₑ := fun j => by
     refine (modNorm_order_le hL _ 1 (T j)).trans ?_
     rw [mul_assoc]
-    refine mul_le_mul' le_rfl ((hlevel hpinv0 (by linarith) le_rfl j).trans_eq ?_)
+    refine mul_le_mul' le_rfl ((hlevel hpinv0 (by linarith) le_rfl g j).trans_eq ?_)
     rw [sub_self, ENNReal.dyadicWeight_zero_left, one_mul]
   have hQtail : ∀ J, Q (∑' i, T (i + (J + 1))) ≤
-      ∑' i, 2 ^ (L - 2) * K1 * ‖Ω.graphBump.localMean hp 1 (i + (J + 1)) g‖ₑ := fun J => by
-    have hsumJ : Summable fun i => T (i + (J + 1)) := (summable_nat_add_iff (J + 1)).2 hsum
-    have htend : Tendsto (fun I => ∑ i ∈ Finset.range (I + 1), T (i + (J + 1))) atTop
-        (𝓝 (∑' i, T (i + (J + 1)))) :=
-      (hsumJ.hasSum.tendsto_sum_nat).comp (tendsto_add_atTop_nat 1)
-    have hmod : ∀ k, lpModulus p L (∑' i, T (i + (J + 1))) k ≤
-        ∑' i, lpModulus p L (T (i + (J + 1))) k := fun k =>
-      ENNReal.le_tsum_of_tendsto_sum (C := 2 ^ L) (by simp) (fun x y => lpModulus_add_le L x y k)
-        (fun x => lpModulus_le L x k) htend
-    calc Q (∑' i, T (i + (J + 1)))
-        ≤ ∑' i, ‖T (i + (J + 1))‖ₑ + ∑' i, lqNorm 1
-            (fun k => dyadicWeight (1 / p.toReal) k * lpModulus p L (T (i + (J + 1))) k) := by
-          refine add_le_add enorm_tsum_le_tsum_enorm ?_
-          rw [ENNReal.lqNorm_one]
-          simp_rw [ENNReal.lqNorm_one]
-          rw [ENNReal.tsum_comm]
-          refine ENNReal.tsum_le_tsum fun k => ?_
-          rw [ENNReal.tsum_mul_left]
-          exact mul_le_mul' le_rfl (hmod k)
-      _ = ∑' i, Q (T (i + (J + 1))) := (ENNReal.tsum_add).symm
-      _ ≤ _ := ENNReal.tsum_le_tsum fun i => hQT _
+      ∑' i, 2 ^ (L - 2) * K1 * ‖Ω.graphBump.localMean hp 1 (i + (J + 1)) g‖ₑ := fun J =>
+    (modNorm_one_tsum_le L (1 / p.toReal) ((summable_nat_add_iff (J + 1)).2 hsum)).trans
+      (ENNReal.tsum_le_tsum fun i => hQT (i + (J + 1)))
   -- the tails tend to `0`
   have hhsum : ∑' j, 2 ^ (L - 2) * K1 * ‖Ω.graphBump.localMean hp 1 j g‖ₑ ≠ ∞ := by
     rw [ENNReal.tsum_mul_left]
-    refine ENNReal.mul_ne_top (ENNReal.mul_ne_top (by simp) hK1) ?_
-    refine ne_top_of_le_ne_top (b := ∑' j, X * dyadicWeight (-s) j) ?_
-      (ENNReal.tsum_le_tsum fun j => ?_)
-    · rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg]
-      exact ENNReal.mul_ne_top hX.ne (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)
-    · have hXj : dyadicWeight s j * ‖Ω.graphBump.localMean hp 1 j g‖ₑ ≤ X :=
-        ENNReal.le_lqNorm (zero_lt_one.trans_le hq).ne'
-          (fun j => dyadicWeight s j * ‖Ω.graphBump.localMean hp 1 j g‖ₑ) j
-      calc ‖Ω.graphBump.localMean hp 1 j g‖ₑ
-          = dyadicWeight (-s) j * (dyadicWeight s j * ‖Ω.graphBump.localMean hp 1 j g‖ₑ) := by
-            rw [← mul_assoc, ENNReal.dyadicWeight_neg_mul_self, one_mul]
-        _ ≤ dyadicWeight (-s) j * X := mul_le_mul' le_rfl hXj
-        _ = X * dyadicWeight (-s) j := mul_comm _ _
+    exact ENNReal.mul_ne_top (ENNReal.mul_ne_top (by simp) hK1) (ne_top_of_le_ne_top
+      (ENNReal.mul_ne_top (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs) hX.ne)
+      (ENNReal.tsum_le_lqNorm_dyadicWeight hq s _))
   have htail : Tendsto (fun J => ∑' i, 2 ^ (L - 2) * K1 *
       ‖Ω.graphBump.localMean hp 1 (i + (J + 1)) g‖ₑ) atTop (𝓝 0) :=
     (ENNReal.tendsto_sum_nat_add _ hhsum).comp (tendsto_add_atTop_nat 1)
   -- the traces of the partial sums converge to the trace of the extension
-  obtain ⟨KT, hKT, hTle⟩ := Ω.enorm_trace_le hp L
-  have hint : ∀ {G : Lp ℂ p (volume : Measure V)}, ‖G‖ₑ + lqNorm q (fun k =>
-      dyadicWeight (s + 1 / p.toReal) k * lpModulus p 2 G k) < ∞ →
-        Ω.intrinsicNorm hp L (s + 1 / p.toReal) q G < ∞ := fun hG =>
-    (Ω.intrinsicNorm_lt_top_of_modNorm hp hL hq hG).2
-  have htail' : Tendsto (fun J => KT * ∑' i, 2 ^ (L - 2) * K1 *
-      ‖Ω.graphBump.localMean hp 1 (i + (J + 1)) g‖ₑ) atTop (𝓝 0) := by
-    simpa using ENNReal.Tendsto.const_mul htail (Or.inr hKT)
-  have htail'' : Tendsto (fun J => (KT * ∑' i, 2 ^ (L - 2) * K1 *
-      ‖Ω.graphBump.localMean hp 1 (i + (J + 1)) g‖ₑ).toReal) atTop (𝓝 0) := by
-    have h := (ENNReal.tendsto_toReal ENNReal.zero_ne_top).comp htail'
-    rwa [ENNReal.toReal_zero] at h
-  have hconv : Tendsto (fun J => Ω.trace hp L (∑ j ∈ Finset.range (J + 1), T j)) atTop
-      (𝓝 (Ω.trace hp L (Ω.graphExtension hp g))) := by
-    rw [tendsto_iff_norm_sub_tendsto_zero]
-    refine squeeze_zero (fun J => norm_nonneg _) (fun J => ?_) htail''
-    have hsplit : Ω.graphExtension hp g - ∑ j ∈ Finset.range (J + 1), T j =
-        ∑' i, T (i + (J + 1)) := by
-      rw [graphExtension, ← hsum.sum_add_tsum_nat_add (J + 1)]
-      abel
-    rw [norm_sub_rev, ← Ω.trace_sub hp L hs hq (hint hF) (hint (hFJ J)), hsplit, ← toReal_enorm]
-    refine ENNReal.toReal_mono (ENNReal.mul_ne_top hKT (ne_top_of_le_ne_top hhsum
-      (ENNReal.tsum_comp_le_tsum_of_injective (add_left_injective (J + 1))
-        (fun j => 2 ^ (L - 2) * K1 * ‖Ω.graphBump.localMean hp 1 j g‖ₑ))))
-      ((hTle _).trans (mul_le_mul' le_rfl (hQtail J)))
+  have hsplit : ∀ J, Ω.graphExtension hp g - ∑ j ∈ Finset.range (J + 1), T j =
+      ∑' i, T (i + (J + 1)) := fun J => by
+    rw [graphExtension, ← hsum.sum_add_tsum_nat_add (J + 1)]
+    abel
+  have hconv := Ω.tendsto_trace_of_modNorm_sub_le hp L hs hq
+    (Ω.intrinsicNorm_lt_top_of_modNorm hp hL hq hF).2
+    (fun J => (Ω.intrinsicNorm_lt_top_of_modNorm hp hL hq (hFJ J)).2) htail
+    (fun J => ne_top_of_le_ne_top hhsum (ENNReal.tsum_comp_le_tsum_of_injective
+      (add_left_injective (J + 1)) fun j => 2 ^ (L - 2) * K1 * ‖Ω.graphBump.localMean hp 1 j g‖ₑ))
+    fun J => by rw [hsplit J]; exact hQtail J
   -- the traces of the partial sums are the partial sums of the reproducing formula on `H`
   have hpart : ∀ J, Ω.trace hp L (∑ j ∈ Finset.range (J + 1), T j) =
       ∑ j ∈ Finset.range (J + 1),
-        convLp hp (Ω.graphBump.integrable_dual 1 j) (Ω.graphBump.localMean hp 1 j g) := by
-    intro J
-    have hcont : Continuous fun x => ∑ j ∈ Finset.range (J + 1), Ω.extLevel hp j g x :=
-      continuous_finsetSum _ fun j _ => Ω.continuous_extLevel hp j g
-    have hae : ((∑ j ∈ Finset.range (J + 1), T j : Lp ℂ p (volume : Measure V)) : V → ℂ) =ᵐ[volume]
-        fun x => ∑ j ∈ Finset.range (J + 1), Ω.extLevel hp j g x := by
-      filter_upwards [Lp.coeFn_fun_finsetSum (Finset.range (J + 1)) T,
-        ae_all_iff.2 fun j => Ω.traceExtTerm_ae hp j g] with x hx1 hx2
-      rw [hx1]
-      exact Finset.sum_congr rfl fun j _ => hx2 j
-    have htr := Ω.trace_ae_eq_comp_graphMap hp (by omega) hs hq
-      (Ω.intrinsicNorm_lt_top_of_modNorm hp hL hq (hFJ J)).1 hcont hae
-    refine Lp.ext ?_
-    filter_upwards [htr, Lp.coeFn_fun_finsetSum (Finset.range (J + 1))
-      (fun j => convLp hp (Ω.graphBump.integrable_dual 1 j) (Ω.graphBump.localMean hp 1 j g)),
-      ae_all_iff.2 fun j => convLp_apply_ae hp (Ω.graphBump.integrable_dual 1 j)
-        (Ω.graphBump.localMean hp 1 j g)] with x' h1 h2 h3
-    rw [h1, h2, Function.comp_apply]
-    refine Finset.sum_congr rfl fun j _ => ?_
-    rw [h3 j, extLevel, Ω.extendAtom_graphMap]
-    rfl
+        convLp hp (Ω.graphBump.integrable_dual 1 j) (Ω.graphBump.localMean hp 1 j g) := fun J =>
+    Ω.trace_sum_traceExtTerm hp hL hs hq g J (hFJ J)
   have hlim := Ω.graphBump.tendsto_sum_dual_localMean hp le_rfl g
   simp_rw [← hpart] at hlim
   exact tendsto_nhds_unique hconv hlim

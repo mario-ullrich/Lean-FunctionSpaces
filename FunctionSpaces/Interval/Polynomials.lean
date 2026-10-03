@@ -269,4 +269,13 @@ theorem enorm_polyFun_le (r : ℕ) (hp : p ≠ ∞) : ∃ K : ℝ≥0∞, K ≠ 
         gcongr
         linarith
 
+/-- The polynomial `P̄` with conjugate coefficients takes the values `P̄(x) = conj P(x)` at real
+points. -/
+theorem polyFun_map_conj (P : ℂ[X]) (x : ℝ) :
+    polyFun (P.map (starRingEnd ℂ)) x = starRingEnd ℂ (polyFun P x) := by
+  have h : (x : ℂ) = starRingEnd ℂ (x : ℂ) := (Complex.conj_ofReal x).symm
+  calc polyFun (P.map (starRingEnd ℂ)) x = P.eval₂ (starRingEnd ℂ) (starRingEnd ℂ (x : ℂ)) := by
+        rw [polyFun, eval_map, ← h]
+    _ = starRingEnd ℂ (polyFun P x) := eval₂_at_apply _ _
+
 end Interval

@@ -12,7 +12,8 @@ public import FunctionSpaces.Rd.Differences
 # Differences of convolutions and dilations
 
 Differences commute with convolution and dilation: `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost
-everywhere for an integrable `K` and `f ∈ L_p` (`Rd.higherDiff_conv_ae`), and
+everywhere for an integrable `K` and `f ∈ L_p` (`Rd.higherDiff_conv_ae`), pointwise where
+the convolutions with the translates of `K` converge absolutely (`Rd.higherDiff_conv_apply`), and
 `Δ_h^r (Φ_c) = (Δ_{ch}^r Φ)_c` (`Rd.higherDiff_dilate`).  Young's inequality then bounds the modulus
 of a convolution by the `L_1` norms of the differences of the kernel (`Rd.lpModulus_convLp_le`).
 -/
@@ -79,5 +80,30 @@ theorem lpModulus_convLp_le (hp : p ≠ ∞) {K : V → ℂ} (hK : Integrable K 
   rw [eLpNorm_congr_ae (higherDiff_conv_ae Fact.out hp hK (Lp.memLp h) r v), Lp.enorm_def]
   exact (eLpNorm_conv_le Fact.out hp (integrable_higherDiff hK r v).aestronglyMeasurable
     (Lp.aestronglyMeasurable h)).trans (by gcongr; exact hB v hv)
+
+end Rd
+
+namespace Rd
+
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+  [MeasurableSpace V] [BorelSpace V]
+
+/-! ### Differences of convolutions, pointwise -/
+
+/-- **Differences of convolutions**: `Δ_h^r (K ⋆ g) = (Δ_h^r K) ⋆ g` where the convolutions with
+the translates of `K` converge absolutely. -/
+theorem higherDiff_conv_apply {K g : V → ℂ}
+    (hK : ∀ v x, Integrable (fun y => K (y + v) * g (x - y)) volume) (r : ℕ) (h x : V) :
+    (fwdDiff h)^[r] (conv K g volume) x = conv ((fwdDiff h)^[r] K) g volume x := by
+  rw [higherDiff_apply, conv_apply]
+  simp_rw [higherDiff_apply, Finset.sum_mul]
+  rw [integral_finsetSum _ fun l _ => ?_]
+  · refine Finset.sum_congr rfl fun l _ => ?_
+    rw [conv_add_apply, ← integral_const_mul]
+    congr 1
+    funext y
+    ring
+  · exact ((hK ((l : ℝ) • h) x).const_mul ((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ))).congr
+      (Eventually.of_forall fun y => by ring)
 
 end Rd

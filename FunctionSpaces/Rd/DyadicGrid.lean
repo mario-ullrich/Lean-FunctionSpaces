@@ -7,6 +7,7 @@ module
 
 public import FunctionSpaces.Rd.Convolution
 public import Mathlib.MeasureTheory.Function.Floor
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 
 /-!
 # The dyadic grid of a finite-dimensional inner product space
@@ -18,7 +19,11 @@ In the coordinates `x_i = ⟪b_i, x⟫` of the orthonormal basis `b = stdOrthono
 `‖x - c_{j,m}‖ ≤ n 2^(-j)` on `P_{j,m}` (`Rd.norm_sub_cellCenter_le`). **Counting**: at most
 `(2ρ + 2)^n` centres of level `j` lie in a ball of radius `ρ 2^(-j)`
 (`Rd.card_le_of_norm_cellCenter_sub_le`), since each coordinate of such a centre lies in an
-interval of length `2ρ 2^(-j)`.
+interval of length `2ρ 2^(-j)`. The cells of one level split integrals and `L_p` norms into sums
+(`Rd.lintegral_eq_tsum_cell`, `Rd.eLpNorm_rpow_eq_tsum_cell`).
+
+**Bounded overlap**: if at every point at most `N` of the functions `g_m` are nonzero and
+`F = ∑_m g_m`, then `‖F‖_p^p ≤ N^(p-1) ∑_m ‖g_m‖_p^p` (`Rd.eLpNorm_rpow_le_of_overlap`).
 -/
 
 @[expose] public section
@@ -150,5 +155,110 @@ theorem card_le_of_norm_cellCenter_sub_le (j : ℕ) (x : V) {ρ : ℝ} (hρ : 0 
           linarith
     _ = (2 * ρ + 2) ^ finrank ℝ V := by
         rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
+
+/-! ### The cells partition the space -/
+
+section Partition
+
+variable [MeasurableSpace V] [BorelSpace V]
+
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- Cells of the same level with different indices are disjoint. -/
+theorem cell_disjoint (j : ℕ) : Pairwise (Function.onFun Disjoint (cell (V := V) j)) :=
+  fun _ _ hmm' => Set.disjoint_left.2 fun _ hx hx' => hmm' (hx.symm.trans hx')
+
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- The cells of one level cover the space. -/
+theorem iUnion_cell (j : ℕ) : ⋃ m, cell (V := V) j m = Set.univ :=
+  Set.eq_univ_of_forall fun x => Set.mem_iUnion.2 ⟨_, mem_cell_cellIndex j x⟩
+
+/-- `∫ F = ∑_m ∫_{P_{j,m}} F`. -/
+theorem lintegral_eq_tsum_cell (j : ℕ) (F : V → ℝ≥0∞) :
+    ∫⁻ x, F x = ∑' m, ∫⁻ x in cell j m, F x := by
+  rw [← lintegral_iUnion (measurableSet_cell j) (cell_disjoint j), iUnion_cell,
+    Measure.restrict_univ]
+
+/-- `‖g‖_p^p = ∑_m ‖1_{P_{j,m}} g‖_p^p`. -/
+theorem eLpNorm_rpow_eq_tsum_cell {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {g : V → ℂ}
+    (hg : AEStronglyMeasurable g volume) (j : ℕ) :
+    eLpNorm g p volume ^ p.toReal =
+      ∑' m, eLpNorm ((cell j m).indicator g) p volume ^ p.toReal := by
+  rw [eLpNorm_rpow_eq hg hp0 hp, lintegral_eq_tsum_cell j]
+  congr 1
+  funext m
+  rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_cell j m),
+    eLpNorm_rpow_eq hg.restrict hp0 hp]
+
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- **Bounded overlap of the centres**: at most `⌈(2ρ + 2)^n⌉` centres of level `j` lie in a
+ball of radius `ρ 2^(-j)`. -/
+theorem card_le_of_norm_sub_cellCenter_le (j : ℕ) {ρ : ℝ} (hρ : 0 ≤ ρ) (x : V)
+    (S : Finset (Fin (finrank ℝ V) → ℤ)) (hS : ∀ m ∈ S, ‖x - cellCenter j m‖ ≤ ρ / 2 ^ j) :
+    S.card ≤ ⌈(2 * ρ + 2) ^ finrank ℝ V⌉₊ := by
+  have h := card_le_of_norm_cellCenter_sub_le j x hρ S fun m hm => by
+    rw [norm_sub_rev]
+    exact hS m hm
+  exact_mod_cast h.trans (Nat.le_ceil _)
+
+end Partition
+
+/-! ### Bounded overlap -/
+
+/-- If every finite set of indices with property `P` has at most `N` elements, the indices with
+property `P` form a finite set with at most `N` elements. -/
+theorem exists_finset_of_card_le {ι : Type*} {P : ι → Prop} {N : ℕ}
+    (h : ∀ S : Finset ι, (∀ m ∈ S, P m) → S.card ≤ N) :
+    ∃ T : Finset ι, (∀ m, P m → m ∈ T) ∧ T.card ≤ N := by
+  have hfin : {m | P m}.Finite := by
+    by_contra hinf
+    obtain ⟨S, hS, hcard⟩ := Set.Infinite.exists_subset_card_eq hinf (N + 1)
+    have := h S fun m hm => hS hm
+    omega
+  exact ⟨hfin.toFinset, fun m hm => hfin.mem_toFinset.2 hm,
+    h _ fun m hm => hfin.mem_toFinset.1 hm⟩
+
+/-- **Bounded overlap, pointwise**: if at most `N` of the `g m` are nonzero, then
+`‖∑' m, g m‖^p ≤ N^(p-1) ∑' m, ‖g m‖^p` for `p ≥ 1`. -/
+theorem enorm_tsum_rpow_le_of_overlap {ι : Type*} (g : ι → ℂ) {N : ℕ}
+    (hN : ∀ S : Finset ι, (∀ m ∈ S, g m ≠ 0) → S.card ≤ N) {p : ℝ} (hp : 1 ≤ p) :
+    ‖∑' m, g m‖ₑ ^ p ≤ (N : ℝ≥0∞) ^ (p - 1) * ∑' m, ‖g m‖ₑ ^ p := by
+  obtain ⟨T, hT, hTN⟩ := exists_finset_of_card_le hN
+  have hzero : ∀ m ∉ T, g m = 0 := fun m hm => by_contra fun h => hm (hT m h)
+  rw [tsum_eq_sum hzero]
+  calc ‖∑ m ∈ T, g m‖ₑ ^ p ≤ (∑ m ∈ T, ‖g m‖ₑ) ^ p :=
+        ENNReal.rpow_le_rpow (enorm_sum_le _ _) (by linarith)
+    _ ≤ (T.card : ℝ≥0∞) ^ (p - 1) * ∑ m ∈ T, ‖g m‖ₑ ^ p :=
+        ENNReal.rpow_sum_le_const_mul_sum_rpow _ _ hp
+    _ ≤ (N : ℝ≥0∞) ^ (p - 1) * ∑' m, ‖g m‖ₑ ^ p :=
+        mul_le_mul' (ENNReal.rpow_le_rpow (by exact_mod_cast hTN) (by linarith))
+          (ENNReal.sum_le_tsum _)
+
+/-- **Bounded overlap in `L_p`**: if at every point at most `N` of the `g m` are nonzero and
+`F = ∑' m, g m` almost everywhere, then `‖F‖_p^p ≤ N^(p-1) ∑' m, ‖g m‖_p^p`. -/
+theorem eLpNorm_rpow_le_of_overlap {α : Type*} [MeasurableSpace α] {μ : Measure α}
+    {ι : Type*} [Countable ι] {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {g : ι → α → ℂ}
+    (hg : ∀ m, AEStronglyMeasurable (g m) μ) {N : ℕ}
+    (hN : ∀ x (S : Finset ι), (∀ m ∈ S, g m x ≠ 0) → S.card ≤ N) {F : α → ℂ}
+    (hF : AEStronglyMeasurable F μ) (hFg : ∀ᵐ x ∂μ, F x = ∑' m, g m x) :
+    eLpNorm F p μ ^ p.toReal ≤
+      (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, eLpNorm (g m) p μ ^ p.toReal := by
+  have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
+  have hpr : 1 ≤ p.toReal := by
+    rw [← ENNReal.toReal_one]
+    exact ENNReal.toReal_mono hp hp1
+  rw [eLpNorm_rpow_eq hF hp0 hp]
+  calc ∫⁻ x, ‖F x‖ₑ ^ p.toReal ∂μ
+      ≤ ∫⁻ x, (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, ‖g m x‖ₑ ^ p.toReal ∂μ := by
+        refine lintegral_mono_ae ?_
+        filter_upwards [hFg] with x hx
+        rw [hx]
+        exact enorm_tsum_rpow_le_of_overlap (fun m => g m x) (hN x) hpr
+    _ = (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, ∫⁻ x, ‖g m x‖ₑ ^ p.toReal ∂μ := by
+        rw [lintegral_const_mul' _ _ (ENNReal.rpow_ne_top_of_nonneg (by linarith)
+          (ENNReal.natCast_ne_top N)), lintegral_tsum fun m => ((hg m).enorm.pow_const _)]
+    _ = (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, eLpNorm (g m) p μ ^ p.toReal := by
+        congr 2
+        funext m
+        rw [eLpNorm_rpow_eq (hg m) hp0 hp]
 
 end Rd

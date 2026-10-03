@@ -36,6 +36,10 @@ overlap on `H` (`Rd.LipschitzGraph.exists_trace_atoms`). With `‖λ_{j,·}‖_{
 the coefficient quasi-norm on `H` is at most `‖(2^(j(s+1/p)) ‖h_j‖_p)_j‖_{ℓ_q}`, since
 `s - (n-1)/p = (s + 1/p) - n/p`, and the atomic synthesis on `H` (`Rd.modNorm_le_coeffNorm`)
 concludes (`Rd.LipschitzGraph.modNorm_traceSeries_le`).
+
+The trace is linear (`Rd.LipschitzGraph.trace_sub`) and bounded by the norm of `B^{1/p}_{p,1}`
+(`Rd.LipschitzGraph.enorm_trace_le`), hence continuous along sequences that converge in this norm
+(`Rd.LipschitzGraph.tendsto_trace_of_modNorm_sub_le`).
 -/
 
 @[expose] public section
@@ -46,138 +50,6 @@ open scoped ENNReal
 open ENNReal (lqNorm dyadicWeight)
 
 namespace Rd
-
-section ApproxIdentity
-
-variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
-  [MeasurableSpace V] [BorelSpace V]
-
-/-- **Approximate identities at points of continuity**: if `Φ` is integrable with `∫ Φ = 1` and
-vanishes outside `B̄(0, R)`, and `F_J(z) → z₀` as `J → ∞` and `z → y`, then
-`(Φ_{2^J} ⋆ F_J)(z) → z₀` as `J → ∞` and `z → y`: for every `ε > 0` there are `J₀` and `δ > 0`
-with `|(Φ_{2^J} ⋆ F_J)(z) - z₀| < ε` for `J ≥ J₀` and `‖z - y‖ < δ`. Since `∫ Φ_{2^J} = 1`,
-`(Φ_{2^J} ⋆ F_J)(z) - z₀ = ∫ Φ_{2^J}(w) (F_J(z - w) - z₀) dw`, and only `‖w‖ ≤ R 2^(-J)` enters. -/
-theorem conv_dilate_near {Φ : V → ℂ} (hΦ : Integrable Φ) (h1 : ∫ x, Φ x = 1) {R : ℝ}
-    (hR : 0 ≤ R) (hΦR : ∀ w, R < ‖w‖ → Φ w = 0) {F : ℕ → V → ℂ}
-    (hFm : ∀ J, AEStronglyMeasurable (F J) volume) {y : V} {z₀ : ℂ}
-    (hF : ∀ ε > 0, ∃ J₀ : ℕ, ∃ δ > 0, ∀ J ≥ J₀, ∀ z, ‖z - y‖ < δ → ‖F J z - z₀‖ < ε) :
-    ∀ ε > 0, ∃ J₀ : ℕ, ∃ δ > 0, ∀ J ≥ J₀, ∀ z, ‖z - y‖ < δ →
-      ‖conv (dilate (2 ^ J) Φ) (F J) volume z - z₀‖ < ε := by
-  intro ε hε
-  have hM : 0 ≤ ∫ x, ‖Φ x‖ := integral_nonneg fun _ => norm_nonneg _
-  obtain ⟨J₁, δ₁, hδ₁, hJ₁⟩ := hF (ε / ((∫ x, ‖Φ x‖) + 1)) (by positivity)
-  obtain ⟨J₂, hJ₂⟩ := pow_unbounded_of_one_lt (2 * R / δ₁) (one_lt_two : (1 : ℝ) < 2)
-  have hJ₂' : ∀ J ≥ J₂, R / 2 ^ J < δ₁ / 2 := fun J hJ => by
-    have h2 : (2 : ℝ) ^ J₂ ≤ 2 ^ J := pow_le_pow_right₀ one_le_two hJ
-    rw [div_lt_div_iff₀ (by positivity) two_pos]
-    rw [div_lt_iff₀ hδ₁] at hJ₂
-    nlinarith
-  refine ⟨max J₁ J₂, δ₁ / 2, half_pos hδ₁, fun J hJ z hz => ?_⟩
-  have hJ1 : J₁ ≤ J := le_of_max_le_left hJ
-  have hJ2 : J₂ ≤ J := le_of_max_le_right hJ
-  have hΦ' : Integrable (dilate ((2 : ℝ) ^ J) Φ) := integrable_dilate hΦ (by positivity)
-  have hsupp : ∀ w, dilate ((2 : ℝ) ^ J) Φ w ≠ 0 → ‖w‖ < δ₁ / 2 := fun w hw => by
-    by_contra hcon
-    push Not at hcon
-    apply hw
-    rw [dilate, hΦR _ ?_, mul_zero]
-    rw [norm_smul, Real.norm_of_nonneg (by positivity)]
-    have h3 := hJ₂' J hJ2
-    rw [div_lt_iff₀ (by positivity)] at h3
-    nlinarith [pow_pos (two_pos : (0 : ℝ) < 2) J]
-  have hpt : ∀ w, ‖dilate ((2 : ℝ) ^ J) Φ w * (F J (z - w) - z₀)‖ ≤
-      ‖dilate ((2 : ℝ) ^ J) Φ w‖ * (ε / ((∫ x, ‖Φ x‖) + 1)) := fun w => by
-    by_cases hw : dilate ((2 : ℝ) ^ J) Φ w = 0
-    · simp [hw]
-    · rw [norm_mul]
-      refine mul_le_mul_of_nonneg_left (hJ₁ J hJ1 (z - w) ?_).le (norm_nonneg _)
-      calc ‖z - w - y‖ = ‖(z - y) - w‖ := by congr 1; abel
-        _ ≤ ‖z - y‖ + ‖w‖ := norm_sub_le _ _
-        _ < δ₁ / 2 + δ₁ / 2 := add_lt_add hz (hsupp w hw)
-        _ = δ₁ := by ring
-  have hmeas : AEStronglyMeasurable (fun w => F J (z - w)) volume :=
-    (hFm J).comp_measurePreserving (Measure.measurePreserving_sub_left volume z)
-  have hint1 : Integrable (fun w => dilate ((2 : ℝ) ^ J) Φ w * (F J (z - w) - z₀)) volume :=
-    Integrable.mono' (hΦ'.norm.mul_const _)
-      (hΦ'.aestronglyMeasurable.mul (hmeas.sub aestronglyMeasurable_const))
-      (Eventually.of_forall hpt)
-  have hint2 : Integrable (fun w => dilate ((2 : ℝ) ^ J) Φ w * F J (z - w)) volume :=
-    (hint1.add (hΦ'.mul_const z₀)).congr (Eventually.of_forall fun w => by
-      simp only [Pi.add_apply]
-      ring)
-  have hone : ∫ w, dilate ((2 : ℝ) ^ J) Φ w = 1 := by
-    rw [integral_dilate Φ (by positivity), h1]
-  have hkey : conv (dilate (2 ^ J) Φ) (F J) volume z - z₀ =
-      ∫ w, dilate ((2 : ℝ) ^ J) Φ w * (F J (z - w) - z₀) := by
-    rw [conv_apply]
-    calc (∫ w, dilate ((2 : ℝ) ^ J) Φ w * F J (z - w)) - z₀
-        = (∫ w, dilate ((2 : ℝ) ^ J) Φ w * F J (z - w)) -
-            ∫ w, dilate ((2 : ℝ) ^ J) Φ w * z₀ := by
-          rw [integral_mul_const, hone, one_mul]
-      _ = ∫ w, (dilate ((2 : ℝ) ^ J) Φ w * F J (z - w) - dilate ((2 : ℝ) ^ J) Φ w * z₀) :=
-          (integral_sub hint2 (hΦ'.mul_const z₀)).symm
-      _ = _ := by
-          congr 1
-          funext w
-          ring
-  have hnorm : ∫ w, ‖dilate ((2 : ℝ) ^ J) Φ w‖ = ∫ x, ‖Φ x‖ := by
-    rw [integral_norm_eq_lintegral_enorm hΦ'.aestronglyMeasurable,
-      integral_norm_eq_lintegral_enorm hΦ.aestronglyMeasurable,
-      ← eLpNorm_one_eq_lintegral_enorm hΦ'.aestronglyMeasurable,
-      ← eLpNorm_one_eq_lintegral_enorm hΦ.aestronglyMeasurable,
-      eLpNorm_dilate_one hΦ (by positivity)]
-  rw [hkey]
-  calc ‖∫ w, dilate ((2 : ℝ) ^ J) Φ w * (F J (z - w) - z₀)‖
-      ≤ ∫ w, ‖dilate ((2 : ℝ) ^ J) Φ w‖ * (ε / ((∫ x, ‖Φ x‖) + 1)) :=
-        norm_integral_le_of_norm_le (hΦ'.norm.mul_const _) (Eventually.of_forall hpt)
-    _ = (∫ x, ‖Φ x‖) * ε / ((∫ x, ‖Φ x‖) + 1) := by
-        rw [integral_mul_const, hnorm]
-        ring
-    _ < ε := by
-        rw [div_lt_iff₀ (by positivity)]
-        nlinarith
-
-end ApproxIdentity
-
-namespace LocalMeansBump
-
-variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
-  [MeasurableSpace V] [BorelSpace V] (b : LocalMeansBump V)
-
-variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
-
-/-- **The reproducing formula at every point**: `∑_{j ≤ J} (η_j ⋆ (k_j ⋆ f))(y) =
-(m_{2^J} ⋆ (m_{2^J} ⋆ f))(y)` for all `y`, since both sides are continuous and agree almost
-everywhere (`Rd.LocalMeansBump.sum_dual_localMean`). -/
-theorem sum_conv_dual_localMean_apply (hp : p ≠ ∞) (L J : ℕ)
-    (f : Lp ℂ p (volume : Measure V)) (y : V) :
-    ∑ j ∈ Finset.range (J + 1), conv (b.dual L j) (b.localMean hp L j f) volume y =
-      conv (b.scaled L J) (convLp hp (b.integrable_scaled L J) f) volume y := by
-  have hp1 : 1 ≤ p := Fact.out
-  have hcont1 : Continuous fun y =>
-      ∑ j ∈ Finset.range (J + 1), conv (b.dual L j) (b.localMean hp L j f) volume y :=
-    continuous_finsetSum _ fun j _ => (b.hasCompactSupport_dual L j).continuous_convolution_left
-      (ContinuousLinearMap.mul ℂ ℂ) (b.continuous_dual L j) ((Lp.memLp _).locallyIntegrable hp1)
-  have hcont2 : Continuous (conv (b.scaled L J) (convLp hp (b.integrable_scaled L J) f) volume) :=
-    (b.hasCompactSupport_scaled L J).continuous_convolution_left (ContinuousLinearMap.mul ℂ ℂ)
-      (b.continuous_scaled L J) ((Lp.memLp _).locallyIntegrable hp1)
-  have hae : (fun y => ∑ j ∈ Finset.range (J + 1),
-      conv (b.dual L j) (b.localMean hp L j f) volume y) =ᵐ[volume]
-        conv (b.scaled L J) (convLp hp (b.integrable_scaled L J) f) volume := by
-    have h1 := Lp.coeFn_fun_finsetSum (Finset.range (J + 1))
-      (fun j => convLp hp (b.integrable_dual L j) (b.localMean hp L j f))
-    rw [b.sum_dual_localMean hp L J f] at h1
-    have h2 := convLp_apply_ae hp (b.integrable_scaled L J)
-      (convLp hp (b.integrable_scaled L J) f)
-    have h3 : ∀ᵐ y ∂volume, ∀ j, convLp hp (b.integrable_dual L j) (b.localMean hp L j f) y =
-        conv (b.dual L j) (b.localMean hp L j f) volume y :=
-      ae_all_iff.2 fun j => convLp_apply_ae hp _ _
-    filter_upwards [h1, h2, h3] with y hy1 hy2 hy3
-    rw [← hy2, hy1]
-    exact Finset.sum_congr rfl fun j _ => (hy3 j).symm
-  exact congrFun ((Continuous.ae_eq_iff_eq volume hcont1 hcont2).1 hae) y
-
-end LocalMeansBump
 
 namespace LipschitzGraph
 
@@ -240,6 +112,38 @@ theorem levelNorm_traceCoef_le {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
     levelNorm p (Ω.traceCoef b p L j h) ≤
       dyadicWeight (finrank ℝ V / p.toReal) j * eLpNorm h p volume :=
   (levelNorm_mono p (Ω.enorm_traceCoef_le b p L j h)).trans_eq (levelNorm_cellCoef hp0 hp hh j)
+
+/-- **The centres of the trace atoms lie near the graph**: if the cell atom `a_{j,m}` of `K ⋆ g`,
+`K = 0` outside `B(0, ρ 2^(-j))`, does not vanish on the graph and the projection of its centre lies
+within `(d + 1) 2^(-j)` of `x'`, `d = ρ + n`, then the centre lies within
+`(d + (1 + M)(2d + 1)) 2^(-j)` of `γ x'`. -/
+theorem norm_graphMap_sub_cellCenter_le {p : ℝ≥0∞} {K g : V → ℂ} {ρ : ℝ} {j : ℕ}
+    (hK : ∀ y, ρ / 2 ^ j < ‖y‖ → K y = 0) {m : Fin (finrank ℝ V) → ℤ}
+    (hne : ∃ y', cellAtom p K j g m (Ω.graphMap y') ≠ 0) {x' : Ω.hyperplane}
+    (hdist : ‖x' - Ω.proj (cellCenter j m)‖ ≤ (ρ + finrank ℝ V + 1) / 2 ^ j) :
+    ‖Ω.graphMap x' - cellCenter j m‖ ≤
+      (ρ + finrank ℝ V + (1 + Ω.M) * (2 * (ρ + finrank ℝ V) + 1)) / 2 ^ j := by
+  set d := ρ + finrank ℝ V
+  obtain ⟨y', hy'⟩ := hne
+  have h1 : ‖Ω.graphMap y' - cellCenter j m‖ ≤ d / 2 ^ j :=
+    not_lt.1 fun hlt => hy' (cellAtom_eq_zero hK m hlt)
+  have h2 : ‖y' - Ω.proj (cellCenter j m)‖ ≤ d / 2 ^ j := (Ω.norm_sub_proj_le y' _).trans h1
+  have h3 : ‖x' - y'‖ ≤ (2 * d + 1) / 2 ^ j := by
+    calc ‖x' - y'‖ = ‖(x' - Ω.proj (cellCenter j m)) - (y' - Ω.proj (cellCenter j m))‖ := by
+          congr 1
+          abel
+      _ ≤ ‖x' - Ω.proj (cellCenter j m)‖ + ‖y' - Ω.proj (cellCenter j m)‖ := norm_sub_le _ _
+      _ ≤ (d + 1) / 2 ^ j + d / 2 ^ j := add_le_add hdist h2
+      _ = (2 * d + 1) / 2 ^ j := by ring
+  calc ‖Ω.graphMap x' - cellCenter j m‖
+      = ‖(Ω.graphMap x' - Ω.graphMap y') + (Ω.graphMap y' - cellCenter j m)‖ := by
+        congr 1
+        abel
+    _ ≤ ‖Ω.graphMap x' - Ω.graphMap y'‖ + ‖Ω.graphMap y' - cellCenter j m‖ := norm_add_le _ _
+    _ ≤ (1 + Ω.M) * ((2 * d + 1) / 2 ^ j) + d / 2 ^ j :=
+        add_le_add ((Ω.norm_graphMap_sub_le x' y').trans
+          (mul_le_mul_of_nonneg_left h3 (by linarith [Ω.M_nonneg]))) h1
+    _ = (d + (1 + Ω.M) * (2 * d + 1)) / 2 ^ j := by ring
 
 /-- **The trace atoms**: there are a radius factor `d`, a constant `C < ∞` and an overlap bound
 `N` such that for every level `j` and `h ∈ L_p` the restrictions `a_{j,m} ∘ γ` of the cell atoms
@@ -305,28 +209,7 @@ theorem exists_trace_atoms {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L : ℕ) :
     have hex : ∃ y', cellAtom p (b.dual L j) j h m (Ω.graphMap y') ≠ 0 := by
       by_contra hcon
       exact hcoef (by simp [traceCoef, hcon])
-    obtain ⟨y', hy'⟩ := hex
-    have h1 : ‖Ω.graphMap y' - cellCenter j m‖ ≤ d / 2 ^ j :=
-      not_lt.1 fun hlt => hy' (cellAtom_eq_zero (hKρ j) m hlt)
-    have h2 : ‖y' - Ω.proj (cellCenter j m)‖ ≤ d / 2 ^ j := (Ω.norm_sub_proj_le y' _).trans h1
-    have h3 : ‖x' - y'‖ ≤ (2 * d + 1) / 2 ^ j := by
-      calc ‖x' - y'‖ = ‖(x' - Ω.proj (cellCenter j m)) - (y' - Ω.proj (cellCenter j m))‖ := by
-            congr 1
-            abel
-        _ ≤ ‖x' - Ω.proj (cellCenter j m)‖ + ‖y' - Ω.proj (cellCenter j m)‖ := norm_sub_le _ _
-        _ ≤ (d + 1) / 2 ^ j + d / 2 ^ j := add_le_add hdist h2
-        _ = (2 * d + 1) / 2 ^ j := by ring
-    calc ‖Ω.graphMap x' - cellCenter j m‖
-        = ‖(Ω.graphMap x' - Ω.graphMap y') + (Ω.graphMap y' - cellCenter j m)‖ := by
-          congr 1
-          abel
-      _ ≤ ‖Ω.graphMap x' - Ω.graphMap y'‖ + ‖Ω.graphMap y' - cellCenter j m‖ := norm_add_le _ _
-      _ ≤ (1 + Ω.M) * ((2 * d + 1) / 2 ^ j) + d / 2 ^ j :=
-          add_le_add ((Ω.norm_graphMap_sub_le x' y').trans
-            (mul_le_mul_of_nonneg_left h3 (by linarith [Ω.M_nonneg]))) h1
-      _ = ρ' / 2 ^ j := by
-          simp only [ρ']
-          ring
+    exact Ω.norm_graphMap_sub_cellCenter_le (hKρ j) hex hdist
 
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- `dim H = n - 1` as a real number. -/
@@ -692,6 +575,31 @@ theorem enorm_trace_le (hp : p ≠ ∞) (L : ℕ) :
           lqNorm 1 (fun k => dyadicWeight (1 / p.toReal) k * lpModulus p L f k))) :=
         mul_le_mul' le_rfl (Ω.coneBump.localMeansNorm_le hp L _ le_rfl f)
     _ = _ := by ring
+
+/-- **The trace along a convergent sequence**: if `F` and the `F_J` have finite intrinsic norms of
+smoothness `s + 1/p`, `s > 0`, and `‖F - F_J‖_p + ‖(2^(k/p) ω_L(F - F_J, 2^(-k))_p)_k‖_{ℓ_1} ≤ b_J`
+with `b_J < ∞` and `b_J → 0`, then `Tr F_J → Tr F`: the trace is linear
+(`Rd.LipschitzGraph.trace_sub`) and bounded by the norm of `B^{1/p}_{p,1}`
+(`Rd.LipschitzGraph.enorm_trace_le`). -/
+theorem tendsto_trace_of_modNorm_sub_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
+    (hq : 1 ≤ q) {F : Lp ℂ p (volume : Measure V)} {FJ : ℕ → Lp ℂ p (volume : Measure V)}
+    (hF : Ω.intrinsicNorm hp L (s + 1 / p.toReal) q F < ∞)
+    (hFJ : ∀ J, Ω.intrinsicNorm hp L (s + 1 / p.toReal) q (FJ J) < ∞) {b : ℕ → ℝ≥0∞}
+    (hb : Tendsto b atTop (𝓝 0)) (hbtop : ∀ J, b J ≠ ∞)
+    (hle : ∀ J, ‖F - FJ J‖ₑ +
+      lqNorm 1 (fun k => dyadicWeight (1 / p.toReal) k * lpModulus p L (F - FJ J) k) ≤ b J) :
+    Tendsto (fun J => Ω.trace hp L (FJ J)) atTop (𝓝 (Ω.trace hp L F)) := by
+  obtain ⟨KT, hKT, hTle⟩ := Ω.enorm_trace_le hp L
+  have hKb0 : Tendsto (fun J => KT * b J) atTop (𝓝 0) := by
+    simpa using ENNReal.Tendsto.const_mul hb (Or.inr hKT)
+  have hKb : Tendsto (fun J => (KT * b J).toReal) atTop (𝓝 0) := by
+    have h := (ENNReal.tendsto_toReal ENNReal.zero_ne_top).comp hKb0
+    rwa [ENNReal.toReal_zero] at h
+  rw [tendsto_iff_norm_sub_tendsto_zero]
+  refine squeeze_zero (fun J => norm_nonneg _) (fun J => ?_) hKb
+  rw [norm_sub_rev, ← Ω.trace_sub hp L hs hq hF (hFJ J), ← toReal_enorm]
+  exact ENNReal.toReal_mono (ENNReal.mul_ne_top hKT (hbtop J))
+    ((hTle _).trans (mul_le_mul' le_rfl (hle J)))
 
 end LipschitzGraph
 

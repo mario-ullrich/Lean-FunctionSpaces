@@ -131,6 +131,25 @@ theorem fwdDiff_nsmul (m : ℕ) (h : V) (f : V → ℂ) :
     simp only [fwdDiff, Pi.add_apply, succ_nsmul, ← add_assoc]
     ring
 
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- `|Δ_h^r f| ≤ 2^r B` for `|f| ≤ B`. -/
+theorem enorm_higherDiff_le_of_bound {f : V → ℂ} {B : ℝ≥0∞}
+    (hf : ∀ y, ‖f y‖ₑ ≤ B) (r : ℕ) (h x : V) : ‖(fwdDiff h)^[r] f x‖ₑ ≤ 2 ^ r * B := by
+  rw [higherDiff_apply]
+  calc ‖∑ l ∈ Finset.range (r + 1), ((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) *
+        f (x + (l : ℝ) • h)‖ₑ
+      ≤ ∑ l ∈ Finset.range (r + 1), ‖((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) *
+          f (x + (l : ℝ) • h)‖ₑ := enorm_sum_le _ _
+    _ ≤ ∑ l ∈ Finset.range (r + 1), (r.choose l : ℝ≥0∞) * B := by
+        refine Finset.sum_le_sum fun l _ => ?_
+        rw [enorm_mul, enorm_mul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul,
+          ← ofReal_norm, Complex.norm_natCast, ENNReal.ofReal_natCast]
+        exact mul_le_mul' le_rfl (hf _)
+    _ = 2 ^ r * B := by
+        rw [← Finset.sum_mul]
+        congr 1
+        exact_mod_cast Nat.sum_range_choose r
+
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- Translates of a.e. strongly measurable functions are a.e. strongly measurable. -/
 theorem aestronglyMeasurable_comp_add {f : V → ℂ} (hf : AEStronglyMeasurable f μ) (c : V) :
@@ -335,6 +354,17 @@ omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 theorem lpModulus_le (r : ℕ) (f : Lp ℂ p μ) (k : ℕ) : lpModulus p r f k ≤ 2 ^ r * ‖f‖ₑ := by
   rw [Lp.enorm_def]
   exact modulus_le (Lp.aestronglyMeasurable f) Fact.out r _
+
+omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
+/-- `ω_{r+l}(f, t)_p ≤ 2^l ω_r(f, t)_p`. -/
+theorem lpModulus_add_order_le (r l : ℕ) (f : Lp ℂ p μ)
+    (k : ℕ) : lpModulus p (r + l) f k ≤ 2 ^ l * lpModulus p r f k := by
+  show modulus μ (r + l) p (f : V → ℂ) (1 / 2 ^ k) ≤
+    2 ^ l * modulus μ r p (f : V → ℂ) (1 / 2 ^ k)
+  refine iSup₂_le fun h hh => ?_
+  rw [add_comm r l, Function.iterate_add_apply]
+  exact (eLpNorm_higherDiff_le (aestronglyMeasurable_higherDiff (Lp.aestronglyMeasurable f) r h)
+    Fact.out l h).trans (mul_le_mul' le_rfl (eLpNorm_higherDiff_le_modulus hh))
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- The modulus of `0` vanishes. -/

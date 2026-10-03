@@ -8,6 +8,7 @@ module
 public import FunctionSpaces.Lp.LintegralForm
 public import ApproximationSpaces.Sequences.Lq
 public import Mathlib.Analysis.Convolution
+public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 public import Mathlib.MeasureTheory.Measure.Haar.Unique
 
 /-!
@@ -31,6 +32,12 @@ in `f` almost everywhere and defines a bounded operator on `L_p` of norm at most
 (`Rd.convLp_convLp`, from the associativity `Rd.conv_conv_ae`), and are linear in the kernel
 (`Rd.convLp_sub_kernel`). Mathlib has the pointwise Hölder bounds of convolutions, not Young's
 inequality.
+
+Uniformly bounded families average to bounded functions: `‖∫ Φ(z) G(·, z) dz‖_p ≤ ‖Φ‖_1 M` if
+`‖G(·, z)‖_p ≤ M` whenever `Φ(z) ≠ 0` (`Rd.eLpNorm_integral_kernel_le_of_bound`). **Pointwise
+bounds**: if `|K| ≤ A` and `K = 0` outside `B̄(0, ρ)`, Hölder's inequality on balls gives
+`|(K ⋆ g)(x)| ≤ A |B̄(0,ρ)|^(1-1/p) ‖g‖_p` (`Rd.lintegral_closedBall_le`,
+`Rd.enorm_conv_le_of_bound`).
 -/
 
 @[expose] public section
@@ -227,6 +234,31 @@ theorem eLpNorm_integral_kernel_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ 
         have hGz : AEStronglyMeasurable (fun x => G x z) μ :=
           (hG.comp measurable_prodMk_right).aestronglyMeasurable
         rw [lintegral_const_mul' _ _ enorm_ne_top, eLpNorm_rpow_eq hGz hp0 hp]
+
+omit [BorelSpace V] in
+/-- **Weighted averages of uniformly bounded functions**: if `‖G(·, z)‖_p ≤ M` for every `z` with
+`Φ(z) ≠ 0` and `0 < ‖Φ‖_1 < ∞`, then `‖∫ Φ(z) G(·, z) dz‖_p ≤ ‖Φ‖_1 M`
+(`Rd.eLpNorm_integral_kernel_le`). -/
+theorem eLpNorm_integral_kernel_le_of_bound {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {Φ : V → ℂ}
+    (hΦ : AEStronglyMeasurable Φ μ) (hΦ0 : ∫⁻ z, ‖Φ z‖ₑ ∂μ ≠ 0) (hΦt : ∫⁻ z, ‖Φ z‖ₑ ∂μ ≠ ∞)
+    {G : V → V → ℂ} (hG : Measurable (Function.uncurry G)) {M : ℝ≥0∞}
+    (hM : ∀ z, Φ z ≠ 0 → eLpNorm (fun x => G x z) p μ ≤ M) :
+    eLpNorm (fun x => ∫ z, Φ z * G x z ∂μ) p μ ≤ (∫⁻ z, ‖Φ z‖ₑ ∂μ) * M := by
+  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  rw [← ENNReal.rpow_le_rpow_iff hq]
+  refine (eLpNorm_integral_kernel_le hp1 hp hΦ hG).trans ?_
+  calc (∫⁻ z, ‖Φ z‖ₑ ∂μ) ^ (p.toReal - 1) *
+        ∫⁻ z, ‖Φ z‖ₑ * eLpNorm (fun x => G x z) p μ ^ p.toReal ∂μ
+      ≤ (∫⁻ z, ‖Φ z‖ₑ ∂μ) ^ (p.toReal - 1) * ∫⁻ z, ‖Φ z‖ₑ * M ^ p.toReal ∂μ :=
+        mul_le_mul' le_rfl (lintegral_mono fun z => by
+          by_cases hz : Φ z = 0
+          · simp [hz]
+          · exact mul_le_mul' le_rfl (ENNReal.rpow_le_rpow (hM z hz) hq.le))
+    _ = (∫⁻ z, ‖Φ z‖ₑ ∂μ) ^ (p.toReal - 1) * (∫⁻ z, ‖Φ z‖ₑ ∂μ) ^ (1 : ℝ) * M ^ p.toReal := by
+        rw [lintegral_mul_const'' _ hΦ.enorm, ENNReal.rpow_one, mul_assoc]
+    _ = ((∫⁻ z, ‖Φ z‖ₑ ∂μ) * M) ^ p.toReal := by
+        rw [← ENNReal.rpow_add _ _ hΦ0 hΦt, sub_add_cancel, ENNReal.mul_rpow_of_nonneg _ _ hq.le]
 
 /-- Convolution of an integrable kernel with an `L_p` function is in `L_p`. -/
 theorem memLp_conv {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K f : V → ℂ} (hK : Integrable K μ)
@@ -511,5 +543,83 @@ theorem convLp_sub_kernel (hp : p ≠ ∞) {K K' : V → ℂ} (hK : Integrable K
     convLp_apply_ae hp hK' f, Lp.coeFn_sub (convLp hp hK f) (convLp hp hK' f),
     sub_conv_ae Fact.out hp hK hK' (Lp.memLp f)] with x h1 h2 h3 h4 h5
   rw [h1, h4, Pi.sub_apply, h2, h3, h5, Pi.sub_apply]
+
+end Rd
+
+/-! ### Pointwise bounds with Lebesgue measure -/
+
+namespace Rd
+
+open Metric
+
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+  [MeasurableSpace V] [BorelSpace V]
+
+/-- **Hölder's inequality on a ball**: `∫_{B̄(x,ρ)} |g| ≤ |B̄(x,ρ)|^(1-1/p) ‖g‖_p`. -/
+theorem lintegral_closedBall_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {g : V → ℂ}
+    (hg : AEStronglyMeasurable g volume) (x : V) (ρ : ℝ) :
+    ∫⁻ z in closedBall x ρ, ‖g z‖ₑ ≤
+      volume (closedBall x ρ) ^ (1 - 1 / p.toReal) * eLpNorm g p volume := by
+  have hgr : AEStronglyMeasurable g (volume.restrict (closedBall x ρ)) := hg.restrict
+  have h := eLpNorm_le_eLpNorm_mul_rpow_measure_univ hp1 hgr
+  rw [eLpNorm_one_eq_lintegral_enorm hgr, Measure.restrict_apply_univ, ENNReal.toReal_one,
+    div_one] at h
+  refine h.trans ?_
+  rw [mul_comm]
+  exact mul_le_mul' le_rfl (eLpNorm_mono_measure _ Measure.restrict_le_self)
+
+/-- `∫ |K(y)| |g(x - y)| dy ≤ A |B̄(0,ρ)|^(1-1/p) ‖g‖_p` if `|K| ≤ A` and `K = 0` outside
+`B̄(0, ρ)`. -/
+theorem lintegral_kernel_mul_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V → ℂ}
+    (hg : AEStronglyMeasurable g volume) {A : ℝ≥0∞} (hK : ∀ y, ‖K y‖ₑ ≤ A) {ρ : ℝ}
+    (hKρ : ∀ y, ρ < ‖y‖ → K y = 0) (x : V) :
+    ∫⁻ y, ‖K y‖ₑ * ‖g (x - y)‖ₑ ≤
+      A * volume (closedBall (0 : V) ρ) ^ (1 - 1 / p.toReal) * eLpNorm g p volume := by
+  set G : V → ℝ≥0∞ := (closedBall x ρ).indicator fun z => ‖g z‖ₑ
+  have h1 : ∀ y, ‖K y‖ₑ * ‖g (x - y)‖ₑ ≤ A * G (x - y) := fun y => by
+    by_cases hy : ‖y‖ ≤ ρ
+    · have hmem : x - y ∈ closedBall x ρ := by
+        rw [mem_closedBall, dist_eq_norm, sub_sub_cancel_left, norm_neg]
+        exact hy
+      simp only [G, Set.indicator_of_mem hmem]
+      exact mul_le_mul' (hK y) le_rfl
+    · rw [hKρ y (not_le.1 hy), enorm_zero, zero_mul]
+      exact zero_le
+  calc ∫⁻ y, ‖K y‖ₑ * ‖g (x - y)‖ₑ ≤ ∫⁻ y, A * G (x - y) := lintegral_mono h1
+    _ = ∫⁻ z, A * G z := lintegral_sub_left_eq_self (fun z => A * G z) x
+    _ = A * ∫⁻ z in closedBall x ρ, ‖g z‖ₑ := by
+        rw [lintegral_const_mul'' A (hg.enorm.indicator measurableSet_closedBall),
+          lintegral_indicator measurableSet_closedBall]
+    _ ≤ A * (volume (closedBall x ρ) ^ (1 - 1 / p.toReal) * eLpNorm g p volume) :=
+        mul_le_mul' le_rfl (lintegral_closedBall_le hp1 hg x ρ)
+    _ = _ := by rw [Measure.addHaar_closedBall_center, mul_assoc]
+
+/-- **Pointwise bound of a convolution**: if `|K| ≤ A` and `K = 0` outside `B̄(0, ρ)`, then
+`|(K ⋆ g)(x)| ≤ A |B̄(0,ρ)|^(1-1/p) ‖g‖_p`, by Hölder's inequality on the ball `B̄(x, ρ)`. -/
+theorem enorm_conv_le_of_bound {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V → ℂ}
+    (hg : AEStronglyMeasurable g volume) {A : ℝ≥0∞} (hK : ∀ y, ‖K y‖ₑ ≤ A) {ρ : ℝ}
+    (hKρ : ∀ y, ρ < ‖y‖ → K y = 0) (x : V) :
+    ‖conv K g volume x‖ₑ ≤
+      A * volume (closedBall (0 : V) ρ) ^ (1 - 1 / p.toReal) * eLpNorm g p volume :=
+  (enorm_conv_le_lintegral K g x).trans (lintegral_kernel_mul_le hp1 hg hK hKρ x)
+
+/-- The convolution integrals of a continuous kernel with compact support and a locally integrable
+function converge absolutely. -/
+theorem integrable_translate_mul_of_locallyIntegrable {K g : V → ℂ} (hKc : Continuous K)
+    (hKs : HasCompactSupport K) (hg : LocallyIntegrable g volume) (v x : V) :
+    Integrable (fun y => K (y + v) * g (x - y)) volume := by
+  have hc : HasCompactSupport fun y => K (y + v) :=
+    hKs.comp_homeomorph (Homeomorph.addRight v)
+  exact (hc.convolutionExists_left (ContinuousLinearMap.mul ℂ ℂ)
+    (hKc.comp (continuous_id.add continuous_const)) hg) x
+
+/-- `(K ⋆ g)(x + v) = ∫ K(y + v) g(x - y) dy`, by translation invariance. -/
+theorem conv_add_apply (K g : V → ℂ) (x v : V) :
+    conv K g volume (x + v) = ∫ y, K (y + v) * g (x - y) := by
+  rw [conv_apply, ← integral_add_right_eq_self (fun y => K y * g (x + v - y)) v]
+  congr 1
+  funext y
+  congr 2
+  abel
 
 end Rd

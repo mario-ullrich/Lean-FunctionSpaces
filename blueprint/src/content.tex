@@ -363,8 +363,9 @@ sum are controlled in a dyadically weighted $\ell_q$ norm.
 \begin{lemma}[Hardy inequalities]
 \label{lem:hardy}
 \lean{ENNReal.hardy_tail_le, ENNReal.hardy_sum_le, ENNReal.lqNorm_shift_le',
-  ENNReal.lqNorm_shiftRight_le, ENNReal.tsum_dyadicWeight_neg, ENNReal.tsum_dyadicWeight_neg_one,
-  ENNReal.lqNorm_dyadicWeight_neg_one_le, ENNReal.tsum_ite_le_eq, ENNReal.tsum_ite_ge_eq}
+  ENNReal.lqNorm_shiftRight_le, ENNReal.tsum_dyadicWeight_neg, ENNReal.tsum_le_lqNorm_dyadicWeight,
+  ENNReal.tsum_dyadicWeight_neg_one, ENNReal.lqNorm_dyadicWeight_neg_one_le, ENNReal.tsum_ite_le_eq,
+  ENNReal.tsum_ite_ge_eq}
 \leanok
 \uses{lem:countable-minkowski}
 Let $\alpha \in \R$ and $1 \leq q \leq \infty$. For every sequence $b$ in $[0, \infty]$,
@@ -377,6 +378,7 @@ and
   \Bigl\| \Bigl(2^{-k\alpha} \sum_{j=0}^{k} b_j\Bigr)_k \Bigr\|_{\ell_q}
   \leq (1 - 2^{-\alpha})^{-1} \, \|(2^{-k\alpha} b_k)_k\|_{\ell_q} .
 \]
+In particular, $\sum_k b_k \leq (1 - 2^{-\alpha})^{-1} \, \|(2^{k\alpha} b_k)_k\|_{\ell_q}$.
 \end{lemma}
 
 \begin{proof}
@@ -386,7 +388,8 @@ Write $2^{k\alpha} \sum_i b_{k+i} = \sum_i 2^{-i\alpha} \, 2^{(k+i)\alpha} b_{k+
 $\sum_i 2^{-i\alpha} \|(2^{(k+i)\alpha} b_{k+i})_k\|_{\ell_q}$, a shift does not increase the
 norm, and $\sum_i 2^{-i\alpha} = (1 - 2^{-\alpha})^{-1}$. The second inequality is the same
 argument with $2^{-k\alpha} \sum_{j \leq k} b_j = \sum_{i \leq k} 2^{-i\alpha} \,
-2^{-(k-i)\alpha} b_{k-i}$ and the shift to the right.
+2^{-(k-i)\alpha} b_{k-i}$ and the shift to the right. The term $k = 0$ of the first inequality
+gives the last one.
 \end{proof}
 
 The comparison of Pietsch's quasi-norm with its dyadic form rests on Cauchy's condensation
@@ -868,10 +871,10 @@ DeVore and Lorentz~\cite[Chapter~7]{DeVoreLorentz}.
 \begin{theorem}[Representation theorem]
 \label{thm:representation}
 \lean{ApproximationScheme.approxNormDyadic_le_interpNorm_of_jackson,
+  ApproximationScheme.interpSeq_le_of_lift,
   ApproximationScheme.interpNorm_le_approxNormDyadic_of_bernstein, ApproximationScheme.reprConst,
   ApproximationScheme.memApprox_iff_memInterp, ApproximationScheme.approxSpace_eq_interpSpace,
-  ApproximationScheme.SmoothnessSpace.memApprox_iff_memInterp,
-  ApproximationScheme.reprConst_ne_top}
+  ApproximationScheme.SmoothnessSpace.memApprox_iff_memInterp, ApproximationScheme.reprConst_ne_top}
 \leanok
 \uses{lem:error-k-functional, def:interpolation, lem:near-best, lem:hardy,
   def:lift-bound, def:dyadic-norm}
@@ -1283,7 +1286,10 @@ word; that theorem is the case $T = \iota^{-1}$ on the approximants.
 
 \begin{theorem}[Surjectivity of the trace]
 \label{thm:trace-surjective}
-\lean{ApproximationScheme.TraceBound.RightInverseBound,
+\lean{ApproximationScheme.TraceBound.RightInverseBound, ApproximationScheme.shiftSeq,
+  ApproximationScheme.shiftSeq_add, ApproximationScheme.shiftSeq_of_lt,
+  ApproximationScheme.hasSum_shiftSeq, ApproximationScheme.shiftSeq_mem,
+  ApproximationScheme.lqNorm_shiftSeq_le, ApproximationScheme.TraceBound.ext_eq_of_hasSum_lift,
   ApproximationScheme.TraceBound.exists_ext_eq, ApproximationScheme.traceSurjConst,
   ApproximationScheme.traceSurjConst_ne_top}
 \leanok
@@ -1394,8 +1400,9 @@ $\|f\|^{\omega}_{s,q} = \|f\| + \|(2^{ks} \omega(f, k))_k\|_{\ell_q}$.
   ApproximationScheme.ModulusData.directConst_ne_top,
   ApproximationScheme.ModulusData.approxNormDyadic_le_modNorm,
   ApproximationScheme.ModulusData.dyadicWeight_neg_sub_two_le,
-  ApproximationScheme.ModulusData.inverseConst,
-  ApproximationScheme.ModulusData.inverseConst_ne_top,
+  ApproximationScheme.ModulusData.inverseConst, ApproximationScheme.ModulusData.inverseConst_ne_top,
+  ApproximationScheme.ModulusData.modulus_le_of_dyadicApprox,
+  ApproximationScheme.ModulusData.dyadicWeight_mul_modulus_le_of_dyadicApprox,
   ApproximationScheme.ModulusData.modNorm_le_approxNormDyadic,
   ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top}
 \leanok
@@ -3380,7 +3387,7 @@ $W$ serves. For $r = 1$, $\psi_1$ is the Haar function.
 \begin{lemma}[Properties of the multiwavelets]
 \label{lem:multiwavelets}
 \lean{Alpert.integral_conj_psi_mul_psi, Alpert.integral_conj_polyFun_mul_psi,
-  Alpert.integral_polyFun_mul_psi, Alpert.ppFun_ae_eq_sum_psi, Alpert.conj_ppFun,
+  Alpert.integral_polyFun_mul_psi, Alpert.ppFun_ae_eq_sum_psi, Interval.conj_ppFun,
   Alpert.integrable_conj_psi_mul, Alpert.integral_conj_psi_mul_sum, Alpert.memLp_sum_psi,
   Alpert.sumPsi, Alpert.coeFn_sumPsi, Alpert.sumPsi_injective, Alpert.exists_stable}
 \leanok
@@ -3404,8 +3411,8 @@ triangle inequality.
 
 \begin{lemma}[Details in the multiwavelets]
 \label{lem:multiwavelet-details}
-\lean{Alpert.integrableOn_mul_polyFun, Alpert.dyadicIco_eq_union,
-  Alpert.disjoint_dyadicIco_halves, Alpert.integral_sub_ppFun_succ_mul, Alpert.detailFun,
+\lean{Interval.integrableOn_mul_polyFun, Interval.dyadicIco_eq_union,
+  Interval.disjoint_dyadicIco_halves, Alpert.integral_sub_ppFun_succ_mul, Alpert.detailFun,
   Alpert.integral_detailFun_mul, Alpert.exists_conj_psi_eq_polyFun,
   Alpert.integral_ppFun_mul_conj_psi, Alpert.integral_detailFun_mul_conj_psi, Alpert.coeff,
   Alpert.detailPieces, Alpert.ppFun_detailPieces, Alpert.levelOne_detailPieces_mem,
@@ -3434,7 +3441,7 @@ moved multiwavelet is a polynomial on each half, so $\int_{I_{k,m}} (P_{k+1} g -
 
 \begin{lemma}[Norms of the details]
 \label{lem:multiwavelet-norms}
-\lean{Alpert.lintegral_unit_eq_sum_dyadicIco, Alpert.enorm_two_rpow_half,
+\lean{Interval.lintegral_unit_eq_sum_dyadicIco, Alpert.enorm_two_rpow_half,
   ENNReal.ofReal_two_pow_eq, Alpert.eLpNorm_detailFun_dyadicIco,
   Alpert.exists_eLpNorm_detailFun_equiv, Alpert.enorm_ppProj_sub}
 \leanok
@@ -4006,9 +4013,10 @@ so the join is that of $Q_k g$ at the knot $1$.
 
 \begin{theorem}[Jackson's inequality for periodic splines]
 \label{thm:per-spline-jackson}
-\lean{Interval.eLpNorm_comp_add_one_dyadicIco, Interval.exists_eLpNorm_sub_perQi_le,
-  Interval.cutoff, Interval.continuous_cutoff, Interval.cutoff_zero, Interval.cutoff_one,
-  Interval.cutoff_nonneg, Interval.cutoff_le_one, Interval.cutoff_eq_one, Interval.dense_periodic,
+\lean{Interval.eLpNorm_comp_add_one_dyadicIco, Interval.qiWindow_subset_Icc_zero_two,
+  Interval.eLpNorm_sub_perQiPieces_eq, Interval.exists_eLpNorm_sub_perQi_le, Interval.cutoff,
+  Interval.continuous_cutoff, Interval.cutoff_zero, Interval.cutoff_one, Interval.cutoff_nonneg,
+  Interval.cutoff_le_one, Interval.cutoff_eq_one, Interval.dense_periodic,
   Interval.exists_approxSeq_perSplineScheme_le}
 \leanok
 \uses{lem:per-qi, lem:qi-taylor, lem:two-sided-smoothing, lem:per-modulus, lem:error-dense}
@@ -4131,7 +4139,8 @@ translation by $mt$ maps it onto $[0, 1 + mt]$.
 \lean{Interval.eLpNorm_le_of_lintegral_le_mul, Interval.mul_rpow_one_div_rpow,
   Interval.lintegral_localBound_le, Interval.sum_localMass_ppFun_le,
   Interval.enorm_higherDiff_le_of_isPiecewisePoly_of_le, Interval.enorm_higherDiff_le_of_mem_piece,
-  Interval.exists_eLpNorm_higherDiff_ppFun_le}
+  Interval.enorm_higherDiff_rpow_le_strip_add_piece, Interval.rpow_strip_mul_eq,
+  Interval.rpow_piece_mul_le, Interval.exists_eLpNorm_higherDiff_ppFun_le}
 \leanok
 \uses{lem:diff-bound, thm:pp-inverse, lem:pp-local}
 Let $1 \leq p < \infty$ and $1 \leq m \leq r$. There is $C$ such that for every $j \in \N$, every
@@ -4155,7 +4164,8 @@ since $2^j h \leq 1$ and $mp \geq 1$.
 \begin{theorem}[Differences of lower order of splines]
 \label{thm:spline-lower-diff}
 \lean{Interval.enorm_higherDiff_truncPow_le_of_lt, Interval.higherDiff_eq_add_sum_jumps,
-  Interval.enorm_higherDiff_spline_le_of_lt, Interval.exists_eLpNorm_higherDiff_spline_le_of_lt}
+  Interval.enorm_jumpCoeff_mul_higherDiff_truncPow_le, Interval.enorm_higherDiff_spline_le_of_lt,
+  Interval.eLpNorm_higherDiff_le_of_lt_mul, Interval.exists_eLpNorm_higherDiff_spline_le_of_lt}
 \leanok
 \uses{lem:diff-bound, lem:spline-across, lem:spline-inverse-tools}
 Let $1 \leq p < \infty$ and $1 \leq m < r$. There is $C$ such that for every $j \in \N$, every
@@ -4574,6 +4584,7 @@ second statement is \Cref{lem:kernel-telescoping}.
 \label{thm:cube-jackson}
 \lean{Cube.eLpNorm_sub_slicewise_ppKernel_le, Cube.cubeJacksonConst, Cube.cubeJacksonConst_ne_top,
   Cube.eLpNorm_sub_cubeProj_le, Cube.approxSeq_le_of_continuous, Cube.approxSeq_cubePPScheme_le,
+  Cube.exists_eLpNorm_sub_ppKernel_zero_apply_le,
   Cube.exists_eLpNorm_sub_slicewise_ppKernel_zero_le, Cube.exists_approxSeq_cubePPScheme_one_le,
   Cube.exists_approxSeq_cubePPScheme_le}
 \leanok
@@ -5050,7 +5061,7 @@ is integrable for integrable $K$ and $L$.
 \label{lem:weighted-jensen}
 \lean{Rd.lintegral_mul_rpow_le, Rd.enorm_conv_le_lintegral, Rd.lintegral_rpow_lintegral_mul_le,
   Rd.aemeasurable_kernel_rpow, Rd.aemeasurable_lintegral_kernel, Rd.lintegral_rpow_lintegral_le,
-  Rd.eLpNorm_integral_kernel_le}
+  Rd.eLpNorm_integral_kernel_le, Rd.eLpNorm_integral_kernel_le_of_bound}
 \leanok
 Let $1 \leq p < \infty$. For every measure $\mu$ and all measurable $a, g \geq 0$,
 \[
@@ -5066,6 +5077,8 @@ and for every measurable $\Phi : V \to \C$ and every measurable $G : V \times V 
   \Bigl\| \int_V \Phi(z) \, G(\cdot, z) \, dz \Bigr\|_p^p
   \leq \|\Phi\|_1^{p-1} \int_V |\Phi(z)| \, \|G(\cdot, z)\|_p^p \, dz .
 \]
+In particular, if $0 < \|\Phi\|_1 < \infty$ and $\|G(\cdot, z)\|_p \leq M$ whenever
+$\Phi(z) \neq 0$, then $\| \int_V \Phi(z) \, G(\cdot, z) \, dz \|_p \leq \|\Phi\|_1 M$.
 \end{lemma}
 
 \begin{proof}
@@ -5073,7 +5086,8 @@ and for every measurable $\Phi : V \to \C$ and every measurable $G : V \times V 
 The first inequality is Hölder's inequality with the conjugate exponent $p'$ for
 $a g = a^{1/p'} \cdot a^{1/p} g$. For the second apply the first for fixed $x$, integrate over
 $x$, exchange the integrals by Tonelli's theorem, and use $\int_V b(x - y)^p \, dx = \int_V b^p$.
-The third follows in the same way from the first with $a = |\Phi|$ and $g = |G(x, \cdot)|$.
+The third follows in the same way from the first with $a = |\Phi|$ and $g = |G(x, \cdot)|$,
+and it gives the last one.
 \end{proof}
 
 \begin{theorem}[Young's inequality]
@@ -5169,8 +5183,8 @@ domain is continuous.
 
 \begin{theorem}[Approximate identities]
 \label{thm:approx-identity}
-\lean{Rd.ae_enorm_conv_dilate_sub_le, Rd.tendsto_eLpNorm_conv_dilate_sub,
-  Rd.tendsto_convLp_dilate}
+\lean{Rd.ae_enorm_conv_dilate_sub_le, Rd.eLpNorm_conv_dilate_sub_le,
+  Rd.tendsto_eLpNorm_conv_dilate_sub, Rd.tendsto_convLp_dilate}
 \leanok
 \uses{lem:dilate, lem:translation-continuity, lem:weighted-jensen, lem:conv-op}
 Let $1 \leq p < \infty$, $\Phi \in L_1$ with $\int \Phi = 1$, and $f \in L_p$. Then
@@ -6625,7 +6639,8 @@ $|a(x) - a(y)| \leq 2^j |x - y|$, are regular atoms with $\sigma = r = 1$, and t
 \begin{lemma}[Level sums]
 \label{lem:level-sums}
 \lean{Rd.higherDiff_tsum_apply, Rd.le_of_rpow_le_overlap, Rd.one_sub_one_div_toReal_nonneg,
-  Rd.summable_levelSum, Rd.eLpNorm_levelSum_le, Rd.modulus_levelSum_le}
+  Rd.summable_levelSum, Rd.eLpNorm_levelSum_le, Rd.card_le_of_higherDiff_ne_zero,
+  Rd.modulus_levelSum_le}
 \leanok
 \uses{lem:bounded-overlap, def:regular-atoms, lem:rd-modulus}
 Let $1 \leq p < \infty$, and let $a_m$ be regular atoms of level $j$ with centres $c_m$ and
@@ -6649,7 +6664,8 @@ $j > k$, $\omega_r(f, t)_p \leq 2^r \|f\|_p$.
 
 \begin{theorem}[Atomic synthesis]
 \label{thm:rd-atomic-synthesis}
-\lean{Rd.atomSynthConst, Rd.atomSynthConst_ne_top, Rd.modNorm_le_coeffNorm}
+\lean{Rd.atomSynthConst, Rd.atomSynthConst_ne_top, ENNReal.enorm_le_of_tendsto_sum,
+  Rd.modNorm_le_coeffNorm}
 \leanok
 \uses{lem:level-sums, lem:almost-diagonal}
 Let $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $0 < s < \sigma$. Let $a_{j,m}$ be regular atoms
@@ -6956,7 +6972,7 @@ $\|\lambda'_{j,\cdot}\|_{\ell_p} \leq 2^{jn/p} \|h\|_p$.
 
 \begin{lemma}[The trace atoms]
 \label{lem:trace-atoms}
-\lean{Rd.LipschitzGraph.exists_trace_atoms}
+\lean{Rd.LipschitzGraph.norm_graphMap_sub_cellCenter_le, Rd.LipschitzGraph.exists_trace_atoms}
 \leanok
 \uses{def:trace-terms, lem:cell-atoms-regular, lem:dual-kernel-bounds, lem:atom-traces,
   lem:cells-partition}
@@ -7042,12 +7058,15 @@ $h_j = 1_\Omega (k_j * f)$, and \Cref{lem:intrinsic-upper} with smoothness $s + 
 \begin{lemma}[Linearity and continuity of the trace]
 \label{lem:trace-linear}
 \lean{Rd.LipschitzGraph.traceTerm_sub, Rd.LipschitzGraph.trace_sub,
-  Rd.LipschitzGraph.enorm_trace_le}
+  Rd.LipschitzGraph.enorm_trace_le, Rd.LipschitzGraph.tendsto_trace_of_modNorm_sub_le}
 \leanok
 \uses{thm:trace-graph, lem:trace-terms-lp, lem:local-means-upper}
 The trace is linear on the functions with a finite intrinsic norm of smoothness $s + 1/p$, $s > 0$,
 and there is $K < \infty$ with
 $\|\operatorname{Tr} f\|_{L_p(H)} \leq K (\|f\|_p + \sum_k 2^{k/p} \omega_L(f, 2^{-k})_p)$.
+If $f$ and the $f_J$ have finite intrinsic norms of smoothness $s + 1/p$ and
+$\|f - f_J\|_p + \sum_k 2^{k/p} \omega_L(f - f_J, 2^{-k})_p \to 0$, then
+$\operatorname{Tr} f_J \to \operatorname{Tr} f$ in $L_p(H)$.
 \end{lemma}
 
 \begin{proof}
@@ -7055,7 +7074,8 @@ $\|\operatorname{Tr} f\|_{L_p(H)} \leq K (\|f\|_p + \sum_k 2^{k/p} \omega_L(f, 2
 The terms are linear in $h_j$, and the series converge. The bound:
 $\|\operatorname{Tr} f\|_{L_p(H)} \leq \sum_j K 2^{j/p} \|k_j * f\|_p$
 (\Cref{lem:trace-terms-lp}), and the local means are bounded by the moduli
-(\Cref{lem:local-means-upper}).
+(\Cref{lem:local-means-upper}). The convergence follows from the linearity and the bound for
+$f - f_J$.
 \end{proof}
 
 \begin{lemma}[Approximate identities at points of continuity]
@@ -7211,6 +7231,7 @@ $v_j(x) = 0$ if $|\langle x, e \rangle - \phi_j(Px)| \geq (c + 1) 2^{-j}$.
 \lean{Rd.LipschitzGraph.norm_profile_sub_le, Rd.LipschitzGraph.norm_profile_second_le,
   Rd.LipschitzGraph.abs_vertCoord_sub_le, Rd.LipschitzGraph.abs_second_vertCoord_le,
   Rd.LipschitzGraph.vertCutoffConst, Rd.LipschitzGraph.four_le_vertCutoffConst,
+  Rd.LipschitzGraph.norm_vertCutoff_add_sub_le, Rd.LipschitzGraph.norm_vertCutoff_second_le,
   Rd.LipschitzGraph.norm_higherDiff_vertCutoff_le, Rd.LipschitzGraph.enorm_higherDiff_vertCutoff_le}
 \leanok
 \uses{def:vertical-cutoff, lem:mollified-graph, lem:smooth-differences}
@@ -7304,7 +7325,8 @@ $\Delta_h^{r + l} f = \Delta_h^l \Delta_h^r f$ and $\|\Delta_h^l g\|_p \leq 2^l 
 
 \begin{theorem}[The trace of the extension]
 \label{thm:trace-extension}
-\lean{Rd.LipschitzGraph.trace_graphExtension}
+\lean{Rd.modNorm_one_tsum_le, Rd.LipschitzGraph.exists_modNorm_traceExtTerm_le,
+  Rd.LipschitzGraph.trace_sum_traceExtTerm, Rd.LipschitzGraph.trace_graphExtension}
 \leanok
 \uses{thm:graph-trace-extension, thm:trace-continuous, lem:trace-linear, lem:moduli-orders,
   lem:reproducing-formula}
@@ -7951,7 +7973,9 @@ $Y^2 - 1 = (Y - 1)(Y + 1)$ and \Cref{lem:moment-polynomial}.
 
 \begin{theorem}[Mixed local means are bounded by the mixed modulus]
 \label{thm:mixed-local-means-upper}
-\lean{Rd.LocalMeansBump.enorm_mixedLocalMean_le, Rd.LocalMeansBump.mixedLocalMeansNorm_le}
+\lean{Rd.LocalMeansBump.lmRemainder, Rd.LocalMeansBump.prod_sum_lmCoeff_eq,
+  Rd.LocalMeansBump.actsBounded_lmRemainder, Rd.LocalMeansBump.mixedLocalMean_ae_eq,
+  Rd.LocalMeansBump.enorm_mixedLocalMean_le, Rd.LocalMeansBump.mixedLocalMeansNorm_le}
 \leanok
 \uses{lem:kernel-dilation-sum, thm:tensor-averaged-differences, lem:acts-bounded,
   lem:weighted-jensen, def:mixed-moduli}

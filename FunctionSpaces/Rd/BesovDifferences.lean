@@ -25,7 +25,10 @@ inverse inequality `ω_r(a, 2^(-k))_p ≤ C_B 2^(-(k-j) r) ‖a‖_p` for `a ∈
 (`Rd.memApprox_bandScheme_iff_modulus`). With the Littlewood–Paley characterisation
 (`Rd.memApprox_bandScheme_iff`), the three descriptions of `B^s_{p,q}(V)` coincide for `0 < s < r`:
 by approximation with band-limited functions, by Littlewood–Paley blocks, and by differences
-(`Rd.littlewoodPaleyNorm_lt_top_iff_modulus`).
+(`Rd.littlewoodPaleyNorm_lt_top_iff_modulus`). Since `ω_{r+l} ≤ 2^l ω_r`
+(`Rd.lpModulus_add_order_le`), the norm with moduli of order `L ≥ 2` is at most `2^(L-2)` times
+the norm with order `2` (`Rd.modNorm_order_le`), and the norm with moduli in `ℓ_1` is countably
+subadditive (`Rd.modNorm_one_tsum_le`).
 -/
 
 @[expose] public section
@@ -74,5 +77,46 @@ theorem littlewoodPaleyNorm_lt_top_iff_modulus (hp : p ≠ ∞) {r : ℕ} {s : �
     littlewoodPaleyNorm hp s q f < ∞ ↔
       ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) < ∞ := by
   rw [← memApprox_bandScheme_iff hp hs hq, memApprox_bandScheme_iff_modulus hp hs.le hsr hq f]
+
+/-- The norm with moduli of order `L ≥ 2` is at most `2^(L-2)` times that with order `2`. -/
+theorem modNorm_order_le {L : ℕ} (hL : 2 ≤ L) (σ : ℝ) (q : ℝ≥0∞)
+    (G : Lp ℂ p (volume : Measure V)) :
+    ‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p L G k) ≤
+      2 ^ (L - 2) * (‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p 2 G k)) := by
+  have hL' : L = 2 + (L - 2) := by omega
+  rw [mul_add]
+  refine add_le_add (le_mul_of_one_le_left' (one_le_pow₀ one_le_two)) ?_
+  rw [← ENNReal.lqNorm_const_mul]
+  refine ENNReal.lqNorm_mono fun k => ?_
+  calc dyadicWeight σ k * lpModulus p L G k
+      ≤ dyadicWeight σ k * (2 ^ (L - 2) * lpModulus p 2 G k) := by
+        refine mul_le_mul' le_rfl ?_
+        conv_lhs => rw [hL']
+        exact lpModulus_add_order_le 2 (L - 2) G k
+    _ = 2 ^ (L - 2) * (dyadicWeight σ k * lpModulus p 2 G k) := by ring
+
+/-- **The norm with moduli is countably subadditive in `ℓ_1`**: for a summable series in `L_p`
+and `N(G) = ‖G‖ + ‖(2^(kσ) ω_L(G, 2^(-k)))_k‖_{ℓ_1}`, `N(∑ G_i) ≤ ∑_i N(G_i)`, by
+`ENNReal.le_tsum_of_tendsto_sum` for the modulus at each scale. -/
+theorem modNorm_one_tsum_le (L : ℕ) (σ : ℝ) {G : ℕ → Lp ℂ p (volume : Measure V)}
+    (hG : Summable G) :
+    ‖∑' i, G i‖ₑ + lqNorm 1 (fun k => dyadicWeight σ k * lpModulus p L (∑' i, G i) k) ≤
+      ∑' i, (‖G i‖ₑ + lqNorm 1 (fun k => dyadicWeight σ k * lpModulus p L (G i) k)) := by
+  have htend : Filter.Tendsto (fun I => ∑ i ∈ Finset.range (I + 1), G i) Filter.atTop
+      (nhds (∑' i, G i)) :=
+    (hG.hasSum.tendsto_sum_nat).comp (Filter.tendsto_add_atTop_nat 1)
+  have hmod : ∀ k, lpModulus p L (∑' i, G i) k ≤ ∑' i, lpModulus p L (G i) k := fun k =>
+    ENNReal.le_tsum_of_tendsto_sum (C := 2 ^ L) (by simp) (fun x y => lpModulus_add_le L x y k)
+      (fun x => lpModulus_le L x k) htend
+  calc ‖∑' i, G i‖ₑ + lqNorm 1 (fun k => dyadicWeight σ k * lpModulus p L (∑' i, G i) k)
+      ≤ ∑' i, ‖G i‖ₑ + ∑' i, lqNorm 1 (fun k => dyadicWeight σ k * lpModulus p L (G i) k) := by
+        refine add_le_add enorm_tsum_le_tsum_enorm ?_
+        rw [ENNReal.lqNorm_one]
+        simp_rw [ENNReal.lqNorm_one]
+        rw [ENNReal.tsum_comm]
+        refine ENNReal.tsum_le_tsum fun k => ?_
+        rw [ENNReal.tsum_mul_left]
+        exact mul_le_mul' le_rfl (hmod k)
+    _ = _ := (ENNReal.tsum_add).symm
 
 end Rd

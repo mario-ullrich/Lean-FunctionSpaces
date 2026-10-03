@@ -220,6 +220,64 @@ theorem enorm_higherDiff_le_of_mem_piece {r k m : ℕ} {u : ℝ → ℂ} (hu : I
 
 /-! ### Piecewise polynomials -/
 
+/-- **The pointwise bound for differences of piecewise polynomials**: for `m ≤ r`,
+`0 ≤ h ≤ 2^(-j)` and `x ∈ [0, 1 - mh]`, `|Δ_h^m u(x)|^p` is at most the strip bound of the
+neighbouring masses `∑_{l ≤ r} M_{n+l}` (`Interval.enorm_higherDiff_le_of_isPiecewisePoly_of_le`)
+plus `(K_m (2^j h)^m 2^(j/p))^p M_n` for the piece of `x`
+(`Interval.enorm_higherDiff_le_of_mem_piece`), where `n = ⌊2^j x⌋`. -/
+theorem enorm_higherDiff_rpow_le_strip_add_piece (hp : p ≠ ∞) {r j m : ℕ} (hmr : m ≤ r)
+    {u : ℝ → ℂ} (hu : IsPiecewisePoly r j u) {K Km : ℝ≥0∞} (hK : NikolskiiBound p r K)
+    (hKm : DiffBound p r m Km) {h : ℝ} (hh0 : 0 ≤ h) (hh : h ≤ 1 / 2 ^ j) {x : ℝ}
+    (hx : x ∈ Icc (0 : ℝ) (1 - m * h)) :
+    ‖higherDiff m h u x‖ₑ ^ p.toReal ≤
+      stripBound j r h ((2 ^ m * K * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal)) ^ p.toReal)
+        (fun n => ∑ l ∈ Finset.range (r + 1), localMass p j u (n + l)) x +
+      (Km * ENNReal.ofReal (2 ^ j * h) ^ m * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal)) ^
+        p.toReal * localMass p j u ⌊2 ^ j * x⌋₊ := by
+  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  by_cases hbad : ((⌊2 ^ j * x⌋₊ : ℝ) + 1) / 2 ^ j ≤ x + m * h
+  · have hbad' : ((⌊2 ^ j * x⌋₊ : ℝ) + 1) / 2 ^ j ≤ x + r * h :=
+      hbad.trans (by
+        have : (m : ℝ) ≤ r := by exact_mod_cast hmr
+        nlinarith)
+    refine le_add_right ?_
+    simp only [stripBound, hbad', ↓reduceIte]
+    rw [← mul_rpow_one_div_rpow hp0 hp]
+    refine ENNReal.rpow_le_rpow ?_ hq.le
+    exact (enorm_higherDiff_le_of_isPiecewisePoly_of_le hmr hu hK hp hh0 hh hx.1).trans_eq
+      (by ring)
+  · push Not at hbad
+    refine le_add_left ?_
+    rw [← mul_rpow_one_div_rpow hp0 hp]
+    exact ENNReal.rpow_le_rpow (enorm_higherDiff_le_of_mem_piece hu hKm hp hh0 hx.1 hbad) hq.le
+
+omit [Fact (1 ≤ p)] in
+/-- **The strip constant**: `(A 2^(j/p))^p (r h) = A^p r (2^j h)`. -/
+theorem rpow_strip_mul_eq (hp0 : p ≠ 0) (hp : p ≠ ∞) (A : ℝ≥0∞) (r j : ℕ) (h : ℝ) :
+    (A * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal)) ^ p.toReal * ENNReal.ofReal (r * h) =
+      A ^ p.toReal * r * ENNReal.ofReal (2 ^ j * h) := by
+  rw [mul_rpow_one_div_rpow hp0 hp, mul_assoc, ← ENNReal.ofReal_mul (by positivity),
+    show (2 : ℝ) ^ j * (r * h) = r * (2 ^ j * h) by ring, ENNReal.ofReal_mul (Nat.cast_nonneg r),
+    ENNReal.ofReal_natCast]
+  ring
+
+omit [Fact (1 ≤ p)] in
+/-- **The gain inside the pieces**: for `σ = 2^j h ≤ 1` and `m ≥ 1`,
+`(K σ^m 2^(j/p))^p 2^(-j) ≤ K^p σ`, since `σ^(mp) ≤ σ^p ≤ σ`. -/
+theorem rpow_piece_mul_le (hp0 : p ≠ 0) (hp : p ≠ ∞) (hq1 : 1 ≤ p.toReal) (K : ℝ≥0∞) {m : ℕ}
+    (hm : 1 ≤ m) (j : ℕ) {σ : ℝ≥0∞} (hσ1 : σ ≤ 1) :
+    (K * σ ^ m * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal)) ^ p.toReal *
+      ENNReal.ofReal (1 / 2 ^ j) ≤ K ^ p.toReal * σ := by
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  rw [mul_rpow_one_div_rpow hp0 hp, mul_assoc, ← ENNReal.ofReal_mul (by positivity),
+    show (2 : ℝ) ^ j * (1 / 2 ^ j) = 1 by field_simp, ENNReal.ofReal_one, mul_one,
+    ENNReal.mul_rpow_of_nonneg _ _ hq.le]
+  gcongr
+  calc (σ ^ m) ^ p.toReal ≤ σ ^ p.toReal :=
+        ENNReal.rpow_le_rpow (pow_le_of_le_one zero_le hσ1 (by omega)) hq.le
+    _ ≤ σ := ENNReal.rpow_le_self_of_le_one hσ1 hq1
+
 /-- **Differences of every positive order of piecewise polynomials**: for `1 ≤ m ≤ r` there is
 `C` such that for every level `j`, every piecewise polynomial `u` of level `j` and degree `< r` and
 `0 ≤ h ≤ 2^(-j)`, `‖Δ_h^m u‖_{L_p[0, 1 - mh]} ≤ C (2^j h)^(1/p) ‖u‖_p`. On the strips of width
@@ -260,24 +318,8 @@ theorem exists_eLpNorm_higherDiff_ppFun_le {r m : ℕ} (hm : 1 ≤ m) (hmr : m �
   set G₂ := Km * σ ^ m * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal)
   -- the pointwise bound: strip part plus interior part
   have hpt : ∀ x ∈ Icc (0 : ℝ) (1 - m * h), ‖higherDiff m h u x‖ₑ ^ p.toReal ≤
-      stripBound j r h (G₁ ^ p.toReal) Mw x + G₂ ^ p.toReal * localMass p j u ⌊2 ^ j * x⌋₊ := by
-    intro x hx
-    by_cases hbad : ((⌊2 ^ j * x⌋₊ : ℝ) + 1) / 2 ^ j ≤ x + m * h
-    · have hbad' : ((⌊2 ^ j * x⌋₊ : ℝ) + 1) / 2 ^ j ≤ x + r * h :=
-        hbad.trans (by
-          have : (m : ℝ) ≤ r := by exact_mod_cast hmr
-          nlinarith)
-      have hs : stripBound j r h (G₁ ^ p.toReal) Mw x = G₁ ^ p.toReal * Mw ⌊2 ^ j * x⌋₊ := by
-        simp only [stripBound, hbad', ↓reduceIte]
-      refine le_add_right ?_
-      rw [hs, ← mul_rpow_one_div_rpow hp0 hp]
-      refine ENNReal.rpow_le_rpow ?_ hq.le
-      exact (enorm_higherDiff_le_of_isPiecewisePoly_of_le hmr hu hKb hp hh0 hh hx.1).trans_eq
-        (by simp only [G₁, Mw]; ring)
-    · push Not at hbad
-      refine le_add_left ?_
-      rw [← mul_rpow_one_div_rpow hp0 hp]
-      exact ENNReal.rpow_le_rpow (enorm_higherDiff_le_of_mem_piece hu hKmb hp hh0 hx.1 hbad) hq.le
+      stripBound j r h (G₁ ^ p.toReal) Mw x + G₂ ^ p.toReal * localMass p j u ⌊2 ^ j * x⌋₊ :=
+    fun x hx => enorm_higherDiff_rpow_le_strip_add_piece hp hmr hu hKb hKmb hh0 hh hx
   -- the integral
   have hmeas : Measurable fun x : ℝ => G₂ ^ p.toReal * localMass p j u ⌊2 ^ j * x⌋₊ :=
     measurable_const.mul ((measurable_from_nat (f := localMass p j u)).comp
@@ -288,22 +330,10 @@ theorem exists_eLpNorm_higherDiff_ppFun_le {r m : ℕ} (hm : 1 ≤ m) (hmr : m �
     sum_sum_localMass_le hp j r Q
   have hsum2 := sum_localMass_ppFun_le hp j Q
   -- the constants
-  have hG₁ : G₁ ^ p.toReal * ENNReal.ofReal (r * h) =
-      (2 ^ m * K) ^ p.toReal * r * σ := by
-    simp only [G₁]
-    rw [mul_rpow_one_div_rpow hp0 hp, mul_assoc, ← ENNReal.ofReal_mul (by positivity),
-      show (2 : ℝ) ^ j * (r * h) = r * (2 ^ j * h) by ring, ENNReal.ofReal_mul (Nat.cast_nonneg r),
-      ENNReal.ofReal_natCast]
-    ring
-  have hG₂ : G₂ ^ p.toReal * ENNReal.ofReal (1 / 2 ^ j) ≤ Km ^ p.toReal * σ := by
-    simp only [G₂]
-    rw [mul_rpow_one_div_rpow hp0 hp, mul_assoc, ← ENNReal.ofReal_mul (by positivity),
-      show (2 : ℝ) ^ j * (1 / 2 ^ j) = 1 by field_simp, ENNReal.ofReal_one, mul_one,
-      ENNReal.mul_rpow_of_nonneg _ _ hq.le]
-    gcongr
-    calc (σ ^ m) ^ p.toReal ≤ σ ^ p.toReal :=
-          ENNReal.rpow_le_rpow (pow_le_of_le_one zero_le hσ1 (by omega)) hq.le
-      _ ≤ σ := ENNReal.rpow_le_self_of_le_one hσ1 hq1
+  have hG₁ : G₁ ^ p.toReal * ENNReal.ofReal (r * h) = (2 ^ m * K) ^ p.toReal * r * σ :=
+    rpow_strip_mul_eq hp0 hp (2 ^ m * K) r j h
+  have hG₂ : G₂ ^ p.toReal * ENNReal.ofReal (1 / 2 ^ j) ≤ Km ^ p.toReal * σ :=
+    rpow_piece_mul_le hp0 hp hq1 Km hm j hσ1
   refine eLpNorm_le_of_lintegral_le_mul hp
     (measurable_higherDiff (measurable_ppFun j Q) m h).aestronglyMeasurable
     (A := C₀ ^ (1 / p.toReal)) ?_
@@ -377,6 +407,72 @@ theorem higherDiff_eq_add_sum_jumps {r j N m : ℕ} (hmr : m ≤ r) {P : ℕ →
     rw [higherDiff_apply, Finset.mul_sum]
     exact Finset.sum_congr rfl fun i _ => by ring
 
+/-- **A jump term of a spline**: for `1 ≤ m < r`, `h ≥ 0` with `mh ≤ 2^(-j)`, `x ≥ 0` and a knot
+`l 2^(-j)` with `n₀ < l ≤ n₀ + r`, `n₀ = ⌊2^j x⌋`, the term `c_l Δ_h^m (· - l 2^(-j))_+^(r-1)(x)`
+is at most `2 · 2^m m^(r-1) K (2^j h)^m 2^(j/p) (∑_{l' ≤ r} M_{n₀+l'})^(1/p)`: the jump
+coefficient is bounded by `Interval.enorm_jumpCoeff_le`, the difference of the truncated power by
+`2^m (mh)^(r-1)`, and `(2^j h)^(r-1) ≤ (2^j h)^m`. -/
+theorem enorm_jumpCoeff_mul_higherDiff_truncPow_le {r j N m : ℕ} (hm : 1 ≤ m) (hmr : m < r)
+    {P : ℕ → ℂ[X]} (hP : ∀ n, P n ∈ degreeLT ℂ r) (hJ : SplineJoinsBelow r j N P) {u : ℝ → ℂ}
+    (hu : ∀ n < N, ∀ x ∈ dyadicIco j n, u x = polyFun (P n) x) {K : ℝ≥0∞}
+    (hK : NikolskiiBound p r K) (hp : p ≠ ∞) {h x : ℝ} (hh0 : 0 ≤ h) (hmh : m * h ≤ 1 / 2 ^ j)
+    {l : ℕ} (hl : l ∈ Finset.Ioc ⌊2 ^ j * x⌋₊ (⌊2 ^ j * x⌋₊ + r)) :
+    ‖jumpCoeff r N P l * higherDiff m h (truncPow r ((l : ℝ) / 2 ^ j)) x‖ₑ ≤
+      2 * 2 ^ m * (m : ℝ≥0∞) ^ (r - 1) * K * ENNReal.ofReal (2 ^ j * h) ^ m *
+        ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal) *
+          (∑ l' ∈ Finset.range (r + 1), localMass p j u (⌊2 ^ j * x⌋₊ + l')) ^ (1 / p.toReal) := by
+  have hpos : (0 : ℝ) < 2 ^ j := by positivity
+  have hL : (0 : ℝ) < 1 / 2 ^ j := by positivity
+  have hm1 : (1 : ℝ) ≤ m := by exact_mod_cast hm
+  have hh : h ≤ 1 / 2 ^ j := le_trans (by nlinarith) hmh
+  set n₀ := ⌊2 ^ j * x⌋₊
+  set S := ∑ l ∈ Finset.range (r + 1), localMass p j u (n₀ + l)
+  set σ := ENNReal.ofReal (2 ^ j * h)
+  have hσ1 : σ ≤ 1 := by
+    rw [← ENNReal.ofReal_one]
+    refine ENNReal.ofReal_le_ofReal ?_
+    rw [le_div_iff₀ hpos] at hh
+    linarith
+  have hmass : ∀ l ≤ r, localMass p j u (n₀ + l) ^ (1 / p.toReal) ≤ S ^ (1 / p.toReal) :=
+    fun l hl => by
+      gcongr
+      exact localMass_le_sum_range j _ n₀ hl
+  have hfl' : 2 ^ j * x < (n₀ : ℝ) + 1 := Nat.lt_floor_add_one _
+  have hscale : ENNReal.ofReal (m * h) ^ (r - 1) =
+      ENNReal.ofReal (1 / 2 ^ j) ^ (r - 1) * ((m : ℝ≥0∞) ^ (r - 1) * σ ^ (r - 1)) := by
+    rw [← mul_pow, ← mul_pow, ← ENNReal.ofReal_natCast, ← ENNReal.ofReal_mul (Nat.cast_nonneg _),
+      ← ENNReal.ofReal_mul hL.le]
+    congr 2
+    field_simp
+  have hσr : σ ^ (r - 1) ≤ σ ^ m := pow_le_pow_of_le_one zero_le hσ1 (by omega)
+  obtain ⟨hl1, hl2⟩ := Finset.mem_Ioc.1 hl
+  have hxl : x < (l : ℝ) / 2 ^ j := by
+    rw [lt_div_iff₀ hpos]
+    have : (n₀ : ℝ) + 1 ≤ l := by exact_mod_cast hl1
+    linarith
+  rw [enorm_mul]
+  refine (mul_le_mul' le_rfl (enorm_higherDiff_truncPow_le_of_lt r m hh0 hxl)).trans ?_
+  rcases lt_or_ge l N with hlN | hlN
+  · have hc := enorm_jumpCoeff_le hP hJ hu hK hp (by omega) hlN
+    have hS : localMass p j u l ^ (1 / p.toReal) + localMass p j u (l - 1) ^ (1 / p.toReal) ≤
+        2 * S ^ (1 / p.toReal) := by
+      rw [two_mul]
+      refine add_le_add ?_ ?_
+      · rw [show l = n₀ + (l - n₀) by omega]; exact hmass _ (by omega)
+      · rw [show l - 1 = n₀ + (l - 1 - n₀) by omega]; exact hmass _ (by omega)
+    calc ‖jumpCoeff r N P l‖ₑ * (2 ^ m * ENNReal.ofReal (m * h) ^ (r - 1))
+        = 2 ^ m * (m : ℝ≥0∞) ^ (r - 1) * σ ^ (r - 1) *
+            (‖jumpCoeff r N P l‖ₑ * ENNReal.ofReal (1 / 2 ^ j) ^ (r - 1)) := by
+          rw [hscale]; ring
+      _ ≤ 2 ^ m * (m : ℝ≥0∞) ^ (r - 1) * σ ^ m *
+            (K * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal) * (2 * S ^ (1 / p.toReal))) :=
+          mul_le_mul' (mul_le_mul' le_rfl hσr) (hc.trans (mul_le_mul' le_rfl hS))
+      _ = _ := by ring
+  · have h0 : jumpCoeff r N P l = 0 := by
+      simp only [jumpCoeff, show ¬ (0 < l ∧ l < N) by omega, ↓reduceIte]
+    rw [h0, enorm_zero, zero_mul]
+    exact zero_le
+
 /-- **Pointwise bound for differences of lower order of splines**: for `1 ≤ m < r`, `h ≥ 0` with
 `mh ≤ 2^(-j)`, `x ≥ 0` and `x + mh < N 2^(-j)`,
 `|Δ_h^m u(x)| ≤ (K_m + 2 r 2^m m^(r-1) K) (2^j h)^m 2^(j/p) (∑_{l ≤ r} M_{n₀+l})^(1/p)`. The
@@ -398,15 +494,6 @@ theorem enorm_higherDiff_spline_le_of_lt {r j N m : ℕ} (hm : 1 ≤ m) (hmr : m
   set n₀ := ⌊2 ^ j * x⌋₊
   set S := ∑ l ∈ Finset.range (r + 1), localMass p j u (n₀ + l)
   set σ := ENNReal.ofReal (2 ^ j * h)
-  have hσ1 : σ ≤ 1 := by
-    rw [← ENNReal.ofReal_one]
-    refine ENNReal.ofReal_le_ofReal ?_
-    rw [le_div_iff₀ hpos] at hh
-    linarith
-  have hmass : ∀ l ≤ r, localMass p j u (n₀ + l) ^ (1 / p.toReal) ≤ S ^ (1 / p.toReal) :=
-    fun l hl => by
-      gcongr
-      exact localMass_le_sum_range j _ n₀ hl
   have hfl : (n₀ : ℝ) ≤ 2 ^ j * x := Nat.floor_le (by positivity)
   have hfl' : 2 ^ j * x < (n₀ : ℝ) + 1 := Nat.lt_floor_add_one _
   have hn₀N : n₀ < N := by
@@ -429,49 +516,39 @@ theorem enorm_higherDiff_spline_le_of_lt {r j N m : ℕ} (hm : 1 ≤ m) (hmr : m
     gcongr
     simpa using localMass_le_sum_range j u n₀ (Nat.zero_le r)
   -- the jumps
-  have hscale : ENNReal.ofReal (m * h) ^ (r - 1) =
-      ENNReal.ofReal (1 / 2 ^ j) ^ (r - 1) * ((m : ℝ≥0∞) ^ (r - 1) * σ ^ (r - 1)) := by
-    rw [← mul_pow, ← mul_pow, ← ENNReal.ofReal_natCast, ← ENNReal.ofReal_mul (Nat.cast_nonneg _),
-      ← ENNReal.ofReal_mul hL.le]
-    congr 2
-    field_simp
-  have hσr : σ ^ (r - 1) ≤ σ ^ m := pow_le_pow_of_le_one zero_le hσ1 (by omega)
   have hterm : ∀ l ∈ Finset.Ioc n₀ (n₀ + r), ‖jumpCoeff r N P l *
       higherDiff m h (truncPow r ((l : ℝ) / 2 ^ j)) x‖ₑ ≤
         2 * 2 ^ m * (m : ℝ≥0∞) ^ (r - 1) * K * σ ^ m * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal) *
-          S ^ (1 / p.toReal) := fun l hl => by
-    obtain ⟨hl1, hl2⟩ := Finset.mem_Ioc.1 hl
-    have hxl : x < (l : ℝ) / 2 ^ j := by
-      rw [lt_div_iff₀ hpos]
-      have : (n₀ : ℝ) + 1 ≤ l := by exact_mod_cast hl1
-      linarith
-    rw [enorm_mul]
-    refine (mul_le_mul' le_rfl (enorm_higherDiff_truncPow_le_of_lt r m hh0 hxl)).trans ?_
-    rcases lt_or_ge l N with hlN | hlN
-    · have hc := enorm_jumpCoeff_le hP hJ hu hK hp (by omega) hlN
-      have hS : localMass p j u l ^ (1 / p.toReal) + localMass p j u (l - 1) ^ (1 / p.toReal) ≤
-          2 * S ^ (1 / p.toReal) := by
-        rw [two_mul]
-        refine add_le_add ?_ ?_
-        · rw [show l = n₀ + (l - n₀) by omega]; exact hmass _ (by omega)
-        · rw [show l - 1 = n₀ + (l - 1 - n₀) by omega]; exact hmass _ (by omega)
-      calc ‖jumpCoeff r N P l‖ₑ * (2 ^ m * ENNReal.ofReal (m * h) ^ (r - 1))
-          = 2 ^ m * (m : ℝ≥0∞) ^ (r - 1) * σ ^ (r - 1) *
-              (‖jumpCoeff r N P l‖ₑ * ENNReal.ofReal (1 / 2 ^ j) ^ (r - 1)) := by
-            rw [hscale]; ring
-        _ ≤ 2 ^ m * (m : ℝ≥0∞) ^ (r - 1) * σ ^ m *
-              (K * ENNReal.ofReal (2 ^ j) ^ (1 / p.toReal) * (2 * S ^ (1 / p.toReal))) :=
-            mul_le_mul' (mul_le_mul' le_rfl hσr) (hc.trans (mul_le_mul' le_rfl hS))
-        _ = _ := by ring
-    · have h0 : jumpCoeff r N P l = 0 := by
-        simp only [jumpCoeff, show ¬ (0 < l ∧ l < N) by omega, ↓reduceIte]
-      rw [h0, enorm_zero, zero_mul]
-      exact zero_le
+          S ^ (1 / p.toReal) := fun l hl =>
+    enorm_jumpCoeff_mul_higherDiff_truncPow_le hm hmr hP hJ hu hK hp hh0 hmh hl
   rw [higherDiff_eq_add_sum_jumps hmr.le hJ hu hh0 hh hx hxm]
   refine (enorm_add_le _ _).trans ((add_le_add hpiece ((enorm_sum_le _ _).trans
     (Finset.sum_le_sum hterm))).trans ?_)
   rw [Finset.sum_const, Nat.card_Ioc, show n₀ + r - n₀ = r by omega, nsmul_eq_mul]
   exact le_of_eq (by ring)
+
+/-- **Long steps**: for `mh > 2^(-j)`, `‖Δ_h^m u‖_{L_p[0, 1 - mh]} ≤ 2^m m^m (2^j h)^m ‖u‖_p`,
+from `‖Δ_h^m u‖_p ≤ 2^m ‖u‖_p` and `1 < m 2^j h`. -/
+theorem eLpNorm_higherDiff_le_of_lt_mul {u : ℝ → ℂ} (hu : Measurable u) {m j : ℕ} {h : ℝ}
+    (hh0 : 0 ≤ h) (hmh : 1 / 2 ^ j < m * h) :
+    eLpNorm (higherDiff m h u) p (volume.restrict (Icc 0 (1 - m * h))) ≤
+      2 ^ m * (m : ℝ≥0∞) ^ m * ENNReal.ofReal (2 ^ j * h) ^ m * eLpNorm u p unitVol := by
+  have hpos : (0 : ℝ) < 2 ^ j := by positivity
+  have h1 := eLpNorm_higherDiff_le hu (Fact.out : 1 ≤ p) m hh0 0 1
+  have hmσ : 1 ≤ (m : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h) := by
+    rw [← ENNReal.ofReal_natCast, ← ENNReal.ofReal_mul (Nat.cast_nonneg _),
+      ← ENNReal.ofReal_one]
+    refine ENNReal.ofReal_le_ofReal ?_
+    rw [div_lt_iff₀ hpos] at hmh
+    nlinarith
+  calc eLpNorm (higherDiff m h u) p (volume.restrict (Icc 0 (1 - m * h)))
+      ≤ 2 ^ m * eLpNorm u p unitVol := h1
+    _ ≤ 2 ^ m * ((m : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^ m * eLpNorm u p unitVol := by
+        gcongr
+        calc (2 : ℝ≥0∞) ^ m = 2 ^ m * 1 := (mul_one _).symm
+          _ ≤ 2 ^ m * ((m : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^ m := by
+              gcongr; exact one_le_pow₀ hmσ
+    _ = _ := by rw [mul_pow]; ring
 
 /-- **Differences of lower order of splines**: for `1 ≤ m < r` there is `C` such that for every
 level `j`, every spline `u` of order `r` and level `j` and `0 ≤ h ≤ 2^(-j)`,
@@ -545,20 +622,9 @@ theorem exists_eLpNorm_higherDiff_spline_le_of_lt {r m : ℕ} (hm : 1 ≤ m) (hm
             gcongr
             exact le_self_add
   · -- `mh > 2^(-j)`: the trivial bound
-    have h1 := eLpNorm_higherDiff_le (measurable_ppFun j Q) (Fact.out : 1 ≤ p) m hh0 0 1
-    have hmσ : 1 ≤ (m : ℝ≥0∞) * σ := by
-      rw [← ENNReal.ofReal_natCast, ← ENNReal.ofReal_mul (Nat.cast_nonneg _),
-        ← ENNReal.ofReal_one]
-      refine ENNReal.ofReal_le_ofReal ?_
-      rw [div_lt_iff₀ hpos] at hmh
-      nlinarith
     calc eLpNorm (higherDiff m h u) p (volume.restrict (Icc 0 (1 - m * h)))
-        ≤ 2 ^ m * B := h1
-      _ ≤ 2 ^ m * ((m : ℝ≥0∞) * σ) ^ m * B := by
-          gcongr
-          calc (2 : ℝ≥0∞) ^ m = 2 ^ m * 1 := (mul_one _).symm
-            _ ≤ 2 ^ m * ((m : ℝ≥0∞) * σ) ^ m := by gcongr; exact one_le_pow₀ hmσ
-      _ = 2 ^ m * (m : ℝ≥0∞) ^ m * σ ^ m * B := by rw [mul_pow]; ring
+        ≤ 2 ^ m * (m : ℝ≥0∞) ^ m * σ ^ m * B :=
+          eLpNorm_higherDiff_le_of_lt_mul (measurable_ppFun j Q) hh0 hmh
       _ ≤ (C₁ * ((r : ℝ≥0∞) + 1) ^ (1 / p.toReal) + 2 ^ m * (m : ℝ≥0∞) ^ m) * σ ^ m * B := by
           gcongr
           exact le_add_self

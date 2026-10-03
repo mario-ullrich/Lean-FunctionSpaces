@@ -210,95 +210,114 @@ theorem sum_lmCoeff_smul_pow {A : Type*} [CommRing A] [Algebra ℂ A] (L j : ℕ
     rw [hP, hP2, show Y ^ 2 - 1 = (Y - 1) * (Y + 1) by ring, mul_pow]
     ring
 
+/-- The **remaining polynomial** of the mixed local means at the steps `w`:
+`∏_i b_i(δ_{w_i e_i})` with `b(Y) = 1 - (-1)^L (Y - 1)^L` in the coordinates with `k_i = 0` and
+`b(Y) = (-1)^L ((Y + 1)^L - 1)` in the others. -/
+noncomputable def lmRemainder (L : ℕ) (k : Fin d → ℕ) (w : Fin d → ℝ) :
+    AddMonoidAlgebra ℂ (Fin d → ℝ) :=
+  ∏ i, if k i = 0 then
+      1 - (-1) ^ L * (AddMonoidAlgebra.single (Pi.single i (w i)) (1 : ℂ) - 1) ^ L
+    else (-1) ^ L * ((AddMonoidAlgebra.single (Pi.single i (w i)) (1 : ℂ) + 1) ^ L - 1)
+
+/-- **The polynomial of the mixed local means factors through the mixed difference**:
+`∏_i ∑_t c_{k_i}(t) δ_{w_i e_i}^{ν(t)} = B ∏_{i ∈ e(k)} (δ_{w_i e_i} - 1)^L` with the remaining
+polynomial `B` (`Rd.LocalMeansBump.sum_lmCoeff_smul_pow` in each coordinate). -/
+theorem prod_sum_lmCoeff_eq (L : ℕ) (k : Fin d → ℕ) (w : Fin d → ℝ) :
+    ∏ i, ∑ t ∈ Finset.univ ×ˢ Finset.range L, lmCoeff L (k i) t •
+        AddMonoidAlgebra.single (Pi.single i (w i)) (1 : ℂ) ^ lmExp t =
+      lmRemainder L k w * ∏ i ∈ mixedSupp k, coordElem w i ^ L := by
+  have hfac : ∀ i, ∑ t ∈ Finset.univ ×ˢ Finset.range L, lmCoeff L (k i) t •
+      AddMonoidAlgebra.single (Pi.single i (w i)) (1 : ℂ) ^ lmExp t =
+      (if k i = 0 then
+          1 - (-1) ^ L * (AddMonoidAlgebra.single (Pi.single i (w i)) (1 : ℂ) - 1) ^ L
+        else (-1) ^ L * ((AddMonoidAlgebra.single (Pi.single i (w i)) (1 : ℂ) + 1) ^ L - 1)) *
+        (if k i = 0 then 1 else coordElem w i ^ L) := fun i => by
+    rw [sum_lmCoeff_smul_pow]
+    by_cases hk : k i = 0
+    · simp [hk]
+    · simp only [hk, ↓reduceIte, coordElem]
+      ring
+  rw [Finset.prod_congr rfl fun i _ => hfac i, Finset.prod_mul_distrib, lmRemainder]
+  congr 1
+  rw [Finset.prod_ite, Finset.prod_const_one, one_mul]
+  rfl
+
+/-- **The remaining polynomial acts boundedly**: it acts on `L_p` with norm at most `(2^L + 1)^d`
+(`Rd.actsBounded_momentPoly`, `Rd.actsBounded_addPoly`). -/
+theorem actsBounded_lmRemainder (L : ℕ) (k : Fin d → ℕ) (w : Fin d → ℝ) :
+    ActsBounded p (lmRemainder L k w) ((2 ^ L + 1) ^ d) := by
+  have hp1 : 1 ≤ p := Fact.out
+  have h := ActsBounded.prod (p := p) (Finset.univ : Finset (Fin d))
+    (a := fun i => if k i = 0 then
+        1 - (-1) ^ L * (AddMonoidAlgebra.single (Pi.single i (w i)) (1 : ℂ) - 1) ^ L
+      else (-1) ^ L * ((AddMonoidAlgebra.single (Pi.single i (w i)) (1 : ℂ) + 1) ^ L - 1))
+    (C := fun _ => (2 : ℝ≥0∞) ^ L + 1) fun i _ => by
+      by_cases hk : k i = 0
+      · simp only [hk, ↓reduceIte]
+        exact (actsBounded_momentPoly hp1 L _).mono (add_comm _ _).le
+      · simp only [hk, ↓reduceIte]
+        exact actsBounded_addPoly hp1 L _
+  rwa [Finset.prod_const, Finset.card_univ, Fintype.card_fin] at h
+
+/-- **Mixed local means average translates**: for almost every `x`,
+`k_k ⋆ f(x) = ∫ (⊗g)(z) A(z) f(x) dz` with the polynomial
+`A(z) = ∏_i ∑_t c_{k_i}(t) δ_{-z_i 2^(-k_i) e_i}^{ν(t)}` in the translations
+(`Rd.LocalMeansBump.kernel_eq_sum_dilate`, `Rd.conv_tensorKernel_sum_dilate_ae`). -/
+theorem mixedLocalMean_ae_eq (hp : p ≠ ∞) (L : ℕ) (k : Fin d → ℕ)
+    (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
+    (b.mixedLocalMean hp L k f : (Fin d → ℝ) → ℂ) =ᵐ[volume] fun x =>
+      ∫ z, tensorKernel (fun _ => b.toFun) z *
+        diffAct (∏ i, ∑ t ∈ Finset.univ ×ˢ Finset.range L, lmCoeff L (k i) t •
+          AddMonoidAlgebra.single (Pi.single i (-z i / 2 ^ k i)) (1 : ℂ) ^ lmExp t)
+          (f : (Fin d → ℝ) → ℂ) x := by
+  have hp1 : 1 ≤ p := Fact.out
+  have hc : ∀ i, (0 : ℝ) < 2 ^ k i := fun i => by positivity
+  have hkernel : b.mixedKernel L k = tensorKernel fun i =>
+      ∑ t ∈ Finset.univ ×ˢ Finset.range L,
+        lmCoeff L (k i) t • dilate ((2 : ℝ) ^ k i / lmExp t) b.toFun := by
+    simp only [mixedKernel]
+    congr 1
+    funext i
+    exact b.kernel_eq_sum_dilate L (k i)
+  have h1 := convLp_apply_ae hp (b.integrable_mixedKernel L k) f
+  have h2 := conv_tensorKernel_sum_dilate_ae hp1 hp b.integrable (Finset.univ ×ˢ Finset.range L)
+    lmExp (fun t _ => one_le_lmExp t) (fun i => lmCoeff L (k i)) hc (Lp.memLp f)
+  rw [← hkernel] at h2
+  exact h1.trans h2
+
 /-- **Mixed local means are bounded by the mixed modulus**: if the bump `g` vanishes outside
 `[-1, 1]`, then `‖k_k ⋆ f‖_p ≤ (‖g‖_1 (2^L + 1))^d Ω^{e(k)}_L(f, 2^(-k))_p`. The tensor kernel
-averages `B(z) Δ^{L,e(k)}_{h(z)} f` with `h(z)_i = -z_i/2^(k_i)` over `(⊗g)(z) dz`, where the
-remaining polynomials `B(z)` in the translations act with norm at most `(2^L + 1)^d`. -/
+averages `B(z) Δ^{L,e(k)}_{h(z)} f` with `h(z)_i = -z_i/2^(k_i)` over `(⊗g)(z) dz`
+(`Rd.LocalMeansBump.mixedLocalMean_ae_eq`, `Rd.LocalMeansBump.prod_sum_lmCoeff_eq`), where the
+remaining polynomials `B(z)` act with norm at most `(2^L + 1)^d`
+(`Rd.LocalMeansBump.actsBounded_lmRemainder`). -/
 theorem enorm_mixedLocalMean_le (hp : p ≠ ∞) (L : ℕ) (hR : b.radius ≤ 1) (k : Fin d → ℕ)
     (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
     ‖b.mixedLocalMean hp L k f‖ₑ ≤
       ((∫⁻ t, ‖b.toFun t‖ₑ) * (2 ^ L + 1)) ^ d * lpMixedModulus p L f k := by
   have hp1 : 1 ≤ p := Fact.out
-  have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   set e := mixedSupp k
-  set T := (Finset.univ ×ˢ Finset.range L : Finset (Bool × ℕ))
-  set c : Fin d → ℝ := fun i => 2 ^ k i
-  have hc : ∀ i, 0 < c i := fun i => by positivity
-  set h : (Fin d → ℝ) → Fin d → ℝ := fun z i => -z i / c i
-  set Y : (Fin d → ℝ) → Fin d → AddMonoidAlgebra ℂ (Fin d → ℝ) := fun z i =>
-    AddMonoidAlgebra.single (Pi.single i (h z i)) (1 : ℂ)
-  set A : (Fin d → ℝ) → AddMonoidAlgebra ℂ (Fin d → ℝ) := fun z =>
-    ∏ i, ∑ t ∈ T, lmCoeff L (k i) t •
-      AddMonoidAlgebra.single (Pi.single i (-z i / c i)) (1 : ℂ) ^ lmExp t
+  set h : (Fin d → ℝ) → Fin d → ℝ := fun z i => -z i / 2 ^ k i
   set G : (Fin d → ℝ) → (Fin d → ℝ) → ℂ := fun x z =>
-    diffAct (A z) (f : (Fin d → ℝ) → ℂ) x
+    diffAct (∏ i, ∑ t ∈ Finset.univ ×ˢ Finset.range L, lmCoeff L (k i) t •
+      AddMonoidAlgebra.single (Pi.single i (h z i)) (1 : ℂ) ^ lmExp t)
+      (f : (Fin d → ℝ) → ℂ) x
   set Φ : (Fin d → ℝ) → ℂ := tensorKernel fun _ => b.toFun
   set ω := lpMixedModulus p L f k
-  -- the local means average the translates
-  have hkernel : b.mixedKernel L k = tensorKernel fun i =>
-      ∑ t ∈ T, lmCoeff L (k i) t • dilate (c i / lmExp t) b.toFun := by
-    simp only [mixedKernel, c]
-    congr 1
-    funext i
-    exact b.kernel_eq_sum_dilate L (k i)
-  have hae : (b.mixedLocalMean hp L k f : (Fin d → ℝ) → ℂ) =ᵐ[volume]
-      fun x => ∫ z, Φ z * G x z := by
-    have h1 := convLp_apply_ae hp (b.integrable_mixedKernel L k) f
-    have h2 := conv_tensorKernel_sum_dilate_ae hp1 hp b.integrable T lmExp
-      (fun t _ => one_le_lmExp t) (fun i => lmCoeff L (k i)) hc (Lp.memLp f)
-    rw [← hkernel] at h2
-    exact h1.trans h2
   -- the translates are jointly measurable
   have hfm : Measurable (f : (Fin d → ℝ) → ℂ) := (Lp.stronglyMeasurable f).measurable
   have hG : Measurable (Function.uncurry G) := by
     have heq : Function.uncurry G = fun q : (Fin d → ℝ) × (Fin d → ℝ) =>
-        ∑ n ∈ Fintype.piFinset (fun _ => T), (∏ i, lmCoeff L (k i) (n i)) *
-          (f : (Fin d → ℝ) → ℂ) (q.1 + fun i => (lmExp (n i) : ℝ) * (-q.2 i / c i)) := by
+        ∑ n ∈ Fintype.piFinset (fun _ => Finset.univ ×ˢ Finset.range L),
+          (∏ i, lmCoeff L (k i) (n i)) *
+            (f : (Fin d → ℝ) → ℂ) (q.1 + fun i => (lmExp (n i) : ℝ) * (-q.2 i / 2 ^ k i)) := by
       funext q
-      exact diffAct_prod_sum_pow_apply T lmExp (fun i => lmCoeff L (k i)) (fun i => -q.2 i / c i)
-        _ q.1
+      exact diffAct_prod_sum_pow_apply (Finset.univ ×ˢ Finset.range L) lmExp
+        (fun i => lmCoeff L (k i)) (fun i => -q.2 i / 2 ^ k i) _ q.1
     rw [heq]
     refine Finset.measurable_sum _ fun n _ => measurable_const.mul (hfm.comp ?_)
     exact measurable_fst.add (measurable_pi_iff.2 fun i => measurable_const.mul
       (((measurable_pi_apply i).comp measurable_snd).neg.div_const _))
-  -- the polynomials factor through the mixed difference
-  set B : (Fin d → ℝ) → AddMonoidAlgebra ℂ (Fin d → ℝ) := fun z => ∏ i,
-    if k i = 0 then 1 - (-1) ^ L * (Y z i - 1) ^ L else (-1) ^ L * ((Y z i + 1) ^ L - 1)
-  have hfactor : ∀ z, A z = B z * ∏ i ∈ e, coordElem (h z) i ^ L := fun z => by
-    have hfac : ∀ i, ∑ t ∈ T, lmCoeff L (k i) t •
-        AddMonoidAlgebra.single (Pi.single i (-z i / c i)) (1 : ℂ) ^ lmExp t =
-        (if k i = 0 then 1 - (-1) ^ L * (Y z i - 1) ^ L else (-1) ^ L * ((Y z i + 1) ^ L - 1)) *
-          (if k i = 0 then 1 else coordElem (h z) i ^ L) := fun i => by
-      rw [sum_lmCoeff_smul_pow]
-      simp only [Y, h]
-      by_cases hk : k i = 0
-      · simp [hk]
-      · simp only [hk, ↓reduceIte, coordElem]
-        ring
-    simp only [A, B]
-    rw [Finset.prod_congr rfl fun i _ => hfac i, Finset.prod_mul_distrib]
-    congr 1
-    rw [Finset.prod_ite, Finset.prod_const_one, one_mul]
-    rfl
-  have hGz : ∀ z, (fun x => G x z) =
-      diffAct (B z) (mixedDiff L e (h z) (f : (Fin d → ℝ) → ℂ)) := fun z => by
-    funext x
-    simp only [G]
-    rw [hfactor z, map_mul, Module.End.mul_apply]
-    rfl
-  -- the remaining polynomials act boundedly
-  have hB : ∀ z, ActsBounded p (B z) ((2 ^ L + 1) ^ d) := fun z => by
-    have h := ActsBounded.prod (p := p) (Finset.univ : Finset (Fin d))
-      (a := fun i => if k i = 0 then 1 - (-1) ^ L * (Y z i - 1) ^ L
-        else (-1) ^ L * ((Y z i + 1) ^ L - 1)) (C := fun _ => (2 : ℝ≥0∞) ^ L + 1)
-      fun i _ => by
-        by_cases hk : k i = 0
-        · simp only [hk, ↓reduceIte]
-          exact (actsBounded_momentPoly hp1 L _).mono (add_comm _ _).le
-        · simp only [hk, ↓reduceIte]
-          exact actsBounded_addPoly hp1 L _
-    rwa [Finset.prod_const, Finset.card_univ, Fintype.card_fin] at h
   -- the bound on the support of the weight
   have hbound : ∀ z, Φ z ≠ 0 →
       eLpNorm (fun x => G x z) p volume ≤ (2 ^ L + 1) ^ d * ω := fun z hz => by
@@ -308,44 +327,31 @@ theorem enorm_mixedLocalMean_le (hp : p ≠ ∞) (L : ℕ) (hR : b.radius ≤ 1)
       have := not_lt.1 fun hlt => hgi (b.eq_zero (z i) hlt)
       exact (Real.norm_eq_abs _ ▸ this).trans hR
     have hsteps : ∀ i ∈ e, |h z i| ≤ 1 / 2 ^ k i := fun i _ => by
-      simp only [h, c, abs_div, abs_neg, abs_of_pos (by positivity : (0 : ℝ) < 2 ^ k i)]
+      simp only [h, abs_div, abs_neg, abs_of_pos (by positivity : (0 : ℝ) < 2 ^ k i)]
       exact div_le_div_of_nonneg_right (hzR i) (by positivity)
-    rw [hGz z]
-    refine ((hB z) _ (aestronglyMeasurable_mixedDiff (Lp.aestronglyMeasurable f) L e (h z))).2.trans
-      (mul_le_mul' le_rfl ?_)
+    have hGz : (fun x => G x z) =
+        diffAct (lmRemainder L k (h z)) (mixedDiff L e (h z) (f : (Fin d → ℝ) → ℂ)) := by
+      funext x
+      simp only [G]
+      rw [prod_sum_lmCoeff_eq, map_mul, Module.End.mul_apply]
+      rfl
+    rw [hGz]
+    refine ((actsBounded_lmRemainder L k (h z)) _ (aestronglyMeasurable_mixedDiff
+      (Lp.aestronglyMeasurable f) L e (h z))).2.trans (mul_le_mul' le_rfl ?_)
     exact eLpNorm_mixedDiff_le_mixedModulus hsteps
   -- Minkowski's inequality
-  set A₀ := ∫⁻ z, ‖Φ z‖ₑ
-  have hA₀ : A₀ = (∫⁻ t, ‖b.toFun t‖ₑ) ^ d := by
-    simp only [A₀, Φ]
+  have hA₀ : ∫⁻ z, ‖Φ z‖ₑ = (∫⁻ t, ‖b.toFun t‖ₑ) ^ d := by
+    simp only [Φ]
     rw [lintegral_enorm_tensorKernel fun _ => b.integrable, Finset.prod_const, Finset.card_univ,
       Fintype.card_fin]
   have hg0 : (∫⁻ t, ‖b.toFun t‖ₑ) ≠ 0 :=
     lintegral_enorm_ne_zero_of_integral_eq_one b.integrable b.integral_eq_one
-  have hA0 : A₀ ≠ 0 := by
-    rw [hA₀]
-    exact pow_ne_zero _ hg0
-  have hAt : A₀ ≠ ∞ := by
-    rw [hA₀]
-    exact ENNReal.pow_ne_top b.integrable.2.ne
-  have hΦ : AEStronglyMeasurable Φ volume :=
+  rw [Lp.enorm_def, eLpNorm_congr_ae (b.mixedLocalMean_ae_eq hp L k f)]
+  refine (eLpNorm_integral_kernel_le_of_bound hp1 hp
     (integrable_tensorKernel fun _ => b.integrable).aestronglyMeasurable
-  set C := (2 : ℝ≥0∞) ^ L + 1
-  rw [Lp.enorm_def, eLpNorm_congr_ae hae, ← ENNReal.rpow_le_rpow_iff hq]
-  refine (eLpNorm_integral_kernel_le hp1 hp hΦ hG).trans ?_
-  calc A₀ ^ (p.toReal - 1) * ∫⁻ z, ‖Φ z‖ₑ * eLpNorm (fun x => G x z) p volume ^ p.toReal
-      ≤ A₀ ^ (p.toReal - 1) * ∫⁻ z, ‖Φ z‖ₑ * (C ^ d * ω) ^ p.toReal :=
-        mul_le_mul' le_rfl (lintegral_mono fun z => by
-          by_cases hz : Φ z = 0
-          · simp [hz]
-          · exact mul_le_mul' le_rfl (ENNReal.rpow_le_rpow (hbound z hz) hq.le))
-    _ = A₀ ^ (p.toReal - 1) * A₀ ^ (1 : ℝ) * (C ^ d * ω) ^ p.toReal := by
-        rw [lintegral_mul_const'' _ hΦ.enorm, ENNReal.rpow_one, mul_assoc]
-    _ = (A₀ * (C ^ d * ω)) ^ p.toReal := by
-        rw [← ENNReal.rpow_add _ _ hA0 hAt, sub_add_cancel,
-          ← ENNReal.mul_rpow_of_nonneg _ _ hq.le]
-    _ = (((∫⁻ t, ‖b.toFun t‖ₑ) * C) ^ d * ω) ^ p.toReal := by
-        rw [hA₀, mul_pow, mul_assoc]
+    (by rw [hA₀]; exact pow_ne_zero _ hg0) (by rw [hA₀]; exact ENNReal.pow_ne_top b.integrable.2.ne)
+    hG hbound).trans_eq ?_
+  rw [hA₀, mul_pow, mul_assoc]
 
 /-- **Local means quasi-norm and differences**:
 `‖(2^(s|k|_1) ‖k_k ⋆ f‖_p)_k‖_{ℓ_q} ≤ (‖g‖_1 (2^L + 1))^d ‖(2^(s|k|_1) Ω^{e(k)}_L(f, 2^(-k))_p)_k‖_{ℓ_q}`

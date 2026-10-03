@@ -137,6 +137,57 @@ theorem tsum_canonical_ne_top {A : ApproximationScheme X} {β : ℝ} (hβ : 0 �
   rw [ENNReal.tsum_add, ENNReal.tsum_dyadicWeight_neg_one, ← ENNReal.lqNorm_one]
   exact ENNReal.add_ne_top.2 ⟨hL.ne, by norm_num⟩
 
+/-! ### Series moved up by a number of levels -/
+
+/-- The sequence `a` moved up by `γ` levels: `a_{i-γ}` at the levels `i ≥ γ`, and `0` below. -/
+def shiftSeq (γ : ℕ) (a : ℕ → X) (i : ℕ) : X := if γ ≤ i then a (i - γ) else 0
+
+omit [NormedSpace ℝ X] in
+/-- `(shiftSeq γ a)_{n+γ} = a_n`. -/
+theorem shiftSeq_add (γ : ℕ) (a : ℕ → X) (n : ℕ) : shiftSeq γ a (n + γ) = a n := by
+  simp [shiftSeq]
+
+omit [NormedSpace ℝ X] in
+/-- The levels below `γ` of the moved sequence are `0`. -/
+theorem shiftSeq_of_lt {γ i : ℕ} (a : ℕ → X) (h : i < γ) : shiftSeq γ a i = 0 := by
+  simp [shiftSeq, not_le.2 h]
+
+omit [NormedSpace ℝ X] in
+/-- **Moving a series up keeps its sum.** -/
+theorem hasSum_shiftSeq {γ : ℕ} {a : ℕ → X} {f : X} (hfa : HasSum a f) :
+    HasSum (shiftSeq γ a) f := by
+  refine (hasSum_nat_add_iff' γ).1 ?_
+  have h1 : (fun n => shiftSeq γ a (n + γ)) = a := funext (shiftSeq_add γ a)
+  have h2 : ∑ i ∈ range γ, shiftSeq γ a i = 0 :=
+    Finset.sum_eq_zero fun i hi => shiftSeq_of_lt a (Finset.mem_range.1 hi)
+  rw [h1, h2, sub_zero]
+  exact hfa
+
+/-- **Moving approximants up**: if `a_j ∈ A_{2^(j+γ)}`, then `(shiftSeq γ a)_i ∈ A_{2^i}`. -/
+theorem shiftSeq_mem {A : ApproximationScheme X} {γ : ℕ} {a : ℕ → X}
+    (ha : ∀ j, a j ∈ A (2 ^ (j + γ))) (i : ℕ) : shiftSeq γ a i ∈ A (2 ^ i) := by
+  by_cases h : γ ≤ i
+  · simp only [shiftSeq, h, ↓reduceIte]
+    have := ha (i - γ)
+    rwa [Nat.sub_add_cancel h] at this
+  · simp only [shiftSeq, h, ↓reduceIte]
+    exact A.zero_mem _
+
+omit [NormedSpace ℝ X] in
+/-- **The weighted norm of a moved sequence**:
+`‖(2^(iσ) ‖(shiftSeq γ a)_i‖)_i‖_{ℓ_q} ≤ ‖(2^((j+γ)σ) ‖a_j‖)_j‖_{ℓ_q}`. -/
+theorem lqNorm_shiftSeq_le (γ : ℕ) (a : ℕ → X) (σ : ℝ) (q : ℝ≥0∞) :
+    lqNorm q (fun i => dyadicWeight σ i * ‖shiftSeq γ a i‖ₑ) ≤
+      lqNorm q (fun j => dyadicWeight σ (j + γ) * ‖a j‖ₑ) := by
+  have : (fun i => dyadicWeight σ i * ‖shiftSeq γ a i‖ₑ) = fun i =>
+      if γ ≤ i then (fun j => dyadicWeight σ (j + γ) * ‖a j‖ₑ) (i - γ) else 0 := by
+    funext i
+    by_cases h : γ ≤ i
+    · simp only [shiftSeq, h, ↓reduceIte, Nat.sub_add_cancel h]
+    · simp [shiftSeq, h]
+  rw [this]
+  exact ENNReal.lqNorm_shiftRight_le γ (fun j => dyadicWeight σ (j + γ) * ‖a j‖ₑ)
+
 namespace TraceBound
 
 variable {A : ApproximationScheme X} {B : ApproximationScheme Y} {β : ℝ} (TB : TraceBound A B β)
@@ -499,120 +550,28 @@ def RightInverseBound (γ : ℕ) (C' : ℝ≥0∞) : Prop :=
   ∀ k, ∀ b ∈ B (2 ^ k), ∃ a ∈ A (2 ^ (k + γ)), TB.T a = b ∧
     ‖a‖ₑ ≤ C' * dyadicWeight (-β) k * ‖b‖ₑ
 
-/-- **Surjectivity of the trace**: in Banach spaces, for `β ≥ 0`, a right inverse bound,
-`s > 0` and `1 ≤ q ≤ ∞`, every `g ∈ B^s_q(Y)` is the trace of some `f ∈ A^{s+β}_q(X)` with
-`‖f‖_{A^{s+β}_q} ≤ K ‖g‖_{B^s_q}` in the dyadic quasi-norms, `K = traceSurjConst C' β s γ`.
-The proof lifts the blocks `b_j ∈ B (2^j)` of a block decomposition of `g` to `a_j` with
-`T a_j = b_j` and takes `f = ∑ a_j`. -/
-theorem exists_ext_eq [CompleteSpace X] [CompleteSpace Y] (hβ : 0 ≤ β) {γ : ℕ} {C' : ℝ≥0∞}
-    (hC' : C' ≠ ∞) (hR : TB.RightInverseBound γ C') {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
-    (hq : 1 ≤ q) {g : Y} (hg : B.MemApprox s q g) :
-    ∃ f : X, A.MemApprox (s + β) q f ∧ TB.ext f = g ∧
-      A.approxNormDyadic (s + β) q f ≤ traceSurjConst C' β s γ * B.approxNormDyadic s q g := by
-  rcases eq_or_ne g 0 with rfl | hg0
-  · exact ⟨0, memApprox_zero _ _, TB.ext_zero hβ, by rw [approxNormDyadic_zero]; exact bot_le⟩
-  have hsβ : 0 < s + β := by linarith
+/-- **The trace of a lifted series**: if `a_j ∈ A_{2^(j+γ)}` lift `b_j = T a_j` with
+`‖a_j‖ ≤ C' 2^(-jβ) ‖b_j‖`, `∑ ‖b_j‖ < ∞` and `∑ b_j = g`, and `f = ∑ a_j` lies in `A^β_1`, then
+the trace of `f` is `g`. The partial sums of the moved series approximate `f` with
+`2^(Kβ) ‖f - ∑_{i < K+γ} G_i‖ ≤ C' ∑_m ‖b_{m+K}‖ → 0`, and `TraceBound.tendsto_ext` applies. -/
+theorem ext_eq_of_hasSum_lift [CompleteSpace Y] (hβ : 0 ≤ β) {γ : ℕ} {C' : ℝ≥0∞} (hC' : C' ≠ ∞)
+    {a : ℕ → X} {b : ℕ → Y} (ha : ∀ j, a j ∈ A (2 ^ (j + γ))) (hTa : ∀ j, TB.T (a j) = b j)
+    (hale : ∀ j, ‖a j‖ₑ ≤ C' * dyadicWeight (-β) j * ‖b j‖ₑ) (hb_fin : ∑' j, ‖b j‖ₑ ≠ ∞)
+    {g : Y} (hb_sum : HasSum b g) {f : X} (hfa : HasSum a f) (hfβ : A.MemApprox β 1 f) :
+    TB.ext f = g := by
   have hw1 : ∀ j, dyadicWeight (-β) j ≤ 1 := fun j =>
     (ENNReal.dyadicWeight_le_of_le (by linarith) j).trans_eq (ENNReal.dyadicWeight_zero_left j)
-  -- near-best approximants of `g` and their blocks
-  set t := tolerance g s
-  obtain ⟨D⟩ := exists_dyadicApprox B g (tolerance_ne_zero hg0 s) (tolerance_ne_top g s)
-  have ht : Antitone t := tolerance_anti g hs.le
-  have htend : Tendsto t atTop (𝓝 0) := tendsto_tolerance g (by linarith)
-  have htsum : ∑' k, t k ≤ 2 * ‖g‖ₑ := tsum_tolerance_le g hs.le
-  set b := D.blocks
-  have hb_mem : ∀ j, b j ∈ B (2 ^ j) := D.blocks_mem
-  have hb_sum : HasSum b g := D.hasSum_blocks hs hq hg ht htend htsum
-  have hb_fin : ∑' j, ‖b j‖ₑ ≠ ∞ := D.tsum_enorm_blocks_ne_top hs hq hg ht htsum
-  have hb_lq := D.lqNorm_blocks_le hq ht (tolerance_zero g s).le
-    (lqNorm_dyadicWeight_mul_tolerance_le hq g le_rfl)
-  -- lift the blocks
-  choose a ha hTa hale using fun j => hR j (b j) (hb_mem j)
-  have hale' : ∀ j, ‖a j‖ₑ ≤ C' * ‖b j‖ₑ := fun j => by
-    calc ‖a j‖ₑ ≤ C' * dyadicWeight (-β) j * ‖b j‖ₑ := hale j
-      _ ≤ C' * 1 * ‖b j‖ₑ := by gcongr; exact hw1 j
-      _ = C' * ‖b j‖ₑ := by rw [mul_one]
-  have ha_fin : ∑' j, ‖a j‖ₑ ≠ ∞ := ne_top_of_le_ne_top (ENNReal.mul_ne_top hC' hb_fin)
-    ((ENNReal.tsum_le_tsum hale').trans_eq ENNReal.tsum_mul_left)
-  have ha_summ : Summable a := Summable.of_norm (by simpa using ENNReal.summable_toReal ha_fin)
-  set f := ∑' j, a j
-  have hfa : HasSum a f := ha_summ.hasSum
-  -- the lifted blocks, placed at the levels `j + γ`
-  set G : ℕ → X := fun i => if γ ≤ i then a (i - γ) else 0
-  have hGa : ∀ n, G (n + γ) = a n := fun n => by simp [G]
-  have hG_mem : ∀ i, G i ∈ A (2 ^ i) := fun i => by
-    by_cases h : γ ≤ i
-    · simp only [G, h, ↓reduceIte]
-      have := ha (i - γ)
-      rwa [Nat.sub_add_cancel h] at this
-    · simp only [G, h, ↓reduceIte]; exact A.zero_mem _
-  have hG : HasSum G f := by
-    refine (hasSum_nat_add_iff' γ).1 ?_
-    have h1 : (fun n => G (n + γ)) = a := funext hGa
-    have h2 : ∑ i ∈ range γ, G i = 0 :=
-      Finset.sum_eq_zero fun i hi => by simp [G, not_le.2 (Finset.mem_range.1 hi)]
-    rw [h1, h2, sub_zero]; exact hfa
-  -- the norm of `f`
-  set N := B.approxNormDyadic s q g
-  have hlqb : lqNorm q (fun j => dyadicWeight s j * ‖b j‖ₑ) ≤
-      (3 * 2 ^ s + 4 * dyadicWeight s 2) * N := by
-    refine hb_lq.trans ?_
-    have hgN : ‖g‖ₑ ≤ N := enorm_le_approxNormDyadic g
-    have hDN : lqNorm q (B.approxSeqDyadic s g) + ‖g‖ₑ = N := by
-      rw [show N = ‖g‖ₑ + lqNorm q (B.approxSeqDyadic s g) from rfl, add_comm]
-    calc 2 ^ s * (3 * ‖g‖ₑ) + 2 * dyadicWeight s 2 * (lqNorm q (B.approxSeqDyadic s g) + 2 * ‖g‖ₑ)
-        = 2 ^ s * (3 * ‖g‖ₑ) + 2 * dyadicWeight s 2 *
-            ((lqNorm q (B.approxSeqDyadic s g) + ‖g‖ₑ) + ‖g‖ₑ) := by ring
-      _ ≤ 2 ^ s * (3 * N) + 2 * dyadicWeight s 2 * (N + N) := by rw [hDN]; gcongr
-      _ = (3 * 2 ^ s + 4 * dyadicWeight s 2) * N := by ring
-  have hwG : lqNorm q (fun i => dyadicWeight (s + β) i * ‖G i‖ₑ) ≤
-      lqNorm q (fun j => dyadicWeight (s + β) (j + γ) * ‖a j‖ₑ) := by
-    have : (fun i => dyadicWeight (s + β) i * ‖G i‖ₑ) = fun i =>
-        if γ ≤ i then (fun j => dyadicWeight (s + β) (j + γ) * ‖a j‖ₑ) (i - γ) else 0 := by
-      funext i
-      by_cases h : γ ≤ i
-      · simp only [G, h, ↓reduceIte, Nat.sub_add_cancel h]
-      · simp [G, h]
-    rw [this]
-    exact ENNReal.lqNorm_shiftRight_le γ (fun j => dyadicWeight (s + β) (j + γ) * ‖a j‖ₑ)
-  have hpt : ∀ j, dyadicWeight (s + β) (j + γ) * ‖a j‖ₑ ≤
-      dyadicWeight (s + β) γ * C' * (dyadicWeight s j * ‖b j‖ₑ) := fun j => by
-    calc dyadicWeight (s + β) (j + γ) * ‖a j‖ₑ
-        ≤ dyadicWeight (s + β) (j + γ) * (C' * dyadicWeight (-β) j * ‖b j‖ₑ) := by
-          gcongr; exact hale j
-      _ = dyadicWeight (s + β) γ * C' *
-            ((dyadicWeight (s + β) j * dyadicWeight (-β) j) * ‖b j‖ₑ) := by
-          rw [ENNReal.dyadicWeight_add_nat]; ring
-      _ = dyadicWeight (s + β) γ * C' * (dyadicWeight s j * ‖b j‖ₑ) := by
-          rw [← ENNReal.dyadicWeight_add, show s + β + -β = s by ring]
-  have hnorm : A.approxNormDyadic (s + β) q f ≤ traceSurjConst C' β s γ * N := by
-    calc A.approxNormDyadic (s + β) q f
-        ≤ 2 * (1 - (2 : ℝ≥0∞) ^ (-(s + β)))⁻¹ *
-            lqNorm q (fun i => dyadicWeight (s + β) i * ‖G i‖ₑ) :=
-          approxNormDyadic_le_of_hasSum hq hG_mem hG
-      _ ≤ 2 * (1 - (2 : ℝ≥0∞) ^ (-(s + β)))⁻¹ *
-            (dyadicWeight (s + β) γ * C' * ((3 * 2 ^ s + 4 * dyadicWeight s 2) * N)) := by
-          gcongr
-          calc _ ≤ lqNorm q (fun j => dyadicWeight (s + β) (j + γ) * ‖a j‖ₑ) := hwG
-            _ ≤ lqNorm q (fun j => dyadicWeight (s + β) γ * C' * (dyadicWeight s j * ‖b j‖ₑ)) :=
-                ENNReal.lqNorm_mono hpt
-            _ = dyadicWeight (s + β) γ * C' * lqNorm q (fun j => dyadicWeight s j * ‖b j‖ₑ) :=
-                ENNReal.lqNorm_const_mul _ _
-            _ ≤ _ := by gcongr
-      _ = traceSurjConst C' β s γ * N := by simp only [traceSurjConst]; ring
-  have hfmem : A.MemApprox (s + β) q f := (memApprox_iff_approxNormDyadic_lt_top hq hsβ.le).2
-    (hnorm.trans_lt (ENNReal.mul_lt_top (traceSurjConst_ne_top hC' hsβ γ).lt_top
-      ((memApprox_iff_approxNormDyadic_lt_top hq hs.le).1 hg)))
-  -- the trace of `f` is `g`
-  have hfβ : A.MemApprox β 1 f := hfmem.mono hq le_rfl hβ (Or.inl (by linarith))
-  have htailG : ∀ K, ‖f - ∑ i ∈ range (K + γ), G i‖ₑ ≤ ∑' m, ‖a (m + K)‖ₑ := fun K => by
-    rw [← hG.tsum_eq, ← ((summable_nat_add_iff (K + γ)).2 hG.summable).sum_add_tsum_nat_add',
-      add_sub_cancel_left]
-    calc ‖∑' m, G (m + (K + γ))‖ₑ ≤ ∑' m, ‖G (m + (K + γ))‖ₑ := enorm_tsum_le_tsum_enorm
-      _ = ∑' m, ‖a (m + K)‖ₑ := by congr 1; funext m; rw [← add_assoc, hGa]
-  have hdecay : ∀ K, dyadicWeight β K * ‖f - ∑ i ∈ range (K + γ), G i‖ₑ ≤
+  have hG : HasSum (shiftSeq γ a) f := hasSum_shiftSeq hfa
+  have htailG : ∀ K, ‖f - ∑ i ∈ range (K + γ), shiftSeq γ a i‖ₑ ≤ ∑' m, ‖a (m + K)‖ₑ :=
+    fun K => by
+      rw [← hG.tsum_eq, ← ((summable_nat_add_iff (K + γ)).2 hG.summable).sum_add_tsum_nat_add',
+        add_sub_cancel_left]
+      calc ‖∑' m, shiftSeq γ a (m + (K + γ))‖ₑ ≤ ∑' m, ‖shiftSeq γ a (m + (K + γ))‖ₑ :=
+            enorm_tsum_le_tsum_enorm
+        _ = ∑' m, ‖a (m + K)‖ₑ := by congr 1; funext m; rw [← add_assoc, shiftSeq_add]
+  have hdecay : ∀ K, dyadicWeight β K * ‖f - ∑ i ∈ range (K + γ), shiftSeq γ a i‖ₑ ≤
       C' * ∑' m, ‖b (m + K)‖ₑ := fun K => by
-    calc dyadicWeight β K * ‖f - ∑ i ∈ range (K + γ), G i‖ₑ
+    calc dyadicWeight β K * ‖f - ∑ i ∈ range (K + γ), shiftSeq γ a i‖ₑ
         ≤ dyadicWeight β K * ∑' m, ‖a (m + K)‖ₑ := mul_le_mul' le_rfl (htailG K)
       _ ≤ dyadicWeight β K * ∑' m, C' * dyadicWeight (-β) (m + K) * ‖b (m + K)‖ₑ :=
           mul_le_mul' le_rfl (ENNReal.tsum_le_tsum fun m => hale (m + K))
@@ -630,24 +589,85 @@ theorem exists_ext_eq [CompleteSpace X] [CompleteSpace Y] (hβ : 0 ≤ β) {γ :
                 gcongr; exact hw1 m
             _ = C' * ‖b (m + K)‖ₑ := by rw [mul_one]
       _ = C' * ∑' m, ‖b (m + K)‖ₑ := ENNReal.tsum_mul_left
-  have hcf : Tendsto (fun K => dyadicWeight β K * ‖f - ∑ i ∈ range (K + γ), G i‖ₑ) atTop
-      (𝓝 0) := by
+  have hcf : Tendsto (fun K => dyadicWeight β K * ‖f - ∑ i ∈ range (K + γ), shiftSeq γ a i‖ₑ)
+      atTop (𝓝 0) := by
     have h0 := ENNReal.Tendsto.const_mul (a := C')
       (ENNReal.tendsto_sum_nat_add (fun j => ‖b j‖ₑ) hb_fin) (Or.inr hC')
     rw [mul_zero] at h0
     exact tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds h0 (fun _ => bot_le) hdecay
-  have h1 := TB.tendsto_ext hβ hfβ (c := fun K => ∑ i ∈ range (K + γ), G i)
-    (fun K => sum_range_mem hG_mem (K + γ)) hcf
-  have hTG : HasSum (fun i => TB.T (G i)) g := by
+  have h1 := TB.tendsto_ext hβ hfβ (c := fun K => ∑ i ∈ range (K + γ), shiftSeq γ a i)
+    (fun K => sum_range_mem (shiftSeq_mem ha) (K + γ)) hcf
+  have hTG : HasSum (fun i => TB.T (shiftSeq γ a i)) g := by
     refine (hasSum_nat_add_iff' γ).1 ?_
-    have h1' : (fun n => TB.T (G (n + γ))) = b := funext fun n => by rw [hGa, hTa]
-    have h2' : ∑ i ∈ range γ, TB.T (G i) = 0 :=
-      Finset.sum_eq_zero fun i hi => by simp [G, not_le.2 (Finset.mem_range.1 hi)]
+    have h1' : (fun n => TB.T (shiftSeq γ a (n + γ))) = b :=
+      funext fun n => by rw [shiftSeq_add, hTa]
+    have h2' : ∑ i ∈ range γ, TB.T (shiftSeq γ a i) = 0 :=
+      Finset.sum_eq_zero fun i hi => by rw [shiftSeq_of_lt a (Finset.mem_range.1 hi), map_zero]
     rw [h1', h2', sub_zero]; exact hb_sum
-  have h2 : Tendsto (fun K => TB.T (∑ i ∈ range (K + γ), G i)) atTop (𝓝 g) := by
+  have h2 : Tendsto (fun K => TB.T (∑ i ∈ range (K + γ), shiftSeq γ a i)) atTop (𝓝 g) := by
     simp_rw [map_sum]
     exact hTG.tendsto_sum_nat.comp (tendsto_add_atTop_nat γ)
-  exact ⟨f, hfmem, tendsto_nhds_unique h1 h2, hnorm⟩
+  exact tendsto_nhds_unique h1 h2
+
+/-- **Surjectivity of the trace**: in Banach spaces, for `β ≥ 0`, a right inverse bound,
+`s > 0` and `1 ≤ q ≤ ∞`, every `g ∈ B^s_q(Y)` is the trace of some `f ∈ A^{s+β}_q(X)` with
+`‖f‖_{A^{s+β}_q} ≤ K ‖g‖_{B^s_q}` in the dyadic quasi-norms, `K = traceSurjConst C' β s γ`.
+The proof lifts the blocks `b_j ∈ B (2^j)` of a block decomposition of `g`
+(`ApproximationScheme.exists_blocks`) to `a_j` with `T a_j = b_j` and takes `f = ∑ a_j`. -/
+theorem exists_ext_eq [CompleteSpace X] [CompleteSpace Y] (hβ : 0 ≤ β) {γ : ℕ} {C' : ℝ≥0∞}
+    (hC' : C' ≠ ∞) (hR : TB.RightInverseBound γ C') {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
+    (hq : 1 ≤ q) {g : Y} (hg : B.MemApprox s q g) :
+    ∃ f : X, A.MemApprox (s + β) q f ∧ TB.ext f = g ∧
+      A.approxNormDyadic (s + β) q f ≤ traceSurjConst C' β s γ * B.approxNormDyadic s q g := by
+  have hsβ : 0 < s + β := by linarith
+  have hw1 : ∀ j, dyadicWeight (-β) j ≤ 1 := fun j =>
+    (ENNReal.dyadicWeight_le_of_le (by linarith) j).trans_eq (ENNReal.dyadicWeight_zero_left j)
+  -- the blocks of `g`, and their lifts
+  obtain ⟨b, hb_mem, hb_sum, hb_fin, hlqb⟩ := B.exists_blocks hs hq hg
+  set N := B.approxNormDyadic s q g
+  choose a ha hTa hale using fun j => hR j (b j) (hb_mem j)
+  have hale' : ∀ j, ‖a j‖ₑ ≤ C' * ‖b j‖ₑ := fun j => by
+    calc ‖a j‖ₑ ≤ C' * dyadicWeight (-β) j * ‖b j‖ₑ := hale j
+      _ ≤ C' * 1 * ‖b j‖ₑ := by gcongr; exact hw1 j
+      _ = C' * ‖b j‖ₑ := by rw [mul_one]
+  have ha_fin : ∑' j, ‖a j‖ₑ ≠ ∞ := ne_top_of_le_ne_top (ENNReal.mul_ne_top hC' hb_fin)
+    ((ENNReal.tsum_le_tsum hale').trans_eq ENNReal.tsum_mul_left)
+  have ha_summ : Summable a := Summable.of_norm (by simpa using ENNReal.summable_toReal ha_fin)
+  set f := ∑' j, a j
+  have hfa : HasSum a f := ha_summ.hasSum
+  -- the norm of `f`, through the lifted blocks placed at the levels `j + γ`
+  have hpt : ∀ j, dyadicWeight (s + β) (j + γ) * ‖a j‖ₑ ≤
+      dyadicWeight (s + β) γ * C' * (dyadicWeight s j * ‖b j‖ₑ) := fun j => by
+    calc dyadicWeight (s + β) (j + γ) * ‖a j‖ₑ
+        ≤ dyadicWeight (s + β) (j + γ) * (C' * dyadicWeight (-β) j * ‖b j‖ₑ) := by
+          gcongr; exact hale j
+      _ = dyadicWeight (s + β) γ * C' *
+            ((dyadicWeight (s + β) j * dyadicWeight (-β) j) * ‖b j‖ₑ) := by
+          rw [ENNReal.dyadicWeight_add_nat]; ring
+      _ = dyadicWeight (s + β) γ * C' * (dyadicWeight s j * ‖b j‖ₑ) := by
+          rw [← ENNReal.dyadicWeight_add, show s + β + -β = s by ring]
+  have hnorm : A.approxNormDyadic (s + β) q f ≤ traceSurjConst C' β s γ * N := by
+    calc A.approxNormDyadic (s + β) q f
+        ≤ 2 * (1 - (2 : ℝ≥0∞) ^ (-(s + β)))⁻¹ *
+            lqNorm q (fun i => dyadicWeight (s + β) i * ‖shiftSeq γ a i‖ₑ) :=
+          approxNormDyadic_le_of_hasSum hq (shiftSeq_mem ha) (hasSum_shiftSeq hfa)
+      _ ≤ 2 * (1 - (2 : ℝ≥0∞) ^ (-(s + β)))⁻¹ *
+            (dyadicWeight (s + β) γ * C' * ((3 * 2 ^ s + 4 * dyadicWeight s 2) * N)) := by
+          gcongr
+          calc _ ≤ lqNorm q (fun j => dyadicWeight (s + β) (j + γ) * ‖a j‖ₑ) :=
+                lqNorm_shiftSeq_le γ a (s + β) q
+            _ ≤ lqNorm q (fun j => dyadicWeight (s + β) γ * C' * (dyadicWeight s j * ‖b j‖ₑ)) :=
+                ENNReal.lqNorm_mono hpt
+            _ = dyadicWeight (s + β) γ * C' * lqNorm q (fun j => dyadicWeight s j * ‖b j‖ₑ) :=
+                ENNReal.lqNorm_const_mul _ _
+            _ ≤ _ := by gcongr
+      _ = traceSurjConst C' β s γ * N := by simp only [traceSurjConst]; ring
+  have hfmem : A.MemApprox (s + β) q f := (memApprox_iff_approxNormDyadic_lt_top hq hsβ.le).2
+    (hnorm.trans_lt (ENNReal.mul_lt_top (traceSurjConst_ne_top hC' hsβ γ).lt_top
+      ((memApprox_iff_approxNormDyadic_lt_top hq hs.le).1 hg)))
+  -- the trace of `f` is `g`
+  exact ⟨f, hfmem, TB.ext_eq_of_hasSum_lift hβ hC' ha hTa hale hb_fin hb_sum hfa
+    (hfmem.mono hq le_rfl hβ (Or.inl (by linarith))), hnorm⟩
 
 end TraceBound
 

@@ -46,64 +46,6 @@ open ENNReal (lqNorm dyadicWeight)
 
 namespace Rd
 
-/-! ### Bounded overlap -/
-
-/-- If every finite set of indices with property `P` has at most `N` elements, the indices with
-property `P` form a finite set with at most `N` elements. -/
-theorem exists_finset_of_card_le {ι : Type*} {P : ι → Prop} {N : ℕ}
-    (h : ∀ S : Finset ι, (∀ m ∈ S, P m) → S.card ≤ N) :
-    ∃ T : Finset ι, (∀ m, P m → m ∈ T) ∧ T.card ≤ N := by
-  have hfin : {m | P m}.Finite := by
-    by_contra hinf
-    obtain ⟨S, hS, hcard⟩ := Set.Infinite.exists_subset_card_eq hinf (N + 1)
-    have := h S fun m hm => hS hm
-    omega
-  exact ⟨hfin.toFinset, fun m hm => hfin.mem_toFinset.2 hm,
-    h _ fun m hm => hfin.mem_toFinset.1 hm⟩
-
-/-- **Bounded overlap, pointwise**: if at most `N` of the `g m` are nonzero, then
-`‖∑' m, g m‖^p ≤ N^(p-1) ∑' m, ‖g m‖^p` for `p ≥ 1`. -/
-theorem enorm_tsum_rpow_le_of_overlap {ι : Type*} (g : ι → ℂ) {N : ℕ}
-    (hN : ∀ S : Finset ι, (∀ m ∈ S, g m ≠ 0) → S.card ≤ N) {p : ℝ} (hp : 1 ≤ p) :
-    ‖∑' m, g m‖ₑ ^ p ≤ (N : ℝ≥0∞) ^ (p - 1) * ∑' m, ‖g m‖ₑ ^ p := by
-  obtain ⟨T, hT, hTN⟩ := exists_finset_of_card_le hN
-  have hzero : ∀ m ∉ T, g m = 0 := fun m hm => by_contra fun h => hm (hT m h)
-  rw [tsum_eq_sum hzero]
-  calc ‖∑ m ∈ T, g m‖ₑ ^ p ≤ (∑ m ∈ T, ‖g m‖ₑ) ^ p :=
-        ENNReal.rpow_le_rpow (enorm_sum_le _ _) (by linarith)
-    _ ≤ (T.card : ℝ≥0∞) ^ (p - 1) * ∑ m ∈ T, ‖g m‖ₑ ^ p :=
-        ENNReal.rpow_sum_le_const_mul_sum_rpow _ _ hp
-    _ ≤ (N : ℝ≥0∞) ^ (p - 1) * ∑' m, ‖g m‖ₑ ^ p :=
-        mul_le_mul' (ENNReal.rpow_le_rpow (by exact_mod_cast hTN) (by linarith))
-          (ENNReal.sum_le_tsum _)
-
-/-- **Bounded overlap in `L_p`**: if at every point at most `N` of the `g m` are nonzero and
-`F = ∑' m, g m` almost everywhere, then `‖F‖_p^p ≤ N^(p-1) ∑' m, ‖g m‖_p^p`. -/
-theorem eLpNorm_rpow_le_of_overlap {α : Type*} [MeasurableSpace α] {μ : Measure α}
-    {ι : Type*} [Countable ι] {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {g : ι → α → ℂ}
-    (hg : ∀ m, AEStronglyMeasurable (g m) μ) {N : ℕ}
-    (hN : ∀ x (S : Finset ι), (∀ m ∈ S, g m x ≠ 0) → S.card ≤ N) {F : α → ℂ}
-    (hF : AEStronglyMeasurable F μ) (hFg : ∀ᵐ x ∂μ, F x = ∑' m, g m x) :
-    eLpNorm F p μ ^ p.toReal ≤ (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, eLpNorm (g m) p μ ^ p.toReal := by
-  have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
-  have hpr : 1 ≤ p.toReal := by
-    rw [← ENNReal.toReal_one]
-    exact ENNReal.toReal_mono hp hp1
-  rw [eLpNorm_rpow_eq hF hp0 hp]
-  calc ∫⁻ x, ‖F x‖ₑ ^ p.toReal ∂μ
-      ≤ ∫⁻ x, (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, ‖g m x‖ₑ ^ p.toReal ∂μ := by
-        refine lintegral_mono_ae ?_
-        filter_upwards [hFg] with x hx
-        rw [hx]
-        exact enorm_tsum_rpow_le_of_overlap (fun m => g m x) (hN x) hpr
-    _ = (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, ∫⁻ x, ‖g m x‖ₑ ^ p.toReal ∂μ := by
-        rw [lintegral_const_mul' _ _ (ENNReal.rpow_ne_top_of_nonneg (by linarith)
-          (ENNReal.natCast_ne_top N)), lintegral_tsum fun m => ((hg m).enorm.pow_const _)]
-    _ = (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, eLpNorm (g m) p μ ^ p.toReal := by
-        congr 2
-        funext m
-        rw [eLpNorm_rpow_eq (hg m) hp0 hp]
-
 /-! ### Regular atoms -/
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
@@ -222,6 +164,36 @@ theorem eLpNorm_levelSum_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {�
   funext m
   rw [show (fun x => coef m * a m x) = coef m • a m from rfl, eLpNorm_const_smul]
 
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **Bounded overlap of the differences of atoms**: if the atoms `a_m` vanish outside the balls
+`B(c_m, d 2^(-j))` and at most `N` centres with `λ_m ≠ 0` lie in a ball of radius
+`(d + r) 2^(-j)`, then for `‖h‖ ≤ 2^(-j)` at most `N` of the functions `λ_m Δ_h^r a_m` are nonzero
+at any point, since `Δ_h^r a_m(x) ≠ 0` needs some `x + l h`, `l ≤ r`, in the ball of `a_m`. -/
+theorem card_le_of_higherDiff_ne_zero {ι : Type*} {r : ℕ} {d : ℝ} {j N : ℕ} (c : ι → V)
+    (a : ι → V → ℂ) (coef : ι → ℂ)
+    (hN : ∀ x (S : Finset ι), (∀ m ∈ S, coef m ≠ 0 ∧ ‖x - c m‖ ≤ (d + r) / 2 ^ j) → S.card ≤ N)
+    (ha : ∀ m x, d / 2 ^ j < ‖x - c m‖ → a m x = 0) {h : V} (hhk : ‖h‖ ≤ 1 / 2 ^ j) (x : V)
+    (S : Finset ι) (hS : ∀ m ∈ S, coef m * (fwdDiff h)^[r] (a m) x ≠ 0) : S.card ≤ N := by
+  refine hN x S fun m hm => ?_
+  have hne : (fwdDiff h)^[r] (a m) x ≠ 0 := right_ne_zero_of_mul (hS m hm)
+  rw [higherDiff_apply] at hne
+  obtain ⟨l, hl, hl0⟩ : ∃ l ∈ Finset.range (r + 1), a m (x + (l : ℝ) • h) ≠ 0 := by
+    by_contra hcon
+    push Not at hcon
+    exact hne (Finset.sum_eq_zero fun l hl => by rw [hcon l hl, mul_zero])
+  have h1 : ‖x + (l : ℝ) • h - c m‖ ≤ d / 2 ^ j := not_lt.1 fun h' => hl0 (ha m _ h')
+  have hl' : (l : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hl)
+  have h2 : ‖(l : ℝ) • h‖ ≤ r / 2 ^ j := by
+    rw [norm_smul, Real.norm_of_nonneg (Nat.cast_nonneg l)]
+    calc (l : ℝ) * ‖h‖ ≤ r * (1 / 2 ^ j) :=
+          mul_le_mul hl' hhk (norm_nonneg h) (Nat.cast_nonneg r)
+      _ = r / 2 ^ j := by ring
+  refine ⟨left_ne_zero_of_mul (hS m hm), ?_⟩
+  calc ‖x - c m‖ = ‖(x + (l : ℝ) • h - c m) - (l : ℝ) • h‖ := by congr 1; abel
+    _ ≤ ‖x + (l : ℝ) • h - c m‖ + ‖(l : ℝ) • h‖ := norm_sub_le _ _
+    _ ≤ d / 2 ^ j + r / 2 ^ j := add_le_add h1 h2
+    _ = (d + r) / 2 ^ j := by ring
+
 /-- **Moduli of the level sums**: `ω_r(∑_m λ_m a_m, 2^(-k))_p ≤
 2^r N^(1-1/p) C 2^(-jn/p) ‖λ‖_{ℓ_p} c_{kj}` with `c_{kj} = 2^(-(k-j)σ)` for `j ≤ k` and `1`
 otherwise. -/
@@ -252,45 +224,12 @@ theorem modulus_levelSum_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {�
     have hhk : ‖h‖ ≤ 1 / 2 ^ j := hh.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ one_le_two hjk))
     have hover : ∀ x (S : Finset ι), (∀ m ∈ S, coef m * (fwdDiff h)^[r] (a m) x ≠ 0) →
-        S.card ≤ N := fun x S hS => hN x S fun m hm => by
-      have hne : (fwdDiff h)^[r] (a m) x ≠ 0 := right_ne_zero_of_mul (hS m hm)
-      rw [higherDiff_apply] at hne
-      obtain ⟨l, hl, hl0⟩ : ∃ l ∈ Finset.range (r + 1), a m (x + (l : ℝ) • h) ≠ 0 := by
-        by_contra hcon
-        push Not at hcon
-        exact hne (Finset.sum_eq_zero fun l hl => by rw [hcon l hl, mul_zero])
-      have h1 : ‖x + (l : ℝ) • h - c m‖ ≤ d / 2 ^ j :=
-        not_lt.1 fun h' => hl0 ((ha m).eq_zero _ h')
-      have hl' : (l : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hl)
-      have h2 : ‖(l : ℝ) • h‖ ≤ r / 2 ^ j := by
-        rw [norm_smul, Real.norm_of_nonneg (Nat.cast_nonneg l)]
-        calc (l : ℝ) * ‖h‖ ≤ r * (1 / 2 ^ j) :=
-              mul_le_mul hl' hhk (norm_nonneg h) (Nat.cast_nonneg r)
-          _ = r / 2 ^ j := by ring
-      refine ⟨left_ne_zero_of_mul (hS m hm), ?_⟩
-      calc ‖x - c m‖ = ‖(x + (l : ℝ) • h - c m) - (l : ℝ) • h‖ := by congr 1; abel
-        _ ≤ ‖x + (l : ℝ) • h - c m‖ + ‖(l : ℝ) • h‖ := norm_sub_le _ _
-        _ ≤ d / 2 ^ j + r / 2 ^ j := add_le_add h1 h2
-        _ = (d + r) / 2 ^ j := by ring
+        S.card ≤ N :=
+      card_le_of_higherDiff_ne_zero c a coef hN (fun m => (ha m).eq_zero) hhk
     have hbound := eLpNorm_rpow_le_of_overlap hp1 hp hg hover
       (aestronglyMeasurable_higherDiff hF r h) hae
-    have hmin : min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ) ≤ dyadicWeight (-σ) (k - j) := by
-      refine (min_le_right _ _).trans ?_
-      have hk : (2 : ℝ) ^ j * ‖h‖ ≤ (1 / 2 ^ (k - j)) := by
-        calc (2 : ℝ) ^ j * ‖h‖ ≤ 2 ^ j * (1 / 2 ^ k) :=
-              mul_le_mul_of_nonneg_left hh (by positivity)
-          _ = 1 / 2 ^ (k - j) := by
-              rw [show k = (k - j) + j by omega, pow_add]
-              field_simp
-              simp
-      calc ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ ≤ ENNReal.ofReal (1 / 2 ^ (k - j)) ^ σ :=
-            ENNReal.rpow_le_rpow (ENNReal.ofReal_le_ofReal hk) hσ
-        _ = dyadicWeight (-σ) (k - j) := by
-            rw [one_div, ENNReal.ofReal_inv_of_pos (by positivity), ENNReal.ofReal_pow zero_le_two,
-              ENNReal.ofReal_ofNat, ← ENNReal.rpow_natCast, ← ENNReal.rpow_neg, ← ENNReal.rpow_mul,
-              ENNReal.dyadicWeight]
-            congr 1
-            ring
+    have hmin : min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ) ≤ dyadicWeight (-σ) (k - j) :=
+      (min_le_right _ _).trans (ENNReal.ofReal_two_pow_mul_rpow_le hjk hh hσ)
     calc eLpNorm ((fwdDiff h)^[r] F) p volume
         ≤ (N : ℝ≥0∞) ^ (1 - 1 / p.toReal) * (C * dyadicWeight (-(finrank ℝ V / p.toReal)) j *
             dyadicWeight (-σ) (k - j)) * levelNorm p coef :=
@@ -377,21 +316,8 @@ theorem modNorm_le_coeffNorm {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) 
     simp only [K0, b]
     ring
   -- the norm
-  have hnorm : ‖F‖ₑ ≤ K0 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
-    have h1 : ‖F‖ₑ ≤ ∑' j, ‖f j‖ₑ :=
-      ENNReal.le_tsum_of_tendsto_sum (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y)
-        (fun x => by rw [one_mul]) hF
-    have h2 : ∀ j, ‖f j‖ₑ ≤ K0 * (dyadicWeight (-s) j * X) := fun j => by
-      have hXj : dyadicWeight s j * b j ≤ X :=
-        ENNReal.le_lqNorm (zero_lt_one.trans_le hq).ne' (fun j => dyadicWeight s j * b j) j
-      calc ‖f j‖ₑ ≤ K0 * b j := hlevel j
-        _ = K0 * (dyadicWeight (-s) j * (dyadicWeight s j * b j)) := by
-            rw [← mul_assoc (dyadicWeight (-s) j), ENNReal.dyadicWeight_neg_mul_self, one_mul]
-        _ ≤ K0 * (dyadicWeight (-s) j * X) := by gcongr
-    calc ‖F‖ₑ ≤ ∑' j, K0 * (dyadicWeight (-s) j * X) := h1.trans (ENNReal.tsum_le_tsum h2)
-      _ = K0 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
-          rw [ENNReal.tsum_mul_left, ENNReal.tsum_mul_right, ENNReal.tsum_dyadicWeight_neg]
-          ring
+  have hnorm : ‖F‖ₑ ≤ K0 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X :=
+    ENNReal.enorm_le_of_tendsto_sum hF hlevel s hq
   -- the moduli
   have hmod : ∀ k, lpModulus p r F k ≤ 2 ^ r * K0 *
       ∑' j, (if j ≤ k then dyadicWeight (-σ) (k - j) else 1) * b j := fun k => by

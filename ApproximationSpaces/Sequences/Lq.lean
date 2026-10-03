@@ -486,6 +486,35 @@ theorem le_tsum_of_tendsto_sum {E : Type*} [NormedAddCommGroup E] {Q : E → ℝ
     Q f ≤ ∑' j, Q (u j) :=
   le_tsum_of_tendsto_finsetSum (S := fun J => Finset.range (J + 1)) hC hadd hle hu
 
+/-- **Weighted sequences are summable**: `∑_j a_j ≤ (1 - 2^(-s))⁻¹ ‖(2^(js) a_j)_j‖_{ℓ_q}`,
+since `a_j ≤ 2^(-js) ‖(2^(js) a_j)_j‖_{ℓ_q}`. -/
+theorem tsum_le_lqNorm_dyadicWeight {q : ℝ≥0∞} (hq : 1 ≤ q) (s : ℝ) (a : ℕ → ℝ≥0∞) :
+    ∑' j, a j ≤ (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * lqNorm q (fun j => dyadicWeight s j * a j) := by
+  set X := lqNorm q (fun j => dyadicWeight s j * a j)
+  calc ∑' j, a j ≤ ∑' j, dyadicWeight (-s) j * X := ENNReal.tsum_le_tsum fun j => by
+        calc a j = dyadicWeight (-s) j * (dyadicWeight s j * a j) := by
+              rw [← mul_assoc, dyadicWeight_neg_mul_self, one_mul]
+          _ ≤ dyadicWeight (-s) j * X := mul_le_mul' le_rfl
+              (le_lqNorm (zero_lt_one.trans_le hq).ne' (fun j => dyadicWeight s j * a j) j)
+    _ = (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
+        rw [ENNReal.tsum_mul_right, tsum_dyadicWeight_neg]
+
+/-- **A series with weighted bounds**: if the partial sums of `∑ u_j` converge to `F` and
+`‖u_j‖ ≤ K b_j`, then `‖F‖ ≤ K (1 - 2^(-s))⁻¹ ‖(2^(js) b_j)_j‖_{ℓ_q}`
+(`ENNReal.tsum_le_lqNorm_dyadicWeight`). -/
+theorem enorm_le_of_tendsto_sum {E : Type*} [NormedAddCommGroup E] {u : ℕ → E} {F : E}
+    (hu : Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), u j) atTop (nhds F)) {K : ℝ≥0∞}
+    {b : ℕ → ℝ≥0∞} (hb : ∀ j, ‖u j‖ₑ ≤ K * b j) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q) :
+    ‖F‖ₑ ≤ K * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * lqNorm q (fun j => dyadicWeight s j * b j) := by
+  have h1 : ‖F‖ₑ ≤ ∑' j, ‖u j‖ₑ :=
+    le_tsum_of_tendsto_sum (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y)
+      (fun x => by rw [one_mul]) hu
+  calc ‖F‖ₑ ≤ ∑' j, K * b j := h1.trans (ENNReal.tsum_le_tsum hb)
+    _ = K * ∑' j, b j := ENNReal.tsum_mul_left
+    _ ≤ K * ((1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * lqNorm q (fun j => dyadicWeight s j * b j)) :=
+        mul_le_mul' le_rfl (tsum_le_lqNorm_dyadicWeight hq s b)
+    _ = _ := (mul_assoc _ _ _).symm
+
 /-! ### Tails and partial sums -/
 
 /-- `∑_K [j ≤ K] g K = ∑_i g (j + i)`. -/
