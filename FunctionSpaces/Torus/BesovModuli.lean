@@ -6,30 +6,31 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Torus.Modulus
+public import ApproximationSpaces.Moduli
 
 /-!
 # Besov spaces through moduli of smoothness: the coincidence theorem in `L_2(𝕋^d)`
 
 The classical definition of the Besov space `B^s_{2,q}(𝕋^d)`, `0 < s < 1`, uses the modulus of
-smoothness `ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`:
+smoothness `ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2` at the dyadic scales `t = 2^(-k)`.  This
+modulus is compatible with the trigonometric scheme, with inverse order `θ = 1`
+(`Torus.trigModulusData`, a `ModulusData`):
 
-`‖f‖ = ‖f‖_2 + ‖(2^(js) ω(f, 2^(-j))_2)_{j ≥ 0}‖_{ℓ_q}`   (`Torus.modulusNorm`).
+* it is subadditive and at most `2 ‖f‖_2` (`Rd.lpModulus_add_le`, `Rd.lpModulus_le`);
+* **Jackson's inequality** `E_n(f)_2 ≤ (d + 1) ω(f, 1/n)_2` (`Torus.approxSeq_le_modulus`);
+* **the inverse inequality** `ω(a, 2^(-k))_2 ≤ max(2, 2πd) 2^(-(k-j)) ‖a‖_2` for trigonometric
+  polynomials `a` of degree `< 2^j` (`Torus.modulus_le_of_mem`), from Bernstein's inequality
+  `‖τ_h a - a‖_2 ≤ 2πd 2^j ‖h‖ ‖a‖_2` (`Torus.enorm_translate_sub_le_of_mem`).
 
 **Coincidence theorem** (`Torus.memBesov_iff_modulusNorm_lt_top`): for `0 < s < 1` and
-`1 ≤ q ≤ ∞` this space is the approximation space `B^s_{2,q}(𝕋^d)` of trigonometric polynomials,
-with equivalent norms:
+`1 ≤ q ≤ ∞`, `f` lies in the approximation space `B^s_{2,q}(𝕋^d)` of trigonometric polynomials
+iff `‖f‖_2 + ‖(2^(js) ω(f, 2^(-j))_2)_{j ≥ 0}‖_{ℓ_q} < ∞`, with the norm equivalence of
+`ModulusData` (`Torus.approxNormDyadic_le_modulusNorm`, `Torus.modulusNorm_le_approxNormDyadic`).
+The restriction `s < 1` is that of differences of first order.
 
-* `‖f‖_{B^s_{2,q}} ≤ (d + 1) ‖f‖_{mod}` by Jackson's theorem
-  (`approxNormDyadic_le_modulusNorm`);
-* `‖f‖_{mod} ≤ C(d, s) ‖f‖_{B^s_{2,q}}` (`modulusNorm_le_approxNormDyadic`): the modulus at
-  `2^(-j)` is bounded by the dyadic Fourier blocks, `ω(f, 2^(-j)) ≲ ∑_K min(1, 2^(K-j)) ‖Δ_K f‖`,
-  because a translation by `h` multiplies the block `Δ_K f` by at most `min(2, 4πd 2^K ‖h‖)`;
-  the two halves of the sum are Hardy's inequalities with exponents `s` and `1 - s`, and the
-  blocks are controlled by the approximation norm.
-
-The restriction `s < 1` is that of first-order differences; higher smoothness needs
-differences of higher order.  For `p ≠ 2` the same theorem needs Jackson's and Bernstein's
-inequalities in `L_p`, proved with the de la Vallée Poussin kernel, which is not formalised.
+The modulus is also controlled by the dyadic Fourier blocks: a translation by `h` multiplies the
+block `Δ_K f` by at most `min(2, 2πd 2^(K+1) ‖h‖)` (`Torus.enorm_translate_sub_sq_le`), so
+`ω(f, t)_2 ≤ ∑_K min(2, 2πd 2^(K+1) t) ‖Δ_K f‖_2` (`Torus.modulus_le_tsum_block`).
 -/
 
 @[expose] public section
@@ -41,15 +42,9 @@ namespace Torus
 
 open ENNReal (lqNorm dyadicWeight)
 
-variable {d : Type*} [Fintype d]
+variable {d : Type*} [Fintype d] {s : ℝ} {q : ℝ≥0∞}
 
-/-- The **classical Besov norm** through the modulus of smoothness,
-`‖f‖_2 + ‖(2^(js) ω(f, 2^(-j))_2)_j‖_{ℓ_q}`. -/
-noncomputable def modulusNorm (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    ℝ≥0∞ :=
-  ‖f‖ₑ + lqNorm q (fun j : ℕ => dyadicWeight s j * modulus f (1 / 2 ^ j))
-
-variable {s : ℝ} {q : ℝ≥0∞}
+/-! ### Jackson's inequality -/
 
 /-- Jackson's theorem in the form `E_n(f) ≤ (d + 1) ω(f, 1/n)`. -/
 theorem approxSeq_le_modulus {n : ℕ} (hn : 1 ≤ n) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
@@ -66,25 +61,108 @@ theorem approxSeq_le_modulus {n : ℕ} (hn : 1 ≤ n) (f : Lp ℂ 2 (volume : Me
   rw [← ENNReal.rpow_two, ← ENNReal.rpow_two] at h2
   exact (ENNReal.rpow_le_rpow_iff (by norm_num)).1 h2
 
-/-- **Jackson's half of the coincidence theorem**: `‖f‖_{B^s_{2,q}} ≤ (d + 1) ‖f‖_{mod}` in the
-dyadic quasi-norm. -/
-theorem approxNormDyadic_le_modulusNorm (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    ((trigScheme d).toLp volume 2).approxNormDyadic s q f ≤
-      ((Fintype.card d : ℝ≥0∞) + 1) * modulusNorm s q f := by
-  set M := (Fintype.card d : ℝ≥0∞) + 1
-  have hseq : ∀ j, ((trigScheme d).toLp volume 2).approxSeqDyadic s f j ≤
-      M * (dyadicWeight s j * modulus f (1 / 2 ^ j)) := fun j => by
-    rw [approxSeqDyadic, mul_left_comm]
+/-! ### The inverse inequality -/
+
+/-- **Trigonometric polynomials have no high frequencies**: for `a` of degree `< n`,
+`â(k) = 0` whenever `deg k ≥ n` (`SpectralScheme.repr_eq_zero_of_mem_span`). -/
+theorem mFourierCoeff_eq_zero_of_mem {n : ℕ} {a : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
+    (ha : a ∈ (trigScheme d).toLp volume 2 n) {k : d → ℤ} (hk : n ≤ deg k) :
+    mFourierCoeff a k = 0 := by
+  rw [toLp_trigScheme_eq d] at ha
+  rw [← mFourierBasis_repr]
+  exact (fourierScheme d).repr_eq_zero_of_mem_span ha hk
+
+/-- **Bernstein's inequality for translations**: a trigonometric polynomial `a` of degree `< n`
+satisfies `‖τ_h a - a‖_2 ≤ 2πd n ‖h‖ ‖a‖_2`, by Parseval and `|e_k(h) - 1| ≤ 2πd deg k ‖h‖`
+(`Torus.norm_mFourier_sub_one_le`). -/
+theorem enorm_translate_sub_le_of_mem {n : ℕ} {a : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
+    (ha : a ∈ (trigScheme d).toLp volume 2 n) (h : UnitAddTorus d) :
+    ‖translate h a - a‖ₑ ≤ ENNReal.ofReal (2 * π * Fintype.card d * n * ‖h‖) * ‖a‖ₑ := by
+  have hpars : ‖a‖ₑ ^ 2 = ∑' k, ‖mFourierCoeff a k‖ₑ ^ 2 := by
+    rw [← mFourierBasis.repr.enorm_map, SpectralScheme.enorm_sq_eq_tsum]
+    simp only [mFourierBasis_repr]
+  refine (ENNReal.pow_le_pow_left_iff two_ne_zero).1 ?_
+  rw [enorm_translate_sub_sq, mul_pow, hpars, ← ENNReal.tsum_mul_left]
+  refine ENNReal.tsum_le_tsum fun k => ?_
+  rcases le_or_gt n (deg k) with hk | hk
+  · simp [mFourierCoeff_eq_zero_of_mem ha hk]
+  · gcongr
+    rw [← ofReal_norm]
+    refine ENNReal.ofReal_le_ofReal ((norm_mFourier_sub_one_le k h).trans ?_)
     gcongr
-    have := approxSeq_le_modulus (Nat.one_le_two_pow (n := j)) f
-    simpa using this
-  calc ((trigScheme d).toLp volume 2).approxNormDyadic s q f
-      = ‖f‖ₑ + lqNorm q (((trigScheme d).toLp volume 2).approxSeqDyadic s f) := rfl
-    _ ≤ M * ‖f‖ₑ + M * lqNorm q (fun j : ℕ => dyadicWeight s j * modulus f (1 / 2 ^ j)) := by
-        gcongr
-        · exact le_mul_of_one_le_left' le_add_self
-        · rw [← ENNReal.lqNorm_const_mul]; exact ENNReal.lqNorm_mono hseq
-    _ = M * modulusNorm s q f := by rw [modulusNorm, mul_add]
+
+/-- **The inverse inequality for the modulus**: a trigonometric polynomial `a` of degree `< 2^j`
+satisfies `ω(a, 2^(-k))_2 ≤ max(2, 2πd) 2^(-(k-j)) ‖a‖_2`: for `k < j` the modulus is at most
+`2 ‖a‖_2`, and for `k ≥ j` Bernstein's inequality gives `2πd 2^(j-k) ‖a‖_2`. -/
+theorem modulus_le_of_mem {j : ℕ} {a : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
+    (ha : a ∈ (trigScheme d).toLp volume 2 (2 ^ j)) (k : ℕ) :
+    modulus a (1 / 2 ^ k) ≤
+      ENNReal.ofReal (max 2 (2 * π * Fintype.card d)) * dyadicWeight (-1) (k - j) * ‖a‖ₑ := by
+  rcases lt_or_ge k j with hkj | hjk
+  · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
+    refine (Rd.lpModulus_le 1 a k).trans ?_
+    gcongr
+    rw [pow_one, ← ENNReal.ofReal_ofNat 2]
+    exact ENNReal.ofReal_le_ofReal (le_max_left _ _)
+  · rw [modulus_eq_iSup]
+    refine iSup₂_le fun h hh => (enorm_translate_sub_le_of_mem ha h).trans ?_
+    have h1 : ENNReal.ofReal (2 * π * Fintype.card d * ((2 ^ j : ℕ) : ℝ) * ‖h‖) =
+        ENNReal.ofReal (2 * π * Fintype.card d) * ENNReal.ofReal (2 ^ j * ‖h‖) := by
+      rw [show 2 * π * Fintype.card d * ((2 ^ j : ℕ) : ℝ) * ‖h‖ =
+          (2 * π * Fintype.card d) * (2 ^ j * ‖h‖) by push_cast; ring,
+        ENNReal.ofReal_mul (by positivity)]
+    rw [h1]
+    refine mul_le_mul' (mul_le_mul' (ENNReal.ofReal_le_ofReal (le_max_right _ _)) ?_) le_rfl
+    simpa using ENNReal.ofReal_two_pow_mul_rpow_le hjk hh zero_le_one
+
+/-! ### The coincidence theorem -/
+
+/-- **The modulus is compatible with the trigonometric scheme**, with inverse order `θ = 1`: at
+the scales `2^(-k)` it is subadditive and at most `2 ‖f‖_2`, Jackson's inequality holds from
+`k = 0` on with the constant `d + 1`, and the inverse inequality with the constant
+`max(2, 2πd)`. -/
+noncomputable def trigModulusData (d : Type*) [Fintype d] :
+    ModulusData ((trigScheme d).toLp volume 2) 1 where
+  modulus f k := modulus f (1 / 2 ^ k)
+  add_le f g k := Rd.lpModulus_add_le 1 f g k
+  C0 := 2
+  C0_ne_top := by norm_num
+  le_enorm f k := (Rd.lpModulus_le 1 f k).trans_eq (by rw [pow_one])
+  jacksonStart := 0
+  CJ := Fintype.card d + 1
+  CJ_ne_top := ENNReal.add_ne_top.2 ⟨ENNReal.natCast_ne_top _, ENNReal.one_ne_top⟩
+  jackson f k _ := by simpa using approxSeq_le_modulus (Nat.one_le_two_pow (n := k)) f
+  CB := ENNReal.ofReal (max 2 (2 * π * Fintype.card d))
+  CB_ne_top := ENNReal.ofReal_ne_top
+  inverse _ k _ ha := modulus_le_of_mem ha k
+
+/-- **Jackson's half of the coincidence theorem**: `‖f‖_{B^s_{2,q}} ≤ (d + 2) ‖f‖^ω_{s,q}` in the
+dyadic quasi-norm, with the constant `1 + C_J` of `ModulusData.approxNormDyadic_le_modNorm`. -/
+theorem approxNormDyadic_le_modulusNorm (hq : 1 ≤ q)
+    (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
+    ((trigScheme d).toLp volume 2).approxNormDyadic s q f ≤
+      (trigModulusData d).directConst s * (trigModulusData d).modNorm s q f :=
+  (trigModulusData d).approxNormDyadic_le_modNorm hq f
+
+/-- **The second half of the coincidence theorem**: for `0 ≤ s < 1`,
+`‖f‖^ω_{s,q} ≤ K ‖f‖_{B^s_{2,q}}` in the dyadic quasi-norm, with the constant `K` of
+`ModulusData.modNorm_le_approxNormDyadic`. -/
+theorem modulusNorm_le_approxNormDyadic (hq : 1 ≤ q) (hs : 0 ≤ s) (hs1 : s < 1)
+    (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
+    (trigModulusData d).modNorm s q f ≤
+      (trigModulusData d).inverseConst s * ((trigScheme d).toLp volume 2).approxNormDyadic s q f :=
+  (trigModulusData d).modNorm_le_approxNormDyadic hq hs hs1 f
+
+/-- **The coincidence theorem in `L_2(𝕋^d)`**: for `0 < s < 1` and `1 ≤ q ≤ ∞`, the Besov space
+`B^s_{2,q}(𝕋^d)` defined by approximation with trigonometric polynomials is the Besov space
+defined by the modulus of smoothness: `f ∈ B^s_{2,q}` iff
+`‖f‖_2 + ‖(2^(js) ω(f, 2^(-j))_2)_j‖_{ℓ_q} < ∞`. -/
+theorem memBesov_iff_modulusNorm_lt_top (hs : 0 < s) (hs1 : s < 1) (hq : 1 ≤ q)
+    (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
+    (trigScheme d).MemBesov volume 2 s q f ↔ (trigModulusData d).modNorm s q f < ∞ :=
+  (trigModulusData d).memApprox_iff_modNorm_lt_top hq hs.le hs1 f
+
+/-! ### The modulus and the dyadic Fourier blocks -/
 
 /-- The multiplier bound of a translation by `‖h‖ ≤ t` on the dyadic block `K`:
 `min(2, 2πd 2^(K+1) t)`. -/
@@ -139,6 +217,7 @@ theorem enorm_translate_sub_sq_le {h : UnitAddTorus d} {t : ℝ} (hh : ‖h‖ �
 `enorm_translate_sub_sq_le` passes to the sum through `∑ b_K² ≤ (∑ b_K)²`. -/
 theorem modulus_le_tsum_block (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) (t : ℝ) :
     modulus f t ≤ ∑' K, blockMult d K t * ‖fourierBlock K f‖ₑ := by
+  rw [modulus_eq_iSup]
   refine iSup₂_le fun h hh => (ENNReal.pow_le_pow_left_iff two_ne_zero).1 ?_
   calc ‖translate h f - f‖ₑ ^ 2 ≤ ∑' K, (blockMult d K t * ‖fourierBlock K f‖ₑ) ^ 2 := by
         simpa only [mul_pow] using enorm_translate_sub_sq_le hh f
@@ -146,25 +225,6 @@ theorem modulus_le_tsum_block (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d)))
         simp only [sq, ← ENNReal.tsum_mul_right]
         exact ENNReal.tsum_le_tsum fun K => by
           gcongr; exact ENNReal.le_tsum (f := fun K => blockMult d K t * ‖fourierBlock K f‖ₑ) K
-
-/-- `∑_K [j ≤ K] g K = ∑_i g (j + i)`. -/
-theorem tsum_ite_le_eq (j : ℕ) (g : ℕ → ℝ≥0∞) :
-    ∑' K, (if j ≤ K then g K else 0) = ∑' i, g (j + i) := by
-  rw [← ENNReal.summable.sum_add_tsum_nat_add' (k := j)]
-  have h0 : ∑ K ∈ Finset.range j, (if j ≤ K then g K else 0) = 0 :=
-    Finset.sum_eq_zero fun K hK => by simp [not_le.2 (Finset.mem_range.1 hK)]
-  rw [h0, zero_add]
-  congr 1; funext i
-  simp only [Nat.le_add_left j i, ↓reduceIte]
-  rw [add_comm]
-
-/-- `∑_K [K ≤ j] g K = ∑_{K ≤ j} g K`. -/
-theorem tsum_ite_ge_eq (j : ℕ) (g : ℕ → ℝ≥0∞) :
-    ∑' K, (if K ≤ j then g K else 0) = ∑ K ∈ Finset.range (j + 1), g K := by
-  rw [tsum_eq_sum (s := Finset.range (j + 1)) fun K hK => by
-    simp [not_le.2 (by simpa using hK : j < K)]]
-  exact Finset.sum_congr rfl fun K hK => by
-    simp [Nat.lt_succ_iff.1 (Finset.mem_range.1 hK)]
 
 /-- At `t = 2^(-j)` the block multipliers are `≤ 2` for `K ≥ j` and `≤ 4πd 2^(K-j)` for
 `K ≤ j`. -/
@@ -192,120 +252,5 @@ theorem blockMult_le (K j : ℕ) :
           ring
       _ = ENNReal.ofReal (4 * π * Fintype.card d) * (dyadicWeight (-1) j * dyadicWeight 1 K) := by
           rw [ENNReal.ofReal_mul (by positivity), h1]
-
-/-- The weighted modulus at `2^(-j)`, split into the tail and the partial sums of the
-weighted blocks. -/
-theorem dyadicWeight_mul_modulus_le (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) (j : ℕ) :
-    dyadicWeight s j * modulus f (1 / 2 ^ j) ≤
-      2 * (dyadicWeight s j * ∑' i, ‖fourierBlock (j + i) f‖ₑ) +
-        ENNReal.ofReal (4 * π * Fintype.card d) * (dyadicWeight (-(1 - s)) j *
-          ∑ K ∈ Finset.range (j + 1), dyadicWeight 1 K * ‖fourierBlock K f‖ₑ) := by
-  set C1 := ENNReal.ofReal (4 * π * Fintype.card d)
-  have hsplit : ∑' K, blockMult d K (1 / 2 ^ j) * ‖fourierBlock K f‖ₑ ≤
-      2 * ∑' i, ‖fourierBlock (j + i) f‖ₑ +
-        C1 * (dyadicWeight (-1) j * ∑ K ∈ Finset.range (j + 1),
-          dyadicWeight 1 K * ‖fourierBlock K f‖ₑ) := by
-    calc ∑' K, blockMult d K (1 / 2 ^ j) * ‖fourierBlock K f‖ₑ
-        ≤ ∑' K, ((if j ≤ K then 2 * ‖fourierBlock K f‖ₑ else 0) +
-            (if K ≤ j then C1 * dyadicWeight (-1) j *
-              (dyadicWeight 1 K * ‖fourierBlock K f‖ₑ) else 0)) :=
-          ENNReal.tsum_le_tsum fun K =>
-            (mul_le_mul' (blockMult_le K j) le_rfl).trans (le_of_eq (by split_ifs <;> ring))
-      _ = 2 * ∑' i, ‖fourierBlock (j + i) f‖ₑ + C1 * (dyadicWeight (-1) j *
-            ∑ K ∈ Finset.range (j + 1), dyadicWeight 1 K * ‖fourierBlock K f‖ₑ) := by
-          rw [ENNReal.tsum_add, tsum_ite_le_eq, tsum_ite_ge_eq, ENNReal.tsum_mul_left,
-            ← Finset.mul_sum, mul_assoc]
-  have hw : dyadicWeight s j * dyadicWeight (-1) j = dyadicWeight (-(1 - s)) j := by
-    rw [← ENNReal.dyadicWeight_add]; congr 1; ring
-  calc dyadicWeight s j * modulus f (1 / 2 ^ j)
-      ≤ dyadicWeight s j * ∑' K, blockMult d K (1 / 2 ^ j) * ‖fourierBlock K f‖ₑ := by
-        gcongr; exact modulus_le_tsum_block f _
-    _ ≤ dyadicWeight s j * (2 * ∑' i, ‖fourierBlock (j + i) f‖ₑ + C1 * (dyadicWeight (-1) j *
-          ∑ K ∈ Finset.range (j + 1), dyadicWeight 1 K * ‖fourierBlock K f‖ₑ)) := by gcongr
-    _ = _ := by rw [mul_add, ← hw]; ring
-
-/-- The constant of the second half of the coincidence theorem,
-`1 + 5 (2 (1 - 2^(-s))⁻¹ + 4πd (1 - 2^(-(1-s)))⁻¹)`. -/
-noncomputable def coincidenceConst (d : Type*) [Fintype d] (s : ℝ) : ℝ≥0∞ :=
-  1 + 5 * (2 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ +
-    ENNReal.ofReal (4 * π * Fintype.card d) * (1 - (2 : ℝ≥0∞) ^ (-(1 - s)))⁻¹)
-
-/-- The constant of the coincidence theorem is finite for `0 < s < 1`. -/
-theorem coincidenceConst_ne_top (hs : 0 < s) (hs1 : s < 1) : coincidenceConst d s ≠ ∞ := by
-  unfold coincidenceConst
-  have h1 := ENNReal.one_sub_two_rpow_neg_inv_ne_top hs
-  have h2 := ENNReal.one_sub_two_rpow_neg_inv_ne_top (sub_pos.2 hs1)
-  refine ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top (by norm_num)
-    (ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top (by norm_num) h1,
-      ENNReal.mul_ne_top ENNReal.ofReal_ne_top h2⟩)⟩
-
-/-- **The second half of the coincidence theorem**: for `0 < s < 1`,
-`‖f‖_{mod} ≤ C(d, s) ‖f‖_{B^s_{2,q}}` in the dyadic quasi-norm. -/
-theorem modulusNorm_le_approxNormDyadic (hq : 1 ≤ q)
-    (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    modulusNorm s q f ≤
-      coincidenceConst d s * ((trigScheme d).toLp volume 2).approxNormDyadic s q f := by
-  set C1 := ENNReal.ofReal (4 * π * Fintype.card d)
-  set Cs := (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹
-  set Cs1 := (1 - (2 : ℝ≥0∞) ^ (-(1 - s)))⁻¹
-  set N := ((trigScheme d).toLp volume 2).approxNormDyadic s q f
-  set L := lqNorm q (fun K => dyadicWeight s K * ‖fourierBlock K f‖ₑ)
-  have hL : L ≤ 5 * N := by
-    have h := (fourierScheme d).projectionScheme.blockNorm_le_approxNormDyadic (s := s) (q := q) f
-    have hb : ENNReal.ofReal (fourierScheme d).projectionScheme.bound +
-        2 * (1 + ENNReal.ofReal (fourierScheme d).projectionScheme.bound) = 5 := by
-      change ENNReal.ofReal 1 + 2 * (1 + ENNReal.ofReal 1) = 5
-      rw [ENNReal.ofReal_one]; norm_num
-    rw [hb] at h
-    have hN : N = (fourierScheme d).toScheme.approxNormDyadic s q f :=
-      congrArg (fun A : ApproximationScheme (Lp ℂ 2 (volume : Measure (UnitAddTorus d))) =>
-        A.approxNormDyadic s q f) (toLp_trigScheme_eq d)
-    rw [hN]
-    exact le_add_self.trans h
-  have hmod : lqNorm q (fun j : ℕ => dyadicWeight s j * modulus f (1 / 2 ^ j)) ≤
-      2 * (Cs * L) + C1 * (Cs1 * L) := by
-    have hsplit : ∀ K, dyadicWeight (-(1 - s)) K * (dyadicWeight 1 K * ‖fourierBlock K f‖ₑ) =
-        dyadicWeight s K * ‖fourierBlock K f‖ₑ := fun K => by
-      rw [← mul_assoc, ← ENNReal.dyadicWeight_add]; congr 2; ring
-    calc lqNorm q (fun j : ℕ => dyadicWeight s j * modulus f (1 / 2 ^ j))
-        ≤ lqNorm q (fun j => 2 * (dyadicWeight s j * ∑' i, ‖fourierBlock (j + i) f‖ₑ) +
-            C1 * (dyadicWeight (-(1 - s)) j *
-              ∑ K ∈ Finset.range (j + 1), dyadicWeight 1 K * ‖fourierBlock K f‖ₑ)) :=
-          ENNReal.lqNorm_mono (dyadicWeight_mul_modulus_le f)
-      _ ≤ 2 * lqNorm q (fun j => dyadicWeight s j * ∑' i, ‖fourierBlock (j + i) f‖ₑ) +
-            C1 * lqNorm q (fun j => dyadicWeight (-(1 - s)) j *
-              ∑ K ∈ Finset.range (j + 1), dyadicWeight 1 K * ‖fourierBlock K f‖ₑ) := by
-          refine (ENNReal.lqNorm_add_le hq _ _).trans (le_of_eq ?_)
-          rw [ENNReal.lqNorm_const_mul, ENNReal.lqNorm_const_mul]
-      _ ≤ 2 * (Cs * L) + C1 * (Cs1 * L) := by
-          gcongr
-          · exact ENNReal.hardy_tail_le hq s (fun m => ‖fourierBlock m f‖ₑ)
-          · have := ENNReal.hardy_sum_le hq (1 - s)
-              (fun K => dyadicWeight 1 K * ‖fourierBlock K f‖ₑ)
-            simp_rw [hsplit] at this
-            exact this
-  have hfN : ‖f‖ₑ ≤ N := enorm_le_approxNormDyadic f
-  calc modulusNorm s q f = ‖f‖ₑ + lqNorm q (fun j : ℕ => dyadicWeight s j * modulus f (1 / 2 ^ j)) :=
-        rfl
-    _ ≤ N + (2 * (Cs * (5 * N)) + C1 * (Cs1 * (5 * N))) :=
-        add_le_add hfN (hmod.trans (by gcongr))
-    _ = coincidenceConst d s * N := by simp only [coincidenceConst, C1, Cs, Cs1]; ring
-
-/-- **The coincidence theorem in `L_2(𝕋^d)`**: for `0 < s < 1` and `1 ≤ q ≤ ∞`, the Besov space
-`B^s_{2,q}(𝕋^d)` defined by approximation with trigonometric polynomials is the Besov space
-defined by the modulus of smoothness: `f ∈ B^s_{2,q}` iff
-`‖f‖_2 + ‖(2^(js) ω(f, 2^(-j))_2)_j‖_{ℓ_q} < ∞`. -/
-theorem memBesov_iff_modulusNorm_lt_top (hs : 0 < s) (hs1 : s < 1) (hq : 1 ≤ q)
-    (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    (trigScheme d).MemBesov volume 2 s q f ↔ modulusNorm s q f < ∞ := by
-  change ((trigScheme d).toLp volume 2).MemApprox s q f ↔ _
-  rw [memApprox_iff_approxNormDyadic_lt_top hq hs.le]
-  constructor
-  · intro h
-    exact (modulusNorm_le_approxNormDyadic hq f).trans_lt
-      (ENNReal.mul_lt_top (coincidenceConst_ne_top hs hs1).lt_top h)
-  · intro h
-    exact (approxNormDyadic_le_modulusNorm f).trans_lt (ENNReal.mul_lt_top
-      (ENNReal.add_lt_top.2 ⟨ENNReal.natCast_lt_top _, ENNReal.one_lt_top⟩) h)
 
 end Torus

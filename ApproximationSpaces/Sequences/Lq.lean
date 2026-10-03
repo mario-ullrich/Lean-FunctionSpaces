@@ -486,6 +486,27 @@ theorem le_tsum_of_tendsto_sum {E : Type*} [NormedAddCommGroup E] {Q : E → ℝ
     Q f ≤ ∑' j, Q (u j) :=
   le_tsum_of_tendsto_finsetSum (S := fun J => Finset.range (J + 1)) hC hadd hle hu
 
+/-! ### Tails and partial sums -/
+
+/-- `∑_K [j ≤ K] g K = ∑_i g (j + i)`. -/
+theorem tsum_ite_le_eq (j : ℕ) (g : ℕ → ℝ≥0∞) :
+    ∑' K, (if j ≤ K then g K else 0) = ∑' i, g (j + i) := by
+  rw [← ENNReal.summable.sum_add_tsum_nat_add' (k := j)]
+  have h0 : ∑ K ∈ Finset.range j, (if j ≤ K then g K else 0) = 0 :=
+    Finset.sum_eq_zero fun K hK => by simp [not_le.2 (Finset.mem_range.1 hK)]
+  rw [h0, zero_add]
+  congr 1; funext i
+  simp only [Nat.le_add_left j i, ↓reduceIte]
+  rw [add_comm]
+
+/-- `∑_K [K ≤ j] g K = ∑_{K ≤ j} g K`. -/
+theorem tsum_ite_ge_eq (j : ℕ) (g : ℕ → ℝ≥0∞) :
+    ∑' K, (if K ≤ j then g K else 0) = ∑ K ∈ Finset.range (j + 1), g K := by
+  rw [tsum_eq_sum (s := Finset.range (j + 1)) fun K hK => by
+    simp [not_le.2 (by simpa using hK : j < K)]]
+  exact Finset.sum_congr rfl fun K hK => by
+    simp [Nat.lt_succ_iff.1 (Finset.mem_range.1 hK)]
+
 end ENNReal
 
 /-- `(1 + t)^N ≤ 2^N (1 + t^N)` for `t ≥ 0`, from Mathlib's `add_pow_le`. -/

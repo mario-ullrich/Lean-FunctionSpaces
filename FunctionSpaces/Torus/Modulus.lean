@@ -5,6 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
+public import FunctionSpaces.Rd.Differences
 public import FunctionSpaces.Torus.Translation
 public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
@@ -13,9 +14,10 @@ public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
 The **modulus of smoothness** (of first order) of `f ∈ L_2(𝕋^d)` is
 
-`ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`   (`Torus.modulus`),
+`ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`   (`Torus.modulus`, `Torus.modulus_eq_iSup`),
 
-with the sup norm `‖h‖ = max_i ‖h_i‖` on `𝕋^d`.  It grows at most linearly,
+the modulus of order `1` in `L_2` of `Rd.modulus` for the Haar measure on `𝕋^d`, with the sup
+norm `‖h‖ = max_i ‖h_i‖` on `𝕋^d`.  It grows at most linearly,
 `ω(f, n t)_2 ≤ n ω(f, t)_2` (`Torus.modulus_natCast_mul_le`).  This file proves
 **Jackson's theorem**
 
@@ -38,20 +40,38 @@ namespace Torus
 
 variable {d : Type*} [Fintype d]
 
-/-- The **modulus of smoothness** `ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`. -/
+/-- The **modulus of smoothness** `ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`, the modulus of
+order `1` in `L_2` of `Rd.modulus` for the Haar measure on `𝕋^d`. -/
 noncomputable def modulus (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) (t : ℝ) : ℝ≥0∞ :=
-  ⨆ (h : UnitAddTorus d) (_ : ‖h‖ ≤ t), ‖translate h f - f‖ₑ
+  Rd.modulus volume 1 2 (f : UnitAddTorus d → ℂ) t
+
+/-- `‖τ_h f - f‖_2 = ‖Δ_h f‖_2` for the representative of `f`. -/
+theorem enorm_translate_sub_eq (h : UnitAddTorus d)
+    (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
+    ‖translate h f - f‖ₑ = eLpNorm ((fwdDiff h)^[1] (f : UnitAddTorus d → ℂ)) 2 volume := by
+  rw [Lp.enorm_def, Function.iterate_one]
+  refine eLpNorm_congr_ae ?_
+  filter_upwards [Lp.coeFn_sub (translate h f) f, coeFn_translate h f] with x h1 h2
+  rw [h1, Pi.sub_apply, h2]
+  rfl
+
+/-- **The modulus through translations**: `ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖τ_h f - f‖_2`. -/
+theorem modulus_eq_iSup (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) (t : ℝ) :
+    modulus f t = ⨆ (h : UnitAddTorus d) (_ : ‖h‖ ≤ t), ‖translate h f - f‖ₑ := by
+  simp only [enorm_translate_sub_eq]
+  rfl
 
 variable {f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
 
 /-- `‖τ_h f - f‖_2 ≤ ω(f, t)_2` for `‖h‖ ≤ t`. -/
 theorem enorm_translate_sub_le_modulus {t : ℝ} {h : UnitAddTorus d} (hh : ‖h‖ ≤ t) :
-    ‖translate h f - f‖ₑ ≤ modulus f t :=
-  le_iSup₂ (f := fun (h : UnitAddTorus d) (_ : ‖h‖ ≤ t) => ‖translate h f - f‖ₑ) h hh
+    ‖translate h f - f‖ₑ ≤ modulus f t := by
+  rw [enorm_translate_sub_eq]
+  exact Rd.eLpNorm_higherDiff_le_modulus hh
 
 /-- The modulus of smoothness increases in `t`. -/
 theorem modulus_mono (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) : Monotone (modulus f) :=
-  fun _ _ hst => iSup₂_le fun _ hh => enorm_translate_sub_le_modulus (hh.trans hst)
+  Rd.modulus_mono 1 2 _
 
 /-- The norm on the circle is at most the absolute value of a representative. -/
 theorem norm_coe_le_abs (u : ℝ) : ‖(u : UnitAddCircle)‖ ≤ |u| := by
@@ -103,6 +123,7 @@ theorem exists_coe_eq_abs_eq_norm (u : UnitAddCircle) :
 theorem modulus_natCast_mul_le {n : ℕ} (hn : 0 < n)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) {t : ℝ} (ht : 0 ≤ t) :
     modulus f (n * t) ≤ n * modulus f t := by
+  rw [modulus_eq_iSup f (n * t)]
   refine iSup₂_le fun h hh => ?_
   have hn' : (0 : ℝ) < n := by exact_mod_cast hn
   choose x hx1 hx2 using fun i => exists_coe_eq_abs_eq_norm (h i)

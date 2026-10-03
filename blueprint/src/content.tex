@@ -364,7 +364,7 @@ sum are controlled in a dyadically weighted $\ell_q$ norm.
 \label{lem:hardy}
 \lean{ENNReal.hardy_tail_le, ENNReal.hardy_sum_le, ENNReal.lqNorm_shift_le',
   ENNReal.lqNorm_shiftRight_le, ENNReal.tsum_dyadicWeight_neg, ENNReal.tsum_dyadicWeight_neg_one,
-  ENNReal.lqNorm_dyadicWeight_neg_one_le}
+  ENNReal.lqNorm_dyadicWeight_neg_one_le, ENNReal.tsum_ite_le_eq, ENNReal.tsum_ite_ge_eq}
 \leanok
 \uses{lem:countable-minkowski}
 Let $\alpha \in \R$ and $1 \leq q \leq \infty$. For every sequence $b$ in $[0, \infty]$,
@@ -2356,12 +2356,14 @@ complex numbers of modulus $1$, and $|e^{i\theta} - 1| \leq |\theta|$.
 
 \begin{definition}[Modulus of smoothness]
 \label{def:modulus}
-\lean{Torus.modulus, Torus.modulus_mono, Torus.enorm_translate_sub_le_modulus,
-  Torus.norm_coe_le_abs}
+\lean{Torus.modulus, Torus.enorm_translate_sub_eq, Torus.modulus_eq_iSup, Torus.modulus_mono,
+  Torus.enorm_translate_sub_le_modulus, Torus.norm_coe_le_abs}
 \leanok
-\uses{def:translation}
+\uses{def:translation, def:rd-modulus}
 For $f \in L_2(\T^d)$ and $t \in \R$,
-$\omega(f, t)_2 = \sup_{\|h\| \leq t} \|\tau_h f - f\|_2$.
+$\omega(f, t)_2 = \sup_{\|h\| \leq t} \|\tau_h f - f\|_2$. Since
+$\|\tau_h f - f\|_2 = \|\Delta_h f\|_2$, this is the modulus of order $1$ in $L_2$ of
+\Cref{def:rd-modulus} for the Haar measure on $\T^d$.
 \end{definition}
 
 \begin{lemma}[Growth of the modulus]
@@ -2419,12 +2421,37 @@ integrand is at most $\omega(f, 1/n)_2^2$.
 
 In particular $E_n(f)_2 \leq (\#d + 1) \, \omega(f, 1/n)_2$, the form used below.
 
+\begin{lemma}[The inverse inequality on the torus]
+\label{lem:torus-inverse}
+\lean{Torus.mFourierCoeff_eq_zero_of_mem, Torus.enorm_translate_sub_le_of_mem,
+  Torus.modulus_le_of_mem}
+\leanok
+\uses{def:modulus, lem:translation-fourier, def:torus-sobolev}
+Let $n, j, k \in \N$, $h \in \T^d$, and let $a \in \mathcal{T}_n$ be a trigonometric
+polynomial of degree $< n$. Then $\hat a(k) = 0$ for $\deg k \geq n$ and
+$\|\tau_h a - a\|_2 \leq 2\pi \, \#d \, n \|h\| \, \|a\|_2$. For $a \in \mathcal{T}_{2^j}$,
+\[
+  \omega(a, 2^{-k})_2 \leq \max(2, 2\pi \, \#d) \, 2^{-(k - j)_+} \|a\|_2 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:translation-fourier}, $\|\tau_h a - a\|_2^2 = \sum_k |e_k(h) - 1|^2 |\hat a(k)|^2$
+with $|e_k(h) - 1| \leq 2\pi \, \#d \deg k \, \|h\|$, and $\hat a(k) = 0$ unless
+$\deg k < n$; Parseval's identity gives the first bound. For $k < j$ use
+$\omega(a, t)_2 \leq 2 \|a\|_2$, and for $k \geq j$ the first bound with $\|h\| \leq 2^{-k}$.
+\end{proof}
+
 \begin{definition}[Besov norm through the modulus]
 \label{def:modulus-norm}
-\lean{Torus.modulusNorm}
+\lean{Torus.trigModulusData}
 \leanok
-\uses{def:modulus, def:lq-norm}
-For $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_2(\T^d)$,
+\uses{def:modulus, def:modulus-data, thm:torus-jackson, lem:torus-inverse}
+The modulus $\omega(f, k) = \omega(f, 2^{-k})_2$ is compatible with the scheme of trigonometric
+polynomials in $L_2(\T^d)$ with inverse order $\theta = 1$ (\Cref{def:modulus-data}), with
+$C_0 = 2$, $k_0 = 0$, $C_J = \#d + 1$ and $C_B = \max(2, 2\pi \, \#d)$. For $s \in \R$,
+$1 \leq q \leq \infty$ and $f \in L_2(\T^d)$, its classical quasi-norm is
 \[
   \|f\|^{\omega}_{s,q} = \|f\|_2 + \bigl\| \bigl(2^{js} \omega(f, 2^{-j})_2\bigr)_{j \in \N}
   \bigr\|_{\ell_q} .
@@ -2434,40 +2461,53 @@ For $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_2(\T^d)$,
 \begin{theorem}[Besov spaces through moduli of smoothness]
 \label{thm:moduli-coincidence}
 \lean{Torus.approxNormDyadic_le_modulusNorm, Torus.modulusNorm_le_approxNormDyadic,
-  Torus.coincidenceConst, Torus.coincidenceConst_ne_top, Torus.memBesov_iff_modulusNorm_lt_top,
-  Torus.blockMult, Torus.modulus_le_tsum_block, Torus.blockMult_le,
-  Torus.dyadicWeight_mul_modulus_le, Torus.enorm_mFourier_sub_one_le_blockMult,
-  Torus.enorm_translate_sub_sq_le, Torus.tsum_ite_le_eq, Torus.tsum_ite_ge_eq}
+  Torus.memBesov_iff_modulusNorm_lt_top}
 \leanok
-\uses{def:modulus-norm, thm:torus-jackson, thm:torus-coefficients, thm:blocks, lem:hardy,
-  lem:translation-fourier}
-Let $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_2(\T^d)$. Then
+\uses{def:modulus-norm, thm:modulus-coincidence}
+Let $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_2(\T^d)$. Then for $s \geq 0$
 \[
-  \|f\|^{\mathrm{dy}}_{\Besov{s}{2}{q}} \leq (\#d + 1) \, \|f\|^{\omega}_{s,q}
-  \qquad \text{and} \qquad
-  \|f\|^{\omega}_{s,q} \leq K_s \, \|f\|^{\mathrm{dy}}_{\Besov{s}{2}{q}},
+  \|f\|^{\mathrm{dy}}_{\Besov{s}{2}{q}} \leq (\#d + 2) \, \|f\|^{\omega}_{s,q} ,
 \]
-where $K_s = 1 + 5\bigl(2(1 - 2^{-s})^{-1} + 4\pi \, \#d \, (1 - 2^{-(1-s)})^{-1}\bigr)$,
-which is finite for $0 < s < 1$. In particular, for $0 < s < 1$, $f \in
-\Besov{s}{2}{q}(\T^d)$ if and only if $\|f\|^{\omega}_{s,q} < \infty$.
+and for $0 \leq s < 1$, with $C_B = \max(2, 2\pi \, \#d)$,
+\[
+  \|f\|^{\omega}_{s,q} \leq \bigl(7 + 27 \, C_B (1 - 2^{-(1-s)})^{-1}\bigr)
+  \|f\|^{\mathrm{dy}}_{\Besov{s}{2}{q}} .
+\]
+In particular, for $0 < s < 1$, $f \in \Besov{s}{2}{q}(\T^d)$ if and only if
+$\|f\|^{\omega}_{s,q} < \infty$.
 \end{theorem}
 
 \begin{proof}
 \leanok
-The first inequality is \Cref{thm:torus-jackson} at $n = 2^j$. For the second, split $f$
-into the Fourier blocks $\Delta_K f$ over $2^K \leq \deg k < 2^{K+1}$; the constant term
-does not move under translation. For $\|h\| \leq t$, \Cref{lem:translation-fourier} gives
-$|e_k(h) - 1| \leq \min(2, 2\pi \, \#d \, 2^{K+1} t)$ on the block $K$, so
-$\|\tau_h f - f\|_2 \leq \sum_K \min(2, 2\pi \, \#d \, 2^{K+1} t) \, \|\Delta_K f\|_2$. At
-$t = 2^{-j}$ the minimum is at most $2$ for $K \geq j$ and at most $4\pi \, \#d \, 2^{K-j}$
-for $K \leq j$, hence
+\Cref{thm:modulus-coincidence} with the constants of \Cref{def:modulus-norm}: the first
+constant is $1 + C_J$, the second $1 + 3 C_0 + C_B (3 + 6 \cdot 4)(1 - 2^{-(1-s)})^{-1}$.
+\end{proof}
+
+The modulus is also controlled by the dyadic Fourier blocks
+$\Delta_K f = \sum_{2^K \leq \deg k < 2^{K+1}} \hat f(k) e_k$.
+
+\begin{lemma}[The modulus through the dyadic blocks]
+\label{lem:torus-modulus-blocks}
+\lean{Torus.blockMult, Torus.enorm_mFourier_sub_one_le_blockMult, Torus.enorm_translate_sub_sq_le,
+  Torus.modulus_le_tsum_block, Torus.blockMult_le}
+\leanok
+\uses{def:modulus, lem:translation-fourier, thm:torus-coefficients}
+Let $f \in L_2(\T^d)$, $t \in \R$, and let $m_K(t) = \min(2, 2\pi \, \#d \, 2^{K+1} t)$. For
+$\|h\| \leq t$,
 \[
-  2^{js} \omega(f, 2^{-j})_2 \leq 2 \cdot 2^{js} \sum_{i \geq 0} \|\Delta_{j+i} f\|_2 +
-  4\pi \, \#d \, 2^{-j(1-s)} \sum_{K \leq j} 2^K \|\Delta_K f\|_2 .
+  \|\tau_h f - f\|_2^2 \leq \sum_K m_K(t)^2 \, \|\Delta_K f\|_2^2 ,
+  \qquad\text{so}\qquad
+  \omega(f, t)_2 \leq \sum_K m_K(t) \, \|\Delta_K f\|_2 .
 \]
-The first Hardy inequality with exponent $s$ and the second with exponent $1 - s$
-(\Cref{lem:hardy}) bound both sums by $\|(2^{Ks} \|\Delta_K f\|_2)_K\|_{\ell_q}$, which is
-at most $5 \|f\|^{\mathrm{dy}}_{\Besov{s}{2}{q}}$ by \Cref{thm:blocks} with $M = 1$.
+For $j \in \N$, $m_K(2^{-j}) \leq 2$ for $K \geq j$ and $m_K(2^{-j}) \leq 4\pi \, \#d \,
+2^{K - j}$ for $K \leq j$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On the block $K$, $|e_k(h) - 1| \leq \min(2, 2\pi \, \#d \deg k \, \|h\|)$ by
+\Cref{lem:translation-fourier}; Parseval's identity and $\sum_K b_K^2 \leq (\sum_K b_K)^2$
+give the bounds.
 \end{proof}
 
 For $s \geq 1$ the first-order modulus no longer describes $\Besov{s}{2}{q}$; higher-order
@@ -8128,12 +8168,13 @@ The dimension of the underlying space is $n$.
     approximation of $f$ by the $m$-th set of a scheme: trigonometric polynomials, band-limited
     functions, piecewise polynomials, splines, step functions, or combinations of $m$ elements of a
     dictionary.
-  \item \emph{Differences}
-    (\Cref{def:modulus,def:interval-modulus,def:cube-modulus,def:iso-modulus,def:rd-modulus}).
+  \item \emph{Differences} (\Cref{def:rd-modulus,def:rd-modulus-on};
+    \Cref{def:modulus,def:interval-modulus,def:iso-modulus,def:cube-modulus}).
     $\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_q}$ with a modulus of smoothness of
-    order $r$: periodic, on an interval or a cube, along the coordinates or in every direction, on
-    $\R^n$, or on a domain $\Omega$ (\Cref{def:rd-modulus-on}), where only the differences with
-    all their points in $\Omega$ count.
+    order $r$ on a group such as $\R^n$ or $\T^n$, or on a set $\Omega$, where only the
+    differences with all their points in $\Omega$ count. The moduli on the torus and on an interval
+    and the isotropic modulus on the cube are of this form; the moduli along the coordinates of the
+    cube take differences in one coordinate at a time.
   \item \emph{Littlewood--Paley blocks} (\Cref{def:lp-blocks}).
     $\|(2^{js} \|\psi_j * f\|_p)_j\|_{\ell_q}$, where the Fourier transforms of the kernels
     $\psi_j$ form a smooth dyadic decomposition of unity. For $p = 2$ on the torus the sharp
