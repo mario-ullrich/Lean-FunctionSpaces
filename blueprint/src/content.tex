@@ -8259,6 +8259,291 @@ level $n$, Hölder's inequality costs $(n + 1)^{(d-1)(1 - 1/q)}$ (\Cref{lem:leve
 \Cref{lem:rate-series} sums over $n > N$.
 \end{proof}
 
+\chapter{The representations of Besov spaces}
+\label{chap:representations}
+
+The earlier chapters describe Besov spaces in many ways and prove that the descriptions agree.
+This chapter collects them: what each description measures (\Cref{sec:descriptions}), in which
+setting and for which parameters it is proved to give the Besov space (\Cref{sec:where}), and how
+the descriptions differ (\Cref{sec:differences}). Throughout $1 \leq q \leq \infty$, and
+$1 \leq p < \infty$ unless stated otherwise. Two descriptions agree when the same functions have
+a finite quasi-norm; most theorems moreover bound each quasi-norm by a constant times the other.
+The dimension of the underlying space is $n$.
+
+\section{The descriptions}
+\label{sec:descriptions}
+
+\begin{enumerate}
+  \item \emph{Approximation} (\Cref{def:approx-space,def:dyadic-norm}).
+    $\|f\| + \|(2^{ks} E_{2^k}(f))_k\|_{\ell_q}$, where $E_m(f)$ is the error of best
+    approximation of $f$ by the $m$-th set of a scheme: trigonometric polynomials, band-limited
+    functions, piecewise polynomials, splines, step functions, or combinations of $m$ elements of a
+    dictionary.
+  \item \emph{Differences}
+    (\Cref{def:modulus,def:interval-modulus,def:cube-modulus,def:iso-modulus,def:rd-modulus}).
+    $\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_q}$ with a modulus of smoothness of
+    order $r$: periodic, on an interval or a cube, along the coordinates or in every direction, on
+    $\R^n$, or on a domain $\Omega$ (\Cref{def:rd-modulus-on}), where only the differences with
+    all their points in $\Omega$ count.
+  \item \emph{Littlewood--Paley blocks} (\Cref{def:lp-blocks}).
+    $\|(2^{js} \|\psi_j * f\|_p)_j\|_{\ell_q}$, where the Fourier transforms of the kernels
+    $\psi_j$ form a smooth dyadic decomposition of unity. For $p = 2$ on the torus the sharp
+    dyadic blocks of the Fourier coefficients serve as well:
+    \[
+      |\hat f(0)| + \Bigl\|\Bigl(2^{ks} \Bigl(\sum_{2^k \leq \deg m < 2^{k+1}} |\hat f(m)|^2
+        \Bigr)^{1/2}\Bigr)_k\Bigr\|_{\ell_q},
+      \qquad \deg m = \max_i |m_i| .
+    \]
+  \item \emph{Local means} (\Cref{def:local-means}).
+    $\|(2^{js} \|k_j * f\|_p)_j\|_{\ell_q}$ with kernels $k_j$ supported in balls of radius
+    $C 2^{-j}$, all built from one bump.
+  \item \emph{Atoms} (\Cref{def:atomic-system,def:lip-atom,def:regular-atoms}).
+    Decompositions into atoms $a_{j,m}$ of level $j$, supported near a cube of side $2^{-j}$,
+    $f = \sum_j \sum_m \lambda_{j,m} a_{j,m}$, measured by
+    \[
+      \|\lambda\|_{b^s_{p,q}} = \bigl\|\bigl(2^{j(s - n/p)} \|\lambda_{j,\cdot}\|_{\ell_p}\bigr)_j
+        \bigr\|_{\ell_q} .
+    \]
+  \item \emph{Coefficients} (\Cref{def:haar,def:multiwavelets,def:spectral}).
+    Weighted $\ell_q(\ell_p)$ norms of the coefficients of $f$ in a basis, level by level: Haar
+    functions, multiwavelets, the Fourier basis, a Hilbert basis of a spectral scheme.
+  \item \emph{Blocks} (\Cref{def:block-decomposition,def:blocks}).
+    Decompositions $f = \sum_k g_k$ with $g_k$ in the $2^k$-th set of the scheme, measured by
+    $\|(2^{ks} \|g_k\|)_k\|_{\ell_q}$; for a scheme with uniformly bounded projections $P_m$, the
+    dyadic blocks $P_{2^{k+1}} f - P_{2^k} f$, among them martingale differences.
+  \item \emph{Interpolation} (\Cref{def:k-functional,def:interpolation}).
+    The real interpolation space $(X, Y)_{s/r, q}$ between $X$ and a space $Y$ of smoothness $r$,
+    defined through the K-functional.
+\end{enumerate}
+
+On a domain $\Omega$ two further quasi-norms enter: the \emph{restriction} quasi-norm, the
+infimum of a quasi-norm on $\R^n$ over all extensions of $f$, and the \emph{intrinsic local
+means} $\|(2^{js} \|k_j * f\|_{L_p(\Omega)})_j\|_{\ell_q}$ (\Cref{def:intrinsic-local-means}).
+Spaces of \emph{dominating mixed smoothness} replace the level $k \in \N$ by $k \in \N^n$, the
+weight $2^{ks}$ by $2^{s|k|_1}$, and every kernel by a tensor product
+(\Cref{def:mixed-moduli,def:mixed-local-means,def:mixed-lp}).
+
+\section{Where each description is proved}
+\label{sec:where}
+
+Each table lists the descriptions that are shown to agree in one setting, the smoothness range of
+the statement, and the result. A range $0 \leq s < \theta$ or $0 < s < \theta$ is the range of
+the cited statement; outside it the descriptions may differ (\Cref{sec:differences}).
+
+\paragraph{Abstract schemes.} Here $A$ is an approximation scheme in a normed space $X$.
+
+\begin{center}
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
+\hline
+Descriptions & Range & Result \\
+\hline
+\raggedright Pietsch's quasi-norm and the dyadic quasi-norm & $s \geq 0$ & \Cref{thm:dyadic-norm} \\
+\raggedright Approximation and interpolation, under Jackson's and Bernstein's inequalities of order $r$
+  & $0 < s < r$ & \Cref{thm:representation}\newline \Cref{cor:equal-spaces} \\
+\raggedright Approximation and moduli, under Jackson's and the inverse inequality of order $\theta$
+  & $0 \leq s < \theta$ & \Cref{thm:modulus-coincidence} \\
+\raggedright Approximation and blocks & $s > 0$ & \Cref{thm:block-decomposition} \\
+\raggedright Approximation and dyadic blocks of projections & $s > 0$ & \Cref{thm:blocks} \\
+\raggedright Approximation and martingale differences in $L_p$ & $s > 0$ & \Cref{thm:martingale} \\
+\raggedright Approximation and atoms of decay $\sigma$ & $0 < s < \sigma$
+  & \Cref{thm:atomic-synthesis}\newline \Cref{thm:atomic-analysis} \\
+\raggedright Approximation and coefficients in a Hilbert space & $s > 0$
+  & \Cref{thm:spectral-coefficients} \\
+\raggedright Intrinsic approximation and restrictions, given an extension & $s \geq 0$
+  & \Cref{thm:retract} \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{The torus $\T^n$.} The scheme consists of the trigonometric polynomials.
+\begin{center}
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
+\hline
+Descriptions & Range & Result \\
+\hline
+\raggedright Trigonometric approximation and Fourier coefficients, $p = 2$; $\Besov{s}{2}{2} = H^s$
+  & $s > 0$ & \Cref{thm:torus-coefficients} \\
+\raggedright Trigonometric approximation and differences of order $1$, $p = 2$ & $0 < s < 1$
+  & \Cref{thm:moduli-coincidence} \\
+\raggedright Weak derivatives, Fourier coefficients and approximation: $\Sob{m}{2} = H^m = \Besov{m}{2}{2}$
+  & $m \geq 1$ & \Cref{thm:weak-sobolev} \\
+\raggedright Trigonometric approximation and Lipschitz atoms, $p = 2$ & $0 < s < 1$
+  & \Cref{thm:lip-characterisation} \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{The interval $[0, 1]$ and the circle.} The schemes are the dyadic piecewise polynomials of degree $< r$ and the dyadic splines of order
+$r$; the differences are of order $r$.
+
+\begin{center}
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
+\hline
+Descriptions & Range & Result \\
+\hline
+\raggedright Piecewise polynomials and differences on $[0, 1]$ & $0 \leq s < 1/p$ & \Cref{thm:pp-besov} \\
+\raggedright Piecewise polynomials and periodic differences; $\Besov{s}{p}{q}[0, 1] = \Besov{s}{p}{q}(\T)$
+  & $0 \leq s < 1/p$ & \Cref{thm:pp-besov-per}\newline \Cref{cor:interval-circle} \\
+\raggedright Splines and differences on $[0, 1]$ & $0 \leq s < r - 1 + 1/p$ & \Cref{thm:spline-besov} \\
+\raggedright Periodic splines and periodic differences & $0 \leq s < r - 1 + 1/p$
+  & \Cref{thm:per-spline-besov} \\
+\raggedright Piecewise polynomials and multiscale details & $s > 0$ & \Cref{thm:pp-multiscale} \\
+\raggedright Piecewise polynomials and multiwavelet coefficients & $s > 0$
+  & \Cref{thm:multiwavelet-besov} \\
+\raggedright Step functions and Haar coefficients & $s > 0$ & \Cref{thm:haar} \\
+\raggedright Haar coefficients and differences of order $1$ & $0 < s < 1/p$ & \Cref{cor:haar-besov} \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{The cube $[0, 1]^n$.} The schemes are the piecewise polynomials of degree $< r$ in
+each variable and the tensor splines of order $r$; the differences are of order $r$.
+\begin{center}
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
+\hline
+Descriptions & Range & Result \\
+\hline
+\raggedright Piecewise polynomials and coordinate differences & $0 \leq s < 1/p$ & \Cref{thm:cube-besov} \\
+\raggedright Tensor splines and coordinate differences & $0 \leq s < r - 1 + 1/p$
+  & \Cref{thm:cube-spline-besov} \\
+\raggedright Piecewise polynomials and isotropic differences & $0 \leq s < 1/p$ & \Cref{thm:iso-besov} \\
+\raggedright Tensor splines and isotropic differences; coordinate and isotropic differences
+  & $0 \leq s < r - 1 + 1/p$ & \Cref{thm:iso-besov} \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{The space $\R^n$.} The scheme consists of the band-limited functions.
+\begin{center}
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
+\hline
+Descriptions & Range & Result \\
+\hline
+\raggedright Band-limited approximation and Littlewood--Paley blocks & $s > 0$ & \Cref{thm:lp-band} \\
+\raggedright Band-limited approximation, Littlewood--Paley blocks and differences of order $r$
+  & $0 < s < r$ & \Cref{thm:rd-besov} \\
+\raggedright Local means and differences of order $L$ & $0 < s < L$ & \Cref{thm:local-means} \\
+\raggedright Atoms of order $L$ and differences of order $L$ & $0 < s < L$
+  & \Cref{thm:atomic-characterisation} \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{Domains in $\R^n$.} Restrictions are taken from the functions on $\R^n$ with a
+finite quasi-norm of the same kind.
+\begin{center}
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
+\hline
+Descriptions & Range & Result \\
+\hline
+\raggedright Lipschitz graph domains: intrinsic local means and restrictions & $0 < s < L$
+  & \Cref{thm:restriction-local-means} \\
+\raggedright Lipschitz graph domains: intrinsic differences, restrictions of differences and of
+  band-limited approximation & $0 < s < r$ & \Cref{thm:graph-besov} \\
+\raggedright Bounded Lipschitz domains: the same three & $0 < s < r$
+  & \Cref{thm:bounded-lipschitz-besov} \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{Traces.} The trace maps $\Besov{s+1/p}{p}{q}$ onto $\Besov{s}{p}{q}$ of the boundary; for abstract schemes
+the loss $1/p$ is an exponent $\beta \geq 0$ of the trace bound.
+
+\begin{center}
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
+\hline
+Setting & Range & Result \\
+\hline
+\raggedright Abstract schemes with a trace bound & $s > 0$
+  & \Cref{thm:trace-transfer}\newline \Cref{thm:trace-surjective} \\
+\raggedright From $\T^{n+1}$ to a face $\T^n$ & $s > 0$ & \Cref{thm:trace-torus} \\
+\raggedright From a Lipschitz graph domain to its boundary graph & $0 < s < 1$
+  & \Cref{thm:graph-trace-space} \\
+\raggedright From a bounded Lipschitz domain to its boundary & $0 < s < 1$
+  & \Cref{thm:boundary-trace-space} \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{Dominating mixed smoothness on $\R^n$.} The kernels are tensor products of
+one-dimensional kernels.
+\begin{center}
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
+\hline
+Descriptions & Range & Result \\
+\hline
+\raggedright Mixed local means and mixed differences of order $L$ & $0 < s < L$
+  & \Cref{thm:mixed-local-means} \\
+\raggedright Tensor Littlewood--Paley blocks and mixed differences & $0 < s < L$ & \Cref{thm:mixed-lp} \\
+\raggedright Approximation by Littlewood--Paley sums over hyperbolic crosses & $s > 0$
+  & \Cref{thm:hyperbolic-cross} \\
+\hline
+\end{tabular}
+\end{center}
+
+\section{How the descriptions differ}
+\label{sec:differences}
+
+\paragraph{Linear and nonlinear.} The approximation quasi-norm measures best approximation, and a
+best approximation need not depend linearly on $f$, although $A^s_q$ is a linear space and $A_m$
+may be a nonlinear set, as for combinations of $m$ dictionary elements. Littlewood--Paley blocks,
+local means, projections, martingale differences and coefficients in a basis are linear in $f$,
+and the coefficients in a basis are unique. Decompositions into blocks or atoms are not unique,
+and their quasi-norm is an infimum over all decompositions. The decompositions constructed here
+come from near-best approximations in the abstract setting (\Cref{thm:atomic-analysis}) and from
+the local means on $\R^n$ (\Cref{thm:atomic-decomposition}), where every term
+$\lambda_{j,m} a_{j,m} = \eta_j * (1_{P_{j,m}} (k_j * f))$ is linear in $f$.
+
+\paragraph{The range of smoothness.} Every description detects smoothness only up to a bound.
+Differences of order $r$ detect $s < r$, local means of order $L$ and atoms of order $L$ detect
+$s < L$, and Lipschitz atoms detect $s < 1$. Littlewood--Paley blocks and Fourier coefficients have
+no such bound. The approximation space of a scheme is defined for every $s$, and it is the Besov
+space below the inverse order $\theta$ of the scheme: $\theta = 1/p$ for piecewise polynomials and
+step functions, $\theta = r - 1 + 1/p$ for splines of order $r$, and every $\theta$ for
+band-limited functions (\Cref{thm:rd-besov}). A scheme of piecewise polynomials contains
+functions with jumps, and these lie in its approximation spaces for every $s$ but in no Besov
+space of smoothness $s > 1/p$.
+
+\paragraph{The order.} For $0 < s < r$ the differences of order $r$ give the band-limited
+approximation space on $\R^n$ (\Cref{thm:rd-besov}), so the spaces defined by differences of any
+order $r > s$ coincide. The same holds for local means of any order $L > s$
+(\Cref{thm:local-means}) and their mixed analogues (\Cref{thm:mixed-lp}).
+
+\paragraph{Fourier analysis and $p$.} Fourier coefficients describe the spaces only for $p = 2$,
+through Parseval's identity (\Cref{thm:torus-coefficients,thm:spectral-coefficients}). For other
+$p$ the sharp dyadic blocks are replaced by the smooth kernels $\psi_j$. The proofs here need
+only integrable kernels, Young's inequality and the kernel identities
+(\Cref{thm:young,thm:kernel-identities}).
+
+\paragraph{Coordinates, directions and mixed smoothness.} On the cube the coordinate moduli, with
+differences along one coordinate at a time, and the isotropic modulus, with differences in every
+direction, give the same spaces (\Cref{thm:iso-besov}). Dominating mixed smoothness measures
+differences in several coordinates at once, $\Delta^{L,e}_h$, with the weight $2^{s|k|_1}$ for
+$k \in \N^n$; its Littlewood--Paley blocks are tensor products, and its natural approximation is by
+sums over the hyperbolic crosses $\{|k|_1 \leq N\}$, with the rate
+$2^{-sN} (N + 1)^{(n-1)(1-1/q)}$ (\Cref{thm:hyperbolic-cross}).
+
+\paragraph{Domains.} On a domain $\Omega$ the intrinsic differences use only the values of $f$ in
+$\Omega$, the restriction quasi-norm uses extensions to $\R^n$, and the intrinsic local means use
+the values in $\Omega$ through kernels supported in a cone. On Lipschitz domains they agree, by
+Rychkov's extension operator (\Cref{thm:graph-extension}), which is linear and is one operator for
+all $0 < s < L$, $p$ and $q$; on bounded Lipschitz domains the graph domains are glued by a
+partition of unity and pointwise multipliers (\Cref{thm:multipliers,thm:local-extension}).
+
+\paragraph{Traces.} Restriction to a hypersurface costs the smoothness $1/p$. On the torus every
+$s > 0$ is allowed (\Cref{thm:trace-torus}). On the boundary of a Lipschitz domain the Besov space
+is defined in charts by differences of order $1$, the order that a Lipschitz change of variables
+preserves, and the trace theorem holds for $0 < s < 1$
+(\Cref{thm:graph-trace-space,thm:boundary-trace-space}).
+
 \bpbibheading
 \begin{thebibliography}{99}
 

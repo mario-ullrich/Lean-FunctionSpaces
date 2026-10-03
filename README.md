@@ -38,6 +38,12 @@ trigonometric polynomials of degree `< n`, these are the classical periodic Beso
 
 ## Main results
 
+The last chapter of the blueprint, *The representations of Besov spaces*, collects the
+descriptions proved equivalent here (approximation, differences, Littlewood–Paley blocks, local
+means, atoms, coefficients, blocks, interpolation, intrinsic and restriction norms on domains,
+traces, dominating mixed smoothness) with their settings, ranges of parameters and theorems, and
+explains how they differ.
+
 * **The error of best approximation.** For every approximation scheme, `E₀(f) = ‖f‖`,
   `E_n(f)` decreases in `n`, `E_n(c f) = |c| E_n(f)`, `E_{m+n}(f + g) ≤ E_m(f) + E_n(g)`,
   and `|E_n(f) - E_n(g)| ≤ ‖f - g‖`
@@ -558,10 +564,9 @@ theorems, spectral schemes in Hilbert spaces, the torus with its traces and Lips
 smoothness and local means, Lipschitz graph domains and bounded Lipschitz domains with Rychkov's
 extension and pointwise multipliers, atomic decompositions, traces on Lipschitz graph domains and
 on the boundaries of bounded Lipschitz domains, dominating mixed smoothness with hyperbolic cross
-approximation,
-filtration schemes for wavelets and multiwavelets, the
-classical definitions through moduli of smoothness and weak derivatives, and polynomial and
-piecewise polynomial approximation on intervals and on the cube `[0, 1]^d`.
+approximation, filtration schemes for wavelets and multiwavelets, the classical definitions
+through moduli of smoothness and weak derivatives, and polynomial and piecewise polynomial
+approximation on intervals and on the cube `[0, 1]^d`.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 `blueprint/` holds the LaTeX source of the blueprint and the scripts that check and link its
 `\lean` references.
