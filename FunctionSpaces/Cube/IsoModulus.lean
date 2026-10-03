@@ -6,19 +6,21 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Cube.Translation
+public import FunctionSpaces.Rd.DomainModuli
 
 /-!
 # The isotropic modulus of smoothness on the cube
 
-The **isotropic modulus** on the cube `Q = [0, 1]^d` is
+The **isotropic modulus** on the cube `Q = [0, 1]^d` is the modulus on the set `Q` of
+`Rd.modulusOn` (`Cube.isoModulus`),
 
-`ω_r(f, t)_p = sup_{‖h‖_∞ ≤ t} ‖Δ_h^r f‖_{L_p({x ∈ Q : x + rh ∈ Q})}`
+`ω_r(f, t)_p = sup_{‖h‖_∞ ≤ t} ‖Δ_h^r f‖_{L_p({x ∈ Q : x + rh ∈ Q})}`   (`Cube.isoModulus_eq_iSup`),
 
-(`Cube.isoModulus`), with steps `h ∈ ℝ^d` of every direction and sign and the region
-`{x ∈ Q : x + rh ∈ Q}` (`Cube.isoRegion`), on which all the points `x + kh`, `k ≤ r`, lie in `Q`.
-As the coordinate moduli, it increases in `t`, is subadditive, is bounded by `2^r ‖f‖_p`, and
-depends only on the class of `f` in `L_p(Q)`; these properties use the translation invariance of
-Lebesgue measure for translations that stay in the cube (`Cube.eLpNorm_comp_add_le`,
+with steps `h ∈ ℝ^d` of every direction and sign and the region `{x ∈ Q : x + rh ∈ Q}`
+(`Cube.isoRegion`), which is the set of the points `x` with `x, x + h, …, x + rh ∈ Q`
+(`Cube.isoRegion_inter_cubeSet`). It increases in `t`, is subadditive, is bounded by
+`2^r ‖f‖_p`, and depends only on the class of `f` in `L_p(Q)`, as every modulus on a set.
+Translations that stay in the cube keep `L_p` norms and null sets (`Cube.eLpNorm_comp_add_le`,
 `Cube.ae_comp_add_of_ae`).
 
 Steps along a coordinate are isotropic steps, so the moduli in the coordinates are bounded by
@@ -131,84 +133,82 @@ theorem add_smul_mem_cubeSet {r : ℕ} {h x : Fin d → ℝ} (hx : x ∈ isoRegi
   simp only [Pi.add_apply, Pi.smul_apply, smul_eq_mul]
   exact add_mul_mem_Icc (hx.2 i (mem_univ i)) (hx.1 i) hn hnr
 
-/-- The **isotropic modulus of smoothness** on the cube:
-`ω_r(f, t)_p = sup_{‖h‖_∞ ≤ t} ‖Δ_h^r f‖_{L_p({x ∈ Q : x + rh ∈ Q})}`. -/
+/-- **The isotropic region on the cube is a step set**: `{x ∈ Q : x + rh ∈ Q}` is the set `Q_{rh}`
+of the points `x` with `x, x + h, …, x + rh ∈ Q` (`Rd.stepSet`). -/
+theorem isoRegion_inter_cubeSet (r : ℕ) (h : Fin d → ℝ) :
+    isoRegion r h ∩ cubeSet d = Rd.stepSet (cubeSet d) r h := by
+  ext x
+  constructor
+  · intro hx l hl
+    exact add_smul_mem_cubeSet hx (Nat.cast_nonneg l) (by exact_mod_cast hl)
+  · intro hx
+    refine ⟨fun i => ?_, by simpa using hx 0 (Nat.zero_le r)⟩
+    simpa using hx r le_rfl i (mem_univ i)
+
+/-- The isotropic difference on the cube is the restricted difference on the set `Q`:
+`‖Δ_h^r f‖_{L_p(Q_{rh})} = ‖Δ_h^r(f, ·, Q)‖_p`. -/
+theorem eLpNorm_higherDiff_isoRegion_eq (r : ℕ) (p : ℝ≥0∞) (f : (Fin d → ℝ) → ℂ)
+    (h : Fin d → ℝ) :
+    eLpNorm (higherDiff r h f) p ((cubeVol d).restrict (isoRegion r h)) =
+      eLpNorm ((Rd.stepSet (cubeSet d) r h).indicator ((fwdDiff h)^[r] f)) p volume := by
+  rw [cubeVol_eq_restrict, Measure.restrict_restrict (measurableSet_isoRegion r h),
+    isoRegion_inter_cubeSet, eLpNorm_indicator_eq_eLpNorm_restrict
+      (Rd.measurableSet_stepSet (measurableSet_cubeSet d) r h)]
+  rfl
+
+/-- The **isotropic modulus of smoothness** on the cube, the modulus on the set `Q` of
+`Rd.modulusOn`: `ω_r(f, t)_p = sup_{‖h‖_∞ ≤ t} ‖Δ_h^r(f, ·, Q)‖_p`. -/
 noncomputable def isoModulus (r : ℕ) (p : ℝ≥0∞) (f : (Fin d → ℝ) → ℂ) (t : ℝ) : ℝ≥0∞ :=
-  ⨆ (h : Fin d → ℝ) (_ : ‖h‖ ≤ t),
-    eLpNorm (higherDiff r h f) p ((cubeVol d).restrict (isoRegion r h))
+  Rd.modulusOn volume (cubeSet d) r p f t
+
+/-- **The isotropic modulus through the isotropic regions**:
+`ω_r(f, t)_p = sup_{‖h‖_∞ ≤ t} ‖Δ_h^r f‖_{L_p({x ∈ Q : x + rh ∈ Q})}`. -/
+theorem isoModulus_eq_iSup (r : ℕ) (p : ℝ≥0∞) (f : (Fin d → ℝ) → ℂ) (t : ℝ) :
+    isoModulus r p f t = ⨆ (h : Fin d → ℝ) (_ : ‖h‖ ≤ t),
+      eLpNorm (higherDiff r h f) p ((cubeVol d).restrict (isoRegion r h)) := by
+  simp only [eLpNorm_higherDiff_isoRegion_eq]
+  rfl
 
 /-- `‖Δ_h^r f‖_{L_p(Q_{rh})} ≤ ω_r(f, t)_p` for `‖h‖_∞ ≤ t`. -/
 theorem eLpNorm_higherDiff_le_isoModulus {r : ℕ} {p : ℝ≥0∞} {f : (Fin d → ℝ) → ℂ} {t : ℝ}
     {h : Fin d → ℝ} (hh : ‖h‖ ≤ t) :
-    eLpNorm (higherDiff r h f) p ((cubeVol d).restrict (isoRegion r h)) ≤ isoModulus r p f t :=
-  le_iSup₂ (f := fun (h : Fin d → ℝ) (_ : ‖h‖ ≤ t) =>
-    eLpNorm (higherDiff r h f) p ((cubeVol d).restrict (isoRegion r h))) h hh
+    eLpNorm (higherDiff r h f) p ((cubeVol d).restrict (isoRegion r h)) ≤
+      isoModulus r p f t := by
+  rw [eLpNorm_higherDiff_isoRegion_eq]
+  exact Rd.eLpNorm_indicator_higherDiff_le_modulusOn hh
 
 /-- The isotropic modulus increases in `t`. -/
 theorem isoModulus_mono (r : ℕ) (p : ℝ≥0∞) (f : (Fin d → ℝ) → ℂ) :
     Monotone (isoModulus r p f) :=
-  fun _ _ hst => iSup₂_le fun _ hh => eLpNorm_higherDiff_le_isoModulus (hh.trans hst)
+  Rd.modulusOn_mono _ r p f
 
 /-- The isotropic modulus is subadditive. -/
 theorem isoModulus_add_le {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) (f g : (Fin d → ℝ) → ℂ) (t : ℝ) :
-    isoModulus r p (f + g) t ≤ isoModulus r p f t + isoModulus r p g t := by
-  refine iSup₂_le fun h hh => ?_
-  rw [higherDiff_add]
-  exact (eLpNorm_add_le hp).trans
-    (add_le_add (eLpNorm_higherDiff_le_isoModulus hh) (eLpNorm_higherDiff_le_isoModulus hh))
+    isoModulus r p (f + g) t ≤ isoModulus r p f t + isoModulus r p g t :=
+  Rd.modulusOn_add_le hp _ r f g t
 
-/-- **`‖Δ_h^r f‖_{L_p(Q_{rh})} ≤ 2^r ‖f‖_{L_p(Q)}`**: each translate `f(· + kh)` has norm at most
-`‖f‖_{L_p(Q)}` on `Q_{rh}`, and `∑_k C(r, k) = 2^r`. -/
+/-- `ω_r(f, t)_p ≤ 2^r ‖f‖_{L_p(Q)}` for the isotropic modulus (`Rd.modulusOn_le`). -/
+theorem isoModulus_le {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p)
+    (r : ℕ) (t : ℝ) : isoModulus r p f t ≤ 2 ^ r * eLpNorm f p (cubeVol d) := by
+  have h := Rd.modulusOn_le (μ := volume) hf.aestronglyMeasurable (measurableSet_cubeSet d) hp
+    r t
+  rwa [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_cubeSet d), ← cubeVol_eq_restrict]
+    at h
+
+/-- **`‖Δ_h^r f‖_{L_p(Q_{rh})} ≤ 2^r ‖f‖_{L_p(Q)}`**, the bound of `Cube.isoModulus_le` at
+`t = ‖h‖_∞`. -/
 theorem eLpNorm_higherDiff_le {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p)
     (r : ℕ) (h : Fin d → ℝ) :
     eLpNorm (higherDiff r h f) p ((cubeVol d).restrict (isoRegion r h)) ≤
-      2 ^ r * eLpNorm f p (cubeVol d) := by
-  have hsum : higherDiff r h f = ∑ k ∈ Finset.range (r + 1),
-      ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) • fun x => f (x + (k : ℝ) • h) := by
-    funext x
-    rw [higherDiff_apply, Finset.sum_apply]
-    rfl
-  rw [hsum]
-  refine (eLpNorm_sum_le hp).trans ?_
-  calc ∑ k ∈ Finset.range (r + 1), eLpNorm (((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) •
-        fun x => f (x + (k : ℝ) • h)) p ((cubeVol d).restrict (isoRegion r h))
-      ≤ ∑ k ∈ Finset.range (r + 1), (r.choose k : ℝ≥0∞) * eLpNorm f p (cubeVol d) :=
-        Finset.sum_le_sum fun k hk => by
-          rw [eLpNorm_const_smul, enorm_higherDiff_coeff]
-          refine mul_le_mul' le_rfl ?_
-          have hkr : (k : ℝ) ≤ r := by
-            exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)
-          have h1 := eLpNorm_comp_add_le hf p (measurableSet_isoRegion r h) MeasurableSet.univ
-            ((k : ℝ) • h) fun x hx => ⟨mem_univ _, add_smul_mem_cubeSet hx (Nat.cast_nonneg k) hkr⟩
-          rwa [Measure.restrict_univ] at h1
-    _ = 2 ^ r * eLpNorm f p (cubeVol d) := by
-        rw [← Finset.sum_mul, ← Nat.cast_sum, Nat.sum_range_choose]
-        push_cast
-        rfl
+      2 ^ r * eLpNorm f p (cubeVol d) :=
+  (eLpNorm_higherDiff_le_isoModulus le_rfl).trans (isoModulus_le hf hp r ‖h‖)
 
-/-- `ω_r(f, t)_p ≤ 2^r ‖f‖_{L_p(Q)}` for the isotropic modulus. -/
-theorem isoModulus_le {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p)
-    (r : ℕ) (t : ℝ) : isoModulus r p f t ≤ 2 ^ r * eLpNorm f p (cubeVol d) :=
-  iSup₂_le fun h _ => eLpNorm_higherDiff_le hf hp r h
-
-/-- **The isotropic modulus depends only on the class in `L_p(Q)`**: the translates `f(· + kh)`
-of functions that agree almost everywhere on the cube agree almost everywhere on `Q_{rh}`. -/
+/-- **The isotropic modulus depends only on the class in `L_p(Q)`** (`Rd.modulusOn_congr_ae`,
+with Mathlib's `ae_eq_restrict_iff_indicator_ae_eq`). -/
 theorem isoModulus_congr_ae {f g : (Fin d → ℝ) → ℂ} (hfg : f =ᵐ[cubeVol d] g) (r : ℕ)
     (p : ℝ≥0∞) (t : ℝ) : isoModulus r p f t = isoModulus r p g t := by
-  simp only [isoModulus]
-  congr 1
-  funext h
-  congr 1
-  funext _
-  refine eLpNorm_congr_ae ?_
-  have hk : ∀ k ∈ Finset.range (r + 1), ∀ᵐ x ∂(cubeVol d).restrict (isoRegion r h),
-      f (x + (k : ℝ) • h) = g (x + (k : ℝ) • h) := fun k hk => by
-    have hkr : (k : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)
-    exact ae_comp_add_of_ae hfg (measurableSet_isoRegion r h) _
-      fun x hx => add_smul_mem_cubeSet hx (Nat.cast_nonneg k) hkr
-  filter_upwards [(Filter.eventually_all_finset _).2 hk] with x hx
-  rw [higherDiff_apply, higherDiff_apply]
-  exact Finset.sum_congr rfl fun k hk' => by rw [hx k hk']
+  rw [cubeVol_eq_restrict, ae_eq_restrict_iff_indicator_ae_eq (measurableSet_cubeSet d)] at hfg
+  exact Rd.modulusOn_congr_ae hfg r p t
 
 /-! ### Coordinate moduli and the isotropic modulus -/
 

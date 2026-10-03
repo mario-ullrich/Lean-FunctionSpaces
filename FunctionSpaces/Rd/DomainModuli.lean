@@ -17,11 +17,12 @@ smoothness on `U`** is
 
 `ω_r(f, t, U)_p = sup_{‖h‖ ≤ t} ‖Δ_h^r(f, ·, U)‖_{L_p(U)}`
 
-(DeVore–Sharpley, (2.1); `Rd.modulusOn`). It uses only the values of `f` on `U`
-(`Rd.modulusOn_indicator`, `Rd.modulusOn_congr_ae`), increases in `t`, is subadditive, is bounded
-by `2^r ‖f‖_{L_p(U)}` (`Rd.modulusOn_le`) and by the modulus on `V` (`Rd.modulusOn_le_modulus`),
-and on `U = V` it is the modulus on `V` (`Rd.modulusOn_univ`). `Rd.lpModulusOn` samples it for
-`f ∈ L_p` at the dyadic scales `2^(-k)`.
+(DeVore–Sharpley, (2.1); `Rd.modulusOn`). The steps `h` and `-h` give the same norm, since
+`Δ_{-h}^r(f, x, U) = (-1)^r Δ_h^r(f, x - r h, U)` (`Rd.eLpNorm_indicator_stepSet_neg`). The
+modulus uses only the values of `f` on `U` (`Rd.modulusOn_indicator`, `Rd.modulusOn_congr_ae`),
+increases in `t`, is subadditive, is bounded by `2^r ‖f‖_{L_p(U)}` (`Rd.modulusOn_le`) and by
+the modulus on `V` (`Rd.modulusOn_le_modulus`), and on `U = V` it is the modulus on `V`
+(`Rd.modulusOn_univ`). `Rd.lpModulusOn` samples it for `f ∈ L_p` at the dyadic scales `2^(-k)`.
 -/
 
 @[expose] public section
@@ -62,6 +63,30 @@ theorem indicator_stepSet_higherDiff_indicator (U : Set V) (r : ℕ) (h : V) (f 
     refine Finset.sum_congr rfl fun l hl => ?_
     rw [Set.indicator_of_mem (hx l (Nat.lt_succ_iff.1 (Finset.mem_range.1 hl)))]
   · rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem hx]
+
+/-- **Negative steps**: `x ∈ U_{r(-h)}` iff `x - r h ∈ U_{rh}`, by `l ↦ r - l`. -/
+theorem mem_stepSet_neg {U : Set V} {r : ℕ} {h x : V} :
+    x ∈ stepSet U r (-h) ↔ x - (r : ℝ) • h ∈ stepSet U r h := by
+  have key : ∀ l ≤ r, x - (r : ℝ) • h + ((r - l : ℕ) : ℝ) • h = x + (l : ℝ) • -h :=
+    fun l hl => by
+      rw [Nat.cast_sub hl, smul_neg, sub_smul]
+      abel
+  constructor
+  · intro hx l hl
+    have := hx (r - l) (Nat.sub_le r l)
+    rwa [← key (r - l) (Nat.sub_le r l), Nat.sub_sub_self hl] at this
+  · intro hx l hl
+    simpa only [key l hl] using hx (r - l) (Nat.sub_le r l)
+
+/-- **Restricted differences with a negative step**:
+`Δ_{-h}^r(f, x, U) = (-1)^r Δ_h^r(f, x - r h, U)`, from `Rd.higherDiff_neg`. -/
+theorem indicator_stepSet_neg (U : Set V) (r : ℕ) (h : V) (f : V → ℂ) (x : V) :
+    (stepSet U r (-h)).indicator ((fwdDiff (-h))^[r] f) x =
+      (-1 : ℂ) ^ r * (stepSet U r h).indicator ((fwdDiff h)^[r] f) (x - (r : ℝ) • h) := by
+  by_cases hx : x ∈ stepSet U r (-h)
+  · rw [Set.indicator_of_mem hx, Set.indicator_of_mem (mem_stepSet_neg.1 hx), higherDiff_neg,
+      Nat.cast_smul_eq_nsmul]
+  · rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem (mt mem_stepSet_neg.2 hx), mul_zero]
 
 /-! ### The modulus of smoothness on a set -/
 
@@ -111,6 +136,22 @@ theorem measurableSet_stepSet {U : Set V} (hU : MeasurableSet U) (r : ℕ) (h : 
     MeasurableSet (stepSet U r h) := by
   simp only [stepSet, Set.ofPred_forall]
   exact MeasurableSet.iInter fun l => MeasurableSet.iInter fun _ => measurable_add_const _ hU
+
+/-- **A restricted difference has the same norm for the steps `h` and `-h`**:
+`‖Δ_{-h}^r(f, ·, U)‖_p = ‖Δ_h^r(f, ·, U)‖_p` for a translation-invariant `μ`, by the substitution
+`x ↦ x - r h` (Mathlib's `MeasurableEmbedding.eLpNorm_map_measure`). -/
+theorem eLpNorm_indicator_stepSet_neg [μ.IsAddRightInvariant] (U : Set V) (r : ℕ) (p : ℝ≥0∞)
+    (h : V) (f : V → ℂ) :
+    eLpNorm ((stepSet U r (-h)).indicator ((fwdDiff (-h))^[r] f)) p μ =
+      eLpNorm ((stepSet U r h).indicator ((fwdDiff h)^[r] f)) p μ := by
+  set G := (stepSet U r h).indicator ((fwdDiff h)^[r] f)
+  have hemb : MeasurableEmbedding fun x : V => x - (r : ℝ) • h :=
+    (MeasurableEquiv.subRight ((r : ℝ) • h)).measurableEmbedding
+  have hfun : (stepSet U r (-h)).indicator ((fwdDiff (-h))^[r] f) =
+      ((-1 : ℂ) ^ r) • (G ∘ fun x => x - (r : ℝ) • h) :=
+    funext fun x => indicator_stepSet_neg U r h f x
+  rw [hfun, eLpNorm_const_smul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul,
+    ← hemb.eLpNorm_map_measure, map_sub_right_eq_self]
 
 /-- **The modulus on `U` is at most the modulus on `V`**, `ω_r(f, t, U)_p ≤ ω_r(f, t)_p`. -/
 theorem modulusOn_le_modulus {U : Set V} (hU : MeasurableSet U) (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ)

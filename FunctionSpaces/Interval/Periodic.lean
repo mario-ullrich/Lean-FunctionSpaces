@@ -184,6 +184,7 @@ theorem perModulus_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp
 of `f̃` and of `f` agree, since `x, …, x + rh` stay in `[0, 1)`. -/
 theorem modulus_le_perModulus (r : ℕ) (p : ℝ≥0∞) (f : ℝ → ℂ) (t : ℝ) :
     modulus r p 0 1 f t ≤ perModulus r p f t := by
+  rw [modulus_eq_iSup_nonneg]
   refine iSup₂_le fun h hh => ?_
   have hrh : (0 : ℝ) ≤ r * h := mul_nonneg (Nat.cast_nonneg r) hh.1
   have hae : higherDiff r h f =ᵐ[volume.restrict (Icc 0 (1 - r * h))]
@@ -206,6 +207,7 @@ theorem modulus_perExt_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞}
     (hp : p ≠ ∞) (r n : ℕ) (t : ℝ) :
     modulus r p 0 n (perExt f) t ≤ (n : ℝ≥0∞) ^ (1 / p.toReal) * perModulus r p f t := by
   have hθ : (0 : ℝ) ≤ 1 / p.toReal := by positivity
+  rw [modulus_eq_iSup_nonneg]
   refine iSup₂_le fun h hh => ?_
   have hm := measurable_higherDiff (measurable_perExt hf) r h
   have hrh : (0 : ℝ) ≤ r * h := mul_nonneg (Nat.cast_nonneg r) hh.1

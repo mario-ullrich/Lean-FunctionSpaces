@@ -2601,15 +2601,20 @@ its differences with step $1$ at $0$ are those of $P$ with step $h$ at $x$.
 
 \begin{definition}[Modulus of smoothness on an interval]
 \label{def:interval-modulus}
-\lean{Interval.modulus, Interval.eLpNorm_higherDiff_le_modulus, Interval.modulus_mono,
+\lean{Interval.modulus, Interval.stepSet_Icc_of_nonneg, Interval.eLpNorm_indicator_stepSet_Icc,
+  Interval.modulus_eq_iSup_nonneg, Interval.eLpNorm_higherDiff_le_modulus, Interval.modulus_mono,
   Interval.eLpNorm_comp_add_Icc, Interval.eLpNorm_comp_sub_Icc, Interval.eLpNorm_Icc_mono}
 \leanok
-\uses{def:iter-diff}
+\uses{def:iter-diff, def:rd-modulus-on}
 For $1 \leq p \leq \infty$, $r \in \N$ and $t \geq 0$ the modulus of smoothness of $f$ on
-$[a, b]$ is
+$[a, b]$ is the modulus on the set $[a, b]$ of \Cref{def:rd-modulus-on},
 \[
-  \omega_r(f, t, [a, b])_p = \sup_{0 \leq h \leq t} \|\Delta_h^r f\|_{L_p[a, b - r h]} .
+  \omega_r(f, t, [a, b])_p = \sup_{|h| \leq t} \|\Delta_h^r f\|_{L_p([a, b]_{rh})}
+  = \sup_{0 \leq h \leq t} \|\Delta_h^r f\|_{L_p[a, b - r h]} ,
 \]
+with $[a, b]_{rh} = \{x : x, x + h, \dots, x + rh \in [a, b]\}$, which is $[a, b - rh]$ for
+$h \geq 0$. The two suprema agree since the steps $h$ and $-h$ give the same norm
+(\Cref{lem:rd-modulus-on}).
 \end{definition}
 
 \begin{lemma}[Properties of the modulus]
@@ -4056,12 +4061,13 @@ $y, y + m\sigma \in [0, 1]$; the substitution $x = u + 2Ly$ rescales.
 \begin{lemma}[Steps of either sign]
 \label{lem:step-regions}
 \lean{Interval.higherDiff_neg, Interval.stepRegion, Interval.mem_stepRegion,
-  Interval.stepRegion_of_nonneg, Interval.stepRegion_of_neg,
+  Interval.stepRegion_of_nonneg, Interval.stepRegion_of_neg, Interval.stepRegion_eq_stepSet,
   Interval.eLpNorm_higherDiff_stepRegion_eq}
 \leanok
-\uses{def:iter-diff}
-For $m \in \N$ and $t \in \R$ let $J(m, t) = \{x \in [0, 1] : x + mt \in [0, 1]\}$. Then
-$\Delta_{-t}^m f(x) = (-1)^m \Delta_t^m f(x - mt)$, and for measurable $f$
+\uses{def:iter-diff, lem:rd-modulus-on}
+For $m \in \N$ and $t \in \R$ let $J(m, t) = \{x \in [0, 1] : x + mt \in [0, 1]\}$, the set
+$[0, 1]_{mt}$ of \Cref{def:rd-modulus-on}. Then $\Delta_{-t}^m f(x) = (-1)^m \Delta_t^m f(x - mt)$,
+and for every $f$
 \[
   \|\Delta_t^m f\|_{L_p(J(m,t))} = \|\Delta_{|t|}^m f\|_{L_p[0, 1 - m|t|]} .
 \]
@@ -4814,11 +4820,14 @@ combines slices in coordinate $i$.
 \begin{definition}[The isotropic modulus]
 \label{def:iso-modulus}
 \lean{Cube.cubeSet, Cube.measurableSet_cubeSet, Cube.cubeVol_eq_restrict,
-  Cube.cubeVol_restrict_congr, Cube.isoRegion, Cube.measurableSet_isoRegion, Cube.isoModulus,
-  Cube.eLpNorm_higherDiff_le_isoModulus, Cube.lpIsoModulus}
+  Cube.cubeVol_restrict_congr, Cube.isoRegion, Cube.measurableSet_isoRegion,
+  Cube.isoRegion_inter_cubeSet, Cube.eLpNorm_higherDiff_isoRegion_eq, Cube.isoModulus,
+  Cube.isoModulus_eq_iSup, Cube.eLpNorm_higherDiff_le_isoModulus, Cube.lpIsoModulus}
 \leanok
-\uses{def:iso-diff, def:cube}
-Let $Q_{rh} = \{x \in Q : x + rh \in Q\}$. The isotropic modulus of smoothness on the cube is
+\uses{def:iso-diff, def:cube, def:rd-modulus-on}
+Let $Q_{rh} = \{x \in Q : x + rh \in Q\}$, the set of the points $x$ with
+$x, x + h, \dots, x + rh \in Q$. The isotropic modulus of smoothness on the cube is the modulus on
+the set $Q$ of \Cref{def:rd-modulus-on},
 \[
   \omega^{\mathrm{iso}}_r(f, t)_p = \sup_{\|h\|_\infty \leq t} \|\Delta_h^r f\|_{L_p(Q_{rh})} ,
 \]
@@ -4834,7 +4843,7 @@ the supremum over steps of every direction and sign.
   Cube.lpIsoModulus_add_le, Cube.lpIsoModulus_le, Cube.lpIsoModulus_anti,
   Cube.lpCubeModulus_le_lpIsoModulus}
 \leanok
-\uses{def:iso-modulus, lem:cube-modulus}
+\uses{def:iso-modulus, lem:cube-modulus, lem:rd-modulus-on}
 Let $1 \leq p < \infty$. The isotropic modulus increases in $t$, is subadditive in $f$, satisfies
 $\omega^{\mathrm{iso}}_r(f, t)_p \leq 2^r \|f\|_p$ and depends only on the class of $f$ in
 $L_p(Q)$. The moduli in the coordinates satisfy
@@ -5473,7 +5482,8 @@ $\Delta_h^r(f, x, U) = \Delta_h^r f(x)$ for $x \in U_{rh}$ and $\Delta_h^r(f, x,
 
 \begin{lemma}[Properties of the modulus on a subset]
 \label{lem:rd-modulus-on}
-\lean{Rd.indicator_stepSet_higherDiff_indicator, Rd.measurableSet_stepSet, Rd.stepSet_mono,
+\lean{Rd.indicator_stepSet_higherDiff_indicator, Rd.mem_stepSet_neg, Rd.indicator_stepSet_neg,
+  Rd.eLpNorm_indicator_stepSet_neg, Rd.measurableSet_stepSet, Rd.stepSet_mono,
   Rd.eLpNorm_indicator_higherDiff_le_modulusOn, Rd.modulusOn_mono, Rd.modulusOn_univ,
   Rd.modulusOn_indicator, Rd.modulusOn_add_le, Rd.modulusOn_le_modulus, Rd.modulusOn_le,
   Rd.modulusOn_congr_ae, Rd.modulusOn_mono_set, Rd.lpModulusOn_succ_le,
@@ -5488,15 +5498,20 @@ and satisfies $\omega_r(f + g, t, U)_p \leq \omega_r(f, t, U)_p + \omega_r(g, t,
   \qquad\text{and}\qquad
   \omega_r(f, t, U)_p \leq 2^r \|f\|_{L_p(U)} .
 \]
-Moreover $\omega_r(f, t, V)_p = \omega_r(f, t)_p$, and
-$\omega_r(f, t, U)_p \leq \omega_r(f, t, O)_p$ for measurable $U \subseteq O$.
+Moreover $\omega_r(f, t, V)_p = \omega_r(f, t)_p$,
+$\omega_r(f, t, U)_p \leq \omega_r(f, t, O)_p$ for measurable $U \subseteq O$, and the steps $h$
+and $-h$ give the same norm: $x \in U_{r(-h)}$ if and only if $x - rh \in U_{rh}$,
+$\Delta_{-h}^r f(x) = (-1)^r \Delta_h^r f(x - rh)$, and
+$\|\Delta_{-h}^r f\|_{L_p(U_{r(-h)})} = \|\Delta_h^r f\|_{L_p(U_{rh})}$ for every function $f$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 For $x \in U_{rh}$ all points $x + lh$, $l \leq r$, lie in $U$, so $\Delta_h^r (1_U f) = \Delta_h^r f$
 on $U_{rh}$. Hence $\omega_r(f, t, U)_p = \omega_r(1_U f, t, U)_p \leq \omega_r(1_U f, t)_p \leq
-2^r \|1_U f\|_p$ by \Cref{lem:rd-modulus}; the other statements follow from the definition.
+2^r \|1_U f\|_p$ by \Cref{lem:rd-modulus}. The reflection $l \mapsto r - l$ maps the points
+$x - lh$ onto $(x - rh) + lh$, and the translation by $rh$ preserves the measure; the other
+statements follow from the definition.
 \end{proof}
 
 \section{Moment kernels}

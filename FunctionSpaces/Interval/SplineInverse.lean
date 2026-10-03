@@ -387,7 +387,7 @@ theorem exists_inverse_splineScheme {r : ℕ} (hp : p ≠ ∞) :
   · have hnorm : ‖a‖ₑ = eLpNorm (ppFun j Q) p unitVol := by
       rw [Lp.enorm_def]
       exact eLpNorm_congr_ae hae
-    rw [lpModulus, modulus_congr_ae hae, hnorm]
+    rw [lpModulus, modulus_congr_ae hae, hnorm, modulus_eq_iSup_nonneg]
     refine iSup₂_le fun h hh => ?_
     have hhj : h ≤ 1 / 2 ^ j := hh.2.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ (by norm_num) hjk))

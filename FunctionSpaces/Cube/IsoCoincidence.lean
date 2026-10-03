@@ -190,7 +190,7 @@ theorem exists_eLpNorm_higherDiff_stepRegion_pp_le (r : ℕ) (hp : p ≠ ∞) :
   refine ⟨1 + ∑ m ∈ Finset.range (r + 1), Cm m, ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
     ENNReal.sum_ne_top.2 fun m _ => hCm m⟩, fun j u hu m hmr t ht => ?_⟩
   obtain ⟨Q, hQ, rfl⟩ := hu
-  rw [eLpNorm_higherDiff_stepRegion_eq (measurable_ppFun j Q) p m t]
+  rw [eLpNorm_higherDiff_stepRegion_eq (ppFun j Q) p m t]
   have hCle : Cm m ≤ 1 + ∑ m ∈ Finset.range (r + 1), Cm m :=
     le_add_left (Finset.single_le_sum (f := Cm) (fun _ _ => zero_le)
       (Finset.mem_range.2 (Nat.lt_succ_of_le hmr)))
@@ -228,7 +228,7 @@ theorem exists_eLpNorm_higherDiff_stepRegion_spline_le {r : ℕ} (hr : 1 ≤ r) 
     ENNReal.sum_ne_top.2 fun m _ => hCm m⟩, splineInverseConst_ne_top r hK⟩,
     fun j u hu m hmr t ht => ?_⟩
   obtain ⟨Q, hQ, hJ, rfl⟩ := hu
-  rw [eLpNorm_higherDiff_stepRegion_eq (measurable_ppFun j Q) p m t]
+  rw [eLpNorm_higherDiff_stepRegion_eq (ppFun j Q) p m t]
   have hCle : Cm m ≤ C := le_add_right (le_add_left (Finset.single_le_sum (f := Cm)
     (fun _ _ => zero_le) (Finset.mem_range.2 (Nat.lt_succ_of_le hmr))))
   rcases lt_or_eq_of_le hmr with hmr' | rfl
@@ -263,7 +263,8 @@ theorem exists_inverse_cubePPScheme_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞
   rcases lt_or_ge k j with hkj | hjk
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
     exact (isoModulus_le hg.1.1 Fact.out r _).trans (by gcongr; exact le_add_self)
-  · refine iSup₂_le fun h hh => ?_
+  · rw [isoModulus_eq_iSup]
+    refine iSup₂_le fun h hh => ?_
     have hhj : ‖h‖ ≤ 1 / 2 ^ j := hh.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ (by norm_num) hjk))
     calc eLpNorm (higherDiff r h g) p ((cubeVol d).restrict (isoRegion r h))
@@ -297,7 +298,8 @@ theorem exists_inverse_cubeSplineScheme_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠
   rcases lt_or_ge k j with hkj | hjk
   · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
     exact (isoModulus_le hg.1.1 Fact.out r _).trans (by gcongr; exact le_add_self)
-  · refine iSup₂_le fun h hh => ?_
+  · rw [isoModulus_eq_iSup]
+    refine iSup₂_le fun h hh => ?_
     have hhj : ‖h‖ ≤ 1 / 2 ^ j := hh.trans (one_div_le_one_div_of_le (by positivity)
       (pow_le_pow_right₀ (by norm_num) hjk))
     calc eLpNorm (higherDiff r h g) p ((cubeVol d).restrict (isoRegion r h))

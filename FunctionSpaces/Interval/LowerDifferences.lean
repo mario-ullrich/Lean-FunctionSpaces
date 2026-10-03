@@ -77,25 +77,37 @@ theorem stepRegion_of_neg (m : ℕ) {t : ℝ} (ht : t < 0) : stepRegion m t = Ic
   have hmt : (m : ℝ) * t ≤ 0 := mul_nonpos_of_nonneg_of_nonpos (Nat.cast_nonneg m) ht.le
   rw [stepRegion, max_eq_right (by linarith), min_eq_left (by linarith)]
 
+/-- **The step region is a step set**: `J(m, t) = [0, 1]_{mt}` (`Rd.stepSet`), since `x + lt`,
+`l ≤ m`, lies between `x` and `x + mt`. -/
+theorem stepRegion_eq_stepSet (m : ℕ) (t : ℝ) : stepRegion m t = Rd.stepSet (Icc 0 1) m t := by
+  ext x
+  rw [mem_stepRegion]
+  simp only [Rd.stepSet, mem_ofPred_eq, smul_eq_mul]
+  constructor
+  · rintro ⟨⟨h0, h1⟩, h2, h3⟩ l hl
+    have hl' : (l : ℝ) ≤ m := by exact_mod_cast hl
+    rcases le_or_gt 0 t with ht | ht
+    · exact ⟨by linarith [mul_nonneg (Nat.cast_nonneg l) ht],
+        by linarith [mul_le_mul_of_nonneg_right hl' ht]⟩
+    · exact ⟨by linarith [mul_le_mul_of_nonpos_right hl' ht.le],
+        by linarith [mul_nonpos_of_nonneg_of_nonpos (Nat.cast_nonneg l) ht.le]⟩
+  · intro hx
+    exact ⟨by simpa using hx 0 (Nat.zero_le m), hx m le_rfl⟩
+
 /-- **The norm of a difference depends only on the size of the step**:
-`‖Δ_t^m u‖_{L_p(step region)} = ‖Δ_{|t|}^m u‖_{L_p[0, 1 - m|t|]}`. -/
-theorem eLpNorm_higherDiff_stepRegion_eq {u : ℝ → ℂ} (hu : Measurable u) (p : ℝ≥0∞) (m : ℕ)
-    (t : ℝ) :
+`‖Δ_t^m u‖_{L_p(step region)} = ‖Δ_{|t|}^m u‖_{L_p[0, 1 - m|t|]}`
+(`Rd.eLpNorm_indicator_stepSet_neg`). -/
+theorem eLpNorm_higherDiff_stepRegion_eq (u : ℝ → ℂ) (p : ℝ≥0∞) (m : ℕ) (t : ℝ) :
     eLpNorm (higherDiff m t u) p (volume.restrict (stepRegion m t)) =
       eLpNorm (higherDiff m |t| u) p (volume.restrict (Icc 0 (1 - m * |t|))) := by
+  rw [stepRegion_eq_stepSet, ← eLpNorm_indicator_eq_eLpNorm_restrict
+      (Rd.measurableSet_stepSet measurableSet_Icc m t),
+    ← eLpNorm_indicator_stepSet_Icc m (abs_nonneg t)]
   rcases le_or_gt 0 t with ht | ht
-  · rw [abs_of_nonneg ht, stepRegion_of_nonneg m ht]
-  · rw [abs_of_neg ht, stepRegion_of_neg m ht]
-    have h1 : higherDiff m t u = ((-1 : ℂ) ^ m) • fun x => higherDiff m (-t) u (x + m * t) := by
-      funext x
-      have h := higherDiff_neg m (-t) u x
-      rw [neg_neg] at h
-      rw [h, Pi.smul_apply, smul_eq_mul]
-      congr 2
-      ring
-    rw [h1, eLpNorm_const_smul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul,
-      eLpNorm_comp_add_Icc (measurable_higherDiff hu m (-t))]
-    congr 3 <;> ring
+  · rw [abs_of_nonneg ht]
+    rfl
+  · rw [abs_of_neg ht, ← Rd.eLpNorm_indicator_stepSet_neg, neg_neg]
+    rfl
 
 /-! ### Tools for the local estimates -/
 
