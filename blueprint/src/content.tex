@@ -294,23 +294,26 @@ With these, a constant $(1 - 2^{-\alpha})^{-1}$ is finite exactly for $\alpha > 
   ENNReal.one_sub_two_rpow_neg_inv_ne_top, ENNReal.one_le_one_sub_two_rpow_neg_inv,
   ENNReal.lqNorm_dyadicWeight_neg_le}
 \leanok
-For $q \in (0, \infty)$ and a sequence $a = (a_n)_{n \in \N}$ in $[0, \infty]$,
+For $q \in (0, \infty)$, a countable set $I$ and a family $a = (a_i)_{i \in I}$ in $[0, \infty]$,
 \[
-  \|a\|_{\ell_q} = \Bigl(\sum_{n=0}^\infty a_n^q\Bigr)^{1/q},
+  \|a\|_{\ell_q} = \Bigl(\sum_{i \in I} a_i^q\Bigr)^{1/q},
   \qquad
-  \|a\|_{\ell_\infty} = \sup_{n \in \N} a_n .
+  \|a\|_{\ell_\infty} = \sup_{i \in I} a_i .
 \]
 For $s \in \R$ and $k \in \N$, the \emph{dyadic weight} is $2^{ks}$.
 \end{definition}
 
-In Lean, $\|a\|_{\ell_q}$ is the $L_q$ norm of $a$ for the counting measure on $\N$.
+In Lean, $\|a\|_{\ell_q}$ is the $L_q$ norm of $a$ for the counting measure on $I$. The index set
+is $\N$ for sequences, $\N^d$ for dominating mixed smoothness, and a finite set for the
+coefficients of one level of atoms and wavelets.
 
 \begin{lemma}[Properties of the $\ell_q$ norm]
 \label{lem:lq-basic}
 \lean{ENNReal.lqNorm_mono, ENNReal.le_lqNorm, ENNReal.lqNorm_const_mul, ENNReal.lqNorm_add_le,
   ENNReal.lqNorm_le_lqNorm_of_le, ENNReal.lqNorm_le_head_add_shift,
   ENNReal.lqNorm_le_sum_range_add_shift, ENNReal.lqNorm_le_lqNorm_one, ENNReal.lqNorm_geometric_le,
-  ENNReal.lqNorm_shift_le}
+  ENNReal.lqNorm_shift_le, ENNReal.lqNorm_eq_sum, ENNReal.lqNorm_le_card_rpow_mul,
+  ENNReal.lqNorm_prod_rpow}
 \leanok
 \uses{def:lq-norm}
 Let $1 \leq q \leq r \leq \infty$. For all sequences $a, b$ in $[0, \infty]$, all
@@ -1101,7 +1104,7 @@ $\varepsilon_j$ is that of a whole level, measured by the coefficients.
 
 \begin{definition}[Atomic system and the sequence space $b^s_{p,q}$]
 \label{def:atomic-system}
-\lean{ApproximationScheme.AtomicSystem, ApproximationScheme.bNorm, ENNReal.finLqNorm}
+\lean{ApproximationScheme.AtomicSystem, ApproximationScheme.bNorm}
 \leanok
 \uses{def:scheme, def:error, def:lq-norm}
 Let $M_j$ be finite sets, $1 \leq p \leq \infty$ and $\delta, \sigma \in \R$. An \emph{atomic
@@ -3333,9 +3336,7 @@ $W$ serves. For $r = 1$, $\psi_1$ is the Haar function.
 \lean{Alpert.integral_conj_psi_mul_psi, Alpert.integral_conj_polyFun_mul_psi,
   Alpert.integral_polyFun_mul_psi, Alpert.ppFun_ae_eq_sum_psi, Alpert.conj_ppFun,
   Alpert.integrable_conj_psi_mul, Alpert.integral_conj_psi_mul_sum, Alpert.memLp_sum_psi,
-  Alpert.sumPsi, Alpert.coeFn_sumPsi, Alpert.sumPsi_injective, Alpert.exists_stable,
-  ENNReal.le_finLqNorm, ENNReal.finLqNorm_le_of_le, ENNReal.finLqNorm_const_mul,
-  ENNReal.finLqNorm_prod_rpow}
+  Alpert.sumPsi, Alpert.coeFn_sumPsi, Alpert.sumPsi_injective, Alpert.exists_stable}
 \leanok
 \uses{def:multiwavelets}
 The multiwavelets are orthonormal in $L_2[0,1]$, have $r$ vanishing moments,
@@ -6522,7 +6523,7 @@ and exchange the sum with the integral.
 
 \begin{definition}[Regular atoms and the coefficient quasi-norm]
 \label{def:regular-atoms}
-\lean{Rd.IsRegularAtom, Rd.levelNorm, Rd.levelNorm_mono, Rd.coeffNorm}
+\lean{Rd.IsRegularAtom, Rd.levelNorm, Rd.levelNorm_eq_tsum, Rd.levelNorm_mono, Rd.coeffNorm}
 \leanok
 Let $1 \leq p < \infty$, $\sigma \geq 0$, $r \in \N$ and $d, C \geq 0$. A regular atom of level
 $j$, exponent $\sigma$ and order $r$ with centre $c$ is a measurable $a : V \to \C$ with $a = 0$
@@ -7676,21 +7677,17 @@ The diagonal map scales Lebesgue measure by its determinant $\prod_i a_i$.
 
 \begin{definition}[$\ell_q$ norms on $\N^d$]
 \label{def:mixed-lq}
-\lean{Rd.mixedLqNorm, Rd.aestronglyMeasurable_mixed, Rd.mixedLqNorm_top, Rd.mixedLqNorm_eq_tsum,
-  Rd.mixedLqNorm_rpow, Rd.mixedLqNorm_one, Rd.le_mixedLqNorm, Rd.mixedLqNorm_mono,
-  Rd.mixedLqNorm_add_le, Rd.mixedLqNorm_const_mul, Rd.mixedLqNorm_le_tsum, Rd.mixedWeight,
-  Rd.mixedWeight_ne_top, Rd.mixedWeight_neg_mul_self}
+\lean{Rd.mixedWeight, Rd.mixedWeight_ne_top, Rd.mixedWeight_neg_mul_self}
 \leanok
 \uses{def:lq-norm}
 For $a : \N^d \to [0, \infty]$, $\|a\|_{\ell_q} = (\sum_k a_k^q)^{1/q}$ for $q < \infty$ and
-$\|a\|_{\ell_\infty} = \sup_k a_k$, the $L_q$ norm for the counting measure. It is monotone,
-homogeneous, satisfies Minkowski's inequality, and is at most $\sum_k a_k$ for $q \geq 1$. The
-mixed weights are $2^{s|k|_1} = \prod_i 2^{s k_i}$.
+$\|a\|_{\ell_\infty} = \sup_k a_k$, the norm of \Cref{def:lq-norm} on the countable set $\N^d$.
+The mixed weights are $2^{s|k|_1} = \prod_i 2^{s k_i}$.
 \end{definition}
 
 \begin{lemma}[The Schur test]
 \label{lem:schur-test}
-\lean{Rd.mixedLqNorm_schur_le, Rd.tsum_prod_le_prod_tsum}
+\lean{Rd.lqNorm_schur_le, Rd.tsum_prod_le_prod_tsum}
 \leanok
 \uses{def:mixed-lq, lem:weighted-jensen}
 Let $w \geq 0$ on $\N^d \times \N^d$ with $\sum_k w(m, k) \leq A$ for every $m$ and
@@ -7710,7 +7707,7 @@ gives at most $A^q \sum_k b_k^q$. The product bound holds on the finite boxes.
 \label{lem:mixed-almost-diagonal}
 \lean{Rd.almostDiagCoeff, Rd.almostDiagProfile, Rd.dyadicWeight_mul_almostDiagCoeff_mul,
   Rd.tsum_almostDiagProfile_le, Rd.almostDiagConst, Rd.almostDiagConst_ne_top,
-  Rd.mixedLqNorm_almostDiagonal_le}
+  Rd.lqNorm_almostDiagonal_pi_le}
 \leanok
 \uses{lem:schur-test, lem:almost-diagonal}
 Let $c(i, j) = 2^{-(i - j)L}$ for $j \leq i$ and $c(i, j) = 1$ for $j > i$, let $s \geq 0$ and
@@ -8029,7 +8026,7 @@ of the dyadic rectangles of these blocks.
 
 \begin{lemma}[Counting and Hölder's inequality on levels]
 \label{lem:level-count}
-\lean{Rd.card_levelSet_le, Rd.tsum_le_tsum_levelSet, Rd.sum_le_card_rpow_mul_mixedLqNorm}
+\lean{Rd.card_levelSet_le, Rd.tsum_le_tsum_levelSet, Rd.sum_le_card_rpow_mul_lqNorm}
 \leanok
 \uses{def:hyperbolic-cross, def:mixed-lq}
 $\#\{k \in \N^d : |k|_1 = n\} \leq (n + 1)^{d-1}$; sums over $\N^d$ are at most the sums over the

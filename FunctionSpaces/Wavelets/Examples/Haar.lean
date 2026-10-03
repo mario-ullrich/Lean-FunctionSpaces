@@ -333,7 +333,7 @@ theorem enorm_haarFunction {j : ℕ} {m : ℤ} {x : ℝ} (hx : dyadicIndex j x =
 have disjoint supports of measure `2^(-j)` and modulus `2^(j/2)` there. -/
 theorem eLpNorm_sum_haar (hp : p ≠ ∞) (j : ℕ) (c : Fin (2 ^ j) → ℂ) :
     eLpNorm (fun x => ∑ m : Fin (2 ^ j), c m * (haarFunction j ((m : ℕ) : ℤ) x : ℂ)) p vol =
-      ENNReal.dyadicWeight (1 / 2 - 1 / p.toReal) j * ENNReal.finLqNorm p (fun m => ‖c m‖ₑ) := by
+      ENNReal.dyadicWeight (1 / 2 - 1 / p.toReal) j * ENNReal.lqNorm p (fun m => ‖c m‖ₑ) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
   have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   set r := p.toReal
@@ -366,7 +366,7 @@ theorem eLpNorm_sum_haar (hp : p ≠ ∞) (j : ℕ) (c : Fin (2 ^ j) → ℂ) :
   simp_rw [hvol, mul_assoc, ← Finset.sum_mul, mul_comm (∑ m : Fin (2 ^ j), ‖c m‖ₑ ^ r)]
   rw [ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.dyadicWeight_add,
     ENNReal.dyadicWeight_rpow]
-  simp only [ENNReal.finLqNorm, hp, ↓reduceIte]
+  simp only [ENNReal.lqNorm_eq_sum hp0 hp]
   rw [show p.toReal = r from rfl]
   congr 2
   field_simp
@@ -457,10 +457,10 @@ theorem memApprox_iff_haarCoeff (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ
     (f : Lp ℂ p vol) :
     (scheme p).MemApprox s q f ↔ ‖∫ x, f x ∂vol‖ₑ + ENNReal.lqNorm q (fun k =>
       ENNReal.dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k *
-        ENNReal.finLqNorm p (fun m : Fin (2 ^ k) => ‖haarCoeff f k ((m : ℕ) : ℤ)‖ₑ)) < ∞ := by
+        ENNReal.lqNorm p (fun m : Fin (2 ^ k) => ‖haarCoeff f k ((m : ℕ) : ℤ)‖ₑ)) < ∞ := by
   have h : ∀ k, ‖Lp.condExpLp (dyadicFiltration (k + 1)) f -
       Lp.condExpLp (dyadicFiltration k) f‖ₑ = ENNReal.dyadicWeight (1 / 2 - 1 / p.toReal) k *
-        ENNReal.finLqNorm p (fun m : Fin (2 ^ k) => ‖haarCoeff f k ((m : ℕ) : ℤ)‖ₑ) :=
+        ENNReal.lqNorm p (fun m : Fin (2 ^ k) => ‖haarCoeff f k ((m : ℕ) : ℤ)‖ₑ) :=
     fun k => by
       rw [Lp.enorm_def, eLpNorm_congr_ae (condExpLp_succ_sub_ae_eq k f)]
       exact eLpNorm_sum_haar hp k _

@@ -13,15 +13,14 @@ public import Mathlib.Topology.Algebra.InfiniteSum.NatInt
 
 The quasi-norms of the spaces of dominating mixed smoothness are `ℓ_q` norms of families indexed by
 `k ∈ ℕ^d = Fin d → ℕ` with the **mixed weights** `2^(s|k|_1) = ∏_i 2^(s k_i)` (`Rd.mixedWeight`).
-The `ℓ_q` norm on `ℕ^d` is the `L_q` norm for the counting measure (`Rd.mixedLqNorm`), as for
-`ENNReal.lqNorm` on `ℕ`, so Minkowski's inequality comes from Mathlib.
+The `ℓ_q` norm on `ℕ^d` is `ENNReal.lqNorm`, the `L_q` norm for the counting measure, as on `ℕ`.
 
-**The Schur test** (`Rd.mixedLqNorm_schur_le`): if the row sums and the column sums of a nonnegative
+**The Schur test** (`Rd.lqNorm_schur_le`): if the row sums and the column sums of a nonnegative
 matrix `w` are at most `A`, then `‖(∑_k w(m, k) b_k)_m‖_{ℓ_q} ≤ A ‖b‖_{ℓ_q}`, `1 ≤ q ≤ ∞`, by the
 weighted Jensen inequality `(∑_k w b)^q ≤ (∑_k w)^(q-1) ∑_k w b^q` (`Rd.lintegral_mul_rpow_le` for
 the counting measure).
 
-**The almost diagonal lemma on `ℕ^d`** (`Rd.mixedLqNorm_almostDiagonal_le`): with the coefficients
+**The almost diagonal lemma on `ℕ^d`** (`Rd.lqNorm_almostDiagonal_pi_le`): with the coefficients
 `c(i, j) = 2^(-(i-j)L)` for `j ≤ i` and `1` for `j > i` (`Rd.almostDiagCoeff`) and `0 < s < L`,
 
 `‖(2^(s|m|_1) ∑_k ∏_i c(m_i, k_i) a_k)_m‖_{ℓ_q} ≤ C^d ‖(2^(s|k|_1) a_k)_k‖_{ℓ_q}`,
@@ -38,119 +37,24 @@ do not iterate over the coordinates.
 open MeasureTheory Filter
 open scoped ENNReal
 
-open ENNReal (dyadicWeight)
+open ENNReal (dyadicWeight lqNorm)
 
 namespace Rd
 
 variable {d : ℕ} {q : ℝ≥0∞}
 
-/-! ### `ℓ_q` norms on `ℕ^d` -/
-
-/-- The **`ℓ_q` norm on `ℕ^d`**: `(∑_k a_k^q)^(1/q)` for `q < ∞` and `sup_k a_k` for `q = ∞`, the
-`L_q` norm for the counting measure. -/
-noncomputable def mixedLqNorm (q : ℝ≥0∞) (a : (Fin d → ℕ) → ℝ≥0∞) : ℝ≥0∞ :=
-  eLpNorm a q Measure.count
-
-/-- Every family on `ℕ^d` is measurable. -/
-theorem aestronglyMeasurable_mixed (a : (Fin d → ℕ) → ℝ≥0∞) :
-    AEStronglyMeasurable a Measure.count :=
-  (measurable_of_countable a).aestronglyMeasurable
-
-/-- `‖a‖_{ℓ_∞} = sup_k a_k`. -/
-theorem mixedLqNorm_top (a : (Fin d → ℕ) → ℝ≥0∞) : mixedLqNorm ∞ a = ⨆ k, a k := by
-  simp [mixedLqNorm, eLpNorm_exponent_top (aestronglyMeasurable_mixed a)]
-
-/-- `‖a‖_{ℓ_q} = (∑_k a_k^q)^(1/q)` for `0 < q < ∞`. -/
-theorem mixedLqNorm_eq_tsum (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : (Fin d → ℕ) → ℝ≥0∞) :
-    mixedLqNorm q a = (∑' k, a k ^ q.toReal) ^ (1 / q.toReal) := by
-  rw [mixedLqNorm, eLpNorm_eq_lintegral_rpow_enorm_toReal hq0 hq (aestronglyMeasurable_mixed a),
-    lintegral_count]
-  rfl
-
-/-- The `q`-th power of the norm is the sum of the `q`-th powers. -/
-theorem mixedLqNorm_rpow (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : (Fin d → ℕ) → ℝ≥0∞) :
-    mixedLqNorm q a ^ q.toReal = ∑' k, a k ^ q.toReal := by
-  have hp : q.toReal ≠ 0 := (ENNReal.toReal_pos hq0 hq).ne'
-  rw [mixedLqNorm_eq_tsum hq0 hq, one_div, ENNReal.rpow_inv_rpow hp]
-
-/-- `‖a‖_{ℓ_1} = ∑_k a_k`. -/
-theorem mixedLqNorm_one (a : (Fin d → ℕ) → ℝ≥0∞) : mixedLqNorm 1 a = ∑' k, a k := by
-  simp [mixedLqNorm_eq_tsum one_ne_zero ENNReal.one_ne_top]
-
-/-- Every term is bounded by the norm. -/
-theorem le_mixedLqNorm (hq : q ≠ 0) (a : (Fin d → ℕ) → ℝ≥0∞) (k : Fin d → ℕ) :
-    a k ≤ mixedLqNorm q a :=
-  enorm_le_eLpNorm_count a k hq
-
-/-- The norm is monotone. -/
-theorem mixedLqNorm_mono {a b : (Fin d → ℕ) → ℝ≥0∞} (h : ∀ k, a k ≤ b k) :
-    mixedLqNorm q a ≤ mixedLqNorm q b :=
-  eLpNorm_mono_enorm (aestronglyMeasurable_mixed a) h
-
-/-- **Minkowski's inequality** on `ℓ_q(ℕ^d)`, `1 ≤ q ≤ ∞`. -/
-theorem mixedLqNorm_add_le (hq : 1 ≤ q) (a b : (Fin d → ℕ) → ℝ≥0∞) :
-    mixedLqNorm q (fun k => a k + b k) ≤ mixedLqNorm q a + mixedLqNorm q b :=
-  eLpNorm_add_le (f := a) (g := b) hq
-
-/-- The norm is homogeneous. -/
-theorem mixedLqNorm_const_mul (c : ℝ≥0∞) (a : (Fin d → ℕ) → ℝ≥0∞) :
-    mixedLqNorm q (fun k => c * a k) = c * mixedLqNorm q a := by
-  rcases eq_or_ne q 0 with rfl | hq0
-  · rw [mixedLqNorm, mixedLqNorm, eLpNorm_exponent_zero (aestronglyMeasurable_mixed _),
-      eLpNorm_exponent_zero (aestronglyMeasurable_mixed _), mul_zero]
-  rcases eq_or_ne q ∞ with rfl | hq
-  · rw [mixedLqNorm_top, mixedLqNorm_top, ENNReal.mul_iSup]
-  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
-  rw [mixedLqNorm_eq_tsum hq0 hq, mixedLqNorm_eq_tsum hq0 hq]
-  simp_rw [ENNReal.mul_rpow_of_nonneg _ _ hp.le]
-  rw [ENNReal.tsum_mul_left, ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_mul,
-    mul_one_div_cancel hp.ne', ENNReal.rpow_one]
-
-/-- **The `ℓ_1` norm dominates**: `‖a‖_{ℓ_q} ≤ ∑_k a_k` for `1 ≤ q ≤ ∞`. -/
-theorem mixedLqNorm_le_tsum (hq : 1 ≤ q) (a : (Fin d → ℕ) → ℝ≥0∞) :
-    mixedLqNorm q a ≤ ∑' k, a k := by
-  rcases eq_or_ne q ∞ with rfl | hq'
-  · rw [mixedLqNorm_top]
-    exact iSup_le fun k => ENNReal.le_tsum k
-  have hq0 : q ≠ 0 := (zero_lt_one.trans_le hq).ne'
-  have hr : 1 ≤ q.toReal := ENNReal.one_le_toReal_of_one_le hq hq'
-  have hr0 : (0 : ℝ) < q.toReal := by linarith
-  rcases eq_or_ne (∑' k, a k) ∞ with hS | hS
-  · rw [hS]
-    exact le_top
-  rw [mixedLqNorm_eq_tsum hq0 hq']
-  set S := ∑' k, a k
-  rcases eq_or_ne S 0 with hS0 | hS0
-  · have hz : ∀ k, a k = 0 := fun k => (ENNReal.tsum_eq_zero.1 hS0) k
-    simp [hz, hS0, ENNReal.zero_rpow_of_pos hr0, hr0]
-  -- `a_k^r = a_k a_k^(r-1) ≤ a_k S^(r-1)`
-  have hterm : ∀ k, a k ^ q.toReal ≤ a k * S ^ (q.toReal - 1) := fun k => by
-    have hk : a k ≤ S := ENNReal.le_tsum k
-    calc a k ^ q.toReal = a k ^ ((1 : ℝ) + (q.toReal - 1)) := by ring_nf
-      _ = a k * a k ^ (q.toReal - 1) := by
-          rw [ENNReal.rpow_add_of_nonneg _ _ zero_le_one (by linarith), ENNReal.rpow_one]
-      _ ≤ a k * S ^ (q.toReal - 1) := mul_le_mul' le_rfl
-          (ENNReal.rpow_le_rpow hk (by linarith))
-  calc (∑' k, a k ^ q.toReal) ^ (1 / q.toReal)
-      ≤ (∑' k, a k * S ^ (q.toReal - 1)) ^ (1 / q.toReal) :=
-        ENNReal.rpow_le_rpow (ENNReal.tsum_le_tsum hterm) (by positivity)
-    _ = (S ^ ((1 : ℝ) + (q.toReal - 1))) ^ (1 / q.toReal) := by
-        rw [ENNReal.tsum_mul_right, ENNReal.rpow_add_of_nonneg _ _ zero_le_one (by linarith),
-          ENNReal.rpow_one]
-    _ = S := by
-        rw [show (1 : ℝ) + (q.toReal - 1) = q.toReal by ring, ← ENNReal.rpow_mul,
-          mul_one_div_cancel (by linarith), ENNReal.rpow_one]
-
 /-! ### The Schur test -/
 
-/-- **The Schur test** on `ℓ_q(ℕ^d)`: if the row sums and the column sums of a nonnegative matrix
+/-- **The Schur test** on `ℓ_q`: if the row sums and the column sums of a nonnegative matrix
 `w` are at most `A`, then `‖(∑_k w(m, k) b_k)_m‖_{ℓ_q} ≤ A ‖b‖_{ℓ_q}` for `1 ≤ q ≤ ∞`, by the weighted
 Jensen inequality `(∑_k w b)^q ≤ (∑_k w)^(q-1) ∑_k w b^q`. -/
-theorem mixedLqNorm_schur_le (hq : 1 ≤ q) {w : (Fin d → ℕ) → (Fin d → ℕ) → ℝ≥0∞} {A : ℝ≥0∞}
-    (hrow : ∀ m, ∑' k, w m k ≤ A) (hcol : ∀ k, ∑' m, w m k ≤ A) (b : (Fin d → ℕ) → ℝ≥0∞) :
-    mixedLqNorm q (fun m => ∑' k, w m k * b k) ≤ A * mixedLqNorm q b := by
+theorem lqNorm_schur_le {ι κ : Type*} [MeasurableSpace ι] [Countable ι]
+    [MeasurableSingletonClass ι] [MeasurableSpace κ] [Countable κ] [MeasurableSingletonClass κ]
+    (hq : 1 ≤ q) {w : ι → κ → ℝ≥0∞} {A : ℝ≥0∞} (hrow : ∀ m, ∑' k, w m k ≤ A)
+    (hcol : ∀ k, ∑' m, w m k ≤ A) (b : κ → ℝ≥0∞) :
+    lqNorm q (fun m => ∑' k, w m k * b k) ≤ A * lqNorm q b := by
   rcases eq_or_ne q ∞ with rfl | hq'
-  · rw [mixedLqNorm_top, mixedLqNorm_top]
+  · rw [ENNReal.lqNorm_top, ENNReal.lqNorm_top]
     refine iSup_le fun m => ?_
     calc ∑' k, w m k * b k ≤ ∑' k, w m k * ⨆ k', b k' :=
           ENNReal.tsum_le_tsum fun k => mul_le_mul' le_rfl (le_iSup b k)
@@ -160,10 +64,10 @@ theorem mixedLqNorm_schur_le (hq : 1 ≤ q) {w : (Fin d → ℕ) → (Fin d → 
   set r := q.toReal
   have hr : 1 ≤ r := ENNReal.one_le_toReal_of_one_le hq hq'
   have hr0 : 0 < r := by linarith
-  rw [mixedLqNorm_eq_tsum hq0 hq', mixedLqNorm_eq_tsum hq0 hq']
+  rw [ENNReal.lqNorm_eq_tsum hq0 hq', ENNReal.lqNorm_eq_tsum hq0 hq']
   -- the weighted Jensen inequality in each row
   have hjensen : ∀ m, (∑' k, w m k * b k) ^ r ≤ A ^ (r - 1) * ∑' k, w m k * b k ^ r := fun m => by
-    have h := lintegral_mul_rpow_le (μ := (Measure.count : Measure (Fin d → ℕ))) hr
+    have h := lintegral_mul_rpow_le (μ := (Measure.count : Measure κ)) hr
       (measurable_of_countable (w m)).aemeasurable (measurable_of_countable b).aemeasurable
     simp only [lintegral_count] at h
     exact h.trans (mul_le_mul' (ENNReal.rpow_le_rpow (hrow m) (by linarith)) le_rfl)
@@ -283,11 +187,11 @@ theorem almostDiagConst_ne_top {s L : ℝ} (hs : 0 < s) (hsL : s < L) : almostDi
 `‖(2^(s|m|_1) ∑_k ∏_i c(m_i, k_i) a_k)_m‖_{ℓ_q} ≤ C^d ‖(2^(s|k|_1) a_k)_k‖_{ℓ_q}` with
 `C = (1 - 2^(-(L-s)))⁻¹ + (1 - 2^(-s))⁻¹`, by the Schur test: the matrix
 `2^(s|m|_1) ∏_i c(m_i, k_i) 2^(-s|k|_1) = ∏_i u(m_i - k_i)` has row and column sums at most `C^d`. -/
-theorem mixedLqNorm_almostDiagonal_le (hq : 1 ≤ q) {s L : ℝ} (hs : 0 ≤ s)
+theorem lqNorm_almostDiagonal_pi_le (hq : 1 ≤ q) {s L : ℝ} (hs : 0 ≤ s)
     (a : (Fin d → ℕ) → ℝ≥0∞) :
-    mixedLqNorm q (fun m => mixedWeight s m *
+    lqNorm q (fun m => mixedWeight s m *
         ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * a k) ≤
-      almostDiagConst s L ^ d * mixedLqNorm q (fun k => mixedWeight s k * a k) := by
+      almostDiagConst s L ^ d * lqNorm q (fun k => mixedWeight s k * a k) := by
   set C := almostDiagConst s L
   set w : (Fin d → ℕ) → (Fin d → ℕ) → ℝ≥0∞ := fun m k =>
     ∏ i, almostDiagProfile s L ((m i : ℤ) - k i)
@@ -307,7 +211,7 @@ theorem mixedLqNorm_almostDiagonal_le (hq : 1 ≤ q) {s L : ℝ} (hs : 0 ≤ s)
           Finset.prod_le_prod fun i _ => le_trans
             (ENNReal.tsum_comp_le_tsum_of_injective (fun j j' h => by simpa using h) _) hprof
       _ = C ^ d := by rw [Finset.prod_const, Finset.card_univ, Fintype.card_fin]
-  refine le_trans (le_of_eq ?_) (mixedLqNorm_schur_le hq hrow hcol _)
+  refine le_trans (le_of_eq ?_) (lqNorm_schur_le hq hrow hcol _)
   congr 1
   funext m
   rw [← ENNReal.tsum_mul_left]

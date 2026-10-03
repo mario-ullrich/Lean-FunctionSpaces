@@ -141,7 +141,7 @@ theorem enorm_cutoff_sub_convLp_scaled_le (hp : p ≠ ∞) (L j : ℕ)
     ring
   rw [lpModulusOn, ← hR]
   exact Ω.coneBump.enorm_indicatorLp_sub_convLp_scaled_le hp Ω.measurableSet_domain L j
-    (fun c hc z hz => Ω.subset_stepSet_of_coneSupported Ω.coneSupported_coneBump
+    (fun _ hc _ hz => Ω.subset_stepSet_of_coneSupported Ω.coneSupported_coneBump
       (lt_of_lt_of_le one_pos hc) L hz) f
 
 /-- `‖1_Ω (k_0 ⋆ f)‖_p ≤ ‖m‖_1 ‖f‖_{L_p(Ω)}`, by the support principle. -/
@@ -164,7 +164,7 @@ theorem enorm_cutoff_localMean_succ_le (hp : p ≠ ∞) (L j : ℕ)
     ‖Ω.cutoff (Ω.coneBump.localMean hp L (j + 1) f)‖ₑ ≤
       2 * (∫⁻ z, ‖Ω.coneBump.toFun z‖ₑ) * lpModulusOn p Ω.domain L f (j + 1) :=
   Ω.coneBump.enorm_indicatorLp_localMean_succ_le hp Ω.measurableSet_domain L j
-    (fun c hc z hz => Ω.subset_stepSet_of_coneSupported Ω.coneSupported_coneBump
+    (fun _ hc _ hz => Ω.subset_stepSet_of_coneSupported Ω.coneSupported_coneBump
       (lt_of_lt_of_le one_pos hc) L hz) Ω.coneBump_radius.le f
 
 /-- The constant `‖m‖_1 + 2 ‖g‖_1` of the intrinsic upper bound. -/

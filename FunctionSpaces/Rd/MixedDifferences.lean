@@ -42,7 +42,7 @@ means.
 open MeasureTheory Filter
 open scoped ENNReal
 
-open ENNReal (dyadicWeight)
+open ENNReal (dyadicWeight lqNorm)
 
 namespace Rd
 
@@ -295,12 +295,12 @@ variable (p) in
 `‖(2^(s|k|_1) Ω^{e(k)}_L(f, 2^(-k))_p)_{k ∈ ℕ^d}‖_{ℓ_q(ℕ^d)}`. -/
 noncomputable def mixedModNorm (L : ℕ) (s : ℝ) (q : ℝ≥0∞)
     (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) : ℝ≥0∞ :=
-  mixedLqNorm q fun k => mixedWeight s k * lpMixedModulus p L f k
+  lqNorm q fun k => mixedWeight s k * lpMixedModulus p L f k
 
 /-- The norm of `f` is bounded by the mixed quasi-norm (the term `k = 0`). -/
 theorem enorm_le_mixedModNorm (L : ℕ) (s : ℝ) {q : ℝ≥0∞} (hq : q ≠ 0)
     (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) : ‖f‖ₑ ≤ mixedModNorm p L s q f := by
-  have h := le_mixedLqNorm hq (fun k => mixedWeight s k * lpMixedModulus p L f k) 0
+  have h := ENNReal.le_lqNorm hq (fun k => mixedWeight s k * lpMixedModulus p L f k) 0
   simp only [mixedWeight, Pi.zero_apply, ENNReal.dyadicWeight_zero_right, Finset.prod_const_one,
     one_mul, lpMixedModulus_zero] at h
   exact h

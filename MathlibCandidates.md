@@ -9,11 +9,12 @@ declarations.
   and it does so as soon as it does along the subsequence `2 ^ k`
   (`ApproximationScheme.tendsto_approxError_zero_of_pow`). Stated here for approximation
   schemes; the proofs use only monotonicity and nonemptiness.
-* **`ℓ_q` norms of sequences in `ℝ≥0∞`** (`ApproximationSpaces/Sequences/Lq.lean`), as the
-  `L_q` norm for the counting measure on `ℕ`: the norm bound `‖a‖_r ≤ ‖a‖_q` for
-  `1 ≤ q ≤ r` behind `lp.monotone` (`ENNReal.lqNorm_le_lqNorm_of_le`), homogeneity for
-  `ℝ≥0∞` scalars, and splitting off the first terms (`ENNReal.lqNorm_le_head_add_shift`,
-  `ENNReal.lqNorm_le_sum_range_add_shift`).
+* **`ℓ_q` norms of families in `ℝ≥0∞`** (`ApproximationSpaces/Sequences/Lq.lean`), as the
+  `L_q` norm for the counting measure on any countable index set: the norm bound
+  `‖a‖_r ≤ ‖a‖_q` for `1 ≤ q ≤ r` behind `lp.monotone` (`ENNReal.lqNorm_le_lqNorm_of_le`),
+  homogeneity for `ℝ≥0∞` scalars, the finite-index forms (`ENNReal.lqNorm_eq_sum`,
+  `ENNReal.lqNorm_le_card_rpow_mul`, `ENNReal.lqNorm_prod_rpow`), and, on `ℕ`, splitting off the
+  first terms (`ENNReal.lqNorm_le_head_add_shift`, `ENNReal.lqNorm_le_sum_range_add_shift`).
 * **Monotone convergence and countable Minkowski for `eLpNorm`**
   (`ApproximationSpaces/Sequences/Hardy.lean`): `ENNReal.lqNorm_iSup` and
   `ENNReal.lqNorm_tsum_le`, stated for the counting measure; the same proof works for
@@ -127,5 +128,6 @@ declarations.
   `(⊗K) ⋆ (⊗K') = ⊗(K_i ⋆ K'_i)` (`Rd.conv_tensorKernel`), and diagonal changes of variables
   `∫ F((a_i z_i)_i) dz = (∏_i a_i)⁻¹ ∫ F` (`Rd.integral_comp_diagMap`).
 * **The Schur test on `ℓ_q`** (`FunctionSpaces/Rd/MixedSequences.lean`): row and column sums at most
-  `A` give `‖(∑_k w(m, k) b_k)_m‖_{ℓ_q} ≤ A ‖b‖_{ℓ_q}` for `1 ≤ q ≤ ∞` (`Rd.mixedLqNorm_schur_le`),
-  stated on `ℕ^d`; `∑_k ∏_i f_i(k_i) ≤ ∏_i ∑_j f_i(j)` (`Rd.tsum_prod_le_prod_tsum`).
+  `A` give `‖(∑_k w(m, k) b_k)_m‖_{ℓ_q} ≤ A ‖b‖_{ℓ_q}` for `1 ≤ q ≤ ∞` (`Rd.lqNorm_schur_le`),
+  for countable index sets; `∑_k ∏_i f_i(k_i) ≤ ∏_i ∑_j f_i(j)` on `ℕ^d`
+  (`Rd.tsum_prod_le_prod_tsum`).

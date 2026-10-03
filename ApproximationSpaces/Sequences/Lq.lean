@@ -40,30 +40,37 @@ open scoped ENNReal
 
 namespace ENNReal
 
-/-- The **`ℓ_q` norm** of a sequence in `ℝ≥0∞`: `(∑ₙ a n ^ q) ^ (1/q)` for `q < ∞` and
-`supₙ a n` for `q = ∞`, defined as the `L_q` norm for the counting measure. -/
-noncomputable def lqNorm (q : ℝ≥0∞) (a : ℕ → ℝ≥0∞) : ℝ≥0∞ := eLpNorm a q Measure.count
+/-- The **`ℓ_q` norm** of a family `a : ι → [0, ∞]`: `(∑_i a_i ^ q) ^ (1/q)` for `q < ∞` and
+`sup_i a_i` for `q = ∞`, defined as the `L_q` norm for the counting measure.  The index set is `ℕ`
+for sequences, `ℕ^d` for the spaces of dominating mixed smoothness and a finite set for the
+coefficients of one level of atoms or wavelets; the general lemmas hold for every countable `ι`
+with measurable singletons. -/
+noncomputable def lqNorm {ι : Type*} [MeasurableSpace ι] (q : ℝ≥0∞) (a : ι → ℝ≥0∞) : ℝ≥0∞ :=
+  eLpNorm a q Measure.count
 
-variable {q r : ℝ≥0∞} {a b : ℕ → ℝ≥0∞}
+section Generic
+
+variable {ι : Type*} [MeasurableSpace ι] [Countable ι] [MeasurableSingletonClass ι]
+  {q r : ℝ≥0∞} {a b : ι → ℝ≥0∞}
 
 /-- Every sequence is measurable for the counting measure; this is the side condition of the
 Mathlib lemmas on `eLpNorm`. -/
-theorem aestronglyMeasurable_count (a : ℕ → ℝ≥0∞) : AEStronglyMeasurable a Measure.count :=
-  measurable_from_nat.aestronglyMeasurable
+theorem aestronglyMeasurable_count (a : ι → ℝ≥0∞) : AEStronglyMeasurable a Measure.count :=
+  (measurable_of_countable a).aestronglyMeasurable
 
 /-- `‖a‖_{ℓ_∞} = sup_n a_n`. -/
-theorem lqNorm_top (a : ℕ → ℝ≥0∞) : lqNorm ∞ a = ⨆ n, a n := by
+theorem lqNorm_top (a : ι → ℝ≥0∞) : lqNorm ∞ a = ⨆ n, a n := by
   simp [lqNorm, eLpNorm_exponent_top (aestronglyMeasurable_count a)]
 
 /-- `‖a‖_{ℓ_q} = (∑_n a_n^q)^(1/q)` for `0 < q < ∞`. -/
-theorem lqNorm_eq_tsum (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ℕ → ℝ≥0∞) :
+theorem lqNorm_eq_tsum (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ι → ℝ≥0∞) :
     lqNorm q a = (∑' n, a n ^ q.toReal) ^ (1 / q.toReal) := by
   rw [lqNorm, eLpNorm_eq_lintegral_rpow_enorm_toReal hq0 hq (aestronglyMeasurable_count a),
     lintegral_count]
   rfl
 
 /-- `‖a‖_{ℓ_1} = ∑_n a_n`. -/
-theorem lqNorm_one (a : ℕ → ℝ≥0∞) : lqNorm 1 a = ∑' n, a n := by
+theorem lqNorm_one (a : ι → ℝ≥0∞) : lqNorm 1 a = ∑' n, a n := by
   simp [lqNorm_eq_tsum one_ne_zero one_ne_top]
 
 /-- For `1 ≤ q < ∞` the exponent `q.toReal` is at least `1`. -/
@@ -71,36 +78,39 @@ theorem one_le_toReal_of_one_le (hq : 1 ≤ q) (hq' : q ≠ ∞) : 1 ≤ q.toRea
   simpa using ENNReal.toReal_mono hq' hq
 
 /-- The `q`-th power of the norm is the sum of the `q`-th powers. -/
-theorem lqNorm_rpow (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ℕ → ℝ≥0∞) :
+theorem lqNorm_rpow (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ι → ℝ≥0∞) :
     lqNorm q a ^ q.toReal = ∑' n, a n ^ q.toReal := by
   have hp : q.toReal ≠ 0 := (ENNReal.toReal_pos hq0 hq).ne'
   rw [lqNorm_eq_tsum hq0 hq, one_div, ENNReal.rpow_inv_rpow hp]
 
-/-- The zero sequence has norm `0`. -/
+omit [Countable ι] [MeasurableSingletonClass ι] in
+/-- The zero family has norm `0`. -/
 @[simp]
-theorem lqNorm_zero_right (q : ℝ≥0∞) : lqNorm q (fun _ => 0) = 0 := eLpNorm_fun_zero
+theorem lqNorm_zero_right (q : ℝ≥0∞) : lqNorm q (fun _ : ι => (0 : ℝ≥0∞)) = 0 := eLpNorm_fun_zero
 
 /-- The exponent `0` is degenerate: `eLpNorm` assigns it the value `0`.  All statements below
 assume `1 ≤ q`. -/
 @[simp]
-theorem lqNorm_zero_left (a : ℕ → ℝ≥0∞) : lqNorm 0 a = 0 :=
+theorem lqNorm_zero_left (a : ι → ℝ≥0∞) : lqNorm 0 a = 0 :=
   eLpNorm_exponent_zero (aestronglyMeasurable_count a)
 
+omit [Countable ι] in
 /-- Every term is bounded by the norm. -/
-theorem le_lqNorm (hq : q ≠ 0) (a : ℕ → ℝ≥0∞) (n : ℕ) : a n ≤ lqNorm q a :=
+theorem le_lqNorm (hq : q ≠ 0) (a : ι → ℝ≥0∞) (n : ι) : a n ≤ lqNorm q a :=
   enorm_le_eLpNorm_count a n hq
 
 /-- The `ℓ_q` norm is monotone in the sequence. -/
 theorem lqNorm_mono (h : ∀ n, a n ≤ b n) : lqNorm q a ≤ lqNorm q b :=
   eLpNorm_mono_enorm (aestronglyMeasurable_count a) h
 
+omit [Countable ι] [MeasurableSingletonClass ι] in
 /-- **Minkowski's inequality** for `ℓ_q`, `1 ≤ q ≤ ∞`. -/
-theorem lqNorm_add_le (hq : 1 ≤ q) (a b : ℕ → ℝ≥0∞) :
+theorem lqNorm_add_le (hq : 1 ≤ q) (a b : ι → ℝ≥0∞) :
     lqNorm q (fun n => a n + b n) ≤ lqNorm q a + lqNorm q b :=
   eLpNorm_add_le (f := a) (g := b) hq
 
 /-- **Homogeneity**: `‖c a‖_q = c ‖a‖_q` for every `c ∈ ℝ≥0∞`. -/
-theorem lqNorm_const_mul (c : ℝ≥0∞) (a : ℕ → ℝ≥0∞) :
+theorem lqNorm_const_mul (c : ℝ≥0∞) (a : ι → ℝ≥0∞) :
     lqNorm q (fun n => c * a n) = c * lqNorm q a := by
   rcases eq_or_ne q 0 with rfl | hq0
   · simp
@@ -114,7 +124,7 @@ theorem lqNorm_const_mul (c : ℝ≥0∞) (a : ℕ → ℝ≥0∞) :
 
 /-- **Comparable sequences have finite `ℓ_q` norms together**: if `a ≤ M b` and `b ≤ K a` with
 finite `K, M`, then `‖a‖_q < ∞ ↔ ‖b‖_q < ∞`. -/
-theorem lqNorm_lt_top_iff_of_le_mul {a b : ℕ → ℝ≥0∞} {K M : ℝ≥0∞} (hK : K ≠ ∞) (hM : M ≠ ∞)
+theorem lqNorm_lt_top_iff_of_le_mul {a b : ι → ℝ≥0∞} {K M : ℝ≥0∞} (hK : K ≠ ∞) (hM : M ≠ ∞)
     (hab : ∀ n, a n ≤ M * b n) (hba : ∀ n, b n ≤ K * a n) :
     lqNorm q a < ∞ ↔ lqNorm q b < ∞ := by
   constructor
@@ -129,7 +139,7 @@ theorem lqNorm_lt_top_iff_of_le_mul {a b : ℕ → ℝ≥0∞} {K M : ℝ≥0∞
 
 /-- **Monotonicity in the exponent**: for `1 ≤ q ≤ r`, `‖a‖_r ≤ ‖a‖_q`.  Proof: with
 `M = ‖a‖_q`, each term satisfies `a n ^ r ≤ M ^ (r - q) a n ^ q`; sum over `n`. -/
-theorem lqNorm_le_lqNorm_of_le (hq : 1 ≤ q) (hqr : q ≤ r) (a : ℕ → ℝ≥0∞) :
+theorem lqNorm_le_lqNorm_of_le (hq : 1 ≤ q) (hqr : q ≤ r) (a : ι → ℝ≥0∞) :
     lqNorm r a ≤ lqNorm q a := by
   have hq0 : q ≠ 0 := (zero_lt_one.trans_le hq).ne'
   rcases eq_or_ne r ∞ with rfl | hr
@@ -153,6 +163,48 @@ theorem lqNorm_le_lqNorm_of_le (hq : 1 ≤ q) (hqr : q ≤ r) (a : ℕ → ℝ�
       _ = M ^ p' := by rw [← ENNReal.rpow_add_of_nonneg _ _ (by linarith) hp.le, sub_add_cancel]
   rw [lqNorm_eq_tsum hr0 hr, one_div, ENNReal.rpow_inv_le_iff hp']
   exact key
+
+/-- `‖a‖_{ℓ_q} ≤ ‖a‖_{ℓ_1} = ∑_i a_i` for `q ≥ 1`. -/
+theorem lqNorm_le_lqNorm_one (hq : 1 ≤ q) (a : ι → ℝ≥0∞) : lqNorm q a ≤ ∑' n, a n := by
+  simpa [lqNorm_one] using lqNorm_le_lqNorm_of_le le_rfl hq a
+
+/-- For a finite index set, `‖a‖_{ℓ_q} = (∑_i a_i^q)^(1/q)` for `0 < q < ∞`. -/
+theorem lqNorm_eq_sum [Fintype ι] (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ι → ℝ≥0∞) :
+    lqNorm q a = (∑ i, a i ^ q.toReal) ^ (1 / q.toReal) := by
+  rw [lqNorm_eq_tsum hq0 hq, tsum_fintype]
+
+/-- For a finite index set, a family bounded by `B` has `‖a‖_{ℓ_q} ≤ (#ι)^(1/q) B`, `q ≠ 0`. -/
+theorem lqNorm_le_card_rpow_mul [Fintype ι] (hq0 : q ≠ 0) {B : ℝ≥0∞} (h : ∀ i, a i ≤ B) :
+    lqNorm q a ≤ (Fintype.card ι : ℝ≥0∞) ^ (1 / q.toReal) * B := by
+  rcases eq_or_ne q ∞ with rfl | hq
+  · have h0 : (1 : ℝ) / (∞ : ℝ≥0∞).toReal = 0 := by simp
+    rw [lqNorm_top, h0, ENNReal.rpow_zero, one_mul]
+    exact iSup_le h
+  have hq' : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
+  rw [lqNorm_eq_sum hq0 hq]
+  calc (∑ i, a i ^ q.toReal) ^ (1 / q.toReal)
+      ≤ (∑ _i : ι, B ^ q.toReal) ^ (1 / q.toReal) := by
+        gcongr with i
+        exact h i
+    _ = ((Fintype.card ι : ℝ≥0∞) * B ^ q.toReal) ^ (1 / q.toReal) := by
+        rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
+    _ = (Fintype.card ι : ℝ≥0∞) ^ (1 / q.toReal) * B := by
+        rw [ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_mul,
+          mul_one_div_cancel hq'.ne', ENNReal.rpow_one]
+
+/-- **The `ℓ_q` norm on a finite product**: `‖a‖_{ℓ_q(M × N)}^q = ∑_m ‖a_{m,·}‖_{ℓ_q(N)}^q` for
+`0 < q < ∞`. -/
+theorem lqNorm_prod_rpow {M N : Type*} [Fintype M] [Fintype N] [MeasurableSpace M]
+    [MeasurableSpace N] [MeasurableSingletonClass M] [MeasurableSingletonClass N] (hq0 : q ≠ 0)
+    (hq : q ≠ ∞) (a : M × N → ℝ≥0∞) :
+    lqNorm q a ^ q.toReal = ∑ m, lqNorm q (fun n => a (m, n)) ^ q.toReal := by
+  rw [lqNorm_rpow hq0 hq, tsum_fintype, Fintype.sum_prod_type]
+  refine Finset.sum_congr rfl fun m _ => ?_
+  rw [lqNorm_rpow hq0 hq, tsum_fintype]
+
+end Generic
+
+variable {q r : ℝ≥0∞} {a b : ℕ → ℝ≥0∞}
 
 /-- Dropping the first term does not increase the norm. -/
 theorem lqNorm_shift_le (a : ℕ → ℝ≥0∞) : lqNorm q (fun n => a (n + 1)) ≤ lqNorm q a := by
@@ -223,10 +275,6 @@ theorem lqNorm_geometric_le (hq : 1 ≤ q) (r : ℝ≥0∞) :
     lqNorm q (fun k => r ^ k) ≤ (1 - r)⁻¹ := by
   calc lqNorm q (fun k => r ^ k) ≤ lqNorm 1 (fun k => r ^ k) := lqNorm_le_lqNorm_of_le le_rfl hq _
     _ = (1 - r)⁻¹ := by rw [lqNorm_one, ENNReal.tsum_geometric]
-
-/-- `‖a‖_{ℓ_q} ≤ ‖a‖_{ℓ_1}` for `q ≥ 1`. -/
-theorem lqNorm_le_lqNorm_one (hq : 1 ≤ q) (a : ℕ → ℝ≥0∞) : lqNorm q a ≤ ∑' n, a n := by
-  simpa [lqNorm_one] using lqNorm_le_lqNorm_of_le le_rfl hq a
 
 /-! ### Dyadic weights -/
 

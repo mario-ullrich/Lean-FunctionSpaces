@@ -488,7 +488,7 @@ theorem levelNorm_cellCoef {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {g 
     (hg : MemLp g p volume) (j : ℕ) :
     levelNorm p (cellCoef p j g) = dyadicWeight (finrank ℝ V / p.toReal) j * eLpNorm g p volume := by
   have hpos : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  rw [levelNorm]
+  rw [levelNorm_eq_tsum hp0 hp]
   simp_rw [enorm_cellCoef hg j, ENNReal.mul_rpow_of_nonneg _ _ hpos.le]
   rw [ENNReal.tsum_mul_left, ← eLpNorm_rpow_eq_tsum_cell hp0 hp hg.aestronglyMeasurable j,
     ← ENNReal.mul_rpow_of_nonneg _ _ hpos.le, one_div, ENNReal.rpow_rpow_inv hpos.ne']

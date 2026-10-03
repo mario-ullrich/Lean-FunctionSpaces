@@ -46,91 +46,26 @@ the blocks of a block decomposition of `f`.  Together:
 open Filter Topology Finset
 open scoped ENNReal
 
-namespace ENNReal
-
-/-- The `ℓ_p` norm of a finite family in `[0, ∞]`: `(∑_i a_i^p)^(1/p)`, and `max_i a_i` for
-`p = ∞`. -/
-noncomputable def finLqNorm {ι : Type*} [Fintype ι] (p : ℝ≥0∞) (a : ι → ℝ≥0∞) : ℝ≥0∞ :=
-  if p = ∞ then ⨆ i, a i else (∑ i, a i ^ p.toReal) ^ (1 / p.toReal)
-
-/-- Every entry of a finite family is at most its `ℓ_p` norm, `p ≠ 0`. -/
-theorem le_finLqNorm {ι : Type*} [Fintype ι] {p : ℝ≥0∞} (hp0 : p ≠ 0) (a : ι → ℝ≥0∞) (i : ι) :
-    a i ≤ finLqNorm p a := by
-  unfold finLqNorm
-  split_ifs with hp
-  · exact le_iSup a i
-  · have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-    calc a i = (a i ^ p.toReal) ^ (1 / p.toReal) := by
-          rw [← ENNReal.rpow_mul, mul_one_div_cancel hq.ne', ENNReal.rpow_one]
-      _ ≤ (∑ j, a j ^ p.toReal) ^ (1 / p.toReal) := by
-          gcongr
-          exact Finset.single_le_sum (f := fun j => a j ^ p.toReal) (fun _ _ => zero_le)
-            (Finset.mem_univ i)
-
-/-- The `ℓ_p` norm of a finite family bounded by `B` is at most `(#ι)^(1/p) B`, `p ≠ 0`. -/
-theorem finLqNorm_le_of_le {ι : Type*} [Fintype ι] {p : ℝ≥0∞} (hp0 : p ≠ 0) {a : ι → ℝ≥0∞}
-    {B : ℝ≥0∞} (h : ∀ i, a i ≤ B) :
-    finLqNorm p a ≤ (Fintype.card ι : ℝ≥0∞) ^ (1 / p.toReal) * B := by
-  unfold finLqNorm
-  split_ifs with hp
-  · have h1 : (Fintype.card ι : ℝ≥0∞) ^ (1 / p.toReal) = 1 := by
-      subst hp
-      simp
-    rw [h1, one_mul]
-    exact iSup_le h
-  · have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-    calc (∑ j, a j ^ p.toReal) ^ (1 / p.toReal)
-        ≤ (∑ _j : ι, B ^ p.toReal) ^ (1 / p.toReal) := by
-          gcongr with j
-          exact h j
-      _ = ((Fintype.card ι : ℝ≥0∞) * B ^ p.toReal) ^ (1 / p.toReal) := by
-          rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
-      _ = (Fintype.card ι : ℝ≥0∞) ^ (1 / p.toReal) * B := by
-          rw [ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_mul,
-            mul_one_div_cancel hq.ne', ENNReal.rpow_one]
-
-/-- The `ℓ_p` norm of a finite family is homogeneous, `p ≠ 0`. -/
-theorem finLqNorm_const_mul {ι : Type*} [Fintype ι] {p : ℝ≥0∞} (hp0 : p ≠ 0) (c : ℝ≥0∞)
-    (a : ι → ℝ≥0∞) : finLqNorm p (fun i => c * a i) = c * finLqNorm p a := by
-  unfold finLqNorm
-  split_ifs with hp
-  · rw [ENNReal.mul_iSup]
-  · have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-    simp only [ENNReal.mul_rpow_of_nonneg _ _ hq.le, ← Finset.mul_sum]
-    rw [ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_mul,
-      mul_one_div_cancel hq.ne', ENNReal.rpow_one]
-
-/-- **The `ℓ_p` norm on a product**: `‖a‖_{ℓ_p(M × N)}^p = ∑_m ‖a_{m,·}‖_{ℓ_p(N)}^p` for
-`0 < p < ∞`. -/
-theorem finLqNorm_prod_rpow {M N : Type*} [Fintype M] [Fintype N] {p : ℝ≥0∞} (hp0 : p ≠ 0)
-    (hp : p ≠ ∞) (a : M × N → ℝ≥0∞) :
-    finLqNorm p a ^ p.toReal = ∑ m, finLqNorm p (fun n => a (m, n)) ^ p.toReal := by
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  simp only [finLqNorm, hp, ↓reduceIte]
-  rw [← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one, Fintype.sum_prod_type]
-  refine Finset.sum_congr rfl fun m _ => ?_
-  rw [← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one]
-
-end ENNReal
-
 namespace ApproximationScheme
 
-open ENNReal (lqNorm dyadicWeight finLqNorm)
+open ENNReal (lqNorm dyadicWeight)
 
 variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
   {A : ApproximationScheme X} {s : ℝ} {q : ℝ≥0∞}
 
 /-- The quasi-norm of the **sequence space** `b^s_{p,q}`:
 `‖(2^(j(s - δ)) ‖λ_{j,·}‖_{ℓ_p})_j‖_{ℓ_q}` for coefficients `λ_{j,m}`, `m ∈ M j`. -/
-noncomputable def bNorm (M : ℕ → Type*) [∀ j, Fintype (M j)] (s δ : ℝ) (p q : ℝ≥0∞)
+noncomputable def bNorm (M : ℕ → Type*) [∀ j, Fintype (M j)] [∀ j, MeasurableSpace (M j)]
+    (s δ : ℝ) (p q : ℝ≥0∞)
     (c : ∀ j, M j → ℝ) : ℝ≥0∞ :=
-  lqNorm q (fun j => dyadicWeight (s - δ) j * finLqNorm p (fun m => ‖c j m‖ₑ))
+  lqNorm q (fun j => dyadicWeight (s - δ) j * lqNorm p (fun m => ‖c j m‖ₑ))
 
 /-- A **system of atoms** for the scheme `A`, with positions `M j` at level `j`, size exponent `δ`
 and smoothness `σ`: admissible atoms `adm j m` (containing `0`) such that every combination
 `∑_m c_m a_m` of atoms of level `j` has size `≤ C 2^(-jδ) ‖c‖_{ℓ_p}` and error
 `E_{2^k} ≤ C 2^(-(k-j)σ) 2^(-jδ) ‖c‖_{ℓ_p}` for `k ≥ j`. -/
 structure AtomicSystem (A : ApproximationScheme X) (M : ℕ → Type*) [∀ j, Fintype (M j)]
+    [∀ j, MeasurableSpace (M j)]
     (p : ℝ≥0∞) (δ σ : ℝ) where
   /-- The admissible atoms of level `j` at position `m`. -/
   adm : ∀ j, M j → Set X
@@ -139,14 +74,15 @@ structure AtomicSystem (A : ApproximationScheme X) (M : ℕ → Type*) [∀ j, F
   C : ℝ≥0∞
   C_ne_top : C ≠ ∞
   size : ∀ j (a : M j → X), (∀ m, a m ∈ adm j m) → ∀ c : M j → ℝ,
-    ‖∑ m, c m • a m‖ₑ ≤ C * (dyadicWeight (-δ) j * finLqNorm p (fun m => ‖c m‖ₑ))
+    ‖∑ m, c m • a m‖ₑ ≤ C * (dyadicWeight (-δ) j * lqNorm p (fun m => ‖c m‖ₑ))
   decay : ∀ j (a : M j → X), (∀ m, a m ∈ adm j m) → ∀ c : M j → ℝ, ∀ k, j ≤ k →
     A.approxSeq (∑ m, c m • a m) (2 ^ k) ≤
-      dyadicWeight (-σ) (k - j) * (C * (dyadicWeight (-δ) j * finLqNorm p (fun m => ‖c m‖ₑ)))
+      dyadicWeight (-σ) (k - j) * (C * (dyadicWeight (-δ) j * lqNorm p (fun m => ‖c m‖ₑ)))
 
 namespace AtomicSystem
 
-variable {M : ℕ → Type*} [∀ j, Fintype (M j)] {p : ℝ≥0∞} {δ σ : ℝ}
+variable {M : ℕ → Type*} [∀ j, Fintype (M j)] [∀ j, MeasurableSpace (M j)] {p : ℝ≥0∞}
+  {δ σ : ℝ}
   (AS : A.AtomicSystem M p δ σ)
 
 /-- The constant `(2 (1 - 2^(-s))⁻¹ + (1 - 2^(-(σ-s)))⁻¹) C` of atomic synthesis. -/
@@ -167,13 +103,13 @@ theorem approxNormDyadic_le_bNorm (hA : A.IsLinear) (hq : 1 ≤ q) {a : ∀ j, M
     (ha : ∀ j m, a j m ∈ AS.adm j m) {c : ∀ j, M j → ℝ} {f : X}
     (hf : HasSum (fun j => ∑ m, c j m • a j m) f) :
     A.approxNormDyadic s q f ≤ AS.synthConst s * bNorm M s δ p q c := by
-  set ε : ℕ → ℝ≥0∞ := fun j => AS.C * (dyadicWeight (-δ) j * finLqNorm p (fun m => ‖c j m‖ₑ))
+  set ε : ℕ → ℝ≥0∞ := fun j => AS.C * (dyadicWeight (-δ) j * lqNorm p (fun m => ‖c j m‖ₑ))
   have h := approxNormDyadic_le_of_hasSum_decay (s := s) (C := 1) hA hq hf (ε := ε)
     (fun j => AS.size j _ (ha j) _) (fun j k hjk => by
       rw [one_mul]; exact AS.decay j _ (ha j) _ k hjk)
   refine h.trans_eq ?_
   have hw : (fun j => dyadicWeight s j * ε j) = fun j =>
-      AS.C * (dyadicWeight (s - δ) j * finLqNorm p (fun m => ‖c j m‖ₑ)) := funext fun j => by
+      AS.C * (dyadicWeight (s - δ) j * lqNorm p (fun m => ‖c j m‖ₑ)) := funext fun j => by
     simp only [ε]
     rw [show s - δ = s + -δ by ring, ENNReal.dyadicWeight_add]; ring
   rw [hw, ENNReal.lqNorm_const_mul, one_mul, synthConst, bNorm]
@@ -194,7 +130,7 @@ theorem memApprox_of_bNorm_lt_top (hA : A.IsLinear) (hs : 0 < s) (hsσ : s < σ)
 Haar functions have this property. -/
 def StableExpansion (C' : ℝ≥0∞) : Prop :=
   ∀ j, ∀ x ∈ A (2 ^ j), ∃ a : M j → X, (∀ m, a m ∈ AS.adm j m) ∧ ∃ c : M j → ℝ,
-    x = ∑ m, c m • a m ∧ finLqNorm p (fun m => ‖c m‖ₑ) ≤ C' * dyadicWeight δ j * ‖x‖ₑ
+    x = ∑ m, c m • a m ∧ lqNorm p (fun m => ‖c m‖ₑ) ≤ C' * dyadicWeight δ j * ‖x‖ₑ
 
 /-- **Atomic analysis**: in a Banach space, under a stable expansion, every `f ∈ A^s_q`, `s > 0`,
 is an atomic sum `f = ∑_j ∑_m λ_{j,m} a_{j,m}` with
@@ -210,9 +146,9 @@ theorem exists_atomic_decomposition [CompleteSpace X] {C' : ℝ≥0∞}
   · have : (fun j => ∑ m, c j m • a j m) = b := funext fun j => (hc j).symm
     rw [this]; exact hb_sum
   · calc bNorm M s δ p q c
-        = lqNorm q (fun j => dyadicWeight (s - δ) j * finLqNorm p (fun m => ‖c j m‖ₑ)) := rfl
+        = lqNorm q (fun j => dyadicWeight (s - δ) j * lqNorm p (fun m => ‖c j m‖ₑ)) := rfl
       _ ≤ lqNorm q (fun j => C' * (dyadicWeight s j * ‖b j‖ₑ)) := ENNReal.lqNorm_mono fun j => by
-          calc dyadicWeight (s - δ) j * finLqNorm p (fun m => ‖c j m‖ₑ)
+          calc dyadicWeight (s - δ) j * lqNorm p (fun m => ‖c j m‖ₑ)
               ≤ dyadicWeight (s - δ) j * (C' * dyadicWeight δ j * ‖b j‖ₑ) := by
                 gcongr; exact hcle j
             _ = C' * ((dyadicWeight (s - δ) j * dyadicWeight δ j) * ‖b j‖ₑ) := by ring

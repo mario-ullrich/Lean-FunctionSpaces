@@ -41,7 +41,7 @@ comparisons with the mixed local means use a reproducing formula, a one-dimensio
 open MeasureTheory Filter Topology
 open scoped ENNReal
 
-open ENNReal (dyadicWeight)
+open ENNReal (dyadicWeight lqNorm)
 
 namespace Rd
 
@@ -101,7 +101,7 @@ noncomputable def mixedBlock (hp : p ≠ ∞) (k : Fin d → ℕ) :
 `‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_{k ∈ ℕ^d}‖_{ℓ_q(ℕ^d)}`. -/
 noncomputable def mixedLPNorm (hp : p ≠ ∞) (s : ℝ) (q : ℝ≥0∞)
     (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) : ℝ≥0∞ :=
-  mixedLqNorm q fun k => mixedWeight s k * ‖mixedBlock hp k f‖ₑ
+  lqNorm q fun k => mixedWeight s k * ‖mixedBlock hp k f‖ₑ
 
 /-- **The tensor Littlewood–Paley decomposition**: `∑_{k ≤ J} δ_k ⋆ f → f` in `L_p` over the boxes
 `{k : k_i ≤ J}`. -/
@@ -345,18 +345,18 @@ theorem exists_mixedLPNorm_le (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) :
     rw [← mul_assoc]
     exact b.enorm_mixedBlock_convLp_mixedDual_le hp L hE m k (h k)
   calc mixedLPNorm hp s q f
-      ≤ mixedLqNorm q (fun m => C ^ d * (mixedWeight s m *
+      ≤ lqNorm q (fun m => C ^ d * (mixedWeight s m *
           ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ)) :=
-        mixedLqNorm_mono fun m => by
+        ENNReal.lqNorm_mono fun m => by
           calc mixedWeight s m * ‖mixedBlock hp m f‖ₑ
               ≤ mixedWeight s m * (C ^ d *
                   ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) :=
                 mul_le_mul' le_rfl (hblock m)
             _ = _ := by ring
-    _ = C ^ d * mixedLqNorm q (fun m => mixedWeight s m *
-          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) := mixedLqNorm_const_mul _ _
-    _ ≤ C ^ d * (almostDiagConst s L ^ d * mixedLqNorm q (fun k => mixedWeight s k * ‖h k‖ₑ)) :=
-        mul_le_mul' le_rfl (mixedLqNorm_almostDiagonal_le hq hs _)
+    _ = C ^ d * lqNorm q (fun m => mixedWeight s m *
+          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) := ENNReal.lqNorm_const_mul _ _
+    _ ≤ C ^ d * (almostDiagConst s L ^ d * lqNorm q (fun k => mixedWeight s k * ‖h k‖ₑ)) :=
+        mul_le_mul' le_rfl (lqNorm_almostDiagonal_pi_le hq hs _)
     _ = (C * almostDiagConst s L) ^ d * b.mixedLocalMeansNorm hp L s q f := by
         rw [mul_pow, mul_assoc]
         rfl
@@ -384,18 +384,18 @@ theorem exists_mixedLocalMeansNorm_le (hp : p ≠ ∞) (L : ℕ) :
     rw [← mul_assoc]
     exact b.enorm_mixedLocalMean_mixedBlock_le hp L hE m k f
   calc b.mixedLocalMeansNorm hp L s q f
-      ≤ mixedLqNorm q (fun m => C ^ d * (mixedWeight s m *
+      ≤ lqNorm q (fun m => C ^ d * (mixedWeight s m *
           ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ)) :=
-        mixedLqNorm_mono fun m => by
+        ENNReal.lqNorm_mono fun m => by
           calc mixedWeight s m * ‖b.mixedLocalMean hp L m f‖ₑ
               ≤ mixedWeight s m * (C ^ d *
                   ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) :=
                 mul_le_mul' le_rfl (hmean m)
             _ = _ := by ring
-    _ = C ^ d * mixedLqNorm q (fun m => mixedWeight s m *
-          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) := mixedLqNorm_const_mul _ _
-    _ ≤ C ^ d * (almostDiagConst s L ^ d * mixedLqNorm q (fun k => mixedWeight s k * ‖h k‖ₑ)) :=
-        mul_le_mul' le_rfl (mixedLqNorm_almostDiagonal_le hq hs _)
+    _ = C ^ d * lqNorm q (fun m => mixedWeight s m *
+          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) := ENNReal.lqNorm_const_mul _ _
+    _ ≤ C ^ d * (almostDiagConst s L ^ d * lqNorm q (fun k => mixedWeight s k * ‖h k‖ₑ)) :=
+        mul_le_mul' le_rfl (lqNorm_almostDiagonal_pi_le hq hs _)
     _ = (C * almostDiagConst s L) ^ d * mixedLPNorm hp s q f := by
         rw [mul_pow, mul_assoc]
         rfl

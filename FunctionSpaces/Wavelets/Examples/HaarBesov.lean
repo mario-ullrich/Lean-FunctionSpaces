@@ -184,7 +184,7 @@ theorem lqNorm_modulus_lt_top_iff_haarCoeff (hp : p ≠ ∞) {s : ℝ} (hs : 0 <
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 f k) < ∞ ↔
       ‖∫ x, f x ∂vol‖ₑ + ENNReal.lqNorm q (fun k =>
         dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k *
-          ENNReal.finLqNorm p (fun m : Fin (2 ^ k) => ‖haarCoeff f k ((m : ℕ) : ℤ)‖ₑ)) < ∞ := by
+          ENNReal.lqNorm p (fun m : Fin (2 ^ k) => ‖haarCoeff f k ((m : ℕ) : ℤ)‖ₑ)) < ∞ := by
   rw [← memApprox_ppScheme_iff le_rfl hp hq hs.le hsp f, memApprox_ppScheme_one_iff,
     memApprox_iff_haarCoeff hp hs hq, integral_toHaar]
   simp only [haarCoeff_toHaar]
@@ -198,7 +198,7 @@ theorem lqNorm_perModulus_lt_top_iff_haarCoeff (hp : p ≠ ∞) {s : ℝ} (hs : 
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * lpPerModulus p 1 f k) < ∞ ↔
       ‖∫ x, f x ∂vol‖ₑ + ENNReal.lqNorm q (fun k =>
         dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k *
-          ENNReal.finLqNorm p (fun m : Fin (2 ^ k) => ‖haarCoeff f k ((m : ℕ) : ℤ)‖ₑ)) < ∞ := by
+          ENNReal.lqNorm p (fun m : Fin (2 ^ k) => ‖haarCoeff f k ((m : ℕ) : ℤ)‖ₑ)) < ∞ := by
   rw [← memApprox_ppScheme_iff_per le_rfl hp hq hs.le hsp f, memApprox_ppScheme_one_iff,
     memApprox_iff_haarCoeff hp hs hq, integral_toHaar]
   simp only [haarCoeff_toHaar]

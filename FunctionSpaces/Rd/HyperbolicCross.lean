@@ -32,7 +32,7 @@ The **level** of `k ∈ ℕ^d` is `|k|_1 = ∑_i k_i` (`Rd.level`), and the **hy
 open MeasureTheory Filter Topology
 open scoped ENNReal
 
-open ENNReal (dyadicWeight)
+open ENNReal (dyadicWeight lqNorm)
 
 namespace Rd
 
@@ -106,27 +106,27 @@ theorem tsum_le_tsum_levelSet (F : (Fin d → ℕ) → ℝ≥0∞) :
 
 /-- **Hölder's inequality on a finite set**: `∑_{k ∈ S} x_k ≤ #S^(1-1/q) ‖x‖_{ℓ_q}` for
 `1 ≤ q ≤ ∞`. -/
-theorem sum_le_card_rpow_mul_mixedLqNorm {q : ℝ≥0∞} (hq : 1 ≤ q) (S : Finset (Fin d → ℕ))
+theorem sum_le_card_rpow_mul_lqNorm {q : ℝ≥0∞} (hq : 1 ≤ q) (S : Finset (Fin d → ℕ))
     (x : (Fin d → ℕ) → ℝ≥0∞) :
-    ∑ k ∈ S, x k ≤ (S.card : ℝ≥0∞) ^ (1 - 1 / q.toReal) * mixedLqNorm q x := by
+    ∑ k ∈ S, x k ≤ (S.card : ℝ≥0∞) ^ (1 - 1 / q.toReal) * lqNorm q x := by
   rcases eq_or_ne q ∞ with rfl | hq'
-  · simp only [ENNReal.toReal_top, div_zero, sub_zero, ENNReal.rpow_one, mixedLqNorm_top]
+  · simp only [ENNReal.toReal_top, div_zero, sub_zero, ENNReal.rpow_one, ENNReal.lqNorm_top]
     calc ∑ k ∈ S, x k ≤ ∑ _k ∈ S, ⨆ k', x k' := Finset.sum_le_sum fun k _ => le_iSup x k
       _ = (S.card : ℝ≥0∞) * ⨆ k', x k' := by rw [Finset.sum_const, nsmul_eq_mul]
   have hq0 : q ≠ 0 := (zero_lt_one.trans_le hq).ne'
   set r := q.toReal
   have hr : 1 ≤ r := ENNReal.one_le_toReal_of_one_le hq hq'
   have hr0 : 0 < r := by linarith
-  have hpow : (∑ k ∈ S, x k) ^ r ≤ (S.card : ℝ≥0∞) ^ (r - 1) * mixedLqNorm q x ^ r := by
+  have hpow : (∑ k ∈ S, x k) ^ r ≤ (S.card : ℝ≥0∞) ^ (r - 1) * lqNorm q x ^ r := by
     refine (ENNReal.rpow_sum_le_const_mul_sum_rpow (s := S) (f := x) hr).trans
       (mul_le_mul' le_rfl ?_)
-    rw [mixedLqNorm_rpow hq0 hq']
+    rw [ENNReal.lqNorm_rpow hq0 hq']
     exact ENNReal.sum_le_tsum _
   calc ∑ k ∈ S, x k = ((∑ k ∈ S, x k) ^ r) ^ (1 / r) := by
         rw [← ENNReal.rpow_mul, mul_one_div_cancel hr0.ne', ENNReal.rpow_one]
-    _ ≤ ((S.card : ℝ≥0∞) ^ (r - 1) * mixedLqNorm q x ^ r) ^ (1 / r) :=
+    _ ≤ ((S.card : ℝ≥0∞) ^ (r - 1) * lqNorm q x ^ r) ^ (1 / r) :=
         ENNReal.rpow_le_rpow hpow (by positivity)
-    _ = (S.card : ℝ≥0∞) ^ (1 - 1 / r) * mixedLqNorm q x := by
+    _ = (S.card : ℝ≥0∞) ^ (1 - 1 / r) * lqNorm q x := by
         rw [ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_mul,
           ← ENNReal.rpow_mul, mul_one_div_cancel hr0.ne', ENNReal.rpow_one]
         congr 2
@@ -270,7 +270,7 @@ theorem enorm_sub_hyperbolicSum_le_mixedLPNorm (hp : p ≠ ∞) (s : ℝ) {q : �
       rw [mixedWeight_eq_dyadicWeight_level, mem_levelSet.1 hk, ← mul_assoc,
         ENNReal.dyadicWeight_neg_mul_self, one_mul]
     rw [Finset.sum_congr rfl hw, ← Finset.mul_sum, mul_assoc]
-    refine mul_le_mul' le_rfl ((sum_le_card_rpow_mul_mixedLqNorm hq (levelSet n)
+    refine mul_le_mul' le_rfl ((sum_le_card_rpow_mul_lqNorm hq (levelSet n)
       fun k => mixedWeight s k * ‖mixedBlock hp k f‖ₑ).trans (mul_le_mul' ?_ le_rfl))
     calc ((levelSet (d := d) n).card : ℝ≥0∞) ^ (1 - 1 / q.toReal)
         ≤ (((n + 1) ^ (d - 1) : ℕ) : ℝ≥0∞) ^ (1 - 1 / q.toReal) :=

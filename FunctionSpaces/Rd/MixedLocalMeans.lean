@@ -34,7 +34,7 @@ Minkowski's inequality (`Rd.eLpNorm_integral_kernel_le`) gives the bound.
 open MeasureTheory Filter Topology
 open scoped ENNReal
 
-open ENNReal (dyadicWeight)
+open ENNReal (dyadicWeight lqNorm)
 
 namespace Rd
 
@@ -132,7 +132,7 @@ noncomputable def mixedLocalMean (hp : p ≠ ∞) (L : ℕ) (k : Fin d → ℕ) 
 /-- The **mixed local means quasi-norm** `‖(2^(s|k|_1) ‖k_k ⋆ f‖_p)_{k ∈ ℕ^d}‖_{ℓ_q(ℕ^d)}`. -/
 noncomputable def mixedLocalMeansNorm (hp : p ≠ ∞) (L : ℕ) (s : ℝ) (q : ℝ≥0∞)
     (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) : ℝ≥0∞ :=
-  mixedLqNorm q fun k => mixedWeight s k * ‖b.mixedLocalMean hp L k f‖ₑ
+  lqNorm q fun k => mixedWeight s k * ‖b.mixedLocalMean hp L k f‖ₑ
 
 /-! ### The local means kernels as sums of dilated bumps -/
 
@@ -353,8 +353,8 @@ theorem mixedLocalMeansNorm_le (hp : p ≠ ∞) (L : ℕ) (hR : b.radius ≤ 1) 
     (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
     b.mixedLocalMeansNorm hp L s q f ≤
       ((∫⁻ t, ‖b.toFun t‖ₑ) * (2 ^ L + 1)) ^ d * mixedModNorm p L s q f := by
-  rw [mixedModNorm, ← mixedLqNorm_const_mul]
-  refine mixedLqNorm_mono fun k => ?_
+  rw [mixedModNorm, ← ENNReal.lqNorm_const_mul]
+  refine ENNReal.lqNorm_mono fun k => ?_
   calc mixedWeight s k * ‖b.mixedLocalMean hp L k f‖ₑ
       ≤ mixedWeight s k * (((∫⁻ t, ‖b.toFun t‖ₑ) * (2 ^ L + 1)) ^ d * lpMixedModulus p L f k) :=
         mul_le_mul' le_rfl (b.enorm_mixedLocalMean_le hp L hR k f)
@@ -491,7 +491,7 @@ theorem mixedModNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 
     (hrep : Tendsto (fun J => ∑ k ∈ Fintype.piFinset (fun _ : Fin d => Finset.range (J + 1)),
       convLp hp (b.integrable_mixedDual L k) (h k)) atTop (𝓝 F)) :
     mixedModNorm p L s q F ≤ (b.dualConst L * almostDiagConst s L) ^ d *
-      mixedLqNorm q (fun k => mixedWeight s k * ‖h k‖ₑ) := by
+      lqNorm q (fun k => mixedWeight s k * ‖h k‖ₑ) := by
   have hmod : ∀ m, lpMixedModulus p L F m ≤ b.dualConst L ^ d *
       ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ := fun m => by
     have h1 : lpMixedModulus p L F m ≤
@@ -504,19 +504,19 @@ theorem mixedModNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 
     rw [← mul_assoc]
     exact b.lpMixedModulus_convLp_mixedDual_le hp L m k (h k)
   calc mixedModNorm p L s q F
-      ≤ mixedLqNorm q (fun m => b.dualConst L ^ d * (mixedWeight s m *
+      ≤ lqNorm q (fun m => b.dualConst L ^ d * (mixedWeight s m *
           ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ)) :=
-        mixedLqNorm_mono fun m => by
+        ENNReal.lqNorm_mono fun m => by
           calc mixedWeight s m * lpMixedModulus p L F m
               ≤ mixedWeight s m * (b.dualConst L ^ d *
                   ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) :=
                 mul_le_mul' le_rfl (hmod m)
             _ = _ := by ring
-    _ = b.dualConst L ^ d * mixedLqNorm q (fun m => mixedWeight s m *
-          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) := mixedLqNorm_const_mul _ _
+    _ = b.dualConst L ^ d * lqNorm q (fun m => mixedWeight s m *
+          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) := ENNReal.lqNorm_const_mul _ _
     _ ≤ b.dualConst L ^ d * (almostDiagConst s L ^ d *
-          mixedLqNorm q (fun k => mixedWeight s k * ‖h k‖ₑ)) :=
-        mul_le_mul' le_rfl (mixedLqNorm_almostDiagonal_le hq hs _)
+          lqNorm q (fun k => mixedWeight s k * ‖h k‖ₑ)) :=
+        mul_le_mul' le_rfl (lqNorm_almostDiagonal_pi_le hq hs _)
     _ = _ := by rw [mul_pow, mul_assoc]
 
 /-- **The mixed modulus is bounded by the mixed local means**: for `0 ≤ s`,

@@ -704,10 +704,10 @@ variable (r) in
 coefficients `β`; the first by the equivalence of norms on the `r`-dimensional space of
 coefficients (`LinearMap.injective_iff_antilipschitz`), the second by the triangle inequality. -/
 theorem exists_stable : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ β : Fin r → ℂ,
-    ENNReal.finLqNorm p (fun i => ‖β i‖ₑ) ≤
+    ENNReal.lqNorm p (fun i => ‖β i‖ₑ) ≤
       K * eLpNorm (fun t => ∑ i, β i * psi r i t) p unitVol ∧
     eLpNorm (fun t => ∑ i, β i * psi r i t) p unitVol ≤
-      M * ENNReal.finLqNorm p (fun i => ‖β i‖ₑ) := by
+      M * ENNReal.lqNorm p (fun i => ‖β i‖ₑ) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
   obtain ⟨K, -, hK⟩ := (sumPsi r p).injective_iff_antilipschitz.1 (sumPsi_injective r p)
   refine ⟨(Fintype.card (Fin r) : ℝ≥0∞) ^ (1 / p.toReal) * K, ∑ i, eLpNorm (psi r i) p unitVol,
@@ -724,9 +724,9 @@ theorem exists_stable : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ β
             ENNReal.ofReal_le_ofReal (ZeroHomClass.bound_of_antilipschitz _ hK β)
         _ = K * ENNReal.ofReal ‖sumPsi r p β‖ := by
             rw [ENNReal.ofReal_mul (NNReal.coe_nonneg _), ENNReal.ofReal_coe_nnreal]
-    calc ENNReal.finLqNorm p (fun i => ‖β i‖ₑ)
+    calc ENNReal.lqNorm p (fun i => ‖β i‖ₑ)
         ≤ (Fintype.card (Fin r) : ℝ≥0∞) ^ (1 / p.toReal) * ‖β‖ₑ :=
-          ENNReal.finLqNorm_le_of_le hp0 fun i => by
+          ENNReal.lqNorm_le_card_rpow_mul hp0 fun i => by
             rw [← ofReal_norm, ← ofReal_norm]
             exact ENNReal.ofReal_le_ofReal (norm_le_pi_norm β i)
       _ ≤ (Fintype.card (Fin r) : ℝ≥0∞) ^ (1 / p.toReal) * (K * ‖sumPsi r p β‖ₑ) := by gcongr
@@ -741,9 +741,9 @@ theorem exists_stable : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ β
           simp only [Finset.sum_apply]
       _ = ∑ i, ‖β i‖ₑ * eLpNorm (psi r i) p unitVol := by
           simp only [hsmul, eLpNorm_const_smul]
-      _ ≤ ∑ i, ENNReal.finLqNorm p (fun i => ‖β i‖ₑ) * eLpNorm (psi r i) p unitVol := by
+      _ ≤ ∑ i, ENNReal.lqNorm p (fun i => ‖β i‖ₑ) * eLpNorm (psi r i) p unitVol := by
           gcongr with i
-          exact ENNReal.le_finLqNorm hp0 (fun i => ‖β i‖ₑ) i
+          exact ENNReal.le_lqNorm hp0 (fun i => ‖β i‖ₑ) i
       _ = _ := by rw [← Finset.mul_sum, mul_comm]
 
 /-- The integral over `[0, 1]` is the sum over the dyadic intervals of level `k`. -/
@@ -793,11 +793,11 @@ a moved multiwavelet combination (`Alpert.eLpNorm_detailFun_dyadicIco`), whose n
 its coefficients up to the constants of `Alpert.exists_stable`. -/
 theorem exists_eLpNorm_detailFun_equiv (hp : p ≠ ∞) : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧
     ∀ g : ℝ → ℂ, IntegrableOn g (Icc 0 1) → ∀ k : ℕ,
-      dyadicWeight (1 / 2 - 1 / p.toReal) k * ENNReal.finLqNorm p
+      dyadicWeight (1 / 2 - 1 / p.toReal) k * ENNReal.lqNorm p
         (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r g k mi.1 mi.2‖ₑ) ≤
           K * eLpNorm (detailFun r g k) p unitVol ∧
       eLpNorm (detailFun r g k) p unitVol ≤ M * (dyadicWeight (1 / 2 - 1 / p.toReal) k *
-        ENNReal.finLqNorm p (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r g k mi.1 mi.2‖ₑ)) := by
+        ENNReal.lqNorm p (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r g k mi.1 mi.2‖ₑ)) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   obtain ⟨K, M, hK, hM, hKM⟩ := exists_stable (p := p) r
@@ -806,7 +806,7 @@ theorem exists_eLpNorm_detailFun_equiv (hp : p ≠ ∞) : ∃ K M : ℝ≥0∞, 
   set β : Fin (2 ^ k) → Fin r → ℂ := fun m i =>
     (((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * coeff r g k m i
   set S : Fin (2 ^ k) → ℝ≥0∞ := fun m => eLpNorm (fun t => ∑ i, β m i * psi r i t) p unitVol
-  set F := ENNReal.finLqNorm p (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r g k mi.1 mi.2‖ₑ)
+  set F := ENNReal.lqNorm p (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r g k mi.1 mi.2‖ₑ)
   have hmeas : Measurable (detailFun r g k) := (measurable_ppFun _ _).sub (measurable_ppFun _ _)
   -- the level norm in pieces
   have hA : dyadicWeight 1 k * A ^ p.toReal = ∑ m, S m ^ p.toReal := by
@@ -820,13 +820,13 @@ theorem exists_eLpNorm_detailFun_equiv (hp : p ≠ ∞) : ∃ K M : ℝ≥0∞, 
         rw [ENNReal.dyadicWeight_rpow, one_div_mul_cancel hq.ne'],
       ← ENNReal.mul_rpow_of_nonneg _ _ hq.le, eLpNorm_detailFun_dyadicIco hp hg m.isLt]
   -- the coefficients in pieces
-  have hβ : ENNReal.finLqNorm p (fun mi : Fin (2 ^ k) × Fin r => ‖β mi.1 mi.2‖ₑ) =
+  have hβ : ENNReal.lqNorm p (fun mi : Fin (2 ^ k) × Fin r => ‖β mi.1 mi.2‖ₑ) =
       dyadicWeight (1 / 2) k * F := by
     simp only [β, enorm_mul, enorm_two_rpow_half]
-    exact ENNReal.finLqNorm_const_mul hp0 _ _
+    exact ENNReal.lqNorm_const_mul _ _
   have hβm : (dyadicWeight (1 / 2) k * F) ^ p.toReal =
-      ∑ m, ENNReal.finLqNorm p (fun i => ‖β m i‖ₑ) ^ p.toReal := by
-    rw [← hβ, ENNReal.finLqNorm_prod_rpow hp0 hp]
+      ∑ m, ENNReal.lqNorm p (fun i => ‖β m i‖ₑ) ^ p.toReal := by
+    rw [← hβ, ENNReal.lqNorm_prod_rpow hp0 hp]
   have hroot : ∀ {x y : ℝ≥0∞}, x ^ p.toReal ≤ y ^ p.toReal → x ≤ y := fun h =>
     (ENNReal.rpow_le_rpow_iff hq).1 h
   have hw : dyadicWeight (1 / p.toReal) k ^ p.toReal = dyadicWeight 1 k := by
@@ -884,7 +884,7 @@ theorem enorm_ppProj_sub (hp : p ≠ ∞) (f : Lp ℂ p unitVol) (k : ℕ) :
 theorem memApprox_ppScheme_iff_coeff (hp : p ≠ ∞) (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p unitVol) :
     (ppScheme p r).MemApprox s q f ↔ ‖ppProj p hp r 0 f‖ₑ + ENNReal.lqNorm q (fun k =>
-      dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k * ENNReal.finLqNorm p
+      dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k * ENNReal.lqNorm p
         (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r f k mi.1 mi.2‖ₑ)) < ∞ := by
   obtain ⟨K, M, hK, hM, hKM⟩ := exists_eLpNorm_detailFun_equiv (r := r) hp
   have hf : IntegrableOn (f : ℝ → ℂ) (Icc 0 1) := (Lp.memLp f).integrable Fact.out
@@ -904,7 +904,7 @@ theorem lqNorm_modulus_lt_top_iff_coeff (hp : p ≠ ∞) (hr : 1 ≤ r) {s : ℝ
     (hsp : s < 1 / p.toReal) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p unitVol) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) < ∞ ↔
       ‖ppProj p hp r 0 f‖ₑ + ENNReal.lqNorm q (fun k =>
-        dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k * ENNReal.finLqNorm p
+        dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k * ENNReal.lqNorm p
           (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r f k mi.1 mi.2‖ₑ)) < ∞ :=
   (memApprox_ppScheme_iff hr hp hq hs.le hsp f).symm.trans
     (memApprox_ppScheme_iff_coeff hp hr hs hq f)
@@ -917,7 +917,7 @@ theorem lqNorm_perModulus_lt_top_iff_coeff (hp : p ≠ ∞) (hr : 1 ≤ r) {s : 
     (hsp : s < 1 / p.toReal) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p unitVol) :
     ‖f‖ₑ + ENNReal.lqNorm q (fun k => dyadicWeight s k * lpPerModulus p r f k) < ∞ ↔
       ‖ppProj p hp r 0 f‖ₑ + ENNReal.lqNorm q (fun k =>
-        dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k * ENNReal.finLqNorm p
+        dyadicWeight (s + (1 / 2 - 1 / p.toReal)) k * ENNReal.lqNorm p
           (fun mi : Fin (2 ^ k) × Fin r => ‖coeff r f k mi.1 mi.2‖ₑ)) < ∞ :=
   (memApprox_ppScheme_iff_per hr hp hq hs.le hsp f).symm.trans
     (memApprox_ppScheme_iff_coeff hp hr hs hq f)

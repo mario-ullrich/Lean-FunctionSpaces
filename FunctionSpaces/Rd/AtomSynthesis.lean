@@ -121,14 +121,20 @@ structure IsRegularAtom (p : ℝ≥0∞) (σ : ℝ) (r : ℕ) (d : ℝ) (C : ℝ
     C * dyadicWeight (-(finrank ℝ V / p.toReal)) j * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ σ)
 
 /-- The `ℓ_p`-norm `‖λ_{j,·}‖_{ℓ_p}` of the coefficients of one level. -/
-noncomputable def levelNorm (p : ℝ≥0∞) {ι : Type*} (coef : ι → ℂ) : ℝ≥0∞ :=
-  (∑' m, ‖coef m‖ₑ ^ p.toReal) ^ (1 / p.toReal)
+noncomputable def levelNorm (p : ℝ≥0∞) {ι : Type*} [MeasurableSpace ι] (coef : ι → ℂ) : ℝ≥0∞ :=
+  lqNorm p fun m => ‖coef m‖ₑ
+
+/-- For `0 < p < ∞`, `‖λ_{j,·}‖_{ℓ_p} = (∑_m |λ_{j,m}|^p)^(1/p)`. -/
+theorem levelNorm_eq_tsum {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {ι : Type*} [MeasurableSpace ι]
+    [Countable ι] [MeasurableSingletonClass ι] (coef : ι → ℂ) :
+    levelNorm p coef = (∑' m, ‖coef m‖ₑ ^ p.toReal) ^ (1 / p.toReal) :=
+  ENNReal.lqNorm_eq_tsum hp0 hp _
 
 /-- The `ℓ_p`-norm of the coefficients is monotone in their moduli. -/
-theorem levelNorm_mono (p : ℝ≥0∞) {ι : Type*} {coef coef' : ι → ℂ}
-    (h : ∀ m, ‖coef m‖ₑ ≤ ‖coef' m‖ₑ) : levelNorm p coef ≤ levelNorm p coef' :=
-  ENNReal.rpow_le_rpow (ENNReal.tsum_le_tsum fun m => ENNReal.rpow_le_rpow (h m)
-    ENNReal.toReal_nonneg) (div_nonneg zero_le_one ENNReal.toReal_nonneg)
+theorem levelNorm_mono (p : ℝ≥0∞) {ι : Type*} [MeasurableSpace ι] [Countable ι]
+    [MeasurableSingletonClass ι] {coef coef' : ι → ℂ} (h : ∀ m, ‖coef m‖ₑ ≤ ‖coef' m‖ₑ) :
+    levelNorm p coef ≤ levelNorm p coef' :=
+  ENNReal.lqNorm_mono h
 
 /-- `0 ≤ 1 - 1/p` for `p ≥ 1`. -/
 theorem one_sub_one_div_toReal_nonneg {p : ℝ≥0∞} (hp1 : 1 ≤ p) : 0 ≤ 1 - 1 / p.toReal := by
@@ -141,7 +147,7 @@ theorem one_sub_one_div_toReal_nonneg {p : ℝ≥0∞} (hp1 : 1 ≤ p) : 0 ≤ 1
     exact this
 
 /-- The **coefficient quasi-norm** `‖λ‖_{b^s_{p,q}} = ‖(2^(j(s - n/p)) ‖λ_{j,·}‖_{ℓ_p})_j‖_{ℓ_q}`. -/
-noncomputable def coeffNorm (p : ℝ≥0∞) (n : ℕ) (s : ℝ) (q : ℝ≥0∞) {ι : Type*}
+noncomputable def coeffNorm (p : ℝ≥0∞) (n : ℕ) (s : ℝ) (q : ℝ≥0∞) {ι : Type*} [MeasurableSpace ι]
     (coef : ℕ → ι → ℂ) : ℝ≥0∞ :=
   lqNorm q (fun j => dyadicWeight (s - n / p.toReal) j * levelNorm p (coef j))
 
@@ -158,7 +164,8 @@ theorem iterDiff_tsum_apply [NormedSpace ℝ V] {ι : Type*} (g : ι → V → �
   exact Finset.sum_congr rfl fun l _ => (tsum_mul_left).symm
 
 /-- From `X^p ≤ N^(p-1) ∑ (b_m |λ_m|)^p` with `b_m ≤ B` to `X ≤ N^(1-1/p) B ‖λ‖_{ℓ_p}`. -/
-theorem le_of_rpow_le_overlap {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {ι : Type*} {X B : ℝ≥0∞}
+theorem le_of_rpow_le_overlap {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {ι : Type*} [MeasurableSpace ι]
+    [Countable ι] [MeasurableSingletonClass ι] {X B : ℝ≥0∞}
     {N : ℕ} {b : ι → ℝ≥0∞} (hb : ∀ m, b m ≤ B) (coef : ι → ℂ)
     (hX : X ^ p.toReal ≤ (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, (‖coef m‖ₑ * b m) ^ p.toReal) :
     X ≤ (N : ℝ≥0∞) ^ (1 - 1 / p.toReal) * B * levelNorm p coef := by
@@ -166,7 +173,8 @@ theorem le_of_rpow_le_overlap {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) 
   have hpos : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   rw [← ENNReal.rpow_le_rpow_iff hpos]
   refine hX.trans ?_
-  rw [levelNorm, ENNReal.mul_rpow_of_nonneg _ _ hpos.le, ENNReal.mul_rpow_of_nonneg _ _ hpos.le,
+  rw [levelNorm_eq_tsum hp0 hp, ENNReal.mul_rpow_of_nonneg _ _ hpos.le,
+    ENNReal.mul_rpow_of_nonneg _ _ hpos.le,
     ← ENNReal.rpow_mul, ← ENNReal.rpow_mul, show (1 - 1 / p.toReal) * p.toReal = p.toReal - 1 by
       field_simp, show 1 / p.toReal * p.toReal = 1 by field_simp, ENNReal.rpow_one, mul_assoc]
   refine mul_le_mul' le_rfl ?_
@@ -193,6 +201,7 @@ theorem summable_levelSum {ι : Type*} {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d 
 
 /-- **The level sums in `L_p`**: `‖∑_m λ_m a_m‖_p ≤ N^(1-1/p) C 2^(-jn/p) ‖λ‖_{ℓ_p}`. -/
 theorem eLpNorm_levelSum_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {ι : Type*} [Countable ι]
+    [MeasurableSpace ι] [MeasurableSingletonClass ι]
     {σ : ℝ} {r : ℕ} {d : ℝ} {C : ℝ≥0∞} {j N : ℕ} (c : ι → V) (a : ι → V → ℂ) (coef : ι → ℂ)
     (hN : ∀ x (S : Finset ι), (∀ m ∈ S, coef m ≠ 0 ∧ ‖x - c m‖ ≤ (d + r) / 2 ^ j) → S.card ≤ N)
     (ha : ∀ m, IsRegularAtom p σ r d C j (c m) (a m)) {F : V → ℂ} (hF : AEStronglyMeasurable F volume)
@@ -217,6 +226,7 @@ theorem eLpNorm_levelSum_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {�
 2^r N^(1-1/p) C 2^(-jn/p) ‖λ‖_{ℓ_p} c_{kj}` with `c_{kj} = 2^(-(k-j)σ)` for `j ≤ k` and `1`
 otherwise. -/
 theorem modulus_levelSum_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {ι : Type*} [Countable ι]
+    [MeasurableSpace ι] [MeasurableSingletonClass ι]
     {σ : ℝ} (hσ : 0 ≤ σ) {r : ℕ} {d : ℝ} {C : ℝ≥0∞} {j N : ℕ} (c : ι → V) (a : ι → V → ℂ)
     (coef : ι → ℂ)
     (hN : ∀ x (S : Finset ι), (∀ m ∈ S, coef m ≠ 0 ∧ ‖x - c m‖ ≤ (d + r) / 2 ^ j) → S.card ≤ N)
@@ -331,6 +341,7 @@ centres of the atoms with nonzero coefficients have overlap at most `N` on balls
 exponent `σ` and order `r`, and `0 < s < σ`, then
 `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ K ‖λ‖_{b^s_{p,q}}`. -/
 theorem modNorm_le_coeffNorm {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {ι : Type*} [Countable ι]
+    [MeasurableSpace ι] [MeasurableSingletonClass ι]
     {σ : ℝ} {r : ℕ} {d : ℝ} {C : ℝ≥0∞} {N : ℕ} (c : ℕ → ι → V) (a : ℕ → ι → V → ℂ)
     (coef : ℕ → ι → ℂ)
     (hN : ∀ j x (S : Finset ι), (∀ m ∈ S, coef j m ≠ 0 ∧ ‖x - c j m‖ ≤ (d + r) / 2 ^ j) →
@@ -451,6 +462,7 @@ theorem isRegularAtom_zero {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : ℝ} {C : 
 `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ K 2^(j(s - n/p)) ‖λ‖_{ℓ_p}`, the case of
 `Rd.modNorm_le_coeffNorm` with one nonzero level. -/
 theorem modNorm_level_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {ι : Type*} [Countable ι]
+    [MeasurableSpace ι] [MeasurableSingletonClass ι]
     {σ : ℝ} {r : ℕ} {d : ℝ} {C : ℝ≥0∞} {N : ℕ} (j : ℕ) (c : ι → V) (a : ι → V → ℂ)
     (coef : ι → ℂ)
     (hN : ∀ x (S : Finset ι), (∀ m ∈ S, coef m ≠ 0 ∧ ‖x - c m‖ ≤ (d + r) / 2 ^ j) → S.card ≤ N)
@@ -501,7 +513,7 @@ theorem modNorm_level_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {ι 
     · subst hij
       simp [coef']
     · have h0 : levelNorm p (coef' i) = 0 := by
-        simp [levelNorm, coef', hij, ENNReal.zero_rpow_of_pos hpos, hpos]
+        simp [levelNorm, coef', hij]
       simp [hij, h0]
   rw [hseq, lqNorm_ite_eq hq]
 
