@@ -3832,15 +3832,23 @@ $Q_k$ is linear and reproduces $T$ on $I_{k,i}$, so $g - Q_k g = (g - T) - Q_k(g
 and part (2) of \Cref{lem:quasi-interp} applies with $J(n) \subseteq W_i$.
 \end{proof}
 
-\begin{lemma}[Spline approximation from two smoothings]
+\begin{lemma}[Spline approximation from smoothings]
 \label{lem:qi-taylor}
-\lean{Interval.lintegral_sub_ppFun_le_sum, Interval.natCast_div_two_pow_le,
-  Interval.exists_eLpNorm_sub_qi_le_of_taylor, Interval.add_ofReal_div_pow_mul_le,
-  Interval.exists_eLpNorm_qi_le}
+\lean{Interval.exists_sum_eLpNorm_sub_qiPieces_le_of_taylor, Interval.lintegral_sub_ppFun_le_sum,
+  Interval.natCast_div_two_pow_le, Interval.exists_eLpNorm_sub_qi_le_of_taylor,
+  Interval.add_ofReal_div_pow_mul_le, Interval.exists_eLpNorm_qi_le}
 \leanok
 \uses{lem:qi-local-error}
-Let $1 \leq p < \infty$ and $r \geq 1$. There is $A < \infty$ such that for $k \geq r + 2$, every
-measurable $u$ integrable on the dyadic intervals of level $k$, and measurable
+Let $1 \leq p < \infty$ and $r \geq 1$. There is $A < \infty$ with the following property. Let
+$k, N \in \N$, $s \subseteq \{0, \dots, N - 1\}$ a set of cells whose windows lie in $[a, b]$,
+$u$ measurable and integrable on the dyadic intervals $I_{k,m}$, $m < N$, and $g, D$ measurable
+such that for all $v \leq w$ some polynomial $T$ of degree $< r$ has
+$\|g - T\|_{L_p[v,w]} \leq (w - v)^r \|D\|_{L_p[v,w]}$. Then, with $c = (r 2^{-k})^r$,
+\[
+  \sum_{i \in s} \|u - Q_k u\|_{L_p(I_{k,i})}^p \leq
+  \bigl(A (\|u - g\|_{L_p[a,b]} + c \|D\|_{L_p[a,b]})\bigr)^p .
+\]
+Consequently, for $k \geq r + 2$, every such $u$ with $N = 2^k$, and measurable
 $g_1, D_1, g_2, D_2$ such that for all $a \leq b$ and $\nu = 1, 2$ some polynomial $T$ of degree
 $< r$ has $\|g_\nu - T\|_{L_p[a,b]} \leq (b - a)^r \|D_\nu\|_{L_p[a,b]}$,
 \begin{multline*}
@@ -3855,19 +3863,18 @@ such $u$.
 
 \begin{proof}
 \leanok
-Every window $W_i$ has length $\leq r 2^{-k} \leq \tfrac14$, so it lies in $[0, \tfrac34]$ or in
-$[\tfrac14, 1]$; take $T_i$ from $g_1$ or $g_2$. \Cref{lem:qi-local-error} with
-$H = 2^{p-1} (|u - g_\nu|^p + c^p |D_\nu|^p)$ on the two parts bounds the $p$-th power of the
-error by $C^p r 2^{p-1}$ times
-$\|u - g_1\|^p + (c \|D_1\|)^p + \|u - g_2\|^p + (c \|D_2\|)^p$, and $a^p + b^p \leq (a + b)^p$
-gives the bound. For the second statement take $T_i = 0$ and $H = |u|^p$ on $[0, 1]$.
+On every window $W_i$, $i \in s$, a Taylor polynomial $T_i$ of $g$ satisfies
+$\|u - T_i\|_{L_p(W_i)}^p \leq 2^{p-1} \int_{W_i} (|u - g|^p + c^p |D|^p)$, since $W_i$ has length
+at most $r 2^{-k}$. \Cref{lem:qi-local-error} with $H = 2^{p-1} (|u - g|^p + c^p |D|^p)$ on
+$[a, b]$ bounds the sum by $C^p r 2^{p-1} (\|u - g\|^p + (c \|D\|)^p)$, and
+$a^p + b^p \leq (a + b)^p$. Every window has length $\leq r 2^{-k} \leq \tfrac14$, so it lies in
+$[0, \tfrac34]$ or in $[\tfrac14, 1]$; the first statement for the two sets of cells gives the
+second. For the third take $g = D = 0$ on $[0, 1]$.
 \end{proof}
 
 \begin{theorem}[Jackson's inequality for splines]
 \label{thm:spline-jackson}
-\lean{Interval.lintegral_smoothing_le, Interval.splineJacksonConst,
-  Interval.splineJacksonConst_ne_top, Interval.splineJacksonConst_rpow_eq,
-  Interval.exists_eLpNorm_sub_qi_le, Interval.approxSeq_splineScheme_one,
+\lean{Interval.exists_eLpNorm_sub_qi_le, Interval.approxSeq_splineScheme_one,
   Interval.exists_approxSeq_splineScheme_le}
 \leanok
 \uses{lem:two-sided-smoothing, lem:qi-taylor, def:spline-space, thm:whitney,
@@ -4004,7 +4011,7 @@ so the join is that of $Q_k g$ at the knot $1$.
   Interval.cutoff_nonneg, Interval.cutoff_le_one, Interval.cutoff_eq_one, Interval.dense_periodic,
   Interval.exists_approxSeq_perSplineScheme_le}
 \leanok
-\uses{lem:per-qi, lem:qi-local-error, lem:two-sided-smoothing, lem:per-modulus, lem:error-dense}
+\uses{lem:per-qi, lem:qi-taylor, lem:two-sided-smoothing, lem:per-modulus, lem:error-dense}
 Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_J$ with
 $E_{2^k}(f)_p \leq C_J \, \omega_r^{\mathrm{per}}(f, 2^{-k})_p$ for every $f \in L_p(\T)$ and
 every $k \geq r$, where $E_{2^k}$ is the error of best approximation by periodic splines of order
@@ -4016,7 +4023,7 @@ $r$ and level $k$.
 First let $f$ be continuous and $1$-periodic. On $[0, 1)$ the error of $Q_k^{\mathrm{per}} f$ is
 the error of $Q_k f$ on $[1, 2)$, whose windows $W_i$, $2^k \leq i < 2^{k+1}$, lie in $[0, 2]$.
 \Cref{lem:two-sided-smoothing} on $[0, 2]$ with $L = 2^{-k}$ and $b = 3$ gives polynomials on all
-windows, and \Cref{lem:qi-local-error} and \Cref{lem:per-modulus} give
+windows, and \Cref{lem:qi-taylor} and \Cref{lem:per-modulus} give
 $\|f - Q_k^{\mathrm{per}} f\|_p \leq C \omega_r(f, 2^{-k}, [0, 3])_p
 \leq 3^{1/p} C \omega_r^{\mathrm{per}}(f, 2^{-k})_p$. The continuous $1$-periodic functions are
 dense in $L_p[0,1]$: for a bounded continuous $g$ and a continuous cut-off $\varphi_\delta$ with

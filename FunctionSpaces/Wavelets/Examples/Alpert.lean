@@ -45,8 +45,9 @@ and `k` (`Alpert.exists_eLpNorm_detailFun_equiv`), and the multiscale characteri
 `f ∈ A^s_q ↔ ‖P_0 f‖_p + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, ψ_{k,m,i}⟩)_{m,i}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
 (`Alpert.memApprox_ppScheme_iff_coeff`). For `0 < s < 1/p` this describes `B^s_{p,q}[0, 1]` and
 `B^s_{p,q}(𝕋)` (`Alpert.lqNorm_modulus_lt_top_iff_coeff`,
-`Alpert.lqNorm_perModulus_lt_top_iff_coeff`). For `r = 1` the multiwavelet is the Haar
-function.
+`Alpert.lqNorm_perModulus_lt_top_iff_coeff`). For `r = 1` the multiwavelet is a multiple of
+modulus `1` of the Haar function, since the basis of the detail space comes from Mathlib's
+`stdOrthonormalBasis`.
 -/
 
 @[expose] public section

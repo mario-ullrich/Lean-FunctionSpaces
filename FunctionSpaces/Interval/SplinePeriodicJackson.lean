@@ -228,17 +228,15 @@ theorem exists_eLpNorm_sub_perQi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ G : ℝ → ℂ, Continuous G → Function.Periodic G 1 → ∀ k : ℕ,
       eLpNorm (fun x => G x - ppFun k (perQiPieces hr k G) x) p unitVol ≤
         C * perModulus r p G (1 / 2 ^ k) := by
-  obtain ⟨Cb, hCb, hCbb⟩ := exists_enorm_bcoord_le p hr
-  obtain ⟨MN, hMN, hMNb⟩ := exists_enorm_bspline_le r
+  obtain ⟨A, hA, hAb⟩ := exists_sum_eLpNorm_sub_qiPieces_le_of_taylor (p := p) hr hp
   have hp1 : 1 ≤ p := Fact.out
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
-  have hCq : 1 + r * (MN * (Cb * ppProjConst r)) ≠ ∞ :=
-    ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top (ENNReal.natCast_ne_top r)
-      (ENNReal.mul_ne_top hMN (ENNReal.mul_ne_top hCb (ppProjConst_ne_top r)))⟩
-  refine ⟨splineJacksonConst r (1 + r * (MN * (Cb * ppProjConst r))) p * 3 ^ (1 / p.toReal),
-    ENNReal.mul_ne_top (splineJacksonConst_ne_top r hCq)
-      (ENNReal.rpow_ne_top_of_nonneg (by positivity) (by simp)), fun G hG hGp k => ?_⟩
-  set Cq := 1 + r * (MN * (Cb * ppProjConst r))
+  set J := 1 + (r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))
+  have hJ : J ≠ ∞ := ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top
+    (ENNReal.pow_ne_top (ENNReal.natCast_ne_top r))
+    (ENNReal.mul_ne_top (by simp) (ENNReal.pow_ne_top (ENNReal.natCast_ne_top r)))⟩
+  refine ⟨A * J * 3 ^ (1 / p.toReal), ENNReal.mul_ne_top (ENNReal.mul_ne_top hA hJ)
+    (ENNReal.rpow_ne_top_of_nonneg (by positivity) (by simp)), fun G hG hGp k => ?_⟩
   set ω := modulus r p 0 3 G (1 / 2 ^ k)
   have hpos : (0 : ℝ) < 2 ^ k := by positivity
   have hL : (0 : ℝ) < 1 / 2 ^ k := by positivity
@@ -248,11 +246,6 @@ theorem exists_eLpNorm_sub_perQi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
       exact one_le_pow₀ (by norm_num)
     linarith
   obtain ⟨g, D, hgm, hDm, h1, h2, h3⟩ := exists_left_smoothing hG hr hp1 hp hL hwL
-  rw [show (1 / (2 : ℝ) ^ k)⁻¹ = 2 ^ k by rw [one_div, inv_inv] ] at h2
-  set c : ℝ≥0∞ := ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r
-  set Hl : ℝ → ℝ≥0∞ := fun x => ‖G x - g x‖ₑ ^ p.toReal + c ^ p.toReal * ‖D x‖ₑ ^ p.toReal
-  have h2top : (2 : ℝ≥0∞) ^ (p.toReal - 1) ≠ ∞ :=
-    ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top
   set s := (Finset.range (2 ^ k)).map (addRightEmbedding (2 ^ k))
   have hs : s ⊆ Finset.range (2 ^ (k + 1)) := by
     intro i hi
@@ -261,30 +254,14 @@ theorem exists_eLpNorm_sub_perQi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     rw [addRightEmbedding_apply, pow_succ]
     omega
   -- the windows of the intervals in `[1, 2)` lie in `[0, 2]`
-  have hT : ∀ i ∈ s, ∃ T ∈ degreeLT ℂ r, eLpNorm (fun x => G x - polyFun T x) p
-      (volume.restrict (qiWindow r k i)) ^ p.toReal ≤
-        ∫⁻ x in qiWindow r k i, 2 ^ (p.toReal - 1) * (Icc (0 : ℝ) 2).indicator Hl x := by
-    intro i hi
+  have hW : ∀ i ∈ s, qiWindow r k i ⊆ Icc 0 2 := fun i hi x hx => by
     have hi2 : i < 2 ^ (k + 1) := Finset.mem_range.1 (hs hi)
-    rw [lintegral_const_mul' _ _ h2top]
-    obtain ⟨T, hT, h⟩ := exists_qiWindow_poly hG.measurable hgm hDm hp h3 k i
-    refine ⟨T, hT, h.trans (mul_le_mul' le_rfl (le_of_eq
-      (setLIntegral_congr_fun measurableSet_Icc fun x hx => ?_)))⟩
-    have hx2 : x ∈ Icc (0 : ℝ) 2 := by
-      refine ⟨(by positivity : (0 : ℝ) ≤ ((i + 1 - r : ℕ) : ℝ) / 2 ^ k).trans hx.1,
-        hx.2.trans ?_⟩
-      rw [div_le_iff₀ hpos]
-      have : ((i + 1 : ℕ) : ℝ) ≤ 2 ^ (k + 1) := by exact_mod_cast hi2
-      push_cast at this
-      rw [pow_succ] at this
-      linarith
-    rw [indicator_of_mem hx2]
-  -- the integral of the dominating function
-  have hint : ∫⁻ x, 2 ^ (p.toReal - 1) * (Icc (0 : ℝ) 2).indicator Hl x ≤
-      2 ^ (p.toReal - 1) * ((1 + ((r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^
-        p.toReal) * ω ^ p.toReal) := by
-    rw [lintegral_const_mul' _ _ h2top, lintegral_indicator measurableSet_Icc]
-    exact mul_le_mul' le_rfl (lintegral_smoothing_le hp hG.measurable hgm hDm h1 h2)
+    refine ⟨(by positivity : (0 : ℝ) ≤ ((i + 1 - r : ℕ) : ℝ) / 2 ^ k).trans hx.1, hx.2.trans ?_⟩
+    rw [div_le_iff₀ hpos]
+    have : ((i + 1 : ℕ) : ℝ) ≤ 2 ^ (k + 1) := by exact_mod_cast hi2
+    push_cast at this
+    rw [pow_succ] at this
+    linarith
   -- the error on `[0, 1)` is the error of the quasi-interpolant on `[1, 2)`
   have hshift : ∀ m : ℕ, eLpNorm (fun x => G x - polyFun (perQiPieces hr k G m) x) p
       (volume.restrict (dyadicIco k m)) = eLpNorm (fun x => G x -
@@ -299,7 +276,7 @@ theorem exists_eLpNorm_sub_perQi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     simp only [polyFun_perQiPieces]
     rw [hGp x]
   have hmain : eLpNorm (fun x => G x - ppFun k (perQiPieces hr k G) x) p unitVol ≤
-      splineJacksonConst r Cq p * ω := by
+      A * (J * ω) := by
     refine eLpNorm_le_of_lintegral_le ((hG.measurable.sub
       (measurable_ppFun _ _)).aestronglyMeasurable) hp0 hp ?_
     calc ∫⁻ x, ‖G x - ppFun k (perQiPieces hr k G) x‖ₑ ^ p.toReal ∂unitVol
@@ -310,23 +287,22 @@ theorem exists_eLpNorm_sub_perQi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
             (volume.restrict (dyadicIco k i)) ^ p.toReal := by
           rw [Finset.sum_map]
           exact Finset.sum_congr rfl fun m _ => congrArg (· ^ p.toReal) (hshift m)
-      _ ≤ Cq ^ p.toReal * (r * ∫⁻ x, 2 ^ (p.toReal - 1) * (Icc (0 : ℝ) 2).indicator Hl x) :=
-          sum_eLpNorm_sub_qiPieces_le hr hCbb hMNb hp hG.measurable
-            (fun m _ => integrableOn_dyadicIco_of_continuous hG k m) hs _ hT
-      _ ≤ Cq ^ p.toReal * (r * (2 ^ (p.toReal - 1) * (2 * ((1 + ((r : ℝ≥0∞) ^ r *
-            (2 ^ r * (r : ℝ≥0∞) ^ (2 * r))) ^ p.toReal) * ω ^ p.toReal)))) := by
+      _ ≤ (A * (eLpNorm (fun x => G x - g x) p (volume.restrict (Icc 0 2)) +
+            ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r * eLpNorm D p (volume.restrict (Icc 0 2)))) ^
+              p.toReal :=
+          hAb hs hW hG.measurable (fun m _ => integrableOn_dyadicIco_of_continuous hG k m)
+            hgm hDm h3
+      _ ≤ (A * (J * ω)) ^ p.toReal := by
           gcongr
-          exact hint.trans (mul_le_mul' le_rfl (le_mul_of_one_le_left zero_le one_le_two))
-      _ = (splineJacksonConst r Cq p * ω) ^ p.toReal := splineJacksonConst_rpow_eq hp r Cq ω
+          exact add_ofReal_div_pow_mul_le r k h1 h2
   have hω : ω ≤ 3 ^ (1 / p.toReal) * perModulus r p G (1 / 2 ^ k) := by
     have h := modulus_perExt_le hG.measurable hp0 hp r 3 (1 / 2 ^ k)
     rw [perExt_eq_of_periodic hGp] at h
     simp only [Nat.cast_ofNat] at h
     exact h
   calc eLpNorm (fun x => G x - ppFun k (perQiPieces hr k G) x) p unitVol
-      ≤ splineJacksonConst r Cq p * ω := hmain
-    _ ≤ splineJacksonConst r Cq p * (3 ^ (1 / p.toReal) * perModulus r p G (1 / 2 ^ k)) :=
-        mul_le_mul' le_rfl hω
+      ≤ A * (J * ω) := hmain
+    _ ≤ A * (J * (3 ^ (1 / p.toReal) * perModulus r p G (1 / 2 ^ k))) := by gcongr
     _ = _ := by ring
 
 /-! ### Density of the continuous periodic functions -/
