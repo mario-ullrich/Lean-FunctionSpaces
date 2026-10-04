@@ -92,23 +92,23 @@ structure CutoffDiffeo (Ω : Set V) where
   isOpen_U : IsOpen U
   isOpen_U' : IsOpen U'
   /-- The change of variables. -/
-  Φ : V → V
+  Phi : V → V
   /-- Its inverse. -/
-  Ψ : V → V
+  Psi : V → V
   /-- The cut-off. -/
-  χ : V → ℂ
+  chi : V → ℂ
   /-- The compact set carrying the cut-off. -/
-  K₀ : Set V
-  contDiffOn_Φ : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) Φ (Ω ∩ U)
-  contDiffOn_Ψ : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) Ψ (Ω ∩ U')
-  contDiffOn_χ : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ (Ω ∩ U')
-  mapsTo_Φ : MapsTo Φ (Ω ∩ U) (Ω ∩ U')
-  mapsTo_Ψ : MapsTo Ψ (Ω ∩ U') (Ω ∩ U)
-  left_inv : ∀ x ∈ Ω ∩ U, Ψ (Φ x) = x
-  right_inv : ∀ y ∈ Ω ∩ U', Φ (Ψ y) = y
-  isCompact_K₀ : IsCompact K₀
-  K₀_subset : K₀ ⊆ Ω ∩ U'
-  χ_eq_zero : ∀ y ∈ Ω, y ∉ K₀ → χ y = 0
+  K0 : Set V
+  contDiffOn_Phi : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) Phi (Ω ∩ U)
+  contDiffOn_Psi : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) Psi (Ω ∩ U')
+  contDiffOn_chi : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) chi (Ω ∩ U')
+  mapsTo_Phi : MapsTo Phi (Ω ∩ U) (Ω ∩ U')
+  mapsTo_Psi : MapsTo Psi (Ω ∩ U') (Ω ∩ U)
+  left_inv : ∀ x ∈ Ω ∩ U, Psi (Phi x) = x
+  right_inv : ∀ y ∈ Ω ∩ U', Phi (Psi y) = y
+  isCompact_K0 : IsCompact K0
+  K0_subset : K0 ⊆ Ω ∩ U'
+  chi_eq_zero : ∀ y ∈ Ω, y ∉ K0 → chi y = 0
 
 namespace CutoffDiffeo
 
@@ -116,38 +116,38 @@ variable {Ω : Set V} (T : CutoffDiffeo Ω)
 
 /-- The action on functions: `T f = 1_{Ω ∩ U} (χ f) ∘ Φ`. -/
 noncomputable def apply (f : V → ℂ) : V → ℂ :=
-  (Ω ∩ T.U).indicator fun x => T.χ (T.Φ x) * f (T.Φ x)
+  (Ω ∩ T.U).indicator fun x => T.chi (T.Phi x) * f (T.Phi x)
 
 /-- The compact set `Ψ(K₀)` that carries the images. -/
-def carrier : Set V := T.Ψ '' T.K₀
+def carrier : Set V := T.Psi '' T.K0
 
 /-- `Ψ(K₀)` is compact. -/
 theorem isCompact_carrier : IsCompact T.carrier :=
-  T.isCompact_K₀.image_of_continuousOn (T.contDiffOn_Ψ.continuousOn.mono T.K₀_subset)
+  T.isCompact_K0.image_of_continuousOn (T.contDiffOn_Psi.continuousOn.mono T.K0_subset)
 
 /-- `Ψ(K₀) ⊆ Ω ∩ U`. -/
 theorem carrier_subset : T.carrier ⊆ Ω ∩ T.U := by
   rintro _ ⟨y, hy, rfl⟩
-  exact T.mapsTo_Ψ (T.K₀_subset hy)
+  exact T.mapsTo_Psi (T.K0_subset hy)
 
 /-- **`T f` vanishes on `Ω` outside `Ψ(K₀)`**: if `Φ x ∉ K₀`, the cut-off vanishes. -/
 theorem apply_eq_zero_of_notMem (f : V → ℂ) {x : V} (hx : x ∉ T.carrier) : T.apply f x = 0 := by
   by_cases hxs : x ∈ Ω ∩ T.U
   · rw [apply, Set.indicator_of_mem hxs]
-    have hΦ : T.Φ x ∉ T.K₀ := fun h => hx ⟨T.Φ x, h, T.left_inv x hxs⟩
-    rw [T.χ_eq_zero _ (T.mapsTo_Φ hxs).1 hΦ, zero_mul]
+    have hΦ : T.Phi x ∉ T.K0 := fun h => hx ⟨T.Phi x, h, T.left_inv x hxs⟩
+    rw [T.chi_eq_zero _ (T.mapsTo_Phi hxs).1 hΦ, zero_mul]
   · rw [apply, Set.indicator_of_notMem hxs]
 
 /-- **`T a` vanishes if `a` lives far from `K₀`**: if `a = 0` outside `B(c, d 2^(-j))` and no
 point of `K₀` lies in that ball, then `T a = 0`. -/
 theorem apply_eq_zero_of_forall_far {d : ℝ} {j : ℕ} {c : V} {a : V → ℂ}
-    (ha : ∀ x, d / 2 ^ j < ‖x - c‖ → a x = 0) (hfar : ∀ y ∈ T.K₀, d / 2 ^ j < ‖y - c‖) (x : V) :
+    (ha : ∀ x, d / 2 ^ j < ‖x - c‖ → a x = 0) (hfar : ∀ y ∈ T.K0, d / 2 ^ j < ‖y - c‖) (x : V) :
     T.apply a x = 0 := by
   by_cases hxs : x ∈ Ω ∩ T.U
   · rw [apply, Set.indicator_of_mem hxs]
-    by_cases hΦ : T.Φ x ∈ T.K₀
+    by_cases hΦ : T.Phi x ∈ T.K0
     · rw [ha _ (hfar _ hΦ), mul_zero]
-    · rw [T.χ_eq_zero _ (T.mapsTo_Φ hxs).1 hΦ, zero_mul]
+    · rw [T.chi_eq_zero _ (T.mapsTo_Phi hxs).1 hΦ, zero_mul]
   · rw [apply, Set.indicator_of_notMem hxs]
 
 variable (hΩ : Convex ℝ Ω) (hint : (interior Ω).Nonempty)
@@ -163,45 +163,45 @@ theorem uniqueDiffOn_target : UniqueDiffOn ℝ (Ω ∩ T.U') :=
 
 omit hint in
 /-- `Ψ` is Lipschitz on `K₀`. -/
-theorem exists_lipschitzOnWith_Ψ : ∃ L : ℝ≥0, LipschitzOnWith L T.Ψ T.K₀ :=
+theorem exists_lipschitzOnWith_Psi : ∃ L : ℝ≥0, LipschitzOnWith L T.Psi T.K0 :=
   exists_lipschitzOnWith_of_contDiffOn_inter hΩ T.isOpen_U' (by exact_mod_cast le_top)
-    T.contDiffOn_Ψ T.isCompact_K₀ T.K₀_subset
+    T.contDiffOn_Psi T.isCompact_K0 T.K0_subset
 
 omit hint in
 /-- `Φ` is Lipschitz on `Ψ(K₀)`. -/
-theorem exists_lipschitzOnWith_Φ : ∃ L : ℝ≥0, LipschitzOnWith L T.Φ T.carrier :=
+theorem exists_lipschitzOnWith_Phi : ∃ L : ℝ≥0, LipschitzOnWith L T.Phi T.carrier :=
   exists_lipschitzOnWith_of_contDiffOn_inter hΩ T.isOpen_U (by exact_mod_cast le_top)
-    T.contDiffOn_Φ T.isCompact_carrier T.carrier_subset
+    T.contDiffOn_Phi T.isCompact_carrier T.carrier_subset
 
 /-- **The derivatives of the cut-off are bounded**: `‖D^l χ‖ ≤ M` within `Ω ∩ U'` for `l ≤ K`;
 on the compact `K₀` by continuity, elsewhere they vanish. -/
-theorem exists_iteratedFDerivWithin_χ_bound (K : ℕ) :
-    ∃ M : ℝ, 0 ≤ M ∧ ∀ l ≤ K, ∀ y ∈ Ω ∩ T.U', ‖iteratedFDerivWithin ℝ l T.χ (Ω ∩ T.U') y‖ ≤ M := by
-  have hb : ∀ l, ∃ M : ℝ, ∀ y ∈ T.K₀, ‖iteratedFDerivWithin ℝ l T.χ (Ω ∩ T.U') y‖ ≤ M := fun l =>
-    T.isCompact_K₀.exists_bound_of_continuousOn
-      ((T.contDiffOn_χ.continuousOn_iteratedFDerivWithin (by exact_mod_cast le_top)
-        (T.uniqueDiffOn_target hΩ hint)).mono T.K₀_subset)
+theorem exists_iteratedFDerivWithin_chi_bound (K : ℕ) :
+    ∃ M : ℝ, 0 ≤ M ∧ ∀ l ≤ K, ∀ y ∈ Ω ∩ T.U', ‖iteratedFDerivWithin ℝ l T.chi (Ω ∩ T.U') y‖ ≤ M := by
+  have hb : ∀ l, ∃ M : ℝ, ∀ y ∈ T.K0, ‖iteratedFDerivWithin ℝ l T.chi (Ω ∩ T.U') y‖ ≤ M := fun l =>
+    T.isCompact_K0.exists_bound_of_continuousOn
+      ((T.contDiffOn_chi.continuousOn_iteratedFDerivWithin (by exact_mod_cast le_top)
+        (T.uniqueDiffOn_target hΩ hint)).mono T.K0_subset)
   choose M hM using hb
   refine ⟨∑ l ∈ Finset.range (K + 1), |M l|, by positivity, fun l hl y hy => ?_⟩
   have hle : |M l| ≤ ∑ l ∈ Finset.range (K + 1), |M l| :=
     Finset.single_le_sum (f := fun l => |M l|) (fun _ _ => abs_nonneg _)
       (Finset.mem_range.2 (Nat.lt_succ_of_le hl))
-  by_cases hyK : y ∈ T.K₀
+  by_cases hyK : y ∈ T.K0
   · exact (hM l y hyK).trans ((le_abs_self _).trans hle)
-  · have hzero : iteratedFDerivWithin ℝ l T.χ (Ω ∩ T.U') y = 0 :=
-      iteratedFDerivWithin_eq_zero_of_eqOn T.isCompact_K₀.isClosed.isOpen_compl hyK hy
-        (fun z hz => T.χ_eq_zero z hz.1.1 hz.2) l
+  · have hzero : iteratedFDerivWithin ℝ l T.chi (Ω ∩ T.U') y = 0 :=
+      iteratedFDerivWithin_eq_zero_of_eqOn T.isCompact_K0.isClosed.isOpen_compl hyK hy
+        (fun z hz => T.chi_eq_zero z hz.1.1 hz.2) l
     rw [hzero, norm_zero]
     exact (abs_nonneg _).trans hle
 
 /-- **The derivatives of `Φ` are bounded on `Ψ(K₀)`**: `‖D^i Φ‖ ≤ D` within `Ω ∩ U` for
 `i ≤ K`, with `D ≥ 1`. -/
-theorem exists_iteratedFDerivWithin_Φ_bound (K : ℕ) :
+theorem exists_iteratedFDerivWithin_Phi_bound (K : ℕ) :
     ∃ D : ℝ, 1 ≤ D ∧ ∀ i ≤ K, ∀ x ∈ T.carrier,
-      ‖iteratedFDerivWithin ℝ i T.Φ (Ω ∩ T.U) x‖ ≤ D := by
-  have hb : ∀ i, ∃ M : ℝ, ∀ x ∈ T.carrier, ‖iteratedFDerivWithin ℝ i T.Φ (Ω ∩ T.U) x‖ ≤ M :=
+      ‖iteratedFDerivWithin ℝ i T.Phi (Ω ∩ T.U) x‖ ≤ D := by
+  have hb : ∀ i, ∃ M : ℝ, ∀ x ∈ T.carrier, ‖iteratedFDerivWithin ℝ i T.Phi (Ω ∩ T.U) x‖ ≤ M :=
     fun i => T.isCompact_carrier.exists_bound_of_continuousOn
-      ((T.contDiffOn_Φ.continuousOn_iteratedFDerivWithin (by exact_mod_cast le_top)
+      ((T.contDiffOn_Phi.continuousOn_iteratedFDerivWithin (by exact_mod_cast le_top)
         (T.uniqueDiffOn_source hΩ hint)).mono T.carrier_subset)
   choose M hM using hb
   refine ⟨1 + ∑ i ∈ Finset.range (K + 1), |M i|, le_add_of_nonneg_right (by positivity),
@@ -223,17 +223,17 @@ omit [MeasurableSpace V] [BorelSpace V] in
 points `z_m ∈ B` satisfy `‖Φ z_m - c_{j,m}‖ ≤ d 2^(-j)` for the centres `c_{j,m}` of the cells of
 level `j`. Then at most `⌈(2 (2 L ρ + d) + 2)^n⌉` of the `z_m` lie in a ball of radius
 `ρ 2^(-j)`. -/
-theorem card_le_of_lipschitz_centres {B : Set V} {Φ : V → V} {L : ℝ≥0}
-    (hΦ : LipschitzOnWith L Φ B) (j : ℕ) {d ρ : ℝ} (hd : 0 ≤ d) (hρ : 0 ≤ ρ)
+theorem card_le_of_lipschitz_centres {B : Set V} {Phi : V → V} {L : ℝ≥0}
+    (hΦ : LipschitzOnWith L Phi B) (j : ℕ) {d ρ : ℝ} (hd : 0 ≤ d) (hρ : 0 ≤ ρ)
     {z : (Fin (finrank ℝ V) → ℤ) → V} (x : V) (S : Finset (Fin (finrank ℝ V) → ℤ))
-    (hS : ∀ m ∈ S, z m ∈ B ∧ ‖Φ (z m) - cellCenter j m‖ ≤ d / 2 ^ j ∧ ‖x - z m‖ ≤ ρ / 2 ^ j) :
+    (hS : ∀ m ∈ S, z m ∈ B ∧ ‖Phi (z m) - cellCenter j m‖ ≤ d / 2 ^ j ∧ ‖x - z m‖ ≤ ρ / 2 ^ j) :
     S.card ≤ ⌈(2 * (2 * L * ρ + d) + 2) ^ finrank ℝ V⌉₊ := by
   rcases S.eq_empty_or_nonempty with hS0 | ⟨m₀, hm₀⟩
   · simp [hS0]
-  refine card_le_of_norm_sub_cellCenter_le j (by positivity) (Φ (z m₀)) S fun m hm => ?_
+  refine card_le_of_norm_sub_cellCenter_le j (by positivity) (Phi (z m₀)) S fun m hm => ?_
   obtain ⟨hz0, -, hx0⟩ := hS m₀ hm₀
   obtain ⟨hz, hc, hx⟩ := hS m hm
-  have h1 : ‖Φ (z m₀) - Φ (z m)‖ ≤ L * (2 * ρ / 2 ^ j) := by
+  have h1 : ‖Phi (z m₀) - Phi (z m)‖ ≤ L * (2 * ρ / 2 ^ j) := by
     have := hΦ.dist_le_mul (z m₀) hz0 (z m) hz
     rw [dist_eq_norm, dist_eq_norm] at this
     refine this.trans (mul_le_mul_of_nonneg_left ?_ L.coe_nonneg)
@@ -241,9 +241,9 @@ theorem card_le_of_lipschitz_centres {B : Set V} {Φ : V → V} {L : ℝ≥0}
       _ ≤ ‖x - z m‖ + ‖x - z m₀‖ := norm_sub_le _ _
       _ ≤ ρ / 2 ^ j + ρ / 2 ^ j := add_le_add hx hx0
       _ = 2 * ρ / 2 ^ j := by ring
-  calc ‖Φ (z m₀) - cellCenter j m‖ = ‖(Φ (z m₀) - Φ (z m)) + (Φ (z m) - cellCenter j m)‖ := by
+  calc ‖Phi (z m₀) - cellCenter j m‖ = ‖(Phi (z m₀) - Phi (z m)) + (Phi (z m) - cellCenter j m)‖ := by
         congr 1; abel
-    _ ≤ ‖Φ (z m₀) - Φ (z m)‖ + ‖Φ (z m) - cellCenter j m‖ := norm_add_le _ _
+    _ ≤ ‖Phi (z m₀) - Phi (z m)‖ + ‖Phi (z m) - cellCenter j m‖ := norm_add_le _ _
     _ ≤ L * (2 * ρ / 2 ^ j) + d / 2 ^ j := add_le_add h1 hc
     _ = (2 * L * ρ + d) / 2 ^ j := by ring
 
@@ -254,10 +254,10 @@ variable {Ω : Set V} (T : CutoffDiffeo Ω)
 /-- **Derivatives of `χ a`**: for a smooth atom `a` on `V` with constant `A` and `‖D^k χ‖ ≤ M`
 within `Ω ∩ U'`, `‖D^i (χ a)‖ ≤ 2^i M A 2^(ji)` within `Ω ∩ U'` for `i ≤ K`. -/
 theorem norm_iteratedFDerivWithin_mul_atom_le (hΩ : Convex ℝ Ω) (hint : (interior Ω).Nonempty)
-    {K : ℕ} {M : ℝ} (hM : ∀ l ≤ K, ∀ y ∈ Ω ∩ T.U', ‖iteratedFDerivWithin ℝ l T.χ (Ω ∩ T.U') y‖ ≤ M)
+    {K : ℕ} {M : ℝ} (hM : ∀ l ≤ K, ∀ y ∈ Ω ∩ T.U', ‖iteratedFDerivWithin ℝ l T.chi (Ω ∩ T.U') y‖ ≤ M)
     {d A : ℝ} (hA : 0 ≤ A) {j : ℕ} {c : V} {a : V → ℂ} (ha : IsSmoothAtom Set.univ K d A j c a)
     {i : ℕ} (hi : i ≤ K) {y : V} (hy : y ∈ Ω ∩ T.U') :
-    ‖iteratedFDerivWithin ℝ i (fun z => T.χ z * a z) (Ω ∩ T.U') y‖ ≤
+    ‖iteratedFDerivWithin ℝ i (fun z => T.chi z * a z) (Ω ∩ T.U') y‖ ≤
       2 ^ i * M * A * 2 ^ (j * i) := by
   have ht := T.uniqueDiffOn_target hΩ hint
   have hac : ContDiff ℝ K a := contDiffOn_univ.1 ha.contDiffOn
@@ -267,17 +267,17 @@ theorem norm_iteratedFDerivWithin_mul_atom_le (hΩ : Convex ℝ Ω) (hint : (int
       rw [iteratedFDerivWithin_eq_iteratedFDeriv ht (hac.contDiffAt.of_le (by exact_mod_cast hk))
         hy, ← iteratedFDerivWithin_univ]
       exact ha.norm_iteratedFDerivWithin_le k hk y (Set.mem_univ y)
-  refine (norm_iteratedFDerivWithin_mul_le (T.contDiffOn_χ.of_le (by exact_mod_cast le_top))
+  refine (norm_iteratedFDerivWithin_mul_le (T.contDiffOn_chi.of_le (by exact_mod_cast le_top))
     hac.contDiffOn ht hy (by exact_mod_cast hi)).trans ?_
   calc ∑ k ∈ Finset.range (i + 1), (i.choose k : ℝ) *
-        ‖iteratedFDerivWithin ℝ k T.χ (Ω ∩ T.U') y‖ *
+        ‖iteratedFDerivWithin ℝ k T.chi (Ω ∩ T.U') y‖ *
           ‖iteratedFDerivWithin ℝ (i - k) a (Ω ∩ T.U') y‖
       ≤ ∑ k ∈ Finset.range (i + 1), (i.choose k : ℝ) * (M * A * 2 ^ (j * i)) := by
         refine Finset.sum_le_sum fun k hk => ?_
         have hki : k ≤ i := Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)
         rw [mul_assoc]
         refine mul_le_mul_of_nonneg_left ?_ (Nat.cast_nonneg _)
-        calc ‖iteratedFDerivWithin ℝ k T.χ (Ω ∩ T.U') y‖ *
+        calc ‖iteratedFDerivWithin ℝ k T.chi (Ω ∩ T.U') y‖ *
               ‖iteratedFDerivWithin ℝ (i - k) a (Ω ∩ T.U') y‖
             ≤ M * (A * 2 ^ (j * (i - k))) :=
               mul_le_mul (hM k (hki.trans hi) y hy) (ha' (i - k) ((Nat.sub_le i k).trans hi))
@@ -298,29 +298,29 @@ omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **The changed atom vanishes far from `Ψ(y₀)`**: if `a` vanishes outside `B(c, d 2^(-j))`,
 `y₀ ∈ K₀` lies within `d 2^(-j)` of `c` and `Ψ` is `L`-Lipschitz on `K₀`, then `T a` vanishes
 outside `B(Ψ y₀, 2 L d 2^(-j))`. -/
-theorem apply_eq_zero_of_far {L : ℝ≥0} (hL : LipschitzOnWith L T.Ψ T.K₀) {d : ℝ} {j : ℕ} {c : V}
-    {a : V → ℂ} (ha : ∀ x, d / 2 ^ j < ‖x - c‖ → a x = 0) {y₀ : V} (hy₀ : y₀ ∈ T.K₀)
-    (hy₀c : ‖y₀ - c‖ ≤ d / 2 ^ j) {x : V} (hx : 2 * L * d / 2 ^ j < ‖x - T.Ψ y₀‖) :
+theorem apply_eq_zero_of_far {L : ℝ≥0} (hL : LipschitzOnWith L T.Psi T.K0) {d : ℝ} {j : ℕ} {c : V}
+    {a : V → ℂ} (ha : ∀ x, d / 2 ^ j < ‖x - c‖ → a x = 0) {y₀ : V} (hy₀ : y₀ ∈ T.K0)
+    (hy₀c : ‖y₀ - c‖ ≤ d / 2 ^ j) {x : V} (hx : 2 * L * d / 2 ^ j < ‖x - T.Psi y₀‖) :
     T.apply a x = 0 := by
   by_contra hb
   have hxs : x ∈ Ω ∩ T.U := by
     by_contra hxs
     exact hb (by rw [apply, Set.indicator_of_notMem hxs])
   rw [apply, Set.indicator_of_mem hxs] at hb
-  have hΦK : T.Φ x ∈ T.K₀ := by
+  have hΦK : T.Phi x ∈ T.K0 := by
     by_contra hΦK
-    exact hb (by rw [T.χ_eq_zero _ (T.mapsTo_Φ hxs).1 hΦK, zero_mul])
-  have hΦc : ‖T.Φ x - c‖ ≤ d / 2 ^ j := not_lt.1 fun h => hb (by rw [ha _ h, mul_zero])
-  have h1 : ‖x - T.Ψ y₀‖ ≤ L * ‖T.Φ x - y₀‖ := by
-    have := hL.dist_le_mul (T.Φ x) hΦK y₀ hy₀
+    exact hb (by rw [T.chi_eq_zero _ (T.mapsTo_Phi hxs).1 hΦK, zero_mul])
+  have hΦc : ‖T.Phi x - c‖ ≤ d / 2 ^ j := not_lt.1 fun h => hb (by rw [ha _ h, mul_zero])
+  have h1 : ‖x - T.Psi y₀‖ ≤ L * ‖T.Phi x - y₀‖ := by
+    have := hL.dist_le_mul (T.Phi x) hΦK y₀ hy₀
     rwa [T.left_inv x hxs, dist_eq_norm, dist_eq_norm] at this
-  have h2 : ‖T.Φ x - y₀‖ ≤ 2 * d / 2 ^ j := by
-    calc ‖T.Φ x - y₀‖ = ‖(T.Φ x - c) - (y₀ - c)‖ := by congr 1; abel
-      _ ≤ ‖T.Φ x - c‖ + ‖y₀ - c‖ := norm_sub_le _ _
+  have h2 : ‖T.Phi x - y₀‖ ≤ 2 * d / 2 ^ j := by
+    calc ‖T.Phi x - y₀‖ = ‖(T.Phi x - c) - (y₀ - c)‖ := by congr 1; abel
+      _ ≤ ‖T.Phi x - c‖ + ‖y₀ - c‖ := norm_sub_le _ _
       _ ≤ d / 2 ^ j + d / 2 ^ j := add_le_add hΦc hy₀c
       _ = 2 * d / 2 ^ j := by ring
-  have h3 : ‖x - T.Ψ y₀‖ ≤ 2 * L * d / 2 ^ j := by
-    calc ‖x - T.Ψ y₀‖ ≤ L * (2 * d / 2 ^ j) :=
+  have h3 : ‖x - T.Psi y₀‖ ≤ 2 * L * d / 2 ^ j := by
+    calc ‖x - T.Psi y₀‖ ≤ L * (2 * d / 2 ^ j) :=
           h1.trans (mul_le_mul_of_nonneg_left h2 L.coe_nonneg)
       _ = 2 * L * d / 2 ^ j := by ring
   exact absurd hx (not_lt.2 h3)
@@ -332,11 +332,11 @@ and constant `A`, and every `y₀ ∈ K₀` within `d 2^(-j)` of its centre, `T 
 theorem isSmoothAtom_apply (hΩ : Convex ℝ Ω) (hΩm : MeasurableSet Ω)
     (hint : (interior Ω).Nonempty) (K : ℕ) :
     ∃ L A' : ℝ, 0 ≤ L ∧ 0 ≤ A' ∧ ∀ {d A : ℝ} {j : ℕ} {c : V} {a : V → ℂ}, 0 ≤ A →
-      IsSmoothAtom Set.univ K d A j c a → ∀ y₀ ∈ T.K₀, ‖y₀ - c‖ ≤ d / 2 ^ j →
-        IsSmoothAtom Ω K (2 * L * d) (A' * A) j (T.Ψ y₀) (T.apply a) := by
-  obtain ⟨L, hL⟩ := T.exists_lipschitzOnWith_Ψ hΩ
-  obtain ⟨M, hM0, hM⟩ := T.exists_iteratedFDerivWithin_χ_bound hΩ hint K
-  obtain ⟨D, hD1, hD⟩ := T.exists_iteratedFDerivWithin_Φ_bound hΩ hint K
+      IsSmoothAtom Set.univ K d A j c a → ∀ y₀ ∈ T.K0, ‖y₀ - c‖ ≤ d / 2 ^ j →
+        IsSmoothAtom Ω K (2 * L * d) (A' * A) j (T.Psi y₀) (T.apply a) := by
+  obtain ⟨L, hL⟩ := T.exists_lipschitzOnWith_Psi hΩ
+  obtain ⟨M, hM0, hM⟩ := T.exists_iteratedFDerivWithin_chi_bound hΩ hint K
+  obtain ⟨D, hD1, hD⟩ := T.exists_iteratedFDerivWithin_Phi_bound hΩ hint K
   refine ⟨L, K.factorial * 2 ^ K * M * D ^ K, L.coe_nonneg, by positivity,
     fun {d A j c a} hA ha y₀ hy₀ hy₀c => ?_⟩
   set S := Ω ∩ T.U
@@ -344,12 +344,12 @@ theorem isSmoothAtom_apply (hΩ : Convex ℝ Ω) (hΩm : MeasurableSet Ω)
   have ht := T.uniqueDiffOn_target hΩ hint
   have hSm : MeasurableSet S := hΩm.inter T.isOpen_U.measurableSet
   have hac : ContDiff ℝ K a := contDiffOn_univ.1 ha.contDiffOn
-  set g : V → ℂ := fun z => T.χ z * a z
+  set g : V → ℂ := fun z => T.chi z * a z
   have hg : ContDiffOn ℝ K g (Ω ∩ T.U') :=
-    (T.contDiffOn_χ.of_le (by exact_mod_cast le_top)).mul hac.contDiffOn
-  have hgΦ : ContDiffOn ℝ K (g ∘ T.Φ) S :=
-    hg.comp (T.contDiffOn_Φ.of_le (by exact_mod_cast le_top)) T.mapsTo_Φ
-  have hEq : ∀ x ∈ S, T.apply a x = (g ∘ T.Φ) x := fun x hx => by
+    (T.contDiffOn_chi.of_le (by exact_mod_cast le_top)).mul hac.contDiffOn
+  have hgΦ : ContDiffOn ℝ K (g ∘ T.Phi) S :=
+    hg.comp (T.contDiffOn_Phi.of_le (by exact_mod_cast le_top)) T.mapsTo_Phi
+  have hEq : ∀ x ∈ S, T.apply a x = (g ∘ T.Phi) x := fun x hx => by
     rw [apply, Set.indicator_of_mem hx]
     rfl
   have hzero : ∀ x ∈ Ω ∩ T.carrierᶜ, T.apply a x = 0 := fun x hx =>
@@ -374,21 +374,21 @@ theorem isSmoothAtom_apply (hΩ : Convex ℝ Ω) (hΩm : MeasurableSet Ω)
     · have hxS : x ∈ S := T.carrier_subset hxc
       rw [← iteratedFDerivWithin_inter_open T.isOpen_U hxS.2,
         iteratedFDerivWithin_congr hEq hxS]
-      have hC : ∀ i ≤ l, ‖iteratedFDerivWithin ℝ i g (Ω ∩ T.U') (T.Φ x)‖ ≤
+      have hC : ∀ i ≤ l, ‖iteratedFDerivWithin ℝ i g (Ω ∩ T.U') (T.Phi x)‖ ≤
           2 ^ l * M * A * 2 ^ (j * l) := fun i hi => by
         refine (T.norm_iteratedFDerivWithin_mul_atom_le hΩ hint hM hA ha (hi.trans hl)
-          (T.mapsTo_Φ hxS)).trans ?_
+          (T.mapsTo_Phi hxS)).trans ?_
         have h2 : (2 : ℝ) ^ i ≤ 2 ^ l := pow_le_pow_right₀ one_le_two hi
         have h3 : (2 : ℝ) ^ (j * i) ≤ 2 ^ (j * l) :=
           pow_le_pow_right₀ one_le_two (Nat.mul_le_mul_left j hi)
         have := mul_le_mul (mul_le_mul_of_nonneg_right (mul_le_mul_of_nonneg_right h2 hM0) hA) h3
           (by positivity) (by positivity)
         simpa [mul_assoc] using this
-      have hDi : ∀ i, 1 ≤ i → i ≤ l → ‖iteratedFDerivWithin ℝ i T.Φ S x‖ ≤ D ^ i :=
+      have hDi : ∀ i, 1 ≤ i → i ≤ l → ‖iteratedFDerivWithin ℝ i T.Phi S x‖ ≤ D ^ i :=
         fun i hi1 hil => (hD i (hil.trans hl) x hxc).trans (le_self_pow₀ hD1 (by omega))
       refine (norm_iteratedFDerivWithin_comp_le (N := (l : WithTop ℕ∞))
-        (hg.of_le (by exact_mod_cast hl)) (T.contDiffOn_Φ.of_le (by exact_mod_cast le_top))
-        le_rfl ht hs T.mapsTo_Φ hxS hC hDi).trans ?_
+        (hg.of_le (by exact_mod_cast hl)) (T.contDiffOn_Phi.of_le (by exact_mod_cast le_top))
+        le_rfl ht hs T.mapsTo_Phi hxS hC hDi).trans ?_
       have hfac : (l.factorial : ℝ) ≤ K.factorial := by exact_mod_cast Nat.factorial_le hl
       have h2 : (2 : ℝ) ^ l ≤ 2 ^ K := pow_le_pow_right₀ one_le_two hl
       have hDl : D ^ l ≤ D ^ K := pow_le_pow_right₀ hD1 hl

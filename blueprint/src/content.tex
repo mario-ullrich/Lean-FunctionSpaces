@@ -7253,9 +7253,9 @@ $\Omega = V$ and $\Phi = \mathrm{id}$, $T$ is a pointwise multiplier.
 \begin{lemma}[Bounds of the change of variables]
 \label{lem:cutoff-diffeo-bounds}
 \lean{Rd.locallyLipschitzOn_inter, Rd.exists_lipschitzOnWith_of_contDiffOn_inter,
-  Rd.iteratedFDerivWithin_eq_zero_of_eqOn, Rd.CutoffDiffeo.exists_lipschitzOnWith_Ψ,
-  Rd.CutoffDiffeo.exists_lipschitzOnWith_Φ, Rd.CutoffDiffeo.exists_iteratedFDerivWithin_χ_bound,
-  Rd.CutoffDiffeo.exists_iteratedFDerivWithin_Φ_bound}
+  Rd.iteratedFDerivWithin_eq_zero_of_eqOn, Rd.CutoffDiffeo.exists_lipschitzOnWith_Psi,
+  Rd.CutoffDiffeo.exists_lipschitzOnWith_Phi, Rd.CutoffDiffeo.exists_iteratedFDerivWithin_chi_bound,
+  Rd.CutoffDiffeo.exists_iteratedFDerivWithin_Phi_bound}
 \leanok
 \uses{def:cutoff-diffeo}
 A map of class $C^1$ within a relatively open part $\Omega \cap U$ of a convex set is Lipschitz on
@@ -8629,6 +8629,106 @@ linear subspace of $L_p(\mu)$.
 \leanok
 \Cref{thm:atlas-independence} in both directions; for the order, the comparison of orders on a
 Besov domain (\Cref{thm:besov-domain-invariance}) piece by piece.
+\end{proof}
+
+\section{Smooth bounded domains}
+
+\begin{lemma}[Flattening a graph domain]
+\label{lem:flattening}
+\lean{Rd.LipschitzGraph.flatten, Rd.LipschitzGraph.unflatten, Rd.LipschitzGraph.phi_sub_smul,
+  Rd.LipschitzGraph.unflatten_flatten, Rd.LipschitzGraph.flatten_unflatten,
+  Rd.LipschitzGraph.inner_flatten, Rd.LipschitzGraph.flattenEquiv,
+  Rd.LipschitzGraph.continuous_flatten, Rd.LipschitzGraph.continuous_unflatten,
+  Rd.LipschitzGraph.contDiff_flatten, Rd.LipschitzGraph.contDiff_unflatten,
+  Rd.LipschitzGraph.fderiv_phi_e, Rd.LipschitzGraph.hasFDerivAt_flatten,
+  Rd.LipschitzGraph.det_fderiv_flatten, Rd.LipschitzGraph.measurePreserving_flatten}
+\leanok
+\uses{def:lipschitz-graph}
+For a Lipschitz graph domain $\{x : \varphi(x) < \langle x, e \rangle\}$ the flattening
+$F(x) = x - \varphi(x) e$ is a bijection of $V$ with inverse $y \mapsto y + \varphi(y) e$ and
+$\langle F(x), e \rangle = \langle x, e \rangle - \varphi(x)$. For smooth $\varphi$ both maps are
+smooth and $F$ preserves the Lebesgue measure.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\varphi$ is constant along $e$, so $\varphi(x - \varphi(x) e) = \varphi(x)$ and $D\varphi(x) e = 0$.
+The derivative $\mathrm{id} - e \otimes D\varphi(x)$ is a transvection with determinant
+$1 - D\varphi(x) e = 1$ (Mathlib's \texttt{LinearMap.transvection.det}), and the change of variables
+formula gives $F_* \mathrm{vol} = \mathrm{vol}$.
+\end{proof}
+
+\begin{definition}[Smooth bounded domains]
+\label{def:smooth-domain}
+\lean{Rd.SmoothDomain, Rd.e0, Rd.norm_e0, Rd.coord_zero_eq_inner, Rd.alignTo,
+  Rd.alignTo_apply_self, Rd.LipschitzGraph.closure_domain, Rd.mem_closure_iff_of_inter_eq}
+\leanok
+\uses{def:bounded-lipschitz}
+A smooth bounded domain in $\R^n$ is a bounded Lipschitz domain whose graph functions are smooth.
+The reflection $A_e$ in $(e - e_0)^\perp$ maps a unit vector $e$ to $e_0 = (1, 0, \dots, 0)$. The
+closure of a graph domain is $\{x : \varphi(x) \leq \langle x, e \rangle\}$, and closures of sets
+that agree on an open set $B$ agree on $B$.
+\end{definition}
+
+\begin{definition}[Straighteners and their charts]
+\label{def:straightener}
+\lean{Rd.SmoothDomain.Straightener, Rd.SmoothDomain.Straightener.tau_mem_closure,
+  Rd.SmoothDomain.Straightener.toMap, Rd.SmoothDomain.Straightener.coe_toMap,
+  Rd.SmoothDomain.Straightener.invMap, Rd.SmoothDomain.Straightener.coe_invMap,
+  Rd.SmoothDomain.Straightener.chart, Rd.SmoothDomain.Straightener.mem_chart_source,
+  Rd.SmoothDomain.Straightener.mem_chart_target, Rd.SmoothDomain.Straightener.chart_apply_coe,
+  Rd.SmoothDomain.Straightener.chart_symm_coe}
+\leanok
+\uses{def:smooth-domain}
+A straightener of the closure of a smooth domain $\Omega$ is a smooth, measure-preserving bijection
+$\sigma$ of $\R^n$ with smooth inverse $\tau$ and an open set $B$ such that for $x \in B$,
+$x \in \overline{\Omega}$ if and only if $\sigma(x)_0 \geq 0$. Its chart maps
+$\overline{\Omega} \cap B$ by $\sigma$ onto an open subset of the half-space
+$\{y : y_0 \geq 0\}$, with inverse $\tau$.
+\end{definition}
+
+\begin{lemma}[Boundary and interior straighteners]
+\label{lem:straighteners}
+\lean{Rd.SmoothDomain.straighten, Rd.SmoothDomain.unstraighten, Rd.SmoothDomain.straighten_coord,
+  Rd.SmoothDomain.boundaryStraightener, Rd.SmoothDomain.interiorRadius,
+  Rd.SmoothDomain.interiorRadius_pos, Rd.SmoothDomain.ball_interiorRadius_subset,
+  Rd.SmoothDomain.interiorStraightener, Rd.SmoothDomain.boundaryIndex,
+  Rd.SmoothDomain.mem_ball_boundaryIndex, Rd.SmoothDomain.straightenerAt,
+  Rd.SmoothDomain.mem_straightenerAt}
+\leanok
+\uses{def:straightener, lem:flattening}
+On the $j$-th boundary ball, $\sigma_j(x) = A_{e_j}(x - \varphi_j(x) e_j)$ is a straightener, with
+$\sigma_j(x)_0 = \langle x, e_j \rangle - \varphi_j(x)$. Around $x_0 \in \Omega$ with
+$B(x_0, \rho) \subseteq \Omega$ the translation $x \mapsto x - x_0 + 2\rho e_0$ is a straightener.
+Every point of $\overline{\Omega}$ lies in the set of one of them.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:flattening} and the reflection give the properties of $\sigma_j$; on the ball,
+$\overline{\Omega}$ agrees with the closure of the graph domain. For the translation,
+$|(x - x_0)_0| \leq \|x - x_0\| < \rho$. A point of $\overline{\Omega} \setminus \Omega$ lies on the
+boundary, which the boundary balls cover.
+\end{proof}
+
+\begin{theorem}[Smooth domains are manifolds with boundary]
+\label{thm:smooth-domain-manifold}
+\lean{Rd.SmoothDomain.chartedSpace, Rd.SmoothDomain.isManifold, Rd.SmoothDomain.compactSpace,
+  Rd.SmoothDomain.volumeOn, Rd.SmoothDomain.Straightener.extend_target,
+  Rd.SmoothDomain.isSmoothMeasure_volumeOn}
+\leanok
+\uses{lem:straighteners, def:smooth-measure}
+The closure of a smooth bounded domain, with the charts of all straighteners, is a compact smooth
+manifold with boundary modelled on the half-space $\{y \in \R^n : y_0 \geq 0\}$, and the Lebesgue
+measure on it is a smooth measure with density $1$ in every chart.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The change of charts from $(\sigma, \tau)$ to $(\sigma', \tau')$ is the restriction of the smooth
+map $\sigma' \circ \tau$. The closure is closed and bounded. The image of the Lebesgue measure on
+$\overline{\Omega} \cap B$ under the measure-preserving $\sigma$ is the Lebesgue measure on
+$\sigma(\overline{\Omega} \cap B)$, the target of the chart.
 \end{proof}
 
 \chapter{Dominating mixed smoothness on $\R^d$}

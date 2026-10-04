@@ -112,6 +112,8 @@ public import FunctionSpaces.Rd.LipschitzBoundaryTrace
 public import FunctionSpaces.Manifold.SmoothMeasure
 public import FunctionSpaces.Manifold.BesovAtlas
 public import FunctionSpaces.Manifold.Besov
+public import FunctionSpaces.Rd.GraphStraightening
+public import FunctionSpaces.Manifold.SmoothDomain
 public import FunctionSpaces.Rd.TensorKernels
 public import FunctionSpaces.Rd.MixedSequences
 public import FunctionSpaces.Rd.MixedDifferences
@@ -349,6 +351,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   with cut-offs, and the pieces of two atlases.
 * `FunctionSpaces.Manifold.Besov`: the Besov quasi-norm of an atlas, its independence of the atlas
   and of the order, and the Besov spaces of a compact manifold.
+* `FunctionSpaces.Rd.GraphStraightening`: the flattening of a graph domain, its inverse, and its
+  preservation of the Lebesgue measure.
+* `FunctionSpaces.Manifold.SmoothDomain`: smooth bounded domains, straighteners and their charts,
+  the closure as a compact manifold with boundary, and the Lebesgue measure as a smooth measure.
 * `FunctionSpaces.Rd.TensorKernels`: tensor products of one-dimensional kernels on `ℝ^d`, their
   integrals, convolutions, dilations, and diagonal changes of variables.
 * `FunctionSpaces.Rd.MixedSequences`: `ℓ_q` norms on `ℕ^d`, the mixed weights `2^(s|k|_1)`, the

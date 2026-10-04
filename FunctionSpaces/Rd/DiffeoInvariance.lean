@@ -77,7 +77,7 @@ theorem apply_tsum {ι : Type*} (coef coef' : ι → ℂ) (a : ι → V → ℂ)
     (h : ∀ m, coef' m = coef m ∨ T.apply (a m) = 0) (x : V) :
     T.apply (fun y => ∑' m, coef m * a m y) x = ∑' m, coef' m * T.apply (a m) x := by
   by_cases hx : x ∈ Ω ∩ T.U
-  · have e : ∀ m, T.apply (a m) x = T.χ (T.Φ x) * a m (T.Φ x) := fun m => by
+  · have e : ∀ m, T.apply (a m) x = T.chi (T.Phi x) * a m (T.Phi x) := fun m => by
       rw [apply, Set.indicator_of_mem hx]
     rw [apply, Set.indicator_of_mem hx, ← tsum_mul_left]
     refine tsum_congr fun m => ?_
@@ -87,7 +87,7 @@ theorem apply_tsum {ι : Type*} (coef coef' : ι → ℂ) (a : ι → V → ℂ)
     · have h' := congrFun h x
       rw [Pi.zero_apply, e] at h'
       rw [e, h', mul_zero]
-      calc T.χ (T.Φ x) * (coef m * a m (T.Φ x)) = coef m * (T.χ (T.Φ x) * a m (T.Φ x)) := by
+      calc T.chi (T.Phi x) * (coef m * a m (T.Phi x)) = coef m * (T.chi (T.Phi x) * a m (T.Phi x)) := by
             ring
         _ = 0 := by rw [h', mul_zero]
   · rw [apply, Set.indicator_of_notMem hx]
@@ -110,21 +110,21 @@ theorem apply_ae_eq {g₁ g₂ : V → ℂ} (h : ∀ᵐ y ∂volume, y ∈ Ω �
   have hN : volume N = 0 := by
     rw [ae_iff] at h
     exact measure_mono_null (fun y hy => fun h' => hy.2 (h' hy.1)) h
-  have hΨN : volume (T.Ψ '' (T.K₀ ∩ N)) = 0 :=
+  have hΨN : volume (T.Psi '' (T.K0 ∩ N)) = 0 :=
     addHaar_image_eq_zero_of_differentiableOn_of_addHaar_eq_zero volume
-      ((T.contDiffOn_Ψ.differentiableOn (by simp)).mono
-        (inter_subset_left.trans T.K₀_subset))
+      ((T.contDiffOn_Psi.differentiableOn (by simp)).mono
+        (inter_subset_left.trans T.K0_subset))
       (measure_mono_null inter_subset_right hN)
   refine ae_iff.2 (measure_mono_null (fun x hx => ?_) hΨN)
   have hx' : T.apply g₁ x ≠ T.apply g₂ x := hx
   by_cases hxs : x ∈ Ω ∩ T.U
   · rw [apply, apply, Set.indicator_of_mem hxs, Set.indicator_of_mem hxs] at hx'
-    have hΦK : T.Φ x ∈ T.K₀ := by
+    have hΦK : T.Phi x ∈ T.K0 := by
       by_contra hΦK
-      rw [T.χ_eq_zero _ (T.mapsTo_Φ hxs).1 hΦK, zero_mul, zero_mul] at hx'
+      rw [T.chi_eq_zero _ (T.mapsTo_Phi hxs).1 hΦK, zero_mul, zero_mul] at hx'
       exact hx' rfl
-    have hne : g₁ (T.Φ x) ≠ g₂ (T.Φ x) := fun he => hx' (by rw [he])
-    exact ⟨T.Φ x, ⟨hΦK, (T.mapsTo_Φ hxs).1, hne⟩, T.left_inv x hxs⟩
+    have hne : g₁ (T.Phi x) ≠ g₂ (T.Phi x) := fun he => hx' (by rw [he])
+    exact ⟨T.Phi x, ⟨hΦK, (T.mapsTo_Phi hxs).1, hne⟩, T.left_inv x hxs⟩
   · rw [apply, apply, Set.indicator_of_notMem hxs, Set.indicator_of_notMem hxs] at hx'
     exact absurd rfl hx'
 
@@ -134,10 +134,10 @@ theorem aestronglyMeasurable_apply (hΩm : MeasurableSet Ω) {g : V → ℂ}
   have hSm : MeasurableSet (Ω ∩ T.U) := hΩm.inter T.isOpen_U.measurableSet
   have h1 : AEStronglyMeasurable (T.apply hg.mk) volume := by
     refine (aestronglyMeasurable_indicator_iff hSm).2 ?_
-    have hΦ : AEMeasurable T.Φ (volume.restrict (Ω ∩ T.U)) :=
-      T.contDiffOn_Φ.continuousOn.aemeasurable hSm
-    have hχ : ContinuousOn (fun x => T.χ (T.Φ x)) (Ω ∩ T.U) :=
-      T.contDiffOn_χ.continuousOn.comp T.contDiffOn_Φ.continuousOn T.mapsTo_Φ
+    have hΦ : AEMeasurable T.Phi (volume.restrict (Ω ∩ T.U)) :=
+      T.contDiffOn_Phi.continuousOn.aemeasurable hSm
+    have hχ : ContinuousOn (fun x => T.chi (T.Phi x)) (Ω ∩ T.U) :=
+      T.contDiffOn_chi.continuousOn.comp T.contDiffOn_Phi.continuousOn T.mapsTo_Phi
     exact (hχ.aestronglyMeasurable hSm).mul
       (hg.stronglyMeasurable_mk.aestronglyMeasurable.comp_aemeasurable hΦ)
   exact h1.congr (T.apply_ae_eq (hg.ae_eq_mk.mono fun y hy _ => hy.symm))
@@ -149,19 +149,19 @@ omit hΩ hint in
 /-- **The change of variables** `x = Ψ(y)`: for `e > 0`,
 `∫ |T g|^e = ∫_{K₀} |det DΨ(y)| |χ(y)|^e |g(y)|^e dy`. -/
 theorem lintegral_apply_eq (g : V → ℂ) {e : ℝ} (he : 0 < e) :
-    ∫⁻ x, ‖T.apply g x‖ₑ ^ e = ∫⁻ y in T.K₀,
-      ENNReal.ofReal |(fderivWithin ℝ T.Ψ (Ω ∩ T.U') y).det| * (‖T.χ y‖ₑ ^ e * ‖g y‖ₑ ^ e) := by
-  have hderiv : ∀ y ∈ T.K₀,
-      HasFDerivWithinAt T.Ψ (fderivWithin ℝ T.Ψ (Ω ∩ T.U') y) T.K₀ y := fun y hy =>
-    ((T.contDiffOn_Ψ.differentiableOn (by simp) y
-      (T.K₀_subset hy)).hasFDerivWithinAt).mono T.K₀_subset
-  have hinj : InjOn T.Ψ T.K₀ := fun y₁ h₁ y₂ h₂ h => by
-    rw [← T.right_inv y₁ (T.K₀_subset h₁), h, T.right_inv y₂ (T.K₀_subset h₂)]
+    ∫⁻ x, ‖T.apply g x‖ₑ ^ e = ∫⁻ y in T.K0,
+      ENNReal.ofReal |(fderivWithin ℝ T.Psi (Ω ∩ T.U') y).det| * (‖T.chi y‖ₑ ^ e * ‖g y‖ₑ ^ e) := by
+  have hderiv : ∀ y ∈ T.K0,
+      HasFDerivWithinAt T.Psi (fderivWithin ℝ T.Psi (Ω ∩ T.U') y) T.K0 y := fun y hy =>
+    ((T.contDiffOn_Psi.differentiableOn (by simp) y
+      (T.K0_subset hy)).hasFDerivWithinAt).mono T.K0_subset
+  have hinj : InjOn T.Psi T.K0 := fun y₁ h₁ y₂ h₂ h => by
+    rw [← T.right_inv y₁ (T.K0_subset h₁), h, T.right_inv y₂ (T.K0_subset h₂)]
   rw [← setLIntegral_eq_of_support_subset (s := T.carrier) fun x hx => ?_]
   · rw [carrier, lintegral_image_eq_lintegral_abs_det_fderiv_mul volume
-      T.isCompact_K₀.measurableSet hderiv hinj]
-    refine setLIntegral_congr_fun T.isCompact_K₀.measurableSet fun y hy => ?_
-    rw [apply, Set.indicator_of_mem (T.mapsTo_Ψ (T.K₀_subset hy)), T.right_inv y (T.K₀_subset hy),
+      T.isCompact_K0.measurableSet hderiv hinj]
+    refine setLIntegral_congr_fun T.isCompact_K0.measurableSet fun y hy => ?_
+    rw [apply, Set.indicator_of_mem (T.mapsTo_Psi (T.K0_subset hy)), T.right_inv y (T.K0_subset hy),
       enorm_mul, ENNReal.mul_rpow_of_nonneg _ _ he.le]
   · by_contra hxc
     exact hx (show ‖T.apply g x‖ₑ ^ e = 0 by
@@ -170,11 +170,11 @@ theorem lintegral_apply_eq (g : V → ℂ) {e : ℝ} (he : 0 < e) :
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The Jacobian of `Ψ` is bounded on `K₀`. -/
 theorem exists_det_bound :
-    ∃ B : ℝ, 0 ≤ B ∧ ∀ y ∈ T.K₀, |(fderivWithin ℝ T.Ψ (Ω ∩ T.U') y).det| ≤ B := by
-  obtain ⟨B, hB⟩ := T.isCompact_K₀.exists_bound_of_continuousOn
+    ∃ B : ℝ, 0 ≤ B ∧ ∀ y ∈ T.K0, |(fderivWithin ℝ T.Psi (Ω ∩ T.U') y).det| ≤ B := by
+  obtain ⟨B, hB⟩ := T.isCompact_K0.exists_bound_of_continuousOn
     ((ContinuousLinearMap.continuous_det.comp_continuousOn
-      (T.contDiffOn_Ψ.continuousOn_fderivWithin (T.uniqueDiffOn_target hΩ hint)
-        (by exact_mod_cast le_top))).mono T.K₀_subset)
+      (T.contDiffOn_Psi.continuousOn_fderivWithin (T.uniqueDiffOn_target hΩ hint)
+        (by exact_mod_cast le_top))).mono T.K0_subset)
   exact ⟨max B 0, le_max_right _ _, fun y hy =>
     ((Real.norm_eq_abs _).symm.trans_le (hB y hy)).trans (le_max_left _ _)⟩
 
@@ -183,7 +183,7 @@ theorem eLpNorm_apply_le (hΩm : MeasurableSet Ω) {p : ℝ≥0∞} (hp0 : p ≠
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ g : V → ℂ, AEStronglyMeasurable g volume →
       eLpNorm (T.apply g) p volume ≤ C * eLpNorm g p volume := by
   obtain ⟨B, hB0, hB⟩ := T.exists_det_bound hΩ hint
-  obtain ⟨M, hM0, hM⟩ := T.exists_iteratedFDerivWithin_χ_bound hΩ hint 0
+  obtain ⟨M, hM0, hM⟩ := T.exists_iteratedFDerivWithin_chi_bound hΩ hint 0
   set e := p.toReal
   have he : 0 < e := ENNReal.toReal_pos hp0 hp
   set D := ENNReal.ofReal B * ENNReal.ofReal M ^ e
@@ -194,12 +194,12 @@ theorem eLpNorm_apply_le (hΩm : MeasurableSet Ω) {p : ℝ≥0∞} (hp0 : p ≠
     one_div_mul_cancel he.ne', ENNReal.rpow_one,
     eLpNorm_rpow_eq (T.aestronglyMeasurable_apply hΩm hg) hp0 hp, eLpNorm_rpow_eq hg hp0 hp,
     T.lintegral_apply_eq g he]
-  calc ∫⁻ y in T.K₀, ENNReal.ofReal |(fderivWithin ℝ T.Ψ (Ω ∩ T.U') y).det| *
-        (‖T.χ y‖ₑ ^ e * ‖g y‖ₑ ^ e)
-      ≤ ∫⁻ y in T.K₀, D * ‖g y‖ₑ ^ e := by
-        refine setLIntegral_mono' T.isCompact_K₀.measurableSet fun y hy => ?_
-        have hχ : ‖T.χ y‖ₑ ≤ ENNReal.ofReal M := by
-          have := hM 0 le_rfl y (T.K₀_subset hy)
+  calc ∫⁻ y in T.K0, ENNReal.ofReal |(fderivWithin ℝ T.Psi (Ω ∩ T.U') y).det| *
+        (‖T.chi y‖ₑ ^ e * ‖g y‖ₑ ^ e)
+      ≤ ∫⁻ y in T.K0, D * ‖g y‖ₑ ^ e := by
+        refine setLIntegral_mono' T.isCompact_K0.measurableSet fun y hy => ?_
+        have hχ : ‖T.chi y‖ₑ ≤ ENNReal.ofReal M := by
+          have := hM 0 le_rfl y (T.K0_subset hy)
           rw [norm_iteratedFDerivWithin_zero] at this
           rw [← ofReal_norm]
           exact ENNReal.ofReal_le_ofReal this
@@ -275,7 +275,7 @@ theorem exists_transported_atoms {r : ℕ} (hr : 1 ≤ r) {d A : ℝ} (hd : 0 �
           (∀ j m, coef' j m = coef j m ∨ T.apply (a j m) = 0) := by
   classical
   obtain ⟨L, A', hL, hA', hT⟩ := T.isSmoothAtom_apply hΩ hΩm hint r
-  obtain ⟨LΦ, hLΦ⟩ := T.exists_lipschitzOnWith_Φ hΩ
+  obtain ⟨LΦ, hLΦ⟩ := T.exists_lipschitzOnWith_Phi hΩ
   set d' := 2 * L * d
   have hd' : 0 ≤ d' := by positivity
   have hρ : 0 ≤ d' + r := by positivity
@@ -288,11 +288,11 @@ theorem exists_transported_atoms {r : ℕ} (hr : 1 ≤ r) {d A : ℝ} (hd : 0 �
     fun a coef ha => ?_⟩
   -- the cells that meet `K₀`, and a point of `K₀` near their centre
   set near : ℕ → (Fin (finrank ℝ V) → ℤ) → Prop :=
-    fun j m => ∃ y ∈ T.K₀, ‖y - cellCenter j m‖ ≤ d / 2 ^ j
+    fun j m => ∃ y ∈ T.K0, ‖y - cellCenter j m‖ ≤ d / 2 ^ j
   have hfar : ∀ j m, ¬ near j m → T.apply (a j m) = 0 := fun j m h => funext fun x =>
     T.apply_eq_zero_of_forall_far (ha j m).eq_zero
       (fun y hy => lt_of_not_ge fun hle => h ⟨y, hy, hle⟩) x
-  refine ⟨fun j m => if h : near j m then T.Ψ h.choose else 0,
+  refine ⟨fun j m => if h : near j m then T.Psi h.choose else 0,
     fun j m => if near j m then coef j m else 0, fun j x S hS => ?_, fun j m => ?_,
     fun j m => ?_, fun j m => ?_⟩
   · -- bounded overlap
@@ -300,12 +300,12 @@ theorem exists_transported_atoms {r : ℕ} (hr : 1 ≤ r) {d A : ℝ} (hd : 0 �
       by_contra h
       exact (hS m hm).1 (ite_eq_right h)
     refine card_le_of_lipschitz_centres hLΦ j hd hρ
-      (z := fun m => if h : near j m then T.Ψ h.choose else 0) x S fun m hm => ?_
+      (z := fun m => if h : near j m then T.Psi h.choose else 0) x S fun m hm => ?_
     have hS' := (hS m hm).2
     dsimp only at hS' ⊢
     rw [dite_eq_left (hnear m hm)] at hS' ⊢
     obtain ⟨hy, hyc⟩ := (hnear m hm).choose_spec
-    exact ⟨⟨_, hy, rfl⟩, by rwa [T.right_inv _ (T.K₀_subset hy)], hS'⟩
+    exact ⟨⟨_, hy, rfl⟩, by rwa [T.right_inv _ (T.K0_subset hy)], hS'⟩
   · -- the atoms
     by_cases h : near j m
     · dsimp only

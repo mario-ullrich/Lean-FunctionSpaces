@@ -464,6 +464,13 @@ explains how they differ.
   `Manifold.BesovAtlas.memBesov_iff_besovNorm_lt_top`). The pieces of two atlases are related by
   the changes of charts with cut-offs (`Manifold.BesovAtlas.pieceLp_eq_sum`), which are bounded on
   the Besov domain.
+* **Smooth bounded domains as manifolds with boundary.** The closure of a smooth bounded domain
+  `Ω ⊆ ℝ^n` (a bounded Lipschitz domain with smooth graph functions, `Rd.SmoothDomain`) is a
+  compact smooth manifold with boundary modelled on the half-space `{y : y_0 ≥ 0}`
+  (`Rd.SmoothDomain.isManifold`): near the boundary the charts are the straightenings
+  `x ↦ A(x - φ(x) e)`, which preserve the Lebesgue measure
+  (`Rd.LipschitzGraph.measurePreserving_flatten`), so the Lebesgue measure is a smooth measure
+  (`Rd.SmoothDomain.isSmoothMeasure_volumeOn`).
 * **Traces on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`,
   boundary balls `B_j` and graph domains `Ω_j` as above, and `(ψ_j)` a smooth resolution of unity on
   `Γ` with `tsupport ψ_j ⊆ B_j` (`Rd.BoundedLipschitzDomain.BoundaryPartition`). A property holds
@@ -604,6 +611,8 @@ explains how they differ.
 | Smooth measures on manifolds, integrals in charts | ✅ proved | ✗ | `FunctionSpaces/Manifold/SmoothMeasure.lean` |
 | Besov atlases, chart pieces, changes of charts with cut-offs | ✅ proved | ✗ | `FunctionSpaces/Manifold/BesovAtlas.lean` |
 | Besov spaces on compact manifolds, independence of the atlas and of the order | ✅ proved | ✗ | `FunctionSpaces/Manifold/Besov.lean` |
+| Flattening of graph domains, preservation of the Lebesgue measure | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphStraightening.lean` |
+| Smooth bounded domains as compact manifolds with boundary, Lebesgue measure as smooth measure | ✅ proved | ✗ | `FunctionSpaces/Manifold/SmoothDomain.lean` |
 | Tensor kernels on `ℝ^d`: integrals, convolutions, dilations, diagonal changes of variables | ✅ proved | ✗ | `FunctionSpaces/Rd/TensorKernels.lean` |
 | Sequences on `ℕ^d`: `ℓ_q` norms, Schur test, almost diagonal lemma | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedSequences.lean` |
 | Mixed differences, mixed moduli, the mixed Besov quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedDifferences.lean` |

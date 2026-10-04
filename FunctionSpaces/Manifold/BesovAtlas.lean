@@ -265,20 +265,20 @@ noncomputable def transition (i : Fin A.n) (j : Fin A'.n) : Rd.CutoffDiffeo (ran
   U' := I.symm ⁻¹' ((A.chart i).symm ≫ₕ A'.chart j).target
   isOpen_U := I.continuous_symm.isOpen_preimage _ (OpenPartialHomeomorph.open_source _)
   isOpen_U' := I.continuous_symm.isOpen_preimage _ (OpenPartialHomeomorph.open_target _)
-  Φ := I.extendCoordChange (A.chart i) (A'.chart j)
-  Ψ := (I.extendCoordChange (A.chart i) (A'.chart j)).symm
-  χ := (A'.ext j).target.indicator fun y =>
+  Phi := I.extendCoordChange (A.chart i) (A'.chart j)
+  Psi := (I.extendCoordChange (A.chart i) (A'.chart j)).symm
+  chi := (A'.ext j).target.indicator fun y =>
     ((A.psi i ((A'.ext j).symm y) * A'.theta j ((A'.ext j).symm y) : ℝ) : ℂ)
-  K₀ := A'.ext j '' (tsupport (A.psi i) ∩ tsupport (A'.theta j))
-  contDiffOn_Φ := by
+  K0 := A'.ext j '' (tsupport (A.psi i) ∩ tsupport (A'.theta j))
+  contDiffOn_Phi := by
     rw [range_inter_coordChange_source]
     exact I.contDiffOn_extendCoordChange (IsManifold.subset_maximalAtlas (A.chart_mem i))
       (IsManifold.subset_maximalAtlas (A'.chart_mem j))
-  contDiffOn_Ψ := by
+  contDiffOn_Psi := by
     rw [range_inter_coordChange_target]
     exact I.contDiffOn_extendCoordChange_symm (IsManifold.subset_maximalAtlas (A.chart_mem i))
       (IsManifold.subset_maximalAtlas (A'.chart_mem j))
-  contDiffOn_χ := by
+  contDiffOn_chi := by
     rw [range_inter_coordChange_target]
     have hsub : (I.extendCoordChange (A.chart i) (A'.chart j)).target ⊆ (A'.ext j).target := by
       rw [coordChange_target_eq_image]
@@ -289,10 +289,10 @@ noncomputable def transition (i : Fin A.n) (j : Fin A'.n) : Rd.CutoffDiffeo (ran
     refine (hsm.mono hsub).congr fun y hy => ?_
     rw [indicator_of_mem (hsub hy)]
     rfl
-  mapsTo_Φ := by
+  mapsTo_Phi := by
     rw [range_inter_coordChange_source, range_inter_coordChange_target]
     exact (I.extendCoordChange (A.chart i) (A'.chart j)).mapsTo
-  mapsTo_Ψ := by
+  mapsTo_Psi := by
     rw [range_inter_coordChange_source, range_inter_coordChange_target]
     exact (I.extendCoordChange (A.chart i) (A'.chart j)).mapsTo_symm
   left_inv x hx := by
@@ -301,16 +301,16 @@ noncomputable def transition (i : Fin A.n) (j : Fin A'.n) : Rd.CutoffDiffeo (ran
   right_inv y hy := by
     rw [range_inter_coordChange_target] at hy
     exact (I.extendCoordChange (A.chart i) (A'.chart j)).right_inv hy
-  isCompact_K₀ :=
+  isCompact_K0 :=
     (((isClosed_tsupport _).isCompact).inter_right (isClosed_tsupport _)).image_of_continuousOn
       ((A'.chart j).continuousOn_extend.mono (by
         rw [OpenPartialHomeomorph.extend_source]
         exact inter_subset_right.trans (A'.tsupport_theta_subset j)))
-  K₀_subset := by
+  K0_subset := by
     rw [range_inter_coordChange_target, coordChange_target_eq_image]
     exact image_mono fun x hx =>
       ⟨A'.tsupport_theta_subset j hx.2, A.tsupport_psi_subset i hx.1⟩
-  χ_eq_zero y _ hyK := by
+  chi_eq_zero y _ hyK := by
     by_cases hy : y ∈ (A'.ext j).target
     · rw [indicator_of_mem hy]
       by_contra h
@@ -328,7 +328,7 @@ omit [FiniteDimensional ℝ E] in
 theorem transition_apply (i : Fin A.n) (j : Fin A'.n) (G : E → ℂ) (y : E) :
     (A.transition A' i j).apply G y =
       (I.extendCoordChange (A.chart i) (A'.chart j)).source.indicator
-        (fun y => (A.transition A' i j).χ (I.extendCoordChange (A.chart i) (A'.chart j) y) *
+        (fun y => (A.transition A' i j).chi (I.extendCoordChange (A.chart i) (A'.chart j) y) *
           G (I.extendCoordChange (A.chart i) (A'.chart j) y)) y := by
   rw [Rd.CutoffDiffeo.apply, ← range_inter_coordChange_source]
   rfl
