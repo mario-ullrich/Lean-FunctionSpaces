@@ -1,16 +1,9 @@
 # Function spaces via approximation in Lean 4 / Mathlib
 
-A Lean 4 / Mathlib formalisation of **approximation spaces** in the sense of Pietsch, and of
-**Besov and Sobolev spaces** defined through them, with their **embedding theorems**. An
-approximation scheme is an increasing family of sets `A₀ ⊆ A₁ ⊆ ⋯` in a normed space, and a
-function belongs to the approximation space `A^s_q` when its errors of best approximation
-`E_n(f) = dist(f, A_n)` decay like `n^(-s)` in the `ℓ_q` sense. Besov spaces on a general
-finite measure space are the approximation spaces of `L_p` for a scheme of bounded
-continuous functions, and the embedding theorems follow from the abstract theory together
-with a Nikolskii inequality for the scheme. The concrete settings are the torus, intervals and
-the cube, `ℝ^d`, Lipschitz and smooth domains, and compact manifolds with boundary. The project
-is work in progress; the details are in seven documents under [`docs/`](docs/), one per block,
-listed under [What is formalised](#what-is-formalised).
+A Lean 4 / Mathlib formalisation of **Besov and Sobolev spaces** on several domains, their
+equivalent **characterisations** and their **embedding theorems**, built on the theory of
+**approximation spaces**. The project is work in progress; the details are in seven documents
+under [`docs/`](docs/), listed under [What is formalised](#what-is-formalised).
 
 * **Blueprint** (a webpage explaining the mathematics):
   <https://mario-ullrich.github.io/Lean-FunctionSpaces/>
@@ -21,11 +14,32 @@ listed under [What is formalised](#what-is-formalised).
 
 ## The setting
 
-Let `X` be a real normed space. An **approximation scheme** is a sequence of subsets
-`A₀ ⊆ A₁ ⊆ A₂ ⊆ ⋯` of `X` with `A₀ = {0}`, `c · a ∈ A_n` for real `c` and `a ∈ A_n`, and
-`A_m + A_n ⊆ A_{m+n}`. The sets need not be subspaces: for `n`-term approximation from a
-dictionary `D`, `A_n` is the set of linear combinations of at most `n` elements of `D`.
-The **error of best approximation** of `f ∈ X` is `E_n(f) = inf { ‖f - a‖ : a ∈ A_n }`.
+**Besov and Sobolev spaces.** Let `1 ≤ p < ∞`, `s > 0`, `1 ≤ q ≤ ∞` and `r > s` an integer. The
+classical Besov space `B^s_{p,q}(ℝ^d)` consists of the `f ∈ L_p(ℝ^d)` with
+
+```
+‖f‖_p + ‖ (2^(ks) ω_r(f, 2^(-k))_p)_{k ≥ 0} ‖_{ℓ_q}  <  ∞ ,
+ω_r(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_p .
+```
+
+Sobolev spaces appear as `W^m_2` through weak derivatives and as `H^s` through Fourier
+coefficients on the torus, and abstractly as every space with Jackson's and Bernstein's
+inequalities of order `s`, the form in which their embeddings are proved.
+
+**Characterisations and domains.** Each setting has its natural descriptions of these spaces:
+Fourier coefficients and Littlewood–Paley blocks on the torus and on `ℝ^d`, splines and Haar or
+multiwavelet coefficients on intervals and the cube, local means and atoms on `ℝ^d`, intrinsic
+differences and extensions on Lipschitz domains, chart pieces on manifolds, traces on
+boundaries, and mixed differences for dominating mixed smoothness. The project proves them
+equivalent; the last chapter of the blueprint, *The representations of Besov spaces*, lists
+them with their settings and ranges of parameters and explains how they differ.
+
+**Approximation spaces.** Let `X` be a real normed space. An **approximation scheme** is a
+sequence of subsets `A₀ ⊆ A₁ ⊆ A₂ ⊆ ⋯` of `X` with `A₀ = {0}`, `c · a ∈ A_n` for real `c` and
+`a ∈ A_n`, and `A_m + A_n ⊆ A_{m+n}`. The sets need not be subspaces: for `n`-term
+approximation from a dictionary `D`, `A_n` is the set of linear combinations of at most `n`
+elements of `D`. The **error of best approximation** of `f ∈ X` is
+`E_n(f) = inf { ‖f - a‖ : a ∈ A_n }`.
 
 For `s > 0` and `1 ≤ q ≤ ∞`, the **approximation space** `A^s_q` consists of those `f` with
 
@@ -36,16 +50,17 @@ For `s > 0` and `1 ≤ q ≤ ∞`, the **approximation space** `A^s_q` consists 
 For a finite measure space `(Ω, μ)` and a scheme `S` of bounded continuous functions on `Ω`,
 the **Besov space** is `B^s_{p,q}(Ω, S) = A^s_q(L_p(μ), S)`: the functions whose best
 approximation from `S` in `L_p` decays at rate `s`. On the torus `𝕋^d` with `S_n` the
-trigonometric polynomials of degree `< n`, these are the classical periodic Besov spaces.
+trigonometric polynomials of degree `< n`, these are the classical periodic Besov spaces. On each
+concrete domain the block documents show that this definition, for the natural scheme, agrees
+with the classical one. It uses only approximation by explicit classes (trigonometric
+polynomials, splines, band-limited functions, step functions), so it measures directly what
+numerical methods can achieve, and the embeddings follow from the abstract theory together with
+a Nikolskii inequality.
 
 ## Main results
 
-The last chapter of the blueprint, *The representations of Besov spaces*, collects the
-descriptions proved equivalent here (approximation, differences, Littlewood–Paley blocks, local
-means, atoms, coefficients, blocks, interpolation, intrinsic and restriction norms on domains,
-traces, dominating mixed smoothness) with their settings, ranges of parameters and theorems, and
-explains how they differ. The list below gives some results of each block; the block documents
-list all of them.
+The list below gives some results of each block; the block documents list all of them, and the
+blueprint chapter *The representations of Besov spaces* collects the characterisations.
 
 **Approximation spaces** ([details](docs/ApproximationSpaces.md))
 
@@ -180,21 +195,21 @@ list all of them.
 
 ## What is formalised
 
-| Block | Lean | Human-checked | Details |
-|---|---|---|---|
-| **Approximation spaces**: schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ | [docs/ApproximationSpaces.md](docs/ApproximationSpaces.md) |
-| **Besov and Sobolev spaces on measure spaces**: schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, spectral schemes, eigenbases | ✅ | ✗ | [docs/BesovSobolev.md](docs/BesovSobolev.md) |
-| **The torus**: trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness for all `p`, weak derivatives, traces | ✅ | ✗ | [docs/Torus.md](docs/Torus.md) |
-| **Intervals, the cube, splines and wavelets**: piecewise polynomials and splines on `[0, 1]`, the circle and `[0, 1]^d`, Whitney's inequality, coordinate and isotropic moduli, multiwavelets, the Haar system | ✅ | ✗ | [docs/IntervalCube.md](docs/IntervalCube.md) |
-| **Function spaces on `ℝ^d`**: convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ | [docs/Rd.md](docs/Rd.md) |
-| **Domains, manifolds and traces**: Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ | [docs/DomainsTraces.md](docs/DomainsTraces.md) |
-| **Dominating mixed smoothness**: mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ | [docs/MixedSmoothness.md](docs/MixedSmoothness.md) |
+| Block | Lean | Checked |
+|---|---|---|
+| [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
+| [**Besov and Sobolev spaces on measure spaces**](docs/BesovSobolev.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, spectral schemes, eigenbases | ✅ | ✗ |
+| [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness for all `p`, weak derivatives, traces | ✅ | ✗ |
+| [**Intervals, the cube, splines and wavelets**](docs/IntervalCube.md): piecewise polynomials and splines on `[0, 1]`, the circle and `[0, 1]^d`, Whitney's inequality, coordinate and isotropic moduli, multiwavelets, the Haar system | ✅ | ✗ |
+| [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
+| [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
+| [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 
 Lean: ✅ every file proved without `sorry` · 🟡 some statement still `sorry` · ⬜ planned.
-Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics
-reviewed · 📝 documentation reviewed · ✗ not yet reviewed. A block shows the weakest mark of its
-files; the block documents hold the tables per file, and a change to a file resets its row there
-and the block here to ✗.
+Checked (human-checked): ✅ mathematics and documentation both reviewed by the author ·
+🧮 mathematics reviewed · 📝 documentation reviewed · ✗ not yet reviewed. A block shows the
+weakest mark of its files; the block documents hold the tables per file, and a change to a file
+resets its row there and the block here to ✗.
 
 ## Organisation
 
