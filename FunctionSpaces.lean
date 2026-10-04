@@ -100,6 +100,8 @@ public import FunctionSpaces.Rd.AtomAnalysis
 public import FunctionSpaces.Rd.ConvexDifferences
 public import FunctionSpaces.Rd.SmoothAtoms
 public import FunctionSpaces.Rd.AtomComposition
+public import FunctionSpaces.Rd.DiffeoInvariance
+public import FunctionSpaces.Rd.HalfSpace
 public import FunctionSpaces.Rd.GraphParametrization
 public import FunctionSpaces.Rd.GraphTrace
 public import FunctionSpaces.Rd.MollifiedGraph
@@ -318,6 +320,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   convex set as regular atoms, and the atomic decomposition into smooth atoms of every order.
 * `FunctionSpaces.Rd.AtomComposition`: smooth changes of variables with a cut-off on a convex set,
   and smooth atoms under them.
+* `FunctionSpaces.Rd.DiffeoInvariance`: the change of variables on `L_p`, the transport of smooth
+  atoms, the invariance of the Besov spaces, and Besov domains.
+* `FunctionSpaces.Rd.HalfSpace`: null sets and moduli on sets, the closed half-space and the models
+  of manifolds as Besov domains.
 * `FunctionSpaces.Rd.GraphParametrization`: the hyperplane and the graph map of a Lipschitz graph
   domain, and the restrictions of atoms to the graph.
 * `FunctionSpaces.Rd.GraphTrace`: the trace on the boundary of a Lipschitz graph domain, its

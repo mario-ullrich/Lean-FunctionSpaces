@@ -5915,7 +5915,7 @@ $\|\Delta_h^r a\|_p \leq (2^j \|h\|)^r \|D^r \Theta\|_1 \|a\|_p$, and $2^j \|h\|
 \begin{theorem}[Approximation, Littlewood--Paley blocks and differences]
 \label{thm:rd-besov}
 \lean{Rd.bandModulusData, Rd.memApprox_bandScheme_iff_modulus,
-  Rd.littlewoodPaleyNorm_lt_top_iff_modulus}
+  Rd.littlewoodPaleyNorm_lt_top_iff_modulus, Rd.modNorm_le_modNorm_of_lt}
 \leanok
 \uses{thm:band-jackson, thm:band-inverse, lem:rd-modulus, def:modulus-data,
   thm:modulus-coincidence, thm:lp-band}
@@ -5925,6 +5925,9 @@ Let $1 \leq p < \infty$, $r \geq 1$, $1 \leq q \leq \infty$ and $f \in L_p$.
     scheme if and only if $\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
   \item For $0 < s < r$, $\|f\|^{\mathrm{LP}}_{s,q} < \infty$ if and only if
     $\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+  \item For $0 \leq s < r'$ and every order $r$ there is $C < \infty$ with
+    $\|f\|_p + \|(2^{ks} \omega_{r'}(f, 2^{-k})_p)_k\|_{\ell_q} \leq
+    C (\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_q})$.
 \end{enumerate}
 \end{theorem}
 
@@ -5932,7 +5935,8 @@ Let $1 \leq p < \infty$, $r \geq 1$, $1 \leq q \leq \infty$ and $f \in L_p$.
 \leanok
 \Cref{thm:band-jackson} and \Cref{thm:band-inverse} make the modulus compatible with the
 band-limited scheme, with inverse order $r$; apply \Cref{thm:modulus-coincidence}. Part (2)
-combines (1) with \Cref{thm:lp-band}.
+combines (1) with \Cref{thm:lp-band}. Part (3) combines the inverse direction of
+\Cref{thm:modulus-coincidence} for the order $r'$ with Jackson's direction for the order $r$.
 \end{proof}
 
 For $0 < s < r$ the Besov space $\Besov{s}{p}{q}(V)$ thus has three equivalent descriptions: by
@@ -7310,6 +7314,160 @@ $\|D^l (T a)(x)\| \leq l!\, 2^l M A D^l 2^{jl}$ on $\Psi(K_0)$, with the bounds 
 $D \geq 1$ of $\Phi$ from \Cref{lem:cutoff-diffeo-bounds}. Outside the compact $\Psi(K_0)$ the
 function $T a$ vanishes near every point of $\Omega$, so its derivatives within $\Omega$ vanish.
 Hence $A' = K!\, 2^K M D^K$.
+\end{proof}
+
+\section{Invariance under changes of variables}
+
+A smooth change of variables with a cut-off maps the Besov spaces of $V$ into the intrinsic Besov
+spaces of a convex set, and, on sets with a bounded extension, the intrinsic spaces into
+themselves. The proof transports smooth atoms (\Cref{thm:smooth-atoms-change-of-variables}).
+
+\begin{lemma}[The change of variables on $L_p$]
+\label{lem:cutoff-diffeo-lp}
+\lean{Rd.CutoffDiffeo.apply_add, Rd.CutoffDiffeo.apply_smul, Rd.CutoffDiffeo.apply_tsum,
+  Rd.CutoffDiffeo.apply_ae_eq, Rd.CutoffDiffeo.aestronglyMeasurable_apply,
+  Rd.CutoffDiffeo.lintegral_apply_eq, Rd.CutoffDiffeo.exists_det_bound,
+  Rd.CutoffDiffeo.eLpNorm_apply_le, Rd.CutoffDiffeo.memLp_apply, Rd.CutoffDiffeo.applyLp,
+  Rd.CutoffDiffeo.applyLp_ae}
+\leanok
+\uses{def:cutoff-diffeo}
+Let $\Omega$ be measurable and convex with nonempty interior, and $T$ a smooth change of variables
+with a cut-off on $\Omega$. Then $T$ is linear, $T g_1 = T g_2$ almost everywhere if $g_1 = g_2$
+almost everywhere on $\Omega$, and for $e > 0$
+\[
+  \int |T g|^e = \int_{K_0} |\det D\Psi(y)|\, |\chi(y)|^e |g(y)|^e \, dy .
+\]
+Hence $T$ is a bounded linear operator on $L_p$, $1 \leq p < \infty$. If for every $m$ either
+$\lambda'_m = \lambda_m$ or $T a_m = 0$, then $T(\sum_m \lambda_m a_m) = \sum_m \lambda'_m T a_m$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $T g_1(x) \neq T g_2(x)$, then $x = \Psi(y)$ with $y \in K_0$ and $g_1(y) \neq g_2(y)$; the
+differentiable map $\Psi$ maps the null set of these $y$ to a null set (Mathlib's
+\texttt{addHaar\_image\_eq\_zero\_of\_differentiableOn\_of\_addHaar\_eq\_zero}). $T g$ vanishes
+outside $\Psi(K_0)$, and the change of variables $x = \Psi(y)$ on the compact $K_0$ (Mathlib's
+\texttt{lintegral\_image\_eq\_lintegral\_abs\_det\_fderiv\_mul}) gives the integral; the Jacobian
+and $\chi$ are bounded on $K_0$.
+\end{proof}
+
+\begin{lemma}[Transport of smooth atoms]
+\label{lem:transported-atoms}
+\lean{Rd.CutoffDiffeo.exists_transported_atoms}
+\leanok
+\uses{thm:smooth-atoms-change-of-variables, lem:smooth-atoms-regular, lem:transported-centres}
+Let $\Omega$ be measurable and convex with nonempty interior, $r \geq 1$, and $d, A \geq 0$. There
+are $d'$, $C' < \infty$ and $N$ such that for smooth atoms $a_{j,m}$ on $V$ of order $r$, radius
+factor $d$ and constant $A$ centred at the cell centres $c_{j,m}$, and all coefficients
+$\lambda_{j,m}$, the functions $T a_{j,m}$ are regular atoms on $\Omega$ of order and exponent
+$r$ with radius factor $d'$ and constant $C'$, with coefficients $\lambda'_{j,m}$ such that
+$|\lambda'_{j,m}| \leq |\lambda_{j,m}|$, $\lambda'_{j,m} = \lambda_{j,m}$ unless $T a_{j,m} = 0$,
+and at most $N$ centres with $\lambda'_{j,m} \neq 0$ lie in a ball of radius $(d' + r) 2^{-j}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If a point $y \in K_0$ lies within $d 2^{-j}$ of $c_{j,m}$, the new centre is $\Psi(y)$ and
+$\lambda'_{j,m} = \lambda_{j,m}$ (\Cref{thm:smooth-atoms-change-of-variables},
+\Cref{lem:smooth-atoms-regular}); otherwise $T a_{j,m} = 0$ and $\lambda'_{j,m} = 0$. Since
+$\Phi(\Psi(y)) = y$ and $\Phi$ is Lipschitz on $\Psi(K_0)$, \Cref{lem:transported-centres} counts
+the centres.
+\end{proof}
+
+\begin{theorem}[Invariance under changes of variables]
+\label{thm:diffeo-invariance}
+\lean{Rd.CutoffDiffeo.modNormOn_applyLp_le}
+\leanok
+\uses{lem:cutoff-diffeo-lp, lem:transported-atoms, thm:smooth-atomic-decomposition,
+  thm:rd-atomic-synthesis, thm:local-means}
+Let $\Omega$ be measurable and convex with nonempty interior, $T$ a smooth change of variables
+with a cut-off on $\Omega$, $1 \leq p < \infty$, $0 < s < r$ and $1 \leq q \leq \infty$. There is
+$C < \infty$ such that for all $F \in L_p(V)$
+\[
+  \|T F\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(T F, 2^{-k}, \Omega)_p)_k\|_{\ell_q} \leq
+  C \bigl(\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q}\bigr) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Decompose $F$ into smooth cell atoms of order $r$ (\Cref{thm:smooth-atomic-decomposition}) for the
+standard bump. $T$ is continuous on $L_p$, so $T F = \sum_j T f_j$ in $L_p$, and
+$T f_j = \sum_m \lambda'_{j,m} T a_{j,m}$ almost everywhere by \Cref{lem:cutoff-diffeo-lp}. The
+transported atoms (\Cref{lem:transported-atoms}) are regular atoms on $\Omega$ of exponent
+$r > s$, and the synthesis on $\Omega$ (\Cref{thm:rd-atomic-synthesis}) bounds the left side by
+$K \|\lambda'\|_{b^s_{p,q}} \leq K \|\lambda\|_{b^s_{p,q}}$, which is the local means quasi-norm of
+$F$, bounded by the right side (\Cref{thm:local-means}).
+\end{proof}
+
+\begin{definition}[Besov domains]
+\label{def:besov-domain}
+\lean{Rd.BesovDomain, Rd.modNormOn_univ, Rd.BesovDomain.univ, Rd.BesovDomain.measurableSet}
+\leanok
+\uses{def:rd-modulus-on}
+A Besov domain is a closed convex set $\Omega \subseteq V$ with nonempty interior such that for
+$1 \leq p < \infty$, $0 < s < r$ and $1 \leq q \leq \infty$ there is $C < \infty$: every
+$f \in L_p(V)$ with
+$N_\Omega(f) = \|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$
+agrees on $\Omega$ with some $F \in L_p(V)$ with
+$\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq C N_\Omega(f)$. The space $V$ is a
+Besov domain, with $F = f$.
+\end{definition}
+
+\begin{theorem}[Invariance on Besov domains]
+\label{thm:besov-domain-invariance}
+\lean{Rd.CutoffDiffeo.applyLp_eq_of_indicatorLp_eq, Rd.CutoffDiffeo.modNormOn_applyLp_le_modNormOn,
+  Rd.BesovDomain.modNormOn_order_le}
+\leanok
+\uses{def:besov-domain, thm:diffeo-invariance, thm:rd-besov}
+Let $\Omega$ be a Besov domain, $T$ a smooth change of variables with a cut-off on $\Omega$,
+$1 \leq p < \infty$, $0 < s < r$ and $1 \leq q \leq \infty$. There is $C < \infty$ with
+$N_\Omega(T f) \leq C N_\Omega(f)$ for all $f$ with $N_\Omega(f) < \infty$. For $s < r'$ there is
+$C < \infty$ with $N_\Omega(f; r') \leq C N_\Omega(f; r)$, where $N_\Omega(f; r)$ uses the
+differences of order $r$; so the order is a free parameter.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$T f$ depends only on $f$ almost everywhere on $\Omega$ (\Cref{lem:cutoff-diffeo-lp}). Extend $f$
+to $F$ with $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq C N_\Omega(f)$; then
+$T f = T F$, and \Cref{thm:diffeo-invariance} applies. For the order, change it on $V$
+(\Cref{thm:rd-besov}) and restrict, $N_\Omega(f; r') \leq
+\|F\|_p + \|(2^{ks} \omega_{r'}(F, 2^{-k})_p)_k\|_{\ell_q}$ (\Cref{lem:rd-modulus-on}).
+\end{proof}
+
+\begin{lemma}[Null sets do not matter]
+\label{lem:null-set-domains}
+\lean{Rd.stepSet_ae_eq, Rd.modulusOn_congr_set, Rd.lpModulusOn_congr_set, Rd.indicatorLp_congr_set}
+\leanok
+\uses{def:rd-modulus-on}
+If $U$ and $U'$ agree up to a null set, so do their step sets $U_{rh}$ and $U'_{rh}$, and
+$\omega_r(f, t, U)_p = \omega_r(f, t, U')_p$ and $1_U f = 1_{U'} f$ in $L_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The step sets are intersections of translates, and translations preserve the Lebesgue measure.
+\end{proof}
+
+\begin{theorem}[The half-space is a Besov domain]
+\label{thm:half-space-besov-domain}
+\lean{Rd.closedHalfSpace, Rd.isClosed_closedHalfSpace, Rd.convex_closedHalfSpace,
+  Rd.mem_interior_closedHalfSpace, Rd.LipschitzGraph.flat, Rd.LipschitzGraph.flat_domain,
+  Rd.closedHalfSpace_ae_eq, Rd.BesovDomain.closedHalfSpace,
+  Rd.BesovDomain.range_euclideanHalfSpace, Rd.BesovDomain.range_of_boundaryless}
+\leanok
+\uses{def:besov-domain, lem:null-set-domains, thm:graph-besov}
+For a unit vector $e$ the closed half-space $\{x : \langle x, e \rangle \geq 0\}$ is a Besov
+domain. Hence the models of manifolds are Besov domains: the range $\{y : y_0 \geq 0\}$ of the
+model with corners of the Euclidean half-space, and the range $V$ of a model without boundary.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The closed half-space differs from the Lipschitz graph domain $\{x : \langle x, e \rangle > 0\}$
+with graph function $0$ by the null set $e^\perp$ (\Cref{lem:null-set-domains}), and Rychkov's
+extension is bounded on the latter (\Cref{thm:graph-besov}).
 \end{proof}
 
 \section{Traces on Lipschitz graph domains}

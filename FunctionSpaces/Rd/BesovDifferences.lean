@@ -78,6 +78,23 @@ theorem littlewoodPaleyNorm_lt_top_iff_modulus (hp : p ≠ ∞) {r : ℕ} {s : �
       ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) < ∞ := by
   rw [← memApprox_bandScheme_iff hp hs hq, memApprox_bandScheme_iff_modulus hp hs.le hsr hq f]
 
+/-- **The order of the differences does not matter**: for `0 ≤ s < r'` and every order `r`,
+`‖F‖_p + ‖(2^(ks) ω_{r'}(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C (‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q})`,
+through the band-limited approximation norm: the inverse direction of
+`Rd.bandModulusData hp r'` and Jackson's direction of `Rd.bandModulusData hp r`. -/
+theorem modNorm_le_modNorm_of_lt (hp : p ≠ ∞) (r : ℕ) {r' : ℕ} {s : ℝ} (hs : 0 ≤ s)
+    (hsr' : s < r') {q : ℝ≥0∞} (hq : 1 ≤ q) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ F : Lp ℂ p (volume : Measure V),
+      ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r' F k) ≤
+        C * (‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k)) := by
+  set M' := bandModulusData (V := V) hp r'
+  set M := bandModulusData (V := V) hp r
+  refine ⟨M'.inverseConst s * M.directConst s,
+    ENNReal.mul_ne_top (M'.inverseConst_ne_top hsr') (M.directConst_ne_top s), fun F => ?_⟩
+  rw [mul_assoc]
+  exact (M'.modNorm_le_approxNormDyadic hq hs hsr' F).trans
+    (mul_le_mul' le_rfl (M.approxNormDyadic_le_modNorm hq F))
+
 /-- The norm with moduli of order `L ≥ 2` is at most `2^(L-2)` times that with order `2`. -/
 theorem modNorm_order_le {L : ℕ} (hL : 2 ≤ L) (σ : ℝ) (q : ℝ≥0∞)
     (G : Lp ℂ p (volume : Measure V)) :

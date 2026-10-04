@@ -406,6 +406,18 @@ explains how they differ.
   their form under a smooth change of variables `T f = 1_{Ω ∩ U} (χ f) ∘ Φ` with a cut-off `χ`
   that vanishes outside a compact set: `T a` is a smooth atom on `Ω` of the same order, with
   uniform constants (`Rd.CutoffDiffeo.isSmoothAtom_apply`).
+* **Invariance under changes of variables.** Let `Ω` be a measurable convex set with nonempty
+  interior, `T` as above, `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`. There is `C < ∞` such that
+  for all `F ∈ L_p(V)`,
+  `‖T F‖_{L_p(Ω)} + ‖(2^(ks) ω_r(T F, 2^(-k), Ω)_p)_k‖_{ℓ_q} ≤
+  C (‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q})` (`Rd.CutoffDiffeo.modNormOn_applyLp_le`). On a
+  Besov domain, a closed convex set with nonempty interior whose functions of finite intrinsic
+  quasi-norm `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}` extend to `V` with
+  a bound (`Rd.BesovDomain`), `N_Ω(T f) ≤ C N_Ω(f)`
+  (`Rd.CutoffDiffeo.modNormOn_applyLp_le_modNormOn`), and the order `r > s` of the differences
+  does not matter (`Rd.BesovDomain.modNormOn_order_le`). The closed half-space is a Besov domain
+  (`Rd.BesovDomain.closedHalfSpace`), and so are the models of manifolds with and without
+  boundary (`Rd.BesovDomain.range_euclideanHalfSpace`, `Rd.BesovDomain.range_of_boundaryless`).
 * **Traces on Lipschitz graph domains.** Let `Ω` be a Lipschitz graph domain as above, with
   Lipschitz constant `M`, and `H = e^⊥`. The boundary of `Ω` is the image of the graph map
   `γ(x') = x' + φ(x') e`, `x' ∈ H` (`Rd.LipschitzGraph.graphMap`). For `f ∈ L_p(V)` the trace
@@ -554,6 +566,8 @@ explains how they differ.
 | Differences within convex sets through derivatives within the set | ✅ proved | ✗ | `FunctionSpaces/Rd/ConvexDifferences.lean` |
 | Smooth atoms on convex sets, smooth cell atoms of every order | ✅ proved | ✗ | `FunctionSpaces/Rd/SmoothAtoms.lean` |
 | Smooth atoms under smooth changes of variables with a cut-off | ✅ proved | ✗ | `FunctionSpaces/Rd/AtomComposition.lean` |
+| Invariance of Besov spaces under changes of variables, Besov domains | ✅ proved | ✗ | `FunctionSpaces/Rd/DiffeoInvariance.lean` |
+| The half-space and the models of manifolds as Besov domains | ✅ proved | ✗ | `FunctionSpaces/Rd/HalfSpace.lean` |
 | Graph map of a Lipschitz graph domain, restrictions of atoms to the graph | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphParametrization.lean` |
 | Traces on Lipschitz graph domains: boundedness, linearity, trace of continuous functions | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTrace.lean` |
 | Mollified graph and vertical cut-off with bounds of their differences | ✅ proved | ✗ | `FunctionSpaces/Rd/MollifiedGraph.lean` |
@@ -587,8 +601,8 @@ theorems, spectral schemes in Hilbert spaces and eigenbases of continuous functi
 with its traces,
 `ℝ^d` with convolution, approximate identities, Littlewood–Paley decompositions, moduli of
 smoothness and local means, Lipschitz graph domains and bounded Lipschitz domains with Rychkov's
-extension and pointwise multipliers, atomic decompositions with regular and smooth atoms, traces on
-Lipschitz graph domains and
+extension and pointwise multipliers, atomic decompositions with regular and smooth atoms, the
+invariance of Besov spaces under smooth changes of variables, traces on Lipschitz graph domains and
 on the boundaries of bounded Lipschitz domains, dominating mixed smoothness with hyperbolic cross
 approximation, filtration schemes for wavelets and multiwavelets, the classical definitions
 through moduli of smoothness and weak derivatives, and polynomial and piecewise polynomial
