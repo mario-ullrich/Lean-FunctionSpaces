@@ -95,7 +95,13 @@ explains how they differ.
   `‖f‖_2 + ‖(2^(js) ω(f, 2^(-j))_2)_j‖_{ℓ_q} < ∞`, with equivalent norms
   (`Torus.memBesov_iff_modulusNorm_lt_top`, `Torus.approxNormDyadic_le_modulusNorm`,
   `Torus.modulusNorm_le_approxNormDyadic`): the modulus is compatible with the trigonometric
-  scheme with inverse order `1` (`Torus.trigModulusData`).
+  scheme with inverse order `1` (`Torus.trigModulusData`). For every `1 ≤ p < ∞`, `0 < s < r`
+  and `1 ≤ q ≤ ∞`, `f ∈ B^s_{p,q}(𝕋^d)` iff `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
+  for the modulus `ω_r` of order `r` (`Torus.memBesov_iff_modNorm_lt_top_lp`). The kernels of
+  `ℝ^d` act on `𝕋^d` by `(Φ ⋆ f)(t) = ∫ Φ(y) f(t - π y) dy` (`Torus.econvLp`), with their Fourier
+  transforms at the lattice points as multipliers (`Torus.econv_mFourier`); this transfers
+  Jackson's inequality (`Torus.approxSeq_trigScheme_le`) and Bernstein's inequality
+  (`Torus.lpModulus_le_of_mem_trigPolyLp`) from band-limited approximation on `ℝ^d`.
 * **Traces on the torus.** For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `s > 0`, the restriction
   `f ↦ f(0, ·)` to the face `{x_0 = 0}` of `𝕋^(n+1)` extends from trigonometric polynomials to
   a map from `B^{s+1/p}_{p,q}(𝕋^(n+1))` into `B^s_{p,q}(𝕋^n)`, and every element of
@@ -599,6 +605,9 @@ explains how they differ.
 | Haar system on `[0, 1)`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ proved | ✗ | `FunctionSpaces/Wavelets/{Partition,Examples/Haar}.lean` |
 | Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ proved | ✗ | `FunctionSpaces/Wavelets/Examples/HaarBesov.lean` |
 | Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ proved | ✗ | `FunctionSpaces/Torus/{Translation,Modulus,BesovModuli}.lean` |
+| Convolution on the torus with kernels on `ℝ^d`: Young's inequality, Fourier multipliers, differences | ✅ proved | ✗ | `FunctionSpaces/Torus/EuclideanConvolution.lean` |
+| Jackson's and Bernstein's inequalities in `L_p(𝕋^d)`, moduli of every order | ✅ proved | ✗ | `FunctionSpaces/Torus/LpJackson.lean` |
+| Besov spaces on the torus by moduli of smoothness for all `1 ≤ p < ∞` | ✅ proved | ✗ | `FunctionSpaces/Torus/LpBesovModuli.lean` |
 | Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ proved | ✗ | `FunctionSpaces/Traces/Examples/Torus.lean` |
 | Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Torus/WeakDerivatives.lean` |
 | Young's inequality on measurable groups, weighted Jensen inequality, weighted averages in `L_p` | ✅ proved | ✗ | `FunctionSpaces/Lp/Young.lean` |
@@ -649,7 +658,6 @@ explains how they differ.
 | Mixed local means and mixed differences | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedLocalMeans.lean` |
 | Tensor Littlewood–Paley blocks, Vybíral's quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedLittlewoodPaley.lean` |
 | Hyperbolic cross approximation | ✅ proved | ✗ | `FunctionSpaces/Rd/HyperbolicCross.lean` |
-| Classical definitions for `p ≠ 2`, higher differences | ⬜ planned | ✗ | `FunctionSpaces/Torus/…` |
 
 Lean: ✅ proved (no `sorry`) · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author ·
@@ -685,8 +693,8 @@ approximation on intervals and on the cube `[0, 1]^d`.
 * **Reiteration** for approximation and interpolation spaces.
 * **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,
   elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.
-* **Classical definitions for all `p`**: Sobolev spaces by weak derivatives and Besov spaces
-  by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
+* **Sobolev spaces for all `p`**: weak derivatives in `L_p` and the coincidence theorems of
+  Triebel's school.
 * **Higher smoothness**: splines on domains, and compactly supported wavelets such as
   Daubechies'.
 * **The quasi-Banach range** `0 < p, q < 1`, the setting of nonlinear `n`-term approximation.

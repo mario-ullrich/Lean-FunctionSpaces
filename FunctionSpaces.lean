@@ -37,6 +37,9 @@ public import FunctionSpaces.Wavelets.Examples.Alpert
 public import FunctionSpaces.Torus.Translation
 public import FunctionSpaces.Torus.Modulus
 public import FunctionSpaces.Torus.BesovModuli
+public import FunctionSpaces.Torus.EuclideanConvolution
+public import FunctionSpaces.Torus.LpJackson
+public import FunctionSpaces.Torus.LpBesovModuli
 public import FunctionSpaces.Torus.WeakDerivatives
 public import FunctionSpaces.Traces.Examples.Torus
 public import FunctionSpaces.Interval.Differences
@@ -193,10 +196,16 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `B^s_{p,q}` for `0 < s < 1/p`, by multiwavelet coefficients.
 * `FunctionSpaces.Torus.Translation`: translations on `L_2(𝕋^d)` and their Fourier
   multipliers.
-* `FunctionSpaces.Torus.Modulus`: the modulus of smoothness `ω(f, t)_2` and Jackson's
-  theorem `E_n(f)_2 ≤ √d ω(f, 1/n)_2`.
+* `FunctionSpaces.Torus.Modulus`: the modulus of smoothness `ω(f, t)_2`, the growth of the
+  moduli of order `r` in `L_p`, and Jackson's theorem `E_n(f)_2 ≤ √d ω(f, 1/n)_2`.
 * `FunctionSpaces.Torus.BesovModuli`: the classical Besov norm through the modulus and
   the coincidence theorem with `B^s_{2,q}(𝕋^d)` for `0 < s < 1`.
+* `FunctionSpaces.Torus.EuclideanConvolution`: the quotient map `ℝ^d → 𝕋^d`, convolution on the
+  torus with kernels on `ℝ^d`, Young's inequality, Fourier multipliers and differences.
+* `FunctionSpaces.Torus.LpJackson`: Jackson's and Bernstein's inequalities for trigonometric
+  polynomials in `L_p(𝕋^d)`, `1 ≤ p < ∞`, with moduli of every order.
+* `FunctionSpaces.Torus.LpBesovModuli`: the Besov spaces `B^s_{p,q}(𝕋^d)` through moduli of
+  smoothness for all `1 ≤ p < ∞`.
 * `FunctionSpaces.Torus.WeakDerivatives`: weak derivatives on the torus through Fourier
   coefficients and `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)`.
 * `FunctionSpaces.Traces.Examples.Torus`: the trace on the face `{x_0 = 0}` of `𝕋^(n+1)`,

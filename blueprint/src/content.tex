@@ -2482,7 +2482,8 @@ discontinuous. The comparison with moduli of smoothness is \Cref{cor:haar-besov}
 
 The Besov and Sobolev spaces of the previous chapters are defined through approximation. The
 classical definitions use moduli of smoothness and derivatives~\cite{Triebel, DeVoreLorentz}.
-This chapter shows that they coincide on $L_2(\T^d)$, with the notation of \Cref{ch:torus}.
+This chapter shows that they coincide on $L_2(\T^d)$, and for moduli of smoothness on every
+$L_p(\T^d)$, $1 \leq p < \infty$, with the notation of \Cref{ch:torus}.
 
 \section{Moduli of smoothness}
 
@@ -2532,18 +2533,28 @@ $\|\tau_h f - f\|_2 = \|\Delta_h f\|_2$, this is the modulus of order $1$ in $L_
 \label{lem:modulus-linear}
 \lean{Torus.enorm_translate, Torus.translate_zero, Torus.translate_add,
   Torus.enorm_translate_nsmul_sub_le, Torus.exists_coe_eq_abs_eq_norm,
-  Torus.modulus_natCast_mul_le, Torus.norm_exp_I_mul_sub_one_sq, Torus.fourier_coe_eq_exp,
-  Torus.norm_fourier_sub_one_sq}
+  Torus.modulus_nat_mul_le, Torus.modulus_mul_le, Torus.norm_exp_I_mul_sub_one_sq,
+  Torus.fourier_coe_eq_exp, Torus.norm_fourier_sub_one_sq}
 \leanok
-\uses{def:modulus}
-For $f \in L_2(\T^d)$, $n \geq 1$ and $t \geq 0$, $\omega(f, n t)_2 \leq n \, \omega(f, t)_2$.
+\uses{def:modulus, lem:rd-modulus}
+For $f \in L_2(\T^d)$, $h \in \T^d$ and $n \in \N$,
+$\|\tau_{n h} f - f\|_2 \leq n \|\tau_h f - f\|_2$. Let $\omega_r(f, t)_p$ be the modulus of
+order $r$ of \Cref{def:rd-modulus} for the Haar measure on $\T^d$. For measurable $f$,
+$1 \leq p$, $r \in \N$, $m \geq 1$ and $c, t \geq 0$,
+\[
+  \omega_r(f, m t)_p \leq m^r \omega_r(f, t)_p , \qquad
+  \omega_r(f, c t)_p \leq (1 + c)^r \omega_r(f, t)_p ;
+\]
+in particular $\omega(f, n t)_2 \leq n \, \omega(f, t)_2$ for $n \geq 1$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-Every $h$ with $\|h\| \leq n t$ is $n h'$ with $\|h'\| \leq t$, and
-$\tau_{n h'} f - f = \sum_{i < n} \tau_{i h'} (\tau_{h'} f - f)$, where translations are
-isometries.
+$\tau_{n h} f - f = \sum_{i < n} \tau_{i h} (\tau_h f - f)$, where translations are isometries.
+Every $h$ with $\|h\| \leq m t$ is $m h'$ with $\|h'\| \leq t$: divide representatives $x_j$ of
+$h_j$ with $|x_j| = \|h_j\|$ by $m$. Then $\|\Delta^r_{m h'} f\|_p \leq m^r
+\|\Delta^r_{h'} f\|_p$ (\Cref{lem:rd-modulus}); for real $c$ take
+$m = \max(1, \lceil c \rceil) \leq 1 + c$.
 \end{proof}
 
 The classical Jackson theorem bounds the error of trigonometric approximation by the modulus
@@ -2672,8 +2683,201 @@ On the block $K$, $|e_k(h) - 1| \leq \min(2, 2\pi \, \#d \deg k \, \|h\|)$ by
 give the bounds.
 \end{proof}
 
-For $s \geq 1$ the first-order modulus no longer describes $\Besov{s}{2}{q}$; higher-order
-differences are needed, and they are not formalised.
+For $s \geq 1$ the first-order modulus no longer describes $\Besov{s}{2}{q}$; the moduli of
+higher order describe $\Besov{s}{p}{q}$ for every $s > 0$ and $1 \leq p < \infty$
+(\Cref{sec:torus-lp-moduli}).
+
+\section{Convolution with kernels on $\R^d$}
+
+Let $\pi : \R^d \to \T^d$, $\pi(x) = (x_j \bmod 1)_j$, be the quotient map, and view
+$m \in \Z^d$ as a point of $\R^d$.
+
+\begin{lemma}[The quotient map]
+\label{lem:torus-proj}
+\lean{Torus.proj, Torus.proj_apply, Torus.continuous_proj, Torus.measurable_proj,
+  Torus.norm_proj_le, Torus.norm_le_card_mul, Torus.exists_proj_eq, Torus.latticeVec,
+  Torus.latticeVec_apply, Torus.deg_le_norm_latticeVec, Torus.norm_latticeVec_le,
+  Torus.mFourier_neg_proj, Torus.integral_mul_mFourier_neg_proj}
+\leanok
+\uses{def:trig-poly}
+The quotient map is an additive homomorphism with $\|\pi x\| \leq |x|$, and every $h \in \T^d$ is
+$\pi x$ with $|x| \leq \#d \, \|h\|$. For $m \in \Z^d$, $\deg m \leq |m| \leq \#d \deg m$ and
+$e_m(-\pi y) = e^{-2\pi i \langle y, m \rangle}$, so
+$\int_{\R^d} \Phi(y) e_m(-\pi y) \, dy = \mathcal{F}\Phi(m)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Choose representatives $x_j$ of $h_j$ with $|x_j| = \|h_j\|$; then
+$|x|^2 = \sum_j x_j^2 \leq (\#d \, \|h\|)^2$. The characters multiply:
+$e_m(\pi y) = \prod_j e^{2\pi i m_j y_j}$.
+\end{proof}
+
+\begin{definition}[Convolution with a kernel on $\R^d$]
+\label{def:torus-econv}
+\lean{Torus.econv, Torus.measurable_comp_sub_proj, Torus.eLpNorm_comp_sub,
+  Torus.aestronglyMeasurable_econv, Torus.econv_congr_ae}
+\leanok
+\uses{lem:torus-proj}
+For $\Phi : \R^d \to \C$ and $f : \T^d \to \C$,
+\[
+  (\Phi * f)(t) = \int_{\R^d} \Phi(y) f(t - \pi y) \, dy ,
+\]
+the convolution of $f$ with the periodisation $\sum_{m \in \Z^d} \Phi(\cdot + m)$ of $\Phi$. It
+depends on $f$ only through its class modulo null sets.
+\end{definition}
+
+\begin{lemma}[Young's inequality on the torus]
+\label{lem:torus-econv-young}
+\lean{Torus.eLpNorm_econv_le, Torus.memLp_econv, Torus.ae_integrable_econv, Torus.econvLp,
+  Torus.econvLp_apply_ae, Torus.enorm_econvLp_le}
+\leanok
+\uses{def:torus-econv, lem:weighted-jensen}
+For $1 \leq p < \infty$, $\Phi \in L_1(\R^d)$ and $f \in L_p(\T^d)$, the integral converges
+absolutely for almost every $t$ and $\|\Phi * f\|_{L_p(\T^d)} \leq \|\Phi\|_{L_1(\R^d)} \|f\|_p$.
+So $f \mapsto \Phi * f$ is a bounded operator on $L_p(\T^d)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Every translate $f(\cdot - \pi y)$ has the norm of $f$, and \Cref{lem:weighted-jensen} averages
+them with the weight $|\Phi|$. Tonelli's theorem gives
+$\int \int |\Phi(y)| |f(t - \pi y)| \, dy \, dt = \|\Phi\|_1 \|f\|_1$.
+\end{proof}
+
+\begin{theorem}[Fourier multipliers on the torus]
+\label{thm:torus-econv-fourier}
+\lean{Torus.econv_mFourier, Torus.econvLp_mFourierLp, Torus.trigPolyLp,
+  Torus.trigPolyLp_eq_span, Torus.mFourierLp_mem_trigPolyLp, Torus.isClosed_trigPolyLp,
+  Torus.mem_toLp_trigScheme_iff, Torus.econvLp_mem_trigPolyLp, Torus.econvLp_eq_self_of_mem}
+\leanok
+\uses{lem:torus-econv-young, def:trig-poly}
+For $\Phi \in L_1(\R^d)$ and $m \in \Z^d$, $\Phi * e_m = \mathcal{F}\Phi(m) \, e_m$. If
+$\mathcal{F}\Phi(m) = 0$ whenever $\deg m \geq n$, then $\Phi * f \in \mathcal{T}_n$ for every
+$f \in L_p(\T^d)$, $1 \leq p < \infty$. If $\mathcal{F}\Phi(m) = 1$ whenever $\deg m < n$, then
+$\Phi * a = a$ for every $a \in \mathcal{T}_n$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$e_m(t - \pi y) = e_m(t) e_m(-\pi y)$ and \Cref{lem:torus-proj}. The trigonometric polynomials of
+degree $< n$ form a finite-dimensional, hence closed, subspace of $L_p(\T^d)$, the operator maps
+every $e_m$ into it, and the $e_m$ span a dense subspace of $L_p(\T^d)$ (Mathlib's
+\texttt{span\_\allowbreak mFourierLp\_\allowbreak closure\_\allowbreak eq\_\allowbreak top}).
+\end{proof}
+
+\begin{lemma}[Differences of the convolution]
+\label{lem:torus-econv-differences}
+\lean{Torus.econv_add_proj, Torus.higherDiff_econv_ae}
+\leanok
+\uses{def:torus-econv, lem:torus-econv-young}
+For $\Phi \in L_1(\R^d)$, $f \in L_1(\T^d)$, $x \in \R^d$ and $t \in \T^d$,
+$(\Phi * f)(t + \pi x) = (\Phi(\cdot + x) * f)(t)$, so
+$\Delta^r_{\pi x}(\Phi * f) = (\Delta^r_x \Phi) * f$ almost everywhere.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Substitute $y \mapsto y + x$; the differences are finite sums of translates, and the integrals
+converge almost everywhere (\Cref{lem:torus-econv-young}).
+\end{proof}
+
+\section{Moduli of smoothness in $L_p$}
+\label{sec:torus-lp-moduli}
+
+In this section $1 \leq p < \infty$, $r \geq 1$, and $\omega_r(f, t)_p$ is the modulus of order $r$
+of \Cref{def:rd-modulus} for the Haar measure on $\T^d$.
+
+\begin{lemma}[Jackson's approximant on the torus]
+\label{lem:torus-lp-jackson-approx}
+\lean{Torus.econv_dilate_apply, Torus.ae_integrable_dilate_mul,
+  Torus.neg_one_pow_mul_higherDiff_proj, Torus.jacksonApprox,
+  Torus.jacksonApprox_mem_trigPolyLp, Torus.ae_sub_jacksonApprox_eq}
+\leanok
+\uses{thm:torus-econv-fourier, def:lp-kernels, lem:fourier-dilate}
+With the kernel $\Phi$ of \Cref{def:lp-kernels} and $\Phi_c(x) = c^d \Phi(c x)$, the approximant
+$J_k f = \sum_{l < r} (-1)^l \binom{r}{l+1} \Phi_{2^k/(l+1)} * f$ lies in $\mathcal{T}_{2^{k+1}}$,
+and for almost every $t$
+\[
+  f(t) - J_k f(t) = \int_{\R^d} \Phi(z) (-1)^r \Delta^r_{\pi(-2^{-k} z)} f(t) \, dz .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\mathcal{F}\Phi_c(\xi) = \mathcal{F}\Phi(\xi / c)$ vanishes for $|\xi| \geq 2c$, and
+$|m| \geq \deg m$ (\Cref{lem:torus-proj}), so \Cref{thm:torus-econv-fourier} applies. The
+identity is the algebra of \Cref{thm:band-jackson} with $\int \Phi = 1$ and
+$(l+1) \, \pi(-c^{-1} z) = -\pi((c/(l+1))^{-1} z)$.
+\end{proof}
+
+\begin{theorem}[Jackson's inequality in $L_p(\T^d)$]
+\label{thm:torus-lp-jackson}
+\lean{Torus.enorm_sub_jacksonApprox_le, Torus.approxSeq_trigScheme_le,
+  Torus.lpModulus_le_two_pow_mul_succ}
+\leanok
+\uses{lem:torus-lp-jackson-approx, lem:modulus-linear, lem:weighted-jensen, thm:band-jackson}
+For $f \in L_p(\T^d)$ and $k \in \N$, with the constant $C_J$ of \Cref{thm:band-jackson} on
+$\R^d$,
+\[
+  E_{2^{k+1}}(f)_p \leq \|f - J_k f\|_p \leq C_J \, \omega_r(f, 2^{-k})_p
+  \leq 2^r C_J \, \omega_r(f, 2^{-(k+1)})_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\|\Delta^r_{\pi(-2^{-k} z)} f\|_p \leq \omega_r(f, 2^{-k} |z|)_p \leq
+(1 + |z|)^r \omega_r(f, 2^{-k})_p$ (\Cref{lem:modulus-linear}), and \Cref{lem:weighted-jensen}
+averages with the weight $|\Phi|$, as in \Cref{thm:band-jackson}.
+\end{proof}
+
+\begin{theorem}[Bernstein's inequality in $L_p(\T^d)$]
+\label{thm:torus-lp-bernstein}
+\lean{Torus.bernsteinConst, Torus.bernsteinConst_ne_top, Torus.econvLp_Theta_eq_self,
+  Torus.lpModulus_le_of_mem_trigPolyLp}
+\leanok
+\uses{thm:torus-econv-fourier, lem:torus-econv-differences, lem:lp-kernels-frequency,
+  thm:band-inverse}
+Let $a \in \mathcal{T}_{2^j}$ and $k \in \N$. Then
+\[
+  \omega_r(a, 2^{-k})_p \leq C_B \, 2^{-(k-j)_+ r} \|a\|_p ,
+  \qquad C_B = 2^r + (2^{\#d} \#d)^r \|D^r \Theta\|_1 .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+With $J = j + \#d$, $\mathcal{F}\Theta_J(m) = 1$ for $\deg m < 2^j$, since
+$|m| \leq \#d \deg m < 2^J$ (\Cref{lem:lp-kernels-frequency}); so $\Theta_J * a = a$
+(\Cref{thm:torus-econv-fourier}). For $k \geq j$ and $\|h\| \leq 2^{-k}$ write $h = \pi x$ with
+$|x| \leq \#d \, \|h\|$. Then $\Delta^r_h a = (\Delta^r_x \Theta_J) * a$
+(\Cref{lem:torus-econv-differences}) and
+$\|\Delta^r_x \Theta_J\|_1 \leq (2^J |x|)^r \|D^r \Theta\|_1$ (\Cref{thm:band-inverse}). For
+$k < j$, $\omega_r(a, t)_p \leq 2^r \|a\|_p$.
+\end{proof}
+
+\begin{theorem}[Besov spaces on the torus through moduli of smoothness]
+\label{thm:torus-lp-moduli}
+\lean{Torus.lpModulusData, Torus.approxNormDyadic_le_modNorm_lp,
+  Torus.modNorm_le_approxNormDyadic_lp, Torus.memBesov_iff_modNorm_lt_top_lp}
+\leanok
+\uses{thm:torus-lp-jackson, thm:torus-lp-bernstein, thm:modulus-coincidence, def:modulus-data}
+Let $1 \leq p < \infty$, $0 < s < r$ and $1 \leq q \leq \infty$. Then
+$f \in \Besov{s}{p}{q}(\T^d)$ if and only if
+\[
+  \|f\|_p + \bigl\| \bigl(2^{ks} \omega_r(f, 2^{-k})_p\bigr)_{k \in \N} \bigr\|_{\ell_q} < \infty ,
+\]
+with equivalent quasi-norms.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The modulus $\omega_r(f, 2^{-k})_p$ is compatible with the trigonometric polynomials in
+$L_p(\T^d)$ with inverse order $\theta = r$ (\Cref{def:modulus-data}): $C_0 = 2^r$, Jackson's
+inequality from $k_0 = 1$ on with the constant $2^r C_J$ (\Cref{thm:torus-lp-jackson}), and
+$C_B$ of \Cref{thm:torus-lp-bernstein}. \Cref{thm:modulus-coincidence} gives the equivalence.
+\end{proof}
 
 \section{Weak derivatives}
 
@@ -9642,8 +9846,8 @@ Descriptions & Range & Result \\
 \hline
 \raggedright Trigonometric approximation and Fourier coefficients, $p = 2$; $\Besov{s}{2}{2} = H^s$
   & $s > 0$ & \Cref{thm:torus-coefficients} \\
-\raggedright Trigonometric approximation and differences of order $1$, $p = 2$ & $0 < s < 1$
-  & \Cref{thm:moduli-coincidence} \\
+\raggedright Trigonometric approximation and differences of order $r$, $1 \leq p < \infty$
+  & $0 < s < r$ & \Cref{thm:torus-lp-moduli} \\
 \raggedright Weak derivatives, Fourier coefficients and approximation: $\Sob{m}{2} = H^m = \Besov{m}{2}{2}$
   & $m \geq 1$ & \Cref{thm:weak-sobolev} \\
 \hline
@@ -9740,6 +9944,24 @@ Descriptions & Range & Result \\
   band-limited approximation & $0 < s < r$ & \Cref{thm:graph-besov} \\
 \raggedright Bounded Lipschitz domains: the same three & $0 < s < r$
   & \Cref{thm:bounded-lipschitz-besov} \\
+\raggedright Smooth bounded domains: charts of the closure, intrinsic differences and
+  restrictions & $0 < s < r$ & \Cref{thm:smooth-domain-besov} \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{Compact manifolds.} The pieces of a function in the charts of a Besov atlas are
+measured by the intrinsic differences on the model space.
+\begin{center}
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
+\hline
+Descriptions & Range & Result \\
+\hline
+\raggedright Charts of any Besov atlas, differences of any order $r > s$ & $s > 0$
+  & \Cref{def:manifold-besov} \\
+\raggedright The boundary: charts of the boundary hyperplane & $s > 0$
+  & \Cref{thm:boundary-atlas-independence} \\
 \hline
 \end{tabular}
 \end{center}
@@ -9760,6 +9982,10 @@ Setting & Range & Result \\
   & \Cref{thm:graph-trace-space} \\
 \raggedright From a bounded Lipschitz domain to its boundary & $0 < s < 1$
   & \Cref{thm:boundary-trace-space} \\
+\raggedright From the half-space to its boundary hyperplane & $s > 0$
+  & \Cref{thm:half-space-trace-space} \\
+\raggedright From a compact manifold with boundary to its boundary & $s > 0$
+  & \Cref{thm:manifold-trace} \\
 \hline
 \end{tabular}
 \end{center}
@@ -9812,7 +10038,10 @@ order $r > s$ coincide. The same holds for local means of any order $L > s$
 through Parseval's identity (\Cref{thm:torus-coefficients,thm:spectral-coefficients}). For other
 $p$ the sharp dyadic blocks are replaced by the smooth kernels $\psi_j$. The proofs here need
 only integrable kernels, Young's inequality and the kernel identities
-(\Cref{thm:young,thm:kernel-identities}).
+(\Cref{thm:young,thm:kernel-identities}). On the torus the kernels of $\R^n$ act by convolution
+with their periodisations, and their Fourier transforms at the lattice points are Fourier
+multipliers; this transfers Jackson's and Bernstein's inequalities to every $L_p(\T^n)$
+(\Cref{thm:torus-econv-fourier,thm:torus-lp-moduli}).
 
 \paragraph{Coordinates, directions and mixed smoothness.} On the cube the coordinate moduli, with
 differences along one coordinate at a time, and the isotropic modulus, with differences in every
@@ -9833,7 +10062,9 @@ partition of unity and pointwise multipliers (\Cref{thm:multipliers,thm:local-ex
 $s > 0$ is allowed (\Cref{thm:trace-torus}). On the boundary of a Lipschitz domain the Besov space
 is defined in charts by differences of order $1$, the order that a Lipschitz change of variables
 preserves, and the trace theorem holds for $0 < s < 1$
-(\Cref{thm:graph-trace-space,thm:boundary-trace-space}).
+(\Cref{thm:graph-trace-space,thm:boundary-trace-space}). Smooth changes of charts keep
+differences of every order, so on the half-space and on compact manifolds with boundary the trace
+theorem holds for every $s > 0$ (\Cref{thm:half-space-trace-space,thm:manifold-trace}).
 
 \bpbibheading
 \begin{thebibliography}{99}

@@ -17,8 +17,9 @@ The **modulus of smoothness** (of first order) of `f ∈ L_2(𝕋^d)` is
 `ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`   (`Torus.modulus`, `Torus.modulus_eq_iSup`),
 
 the modulus of order `1` in `L_2` of `Rd.modulus` for the Haar measure on `𝕋^d`, with the sup
-norm `‖h‖ = max_i ‖h_i‖` on `𝕋^d`.  It grows at most linearly,
-`ω(f, n t)_2 ≤ n ω(f, t)_2` (`Torus.modulus_natCast_mul_le`).  This file proves
+norm `‖h‖ = max_i ‖h_i‖` on `𝕋^d`.  For every order `r` and `1 ≤ p` the modulus
+`ω_r(f, t)_p` of `Rd.modulus` on the torus satisfies `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p`
+(`Torus.modulus_mul_le`).  This file proves
 **Jackson's theorem**
 
 `E_n(f)_2² ≤ d · ω(f, 1/n)_2²`   (`Torus.approxSeq_sq_le_card_mul_modulus_sq`),
@@ -118,25 +119,49 @@ theorem exists_coe_eq_abs_eq_norm (u : UnitAddCircle) :
   rw [AddCircle.coe_sub,
     (AddCircle.coe_eq_zero_iff 1 (x := ((round y : ℤ) : ℝ))).2 ⟨round y, by simp⟩, sub_zero]
 
-/-- **The modulus grows at most linearly**: `ω(f, n t)_2 ≤ n ω(f, t)_2` for `n ≥ 1`, since every
-`h` with `‖h‖ ≤ n t` is `n h'` with `‖h'‖ ≤ t`. -/
-theorem modulus_natCast_mul_le {n : ℕ} (hn : 0 < n)
-    (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) {t : ℝ} (ht : 0 ≤ t) :
-    modulus f (n * t) ≤ n * modulus f t := by
-  rw [modulus_eq_iSup f (n * t)]
+/-- **Scaling the modulus of order `r`**: `ω_r(f, m t)_p ≤ m^r ω_r(f, t)_p` on the torus for
+`m ≥ 1` and `1 ≤ p`, since every `h` with `‖h‖ ≤ m t` is `m h'` with `‖h'‖ ≤ t`
+(`Torus.exists_coe_eq_abs_eq_norm`) and `‖Δ^r_{m h'} f‖_p ≤ m^r ‖Δ^r_{h'} f‖_p`
+(`Rd.eLpNorm_higherDiff_nsmul_higherDiff_le`). -/
+theorem modulus_nat_mul_le {f : UnitAddTorus d → ℂ} (hf : AEStronglyMeasurable f volume)
+    {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) {m : ℕ} (hm : 1 ≤ m) {t : ℝ} (ht : 0 ≤ t) :
+    Rd.modulus volume r p f (m * t) ≤ (m : ℝ≥0∞) ^ r * Rd.modulus volume r p f t := by
   refine iSup₂_le fun h hh => ?_
-  have hn' : (0 : ℝ) < n := by exact_mod_cast hn
+  have hm' : (0 : ℝ) < m := by exact_mod_cast hm
   choose x hx1 hx2 using fun i => exists_coe_eq_abs_eq_norm (h i)
-  set h' : UnitAddTorus d := fun i => ((x i / n : ℝ) : UnitAddCircle)
+  set h' : UnitAddTorus d := fun i => ((x i / m : ℝ) : UnitAddCircle)
   have hh' : ‖h'‖ ≤ t := (pi_norm_le_iff_of_nonneg ht).2 fun i => (norm_coe_le_abs _).trans (by
-    rw [abs_div, Nat.abs_cast, div_le_iff₀ hn', hx2, mul_comm]
+    rw [abs_div, Nat.abs_cast, div_le_iff₀ hm', hx2, mul_comm]
     exact (norm_le_pi_norm h i).trans hh)
-  have hnh : n • h' = h := funext fun i => by
-    rw [Pi.smul_apply, ← hx1 i, ← AddCircle.coe_nsmul, nsmul_eq_mul,
-      mul_div_cancel₀ _ hn'.ne']
-  rw [← hnh]
-  exact (enorm_translate_nsmul_sub_le n h' f).trans
-    (mul_le_mul_right (enorm_translate_sub_le_modulus hh') _)
+  have hmh : m • h' = h := funext fun i => by
+    rw [Pi.smul_apply, ← hx1 i, ← AddCircle.coe_nsmul, nsmul_eq_mul, mul_div_cancel₀ _ hm'.ne']
+  rw [← hmh]
+  have h1 := Rd.eLpNorm_higherDiff_nsmul_higherDiff_le hf hp m h' r 0
+  simp only [Function.iterate_zero, id_eq, add_zero] at h1
+  exact h1.trans (mul_le_mul' le_rfl (Rd.eLpNorm_higherDiff_le_modulus hh'))
+
+/-- **The modulus of order `r` grows polynomially**: `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` on the
+torus for `c, t ≥ 0`, from `Torus.modulus_nat_mul_le` with `m = max 1 ⌈c⌉`. -/
+theorem modulus_mul_le {f : UnitAddTorus d → ℂ} (hf : AEStronglyMeasurable f volume)
+    {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) {c t : ℝ} (hc : 0 ≤ c) (ht : 0 ≤ t) :
+    Rd.modulus volume r p f (c * t) ≤ ENNReal.ofReal (1 + c) ^ r * Rd.modulus volume r p f t := by
+  set m := max 1 ⌈c⌉₊
+  have hm : 1 ≤ m := le_max_left _ _
+  have hcm : c ≤ m := (Nat.le_ceil c).trans (by exact_mod_cast le_max_right 1 ⌈c⌉₊)
+  have hm1 : (m : ℝ) ≤ 1 + c := by
+    rcases le_total 1 ⌈c⌉₊ with h | h
+    · rw [show m = ⌈c⌉₊ from max_eq_right h]
+      linarith [Nat.ceil_lt_add_one hc]
+    · rw [show m = 1 from max_eq_left h]
+      push_cast
+      linarith
+  calc Rd.modulus volume r p f (c * t) ≤ Rd.modulus volume r p f (m * t) :=
+        Rd.modulus_mono r p f (mul_le_mul_of_nonneg_right hcm ht)
+    _ ≤ (m : ℝ≥0∞) ^ r * Rd.modulus volume r p f t := modulus_nat_mul_le hf hp r hm ht
+    _ ≤ ENNReal.ofReal (1 + c) ^ r * Rd.modulus volume r p f t := by
+        gcongr
+        rw [← ENNReal.ofReal_natCast]
+        exact ENNReal.ofReal_le_ofReal hm1
 
 /-- `|e^(ix) - 1|² = 2 - 2 cos x`. -/
 theorem norm_exp_I_mul_sub_one_sq (x : ℝ) :
