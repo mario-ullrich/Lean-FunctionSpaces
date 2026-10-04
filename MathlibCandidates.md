@@ -64,11 +64,11 @@ declarations.
 * **Young's inequality and convolution operators** (`FunctionSpaces/Rd/Convolution.lean`): for a
   Haar measure on a finite-dimensional space, `1 ≤ p < ∞`, integrable `K` and `f ∈ L_p`,
   `‖K ⋆ f‖_p ≤ ‖K‖_1 ‖f‖_p` (`Rd.eLpNorm_conv_le`), from the weighted Jensen inequality
-  `(∫ a g)^p ≤ (∫ a)^(p-1) ∫ a g^p` (`Rd.lintegral_mul_rpow_le`); associativity
+  `(∫ a g)^p ≤ (∫ a)^(p-1) ∫ a g^p` (`MeasureTheory.lintegral_mul_rpow_le`); associativity
   `(K ⋆ L) ⋆ f = K ⋆ (L ⋆ f)` a.e. (`Rd.conv_conv_ae`), convolution as a bounded operator on
   `L_p` (`Rd.convLp`), and Minkowski's integral inequality in the weighted form
   `‖∫ Φ(z) G(·, z) dz‖_p^p ≤ ‖Φ‖_1^(p-1) ∫ |Φ(z)| ‖G(·, z)‖_p^p dz`
-  (`Rd.eLpNorm_integral_kernel_le`). Mathlib has only pointwise bounds of convolutions.
+  (`MeasureTheory.eLpNorm_integral_kernel_le`). Mathlib has only pointwise bounds of convolutions.
 * **Approximate identities in `L_p`** (`FunctionSpaces/Rd/ApproxIdentity.lean`): for integrable
   `Φ` with `∫ Φ = 1`, `‖Φ_c ⋆ f - f‖_p → 0` as `c → ∞`, `Φ_c = c^n Φ(c ·)`
   (`Rd.tendsto_eLpNorm_conv_dilate_sub`, `Rd.tendsto_convLp_dilate`), and the continuity of

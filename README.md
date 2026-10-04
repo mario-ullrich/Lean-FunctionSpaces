@@ -601,6 +601,7 @@ explains how they differ.
 | Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ proved | ✗ | `FunctionSpaces/Torus/{Translation,Modulus,BesovModuli}.lean` |
 | Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ proved | ✗ | `FunctionSpaces/Traces/Examples/Torus.lean` |
 | Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Torus/WeakDerivatives.lean` |
+| Young's inequality on measurable groups, weighted Jensen inequality, weighted averages in `L_p` | ✅ proved | ✗ | `FunctionSpaces/Lp/Young.lean` |
 | Convolution with integrable kernels on `ℝ^d`: Young's inequality, pointwise bounds, associativity, operators on `L_p` | ✅ proved | ✗ | `FunctionSpaces/Rd/Convolution.lean` |
 | Dilations, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ proved | ✗ | `FunctionSpaces/Rd/ApproxIdentity.lean` |
 | Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, kernel identities by Fourier inversion | ✅ proved | ✗ | `FunctionSpaces/Rd/LittlewoodPaleyKernels.lean` |

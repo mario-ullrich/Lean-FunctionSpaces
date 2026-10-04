@@ -17,8 +17,8 @@ The `ℓ_q` norm on `ℕ^d` is `ENNReal.lqNorm`, the `L_q` norm for the counting
 
 **The Schur test** (`Rd.lqNorm_schur_le`): if the row sums and the column sums of a nonnegative
 matrix `w` are at most `A`, then `‖(∑_k w(m, k) b_k)_m‖_{ℓ_q} ≤ A ‖b‖_{ℓ_q}`, `1 ≤ q ≤ ∞`, by the
-weighted Jensen inequality `(∑_k w b)^q ≤ (∑_k w)^(q-1) ∑_k w b^q` (`Rd.lintegral_mul_rpow_le` for
-the counting measure).
+weighted Jensen inequality `(∑_k w b)^q ≤ (∑_k w)^(q-1) ∑_k w b^q`
+(`MeasureTheory.lintegral_mul_rpow_le` for the counting measure).
 
 **The almost diagonal lemma on `ℕ^d`** (`Rd.lqNorm_almostDiagonal_pi_le`): with the coefficients
 `c(i, j) = 2^(-(i-j)L)` for `j ≤ i` and `1` for `j > i` (`Rd.almostDiagCoeff`) and `0 < s < L`,

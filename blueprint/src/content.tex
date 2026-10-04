@@ -5214,26 +5214,29 @@ is integrable for integrable $K$ and $L$.
 
 \begin{lemma}[Weighted Jensen inequality]
 \label{lem:weighted-jensen}
-\lean{Rd.lintegral_mul_rpow_le, Rd.enorm_conv_le_lintegral, Rd.lintegral_rpow_lintegral_mul_le,
-  Rd.aemeasurable_kernel_rpow, Rd.aemeasurable_lintegral_kernel, Rd.lintegral_rpow_lintegral_le,
-  Rd.eLpNorm_integral_kernel_le, Rd.eLpNorm_integral_kernel_le_of_bound}
+\lean{MeasureTheory.lintegral_mul_rpow_le, Rd.enorm_conv_le_lintegral,
+  MeasureTheory.lintegral_rpow_lintegral_mul_le, MeasureTheory.aemeasurable_kernel_rpow,
+  MeasureTheory.aemeasurable_lintegral_kernel, MeasureTheory.lintegral_rpow_lintegral_le,
+  MeasureTheory.eLpNorm_integral_kernel_le, MeasureTheory.eLpNorm_integral_kernel_le_of_bound}
 \leanok
 Let $1 \leq p < \infty$. For every measure $\mu$ and all measurable $a, g \geq 0$,
 \[
   \Bigl( \int a g \, d\mu \Bigr)^p \leq \Bigl( \int a \, d\mu \Bigr)^{p-1} \int a g^p \, d\mu .
 \]
-For all measurable $a, b \geq 0$ on $V$,
+For all measurable $a, b \geq 0$ on a measurable group $G$ with a right-invariant $s$-finite
+measure, such as $V$ and the torus,
 \[
-  \int_V \Bigl( \int_V a(y) \, b(x - y) \, dy \Bigr)^p dx
-  \leq \Bigl( \int_V a \Bigr)^p \int_V b^p ,
+  \int_G \Bigl( \int_G a(y) \, b(x - y) \, dy \Bigr)^p dx
+  \leq \Bigl( \int_G a \Bigr)^p \int_G b^p ,
 \]
-and for every measurable $\Phi : V \to \C$ and every measurable $G : V \times V \to \C$,
+and for $s$-finite measure spaces $X$, $Z$, every measurable $\Phi : Z \to \C$ and every measurable
+$G : X \times Z \to \C$,
 \[
-  \Bigl\| \int_V \Phi(z) \, G(\cdot, z) \, dz \Bigr\|_p^p
-  \leq \|\Phi\|_1^{p-1} \int_V |\Phi(z)| \, \|G(\cdot, z)\|_p^p \, dz .
+  \Bigl\| \int_Z \Phi(z) \, G(\cdot, z) \, dz \Bigr\|_{L_p(X)}^p
+  \leq \|\Phi\|_1^{p-1} \int_Z |\Phi(z)| \, \|G(\cdot, z)\|_{L_p(X)}^p \, dz .
 \]
 In particular, if $0 < \|\Phi\|_1 < \infty$ and $\|G(\cdot, z)\|_p \leq M$ whenever
-$\Phi(z) \neq 0$, then $\| \int_V \Phi(z) \, G(\cdot, z) \, dz \|_p \leq \|\Phi\|_1 M$.
+$\Phi(z) \neq 0$, then $\| \int_Z \Phi(z) \, G(\cdot, z) \, dz \|_p \leq \|\Phi\|_1 M$.
 \end{lemma}
 
 \begin{proof}
@@ -5247,11 +5250,14 @@ and it gives the last one.
 
 \begin{theorem}[Young's inequality]
 \label{thm:young}
-\lean{Rd.eLpNorm_conv_le, Rd.memLp_conv, Rd.ae_convolutionExistsAt}
+\lean{Rd.eLpNorm_conv_le, Rd.memLp_conv, MeasureTheory.enorm_convolution_le_lintegral,
+  MeasureTheory.eLpNorm_convolution_le, MeasureTheory.memLp_convolution,
+  MeasureTheory.ae_convolutionExistsAt}
 \leanok
 \uses{def:conv, lem:weighted-jensen}
-Let $1 \leq p < \infty$, $K \in L_1$ and $f \in L_p$. The integral defining $(K * f)(x)$
-converges absolutely for almost every $x \in V$, and
+Let $1 \leq p < \infty$, $K \in L_1$ and $f \in L_p$, on $V$ or on a measurable group with a
+right-invariant $s$-finite measure. The integral defining $(K * f)(x)$ converges absolutely for
+almost every $x$, and
 \[
   \|K * f\|_p \leq \|K\|_1 \|f\|_p .
 \]

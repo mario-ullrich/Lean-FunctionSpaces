@@ -25,7 +25,8 @@ give
 `f(x) - J_k f(x) = ∫ Φ(z) (-1)^r Δ^r_{-2^(-k) z} f(x) dz`
 
 for almost every `x` (`Rd.ae_sub_jacksonApprox_eq`). The weighted Jensen inequality
-(`Rd.eLpNorm_integral_kernel_le`) and `ω_r(f, 2^(-k) |z|)_p ≤ (1 + |z|)^r ω_r(f, 2^(-k))_p` give
+(`MeasureTheory.eLpNorm_integral_kernel_le`) and
+`ω_r(f, 2^(-k) |z|)_p ≤ (1 + |z|)^r ω_r(f, 2^(-k))_p` give
 **Jackson's inequality** (`Rd.enorm_sub_jacksonApprox_le`, `Rd.approxSeq_bandScheme_le`)
 
 `E(f, E_k)_p ≤ ‖f - J_k f‖_p ≤ C ω_r(f, 2^(-k))_p`,

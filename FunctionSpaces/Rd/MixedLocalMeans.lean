@@ -26,7 +26,7 @@ if the bump vanishes outside `[-1, 1]`, then
 translation `Y = δ_{-z/2^j}`, `P(Y) = 1 - (-1)^L (Y - 1)^L`. Since
 `P(Y) - P(Y²) = (Y - 1)^L (-1)^L ((Y + 1)^L - 1)`, the tensor kernel averages the mixed differences
 `Δ^{L,e(k)}_h f` with steps `|h_i| ≤ 2^(-k_i)` (`Rd.conv_tensorKernel_sum_dilate_ae`), and
-Minkowski's inequality (`Rd.eLpNorm_integral_kernel_le`) gives the bound.
+Minkowski's inequality (`MeasureTheory.eLpNorm_integral_kernel_le`) gives the bound.
 -/
 
 @[expose] public section
