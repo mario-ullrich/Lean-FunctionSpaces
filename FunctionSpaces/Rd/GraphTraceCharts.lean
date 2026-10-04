@@ -33,6 +33,9 @@ independent of the graph that describes it:
 * **Products with smooth functions** (`Rd.LipschitzGraph.trace_mulLp_ae`): `Tr(ψ F) = (ψ ∘ γ) Tr F`.
 * **Finite sums** (`Rd.LipschitzGraph.trace_finsetSum`): the trace of a finite sum is the sum of the
   traces.
+
+The trace depends only on `1_Ω f` (`Rd.LipschitzGraph.trace_congr`) and is bounded by the intrinsic
+norm of `B^{1/p}_{p,1}` on `Ω` (`Rd.LipschitzGraph.enorm_trace_le_modNormOn`).
 -/
 
 @[expose] public section
@@ -302,6 +305,41 @@ theorem trace_ae_eq_of_ae_eq (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {
   rw [hsub, Pi.sub_apply, sub_eq_zero] at h
   exact h
 
+/-- **The trace depends only on `f` on `Ω`**: `1_Ω F = 1_Ω f` gives `Tr F = Tr f`, since the
+trace is built from the cut-offs `1_Ω (k_j ⋆ f)` and the kernels `k_j` are supported in `-K`. -/
+theorem trace_congr (hp : p ≠ ∞) (L : ℕ) {F f : Lp ℂ p (volume : Measure V)}
+    (hFf : Ω.cutoff F = Ω.cutoff f) : Ω.trace hp L F = Ω.trace hp L f := by
+  unfold trace
+  congr 1
+  funext j
+  exact Ω.cutoff_convLp_eq hp (Ω.coneBump.integrable_kernel L j) (Ω.coneSupported_kernel L j) hFf
+
+/-- **The trace is bounded by the intrinsic norm of `B^{1/p}_{p,1}`**:
+`‖Tr f‖_{L_p(H)} ≤ K (‖f‖_{L_p(Ω)} + ∑_k 2^(k/p) ω_L(f, 2^(-k), Ω)_p)`, by the bounds of the terms
+(`Rd.LipschitzGraph.eLpNorm_traceFun_le`) and the comparison of the intrinsic local means with the
+moduli on `Ω`. -/
+theorem enorm_trace_le_modNormOn (hp : p ≠ ∞) (L : ℕ) :
+    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
+      ‖Ω.trace hp L f‖ₑ ≤ K * (‖Ω.cutoff f‖ₑ + lqNorm 1 (fun k =>
+        dyadicWeight (1 / p.toReal) k * lpModulusOn p Ω.domain L f k)) := by
+  obtain ⟨K, hK, hle⟩ := Ω.eLpNorm_traceFun_le Ω.coneBump Fact.out hp L
+  refine ⟨K * Ω.intrinsicConst L, ENNReal.mul_ne_top hK (Ω.intrinsicConst_ne_top L),
+    fun f => ?_⟩
+  calc ‖Ω.trace hp L f‖ₑ ≤ ∑' j, ‖Ω.traceTerm Ω.coneBump hp L j
+        (Ω.cutoff (Ω.coneBump.localMean hp L j f))‖ₑ := enorm_tsum_le_tsum_enorm
+    _ ≤ ∑' j, K * (dyadicWeight (1 / p.toReal) j *
+          ‖Ω.cutoff (Ω.coneBump.localMean hp L j f)‖ₑ) :=
+        ENNReal.tsum_le_tsum fun j => by
+          rw [Lp.enorm_def, eLpNorm_congr_ae (Ω.traceTerm_ae Ω.coneBump hp L j _)]
+          refine (hle j (Lp.memLp _)).trans ?_
+          rw [← Lp.enorm_def, mul_assoc]
+    _ = K * Ω.intrinsicNorm hp L (1 / p.toReal) 1 f := by
+        rw [ENNReal.tsum_mul_left, intrinsicNorm, ENNReal.lqNorm_one]
+    _ ≤ K * (Ω.intrinsicConst L * (‖Ω.cutoff f‖ₑ + lqNorm 1 (fun k =>
+          dyadicWeight (1 / p.toReal) k * lpModulusOn p Ω.domain L f k))) :=
+        mul_le_mul' le_rfl (Ω.intrinsicNorm_le hp L _ le_rfl f)
+    _ = _ := by ring
+
 /-! ### Change of chart -/
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
@@ -530,6 +568,52 @@ theorem trace_finsetSum (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : �
     rw [Finset.sum_insert hi] at hiS
     have h := Ω.trace_sub hp L hs hq (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq hiS).2
       (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq hS).2
+    rw [add_sub_cancel_right] at h
+    rw [Finset.sum_insert hi, Finset.sum_insert hi,
+      ← ih fun j hj => hF j (Finset.mem_insert_of_mem hj), h, sub_add_cancel]
+
+/-- The intrinsic quasi-norm of a sum is at most the sum of the intrinsic quasi-norms. -/
+theorem intrinsicNorm_add_le (hp : p ≠ ∞) (L : ℕ) (σ : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q)
+    (f₁ f₂ : Lp ℂ p (volume : Measure V)) :
+    Ω.intrinsicNorm hp L σ q (f₁ + f₂) ≤
+      Ω.intrinsicNorm hp L σ q f₁ + Ω.intrinsicNorm hp L σ q f₂ := by
+  simp only [intrinsicNorm]
+  refine (ENNReal.lqNorm_mono fun j => ?_).trans (ENNReal.lqNorm_add_le hq _ _)
+  rw [map_add, map_add, ← mul_add]
+  exact mul_le_mul' le_rfl (enorm_add_le _ _)
+
+/-- Finite sums of functions with finite intrinsic quasi-norms have finite intrinsic
+quasi-norms. -/
+theorem intrinsicNorm_finsetSum_lt_top (hp : p ≠ ∞) (L : ℕ) (σ : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q)
+    {ι : Type*} (t : Finset ι) {F : ι → Lp ℂ p (volume : Measure V)}
+    (hF : ∀ i ∈ t, Ω.intrinsicNorm hp L σ q (F i) < ∞) :
+    Ω.intrinsicNorm hp L σ q (∑ i ∈ t, F i) < ∞ := by
+  classical
+  induction t using Finset.induction_on with
+  | empty =>
+    simp only [Finset.sum_empty, intrinsicNorm, map_zero, enorm_zero, mul_zero,
+      ENNReal.lqNorm_zero_right]
+    exact ENNReal.zero_lt_top
+  | insert i t hi ih =>
+    rw [Finset.sum_insert hi]
+    exact (Ω.intrinsicNorm_add_le hp L σ hq _ _).trans_lt (ENNReal.add_lt_top.2
+      ⟨hF i (Finset.mem_insert_self i t), ih fun j hj => hF j (Finset.mem_insert_of_mem hj)⟩)
+
+/-- **The trace of a finite sum** is the sum of the traces, for summands with finite intrinsic
+quasi-norms of smoothness `s + 1/p`. -/
+theorem trace_finsetSum_of_intrinsicNorm (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s)
+    {q : ℝ≥0∞} (hq : 1 ≤ q) {ι : Type*} (t : Finset ι) {F : ι → Lp ℂ p (volume : Measure V)}
+    (hF : ∀ i ∈ t, Ω.intrinsicNorm hp L (s + 1 / p.toReal) q (F i) < ∞) :
+    Ω.trace hp L (∑ i ∈ t, F i) = ∑ i ∈ t, Ω.trace hp L (F i) := by
+  classical
+  induction t using Finset.induction_on with
+  | empty => simp only [Finset.sum_empty, Ω.trace_zero hp L]
+  | insert i t hi ih =>
+    have hS := Ω.intrinsicNorm_finsetSum_lt_top hp L _ hq t fun j hj =>
+      hF j (Finset.mem_insert_of_mem hj)
+    have hiS := Ω.intrinsicNorm_finsetSum_lt_top hp L _ hq (insert i t) hF
+    rw [Finset.sum_insert hi] at hiS
+    have h := Ω.trace_sub hp L hs hq hiS hS
     rw [add_sub_cancel_right] at h
     rw [Finset.sum_insert hi, Finset.sum_insert hi,
       ← ih fun j hj => hF j (Finset.mem_insert_of_mem hj), h, sub_add_cancel]

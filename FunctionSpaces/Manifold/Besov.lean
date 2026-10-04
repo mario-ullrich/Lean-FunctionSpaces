@@ -28,6 +28,10 @@ finite sums of the pieces of `A'` transported by the changes of charts with cut-
 (`Manifold.BesovAtlas.memBesov_iff_besovNorm_lt_top`), so the **Besov space**
 `B^s_{p,q}(M) = {f : ‖f‖_{A, ⌊s⌋+1, s, q} < ∞}` (`Manifold.MemBesov`) depends on no choice
 (`Manifold.memBesov_iff`).
+
+**Lifts from a chart**: for `F ∈ B^s_{p,q}(E)` the function `θ_k · F ∘ κ_k` lies in
+`B^s_{p,q}(M)` (`Manifold.BesovAtlas.memBesov_chartLiftLp`), since its pieces are the images
+`T_{ik} F` under the changes of charts (`Manifold.BesovAtlas.pieceLp_chartLiftLp`).
 -/
 
 @[expose] public section
@@ -110,6 +114,17 @@ theorem pieceLp_smul (i : Fin A.n) (c : ℂ) (f : Lp ℂ p μ) :
   filter_upwards [A.pieceLp_ae μ hp i (c • f), A.pieceLp_ae μ hp i f,
     Lp.coeFn_smul c (A.pieceLp μ hp i f), h] with y h1 h2 h3 h4
   rw [h1, h3, Pi.smul_apply, h2, h4, piece_smul, Pi.smul_apply]
+
+omit hB in
+/-- The pieces in `L_p` of a finite sum are the sums of the pieces. -/
+theorem pieceLp_finsetSum (i : Fin A.n) {ι : Type*} (t : Finset ι) (f : ι → Lp ℂ p μ) :
+    A.pieceLp μ hp i (∑ j ∈ t, f j) = ∑ j ∈ t, A.pieceLp μ hp i (f j) := by
+  classical
+  induction t using Finset.induction_on with
+  | empty =>
+    rw [Finset.sum_empty, Finset.sum_empty]
+    simpa using A.pieceLp_smul hp i 0 (0 : Lp ℂ p μ)
+  | insert j t hj ih => rw [Finset.sum_insert hj, Finset.sum_insert hj, A.pieceLp_add hp i, ih]
 
 /-- The **Besov quasi-norm of a Besov atlas**: the sum over the charts of the intrinsic
 quasi-norms on `range I` of the chart pieces `(ψ_i f) ∘ κ_i⁻¹`, with differences of order `r`. -/
@@ -262,6 +277,16 @@ theorem memBesov_iff_besovNorm_lt_top {r : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s 
     exact (hle _ hi).trans_lt (ENNReal.mul_lt_top hC.lt_top hi)
   exact ⟨hcmp hs1 hsr, hcmp hsr hs1⟩
 
+/-- **The pieces of `f ∈ B^s_{p,q}` have finite intrinsic quasi-norms** of every order `r > s` on
+`range I`. -/
+theorem MemBesov.modNormOn_pieceLp_lt_top {r : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞}
+    (hq : 1 ≤ q) {f : Lp ℂ p μ} (hf : A.MemBesov hp s q f) (i : Fin A.n) :
+    Rd.modNormOn (Rd.BesovDomain.measurableSet (range I)) r s q (A.pieceLp μ hp i f) < ⊤ :=
+  (Finset.single_le_sum (f := fun i =>
+    Rd.modNormOn (Rd.BesovDomain.measurableSet (range I)) r s q (A.pieceLp μ hp i f))
+    (fun _ _ => zero_le) (Finset.mem_univ i)).trans_lt
+      ((A.memBesov_iff_besovNorm_lt_top hp hs hsr hq f).1 hf)
+
 /-- **The Besov space does not depend on the atlas**: `f ∈ B^s_{p,q}` for `A` iff for `A'`. -/
 theorem memBesov_iff_memBesov [IsManifold I ∞ M] (A' : BesovAtlas I M) {s : ℝ} (hs : 0 < s)
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p μ) :
@@ -292,6 +317,61 @@ theorem MemBesov.zero (s : ℝ) (q : ℝ≥0∞) : A.MemBesov hp s q (0 : Lp ℂ
   rw [zero_smul, enorm_zero, zero_mul] at h
   rw [MemBesov, h]
   exact ENNReal.zero_lt_top
+
+/-- `B^s_{p,q}` of an atlas is closed under finite sums. -/
+theorem MemBesov.finsetSum {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q) {ι : Type*} (t : Finset ι)
+    {f : ι → Lp ℂ p μ} (hf : ∀ i ∈ t, A.MemBesov hp s q (f i)) :
+    A.MemBesov hp s q (∑ i ∈ t, f i) := by
+  classical
+  induction t using Finset.induction_on with
+  | empty =>
+    rw [Finset.sum_empty]
+    exact MemBesov.zero hp A s q
+  | insert i t hi ih =>
+    rw [Finset.sum_insert hi]
+    exact MemBesov.add hp A hq (hf i (Finset.mem_insert_self i t))
+      (ih fun j hj => hf j (Finset.mem_insert_of_mem hj))
+
+/-! ### Functions from a chart -/
+
+omit hB in
+variable (μ) in
+/-- The **lift from the `k`-th chart** of `F ∈ L_p(E)` to `L_p(μ)`: `θ_k · F ∘ κ_k`
+(`Manifold.chartLift`). -/
+noncomputable def chartLiftLp (k : Fin A.n) (F : Lp ℂ p (volume : Measure E)) : Lp ℂ p μ :=
+  (memLp_chartLift (I := I) μ (A.chart_mem k) (A.contMDiff_theta k).continuous
+    (A.tsupport_theta_subset k) (zero_lt_one.trans_le (Fact.out : 1 ≤ p)).ne' hp
+    (Lp.stronglyMeasurable F) (Lp.memLp F)).toLp _
+
+/-- **The pieces of a lift from a chart in `L_p`**: `piece_i (θ_k · F ∘ κ_k) = T_{ik} F`. -/
+theorem pieceLp_chartLiftLp [IsManifold I ∞ M] (i k : Fin A.n)
+    (F : Lp ℂ p (volume : Measure E)) :
+    A.pieceLp μ hp i (A.chartLiftLp μ hp k F) = (A.transition A i k).applyLp hB.convex
+      hB.interior_nonempty (Rd.BesovDomain.measurableSet (range I)) hp F := by
+  refine Lp.ext ?_
+  have hlift : (A.chartLiftLp μ hp k F : M → ℂ) =ᵐ[μ] chartLift I (A.chart k) (A.theta k) F :=
+    MemLp.coeFn_toLp _
+  have h := A.piece_ae_eq i (Lp.stronglyMeasurable _) (stronglyMeasurable_chartLift (A.chart k)
+    (A.contMDiff_theta k).continuous (Lp.stronglyMeasurable F)) hlift
+  filter_upwards [A.pieceLp_ae μ hp i (A.chartLiftLp μ hp k F), h,
+    (A.transition A i k).applyLp_ae hB.convex hB.interior_nonempty
+      (Rd.BesovDomain.measurableSet (range I)) hp F] with y h1 h2 h3
+  rw [h1, h2, h3, piece_chartLift]
+
+/-- **Lifts from a chart are in `B^σ_{p,q}(M)`**: for `F ∈ L_p(E)` with
+`‖F‖_p + ‖(2^(kσ) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞`, `0 < σ < r`, the lift `θ_k · F ∘ κ_k` lies in
+`B^σ_{p,q}(M)`: its pieces are `T_{ik} F`, bounded on `range I`
+(`Rd.CutoffDiffeo.modNormOn_applyLp_le`). -/
+theorem memBesov_chartLiftLp [IsManifold I ∞ M] (k : Fin A.n) {r : ℕ} (hr : 1 ≤ r) {σ : ℝ}
+    (hσ : 0 < σ) (hσr : σ < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {F : Lp ℂ p (volume : Measure E)}
+    (hF : ‖F‖ₑ + lqNorm q (fun j => dyadicWeight σ j * Rd.lpModulus p r F j) < ⊤) :
+    A.MemBesov hp σ q (A.chartLiftLp μ hp k F) := by
+  rw [A.memBesov_iff_besovNorm_lt_top hp hσ hσr hq]
+  refine ENNReal.sum_lt_top.2 fun i _ => ?_
+  obtain ⟨C, hC, hle⟩ := (A.transition A i k).modNormOn_applyLp_le hB.convex
+    hB.interior_nonempty (Rd.BesovDomain.measurableSet (range I)) hp hr hσ hσr hq
+  rw [A.pieceLp_chartLiftLp hp i k F]
+  exact (hle F).trans_lt (ENNReal.mul_lt_top hC.lt_top hF)
 
 end BesovAtlas
 

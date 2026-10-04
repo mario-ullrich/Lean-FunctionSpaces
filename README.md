@@ -484,6 +484,17 @@ explains how they differ.
   almost everywhere with functions in `B^s_{p,q}(H₀)`. For `1 ≤ p < ∞`, `s > 0` and
   `1 ≤ q ≤ ∞` this does not depend on the atlas
   (`Manifold.BesovAtlas.memBoundaryBesov_iff_memBoundaryBesov`).
+* **The trace theorem on compact manifolds with boundary.** With `M` as above, a smooth measure
+  `μ`, `1 ≤ p < ∞`, `s > 0`, `1 ≤ q ≤ ∞` and the trace `Tr` of order `L ≥ 2`, `L > s + 1/p`, of the
+  half-space, the trace of `f ∈ L_p(μ)` on `∂M` is `Tr_A f = ∑_i θ_i · Tr((ψ_i f) ∘ κ_i⁻¹) ∘ P ∘ κ_i`
+  (`Manifold.BesovAtlas.boundaryTrace`). The trace commutes with the changes of charts
+  (`Manifold.trace_chartChange_applyLp`), so for `f ∈ B^{s+1/p}_{p,q}(M)` the boundary pieces of
+  `Tr_A f` are the traces of the chart pieces of `f`, for every atlas
+  (`Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_atlas`). `B^s_{p,q}(∂M)` is the trace space
+  of `B^{s+1/p}_{p,q}(M)`: `g ∈ B^s_{p,q}(∂M)` iff the boundary pieces of `g` agree almost
+  everywhere with those of `Tr_A f` for some `f ∈ B^{s+1/p}_{p,q}(M)`
+  (`Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace`). For the closure of a smooth
+  bounded domain this is the trace theorem on its boundary for every `s > 0`.
 * **Traces on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`,
   boundary balls `B_j` and graph domains `Ω_j` as above, and `(ψ_j)` a smooth resolution of unity on
   `Γ` with `tsupport ψ_j ⊆ B_j` (`Rd.BoundedLipschitzDomain.BoundaryPartition`). A property holds
@@ -628,6 +639,7 @@ explains how they differ.
 | Smooth bounded domains as compact manifolds with boundary, Lebesgue measure as smooth measure | ✅ proved | ✗ | `FunctionSpaces/Manifold/SmoothDomain.lean` |
 | Besov spaces of smooth domains by charts equal the intrinsic Besov spaces | ✅ proved | ✗ | `FunctionSpaces/Manifold/SmoothDomainBesov.lean` |
 | Besov spaces on the boundary of a compact manifold, independence of the atlas | ✅ proved | ✗ | `FunctionSpaces/Manifold/BoundaryBesov.lean` |
+| Trace theorem on compact manifolds: commutation with charts, boundedness, trace space | ✅ proved | ✗ | `FunctionSpaces/Manifold/BoundaryTrace.lean` |
 | Tensor kernels on `ℝ^d`: integrals, convolutions, dilations, diagonal changes of variables | ✅ proved | ✗ | `FunctionSpaces/Rd/TensorKernels.lean` |
 | Sequences on `ℕ^d`: `ℓ_q` norms, Schur test, almost diagonal lemma | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedSequences.lean` |
 | Mixed differences, mixed moduli, the mixed Besov quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedDifferences.lean` |
@@ -657,7 +669,7 @@ with its traces,
 smoothness and local means, Lipschitz graph domains and bounded Lipschitz domains with Rychkov's
 extension and pointwise multipliers, atomic decompositions with regular and smooth atoms, the
 invariance of Besov spaces under smooth changes of variables, Besov spaces on compact manifolds
-with boundary, traces on Lipschitz graph domains and
+with boundary and their traces, traces on Lipschitz graph domains and
 on the boundaries of bounded Lipschitz domains, dominating mixed smoothness with hyperbolic cross
 approximation, filtration schemes for wavelets and multiwavelets, the classical definitions
 through moduli of smoothness and weak derivatives, and polynomial and piecewise polynomial

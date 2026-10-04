@@ -116,6 +116,7 @@ public import FunctionSpaces.Rd.GraphStraightening
 public import FunctionSpaces.Manifold.SmoothDomain
 public import FunctionSpaces.Manifold.SmoothDomainBesov
 public import FunctionSpaces.Manifold.BoundaryBesov
+public import FunctionSpaces.Manifold.BoundaryTrace
 public import FunctionSpaces.Rd.TensorKernels
 public import FunctionSpaces.Rd.MixedSequences
 public import FunctionSpaces.Rd.MixedDifferences
@@ -327,13 +328,14 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.SmoothAtoms`: derivatives of convolutions and dilations, smooth atoms on a
   convex set as regular atoms, and the atomic decomposition into smooth atoms of every order.
 * `FunctionSpaces.Rd.AtomComposition`: smooth changes of variables with a cut-off on a convex set,
-  and smooth atoms under them.
+  their action on continuous functions, and smooth atoms under them.
 * `FunctionSpaces.Rd.DiffeoInvariance`: the change of variables on `L_p`, the transport of smooth
   atoms, the invariance of the Besov spaces, and Besov domains.
 * `FunctionSpaces.Rd.HalfSpace`: null sets and moduli on sets, the closed half-space and the models
   of manifolds as Besov domains.
 * `FunctionSpaces.Rd.HalfSpaceTrace`: restrictions and extensions of smooth atoms on the flat
-  graph, the trace theorem and the trace space of the half-space for every smoothness.
+  graph, the trace theorem and the trace space of the half-space for every smoothness, and the
+  traces of functions continuous on the closed half-space.
 * `FunctionSpaces.Rd.GraphParametrization`: the hyperplane and the graph map of a Lipschitz graph
   domain, and the restrictions of atoms to the graph.
 * `FunctionSpaces.Rd.GraphTrace`: the trace on the boundary of a Lipschitz graph domain, its
@@ -342,17 +344,17 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   bounds of their differences.
 * `FunctionSpaces.Rd.GraphTraceExtension`: the extension from the boundary by extended atoms and the
   trace space of a Lipschitz graph domain.
-* `FunctionSpaces.Rd.GraphTraceCharts`: locality of the trace, approximation by the partial sums of
-  the reproducing formula, change of chart, traces of products with smooth functions and of finite
-  sums.
+* `FunctionSpaces.Rd.GraphTraceCharts`: locality of the trace, its bound by the intrinsic norm,
+  approximation by the partial sums of the reproducing formula, change of chart, traces of products
+  with smooth functions and of finite sums.
 * `FunctionSpaces.Rd.LipschitzBoundaryTrace`: almost everywhere on the boundary of a bounded
   Lipschitz domain, Besov spaces on the boundary, the boundary trace and its trace space.
 * `FunctionSpaces.Manifold.SmoothMeasure`: smooth measures on manifolds, integrals in charts and
   their comparison with integrals on the manifold.
 * `FunctionSpaces.Manifold.BesovAtlas`: Besov atlases, chart pieces in `L_p`, the changes of charts
-  with cut-offs, and the pieces of two atlases.
+  with cut-offs, the pieces of two atlases, and lifts of functions from a chart.
 * `FunctionSpaces.Manifold.Besov`: the Besov quasi-norm of an atlas, its independence of the atlas
-  and of the order, and the Besov spaces of a compact manifold.
+  and of the order, the Besov spaces of a compact manifold, and lifts from a chart in them.
 * `FunctionSpaces.Rd.GraphStraightening`: the flattening of a graph domain, its inverse, and its
   preservation of the Lebesgue measure.
 * `FunctionSpaces.Manifold.SmoothDomain`: smooth bounded domains, straighteners and their charts,
@@ -362,6 +364,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Manifold.BoundaryBesov`: the boundary hyperplane of the half-space, the changes of
   charts restricted to it, boundary pieces, and the Besov spaces of the boundary of a compact
   manifold with their independence of the atlas.
+* `FunctionSpaces.Manifold.BoundaryTrace`: the trace commutes with the changes of charts, the trace
+  on the boundary of a compact manifold, its independence of the atlas, and the trace theorem.
 * `FunctionSpaces.Rd.TensorKernels`: tensor products of one-dimensional kernels on `ℝ^d`, their
   integrals, convolutions, dilations, and diagonal changes of variables.
 * `FunctionSpaces.Rd.MixedSequences`: `ℓ_q` norms on `ℕ^d`, the mixed weights `2^(s|k|_1)`, the

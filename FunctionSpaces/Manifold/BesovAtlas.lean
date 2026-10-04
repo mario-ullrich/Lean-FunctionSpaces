@@ -20,7 +20,10 @@ Mathlib's smooth partitions of unity are subordinate to them
 (`SmoothPartitionOfUnity.exists_isSubordinate`), and smooth Urysohn functions give the cut-offs.
 
 A smooth function on `M` read in an extended chart is smooth within the target of the chart
-(`Manifold.contDiffOn_comp_extend_symm`).
+(`Manifold.contDiffOn_comp_extend_symm`). Conversely, a function `F` on `E` gives the **lift from
+a chart** `θ · F ∘ κ` on `M` (`Manifold.chartLift`), which lies in `L_p(μ)` for `F ∈ L_p(E)`
+(`Manifold.memLp_chartLift`) and whose pieces are the images of `F` under the changes of charts
+(`Manifold.BesovAtlas.piece_chartLift`).
 -/
 
 @[expose] public section
@@ -411,6 +414,113 @@ theorem pieceLp_eq_sum (i : Fin A.n) (f : Lp ℂ p μ) :
   exact Finset.sum_congr rfl fun j _ => (hy3 j).symm
 
 end Transition
+
+end BesovAtlas
+
+/-! ### Functions from a chart -/
+
+section ChartLift
+
+variable (I) in
+/-- The **lift from a chart**: `θ · F ∘ κ` on the source of the chart `e`, `0` outside, for a
+cut-off `θ` on `M` and `F : E → ℂ`. -/
+noncomputable def chartLift (e : OpenPartialHomeomorph M H) (θ : M → ℝ) (F : E → ℂ) : M → ℂ :=
+  e.source.indicator fun x => (θ x : ℂ) * F (e.extend I x)
+
+variable [MeasurableSpace E] [BorelSpace E] [MeasurableSpace M] [BorelSpace M]
+
+omit [FiniteDimensional ℝ E] [ChartedSpace H M] in
+/-- The lift from a chart is strongly measurable for continuous `θ` and strongly measurable `F`,
+since `κ` is continuous on the open source (Mathlib's `ContinuousOn.measurable_piecewise`). -/
+theorem stronglyMeasurable_chartLift (e : OpenPartialHomeomorph M H) {θ : M → ℝ}
+    (hθ : Continuous θ) {F : E → ℂ} (hF : StronglyMeasurable F) :
+    StronglyMeasurable (chartLift I e θ F) := by
+  classical
+  have hκ : Measurable (e.source.piecewise (e.extend I) fun _ => (0 : E)) := by
+    refine ContinuousOn.measurable_piecewise ?_ continuousOn_const e.open_source.measurableSet
+    have h := e.continuousOn_extend (I := I)
+    rwa [e.extend_source] at h
+  have h : chartLift I e θ F = e.source.indicator fun x =>
+      (θ x : ℂ) * F (e.source.piecewise (e.extend I) (fun _ => (0 : E)) x) := by
+    funext x
+    by_cases hx : x ∈ e.source
+    · rw [chartLift, indicator_of_mem hx, indicator_of_mem hx, piecewise_eq_of_mem _ _ _ hx]
+    · rw [chartLift, indicator_of_notMem hx, indicator_of_notMem hx]
+  rw [h]
+  exact ((Complex.continuous_ofReal.comp hθ).stronglyMeasurable.mul
+    (hF.comp_measurable hκ)).indicator e.open_source.measurableSet
+
+/-- **The lift from a chart is in `L_p(μ)`** for `F ∈ L_p(E)`, a continuous cut-off `θ` with
+`tsupport θ ⊆ e.source` and a smooth measure `μ`: the integrals over `M` and in the chart are
+comparable on `tsupport θ`, and `θ` is bounded. -/
+theorem memLp_chartLift [CompactSpace M] (μ : Measure M) [IsSmoothMeasure I μ]
+    {e : OpenPartialHomeomorph M H} (he : e ∈ atlas H M) {θ : M → ℝ} (hθ : Continuous θ)
+    (hθs : tsupport θ ⊆ e.source) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ⊤) {F : E → ℂ}
+    (hFm : StronglyMeasurable F) (hF : MemLp F p volume) : MemLp (chartLift I e θ F) p μ := by
+  have he0 : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  have hm := stronglyMeasurable_chartLift (I := I) e hθ hFm
+  obtain ⟨c, C, -, hC, hle⟩ := IsSmoothMeasure.exists_lintegral_chart_le (I := I) μ he
+    (isClosed_tsupport θ).isCompact hθs
+  obtain ⟨B, hB⟩ := isCompact_univ.exists_bound_of_continuousOn hθ.continuousOn
+  have hF' := (eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top hp0 hp
+    hF.aestronglyMeasurable).1 hF
+  refine (eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top hp0 hp hm.aestronglyMeasurable).2 ?_
+  have hG0 : ∀ x ∉ tsupport θ, ‖chartLift I e θ F x‖ₑ ^ p.toReal = 0 := fun x hx => by
+    by_cases hxs : x ∈ e.source
+    · rw [chartLift, indicator_of_mem hxs, image_eq_zero_of_notMem_tsupport hx,
+        Complex.ofReal_zero, zero_mul, enorm_zero, ENNReal.zero_rpow_of_pos he0]
+    · rw [chartLift, indicator_of_notMem hxs, enorm_zero, ENNReal.zero_rpow_of_pos he0]
+  refine ((hle _ (hm.measurable.enorm.pow_const _) hG0).2).trans_lt
+    (ENNReal.mul_lt_top hC.lt_top ?_)
+  calc ∫⁻ y in (e.extend I).target, ‖chartLift I e θ F ((e.extend I).symm y)‖ₑ ^ p.toReal
+      ≤ ∫⁻ y in (e.extend I).target, ENNReal.ofReal B ^ p.toReal * ‖F y‖ₑ ^ p.toReal := by
+        refine setLIntegral_mono' (measurableSet_extend_target I e) fun y hy => ?_
+        have hx : (e.extend I).symm y ∈ e.source := by
+          have h := (e.extend I).map_target hy
+          rwa [e.extend_source] at h
+        rw [chartLift, indicator_of_mem hx, (e.extend I).right_inv hy, enorm_mul,
+          ENNReal.mul_rpow_of_nonneg _ _ he0.le]
+        refine mul_le_mul' (ENNReal.rpow_le_rpow ?_ he0.le) le_rfl
+        rw [← ofReal_norm, Complex.norm_real]
+        exact ENNReal.ofReal_le_ofReal (hB _ (mem_univ _))
+    _ ≤ ∫⁻ y, ENNReal.ofReal B ^ p.toReal * ‖F y‖ₑ ^ p.toReal := setLIntegral_le_lintegral _ _
+    _ = ENNReal.ofReal B ^ p.toReal * ∫⁻ y, ‖F y‖ₑ ^ p.toReal :=
+        lintegral_const_mul' _ _ (ENNReal.rpow_ne_top_of_nonneg he0.le ENNReal.ofReal_ne_top)
+    _ < ⊤ := ENNReal.mul_lt_top (ENNReal.rpow_lt_top_of_nonneg he0.le ENNReal.ofReal_ne_top) hF'
+
+end ChartLift
+
+namespace BesovAtlas
+
+variable (A : BesovAtlas I M) [IsManifold I ∞ M] [CompactSpace M]
+
+omit [FiniteDimensional ℝ E] in
+/-- **The pieces of a lift from a chart**: `piece_i (θ_k · F ∘ κ_k) = T_{ik} F` pointwise, for the
+change of charts `T_{ik}` with the cut-off `ψ_i θ_k`. -/
+theorem piece_chartLift (i k : Fin A.n) (F : E → ℂ) :
+    A.piece i (chartLift I (A.chart k) (A.theta k) F) = (A.transition A i k).apply F := by
+  funext y
+  rw [transition_apply]
+  by_cases hy : y ∈ (A.ext i).target
+  · set x := (A.ext i).symm y
+    by_cases hxk : x ∈ (A.chart k).source
+    · have hyk : y ∈ (I.extendCoordChange (A.chart i) (A.chart k)).source :=
+        (mem_coordChange_source _ _).2 ⟨hy, hxk⟩
+      have hxk' : x ∈ (A.ext k).source := by rwa [OpenPartialHomeomorph.extend_source]
+      have hz : A.ext k x ∈ (A.ext k).target := (A.ext k).map_source hxk'
+      have hzx : (A.ext k).symm (A.ext k x) = x := (A.ext k).left_inv hxk'
+      rw [piece, indicator_of_mem hy, indicator_of_mem hyk, coordChange_apply, chartLift,
+        indicator_of_mem hxk]
+      simp only [transition, chartChange]
+      rw [indicator_of_mem hz, hzx]
+      push_cast
+      ring
+    · have hyk : y ∉ (I.extendCoordChange (A.chart i) (A.chart k)).source := fun h =>
+        hxk ((mem_coordChange_source _ _).1 h).2
+      rw [piece, indicator_of_mem hy, indicator_of_notMem hyk, chartLift,
+        indicator_of_notMem hxk, mul_zero]
+  · rw [piece, indicator_of_notMem hy,
+      indicator_of_notMem fun h => hy ((mem_coordChange_source _ _).1 h).1]
 
 end BesovAtlas
 

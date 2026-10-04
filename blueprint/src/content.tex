@@ -7232,7 +7232,8 @@ radius $1$ around $0$ is a bump.
 \lean{Rd.CutoffDiffeo, Rd.CutoffDiffeo.apply, Rd.CutoffDiffeo.carrier,
   Rd.CutoffDiffeo.isCompact_carrier, Rd.CutoffDiffeo.carrier_subset,
   Rd.CutoffDiffeo.apply_eq_zero_of_notMem, Rd.CutoffDiffeo.apply_eq_zero_of_forall_far,
-  Rd.CutoffDiffeo.uniqueDiffOn_source, Rd.CutoffDiffeo.uniqueDiffOn_target}
+  Rd.CutoffDiffeo.uniqueDiffOn_source, Rd.CutoffDiffeo.uniqueDiffOn_target,
+  Rd.CutoffDiffeo.continuousOn_apply}
 \leanok
 Let $\Omega \subseteq V$. A smooth change of variables with a cut-off on $\Omega$ consists of open
 sets $U, U'$, a bijection $\Phi : \Omega \cap U \to \Omega \cap U'$ that is smooth within
@@ -7243,8 +7244,9 @@ vanishes on $\Omega \setminus K_0$. It acts on functions by
   T f = 1_{\Omega \cap U}\, (\chi f) \circ \Phi .
 \]
 $T f$ vanishes outside the compact set $\Psi(K_0) \subseteq \Omega \cap U$, and $T a = 0$ if $a$
-vanishes on a ball that contains no point of $K_0$. If $\Omega$ is convex with nonempty interior,
-$\Omega \cap U$ and $\Omega \cap U'$ are sets of unique differentiability.
+vanishes on a ball that contains no point of $K_0$, and $T f$ is continuous on $\Omega$ for
+continuous $f$. If $\Omega$ is convex with nonempty interior, $\Omega \cap U$ and $\Omega \cap U'$
+are sets of unique differentiability.
 \end{definition}
 
 The pieces of a function in two overlapping charts of a manifold are related in this way; for
@@ -7637,12 +7639,15 @@ $h_j = 1_\Omega (k_j * f)$, and \Cref{lem:intrinsic-upper} with smoothness $s + 
 \begin{lemma}[Linearity and continuity of the trace]
 \label{lem:trace-linear}
 \lean{Rd.LipschitzGraph.traceTerm_sub, Rd.LipschitzGraph.trace_sub,
-  Rd.LipschitzGraph.enorm_trace_le, Rd.LipschitzGraph.tendsto_trace_of_modNorm_sub_le}
+  Rd.LipschitzGraph.enorm_trace_le, Rd.LipschitzGraph.tendsto_trace_of_modNorm_sub_le,
+  Rd.LipschitzGraph.enorm_trace_le_modNormOn}
 \leanok
-\uses{thm:trace-graph, lem:trace-terms-lp, lem:local-means-upper}
+\uses{thm:trace-graph, lem:trace-terms-lp, lem:local-means-upper, lem:intrinsic-upper}
 The trace is linear on the functions with a finite intrinsic norm of smoothness $s + 1/p$, $s > 0$,
 and there is $K < \infty$ with
-$\|\operatorname{Tr} f\|_{L_p(H)} \leq K (\|f\|_p + \sum_k 2^{k/p} \omega_L(f, 2^{-k})_p)$.
+$\|\operatorname{Tr} f\|_{L_p(H)} \leq K (\|f\|_p + \sum_k 2^{k/p} \omega_L(f, 2^{-k})_p)$ and
+$\|\operatorname{Tr} f\|_{L_p(H)} \leq
+K (\|f\|_{L_p(\Omega)} + \sum_k 2^{k/p} \omega_L(f, 2^{-k}, \Omega)_p)$.
 If $f$ and the $f_J$ have finite intrinsic norms of smoothness $s + 1/p$ and
 $\|f - f_J\|_p + \sum_k 2^{k/p} \omega_L(f - f_J, 2^{-k})_p \to 0$, then
 $\operatorname{Tr} f_J \to \operatorname{Tr} f$ in $L_p(H)$.
@@ -7653,7 +7658,8 @@ $\operatorname{Tr} f_J \to \operatorname{Tr} f$ in $L_p(H)$.
 The terms are linear in $h_j$, and the series converge. The bound:
 $\|\operatorname{Tr} f\|_{L_p(H)} \leq \sum_j K 2^{j/p} \|k_j * f\|_p$
 (\Cref{lem:trace-terms-lp}), and the local means are bounded by the moduli
-(\Cref{lem:local-means-upper}). The convergence follows from the linearity and the bound for
+(\Cref{lem:local-means-upper}); with the cut-offs $1_\Omega (k_j * f)$ kept, by the moduli on
+$\Omega$ (\Cref{lem:intrinsic-upper}). The convergence follows from the linearity and the bound for
 $f - f_J$.
 \end{proof}
 
@@ -8088,6 +8094,28 @@ $L_H = r$ has finite norm (\Cref{thm:flat-extension-bounded}) and trace $g$
 (\Cref{thm:trace-flat-extension}).
 \end{proof}
 
+\begin{lemma}[Traces of functions continuous on the closed half-space]
+\label{lem:trace-continuous-half-space}
+\lean{Rd.foldHalfSpace, Rd.continuous_foldHalfSpace, Rd.foldHalfSpace_of_nonneg,
+  Rd.inner_foldHalfSpace, Rd.foldHalfSpace_mem, Rd.norm_foldHalfSpace,
+  Rd.trace_ae_eq_of_continuousOn}
+\leanok
+\uses{thm:trace-continuous, lem:trace-locality}
+Let $f \in L_p(V)$ have a finite intrinsic norm of smoothness $s + 1/p$, $s > 0$, on $\Omega$, and
+let $G$ be continuous on the closed half-space $\{x : \langle x, e \rangle \geq 0\}$, vanish there
+outside a compact set, and agree with $f$ almost everywhere on $\Omega$. Then
+$\operatorname{Tr} f = G$ almost everywhere on $H$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The folding $F(x) = x + (|\langle x, e \rangle| - \langle x, e \rangle) e$ is continuous, preserves
+the norm, maps $V$ into the closed half-space and fixes it. So $G \circ F$ is continuous with compact
+support and agrees with $f$ on $\Omega$. The trace depends only on $1_\Omega f$
+(\Cref{lem:trace-locality}), and the trace of a continuous function is its restriction
+(\Cref{thm:trace-continuous}).
+\end{proof}
+
 \section{Traces in charts}
 
 Three properties make the trace a function on the boundary, independent of the graph domain that
@@ -8100,12 +8128,13 @@ $P_1$, $P_2$.
 \label{lem:trace-locality}
 \lean{Rd.LipschitzGraph.conv_scaled_convLp_eq_zero,
   Rd.LipschitzGraph.trace_ae_eq_zero_of_ae_eq_zero, Rd.LipschitzGraph.intrinsicNorm_sub_le,
-  Rd.LipschitzGraph.trace_ae_eq_of_ae_eq}
+  Rd.LipschitzGraph.trace_ae_eq_of_ae_eq, Rd.LipschitzGraph.trace_congr}
 \leanok
 \uses{lem:trace-mollified, lem:trace-linear, lem:support-principle-two}
 Let $s > 0$, let $f_1, f_2 \in L_p$ have finite intrinsic norms of smoothness $s + 1/p$, and let
 $U \subseteq V$ be open with $f_1 = f_2$ almost everywhere on $\Omega \cap U$. Then
-$\operatorname{Tr} f_1 = \operatorname{Tr} f_2$ almost everywhere on $\gamma^{-1}(U)$.
+$\operatorname{Tr} f_1 = \operatorname{Tr} f_2$ almost everywhere on $\gamma^{-1}(U)$. For
+$U = V$ this holds for all $f_1, f_2 \in L_p$: the trace depends only on $1_\Omega f$.
 \end{lemma}
 
 \begin{proof}
@@ -8115,6 +8144,8 @@ at most the sum of the two. The mollified restriction $(m_{2^J} * (m_{2^J} * f))
 sees $f$ on $\Omega \cap B(\gamma(x'), 2 L R 2^{-J})$, since the kernels are supported in the cone
 (\Cref{lem:support-principle-two}); so it vanishes for large $J$ if $\gamma(x') \in U$, and a
 subsequence converges to $\operatorname{Tr} f(x')$ almost everywhere (\Cref{lem:trace-mollified}).
+For $U = V$, the trace is built from the cut-offs $1_\Omega (k_j * f)$, which depend only on
+$1_\Omega f$ (\Cref{lem:support-principle-two}).
 \end{proof}
 
 \begin{lemma}[Approximation by the partial sums of the reproducing formula]
@@ -8221,18 +8252,21 @@ everywhere.
 
 \begin{lemma}[Traces of finite sums]
 \label{lem:trace-sums}
-\lean{Rd.LipschitzGraph.trace_zero, Rd.LipschitzGraph.trace_finsetSum}
+\lean{Rd.LipschitzGraph.trace_zero, Rd.LipschitzGraph.trace_finsetSum,
+  Rd.LipschitzGraph.intrinsicNorm_add_le, Rd.LipschitzGraph.intrinsicNorm_finsetSum_lt_top,
+  Rd.LipschitzGraph.trace_finsetSum_of_intrinsicNorm}
 \leanok
 \uses{lem:trace-linear, lem:pasting}
 For $s > 0$ and summands $F_i$ with finite norms
-$\|F_i\|_p + \|(2^{k(s + 1/p)} \omega_L(F_i, 2^{-k})_p)_k\|_{\ell_q}$,
+$\|F_i\|_p + \|(2^{k(s + 1/p)} \omega_L(F_i, 2^{-k})_p)_k\|_{\ell_q}$, or with finite intrinsic
+norms of smoothness $s + 1/p$,
 $\operatorname{Tr} \sum_i F_i = \sum_i \operatorname{Tr} F_i$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 Induction on the number of summands with \Cref{lem:trace-linear}; finite sums keep the norms finite
-(\Cref{lem:pasting}).
+(\Cref{lem:pasting}), and the intrinsic norms are subadditive.
 \end{proof}
 
 \section{Traces on bounded Lipschitz domains}
@@ -8518,7 +8552,7 @@ an open $V_i$ with $\overline{V_i} \subseteq e_i.\mathrm{source}$ is the cut-off
   Manifold.BesovAtlas.exists_eLpNorm_piece_le, Manifold.BesovAtlas.memLp_piece,
   Manifold.BesovAtlas.pieceLp, Manifold.BesovAtlas.pieceLp_ae, Manifold.BesovAtlas.piece_add,
   Manifold.BesovAtlas.piece_smul, Manifold.BesovAtlas.piece_ae_eq, Manifold.BesovAtlas.pieceLp_add,
-  Manifold.BesovAtlas.pieceLp_smul}
+  Manifold.BesovAtlas.pieceLp_smul, Manifold.BesovAtlas.pieceLp_finsetSum}
 \leanok
 \uses{def:besov-atlas, lem:chart-integrals}
 The $i$-th piece of $g : M \to \C$ is $(\psi_i g) \circ \kappa_i^{-1}$ on the target of
@@ -8621,19 +8655,47 @@ $N_\Omega(T_{ij} G) \leq C_{ij} N_\Omega(G)$ on the Besov domain $\Omega$
 \lean{Manifold.BesovAtlas.MemBesov, Manifold.BesovAtlas.memBesov_iff_besovNorm_lt_top,
   Manifold.BesovAtlas.memBesov_iff_memBesov, Manifold.MemBesov, Manifold.memBesov_iff,
   Manifold.BesovAtlas.MemBesov.add, Manifold.BesovAtlas.MemBesov.const_smul,
-  Manifold.BesovAtlas.MemBesov.zero}
+  Manifold.BesovAtlas.MemBesov.zero, Manifold.BesovAtlas.MemBesov.finsetSum,
+  Manifold.BesovAtlas.MemBesov.modNormOn_pieceLp_lt_top}
 \leanok
 \uses{thm:atlas-independence, thm:besov-domain-invariance}
 For $s > 0$, $f \in L_p(\mu)$ lies in $\Besov{s}{p}{q}(M)$ if $\|f\|_{A, \lfloor s \rfloor + 1, s,
 q} < \infty$ for some Besov atlas $A$. This holds for one atlas if and only if it holds for every
-atlas, and with any order $r > s$ in place of $\lfloor s \rfloor + 1$. $\Besov{s}{p}{q}(M)$ is a
-linear subspace of $L_p(\mu)$.
+atlas, and with any order $r > s$ in place of $\lfloor s \rfloor + 1$; then every piece has a
+finite intrinsic quasi-norm of order $r$. $\Besov{s}{p}{q}(M)$ is a linear subspace of
+$L_p(\mu)$.
 \end{definition}
 
 \begin{proof}
 \leanok
 \Cref{thm:atlas-independence} in both directions; for the order, the comparison of orders on a
 Besov domain (\Cref{thm:besov-domain-invariance}) piece by piece.
+\end{proof}
+
+\begin{lemma}[Functions from a chart]
+\label{lem:chart-lift}
+\lean{Manifold.chartLift, Manifold.stronglyMeasurable_chartLift, Manifold.memLp_chartLift,
+  Manifold.BesovAtlas.piece_chartLift, Manifold.BesovAtlas.chartLiftLp,
+  Manifold.BesovAtlas.pieceLp_chartLiftLp, Manifold.BesovAtlas.memBesov_chartLiftLp}
+\leanok
+\uses{def:manifold-besov, def:chart-transition, thm:diffeo-invariance, lem:chart-integrals}
+For a chart $e$ of the atlas, a continuous $\theta$ on $M$ with $\operatorname{tsupport} \theta
+\subseteq e.\mathrm{source}$ and $F \in L_p(E)$, the lift $\theta \cdot F \circ \kappa$ on
+$e.\mathrm{source}$, $0$ elsewhere, lies in $L_p(\mu)$. For a Besov atlas, the $i$-th piece of the
+lift $\theta_k \cdot F \circ \kappa_k$ is $T_{ik} F$. If
+$\|F\|_p + \|(2^{j\sigma} \omega_r(F, 2^{-j})_p)_j\|_{\ell_q} < \infty$ with $0 < \sigma < r$,
+the lift lies in $\Besov{\sigma}{p}{q}(M)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The chart $\kappa$ is continuous on the open source, so the lift is measurable (Mathlib's
+\texttt{ContinuousOn.\allowbreak measurable\_\allowbreak piecewise}). Its integral is comparable to
+the integral in the chart on the compact $\operatorname{tsupport} \theta$
+(\Cref{lem:chart-integrals}), where $\theta$ is bounded. At $y = \kappa_i(x)$ with
+$x \in e_k.\mathrm{source}$, $\psi_i(x) \theta_k(x) F(\kappa_k x) = \chi_{ik}(\Phi_{ik} y)
+F(\Phi_{ik} y)$. The changes of charts are bounded into the intrinsic space on $\Omega$
+(\Cref{thm:diffeo-invariance}).
 \end{proof}
 
 \section{Smooth bounded domains}
@@ -8896,6 +8958,114 @@ space $H_0$, so \Cref{thm:diffeo-invariance} bounds
 $N(T^\partial_{ij} G'_j) \leq C_{ij} N(G'_j)$ for the Besov quasi-norm $N$ of $H_0$, and $N$ is
 subadditive (\Cref{lem:modnorm-on}).
 \end{proof}
+
+\section{The trace theorem on compact manifolds}
+
+In this section $M$ is a compact manifold with boundary as in the previous section, $\mu$ a smooth
+measure, $1 \leq p < \infty$, and $\operatorname{Tr}$ the trace of order $L$ of the open
+half-space $\Omega_0 = \{y : y_0 > 0\}$ (\Cref{thm:trace-every-order}).
+
+\begin{lemma}[The closed and the open half-space]
+\label{lem:closed-open-half-space}
+\lean{Manifold.range_eq_closedHalfSpace, Manifold.range_ae_eq_domain,
+  Manifold.cutoff_eq_indicatorLp, Manifold.modNormOn_range_eq}
+\leanok
+\uses{lem:null-set-domains}
+The range of the model is the closed half-space $\{y : y_0 \geq 0\}$, which differs from
+$\Omega_0$ by the null set $H_0$. So the cut-offs and the intrinsic quasi-norms on the two sets
+agree.
+\end{lemma}
+
+\begin{theorem}[The trace commutes with the changes of charts]
+\label{thm:trace-chart-change}
+\lean{Manifold.trace_chartChange_applyLp_of_continuous,
+  Manifold.trace_chartChange_applyLp_of_modNorm, Manifold.trace_chartChange_applyLp}
+\leanok
+\uses{def:boundary-chart-change, lem:trace-continuous-half-space, lem:partial-sums-approx,
+  lem:trace-linear, thm:diffeo-invariance, lem:closed-open-half-space, def:besov-domain}
+Let $T$ be a change of charts with a cut-off and $T^\partial$ its restriction to $H_0$
+(\Cref{def:boundary-chart-change}), $s > 0$, $L > s + 1/p$, and let $G \in L_p(\R^n)$ satisfy
+$\|G\|_{L_p(\Omega)} + \|(2^{k(s+1/p)} \omega_L(G, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$ on the
+closed half-space $\Omega$. Then $\operatorname{Tr}(T G) = T^\partial(\operatorname{Tr} G)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Extend $G$ to $\R^n$, since the half-space is a Besov domain; neither side changes. For the
+continuous partial sums $G_J$ of the reproducing formula, $T G_J$ is continuous on the closed
+half-space and vanishes outside a compact set (\Cref{def:cutoff-diffeo}), so both sides are the
+restriction of $T G_J$ to $H_0$ (\Cref{lem:trace-continuous-half-space}). As $J \to \infty$,
+$G_J \to G$ in $\Besov{1/p}{p}{1}$ (\Cref{lem:partial-sums-approx}); $T$ maps this space boundedly
+into the intrinsic space on $\Omega$ (\Cref{thm:diffeo-invariance}), where the trace is bounded
+(\Cref{lem:trace-linear}), so $\operatorname{Tr}(T G_J) \to \operatorname{Tr}(T G)$; and
+$\operatorname{Tr} G_J \to \operatorname{Tr} G$ in $L_p(H_0)$, where $T^\partial$ is bounded.
+\end{proof}
+
+\begin{definition}[The trace on the boundary]
+\label{def:manifold-boundary-trace}
+\lean{Manifold.BesovAtlas.boundaryTrace, Manifold.BesovAtlas.boundaryPiece_boundaryTrace_eq_sum}
+\leanok
+\uses{def:manifold-boundary-besov, def:boundary-chart-change}
+For a Besov atlas $A$, an order $L$ and $f \in L_p(\mu)$, the trace on the boundary is
+$\operatorname{Tr}_A f = \sum_i \theta_i \cdot \operatorname{Tr}(\text{piece}_i f) \circ P \circ
+\kappa_i$ on the chart sources. At every point of $H_0$ its $k$-th boundary piece is
+$\sum_i T^\partial_{ki} \bigl(\operatorname{Tr}(\text{piece}_i f)\bigr)$, since $\psi_k \theta_i$
+is the cut-off of $T_{ki}$.
+\end{definition}
+
+\begin{theorem}[The boundary pieces of the trace]
+\label{thm:boundary-trace-pieces}
+\lean{Manifold.BesovAtlas.trace_pieceLp_eq_sum, Manifold.BesovAtlas.boundaryPiece_boundaryTrace,
+  Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_atlas}
+\leanok
+\uses{def:manifold-boundary-trace, thm:trace-chart-change, thm:pieces-two-atlases, lem:trace-sums,
+  thm:boundary-atlas-independence}
+Let $s > 0$, $L > s + 1/p$ and $f \in \Besov{s+1/p}{p}{q}(M)$. For two Besov atlases $A, A'$,
+$\operatorname{Tr}(\text{piece}_i f) = \sum_j T^\partial_{ij}
+\bigl(\operatorname{Tr}(\text{piece}'_j f)\bigr)$, and the $i$-th boundary piece for $A$ of
+$\operatorname{Tr}_{A'} f$ is $\operatorname{Tr}(\text{piece}_i f)$ almost everywhere on $H_0$. In
+particular the trace does not depend on the atlas.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Take the traces in $\text{piece}_i f = \sum_j T_{ij}(\text{piece}'_j f)$
+(\Cref{thm:pieces-two-atlases}): the trace of the finite sum is the sum of the traces
+(\Cref{lem:trace-sums}), and it commutes with the $T_{ij}$ (\Cref{thm:trace-chart-change}). For
+$A' = A$ this is the pointwise formula of \Cref{def:manifold-boundary-trace}, almost everywhere; for
+general $A'$ combine it with \Cref{thm:boundary-atlas-independence}.
+\end{proof}
+
+\begin{theorem}[The trace theorem on compact manifolds]
+\label{thm:manifold-trace}
+\lean{Manifold.exists_flatExtension, Manifold.BesovAtlas.memBoundaryBesov_boundaryTrace,
+  Manifold.BesovAtlas.exists_boundaryTrace_eq,
+  Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace}
+\leanok
+\uses{thm:boundary-trace-pieces, thm:trace-every-order, thm:half-space-trace-space, lem:chart-lift}
+Let $1 \leq p < \infty$, $s > 0$, $1 \leq q \leq \infty$ and $L \geq 2$ with $s + 1/p < L$. For
+$f \in \Besov{s+1/p}{p}{q}(M)$, $\operatorname{Tr}_A f \in \Besov{s}{p}{q}(\partial M)$. Every
+$g \in \Besov{s}{p}{q}(\partial M)$ is the trace of some $f \in \Besov{s+1/p}{p}{q}(M)$: the
+boundary pieces of $\operatorname{Tr}_A f$ and of $g$ agree almost everywhere. So
+$\Besov{s}{p}{q}(\partial M)$ is the trace space of $\Besov{s+1/p}{p}{q}(M)$ for every $s > 0$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The boundary pieces of $\operatorname{Tr}_A f$ are the traces of the pieces
+(\Cref{thm:boundary-trace-pieces}), which lie in $\Besov{s}{p}{q}(H_0)$
+(\Cref{thm:trace-every-order}). Conversely, the extensions $E G_k$ of moment order
+$\lfloor s \rfloor + 1$ of the boundary pieces $G_k$ of $g$ have finite norms and traces $G_k$
+(\Cref{thm:half-space-trace-space}). The pieces of
+$f = \sum_k \theta_k \cdot (E G_k) \circ \kappa_k \in \Besov{s+1/p}{p}{q}(M)$
+(\Cref{lem:chart-lift}) are $\sum_k T_{ik}(E G_k)$, with traces $\sum_k T^\partial_{ik} G_k$
+(\Cref{thm:trace-chart-change}), the $i$-th boundary piece of $g$
+(\Cref{thm:boundary-atlas-independence}).
+\end{proof}
+
+The closure of a smooth bounded domain is a compact manifold with boundary
+(\Cref{thm:smooth-domain-manifold}), so this is the trace theorem on its boundary for every
+$s > 0$, in charts.
 
 \chapter{Dominating mixed smoothness on $\R^d$}
 

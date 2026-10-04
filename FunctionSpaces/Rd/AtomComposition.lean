@@ -19,7 +19,9 @@ compact set `K₀ ⊆ Ω ∩ U'`. It acts on functions by
 `T f = 1_{Ω ∩ U} (χ f) ∘ Φ`   (`Rd.CutoffDiffeo.apply`).
 
 The pieces of a function on a manifold in two overlapping charts are related in this way; on
-`Ω = V`, `χ` a smooth cut-off and `Φ = id` it is a pointwise multiplier.
+`Ω = V`, `χ` a smooth cut-off and `Φ = id` it is a pointwise multiplier. `T f` vanishes outside
+the compact set `Ψ(K₀)` and is continuous on `Ω` for continuous `f`
+(`Rd.CutoffDiffeo.continuousOn_apply`).
 
 **Smooth atoms stay smooth atoms** (`Rd.CutoffDiffeo.isSmoothAtom_apply`): there are `L` and `A'`,
 depending only on `T` and the order `K`, such that for a smooth atom `a` on `V` of level `j`,
@@ -137,6 +139,26 @@ theorem apply_eq_zero_of_notMem (f : V → ℂ) {x : V} (hx : x ∉ T.carrier) :
     have hΦ : T.Phi x ∉ T.K0 := fun h => hx ⟨T.Phi x, h, T.left_inv x hxs⟩
     rw [T.chi_eq_zero _ (T.mapsTo_Phi hxs).1 hΦ, zero_mul]
   · rw [apply, Set.indicator_of_notMem hxs]
+
+/-- **`T` keeps continuity on `Ω`**: for continuous `f`, `T f` is continuous on `Ω`. Near a point
+of `Ψ(K₀)` it is `(χ f) ∘ Φ`, and off the compact set `Ψ(K₀)` it vanishes. -/
+theorem continuousOn_apply {f : V → ℂ} (hf : Continuous f) : ContinuousOn (T.apply f) Ω := by
+  intro x hx
+  by_cases hxK : x ∈ T.carrier
+  · have hxU : x ∈ T.U := (T.carrier_subset hxK).2
+    have hcont : ContinuousOn (fun y => T.chi (T.Phi y) * f (T.Phi y)) (Ω ∩ T.U) :=
+      (T.contDiffOn_chi.continuousOn.comp T.contDiffOn_Phi.continuousOn T.mapsTo_Phi).mul
+        (hf.comp_continuousOn T.contDiffOn_Phi.continuousOn)
+    have hwithin := (continuousWithinAt_inter (T.isOpen_U.mem_nhds hxU)).1 (hcont x ⟨hx, hxU⟩)
+    refine hwithin.congr_of_eventuallyEq ?_ ?_
+    · filter_upwards [mem_nhdsWithin_of_mem_nhds (T.isOpen_U.mem_nhds hxU),
+        self_mem_nhdsWithin] with y hyU hyΩ
+      rw [apply, Set.indicator_of_mem (Set.mem_inter hyΩ hyU)]
+    · rw [apply, Set.indicator_of_mem (Set.mem_inter hx hxU)]
+  · have hev : T.apply f =ᶠ[𝓝 x] fun _ => 0 := by
+      filter_upwards [T.isCompact_carrier.isClosed.isOpen_compl.mem_nhds hxK] with y hy
+      exact T.apply_eq_zero_of_notMem f hy
+    exact (continuousAt_const.congr hev.symm).continuousWithinAt
 
 /-- **`T a` vanishes if `a` lives far from `K₀`**: if `a = 0` outside `B(c, d 2^(-j))` and no
 point of `K₀` lies in that ball, then `T a = 0`. -/

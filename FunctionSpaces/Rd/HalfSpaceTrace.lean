@@ -38,6 +38,10 @@ the extension `E g = ∑_j g_j(Px) χ(2^j ⟪x, e⟫)` (`Rd.LipschitzGraph.flatE
 `B^{s+1/p}_{p,q}` of the half-space for every `s > 0`
 (`Rd.LipschitzGraph.exists_trace_eq_iff_flat`). The extension of the Lipschitz case uses moment
 order `1` on `H` and reaches only `s < 1`; here the moment order `Lh > s` matches the smoothness.
+
+**Functions continuous on the closed half-space** have their restrictions as traces
+(`Rd.trace_ae_eq_of_continuousOn`): the folding `x ↦ x + (|⟪x, e⟫| - ⟪x, e⟫) e`
+(`Rd.foldHalfSpace`) extends them continuously to `V`.
 -/
 
 @[expose] public section
@@ -736,5 +740,109 @@ theorem exists_trace_eq_iff_flat (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {r : 
 end Extension
 
 end LipschitzGraph
+
+/-! ### Traces of functions continuous on the closed half-space -/
+
+section Fold
+
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] (e : V)
+
+/-- The **folding** onto the closed half-space, `x ↦ x + (|⟪x, e⟫| - ⟪x, e⟫) e`: it reflects
+`{x : ⟪x, e⟫ < 0}` in `e^⊥` and fixes the closed half-space. -/
+noncomputable def foldHalfSpace (x : V) : V := x + (|inner ℝ x e| - inner ℝ x e) • e
+
+/-- The folding is continuous. -/
+theorem continuous_foldHalfSpace : Continuous (foldHalfSpace e) :=
+  continuous_id.add ((((continuous_id.inner continuous_const).abs).sub
+    (continuous_id.inner continuous_const)).smul continuous_const)
+
+/-- The folding fixes the closed half-space. -/
+theorem foldHalfSpace_of_nonneg {x : V} (hx : 0 ≤ inner ℝ x e) : foldHalfSpace e x = x := by
+  rw [foldHalfSpace, abs_of_nonneg hx, sub_self, zero_smul, add_zero]
+
+variable {e} (he : ‖e‖ = 1)
+include he
+
+/-- `⟪F x, e⟫ = |⟪x, e⟫|` for the folding `F`. -/
+theorem inner_foldHalfSpace (x : V) : inner ℝ (foldHalfSpace e x) e = |inner ℝ x e| := by
+  rw [foldHalfSpace, inner_add_left, real_inner_smul_left, real_inner_self_eq_norm_sq, he]
+  ring
+
+/-- The folding maps into the closed half-space. -/
+theorem foldHalfSpace_mem (x : V) : foldHalfSpace e x ∈ closedHalfSpace e := by
+  show 0 ≤ inner ℝ (foldHalfSpace e x) e
+  rw [inner_foldHalfSpace he]
+  exact abs_nonneg _
+
+/-- The folding preserves the norm: `‖x + c e‖² = ‖x‖² + c (2⟪x, e⟫ + c)` vanishes in the second
+term for `c = |⟪x, e⟫| - ⟪x, e⟫`. -/
+theorem norm_foldHalfSpace (x : V) : ‖foldHalfSpace e x‖ = ‖x‖ := by
+  have h : ‖foldHalfSpace e x‖ ^ 2 = ‖x‖ ^ 2 := by
+    rw [foldHalfSpace, norm_add_sq_real, norm_smul, he, mul_one, real_inner_smul_right,
+      Real.norm_eq_abs, sq_abs]
+    rw [show ‖x‖ ^ 2 + 2 * ((|inner ℝ x e| - inner ℝ x e) * inner ℝ x e) +
+        (|inner ℝ x e| - inner ℝ x e) ^ 2 = ‖x‖ ^ 2 + (|inner ℝ x e| ^ 2 - inner ℝ x e ^ 2) by
+      ring, sq_abs, sub_self, add_zero]
+  exact (pow_left_inj₀ (norm_nonneg _) (norm_nonneg _) two_ne_zero).1 h
+
+
+variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] {p : ℝ≥0∞} [Fact (1 ≤ p)]
+
+/-- **Traces of functions continuous on the closed half-space**: let `f ∈ L_p(V)` have a finite
+intrinsic quasi-norm of smoothness `s + 1/p`, `s > 0`, on the open half-space, and let `G` be
+continuous on the closed half-space, vanish there outside a compact set, and agree with `f` almost
+everywhere on the open half-space. Then `Tr f = G` almost everywhere on `e^⊥`. The folded `G ∘ F`
+is continuous with compact support and agrees with `f` on the half-space, and traces of continuous
+functions are restrictions (`Rd.LipschitzGraph.trace_ae_eq_comp_graphMap`). -/
+theorem trace_ae_eq_of_continuousOn (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
+    {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
+    (hf : ‖(LipschitzGraph.flat e he).cutoff f‖ₑ + lqNorm q (fun k =>
+      dyadicWeight (s + 1 / p.toReal) k *
+        lpModulusOn p (LipschitzGraph.flat e he).domain L f k) < ∞)
+    {G : V → ℂ} (hG : ContinuousOn G (closedHalfSpace e)) {K : Set V} (hK : IsCompact K)
+    (hGK : ∀ x ∈ closedHalfSpace e, x ∉ K → G x = 0)
+    (hfG : ∀ᵐ x ∂volume, x ∈ (LipschitzGraph.flat e he).domain → f x = G x) :
+    (LipschitzGraph.flat e he).trace hp L f =ᵐ[volume] fun x' => G x' := by
+  set Ω := LipschitzGraph.flat e he
+  set G' := G ∘ foldHalfSpace e
+  have hG'c : Continuous G' :=
+    hG.comp_continuous (continuous_foldHalfSpace e) (foldHalfSpace_mem he)
+  have hG's : HasCompactSupport G' := by
+    obtain ⟨R, hR⟩ := hK.isBounded.subset_closedBall 0
+    refine HasCompactSupport.intro (isCompact_closedBall (0 : V) R) fun x hx => ?_
+    have hfx : foldHalfSpace e x ∉ K := fun h => hx (by
+      have h' := hR h
+      rw [mem_closedBall_zero_iff, norm_foldHalfSpace he] at h'
+      exact mem_closedBall_zero_iff.2 h')
+    exact hGK _ (foldHalfSpace_mem he x) hfx
+  have hmem : MemLp G' p volume := hG'c.memLp_of_hasCompactSupport hG's
+  have hFG : (hmem.toLp G' : V → ℂ) =ᵐ[volume] G' := hmem.coeFn_toLp
+  have hcut : Ω.cutoff (hmem.toLp G') = Ω.cutoff f := by
+    refine Lp.ext ?_
+    filter_upwards [Ω.cutoff_apply_ae (hmem.toLp G'), Ω.cutoff_apply_ae f, hFG, hfG]
+      with x h1 h2 h3 h4
+    rw [h1, h2]
+    by_cases hx : x ∈ Ω.domain
+    · rw [indicator_of_mem hx, indicator_of_mem hx, h3, h4 hx]
+      show G (foldHalfSpace e x) = G x
+      rw [foldHalfSpace_of_nonneg e (le_of_lt (show 0 < inner ℝ x e from hx))]
+    · rw [indicator_of_notMem hx, indicator_of_notMem hx]
+  have hmod : ∀ k, lpModulusOn p Ω.domain L (hmem.toLp G') k = lpModulusOn p Ω.domain L f k :=
+    fun k => lpModulusOn_congr (Ω.indicator_ae_eq_of_cutoff_eq hcut) L k
+  have hFfin : ‖Ω.cutoff (hmem.toLp G')‖ₑ + lqNorm q (fun k => dyadicWeight (s + 1 / p.toReal) k *
+      lpModulusOn p Ω.domain L (hmem.toLp G') k) < ∞ := by
+    simp_rw [hcut, hmod]
+    exact hf
+  rw [← Ω.trace_congr hp L hcut]
+  filter_upwards [Ω.trace_ae_eq_comp_graphMap hp hL hs hq hFfin hG'c hFG] with x' hx'
+  have hx'0 : inner ℝ (x' : V) e = 0 := by
+    have h := x'.2
+    rw [Submodule.mem_orthogonal_singleton_iff_inner_right, real_inner_comm] at h
+    exact h
+  rw [hx', Function.comp_apply, LipschitzGraph.flat_graphMap]
+  show G (foldHalfSpace e x') = G x'
+  rw [foldHalfSpace_of_nonneg e hx'0.ge]
+
+end Fold
 
 end Rd
