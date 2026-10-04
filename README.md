@@ -586,6 +586,7 @@ explains how they differ.
 | Extension from the boundary of a Lipschitz graph domain, its trace space | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTraceExtension.lean` |
 | Traces in charts: locality, approximation, change of chart, products, finite sums | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTraceCharts.lean` |
 | Traces on bounded Lipschitz domains: Besov spaces on the boundary, the trace space | ✅ proved | ✗ | `FunctionSpaces/Rd/LipschitzBoundaryTrace.lean` |
+| Smooth measures on manifolds, integrals in charts | ✅ proved | ✗ | `FunctionSpaces/Manifold/SmoothMeasure.lean` |
 | Tensor kernels on `ℝ^d`: integrals, convolutions, dilations, diagonal changes of variables | ✅ proved | ✗ | `FunctionSpaces/Rd/TensorKernels.lean` |
 | Sequences on `ℕ^d`: `ℓ_q` norms, Schur test, almost diagonal lemma | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedSequences.lean` |
 | Mixed differences, mixed moduli, the mixed Besov quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedDifferences.lean` |

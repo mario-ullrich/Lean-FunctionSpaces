@@ -8424,6 +8424,52 @@ functions with a finite intrinsic norm on $\Omega$ are the restrictions of such 
 and the boundary traces agree almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}).
 \end{proof}
 
+\chapter{Besov spaces on compact manifolds}
+\label{ch:manifolds}
+
+This chapter works on a compact manifold $M$ modelled on a finite-dimensional real inner product
+space $E$ with corners $I$, in the sense of Mathlib: charts $e$ map open sets of $M$ to open sets
+of a model space $H$, and the extended charts $\kappa = e.\mathrm{extend}\, I$ take values in the
+closed set $\Omega = \operatorname{range} I \subseteq E$, the half-space for manifolds with
+boundary and $E$ itself for manifolds without boundary.
+
+\section{Smooth measures}
+
+\begin{definition}[Smooth measures]
+\label{def:smooth-measure}
+\lean{Manifold.IsSmoothMeasure, Manifold.measurableSet_extend_target}
+\leanok
+A measure $\mu$ on $M$ is smooth if for every chart $e$ of the atlas there is a function $\rho_e$,
+continuous on the target $\kappa(e.\mathrm{source})$ with $0 < \rho_e < \infty$ there, such that
+$\kappa_* (\mu|_{e.\mathrm{source}}) = \rho_e \, \mathrm{vol}|_{\kappa(e.\mathrm{source})}$. The
+target is measurable, the intersection of an open set with the closed range of $I$.
+\end{definition}
+
+The Riemannian volume and the Lebesgue measure of a smooth domain are smooth measures.
+
+\begin{lemma}[Integrals in a chart]
+\label{lem:chart-integrals}
+\lean{Manifold.IsSmoothMeasure.lintegral_source_eq, Manifold.IsSmoothMeasure.exists_density_bounds,
+  Manifold.IsSmoothMeasure.exists_lintegral_chart_le}
+\leanok
+\uses{def:smooth-measure}
+For a chart $e$ of the atlas and a measurable $F \geq 0$ on $M$,
+\[
+  \int_{e.\mathrm{source}} F \, d\mu = \int_{\kappa(e.\mathrm{source})} \rho_e(y) F(\kappa^{-1} y) \, dy .
+\]
+For a compact $K \subseteq e.\mathrm{source}$ there are $c > 0$ and $C < \infty$ such that every
+measurable $F \geq 0$ that vanishes outside $K$ satisfies
+$\int_{\kappa(e.\mathrm{source})} F \circ \kappa^{-1} \leq c^{-1} \int_M F \, d\mu$ and
+$\int_M F \, d\mu \leq C \int_{\kappa(e.\mathrm{source})} F \circ \kappa^{-1}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first identity is the definition of the image measure with $F = (F \circ \kappa^{-1}) \circ
+\kappa$ on the source. The continuous density is bounded above and below by positive finite
+constants on the compact $\kappa(K)$, which carries $F \circ \kappa^{-1}$.
+\end{proof}
+
 \chapter{Dominating mixed smoothness on $\R^d$}
 
 This chapter works on $\R^d$ with Lebesgue measure, for functions of $d$ real variables
