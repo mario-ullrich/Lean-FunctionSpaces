@@ -86,14 +86,14 @@ noncomputable def sobolevSpace (s : ℝ) (hs : 0 < s) :
 theorem sobolevSpace_order (s : ℝ) (hs : 0 < s) : (sobolevSpace (d := d) s hs).order = s := rfl
 
 /-- The embedding of `H^s(𝕋^d)` is `J_s`. -/
-theorem sobolevSpace_iota (s : ℝ) (hs : 0 < s) (c : ℓ²(d → ℤ, ℂ)) :
-    (sobolevSpace (d := d) s hs).ι c = (fourierScheme d).sobolevEmbed s hs.le c := rfl
+theorem sobolevSpace_incl (s : ℝ) (hs : 0 < s) (c : ℓ²(d → ℤ, ℂ)) :
+    (sobolevSpace (d := d) s hs).incl c = (fourierScheme d).sobolevEmbed s hs.le c := rfl
 
 /-- **Membership in `H^s(𝕋^d)`** through the Fourier coefficients: `f ∈ L_2(𝕋^d)` lies in the
 range of the Sobolev embedding exactly when
 `∑_k (1 + max_i |k_i|)^(2s) |f̂(k)|² < ∞`. -/
 theorem mem_range_sobolev_iff (s : ℝ) (hs : 0 < s) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    f ∈ Set.range (sobolevSpace (d := d) s hs).ι ↔
+    f ∈ Set.range (sobolevSpace (d := d) s hs).incl ↔
       Memℓp (fun k => ((((1 + deg k : ℕ) : ℝ) ^ s : ℝ) : ℂ) * mFourierCoeff f k) 2 := by
   have := (fourierScheme d).mem_range_sobolevEmbed_iff s hs.le f
   simp only [fourierScheme, mFourierBasis_repr] at this

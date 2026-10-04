@@ -73,13 +73,13 @@ theorem memBesov_exists_continuous (hs : (Fintype.card d : ℝ) * p.toReal⁻¹ 
 
 /-- **`H^s(𝕋^d) ⊆ B^s_{2,∞}(𝕋^d)`**, from Jackson's inequality. -/
 theorem sobolev_memBesov_top (hs : 0 < s) (c : ℓ²(d → ℤ, ℂ)) :
-    (trigScheme d).MemBesov volume 2 s ∞ ((sobolevSpace s hs).ι c) :=
+    (trigScheme d).MemBesov volume 2 s ∞ ((sobolevSpace s hs).incl c) :=
   (sobolevSpace s hs).memApprox_top c
 
 /-- **`B^t_{2,q}(𝕋^d) ⊆ H^s(𝕋^d)` for `t > s`**, from Bernstein's inequality. -/
 theorem exists_sobolev_of_memBesov (hs : 0 < s) {t : ℝ} (hst : s < t) (hq : 1 ≤ q)
     {f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))} (hf : (trigScheme d).MemBesov volume 2 t q f) :
-    ∃ c : ℓ²(d → ℤ, ℂ), (sobolevSpace s hs).ι c = f :=
+    ∃ c : ℓ²(d → ℤ, ℂ), (sobolevSpace s hs).incl c = f :=
   (sobolevSpace s hs).exists_eq_of_lt hst hq hf
 
 /-- **The Sobolev embedding into `L_r`** on the torus: for `2 ≤ r ≤ ∞` and
@@ -88,7 +88,7 @@ theorem exists_sobolev_of_memBesov (hs : 0 < s) {t : ℝ} (hst : s < t) (hq : 1 
 theorem sobolev_exists_inclusion_eq (h2r : (2 : ℝ≥0∞) ≤ r) (hs : 0 < s)
     (hsr : (Fintype.card d : ℝ) * ((2 : ℝ≥0∞).toReal⁻¹ - r.toReal⁻¹) < s) (c : ℓ²(d → ℤ, ℂ)) :
     ∃ g : Lp ℂ r (volume : Measure (UnitAddTorus d)),
-      Lp.inclusionOfExponentLe (𝕜 := ℝ) volume h2r g = (sobolevSpace s hs).ι c ∧
+      Lp.inclusionOfExponentLe (𝕜 := ℝ) volume h2r g = (sobolevSpace s hs).incl c ∧
         (trigScheme d).MemBesov volume r
           (s - Fintype.card d * ((2 : ℝ≥0∞).toReal⁻¹ - r.toReal⁻¹)) ∞ g :=
   memBesov_exists_inclusion_eq h2r hsr le_top (sobolev_memBesov_top hs c)

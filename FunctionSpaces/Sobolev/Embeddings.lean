@@ -66,7 +66,7 @@ inclusion of an element of `V'`. -/
 theorem SobolevSpace.exists_eq_inclusion (h : S.HasNikolskii μ D) (hD : 0 ≤ D)
     (V : S.SobolevSpace μ p W) (V' : S.SobolevSpace μ r W') (hpr : p ≤ r)
     (hst : V'.order < V.order - nikolskiiExponent D p r) (y : W) :
-    ∃ y' : W', Lp.inclusionOfExponentLe (𝕜 := ℝ) μ hpr (V'.ι y') = V.ι y := by
+    ∃ y' : W', Lp.inclusionOfExponentLe (𝕜 := ℝ) μ hpr (V'.incl y') = V.incl y := by
   have hα : nikolskiiExponent D p r < V.order := by linarith [V'.order_pos]
   obtain ⟨g, hg, hmem⟩ :=
     MemBesov.exists_inclusion_eq_of_nikolskii h hD hpr hα le_top (V.memApprox_top y)
@@ -77,7 +77,7 @@ theorem SobolevSpace.exists_eq_inclusion (h : S.HasNikolskii μ D) (hD : 0 ≤ D
 theorem SobolevSpace.exists_eq_inclusion' (h : S.HasNikolskii μ D) (hD : 0 ≤ D)
     (V : S.SobolevSpace μ p W) (V' : S.SobolevSpace μ r W') (hpr : p ≤ r)
     (hst : V'.order - D * r.toReal⁻¹ < V.order - D * p.toReal⁻¹) (y : W) :
-    ∃ y' : W', Lp.inclusionOfExponentLe (𝕜 := ℝ) μ hpr (V'.ι y') = V.ι y :=
+    ∃ y' : W', Lp.inclusionOfExponentLe (𝕜 := ℝ) μ hpr (V'.incl y') = V.incl y :=
   V.exists_eq_inclusion h hD V' hpr (by unfold nikolskiiExponent; linarith) y
 
 /-- **Embedding of a Sobolev space into bounded continuous functions**: for `s > D/p` and a
@@ -86,7 +86,7 @@ measure charging every nonempty open set, every element of a Sobolev space of or
 theorem SobolevSpace.exists_boundedContinuous [μ.IsOpenPosMeasure] (h : S.HasNikolskii μ D)
     (hD : 0 ≤ D) (V : S.SobolevSpace μ p W) (hs : D * p.toReal⁻¹ < V.order) (y : W) :
     ∃ a : Ω →ᵇ ℂ, Lp.inclusionOfExponentLe (𝕜 := ℝ) μ le_top
-      (BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ a) = V.ι y :=
+      (BoundedContinuousFunction.toLp (E := ℂ) ∞ μ ℝ a) = V.incl y :=
   MemBesov.exists_boundedContinuous h hD hs le_top (V.memApprox_top y)
 
 end FunctionScheme

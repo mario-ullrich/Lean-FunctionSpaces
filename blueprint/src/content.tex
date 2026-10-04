@@ -1852,7 +1852,7 @@ scheme $(\mathcal{E}_n)$ are defined for every $1 \leq p \leq \infty$ by \Cref{d
 \label{thm:eigenbasis-besov}
 \lean{LaplaceEigenbasis.memBesov_two_two_iff, LaplaceEigenbasis.memBesov_two_iff_blockNorm_lt_top,
   LaplaceEigenbasis.sobolevSpace, LaplaceEigenbasis.sobolevSpace_order,
-  LaplaceEigenbasis.sobolevSpace_iota, LaplaceEigenbasis.mem_range_sobolev_iff,
+  LaplaceEigenbasis.sobolevSpace_incl, LaplaceEigenbasis.mem_range_sobolev_iff,
   LaplaceEigenbasis.sobolev_memBesov_top, LaplaceEigenbasis.exists_sobolev_of_memBesov}
 \leanok
 \uses{def:laplace-eigenbasis, thm:spectral-coefficients, prop:spectral-jackson-bernstein,
@@ -2042,7 +2042,7 @@ Divide by $(\sup|T|)^{2m-p}$ and take $p$-th roots. For $p = \infty$ the constan
 \begin{definition}[Sobolev space $H^s(\T^d)$]
 \label{def:torus-sobolev}
 \lean{Torus.fourierScheme, Torus.toLp_trigScheme_eq, Torus.sobolevSpace,
-  Torus.mem_range_sobolev_iff, Torus.sobolevSpace_order, Torus.sobolevSpace_iota}
+  Torus.mem_range_sobolev_iff, Torus.sobolevSpace_order, Torus.sobolevSpace_incl}
 \leanok
 \uses{def:spectral, def:sobolev-embed, prop:spectral-jackson-bernstein, def:sobolev-scheme}
 The Fourier basis $(e_k)_{k \in \Z^d}$ of $L_2(\T^d)$ with the level $\deg$ is a spectral

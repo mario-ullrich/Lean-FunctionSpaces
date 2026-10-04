@@ -142,25 +142,25 @@ noncomputable def sobolevSpace (s : ℝ) (hs : 0 < s) : B.eigenScheme.SobolevSpa
 theorem sobolevSpace_order (hs : 0 < s) : (B.sobolevSpace s hs).order = s := rfl
 
 /-- The embedding of `H^s` is `J_s`. -/
-theorem sobolevSpace_iota (hs : 0 < s) (c : ℓ²(ι, ℂ)) :
-    (B.sobolevSpace s hs).ι c = B.sobolevEmbed s hs.le c := rfl
+theorem sobolevSpace_incl (hs : 0 < s) (c : ℓ²(ι, ℂ)) :
+    (B.sobolevSpace s hs).incl c = B.sobolevEmbed s hs.le c := rfl
 
 /-- **Membership in `H^s`** through the coefficients: `f ∈ L_2(μ)` lies in the range of the
 Sobolev embedding iff `∑_i (1 + λ(i))^(2s) |⟨e_i, f⟩|² < ∞`. -/
 theorem mem_range_sobolev_iff (hs : 0 < s) (f : Lp ℂ 2 μ) :
-    f ∈ Set.range (B.sobolevSpace s hs).ι ↔
+    f ∈ Set.range (B.sobolevSpace s hs).incl ↔
       Memℓp (fun i => ((((1 + B.level i : ℕ) : ℝ) ^ s : ℝ) : ℂ) * B.basis.repr f i) 2 :=
   B.mem_range_sobolevEmbed_iff s hs.le f
 
 /-- **`H^s ⊆ B^s_{2,∞}`**, from Jackson's inequality. -/
 theorem sobolev_memBesov_top (hs : 0 < s) (c : ℓ²(ι, ℂ)) :
-    B.eigenScheme.MemBesov μ 2 s ∞ ((B.sobolevSpace s hs).ι c) :=
+    B.eigenScheme.MemBesov μ 2 s ∞ ((B.sobolevSpace s hs).incl c) :=
   (B.sobolevSpace s hs).memApprox_top c
 
 /-- **`B^t_{2,q} ⊆ H^s` for `t > s`**, from Bernstein's inequality. -/
 theorem exists_sobolev_of_memBesov (hs : 0 < s) {t : ℝ} (hst : s < t) (hq : 1 ≤ q)
     {f : Lp ℂ 2 μ} (hf : B.eigenScheme.MemBesov μ 2 t q f) :
-    ∃ c : ℓ²(ι, ℂ), (B.sobolevSpace s hs).ι c = f :=
+    ∃ c : ℓ²(ι, ℂ), (B.sobolevSpace s hs).incl c = f :=
   (B.sobolevSpace s hs).exists_eq_of_lt hst hq hf
 
 end LaplaceEigenbasis

@@ -225,7 +225,7 @@ theorem approxSpace_eq_of_jackson_bernstein {B : ApproximationScheme X} {C₁ C�
 `A^s_q = (X, W)_{s/r,q}`. -/
 theorem SmoothnessSpace.memApprox_iff_memInterp (W : SmoothnessSpace A Y) (hs : 0 < s)
     (hsr : s < W.order) (hq : 1 ≤ q) {f : X} :
-    A.MemApprox s q f ↔ MemInterp W.ι (s / W.order) W.order q f :=
+    A.MemApprox s q f ↔ MemInterp W.incl (s / W.order) W.order q f :=
   ApproximationScheme.memApprox_iff_memInterp W.jackson W.jacksonConst_nonneg W.bernstein
     W.bernsteinConst_nonneg hs hsr hq
 

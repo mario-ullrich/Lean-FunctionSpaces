@@ -53,10 +53,10 @@ structure ApproxExtension (R : X →L[ℝ] Y) (A : ApproximationScheme X)
   /-- The constant of the extension. -/
   C : ℝ≥0∞
   C_ne_top : C ≠ ∞
-  /-- The loss in complexity: `2^k` becomes `2^(k+γ)`. -/
-  γ : ℕ
+  /-- The loss `γ` in complexity: `2^k` becomes `2^(k+γ)`. -/
+  loss : ℕ
   enorm_le : ∀ g, ‖E g‖ₑ ≤ C * ‖g‖ₑ
-  approxSeq_le : ∀ g k, A.approxSeq (E g) (2 ^ (k + γ)) ≤ C * B.approxSeq g (2 ^ k)
+  approxSeq_le : ∀ g k, A.approxSeq (E g) (2 ^ (k + loss)) ≤ C * B.approxSeq g (2 ^ k)
 
 /-- The constant `C (1 + (γ + 1) 2^(γs))` of the extension bound. -/
 noncomputable def extensionConst (C : ℝ≥0∞) (γ : ℕ) (s : ℝ) : ℝ≥0∞ :=
@@ -73,8 +73,8 @@ theorem extensionConst_ne_top {C : ℝ≥0∞} (hC : C ≠ ∞) (γ : ℕ) (s : 
 `‖E g‖_{A^s_q} ≤ C (1 + (γ + 1) 2^(γs)) ‖g‖_{B^s_q}` in the dyadic quasi-norms. -/
 theorem approxNormDyadic_extension_le {R : X →L[ℝ] Y} (Ex : ApproxExtension R A B) (hs : 0 ≤ s)
     (hq : 1 ≤ q) (g : Y) :
-    A.approxNormDyadic s q (Ex.E g) ≤ extensionConst Ex.C Ex.γ s * B.approxNormDyadic s q g := by
-  set γ := Ex.γ
+    A.approxNormDyadic s q (Ex.E g) ≤ extensionConst Ex.C Ex.loss s * B.approxNormDyadic s q g := by
+  set γ := Ex.loss
   set C := Ex.C
   set w := dyadicWeight s γ
   set L := lqNorm q (B.approxSeqDyadic s g)
@@ -140,7 +140,7 @@ theorem approxNormDyadic_le_iInf_restrict {R : X →L[ℝ] Y} (hR : ∀ n, ∀ a
 extension exists: `inf { ‖f‖_{A^s_q} : R f = g } ≤ K ‖g‖_{B^s_q}`. -/
 theorem restrictionNorm_le_approxNormDyadic {R : X →L[ℝ] Y} (Ex : ApproxExtension R A B)
     (hs : 0 ≤ s) (hq : 1 ≤ q) (g : Y) :
-    restrictionNorm R A s q g ≤ extensionConst Ex.C Ex.γ s * B.approxNormDyadic s q g :=
+    restrictionNorm R A s q g ≤ extensionConst Ex.C Ex.loss s * B.approxNormDyadic s q g :=
   (iInf₂_le (Ex.E g) (Ex.right_inv g)).trans (approxNormDyadic_extension_le Ex hs hq g)
 
 /-- **Intrinsic description of the restricted space**: with an approximation-preserving
@@ -152,7 +152,7 @@ theorem memApprox_iff_exists_restrict {R : X →L[ℝ] Y} (hR : ∀ n, ∀ a ∈
   · intro hg
     refine ⟨Ex.E g, Ex.right_inv g, (memApprox_iff_approxNormDyadic_lt_top hq hs).2 ?_⟩
     exact (approxNormDyadic_extension_le Ex hs hq g).trans_lt (ENNReal.mul_lt_top
-      (extensionConst_ne_top Ex.C_ne_top Ex.γ s).lt_top
+      (extensionConst_ne_top Ex.C_ne_top Ex.loss s).lt_top
       ((memApprox_iff_approxNormDyadic_lt_top hq hs).1 hg))
   · rintro ⟨f, rfl, hf⟩
     exact hf.map R hR

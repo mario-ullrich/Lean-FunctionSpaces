@@ -83,9 +83,9 @@ bounded linear map `ι : F → E` satisfying Jackson's and Bernstein's inequalit
 Sobolev spaces inside `L_p` are the motivating example. -/
 structure SmoothnessSpace {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
     (A : ApproximationScheme E) (F : Type*) [NormedAddCommGroup F] [NormedSpace ℝ F] where
-  /-- The embedding of the smoothness space into `E`. -/
-  ι : F →L[ℝ] E
-  injective : Function.Injective ι
+  /-- The embedding `ι` of the smoothness space into `E`. -/
+  incl : F →L[ℝ] E
+  injective : Function.Injective incl
   /-- The order of smoothness. -/
   order : ℝ
   order_pos : 0 < order
@@ -95,20 +95,20 @@ structure SmoothnessSpace {E : Type*} [NormedAddCommGroup E] [NormedSpace ℝ E]
   /-- The constant of Bernstein's inequality. -/
   bernsteinConst : ℝ
   bernsteinConst_nonneg : 0 ≤ bernsteinConst
-  jackson : JacksonBound ι A order jacksonConst
-  bernstein : LiftBound ι A order bernsteinConst
+  jackson : JacksonBound incl A order jacksonConst
+  bernstein : LiftBound incl A order bernsteinConst
 
 namespace SmoothnessSpace
 
 variable (W : SmoothnessSpace A Y)
 
 /-- **`W ⊆ A^r_∞`**, from Jackson's inequality. -/
-theorem memApprox_top (y : Y) : A.MemApprox W.order ∞ (W.ι y) :=
+theorem memApprox_top (y : Y) : A.MemApprox W.order ∞ (W.incl y) :=
   memApprox_top_of_jackson W.jackson W.jacksonConst_nonneg W.order_pos.le y
 
 /-- **`A^r_1 ⊆ W`**, from Bernstein's inequality. -/
 theorem exists_eq_of_memApprox_one [CompleteSpace Y] {f : X} (hf : A.MemApprox W.order 1 f) :
-    ∃ y : Y, W.ι y = f ∧ ‖y‖ₑ ≤ (3 * ENNReal.ofReal W.bernsteinConst +
+    ∃ y : Y, W.incl y = f ∧ ‖y‖ₑ ≤ (3 * ENNReal.ofReal W.bernsteinConst +
       3 * liftConst W.bernsteinConst W.order) * A.approxNormDyadic W.order 1 f :=
   exists_preimage_of_liftBound W.bernstein W.bernsteinConst_nonneg W.order_pos.le
     ((memApprox_iff_lqNorm_dyadic_lt_top le_rfl W.order_pos.le).1 hf)
@@ -116,7 +116,7 @@ theorem exists_eq_of_memApprox_one [CompleteSpace Y] {f : X} (hf : A.MemApprox W
 /-- **`A^s_q ⊆ W` for `s > r`**: more smoothness in the approximation sense than the order of
 `W` gives an element of `W`, for every fine index. -/
 theorem exists_eq_of_lt [CompleteSpace Y] {s : ℝ} {q : ℝ≥0∞} (hs : W.order < s) (hq : 1 ≤ q)
-    {f : X} (hf : A.MemApprox s q f) : ∃ y : Y, W.ι y = f :=
+    {f : X} (hf : A.MemApprox s q f) : ∃ y : Y, W.incl y = f :=
   let ⟨y, hy, _⟩ := W.exists_eq_of_memApprox_one (hf.of_lt hq le_rfl W.order_pos.le hs)
   ⟨y, hy⟩
 
@@ -124,7 +124,7 @@ theorem exists_eq_of_lt [CompleteSpace Y] {s : ℝ} {q : ℝ≥0∞} (hs : W.ord
 the constants. -/
 def congr {B : ApproximationScheme X} (h : A = B) (W : SmoothnessSpace A Y) :
     SmoothnessSpace B Y where
-  ι := W.ι
+  incl := W.incl
   injective := W.injective
   order := W.order
   order_pos := W.order_pos

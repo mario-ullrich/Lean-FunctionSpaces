@@ -277,7 +277,7 @@ theorem liftBound (s : ℝ) (hs : 0 ≤ s) :
 Jackson and Bernstein constants `1`. -/
 noncomputable def toSmoothnessSpace (s : ℝ) (hs : 0 < s) :
     ApproximationScheme.SmoothnessSpace S.toScheme ℓ²(ι, ℂ) where
-  ι := (S.sobolevEmbed s hs.le).restrictScalars ℝ
+  incl := (S.sobolevEmbed s hs.le).restrictScalars ℝ
   injective := S.sobolevEmbed_injective s hs.le
   order := s
   order_pos := hs

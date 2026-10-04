@@ -194,7 +194,7 @@ theorem memSobolev_iff_memBesov {m : ℕ} (hm : 1 ≤ m)
 `H^m(𝕋^d)` of the approximation theory. -/
 theorem memSobolev_iff_mem_range {m : ℕ} (hm : 1 ≤ m)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    MemSobolev m f ↔ f ∈ Set.range (sobolevSpace (d := d) m (by exact_mod_cast hm)).ι := by
+    MemSobolev m f ↔ f ∈ Set.range (sobolevSpace (d := d) m (by exact_mod_cast hm)).incl := by
   rw [memSobolev_iff, mem_range_sobolev_iff]
 
 end Torus
