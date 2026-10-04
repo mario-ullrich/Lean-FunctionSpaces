@@ -484,10 +484,11 @@ explains how they differ.
   almost everywhere with functions in `B^s_{p,q}(H₀)`. For `1 ≤ p < ∞`, `s > 0` and
   `1 ≤ q ≤ ∞` this does not depend on the atlas
   (`Manifold.BesovAtlas.memBoundaryBesov_iff_memBoundaryBesov`).
-* **The trace theorem on compact manifolds with boundary.** With `M` as above, a smooth measure
-  `μ`, `1 ≤ p < ∞`, `s > 0`, `1 ≤ q ≤ ∞` and the trace `Tr` of order `L ≥ 2`, `L > s + 1/p`, of the
-  half-space, the trace of `f ∈ L_p(μ)` on `∂M` is `Tr_A f = ∑_i θ_i · Tr((ψ_i f) ∘ κ_i⁻¹) ∘ P ∘ κ_i`
-  (`Manifold.BesovAtlas.boundaryTrace`). The trace commutes with the changes of charts
+* **The trace theorem on compact manifolds with boundary.** With `M` as above, a smooth measure `μ`,
+  `1 ≤ p < ∞`, `s > 0`, `1 ≤ q ≤ ∞` and the trace `Tr` of order `L ≥ 2`, `L > s + 1/p`, of the
+  half-space, the trace of `f ∈ L_p(μ)` on `∂M` is
+  `Tr_A f = ∑_i θ_i · Tr((ψ_i f) ∘ κ_i⁻¹) ∘ P ∘ κ_i` (`Manifold.BesovAtlas.boundaryTrace`). The
+  trace commutes with the changes of charts
   (`Manifold.trace_chartChange_applyLp`), so for `f ∈ B^{s+1/p}_{p,q}(M)` the boundary pieces of
   `Tr_A f` are the traces of the chart pieces of `f`, for every atlas
   (`Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_atlas`). `B^s_{p,q}(∂M)` is the trace space
