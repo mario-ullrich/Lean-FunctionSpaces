@@ -8547,14 +8547,19 @@ the range of $I$.
 
 \begin{definition}[The changes of charts with cut-offs]
 \label{def:chart-transition}
-\lean{Manifold.BesovAtlas.transition, Manifold.BesovAtlas.transition_apply}
+\lean{Manifold.BesovAtlas.chartChange, Manifold.BesovAtlas.chartChange_apply,
+  Manifold.BesovAtlas.tsupport_psi_mul_theta_subset, Manifold.BesovAtlas.transition,
+  Manifold.BesovAtlas.transition_apply}
 \leanok
 \uses{def:cutoff-diffeo, lem:coord-change, def:besov-atlas}
-For two Besov atlases $A, A'$ and charts $i$ of $A$ and $j$ of $A'$, the change of charts
-$\Phi_{ij} = \kappa'_j \circ \kappa_i^{-1}$ with the cut-off
-$\chi_{ij} = (\psi_i \theta'_j) \circ \kappa_j'^{-1}$ and
-$K_0 = \kappa'_j(\operatorname{tsupport} \psi_i \cap \operatorname{tsupport} \theta'_j)$ is a smooth
-change of variables with a cut-off $T_{ij}$ on $\Omega$.
+For charts $e, e'$ of the atlas and a smooth $c : M \to \R$ with $\operatorname{tsupport} c
+\subseteq e.\mathrm{source} \cap e'.\mathrm{source}$, the change of charts
+$\Phi = \kappa' \circ \kappa^{-1}$ with the cut-off $\chi = c \circ \kappa'^{-1}$ and
+$K_0 = \kappa'(\operatorname{tsupport} c)$ is a smooth change of variables with a cut-off on
+$\Omega$. For two Besov atlases $A, A'$ and charts $i$ of $A$ and $j$ of $A'$, the cut-off
+$c = \psi_i \theta'_j$ gives the change of variables $T_{ij}$, with
+$\Phi_{ij} = \kappa'_j \circ \kappa_i^{-1}$ and $\chi_{ij} = (\psi_i \theta'_j) \circ
+\kappa_j'^{-1}$.
 \end{definition}
 
 The smoothness of $\Phi_{ij}$ and of its inverse is the compatibility of the charts in the
@@ -8812,6 +8817,84 @@ $\Besov{s}{p}{q}(\R^n)$ by \Cref{lem:global-changes}. Conversely, the pieces ext
 half-space (\Cref{thm:half-space-besov-domain}) to $G_i \in \Besov{s}{p}{q}(\R^n)$, and
 $F = \sum_i \theta_i (G_i \circ \sigma_i) \in \Besov{s}{p}{q}(\R^n)$ agrees with $f$ on $\Omega$,
 since $\theta_i \psi_i = \psi_i$ and $\sum_i \psi_i = 1$ on $\overline{\Omega}$.
+\end{proof}
+
+\section{Besov spaces on the boundary}
+
+In this section $M$ is a compact smooth manifold with boundary modelled on the half-space
+$\{y \in \R^n : y_0 \geq 0\}$. Its boundary hyperplane is $H_0 = e_0^\perp = \{y : y_0 = 0\}$, with
+the orthogonal projection $P$ onto $H_0$ and the Lebesgue measure of $H_0$.
+
+\begin{lemma}[Changes of charts preserve the boundary]
+\label{lem:coord-change-boundary}
+\lean{Manifold.flatDomain, Manifold.bdry, Manifold.mem_bdry_iff, Manifold.bdry_subset_range,
+  Manifold.coe_proj_of_mem_bdry, Manifold.isClosed_bdry, Manifold.mem_interior_extend_target_iff,
+  Manifold.coordChange_mem_bdry, Manifold.mem_coordChange_source_iff_of_bdry,
+  Manifold.mem_coordChange_target_iff_of_bdry, Manifold.coe_proj_coordChange,
+  Manifold.coe_proj_coordChange_symm}
+\leanok
+\uses{lem:coord-change}
+$H_0$ is a closed subspace contained in the half-space. A point $y$ of the target of an extended
+chart lies in the interior of the target if and only if $y_0 > 0$. For charts $e, e'$ of the
+atlas, the change of charts maps every point $y$ of its source with $y_0 = 0$ to a point of $H_0$,
+and so does its inverse.
+\end{lemma}
+
+\begin{proof}
+\leanok
+A point of $M$ is mapped into the interior of the half-space by one chart if and only if by every
+chart (Mathlib's \texttt{ModelWithCorners.\allowbreak mem\_interior\_range\_iff\_of\_mem\_atlas}).
+The change of charts maps into the half-space, so a point with $y_0 = 0$ goes to a point whose
+first coordinate is $\geq 0$ and not $> 0$.
+\end{proof}
+
+\begin{definition}[Changes of charts on the boundary]
+\label{def:boundary-chart-change}
+\lean{Manifold.boundaryChartChange, Manifold.chartChange_apply_coe,
+  Manifold.BesovAtlas.boundaryTransition}
+\leanok
+\uses{lem:coord-change-boundary, def:chart-transition, def:cutoff-diffeo}
+Let $T$ be the change of charts with a cut-off of \Cref{def:chart-transition}, with $\Phi$, $\chi$
+and $K_0$. Its restriction $T^\partial$ to $H_0$, with the change of charts $P \circ \Phi$ on
+$H_0 \cap U$, its inverse $P \circ \Phi^{-1}$ on $H_0 \cap U'$, the cut-off $\chi|_{H_0}$ and the
+compact set $K_0 \cap H_0$, is a smooth change of variables with a cut-off on the whole space
+$H_0$, and $(T G)|_{H_0} = T^\partial(G|_{H_0})$ for every $G : \R^n \to \C$. For two Besov
+atlases $A, A'$ the restriction of $T_{ij}$ is $T^\partial_{ij}$.
+\end{definition}
+
+\begin{definition}[Besov spaces on the boundary]
+\label{def:manifold-boundary-besov}
+\lean{Manifold.BesovAtlas.boundaryPiece, Manifold.BesovAtlas.MemBoundaryBesov}
+\leanok
+\uses{def:chart-pieces}
+For a Besov atlas $A$, the $i$-th boundary piece of $g : M \to \C$ is the restriction
+$\bigl((\psi_i g) \circ \kappa_i^{-1}\bigr)|_{H_0}$ of its $i$-th piece. For $1 \leq p < \infty$,
+$s > 0$ and $1 \leq q \leq \infty$, $g$ lies in $\Besov{s}{p}{q}(\partial M)$ if every boundary
+piece agrees almost everywhere on $H_0$ with some $G_i \in L_p(H_0)$ with
+$\|G_i\|_p + \|(2^{ks} \omega_r(G_i, 2^{-k})_p)_k\|_{\ell_q} < \infty$, $r = \lfloor s \rfloor + 1$.
+\end{definition}
+
+\begin{theorem}[Independence of the atlas on the boundary]
+\label{thm:boundary-atlas-independence}
+\lean{Manifold.BesovAtlas.boundaryPiece_eq_sum, Manifold.BesovAtlas.interior_univ_bdry_nonempty,
+  Manifold.BesovAtlas.MemBoundaryBesov.of_atlas,
+  Manifold.BesovAtlas.memBoundaryBesov_iff_memBoundaryBesov}
+\leanok
+\uses{def:manifold-boundary-besov, def:boundary-chart-change, thm:pieces-two-atlases,
+  thm:diffeo-invariance, lem:modnorm-on}
+For two Besov atlases $A, A'$ and $g : M \to \C$, the $i$-th boundary piece of $g$ for $A$ is
+$\sum_j T^\partial_{ij}$ applied to the $j$-th boundary piece for $A'$, at every point of $H_0$.
+For $1 \leq p < \infty$, $s > 0$ and $1 \leq q \leq \infty$, $g \in \Besov{s}{p}{q}(\partial M)$
+for $A$ if and only if for $A'$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The identity is \Cref{thm:pieces-two-atlases} restricted to $H_0$
+(\Cref{def:boundary-chart-change}). The changes of charts $T^\partial_{ij}$ live on the whole
+space $H_0$, so \Cref{thm:diffeo-invariance} bounds
+$N(T^\partial_{ij} G'_j) \leq C_{ij} N(G'_j)$ for the Besov quasi-norm $N$ of $H_0$, and $N$ is
+subadditive (\Cref{lem:modnorm-on}).
 \end{proof}
 
 \chapter{Dominating mixed smoothness on $\R^d$}

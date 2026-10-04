@@ -256,71 +256,94 @@ end Lp
 
 section Transition
 
-variable [IsManifold I ∞ M] [CompactSpace M] (A' : BesovAtlas I M)
+variable [IsManifold I ∞ M] [CompactSpace M]
 
-/-- The **change of charts** from the `i`-th chart of `A` to the `j`-th chart of `A'`, with the
-cut-off `(ψ_i θ'_j) ∘ κ'_j⁻¹`, as a smooth change of variables with a cut-off on `range I`. -/
-noncomputable def transition (i : Fin A.n) (j : Fin A'.n) : Rd.CutoffDiffeo (range I) where
-  U := I.symm ⁻¹' ((A.chart i).symm ≫ₕ A'.chart j).source
-  U' := I.symm ⁻¹' ((A.chart i).symm ≫ₕ A'.chart j).target
+omit [FiniteDimensional ℝ E] in
+/-- **The change of charts with a cut-off** from a chart `e` to a chart `e'` of the atlas, with a
+smooth cut-off `c` on `M` whose support lies in both sources: `Φ = κ' ∘ κ⁻¹` with
+`χ = c ∘ κ'⁻¹`, as a smooth change of variables with a cut-off on `range I`. -/
+noncomputable def chartChange {e e' : OpenPartialHomeomorph M H} (he : e ∈ atlas H M)
+    (he' : e' ∈ atlas H M) (c : M → ℝ) (hc : ContMDiff I 𝓘(ℝ, ℝ) ∞ c)
+    (hcs : tsupport c ⊆ e.source ∩ e'.source) : Rd.CutoffDiffeo (range I) where
+  U := I.symm ⁻¹' (e.symm ≫ₕ e').source
+  U' := I.symm ⁻¹' (e.symm ≫ₕ e').target
   isOpen_U := I.continuous_symm.isOpen_preimage _ (OpenPartialHomeomorph.open_source _)
   isOpen_U' := I.continuous_symm.isOpen_preimage _ (OpenPartialHomeomorph.open_target _)
-  Phi := I.extendCoordChange (A.chart i) (A'.chart j)
-  Psi := (I.extendCoordChange (A.chart i) (A'.chart j)).symm
-  chi := (A'.ext j).target.indicator fun y =>
-    ((A.psi i ((A'.ext j).symm y) * A'.theta j ((A'.ext j).symm y) : ℝ) : ℂ)
-  K0 := A'.ext j '' (tsupport (A.psi i) ∩ tsupport (A'.theta j))
+  Phi := I.extendCoordChange e e'
+  Psi := (I.extendCoordChange e e').symm
+  chi := (e'.extend I).target.indicator fun y => (c ((e'.extend I).symm y) : ℂ)
+  K0 := e'.extend I '' tsupport c
   contDiffOn_Phi := by
     rw [range_inter_coordChange_source]
-    exact I.contDiffOn_extendCoordChange (IsManifold.subset_maximalAtlas (A.chart_mem i))
-      (IsManifold.subset_maximalAtlas (A'.chart_mem j))
+    exact I.contDiffOn_extendCoordChange (IsManifold.subset_maximalAtlas he)
+      (IsManifold.subset_maximalAtlas he')
   contDiffOn_Psi := by
     rw [range_inter_coordChange_target]
-    exact I.contDiffOn_extendCoordChange_symm (IsManifold.subset_maximalAtlas (A.chart_mem i))
-      (IsManifold.subset_maximalAtlas (A'.chart_mem j))
+    exact I.contDiffOn_extendCoordChange_symm (IsManifold.subset_maximalAtlas he)
+      (IsManifold.subset_maximalAtlas he')
   contDiffOn_chi := by
     rw [range_inter_coordChange_target]
-    have hsub : (I.extendCoordChange (A.chart i) (A'.chart j)).target ⊆ (A'.ext j).target := by
+    have hsub : (I.extendCoordChange e e').target ⊆ (e'.extend I).target := by
       rw [coordChange_target_eq_image]
       rintro _ ⟨x, hx, rfl⟩
-      exact (A'.ext j).map_source (by rw [OpenPartialHomeomorph.extend_source]; exact hx.1)
-    have hsm := Complex.ofRealCLM.contDiff.comp_contDiffOn (contDiffOn_comp_extend_symm
-      (A'.chart_mem j) ((A.contMDiff_psi i).mul (A'.contMDiff_theta j)))
+      exact (e'.extend I).map_source (by rw [OpenPartialHomeomorph.extend_source]; exact hx.1)
+    have hsm := Complex.ofRealCLM.contDiff.comp_contDiffOn (contDiffOn_comp_extend_symm he' hc)
     refine (hsm.mono hsub).congr fun y hy => ?_
     rw [indicator_of_mem (hsub hy)]
     rfl
   mapsTo_Phi := by
     rw [range_inter_coordChange_source, range_inter_coordChange_target]
-    exact (I.extendCoordChange (A.chart i) (A'.chart j)).mapsTo
+    exact (I.extendCoordChange e e').mapsTo
   mapsTo_Psi := by
     rw [range_inter_coordChange_source, range_inter_coordChange_target]
-    exact (I.extendCoordChange (A.chart i) (A'.chart j)).mapsTo_symm
+    exact (I.extendCoordChange e e').mapsTo_symm
   left_inv x hx := by
     rw [range_inter_coordChange_source] at hx
-    exact (I.extendCoordChange (A.chart i) (A'.chart j)).left_inv hx
+    exact (I.extendCoordChange e e').left_inv hx
   right_inv y hy := by
     rw [range_inter_coordChange_target] at hy
-    exact (I.extendCoordChange (A.chart i) (A'.chart j)).right_inv hy
-  isCompact_K0 :=
-    (((isClosed_tsupport _).isCompact).inter_right (isClosed_tsupport _)).image_of_continuousOn
-      ((A'.chart j).continuousOn_extend.mono (by
-        rw [OpenPartialHomeomorph.extend_source]
-        exact inter_subset_right.trans (A'.tsupport_theta_subset j)))
+    exact (I.extendCoordChange e e').right_inv hy
+  isCompact_K0 := (isClosed_tsupport c).isCompact.image_of_continuousOn
+    (e'.continuousOn_extend.mono (by
+      rw [OpenPartialHomeomorph.extend_source]
+      exact hcs.trans inter_subset_right))
   K0_subset := by
     rw [range_inter_coordChange_target, coordChange_target_eq_image]
-    exact image_mono fun x hx =>
-      ⟨A'.tsupport_theta_subset j hx.2, A.tsupport_psi_subset i hx.1⟩
+    exact image_mono fun x hx => ⟨(hcs hx).2, (hcs hx).1⟩
   chi_eq_zero y _ hyK := by
-    by_cases hy : y ∈ (A'.ext j).target
+    by_cases hy : y ∈ (e'.extend I).target
     · rw [indicator_of_mem hy]
       by_contra h
-      have hne : A.psi i ((A'.ext j).symm y) * A'.theta j ((A'.ext j).symm y) ≠ 0 := by
-        intro h0
-        exact h (by rw [h0, Complex.ofReal_zero])
-      exact hyK ⟨(A'.ext j).symm y,
-        ⟨subset_tsupport _ (left_ne_zero_of_mul hne), subset_tsupport _ (right_ne_zero_of_mul hne)⟩,
-        (A'.ext j).right_inv hy⟩
+      have hne : c ((e'.extend I).symm y) ≠ 0 := fun h0 => h (by rw [h0, Complex.ofReal_zero])
+      exact hyK ⟨(e'.extend I).symm y, subset_tsupport _ hne, (e'.extend I).right_inv hy⟩
     · exact indicator_of_notMem hy _
+
+omit [FiniteDimensional ℝ E] in
+/-- The change of charts with a cut-off acts on the source of the change of charts:
+`T G = 1_{κ(s ∩ s')} (χ G) ∘ Φ`. -/
+theorem chartChange_apply {e e' : OpenPartialHomeomorph M H} (he : e ∈ atlas H M)
+    (he' : e' ∈ atlas H M) (c : M → ℝ) (hc : ContMDiff I 𝓘(ℝ, ℝ) ∞ c)
+    (hcs : tsupport c ⊆ e.source ∩ e'.source) (G : E → ℂ) (y : E) :
+    (chartChange he he' c hc hcs).apply G y = (I.extendCoordChange e e').source.indicator
+      (fun y => (chartChange he he' c hc hcs).chi (I.extendCoordChange e e' y) *
+        G (I.extendCoordChange e e' y)) y := by
+  rw [Rd.CutoffDiffeo.apply, ← range_inter_coordChange_source]
+  rfl
+
+variable (A' : BesovAtlas I M)
+
+omit [FiniteDimensional ℝ E] [IsManifold I ∞ M] [CompactSpace M] in
+/-- The cut-off `ψ_i θ'_j` of two atlases has its support in both sources. -/
+theorem tsupport_psi_mul_theta_subset (i : Fin A.n) (j : Fin A'.n) :
+    tsupport (fun x => A.psi i x * A'.theta j x) ⊆ (A.chart i).source ∩ (A'.chart j).source :=
+  subset_inter (tsupport_mul_subset_left.trans (A.tsupport_psi_subset i))
+    (tsupport_mul_subset_right.trans (A'.tsupport_theta_subset j))
+
+/-- The **change of charts** from the `i`-th chart of `A` to the `j`-th chart of `A'`, with the
+cut-off `(ψ_i θ'_j) ∘ κ'_j⁻¹`, as a smooth change of variables with a cut-off on `range I`. -/
+noncomputable def transition (i : Fin A.n) (j : Fin A'.n) : Rd.CutoffDiffeo (range I) :=
+  chartChange (A.chart_mem i) (A'.chart_mem j) (fun x => A.psi i x * A'.theta j x)
+    ((A.contMDiff_psi i).mul (A'.contMDiff_theta j)) (A.tsupport_psi_mul_theta_subset A' i j)
 
 omit [FiniteDimensional ℝ E] in
 /-- The change of charts acts on the source of the change of charts:
@@ -330,8 +353,7 @@ theorem transition_apply (i : Fin A.n) (j : Fin A'.n) (G : E → ℂ) (y : E) :
       (I.extendCoordChange (A.chart i) (A'.chart j)).source.indicator
         (fun y => (A.transition A' i j).chi (I.extendCoordChange (A.chart i) (A'.chart j) y) *
           G (I.extendCoordChange (A.chart i) (A'.chart j) y)) y := by
-  rw [Rd.CutoffDiffeo.apply, ← range_inter_coordChange_source]
-  rfl
+  exact chartChange_apply _ _ _ _ _ G y
 
 omit [FiniteDimensional ℝ E] in
 /-- **The pieces of two atlases** (pointwise): `piece_i g = ∑_j T_{ij}(piece'_j g)`, since
@@ -350,7 +372,7 @@ theorem piece_eq_sum_apply (i : Fin A.n) (g : M → ℂ) (y : E) :
         have hz : A'.ext j x ∈ (A'.ext j).target := (A'.ext j).map_source hxj'
         have hzx : (A'.ext j).symm (A'.ext j x) = x := (A'.ext j).left_inv hxj'
         rw [indicator_of_mem hyj, coordChange_apply]
-        simp only [transition, piece]
+        simp only [transition, chartChange, piece]
         rw [indicator_of_mem hz, indicator_of_mem hz, hzx]
         push_cast
         have h := congrArg (fun t : ℝ => (t : ℂ)) (A'.theta_mul_psi j x)

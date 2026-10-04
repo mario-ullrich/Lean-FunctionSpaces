@@ -475,6 +475,15 @@ explains how they differ.
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
   (`Rd.SmoothDomain.memBesov_iff_modNormOn_lt_top`): the descriptions by charts, by intrinsic
   differences and as restrictions of `B^s_{p,q}(ℝ^n)` coincide.
+* **Besov spaces on the boundary of a compact manifold.** Let `M` be a compact smooth manifold
+  with boundary modelled on the half-space `{y ∈ ℝ^n : y_0 ≥ 0}`. The changes of charts map the
+  boundary hyperplane `H₀ = {y_0 = 0}` into itself (`Manifold.coordChange_mem_bdry`), and their
+  restrictions to `H₀` are smooth changes of variables with cut-offs on all of `H₀`
+  (`Manifold.boundaryChartChange`). For a Besov atlas `A`, `g : M → ℂ` lies in `B^s_{p,q}(∂M)`
+  (`Manifold.BesovAtlas.MemBoundaryBesov`) if the restrictions to `H₀` of its chart pieces agree
+  almost everywhere with functions in `B^s_{p,q}(H₀)`. For `1 ≤ p < ∞`, `s > 0` and
+  `1 ≤ q ≤ ∞` this does not depend on the atlas
+  (`Manifold.BesovAtlas.memBoundaryBesov_iff_memBoundaryBesov`).
 * **Traces on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`,
   boundary balls `B_j` and graph domains `Ω_j` as above, and `(ψ_j)` a smooth resolution of unity on
   `Γ` with `tsupport ψ_j ⊆ B_j` (`Rd.BoundedLipschitzDomain.BoundaryPartition`). A property holds
@@ -618,6 +627,7 @@ explains how they differ.
 | Flattening of graph domains, preservation of the Lebesgue measure | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphStraightening.lean` |
 | Smooth bounded domains as compact manifolds with boundary, Lebesgue measure as smooth measure | ✅ proved | ✗ | `FunctionSpaces/Manifold/SmoothDomain.lean` |
 | Besov spaces of smooth domains by charts equal the intrinsic Besov spaces | ✅ proved | ✗ | `FunctionSpaces/Manifold/SmoothDomainBesov.lean` |
+| Besov spaces on the boundary of a compact manifold, independence of the atlas | ✅ proved | ✗ | `FunctionSpaces/Manifold/BoundaryBesov.lean` |
 | Tensor kernels on `ℝ^d`: integrals, convolutions, dilations, diagonal changes of variables | ✅ proved | ✗ | `FunctionSpaces/Rd/TensorKernels.lean` |
 | Sequences on `ℕ^d`: `ℓ_q` norms, Schur test, almost diagonal lemma | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedSequences.lean` |
 | Mixed differences, mixed moduli, the mixed Besov quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedDifferences.lean` |

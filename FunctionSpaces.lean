@@ -115,6 +115,7 @@ public import FunctionSpaces.Manifold.Besov
 public import FunctionSpaces.Rd.GraphStraightening
 public import FunctionSpaces.Manifold.SmoothDomain
 public import FunctionSpaces.Manifold.SmoothDomainBesov
+public import FunctionSpaces.Manifold.BoundaryBesov
 public import FunctionSpaces.Rd.TensorKernels
 public import FunctionSpaces.Rd.MixedSequences
 public import FunctionSpaces.Rd.MixedDifferences
@@ -358,6 +359,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   the closure as a compact manifold with boundary, and the Lebesgue measure as a smooth measure.
 * `FunctionSpaces.Manifold.SmoothDomainBesov`: global atlases, extension by zero, and the Besov space
   of a smooth domain by charts as the intrinsic Besov space.
+* `FunctionSpaces.Manifold.BoundaryBesov`: the boundary hyperplane of the half-space, the changes of
+  charts restricted to it, boundary pieces, and the Besov spaces of the boundary of a compact
+  manifold with their independence of the atlas.
 * `FunctionSpaces.Rd.TensorKernels`: tensor products of one-dimensional kernels on `ℝ^d`, their
   integrals, convolutions, dilations, and diagonal changes of variables.
 * `FunctionSpaces.Rd.MixedSequences`: `ℓ_q` norms on `ℕ^d`, the mixed weights `2^(s|k|_1)`, the
