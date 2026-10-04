@@ -41,6 +41,9 @@ DECL_RE = re.compile(
     r"(?:theorem|lemma|def|abbrev|instance|structure|class|inductive)\s+"
     r"(_root_\.)?([A-Za-z_][A-Za-z0-9_.'!?]*)"
 )
+# A field of a structure or class: a name at the indentation of the body, followed by its
+# binders or its type, e.g. `  kernel : ι → ℝ → ℂ` or `  le_add (m n : ℕ) : ...`.
+FIELD_RE = re.compile(r"^  ([A-Za-z_][A-Za-z0-9_']*)\s*[:({\[]")
 NAMESPACE_RE = re.compile(r"^\s*namespace\s+([A-Za-z_][A-Za-z0-9_.']*)")
 END_RE = re.compile(r"^\s*end\s+([A-Za-z_][A-Za-z0-9_.']*)")
 
@@ -59,8 +62,18 @@ def declaration_table(root: Path) -> dict[str, tuple[str, int]]:
         if head in SKIP_DIRS or head.removesuffix(".lean") in SKIP_DIRS:
             continue
         stack: list[str] = []
+        # The structure or class whose body is being read; its fields are declarations too.
+        structure: str | None = None
         with path.open(encoding="utf-8", errors="replace") as handle:
             for lineno, line in enumerate(handle, 1):
+                if structure is not None:
+                    if line.strip() and not line[0].isspace():
+                        structure = None
+                    else:
+                        match = FIELD_RE.match(line)
+                        if match:
+                            table.setdefault(f"{structure}.{match.group(1)}", (rel, lineno))
+                        continue
                 match = NAMESPACE_RE.match(line)
                 if match:
                     stack.append(match.group(1))
@@ -75,6 +88,8 @@ def declaration_table(root: Path) -> dict[str, tuple[str, int]]:
                     # `_root_.Foo` escapes the enclosing namespaces.
                     full = name if match.group(1) else ".".join(stack + [name])
                     table.setdefault(full, (rel, lineno))
+                    if re.search(r"\b(?:structure|class)\b", line[: match.start(2)]):
+                        structure = full
     return table
 
 
