@@ -224,4 +224,20 @@ theorem lpModulusOn_congr {U : Set V} {f g : Lp ℂ p μ}
     lpModulusOn p U r f k = lpModulusOn p U r g k :=
   modulusOn_congr_ae hfg r p _
 
+/-- The modulus on `U` of elements of `L_p` is subadditive. -/
+theorem lpModulusOn_add_le [Fact (1 ≤ p)] (U : Set V) (r : ℕ) (f g : Lp ℂ p μ) (k : ℕ) :
+    lpModulusOn p U r (f + g) k ≤ lpModulusOn p U r f k + lpModulusOn p U r g k := by
+  rw [lpModulusOn, modulusOn_congr_ae (g := (f : V → ℂ) + (g : V → ℂ)) ?_ r p _]
+  · exact modulusOn_add_le Fact.out U r _ _ _
+  · filter_upwards [Lp.coeFn_add f g] with x hx
+    by_cases hxU : x ∈ U
+    · rw [Set.indicator_of_mem hxU, Set.indicator_of_mem hxU, hx]
+    · rw [Set.indicator_of_notMem hxU, Set.indicator_of_notMem hxU]
+
+/-- `ω_r(f, 2^(-k), U)_p ≤ 2^r ‖f‖_p` on `L_p`. -/
+theorem lpModulusOn_le [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet U) (r : ℕ) (f : Lp ℂ p μ)
+    (k : ℕ) : lpModulusOn p U r f k ≤ 2 ^ r * ‖f‖ₑ :=
+  (modulusOn_le (Lp.aestronglyMeasurable f) hU Fact.out r _).trans
+    (mul_le_mul' le_rfl ((eLpNorm_indicator_le _ hU).trans_eq (Lp.enorm_def f).symm))
+
 end Rd

@@ -5703,7 +5703,8 @@ $\Delta_h^r(f, x, U) = \Delta_h^r f(x)$ for $x \in U_{rh}$ and $\Delta_h^r(f, x,
   Rd.eLpNorm_indicator_higherDiff_le_modulusOn, Rd.modulusOn_mono, Rd.modulusOn_univ,
   Rd.modulusOn_indicator, Rd.modulusOn_add_le, Rd.modulusOn_le_modulus, Rd.modulusOn_le,
   Rd.modulusOn_congr_ae, Rd.modulusOn_mono_set, Rd.lpModulusOn_succ_le,
-  Rd.lpModulusOn_le_lpModulus, Rd.lpModulusOn_mono_set, Rd.lpModulusOn_congr}
+  Rd.lpModulusOn_le_lpModulus, Rd.lpModulusOn_mono_set, Rd.lpModulusOn_congr,
+  Rd.lpModulusOn_add_le, Rd.lpModulusOn_le}
 \leanok
 \uses{def:rd-modulus-on, lem:rd-modulus}
 Let $U \subseteq V$ be measurable, $1 \leq p < \infty$, $r \in \N$ and $f, g \in L_p$. Then
@@ -6772,15 +6773,18 @@ and exchange the sum with the integral.
 
 \begin{definition}[Regular atoms and the coefficient quasi-norm]
 \label{def:regular-atoms}
-\lean{Rd.IsRegularAtom, Rd.levelNorm, Rd.levelNorm_eq_tsum, Rd.levelNorm_mono, Rd.coeffNorm}
+\lean{Rd.IsRegularAtomOn, Rd.IsRegularAtom, Rd.levelNorm, Rd.levelNorm_eq_tsum, Rd.levelNorm_mono,
+  Rd.coeffNorm}
 \leanok
-Let $1 \leq p < \infty$, $\sigma \geq 0$, $r \in \N$ and $d, C \geq 0$. A regular atom of level
-$j$, exponent $\sigma$ and order $r$ with centre $c$ is a measurable $a : V \to \C$ with $a = 0$
-outside $\overline{B}(c, d 2^{-j})$,
-\[
-  \|a\|_p \leq C 2^{-jn/p} \quad\text{and}\quad
-  \|\Delta_h^r a\|_p \leq C 2^{-jn/p} \min(1, (2^j \|h\|)^\sigma) \quad (h \in V).
-\]
+\uses{def:rd-modulus-on}
+Let $1 \leq p < \infty$, $\sigma \geq 0$, $r \in \N$, $d, C \geq 0$ and $\Omega \subseteq V$. A
+regular atom on $\Omega$ of level $j$, exponent $\sigma$ and order $r$ with centre $c$ is a
+measurable $a : V \to \C$ with $a = 0$ outside $\overline{B}(c, d 2^{-j})$,
+\begin{gather*}
+  \|a\|_{L_p(\Omega)} \leq C 2^{-jn/p}, \
+  \|\Delta_h^r a\|_{L_p(\Omega_{rh})} \leq C 2^{-jn/p} \min(1, (2^j \|h\|)^\sigma) \quad (h \in V).
+\end{gather*}
+A regular atom is a regular atom on $V$.
 For coefficients $\lambda = (\lambda_{j,m})$ let
 $\|\lambda_{j,\cdot}\|_{\ell_p} = (\sum_m |\lambda_{j,m}|^p)^{1/p}$ and
 $\|\lambda\|_{b^s_{p,q}} = \|(2^{j(s - n/p)} \|\lambda_{j,\cdot}\|_{\ell_p})_j\|_{\ell_q}$.
@@ -6795,9 +6799,9 @@ $|a(x) - a(y)| \leq 2^j |x - y|$, are regular atoms with $\sigma = r = 1$, and t
 \label{lem:level-sums}
 \lean{Rd.higherDiff_tsum_apply, Rd.le_of_rpow_le_overlap, Rd.one_sub_one_div_toReal_nonneg,
   Rd.summable_levelSum, Rd.eLpNorm_levelSum_le, Rd.card_le_of_higherDiff_ne_zero,
-  Rd.modulus_levelSum_le}
+  Rd.modulus_levelSum_le, Rd.eLpNorm_indicator_levelSum_le, Rd.modulusOn_levelSum_le}
 \leanok
-\uses{lem:bounded-overlap, def:regular-atoms, lem:rd-modulus}
+\uses{lem:bounded-overlap, def:regular-atoms, lem:rd-modulus, lem:rd-modulus-on}
 Let $1 \leq p < \infty$, and let $a_m$ be regular atoms of level $j$ with centres $c_m$ and
 coefficients $\lambda_m$, such that at most $N$ of the centres $c_m$ with $\lambda_m \neq 0$ lie in a
 ball of radius $(d + r) 2^{-j}$. Then $f = \sum_m \lambda_m a_m$ converges at every point, and
@@ -6805,7 +6809,9 @@ ball of radius $(d + r) 2^{-j}$. Then $f = \sum_m \lambda_m a_m$ converges at ev
   \|f\|_p \leq N^{1-1/p} C 2^{-jn/p} \|\lambda\|_{\ell_p}, \qquad
   \omega_r(f, 2^{-k})_p \leq 2^r N^{1-1/p} C 2^{-jn/p} \|\lambda\|_{\ell_p} c_{kj},
 \]
-with $c_{kj} = 2^{-(k-j)\sigma}$ for $j \leq k$ and $c_{kj} = 1$ for $j > k$.
+with $c_{kj} = 2^{-(k-j)\sigma}$ for $j \leq k$ and $c_{kj} = 1$ for $j > k$. For regular atoms
+on a measurable set $\Omega$ the same bounds hold for $\|f\|_{L_p(\Omega)}$ and
+$\omega_r(f, 2^{-k}, \Omega)_p$.
 \end{lemma}
 
 \begin{proof}
@@ -6820,9 +6826,10 @@ $j > k$, $\omega_r(f, t)_p \leq 2^r \|f\|_p$.
 \begin{theorem}[Atomic synthesis]
 \label{thm:rd-atomic-synthesis}
 \lean{Rd.atomSynthConst, Rd.atomSynthConst_ne_top, ENNReal.enorm_le_of_tendsto_sum,
-  Rd.modNorm_le_coeffNorm}
+  Rd.modNorm_le_coeffNorm, Rd.eLpNorm_indicator_le_tsum, Rd.lpModulusOn_le_tsum,
+  Rd.modNormOn_le_coeffNorm}
 \leanok
-\uses{lem:level-sums, lem:almost-diagonal}
+\uses{lem:level-sums, lem:almost-diagonal, lem:rd-modulus-on}
 Let $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $0 < s < \sigma$. Let $a_{j,m}$ be regular atoms
 of level $j$ such that the centres of the atoms with $\lambda_{j,m} \neq 0$ satisfy the overlap
 condition of \Cref{lem:level-sums} at every level, and let $F = \sum_j f_j$ in $L_p$ with
@@ -6831,7 +6838,11 @@ $f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere. Then
   \|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq K \|\lambda\|_{b^s_{p,q}},
 \]
 with $K = N^{1-1/p} C \bigl((1 - 2^{-s})^{-1} + 2^r ((1 - 2^{-(\sigma - s)})^{-1} +
-(1 - 2^{-s})^{-1})\bigr)$.
+(1 - 2^{-s})^{-1})\bigr)$. For regular atoms on a measurable set $\Omega$,
+\[
+  \|F\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(F, 2^{-k}, \Omega)_p)_k\|_{\ell_q} \leq
+  K \|\lambda\|_{b^s_{p,q}} .
+\]
 \end{theorem}
 
 \begin{proof}
@@ -6845,7 +6856,7 @@ since $2^{js} b_j = 2^{j(s - n/p)} \|\lambda_{j,\cdot}\|_{\ell_p}$.
 
 \begin{lemma}[Synthesis of one level]
 \label{lem:single-level}
-\lean{Rd.lqNorm_ite_eq, Rd.isRegularAtom_zero, Rd.modNorm_level_le}
+\lean{Rd.lqNorm_ite_eq, Rd.isRegularAtomOn_zero, Rd.modNorm_level_le}
 \leanok
 \uses{thm:rd-atomic-synthesis}
 For regular atoms of level $j$ with the overlap of \Cref{lem:level-sums}, $F = \sum_m \lambda_m a_m$
@@ -6863,13 +6874,14 @@ zero function is a regular atom, and a sequence with one nonzero term $x$ has $\
 \begin{lemma}[Atoms from pointwise bounds]
 \label{lem:pointwise-atoms}
 \lean{Rd.eLpNorm_le_of_bound_of_support, Rd.volume_closedBall_div_two_pow,
-  Rd.rpow_mul_dyadicWeight_neg, Rd.isRegularAtom_of_pointwise,
+  Rd.rpow_mul_dyadicWeight_neg, Rd.isRegularAtomOn_of_pointwise, Rd.isRegularAtom_of_pointwise,
   Rd.enorm_higherDiff_le_of_iteratedFDeriv}
 \leanok
 \uses{def:regular-atoms, lem:smooth-differences}
 Let $a$ be measurable with $a = 0$ outside $\overline{B}(c, d 2^{-j})$, $|a| \leq A$ and
 $|\Delta_h^r a| \leq A \min(1, (2^j \|h\|)^\sigma)$. Then $a$ is a regular atom with the constant
-$A ((r + 1) d^n |B_1|)^{1/p}$. A smooth $a$ with $\|D^l a\| \leq A 2^{jl}$ for $l \leq r$ has
+$A ((r + 1) d^n |B_1|)^{1/p}$; on a measurable set $\Omega$ the bounds are needed only on $\Omega$
+and on $\Omega_{rh}$. A smooth $a$ with $\|D^l a\| \leq A 2^{jl}$ for $l \leq r$ has
 $|\Delta_h^r a| \leq 2^r A \min(1, (2^j \|h\|)^r)$.
 \end{lemma}
 
@@ -7061,6 +7073,243 @@ This is \cite[Theorem 2.6]{SchneiderVybiral} for $p \geq 1$. If the norm is fini
 means quasi-norm (\Cref{thm:local-means}), and \Cref{thm:atomic-decomposition} with $r = L$ gives
 the decomposition, with the overlap of \Cref{lem:cells-partition}. The converse is
 \Cref{thm:rd-atomic-synthesis} with $\sigma = r = L$.
+\end{proof}
+
+\section{Smooth atoms}
+
+On a convex set $\Omega$ with nonempty interior, derivatives within $\Omega$ bound the differences
+whose steps stay in $\Omega$. Smooth atoms on $\Omega$ are therefore regular atoms on $\Omega$, and
+the cell atoms of the atomic decomposition are smooth atoms of every order. Smooth atoms keep their
+form under smooth changes of variables, which is how Besov spaces move between charts.
+
+\begin{lemma}[Differences through derivatives within a convex set]
+\label{lem:convex-differences}
+\lean{Rd.fwdDiff_iter_comp_ofReal, Rd.fwdDiff_iter_taylorWithinEval_eq_zero,
+  Rd.norm_fwdDiff_iter_le_of_iteratedDerivWithin, Rd.norm_iteratedFDeriv_line_le,
+  Rd.add_smul_mem_of_mem_stepSet, Rd.norm_higherDiff_le_of_iteratedFDerivWithin}
+\leanok
+\uses{def:rd-modulus-on, lem:rd-differences}
+Let $\Omega \subseteq V$ be convex with nonempty interior, $r \geq 1$, and let $a$ be $r$ times
+continuously differentiable within $\Omega$ with $\|D^i a(y)\| \leq C$ for $i \leq r$ and
+$y \in \Omega$, the derivatives taken within $\Omega$. Then for $x \in \Omega_{rh}$
+\[
+  |\Delta_h^r a(x)| \leq 2^r r^{r+1} C \|h\|^r .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By convexity the segment $[x, x + rh]$ lies in $\Omega$. The function $g(t) = a(x + th)$ on
+$[0, r]$ has $|g^{(r)}| \leq r!\, C \|h\|^r$ by the chain rule within $\Omega$ (Mathlib's
+\texttt{norm\_iteratedFDerivWithin\_comp\_le}). The $r$-th difference of step $1$ annihilates the
+Taylor polynomial of $g$ of degree $r - 1$ at $0$, and Taylor's theorem (Mathlib's
+\texttt{taylor\_mean\_remainder\_bound}) bounds the remainder on $[0, r]$ by
+$\sup |g^{(r)}|\, r^r / (r-1)!$. The binomial coefficients add up to $2^r$, and
+$2^r r^r r! / (r - 1)! = 2^r r^{r+1}$.
+\end{proof}
+
+\begin{definition}[Smooth atoms]
+\label{def:smooth-atoms}
+\lean{Rd.IsSmoothAtom, Rd.isSmoothAtom_zero, Rd.IsSmoothAtom.of_univ}
+\leanok
+\uses{def:regular-atoms}
+Let $\Omega \subseteq V$, $K \in \N$ and $d, A \geq 0$. A smooth atom on $\Omega$ of level $j$
+and order $K$ with centre $c$ is a measurable $a : V \to \C$ with $a = 0$ outside
+$\overline{B}(c, d 2^{-j})$ that is $K$ times continuously differentiable within $\Omega$ with
+\[
+  \|D^l a(y)\| \leq A 2^{jl} \qquad (l \leq K,\ y \in \Omega).
+\]
+The function $0$ is a smooth atom, and a smooth atom on $V$ is a smooth atom on every set of
+unique differentiability, where the derivatives within the set are the derivatives.
+\end{definition}
+
+These are the $K$-atoms of \cite[Definition 1.3]{SchneiderVybiral} on a set, without moment
+conditions.
+
+\begin{lemma}[Smooth atoms are regular atoms]
+\label{lem:smooth-atoms-regular}
+\lean{Rd.IsSmoothAtom.enorm_higherDiff_le, Rd.isRegularAtomOn_of_isSmoothAtom}
+\leanok
+\uses{def:smooth-atoms, lem:convex-differences, lem:pointwise-atoms}
+Let $\Omega$ be measurable and convex with nonempty interior, and let $a$ be a smooth atom on
+$\Omega$ of order $K$ and level $j$. For $1 \leq r \leq K$ and $x \in \Omega_{rh}$,
+$|\Delta_h^r a(x)| \leq 2^r r^{r+1} A \min(1, (2^j \|h\|)^r)$, and $a$ is a regular atom on
+$\Omega$ of order and exponent $r$ with the constant
+$2^r r^{r+1} A ((r + 1) d^n |B_1|)^{1/p}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:convex-differences} with $C = A 2^{jr}$ gives the bound $(2^j \|h\|)^r$, and
+$|\Delta_h^r a| \leq 2^r A$ on $\Omega_{rh}$ since all its points lie in $\Omega$.
+\Cref{lem:pointwise-atoms} on $\Omega$ concludes.
+\end{proof}
+
+\begin{lemma}[Derivatives of convolutions]
+\label{lem:conv-derivatives}
+\lean{Rd.conv_eq_convolution_mul_real, Rd.contDiff_conv, Rd.fderiv_conv_apply,
+  Rd.iteratedFDeriv_conv_apply, Rd.norm_iteratedFDeriv_const_mul_conv_le}
+\leanok
+\uses{def:conv}
+Let $K$ be smooth with compact support and $g$ locally integrable. Then $K * g$ is smooth and
+\[
+  D^l (K * g)(x)(v_1, \dots, v_l) = \bigl((D^l K)(\cdot)(v_1, \dots, v_l) * g\bigr)(x) .
+\]
+Hence $\|D^l (c\, K * g)(x)\| \leq B$ as soon as
+$|c\, ((D^l K)(\cdot)(v_1, \dots, v_l) * g)(x)| \leq B \prod_i \|v_i\|$ for all $v_i$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's \texttt{HasCompactSupport.hasFDerivAt\_convolution\_left} differentiates under the
+integral; induction on $l$ applies it to the directional derivatives of $K$.
+\end{proof}
+
+\begin{lemma}[Derivatives of the dual kernels]
+\label{lem:dual-kernel-derivatives}
+\lean{Rd.contDiff_dilate, Rd.ofReal_two_pow_mul, Rd.norm_iteratedFDeriv_dilate_le,
+  Rd.LocalMeansBump.contDiff_scaled, Rd.LocalMeansBump.contDiff_dual,
+  Rd.LocalMeansBump.exists_iteratedFDeriv_dual_bound}
+\leanok
+\uses{def:local-means, lem:dual-kernel-bounds}
+Dilations of smooth functions are smooth, with
+$\|D^l (\Phi_c)(x)\| \leq |c|^{n+l} \sup_y \|D^l \Phi(y)\|$. For a bump $g$ and $L, K \in \N$ the
+kernels $m_{2^j}$ and $\eta_j$ are smooth, and there is $A$ with
+$\|D^l \eta_j\| \leq A 2^{j(n+l)}$ for all $l \leq K$ and $j$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\Phi_c(x) = c^n \Phi(cx)$, and the chain rule for the linear map $x \mapsto cx$. The moment kernel
+is smooth with compact support, so its derivatives are bounded, and $\eta_j$ is a sum of two
+dilations.
+\end{proof}
+
+\begin{lemma}[Cell atoms are smooth atoms]
+\label{lem:cell-atoms-smooth}
+\lean{Rd.norm_iteratedFDeriv_cellAtom_le, Rd.LocalMeansBump.exists_isSmoothAtom_cellAtom}
+\leanok
+\uses{lem:conv-derivatives, lem:dual-kernel-derivatives, lem:cell-atoms-regular}
+Let $K$ be smooth with $K = 0$ outside $\overline{B}(0, \rho 2^{-j})$ and
+$\|D^l K\| \leq A 2^{j(n+l)}$. Then the cell atoms of $K * g$, $g \in L_p$, have
+$\|D^l a_{j,m}\| \leq A 2^{jl} (\rho^n |B_1|)^{1-1/p}$. For a bump of radius $R$ and every order
+$K$ there is $A$ such that every cell atom of $\eta_j * g$ is a smooth atom on $V$ of order $K$
+with radius factor $2LR + n$ and constant $A$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:conv-derivatives} moves the derivatives onto the kernel, and the bound of
+\Cref{lem:conv-pointwise} for the kernel $(D^l K)(\cdot)(v_1, \dots, v_l)$ cancels the factor
+$2^{jn}$ against the coefficient as in \Cref{lem:cell-atoms-regular}.
+\end{proof}
+
+\begin{theorem}[Atomic decomposition into smooth atoms]
+\label{thm:smooth-atomic-decomposition}
+\lean{Rd.LocalMeansBump.atomic_decomposition_smooth, Rd.stdBumpBase, Rd.LocalMeansBump.std}
+\leanok
+\uses{thm:atomic-decomposition, lem:cell-atoms-smooth}
+Let $g$ be a bump of radius $R$, $1 \leq p < \infty$ and $L, K \in \N$. There is $A$ such that for
+every $F \in L_p$ the terms of the reproducing formula are
+$\eta_j * (k_j * F) = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, with cell atoms that are
+smooth atoms on $V$ of order $K$, radius factor $2LR + n$ and constant $A$, and
+$\|\lambda\|_{b^s_{p,q}} = \|(2^{js} \|k_j * F\|_p)_j\|_{\ell_q}$. The normalised smooth bump of
+radius $1$ around $0$ is a bump.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:atomic-decomposition} for the decomposition and the coefficients, and
+\Cref{lem:cell-atoms-smooth} for the atoms.
+\end{proof}
+
+\begin{definition}[Smooth changes of variables with a cut-off]
+\label{def:cutoff-diffeo}
+\lean{Rd.CutoffDiffeo, Rd.CutoffDiffeo.apply, Rd.CutoffDiffeo.carrier,
+  Rd.CutoffDiffeo.isCompact_carrier, Rd.CutoffDiffeo.carrier_subset,
+  Rd.CutoffDiffeo.apply_eq_zero_of_notMem, Rd.CutoffDiffeo.apply_eq_zero_of_forall_far,
+  Rd.CutoffDiffeo.uniqueDiffOn_source, Rd.CutoffDiffeo.uniqueDiffOn_target}
+\leanok
+Let $\Omega \subseteq V$. A smooth change of variables with a cut-off on $\Omega$ consists of open
+sets $U, U'$, a bijection $\Phi : \Omega \cap U \to \Omega \cap U'$ that is smooth within
+$\Omega \cap U$ with inverse $\Psi$ smooth within $\Omega \cap U'$, a compact
+$K_0 \subseteq \Omega \cap U'$, and a function $\chi$ that is smooth within $\Omega \cap U'$ and
+vanishes on $\Omega \setminus K_0$. It acts on functions by
+\[
+  T f = 1_{\Omega \cap U}\, (\chi f) \circ \Phi .
+\]
+$T f$ vanishes outside the compact set $\Psi(K_0) \subseteq \Omega \cap U$, and $T a = 0$ if $a$
+vanishes on a ball that contains no point of $K_0$. If $\Omega$ is convex with nonempty interior,
+$\Omega \cap U$ and $\Omega \cap U'$ are sets of unique differentiability.
+\end{definition}
+
+The pieces of a function in two overlapping charts of a manifold are related in this way; for
+$\Omega = V$ and $\Phi = \mathrm{id}$, $T$ is a pointwise multiplier.
+
+\begin{lemma}[Bounds of the change of variables]
+\label{lem:cutoff-diffeo-bounds}
+\lean{Rd.locallyLipschitzOn_inter, Rd.exists_lipschitzOnWith_of_contDiffOn_inter,
+  Rd.iteratedFDerivWithin_eq_zero_of_eqOn, Rd.CutoffDiffeo.exists_lipschitzOnWith_Ψ,
+  Rd.CutoffDiffeo.exists_lipschitzOnWith_Φ, Rd.CutoffDiffeo.exists_iteratedFDerivWithin_χ_bound,
+  Rd.CutoffDiffeo.exists_iteratedFDerivWithin_Φ_bound}
+\leanok
+\uses{def:cutoff-diffeo}
+A map of class $C^1$ within a relatively open part $\Omega \cap U$ of a convex set is Lipschitz on
+the compact subsets of $\Omega \cap U$. Hence $\Psi$ is Lipschitz on $K_0$ and $\Phi$ on
+$\Psi(K_0)$. For every $K$ the derivatives of $\chi$ of order at most $K$ are bounded on
+$\Omega \cap U'$, and those of $\Phi$ on $\Psi(K_0)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The mean value inequality on the convex sets $\Omega \cap B$ for small balls $B$ gives local
+Lipschitz bounds within $\Omega$; on a compact set finitely many of them suffice. The derivatives
+are continuous within the sets, hence bounded on the compact sets $K_0$ and $\Psi(K_0)$; the
+derivatives of $\chi$ vanish on $\Omega \cap U' \setminus K_0$, where $\chi$ vanishes near
+every point.
+\end{proof}
+
+\begin{lemma}[Overlap of transported centres]
+\label{lem:transported-centres}
+\lean{Rd.card_le_of_lipschitz_centres}
+\leanok
+\uses{lem:cells-partition}
+Let $\Phi$ be $L$-Lipschitz on $B$, and let $z_m \in B$ with
+$\|\Phi(z_m) - c_{j,m}\| \leq d 2^{-j}$ for the centres $c_{j,m}$ of level $j$. Then at most
+$\lceil (2(2L\rho + d) + 2)^n \rceil$ of the points $z_m$ lie in a ball of radius $\rho 2^{-j}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $z_{m_0}$ and $z_m$ lie in such a ball, then
+$\|\Phi(z_{m_0}) - c_{j,m}\| \leq (2L\rho + d) 2^{-j}$, and \Cref{lem:cells-partition} counts the
+centres in the ball around $\Phi(z_{m_0})$.
+\end{proof}
+
+\begin{theorem}[Smooth atoms under changes of variables]
+\label{thm:smooth-atoms-change-of-variables}
+\lean{Rd.CutoffDiffeo.norm_iteratedFDerivWithin_mul_atom_le, Rd.CutoffDiffeo.apply_eq_zero_of_far,
+  Rd.CutoffDiffeo.isSmoothAtom_apply}
+\leanok
+\uses{def:smooth-atoms, def:cutoff-diffeo, lem:cutoff-diffeo-bounds}
+Let $\Omega$ be measurable and convex with nonempty interior, $T$ a smooth change of variables
+with a cut-off on $\Omega$, and $K \in \N$. There are $L, A' \geq 0$ such that for every smooth
+atom $a$ on $V$ of order $K$, level $j$, radius factor $d$, constant $A$ and centre $c$, and every
+$y_0 \in K_0$ with $\|y_0 - c\| \leq d 2^{-j}$, $T a$ is a smooth atom on $\Omega$ of order $K$
+and level $j$ with centre $\Psi(y_0)$, radius factor $2Ld$ and constant $A' A$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+If $T a(x) \neq 0$, then $\Phi(x) \in K_0$ and $\|\Phi(x) - c\| \leq d 2^{-j}$, so
+$\|x - \Psi(y_0)\| \leq L \|\Phi(x) - y_0\| \leq 2 L d 2^{-j}$ with a Lipschitz constant $L$ of
+$\Psi$ on $K_0$. By Leibniz's rule within $\Omega \cap U'$,
+$\|D^i (\chi a)\| \leq 2^i M A 2^{ji}$ (Mathlib's \texttt{norm\_iteratedFDerivWithin\_mul\_le}),
+and by the chain rule within sets (Mathlib's \texttt{norm\_iteratedFDerivWithin\_comp\_le}),
+$\|D^l (T a)(x)\| \leq l!\, 2^l M A D^l 2^{jl}$ on $\Psi(K_0)$, with the bounds $M$ of $\chi$ and
+$D \geq 1$ of $\Phi$ from \Cref{lem:cutoff-diffeo-bounds}. Outside the compact $\Psi(K_0)$ the
+function $T a$ vanishes near every point of $\Omega$, so its derivatives within $\Omega$ vanish.
+Hence $A' = K!\, 2^K M D^K$.
 \end{proof}
 
 \section{Traces on Lipschitz graph domains}

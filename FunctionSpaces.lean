@@ -97,6 +97,9 @@ public import FunctionSpaces.Rd.BoundedLipschitz
 public import FunctionSpaces.Rd.DyadicGrid
 public import FunctionSpaces.Rd.AtomSynthesis
 public import FunctionSpaces.Rd.AtomAnalysis
+public import FunctionSpaces.Rd.ConvexDifferences
+public import FunctionSpaces.Rd.SmoothAtoms
+public import FunctionSpaces.Rd.AtomComposition
 public import FunctionSpaces.Rd.GraphParametrization
 public import FunctionSpaces.Rd.GraphTrace
 public import FunctionSpaces.Rd.MollifiedGraph
@@ -305,10 +308,16 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   the restrictions of Besov spaces described by intrinsic differences.
 * `FunctionSpaces.Rd.DyadicGrid`: the dyadic cells of a finite-dimensional inner product space,
   their centres, and the counting of centres in balls.
-* `FunctionSpaces.Rd.AtomSynthesis`: bounded overlap, regular atoms, the coefficient quasi-norm, and
-  the atomic synthesis of Besov spaces by differences.
+* `FunctionSpaces.Rd.AtomSynthesis`: bounded overlap, regular atoms on a set, the coefficient
+  quasi-norm, and the atomic synthesis of Besov spaces by differences, on `V` and on a set.
 * `FunctionSpaces.Rd.AtomAnalysis`: cell atoms of convolutions, the atomic decomposition by local
   means, and the atomic characterisation of Besov spaces.
+* `FunctionSpaces.Rd.ConvexDifferences`: differences within a convex set bounded by derivatives
+  within the set.
+* `FunctionSpaces.Rd.SmoothAtoms`: derivatives of convolutions and dilations, smooth atoms on a
+  convex set as regular atoms, and the atomic decomposition into smooth atoms of every order.
+* `FunctionSpaces.Rd.AtomComposition`: smooth changes of variables with a cut-off on a convex set,
+  and smooth atoms under them.
 * `FunctionSpaces.Rd.GraphParametrization`: the hyperplane and the graph map of a Lipschitz graph
   domain, and the restrictions of atoms to the graph.
 * `FunctionSpaces.Rd.GraphTrace`: the trace on the boundary of a Lipschitz graph domain, its

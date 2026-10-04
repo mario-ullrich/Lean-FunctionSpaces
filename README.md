@@ -392,7 +392,20 @@ explains how they differ.
   `λ_{j,m} = 2^(jn/p) ‖1_{P_{j,m}} (k_j ⋆ F)‖_p` (`Rd.LocalMeansBump.atomic_decomposition`). Hence
   for `0 < s < L`, `F ∈ L_p(V)` has `‖F‖_p + ‖(2^(ks) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff it has
   such an atomic decomposition with atoms of order and exponent `L` and finite coefficient
-  quasi-norm (`Rd.LocalMeansBump.besov_iff_atomic`).
+  quasi-norm (`Rd.LocalMeansBump.besov_iff_atomic`). On a measurable set `Ω`, regular atoms on `Ω`
+  bound `‖a‖_{L_p(Ω)}` and the differences on the step sets `Ω_{rh}` (`Rd.IsRegularAtomOn`), and
+  the synthesis bounds `‖F‖_{L_p(Ω)} + ‖(2^(ks) ω_r(F, 2^(-k), Ω)_p)_k‖_{ℓ_q}` in the same way
+  (`Rd.modNormOn_le_coeffNorm`).
+* **Smooth atoms.** A smooth atom on `Ω` of order `K` vanishes outside `B(c, d 2^(-j))`, is `K`
+  times continuously differentiable within `Ω` and has `‖D^l a‖ ≤ A 2^(jl)` on `Ω` for `l ≤ K`
+  (`Rd.IsSmoothAtom`). On a convex set with nonempty interior it is a regular atom on `Ω` of order
+  and exponent `r` for every `1 ≤ r ≤ K`, since `|Δ_h^r a(x)| ≤ 2^r r^(r+1) C ‖h‖^r` whenever
+  `x, …, x + r h ∈ Ω` and `‖D^i a‖ ≤ C` on `Ω` (`Rd.isRegularAtomOn_of_isSmoothAtom`,
+  `Rd.norm_higherDiff_le_of_iteratedFDerivWithin`). The cell atoms of the atomic decomposition are
+  smooth atoms of every order (`Rd.LocalMeansBump.atomic_decomposition_smooth`). Smooth atoms keep
+  their form under a smooth change of variables `T f = 1_{Ω ∩ U} (χ f) ∘ Φ` with a cut-off `χ`
+  that vanishes outside a compact set: `T a` is a smooth atom on `Ω` of the same order, with
+  uniform constants (`Rd.CutoffDiffeo.isSmoothAtom_apply`).
 * **Traces on Lipschitz graph domains.** Let `Ω` be a Lipschitz graph domain as above, with
   Lipschitz constant `M`, and `H = e^⊥`. The boundary of `Ω` is the image of the graph map
   `γ(x') = x' + φ(x') e`, `x' ∈ H` (`Rd.LipschitzGraph.graphMap`). For `f ∈ L_p(V)` the trace
@@ -536,8 +549,11 @@ explains how they differ.
 | Local versions of Rychkov's extension: boundary and inner patches | ✅ proved | ✗ | `FunctionSpaces/Rd/LocalExtension.lean` |
 | Bounded Lipschitz domains: restrictions by intrinsic differences | ✅ proved | ✗ | `FunctionSpaces/Rd/BoundedLipschitz.lean` |
 | Dyadic cells of `ℝ^d`: partition, counting of their centres, bounded overlap | ✅ proved | ✗ | `FunctionSpaces/Rd/DyadicGrid.lean` |
-| Atomic synthesis: bounded overlap, regular atoms, coefficient quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/AtomSynthesis.lean` |
+| Atomic synthesis: bounded overlap, regular atoms on sets, coefficient quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/AtomSynthesis.lean` |
 | Atomic decomposition by cell atoms, atomic characterisation of Besov spaces | ✅ proved | ✗ | `FunctionSpaces/Rd/AtomAnalysis.lean` |
+| Differences within convex sets through derivatives within the set | ✅ proved | ✗ | `FunctionSpaces/Rd/ConvexDifferences.lean` |
+| Smooth atoms on convex sets, smooth cell atoms of every order | ✅ proved | ✗ | `FunctionSpaces/Rd/SmoothAtoms.lean` |
+| Smooth atoms under smooth changes of variables with a cut-off | ✅ proved | ✗ | `FunctionSpaces/Rd/AtomComposition.lean` |
 | Graph map of a Lipschitz graph domain, restrictions of atoms to the graph | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphParametrization.lean` |
 | Traces on Lipschitz graph domains: boundedness, linearity, trace of continuous functions | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTrace.lean` |
 | Mollified graph and vertical cut-off with bounds of their differences | ✅ proved | ✗ | `FunctionSpaces/Rd/MollifiedGraph.lean` |
@@ -571,7 +587,8 @@ theorems, spectral schemes in Hilbert spaces and eigenbases of continuous functi
 with its traces,
 `ℝ^d` with convolution, approximate identities, Littlewood–Paley decompositions, moduli of
 smoothness and local means, Lipschitz graph domains and bounded Lipschitz domains with Rychkov's
-extension and pointwise multipliers, atomic decompositions, traces on Lipschitz graph domains and
+extension and pointwise multipliers, atomic decompositions with regular and smooth atoms, traces on
+Lipschitz graph domains and
 on the boundaries of bounded Lipschitz domains, dominating mixed smoothness with hyperbolic cross
 approximation, filtration schemes for wavelets and multiwavelets, the classical definitions
 through moduli of smoothness and weak derivatives, and polynomial and piecewise polynomial
