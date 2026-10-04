@@ -102,6 +102,7 @@ public import FunctionSpaces.Rd.SmoothAtoms
 public import FunctionSpaces.Rd.AtomComposition
 public import FunctionSpaces.Rd.DiffeoInvariance
 public import FunctionSpaces.Rd.HalfSpace
+public import FunctionSpaces.Rd.HalfSpaceTrace
 public import FunctionSpaces.Rd.GraphParametrization
 public import FunctionSpaces.Rd.GraphTrace
 public import FunctionSpaces.Rd.MollifiedGraph
@@ -324,6 +325,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   atoms, the invariance of the Besov spaces, and Besov domains.
 * `FunctionSpaces.Rd.HalfSpace`: null sets and moduli on sets, the closed half-space and the models
   of manifolds as Besov domains.
+* `FunctionSpaces.Rd.HalfSpaceTrace`: restrictions and extensions of smooth atoms on the flat
+  graph, the trace theorem and the trace space of the half-space for every smoothness.
 * `FunctionSpaces.Rd.GraphParametrization`: the hyperplane and the graph map of a Lipschitz graph
   domain, and the restrictions of atoms to the graph.
 * `FunctionSpaces.Rd.GraphTrace`: the trace on the boundary of a Lipschitz graph domain, its

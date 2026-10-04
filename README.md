@@ -438,6 +438,17 @@ explains how they differ.
   `A(x) = a(Px) χ(2^j (⟪x, e⟫ - φ_j(Px)))` with a graph `φ_j` mollified at scale `2^(-j)`; it has a
   finite `B^{s+1/p}_{p,q}`-norm on `V` (`Rd.LipschitzGraph.modNorm_graphExtension_le`) and the trace
   `g` (`Rd.LipschitzGraph.trace_graphExtension`).
+* **Traces of every order on the half-space.** Let `Ω = {x : ⟪x, e⟫ > 0}` for a unit vector `e`
+  (`Rd.LipschitzGraph.flat`) and `H = e^⊥`. For `1 ≤ p < ∞`, `s > 0`, `1 ≤ q ≤ ∞`, `L ≥ 2` with
+  `s + 1/p < L`, and `r > s`, `g ∈ L_p(H)` is the trace of some `f ∈ L_p(V)` with
+  `‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` iff
+  `‖g‖_p + ‖(2^(ks) ω_r(g, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Rd.LipschitzGraph.exists_trace_eq_iff_flat`).
+  The trace is bounded for every `s > 0` (`Rd.LipschitzGraph.modNorm_trace_le_flat`), since the cell
+  atoms restrict to smooth atoms on `H`; the extension
+  `E g = ∑_j (η_j ⋆ k_j ⋆ g)(Px) χ(2^j ⟪x, e⟫)` with local means of moment order `r` on `H`
+  (`Rd.LipschitzGraph.flatExtension`) is bounded
+  (`Rd.LipschitzGraph.modNorm_flatExtension_le`) and has the trace `g`
+  (`Rd.LipschitzGraph.trace_flatExtension`).
 * **Traces on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`,
   boundary balls `B_j` and graph domains `Ω_j` as above, and `(ψ_j)` a smooth resolution of unity on
   `Γ` with `tsupport ψ_j ⊆ B_j` (`Rd.BoundedLipschitzDomain.BoundaryPartition`). A property holds
@@ -568,6 +579,7 @@ explains how they differ.
 | Smooth atoms under smooth changes of variables with a cut-off | ✅ proved | ✗ | `FunctionSpaces/Rd/AtomComposition.lean` |
 | Invariance of Besov spaces under changes of variables, Besov domains | ✅ proved | ✗ | `FunctionSpaces/Rd/DiffeoInvariance.lean` |
 | The half-space and the models of manifolds as Besov domains | ✅ proved | ✗ | `FunctionSpaces/Rd/HalfSpace.lean` |
+| Traces of every order on the half-space: trace theorem, extension, trace space | ✅ proved | ✗ | `FunctionSpaces/Rd/HalfSpaceTrace.lean` |
 | Graph map of a Lipschitz graph domain, restrictions of atoms to the graph | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphParametrization.lean` |
 | Traces on Lipschitz graph domains: boundedness, linearity, trace of continuous functions | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTrace.lean` |
 | Mollified graph and vertical cut-off with bounds of their differences | ✅ proved | ✗ | `FunctionSpaces/Rd/MollifiedGraph.lean` |

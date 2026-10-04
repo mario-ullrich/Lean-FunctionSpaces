@@ -7926,6 +7926,151 @@ trace is bounded (\Cref{thm:trace-graph}), and $E g$ has the trace $g$
 \Cref{lem:moduli-orders}).
 \end{proof}
 
+\section{Traces of every order on the half-space}
+
+For the half-space the boundary is flat, and the restrictions and extensions of smooth atoms stay
+smooth. This removes the restriction $s < 1$ of the Lipschitz case. Let $e$ be a unit vector,
+$\Omega = \{x : \langle x, e \rangle > 0\}$ the Lipschitz graph domain with graph function $0$,
+and $H = e^\perp$.
+
+\begin{lemma}[Restrictions of smooth atoms to the hyperplane]
+\label{lem:smooth-atoms-hyperplane}
+\lean{Rd.norm_iteratedFDeriv_comp_clm_le, Rd.LipschitzGraph.flat_graphMap,
+  Rd.LipschitzGraph.isSmoothAtom_comp_graphMap_flat}
+\leanok
+\uses{def:smooth-atoms, def:graph-map}
+The graph map of $\Omega$ is the inclusion of $H$. A smooth atom on $V$ of order $K$ with centre
+$c$ restricts to a smooth atom on $H$ of order $K$ with centre $Pc$, the same radius factor and the
+same constant.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\|D^i (f \circ L)(x)\| \leq \|D^i f(Lx)\| \|L\|^i$ for a continuous linear map $L$, and the
+inclusion has norm at most $1$. For $x' \in H$, $\|x' - Pc\| \leq \|x' - c\|$.
+\end{proof}
+
+\begin{theorem}[The trace theorem of every order]
+\label{thm:trace-every-order}
+\lean{Rd.LipschitzGraph.exists_trace_atoms_flat, Rd.LipschitzGraph.modNorm_traceSeries_le_flat,
+  Rd.LipschitzGraph.modNorm_trace_le_flat}
+\leanok
+\uses{lem:smooth-atoms-hyperplane, lem:cell-atoms-smooth, lem:smooth-atoms-regular,
+  thm:trace-graph, thm:rd-atomic-synthesis}
+Let $1 \leq p < \infty$, $0 < s < r$, $1 \leq q \leq \infty$ and $L \in \N$. There is
+$K < \infty$ such that
+\begin{multline*}
+  \|\operatorname{Tr} f\|_{L_p(H)} + \|(2^{ks} \omega_r(\operatorname{Tr} f, 2^{-k})_p)_k\|_{\ell_q}
+  \\ \leq K \bigl(\|f\|_{L_p(\Omega)} +
+    \|(2^{k(s + 1/p)} \omega_L(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q}\bigr)
+\end{multline*}
+for all $f \in L_p(V)$ for which the right side is finite.
+\end{theorem}
+
+\begin{proof}
+\leanok
+As \Cref{thm:trace-graph}: the restrictions of the cell atoms are smooth atoms of order $r$ on $H$
+(\Cref{lem:cell-atoms-smooth}, \Cref{lem:smooth-atoms-hyperplane}), hence regular atoms of order
+and exponent $r$ (\Cref{lem:smooth-atoms-regular}). The centres of the cells meeting $H$ lie within
+$3d 2^{-j} + r 2^{-j}$ of the point, and the synthesis on $H$ with exponent $r > s$ concludes.
+\end{proof}
+
+\begin{lemma}[Extended atoms of every order]
+\label{lem:extended-atoms-every-order}
+\lean{Rd.LipschitzGraph.smoothGraph_flat, Rd.LipschitzGraph.vertCutoff_flat,
+  Rd.LipschitzGraph.exists_isSmoothAtom_extendAtom_flat}
+\leanok
+\uses{def:vertical-cutoff, lem:extended-atoms, def:smooth-atoms}
+For $\Omega$ the vertical cut-off is $v_j(x) = \chi(2^j \langle x, e \rangle)$. For every order $K$
+there is $B \geq 0$ such that the extension $A(x) = a(Px) \chi(2^j \langle x, e \rangle)$ of a
+smooth atom $a$ on $H$ of order $K$, level $j$ and constant $A$ is a smooth atom on $V$ of order
+$K$ with constant $2^K B A$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The mollified graph of the graph function $0$ vanishes. Leibniz's rule bounds
+$\|D^l A\| \leq \sum_i \binom{l}{i} A 2^{ji} B 2^{j(l-i)} = 2^l A B 2^{jl}$, since
+$\|D^i (a \circ P)\| \leq A 2^{ji}$ and the derivatives of $x \mapsto \chi(2^j \langle x, e \rangle)$
+of order $i$ are at most $2^{ji} \sup |\chi^{(i)}|$.
+\end{proof}
+
+\begin{definition}[The extension of every order]
+\label{def:flat-extension}
+\lean{Rd.LipschitzGraph.flatLevelH, Rd.LipschitzGraph.continuous_flatLevelH,
+  Rd.LipschitzGraph.flatLevel, Rd.LipschitzGraph.flatLevel_eq_tsum,
+  Rd.LipschitzGraph.continuous_flatLevel, Rd.LipschitzGraph.flatTerm,
+  Rd.LipschitzGraph.flatTerm_ae, Rd.LipschitzGraph.flatExtension}
+\leanok
+\uses{def:local-means, lem:cell-decomposition}
+For $g \in L_p(H)$ and a moment order $L_H$ let $g_j = \eta_j * (k_j * g)$ be the terms of the
+reproducing formula on $H$. The extension is $E g = \sum_j F_j$ with the continuous levels
+$F_j(x) = g_j(Px) \chi(2^j \langle x, e \rangle) = \sum_m \lambda_{j,m} A_{j,m}(x)$, the
+extensions of the cell atoms of $g_j$.
+\end{definition}
+
+\begin{theorem}[The extension of every order is bounded]
+\label{thm:flat-extension-bounded}
+\lean{Rd.LipschitzGraph.exists_flat_extension_atoms, Rd.LipschitzGraph.eLpNorm_flatLevel_le,
+  Rd.LipschitzGraph.memLp_flatLevel, Rd.LipschitzGraph.summable_flatTerm,
+  Rd.LipschitzGraph.coeffNorm_flat_eq, Rd.LipschitzGraph.modNorm_flatExtension_le_localMeansNorm,
+  Rd.LipschitzGraph.modNorm_flatExtension_le}
+\leanok
+\uses{def:flat-extension, lem:extended-atoms-every-order, lem:cell-atoms-smooth,
+  thm:rd-atomic-synthesis, thm:local-means}
+Let $1 \leq p < \infty$, $s > 0$ and $s + 1/p < r$. There is $K < \infty$ with
+\begin{multline*}
+  \|E g\|_p + \|(2^{k(s + 1/p)} \omega_r(E g, 2^{-k})_p)_k\|_{\ell_q} \\ \leq
+  K \bigl(\|g\|_{L_p(H)} + \|(2^{ks} \omega_{L_H}(g, 2^{-k})_p)_k\|_{\ell_q}\bigr) .
+\end{multline*}
+\end{theorem}
+
+\begin{proof}
+\leanok
+The extended atoms are smooth of order $r$ (\Cref{lem:extended-atoms-every-order}), hence regular
+atoms of order and exponent $r$ on $V$; they project to the cell centres of $H$, so they have
+bounded overlap. The coefficient quasi-norm with smoothness $s + 1/p$ in dimension $n$ is the local
+means quasi-norm of $g$ with smoothness $s$, since $(s + 1/p) - n/p = s - (n-1)/p$, and
+\Cref{thm:local-means} bounds it.
+\end{proof}
+
+\begin{theorem}[The trace of the extension of every order]
+\label{thm:trace-flat-extension}
+\lean{Rd.LipschitzGraph.exists_modNorm_flatTerm_le, Rd.LipschitzGraph.trace_sum_flatTerm,
+  Rd.LipschitzGraph.trace_flatExtension}
+\leanok
+\uses{thm:flat-extension-bounded, thm:trace-continuous, thm:trace-extension}
+Let $L \geq 2$, $L_H \geq 1$, $s > 0$ with $s + 1/p < L$, and $g \in L_p(H)$ with
+$\|(2^{js} \|k_j * g\|_p)_j\|_{\ell_q} < \infty$. Then $\operatorname{Tr}(E g) = g$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+As \Cref{thm:trace-extension}: the partial sums $\sum_{j \leq J} F_j$ are continuous with traces
+$\sum_{j \leq J} g_j \to g$ (\Cref{thm:trace-continuous}), and they converge to $E g$ in the norm of
+$\Besov{1/p}{p}{1}$ with order $L$, where the trace is continuous.
+\end{proof}
+
+\begin{theorem}[The trace space of the half-space]
+\label{thm:half-space-trace-space}
+\lean{Rd.LipschitzGraph.exists_trace_eq_iff_flat}
+\leanok
+\uses{thm:trace-every-order, thm:flat-extension-bounded, thm:trace-flat-extension}
+Let $1 \leq p < \infty$, $s > 0$, $1 \leq q \leq \infty$, $L \geq 2$ with $s + 1/p < L$, and
+$r > s$. Then $g \in L_p(H)$ is the trace of some $f$ with
+$\|f\|_{L_p(\Omega)} + \|(2^{k(s+1/p)} \omega_L(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$ if and
+only if $\|g\|_p + \|(2^{ks} \omega_r(g, 2^{-k})_p)_k\|_{\ell_q} < \infty$. So
+$\Besov{s}{p}{q}(H)$ is the trace space of $\Besov{s + 1/p}{p}{q}$ of the half-space for every
+$s > 0$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:trace-every-order} bounds the trace. Conversely, the extension with moment order
+$L_H = r$ has finite norm (\Cref{thm:flat-extension-bounded}) and trace $g$
+(\Cref{thm:trace-flat-extension}).
+\end{proof}
+
 \section{Traces in charts}
 
 Three properties make the trace a function on the boundary, independent of the graph domain that
