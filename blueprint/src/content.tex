@@ -5704,7 +5704,7 @@ $\Delta_h^r(f, x, U) = \Delta_h^r f(x)$ for $x \in U_{rh}$ and $\Delta_h^r(f, x,
   Rd.modulusOn_indicator, Rd.modulusOn_add_le, Rd.modulusOn_le_modulus, Rd.modulusOn_le,
   Rd.modulusOn_congr_ae, Rd.modulusOn_mono_set, Rd.lpModulusOn_succ_le,
   Rd.lpModulusOn_le_lpModulus, Rd.lpModulusOn_mono_set, Rd.lpModulusOn_congr,
-  Rd.lpModulusOn_add_le, Rd.lpModulusOn_le}
+  Rd.lpModulusOn_add_le, Rd.lpModulusOn_le, Rd.modulusOn_const_smul, Rd.lpModulusOn_const_smul}
 \leanok
 \uses{def:rd-modulus-on, lem:rd-modulus}
 Let $U \subseteq V$ be measurable, $1 \leq p < \infty$, $r \in \N$ and $f, g \in L_p$. Then
@@ -7400,6 +7400,23 @@ $K \|\lambda'\|_{b^s_{p,q}} \leq K \|\lambda\|_{b^s_{p,q}}$, which is the local 
 $F$, bounded by the right side (\Cref{thm:local-means}).
 \end{proof}
 
+\begin{lemma}[The intrinsic quasi-norm]
+\label{lem:modnorm-on}
+\lean{Rd.modNormOn, Rd.modNormOn_zero, Rd.modNormOn_add_le, Rd.modNormOn_const_smul,
+  Rd.modNormOn_finsetSum_le}
+\leanok
+\uses{def:rd-modulus-on, lem:rd-modulus-on}
+On a measurable set $\Omega$, $N_\Omega(G) = \|G\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(G, 2^{-k},
+\Omega)_p)_k\|_{\ell_q}$ vanishes at $0$, is homogeneous and, for $q \geq 1$, subadditive, also
+for finite sums.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The modulus on $\Omega$ is homogeneous and subadditive (\Cref{lem:rd-modulus-on}), and so are the
+$L_p$ and $\ell_q$ norms.
+\end{proof}
+
 \begin{definition}[Besov domains]
 \label{def:besov-domain}
 \lean{Rd.BesovDomain, Rd.modNormOn_univ, Rd.BesovDomain.univ, Rd.BesovDomain.measurableSet}
@@ -8468,6 +8485,150 @@ $\int_M F \, d\mu \leq C \int_{\kappa(e.\mathrm{source})} F \circ \kappa^{-1}$.
 The first identity is the definition of the image measure with $F = (F \circ \kappa^{-1}) \circ
 \kappa$ on the source. The continuous density is bounded above and below by positive finite
 constants on the compact $\kappa(K)$, which carries $F \circ \kappa^{-1}$.
+\end{proof}
+
+\section{The Besov atlas}
+
+From now on $M$ is compact, smooth, and the range $\Omega$ of $I$ is a Besov domain
+(\Cref{def:besov-domain}); $\mu$ is a smooth measure and $1 \leq p < \infty$.
+
+\begin{definition}[Besov atlases]
+\label{def:besov-atlas}
+\lean{Manifold.BesovAtlas, Manifold.BesovAtlas.nonempty, Manifold.contDiffOn_comp_extend_symm,
+  Manifold.BesovAtlas.ext, Manifold.BesovAtlas.psi_le_one, Manifold.BesovAtlas.theta_mul_psi}
+\leanok
+A Besov atlas consists of finitely many charts $e_i$ of the atlas with extended charts
+$\kappa_i$, a smooth partition of unity $(\psi_i)$ with $\operatorname{tsupport} \psi_i \subseteq
+e_i.\mathrm{source}$, and smooth cut-offs $\theta_i$ with $\theta_i = 1$ on
+$\operatorname{tsupport} \psi_i$ and $\operatorname{tsupport} \theta_i \subseteq
+e_i.\mathrm{source}$. Every compact smooth manifold has a Besov atlas. A smooth function $g$ on $M$
+gives a function $g \circ \kappa^{-1}$ that is smooth within the target of $\kappa$.
+\end{definition}
+
+\begin{proof}
+\leanok
+Finitely many chart sources cover $M$; Mathlib's smooth partitions of unity are subordinate to
+them, and a smooth Urysohn function between $\operatorname{tsupport} \psi_i$ and the complement of
+an open $V_i$ with $\overline{V_i} \subseteq e_i.\mathrm{source}$ is the cut-off.
+\end{proof}
+
+\begin{definition}[Chart pieces]
+\label{def:chart-pieces}
+\lean{Manifold.BesovAtlas.piece, Manifold.BesovAtlas.aestronglyMeasurable_piece,
+  Manifold.BesovAtlas.exists_eLpNorm_piece_le, Manifold.BesovAtlas.memLp_piece,
+  Manifold.BesovAtlas.pieceLp, Manifold.BesovAtlas.pieceLp_ae, Manifold.BesovAtlas.piece_add,
+  Manifold.BesovAtlas.piece_smul, Manifold.BesovAtlas.piece_ae_eq, Manifold.BesovAtlas.pieceLp_add,
+  Manifold.BesovAtlas.pieceLp_smul}
+\leanok
+\uses{def:besov-atlas, lem:chart-integrals}
+The $i$-th piece of $g : M \to \C$ is $(\psi_i g) \circ \kappa_i^{-1}$ on the target of
+$\kappa_i$ and $0$ elsewhere. It is linear in $g$, depends only on the class of $g$ modulo
+$\mu$-null sets, and $\|(\psi_i g) \circ \kappa_i^{-1}\|_{L_p(E)} \leq C \|g\|_{L_p(\mu)}$; so the
+pieces of $f \in L_p(\mu)$ lie in $L_p(E)$.
+\end{definition}
+
+\begin{lemma}[Changes of charts]
+\label{lem:coord-change}
+\lean{Manifold.range_inter_coordChange_source, Manifold.range_inter_coordChange_target,
+  Manifold.mem_coordChange_source, Manifold.coordChange_target_eq_image,
+  Manifold.coordChange_apply}
+\leanok
+For charts $e, e'$ the change of charts $\kappa' \circ \kappa^{-1}$ (Mathlib's
+\texttt{ModelWithCorners.extendCoordChange}) has the source $\kappa(e.\mathrm{source} \cap
+e'.\mathrm{source}) = \Omega \cap U$ and the target
+$\kappa'(e.\mathrm{source} \cap e'.\mathrm{source}) = \Omega \cap U'$ with open $U, U'$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The image of an open subset $S$ of $H$ under $I$ is $I^{-1}$-preimage of $S$ intersected with
+the range of $I$.
+\end{proof}
+
+\begin{definition}[The changes of charts with cut-offs]
+\label{def:chart-transition}
+\lean{Manifold.BesovAtlas.transition, Manifold.BesovAtlas.transition_apply}
+\leanok
+\uses{def:cutoff-diffeo, lem:coord-change, def:besov-atlas}
+For two Besov atlases $A, A'$ and charts $i$ of $A$ and $j$ of $A'$, the change of charts
+$\Phi_{ij} = \kappa'_j \circ \kappa_i^{-1}$ with the cut-off
+$\chi_{ij} = (\psi_i \theta'_j) \circ \kappa_j'^{-1}$ and
+$K_0 = \kappa'_j(\operatorname{tsupport} \psi_i \cap \operatorname{tsupport} \theta'_j)$ is a smooth
+change of variables with a cut-off $T_{ij}$ on $\Omega$.
+\end{definition}
+
+The smoothness of $\Phi_{ij}$ and of its inverse is the compatibility of the charts in the
+maximal atlas, Mathlib's
+\texttt{ModelWithCorners.\allowbreak contDiffOn\_\allowbreak extendCoordChange}.
+
+\begin{theorem}[The pieces of two atlases]
+\label{thm:pieces-two-atlases}
+\lean{Manifold.BesovAtlas.piece_eq_sum_apply, Manifold.BesovAtlas.pieceLp_eq_sum}
+\leanok
+\uses{def:chart-pieces, def:chart-transition, lem:cutoff-diffeo-lp}
+For every $g : M \to \C$, $(\psi_i g) \circ \kappa_i^{-1} = \sum_j T_{ij}\bigl((\psi'_j g) \circ
+\kappa_j'^{-1}\bigr)$ at every point; for $f \in L_p(\mu)$ the same holds in $L_p(E)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+At $y = \kappa_i(x)$, $\psi_i(x) g(x) = \sum_j \psi_i(x) \psi'_j(x) g(x)$, and the $j$-th term is
+$\chi_{ij}(\Phi_{ij} y) \cdot (\psi'_j g)(\kappa_j'^{-1} \Phi_{ij} y)$ when $x$ lies in the source
+of $e'_j$, since $\theta'_j \psi'_j = \psi'_j$; otherwise $\psi'_j(x) = 0$ and $y$ lies outside the
+source of $\Phi_{ij}$.
+\end{proof}
+
+\section{Besov spaces on compact manifolds}
+
+\begin{definition}[The Besov quasi-norm of an atlas]
+\label{def:manifold-besov-norm}
+\lean{Manifold.BesovAtlas.besovNorm, Manifold.BesovAtlas.besovNorm_add_le,
+  Manifold.BesovAtlas.besovNorm_const_smul, Manifold.BesovAtlas.exists_enorm_le_besovNorm}
+\leanok
+\uses{def:chart-pieces, lem:modnorm-on}
+For a Besov atlas $A$, $r \in \N$, $s \in \R$ and $1 \leq q \leq \infty$,
+\begin{gather*}
+  \|f\|_{A, r, s, q} = \sum_i N_\Omega\bigl((\psi_i f) \circ \kappa_i^{-1}\bigr), \\
+  N_\Omega(G) = \|G\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(G, 2^{-k}, \Omega)_p)_k\|_{\ell_q} .
+\end{gather*}
+It is subadditive, homogeneous, and $\|f\|_{L_p(\mu)} \leq C \|f\|_{A, r, s, q}$.
+\end{definition}
+
+\begin{theorem}[Independence of the atlas]
+\label{thm:atlas-independence}
+\lean{Manifold.BesovAtlas.besovNorm_le_besovNorm}
+\leanok
+\uses{def:manifold-besov-norm, thm:pieces-two-atlases, thm:besov-domain-invariance}
+For two Besov atlases $A, A'$, $0 < s < r$ and $1 \leq q \leq \infty$ there is $C < \infty$ with
+$\|f\|_{A, r, s, q} \leq C \|f\|_{A', r, s, q}$ for all $f \in L_p(\mu)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:pieces-two-atlases} and the subadditivity of $N_\Omega$,
+$N_\Omega(\text{piece}_i f) \leq \sum_j N_\Omega(T_{ij}\, \text{piece}'_j f)$, and
+$N_\Omega(T_{ij} G) \leq C_{ij} N_\Omega(G)$ on the Besov domain $\Omega$
+(\Cref{thm:besov-domain-invariance}).
+\end{proof}
+
+\begin{definition}[Besov spaces on compact manifolds]
+\label{def:manifold-besov}
+\lean{Manifold.BesovAtlas.MemBesov, Manifold.BesovAtlas.memBesov_iff_besovNorm_lt_top,
+  Manifold.BesovAtlas.memBesov_iff_memBesov, Manifold.MemBesov, Manifold.memBesov_iff,
+  Manifold.BesovAtlas.MemBesov.add, Manifold.BesovAtlas.MemBesov.const_smul,
+  Manifold.BesovAtlas.MemBesov.zero}
+\leanok
+\uses{thm:atlas-independence, thm:besov-domain-invariance}
+For $s > 0$, $f \in L_p(\mu)$ lies in $\Besov{s}{p}{q}(M)$ if $\|f\|_{A, \lfloor s \rfloor + 1, s,
+q} < \infty$ for some Besov atlas $A$. This holds for one atlas if and only if it holds for every
+atlas, and with any order $r > s$ in place of $\lfloor s \rfloor + 1$. $\Besov{s}{p}{q}(M)$ is a
+linear subspace of $L_p(\mu)$.
+\end{definition}
+
+\begin{proof}
+\leanok
+\Cref{thm:atlas-independence} in both directions; for the order, the comparison of orders on a
+Besov domain (\Cref{thm:besov-domain-invariance}) piece by piece.
 \end{proof}
 
 \chapter{Dominating mixed smoothness on $\R^d$}

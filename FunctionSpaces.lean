@@ -110,6 +110,8 @@ public import FunctionSpaces.Rd.GraphTraceExtension
 public import FunctionSpaces.Rd.GraphTraceCharts
 public import FunctionSpaces.Rd.LipschitzBoundaryTrace
 public import FunctionSpaces.Manifold.SmoothMeasure
+public import FunctionSpaces.Manifold.BesovAtlas
+public import FunctionSpaces.Manifold.Besov
 public import FunctionSpaces.Rd.TensorKernels
 public import FunctionSpaces.Rd.MixedSequences
 public import FunctionSpaces.Rd.MixedDifferences
@@ -343,6 +345,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   Lipschitz domain, Besov spaces on the boundary, the boundary trace and its trace space.
 * `FunctionSpaces.Manifold.SmoothMeasure`: smooth measures on manifolds, integrals in charts and
   their comparison with integrals on the manifold.
+* `FunctionSpaces.Manifold.BesovAtlas`: Besov atlases, chart pieces in `L_p`, the changes of charts
+  with cut-offs, and the pieces of two atlases.
+* `FunctionSpaces.Manifold.Besov`: the Besov quasi-norm of an atlas, its independence of the atlas
+  and of the order, and the Besov spaces of a compact manifold.
 * `FunctionSpaces.Rd.TensorKernels`: tensor products of one-dimensional kernels on `ℝ^d`, their
   integrals, convolutions, dilations, and diagonal changes of variables.
 * `FunctionSpaces.Rd.MixedSequences`: `ℓ_q` norms on `ℕ^d`, the mixed weights `2^(s|k|_1)`, the

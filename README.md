@@ -449,6 +449,21 @@ explains how they differ.
   (`Rd.LipschitzGraph.flatExtension`) is bounded
   (`Rd.LipschitzGraph.modNorm_flatExtension_le`) and has the trace `g`
   (`Rd.LipschitzGraph.trace_flatExtension`).
+* **Besov spaces on compact manifolds.** Let `M` be a compact smooth manifold modelled on `E` with
+  corners `I` whose range is a Besov domain (the half-space or `E`), `μ` a smooth measure (in
+  every chart a continuous positive density with respect to the Lebesgue measure,
+  `Manifold.IsSmoothMeasure`) and `1 ≤ p < ∞`. A Besov atlas consists of finitely many charts
+  `κ_i`, a smooth partition of unity `ψ_i` subordinate to them and cut-offs
+  (`Manifold.BesovAtlas`); every compact manifold has one (`Manifold.BesovAtlas.nonempty`). Its
+  Besov quasi-norm is `‖f‖_{A,r,s,q} = ∑_i N_Ω((ψ_i f) ∘ κ_i⁻¹)` with
+  `N_Ω(G) = ‖G‖_{L_p(Ω)} + ‖(2^(ks) ω_r(G, 2^(-k), Ω)_p)_k‖_{ℓ_q}`, `Ω = range I`
+  (`Manifold.BesovAtlas.besovNorm`). For two Besov atlases, `0 < s < r` and `1 ≤ q ≤ ∞` there is
+  `C < ∞` with `‖f‖_{A,r,s,q} ≤ C ‖f‖_{A',r,s,q}` for all `f ∈ L_p(μ)`
+  (`Manifold.BesovAtlas.besovNorm_le_besovNorm`), so `B^s_{p,q}(M)` (`Manifold.MemBesov`) depends
+  neither on the atlas nor on the order (`Manifold.memBesov_iff`,
+  `Manifold.BesovAtlas.memBesov_iff_besovNorm_lt_top`). The pieces of two atlases are related by
+  the changes of charts with cut-offs (`Manifold.BesovAtlas.pieceLp_eq_sum`), which are bounded on
+  the Besov domain.
 * **Traces on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`,
   boundary balls `B_j` and graph domains `Ω_j` as above, and `(ψ_j)` a smooth resolution of unity on
   `Γ` with `tsupport ψ_j ⊆ B_j` (`Rd.BoundedLipschitzDomain.BoundaryPartition`). A property holds
@@ -587,6 +602,8 @@ explains how they differ.
 | Traces in charts: locality, approximation, change of chart, products, finite sums | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphTraceCharts.lean` |
 | Traces on bounded Lipschitz domains: Besov spaces on the boundary, the trace space | ✅ proved | ✗ | `FunctionSpaces/Rd/LipschitzBoundaryTrace.lean` |
 | Smooth measures on manifolds, integrals in charts | ✅ proved | ✗ | `FunctionSpaces/Manifold/SmoothMeasure.lean` |
+| Besov atlases, chart pieces, changes of charts with cut-offs | ✅ proved | ✗ | `FunctionSpaces/Manifold/BesovAtlas.lean` |
+| Besov spaces on compact manifolds, independence of the atlas and of the order | ✅ proved | ✗ | `FunctionSpaces/Manifold/Besov.lean` |
 | Tensor kernels on `ℝ^d`: integrals, convolutions, dilations, diagonal changes of variables | ✅ proved | ✗ | `FunctionSpaces/Rd/TensorKernels.lean` |
 | Sequences on `ℕ^d`: `ℓ_q` norms, Schur test, almost diagonal lemma | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedSequences.lean` |
 | Mixed differences, mixed moduli, the mixed Besov quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedDifferences.lean` |
@@ -615,7 +632,8 @@ with its traces,
 `ℝ^d` with convolution, approximate identities, Littlewood–Paley decompositions, moduli of
 smoothness and local means, Lipschitz graph domains and bounded Lipschitz domains with Rychkov's
 extension and pointwise multipliers, atomic decompositions with regular and smooth atoms, the
-invariance of Besov spaces under smooth changes of variables, traces on Lipschitz graph domains and
+invariance of Besov spaces under smooth changes of variables, Besov spaces on compact manifolds
+with boundary, traces on Lipschitz graph domains and
 on the boundaries of bounded Lipschitz domains, dominating mixed smoothness with hyperbolic cross
 approximation, filtration schemes for wavelets and multiwavelets, the classical definitions
 through moduli of smoothness and weak derivatives, and polynomial and piecewise polynomial
@@ -627,8 +645,8 @@ approximation on intervals and on the cube `[0, 1]^d`.
 ## What is left to do
 
 * **Reiteration** for approximation and interpolation spaces.
-* **Function spaces beyond the torus**: compact manifolds, and the existence of eigenbases of the
-  Laplace–Beltrami operator (Rellich's compactness, elliptic regularity).
+* **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,
+  elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.
 * **Classical definitions for all `p`**: Sobolev spaces by weak derivatives and Besov spaces
   by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
 * **Higher smoothness**: splines on domains, and compactly supported wavelets such as

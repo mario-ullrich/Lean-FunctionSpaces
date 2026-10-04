@@ -224,6 +224,33 @@ theorem lpModulusOn_congr {U : Set V} {f g : Lp ℂ p μ}
     lpModulusOn p U r f k = lpModulusOn p U r g k :=
   modulusOn_congr_ae hfg r p _
 
+omit [BorelSpace V] [μ.IsAddHaarMeasure] in
+/-- `ω_r(c f, t, U)_p = |c| ω_r(f, t, U)_p`. -/
+theorem modulusOn_const_smul (U : Set V) (r : ℕ) (p : ℝ≥0∞) (c : ℂ) (f : V → ℂ) (t : ℝ) :
+    modulusOn μ U r p (c • f) t = ‖c‖ₑ * modulusOn μ U r p f t := by
+  simp only [modulusOn, fwdDiff_iter_const_smul, ENNReal.mul_iSup]
+  congr 1
+  funext h
+  congr 1
+  funext _
+  rw [← eLpNorm_const_smul]
+  congr 1
+  funext x
+  by_cases hx : x ∈ stepSet U r h
+  · simp only [Set.indicator_of_mem hx, Pi.smul_apply]
+  · simp only [Set.indicator_of_notMem hx, Pi.smul_apply, smul_zero]
+
+/-- The dyadic moduli on `U` are homogeneous: `ω_r(c f, 2^(-k), U)_p = |c| ω_r(f, 2^(-k), U)_p`. -/
+theorem lpModulusOn_const_smul (U : Set V) (r : ℕ) (c : ℂ) (f : Lp ℂ p μ) (k : ℕ) :
+    lpModulusOn p U r (c • f) k = ‖c‖ₑ * lpModulusOn p U r f k := by
+  have h : U.indicator ((c • f : Lp ℂ p μ) : V → ℂ) =ᵐ[μ] U.indicator (c • (f : V → ℂ)) := by
+    filter_upwards [Lp.coeFn_smul c f] with x hx
+    by_cases hxU : x ∈ U
+    · rw [Set.indicator_of_mem hxU, Set.indicator_of_mem hxU, hx]
+    · rw [Set.indicator_of_notMem hxU, Set.indicator_of_notMem hxU]
+  rw [lpModulusOn, modulusOn_congr_ae h, modulusOn_const_smul]
+  rfl
+
 /-- The modulus on `U` of elements of `L_p` is subadditive. -/
 theorem lpModulusOn_add_le [Fact (1 ≤ p)] (U : Set V) (r : ℕ) (f g : Lp ℂ p μ) (k : ℕ) :
     lpModulusOn p U r (f + g) k ≤ lpModulusOn p U r f k + lpModulusOn p U r g k := by
