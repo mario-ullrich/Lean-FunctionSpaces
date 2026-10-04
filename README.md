@@ -301,6 +301,17 @@ explains how they differ.
   `H^s(𝕋^d) ⊆ L_r(𝕋^d)` for `2 ≤ r ≤ ∞` and `s > d(1/2 - 1/r)`
   (`Torus.sobolev_memBesov_top`, `Torus.exists_sobolev_of_memBesov`,
   `Torus.sobolev_exists_inclusion_eq`).
+* **Spaces with an eigenbasis.** Let `μ` be a finite Borel measure on a topological space `M`,
+  and `(e_i)` an orthonormal basis of `L_2(μ)` of bounded continuous functions with levels
+  `λ(i) ∈ ℕ`, finitely many of each level, as the eigenfunctions of the Laplacian on a compact
+  Riemannian manifold with `λ(i) = ⌊√λ_i⌋`. The existence of such a basis is a hypothesis here
+  (`LaplaceEigenbasis`); the torus satisfies it (`Torus.fourierEigenbasis`). For the scheme of the
+  spans of `{e_i : λ(i) < n}` and `s > 0`, `f ∈ B^s_{2,2}` iff
+  `∑_i (1 + λ(i))^(2s) |⟨e_i, f⟩|² < ∞` (`LaplaceEigenbasis.memBesov_two_two_iff`). If moreover
+  `∑_{λ(i) < n} |e_i(x)|² ≤ C n^D` for all `x` and `n ≥ 1` (the local Weyl bound), then
+  `‖a‖_∞^p ≤ C n^D ‖a‖_p^p` for `1 ≤ p ≤ 2` and `a` in the span of level `< n`
+  (`LaplaceEigenbasis.norm_rpow_le_of_localWeyl`), and for `2s > D` every such `f` has a bounded
+  continuous representative (`LaplaceEigenbasis.exists_continuous_of_localWeyl`).
 * **Littlewood–Paley blocks on `ℝ^d`.** Let `V` be a finite-dimensional real inner product
   space, such as `ℝ^d`, and `1 ≤ p < ∞`. Let `χ` be a smooth cut-off, `1` on the unit ball and
   `0` outside the ball of radius `2`, and `ψ_j` the kernels with `𝓕ψ_0 = χ` and
@@ -498,6 +509,7 @@ explains how they differ.
 | Interpolation `L_p`–`L_∞`, Nikolskii property, Besov embeddings | ✅ proved | ✗ | `FunctionSpaces/{Lp/Interpolation,Besov/Nikolskii,Besov/Embeddings}.lean` |
 | Jackson inequality, smoothness spaces, Sobolev embeddings | ✅ proved | ✗ | `ApproximationSpaces/Jackson.lean`, `FunctionSpaces/Sobolev/Embeddings.lean` |
 | Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ proved | ✗ | `FunctionSpaces/Spectral/Basic.lean` |
+| Eigenbases of continuous functions (hypothesis), `B^s_{2,2} = H^s`, local Weyl bound, Nikolskii for `p ≤ 2`, continuity of `H^s` for `s > D/2`; the Fourier basis as an instance | ✅ proved | ✗ | `FunctionSpaces/Spectral/{Eigenbasis,LocalWeyl}.lean`, `FunctionSpaces/Torus/Eigenbasis.lean` |
 | The torus: trigonometric polynomials, Nikolskii inequality | ✅ proved | ✗ | `FunctionSpaces/Torus/{Measure,Scheme,Nikolskii}.lean` |
 | The torus: `H^s(𝕋^d)`, Besov and Sobolev embeddings, `H^s(𝕋^d) ↪ C(𝕋^d)` | ✅ proved | ✗ | `FunctionSpaces/Torus/{Sobolev,Embeddings}.lean` |
 | Filtration schemes (Haar), martingale-difference characterisation | ✅ proved | ✗ | `FunctionSpaces/Wavelets/Filtration.lean` |
@@ -555,7 +567,8 @@ decompositions, projection schemes, traces and intrinsic norms, and the coincide
 approximation spaces with spaces defined by moduli of smoothness. Nothing in it mentions
 functions or measures. `FunctionSpaces` holds the Besov and Sobolev spaces built on it:
 schemes of bounded continuous functions on a finite measure space and their embedding
-theorems, spectral schemes in Hilbert spaces, the torus with its traces,
+theorems, spectral schemes in Hilbert spaces and eigenbases of continuous functions, the torus
+with its traces,
 `ℝ^d` with convolution, approximate identities, Littlewood–Paley decompositions, moduli of
 smoothness and local means, Lipschitz graph domains and bounded Lipschitz domains with Rychkov's
 extension and pointwise multipliers, atomic decompositions, traces on Lipschitz graph domains and
@@ -570,7 +583,8 @@ approximation on intervals and on the cube `[0, 1]^d`.
 ## What is left to do
 
 * **Reiteration** for approximation and interpolation spaces.
-* **Function spaces beyond the torus**: compact manifolds.
+* **Function spaces beyond the torus**: compact manifolds, and the existence of eigenbases of the
+  Laplace–Beltrami operator (Rellich's compactness, elliptic regularity).
 * **Classical definitions for all `p`**: Sobolev spaces by weak derivatives and Besov spaces
   by moduli of smoothness in `L_p`, with the coincidence theorems of Triebel's school.
 * **Higher smoothness**: splines on domains, and compactly supported wavelets such as

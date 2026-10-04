@@ -1716,8 +1716,9 @@ scheme in $H$, the \emph{spectral scheme} of $(e_i, \lambda)$.
 \end{definition}
 
 On the torus, $e_k$ is the Fourier basis and $\lambda(k) = \max_j |k_j|$. On a compact
-manifold, $e_i$ would be the eigenfunctions of the Laplacian and $\lambda$ a function of the
-eigenvalue.
+manifold, $e_i$ are the eigenfunctions of the Laplacian and $\lambda$ a function of the
+eigenvalue; \Cref{sec:eigenbases} treats this case with the existence of the eigenbasis as a
+hypothesis.
 
 \begin{definition}[Sobolev embedding of $\ell_2$]
 \label{def:sobolev-embed}
@@ -1748,9 +1749,10 @@ The preimage is $c_i = (1 + \lambda(i))^s \hat f(i)$.
 
 \begin{proposition}[Jackson and Bernstein inequalities]
 \label{prop:spectral-jackson-bernstein}
-\lean{SpectralScheme.jacksonBound, SpectralScheme.liftBound, SpectralScheme.toSmoothnessSpace,
-  SpectralScheme.truncate, SpectralScheme.repr_eq_zero_of_mem_span,
-  SpectralScheme.truncate_mem_span, SpectralScheme.repr_truncate, SpectralScheme.repr_sub_truncate}
+\lean{SpectralScheme.norm_sub_truncate_le, SpectralScheme.jacksonBound, SpectralScheme.liftBound,
+  SpectralScheme.toSmoothnessSpace, SpectralScheme.truncate,
+  SpectralScheme.repr_eq_zero_of_mem_span, SpectralScheme.truncate_mem_span,
+  SpectralScheme.repr_truncate, SpectralScheme.repr_sub_truncate}
 \leanok
 \uses{def:sobolev-embed, def:jackson, def:lift-bound, def:smoothness}
 Let $s \geq 0$. For every $n \geq 1$ and $c \in \ell_2(I)$, $E_n(J_s c) \leq n^{-s} \|c\|$;
@@ -1815,6 +1817,139 @@ The first statement is \Cref{thm:blocks} with the formulas of
 $q = 2$ the square of the block norm is comparable with $\sum_i \omega_i |\hat f(i)|^2$,
 where $\omega_i = 2^{2ks}$ on the block $2^k \leq \lambda(i) < 2^{k+1}$ and $\omega_i = 1$
 for $\lambda(i) = 0$; and $\omega_i \leq (1 + \lambda(i))^{2s} \leq 4^s \omega_i$.
+\end{proof}
+
+
+\section{Eigenbases of continuous functions}
+\label{sec:eigenbases}
+
+Let $M$ be a topological space with a finite Borel measure $\mu$. On a compact Riemannian
+manifold the eigenfunctions of the Laplace--Beltrami operator form an orthonormal basis of
+$L_2(M)$; they are continuous by elliptic regularity, and the eigenvalues $\lambda_i$ tend to
+infinity. Mathlib has neither the operator nor these facts. The statements below therefore assume
+an orthonormal basis of continuous functions with levels, and every one of them is proved from
+this assumption; the torus satisfies it (\Cref{prop:fourier-eigenbasis}).
+
+\begin{definition}[Eigenbasis]
+\label{def:laplace-eigenbasis}
+\lean{LaplaceEigenbasis, LaplaceEigenbasis.eigenSpan, LaplaceEigenbasis.eigenScheme,
+  LaplaceEigenbasis.eigenSpan_zero, LaplaceEigenbasis.eigenSpan_mono,
+  LaplaceEigenbasis.eigenfun_mem_eigenSpan, LaplaceEigenbasis.mem_eigenScheme,
+  LaplaceEigenbasis.toLp_eigenScheme_eq}
+\leanok
+\uses{def:spectral, def:function-scheme}
+An \emph{eigenbasis} of $M$ is a spectral scheme $(e_i, \lambda)$ in $L_2(\mu)$ together with
+bounded continuous functions $\tilde e_i$ whose classes are the $e_i$. The spaces
+$\mathcal{E}_n = \spn\{\tilde e_i : \lambda(i) < n\}$ of bounded continuous functions form a scheme
+of functions on $M$, and its classes in $L_2(\mu)$ form the spectral scheme of $(e_i, \lambda)$.
+\end{definition}
+
+For the Laplace--Beltrami operator, $\tilde e_i$ are the eigenfunctions and
+$\lambda(i) = \lfloor \sqrt{\lambda_i} \rfloor$. The Besov spaces $\Besov{s}{p}{q}(M)$ of the
+scheme $(\mathcal{E}_n)$ are defined for every $1 \leq p \leq \infty$ by \Cref{def:besov}.
+
+\begin{theorem}[Besov and Sobolev spaces of an eigenbasis]
+\label{thm:eigenbasis-besov}
+\lean{LaplaceEigenbasis.memBesov_two_two_iff, LaplaceEigenbasis.memBesov_two_iff_blockNorm_lt_top,
+  LaplaceEigenbasis.sobolevSpace, LaplaceEigenbasis.sobolevSpace_order,
+  LaplaceEigenbasis.sobolevSpace_iota, LaplaceEigenbasis.mem_range_sobolev_iff,
+  LaplaceEigenbasis.sobolev_memBesov_top, LaplaceEigenbasis.exists_sobolev_of_memBesov}
+\leanok
+\uses{def:laplace-eigenbasis, thm:spectral-coefficients, prop:spectral-jackson-bernstein,
+  def:sobolev-scheme}
+Let $s > 0$ and $1 \leq q \leq \infty$. For $f \in L_2(\mu)$:
+\begin{enumerate}
+  \item $f \in \Besov{s}{2}{2}(M)$ if and only if
+    $\sum_i (1 + \lambda(i))^{2s} |\langle e_i, f \rangle|^2 < \infty$;
+  \item $f \in \Besov{s}{2}{q}(M)$ if and only if the block norm of \Cref{thm:spectral-coefficients}
+    is finite;
+  \item the space $H^s(M)$ of the $f$ with
+    $\sum_i (1 + \lambda(i))^{2s} |\langle e_i, f \rangle|^2 < \infty$ is a Sobolev space of order
+    $s$ for the scheme in $L_2$, with constants $1$; $H^s(M) \subseteq \Besov{s}{2}{\infty}(M)$, and
+    $\Besov{t}{2}{q}(M) \subseteq H^s(M)$ for $t > s$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+The classes in $L_2$ of the scheme form the spectral scheme (\Cref{def:laplace-eigenbasis}), so
+\Cref{thm:spectral-coefficients} and \Cref{prop:spectral-jackson-bernstein} apply.
+\end{proof}
+
+\begin{definition}[Local Weyl bound]
+\label{def:local-weyl}
+\lean{LaplaceEigenbasis.LocalWeylBound, LaplaceEigenbasis.levelSet,
+  LaplaceEigenbasis.mem_levelSet}
+\leanok
+\uses{def:laplace-eigenbasis}
+An eigenbasis satisfies the \emph{local Weyl bound} of dimension $D$ with constant $C \geq 0$ if
+\[
+  \sum_{\lambda(i) < n} |\tilde e_i(x)|^2 \leq C n^D
+  \qquad \text{for every } x \in M \text{ and every } n \geq 1 .
+\]
+\end{definition}
+
+For the Laplace--Beltrami operator of a compact Riemannian manifold of dimension $d$ this is
+H\"ormander's local Weyl law, with $D = d$.
+
+\begin{theorem}[Nikolskii inequality from the local Weyl bound]
+\label{thm:local-weyl-nikolskii}
+\lean{LaplaceEigenbasis.norm_sq_le_of_localWeyl, LaplaceEigenbasis.norm_le_sqrt_mul_of_localWeyl,
+  LaplaceEigenbasis.norm_rpow_le_of_localWeyl, LaplaceEigenbasis.norm_le_of_localWeyl,
+  LaplaceEigenbasis.exists_sum_of_mem_eigenSpan, LaplaceEigenbasis.norm_toLp_sum_sq}
+\leanok
+\uses{def:local-weyl, lem:lp-interpolation}
+Let the eigenbasis satisfy the local Weyl bound of dimension $D$ with constant $C$. For every
+$n \geq 1$, every $a \in \mathcal{E}_n$ and every $1 \leq p \leq 2$,
+\[
+  \|a\|_\infty^2 \leq C n^D \|a\|_2^2 ,
+  \qquad
+  \|a\|_\infty^p \leq C n^D \|a\|_p^p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Write $a = \sum_{\lambda(i) < n} c_i \tilde e_i$. By the Cauchy--Schwarz inequality and the local
+Weyl bound, $|a(x)|^2 \leq \sum_i |c_i|^2 \sum_{\lambda(i) < n} |\tilde e_i(x)|^2 \leq C n^D
+\sum_i |c_i|^2$, and $\sum_i |c_i|^2 = \|a\|_2^2$ by Parseval's identity. For $p \leq 2$,
+$\|a\|_2^2 \leq \|a\|_\infty^{2-p} \|a\|_p^p$ (\Cref{lem:lp-interpolation}); dividing by
+$\|a\|_\infty^{2-p}$ gives the second inequality.
+\end{proof}
+
+For $p > 2$ the inequality $\|a\|_\infty \leq C' n^{D/p} \|a\|_p$ does not follow in this way:
+the proof on the torus raises polynomials to powers (\Cref{thm:torus-nikolskii}), and products of
+eigenfunctions are no eigenfunctions. The embeddings of \Cref{thm:besov-embedding} hold for the
+scheme $(\mathcal{E}_n)$ whenever it has the Nikolskii property of \Cref{def:nikolskii-property}.
+The embedding into continuous functions needs only the local Weyl bound.
+
+\begin{theorem}[Continuity of $H^s(M)$]
+\label{thm:local-weyl-continuity}
+\lean{LaplaceEigenbasis.exists_continuous_of_localWeyl, LaplaceEigenbasis.partialSum,
+  LaplaceEigenbasis.partialSum_mem_eigenSpan, LaplaceEigenbasis.toLp_partialSum,
+  LaplaceEigenbasis.norm_truncate_sub_truncate_le,
+  LaplaceEigenbasis.norm_partialSum_succ_sub_le, Real.natCast_two_pow_rpow}
+\leanok
+\uses{thm:local-weyl-nikolskii, thm:eigenbasis-besov}
+Let the eigenbasis satisfy the local Weyl bound of dimension $D$, and let $s > 0$ with
+$2s > D$. Every $f \in L_2(\mu)$ with
+$\sum_i (1 + \lambda(i))^{2s} |\langle e_i, f \rangle|^2 < \infty$ is the class of a bounded
+continuous function.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $f = J_s c$ and $S_n f = \sum_{\lambda(i) < n} \langle e_i, f \rangle \tilde e_i$, a bounded
+continuous function whose class is the truncation $P_n f$. The difference
+$S_{2^{k+1}} f - S_{2^k} f$ lies in $\mathcal{E}_{2^{k+1}}$, and its $L_2$ norm is at most
+$\|f - P_{2^k} f\|_2 \leq 2^{-ks} \|c\|$ (\Cref{prop:spectral-jackson-bernstein}). By
+\Cref{thm:local-weyl-nikolskii}
+\[
+  \|S_{2^{k+1}} f - S_{2^k} f\|_\infty \leq C^{1/2} 2^{(k+1)D/2} 2^{-ks} \|c\|
+  = C^{1/2} 2^{D/2} \|c\| \, (2^{D/2 - s})^k ,
+\]
+a geometric sequence since $D/2 < s$. So $(S_{2^k} f)_k$ converges uniformly to a bounded
+continuous $g$, and the class of $g$ is the $L_2$ limit $\lim_k P_{2^k} f = f$.
 \end{proof}
 
 \chapter{The torus}
@@ -1923,6 +2058,26 @@ scheme in $L_2$, with constants $1$.
 The weight $(1 + \max_j |k_j|)^{2s}$ is equivalent to the more common $(1 + |k|^2)^s$, up to
 constants depending on $d$ and $s$; the degree is used because it indexes the trigonometric
 polynomials.
+
+\begin{proposition}[The Fourier basis as an eigenbasis]
+\label{prop:fourier-eigenbasis}
+\lean{Torus.fourierEigenbasis, Torus.fourierEigenbasis_level, Torus.fourierEigenbasis_eigenfun,
+  Torus.eigenSpan_fourierEigenbasis, Torus.eigenScheme_fourierEigenbasis,
+  Torus.levelSet_fourierEigenbasis, Torus.localWeylBound_fourierEigenbasis,
+  Torus.hasNikolskii_fourierEigenbasis}
+\leanok
+\uses{def:laplace-eigenbasis, def:local-weyl, def:torus-sobolev, thm:torus-nikolskii}
+The trigonometric monomials $e_k$ with the level $\deg$ form an eigenbasis of $\T^d$ whose scheme
+is the trigonometric scheme. It satisfies the local Weyl bound of dimension $d$ with constant
+$2^d$, and its scheme has the Nikolskii property of dimension $d$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+The $e_k$ are bounded continuous representatives of the Fourier basis, and their spans are the
+spaces $\mathcal{T}_n$. Since $|e_k| = 1$ and at most $(2n)^d$ frequencies have degree $< n$,
+$\sum_{\deg k < n} |e_k(x)|^2 \leq 2^d n^d$. The Nikolskii property is \Cref{thm:torus-nikolskii}.
+\end{proof}
 
 \begin{theorem}[Embeddings on the torus]
 \label{thm:torus-embeddings}
@@ -8290,6 +8445,23 @@ Descriptions & Range & Result \\
   & \Cref{thm:moduli-coincidence} \\
 \raggedright Weak derivatives, Fourier coefficients and approximation: $\Sob{m}{2} = H^m = \Besov{m}{2}{2}$
   & $m \geq 1$ & \Cref{thm:weak-sobolev} \\
+\hline
+\end{tabular}
+\end{center}
+
+\paragraph{Spaces with an eigenbasis.} The scheme consists of the spans of continuous
+eigenfunctions (\Cref{def:laplace-eigenbasis}); the eigenbasis is a hypothesis, and the torus
+satisfies it (\Cref{prop:fourier-eigenbasis}).
+\begin{center}
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
+\hline
+Descriptions & Range & Result \\
+\hline
+\raggedright Approximation and coefficients, $p = 2$; $\Besov{s}{2}{2} = H^s$ & $s > 0$
+  & \Cref{thm:eigenbasis-besov} \\
+\raggedright $H^s$ and continuous functions, under the local Weyl bound of dimension $D$
+  & $s > D/2$ & \Cref{thm:local-weyl-continuity} \\
 \hline
 \end{tabular}
 \end{center}

@@ -218,13 +218,13 @@ theorem mem_range_sobolevEmbed_iff (s : ℝ) (hs : 0 ≤ s) (f : H) :
   · intro h
     exact ⟨⟨_, h⟩, S.sobolevEmbed_weighted s hs h⟩
 
-/-- **Jackson's inequality** for the Sobolev space: `E_n(J_s c) ≤ n^(-s) ‖c‖`. -/
-theorem jacksonBound (s : ℝ) (hs : 0 ≤ s) :
-    ApproximationScheme.JacksonBound ((S.sobolevEmbed s hs).restrictScalars ℝ) S.toScheme s 1 := by
-  intro n hn c
+/-- **The truncation error of a Sobolev element**: `‖J_s c - P_n J_s c‖ ≤ n^(-s) ‖c‖` for
+`n ≥ 1`, by Parseval's identity, since only the coefficients of level `≥ n` remain and
+`(1 + lvl i)^(-s) ≤ n^(-s)` there. -/
+theorem norm_sub_truncate_le (s : ℝ) (hs : 0 ≤ s) {n : ℕ} (hn : 1 ≤ n) (c : ℓ²(ι, ℂ)) :
+    ‖S.sobolevEmbed s hs c - S.truncate n (S.sobolevEmbed s hs c)‖ ≤ (n : ℝ) ^ (-s) * ‖c‖ := by
   set f := S.sobolevEmbed s hs c
-  refine (ApproximationScheme.approxError_le_norm_sub (S.truncate_mem_span n f) f).trans ?_
-  rw [← S.basis.repr.norm_map, one_mul]
+  rw [← S.basis.repr.norm_map]
   calc ‖S.basis.repr (f - S.truncate n f)‖ ≤ ‖(((n : ℝ) ^ (-s) : ℝ) : ℂ) • c‖ := by
         refine lp.norm_mono (by norm_num) fun i => ?_
         rw [repr_sub_truncate, lp.coeFn_smul, Pi.smul_apply, smul_eq_mul]
@@ -236,6 +236,16 @@ theorem jacksonBound (s : ℝ) (hs : 0 ≤ s) :
           exact S.inv_weight_le hs hn (not_lt.1 hi)
     _ = (n : ℝ) ^ (-s) * ‖c‖ := by
         rw [norm_smul, Complex.norm_real, Real.norm_eq_abs, abs_of_pos (by positivity)]
+
+/-- **Jackson's inequality** for the Sobolev space: `E_n(J_s c) ≤ n^(-s) ‖c‖`, with the
+truncation as approximant (`SpectralScheme.norm_sub_truncate_le`). -/
+theorem jacksonBound (s : ℝ) (hs : 0 ≤ s) :
+    ApproximationScheme.JacksonBound ((S.sobolevEmbed s hs).restrictScalars ℝ) S.toScheme s 1 := by
+  intro n hn c
+  refine (ApproximationScheme.approxError_le_norm_sub
+    (S.truncate_mem_span n (S.sobolevEmbed s hs c)) _).trans ?_
+  rw [one_mul]
+  exact S.norm_sub_truncate_le s hs hn c
 
 /-- **Bernstein's inequality** for the Sobolev space: every `a ∈ A n` is `J_s c` with
 `‖c‖ ≤ n^s ‖a‖`. -/
