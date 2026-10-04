@@ -470,7 +470,11 @@ explains how they differ.
   (`Rd.SmoothDomain.isManifold`): near the boundary the charts are the straightenings
   `x ↦ A(x - φ(x) e)`, which preserve the Lebesgue measure
   (`Rd.LipschitzGraph.measurePreserving_flatten`), so the Lebesgue measure is a smooth measure
-  (`Rd.SmoothDomain.isSmoothMeasure_volumeOn`).
+  (`Rd.SmoothDomain.isSmoothMeasure_volumeOn`). For `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`,
+  `f ∈ L_p(closure Ω)` lies in the Besov space `B^s_{p,q}` of this manifold iff
+  `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
+  (`Rd.SmoothDomain.memBesov_iff_modNormOn_lt_top`): the descriptions by charts, by intrinsic
+  differences and as restrictions of `B^s_{p,q}(ℝ^n)` coincide.
 * **Traces on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`,
   boundary balls `B_j` and graph domains `Ω_j` as above, and `(ψ_j)` a smooth resolution of unity on
   `Γ` with `tsupport ψ_j ⊆ B_j` (`Rd.BoundedLipschitzDomain.BoundaryPartition`). A property holds
@@ -613,6 +617,7 @@ explains how they differ.
 | Besov spaces on compact manifolds, independence of the atlas and of the order | ✅ proved | ✗ | `FunctionSpaces/Manifold/Besov.lean` |
 | Flattening of graph domains, preservation of the Lebesgue measure | ✅ proved | ✗ | `FunctionSpaces/Rd/GraphStraightening.lean` |
 | Smooth bounded domains as compact manifolds with boundary, Lebesgue measure as smooth measure | ✅ proved | ✗ | `FunctionSpaces/Manifold/SmoothDomain.lean` |
+| Besov spaces of smooth domains by charts equal the intrinsic Besov spaces | ✅ proved | ✗ | `FunctionSpaces/Manifold/SmoothDomainBesov.lean` |
 | Tensor kernels on `ℝ^d`: integrals, convolutions, dilations, diagonal changes of variables | ✅ proved | ✗ | `FunctionSpaces/Rd/TensorKernels.lean` |
 | Sequences on `ℕ^d`: `ℓ_q` norms, Schur test, almost diagonal lemma | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedSequences.lean` |
 | Mixed differences, mixed moduli, the mixed Besov quasi-norm | ✅ proved | ✗ | `FunctionSpaces/Rd/MixedDifferences.lean` |

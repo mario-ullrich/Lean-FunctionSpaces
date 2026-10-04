@@ -8692,7 +8692,8 @@ $\{y : y_0 \geq 0\}$, with inverse $\tau$.
 \lean{Rd.SmoothDomain.straighten, Rd.SmoothDomain.unstraighten, Rd.SmoothDomain.straighten_coord,
   Rd.SmoothDomain.boundaryStraightener, Rd.SmoothDomain.interiorRadius,
   Rd.SmoothDomain.interiorRadius_pos, Rd.SmoothDomain.ball_interiorRadius_subset,
-  Rd.SmoothDomain.interiorStraightener, Rd.SmoothDomain.boundaryIndex,
+  Rd.SmoothDomain.interior_coord_pos, Rd.SmoothDomain.interiorStraightener,
+  Rd.SmoothDomain.boundaryIndex,
   Rd.SmoothDomain.mem_ball_boundaryIndex, Rd.SmoothDomain.straightenerAt,
   Rd.SmoothDomain.mem_straightenerAt}
 \leanok
@@ -8729,6 +8730,88 @@ The change of charts from $(\sigma, \tau)$ to $(\sigma', \tau')$ is the restrict
 map $\sigma' \circ \tau$. The closure is closed and bounded. The image of the Lebesgue measure on
 $\overline{\Omega} \cap B$ under the measure-preserving $\sigma$ is the Lebesgue measure on
 $\sigma(\overline{\Omega} \cap B)$, the target of the chart.
+\end{proof}
+
+\section{Besov spaces of smooth domains by charts}
+
+\begin{definition}[Global atlases]
+\label{def:global-atlas}
+\lean{Rd.SmoothDomain.GlobalAtlas, Rd.SmoothDomain.GlobalAtlas.nonempty,
+  Rd.SmoothDomain.GlobalAtlas.toBesovAtlas, Rd.SmoothDomain.contMDiff_subtype_val,
+  Rd.SmoothDomain.GlobalAtlas.hasCompactSupport_psi,
+  Rd.SmoothDomain.GlobalAtlas.hasCompactSupport_theta, Rd.SmoothDomain.GlobalAtlas.psi_eq_zero,
+  Rd.SmoothDomain.GlobalAtlas.theta_eq_zero, Rd.SmoothDomain.GlobalAtlas.theta_mul_psi}
+\leanok
+\uses{thm:smooth-domain-manifold, def:besov-atlas}
+A global atlas of a smooth domain $\Omega$ consists of finitely many straighteners $(\sigma_i,
+\tau_i, B_i)$ whose sets cover $\overline{\Omega}$, smooth functions $\psi_i \geq 0$ on $\R^n$ with
+compact $\operatorname{tsupport} \psi_i \subseteq B_i$ and $\sum_i \psi_i = 1$ on
+$\overline{\Omega}$, and smooth cut-offs $\theta_i = 1$ on $\operatorname{tsupport} \psi_i$ with
+compact $\operatorname{tsupport} \theta_i \subseteq B_i$. Every smooth domain has one, and their
+restrictions to $\overline{\Omega}$ form a Besov atlas, since the inclusion of $\overline{\Omega}$
+into $\R^n$ is smooth.
+\end{definition}
+
+\begin{lemma}[Extension by zero and the pieces]
+\label{lem:global-pieces}
+\lean{Rd.SmoothDomain.extend, Rd.SmoothDomain.extend_coe, Rd.SmoothDomain.extend_eq_zero,
+  Rd.SmoothDomain.stronglyMeasurable_extend, Rd.SmoothDomain.eLpNorm_extend,
+  Rd.SmoothDomain.memLp_extend, Rd.SmoothDomain.extLp, Rd.SmoothDomain.extLp_ae,
+  Rd.SmoothDomain.volume_coord_zero_eq_zero, Rd.SmoothDomain.Straightener.mem_image_iff,
+  Rd.SmoothDomain.Straightener.homeomorph, Rd.SmoothDomain.Straightener.measurePreserving_tau,
+  Rd.SmoothDomain.GlobalAtlas.piece_apply, Rd.SmoothDomain.GlobalAtlas.indicator_piece}
+\leanok
+\uses{def:global-atlas, def:chart-pieces}
+The extension by $0$ is an isometry $L_p(\overline{\Omega}) \to L_p(\R^n)$. On the half-space
+$\{y_0 \geq 0\}$, the $i$-th piece of $g$ is $(\psi_i\, \mathrm{ext}\, g) \circ \tau_i$. The
+hyperplane $\{y_0 = 0\}$ is a null set, and $\tau_i$ preserves the Lebesgue measure.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The image $\sigma_i(\overline{\Omega} \cap B_i)$ is $\{y : y_0 \geq 0,\ \tau_i(y) \in B_i\}$;
+outside it on the half-space, $\psi_i \circ \tau_i = 0$.
+\end{proof}
+
+\begin{lemma}[The changes of variables between $\Omega$ and the charts]
+\label{lem:global-changes}
+\lean{Rd.CutoffDiffeo.global, Rd.CutoffDiffeo.global_apply, Rd.SmoothDomain.GlobalAtlas.toChart,
+  Rd.SmoothDomain.GlobalAtlas.toChart_apply, Rd.SmoothDomain.GlobalAtlas.fromChart,
+  Rd.SmoothDomain.GlobalAtlas.fromChart_apply, Rd.SmoothDomain.interior_univ_nonempty,
+  Rd.modNormOn_congr}
+\leanok
+\uses{def:cutoff-diffeo, def:global-atlas, lem:modnorm-on}
+A smooth bijection $\Phi$ of $V$ with smooth inverse and a smooth cut-off $\chi$ with compact
+support form a change of variables with a cut-off on $V$, acting by $(\chi f) \circ \Phi$. In
+particular $F \mapsto (\psi_i F) \circ \tau_i$ and $G \mapsto \theta_i (G \circ \sigma_i)$ are
+bounded for the Besov quasi-norms of $\R^n$ (\Cref{thm:diffeo-invariance}). The intrinsic
+quasi-norm on a set depends only on the restriction to the set.
+\end{lemma}
+
+\begin{theorem}[The Besov space of a smooth domain by charts]
+\label{thm:smooth-domain-besov}
+\lean{Rd.SmoothDomain.GlobalAtlas.modNormOn_pieceLp_lt_top,
+  Rd.SmoothDomain.GlobalAtlas.modNormOn_extLp_lt_top, Rd.SmoothDomain.memBesov_iff_modNormOn_lt_top}
+\leanok
+\uses{lem:global-pieces, lem:global-changes, def:manifold-besov, thm:bounded-lipschitz-besov,
+  thm:half-space-besov-domain}
+For a smooth bounded domain $\Omega \subseteq \R^n$, $1 \leq p < \infty$, $0 < s < r$ and
+$1 \leq q \leq \infty$, $f \in L_p(\overline{\Omega})$ lies in the Besov space
+$\Besov{s}{p}{q}(\overline{\Omega})$ of the compact manifold $\overline{\Omega}$ with the Lebesgue
+measure if and only if
+$\|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+If the intrinsic quasi-norm is finite, $f$ agrees on $\Omega$ with some $F \in \Besov{s}{p}{q}(\R^n)$
+(\Cref{thm:bounded-lipschitz-besov}). On the half-space the piece $(\psi_i f) \circ \tau_i$ agrees
+almost everywhere with $(\psi_i F) \circ \tau_i$: where $y_0 > 0$ and $\tau_i(y) \in B_i$, the
+point $\tau_i(y)$ lies in $\Omega$, and $\tau_i$ preserves null sets. The latter function is in
+$\Besov{s}{p}{q}(\R^n)$ by \Cref{lem:global-changes}. Conversely, the pieces extend from the
+half-space (\Cref{thm:half-space-besov-domain}) to $G_i \in \Besov{s}{p}{q}(\R^n)$, and
+$F = \sum_i \theta_i (G_i \circ \sigma_i) \in \Besov{s}{p}{q}(\R^n)$ agrees with $f$ on $\Omega$,
+since $\theta_i \psi_i = \psi_i$ and $\sum_i \psi_i = 1$ on $\overline{\Omega}$.
 \end{proof}
 
 \chapter{Dominating mixed smoothness on $\R^d$}

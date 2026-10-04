@@ -127,7 +127,9 @@ structure Straightener where
   /-- The open set where the straightener describes the closure. -/
   B : Set (EuclideanSpace ℝ (Fin n))
   isOpen_B : IsOpen B
+  isBounded_B : Bornology.IsBounded B
   mem_closure_iff : ∀ x ∈ B, x ∈ closure Ω.carrier ↔ 0 ≤ sigma x 0
+  mem_iff : ∀ x ∈ B, x ∈ Ω.carrier ↔ 0 < sigma x 0
   /-- A base point. -/
   base : EuclideanSpace ℝ (Fin n)
   base_mem : base ∈ closure Ω.carrier
@@ -253,10 +255,16 @@ noncomputable def boundaryStraightener (j : Fin Ω.N) : Ω.Straightener where
     ((Ω.graph j).measurePreserving_flatten ((Ω.contDiff_phi j).of_le (by exact_mod_cast le_top)))
   B := ball (Ω.center j) (Ω.radius j)
   isOpen_B := isOpen_ball
+  isBounded_B := isBounded_ball
   mem_closure_iff x hx := by
     rw [mem_closure_iff_of_inter_eq isOpen_ball (Ω.ball_inter j) hx,
       LipschitzGraph.closure_domain, straighten_coord, sub_nonneg]
     rfl
+  mem_iff x hx := by
+    have h : x ∈ ball (Ω.center j) (Ω.radius j) ∩ Ω.carrier ↔
+        x ∈ ball (Ω.center j) (Ω.radius j) ∩ (Ω.graph j).domain := by rw [Ω.ball_inter j]
+    rw [straighten_coord, sub_pos]
+    exact ⟨fun h1 => (h.1 ⟨hx, h1⟩).2, fun h1 => (h.2 ⟨hx, h1⟩).2⟩
   base := Ω.center j
   base_mem := frontier_subset_closure (Ω.center_mem j)
 
@@ -274,6 +282,18 @@ theorem ball_interiorRadius_subset {x₀ : EuclideanSpace ℝ (Fin n)} (hx₀ : 
     ball x₀ (Ω.interiorRadius hx₀) ⊆ Ω.carrier :=
   (Metric.isOpen_iff.1 Ω.isOpen x₀ hx₀).choose_spec.2
 
+/-- Around an interior point, the translated first coordinate is positive:
+`(x - x₀ + 2ρ e₀)_0 > 0` for `‖x - x₀‖ < ρ`. -/
+theorem interior_coord_pos {x₀ x : EuclideanSpace ℝ (Fin n)} {ρ : ℝ} (hx : x ∈ ball x₀ ρ) :
+    0 < (x - x₀ + (2 * ρ) • e0 : EuclideanSpace ℝ (Fin n)) 0 := by
+  have h1 : |(x - x₀) 0| ≤ ‖x - x₀‖ := by
+    have := PiLp.norm_apply_le (x - x₀) 0
+    rwa [Real.norm_eq_abs] at this
+  have h2 : ‖x - x₀‖ < ρ := by rwa [← dist_eq_norm]
+  have he : (e0 : EuclideanSpace ℝ (Fin n)) 0 = 1 := by simp [e0]
+  simp only [PiLp.add_apply, PiLp.smul_apply, smul_eq_mul, he, mul_one]
+  linarith [neg_abs_le ((x - x₀) 0), norm_nonneg (x - x₀)]
+
 /-- The straightener at an interior point `x₀`: the translation `x ↦ x - x₀ + 2ρ e₀` on
 `B(x₀, ρ) ⊆ Ω`, which lands in the open half-space. -/
 noncomputable def interiorStraightener {x₀ : EuclideanSpace ℝ (Fin n)} (hx₀ : x₀ ∈ Ω.carrier) :
@@ -288,16 +308,10 @@ noncomputable def interiorStraightener {x₀ : EuclideanSpace ℝ (Fin n)} (hx�
     (measurePreserving_sub_right volume _)
   B := ball x₀ (Ω.interiorRadius hx₀)
   isOpen_B := isOpen_ball
-  mem_closure_iff x hx := by
-    refine ⟨fun _ => ?_, fun _ => subset_closure (Ω.ball_interiorRadius_subset hx₀ hx)⟩
-    have hρ := Ω.interiorRadius_pos hx₀
-    have h1 : |(x - x₀) 0| ≤ ‖x - x₀‖ := by
-      have := PiLp.norm_apply_le (x - x₀) 0
-      rwa [Real.norm_eq_abs] at this
-    have h2 : ‖x - x₀‖ < Ω.interiorRadius hx₀ := by rwa [← dist_eq_norm]
-    have he : (e0 : EuclideanSpace ℝ (Fin n)) 0 = 1 := by simp [e0]
-    simp only [PiLp.add_apply, PiLp.smul_apply, smul_eq_mul, he, mul_one]
-    linarith [neg_abs_le ((x - x₀) 0)]
+  isBounded_B := isBounded_ball
+  mem_closure_iff x hx :=
+    ⟨fun _ => (interior_coord_pos hx).le, fun _ => subset_closure (Ω.ball_interiorRadius_subset hx₀ hx)⟩
+  mem_iff x hx := ⟨fun _ => interior_coord_pos hx, fun _ => Ω.ball_interiorRadius_subset hx₀ hx⟩
   base := x₀
   base_mem := subset_closure hx₀
 
@@ -354,6 +368,32 @@ instance isManifold : IsManifold (𝓡∂ n) ∞ (closure Ω.carrier) := by
       S'.B := S'.mem_chart_source.1 hz2
   simp only [Function.comp_apply, OpenPartialHomeomorph.coe_trans]
   rw [S'.chart_apply_coe hB', hsymm]
+
+/-- **The inclusion of the closure into `ℝ^n` is smooth**: in the chart of a straightener it is
+`τ`. -/
+theorem contMDiff_subtype_val :
+    ContMDiff (𝓡∂ n) 𝓘(ℝ, EuclideanSpace ℝ (Fin n)) ∞
+      (Subtype.val : closure Ω.carrier → EuclideanSpace ℝ (Fin n)) := by
+  intro x
+  rw [contMDiffAt_iff]
+  refine ⟨continuous_subtype_val.continuousAt, ?_⟩
+  set S := Ω.straightenerAt x
+  have hev : (extChartAt 𝓘(ℝ, EuclideanSpace ℝ (Fin n)) (x : EuclideanSpace ℝ (Fin n)) ∘
+      Subtype.val ∘ (extChartAt (𝓡∂ n) x).symm) =ᶠ[𝓝[range (𝓡∂ n)] (extChartAt (𝓡∂ n) x x)]
+        S.tau := by
+    filter_upwards [extChartAt_target_mem_nhdsWithin (I := 𝓡∂ n) x] with z hz
+    have hzI : z ∈ range (𝓡∂ n) := extChartAt_target_subset_range x hz
+    have hzz : (𝓡∂ n) ((𝓡∂ n).symm z) = z := (𝓡∂ n).right_inv hzI
+    rw [extChartAt_target] at hz
+    have hzt : S.tau ((𝓡∂ n) ((𝓡∂ n).symm z)) ∈ S.B := S.mem_chart_target.1 hz.1
+    have hcomp : (extChartAt 𝓘(ℝ, EuclideanSpace ℝ (Fin n)) (x : EuclideanSpace ℝ (Fin n)) ∘
+        Subtype.val ∘ (extChartAt (𝓡∂ n) x).symm) z =
+          ((S.chart.symm ((𝓡∂ n).symm z) : closure Ω.carrier) : EuclideanSpace ℝ (Fin n)) := by
+      rw [extChartAt_model_space_eq_id]
+      rfl
+    rw [hcomp, S.chart_symm_coe hzt, hzz]
+  exact (S.contDiff_tau.contDiffAt.contDiffWithinAt).congr_of_eventuallyEq hev
+    (hev.self_of_nhdsWithin (extChartAt_target_subset_range x (mem_extChartAt_target x)))
 
 /-- The closure of a smooth domain is compact. -/
 instance compactSpace : CompactSpace (closure Ω.carrier) :=

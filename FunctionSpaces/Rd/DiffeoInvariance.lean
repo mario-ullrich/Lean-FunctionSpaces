@@ -377,6 +377,53 @@ theorem modNormOn_applyLp_le {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s) (hs
 
 end CutoffDiffeo
 
+/-! ### Global changes of variables -/
+
+namespace CutoffDiffeo
+
+section Global
+
+variable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V]
+
+/-- A **global change of variables with a cut-off**: a smooth bijection `Φ` of `V` with smooth
+inverse `Ψ` and a smooth cut-off `χ` with compact support, as a change of variables on `V`. -/
+noncomputable def global (Phi Psi : V → V) (hPhi : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) Phi)
+    (hPsi : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) Psi) (hPsiPhi : ∀ x, Psi (Phi x) = x)
+    (hPhiPsi : ∀ y, Phi (Psi y) = y) (chi : V → ℂ) (hchi : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) chi)
+    (hchic : HasCompactSupport chi) : CutoffDiffeo (Set.univ : Set V) where
+  U := Set.univ
+  U' := Set.univ
+  isOpen_U := isOpen_univ
+  isOpen_U' := isOpen_univ
+  Phi := Phi
+  Psi := Psi
+  chi := chi
+  K0 := tsupport chi
+  contDiffOn_Phi := hPhi.contDiffOn
+  contDiffOn_Psi := hPsi.contDiffOn
+  contDiffOn_chi := hchi.contDiffOn
+  mapsTo_Phi _ _ := ⟨Set.mem_univ _, Set.mem_univ _⟩
+  mapsTo_Psi _ _ := ⟨Set.mem_univ _, Set.mem_univ _⟩
+  left_inv x _ := hPsiPhi x
+  right_inv y _ := hPhiPsi y
+  isCompact_K0 := hchic
+  K0_subset _ _ := ⟨Set.mem_univ _, Set.mem_univ _⟩
+  chi_eq_zero _ _ hy := image_eq_zero_of_notMem_tsupport hy
+
+/-- A global change of variables acts by `T f = (χ f) ∘ Φ`. -/
+theorem global_apply (Phi Psi : V → V) (hPhi : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) Phi)
+    (hPsi : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) Psi) (hPsiPhi : ∀ x, Psi (Phi x) = x)
+    (hPhiPsi : ∀ y, Phi (Psi y) = y) (chi : V → ℂ) (hchi : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) chi)
+    (hchic : HasCompactSupport chi) (f : V → ℂ) (x : V) :
+    (global Phi Psi hPhi hPsi hPsiPhi hPhiPsi chi hchi hchic).apply f x = chi (Phi x) * f (Phi x) := by
+  rw [apply, Set.indicator_of_mem]
+  · rfl
+  · exact ⟨Set.mem_univ _, Set.mem_univ _⟩
+
+end Global
+
+end CutoffDiffeo
+
 /-! ### The intrinsic quasi-norm -/
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
@@ -391,6 +438,15 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)] {Ω : Set V} (hΩ : MeasurableSet Ω)
 noncomputable def modNormOn (r : ℕ) (s : ℝ) (q : ℝ≥0∞) (G : Lp ℂ p (volume : Measure V)) :
     ℝ≥0∞ :=
   ‖indicatorLp hΩ G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r G k)
+
+/-- **The intrinsic quasi-norm sees only `1_Ω G`**: equal cut-offs give equal quasi-norms. -/
+theorem modNormOn_congr {r : ℕ} {s : ℝ} {q : ℝ≥0∞} {G₁ G₂ : Lp ℂ p (volume : Measure V)}
+    (h : indicatorLp hΩ G₁ = indicatorLp hΩ G₂) :
+    modNormOn hΩ r s q G₁ = modNormOn hΩ r s q G₂ := by
+  have hae : Ω.indicator G₁ =ᵐ[volume] Ω.indicator G₂ := by
+    filter_upwards [indicatorLp_apply_ae hΩ G₁, indicatorLp_apply_ae hΩ G₂] with x h1 h2
+    rw [← h1, ← h2, h]
+  simp only [modNormOn, h, lpModulusOn_congr hae]
 
 /-- `N_Ω(0) = 0`. -/
 theorem modNormOn_zero (r : ℕ) (s : ℝ) (q : ℝ≥0∞) :
