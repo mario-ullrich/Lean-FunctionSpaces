@@ -226,6 +226,1498 @@ identity becomes the quadrature mirror filter identity
   |m_0(\xi)|^2 + \bigl|m_0\bigl(\xi + \tfrac12\bigr)\bigr|^2 = 1 .
 \]
 
+\section{Masks and filters}
+
+This section defines the Daubechies masks with their filter coefficients and symbols, and proves
+the identities between the filter coefficients on which the scaling function and the wavelet
+rest: the quadrature mirror filter identity, the orthogonality of the even shifts, the sum
+rules, and their counterparts for the dual filter. The first Daubechies mask, D4, is explicit.
+
+\paragraph{The unit circle.}
+A symbol is a polynomial evaluated at the point $e^{-2\pi i \xi}$ of the unit circle; the sign
+of the exponent is the one of the Fourier transform.
+
+\begin{lemma}[The exponentials $e^{-2\pi i \xi}$]
+\label{lem:daub-exp}
+\lean{Daubechies.expFreq, Daubechies.norm_expFreq, Daubechies.expFreq_ne_zero,
+  Daubechies.expFreq_eq_exp_mul, Daubechies.expFreq_re, Daubechies.expFreq_im,
+  Daubechies.expFreq_zero, Daubechies.expFreq_add, Daubechies.expFreq_pow,
+  Daubechies.expFreq_intCast, Daubechies.expFreq_one, Daubechies.expFreq_periodic,
+  Daubechies.expFreq_half_add_int, Daubechies.conj_expFreq, Daubechies.contDiff_expFreq,
+  Daubechies.continuous_expFreq, Daubechies.norm_expFreq_sub_one_le,
+  Daubechies.norm_expFreq_pow_sub_one_le}
+\leanok
+The function $\xi \mapsto e^{-2\pi i \xi}$ on $\R$ is smooth and has period $1$. For all
+$\xi, \eta \in \R$, every $k \in \N$ and every $n \in \Z$:
+\begin{enumerate}
+  \item $|e^{-2\pi i \xi}| = 1$, $\operatorname{Re} e^{-2\pi i \xi} = \cos 2\pi\xi$ and
+    $\operatorname{Im} e^{-2\pi i \xi} = -\sin 2\pi\xi$;
+  \item $\overline{e^{-2\pi i \xi}} = e^{-2\pi i (-\xi)}$ and
+    $e^{-2\pi i (\xi + \eta)} = e^{-2\pi i \xi} e^{-2\pi i \eta}$;
+  \item $(e^{-2\pi i \xi})^k = e^{-2\pi i k \xi}$, $e^{-2\pi i n} = 1$ and
+    $e^{-2\pi i (1/2 + n)} = -1$;
+  \item $|e^{-2\pi i k \xi} - 1| \leq 2\pi k |\xi|$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The exponential turns sums into products and commutes with conjugation, $e^{-2\pi i n} = 1$
+for $n \in \Z$, and $e^{-\pi i} = -1$. The bound is $|e^{ix} - 1| \leq |x|$ for real $x$, at
+$x = -2\pi k \xi$.
+\end{proof}
+
+\begin{lemma}[The factor $(1 + z)/2$ on the unit circle]
+\label{lem:daub-half-factor}
+\lean{Daubechies.one_add_expFreq_div_two, Daubechies.norm_one_add_expFreq_div_two,
+  Daubechies.normSq_one_add_expFreq_div_two}
+\leanok
+For every $\xi \in \R$,
+\[
+  \frac{1 + e^{-2\pi i \xi}}{2} = e^{-\pi i \xi} \cos \pi\xi ;
+\]
+in particular $|1 + e^{-2\pi i \xi}|/2 = |\cos \pi\xi|$ and
+$|1 + e^{-2\pi i \xi}|^2/4 = \cos^2 \pi\xi$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-exp}
+$2 \cos \pi\xi = e^{\pi i \xi} + e^{-\pi i \xi}$; multiply by $e^{-\pi i \xi}$, which has
+modulus $1$ (\Cref{lem:daub-exp}).
+\end{proof}
+
+\paragraph{Masks.}
+The factor $((1 + z)/2)^N$ of the mask polynomial produces the zeros of the symbol at the
+half-integers and the sum rules of the filter coefficients.
+
+\begin{definition}[Daubechies masks]
+\label{def:daub-mask}
+\lean{Daubechies.Mask, Daubechies.Mask.one_le}
+\leanok
+\uses{def:daub-fun}
+Let $N \in \N$. A \emph{Daubechies mask of order $N$} is a real polynomial $L$ of degree less
+than $N$ with $L(1) = 1$ and
+\[
+  |L(e^{-2\pi i \xi})|^2 = P(\xi) = P_N(\sin^2 \pi\xi) \quad\text{for every } \xi \in \R .
+\]
+Every Daubechies mask has order $N \geq 1$.
+\end{definition}
+
+\begin{definition}[Mask polynomial, filter coefficients and symbol]
+\label{def:daub-symbol}
+\lean{Daubechies.maskPoly, Daubechies.coeff, Daubechies.coeff_natCast, Daubechies.symbol}
+\leanok
+\uses{def:daub-mask}
+Let $L$ be a Daubechies mask of order $N$. Its \emph{mask polynomial} is
+\[
+  m(z) = \Bigl(\frac{1 + z}{2}\Bigr)^N L(z) .
+\]
+Its \emph{filter coefficients} are $c_k = 2 [z^k] m$ for $k \in \N$, where $[z^k] m$ is the
+coefficient of $z^k$ in $m$, and $c_k = 0$ for the integers $k < 0$. Its \emph{symbol} is the
+function $m_0(\xi) = m(e^{-2\pi i \xi})$ of $\xi \in \R$.
+\end{definition}
+
+The filter coefficients, the symbol and everything built from them below belong to a Daubechies
+mask $L$ of order $N$, which the notation omits.
+
+\begin{lemma}[The mask polynomial]
+\label{lem:daub-mask-poly}
+\lean{Daubechies.X_add_one_pow_dvd_maskPoly, Daubechies.natDegree_maskPoly_le,
+  Daubechies.natDegree_maskPoly_lt, Daubechies.eval_one_maskPoly, Daubechies.coeff_eq_zero,
+  Daubechies.sum_coeff}
+\leanok
+\uses{def:daub-symbol}
+For every Daubechies mask of order $N$ the mask polynomial $m$ is divisible by $(z + 1)^N$, has
+degree at most $2N - 1$, and satisfies $m(1) = 1$. The filter coefficients satisfy $c_k = 0$ for
+every integer $k < 0$ and every integer $k \geq 2N$, and
+\[
+  \sum_{k=0}^{2N-1} c_k = 2 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$m(z) = (z + 1)^N 2^{-N} L(z)$ is the product of $N$ factors of degree $1$ and of $L$, of degree
+at most $N - 1$, and $m(1) = L(1) = 1$. The coefficients of $m$ add up to $m(1) = 1$, and
+$c_k = 2 [z^k] m$.
+\end{proof}
+
+\begin{lemma}[The symbol as a trigonometric polynomial]
+\label{lem:daub-symbol-sum}
+\lean{Daubechies.symbol_eq_mul, Daubechies.symbol_eq_sum, Daubechies.symbol_zero}
+\leanok
+\uses{def:daub-symbol}
+For every Daubechies mask of order $N$ and every $\xi \in \R$,
+\[
+  m_0(\xi) = \Bigl(\frac{1 + e^{-2\pi i \xi}}{2}\Bigr)^N L(e^{-2\pi i \xi})
+  = \frac12 \sum_{k=0}^{2N-1} c_k e^{-2\pi i k \xi} ,
+\]
+and $m_0(0) = 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-mask-poly, lem:daub-exp}
+By \Cref{lem:daub-mask-poly}, $m(z) = \frac12 \sum_{k < 2N} c_k z^k$. Evaluate at
+$z = e^{-2\pi i \xi}$, where $z^k = e^{-2\pi i k \xi}$ (\Cref{lem:daub-exp}). At $\xi = 0$,
+$z = 1$ and $m(1) = 1$.
+\end{proof}
+
+\begin{proposition}[The modulus of the symbol]
+\label{prop:daub-symbol-modulus}
+\lean{Daubechies.normSq_symbol}
+\leanok
+\uses{def:daub-symbol}
+For every Daubechies mask of order $N$ and every $\xi \in \R$,
+\[
+  |m_0(\xi)|^2 = \cos(\pi\xi)^{2N} P(\xi) .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-symbol-sum, lem:daub-half-factor, def:daub-mask}
+By \Cref{lem:daub-symbol-sum}, $|m_0(\xi)|^2$ is the product of
+$\bigl(|1 + e^{-2\pi i \xi}|^2/4\bigr)^N = \cos(\pi\xi)^{2N}$ (\Cref{lem:daub-half-factor}) and
+$|L(e^{-2\pi i \xi})|^2 = P(\xi)$ (\Cref{def:daub-mask}).
+\end{proof}
+
+\begin{theorem}[The quadrature mirror filter identity]
+\label{thm:daub-qmf}
+\lean{Daubechies.qmf, Daubechies.norm_symbol_le_one}
+\leanok
+\uses{def:daub-symbol}
+For every Daubechies mask and every $\xi \in \R$,
+\[
+  |m_0(\xi)|^2 + \bigl|m_0\bigl(\xi + \tfrac12\bigr)\bigr|^2 = 1 ;
+\]
+in particular $|m_0(\xi)| \leq 1$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-symbol-modulus, thm:daub-fun-bezout}
+By \Cref{prop:daub-symbol-modulus} at $\xi$ and at $\xi + \frac12$, where
+$\cos(\pi\xi + \frac{\pi}{2})^{2N} = \sin(\pi\xi)^{2N}$, the left side is
+$\cos(\pi\xi)^{2N} P(\xi) + \sin(\pi\xi)^{2N} P(\xi + \frac12)$. This is $1$ by the
+trigonometric B\'ezout identity (\Cref{thm:daub-fun-bezout}), since $N \geq 1$.
+\end{proof}
+
+\begin{lemma}[Symmetries and zeros of the symbol]
+\label{lem:daub-symbol-props}
+\lean{Daubechies.symbol_periodic, Daubechies.symbol_neg, Daubechies.symbol_ne_zero,
+  Daubechies.symbol_half_add_int, Daubechies.symbol_half, Daubechies.contDiff_symbol,
+  Daubechies.continuous_symbol}
+\leanok
+\uses{def:daub-symbol}
+For every Daubechies mask the symbol $m_0$ is smooth and has period $1$, and
+$m_0(-\xi) = \overline{m_0(\xi)}$ for every $\xi \in \R$. Moreover $m_0(\xi) \neq 0$ for every
+$\xi \in \R$ with $|\xi| < \frac12$, and $m_0(\frac12 + n) = 0$ for every $n \in \Z$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-exp, lem:daub-symbol-sum, prop:daub-symbol-modulus, prop:daub-fun-bounds}
+The symbol is a polynomial with real coefficients in $e^{-2\pi i \xi}$, which is smooth, has
+period $1$ and satisfies $\overline{e^{-2\pi i \xi}} = e^{-2\pi i (-\xi)}$ (\Cref{lem:daub-exp}).
+For $|\xi| < \frac12$, $\cos \pi\xi > 0$ and $P(\xi) \geq 1$ (\Cref{prop:daub-fun-bounds}), so
+$|m_0(\xi)|^2 > 0$ by \Cref{prop:daub-symbol-modulus}. At $\xi = \frac12 + n$,
+$z = e^{-2\pi i \xi} = -1$, where the factor $((1 + z)/2)^N$ of \Cref{lem:daub-symbol-sum}
+vanishes since $N \geq 1$.
+\end{proof}
+
+\begin{lemma}[The symbol near $0$]
+\label{lem:daub-symbol-lipschitz}
+\lean{Daubechies.symbolLip, Daubechies.symbolLip_nonneg, Daubechies.norm_symbol_sub_one_le}
+\leanok
+\uses{def:daub-symbol}
+For a Daubechies mask of order $N$ let $C_0 = \pi \sum_{k=0}^{2N-1} k |c_k|$. Then $C_0 \geq 0$,
+and for every $\xi \in \R$
+\[
+  |m_0(\xi) - 1| \leq C_0 |\xi| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-mask-poly, lem:daub-symbol-sum, lem:daub-exp}
+Since $\sum_k c_k = 2$ (\Cref{lem:daub-mask-poly}), \Cref{lem:daub-symbol-sum} gives
+$m_0(\xi) - 1 = \frac12 \sum_k c_k (e^{-2\pi i k \xi} - 1)$, and
+$|e^{-2\pi i k \xi} - 1| \leq 2\pi k |\xi|$ (\Cref{lem:daub-exp}).
+\end{proof}
+
+\paragraph{Sums over $\Z$.}
+The identities below are sums over $\Z$ with finitely many nonzero terms (Mathlib's
+\texttt{finsum}). Throughout, $\delta_{ab} = 1$ if $a = b$ and $\delta_{ab} = 0$ otherwise.
+
+\begin{lemma}[Sums over $\Z$ by parity]
+\label{lem:daub-parity-split}
+\lean{Daubechies.finsum_eq_sum_range_of_eq_zero,
+  Daubechies.finsum_two_mul_add_finsum_two_mul_add_one, Daubechies.finsum_two_mul_add_add_finsum,
+  Daubechies.finsum_two_mul_add_add_two_mul, Daubechies.neg_one_zpow_eq_of_even_sub,
+  Daubechies.neg_one_zpow_eq_neg_of_odd_sub, Daubechies.finsum_two_mul_add_eq_half}
+\leanok
+Let $g$ be a function on $\Z$ with values in a commutative monoid, written additively, and let
+$n \in \N$ and $r, q \in \Z$.
+\begin{enumerate}
+  \item If $g(k) = 0$ for every $k < 0$ and every $k \geq n$, then
+    $\sum_{k \in \Z} g(k) = \sum_{k=0}^{n-1} g(k)$.
+  \item $\sum_{i \in \Z} g(2i + r + 2q) = \sum_{i \in \Z} g(2i + r)$, and if $g$ has finite
+    support, then
+    \[
+      \sum_{i \in \Z} g(2i + r) + \sum_{i \in \Z} g(2i + r + 1) = \sum_{k \in \Z} g(k) .
+    \]
+  \item If $g$ is real valued with finite support and $\sum_{k \in \Z} (-1)^k g(k) = 0$, then
+    $\sum_{i \in \Z} g(2i + r) = \frac12 \sum_{k \in \Z} g(k)$.
+\end{enumerate}
+For all integers $a$ and $b$, $(-1)^a = (-1)^b$ if $a - b$ is even, and $(-1)^a = -(-1)^b$ if
+$a - b$ is odd.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The even and the odd integers partition $\Z$, and $k \mapsto k + r$ and $i \mapsto i + q$ are
+bijections of $\Z$. In item~3 the alternating sum is
+$(-1)^r \bigl(\sum_i g(2i + r) - \sum_i g(2i + r + 1)\bigr)$, so the two parity classes carry the
+same sum, and by item~2 the two sums add up to $\sum_k g(k)$.
+\end{proof}
+
+\begin{lemma}[The filter coefficients as a sequence on $\Z$]
+\label{lem:daub-coeff-finsum}
+\lean{Daubechies.finite_support_coeff, Daubechies.finsum_eq_sum_range_of_coeff,
+  Daubechies.finsum_coeff, Daubechies.symbol_eq_finsum}
+\leanok
+\uses{def:daub-symbol}
+For every Daubechies mask of order $N$ the sequence $(c_k)_{k \in \Z}$ has finite support,
+$\sum_{k \in \Z} f(k) = \sum_{k=0}^{2N-1} f(k)$ for every function $f$ on $\Z$ that vanishes
+wherever $c_k = 0$, and $\sum_{k \in \Z} c_k = 2$. For every $\xi \in \R$,
+\[
+  m_0(\xi) = \frac12 \sum_{k \in \Z} c_k e^{-2\pi i k \xi} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-mask-poly, lem:daub-parity-split, lem:daub-symbol-sum}
+$c_k = 0$ for $k < 0$ and for $k \geq 2N$ (\Cref{lem:daub-mask-poly}); apply item~1 of
+\Cref{lem:daub-parity-split}, and \Cref{lem:daub-symbol-sum}.
+\end{proof}
+
+\paragraph{Orthogonality of the even shifts.}
+The coefficients of a trigonometric polynomial are its Fourier coefficients on $[0, 1]$, so
+integrating the quadrature mirror filter identity against exponentials gives identities for the
+filter coefficients.
+
+\begin{lemma}[Orthonormality of the exponentials]
+\label{lem:daub-exp-orthonormal}
+\lean{Daubechies.continuous_expFreq_mul, Daubechies.integral_expFreq_intCast_mul,
+  Daubechies.integral_sum_mul_conj_sum, Daubechies.integral_finsum_mul_conj_finsum,
+  Daubechies.integral_expFreq_mul_normSq_finsum}
+\leanok
+For every $c \in \R$ the function $\xi \mapsto e^{-2\pi i c \xi}$ is continuous, and for every
+$n \in \Z$, $\int_0^1 e^{-2\pi i n \xi} \, d\xi = \delta_{n0}$. For every finite set
+$u \subseteq \Z$ and every $a : \Z \to \C$ let
+$T_a(\xi) = \sum_{k \in u} a_k e^{-2\pi i k \xi}$. Then for all $a, b : \Z \to \C$
+\[
+  \int_0^1 T_a(\xi) \, \overline{T_b(\xi)} \, d\xi = \sum_{k \in u} a_k \overline{b_k} ,
+\]
+and the same holds for the sums over $k \in \Z$ if $a$ and $b$ have finite support. For every
+$a : \Z \to \C$ with finite support and every $n \in \Z$,
+\[
+  \int_0^1 e^{-2\pi i n \xi} \Bigl|\sum_{k \in \Z} a_k e^{-2\pi i k \xi}\Bigr|^2 \, d\xi
+  = \sum_{k \in \Z} a_{k-n} \overline{a_k} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-exp}
+For $n \neq 0$, $\int_0^1 e^{-2\pi i n \xi} \, d\xi = (e^{-2\pi i n} - 1)/(-2\pi i n) = 0$.
+Expanding the product gives the double sum of the terms
+$a_k \overline{b_l} e^{-2\pi i (k - l) \xi}$ (\Cref{lem:daub-exp}), of which only those with
+$k = l$ have nonzero integrals. For the last identity, multiplication by $e^{-2\pi i n \xi}$
+shifts the coefficients to $a_{k-n}$, and $|z|^2 = z \bar z$.
+\end{proof}
+
+\begin{lemma}[Fourier coefficients of $|m_0|^2$]
+\label{lem:daub-symbol-fourier}
+\lean{Daubechies.norm_half_mul_sq, Daubechies.integral_expFreq_mul_normSq_symbol,
+  Daubechies.integral_expFreq_mul_normSq_symbol_add_half}
+\leanok
+\uses{def:daub-symbol}
+For every Daubechies mask and every $n \in \Z$,
+\[
+  \int_0^1 e^{-2\pi i n \xi} |m_0(\xi)|^2 \, d\xi = \frac14 \sum_{k \in \Z} c_{k-n} c_k
+\]
+and
+\[
+  \int_0^1 e^{-2\pi i n \xi} \bigl|m_0\bigl(\xi + \tfrac12\bigr)\bigr|^2 \, d\xi
+  = \frac14 e^{\pi i n} \sum_{k \in \Z} c_{k-n} c_k .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-coeff-finsum, lem:daub-exp-orthonormal}
+By \Cref{lem:daub-coeff-finsum}, $m_0(\xi) = \frac12 \sum_k c_k e^{-2\pi i k \xi}$ and
+$m_0(\xi + \frac12) = \frac12 \sum_k c_k e^{-\pi i k} e^{-2\pi i k \xi}$; apply the last identity
+of \Cref{lem:daub-exp-orthonormal}, with $|z/2|^2 = |z|^2/4$. In the second case the factors
+combine to $e^{-\pi i (k - n)} \, \overline{e^{-\pi i k}} = e^{\pi i n}$.
+\end{proof}
+
+\begin{theorem}[Orthogonality of the even shifts]
+\label{thm:daub-even-shifts}
+\lean{Daubechies.sum_coeff_mul_coeff_add}
+\leanok
+\uses{def:daub-symbol}
+For every Daubechies mask and every $j \in \Z$,
+\[
+  \sum_{k \in \Z} c_k c_{k+2j} = 2 \delta_{j0} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-qmf, lem:daub-symbol-fourier, lem:daub-exp-orthonormal}
+Multiply the quadrature mirror filter identity (\Cref{thm:daub-qmf}) by $e^{2\pi i \cdot 2j \xi}$
+and integrate over $[0, 1]$. By \Cref{lem:daub-symbol-fourier} with $n = -2j$, where
+$e^{\pi i n} = 1$, the left side becomes $\frac12 \sum_k c_k c_{k+2j}$, and the right side is
+$\delta_{j0}$ by \Cref{lem:daub-exp-orthonormal}.
+\end{proof}
+
+\paragraph{Sum rules.}
+The factor $(z + 1)^N$ of the mask polynomial makes the alternating moments of order less than
+$N$ of the filter coefficients vanish. For a real polynomial $p$ let $E p = z p'$ be the Euler
+operator.
+
+\begin{lemma}[The Euler operator]
+\label{lem:daub-euler-operator}
+\lean{Daubechies.coeff_X_mul_derivative, Daubechies.coeff_iterate_X_mul_derivative,
+  Daubechies.pow_dvd_iterate_X_mul_derivative,
+  Daubechies.sum_range_neg_one_pow_mul_pow_mul_coeff}
+\leanok
+Let $p$ be a real polynomial and $j, k, l, n \in \N$. The coefficient of $z^k$ in $E^l p$ is
+$k^l$ times the coefficient of $z^k$ in $p$. If $(z + 1)^j$ divides $p$ and $l \leq j$, then
+$(z + 1)^{j-l}$ divides $E^l p$. If $(z + 1)^j$ divides $p$, $l < j$ and $p$ has degree less
+than $n$, then
+\[
+  \sum_{k=0}^{n-1} (-1)^k k^l [z^k] p = 0 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$E z^k = k z^k$. Differentiation lowers the power of $z + 1$ dividing a polynomial by at most
+one, and multiplication by $z$ keeps it. The sum is the value of $E^l p$ at $z = -1$, a zero of
+$E^l p$ since $j - l \geq 1$.
+\end{proof}
+
+\begin{theorem}[The sum rules]
+\label{thm:daub-sum-rules}
+\lean{Daubechies.sum_range_rule, Daubechies.sum_rule, Daubechies.sum_rule_poly}
+\leanok
+\uses{def:daub-symbol}
+For every Daubechies mask of order $N$ and every real polynomial $Q$ of degree less than $N$,
+\[
+  \sum_{k \in \Z} (-1)^k Q(k) \, c_k = 0 .
+\]
+In particular $\sum_{k \in \Z} (-1)^k k^l c_k = \sum_{k=0}^{2N-1} (-1)^k k^l c_k = 0$ for every
+$l < N$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-euler-operator, lem:daub-mask-poly, lem:daub-coeff-finsum}
+\Cref{lem:daub-euler-operator} for $p = m$, $j = N$ and $n = 2N$ (\Cref{lem:daub-mask-poly}),
+with $c_k = 2 [z^k] m$, gives the case $Q(k) = k^l$. The sum over $\Z$ is the sum over
+$0 \leq k < 2N$ (\Cref{lem:daub-coeff-finsum}), and $Q$ is a linear combination of the monomials
+of degree less than $N$.
+\end{proof}
+
+\begin{corollary}[Parity sums]
+\label{cor:daub-parity-sums}
+\lean{Daubechies.finsum_neg_one_zpow_mul_coeff, Daubechies.sum_coeff_two_mul_add,
+  Daubechies.sum_coeff_two_mul, Daubechies.sum_coeff_two_mul_add_one}
+\leanok
+\uses{def:daub-symbol}
+For every Daubechies mask and every integer $r$,
+\[
+  \sum_{k \in \Z} (-1)^k c_k = 0 \quad\text{and}\quad \sum_{i \in \Z} c_{2i+r} = 1 ;
+\]
+in particular $\sum_{i \in \Z} c_{2i} = \sum_{i \in \Z} c_{2i+1} = 1$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-sum-rules, lem:daub-parity-split, lem:daub-coeff-finsum}
+The first identity is \Cref{thm:daub-sum-rules} for $l = 0 < N$. Item~3 of
+\Cref{lem:daub-parity-split} and $\sum_k c_k = 2$ (\Cref{lem:daub-coeff-finsum}) give the second.
+\end{proof}
+
+The first identity says $m_0(\frac12) = 0$.
+
+\begin{proposition}[The first moment]
+\label{prop:daub-first-moments}
+\lean{Daubechies.firstMoment, Daubechies.sum_two_mul_add_mul_coeff}
+\leanok
+\uses{def:daub-symbol}
+For a Daubechies mask let $\mu = \frac12 \sum_{k \in \Z} k c_k$ be its \emph{first moment}. If
+the mask has order $N \geq 2$, then for every $r \in \Z$
+\[
+  \sum_{i \in \Z} (2i + r) \, c_{2i+r} = \mu .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-sum-rules, lem:daub-parity-split, lem:daub-coeff-finsum}
+Item~3 of \Cref{lem:daub-parity-split} for $g(k) = k c_k$, which has finite support
+(\Cref{lem:daub-coeff-finsum}) and whose alternating sum vanishes by \Cref{thm:daub-sum-rules}
+with $l = 1 < N$.
+\end{proof}
+
+\begin{lemma}[Derivatives of the symbol]
+\label{lem:daub-symbol-derivatives}
+\lean{Daubechies.iteratedDeriv_sum_mul_cexp, Daubechies.symbol_eq_sum_cexp,
+  Daubechies.iteratedDeriv_symbol}
+\leanok
+\uses{def:daub-symbol}
+For every finite family of pairs $a_i, b_i \in \C$ and every $l \in \N$, the $l$-th derivative
+of $t \mapsto \sum_i a_i e^{b_i t}$ on $\R$ is $t \mapsto \sum_i a_i b_i^l e^{b_i t}$. For every
+Daubechies mask of order $N$, every $l \in \N$ and every $\xi \in \R$,
+\[
+  m_0^{(l)}(\xi) = \frac12 \sum_{k=0}^{2N-1} c_k (-2\pi i k)^l e^{-2\pi i k \xi} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-symbol-sum}
+Induction on $l$, with $\frac{d}{dt} e^{bt} = b e^{bt}$, and
+$m_0(\xi) = \frac12 \sum_k c_k e^{-2\pi i k \xi}$ (\Cref{lem:daub-symbol-sum}).
+\end{proof}
+
+\begin{proposition}[Zeros of the symbol at the half-integers]
+\label{prop:daub-symbol-zeros}
+\lean{Daubechies.iteratedDeriv_symbol_half_add_int}
+\leanok
+\uses{def:daub-symbol}
+For every Daubechies mask of order $N$, every $l < N$ and every $n \in \Z$,
+$m_0^{(l)}(\frac12 + n) = 0$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-symbol-derivatives, lem:daub-exp, thm:daub-sum-rules}
+At $\xi = \frac12 + n$, $e^{-2\pi i k \xi} = (-1)^k$ (\Cref{lem:daub-exp}), so
+$m_0^{(l)}(\frac12 + n) = \frac12 (-2\pi i)^l \sum_k (-1)^k k^l c_k$ by
+\Cref{lem:daub-symbol-derivatives}, which vanishes by \Cref{thm:daub-sum-rules}.
+\end{proof}
+
+\paragraph{The dual filter.}
+The dual filter carries the coefficients of the wavelet. Its identities follow from those of
+the filter by reflections $k \mapsto a - k$ of the index and a split by parity.
+
+\begin{definition}[The dual filter]
+\label{def:daub-dual-filter}
+\lean{Daubechies.dualCoeff, Daubechies.dualCoeff_eq_zero, Daubechies.finite_support_dualCoeff,
+  Daubechies.finsum_eq_sum_Icc_of_dualCoeff}
+\leanok
+\uses{def:daub-symbol}
+The \emph{dual filter} of a Daubechies mask of order $N$ is $g_k = (-1)^k c_{1-k}$, $k \in \Z$.
+It vanishes outside $2 - 2N \leq k \leq 1$, so it has finite support, and
+$\sum_{k \in \Z} f(k) = \sum_{k=2-2N}^{1} f(k)$ for every function $f$ on $\Z$ that vanishes
+wherever $g_k = 0$.
+\end{definition}
+
+\begin{proposition}[Orthogonality of the dual filter]
+\label{prop:daub-dual-orthogonality}
+\lean{Daubechies.sum_dualCoeff_mul_dualCoeff_add, Daubechies.sum_coeff_mul_dualCoeff_add}
+\leanok
+\uses{def:daub-dual-filter}
+For every Daubechies mask and every $j \in \Z$,
+\[
+  \sum_{k \in \Z} g_k g_{k+2j} = 2 \delta_{j0} \quad\text{and}\quad
+  \sum_{k \in \Z} c_k g_{k+2j} = 0 .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-even-shifts, lem:daub-parity-split}
+The substitution $k \mapsto 1 - 2j - k$ turns the first sum into $\sum_k c_k c_{k+2j}$, since
+$1 - 2j - k$ and $1 - k$ have the same parity (\Cref{lem:daub-parity-split}); apply
+\Cref{thm:daub-even-shifts}. It turns the second sum into its negative, since $1 - k$ and
+$k + 2j$ have different parity.
+\end{proof}
+
+\begin{lemma}[Reindexing over one parity class]
+\label{lem:daub-dual-reindex}
+\lean{Daubechies.finsum_coeff_sub_two_mul_mul, Daubechies.finsum_dualCoeff_sub_two_mul_mul}
+\leanok
+\uses{def:daub-dual-filter}
+For every Daubechies mask and all $a, b \in \Z$,
+\[
+  \sum_{j \in \Z} c_{a-2j} c_{b-2j} = \sum_{i \in \Z} c_{2i+b+(a-b)} c_{2i+b}
+\]
+and
+\[
+  \sum_{j \in \Z} g_{a-2j} g_{b-2j}
+  = (-1)^{a+b} \sum_{i \in \Z} c_{2i+(1-a)+(a-b)} c_{2i+(1-a)} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-parity-split}
+In the first sum substitute $j = -i$. In the second,
+$(-1)^{a-2j} (-1)^{b-2j} = (-1)^{a+b}$ (\Cref{lem:daub-parity-split}),
+$1 - (a - 2j) = 2j + (1 - a)$ and $1 - (b - 2j) = 2j + (1 - a) + (a - b)$.
+\end{proof}
+
+\begin{theorem}[The filter and its dual resolve the identity]
+\label{thm:daub-filter-identity}
+\lean{Daubechies.sum_coeff_mul_add_dual}
+\leanok
+\uses{def:daub-dual-filter}
+For every Daubechies mask and all $a, b \in \Z$,
+\[
+  \sum_{j \in \Z} \bigl(c_{a-2j} c_{b-2j} + g_{a-2j} g_{b-2j}\bigr) = 2 \delta_{ab} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-dual-reindex, lem:daub-parity-split, thm:daub-even-shifts}
+By \Cref{lem:daub-dual-reindex} both sums run over one parity class of
+$h(k) = c_{k+(a-b)} c_k$, the first over the class of $b$ and the second over the class of
+$1 - a$. If $a - b$ is even, then $(-1)^{a+b} = 1$ and the two classes are complementary, so the
+sum is $\sum_k c_k c_{k+(a-b)} = 2 \delta_{ab}$ (\Cref{lem:daub-parity-split},
+\Cref{thm:daub-even-shifts}). If $a - b$ is odd, the two classes agree and $(-1)^{a+b} = -1$, so
+the two sums cancel.
+\end{proof}
+
+\begin{proposition}[Vanishing moments of the dual filter]
+\label{prop:daub-dual-moments}
+\lean{Daubechies.sum_dualCoeff_mul_pow}
+\leanok
+\uses{def:daub-dual-filter}
+For every Daubechies mask of order $N$ and every $l < N$, $\sum_{k \in \Z} g_k k^l = 0$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-sum-rules}
+The substitution $k \mapsto 1 - k$ turns the sum into $-\sum_k (-1)^k (1 - k)^l c_k$, which
+vanishes by \Cref{thm:daub-sum-rules} for $Q(z) = (1 - z)^l$.
+\end{proof}
+
+\paragraph{The mask D4.}
+For $N = 2$ the polynomial $L$ is linear, with its root $2 + \sqrt 3$ outside the unit disk.
+
+\begin{lemma}[Linear polynomials on the unit circle]
+\label{lem:daub-linear-circle}
+\lean{Daubechies.normSq_add_mul_expFreq, Daubechies.daubFun_two_eq_two_sub_cos}
+\leanok
+\uses{def:daub-fun}
+For all $a, b, \xi \in \R$,
+\[
+  |a + b e^{-2\pi i \xi}|^2 = a^2 + b^2 + 2ab \cos 2\pi\xi .
+\]
+For $N = 2$ and every $\xi \in \R$, $P(\xi) = 2 - \cos 2\pi\xi$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-exp}
+$|a + bz|^2 = a^2 + b^2 |z|^2 + 2ab \operatorname{Re} z$ for real $a$ and $b$, with $|z| = 1$ and
+$\operatorname{Re} z = \cos 2\pi\xi$ at $z = e^{-2\pi i \xi}$ (\Cref{lem:daub-exp}). For $N = 2$,
+$P(\xi) = 1 + 2 \sin^2 \pi\xi$ (\Cref{def:daub-fun}) and $\cos 2\pi\xi = 1 - 2 \sin^2 \pi\xi$.
+\end{proof}
+
+\begin{proposition}[The mask D4]
+\label{prop:daub-d4}
+\lean{Daubechies.d4, Daubechies.d4_L}
+\leanok
+\uses{def:daub-mask}
+The polynomial
+\[
+  L(z) = \frac{1 + \sqrt 3}{2} + \frac{1 - \sqrt 3}{2} \, z
+\]
+is a Daubechies mask of order $2$, the mask \emph{D4}.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-linear-circle}
+$L$ has degree $1 < 2$ and $L(1) = 1$. With $a = (1 + \sqrt 3)/2$ and $b = (1 - \sqrt 3)/2$,
+$a^2 + b^2 = 2$ and $2ab = -1$, so $|L(e^{-2\pi i \xi})|^2 = 2 - \cos 2\pi\xi = P(\xi)$ by
+\Cref{lem:daub-linear-circle}.
+\end{proof}
+
+\begin{proposition}[The filter coefficients of D4]
+\label{prop:daub-d4-coeff}
+\lean{Daubechies.maskPoly_d4, Daubechies.coeff_d4_zero, Daubechies.coeff_d4_one,
+  Daubechies.coeff_d4_two, Daubechies.coeff_d4_three, Daubechies.coeff_d4,
+  Daubechies.coeff_d4_eq_zero}
+\leanok
+\uses{prop:daub-d4, def:daub-symbol}
+The mask polynomial of D4 is
+\[
+  m(z) = \frac18 \bigl((1 + \sqrt 3) + (3 + \sqrt 3) z + (3 - \sqrt 3) z^2
+    + (1 - \sqrt 3) z^3\bigr) ,
+\]
+its filter coefficients are
+\[
+  c_0 = \frac{1 + \sqrt 3}{4} , \quad c_1 = \frac{3 + \sqrt 3}{4} , \quad
+  c_2 = \frac{3 - \sqrt 3}{4} , \quad c_3 = \frac{1 - \sqrt 3}{4} ,
+\]
+and $c_k = 0$ for every other $k \in \Z$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-mask-poly}
+Expand $m(z) = \frac14 (1 + 2z + z^2) L(z)$; two real polynomials agree once they agree at every
+real point. Then $c_k = 2 [z^k] m$, and $c_k = 0$ for $k < 0$ and for $k \geq 4$
+(\Cref{lem:daub-mask-poly}).
+\end{proof}
+
+The orthonormal filter $c_k/\sqrt 2$ is the form in which these coefficients are usually
+tabulated.
+
+\section{The symbol product}
+
+The scaling function of a mask is the inverse Fourier transform of the infinite product
+$\Phi(\xi) = \prod_{j \geq 0} m_0(\xi/2^{j+1})$. This section proves that the product converges
+locally uniformly, satisfies $\Phi(2\xi) = m_0(\xi) \Phi(\xi)$, and has the modulus
+$|\Phi(\xi)|^2 = \operatorname{sinc}(\pi\xi)^{2N} \prod_{j \geq 0} P(\xi/2^{j+1})$.
+
+\paragraph{The cosine product.}
+Infinite products are understood as in Mathlib: $\prod_{j \geq 0} a_j$ converges if the products
+$\prod_{j \in F} a_j$ over the finite sets $F \subseteq \N$ converge as $F$ increases, and then
+the partial products $\prod_{j<n} a_j$ converge to the same value. Here
+$\operatorname{sinc} x = \sin x / x$ for $x \neq 0$ and $\operatorname{sinc} 0 = 1$. The doubling
+formula $\sin 2y = 2 \sin y \cos y$ telescopes into the cosine product, which for $x = \pi/2$ is
+Vi\`ete's product $2/\pi = \prod_{j \geq 0} \cos(\pi/2^{j+2})$.
+
+\begin{lemma}[Dyadic scalings]
+\label{lem:daub-dyadic}
+\lean{Daubechies.div_two_pow_add_succ, Daubechies.sq_div_two_pow_succ,
+  Daubechies.hasSum_sq_div_two_pow}
+\leanok
+For every $x \in \R$ and all $n, j \in \N$, $x/2^{n+j+1} = (x/2^n)/2^{j+1}$ and
+$(x/2^{j+1})^2 = \frac{x^2}{4} \, 4^{-j}$, and
+\[
+  \sum_{j \geq 0} \Bigl(\frac{x}{2^{j+1}}\Bigr)^2 = \frac{x^2}{3} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+A geometric series: $\frac{x^2}{4} \sum_{j \geq 0} 4^{-j} = \frac{x^2}{4} \cdot \frac43$.
+\end{proof}
+
+\begin{lemma}[The finite cosine product]
+\label{lem:daub-finite-cos-product}
+\lean{Daubechies.sinc_mul_cos, Daubechies.sinc_div_two_pow_mul_prod_cos,
+  Daubechies.norm_cos_sub_one_le, Daubechies.multipliable_cos_div_two_pow}
+\leanok
+For every $x \in \R$ and every $n \in \N$,
+\[
+  \operatorname{sinc}\Bigl(\frac{x}{2^n}\Bigr) \prod_{j<n} \cos\Bigl(\frac{x}{2^{j+1}}\Bigr)
+  = \operatorname{sinc} x ,
+\]
+and the product $\prod_{j \geq 0} \cos(x/2^{j+1})$ converges. For every $y \in \R$,
+$\operatorname{sinc}(y) \cos(y) = \operatorname{sinc}(2y)$ and $|\cos y - 1| \leq y^2/2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-dyadic}
+$\sin 2y = 2 \sin y \cos y$, and $1 - y^2/2 \leq \cos y \leq 1$. Induction on $n$ with
+$y = x/2^{n+1}$ gives the identity. The factors are $1 + a_j$ with
+$|a_j| \leq (x/2^{j+1})^2/2$, a summable bound (\Cref{lem:daub-dyadic}).
+\end{proof}
+
+\begin{theorem}[The cosine product]
+\label{thm:daub-cos-product}
+\lean{Daubechies.hasProd_cos_div_two_pow, Daubechies.tprod_cos}
+\leanok
+For every $x \in \R$,
+\[
+  \prod_{j \geq 0} \cos\Bigl(\frac{x}{2^{j+1}}\Bigr) = \operatorname{sinc} x .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-finite-cos-product}
+The partial products converge (\Cref{lem:daub-finite-cos-product}), and
+$\operatorname{sinc}(x/2^n) \to \operatorname{sinc} 0 = 1$, so by the identity of
+\Cref{lem:daub-finite-cos-product} their limit is $\operatorname{sinc} x$.
+\end{proof}
+
+\paragraph{The product of $P$.}
+The modulus of $\Phi$ contains the real product $\prod_{j \geq 0} P(\xi/2^{j+1})$; its tail after
+the first $n$ factors is bounded uniformly for $|\xi| \leq 2^n/2$.
+
+\begin{lemma}[Convergence of the product of $P$]
+\label{lem:daub-fun-product}
+\lean{Daubechies.multipliable_daubFun, Daubechies.multipliable_daubFun_shift,
+  Daubechies.tprod_daubFun_nonneg, Daubechies.tprod_daubFun_eq_prod_mul}
+\leanok
+\uses{def:daub-fun}
+For every $N \in \N$, every $n \in \N$ and every $\xi \in \R$ the products
+$\prod_{j \geq 0} P(\xi/2^{j+1})$ and $\prod_{j \geq 0} P(\xi/2^{n+j+1})$ converge, the first
+one is nonnegative, and
+\[
+  \prod_{j \geq 0} P\Bigl(\frac{\xi}{2^{j+1}}\Bigr)
+  = \prod_{j<n} P\Bigl(\frac{\xi}{2^{j+1}}\Bigr) \cdot
+    \prod_{j \geq 0} P\Bigl(\frac{\xi}{2^{n+j+1}}\Bigr) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-fun-bounds, lem:daub-dyadic}
+For $N \geq 1$ the factors are $1 + a_j$ with
+$0 \leq a_j \leq \binom{2N-1}{N} \pi^2 (\xi/2^{j+1})^2$ (\Cref{prop:daub-fun-bounds}), a
+summable bound (\Cref{lem:daub-dyadic}); for $N = 0$ every factor is $0$. The second product is
+the first one at the point $\xi/2^n$ (\Cref{lem:daub-dyadic}), and $P \geq 0$.
+\end{proof}
+
+\begin{proposition}[Bounds for the product of $P$]
+\label{prop:daub-fun-product-bound}
+\lean{Daubechies.tprod_daubFun_le, Daubechies.tprod_daubFun_shift_le}
+\leanok
+\uses{def:daub-fun}
+For every $N \in \N$ and every $x \in \R$,
+\[
+  \prod_{j \geq 0} P\Bigl(\frac{x}{2^{j+1}}\Bigr)
+  \leq \exp\Bigl(\binom{2N-1}{N} \frac{\pi^2 x^2}{3}\Bigr) .
+\]
+For every $n \in \N$ and every $\xi \in \R$ with $|\xi| \leq 2^n/2$,
+\[
+  \prod_{j \geq 0} P\Bigl(\frac{\xi}{2^{n+j+1}}\Bigr)
+  \leq \exp\Bigl(\binom{2N-1}{N} \frac{\pi^2}{12}\Bigr) .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-fun-bounds, lem:daub-dyadic, lem:daub-fun-product}
+With $t_j = \binom{2N-1}{N} \pi^2 (x/2^{j+1})^2$, each factor is at most $1 + t_j \leq e^{t_j}$
+(\Cref{prop:daub-fun-bounds}), and $\sum_j (x/2^{j+1})^2 = x^2/3$ (\Cref{lem:daub-dyadic}). The
+tail is the product at $x = \xi/2^n$ (\Cref{lem:daub-fun-product}), where $|x| \leq \frac12$
+gives $x^2/3 \leq 1/12$.
+\end{proof}
+
+\paragraph{Convergence.}
+Near $0$ the symbol is $1 + O(|\eta|)$, so the factors of $\Phi$ approach $1$ geometrically.
+
+\begin{definition}[The symbol product]
+\label{def:daub-symbol-product}
+\lean{Daubechies.symbolProduct}
+\leanok
+\uses{def:daub-symbol}
+The \emph{symbol product} of a Daubechies mask is the function
+\[
+  \Phi(\xi) = \prod_{j \geq 0} m_0\Bigl(\frac{\xi}{2^{j+1}}\Bigr) , \qquad \xi \in \R .
+\]
+\end{definition}
+
+\begin{lemma}[The factors of the symbol product]
+\label{lem:daub-symbol-product-factors}
+\lean{Daubechies.norm_symbol_div_two_pow_sub_one_le, Daubechies.summable_norm_symbol_sub_one,
+  Daubechies.multipliable_symbolProduct}
+\leanok
+\uses{def:daub-symbol-product, lem:daub-symbol-lipschitz}
+For every Daubechies mask, every $\xi \in \R$ and every $j \in \N$,
+\[
+  \Bigl|m_0\Bigl(\frac{\xi}{2^{j+1}}\Bigr) - 1\Bigr| \leq \frac{C_0 |\xi|}{2^{j+1}}
+\]
+with the constant $C_0$ of \Cref{lem:daub-symbol-lipschitz}. Moreover
+$\sum_{j \geq 0} |m_0(\xi/2^{j+1}) - 1| < \infty$, and the product $\Phi(\xi)$ converges.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-symbol-lipschitz}
+\Cref{lem:daub-symbol-lipschitz} at the point $\xi/2^{j+1}$. The bounds form a geometric
+series, and a product $\prod_j (1 + a_j)$ of complex numbers with $\sum_j |a_j| < \infty$
+converges.
+\end{proof}
+
+\begin{theorem}[Locally uniform convergence]
+\label{thm:daub-symbol-product-continuous}
+\lean{Daubechies.hasProdUniformlyOn_symbolProduct,
+  Daubechies.hasProdLocallyUniformly_symbolProduct,
+  Daubechies.tendstoLocallyUniformly_prod_symbol, Daubechies.tendsto_prod_symbol,
+  Daubechies.continuous_symbolProduct}
+\leanok
+\uses{def:daub-symbol-product}
+For every Daubechies mask the product $\Phi$ converges uniformly on every compact set
+$K \subseteq \R$. The partial products $\prod_{j<n} m_0(\xi/2^{j+1})$ converge to $\Phi(\xi)$ as
+$n \to \infty$, for every $\xi \in \R$ and locally uniformly on $\R$, and $\Phi$ is continuous.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-symbol-product-factors, lem:daub-symbol-props}
+On a compact set $K \subseteq [-R, R]$ the bound of \Cref{lem:daub-symbol-product-factors} is at
+most $C_0 R/2^{j+1}$, uniformly in $\xi$, and the factors are continuous
+(\Cref{lem:daub-symbol-props}); Mathlib's uniform version of the convergence criterion for
+products $\prod_j (1 + a_j)$ applies. Locally uniform limits of continuous functions are
+continuous.
+\end{proof}
+
+\paragraph{Algebraic properties.}
+The product inherits the bounds and the symmetry of the symbol, and splitting off its first
+factor gives the refinement identity.
+
+\begin{proposition}[Values, bounds and symmetry of $\Phi$]
+\label{prop:daub-symbol-product-basic}
+\lean{Daubechies.symbolProduct_zero, Daubechies.norm_prod_symbol_le_one,
+  Daubechies.norm_symbolProduct_le_one, Daubechies.symbolProduct_neg}
+\leanok
+\uses{def:daub-symbol-product}
+For every Daubechies mask, $\Phi(0) = 1$, and for every $\xi \in \R$ and every $n \in \N$,
+\[
+  \Bigl|\prod_{j<n} m_0\Bigl(\frac{\xi}{2^{j+1}}\Bigr)\Bigr| \leq 1 , \qquad
+  |\Phi(\xi)| \leq 1 , \qquad \Phi(-\xi) = \overline{\Phi(\xi)} .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-symbol-sum, thm:daub-qmf, lem:daub-symbol-props,
+  lem:daub-symbol-product-factors}
+$m_0(0) = 1$ (\Cref{lem:daub-symbol-sum}) and $|m_0| \leq 1$ (\Cref{thm:daub-qmf}), and the
+modulus of a convergent product is the product of the moduli
+(\Cref{lem:daub-symbol-product-factors}). Conjugation is continuous and multiplicative, and
+$m_0(-\eta) = \overline{m_0(\eta)}$ (\Cref{lem:daub-symbol-props}).
+\end{proof}
+
+\begin{lemma}[Splitting off factors]
+\label{lem:daub-symbol-product-split}
+\lean{Daubechies.prod_range_succ_symbol, Daubechies.symbolProduct_eq_prod_mul}
+\leanok
+\uses{def:daub-symbol-product}
+For every Daubechies mask, every $\xi \in \R$ and every $n \in \N$,
+\[
+  \prod_{j<n+1} m_0\Bigl(\frac{\xi}{2^{j+1}}\Bigr)
+  = m_0\Bigl(\frac{\xi}{2}\Bigr) \prod_{j<n} m_0\Bigl(\frac{\xi/2}{2^{j+1}}\Bigr)
+\]
+and
+\[
+  \Phi(\xi) = \prod_{j<n} m_0\Bigl(\frac{\xi}{2^{j+1}}\Bigr) \cdot \Phi\Bigl(\frac{\xi}{2^n}\Bigr) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-dyadic, lem:daub-symbol-product-factors}
+$\xi/2^{j+2} = (\xi/2)/2^{j+1}$ and $\xi/2^{n+j+1} = (\xi/2^n)/2^{j+1}$
+(\Cref{lem:daub-dyadic}), and a convergent product splits into its first $n$ factors and its
+tail, which converges (\Cref{lem:daub-symbol-product-factors}).
+\end{proof}
+
+\begin{theorem}[The refinement identity]
+\label{thm:daub-refinement-identity}
+\lean{Daubechies.symbolProduct_two_mul}
+\leanok
+\uses{def:daub-symbol-product}
+For every Daubechies mask and every $\xi \in \R$, $\Phi(2\xi) = m_0(\xi) \Phi(\xi)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-symbol-product-split}
+\Cref{lem:daub-symbol-product-split} with $n = 1$ at the point $2\xi$.
+\end{proof}
+
+\begin{proposition}[$\Phi$ near the origin]
+\label{prop:daub-symbol-product-nonzero}
+\lean{Daubechies.symbolProduct_ne_zero, Daubechies.exists_pos_le_norm_symbolProduct}
+\leanok
+\uses{def:daub-symbol-product}
+For every Daubechies mask there is $\kappa > 0$ such that $\Phi(\xi) \neq 0$ and
+$|\Phi(\xi)| \geq \kappa$ for every $\xi \in \R$ with $|\xi| \leq \frac12$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-symbol-props, lem:daub-symbol-product-factors,
+  thm:daub-symbol-product-continuous}
+For $|\xi| \leq \frac12$ every argument $\xi/2^{j+1}$ lies in $[-\frac14, \frac14]$, where
+$m_0 \neq 0$ (\Cref{lem:daub-symbol-props}), and a convergent product of nonzero factors
+$1 + a_j$ with $\sum_j |a_j| < \infty$ is nonzero (\Cref{lem:daub-symbol-product-factors}). The
+continuous function $|\Phi|$ (\Cref{thm:daub-symbol-product-continuous}) attains its minimum on
+the compact interval $[-\frac12, \frac12]$.
+\end{proof}
+
+\paragraph{The modulus.}
+The squared modulus of each factor is $\cos(\pi\eta)^{2N} P(\eta)$, and the cosines multiply to
+the function $\operatorname{sinc}$.
+
+\begin{theorem}[The modulus of the symbol product]
+\label{thm:daub-symbol-product-modulus}
+\lean{Daubechies.normSq_symbolProduct}
+\leanok
+\uses{def:daub-symbol-product, def:daub-fun}
+For every Daubechies mask of order $N$ and every $\xi \in \R$,
+\[
+  |\Phi(\xi)|^2
+  = \operatorname{sinc}(\pi\xi)^{2N} \prod_{j \geq 0} P\Bigl(\frac{\xi}{2^{j+1}}\Bigr) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-symbol-modulus, thm:daub-cos-product, lem:daub-fun-product,
+  lem:daub-symbol-product-factors}
+The factors satisfy $|m_0(\eta)|^2 = \cos(\pi\eta)^{2N} P(\eta)$
+(\Cref{prop:daub-symbol-modulus}), the cosines multiply to
+$\prod_{j \geq 0} \cos(\pi\xi/2^{j+1}) = \operatorname{sinc}(\pi\xi)$
+(\Cref{thm:daub-cos-product}), and the products of $P$ and of the factors of $\Phi$ converge
+(\Cref{lem:daub-fun-product,lem:daub-symbol-product-factors}). The factorwise product of two
+convergent products converges to the product of their values.
+\end{proof}
+
+\begin{proposition}[A bound by finite products]
+\label{prop:daub-symbol-product-bound}
+\lean{Daubechies.normSq_symbolProduct_le}
+\leanok
+\uses{def:daub-symbol-product, def:daub-fun}
+For every Daubechies mask of order $N$, every $n \in \N$ and every $\xi \in \R$ with
+$|\xi| \leq 2^n/2$,
+\[
+  |\Phi(\xi)|^2 \leq \exp\Bigl(\binom{2N-1}{N} \frac{\pi^2}{12}\Bigr)
+  \operatorname{sinc}(\pi\xi)^{2N} \prod_{j<n} P\Bigl(\frac{\xi}{2^{j+1}}\Bigr) .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-symbol-product-modulus, lem:daub-fun-product, prop:daub-fun-product-bound}
+Split the product of $P$ in \Cref{thm:daub-symbol-product-modulus} into its first $n$ factors
+and its tail (\Cref{lem:daub-fun-product}), and bound the tail by
+\Cref{prop:daub-fun-product-bound}.
+\end{proof}
+
+The next section bounds the integrals of $\prod_{j<n} P(\xi/2^{j+1})$ through the transfer
+operator.
+
+\section{The transfer operator}
+
+The transfer operator of Eirola~\cite{Eirola} and Villemoes~\cite{Villemoes} turns the decay of
+the symbol product into the growth of its iterates: a bound $T^n 1 \leq C \lambda^n$ gives
+$\int_\R (1 + |\xi|)^{2s} |\Phi(\xi)|^2 \, d\xi < \infty$ for every $s < N - \log_4 \lambda$. For
+$N = 2$ and $N = 3$ explicit eigenfunctions give $\lambda = 4$ and $\lambda = 9$, hence the
+exponents $1$ and $3 - \log_2 3$.
+
+\paragraph{The operator.}
+The points $\xi/2$ and $(\xi + 1)/2$ are the two preimages of $\xi$ under the doubling map
+$\eta \mapsto 2\eta$ modulo $1$.
+
+\begin{definition}[The transfer operator]
+\label{def:daub-transfer}
+\lean{Daubechies.transfer, Daubechies.transfer_add, Daubechies.transfer_smul}
+\leanok
+\uses{def:daub-fun}
+The \emph{transfer operator} $T$ of order $N \in \N$ maps a function $g : \R \to \R$ to
+\[
+  (T g)(\xi) = P\Bigl(\frac{\xi}{2}\Bigr) g\Bigl(\frac{\xi}{2}\Bigr)
+    + P\Bigl(\frac{\xi + 1}{2}\Bigr) g\Bigl(\frac{\xi + 1}{2}\Bigr) , \qquad \xi \in \R .
+\]
+It is linear.
+\end{definition}
+
+\begin{lemma}[Elementary properties of $T$]
+\label{lem:daub-transfer-basic}
+\lean{Daubechies.transfer_periodic, Daubechies.continuous_transfer, Daubechies.transfer_nonneg,
+  Daubechies.transfer_mono, Daubechies.abs_transfer_le}
+\leanok
+\uses{def:daub-transfer}
+Let $N \in \N$, and let $g$, $g_1$ and $g_2$ be real functions on $\R$. If $g$ is continuous,
+so is $T g$; if $g$ has period $1$, so has $T g$; if $g \geq 0$, then $T g \geq 0$; and if
+$g_1 \leq g_2$, then $T g_1 \leq T g_2$. If $|g| \leq B$ on $\R$, then
+$|T g| \leq 2 \binom{2N-1}{N} B$ on $\R$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-fun-symmetry, prop:daub-fun-bounds}
+$P$ is continuous, has period $1$ (\Cref{lem:daub-fun-symmetry}) and satisfies
+$0 \leq P \leq \binom{2N-1}{N}$ (\Cref{prop:daub-fun-bounds}). From $\xi$ to $\xi + 1$ the points
+$\xi/2$ and $(\xi + 1)/2$ become $(\xi + 1)/2$ and $\xi/2 + 1$, so for $1$-periodic $g$ the two
+summands swap.
+\end{proof}
+
+\begin{lemma}[The iterates of $T$]
+\label{lem:daub-transfer-iterates}
+\lean{Daubechies.continuous_iterate_transfer, Daubechies.periodic_iterate_transfer,
+  Daubechies.iterate_transfer_nonneg, Daubechies.abs_iterate_transfer_le,
+  Daubechies.continuous_iterate_transfer_one, Daubechies.periodic_iterate_transfer_one,
+  Daubechies.iterate_transfer_one_nonneg}
+\leanok
+\uses{def:daub-transfer}
+Let $N, n \in \N$ and $g : \R \to \R$. If $g$ is continuous, has period $1$, or is nonnegative,
+then so is $T^n g$. If $|g| \leq B$ on $\R$, then $|T^n g| \leq (2 \binom{2N-1}{N})^n B$ on $\R$.
+In particular $T^n 1$ is continuous, nonnegative and has period $1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-transfer-basic}
+Induction on $n$ with \Cref{lem:daub-transfer-basic}.
+\end{proof}
+
+\paragraph{The adjoint identity.}
+Integrated against a $1$-periodic function $h$, the operator $T$ becomes the multiplication by
+$P$ together with the dilation of $h$ by $2$. Iterated, this identifies the integrals of the
+finite products of $P$ with the integrals of $T^n 1$.
+
+\begin{lemma}[The two branches of halving]
+\label{lem:daub-halving}
+\lean{Daubechies.periodic_comp_two_mul,
+  Daubechies.integral_comp_div_two_add_comp_add_one_div_two}
+\leanok
+If $h : \R \to \R$ has period $1$, then so has $\eta \mapsto h(2\eta)$. For every continuous
+$f : \R \to \R$ with period $1$,
+\[
+  \int_{-1/2}^{1/2} \Bigl(f\Bigl(\frac{\eta}{2}\Bigr) + f\Bigl(\frac{\eta + 1}{2}\Bigr)\Bigr)
+  \, d\eta = 2 \int_{-1/2}^{1/2} f(\eta) \, d\eta .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The substitutions $u = \eta/2$ and $u = (\eta + 1)/2$ give $2 \int_{-1/4}^{1/4} f$ and
+$2 \int_{1/4}^{3/4} f$, together $2 \int_{-1/4}^{3/4} f$, and the integral of a $1$-periodic
+function over an interval of length $1$ does not depend on the interval.
+\end{proof}
+
+\begin{theorem}[The adjoint identity]
+\label{thm:daub-transfer-adjoint}
+\lean{Daubechies.integral_transfer}
+\leanok
+\uses{def:daub-transfer}
+For every $N \in \N$ and all continuous $h, g : \R \to \R$ with period $1$,
+\[
+  \int_{-1/2}^{1/2} h(\eta) \, (T g)(\eta) \, d\eta
+  = 2 \int_{-1/2}^{1/2} h(2\eta) P(\eta) g(\eta) \, d\eta .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-halving, lem:daub-fun-symmetry}
+The function $f(u) = h(2u) P(u) g(u)$ is continuous and has period $1$
+(\Cref{lem:daub-halving,lem:daub-fun-symmetry}), and the integrand on the left is
+$f(\eta/2) + f((\eta + 1)/2)$, since $h(\eta + 1) = h(\eta)$. Apply \Cref{lem:daub-halving}.
+\end{proof}
+
+\begin{proposition}[The adjoint identity for the iterates]
+\label{prop:daub-transfer-iterates-adjoint}
+\lean{Daubechies.integral_iterate_transfer, Daubechies.integral_iterate_transfer_one}
+\leanok
+\uses{def:daub-transfer}
+For all $N, n \in \N$ and all continuous $h, g : \R \to \R$ with period $1$,
+\[
+  \int_{-1/2}^{1/2} h(\eta) \, (T^n g)(\eta) \, d\eta
+  = 2^n \int_{-1/2}^{1/2} h(2^n \eta) \prod_{i<n} P(2^i \eta) \, g(\eta) \, d\eta .
+\]
+In particular
+\[
+  \int_{-1/2}^{1/2} (T^n 1)(\eta) \, d\eta
+  = 2^n \int_{-1/2}^{1/2} \prod_{i<n} P(2^i \eta) \, d\eta .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-transfer-adjoint, lem:daub-transfer-iterates, lem:daub-halving}
+Induction on $n$: $T^{n+1} g = T (T^n g)$, \Cref{thm:daub-transfer-adjoint} for the continuous
+$1$-periodic function $T^n g$ (\Cref{lem:daub-transfer-iterates}), and the induction hypothesis
+for the continuous $1$-periodic function $\eta \mapsto h(2\eta) P(\eta)$ in place of $h$
+(\Cref{lem:daub-halving}).
+\end{proof}
+
+\begin{theorem}[The finite products and the transfer operator]
+\label{thm:daub-transfer-products}
+\lean{Daubechies.prod_daubFun_two_pow_mul_div, Daubechies.integral_prod_daubFun}
+\leanok
+\uses{def:daub-transfer}
+For all $N, n \in \N$,
+\[
+  \int_{-2^n/2}^{2^n/2} \prod_{j<n} P\Bigl(\frac{\xi}{2^{j+1}}\Bigr) \, d\xi
+  = \int_{-1/2}^{1/2} (T^n 1)(\eta) \, d\eta .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-transfer-iterates-adjoint}
+The substitution $\xi = 2^n \eta$ turns the left side into
+\[
+  2^n \int_{-1/2}^{1/2} \prod_{j<n} P\Bigl(\frac{2^n \eta}{2^{j+1}}\Bigr) \, d\eta ,
+\]
+and $\prod_{j<n} P(2^n \eta/2^{j+1}) = \prod_{i<n} P(2^i \eta)$ for every $\eta \in \R$, by the
+reindexing $i = n - 1 - j$. Apply \Cref{prop:daub-transfer-iterates-adjoint}.
+\end{proof}
+
+\paragraph{Growth bounds.}
+Bounds on $T^n 1$ thereby bound the integrals of the finite products of $P$.
+
+\begin{definition}[Growth bounds]
+\label{def:daub-transfer-growth}
+\lean{Daubechies.TransferGrowth, Daubechies.TransferGrowth.one_le}
+\leanok
+\uses{def:daub-transfer}
+Let $N \in \N$. A \emph{growth bound} for the transfer operator of order $N$ is a pair of real
+numbers $\lambda > 0$ and $C$ with
+\[
+  (T^n 1)(\xi) \leq C \lambda^n \quad\text{for every } n \in \N \text{ and every } \xi \in \R .
+\]
+Every growth bound has $C \geq 1$.
+\end{definition}
+
+\begin{lemma}[Integrals under a growth bound]
+\label{lem:daub-growth-integrals}
+\lean{Daubechies.prod_daubFun_nonneg, Daubechies.continuous_prod_daubFun,
+  Daubechies.TransferGrowth.integral_iterate_transfer_one_le,
+  Daubechies.TransferGrowth.integral_prod_daubFun_le,
+  Daubechies.TransferGrowth.setIntegral_prod_daubFun_le}
+\leanok
+\uses{def:daub-transfer-growth}
+Let $N, n \in \N$. The function $\xi \mapsto \prod_{j<n} P(\xi/2^{j+1})$ is continuous and
+nonnegative. If $\lambda, C$ is a growth bound for the transfer operator of order $N$, then for
+every set $S \subseteq [-2^n/2, 2^n/2]$
+\[
+  \int_{-1/2}^{1/2} (T^n 1)(\eta) \, d\eta \leq C \lambda^n
+  \quad\text{and}\quad
+  \int_S \prod_{j<n} P\Bigl(\frac{\xi}{2^{j+1}}\Bigr) \, d\xi \leq C \lambda^n ,
+\]
+in particular for $S = [-2^n/2, 2^n/2]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-transfer-products, lem:daub-fun-symmetry, prop:daub-fun-bounds}
+$P$ is continuous and nonnegative (\Cref{lem:daub-fun-symmetry,prop:daub-fun-bounds}). The
+first bound integrates $T^n 1 \leq C \lambda^n$ over an interval of length $1$. The integrand of
+the second is nonnegative, so the integral over $S$ is at most the integral over
+$[-2^n/2, 2^n/2]$, which equals the first integral by \Cref{thm:daub-transfer-products}.
+\end{proof}
+
+\begin{proposition}[The crude growth bound]
+\label{prop:daub-crude-growth}
+\lean{Daubechies.transferGrowth_crude, Daubechies.logb_four_two_mul_choose_lt}
+\leanok
+\uses{def:daub-transfer-growth}
+For every $N \in \N$, $\lambda = 2 \binom{2N-1}{N}$ and $C = 1$ form a growth bound for the
+transfer operator of order $N$. For every $N \geq 2$,
+$\log_4 \bigl(2 \binom{2N-1}{N}\bigr) < N - \frac12$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-transfer-iterates, lem:daub-choose-bound}
+\Cref{lem:daub-transfer-iterates} with $g = 1$ and $B = 1$. For $N \geq 2$,
+$2 \binom{2N-1}{N} < 2 \cdot 4^{N-1} = 4^{N - 1/2}$ by \Cref{lem:daub-choose-bound}.
+\end{proof}
+
+\paragraph{Decay of the symbol product.}
+Under a growth bound the integrals of $|\Phi|^2$ over the dyadic annuli decay geometrically,
+since $\operatorname{sinc}(\pi\xi)^{2N}$ is at most $(\pi |\xi|)^{-2N}$.
+
+\begin{definition}[Dyadic annuli]
+\label{def:daub-annulus}
+\lean{Daubechies.annulus, Daubechies.measurableSet_annulus, Daubechies.annulus_subset_Icc,
+  Daubechies.exists_mem_annulus, Daubechies.univ_subset_Icc_union_annulus}
+\leanok
+For $n \in \N$ the \emph{dyadic annulus} is
+\[
+  A_n = \{\xi \in \R : 2^n/4 < |\xi| \leq 2^n/2\} .
+\]
+It is measurable and contained in $[-2^n/2, 2^n/2]$. Every $\xi \in \R$ with $|\xi| > \frac14$
+lies in some $A_n$, so $\R = [-\frac14, \frac14] \cup \bigcup_{n \in \N} A_n$.
+\end{definition}
+
+\begin{lemma}[Integrability from the annuli]
+\label{lem:daub-annulus-integrable}
+\lean{Daubechies.integrable_of_integral_annulus_le}
+\leanok
+\uses{def:daub-annulus}
+Let $f$ be a continuous function from $\R$ to a normed abelian group, and let $A \in \R$ and
+$0 \leq r < 1$ with $\int_{A_n} |f| \leq A r^n$ for every $n \in \N$. Then $f$ is integrable on
+$\R$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $[-\frac14, \frac14]$ the function $f$ is integrable as a continuous function on a compact
+interval, and on $\bigcup_n A_n$ since the integrals over the annuli are summable; these two
+sets cover $\R$ (\Cref{def:daub-annulus}).
+\end{proof}
+
+\begin{lemma}[$\Phi$ on the annuli]
+\label{lem:daub-sinc-annulus}
+\lean{Daubechies.abs_sinc_le_inv_abs, Daubechies.sinc_pow_le_of_mem_annulus,
+  Daubechies.normSq_symbolProduct_le_of_mem_annulus}
+\leanok
+\uses{def:daub-annulus, def:daub-symbol-product}
+For every $x \in \R$ with $x \neq 0$, $|\operatorname{sinc} x| \leq 1/|x|$. For all
+$N, n \in \N$ and every $\xi \in A_n$,
+$\operatorname{sinc}(\pi\xi)^{2N} \leq (4/(\pi 2^n))^{2N}$, and for every Daubechies mask of
+order $N$
+\[
+  |\Phi(\xi)|^2 \leq \exp\Bigl(\binom{2N-1}{N} \frac{\pi^2}{12}\Bigr)
+  \Bigl(\frac{4}{\pi 2^n}\Bigr)^{2N} \prod_{j<n} P\Bigl(\frac{\xi}{2^{j+1}}\Bigr) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-symbol-product-bound, lem:daub-growth-integrals}
+$|\sin x| \leq 1$, and $\pi |\xi| > \pi 2^n/4$ on $A_n$. Since $|\xi| \leq 2^n/2$ on $A_n$,
+\Cref{prop:daub-symbol-product-bound} applies, and the finite product is nonnegative
+(\Cref{lem:daub-growth-integrals}).
+\end{proof}
+
+\begin{proposition}[$|\Phi|^2$ on the annuli]
+\label{prop:daub-annulus-integral}
+\lean{Daubechies.integral_annulus_normSq_le}
+\leanok
+\uses{def:daub-annulus, def:daub-symbol-product, def:daub-transfer-growth}
+Let $\lambda, C$ be a growth bound for the transfer operator of order $N$. Then for every
+Daubechies mask of order $N$ and every $n \in \N$,
+\[
+  \int_{A_n} |\Phi(\xi)|^2 \, d\xi
+  \leq \exp\Bigl(\binom{2N-1}{N} \frac{\pi^2}{12}\Bigr)
+  \Bigl(\frac{4}{\pi 2^n}\Bigr)^{2N} C \lambda^n .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-sinc-annulus, lem:daub-growth-integrals, thm:daub-symbol-product-continuous}
+Both sides of the bound of \Cref{lem:daub-sinc-annulus} are continuous
+(\Cref{thm:daub-symbol-product-continuous,lem:daub-growth-integrals}); integrate it over
+$A_n \subseteq [-2^n/2, 2^n/2]$ and apply \Cref{lem:daub-growth-integrals}.
+\end{proof}
+
+Since $(4/(\pi 2^n))^{2N} = (4/\pi)^{2N} 4^{-Nn}$, these bounds decay geometrically in $n$, with
+the ratio $\lambda/4^N$.
+
+\begin{lemma}[Weights on the annuli]
+\label{lem:daub-weights}
+\lean{Daubechies.rpow_le_four_rpow_abs_mul, Daubechies.one_add_abs_rpow_le_of_mem_annulus,
+  Daubechies.four_div_pi_mul_two_pow_pow, Daubechies.two_rpow_two_mul_mul_lt}
+\leanok
+\uses{def:daub-annulus}
+The following hold.
+\begin{enumerate}
+  \item If $x, y \in \R$ satisfy $y > 0$ and $y/4 \leq x \leq 4y$, then $x^t \leq 4^{|t|} y^t$ for
+    every $t \in \R$.
+  \item For every $t \in \R$, every $n \in \N$ and every $\xi \in A_n$,
+    $(1 + |\xi|)^t \leq 4^{|t|} (2^t)^n$.
+  \item For all $N, n \in \N$, $(4/(\pi 2^n))^{2N} = (4/\pi)^{2N}/(4^N)^n$.
+  \item If $N \in \N$ and $\lambda, s \in \R$ satisfy $\lambda > 0$ and
+    $s < N - \log_4 \lambda$, then $2^{2s} \lambda < 4^N$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+Item~1 follows from $x \leq 4y$ for $t \geq 0$ and from $y/4 \leq x$ for $t \leq 0$. Item~2 is
+item~1 with $y = 2^n$, since $2^n/4 \leq 1 + |\xi| \leq 4 \cdot 2^n$ on $A_n$. Item~3 is
+$(2^n)^{2N} = (4^N)^n$, and item~4 says $\lambda < 4^{N-s} = 4^N/2^{2s}$.
+\end{proof}
+
+\begin{lemma}[Splitting a product of powers]
+\label{lem:daub-weight-split}
+\lean{Daubechies.rpow_mul_le_rpow_add_rpow_mul_sq}
+\leanok
+For every $x > 0$, every $c \geq 0$ and all $a, b \in \R$,
+$x^a c \leq x^{2(a-b)} + x^{2b} c^2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+With $u = x^{a-b}$ and $v = x^b c$, $x^a c = uv \leq 2uv \leq u^2 + v^2$.
+\end{proof}
+
+\begin{theorem}[Weighted $L_2$ decay of the symbol product]
+\label{thm:daub-decay-l2}
+\lean{Daubechies.integrable_rpow_mul_normSq}
+\leanok
+\uses{def:daub-symbol-product, def:daub-transfer-growth}
+Let $\lambda, C$ be a growth bound for the transfer operator of order $N$. Then for every
+Daubechies mask of order $N$ and every $s \in \R$ with $s < N - \log_4 \lambda$, the function
+$\xi \mapsto (1 + |\xi|)^{2s} |\Phi(\xi)|^2$ is integrable on $\R$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-weights, prop:daub-annulus-integral, lem:daub-annulus-integrable,
+  thm:daub-symbol-product-continuous}
+On $A_n$ the weight is at most $4^{|2s|} (2^{2s})^n$ (\Cref{lem:daub-weights}), so by
+\Cref{prop:daub-annulus-integral} the integral over $A_n$ is at most a constant times
+$(2^{2s} \lambda/4^N)^n$, and $2^{2s} \lambda/4^N < 1$ (\Cref{lem:daub-weights}). The function is
+continuous (\Cref{thm:daub-symbol-product-continuous}); apply \Cref{lem:daub-annulus-integrable}.
+\end{proof}
+
+\begin{theorem}[Weighted $L_1$ decay of the symbol product]
+\label{thm:daub-decay-l1}
+\lean{Daubechies.integrable_rpow_mul_norm}
+\leanok
+\uses{def:daub-symbol-product, def:daub-transfer-growth}
+Let $\lambda, C$ be a growth bound for the transfer operator of order $N$. Then for every
+Daubechies mask of order $N$ and every $a \in \R$ with $a < N - \log_4 \lambda - \frac12$, the
+function $\xi \mapsto (1 + |\xi|)^a |\Phi(\xi)|$ is integrable on $\R$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-weight-split, thm:daub-decay-l2, thm:daub-symbol-product-continuous}
+Choose $b$ with $a + \frac12 < b < N - \log_4 \lambda$. By \Cref{lem:daub-weight-split},
+\[
+  (1 + |\xi|)^a |\Phi(\xi)| \leq (1 + |\xi|)^{-2(b - a)} + (1 + |\xi|)^{2b} |\Phi(\xi)|^2 ,
+\]
+where the first summand is integrable since $2(b - a) > 1$, and the second by
+\Cref{thm:daub-decay-l2}. The function on the left is continuous
+(\Cref{thm:daub-symbol-product-continuous}).
+\end{proof}
+
+\begin{corollary}[The symbol product is integrable and square integrable]
+\label{cor:daub-symbol-product-integrable}
+\lean{Daubechies.integrable_symbolProduct, Daubechies.memLp_symbolProduct_two}
+\leanok
+\uses{def:daub-symbol-product}
+For every Daubechies mask of order $N \geq 2$ the symbol product $\Phi$ is integrable and square
+integrable on $\R$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-crude-growth, thm:daub-decay-l1, thm:daub-decay-l2}
+The crude growth bound has $\log_4 \lambda < N - \frac12$ (\Cref{prop:daub-crude-growth}); take
+$a = 0$ in \Cref{thm:daub-decay-l1} and $s = 0$ in \Cref{thm:daub-decay-l2}.
+\end{proof}
+
+\paragraph{Orders two and three.}
+For $N = 2$ and $N = 3$ the transfer operator has eigenfunctions among the trigonometric
+polynomials, and $T^n 1$ is known exactly. In the variable $y = \sin^2(\pi\xi/2)$ every
+eigenvalue equation becomes a polynomial identity in $y$.
+
+\begin{lemma}[Linearity of the iterates and eigenfunctions]
+\label{lem:daub-transfer-eigen}
+\lean{Daubechies.iterate_transfer_add, Daubechies.iterate_transfer_smul,
+  Daubechies.iterate_transfer_eq_pow_smul}
+\leanok
+\uses{def:daub-transfer}
+For all $N, n \in \N$, all $g, g_1, g_2 : \R \to \R$ and every $c \in \R$,
+$T^n (g_1 + g_2) = T^n g_1 + T^n g_2$ and $T^n (c g) = c \, T^n g$. If $e : \R \to \R$ and
+$\mu \in \R$ satisfy $T e = \mu e$, then $T^n e = \mu^n e$ for every $n \in \N$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Induction on $n$, since $T$ is linear (\Cref{def:daub-transfer}).
+\end{proof}
+
+\begin{lemma}[The variable $y$]
+\label{lem:daub-transfer-sin-sq}
+\lean{Daubechies.transfer_eq_eval_sin_sq, Daubechies.cos_two_pi_mul_div_two,
+  Daubechies.cos_two_pi_mul_add_one_div_two, Daubechies.cos_two_pi_mul_eq_sin_sq}
+\leanok
+\uses{def:daub-transfer, def:daub-poly}
+Let $\xi \in \R$ and $y = \sin^2(\pi\xi/2)$. For every $N \in \N$ and every $g : \R \to \R$,
+\[
+  (T g)(\xi) = P_N(y) \, g\Bigl(\frac{\xi}{2}\Bigr)
+    + P_N(1 - y) \, g\Bigl(\frac{\xi + 1}{2}\Bigr) ,
+\]
+and $\cos \pi\xi = 1 - 2y$, $\cos(\pi(\xi + 1)) = 2y - 1$ and $\cos 2\pi\xi = 1 - 8y(1 - y)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-fun-symmetry}
+$P(\xi/2) = P_N(y)$ and
+$P((\xi + 1)/2) = P(\xi/2 + \frac12) = P_N(\cos^2(\pi\xi/2)) = P_N(1 - y)$
+(\Cref{lem:daub-fun-symmetry}). The double angle formulas give $\cos \pi\xi = 1 - 2y$ and
+$\cos 2\pi\xi = 1 - 2 \sin^2 \pi\xi = 1 - 8y(1 - y)$, and $\cos(\pi\xi + \pi) = -\cos \pi\xi$.
+\end{proof}
+
+\begin{proposition}[Order two]
+\label{prop:daub-transfer-two}
+\lean{Daubechies.transfer_two_one, Daubechies.iterate_transfer_two_one,
+  Daubechies.transferGrowth_two, Daubechies.two_sub_logb_four_four}
+\leanok
+\uses{def:daub-transfer-growth}
+For $N = 2$, $T 1 = 4$ and $T^n 1 = 4^n$ for every $n \in \N$. The numbers $\lambda = 4$ and
+$C = 1$ form a growth bound for the transfer operator of order $2$, and $2 - \log_4 4 = 1$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-transfer-sin-sq, lem:daub-transfer-eigen, def:daub-poly}
+$P_2(y) = 1 + 2y$ (\Cref{def:daub-poly}), so $(T 1)(\xi) = (1 + 2y) + (1 + 2(1 - y)) = 4$ by
+\Cref{lem:daub-transfer-sin-sq}. Then \Cref{lem:daub-transfer-eigen} with $e = 1$ and $\mu = 4$.
+\end{proof}
+
+\begin{proposition}[Eigenfunctions of order three]
+\label{prop:daub-transfer-three-eigen}
+\lean{Daubechies.transfer_three_eigen_one, Daubechies.transfer_three_eigen_two}
+\leanok
+\uses{def:daub-transfer}
+Let $N = 3$ and $c(\xi) = \cos 2\pi\xi$. Then
+\[
+  T (9 + c) = 9 \, (9 + c) \quad\text{and}\quad T (1 + 3c) = -4 \, (1 + 3c) .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-transfer-sin-sq, def:daub-poly}
+$P_3(y) = 1 + 3y + 6y^2$ (\Cref{def:daub-poly}). By \Cref{lem:daub-transfer-sin-sq}, at $\xi$
+both sides of the first identity equal $90 - 72 y(1 - y)$ and both sides of the second equal
+$-16 + 96 y(1 - y)$, where $y = \sin^2(\pi\xi/2)$.
+\end{proof}
+
+\begin{proposition}[Order three]
+\label{prop:daub-transfer-three}
+\lean{Daubechies.iterate_transfer_three_one, Daubechies.iterate_transfer_three_one_le,
+  Daubechies.transferGrowth_three, Daubechies.three_sub_logb_four_nine}
+\leanok
+\uses{def:daub-transfer-growth}
+For $N = 3$, every $n \in \N$ and every $\xi \in \R$,
+\[
+  (T^n 1)(\xi) = \frac{3}{26} \, 9^n (9 + \cos 2\pi\xi)
+    - \frac{1}{26} \, (-4)^n (1 + 3 \cos 2\pi\xi) ,
+\]
+and $(T^n 1)(\xi) \leq \frac{17}{13} \, 9^n$. The numbers $\lambda = 9$ and $C = 2$ form a
+growth bound for the transfer operator of order $3$, and $3 - \log_4 9 = 3 - \log_2 3$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-transfer-three-eigen, lem:daub-transfer-eigen}
+$1 = \frac{3}{26} (9 + c) - \frac{1}{26} (1 + 3c)$; apply \Cref{lem:daub-transfer-eigen} with the
+eigenfunctions of \Cref{prop:daub-transfer-three-eigen}. Then $9 + \cos 2\pi\xi \leq 10$ and
+$|(-4)^n (1 + 3 \cos 2\pi\xi)| \leq 4 \cdot 9^n$ give
+$T^n 1 \leq (\frac{30}{26} + \frac{4}{26}) \, 9^n$. Finally
+$\log_4 9 = \log 3^2 / \log 2^2 = \log_2 3$.
+\end{proof}
+
+By \Cref{thm:daub-decay-l2}, $\int_\R (1 + |\xi|)^{2s} |\Phi(\xi)|^2 \, d\xi < \infty$ for every
+Daubechies mask of order $2$ and every $s < 1$, and for every Daubechies mask of order $3$ and
+every $s < 3 - \log_2 3 \approx 1.415$.
+
 \section{Fourier transforms of integrable functions}
 
 This section is general analysis on $\R$, used for the scaling function

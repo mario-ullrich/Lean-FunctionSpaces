@@ -37,6 +37,13 @@ public import FunctionSpaces.Wavelets.Examples.Alpert
 public import FunctionSpaces.Wavelets.Daubechies.DaubechiesPolynomial
 public import FunctionSpaces.Wavelets.Daubechies.FourierIntegrable
 public import FunctionSpaces.Wavelets.Daubechies.FejerRiesz
+public import FunctionSpaces.Wavelets.Daubechies.Mask
+public import FunctionSpaces.Wavelets.Daubechies.FilterIdentities
+public import FunctionSpaces.Wavelets.Daubechies.D4
+public import FunctionSpaces.Wavelets.Daubechies.SymbolProduct
+public import FunctionSpaces.Wavelets.Daubechies.TransferOperator
+public import FunctionSpaces.Wavelets.Daubechies.SymbolDecay
+public import FunctionSpaces.Wavelets.Daubechies.TransferExamples
 public import FunctionSpaces.Torus.Translation
 public import FunctionSpaces.Torus.Modulus
 public import FunctionSpaces.Torus.BesovModuli
@@ -207,6 +214,27 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Wavelets.Daubechies.FejerRiesz`: the Fejér–Riesz theorem: a real polynomial `Q`
   positive on `[-1, 1]` satisfies `Q(cos θ) = |L(e^{iθ})|²` for a real polynomial `L` without zeros
   in the closed unit disk.
+* `FunctionSpaces.Wavelets.Daubechies.Mask`: the point `e^{-2πiξ}` of the unit circle, masks of
+  order `N` (a real polynomial `L` of degree `< N` with `L(1) = 1` and
+  `|L(e^{-2πiξ})|² = P_N(sin²(πξ))`), the mask polynomial, the filter coefficients and the symbol
+  `m_0` with the quadrature mirror filter identity.
+* `FunctionSpaces.Wavelets.Daubechies.FilterIdentities`: identities of the filter coefficients:
+  orthogonality of the even shifts, the sum rules, parity sums and first moments, the vanishing
+  derivatives of the symbol at the half-integers, and the dual filter of the wavelet.
+* `FunctionSpaces.Wavelets.Daubechies.D4`: the Daubechies mask D4 of order `2` and its four filter
+  coefficients.
+* `FunctionSpaces.Wavelets.Daubechies.SymbolProduct`: the infinite product
+  `Φ(ξ) = ∏_{j ≥ 0} m_0(ξ/2^(j+1))`: convergence, continuity, the two-scale relation, zeros, and
+  `|Φ(ξ)|² = sinc(πξ)^(2N) ∏_j P(ξ/2^(j+1))` through Viète's cosine product.
+* `FunctionSpaces.Wavelets.Daubechies.TransferOperator`: the transfer operator
+  `T g(ξ) = P(ξ/2) g(ξ/2) + P((ξ+1)/2) g((ξ+1)/2)`, its adjoint identity, the integrals of the
+  dyadic products of `P` as integrals of `T^n 1`, and growth bounds.
+* `FunctionSpaces.Wavelets.Daubechies.SymbolDecay`: the decay of `Φ` on dyadic annuli:
+  `(1 + |ξ|)^(2s) |Φ|²` is integrable for `s < N - log₄ λ` and `(1 + |ξ|)^a |Φ|` for
+  `a < N - log₄ λ - 1/2` when `T^n 1 ≤ C λ^n`; `Φ ∈ L¹ ∩ L²` for `N ≥ 2`.
+* `FunctionSpaces.Wavelets.Daubechies.TransferExamples`: the transfer operator for `N = 2`
+  (`T 1 = 4`) and `N = 3` (eigenvalues `9` and `-4`), with the growth rates `4` and `9` and the
+  exponents `1` and `3 - log₂ 3`.
 * `FunctionSpaces.Torus.Translation`: translations on `L_2(𝕋^d)` and their Fourier
   multipliers.
 * `FunctionSpaces.Torus.Modulus`: the modulus of smoothness `ω(f, t)_2`, the growth of the
