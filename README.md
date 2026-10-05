@@ -11,6 +11,9 @@ under [`docs/`](docs/), listed under [What is formalised](#what-is-formalised).
   <https://mario-ullrich.github.io/Lean-FunctionSpaces/blueprint.pdf>
 * **Dependency graph**:
   <https://mario-ullrich.github.io/Lean-FunctionSpaces/dep_graph_document.html>
+* **PDF and dependency graph as images**, built from the latest commit on `main` and shown by
+  GitHub itself: branch
+  [`blueprint-build`](https://github.com/mario-ullrich/Lean-FunctionSpaces/tree/blueprint-build)
 
 ## The setting
 
@@ -262,8 +265,10 @@ leanblueprint web          # blueprint/web/index.html and the dependency graph
 python blueprint/scripts/check_lean_decls.py   # checks that every \lean{Decl} resolves
 ```
 
-GitHub Actions builds the project and the blueprint on every push to `main`, and deploys
-the blueprint to GitHub Pages. Neither output is committed.
+GitHub Actions builds the project and the blueprint on every push to `main`, deploys the
+blueprint to GitHub Pages, and puts the PDF and the dependency graphs as SVG images on the
+branch `blueprint-build`, replacing its single commit each time. `main` holds no build
+output. `node blueprint/scripts/dep_graph_svg.js` draws the images from a local web build.
 
 ## AI assistance
 

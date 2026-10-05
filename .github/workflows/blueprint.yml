@@ -1,5 +1,5 @@
 # Builds the Lean project and the leanblueprint, then publishes the result
-# two ways:
+# three ways:
 #
 #   * GitHub Pages (public repository): the rendered blueprint is deployed to
 #     https://<owner>.github.io/Lean-FunctionSpaces/ with the PDF at
@@ -7,9 +7,13 @@
 #     While the repository is private, the deploy job is skipped (Pages is
 #     unavailable on the free plan for private repositories).
 #
+#   * Branch `blueprint-build` (always): the PDF and the dependency graphs as
+#     SVG images, which GitHub shows in the browser, also in a private
+#     repository.
+#
 #   * Workflow artifact (always): `blueprint-YYYYMMDD` is downloadable from
-#     every run summary under the Actions tab. It contains the PDF and the
-#     web pages.
+#     every run summary under the Actions tab. It contains the PDF, the
+#     graph images and the web pages.
 
 name: Build blueprint
 
@@ -24,6 +28,8 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      artifact: ${{ steps.stamp.outputs.name }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v5
@@ -122,6 +128,14 @@ jobs:
         run: |
           sed -i 's/#A3D6FF/#FFFFFF/g; /<dt>Orange border<\/dt>/d; /<dt>Blue border<\/dt>/d; /<dt>Blue background<\/dt>/d' blueprint/web/dep_graph_document.html blueprint/web/dep_graph_grouped.html
 
+      # Draw both graphs as SVG images, dep_graph.svg and dep_graph_grouped.svg,
+      # with the pages' own Graphviz build run under Node, so that they show the
+      # same pictures as the pages. GitHub displays them, also while the
+      # repository is private; the job publish-files puts them on a branch. The
+      # script's comments have the details.
+      - name: Draw the dependency graphs as SVG images
+        run: node blueprint/scripts/dep_graph_svg.js
+
       # Point the `\lean{...}` links at this repository. leanblueprint builds
       # them as `{dochome}/find/#doc/Decl` and, with no `\dochome` set, falls
       # back to Mathlib's documentation site, where none of this project's
@@ -170,6 +184,56 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: blueprint/web
+
+  # ----- Put the PDF and the two graph images on the branch `blueprint-build`.
+  # GitHub shows PDF and SVG files in the browser, also in a private repository,
+  # where Pages (the web pages and the interactive graph) is unavailable on the
+  # free plan. The branch holds a single commit, replaced on every run, so the
+  # repository does not grow with each build; its README names the commit of
+  # `main` it was built from. Without a PDF (its build step may fail) the job
+  # stops, and the branch keeps the previous version.
+  publish-files:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: blueprint-build
+      cancel-in-progress: false
+    steps:
+      - name: Download the blueprint artifact
+        uses: actions/download-artifact@v5
+        with:
+          name: ${{ needs.build.outputs.artifact }}
+          path: site
+
+      - name: Push the PDF and the graph images to blueprint-build
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir out
+          cp site/blueprint.pdf site/dep_graph.svg site/dep_graph_grouped.svg out/
+          cd out
+          cat > README.md <<EOF
+          # Blueprint of ${GITHUB_REPOSITORY#*/}
+
+          Built by GitHub Actions on $(date -u +%Y-%m-%d) from commit
+          [${GITHUB_SHA::7}](https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}) of main.
+
+          * [blueprint.pdf](blueprint.pdf): the blueprint
+          * [dep_graph.svg](dep_graph.svg): the dependency graph
+          * [dep_graph_grouped.svg](dep_graph_grouped.svg): the same graph, grouped into the
+            blocks of the README
+
+          GitHub shows the images scaled to the window; *Raw* opens them at full size.
+          EOF
+          git init -q -b blueprint-build
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Blueprint of ${GITHUB_SHA::7}"
+          git push -q --force "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" blueprint-build
 
   # ----- Deploy the rendered blueprint to GitHub Pages. Skipped while the
   # repository is private; once it is public, the next push to main (or a
