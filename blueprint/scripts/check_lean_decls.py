@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Check that every declaration the blueprint cites exists in the compiled project.
 
-Every ``\\lean{Decl}`` tag in ``blueprint/src/content.tex`` names a Lean
-declaration.  This script collects those names, writes a Lean file that imports
+Every ``\\lean{Decl}`` tag in ``blueprint/src/content.tex``, and in the files it
+includes with ``\\input``, names a Lean declaration.  This script collects those names, writes a Lean file that imports
 the root module of each library of the project, and asks Lean whether the
 resulting environment contains each name.  A blueprint citing a declaration that
 the project no longer has is wrong, so a missing name fails the run.
@@ -34,6 +34,15 @@ ROOTS = ["ApproximationSpaces", "FunctionSpaces"]
 CHECK_FILE = Path(".lake/check_lean_decls.lean")
 
 LEAN_TAG = re.compile(r"\\lean\{([^}]*)\}")
+INPUT_TAG = re.compile(r"\\input\{([^}]*)\}")
+
+
+def read_tex(path: Path) -> str:
+    """The text of `path`, each input command replaced by the text of the file it names."""
+    text = path.read_text(encoding="utf-8")
+    return INPUT_TAG.sub(
+        lambda m: read_tex(path.parent / (m.group(1).strip().removesuffix(".tex") + ".tex")),
+        text)
 
 
 def cited_names(tex: str) -> list[str]:
@@ -62,7 +71,7 @@ run_cmd do
 
 
 def main() -> int:
-    names = cited_names(CONTENT.read_text(encoding="utf-8"))
+    names = cited_names(read_tex(CONTENT))
     if not names:
         print(f"no \\lean tag found in {CONTENT}", file=sys.stderr)
         return 1

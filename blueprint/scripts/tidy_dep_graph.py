@@ -51,7 +51,8 @@ from pathlib import Path
 
 # The blocks, in the order in which their frames are emitted. Each entry is the frame's title
 # and the chapters it holds; a chapter given as (chapter, [sections]) contributes only those
-# sections. The titles are those of `blueprint/src/content.tex`.
+# sections. The titles are those of `blueprint/src/content.tex` and of the files it includes
+# with `\input`.
 R_D = r"Function spaces on $\R^d$"
 INTERVALS = "Polynomial approximation on intervals"
 BLOCKS: list[tuple[str, list]] = [
@@ -104,6 +105,7 @@ BLOCKS: list[tuple[str, list]] = [
                "Traces on bounded Lipschitz domains"])]),
     ("Compact manifolds", ["Besov spaces on compact manifolds"]),
     ("Dominating mixed smoothness", [r"Dominating mixed smoothness on $\R^d$"]),
+    ("Daubechies wavelets", ["Daubechies wavelets"]),
 ]
 
 # Columns of blocks: in each list, every block is placed below the one before it. Without
@@ -177,6 +179,15 @@ BACKSLASH = re.escape("\\")
 CHAPTER_RE = re.compile(BACKSLASH + r"chapter\{(.*)\}")
 SECTION_RE = re.compile(BACKSLASH + r"section\*?\{(.*)\}")
 LABEL_RE = re.compile(BACKSLASH + r"label\{([^}]+)\}")
+INPUT_RE = re.compile(BACKSLASH + r"input\{([^}]*)\}")
+
+
+def read_tex(path: Path) -> str:
+    """The text of `path`, each input command replaced by the text of the file it names."""
+    text = path.read_text(encoding="utf-8")
+    return INPUT_RE.sub(
+        lambda m: read_tex(path.parent / (m.group(1).strip().removesuffix(".tex") + ".tex")),
+        text)
 
 
 def statements(body: str) -> list[str]:
@@ -357,7 +368,7 @@ def main() -> int:
         nodes.setdefault(v, {})
 
     # Chapter, section and block of every node.
-    places = node_places(Path(args.tex).read_text(encoding="utf-8"))
+    places = node_places(read_tex(Path(args.tex)))
     block: dict[str, int] = {}
     unplaced = []
     for n in nodes:

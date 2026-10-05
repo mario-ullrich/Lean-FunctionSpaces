@@ -102,6 +102,16 @@
 \AtEndEnvironment{remark}{\bp@leanflush}
 \makeatother
 
+% Room after every statement and more after every proof, so that what follows starts
+% clearly apart.
+\AfterEndEnvironment{theorem}{\medskip}
+\AfterEndEnvironment{proposition}{\medskip}
+\AfterEndEnvironment{lemma}{\medskip}
+\AfterEndEnvironment{corollary}{\medskip}
+\AfterEndEnvironment{definition}{\medskip}
+\AfterEndEnvironment{remark}{\medskip}
+\AfterEndEnvironment{proof}{\bigskip}
+
 % --- notation -------------------------------------------------------------
 \newcommand{\Besov}[3]{B^{#1}_{#2,#3}}
 \newcommand{\Sob}[2]{W^{#1}_{#2}}
