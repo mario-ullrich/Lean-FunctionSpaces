@@ -97,8 +97,20 @@ jobs:
       - name: Build blueprint web
         run: leanblueprint web
 
-      # Tidy the dependency graph. plastexdepgraph exposes no options for
-      # this, so we post-process the generated page:
+      # Thin out the dependency graph: the helper lemmas (used by one result of
+      # their chapter) are left out with their arrows passed through, all edges
+      # are solid, and the source is sorted, so that every build lays the graph
+      # out the same way. A second page, dep_graph_grouped.html, shows the same
+      # graph with frames for the blocks of the project (those of the README,
+      # some split into parts), stacked in columns; each page links to the
+      # other. Both zoom further in than d3-graphviz's default allows. The
+      # script's docstring has the details, and it fails if a node falls in no
+      # block.
+      - name: Thin out the dependency graph and add a grouped version
+        run: python blueprint/scripts/tidy_dep_graph.py
+
+      # Tidy both dependency-graph pages. plastexdepgraph exposes no options
+      # for this, so we post-process the generated pages:
       #   * Recolor the "ready to formalize" nodes from blue (#A3D6FF) to white,
       #     so the graph reads two-tone: green = proof formalized, white = the
       #     statement is formalized (green border) but the proof is still a `sorry`.
@@ -108,7 +120,7 @@ jobs:
       #     already explains a stated-but-unproved node).
       - name: Tidy dependency graph (recolor sorry-nodes white, drop unused legend rows)
         run: |
-          sed -i 's/#A3D6FF/#FFFFFF/g; /<dt>Orange border<\/dt>/d; /<dt>Blue border<\/dt>/d; /<dt>Blue background<\/dt>/d' blueprint/web/dep_graph_document.html
+          sed -i 's/#A3D6FF/#FFFFFF/g; /<dt>Orange border<\/dt>/d; /<dt>Blue border<\/dt>/d; /<dt>Blue background<\/dt>/d' blueprint/web/dep_graph_document.html blueprint/web/dep_graph_grouped.html
 
       # Point the `\lean{...}` links at this repository. leanblueprint builds
       # them as `{dochome}/find/#doc/Decl` and, with no `\dochome` set, falls
