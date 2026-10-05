@@ -30,6 +30,16 @@ div.proof_content {
 	border-left: .08rem solid grey;
 }
 
+/* Room after every statement and more after every proof, so that what follows starts
+   clearly apart. */
+div[class*="_thmwrapper"] {
+	margin-bottom: 1rem;
+}
+
+div.proof_wrapper {
+	margin-bottom: 2.5rem;
+}
+
 /* Smaller dependency-graph legend, with tighter colon spacing and a little
    more separation between entries. */
 #Legend dl.legend {

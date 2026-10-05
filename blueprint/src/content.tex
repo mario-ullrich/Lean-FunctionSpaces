@@ -8693,6 +8693,189 @@ functions with a finite intrinsic norm on $\Omega$ are the restrictions of such 
 and the boundary traces agree almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}).
 \end{proof}
 
+\chapter{Triebel--Lizorkin spaces}
+\label{ch:triebel-lizorkin}
+
+Besov quasi-norms take the $L_p$ norm of every Littlewood--Paley block and then the $\ell_q$ norm
+over the levels. Triebel--Lizorkin quasi-norms take the two norms in the other order: the $\ell_q$
+norm over the levels at every point, and then the $L_p$ norm. This chapter starts with the
+comparison of the two mixed norms on an arbitrary measure space.
+
+\section{Mixed norms}
+
+Throughout this section $(X, \mu)$ is a measure space, $I$ a countable set, and
+$g = (g_i)_{i \in I}$ a family of measurable functions $g_i : X \to [0, \infty]$. The two mixed
+norms of $g$ are
+\[
+  \|g\|_{L_p(\ell_q)} = \Bigl\| x \mapsto \|(g_i(x))_{i \in I}\|_{\ell_q} \Bigr\|_{L_p},
+  \qquad
+  \|g\|_{\ell_q(L_p)} = \bigl\| (\|g_i\|_{L_p})_{i \in I} \bigr\|_{\ell_q},
+\]
+with the $\ell_q$ norm of \Cref{def:lq-norm}. All functions take values in $[0, \infty]$, so
+every integral, series and norm has a value and no integrability conditions appear.
+
+\begin{lemma}[{Homogeneity, powers and measurability in $[0, \infty]$}]
+\label{lem:lp-norm-nonnegative}
+\lean{MeasureTheory.eLpNorm_const_mul_ennreal, MeasureTheory.eLpNorm_rpow_eq_lintegral,
+  MeasureTheory.eLpNorm_fun_rpow, ENNReal.lqNorm_fun_rpow, MeasureTheory.aemeasurable_lqNorm_comp}
+\leanok
+\uses{def:lq-norm}
+For every measurable $h : X \to [0, \infty]$, every $c \in [0, \infty]$, every
+$p \in [0, \infty]$ and every $r > 0$,
+\[
+  \|c h\|_p = c \, \|h\|_p, \qquad \|h^r\|_p = \|h\|_{pr}^r,
+\]
+and $\|h\|_p^p = \int h^p \, d\mu$ if $0 < p < \infty$.
+
+For every family $a$ in $[0, \infty]$ indexed by $I$, every $u \in [0, \infty]$ and every
+$r > 0$, $\|(a_i^r)_i\|_{\ell_u} = \|a\|_{\ell_{ur}}^r$.
+
+For every $q \in [0, \infty]$ the function $x \mapsto \|(g_i(x))_i\|_{\ell_q}$ is measurable.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $0 < p < \infty$ the norm is $(\int h^p)^{1/p}$, and constants leave the integral; for
+$p = \infty$ the essential supremum is homogeneous. The power rule is Mathlib's
+\texttt{eLpNorm\_enorm\_rpow}, and for the counting measure on $I$ it is the statement on
+$\ell_u$ norms. The pointwise $\ell_q$ norm is a countable supremum for $q = \infty$ and the
+$1/q$-th power of a series of measurable functions for $0 < q < \infty$.
+\end{proof}
+
+\begin{lemma}[Monotone convergence and Minkowski's inequality for series in $L_p$]
+\label{lem:lp-series-minkowski}
+\lean{MeasureTheory.eLpNorm_iSup_of_directed, MeasureTheory.eLpNorm_tsum_le}
+\leanok
+\uses{lem:lp-norm-nonnegative}
+For every countable directed family $(F_b)_b$ of measurable functions $F_b : X \to [0, \infty]$
+and every $p \in [0, \infty]$,
+$\|\sup_b F_b\|_p = \sup_b \|F_b\|_p$. For every $1 \leq p \leq \infty$,
+\[
+  \Bigl\| \sum_{i \in I} g_i \Bigr\|_p \leq \sum_{i \in I} \|g_i\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $0 < p < \infty$, $\|\sup_b F_b\|_p^p = \int \sup_b F_b^p = \sup_b \int F_b^p$ by the
+monotone convergence theorem for directed families; for $p = \infty$, almost everywhere
+$F_b \leq \|F_b\|_\infty$ for all $b$ at once, since there are countably many. The series is the
+supremum of its finite partial sums, a directed family, and Minkowski's inequality bounds the
+norm of each partial sum by $\sum_{i \in I} \|g_i\|_p$.
+\end{proof}
+
+\begin{lemma}[Minkowski's integral inequality for $\ell_u$-valued functions]
+\label{lem:minkowski-integral-lq}
+\lean{ENNReal.rpow_eq_mul_rpow_sub_one, ENNReal.le_rpow_sum_rpow,
+  MeasureTheory.sum_rpow_lintegral_le_mul, MeasureTheory.rpow_sum_rpow_lintegral_le,
+  MeasureTheory.lqNorm_lintegral_le}
+\leanok
+\uses{def:lq-norm}
+For every $1 \leq u \leq \infty$,
+\[
+  \Bigl\| \Bigl( \int_X g_i \, d\mu \Bigr)_{i \in I} \Bigr\|_{\ell_u}
+  \leq \int_X \|(g_i(x))_{i \in I}\|_{\ell_u} \, d\mu(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $u = 1$ both sides are equal by Tonelli's theorem, and for $u = \infty$ the supremum of the
+integrals is at most the integral of the supremum. Let $1 < u < \infty$ with conjugate exponent
+$u'$, let $S \subseteq I$ be finite, $a_i = \int g_i$ and $T = \sum_{i \in S} a_i^u$. Then
+\[
+  T = \sum_{i \in S} a_i \, a_i^{u-1}
+  = \int \sum_{i \in S} g_i(x) \, a_i^{u-1} \, d\mu(x)
+  \leq \int \Bigl( \sum_{i \in S} g_i^u \Bigr)^{1/u} d\mu \cdot T^{1/u'}
+\]
+by H\"older's inequality at every point, since $(u - 1) u' = u$. If $0 < T < \infty$, dividing by
+$T^{1/u'}$ gives $T^{1/u} \leq \int (\sum_{i \in S} g_i^u)^{1/u}$; if $T = \infty$, some $a_i$ is
+infinite and so is the right side, because $g_i \leq (\sum_{j \in S} g_j^u)^{1/u}$. The right side
+is at most $\int \|(g_i)_i\|_{\ell_u}$, and the supremum over $S$ gives the claim.
+\end{proof}
+
+\begin{theorem}[Comparison of mixed norms]
+\label{thm:mixed-norms}
+\lean{MeasureTheory.eLpNorm_lqNorm_eq_lqNorm_eLpNorm,
+  MeasureTheory.lqNorm_eLpNorm_le_eLpNorm_lqNorm, MeasureTheory.eLpNorm_lqNorm_le_lqNorm_eLpNorm}
+\leanok
+\uses{lem:lp-norm-nonnegative, lem:lp-series-minkowski, lem:minkowski-integral-lq,
+  lem:lq-basic}
+For every $0 < p < \infty$,
+$\|g\|_{L_p(\ell_p)} = \|g\|_{\ell_p(L_p)}$. For all $0 < p \leq q \leq \infty$,
+$\|g\|_{\ell_q(L_p)} \leq \|g\|_{L_p(\ell_q)}$. For all $0 < q \leq p < \infty$,
+$\|g\|_{L_p(\ell_q)} \leq \|g\|_{\ell_q(L_p)}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The $p$-th powers of both sides of the identity are $\sum_i \int g_i^p$, by Tonelli's theorem
+for series. For $p \leq q < \infty$ put $U = q/p \geq 1$; by \Cref{lem:lp-norm-nonnegative}
+\[
+  \|g\|_{\ell_q(L_p)}^p = \Bigl\| \Bigl( \int g_i^p \Bigr)_i \Bigr\|_{\ell_U}
+  \leq \int \|(g_i^p)_i\|_{\ell_U} = \|g\|_{L_p(\ell_q)}^p
+\]
+by \Cref{lem:minkowski-integral-lq}; for $q = \infty$ each $g_i$ is at most the pointwise
+supremum. For $q \leq p$ put $U = p/q \geq 1$; then
+\[
+  \|g\|_{L_p(\ell_q)}^q = \Bigl\| \sum_i g_i^q \Bigr\|_U \leq \sum_i \|g_i^q\|_U
+  = \sum_i \|g_i\|_p^q = \|g\|_{\ell_q(L_p)}^q
+\]
+by \Cref{lem:lp-series-minkowski}.
+\end{proof}
+
+\begin{corollary}[The mixed-norm sandwich]
+\label{cor:mixed-norm-sandwich}
+\lean{MeasureTheory.eLpNorm_lqNorm_le_lqNorm_min, MeasureTheory.lqNorm_max_le_eLpNorm_lqNorm,
+  MeasureTheory.eLpNorm_const_mul_enorm, MeasureTheory.eLpNorm_lqNorm_weighted_eq,
+  MeasureTheory.eLpNorm_lqNorm_weighted_le_min, MeasureTheory.lqNorm_max_weighted_le,
+  MeasureTheory.eLpNorm_lqNorm_dyadicWeight_eq, MeasureTheory.eLpNorm_lqNorm_dyadicWeight_le_min,
+  MeasureTheory.lqNorm_max_dyadicWeight_le}
+\leanok
+\uses{thm:mixed-norms, lem:lp-norm-nonnegative, lem:lq-basic}
+For all $1 \leq p < \infty$ and $1 \leq q \leq \infty$,
+\[
+  \|g\|_{\ell_{\max(p,q)}(L_p)} \leq \|g\|_{L_p(\ell_q)} \leq \|g\|_{\ell_{\min(p,q)}(L_p)} .
+\]
+For every normed group $E$, all measurable functions $u_j : X \to E$ and all weights
+$w_j \in [0, \infty]$, indexed by $j \in I$, the family $g_j = w_j \|u_j(\cdot)\|_E$ satisfies
+$\|g_j\|_p = w_j \|u_j\|_p$ for every $p$, the two inequalities above, and
+$\|g\|_{L_p(\ell_p)} = \|g\|_{\ell_p(L_p)}$ for $0 < p < \infty$. This holds in particular for
+$I = \N$ and the weights $w_j = 2^{js}$ with $s \in \R$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+For $p \leq q$ the lower bound is \Cref{thm:mixed-norms}, and the upper bound follows from the
+pointwise inequality $\|\cdot\|_{\ell_q} \leq \|\cdot\|_{\ell_p}$ of \Cref{lem:lq-basic} and the
+identity $L_p(\ell_p) = \ell_p(L_p)$. For $q \leq p$ the roles are exchanged. The weighted family
+is the case $g_j = w_j \|u_j(\cdot)\|_E$, by homogeneity (\Cref{lem:lp-norm-nonnegative}).
+\end{proof}
+
+With $u_j$ the Littlewood--Paley blocks of a function $f$ and $w_j = 2^{js}$, the corollary
+places the Triebel--Lizorkin quasi-norm between the Besov quasi-norms with $\ell_{\max(p,q)}$
+and $\ell_{\min(p,q)}$, with equality for $q = p$.
+
+\begin{lemma}[Limits of pointwise bounds]
+\label{lem:limits-of-pointwise-bounds}
+\lean{MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm}
+\leanok
+For every $0 < p \leq \infty$, all measurable $u, v : X \to [0, \infty]$ and every sequence of
+functions $w_J : X \to [0, \infty]$ with $u \leq v + w_J$ almost everywhere for every $J$ and
+$\|w_J\|_p \to 0$, we have $u \leq v$ almost everywhere.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The truncated difference $(u - v)_+$ is measurable and at most $w_J$ almost everywhere, so
+$\|(u - v)_+\|_p \leq \|w_J\|_p$ for every $J$. Hence $\|(u - v)_+\|_p = 0$, and $(u - v)_+ = 0$
+almost everywhere.
+\end{proof}
+
+This is how pointwise bounds pass to limits in $L_p$ for functions with values in
+$[0, \infty]$; Mathlib derives convergence in measure from convergence in $L_p$ for normed
+groups.
+
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
 

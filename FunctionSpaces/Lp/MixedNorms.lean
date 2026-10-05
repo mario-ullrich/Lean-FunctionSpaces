@@ -1,0 +1,519 @@
+/-
+Copyright (c) 2026 Mario Ullrich. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Mario Ullrich
+-/
+module
+
+public import ApproximationSpaces.Sequences.Lq
+public import FunctionSpaces.Lp.LintegralForm
+public import Mathlib.Analysis.MeanInequalities
+
+/-!
+# Mixed norms
+
+For a countable family of functions `g_i : α → [0, ∞]` on a measure space, the mixed norm
+`‖g‖_{L_p(ℓ_q)} = ‖ x ↦ ‖(g_i(x))_i‖_{ℓ_q} ‖_{L_p}` takes the `ℓ_q` norm at each point before
+the `L_p` norm, and `‖g‖_{ℓ_q(L_p)} = ‖(‖g_i‖_p)_i‖_{ℓ_q}` takes them in the other order.
+Triebel–Lizorkin spaces use the first, Besov spaces the second. This file compares the two:
+
+* `L_p(ℓ_p) = ℓ_p(L_p)` by Tonelli's theorem (`MeasureTheory.eLpNorm_lqNorm_eq_lqNorm_eLpNorm`);
+* `ℓ_q(L_p) ≤ L_p(ℓ_q)` for `0 < p ≤ q` (`MeasureTheory.lqNorm_eLpNorm_le_eLpNorm_lqNorm`) and
+  `L_p(ℓ_q) ≤ ℓ_q(L_p)` for `0 < q ≤ p < ∞` (`MeasureTheory.eLpNorm_lqNorm_le_lqNorm_eLpNorm`);
+* the sandwich `ℓ_{max(p,q)}(L_p) ≤ L_p(ℓ_q) ≤ ℓ_{min(p,q)}(L_p)`
+  (`MeasureTheory.lqNorm_max_le_eLpNorm_lqNorm`, `MeasureTheory.eLpNorm_lqNorm_le_lqNorm_min`),
+  and the same for the weighted families `w_j ‖u_j‖` of any functions `u_j` with values in a
+  normed group (`MeasureTheory.lqNorm_max_weighted_le`,
+  `MeasureTheory.eLpNorm_lqNorm_weighted_le_min`), such as the families `2^(js) ‖u_j‖` of
+  Littlewood–Paley blocks (`MeasureTheory.lqNorm_max_dyadicWeight_le`,
+  `MeasureTheory.eLpNorm_lqNorm_dyadicWeight_le_min`).
+
+The tools are power identities and homogeneity of `eLpNorm` in `[0, ∞]`, monotone convergence for
+`L_p` norms (`MeasureTheory.eLpNorm_iSup_of_directed`), Minkowski's inequality for series in `L_p`
+(`MeasureTheory.eLpNorm_tsum_le`) and Minkowski's integral inequality for `ℓ_u`-valued functions,
+`‖(∫ g_i)_i‖_{ℓ_u} ≤ ∫ ‖(g_i)_i‖_{ℓ_u}` (`MeasureTheory.lqNorm_lintegral_le`), proved by
+Hölder's inequality on finite sets. Finally, a pointwise bound `u ≤ v + w_J` with `‖w_J‖_p → 0`
+gives `u ≤ v` almost everywhere (`MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm`).
+-/
+
+@[expose] public section
+
+open Filter Topology
+open scoped ENNReal
+open ENNReal (lqNorm dyadicWeight)
+
+namespace ENNReal
+
+/-! ### Powers in `[0, ∞]` -/
+
+/-- `a^r = a · a^(r-1)` in `[0, ∞]` for `r ≥ 1`. -/
+theorem rpow_eq_mul_rpow_sub_one (a : ℝ≥0∞) {r : ℝ} (hr : 1 ≤ r) :
+    a ^ r = a * a ^ (r - 1) := by
+  calc a ^ r = a ^ ((1 : ℝ) + (r - 1)) := by ring_nf
+    _ = a ^ (1 : ℝ) * a ^ (r - 1) := ENNReal.rpow_add_of_nonneg _ _ zero_le_one (by linarith)
+    _ = a * a ^ (r - 1) := by rw [ENNReal.rpow_one]
+
+/-- Every term of a finite family is bounded by its `ℓ_r` norm:
+`a_i ≤ (∑_{j ∈ S} a_j^r)^(1/r)` for `i ∈ S` and `r > 0`. -/
+theorem le_rpow_sum_rpow {ι : Type*} {S : Finset ι} {a : ι → ℝ≥0∞} {i : ι}
+    (hi : i ∈ S) {r : ℝ} (hr : 0 < r) : a i ≤ (∑ j ∈ S, a j ^ r) ^ (1 / r) := by
+  calc a i = (a i ^ r) ^ (1 / r) := by rw [one_div, ENNReal.rpow_rpow_inv hr.ne']
+    _ ≤ _ := ENNReal.rpow_le_rpow
+          (Finset.single_le_sum (f := fun j => a j ^ r) (fun j _ => zero_le) hi) (by positivity)
+
+section Countable
+
+variable {ι : Type*} [Countable ι] [MeasurableSpace ι] [MeasurableSingletonClass ι]
+
+/-- **Powers inside an `ℓ_u` norm**: `‖(a_i^r)_i‖_{ℓ_u} = ‖a‖_{ℓ_{u r}}^r` for `r > 0`. -/
+theorem lqNorm_fun_rpow (u : ℝ≥0∞) {r : ℝ} (hr : 0 < r) (a : ι → ℝ≥0∞) :
+    lqNorm u (fun i => a i ^ r) = lqNorm (u * ENNReal.ofReal r) a ^ r := by
+  simpa only [lqNorm, enorm_eq_self] using
+    MeasureTheory.eLpNorm_enorm_rpow (p := u) (μ := MeasureTheory.Measure.count) a
+      (aestronglyMeasurable_count a) hr
+
+end Countable
+
+end ENNReal
+
+namespace MeasureTheory
+
+variable {α : Type*} [MeasurableSpace α] {μ : Measure α} {p q : ℝ≥0∞}
+
+/-! ### `L_p` norms of functions with values in `[0, ∞]` -/
+
+/-- **Homogeneity** for a scalar `c ∈ [0, ∞]`: `‖c h‖_p = c ‖h‖_p` for measurable
+`h : α → [0, ∞]` (Mathlib's `eLpNorm_const_smul` covers scalars in a normed division ring).
+Measurability matters for `p = 0`: a non-measurable `h > 0` has `‖h‖_0 = ∞`, while `∞ · h = ∞`
+is measurable with `‖∞ · h‖_0 = 0`. -/
+theorem eLpNorm_const_mul_ennreal (c : ℝ≥0∞) {h : α → ℝ≥0∞} (hh : AEMeasurable h μ)
+    (p : ℝ≥0∞) : eLpNorm (fun x => c * h x) p μ = c * eLpNorm h p μ := by
+  have hch : AEStronglyMeasurable (fun x => c * h x) μ := (hh.const_mul c).aestronglyMeasurable
+  rcases eq_or_ne p 0 with rfl | hp0
+  · rw [eLpNorm_exponent_zero hch, eLpNorm_exponent_zero hh.aestronglyMeasurable, mul_zero]
+  rcases eq_or_ne p ∞ with rfl | hp
+  · rw [eLpNorm_exponent_top hch, eLpNorm_exponent_top hh.aestronglyMeasurable]
+    simp only [eLpNormEssSup, enorm_eq_self]
+    exact ENNReal.essSup_const_mul
+  have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hch,
+    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hh.aestronglyMeasurable]
+  simp only [enorm_eq_self]
+  simp_rw [ENNReal.mul_rpow_of_nonneg _ _ hr.le]
+  rw [lintegral_const_mul'' _ (hh.pow_const _), ENNReal.mul_rpow_of_nonneg _ _ (by positivity),
+    ← ENNReal.rpow_mul, mul_one_div_cancel hr.ne', ENNReal.rpow_one]
+
+/-- `‖g‖_p^p = ∫ g^p` for `0 < p < ∞` and `g : α → [0, ∞]` measurable: the case `[0, ∞]` of
+`MeasureTheory.eLpNorm_rpow_eq`, with `‖g(x)‖ₑ = g(x)`. -/
+theorem eLpNorm_rpow_eq_lintegral (hp0 : p ≠ 0) (hp : p ≠ ∞) {g : α → ℝ≥0∞}
+    (hg : AEMeasurable g μ) : eLpNorm g p μ ^ p.toReal = ∫⁻ x, g x ^ p.toReal ∂μ := by
+  simpa only [enorm_eq_self] using eLpNorm_rpow_eq hg.aestronglyMeasurable hp0 hp
+
+/-- **Powers inside an `L_p` norm**: `‖g^r‖_p = ‖g‖_{p r}^r` for `r > 0` and `g : α → [0, ∞]`
+measurable (Mathlib's `eLpNorm_enorm_rpow`). -/
+theorem eLpNorm_fun_rpow {g : α → ℝ≥0∞} (hg : AEMeasurable g μ) {r : ℝ} (hr : 0 < r)
+    (p : ℝ≥0∞) : eLpNorm (fun x => g x ^ r) p μ = eLpNorm g (p * ENNReal.ofReal r) μ ^ r := by
+  simpa only [enorm_eq_self] using eLpNorm_enorm_rpow (p := p) (μ := μ) g hg.aestronglyMeasurable hr
+
+/-- **Monotone convergence for `L_p` norms**: for a directed countable family of measurable
+functions `F_b : α → [0, ∞]`, `‖sup_b F_b‖_p = sup_b ‖F_b‖_p`. For `p < ∞` this is the monotone
+convergence theorem for `∫ F_b^p`; for `p = ∞` it holds for every countable family. -/
+theorem eLpNorm_iSup_of_directed {β : Type*} [Countable β] {F : β → α → ℝ≥0∞}
+    (hF : ∀ b, AEMeasurable (F b) μ) (hd : Directed (· ≤ ·) F) (p : ℝ≥0∞) :
+    eLpNorm (fun x => ⨆ b, F b x) p μ = ⨆ b, eLpNorm (F b) p μ := by
+  have hm : AEMeasurable (fun x => ⨆ b, F b x) μ := AEMeasurable.iSup hF
+  rcases eq_or_ne p 0 with rfl | hp0
+  · simp [eLpNorm_exponent_zero hm.aestronglyMeasurable,
+      eLpNorm_exponent_zero (hF _).aestronglyMeasurable]
+  rcases eq_or_ne p ∞ with rfl | hp
+  · simp only [eLpNorm_exponent_top hm.aestronglyMeasurable,
+      eLpNorm_exponent_top (hF _).aestronglyMeasurable, eLpNormEssSup, enorm_eq_self]
+    refine le_antisymm (essSup_le_of_ae_le _ ?_) (iSup_le fun b => essSup_mono_ae ?_)
+    · have h : ∀ᵐ x ∂μ, ∀ b, F b x ≤ essSup (F b) μ :=
+        ae_all_iff.2 fun b => ENNReal.ae_le_essSup (F b)
+      filter_upwards [h] with x hx
+      exact iSup_le fun b => (hx b).trans (le_iSup (fun b => essSup (F b) μ) b)
+    · exact Eventually.of_forall fun x => le_iSup (fun b => F b x) b
+  have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hm.aestronglyMeasurable]
+  simp_rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (hF _).aestronglyMeasurable]
+  simp only [enorm_eq_self]
+  have h1 : ∀ x, (⨆ b, F b x) ^ p.toReal = ⨆ b, F b x ^ p.toReal := fun x =>
+    (ENNReal.orderIsoRpow p.toReal hr).map_iSup (fun b => F b x)
+  simp_rw [h1]
+  rw [lintegral_iSup_directed (fun b => (hF b).pow_const _) ?_]
+  · exact (ENNReal.orderIsoRpow (1 / p.toReal) (by positivity)).map_iSup _
+  · intro b₁ b₂
+    obtain ⟨c, h₁, h₂⟩ := hd b₁ b₂
+    exact ⟨c, fun x => ENNReal.rpow_le_rpow (h₁ x) hr.le,
+      fun x => ENNReal.rpow_le_rpow (h₂ x) hr.le⟩
+
+/-- **Minkowski's inequality for series** in `L_p`, `1 ≤ p ≤ ∞`, on any measure space: for
+`g_i : α → [0, ∞]` indexed by a countable set, `‖∑_i g_i‖_p ≤ ∑_i ‖g_i‖_p`. If some `g_i` is not
+measurable, then `‖g_i‖_p = ∞` and so is the right side. Otherwise the series is the supremum of
+its finite partial sums, and this follows from Mathlib's finite version `eLpNorm_sum_le` by
+monotone convergence (`MeasureTheory.eLpNorm_iSup_of_directed`). -/
+theorem eLpNorm_tsum_le {ι : Type*} [Countable ι] {g : ι → α → ℝ≥0∞} (hp1 : 1 ≤ p) :
+    eLpNorm (fun x => ∑' i, g i x) p μ ≤ ∑' i, eLpNorm (g i) p μ := by
+  by_cases hg : ∀ i, AEMeasurable (g i) μ
+  swap
+  · obtain ⟨i, hi⟩ := not_forall.1 hg
+    have h : eLpNorm (g i) p μ = ∞ :=
+      eLpNorm_of_not_aestronglyMeasurable fun h => hi h.aemeasurable
+    rw [ENNReal.tsum_eq_top_of_eq_top ⟨i, h⟩]
+    exact le_top
+  have h : (fun x => ∑' i, g i x) = fun x => ⨆ s : Finset ι, ∑ i ∈ s, g i x := by
+    funext x
+    exact ENNReal.tsum_eq_iSup_sum
+  have hmono : Monotone fun (s : Finset ι) (x : α) => ∑ i ∈ s, g i x := fun s t hst x =>
+    Finset.sum_le_sum_of_subset hst
+  rw [h, eLpNorm_iSup_of_directed (fun s => Finset.aemeasurable_fun_sum s fun i _ => hg i)
+    hmono.directed_le p]
+  refine iSup_le fun s => ?_
+  calc eLpNorm (fun x => ∑ i ∈ s, g i x) p μ = eLpNorm (∑ i ∈ s, g i) p μ := by
+        congr 1
+        funext x
+        simp [Finset.sum_apply]
+    _ ≤ ∑ i ∈ s, eLpNorm (g i) p μ := eLpNorm_sum_le hp1
+    _ ≤ ∑' i, eLpNorm (g i) p μ := ENNReal.sum_le_tsum s
+
+/-! ### Minkowski's integral inequality for `ℓ_u`-valued functions -/
+
+/-- The **duality step** of Minkowski's integral inequality on a finite set `S`, for `r > 1`
+with conjugate exponent `r'`: `∑_{i ∈ S} (∫ g_i)^r ≤ (∫ (∑_{i ∈ S} g_i^r)^(1/r)) ·
+(∑_{i ∈ S} (∫ g_i)^r)^(1/r')`. Write `(∫ g_i)^r = ∫ g_i · (∫ g_i)^(r-1)`, exchange the finite
+sum with the integral and apply Hölder's inequality at every point. -/
+theorem sum_rpow_lintegral_le_mul {ι : Type*} {g : ι → α → ℝ≥0∞}
+    (hg : ∀ i, AEMeasurable (g i) μ) {r : ℝ} (hr : 1 < r) (S : Finset ι) :
+    ∑ i ∈ S, (∫⁻ x, g i x ∂μ) ^ r ≤ (∫⁻ x, (∑ i ∈ S, g i x ^ r) ^ (1 / r) ∂μ) *
+      (∑ i ∈ S, (∫⁻ x, g i x ∂μ) ^ r) ^ (1 / r.conjExponent) := by
+  have hpq := Real.HolderConjugate.conjExponent hr
+  have hconj : ∑ i ∈ S, ((∫⁻ x, g i x ∂μ) ^ (r - 1)) ^ r.conjExponent =
+      ∑ i ∈ S, (∫⁻ x, g i x ∂μ) ^ r :=
+    Finset.sum_congr rfl fun i _ => by rw [← ENNReal.rpow_mul, hpq.sub_one_mul_conj]
+  calc ∑ i ∈ S, (∫⁻ x, g i x ∂μ) ^ r
+      = ∑ i ∈ S, (∫⁻ x, g i x ∂μ) * (∫⁻ x, g i x ∂μ) ^ (r - 1) :=
+        Finset.sum_congr rfl fun i _ => ENNReal.rpow_eq_mul_rpow_sub_one _ hr.le
+    _ = ∫⁻ x, ∑ i ∈ S, g i x * (∫⁻ y, g i y ∂μ) ^ (r - 1) ∂μ := by
+        rw [lintegral_finsetSum' S fun i _ => (hg i).mul_const _]
+        exact Finset.sum_congr rfl fun i _ => (lintegral_mul_const'' _ (hg i)).symm
+    _ ≤ ∫⁻ x, (∑ i ∈ S, g i x ^ r) ^ (1 / r) *
+          (∑ i ∈ S, ((∫⁻ y, g i y ∂μ) ^ (r - 1)) ^ r.conjExponent) ^ (1 / r.conjExponent) ∂μ :=
+        lintegral_mono fun x => ENNReal.inner_le_Lp_mul_Lq S (fun i => g i x) _ hpq
+    _ = (∫⁻ x, (∑ i ∈ S, g i x ^ r) ^ (1 / r) ∂μ) *
+          (∑ i ∈ S, (∫⁻ x, g i x ∂μ) ^ r) ^ (1 / r.conjExponent) := by
+        rw [hconj, lintegral_mul_const'' _ (by fun_prop)]
+
+/-- **Minkowski's integral inequality on a finite set**: for `r > 1` and measurable
+`g_i : α → [0, ∞]`, `(∑_{i ∈ S} (∫ g_i)^r)^(1/r) ≤ ∫ (∑_{i ∈ S} g_i^r)^(1/r)`. If the left side is
+finite and nonzero, cancel the factor `(∑_{i ∈ S} (∫ g_i)^r)^(1/r')` in
+`MeasureTheory.sum_rpow_lintegral_le_mul`; if it is infinite, some `∫ g_i` is infinite and so is
+the right side. -/
+theorem rpow_sum_rpow_lintegral_le {ι : Type*} {g : ι → α → ℝ≥0∞}
+    (hg : ∀ i, AEMeasurable (g i) μ) {r : ℝ} (hr : 1 < r) (S : Finset ι) :
+    (∑ i ∈ S, (∫⁻ x, g i x ∂μ) ^ r) ^ (1 / r) ≤ ∫⁻ x, (∑ i ∈ S, g i x ^ r) ^ (1 / r) ∂μ := by
+  have hr0 : 0 < r := zero_lt_one.trans hr
+  have hpq := Real.HolderConjugate.conjExponent hr
+  rcases eq_or_ne (∑ i ∈ S, (∫⁻ x, g i x ∂μ) ^ r) 0 with h0 | h0
+  · rw [h0, ENNReal.zero_rpow_of_pos (by positivity)]
+    exact zero_le
+  rcases eq_or_ne (∑ i ∈ S, (∫⁻ x, g i x ∂μ) ^ r) ∞ with htop | htop
+  · obtain ⟨i, hi, hgi⟩ := ENNReal.sum_eq_top.1 htop
+    have hgi' : ∫⁻ x, g i x ∂μ = ∞ := by
+      rcases ENNReal.rpow_eq_top_iff.1 hgi with ⟨_, h⟩ | ⟨h, _⟩
+      · linarith
+      · exact h
+    have hI : ∫⁻ x, (∑ j ∈ S, g j x ^ r) ^ (1 / r) ∂μ = ∞ :=
+      top_unique (hgi' ▸ lintegral_mono fun x =>
+        ENNReal.le_rpow_sum_rpow (a := fun j => g j x) hi hr0)
+    rw [hI]
+    exact le_top
+  have hc0 : (∑ i ∈ S, (∫⁻ x, g i x ∂μ) ^ r) ^ (1 / r.conjExponent) ≠ 0 :=
+    (ENNReal.rpow_pos (pos_iff_ne_zero.2 h0) htop).ne'
+  have hctop : (∑ i ∈ S, (∫⁻ x, g i x ∂μ) ^ r) ^ (1 / r.conjExponent) ≠ ∞ :=
+    ENNReal.rpow_ne_top_of_nonneg (by have := hpq.symm.pos; positivity) htop
+  refine (ENNReal.mul_le_mul_iff_left hc0 hctop).1 ?_
+  rw [← ENNReal.rpow_add _ _ h0 htop, one_div, one_div, hpq.inv_add_inv_eq_one, ENNReal.rpow_one,
+    ← one_div, ← one_div]
+  exact sum_rpow_lintegral_le_mul hg hr S
+
+section Countable
+
+variable {ι : Type*} [Countable ι] [MeasurableSpace ι] [MeasurableSingletonClass ι]
+
+/-- **Minkowski's integral inequality for `ℓ_u`-valued functions**, `1 ≤ u ≤ ∞`: for measurable
+`g_i : α → [0, ∞]` indexed by a countable set, `‖(∫ g_i)_i‖_{ℓ_u} ≤ ∫ ‖(g_i(x))_i‖_{ℓ_u} dx`. For
+`u = 1` both sides are equal (Tonelli), for `u = ∞` the supremum of integrals is at most the
+integral of the supremum, and for `1 < u < ∞` the finite sums are bounded by
+`MeasureTheory.rpow_sum_rpow_lintegral_le`. -/
+theorem lqNorm_lintegral_le {u : ℝ≥0∞} (hu : 1 ≤ u) {g : ι → α → ℝ≥0∞}
+    (hg : ∀ i, AEMeasurable (g i) μ) :
+    lqNorm u (fun i => ∫⁻ x, g i x ∂μ) ≤ ∫⁻ x, lqNorm u (fun i => g i x) ∂μ := by
+  rcases eq_or_ne u ∞ with rfl | hu'
+  · simp only [ENNReal.lqNorm_top]
+    exact iSup_le fun i => lintegral_mono fun x => le_iSup (fun j => g j x) i
+  rcases eq_or_lt_of_le hu with rfl | hu1
+  · simp only [ENNReal.lqNorm_one]
+    exact (lintegral_tsum hg).ge
+  have hu0 : u ≠ 0 := (zero_lt_one.trans hu1).ne'
+  have hr : 1 < u.toReal := by
+    simpa using (ENNReal.toReal_lt_toReal ENNReal.one_ne_top hu').2 hu1
+  have hr0 : 0 < u.toReal := zero_lt_one.trans hr
+  simp only [ENNReal.lqNorm_eq_tsum hu0 hu']
+  rw [one_div, ENNReal.rpow_inv_le_iff hr0, ENNReal.tsum_eq_iSup_sum]
+  refine iSup_le fun S => ?_
+  rw [← ENNReal.rpow_inv_le_iff hr0, ← one_div]
+  refine (rpow_sum_rpow_lintegral_le hg hr S).trans (lintegral_mono fun x => ?_)
+  exact ENNReal.rpow_le_rpow (ENNReal.sum_le_tsum S) (by positivity)
+
+/-- The pointwise `ℓ_q` norm `x ↦ ‖(g_i(x))_i‖_{ℓ_q}` of a countable family of measurable
+functions is measurable: it is a constant for `q = 0`, a countable supremum for `q = ∞` and a
+power of a series otherwise. -/
+theorem aemeasurable_lqNorm_comp {g : ι → α → ℝ≥0∞} (hg : ∀ i, AEMeasurable (g i) μ)
+    (q : ℝ≥0∞) : AEMeasurable (fun x => lqNorm q (fun i => g i x)) μ := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · simp only [ENNReal.lqNorm_zero_left]
+    exact aemeasurable_const
+  rcases eq_or_ne q ∞ with rfl | hq
+  · simp only [ENNReal.lqNorm_top]
+    exact AEMeasurable.iSup hg
+  simp only [ENNReal.lqNorm_eq_tsum hq0 hq]
+  exact (AEMeasurable.tsum fun i => (hg i).pow_const _).pow_const _
+
+/-! ### Comparison of `L_p(ℓ_q)` and `ℓ_q(L_p)` -/
+
+/-- **`L_p(ℓ_p) = ℓ_p(L_p)`** for `0 < p < ∞`:
+`‖ x ↦ ‖(g_i(x))_i‖_{ℓ_p} ‖_p = ‖(‖g_i‖_p)_i‖_{ℓ_p}`. Both sides to the power `p` equal
+`∑_i ∫ g_i^p`, by Tonelli's theorem for series (`lintegral_tsum`). -/
+theorem eLpNorm_lqNorm_eq_lqNorm_eLpNorm (hp0 : p ≠ 0) (hp : p ≠ ∞) {g : ι → α → ℝ≥0∞}
+    (hg : ∀ i, AEMeasurable (g i) μ) :
+    eLpNorm (fun x => lqNorm p (fun i => g i x)) p μ = lqNorm p (fun i => eLpNorm (g i) p μ) := by
+  have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  refine ENNReal.rpow_left_injective hr.ne' ?_
+  change eLpNorm _ p μ ^ p.toReal = lqNorm p _ ^ p.toReal
+  rw [eLpNorm_rpow_eq_lintegral hp0 hp (aemeasurable_lqNorm_comp hg p),
+    ENNReal.lqNorm_rpow hp0 hp]
+  simp_rw [ENNReal.lqNorm_rpow hp0 hp]
+  rw [lintegral_tsum fun i => (hg i).pow_const _]
+  exact tsum_congr fun i => (eLpNorm_rpow_eq_lintegral hp0 hp (hg i)).symm
+
+/-- **`ℓ_q(L_p) ≤ L_p(ℓ_q)` for `0 < p ≤ q ≤ ∞`**:
+`‖(‖g_i‖_p)_i‖_{ℓ_q} ≤ ‖ x ↦ ‖(g_i(x))_i‖_{ℓ_q} ‖_p`. For `q = ∞` every `g_i` is at most the
+pointwise supremum. For `q < ∞`, with `U = q/p ≥ 1`, the `p`-th power of the left side is
+`‖(∫ g_i^p)_i‖_{ℓ_U}`, and Minkowski's integral inequality for `ℓ_U`-valued functions
+(`MeasureTheory.lqNorm_lintegral_le`) bounds it by `∫ ‖(g_i^p)_i‖_{ℓ_U}`, the `p`-th power of the
+right side. -/
+theorem lqNorm_eLpNorm_le_eLpNorm_lqNorm (hp0 : p ≠ 0) (hpq : p ≤ q)
+    {g : ι → α → ℝ≥0∞} (hg : ∀ i, AEMeasurable (g i) μ) :
+    lqNorm q (fun i => eLpNorm (g i) p μ) ≤ eLpNorm (fun x => lqNorm q (fun i => g i x)) p μ := by
+  rcases eq_or_ne q ∞ with rfl | hq
+  · rw [ENNReal.lqNorm_top]
+    refine iSup_le fun i => eLpNorm_mono_enorm_ae (hg i).aestronglyMeasurable
+      (Eventually.of_forall fun x => ?_)
+    simp only [enorm_eq_self]
+    exact ENNReal.le_lqNorm ENNReal.top_ne_zero (fun j => g j x) i
+  have hp : p ≠ ∞ := ne_top_of_le_ne_top hq hpq
+  have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  have hU : q / p * ENNReal.ofReal p.toReal = q := by
+    rw [ENNReal.ofReal_toReal hp, ENNReal.div_mul_cancel hp0 hp]
+  have hU1 : 1 ≤ q / p :=
+    (ENNReal.le_div_iff_mul_le (Or.inl hp0) (Or.inl hp)).2 (by rwa [one_mul])
+  rw [← ENNReal.rpow_le_rpow_iff hr]
+  calc lqNorm q (fun i => eLpNorm (g i) p μ) ^ p.toReal
+      = lqNorm (q / p) (fun i => eLpNorm (g i) p μ ^ p.toReal) := by
+        rw [ENNReal.lqNorm_fun_rpow _ hr, hU]
+    _ = lqNorm (q / p) (fun i => ∫⁻ x, g i x ^ p.toReal ∂μ) := by
+        congr 1
+        funext i
+        exact eLpNorm_rpow_eq_lintegral hp0 hp (hg i)
+    _ ≤ ∫⁻ x, lqNorm (q / p) (fun i => g i x ^ p.toReal) ∂μ :=
+        lqNorm_lintegral_le hU1 fun i => (hg i).pow_const _
+    _ = ∫⁻ x, lqNorm q (fun i => g i x) ^ p.toReal ∂μ := by
+        congr 1
+        funext x
+        rw [ENNReal.lqNorm_fun_rpow _ hr, hU]
+    _ = eLpNorm (fun x => lqNorm q (fun i => g i x)) p μ ^ p.toReal :=
+        (eLpNorm_rpow_eq_lintegral hp0 hp (aemeasurable_lqNorm_comp hg q)).symm
+
+/-- **`L_p(ℓ_q) ≤ ℓ_q(L_p)` for `0 < q ≤ p < ∞`**:
+`‖ x ↦ ‖(g_i(x))_i‖_{ℓ_q} ‖_p ≤ ‖(‖g_i‖_p)_i‖_{ℓ_q}`. If some `g_i` is not measurable, then
+`‖g_i‖_p = ∞` and so is the right side. Otherwise, with `U = p/q ≥ 1`, the `q`-th power of the
+left side is `‖∑_i g_i^q‖_U`, and Minkowski's inequality for series in `L_U`
+(`MeasureTheory.eLpNorm_tsum_le`) bounds it by `∑_i ‖g_i^q‖_U = ∑_i ‖g_i‖_p^q`, the `q`-th power of
+the right side. -/
+theorem eLpNorm_lqNorm_le_lqNorm_eLpNorm (hq0 : q ≠ 0) (hqp : q ≤ p) (hp : p ≠ ∞)
+    {g : ι → α → ℝ≥0∞} :
+    eLpNorm (fun x => lqNorm q (fun i => g i x)) p μ ≤ lqNorm q (fun i => eLpNorm (g i) p μ) := by
+  by_cases hg : ∀ i, AEMeasurable (g i) μ
+  swap
+  · obtain ⟨i, hi⟩ := not_forall.1 hg
+    have h : eLpNorm (g i) p μ = ∞ :=
+      eLpNorm_of_not_aestronglyMeasurable fun h => hi h.aemeasurable
+    have hle := ENNReal.le_lqNorm hq0 (fun j => eLpNorm (g j) p μ) i
+    rw [h, top_le_iff] at hle
+    rw [hle]
+    exact le_top
+  have hq : q ≠ ∞ := ne_top_of_le_ne_top hp hqp
+  have hr : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
+  have hU : p / q * ENNReal.ofReal q.toReal = p := by
+    rw [ENNReal.ofReal_toReal hq, ENNReal.div_mul_cancel hq0 hq]
+  have hU1 : 1 ≤ p / q :=
+    (ENNReal.le_div_iff_mul_le (Or.inl hq0) (Or.inl hq)).2 (by rwa [one_mul])
+  rw [← ENNReal.rpow_le_rpow_iff hr]
+  calc eLpNorm (fun x => lqNorm q (fun i => g i x)) p μ ^ q.toReal
+      = eLpNorm (fun x => lqNorm q (fun i => g i x) ^ q.toReal) (p / q) μ := by
+        rw [eLpNorm_fun_rpow (aemeasurable_lqNorm_comp hg q) hr, hU]
+    _ = eLpNorm (fun x => ∑' i, g i x ^ q.toReal) (p / q) μ := by
+        simp_rw [ENNReal.lqNorm_rpow hq0 hq]
+    _ ≤ ∑' i, eLpNorm (fun x => g i x ^ q.toReal) (p / q) μ := eLpNorm_tsum_le hU1
+    _ = ∑' i, eLpNorm (g i) p μ ^ q.toReal := by
+        refine tsum_congr fun i => ?_
+        rw [eLpNorm_fun_rpow (hg i) hr, hU]
+    _ = lqNorm q (fun i => eLpNorm (g i) p μ) ^ q.toReal := (ENNReal.lqNorm_rpow hq0 hq _).symm
+
+/-- **The upper half of the sandwich**:
+`‖ x ↦ ‖(g_i(x))_i‖_{ℓ_q} ‖_p ≤ ‖(‖g_i‖_p)_i‖_{ℓ_{min(p,q)}}` for `1 ≤ p < ∞` and `1 ≤ q ≤ ∞`.
+For `p ≤ q` the pointwise bound `‖·‖_{ℓ_q} ≤ ‖·‖_{ℓ_p}` and `L_p(ℓ_p) = ℓ_p(L_p)`; for `q ≤ p` the
+inequality `L_p(ℓ_q) ≤ ℓ_q(L_p)`. -/
+theorem eLpNorm_lqNorm_le_lqNorm_min (hp1 : 1 ≤ p) (hp : p ≠ ∞) (hq : 1 ≤ q)
+    {g : ι → α → ℝ≥0∞} (hg : ∀ i, AEMeasurable (g i) μ) :
+    eLpNorm (fun x => lqNorm q (fun i => g i x)) p μ ≤
+      lqNorm (min p q) (fun i => eLpNorm (g i) p μ) := by
+  rcases le_total p q with hpq | hqp
+  · rw [min_eq_left hpq, ← eLpNorm_lqNorm_eq_lqNorm_eLpNorm (zero_lt_one.trans_le hp1).ne' hp hg]
+    refine eLpNorm_mono_enorm_ae (aemeasurable_lqNorm_comp hg q).aestronglyMeasurable
+      (Eventually.of_forall fun x => ?_)
+    simp only [enorm_eq_self]
+    exact ENNReal.lqNorm_le_lqNorm_of_le hp1 hpq _
+  · rw [min_eq_right hqp]
+    exact eLpNorm_lqNorm_le_lqNorm_eLpNorm (zero_lt_one.trans_le hq).ne' hqp hp
+
+/-- **The lower half of the sandwich**:
+`‖(‖g_i‖_p)_i‖_{ℓ_{max(p,q)}} ≤ ‖ x ↦ ‖(g_i(x))_i‖_{ℓ_q} ‖_p` for `1 ≤ p < ∞` and `1 ≤ q ≤ ∞`.
+For `p ≤ q` the inequality `ℓ_q(L_p) ≤ L_p(ℓ_q)`; for `q ≤ p` the identity
+`ℓ_p(L_p) = L_p(ℓ_p)` and the pointwise bound `‖·‖_{ℓ_p} ≤ ‖·‖_{ℓ_q}`. -/
+theorem lqNorm_max_le_eLpNorm_lqNorm (hp1 : 1 ≤ p) (hp : p ≠ ∞) (hq : 1 ≤ q)
+    {g : ι → α → ℝ≥0∞} (hg : ∀ i, AEMeasurable (g i) μ) :
+    lqNorm (max p q) (fun i => eLpNorm (g i) p μ) ≤
+      eLpNorm (fun x => lqNorm q (fun i => g i x)) p μ := by
+  rcases le_total p q with hpq | hqp
+  · rw [max_eq_right hpq]
+    exact lqNorm_eLpNorm_le_eLpNorm_lqNorm (zero_lt_one.trans_le hp1).ne' hpq hg
+  · rw [max_eq_left hqp, ← eLpNorm_lqNorm_eq_lqNorm_eLpNorm (zero_lt_one.trans_le hp1).ne' hp hg]
+    refine eLpNorm_mono_enorm_ae (aemeasurable_lqNorm_comp hg p).aestronglyMeasurable
+      (Eventually.of_forall fun x => ?_)
+    simp only [enorm_eq_self]
+    exact ENNReal.lqNorm_le_lqNorm_of_le hq hqp _
+
+end Countable
+
+/-! ### Weighted families of functions -/
+
+section Weighted
+
+variable {E : Type*} [NormedAddCommGroup E]
+
+/-- **Homogeneity of the pointwise norm**: `‖c ‖v(·)‖‖_p = c ‖v‖_p` for every constant
+`c ∈ [0, ∞]`, every measurable `v : α → E` with values in a normed group and every `p`. -/
+theorem eLpNorm_const_mul_enorm (c : ℝ≥0∞) {v : α → E} (hv : AEStronglyMeasurable v μ)
+    (p : ℝ≥0∞) : eLpNorm (fun x => c * ‖v x‖ₑ) p μ = c * eLpNorm v p μ := by
+  rw [eLpNorm_const_mul_ennreal _ hv.enorm p, eLpNorm_enorm _ hv]
+
+section Countable
+
+variable {ι : Type*} [Countable ι] [MeasurableSpace ι] [MeasurableSingletonClass ι]
+  {u : ι → α → E}
+
+/-- **`L_p(ℓ_p) = ℓ_p(L_p)` for weighted families**: for `0 < p < ∞`, weights `w_j ∈ [0, ∞]` and
+measurable `u_j : α → E` with values in a normed group, indexed by a countable set,
+`‖ x ↦ ‖(w_j ‖u_j(x)‖)_j‖_{ℓ_p} ‖_p = ‖(w_j ‖u_j‖_p)_j‖_{ℓ_p}`. -/
+theorem eLpNorm_lqNorm_weighted_eq (w : ι → ℝ≥0∞) (hp0 : p ≠ 0) (hp : p ≠ ∞)
+    (hu : ∀ j, AEStronglyMeasurable (u j) μ) :
+    eLpNorm (fun x => lqNorm p (fun j => w j * ‖u j x‖ₑ)) p μ =
+      lqNorm p (fun j => w j * eLpNorm (u j) p μ) := by
+  rw [eLpNorm_lqNorm_eq_lqNorm_eLpNorm hp0 hp fun j => (hu j).enorm.const_mul _]
+  congr 1
+  funext j
+  exact eLpNorm_const_mul_enorm (w j) (hu j) p
+
+/-- **The upper half of the sandwich for weighted families**: for `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`,
+weights `w_j ∈ [0, ∞]` and measurable `u_j : α → E` with values in a normed group, indexed by a
+countable set, `‖ x ↦ ‖(w_j ‖u_j(x)‖)_j‖_{ℓ_q} ‖_p ≤ ‖(w_j ‖u_j‖_p)_j‖_{ℓ_{min(p,q)}}`. -/
+theorem eLpNorm_lqNorm_weighted_le_min (w : ι → ℝ≥0∞) (hp1 : 1 ≤ p) (hp : p ≠ ∞) (hq : 1 ≤ q)
+    (hu : ∀ j, AEStronglyMeasurable (u j) μ) :
+    eLpNorm (fun x => lqNorm q (fun j => w j * ‖u j x‖ₑ)) p μ ≤
+      lqNorm (min p q) (fun j => w j * eLpNorm (u j) p μ) := by
+  refine (eLpNorm_lqNorm_le_lqNorm_min hp1 hp hq fun j => (hu j).enorm.const_mul _).trans_eq ?_
+  congr 1
+  funext j
+  exact eLpNorm_const_mul_enorm (w j) (hu j) p
+
+/-- **The lower half of the sandwich for weighted families**: for `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`,
+weights `w_j ∈ [0, ∞]` and measurable `u_j : α → E` with values in a normed group, indexed by a
+countable set, `‖(w_j ‖u_j‖_p)_j‖_{ℓ_{max(p,q)}} ≤ ‖ x ↦ ‖(w_j ‖u_j(x)‖)_j‖_{ℓ_q} ‖_p`. -/
+theorem lqNorm_max_weighted_le (w : ι → ℝ≥0∞) (hp1 : 1 ≤ p) (hp : p ≠ ∞) (hq : 1 ≤ q)
+    (hu : ∀ j, AEStronglyMeasurable (u j) μ) :
+    lqNorm (max p q) (fun j => w j * eLpNorm (u j) p μ) ≤
+      eLpNorm (fun x => lqNorm q (fun j => w j * ‖u j x‖ₑ)) p μ := by
+  refine le_of_eq_of_le ?_ (lqNorm_max_le_eLpNorm_lqNorm hp1 hp hq
+    fun j => (hu j).enorm.const_mul _)
+  congr 1
+  funext j
+  exact (eLpNorm_const_mul_enorm (w j) (hu j) p).symm
+
+end Countable
+
+variable {s : ℝ} {u : ℕ → α → E}
+
+/-- **`L_p(ℓ_p) = ℓ_p(L_p)` for dyadic weights**: for `0 < p < ∞`, `s ∈ ℝ` and measurable
+`u_j : α → E`, `‖ x ↦ ‖(2^(js) ‖u_j(x)‖)_j‖_{ℓ_p} ‖_p = ‖(2^(js) ‖u_j‖_p)_j‖_{ℓ_p}`. With `u_j` the
+Littlewood–Paley blocks of `f`, this says that the Triebel–Lizorkin and the Besov quasi-norm agree
+for `q = p`. -/
+theorem eLpNorm_lqNorm_dyadicWeight_eq (hp0 : p ≠ 0) (hp : p ≠ ∞)
+    (hu : ∀ j, AEStronglyMeasurable (u j) μ) :
+    eLpNorm (fun x => lqNorm p (fun j => dyadicWeight s j * ‖u j x‖ₑ)) p μ =
+      lqNorm p (fun j => dyadicWeight s j * eLpNorm (u j) p μ) :=
+  eLpNorm_lqNorm_weighted_eq (dyadicWeight s) hp0 hp hu
+
+/-- **The upper half of the sandwich for dyadic weights**: for `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`,
+`s ∈ ℝ` and measurable `u_j : α → E`,
+`‖ x ↦ ‖(2^(js) ‖u_j(x)‖)_j‖_{ℓ_q} ‖_p ≤ ‖(2^(js) ‖u_j‖_p)_j‖_{ℓ_{min(p,q)}}`. -/
+theorem eLpNorm_lqNorm_dyadicWeight_le_min (hp1 : 1 ≤ p) (hp : p ≠ ∞) (hq : 1 ≤ q)
+    (hu : ∀ j, AEStronglyMeasurable (u j) μ) :
+    eLpNorm (fun x => lqNorm q (fun j => dyadicWeight s j * ‖u j x‖ₑ)) p μ ≤
+      lqNorm (min p q) (fun j => dyadicWeight s j * eLpNorm (u j) p μ) :=
+  eLpNorm_lqNorm_weighted_le_min (dyadicWeight s) hp1 hp hq hu
+
+/-- **The lower half of the sandwich for dyadic weights**: for `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`,
+`s ∈ ℝ` and measurable `u_j : α → E`,
+`‖(2^(js) ‖u_j‖_p)_j‖_{ℓ_{max(p,q)}} ≤ ‖ x ↦ ‖(2^(js) ‖u_j(x)‖)_j‖_{ℓ_q} ‖_p`. -/
+theorem lqNorm_max_dyadicWeight_le (hp1 : 1 ≤ p) (hp : p ≠ ∞) (hq : 1 ≤ q)
+    (hu : ∀ j, AEStronglyMeasurable (u j) μ) :
+    lqNorm (max p q) (fun j => dyadicWeight s j * eLpNorm (u j) p μ) ≤
+      eLpNorm (fun x => lqNorm q (fun j => dyadicWeight s j * ‖u j x‖ₑ)) p μ :=
+  lqNorm_max_weighted_le (dyadicWeight s) hp1 hp hq hu
+
+end Weighted
+
+/-! ### Limits of pointwise bounds -/
+
+/-- **Limits of pointwise bounds**: if `u` and `v` are measurable, `u ≤ v + w_J` almost everywhere
+for every `J` and `‖w_J‖_p → 0` for some `p > 0`, then `u ≤ v` almost everywhere. The truncated
+difference `(u - v)_+` has `‖(u - v)_+‖_p ≤ ‖w_J‖_p` for every `J`, hence norm `0`. This passes
+pointwise bounds to limits in `L_p` for functions with values in `[0, ∞]` directly; Mathlib
+derives convergence in measure from `L_p` convergence for functions with values in a normed group
+(`tendstoInMeasure_of_tendsto_eLpNorm`). -/
+theorem ae_le_of_le_add_of_tendsto_eLpNorm {u v : α → ℝ≥0∞} {w : ℕ → α → ℝ≥0∞}
+    (hu : AEMeasurable u μ) (hv : AEMeasurable v μ) (hp0 : p ≠ 0)
+    (h : ∀ J, ∀ᵐ x ∂μ, u x ≤ v x + w J x)
+    (hw : Tendsto (fun J => eLpNorm (w J) p μ) atTop (𝓝 0)) : ∀ᵐ x ∂μ, u x ≤ v x := by
+  have hd : AEStronglyMeasurable (fun x => u x - v x) μ := (hu.sub hv).aestronglyMeasurable
+  have hle : ∀ J, eLpNorm (fun x => u x - v x) p μ ≤ eLpNorm (w J) p μ := fun J =>
+    eLpNorm_mono_enorm_ae hd ((h J).mono fun x hx => by
+      simp only [enorm_eq_self]
+      exact tsub_le_iff_left.2 hx)
+  have h0 : eLpNorm (fun x => u x - v x) p μ = 0 := le_antisymm (ge_of_tendsto' hw hle) zero_le
+  filter_upwards [(eLpNorm_eq_zero_iff hp0).1 h0] with x hx
+  exact tsub_eq_zero_iff_le.1 hx
+
+end MeasureTheory

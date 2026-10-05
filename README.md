@@ -2,7 +2,7 @@
 
 A Lean 4 / Mathlib formalisation of **Besov and Sobolev spaces** on several domains, their
 equivalent **characterisations** and their **embedding theorems**, built on the theory of
-**approximation spaces**. The project is work in progress; the details are in seven documents
+**approximation spaces**. The project is work in progress; the details are in eight documents
 under [`docs/`](docs/), listed under [What is formalised](#what-is-formalised).
 
 * **Blueprint** (a webpage explaining the mathematics):
@@ -205,6 +205,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness for all `p`, weak derivatives, traces | ✅ | ✗ |
 | [**Intervals, the cube, splines and wavelets**](docs/IntervalCube.md): piecewise polynomials and splines on `[0, 1]`, the circle and `[0, 1]^d`, Whitney's inequality, coordinate and isotropic moduli, multiwavelets, the Haar system | ✅ | ✗ |
 | [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
+| [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): mixed norms, maximal functions, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, local means, ball means of differences, atoms, the torus | ⬜ | ✗ |
 | [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 
@@ -224,7 +225,8 @@ setting. The blocks map onto the folders as follows: approximation spaces are al
 the torus traces in `FunctionSpaces/Traces/`; intervals, the cube, splines and wavelets are
 `FunctionSpaces/{Interval,Cube,Wavelets}` and `FunctionSpaces/TranslationAlgebra.lean`; function
 spaces on `ℝ^d`, domains and traces, and mixed smoothness share `FunctionSpaces/Rd/`, with the
-manifolds in `FunctionSpaces/Manifold/`. Each block document lists its files.
+manifolds in `FunctionSpaces/Manifold/`; Triebel–Lizorkin spaces start from the mixed norms in
+`FunctionSpaces/Lp/MixedNorms.lean`. Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 `blueprint/` holds the LaTeX source of the blueprint and the scripts that check and link its
 `\lean` references.

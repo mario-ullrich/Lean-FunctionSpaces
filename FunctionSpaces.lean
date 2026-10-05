@@ -10,6 +10,7 @@ public import FunctionSpaces.Lp.LintegralForm
 public import FunctionSpaces.Lp.Young
 public import FunctionSpaces.Lp.Inclusion
 public import FunctionSpaces.Lp.BoundedContinuous
+public import FunctionSpaces.Lp.MixedNorms
 public import FunctionSpaces.Scheme
 public import FunctionSpaces.Besov.Basic
 public import FunctionSpaces.Besov.Trivial
@@ -145,6 +146,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   finite measure, `MeasureTheory.Lp.inclusionOfExponentLe`.
 * `FunctionSpaces.Lp.BoundedContinuous`: bounded continuous functions in `L_p`; for a measure
   charging open sets, `L_∞` restricted to them is the sup norm.
+* `FunctionSpaces.Lp.MixedNorms`: the mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)` and their
+  comparison, from Minkowski's integral inequality for `ℓ_u`-valued functions.
 * `FunctionSpaces.Scheme`: schemes of functions `FunctionScheme` and their transport
   `FunctionScheme.toLp` to every `L_p(μ)`, compatible with the inclusions.
 * `FunctionSpaces.Besov.Basic`: the Besov spaces `B^s_{p,q}(Ω, S) = A^s_q(L_p(μ), S)`.
