@@ -1,0 +1,742 @@
+% !TEX root = print.tex
+\chapter{Daubechies wavelets}
+\label{ch:daubechies}
+
+This chapter constructs the compactly supported orthonormal wavelets of
+Daubechies~\cite{Daubechies} on $\R$ and describes the Besov spaces $\Besov{s}{p}{q}(\R)$ by
+their coefficients. A mask of order $N$ is a real polynomial $L$ of degree less than $N$ with
+$L(1) = 1$ and $|L(e^{-2\pi i \xi})|^2 = P_N(\sin^2 \pi\xi)$, where
+$P_N(y) = \sum_{k < N} \binom{N-1+k}{k} y^k$. The scaling function $\varphi$ is the inverse
+Fourier transform of the infinite product of the symbol of the mask. Everything is proved with
+the Fourier transform of integrable functions: the refinement equation, the compact support
+(through the cascade algorithm), the orthonormality of the integer translates, and the
+reproduction of the polynomials of degree less than $N$. The regularity of $\varphi$ comes from
+the transfer operator of Eirola~\cite{Eirola} and Villemoes~\cite{Villemoes}, which gives
+$\varphi \in H^s$ for $s < 1$ if $N = 2$ and for $s < 3 - \log_2 3$ if $N = 3$, and, for the
+first wavelet $N = 2$, from the matrices of Daubechies and Lagarias~\cite{DaubechiesLagarias},
+which give the H\"older exponent $2 - \log_2(1 + \sqrt 3)$. With Jackson's and Bernstein's
+inequalities the Daubechies coefficients then characterise $\Besov{s}{p}{q}(\R)$.
+
+\section{The Daubechies polynomial}
+
+This section proves the B\'ezout identity of the Daubechies polynomial $P_N$ and the bounds on
+$P_N$ that the later sections use. At $y = \sin^2 \pi\xi$ the identity becomes the trigonometric
+identity behind the quadrature mirror filter identity of the masks. Throughout,
+$\binom{2N-1}{N}$ stands for $\binom{-1}{0} = 1$ if $N = 0$.
+
+The polynomial $P_N$ consists of the first $N$ terms of the binomial series
+$(1 - y)^{-N} = \sum_{k \geq 0} \binom{N-1+k}{k} y^k$.
+
+\begin{definition}[The Daubechies polynomial]
+\label{def:daub-poly}
+\lean{Daubechies.daubPoly, Daubechies.eval_daubPoly, Daubechies.daubPoly_zero,
+  Daubechies.daubPoly_one, Daubechies.daubPoly_two, Daubechies.daubPoly_three,
+  Daubechies.natDegree_daubPoly_le, Daubechies.eval_daubPoly_succ_eq_one_add}
+\leanok
+For $N \in \N$ the \emph{Daubechies polynomial} of order $N$ is the real polynomial
+\[
+  P_N(y) = \sum_{k=0}^{N-1} \binom{N-1+k}{k} y^k
+\]
+of degree at most $N - 1$. Thus $P_0 = 0$, $P_1 = 1$, $P_2(y) = 1 + 2y$ and
+$P_3(y) = 1 + 3y + 6y^2$, and for every $M \in \N$ the constant term of $P_{M+1}$ is $1$:
+\[
+  P_{M+1}(y) = 1 + \sum_{k=0}^{M-1} \binom{M+k+1}{k+1} y^{k+1} .
+\]
+\end{definition}
+
+\begin{lemma}[Values at $0$ and $1$]
+\label{lem:daub-poly-values}
+\lean{Daubechies.eval_zero_daubPoly, Daubechies.eval_one_daubPoly}
+\leanok
+\uses{def:daub-poly}
+For every $N \geq 1$, $P_N(0) = 1$ and $P_N(1) = \binom{2N-1}{N}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Only the constant term $\binom{N-1}{0} = 1$ contributes to $P_N(0)$. For $P_N(1)$, write
+$\binom{N-1+k}{k} = \binom{N-1+k}{N-1}$ and apply the hockey-stick identity
+$\sum_{i=0}^{n} \binom{i+m}{m} = \binom{n+m+1}{m+1}$ with $n = m = N - 1$.
+\end{proof}
+
+The coefficients of $P_N$ and $P_{N+1}$ are linked by Pascal's rule.
+
+\begin{lemma}[The recurrence]
+\label{lem:daub-poly-recurrence}
+\lean{Daubechies.one_sub_mul_eval_daubPoly_succ, Daubechies.one_sub_X_mul_daubPoly_succ,
+  Daubechies.choose_two_mul_eq_two_mul_choose}
+\leanok
+\uses{def:daub-poly}
+For every $N \in \N$ and every $y \in \R$,
+\[
+  (1 - y) P_{N+1}(y) = P_N(y) + \binom{2N-1}{N} y^N - \binom{2N}{N} y^{N+1} ,
+\]
+and the same identity holds for polynomials. For every $N \geq 1$,
+$\binom{2N}{N} = 2 \binom{2N-1}{N}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On the left the constant term is $1$, the coefficient of $y^{k+1}$ for $k < N$ is
+$\binom{N+k+1}{k+1} - \binom{N+k}{k} = \binom{N+k}{k+1}$ by Pascal's rule, and the top term is
+$-\binom{2N}{N} y^{N+1}$. On the right,
+$P_N(y) + \binom{2N-1}{N} y^N = \sum_{k=0}^{N} \binom{N-1+k}{k} y^k$ has the same
+coefficients. Pascal's rule $\binom{2N}{N} = \binom{2N-1}{N-1} + \binom{2N-1}{N}$ and the
+symmetry $\binom{2N-1}{N-1} = \binom{2N-1}{N}$ give the second identity.
+\end{proof}
+
+\begin{theorem}[The B\'ezout identity]
+\label{thm:daub-bezout}
+\lean{Daubechies.eval_daubPoly_bezout_succ, Daubechies.eval_daubPoly_bezout,
+  Daubechies.daubPoly_bezout}
+\leanok
+\uses{def:daub-poly}
+For every $N \geq 1$ and every $y \in \R$,
+\[
+  (1 - y)^N P_N(y) + y^N P_N(1 - y) = 1 ,
+\]
+and the same identity holds for polynomials.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-poly-recurrence}
+Induction on $N$; for $N = 1$ the identity reads $(1 - y) + y = 1$. By
+\Cref{lem:daub-poly-recurrence}, from $N$ to $N + 1$ the first summand changes by
+$y^N (1 - y)^N \bigl(\binom{2N-1}{N} - \binom{2N}{N} y\bigr)$ and the second by
+$y^N (1 - y)^N \bigl(\binom{2N-1}{N} - \binom{2N}{N} (1 - y)\bigr)$. The changes add up to
+$y^N (1 - y)^N \bigl(2 \binom{2N-1}{N} - \binom{2N}{N}\bigr) = 0$. Two real polynomials with the
+same value at every real number are equal.
+\end{proof}
+
+\begin{lemma}[Bounds for $P_N$]
+\label{lem:daub-poly-bounds}
+\lean{Daubechies.eval_daubPoly_nonneg, Daubechies.one_le_eval_daubPoly,
+  Daubechies.eval_daubPoly_le_eval_one, Daubechies.eval_daubPoly_le}
+\leanok
+\uses{def:daub-poly}
+Let $N \in \N$. For every $y \geq 0$, $P_N(y) \geq 0$, and $P_N(y) \geq 1$ if $N \geq 1$. For
+every $y \in [0, 1]$,
+\[
+  P_N(y) \leq P_N(1) \quad\text{and}\quad P_N(y) \leq 1 + \binom{2N-1}{N} y .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-poly-values}
+The coefficients of $P_N$ are nonnegative, and for $N \geq 1$ the constant term is $1$. For
+$y \in [0, 1]$, $y^k \leq 1$ for every $k$ and $y^k \leq y$ for $k \geq 1$, and the coefficients
+of the terms with $k \geq 1$ add up to $P_N(1) - 1 = \binom{2N-1}{N} - 1$
+(\Cref{lem:daub-poly-values}). For $N = 0$, $P_N = 0$.
+\end{proof}
+
+\begin{lemma}[A binomial bound]
+\label{lem:daub-choose-bound}
+\lean{Daubechies.choose_lt_four_pow}
+\leanok
+For every $N \geq 2$, $\binom{2N-1}{N} < 4^{N-1}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Let $N = M + 1$. The coefficients $\binom{2M+1}{i}$ with $i \leq M$ form one half of the row
+$2M + 1$ of Pascal's triangle, so $\sum_{i=0}^{M} \binom{2M+1}{i} = 2^{2M} = 4^M$. This sum
+contains the term $\binom{2M+1}{M} = \binom{2M+1}{M+1}$ and, since $M \geq 1$, the further term
+$\binom{2M+1}{0} = 1$, so $\binom{2N-1}{N} = \binom{2M+1}{M+1} \leq 4^M - 1$.
+\end{proof}
+
+Equivalently, $N - \log_4 \bigl(2 \binom{2N-1}{N}\bigr) > \frac12$ for every $N \geq 2$.
+
+\paragraph{The trigonometric form.}
+On the circle the Daubechies polynomial is evaluated at $\sin^2 \pi\xi$: a mask $L$ of order $N$
+has $|L(e^{-2\pi i \xi})|^2 = P_N(\sin^2 \pi\xi)$.
+
+\begin{definition}[The trigonometric Daubechies polynomial]
+\label{def:daub-fun}
+\lean{Daubechies.daubFun, Daubechies.daubFun_two, Daubechies.daubFun_three}
+\leanok
+\uses{def:daub-poly}
+For $N \in \N$ and $\xi \in \R$ let $P(\xi) = P_N(\sin^2 \pi\xi)$; the order $N$ is fixed and
+omitted from the notation. For $N = 2$, $P(\xi) = 1 + 2 \sin^2 \pi\xi$, and for $N = 3$,
+$P(\xi) = 1 + 3 \sin^2 \pi\xi + 6 \sin^4 \pi\xi$.
+\end{definition}
+
+\begin{lemma}[Symmetries of $P$]
+\label{lem:daub-fun-symmetry}
+\lean{Daubechies.daubFun_periodic, Daubechies.daubFun_neg, Daubechies.daubFun_add_half,
+  Daubechies.continuous_daubFun}
+\leanok
+\uses{def:daub-fun}
+For every $N \in \N$ the function $P$ is continuous, and for every $\xi \in \R$
+\[
+  P(\xi + 1) = P(\xi), \qquad P(-\xi) = P(\xi), \qquad
+  P\bigl(\xi + \tfrac12\bigr) = P_N(\cos^2 \pi\xi) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\sin(\pi(\xi + 1)) = -\sin \pi\xi$, $\sin(-\pi\xi) = -\sin \pi\xi$ and
+$\sin(\pi(\xi + \frac12)) = \cos \pi\xi$, and $P(\xi)$ is a polynomial in $\sin \pi\xi$.
+\end{proof}
+
+\begin{proposition}[Bounds for $P$]
+\label{prop:daub-fun-bounds}
+\lean{Daubechies.daubFun_nonneg, Daubechies.daubFun_le_choose, Daubechies.daubFun_le,
+  Daubechies.daubFun_zero, Daubechies.one_le_daubFun}
+\leanok
+\uses{def:daub-fun}
+For every $N \in \N$ and every $\xi \in \R$,
+\[
+  0 \leq P(\xi) \leq \binom{2N-1}{N} \quad\text{and}\quad
+  P(\xi) \leq 1 + \binom{2N-1}{N} \pi^2 \xi^2 .
+\]
+If $N \geq 1$, then moreover $P(0) = 1$ and $P(\xi) \geq 1$ for every $\xi \in \R$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-poly-bounds, lem:daub-poly-values}
+\Cref{lem:daub-poly-bounds} at $y = \sin^2 \pi\xi \in [0, 1]$, with $P_N(1) = \binom{2N-1}{N}$
+and $P_N(0) = 1$ (\Cref{lem:daub-poly-values}), and $\sin^2 \pi\xi \leq \pi^2 \xi^2$.
+\end{proof}
+
+\begin{theorem}[The trigonometric B\'ezout identity]
+\label{thm:daub-fun-bezout}
+\lean{Daubechies.daubFun_bezout}
+\leanok
+\uses{def:daub-fun}
+For every $N \geq 1$ and every $\xi \in \R$,
+\[
+  \cos(\pi\xi)^{2N} P(\xi) + \sin(\pi\xi)^{2N} P\bigl(\xi + \tfrac12\bigr) = 1 .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-bezout, lem:daub-fun-symmetry}
+\Cref{thm:daub-bezout} at $y = \sin^2 \pi\xi$, where $1 - y = \cos^2 \pi\xi$ and
+$P(\xi + \frac12) = P_N(1 - y)$ (\Cref{lem:daub-fun-symmetry}).
+\end{proof}
+
+The symbol $m_0$ of a mask of order $N$ has $|m_0(\xi)|^2 = \cos(\pi\xi)^{2N} P(\xi)$, and the
+identity becomes the quadrature mirror filter identity
+\[
+  |m_0(\xi)|^2 + \bigl|m_0\bigl(\xi + \tfrac12\bigr)\bigr|^2 = 1 .
+\]
+
+\section{Fourier transforms of integrable functions}
+
+This section is general analysis on $\R$, used for the scaling function
+$\varphi = \mathcal F^{-1} \Phi$ in the following sections. The Fourier transform of
+$f : \R \to \C$ is
+\[
+  \widehat f(\xi) = \mathcal F f(\xi) = \int_\R f(x) e^{-2\pi i x \xi} \, dx ,
+\]
+and its inverse transform is $\mathcal F^{-1} f(x) = \int_\R f(\xi) e^{2\pi i x \xi} \, d\xi$.
+Lean reads the integral of a function that is not integrable as $0$; with this convention the
+statements below without integrability hypotheses hold for every $f$.
+
+\begin{lemma}[Continuity and the uniform bound]
+\label{lem:daub-fourier-continuous}
+\lean{Real.continuous_fourier_of_integrable, Real.continuous_fourierInv_of_integrable,
+  Real.norm_fourier_le_integral_norm, Real.norm_fourierInv_le_integral_norm}
+\leanok
+For every integrable $f : \R \to \C$ the functions $\widehat f$ and $\mathcal F^{-1} f$ are
+continuous. For every $f : \R \to \C$ and all $\xi, x \in \R$,
+\[
+  |\widehat f(\xi)| \leq \int_\R |f| \quad\text{and}\quad |\mathcal F^{-1} f(x)| \leq \int_\R |f| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$|e^{-2\pi i x \xi}| = 1$, and dominated convergence with the dominating function $|f|$; the
+inverse transform is $\mathcal F^{-1} f(x) = \widehat f(-x)$.
+\end{proof}
+
+\begin{lemma}[Linearity]
+\label{lem:daub-fourier-linear}
+\lean{Real.fourier_const_mul_apply, Real.fourierInv_const_mul_apply, Real.fourier_sum_apply,
+  Real.fourierInv_sum_apply}
+\leanok
+For every $f : \R \to \C$ and every $c \in \C$, $\mathcal F(c f) = c \widehat f$ and
+$\mathcal F^{-1}(c f) = c \mathcal F^{-1} f$. For every finite family $(F_i)_{i \in S}$ of
+integrable functions $F_i : \R \to \C$,
+\[
+  \mathcal F\Bigl(\sum_{i \in S} F_i\Bigr) = \sum_{i \in S} \widehat{F_i}
+  \quad\text{and}\quad
+  \mathcal F^{-1}\Bigl(\sum_{i \in S} F_i\Bigr) = \sum_{i \in S} \mathcal F^{-1} F_i .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Linearity of the integral.
+\end{proof}
+
+\begin{lemma}[Translation and modulation]
+\label{lem:daub-fourier-translate}
+\lean{Real.fourier_comp_add_right_apply, Real.fourier_comp_sub_right_apply,
+  Real.fourierInv_comp_add_right_apply, Real.fourier_exp_mul_apply,
+  Real.fourierInv_exp_mul_apply}
+\leanok
+For $b \in \R$ let $e_b(x) = e^{2\pi i b x}$. For every $f : \R \to \C$ and all
+$a, b, \xi, x \in \R$:
+\begin{enumerate}
+  \item $\mathcal F[f(\cdot + a)](\xi) = e^{2\pi i a \xi} \widehat f(\xi)$ and
+    $\mathcal F[f(\cdot - a)](\xi) = e^{-2\pi i a \xi} \widehat f(\xi)$;
+  \item $\mathcal F^{-1}[f(\cdot + a)](x) = e^{-2\pi i a x} \mathcal F^{-1} f(x)$;
+  \item $\mathcal F(e_b f)(\xi) = \widehat f(\xi - b)$ and
+    $\mathcal F^{-1}(e_b f)(x) = \mathcal F^{-1} f(x + b)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The substitution $y = x + a$, and $e^{-2\pi i x \xi} e^{2\pi i b x} = e^{-2\pi i x (\xi - b)}$.
+\end{proof}
+
+\begin{lemma}[Dilation]
+\label{lem:daub-fourier-dilate}
+\lean{Real.fourier_comp_mul_left_apply_of_ne_zero, Real.fourier_comp_mul_left_apply,
+  Real.fourierInv_comp_mul_left_apply, Real.fourier_comp_mul_sub_apply}
+\leanok
+For every $f : \R \to \C$ and all $b, \xi, x \in \R$:
+\begin{enumerate}
+  \item $\mathcal F[f(a\,\cdot)](\xi) = |a|^{-1} \widehat f(\xi / a)$ for every $a \neq 0$;
+  \item $\mathcal F^{-1}[f(a\,\cdot)](x) = a^{-1} \mathcal F^{-1} f(x / a)$ for every $a > 0$;
+  \item $\widehat g(\xi) = a^{-1} e^{-2\pi i b \xi / a} \widehat f(\xi / a)$ for every $a > 0$,
+    where $g(x) = f(ax - b)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-fourier-translate}
+The substitution $y = ax$, with $dx = |a|^{-1} \, dy$. The third identity is the first one for
+$f(\cdot - b)$, together with \Cref{lem:daub-fourier-translate}.
+\end{proof}
+
+The third identity is the form met by the cascade algorithm
+$\eta_{n+1}(x) = \sum_k c_k \eta_n(2x - k)$.
+
+\begin{lemma}[Conjugation]
+\label{lem:daub-fourier-conj}
+\lean{Real.conj_fourier, Real.conj_fourierInv}
+\leanok
+For every $f : \R \to \C$ and all $\xi, x \in \R$, with $\bar f(x) = \overline{f(x)}$,
+\[
+  \overline{\widehat f(\xi)} = \mathcal F^{-1} \bar f(\xi) \quad\text{and}\quad
+  \overline{\mathcal F^{-1} f(x)} = \mathcal F \bar f(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\overline{e^{-2\pi i x \xi}} = e^{2\pi i x \xi}$, and conjugation commutes with the integral.
+\end{proof}
+
+\paragraph{The multiplication formula and Parseval's identity.}
+The transform moves from one factor of a product to the other. Together with Fourier inversion
+this gives Parseval's identity for integrable functions with integrable transforms.
+
+\begin{theorem}[The multiplication formula]
+\label{thm:daub-multiplication-formula}
+\lean{Real.integral_fourier_mul, Real.integral_fourierInv_mul}
+\leanok
+For all integrable $f, g : \R \to \C$,
+\[
+  \int_\R \widehat f(\xi) \, g(\xi) \, d\xi = \int_\R f(x) \, \widehat g(x) \, dx ,
+\]
+and the same holds with $\mathcal F^{-1}$ in place of $\mathcal F$:
+\[
+  \int_\R \mathcal F^{-1} f(\xi) \, g(\xi) \, d\xi = \int_\R f(x) \, \mathcal F^{-1} g(x) \, dx .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By Fubini's theorem both sides of the first identity equal the absolutely convergent double
+integral $\int_\R \int_\R e^{-2\pi i x \xi} f(x) g(\xi) \, dx \, d\xi$. The second identity is
+the same with $e^{2\pi i x \xi}$.
+\end{proof}
+
+\begin{theorem}[Parseval's identity]
+\label{thm:daub-parseval}
+\lean{Real.integral_mul_conj_eq_integral_fourier, Real.integral_norm_sq_fourier}
+\leanok
+Let $f : \R \to \C$ be integrable, and let $g : \R \to \C$ be continuous and integrable with
+integrable $\widehat g$. Then
+\[
+  \int_\R f(x) \, \overline{g(x)} \, dx = \int_\R \widehat f(\xi) \, \overline{\widehat g(\xi)}
+  \, d\xi .
+\]
+In particular $\int_\R |\widehat f|^2 = \int_\R |f|^2$ for every continuous integrable
+$f : \R \to \C$ with integrable $\widehat f$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-multiplication-formula, lem:daub-fourier-conj}
+By \Cref{lem:daub-fourier-conj} and \Cref{thm:daub-multiplication-formula} for $\mathcal F^{-1}$,
+\[
+  \int_\R \widehat g \, \overline{\widehat f} = \int_\R \widehat g \, \mathcal F^{-1} \bar f
+  = \int_\R \mathcal F^{-1} \widehat g \, \bar f ,
+\]
+and $\mathcal F^{-1} \widehat g = g$ by the Fourier inversion theorem, which holds for
+continuous integrable $g$ with integrable $\widehat g$. Conjugation gives the identity. For
+$g = f$ it reads $\int |f|^2 = \int |\widehat f|^2$, since $z \bar z = |z|^2$.
+\end{proof}
+
+\begin{lemma}[Testing against Schwartz functions]
+\label{lem:daub-fourier-schwartz}
+\lean{Real.integral_mul_schwartz_eq}
+\leanok
+For every integrable $f : \R \to \C$ and every Schwartz function $\psi : \R \to \C$,
+\[
+  \int_\R f(x) \, \psi(x) \, dx = \int_\R \widehat f(\xi) \, \mathcal F^{-1} \psi(\xi) \, d\xi .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-multiplication-formula}
+$\mathcal F^{-1} \psi$ is a Schwartz function, hence integrable, and
+$\mathcal F \mathcal F^{-1} \psi = \psi$ by Fourier inversion on the Schwartz space. Apply
+\Cref{thm:daub-multiplication-formula} to $f$ and $\mathcal F^{-1} \psi$.
+\end{proof}
+
+\paragraph{The fundamental lemma.}
+A function whose integrals against all test functions supported in an open set vanish is zero
+almost everywhere on that set, and everywhere on it if it is continuous.
+
+\begin{proposition}[The fundamental lemma of the calculus of variations]
+\label{prop:daub-fundamental-lemma}
+\lean{Real.ae_eq_zero_of_integral_mul_schwartz_eq_zero,
+  Real.eqOn_zero_of_integral_mul_schwartz_eq_zero}
+\leanok
+Let $U \subseteq \R$ be open, and let $f : \R \to \C$ satisfy $\int_\R \psi f = 0$ for every
+Schwartz function $\psi : \R \to \C$ whose support is compact and contained in $U$.
+\begin{enumerate}
+  \item If $f$ is locally integrable on $U$, then $f(x) = 0$ for almost every $x \in U$.
+  \item If $f$ is continuous, then $f(x) = 0$ for every $x \in U$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+\leanok
+Mathlib's fundamental lemma tests with real smooth functions $g$ with compact support in $U$,
+and $x \mapsto g(x)$, read as a complex function, is a Schwartz function. Two continuous
+functions that agree almost everywhere on an open set agree on it, since nonempty open sets
+have positive Lebesgue measure.
+\end{proof}
+
+\section{Masks of every order}
+
+The masks of every order come from the Fej\'er--Riesz theorem, as in~\cite{Daubechies}: a real
+polynomial $Q$ with $Q > 0$ on $[-1, 1]$ satisfies $Q(\cos\theta) = |L(e^{i\theta})|^2$ with a
+real polynomial $L$. For $Q(t) = P_N((1 - t)/2)$, where $Q(\cos 2\pi\xi) = P_N(\sin^2 \pi\xi)$,
+this gives the polynomial $L$ of a mask of order $N$. The proof factors $Q$ over $\C$ and
+splits each factor $\cos\theta - t$ with the inverse of the Joukowsky map.
+
+\paragraph{The inverse of the Joukowsky map.}
+The Joukowsky map $a \mapsto (a + a^{-1})/2$ takes $e^{i\varphi}$ to $\cos\varphi$, and for
+$a \neq 0$ the equation $(a + a^{-1})/2 = t$ reads $a^2 - 2ta + 1 = 0$.
+
+\begin{lemma}[Roots of $a^2 - 2ta + 1$]
+\label{lem:daub-joukowsky-equation}
+\lean{Complex.joukowsky_eq_re_of_norm_eq_one, Complex.joukowsky_root_ne_zero,
+  Complex.joukowsky_root_conj}
+\leanok
+Let $a, t \in \C$ with $a^2 - 2ta + 1 = 0$. Then $a \neq 0$ and
+$\bar a^2 - 2 \bar t \bar a + 1 = 0$. If $|a| = 1$, then $t = \operatorname{Re} a$; in
+particular $t$ is a real number in $[-1, 1]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The constant term of the equation is $1$, and conjugation is a ring homomorphism of $\C$. If
+$|a| = 1$, then $a^{-1} = \bar a$, and the equation divided by $a$ says
+$2t = a + a^{-1} = a + \bar a = 2 \operatorname{Re} a$.
+\end{proof}
+
+\begin{lemma}[The root in the disk]
+\label{lem:daub-joukowsky-root}
+\lean{Complex.exists_joukowsky_root, Complex.joukowsky_root_unique}
+\leanok
+For every $t \in \C \setminus [-1, 1]$ the equation $a^2 - 2ta + 1 = 0$ has a root $a$ with
+$|a| < 1$. For every $t \in \C$ it has at most one root $a$ with $|a| < 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-joukowsky-equation}
+The two roots $t \pm s$, $s^2 = t^2 - 1$, have product $1$, and for $t \notin [-1, 1]$ neither
+lies on the unit circle (\Cref{lem:daub-joukowsky-equation}), so one of them lies in the open
+unit disk. Two different roots are the two roots of the equation and have product $1$, so they
+cannot both lie in the open unit disk.
+\end{proof}
+
+\begin{definition}[The inverse of the Joukowsky map]
+\label{def:daub-joukowsky-inv}
+\lean{Complex.joukowskyInv, Complex.joukowskyInv_spec, Complex.joukowskyInv_eq}
+\leanok
+\uses{lem:daub-joukowsky-root}
+For $t \in \C$ let $a(t)$ be the root $a$ of $a^2 - 2ta + 1 = 0$ with $|a| < 1$ if there is
+one, and $a(t) = 0$ otherwise. If the equation has a root $a$ with $|a| < 1$, then $a = a(t)$;
+in particular $|a(t)| < 1$ and $a(t)^2 - 2t \, a(t) + 1 = 0$. This is the case for every
+$t \in \C \setminus [-1, 1]$; on this set $t \mapsto a(t)$ is the inverse of the Joukowsky map
+on the punctured open unit disk.
+\end{definition}
+
+For $t \in [-1, 1]$ the two roots $t \pm i \sqrt{1 - t^2}$ lie on the unit circle, and
+$a(t) = 0$.
+
+\begin{lemma}[The inverse of the Joukowsky map and conjugation]
+\label{lem:daub-joukowsky-conj}
+\lean{Complex.joukowskyInv_conj}
+\leanok
+\uses{def:daub-joukowsky-inv}
+For every $t \in \C$, $a(\bar t) = \overline{a(t)}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-joukowsky-equation, lem:daub-joukowsky-root}
+Conjugation maps the roots of $a^2 - 2ta + 1$ in the open unit disk to the roots of
+$a^2 - 2\bar t a + 1$ in the open unit disk (\Cref{lem:daub-joukowsky-equation}), and such a root
+is unique (\Cref{lem:daub-joukowsky-root}). If there is no such root for $t$, there is none
+for $\bar t$, and both sides are $0$.
+\end{proof}
+
+\begin{lemma}[The factorisation on the unit circle]
+\label{lem:daub-joukowsky-factor}
+\lean{Complex.joukowsky_two_mul_mul_re_sub, Complex.joukowsky_two_mul_norm_mul_norm_re_sub}
+\leanok
+Let $a, t, z \in \C$ with $a^2 - 2ta + 1 = 0$. If $z \bar z = 1$, then
+\[
+  2a (\operatorname{Re} z - t) = -(1 - az)(1 - a \bar z) ,
+\]
+and hence $2 |a| \, |\operatorname{Re} z - t| = |1 - az| \, |1 - \bar a z|$ if $|z| = 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Expand the right side with $z \bar z = 1$, $z + \bar z = 2 \operatorname{Re} z$ and
+$a^2 + 1 = 2ta$. For the moduli, $|1 - a \bar z| = |\overline{1 - a \bar z}| = |1 - \bar a z|$.
+\end{proof}
+
+For $z = e^{i\theta}$ the left side is $2 |a| \, |\cos\theta - t|$: on the unit circle the factor
+$\cos\theta - t$ splits into two linear factors in $e^{i\theta}$.
+
+\paragraph{The complex roots of a real polynomial.}
+For a real polynomial $Q$, products $\prod_t$ run over the complex roots $t$ of $Q$, counted
+with multiplicity.
+
+\begin{lemma}[Real polynomials over $\C$]
+\label{lem:daub-real-poly-roots}
+\lean{Multiset.norm_prod, Complex.aeval_ofReal, Polynomial.map_conj_aroots,
+  Polynomial.map_comp_conj_aroots, Polynomial.ofReal_ne_of_mem_aroots,
+  Polynomial.aeval_eq_mul_prod_aroots, Polynomial.eval_eq_abs_leadingCoeff_mul_prod_norm}
+\leanok
+Let $Q$ be a real polynomial with leading coefficient $c$.
+\begin{enumerate}
+  \item The conjugates $\bar t$ of the complex roots $t$ of $Q$ are again the complex roots of
+    $Q$, with the same multiplicities; so for every function $g$ on $\C$ the values $g(\bar t)$
+    and $g(t)$ over the roots agree as multisets.
+  \item $Q(z) = c \prod_t (z - t)$ for every $z \in \C$.
+  \item $Q(x) = |c| \prod_t |x - t|$ for every $x \in \R$ with $Q(x) \geq 0$.
+  \item No $r \in \R$ with $Q(r) \neq 0$ is a complex root of $Q$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\C$ is algebraically closed, so $Q$ has $\deg Q$ complex roots, counted with multiplicity, and
+item~2 holds; the coefficients of $Q$ are real, so $\bar t$ is a root of the same multiplicity
+as $t$. Item~3 is the modulus of item~2, since $Q(x) = |Q(x)|$: the modulus of a product is the
+product of the moduli, and a real polynomial takes real values at real points. Item~4 holds
+since $Q(t) = 0$ at every root $t$.
+\end{proof}
+
+\paragraph{The Fej\'er--Riesz factor.}
+For $Q > 0$ on $[-1, 1]$ each root $t$ of $Q$ contributes the factor $1 - a(t) z$, whose zero
+$1/a(t)$ lies outside the closed unit disk.
+
+\begin{definition}[The Fej\'er--Riesz factor]
+\label{def:daub-fejer-riesz-factor}
+\lean{Polynomial.fejerRieszFactor, Polynomial.eval_fejerRieszFactor,
+  Polynomial.natDegree_fejerRieszFactor_le}
+\leanok
+\uses{def:daub-joukowsky-inv}
+The \emph{Fej\'er--Riesz factor} of a real polynomial $Q$ is the complex polynomial
+\[
+  L_0(z) = \prod_t \bigl(1 - a(t) z\bigr) ,
+\]
+the product over the complex roots $t$ of $Q$, counted with multiplicity. Its degree is at most
+$\deg Q$.
+\end{definition}
+
+\begin{lemma}[The Fej\'er--Riesz factor is real]
+\label{lem:daub-fejer-riesz-factor-real}
+\lean{Polynomial.map_conj_fejerRieszFactor, Polynomial.exists_map_eq_of_map_conj_eq}
+\leanok
+\uses{def:daub-fejer-riesz-factor}
+A complex polynomial whose coefficients are fixed by conjugation has real coefficients. For
+every real polynomial $Q$ the coefficients of $L_0$ are fixed by conjugation, so $L_0$ is a real
+polynomial.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-joukowsky-conj, lem:daub-real-poly-roots}
+A complex number fixed by conjugation equals its real part. Conjugating the coefficients of
+$L_0$ replaces $a(t)$ by $\overline{a(t)} = a(\bar t)$ (\Cref{lem:daub-joukowsky-conj}), and the
+roots of $Q$ are invariant under conjugation (\Cref{lem:daub-real-poly-roots}).
+\end{proof}
+
+\begin{lemma}[Zeros of the Fej\'er--Riesz factor]
+\label{lem:daub-fejer-riesz-factor-zeros}
+\lean{Polynomial.joukowskyInv_spec_of_mem_aroots, Polynomial.eval_fejerRieszFactor_ne_zero}
+\leanok
+\uses{def:daub-fejer-riesz-factor}
+Let $Q$ be a real polynomial with $Q(r) > 0$ for every $r \in [-1, 1]$. Then every complex root
+$t$ of $Q$ satisfies $|a(t)| < 1$ and $a(t)^2 - 2t \, a(t) + 1 = 0$, and $L_0(z) \neq 0$ for
+every $z \in \C$ with $|z| \leq 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-real-poly-roots, lem:daub-joukowsky-root}
+No root of $Q$ lies in $[-1, 1]$ (\Cref{lem:daub-real-poly-roots}), so the equation for $a(t)$
+has a root in the open unit disk (\Cref{lem:daub-joukowsky-root}). For $|z| \leq 1$ each factor
+$1 - a(t) z$ of $L_0(z)$ is nonzero, since $|a(t) z| < 1$.
+\end{proof}
+
+\begin{lemma}[The Fej\'er--Riesz factor on the unit circle]
+\label{lem:daub-fejer-riesz-factor-modulus}
+\lean{Polynomial.prod_two_mul_norm_mul_prod_norm_eq}
+\leanok
+\uses{def:daub-fejer-riesz-factor}
+Let $Q$ be a real polynomial with $Q(r) > 0$ for every $r \in [-1, 1]$. Then for every
+$\theta \in \R$
+\[
+  \prod_t 2 |a(t)| \cdot \prod_t |\cos\theta - t| = |L_0(e^{i\theta})|^2 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-joukowsky-factor, lem:daub-fejer-riesz-factor-zeros, lem:daub-joukowsky-conj,
+  lem:daub-real-poly-roots}
+Let $z = e^{i\theta}$, so $|z| = 1$ and $\operatorname{Re} z = \cos\theta$. For each root $t$,
+\Cref{lem:daub-joukowsky-factor,lem:daub-fejer-riesz-factor-zeros} give
+\[
+  2 |a(t)| \, |\cos\theta - t| = |1 - a(t) z| \, \bigl|1 - \overline{a(t)} z\bigr| .
+\]
+Since $\overline{a(t)} = a(\bar t)$ (\Cref{lem:daub-joukowsky-conj}) and the roots are invariant
+under conjugation (\Cref{lem:daub-real-poly-roots}),
+$\prod_t |1 - \overline{a(t)} z| = \prod_t |1 - a(t) z| = |L_0(z)|$.
+\end{proof}
+
+\paragraph{The Fej\'er--Riesz theorem.}
+On the unit circle $|L_0|^2$ is $Q(\cos\theta)$ up to a positive constant; normalising the
+constant and the sign gives the theorem.
+
+\begin{lemma}[Fej\'er--Riesz up to a constant]
+\label{lem:daub-fejer-riesz-constant}
+\lean{Polynomial.exists_eval_cos_eq_mul_norm_sq}
+\leanok
+Let $Q$ be a real polynomial with $Q(r) > 0$ for every $r \in [-1, 1]$. Then there are $K > 0$
+and a real polynomial $L$ with $\deg L \leq \deg Q$ and $L(z) \neq 0$ for every $z \in \C$ with
+$|z| \leq 1$ such that $Q(\cos\theta) = K \, |L(e^{i\theta})|^2$ for every $\theta \in \R$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{def:daub-fejer-riesz-factor, lem:daub-fejer-riesz-factor-real,
+  lem:daub-fejer-riesz-factor-zeros, lem:daub-fejer-riesz-factor-modulus,
+  lem:daub-real-poly-roots, lem:daub-joukowsky-equation}
+Let $L$ be $L_0$ read as a real polynomial (\Cref{lem:daub-fejer-riesz-factor-real}); its degree
+is at most $\deg Q$ (\Cref{def:daub-fejer-riesz-factor}), and it has no zeros in the closed unit
+disk (\Cref{lem:daub-fejer-riesz-factor-zeros}). Since $Q(0) > 0$, $Q \neq 0$; let $c \neq 0$ be its
+leading coefficient and $K = |c| / \prod_t 2 |a(t)|$, which is positive since $a(t) \neq 0$
+(\Cref{lem:daub-joukowsky-equation}). At $x = \cos\theta \in [-1, 1]$, $Q(x) > 0$, so
+\[
+  Q(x) = |c| \prod_t |x - t| = K \, |L_0(e^{i\theta})|^2
+\]
+by \Cref{lem:daub-real-poly-roots} and \Cref{lem:daub-fejer-riesz-factor-modulus}.
+\end{proof}
+
+\begin{lemma}[Fixing the sign]
+\label{lem:daub-fejer-riesz-sign}
+\lean{Polynomial.exists_eval_one_pos_of_aeval_ne_zero}
+\leanok
+Let $L$ be a real polynomial with $L(z) \neq 0$ for every $z \in \C$ with $|z| \leq 1$. Then
+there is a real polynomial $L'$ with $\deg L' = \deg L$ and $L'(1) > 0$, with $L'(z) \neq 0$ for
+every $z \in \C$ with $|z| \leq 1$, and with $|L'(z)| = |L(z)|$ for every $z \in \C$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$L(1) \neq 0$; take $L' = L$ if $L(1) > 0$, and $L' = -L$ otherwise.
+\end{proof}
+
+\begin{theorem}[The Fej\'er--Riesz theorem]
+\label{thm:daub-fejer-riesz}
+\lean{Polynomial.fejer_riesz_outer, Polynomial.fejer_riesz}
+\leanok
+Let $Q$ be a real polynomial with $Q(t) > 0$ for every $t \in [-1, 1]$. Then there is a real
+polynomial $L$ with $\deg L \leq \deg Q$, $L(1) > 0$ and $L(z) \neq 0$ for every $z \in \C$ with
+$|z| \leq 1$, such that
+\[
+  |L(e^{i\theta})|^2 = Q(\cos\theta) \quad\text{for every } \theta \in \R .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-fejer-riesz-constant, lem:daub-fejer-riesz-sign}
+Take $K$ and $L$ from \Cref{lem:daub-fejer-riesz-constant}, and apply
+\Cref{lem:daub-fejer-riesz-sign} to $\sqrt K L$; then
+$|\sqrt K L(e^{i\theta})|^2 = K \, |L(e^{i\theta})|^2 = Q(\cos\theta)$.
+\end{proof}
+
+\begin{lemma}[Two readings of the identity]
+\label{lem:daub-fejer-riesz-readings}
+\lean{Polynomial.forall_norm_aeval_exp_neg_sq_iff, Polynomial.eval_one_sq_of_norm_aeval_exp_sq}
+\leanok
+Let $Q$ and $L$ be real polynomials. Then $|L(e^{-i\theta})|^2 = Q(\cos\theta)$ for every
+$\theta \in \R$ if and only if $|L(e^{i\theta})|^2 = Q(\cos\theta)$ for every $\theta \in \R$,
+and then $L(1)^2 = Q(1)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Replace $\theta$ by $-\theta$, and use $\cos(-\theta) = \cos\theta$. At $\theta = 0$ the identity
+reads $|L(1)|^2 = Q(1)$, and $L(1)$ is real.
+\end{proof}
+
+\begin{corollary}[The Fej\'er--Riesz theorem with $e^{-i\theta}$]
+\label{cor:daub-fejer-riesz-exp-neg}
+\lean{Polynomial.fejer_riesz_exp_neg}
+\leanok
+Let $Q$ be a real polynomial with $Q(t) > 0$ for every $t \in [-1, 1]$. Then there is a real
+polynomial $L$ with $\deg L \leq \deg Q$ and $L(1) > 0$ such that
+\[
+  |L(e^{-i\theta})|^2 = Q(\cos\theta) \quad\text{for every } \theta \in \R .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-fejer-riesz, lem:daub-fejer-riesz-readings}
+\Cref{thm:daub-fejer-riesz} and \Cref{lem:daub-fejer-riesz-readings}.
+\end{proof}
+
+With $\theta = 2\pi\xi$ this is the form $|L(e^{-2\pi i \xi})|^2$ of the masks. For example,
+$Q(t) = 2 - t = P_2((1 - t)/2)$ has the single root $t = 2$, with $a(2) = 2 - \sqrt 3$, and the
+construction gives $L(z) = \frac12 \bigl((1 + \sqrt 3) + (1 - \sqrt 3) z\bigr)$, the polynomial of
+the first Daubechies wavelet, $N = 2$.

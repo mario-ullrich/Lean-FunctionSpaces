@@ -34,6 +34,9 @@ public import FunctionSpaces.Wavelets.Examples.Haar
 public import FunctionSpaces.Wavelets.Examples.HaarBesov
 public import FunctionSpaces.Wavelets.Examples.Multiscale
 public import FunctionSpaces.Wavelets.Examples.Alpert
+public import FunctionSpaces.Wavelets.Daubechies.DaubechiesPolynomial
+public import FunctionSpaces.Wavelets.Daubechies.FourierIntegrable
+public import FunctionSpaces.Wavelets.Daubechies.FejerRiesz
 public import FunctionSpaces.Torus.Translation
 public import FunctionSpaces.Torus.Modulus
 public import FunctionSpaces.Torus.BesovModuli
@@ -194,6 +197,16 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Wavelets.Examples.Alpert`: multiwavelets of Alpert type, an orthonormal basis
   of the detail space, and the characterisation of `A^s_q` of piecewise polynomials, and of
   `B^s_{p,q}` for `0 < s < 1/p`, by multiwavelet coefficients.
+* `FunctionSpaces.Wavelets.Daubechies.DaubechiesPolynomial`: the Daubechies polynomial
+  `P_N(y) = ∑_{k<N} C(N-1+k, k) y^k`, its Bézout identity, its values and bounds, and its
+  trigonometric form `P_N(sin²(πξ))`.
+* `FunctionSpaces.Wavelets.Daubechies.FourierIntegrable`: the Fourier transform of integrable
+  functions on `ℝ`: continuity and bounds, translations and dilations, the multiplication formula,
+  Parseval's identity for integrable functions with integrable transforms, and the fundamental lemma
+  with Schwartz test functions.
+* `FunctionSpaces.Wavelets.Daubechies.FejerRiesz`: the Fejér–Riesz theorem: a real polynomial `Q`
+  positive on `[-1, 1]` satisfies `Q(cos θ) = |L(e^{iθ})|²` for a real polynomial `L` without zeros
+  in the closed unit disk.
 * `FunctionSpaces.Torus.Translation`: translations on `L_2(𝕋^d)` and their Fourier
   multipliers.
 * `FunctionSpaces.Torus.Modulus`: the modulus of smoothness `ω(f, t)_2`, the growth of the
