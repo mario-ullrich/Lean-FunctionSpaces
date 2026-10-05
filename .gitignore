@@ -26,8 +26,8 @@ blueprint/src/web.log
 blueprint/src/web.paux
 blueprint/src/web.pdf
 
-# Working documents (plans, reviews) are not part of the repository
-refs/*.md
+# Papers, working documents and scripts in refs/ are not part of the repository
+refs/
 
 # Archive of deleted files, a local working aid (see old/README.md)
 old/
