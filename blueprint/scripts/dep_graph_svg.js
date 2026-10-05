@@ -47,7 +47,10 @@ function dotOf(page) {
     throw new Error(`no renderDot(\`...\`) in ${page}; has the upstream template changed?`);
   }
   const dot = Function(`"use strict"; return \`${match[1]}\`;`)();
-  return dot.replace('bgcolor="transparent"', 'bgcolor="white"');
+  // Of two settings of a graph attribute the later one counts, so a white background set at
+  // the end replaces the page's, however the page writes it.
+  const end = dot.lastIndexOf("}");
+  return dot.slice(0, end) + '\tgraph [bgcolor="white"];\n' + dot.slice(end);
 }
 
 (async () => {
