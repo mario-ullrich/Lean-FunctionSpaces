@@ -3306,6 +3306,14 @@ $\int_{[u, u + mL]} G = \sum_{n < m} \int_{[u + nL, u + (n+1)L]} G$; in particul
 $\int_{[0, 1]} G = \sum_{n < 2^k} \int_{I_{k,n}} G$.
 \end{lemma}
 
+\begin{proof}
+\leanok
+The first claim restates $n 2^{-k} \leq x < (n+1) 2^{-k}$, and the claims on piecewise
+polynomials follow from their definition, since $I_{k+1,n} \subseteq I_{k,\lfloor n/2 \rfloor}$.
+The identity for the integrals follows by induction on $m$, splitting off the last interval,
+whose intersection with the others is a single point.
+\end{proof}
+
 \begin{lemma}[Piecewise Taylor approximation]
 \label{lem:pp-taylor}
 \lean{Interval.exists_taylor_pieces, Interval.exists_ppFun_approx_of_taylor,
@@ -9065,6 +9073,14 @@ bounded for the Besov quasi-norms of $\R^n$ (\Cref{thm:diffeo-invariance}). The 
 quasi-norm on a set depends only on the restriction to the set.
 \end{lemma}
 
+\begin{proof}
+\leanok
+The charts of the atlas and their inverses are smooth bijections of $V$, and the functions of
+the partition of unity are smooth with compact support, so each pair is a change of variables
+with a cut-off; \Cref{thm:diffeo-invariance} gives the bounds. The intrinsic quasi-norm on a set
+evaluates the function only at points of the set.
+\end{proof}
+
 \begin{theorem}[The Besov space of a smooth domain by charts]
 \label{thm:smooth-domain-besov}
 \lean{Rd.SmoothDomain.GlobalAtlas.modNormOn_pieceLp_lt_top,
@@ -9185,6 +9201,14 @@ The range of the model is the closed half-space $\{y : y_0 \geq 0\}$, which diff
 $\Omega_0$ by the null set $H_0$. So the cut-offs and the intrinsic quasi-norms on the two sets
 agree.
 \end{lemma}
+
+\begin{proof}
+\leanok
+The range of the model is the closed half-space by its definition. The cut-offs and the
+intrinsic quasi-norms are built from integrals over the set and over its translates, and these
+change only by null sets when $\Omega_0$ is replaced by its closure
+(\Cref{lem:null-set-domains}).
+\end{proof}
 
 \begin{theorem}[The trace commutes with the changes of charts]
 \label{thm:trace-chart-change}
