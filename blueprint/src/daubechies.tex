@@ -3853,29 +3853,6 @@ vanishes outside $[a, b]$ lies in $L_p(\R)$ and in $L_{p'}(\R)$
 (\Cref{lem:daub-generator-norms}).
 \end{proof}
 
-\begin{lemma}[Linearity of the coefficients]
-\label{lem:daub-coeff-linear}
-\lean{Daubechies.coeffFun_congr_ae, Daubechies.integrable_mul_conj_scaledFun,
-  Daubechies.coeffFun_add, Daubechies.coeffFun_const_mul}
-\leanok
-\uses{def:daub-generators}
-Let $\gamma : \R \to \C$, $j \in \N$ and $k \in \Z$. The coefficient
-$\langle f, \gamma_{j,k} \rangle$ depends only on the class of $f$ modulo null sets, and
-$\langle z f, \gamma_{j,k} \rangle = z \langle f, \gamma_{j,k} \rangle$ for every $z \in \C$. If
-$f \overline{\gamma_{j,k}}$ and $f' \overline{\gamma_{j,k}}$ are integrable, then
-$\langle f + f', \gamma_{j,k} \rangle = \langle f, \gamma_{j,k} \rangle
-+ \langle f', \gamma_{j,k} \rangle$. This is the case for all $f, f' \in L_p(\R)$,
-$1 \leq p \leq \infty$, if $\gamma$ is continuous and vanishes outside $[a, b]$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-generator-norms}
-The integral is linear. For $f \in L_p(\R)$, H\"older's inequality with
-$\overline{\gamma_{j,k}} \in L_{p'}(\R)$ (\Cref{lem:daub-generator-norms}) gives the
-integrability.
-\end{proof}
-
 \paragraph{The scaling functions of every level.}
 The scaling function of a mask of order $N \geq 2$ is continuous and vanishes outside
 $[0, 2N - 1]$ (\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}), so everything
@@ -3950,9 +3927,10 @@ For a Daubechies mask, a level $j \in \N$ and $f : \R \to \C$ let
 
 \begin{lemma}[Continuity and linearity of $P_j$]
 \label{lem:daub-proj-fun-basic}
-\lean{Daubechies.continuous_projFun, Daubechies.projFun_congr_ae,
-  Daubechies.integrable_mul_conj_scaled, Daubechies.projFun_add, Daubechies.projFun_const_mul,
-  Daubechies.projFun_sub}
+\lean{Daubechies.coeffFun_congr_ae, Daubechies.integrable_mul_conj_scaledFun,
+  Daubechies.coeffFun_add, Daubechies.coeffFun_const_mul, Daubechies.continuous_projFun,
+  Daubechies.projFun_congr_ae, Daubechies.integrable_mul_conj_scaled, Daubechies.projFun_add,
+  Daubechies.projFun_const_mul, Daubechies.projFun_sub}
 \leanok
 \uses{def:daub-proj-fun}
 Let $N \geq 2$ and $j \in \N$. For every $f : \R \to \C$ the function $P_j f$ is continuous and
@@ -3964,12 +3942,20 @@ $P_j(f - g) = P_j f - P_j g$.
 
 \begin{proof}
 \leanok
-\uses{lem:daub-expand-finite, lem:daub-coeff-linear, lem:daub-support-window}
-$P_j f$ is an expansion in the continuous functions $\varphi_{j,k}$
-(\Cref{lem:daub-expand-finite}), and the coefficients are linear in $f$
-(\Cref{lem:daub-coeff-linear}). Each $\varphi_{j,k}$ is continuous with compact support
-(\Cref{lem:daub-support-window}), so its product with a locally integrable function is
-integrable.
+\uses{def:daub-generators, lem:daub-generator-norms, lem:daub-expand-finite,
+  lem:daub-support-window}
+First, the coefficients are linear: for every $\gamma : \R \to \C$ and every $k \in \Z$ the
+coefficient $\langle f, \gamma_{j,k} \rangle$ depends only on the class of $f$ modulo null sets,
+and $\langle z f, \gamma_{j,k} \rangle = z \langle f, \gamma_{j,k} \rangle$ for every $z \in \C$;
+if $f \overline{\gamma_{j,k}}$ and $f' \overline{\gamma_{j,k}}$ are integrable, then
+$\langle f + f', \gamma_{j,k} \rangle = \langle f, \gamma_{j,k} \rangle
++ \langle f', \gamma_{j,k} \rangle$, since the integral is linear. This is the case for all
+$f, f' \in L_p(\R)$, $1 \leq p \leq \infty$, if $\gamma$ is continuous and vanishes outside
+$[a, b]$, by H\"older's inequality with $\overline{\gamma_{j,k}} \in L_{p'}(\R)$
+(\Cref{lem:daub-generator-norms}). Now $P_j f$ is an expansion in the continuous functions
+$\varphi_{j,k}$ (\Cref{lem:daub-expand-finite}), and its coefficients are linear in $f$. Each
+$\varphi_{j,k}$ is continuous with compact support (\Cref{lem:daub-support-window}), so its
+product with a locally integrable function is integrable.
 \end{proof}
 
 \begin{theorem}[Uniform boundedness of the projections]
@@ -3994,34 +3980,11 @@ and $C_\varphi C'_\varphi = M^{1 - 1/p} \|\varphi\|_p M^{1/p} \|\varphi\|_{p'}$.
 finite since $\varphi$ lies in every $L_p(\R)$ (\Cref{prop:daub-scaling-integrable}).
 \end{proof}
 
-\begin{lemma}[The projection on a dyadic cell]
-\label{lem:daub-proj-cell}
-\lean{Daubechies.scaled_eq_zero_of_mem_cell, Daubechies.projFun_eq_sum_of_mem_cell,
-  Daubechies.supportWindow_subset_of_mem_Icc, Daubechies.card_Icc_sub_two_mul_sub_two}
-\leanok
-\uses{def:daub-proj-fun}
-Let $N \geq 2$, $j \in \N$ and $k \in \Z$, and let $I = [k/2^j, (k+1)/2^j)$ be a dyadic cell and
-$W = [(k - 2N + 2)/2^j, (k + 2N - 1)/2^j]$ its window. For every $x \in I$ and every integer
-$l \notin [k - 2N + 2, k]$, $\varphi_{j,l}(x) = 0$; hence for every $f : \R \to \C$ and $x \in I$
-\[
-  P_j f(x) = \sum_{l = k - 2N + 2}^{k} \langle f, \varphi_{j,l} \rangle \, \varphi_{j,l}(x) ,
-\]
-a sum of $2N - 1$ terms. For $k - 2N + 2 \leq l \leq k$ the function $\varphi_{j,l}$ vanishes
-outside $W$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{thm:daub-scaling-support, lem:daub-support-window}
-$\varphi$ vanishes outside $(0, 2N - 1)$ (\Cref{thm:daub-scaling-support}), and
-$0 < 2^j x - l < 2N - 1$ together with $k \leq 2^j x < k + 1$ forces $k - 2N + 1 < l < k + 1$.
-The support window $[l/2^j, (l + 2N - 1)/2^j]$ of $\varphi_{j,l}$
-(\Cref{lem:daub-support-window}) lies in $W$.
-\end{proof}
-
 \begin{proposition}[The local bound]
 \label{prop:daub-proj-cell-bound}
-\lean{Daubechies.cellConst, Daubechies.cellConst_ne_top, Daubechies.eLpNorm_coeffFun_mul_scaled_le,
+\lean{Daubechies.scaled_eq_zero_of_mem_cell, Daubechies.projFun_eq_sum_of_mem_cell,
+  Daubechies.supportWindow_subset_of_mem_Icc, Daubechies.card_Icc_sub_two_mul_sub_two,
+  Daubechies.cellConst, Daubechies.cellConst_ne_top, Daubechies.eLpNorm_coeffFun_mul_scaled_le,
   Daubechies.eLpNorm_projFun_cell_le}
 \leanok
 \uses{def:daub-proj-fun}
@@ -4032,7 +3995,8 @@ every set $W' \supseteq [l/2^j, (l + 2N - 1)/2^j]$,
   \bigl\|\langle f, \varphi_{j,l} \rangle \varphi_{j,l}\bigr\|_p
   \leq \|\varphi\|_p \|\varphi\|_{p'} \|f\|_{L_p(W')} ,
 \]
-and for every dyadic cell $I$ of level $j$ with its window $W$ as in \Cref{lem:daub-proj-cell},
+and for every dyadic cell $I = [k/2^j, (k+1)/2^j)$, $k \in \Z$, of level $j$ with its window
+$W = [(k - 2N + 2)/2^j, (k + 2N - 1)/2^j]$,
 \[
   \|P_j f\|_{L_p(I)} \leq C_I \|f\|_{L_p(W)} .
 \]
@@ -4040,14 +4004,23 @@ and for every dyadic cell $I$ of level $j$ with its window $W$ as in \Cref{lem:d
 
 \begin{proof}
 \leanok
-\uses{lem:daub-coeff-local, lem:daub-generator-norms, lem:daub-proj-cell,
-  prop:daub-scaling-integrable}
+\uses{thm:daub-scaling-support, lem:daub-support-window, lem:daub-coeff-local,
+  lem:daub-generator-norms, prop:daub-scaling-integrable}
+First, the projection on a dyadic cell: for every $x \in I$ and every integer
+$l \notin [k - 2N + 2, k]$, $\varphi_{j,l}(x) = 0$, since $\varphi$ vanishes outside
+$(0, 2N - 1)$ (\Cref{thm:daub-scaling-support}), and $0 < 2^j x - l < 2N - 1$ together with
+$k \leq 2^j x < k + 1$ forces $k - 2N + 1 < l < k + 1$. Hence for every $f : \R \to \C$ and
+$x \in I$
+\[
+  P_j f(x) = \sum_{l = k - 2N + 2}^{k} \langle f, \varphi_{j,l} \rangle \, \varphi_{j,l}(x) ,
+\]
+a sum of $2N - 1$ terms, and for $k - 2N + 2 \leq l \leq k$ the support window
+$[l/2^j, (l + 2N - 1)/2^j]$ of $\varphi_{j,l}$ (\Cref{lem:daub-support-window}) lies in $W$.
 By \Cref{lem:daub-coeff-local} the coefficient is at most
 $\|f\|_{L_p(W')} \|\varphi_{j,l}\|_{p'}$, and the factors $2^{\pm j(1/2 - 1/p)}$ of the norms of
 $\varphi_{j,l}$ in $L_p$ and $L_{p'}$ cancel (\Cref{lem:daub-generator-norms}). On $I$ only the
-$2N - 1$ terms of \Cref{lem:daub-proj-cell} contribute, each with its support window in $W$;
-apply the triangle inequality. The norms of $\varphi$ are finite
-(\Cref{prop:daub-scaling-integrable}).
+$2N - 1$ terms above contribute, each with its support window in $W$; apply the triangle
+inequality. The norms of $\varphi$ are finite (\Cref{prop:daub-scaling-integrable}).
 \end{proof}
 
 \begin{proposition}[Reproduction]
@@ -4117,37 +4090,12 @@ By the partition of unity, $P_j f - f$ is an integral against a kernel concentra
 distance $(2N - 1)/2^j$ of the diagonal. Uniform continuity then gives $P_j f \to f$ for
 continuous functions with compact support.
 
-\begin{lemma}[Partition of unity at level $j$]
-\label{lem:daub-unity-level}
-\lean{Daubechies.integrable_conj_scaled, Daubechies.scaled_mul_integral_conj,
-  Daubechies.tsum_scaled_mul_integral_conj}
-\leanok
-\uses{def:daub-scaled}
-For every Daubechies mask of order $N \geq 2$, every $j \in \N$, $k \in \Z$ and $x \in \R$, the
-function $\overline{\varphi_{j,k}}$ is integrable,
-\[
-  \varphi_{j,k}(x) \int_\R \overline{\varphi_{j,k}(y)} \, dy = \varphi(2^j x - k)
-  \quad\text{and}\quad
-  \sum_{k \in \Z} \varphi_{j,k}(x) \int_\R \overline{\varphi_{j,k}(y)} \, dy = 1 .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{prop:daub-scaling-real, thm:daub-scaling-fourier, lem:daub-dyadic-substitution,
-  cor:daub-partition-of-unity, lem:daub-support-window}
-$\varphi$ is real with $\int_\R \varphi = 1$
-(\Cref{prop:daub-scaling-real,thm:daub-scaling-fourier}), so the substitution $u = 2^j y$
-(\Cref{lem:daub-dyadic-substitution}) gives
-$\int_\R \overline{\varphi_{j,k}} = 2^{j/2} 2^{-j}$, and $2^{j/2} 2^{j/2} 2^{-j} = 1$. The
-partition of unity (\Cref{cor:daub-partition-of-unity}) at the point $2^j x$ gives the sum.
-\end{proof}
-
 \begin{lemma}[The kernel form of $P_j f - f$]
 \label{lem:daub-kernel-form}
-\lean{Daubechies.scaled_eq_zero_of_notMem_Icc, Daubechies.tsum_eq_sum_of_scaled_eq_zero,
-  Daubechies.summable_of_scaled_eq_zero, Daubechies.card_Icc_ceil_floor_le_two_mul,
-  Daubechies.projFun_sub_eq_tsum}
+\lean{Daubechies.integrable_conj_scaled, Daubechies.scaled_mul_integral_conj,
+  Daubechies.tsum_scaled_mul_integral_conj, Daubechies.scaled_eq_zero_of_notMem_Icc,
+  Daubechies.tsum_eq_sum_of_scaled_eq_zero, Daubechies.summable_of_scaled_eq_zero,
+  Daubechies.card_Icc_ceil_floor_le_two_mul, Daubechies.projFun_sub_eq_tsum}
 \leanok
 \uses{def:daub-proj-fun}
 Let $N \geq 2$, $j \in \N$ and $x \in \R$. Then $\varphi_{j,k}(x) = 0$ for every integer $k$
@@ -4162,12 +4110,24 @@ has only finitely many nonzero terms. For every locally integrable $f : \R \to \
 
 \begin{proof}
 \leanok
-\uses{lem:daub-support-window, lem:daub-window-overlap, lem:daub-unity-level,
-  lem:daub-proj-fun-basic}
-\Cref{lem:daub-support-window,lem:daub-window-overlap} with $a = 0$ and $b = 2N - 1$. Subtract
-$f(x) = \sum_k \varphi_{j,k}(x) f(x) \int_\R \overline{\varphi_{j,k}}$
-(\Cref{lem:daub-unity-level}) term by term; the functions $f \overline{\varphi_{j,k}}$ are
-integrable (\Cref{lem:daub-proj-fun-basic}).
+\uses{def:daub-scaled, prop:daub-scaling-real, thm:daub-scaling-fourier,
+  lem:daub-dyadic-substitution, cor:daub-partition-of-unity, lem:daub-support-window,
+  lem:daub-window-overlap, lem:daub-proj-fun-basic}
+\Cref{lem:daub-support-window,lem:daub-window-overlap} with $a = 0$ and $b = 2N - 1$ give the
+first part. Next, the partition of unity at level $j$: for every $k \in \Z$ the function
+$\overline{\varphi_{j,k}}$ is integrable,
+\[
+  \varphi_{j,k}(x) \int_\R \overline{\varphi_{j,k}(y)} \, dy = \varphi(2^j x - k)
+  \quad\text{and}\quad
+  \sum_{k \in \Z} \varphi_{j,k}(x) \int_\R \overline{\varphi_{j,k}(y)} \, dy = 1 .
+\]
+Indeed, $\varphi$ is real with $\int_\R \varphi = 1$
+(\Cref{prop:daub-scaling-real,thm:daub-scaling-fourier}), so the substitution $u = 2^j y$
+(\Cref{lem:daub-dyadic-substitution}) gives $\int_\R \overline{\varphi_{j,k}} = 2^{j/2} 2^{-j}$,
+and $2^{j/2} 2^{j/2} 2^{-j} = 1$; the partition of unity (\Cref{cor:daub-partition-of-unity}) at
+the point $2^j x$ gives the sum. Subtract
+$f(x) = \sum_k \varphi_{j,k}(x) f(x) \int_\R \overline{\varphi_{j,k}}$ term by term; the
+functions $f \overline{\varphi_{j,k}}$ are integrable (\Cref{lem:daub-proj-fun-basic}).
 \end{proof}
 
 \begin{proposition}[The error for uniformly continuous functions]
@@ -4204,27 +4164,6 @@ $|y - x| \leq (2N - 1)/2^j$, so the integral is at most
 $\eta \|\varphi_{j,k}\|_1 = \eta \, 2^{-j/2} \|\varphi\|_1$ (\Cref{lem:daub-generator-norms}),
 and at most $2N$ terms are nonzero. For item~2, item~1 with $\eta = 0$ shows that
 $P_j f - f$ vanishes for $|x| > R + 2N$, and on $[-R - 2N, R + 2N]$ the bound of item~1 holds.
-\end{proof}
-
-\begin{proposition}[Convergence for continuous functions with compact support]
-\label{prop:daub-proj-converges-cc}
-\lean{Daubechies.exists_div_two_pow_lt, Daubechies.tendsto_eLpNorm_sub_projFun}
-\leanok
-\uses{def:daub-proj-fun}
-For every $c \in \R$ and every $\delta > 0$ there is $J \in \N$ with $c/2^J < \delta$. For every
-Daubechies mask of order $N \geq 2$, every continuous $f : \R \to \C$ with compact support and
-every $0 < p \leq \infty$, $\|f - P_j f\|_p \to 0$ as $j \to \infty$.
-\end{proposition}
-
-\begin{proof}
-\leanok
-\uses{prop:daub-proj-error, prop:daub-scaling-continuous, thm:daub-scaling-support,
-  prop:daub-scaling-integrable}
-$2^J > J$, so any $J > c/\delta$ serves. The function $f$ is uniformly continuous, and $\varphi$
-is bounded, being continuous with compact support
-(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}). For $\eta > 0$ and all large
-$j$ the hypothesis of item~2 of \Cref{prop:daub-proj-error} holds, and the bound there is a fixed
-multiple of $\eta$.
 \end{proof}
 
 \paragraph{The scaling spaces.}
@@ -4286,7 +4225,8 @@ bound $C_P$ (\Cref{def:projection-scheme}), whose projection of complexity $2^j$
 
 \begin{theorem}[Density and convergence]
 \label{thm:daub-density}
-\lean{Daubechies.closure_iUnion_scalingSpace, Daubechies.closure_iUnion_scheme,
+\lean{Daubechies.exists_div_two_pow_lt, Daubechies.tendsto_eLpNorm_sub_projFun,
+  Daubechies.closure_iUnion_scalingSpace, Daubechies.closure_iUnion_scheme,
   Daubechies.tendsto_proj}
 \leanok
 \uses{def:daub-scheme}
@@ -4297,11 +4237,18 @@ $f \in L_p(\R)$, $P_j f \to f$ in $L_p(\R)$ as $j \to \infty$.
 
 \begin{proof}
 \leanok
-\uses{prop:daub-proj-converges-cc, lem:lebesgue}
-Continuous functions with compact support are dense in $L_p(\R)$, and such a function $g$ is the
-limit of $P_j g \in V_j$ (\Cref{prop:daub-proj-converges-cc}). The projections are uniformly
-bounded, so the projection scheme converges on all of $L_p(\R)$ (\Cref{lem:lebesgue}), along the
-complexities $2^j$.
+\uses{def:daub-proj-fun, prop:daub-proj-error, prop:daub-scaling-continuous,
+  thm:daub-scaling-support, prop:daub-scaling-integrable, lem:lebesgue}
+First, for every continuous $g : \R \to \C$ with compact support and every $0 < p \leq \infty$,
+$\|g - P_j g\|_p \to 0$ as $j \to \infty$. Indeed, $g$ is uniformly continuous, and $\varphi$ is
+bounded, being continuous with compact support
+(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}). For $\eta > 0$ and all large
+$j$ the hypothesis of item~2 of \Cref{prop:daub-proj-error} holds, since for every $c \in \R$
+and every $\delta > 0$ there is $J \in \N$ with $c/2^J < \delta$ ($2^J > J$, so any
+$J > c/\delta$ serves), and the bound there is a fixed multiple of $\eta$. Continuous functions
+with compact support are dense in $L_p(\R)$, and such a $g$ is the limit of $P_j g \in V_j$. The
+projections are uniformly bounded, so the projection scheme converges on all of $L_p(\R)$
+(\Cref{lem:lebesgue}), along the complexities $2^j$.
 \end{proof}
 
 \paragraph{The wavelet.}
@@ -4449,32 +4396,6 @@ $\frac12 \sum_i c_i g_{i + 2(l-k)} = 0$ (\Cref{prop:daub-dual-orthogonality}).
 Perfect reconstruction of the filter pair joins the expansions of level $j$ in the
 $\varphi_{j,k}$ and in the $\psi_{j,k}$ into one expansion of level $j + 1$.
 
-\begin{lemma}[The coefficients of two consecutive levels]
-\label{lem:daub-coeff-two-levels}
-\lean{Daubechies.coeffFun_scalingFun_eq_tsum, Daubechies.coeffFun_wavelet_eq_tsum}
-\leanok
-\uses{def:daub-wavelet, def:daub-scaled}
-For every Daubechies mask of order $N \geq 2$, every locally integrable $f : \R \to \C$, every
-$j \in \N$ and $k \in \Z$,
-\[
-  \langle f, \varphi_{j,k} \rangle
-  = \sum_{n \in \Z} \frac{c_{n-2k}}{\sqrt 2} \langle f, \varphi_{j+1,n} \rangle
-  \quad\text{and}\quad
-  \langle f, \psi_{j,k} \rangle
-  = \sum_{n \in \Z} \frac{g_{n-2k}}{\sqrt 2} \langle f, \varphi_{j+1,n} \rangle .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{prop:daub-scaled-refine, lem:daub-wavelet-refine, lem:daub-finite-expansions,
-  lem:daub-shifted-filters}
-By \Cref{prop:daub-scaled-refine,lem:daub-wavelet-refine}, $\varphi_{j,k}$ and $\psi_{j,k}$ are
-expansions of level $j + 1$ whose coefficients vanish outside a finite set
-(\Cref{lem:daub-shifted-filters}). Insert them into the first identity of
-\Cref{lem:daub-finite-expansions}; the filters are real.
-\end{proof}
-
 \begin{definition}[Refined wavelet coefficients]
 \label{def:daub-wavelet-refine-coeff}
 \lean{Daubechies.waveletRefineCoeff, Daubechies.summable_waveletRefine}
@@ -4541,7 +4462,8 @@ $\sum_n \lambda_n \delta_{nn'} = \lambda_{n'}$.
 
 \begin{theorem}[The block identity]
 \label{thm:daub-block-identity}
-\lean{Daubechies.detailFun, Daubechies.projFun_succ_eq_add, Daubechies.memLp_detailFun,
+\lean{Daubechies.coeffFun_scalingFun_eq_tsum, Daubechies.coeffFun_wavelet_eq_tsum,
+  Daubechies.detailFun, Daubechies.projFun_succ_eq_add, Daubechies.memLp_detailFun,
   Daubechies.proj_succ_sub_proj}
 \leanok
 \uses{def:daub-proj-fun, def:daub-proj, def:daub-wavelet}
@@ -4557,10 +4479,25 @@ class of $Q_j f$.
 
 \begin{proof}
 \leanok
-\uses{prop:daub-expand-succ, lem:daub-expand-wavelet-succ, lem:daub-coeff-two-levels,
-  prop:daub-perfect-reconstruction, lem:daub-expand-coeff, lem:daub-wavelet-basic}
-Let $\lambda_n = \langle f, \varphi_{j+1,n} \rangle$. By \Cref{lem:daub-coeff-two-levels} the
-coefficients of $P_j f$ and $Q_j f$ are $H \lambda$ and $G \lambda$, so by
+\uses{def:daub-scaled, prop:daub-scaled-refine, lem:daub-wavelet-refine,
+  lem:daub-finite-expansions, lem:daub-shifted-filters, prop:daub-expand-succ,
+  lem:daub-expand-wavelet-succ, prop:daub-perfect-reconstruction, lem:daub-expand-coeff,
+  lem:daub-wavelet-basic}
+First, the coefficients of two consecutive levels: for every locally integrable $f$ and every
+$k \in \Z$,
+\[
+  \langle f, \varphi_{j,k} \rangle
+  = \sum_{n \in \Z} \frac{c_{n-2k}}{\sqrt 2} \langle f, \varphi_{j+1,n} \rangle
+  \quad\text{and}\quad
+  \langle f, \psi_{j,k} \rangle
+  = \sum_{n \in \Z} \frac{g_{n-2k}}{\sqrt 2} \langle f, \varphi_{j+1,n} \rangle ,
+\]
+since $\varphi_{j,k}$ and $\psi_{j,k}$ are expansions of level $j + 1$
+(\Cref{prop:daub-scaled-refine,lem:daub-wavelet-refine}) whose coefficients vanish outside a
+finite set (\Cref{lem:daub-shifted-filters}); insert them into the first identity of
+\Cref{lem:daub-finite-expansions}, where the filters are real. Let
+$\lambda_n = \langle f, \varphi_{j+1,n} \rangle$. These identities say that the coefficients of
+$P_j f$ and $Q_j f$ are $H \lambda$ and $G \lambda$, so by
 \Cref{prop:daub-expand-succ,lem:daub-expand-wavelet-succ} both are expansions of level $j + 1$,
 with the coefficients $H^* H \lambda$ and $G^* G \lambda$. These add up to $\lambda$
 (\Cref{prop:daub-perfect-reconstruction}), and the expansion of $\lambda$ is $P_{j+1} f$. The
@@ -4641,42 +4578,20 @@ orthonormal (\Cref{thm:daub-orthonormal}) and which lies in every $L_p(\R)$
 (\Cref{prop:daub-scaling-integrable}), gives $K_3 = C'_\varphi$ and $K_4 = C_\varphi$.
 \end{proof}
 
-By \Cref{lem:daub-scheme-blocks}, $P_{j+1} f - P_j f$ is the dyadic block of the projection
-scheme of the Daubechies scheme (\Cref{def:blocks}), so the block norms of \Cref{thm:blocks} are
-equivalent to weighted $\ell_p$ norms of the wavelet coefficients.
+Since the projection of complexity $2^j$ of the Daubechies projection scheme is $P_j$
+(\Cref{def:daub-scheme}), $P_{j+1} f - P_j f$ is its dyadic block of level $j$
+(\Cref{def:blocks}), so the block norms of \Cref{thm:blocks} are equivalent to weighted $\ell_p$
+norms of the wavelet coefficients.
 
 \paragraph{Vanishing moments.}
 The vanishing moments of the dual filter (\Cref{prop:daub-dual-moments}) pass to the wavelet.
 
-\begin{lemma}[Moments of dilated translates of $\varphi$]
-\label{lem:daub-dilated-moments}
-\lean{Daubechies.integrable_pow_mul_scalingFun_two_mul_sub,
-  Daubechies.integrable_pow_mul_scalingFun,
-  Daubechies.integral_pow_mul_scalingFun_two_mul_sub, Daubechies.sum_dualCoeff_mul_pow_eq_zero}
-\leanok
-\uses{def:daub-scaling-function, def:daub-dual-filter}
-For every Daubechies mask of order $N \geq 2$, all $l, i \in \N$ and every $k \in \Z$ the
-functions $x \mapsto x^l \varphi(2x - k)$ and $y \mapsto y^i \varphi(y)$ are integrable, and
-\[
-  \int_\R x^l \varphi(2x - k) \, dx
-  = 2^{-(l+1)} \sum_{i=0}^{l} \binom{l}{i} k^{l-i} \int_\R y^i \varphi(y) \, dy .
-\]
-For every Daubechies mask of order $N$ and every $s < N$,
-$\sum_{k = 2 - 2N}^{1} g_k k^s = 0$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{prop:daub-scaling-continuous, thm:daub-scaling-support, prop:daub-dual-moments}
-The functions are continuous with compact support
-(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}). The substitution $u = 2x$, the
-translation $u = y + k$ and the binomial theorem for $(y + k)^l$ give the identity. The last
-statement is \Cref{prop:daub-dual-moments}, since $g_k = 0$ outside $2 - 2N \leq k \leq 1$.
-\end{proof}
-
 \begin{theorem}[Vanishing moments of the wavelet]
 \label{thm:daub-vanishing-moments}
-\lean{Daubechies.vanishing_moments}
+\lean{Daubechies.integrable_pow_mul_scalingFun_two_mul_sub,
+  Daubechies.integrable_pow_mul_scalingFun,
+  Daubechies.integral_pow_mul_scalingFun_two_mul_sub, Daubechies.sum_dualCoeff_mul_pow_eq_zero,
+  Daubechies.vanishing_moments}
 \leanok
 \uses{def:daub-wavelet}
 For every Daubechies mask of order $N \geq 2$ and every $l < N$,
@@ -4685,8 +4600,19 @@ $\int_\R x^l \psi(x) \, dx = 0$.
 
 \begin{proof}
 \leanok
-\uses{lem:daub-dilated-moments}
-By \Cref{lem:daub-dilated-moments},
+\uses{def:daub-scaling-function, def:daub-dual-filter, prop:daub-scaling-continuous,
+  thm:daub-scaling-support, prop:daub-dual-moments}
+First, the moments of the dilated translates of $\varphi$: for all $l, i \in \N$ and every
+$k \in \Z$ the functions $x \mapsto x^l \varphi(2x - k)$ and $y \mapsto y^i \varphi(y)$ are
+integrable, being continuous with compact support
+(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}), and
+\[
+  \int_\R x^l \varphi(2x - k) \, dx
+  = 2^{-(l+1)} \sum_{i=0}^{l} \binom{l}{i} k^{l-i} \int_\R y^i \varphi(y) \, dy
+\]
+by the substitution $u = 2x$, the translation $u = y + k$ and the binomial theorem for
+$(y + k)^l$. Moreover $\sum_{k = 2 - 2N}^{1} g_k k^s = 0$ for every $s < N$
+(\Cref{prop:daub-dual-moments}, since $g_k = 0$ outside $2 - 2N \leq k \leq 1$). Hence
 \[
   \int_\R x^l \psi(x) \, dx = 2^{-(l+1)} \sum_{i=0}^{l} \binom{l}{i}
   \Bigl(\int_\R y^i \varphi(y) \, dy\Bigr) \sum_{k = 2 - 2N}^{1} g_k k^{l-i} ,
@@ -4712,37 +4638,11 @@ $S_\delta f = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} M_{k\delta}^r f$ of
 \Cref{thm:steklov-smoothing}, with the averages $M_\eta$ of \Cref{def:steklov}, is defined at
 every point of $\R$, and its bounds hold on the whole line with the modulus of $L_p(\R)$.
 
-\begin{lemma}[The derivative of the smoothing, term by term]
-\label{lem:daub-smoothing-terms}
-\lean{Daubechies.eLpNorm_higherDiff_le_modulus_of_nonneg, Daubechies.sum_range_choose_succ_le,
-  Daubechies.iteratedDeriv_smooth_eq_sum_smul, Daubechies.eLpNorm_smul_higherDiff_le_modulus}
-\leanok
-\uses{def:steklov, def:rd-modulus}
-Let $f : \R \to \C$, $r \in \N$, $\delta > 0$ and $0 < p \leq \infty$. Then
-$\|\Delta_h^r f\|_p \leq \omega_r(f, t)_p$ for $0 \leq h \leq t$,
-$\sum_{k=1}^r \binom{r}{k} \leq 2^r$, and for every $1 \leq k \leq r$
-\[
-  \Bigl\|(-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta_{k\delta}^r f\Bigr\|_p
-  \leq \binom{r}{k} \delta^{-r} \omega_r(f, r\delta)_p .
-\]
-If $f$ is continuous, then
-\[
-  (S_\delta f)^{(r)} = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta_{k\delta}^r f .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:rd-modulus, thm:steklov-smoothing}
-The first bound is the definition of the modulus (\Cref{lem:rd-modulus}), and
-$\sum_{k=0}^r \binom{r}{k} = 2^r$. For the third, $(k\delta)^{-r} \leq \delta^{-r}$ and
-$0 \leq k\delta \leq r\delta$. The formula for the derivative is that of
-\Cref{thm:steklov-smoothing}, at every point of $\R$.
-\end{proof}
-
 \begin{proposition}[Steklov smoothing on the line]
 \label{prop:daub-steklov-line}
-\lean{Daubechies.eLpNorm_sub_smooth_le_modulus, Daubechies.eLpNorm_iteratedDeriv_smooth_le_modulus,
+\lean{Daubechies.eLpNorm_higherDiff_le_modulus_of_nonneg, Daubechies.sum_range_choose_succ_le,
+  Daubechies.iteratedDeriv_smooth_eq_sum_smul, Daubechies.eLpNorm_smul_higherDiff_le_modulus,
+  Daubechies.eLpNorm_sub_smooth_le_modulus, Daubechies.eLpNorm_iteratedDeriv_smooth_le_modulus,
   Daubechies.memLp_smooth, Daubechies.memLp_iteratedDeriv_smooth}
 \leanok
 \uses{thm:steklov-smoothing, def:rd-modulus}
@@ -4760,34 +4660,26 @@ $(S_\delta f)^{(r)} \in L_p(\R)$ for $1 \leq p \leq \infty$.
 
 \begin{proof}
 \leanok
-\uses{lem:minkowski-avg, lem:daub-smoothing-terms, lem:rd-modulus}
+\uses{def:steklov, lem:rd-modulus, thm:steklov-smoothing, lem:minkowski-avg}
 $f - S_\delta f$ is $(-1)^r$ times the average of $\Delta_{v_1 + \cdots + v_r}^r f$ over
 $v \in [0, \delta]^r$ (\Cref{thm:steklov-smoothing}), so Minkowski's inequality for averages
 (\Cref{lem:minkowski-avg}) for Lebesgue measure on $\R$ bounds its norm by the supremum of
-$\|\Delta_h^r f\|_p$ over $0 \leq h \leq r\delta$. The triangle inequality and
-\Cref{lem:daub-smoothing-terms} bound the derivative. The memberships follow from
-$\omega_r(f, t)_p \leq 2^r \|f\|_p$ (\Cref{lem:rd-modulus}).
-\end{proof}
-
-\begin{lemma}[The dyadic step]
-\label{lem:daub-steklov-dyadic}
-\lean{Daubechies.eLpNorm_sub_smooth_le_dyadic, Daubechies.eLpNorm_iteratedDeriv_smooth_le_dyadic}
-\leanok
-\uses{thm:steklov-smoothing, def:rd-modulus}
-Let $f : \R \to \C$ be continuous, $N \geq 1$, $j \in \N$, and let $S_\delta$ be the smoothing of
-order $r = N$ with the step $\delta = 1/(N 2^j)$. Then
-$\|f - S_\delta f\|_p \leq \omega_N(f, 2^{-j})_p$ for $1 \leq p < \infty$, and
+$\|\Delta_h^r f\|_p$ over $0 \leq h \leq r\delta$. For the derivative, take the terms one by
+one: for every $f : \R \to \C$ and $0 < p \leq \infty$, $\|\Delta_h^r f\|_p \leq \omega_r(f, t)_p$
+for $0 \leq h \leq t$, the definition of the modulus (\Cref{lem:rd-modulus}), and
+$\sum_{k=1}^r \binom{r}{k} \leq 2^r$, since $\sum_{k=0}^r \binom{r}{k} = 2^r$; hence for every
+$1 \leq k \leq r$
 \[
-  \|(S_\delta f)^{(N)}\|_p \leq 2^N N^N 2^{jN} \omega_N(f, 2^{-j})_p
-  \quad\text{for } 1 \leq p \leq \infty .
+  \Bigl\|(-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta_{k\delta}^r f\Bigr\|_p
+  \leq \binom{r}{k} \delta^{-r} \omega_r(f, r\delta)_p ,
 \]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{prop:daub-steklov-line}
-\Cref{prop:daub-steklov-line} with $r = N$, where $N\delta = 2^{-j}$ and
-$\delta^{-N} = N^N 2^{jN}$.
+as $(k\delta)^{-r} \leq \delta^{-r}$ and $0 \leq k\delta \leq r\delta$. For continuous $f$,
+\[
+  (S_\delta f)^{(r)} = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta_{k\delta}^r f
+\]
+at every point of $\R$ (\Cref{thm:steklov-smoothing}), and the triangle inequality bounds the
+derivative. The memberships follow from $\omega_r(f, t)_p \leq 2^r \|f\|_p$
+(\Cref{lem:rd-modulus}).
 \end{proof}
 
 \paragraph{Jackson's inequality.}
@@ -4843,40 +4735,11 @@ length $4N - 3$ is $4N - 2$ (\Cref{lem:daub-window-overlap}), and the window ine
 (\Cref{lem:daub-window-inequality}) for $|G|^p$ gives the sum.
 \end{proof}
 
-\begin{lemma}[The error on a cell]
-\label{lem:daub-cell-error}
-\lean{Daubechies.sub_projFun_eq_sub_projFun_sub, Daubechies.eLpNorm_sub_projFun_cell_le_of_poly,
-  Daubechies.eLpNorm_sub_projFun_cell_le}
-\leanok
-\uses{def:daub-proj-fun}
-Let $N \geq 2$, $1 \leq p \leq \infty$, $j \in \N$ and $k \in \Z$, and let $C_I$ be the constant
-of \Cref{prop:daub-proj-cell-bound}. For every locally integrable $S : \R \to \C$ and every
-complex polynomial $Q$ of degree less than $N$, $S - P_j S = (S - Q) - P_j(S - Q)$ and
-\[
-  \|S - P_j S\|_{L_p(I_k)} \leq (1 + C_I) \|S - Q\|_{L_p(W_k)} .
-\]
-For every $S \in C^N(\R)$,
-\[
-  \|S - P_j S\|_{L_p(I_k)} \leq (1 + C_I) (4N - 3)^N 2^{-jN} \|S^{(N)}\|_{L_p(W_k)} .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-proj-fun-basic, prop:daub-proj-reproduction, prop:daub-proj-cell-bound,
-  lem:daub-cells-windows, lem:taylor-lp}
-$P_j$ is linear on locally integrable functions (\Cref{lem:daub-proj-fun-basic}) and reproduces
-$Q$ (\Cref{prop:daub-proj-reproduction}). Then $I_k \subseteq W_k$
-(\Cref{lem:daub-cells-windows}) and
-$\|P_j(S - Q)\|_{L_p(I_k)} \leq C_I \|S - Q\|_{L_p(W_k)}$ (\Cref{prop:daub-proj-cell-bound}).
-For $S \in C^N(\R)$, Taylor's theorem on $W_k$ (\Cref{lem:taylor-lp}) gives $Q$ with
-$\|S - Q\|_{L_p(W_k)} \leq |W_k|^N \|S^{(N)}\|_{L_p(W_k)}$, and $|W_k| = (4N - 3)/2^j$.
-\end{proof}
-
 \begin{proposition}[Jackson's inequality for smooth functions]
 \label{prop:daub-jackson-smooth}
-\lean{Daubechies.smoothJacksonConst, Daubechies.smoothJacksonConst_ne_top,
-  Daubechies.eLpNorm_sub_projFun_le_of_contDiff}
+\lean{Daubechies.sub_projFun_eq_sub_projFun_sub, Daubechies.eLpNorm_sub_projFun_cell_le_of_poly,
+  Daubechies.eLpNorm_sub_projFun_cell_le, Daubechies.smoothJacksonConst,
+  Daubechies.smoothJacksonConst_ne_top, Daubechies.eLpNorm_sub_projFun_le_of_contDiff}
 \leanok
 \uses{def:daub-proj-fun}
 Let $N \geq 2$ and $1 \leq p < \infty$, and let
@@ -4889,36 +4752,31 @@ $S \in C^N(\R)$ and every $j \in \N$
 
 \begin{proof}
 \leanok
-\uses{lem:daub-cell-error, lem:daub-cells-windows, lem:daub-summing-cover,
-  prop:daub-proj-cell-bound}
-\Cref{lem:daub-summing-cover} with the cells $I_k$ and the windows $W_k$, the bound of
-\Cref{lem:daub-cell-error} on each cell, and the window sum of \Cref{lem:daub-cells-windows}
-for $G = S^{(N)}$. The constant $C_I$ is finite (\Cref{prop:daub-proj-cell-bound}).
-\end{proof}
-
-\begin{lemma}[Comparing the errors of two functions]
-\label{lem:daub-error-compare}
-\lean{Daubechies.eLpNorm_sub_projFun_le_add}
-\leanok
-\uses{def:daub-proj-fun}
-Let $N \geq 2$ and $1 \leq p < \infty$. For all locally integrable $f, S : \R \to \C$ and every
-$j \in \N$,
+\uses{lem:daub-proj-fun-basic, prop:daub-proj-reproduction, prop:daub-proj-cell-bound,
+  lem:daub-cells-windows, lem:taylor-lp, lem:daub-summing-cover}
+First, the error on a cell, for every $1 \leq p \leq \infty$ and $k \in \Z$. For every locally
+integrable $S : \R \to \C$ and every complex polynomial $Q$ of degree less than $N$,
+$S - P_j S = (S - Q) - P_j(S - Q)$, since $P_j$ is linear on locally integrable functions
+(\Cref{lem:daub-proj-fun-basic}) and reproduces $Q$ (\Cref{prop:daub-proj-reproduction}); as
+$I_k \subseteq W_k$ (\Cref{lem:daub-cells-windows}) and
+$\|P_j(S - Q)\|_{L_p(I_k)} \leq C_I \|S - Q\|_{L_p(W_k)}$ (\Cref{prop:daub-proj-cell-bound}),
 \[
-  \|f - P_j f\|_p \leq (1 + C_P) \|f - S\|_p + \|S - P_j S\|_p
+  \|S - P_j S\|_{L_p(I_k)} \leq (1 + C_I) \|S - Q\|_{L_p(W_k)} .
 \]
-with the constant $C_P$ of \Cref{thm:daub-proj-bound}.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-proj-fun-basic, thm:daub-proj-bound}
-$f - P_j f = (f - S) + (S - P_j S) + P_j(S - f)$ by linearity (\Cref{lem:daub-proj-fun-basic}),
-and $\|P_j(S - f)\|_p \leq C_P \|S - f\|_p$ (\Cref{thm:daub-proj-bound}).
+For $S \in C^N(\R)$, Taylor's theorem on $W_k$ (\Cref{lem:taylor-lp}) gives $Q$ with
+$\|S - Q\|_{L_p(W_k)} \leq |W_k|^N \|S^{(N)}\|_{L_p(W_k)}$, and $|W_k| = (4N - 3)/2^j$, so
+\[
+  \|S - P_j S\|_{L_p(I_k)} \leq (1 + C_I) (4N - 3)^N 2^{-jN} \|S^{(N)}\|_{L_p(W_k)} .
+\]
+Now apply \Cref{lem:daub-summing-cover} with the cells $I_k$ and the windows $W_k$, this bound
+on each cell, and the window sum of \Cref{lem:daub-cells-windows} for $G = S^{(N)}$. The
+constant $C_I$ is finite (\Cref{prop:daub-proj-cell-bound}).
 \end{proof}
 
 \begin{proposition}[Jackson's inequality for continuous functions]
 \label{prop:daub-jackson-continuous}
-\lean{Daubechies.jacksonConst, Daubechies.jacksonConst_ne_top,
+\lean{Daubechies.eLpNorm_sub_smooth_le_dyadic, Daubechies.eLpNorm_iteratedDeriv_smooth_le_dyadic,
+  Daubechies.eLpNorm_sub_projFun_le_add, Daubechies.jacksonConst, Daubechies.jacksonConst_ne_top,
   Daubechies.eLpNorm_sub_projFun_le_modulus, Daubechies.enorm_sub_proj_le_of_continuous}
 \leanok
 \uses{def:daub-proj-fun, def:daub-proj, def:rd-modulus}
@@ -4933,18 +4791,24 @@ representative.
 
 \begin{proof}
 \leanok
-\uses{lem:daub-steklov-dyadic, prop:daub-jackson-smooth, lem:daub-error-compare,
+\uses{prop:daub-steklov-line, thm:daub-proj-bound, prop:daub-jackson-smooth,
   thm:steklov-smoothing, lem:daub-proj-fun-basic, lem:rd-modulus}
-Let $S = S_\delta f$ with $\delta = 1/(N 2^j)$, a function in $C^N(\R)$
-(\Cref{thm:steklov-smoothing}). By \Cref{lem:daub-steklov-dyadic},
-$\|f - S\|_p \leq \omega_N(f, 2^{-j})_p$, and by \Cref{prop:daub-jackson-smooth} and
-\Cref{lem:daub-steklov-dyadic},
+First, the errors of two functions compare: for all locally integrable $f, S : \R \to \C$,
+\[
+  \|f - P_j f\|_p \leq (1 + C_P) \|f - S\|_p + \|S - P_j S\|_p ,
+\]
+since $f - P_j f = (f - S) + (S - P_j S) + P_j(S - f)$ by linearity
+(\Cref{lem:daub-proj-fun-basic}) and $\|P_j(S - f)\|_p \leq C_P \|S - f\|_p$
+(\Cref{thm:daub-proj-bound}). Let $S = S_\delta f$ be the smoothing of order $r = N$ with the
+step $\delta = 1/(N 2^j)$, a function in $C^N(\R)$ (\Cref{thm:steklov-smoothing}). This dyadic
+step of \Cref{prop:daub-steklov-line}, where $N\delta = 2^{-j}$ and $\delta^{-N} = N^N 2^{jN}$,
+gives $\|f - S\|_p \leq \omega_N(f, 2^{-j})_p$ and
+$\|S^{(N)}\|_p \leq 2^N N^N 2^{jN} \omega_N(f, 2^{-j})_p$, so by \Cref{prop:daub-jackson-smooth}
 \[
   \|S - P_j S\|_p \leq C_S 2^{-jN} \, 2^N N^N 2^{jN} \omega_N(f, 2^{-j})_p
   = 2^N N^N C_S \, \omega_N(f, 2^{-j})_p .
 \]
-\Cref{lem:daub-error-compare} combines the two bounds. Both sides depend only on the class of $f$
-(\Cref{lem:daub-proj-fun-basic,lem:rd-modulus}).
+Both sides depend only on the class of $f$ (\Cref{lem:daub-proj-fun-basic,lem:rd-modulus}).
 \end{proof}
 
 \begin{theorem}[Jackson's inequality]
@@ -5191,24 +5055,10 @@ The coincidence theorem (\Cref{thm:modulus-coincidence}) for the modulus of
 \Cref{def:daub-modulus-data}.
 \end{proof}
 
-\begin{lemma}[The blocks of the Daubechies projection scheme]
-\label{lem:daub-scheme-blocks}
-\lean{Daubechies.projectionScheme_one, Daubechies.projectionScheme_block}
-\leanok
-\uses{def:daub-scheme, def:blocks}
-Let $N \geq 2$ and $1 \leq p < \infty$. The projection of complexity $1$ of the Daubechies
-projection scheme is $P_0$, and for every $j \in \N$ its dyadic block of level $j$
-(\Cref{def:blocks}) maps $f \in L_p(\R)$ to $P_{j+1} f - P_j f$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The projection of complexity $2^j$ is $P_j$ (\Cref{def:daub-scheme}), and $2^0 = 1$.
-\end{proof}
-
 \begin{theorem}[Approximation and coefficients]
 \label{thm:daub-approx-coeff}
-\lean{Daubechies.memApprox_scheme_iff_coeff}
+\lean{Daubechies.projectionScheme_one, Daubechies.projectionScheme_block,
+  Daubechies.memApprox_scheme_iff_coeff}
 \leanok
 \uses{def:daub-coeff-norm, def:daub-scheme, def:approx-space}
 Let $N \geq 2$, $1 \leq p < \infty$, $s > 0$ and $1 \leq q \leq \infty$. An $f \in L_p(\R)$ lies
@@ -5218,9 +5068,12 @@ $\|f\|^{\mathrm{coef}}_{s,q} < \infty$.
 
 \begin{proof}
 \leanok
-\uses{thm:blocks, thm:daub-density, lem:daub-scheme-blocks, prop:daub-block-norms}
-The union of the sets of the scheme is dense (\Cref{thm:daub-density}), so by \Cref{thm:blocks}
-and \Cref{lem:daub-scheme-blocks}, $f \in A^s_q$ if and only if
+\uses{def:blocks, thm:blocks, thm:daub-density, prop:daub-block-norms}
+The projection of complexity $2^j$ of the Daubechies projection scheme is $P_j$
+(\Cref{def:daub-scheme}), so its projection of complexity $1 = 2^0$ is $P_0$, and its dyadic
+block of level $j$ (\Cref{def:blocks}) maps $f \in L_p(\R)$ to $P_{j+1} f - P_j f$. The union of
+the sets of the scheme is dense (\Cref{thm:daub-density}), so by \Cref{thm:blocks}, $f \in A^s_q$
+if and only if
 \[
   \|P_0 f\|_p + \bigl\|\bigl(2^{js} \|P_{j+1} f - P_j f\|_p\bigr)_{j \in \N}\bigr\|_{\ell_q}
   < \infty .
@@ -5291,25 +5144,6 @@ of $(T g)(\xi)$ is at least $1$, and the second is nonnegative since $T^n 1 \geq
 $(T^n 1)(0) \geq 1$ for every $n$.
 \end{proof}
 
-\begin{lemma}[Bernstein bounds above a given order]
-\label{lem:daub-bernstein-above}
-\lean{Daubechies.exists_bernsteinBound_of_le_two}
-\leanok
-\uses{def:daub-bernstein-bound, def:daub-transfer-growth}
-Let $\lambda, C$ be a growth bound for the transfer operator of order $N \geq 2$, let
-$0 < p \leq 2$ and $0 \leq s < N - \log_4 \lambda$. For every Daubechies mask of order $N$ there
-is $\theta > s$ such that its scaling function has a Bernstein bound of order $\theta$ in $L_p$
-with differences of order $N$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{prop:daub-bernstein-bounds, lem:daub-growth-rate}
-The order $\theta = (s + N - \log_4 \lambda)/2$ lies between $s$ and $N - \log_4 \lambda \leq N$
-(\Cref{lem:daub-growth-rate}), so item~1 of \Cref{prop:daub-bernstein-bounds} with $r = N$
-applies.
-\end{proof}
-
 \begin{lemma}[Interpolated orders]
 \label{lem:daub-interpolated-orders}
 \lean{Daubechies.two_div_toReal_mem_Icc, Daubechies.mul_add_one_sub_mul_le}
@@ -5325,7 +5159,7 @@ $w s + (1 - w) a \leq w b + (1 - w) b = b$, since $w \geq 0$ and $1 - w \geq 0$.
 
 \begin{corollary}[Besov spaces by coefficients, $p \leq 2$]
 \label{cor:daub-besov-le-two}
-\lean{Daubechies.besov_iff_coeff_of_le_two,
+\lean{Daubechies.exists_bernsteinBound_of_le_two, Daubechies.besov_iff_coeff_of_le_two,
   Daubechies.littlewoodPaleyNorm_lt_top_iff_coeff_of_le_two}
 \leanok
 \uses{def:daub-coeff-norm, def:daub-modulus-data, def:daub-transfer-growth, def:lp-blocks}
@@ -5341,10 +5175,14 @@ mask of order $N$ and every $f \in L_p(\R)$ the following are equivalent:
 
 \begin{proof}
 \leanok
-\uses{lem:daub-bernstein-above, thm:daub-besov, lem:daub-growth-rate}
-By \Cref{lem:daub-bernstein-above} the scaling function has a Bernstein bound of an order
-$\theta > s$; apply \Cref{thm:daub-besov}, where $s < N - \log_4 \lambda \leq N$
-(\Cref{lem:daub-growth-rate}).
+\uses{def:daub-bernstein-bound, prop:daub-bernstein-bounds, lem:daub-growth-rate,
+  thm:daub-besov}
+First, for every $0 < p \leq 2$ and $0 \leq s < N - \log_4 \lambda$ there is $\theta > s$ such
+that the scaling function has a Bernstein bound of order $\theta$ in $L_p$ with differences of
+order $N$: the order $\theta = (s + N - \log_4 \lambda)/2$ lies between $s$ and
+$N - \log_4 \lambda \leq N$ (\Cref{lem:daub-growth-rate}), so item~1 of
+\Cref{prop:daub-bernstein-bounds} with $r = N$ applies. Now apply \Cref{thm:daub-besov}, where
+$s < N - \log_4 \lambda \leq N$ (\Cref{lem:daub-growth-rate}).
 \end{proof}
 
 \begin{corollary}[Besov spaces by coefficients, $p \geq 2$]
@@ -5416,23 +5254,9 @@ a constant $K$ with $|\varphi(x) - \varphi(y)| \leq K |x - y|^a$ for all $x, y \
 (\Cref{prop:daub-d4-exponent-value}).
 \end{proof}
 
-\begin{lemma}[Interpolated orders below a strict bound]
-\label{lem:daub-interpolated-strict}
-\lean{Daubechies.exists_lt_mul_add_one_sub_mul}
-\leanok
-Let $w \in [0, 1]$, let $s, a \in \R$ and $b > 0$ with $s < w b + (1 - w) a$. Then there is
-$s' \in \R$ with $0 \leq s' < b$ and $s < w s' + (1 - w) a$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-Let $\varepsilon = w b + (1 - w) a - s > 0$ and $s' = \max(0, b - \varepsilon/2)$. Then
-$0 \leq b - s' \leq \varepsilon/2$, so $w b - w s' \leq \varepsilon/2 < \varepsilon$.
-\end{proof}
-
 \begin{lemma}[Bernstein bounds for D4, $p \geq 2$]
 \label{lem:daub-d4-bernstein}
-\lean{Daubechies.exists_bernsteinBound_d4_of_two_le}
+\lean{Daubechies.exists_lt_mul_add_one_sub_mul, Daubechies.exists_bernsteinBound_d4_of_two_le}
 \leanok
 \uses{prop:daub-d4, def:daub-bernstein-bound}
 Let $2 \leq p < \infty$, $\alpha = 2 - \log_2(1 + \sqrt 3)$, and let $s \in \R$ with
@@ -5442,13 +5266,16 @@ differences of order $2$ of some order $\theta$ with $s < \theta \leq 1$.
 
 \begin{proof}
 \leanok
-\uses{lem:daub-interpolated-orders, lem:daub-interpolated-strict, prop:daub-bernstein-bounds,
-  lem:daub-d4-alpha-bounds}
-The weight $2/p$ lies in $[0, 1]$ (\Cref{lem:daub-interpolated-orders}), so
-\Cref{lem:daub-interpolated-strict} with $b = 1$ gives $s' \in [0, 1)$ with
-$s < \theta = (2/p) s' + (1 - 2/p) \alpha$. The case D4 of \Cref{prop:daub-bernstein-bounds}, with
-$r = 2$ and $a = \alpha \geq 0$, gives a Bernstein bound of order $\theta$, and $\theta \leq 1$
-since $s' < 1$ and $\alpha < 1$ (\Cref{lem:daub-d4-alpha-bounds,lem:daub-interpolated-orders}).
+\uses{lem:daub-interpolated-orders, prop:daub-bernstein-bounds, lem:daub-d4-alpha-bounds}
+First, for every $w \in [0, 1]$, all $s, a \in \R$ and every $b > 0$ with
+$s < w b + (1 - w) a$ there is $s' \in \R$ with $0 \leq s' < b$ and $s < w s' + (1 - w) a$: let
+$\varepsilon = w b + (1 - w) a - s > 0$ and $s' = \max(0, b - \varepsilon/2)$; then
+$0 \leq b - s' \leq \varepsilon/2$, so $w b - w s' \leq \varepsilon/2 < \varepsilon$. The weight
+$w = 2/p$ lies in $[0, 1]$ (\Cref{lem:daub-interpolated-orders}), so this with $a = \alpha$ and
+$b = 1$ gives $s' \in [0, 1)$ with $s < \theta = (2/p) s' + (1 - 2/p) \alpha$. The case D4 of
+\Cref{prop:daub-bernstein-bounds}, with $r = 2$ and $a = \alpha \geq 0$, gives a Bernstein bound
+of order $\theta$, and $\theta \leq 1$ since $s' < 1$ and $\alpha < 1$
+(\Cref{lem:daub-d4-alpha-bounds,lem:daub-interpolated-orders}).
 \end{proof}
 
 \begin{theorem}[Besov spaces by D4 coefficients]
@@ -5536,55 +5363,11 @@ are positive since $\log_2 3 < \frac85$ (\Cref{lem:daub-logb-two-three}), and
 $3 - \log_4 9 = 3 - \log_2 3$ (\Cref{prop:daub-transfer-three}).
 \end{proof}
 
-\begin{proposition}[Sobolev regularity of order three]
-\label{prop:daub-sobolev-order-three}
-\lean{Daubechies.integrable_rpow_mul_normSq_order_three,
-  Daubechies.sobolev_scalingFun_order_three}
-\leanok
-\uses{def:daub-symbol-product, def:daub-scaling-function}
-For every Daubechies mask of order $3$ and every real $s < 3 - \log_2 3$, the functions
-$\xi \mapsto (1 + |\xi|)^{2s} |\Phi(\xi)|^2$ and
-$\xi \mapsto (1 + |\xi|)^{2s} |\widehat\varphi(\xi)|^2$ are integrable on $\R$.
-\end{proposition}
-
-\begin{proof}
-\leanok
-\uses{thm:daub-decay-l2, prop:daub-transfer-three, thm:daub-scaling-fourier}
-\Cref{thm:daub-decay-l2} for the growth bound $\lambda = 9$, $C = 2$, with
-$3 - \log_4 9 = 3 - \log_2 3$ (\Cref{prop:daub-transfer-three}), and
-$\widehat\varphi = \Phi$ (\Cref{thm:daub-scaling-fourier}).
-\end{proof}
-
-So $\varphi \in H^s(\R)$ for every $s < 3 - \log_2 3$.
-
-\begin{lemma}[Power bounds give finite Besov seminorms]
-\label{lem:daub-power-bound-seminorm}
-\lean{Daubechies.lqNorm_dyadicWeight_mul_lt_top_of_le_rpow,
-  Daubechies.BernsteinBound.lqNorm_modulus_lt_top}
-\leanok
-\uses{def:lq-norm, def:daub-bernstein-bound}
-Let $F : \R \to [0, \infty]$, $K < \infty$ and $\theta \in \R$ with $F(t) \leq K t^\theta$ for
-every $t \in (0, 1]$. Then for every $s < \theta$ and every $1 \leq q \leq \infty$,
-\[
-  \bigl\|\bigl(2^{ks} F(2^{-k})\bigr)_{k \in \N}\bigr\|_{\ell_q} < \infty .
-\]
-In particular, if the scaling function $\varphi$ of a Daubechies mask has a Bernstein bound of
-order $\theta$ in $L_p$ with differences of order $r$, then
-$\|(2^{ks} \omega_r(\varphi, 2^{-k})_p)_k\|_{\ell_q} < \infty$ for every $s < \theta$ and every
-$1 \leq q \leq \infty$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-dyadic-scales}
-$2^{ks} F(2^{-k}) \leq K 2^{-k(\theta - s)}$ (\Cref{lem:daub-dyadic-scales}), and the geometric
-sequence $(2^{-k(\theta - s)})_k$ has $\ell_q$ norm at most $(1 - 2^{-(\theta - s)})^{-1} < \infty$
-(\Cref{def:lq-norm}).
-\end{proof}
-
 \begin{proposition}[Besov seminorms of the scaling function of order three]
 \label{prop:daub-besov-seminorm-order-three}
-\lean{Daubechies.lqNorm_modulus_scalingFun_lt_top_order_three}
+\lean{Daubechies.lqNorm_dyadicWeight_mul_lt_top_of_le_rpow,
+  Daubechies.BernsteinBound.lqNorm_modulus_lt_top,
+  Daubechies.lqNorm_modulus_scalingFun_lt_top_order_three}
 \leanok
 \uses{def:daub-scaling-function, def:rd-modulus, def:lq-norm}
 Let $\varphi$ be the scaling function of a Daubechies mask of order $3$, let $0 < p \leq 2$,
@@ -5597,11 +5380,18 @@ $s < 3 - \log_2 3$. Then
 
 \begin{proof}
 \leanok
-\uses{prop:daub-bernstein-bounds, lem:daub-power-bound-seminorm}
-The order $\theta = (s + \min(r, 3 - \log_2 3))/2$ lies between $s$ and
-$\min(r, 3 - \log_2 3)$, so $\varphi$ has a Bernstein bound of order $\theta$
-(\Cref{prop:daub-bernstein-bounds}, order three), and \Cref{lem:daub-power-bound-seminorm}
-applies.
+\uses{def:daub-bernstein-bound, lem:daub-dyadic-scales, prop:daub-bernstein-bounds}
+First, power bounds give finite Besov seminorms: if $F : \R \to [0, \infty]$, $K < \infty$ and
+$\theta \in \R$ satisfy $F(t) \leq K t^\theta$ for every $t \in (0, 1]$, then
+$\|(2^{ks} F(2^{-k}))_{k \in \N}\|_{\ell_q} < \infty$ for every $s < \theta$ and every
+$1 \leq q \leq \infty$, since $2^{ks} F(2^{-k}) \leq K 2^{-k(\theta - s)}$
+(\Cref{lem:daub-dyadic-scales}) and the geometric sequence $(2^{-k(\theta - s)})_k$ has $\ell_q$
+norm at most $(1 - 2^{-(\theta - s)})^{-1} < \infty$ (\Cref{def:lq-norm}). In particular, if
+$\varphi$ has a Bernstein bound of order $\theta$ in $L_p$ with differences of order $r$, then
+$\|(2^{ks} \omega_r(\varphi, 2^{-k})_p)_k\|_{\ell_q} < \infty$ for every $s < \theta$. Now the
+order $\theta = (s + \min(r, 3 - \log_2 3))/2$ lies between $s$ and $\min(r, 3 - \log_2 3)$, so
+$\varphi$ has a Bernstein bound of order $\theta$ (\Cref{prop:daub-bernstein-bounds}, order
+three).
 \end{proof}
 
 For $p = q = 2$ and $s > 0$ this is the regularity $\varphi \in H^s$ in the form
@@ -5625,7 +5415,8 @@ $\frac{9}{10} < \frac52 - \log_2 3$ by \Cref{lem:daub-logb-two-three}.
 
 \begin{corollary}[A regular wavelet of order three]
 \label{cor:daub-order-three-regular}
-\lean{Daubechies.exists_mask_order_three_regular}
+\lean{Daubechies.integrable_rpow_mul_normSq_order_three,
+  Daubechies.sobolev_scalingFun_order_three, Daubechies.exists_mask_order_three_regular}
 \leanok
 \uses{def:daub-mask, def:daub-scaling-function}
 There is a Daubechies mask of order $3$ whose scaling function $\varphi$ satisfies
@@ -5636,9 +5427,15 @@ $|\varphi(x) - \varphi(y)| \leq K |x - y|^a$ for all $x, y \in \R$.
 
 \begin{proof}
 \leanok
-\uses{thm:daub-mask-existence, prop:daub-sobolev-order-three, cor:daub-holder-orders-two-three}
-A mask of order $3$ exists (\Cref{thm:daub-mask-existence}); apply
-\Cref{prop:daub-sobolev-order-three,cor:daub-holder-orders-two-three}.
+\uses{def:daub-symbol-product, thm:daub-decay-l2, prop:daub-transfer-three,
+  thm:daub-scaling-fourier, thm:daub-mask-existence, cor:daub-holder-orders-two-three}
+A mask of order $3$ exists (\Cref{thm:daub-mask-existence}). For every mask of order $3$ and
+every real $s < 3 - \log_2 3$ the functions $\xi \mapsto (1 + |\xi|)^{2s} |\Phi(\xi)|^2$ and
+$\xi \mapsto (1 + |\xi|)^{2s} |\widehat\varphi(\xi)|^2$ are integrable on $\R$, by
+\Cref{thm:daub-decay-l2} for the growth bound $\lambda = 9$, $C = 2$, with
+$3 - \log_4 9 = 3 - \log_2 3$ (\Cref{prop:daub-transfer-three}) and $\widehat\varphi = \Phi$
+(\Cref{thm:daub-scaling-fourier}); so $\varphi \in H^s(\R)$. The H\"older bound is
+\Cref{cor:daub-holder-orders-two-three}.
 \end{proof}
 
 \begin{theorem}[Besov spaces by coefficients of order three]
