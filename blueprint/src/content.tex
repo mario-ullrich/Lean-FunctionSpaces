@@ -8952,7 +8952,10 @@ and the boundary traces agree almost everywhere on $\Gamma$ (\Cref{thm:boundary-
 Besov quasi-norms take the $L_p$ norm of every Littlewood--Paley block and then the $\ell_q$ norm
 over the levels. Triebel--Lizorkin quasi-norms take the two norms in the other order: the $\ell_q$
 norm over the levels at every point, and then the $L_p$ norm. This chapter starts with the
-comparison of the two mixed norms on an arbitrary measure space.
+comparison of the two mixed norms on an arbitrary measure space. For $s > 0$ the spaces
+$\TL{s}{p}{q}$ and their descriptions by local means, ball means of differences and atoms are
+those of Triebel~\cite{TriebelII}; the descriptions are proved here for $1 < p < \infty$ and
+$1 < q \leq \infty$.
 
 \section{Mixed norms}
 
@@ -9152,7 +9155,7 @@ $|F(x)| = \lim_k |G_{J_k}(x)| \leq v(x)$.
 For a bounded linear operator $T$ on $L_p$ the lemma applies to $T G_J \to T f$: a pointwise bound
 on $T G_J$ passes to $T f$.
 
-\section{The spaces $F^s_{p,q}$ and the Besov sandwich}
+\section{The spaces $\TL{s}{p}{q}$ and the Besov sandwich}
 
 As in \Cref{ch:rd}, $V$ is a finite-dimensional real inner product space with Lebesgue measure
 and $L_p = L_p(V)$ for $1 \leq p < \infty$. The Littlewood--Paley kernels $\psi_j$ are those of
@@ -9198,7 +9201,7 @@ the Littlewood--Paley block $\Delta_j f \in L_p$. The Triebel--Lizorkin quasi-no
   \|f\|_{F^s_{p,q}} = \Bigl\| x \mapsto \bigl\| (2^{js} |(\psi_j * f)(x)|)_{j \in \N}
   \bigr\|_{\ell_q} \Bigr\|_{L_p},
 \]
-and $F^s_{p,q}$ consists of the $f \in L_p$ with $\|f\|_{F^s_{p,q}} < \infty$.
+and $\TL{s}{p}{q}$ consists of the $f \in L_p$ with $\|f\|_{F^s_{p,q}} < \infty$.
 \end{definition}
 
 The Littlewood--Paley quasi-norm of the Besov spaces (\Cref{def:lp-blocks}) takes the two norms
@@ -9248,8 +9251,8 @@ $f, g \in L_p$ and every $c \in \C$,
 \[
   \|f\|_{F^s_{p,r}} \leq \|f\|_{F^s_{p,q}}, \qquad \|f\|_{F^s_{p,q}} \leq \|f\|_{F^t_{p,q}} .
 \]
-In particular $F^s_{p,q}$ is a linear subspace of $L_p$, $F^s_{p,q} \subseteq F^s_{p,r}$ and
-$F^t_{p,q} \subseteq F^s_{p,q}$.
+In particular $\TL{s}{p}{q}$ is a linear subspace of $L_p$,
+$\TL{s}{p}{q} \subseteq \TL{s}{p}{r}$ and $\TL{t}{p}{q} \subseteq \TL{s}{p}{q}$.
 \end{proposition}
 
 \begin{proof}
@@ -9262,15 +9265,15 @@ those of $f$, and $|c|$ leaves the $\ell_q$ and the $L_p$ norm
 $\|\cdot\|_{\ell_r} \leq \|\cdot\|_{\ell_q}$ and $2^{js} \leq 2^{jt}$ at every point.
 \end{proof}
 
-\begin{theorem}[$F^s_{p,p} = \Besov{s}{p}{p}$]
+\begin{theorem}[$\TL{s}{p}{p} = \Besov{s}{p}{p}$]
 \label{thm:tl-diagonal}
 \lean{Rd.triebelLizorkinNorm_eq_littlewoodPaleyNorm, Rd.memTriebelLizorkin_iff_memApprox,
   Rd.memTriebelLizorkin_iff_modulus}
 \leanok
 \uses{def:triebel-lizorkin, cor:mixed-norm-sandwich, thm:lp-band, thm:rd-besov}
 For every $1 \leq p < \infty$, every $s \in \R$ and every $f \in L_p$,
-$\|f\|_{F^s_{p,p}} = \|f\|^{\mathrm{LP}}_{s,p}$. If moreover $s > 0$, then $f \in F^s_{p,p}$ if
-and only if $f \in \Besov{s}{p}{p}$, and for every $r \in \N$ with $s < r$, $f \in F^s_{p,p}$ if
+$\|f\|_{F^s_{p,p}} = \|f\|^{\mathrm{LP}}_{s,p}$. If moreover $s > 0$, then $f \in \TL{s}{p}{p}$ if
+and only if $f \in \Besov{s}{p}{p}$, and for every $r \in \N$ with $s < r$, $f \in \TL{s}{p}{p}$ if
 and only if $\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_p} < \infty$.
 \end{theorem}
 
@@ -9305,7 +9308,7 @@ with the band-limited scheme. If $s > 0$, then
 \]
 and
 \[
-  \Besov{s}{p}{\min(p,q)} \subseteq F^s_{p,q} \subseteq \Besov{s}{p}{\max(p,q)} .
+  \Besov{s}{p}{\min(p,q)} \subseteq \TL{s}{p}{q} \subseteq \Besov{s}{p}{\max(p,q)} .
 \]
 \end{theorem}
 
@@ -9317,7 +9320,7 @@ approximation norms follow with \Cref{thm:lp-band} at the exponents $\max(p,q)$ 
 $\min(p,q)$, and so do the inclusions.
 \end{proof}
 
-For $q = 2$ the theorem places $F^s_{p,2}$ between $\Besov{s}{p}{\min(p,2)}$ and
+For $q = 2$ the theorem places $\TL{s}{p}{2}$ between $\Besov{s}{p}{\min(p,2)}$ and
 $\Besov{s}{p}{\max(p,2)}$: for $p \geq 2$ between $\Besov{s}{p}{2}$ and $\Besov{s}{p}{p}$, for
 $p \leq 2$ between $\Besov{s}{p}{p}$ and $\Besov{s}{p}{2}$.
 
@@ -9342,7 +9345,7 @@ Triebel--Lizorkin quasi-norm of $f$ is
   \|f\|_{F^s_{p,q}} = \Bigl\| t \mapsto \bigl\| (2^{js} |(\psi_j * f)(t)|)_{j \in \N}
   \bigr\|_{\ell_q} \Bigr\|_{L_p(\T^d)},
 \]
-and $F^s_{p,q}(\T^d)$ consists of the $f \in L_p(\T^d)$ with $\|f\|_{F^s_{p,q}} < \infty$.
+and $\TL{s}{p}{q}(\T^d)$ consists of the $f \in L_p(\T^d)$ with $\|f\|_{F^s_{p,q}} < \infty$.
 \end{definition}
 
 \begin{proposition}[Elementary properties on the torus]
@@ -9369,8 +9372,9 @@ and
 \[
   \|f\|_{F^s_{p,r}} \leq \|f\|_{F^s_{p,q}}, \qquad \|f\|_{F^s_{p,q}} \leq \|f\|_{F^t_{p,q}} .
 \]
-In particular $F^s_{p,q}(\T^d)$ is a linear subspace of $L_p(\T^d)$,
-$F^s_{p,q}(\T^d) \subseteq F^s_{p,r}(\T^d)$ and $F^t_{p,q}(\T^d) \subseteq F^s_{p,q}(\T^d)$.
+In particular $\TL{s}{p}{q}(\T^d)$ is a linear subspace of $L_p(\T^d)$,
+$\TL{s}{p}{q}(\T^d) \subseteq \TL{s}{p}{r}(\T^d)$ and
+$\TL{t}{p}{q}(\T^d) \subseteq \TL{s}{p}{q}(\T^d)$.
 \end{proposition}
 
 \begin{proof}
@@ -9381,7 +9385,7 @@ every point (\Cref{lem:torus-econv-young}), which gives the identities for the p
 for all $j$ at once. The rest is the proof of \Cref{prop:tl-elementary}.
 \end{proof}
 
-\begin{theorem}[$F^s_{p,p}(\T^d) = \Besov{s}{p}{p}(\T^d)$ and the Besov sandwich on the torus]
+\begin{theorem}[$\TL{s}{p}{p}(\T^d) = \Besov{s}{p}{p}(\T^d)$ and the Besov sandwich on the torus]
 \label{thm:torus-tl-besov-sandwich}
 \lean{Torus.triebelLizorkinNorm_eq_littlewoodPaleyNorm, Torus.memTriebelLizorkin_iff_memBesov,
   Torus.memTriebelLizorkin_iff_modulus, Torus.littlewoodPaleyNorm_max_le_triebelLizorkinNorm,
@@ -9406,11 +9410,12 @@ If $s > 0$, then
 \[
   \|f\|^{\mathrm{dy}}_{A^s_{\max(p,q)}} \leq 2 \cdot 2^s (1 - 2^{-s})^{-1} \, \|f\|_{F^s_{p,q}} ,
 \]
-$f \in F^s_{p,p}(\T^d)$ if and only if $f \in \Besov{s}{p}{p}(\T^d)$, for every $r \in \N$ with
-$s < r$, $f \in F^s_{p,p}(\T^d)$ if and only if
+$f \in \TL{s}{p}{p}(\T^d)$ if and only if $f \in \Besov{s}{p}{p}(\T^d)$, for every $r \in \N$ with
+$s < r$, $f \in \TL{s}{p}{p}(\T^d)$ if and only if
 $\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_p} < \infty$, and
 \[
-  \Besov{s}{p}{\min(p,q)}(\T^d) \subseteq F^s_{p,q}(\T^d) \subseteq \Besov{s}{p}{\max(p,q)}(\T^d) .
+  \Besov{s}{p}{\min(p,q)}(\T^d) \subseteq \TL{s}{p}{q}(\T^d)
+  \subseteq \Besov{s}{p}{\max(p,q)}(\T^d) .
 \]
 \end{theorem}
 
@@ -9424,7 +9429,7 @@ bounds by the approximation norms and the statements on spaces; the description 
 smoothness is \Cref{thm:torus-lp-moduli} with $q = p$.
 \end{proof}
 
-As on $\R^n$, for $q = 2$ the theorem places $F^s_{p,2}(\T^d)$ between
+As on $\R^n$, for $q = 2$ the theorem places $\TL{s}{p}{2}(\T^d)$ between
 $\Besov{s}{p}{\min(p,2)}(\T^d)$ and $\Besov{s}{p}{\max(p,2)}(\T^d)$.
 
 \section{Dyadic cubes and the Lebesgue differentiation theorem}
@@ -9573,7 +9578,9 @@ when the $\ell_q$ norm over the levels is taken before the $L_p$ norm. As in the
 $V$ is a finite-dimensional real inner product space of dimension $n$ with Lebesgue measure
 $|\cdot|$, and $B(x, r)$ and $\bar B(x, r)$ are the open and the closed ball. All functions in
 this section take values in $[0, \infty]$, so every integral has a value; for a function that
-is not measurable, $\int$ is the lower Lebesgue integral, as in Mathlib.
+is not measurable, $\int$ is the lower Lebesgue integral, as in Mathlib. The maximal theorem and
+the Calder\'on--Zygmund decomposition of the next section are classical; see
+Stein~\cite{Stein}.
 
 \begin{definition}[Hardy--Littlewood maximal function]
 \label{def:maximal-function}
@@ -9931,7 +9938,8 @@ for the pointwise $\ell_q$ norms of the family and of its maximal functions.
 The cases $q = \infty$ and $q = p$ follow from the maximal theorem one function at a time. The
 case $q < p$ is a duality argument with the weighted strong type, and the case $p < q$ an
 interpolation between the case $q = p$ and a vector-valued weak type $(1,1)$, whose proof
-combines the Calder\'on--Zygmund decomposition of $G$ with the positivity of $M$.
+combines the Calder\'on--Zygmund decomposition of $G$ with the positivity of $M$. This is the
+pattern of the original proof by Fefferman and Stein~\cite{FeffermanStein}.
 
 \begin{lemma}[The maximal function off enlarged sets]
 \label{lem:maximal-off-enlarged}
@@ -10310,7 +10318,7 @@ blocks.
 
 \section{Kernel majorants}
 
-The characterisations of the spaces $F^s_{p,q}$ compare two kinds of blocks pointwise: a block of
+The characterisations of the spaces $\TL{s}{p}{q}$ compare two kinds of blocks pointwise: a block of
 one kind is a sum of blocks of the other kind, each convolved with a cross kernel. This section
 bounds the cross kernels by the Peetre weights $2^{\nu n} (1 + 2^\nu \|y\|)^{-N}$ times a factor
 $c_{ji}$, a power $2^{-(j-i)L}$ that decays geometrically in $j - i$ for $i \leq j$ and $1$ for
@@ -10752,14 +10760,15 @@ The bound holds for every function $h$, periodic functions included.
 
 \section{The local means characterisation}
 
-This section describes $F^s_{p,q}$ by the local means of \Cref{def:local-means}, in the range
+This section describes $\TL{s}{p}{q}$ by the local means of \Cref{def:local-means}, in the range
 $1 < p < \infty$, $1 < q \leq \infty$, $0 < s < L$. As in the previous section, $g$ is a bump of
 radius $R$, $m$ its moment kernel of order $L$, and $k_j$, $\eta_j$ are the local means kernels
 and the dual kernels; $M$ is the maximal function of \Cref{def:maximal-function}. For a real
 $L$ the weights are $c^L_{ji} = 2^{-(j-i)L}$ for $i \leq j$ and $c^L_{ji} = 1$ for $i > j$.
 Both directions of the characterisation are pointwise bounds by the cross kernels of the
 previous section, summed in $\ell_q$ by the almost diagonal estimate and integrated by the
-Fefferman--Stein inequality.
+Fefferman--Stein inequality. Rychkov~\cite{Rychkov} describes $\TL{s}{p}{q}$ by local means for
+all $0 < p < \infty$ and $0 < q \leq \infty$, with the Peetre maximal function in place of $M$.
 
 \begin{definition}[Local means of Triebel--Lizorkin type]
 \label{def:tl-local-means}
@@ -10949,7 +10958,7 @@ $f \in L_p$,
   \|f\|^{g,L}_{F^s_{p,q}} \leq D_{L,p,q,s} \, \|f\|_{F^s_{p,q}},
 \]
 and if $L \geq 1$, then $\|f\|_{F^s_{p,q}} \leq U_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}}$. In
-particular, for $L \geq 1$ and $0 < s < L$, $f \in F^s_{p,q}$ if and only if
+particular, for $L \geq 1$ and $0 < s < L$, $f \in \TL{s}{p}{q}$ if and only if
 $\|f\|^{g,L}_{F^s_{p,q}} < \infty$.
 \end{theorem}
 
@@ -10983,7 +10992,7 @@ $\|f\|^{g',L'}_{F^s_{p,q}} < \infty$.
 Both quasi-norms are compared with $\|f\|_{F^s_{p,q}}$ by \Cref{thm:tl-local-means}.
 \end{proof}
 
-Every bump and every order $L > s$ describe the same space $F^s_{p,q}$, the space defined by
+Every bump and every order $L > s$ describe the same space $\TL{s}{p}{q}$, the space defined by
 the Littlewood--Paley blocks.
 
 \section{Local means on the torus}
@@ -11324,7 +11333,7 @@ For every $f \in L_p(\T^d)$,
 \]
 and if $L \geq 1$, then
 $\|f\|_{F^s_{p,q}(\T^d)} \leq U^{\T}_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}(\T^d)}$. In particular,
-for $L \geq 1$ and $0 < s < L$, $f \in F^s_{p,q}(\T^d)$ if and only if
+for $L \geq 1$ and $0 < s < L$, $f \in \TL{s}{p}{q}(\T^d)$ if and only if
 $\|f\|^{g,L}_{F^s_{p,q}(\T^d)} < \infty$.
 \end{theorem}
 
@@ -11338,7 +11347,7 @@ $C^{\T}_{p,q} < \infty$ by \Cref{thm:fefferman-stein-periodic}.
 
 \section{Ball means of differences}
 
-This section describes $F^s_{p,q}$ on $V$ by ball means of differences, in the range
+This section describes $\TL{s}{p}{q}$ on $V$ by ball means of differences, in the range
 $1 < p < \infty$, $1 < q \leq \infty$, $0 < s < L$. As in the previous sections, $g$ is a bump of
 radius $R$, $m$ its moment kernel of order $L$, $k_j$ and $\eta_j$ are the local means kernels and
 the dual kernels, $A_{L,K}$ are the constants of \Cref{lem:dual-kernel-derivatives}, and
@@ -11618,13 +11627,13 @@ $\|(2^{js} d_j f(x))_j\|_{\ell_q}$ by $E_L A_{s,L} \|(M(2^{is} |k_i * f|)(x))_i\
 almost everywhere, and \Cref{lem:maximal-bounds-mixed-norm} finishes.
 \end{proof}
 
-\begin{corollary}[Ball means describe $F^s_{p,q}$]
+\begin{corollary}[Ball means describe $\TL{s}{p}{q}$]
 \label{cor:tl-ball-means}
 \lean{Rd.memTriebelLizorkin_iff_tlDiffNorm_lt_top}
 \leanok
 \uses{thm:tl-ball-means, thm:tl-local-means, thm:smooth-atomic-decomposition}
 For every $1 < p < \infty$, every $1 < q \leq \infty$, every $L \in \N$, every $0 < s < L$ and
-every $f \in L_p$, $f \in F^s_{p,q}$ if and only if $\|f\|^{L}_{F^s_{p,q}, \Delta} < \infty$.
+every $f \in L_p$, $f \in \TL{s}{p}{q}$ if and only if $\|f\|^{L}_{F^s_{p,q}, \Delta} < \infty$.
 \end{corollary}
 
 \begin{proof}
@@ -11636,7 +11645,7 @@ quasi-norm of the standard bump (\Cref{thm:smooth-atomic-decomposition}), by
 
 \section{The atomic characterisation}
 
-This section describes $F^s_{p,q}$ by atomic decompositions, in the range $1 < p < \infty$,
+This section describes $\TL{s}{p}{q}$ by atomic decompositions, in the range $1 < p < \infty$,
 $1 < q \leq \infty$, $0 < s < L$. As in the previous sections, $g$ is a bump of radius $R$,
 $m^g$ its moment kernel of order $L$, $A_L = 2 \sup_V |m^g|$ the constant of
 \Cref{lem:local-means-kernel-bounds}, $k_j$ and $\eta_j$ are the local means kernels and the dual
@@ -11956,25 +11965,25 @@ the continuous $u_j$ and \Cref{lem:maximal-bounds-mixed-norm} for the functions 
 
 The bound (4) uses neither $L \geq 1$ nor the order $K$.
 
-\begin{corollary}[Atoms describe $F^s_{p,q}$]
+\begin{corollary}[Atoms describe $\TL{s}{p}{q}$]
 \label{cor:tl-atomic}
 \lean{Rd.memTriebelLizorkin_iff_atomic}
 \leanok
 \uses{thm:tl-atomic-synthesis, thm:tl-atomic-decomposition, thm:tl-local-means,
   thm:smooth-atomic-decomposition}
 For every $1 < p < \infty$, every $1 < q \leq \infty$, every $L \in \N$, every $0 < s < L$ and
-every $F \in L_p$, $F \in F^s_{p,q}$ if and only if there are $d \geq 0$, $A \in \R$, complex
-coefficients $\lambda_{j,m}$, smooth atoms $a_{j,m}$ on $V$ of level $j$ and order $L$ with
-centres $c_{j,m}$, radius factor $d$ and constant $A$, and $f_j \in L_p$ with
+every $F \in L_p$, $F \in \TL{s}{p}{q}$ if and only if there are $\rho \geq 0$, $A \in \R$,
+complex coefficients $\lambda_{j,m}$, smooth atoms $a_{j,m}$ on $V$ of level $j$ and order $L$
+with centres $c_{j,m}$, radius factor $\rho$ and constant $A$, and $f_j \in L_p$ with
 $f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, $\sum_{j \leq J} f_j \to F$ in $L_p$ and
 $\|\lambda\|_{f^s_{p,q}} < \infty$.
 \end{corollary}
 
 \begin{proof}
 \leanok
-$L \geq 1$ since $0 < s < L$, and $F \in F^s_{p,q}$ iff the local means quasi-norm of a bump is
+$L \geq 1$ since $0 < s < L$, and $F \in \TL{s}{p}{q}$ iff the local means quasi-norm of a bump is
 finite (\Cref{thm:tl-local-means}, with the bump of \Cref{thm:smooth-atomic-decomposition}).
-Forward: \Cref{thm:tl-atomic-decomposition} with $K = L$, $d = 2LR + n$, $A = A_{L,L}$ and
+Forward: \Cref{thm:tl-atomic-decomposition} with $K = L$, $\rho = 2LR + n$, $A = A_{L,L}$ and
 $f_j = \eta_j * (k_j * F)$. Backward: \Cref{thm:tl-atomic-synthesis}, since
 $A_{s,L} < \infty$.
 \end{proof}
@@ -13323,6 +13332,35 @@ Descriptions & Range & Result \\
 \end{tabular}
 \end{center}
 
+\paragraph{Triebel--Lizorkin spaces.} The space $\TL{s}{p}{q}$ takes the $\ell_q$ norm of the
+Littlewood--Paley blocks at every point before the $L_p$ norm
+(\Cref{def:triebel-lizorkin,def:torus-triebel-lizorkin}); each row compares a description of
+$\TL{s}{p}{q}$ with this definition, on $\R^n$ unless $\T^n$ is named. The descriptions also take
+the $\ell_q$ norm at every point first: the local means of
+\Cref{def:tl-local-means,def:torus-tl-local-means}, the ball means of differences of
+\Cref{def:ball-means-differences} and the coefficient space $f^s_{p,q}$ of
+\Cref{def:tl-sequence-space}. The first two rows hold for $1 \leq p < \infty$, the others for
+$1 < p < \infty$ and $1 < q \leq \infty$.
+\begin{center}
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
+\hline
+Descriptions & Range & Result \\
+\hline
+\raggedright Littlewood--Paley blocks: $\TL{s}{p}{p} = \Besov{s}{p}{p}$ and
+  $\Besov{s}{p}{\min(p,q)} \subseteq \TL{s}{p}{q} \subseteq \Besov{s}{p}{\max(p,q)}$
+  & $s > 0$ & \Cref{thm:tl-diagonal}\newline \Cref{thm:tl-besov-sandwich} \\
+\raggedright The same on $\T^n$ & $s > 0$ & \Cref{thm:torus-tl-besov-sandwich} \\
+\raggedright Local means of order $L$ and Littlewood--Paley blocks & $0 < s < L$
+  & \Cref{thm:tl-local-means}\newline \Cref{cor:tl-local-means-independence} \\
+\raggedright The same on $\T^n$ & $0 < s < L$ & \Cref{thm:torus-tl-local-means} \\
+\raggedright Ball means of differences of order $L$ & $0 < s < L$ & \Cref{cor:tl-ball-means} \\
+\raggedright Atoms of order $L$ normalised in $L_\infty$, coefficients in $f^s_{p,q}$
+  & $0 < s < L$ & \Cref{cor:tl-atomic} \\
+\hline
+\end{tabular}
+\end{center}
+
 \section{How the descriptions differ}
 \label{sec:differences}
 
@@ -13359,6 +13397,16 @@ with their periodisations, and their Fourier transforms at the lattice points ar
 multipliers; this transfers Jackson's and Bernstein's inequalities to every $L_p(\T^n)$
 (\Cref{thm:torus-econv-fourier,thm:torus-lp-moduli}), and the smooth blocks $\psi_j * f$
 describe $\Besov{s}{p}{q}(\T^n)$ for every $1 \leq p < \infty$ (\Cref{thm:torus-lp-besov}).
+
+\paragraph{Besov and Triebel--Lizorkin spaces.} A Besov quasi-norm takes the $L_p$ norm of each
+level first, so a bound of one kind of block by convolutions of the other kind is integrated
+level by level with Young's inequality. A Triebel--Lizorkin quasi-norm takes the $\ell_q$ norm
+at every point first, so the bounds must stay pointwise: a convolution $K * h$ with
+$|K(y)| \leq C 2^{\nu n} (1 + 2^\nu \|y\|)^{-N}$, $N > n$, is at most $C_{n,N} C \, M|h|$
+(\Cref{thm:decay-kernels-maximal}), and the Fefferman--Stein inequality
+(\Cref{thm:fefferman-stein}) integrates the maximal functions in $L_p(\ell_q)$. It holds for
+$1 < p < \infty$ and $1 < q \leq \infty$, which is the range of the descriptions of
+$\TL{s}{p}{q}$ beyond the Littlewood--Paley blocks.
 
 \paragraph{Coordinates, directions and mixed smoothness.} On the cube the coordinate moduli, with
 differences along one coordinate at a time, and the isotropic modulus, with differences in every
@@ -13403,6 +13451,12 @@ R.~A.~DeVore, R.~C.~Sharpley,
 \emph{Besov spaces on domains in $\R^d$},
 Trans.\ Amer.\ Math.\ Soc.\ \textbf{335} (1993), no.~2, 843--864.
 
+\bibitem{FeffermanStein}
+C.~Fefferman, E.~M.~Stein,
+\emph{Some maximal inequalities},
+Amer.\ J.\ Math.\ \textbf{93} (1971), no.~1, 107--115,
+\href{https://doi.org/10.2307/2373450}{doi}.
+
 \bibitem{Nikolskii}
 S.~M.~Nikol'ski\u{\i},
 \emph{Approximation of Functions of Several Variables and Imbedding Theorems},
@@ -13427,6 +13481,11 @@ C.~Schneider, J.~Vyb\'{\i}ral,
 in function spaces}, preprint, 2012,
 \href{https://arxiv.org/abs/1201.2280}{arXiv:1201.2280}.
 
+\bibitem{Stein}
+E.~M.~Stein,
+\emph{Harmonic Analysis: Real-Variable Methods, Orthogonality, and Oscillatory Integrals},
+Princeton Mathematical Series \textbf{43}, Princeton University Press, Princeton, NJ, 1993.
+
 \bibitem{Temlyakov}
 V.~Temlyakov,
 \emph{Multivariate Approximation},
@@ -13439,6 +13498,12 @@ H.~Triebel,
 \emph{Theory of Function Spaces},
 Monographs in Mathematics \textbf{78}, Birkh\"auser, Basel, 1983,
 \href{https://doi.org/10.1007/978-3-0346-0416-1}{doi}.
+
+\bibitem{TriebelII}
+H.~Triebel,
+\emph{Theory of Function Spaces II},
+Monographs in Mathematics \textbf{84}, Birkh\"auser, Basel, 1992,
+\href{https://doi.org/10.1007/978-3-0346-0419-2}{doi}.
 
 \bibitem{UllrichT}
 T.~Ullrich,

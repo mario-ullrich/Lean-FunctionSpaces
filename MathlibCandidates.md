@@ -15,10 +15,21 @@ declarations.
   homogeneity for `ℝ≥0∞` scalars, the finite-index forms (`ENNReal.lqNorm_eq_sum`,
   `ENNReal.lqNorm_le_card_rpow_mul`, `ENNReal.lqNorm_prod_rpow`), and, on `ℕ`, splitting off the
   first terms (`ENNReal.lqNorm_le_head_add_shift`, `ENNReal.lqNorm_le_sum_range_add_shift`).
-* **Monotone convergence and countable Minkowski for `eLpNorm`**
-  (`ApproximationSpaces/Sequences/Hardy.lean`): `ENNReal.lqNorm_iSup` and
-  `ENNReal.lqNorm_tsum_le`, stated for the counting measure; the same proof works for
-  `eLpNorm` on any measure space. Mathlib has only the finite version `eLpNorm_sum_le`.
+* **Monotone convergence and countable Minkowski for `eLpNorm`**: on any measure space,
+  `‖sup_b F_b‖_p = sup_b ‖F_b‖_p` for directed countable families of a.e. measurable `F_b`
+  (`MeasureTheory.eLpNorm_iSup_of_directed`) and `‖∑_i g_i‖_p ≤ ∑_i ‖g_i‖_p` for
+  `1 ≤ p ≤ ∞` and countably many `g_i : α → [0, ∞]` (`MeasureTheory.eLpNorm_tsum_le`), both in
+  `FunctionSpaces/Lp/MixedNorms.lean`; the counting-measure versions `ENNReal.lqNorm_iSup` and
+  `ENNReal.lqNorm_tsum_le` are in `ApproximationSpaces/Sequences/Hardy.lean`. Mathlib has only
+  the finite version `eLpNorm_sum_le`.
+* **Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`** (`FunctionSpaces/Lp/MixedNorms.lean`): Minkowski's
+  integral inequality for `ℓ_u`-valued functions, `‖(∫ g_i)_i‖_{ℓ_u} ≤ ∫ ‖(g_i(x))_i‖_{ℓ_u}` for
+  `1 ≤ u ≤ ∞` (`MeasureTheory.lqNorm_lintegral_le`); `L_p(ℓ_p) = ℓ_p(L_p)` for `0 < p < ∞`
+  (`MeasureTheory.eLpNorm_lqNorm_eq_lqNorm_eLpNorm`) and the comparisons for `p ≤ q` and
+  `q ≤ p` (`MeasureTheory.lqNorm_eLpNorm_le_eLpNorm_lqNorm`,
+  `MeasureTheory.eLpNorm_lqNorm_le_lqNorm_eLpNorm`); and the passage of pointwise bounds to
+  limits, `u ≤ v + w_J` a.e. with `‖w_J‖_p → 0` gives `u ≤ v` a.e.
+  (`MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm`).
 * **Weighted Cauchy condensation** (`ApproximationSpaces/Sequences/Dyadic.lean`): for a
   decreasing sequence and a power weight `(n + 1)^γ`, the comparison with the dyadic series
   in both directions (`ENNReal.tsum_pow_mul_le_dyadic`, `ENNReal.dyadic_le_tsum_pow_mul`),
@@ -135,3 +146,46 @@ declarations.
   `A` give `‖(∑_k w(m, k) b_k)_m‖_{ℓ_q} ≤ A ‖b‖_{ℓ_q}` for `1 ≤ q ≤ ∞` (`Rd.lqNorm_schur_le`),
   for countable index sets; `∑_k ∏_i f_i(k_i) ≤ ∏_i ∑_j f_i(j)` on `ℕ^d`
   (`Rd.tsum_prod_le_prod_tsum`).
+* **The layer cake formula for `[0, ∞]`-valued functions**
+  (`FunctionSpaces/Rd/MaximalFunction.lean`): `∫ F^p dν = p ∫_0^∞ ν{F > t} t^(p-1) dt` for
+  `p > 0`, every measure and every a.e. measurable `F : α → [0, ∞]`
+  (`MeasureTheory.lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal`); Mathlib's
+  `lintegral_rpow_eq_lintegral_meas_lt_mul` is for real `f ≥ 0`. Also the `lintegral` of powers
+  over intervals, `∫_{(0,b)} t^r dt = b^(r+1)/(r+1)` for `r > -1` and `b ≥ 0`
+  (`MeasureTheory.lintegral_Ioo_rpow`) and
+  `∫_{(0,∞)} t^r dt = ∞` (`MeasureTheory.lintegral_Ioi_rpow_eq_top`).
+* **The Hardy–Littlewood maximal function** (`FunctionSpaces/Rd/MaximalFunction.lean`): the
+  centred maximal function on a finite-dimensional inner product space (`Rd.maximal`), its lower
+  semicontinuity and measurability for every `g` (`Rd.lowerSemicontinuous_maximal`,
+  `Rd.measurable_maximal`), the weighted weak type
+  `∫_{Mg > t} w ≤ C t⁻¹ ∫ g Mw` (`Rd.setLIntegral_maximal_gt_le`), the weak type `(1,1)`
+  (`Rd.volume_maximal_gt_le`), the weighted strong type `∫ (Mg)^p w ≤ C ∫ g^p Mw`
+  (`Rd.lintegral_maximal_rpow_mul_le`) and the maximal theorem `‖Mg‖_p ≤ C ‖g‖_p` for
+  `1 < p < ∞` (`Rd.eLpNorm_maximal_le`), with explicit constants. Mathlib has Vitali's covering
+  lemma and the differentiation theorem, but no maximal function.
+* **Dyadic cubes and Lebesgue differentiation along them** (`FunctionSpaces/Rd/DyadicCubes.lean`):
+  the dyadic cubes of every level `k ∈ ℤ` (`Rd.zcell`), their nesting
+  (`Rd.zcell_subset_or_disjoint`), and the convergence of the averages over the cubes containing
+  `x` to `F(x)` for almost every `x` and locally integrable `F` (`Rd.ae_tendsto_average_cubeAt`),
+  from Mathlib's `IsUnifLocDoublingMeasure.ae_tendsto_average_norm_sub`.
+* **The Calderón–Zygmund decomposition** (`FunctionSpaces/Rd/CalderonZygmund.lean`): for
+  `n ≥ 1`, `t > 0` and a.e. measurable `G` with `∫ G < ∞`, the maximal dyadic cubes with
+  average `> t` are disjoint, have averages at most `2^n t`, total measure at most `t⁻¹ ∫ G`
+  (`Rd.cz_volume_le`), and `G ≤ t` almost everywhere off their union (`Rd.cz_ae_le_of_notMem`).
+* **The Fefferman–Stein inequality** (`FunctionSpaces/Rd/FeffermanStein.lean`):
+  `‖ ‖(M g_j)_j‖_{ℓ_q} ‖_p ≤ C ‖ ‖(g_j)_j‖_{ℓ_q} ‖_p` for `1 < p < ∞`, `1 < q ≤ ∞`
+  (`Rd.feffermanStein`), with the vector-valued weak type `(1,1)`
+  (`Rd.volume_lqNorm_maximal_gt_le`) and the bound of the maximal function off enlarged sets,
+  `M(1_{⋃ Q_i} g)(x) ≤ 3^n M g̃(x)` for countably many sets `Q_i ⊆ B̄(c_i, ρ_i)` of positive
+  finite measure and `x` outside every `B̄(c_i, 2ρ_i)`, where `g̃ = ∑_i (⨍_{Q_i} g) 1_{Q_i}`
+  (`Rd.maximal_indicator_iUnion_le`).
+* **Integrals under a change of scale** (`FunctionSpaces/Rd/KernelMajorants.lean`):
+  `∫ f(r x) dx = |r^(-n)| ∫ f` for `f : V → [0, ∞]` and `r ≠ 0` (`Rd.lintegral_comp_smul`),
+  from Mathlib's `Measure.map_addHaar_smul`; Mathlib has the Bochner version
+  `Measure.integral_comp_smul`.
+* **The quotient map of the torus** (`FunctionSpaces/Torus/PeriodicLift.lean`): Mathlib has the
+  period-box identity `∫_{a + (0,1]^d} g(π x) dx = ∫_{𝕋^d} g` on `d → ℝ`
+  (`UnitAddTorus.lintegral_preimage`). New here are the measure preservation of
+  `π : ℝ^d → 𝕋^d` on every period box of `EuclideanSpace ℝ d`
+  (`Torus.measurePreserving_proj_periodBox`) and the fact that `π` pulls null sets back to null
+  sets (`Torus.quasiMeasurePreserving_proj`).

@@ -1,9 +1,9 @@
 # Function spaces via approximation in Lean 4 / Mathlib
 
-A Lean 4 / Mathlib formalisation of **Besov and Sobolev spaces** on several domains, their
-equivalent **characterisations** and their **embedding theorems**, built on the theory of
-**approximation spaces**. The project is work in progress; the details are in eight documents
-under [`docs/`](docs/), listed under [What is formalised](#what-is-formalised).
+A Lean 4 / Mathlib formalisation of **Besov, Triebel–Lizorkin and Sobolev spaces** on several
+domains, their equivalent **characterisations** and their **embedding theorems**, built on the
+theory of **approximation spaces**. The project is work in progress; the details are in eight
+documents under [`docs/`](docs/), listed under [What is formalised](#what-is-formalised).
 
 * **Blueprint** (a webpage explaining the mathematics):
   <https://mario-ullrich.github.io/Lean-FunctionSpaces/>
@@ -29,11 +29,18 @@ Sobolev spaces appear as `W^m_2` through weak derivatives and as `H^s` through F
 coefficients on the torus, and abstractly as every space with Jackson's and Bernstein's
 inequalities of order `s`, the form in which their embeddings are proved.
 
+**Triebel–Lizorkin spaces** `F^s_{p,q}(ℝ^d)` take the `ℓ_q` norm of the Littlewood–Paley blocks
+`ψ_j ⋆ f` at every point before the `L_p` norm: they consist of the `f ∈ L_p(ℝ^d)` with
+`‖ x ↦ ‖(2^(js) |ψ_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p < ∞`. For `q = p` and `s > 0` they are the Besov
+spaces `B^s_{p,p}`.
+
 **Characterisations and domains.** Each setting has its natural descriptions of these spaces:
 Fourier coefficients and Littlewood–Paley blocks on the torus and on `ℝ^d`, splines and Haar or
 multiwavelet coefficients on intervals and the cube, local means and atoms on `ℝ^d`, intrinsic
 differences and extensions on Lipschitz domains, chart pieces on manifolds, traces on
-boundaries, and mixed differences for dominating mixed smoothness. The project proves them
+boundaries, and mixed differences for dominating mixed smoothness. Triebel–Lizorkin spaces are
+described by local means on `ℝ^d` and on the torus, and by ball means of differences and atoms
+on `ℝ^d`. The project proves them
 equivalent; the last chapter of the blueprint, *The representations of Besov spaces*, lists
 them with their settings and ranges of parameters and explains how they differ.
 
@@ -111,6 +118,11 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   (`Torus.memBesov_iff_modNorm_lt_top_lp`). The kernels of `ℝ^d` act on `𝕋^d` by
   `(Φ ⋆ f)(t) = ∫ Φ(y) f(t - π y) dy` (`Torus.econvLp`), which transfers Jackson's and
   Bernstein's inequalities from band-limited approximation on `ℝ^d`.
+* **Besov spaces on the torus through Littlewood–Paley blocks.** Let `ψ_j` be the
+  Littlewood–Paley kernels on `ℝ^d` (below), acting on `𝕋^d` by
+  `ψ_j ⋆ f(t) = ∫ ψ_j(y) f(t - π y) dy` with the quotient map `π : ℝ^d → 𝕋^d`. For every
+  `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ B^s_{p,q}(𝕋^d)` iff
+  `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q} < ∞` (`Torus.memBesov_iff_littlewoodPaleyNorm_lt_top`).
 * **The Nikolskii inequality on the torus.** For a trigonometric polynomial `T` of degree `< n`
   on `𝕋^d`, `n ≥ 1`, and `1 ≤ p < ∞`, `‖T‖_∞ ≤ (2⌈p/2⌉)^(d/p) n^(d/p) ‖T‖_p`
   (`Torus.norm_le_rpow_mul_eLpNorm`). Hence the Besov embeddings hold on `𝕋^d` with
@@ -154,6 +166,37 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `‖F‖_p + ‖(2^(ks) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff `F = ∑_j ∑_m λ_{j,m} a_{j,m}` with
   regular atoms of order and exponent `L` whose centres have bounded overlap at every level, and
   `‖(2^(j(s - n/p)) ‖λ_{j,·}‖_{ℓ_p})_j‖_{ℓ_q} < ∞` (`Rd.LocalMeansBump.besov_iff_atomic`).
+
+**Triebel–Lizorkin spaces** ([details](docs/TriebelLizorkin.md))
+
+* **The Fefferman–Stein inequality.** Let `V` be a finite-dimensional real inner product space,
+  such as `ℝ^d`, and `M g(x) = sup_{r > 0} |B(x, r)|⁻¹ ∫_{B(x, r)} g` the Hardy–Littlewood
+  maximal function. For `1 < p < ∞`, `1 < q ≤ ∞` and almost everywhere measurable
+  `g_j : V → [0, ∞]`, `j ∈ ℕ`,
+  `‖ x ↦ ‖(M g_j(x))_j‖_{ℓ_q} ‖_p ≤ C ‖ x ↦ ‖(g_j(x))_j‖_{ℓ_q} ‖_p` with an explicit constant
+  `C` that depends only on `dim V`, `p` and `q` (`Rd.feffermanStein`).
+* **Triebel–Lizorkin spaces and the Besov sandwich.** For `1 ≤ p < ∞`, `s ∈ ℝ` and
+  `1 ≤ q ≤ ∞`, `F^s_{p,q}` consists of the `f ∈ L_p(V)` with
+  `‖ x ↦ ‖(2^(js) |ψ_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p < ∞`, for the Littlewood–Paley kernels `ψ_j` of
+  `ℝ^d` above. For `s > 0`, `F^s_{p,p} = B^s_{p,p}` and
+  `B^s_{p,min(p,q)} ⊆ F^s_{p,q} ⊆ B^s_{p,max(p,q)}`, where `B^s_{p,q}` is the approximation space
+  `A^s_q` of the band-limited classes (`Rd.memTriebelLizorkin_iff_memApprox`,
+  `Rd.memTriebelLizorkin_of_memApprox`, `Rd.memApprox_of_memTriebelLizorkin`). The same holds on
+  the torus `𝕋^d`, with the blocks `ψ_j ⋆ f(t) = ∫ ψ_j(y) f(t - π y) dy` and the approximation
+  spaces of the trigonometric polynomials (`Torus.memTriebelLizorkin_iff_memBesov`,
+  `Torus.memTriebelLizorkin_of_memBesov`, `Torus.memBesov_of_memTriebelLizorkin`).
+* **The local means characterisation.** Let `g` be a smooth function on `V` with `∫ g = 1` that
+  vanishes outside a ball, `g_c = c^n g(c ·)` its dilations (`n = dim V`), `L ≥ 1`,
+  `m = ∑_{l=1}^L (-1)^(l+1) C(L, l) g_{1/l}`, and `k_0 = m`, `k_j = m_{2^j} - m_{2^(j-1)}` the
+  local means kernels. For `1 < p < ∞`, `1 < q ≤ ∞`, `0 < s < L` and `f ∈ L_p(V)`,
+  `f ∈ F^s_{p,q}` iff `‖ x ↦ ‖(2^(js) |k_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p < ∞`
+  (`Rd.LocalMeansBump.memTriebelLizorkin_iff_tlLocalMeans`), and the same holds on `𝕋^d`
+  (`Torus.memTriebelLizorkin_iff_tlLocalMeans`).
+* **Ball means of differences.** For `f ∈ L_p(V)` let
+  `d_j f(x) = |B(0,2^(-j))|⁻¹ ∫_{B(0,2^(-j))} |Δ_h^L f(x)| dh`. For `1 < p < ∞`, `1 < q ≤ ∞`
+  and `0 < s < L`, `f ∈ F^s_{p,q}` iff `‖f‖_p + ‖ x ↦ ‖(2^(js) d_j f(x))_j‖_{ℓ_q} ‖_p < ∞`
+  (`Rd.memTriebelLizorkin_iff_tlDiffNorm_lt_top`). The block document also describes
+  `F^s_{p,q}` by atoms.
 
 **Domains, manifolds and traces** ([details](docs/DomainsTraces.md))
 
@@ -202,10 +245,10 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 |---|---|---|
 | [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
 | [**Besov and Sobolev spaces on measure spaces**](docs/BesovSobolev.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, spectral schemes, eigenbases | ✅ | ✗ |
-| [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness for all `p`, weak derivatives, traces | ✅ | ✗ |
+| [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness and smooth Littlewood–Paley blocks for all `p`, weak derivatives, traces | ✅ | ✗ |
 | [**Intervals, the cube, splines and wavelets**](docs/IntervalCube.md): piecewise polynomials and splines on `[0, 1]`, the circle and `[0, 1]^d`, Whitney's inequality, coordinate and isotropic moduli, multiwavelets, the Haar system | ✅ | ✗ |
 | [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
-| [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): mixed norms, maximal functions, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, local means, ball means of differences, atoms, the torus | ⬜ | ✗ |
+| [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): mixed norms, maximal functions, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, local means, ball means of differences, atoms, the torus | ✅ | ✗ |
 | [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 
@@ -218,15 +261,20 @@ resets its row there and the block here to ✗.
 ## Organisation
 
 Two libraries. `ApproximationSpaces` holds the abstract theory, which mentions neither functions
-nor measures; `FunctionSpaces` holds the Besov and Sobolev spaces built on it, in folders by
-setting. The blocks map onto the folders as follows: approximation spaces are all of
+nor measures; `FunctionSpaces` holds the Besov, Triebel–Lizorkin and Sobolev spaces built on
+it, in folders by setting.
+The blocks map onto the folders as follows: approximation spaces are all of
 `ApproximationSpaces/`; Besov and Sobolev spaces on measure spaces are
 `FunctionSpaces/{Lp,Scheme,Besov,Sobolev,Spectral}`; the torus is `FunctionSpaces/Torus/` with
 the torus traces in `FunctionSpaces/Traces/`; intervals, the cube, splines and wavelets are
 `FunctionSpaces/{Interval,Cube,Wavelets}` and `FunctionSpaces/TranslationAlgebra.lean`; function
 spaces on `ℝ^d`, domains and traces, and mixed smoothness share `FunctionSpaces/Rd/`, with the
-manifolds in `FunctionSpaces/Manifold/`; Triebel–Lizorkin spaces start from the mixed norms in
-`FunctionSpaces/Lp/MixedNorms.lean`. Each block document lists its files.
+manifolds in `FunctionSpaces/Manifold/`; the Triebel–Lizorkin block is the mixed norms in
+`FunctionSpaces/Lp/MixedNorms.lean`, the files
+`FunctionSpaces/Rd/{DyadicCubes,MaximalFunction,CalderonZygmund,FeffermanStein,KernelMajorants}`
+and `FunctionSpaces/Rd/TriebelLizorkin*`, and
+`FunctionSpaces/Torus/{TriebelLizorkin,PeriodicLift,FeffermanStein,TriebelLizorkinLocalMeans}`.
+Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 `blueprint/` holds the LaTeX source of the blueprint and the scripts that check and link its
 `\lean` references.
@@ -236,8 +284,10 @@ manifolds in `FunctionSpaces/Manifold/`; Triebel–Lizorkin spaces start from th
 * **Reiteration** for approximation and interpolation spaces.
 * **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,
   elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.
-* **Sobolev spaces for all `p`**: weak derivatives in `L_p` and the coincidence theorems of
-  Triebel's school.
+* **Sobolev spaces for all `p`**: weak derivatives in `L_p`, Fourier multipliers and
+  `H^s_p = F^s_{p,2}`.
+* **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and their ball means and atoms on the
+  torus.
 * **Higher smoothness**: splines on domains, and compactly supported wavelets such as
   Daubechies'.
 * **The quasi-Banach range** `0 < p, q < 1`, the setting of nonlinear `n`-term approximation.
@@ -293,22 +343,29 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   spaces, Jackson and Bernstein inequalities, and their relation to interpolation.
 * R. A. DeVore, R. C. Sharpley, *Besov spaces on domains in ℝ^d*, Trans. Amer. Math. Soc.
   **335** (1993), no. 2, 843–864. The modulus of smoothness on a domain.
+* C. Fefferman, E. M. Stein, *Some maximal inequalities*, Amer. J. Math. **93** (1971), no. 1,
+  107–115. The vector-valued maximal inequality.
 * S. M. Nikol'skii, *Approximation of Functions of Several Variables and Imbedding
   Theorems*, Grundlehren der mathematischen Wissenschaften **205**, Springer-Verlag, 1975.
   The Nikolskii inequality and the embedding theorems it yields.
 * A. Pietsch, *Approximation spaces*, J. Approx. Theory **32** (1981), no. 2, 115–134.
   The definition of approximation schemes and spaces followed here.
 * V. S. Rychkov, *On restrictions and extensions of the Besov and Triebel–Lizorkin spaces with
-  respect to Lipschitz domains*, J. London Math. Soc. (2) **60** (1999), no. 1, 237–257. The
-  universal extension operator for Lipschitz domains.
+  respect to Lipschitz domains*, J. London Math. Soc. (2) **60** (1999), no. 1, 237–257. Local
+  means and the universal extension operator for Lipschitz domains.
 * C. Schneider, J. Vybíral, *Non-smooth atomic decompositions, traces on Lipschitz domains, and
   pointwise multipliers in function spaces*, preprint, 2012,
   [arXiv:1201.2280](https://arxiv.org/abs/1201.2280). Atoms with bounds instead of smoothness, and
   traces on Lipschitz domains through atoms.
+* E. M. Stein, *Harmonic Analysis: Real-Variable Methods, Orthogonality, and Oscillatory
+  Integrals*, Princeton Mathematical Series **43**, Princeton University Press, 1993. The
+  maximal function and the Calderón–Zygmund decomposition.
 * V. Temlyakov, *Multivariate Approximation*, Cambridge University Press, 2018. Periodic
   function spaces and trigonometric approximation.
-* H. Triebel, *Theory of Function Spaces*, Birkhäuser, 1983. Besov and Sobolev spaces and
-  the equivalence of their definitions.
+* H. Triebel, *Theory of Function Spaces*, Monographs in Mathematics **78**, Birkhäuser, 1983.
+  Besov and Sobolev spaces and the equivalence of their definitions.
+* H. Triebel, *Theory of Function Spaces II*, Monographs in Mathematics **84**, Birkhäuser, 1992.
+  Triebel–Lizorkin spaces, local means, ball means of differences and atoms.
 * T. Ullrich, *Function spaces with dominating mixed smoothness; characterization by
   differences*, Jenaer Schriften zur Mathematik und Informatik Math/Inf/05/06, 2006. Mixed
   differences and mixed local means.
