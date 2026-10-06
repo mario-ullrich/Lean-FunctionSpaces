@@ -2570,28 +2570,6 @@ Lagarias~\cite{DaubechiesLagarias} gives the H\"older exponent $2 - \log_2(1 + \
 A difference with step $h$ becomes the multiplication by $e^{2\pi i h \xi} - 1$ on the Fourier
 side, a factor of modulus at most $2\pi \min(1, |h \xi|)$.
 
-\begin{lemma}[The Fourier transform of a difference]
-\label{lem:daub-fourier-difference}
-\lean{Real.fourier_fwdDiff_apply, Real.fourier_iterate_fwdDiff_apply}
-\leanok
-\uses{def:rd-modulus}
-For every integrable $f : \R \to \C$, every $r \in \N$ and all $h, \xi \in \R$,
-\[
-  \mathcal F(\Delta_h f)(\xi) = (e^{2\pi i h \xi} - 1) \, \widehat f(\xi)
-  \quad\text{and}\quad
-  \mathcal F(\Delta_h^r f)(\xi) = (e^{2\pi i h \xi} - 1)^r \, \widehat f(\xi) .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:fourier-dilate, lem:daub-fourier-translate, lem:rd-differences}
-The transform is linear on integrable functions (\Cref{lem:fourier-dilate}), and
-$\mathcal F[f(\cdot + h)](\xi) = e^{2\pi i h \xi} \widehat f(\xi)$
-(\Cref{lem:daub-fourier-translate}). The second identity follows by induction on $r$, since the
-differences of an integrable function are integrable (\Cref{lem:rd-differences}).
-\end{proof}
-
 \begin{lemma}[The multiplier of a difference]
 \label{lem:daub-difference-multiplier}
 \lean{Daubechies.exp_two_pi_mul_I_eq, Daubechies.norm_exp_sub_one_le_two,
@@ -2644,7 +2622,8 @@ which the weighted decay of \Cref{thm:daub-decay-l2} bounds.
 
 \begin{lemma}[The differences of $\varphi$ on the Fourier side]
 \label{lem:daub-scaling-difference-fourier}
-\lean{Daubechies.fourier_higherDiff_scalingFun,
+\lean{Real.fourier_fwdDiff_apply, Real.fourier_iterate_fwdDiff_apply,
+  Daubechies.fourier_higherDiff_scalingFun,
   Daubechies.integrable_fourier_higherDiff_scalingFun, Daubechies.memLp_higherDiff_scalingFun}
 \leanok
 \uses{def:daub-scaling-function, def:rd-modulus}
@@ -2657,43 +2636,32 @@ this transform is integrable, and $\Delta_h^r \varphi \in L_p(\R)$ for every $p 
 
 \begin{proof}
 \leanok
-\uses{lem:daub-fourier-difference, prop:daub-scaling-integrable, thm:daub-scaling-fourier,
-  lem:daub-difference-multiplier, prop:daub-symbol-product-integrable, lem:daub-differences-lp}
-\Cref{lem:daub-fourier-difference} for the integrable function $\varphi$ with
-$\widehat\varphi = \Phi$ (\Cref{prop:daub-scaling-integrable,thm:daub-scaling-fourier}). The
-factor $(e^{2\pi i h \xi} - 1)^r$ is continuous with modulus at most $2^r$
+\uses{lem:fourier-dilate, lem:daub-fourier-translate, lem:rd-differences,
+  prop:daub-scaling-integrable, thm:daub-scaling-fourier, lem:daub-difference-multiplier,
+  prop:daub-symbol-product-integrable, lem:daub-differences-lp}
+First, for every integrable $f : \R \to \C$, every $r \in \N$ and all $h, \xi \in \R$,
+\[
+  \mathcal F(\Delta_h f)(\xi) = (e^{2\pi i h \xi} - 1) \, \widehat f(\xi)
+  \quad\text{and}\quad
+  \mathcal F(\Delta_h^r f)(\xi) = (e^{2\pi i h \xi} - 1)^r \, \widehat f(\xi) ,
+\]
+since the transform is linear on integrable functions (\Cref{lem:fourier-dilate}) and
+$\mathcal F[f(\cdot + h)](\xi) = e^{2\pi i h \xi} \widehat f(\xi)$
+(\Cref{lem:daub-fourier-translate}); the second identity follows by induction on $r$, since the
+differences of an integrable function are integrable (\Cref{lem:rd-differences}). Apply this to
+the integrable function $\varphi$ with $\widehat\varphi = \Phi$
+(\Cref{prop:daub-scaling-integrable,thm:daub-scaling-fourier}). The factor
+$(e^{2\pi i h \xi} - 1)^r$ is continuous with modulus at most $2^r$
 (\Cref{lem:daub-difference-multiplier}), and $\Phi$ is integrable
 (\Cref{prop:daub-symbol-product-integrable}). Finally $\varphi \in L_p$
 (\Cref{prop:daub-scaling-integrable}) and \Cref{lem:daub-differences-lp}.
 \end{proof}
 
-\begin{proposition}[Parseval's identity for the differences of $\varphi$]
-\label{prop:daub-scaling-difference-parseval}
-\lean{Daubechies.integral_norm_sq_higherDiff_scalingFun,
-  Daubechies.eLpNorm_two_higherDiff_scalingFun_sq}
-\leanok
-\uses{def:daub-scaling-function, def:rd-modulus}
-For every Daubechies mask of order $N \geq 2$, every $r \in \N$ and every $h \in \R$,
-\[
-  \|\Delta_h^r \varphi\|_2^2 = \int_\R |\Delta_h^r \varphi(x)|^2 \, dx
-  = \int_\R |e^{2\pi i h \xi} - 1|^{2r} \, |\Phi(\xi)|^2 \, d\xi .
-\]
-\end{proposition}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-differences-lp, lem:rd-differences, prop:daub-scaling-continuous,
-  prop:daub-scaling-integrable, lem:daub-scaling-difference-fourier, prop:daub-parseval}
-The function $\Delta_h^r \varphi$ is continuous and integrable
-(\Cref{lem:daub-differences-lp,lem:rd-differences} with
-\Cref{prop:daub-scaling-continuous,prop:daub-scaling-integrable}), with the integrable transform
-of \Cref{lem:daub-scaling-difference-fourier}. Apply the case $g = f$ of
-\Cref{prop:daub-parseval}, and $\|g\|_2^2 = \int |g|^2$ (\Cref{lem:daub-differences-lp}).
-\end{proof}
-
 \begin{lemma}[$L_2$ bounds for the differences of $\varphi$]
 \label{lem:daub-scaling-difference-l2}
-\lean{Daubechies.rpow_two_mul_eq_sq, Daubechies.integral_norm_sq_higherDiff_scalingFun_le,
+\lean{Daubechies.integral_norm_sq_higherDiff_scalingFun,
+  Daubechies.eLpNorm_two_higherDiff_scalingFun_sq, Daubechies.rpow_two_mul_eq_sq,
+  Daubechies.integral_norm_sq_higherDiff_scalingFun_le,
   Daubechies.eLpNorm_two_higherDiff_scalingFun_le}
 \leanok
 \uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
@@ -2708,9 +2676,21 @@ Daubechies mask of order $N$ and every $h \in \R$,
 
 \begin{proof}
 \leanok
-\uses{prop:daub-scaling-difference-parseval, lem:daub-difference-multiplier, thm:daub-decay-l2}
-By \Cref{prop:daub-scaling-difference-parseval}, the last bound of
-\Cref{lem:daub-difference-multiplier} and $|h|^{2s} = (|h|^s)^2$,
+\uses{lem:daub-differences-lp, lem:rd-differences, prop:daub-scaling-continuous,
+  prop:daub-scaling-integrable, lem:daub-scaling-difference-fourier, prop:daub-parseval,
+  lem:daub-difference-multiplier, thm:daub-decay-l2}
+First, Parseval's identity for the differences of $\varphi$: for every $r \in \N$ and every
+$h \in \R$,
+\[
+  \|\Delta_h^r \varphi\|_2^2 = \int_\R |\Delta_h^r \varphi(x)|^2 \, dx
+  = \int_\R |e^{2\pi i h \xi} - 1|^{2r} \, |\Phi(\xi)|^2 \, d\xi .
+\]
+Indeed, $\Delta_h^r \varphi$ is continuous and integrable
+(\Cref{lem:daub-differences-lp,lem:rd-differences} with
+\Cref{prop:daub-scaling-continuous,prop:daub-scaling-integrable}), with the integrable transform
+of \Cref{lem:daub-scaling-difference-fourier}; apply the case $g = f$ of
+\Cref{prop:daub-parseval}, and $\|g\|_2^2 = \int |g|^2$ (\Cref{lem:daub-differences-lp}). By the
+last bound of \Cref{lem:daub-difference-multiplier} and $|h|^{2s} = (|h|^s)^2$,
 \[
   \|\Delta_h^r \varphi\|_2^2
   \leq \bigl((2\pi)^r |h|^s\bigr)^2 \int_\R (1 + |\xi|)^{2s} \, |\Phi(\xi)|^2 \, d\xi ,
@@ -2847,51 +2827,18 @@ operator; for $N = 2, 3$ this gives the Sobolev exponents $1$ and $3 - \log_2 3 
 
 \paragraph{H\"older continuity through the Fourier transform.}
 The differences of an inverse Fourier transform $\mathcal F^{-1} F$ are the inverse transforms
-of $(e^{2\pi i h \xi} - 1)^r F(\xi)$, the counterpart of \Cref{lem:daub-fourier-difference}, and
-are therefore bounded uniformly by $\int_\R |e^{2\pi i h \xi} - 1|^r |F(\xi)| \, d\xi$. For
-$\varphi = \mathcal F^{-1} \Phi$ the weighted $L_1$ decay of \Cref{cor:daub-decay-l1} bounds this
-integral by a multiple of $|h|^a$ for every $0 \leq a \leq r$ with
-$a < N - \log_4 \lambda - \frac12$.
-
-\begin{lemma}[Differences of an inverse Fourier transform]
-\label{lem:daub-inverse-fourier-difference}
-\lean{Real.fourierInv_sub_apply, Real.integrable_exp_mul, Real.integrable_exp_sub_one_pow_mul,
-  Real.fwdDiff_fourierInv_apply, Real.iterate_fwdDiff_fourierInv_apply,
-  Real.norm_iterate_fwdDiff_fourierInv_le}
-\leanok
-\uses{def:rd-modulus}
-For all integrable $F, G : \R \to \C$ and every $x \in \R$,
-$\mathcal F^{-1}(F - G)(x) = \mathcal F^{-1} F(x) - \mathcal F^{-1} G(x)$. Let $F : \R \to \C$ be
-integrable, $r \in \N$ and $h \in \R$. Then the functions $\xi \mapsto e^{2\pi i h \xi} F(\xi)$
-and $\xi \mapsto (e^{2\pi i h \xi} - 1)^r F(\xi)$ are integrable, and for every $x \in \R$
-\[
-  \Delta_h^r (\mathcal F^{-1} F)(x)
-  = \mathcal F^{-1}\bigl[\xi \mapsto (e^{2\pi i h \xi} - 1)^r F(\xi)\bigr](x)
-\]
-and
-\[
-  |\Delta_h^r (\mathcal F^{-1} F)(x)| \leq \int_\R |e^{2\pi i h \xi} - 1|^r \, |F(\xi)| \, d\xi .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:fourier-dilate, lem:daub-difference-multiplier, lem:daub-fourier-translate,
-  lem:daub-fourier-continuous}
-Since $\mathcal F^{-1} F(x) = \widehat F(-x)$, the first identity is the linearity of the
-transform on integrable functions (\Cref{lem:fourier-dilate}). The factor $e^{2\pi i h \xi}$ is
-continuous of modulus $1$, and $(e^{2\pi i h \xi} - 1)^r$ is continuous of modulus at most $2^r$
-(\Cref{lem:daub-difference-multiplier}), so both products are integrable. By item~3 of
-\Cref{lem:daub-fourier-translate}, $\mathcal F^{-1} F(x + h)$ is the inverse transform of
-$e^{2\pi i h \xi} F(\xi)$, so the first identity gives the case $r = 1$, and induction on $r$
-gives the identity for every $r$. The bound follows with $|\mathcal F^{-1} G(x)| \leq \int_\R |G|$
-(\Cref{lem:daub-fourier-continuous}).
-\end{proof}
+of $(e^{2\pi i h \xi} - 1)^r F(\xi)$, the counterpart of
+\Cref{lem:daub-scaling-difference-fourier}, and are therefore bounded uniformly by
+$\int_\R |e^{2\pi i h \xi} - 1|^r |F(\xi)| \, d\xi$. For $\varphi = \mathcal F^{-1} \Phi$ the
+weighted $L_1$ decay of \Cref{cor:daub-decay-l1} bounds this integral by a multiple of $|h|^a$
+for every $0 \leq a \leq r$ with $a < N - \log_4 \lambda - \frac12$.
 
 \begin{lemma}[The differences of $\varphi$ as inverse transforms]
 \label{lem:daub-scaling-difference-inverse}
 \lean{Daubechies.norm_exp_sub_one_pow_le_mul_rpow, Daubechies.integrable_symbolProduct_of_growth,
-  Daubechies.higherDiff_scalingFun_eq_fourierInv,
+  Real.fourierInv_sub_apply, Real.integrable_exp_mul, Real.integrable_exp_sub_one_pow_mul,
+  Real.fwdDiff_fourierInv_apply, Real.iterate_fwdDiff_fourierInv_apply,
+  Real.norm_iterate_fwdDiff_fourierInv_le, Daubechies.higherDiff_scalingFun_eq_fourierInv,
   Daubechies.norm_higherDiff_scalingFun_le_integral}
 \leanok
 \uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
@@ -2916,14 +2863,31 @@ and
 \begin{proof}
 \leanok
 \uses{lem:daub-difference-multiplier, cor:daub-decay-l1, thm:daub-symbol-product-continuous,
-  lem:daub-inverse-fourier-difference}
-The bound combines $|e^{2\pi i h \xi} - 1| \leq 2\pi \min(1, |h \xi|)$ and
+  lem:fourier-dilate, lem:daub-fourier-translate, lem:daub-fourier-continuous}
+The first bound combines $|e^{2\pi i h \xi} - 1| \leq 2\pi \min(1, |h \xi|)$ and
 $\min(1, |h \xi|)^r \leq |h \xi|^a$ (\Cref{lem:daub-difference-multiplier}) with
 $|h \xi| \leq |h| (1 + |\xi|)$. The case $a = 0$ of \Cref{cor:daub-decay-l1} shows that $|\Phi|$
 is integrable, and so is the continuous function $\Phi$
-(\Cref{thm:daub-symbol-product-continuous}). The identity and the bound for $\Delta_h^r \varphi$
-are \Cref{lem:daub-inverse-fourier-difference} for $F = \Phi$, since
-$\varphi = \mathcal F^{-1} \Phi$.
+(\Cref{thm:daub-symbol-product-continuous}).
+
+The identity and the bound for $\Delta_h^r \varphi$ hold for every integrable $F : \R \to \C$ in
+place of $\Phi$, with $\mathcal F^{-1} F$ in place of $\varphi = \mathcal F^{-1} \Phi$: for every
+$r \in \N$ and all $h, x \in \R$,
+\[
+  \Delta_h^r (\mathcal F^{-1} F)(x)
+  = \mathcal F^{-1}\bigl[\xi \mapsto (e^{2\pi i h \xi} - 1)^r F(\xi)\bigr](x)
+\]
+and $|\Delta_h^r (\mathcal F^{-1} F)(x)| \leq \int_\R |e^{2\pi i h \xi} - 1|^r \, |F(\xi)| \, d\xi$,
+where the functions $\xi \mapsto e^{2\pi i h \xi} F(\xi)$ and
+$\xi \mapsto (e^{2\pi i h \xi} - 1)^r F(\xi)$ are integrable, since the first factor is continuous
+of modulus $1$ and the second is continuous of modulus at most $2^r$
+(\Cref{lem:daub-difference-multiplier}). Indeed, since $\mathcal F^{-1} F(x) = \widehat F(-x)$,
+the inverse transform is linear on integrable functions (\Cref{lem:fourier-dilate}):
+$\mathcal F^{-1}(F - G)(x) = \mathcal F^{-1} F(x) - \mathcal F^{-1} G(x)$ for all integrable
+$F, G$. By item~3 of \Cref{lem:daub-fourier-translate}, $\mathcal F^{-1} F(x + h)$ is the inverse
+transform of $e^{2\pi i h \xi} F(\xi)$, so linearity gives the case $r = 1$, and induction on $r$
+gives the identity for every $r$. The bound follows with $|\mathcal F^{-1} G(x)| \leq \int_\R |G|$
+(\Cref{lem:daub-fourier-continuous}). Take $F = \Phi$.
 \end{proof}
 
 By \Cref{prop:daub-symbol-product-integrable} the identity and the bound for $\Delta_h^r \varphi$
@@ -3073,37 +3037,10 @@ $\|g\|_p \leq M^{1 - 2/p} \|g\|_2^{2/p}$, and $\|g\|_2^{2/p} \leq B^{2/p}$. The 
 from the rules for powers in $[0, \infty]$ with nonnegative exponents.
 \end{proof}
 
-\begin{lemma}[The $L_p$ modulus by interpolation]
-\label{lem:daub-modulus-interpolation}
-\lean{Daubechies.modulus_le_of_norm_le_of_eLpNorm_two_le}
-\leanok
-\uses{def:rd-modulus}
-Let $f : \R \to \C$ be measurable, let $r \in \N$, $a, s \geq 0$, $K \in \R$ and
-$B \in [0, \infty]$, and suppose that for all $x, h \in \R$
-\[
-  |\Delta_h^r f(x)| \leq K |h|^a \quad\text{and}\quad \|\Delta_h^r f\|_2 \leq B |h|^s .
-\]
-Then for every $2 \leq p < \infty$ and every $t > 0$, with $\theta = (2/p) s + (1 - 2/p) a$,
-\[
-  \omega_r(f, t)_p \leq K^{1 - 2/p} B^{2/p} \, t^\theta .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-interpolation-two-infty, lem:rd-differences}
-Let $|h| \leq t$. The difference $\Delta_h^r f$ is measurable (\Cref{lem:rd-differences}), and
-\Cref{lem:daub-interpolation-two-infty} with $M = K |h|^a$ and $B |h|^s$ in place of $B$ gives
-\[
-  \|\Delta_h^r f\|_p \leq (K |h|^a)^{1 - 2/p} (B |h|^s)^{2/p} = K^{1 - 2/p} B^{2/p} |h|^\theta
-  \leq K^{1 - 2/p} B^{2/p} t^\theta ,
-\]
-since $\theta \geq 0$. Take the supremum over $|h| \leq t$.
-\end{proof}
-
 \begin{theorem}[The $L_p$ modulus of the scaling function, $p \geq 2$]
 \label{thm:daub-modulus-interp}
-\lean{Daubechies.modulus_scalingFun_interp_of_norm_le, Daubechies.modulus_scalingFun_interp}
+\lean{Daubechies.modulus_le_of_norm_le_of_eLpNorm_two_le,
+  Daubechies.modulus_scalingFun_interp_of_norm_le, Daubechies.modulus_scalingFun_interp}
 \leanok
 \uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
 Let $\lambda, C$ be a growth bound for the transfer operator of order $N \geq 2$, let
@@ -3123,15 +3060,29 @@ $t \in (0, 1]$.
 \begin{proof}
 \leanok
 \uses{prop:daub-scaling-difference-uniform, prop:daub-scaling-continuous,
-  lem:daub-modulus-top-pointwise, lem:daub-scaling-difference-l2, lem:daub-modulus-interpolation,
-  lem:daub-interpolation-two-infty}
+  lem:daub-modulus-top-pointwise, lem:daub-scaling-difference-l2,
+  lem:daub-interpolation-two-infty, lem:rd-differences}
 Condition~2 implies condition~1 by \Cref{prop:daub-scaling-difference-uniform}; assume
 condition~1. The scaling function is continuous (\Cref{prop:daub-scaling-continuous}), hence
 measurable. For $p = \infty$, $\theta = a$, and \Cref{lem:daub-modulus-top-pointwise} gives the
 bound with $K = K_0$. For $p < \infty$, \Cref{lem:daub-scaling-difference-l2} gives
-$\|\Delta_h^r \varphi\|_2 \leq K_2 |h|^s$ for every $h \in \R$ with a constant $K_2 < \infty$, and
-\Cref{lem:daub-modulus-interpolation} gives the bound with $K = K_0^{1 - 2/p} K_2^{2/p}$, which is
-finite since $1 - 2/p \geq 0$ (\Cref{lem:daub-interpolation-two-infty}).
+$\|\Delta_h^r \varphi\|_2 \leq K_2 |h|^s$ for every $h \in \R$ with a constant $K_2 < \infty$.
+The two bounds interpolate: for every measurable $f : \R \to \C$, $K_1 \in \R$ and
+$B \in [0, \infty]$ with $|\Delta_h^r f(x)| \leq K_1 |h|^a$ and
+$\|\Delta_h^r f\|_2 \leq B |h|^s$ for all $x, h \in \R$, and every $t > 0$,
+\[
+  \omega_r(f, t)_p \leq K_1^{1 - 2/p} B^{2/p} \, t^\theta .
+\]
+Indeed, for $|h| \leq t$ the difference $\Delta_h^r f$ is measurable
+(\Cref{lem:rd-differences}), and \Cref{lem:daub-interpolation-two-infty} with $M = K_1 |h|^a$ and
+$B |h|^s$ in place of $B$ gives
+\[
+  \|\Delta_h^r f\|_p \leq (K_1 |h|^a)^{1 - 2/p} (B |h|^s)^{2/p} = K_1^{1 - 2/p} B^{2/p} |h|^\theta
+  \leq K_1^{1 - 2/p} B^{2/p} t^\theta ,
+\]
+since $\theta \geq 0$; take the supremum over $|h| \leq t$. For $f = \varphi$, $K_1 = K_0$ and
+$B = K_2$ this is the bound with $K = K_0^{1 - 2/p} K_2^{2/p}$, which is finite since
+$1 - 2/p \geq 0$ (\Cref{lem:daub-interpolation-two-infty}).
 \end{proof}
 
 For $p = 2$ the exponent is $\theta = s$, that of \Cref{prop:daub-modulus-l2}, and for
@@ -3164,28 +3115,9 @@ $N - \log_4 \lambda - \frac12$ is $\frac12$ and $\frac52 - \log_2 3$.
 A H\"older estimate bounds all higher differences, so a H\"older exponent obtained by any other
 method enters the interpolation as well.
 
-\begin{lemma}[Higher differences of a H\"older function]
-\label{lem:daub-holder-differences}
-\lean{Daubechies.norm_iterate_fwdDiff_le_of_holder}
-\leanok
-\uses{def:rd-modulus}
-Let $E$ be a normed abelian group, and let $f : \R \to E$ and $K, a \in \R$ satisfy
-$\|f(x) - f(y)\| \leq K |x - y|^a$ for all $x, y \in \R$. Then for every $r \in \N$ and all
-$x, h \in \R$,
-\[
-  \|\Delta_h^{r+1} f(x)\| \leq 2^r K |h|^a .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-Induction on $r$. The case $r = 0$ is the estimate at the points $x + h$ and $x$, and
-$\Delta_h^{r+2} f(x) = \Delta_h^{r+1} f(x + h) - \Delta_h^{r+1} f(x)$ gives the step.
-\end{proof}
-
 \begin{corollary}[The $L_p$ modulus from a H\"older estimate]
 \label{cor:daub-modulus-interp-holder}
-\lean{Daubechies.modulus_scalingFun_interp_of_holder}
+\lean{Daubechies.norm_iterate_fwdDiff_le_of_holder, Daubechies.modulus_scalingFun_interp_of_holder}
 \leanok
 \uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
 Let $\lambda, C$ be a growth bound for the transfer operator of order $N \geq 2$, let
@@ -3198,9 +3130,14 @@ constant $K < \infty$ with $\omega_r(\varphi, t)_p \leq K t^\theta$ for every $t
 
 \begin{proof}
 \leanok
-\uses{lem:daub-holder-differences, thm:daub-modulus-interp}
-By \Cref{lem:daub-holder-differences}, $|\Delta_h^r \varphi(x)| \leq 2^{r-1} K_0 |h|^a$ for all
-$x, h \in \R$, which is condition~1 of \Cref{thm:daub-modulus-interp}.
+\uses{thm:daub-modulus-interp}
+First, a H\"older estimate bounds all higher differences: if $E$ is a normed abelian group and
+$f : \R \to E$ and $K, a \in \R$ satisfy $\|f(x) - f(y)\| \leq K |x - y|^a$ for all
+$x, y \in \R$, then $\|\Delta_h^{r+1} f(x)\| \leq 2^r K |h|^a$ for every $r \in \N$ and all
+$x, h \in \R$, by induction on $r$: the case $r = 0$ is the estimate at the points $x + h$ and
+$x$, and $\Delta_h^{r+2} f(x) = \Delta_h^{r+1} f(x + h) - \Delta_h^{r+1} f(x)$ gives the step.
+Hence $|\Delta_h^r \varphi(x)| \leq 2^{r-1} K_0 |h|^a$ for all $x, h \in \R$, which is
+condition~1 of \Cref{thm:daub-modulus-interp}.
 \end{proof}
 
 For the mask D4 the matrix method below gives the H\"older estimate for every
@@ -3296,51 +3233,12 @@ The pair of differences of $A$ and $B$ follows a lower triangular recursion with
 $(\frac12, \rho)$; for $\rho > \frac12$ its rate is $\rho^n$, and the term $-C/2^n$ makes the
 induction close.
 
-\begin{lemma}[Closed dyadic intervals]
-\label{lem:daub-closed-dyadic}
-\lean{Daubechies.norm_sub_le_of_forall_Ico, Daubechies.norm_sub_le_of_unit_dyadic,
-  Daubechies.norm_sub_le_of_adjacent_dyadic}
-\leanok
-Let $E$ be a seminormed abelian group, let $f : \R \to E$, $n \in \N$ and $c \in \R$.
-\begin{enumerate}
-  \item If $f$ is continuous, $a < b$ and $\|f(x) - f(y)\| \leq c$ for all $x, y \in [a, b)$,
-    then $\|f(x) - f(y)\| \leq c$ for all $x, y \in [a, b]$.
-  \item If $f$ is continuous and $\|f(x + i) - f(y + i)\| \leq c$ for every $i \in \Z$, every
-    $k \in \N$ with $k < 2^n$ and all $x, y \in [k/2^n, (k+1)/2^n)$, then
-    $\|f(x) - f(y)\| \leq c$ for every $k \in \Z$ and all $x, y \in [k/2^n, (k+1)/2^n]$.
-  \item If $\|f(x) - f(y)\| \leq c$ for every $k \in \Z$ and all
-    $x, y \in [k/2^n, (k+1)/2^n]$, then $\|f(x) - f(y)\| \leq 2c$ for all $x, y \in \R$ with
-    $x \leq y \leq x + 2^{-n}$.
-\end{enumerate}
-\end{lemma}
-
-\begin{proof}
-\leanok
-(1) The pairs $(x, y)$ with $\|f(x) - f(y)\| \leq c$ form a closed set that contains
-$[a, b) \times [a, b)$, hence also its closure. (2) Write $k = 2^n q + r$ with $q \in \Z$ and
-$0 \leq r < 2^n$, and apply (1) to $t \mapsto f(t + q)$. (3) Let $k = \lfloor 2^n x \rfloor$.
-Either $y$ lies in the closed dyadic interval $[k/2^n, (k+1)/2^n]$ of $x$, or the point
-$(k+1)/2^n$ joins $x$ and $y$ through two adjacent closed dyadic intervals.
-\end{proof}
-
-\begin{lemma}[Dyadic levels]
-\label{lem:daub-dyadic-level}
-\lean{Daubechies.exists_dyadic_level, Daubechies.pow_le_two_rpow_mul_rpow}
-\leanok
-For every $t \in (0, 1]$ there is $n \in \N$ with $2^{-(n+1)} < t \leq 2^{-n}$. For all real
-$a$, $\rho$ and $t$ with $a \geq 0$ and $0 \leq \rho \leq 2^{-a}$, and every $n \in \N$ with
-$2^{-(n+1)} < t$, $\rho^n \leq 2^a t^a$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The powers $2^{-n}$ decrease to $0$. Moreover $\rho^n \leq (2^{-a})^n = (2^{-n})^a$ and
-$2^{-n} < 2t$.
-\end{proof}
-
 \begin{proposition}[H\"older continuity from dyadic oscillation bounds]
 \label{prop:daub-holder-from-dyadic}
-\lean{Daubechies.exists_holder_of_dyadic, Daubechies.exists_holder_of_unit_dyadic}
+\lean{Daubechies.norm_sub_le_of_forall_Ico, Daubechies.norm_sub_le_of_unit_dyadic,
+  Daubechies.norm_sub_le_of_adjacent_dyadic, Daubechies.exists_dyadic_level,
+  Daubechies.pow_le_two_rpow_mul_rpow, Daubechies.exists_holder_of_dyadic,
+  Daubechies.exists_holder_of_unit_dyadic}
 \leanok
 Let $E$ be a seminormed abelian group, let $f : \R \to E$ and $M \in \R$ with
 $\|f(x)\| \leq M$ for every $x \in \R$, and let $C, a, \rho \in \R$ with $C \geq 0$, $a \geq 0$
@@ -3356,12 +3254,30 @@ Then there is a constant $K$ with $\|f(x) - f(y)\| \leq K |x - y|^a$ for all $x,
 
 \begin{proof}
 \leanok
-\uses{lem:daub-closed-dyadic, lem:daub-dyadic-level}
-Condition~2 implies condition~1 by item~2 of \Cref{lem:daub-closed-dyadic}. Let $x < y$. If
-$y - x \leq 1$, choose $n$ with $2^{-(n+1)} < y - x \leq 2^{-n}$ (\Cref{lem:daub-dyadic-level});
-then $\|f(x) - f(y)\| \leq 2C\rho^n \leq 2C 2^a (y - x)^a$ by item~3 of
-\Cref{lem:daub-closed-dyadic} and \Cref{lem:daub-dyadic-level}. If $y - x > 1$, then
-$\|f(x) - f(y)\| \leq 2M \leq 2M (y - x)^a$. Take $K = 2C 2^a + 2M$.
+First, three facts about closed dyadic intervals, for $f : \R \to E$, $n \in \N$ and $c \in \R$.
+\begin{enumerate}
+  \item If $f$ is continuous, $u < v$ and $\|f(x) - f(y)\| \leq c$ for all $x, y \in [u, v)$,
+    then $\|f(x) - f(y)\| \leq c$ for all $x, y \in [u, v]$: the pairs $(x, y)$ with
+    $\|f(x) - f(y)\| \leq c$ form a closed set that contains $[u, v) \times [u, v)$, hence also
+    its closure.
+  \item If $f$ is continuous and $\|f(x + i) - f(y + i)\| \leq c$ for every $i \in \Z$, every
+    $k \in \N$ with $k < 2^n$ and all $x, y \in [k/2^n, (k+1)/2^n)$, then
+    $\|f(x) - f(y)\| \leq c$ for every $k \in \Z$ and all $x, y \in [k/2^n, (k+1)/2^n]$: write
+    $k = 2^n q + r$ with $q \in \Z$ and $0 \leq r < 2^n$, and apply item~1 to $z \mapsto f(z + q)$.
+  \item If $\|f(x) - f(y)\| \leq c$ for every $k \in \Z$ and all $x, y \in [k/2^n, (k+1)/2^n]$,
+    then $\|f(x) - f(y)\| \leq 2c$ for all $x, y \in \R$ with $x \leq y \leq x + 2^{-n}$: with
+    $k = \lfloor 2^n x \rfloor$, either $y$ lies in the closed dyadic interval
+    $[k/2^n, (k+1)/2^n]$ of $x$, or the point $(k+1)/2^n$ joins $x$ and $y$ through two
+    adjacent closed dyadic intervals.
+\end{enumerate}
+Moreover, for every $t \in (0, 1]$ there is $n \in \N$ with $2^{-(n+1)} < t \leq 2^{-n}$, since
+the powers $2^{-n}$ decrease to $0$, and then $\rho^n \leq (2^{-a})^n = (2^{-n})^a \leq 2^a t^a$,
+since $2^{-n} < 2t$.
+
+Condition~2 implies condition~1 by item~2. Let $x < y$. If $y - x \leq 1$, choose $n$ with
+$2^{-(n+1)} < y - x \leq 2^{-n}$; then $\|f(x) - f(y)\| \leq 2C\rho^n \leq 2C 2^a (y - x)^a$ by
+item~3. If $y - x > 1$, then $\|f(x) - f(y)\| \leq 2M \leq 2M (y - x)^a$. Take
+$K = 2C 2^a + 2M$.
 \end{proof}
 
 \paragraph{The H\"older exponent of D4.}
@@ -3405,34 +3321,6 @@ $x \in \R$
 nonzero; \Cref{thm:daub-refinement-equation} with $2N = 4$.
 \end{proof}
 
-\begin{lemma}[The refinement equation of D4 on the two halves]
-\label{lem:daub-d4-halves}
-\lean{Daubechies.scalingFun_d4_left, Daubechies.scalingFun_d4_add_one_left,
-  Daubechies.scalingFun_d4_add_two_left, Daubechies.scalingFun_d4_right,
-  Daubechies.scalingFun_d4_add_one_right, Daubechies.scalingFun_d4_add_two_right}
-\leanok
-\uses{prop:daub-d4, def:daub-scaling-function}
-Let $\varphi$ be the scaling function of D4, with filter coefficients $c_0, \dots, c_3$, and let
-$v(x) \in \C^3$ be the column vector with the entries $\varphi(x)$, $\varphi(x + 1)$,
-$\varphi(x + 2)$. Then
-\[
-  v(x) = T_0 \, v(2x) \ \text{ for } x \in [0, \tfrac12) , \qquad
-  v(x) = T_1 \, v(2x - 1) \ \text{ for } x \in [\tfrac12, 1) ,
-\]
-with the matrices
-\[
-  T_0 = \begin{pmatrix} c_0 & 0 & 0 \\ c_2 & c_1 & c_0 \\ 0 & c_3 & c_2 \end{pmatrix} , \qquad
-  T_1 = \begin{pmatrix} c_1 & c_0 & 0 \\ c_3 & c_2 & c_1 \\ 0 & 0 & c_3 \end{pmatrix} .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-d4-scaling}
-Apply \Cref{lem:daub-d4-scaling} at $x$, $x + 1$ and $x + 2$; the terms $\varphi(2x + j)$ with
-$2x + j \notin (0, 3)$ vanish.
-\end{proof}
-
 Differences $v(x) - v(y)$ lie in the kernel of the functional $\ell_0 = (1, 1, 1)$, since
 $\ell_0(v(x)) = 1$ for $x \in [0, 1)$. The proof works with the scalar functions
 $A(x) = \varphi(x + 1) + 2 \varphi(x + 2)$ and $B(x) = \varphi(x) + A(x)$, the coordinates of
@@ -3455,7 +3343,10 @@ For the scaling function $\varphi$ of D4 and $x \in \R$ let
 
 \begin{lemma}[The recursions of $A$ and $B$]
 \label{lem:daub-d4-recursions}
-\lean{Daubechies.d4A_left, Daubechies.d4A_right, Daubechies.d4B_left, Daubechies.d4B_right}
+\lean{Daubechies.scalingFun_d4_left, Daubechies.scalingFun_d4_add_one_left,
+  Daubechies.scalingFun_d4_add_two_left, Daubechies.scalingFun_d4_right,
+  Daubechies.scalingFun_d4_add_one_right, Daubechies.scalingFun_d4_add_two_right,
+  Daubechies.d4A_left, Daubechies.d4A_right, Daubechies.d4B_left, Daubechies.d4B_right}
 \leanok
 \uses{def:daub-d4-coordinates}
 The functions $A$ and $B$ of D4 satisfy the following recursions.
@@ -3469,8 +3360,21 @@ The functions $A$ and $B$ of D4 satisfy the following recursions.
 
 \begin{proof}
 \leanok
-\uses{lem:daub-d4-halves, prop:daub-d4-coeff, lem:daub-d4-scaling}
-Insert \Cref{lem:daub-d4-halves} with the coefficients of \Cref{prop:daub-d4-coeff}. For
+\uses{prop:daub-d4, def:daub-scaling-function, lem:daub-d4-scaling, prop:daub-d4-coeff}
+First, the refinement equation on the two halves: with the filter coefficients
+$c_0, \dots, c_3$ of D4, let $v(x) \in \C^3$ be the column vector with the entries $\varphi(x)$,
+$\varphi(x + 1)$, $\varphi(x + 2)$. Then
+\[
+  v(x) = T_0 \, v(2x) \ \text{ for } x \in [0, \tfrac12) , \qquad
+  v(x) = T_1 \, v(2x - 1) \ \text{ for } x \in [\tfrac12, 1) ,
+\]
+with the matrices
+\[
+  T_0 = \begin{pmatrix} c_0 & 0 & 0 \\ c_2 & c_1 & c_0 \\ 0 & c_3 & c_2 \end{pmatrix} , \qquad
+  T_1 = \begin{pmatrix} c_1 & c_0 & 0 \\ c_3 & c_2 & c_1 \\ 0 & 0 & c_3 \end{pmatrix} ,
+\]
+by \Cref{lem:daub-d4-scaling} at $x$, $x + 1$ and $x + 2$, where the terms $\varphi(2x + j)$
+with $2x + j \notin (0, 3)$ vanish. Insert the coefficients of \Cref{prop:daub-d4-coeff}. For
 $x \in [0, \frac12)$ and $u = 2x$, for instance,
 $A(x) = c_2 \varphi(u) + (c_1 + 2c_3) \varphi(u + 1) + (c_0 + 2c_2) \varphi(u + 2)$, whose
 coefficients are $\frac{3 - \sqrt 3}{4} + (0, \frac12, 1)$, and
@@ -3509,55 +3413,13 @@ $|1 - \sqrt 3|/4 = (\sqrt 3 - 1)/4$; for $d = 1$, $|1 - \sqrt 3|/4 \leq (1 + \sq
 use $\sqrt 3 > 1$ (\Cref{lem:daub-d4-rate}).
 \end{proof}
 
-\begin{lemma}[From $A$ and $B$ back to $\varphi$]
-\label{lem:daub-d4-back}
-\lean{Daubechies.scalingFun_d4_eq_d4B_sub_d4A, Daubechies.scalingFun_d4_add_two_eq,
-  Daubechies.scalingFun_d4_add_one_eq, Daubechies.scalingFun_d4_add_int_eq_zero,
-  Daubechies.norm_scalingFun_d4_sub_le}
-\leanok
-\uses{def:daub-d4-coordinates}
-For every $x \in \R$, $\varphi(x) = B(x) - A(x)$. For every $x \in [0, 1)$,
-\[
-  \varphi(x + 1) = A(x) - 2 \bigl(B(x) - 1\bigr) \quad\text{and}\quad
-  \varphi(x + 2) = B(x) - 1 ,
-\]
-and $\varphi(x + i) = 0$ for every $i \in \Z \setminus \{0, 1, 2\}$. Hence for all
-$x, y \in [0, 1)$ and every $i \in \Z$,
-\[
-  |\varphi(x + i) - \varphi(y + i)| \leq |A(x) - A(y)| + 2 \, |B(x) - B(y)| .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-d4-scaling}
-The definition of $B$, the identity $\varphi(x) + \varphi(x + 1) + \varphi(x + 2) = 1$ and the
-support of $\varphi$ (\Cref{lem:daub-d4-scaling}). The bound follows by the triangle inequality,
-case by case.
-\end{proof}
-
-\begin{lemma}[Bounds for $A$ and $B$]
-\label{lem:daub-d4-coordinate-bounds}
-\lean{Daubechies.norm_d4A_le, Daubechies.norm_d4B_le, Daubechies.norm_d4A_sub_d4A_le,
-  Daubechies.norm_d4B_sub_d4B_le}
-\leanok
-\uses{def:daub-d4-coordinates}
-Let $M \in \R$ with $|\varphi(x)| \leq M$ for every $x \in \R$, where $\varphi$ is the scaling
-function of D4. Then for all $x, y \in \R$,
-\[
-  |A(x)| \leq 3M , \quad |B(x)| \leq 4M , \quad |A(x) - A(y)| \leq 6M , \quad
-  |B(x) - B(y)| \leq 8M .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-The triangle inequality.
-\end{proof}
-
 \begin{proposition}[Oscillation of D4 on dyadic intervals]
 \label{prop:daub-d4-oscillation}
-\lean{Daubechies.norm_scalingFun_d4_sub_le_dyadic}
+\lean{Daubechies.norm_d4A_le, Daubechies.norm_d4B_le, Daubechies.norm_d4A_sub_d4A_le,
+  Daubechies.norm_d4B_sub_d4B_le, Daubechies.scalingFun_d4_eq_d4B_sub_d4A,
+  Daubechies.scalingFun_d4_add_two_eq, Daubechies.scalingFun_d4_add_one_eq,
+  Daubechies.scalingFun_d4_add_int_eq_zero, Daubechies.norm_scalingFun_d4_sub_le,
+  Daubechies.norm_scalingFun_d4_sub_le_dyadic}
 \leanok
 \uses{prop:daub-d4, def:daub-scaling-function}
 Let $\varphi$ be the scaling function of D4, let $M \in \R$ with $|\varphi(x)| \leq M$ for every
@@ -3570,15 +3432,27 @@ $i \in \Z$ and all $x, y \in [k/2^n, (k+1)/2^n)$,
 
 \begin{proof}
 \leanok
-\uses{lem:daub-d4-difference-recursions, lem:daub-d4-coordinate-bounds,
-  lem:daub-descent-halving, lem:daub-descent-triangular, lem:daub-d4-rate,
-  lem:daub-dyadic-intervals, lem:daub-d4-back}
-By \Cref{lem:daub-d4-difference-recursions,lem:daub-d4-coordinate-bounds},
+\uses{def:daub-d4-coordinates, lem:daub-d4-difference-recursions, lem:daub-descent-halving,
+  lem:daub-descent-triangular, lem:daub-d4-rate, lem:daub-dyadic-intervals, lem:daub-d4-scaling}
+Let $A$ and $B$ be the coordinates of \Cref{def:daub-d4-coordinates}. By the triangle
+inequality, $|A(x)| \leq 3M$, $|B(x)| \leq 4M$, $|A(x) - A(y)| \leq 6M$ and
+$|B(x) - B(y)| \leq 8M$ for all $x, y \in \R$. By \Cref{lem:daub-d4-difference-recursions},
 \Cref{lem:daub-descent-halving} applies to $A$ with $E_A = 6M$ and gives
 $|A(x) - A(y)| \leq 6M/2^n$, and \Cref{lem:daub-descent-triangular} applies to $B$ with
 $\beta = \rho - \frac12 = (\sqrt 3 - 1)/4 \geq 0$ (\Cref{lem:daub-d4-rate}), $E_B = 8M$ and
-$C = 6M$, and gives $|B(x) - B(y)| \leq 14 M \rho^n - 6M/2^n$. The points lie in $[0, 1)$
-(\Cref{lem:daub-dyadic-intervals}), so by \Cref{lem:daub-d4-back}
+$C = 6M$, and gives $|B(x) - B(y)| \leq 14 M \rho^n - 6M/2^n$.
+
+From $A$ and $B$ back to $\varphi$: for every $x \in \R$, $\varphi(x) = B(x) - A(x)$, and for
+every $x \in [0, 1)$,
+\[
+  \varphi(x + 1) = A(x) - 2 \bigl(B(x) - 1\bigr) , \qquad \varphi(x + 2) = B(x) - 1 ,
+\]
+and $\varphi(x + i) = 0$ for every $i \in \Z \setminus \{0, 1, 2\}$, by the definition of $B$,
+the identity $\varphi(x) + \varphi(x + 1) + \varphi(x + 2) = 1$ and the support of $\varphi$
+(\Cref{lem:daub-d4-scaling}). Hence, by the triangle inequality case by case,
+$|\varphi(x + i) - \varphi(y + i)| \leq |A(x) - A(y)| + 2 \, |B(x) - B(y)|$ for all
+$x, y \in [0, 1)$ and every $i \in \Z$. The points $x, y$ of the statement lie in $[0, 1)$
+(\Cref{lem:daub-dyadic-intervals}), so
 $|\varphi(x + i) - \varphi(y + i)| \leq 6M/2^n + 2 (14 M \rho^n - 6M/2^n) \leq 28 M \rho^n$.
 \end{proof}
 
@@ -5896,26 +5770,6 @@ is unique (\Cref{lem:daub-joukowsky-root}). If there is no such root for $t$, th
 for $\bar t$, and both sides are $0$.
 \end{proof}
 
-\begin{lemma}[The factorisation on the unit circle]
-\label{lem:daub-joukowsky-factor}
-\lean{Complex.joukowsky_two_mul_mul_re_sub, Complex.joukowsky_two_mul_norm_mul_norm_re_sub}
-\leanok
-Let $a, t, z \in \C$ with $a^2 - 2ta + 1 = 0$. If $z \bar z = 1$, then
-\[
-  2a (\operatorname{Re} z - t) = -(1 - az)(1 - a \bar z) ,
-\]
-and hence $2 |a| \, |\operatorname{Re} z - t| = |1 - az| \, |1 - \bar a z|$ if $|z| = 1$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-Expand the right side with $z \bar z = 1$, $z + \bar z = 2 \operatorname{Re} z$ and
-$a^2 + 1 = 2ta$. For the moduli, $|1 - a \bar z| = |\overline{1 - a \bar z}| = |1 - \bar a z|$.
-\end{proof}
-
-For $z = e^{i\theta}$ the left side is $2 |a| \, |\cos\theta - t|$: on the unit circle the factor
-$\cos\theta - t$ splits into two linear factors in $e^{i\theta}$.
-
 \paragraph{The complex roots of a real polynomial.}
 For a real polynomial $Q$, products $\prod_t$ run over the complex roots $t$ of $Q$, counted
 with multiplicity.
@@ -5948,7 +5802,9 @@ since $Q(t) = 0$ at every root $t$.
 
 \paragraph{The Fej\'er--Riesz factor.}
 For $Q > 0$ on $[-1, 1]$ each root $t$ of $Q$ contributes the factor $1 - a(t) z$, whose zero
-$1/a(t)$ lies outside the closed unit disk.
+$1/a(t)$ lies outside the closed unit disk: on the unit circle the factor $\cos\theta - t$ splits,
+up to the constant $2 |a(t)|$, into the two linear factors $1 - a(t) e^{i\theta}$ and
+$1 - \overline{a(t)} e^{i\theta}$ in $e^{i\theta}$.
 
 \begin{definition}[The Fej\'er--Riesz factor]
 \label{def:daub-fejer-riesz-factor}
@@ -5963,24 +5819,6 @@ The \emph{Fej\'er--Riesz factor} of a real polynomial $Q$ is the complex polynom
 the product over the complex roots $t$ of $Q$, counted with multiplicity. Its degree is at most
 $\deg Q$.
 \end{definition}
-
-\begin{lemma}[The Fej\'er--Riesz factor is real]
-\label{lem:daub-fejer-riesz-factor-real}
-\lean{Polynomial.map_conj_fejerRieszFactor, Polynomial.exists_map_eq_of_map_conj_eq}
-\leanok
-\uses{def:daub-fejer-riesz-factor}
-A complex polynomial whose coefficients are fixed by conjugation has real coefficients. For
-every real polynomial $Q$ the coefficients of $L_0$ are fixed by conjugation, so $L_0$ is a real
-polynomial.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-joukowsky-conj, lem:daub-real-poly-roots}
-A complex number fixed by conjugation equals its real part. Conjugating the coefficients of
-$L_0$ replaces $a(t)$ by $\overline{a(t)} = a(\bar t)$ (\Cref{lem:daub-joukowsky-conj}), and the
-roots of $Q$ are invariant under conjugation (\Cref{lem:daub-real-poly-roots}).
-\end{proof}
 
 \begin{lemma}[Zeros of the Fej\'er--Riesz factor]
 \label{lem:daub-fejer-riesz-factor-zeros}
@@ -6002,7 +5840,8 @@ $1 - a(t) z$ of $L_0(z)$ is nonzero, since $|a(t) z| < 1$.
 
 \begin{lemma}[The Fej\'er--Riesz factor on the unit circle]
 \label{lem:daub-fejer-riesz-factor-modulus}
-\lean{Polynomial.prod_two_mul_norm_mul_prod_norm_eq}
+\lean{Complex.joukowsky_two_mul_mul_re_sub, Complex.joukowsky_two_mul_norm_mul_norm_re_sub,
+  Polynomial.prod_two_mul_norm_mul_prod_norm_eq}
 \leanok
 \uses{def:daub-fejer-riesz-factor}
 Let $Q$ be a real polynomial with $Q(r) > 0$ for every $r \in [-1, 1]$. Then for every
@@ -6014,10 +5853,17 @@ $\theta \in \R$
 
 \begin{proof}
 \leanok
-\uses{lem:daub-joukowsky-factor, lem:daub-fejer-riesz-factor-zeros, lem:daub-joukowsky-conj,
-  lem:daub-real-poly-roots}
-Let $z = e^{i\theta}$, so $|z| = 1$ and $\operatorname{Re} z = \cos\theta$. For each root $t$,
-\Cref{lem:daub-joukowsky-factor,lem:daub-fejer-riesz-factor-zeros} give
+\uses{lem:daub-fejer-riesz-factor-zeros, lem:daub-joukowsky-conj, lem:daub-real-poly-roots}
+First, the factorisation on the unit circle: for all $a, t, z \in \C$ with $a^2 - 2ta + 1 = 0$
+and $z \bar z = 1$,
+\[
+  2a (\operatorname{Re} z - t) = -(1 - az)(1 - a \bar z) ,
+\]
+by expanding the right side with $z \bar z = 1$, $z + \bar z = 2 \operatorname{Re} z$ and
+$a^2 + 1 = 2ta$; hence $2 |a| \, |\operatorname{Re} z - t| = |1 - az| \, |1 - \bar a z|$ if
+$|z| = 1$, since $|1 - a \bar z| = |\overline{1 - a \bar z}| = |1 - \bar a z|$. Now let
+$z = e^{i\theta}$, so $|z| = 1$ and $\operatorname{Re} z = \cos\theta$. For each root $t$ the
+number $a = a(t)$ satisfies $a^2 - 2ta + 1 = 0$ (\Cref{lem:daub-fejer-riesz-factor-zeros}), so
 \[
   2 |a(t)| \, |\cos\theta - t| = |1 - a(t) z| \, \bigl|1 - \overline{a(t)} z\bigr| .
 \]
@@ -6032,7 +5878,8 @@ constant and the sign gives the theorem.
 
 \begin{lemma}[Fej\'er--Riesz up to a constant]
 \label{lem:daub-fejer-riesz-constant}
-\lean{Polynomial.exists_eval_cos_eq_mul_norm_sq}
+\lean{Polynomial.map_conj_fejerRieszFactor, Polynomial.exists_map_eq_of_map_conj_eq,
+  Polynomial.exists_eval_cos_eq_mul_norm_sq}
 \leanok
 Let $Q$ be a real polynomial with $Q(r) > 0$ for every $r \in [-1, 1]$. Then there are $K > 0$
 and a real polynomial $L$ with $\deg L \leq \deg Q$ and $L(z) \neq 0$ for every $z \in \C$ with
@@ -6041,12 +5888,15 @@ $|z| \leq 1$ such that $Q(\cos\theta) = K \, |L(e^{i\theta})|^2$ for every $\the
 
 \begin{proof}
 \leanok
-\uses{def:daub-fejer-riesz-factor, lem:daub-fejer-riesz-factor-real,
-  lem:daub-fejer-riesz-factor-zeros, lem:daub-fejer-riesz-factor-modulus,
-  lem:daub-real-poly-roots, lem:daub-joukowsky-equation}
-Let $L$ be $L_0$ read as a real polynomial (\Cref{lem:daub-fejer-riesz-factor-real}); its degree
-is at most $\deg Q$ (\Cref{def:daub-fejer-riesz-factor}), and it has no zeros in the closed unit
-disk (\Cref{lem:daub-fejer-riesz-factor-zeros}). Since $Q(0) > 0$, $Q \neq 0$; let $c \neq 0$ be its
+\uses{def:daub-fejer-riesz-factor, lem:daub-joukowsky-conj, lem:daub-fejer-riesz-factor-zeros,
+  lem:daub-fejer-riesz-factor-modulus, lem:daub-real-poly-roots, lem:daub-joukowsky-equation}
+First, $L_0$ is a real polynomial: a complex polynomial whose coefficients are fixed by
+conjugation has real coefficients, since a complex number fixed by conjugation equals its real
+part, and conjugating the coefficients of $L_0$ replaces $a(t)$ by $\overline{a(t)} = a(\bar t)$
+(\Cref{lem:daub-joukowsky-conj}), while the roots of $Q$ are invariant under conjugation
+(\Cref{lem:daub-real-poly-roots}). Let $L$ be $L_0$ read as a real polynomial; its degree is at
+most $\deg Q$ (\Cref{def:daub-fejer-riesz-factor}), and it has no zeros in the closed unit disk
+(\Cref{lem:daub-fejer-riesz-factor-zeros}). Since $Q(0) > 0$, $Q \neq 0$; let $c \neq 0$ be its
 leading coefficient and $K = |c| / \prod_t 2 |a(t)|$, which is positive since $a(t) \neq 0$
 (\Cref{lem:daub-joukowsky-equation}). At $x = \cos\theta \in [-1, 1]$, $Q(x) > 0$, so
 \[
@@ -6055,23 +5905,10 @@ leading coefficient and $K = |c| / \prod_t 2 |a(t)|$, which is positive since $a
 by \Cref{lem:daub-real-poly-roots} and \Cref{lem:daub-fejer-riesz-factor-modulus}.
 \end{proof}
 
-\begin{lemma}[Fixing the sign]
-\label{lem:daub-fejer-riesz-sign}
-\lean{Polynomial.exists_eval_one_pos_of_aeval_ne_zero}
-\leanok
-Let $L$ be a real polynomial with $L(z) \neq 0$ for every $z \in \C$ with $|z| \leq 1$. Then
-there is a real polynomial $L'$ with $\deg L' = \deg L$ and $L'(1) > 0$, with $L'(z) \neq 0$ for
-every $z \in \C$ with $|z| \leq 1$, and with $|L'(z)| = |L(z)|$ for every $z \in \C$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-$L(1) \neq 0$; take $L' = L$ if $L(1) > 0$, and $L' = -L$ otherwise.
-\end{proof}
-
 \begin{theorem}[The Fej\'er--Riesz theorem]
 \label{thm:daub-fejer-riesz}
-\lean{Polynomial.fejer_riesz_outer, Polynomial.fejer_riesz}
+\lean{Polynomial.exists_eval_one_pos_of_aeval_ne_zero, Polynomial.fejer_riesz_outer,
+  Polynomial.fejer_riesz}
 \leanok
 Let $Q$ be a real polynomial with $Q(t) > 0$ for every $t \in [-1, 1]$. Then there is a real
 polynomial $L$ with $\deg L \leq \deg Q$, $L(1) > 0$ and $L(z) \neq 0$ for every $z \in \C$ with
@@ -6083,9 +5920,12 @@ $|z| \leq 1$, such that
 
 \begin{proof}
 \leanok
-\uses{lem:daub-fejer-riesz-constant, lem:daub-fejer-riesz-sign}
-Take $K$ and $L$ from \Cref{lem:daub-fejer-riesz-constant}, and apply
-\Cref{lem:daub-fejer-riesz-sign} to $\sqrt K L$; then
+\uses{lem:daub-fejer-riesz-constant}
+Take $K$ and $L$ from \Cref{lem:daub-fejer-riesz-constant}. The sign can be fixed: for every
+real polynomial $L$ with $L(z) \neq 0$ for every $z \in \C$ with $|z| \leq 1$ there is a real
+polynomial $L'$ with $\deg L' = \deg L$ and $L'(1) > 0$, with $L'(z) \neq 0$ for every $z \in \C$
+with $|z| \leq 1$, and with $|L'(z)| = |L(z)|$ for every $z \in \C$: $L(1) \neq 0$, so take
+$L' = L$ if $L(1) > 0$, and $L' = -L$ otherwise. Apply this to $\sqrt K L$; then
 $|\sqrt K L(e^{i\theta})|^2 = K \, |L(e^{i\theta})|^2 = Q(\cos\theta)$.
 \end{proof}
 
@@ -6162,31 +6002,11 @@ For $t \leq 1$ the point $(1 - t)/2$ is nonnegative, where $P_N \geq 1$
 identities follow from $\cos\theta = 1 - 2 \sin^2(\theta/2)$.
 \end{proof}
 
-\begin{lemma}[Masks from the cosine form]
-\label{lem:daub-mask-of-cos}
-\lean{Daubechies.eval_one_eq_one_of_norm_aeval_exp_sq,
-  Daubechies.normSq_aeval_expFreq_of_norm_aeval_exp_sq, Daubechies.Mask.ofNormSqCos}
-\leanok
-\uses{def:daub-mask, def:daub-cos-poly}
-Let $N \in \N$, and let $L$ be a real polynomial with $|L(e^{i\theta})|^2 = Q_N(\cos\theta)$ for
-every $\theta \in \R$. Then $|L(e^{-2\pi i \xi})|^2 = P(\xi)$ for every $\xi \in \R$, and
-$L(1) = 1$ if $N \geq 1$ and $L(1) > 0$. Hence, if moreover $\deg L < N$ and $L(1) > 0$, then $L$
-is a Daubechies mask of order $N$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-cos-poly-values, lem:daub-fejer-riesz-readings}
-At $\theta = -2\pi\xi$, $e^{i\theta} = e^{-2\pi i \xi}$ and
-$Q_N(\cos(-2\pi\xi)) = Q_N(\cos 2\pi\xi) = P(\xi)$ (\Cref{lem:daub-cos-poly-values}). At
-$\theta = 0$ the identity reads $L(1)^2 = Q_N(1) = 1$
-(\Cref{lem:daub-fejer-riesz-readings,lem:daub-cos-poly-values}). A polynomial of degree less
-than $N$ exists only for $N \geq 1$.
-\end{proof}
-
 \begin{theorem}[Existence of Daubechies masks]
 \label{thm:daub-mask-existence}
-\lean{Daubechies.exists_mask_outer, Daubechies.exists_mask, Daubechies.nonempty_mask_iff}
+\lean{Daubechies.eval_one_eq_one_of_norm_aeval_exp_sq,
+  Daubechies.normSq_aeval_expFreq_of_norm_aeval_exp_sq, Daubechies.Mask.ofNormSqCos,
+  Daubechies.exists_mask_outer, Daubechies.exists_mask, Daubechies.nonempty_mask_iff}
 \leanok
 \uses{def:daub-mask}
 For every $N \geq 1$ there is a Daubechies mask of order $N$ whose polynomial $L$ satisfies
@@ -6196,12 +6016,22 @@ and only if $N \geq 1$.
 
 \begin{proof}
 \leanok
-\uses{thm:daub-fejer-riesz, lem:daub-cos-poly-values, lem:daub-mask-of-cos, def:daub-cos-poly}
+\uses{thm:daub-fejer-riesz, lem:daub-cos-poly-values, def:daub-cos-poly,
+  lem:daub-fejer-riesz-readings}
 $Q_N$ is positive on $[-1, 1]$ and has degree at most $N - 1$
 (\Cref{lem:daub-cos-poly-values,def:daub-cos-poly}). The Fej\'er--Riesz theorem
 (\Cref{thm:daub-fejer-riesz}) gives a real polynomial $L$ with $\deg L \leq N - 1$, $L(1) > 0$,
-no zeros in the closed unit disk and $|L(e^{i\theta})|^2 = Q_N(\cos\theta)$, a mask by
-\Cref{lem:daub-mask-of-cos}. Every mask has order $N \geq 1$ (\Cref{def:daub-mask}).
+no zeros in the closed unit disk and $|L(e^{i\theta})|^2 = Q_N(\cos\theta)$ for every
+$\theta \in \R$. Such an $L$ is a mask: for every $N \in \N$ and every real polynomial $L$ with
+$|L(e^{i\theta})|^2 = Q_N(\cos\theta)$ for every $\theta \in \R$,
+$|L(e^{-2\pi i \xi})|^2 = P(\xi)$ for every $\xi \in \R$, since at $\theta = -2\pi\xi$,
+$e^{i\theta} = e^{-2\pi i \xi}$ and $Q_N(\cos(-2\pi\xi)) = Q_N(\cos 2\pi\xi) = P(\xi)$
+(\Cref{lem:daub-cos-poly-values}); and $L(1) = 1$ if $N \geq 1$ and $L(1) > 0$, since at
+$\theta = 0$ the identity reads $L(1)^2 = Q_N(1) = 1$
+(\Cref{lem:daub-fejer-riesz-readings,lem:daub-cos-poly-values}). Hence, if moreover
+$\deg L < N$ and $L(1) > 0$, then $L$ is a Daubechies mask of order $N$, where $N \geq 1$ since
+a polynomial of degree less than $N$ exists only for $N \geq 1$. Conversely, every mask has
+order $N \geq 1$ (\Cref{def:daub-mask}).
 \end{proof}
 
 \begin{definition}[The Daubechies mask of order $N$]
@@ -6217,30 +6047,10 @@ mask of order $N$, chosen among those of \Cref{thm:daub-mask-existence}.
 \paragraph{Order two.}
 For $N = 2$ the condition on the zeros of $L$ singles out the mask D4.
 
-\begin{lemma}[Masks of order two]
-\label{lem:daub-mask-two}
-\lean{Daubechies.Mask.ext, Daubechies.Mask.exists_L_eq_of_two, Daubechies.aeval_d4_L_ne_zero}
-\leanok
-\uses{def:daub-mask, prop:daub-d4}
-Two Daubechies masks of the same order with the same polynomial $L$ are equal. The polynomial of
-every Daubechies mask of order $2$ is $L(z) = \alpha + \beta z$ with real numbers $\alpha$ and
-$\beta$ such that $\alpha + \beta = 1$ and $(\alpha - \beta)^2 = 3$. The polynomial of D4
-satisfies $L(z) \neq 0$ for every $z \in \C$ with $|z| \leq 1$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-linear-circle}
-The other data of a mask are properties of $L$. For order $2$, $\deg L \leq 1$,
-$\alpha + \beta = L(1) = 1$, and at $\xi = \frac12$ the identity
-$\alpha^2 + \beta^2 + 2\alpha\beta \cos 2\pi\xi = 2 - \cos 2\pi\xi$
-(\Cref{lem:daub-linear-circle}) reads $(\alpha - \beta)^2 = 3$. The root of the polynomial of D4
-is $(1 + \sqrt 3)/(\sqrt 3 - 1) = 2 + \sqrt 3 > 1$.
-\end{proof}
-
 \begin{proposition}[D4 is the outer mask of order two]
 \label{prop:daub-d4-outer}
-\lean{Daubechies.eq_d4_of_aeval_ne_zero, Daubechies.eq_d4_iff_aeval_ne_zero,
+\lean{Daubechies.Mask.ext, Daubechies.Mask.exists_L_eq_of_two, Daubechies.aeval_d4_L_ne_zero,
+  Daubechies.eq_d4_of_aeval_ne_zero, Daubechies.eq_d4_iff_aeval_ne_zero,
   Daubechies.daubMask_two}
 \leanok
 \uses{def:daub-outer-mask, prop:daub-d4}
@@ -6251,10 +6061,19 @@ for every $z \in \C$ with $|z| \leq 1$. In particular the Daubechies mask of ord
 
 \begin{proof}
 \leanok
-\uses{lem:daub-mask-two}
-By \Cref{lem:daub-mask-two}, $L(z) = \alpha + \beta z$ with $\alpha + \beta = 1$ and
-$\alpha - \beta = \pm \sqrt 3$. The sign $+$ gives the coefficients
-$\alpha = (1 + \sqrt 3)/2$ and $\beta = (1 - \sqrt 3)/2$ of D4, and two masks with the same
-polynomial are equal. The sign $-$ gives $\alpha = (1 - \sqrt 3)/2$ and
-$\beta = (1 + \sqrt 3)/2$, and then $L$ has the root $2 - \sqrt 3$ in the unit disk.
+\uses{def:daub-mask, lem:daub-linear-circle}
+First, two Daubechies masks of the same order with the same polynomial $L$ are equal, since the
+other data of a mask are properties of $L$. Second, the polynomial of every Daubechies mask of
+order $2$ is $L(z) = \alpha + \beta z$ with real numbers $\alpha$ and $\beta$ such that
+$\alpha + \beta = 1$ and $(\alpha - \beta)^2 = 3$: for order $2$, $\deg L \leq 1$,
+$\alpha + \beta = L(1) = 1$, and at $\xi = \frac12$ the identity
+$\alpha^2 + \beta^2 + 2\alpha\beta \cos 2\pi\xi = 2 - \cos 2\pi\xi$
+(\Cref{lem:daub-linear-circle}) reads $(\alpha - \beta)^2 = 3$. Third, the polynomial of D4
+satisfies $L(z) \neq 0$ for every $z \in \C$ with $|z| \leq 1$, since its root is
+$(1 + \sqrt 3)/(\sqrt 3 - 1) = 2 + \sqrt 3 > 1$. Now let $L(z) = \alpha + \beta z$ be the
+polynomial of a mask of order $2$, so $\alpha + \beta = 1$ and $\alpha - \beta = \pm \sqrt 3$.
+The sign $+$ gives the coefficients $\alpha = (1 + \sqrt 3)/2$ and $\beta = (1 - \sqrt 3)/2$ of
+D4, and two masks with the same polynomial are equal. The sign $-$ gives
+$\alpha = (1 - \sqrt 3)/2$ and $\beta = (1 + \sqrt 3)/2$, and then $L$ has the root
+$2 - \sqrt 3$ in the unit disk.
 \end{proof}
