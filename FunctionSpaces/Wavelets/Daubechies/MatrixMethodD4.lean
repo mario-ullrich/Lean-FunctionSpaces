@@ -225,8 +225,8 @@ theorem d4B_left {x : ℝ} (hx : x ∈ Ico (0 : ℝ) (1 / 2)) :
 /-- **The recursion of `B` on the right half**: for `x ∈ [1/2, 1)`,
 `B(x) = (3 + √3)/4 + ((1 - √3)/4) B(2x - 1)`. With `u = 2x - 1`, the refinement equation gives
 `B(x) = φ(u) + φ(u + 1) + ((5 - √3)/4) φ(u + 2)`, the row vector
-`a_1 ℓ_0 + λ_1 (1, 1, 2)` with `a_1 = (3 + √3)/4` and `λ_1 = (1 - √3)/4`; here `A(u)` does not
-occur. -/
+`a_1 ℓ_0 + λ_1 (1, 1, 2)` with `a_1 = (3 + √3)/4` and `λ_1 = (1 - √3)/4`, whose `A`-coordinate
+is `0`. -/
 theorem d4B_right {x : ℝ} (hx : x ∈ Ico (1 / 2 : ℝ) 1) :
     d4B x = (((3 + √3) / 4 : ℝ) : ℂ) + (((1 - √3) / 4 : ℝ) : ℂ) * d4B (2 * x - 1) := by
   have hp := scalingFun_d4_add_add_eq_one (x := 2 * x - 1) ⟨by linarith [hx.1], by linarith [hx.2]⟩

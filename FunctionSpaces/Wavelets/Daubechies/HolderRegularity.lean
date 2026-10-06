@@ -25,7 +25,7 @@ For `r = 1` and `a ≤ 1` this is the Hölder estimate `|φ(x) - φ(y)| ≤ K |x
 (`Daubechies.holder_scalingFun_fourier`); in `L^∞` it reads `ω_r(φ, t)_∞ ≤ K t^a`
 (`Daubechies.modulus_scalingFun_top_le`). Interpolation with the `L²` bound `ω_r(φ, t)_2 ≤ K t^s`,
 `0 ≤ s < N - log₄ λ`, of `FunctionSpaces.Wavelets.Daubechies.SobolevRegularity` gives, for
-`2 ≤ p ≤ ∞` and `0 < t ≤ 1`,
+`N ≥ 2`, `2 ≤ p ≤ ∞` and `0 < t ≤ 1`,
 
 `ω_r(φ, t)_p ≤ K t^θ`, `θ = (2/p) s + (1 - 2/p) a` (`Daubechies.modulus_scalingFun_interp`).
 

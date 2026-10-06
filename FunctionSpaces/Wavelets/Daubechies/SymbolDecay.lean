@@ -74,10 +74,6 @@ theorem continuous_prod_daubFun (N n : ℕ) :
 
 /-! ### Growth bounds -/
 
-/-- A growth bound `T^n 1 ≤ C λ^n` forces `C ≥ 1`: for `n = 0` it says `1 ≤ C`. -/
-theorem TransferGrowth.one_le {N : ℕ} {lam C : ℝ} (hg : TransferGrowth N lam C) : 1 ≤ C := by
-  simpa using hg.2 0 0
-
 /-- Under a growth bound `T^n 1 ≤ C λ^n`, the integral of `∏_{j<n} P(ξ/2^(j+1))` over every set
 `s ⊆ [-2^n/2, 2^n/2]` is at most `C λ^n`: the integrand is nonnegative, so the integral over `s`
 is at most the integral over the whole interval, which is at most `C λ^n`
@@ -172,19 +168,19 @@ theorem univ_subset_Icc_union_annulus :
   · exact Or.inr (Set.mem_iUnion.2 (exists_mem_annulus h))
 
 /-- **Integrability from geometric decay on the annuli**: a continuous `f : ℝ → E` with
-`∫_{A_n} ‖f‖ ≤ A r^n` for every `n`, where `0 ≤ r < 1`, is integrable on `ℝ`. On `[-1/4, 1/4]` it
+`∫_{A_n} ‖f‖ ≤ M r^n` for every `n`, where `0 ≤ r < 1`, is integrable on `ℝ`. On `[-1/4, 1/4]` it
 is integrable as a continuous function on a compact interval, on `⋃_n A_n` because the integrals
 over the annuli are summable (Mathlib's `integrableOn_iUnion_of_summable_integral_norm`), and
 these two sets cover `ℝ`. -/
 theorem integrable_of_integral_annulus_le {E : Type*} [NormedAddCommGroup E] {f : ℝ → E}
-    (hf : Continuous f) {A r : ℝ} (hr0 : 0 ≤ r) (hr1 : r < 1)
-    (h : ∀ n : ℕ, ∫ ξ in annulus n, ‖f ξ‖ ≤ A * r ^ n) : Integrable f := by
+    (hf : Continuous f) {M r : ℝ} (hr0 : 0 ≤ r) (hr1 : r < 1)
+    (h : ∀ n : ℕ, ∫ ξ in annulus n, ‖f ξ‖ ≤ M * r ^ n) : Integrable f := by
   have h1 : IntegrableOn f (Set.Icc (-(1 / 4)) (1 / 4)) := hf.integrableOn_Icc
   have h2 : IntegrableOn f (⋃ n, annulus n) :=
     integrableOn_iUnion_of_summable_integral_norm
       (fun n => hf.integrableOn_Icc.mono_set (annulus_subset_Icc n))
       (Summable.of_nonneg_of_le (fun n => integral_nonneg fun _ => norm_nonneg _) h
-        ((summable_geometric_of_lt_one hr0 hr1).mul_left A))
+        ((summable_geometric_of_lt_one hr0 hr1).mul_left M))
   exact integrableOn_univ.1 ((h1.union h2).mono_set univ_subset_Icc_union_annulus)
 
 /-! ### The symbol product on the annuli -/
@@ -327,7 +323,7 @@ theorem integrable_rpow_mul_normSq {N : ℕ} (m : Mask N) {lam C s : ℝ}
   have hr0 : 0 ≤ (2 : ℝ) ^ (2 * s) * lam / 4 ^ N :=
     div_nonneg (mul_nonneg (Real.rpow_nonneg zero_le_two _) hg.1.le) (by positivity)
   refine integrable_of_integral_annulus_le (hw.mul hc)
-    (A := 4 ^ |2 * s| * (Real.exp (((2 * N - 1).choose N : ℝ) * π ^ 2 / 12) *
+    (M := 4 ^ |2 * s| * (Real.exp (((2 * N - 1).choose N : ℝ) * π ^ 2 / 12) *
       (4 / π) ^ (2 * N) * C)) hr0 hr fun n => ?_
   calc ∫ ξ in annulus n, ‖(1 + |ξ|) ^ (2 * s) * ‖symbolProduct m ξ‖ ^ 2‖
       = ∫ ξ in annulus n, (1 + |ξ|) ^ (2 * s) * ‖symbolProduct m ξ‖ ^ 2 := by

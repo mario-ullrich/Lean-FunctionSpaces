@@ -49,10 +49,10 @@ follows from the identity `sinc(x/2^n) ∏_{j<n} cos(x/2^(j+1)) = sinc x`
 
 `|Φ(ξ)|² = sinc(πξ)^(2N) ∏_{j ≥ 0} P(ξ/2^(j+1))` (`Daubechies.normSq_symbolProduct`).
 
-The real product converges since `0 ≤ P(η) - 1 ≤ C(2N - 1, N) π² η²`
-(`Daubechies.multipliable_daubFun`), and it splits into the first `n` factors and the tail
-`∏_{j ≥ 0} P(ξ/2^(n+j+1))` (`Daubechies.tprod_daubFun_eq_prod_mul`). With `1 + t ≤ e^t` and
-`∑_{j ≥ 0} (x/2^(j+1))² = x²/3` (`Daubechies.hasSum_sq_div_two_pow`),
+The real product converges since `0 ≤ P(η) - 1 ≤ C(2N - 1, N) π² η²` for `N ≥ 1`, and since
+`P = 0` for `N = 0` (`Daubechies.multipliable_daubFun`), and it splits into the first `n` factors
+and the tail `∏_{j ≥ 0} P(ξ/2^(n+j+1))` (`Daubechies.tprod_daubFun_eq_prod_mul`). With
+`1 + t ≤ e^t` and `∑_{j ≥ 0} (x/2^(j+1))² = x²/3` (`Daubechies.hasSum_sq_div_two_pow`),
 `∏_{j ≥ 0} P(x/2^(j+1)) ≤ exp(C(2N - 1, N) π² x²/3)` (`Daubechies.tprod_daubFun_le`), so for
 `|ξ| ≤ 2^n/2` the tail is at most `exp(C(2N - 1, N) π²/12)`
 (`Daubechies.tprod_daubFun_shift_le`) and

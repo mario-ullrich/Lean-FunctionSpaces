@@ -169,8 +169,8 @@ theorem measurable_truncProduct (n : ℕ) : Measurable (truncProduct m n) := by
 
 /-- **The integral identity for `n = 0`**: `∫ w(ξ) |Φ_0(ξ)|² dξ = ∫_0^1 w(ξ) dξ` for every
 `1`-periodic `w : ℝ → ℂ`. Since `|Φ_0|² = 1_[-1/2, 1/2)`, the left side is `∫_(-1/2)^(1/2) w`,
-and the integral of a `1`-periodic function over an interval of length `1` does not depend on the
-interval (Mathlib's `Function.Periodic.intervalIntegral_add_eq`). -/
+and the integral of a `1`-periodic function is the same over every interval of length `1`
+(Mathlib's `Function.Periodic.intervalIntegral_add_eq`). -/
 theorem integral_mul_normSq_truncProduct_zero {w : ℝ → ℂ} (hper : Function.Periodic w 1) :
     ∫ ξ, w ξ * ((‖truncProduct m 0 ξ‖ ^ 2 : ℝ) : ℂ) = ∫ ξ in (0 : ℝ)..1, w ξ := by
   have h : ∀ ξ, w ξ * ((‖truncProduct m 0 ξ‖ ^ 2 : ℝ) : ℂ) =

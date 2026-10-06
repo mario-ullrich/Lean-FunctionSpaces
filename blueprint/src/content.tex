@@ -292,7 +292,7 @@ With these, a constant $(1 - 2^{-\alpha})^{-1}$ is finite exactly for $\alpha > 
   ENNReal.dyadicWeight_le_of_le, ENNReal.dyadicWeight_anti, ENNReal.one_le_dyadicWeight,
   ENNReal.natCast_two_pow_rpow, ENNReal.two_rpow_neg_lt_one,
   ENNReal.one_sub_two_rpow_neg_inv_ne_top, ENNReal.one_le_one_sub_two_rpow_neg_inv,
-  ENNReal.lqNorm_dyadicWeight_neg_le}
+  ENNReal.lqNorm_dyadicWeight_neg_le, ENNReal.lqNorm_lt_top_iff_of_le_mul}
 \leanok
 For $q \in (0, \infty)$, a countable set $I$ and a family $a = (a_i)_{i \in I}$ in $[0, \infty]$,
 \[
@@ -3836,8 +3836,8 @@ over $m < 2^k$.
 
 \begin{theorem}[Multiwavelet characterisation]
 \label{thm:multiwavelet-besov}
-\lean{ENNReal.lqNorm_lt_top_iff_of_le_mul, Alpert.memApprox_ppScheme_iff_coeff,
-  Alpert.lqNorm_modulus_lt_top_iff_coeff, Alpert.lqNorm_perModulus_lt_top_iff_coeff}
+\lean{Alpert.memApprox_ppScheme_iff_coeff, Alpert.lqNorm_modulus_lt_top_iff_coeff,
+  Alpert.lqNorm_perModulus_lt_top_iff_coeff}
 \leanok
 \uses{thm:pp-multiscale, lem:multiwavelet-norms, thm:pp-besov, thm:pp-besov-per}
 Let $1 \leq p < \infty$, $r \geq 1$, $s > 0$ and $1 \leq q \leq \infty$. A function
@@ -9561,8 +9561,8 @@ $Y^2 - 1 = (Y - 1)(Y + 1)$ and \Cref{lem:moment-polynomial}.
   Rd.LocalMeansBump.actsBounded_lmRemainder, Rd.LocalMeansBump.mixedLocalMean_ae_eq,
   Rd.LocalMeansBump.enorm_mixedLocalMean_le, Rd.LocalMeansBump.mixedLocalMeansNorm_le}
 \leanok
-\uses{lem:kernel-dilation-sum, thm:tensor-averaged-differences, lem:acts-bounded,
-  lem:weighted-jensen, def:mixed-moduli}
+\uses{def:mixed-local-means, lem:kernel-dilation-sum, thm:tensor-averaged-differences,
+  lem:acts-bounded, lem:weighted-jensen, def:mixed-moduli}
 If the bump vanishes outside $[-1, 1]$, then
 $\|k_k * f\|_p \leq (\|g\|_1 (2^L + 1))^d \, \Omega^{e(k)}_L(f, 2^{-k})_p$. Hence the mixed local
 means quasi-norm is at most $(\|g\|_1 (2^L + 1))^d$ times the quasi-norm by differences.

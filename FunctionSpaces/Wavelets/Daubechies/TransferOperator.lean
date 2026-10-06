@@ -178,7 +178,7 @@ theorem periodic_comp_two_mul {h : ℝ → ℝ} (hh : Periodic h 1) :
 `u = η/2` and `u = (η + 1)/2` (Mathlib's `intervalIntegral.integral_comp_div` and
 `intervalIntegral.integral_comp_div_add`) turn the two summands into `2 ∫_{-1/4}^{1/4} f` and
 `2 ∫_{1/4}^{3/4} f`. Together they give `2 ∫_{-1/4}^{3/4} f`, and the integral of a `1`-periodic
-function over an interval of length `1` does not depend on the interval
+function is the same over every interval of length `1`
 (`Function.Periodic.intervalIntegral_add_eq`). -/
 theorem integral_comp_div_two_add_comp_add_one_div_two {f : ℝ → ℝ} (hf : Continuous f)
     (hp : Periodic f 1) :
@@ -290,6 +290,10 @@ bound controls the decay of the symbol product `Φ` of a Daubechies mask of orde
 `∫ (1 + |ξ|)^(2s) |Φ(ξ)|² dξ < ∞` for `s < N - log₄ λ`. -/
 def TransferGrowth (N : ℕ) (lam C : ℝ) : Prop :=
   0 < lam ∧ ∀ (n : ℕ) (ξ : ℝ), (transfer N)^[n] (fun _ => 1) ξ ≤ C * lam ^ n
+
+/-- A growth bound `T^n 1 ≤ C λ^n` forces `C ≥ 1`: for `n = 0` it says `1 ≤ C`. -/
+theorem TransferGrowth.one_le {N : ℕ} {lam C : ℝ} (hg : TransferGrowth N lam C) : 1 ≤ C := by
+  simpa using hg.2 0 0
 
 /-- Under a growth bound `T^n 1 ≤ C λ^n`, the integral of `T^n 1` over one period is at most
 `C λ^n`. -/

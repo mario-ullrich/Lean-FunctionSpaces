@@ -140,14 +140,12 @@ declarations.
   positive trigonometric polynomials.
 * **Fourier transforms of integrable functions**
   (`FunctionSpaces/Wavelets/Daubechies/FourierIntegrable.lean`):
-  the multiplication formula `∫ 𝓕f · g = ∫ f · 𝓕g` for integrable `f, g`
-  (`Real.integral_fourier_mul`), Parseval's identity for integrable `f` and continuous integrable
-  `g` with integrable transform (`Real.integral_mul_conj_eq_integral_fourier`), and the
-  fundamental lemma with Schwartz test functions on an open set
-  (`Real.eqOn_zero_of_integral_mul_schwartz_eq_zero`); also `𝓕 f 0 = ∫ f`
-  (`Real.fourier_apply_zero`) and the transform of differences
+  the fundamental lemma with Schwartz test functions on an open set, pointwise for continuous `f`
+  (`Real.eqOn_zero_of_integral_mul_schwartz_eq_zero`); Mathlib's
+  `IsOpen.ae_eq_zero_of_integral_contDiff_smul_eq_zero` tests with smooth compactly supported
+  functions and concludes almost everywhere. Also the transform of differences
   `𝓕(Δ_h^r f)(ξ) = (e^(2πihξ) - 1)^r 𝓕 f(ξ)` (`Real.fourier_iterate_fwdDiff_apply`,
-  `SobolevRegularity.lean`). Mathlib has the first two for Schwartz functions and on `L²` only.
+  `SobolevRegularity.lean`).
 * **Viète's product** (`FunctionSpaces/Wavelets/Daubechies/SymbolProduct.lean`):
   `∏_{j ≥ 0} cos(x/2^(j+1)) = sinc x` (`Daubechies.tprod_cos`), with `|cos y - 1| ≤ y²/2`
   (`Daubechies.norm_cos_sub_one_le`) and the two-sided bound `|sinc x| ≤ 1/|x|`

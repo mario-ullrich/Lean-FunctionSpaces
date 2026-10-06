@@ -24,9 +24,10 @@ Bernstein's inequalities identify its approximation spaces with the Besov spaces
   `2 ((1 + z)/2)^N L(z)` (`Daubechies.coeff`). Masks of order `N` exist iff `N ≥ 1`
   (`Daubechies.nonempty_mask_iff`), by the Fejér–Riesz theorem: a real polynomial `Q` with
   `Q > 0` on `[-1, 1]` satisfies `Q(cos θ) = |L(e^(iθ))|²` for all `θ` with a real polynomial `L`
-  of degree `≤ deg Q` and `L(1) > 0` (`Polynomial.fejer_riesz`). For `N = 2` the mask without
-  zeros in the closed unit disk is D4, with `c = ((1+√3), (3+√3), (3-√3), (1-√3))/4`
-  (`Daubechies.daubMask_two`, `Daubechies.coeff_d4`).
+  of degree `≤ deg Q` and `L(1) > 0` (`Polynomial.fejer_riesz`). For `N = 2` the mask whose
+  polynomial `L` has no zeros in the closed unit disk is D4, with
+  `c = ((1+√3), (3+√3), (3-√3), (1-√3))/4` (`Daubechies.eq_d4_iff_aeval_ne_zero`,
+  `Daubechies.coeff_d4`).
 * **The scaling function.** Let `N ≥ 2`, `m_0(ξ) = (1/2) ∑_k c_k e^(-2πikξ)` and
   `Φ(ξ) = ∏_{j ≥ 1} m_0(2^(-j) ξ)`. Then `Φ` is integrable, and `φ = 𝓕⁻¹ Φ` is a continuous real
   function with `φ(x) = ∑_k c_k φ(2x - k)` (`Daubechies.scalingFun_refine`), `φ = 0` outside

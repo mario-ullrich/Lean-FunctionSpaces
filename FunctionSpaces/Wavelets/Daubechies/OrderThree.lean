@@ -16,7 +16,7 @@ Daubechies mask of order `N = 3` and the characterisation of `B^s_{p,q}(ℝ)` by
 All exponents come from the growth bound `T^n 1 ≤ 2 · 9^n` of the transfer operator
 (`Daubechies.transferGrowth_three`), whose Sobolev exponent is
 `3 - log₄ 9 = 3 - log₂ 3 ≈ 1.415` (`Daubechies.three_sub_logb_four_nine`). Masks of order three
-exist (`Daubechies.exists_mask`), so none of the statements is vacuous
+exist (`Daubechies.exists_mask`), so every statement below applies to at least one mask
 (`Daubechies.exists_mask_order_three_regular`). For every mask `m : Mask 3`:
 
 * **Sobolev regularity.** `∫ (1 + |ξ|)^(2s) |𝓕 φ(ξ)|² dξ < ∞`, that is `φ ∈ H^s`, for every

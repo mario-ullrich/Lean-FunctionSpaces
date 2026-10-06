@@ -47,8 +47,8 @@ The proof has three steps.
   `δ = 1/(N 2^j)`, `‖f - S‖_p ≤ ω_N(f, 2^(-j))_p` and
   `‖S^(N)‖_p ≤ 2^N N^N 2^(jN) ω_N(f, 2^(-j))_p`
   (`FunctionSpaces.Wavelets.Daubechies.JacksonSmoothing`), while
-  `‖f - P_j f‖_p ≤ (1 + ‖P_j‖) ‖f - S‖_p + ‖S - P_j S‖_p`
-  (`Daubechies.eLpNorm_sub_projFun_le_add`). Together:
+  `‖f - P_j f‖_p ≤ (1 + C) ‖f - S‖_p + ‖S - P_j S‖_p` with the uniform bound `C` of the
+  projections (`Daubechies.eLpNorm_sub_projFun_le_add`). Together:
   `‖f - P_j f‖_p ≤ C_J ω_N(f, 2^(-j))_p` (`Daubechies.eLpNorm_sub_projFun_le_modulus`), and the
   same for every `f ∈ L_p` with a continuous representative
   (`Daubechies.enorm_sub_proj_le_of_continuous`).

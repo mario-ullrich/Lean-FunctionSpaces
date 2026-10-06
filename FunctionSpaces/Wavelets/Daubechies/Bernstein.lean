@@ -155,7 +155,7 @@ the conjugate exponent `p'`. The first factor is the overlap factor of the upper
 expansions (`Daubechies.eLpNorm_expand_le`) for the generators `Δ_H^r φ`, `|H| ≤ 1`, which vanish
 outside `[-r, 2N - 1 + r]` (`Daubechies.natCeil_higherDiff_support_add_one`); the second is the
 constant of the coefficient estimate (`Daubechies.coeffConst` for `φ` and its support
-`[0, 2N - 1]`). It depends neither on the level nor on the scale. -/
+`[0, 2N - 1]`). It is the same for every level and every scale. -/
 noncomputable def bernsteinConst (p : ℝ≥0∞) (r : ℕ) : ℝ≥0∞ :=
   ((2 * N + 2 * r : ℕ) : ℝ≥0∞) ^ (1 - 1 / p.toReal) * coeffConst (scalingFun m) 0 (2 * N - 1) p
 

@@ -141,7 +141,7 @@ theorem projFun_sub (hN : 2 ≤ N) {f g : ℝ → ℂ} (hf : LocallyIntegrable f
 `M = ⌈2N - 1⌉ + 1 = 2N` (for `N ≥ 1`) and the conjugate exponent `p'`, the product of the
 constants of the upper estimate and of the coefficient estimate of the expansions
 (`Daubechies.expandConst`, `Daubechies.coeffConst`, with the support interval `[0, 2N - 1]` of
-`φ`). It does not depend on the level. -/
+`φ`). It is the same for every level. -/
 noncomputable def projConst (p : ℝ≥0∞) : ℝ :=
   (expandConst (scalingFun m) 0 (2 * N - 1) p * coeffConst (scalingFun m) 0 (2 * N - 1) p).toReal
 
@@ -280,7 +280,7 @@ theorem eLpNorm_coeffFun_mul_scaled_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 
 `I = [k/2^j, (k + 1)/2^j)` is controlled by `f` on the window
 `W = [(k - (2N - 2))/2^j, (k + 2N - 1)/2^j]`:
 `‖P_j f‖_{L_p(I)} ≤ (2N - 1) ‖φ‖_p ‖φ‖_{p'} ‖f‖_{L_p(W)}` (the constant `Daubechies.cellConst`
-depends neither on `j` nor on `k`). On `I` only the `2N - 1` positions `k - (2N - 2) ≤ l ≤ k`
+is the same for every `j` and `k`). On `I` only the `2N - 1` positions `k - (2N - 2) ≤ l ≤ k`
 contribute (`Daubechies.projFun_eq_sum_of_mem_cell`), the support windows of their `φ_{j,l}` lie
 in `W` (`Daubechies.supportWindow_subset_of_mem_Icc`), and each term is bounded by
 `Daubechies.eLpNorm_coeffFun_mul_scaled_le`. -/

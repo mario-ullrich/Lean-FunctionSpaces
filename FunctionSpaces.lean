@@ -239,8 +239,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `|L(e^{-2πiξ})|² = P_N(sin²(πξ))`), the mask polynomial, the filter coefficients and the symbol
   `m_0` with the quadrature mirror filter identity.
 * `FunctionSpaces.Wavelets.Daubechies.MaskExistence`: masks of every order `N ≥ 1` by the
-  Fejér–Riesz theorem applied to `P_N((1 - t)/2)`, the minimum-phase mask without zeros in the
-  closed unit disk, and its identification with D4 for `N = 2`.
+  Fejér–Riesz theorem applied to `P_N((1 - t)/2)`, the minimum-phase mask, whose polynomial `L`
+  has no zeros in the closed unit disk, and its identification with D4 for `N = 2`.
 * `FunctionSpaces.Wavelets.Daubechies.FilterIdentities`: identities of the filter coefficients:
   orthogonality of the even shifts, the sum rules, parity sums and first moments, the vanishing
   derivatives of the symbol at the half-integers, and the dual filter of the wavelet.

@@ -39,6 +39,11 @@ projections `P_j f = ∑_k ⟨f, φ_{j,k}⟩ φ_{j,k}`.
   `Daubechies.expand_wavelet_eq_expand_succ`), and the filter identity
   `∑_k (c_{a-2k} c_{b-2k} + g_{a-2k} g_{b-2k}) = 2 δ_{ab}` gives perfect reconstruction
   (`Daubechies.refineCoeff_add_waveletRefineCoeff`).
+* **The kernel identity.**
+  `∑_n φ_{j+1,n}(x) φ_{j+1,n}(y) = ∑_k φ_{j,k}(x) φ_{j,k}(y) + ∑_k ψ_{j,k}(x) ψ_{j,k}(y)`
+  (`Daubechies.tsum_scaled_mul_scaled_succ`), by perfect reconstruction with
+  `a_n = φ_{j+1,n}(y)`; at level `0` it reads `2 K(2x, 2y) = K(x, y) + ∑_k ψ(x - k) ψ(y - k)` for
+  the kernel `K(x, y) = ∑_k φ(x - k) φ(y - k)` of `P_0` (`Daubechies.kernel_succ`).
 * **Norms of the blocks.** For `1 ≤ p < ∞` there are constants `K, M < ∞` with
   `2^(j(1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p} ≤ K ‖P_{j+1} f - P_j f‖_p` and
   `‖P_{j+1} f - P_j f‖_p ≤ M 2^(j(1/2 - 1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p}` for all `f` and `j`

@@ -44,7 +44,7 @@ The file is generic in `g`, so that it serves the scaling function `φ` (support
   Together with coefficient recovery it gives the lower estimate
   `2^(j(1/2 - 1/p)) ‖c‖_{ℓ_p} ≤ M^(1/p) ‖g‖_{p'} ‖∑_k c_k g_{j,k}‖_p` for orthonormal translates
   (`Daubechies.lqNorm_le_eLpNorm_expand`). The constants (`Daubechies.expandConst`,
-  `Daubechies.coeffConst`) do not depend on the level.
+  `Daubechies.coeffConst`) are the same for every level.
 * **`L_p` membership and linearity.** Expansions with `ℓ_p` coefficients lie in `L_p`
   (`Daubechies.memLp_expand`), and so does the expansion of the coefficients of an `L_p`
   function (`Daubechies.memLp_expand_coeffFun`), with
@@ -424,8 +424,9 @@ theorem memLp_of_continuous_of_eq_zero (hg : Continuous g) (hsupp : ∀ x ∉ Se
 `[a, b]`, and let `1 ≤ p < ∞`. Then for every level `j` and all coefficients `c : ℤ → ℂ`,
 `‖∑_k c_k g_{j,k}‖_p ≤ M^(1 - 1/p) ‖g‖_p 2^(j(1/2 - 1/p)) ‖c‖_{ℓ_p}` with the overlap number
 `M = ⌈b - a⌉ + 1`. The constant `M^(1 - 1/p) ‖g‖_p` (`Daubechies.expandConst`) is proportional to
-`‖g‖_p`, depends on the support only through `b - a`, and depends neither on `j` nor on `c`. At
-each point at most `M` terms are nonzero (`Daubechies.card_le_of_forall_mem_supportWindow`), so
+`‖g‖_p`, depends on the support only through `b - a`, and is the same for every level `j` and
+every `c`. At each point at most `M` terms are nonzero
+(`Daubechies.card_le_of_forall_mem_supportWindow`), so
 the bounded overlap inequality `‖∑_k F_k‖_p^p ≤ M^(p-1) ∑_k ‖F_k‖_p^p`
 (`Rd.eLpNorm_rpow_le_of_overlap`) applies, and
 `‖c_k g_{j,k}‖_p = |c_k| 2^(j(1/2 - 1/p)) ‖g‖_p` (`Daubechies.eLpNorm_const_mul_scaledFun`). -/
@@ -453,7 +454,7 @@ theorem eLpNorm_expand_le (hg : AEStronglyMeasurable g volume)
 
 /-- **The constant of the upper estimate** `Daubechies.eLpNorm_expand_le`:
 `M^(1 - 1/p) ‖g‖_p` with the overlap number `M = ⌈b - a⌉ + 1`, which bounds the number of
-generators of one level that are nonzero at a point. It does not depend on the level. -/
+generators of one level that are nonzero at a point. It is the same for every level. -/
 noncomputable def expandConst (g : ℝ → ℂ) (a b : ℝ) (p : ℝ≥0∞) : ℝ≥0∞ :=
   ((⌈b - a⌉₊ + 1 : ℕ) : ℝ≥0∞) ^ (1 - 1 / p.toReal) * eLpNorm g p volume
 
@@ -590,7 +591,7 @@ theorem lqNorm_le_of_le_eLpNorm_indicator {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp :
 `[a, b]`, and let `1 ≤ p < ∞`. Then for every a.e. strongly measurable `f` and every level `j`,
 `‖(⟨f, g_{j,k}⟩)_k‖_{ℓ_p} ≤ M^(1/p) ‖g‖_{p'} 2^(-j(1/2 - 1/p)) ‖f‖_p` with the overlap number
 `M = ⌈b - a⌉ + 1` and the conjugate exponent `p'`. The constant `M^(1/p) ‖g‖_{p'}`
-(`Daubechies.coeffConst`) depends neither on `j` nor on `f`. Each coefficient is bounded by
+(`Daubechies.coeffConst`) is the same for every `j` and `f`. Each coefficient is bounded by
 Hölder's inequality on its support window, `|⟨f, g_{j,k}⟩| ≤ ‖1_{W_k} f‖_p ‖g_{j,k}‖_{p'}`
 (`Daubechies.enorm_coeffFun_le`) with `‖g_{j,k}‖_{p'} = 2^(-j(1/2 - 1/p)) ‖g‖_{p'}`
 (`Daubechies.eLpNorm_scaledFun_conjExponent`), and the windows overlap at most `M` times
@@ -612,7 +613,7 @@ theorem lqNorm_coeffFun_le (hg : AEStronglyMeasurable g volume)
 
 /-- **The constant of the coefficient estimate** `Daubechies.lqNorm_coeffFun_le`:
 `M^(1/p) ‖g‖_{p'}` with the overlap number `M = ⌈b - a⌉ + 1` and the conjugate exponent
-`p' = p/(p - 1)` (Mathlib's `ENNReal.conjExponent`). It does not depend on the level. -/
+`p' = p/(p - 1)` (Mathlib's `ENNReal.conjExponent`). It is the same for every level. -/
 noncomputable def coeffConst (g : ℝ → ℂ) (a b : ℝ) (p : ℝ≥0∞) : ℝ≥0∞ :=
   ((⌈b - a⌉₊ + 1 : ℕ) : ℝ≥0∞) ^ (1 / p.toReal) * eLpNorm g (ENNReal.conjExponent p) volume
 
