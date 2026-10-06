@@ -21,8 +21,9 @@ inverse Fourier transform of `Φ`,
 
 For `N ≥ 2` the symbol product is integrable (`Daubechies.integrable_symbolProduct`), so `φ` is
 continuous (`Daubechies.continuous_scalingFun`), and `|φ(x)| ≤ ∫ |Φ|` for every `x`
-(`Daubechies.norm_scalingFun_le`). Compact support of `φ` and `𝓕 φ = Φ` follow from the cascade
-algorithm (`FunctionSpaces.Wavelets.Daubechies.Cascade`).
+(`Daubechies.norm_scalingFun_le`). The file `FunctionSpaces.Wavelets.Daubechies.Cascade` proves
+that `φ` has compact support, by the cascade algorithm, and then that `𝓕 φ = Φ`, by Fourier
+inversion.
 
 **The refinement equation.** For `N ≥ 2` and every `x ∈ ℝ`,
 

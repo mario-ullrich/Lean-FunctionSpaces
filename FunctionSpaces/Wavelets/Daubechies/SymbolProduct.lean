@@ -25,12 +25,14 @@ The scaling function of the mask is the inverse Fourier transform of `Φ`.
 satisfy `|m_0(ξ/2^(j+1)) - 1| ≤ C|ξ|/2^(j+1)`, a summable bound, uniform for `ξ` in a compact
 set. Hence the product converges for every `ξ` (`Daubechies.multipliable_symbolProduct`, from
 Mathlib's `multipliable_one_add_of_summable`), uniformly on compact sets
-(`Daubechies.hasProdUniformlyOn_symbolProduct`), the partial products converge locally uniformly
-(`Daubechies.tendstoLocallyUniformly_prod_symbol`), and `Φ` is continuous
-(`Daubechies.continuous_symbolProduct`).
+(`Daubechies.hasProdUniformlyOn_symbolProduct`), the partial products
+`∏_{j<n} m_0(ξ/2^(j+1))` converge to `Φ(ξ)` for every `ξ` (`Daubechies.tendsto_prod_symbol`) and
+locally uniformly in `ξ` (`Daubechies.tendstoLocallyUniformly_prod_symbol`), and `Φ` is
+continuous (`Daubechies.continuous_symbolProduct`).
 
-**Algebraic properties.** `Φ(0) = 1`, `|Φ| ≤ 1` since `|m_0| ≤ 1`, `Φ(-ξ) = conj Φ(ξ)`, and
-`Φ(ξ) = ∏_{j<n} m_0(ξ/2^(j+1)) · Φ(ξ/2^n)` for every `n`
+**Algebraic properties.** `Φ(0) = 1` (`Daubechies.symbolProduct_zero`), `|Φ(ξ)| ≤ 1` since
+`|m_0| ≤ 1` (`Daubechies.norm_symbolProduct_le_one`), `Φ(-ξ) = conj Φ(ξ)`
+(`Daubechies.symbolProduct_neg`), and `Φ(ξ) = ∏_{j<n} m_0(ξ/2^(j+1)) · Φ(ξ/2^n)` for every `n`
 (`Daubechies.symbolProduct_eq_prod_mul`), in particular the refinement identity
 `Φ(2ξ) = m_0(ξ) Φ(ξ)` (`Daubechies.symbolProduct_two_mul`); the partial products
 `p_n(ξ) = ∏_{j<n} m_0(ξ/2^(j+1))` satisfy `p_{n+1}(ξ) = m_0(ξ/2) p_n(ξ/2)`
@@ -184,7 +186,9 @@ theorem multipliable_daubFun_shift (N n : ℕ) (ξ : ℝ) :
     Multipliable (fun j : ℕ => daubFun N (ξ / 2 ^ (n + j + 1))) := by
   simpa only [div_two_pow_add_succ] using multipliable_daubFun N (ξ / 2 ^ n)
 
-/-- The product of the trigonometric Daubechies polynomial is nonnegative, since `P ≥ 0`. -/
+/-- The product of the trigonometric Daubechies polynomial is nonnegative:
+`∏_{j ≥ 0} P(x/2^(j+1)) ≥ 0` for every `N` and every real `x`, since `P ≥ 0`
+(`Daubechies.daubFun_nonneg`, Mathlib's `tprod_nonneg`). -/
 theorem tprod_daubFun_nonneg (N : ℕ) (x : ℝ) : 0 ≤ ∏' j : ℕ, daubFun N (x / 2 ^ (j + 1)) :=
   tprod_nonneg fun _ => daubFun_nonneg N _
 
@@ -291,7 +295,10 @@ theorem hasProdUniformlyOn_symbolProduct {K : Set ℝ} (hK : IsCompact K) :
   simp only [add_sub_cancel] at h
   exact h
 
-/-- **Locally uniform convergence**: the symbol product converges locally uniformly on `ℝ`. -/
+/-- **Locally uniform convergence**: the products `∏_{j ∈ s} m_0(ξ/2^(j+1))` over finite sets
+`s ⊆ ℕ` converge to `Φ(ξ)` as `s` grows, locally uniformly in `ξ ∈ ℝ`: uniformly on every compact
+set (`Daubechies.hasProdUniformlyOn_symbolProduct`, Mathlib's
+`hasProdLocallyUniformly_of_forall_compact`). -/
 theorem hasProdLocallyUniformly_symbolProduct :
     HasProdLocallyUniformly (fun j ξ => symbol m (ξ / 2 ^ (j + 1))) (symbolProduct m) :=
   hasProdLocallyUniformly_of_forall_compact fun _ hK => hasProdUniformlyOn_symbolProduct m hK

@@ -99,8 +99,8 @@ theorem TransferGrowth.setIntegral_prod_daubFun_le {N : ℕ} {lam C : ℝ}
         rw [intervalIntegral.integral_of_le hle, integral_Icc_eq_integral_Ioc]
     _ ≤ C * lam ^ n := hg.integral_prod_daubFun_le n
 
-/-- `log₄(2 C(2N - 1, N)) < N - 1/2` for `N ≥ 2`. This says
-`2 C(2N - 1, N) < 4^(N - 1/2) = 2 · 4^(N - 1)`, which is `Daubechies.choose_lt_four_pow`. -/
+/-- `log₄(2 C(2N - 1, N)) < N - 1/2` for `N ≥ 2`. It follows from `C(2N - 1, N) < 4^(N - 1)`
+(`Daubechies.choose_lt_four_pow`), since `2 · 4^(N - 1) = 4^(N - 1/2)`. -/
 theorem logb_four_two_mul_choose_lt {N : ℕ} (hN : 2 ≤ N) :
     Real.logb 4 (2 * ((2 * N - 1).choose N : ℝ)) < N - 1 / 2 := by
   have hC : ((2 * N - 1).choose N : ℝ) < 4 ^ (N - 1) := by
@@ -172,7 +172,7 @@ theorem univ_subset_Icc_union_annulus :
   · exact Or.inr (Set.mem_iUnion.2 (exists_mem_annulus h))
 
 /-- **Integrability from geometric decay on the annuli**: a continuous `f : ℝ → E` with
-`∫_{A_n} |f| ≤ A r^n` for every `n`, where `0 ≤ r < 1`, is integrable on `ℝ`. On `[-1/4, 1/4]` it
+`∫_{A_n} ‖f‖ ≤ A r^n` for every `n`, where `0 ≤ r < 1`, is integrable on `ℝ`. On `[-1/4, 1/4]` it
 is integrable as a continuous function on a compact interval, on `⋃_n A_n` because the integrals
 over the annuli are summable (Mathlib's `integrableOn_iUnion_of_summable_integral_norm`), and
 these two sets cover `ℝ`. -/
@@ -189,7 +189,8 @@ theorem integrable_of_integral_annulus_le {E : Type*} [NormedAddCommGroup E] {f 
 
 /-! ### The symbol product on the annuli -/
 
-/-- `|sinc x| ≤ 1/|x|` for `x ≠ 0`, since `sinc x = sin x / x` and `|sin x| ≤ 1`. -/
+/-- `|sinc x| ≤ 1/|x|` for `x ≠ 0`, since `sinc x = sin x / x` and `|sin x| ≤ 1`. Mathlib's
+`Real.sinc_le_inv_abs` is the one-sided bound `sinc x ≤ 1/|x|`. -/
 theorem abs_sinc_le_inv_abs {x : ℝ} (hx : x ≠ 0) : |Real.sinc x| ≤ |x|⁻¹ := by
   rw [Real.sinc_of_ne_zero hx, abs_div, div_eq_mul_inv]
   exact mul_le_of_le_one_left (inv_nonneg.2 (abs_nonneg x)) (Real.abs_sin_le_one x)
@@ -251,6 +252,11 @@ theorem integral_annulus_normSq_le {N : ℕ} (m : Mask N) {lam C : ℝ}
         mul_le_mul_of_nonneg_left (hg.setIntegral_prod_daubFun_le n (annulus_subset_Icc n)) hK
 
 /-! ### Weights -/
+
+/-- The weight `ξ ↦ (1 + |ξ|)^t` is continuous for every real `t`, since `1 + |ξ| > 0`. -/
+theorem continuous_one_add_abs_rpow (t : ℝ) : Continuous fun ξ : ℝ => (1 + |ξ|) ^ t :=
+  (continuous_const.add continuous_abs).rpow_const fun ξ =>
+    Or.inl (by positivity : (0 : ℝ) < 1 + |ξ|).ne'
 
 /-- **Comparable bases give comparable powers**: if `y > 0` and `y/4 ≤ x ≤ 4y`, then
 `x^t ≤ 4^|t| y^t` for every real exponent `t` (for `t ≥ 0` from `x ≤ 4y`, for `t ≤ 0` from
@@ -314,9 +320,7 @@ theorem integrable_rpow_mul_normSq {N : ℕ} (m : Mask N) {lam C s : ℝ}
     Integrable (fun ξ => (1 + |ξ|) ^ (2 * s) * ‖symbolProduct m ξ‖ ^ 2) := by
   have hc : Continuous fun ξ => ‖symbolProduct m ξ‖ ^ 2 :=
     (continuous_symbolProduct m).norm.pow 2
-  have hw : Continuous fun ξ : ℝ => (1 + |ξ|) ^ (2 * s) :=
-    (continuous_const.add continuous_abs).rpow_const fun ξ =>
-      Or.inl (by positivity : (0 : ℝ) < 1 + |ξ|).ne'
+  have hw := continuous_one_add_abs_rpow (2 * s)
   have hr : (2 : ℝ) ^ (2 * s) * lam / 4 ^ N < 1 := by
     rw [div_lt_one (by positivity)]
     exact two_rpow_two_mul_mul_lt hg.1 hs
@@ -361,8 +365,7 @@ theorem integrable_rpow_mul_norm {N : ℕ} (m : Mask N) {lam C a : ℝ}
   have h2 : Integrable (fun ξ : ℝ => (1 + ‖ξ‖) ^ (-(2 * (b - a)))) :=
     integrable_one_add_norm (by simpa using hb2)
   have hc : Continuous fun ξ => (1 + |ξ|) ^ a * ‖symbolProduct m ξ‖ :=
-    ((continuous_const.add continuous_abs).rpow_const fun ξ =>
-      Or.inl (by positivity : (0 : ℝ) < 1 + |ξ|).ne').mul (continuous_symbolProduct m).norm
+    (continuous_one_add_abs_rpow a).mul (continuous_symbolProduct m).norm
   refine (h2.add h1).mono' hc.aestronglyMeasurable (Eventually.of_forall fun ξ => ?_)
   rw [Real.norm_of_nonneg (by positivity), Pi.add_apply, Real.norm_eq_abs,
     show -(2 * (b - a)) = 2 * (a - b) by ring]

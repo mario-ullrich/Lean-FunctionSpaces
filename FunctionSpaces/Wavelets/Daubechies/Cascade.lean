@@ -49,17 +49,6 @@ the **cascade algorithm**
 open Filter MeasureTheory Topology
 open scoped Real FourierTransform SchwartzMap ENNReal
 
-namespace Real
-
-/-! ### The Fourier transform at `0` -/
-
-/-- **The Fourier transform at `0` is the integral**: `𝓕 f(0) = ∫ f(x) dx` for every
-`f : ℝ → ℂ`, since `e^(-2πix·0) = 1`. -/
-theorem fourier_apply_zero (f : ℝ → ℂ) : 𝓕 f 0 = ∫ x, f x := by
-  simp [fourier_real_eq]
-
-end Real
-
 namespace Daubechies
 
 /-! ### The cascade -/

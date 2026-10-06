@@ -16,9 +16,17 @@ public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 
 For a Daubechies mask of order `N` with filter coefficients `c_k` (`Daubechies.coeff`, zero
 outside `0 ≤ k < 2N`) and symbol `m_0(ξ) = (1/2) ∑_k c_k e^(-2πikξ)` this file proves the
-identities between the coefficients that the scaling function and the wavelet are built on. All
-sums run over `k ∈ ℤ`; only finitely many terms are nonzero, and Mathlib writes such sums
-`∑ᶠ k : ℤ` (`finsum`).
+identities between the coefficients that the scaling function and the wavelet are built on.
+
+**Sums over `ℤ`.** All sums run over `k ∈ ℤ` and are Mathlib's `finsum`, written `∑ᶠ k : ℤ`:
+the sum of the finitely many nonzero terms, with the value `0` by convention when infinitely many
+terms are nonzero. The filter coefficients have finite support
+(`Daubechies.finite_support_coeff`), so every sum here has finitely many nonzero terms. Three
+conversions connect these sums with the other notations: a sum whose terms vanish wherever `c_k`
+vanishes is the finite sum `∑_{k<2N}` (`Daubechies.finsum_eq_sum_range_of_coeff`), a sum whose
+terms vanish wherever `g_k` vanishes is the finite sum `∑_{2-2N ≤ k ≤ 1}`
+(`Daubechies.finsum_eq_sum_Icc_of_dualCoeff`), and a series `∑'` with finitely many nonzero terms
+is the `finsum` (Mathlib's `tsum_eq_finsum`).
 
 * **Orthogonality of the even shifts**: `∑_k c_k c_(k+2j) = 2 δ_(j0)` for every `j ∈ ℤ`
   (`Daubechies.sum_coeff_mul_coeff_add`). The proof integrates the quadrature mirror filter
@@ -34,17 +42,25 @@ sums run over `k ∈ ℤ`; only finitely many terms are nonzero, and Mathlib wri
 * **Parity sums and first moments**: `∑_i c_(2i+r) = 1` for every `r ∈ ℤ`
   (`Daubechies.sum_coeff_two_mul_add`) and, for `N ≥ 2`, `∑_i (2i + r) c_(2i+r) = μ` with
   `μ = (1/2) ∑_k k c_k` (`Daubechies.firstMoment`, `Daubechies.sum_two_mul_add_mul_coeff`): by
-  the sum rules for `l = 0` and `l = 1` the even and the odd indices contribute equally.
+  the sum rules for `l = 0` and `l = 1` the even and the odd indices contribute equally. Together
+  they give `∑_i i c_(2i+r) = (μ - r)/2` (`Daubechies.sum_mul_coeff_two_mul_add`).
 * **Derivatives of the symbol at the half-integers**: `m_0^(l)(1/2 + n) = 0` for `l < N` and
   `n ∈ ℤ` (`Daubechies.iteratedDeriv_symbol_half_add_int`), since
   `m_0^(l)(ξ) = (1/2) ∑_k c_k (-2πik)^l e^(-2πikξ)` (`Daubechies.iteratedDeriv_symbol`) and
   `e^(-2πik(1/2 + n)) = (-1)^k`.
-* **The dual filter** `g_k = (-1)^k c_(1-k)` (`Daubechies.dualCoeff`), the filter of the wavelet:
-  `∑_k g_k g_(k+2j) = 2 δ_(j0)`, `∑_k c_k g_(k+2j) = 0`, the identity
-  `∑_j (c_(a-2j) c_(b-2j) + g_(a-2j) g_(b-2j)) = 2 δ_(ab)` for all `a, b ∈ ℤ`
-  (`Daubechies.sum_coeff_mul_add_dual`), and the vanishing moments `∑_k g_k k^l = 0` for `l < N`
-  (`Daubechies.sum_dualCoeff_mul_pow`). The proofs substitute `k ↦ 1 - 2j - k` and split the
-  indices by parity.
+* **The dual filter** `g_k = (-1)^k c_(1-k)` (`Daubechies.dualCoeff`), the filter of the wavelet.
+  Each of its identities comes from an identity for `c_k` by a substitution:
+  - `∑_k g_k g_(k+2j) = 2 δ_(j0)` (`Daubechies.sum_dualCoeff_mul_dualCoeff_add`): `k ↦ 1 - 2j - k`
+    turns the sum into `∑_k c_k c_(k+2j)`;
+  - `∑_k c_k g_(k+2j) = 0` (`Daubechies.sum_coeff_mul_dualCoeff_add`): `k ↦ 1 - 2j - k` turns the
+    sum into its negative;
+  - `∑_j (c_(a-2j) c_(b-2j) + g_(a-2j) g_(b-2j)) = 2 δ_(ab)` for all `a, b ∈ ℤ`
+    (`Daubechies.sum_coeff_mul_add_dual`): `j ↦ -j` turns both sums into sums over one parity
+    class of `h(k) = c_(k+(a-b)) c_k`; for `a - b` even the two classes are complementary and
+    add up to `∑_k c_k c_(k+(a-b))`, for `a - b` odd they cancel;
+  - the vanishing moments `∑_k g_k k^l = 0` for `l < N` (`Daubechies.sum_dualCoeff_mul_pow`):
+    `k ↦ 1 - k` turns the sum into `-∑_k (-1)^k (1 - k)^l c_k`, a sum rule for the polynomial
+    `(1 - X)^l`.
 -/
 
 @[expose] public section
@@ -542,6 +558,28 @@ theorem sum_two_mul_add_mul_coeff (hN : 2 ≤ N) (r : ℤ) :
         finsum_congr fun i => by push_cast; ring
     _ = (∑ᶠ k : ℤ, (k : ℝ) * coeff m k) / 2 := finsum_two_mul_add_eq_half hfin halt r
     _ = firstMoment m := by rw [firstMoment]; ring
+
+/-- **The index moments of the two parity classes** (`N ≥ 2`): `∑_i i c_(2i+r) = (μ - r)/2` for
+every `r ∈ ℤ`, where `μ = (1/2) ∑_k k c_k`. It follows from `∑_i (2i + r) c_(2i+r) = μ`
+(`Daubechies.sum_two_mul_add_mul_coeff`) and `∑_i c_(2i+r) = 1`
+(`Daubechies.sum_coeff_two_mul_add`). -/
+theorem sum_mul_coeff_two_mul_add (hN : 2 ≤ N) (r : ℤ) :
+    ∑ᶠ i : ℤ, (i : ℝ) * coeff m (2 * i + r) = (firstMoment m - r) / 2 := by
+  have hinj : Function.Injective fun i : ℤ => 2 * i + r := fun i j h => by
+    simp only at h
+    omega
+  have hfin : (Function.support fun i : ℤ => coeff m (2 * i + r)).Finite :=
+    Function.HasFiniteSupport.fun_comp_of_injective hinj (finite_support_coeff m)
+  have h1 : (Function.support fun i : ℤ => 2 * (i : ℝ) * coeff m (2 * i + r)).Finite :=
+    hfin.subset (Function.support_mul_subset_right _ _)
+  have h2 : (Function.support fun i : ℤ => (r : ℝ) * coeff m (2 * i + r)).Finite :=
+    hfin.subset (Function.support_mul_subset_right _ _)
+  have h := sum_two_mul_add_mul_coeff m hN r
+  simp only [add_mul] at h
+  rw [finsum_add_distrib h1 h2, ← mul_finsum, sum_coeff_two_mul_add, mul_one] at h
+  simp only [mul_assoc] at h
+  rw [← mul_finsum] at h
+  linarith
 
 /-! ### Derivatives of the symbol -/
 

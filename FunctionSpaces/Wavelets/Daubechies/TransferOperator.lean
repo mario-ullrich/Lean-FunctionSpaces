@@ -167,11 +167,11 @@ theorem iterate_transfer_one_nonneg (N n : ℕ) (ξ : ℝ) : 0 ≤ (transfer N)^
 
 /-! ### The adjoint identity -/
 
-/-- If `h` has period `1`, then so has `η ↦ h(2η)`, since `h(2η + 2) = h(2η)`. -/
+/-- If `h` has period `1`, then so has `η ↦ h(2η)`: `h` has period `2`, so `η ↦ h(2η)` has period
+`2⁻¹ · 2 = 1` (Mathlib's `Function.Periodic.nat_mul` and `Function.Periodic.const_mul`). -/
 theorem periodic_comp_two_mul {h : ℝ → ℝ} (hh : Periodic h 1) :
-    Periodic (fun η => h (2 * η)) 1 := fun η => by
-  show h (2 * (η + 1)) = h (2 * η)
-  rw [show 2 * (η + 1) = 2 * η + 1 + 1 by ring, hh, hh]
+    Periodic (fun η => h (2 * η)) 1 := by
+  simpa using (hh.nat_mul 2).const_mul (2 : ℝ)
 
 /-- **The two branches of halving**: for a continuous `1`-periodic `f`,
 `∫_{-1/2}^{1/2} (f(η/2) + f((η + 1)/2)) dη = 2 ∫_{-1/2}^{1/2} f(η) dη`. The substitutions
@@ -284,10 +284,10 @@ theorem integral_prod_daubFun (N n : ℕ) :
 
 /-! ### Growth bounds -/
 
-/-- **A growth bound for the transfer operator** of order `N`: `λ > 0`, and
-`(T^n 1)(ξ) ≤ C λ^n` for every `n ∈ ℕ` and every `ξ ∈ ℝ`. Such a bound controls the decay of the
-symbol product `Φ` of a Daubechies mask of order `N`: `∫ (1 + |ξ|)^(2s) |Φ(ξ)|² dξ < ∞` for
-`s < N - log₄ λ`. -/
+/-- **A growth bound for the transfer operator** of order `N`, with rate `λ` (the argument `lam`)
+and constant `C`: `λ > 0`, and `(T^n 1)(ξ) ≤ C λ^n` for every `n ∈ ℕ` and every `ξ ∈ ℝ`. Such a
+bound controls the decay of the symbol product `Φ` of a Daubechies mask of order `N`:
+`∫ (1 + |ξ|)^(2s) |Φ(ξ)|² dξ < ∞` for `s < N - log₄ λ`. -/
 def TransferGrowth (N : ℕ) (lam C : ℝ) : Prop :=
   0 < lam ∧ ∀ (n : ℕ) (ξ : ℝ), (transfer N)^[n] (fun _ => 1) ξ ≤ C * lam ^ n
 

@@ -17,10 +17,12 @@ degree `< N` with `L(1) = 1` and `|L(e^(-2πiξ))|² = P(ξ)` for all `ξ ∈ �
 `P(ξ) = P_N(sin²(πξ))` is the trigonometric Daubechies polynomial (`Daubechies.daubFun`). Every
 mask has order `N ≥ 1` (`Daubechies.Mask.one_le`). From `L` one builds
 
-* the **mask polynomial** `m(z) = ((1 + z)/2)^N L(z)` (`Daubechies.maskPoly`), of degree
-  `≤ 2N - 1` and divisible by `(z + 1)^N`;
-* the **filter coefficients** `c_k = 2 [z^k] m(z)` for `k ∈ ℤ` (`Daubechies.coeff`), which vanish
-  outside `0 ≤ k < 2N` and add up to `∑_k c_k = 2`;
+* the **mask polynomial** `m(z) = ((1 + z)/2)^N L(z)` (`Daubechies.maskPoly`), with
+  `deg m ≤ 2N - 1` (`Daubechies.natDegree_maskPoly_le`) and `(z + 1)^N ∣ m(z)`
+  (`Daubechies.X_add_one_pow_dvd_maskPoly`);
+* the **filter coefficients** `c_k = 2 [z^k] m(z)` for `k ∈ ℤ` (`Daubechies.coeff`), with
+  `c_k = 0` for `k < 0` and for `k ≥ 2N` (`Daubechies.coeff_eq_zero`) and
+  `∑_{k<2N} c_k = 2 m(1) = 2` (`Daubechies.sum_coeff`);
 * the **symbol** `m_0(ξ) = m(e^(-2πiξ)) = (1/2) ∑_k c_k e^(-2πikξ)` (`Daubechies.symbol`,
   `Daubechies.symbol_eq_sum`), a smooth function of period `1` with `m_0(0) = 1`
   (`Daubechies.contDiff_symbol`, `Daubechies.symbol_periodic`, `Daubechies.symbol_zero`).
@@ -35,11 +37,13 @@ Together with the trigonometric Bézout identity `cos(πξ)^(2N) P(ξ) + sin(π�
 
 `|m_0(ξ)|² + |m_0(ξ + 1/2)|² = 1` (`Daubechies.qmf`),
 
-and hence `|m_0| ≤ 1`. Since `P ≥ 1` and `cos(πξ) > 0` for `|ξ| < 1/2`, the symbol has no zeros
-in `(-1/2, 1/2)` (`Daubechies.symbol_ne_zero`), while `m_0(1/2 + n) = 0` for every `n ∈ ℤ`
+and hence `|m_0(ξ)| ≤ 1` for every `ξ` (`Daubechies.norm_symbol_le_one`). Since `P ≥ 1` and
+`cos(πξ) > 0` for `|ξ| < 1/2`, the symbol has no zeros in `(-1/2, 1/2)`
+(`Daubechies.symbol_ne_zero`), while `m_0(1/2 + n) = 0` for every `n ∈ ℤ`
 (`Daubechies.symbol_half_add_int`), where `z = -1`. The mask polynomial has real coefficients,
 so `m_0(-ξ) = conj (m_0(ξ))` (`Daubechies.symbol_neg`). Finally `m_0` is Lipschitz at `0`:
-`|m_0(ξ) - 1| ≤ π ∑_k k |c_k| · |ξ|` (`Daubechies.norm_symbol_sub_one_le`), from
+`|m_0(ξ) - 1| ≤ π ∑_{k<2N} k |c_k| · |ξ|` (`Daubechies.norm_symbol_sub_one_le`), where the
+constant `π ∑_{k<2N} k |c_k|` is `Daubechies.symbolLip`. The bound follows from
 `m_0(ξ) - 1 = (1/2) ∑_k c_k (e^(-2πikξ) - 1)` and `|e^(-2πikξ) - 1| ≤ 2πk|ξ|`.
 -/
 

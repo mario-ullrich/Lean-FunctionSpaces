@@ -19,6 +19,7 @@ analytic hypotheses are integrability and continuity conditions.
 * **Continuity and the uniform bound.** For integrable `f`, `𝓕 f` and `𝓕⁻ f` are continuous
   (`Real.continuous_fourier_of_integrable`), and `‖𝓕 f(ξ)‖ ≤ ∫ ‖f‖`
   (`Real.norm_fourier_le_integral_norm`).
+* **The value at `0`**: `𝓕 f(0) = ∫ f` for every `f` (`Real.fourier_apply_zero`).
 * **Linearity**: `𝓕[c f] = c 𝓕 f` for every `f` (`Real.fourier_const_mul_apply`) and finite sums
   of integrable functions (`Real.fourier_sum_apply`), each with its `𝓕⁻` version.
 * **Translation, modulation, dilation, conjugation**:
@@ -78,6 +79,13 @@ theorem norm_fourier_le_integral_norm (f : ℝ → ℂ) (ξ : ℝ) : ‖𝓕 f �
 theorem norm_fourierInv_le_integral_norm (f : ℝ → ℂ) (x : ℝ) : ‖𝓕⁻ f x‖ ≤ ∫ ξ, ‖f ξ‖ := by
   rw [fourierInv_eq_fourier_neg]
   exact norm_fourier_le_integral_norm f (-x)
+
+/-! ### The Fourier transform at `0` -/
+
+/-- **The Fourier transform at `0` is the integral**: `𝓕 f(0) = ∫ f(x) dx` for every
+`f : ℝ → ℂ`, since `e^(-2πix·0) = 1`. -/
+theorem fourier_apply_zero (f : ℝ → ℂ) : 𝓕 f 0 = ∫ x, f x := by
+  simp [fourier_real_eq]
 
 /-! ### Linearity -/
 

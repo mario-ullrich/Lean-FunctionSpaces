@@ -119,7 +119,7 @@ COLUMNS: list[list[str]] = [
      "Differences and local means", "Lipschitz domains", "Multipliers and atoms",
      "Smooth atoms and changes of variables", "Traces", "Compact manifolds",
      "Dominating mixed smoothness"],
-    ["Besov and Sobolev spaces on measure spaces", "The torus"],
+    ["Besov and Sobolev spaces on measure spaces", "The torus", "Daubechies wavelets"],
     ["Differences and local means", "Piecewise polynomials on intervals",
      "The Haar system and multiwavelets", "Splines", "The cube",
      "Dominating mixed smoothness"],
