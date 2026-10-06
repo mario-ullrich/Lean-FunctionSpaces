@@ -5,10 +5,12 @@ leanblueprint (through plastexdepgraph) writes the dependency graph as DOT sourc
 ``dep_graph_document.html``, where the browser lays it out with Graphviz. With every result
 of the project the graph has several hundred nodes. This script rewrites the DOT source:
 
-* **Helper lemmas are hidden.** A lemma used by exactly one node of its own chapter, and fully
-  proved, is a step inside that node's proof. It is left out, and every arrow into it now
-  points to the node that uses it. The transitive reduction is then taken again, as
-  plastexdepgraph does, so no arrow repeats what a path already says.
+* **Steps are hidden.** The graph keeps the theorems, the corollaries and the definitions
+  they use. A lemma or proposition that is fully proved is a step towards them (``STEPS``),
+  and a definition used only by steps belongs to them; both are left out, and every arrow
+  into one of them now points to the results that use it. The transitive reduction is then
+  taken again, as plastexdepgraph does, so no arrow repeats what a path already says. A lemma
+  or proposition without a complete proof stays, so the graph shows what is left to prove.
 * **Every edge is drawn solid.** plastexdepgraph dashes the edges that come from a ``\\uses``
   inside a statement; here they only say that a statement uses a definition, and an arrow
   through a hidden lemma has no single kind, so one kind of arrow suffices.
@@ -171,8 +173,11 @@ CLUSTER_ATTRS = ('labeljust=l; style=rounded; color="#b0b0b0"; fontcolor="#80808
 # Fill colours of a node whose proof is formalized (alone, or with all its ancestors).
 PROVED = {"#B0ECA3", "#1CAC78"}
 
-LEGEND_ROW = ("<dt>Not shown</dt><dd>lemmas used by a single result of the same chapter; "
-              "their arrows pass through to that result</dd>")
+# The label prefixes of the steps: the kinds of result that the graph leaves out once proved.
+STEPS = ("lem", "prop")
+
+LEGEND_ROW = ("<dt>Not shown</dt><dd>lemmas and propositions, and the definitions only they "
+              "use; their arrows pass through to the theorems</dd>")
 
 DOT_RE = re.compile(r"renderDot\(`(.*?)`\)", re.S)
 BACKSLASH = re.escape("\\")
@@ -384,16 +389,16 @@ def main() -> int:
             print("  " + line)
         return 1
 
-    # Hide the helper lemmas and let their arrows pass through.
+    # Hide the steps and let their arrows pass through: every proved lemma and proposition,
+    # and every definition whose users are all steps. A definition nothing uses stays, as an
+    # isolated node that shows the gap in the `\uses` of the blueprint.
     succ: dict[str, set[str]] = defaultdict(set)
     for u, v in edges:
         succ[u].add(v)
-    hidden = {
-        n for n, a in nodes.items()
-        if n.startswith("lem:") and len(succ[n]) == 1
-        and places[next(iter(succ[n]))][0] == places[n][0]
-        and a.get("fillcolor") in PROVED
-    }
+    steps = {n for n, a in nodes.items()
+             if n.split(":")[0] in STEPS and a.get("fillcolor") in PROVED}
+    hidden = steps | {n for n in nodes
+                      if n.startswith("def:") and succ[n] and succ[n] <= steps}
 
     def targets(n: str) -> set[str]:
         out, stack = set(), list(succ[n])
@@ -439,7 +444,7 @@ def main() -> int:
     (Path(args.web) / GROUPED_PAGE).write_text(grouped_html, encoding="utf-8")
 
     between = sum(1 for u, v in new_edges if block[u] != block[v])
-    print(f"nodes: {len(nodes)}, hidden helper lemmas: {len(hidden)}, shown: {len(kept)}")
+    print(f"nodes: {len(nodes)}, hidden steps: {len(hidden)}, shown: {len(kept)}")
     print(f"edges: {len(edges)} before, {len(new_edges)} after, {between} between blocks")
     for index, (title, _) in enumerate(BLOCKS):
         print(f"  {sum(1 for n in kept if block[n] == index):3d}  {title}")
