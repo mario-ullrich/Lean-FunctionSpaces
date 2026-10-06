@@ -2482,8 +2482,9 @@ discontinuous. The comparison with moduli of smoothness is \Cref{cor:haar-besov}
 
 The Besov and Sobolev spaces of the previous chapters are defined through approximation. The
 classical definitions use moduli of smoothness and derivatives~\cite{Triebel, DeVoreLorentz}.
-This chapter shows that they coincide on $L_2(\T^d)$, and for moduli of smoothness on every
-$L_p(\T^d)$, $1 \leq p < \infty$, with the notation of \Cref{ch:torus}.
+This chapter shows that they coincide on $L_2(\T^d)$, and for moduli of smoothness and
+Littlewood--Paley blocks on every $L_p(\T^d)$, $1 \leq p < \infty$, with the notation of
+\Cref{ch:torus}.
 
 \section{Moduli of smoothness}
 
@@ -2878,6 +2879,169 @@ $L_p(\T^d)$ with inverse order $\theta = r$ (\Cref{def:modulus-data}): $C_0 = 2^
 inequality from $k_0 = 1$ on with the constant $2^r C_J$ (\Cref{thm:torus-lp-jackson}), and
 $C_B$ of \Cref{thm:torus-lp-bernstein}. \Cref{thm:modulus-coincidence} gives the equivalence.
 \end{proof}
+
+\section{Littlewood--Paley blocks on the torus}
+\label{sec:torus-lp-blocks}
+
+In this section $1 \leq p < \infty$, and the kernels of \Cref{def:lp-kernels} on $\R^d$ act on
+$L_p(\T^d)$ by convolution (\Cref{def:torus-econv}). Every identity between these operators is
+checked on the characters $e_m$, where it becomes an identity of Fourier multipliers
+(\Cref{thm:torus-econv-fourier}), and density of the characters carries it to all of
+$L_p(\T^d)$.
+
+\begin{lemma}[Identities of convolution operators on the torus]
+\label{lem:torus-econv-identities}
+\lean{Torus.ext_mFourierLp, Torus.econvLp_comp_econvLp, Torus.econvLp_comm,
+  Torus.econvLp_add_kernel, Torus.econvLp_sub_kernel, Torus.econvLp_eq_zero_of_mem}
+\leanok
+\uses{thm:torus-econv-fourier, lem:torus-econv-young, lem:fourier-conv, lem:fourier-dilate}
+Two bounded operators on $L_p(\T^d)$ that agree on every $e_m$, $m \in \Z^d$, are equal. For all
+$K, L \in L_1(\R^d)$ and every $f \in L_p(\T^d)$,
+\[
+  K * (L * f) = (K * L) * f = L * (K * f), \qquad (K \pm L) * f = K * f \pm L * f .
+\]
+For every $n \in \N$ and every $\Phi \in L_1(\R^d)$ with $\mathcal{F}\Phi(m) = 0$ whenever
+$\deg m < n$, $\Phi * a = 0$ for every $a \in \mathcal{T}_n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The characters span a dense subspace of $L_p(\T^d)$, so a bounded operator is determined by its
+values on them. All operators in the identities are bounded (\Cref{lem:torus-econv-young}) and
+multiply $e_m$ by $\mathcal{F}K(m) \, \mathcal{F}L(m) = \mathcal{F}(K * L)(m)$, respectively by
+$\mathcal{F}K(m) \pm \mathcal{F}L(m) = \mathcal{F}(K \pm L)(m)$ (\Cref{thm:torus-econv-fourier},
+\Cref{lem:fourier-conv,lem:fourier-dilate}). The last claim holds on the characters $e_m$ with
+$\deg m < n$, which span $\mathcal{T}_n$.
+\end{proof}
+
+\begin{theorem}[Approximate identities on the torus]
+\label{thm:torus-approx-identity}
+\lean{Torus.norm_econvLp_le, Torus.tendsto_econvLp_of_fourier, Torus.tendsto_econvLp_dilate,
+  Torus.tendsto_econvLp_Phi}
+\leanok
+\uses{lem:torus-econv-young, thm:torus-econv-fourier, lem:fourier-conv, lem:fourier-dilate,
+  lem:dilate, lem:lp-kernels-basic}
+Let $(\Phi_i)_{i \in I}$ be integrable kernels on $\R^d$, $\ell$ a filter on $I$ and
+$C < \infty$ with $\|\Phi_i\|_1 \leq C$ for every $i \in I$ and $\mathcal{F}\Phi_i(m) \to 1$ along
+$\ell$ for every $m \in \Z^d$. Then $\Phi_i * f \to f$ in $L_p(\T^d)$ along $\ell$ for every
+$f \in L_p(\T^d)$. In particular, for every $f \in L_p(\T^d)$:
+\begin{enumerate}
+  \item for every $K \in L_1(\R^d)$ with $\int K = 1$ and all $c_i > 0$, $i \in I$, with
+    $c_i \to \infty$ along $\ell$, $K_{c_i} * f \to f$ along $\ell$;
+  \item $\Phi_J * f \to f$ as $J \to \infty$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+The $f$ with $\Phi_i * f \to f$ form a linear subspace. It contains every $e_m$, since
+$\Phi_i * e_m = \mathcal{F}\Phi_i(m) \, e_m$ (\Cref{thm:torus-econv-fourier}). It is closed: the
+operators are bounded by $C$ (\Cref{lem:torus-econv-young}), hence equicontinuous, and the set
+where an equicontinuous family converges to the identity is closed. So it contains the closure
+of the span of the characters, which is $L_p(\T^d)$. For (1), $\mathcal{F}K_c(m) =
+\mathcal{F}K(m / c)$ (\Cref{lem:fourier-dilate}) tends to $\mathcal{F}K(0) = \int K = 1$ by the
+continuity of $\mathcal{F}K$ (\Cref{lem:fourier-conv}), and $\|K_c\|_1 = \|K\|_1$
+(\Cref{lem:dilate}). (2) is (1) with $K = \Phi$, $\ell$ the limit $J \to \infty$ and
+$c_J = 2^J$ (\Cref{lem:lp-kernels-basic}).
+\end{proof}
+
+\begin{definition}[Littlewood--Paley blocks on the torus]
+\label{def:torus-lp-blocks}
+\lean{Torus.lpBlock, Torus.littlewoodPaleyNorm}
+\leanok
+\uses{def:lp-kernels, lem:torus-econv-young, def:lq-norm}
+Let $s \in \R$ and $1 \leq q \leq \infty$. The Littlewood--Paley blocks of $f \in L_p(\T^d)$ are
+$\Delta_j f = \psi_j * f$, $j \in \N$, with the kernels $\psi_j$ of \Cref{def:lp-kernels} on
+$\R^d$, and the Littlewood--Paley quasi-norm is
+$\|f\|^{\mathrm{LP}}_{s,q} = \|(2^{js} \|\Delta_j f\|_p)_j\|_{\ell_q}$.
+\end{definition}
+
+\begin{lemma}[Bounds and reconstruction on the torus]
+\label{lem:torus-lp-blocks}
+\lean{Torus.enorm_lpBlock_le, Torus.lpBlock_succ, Torus.sum_lpBlock, Torus.tendsto_sum_lpBlock,
+  Torus.hasSum_lpBlock}
+\leanok
+\uses{def:torus-lp-blocks, lem:torus-econv-young, lem:torus-econv-identities,
+  thm:torus-approx-identity, lem:lp-kernels-basic}
+Let $f \in L_p(\T^d)$. For all $j, J \in \N$, $\|\Delta_j f\|_p \leq 2 \|\Phi\|_1 \|f\|_p$ and
+$\sum_{j=0}^J \Delta_j f = \Phi_J * f$, and $\sum_{j=0}^J \Delta_j f \to f$ in $L_p(\T^d)$ as
+$J \to \infty$. If $s > 0$, $1 \leq q \leq \infty$ and $\|f\|^{\mathrm{LP}}_{s,q} < \infty$,
+then $\sum_j \Delta_j f$ converges absolutely to $f$ in $L_p(\T^d)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bound is \Cref{lem:torus-econv-young} with $\|\psi_j\|_1 \leq 2 \|\Phi\|_1$
+(\Cref{lem:lp-kernels-basic}). The sum telescopes, since
+$\psi_{j+1} * f = \Phi_{j+1} * f - \Phi_j * f$ (\Cref{lem:torus-econv-identities}), and
+$\Phi_J * f \to f$ by \Cref{thm:torus-approx-identity}. For the last claim,
+$\|\Delta_j f\|_p \leq 2^{-js} \|f\|^{\mathrm{LP}}_{s,q}$ is summable.
+\end{proof}
+
+\begin{lemma}[Blocks and trigonometric polynomials]
+\label{lem:torus-lp-blocks-trig}
+\lean{Torus.lpBlock_mem_trigPolyLp, Torus.lpBlock_eq_zero_of_mem,
+  Torus.enorm_lpBlock_le_approxSeq}
+\leanok
+\uses{lem:torus-lp-blocks, thm:torus-econv-fourier, lem:torus-econv-identities,
+  lem:lp-kernels-frequency, lem:torus-proj, lem:error-basic}
+Let $f \in L_p(\T^d)$ and $i, j \in \N$. Then $\Delta_j f \in \mathcal{T}_{2^{j+1}}$. If
+$j \geq i + \#d + 1$, then $\Delta_j a = 0$ for every $a \in \mathcal{T}_{2^i}$, and
+\[
+  \|\Delta_j f\|_p \leq 2 \|\Phi\|_1 \, E_{2^i}(f)_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $\mathcal{F}\psi_j(m) \neq 0$, then $\deg m \leq |m| < 2^{j+1}$
+(\Cref{lem:lp-kernels-frequency,lem:torus-proj}), so \Cref{thm:torus-econv-fourier} gives the
+first claim. For $j = k + 1$ with $k \geq i + \#d$ and $\deg m < 2^i$,
+$|m| \leq \#d \deg m < 2^{\#d} 2^i \leq 2^k$, hence $\mathcal{F}\psi_j(m) = 0$
+(\Cref{lem:lp-kernels-frequency}) and $\Delta_j a = 0$ (\Cref{lem:torus-econv-identities}).
+Hence $\Delta_j f = \Delta_j (f - a)$ for $a \in \mathcal{T}_{2^i}$, and \Cref{lem:torus-lp-blocks}
+bounds it by $2 \|\Phi\|_1 \|f - a\|_p$.
+\end{proof}
+
+\begin{theorem}[Besov spaces on the torus by Littlewood--Paley blocks]
+\label{thm:torus-lp-besov}
+\lean{Torus.shiftedBlock, Torus.shiftedBlock_mem, Torus.hasSum_shiftedBlock,
+  Torus.lqNorm_shiftedBlock_le, Torus.approxNormDyadic_trigScheme_le,
+  Torus.littlewoodPaleyNorm_le_approxNormDyadic_trigScheme,
+  Torus.memBesov_iff_littlewoodPaleyNorm_lt_top}
+\leanok
+\uses{lem:torus-lp-blocks, lem:torus-lp-blocks-trig, thm:block-decomposition, def:dyadic-norm,
+  thm:dyadic-norm, def:besov, lem:lq-basic, lem:hardy}
+Let $1 \leq q \leq \infty$, let $A$ be the scheme of trigonometric polynomials in $L_p(\T^d)$,
+and let $f \in L_p(\T^d)$. For every $s > 0$,
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_q} \leq 2 \cdot 2^s (1 - 2^{-s})^{-1} \, \|f\|^{\mathrm{LP}}_{s,q} ,
+\]
+and for every $s \geq 0$,
+\[
+  \|f\|^{\mathrm{LP}}_{s,q} \leq 2 (\#d + 1) \, 2^{(\#d + 1) s} \, \|\Phi\|_1 \,
+  \|f\|^{\mathrm{dy}}_{A^s_q} .
+\]
+In particular, for every $s > 0$, $f \in \Besov{s}{p}{q}(\T^d)$ if and only if
+$\|f\|^{\mathrm{LP}}_{s,q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Put $g_0 = 0$ and $g_{k+1} = \Delta_k f$. Then $g_k \in \mathcal{T}_{2^k}$ by
+\Cref{lem:torus-lp-blocks-trig}, a finite Littlewood--Paley quasi-norm makes $f = \sum_k g_k$ a
+block decomposition (\Cref{lem:torus-lp-blocks}), and
+$\|(2^{ks} \|g_k\|_p)_k\|_{\ell_q} \leq 2^s \|f\|^{\mathrm{LP}}_{s,q}$, since shifting a sequence
+keeps its $\ell_q$ norm or lowers it (\Cref{lem:hardy}); \Cref{thm:block-decomposition} gives the
+first
+inequality. For the second, split off the first $M = \#d + 1$ terms (\Cref{lem:lq-basic}):
+$2^{js} \|\Delta_j f\|_p \leq 2^{Ms} \cdot 2 \|\Phi\|_1 \|f\|_p$ for $j < M$, and
+$2^{(j+M)s} \|\Delta_{j+M} f\|_p \leq 2^{Ms} \cdot 2 \|\Phi\|_1 \, 2^{js} E_{2^j}(f)_p$ by
+\Cref{lem:torus-lp-blocks-trig}.
+\end{proof}
+
+For $p = 2$ the sharp dyadic blocks of the Fourier coefficients describe the same spaces
+(\Cref{thm:torus-coefficients}); the smooth blocks work for every $1 \leq p < \infty$.
 
 \section{Weak derivatives}
 
@@ -5591,6 +5755,31 @@ $\widehat{f - g} = \widehat f - \widehat g$.
 \begin{proof}
 \leanok
 Substitute $y = c x$ and use $\langle c x, c^{-1} \xi \rangle = \langle x, \xi \rangle$.
+\end{proof}
+
+\begin{lemma}[Fourier transforms of convolutions]
+\label{lem:fourier-conv}
+\lean{Rd.fourier_conv, Rd.fourier_add_apply, Rd.fourier_apply_zero,
+  Rd.continuous_fourier_of_integrable}
+\leanok
+\uses{def:conv}
+For all integrable $K, L : V \to \C$ and every $\xi \in V$,
+\[
+  \widehat{K * L}(\xi) = \widehat K(\xi) \, \widehat L(\xi), \qquad
+  \widehat{K + L}(\xi) = \widehat K(\xi) + \widehat L(\xi), \qquad
+  \widehat K(0) = \int_V K ,
+\]
+and $\widehat K$ is continuous.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The product formula is Fubini's theorem with $e^{-2\pi i \langle x + y, \xi \rangle} =
+e^{-2\pi i \langle x, \xi \rangle} e^{-2\pi i \langle y, \xi \rangle}$ (Mathlib's
+\texttt{Real.\allowbreak fourier\_\allowbreak bilin\_\allowbreak convolution\_\allowbreak eq}).
+The sum rule is the linearity of the integral (Mathlib's
+\texttt{VectorFourier.\allowbreak fourierIntegral\_\allowbreak add}), and the continuity follows
+from dominated convergence with the majorant $|K|$.
 \end{proof}
 
 \begin{definition}[Cut-offs and kernels]
@@ -9045,6 +9234,112 @@ For $q = 2$ the theorem places $F^s_{p,2}$ between $\Besov{s}{p}{\min(p,2)}$ and
 $\Besov{s}{p}{\max(p,2)}$: for $p \geq 2$ between $\Besov{s}{p}{2}$ and $\Besov{s}{p}{p}$, for
 $p \leq 2$ between $\Besov{s}{p}{p}$ and $\Besov{s}{p}{2}$.
 
+\section{Triebel--Lizorkin spaces on the torus}
+
+The Littlewood--Paley blocks on the torus are those of \Cref{def:torus-lp-blocks}, and
+$\Besov{s}{p}{q}(\T^d)$ is the approximation space of the trigonometric polynomials in
+$L_p(\T^d)$, $1 \leq p < \infty$.
+
+\begin{definition}[Triebel--Lizorkin spaces on the torus]
+\label{def:torus-triebel-lizorkin}
+\lean{Torus.blockFun, Torus.lpBlock_ae_eq_blockFun, Torus.aestronglyMeasurable_blockFun,
+  Torus.enorm_lpBlock_eq_eLpNorm_blockFun, Torus.triebelLizorkinNorm, Torus.MemTriebelLizorkin,
+  Torus.aemeasurable_lqNorm_blockFun, Torus.littlewoodPaleyNorm_eq_lqNorm_eLpNorm}
+\leanok
+\uses{def:torus-lp-blocks, def:torus-econv, def:lq-norm}
+Let $1 \leq p < \infty$, $s \in \R$ and $1 \leq q \leq \infty$. For $f \in L_p(\T^d)$ and
+$j \in \N$ the pointwise block is $(\psi_j * f)(t) = \int_{\R^d} \psi_j(y) f(t - \pi y) \, dy$
+at every $t \in \T^d$; it represents the block $\Delta_j f \in L_p(\T^d)$. The
+Triebel--Lizorkin quasi-norm of $f$ is
+\[
+  \|f\|_{F^s_{p,q}} = \Bigl\| t \mapsto \bigl\| (2^{js} |(\psi_j * f)(t)|)_{j \in \N}
+  \bigr\|_{\ell_q} \Bigr\|_{L_p(\T^d)},
+\]
+and $F^s_{p,q}(\T^d)$ consists of the $f \in L_p(\T^d)$ with $\|f\|_{F^s_{p,q}} < \infty$.
+\end{definition}
+
+\begin{proposition}[Elementary properties on the torus]
+\label{prop:torus-tl-elementary}
+\lean{Torus.blockFun_add_ae, Torus.blockFun_smul_ae, Torus.triebelLizorkinNorm_add_le,
+  Torus.triebelLizorkinNorm_smul, Torus.triebelLizorkinNorm_zero,
+  Torus.triebelLizorkinNorm_mono_exponent, Torus.triebelLizorkinNorm_mono_smoothness,
+  Torus.MemTriebelLizorkin.mono_exponent, Torus.MemTriebelLizorkin.mono_smoothness,
+  Torus.MemTriebelLizorkin.add, Torus.MemTriebelLizorkin.smul, Torus.triebelLizorkinSpace,
+  Torus.mem_triebelLizorkinSpace}
+\leanok
+\uses{def:torus-triebel-lizorkin, lem:torus-econv-young, lem:lq-basic, lem:lp-norm-nonnegative}
+For every $1 \leq p < \infty$, all $s \leq t$ in $\R$, all $1 \leq q \leq r \leq \infty$, all
+$f, g \in L_p(\T^d)$ and every $c \in \C$, for almost every $x \in \T^d$ and all $j \in \N$,
+\[
+  (\psi_j * (f + g))(x) = (\psi_j * f)(x) + (\psi_j * g)(x), \qquad
+  (\psi_j * (c f))(x) = c \, (\psi_j * f)(x),
+\]
+and
+\[
+  \|f + g\|_{F^s_{p,q}} \leq \|f\|_{F^s_{p,q}} + \|g\|_{F^s_{p,q}}, \qquad
+  \|c f\|_{F^s_{p,q}} = |c| \, \|f\|_{F^s_{p,q}},
+\]
+\[
+  \|f\|_{F^s_{p,r}} \leq \|f\|_{F^s_{p,q}}, \qquad \|f\|_{F^s_{p,q}} \leq \|f\|_{F^t_{p,q}} .
+\]
+In particular $F^s_{p,q}(\T^d)$ is a linear subspace of $L_p(\T^d)$,
+$F^s_{p,q}(\T^d) \subseteq F^s_{p,r}(\T^d)$ and $F^t_{p,q}(\T^d) \subseteq F^s_{p,q}(\T^d)$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+The pointwise block depends on $f$ only through its class, and the convolution integral is
+linear in $f$. Since $L_p(\T^d) \subseteq L_1(\T^d)$, the integrals converge absolutely at almost
+every point (\Cref{lem:torus-econv-young}), which gives the identities for the pointwise blocks,
+for all $j$ at once. The rest is the proof of \Cref{prop:tl-elementary}.
+\end{proof}
+
+\begin{theorem}[$F^s_{p,p}(\T^d) = \Besov{s}{p}{p}(\T^d)$ and the Besov sandwich on the torus]
+\label{thm:torus-tl-besov-sandwich}
+\lean{Torus.triebelLizorkinNorm_eq_littlewoodPaleyNorm, Torus.memTriebelLizorkin_iff_memBesov,
+  Torus.memTriebelLizorkin_iff_modulus, Torus.littlewoodPaleyNorm_max_le_triebelLizorkinNorm,
+  Torus.triebelLizorkinNorm_le_littlewoodPaleyNorm_min,
+  Torus.approxNormDyadic_le_triebelLizorkinNorm, Torus.triebelLizorkinNorm_le_approxNormDyadic,
+  Torus.memBesov_of_memTriebelLizorkin, Torus.memTriebelLizorkin_of_memBesov}
+\leanok
+\uses{def:torus-triebel-lizorkin, cor:mixed-norm-sandwich, thm:torus-lp-besov, def:dyadic-norm,
+  thm:torus-lp-moduli}
+For every $1 \leq p < \infty$, every $s \in \R$, every $1 \leq q \leq \infty$ and every
+$f \in L_p(\T^d)$,
+\[
+  \|f\|^{\mathrm{LP}}_{s,\max(p,q)} \leq \|f\|_{F^s_{p,q}} \leq \|f\|^{\mathrm{LP}}_{s,\min(p,q)} ,
+  \qquad \|f\|_{F^s_{p,p}} = \|f\|^{\mathrm{LP}}_{s,p} .
+\]
+Let $A$ be the scheme of trigonometric polynomials in $L_p(\T^d)$. If $s \geq 0$, then
+\[
+  \|f\|_{F^s_{p,q}} \leq 2 (\#d + 1) \, 2^{(\#d + 1) s} \, \|\Phi\|_1 \,
+  \|f\|^{\mathrm{dy}}_{A^s_{\min(p,q)}} .
+\]
+If $s > 0$, then
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_{\max(p,q)}} \leq 2 \cdot 2^s (1 - 2^{-s})^{-1} \, \|f\|_{F^s_{p,q}} ,
+\]
+$f \in F^s_{p,p}(\T^d)$ if and only if $f \in \Besov{s}{p}{p}(\T^d)$, for every $r \in \N$ with
+$s < r$, $f \in F^s_{p,p}(\T^d)$ if and only if
+$\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_p} < \infty$, and
+\[
+  \Besov{s}{p}{\min(p,q)}(\T^d) \subseteq F^s_{p,q}(\T^d) \subseteq \Besov{s}{p}{\max(p,q)}(\T^d) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The $L_p$ norm of the pointwise block $\psi_j * f$ is $\|\Delta_j f\|_p$, so the bounds are
+\Cref{cor:mixed-norm-sandwich} for the family $g_j = 2^{js} |\psi_j * f|$ on $\T^d$. The
+characterisation of $\Besov{s}{p}{q}(\T^d)$ by Littlewood--Paley blocks
+(\Cref{thm:torus-lp-besov}) at the exponents $p$, $\max(p,q)$ and $\min(p,q)$ gives the
+bounds by the approximation norms and the statements on spaces; the description by moduli of
+smoothness is \Cref{thm:torus-lp-moduli} with $q = p$.
+\end{proof}
+
+As on $\R^n$, for $q = 2$ the theorem places $F^s_{p,2}(\T^d)$ between
+$\Besov{s}{p}{\min(p,2)}(\T^d)$ and $\Besov{s}{p}{\max(p,2)}(\T^d)$.
+
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
 
@@ -10224,6 +10519,8 @@ Descriptions & Range & Result \\
   & $s > 0$ & \Cref{thm:torus-coefficients} \\
 \raggedright Trigonometric approximation and differences of order $r$, $1 \leq p < \infty$
   & $0 < s < r$ & \Cref{thm:torus-lp-moduli} \\
+\raggedright Trigonometric approximation and smooth Littlewood--Paley blocks, $1 \leq p < \infty$
+  & $s > 0$ & \Cref{thm:torus-lp-besov} \\
 \raggedright Weak derivatives, Fourier coefficients and approximation: $\Sob{m}{2} = H^m = \Besov{m}{2}{2}$
   & $m \geq 1$ & \Cref{thm:weak-sobolev} \\
 \hline
@@ -10417,7 +10714,8 @@ only integrable kernels, Young's inequality and the kernel identities
 (\Cref{thm:young,thm:kernel-identities}). On the torus the kernels of $\R^n$ act by convolution
 with their periodisations, and their Fourier transforms at the lattice points are Fourier
 multipliers; this transfers Jackson's and Bernstein's inequalities to every $L_p(\T^n)$
-(\Cref{thm:torus-econv-fourier,thm:torus-lp-moduli}).
+(\Cref{thm:torus-econv-fourier,thm:torus-lp-moduli}), and the smooth blocks $\psi_j * f$
+describe $\Besov{s}{p}{q}(\T^n)$ for every $1 \leq p < \infty$ (\Cref{thm:torus-lp-besov}).
 
 \paragraph{Coordinates, directions and mixed smoothness.} On the cube the coordinate moduli, with
 differences along one coordinate at a time, and the isotropic modulus, with differences in every

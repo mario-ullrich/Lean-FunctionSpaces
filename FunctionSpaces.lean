@@ -41,6 +41,8 @@ public import FunctionSpaces.Torus.BesovModuli
 public import FunctionSpaces.Torus.EuclideanConvolution
 public import FunctionSpaces.Torus.LpJackson
 public import FunctionSpaces.Torus.LpBesovModuli
+public import FunctionSpaces.Torus.EuclideanConvolutionIdentities
+public import FunctionSpaces.Torus.LittlewoodPaley
 public import FunctionSpaces.Torus.WeakDerivatives
 public import FunctionSpaces.Traces.Examples.Torus
 public import FunctionSpaces.Interval.Differences
@@ -130,6 +132,7 @@ public import FunctionSpaces.Rd.MixedLocalMeans
 public import FunctionSpaces.Rd.MixedLittlewoodPaley
 public import FunctionSpaces.Rd.HyperbolicCross
 public import FunctionSpaces.Rd.TriebelLizorkin
+public import FunctionSpaces.Torus.TriebelLizorkin
 
 /-!
 # Function spaces
@@ -210,6 +213,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   polynomials in `L_p(𝕋^d)`, `1 ≤ p < ∞`, with moduli of every order.
 * `FunctionSpaces.Torus.LpBesovModuli`: the Besov spaces `B^s_{p,q}(𝕋^d)` through moduli of
   smoothness for all `1 ≤ p < ∞`.
+* `FunctionSpaces.Torus.EuclideanConvolutionIdentities`: identities of the convolution
+  operators on the torus through their Fourier multipliers, and approximate identities.
+* `FunctionSpaces.Torus.LittlewoodPaley`: Littlewood–Paley blocks on the torus and the
+  characterisation of `B^s_{p,q}(𝕋^d)` by them for all `1 ≤ p < ∞`.
 * `FunctionSpaces.Torus.WeakDerivatives`: weak derivatives on the torus through Fourier
   coefficients and `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)`.
 * `FunctionSpaces.Traces.Examples.Torus`: the trace on the face `{x_0 = 0}` of `𝕋^(n+1)`,
@@ -400,4 +407,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.TriebelLizorkin`: the Triebel–Lizorkin quasi-norm by Littlewood–Paley
   blocks, `F^s_{p,p} = B^s_{p,p}` and the sandwich
   `B^s_{p,min(p,q)} ⊆ F^s_{p,q} ⊆ B^s_{p,max(p,q)}`.
+* `FunctionSpaces.Torus.TriebelLizorkin`: the Triebel–Lizorkin quasi-norm on the torus,
+  `F^s_{p,p}(𝕋^d) = B^s_{p,p}(𝕋^d)` and the Besov sandwich on the torus.
 -/

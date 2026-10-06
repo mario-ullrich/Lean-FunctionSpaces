@@ -47,6 +47,20 @@ of the block.
   `Rd.memApprox_of_memTriebelLizorkin`), where `B^s_{p,q}` is the approximation space `A^s_q` of
   the band-limited classes, with explicit constants
   (`Rd.approxNormDyadic_le_triebelLizorkinNorm`, `Rd.triebelLizorkinNorm_le_approxNormDyadic`).
+* **Triebel–Lizorkin spaces and the Besov sandwich on the torus.** For `f ∈ L_p(𝕋^d)`,
+  `1 ≤ p < ∞`, the same quasi-norm with the blocks `ψ_j ⋆ f(t) = ∫ ψ_j(y) f(t - π y) dy` of the
+  kernels on `ℝ^d`, with the quotient map `π : ℝ^d → 𝕋^d`, defines `F^s_{p,q}(𝕋^d)`
+  (`Torus.triebelLizorkinNorm`, `Torus.MemTriebelLizorkin`). The same bounds hold
+  (`Torus.littlewoodPaleyNorm_max_le_triebelLizorkinNorm`,
+  `Torus.triebelLizorkinNorm_le_littlewoodPaleyNorm_min`), and for `s > 0`,
+  `F^s_{p,p}(𝕋^d) = B^s_{p,p}(𝕋^d)` (`Torus.memTriebelLizorkin_iff_memBesov`), also described by
+  moduli of smoothness (`Torus.memTriebelLizorkin_iff_modulus`), and
+  `B^s_{p,min(p,q)}(𝕋^d) ⊆ F^s_{p,q}(𝕋^d) ⊆ B^s_{p,max(p,q)}(𝕋^d)`
+  (`Torus.memTriebelLizorkin_of_memBesov`, `Torus.memBesov_of_memTriebelLizorkin`), with explicit
+  constants (`Torus.approxNormDyadic_le_triebelLizorkinNorm`,
+  `Torus.triebelLizorkinNorm_le_approxNormDyadic`), where
+  `B^s_{p,q}(𝕋^d)` is the approximation space of the trigonometric polynomials, described by the
+  Littlewood–Paley blocks of [the torus](Torus.md).
 
 ## What is formalised
 
@@ -64,7 +78,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Local means characterisation of Triebel–Lizorkin spaces | ⬜ | ✗ | `Rd/TriebelLizorkinLocalMeans` |
 | Ball means of differences | ⬜ | ✗ | `Rd/TriebelLizorkinDifferences` |
 | Atomic characterisation | ⬜ | ✗ | `Rd/TriebelLizorkinAtoms` |
-| Triebel–Lizorkin spaces on the torus, the Besov sandwich | ⬜ | ✗ | `Torus/TriebelLizorkin` |
+| Triebel–Lizorkin spaces on the torus, the Besov sandwich | ✅ | ✗ | `Torus/TriebelLizorkin` |
 | The periodic lift of functions on the torus | ⬜ | ✗ | `Torus/PeriodicLift` |
 | The Fefferman–Stein inequality for periodic lifts | ⬜ | ✗ | `Torus/FeffermanStein` |
 | Local means on the torus | ⬜ | ✗ | `Torus/TriebelLizorkinLocalMeans` |

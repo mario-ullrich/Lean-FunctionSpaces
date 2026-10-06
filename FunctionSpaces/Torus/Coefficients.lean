@@ -21,9 +21,10 @@ For `f ∈ L_2(𝕋^d)` with Fourier coefficients `f̂(k)`, and `s > 0`:
   `Torus.enorm_fourierBlock_sq`.
 
 Both are the spectral statements of `FunctionSpaces.Spectral.Blocks` for the Fourier basis,
-transported along `Torus.toLp_trigScheme_eq`.  For `p ≠ 2` the Littlewood–Paley
-characterisation needs smooth cut-offs and a Fourier multiplier theorem, which is not
-available in Mathlib.
+transported along `Torus.toLp_trigScheme_eq`.  The smooth Littlewood–Paley blocks
+`Torus.lpBlock` describe `B^s_{p,q}(𝕋^d)` for every `1 ≤ p < ∞`
+(`Torus.memBesov_iff_littlewoodPaleyNorm_lt_top`). The Littlewood–Paley identity
+`F^0_{p,2}(𝕋^d) = L_p(𝕋^d)`, `1 < p < ∞`, needs a Fourier multiplier theorem.
 -/
 
 @[expose] public section

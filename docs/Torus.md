@@ -9,8 +9,9 @@ polynomials of degree `< n`. They satisfy the Nikolskii inequality, so all the e
 describe `B^s_{2,q}`, `H^s` and the Sobolev spaces of weak derivatives. For every `1 ≤ p < ∞`
 the Besov spaces are described by moduli of smoothness of every order: the kernels of `ℝ^d` act
 on `𝕋^d` by convolution with their periodisations, using Young's inequality on measurable groups
-and the band-limited approximation of [Function spaces on `ℝ^d`](Rd.md). The restriction to a
-face of `𝕋^(n+1)` is the model case of the trace theorem.
+and the band-limited approximation of [Function spaces on `ℝ^d`](Rd.md); the same kernels give
+smooth Littlewood–Paley blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. The
+restriction to a face of `𝕋^(n+1)` is the model case of the trace theorem.
 
 ## Main results
 
@@ -28,6 +29,15 @@ face of `𝕋^(n+1)` is the model case of the trace theorem.
   transforms at the lattice points as multipliers (`Torus.econv_mFourier`); this transfers
   Jackson's inequality (`Torus.approxSeq_trigScheme_le`) and Bernstein's inequality
   (`Torus.lpModulus_le_of_mem_trigPolyLp`) from band-limited approximation on `ℝ^d`.
+* **Besov spaces on the torus through Littlewood–Paley blocks.** Let `ψ_j` be the
+  Littlewood–Paley kernels on `ℝ^d` of [Function spaces on `ℝ^d`](Rd.md), acting on `𝕋^d` by
+  convolution, and `Δ_j f = ψ_j ⋆ f` (`Torus.lpBlock`). For every `1 ≤ p < ∞`, `s > 0` and
+  `1 ≤ q ≤ ∞`, `f ∈ B^s_{p,q}(𝕋^d)` iff `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_q} < ∞`
+  (`Torus.memBesov_iff_littlewoodPaleyNorm_lt_top`), with explicit constants in both directions
+  (`Torus.approxNormDyadic_trigScheme_le`,
+  `Torus.littlewoodPaleyNorm_le_approxNormDyadic_trigScheme`). The identities between the
+  convolution operators follow from their Fourier multipliers and the density of the
+  trigonometric polynomials (`Torus.econvLp_comp_econvLp`, `Torus.tendsto_econvLp_of_fourier`).
 * **Traces on the torus.** For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `s > 0`, the restriction
   `f ↦ f(0, ·)` to the face `{x_0 = 0}` of `𝕋^(n+1)` extends from trigonometric polynomials to
   a map from `B^{s+1/p}_{p,q}(𝕋^(n+1))` into `B^s_{p,q}(𝕋^n)`, and every element of
@@ -75,6 +85,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ | ✗ | `Torus/Translation`, `Torus/Modulus`, `Torus/BesovModuli` |
 | Convolution on the torus with kernels on `ℝ^d`: Young's inequality, Fourier multipliers, differences | ✅ | ✗ | `Torus/EuclideanConvolution` |
 | Jackson's and Bernstein's inequalities in `L_p(𝕋^d)`, moduli of every order | ✅ | ✗ | `Torus/LpJackson` |
+| Convolution identities, approximate identities | ✅ | ✗ | `Torus/EuclideanConvolutionIdentities` |
+| Littlewood–Paley blocks, Besov spaces by them for `1 ≤ p < ∞` | ✅ | ✗ | `Torus/LittlewoodPaley` |
 | Besov spaces on the torus by moduli of smoothness for all `1 ≤ p < ∞` | ✅ | ✗ | `Torus/LpBesovModuli` |
 | Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ | ✗ | `Traces/Examples/Torus` |
 | Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ | ✗ | `Torus/WeakDerivatives` |
