@@ -1775,26 +1775,6 @@ On the Fourier side, multiplication by $e^{-2\pi i k \xi}$ is translation by $k$
 dilation by $2$ turns the refinement identity $\Phi(2\xi) = m_0(\xi) \Phi(\xi)$ into the
 refinement equation.
 
-\begin{lemma}[Modulation]
-\label{lem:daub-modulation}
-\lean{Daubechies.expFreq_mul_eq_exp, Daubechies.fourierInv_expFreq_mul_apply,
-  Daubechies.integrable_expFreq_mul}
-\leanok
-For every $f : \R \to \C$ and all $a, x \in \R$,
-\[
-  \mathcal F^{-1}\bigl[\xi \mapsto e^{-2\pi i a \xi} f(\xi)\bigr](x) = \mathcal F^{-1} f(x - a) .
-\]
-If $f$ is integrable, then so is $\xi \mapsto e^{-2\pi i a \xi} f(\xi)$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-fourier-translate, lem:daub-exp}
-Since $e^{-2\pi i a \xi} = e^{2\pi i (-a) \xi}$, the identity is item~3 of
-\Cref{lem:daub-fourier-translate} with $b = -a$. The factor $e^{-2\pi i a \xi}$ is continuous and
-has modulus $1$ (\Cref{lem:daub-exp}).
-\end{proof}
-
 \begin{definition}[The scaling function]
 \label{def:daub-scaling-function}
 \lean{Daubechies.scalingFun, Daubechies.scalingFun_eq_integral}
@@ -1827,29 +1807,11 @@ Daubechies mask of order $N \geq 2$ the scaling function $\varphi$ is continuous
 (\Cref{prop:daub-symbol-product-integrable}).
 \end{proof}
 
-\begin{lemma}[The refinement identity and the dilation by $2$]
-\label{lem:daub-refinement-steps}
-\lean{Daubechies.symbolProduct_two_mul_eq_sum, Daubechies.scalingFun_eq_two_mul_fourierInv}
-\leanok
-\uses{def:daub-scaling-function, def:daub-symbol}
-For every Daubechies mask of order $N$ and every $\xi \in \R$,
-\[
-  \Phi(2\xi) = \sum_{k=0}^{2N-1} \frac{c_k}{2} \, e^{-2\pi i k \xi} \, \Phi(\xi) ,
-\]
-and for every $x \in \R$, $\varphi(x) = 2 \mathcal F^{-1}\bigl[\xi \mapsto \Phi(2\xi)\bigr](2x)$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{prop:daub-refinement-identity, lem:daub-symbol-sum, lem:daub-fourier-dilate}
-The first identity is $\Phi(2\xi) = m_0(\xi) \Phi(\xi)$ (\Cref{prop:daub-refinement-identity})
-with $m_0(\xi) = \frac12 \sum_k c_k e^{-2\pi i k \xi}$ (\Cref{lem:daub-symbol-sum}). The second
-is item~2 of \Cref{lem:daub-fourier-dilate} with $a = 2$, at the point $2x$.
-\end{proof}
-
 \begin{theorem}[The refinement equation]
 \label{thm:daub-refinement-equation}
-\lean{Daubechies.scalingFun_refine}
+\lean{Daubechies.scalingFun_refine, Daubechies.expFreq_mul_eq_exp,
+  Daubechies.fourierInv_expFreq_mul_apply, Daubechies.integrable_expFreq_mul,
+  Daubechies.symbolProduct_two_mul_eq_sum, Daubechies.scalingFun_eq_two_mul_fourierInv}
 \leanok
 \uses{def:daub-scaling-function, def:daub-symbol}
 For every Daubechies mask of order $N \geq 2$ and every $x \in \R$,
@@ -1860,13 +1822,30 @@ For every Daubechies mask of order $N \geq 2$ and every $x \in \R$,
 
 \begin{proof}
 \leanok
-\uses{lem:daub-refinement-steps, lem:daub-modulation, lem:daub-fourier-linear,
+\uses{lem:daub-fourier-translate, lem:daub-exp, prop:daub-refinement-identity,
+  lem:daub-symbol-sum, lem:daub-fourier-dilate, lem:daub-fourier-linear,
   prop:daub-symbol-product-integrable}
-By \Cref{lem:daub-refinement-steps}, $\varphi(x) = 2 \mathcal F^{-1} F(2x)$ for the function
+First, modulation: for every $f : \R \to \C$ and all $a, x \in \R$,
+\[
+  \mathcal F^{-1}\bigl[\xi \mapsto e^{-2\pi i a \xi} f(\xi)\bigr](x) = \mathcal F^{-1} f(x - a) ,
+\]
+since $e^{-2\pi i a \xi} = e^{2\pi i (-a) \xi}$ and item~3 of \Cref{lem:daub-fourier-translate}
+applies with $b = -a$; and if $f$ is integrable, then so is
+$\xi \mapsto e^{-2\pi i a \xi} f(\xi)$, since this factor is continuous and has modulus $1$
+(\Cref{lem:daub-exp}). Second, for every $\xi \in \R$,
+\[
+  \Phi(2\xi) = \sum_{k=0}^{2N-1} \frac{c_k}{2} \, e^{-2\pi i k \xi} \, \Phi(\xi) ,
+\]
+which is $\Phi(2\xi) = m_0(\xi) \Phi(\xi)$ (\Cref{prop:daub-refinement-identity}) with
+$m_0(\xi) = \frac12 \sum_k c_k e^{-2\pi i k \xi}$ (\Cref{lem:daub-symbol-sum}), and
+$\varphi(x) = 2 \mathcal F^{-1}\bigl[\xi \mapsto \Phi(2\xi)\bigr](2x)$ by item~2 of
+\Cref{lem:daub-fourier-dilate} with $a = 2$, at the point $2x$.
+
+Hence $\varphi(x) = 2 \mathcal F^{-1} F(2x)$ for the function
 $F(\xi) = \sum_k \frac{c_k}{2} e^{-2\pi i k \xi} \Phi(\xi)$. Its summands are integrable since
-$\Phi$ is (\Cref{prop:daub-symbol-product-integrable,lem:daub-modulation}), so the inverse
-transform is linear on them (\Cref{lem:daub-fourier-linear}), and by \Cref{lem:daub-modulation}
-the $k$-th term becomes $c_k \mathcal F^{-1} \Phi(2x - k) = c_k \varphi(2x - k)$.
+$\Phi$ is (\Cref{prop:daub-symbol-product-integrable}), so the inverse transform is linear on
+them (\Cref{lem:daub-fourier-linear}), and by modulation the $k$-th term becomes
+$c_k \mathcal F^{-1} \Phi(2x - k) = c_k \varphi(2x - k)$.
 \end{proof}
 
 \begin{proposition}[The scaling function is real]
@@ -1906,28 +1885,6 @@ $[0, 1)$, and
 \]
 \end{definition}
 
-\begin{lemma}[Support of the cascade]
-\label{lem:daub-cascade-support}
-\lean{Daubechies.mem_Icc_of_two_mul_sub_mem_Icc, Daubechies.cascade_eq_zero,
-  Daubechies.integral_cascade_mul_eq_zero}
-\leanok
-\uses{def:daub-cascade}
-For all real numbers $k$, $b$ and $x$ with $0 \leq k \leq b$ and $2x - k \in [0, b]$,
-$x \in [0, b]$. For every Daubechies mask of order $N$, every $n \in \N$ and every
-$x \notin [0, 2N - 1]$, $\eta_n(x) = 0$; hence $\int_\R \eta_n g = 0$ for every
-$g : \R \to \C$ that vanishes on $[0, 2N - 1]$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{def:daub-mask}
-From $2x - k \geq 0$, $x \geq k/2 \geq 0$, and from $2x - k \leq b$, $x \leq (b + k)/2 \leq b$.
-The second statement follows by induction on $n$: $[0, 1) \subseteq [0, 2N - 1]$ since
-$N \geq 1$ (\Cref{def:daub-mask}), and for $x \notin [0, 2N - 1]$ and $0 \leq k \leq 2N - 1$ the
-point $2x - k$ lies outside $[0, 2N - 1]$ by the first statement. Then $\eta_n g$ vanishes
-everywhere.
-\end{proof}
-
 \begin{lemma}[Integrability of the cascade]
 \label{lem:daub-cascade-integrable}
 \lean{Daubechies.integrable_const_mul_comp_two_mul_sub, Daubechies.integrable_cascade}
@@ -1942,23 +1899,6 @@ function $\eta_n$ is integrable.
 \leanok
 Translations and dilations of $\R$ preserve integrability. Induction on $n$: $1_{[0, 1)}$ is
 integrable, and $\eta_{n+1}$ is a finite sum of functions $x \mapsto c_k \eta_n(2x - k)$.
-\end{proof}
-
-\begin{lemma}[The first function of the cascade]
-\label{lem:daub-cascade-zero}
-\lean{Daubechies.integral_cascade_zero, Daubechies.integral_norm_cascade_zero,
-  Daubechies.fourier_cascade_zero_apply_zero, Daubechies.norm_fourier_cascade_zero_le_one}
-\leanok
-\uses{def:daub-cascade}
-For every Daubechies mask, $\int_\R \eta_0 = \int_\R |\eta_0| = 1$, $\widehat{\eta_0}(0) = 1$,
-and $|\widehat{\eta_0}(\xi)| \leq 1$ for every $\xi \in \R$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-fourier-zero, lem:daub-fourier-continuous}
-Since $|\eta_0| = \eta_0 = 1_{[0, 1)}$, the claims follow from \Cref{lem:daub-fourier-zero} and
-the bound of \Cref{lem:daub-fourier-continuous}.
 \end{proof}
 
 \begin{proposition}[The Fourier transform of the cascade]
@@ -1993,29 +1933,12 @@ formula follows by induction on $n$ with \Cref{lem:daub-symbol-product-split}. T
 integrable functions are continuous (\Cref{lem:daub-fourier-continuous}).
 \end{proof}
 
-\begin{proposition}[Convergence of the Fourier transforms]
-\label{prop:daub-cascade-fourier-limit}
-\lean{Daubechies.norm_fourier_cascade_le_one, Daubechies.tendsto_fourier_cascade}
-\leanok
-\uses{def:daub-cascade, def:daub-symbol-product}
-For every Daubechies mask, every $n \in \N$ and every $\xi \in \R$,
-$|\widehat{\eta_n}(\xi)| \leq 1$, and $\widehat{\eta_n}(\xi) \to \Phi(\xi)$ as $n \to \infty$.
-\end{proposition}
-
-\begin{proof}
-\leanok
-\uses{prop:daub-cascade-fourier, prop:daub-symbol-product-basic,
-  thm:daub-symbol-product-continuous, lem:daub-cascade-zero}
-In the product formula of \Cref{prop:daub-cascade-fourier} the partial products have modulus
-at most $1$ (\Cref{prop:daub-symbol-product-basic}) and converge to $\Phi(\xi)$
-(\Cref{thm:daub-symbol-product-continuous}), while $|\widehat{\eta_0}| \leq 1$ and
-$\widehat{\eta_0}(\xi/2^n) \to \widehat{\eta_0}(0) = 1$, since $\widehat{\eta_0}$ is continuous
-(\Cref{prop:daub-cascade-fourier,lem:daub-cascade-zero}).
-\end{proof}
-
 \begin{proposition}[Convergence of the cascade]
 \label{prop:daub-cascade-convergence}
-\lean{Daubechies.tendsto_integral_cascade_mul}
+\lean{Daubechies.tendsto_integral_cascade_mul, Daubechies.integral_cascade_zero,
+  Daubechies.integral_norm_cascade_zero, Daubechies.fourier_cascade_zero_apply_zero,
+  Daubechies.norm_fourier_cascade_zero_le_one, Daubechies.norm_fourier_cascade_le_one,
+  Daubechies.tendsto_fourier_cascade}
 \leanok
 \uses{def:daub-cascade, def:daub-scaling-function}
 For every Daubechies mask of order $N \geq 2$ and every Schwartz function $\psi : \R \to \C$,
@@ -2027,16 +1950,29 @@ For every Daubechies mask of order $N \geq 2$ and every Schwartz function $\psi 
 
 \begin{proof}
 \leanok
-\uses{lem:daub-fourier-schwartz, lem:daub-cascade-integrable, prop:daub-cascade-fourier,
-  prop:daub-cascade-fourier-limit, prop:daub-multiplication-formula,
-  prop:daub-symbol-product-integrable}
-By \Cref{lem:daub-fourier-schwartz} for the integrable functions $\eta_n$
+\uses{def:daub-symbol-product, lem:daub-fourier-zero, lem:daub-fourier-continuous,
+  prop:daub-cascade-fourier, prop:daub-symbol-product-basic,
+  thm:daub-symbol-product-continuous, lem:daub-fourier-schwartz, lem:daub-cascade-integrable,
+  prop:daub-multiplication-formula, prop:daub-symbol-product-integrable}
+First, the initial function of the cascade: for every Daubechies mask,
+$\int_\R \eta_0 = \int_\R |\eta_0| = 1$, $\widehat{\eta_0}(0) = 1$, and
+$|\widehat{\eta_0}(\xi)| \leq 1$ for every $\xi \in \R$, since $|\eta_0| = \eta_0 = 1_{[0, 1)}$
+(\Cref{lem:daub-fourier-zero} and the bound of \Cref{lem:daub-fourier-continuous}). Second, the
+transforms converge: for every Daubechies mask, every $n \in \N$ and every $\xi \in \R$,
+$|\widehat{\eta_n}(\xi)| \leq 1$, and $\widehat{\eta_n}(\xi) \to \Phi(\xi)$ as $n \to \infty$.
+Indeed, in the product formula of \Cref{prop:daub-cascade-fourier} the partial products have
+modulus at most $1$ (\Cref{prop:daub-symbol-product-basic}) and converge to $\Phi(\xi)$
+(\Cref{thm:daub-symbol-product-continuous}), while $|\widehat{\eta_0}| \leq 1$ and
+$\widehat{\eta_0}(\xi/2^n) \to \widehat{\eta_0}(0) = 1$, since $\widehat{\eta_0}$ is continuous
+(\Cref{prop:daub-cascade-fourier}).
+
+Now by \Cref{lem:daub-fourier-schwartz} for the integrable functions $\eta_n$
 (\Cref{lem:daub-cascade-integrable}),
 $\int \eta_n \psi = \int \widehat{\eta_n} \, \mathcal F^{-1} \psi$. The integrands on the right
 are continuous (\Cref{prop:daub-cascade-fourier}), converge pointwise to
 $\Phi \, \mathcal F^{-1} \psi$, and are bounded by the integrable function
-$|\mathcal F^{-1} \psi|$ (\Cref{prop:daub-cascade-fourier-limit}). Dominated convergence gives
-the limit $\int \Phi \, \mathcal F^{-1} \psi$, which is
+$|\mathcal F^{-1} \psi|$. Dominated convergence gives the limit
+$\int \Phi \, \mathcal F^{-1} \psi$, which is
 $\int \mathcal F^{-1} \Phi \, \psi = \int \varphi \psi$ by \Cref{prop:daub-multiplication-formula}
 for $\mathcal F^{-1}$, since $\Phi$ is integrable (\Cref{prop:daub-symbol-product-integrable}).
 \end{proof}
@@ -2048,7 +1984,9 @@ $\varphi$, and Fourier inversion then identifies $\widehat\varphi$.
 \begin{theorem}[The support of the scaling function]
 \label{thm:daub-scaling-support}
 \lean{Daubechies.scalingFun_eq_zero, Daubechies.scalingFun_eq_zero_of_notMem_Ioo,
-  Daubechies.tsupport_scalingFun_subset, Daubechies.hasCompactSupport_scalingFun}
+  Daubechies.tsupport_scalingFun_subset, Daubechies.hasCompactSupport_scalingFun,
+  Daubechies.mem_Icc_of_two_mul_sub_mem_Icc, Daubechies.cascade_eq_zero,
+  Daubechies.integral_cascade_mul_eq_zero}
 \leanok
 \uses{def:daub-scaling-function}
 For every Daubechies mask of order $N \geq 2$ and every $x \in \R \setminus (0, 2N - 1)$,
@@ -2057,15 +1995,23 @@ $\varphi(x) = 0$. In particular the support of $\varphi$ is a compact subset of 
 
 \begin{proof}
 \leanok
-\uses{lem:daub-cascade-support, prop:daub-cascade-convergence, prop:daub-fundamental-lemma,
-  prop:daub-scaling-continuous}
+\uses{def:daub-cascade, def:daub-mask, prop:daub-cascade-convergence,
+  prop:daub-fundamental-lemma, prop:daub-scaling-continuous}
+First, the support of the cascade: for every $n \in \N$ and every $x \notin [0, 2N - 1]$,
+$\eta_n(x) = 0$; hence $\int_\R \eta_n g = 0$ for every $g : \R \to \C$ that vanishes on
+$[0, 2N - 1]$. Indeed, for all real numbers $k$, $b$ and $x$ with $0 \leq k \leq b$ and
+$2x - k \in [0, b]$, $x \in [0, b]$: from $2x - k \geq 0$, $x \geq k/2 \geq 0$, and from
+$2x - k \leq b$, $x \leq (b + k)/2 \leq b$. Now induction on $n$: $[0, 1) \subseteq [0, 2N - 1]$
+since $N \geq 1$ (\Cref{def:daub-mask}), and for $x \notin [0, 2N - 1]$ and
+$0 \leq k \leq 2N - 1$ the point $2x - k$ lies outside $[0, 2N - 1]$. Then $\eta_n g$ vanishes
+everywhere.
+
 Let $\psi$ be a Schwartz function whose support is compact and contained in the open set
-$U = \R \setminus [0, 2N - 1]$. Every integral $\int \eta_n \psi$ vanishes
-(\Cref{lem:daub-cascade-support}), so their limit $\int \varphi \psi$ vanishes
-(\Cref{prop:daub-cascade-convergence}). The fundamental lemma (\Cref{prop:daub-fundamental-lemma})
-for the continuous function $\varphi$ (\Cref{prop:daub-scaling-continuous}) gives $\varphi = 0$
-on $U$. The zero set of $\varphi$ is closed, so it also contains the closure
-$\R \setminus (0, 2N - 1)$ of $U$.
+$U = \R \setminus [0, 2N - 1]$. Every integral $\int \eta_n \psi$ vanishes, so their limit
+$\int \varphi \psi$ vanishes (\Cref{prop:daub-cascade-convergence}). The fundamental lemma
+(\Cref{prop:daub-fundamental-lemma}) for the continuous function $\varphi$
+(\Cref{prop:daub-scaling-continuous}) gives $\varphi = 0$ on $U$. The zero set of $\varphi$ is
+closed, so it also contains the closure $\R \setminus (0, 2N - 1)$ of $U$.
 \end{proof}
 
 \begin{proposition}[Integrability of the scaling function]
@@ -2188,56 +2134,12 @@ For a Daubechies mask and $n \in \N$ the \emph{truncated product} is the measura
 in particular $\Phi_0 = 1_{[-1/2, 1/2)}$.
 \end{definition}
 
-\begin{lemma}[The recursion of the truncated products]
-\label{lem:daub-trunc-recursion}
-\lean{Daubechies.mem_Ico_two_pow_succ_iff, Daubechies.truncProduct_succ,
-  Daubechies.normSq_truncProduct_succ}
-\leanok
-\uses{def:daub-trunc-product}
-For every $n \in \N$ and every $\xi \in \R$, $\xi \in [-2^{n+1}/2, 2^{n+1}/2)$ if and only if
-$\xi/2 \in [-2^n/2, 2^n/2)$. For every Daubechies mask, every $n \in \N$ and every $\xi \in \R$,
-\[
-  \Phi_{n+1}(\xi) = m_0\Bigl(\frac{\xi}{2}\Bigr) \, \Phi_n\Bigl(\frac{\xi}{2}\Bigr)
-  \quad\text{and}\quad
-  |\Phi_{n+1}(\xi)|^2 = \Bigl|m_0\Bigl(\frac{\xi}{2}\Bigr)\Bigr|^2 \,
-    \Bigl|\Phi_n\Bigl(\frac{\xi}{2}\Bigr)\Bigr|^2 .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-symbol-product-split}
-Split off the first factor of the product (\Cref{lem:daub-symbol-product-split}); the cut-off
-factor of level $n + 1$ at $\xi$ is the one of level $n$ at $\xi/2$.
-\end{proof}
-
-\begin{lemma}[Start and step of the integral identity]
-\label{lem:daub-trunc-integral-steps}
-\lean{Daubechies.integral_mul_normSq_truncProduct_zero,
-  Daubechies.integral_mul_normSq_truncProduct_succ}
-\leanok
-\uses{def:daub-trunc-product}
-Let $w : \R \to \C$. For every Daubechies mask and every $n \in \N$,
-\[
-  \int_\R w(\xi) \, |\Phi_{n+1}(\xi)|^2 \, d\xi
-  = 2 \int_\R w(2\zeta) \, |m_0(\zeta)|^2 \, |\Phi_n(\zeta)|^2 \, d\zeta ,
-\]
-and if $w$ has period $1$, then
-$\int_\R w(\xi) \, |\Phi_0(\xi)|^2 \, d\xi = \int_0^1 w(\xi) \, d\xi$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-trunc-recursion, lem:daub-substitutions}
-The first identity is \Cref{lem:daub-trunc-recursion} together with the substitution
-$\xi = 2\zeta$ (\Cref{lem:daub-substitutions}). Since $|\Phi_0|^2 = 1_{[-1/2, 1/2)}$, the left
-side of the second identity is $\int_{-1/2}^{1/2} w$, and a $1$-periodic function has the same
-integral over every interval of length $1$.
-\end{proof}
-
 \begin{proposition}[The integral identity for the truncated products]
 \label{prop:daub-trunc-integral}
-\lean{Daubechies.integral_periodic_mul_normSq_truncProduct}
+\lean{Daubechies.integral_periodic_mul_normSq_truncProduct,
+  Daubechies.mem_Ico_two_pow_succ_iff, Daubechies.truncProduct_succ,
+  Daubechies.normSq_truncProduct_succ, Daubechies.integral_mul_normSq_truncProduct_zero,
+  Daubechies.integral_mul_normSq_truncProduct_succ}
 \leanok
 \uses{def:daub-trunc-product}
 For every Daubechies mask, every continuous $w : \R \to \C$ with period $1$ and every
@@ -2249,36 +2151,27 @@ $n \in \N$,
 
 \begin{proof}
 \leanok
-\uses{lem:daub-trunc-integral-steps, lem:daub-halving-symbol, lem:daub-symbol-props}
-Induction on $n$, for all such $w$ at once; the case $n = 0$ is
-\Cref{lem:daub-trunc-integral-steps}. For the step, \Cref{lem:daub-trunc-integral-steps} and the
-induction hypothesis for the continuous $1$-periodic function
-$\zeta \mapsto w(2\zeta) |m_0(\zeta)|^2$ (\Cref{lem:daub-symbol-props,lem:daub-halving-symbol})
-give $2 \int_0^1 w(2\zeta) |m_0(\zeta)|^2 \, d\zeta$, which is $\int_0^1 w$ by
-\Cref{lem:daub-halving-symbol}.
-\end{proof}
+\uses{lem:daub-symbol-product-split, lem:daub-substitutions, lem:daub-halving-symbol,
+  lem:daub-symbol-props}
+First, the recursion of the truncated products: for every $n \in \N$ and every $\xi \in \R$,
+$\xi \in [-2^{n+1}/2, 2^{n+1}/2)$ if and only if $\xi/2 \in [-2^n/2, 2^n/2)$, so splitting off
+the first factor of the product (\Cref{lem:daub-symbol-product-split}) gives
+$\Phi_{n+1}(\xi) = m_0(\xi/2) \, \Phi_n(\xi/2)$ and
+$|\Phi_{n+1}(\xi)|^2 = |m_0(\xi/2)|^2 \, |\Phi_n(\xi/2)|^2$. Hence for every $w : \R \to \C$
+the substitution $\xi = 2\zeta$ (\Cref{lem:daub-substitutions}) gives
+\[
+  \int_\R w(\xi) \, |\Phi_{n+1}(\xi)|^2 \, d\xi
+  = 2 \int_\R w(2\zeta) \, |m_0(\zeta)|^2 \, |\Phi_n(\zeta)|^2 \, d\zeta ,
+\]
+and if $w$ has period $1$, then $\int_\R w(\xi) \, |\Phi_0(\xi)|^2 \, d\xi = \int_0^1 w$, since
+$|\Phi_0|^2 = 1_{[-1/2, 1/2)}$ and a $1$-periodic function has the same integral over every
+interval of length $1$.
 
-\begin{lemma}[Domination and convergence]
-\label{lem:daub-trunc-limit}
-\lean{Daubechies.norm_truncProduct_le, Daubechies.eventually_mem_Ico_two_pow,
-  Daubechies.tendsto_truncProduct}
-\leanok
-\uses{def:daub-trunc-product, def:daub-symbol-product}
-For every $\xi \in \R$ and all sufficiently large $n \in \N$, $\xi \in [-2^n/2, 2^n/2)$. For
-every Daubechies mask and every $\xi \in \R$, $\Phi_n(\xi) \to \Phi(\xi)$ as $n \to \infty$, and
-if $\kappa > 0$ satisfies $|\Phi(\eta)| \geq \kappa$ for every $\eta \in [-\frac12, \frac12]$,
-then $|\Phi_n(\xi)| \leq |\Phi(\xi)|/\kappa$ for every $n \in \N$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{thm:daub-symbol-product-continuous, lem:daub-symbol-product-split}
-Since $2^n \to \infty$, the cut-off factor at $\xi$ is $1$ for all large $n$, and the partial
-products converge to $\Phi(\xi)$ (\Cref{thm:daub-symbol-product-continuous}). For
-$\xi \in [-2^n/2, 2^n/2)$, $|\xi/2^n| \leq \frac12$ and
-$\Phi(\xi) = \prod_{j<n} m_0(\xi/2^{j+1}) \cdot \Phi(\xi/2^n)$
-(\Cref{lem:daub-symbol-product-split}), so $|\Phi(\xi)| \geq \kappa |\Phi_n(\xi)|$; for the
-other $\xi$, $\Phi_n(\xi) = 0$.
+Now induction on $n$, for all continuous $1$-periodic $w$ at once; the case $n = 0$ is the last
+identity. For the step, the function $\zeta \mapsto w(2\zeta) |m_0(\zeta)|^2$ is continuous with
+period $1$ (\Cref{lem:daub-symbol-props,lem:daub-halving-symbol}), so the induction hypothesis
+turns the right side of the step identity into $2 \int_0^1 w(2\zeta) |m_0(\zeta)|^2 \, d\zeta$,
+which is $\int_0^1 w$ by \Cref{lem:daub-halving-symbol}.
 \end{proof}
 
 \paragraph{Orthonormality.}
@@ -2288,7 +2181,8 @@ turns it into the orthonormality of the translates.
 \begin{proposition}[The integral identity for the symbol product]
 \label{prop:daub-periodic-integral}
 \lean{Daubechies.integrable_normSq_symbolProduct,
-  Daubechies.integral_periodic_mul_normSq_symbolProduct}
+  Daubechies.integral_periodic_mul_normSq_symbolProduct, Daubechies.norm_truncProduct_le,
+  Daubechies.eventually_mem_Ico_two_pow, Daubechies.tendsto_truncProduct}
 \leanok
 \uses{def:daub-symbol-product}
 For every Daubechies mask of order $N \geq 2$ the function $|\Phi|^2$ is integrable, and for
@@ -2300,44 +2194,36 @@ every continuous $w : \R \to \C$ with period $1$,
 
 \begin{proof}
 \leanok
-\uses{thm:daub-symbol-product-continuous, prop:daub-symbol-product-integrable,
-  prop:daub-symbol-product-nonzero, lem:daub-trunc-limit, prop:daub-trunc-integral}
-$\Phi$ is continuous and square integrable
+\uses{def:daub-trunc-product, thm:daub-symbol-product-continuous,
+  lem:daub-symbol-product-split, prop:daub-symbol-product-integrable,
+  prop:daub-symbol-product-nonzero, prop:daub-trunc-integral}
+First, domination and convergence of the truncated products: for every $\xi \in \R$ and all
+sufficiently large $n \in \N$, $\xi \in [-2^n/2, 2^n/2)$, since $2^n \to \infty$; so the cut-off
+factor at $\xi$ is $1$ for all large $n$, and $\Phi_n(\xi) \to \Phi(\xi)$ as $n \to \infty$,
+since the partial products converge to $\Phi(\xi)$ (\Cref{thm:daub-symbol-product-continuous}).
+If $\kappa > 0$ satisfies $|\Phi(\eta)| \geq \kappa$ for every $\eta \in [-\frac12, \frac12]$,
+then $|\Phi_n(\xi)| \leq |\Phi(\xi)|/\kappa$ for every $n \in \N$: for
+$\xi \in [-2^n/2, 2^n/2)$, $|\xi/2^n| \leq \frac12$ and
+$\Phi(\xi) = \prod_{j<n} m_0(\xi/2^{j+1}) \cdot \Phi(\xi/2^n)$
+(\Cref{lem:daub-symbol-product-split}), so $|\Phi(\xi)| \geq \kappa |\Phi_n(\xi)|$; for the
+other $\xi$, $\Phi_n(\xi) = 0$.
+
+Now $\Phi$ is continuous and square integrable
 (\Cref{thm:daub-symbol-product-continuous,prop:daub-symbol-product-integrable}), so $|\Phi|^2$
-is integrable. Take $\kappa$ from
-\Cref{prop:daub-symbol-product-nonzero} and a bound $B$ of the continuous periodic function
-$|w|$. The functions $w |\Phi_n|^2$ converge pointwise to $w |\Phi|^2$ and are bounded by the
-integrable function $B \kappa^{-2} |\Phi|^2$ (\Cref{lem:daub-trunc-limit}). By dominated
+is integrable. Take $\kappa$ from \Cref{prop:daub-symbol-product-nonzero} and a bound $B$ of the
+continuous periodic function $|w|$. The functions $w |\Phi_n|^2$ converge pointwise to
+$w |\Phi|^2$ and are bounded by the integrable function $B \kappa^{-2} |\Phi|^2$. By dominated
 convergence and \Cref{prop:daub-trunc-integral},
 $\int w |\Phi|^2 = \lim_n \int w |\Phi_n|^2 = \int_0^1 w$.
-\end{proof}
-
-\begin{lemma}[The Fourier coefficients of $|\Phi|^2$]
-\label{lem:daub-symbol-product-coefficients}
-\lean{Daubechies.periodic_expFreq_intCast_mul,
-  Daubechies.integral_normSq_symbolProduct_mul_expFreq}
-\leanok
-\uses{def:daub-symbol-product}
-For every $k \in \Z$ the function $\xi \mapsto e^{-2\pi i k \xi}$ has period $1$. For every
-Daubechies mask of order $N \geq 2$ and every $k \in \Z$,
-\[
-  \int_\R |\Phi(\xi)|^2 \, e^{-2\pi i k \xi} \, d\xi = \delta_{k0} .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-exp, prop:daub-periodic-integral, lem:daub-exp-orthonormal}
-$e^{-2\pi i k} = 1$ (\Cref{lem:daub-exp}). Apply \Cref{prop:daub-periodic-integral} to the
-continuous function $w(\xi) = e^{-2\pi i k \xi}$, with
-$\int_0^1 e^{-2\pi i k \xi} \, d\xi = \delta_{k0}$ (\Cref{lem:daub-exp-orthonormal}).
 \end{proof}
 
 \begin{theorem}[Orthonormality of the integer translates]
 \label{thm:daub-orthonormal}
 \lean{Daubechies.integral_scalingFun_translate_mul_conj,
   Daubechies.integral_scalingFun_translate_mul_conj_translate,
-  Daubechies.integral_scalingFun_translate_mul_translate}
+  Daubechies.integral_scalingFun_translate_mul_translate,
+  Daubechies.periodic_expFreq_intCast_mul,
+  Daubechies.integral_normSq_symbolProduct_mul_expFreq}
 \leanok
 \uses{def:daub-scaling-function}
 For every Daubechies mask of order $N \geq 2$ and all $k, l \in \Z$,
@@ -2349,17 +2235,27 @@ For every Daubechies mask of order $N \geq 2$ and all $k, l \in \Z$,
 
 \begin{proof}
 \leanok
-\uses{prop:daub-scaling-continuous, prop:daub-scaling-integrable, thm:daub-scaling-fourier,
-  prop:daub-symbol-product-integrable, lem:daub-fourier-translate, prop:daub-parseval,
-  lem:daub-symbol-product-coefficients, prop:daub-scaling-real}
-First let $l = 0$. The function $\varphi$ is continuous and integrable
+\uses{def:daub-symbol-product, lem:daub-exp, prop:daub-periodic-integral,
+  lem:daub-exp-orthonormal, prop:daub-scaling-continuous, prop:daub-scaling-integrable,
+  thm:daub-scaling-fourier, prop:daub-symbol-product-integrable, lem:daub-fourier-translate,
+  prop:daub-parseval, prop:daub-scaling-real}
+First, the Fourier coefficients of $|\Phi|^2$: for every $k \in \Z$ the function
+$\xi \mapsto e^{-2\pi i k \xi}$ has period $1$, since $e^{-2\pi i k} = 1$ (\Cref{lem:daub-exp}),
+and
+\[
+  \int_\R |\Phi(\xi)|^2 \, e^{-2\pi i k \xi} \, d\xi = \delta_{k0} ,
+\]
+by \Cref{prop:daub-periodic-integral} for the continuous function $w(\xi) = e^{-2\pi i k \xi}$,
+with $\int_0^1 e^{-2\pi i k \xi} \, d\xi = \delta_{k0}$ (\Cref{lem:daub-exp-orthonormal}).
+
+Now let $l = 0$. The function $\varphi$ is continuous and integrable
 (\Cref{prop:daub-scaling-continuous,prop:daub-scaling-integrable}) with the integrable transform
 $\widehat\varphi = \Phi$ (\Cref{thm:daub-scaling-fourier,prop:daub-symbol-product-integrable}),
 and $\mathcal F[\varphi(\cdot - k)](\xi) = e^{-2\pi i k \xi} \Phi(\xi)$
-(\Cref{lem:daub-fourier-translate}). Parseval's identity (\Cref{prop:daub-parseval})
-turns the integral into $\int_\R e^{-2\pi i k \xi} |\Phi(\xi)|^2 \, d\xi = \delta_{k0}$
-(\Cref{lem:daub-symbol-product-coefficients}). The substitution $x \mapsto x + l$ gives the case
-of two translates, and $\overline{\varphi} = \varphi$ (\Cref{prop:daub-scaling-real}).
+(\Cref{lem:daub-fourier-translate}). Parseval's identity (\Cref{prop:daub-parseval}) turns the
+integral into $\int_\R e^{-2\pi i k \xi} |\Phi(\xi)|^2 \, d\xi = \delta_{k0}$. The substitution
+$x \mapsto x + l$ gives the case of two translates, and $\overline{\varphi} = \varphi$
+(\Cref{prop:daub-scaling-real}).
 \end{proof}
 
 \paragraph{Smoothness of $\Phi$.}
@@ -2368,53 +2264,13 @@ refinement identity $\Phi(2\xi) = m_0(\xi) \Phi(\xi)$ and using the zeros of $m_
 half-integers shows that the derivatives of $\Phi$ of order less than $N$ vanish at the nonzero
 integers.
 
-\begin{proposition}[Smoothness of the symbol product]
-\label{prop:daub-symbol-product-smooth}
-\lean{Daubechies.integrable_norm_pow_mul_norm_scalingFun, Daubechies.contDiff_symbolProduct,
-  Daubechies.contDiff_nat_symbolProduct}
-\leanok
-\uses{def:daub-symbol-product, def:daub-scaling-function}
-For every Daubechies mask of order $N \geq 2$ and every $n \in \N$ the function
-$x \mapsto |x|^n |\varphi(x)|$ is integrable, and $\Phi$ is infinitely differentiable.
-\end{proposition}
-
-\begin{proof}
-\leanok
-\uses{prop:daub-scaling-continuous, thm:daub-scaling-support, thm:daub-scaling-fourier}
-The functions $x \mapsto |x|^n |\varphi(x)|$ are continuous with compact support
-(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}). The Fourier transform of a
-function with integrable moments of every order is infinitely differentiable, by
-differentiation under the integral sign, and $\Phi = \widehat\varphi$
-(\Cref{thm:daub-scaling-fourier}).
-\end{proof}
-
-\begin{lemma}[The derivatives of $\Phi$ as Fourier transforms]
-\label{lem:daub-symbol-product-derivatives}
-\lean{Daubechies.integrable_pow_smul_scalingFun,
-  Daubechies.iteratedDeriv_symbolProduct_eq_fourier}
-\leanok
-\uses{def:daub-symbol-product, def:daub-scaling-function}
-For every Daubechies mask of order $N \geq 2$ and every $l \in \N$ the function
-$x \mapsto x^l \varphi(x)$ is integrable, and for every $\xi \in \R$
-\[
-  \Phi^{(l)}(\xi) = (-2\pi i)^l \, \mathcal F\bigl[x \mapsto x^l \varphi(x)\bigr](\xi) .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{prop:daub-scaling-continuous, thm:daub-scaling-support, thm:daub-scaling-fourier}
-The functions $x \mapsto x^l \varphi(x)$ are continuous with compact support
-(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}). By
-\Cref{thm:daub-scaling-fourier}, $\Phi = \widehat\varphi$, and each differentiation under the
-integral sign multiplies the integrand $\varphi(x) e^{-2\pi i x \xi}$ by $-2\pi i x$.
-\end{proof}
-
 \begin{lemma}[The derivatives of the refinement identity]
 \label{lem:daub-symbol-product-leibniz}
 \lean{Daubechies.iteratedDeriv_symbolProduct_two_mul,
   Daubechies.iteratedDeriv_symbolProduct_two_mul_eq_zero,
-  Daubechies.iteratedDeriv_symbolProduct_two_mul_add_one}
+  Daubechies.iteratedDeriv_symbolProduct_two_mul_add_one,
+  Daubechies.integrable_norm_pow_mul_norm_scalingFun, Daubechies.contDiff_symbolProduct,
+  Daubechies.contDiff_nat_symbolProduct}
 \leanok
 \uses{def:daub-symbol-product}
 For every Daubechies mask of order $N \geq 2$, every $l \in \N$ and every $\xi \in \R$,
@@ -2427,18 +2283,26 @@ $\Phi^{(l)}(2n + 1) = 0$ for every $n \in \Z$.
 
 \begin{proof}
 \leanok
-\uses{prop:daub-refinement-identity, prop:daub-symbol-product-smooth, lem:daub-symbol-props,
+\uses{def:daub-scaling-function, prop:daub-scaling-continuous, thm:daub-scaling-support,
+  thm:daub-scaling-fourier, prop:daub-refinement-identity, lem:daub-symbol-props,
   prop:daub-symbol-zeros}
-Differentiate $\Phi(2\xi) = m_0(\xi) \Phi(\xi)$ (\Cref{prop:daub-refinement-identity}) $l$
-times, by the chain rule on the left and by the Leibniz rule on the right; both factors are
-smooth (\Cref{prop:daub-symbol-product-smooth,lem:daub-symbol-props}). If all $\Phi^{(i)}(\xi)$
-with $i \leq l$ vanish, so does every term of the sum. At $\xi = \frac12 + n$ every
-$m_0^{(i)}(\frac12 + n)$ with $i \leq l < N$ vanishes (\Cref{prop:daub-symbol-zeros}).
+First, $\Phi$ is infinitely differentiable: for every $n \in \N$ the function
+$x \mapsto |x|^n |\varphi(x)|$ is integrable, being continuous with compact support
+(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}); the Fourier transform of a
+function with integrable moments of every order is infinitely differentiable, by
+differentiation under the integral sign; and $\Phi = \widehat\varphi$
+(\Cref{thm:daub-scaling-fourier}). Now differentiate $\Phi(2\xi) = m_0(\xi) \Phi(\xi)$
+(\Cref{prop:daub-refinement-identity}) $l$ times, by the chain rule on the left and by the
+Leibniz rule on the right; both factors are smooth (\Cref{lem:daub-symbol-props}). If all
+$\Phi^{(i)}(\xi)$ with $i \leq l$ vanish, so does every term of the sum. At $\xi = \frac12 + n$
+every $m_0^{(i)}(\frac12 + n)$ with $i \leq l < N$ vanishes (\Cref{prop:daub-symbol-zeros}).
 \end{proof}
 
 \begin{proposition}[The derivatives of $\Phi$ at the nonzero integers]
 \label{prop:daub-symbol-product-integer-zeros}
-\lean{Daubechies.iteratedDeriv_symbolProduct_int, Daubechies.fourier_pow_mul_scalingFun_int}
+\lean{Daubechies.iteratedDeriv_symbolProduct_int, Daubechies.fourier_pow_mul_scalingFun_int,
+  Daubechies.integrable_pow_smul_scalingFun,
+  Daubechies.iteratedDeriv_symbolProduct_eq_fourier}
 \leanok
 \uses{def:daub-symbol-product, def:daub-scaling-function}
 For every Daubechies mask of order $N \geq 2$, every $l < N$ and every
@@ -2451,13 +2315,22 @@ $j \in \Z \setminus \{0\}$,
 
 \begin{proof}
 \leanok
-\uses{lem:daub-symbol-product-leibniz, lem:daub-symbol-product-derivatives}
-Induction on $|j|$, for all $l < N$ at once. For odd $j$ apply the last statement of
+\uses{lem:daub-symbol-product-leibniz, prop:daub-scaling-continuous, thm:daub-scaling-support,
+  thm:daub-scaling-fourier}
+First, the derivatives of $\Phi$ as Fourier transforms: for every $l \in \N$ the function
+$x \mapsto x^l \varphi(x)$ is integrable, being continuous with compact support
+(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}), and for every $\xi \in \R$
+\[
+  \Phi^{(l)}(\xi) = (-2\pi i)^l \, \mathcal F\bigl[x \mapsto x^l \varphi(x)\bigr](\xi) ,
+\]
+since $\Phi = \widehat\varphi$ (\Cref{thm:daub-scaling-fourier}) and each differentiation under
+the integral sign multiplies the integrand $\varphi(x) e^{-2\pi i x \xi}$ by $-2\pi i x$.
+
+Now induction on $|j|$, for all $l < N$ at once. For odd $j$ apply the last statement of
 \Cref{lem:daub-symbol-product-leibniz}. For even $j = 2j'$, $0 < |j'| < |j|$, so
 $\Phi^{(i)}(j') = 0$ for every $i \leq l$ by the induction hypothesis, and
 \Cref{lem:daub-symbol-product-leibniz} gives $\Phi^{(l)}(j) = 0$. Finally
-$(-2\pi i)^l \mathcal F[x \mapsto x^l \varphi(x)](j) = \Phi^{(l)}(j)$
-(\Cref{lem:daub-symbol-product-derivatives}).
+$(-2\pi i)^l \mathcal F[x \mapsto x^l \varphi(x)](j) = \Phi^{(l)}(j)$.
 \end{proof}
 
 Together with $\Phi(0) = 1$, these are the Strang--Fix conditions of order $N$ for $\varphi$.
@@ -2466,33 +2339,11 @@ Together with $\Phi(0) = 1$, these are the Strang--Fix conditions of order $N$ f
 By Poisson summation, a continuous function with compact support whose Fourier transform
 vanishes at the nonzero integers has a constant periodisation.
 
-\begin{lemma}[Poisson summation with vanishing coefficients]
-\label{lem:daub-poisson}
-\lean{Real.summable_norm_restrict_comp_addRight, Real.tsum_comp_add_int_eq_integral}
-\leanok
-Let $a, b \in \R$, and let $f$ be a continuous function on $\R$ with values in a normed abelian
-group that vanishes outside $[a, b]$. Then
-$\sum_{n \in \Z} \sup_{x \in K} \|f(x + n)\| < \infty$ for every compact set $K \subseteq \R$. If
-moreover $f$ is complex valued and $\widehat f(n) = 0$ for every $n \in \Z \setminus \{0\}$, then
-for every $x \in \R$
-\[
-  \sum_{n \in \Z} f(x + n) = \int_\R f(y) \, dy .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-fourier-zero}
-Only the finitely many $n$ for which $K + n$ meets $[a, b]$ give a translate that is nonzero on
-$K$. This is the hypothesis of the Poisson summation formula, which writes the periodisation as
-the Fourier series $\sum_n \widehat f(n) e^{2\pi i n x}$. Its only nonzero term is
-$\widehat f(0) = \int_\R f$ (\Cref{lem:daub-fourier-zero}).
-\end{proof}
-
 \begin{proposition}[The periodised moments]
 \label{prop:daub-periodised-moments}
 \lean{Daubechies.continuous_pow_mul_scalingFun, Daubechies.periodization_moment_eq,
-  Daubechies.periodization_moment_const}
+  Daubechies.periodization_moment_const, Real.summable_norm_restrict_comp_addRight,
+  Real.tsum_comp_add_int_eq_integral}
 \leanok
 \uses{def:daub-scaling-function}
 For every Daubechies mask of order $N \geq 2$, every $l < N$ and every $x \in \R$,
@@ -2504,13 +2355,23 @@ in particular the left side is a constant function of $x$.
 
 \begin{proof}
 \leanok
-\uses{prop:daub-scaling-continuous, thm:daub-scaling-support,
-  prop:daub-symbol-product-integer-zeros, lem:daub-poisson}
-The function $f(y) = y^l \varphi(y)$ is continuous, vanishes outside $[0, 2N - 1]$
+\uses{lem:daub-fourier-zero, prop:daub-scaling-continuous, thm:daub-scaling-support,
+  prop:daub-symbol-product-integer-zeros}
+First, Poisson summation with vanishing coefficients: let $a, b \in \R$, and let $f$ be a
+continuous function on $\R$ with values in a normed abelian group that vanishes outside
+$[a, b]$. Then $\sum_{n \in \Z} \sup_{x \in K} \|f(x + n)\| < \infty$ for every compact set
+$K \subseteq \R$, since only the finitely many $n$ for which $K + n$ meets $[a, b]$ give a
+translate that is nonzero on $K$. If moreover $f$ is complex valued and $\widehat f(n) = 0$ for
+every $n \in \Z \setminus \{0\}$, then $\sum_{n \in \Z} f(x + n) = \int_\R f(y) \, dy$ for every
+$x \in \R$: the summability is the hypothesis of the Poisson summation formula, which writes
+the periodisation as the Fourier series $\sum_n \widehat f(n) e^{2\pi i n x}$, and its only
+nonzero term is $\widehat f(0) = \int_\R f$ (\Cref{lem:daub-fourier-zero}).
+
+Now the function $f(y) = y^l \varphi(y)$ is continuous, vanishes outside $[0, 2N - 1]$
 (\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}), and $\widehat f(n) = 0$ for
-every $n \in \Z \setminus \{0\}$ (\Cref{prop:daub-symbol-product-integer-zeros}). By
-\Cref{lem:daub-poisson}, $\sum_n f(x + n) = \int_\R f$, and the substitution $k = -n$ turns the
-sum into the sum over the points $x - k$.
+every $n \in \Z \setminus \{0\}$ (\Cref{prop:daub-symbol-product-integer-zeros}). Hence
+$\sum_n f(x + n) = \int_\R f$, and the substitution $k = -n$ turns the sum into the sum over
+the points $x - k$.
 \end{proof}
 
 \begin{lemma}[Finite sums over the translates]
@@ -2561,47 +2422,11 @@ combination of the translates with polynomial coefficients, and orthonormality i
 coefficients with inner products. Polynomials have complex coefficients and are evaluated at
 real points.
 
-\begin{proposition}[The integer moments of the translates]
-\label{prop:daub-integer-moments}
-\lean{Daubechies.tsum_intCast_pow_mul_scalingFun_sub, Daubechies.exists_poly_sum_pow_mul}
-\leanok
-\uses{def:daub-scaling-function}
-For a Daubechies mask of order $N \geq 2$ let $\mu_r = \int_\R y^r \varphi(y) \, dy$ for
-$r \in \N$. Then for every $l < N$ and every $x \in \R$
-\[
-  \sum_{k \in \Z} k^l \, \varphi(x - k)
-  = \sum_{i=0}^{l} \binom{l}{i} (-1)^{l-i} \mu_{l-i} \, x^i ,
-\]
-and the right side is a polynomial of degree $l$ in $x$ with leading coefficient $1$.
-\end{proposition}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-finite-sums, prop:daub-periodised-moments, thm:daub-scaling-fourier}
-Write $k = x - (x - k)$ and expand $k^l$ by the binomial theorem. The sums over $k$ are finite
-(\Cref{lem:daub-finite-sums}), so they can be exchanged with the sum over $i$, and
-$\sum_k (x - k)^r \varphi(x - k) = \mu_r$ for every $r < N$
-(\Cref{prop:daub-periodised-moments}). The coefficient of $x^l$ is $\mu_0 = \int_\R \varphi = 1$
-(\Cref{thm:daub-scaling-fourier}).
-\end{proof}
-
-\begin{lemma}[Lowering the degree]
-\label{lem:daub-lower-degree}
-\lean{Daubechies.sub_C_coeff_mul_mem_degreeLT}
-\leanok
-Let $R$ be a ring and $n \in \N$, let $Q \in R[X]$ have degree less than $n + 1$, and let
-$P \in R[X]$ have degree at most $n$ and coefficient $1$ at $X^n$. Then $Q - q_n P$ has degree
-less than $n$, where $q_n$ is the coefficient of $X^n$ in $Q$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The coefficients at $X^n$ cancel, and both polynomials have degree at most $n$.
-\end{proof}
-
 \begin{proposition}[Polynomials as combinations of the translates]
 \label{prop:daub-poly-combination}
-\lean{Daubechies.exists_coeff_poly_of_mem_degreeLT, Daubechies.exists_coeff_poly}
+\lean{Daubechies.exists_coeff_poly_of_mem_degreeLT, Daubechies.exists_coeff_poly,
+  Daubechies.tsum_intCast_pow_mul_scalingFun_sub, Daubechies.exists_poly_sum_pow_mul,
+  Daubechies.sub_C_coeff_mul_mem_degreeLT}
 \leanok
 \uses{def:daub-scaling-function}
 Let $N \geq 2$ and $n \leq N$. For every Daubechies mask of order $N$ and every polynomial $Q$
@@ -2613,48 +2438,37 @@ of degree less than $n$ there is a polynomial $a$ of degree less than $n$ with
 
 \begin{proof}
 \leanok
-\uses{prop:daub-integer-moments, lem:daub-lower-degree, lem:daub-finite-sums}
-Induction on $n$; for $n = 0$, $Q = 0$. For the step let $q_n$ be the coefficient of $X^n$ in
-$Q$, and let $P$ be the polynomial of degree $n$ with leading coefficient $1$ and
-$P(x) = \sum_k k^n \varphi(x - k)$ (\Cref{prop:daub-integer-moments}, since $n < N$). By
-\Cref{lem:daub-lower-degree} and the induction hypothesis,
-$Q - q_n P = \sum_k a'(k) \varphi(\cdot - k)$ with a polynomial $a'$ of degree less than $n$,
-and $a = q_n X^n + a'$ represents $Q$; all sums over $k$ are finite
-(\Cref{lem:daub-finite-sums}).
-\end{proof}
-
-\begin{proposition}[Recovery of the coefficients]
-\label{prop:daub-coefficient-recovery}
-\lean{Daubechies.scalingFun_sub_mul_conj_eq_zero, Daubechies.integrable_scalingFun_sub_mul_conj,
-  Daubechies.integral_tsum_mul_scalingFun_sub_mul_conj}
-\leanok
-\uses{def:daub-scaling-function}
-For every Daubechies mask of order $N \geq 2$ and all $j, k \in \Z$ the function
-$y \mapsto \varphi(y - j) \, \overline{\varphi(y - k)}$ is integrable, and it vanishes
-identically if $|j - k| > 2N - 1$. For every Daubechies mask of order $N \geq 2$, every
-$a : \Z \to \C$ and every $k \in \Z$,
+\uses{lem:daub-finite-sums, prop:daub-periodised-moments, thm:daub-scaling-fourier}
+First, the integer moments of the translates: with $\mu_r = \int_\R y^r \varphi(y) \, dy$ for
+$r \in \N$, for every $l < N$ and every $x \in \R$
 \[
-  \int_\R \Bigl(\sum_{j \in \Z} a(j) \, \varphi(y - j)\Bigr) \overline{\varphi(y - k)} \, dy
-  = a(k) .
+  \sum_{k \in \Z} k^l \, \varphi(x - k)
+  = \sum_{i=0}^{l} \binom{l}{i} (-1)^{l-i} \mu_{l-i} \, x^i ,
 \]
-\end{proposition}
+and the right side is a polynomial of degree $l$ in $x$ with leading coefficient $1$. Indeed,
+write $k = x - (x - k)$ and expand $k^l$ by the binomial theorem. The sums over $k$ are finite
+(\Cref{lem:daub-finite-sums}), so they can be exchanged with the sum over $i$, and
+$\sum_k (x - k)^r \varphi(x - k) = \mu_r$ for every $r < N$
+(\Cref{prop:daub-periodised-moments}). The coefficient of $x^l$ is $\mu_0 = \int_\R \varphi = 1$
+(\Cref{thm:daub-scaling-fourier}). Second, lowering the degree: for a ring $R$, $n \in \N$, a
+polynomial $Q \in R[X]$ of degree less than $n + 1$ and a polynomial $P \in R[X]$ of degree at
+most $n$ with coefficient $1$ at $X^n$, the polynomial $Q - q_n P$ has degree less than $n$,
+where $q_n$ is the coefficient of $X^n$ in $Q$: the coefficients at $X^n$ cancel, and both
+polynomials have degree at most $n$.
 
-\begin{proof}
-\leanok
-\uses{thm:daub-scaling-support, prop:daub-scaling-integrable, prop:daub-scaling-continuous,
-  prop:daub-scaling-real, thm:daub-orthonormal}
-If both factors are nonzero at $y$, then $y - j, y - k \in [0, 2N - 1]$
-(\Cref{thm:daub-scaling-support}), so $|j - k| \leq 2N - 1$. The product of the integrable
-function $\varphi(\cdot - j)$ (\Cref{prop:daub-scaling-integrable}) and the bounded continuous
-function $\overline{\varphi(\cdot - k)} = \varphi(\cdot - k)$
-(\Cref{prop:daub-scaling-continuous,prop:daub-scaling-real}) is integrable.
-Hence the integrand is a finite sum over the $j$ with $|j - k| \leq 2N - 1$, and orthonormality
-(\Cref{thm:daub-orthonormal}) leaves the term $j = k$.
+Now induction on $n$; for $n = 0$, $Q = 0$. For the step let $q_n$ be the coefficient of $X^n$
+in $Q$, and let $P$ be the polynomial of degree $n$ with leading coefficient $1$ and
+$P(x) = \sum_k k^n \varphi(x - k)$, which exists since $n < N$. By lowering the degree and the
+induction hypothesis, $Q - q_n P = \sum_k a'(k) \varphi(\cdot - k)$ with a polynomial $a'$ of
+degree less than $n$, and $a = q_n X^n + a'$ represents $Q$; all sums over $k$ are finite
+(\Cref{lem:daub-finite-sums}).
 \end{proof}
 
 \begin{theorem}[Polynomial reproduction]
 \label{thm:daub-poly-reproduction}
-\lean{Daubechies.sum_inner_poly_mul_scalingFun, Daubechies.sum_integral_poly_mul_scalingFun}
+\lean{Daubechies.sum_inner_poly_mul_scalingFun, Daubechies.sum_integral_poly_mul_scalingFun,
+  Daubechies.scalingFun_sub_mul_conj_eq_zero, Daubechies.integrable_scalingFun_sub_mul_conj,
+  Daubechies.integral_tsum_mul_scalingFun_sub_mul_conj}
 \leanok
 \uses{def:daub-scaling-function}
 For every Daubechies mask of order $N \geq 2$, every polynomial $Q$ of degree less than $N$ and
@@ -2668,12 +2482,28 @@ and the same holds with $\varphi(y - k)$ in place of $\overline{\varphi(y - k)}$
 
 \begin{proof}
 \leanok
-\uses{prop:daub-poly-combination, prop:daub-coefficient-recovery, prop:daub-scaling-real}
-Write $Q = \sum_j a(j) \varphi(\cdot - j)$ with a polynomial $a$
+\uses{thm:daub-scaling-support, prop:daub-scaling-integrable, prop:daub-scaling-continuous,
+  prop:daub-scaling-real, thm:daub-orthonormal, prop:daub-poly-combination}
+First, the recovery of the coefficients: for all $j, k \in \Z$ the function
+$y \mapsto \varphi(y - j) \, \overline{\varphi(y - k)}$ is integrable, and it vanishes
+identically if $|j - k| > 2N - 1$; and for every $a : \Z \to \C$ and every $k \in \Z$,
+\[
+  \int_\R \Bigl(\sum_{j \in \Z} a(j) \, \varphi(y - j)\Bigr) \overline{\varphi(y - k)} \, dy
+  = a(k) .
+\]
+Indeed, if both factors are nonzero at $y$, then $y - j, y - k \in [0, 2N - 1]$
+(\Cref{thm:daub-scaling-support}), so $|j - k| \leq 2N - 1$. The product of the integrable
+function $\varphi(\cdot - j)$ (\Cref{prop:daub-scaling-integrable}) and the bounded continuous
+function $\overline{\varphi(\cdot - k)} = \varphi(\cdot - k)$
+(\Cref{prop:daub-scaling-continuous,prop:daub-scaling-real}) is integrable. Hence the integrand
+is a finite sum over the $j$ with $|j - k| \leq 2N - 1$, and orthonormality
+(\Cref{thm:daub-orthonormal}) leaves the term $j = k$.
+
+Now write $Q = \sum_j a(j) \varphi(\cdot - j)$ with a polynomial $a$
 (\Cref{prop:daub-poly-combination}). Then
-$\int_\R Q(y) \overline{\varphi(y - k)} \, dy = a(k)$ (\Cref{prop:daub-coefficient-recovery}),
-so the left side is $\sum_k a(k) \varphi(x - k) = Q(x)$. Since $\varphi$ is real
-(\Cref{prop:daub-scaling-real}), the second form is the same identity.
+$\int_\R Q(y) \overline{\varphi(y - k)} \, dy = a(k)$, so the left side is
+$\sum_k a(k) \varphi(x - k) = Q(x)$. Since $\varphi$ is real (\Cref{prop:daub-scaling-real}),
+the second form is the same identity.
 \end{proof}
 
 So the operator $f \mapsto \sum_k \langle f, \varphi(\cdot - k) \rangle \varphi(\cdot - k)$
