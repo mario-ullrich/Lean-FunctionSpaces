@@ -72,7 +72,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Triebel–Lizorkin spaces on `ℝ^d`: definition, `F_{p,p} = B_{p,p}`, the Besov sandwich | ✅ | ✗ | `Rd/TriebelLizorkin` |
 | Dyadic cubes of every level, Lebesgue differentiation along them | ✅ | ✗ | `Rd/DyadicCubes` |
 | Hardy–Littlewood maximal function: weighted weak and strong types | ✅ | ✗ | `Rd/MaximalFunction` |
-| The Calderón–Zygmund decomposition | ⬜ | ✗ | `Rd/CalderonZygmund` |
+| The Calderón–Zygmund decomposition on dyadic cubes | ✅ | ✗ | `Rd/CalderonZygmund` |
 | The Fefferman–Stein inequality | ⬜ | ✗ | `Rd/FeffermanStein` |
 | Kernel majorants and maximal function bounds of convolutions | ⬜ | ✗ | `Rd/KernelMajorants` |
 | Local means characterisation of Triebel–Lizorkin spaces | ⬜ | ✗ | `Rd/TriebelLizorkinLocalMeans` |

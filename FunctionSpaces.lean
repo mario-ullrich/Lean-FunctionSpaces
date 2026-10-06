@@ -135,6 +135,7 @@ public import FunctionSpaces.Rd.TriebelLizorkin
 public import FunctionSpaces.Torus.TriebelLizorkin
 public import FunctionSpaces.Rd.DyadicCubes
 public import FunctionSpaces.Rd.MaximalFunction
+public import FunctionSpaces.Rd.CalderonZygmund
 
 /-!
 # Function spaces
@@ -415,4 +416,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   Lebesgue differentiation theorem along them.
 * `FunctionSpaces.Rd.MaximalFunction`: the Hardy–Littlewood maximal function, its weighted weak
   and strong types, and the Hardy–Littlewood maximal theorem.
+* `FunctionSpaces.Rd.CalderonZygmund`: the Calderón–Zygmund decomposition on dyadic cubes, with
+  the averages over the maximal big cubes, the measure of the exceptional set, and the bound
+  `G ≤ t` almost everywhere outside it.
 -/

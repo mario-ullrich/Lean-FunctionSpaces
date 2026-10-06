@@ -16,9 +16,10 @@ public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 In the coordinates of `Rd.gridBasis`, the **dyadic cube** of level `k ∈ ℤ` and index `m ∈ ℤ^n`
 is `Q_{k,m} = {x : ⌊2^k x_i⌋ = m_i for all i}` (`Rd.zcell`); for `k ∈ ℕ` it is the cell
 `Rd.cell k m` (`Rd.zcell_natCast`). The cubes of one level partition `V`, have the volume
-`2^(-kn)` (`Rd.volume_zcell`), and contain the ball of radius `2^(-k)/2` around their centre
-(`Rd.ball_subset_zcell`). Cubes are **nested**: each cube of level `k + 1` lies in its parent of
-level `k` (`Rd.zcell_succ_subset_parent`), so two cubes are nested or disjoint
+`2^(-kn)` (`Rd.volume_zcell`), contain the ball of radius `2^(-k)/2` around their centre
+(`Rd.ball_subset_zcell`), and lie in the closed ball of radius `n 2^(-k)` around it
+(`Rd.zcell_subset_closedBall`). Cubes are **nested**: each cube of level `k + 1` lies in its
+parent of level `k` (`Rd.zcell_succ_subset_parent`), so two cubes are nested or disjoint
 (`Rd.zcell_subset_or_disjoint`).
 
 **Lebesgue differentiation along cubes**: for a locally integrable `F`, the averages of `F` over
@@ -112,6 +113,12 @@ theorem norm_sub_zcellCenter_le {k : ℤ} {m : Fin (finrank ℝ V) → ℤ} {x :
           (div_le_div_of_nonneg_right (by norm_num) (by positivity))
     _ = finrank ℝ V / 2 ^ k := by
         rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one_div]
+
+/-- **Outer ball**: the cube `Q_{k,m}` lies in the closed ball of radius `n 2^(-k)` around its
+centre. -/
+theorem zcell_subset_closedBall (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
+    zcell k m ⊆ closedBall (zcellCenter k m) (finrank ℝ V / 2 ^ k) := fun _ hx =>
+  mem_closedBall_iff_norm.2 (norm_sub_zcellCenter_le hx)
 
 /-- **Inner ball**: the cube `Q_{k,m}` contains the open ball of radius `2^(-k)/2` around its
 centre. -/
@@ -267,6 +274,16 @@ theorem volume_zcell_parent (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
   rw [← ENNReal.ofReal_ofNat 2, ← ENNReal.ofReal_mul (by norm_num), zpow_add_one₀ two_ne_zero]
   congr 1
   field_simp
+
+/-- **Coarser cubes are larger**: a cube of level `k - l` has `2^(ln)` times the volume of a cube
+of level `k`, for all indices. -/
+theorem volume_zcell_sub (k : ℤ) (l : ℕ) (m m' : Fin (finrank ℝ V) → ℤ) :
+    volume (zcell (V := V) (k - l) m') = 2 ^ (l * finrank ℝ V) * volume (zcell (V := V) k m) := by
+  have h : ((2 : ℝ) ^ (k - l))⁻¹ = 2 ^ l * ((2 : ℝ) ^ k)⁻¹ := by
+    rw [zpow_sub₀ two_ne_zero, zpow_natCast]
+    field_simp
+  rw [volume_zcell, volume_zcell, h, ENNReal.ofReal_mul (by positivity),
+    ENNReal.ofReal_pow (by norm_num), ENNReal.ofReal_ofNat, mul_pow, ← pow_mul]
 
 end Measure
 

@@ -9367,8 +9367,9 @@ $Q_{k,m}$ is measurable, and for every $k \in \N$ it is the cell $P_{k,m}$, with
 \begin{lemma}[Size, partition and volume of cubes]
 \label{lem:dyadic-cubes}
 \lean{Rd.repr_sub_zcellCenter, Rd.abs_repr_sub_zcellCenter_le, Rd.norm_sub_zcellCenter_le,
-  Rd.ball_subset_zcell, Rd.zcell_disjoint, Rd.iUnion_zcell, Rd.zcell_eq_preimage, Rd.volume_zcell,
-  Rd.volume_zcell_pos, Rd.volume_zcell_lt_top, Rd.volume_real_zcell}
+  Rd.zcell_subset_closedBall, Rd.ball_subset_zcell, Rd.zcell_disjoint, Rd.iUnion_zcell,
+  Rd.zcell_eq_preimage, Rd.volume_zcell, Rd.volume_zcell_pos, Rd.volume_zcell_lt_top,
+  Rd.volume_real_zcell}
 \leanok
 \uses{def:dyadic-cubes, lem:dyadic-cells}
 For every $k \in \Z$, every $m \in \Z^n$ and every $x \in V$, the $i$-th coordinate of
@@ -9378,8 +9379,9 @@ $\|x - c_{k,m}\| \leq n 2^{-k}$. For every $k \in \Z$ and every $m \in \Z^n$,
 \[
   Q_{k,m} = \{x \in V : m_i 2^{-k} \leq x_i < (m_i + 1) 2^{-k} \text{ for all } i\},
 \]
-$B(c_{k,m}, 2^{-k}/2) \subseteq Q_{k,m}$ and $|Q_{k,m}| = 2^{-kn}$. For every $k \in \Z$ the cubes
-of level $k$ are pairwise disjoint and cover $V$.
+$B(c_{k,m}, 2^{-k}/2) \subseteq Q_{k,m} \subseteq \bar B(c_{k,m}, n 2^{-k})$ and
+$|Q_{k,m}| = 2^{-kn}$. For every $k \in \Z$ the cubes of level $k$ are pairwise disjoint and cover
+$V$.
 \end{lemma}
 
 \begin{proof}
@@ -9394,7 +9396,8 @@ preserves the volume (Mathlib's \texttt{OrthonormalBasis.measurePreserving\_repr
 
 \begin{lemma}[Nesting of cubes]
 \label{lem:dyadic-cubes-nested}
-\lean{Rd.parent, Rd.zcell_succ_subset_parent, Rd.volume_zcell_parent, Rd.ancestor,
+\lean{Rd.parent, Rd.zcell_succ_subset_parent, Rd.volume_zcell_parent, Rd.volume_zcell_sub,
+  Rd.ancestor,
   Rd.ancestor_add, Rd.zcell_subset_ancestor, Rd.zcellIndex_sub_ancestor,
   Rd.zcell_subset_or_disjoint}
 \leanok
@@ -9406,8 +9409,10 @@ $m \in \Z^n$,
   Q_{k+1,m} \subseteq Q_{k,\hat m}, \qquad |Q_{k,\hat m}| = 2^n |Q_{k+1,m}|, \qquad
   Q_{k+l,m} \subseteq Q_{k,m^{(l)}}.
 \]
-For every $k \in \Z$, every $l \in \N$ and every $x \in V$, the index of $Q_{k-l}(x)$ is
-$p^{(l)}$, where $p = (\lfloor 2^k x_i \rfloor)_i$ is the index of $Q_k(x)$. For all integers
+For every $k \in \Z$, every $l \in \N$ and all $m, m' \in \Z^n$,
+$|Q_{k-l,m'}| = 2^{ln} |Q_{k,m}|$. For every $k \in \Z$, every $l \in \N$ and every $x \in V$,
+the index of $Q_{k-l}(x)$ is $p^{(l)}$, where $p = (\lfloor 2^k x_i \rfloor)_i$ is the index of
+$Q_k(x)$. For all integers
 $k \leq k'$ and all $m, m' \in \Z^n$, either $Q_{k',m'} \subseteq Q_{k,m}$ or
 $Q_{k',m'} \cap Q_{k,m} = \emptyset$.
 \end{lemma}
@@ -9732,6 +9737,98 @@ $\int (M g)^p < \infty$, so $M g < \infty$ almost everywhere.
 The weighted bound holds for every almost everywhere measurable $g$, with both sides possibly
 infinite; this is what the duality argument for the Fefferman--Stein inequality uses, where it is
 applied at an exponent other than $p$.
+
+\section{The Calder\'on--Zygmund decomposition}
+
+The Calder\'on--Zygmund decomposition splits $V$ at a height $t$ into a union $\Omega$ of disjoint
+dyadic cubes, on which $G$ has average comparable to $t$, and its complement, on which $G \leq t$
+almost everywhere (for $n \geq 1$, $t > 0$ and an almost everywhere measurable $G$ with
+$\int G < \infty$). The Fefferman--Stein inequality applies it to the $\ell_q$ norm of a family
+of functions. As in \Cref{def:dyadic-cubes}, $Q_{k,m}$ is the dyadic cube of level $k$ and
+index $m$, $m^{(l)}$ the index of its ancestor $l$ levels up (\Cref{lem:dyadic-cubes-nested}),
+and $G_Q$ the average of $G$ over $Q$. Throughout, $G : V \to [0, \infty]$ and
+$t \in [0, \infty]$; a cube $Q$ is \emph{big} if $G_Q > t$.
+
+\begin{lemma}[Coarse cubes are not big]
+\label{lem:coarse-cubes-not-big}
+\lean{Rd.lt_setLAverage_zcell_iff, Rd.exists_forall_setLAverage_zcell_sub_le}
+\leanok
+\uses{def:dyadic-cubes, lem:dyadic-cubes, lem:dyadic-cubes-nested}
+For every $G : V \to [0, \infty]$, every $t \in [0, \infty]$ and every cube $Q$, $G_Q > t$ holds
+if and only if $t \, |Q| < \int_Q G$. If $n \geq 1$, then for every $G : V \to [0, \infty]$ with
+$\int G < \infty$, every $t \in (0, \infty]$ and every $k \in \Z$ there is $B \in \N$ such that
+$G_{Q_{k-l,m'}} \leq t$ for every integer $l > B$ and every $m' \in \Z^n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:dyadic-cubes}, $G_Q = |Q|^{-1} \int_Q G$ with $0 < |Q| < \infty$. For $t = \infty$
+no cube is big. For $t < \infty$ choose $B \in \N$ with $\int G < B \, t \, |Q_{k,0}|$. For
+$l > B$, $2^{ln} \geq 2^l > B$ since $n \geq 1$, so by \Cref{lem:dyadic-cubes-nested}
+$t \, |Q_{k-l,m'}| = 2^{ln} \, t \, |Q_{k,0}| > \int G \geq \int_{Q_{k-l,m'}} G$.
+\end{proof}
+
+For $n = 0$ the space $V$ is a single point and every cube is $V$, so the last statement needs
+$n \geq 1$.
+
+\begin{definition}[Maximal big cubes and the exceptional sets]
+\label{def:calderon-zygmund-cubes}
+\lean{Rd.czMaximal, Rd.czMaximal_countable, Rd.czSet, Rd.czEnlarged, Rd.measurableSet_czSet,
+  Rd.measurableSet_czEnlarged, Rd.zcell_subset_czSet, Rd.czSet_subset_czEnlarged}
+\leanok
+\uses{def:dyadic-cubes, lem:dyadic-cubes, lem:dyadic-cubes-nested}
+A pair $(k, m) \in \Z \times \Z^n$ is a maximal big cube of $G$ at height $t$ if
+$G_{Q_{k,m}} > t$ and $G_{Q_{k-l,m^{(l)}}} \leq t$ for every integer $l \geq 1$. The exceptional
+set $\Omega$ is the union of the maximal big cubes $Q_{k,m}$, and the enlarged exceptional set is
+\[
+  \Omega^* = \bigcup_{(k, m) \text{ maximal big}} \bar B\bigl(c_{k,m}, 2 n 2^{-k}\bigr) .
+\]
+There are countably many maximal big cubes, $\Omega$ and $\Omega^*$ are measurable, and every
+maximal big cube lies in $\Omega \subseteq \Omega^*$.
+\end{definition}
+
+The inclusion $\Omega \subseteq \Omega^*$ holds since $Q_{k,m} \subseteq \bar B(c_{k,m}, n 2^{-k})$
+by \Cref{lem:dyadic-cubes}; the factor $2$ in the radius keeps every point outside $\Omega^*$ at
+a distance greater than $n 2^{-k}$ from each maximal big cube $Q_{k,m}$.
+
+\begin{theorem}[Calder\'on--Zygmund decomposition]
+\label{thm:calderon-zygmund}
+\lean{Rd.exists_maximal_of_big, Rd.czMaximal_disjoint_of_le, Rd.czMaximal_pairwiseDisjoint,
+  Rd.cz_avg_gt, Rd.cz_avg_le, Rd.cz_volume_zcell_le, Rd.cz_volume_le, Rd.cz_ae_le_of_notMem}
+\leanok
+\uses{def:dyadic-cubes, lem:dyadic-cubes, lem:dyadic-cubes-nested, def:calderon-zygmund-cubes,
+  lem:coarse-cubes-not-big, thm:lebesgue-differentiation-cubes}
+For every $G : V \to [0, \infty]$ and every $t \in [0, \infty]$, with $0^{-1} = \infty$, the
+maximal big cubes of $G$ at height $t$ are pairwise disjoint, every maximal big cube $Q$ satisfies
+\[
+  t < G_Q \leq 2^n t, \qquad |Q| \leq t^{-1} \int_Q G,
+\]
+and $|\Omega| \leq t^{-1} \int G$. If moreover $n \geq 1$, $\int G < \infty$ and $t > 0$, then
+every big cube $Q_{k,m}$ lies in a maximal big cube $Q_{k-l,m^{(l)}}$ for some $l \in \N$, and if
+in addition $G$ is almost everywhere measurable, then $G(x) \leq t$ for almost every
+$x \in V \setminus \Omega$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $Q_{k,m}$ and $Q_{k',m'}$ be distinct maximal big cubes with $k \leq k'$. For $k = k'$ they
+are distinct cubes of one level, hence disjoint. For $k' = k + l$ with $l \geq 1$, the cube
+$Q_{k',m'}$ lies in its ancestor $Q_{k,m'^{(l)}}$, which is not big by maximality, so
+$m'^{(l)} \neq m$ and the two cubes of level $k$ are disjoint. The bound $G_Q > t$ is the
+definition. The parent $P$ of $Q$ is not big and $|P| = 2^n |Q|$, so
+$\int_Q G \leq \int_P G \leq t \, |P| = 2^n t \, |Q|$. From $t \, |Q| < \int_Q G$ follows
+$|Q| \leq t^{-1} \int_Q G$, for $t = 0$ since then $\int_Q G > 0$ and the right side is
+$\infty$, and summing over the disjoint maximal cubes gives
+$|\Omega| \leq t^{-1} \int_\Omega G \leq t^{-1} \int G$.
+
+Let $Q_{k,m}$ be big. By \Cref{lem:coarse-cubes-not-big} the set of $l \in \N$ with
+$Q_{k-l,m^{(l)}}$ big is bounded and contains $0$; for its largest element $l_0$ the cube
+$Q_{k-l_0,m^{(l_0)}}$ is a maximal big cube, since its ancestors are the cubes
+$Q_{k-l,m^{(l)}}$ with $l > l_0$, and it contains $Q_{k,m}$ by \Cref{lem:dyadic-cubes-nested}.
+Hence for $x \notin \Omega$ no cube $Q_k(x)$, $k \in \N$, is big, so $G_{Q_k(x)} \leq t$ for
+all $k$, and \Cref{thm:lebesgue-differentiation-cubes} gives $G(x) \leq t$ for almost every
+such $x$.
+\end{proof}
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
