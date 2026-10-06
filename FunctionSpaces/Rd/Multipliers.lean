@@ -18,8 +18,10 @@ differences into themselves (`Rd.exists_modNorm_mulLp_le`): for `1 ≤ p < ∞`,
 
 The ingredients:
 
-* **differences of smooth functions**: `‖Δ_h^l G(x)‖ ≤ C ‖h‖^l` if `‖D^l G‖ ≤ C`
-  (`Rd.norm_higherDiff_le_of_iteratedFDeriv`), by the mean value inequality;
+* **differences of smooth functions**: for `G` of class `C^l`, `‖Δ_h^l G(x)‖ ≤ C ‖h‖^l` if
+  `‖D^l G‖ ≤ C` on the segment from `x` to `x + l h` (`Rd.norm_higherDiff_le_of_segment`), by the
+  mean value inequality, in particular if `‖D^l G‖ ≤ C` everywhere
+  (`Rd.norm_higherDiff_le_of_iteratedFDeriv`);
 * **Leibniz's rule for differences** (`Rd.higherDiff_mul`):
   `Δ_h^r(u v)(x) = ∑_{l ≤ r} C(r, l) Δ_h^l u(x) Δ_h^(r-l) v(x + l h)`, hence
   `ω_r(ψ f, t)_p ≤ ∑_{l ≤ r} C(r, l) C t^l ω_(r-l)(f, t)_p` (`Rd.modulus_mul_smooth_le`);
@@ -43,38 +45,70 @@ section Smooth
 variable {V E : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] [NormedAddCommGroup E]
   [NormedSpace ℝ E]
 
-/-- **Differences of smooth functions**: if `‖D^l G‖ ≤ C`, then `‖Δ_h^l G(x)‖ ≤ C ‖h‖^l`, by
-induction on `l`: the derivatives of order `l` of `Δ_h G` are those of `G` at `x + h` minus those
-at `x`, and the mean value inequality bounds their difference by `C ‖h‖`. -/
+/-- The derivative bound of one step of `Rd.norm_higherDiff_le_of_segment`: for `G` of class
+`C^(l+1)`, if `‖D^(l+1) G‖ ≤ C` at the points `x + s h`, `0 ≤ s ≤ l + 1`, then
+`‖D^l (Δ_h G)‖ ≤ C ‖h‖` at the points `x + t h`, `0 ≤ t ≤ l`, by the mean value inequality on the
+segment from `x + t h` to `x + (t + 1) h`. -/
+theorem norm_iteratedFDeriv_fwdDiff_le_of_segment {G : V → E} (l : ℕ)
+    (hG : ContDiff ℝ (l + 1 : ℕ) G) (h x : V) {C : ℝ}
+    (hC : ∀ s ∈ Set.Icc (0 : ℝ) (l + 1 : ℕ), ‖iteratedFDeriv ℝ (l + 1) G (x + s • h)‖ ≤ C)
+    {t : ℝ} (ht : t ∈ Set.Icc (0 : ℝ) l) :
+    ‖iteratedFDeriv ℝ l (fwdDiff h G) (x + t • h)‖ ≤ C * ‖h‖ := by
+  have hGh : ContDiff ℝ (l + 1 : ℕ) fun z => G (z + h) := hG.comp (contDiff_id.add contDiff_const)
+  have hle : (l : WithTop ℕ∞) ≤ (l + 1 : ℕ) := by exact_mod_cast Nat.le_succ l
+  have hd : Differentiable ℝ (iteratedFDeriv ℝ l G) :=
+    hG.differentiable_iteratedFDeriv (by exact_mod_cast Nat.lt_succ_self l)
+  have hsub : iteratedFDeriv ℝ l (fwdDiff h G) (x + t • h) =
+      iteratedFDeriv ℝ l G (x + t • h + h) - iteratedFDeriv ℝ l G (x + t • h) := by
+    rw [show fwdDiff h G = (fun z => G (z + h)) - G from rfl,
+      iteratedFDeriv_sub_apply (hGh.contDiffAt.of_le hle) (hG.contDiffAt.of_le hle),
+      iteratedFDeriv_comp_add_right]
+  have hder : ∀ z ∈ segment ℝ (x + t • h) (x + t • h + h),
+      ‖fderiv ℝ (iteratedFDeriv ℝ l G) z‖ ≤ C := by
+    intro z hz
+    rw [segment_eq_image'] at hz
+    obtain ⟨θ, hθ, rfl⟩ := hz
+    rw [add_sub_cancel_left, norm_fderiv_iteratedFDeriv]
+    have hmem : t + θ ∈ Set.Icc (0 : ℝ) (l + 1 : ℕ) := by
+      refine ⟨by linarith [ht.1, hθ.1], ?_⟩
+      push_cast
+      linarith [ht.2, hθ.2]
+    have := hC (t + θ) hmem
+    rwa [add_smul, ← add_assoc] at this
+  have hmv := (convex_segment _ _).norm_image_sub_le_of_norm_fderiv_le
+    (fun z _ => hd z) hder (left_mem_segment ℝ _ _) (right_mem_segment ℝ _ _)
+  rw [add_sub_cancel_left] at hmv
+  rw [hsub]
+  exact hmv
+
+/-- **Differences along a segment**: for `G` of class `C^l`, if `‖D^l G‖ ≤ C` at the points
+`x + t h`, `0 ≤ t ≤ l`, then `‖Δ_h^l G(x)‖ ≤ C ‖h‖^l`. By induction on `l`: the derivatives of
+order `l` of `Δ_h G` at `x + t h` are differences of those of `G`, bounded by the mean value
+inequality on the segment from `x + t h` to `x + (t + 1) h`. -/
+theorem norm_higherDiff_le_of_segment {G : V → E} (l : ℕ) (hG : ContDiff ℝ l G) (h x : V)
+    {C : ℝ} (hC : ∀ t ∈ Set.Icc (0 : ℝ) l, ‖iteratedFDeriv ℝ l G (x + t • h)‖ ≤ C) :
+    ‖(fwdDiff h)^[l] G x‖ ≤ C * ‖h‖ ^ l := by
+  induction l generalizing G C with
+  | zero =>
+    have := hC 0 (by simp)
+    simpa [norm_iteratedFDeriv_zero] using this
+  | succ l ih =>
+    have hG' : ContDiff ℝ l (fwdDiff h G) :=
+      ((hG.comp (contDiff_id.add contDiff_const)).sub hG).of_le
+        (by exact_mod_cast Nat.le_succ l)
+    rw [Function.iterate_succ_apply]
+    calc ‖(fwdDiff h)^[l] (fwdDiff h G) x‖ ≤ C * ‖h‖ * ‖h‖ ^ l :=
+          ih hG' fun t ht => norm_iteratedFDeriv_fwdDiff_le_of_segment l hG h x hC ht
+      _ = C * ‖h‖ ^ (l + 1) := by ring
+
+/-- **Differences of smooth functions**: if `‖D^l G‖ ≤ C` everywhere, then
+`‖Δ_h^l G(x)‖ ≤ C ‖h‖^l`, the case of `Rd.norm_higherDiff_le_of_segment` with the bound on the
+whole space. -/
 theorem norm_higherDiff_le_of_iteratedFDeriv {G : V → E}
     (hG : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) G) {l : ℕ} {C : ℝ}
     (hC : ∀ x, ‖iteratedFDeriv ℝ l G x‖ ≤ C) (h x : V) :
-    ‖(fwdDiff h)^[l] G x‖ ≤ C * ‖h‖ ^ l := by
-  induction l generalizing G C with
-  | zero => simpa [norm_iteratedFDeriv_zero] using hC x
-  | succ l ih =>
-    have hGh : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) fun z => G (z + h) :=
-      hG.comp (contDiff_id.add contDiff_const)
-    have hle : ((l : ℕ∞) : WithTop ℕ∞) ≤ ((⊤ : ℕ∞) : WithTop ℕ∞) :=
-      WithTop.coe_le_coe.2 le_top
-    have hbound : ∀ y, ‖iteratedFDeriv ℝ l (fwdDiff h G) y‖ ≤ C * ‖h‖ := fun y => by
-      have hsub : iteratedFDeriv ℝ l (fwdDiff h G) y =
-          iteratedFDeriv ℝ l G (y + h) - iteratedFDeriv ℝ l G y := by
-        rw [show fwdDiff h G = (fun z => G (z + h)) - G from rfl,
-          iteratedFDeriv_sub_apply (hGh.contDiffAt.of_le hle) (hG.contDiffAt.of_le hle),
-          iteratedFDeriv_comp_add_right]
-      have hd : Differentiable ℝ (iteratedFDeriv ℝ l G) :=
-        hG.differentiable_iteratedFDeriv (WithTop.coe_lt_coe.2 (ENat.natCast_lt_top l))
-      have hmv := convex_univ.norm_image_sub_le_of_norm_fderiv_le (fun z _ => hd z)
-        (fun z _ => norm_fderiv_iteratedFDeriv.le.trans (hC z)) (Set.mem_univ y)
-        (Set.mem_univ (y + h))
-      rw [add_sub_cancel_left] at hmv
-      rw [hsub]
-      exact hmv
-    have hG' : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (fwdDiff h G) := hGh.sub hG
-    rw [Function.iterate_succ_apply]
-    calc ‖(fwdDiff h)^[l] (fwdDiff h G) x‖ ≤ C * ‖h‖ * ‖h‖ ^ l := ih hG' hbound
-      _ = C * ‖h‖ ^ (l + 1) := by ring
+    ‖(fwdDiff h)^[l] G x‖ ≤ C * ‖h‖ ^ l :=
+  norm_higherDiff_le_of_segment l (hG.of_le (WithTop.coe_le_coe.2 le_top)) h x fun _ _ => hC _
 
 /-- The bound `‖ψ‖ ≤ C` from `‖D^0 ψ‖ ≤ C`. -/
 theorem norm_le_of_iteratedFDeriv_le {ψ : V → E} {r : ℕ} {C : ℝ}

@@ -23,9 +23,11 @@ through derivatives within `Ω` (`Rd.norm_higherDiff_le_of_iteratedFDerivWithin`
 Derivatives fall on the kernel: for a smooth kernel `K` with compact support and a locally
 integrable `g`, `D^l (K ⋆ g)(x)(v_1, …, v_l) = ((D^l K)(v_1, …, v_l) ⋆ g)(x)`
 (`Rd.iteratedFDeriv_conv_apply`, from Mathlib's `HasCompactSupport.hasFDerivAt_convolution_left`).
-The dual kernels are dilations, `‖D^l η_j‖ ≤ A 2^(j(n+l))` (`Rd.norm_iteratedFDeriv_dilate_le`,
-`Rd.LocalMeansBump.exists_iteratedFDeriv_dual_bound`), and the cell coefficients cancel the
-factor `2^(jn)` as for the atoms themselves (`Rd.enorm_inv_cellCoef_mul_conv_le`).
+The dual kernels are dilations, `‖D^l η_j‖ ≤ A 2^(j(n+l))` (`Rd.norm_iteratedFDeriv_dilate_le`),
+with the explicit constant `A = 2 ∑_{l ≤ K} sup ‖D^l m‖` of the moment kernel `m`
+(`Rd.LocalMeansBump.dualDerivConst`, `Rd.LocalMeansBump.norm_iteratedFDeriv_dual_le`), and the
+cell coefficients cancel the factor `2^(jn)` as for the atoms themselves
+(`Rd.enorm_inv_cellCoef_mul_conv_le`).
 -/
 
 @[expose] public section
@@ -176,23 +178,42 @@ theorem contDiff_dual (L j : ℕ) : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ�
   | zero => exact b.contDiff_scaled L 0
   | succ j => exact (b.contDiff_scaled L (j + 1)).add (b.contDiff_scaled L j)
 
-/-- **Derivatives of the dual kernels**: for every order `K` there is `A` with
-`‖D^l η_j‖ ≤ A 2^(j(n+l))` for `l ≤ K` and every level `j`. -/
-theorem exists_iteratedFDeriv_dual_bound (L K : ℕ) :
-    ∃ A : ℝ, 0 ≤ A ∧ ∀ l ≤ K, ∀ j y,
-      ‖iteratedFDeriv ℝ l (b.dual L j) y‖ ≤ A * 2 ^ (j * (finrank ℝ V + l)) := by
-  obtain ⟨C, hC⟩ := exists_iteratedFDeriv_bound (b.contDiff_momentKernel L)
-    (b.hasCompactSupport_momentKernel L) K
-  have hC0 : 0 ≤ C := (norm_nonneg _).trans (hC 0 (Nat.zero_le K) 0)
-  have hs : ∀ l ≤ K, ∀ j y, ‖iteratedFDeriv ℝ l (b.scaled L j) y‖ ≤
-      C * 2 ^ (j * (finrank ℝ V + l)) := fun l hl j y => by
+/-- The constant `A = 2 ∑_{l ≤ K} sup ‖D^l m‖` of the derivatives of the dual kernels, where the
+suprema of the derivatives of the moment kernel `m` are its Schwartz seminorms. -/
+noncomputable def dualDerivConst (L K : ℕ) : ℝ :=
+  2 * ∑ l ∈ Finset.range (K + 1), SchwartzMap.seminorm ℝ 0 l (b.momentSchwartz L)
+
+/-- The constant of the derivatives of the dual kernels is nonnegative. -/
+theorem dualDerivConst_nonneg (L K : ℕ) : 0 ≤ b.dualDerivConst L K :=
+  mul_nonneg zero_le_two (Finset.sum_nonneg fun _ _ => apply_nonneg _ _)
+
+/-- The derivatives of order `l ≤ K` of the moment kernel `m` are bounded by the sum of the
+suprema `∑_{i ≤ K} sup ‖D^i m‖`, its Schwartz seminorms. -/
+theorem norm_iteratedFDeriv_momentKernel_le (L K : ℕ) {l : ℕ} (hl : l ≤ K) (x : V) :
+    ‖iteratedFDeriv ℝ l (momentKernel b.toFun L) x‖ ≤
+      ∑ i ∈ Finset.range (K + 1), SchwartzMap.seminorm ℝ 0 i (b.momentSchwartz L) :=
+  (SchwartzMap.norm_iteratedFDeriv_le_seminorm ℝ (b.momentSchwartz L) l x).trans
+    (Finset.single_le_sum (f := fun i => SchwartzMap.seminorm ℝ 0 i (b.momentSchwartz L))
+      (fun _ _ => apply_nonneg _ _) (Finset.mem_range.2 (Nat.lt_succ_of_le hl)))
+
+/-- **Derivatives of the dual kernels**: `‖D^l η_j‖ ≤ A 2^(j(n+l))` for `l ≤ K` and every level
+`j`, with the explicit constant `A = Rd.LocalMeansBump.dualDerivConst L K`. -/
+theorem norm_iteratedFDeriv_dual_le (L K : ℕ) {l : ℕ} (hl : l ≤ K) (j : ℕ) (y : V) :
+    ‖iteratedFDeriv ℝ l (b.dual L j) y‖ ≤
+      b.dualDerivConst L K * 2 ^ (j * (finrank ℝ V + l)) := by
+  set C := ∑ i ∈ Finset.range (K + 1), SchwartzMap.seminorm ℝ 0 i (b.momentSchwartz L)
+  have hs : ∀ j y, ‖iteratedFDeriv ℝ l (b.scaled L j) y‖ ≤
+      C * 2 ^ (j * (finrank ℝ V + l)) := fun j y => by
     refine (norm_iteratedFDeriv_dilate_le (b.contDiff_momentKernel L) (by positivity) l y).trans ?_
     rw [mul_comm C, ← pow_mul]
-    exact mul_le_mul_of_nonneg_left (hC l hl _) (by positivity)
-  refine ⟨2 * C, by positivity, fun l hl j y => ?_⟩
+    exact mul_le_mul_of_nonneg_left (b.norm_iteratedFDeriv_momentKernel_le L K hl _)
+      (by positivity)
+  have hC : b.dualDerivConst L K = 2 * C := rfl
+  have hC0 : 0 ≤ C := (norm_nonneg _).trans (b.norm_iteratedFDeriv_momentKernel_le L K hl 0)
+  rw [hC]
   cases j with
   | zero =>
-    have h := hs l hl 0 y
+    have h := hs 0 y
     simp only [zero_mul, pow_zero, mul_one] at h ⊢
     show ‖iteratedFDeriv ℝ l (b.scaled L 0) y‖ ≤ 2 * C
     linarith
@@ -202,11 +223,19 @@ theorem exists_iteratedFDeriv_dual_bound (L K : ℕ) :
       (((b.contDiff_scaled L (j + 1)).of_le (by exact_mod_cast le_top)).contDiffAt)
       (((b.contDiff_scaled L j).of_le (by exact_mod_cast le_top)).contDiffAt)]
     refine (norm_add_le _ _).trans ?_
-    have h1 := hs l hl (j + 1) y
-    have h2 := hs l hl j y
+    have h1 := hs (j + 1) y
+    have h2 := hs j y
     have hmono : (2 : ℝ) ^ (j * (finrank ℝ V + l)) ≤ 2 ^ ((j + 1) * (finrank ℝ V + l)) :=
       pow_le_pow_right₀ one_le_two (Nat.mul_le_mul_right _ (Nat.le_succ j))
     nlinarith
+
+/-- **Derivatives of the dual kernels**: for every order `K` there is `A` with
+`‖D^l η_j‖ ≤ A 2^(j(n+l))` for `l ≤ K` and every level `j`. -/
+theorem exists_iteratedFDeriv_dual_bound (L K : ℕ) :
+    ∃ A : ℝ, 0 ≤ A ∧ ∀ l ≤ K, ∀ j y,
+      ‖iteratedFDeriv ℝ l (b.dual L j) y‖ ≤ A * 2 ^ (j * (finrank ℝ V + l)) :=
+  ⟨b.dualDerivConst L K, b.dualDerivConst_nonneg L K,
+    fun _ hl j y => b.norm_iteratedFDeriv_dual_le L K hl j y⟩
 
 end LocalMeansBump
 
@@ -368,19 +397,19 @@ namespace LocalMeansBump
 
 variable (b : LocalMeansBump V)
 
-/-- **Cell atoms of the dual kernels are smooth atoms of every order**: for every order `K` there
-is `A` such that every cell atom of `η_j ⋆ g`, `g ∈ L_p`, is a smooth atom on `V` of order `K`,
-radius factor `2LR + n` and constant `A`. -/
-theorem exists_isSmoothAtom_cellAtom {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L K : ℕ) :
-    ∃ A : ℝ, 0 ≤ A ∧ ∀ (j : ℕ) {g : V → ℂ}, MemLp g p volume → ∀ m,
-      IsSmoothAtom Set.univ K (2 * L * b.radius + finrank ℝ V) A j (cellCenter j m)
-        (cellAtom p (b.dual L j) j g m) := by
-  obtain ⟨A, hA, hb⟩ := b.exists_iteratedFDeriv_dual_bound L K
-  set ρ := 2 * (L : ℝ) * b.radius
-  have hρ : 0 ≤ ρ := mul_nonneg (mul_nonneg zero_le_two (Nat.cast_nonneg L)) b.radius_nonneg
-  set X := (ENNReal.ofReal (ρ ^ finrank ℝ V) * volume (ball (0 : V) 1)) ^ (1 - 1 / p.toReal)
-  refine ⟨A * X.toReal, by positivity, fun j g hg m => ?_⟩
-  have hKρ : ∀ y, ρ / 2 ^ j < ‖y‖ → b.dual L j y = 0 := fun y hy => b.dual_eq_zero_of_lt L j hy
+/-- **Cell atoms of the dual kernels are smooth atoms of every order**: every cell atom of
+`η_j ⋆ g`, `g ∈ L_p`, is a smooth atom on `V` of order `K`, radius factor `2LR + n` and constant
+`A ((2LR)^n |B_1|)^(1-1/p)` with `A = Rd.LocalMeansBump.dualDerivConst L K`. -/
+theorem isSmoothAtom_cellAtom {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L K j : ℕ) {g : V → ℂ}
+    (hg : MemLp g p volume) (m : Fin (finrank ℝ V) → ℤ) :
+    IsSmoothAtom Set.univ K (2 * L * b.radius + finrank ℝ V)
+      (b.dualDerivConst L K * ((ENNReal.ofReal ((2 * L * b.radius) ^ finrank ℝ V) *
+        volume (ball (0 : V) 1)) ^ (1 - 1 / p.toReal)).toReal) j (cellCenter j m)
+      (cellAtom p (b.dual L j) j g m) := by
+  have hρ : 0 ≤ 2 * (L : ℝ) * b.radius :=
+    mul_nonneg (mul_nonneg zero_le_two (Nat.cast_nonneg L)) b.radius_nonneg
+  have hKρ : ∀ y, 2 * L * b.radius / 2 ^ j < ‖y‖ → b.dual L j y = 0 := fun y hy =>
+    b.dual_eq_zero_of_lt L j hy
   have hKs := b.hasCompactSupport_dual L j
   have hgl : LocallyIntegrable ((cell j m).indicator g) volume :=
     (hg.indicator (measurableSet_cell j m)).locallyIntegrable hp1
@@ -390,9 +419,19 @@ theorem exists_isSmoothAtom_cellAtom {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L K : ℕ
   refine ⟨hsmooth.continuous.aestronglyMeasurable, fun x hx => cellAtom_eq_zero hKρ m hx,
     (hsmooth.of_le (by exact_mod_cast le_top)).contDiffOn, fun l hl y _ => ?_⟩
   rw [iteratedFDerivWithin_univ]
-  refine (norm_iteratedFDeriv_cellAtom_le hp1 (b.contDiff_dual L j) hg m hρ hKρ hA
-    (fun z => hb l hl j z) y).trans_eq ?_
+  refine (norm_iteratedFDeriv_cellAtom_le hp1 (b.contDiff_dual L j) hg m hρ hKρ
+    (b.dualDerivConst_nonneg L K) (fun z => b.norm_iteratedFDeriv_dual_le L K hl j z) y).trans_eq ?_
   ring
+
+/-- **Cell atoms of the dual kernels are smooth atoms of every order**: for every order `K` there
+is `A` such that every cell atom of `η_j ⋆ g`, `g ∈ L_p`, is a smooth atom on `V` of order `K`,
+radius factor `2LR + n` and constant `A`. -/
+theorem exists_isSmoothAtom_cellAtom {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L K : ℕ) :
+    ∃ A : ℝ, 0 ≤ A ∧ ∀ (j : ℕ) {g : V → ℂ}, MemLp g p volume → ∀ m,
+      IsSmoothAtom Set.univ K (2 * L * b.radius + finrank ℝ V) A j (cellCenter j m)
+        (cellAtom p (b.dual L j) j g m) :=
+  ⟨_, mul_nonneg (b.dualDerivConst_nonneg L K) ENNReal.toReal_nonneg,
+    fun j _ hg m => b.isSmoothAtom_cellAtom hp1 L K j hg m⟩
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 

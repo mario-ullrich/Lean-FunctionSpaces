@@ -137,6 +137,7 @@ public import FunctionSpaces.Rd.DyadicCubes
 public import FunctionSpaces.Rd.MaximalFunction
 public import FunctionSpaces.Rd.CalderonZygmund
 public import FunctionSpaces.Rd.FeffermanStein
+public import FunctionSpaces.Rd.KernelMajorants
 
 /-!
 # Function spaces
@@ -422,4 +423,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `G ≤ t` almost everywhere outside it.
 * `FunctionSpaces.Rd.FeffermanStein`: the Fefferman–Stein inequality for the maximal functions
   of a family in `L_p(ℓ_q)`, `1 < p < ∞`, `1 < q ≤ ∞`, with the vector-valued weak type `(1,1)`.
+* `FunctionSpaces.Rd.KernelMajorants`: Peetre majorants of the cross kernels `k_j ⋆ Θ_i` and
+  `ψ_j ⋆ η_i` with explicit constants, and the maximal function bound of convolutions with such
+  kernels.
 -/

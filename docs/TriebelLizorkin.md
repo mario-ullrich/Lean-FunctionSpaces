@@ -81,7 +81,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Hardy–Littlewood maximal function: weighted weak and strong types | ✅ | ✗ | `Rd/MaximalFunction` |
 | The Calderón–Zygmund decomposition on dyadic cubes | ✅ | ✗ | `Rd/CalderonZygmund` |
 | The Fefferman–Stein inequality | ✅ | ✗ | `Rd/FeffermanStein` |
-| Kernel majorants and maximal function bounds of convolutions | ⬜ | ✗ | `Rd/KernelMajorants` |
+| Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/KernelMajorants` |
 | Local means characterisation of Triebel–Lizorkin spaces | ⬜ | ✗ | `Rd/TriebelLizorkinLocalMeans` |
 | Ball means of differences | ⬜ | ✗ | `Rd/TriebelLizorkinDifferences` |
 | Atomic characterisation | ⬜ | ✗ | `Rd/TriebelLizorkinAtoms` |

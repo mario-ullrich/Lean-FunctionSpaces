@@ -162,6 +162,21 @@ theorem eLpNorm_dual_one_le (L j : ℕ) :
       _ = 2 * eLpNorm (momentKernel b.toFun L) 1 volume := by
           rw [b.eLpNorm_scaled_one, b.eLpNorm_scaled_one, two_mul]
 
+/-- `‖k_j‖_1 ≤ 2 ‖m‖_1`. -/
+theorem eLpNorm_kernel_one_le (L j : ℕ) :
+    eLpNorm (b.kernel L j) 1 volume ≤ 2 * eLpNorm (momentKernel b.toFun L) 1 volume := by
+  cases j with
+  | zero =>
+    rw [two_mul]
+    exact (b.eLpNorm_scaled_one L 0).le.trans le_self_add
+  | succ j =>
+    show eLpNorm (b.scaled L (j + 1) - b.scaled L j) 1 volume ≤ _
+    calc eLpNorm (b.scaled L (j + 1) - b.scaled L j) 1 volume
+        ≤ eLpNorm (b.scaled L (j + 1)) 1 volume + eLpNorm (b.scaled L j) 1 volume :=
+          eLpNorm_sub_le le_rfl
+      _ = 2 * eLpNorm (momentKernel b.toFun L) 1 volume := by
+          rw [b.eLpNorm_scaled_one, b.eLpNorm_scaled_one, two_mul]
+
 /-- The dilated moment kernels vanish outside `B̄(0, L R 2^(-j))`. -/
 theorem scaled_eq_zero_of_lt (L j : ℕ) {y : V} (hy : L * b.radius / 2 ^ j < ‖y‖) :
     b.scaled L j y = 0 := by

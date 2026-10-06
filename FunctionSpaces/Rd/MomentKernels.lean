@@ -24,7 +24,8 @@ order `L`:
 
 `f(x) - (m_c ⋆ f)(x) = (-1)^L ∫ g(z) Δ^L_{-c^(-1) z} f(x) dz`
 
-for `f ∈ L_p` and almost every `x` (`Rd.ae_sub_conv_dilate_momentKernel_eq`). The moments of `m`
+for `f ∈ L_p` and almost every `x` (`Rd.ae_sub_conv_dilate_momentKernel_eq`; in absolute value
+`Rd.ae_enorm_sub_conv_dilate_momentKernel_le`). The moments of `m`
 of the orders `1, …, L - 1` vanish; the estimates below go through the averaged differences
 instead. If `g` vanishes outside the ball of radius `R`, then
 `‖f - m_c ⋆ f‖_p ≤ ‖g‖_1 ω_L(f, R/c)_p` (`Rd.enorm_sub_convLp_momentKernel_le`), and if the steps
@@ -210,6 +211,20 @@ theorem ae_sub_conv_dilate_momentKernel_eq {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp 
     ae_sub_sum_conv_dilate_eq hp1 hp hg h1 hf L hc] with x h2 h3
   rw [h2]
   exact h3
+
+/-- **The averaged differences, in absolute value**: for an integrable `g` with `∫ g = 1`,
+`f ∈ L_p` with `1 ≤ p < ∞`, `c > 0` and almost every `x`,
+`|f(x) - (m_c ⋆ f)(x)| ≤ ∫ |g(z)| |Δ^L_{-c^(-1) z} f(x)| dz`, where `m` is the moment kernel of
+order `L` of `g`. -/
+theorem ae_enorm_sub_conv_dilate_momentKernel_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞)
+    {g f : V → ℂ} (hg : Integrable g μ) (h1 : ∫ x, g x ∂μ = 1) (hf : MemLp f p μ) (L : ℕ)
+    {c : ℝ} (hc : 0 < c) :
+    ∀ᵐ x ∂μ, ‖f x - conv (dilate c (momentKernel g L)) f μ x‖ₑ ≤
+      ∫⁻ z, ‖g z‖ₑ * ‖(fwdDiff (-c⁻¹ • z))^[L] f x‖ₑ ∂μ := by
+  filter_upwards [ae_sub_conv_dilate_momentKernel_eq hp1 hp hg h1 hf L hc] with x hx
+  rw [hx]
+  refine (enorm_integral_le_lintegral_enorm _).trans (le_of_eq (lintegral_congr fun z => ?_))
+  rw [enorm_mul, enorm_mul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul]
 
 /-- **Moment kernels approximate with the modulus on a set**: let `g` have integral `1` and vanish
 outside the ball of radius `R`, and let `U` be a measurable set that the steps of the averaged

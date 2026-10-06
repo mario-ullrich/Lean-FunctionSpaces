@@ -6424,13 +6424,15 @@ both terms by $\|g\|_1 \omega_L(f, R 2^{-j})_p \leq \|g\|_1 (1 + R)^L \omega_L(f
 \begin{lemma}[Moduli of the reproducing terms]
 \label{lem:dual-kernel-moduli}
 \lean{Rd.LocalMeansBump.eLpNorm_scaled_one, Rd.LocalMeansBump.eLpNorm_dual_one_le,
+  Rd.LocalMeansBump.eLpNorm_kernel_one_le,
   Rd.LocalMeansBump.eLpNorm_higherDiff_scaled_le, Rd.LocalMeansBump.eLpNorm_higherDiff_scaled_le',
   Rd.LocalMeansBump.dualConst, Rd.LocalMeansBump.dualConst_ne_top,
   Rd.LocalMeansBump.eLpNorm_higherDiff_scaled_le_dyadic,
   Rd.LocalMeansBump.eLpNorm_higherDiff_dual_le, Rd.LocalMeansBump.lpModulus_dual_le}
 \leanok
 \uses{def:local-means, lem:schwartz-differences, lem:rd-differences, lem:rd-modulus-conv}
-With the notation of \Cref{def:local-means}, $\|\eta_j\|_1 \leq 2 \|m\|_1$, and there is
+With the notation of \Cref{def:local-means}, $\|\eta_j\|_1 \leq 2 \|m\|_1$ and
+$\|k_j\|_1 \leq 2 \|m\|_1$, and there is
 $C < \infty$ with
 \[
   \omega_L(\eta_j * h, 2^{-i})_p \leq C \, \min\bigl(1, 2^{-(i - j) L}\bigr) \, \|h\|_p
@@ -6440,7 +6442,8 @@ for all $i, j \in \N$ and $h \in L_p$.
 
 \begin{proof}
 \leanok
-The moment kernel $m$ is smooth with compact support, so
+$\eta_j$ and $k_j$ are sums or differences of at most two dilations $m_{2^k}$, each with
+$\|m_{2^k}\|_1 = \|m\|_1$. The moment kernel $m$ is smooth with compact support, so
 $\|\Delta_v^L m_{2^j}\|_1 \leq (2^j \|v\|)^L \|D^L m\|_1$ by \Cref{lem:rd-differences} and
 \Cref{lem:schwartz-differences}, and $\|\Delta_v^L m_{2^j}\|_1 \leq 2^L \|m\|_1$. For
 $\|v\| \leq 2^{-i}$ this gives $\|\Delta_v^L \eta_j\|_1 \leq C \min(1, 2^{-(i-j)L})$, and
@@ -6785,19 +6788,38 @@ $\operatorname{Ext} f$. The equivalence of (2) and (3) is \Cref{thm:rd-besov}.
 
 \section{Pointwise multipliers}
 
+\begin{lemma}[Differences along a segment]
+\label{lem:differences-segment}
+\lean{Rd.norm_iteratedFDeriv_fwdDiff_le_of_segment, Rd.norm_higherDiff_le_of_segment}
+\leanok
+\uses{def:rd-modulus}
+Let $E$ be a real normed space, $l \in \N$, $G : V \to E$ of class $C^l$, $h, x \in V$ and
+$C \in \R$ with $\|D^l G(x + t h)\| \leq C$ for every $t \in [0, l]$. Then
+$\|\Delta_h^l G(x)\| \leq C \|h\|^l$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Induction on $l$: the derivatives of order $l$ of $\Delta_h G$ at $x + t h$, $0 \leq t \leq l$,
+are the differences of those of $G$ at $x + (t + 1) h$ and $x + t h$, and the mean value
+inequality on the segment between these points bounds them by $C \|h\|$.
+\end{proof}
+
+The bound needs the derivatives only on the segment from $x$ to $x + l h$, which matters for
+functions that decay.
+
 \begin{lemma}[Differences of smooth functions]
 \label{lem:smooth-differences}
 \lean{Rd.norm_higherDiff_le_of_iteratedFDeriv, Rd.norm_le_of_iteratedFDeriv_le}
 \leanok
-\uses{def:rd-modulus}
+\uses{lem:differences-segment}
 Let $E$ be a normed space, $l \in \N$, $C \geq 0$ and $G : V \to E$ smooth with
 $\|D^l G(x)\| \leq C$ for all $x$. Then $\|\Delta_h^l G(x)\| \leq C \|h\|^l$ for all $h, x \in V$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-Induction on $l$: the derivatives of order $l$ of $\Delta_h G$ are $D^l G(\cdot + h) - D^l G$, and
-the mean value inequality bounds them by $C \|h\|$.
+This is \Cref{lem:differences-segment} with the bound on all of $V$.
 \end{proof}
 
 \begin{lemma}[Leibniz's rule for differences]
@@ -7580,32 +7602,38 @@ integral; induction on $l$ applies it to the directional derivatives of $K$.
 \label{lem:dual-kernel-derivatives}
 \lean{Rd.contDiff_dilate, Rd.ofReal_two_pow_mul, Rd.norm_iteratedFDeriv_dilate_le,
   Rd.LocalMeansBump.contDiff_scaled, Rd.LocalMeansBump.contDiff_dual,
+  Rd.LocalMeansBump.dualDerivConst, Rd.LocalMeansBump.dualDerivConst_nonneg,
+  Rd.LocalMeansBump.norm_iteratedFDeriv_momentKernel_le,
+  Rd.LocalMeansBump.norm_iteratedFDeriv_dual_le,
   Rd.LocalMeansBump.exists_iteratedFDeriv_dual_bound}
 \leanok
 \uses{def:local-means, lem:dual-kernel-bounds}
 Dilations of smooth functions are smooth, with
 $\|D^l (\Phi_c)(x)\| \leq |c|^{n+l} \sup_y \|D^l \Phi(y)\|$. For a bump $g$ and $L, K \in \N$ the
-kernels $m_{2^j}$ and $\eta_j$ are smooth, and there is $A$ with
-$\|D^l \eta_j\| \leq A 2^{j(n+l)}$ for all $l \leq K$ and $j$.
+kernels $m_{2^j}$ and $\eta_j$ are smooth, and with
+$A_{L,K} = 2 \sum_{l=0}^K \sup_y \|D^l m(y)\| < \infty$,
+$\|D^l \eta_j(y)\| \leq A_{L,K} 2^{j(n+l)}$ for all $l \leq K$, $j \in \N$ and $y \in V$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 $\Phi_c(x) = c^n \Phi(cx)$, and the chain rule for the linear map $x \mapsto cx$. The moment kernel
-is smooth with compact support, so its derivatives are bounded, and $\eta_j$ is a sum of two
-dilations.
+is smooth with compact support, so its derivatives are bounded by its Schwartz seminorms, and
+$\eta_j$ is a sum of two dilations.
 \end{proof}
 
 \begin{lemma}[Cell atoms are smooth atoms]
 \label{lem:cell-atoms-smooth}
-\lean{Rd.norm_iteratedFDeriv_cellAtom_le, Rd.LocalMeansBump.exists_isSmoothAtom_cellAtom}
+\lean{Rd.norm_iteratedFDeriv_cellAtom_le, Rd.LocalMeansBump.isSmoothAtom_cellAtom,
+  Rd.LocalMeansBump.exists_isSmoothAtom_cellAtom}
 \leanok
 \uses{lem:conv-derivatives, lem:dual-kernel-derivatives, lem:cell-atoms-regular}
 Let $K$ be smooth with $K = 0$ outside $\overline{B}(0, \rho 2^{-j})$ and
 $\|D^l K\| \leq A 2^{j(n+l)}$. Then the cell atoms of $K * g$, $g \in L_p$, have
-$\|D^l a_{j,m}\| \leq A 2^{jl} (\rho^n |B_1|)^{1-1/p}$. For a bump of radius $R$ and every order
-$K$ there is $A$ such that every cell atom of $\eta_j * g$ is a smooth atom on $V$ of order $K$
-with radius factor $2LR + n$ and constant $A$.
+$\|D^l a_{j,m}\| \leq A 2^{jl} (\rho^n |B_1|)^{1-1/p}$. For a bump of radius $R$, every order
+$K$, every level $j$ and every $g \in L_p$, every cell atom of $\eta_j * g$ is a smooth atom on
+$V$ of order $K$ with radius factor $2LR + n$ and constant
+$A_{L,K} ((2LR)^n |B_1|)^{1-1/p}$, with $A_{L,K}$ of \Cref{lem:dual-kernel-derivatives}.
 \end{lemma}
 
 \begin{proof}
@@ -10220,6 +10248,428 @@ $\|F\|_p^p = \int F^p$ for measurable $F$.
 The case $q = 2$ is the one behind the description of the spaces $H^s_p$ by Littlewood--Paley
 blocks.
 
+\section{Kernel majorants}
+
+The characterisations of the spaces $F^s_{p,q}$ compare two kinds of blocks pointwise: a block of
+one kind is a sum of blocks of the other kind, each convolved with a cross kernel. This section
+bounds the cross kernels by the Peetre weights $2^{\nu n} (1 + 2^\nu \|y\|)^{-N}$ times a factor
+$c_{ji}$, a power $2^{-(j-i)L}$ that decays geometrically in $j - i$ for $i \leq j$ and $1$ for
+$i > j$, and such kernels act below the maximal function. As in the previous sections, $V$ has
+dimension $n$; the kernels $\Phi$, $\Theta$, $\psi_j$ are those of \Cref{def:lp-kernels}, $g$ is
+a bump of radius $R$ with the kernels $m$, $k_j$, $\eta_j$ of \Cref{def:local-means}, and every
+constant is explicit.
+
+\begin{lemma}[Peetre weights]
+\label{lem:peetre-weights}
+\lean{ENNReal.inv_le_mul_inv_of_le, ENNReal.one_add_ne_zero, ENNReal.inv_one_add_mul_pow_le,
+  Rd.inv_one_add_mul_enorm_sub_pow_le, ENNReal.inv_one_add_mul_pow_anti,
+  ENNReal.inv_one_add_mul_pow_le_two_pow, ENNReal.inv_one_add_pow_mul_pow_le,
+  Rd.ofReal_one_add_norm_rpow_neg, Rd.ofReal_inv_one_add_mul_norm_pow,
+  Rd.two_pow_mul_enorm_le_ofReal, Rd.ofReal_one_add_two_pow_mul_norm,
+  ENNReal.one_le_ofReal_mul_inv_of_le, Rd.inv_one_add_ofReal_half_pow_le,
+  Rd.inv_one_add_ofReal_div_pow_le, ENNReal.inv_one_add_pow_two_mul_mul_pow}
+\leanok
+For every $N \in \N$, all $i, j, j', L \in \N$, all $0 \leq a \leq b < \infty$, every
+$u \in [0, \infty]$ and all $y, w \in V$:
+\begin{enumerate}
+  \item $(1 + a \|y - w\|)^{-N} \leq (1 + a \|w\|)^N (1 + a \|y\|)^{-N}$;
+  \item $(1 + b u)^{-N} \leq (1 + a u)^{-N}$ and $(1 + a u)^{-N} \leq 2^N (1 + 2 a u)^{-N}$;
+  \item $(1 + a)^{-(k + r + m)} a^r \leq (1 + a)^{-k} (1 + a)^{-m}$ and
+    $(1 + a)^{-2N} (1 + a)^N = (1 + a)^{-N}$ for all $k, r, m \in \N$;
+  \item if $a \leq b$, then $1 \leq (1 + b)^N (1 + a)^{-N}$;
+  \item $(1 + 2^i \|y\| / 2)^{-N} \leq 2^N (1 + 2^j \|y\|)^{-N}$ for all $j \leq i$;
+  \item $(1 + 2^{j'} \|w\| / (2 L))^{-N} \leq (8 L)^N (1 + 2^i \|w\|)^{-N}$ for all
+    $L \geq 1$ and $i \leq j' + 2$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) follows from $\|y\| \leq \|w\| + \|y - w\|$ and
+$1 + a (s + t) \leq (1 + a s)(1 + a t)$; (5) from $1 + 2^j \|y\| \leq 2 (1 + 2^i \|y\| / 2)$, and
+(6) from $1 + 2^i \|w\| \leq 8 L + 4 \cdot 2^{j'} \|w\| = 8 L (1 + 2^{j'} \|w\| / (2 L))$. The
+other claims are elementary. Each inequality $X^{-1} \leq c Y^{-1}$ follows from $Y \leq c X$
+for $0 < c < \infty$.
+\end{proof}
+
+\begin{lemma}[Decay of Schwartz functions and of their differences]
+\label{lem:schwartz-decay}
+\lean{Rd.schwartzDecayConst, Rd.schwartzDecayConst_ne_top, Rd.one_add_norm_pow_mul_le_schwartz,
+  Rd.one_add_norm_le_mul_of_mem_Icc, Rd.norm_iteratedFDeriv_schwartz_le_of_mem_Icc,
+  Rd.enorm_higherDiff_schwartz_le, Rd.enorm_schwartz_le, Rd.enorm_two_pow_smul,
+  Rd.enorm_dilate_two_pow, Rd.enorm_dilate_schwartz_le, Rd.enorm_higherDiff_dilate_schwartz_le}
+\leanok
+\uses{lem:differences-segment, lem:peetre-weights, lem:dilate, lem:rd-differences,
+  thm:band-jackson}
+For every Schwartz function $G : V \to \C$ and all $r, N \in \N$ let
+\[
+  C_{G,r,N} = 2^N \Bigl( \sup_x \|D^r G(x)\| + \sup_x \|x\|^N \|D^r G(x)\| \Bigr) < \infty .
+\]
+For all $v, y, h \in V$ and $j \in \N$,
+\[
+  |\Delta_v^r G(y)| \leq C_{G,r,N} \|v\|^r (1 + r \|v\|)^N (1 + \|y\|)^{-N},
+\]
+\[
+  |\Delta_h^r G_{2^j}(y)| \leq C_{G,r,N} \|2^j h\|^r (1 + r \|2^j h\|)^N \, 2^{jn}
+  (1 + 2^j \|y\|)^{-N} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$(1 + \|x\|)^N \leq 2^N (1 + \|x\|^N)$ gives $\|D^r G(x)\| \leq C_{G,r,N} (1 + \|x\|)^{-N}$
+(Mathlib's \texttt{SchwartzMap.\allowbreak one\_\allowbreak add\_\allowbreak le\_\allowbreak
+sup\_\allowbreak seminorm\_\allowbreak apply} is the same kind of bound with a supremum over
+seminorms), and $1 + \|y\| \leq (1 + \|y + t v\|)(1 + r \|v\|)$ for $0 \leq t \leq r$ moves the
+weight from $y + t v$ to $y$; \Cref{lem:differences-segment} concludes. For the dilations,
+$|G_{2^j}(y)| = 2^{jn} |G(2^j y)|$ and $\Delta_h^r G_{2^j} = (\Delta_{2^j h}^r G)_{2^j}$
+(\Cref{lem:rd-differences}).
+\end{proof}
+
+With $r = 0$ the two bounds are the decay $|G(y)| \leq C_{G,0,N} (1 + \|y\|)^{-N}$ and
+$|G_{2^j}(y)| \leq C_{G,0,N} \, 2^{jn} (1 + 2^j \|y\|)^{-N}$.
+
+\begin{lemma}[Tails and changes of scale]
+\label{lem:schwartz-tails}
+\lean{Rd.peetreIntegral, Rd.peetreIntegral_ne_top, Rd.tailConst, Rd.tailConst_ne_top,
+  Rd.enorm_mul_enorm_pow_le_of_le, Rd.lintegral_tail_schwartz_le, Rd.lintegral_comp_smul,
+  Rd.setLIntegral_comp_smul, Rd.smul_setOf_le_norm, Rd.lintegral_comp_two_pow_smul,
+  Rd.lintegral_dilate_peetre, Rd.setLIntegral_enorm_dilate_schwartz_le}
+\leanok
+\uses{lem:schwartz-decay, lem:peetre-weights}
+For every $M \in \N$ let $I_M = \int_V (1 + \|u\|)^{-M} \, du$; then $I_M < \infty$ for $M > n$.
+For every Schwartz function $G$ and all $r, N \in \N$ let
+$T_{G,r,N} = C_{G,0,N+r+n+1} \, I_{n+1} < \infty$, and write $t_+ = \max(t, 0)$. For all
+$\rho, a \in \R$ and $j \in \N$,
+\[
+  \int_{\{\|z\| \geq \rho\}} |G(z)| \, \|z\|^r \, dz \leq T_{G,r,N} (1 + \rho_+)^{-N},
+\]
+\[
+  \int_{\{\|z\| \geq a\}} |G_{2^j}(z)| \, dz \leq T_{G,0,N} (1 + (2^j a)_+)^{-N},
+\]
+and $\int_V 2^{jn} (1 + 2^j \|u\|)^{-N} \, du = I_N$. For every $f : V \to [0, \infty]$, every
+$c \neq 0$ and every $S \subseteq V$, $\int_S f(c x) \, dx = |c|^{-n} \int_{c S} f$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$I_M < \infty$ is Mathlib's \texttt{finite\_integral\_one\_add\_norm}. On $\{\|z\| \geq \rho\}$,
+\Cref{lem:schwartz-decay} and part (3) of \Cref{lem:peetre-weights} give
+$|G(z)| \|z\|^r \leq C_{G,0,N+r+n+1} (1 + \rho_+)^{-N} (1 + \|z\|)^{-(n+1)}$. The change of scale
+is the image of Lebesgue measure under $x \mapsto c x$ (Mathlib's
+\texttt{Measure.\allowbreak map\_\allowbreak addHaar\_\allowbreak smul}), restricted to $c S$;
+with $c = 2^j$ it turns the tail of $G_{2^j}$ beyond $a$ into the tail of $G$ beyond $2^j a$.
+\end{proof}
+
+For $S = V$ the change of scale reads $\int_V f(c x) \, dx = |c|^{-n} \int_V f$.
+
+\begin{lemma}[Two Peetre bumps]
+\label{lem:two-decay-bumps}
+\lean{Rd.peetre_mul_peetre_le, Rd.lintegral_peetre_mul_le}
+\leanok
+\uses{lem:peetre-weights, lem:schwartz-tails}
+For all $i \leq j$ in $\N$, every $N \in \N$ and every $y \in V$,
+\[
+  \int_V 2^{jn} (1 + 2^j \|y - w\|)^{-2N} \, 2^{in} (1 + 2^i \|w\|)^{-N} \, dw
+  \leq I_N \, 2^{in} (1 + 2^i \|y\|)^{-N} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By part (1) of \Cref{lem:peetre-weights} and $2^i \leq 2^j$,
+$(1 + 2^i \|w\|)^{-N} \leq (1 + 2^j \|y - w\|)^N (1 + 2^i \|y\|)^{-N}$, which leaves
+$\int_V 2^{jn} (1 + 2^j \|y - w\|)^{-N} \, dw = I_N$ by the substitution $u = 2^j (y - w)$.
+\end{proof}
+
+The bound holds for every $N$; it is useful for $N > n$, where $I_N < \infty$.
+
+\begin{lemma}[Dyadic weights of integer order]
+\label{lem:dyadic-weights-integer}
+\lean{ENNReal.dyadicWeight_natCast, ENNReal.dyadicWeight_neg_natCast,
+  ENNReal.dyadicWeight_neg_sub_le, ENNReal.one_le_two_pow_mul_dyadicWeight_neg,
+  ENNReal.dyadicWeight_mul_dyadicWeight_neg_eq}
+\leanok
+\uses{def:lq-norm}
+For all $L, i, j', k, m \in \N$: $2^{-mL} = (2^m)^{-L}$; if $i \leq j' \leq k$, then
+$2^{-(k-i)L} \leq 2^L \, 2^{-(j'+1-i)L}$; if $m \leq 1$, then $1 \leq 2^L 2^{-mL}$; and if
+$i \leq j' + 2$, then $2^{iL} 2^{-j'L} = 4^L \, 2^{-(j'+2-i)L}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The exponents add: $2^{-(j'+2-i)L} 2^{-iL} = 2^{-j'L} 2^{-2L}$.
+\end{proof}
+
+\begin{lemma}[Convolution in the second argument and averaged differences]
+\label{lem:conv-second-argument}
+\lean{Rd.conv_sub_ae, Rd.conv_finsetSum_ae, Rd.ae_enorm_sub_conv_dilate_momentKernel_le}
+\leanok
+\uses{lem:conv-assoc, lem:averaged-differences}
+Let $1 \leq p < \infty$ and $K \in L_1$. For all $f, f' \in L_p$ and every finite family
+$(f_i)_{i \in S}$ in $L_p$, almost everywhere on $V$,
+\[
+  K * (f - f') = K * f - K * f', \qquad K * \sum_{i \in S} f_i = \sum_{i \in S} K * f_i .
+\]
+For every $L \in \N$, every $g \in L_1$ with $\int_V g = 1$ and its moment kernel $m^g$ of
+order $L$, every $c > 0$, every $f \in L_p$ and almost every $x \in V$,
+\[
+  |f(x) - (m^g_c * f)(x)| \leq \int_V |g(z)| \, |\Delta^L_{-c^{-1} z} f(x)| \, dz .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first two identities follow from the additivity in \Cref{lem:conv-assoc}, by induction over
+$S$ for the sum. The bound is \Cref{lem:averaged-differences} with the triangle inequality for
+the integral.
+\end{proof}
+
+\begin{lemma}[Bounds of the local means kernels]
+\label{lem:local-means-kernel-bounds}
+\lean{Rd.LocalMeansBump.kernelSupConst, Rd.LocalMeansBump.kernelSupConst_nonneg,
+  Rd.LocalMeansBump.norm_scaled_le, Rd.LocalMeansBump.norm_kernel_le,
+  Rd.LocalMeansBump.kernel_eq_zero_of_lt, Rd.LocalMeansBump.enorm_kernel_le}
+\leanok
+\uses{def:local-means, lem:dual-kernel-bounds}
+Let $L \in \N$ and $A_L = 2 \sup_V |m|$. For all $j \in \N$ and $y \in V$,
+$|m_{2^j}(y)| \leq 2^{jn} \sup_V |m|$ and $|k_j(y)| \leq A_L 2^{jn}$, and $k_j(y) = 0$ if
+$\|y\| > 2 L R \, 2^{-j}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$m_{2^j}(y) = 2^{jn} m(2^j y)$, and $k_j$ is a difference of two such terms, each supported in
+$\overline B(0, L R \, 2^{-(j-1)})$ by \Cref{lem:dual-kernel-bounds}.
+\end{proof}
+
+\begin{theorem}[The cross kernel of local means and band-limiting kernels]
+\label{thm:cross-kernel-theta}
+\lean{Rd.LocalMeansBump.enorm_mul_higherDiff_Theta_le,
+  Rd.LocalMeansBump.ae_enorm_Theta_sub_conv_scaled_le, Rd.LocalMeansBump.kernelThetaMomentConst,
+  Rd.LocalMeansBump.kernelThetaMomentConst_ne_top,
+  Rd.LocalMeansBump.ae_enorm_conv_kernel_Theta_le_of_lt,
+  Rd.LocalMeansBump.kernelThetaSupportConst, Rd.LocalMeansBump.kernelThetaSupportConst_ne_top,
+  Rd.LocalMeansBump.lintegral_Theta_mul_kernel_le_near,
+  Rd.LocalMeansBump.lintegral_Theta_mul_kernel_le_far,
+  Rd.LocalMeansBump.enorm_conv_kernel_Theta_le_of_le, Rd.LocalMeansBump.kernelThetaConst,
+  Rd.LocalMeansBump.kernelThetaConst_ne_top, Rd.LocalMeansBump.enorm_conv_kernel_Theta_le}
+\leanok
+\uses{lem:local-means-kernel-bounds, lem:conv-second-argument, lem:schwartz-decay,
+  lem:schwartz-tails, lem:peetre-weights, lem:dyadic-weights-integer, lem:lp-kernels-basic,
+  lem:conv-assoc, lem:weighted-jensen}
+Let $L, N \in \N$, let
+\[
+  C^{\mathrm m}_{L,N} = 2 \|g\|_1 (2R)^L (1 + 2LR)^N C_{\Theta,L,N},
+\]
+\[
+  C^{\mathrm s}_{L,N} = A_L \bigl( \|\Theta\|_1 (1 + 4LR)^N + 2^N T_{\Theta,0,N} \bigr),
+\]
+and $C^\Theta_{L,N} = C^{\mathrm m}_{L,N} + C^{\mathrm s}_{L,N} < \infty$.
+For all $i, j \in \N$, with $\nu = \min(i, j)$, $c_{ji} = 2^{-(j-i)L}$ for $i \leq j$ and
+$c_{ji} = 1$ for $i > j$, and for almost every $y \in V$,
+\[
+  |(k_j * \Theta_i)(y)| \leq C^\Theta_{L,N} \, c_{ji} \, 2^{\nu n} (1 + 2^\nu \|y\|)^{-N} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\emph{Moment case $i < j$.} Here $k_j = m_{2^j} - m_{2^{j-1}}$, so
+$k_j * \Theta_i = (\Theta_i - m_{2^{j-1}} * \Theta_i) - (\Theta_i - m_{2^j} * \Theta_i)$ almost
+everywhere. For $c = 2^k$, $k \in \{j - 1, j\}$, \Cref{lem:conv-second-argument} bounds
+$|\Theta_i - m_c * \Theta_i|(y)$ by $\int |g(z)| |\Delta^L_{-2^{-k} z} \Theta_i(y)| \, dz$. On the
+support of $g$ the step $2^i \cdot 2^{-k} z$ of the dilated difference has length at most
+$2^{-(k-i)} R \leq R$, and \Cref{lem:schwartz-decay} for $G = \Theta$ gives
+$|\Delta^L_{-2^{-k} z} \Theta_i(y)| \leq C_{\Theta,L,N} R^L 2^{-(k-i)L} (1 + LR)^N 2^{in}
+(1 + 2^i \|y\|)^{-N}$; \Cref{lem:dyadic-weights-integer} replaces $2^{-(k-i)L}$ by
+$2^L 2^{-(j-i)L}$.
+
+\emph{Support case $i \geq j$.} By commutativity,
+$|(k_j * \Theta_i)(y)| \leq \int |\Theta_i(z)| |k_j(y - z)| \, dz$, and
+$|k_j| \leq A_L 2^{jn}$ vanishes outside $\overline B(0, 2LR \, 2^{-j})$
+(\Cref{lem:local-means-kernel-bounds}). For $\|y\| \leq 4LR \, 2^{-j}$ the integral is at most
+$A_L 2^{jn} \|\Theta\|_1$, and $1 \leq (1 + 4LR)^N (1 + 2^j \|y\|)^{-N}$. For
+$\|y\| > 4LR \, 2^{-j}$ the integrand vanishes unless $\|z\| \geq \|y\|/2$, and
+\Cref{lem:schwartz-tails} bounds the tail of $\Theta_i$ by
+$T_{\Theta,0,N} (1 + 2^i \|y\|/2)^{-N} \leq 2^N T_{\Theta,0,N} (1 + 2^j \|y\|)^{-N}$ (part (5)
+of \Cref{lem:peetre-weights}). For $i = j$ the weight is $c_{jj} = 1$.
+\end{proof}
+
+The moment case uses only $\int g = 1$, through the averaged differences, so the bound holds
+for every bump $g$ and every order $L$.
+
+\begin{lemma}[The moment kernels of the Littlewood--Paley kernel]
+\label{lem:lp-moment-kernels}
+\lean{Rd.fourier_dilate_momentKernel, Rd.continuous_momentKernel, Rd.bddAbove_momentKernel,
+  Rd.lpMoment, Rd.lpMomentScaled, Rd.integrable_lpMomentScaled, Rd.continuous_lpMomentScaled,
+  Rd.bddAbove_lpMomentScaled, Rd.fourier_lpMomentScaled_eq_zero, Rd.conv_psi_lpMomentScaled}
+\leanok
+\uses{def:moment-kernel, lem:fourier-dilate, lem:lp-kernels-basic, lem:lp-kernels-frequency,
+  lem:conv-of-fourier}
+For every integrable $h : V \to \C$, every $L \in \N$, every $c > 0$ and every $\xi \in V$, the
+moment kernel $m^h$ of order $L$ of $h$ satisfies
+\[
+  \widehat{(m^h)_c}(\xi) = \sum_{l=1}^L (-1)^{l+1} \binom{L}{l} \, \widehat h(l c^{-1} \xi) .
+\]
+Let $\mu$ be the moment kernel of order $L$ of $\Phi$. For all $j \in \N$ and $\xi \in V$ with
+$\|\xi\| \geq 2^{j+1}$, $\widehat{\mu_{2^j}}(\xi) = 0$, and $\psi_{j+2} * \mu_{2^j} = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The formula follows from \Cref{def:moment-kernel} and \Cref{lem:fourier-dilate}, term by term.
+For $\|\xi\| \geq 2^{j+1}$ and $l \geq 1$, $\|l \, 2^{-j} \xi\| \geq 2$, where
+$\widehat\Phi = \chi_{1,2}$ vanishes. Since $\widehat{\psi_{j+2}}$ vanishes on the ball of
+radius $2^{j+1}$ (\Cref{lem:lp-kernels-frequency}), $\widehat{\psi_{j+2}} \widehat{\mu_{2^j}} = 0$,
+and \Cref{lem:conv-of-fourier} applies to the bounded continuous kernel $\mu_{2^j}$.
+\end{proof}
+
+\begin{lemma}[Decay of the Littlewood--Paley blocks]
+\label{lem:lp-blocks-decay}
+\lean{Rd.psiDecayConst, Rd.psiDecayConst_ne_top, Rd.enorm_psi_le}
+\leanok
+\uses{lem:schwartz-decay, lem:peetre-weights, def:lp-kernels}
+For every $N \in \N$ let $P_N = (1 + 2^N) C_{\Phi,0,N} < \infty$. For every $j \in \N$ and every
+$y \in V$, $|\psi_j(y)| \leq P_N 2^{jn} (1 + 2^j \|y\|)^{-N}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\psi_j = \Phi_j - \Phi_{j-1}$ for $j \geq 1$; \Cref{lem:schwartz-decay} bounds both dilations,
+and $(1 + 2^{j-1} \|y\|)^{-N} \leq 2^N (1 + 2^j \|y\|)^{-N}$.
+\end{proof}
+
+\begin{lemma}[Kernels of small support against Peetre weights]
+\label{lem:small-support-decay}
+\lean{Rd.lintegral_mul_peetre_le_of_support}
+\leanok
+\uses{lem:peetre-weights}
+Let $k, N \in \N$, $\rho \geq 0$, $C \in [0, \infty]$, and let $\eta, \psi : V \to \C$ with
+$\eta$ almost everywhere strongly measurable, $\eta = 0$ outside $\overline B(0, \rho 2^{-k})$
+and $|\psi(z)| \leq C 2^{kn} (1 + 2^k \|z\|)^{-N}$ for all $z$. For every $y \in V$,
+\[
+  \int_V |\eta(w)| \, |\psi(y - w)| \, dw \leq \|\eta\|_1 \, C (1 + \rho)^N 2^{kn}
+  (1 + 2^k \|y\|)^{-N} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+On the support of $\eta$, $2^k \|w\| \leq \rho$, and part (1) of \Cref{lem:peetre-weights} gives
+$(1 + 2^k \|y - w\|)^{-N} \leq (1 + \rho)^N (1 + 2^k \|y\|)^{-N}$.
+\end{proof}
+
+\begin{lemma}[Averaged differences of the dual kernels]
+\label{lem:dual-averaged-differences}
+\lean{Rd.LocalMeansBump.enorm_higherDiff_dual_le, Rd.LocalMeansBump.higherDiff_dual_eq_zero,
+  Rd.LocalMeansBump.lintegral_lpKernel_mul_higherDiff_dual_le, Rd.LocalMeansBump.dualTailConst,
+  Rd.LocalMeansBump.dualTailConst_ne_top, Rd.LocalMeansBump.higherDiff_dual_eq_zero_of_norm_lt,
+  Rd.LocalMeansBump.ae_enorm_dual_sub_conv_lpMomentScaled_le}
+\leanok
+\uses{lem:dual-kernel-derivatives, lem:dual-kernel-bounds, lem:smooth-differences,
+  lem:conv-second-argument, lem:schwartz-tails, lem:peetre-weights, lem:dyadic-weights-integer,
+  lem:lp-moment-kernels, lem:lp-kernels-basic}
+Let $L, N \in \N$, $L' \geq 1$, let $\mu$ be the moment kernel of order $L'$ of $\Phi$, let
+$A_{L,L'}$ be the constant of \Cref{lem:dual-kernel-derivatives} for the order $K = L'$, and
+\[
+  D_{L,L',N} = A_{L,L'} \, 4^{L'} (8 L')^N (1 + 4LR)^N \, T_{\Phi,L',N} < \infty .
+\]
+For all $i, j' \in \N$ with $i \leq j' + 2$ and almost every $w \in V$,
+\[
+  |\eta_i(w) - (\mu_{2^{j'}} * \eta_i)(w)| \leq D_{L,L',N} \, 2^{-(j'+2-i)L'} \, 2^{in}
+  (1 + 2^i \|w\|)^{-N} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:conv-second-argument} the left side is at most
+$\int |\Phi(z)| |\Delta^{L'}_{-2^{-j'} z} \eta_i(w)| \, dz$. By \Cref{lem:smooth-differences} and
+\Cref{lem:dual-kernel-derivatives},
+$|\Delta^{L'}_{-2^{-j'} z} \eta_i(w)| \leq A_{L,L'} 2^{in} 2^{iL'} 2^{-j'L'} \|z\|^{L'}$, and
+the difference vanishes if $\|w\| > 2LR \, 2^{-i} + L' 2^{-j'} \|z\|$, since $\eta_i$ vanishes
+outside $\overline B(0, 2LR \, 2^{-i})$. For $\|w\| \leq 4LR \, 2^{-i}$, \Cref{lem:schwartz-tails}
+with $\rho = 0$ bounds the integral by $T_{\Phi,L',N}$, and
+$1 \leq (1 + 4LR)^N (1 + 2^i \|w\|)^{-N}$. For $\|w\| > 4LR \, 2^{-i}$ only
+$\|z\| \geq 2^{j'} \|w\| / (2L')$ contributes, and the tail bound with part (6) of
+\Cref{lem:peetre-weights} gives the factor $(8L')^N (1 + 2^i \|w\|)^{-N}$. Finally
+$2^{iL'} 2^{-j'L'} = 4^{L'} 2^{-(j'+2-i)L'}$ (\Cref{lem:dyadic-weights-integer}).
+\end{proof}
+
+\begin{theorem}[The cross kernel of blocks and dual kernels]
+\label{thm:cross-kernel-dual}
+\lean{Rd.LocalMeansBump.psiDualSupportConst, Rd.LocalMeansBump.psiDualSupportConst_ne_top,
+  Rd.LocalMeansBump.lintegral_enorm_dual_le,
+  Rd.LocalMeansBump.enorm_conv_psi_dual_le_of_lt,
+  Rd.LocalMeansBump.enorm_conv_psi_dual_le_of_le_one, Rd.LocalMeansBump.conv_psi_dual_ae_eq,
+  Rd.LocalMeansBump.ae_enorm_conv_psi_dual_le_of_two_le, Rd.LocalMeansBump.psiDualConst,
+  Rd.LocalMeansBump.psiDualConst_ne_top, Rd.LocalMeansBump.enorm_conv_psi_dual_le}
+\leanok
+\uses{lem:lp-blocks-decay, lem:small-support-decay, lem:dual-averaged-differences,
+  lem:lp-moment-kernels, lem:two-decay-bumps, lem:dual-kernel-bounds, lem:dual-kernel-moduli,
+  lem:dyadic-weights-integer, lem:conv-assoc, lem:conv-second-argument, lem:weighted-jensen}
+Let $L, N \in \N$ and $L' \geq 1$, and let
+\[
+  S_{L,N} = 2 P_N (1 + 2LR)^N \|m\|_1,
+\]
+\[
+  C_{L,L',N} = (1 + 2^{n + L'}) S_{L,N} + D_{L,L',N} \, P_{2N} \, I_N ,
+\]
+with $C_{L,L',N} < \infty$ for $N > n$. For all $i, j \in \N$, with $\nu = \min(i, j)$,
+$c_{ji} = 2^{-(j-i)L'}$ for $i \leq j$ and $c_{ji} = 1$ for $i > j$, and for almost every
+$y \in V$,
+\[
+  |(\psi_j * \eta_i)(y)| \leq C_{L,L',N} \, c_{ji} \, 2^{\nu n} (1 + 2^\nu \|y\|)^{-N} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By commutativity, $|(\psi_j * \eta_i)(y)| \leq \int |\eta_i(w)| |\psi_j(y - w)| \, dw$, and
+$\|\eta_i\|_1 \leq 2 \|m\|_1$ (\Cref{lem:dual-kernel-moduli}).
+
+\emph{Case $i > j$.} $\eta_i$ vanishes outside $\overline B(0, 2LR \, 2^{-i})$, which lies in
+$\overline B(0, 2LR \, 2^{-j})$; \Cref{lem:small-support-decay} with $k = j$ and
+\Cref{lem:lp-blocks-decay} give the bound $S_{L,N} 2^{jn} (1 + 2^j \|y\|)^{-N}$.
+
+\emph{Case $i \leq j \leq 1$.} The same with $k = i$, since
+$|\psi_j(z)| \leq 2^n P_N 2^{in} (1 + 2^i \|z\|)^{-N}$, and $1 \leq 2^{L'} 2^{-(j-i)L'}$.
+
+\emph{Case $i \leq j$, $j \geq 2$.} By \Cref{lem:lp-moment-kernels} and associativity,
+$\psi_j * (\mu_{2^{j-2}} * \eta_i) = (\psi_j * \mu_{2^{j-2}}) * \eta_i = 0$ almost everywhere,
+so $\psi_j * \eta_i = \psi_j * (\eta_i - \mu_{2^{j-2}} * \eta_i)$ almost everywhere.
+\Cref{lem:dual-averaged-differences} with $j' = j - 2$, \Cref{lem:lp-blocks-decay} with the
+order $2N$ and \Cref{lem:two-decay-bumps} give the bound
+$D_{L,L',N} P_{2N} I_N \, 2^{-(j-i)L'} 2^{in} (1 + 2^i \|y\|)^{-N}$.
+\end{proof}
+
+The order $L'$ of the moment kernel of $\Phi$ is free, so the decay $2^{-(j-i)L'}$ is available
+for every $L'$, independently of the order $L$ of the local means.
+
+\begin{theorem}[Convolutions under Peetre majorants]
+\label{thm:decay-kernels-maximal}
+\lean{Rd.enorm_conv_le_maximal_of_decay}
+\leanok
+\uses{lem:maximal-function-kernels, def:conv, lem:weighted-jensen}
+Let $N > n$ and $\nu \geq 0$ be integers, $C \in [0, \infty)$, and let $K : V \to \C$
+satisfy $|K(y)| \leq C 2^{\nu n} (1 + 2^\nu \|y\|)^{-N}$ for almost every $y$. For every
+$h : V \to \C$ and every $x \in V$,
+\[
+  |(K * h)(x)| \leq C_{n,N} \, C \, M|h|(x),
+\]
+with the constant $C_{n,N}$ of \Cref{lem:maximal-function-kernels}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$|(K * h)(x)| \leq \int |K(y)| |h(x - y)| \, dy$; the majorant holds almost everywhere, so it
+bounds the integral from above, and part (3) of \Cref{lem:maximal-function-kernels} applies to
+it.
+\end{proof}
+
+The bound holds for every function $h$, periodic functions included.
+
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
 
@@ -11185,7 +11635,7 @@ $(\otimes \Phi)_{2^J}$, and $\sum_k \delta_k * f = f$ in $L_p$.
 \begin{lemma}[One-dimensional estimates in $L_1$]
 \label{lem:mixed-lp-kernels}
 \lean{Rd.eLpNorm_conv_eq_enorm_convLp, Rd.one_le_dyadicWeight_mul_almostDiagCoeff,
-  Rd.LocalMeansBump.eLpNorm_kernel_one_le, Rd.LocalMeansBump.exists_eLpNorm_conv_psi_dual_le,
+  Rd.LocalMeansBump.exists_eLpNorm_conv_psi_dual_le,
   Rd.LocalMeansBump.exists_eLpNorm_conv_kernel_Theta_le}
 \leanok
 \uses{thm:band-jackson, thm:kernel-identities, lem:local-means-upper, thm:band-inverse,

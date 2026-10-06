@@ -21,7 +21,8 @@ integrable kernel `K` with `f ∈ L_p` is `(K ⋆ f)(x) = ∫ K(y) f(x - y) dy` 
 **Young's inequality** `‖K ⋆ f‖_p ≤ ‖K‖_1 ‖f‖_p`, `1 ≤ p < ∞` (`Rd.eLpNorm_conv_le`), is the case
 of the group `V` of `MeasureTheory.eLpNorm_convolution_le`. The integral of the convolution
 converges absolutely at almost every point (`MeasureTheory.ae_convolutionExistsAt`), so
-convolution is linear in `f` almost everywhere and defines a bounded operator on `L_p` of norm at
+convolution is linear in `f` almost everywhere (`Rd.conv_add_ae`, `Rd.conv_sub_ae`,
+`Rd.conv_finsetSum_ae`) and defines a bounded operator on `L_p` of norm at
 most `‖K‖_1` (`Rd.convLp`). These operators compose like their kernels, `K ⋆ (L ⋆ f) = (K ⋆ L) ⋆ f`
 (`Rd.convLp_convLp`, from the associativity `Rd.conv_conv_ae`), and are linear in the kernel
 (`Rd.convLp_sub_kernel`).
@@ -211,6 +212,34 @@ theorem sub_conv_ae {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K K' f : 
     simp
   filter_upwards [add_conv_ae hp1 hp hK hK'.neg hf] with x hx
   rw [sub_eq_add_neg K K', hx, Pi.add_apply, hneg, Pi.neg_apply, Pi.sub_apply, sub_eq_add_neg]
+
+/-- **Convolution is subtractive in `f`** almost everywhere: `K ⋆ (f - g) = K ⋆ f - K ⋆ g` a.e.
+for `K ∈ L_1` and `f, g ∈ L_p`, `1 ≤ p < ∞`. -/
+theorem conv_sub_ae {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K f g : V → ℂ}
+    (hK : Integrable K μ) (hf : MemLp f p μ) (hg : MemLp g p μ) :
+    conv K (f - g) μ =ᵐ[μ] conv K f μ - conv K g μ := by
+  have hneg : conv K (-g) μ = -conv K g μ := by
+    rw [show -g = (-1 : ℂ) • g by simp, conv_smul]
+    simp
+  filter_upwards [conv_add_ae hp1 hp hK hf hg.neg] with x hx
+  rw [sub_eq_add_neg f g, hx, Pi.add_apply, hneg, Pi.neg_apply, Pi.sub_apply, sub_eq_add_neg]
+
+/-- **Convolution is linear in `f`** almost everywhere: `K ⋆ ∑_i f_i = ∑_i K ⋆ f_i` a.e. for
+`K ∈ L_1` and finitely many `f_i ∈ L_p`, `1 ≤ p < ∞`. -/
+theorem conv_finsetSum_ae {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {ι : Type*} {K : V → ℂ}
+    (hK : Integrable K μ) {s : Finset ι} {f : ι → V → ℂ} (hf : ∀ i ∈ s, MemLp (f i) p μ) :
+    conv K (∑ i ∈ s, f i) μ =ᵐ[μ] ∑ i ∈ s, conv K (f i) μ := by
+  classical
+  induction s using Finset.induction_on with
+  | empty =>
+    refine Filter.EventuallyEq.of_eq (funext fun x => ?_)
+    simp [conv_apply]
+  | insert i s hi ih =>
+    have hs : MemLp (∑ j ∈ s, f j) p μ :=
+      memLp_finsetSum' s fun j hj => hf j (Finset.mem_insert_of_mem hj)
+    filter_upwards [conv_add_ae hp1 hp hK (hf i (Finset.mem_insert_self i s)) hs,
+      ih fun j hj => hf j (Finset.mem_insert_of_mem hj)] with x h1 h2
+    rw [Finset.sum_insert hi, h1, Pi.add_apply, h2, Finset.sum_insert hi, Pi.add_apply]
 
 /-- Convolutions of functions that agree almost everywhere agree everywhere (Mathlib's
 `convolution_congr`). -/

@@ -146,21 +146,6 @@ namespace LocalMeansBump
 
 variable (b : LocalMeansBump ℝ)
 
-/-- `‖k_j‖_1 ≤ 2 ‖m‖_1`. -/
-theorem eLpNorm_kernel_one_le (L j : ℕ) :
-    eLpNorm (b.kernel L j) 1 volume ≤ 2 * eLpNorm (momentKernel b.toFun L) 1 volume := by
-  cases j with
-  | zero =>
-    rw [two_mul]
-    exact (b.eLpNorm_scaled_one L 0).le.trans le_self_add
-  | succ j =>
-    show eLpNorm (b.scaled L (j + 1) - b.scaled L j) 1 volume ≤ _
-    calc eLpNorm (b.scaled L (j + 1) - b.scaled L j) 1 volume
-        ≤ eLpNorm (b.scaled L (j + 1)) 1 volume + eLpNorm (b.scaled L j) 1 volume :=
-          eLpNorm_sub_le le_rfl
-      _ = 2 * eLpNorm (momentKernel b.toFun L) 1 volume := by
-          rw [b.eLpNorm_scaled_one, b.eLpNorm_scaled_one, two_mul]
-
 /-- **Littlewood–Paley blocks against the dual kernels**: there is `C < ∞` with
 `‖ψ_m ⋆ η_k‖_1 ≤ C c(m, k)`, `c(m, k) = 2^(-(m-k)L)` for `k ≤ m` and `1` for `k > m`. For
 `k + 3 ≤ m`, `ψ_m` annihilates the band-limited Jackson approximant `J_{m-3} η_k`, and

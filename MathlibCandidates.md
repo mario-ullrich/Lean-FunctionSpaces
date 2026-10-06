@@ -86,7 +86,9 @@ declarations.
   (`Rd.modulusOn`, `FunctionSpaces/Rd/DomainModuli.lean`).
 * **Leibniz's rule for iterated forward differences** (`FunctionSpaces/Rd/Multipliers.lean`):
   `Δ_h^r(u v)(x) = ∑_{l ≤ r} C(r, l) Δ_h^l u(x) Δ_h^(r-l) v(x + l h)` (`Rd.higherDiff_mul`); Mathlib
-  has only the one-step `fwdDiff_smul`. Also `‖Δ_h^l G(x)‖ ≤ ‖h‖^l sup ‖D^l G‖` for smooth `G`
+  has only the one-step `fwdDiff_smul`. Also `‖Δ_h^l G(x)‖ ≤ C ‖h‖^l` for `G` of class `C^l`
+  with `‖D^l G‖ ≤ C` on the segment from `x` to `x + l h` (`Rd.norm_higherDiff_le_of_segment`),
+  and its global form `‖Δ_h^l G(x)‖ ≤ ‖h‖^l sup ‖D^l G‖`
   (`Rd.norm_higherDiff_le_of_iteratedFDeriv`).
 * **Smooth resolutions of unity in a finite-dimensional space**
   (`FunctionSpaces/Rd/BoundedLipschitz.lean`): `Rd.exists_smooth_partition`, with `ContDiff`
