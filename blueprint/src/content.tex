@@ -9340,6 +9340,140 @@ smoothness is \Cref{thm:torus-lp-moduli} with $q = p$.
 As on $\R^n$, for $q = 2$ the theorem places $F^s_{p,2}(\T^d)$ between
 $\Besov{s}{p}{\min(p,2)}(\T^d)$ and $\Besov{s}{p}{\max(p,2)}(\T^d)$.
 
+\section{Dyadic cubes and the Lebesgue differentiation theorem}
+
+The Calder\'on--Zygmund decomposition stops at dyadic cubes of every size, so the cells of
+\Cref{def:dyadic-cells} are extended to all integer levels. Throughout, $V$ is a
+finite-dimensional real inner product space of dimension $n$ with Lebesgue measure $|\cdot|$,
+$(b_i)_{i=1}^n$ is the orthonormal basis of \Cref{def:dyadic-cells}, $x_i = \langle b_i, x \rangle$
+are the coordinates of $x \in V$, and for a measure $\mu$ and a set $Q$,
+$F_Q = \mu(Q)^{-1} \int_Q F \, d\mu$ is the average of $F$ over $Q$ (with $\mu = |\cdot|$ on $V$;
+as in Mathlib, $F_Q = 0$ when $\mu(Q)$ is $0$ or $\infty$).
+
+\begin{definition}[Dyadic cubes]
+\label{def:dyadic-cubes}
+\lean{Rd.zcellIndex, Rd.zcell, Rd.zcellCenter, Rd.zcellIndex_natCast, Rd.zcell_natCast,
+  Rd.zcellCenter_natCast, Rd.mem_zcell_zcellIndex, Rd.repr_zcellCenter, Rd.measurable_zcellIndex,
+  Rd.measurableSet_zcell, Rd.cubeAt, Rd.mem_cubeAt}
+\leanok
+\uses{def:dyadic-cells}
+For $k \in \Z$ and $m \in \Z^n$ the dyadic cube of level $k$ and index $m$ is
+$Q_{k,m} = \{x \in V : \lfloor 2^k x_i \rfloor = m_i \text{ for all } i\}$, with centre
+$c_{k,m} = \sum_i (m_i + 1/2) 2^{-k} b_i$. Every $x$ lies in the cube $Q_k(x)$ of level $k$ with
+index $(\lfloor 2^k x_i \rfloor)_i$. For every $k \in \Z$ and every $m \in \Z^n$ the cube
+$Q_{k,m}$ is measurable, and for every $k \in \N$ it is the cell $P_{k,m}$, with the same centre.
+\end{definition}
+
+\begin{lemma}[Size, partition and volume of cubes]
+\label{lem:dyadic-cubes}
+\lean{Rd.repr_sub_zcellCenter, Rd.abs_repr_sub_zcellCenter_le, Rd.norm_sub_zcellCenter_le,
+  Rd.ball_subset_zcell, Rd.zcell_disjoint, Rd.iUnion_zcell, Rd.zcell_eq_preimage, Rd.volume_zcell,
+  Rd.volume_zcell_pos, Rd.volume_zcell_lt_top, Rd.volume_real_zcell}
+\leanok
+\uses{def:dyadic-cubes, lem:dyadic-cells}
+For every $k \in \Z$, every $m \in \Z^n$ and every $x \in V$, the $i$-th coordinate of
+$x - c_{k,m}$ is $(2^k x_i - m_i - 1/2) 2^{-k}$. For every $k \in \Z$, every $m \in \Z^n$ and
+every $x \in Q_{k,m}$, every coordinate of $x - c_{k,m}$ is at most $2^{-k}/2$ in modulus and
+$\|x - c_{k,m}\| \leq n 2^{-k}$. For every $k \in \Z$ and every $m \in \Z^n$,
+\[
+  Q_{k,m} = \{x \in V : m_i 2^{-k} \leq x_i < (m_i + 1) 2^{-k} \text{ for all } i\},
+\]
+$B(c_{k,m}, 2^{-k}/2) \subseteq Q_{k,m}$ and $|Q_{k,m}| = 2^{-kn}$. For every $k \in \Z$ the cubes
+of level $k$ are pairwise disjoint and cover $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bounds are those of \Cref{lem:dyadic-cells} with $2^{-k}$ in place of $2^{-j}$. A point of
+the ball has coordinates within less than $2^{-k}/2$ of $(m_i + 1/2) 2^{-k}$, so
+$\lfloor 2^k x_i \rfloor = m_i$. The description as a set of inequalities is
+$\lfloor t \rfloor = m_i \iff m_i \leq t < m_i + 1$; in the coordinates of the basis the cube is
+therefore the box $\prod_i [m_i 2^{-k}, (m_i + 1) 2^{-k})$, and the coordinate map $V \to \R^n$
+preserves the volume (Mathlib's \texttt{OrthonormalBasis.measurePreserving\_repr}).
+\end{proof}
+
+\begin{lemma}[Nesting of cubes]
+\label{lem:dyadic-cubes-nested}
+\lean{Rd.parent, Rd.zcell_succ_subset_parent, Rd.volume_zcell_parent, Rd.ancestor,
+  Rd.ancestor_add, Rd.zcell_subset_ancestor, Rd.zcellIndex_sub_ancestor,
+  Rd.zcell_subset_or_disjoint}
+\leanok
+\uses{def:dyadic-cubes, lem:dyadic-cubes}
+For $m \in \Z^n$ let $\hat m = (\lfloor m_i / 2 \rfloor)_i$, and let $m^{(l)}$ be the result of
+$l$ applications of $m \mapsto \hat m$. For every $k \in \Z$, every $l \in \N$ and every
+$m \in \Z^n$,
+\[
+  Q_{k+1,m} \subseteq Q_{k,\hat m}, \qquad |Q_{k,\hat m}| = 2^n |Q_{k+1,m}|, \qquad
+  Q_{k+l,m} \subseteq Q_{k,m^{(l)}}.
+\]
+For every $k \in \Z$, every $l \in \N$ and every $x \in V$, the index of $Q_{k-l}(x)$ is
+$p^{(l)}$, where $p = (\lfloor 2^k x_i \rfloor)_i$ is the index of $Q_k(x)$. For all integers
+$k \leq k'$ and all $m, m' \in \Z^n$, either $Q_{k',m'} \subseteq Q_{k,m}$ or
+$Q_{k',m'} \cap Q_{k,m} = \emptyset$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For real $t$, $\lfloor 2^k t \rfloor = \lfloor 2^{k+1} t / 2 \rfloor
+= \lfloor \lfloor 2^{k+1} t \rfloor / 2 \rfloor$, which gives the first inclusion; the volumes
+are those of \Cref{lem:dyadic-cubes}, and the third inclusion follows by induction on $l$. For
+$k \leq k'$ the cube $Q_{k',m'}$ lies in the cube of level $k$ with index $m'^{(k'-k)}$, which is
+$Q_{k,m}$ or disjoint from it.
+\end{proof}
+
+\begin{lemma}[Averages over a subset]
+\label{lem:average-subset}
+\lean{Rd.abs_setAverage_sub_le, Rd.setLAverage_eq_ofReal_setAverage}
+\leanok
+For every measure space $(X, \mu)$, all sets $Q \subseteq B \subseteq X$ with $\mu(Q) > 0$ and
+$\mu(B) < \infty$, every $F : X \to \R$ integrable on $B$ and every $c \in \R$,
+\[
+  |F_Q - c| \leq \frac{\mu(B)}{\mu(Q)} \, (|F - c|)_B .
+\]
+For every measure space $(X, \mu)$, every set $Q \subseteq X$ and every $G : X \to [0, \infty]$,
+almost everywhere measurable on $Q$ with $\int_Q G \, d\mu < \infty$, the average $G_Q$ equals the
+average over $Q$ of the real function equal to $G$ where $G < \infty$ and to $0$ elsewhere.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$F_Q - c = \mu(Q)^{-1} \int_Q (F - c) \, d\mu$, and
+$\int_Q |F - c| \, d\mu \leq \int_B |F - c| \, d\mu$. In the second statement $G$ is finite almost
+everywhere on $Q$, so both functions have the same integral over $Q$ (Mathlib's
+\texttt{toReal\_setLAverage}).
+\end{proof}
+
+\begin{theorem}[Lebesgue differentiation along dyadic cubes]
+\label{thm:lebesgue-differentiation-cubes}
+\lean{Rd.cubeAt_subset_closedBall, Rd.volume_real_closedBall_div_cubeAt,
+  Rd.ae_tendsto_average_cubeAt, Rd.ae_le_of_forall_laverage_le}
+\leanok
+\uses{def:dyadic-cubes, lem:dyadic-cubes, lem:average-subset}
+For every locally integrable $F : V \to \R$ and almost every $x \in V$,
+\[
+  F_{Q_k(x)} \to F(x) \qquad (k \to \infty, \ k \in \N) .
+\]
+For every almost everywhere measurable $G : V \to [0, \infty]$ with $\int G < \infty$ and every
+$t \in [0, \infty]$, almost every $x \in V$ with $G_{Q_k(x)} \leq t$ for all $k \in \N$
+satisfies $G(x) \leq t$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $w_k$ be the centre of $Q_k(x)$ and $\delta_k = (n + 1) 2^{-k}$. By \Cref{lem:dyadic-cubes},
+$Q_k(x)$ lies in the closed ball $\bar B_k = \bar B(w_k, \delta_k)$, which contains $x$, and
+$|\bar B_k| = (n + 1)^n |B(0,1)| \, |Q_k(x)|$. By \Cref{lem:average-subset},
+\[
+  |F_{Q_k(x)} - F(x)| \leq (n + 1)^n |B(0,1)| \, (|F - F(x)|)_{\bar B_k} .
+\]
+Lebesgue measure is doubling, and Mathlib's Lebesgue differentiation theorem for doubling
+measures (\texttt{IsUnifLocDoublingMeasure.\allowbreak ae\_tendsto\_average\_norm\_sub}) shows
+that the right side tends to $0$ at almost every $x$, since the radii $\delta_k$ tend to $0$.
+For $G$ apply this to the integrable real function $F$ equal to $G$ where $G < \infty$ and to $0$
+elsewhere; $G$ is finite almost everywhere, so the averages of $F$ over the cubes are those of $G$
+(\Cref{lem:average-subset}), and the bound $t$ passes to the limit.
+\end{proof}
+
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
 

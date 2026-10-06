@@ -133,6 +133,7 @@ public import FunctionSpaces.Rd.MixedLittlewoodPaley
 public import FunctionSpaces.Rd.HyperbolicCross
 public import FunctionSpaces.Rd.TriebelLizorkin
 public import FunctionSpaces.Torus.TriebelLizorkin
+public import FunctionSpaces.Rd.DyadicCubes
 
 /-!
 # Function spaces
@@ -409,4 +410,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `B^s_{p,min(p,q)} ⊆ F^s_{p,q} ⊆ B^s_{p,max(p,q)}`.
 * `FunctionSpaces.Torus.TriebelLizorkin`: the Triebel–Lizorkin quasi-norm on the torus,
   `F^s_{p,p}(𝕋^d) = B^s_{p,p}(𝕋^d)` and the Besov sandwich on the torus.
+* `FunctionSpaces.Rd.DyadicCubes`: dyadic cubes of every integer level, their nesting, and the
+  Lebesgue differentiation theorem along them.
 -/
