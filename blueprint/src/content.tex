@@ -8955,7 +8955,7 @@ norm of each partial sum by $\sum_{i \in I} \|g_i\|_p$.
 
 \begin{lemma}[Minkowski's integral inequality for $\ell_u$-valued functions]
 \label{lem:minkowski-integral-lq}
-\lean{ENNReal.rpow_eq_mul_rpow_sub_one, ENNReal.le_rpow_sum_rpow,
+\lean{ENNReal.rpow_eq_mul_rpow_sub_one, ENNReal.one_lt_toReal, ENNReal.le_rpow_sum_rpow,
   MeasureTheory.sum_rpow_lintegral_le_mul, MeasureTheory.rpow_sum_rpow_lintegral_le,
   MeasureTheory.lqNorm_lintegral_le}
 \leanok
@@ -9473,6 +9473,265 @@ For $G$ apply this to the integrable real function $F$ equal to $G$ where $G < \
 elsewhere; $G$ is finite almost everywhere, so the averages of $F$ over the cubes are those of $G$
 (\Cref{lem:average-subset}), and the bound $t$ passes to the limit.
 \end{proof}
+
+\section{The Hardy--Littlewood maximal function}
+
+The maximal function is the tool that turns pointwise bounds of convolutions into $L_p$ bounds
+when the $\ell_q$ norm over the levels is taken before the $L_p$ norm. As in the previous section,
+$V$ is a finite-dimensional real inner product space of dimension $n$ with Lebesgue measure
+$|\cdot|$, and $B(x, r)$ and $\bar B(x, r)$ are the open and the closed ball. All functions in
+this section take values in $[0, \infty]$, so every integral has a value; for a function that
+is not measurable, $\int$ is the lower Lebesgue integral, as in Mathlib.
+
+\begin{definition}[Hardy--Littlewood maximal function]
+\label{def:maximal-function}
+\lean{Rd.maximal, Rd.volume_ball_ne_zero, Rd.volume_ball_ne_top, Rd.le_maximal,
+  Rd.setLIntegral_ball_le_mul_maximal, Rd.maximal_le_of_forall}
+\leanok
+For $g : V \to [0, \infty]$ and $x \in V$,
+\[
+  M g(x) = \sup_{r > 0} \frac{1}{|B(0, r)|} \int_{B(x, r)} g(y) \, dy \in [0, \infty] .
+\]
+For every $r > 0$, $0 < |B(0, r)| < \infty$. For every $g$, every $x \in V$ and every $r > 0$,
+$\int_{B(x,r)} g \leq |B(0,r)| \, M g(x)$, and for every $c \in [0, \infty]$ with
+$\int_{B(x,r)} g \leq |B(0,r)| \, c$ for all $r > 0$, $M g(x) \leq c$.
+\end{definition}
+
+The normalisation by $|B(0, r)| = |B(x, r)|$ keeps the factor independent of $x$.
+
+\begin{lemma}[Elementary properties of the maximal function]
+\label{lem:maximal-function-basic}
+\lean{Rd.maximal_mono, Rd.maximal_add_le, Rd.maximal_const_mul, Rd.maximal_le_of_ae_le,
+  Rd.maximal_const, Rd.maximal_congr_ae, Rd.maximal_indicator_le, Rd.maximal_iSup_of_monotone,
+  Rd.maximal_eq_self_of_subsingleton, Rd.maximal_le_eLpNorm_top,
+  Rd.maximal_le_maximal_indicator_add}
+\leanok
+\uses{def:maximal-function}
+For all $g, h : V \to [0, \infty]$, every $x \in V$, every $c \in [0, \infty]$, every
+$s \in [0, \infty]$ and every set $S \subseteq V$:
+\begin{enumerate}
+  \item if $g \leq h$, then $M g \leq M h$; in particular $M(\mathbf 1_S g) \leq M g$;
+  \item if $g$ is almost everywhere measurable, then $M(g + h)(x) \leq M g(x) + M h(x)$;
+  \item if $c < \infty$, then $M(c g) = c \, M g$; and $M c = c$ for the constant function $c$;
+  \item if $g \leq s$ almost everywhere, then $M g \leq s$; in particular $M g \leq \|g\|_\infty$;
+  \item if $g = h$ almost everywhere, then $M g = M h$;
+  \item if $g$ is measurable, then $M g(x) \leq M(\mathbf 1_{\{g > s\}} g)(x) + s$;
+  \item if $n = 0$, then $M g = g$.
+\end{enumerate}
+For every increasing sequence $(g_N)_{N \in \N}$ of almost everywhere measurable functions
+$g_N : V \to [0, \infty]$, $M(\sup_N g_N) = \sup_N M g_N$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Each property holds for the integrals over every ball $B(x, r)$ and passes to the supremum over
+$r$: monotonicity and additivity of the integral (additivity needs one measurable summand),
+homogeneity, the integral of a constant, and the monotone convergence theorem on each ball,
+followed by an exchange of the two suprema. The cut at height $s$ uses
+$g \leq \mathbf 1_{\{g > s\}} g + s$. For $n = 0$ every ball of positive radius is the whole
+one-point space.
+\end{proof}
+
+\begin{lemma}[Measurability of the maximal function]
+\label{lem:maximal-function-measurable}
+\lean{Rd.lowerSemicontinuous_setLIntegral_ball, Rd.lowerSemicontinuous_maximal,
+  Rd.measurable_maximal}
+\leanok
+\uses{def:maximal-function}
+For every $g : V \to [0, \infty]$ and every $r \in \R$, the function
+$x \mapsto \int_{B(x,r)} g$ is lower semicontinuous. For every $g : V \to [0, \infty]$, $M g$ is
+lower semicontinuous, hence measurable.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The ball $B(x_0, r)$ is the increasing union of the balls $B(x_0, r - 1/(m+1))$, so
+$\int_{B(x_0, r)} g > a$ implies $\int_{B(x_0, r - 1/(m+1))} g > a$ for some $m$, and this ball
+lies in $B(x, r)$ for every $x$ with $\|x - x_0\| < 1/(m+1)$. A supremum of lower semicontinuous
+functions is lower semicontinuous, and lower semicontinuous functions are Borel measurable.
+\end{proof}
+
+The lemma holds for every $g$; the measurability comes from the open balls.
+
+\begin{lemma}[Convolutions with kernels under radial majorants]
+\label{lem:maximal-function-kernels}
+\lean{Rd.lintegral_mul_le_maximal_of_ball, Rd.dyadicShell, Rd.measurableSet_dyadicShell,
+  Rd.iUnion_dyadicShell, Rd.kernel_le_of_mem_dyadicShell, Rd.volume_ball_two_pow_mul,
+  Rd.tsum_two_inv_pow_mul_two_pow, Rd.lintegral_mul_le_maximal_of_decay, Rd.decayMaximalConst,
+  Rd.decayMaximalConst_ne_top, Rd.inv_one_add_two_pow_mul_pow_le,
+  Rd.lintegral_mul_le_maximal_of_one_add_norm}
+\leanok
+\uses{def:maximal-function}
+For every integer $N > n$ let $c_{n,N} = 2^n \bigl(1 - 2^{-(N - n)}\bigr)^{-1}$ and
+$C_{n,N} = |B(0, 1)| \, c_{n,N}$. For every $K : V \to [0, \infty]$, every
+$g : V \to [0, \infty]$, every $x \in V$, every $A \in [0, \infty)$ and every $\rho > 0$:
+\begin{enumerate}
+  \item if $K \leq A \mathbf 1_{B(0, \rho)}$, then
+    $\int K(y) g(x - y) \, dy \leq A \, |B(0, \rho)| \, M g(x)$;
+  \item if $N > n$ is an integer, $K(y) \leq A$ for $\|y\| \leq \rho$ and
+    $K(y) \leq A (\rho / \|y\|)^N$ for $\|y\| > \rho$, then
+    $\int K(y) g(x - y) \, dy \leq c_{n,N} \, A \, |B(0, \rho)| \, M g(x)$;
+  \item if $N > n$ and $j \geq 0$ are integers and
+    $K(y) \leq A \, 2^{jn} (1 + 2^j \|y\|)^{-N}$ for all $y$, then
+    $\int K(y) g(x - y) \, dy \leq C_{n,N} \, A \, M g(x)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The integrand is at most $A \mathbf 1_{B(x, \rho)}(x - y) \, g(x - y)$; translation
+invariance gives $A \int_{B(x, \rho)} g \leq A \, |B(0, \rho)| \, M g(x)$. (2) The shells
+$S_0 = B(0, 2\rho)$ and $S_i = \{2^i \rho \leq \|y\| < 2^{i+1} \rho\}$, $i \geq 1$, cover $V$,
+and $K \leq A 2^{-iN} \mathbf 1_{B(0, 2^{i+1} \rho)}$ on $S_i$. By (1) and
+$|B(0, 2^{i+1} \rho)| = 2^{(i+1) n} |B(0, \rho)|$, the integral over $S_i$ is at most
+$A \, |B(0, \rho)| \, 2^n 2^{-i(N - n)} M g(x)$, and the geometric series sums to the bound.
+(3) is (2) with $\rho = 2^{-j}$: $(1 + 2^j \|y\|)^{-N} \leq 1$, and
+$(1 + 2^j \|y\|)^{-N} \leq (2^{-j} / \|y\|)^N$, and $2^{jn} |B(0, 2^{-j})| = |B(0, 1)|$.
+\end{proof}
+
+Only the integral of $g$ over subsets of $V$ enters, so the lemma holds for all $K$ and $g$, and
+$C_{n,N}$ is the same for every level $j$.
+
+\begin{theorem}[Weighted weak type $(1,1)$]
+\label{thm:maximal-weak-type}
+\lean{Rd.setLIntegral_closedBall_le_maximal, Rd.mul_setLIntegral_closedBall_le, Rd.bigBallSet,
+  Rd.bigBallSet_mono, Rd.setOf_lt_maximal_subset, Rd.mul_setLIntegral_bigBallSet_le,
+  Rd.setLIntegral_maximal_gt_le, Rd.volume_maximal_gt_le}
+\leanok
+\uses{def:maximal-function, lem:maximal-function-basic}
+For all $g, w : V \to [0, \infty]$ and every $t \in (0, \infty]$,
+\[
+  \int_{\{M g > t\}} w(x) \, dx \leq \frac{5^n}{t} \int g(x) \, M w(x) \, dx,
+  \qquad
+  |\{M g > t\}| \leq \frac{5^n}{t} \int g(x) \, dx .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The second inequality is the first for $w = 1$, since $M 1 = 1$. For $t = \infty$ the level set
+is empty. For $t < \infty$ and $R > 0$ let $E_R$ be the set of $x$ with a radius
+$0 < r \leq R$ such that $t \, |B(0, r)| < \int_{B(x, r)} g$. If $M g(x) > t$, some radius
+$r$ satisfies this, so $\{M g > t\}$ is the increasing union of the sets $E_N$, $N \in \N$, and
+it suffices to show $t \int_{E_R} w \leq 5^n \int g \, M w$ for every $R$.
+
+Choose such a radius $r_x \leq R$ for every $x \in E_R$. Vitali's covering lemma (Mathlib's
+\texttt{Vitali.\allowbreak exists\_disjoint\_subfamily\_\allowbreak
+covering\_enlargement\_closedBall}) gives a
+set $U \subseteq E_R$ such that the balls $\bar B(b, r_b)$, $b \in U$, are pairwise disjoint and
+the balls $\bar B(b, 4 r_b)$ cover $E_R$; $U$ is countable, since the disjoint open balls
+$B(b, r_b)$ are nonempty. For $b \in U$ and $y \in B(b, r_b)$,
+$\bar B(b, 4 r_b) \subseteq B(y, 5 r_b)$, so
+$W_b = \int_{\bar B(b, 4 r_b)} w \leq 5^n |B(0, r_b)| \, M w(y)$. Hence
+\[
+  t \, |B(0, r_b)| \, W_b \leq W_b \int_{B(b, r_b)} g
+  \leq 5^n |B(0, r_b)| \int_{B(b, r_b)} g \, M w ,
+\]
+and after division by $|B(0, r_b)|$ the sum over $b \in U$ gives
+$t \int_{E_R} w \leq \sum_b t \, W_b \leq 5^n \int g \, M w$, as the balls $B(b, r_b)$ are
+disjoint.
+\end{proof}
+
+The theorem holds for all $g$ and $w$: the radii are bounded by $R$ on each $E_R$, and the
+exhaustion in $R$ takes the place of a bound of the radii by $\int g$.
+
+\begin{lemma}[{Layer cake formula for functions with values in $[0, \infty]$}]
+\label{lem:layer-cake}
+\lean{ENNReal.lt_toReal_min_natCast_iff, MeasureTheory.lintegral_min_natCast_rpow_eq,
+  ENNReal.iSup_min_natCast_rpow, MeasureTheory.lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal}
+\leanok
+For every measure space $(X, \nu)$, every almost everywhere measurable
+$F : X \to [0, \infty]$ and every $p > 0$,
+\[
+  \int F^p \, d\nu = p \int_0^\infty \nu(\{F > t\}) \, t^{p-1} \, dt .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For the truncation $\min(F, N)$, $N \in \N$, this is Mathlib's layer cake formula for real
+functions (\texttt{lintegral\_rpow\_eq\_lintegral\_meas\_lt\_mul}), and for $t > 0$,
+$\min(F, N) > t$ holds exactly when $F > t$ and $N > t$, so the right side is the integral
+over $(0, N)$. As $N \to \infty$ the left side converges by monotone convergence and the right
+side by the increasing union $\bigcup_N (0, N) = (0, \infty)$.
+\end{proof}
+
+\begin{lemma}[Integrals of powers]
+\label{lem:power-integrals}
+\lean{MeasureTheory.lintegral_Ioo_rpow, MeasureTheory.lintegral_Ioi_rpow_eq_top,
+  MeasureTheory.lintegral_Ioi_rpow_indicator_lt, MeasureTheory.lintegral_Ioi_rpow_indicator_ge}
+\leanok
+For every $r > -1$ and every $a \in [0, \infty]$,
+\[
+  \int_{(0, \infty)} \mathbf 1_{\{t < a\}} \, t^r \, dt = \frac{a^{r+1}}{r + 1} .
+\]
+For every $r < -1$ and every $a \in [0, \infty]$,
+\[
+  \int_{(0, \infty)} \mathbf 1_{\{t \geq a\}} \, t^r \, dt = \frac{a^{r+1}}{-(r + 1)} .
+\]
+Here $\infty^{r+1} = \infty$ and $0^{r+1} = 0$ for $r + 1 > 0$, and $\infty^{r+1} = 0$ and
+$0^{r+1} = \infty$ for $r + 1 < 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $0 < a < \infty$ these are the integrals of $t^r$ over $(0, a)$ and $[a, \infty)$ (Mathlib's
+\texttt{integral\_rpow} and \texttt{integral\_Ioi\_rpow\_of\_lt}), and the first formula also
+holds for $a = 0$. The integral of $t^r$ over $(0, \infty)$ is infinite for every $r$, since
+$t^r$ is not integrable on $(0, \infty)$ (Mathlib's \texttt{not\_integrableOn\_Ioi\_rpow}); this
+is the first integral for $a = \infty$ and the second for $a = 0$. For $a = \infty$ the second
+integral vanishes.
+\end{proof}
+
+\begin{theorem}[Weighted strong type and the Hardy--Littlewood maximal theorem]
+\label{thm:maximal-strong-type}
+\lean{Rd.maximalConst, Rd.maximalConst_ne_top, Rd.setLIntegral_maximal_gt_le_indicator,
+  Rd.withDensity_maximal_gt_mul_le, Rd.measurable_indicator_half_lt,
+  MeasureTheory.lintegral_Ioi_indicator_half_lt_mul_rpow,
+  Rd.lintegral_Ioi_lintegral_indicator_mul_rpow,
+  Rd.lintegral_maximal_rpow_mul_le_of_measurable, Rd.lintegral_maximal_rpow_mul_le,
+  Rd.maximalConst_ne_zero, Rd.eLpNorm_maximal_le, Rd.maximal_lt_top_ae}
+\leanok
+\uses{thm:maximal-weak-type, lem:maximal-function-basic, lem:maximal-function-measurable,
+  lem:layer-cake, lem:power-integrals}
+Let $1 < p < \infty$ and $C_{n,p} = p \, 2^p \, 5^n / (p - 1)$. For all almost everywhere
+measurable $g, w : V \to [0, \infty]$,
+\[
+  \int (M g)^p \, w \leq C_{n,p} \int g^p \, M w .
+\]
+For every $g : V \to [0, \infty]$,
+\[
+  \|M g\|_p \leq C_{n,p}^{1/p} \|g\|_p .
+\]
+For every $g : V \to [0, \infty]$ with $\|g\|_p < \infty$, $M g$ is finite almost everywhere.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Changing $g$ or $w$ on a null set changes neither side, so let $g$ and $w$ be measurable, and let
+$\nu$ be the measure $w(x) \, dx$. By \Cref{lem:layer-cake},
+$\int (M g)^p w = p \int_0^\infty \nu(\{M g > t\}) \, t^{p-1} \, dt$. For $t > 0$,
+$M g \leq M(\mathbf 1_{\{g > t/2\}} g) + t/2$ by \Cref{lem:maximal-function-basic}, so
+$\{M g > t\} \subseteq \{M(\mathbf 1_{\{g > t/2\}} g) > t/2\}$ and \Cref{thm:maximal-weak-type}
+gives
+\[
+  \nu(\{M g > t\}) \leq \frac{2 \cdot 5^n}{t} \int_{\{g > t/2\}} g \, M w .
+\]
+By Tonelli's theorem and \Cref{lem:power-integrals} with $r = p - 2 > -1$,
+\[
+  \int_0^\infty t^{p-2} \int_{\{g > t/2\}} g \, M w \, dx \, dt
+  = \int g \, M w \, \frac{(2 g)^{p-1}}{p - 1} \, dx
+  = \frac{2^{p-1}}{p - 1} \int g^p \, M w ,
+\]
+which gives the weighted bound. For $w = 1$, $M w = 1$, and taking $p$-th roots gives the bound
+in $L_p$ for almost everywhere measurable $g$; for every other $g$, $\|g\|_p = \infty$ in
+Mathlib, and $C_{n,p} > 0$ makes the right side infinite. If $\|g\|_p < \infty$, then
+$\int (M g)^p < \infty$, so $M g < \infty$ almost everywhere.
+\end{proof}
+
+The weighted bound holds for every almost everywhere measurable $g$, with both sides possibly
+infinite; this is what the duality argument for the Fefferman--Stein inequality uses, where it is
+applied at an exponent other than $p$.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

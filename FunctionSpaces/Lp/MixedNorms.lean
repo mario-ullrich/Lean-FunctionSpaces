@@ -53,6 +53,10 @@ theorem rpow_eq_mul_rpow_sub_one (a : ℝ≥0∞) {r : ℝ} (hr : 1 ≤ r) :
     _ = a ^ (1 : ℝ) * a ^ (r - 1) := ENNReal.rpow_add_of_nonneg _ _ zero_le_one (by linarith)
     _ = a * a ^ (r - 1) := by rw [ENNReal.rpow_one]
 
+/-- An exponent `1 < p < ∞` in `[0, ∞]` has real value `p.toReal > 1`. -/
+theorem one_lt_toReal {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) : 1 < p.toReal := by
+  simpa using (ENNReal.toReal_lt_toReal ENNReal.one_ne_top hp).2 hp1
+
 /-- Every term of a finite family is bounded by its `ℓ_r` norm:
 `a_i ≤ (∑_{j ∈ S} a_j^r)^(1/r)` for `i ∈ S` and `r > 0`. -/
 theorem le_rpow_sum_rpow {ι : Type*} {S : Finset ι} {a : ι → ℝ≥0∞} {i : ι}
@@ -256,8 +260,7 @@ theorem lqNorm_lintegral_le {u : ℝ≥0∞} (hu : 1 ≤ u) {g : ι → α → �
   · simp only [ENNReal.lqNorm_one]
     exact (lintegral_tsum hg).ge
   have hu0 : u ≠ 0 := (zero_lt_one.trans hu1).ne'
-  have hr : 1 < u.toReal := by
-    simpa using (ENNReal.toReal_lt_toReal ENNReal.one_ne_top hu').2 hu1
+  have hr : 1 < u.toReal := ENNReal.one_lt_toReal hu1 hu'
   have hr0 : 0 < u.toReal := zero_lt_one.trans hr
   simp only [ENNReal.lqNorm_eq_tsum hu0 hu']
   rw [one_div, ENNReal.rpow_inv_le_iff hr0, ENNReal.tsum_eq_iSup_sum]

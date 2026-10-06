@@ -134,6 +134,7 @@ public import FunctionSpaces.Rd.HyperbolicCross
 public import FunctionSpaces.Rd.TriebelLizorkin
 public import FunctionSpaces.Torus.TriebelLizorkin
 public import FunctionSpaces.Rd.DyadicCubes
+public import FunctionSpaces.Rd.MaximalFunction
 
 /-!
 # Function spaces
@@ -412,4 +413,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `F^s_{p,p}(𝕋^d) = B^s_{p,p}(𝕋^d)` and the Besov sandwich on the torus.
 * `FunctionSpaces.Rd.DyadicCubes`: dyadic cubes of every integer level, their nesting, and the
   Lebesgue differentiation theorem along them.
+* `FunctionSpaces.Rd.MaximalFunction`: the Hardy–Littlewood maximal function, its weighted weak
+  and strong types, and the Hardy–Littlewood maximal theorem.
 -/
