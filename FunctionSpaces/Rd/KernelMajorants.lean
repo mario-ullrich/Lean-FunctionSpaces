@@ -25,8 +25,10 @@ spaces. Every constant is explicit.
   change of scale `Rd.lintegral_comp_smul`).
 * **The cross kernel `k_j ⋆ Θ_i`** of the local means kernels and the band-limiting kernels
   (`Rd.LocalMeansBump.enorm_conv_kernel_Theta_le`): for `i < j` the averaged differences of the
-  moment kernels act on the smooth `Θ_i`; for `i ≥ j` the kernel `k_j` is bounded and of small
-  support (`Rd.LocalMeansBump.norm_kernel_le`, `Rd.LocalMeansBump.kernel_eq_zero_of_lt`).
+  moment kernels act on the smooth `Θ_i`, one scale at a time
+  (`Rd.LocalMeansBump.ae_enorm_conv_kernel_le_of_scaled`); for `i ≥ j` the kernel `k_j` is
+  bounded and of small support (`Rd.LocalMeansBump.norm_kernel_le`,
+  `Rd.LocalMeansBump.kernel_eq_zero_of_lt`).
 * **The cross kernel `ψ_j ⋆ η_i`** of the Littlewood–Paley blocks and the dual kernels
   (`Rd.LocalMeansBump.enorm_conv_psi_dual_le`): for `i ≤ j` and `j ≥ 2` the block `ψ_j`
   annihilates the moment kernel `μ_{2^(j-2)}` of `Φ` (`Rd.conv_psi_lpMomentScaled`, through the
@@ -673,6 +675,39 @@ namespace LocalMeansBump
 
 variable (b : LocalMeansBump V)
 
+/-! ### Local means kernels from one scale -/
+
+/-- **Local means kernels from one scale**: for levels `j < i`, `f ∈ L_1` and a bound
+`|f(x) - (m_{2^k} ⋆ f)(x)| ≤ C 2^(-(k-j)L) u(x)` almost everywhere at every scale `k ≥ j`,
+almost everywhere `|k_i ⋆ f(x)| ≤ 2 · 2^L C 2^(-(i-j)L) u(x)`. The kernel
+`k_i = m_{2^i} - m_{2^(i-1)}` is a difference of two moment kernels, so
+`k_i ⋆ f = (f - m_{2^(i-1)} ⋆ f) - (f - m_{2^i} ⋆ f)`. -/
+theorem ae_enorm_conv_kernel_le_of_scaled (L : ℕ) {f : V → ℂ} (hf : MemLp f 1 volume)
+    {C : ℝ≥0∞} {u : V → ℝ≥0∞} {j : ℕ}
+    (hB : ∀ k, j ≤ k → ∀ᵐ x ∂volume, ‖f x - conv (b.scaled L k) f volume x‖ₑ ≤
+      C * dyadicWeight (-(L : ℝ)) (k - j) * u x) {i : ℕ} (hji : j < i) :
+    ∀ᵐ x ∂volume, ‖conv (b.kernel L i) f volume x‖ₑ ≤
+      2 * 2 ^ L * C * dyadicWeight (-(L : ℝ)) (i - j) * u x := by
+  obtain ⟨i', rfl⟩ : ∃ i', i = i' + 1 := ⟨i - 1, by omega⟩
+  have hji' : j ≤ i' := by omega
+  filter_upwards [sub_conv_ae le_rfl ENNReal.one_ne_top (b.integrable_scaled L (i' + 1))
+    (b.integrable_scaled L i') hf, hB i' hji', hB (i' + 1) (hji'.trans (Nat.le_succ i'))]
+    with x h0 h1 h2
+  have hsplit : conv (b.kernel L (i' + 1)) f volume x =
+      (f x - conv (b.scaled L i') f volume x) - (f x - conv (b.scaled L (i' + 1)) f volume x) := by
+    show conv (b.scaled L (i' + 1) - b.scaled L i') f volume x = _
+    rw [h0, Pi.sub_apply]
+    ring
+  rw [hsplit]
+  refine enorm_sub_le.trans ((add_le_add h1 h2).trans ?_)
+  have hw1 := ENNReal.dyadicWeight_neg_sub_le L hji' le_rfl
+  have hw2 := ENNReal.dyadicWeight_neg_sub_le L hji' (Nat.le_succ i')
+  calc C * dyadicWeight (-(L : ℝ)) (i' - j) * u x +
+        C * dyadicWeight (-(L : ℝ)) (i' + 1 - j) * u x
+      ≤ C * (2 ^ L * dyadicWeight (-(L : ℝ)) (i' + 1 - j)) * u x +
+        C * (2 ^ L * dyadicWeight (-(L : ℝ)) (i' + 1 - j)) * u x := by gcongr
+    _ = _ := by ring
+
 /-! ### The cross kernel `k_j ⋆ Θ_i` -/
 
 /-- One step of the moment case, pointwise in `z`: for `i ≤ k`,
@@ -756,28 +791,13 @@ theorem kernelThetaMomentConst_ne_top (L N : ℕ) : b.kernelThetaMomentConst L N
 /-- **The moment case**: for `i < j` and almost every `y`,
 `|(k_j ⋆ Θ_i)(y)| ≤ C 2^(-(j-i)L) 2^(in) (1 + 2^i ‖y‖)^(-N)` with
 `C = Rd.LocalMeansBump.kernelThetaMomentConst L N`. The kernel `k_j = m_{2^j} - m_{2^(j-1)}` is
-a difference of two moment kernels, and `Θ_i - m_{2^k} ⋆ Θ_i` averages differences of order `L`
-of `Θ_i` with steps of length at most `2^(-k) R`. -/
+a difference of two moment kernels (`Rd.LocalMeansBump.ae_enorm_conv_kernel_le_of_scaled`), and
+`Θ_i - m_{2^k} ⋆ Θ_i` averages differences of order `L` of `Θ_i` with steps of length at most
+`2^(-k) R`. -/
 theorem ae_enorm_conv_kernel_Theta_le_of_lt (L N : ℕ) {i j : ℕ} (hij : i < j) :
     ∀ᵐ y ∂volume, ‖conv (b.kernel L j) (Theta i) volume y‖ₑ ≤
       b.kernelThetaMomentConst L N * dyadicWeight (-(L : ℝ)) (j - i) *
         2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹ := by
-  obtain ⟨j', rfl⟩ : ∃ j', j = j' + 1 := ⟨j - 1, by omega⟩
-  have hij' : i ≤ j' := by omega
-  have hΘ : MemLp (Theta (V := V) i) 1 volume := memLp_one_iff_integrable.2 (integrable_Theta i)
-  filter_upwards [sub_conv_ae le_rfl ENNReal.one_ne_top (b.integrable_scaled L (j' + 1))
-    (b.integrable_scaled L j') hΘ, b.ae_enorm_Theta_sub_conv_scaled_le L N hij',
-    b.ae_enorm_Theta_sub_conv_scaled_le L N (hij'.trans (Nat.le_succ j'))] with y h0 h1 h2
-  have hsplit : conv (b.kernel L (j' + 1)) (Theta i) volume y =
-      (Theta i y - conv (b.scaled L j') (Theta i) volume y) -
-        (Theta i y - conv (b.scaled L (j' + 1)) (Theta i) volume y) := by
-    show conv (b.scaled L (j' + 1) - b.scaled L j') (Theta i) volume y = _
-    rw [h0, Pi.sub_apply]
-    ring
-  rw [hsplit]
-  refine (enorm_sub_le).trans ((add_le_add h1 h2).trans ?_)
-  have hw1 := ENNReal.dyadicWeight_neg_sub_le L hij' le_rfl
-  have hw2 := ENNReal.dyadicWeight_neg_sub_le L hij' (Nat.le_succ j')
   have hR0 := b.radius_nonneg
   have hR : ENNReal.ofReal ((1 + L * b.radius) ^ N) ≤
       ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) :=
@@ -786,22 +806,22 @@ theorem ae_enorm_conv_kernel_Theta_le_of_lt (L N : ℕ) {i j : ℕ} (hij : i < j
   have h2R : ENNReal.ofReal ((2 * b.radius) ^ L) = 2 ^ L * ENNReal.ofReal (b.radius ^ L) := by
     rw [mul_pow, ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_pow zero_le_two,
       ENNReal.ofReal_ofNat]
-  calc (∫⁻ z, ‖b.toFun z‖ₑ) * (schwartzDecayConst (bandKernelS (V := V)) L N *
-          ENNReal.ofReal (b.radius ^ L) * dyadicWeight (-(L : ℝ)) (j' - i) *
-            ENNReal.ofReal ((1 + L * b.radius) ^ N) *
-              (2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹)) +
-        (∫⁻ z, ‖b.toFun z‖ₑ) * (schwartzDecayConst (bandKernelS (V := V)) L N *
-          ENNReal.ofReal (b.radius ^ L) * dyadicWeight (-(L : ℝ)) (j' + 1 - i) *
-            ENNReal.ofReal ((1 + L * b.radius) ^ N) *
-              (2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹))
-      ≤ (∫⁻ z, ‖b.toFun z‖ₑ) * (schwartzDecayConst (bandKernelS (V := V)) L N *
-          ENNReal.ofReal (b.radius ^ L) * (2 ^ L * dyadicWeight (-(L : ℝ)) (j' + 1 - i)) *
-            ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) *
-              (2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹)) +
-        (∫⁻ z, ‖b.toFun z‖ₑ) * (schwartzDecayConst (bandKernelS (V := V)) L N *
-          ENNReal.ofReal (b.radius ^ L) * (2 ^ L * dyadicWeight (-(L : ℝ)) (j' + 1 - i)) *
-            ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N) *
-              (2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹)) := by gcongr
+  filter_upwards [b.ae_enorm_conv_kernel_le_of_scaled L
+    (memLp_one_iff_integrable.2 (integrable_Theta (V := V) i))
+    (C := (∫⁻ z, ‖b.toFun z‖ₑ) * (schwartzDecayConst (bandKernelS (V := V)) L N *
+      ENNReal.ofReal (b.radius ^ L) * ENNReal.ofReal ((1 + L * b.radius) ^ N)))
+    (u := fun y => 2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹)
+    (fun k hik => (b.ae_enorm_Theta_sub_conv_scaled_le L N hik).mono fun y hy =>
+      hy.trans_eq (by ring)) hij] with y hy
+  refine hy.trans ?_
+  calc 2 * 2 ^ L * ((∫⁻ z, ‖b.toFun z‖ₑ) * (schwartzDecayConst (bandKernelS (V := V)) L N *
+        ENNReal.ofReal (b.radius ^ L) * ENNReal.ofReal ((1 + L * b.radius) ^ N))) *
+          dyadicWeight (-(L : ℝ)) (j - i) *
+            (2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹)
+      ≤ 2 * 2 ^ L * ((∫⁻ z, ‖b.toFun z‖ₑ) * (schwartzDecayConst (bandKernelS (V := V)) L N *
+        ENNReal.ofReal (b.radius ^ L) * ENNReal.ofReal ((1 + 2 * L * b.radius) ^ N))) *
+          dyadicWeight (-(L : ℝ)) (j - i) *
+            (2 ^ (i * finrank ℝ V) * ((1 + 2 ^ i * ‖y‖ₑ) ^ N)⁻¹) := by gcongr
     _ = _ := by rw [kernelThetaMomentConst, h2R]; ring
 
 /-- The constant `C (‖Θ‖_1 (1 + 4LR)^N + 2^N T)` of the support case of `k_j ⋆ Θ_i`, with

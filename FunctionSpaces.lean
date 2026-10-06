@@ -143,6 +143,7 @@ public import FunctionSpaces.Torus.PeriodicLift
 public import FunctionSpaces.Torus.FeffermanStein
 public import FunctionSpaces.Torus.TriebelLizorkinLocalMeans
 public import FunctionSpaces.Rd.TriebelLizorkinDifferences
+public import FunctionSpaces.Rd.TriebelLizorkinAtoms
 
 /-!
 # Function spaces
@@ -444,4 +445,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.TriebelLizorkinDifferences`: ball means of differences, their pointwise
   comparison with local means, and the characterisation of `F^s_{p,q}` by ball means of
   differences for `1 < p < ∞`, `1 < q ≤ ∞`, `0 < s < L`.
+* `FunctionSpaces.Rd.TriebelLizorkinAtoms`: the sequence space `f^s_{p,q}`, local means of smooth
+  atoms by maximal functions of the coefficients, and the atomic characterisation of `F^s_{p,q}`
+  for `1 < p < ∞`, `1 < q ≤ ∞`, `0 < s < L`.
 -/

@@ -7382,30 +7382,53 @@ differences are finite sums of translates.
 
 \begin{definition}[Cell atoms]
 \label{def:cell-atoms}
-\lean{Rd.cellCoef, Rd.cellAtom, Rd.enorm_cellCoef, Rd.cellCoef_mul_cellAtom}
+\lean{Rd.cellCoef, Rd.cellAtom, Rd.enorm_cellCoef, Rd.cellCoef_mul_cellAtom,
+  Rd.cellCoef_indicator, Rd.cellAtom_indicator, Rd.cellCoef_mul_cellAtom_of_indicator}
 \leanok
 \uses{def:dyadic-cells}
-For $1 \leq p < \infty$, a kernel $K$ and $g \in L_p$, the coefficients of the cells of level $j$
-are $\lambda_{j,m} = 2^{jn/p} \|1_{P_{j,m}} g\|_p$, and the cell atoms are
+For $1 \leq p < \infty$, a kernel $K$, a function $g : V \to \C$ and $j \in \N$, the
+coefficients of the cells of level $j$ are $\lambda_{j,m} = 2^{jn/p} \|1_{P_{j,m}} g\|_p$ when this
+is finite and $\lambda_{j,m} = 0$ otherwise, and the cell atoms are
 $a_{j,m} = \lambda_{j,m}^{-1} K * (1_{P_{j,m}} g)$, with $a_{j,m} = 0$ if $\lambda_{j,m} = 0$.
-Then $\lambda_{j,m} a_{j,m} = K * (1_{P_{j,m}} g)$.
+The coefficient and the atom of a cell depend only on the values of $g$ on that cell, and
+$\lambda_{j,m} a_{j,m} = K * (1_{P_{j,m}} g)$ for every $m \in \Z^n$ with
+$1_{P_{j,m}} g \in L_p$.
 \end{definition}
 
 \begin{lemma}[Cell decomposition of a convolution]
 \label{lem:cell-decomposition}
-\lean{Rd.conv_eq_tsum_cellAtom, Rd.continuous_cellAtom}
+\lean{Rd.volume_cell_ne_top, Rd.memLp_one_indicator_cell, Rd.tsum_indicator_cell,
+  Rd.conv_tsum_of_finset, Rd.conv_eq_tsum_cellAtom_of_indicator, Rd.conv_eq_tsum_cellAtom,
+  Rd.continuous_cellAtom}
 \leanok
-\uses{def:cell-atoms, lem:cells-partition, lem:conv-pointwise}
-Let $K$ be continuous with $K = 0$ outside $\overline{B}(0, \rho)$, and $g \in L_p$. Then
-$(K * g)(x) = \sum_m \lambda_{j,m} a_{j,m}(x)$ at every $x \in V$, with finitely many nonzero terms,
-and the cell atoms are continuous.
+\uses{def:cell-atoms, lem:cells-partition, lem:bounded-overlap, lem:conv-pointwise,
+  lem:dyadic-cells}
+Let $1 \leq p < \infty$ and $j \in \N$.
+\begin{enumerate}
+  \item For every $m \in \Z^n$ the cell $P_{j,m}$ has finite volume, and
+    $1_{P_{j,m}} g \in L_1$ for every $g \in L_p$.
+  \item For every $g : V \to \C$ and every $y \in V$, $g(y) = \sum_m (1_{P_{j,m}} g)(y)$.
+  \item For every continuous $K$ with compact support, all locally integrable
+    $u_i : V \to \C$, $i \in I$, every $x \in V$ and every finite $T \subseteq I$ with
+    $u_i(x - y) = 0$ whenever $i \notin T$ and $K(y) \neq 0$,
+    $\bigl(K * \sum_i u_i\bigr)(x) = \sum_i (K * u_i)(x)$.
+  \item For every $\rho \geq 0$, every continuous $K$ with $K = 0$ outside
+    $\overline{B}(0, \rho)$ and every $g : V \to \C$ with $1_{P_{j,m}} g \in L_p$ for every
+    $m \in \Z^n$, $(K * g)(x) = \sum_m \lambda_{j,m} a_{j,m}(x)$ at every $x \in V$, with finitely
+    many nonzero terms. If moreover $g \in L_p$, the cell atoms are continuous.
+\end{enumerate}
 \end{lemma}
 
 \begin{proof}
 \leanok
-Only the finitely many cells that meet $\overline{B}(x, \rho)$ contribute, and on this ball their
-indicators add up to $1$.
+(1) A cell lies in a closed ball by \Cref{lem:dyadic-cells}. (2) Only the cell containing $y$
+contributes (\Cref{lem:cells-partition}). (3) Only the finitely many terms of $T$ contribute, and
+the integral of a finite sum is the sum of the integrals (\Cref{lem:conv-pointwise}). (4) Only the
+finitely many cells that meet $\overline{B}(x, \rho)$ contribute (\Cref{lem:cells-partition},
+\Cref{lem:bounded-overlap}); apply (2) and (3) to $u_m = 1_{P_{j,m}} g$.
 \end{proof}
+
+Item (4) applies in particular to every $g \in L_p$.
 
 \begin{lemma}[Cell atoms are atoms]
 \label{lem:cell-atoms-regular}
@@ -10480,6 +10503,27 @@ $m_{2^j}(y) = 2^{jn} m(2^j y)$, and $k_j$ is a difference of two such terms, eac
 $\overline B(0, L R \, 2^{-(j-1)})$ by \Cref{lem:dual-kernel-bounds}.
 \end{proof}
 
+\begin{lemma}[Local means kernels from one scale]
+\label{lem:local-means-one-scale}
+\lean{Rd.LocalMeansBump.ae_enorm_conv_kernel_le_of_scaled}
+\leanok
+\uses{def:local-means, lem:conv-assoc, lem:dyadic-weights-integer}
+For every $L \in \N$, all $j < i$, every $f \in L_1$, every $C \in [0, \infty]$ and every
+$u : V \to [0, \infty]$ such that for every $k \geq j$ almost everywhere
+$|f(x) - (m_{2^k} * f)(x)| \leq C \, 2^{-(k-j)L} u(x)$, almost everywhere
+\[
+  |(k_i * f)(x)| \leq 2 \cdot 2^L \, C \, 2^{-(i-j)L} u(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Since $i \geq 1$, $k_i = m_{2^i} - m_{2^{i-1}}$, so
+$k_i * f = (f - m_{2^{i-1}} * f) - (f - m_{2^i} * f)$ almost everywhere (\Cref{lem:conv-assoc}),
+and $2^{-(k-j)L} \leq 2^L \, 2^{-(i-j)L}$ for $k \in \{i - 1, i\}$
+(\Cref{lem:dyadic-weights-integer}).
+\end{proof}
+
 \begin{theorem}[The cross kernel of local means and band-limiting kernels]
 \label{thm:cross-kernel-theta}
 \lean{Rd.LocalMeansBump.enorm_mul_higherDiff_Theta_le,
@@ -10492,9 +10536,9 @@ $\overline B(0, L R \, 2^{-(j-1)})$ by \Cref{lem:dual-kernel-bounds}.
   Rd.LocalMeansBump.enorm_conv_kernel_Theta_le_of_le, Rd.LocalMeansBump.kernelThetaConst,
   Rd.LocalMeansBump.kernelThetaConst_ne_top, Rd.LocalMeansBump.enorm_conv_kernel_Theta_le}
 \leanok
-\uses{lem:local-means-kernel-bounds, lem:conv-second-argument, lem:schwartz-decay,
-  lem:schwartz-tails, lem:peetre-weights, lem:dyadic-weights-integer, lem:lp-kernels-basic,
-  lem:conv-assoc, lem:weighted-jensen}
+\uses{lem:local-means-kernel-bounds, lem:local-means-one-scale, lem:conv-second-argument,
+  lem:schwartz-decay, lem:schwartz-tails, lem:peetre-weights, lem:dyadic-weights-integer,
+  lem:lp-kernels-basic, lem:conv-assoc, lem:weighted-jensen}
 Let $L, N \in \N$, let
 \[
   C^{\mathrm m}_{L,N} = 2 \|g\|_1 (2R)^L (1 + 2LR)^N C_{\Theta,L,N},
@@ -10512,9 +10556,8 @@ $c_{ji} = 1$ for $i > j$, and for almost every $y \in V$,
 
 \begin{proof}
 \leanok
-\emph{Moment case $i < j$.} Here $k_j = m_{2^j} - m_{2^{j-1}}$, so
-$k_j * \Theta_i = (\Theta_i - m_{2^{j-1}} * \Theta_i) - (\Theta_i - m_{2^j} * \Theta_i)$ almost
-everywhere. For $c = 2^k$, $k \in \{j - 1, j\}$, \Cref{lem:conv-second-argument} bounds
+\emph{Moment case $i < j$.} By \Cref{lem:local-means-one-scale} it suffices to bound
+$|\Theta_i - m_c * \Theta_i|$ for $c = 2^k$, $k \geq i$. \Cref{lem:conv-second-argument} bounds
 $|\Theta_i - m_c * \Theta_i|(y)$ by $\int |g(z)| |\Delta^L_{-2^{-k} z} \Theta_i(y)| \, dz$. On the
 support of $g$ the step $2^i \cdot 2^{-k} z$ of the dilated difference has length at most
 $2^{-(k-i)} R \leq R$, and \Cref{lem:schwartz-decay} for $G = \Theta$ gives
@@ -11590,6 +11633,355 @@ $L \geq 1$ since $0 < s < L$. Both conditions are equivalent to the finiteness o
 quasi-norm of the standard bump (\Cref{thm:smooth-atomic-decomposition}), by
 \Cref{thm:tl-local-means} and \Cref{thm:tl-ball-means}.
 \end{proof}
+
+\section{The atomic characterisation}
+
+This section describes $F^s_{p,q}$ by atomic decompositions, in the range $1 < p < \infty$,
+$1 < q \leq \infty$, $0 < s < L$. As in the previous sections, $g$ is a bump of radius $R$,
+$m^g$ its moment kernel of order $L$, $A_L = 2 \sup_V |m^g|$ the constant of
+\Cref{lem:local-means-kernel-bounds}, $k_j$ and $\eta_j$ are the local means kernels and the dual
+kernels, and $c^L_{ij} = 2^{-(i-j)L}$ for $j \leq i$, $c^L_{ij} = 1$ for $j > i$. The cells
+$P_{j,m}$ and their centres $c_{j,m}$ are those of \Cref{def:dyadic-cells}, $|B_1|$ is the
+volume of the unit ball, and $A_+ = \max(A, 0)$ for $A \in \R$. The atoms are the smooth atoms
+of \Cref{def:smooth-atoms}, normalised in $L_\infty$; their constants are nonnegative
+(\Cref{lem:smooth-atoms-basic}), so $A_+ = A$ for them. The coefficient of a cell in the
+decomposition of $F$ is the mean of $|k_j * F|$ over the cell, at most a multiple of
+$M(k_j * F)$ at every point of the cell. The Besov spaces use atoms normalised in $L_p$
+(\Cref{thm:atomic-characterisation}); here the maximal function bounds means in $L_1$, so the
+coefficients are $L_1$ means over the cells.
+
+\begin{definition}[The sequence space $f^s_{p,q}$]
+\label{def:tl-sequence-space}
+\lean{Rd.cellCoefFun, Rd.cellCoefFun_of_mem, Rd.measurable_cellCoefFun, Rd.tlCoeffNorm,
+  Rd.aemeasurable_lqNorm_cellCoefFun}
+\leanok
+\uses{def:dyadic-cells, def:lq-norm, lem:lp-norm-nonnegative}
+Let $\lambda = (\lambda_{j,m})_{j \in \N, m \in \Z^n}$ be complex coefficients. For $j \in \N$ and
+$x \in V$ let $\lambda_j(x) = |\lambda_{j,m}|$ for the index $m$ of the cell $P_{j,m}$ of level
+$j$ that contains $x$. The function $\lambda_j : V \to [0, \infty)$ is measurable. For
+$1 \leq p < \infty$, $s \in \R$ and $1 \leq q \leq \infty$,
+\[
+  \|\lambda\|_{f^s_{p,q}} = \Bigl\| x \mapsto \bigl\| (2^{js} \lambda_j(x))_{j \in \N}
+  \bigr\|_{\ell_q} \Bigr\|_{L_p} ,
+\]
+and $x \mapsto \|(2^{js} \lambda_j(x))_j\|_{\ell_q}$ is measurable.
+\end{definition}
+
+\begin{lemma}[Coefficients and the maximal function]
+\label{lem:coefficients-maximal}
+\lean{Rd.volume_cell, Rd.volume_ball_div_two_pow, Rd.dyadicWeight_mul_setLIntegral_ball_le,
+  Rd.cellCoefFun_le_maximal, Rd.enorm_coef_le_maximal_cellCoefFun,
+  Rd.dyadicWeight_mul_tsum_ite_le_maximal, ENNReal.tsum_mul_le_of_le}
+\leanok
+\uses{def:tl-sequence-space, def:maximal-function, lem:dyadic-cubes, lem:dyadic-cells,
+  lem:cells-partition, lem:product-modulus}
+Let $\lambda$ be complex coefficients and $j \in \N$.
+\begin{enumerate}
+  \item For every $m \in \Z^n$, $|P_{j,m}| = 2^{-jn}$; for every $\rho > 0$ and every $z \in V$,
+    $|B(z, \rho 2^{-j})| = \rho^n |B_1| 2^{-jn}$, and for every $u : V \to [0, \infty]$ and every
+    $x \in V$, $2^{jn} \int_{B(x, \rho 2^{-j})} u \leq \rho^n |B_1| \, M u(x)$.
+  \item For every $u : V \to [0, \infty]$ with $|\lambda_{j,m}| \leq 2^{jn} \int_{P_{j,m}} u$
+    for every $m \in \Z^n$, and every $x \in V$,
+    $\lambda_j(x) \leq (2n + 1)^n |B_1| \, M u(x)$.
+  \item For every $\rho \in \R$, every $m \in \Z^n$ and every $x \in V$ with
+    $\|x - c_{j,m}\| \leq \rho 2^{-j}$, $|\lambda_{j,m}| \leq (2(\rho + 1))^n M \lambda_j(x)$.
+  \item For every $i \leq j$, every $\rho \geq 0$ and every $x \in V$,
+    \[
+      2^{-jn} \sum_{m : \|x - c_{j,m}\| \leq \rho 2^{-i}} |\lambda_{j,m}| \leq
+      (\rho + n + 1)^n |B_1| \, 2^{-in} M \lambda_j(x) .
+    \]
+  \item For every family $(\mu_m)$ in $[0, \infty]$, every predicate $P$ on the indices, every
+    $B \in [0, \infty]$ and all $u_m \in [0, \infty]$ with $u_m \leq B \, \mathbf 1_{P(m)}$,
+    $\sum_m \mu_m u_m \leq B \sum_{m : P(m)} \mu_m$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The cell is a cube of side $2^{-j}$ (\Cref{lem:dyadic-cubes}), the volume of balls scales
+with the $n$-th power of the radius, $(2^{-j})^n = 2^{-jn}$ (\Cref{lem:product-modulus}), and
+\Cref{def:maximal-function}. (2) The cell of $x$ lies in
+$B(x, (2n + 1) 2^{-j})$, since all its points have distance at most $n 2^{-j}$ from its centre
+(\Cref{lem:dyadic-cells}); apply (1). (3) $\rho \geq 0$ since $\|x - c_{j,m}\| \geq 0$. The ball
+$B(c_{j,m}, 2^{-j}/2)$ lies in $P_{j,m}$
+(\Cref{lem:dyadic-cubes}), where $\lambda_j = |\lambda_{j,m}|$, and in
+$B(x, (\rho + 1) 2^{-j})$, whose volume is $(2(\rho + 1))^n$ times as large. (4) The cells in the
+sum lie in $B(x, (\rho + n + 1) 2^{-i})$, and $2^{-jn} |\lambda_{j,m}| = \int_{P_{j,m}} \lambda_j$;
+the cells are disjoint (\Cref{lem:cells-partition}), and (1) at level $i$ finishes. (5) is
+termwise.
+\end{proof}
+
+\begin{lemma}[Smooth atoms on $V$]
+\label{lem:smooth-atoms-basic}
+\lean{Rd.IsSmoothAtom.norm_le, Rd.IsSmoothAtom.const_nonneg, Rd.IsSmoothAtom.continuous,
+  Rd.IsSmoothAtom.hasCompactSupport, Rd.IsSmoothAtom.integrable,
+  Rd.IsSmoothAtom.lintegral_enorm_le}
+\leanok
+\uses{def:smooth-atoms, lem:pointwise-atoms}
+Let $a$ be a smooth atom on a set $\Omega$ of level $j$ with centre $c$, radius factor $d$ and
+constant $A$. Then $|a| \leq A$ on $\Omega$, and $a$ has compact support. If $\Omega = V$, then
+$A \geq 0$, $a$ is continuous and integrable, and for $d \geq 0$,
+$\int_V |a| \leq A \, d^n |B_1| \, 2^{-jn}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bound is the case $l = 0$ of \Cref{def:smooth-atoms}; for $\Omega = V$ it gives
+$0 \leq |a(0)| \leq A$. The atom vanishes outside $\overline B(c, d 2^{-j})$, whose volume is
+$d^n |B_1| 2^{-jn}$ (\Cref{lem:pointwise-atoms}).
+\end{proof}
+
+\begin{lemma}[Convolution with a series of atoms]
+\label{lem:conv-atom-series}
+\lean{Rd.conv_tsum_atom, Rd.enorm_conv_le_tsum_atom}
+\leanok
+\uses{lem:smooth-atoms-basic, lem:cells-partition, lem:bounded-overlap, lem:cell-decomposition,
+  def:conv}
+Let $K$ be continuous with $K = 0$ outside $\overline B(0, \rho)$, $\rho \geq 0$, let $d \geq 0$,
+and for every $m \in \Z^n$ let $a_m$ be a smooth atom on $V$ of level $j$ with centre $c_{j,m}$,
+radius factor $d$ and constant $A$. For all complex $\lambda_m$ and every $x \in V$,
+\[
+  \Bigl(K * \sum_m \lambda_m a_m\Bigr)(x) = \sum_m \lambda_m (K * a_m)(x) ,
+\]
+and for every $f : V \to \C$ with $f = \sum_m \lambda_m a_m$ almost everywhere,
+$|(K * f)(x)| \leq \sum_m |\lambda_m| \, |(K * a_m)(x)|$ for every $x \in V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $K(y) \neq 0$ and $a_m(x - y) \neq 0$, then $\|x - c_{j,m}\| \leq \rho + d 2^{-j}$; only
+finitely many centres satisfy this (\Cref{lem:cells-partition}, \Cref{lem:bounded-overlap}), so
+\Cref{lem:cell-decomposition} (3) applies to $u_m = \lambda_m a_m$. The bound follows since
+$K * f = K * \sum_m \lambda_m a_m$ (\Cref{def:conv}).
+\end{proof}
+
+\begin{lemma}[Coarse local means of atoms]
+\label{lem:coarse-local-means-atoms}
+\lean{Rd.LocalMeansBump.lintegral_enorm_kernel_mul_atom_le,
+  Rd.LocalMeansBump.tlAtomCoarseConst, Rd.LocalMeansBump.tlAtomCoarseConst_ne_top,
+  Rd.LocalMeansBump.enorm_conv_kernel_level_le_of_le}
+\leanok
+\uses{lem:local-means-kernel-bounds, lem:reproducing-pointwise, lem:dyadic-weights-integer,
+  lem:smooth-atoms-basic, lem:conv-atom-series, lem:coefficients-maximal, lem:weighted-jensen}
+Let $L \in \N$, $d \geq 0$ and $A \in \R$, and let
+\[
+  C^{\mathrm c}_{L,d,A} = A_L \, A_+ \, d^n |B_1| \, (2LR + d + n + 1)^n |B_1| ;
+\]
+then $C^{\mathrm c}_{L,d,A} < \infty$. For all $i \leq j$, every smooth atom $a$ on $V$ of level
+$j$ with centre $c$, radius factor $d$ and constant $A$, and every $x \in V$,
+\[
+  \int_V |k_i(y)| \, |a(x - y)| \, dy \leq A_L \, A_+ \, d^n |B_1| \, 2^{in} 2^{-jn}
+  \mathbf 1_{\|x - c\| \leq (2LR + d) 2^{-i}} .
+\]
+For all $i \leq j$, all coefficients $\lambda$, smooth atoms $a_{j,m}$ on $V$ of level $j$ with
+centres $c_{j,m}$, radius factor $d$ and constant $A$, every $f : V \to \C$ with
+$f = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere and every $x \in V$,
+\[
+  |(k_i * f)(x)| \leq C^{\mathrm c}_{L,d,A} \, M \lambda_j(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The kernel $k_i$ is continuous (\Cref{lem:reproducing-pointwise}), and
+$|k_i| \leq A_L 2^{in}$ vanishes outside $\overline B(0, 2LR 2^{-i})$
+(\Cref{lem:local-means-kernel-bounds}, \Cref{lem:dyadic-weights-integer}). Moreover
+$\int |a| \leq A d^n |B_1| 2^{-jn}$ with $A = A_+$ (\Cref{lem:smooth-atoms-basic}); if
+$\|x - c\| > (2LR + d) 2^{-i}$, then $\|x - y - c\| > d 2^{-i} \geq d 2^{-j}$ wherever
+$k_i(y) \neq 0$. By \Cref{lem:conv-atom-series} and \Cref{lem:weighted-jensen},
+$|(k_i * f)(x)| \leq A_L A_+ d^n |B_1| 2^{in} \cdot 2^{-jn}
+\sum_{m : \|x - c_{j,m}\| \leq (2LR + d) 2^{-i}} |\lambda_{j,m}|$, and
+\Cref{lem:coefficients-maximal} (4) bounds the last factor by
+$(2LR + d + n + 1)^n |B_1| 2^{-in} M \lambda_j(x)$.
+\end{proof}
+
+\begin{lemma}[Fine local means of atoms]
+\label{lem:fine-local-means-atoms}
+\lean{Rd.LocalMeansBump.enorm_mul_higherDiff_atom_le,
+  Rd.LocalMeansBump.ae_enorm_atom_sub_conv_scaled_le, Rd.LocalMeansBump.momentAtomConst,
+  Rd.LocalMeansBump.momentAtomConst_ne_top,
+  Rd.LocalMeansBump.ae_enorm_conv_kernel_atom_le_of_lt, Rd.LocalMeansBump.tlAtomFineConst,
+  Rd.LocalMeansBump.tlAtomFineConst_ne_top,
+  Rd.LocalMeansBump.ae_enorm_conv_kernel_level_le_of_lt}
+\leanok
+\uses{lem:smooth-atoms-regular, lem:local-means-one-scale, lem:conv-second-argument,
+  def:local-means, lem:local-means-kernel-bounds, lem:reproducing-pointwise, def:rd-modulus,
+  def:rd-modulus-on, lem:smooth-atoms-basic, lem:conv-atom-series, lem:coefficients-maximal}
+Let $L \in \N$ with $L \geq 1$, $d \geq 0$ and $A \in \R$, and let
+\[
+  D_{L,A} = 2 \|g\|_1 \, 2^L L^{L+1} A_+ \, (2R)^L , \qquad
+  C^{\mathrm f}_{L,d,A} = D_{L,A} \, (d + LR + n + 1)^n |B_1| ;
+\]
+then both are finite. For all $j < i$ and every smooth atom $a$ on $V$ of level $j$ and order
+$L$ with centre $c$, radius factor $d$ and constant $A$, almost everywhere
+\[
+  |(k_i * a)(x)| \leq D_{L,A} \, 2^{-(i-j)L} \, \mathbf 1_{\|x - c\| \leq (d + LR) 2^{-j}} .
+\]
+For all $j < i$, all coefficients $\lambda$, smooth atoms $a_{j,m}$ on $V$ of level $j$ and order
+$L$ with centres $c_{j,m}$, radius factor $d$ and constant $A$, and every $f : V \to \C$ with
+$f = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, almost everywhere
+\[
+  |(k_i * f)(x)| \leq C^{\mathrm f}_{L,d,A} \, 2^{-(i-j)L} \, M \lambda_j(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:local-means-one-scale} it suffices to show, for every $k \geq j$ and almost every
+$x$,
+\[
+  |a(x) - (m^g_{2^k} * a)(x)| \leq \|g\|_1 \, 2^L L^{L+1} A_+ R^L \, 2^{-(k-j)L}
+  \mathbf 1_{\|x - c\| \leq (d + LR) 2^{-j}} ,
+\]
+since $2 \cdot 2^L$ times this constant is $D_{L,A}$. By \Cref{lem:conv-second-argument},
+$|a(x) - (m^g_{2^k} * a)(x)| \leq \int |g(z)| \, |\Delta^L_{-2^{-k} z} a(x)| \, dz$ almost
+everywhere. On the support of $g$ the step $h = -2^{-k} z$ has $\|h\| \leq R 2^{-k}$, so
+$|\Delta^L_h a(x)| \leq 2^L L^{L+1} A (2^j \|h\|)^L \leq 2^L L^{L+1} A R^L 2^{-(k-j)L}$
+(\Cref{lem:smooth-atoms-regular}, with the steps of \Cref{def:rd-modulus-on}). The difference
+is a sum of values $a(x + l h)$, $l \leq L$ (\Cref{def:rd-modulus}), which vanish unless
+$\|x - c\| \leq (d + LR) 2^{-j}$. For the level, \Cref{lem:conv-atom-series} and
+\Cref{lem:coefficients-maximal} (5) give
+$|(k_i * f)(x)| \leq D_{L,A} 2^{-(i-j)L} \sum_{m : \|x - c_{j,m}\| \leq (d + LR) 2^{-j}}
+|\lambda_{j,m}|$, and \Cref{lem:coefficients-maximal} (4) with $i = j$ bounds the sum by
+$(d + LR + n + 1)^n |B_1| M \lambda_j(x)$.
+\end{proof}
+
+The fine local means need no moment conditions on the atoms: the moments of the kernel $k_i$ and
+the smoothness of the atoms give the decay $2^{-(i-j)L}$.
+
+\begin{theorem}[Synthesis from atoms]
+\label{thm:tl-atomic-synthesis}
+\lean{Rd.LocalMeansBump.tlAtomSynthesisConst, Rd.LocalMeansBump.tlAtomSynthesisConst_ne_top,
+  Rd.LocalMeansBump.ae_enorm_conv_kernel_level_le,
+  Rd.LocalMeansBump.enorm_conv_kernel_le_tsum_level,
+  Rd.LocalMeansBump.enorm_localMean_le_tsum_maximal_cellCoefFun,
+  Rd.LocalMeansBump.tlLocalMeansNorm_le_tlCoeffNorm}
+\leanok
+\uses{lem:coarse-local-means-atoms, lem:fine-local-means-atoms, lem:lp-limits-pointwise,
+  def:tl-local-means, lem:conv-op, lem:almost-diagonal-pointwise, lem:maximal-bounds-mixed-norm,
+  def:tl-sequence-space}
+Let $L \in \N$ with $L \geq 1$, $d \geq 0$, $A \in \R$, and
+$C^{\mathrm a}_{L,d,A} = \max(C^{\mathrm c}_{L,d,A}, C^{\mathrm f}_{L,d,A}) < \infty$. Let
+$1 < p < \infty$, $1 < q \leq \infty$ and $s \in \R$. For all coefficients $\lambda$, all smooth
+atoms $a_{j,m}$ on $V$ of level $j$ and order $L$ with centres $c_{j,m}$, radius factor $d$ and
+constant $A$, all $f_j \in L_p$ with $f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, and
+every $F \in L_p$ with $\sum_{j \leq J} f_j \to F$ in $L_p$, almost everywhere and for all
+$i \in \N$
+\[
+  |(k_i * F)(x)| \leq C^{\mathrm a}_{L,d,A} \sum_{j \in \N} c^L_{ij} \, M \lambda_j(x) ,
+\]
+and
+\[
+  \|F\|^{g,L}_{F^s_{p,q}} \leq C^{\mathrm a}_{L,d,A} \, A_{s,L} \, C_{n,p,q} \,
+  \|\lambda\|_{f^s_{p,q}} ,
+\]
+with the constants $A_{s,L}$ of \Cref{lem:almost-diagonal-pointwise}, finite for $0 < s < L$,
+and $C_{n,p,q}$ of \Cref{thm:fefferman-stein}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{lem:coarse-local-means-atoms} for $j \geq i$ and \Cref{lem:fine-local-means-atoms} for
+$j < i$ give $|(k_i * f_j)(x)| \leq C^{\mathrm a}_{L,d,A} c^L_{ij} M \lambda_j(x)$ almost
+everywhere. The local mean $k_i *$ is continuous on $L_p$ (\Cref{lem:conv-op}), so
+$k_i * \sum_{j \leq J} f_j \to k_i * F$, and the bound
+$|k_i * \sum_{j \leq J} f_j| \leq \sum_j |k_i * f_j|$ of the partial sums passes to $F$
+(\Cref{lem:lp-limits-pointwise}). \Cref{lem:almost-diagonal-pointwise} with the local means index
+$i$ and the level $j$ and \Cref{lem:maximal-bounds-mixed-norm} for the functions
+$2^{js} \lambda_j$ finish.
+\end{proof}
+
+\begin{lemma}[Coefficients with exponent one]
+\label{lem:cell-coefficients-exponent-one}
+\lean{Rd.enorm_cellCoef_one_le, Rd.lqNorm_cellCoefFun_le_lqNorm_maximal}
+\leanok
+\uses{def:cell-atoms, lem:coefficients-maximal, lem:almost-diagonal-pointwise, lem:lq-basic}
+For every almost everywhere strongly measurable $u : V \to \C$, every $j \in \N$ and every
+$m \in \Z^n$, the coefficient $\lambda_{j,m}$ of $u$ with exponent $p = 1$
+(\Cref{def:cell-atoms}) satisfies $|\lambda_{j,m}| \leq 2^{jn} \int_{P_{j,m}} |u|$. For all
+almost everywhere strongly measurable $u_j : V \to \C$, $j \in \N$, the coefficients
+$\lambda_{j,m}$ of $u_j$ with exponent one satisfy, for every $0 < q \leq \infty$, every
+$s \in \R$ and every $x \in V$,
+\[
+  \|(2^{js} \lambda_j(x))_j\|_{\ell_q} \leq (2n + 1)^n |B_1| \,
+  \|(M(2^{js} |u_j|)(x))_j\|_{\ell_q} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\lambda_{j,m} = 2^{jn} \|1_{P_{j,m}} u\|_1$ when this is finite, and $0$ otherwise. The second
+bound is \Cref{lem:coefficients-maximal} (2) for every level, with the weights moved inside the
+maximal function (\Cref{lem:almost-diagonal-pointwise}).
+\end{proof}
+
+\begin{theorem}[Atomic decomposition of Triebel--Lizorkin type]
+\label{thm:tl-atomic-decomposition}
+\lean{Rd.LocalMeansBump.tl_atomic_decomposition, Rd.LocalMeansBump.tlCoeffNorm_cellCoef_le}
+\leanok
+\uses{lem:cell-atoms-smooth, lem:cell-decomposition, def:cell-atoms, lem:reproducing-formula,
+  def:tl-local-means, lem:cell-coefficients-exponent-one, lem:maximal-bounds-mixed-norm,
+  thm:young, def:local-means}
+Let $L \in \N$ with $L \geq 1$, $K \in \N$, $1 \leq p < \infty$ and $F \in L_p$, and let
+$u_j = k_j * F$. Then $u_j \in L_p$. For $j \in \N$ and $m \in \Z^n$ let
+\[
+  \lambda_{j,m} = 2^{jn} \int_{P_{j,m}} |u_j| , \qquad
+  a_{j,m} = \lambda_{j,m}^{-1} \, \eta_j * (1_{P_{j,m}} u_j) ,
+\]
+with $a_{j,m} = 0$ if $\lambda_{j,m} = 0$: the coefficients and cell atoms with exponent $p = 1$
+of \Cref{def:cell-atoms} for the kernel $\eta_j$ and $g = u_j$. Then:
+\begin{enumerate}
+  \item every $a_{j,m}$ is a smooth atom on $V$ of level $j$ and order $K$ with centre $c_{j,m}$,
+    radius factor $2LR + n$ and constant $A_{L,K}$ of \Cref{lem:dual-kernel-derivatives};
+  \item $(\eta_j * u_j)(x) = \sum_m \lambda_{j,m} a_{j,m}(x)$ for every $j \in \N$ and every
+    $x \in V$;
+  \item $\sum_{j \leq J} \eta_j * u_j \to F$ in $L_p$;
+  \item if $p > 1$, then for every $1 < q \leq \infty$ and every $s \in \R$,
+    \[
+      \|\lambda\|_{f^s_{p,q}} \leq (2n + 1)^n |B_1| \, C_{n,p,q} \, \|F\|^{g,L}_{F^s_{p,q}} .
+    \]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+$u_j \in L_p$ by Young's inequality (\Cref{thm:young}), so $1_{P_{j,m}} u_j \in L_1$
+(\Cref{lem:cell-decomposition}) and $\lambda_{j,m}$ is the finite integral. (1) is
+\Cref{lem:cell-atoms-smooth} at $p = 1$, where the factor $((2LR)^n |B_1|)^{1 - 1/p}$ is $1$,
+applied to $1_{P_{j,m}} u_j$; the atom of a cell depends only on $u_j$ on that cell
+(\Cref{def:cell-atoms}). (2) is \Cref{lem:cell-decomposition} (4), and (3) is the reproducing
+formula (\Cref{lem:reproducing-formula}). (4) is \Cref{lem:cell-coefficients-exponent-one} for
+the continuous $u_j$ and \Cref{lem:maximal-bounds-mixed-norm} for the functions $2^{js} |u_j|$.
+\end{proof}
+
+The bound (4) uses neither $L \geq 1$ nor the order $K$.
+
+\begin{corollary}[Atoms describe $F^s_{p,q}$]
+\label{cor:tl-atomic}
+\lean{Rd.memTriebelLizorkin_iff_atomic}
+\leanok
+\uses{thm:tl-atomic-synthesis, thm:tl-atomic-decomposition, thm:tl-local-means,
+  thm:smooth-atomic-decomposition}
+For every $1 < p < \infty$, every $1 < q \leq \infty$, every $L \in \N$, every $0 < s < L$ and
+every $F \in L_p$, $F \in F^s_{p,q}$ if and only if there are $d \geq 0$, $A \in \R$, complex
+coefficients $\lambda_{j,m}$, smooth atoms $a_{j,m}$ on $V$ of level $j$ and order $L$ with
+centres $c_{j,m}$, radius factor $d$ and constant $A$, and $f_j \in L_p$ with
+$f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, $\sum_{j \leq J} f_j \to F$ in $L_p$ and
+$\|\lambda\|_{f^s_{p,q}} < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+$L \geq 1$ since $0 < s < L$, and $F \in F^s_{p,q}$ iff the local means quasi-norm of a bump is
+finite (\Cref{thm:tl-local-means}, with the bump of \Cref{thm:smooth-atomic-decomposition}).
+Forward: \Cref{thm:tl-atomic-decomposition} with $K = L$, $d = 2LR + n$, $A = A_{L,L}$ and
+$f_j = \eta_j * (k_j * F)$. Backward: \Cref{thm:tl-atomic-synthesis}, since
+$A_{s,L} < \infty$.
+\end{proof}
+
+The Besov analogue is \Cref{thm:atomic-characterisation}. Here the atoms are indexed by the cells
+and centred at their centres, which takes the place of the bounded overlap condition there, and
+the atoms of the decomposition are smooth of every order.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

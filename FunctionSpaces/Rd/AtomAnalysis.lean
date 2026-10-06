@@ -18,11 +18,17 @@ Every `F ∈ L_p(V)`, `1 ≤ p < ∞`, is a sum of atoms built from its local me
 `a_{j,m} = λ_{j,m}⁻¹ K ⋆ (1_{P_{j,m}} g)`
 
 (`Rd.conv_eq_tsum_cellAtom`), with `‖λ_{j,·}‖_{ℓ_p} = 2^(jn/p) ‖g‖_p`, since the cells partition
-`V` (`Rd.levelNorm_cellCoef`). If `K` vanishes outside `B(0, ρ 2^(-j))` and
-`|Δ_h^l K| ≤ A 2^(jn) min(1, (2^j ‖h‖)^l)` for `l ≤ r`, Hölder's inequality on balls
-(`Rd.enorm_conv_le_of_bound`) and `Δ_h^r (K ⋆ g) = (Δ_h^r K) ⋆ g` (`Rd.higherDiff_conv_apply`) give
-the pointwise bounds of atoms of order and exponent `r` (`Rd.enorm_higherDiff_cellAtom_le`); by
-`Rd.isRegularAtom_of_pointwise` the cell atoms are regular atoms (`Rd.isRegularAtom_cellAtom`).
+`V` (`Rd.levelNorm_cellCoef`). Coefficients and atoms of a cell depend only on `g` on that cell,
+so the decomposition holds as soon as every `1_{P_{j,m}} g` lies in `L_p`
+(`Rd.conv_eq_tsum_cellAtom_of_indicator`, from the termwise convolution of locally finite series
+`Rd.conv_tsum_of_finset`); the cells have finite volume, so this holds with `p = 1` for every
+`g ∈ L_p` (`Rd.memLp_one_indicator_cell`), and then the coefficients are at most the averages
+`2^(jn) ∫_{P_{j,m}} |g|` (`Rd.enorm_cellCoef_one_le`). If `K` vanishes outside
+`B(0, ρ 2^(-j))` and `|Δ_h^l K| ≤ A 2^(jn) min(1, (2^j ‖h‖)^l)` for `l ≤ r`, Hölder's
+inequality on balls (`Rd.enorm_conv_le_of_bound`) and `Δ_h^r (K ⋆ g) = (Δ_h^r K) ⋆ g`
+(`Rd.higherDiff_conv_apply`) give the pointwise bounds of atoms of order and exponent `r`
+(`Rd.enorm_higherDiff_cellAtom_le`); by `Rd.isRegularAtom_of_pointwise` the cell atoms are
+regular atoms (`Rd.isRegularAtom_cellAtom`).
 The dual kernels `η_j` of a bump satisfy these bounds
 (`Rd.LocalMeansBump.exists_higherDiff_dual_bound`).
 
@@ -70,6 +76,20 @@ theorem enorm_cellCoef {p : ℝ≥0∞} {g : V → ℂ} (hg : MemLp g p volume) 
   rw [cellCoef, ← ofReal_norm, Complex.norm_real, Real.norm_eq_abs,
     abs_of_nonneg ENNReal.toReal_nonneg, ENNReal.ofReal_toReal hfin]
 
+/-- The coefficients with exponent one are averages: `|λ_{j,m}| ≤ 2^(jn) ∫_{P_{j,m}} |g|` for the
+coefficients `Rd.cellCoef 1` of an almost everywhere strongly measurable `g` (equality for
+`g ∈ L_1` is `Rd.enorm_cellCoef`). -/
+theorem enorm_cellCoef_one_le (j : ℕ) {g : V → ℂ} (hg : AEStronglyMeasurable g volume)
+    (m : Fin (finrank ℝ V) → ℤ) :
+    ‖cellCoef 1 j g m‖ₑ ≤ dyadicWeight (finrank ℝ V : ℝ) j * ∫⁻ y in cell j m, ‖g y‖ₑ := by
+  rw [cellCoef, ← ofReal_norm, Complex.norm_real, Real.norm_eq_abs,
+    abs_of_nonneg ENNReal.toReal_nonneg]
+  refine ENNReal.ofReal_toReal_le.trans_eq ?_
+  rw [ENNReal.toReal_one, div_one, eLpNorm_one_eq_lintegral_enorm
+    (hg.indicator (measurableSet_cell j m))]
+  simp_rw [enorm_indicator_eq_indicator_enorm]
+  rw [lintegral_indicator (measurableSet_cell j m)]
+
 /-- `λ_{j,m} a_{j,m} = K ⋆ (1_{P_{j,m}} g)`. -/
 theorem cellCoef_mul_cellAtom {p : ℝ≥0∞} (hp0 : p ≠ 0) {g : V → ℂ} (hg : MemLp g p volume)
     (K : V → ℂ) (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) (x : V) :
@@ -85,11 +105,80 @@ theorem cellCoef_mul_cellAtom {p : ℝ≥0∞} (hp0 : p ≠ 0) {g : V → ℂ} (
     simp
   · rw [cellAtom, ← mul_assoc, mul_inv_cancel₀ h0, one_mul]
 
-/-- **Cell decomposition of a convolution**: `K ⋆ g = ∑_m λ_{j,m} a_{j,m}` at every point, with
-finitely many nonzero terms, for a continuous `K` that vanishes outside `B̄(0, ρ)`. -/
-theorem conv_eq_tsum_cellAtom {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V → ℂ} (hKc : Continuous K)
-    {ρ : ℝ} (hρ : 0 ≤ ρ) (hKρ : ∀ y, ρ < ‖y‖ → K y = 0) (hg : MemLp g p volume) (j : ℕ)
+/-- The cells have finite volume: `P_{j,m}` lies in the closed ball `B̄(c_{j,m}, n 2^(-j))`. -/
+theorem volume_cell_ne_top (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) : volume (cell (V := V) j m) ≠ ∞ :=
+  ne_top_of_le_ne_top measure_closedBall_lt_top.ne (measure_mono fun _ hx => by
+    rw [mem_closedBall, dist_eq_norm]
+    exact norm_sub_cellCenter_le hx)
+
+/-- The coefficient of a cell depends only on `g` on that cell:
+`λ_{j,m}(1_{P_{j,m}} g) = λ_{j,m}(g)`. -/
+theorem cellCoef_indicator (p : ℝ≥0∞) (j : ℕ) (g : V → ℂ) (m : Fin (finrank ℝ V) → ℤ) :
+    cellCoef p j ((cell j m).indicator g) m = cellCoef p j g m := by
+  rw [cellCoef, cellCoef, Set.indicator_indicator, Set.inter_self]
+
+/-- The atom of a cell depends only on `g` on that cell:
+`a_{j,m}(1_{P_{j,m}} g) = a_{j,m}(g)`. -/
+theorem cellAtom_indicator (p : ℝ≥0∞) (K : V → ℂ) (j : ℕ) (g : V → ℂ)
+    (m : Fin (finrank ℝ V) → ℤ) :
+    cellAtom p K j ((cell j m).indicator g) m = cellAtom p K j g m := by
+  funext x
+  rw [cellAtom, cellAtom, cellCoef_indicator, Set.indicator_indicator, Set.inter_self]
+
+/-- On a cell, `L_p` functions are integrable: `1_{P_{j,m}} g ∈ L_1` for `g ∈ L_p`, `p ≥ 1`,
+since the cell has finite volume. -/
+theorem memLp_one_indicator_cell {p : ℝ≥0∞} (hp1 : 1 ≤ p) {g : V → ℂ} (hg : MemLp g p volume)
+    (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) : MemLp ((cell j m).indicator g) 1 volume :=
+  (hg.indicator (measurableSet_cell j m)).mono_exponent_of_measure_support_ne_top
+    (fun _ hx => Set.indicator_of_notMem hx g) (volume_cell_ne_top j m) hp1
+
+/-- `λ_{j,m} a_{j,m} = K ⋆ (1_{P_{j,m}} g)` as soon as `1_{P_{j,m}} g ∈ L_p`. -/
+theorem cellCoef_mul_cellAtom_of_indicator {p : ℝ≥0∞} (hp0 : p ≠ 0) {g : V → ℂ} {j : ℕ}
+    {m : Fin (finrank ℝ V) → ℤ} (hg : MemLp ((cell j m).indicator g) p volume) (K : V → ℂ)
     (x : V) :
+    cellCoef p j g m * cellAtom p K j g m x = conv K ((cell j m).indicator g) volume x := by
+  have h := cellCoef_mul_cellAtom hp0 hg K j m x
+  rwa [cellCoef_indicator, cellAtom_indicator, Set.indicator_indicator, Set.inter_self] at h
+
+/-- **Convolution with a locally finite series, term by term**: for a continuous kernel `K` with
+compact support and locally integrable `u_m`, if only the indices of a finite set `T` have
+`u_m(x - y) ≠ 0` for some `y` with `K(y) ≠ 0`, then `K ⋆ (∑_m u_m)(x) = ∑_m (K ⋆ u_m)(x)`. -/
+theorem conv_tsum_of_finset {ι : Type*} {K : V → ℂ} (hKc : Continuous K)
+    (hKs : HasCompactSupport K) {u : ι → V → ℂ} (hu : ∀ m, LocallyIntegrable (u m) volume)
+    (x : V) (T : Finset ι) (hT : ∀ m ∉ T, ∀ y, K y ≠ 0 → u m (x - y) = 0) :
+    conv K (fun y => ∑' m, u m y) volume x = ∑' m, conv K (u m) volume x := by
+  have hvanish : ∀ m ∉ T, ∀ y, K y * u m (x - y) = 0 := fun m hm y => by
+    by_cases hy : K y = 0
+    · rw [hy, zero_mul]
+    · rw [hT m hm y hy, mul_zero]
+  have hzero : ∀ m ∉ T, conv K (u m) volume x = 0 := fun m hm => by
+    rw [conv_apply]
+    simp only [hvanish m hm, integral_zero]
+  rw [tsum_eq_sum hzero, conv_apply]
+  have hpt : ∀ y, K y * ∑' m, u m (x - y) = ∑ m ∈ T, K y * u m (x - y) := fun y => by
+    by_cases hy : K y = 0
+    · simp [hy]
+    · rw [tsum_eq_sum fun m hm => hT m hm y hy, Finset.mul_sum]
+  simp_rw [hpt]
+  rw [integral_finsetSum _ fun m _ => by
+    simpa using integrable_translate_mul_of_locallyIntegrable hKc hKs (hu m) 0 x]
+  exact Finset.sum_congr rfl fun m _ => (conv_apply _ _ _ _).symm
+
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- The cells split every function:`g(y) = ∑_m (1_{P_{j,m}} g)(y)`, where only the cell
+containing `y` contributes. -/
+theorem tsum_indicator_cell (j : ℕ) (g : V → ℂ) (y : V) :
+    ∑' m, (cell j m).indicator g y = g y := by
+  rw [tsum_eq_single (f := fun m => (cell j m).indicator g y) (cellIndex j y) fun m hm =>
+    Set.indicator_of_notMem (fun hy : y ∈ cell j m => hm (show cellIndex j y = m from hy).symm) _]
+  exact Set.indicator_of_mem (mem_cell_cellIndex j y) g
+
+/-- **Cell decomposition of a convolution, cellwise hypothesis**: `K ⋆ g = ∑_m λ_{j,m} a_{j,m}` at
+every point, with finitely many nonzero terms, for a continuous `K` that vanishes outside
+`B̄(0, ρ)`, as soon as `1_{P_{j,m}} g ∈ L_p` for every cell. -/
+theorem conv_eq_tsum_cellAtom_of_indicator {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V → ℂ}
+    (hKc : Continuous K) {ρ : ℝ} (hρ : 0 ≤ ρ) (hKρ : ∀ y, ρ < ‖y‖ → K y = 0) {j : ℕ}
+    (hg : ∀ m, MemLp ((cell j m).indicator g) p volume) (x : V) :
     conv K g volume x = ∑' m, cellCoef p j g m * cellAtom p K j g m x := by
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
   have hKs : HasCompactSupport K := HasCompactSupport.intro (isCompact_closedBall 0 ρ)
@@ -101,39 +190,30 @@ theorem conv_eq_tsum_cellAtom {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V → ℂ}
     fun m y hy hxy => by
       have h1 : ‖y‖ ≤ ρ := not_lt.1 fun h => hy (hKρ y h)
       have h2 := norm_sub_cellCenter_le hxy
-      calc ‖x - cellCenter j m‖ = ‖(x - y - cellCenter j m) + y‖ := by congr 1; abel
-        _ ≤ ‖x - y - cellCenter j m‖ + ‖y‖ := norm_add_le _ _
-        _ ≤ finrank ℝ V / 2 ^ j + ρ := add_le_add h2 h1
+      calc ‖x - cellCenter j m‖ ≤ ‖x - (x - y)‖ + ‖x - y - cellCenter j m‖ :=
+            norm_sub_le_norm_sub_add_norm_sub _ _ _
+        _ ≤ ρ + finrank ℝ V / 2 ^ j := by rw [sub_sub_cancel]; exact add_le_add h1 h2
         _ = R / 2 ^ j := by
             simp only [R]
             field_simp
-            ring
   obtain ⟨T, hT, -⟩ := exists_finset_of_card_le
     (P := fun m => ‖x - cellCenter j m‖ ≤ R / 2 ^ j)
     fun S hS => card_le_of_norm_sub_cellCenter_le j hR x S hS
-  have hzero : ∀ m ∉ T, cellCoef p j g m * cellAtom p K j g m x = 0 := fun m hm => by
-    rw [cellCoef_mul_cellAtom hp0 hg, conv_apply]
-    have : ∀ y, K y * (cell j m).indicator g (x - y) = 0 := fun y => by
-      by_cases hy : K y = 0
-      · rw [hy, zero_mul]
-      · have hxy : x - y ∉ cell j m := fun hxy => hm (hT m (hnear m y hy hxy))
-        rw [Set.indicator_of_notMem hxy, mul_zero]
-    simp only [this, integral_zero]
-  rw [tsum_eq_sum hzero]
-  simp_rw [cellCoef_mul_cellAtom hp0 hg, conv_apply]
-  rw [← integral_finsetSum _ fun m _ => by
-    simpa using integrable_translate_mul_of_locallyIntegrable hKc hKs
-      ((hg.indicator (measurableSet_cell j m)).locallyIntegrable hp1) 0 x]
-  congr 1
-  funext y
-  rw [← Finset.mul_sum]
-  by_cases hy : K y = 0
-  · rw [hy, zero_mul, zero_mul]
-  · congr 1
-    have hm0 : cellIndex j (x - y) ∈ T := hT _ (hnear _ y hy (mem_cell_cellIndex j (x - y)))
-    rw [Finset.sum_eq_single (cellIndex j (x - y)) (fun m _ hm => Set.indicator_of_notMem
-      (fun hxy => hm hxy.symm) _) (fun h => absurd hm0 h),
-      Set.indicator_of_mem (mem_cell_cellIndex j (x - y))]
+  calc conv K g volume x = conv K (fun y => ∑' m, (cell j m).indicator g y) volume x := by
+        simp only [tsum_indicator_cell]
+    _ = ∑' m, conv K ((cell j m).indicator g) volume x :=
+        conv_tsum_of_finset hKc hKs (fun m => (hg m).locallyIntegrable hp1) x T
+          fun m hm y hy => Set.indicator_of_notMem (fun hxy => hm (hT m (hnear m y hy hxy))) _
+    _ = _ := tsum_congr fun m => (cellCoef_mul_cellAtom_of_indicator hp0 (hg m) K x).symm
+
+/-- **Cell decomposition of a convolution**: `K ⋆ g = ∑_m λ_{j,m} a_{j,m}` at every point, with
+finitely many nonzero terms, for a continuous `K` that vanishes outside `B̄(0, ρ)`. -/
+theorem conv_eq_tsum_cellAtom {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V → ℂ} (hKc : Continuous K)
+    {ρ : ℝ} (hρ : 0 ≤ ρ) (hKρ : ∀ y, ρ < ‖y‖ → K y = 0) (hg : MemLp g p volume) (j : ℕ)
+    (x : V) :
+    conv K g volume x = ∑' m, cellCoef p j g m * cellAtom p K j g m x :=
+  conv_eq_tsum_cellAtom_of_indicator hp1 hKc hρ hKρ
+    (fun m => hg.indicator (measurableSet_cell j m)) x
 
 /-- Cell atoms are continuous for a continuous kernel with compact support. -/
 theorem continuous_cellAtom {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V → ℂ} (hKc : Continuous K)

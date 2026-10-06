@@ -8,8 +8,7 @@ Besov quasi-norms take the `L_p` norm of every Littlewood–Paley block `ψ_j �
 `‖ (∑_j 2^(jsq) |ψ_j ⋆ f|^q)^(1/q) ‖_p` takes the `ℓ_q` norm at every point first. This block
 develops the spaces `F^s_{p,q}` on `ℝ^d` and on the torus `𝕋^d` with the blocks of
 [Function spaces on `ℝ^d`](Rd.md). Its first part compares the two mixed norms `L_p(ℓ_q)` and
-`ℓ_q(L_p)` on every measure space; the rows marked ⬜ in the table below are the planned files
-of the block.
+`ℓ_q(L_p)` on every measure space.
 
 ## Main results
 
@@ -102,6 +101,18 @@ of the block.
   `Rd.LocalMeansBump.tlLocalMeansNorm_le_tlDiffNorm`). Pointwise, a local mean is bounded by a
   ball mean (`Rd.LocalMeansBump.enorm_localMean_le_ballMeanDiff`), and a ball mean by maximal
   functions of the local means (`Rd.LocalMeansBump.ballMeanDiff_le_tsum_maximal`).
+* **Atoms.** For complex coefficients `λ_{j,m}` of the dyadic cells `P_{j,m}` let `λ_j(x)` be
+  `|λ_{j,m}|` for the cell of level `j` containing `x` (`Rd.cellCoefFun`) and
+  `‖λ‖_{f^s_{p,q}} = ‖ x ↦ ‖(2^(js) λ_j(x))_j‖_{ℓ_q} ‖_p` (`Rd.tlCoeffNorm`). For `1 < p < ∞`,
+  `1 < q ≤ ∞`, `0 < s < L` and `F ∈ L_p(V)`, `F ∈ F^s_{p,q}` iff `F = ∑_j f_j` in `L_p` with
+  `f_j = ∑_m λ_{j,m} a_{j,m}` almost everywhere, for smooth atoms `a_{j,m}` of level `j` and
+  order `L` centred at the cells, with a common radius factor `d ≥ 0` and constant `A`,
+  normalised in `L_∞`, and `‖λ‖_{f^s_{p,q}} < ∞`
+  (`Rd.memTriebelLizorkin_iff_atomic`); no moment conditions are needed. The synthesis bounds
+  the local means quasi-norm of `F` by `‖λ‖_{f^s_{p,q}}` with an explicit constant
+  (`Rd.LocalMeansBump.tlLocalMeansNorm_le_tlCoeffNorm`); the decomposition takes the cell atoms
+  of `η_j ⋆ (k_j ⋆ F)` with the means of `|k_j ⋆ F|` over the cells as coefficients
+  (`Rd.LocalMeansBump.tl_atomic_decomposition`, `Rd.LocalMeansBump.tlCoeffNorm_cellCoef_le`).
 
 ## What is formalised
 
@@ -118,7 +129,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/KernelMajorants` |
 | Local means characterisation of Triebel–Lizorkin spaces | ✅ | ✗ | `Rd/TriebelLizorkinLocalMeans` |
 | Characterisation by ball means of differences | ✅ | ✗ | `Rd/TriebelLizorkinDifferences` |
-| Atomic characterisation | ⬜ | ✗ | `Rd/TriebelLizorkinAtoms` |
+| `f^s_{p,q}`, atomic analysis, synthesis, characterisation | ✅ | ✗ | `Rd/TriebelLizorkinAtoms` |
 | Triebel–Lizorkin spaces on the torus, the Besov sandwich | ✅ | ✗ | `Torus/TriebelLizorkin` |
 | The periodic lift: period boxes, lifted null sets, counting boxes | ✅ | ✗ | `Torus/PeriodicLift` |
 | The Fefferman–Stein inequality for periodic lifts | ✅ | ✗ | `Torus/FeffermanStein` |
