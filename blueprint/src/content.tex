@@ -6455,7 +6455,7 @@ $\|v\| \leq 2^{-i}$ this gives $\|\Delta_v^L \eta_j\|_1 \leq C \min(1, 2^{-(i-j)
 \lean{ENNReal.lqNorm_almostDiagonal_le}
 \leanok
 \uses{lem:hardy}
-Let $1 \leq q \leq \infty$, $0 < s < L$, and let $c_{ij} = 2^{-(i-j)L}$ for $j \leq i$ and
+Let $1 \leq q \leq \infty$, $s, L \in \R$, and let $c_{ij} = 2^{-(i-j)L}$ for $j \leq i$ and
 $c_{ij} = 1$ for $j > i$. For every sequence $a$ in $[0, \infty]$,
 \[
   \Bigl\| \Bigl( 2^{is} \sum_j c_{ij} \, a_j \Bigr)_i \Bigr\|_{\ell_q}
@@ -6463,10 +6463,14 @@ $c_{ij} = 1$ for $j > i$. For every sequence $a$ in $[0, \infty]$,
 \]
 \end{lemma}
 
+The constant is computed in $[0, \infty]$; it is finite exactly for $0 < s < L$.
+
 \begin{proof}
 \leanok
-Split the sum at $j = i$: the part $j \leq i$ is a partial sum with the weights $2^{-i(L-s)}$,
-the part $j > i$ a tail sum with the weights $2^{is}$, and \Cref{lem:hardy} bounds both.
+For $s \leq 0$ or $s \geq L$ the constant is $\infty$, and the right side vanishes only for
+$a = 0$, where both sides are $0$. For $0 < s < L$, split the sum at $j = i$: the part
+$j \leq i$ is a partial sum with the weights $2^{-i(L-s)}$, the part $j > i$ a tail sum with the
+weights $2^{is}$, and \Cref{lem:hardy} bounds both.
 \end{proof}
 
 \begin{lemma}[The synthesis estimate]
@@ -9093,6 +9097,26 @@ This is how pointwise bounds pass to limits in $L_p$ for functions with values i
 $[0, \infty]$; Mathlib derives convergence in measure from convergence in $L_p$ for normed
 groups.
 
+\begin{lemma}[Pointwise bounds under limits in $L_p$]
+\label{lem:lp-limits-pointwise}
+\lean{MeasureTheory.ae_enorm_le_of_tendsto_Lp}
+\leanok
+Let $(X, \mu)$ be a measure space, $E$ a normed group and $1 \leq p \leq \infty$. For every
+$F \in L_p(X; E)$, every sequence $(G_J)_{J \in \N}$ in $L_p(X; E)$ with $G_J \to F$ in $L_p$
+and every $v : X \to [0, \infty]$ with $|G_J| \leq v$ almost everywhere for every $J$, we have
+$|F| \leq v$ almost everywhere.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Convergence in $L_p$ implies convergence in measure, so a subsequence $G_{J_k}$ converges to $F$
+almost everywhere (Mathlib). At every point where it converges and all the bounds hold,
+$|F(x)| = \lim_k |G_{J_k}(x)| \leq v(x)$.
+\end{proof}
+
+For a bounded linear operator $T$ on $L_p$ the lemma applies to $T G_J \to T f$: a pointwise bound
+on $T G_J$ passes to $T f$.
+
 \section{The spaces $F^s_{p,q}$ and the Besov sandwich}
 
 As in \Cref{ch:rd}, $V$ is a finite-dimensional real inner product space with Lebesgue measure
@@ -10669,6 +10693,242 @@ it.
 \end{proof}
 
 The bound holds for every function $h$, periodic functions included.
+
+\section{The local means characterisation}
+
+This section describes $F^s_{p,q}$ by the local means of \Cref{def:local-means}, in the range
+$1 < p < \infty$, $1 < q \leq \infty$, $0 < s < L$. As in the previous section, $g$ is a bump of
+radius $R$, $m$ its moment kernel of order $L$, and $k_j$, $\eta_j$ are the local means kernels
+and the dual kernels; $M$ is the maximal function of \Cref{def:maximal-function}. For a real
+$L$ the weights are $c^L_{ji} = 2^{-(j-i)L}$ for $i \leq j$ and $c^L_{ji} = 1$ for $i > j$.
+Both directions of the characterisation are pointwise bounds by the cross kernels of the
+previous section, summed in $\ell_q$ by the almost diagonal estimate and integrated by the
+Fefferman--Stein inequality.
+
+\begin{definition}[Local means of Triebel--Lizorkin type]
+\label{def:tl-local-means}
+\lean{Rd.LocalMeansBump.tlLocalMeansNorm, Rd.LocalMeansBump.localMean_ae_eq,
+  Rd.LocalMeansBump.continuous_conv_kernel,
+  Rd.LocalMeansBump.measurable_dyadicWeight_mul_conv_kernel,
+  Rd.LocalMeansBump.aemeasurable_lqNorm_conv_kernel}
+\leanok
+\uses{def:local-means, def:lq-norm, lem:reproducing-pointwise, lem:conv-op,
+  lem:lp-norm-nonnegative}
+Let $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $L \in \N$. For $f \in L_p$ the
+local means $k_j * f$ are continuous functions on $V$, defined at every point, and represent the
+local means $k_j * f \in L_p$. The local means quasi-norm of Triebel--Lizorkin type is
+\[
+  \|f\|^{g,L}_{F^s_{p,q}} = \Bigl\| x \mapsto \bigl\| (2^{js} |(k_j * f)(x)|)_{j \in \N}
+  \bigr\|_{\ell_q} \Bigr\|_{L_p} .
+\]
+\end{definition}
+
+The local means quasi-norm of the Besov spaces (\Cref{def:local-means}) takes the two norms in
+the other order.
+
+\begin{lemma}[Almost diagonal sums at one point]
+\label{lem:almost-diagonal-pointwise}
+\lean{Rd.ite_dyadicWeight_ne_top, Rd.almostDiagonalConst, Rd.almostDiagonalConst_ne_top,
+  Rd.lqNorm_le_almostDiagonalConst_mul_of_le, Rd.dyadicWeight_mul_maximal}
+\leanok
+\uses{lem:almost-diagonal, lem:maximal-function-basic}
+For all $s, L \in \R$ let $A_{s,L} = (1 - 2^{-(L-s)})^{-1} + (1 - 2^{-s})^{-1}$; then
+$A_{s,L} < \infty$ for $0 < s < L$, and $c^L_{ji} < \infty$ for all $i, j \in \N$. Let
+$1 \leq q \leq \infty$ and $C \in [0, \infty]$. For all sequences $a, m$ in $[0, \infty]$ with
+$a_j \leq C \sum_i c^L_{ji} m_i$ for every $j \in \N$,
+\[
+  \|(2^{js} a_j)_j\|_{\ell_q} \leq C A_{s,L} \, \|(2^{is} m_i)_i\|_{\ell_q} .
+\]
+For every $h : V \to [0, \infty]$, every $i \in \N$ and every $x \in V$,
+$2^{is} M h(x) = M(2^{is} h)(x)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Multiply the bound by $2^{js}$, take the $\ell_q$ norm and apply \Cref{lem:almost-diagonal}, which
+holds for all $s, L \in \R$, to $(m_i)_i$. The second claim is part (3) of
+\Cref{lem:maximal-function-basic}.
+\end{proof}
+
+\begin{lemma}[From pointwise maximal bounds to $L_p(\ell_q)$]
+\label{lem:maximal-bounds-mixed-norm}
+\lean{Rd.eLpNorm_le_of_le_lqNorm_maximal}
+\leanok
+\uses{thm:fefferman-stein, lem:lp-norm-nonnegative, lem:maximal-function-measurable}
+Let $1 < p < \infty$, $1 < q \leq \infty$ and $C \in [0, \infty]$. For every almost everywhere
+measurable $F : V \to [0, \infty]$ and every family of almost everywhere measurable
+$h_i : V \to [0, \infty]$, $i \in \N$, with $F(x) \leq C \|(M h_i(x))_i\|_{\ell_q}$ for almost
+every $x$,
+\[
+  \|F\|_p \leq C \, C_{n,p,q} \Bigl\| x \mapsto \|(h_i(x))_i\|_{\ell_q} \Bigr\|_p ,
+\]
+with the constant $C_{n,p,q}$ of \Cref{thm:fefferman-stein}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Monotonicity and homogeneity of the $L_p$ norm, then \Cref{thm:fefferman-stein}.
+\end{proof}
+
+\begin{theorem}[Blocks by local means]
+\label{thm:blocks-by-local-means}
+\lean{Rd.LocalMeansBump.blockByLocalMeansConst, Rd.LocalMeansBump.blockByLocalMeansConst_ne_top,
+  Rd.LocalMeansBump.enorm_conv_conv_psi_dual_le, Rd.LocalMeansBump.lpBlock_sum_dual_localMean_ae,
+  Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dual_le,
+  Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximal}
+\leanok
+\uses{thm:cross-kernel-dual, thm:decay-kernels-maximal, lem:maximal-function-kernels,
+  lem:reproducing-formula, lem:lp-limits-pointwise, lem:conv-op, lem:almost-diagonal-pointwise,
+  def:triebel-lizorkin, def:tl-local-means}
+Let $L, L' \in \N$ with $L, L' \geq 1$ and $1 \leq p < \infty$, and let
+$B_{L,L'} = C_{L,L',n+1} \, C_{n,n+1} < \infty$ with the constants of
+\Cref{thm:cross-kernel-dual} and \Cref{lem:maximal-function-kernels}. For every
+$h : V \to \C$, all $i, j \in \N$ and every $x \in V$,
+\[
+  |((\psi_j * \eta_i) * h)(x)| \leq B_{L,L'} \, c^{L'}_{ji} \, M|h|(x) .
+\]
+For every $f \in L_p$, almost every $x \in V$ and every $j \in \N$,
+\[
+  |(\psi_j * f)(x)| \leq B_{L,L'} \sum_{i \in \N} c^{L'}_{ji} \, M|k_i * f|(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first bound is \Cref{thm:cross-kernel-dual} with $N = n + 1$ and
+\Cref{thm:decay-kernels-maximal}, with the finite weights $c^{L'}_{ji}$ of
+\Cref{lem:almost-diagonal-pointwise}. Let
+$G_J = \sum_{i \leq J} \eta_i * k_i * f$. By associativity (\Cref{lem:conv-op}),
+$\psi_j * G_J = \sum_{i \leq J} (\psi_j * \eta_i) * (k_i * f)$ almost everywhere, so
+$|\psi_j * G_J| \leq B_{L,L'} \sum_i c^{L'}_{ji} M|k_i * f|$ almost everywhere. Since
+$G_J \to f$ in $L_p$ (\Cref{lem:reproducing-formula}) and $f \mapsto \psi_j * f$ is bounded on
+$L_p$, $\psi_j * G_J \to \psi_j * f$ in $L_p$, and \Cref{lem:lp-limits-pointwise} passes the
+bound to $f$.
+\end{proof}
+
+\begin{theorem}[Local means by blocks]
+\label{thm:local-means-by-blocks}
+\lean{Rd.LocalMeansBump.localMeansByBlockConst, Rd.LocalMeansBump.localMeansByBlockConst_ne_top,
+  Rd.LocalMeansBump.enorm_conv_conv_kernel_Theta_le, Rd.LocalMeansBump.localMean_lpBlock,
+  Rd.LocalMeansBump.localMean_sum_lpBlock_ae, Rd.LocalMeansBump.ae_enorm_localMean_sum_lpBlock_le,
+  Rd.LocalMeansBump.enorm_localMean_le_tsum_maximal}
+\leanok
+\uses{thm:cross-kernel-theta, thm:decay-kernels-maximal, lem:maximal-function-kernels,
+  lem:lp-blocks, thm:kernel-identities, lem:lp-limits-pointwise, lem:conv-op,
+  lem:almost-diagonal-pointwise, def:triebel-lizorkin, def:tl-local-means}
+Let $L \in \N$ and $1 \leq p < \infty$, and let
+$B^\Theta_L = C^\Theta_{L,n+1} \, C_{n,n+1} < \infty$ with the constants of
+\Cref{thm:cross-kernel-theta} and \Cref{lem:maximal-function-kernels}. For every
+$h : V \to \C$, all $i, j \in \N$ and every $x \in V$,
+\[
+  |((k_j * \Theta_i) * h)(x)| \leq B^\Theta_L \, c^L_{ji} \, M|h|(x) .
+\]
+For every $f \in L_p$, almost every $x \in V$ and every $j \in \N$,
+\[
+  |(k_j * f)(x)| \leq B^\Theta_L \sum_{i \in \N} c^L_{ji} \, M|\psi_i * f|(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first bound is \Cref{thm:cross-kernel-theta} with $N = n + 1$ and
+\Cref{thm:decay-kernels-maximal}, with the finite weights $c^L_{ji}$ of
+\Cref{lem:almost-diagonal-pointwise}. Since
+$\Theta_i * \psi_i = \psi_i$ (\Cref{thm:kernel-identities}),
+$k_j * \Delta_i f = (k_j * \Theta_i) * \Delta_i f$ in $L_p$, so
+$k_j * \sum_{i < J} \Delta_i f = \sum_{i < J} (k_j * \Theta_i) * (\psi_i * f)$ almost
+everywhere. The partial sums converge to $f$ in $L_p$ (\Cref{lem:lp-blocks}), so their local
+means converge to $k_j * f$, and \Cref{lem:lp-limits-pointwise} passes the bound to $f$.
+\end{proof}
+
+The theorem holds for every order $L \in \N$: the cross kernel $k_j * \Theta_i$ uses only
+$\int g = 1$.
+
+\begin{lemma}[The almost diagonal step]
+\label{lem:tl-local-means-lq}
+\lean{Rd.LocalMeansBump.lqNorm_blockFun_le_lqNorm_maximal,
+  Rd.LocalMeansBump.lqNorm_localMean_le_lqNorm_maximal}
+\leanok
+\uses{thm:blocks-by-local-means, thm:local-means-by-blocks, lem:almost-diagonal-pointwise}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $s \in \R$ and $L, L' \in \N$. For every
+$f \in L_p$ and almost every $x \in V$,
+\[
+  \bigl\| (2^{js} |(k_j * f)(x)|)_j \bigr\|_{\ell_q} \leq B^\Theta_L A_{s,L}
+  \bigl\| (M(2^{is} |\psi_i * f|)(x))_i \bigr\|_{\ell_q},
+\]
+and if $L \geq 1$ and $L' \geq 1$, then
+\[
+  \bigl\| (2^{js} |(\psi_j * f)(x)|)_j \bigr\|_{\ell_q} \leq B_{L,L'} A_{s,L'}
+  \bigl\| (M(2^{is} |k_i * f|)(x))_i \bigr\|_{\ell_q} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{thm:blocks-by-local-means} and \Cref{thm:local-means-by-blocks} at a point, with
+\Cref{lem:almost-diagonal-pointwise}.
+\end{proof}
+
+\begin{theorem}[Local means characterisation of Triebel--Lizorkin spaces]
+\label{thm:tl-local-means}
+\lean{Rd.LocalMeansBump.tlUpperConst, Rd.LocalMeansBump.tlUpperConst_ne_top,
+  Rd.LocalMeansBump.tlLowerConst, Rd.LocalMeansBump.tlLowerConst_ne_top,
+  Rd.LocalMeansBump.triebelLizorkinNorm_le_tlLocalMeansNorm,
+  Rd.LocalMeansBump.tlLocalMeansNorm_le_triebelLizorkinNorm,
+  Rd.LocalMeansBump.memTriebelLizorkin_iff_tlLocalMeans}
+\leanok
+\uses{lem:tl-local-means-lq, lem:maximal-bounds-mixed-norm, lem:almost-diagonal-pointwise,
+  thm:blocks-by-local-means, thm:local-means-by-blocks, thm:fefferman-stein,
+  def:triebel-lizorkin, def:tl-local-means}
+Let $1 < p < \infty$, $1 < q \leq \infty$, $s \in \R$ and $L \in \N$, let
+$L_s = \lceil s \rceil_+ + 1$, where $\lceil s \rceil_+ = \max(\lceil s \rceil, 0)$ is the least
+natural number at least $s$, and let
+\[
+  U_{L,p,q,s} = B_{L,L_s} A_{s,L_s} C_{n,p,q}, \qquad
+  D_{L,p,q,s} = B^\Theta_L A_{s,L} C_{n,p,q} .
+\]
+Then $U_{L,p,q,s} < \infty$ for $s > 0$, and $D_{L,p,q,s} < \infty$ for $0 < s < L$. For every
+$f \in L_p$,
+\[
+  \|f\|^{g,L}_{F^s_{p,q}} \leq D_{L,p,q,s} \, \|f\|_{F^s_{p,q}},
+\]
+and if $L \geq 1$, then $\|f\|_{F^s_{p,q}} \leq U_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}}$. In
+particular, for $L \geq 1$ and $0 < s < L$, $f \in F^s_{p,q}$ if and only if
+$\|f\|^{g,L}_{F^s_{p,q}} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Both bounds are \Cref{lem:tl-local-means-lq}, with $L' = L_s$ for the second, followed by
+\Cref{lem:maximal-bounds-mixed-norm} for the families $2^{is} |\psi_i * f|$ and
+$2^{is} |k_i * f|$. The constants $B_{L,L_s}$, $B^\Theta_L$ and $C_{n,p,q}$ are finite, and
+since $L_s > s$, \Cref{lem:almost-diagonal-pointwise} gives $A_{s,L_s} < \infty$ for $s > 0$
+and $A_{s,L} < \infty$ for $0 < s < L$.
+\end{proof}
+
+\begin{corollary}[Independence of the bump and the order]
+\label{cor:tl-local-means-independence}
+\lean{Rd.LocalMeansBump.tlLocalMeansNorm_le_tlLocalMeansNorm,
+  Rd.LocalMeansBump.tlLocalMeansNorm_lt_top_iff}
+\leanok
+\uses{thm:tl-local-means}
+Let $1 < p < \infty$, $1 < q \leq \infty$ and $s \in \R$, and let $g, g'$ be two bumps with
+orders $L \geq 1$ and $L' \in \N$. For every $f \in L_p$,
+\[
+  \|f\|^{g',L'}_{F^s_{p,q}} \leq D'_{L',p,q,s} \, U_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}},
+\]
+with $D'$ the constant of \Cref{thm:tl-local-means} for $g'$. If $L' \geq 1$ and
+$0 < s < \min(L, L')$, then $\|f\|^{g,L}_{F^s_{p,q}} < \infty$ if and only if
+$\|f\|^{g',L'}_{F^s_{p,q}} < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+Both quasi-norms are compared with $\|f\|_{F^s_{p,q}}$ by \Cref{thm:tl-local-means}.
+\end{proof}
+
+Every bump and every order $L > s$ describe the same space $F^s_{p,q}$, the space defined by
+the Littlewood--Paley blocks.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

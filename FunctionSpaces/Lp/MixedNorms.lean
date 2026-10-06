@@ -8,6 +8,7 @@ module
 public import ApproximationSpaces.Sequences.Lq
 public import FunctionSpaces.Lp.LintegralForm
 public import Mathlib.Analysis.MeanInequalities
+public import Mathlib.MeasureTheory.Function.ConvergenceInMeasure
 public import Mathlib.MeasureTheory.Integral.Average
 
 /-!
@@ -35,7 +36,8 @@ The tools are power identities and homogeneity of `eLpNorm` in `[0, ∞]`, monot
 `‖(∫ g_i)_i‖_{ℓ_u} ≤ ∫ ‖(g_i)_i‖_{ℓ_u}` (`MeasureTheory.lqNorm_lintegral_le`), proved by
 Hölder's inequality on finite sets, also for means (`MeasureTheory.lqNorm_laverage_le`).
 Finally, a pointwise bound `u ≤ v + w_J` with `‖w_J‖_p → 0` gives `u ≤ v` almost everywhere
-(`MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm`).
+(`MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm`), and a bound `|G_J| ≤ v` almost everywhere
+passes to the limit of `G_J` in `L_p` (`MeasureTheory.ae_enorm_le_of_tendsto_Lp`).
 -/
 
 @[expose] public section
@@ -543,5 +545,16 @@ theorem ae_le_of_le_add_of_tendsto_eLpNorm {u v : α → ℝ≥0∞} {w : ℕ �
   have h0 : eLpNorm (fun x => u x - v x) p μ = 0 := le_antisymm (ge_of_tendsto' hw hle) zero_le
   filter_upwards [(eLpNorm_eq_zero_iff hp0).1 h0] with x hx
   exact tsub_eq_zero_iff_le.1 hx
+
+/-- **Pointwise bounds pass to limits in `L_p`**: for `1 ≤ p ≤ ∞`, if `G_J → F` in `L_p` and
+`|G_J| ≤ v` almost everywhere for every `J`, then `|F| ≤ v` almost everywhere, for every
+`v : α → [0, ∞]`. A subsequence of `G_J` converges to `F` almost everywhere (Mathlib's
+`tendstoInMeasure_of_tendsto_Lp` and `MeasureTheory.TendstoInMeasure.exists_seq_tendsto_ae`). -/
+theorem ae_enorm_le_of_tendsto_Lp {E : Type*} [NormedAddCommGroup E] [Fact (1 ≤ p)]
+    {F : Lp E p μ} {G : ℕ → Lp E p μ} (hG : Tendsto G atTop (𝓝 F)) {v : α → ℝ≥0∞}
+    (h : ∀ J, ∀ᵐ x ∂μ, ‖G J x‖ₑ ≤ v x) : ∀ᵐ x ∂μ, ‖F x‖ₑ ≤ v x := by
+  obtain ⟨ns, -, hns⟩ := (tendstoInMeasure_of_tendsto_Lp hG).exists_seq_tendsto_ae
+  filter_upwards [hns, ae_all_iff.2 fun k => h (ns k)] with x hx hk
+  exact le_of_tendsto' hx.enorm hk
 
 end MeasureTheory

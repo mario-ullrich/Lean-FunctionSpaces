@@ -68,6 +68,19 @@ of the block.
   `C = Rd.feffermanSteinConst V p q` (`Rd.feffermanStein`). The case `p < q` rests on a
   vector-valued weak type `(1,1)` (`Rd.volume_lqNorm_maximal_gt_le`), proved with the
   Calderón–Zygmund decomposition on dyadic cubes.
+* **Local means.** Let `k_j` be the local means kernels of order `L` of a bump `g`
+  ([Function spaces on `ℝ^d`](Rd.md)) and
+  `‖f‖^{g,L}_{F^s_{p,q}} = ‖ x ↦ ‖(2^(js) |k_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p`
+  (`Rd.LocalMeansBump.tlLocalMeansNorm`). For `1 < p < ∞`, `1 < q ≤ ∞` and `f ∈ L_p(V)`,
+  `‖f‖^{g,L}_{F^s_{p,q}} ≤ D ‖f‖_{F^s_{p,q}}` and, for `L ≥ 1`,
+  `‖f‖_{F^s_{p,q}} ≤ U ‖f‖^{g,L}_{F^s_{p,q}}`, with explicit constants `D`, `U` that are
+  finite for `0 < s < L` (`Rd.LocalMeansBump.tlLocalMeansNorm_le_triebelLizorkinNorm`,
+  `Rd.LocalMeansBump.triebelLizorkinNorm_le_tlLocalMeansNorm`). Hence for `L ≥ 1` and
+  `0 < s < L`, `f ∈ F^s_{p,q}` iff `‖f‖^{g,L}_{F^s_{p,q}} < ∞`
+  (`Rd.LocalMeansBump.memTriebelLizorkin_iff_tlLocalMeans`), for every bump and every such
+  order (`Rd.LocalMeansBump.tlLocalMeansNorm_lt_top_iff`). The proof bounds blocks and local
+  means by maximal functions of each other at every point and applies the Fefferman–Stein
+  inequality.
 
 ## What is formalised
 
@@ -82,7 +95,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The Calderón–Zygmund decomposition on dyadic cubes | ✅ | ✗ | `Rd/CalderonZygmund` |
 | The Fefferman–Stein inequality | ✅ | ✗ | `Rd/FeffermanStein` |
 | Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/KernelMajorants` |
-| Local means characterisation of Triebel–Lizorkin spaces | ⬜ | ✗ | `Rd/TriebelLizorkinLocalMeans` |
+| Local means characterisation of Triebel–Lizorkin spaces | ✅ | ✗ | `Rd/TriebelLizorkinLocalMeans` |
 | Ball means of differences | ⬜ | ✗ | `Rd/TriebelLizorkinDifferences` |
 | Atomic characterisation | ⬜ | ✗ | `Rd/TriebelLizorkinAtoms` |
 | Triebel–Lizorkin spaces on the torus, the Besov sandwich | ✅ | ✗ | `Torus/TriebelLizorkin` |

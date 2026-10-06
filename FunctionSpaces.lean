@@ -138,6 +138,7 @@ public import FunctionSpaces.Rd.MaximalFunction
 public import FunctionSpaces.Rd.CalderonZygmund
 public import FunctionSpaces.Rd.FeffermanStein
 public import FunctionSpaces.Rd.KernelMajorants
+public import FunctionSpaces.Rd.TriebelLizorkinLocalMeans
 
 /-!
 # Function spaces
@@ -426,4 +427,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.KernelMajorants`: Peetre majorants of the cross kernels `k_j ⋆ Θ_i` and
   `ψ_j ⋆ η_i` with explicit constants, and the maximal function bound of convolutions with such
   kernels.
+* `FunctionSpaces.Rd.TriebelLizorkinLocalMeans`: the local means quasi-norm of
+  Triebel–Lizorkin type, pointwise bounds of blocks and local means by maximal functions, and
+  the local means characterisation of `F^s_{p,q}` for `1 < p < ∞`, `1 < q ≤ ∞`, `0 < s < L`.
 -/
