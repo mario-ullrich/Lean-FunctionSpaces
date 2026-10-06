@@ -8,6 +8,7 @@ module
 public import ApproximationSpaces.Sequences.Lq
 public import FunctionSpaces.Lp.LintegralForm
 public import Mathlib.Analysis.MeanInequalities
+public import Mathlib.MeasureTheory.Integral.Average
 
 /-!
 # Mixed norms
@@ -32,8 +33,9 @@ The tools are power identities and homogeneity of `eLpNorm` in `[0, ∞]`, monot
 `L_p` norms (`MeasureTheory.eLpNorm_iSup_of_directed`), Minkowski's inequality for series in `L_p`
 (`MeasureTheory.eLpNorm_tsum_le`) and Minkowski's integral inequality for `ℓ_u`-valued functions,
 `‖(∫ g_i)_i‖_{ℓ_u} ≤ ∫ ‖(g_i)_i‖_{ℓ_u}` (`MeasureTheory.lqNorm_lintegral_le`), proved by
-Hölder's inequality on finite sets. Finally, a pointwise bound `u ≤ v + w_J` with `‖w_J‖_p → 0`
-gives `u ≤ v` almost everywhere (`MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm`).
+Hölder's inequality on finite sets, also for means (`MeasureTheory.lqNorm_laverage_le`).
+Finally, a pointwise bound `u ≤ v + w_J` with `‖w_J‖_p → 0` gives `u ≤ v` almost everywhere
+(`MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm`).
 -/
 
 @[expose] public section
@@ -282,6 +284,29 @@ theorem aemeasurable_lqNorm_comp {g : ι → α → ℝ≥0∞} (hg : ∀ i, AEM
     exact AEMeasurable.iSup hg
   simp only [ENNReal.lqNorm_eq_tsum hq0 hq]
   exact (AEMeasurable.tsum fun i => (hg i).pow_const _).pow_const _
+
+/-- The pointwise `ℓ_q` norm `x ↦ ‖(g_i(x))_i‖_{ℓ_q}` of a countable family of measurable
+functions is measurable, as in `MeasureTheory.aemeasurable_lqNorm_comp`. -/
+theorem measurable_lqNorm_comp {g : ι → α → ℝ≥0∞} (hg : ∀ i, Measurable (g i)) (q : ℝ≥0∞) :
+    Measurable fun x => lqNorm q (fun i => g i x) := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · simp only [ENNReal.lqNorm_zero_left]
+    exact measurable_const
+  rcases eq_or_ne q ∞ with rfl | hq
+  · simp only [ENNReal.lqNorm_top]
+    exact Measurable.iSup hg
+  simp only [ENNReal.lqNorm_eq_tsum hq0 hq]
+  exact (Measurable.tsum fun i => (hg i).pow_const _).pow_const _
+
+/-- **Minkowski's integral inequality for means**: for `1 ≤ u ≤ ∞` and almost everywhere
+measurable `g_i : α → [0, ∞]` indexed by a countable set,
+`‖(⨍ g_i dμ)_i‖_{ℓ_u} ≤ ⨍ ‖(g_i(x))_i‖_{ℓ_u} dμ(x)`. The mean is the integral for the normalised
+measure `μ(α)⁻¹ μ`, so this is `MeasureTheory.lqNorm_lintegral_le`. -/
+theorem lqNorm_laverage_le {u : ℝ≥0∞} (hu : 1 ≤ u) {g : ι → α → ℝ≥0∞}
+    (hg : ∀ i, AEMeasurable (g i) μ) :
+    lqNorm u (fun i => ⨍⁻ x, g i x ∂μ) ≤ ⨍⁻ x, lqNorm u (fun i => g i x) ∂μ := by
+  simp only [laverage_eq']
+  exact lqNorm_lintegral_le hu fun i => (hg i).smul_measure _
 
 /-! ### Comparison of `L_p(ℓ_q)` and `ℓ_q(L_p)` -/
 

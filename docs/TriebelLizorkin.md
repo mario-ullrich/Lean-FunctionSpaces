@@ -61,6 +61,13 @@ of the block.
   `Torus.triebelLizorkinNorm_le_approxNormDyadic`), where
   `B^s_{p,q}(𝕋^d)` is the approximation space of the trigonometric polynomials, described by the
   Littlewood–Paley blocks of [the torus](Torus.md).
+* **The Fefferman–Stein inequality.** Let `V` be a finite-dimensional real inner product space,
+  such as `ℝ^d`, and `M` the Hardy–Littlewood maximal operator. For `1 < p < ∞`, `1 < q ≤ ∞` and
+  almost everywhere measurable `g_j : V → [0, ∞]`, `j ∈ ℕ`,
+  `‖ x ↦ ‖(M g_j(x))_j‖_{ℓ_q} ‖_p ≤ C ‖ x ↦ ‖(g_j(x))_j‖_{ℓ_q} ‖_p` with the explicit constant
+  `C = Rd.feffermanSteinConst V p q` (`Rd.feffermanStein`). The case `p < q` rests on a
+  vector-valued weak type `(1,1)` (`Rd.volume_lqNorm_maximal_gt_le`), proved with the
+  Calderón–Zygmund decomposition on dyadic cubes.
 
 ## What is formalised
 
@@ -73,7 +80,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Dyadic cubes of every level, Lebesgue differentiation along them | ✅ | ✗ | `Rd/DyadicCubes` |
 | Hardy–Littlewood maximal function: weighted weak and strong types | ✅ | ✗ | `Rd/MaximalFunction` |
 | The Calderón–Zygmund decomposition on dyadic cubes | ✅ | ✗ | `Rd/CalderonZygmund` |
-| The Fefferman–Stein inequality | ⬜ | ✗ | `Rd/FeffermanStein` |
+| The Fefferman–Stein inequality | ✅ | ✗ | `Rd/FeffermanStein` |
 | Kernel majorants and maximal function bounds of convolutions | ⬜ | ✗ | `Rd/KernelMajorants` |
 | Local means characterisation of Triebel–Lizorkin spaces | ⬜ | ✗ | `Rd/TriebelLizorkinLocalMeans` |
 | Ball means of differences | ⬜ | ✗ | `Rd/TriebelLizorkinDifferences` |

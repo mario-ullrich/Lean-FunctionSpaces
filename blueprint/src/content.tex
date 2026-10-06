@@ -9830,6 +9830,396 @@ all $k$, and \Cref{thm:lebesgue-differentiation-cubes} gives $G(x) \leq t$ for a
 such $x$.
 \end{proof}
 
+\section{The Fefferman--Stein inequality}
+
+The Fefferman--Stein inequality bounds the $L_p(\ell_q)$ norm of a family of maximal functions
+by the $L_p(\ell_q)$ norm of the family. As in the previous sections, $V$ has dimension $n$, all
+functions take values in $[0, \infty]$, and $g = (g_j)_{j \in \N}$ is a family of almost
+everywhere measurable functions $g_j : V \to [0, \infty]$. Write
+\[
+  G(x) = \|(g_j(x))_j\|_{\ell_q}, \qquad \overline M g(x) = \|(M g_j(x))_j\|_{\ell_q}
+\]
+for the pointwise $\ell_q$ norms of the family and of its maximal functions.
+The cases $q = \infty$ and $q = p$ follow from the maximal theorem one function at a time. The
+case $q < p$ is a duality argument with the weighted strong type, and the case $p < q$ an
+interpolation between the case $q = p$ and a vector-valued weak type $(1,1)$, whose proof
+combines the Calder\'on--Zygmund decomposition of $G$ with the positivity of $M$.
+
+\begin{lemma}[The maximal function off enlarged sets]
+\label{lem:maximal-off-enlarged}
+\lean{Metric.subset_ball_three_mul_of_inter_nonempty, Rd.setLIntegral_inter_ball_le,
+  Rd.maximal_indicator_iUnion_le}
+\leanok
+\uses{def:maximal-function}
+Let $I$ be a countable set, and for every $i \in I$ let $Q_i \subseteq \bar B(c_i, \rho_i)$ be
+a measurable set with $0 < |Q_i| < \infty$. For every $g : V \to [0, \infty]$ and every
+$x \in V$ with $x \notin \bar B(c_i, 2 \rho_i)$ for all $i \in I$,
+\[
+  M\bigl(\mathbf 1_{\bigcup_i Q_i} \, g\bigr)(x)
+  \leq 3^n \, M\Bigl( \sum_{i \in I} \Bigl( \frac{1}{|Q_i|} \int_{Q_i} g \Bigr)
+    \mathbf 1_{Q_i} \Bigr)(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Let $r > 0$. If the ball $B(x, r)$ meets $Q_i$ in a point $y$, then
+$r > \|x - y\| \geq \|x - c_i\| - \rho_i > \rho_i$, and every $z \in Q_i$ satisfies
+$\|x - z\| < r + 2 \rho_i < 3 r$, so $Q_i \subseteq B(x, 3r)$. Write $\tilde g$ for the sum on
+the right and $g_{Q_i}$ for the mean of $g$ over $Q_i$. Hence, by the subadditivity of the
+integral over a union,
+\begin{multline*}
+  \int_{B(x, r)} \mathbf 1_{\bigcup_i Q_i} \, g
+  \leq \sum_{i \in I} \int_{Q_i \cap B(x, r)} g
+  \leq \sum_{i \in I} g_{Q_i} \, |Q_i \cap B(x, 3r)| \\
+  = \int_{B(x, 3r)} \tilde g
+  \leq |B(0, 3r)| \, M \tilde g(x),
+\end{multline*}
+where the $i$-th integral of the first sum vanishes if $Q_i$ misses $B(x, r)$ and is at most
+$\int_{Q_i} g = g_{Q_i} |Q_i|$ otherwise.
+Since $|B(0, 3r)| = 3^n |B(0, r)|$, the bound holds for every $r$, hence for the supremum.
+\end{proof}
+
+The bound holds for arbitrary, possibly overlapping sets $Q_i$ and every
+$g : V \to [0, \infty]$.
+
+\begin{definition}[Calder\'on--Zygmund averages and good parts]
+\label{def:calderon-zygmund-good-part}
+\lean{Rd.czAverage, Rd.measurable_czAverage, Rd.czGood, Rd.aemeasurable_czGood}
+\leanok
+\uses{def:calderon-zygmund-cubes}
+Let $G : V \to [0, \infty]$, $t \in [0, \infty]$, and let $\Omega$ be the exceptional set of
+the maximal big cubes of $G$ at height $t$. For $h : V \to [0, \infty]$ the
+Calder\'on--Zygmund averages and the good part of $h$ are
+\[
+  A h = \sum_{Q \text{ maximal big}} h_Q \, \mathbf 1_Q,
+  \qquad
+  \mathcal G h = \mathbf 1_{V \setminus \Omega} \, h + A h,
+\]
+with the means $h_Q$ of $h$ over the cubes. The function $A h$ is measurable, and $\mathcal G h$
+is almost everywhere measurable if $h$ is.
+\end{definition}
+
+\begin{lemma}[Properties of the averages]
+\label{lem:calderon-zygmund-averages}
+\lean{Rd.czAverage_eq_of_mem, Rd.czAverage_eq_zero_of_notMem, Rd.lintegral_czAverage,
+  Rd.czAverage_self_le, Rd.maximal_indicator_czSet_le, Rd.volume_closedBall_zcellCenter,
+  Rd.volume_czEnlarged_le}
+\leanok
+\uses{def:calderon-zygmund-good-part, thm:calderon-zygmund, lem:maximal-off-enlarged,
+  lem:dyadic-cubes}
+For every $G : V \to [0, \infty]$, every $t \in [0, \infty]$ and every $h : V \to [0, \infty]$,
+with $0^{-1} = \infty$:
+\begin{enumerate}
+  \item $A h = h_Q$ on every maximal big cube $Q$, and $A h = 0$ outside $\Omega$;
+  \item $\int A h = \int_\Omega h$, and $A G \leq 2^n t$;
+  \item $M(\mathbf 1_\Omega h)(x) \leq 3^n M(A h)(x)$ for every $x \notin \Omega^*$;
+  \item $|\Omega^*| \leq (2n)^n \, |B(0, 1)| \, t^{-1} \int G$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The maximal big cubes are disjoint, so at a point of $\Omega$ only one term of $A h$ survives,
+and $\int A h = \sum_Q h_Q |Q| = \sum_Q \int_Q h = \int_\Omega h$. The bound $G_Q \leq 2^n t$ is
+\Cref{thm:calderon-zygmund}. Every maximal big cube $Q_{k,m}$ lies in
+$\bar B(c_{k,m}, n 2^{-k})$ by \Cref{lem:dyadic-cubes}, so (3) is
+\Cref{lem:maximal-off-enlarged}. Finally
+$|\bar B(c_{k,m}, 2 n 2^{-k})| = (2n)^n |B(0,1)| \, |Q_{k,m}|$, and the sum over the disjoint
+maximal big cubes is $(2n)^n |B(0,1)| \, |\Omega| \leq (2n)^n |B(0,1)| \, t^{-1} \int G$.
+\end{proof}
+
+\begin{lemma}[Means of $\ell_q$-valued functions]
+\label{lem:lq-norm-means}
+\lean{MeasureTheory.lqNorm_laverage_le, MeasureTheory.measurable_lqNorm_comp}
+\leanok
+\uses{lem:minkowski-integral-lq, lem:lp-norm-nonnegative}
+For every measure space $(X, \mu)$, every $1 \leq u \leq \infty$, every countable set $I$ and
+every family of almost everywhere measurable functions $g_i : X \to [0, \infty]$, $i \in I$,
+\[
+  \Bigl\| \Bigl( \frac{1}{\mu(X)} \int g_i \, d\mu \Bigr)_i \Bigr\|_{\ell_u}
+  \leq \frac{1}{\mu(X)} \int \|(g_i(x))_i\|_{\ell_u} \, d\mu(x) .
+\]
+If every $g_i$ is measurable, then so is $x \mapsto \|(g_i(x))_i\|_{\ell_u}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The mean is the integral for the measure $\mu(X)^{-1} \mu$, so the inequality is
+\Cref{lem:minkowski-integral-lq}. The measurability is that of a countable supremum or a power of
+a series.
+\end{proof}
+
+\begin{lemma}[The good parts]
+\label{lem:calderon-zygmund-good-parts}
+\lean{Rd.lqNorm_czGood_le, Rd.ae_lqNorm_czGood_le, Rd.lintegral_lqNorm_czGood_le,
+  Rd.maximal_le_maximal_czGood, Rd.lintegral_lqNorm_czGood_rpow_le}
+\leanok
+\uses{def:calderon-zygmund-good-part, lem:calderon-zygmund-averages, lem:lq-norm-means,
+  thm:calderon-zygmund, lem:maximal-function-basic, lem:lp-norm-nonnegative}
+Let $1 \leq q \leq \infty$ and let $\mathcal G$ be the good part for the decomposition of some
+$G' : V \to [0, \infty]$ at a height $t$. For every family of almost everywhere measurable
+$g_j : V \to [0, \infty]$, $j \in \N$, every $x \in V$ satisfies
+\[
+  \|(\mathcal G g_j(x))_j\|_{\ell_q} \leq \mathbf 1_{V \setminus \Omega}(x) \, G(x) + A G(x),
+\]
+and
+\[
+  \int \|(\mathcal G g_j(x))_j\|_{\ell_q} \, dx \leq \int G .
+\]
+For every almost everywhere measurable $h : V \to [0, \infty]$ and every
+$x \notin \Omega^*$, $M h(x) \leq (1 + 3^n) \, M(\mathcal G h)(x)$. If moreover $n \geq 1$,
+$G' = G$, $\int G < \infty$ and $t > 0$, then $\|(\mathcal G g_j(x))_j\|_{\ell_q} \leq 2^n t$
+for almost every $x$, and for $1 < q < \infty$
+\[
+  \int \|(\mathcal G g_j(x))_j\|_{\ell_q}^q \, dx \leq (2^n t)^{q-1} \int G .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Off $\Omega$ the good parts are the functions $g_j$ themselves. On a maximal big cube $Q$ they
+are the means $(g_j)_Q$, and \Cref{lem:lq-norm-means} gives
+$\|((g_j)_Q)_j\|_{\ell_q} \leq G_Q = A G$. Integrating, by
+\Cref{lem:calderon-zygmund-averages}, $\int (\mathbf 1_{V \setminus \Omega} G + A G)
+= \int_{V \setminus \Omega} G + \int_\Omega G = \int G$. For $x \notin \Omega^*$,
+$h = \mathbf 1_{V \setminus \Omega} h + \mathbf 1_\Omega h$, the first part is at most
+$\mathcal G h$, and $M(\mathbf 1_\Omega h)(x) \leq 3^n M(A h)(x) \leq 3^n M(\mathcal G h)(x)$.
+For $G' = G$, almost every $x \notin \Omega$ has $G(x) \leq t$, and $A G \leq 2^n t$, by
+\Cref{thm:calderon-zygmund}; then
+$\|\cdot\|_{\ell_q}^q \leq (2^n t)^{q-1} \|\cdot\|_{\ell_q}$ almost everywhere.
+\end{proof}
+
+\begin{lemma}[The case $q = p$ in integral form]
+\label{lem:fefferman-stein-diagonal}
+\lean{Rd.lintegral_maximal_rpow_le, Rd.lintegral_lqNorm_maximal_rpow_le}
+\leanok
+\uses{thm:maximal-strong-type, lem:lp-norm-nonnegative, lem:maximal-function-measurable}
+For every $p > 1$ and every almost everywhere measurable $g : V \to [0, \infty]$,
+$\int (M g)^p \leq C_{n,p} \int g^p$. For every $1 < q < \infty$ and every family of almost
+everywhere measurable $g_j : V \to [0, \infty]$, $j \in \N$,
+\[
+  \int \|(M g_j(x))_j\|_{\ell_q}^q \, dx \leq C_{n,q} \int \|(g_j(x))_j\|_{\ell_q}^q \, dx .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first bound is \Cref{thm:maximal-strong-type} with $w = 1$. Both sides of the second are
+$\sum_j \int (\cdot)^q$ by Tonelli's theorem, and the first bound applies to each $j$.
+\end{proof}
+
+\begin{theorem}[Vector-valued weak type $(1,1)$]
+\label{thm:vector-weak-type}
+\lean{Rd.weakTypeConst, Rd.weakTypeConst_ne_top, Rd.volume_lt_mul_lqNorm_maximal_czGood_le,
+  Rd.volume_lqNorm_maximal_gt_le}
+\leanok
+\uses{lem:calderon-zygmund-good-parts, lem:calderon-zygmund-averages,
+  lem:fefferman-stein-diagonal, def:calderon-zygmund-good-part, lem:maximal-function-measurable,
+  lem:lq-norm-means}
+Let $n \geq 1$, $1 < q < \infty$ and
+$C^{\mathrm w}_{n,q} = (2n)^n |B(0,1)| + (1 + 3^n)^q \, 2^{n(q-1)} \, C_{n,q}$. For every family
+of almost everywhere measurable $g_j : V \to [0, \infty]$ with $\int G < \infty$ and every
+$0 < t < \infty$,
+\[
+  \bigl|\{x : \|(M g_j(x))_j\|_{\ell_q} > t\}\bigr| \leq \frac{C^{\mathrm w}_{n,q}}{t} \int G .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Decompose $G$ at height $t$. Off $\Omega^*$, \Cref{lem:calderon-zygmund-good-parts} gives
+$\overline M g \leq (1 + 3^n) \|(M(\mathcal G g_j))_j\|_{\ell_q}$, so the level set lies in the
+union of $\Omega^*$ and the set $E$ where the right side exceeds $t$. By Chebyshev's inequality,
+\Cref{lem:fefferman-stein-diagonal} and \Cref{lem:calderon-zygmund-good-parts},
+\[
+  t^q |E| \leq (1 + 3^n)^q \, C_{n,q} \int \|(\mathcal G g_j(x))_j\|_{\ell_q}^q \, dx
+  \leq (1 + 3^n)^q \, C_{n,q} \, (2^n t)^{q-1} \int G,
+\]
+and \Cref{lem:calderon-zygmund-averages} bounds $|\Omega^*|$.
+\end{proof}
+
+\begin{lemma}[Splitting at a level]
+\label{lem:fefferman-stein-split}
+\lean{ENNReal.lqNorm_indicator, Rd.lqNorm_maximal_le_indicator_add,
+  Rd.volume_lqNorm_maximal_gt_le_split, MeasureTheory.lintegral_indicator_lt_le,
+  ENNReal.inv_half_mul_ofReal_rpow, ENNReal.inv_half_rpow_mul_ofReal_rpow,
+  Rd.volume_lqNorm_maximal_gt_mul_rpow_le}
+\leanok
+\uses{thm:vector-weak-type, lem:fefferman-stein-diagonal, lem:maximal-function-basic,
+  lem:maximal-function-measurable, lem:lq-norm-means}
+Let $n \geq 1$ and $1 < q < \infty$. For every family of almost everywhere measurable
+$g_j : V \to [0, \infty]$, $j \in \N$, every measurable $S \subseteq V$ with
+$\int_S G < \infty$ and every $0 < s < \infty$,
+\[
+  \bigl|\{\overline M g > s\}\bigr|
+  \leq \frac{2 C^{\mathrm w}_{n,q}}{s} \int_S G + \frac{2^q C_{n,q}}{s^q} \int_{V \setminus S} G^q .
+\]
+For every $p \geq 1$, every $F : V \to [0, \infty]$ and every $0 < s < \infty$,
+$\int_{\{F > s\}} F \leq s^{1-p} \int F^p$. For every $p > 1$, every family of measurable
+$g_j : V \to [0, \infty]$, $j \in \N$, with $\int G^p < \infty$ and every $\tau > 0$,
+\[
+  \bigl|\{\overline M g > \tau\}\bigr| \, \tau^{p-1}
+  \leq 2 C^{\mathrm w}_{n,q} \, \tau^{p-2} \int_{\{G > \tau\}} G
+    + 2^q C_{n,q} \, \tau^{p-1-q} \int_{\{G \leq \tau\}} G^q .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The pointwise $\ell_q$ norm of $(\mathbf 1_S g_j)_j$ is $\mathbf 1_S G$. Since
+$g_j = \mathbf 1_S g_j + \mathbf 1_{V \setminus S} g_j$, the subadditivity of $M$ and
+Minkowski's inequality in $\ell_q$ give
+$\overline M g \leq \overline M(\mathbf 1_S g) + \overline M(\mathbf 1_{V \setminus S} g)$, so
+$\{\overline M g > s\}$ lies in
+$\{\overline M(\mathbf 1_S g) > s/2\} \cup \{\overline M(\mathbf 1_{V \setminus S} g) > s/2\}$.
+\Cref{thm:vector-weak-type} bounds the first set, Chebyshev's inequality and
+\Cref{lem:fefferman-stein-diagonal} the second. On $\{F > s\}$, $s^{p-1} F \leq F^p$. The last bound
+is the first for $S = \{G > \tau\}$, with $(\tau/2)^{-1} \tau^{p-1} = 2 \tau^{p-2}$ and
+$(\tau/2)^{-q} \tau^{p-1} = 2^q \tau^{p-1-q}$.
+\end{proof}
+
+\begin{lemma}[Two Tonelli steps]
+\label{lem:interpolation-tonelli}
+\lean{MeasureTheory.measurable_indicator_section, MeasureTheory.measurableSet_ofReal_lt,
+  Rd.lintegral_Ioi_lintegral_indicator_lt_mul_rpow, ENNReal.rpow_mul_rpow_sub_le,
+  Rd.lintegral_Ioi_lintegral_indicator_compl_mul_rpow_le}
+\leanok
+\uses{lem:power-integrals}
+For every measurable $F : V \to [0, \infty]$ and every $p > 1$,
+\[
+  \int_0^\infty \tau^{p-2} \int_{\{F > \tau\}} F \, dx \, d\tau = \frac{1}{p - 1} \int F^p ,
+\]
+and for every $r > 0$ and every $p < r$,
+\[
+  \int_0^\infty \tau^{p-1-r} \int_{\{F \leq \tau\}} F^r \, dx \, d\tau
+  \leq \frac{1}{r - p} \int F^p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The integrands are jointly measurable in $(\tau, x)$, so Tonelli's theorem exchanges the
+integrals. By \Cref{lem:power-integrals}, $\int_0^{F(x)} \tau^{p-2} \, d\tau = F(x)^{p-1}/(p-1)$
+and $\int_{F(x)}^\infty \tau^{p-1-r} \, d\tau = F(x)^{p-r}/(r-p)$, and
+$F^r F^{p-r} \leq F^p$ in $[0, \infty]$, with equality where $0 < F < \infty$.
+\end{proof}
+
+\begin{theorem}[The case $p < q$]
+\label{thm:fefferman-stein-interpolation}
+\lean{Rd.interpolationConst, Rd.interpolationConst_ne_top, Rd.interpolationConst_ne_zero,
+  Rd.lintegral_lqNorm_maximal_rpow_le_of_lt_of_measurable,
+  Rd.lintegral_lqNorm_maximal_rpow_le_of_lt}
+\leanok
+\uses{lem:fefferman-stein-split, lem:interpolation-tonelli, lem:layer-cake,
+  lem:maximal-function-basic, lem:maximal-function-measurable, lem:lq-norm-means}
+Let $n \geq 1$, $1 < p < q < \infty$ and
+\[
+  C^{\mathrm i}_{n,p,q} = p \Bigl( \frac{2 C^{\mathrm w}_{n,q}}{p - 1}
+    + \frac{2^q C_{n,q}}{q - p} \Bigr) .
+\]
+For every family of almost everywhere measurable $g_j : V \to [0, \infty]$,
+\[
+  \int \|(M g_j(x))_j\|_{\ell_q}^p \, dx \leq C^{\mathrm i}_{n,p,q} \int G^p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Replacing each $g_j$ by a measurable function equal to it almost everywhere leaves both sides
+unchanged. Let $\int G^p < \infty$. By \Cref{lem:layer-cake},
+$\int (\overline M g)^p = p \int_0^\infty |\{\overline M g > \tau\}| \, \tau^{p-1} \, d\tau$, and
+\Cref{lem:fefferman-stein-split} bounds the integrand. \Cref{lem:interpolation-tonelli} with
+$r = q$ evaluates the two resulting integrals.
+\end{proof}
+
+\begin{lemma}[Cancellation in H\"older's inequality]
+\label{lem:cancel-conjugate-power}
+\lean{ENNReal.le_rpow_mul_of_le_mul_rpow}
+\leanok
+For all conjugate exponents $1 < u, u' < \infty$ and all $X, K, A \in [0, \infty]$ with
+$X < \infty$ and $X \leq K A^{1/u} X^{1/u'}$, $X \leq K^u A$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $X = 0$ there is nothing to show. Otherwise $X = X^{1/u} X^{1/u'}$ with
+$0 < X^{1/u'} < \infty$, so $X^{1/u} \leq K A^{1/u}$; take the $u$-th power.
+\end{proof}
+
+\begin{theorem}[The case $q < p$]
+\label{thm:fefferman-stein-duality}
+\lean{Rd.dualityConst, Rd.dualityConst_ne_top, Rd.dualityConst_ne_zero,
+  Rd.lintegral_rpow_sum_maximal_ne_top, Rd.lintegral_rpow_sum_maximal_le_mul,
+  Rd.lintegral_rpow_sum_maximal_le, Rd.lintegral_lqNorm_maximal_rpow_le_of_gt}
+\leanok
+\uses{thm:maximal-strong-type, lem:fefferman-stein-diagonal, lem:cancel-conjugate-power,
+  lem:maximal-function-measurable}
+Let $1 < q < p < \infty$, $u = p/q$, $u' = p/(p - q)$ and
+$C^{\mathrm d}_{n,p,q} = \bigl( C_{n,q} \, C_{n,u'}^{1/u'} \bigr)^{u}$. For every finite set
+$S \subseteq \N$ and every family of almost everywhere measurable $g_j : V \to [0, \infty]$,
+\[
+  \int \Bigl( \sum_{j \in S} (M g_j)^q \Bigr)^{p/q}
+  \leq C^{\mathrm d}_{n,p,q} \int \Bigl( \sum_{j \in S} g_j^q \Bigr)^{p/q}
+\]
+and
+\[
+  \int \|(M g_j(x))_j\|_{\ell_q}^p \, dx \leq C^{\mathrm d}_{n,p,q} \int G^p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $A = \int (\sum_{j \in S} g_j^q)^u < \infty$, $H = \sum_{j \in S} (M g_j)^q$ and
+$X = \int H^u$. Each $g_j^p$ is at most $(\sum_{j \in S} g_j^q)^u$, so by the maximal theorem
+and $(\sum_{j \in S} a_j)^u \leq |S|^{u-1} \sum_{j \in S} a_j^u$, $X < \infty$. With
+$w = H^{u-1}$, $\int w^{u'} = X$, and the weighted strong type of \Cref{thm:maximal-strong-type}
+at the exponent $q$, H\"older's inequality and the maximal theorem in $L_{u'}$ give
+\[
+  X = \sum_{j \in S} \int (M g_j)^q \, w
+  \leq C_{n,q} \int \Bigl( \sum_{j \in S} g_j^q \Bigr) M w
+  \leq C_{n,q} \, A^{1/u} \, \bigl( C_{n,u'} X \bigr)^{1/u'} ,
+\]
+and \Cref{lem:cancel-conjugate-power} gives the first bound. Since
+$\|a\|_{\ell_q}^p = \sup_J (\sum_{j < J} a_j^q)^{p/q}$, the monotone convergence theorem gives the
+second.
+\end{proof}
+
+The duality argument works in every dimension and rests on the weighted strong type alone;
+that bound is used at the exponent $q$ for functions known only to lie in $L_p$.
+
+\begin{theorem}[Fefferman--Stein inequality]
+\label{thm:fefferman-stein}
+\lean{MeasureTheory.eLpNorm_le_rpow_mul_of_lintegral_le, Rd.feffermanStein_top,
+  Rd.feffermanStein_self, Rd.feffermanStein_of_gt, Rd.feffermanStein_of_lt,
+  Rd.feffermanSteinConst, Rd.feffermanSteinConst_ne_top, Rd.feffermanStein}
+\leanok
+\uses{thm:fefferman-stein-duality, thm:fefferman-stein-interpolation,
+  lem:fefferman-stein-diagonal, thm:maximal-strong-type, lem:maximal-function-basic,
+  lem:maximal-function-measurable, lem:lq-norm-means, lem:lp-norm-nonnegative}
+Let $1 < p < \infty$ and $1 < q \leq \infty$, and let $C_{n,p,q}$ be $1$ for $n = 0$, and
+otherwise $C_{n,p}^{1/p}$ for $q \in \{p, \infty\}$, $(C^{\mathrm d}_{n,p,q})^{1/p}$ for $q < p$
+and $(C^{\mathrm i}_{n,p,q})^{1/p}$ for $p < q < \infty$. Then $C_{n,p,q} < \infty$, and for
+every family of almost everywhere measurable $g_j : V \to [0, \infty]$, $j \in \N$,
+\[
+  \Bigl\| x \mapsto \|(M g_j(x))_j\|_{\ell_q} \Bigr\|_p
+  \leq C_{n,p,q} \Bigl\| x \mapsto \|(g_j(x))_j\|_{\ell_q} \Bigr\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $n = 0$, $M g_j = g_j$ by \Cref{lem:maximal-function-basic}. For $q = \infty$,
+$M g_j \leq M(\sup_k g_k)$ for every $j$, and \Cref{thm:maximal-strong-type} applies to
+$\sup_k g_k$; for every other $q$ the bound is the $p$-th root of
+\Cref{lem:fefferman-stein-diagonal} ($q = p$), \Cref{thm:fefferman-stein-duality} ($q < p$) or
+\Cref{thm:fefferman-stein-interpolation} ($p < q$), since
+$\|F\|_p^p = \int F^p$ for measurable $F$.
+\end{proof}
+
+The case $q = 2$ is the one behind the description of the spaces $H^s_p$ by Littlewood--Paley
+blocks.
+
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
 

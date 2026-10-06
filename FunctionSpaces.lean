@@ -136,6 +136,7 @@ public import FunctionSpaces.Torus.TriebelLizorkin
 public import FunctionSpaces.Rd.DyadicCubes
 public import FunctionSpaces.Rd.MaximalFunction
 public import FunctionSpaces.Rd.CalderonZygmund
+public import FunctionSpaces.Rd.FeffermanStein
 
 /-!
 # Function spaces
@@ -419,4 +420,6 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.CalderonZygmund`: the Calderón–Zygmund decomposition on dyadic cubes, with
   the averages over the maximal big cubes, the measure of the exceptional set, and the bound
   `G ≤ t` almost everywhere outside it.
+* `FunctionSpaces.Rd.FeffermanStein`: the Fefferman–Stein inequality for the maximal functions
+  of a family in `L_p(ℓ_q)`, `1 < p < ∞`, `1 < q ≤ ∞`, with the vector-valued weak type `(1,1)`.
 -/
