@@ -44,6 +44,15 @@ public import FunctionSpaces.Wavelets.Daubechies.SymbolProduct
 public import FunctionSpaces.Wavelets.Daubechies.TransferOperator
 public import FunctionSpaces.Wavelets.Daubechies.SymbolDecay
 public import FunctionSpaces.Wavelets.Daubechies.TransferExamples
+public import FunctionSpaces.Wavelets.Daubechies.ScalingFunction
+public import FunctionSpaces.Wavelets.Daubechies.Cascade
+public import FunctionSpaces.Wavelets.Daubechies.Orthonormality
+public import FunctionSpaces.Wavelets.Daubechies.ScalingMoments
+public import FunctionSpaces.Wavelets.Daubechies.PolynomialReproduction
+public import FunctionSpaces.Wavelets.Daubechies.SobolevRegularity
+public import FunctionSpaces.Wavelets.Daubechies.MatrixMethod
+public import FunctionSpaces.Wavelets.Daubechies.MatrixMethodD4
+public import FunctionSpaces.Wavelets.Daubechies.HolderRegularity
 public import FunctionSpaces.Torus.Translation
 public import FunctionSpaces.Torus.Modulus
 public import FunctionSpaces.Torus.BesovModuli
@@ -235,6 +244,37 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Wavelets.Daubechies.TransferExamples`: the transfer operator for `N = 2`
   (`T 1 = 4`) and `N = 3` (eigenvalues `9` and `-4`), with the growth rates `4` and `9` and the
   exponents `1` and `3 - log₂ 3`.
+* `FunctionSpaces.Wavelets.Daubechies.ScalingFunction`: the scaling function `φ = 𝓕⁻ Φ`, its
+  continuity and bound, the refinement equation `φ(x) = ∑_k c_k φ(2x - k)`, and the fact that `φ` is
+  real.
+* `FunctionSpaces.Wavelets.Daubechies.Cascade`: the cascade algorithm
+  `η_{n+1}(x) = ∑_k c_k η_n(2x - k)` from the indicator of `[0, 1)`, its Fourier transform, the
+  compact support of `φ` in `[0, 2N - 1]` by testing against Schwartz functions, and `𝓕 φ = Φ`,
+  `∫ φ = 1`.
+* `FunctionSpaces.Wavelets.Daubechies.Orthonormality`: `∫ w |Φ|² = ∫_0^1 w` for continuous
+  `1`-periodic `w` through the truncated products, and the orthonormality of the integer translates
+  of `φ`.
+* `FunctionSpaces.Wavelets.Daubechies.ScalingMoments`: the smoothness of `Φ`, its vanishing
+  derivatives of order `< N` at the nonzero integers, the constant periodised moments of `φ` by
+  Poisson summation, and the partition of unity `∑_k φ(x - k) = 1`.
+* `FunctionSpaces.Wavelets.Daubechies.PolynomialReproduction`: every polynomial of degree `< N` as a
+  combination of the translates of `φ` with polynomial coefficients, the recovery of coefficients by
+  orthonormality, and the projection identity `∑_k ⟨Q, φ(· - k)⟩ φ(x - k) = Q(x)`, also at every
+  level `j`.
+* `FunctionSpaces.Wavelets.Daubechies.SobolevRegularity`: the Fourier transform of differences,
+  Parseval for the differences of `φ`, and the bound `ω_r(φ, t)_p ≤ K t^s` for `p ≤ 2` and
+  `s < N - log₄ λ` under a growth bound of the transfer operator, with the instances `s < 1` for
+  `N = 2` and `s < 3 - log₂ 3` for `N = 3`.
+* `FunctionSpaces.Wavelets.Daubechies.MatrixMethod`: the dyadic descent: two functions on `[0, 1)`
+  with halving and triangular recursions on the two halves have differences `O(ρ^n)` on dyadic
+  intervals of level `n`, which gives a Hölder bound with exponent `-log₂ ρ`.
+* `FunctionSpaces.Wavelets.Daubechies.MatrixMethodD4`: the matrix method of Daubechies and Lagarias
+  for D4 in scalar form: the scaling function of D4 is Hölder continuous of every order
+  `a ≤ 2 - log₂(1 + √3)`, and `2 - log₂(1 + √3) > 0.55`.
+* `FunctionSpaces.Wavelets.Daubechies.HolderRegularity`: the differences of `φ` through the inverse
+  Fourier transform: the Hölder bound `|Δ_h^r φ(x)| ≤ K |h|^a` for `a < N - log₄ λ - 1/2`, the
+  modulus in `L_∞`, and the moduli in `L_p` for `p ≥ 2` by interpolation between `L²` and `L_∞`,
+  with the instances for `N = 2, 3`.
 * `FunctionSpaces.Torus.Translation`: translations on `L_2(𝕋^d)` and their Fourier
   multipliers.
 * `FunctionSpaces.Torus.Modulus`: the modulus of smoothness `ω(f, t)_2`, the growth of the

@@ -1925,6 +1925,2048 @@ functions that agree almost everywhere on an open set agree on it, since nonempt
 have positive Lebesgue measure.
 \end{proof}
 
+\section{The scaling function}
+
+The scaling function of a Daubechies mask is the inverse Fourier transform
+$\varphi = \mathcal F^{-1} \Phi$ of its symbol product. This section proves the refinement
+equation $\varphi(x) = \sum_k c_k \varphi(2x - k)$ by a computation on the Fourier side and, with
+the cascade algorithm, that $\varphi$ vanishes outside $[0, 2N - 1]$, that
+$\widehat\varphi = \Phi$ and that $\int_\R \varphi = 1$. The construction and the cascade
+algorithm are those of Daubechies~\cite{Daubechies}.
+
+\paragraph{The refinement equation.}
+On the Fourier side, multiplication by $e^{-2\pi i k \xi}$ is translation by $k$, and the
+dilation by $2$ turns the refinement identity $\Phi(2\xi) = m_0(\xi) \Phi(\xi)$ into the
+refinement equation.
+
+\begin{lemma}[Modulation]
+\label{lem:daub-modulation}
+\lean{Daubechies.expFreq_mul_eq_exp, Daubechies.fourierInv_expFreq_mul_apply,
+  Daubechies.integrable_expFreq_mul}
+\leanok
+For every $f : \R \to \C$ and all $a, x \in \R$,
+\[
+  \mathcal F^{-1}\bigl[\xi \mapsto e^{-2\pi i a \xi} f(\xi)\bigr](x) = \mathcal F^{-1} f(x - a) .
+\]
+If $f$ is integrable, then so is $\xi \mapsto e^{-2\pi i a \xi} f(\xi)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-fourier-translate, lem:daub-exp}
+Since $e^{-2\pi i a \xi} = e^{2\pi i (-a) \xi}$, the identity is item~3 of
+\Cref{lem:daub-fourier-translate} with $b = -a$. The factor $e^{-2\pi i a \xi}$ is continuous and
+has modulus $1$ (\Cref{lem:daub-exp}).
+\end{proof}
+
+\begin{definition}[The scaling function]
+\label{def:daub-scaling-function}
+\lean{Daubechies.scalingFun, Daubechies.scalingFun_eq_integral}
+\leanok
+\uses{def:daub-symbol-product}
+The \emph{scaling function} of a Daubechies mask is the inverse Fourier transform of its symbol
+product,
+\[
+  \varphi(x) = \mathcal F^{-1} \Phi(x) = \int_\R \Phi(\xi) e^{2\pi i x \xi} \, d\xi ,
+  \qquad x \in \R .
+\]
+\end{definition}
+
+For order $N \geq 2$ the symbol product is integrable
+(\Cref{cor:daub-symbol-product-integrable}), and the integral converges absolutely.
+
+\begin{proposition}[Continuity and the uniform bound]
+\label{prop:daub-scaling-continuous}
+\lean{Daubechies.continuous_scalingFun, Daubechies.norm_scalingFun_le}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask and every $x \in \R$, $|\varphi(x)| \leq \int_\R |\Phi|$. For every
+Daubechies mask of order $N \geq 2$ the scaling function $\varphi$ is continuous.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-fourier-continuous, cor:daub-symbol-product-integrable}
+\Cref{lem:daub-fourier-continuous} for $\Phi$, which is integrable for $N \geq 2$
+(\Cref{cor:daub-symbol-product-integrable}).
+\end{proof}
+
+\begin{lemma}[The refinement identity and the dilation by $2$]
+\label{lem:daub-refinement-steps}
+\lean{Daubechies.symbolProduct_two_mul_eq_sum, Daubechies.scalingFun_eq_two_mul_fourierInv}
+\leanok
+\uses{def:daub-scaling-function, def:daub-symbol}
+For every Daubechies mask of order $N$ and every $\xi \in \R$,
+\[
+  \Phi(2\xi) = \sum_{k=0}^{2N-1} \frac{c_k}{2} \, e^{-2\pi i k \xi} \, \Phi(\xi) ,
+\]
+and for every $x \in \R$, $\varphi(x) = 2 \mathcal F^{-1}\bigl[\xi \mapsto \Phi(2\xi)\bigr](2x)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-refinement-identity, lem:daub-symbol-sum, lem:daub-fourier-dilate}
+The first identity is $\Phi(2\xi) = m_0(\xi) \Phi(\xi)$ (\Cref{thm:daub-refinement-identity})
+with $m_0(\xi) = \frac12 \sum_k c_k e^{-2\pi i k \xi}$ (\Cref{lem:daub-symbol-sum}). The second
+is item~2 of \Cref{lem:daub-fourier-dilate} with $a = 2$, at the point $2x$.
+\end{proof}
+
+\begin{theorem}[The refinement equation]
+\label{thm:daub-refinement-equation}
+\lean{Daubechies.scalingFun_refine}
+\leanok
+\uses{def:daub-scaling-function, def:daub-symbol}
+For every Daubechies mask of order $N \geq 2$ and every $x \in \R$,
+\[
+  \varphi(x) = \sum_{k=0}^{2N-1} c_k \, \varphi(2x - k) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-refinement-steps, lem:daub-modulation, lem:daub-fourier-linear,
+  cor:daub-symbol-product-integrable}
+By \Cref{lem:daub-refinement-steps}, $\varphi(x) = 2 \mathcal F^{-1} F(2x)$ for the function
+$F(\xi) = \sum_k \frac{c_k}{2} e^{-2\pi i k \xi} \Phi(\xi)$. Its summands are integrable since
+$\Phi$ is (\Cref{cor:daub-symbol-product-integrable,lem:daub-modulation}), so the inverse
+transform is linear on them (\Cref{lem:daub-fourier-linear}), and by \Cref{lem:daub-modulation}
+the $k$-th term becomes $c_k \mathcal F^{-1} \Phi(2x - k) = c_k \varphi(2x - k)$.
+\end{proof}
+
+\begin{proposition}[The scaling function is real]
+\label{prop:daub-scaling-real}
+\lean{Daubechies.conj_scalingFun, Daubechies.im_scalingFun, Daubechies.ofReal_re_scalingFun}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask and every $x \in \R$, $\overline{\varphi(x)} = \varphi(x)$;
+equivalently, $\operatorname{Im} \varphi(x) = 0$ and $\varphi(x) = \operatorname{Re} \varphi(x)$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-fourier-conj, prop:daub-symbol-product-basic}
+By \Cref{lem:daub-fourier-conj}, $\overline{\varphi(x)} = \mathcal F \bar\Phi(x)$, and
+$\bar\Phi(\xi) = \Phi(-\xi)$ (\Cref{prop:daub-symbol-product-basic}). The substitution
+$\xi \mapsto -\xi$ turns $\mathcal F[\Phi(-\cdot)](x)$ into
+$\mathcal F^{-1} \Phi(x) = \varphi(x)$.
+\end{proof}
+
+\paragraph{The cascade algorithm.}
+The cascade algorithm iterates the refinement equation, starting from the indicator function of
+$[0, 1)$. All iterates vanish outside $[0, 2N - 1]$, and their Fourier transforms are the
+partial products of $\Phi$, up to a factor that tends to $1$.
+
+\begin{definition}[The cascade algorithm]
+\label{def:daub-cascade}
+\lean{Daubechies.cascade, Daubechies.cascade_zero, Daubechies.cascade_succ,
+  Daubechies.cascade_succ_apply}
+\leanok
+\uses{def:daub-symbol}
+The \emph{cascade} of a Daubechies mask of order $N$ is the sequence of functions
+$\eta_n : \R \to \C$, $n \in \N$, given by $\eta_0 = 1_{[0, 1)}$, the indicator function of
+$[0, 1)$, and
+\[
+  \eta_{n+1}(x) = \sum_{k=0}^{2N-1} c_k \, \eta_n(2x - k) , \qquad x \in \R .
+\]
+\end{definition}
+
+\begin{lemma}[Support of the cascade]
+\label{lem:daub-cascade-support}
+\lean{Daubechies.mem_Icc_of_two_mul_sub_mem_Icc, Daubechies.cascade_eq_zero,
+  Daubechies.integral_cascade_mul_eq_zero}
+\leanok
+\uses{def:daub-cascade}
+For all real numbers $k$, $b$ and $x$ with $0 \leq k \leq b$ and $2x - k \in [0, b]$,
+$x \in [0, b]$. For every Daubechies mask of order $N$, every $n \in \N$ and every
+$x \notin [0, 2N - 1]$, $\eta_n(x) = 0$; hence $\int_\R \eta_n g = 0$ for every
+$g : \R \to \C$ that vanishes on $[0, 2N - 1]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{def:daub-mask}
+From $2x - k \geq 0$, $x \geq k/2 \geq 0$, and from $2x - k \leq b$, $x \leq (b + k)/2 \leq b$.
+The second statement follows by induction on $n$: $[0, 1) \subseteq [0, 2N - 1]$ since
+$N \geq 1$ (\Cref{def:daub-mask}), and for $x \notin [0, 2N - 1]$ and $0 \leq k \leq 2N - 1$ the
+point $2x - k$ lies outside $[0, 2N - 1]$ by the first statement. Then $\eta_n g$ vanishes
+everywhere.
+\end{proof}
+
+\begin{lemma}[Integrability of the cascade]
+\label{lem:daub-cascade-integrable}
+\lean{Daubechies.integrable_const_mul_comp_two_mul_sub, Daubechies.integrable_cascade}
+\leanok
+\uses{def:daub-cascade}
+For every integrable $f : \R \to \C$ and all $c \in \C$ and $b \in \R$ the function
+$x \mapsto c f(2x - b)$ is integrable. For every Daubechies mask and every $n \in \N$ the
+function $\eta_n$ is integrable.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Translations and dilations of $\R$ preserve integrability. Induction on $n$: $1_{[0, 1)}$ is
+integrable, and $\eta_{n+1}$ is a finite sum of functions $x \mapsto c_k \eta_n(2x - k)$.
+\end{proof}
+
+\begin{lemma}[The Fourier transform at the origin]
+\label{lem:daub-fourier-zero}
+\lean{Real.fourier_apply_zero}
+\leanok
+For every $f : \R \to \C$, $\widehat f(0) = \int_\R f$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$e^{-2\pi i x \cdot 0} = 1$ for every $x \in \R$.
+\end{proof}
+
+\begin{lemma}[The first function of the cascade]
+\label{lem:daub-cascade-zero}
+\lean{Daubechies.integral_cascade_zero, Daubechies.integral_norm_cascade_zero,
+  Daubechies.fourier_cascade_zero_apply_zero, Daubechies.norm_fourier_cascade_zero_le_one}
+\leanok
+\uses{def:daub-cascade}
+For every Daubechies mask, $\int_\R \eta_0 = \int_\R |\eta_0| = 1$, $\widehat{\eta_0}(0) = 1$,
+and $|\widehat{\eta_0}(\xi)| \leq 1$ for every $\xi \in \R$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-fourier-zero, lem:daub-fourier-continuous}
+Since $|\eta_0| = \eta_0 = 1_{[0, 1)}$, the claims follow from \Cref{lem:daub-fourier-zero} and
+the bound of \Cref{lem:daub-fourier-continuous}.
+\end{proof}
+
+\begin{proposition}[The Fourier transform of the cascade]
+\label{prop:daub-cascade-fourier}
+\lean{Daubechies.fourier_cascade_succ, Daubechies.fourier_cascade,
+  Daubechies.continuous_fourier_cascade}
+\leanok
+\uses{def:daub-cascade}
+For every Daubechies mask, every $n \in \N$ and every $\xi \in \R$,
+\[
+  \widehat{\eta_{n+1}}(\xi)
+  = m_0\Bigl(\frac{\xi}{2}\Bigr) \, \widehat{\eta_n}\Bigl(\frac{\xi}{2}\Bigr)
+\]
+and
+\[
+  \widehat{\eta_n}(\xi) = \prod_{j<n} m_0\Bigl(\frac{\xi}{2^{j+1}}\Bigr) \cdot
+    \widehat{\eta_0}\Bigl(\frac{\xi}{2^n}\Bigr) ,
+\]
+and the function $\widehat{\eta_n}$ is continuous.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-fourier-dilate, lem:daub-cascade-integrable, lem:daub-fourier-linear,
+  lem:daub-symbol-sum, lem:daub-symbol-product-split, lem:daub-fourier-continuous}
+By item~3 of \Cref{lem:daub-fourier-dilate} with $a = 2$ and $b = k$, the transform of
+$x \mapsto \eta_n(2x - k)$ is $\xi \mapsto \frac12 e^{-2\pi i k \xi/2} \widehat{\eta_n}(\xi/2)$.
+The transform is linear on the integrable summands of $\eta_{n+1}$
+(\Cref{lem:daub-cascade-integrable,lem:daub-fourier-linear}), and
+$\frac12 \sum_k c_k e^{-2\pi i k \xi/2} = m_0(\xi/2)$ (\Cref{lem:daub-symbol-sum}). The product
+formula follows by induction on $n$ with \Cref{lem:daub-symbol-product-split}. Transforms of
+integrable functions are continuous (\Cref{lem:daub-fourier-continuous}).
+\end{proof}
+
+\begin{proposition}[Convergence of the Fourier transforms]
+\label{prop:daub-cascade-fourier-limit}
+\lean{Daubechies.norm_fourier_cascade_le_one, Daubechies.tendsto_fourier_cascade}
+\leanok
+\uses{def:daub-cascade, def:daub-symbol-product}
+For every Daubechies mask, every $n \in \N$ and every $\xi \in \R$,
+$|\widehat{\eta_n}(\xi)| \leq 1$, and $\widehat{\eta_n}(\xi) \to \Phi(\xi)$ as $n \to \infty$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-cascade-fourier, prop:daub-symbol-product-basic,
+  thm:daub-symbol-product-continuous, lem:daub-cascade-zero}
+In the product formula of \Cref{prop:daub-cascade-fourier} the partial products have modulus
+at most $1$ (\Cref{prop:daub-symbol-product-basic}) and converge to $\Phi(\xi)$
+(\Cref{thm:daub-symbol-product-continuous}), while $|\widehat{\eta_0}| \leq 1$ and
+$\widehat{\eta_0}(\xi/2^n) \to \widehat{\eta_0}(0) = 1$, since $\widehat{\eta_0}$ is continuous
+(\Cref{prop:daub-cascade-fourier,lem:daub-cascade-zero}).
+\end{proof}
+
+\begin{theorem}[Convergence of the cascade]
+\label{thm:daub-cascade-convergence}
+\lean{Daubechies.tendsto_integral_cascade_mul}
+\leanok
+\uses{def:daub-cascade, def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$ and every Schwartz function $\psi : \R \to \C$,
+\[
+  \int_\R \eta_n(x) \, \psi(x) \, dx \to \int_\R \varphi(x) \, \psi(x) \, dx
+  \quad\text{as } n \to \infty .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-fourier-schwartz, lem:daub-cascade-integrable, prop:daub-cascade-fourier,
+  prop:daub-cascade-fourier-limit, thm:daub-multiplication-formula,
+  cor:daub-symbol-product-integrable}
+By \Cref{lem:daub-fourier-schwartz} for the integrable functions $\eta_n$
+(\Cref{lem:daub-cascade-integrable}),
+$\int \eta_n \psi = \int \widehat{\eta_n} \, \mathcal F^{-1} \psi$. The integrands on the right
+are continuous (\Cref{prop:daub-cascade-fourier}), converge pointwise to
+$\Phi \, \mathcal F^{-1} \psi$, and are bounded by the integrable function
+$|\mathcal F^{-1} \psi|$ (\Cref{prop:daub-cascade-fourier-limit}). Dominated convergence gives
+the limit $\int \Phi \, \mathcal F^{-1} \psi$, which is
+$\int \mathcal F^{-1} \Phi \, \psi = \int \varphi \psi$ by \Cref{thm:daub-multiplication-formula}
+for $\mathcal F^{-1}$, since $\Phi$ is integrable (\Cref{cor:daub-symbol-product-integrable}).
+\end{proof}
+
+\paragraph{Compact support.}
+Schwartz functions supported outside $[0, 2N - 1]$ carry the support of the cascade over to
+$\varphi$, and Fourier inversion then identifies $\widehat\varphi$.
+
+\begin{theorem}[The support of the scaling function]
+\label{thm:daub-scaling-support}
+\lean{Daubechies.scalingFun_eq_zero, Daubechies.scalingFun_eq_zero_of_notMem_Ioo,
+  Daubechies.tsupport_scalingFun_subset, Daubechies.hasCompactSupport_scalingFun}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$ and every $x \in \R \setminus (0, 2N - 1)$,
+$\varphi(x) = 0$. In particular the support of $\varphi$ is a compact subset of $[0, 2N - 1]$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-cascade-support, thm:daub-cascade-convergence, prop:daub-fundamental-lemma,
+  prop:daub-scaling-continuous}
+Let $\psi$ be a Schwartz function whose support is compact and contained in the open set
+$U = \R \setminus [0, 2N - 1]$. Every integral $\int \eta_n \psi$ vanishes
+(\Cref{lem:daub-cascade-support}), so their limit $\int \varphi \psi$ vanishes
+(\Cref{thm:daub-cascade-convergence}). The fundamental lemma (\Cref{prop:daub-fundamental-lemma})
+for the continuous function $\varphi$ (\Cref{prop:daub-scaling-continuous}) gives $\varphi = 0$
+on $U$. The zero set of $\varphi$ is closed, so it also contains the closure
+$\R \setminus (0, 2N - 1)$ of $U$.
+\end{proof}
+
+\begin{corollary}[Integrability of the scaling function]
+\label{cor:daub-scaling-integrable}
+\lean{Daubechies.integrable_scalingFun, Daubechies.memLp_scalingFun}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$ the scaling function $\varphi$ is integrable, and
+$\varphi \in L_p(\R)$ for every $0 < p \leq \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-scaling-continuous, thm:daub-scaling-support}
+$\varphi$ is continuous with compact support
+(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}).
+\end{proof}
+
+\begin{theorem}[The Fourier transform of the scaling function]
+\label{thm:daub-scaling-fourier}
+\lean{Daubechies.fourier_symbolProduct_apply, Daubechies.integrable_fourier_symbolProduct,
+  Daubechies.fourier_scalingFun, Daubechies.integral_scalingFun}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask and every $\xi \in \R$, $\widehat\Phi(\xi) = \varphi(-\xi)$. For
+every Daubechies mask of order $N \geq 2$ the function $\widehat\Phi$ is integrable, and
+\[
+  \widehat\varphi = \Phi \quad\text{and}\quad \int_\R \varphi(x) \, dx = 1 .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{cor:daub-scaling-integrable, thm:daub-symbol-product-continuous,
+  cor:daub-symbol-product-integrable, lem:daub-fourier-zero, prop:daub-symbol-product-basic}
+$\mathcal F^{-1} \Phi(x) = \widehat\Phi(-x)$ for every $x \in \R$, and $\varphi$ is integrable
+(\Cref{cor:daub-scaling-integrable}), hence so is $\widehat\Phi$. The function $\Phi$ is
+continuous and integrable
+(\Cref{thm:daub-symbol-product-continuous,cor:daub-symbol-product-integrable}) with integrable
+transform, so the Fourier inversion theorem gives $\mathcal F \mathcal F^{-1} \Phi = \Phi$.
+Finally $\int \varphi = \widehat\varphi(0) = \Phi(0) = 1$
+(\Cref{lem:daub-fourier-zero,prop:daub-symbol-product-basic}).
+\end{proof}
+
+So $\varphi$ is a continuous function with support in $[0, 2N - 1]$, integral $1$ and Fourier
+transform $\Phi$.
+
+\section{Orthonormality and polynomial reproduction}
+
+This section proves that the integer translates $\varphi(\cdot - k)$, $k \in \Z$, of the scaling
+function of a mask of order $N \geq 2$ are orthonormal in $L_2(\R)$ and reproduce the
+polynomials of degree less than $N$. Orthonormality amounts to the identity
+$\int_\R w |\Phi|^2 = \int_0^1 w$ for continuous $1$-periodic functions $w$, proved for
+truncated products by induction with the quadrature mirror filter identity. Polynomial
+reproduction rests on the zeros of the derivatives of $\Phi$ at the nonzero integers and on
+Poisson summation.
+
+\paragraph{Halving a period.}
+Two substitutions and the quadrature mirror filter identity halve an integral over a period.
+
+\begin{lemma}[Substitutions]
+\label{lem:daub-substitutions}
+\lean{Daubechies.intervalIntegral_zero_one_eq_add_half,
+  Daubechies.two_mul_intervalIntegral_comp_two_mul, Daubechies.integral_comp_div_two}
+\leanok
+For every continuous $g : \R \to \C$,
+\[
+  \int_0^1 g(\zeta) \, d\zeta
+  = \int_0^{1/2} \bigl(g(\zeta) + g(\zeta + \tfrac12)\bigr) \, d\zeta .
+\]
+For every $w : \R \to \C$, $2 \int_0^{1/2} w(2\zeta) \, d\zeta = \int_0^1 w(\xi) \, d\xi$, and
+for every $F : \R \to \C$, $\int_\R F(\xi/2) \, d\xi = 2 \int_\R F(\zeta) \, d\zeta$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The integral over $[\frac12, 1]$ is the integral of $g(\cdot + \frac12)$ over $[0, \frac12]$.
+The substitution $\xi = 2\zeta$ gives the other two identities, both sides being $0$ for
+functions that are not integrable.
+\end{proof}
+
+\begin{lemma}[Halving against $|m_0|^2$]
+\label{lem:daub-halving-symbol}
+\lean{Daubechies.two_mul_intervalIntegral_comp_two_mul_mul_normSq_symbol,
+  Daubechies.periodic_comp_two_mul_mul_normSq_symbol}
+\leanok
+\uses{def:daub-symbol}
+Let $w : \R \to \C$ have period $1$. For every Daubechies mask the function
+$\zeta \mapsto w(2\zeta) \, |m_0(\zeta)|^2$ has period $1$, and if $w$ is continuous, then
+\[
+  2 \int_0^1 w(2\zeta) \, |m_0(\zeta)|^2 \, d\zeta = \int_0^1 w(\xi) \, d\xi .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-symbol-props, lem:daub-substitutions, thm:daub-qmf}
+$w(2\zeta + 2) = w(2\zeta)$, and $m_0$ has period $1$ (\Cref{lem:daub-symbol-props}). Split
+$[0, 1]$ into its two halves (\Cref{lem:daub-substitutions}). Since $w(2\zeta + 1) = w(2\zeta)$,
+the integrand on $[0, \frac12]$ becomes
+$w(2\zeta) \bigl(|m_0(\zeta)|^2 + |m_0(\zeta + \frac12)|^2\bigr) = w(2\zeta)$ by the quadrature
+mirror filter identity (\Cref{thm:daub-qmf}), and
+$2 \int_0^{1/2} w(2\zeta) \, d\zeta = \int_0^1 w$ (\Cref{lem:daub-substitutions}).
+\end{proof}
+
+\paragraph{Truncated products.}
+Cut off outside $[-2^n/2, 2^n/2)$, the partial products of $\Phi$ satisfy the identity
+$\int_\R w |\Phi_n|^2 = \int_0^1 w$ exactly, at every level $n$.
+
+\begin{definition}[Truncated products]
+\label{def:daub-trunc-product}
+\lean{Daubechies.truncProduct, Daubechies.truncProduct_zero, Daubechies.measurable_truncProduct}
+\leanok
+\uses{def:daub-symbol}
+For a Daubechies mask and $n \in \N$ the \emph{truncated product} is the measurable function
+\[
+  \Phi_n(\xi) = \prod_{j<n} m_0\Bigl(\frac{\xi}{2^{j+1}}\Bigr) \cdot 1_{[-2^n/2, \, 2^n/2)}(\xi) ,
+  \qquad \xi \in \R ;
+\]
+in particular $\Phi_0 = 1_{[-1/2, 1/2)}$.
+\end{definition}
+
+\begin{lemma}[The recursion of the truncated products]
+\label{lem:daub-trunc-recursion}
+\lean{Daubechies.mem_Ico_two_pow_succ_iff, Daubechies.truncProduct_succ,
+  Daubechies.normSq_truncProduct_succ}
+\leanok
+\uses{def:daub-trunc-product}
+For every $n \in \N$ and every $\xi \in \R$, $\xi \in [-2^{n+1}/2, 2^{n+1}/2)$ if and only if
+$\xi/2 \in [-2^n/2, 2^n/2)$. For every Daubechies mask, every $n \in \N$ and every $\xi \in \R$,
+\[
+  \Phi_{n+1}(\xi) = m_0\Bigl(\frac{\xi}{2}\Bigr) \, \Phi_n\Bigl(\frac{\xi}{2}\Bigr)
+  \quad\text{and}\quad
+  |\Phi_{n+1}(\xi)|^2 = \Bigl|m_0\Bigl(\frac{\xi}{2}\Bigr)\Bigr|^2 \,
+    \Bigl|\Phi_n\Bigl(\frac{\xi}{2}\Bigr)\Bigr|^2 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-symbol-product-split}
+Split off the first factor of the product (\Cref{lem:daub-symbol-product-split}); the cut-off
+factor of level $n + 1$ at $\xi$ is the one of level $n$ at $\xi/2$.
+\end{proof}
+
+\begin{lemma}[Start and step of the integral identity]
+\label{lem:daub-trunc-integral-steps}
+\lean{Daubechies.integral_mul_normSq_truncProduct_zero,
+  Daubechies.integral_mul_normSq_truncProduct_succ}
+\leanok
+\uses{def:daub-trunc-product}
+Let $w : \R \to \C$. For every Daubechies mask and every $n \in \N$,
+\[
+  \int_\R w(\xi) \, |\Phi_{n+1}(\xi)|^2 \, d\xi
+  = 2 \int_\R w(2\zeta) \, |m_0(\zeta)|^2 \, |\Phi_n(\zeta)|^2 \, d\zeta ,
+\]
+and if $w$ has period $1$, then
+$\int_\R w(\xi) \, |\Phi_0(\xi)|^2 \, d\xi = \int_0^1 w(\xi) \, d\xi$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-trunc-recursion, lem:daub-substitutions}
+The first identity is \Cref{lem:daub-trunc-recursion} together with the substitution
+$\xi = 2\zeta$ (\Cref{lem:daub-substitutions}). Since $|\Phi_0|^2 = 1_{[-1/2, 1/2)}$, the left
+side of the second identity is $\int_{-1/2}^{1/2} w$, and a $1$-periodic function has the same
+integral over every interval of length $1$.
+\end{proof}
+
+\begin{proposition}[The integral identity for the truncated products]
+\label{prop:daub-trunc-integral}
+\lean{Daubechies.integral_periodic_mul_normSq_truncProduct}
+\leanok
+\uses{def:daub-trunc-product}
+For every Daubechies mask, every continuous $w : \R \to \C$ with period $1$ and every
+$n \in \N$,
+\[
+  \int_\R w(\xi) \, |\Phi_n(\xi)|^2 \, d\xi = \int_0^1 w(\xi) \, d\xi .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-trunc-integral-steps, lem:daub-halving-symbol, lem:daub-symbol-props}
+Induction on $n$, for all such $w$ at once; the case $n = 0$ is
+\Cref{lem:daub-trunc-integral-steps}. For the step, \Cref{lem:daub-trunc-integral-steps} and the
+induction hypothesis for the continuous $1$-periodic function
+$\zeta \mapsto w(2\zeta) |m_0(\zeta)|^2$ (\Cref{lem:daub-symbol-props,lem:daub-halving-symbol})
+give $2 \int_0^1 w(2\zeta) |m_0(\zeta)|^2 \, d\zeta$, which is $\int_0^1 w$ by
+\Cref{lem:daub-halving-symbol}.
+\end{proof}
+
+\begin{lemma}[Domination and convergence]
+\label{lem:daub-trunc-limit}
+\lean{Daubechies.norm_truncProduct_le, Daubechies.eventually_mem_Ico_two_pow,
+  Daubechies.tendsto_truncProduct}
+\leanok
+\uses{def:daub-trunc-product, def:daub-symbol-product}
+For every $\xi \in \R$ and all sufficiently large $n \in \N$, $\xi \in [-2^n/2, 2^n/2)$. For
+every Daubechies mask and every $\xi \in \R$, $\Phi_n(\xi) \to \Phi(\xi)$ as $n \to \infty$, and
+if $\kappa > 0$ satisfies $|\Phi(\eta)| \geq \kappa$ for every $\eta \in [-\frac12, \frac12]$,
+then $|\Phi_n(\xi)| \leq |\Phi(\xi)|/\kappa$ for every $n \in \N$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-symbol-product-continuous, lem:daub-symbol-product-split}
+Since $2^n \to \infty$, the cut-off factor at $\xi$ is $1$ for all large $n$, and the partial
+products converge to $\Phi(\xi)$ (\Cref{thm:daub-symbol-product-continuous}). For
+$\xi \in [-2^n/2, 2^n/2)$, $|\xi/2^n| \leq \frac12$ and
+$\Phi(\xi) = \prod_{j<n} m_0(\xi/2^{j+1}) \cdot \Phi(\xi/2^n)$
+(\Cref{lem:daub-symbol-product-split}), so $|\Phi(\xi)| \geq \kappa |\Phi_n(\xi)|$; for the
+other $\xi$, $\Phi_n(\xi) = 0$.
+\end{proof}
+
+\paragraph{Orthonormality.}
+Dominated convergence carries the identity from $\Phi_n$ to $\Phi$, and Parseval's identity
+turns it into the orthonormality of the translates.
+
+\begin{theorem}[The integral identity for the symbol product]
+\label{thm:daub-periodic-integral}
+\lean{Daubechies.integrable_normSq_symbolProduct,
+  Daubechies.integral_periodic_mul_normSq_symbolProduct}
+\leanok
+\uses{def:daub-symbol-product}
+For every Daubechies mask of order $N \geq 2$ the function $|\Phi|^2$ is integrable, and for
+every continuous $w : \R \to \C$ with period $1$,
+\[
+  \int_\R w(\xi) \, |\Phi(\xi)|^2 \, d\xi = \int_0^1 w(\xi) \, d\xi .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{cor:daub-symbol-product-integrable, prop:daub-symbol-product-nonzero,
+  lem:daub-trunc-limit, prop:daub-trunc-integral}
+$\Phi$ is square integrable (\Cref{cor:daub-symbol-product-integrable}). Take $\kappa$ from
+\Cref{prop:daub-symbol-product-nonzero} and a bound $B$ of the continuous periodic function
+$|w|$. The functions $w |\Phi_n|^2$ converge pointwise to $w |\Phi|^2$ and are bounded by the
+integrable function $B \kappa^{-2} |\Phi|^2$ (\Cref{lem:daub-trunc-limit}). By dominated
+convergence and \Cref{prop:daub-trunc-integral},
+$\int w |\Phi|^2 = \lim_n \int w |\Phi_n|^2 = \int_0^1 w$.
+\end{proof}
+
+\begin{corollary}[The Fourier coefficients of $|\Phi|^2$]
+\label{cor:daub-symbol-product-coefficients}
+\lean{Daubechies.periodic_expFreq_intCast_mul,
+  Daubechies.integral_normSq_symbolProduct_mul_expFreq}
+\leanok
+\uses{def:daub-symbol-product}
+For every $k \in \Z$ the function $\xi \mapsto e^{-2\pi i k \xi}$ has period $1$. For every
+Daubechies mask of order $N \geq 2$ and every $k \in \Z$,
+\[
+  \int_\R |\Phi(\xi)|^2 \, e^{-2\pi i k \xi} \, d\xi = \delta_{k0} .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-exp, thm:daub-periodic-integral, lem:daub-exp-orthonormal}
+$e^{-2\pi i k} = 1$ (\Cref{lem:daub-exp}). Apply \Cref{thm:daub-periodic-integral} to the
+continuous function $w(\xi) = e^{-2\pi i k \xi}$, with
+$\int_0^1 e^{-2\pi i k \xi} \, d\xi = \delta_{k0}$ (\Cref{lem:daub-exp-orthonormal}).
+\end{proof}
+
+\begin{theorem}[Orthonormality of the integer translates]
+\label{thm:daub-orthonormal}
+\lean{Daubechies.integral_scalingFun_translate_mul_conj,
+  Daubechies.integral_scalingFun_translate_mul_conj_translate,
+  Daubechies.integral_scalingFun_translate_mul_translate}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$ and all $k, l \in \Z$,
+\[
+  \int_\R \varphi(x - k) \, \overline{\varphi(x - l)} \, dx
+  = \int_\R \varphi(x - k) \, \varphi(x - l) \, dx = \delta_{kl} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-scaling-continuous, cor:daub-scaling-integrable, thm:daub-scaling-fourier,
+  lem:daub-fourier-translate, thm:daub-parseval, cor:daub-symbol-product-coefficients,
+  prop:daub-scaling-real}
+First let $l = 0$. The function $\varphi$ is continuous and integrable with integrable transform
+$\widehat\varphi = \Phi$ (\Cref{prop:daub-scaling-continuous,cor:daub-scaling-integrable} and
+\Cref{thm:daub-scaling-fourier}), and $\mathcal F[\varphi(\cdot - k)](\xi) = e^{-2\pi i k \xi}
+\Phi(\xi)$ (\Cref{lem:daub-fourier-translate}). Parseval's identity (\Cref{thm:daub-parseval})
+turns the integral into $\int_\R e^{-2\pi i k \xi} |\Phi(\xi)|^2 \, d\xi = \delta_{k0}$
+(\Cref{cor:daub-symbol-product-coefficients}). The substitution $x \mapsto x + l$ gives the case
+of two translates, and $\overline{\varphi} = \varphi$ (\Cref{prop:daub-scaling-real}).
+\end{proof}
+
+\paragraph{Smoothness of $\Phi$.}
+Since $\varphi$ has compact support, $\Phi = \widehat\varphi$ is smooth. Differentiating the
+refinement identity $\Phi(2\xi) = m_0(\xi) \Phi(\xi)$ and using the zeros of $m_0$ at the
+half-integers shows that the derivatives of $\Phi$ of order less than $N$ vanish at the nonzero
+integers.
+
+\begin{proposition}[Smoothness of the symbol product]
+\label{prop:daub-symbol-product-smooth}
+\lean{Daubechies.integrable_norm_pow_mul_norm_scalingFun, Daubechies.contDiff_symbolProduct,
+  Daubechies.contDiff_nat_symbolProduct}
+\leanok
+\uses{def:daub-symbol-product, def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$ and every $n \in \N$ the function
+$x \mapsto |x|^n |\varphi(x)|$ is integrable, and $\Phi$ is infinitely differentiable.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-scaling-continuous, thm:daub-scaling-support, thm:daub-scaling-fourier}
+The functions $x \mapsto |x|^n |\varphi(x)|$ are continuous with compact support
+(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}). The Fourier transform of a
+function with integrable moments of every order is infinitely differentiable, by
+differentiation under the integral sign, and $\Phi = \widehat\varphi$
+(\Cref{thm:daub-scaling-fourier}).
+\end{proof}
+
+\begin{lemma}[The derivatives of $\Phi$ as Fourier transforms]
+\label{lem:daub-symbol-product-derivatives}
+\lean{Daubechies.integrable_pow_smul_scalingFun,
+  Daubechies.iteratedDeriv_symbolProduct_eq_fourier}
+\leanok
+\uses{def:daub-symbol-product, def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$ and every $l \in \N$ the function
+$x \mapsto x^l \varphi(x)$ is integrable, and for every $\xi \in \R$
+\[
+  \Phi^{(l)}(\xi) = (-2\pi i)^l \, \mathcal F\bigl[x \mapsto x^l \varphi(x)\bigr](\xi) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-scaling-continuous, thm:daub-scaling-support, thm:daub-scaling-fourier}
+The functions $x \mapsto x^l \varphi(x)$ are continuous with compact support
+(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}). By
+\Cref{thm:daub-scaling-fourier}, $\Phi = \widehat\varphi$, and each differentiation under the
+integral sign multiplies the integrand $\varphi(x) e^{-2\pi i x \xi}$ by $-2\pi i x$.
+\end{proof}
+
+\begin{lemma}[The derivatives of the refinement identity]
+\label{lem:daub-symbol-product-leibniz}
+\lean{Daubechies.iteratedDeriv_symbolProduct_two_mul,
+  Daubechies.iteratedDeriv_symbolProduct_two_mul_eq_zero,
+  Daubechies.iteratedDeriv_symbolProduct_two_mul_add_one}
+\leanok
+\uses{def:daub-symbol-product}
+For every Daubechies mask of order $N \geq 2$, every $l \in \N$ and every $\xi \in \R$,
+\[
+  2^l \, \Phi^{(l)}(2\xi) = \sum_{i=0}^{l} \binom{l}{i} \, m_0^{(i)}(\xi) \, \Phi^{(l-i)}(\xi) .
+\]
+If $\Phi^{(i)}(\xi) = 0$ for every $i \leq l$, then $\Phi^{(l)}(2\xi) = 0$. If $l < N$, then
+$\Phi^{(l)}(2n + 1) = 0$ for every $n \in \Z$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-refinement-identity, prop:daub-symbol-product-smooth, lem:daub-symbol-props,
+  prop:daub-symbol-zeros}
+Differentiate $\Phi(2\xi) = m_0(\xi) \Phi(\xi)$ (\Cref{thm:daub-refinement-identity}) $l$
+times, by the chain rule on the left and by the Leibniz rule on the right; both factors are
+smooth (\Cref{prop:daub-symbol-product-smooth,lem:daub-symbol-props}). If all $\Phi^{(i)}(\xi)$
+with $i \leq l$ vanish, so does every term of the sum. At $\xi = \frac12 + n$ every
+$m_0^{(i)}(\frac12 + n)$ with $i \leq l < N$ vanishes (\Cref{prop:daub-symbol-zeros}).
+\end{proof}
+
+\begin{proposition}[The derivatives of $\Phi$ at the nonzero integers]
+\label{prop:daub-symbol-product-integer-zeros}
+\lean{Daubechies.iteratedDeriv_symbolProduct_int, Daubechies.fourier_pow_mul_scalingFun_int}
+\leanok
+\uses{def:daub-symbol-product, def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$, every $l < N$ and every
+$j \in \Z \setminus \{0\}$,
+\[
+  \Phi^{(l)}(j) = 0 \quad\text{and}\quad
+  \mathcal F\bigl[x \mapsto x^l \varphi(x)\bigr](j) = 0 .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-symbol-product-leibniz, lem:daub-symbol-product-derivatives}
+Induction on $|j|$, for all $l < N$ at once. For odd $j$ apply the last statement of
+\Cref{lem:daub-symbol-product-leibniz}. For even $j = 2j'$, $0 < |j'| < |j|$, so
+$\Phi^{(i)}(j') = 0$ for every $i \leq l$ by the induction hypothesis, and
+\Cref{lem:daub-symbol-product-leibniz} gives $\Phi^{(l)}(j) = 0$. Finally
+$(-2\pi i)^l \mathcal F[x \mapsto x^l \varphi(x)](j) = \Phi^{(l)}(j)$
+(\Cref{lem:daub-symbol-product-derivatives}).
+\end{proof}
+
+Together with $\Phi(0) = 1$, these are the Strang--Fix conditions of order $N$ for $\varphi$.
+
+\paragraph{Periodisation.}
+By Poisson summation, a continuous function with compact support whose Fourier transform
+vanishes at the nonzero integers has a constant periodisation.
+
+\begin{lemma}[Poisson summation with vanishing coefficients]
+\label{lem:daub-poisson}
+\lean{Real.summable_norm_restrict_comp_addRight, Real.tsum_comp_add_int_eq_integral}
+\leanok
+Let $a, b \in \R$, and let $f$ be a continuous function on $\R$ with values in a normed abelian
+group that vanishes outside $[a, b]$. Then
+$\sum_{n \in \Z} \sup_{x \in K} \|f(x + n)\| < \infty$ for every compact set $K \subseteq \R$. If
+moreover $f$ is complex valued and $\widehat f(n) = 0$ for every $n \in \Z \setminus \{0\}$, then
+for every $x \in \R$
+\[
+  \sum_{n \in \Z} f(x + n) = \int_\R f(y) \, dy .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-fourier-zero}
+Only the finitely many $n$ for which $K + n$ meets $[a, b]$ give a translate that is nonzero on
+$K$. This is the hypothesis of the Poisson summation formula, which writes the periodisation as
+the Fourier series $\sum_n \widehat f(n) e^{2\pi i n x}$. Its only nonzero term is
+$\widehat f(0) = \int_\R f$ (\Cref{lem:daub-fourier-zero}).
+\end{proof}
+
+\begin{theorem}[The periodised moments]
+\label{thm:daub-periodised-moments}
+\lean{Daubechies.continuous_pow_mul_scalingFun, Daubechies.periodization_moment_eq,
+  Daubechies.periodization_moment_const}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$, every $l < N$ and every $x \in \R$,
+\[
+  \sum_{k \in \Z} (x - k)^l \, \varphi(x - k) = \int_\R y^l \, \varphi(y) \, dy ;
+\]
+in particular the left side is a constant function of $x$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-scaling-continuous, thm:daub-scaling-support,
+  prop:daub-symbol-product-integer-zeros, lem:daub-poisson}
+The function $f(y) = y^l \varphi(y)$ is continuous, vanishes outside $[0, 2N - 1]$
+(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}), and $\widehat f(n) = 0$ for
+every $n \in \Z \setminus \{0\}$ (\Cref{prop:daub-symbol-product-integer-zeros}). By
+\Cref{lem:daub-poisson}, $\sum_n f(x + n) = \int_\R f$, and the substitution $k = -n$ turns the
+sum into the sum over the points $x - k$.
+\end{proof}
+
+\begin{lemma}[Finite sums over the translates]
+\label{lem:daub-finite-sums}
+\lean{Daubechies.scalingFun_sub_eq_zero, Daubechies.tsum_mul_scalingFun_sub_eq_sum,
+  Daubechies.summable_mul_scalingFun_sub, Daubechies.tsum_scalingFun_sub_eq_sum}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$, every $x \in \R$ and every integer $k$ outside
+$[\lfloor x \rfloor - (2N - 1), \lfloor x \rfloor]$, $\varphi(x - k) = 0$. Hence for every
+$a : \Z \to \C$ the series $\sum_{k \in \Z} a(k) \varphi(x - k)$ converges, and
+\[
+  \sum_{k \in \Z} a(k) \, \varphi(x - k)
+  = \sum_{k = \lfloor x \rfloor - (2N - 1)}^{\lfloor x \rfloor} a(k) \, \varphi(x - k) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-scaling-support}
+If $\varphi(x - k) \neq 0$, then $0 \leq x - k \leq 2N - 1$ (\Cref{thm:daub-scaling-support}),
+so $k \leq \lfloor x \rfloor$ and $k \geq x - (2N - 1) \geq \lfloor x \rfloor - (2N - 1)$.
+\end{proof}
+
+\begin{corollary}[Partition of unity]
+\label{cor:daub-partition-of-unity}
+\lean{Daubechies.sum_scalingFun_translate, Daubechies.sum_Icc_scalingFun_sub}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$ and every $x \in \R$,
+\[
+  \sum_{k \in \Z} \varphi(x - k)
+  = \sum_{k = \lfloor x \rfloor - (2N - 1)}^{\lfloor x \rfloor} \varphi(x - k) = 1 .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-periodised-moments, thm:daub-scaling-fourier, lem:daub-finite-sums}
+\Cref{thm:daub-periodised-moments} for $l = 0$, with $\int_\R \varphi = 1$
+(\Cref{thm:daub-scaling-fourier}), and \Cref{lem:daub-finite-sums}.
+\end{proof}
+
+\paragraph{Polynomial reproduction.}
+The sums $\sum_k k^l \varphi(x - k)$ are polynomials of degree $l$ in $x$ with leading
+coefficient $1$. By induction on the degree, every polynomial of degree less than $N$ is a
+combination of the translates with polynomial coefficients, and orthonormality identifies these
+coefficients with inner products. Polynomials have complex coefficients and are evaluated at
+real points.
+
+\begin{proposition}[The integer moments of the translates]
+\label{prop:daub-integer-moments}
+\lean{Daubechies.tsum_intCast_pow_mul_scalingFun_sub, Daubechies.exists_poly_sum_pow_mul}
+\leanok
+\uses{def:daub-scaling-function}
+For a Daubechies mask of order $N \geq 2$ let $\mu_r = \int_\R y^r \varphi(y) \, dy$ for
+$r \in \N$. Then for every $l < N$ and every $x \in \R$
+\[
+  \sum_{k \in \Z} k^l \, \varphi(x - k)
+  = \sum_{i=0}^{l} \binom{l}{i} (-1)^{l-i} \mu_{l-i} \, x^i ,
+\]
+and the right side is a polynomial of degree $l$ in $x$ with leading coefficient $1$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-finite-sums, thm:daub-periodised-moments, thm:daub-scaling-fourier}
+Write $k = x - (x - k)$ and expand $k^l$ by the binomial theorem. The sums over $k$ are finite
+(\Cref{lem:daub-finite-sums}), so they can be exchanged with the sum over $i$, and
+$\sum_k (x - k)^r \varphi(x - k) = \mu_r$ for every $r < N$
+(\Cref{thm:daub-periodised-moments}). The coefficient of $x^l$ is $\mu_0 = \int_\R \varphi = 1$
+(\Cref{thm:daub-scaling-fourier}).
+\end{proof}
+
+\begin{lemma}[Lowering the degree]
+\label{lem:daub-lower-degree}
+\lean{Daubechies.sub_C_coeff_mul_mem_degreeLT}
+\leanok
+Let $R$ be a ring and $n \in \N$, let $Q \in R[X]$ have degree less than $n + 1$, and let
+$P \in R[X]$ have degree at most $n$ and coefficient $1$ at $X^n$. Then $Q - q_n P$ has degree
+less than $n$, where $q_n$ is the coefficient of $X^n$ in $Q$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The coefficients at $X^n$ cancel, and both polynomials have degree at most $n$.
+\end{proof}
+
+\begin{proposition}[Polynomials as combinations of the translates]
+\label{prop:daub-poly-combination}
+\lean{Daubechies.exists_coeff_poly_of_mem_degreeLT, Daubechies.exists_coeff_poly}
+\leanok
+\uses{def:daub-scaling-function}
+Let $N \geq 2$ and $n \leq N$. For every Daubechies mask of order $N$ and every polynomial $Q$
+of degree less than $n$ there is a polynomial $a$ of degree less than $n$ with
+\[
+  Q(x) = \sum_{k \in \Z} a(k) \, \varphi(x - k) \quad\text{for every } x \in \R .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-integer-moments, lem:daub-lower-degree, lem:daub-finite-sums}
+Induction on $n$; for $n = 0$, $Q = 0$. For the step let $q_n$ be the coefficient of $X^n$ in
+$Q$, and let $P$ be the polynomial of degree $n$ with leading coefficient $1$ and
+$P(x) = \sum_k k^n \varphi(x - k)$ (\Cref{prop:daub-integer-moments}, since $n < N$). By
+\Cref{lem:daub-lower-degree} and the induction hypothesis,
+$Q - q_n P = \sum_k a'(k) \varphi(\cdot - k)$ with a polynomial $a'$ of degree less than $n$,
+and $a = q_n X^n + a'$ represents $Q$; all sums over $k$ are finite
+(\Cref{lem:daub-finite-sums}).
+\end{proof}
+
+\begin{proposition}[Recovery of the coefficients]
+\label{prop:daub-coefficient-recovery}
+\lean{Daubechies.scalingFun_sub_mul_conj_eq_zero, Daubechies.integrable_scalingFun_sub_mul_conj,
+  Daubechies.integral_tsum_mul_scalingFun_sub_mul_conj}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$ and all $j, k \in \Z$ the function
+$y \mapsto \varphi(y - j) \, \overline{\varphi(y - k)}$ is integrable, and it vanishes
+identically if $|j - k| > 2N - 1$. For every Daubechies mask of order $N \geq 2$, every
+$a : \Z \to \C$ and every $k \in \Z$,
+\[
+  \int_\R \Bigl(\sum_{j \in \Z} a(j) \, \varphi(y - j)\Bigr) \overline{\varphi(y - k)} \, dy
+  = a(k) .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-scaling-support, cor:daub-scaling-integrable, prop:daub-scaling-continuous,
+  thm:daub-orthonormal}
+If both factors are nonzero at $y$, then $y - j, y - k \in [0, 2N - 1]$
+(\Cref{thm:daub-scaling-support}), so $|j - k| \leq 2N - 1$. The product of the integrable
+function $\varphi(\cdot - j)$ (\Cref{cor:daub-scaling-integrable}) and the bounded continuous
+function $\overline{\varphi(\cdot - k)}$ (\Cref{prop:daub-scaling-continuous}) is integrable.
+Hence the integrand is a finite sum over the $j$ with $|j - k| \leq 2N - 1$, and orthonormality
+(\Cref{thm:daub-orthonormal}) leaves the term $j = k$.
+\end{proof}
+
+\begin{theorem}[Polynomial reproduction]
+\label{thm:daub-poly-reproduction}
+\lean{Daubechies.sum_inner_poly_mul_scalingFun, Daubechies.sum_integral_poly_mul_scalingFun}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$, every polynomial $Q$ of degree less than $N$ and
+every $x \in \R$,
+\[
+  \sum_{k \in \Z} \Bigl(\int_\R Q(y) \, \overline{\varphi(y - k)} \, dy\Bigr) \varphi(x - k)
+  = Q(x) ,
+\]
+and the same holds with $\varphi(y - k)$ in place of $\overline{\varphi(y - k)}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-poly-combination, prop:daub-coefficient-recovery, prop:daub-scaling-real}
+Write $Q = \sum_j a(j) \varphi(\cdot - j)$ with a polynomial $a$
+(\Cref{prop:daub-poly-combination}). Then
+$\int_\R Q(y) \overline{\varphi(y - k)} \, dy = a(k)$ (\Cref{prop:daub-coefficient-recovery}),
+so the left side is $\sum_k a(k) \varphi(x - k) = Q(x)$. Since $\varphi$ is real
+(\Cref{prop:daub-scaling-real}), the second form is the same identity.
+\end{proof}
+
+So the operator $f \mapsto \sum_k \langle f, \varphi(\cdot - k) \rangle \varphi(\cdot - k)$
+fixes every polynomial of degree less than $N$, and at each point the sum has at most $2N$
+nonzero terms. The same holds at every dyadic level.
+
+\begin{lemma}[Dyadic substitutions]
+\label{lem:daub-dyadic-substitution}
+\lean{Daubechies.integral_eq_two_pow_mul_integral_comp, Daubechies.exists_poly_comp_two_pow_mul}
+\leanok
+For every $g : \R \to \C$ and every $j \in \N$,
+$\int_\R g(u) \, du = 2^j \int_\R g(2^j y) \, dy$. For every $N \in \N$, every polynomial $Q$ of
+degree less than $N$ and every $j \in \N$ there is a polynomial $R$ of degree less than $N$ with
+$R(2^j y) = Q(y)$ for every $y \in \R$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:iter-diff-poly}
+The substitution $u = 2^j y$, and $R(u) = Q(2^{-j} u)$; affine substitutions keep the degree
+below $N$ (\Cref{lem:iter-diff-poly}).
+\end{proof}
+
+\begin{corollary}[Polynomial reproduction at the dyadic levels]
+\label{cor:daub-poly-reproduction-dyadic}
+\lean{Daubechies.sum_inner_poly_mul_scalingFun_two_pow}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$, every polynomial $Q$ of degree less than $N$,
+every $j \in \N$ and every $x \in \R$,
+\[
+  \sum_{k \in \Z} 2^j \Bigl(\int_\R Q(y) \, \overline{\varphi(2^j y - k)} \, dy\Bigr)
+  \varphi(2^j x - k) = Q(x) .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-poly-reproduction, lem:daub-dyadic-substitution}
+Apply \Cref{thm:daub-poly-reproduction} to the polynomial $R$ of
+\Cref{lem:daub-dyadic-substitution} at the point $2^j x$, and substitute $u = 2^j y$ in the
+integrals (\Cref{lem:daub-dyadic-substitution}).
+\end{proof}
+
+For the functions $\varphi_{j,k}(x) = 2^{j/2} \varphi(2^j x - k)$ the identity reads
+$\sum_k \langle Q, \varphi_{j,k} \rangle \varphi_{j,k}(x) = Q(x)$.
+
+\section{Regularity}
+
+The regularity of the scaling function is measured by its moduli of smoothness
+$\omega_r(\varphi, t)_p = \sup_{|h| \leq t} \|\Delta_h^r \varphi\|_p$ (\Cref{def:rd-modulus} for
+$V = \R$, here also for $0 < p < 1$ and $p = \infty$). Parseval's identity and the weighted $L_2$
+decay of $\Phi$ give the Sobolev exponent of Eirola~\cite{Eirola} and Villemoes~\cite{Villemoes}:
+under a growth bound $T^n 1 \leq C \lambda^n$ for the transfer operator,
+$\omega_r(\varphi, t)_2 \leq K t^s$ for every $s < N - \log_4 \lambda$, and the same bound holds
+in $L_p$ for $p \leq 2$. The weighted $L_1$ decay of $\Phi$ gives the uniform bound
+$|\Delta_h^r \varphi(x)| \leq K |h|^a$ for every $a < N - \log_4 \lambda - \frac12$, hence
+H\"older continuity and $\omega_r(\varphi, t)_\infty \leq K t^a$, and interpolation between $L_2$
+and $L_\infty$ gives $\omega_r(\varphi, t)_p \leq K t^\theta$ with $\theta = (2/p) s + (1 - 2/p) a$
+for $2 \leq p < \infty$. For the mask D4 the matrix method of Daubechies and
+Lagarias~\cite{DaubechiesLagarias} gives the H\"older exponent $2 - \log_2(1 + \sqrt 3)$.
+
+\paragraph{Differences on the Fourier side.}
+A difference with step $h$ becomes the multiplication by $e^{2\pi i h \xi} - 1$ on the Fourier
+side, a factor of modulus at most $2\pi \min(1, |h \xi|)$.
+
+\begin{lemma}[The Fourier transform of a difference]
+\label{lem:daub-fourier-difference}
+\lean{Real.fourier_fwdDiff_apply, Real.fourier_iterate_fwdDiff_apply}
+\leanok
+\uses{def:rd-modulus}
+For every integrable $f : \R \to \C$, every $r \in \N$ and all $h, \xi \in \R$,
+\[
+  \mathcal F(\Delta_h f)(\xi) = (e^{2\pi i h \xi} - 1) \, \widehat f(\xi)
+  \quad\text{and}\quad
+  \mathcal F(\Delta_h^r f)(\xi) = (e^{2\pi i h \xi} - 1)^r \, \widehat f(\xi) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:fourier-dilate, lem:daub-fourier-translate, lem:rd-differences}
+The transform is linear on integrable functions (\Cref{lem:fourier-dilate}), and
+$\mathcal F[f(\cdot + h)](\xi) = e^{2\pi i h \xi} \widehat f(\xi)$
+(\Cref{lem:daub-fourier-translate}). The second identity follows by induction on $r$, since the
+differences of an integrable function are integrable (\Cref{lem:rd-differences}).
+\end{proof}
+
+\begin{lemma}[The multiplier of a difference]
+\label{lem:daub-difference-multiplier}
+\lean{Daubechies.exp_two_pi_mul_I_eq, Daubechies.norm_exp_sub_one_le_two,
+  Daubechies.norm_exp_sub_one_le_min, Daubechies.min_one_rpow_le_rpow,
+  Daubechies.norm_exp_sub_one_pow_le}
+\leanok
+For all $h, \xi \in \R$,
+\[
+  |e^{2\pi i h \xi} - 1| \leq 2 \quad\text{and}\quad
+  |e^{2\pi i h \xi} - 1| \leq 2\pi \min(1, |h \xi|) .
+\]
+For every $x \geq 0$ and all real $a, b$ with $0 \leq a \leq b$, $\min(1, x)^b \leq x^a$. For
+all real $s$ and $r \in \N$ with $0 \leq s \leq r$ and all $h, \xi \in \R$,
+\[
+  |e^{2\pi i h \xi} - 1|^{2r} \leq (2\pi)^{2r} \, |h|^{2s} (1 + |\xi|)^{2s} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Write $e^{2\pi i h \xi} = e^{i\theta}$ with the real number $\theta = 2\pi h \xi$; then
+$|e^{i\theta}| = 1$, $|e^{i\theta} - 1| \leq |\theta|$, and $2 \leq 2\pi$. For $x \leq 1$ the
+power $x^t$ decreases in $t$, and for $x \geq 1$, $\min(1, x)^b = 1 \leq x^a$. The last bound
+combines these with $|h \xi| \leq |h| (1 + |\xi|)$.
+\end{proof}
+
+\begin{lemma}[Differences in $L_p$]
+\label{lem:daub-differences-lp}
+\lean{Daubechies.continuous_iterate_fwdDiff, Daubechies.memLp_iterate_fwdDiff,
+  Daubechies.eLpNorm_two_eq_sqrt_integral}
+\leanok
+\uses{def:rd-modulus}
+Let $r \in \N$ and $h \in \R$. For every continuous $f : \R \to \C$ the difference
+$\Delta_h^r f$ is continuous, and for every $p \geq 1$ and every $f \in L_p(\R)$,
+$\Delta_h^r f \in L_p(\R)$. On every measure space, $\|g\|_2 = (\int \|g\|^2)^{1/2}$ for every
+$g \in L_2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:rd-differences}
+Induction on $r$, since $\Delta_h g = g(\cdot + h) - g$, and
+$\|\Delta_h^r f\|_p \leq 2^r \|f\|_p$ (\Cref{lem:rd-differences}). The last identity is the
+definition of the $L_2$ norm.
+\end{proof}
+
+\paragraph{The $L_2$ modulus.}
+Parseval's identity turns $\|\Delta_h^r \varphi\|_2$ into a weighted integral of $|\Phi|^2$,
+which the weighted decay of \Cref{thm:daub-decay-l2} bounds.
+
+\begin{lemma}[The differences of $\varphi$ on the Fourier side]
+\label{lem:daub-scaling-difference-fourier}
+\lean{Daubechies.fourier_higherDiff_scalingFun,
+  Daubechies.integrable_fourier_higherDiff_scalingFun, Daubechies.memLp_higherDiff_scalingFun}
+\leanok
+\uses{def:daub-scaling-function, def:rd-modulus}
+For every Daubechies mask of order $N \geq 2$, every $r \in \N$ and all $h, \xi \in \R$,
+\[
+  \mathcal F(\Delta_h^r \varphi)(\xi) = (e^{2\pi i h \xi} - 1)^r \, \Phi(\xi) ;
+\]
+this transform is integrable, and $\Delta_h^r \varphi \in L_p(\R)$ for every $p \geq 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-fourier-difference, cor:daub-scaling-integrable, thm:daub-scaling-fourier,
+  lem:daub-difference-multiplier, cor:daub-symbol-product-integrable, lem:daub-differences-lp}
+\Cref{lem:daub-fourier-difference} for the integrable function $\varphi$ with
+$\widehat\varphi = \Phi$ (\Cref{cor:daub-scaling-integrable,thm:daub-scaling-fourier}). The
+factor $(e^{2\pi i h \xi} - 1)^r$ is continuous with modulus at most $2^r$
+(\Cref{lem:daub-difference-multiplier}), and $\Phi$ is integrable
+(\Cref{cor:daub-symbol-product-integrable}). Finally $\varphi \in L_p$
+(\Cref{cor:daub-scaling-integrable}) and \Cref{lem:daub-differences-lp}.
+\end{proof}
+
+\begin{proposition}[Parseval's identity for the differences of $\varphi$]
+\label{prop:daub-scaling-difference-parseval}
+\lean{Daubechies.integral_norm_sq_higherDiff_scalingFun,
+  Daubechies.eLpNorm_two_higherDiff_scalingFun_sq}
+\leanok
+\uses{def:daub-scaling-function, def:rd-modulus}
+For every Daubechies mask of order $N \geq 2$, every $r \in \N$ and every $h \in \R$,
+\[
+  \|\Delta_h^r \varphi\|_2^2 = \int_\R |\Delta_h^r \varphi(x)|^2 \, dx
+  = \int_\R |e^{2\pi i h \xi} - 1|^{2r} \, |\Phi(\xi)|^2 \, d\xi .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-differences-lp, lem:rd-differences, prop:daub-scaling-continuous,
+  cor:daub-scaling-integrable, lem:daub-scaling-difference-fourier, thm:daub-parseval}
+The function $\Delta_h^r \varphi$ is continuous and integrable
+(\Cref{lem:daub-differences-lp,lem:rd-differences} with
+\Cref{prop:daub-scaling-continuous,cor:daub-scaling-integrable}), with the integrable transform
+of \Cref{lem:daub-scaling-difference-fourier}. Apply the case $g = f$ of
+\Cref{thm:daub-parseval}, and $\|g\|_2^2 = \int |g|^2$ (\Cref{lem:daub-differences-lp}).
+\end{proof}
+
+\begin{lemma}[$L_2$ bounds for the differences of $\varphi$]
+\label{lem:daub-scaling-difference-l2}
+\lean{Daubechies.rpow_two_mul_eq_sq, Daubechies.integral_norm_sq_higherDiff_scalingFun_le,
+  Daubechies.eLpNorm_two_higherDiff_scalingFun_le}
+\leanok
+\uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
+Let $\lambda, C$ be a growth bound for the transfer operator of order $N \geq 2$, and let
+$s \in \R$ and $r \in \N$ with $0 \leq s \leq r$ and $s < N - \log_4 \lambda$. Then for every
+Daubechies mask of order $N$ and every $h \in \R$,
+\[
+  \|\Delta_h^r \varphi\|_2
+  \leq (2\pi)^r \Bigl(\int_\R (1 + |\xi|)^{2s} \, |\Phi(\xi)|^2 \, d\xi\Bigr)^{1/2} |h|^s .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-scaling-difference-parseval, lem:daub-difference-multiplier, thm:daub-decay-l2}
+By \Cref{prop:daub-scaling-difference-parseval}, the last bound of
+\Cref{lem:daub-difference-multiplier} and $|h|^{2s} = (|h|^s)^2$,
+\[
+  \|\Delta_h^r \varphi\|_2^2
+  \leq \bigl((2\pi)^r |h|^s\bigr)^2 \int_\R (1 + |\xi|)^{2s} \, |\Phi(\xi)|^2 \, d\xi ,
+\]
+where the integrand on the right is integrable by \Cref{thm:daub-decay-l2}. Take square roots.
+\end{proof}
+
+\begin{theorem}[The $L_2$ modulus of the scaling function]
+\label{thm:daub-modulus-l2}
+\lean{Daubechies.modulus_scalingFun_two_le_mul_rpow, Daubechies.modulus_scalingFun_two_le}
+\leanok
+\uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
+Let $\lambda, C$ be a growth bound for the transfer operator of order $N \geq 2$, and let
+$s \in \R$ and $r \in \N$ with $0 \leq s \leq r$ and $s < N - \log_4 \lambda$. For every
+Daubechies mask of order $N$ and every $t > 0$,
+\[
+  \omega_r(\varphi, t)_2 \leq K t^s , \qquad
+  K = (2\pi)^r \Bigl(\int_\R (1 + |\xi|)^{2s} \, |\Phi(\xi)|^2 \, d\xi\Bigr)^{1/2} < \infty .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-decay-l2, lem:daub-scaling-difference-l2}
+The integral is finite by \Cref{thm:daub-decay-l2}. Take the supremum over $|h| \leq t$ in
+\Cref{lem:daub-scaling-difference-l2}, with $|h|^s \leq t^s$ since $s \geq 0$.
+\end{proof}
+
+With $\widehat\varphi = \Phi$ (\Cref{thm:daub-scaling-fourier}), \Cref{thm:daub-decay-l2} says
+that $\varphi$ lies in the Sobolev space $H^s(\R)$ for every $s < N - \log_4 \lambda$;
+\Cref{thm:daub-modulus-l2} expresses this regularity by moduli of smoothness.
+
+\paragraph{Exponents $p \leq 2$.}
+For $|h| \leq 1$ the differences of $\varphi$ vanish outside a fixed interval, on which
+H\"older's inequality bounds $L_p$ norms by $L_2$ norms.
+
+\begin{lemma}[The support of a difference and H\"older's inequality]
+\label{lem:daub-difference-support}
+\lean{Daubechies.iterate_fwdDiff_eq_zero_of_notMem, Daubechies.eLpNorm_le_eLpNorm_mul_of_eq_zero}
+\leanok
+\uses{def:rd-modulus}
+Let $a \leq b$. If $f : \R \to \C$ vanishes outside $[a, b]$, then for every $r \in \N$ and
+every $h \in \R$ the difference $\Delta_h^r f$ vanishes outside $[a - r|h|, b + r|h|]$. If $g$
+is a measurable function on $\R$ with values in a normed abelian group that vanishes outside
+$[a, b]$, then for all $0 < p \leq q \leq \infty$, with $1/\infty = 0$,
+\[
+  \|g\|_p \leq \|g\|_q \, (b - a)^{1/p - 1/q} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Induction on $r$: $\Delta_h^{r+1} f(x) = \Delta_h^r f(x + h) - \Delta_h^r f(x)$, and for $x$
+outside $[a - (r+1)|h|, b + (r+1)|h|]$ both $x$ and $x + h$ lie outside
+$[a - r|h|, b + r|h|]$. Both norms of $g$ are norms for Lebesgue measure restricted to
+$[a, b]$, a finite measure of total mass $b - a$, on which H\"older's inequality gives the
+bound.
+\end{proof}
+
+\begin{lemma}[The $L_p$ modulus by the $L_2$ modulus]
+\label{lem:daub-modulus-lp-l2}
+\lean{Daubechies.higherDiff_scalingFun_eq_zero, Daubechies.eLpNorm_higherDiff_scalingFun_le_two,
+  Daubechies.modulus_scalingFun_le_modulus_two}
+\leanok
+\uses{def:daub-scaling-function, def:rd-modulus}
+For every Daubechies mask of order $N \geq 2$, every $r \in \N$ and every $h \in \R$ with
+$|h| \leq 1$, the difference $\Delta_h^r \varphi$ vanishes outside $[-r, 2N - 1 + r]$, and
+\[
+  \|\Delta_h^r \varphi\|_p \leq \|\Delta_h^r \varphi\|_2 \, (2N - 1 + 2r)^{1/p - 1/2}
+\]
+for every $0 < p \leq 2$. For every $0 < p \leq 2$ and every $t \leq 1$,
+$\omega_r(\varphi, t)_p \leq (2N - 1 + 2r)^{1/p - 1/2} \, \omega_r(\varphi, t)_2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-scaling-support, lem:daub-difference-support,
+  lem:daub-scaling-difference-fourier, lem:rd-modulus}
+$\varphi$ vanishes outside $[0, 2N - 1]$ (\Cref{thm:daub-scaling-support}), so by
+\Cref{lem:daub-difference-support} the difference $\Delta_h^r \varphi$ vanishes outside
+$[-r|h|, 2N - 1 + r|h|] \subseteq [-r, 2N - 1 + r]$, an interval of length $2N - 1 + 2r$, and the
+second part of \Cref{lem:daub-difference-support} gives the bound; $\Delta_h^r \varphi$ is
+measurable since it lies in $L_2$ (\Cref{lem:daub-scaling-difference-fourier}). Take the
+supremum over $|h| \leq t$, with $\|\Delta_h^r \varphi\|_2 \leq \omega_r(\varphi, t)_2$
+(\Cref{lem:rd-modulus}).
+\end{proof}
+
+\begin{theorem}[The $L_p$ modulus of the scaling function, $p \leq 2$]
+\label{thm:daub-modulus-lp}
+\lean{Daubechies.modulus_scalingFun_le_two}
+\leanok
+\uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
+Let $\lambda, C$ be a growth bound for the transfer operator of order $N \geq 2$, let
+$0 < p \leq 2$, and let $s \in \R$ and $r \in \N$ with $0 \leq s \leq r$ and
+$s < N - \log_4 \lambda$. For every Daubechies mask of order $N$ there is a constant $K < \infty$
+with $\omega_r(\varphi, t)_p \leq K t^s$ for every $t \in (0, 1]$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-modulus-l2, lem:daub-modulus-lp-l2}
+By \Cref{thm:daub-modulus-l2,lem:daub-modulus-lp-l2} one can take
+$K = (2N - 1 + 2r)^{1/p - 1/2} K_2$ with the constant $K_2$ of the $L_2$ bound.
+\end{proof}
+
+\begin{corollary}[Orders two and three]
+\label{cor:daub-modulus-orders-two-three}
+\lean{Daubechies.modulus_scalingFun_two_le_order_two,
+  Daubechies.modulus_scalingFun_le_two_order_two,
+  Daubechies.modulus_scalingFun_two_le_order_three,
+  Daubechies.modulus_scalingFun_le_two_order_three}
+\leanok
+\uses{def:daub-scaling-function, def:rd-modulus}
+Let $0 < p \leq 2$, and let $s \in \R$ and $r \in \N$ with $0 \leq s \leq r$. For every
+Daubechies mask of order $2$ if $s < 1$, and for every Daubechies mask of order $3$ if
+$s < 3 - \log_2 3$, there is a constant $K < \infty$ with $\omega_r(\varphi, t)_p \leq K t^s$ for
+every $t \in (0, 1]$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-transfer-two, prop:daub-transfer-three, thm:daub-modulus-l2,
+  thm:daub-modulus-lp}
+The growth bounds $\lambda = 4$ for $N = 2$ and $\lambda = 9$ for $N = 3$ have
+$2 - \log_4 4 = 1$ and $3 - \log_4 9 = 3 - \log_2 3$
+(\Cref{prop:daub-transfer-two,prop:daub-transfer-three}). Apply \Cref{thm:daub-modulus-l2} for
+$p = 2$ and \Cref{thm:daub-modulus-lp} for the other $p$.
+\end{proof}
+
+By the theorem of Eirola~\cite{Eirola} and Villemoes~\cite{Villemoes}, $\varphi \in H^s$ holds
+exactly for $s < N - \log_4 \rho(T)$, with $\rho(T)$ the spectral radius of the transfer
+operator; for $N = 2, 3$ this gives the Sobolev exponents $1$ and $3 - \log_2 3 \approx 1.415$
+(see the table in Ojanen~\cite{Ojanen}). The statements above are the lower bounds.
+
+\paragraph{H\"older continuity through the Fourier transform.}
+The differences of an inverse Fourier transform $\mathcal F^{-1} F$ are the inverse transforms
+of $(e^{2\pi i h \xi} - 1)^r F(\xi)$, the counterpart of \Cref{lem:daub-fourier-difference}, and
+are therefore bounded uniformly by $\int_\R |e^{2\pi i h \xi} - 1|^r |F(\xi)| \, d\xi$. For
+$\varphi = \mathcal F^{-1} \Phi$ the weighted $L_1$ decay of \Cref{thm:daub-decay-l1} bounds this
+integral by a multiple of $|h|^a$ for every $0 \leq a \leq r$ with
+$a < N - \log_4 \lambda - \frac12$.
+
+\begin{lemma}[Differences of an inverse Fourier transform]
+\label{lem:daub-inverse-fourier-difference}
+\lean{Real.fourierInv_sub_apply, Real.integrable_exp_mul, Real.integrable_exp_sub_one_pow_mul,
+  Real.fwdDiff_fourierInv_apply, Real.iterate_fwdDiff_fourierInv_apply,
+  Real.norm_iterate_fwdDiff_fourierInv_le}
+\leanok
+\uses{def:rd-modulus}
+For all integrable $F, G : \R \to \C$ and every $x \in \R$,
+$\mathcal F^{-1}(F - G)(x) = \mathcal F^{-1} F(x) - \mathcal F^{-1} G(x)$. Let $F : \R \to \C$ be
+integrable, $r \in \N$ and $h \in \R$. Then the functions $\xi \mapsto e^{2\pi i h \xi} F(\xi)$
+and $\xi \mapsto (e^{2\pi i h \xi} - 1)^r F(\xi)$ are integrable, and for every $x \in \R$
+\[
+  \Delta_h^r (\mathcal F^{-1} F)(x)
+  = \mathcal F^{-1}\bigl[\xi \mapsto (e^{2\pi i h \xi} - 1)^r F(\xi)\bigr](x)
+\]
+and
+\[
+  |\Delta_h^r (\mathcal F^{-1} F)(x)| \leq \int_\R |e^{2\pi i h \xi} - 1|^r \, |F(\xi)| \, d\xi .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:fourier-dilate, lem:daub-difference-multiplier, lem:daub-fourier-translate,
+  lem:daub-fourier-continuous}
+Since $\mathcal F^{-1} F(x) = \widehat F(-x)$, the first identity is the linearity of the
+transform on integrable functions (\Cref{lem:fourier-dilate}). The factor $e^{2\pi i h \xi}$ is
+continuous of modulus $1$, and $(e^{2\pi i h \xi} - 1)^r$ is continuous of modulus at most $2^r$
+(\Cref{lem:daub-difference-multiplier}), so both products are integrable. By item~3 of
+\Cref{lem:daub-fourier-translate}, $\mathcal F^{-1} F(x + h)$ is the inverse transform of
+$e^{2\pi i h \xi} F(\xi)$, so the first identity gives the case $r = 1$, and induction on $r$
+gives the identity for every $r$. The bound follows with $|\mathcal F^{-1} G(x)| \leq \int_\R |G|$
+(\Cref{lem:daub-fourier-continuous}).
+\end{proof}
+
+\begin{lemma}[The differences of $\varphi$ as inverse transforms]
+\label{lem:daub-scaling-difference-inverse}
+\lean{Daubechies.norm_exp_sub_one_pow_le_mul_rpow, Daubechies.integrable_symbolProduct_of_growth,
+  Daubechies.higherDiff_scalingFun_eq_fourierInv,
+  Daubechies.norm_higherDiff_scalingFun_le_integral}
+\leanok
+\uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
+For all real $a$ and $r \in \N$ with $0 \leq a \leq r$ and all $h, \xi \in \R$,
+\[
+  |e^{2\pi i h \xi} - 1|^r \leq (2\pi)^r \, |h|^a (1 + |\xi|)^a .
+\]
+If $\lambda, C$ is a growth bound for the transfer operator of order $N$ with
+$\log_4 \lambda < N - \frac12$, then the symbol product $\Phi$ of every Daubechies mask of order
+$N$ is integrable. For every Daubechies mask with integrable symbol product, every $r \in \N$
+and all $h, x \in \R$,
+\[
+  \Delta_h^r \varphi(x)
+  = \mathcal F^{-1}\bigl[\xi \mapsto (e^{2\pi i h \xi} - 1)^r \, \Phi(\xi)\bigr](x)
+\]
+and
+\[
+  |\Delta_h^r \varphi(x)| \leq \int_\R |e^{2\pi i h \xi} - 1|^r \, |\Phi(\xi)| \, d\xi .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-difference-multiplier, thm:daub-decay-l1, thm:daub-symbol-product-continuous,
+  lem:daub-inverse-fourier-difference}
+The bound combines $|e^{2\pi i h \xi} - 1| \leq 2\pi \min(1, |h \xi|)$ and
+$\min(1, |h \xi|)^r \leq |h \xi|^a$ (\Cref{lem:daub-difference-multiplier}) with
+$|h \xi| \leq |h| (1 + |\xi|)$. The case $a = 0$ of \Cref{thm:daub-decay-l1} shows that $|\Phi|$
+is integrable, and so is the continuous function $\Phi$
+(\Cref{thm:daub-symbol-product-continuous}). The identity and the bound for $\Delta_h^r \varphi$
+are \Cref{lem:daub-inverse-fourier-difference} for $F = \Phi$, since
+$\varphi = \mathcal F^{-1} \Phi$.
+\end{proof}
+
+By \Cref{cor:daub-symbol-product-integrable} the identity and the bound for $\Delta_h^r \varphi$
+hold for every Daubechies mask of order $N \geq 2$.
+
+\begin{proposition}[Uniform bounds for the differences of $\varphi$]
+\label{prop:daub-scaling-difference-uniform}
+\lean{Daubechies.norm_higherDiff_scalingFun_le_mul_rpow, Daubechies.norm_higherDiff_scalingFun_le}
+\leanok
+\uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
+Let $\lambda, C$ be a growth bound for the transfer operator of order $N$, and let $a \in \R$ and
+$r \in \N$ with $0 \leq a \leq r$ and $a < N - \log_4 \lambda - \frac12$. For every Daubechies
+mask of order $N$ and all $x, h \in \R$,
+\[
+  |\Delta_h^r \varphi(x)| \leq K |h|^a , \qquad
+  K = (2\pi)^r \int_\R (1 + |\xi|)^a \, |\Phi(\xi)| \, d\xi < \infty .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-scaling-difference-inverse, thm:daub-decay-l1}
+Since $0 \leq a < N - \log_4 \lambda - \frac12$, the symbol product is integrable, and by
+\Cref{lem:daub-scaling-difference-inverse}
+\[
+  |\Delta_h^r \varphi(x)| \leq \int_\R |e^{2\pi i h \xi} - 1|^r \, |\Phi(\xi)| \, d\xi
+  \leq (2\pi)^r |h|^a \int_\R (1 + |\xi|)^a \, |\Phi(\xi)| \, d\xi ,
+\]
+where the last integral is finite by \Cref{thm:daub-decay-l1}.
+\end{proof}
+
+For $r = 1$ the uniform bound is a H\"older estimate.
+
+\begin{theorem}[H\"older continuity of the scaling function]
+\label{thm:daub-holder-fourier}
+\lean{Daubechies.holder_scalingFun_fourier}
+\leanok
+\uses{def:daub-scaling-function, def:daub-transfer-growth}
+Let $\lambda, C$ be a growth bound for the transfer operator of order $N$, and let $a \in \R$ with
+$0 \leq a \leq 1$ and $a < N - \log_4 \lambda - \frac12$. For every Daubechies mask of order $N$
+there is a constant $K$ with
+\[
+  |\varphi(x) - \varphi(y)| \leq K |x - y|^a \quad\text{for all } x, y \in \R .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-scaling-difference-uniform}
+The case $r = 1$ of \Cref{prop:daub-scaling-difference-uniform}, at the point $y$ with the step
+$h = x - y$.
+\end{proof}
+
+\begin{corollary}[H\"older exponents of orders two and three]
+\label{cor:daub-holder-orders-two-three}
+\lean{Daubechies.three_halves_lt_logb_two_three, Daubechies.holder_scalingFun_order_two,
+  Daubechies.holder_scalingFun_order_three}
+\leanok
+\uses{def:daub-scaling-function}
+Let $a \geq 0$. For every Daubechies mask of order $2$ if $a < \frac12$, and for every Daubechies
+mask of order $3$ if $a < \frac52 - \log_2 3$, there is a constant $K$ with
+\[
+  |\varphi(x) - \varphi(y)| \leq K |x - y|^a \quad\text{for all } x, y \in \R .
+\]
+Moreover $\log_2 3 > \frac32$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-transfer-two, prop:daub-transfer-three, thm:daub-holder-fourier}
+$2^3 < 3^2$ gives $\log_2 3 > \frac32$. The growth bounds $\lambda = 4$ for $N = 2$ and
+$\lambda = 9$ for $N = 3$ (\Cref{prop:daub-transfer-two,prop:daub-transfer-three}) give
+$N - \log_4 \lambda - \frac12 = \frac12$ and $N - \log_4 \lambda - \frac12 = \frac52 - \log_2 3$,
+both less than $1$, so \Cref{thm:daub-holder-fourier} applies.
+\end{proof}
+
+For order three the exponent is $\frac52 - \log_2 3 \approx 0.915$.
+
+\paragraph{Exponents $p \geq 2$.}
+For $p = \infty$ a uniform bound for the differences bounds the modulus directly; here
+$\|g\|_\infty$ is the essential supremum of $|g|$. For $2 \leq p < \infty$ the $L_p$ norm lies
+between the $L_2$ norm and the uniform norm, $\|g\|_p \leq \|g\|_\infty^{1 - 2/p} \|g\|_2^{2/p}$,
+so the uniform bound of \Cref{prop:daub-scaling-difference-uniform} and the $L_2$ bound of
+\Cref{lem:daub-scaling-difference-l2} combine into a bound with the exponent
+$\theta = (2/p) s + (1 - 2/p) a$.
+
+\begin{lemma}[The uniform modulus from a pointwise bound]
+\label{lem:daub-modulus-top-pointwise}
+\lean{Daubechies.eLpNorm_top_le_of_norm_le, Daubechies.modulus_top_le_of_norm_le}
+\leanok
+\uses{def:rd-modulus}
+On every measure space, for every $B \in \R$, every measurable function $g$ with values in a
+normed abelian group and $\|g(x)\| \leq B$ for every $x$ satisfies $\|g\|_\infty \leq B$. Let
+$f : \R \to \C$ be measurable, let $r \in \N$, $a \geq 0$ and $K \in \R$, and suppose that
+$|\Delta_h^r f(x)| \leq K |h|^a$ for all $x, h \in \R$. Then $\omega_r(f, t)_\infty \leq K t^a$
+for every $t > 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:rd-differences}
+The essential supremum is at most the supremum. Each difference $\Delta_h^r f$ is measurable
+(\Cref{lem:rd-differences}), and for $|h| \leq t$ its uniform norm is at most
+$K |h|^a \leq K t^a$, since $a \geq 0$.
+\end{proof}
+
+\begin{theorem}[The uniform modulus of the scaling function]
+\label{thm:daub-modulus-top}
+\lean{Daubechies.modulus_scalingFun_top_le}
+\leanok
+\uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
+Let $\lambda, C$ be a growth bound for the transfer operator of order $N$, and let $a \in \R$ and
+$r \in \N$ with $0 \leq a \leq r$ and $a < N - \log_4 \lambda - \frac12$. For every Daubechies
+mask of order $N$ there is a constant $K < \infty$ with $\omega_r(\varphi, t)_\infty \leq K t^a$
+for every $t \in (0, 1]$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-scaling-difference-inverse, lem:daub-fourier-continuous,
+  lem:daub-modulus-top-pointwise, prop:daub-scaling-difference-uniform}
+The symbol product is integrable (\Cref{lem:daub-scaling-difference-inverse}), so
+$\varphi = \mathcal F^{-1} \Phi$ is continuous (\Cref{lem:daub-fourier-continuous}). Apply
+\Cref{lem:daub-modulus-top-pointwise} to the uniform bound of
+\Cref{prop:daub-scaling-difference-uniform}.
+\end{proof}
+
+\begin{lemma}[Interpolation between $L_2$ and $L_\infty$]
+\label{lem:daub-interpolation-two-infty}
+\lean{Daubechies.one_sub_two_div_toReal_nonneg,
+  Daubechies.eLpNorm_le_rpow_mul_rpow_of_eLpNorm_two_le, Daubechies.mul_rpow_mul_mul_rpow}
+\leanok
+Let $2 \leq p < \infty$. Then $1 - 2/p \geq 0$, and for every measurable $g : \R \to \C$ and all
+$M, B \in [0, \infty]$ with $|g(x)| \leq M$ for every $x \in \R$ and $\|g\|_2 \leq B$,
+\[
+  \|g\|_p \leq M^{1 - 2/p} \, B^{2/p} .
+\]
+For all $A, B, x \in [0, \infty]$ and all real $a, s, \alpha, \beta \geq 0$,
+$(A x^a)^\alpha (B x^s)^\beta = A^\alpha B^\beta x^{\beta s + \alpha a}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:lp-interpolation}
+$2 \leq p$ gives $2/p \leq 1$. \Cref{lem:lp-interpolation} with the exponents $2 \leq p$ gives
+$\|g\|_p \leq M^{1 - 2/p} \|g\|_2^{2/p}$, and $\|g\|_2^{2/p} \leq B^{2/p}$. The identity follows
+from the rules for powers in $[0, \infty]$ with nonnegative exponents.
+\end{proof}
+
+\begin{lemma}[The $L_p$ modulus by interpolation]
+\label{lem:daub-modulus-interpolation}
+\lean{Daubechies.modulus_le_of_norm_le_of_eLpNorm_two_le}
+\leanok
+\uses{def:rd-modulus}
+Let $f : \R \to \C$ be measurable, let $r \in \N$, $a, s \geq 0$, $K \in \R$ and
+$B \in [0, \infty]$, and suppose that for all $x, h \in \R$
+\[
+  |\Delta_h^r f(x)| \leq K |h|^a \quad\text{and}\quad \|\Delta_h^r f\|_2 \leq B |h|^s .
+\]
+Then for every $2 \leq p < \infty$ and every $t > 0$, with $\theta = (2/p) s + (1 - 2/p) a$,
+\[
+  \omega_r(f, t)_p \leq K^{1 - 2/p} B^{2/p} \, t^\theta .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-interpolation-two-infty, lem:rd-differences}
+Let $|h| \leq t$. The difference $\Delta_h^r f$ is measurable (\Cref{lem:rd-differences}), and
+\Cref{lem:daub-interpolation-two-infty} with $M = K |h|^a$ and $B |h|^s$ in place of $B$ gives
+\[
+  \|\Delta_h^r f\|_p \leq (K |h|^a)^{1 - 2/p} (B |h|^s)^{2/p} = K^{1 - 2/p} B^{2/p} |h|^\theta
+  \leq K^{1 - 2/p} B^{2/p} t^\theta ,
+\]
+since $\theta \geq 0$. Take the supremum over $|h| \leq t$.
+\end{proof}
+
+\begin{theorem}[The $L_p$ modulus of the scaling function, $p \geq 2$]
+\label{thm:daub-modulus-interp}
+\lean{Daubechies.modulus_scalingFun_interp_of_norm_le, Daubechies.modulus_scalingFun_interp}
+\leanok
+\uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
+Let $\lambda, C$ be a growth bound for the transfer operator of order $N \geq 2$, let
+$2 \leq p \leq \infty$, let $s, a \in \R$ and $r \in \N$ with $0 \leq s \leq r$,
+$s < N - \log_4 \lambda$ and $a \geq 0$, and let $\theta = (2/p) s + (1 - 2/p) a$, where
+$2/p = 0$ for $p = \infty$. Let $\varphi$ be the scaling function of a Daubechies mask of order
+$N$, and suppose that one of the following holds:
+\begin{enumerate}
+  \item there is a constant $K_0$ with $|\Delta_h^r \varphi(x)| \leq K_0 |h|^a$ for all
+    $x, h \in \R$;
+  \item $a \leq r$ and $a < N - \log_4 \lambda - \frac12$.
+\end{enumerate}
+Then there is a constant $K < \infty$ with $\omega_r(\varphi, t)_p \leq K t^\theta$ for every
+$t \in (0, 1]$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-scaling-difference-uniform, prop:daub-scaling-continuous,
+  lem:daub-modulus-top-pointwise, lem:daub-scaling-difference-l2, lem:daub-modulus-interpolation,
+  lem:daub-interpolation-two-infty}
+Condition~2 implies condition~1 by \Cref{prop:daub-scaling-difference-uniform}; assume
+condition~1. The scaling function is continuous (\Cref{prop:daub-scaling-continuous}), hence
+measurable. For $p = \infty$, $\theta = a$, and \Cref{lem:daub-modulus-top-pointwise} gives the
+bound with $K = K_0$. For $p < \infty$, \Cref{lem:daub-scaling-difference-l2} gives
+$\|\Delta_h^r \varphi\|_2 \leq K_2 |h|^s$ for every $h \in \R$ with a constant $K_2 < \infty$, and
+\Cref{lem:daub-modulus-interpolation} gives the bound with $K = K_0^{1 - 2/p} K_2^{2/p}$, which is
+finite since $1 - 2/p \geq 0$ (\Cref{lem:daub-interpolation-two-infty}).
+\end{proof}
+
+For $p = 2$ the exponent is $\theta = s$, that of \Cref{thm:daub-modulus-l2}, and for
+$p = \infty$ it is $\theta = a$, that of \Cref{thm:daub-modulus-top}. Together with
+\Cref{thm:daub-modulus-lp} for $p \leq 2$, the moduli of $\varphi$ are bounded by powers of $t$
+in every $L_p$, $0 < p \leq \infty$.
+
+\begin{corollary}[Orders two and three, $p \geq 2$]
+\label{cor:daub-modulus-interp-orders-two-three}
+\lean{Daubechies.modulus_scalingFun_interp_order_two,
+  Daubechies.modulus_scalingFun_interp_order_three}
+\leanok
+\uses{def:daub-scaling-function, def:rd-modulus}
+Let $2 \leq p \leq \infty$, let $s, a \in \R$ and $r \in \N$ with $0 \leq s \leq r$ and
+$0 \leq a \leq r$, and let $\theta = (2/p) s + (1 - 2/p) a$. For every Daubechies mask of order
+$2$ if $s < 1$ and $a < \frac12$, and for every Daubechies mask of order $3$ if
+$s < 3 - \log_2 3$ and $a < \frac52 - \log_2 3$, there is a constant $K < \infty$ with
+$\omega_r(\varphi, t)_p \leq K t^\theta$ for every $t \in (0, 1]$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-transfer-two, prop:daub-transfer-three, thm:daub-modulus-interp}
+Condition~2 of \Cref{thm:daub-modulus-interp} with the growth bounds $\lambda = 4$ for $N = 2$
+and $\lambda = 9$ for $N = 3$, for which $N - \log_4 \lambda$ is $1$ and $3 - \log_2 3$
+(\Cref{prop:daub-transfer-two,prop:daub-transfer-three}), so that
+$N - \log_4 \lambda - \frac12$ is $\frac12$ and $\frac52 - \log_2 3$.
+\end{proof}
+
+A H\"older estimate bounds all higher differences, so a H\"older exponent obtained by any other
+method enters the interpolation as well.
+
+\begin{lemma}[Higher differences of a H\"older function]
+\label{lem:daub-holder-differences}
+\lean{Daubechies.norm_iterate_fwdDiff_le_of_holder}
+\leanok
+\uses{def:rd-modulus}
+Let $E$ be a normed abelian group, and let $f : \R \to E$ and $K, a \in \R$ satisfy
+$\|f(x) - f(y)\| \leq K |x - y|^a$ for all $x, y \in \R$. Then for every $r \in \N$ and all
+$x, h \in \R$,
+\[
+  \|\Delta_h^{r+1} f(x)\| \leq 2^r K |h|^a .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Induction on $r$. The case $r = 0$ is the estimate at the points $x + h$ and $x$, and
+$\Delta_h^{r+2} f(x) = \Delta_h^{r+1} f(x + h) - \Delta_h^{r+1} f(x)$ gives the step.
+\end{proof}
+
+\begin{corollary}[The $L_p$ modulus from a H\"older estimate]
+\label{cor:daub-modulus-interp-holder}
+\lean{Daubechies.modulus_scalingFun_interp_of_holder}
+\leanok
+\uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
+Let $\lambda, C$ be a growth bound for the transfer operator of order $N \geq 2$, let
+$2 \leq p \leq \infty$, let $s \in \R$ and $r \in \N$ with $r \geq 1$, $0 \leq s \leq r$ and
+$s < N - \log_4 \lambda$, let $a \geq 0$, and let $\theta = (2/p) s + (1 - 2/p) a$. Let $\varphi$
+be the scaling function of a Daubechies mask of order $N$, and suppose that there is a constant
+$K_0$ with $|\varphi(x) - \varphi(y)| \leq K_0 |x - y|^a$ for all $x, y \in \R$. Then there is a
+constant $K < \infty$ with $\omega_r(\varphi, t)_p \leq K t^\theta$ for every $t \in (0, 1]$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-holder-differences, thm:daub-modulus-interp}
+By \Cref{lem:daub-holder-differences}, $|\Delta_h^r \varphi(x)| \leq 2^{r-1} K_0 |h|^a$ for all
+$x, h \in \R$, which is condition~1 of \Cref{thm:daub-modulus-interp}.
+\end{proof}
+
+For the mask D4 the matrix method below gives the H\"older estimate for every
+$0 \leq a \leq 2 - \log_2(1 + \sqrt 3) \approx 0.55$ (\Cref{thm:daub-holder-d4}), beyond the
+range $a < \frac12$ of \Cref{cor:daub-holder-orders-two-three}. With the growth bound
+$\lambda = 4$ of order two (\Cref{prop:daub-transfer-two}), \Cref{cor:daub-modulus-interp-holder}
+then gives for D4 the exponents $\theta = (2/p) s + (1 - 2/p) a$ with $s < 1$ and
+$a \leq 2 - \log_2(1 + \sqrt 3)$.
+
+\paragraph{The matrix method.}
+For the mask D4 the matrix method of Daubechies and Lagarias~\cite{DaubechiesLagarias} gives
+the H\"older exponent $2 - \log_2(1 + \sqrt 3)$. The scaling function of D4 vanishes outside
+$(0, 3)$, so the vector $v(x) = (\varphi(x), \varphi(x + 1), \varphi(x + 2))$, $x \in [0, 1)$,
+carries all values of $\varphi$, and on each half $[d/2, (d + 1)/2)$, $d \in \{0, 1\}$, the
+refinement equation becomes $v(x) = T_d v(2x - d)$ with a $3 \times 3$ matrix $T_d$. Oscillation
+bounds on the dyadic intervals $[k/2^n, (k+1)/2^n)$, $0 \leq k < 2^n$, then pass from level $n$
+to level $n + 1$. This paragraph proves this dyadic descent for general functions, the next one
+applies it to D4.
+
+\begin{lemma}[Dyadic intervals]
+\label{lem:daub-dyadic-intervals}
+\lean{Daubechies.mem_Ico_half_of_mem_dyadic, Daubechies.two_mul_sub_mem_dyadic,
+  Daubechies.mem_Ico_zero_one_of_mem_dyadic, Daubechies.div_two_pow_lt_two}
+\leanok
+Let $n, k \in \N$, and write $k = 2^n d + q$ with $d, q \in \N$ and $q < 2^n$. For every
+$x \in [k/2^{n+1}, (k+1)/2^{n+1})$,
+\[
+  x \in \Bigl[\frac d2, \frac{d+1}{2}\Bigr) \quad\text{and}\quad
+  2x - d \in \Bigl[\frac{q}{2^n}, \frac{q+1}{2^n}\Bigr) .
+\]
+If $k < 2^{n+1}$, then $d < 2$, and if $k < 2^n$, then $[k/2^n, (k+1)/2^n) \subseteq [0, 1)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$k/2^{n+1} = d/2 + q/2^{n+1}$ with $0 \leq q/2^{n+1}$ and $(q+1)/2^{n+1} \leq \frac12$, and
+$2 \cdot k/2^{n+1} - d = q/2^n$.
+\end{proof}
+
+\begin{lemma}[Dyadic descent for a halving recursion]
+\label{lem:daub-descent-halving}
+\lean{Daubechies.norm_sub_le_of_halving}
+\leanok
+Let $E$ be a seminormed abelian group, let $E_A \in \R$, and let $A : \R \to E$ satisfy
+$\|A(x) - A(y)\| \leq E_A$ for all $x, y \in [0, 1)$ and
+\[
+  \|A(x) - A(y)\| \leq \tfrac12 \, \|A(2x - d) - A(2y - d)\|
+\]
+for every $d \in \{0, 1\}$ and all $x, y \in [d/2, (d+1)/2)$. Then for all $n, k \in \N$ with
+$k < 2^n$ and all $x, y \in [k/2^n, (k+1)/2^n)$, $\|A(x) - A(y)\| \leq E_A/2^n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-dyadic-intervals}
+Induction on $n$: for $k < 2^{n+1}$ the points of $[k/2^{n+1}, (k+1)/2^{n+1})$ lie in one half
+$[d/2, (d+1)/2)$, and $x \mapsto 2x - d$ maps them into a dyadic interval of level $n$
+(\Cref{lem:daub-dyadic-intervals}).
+\end{proof}
+
+\begin{lemma}[Dyadic descent for a triangular recursion]
+\label{lem:daub-descent-triangular}
+\lean{Daubechies.norm_sub_le_of_triangular}
+\leanok
+Let $E$ be a seminormed abelian group, let $A, B : \R \to E$, and let
+$E_A, E_B, \beta, \rho, C \in \R$ with $\beta, \rho \geq 0$ and
+$\beta E_A \leq (\rho - \frac12) C$. Suppose that $\|A(x) - A(y)\| \leq E_A/2^n$ for all
+$n, k \in \N$ with $k < 2^n$ and all $x, y \in [k/2^n, (k+1)/2^n)$, that
+$\|B(x) - B(y)\| \leq E_B$ for all $x, y \in [0, 1)$, and that
+\[
+  \|B(x) - B(y)\| \leq \beta \, \|A(2x - d) - A(2y - d)\| + \rho \, \|B(2x - d) - B(2y - d)\|
+\]
+for every $d \in \{0, 1\}$ and all $x, y \in [d/2, (d+1)/2)$. Then for all $n, k \in \N$ with
+$k < 2^n$ and all $x, y \in [k/2^n, (k+1)/2^n)$,
+\[
+  \|B(x) - B(y)\| \leq \rho^n (E_B + C) - \frac{C}{2^n} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-dyadic-intervals}
+Induction on $n$ with \Cref{lem:daub-dyadic-intervals}. At level $n + 1$ the recursion, the
+bound for $A$ and the induction hypothesis bound $\|B(x) - B(y)\|$ by
+$\beta E_A/2^n + \rho (\rho^n (E_B + C) - C/2^n)$, which equals
+\[
+  \rho^{n+1} (E_B + C) - \frac{C}{2^{n+1}} + \frac{\beta E_A - (\rho - \frac12) C}{2^n} ,
+\]
+and the last term is at most $0$.
+\end{proof}
+
+The pair of differences of $A$ and $B$ follows a lower triangular recursion with diagonal
+$(\frac12, \rho)$; for $\rho > \frac12$ its rate is $\rho^n$, and the term $-C/2^n$ makes the
+induction close.
+
+\begin{lemma}[Closed dyadic intervals]
+\label{lem:daub-closed-dyadic}
+\lean{Daubechies.norm_sub_le_of_forall_Ico, Daubechies.norm_sub_le_of_unit_dyadic,
+  Daubechies.norm_sub_le_of_adjacent_dyadic}
+\leanok
+Let $E$ be a seminormed abelian group, let $f : \R \to E$, $n \in \N$ and $c \in \R$.
+\begin{enumerate}
+  \item If $f$ is continuous, $a < b$ and $\|f(x) - f(y)\| \leq c$ for all $x, y \in [a, b)$,
+    then $\|f(x) - f(y)\| \leq c$ for all $x, y \in [a, b]$.
+  \item If $f$ is continuous and $\|f(x + i) - f(y + i)\| \leq c$ for every $i \in \Z$, every
+    $k \in \N$ with $k < 2^n$ and all $x, y \in [k/2^n, (k+1)/2^n)$, then
+    $\|f(x) - f(y)\| \leq c$ for every $k \in \Z$ and all $x, y \in [k/2^n, (k+1)/2^n]$.
+  \item If $\|f(x) - f(y)\| \leq c$ for every $k \in \Z$ and all
+    $x, y \in [k/2^n, (k+1)/2^n]$, then $\|f(x) - f(y)\| \leq 2c$ for all $x, y \in \R$ with
+    $x \leq y \leq x + 2^{-n}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The pairs $(x, y)$ with $\|f(x) - f(y)\| \leq c$ form a closed set that contains
+$[a, b) \times [a, b)$, hence also its closure. (2) Write $k = 2^n q + r$ with $q \in \Z$ and
+$0 \leq r < 2^n$, and apply (1) to $t \mapsto f(t + q)$. (3) Let $k = \lfloor 2^n x \rfloor$.
+Either $y$ lies in the closed dyadic interval $[k/2^n, (k+1)/2^n]$ of $x$, or the point
+$(k+1)/2^n$ joins $x$ and $y$ through two adjacent closed dyadic intervals.
+\end{proof}
+
+\begin{lemma}[Dyadic levels]
+\label{lem:daub-dyadic-level}
+\lean{Daubechies.exists_dyadic_level, Daubechies.pow_le_two_rpow_mul_rpow}
+\leanok
+For every $t \in (0, 1]$ there is $n \in \N$ with $2^{-(n+1)} < t \leq 2^{-n}$. For all real
+$a$, $\rho$ and $t$ with $a \geq 0$ and $0 \leq \rho \leq 2^{-a}$, and every $n \in \N$ with
+$2^{-(n+1)} < t$, $\rho^n \leq 2^a t^a$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The powers $2^{-n}$ decrease to $0$. Moreover $\rho^n \leq (2^{-a})^n = (2^{-n})^a$ and
+$2^{-n} < 2t$.
+\end{proof}
+
+\begin{proposition}[H\"older continuity from dyadic oscillation bounds]
+\label{prop:daub-holder-from-dyadic}
+\lean{Daubechies.exists_holder_of_dyadic, Daubechies.exists_holder_of_unit_dyadic}
+\leanok
+Let $E$ be a seminormed abelian group, let $f : \R \to E$ and $M \in \R$ with
+$\|f(x)\| \leq M$ for every $x \in \R$, and let $C, a, \rho \in \R$ with $C \geq 0$, $a \geq 0$
+and $0 \leq \rho \leq 2^{-a}$. Suppose that one of the following holds:
+\begin{enumerate}
+  \item $\|f(x) - f(y)\| \leq C \rho^n$ for every $n \in \N$, every $k \in \Z$ and all
+    $x, y \in [k/2^n, (k+1)/2^n]$;
+  \item $f$ is continuous, and $\|f(x + i) - f(y + i)\| \leq C \rho^n$ for every $n \in \N$,
+    every $i \in \Z$, every $k \in \N$ with $k < 2^n$ and all $x, y \in [k/2^n, (k+1)/2^n)$.
+\end{enumerate}
+Then there is a constant $K$ with $\|f(x) - f(y)\| \leq K |x - y|^a$ for all $x, y \in \R$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-closed-dyadic, lem:daub-dyadic-level}
+Condition~2 implies condition~1 by item~2 of \Cref{lem:daub-closed-dyadic}. Let $x < y$. If
+$y - x \leq 1$, choose $n$ with $2^{-(n+1)} < y - x \leq 2^{-n}$ (\Cref{lem:daub-dyadic-level});
+then $\|f(x) - f(y)\| \leq 2C\rho^n \leq 2C 2^a (y - x)^a$ by item~3 of
+\Cref{lem:daub-closed-dyadic} and \Cref{lem:daub-dyadic-level}. If $y - x > 1$, then
+$\|f(x) - f(y)\| \leq 2M \leq 2M (y - x)^a$. Take $K = 2C 2^a + 2M$.
+\end{proof}
+
+\paragraph{The H\"older exponent of D4.}
+For D4 the matrices of the refinement equation have the entries $(T_d)_{ij} = c_{2i + d - j}$,
+$i, j \in \{0, 1, 2\}$, with the filter coefficients of \Cref{prop:daub-d4-coeff}. On
+differences their rate is $\rho = (1 + \sqrt 3)/4 = 2^{-\alpha}$ with
+$\alpha = 2 - \log_2(1 + \sqrt 3)$.
+
+\begin{lemma}[The rate]
+\label{lem:daub-d4-rate}
+\lean{Daubechies.one_lt_sqrt_three, Daubechies.one_add_sqrt_three_div_four_le}
+\leanok
+$1 < \sqrt 3$, and $(1 + \sqrt 3)/4 \leq 2^{-a}$ for every real $a \leq 2 - \log_2(1 + \sqrt 3)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$1^2 < 3$, and $2^{\log_2(1 + \sqrt 3) - 2} = (1 + \sqrt 3)/4$.
+\end{proof}
+
+\begin{lemma}[The scaling function of D4]
+\label{lem:daub-d4-scaling}
+\lean{Daubechies.scalingFun_d4_eq_zero, Daubechies.scalingFun_d4_add_add_eq_one,
+  Daubechies.scalingFun_d4_refine}
+\leanok
+\uses{prop:daub-d4, def:daub-scaling-function}
+Let $\varphi$ be the scaling function of the mask D4, with filter coefficients
+$c_0, \dots, c_3$. Then $\varphi(x) = 0$ for every $x \notin (0, 3)$,
+$\varphi(x) + \varphi(x + 1) + \varphi(x + 2) = 1$ for every $x \in [0, 1)$, and for every
+$x \in \R$
+\[
+  \varphi(x) = c_0 \varphi(2x) + c_1 \varphi(2x - 1) + c_2 \varphi(2x - 2) + c_3 \varphi(2x - 3) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-scaling-support, cor:daub-partition-of-unity, thm:daub-refinement-equation}
+\Cref{thm:daub-scaling-support} with $2N - 1 = 3$; in the partition of unity
+(\Cref{cor:daub-partition-of-unity}) at $x \in [0, 1)$ only the terms $k = 0, -1, -2$ are
+nonzero; \Cref{thm:daub-refinement-equation} with $2N = 4$.
+\end{proof}
+
+\begin{lemma}[The refinement equation of D4 on the two halves]
+\label{lem:daub-d4-halves}
+\lean{Daubechies.scalingFun_d4_left, Daubechies.scalingFun_d4_add_one_left,
+  Daubechies.scalingFun_d4_add_two_left, Daubechies.scalingFun_d4_right,
+  Daubechies.scalingFun_d4_add_one_right, Daubechies.scalingFun_d4_add_two_right}
+\leanok
+\uses{prop:daub-d4, def:daub-scaling-function}
+Let $\varphi$ be the scaling function of D4, with filter coefficients $c_0, \dots, c_3$, and let
+$v(x) \in \C^3$ be the column vector with the entries $\varphi(x)$, $\varphi(x + 1)$,
+$\varphi(x + 2)$. Then
+\[
+  v(x) = T_0 \, v(2x) \ \text{ for } x \in [0, \tfrac12) , \qquad
+  v(x) = T_1 \, v(2x - 1) \ \text{ for } x \in [\tfrac12, 1) ,
+\]
+with the matrices
+\[
+  T_0 = \begin{pmatrix} c_0 & 0 & 0 \\ c_2 & c_1 & c_0 \\ 0 & c_3 & c_2 \end{pmatrix} , \qquad
+  T_1 = \begin{pmatrix} c_1 & c_0 & 0 \\ c_3 & c_2 & c_1 \\ 0 & 0 & c_3 \end{pmatrix} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-d4-scaling}
+Apply \Cref{lem:daub-d4-scaling} at $x$, $x + 1$ and $x + 2$; the terms $\varphi(2x + j)$ with
+$2x + j \notin (0, 3)$ vanish.
+\end{proof}
+
+Differences $v(x) - v(y)$ lie in the kernel of the functional $\ell_0 = (1, 1, 1)$, since
+$\ell_0(v(x)) = 1$ for $x \in [0, 1)$. The proof works with the scalar functions
+$A(x) = \varphi(x + 1) + 2 \varphi(x + 2)$ and $B(x) = \varphi(x) + A(x)$, the coordinates of
+$v(x)$ along eigenvectors of the matrices of Daubechies and Lagarias: for $x \in [0, 1)$,
+$v(x) = e + A(x) u + B(x) w$ with $e = (0, 2, -1)$, $u = (-1, 1, 0)$ and $w = (1, -2, 1)$, and
+$T_d w = \lambda_d w$, $T_d u = \frac12 u + \beta_d w$ with $\lambda_0 = \frac{1 + \sqrt 3}{4}$,
+$\lambda_1 = \beta_0 = \frac{1 - \sqrt 3}{4}$ and $\beta_1 = 0$.
+
+\begin{definition}[The coordinates $A$ and $B$]
+\label{def:daub-d4-coordinates}
+\lean{Daubechies.d4A, Daubechies.d4B}
+\leanok
+\uses{prop:daub-d4, def:daub-scaling-function}
+For the scaling function $\varphi$ of D4 and $x \in \R$ let
+\[
+  A(x) = \varphi(x + 1) + 2 \varphi(x + 2) \quad\text{and}\quad B(x) = \varphi(x) + A(x) .
+\]
+\end{definition}
+
+\begin{lemma}[The recursions of $A$ and $B$]
+\label{lem:daub-d4-recursions}
+\lean{Daubechies.d4A_left, Daubechies.d4A_right, Daubechies.d4B_left, Daubechies.d4B_right}
+\leanok
+\uses{def:daub-d4-coordinates}
+The functions $A$ and $B$ of D4 satisfy the following recursions.
+\begin{enumerate}
+  \item For every $x \in [0, \frac12)$, $A(x) = \frac12 A(2x) + \frac{3 - \sqrt 3}{4}$ and
+    $B(x) = \frac{3 - \sqrt 3}{4} + \frac{1 - \sqrt 3}{4} A(2x) + \frac{1 + \sqrt 3}{4} B(2x)$.
+  \item For every $x \in [\frac12, 1)$, $A(x) = \frac12 A(2x - 1) + \frac{1 - \sqrt 3}{4}$ and
+    $B(x) = \frac{3 + \sqrt 3}{4} + \frac{1 - \sqrt 3}{4} B(2x - 1)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-d4-halves, prop:daub-d4-coeff, lem:daub-d4-scaling}
+Insert \Cref{lem:daub-d4-halves} with the coefficients of \Cref{prop:daub-d4-coeff}. For
+$x \in [0, \frac12)$ and $u = 2x$, for instance,
+$A(x) = c_2 \varphi(u) + (c_1 + 2c_3) \varphi(u + 1) + (c_0 + 2c_2) \varphi(u + 2)$, whose
+coefficients are $\frac{3 - \sqrt 3}{4} + (0, \frac12, 1)$, and
+$\varphi(u) + \varphi(u + 1) + \varphi(u + 2) = 1$ (\Cref{lem:daub-d4-scaling}) turns the first
+part into the constant $\frac{3 - \sqrt 3}{4}$. The other three identities are the same
+computation.
+\end{proof}
+
+In matrix terms, the recursions of $A$ say that the functional $\ell_1 = (0, 1, 2)$ satisfies
+$\ell_1 T_d = \frac12 \ell_1 + \frac{\mu - d}{2} \ell_0$, where $\mu = \frac{3 - \sqrt 3}{2}$ is
+the first moment of D4 (\Cref{prop:daub-first-moments}).
+
+\begin{lemma}[The recursions for differences]
+\label{lem:daub-d4-difference-recursions}
+\lean{Daubechies.norm_d4A_sub_le, Daubechies.norm_d4B_sub_le}
+\leanok
+\uses{def:daub-d4-coordinates}
+For every $d \in \{0, 1\}$ and all $x, y \in [d/2, (d+1)/2)$, with $x' = 2x - d$ and
+$y' = 2y - d$,
+\[
+  |A(x) - A(y)| \leq \tfrac12 \, |A(x') - A(y')|
+\]
+and
+\[
+  |B(x) - B(y)| \leq \frac{\sqrt 3 - 1}{4} \, |A(x') - A(y')|
+    + \frac{1 + \sqrt 3}{4} \, |B(x') - B(y')| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-d4-recursions, lem:daub-d4-rate}
+The constants of \Cref{lem:daub-d4-recursions} cancel in the differences, and the first bound
+holds with equality. For $d = 0$ the triangle inequality gives the second bound, with
+$|1 - \sqrt 3|/4 = (\sqrt 3 - 1)/4$; for $d = 1$, $|1 - \sqrt 3|/4 \leq (1 + \sqrt 3)/4$. Both
+use $\sqrt 3 > 1$ (\Cref{lem:daub-d4-rate}).
+\end{proof}
+
+\begin{lemma}[From $A$ and $B$ back to $\varphi$]
+\label{lem:daub-d4-back}
+\lean{Daubechies.scalingFun_d4_eq_d4B_sub_d4A, Daubechies.scalingFun_d4_add_two_eq,
+  Daubechies.scalingFun_d4_add_one_eq, Daubechies.scalingFun_d4_add_int_eq_zero,
+  Daubechies.norm_scalingFun_d4_sub_le}
+\leanok
+\uses{def:daub-d4-coordinates}
+For every $x \in \R$, $\varphi(x) = B(x) - A(x)$. For every $x \in [0, 1)$,
+\[
+  \varphi(x + 1) = A(x) - 2 \bigl(B(x) - 1\bigr) \quad\text{and}\quad
+  \varphi(x + 2) = B(x) - 1 ,
+\]
+and $\varphi(x + i) = 0$ for every $i \in \Z \setminus \{0, 1, 2\}$. Hence for all
+$x, y \in [0, 1)$ and every $i \in \Z$,
+\[
+  |\varphi(x + i) - \varphi(y + i)| \leq |A(x) - A(y)| + 2 \, |B(x) - B(y)| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-d4-scaling}
+The definition of $B$, the identity $\varphi(x) + \varphi(x + 1) + \varphi(x + 2) = 1$ and the
+support of $\varphi$ (\Cref{lem:daub-d4-scaling}). The bound follows by the triangle inequality,
+case by case.
+\end{proof}
+
+\begin{lemma}[Bounds for $A$ and $B$]
+\label{lem:daub-d4-coordinate-bounds}
+\lean{Daubechies.norm_d4A_le, Daubechies.norm_d4B_le, Daubechies.norm_d4A_sub_d4A_le,
+  Daubechies.norm_d4B_sub_d4B_le}
+\leanok
+\uses{def:daub-d4-coordinates}
+Let $M \in \R$ with $|\varphi(x)| \leq M$ for every $x \in \R$, where $\varphi$ is the scaling
+function of D4. Then for all $x, y \in \R$,
+\[
+  |A(x)| \leq 3M , \quad |B(x)| \leq 4M , \quad |A(x) - A(y)| \leq 6M , \quad
+  |B(x) - B(y)| \leq 8M .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The triangle inequality.
+\end{proof}
+
+\begin{proposition}[Oscillation of D4 on dyadic intervals]
+\label{prop:daub-d4-oscillation}
+\lean{Daubechies.norm_scalingFun_d4_sub_le_dyadic}
+\leanok
+\uses{prop:daub-d4, def:daub-scaling-function}
+Let $\varphi$ be the scaling function of D4, let $M \in \R$ with $|\varphi(x)| \leq M$ for every
+$x \in \R$, and let $\rho = (1 + \sqrt 3)/4$. For all $n, k \in \N$ with $k < 2^n$, every
+$i \in \Z$ and all $x, y \in [k/2^n, (k+1)/2^n)$,
+\[
+  |\varphi(x + i) - \varphi(y + i)| \leq 28 M \rho^n .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-d4-difference-recursions, lem:daub-d4-coordinate-bounds,
+  lem:daub-descent-halving, lem:daub-descent-triangular, lem:daub-d4-rate,
+  lem:daub-dyadic-intervals, lem:daub-d4-back}
+By \Cref{lem:daub-d4-difference-recursions,lem:daub-d4-coordinate-bounds},
+\Cref{lem:daub-descent-halving} applies to $A$ with $E_A = 6M$ and gives
+$|A(x) - A(y)| \leq 6M/2^n$, and \Cref{lem:daub-descent-triangular} applies to $B$ with
+$\beta = \rho - \frac12 = (\sqrt 3 - 1)/4 \geq 0$ (\Cref{lem:daub-d4-rate}), $E_B = 8M$ and
+$C = 6M$, and gives $|B(x) - B(y)| \leq 14 M \rho^n - 6M/2^n$. The points lie in $[0, 1)$
+(\Cref{lem:daub-dyadic-intervals}), so by \Cref{lem:daub-d4-back}
+$|\varphi(x + i) - \varphi(y + i)| \leq 6M/2^n + 2 (14 M \rho^n - 6M/2^n) \leq 28 M \rho^n$.
+\end{proof}
+
+\begin{theorem}[The H\"older exponent of D4]
+\label{thm:daub-holder-d4}
+\lean{Daubechies.holder_d4}
+\leanok
+\uses{prop:daub-d4, def:daub-scaling-function}
+Let $\varphi$ be the scaling function of D4. For every real $a$ with
+$0 \leq a \leq 2 - \log_2(1 + \sqrt 3)$ there is a constant $K$ with
+\[
+  |\varphi(x) - \varphi(y)| \leq K |x - y|^a \quad\text{for all } x, y \in \R .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{prop:daub-scaling-continuous, prop:daub-d4-oscillation, prop:daub-holder-from-dyadic,
+  lem:daub-d4-rate}
+$\varphi$ is continuous and bounded by $M = \int_\R |\Phi|$
+(\Cref{prop:daub-scaling-continuous}). By \Cref{prop:daub-d4-oscillation}, condition~2 of
+\Cref{prop:daub-holder-from-dyadic} holds with $C = 28M$ and $\rho = (1 + \sqrt 3)/4 \leq 2^{-a}$
+(\Cref{lem:daub-d4-rate}).
+\end{proof}
+
+\begin{proposition}[The value of the exponent]
+\label{prop:daub-d4-exponent-value}
+\lean{Daubechies.one_add_sqrt_three_pow_twenty,
+  Daubechies.two_sub_logb_two_one_add_sqrt_three_gt}
+\leanok
+$(1 + \sqrt 3)^{20} = 268377088 + 154947584 \sqrt 3$, and $2 - \log_2(1 + \sqrt 3) > 0.55$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+Repeated squaring with $(\sqrt 3)^2 = 3$ gives $(1 + \sqrt 3)^2 = 4 + 2 \sqrt 3$,
+$(1 + \sqrt 3)^4 = 28 + 16 \sqrt 3$, $(1 + \sqrt 3)^8 = 1552 + 896 \sqrt 3$ and
+$(1 + \sqrt 3)^{16} = 4817152 + 2781184 \sqrt 3$. The inequality says
+$(1 + \sqrt 3)^{20} < 2^{29} = 536870912$, that is $154947584 \sqrt 3 < 268493824$, which holds
+since $\sqrt 3 < 1.7321$.
+\end{proof}
+
+The exponent $2 - \log_2(1 + \sqrt 3) \approx 0.5500$ is the H\"older exponent of D4:
+\Cref{thm:daub-holder-d4} gives the lower bound, and Daubechies and
+Lagarias~\cite{DaubechiesLagarias} show that it is sharp. Guglielmi and
+Protasov~\cite{GuglielmiProtasov} compute such exponents for higher orders $N$.
+
 \section{Masks of every order}
 
 The masks of every order come from the Fej\'er--Riesz theorem, as in~\cite{Daubechies}: a real
