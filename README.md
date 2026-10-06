@@ -2,7 +2,7 @@
 
 A Lean 4 / Mathlib formalisation of **Besov and Sobolev spaces** on several domains, their
 equivalent **characterisations** and their **embedding theorems**, built on the theory of
-**approximation spaces**. The project is work in progress; the details are in seven documents
+**approximation spaces**. The project is work in progress; the details are in eight documents
 under [`docs/`](docs/), listed under [What is formalised](#what-is-formalised).
 
 * **Blueprint** (a webpage explaining the mathematics):
@@ -137,6 +137,24 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
   (`Haar.memApprox_iff_haarCoeff`).
 
+**Daubechies wavelets** ([details](docs/Daubechies.md))
+
+* **Daubechies wavelets and Besov spaces.** For a mask of order `N ≥ 2` with filter
+  coefficients `c_k`, a real polynomial `L` of degree `< N` with `L(1) = 1` and
+  `|L(e^(-2πiξ))|² = ∑_{k<N} C(N-1+k, k) sin^(2k)(πξ)`, which exists by the Fejér–Riesz theorem
+  (`Daubechies.nonempty_mask_iff`, `Polynomial.fejer_riesz`), the scaling function `φ` is
+  continuous, vanishes outside `[0, 2N - 1]`, satisfies `φ(x) = ∑_k c_k φ(2x - k)` and has
+  orthonormal integer translates (`Daubechies.scalingFun_eq_zero`,
+  `Daubechies.scalingFun_refine`, `Daubechies.integral_scalingFun_translate_mul_conj_translate`).
+  Let `ψ` be the wavelet and `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`. If `ω_N(φ, t)_p ≤ K t^θ` and `0 < s < θ`,
+  then `f ∈ L_p(ℝ)` lies in `B^s_{p,q}(ℝ)` iff
+  `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s+1/2-1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
+  (`Daubechies.besov_iff_coeff`). The bound holds for `p ≤ 2` and every
+  `θ < N - log₄ λ` whenever the transfer operator satisfies `T^n 1 ≤ C λ^n`
+  (`Daubechies.besov_iff_coeff_of_le_two`); `λ = 4` for `N = 2` and `λ = 9` for `N = 3`, the
+  Sobolev exponents `1` and `3 - log₂ 3`. The scaling function of D4 is Hölder continuous of
+  every order `a ≤ 2 - log₂(1 + √3) ≈ 0.55` (`Daubechies.holder_d4`).
+
 **Function spaces on `ℝ^d`** ([details](docs/Rd.md))
 
 * **Besov spaces on `ℝ^d` by differences.** Let `V` be a finite-dimensional real inner product
@@ -204,6 +222,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Besov and Sobolev spaces on measure spaces**](docs/BesovSobolev.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, spectral schemes, eigenbases | ✅ | ✗ |
 | [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness for all `p`, weak derivatives, traces | ✅ | ✗ |
 | [**Intervals, the cube, splines and wavelets**](docs/IntervalCube.md): piecewise polynomials and splines on `[0, 1]`, the circle and `[0, 1]^d`, Whitney's inequality, coordinate and isotropic moduli, multiwavelets, the Haar system | ✅ | ✗ |
+| [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
 | [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
 | [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
@@ -222,7 +241,8 @@ setting. The blocks map onto the folders as follows: approximation spaces are al
 `ApproximationSpaces/`; Besov and Sobolev spaces on measure spaces are
 `FunctionSpaces/{Lp,Scheme,Besov,Sobolev,Spectral}`; the torus is `FunctionSpaces/Torus/` with
 the torus traces in `FunctionSpaces/Traces/`; intervals, the cube, splines and wavelets are
-`FunctionSpaces/{Interval,Cube,Wavelets}` and `FunctionSpaces/TranslationAlgebra.lean`; function
+`FunctionSpaces/{Interval,Cube,Wavelets}` without `FunctionSpaces/Wavelets/Daubechies/`, which
+holds the Daubechies wavelets, and `FunctionSpaces/TranslationAlgebra.lean`; function
 spaces on `ℝ^d`, domains and traces, and mixed smoothness share `FunctionSpaces/Rd/`, with the
 manifolds in `FunctionSpaces/Manifold/`. Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
@@ -236,8 +256,8 @@ manifolds in `FunctionSpaces/Manifold/`. Each block document lists its files.
   elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.
 * **Sobolev spaces for all `p`**: weak derivatives in `L_p` and the coincidence theorems of
   Triebel's school.
-* **Higher smoothness**: splines on domains, and compactly supported wavelets such as
-  Daubechies'.
+* **Higher smoothness**: splines on domains; for the Daubechies wavelets the sharp `L_p`
+  exponents of the scaling functions, Hölder exponents beyond D4, and `ℝ^d`.
 * **The quasi-Banach range** `0 < p, q < 1`, the setting of nonlinear `n`-term approximation.
 
 ## Building
@@ -286,11 +306,19 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * J. Bergh, J. Löfström, *Interpolation Spaces. An Introduction*, Grundlehren der
   mathematischen Wissenschaften **223**, Springer-Verlag, 1976. Real interpolation and the
   K-functional.
+* I. Daubechies, *Ten Lectures on Wavelets*, CBMS-NSF Regional Conference Series in Applied
+  Mathematics **61**, SIAM, 1992. The construction of the compactly supported wavelets and the
+  cascade algorithm.
+* I. Daubechies, J. C. Lagarias, *Two-scale difference equations. II. Local regularity,
+  infinite products of matrices and fractals*, SIAM J. Math. Anal. **23** (1992), no. 4,
+  1031–1079. The matrix method for the Hölder exponent.
 * R. A. DeVore, G. G. Lorentz, *Constructive Approximation*, Grundlehren der
   mathematischen Wissenschaften **303**, Springer-Verlag, 1993. Chapter 7: approximation
   spaces, Jackson and Bernstein inequalities, and their relation to interpolation.
 * R. A. DeVore, R. C. Sharpley, *Besov spaces on domains in ℝ^d*, Trans. Amer. Math. Soc.
   **335** (1993), no. 2, 843–864. The modulus of smoothness on a domain.
+* T. Eirola, *Sobolev characterization of solutions of dilation equations*, SIAM J. Math.
+  Anal. **23** (1992), no. 4, 1015–1030. The transfer operator and the Sobolev exponent.
 * S. M. Nikol'skii, *Approximation of Functions of Several Variables and Imbedding
   Theorems*, Grundlehren der mathematischen Wissenschaften **205**, Springer-Verlag, 1975.
   The Nikolskii inequality and the embedding theorems it yields.
@@ -310,5 +338,8 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * T. Ullrich, *Function spaces with dominating mixed smoothness; characterization by
   differences*, Jenaer Schriften zur Mathematik und Informatik Math/Inf/05/06, 2006. Mixed
   differences and mixed local means.
+* L. F. Villemoes, *Energy moments in time and frequency for two-scale difference equation
+  solutions and wavelets*, SIAM J. Math. Anal. **23** (1992), no. 6, 1519–1543. The transfer
+  operator and the Sobolev exponent.
 * J. Vybíral, *Function spaces with dominating mixed smoothness*, Dissertationes Math. **436**
   (2006). Tensor Littlewood–Paley decompositions of spaces of dominating mixed smoothness.
