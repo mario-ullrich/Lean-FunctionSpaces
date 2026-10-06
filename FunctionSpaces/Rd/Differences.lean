@@ -19,7 +19,9 @@ For `f : V → ℂ`, a step `h ∈ V` and `r ∈ ℕ`, the **difference** of ord
 `Rd.higherDiff r h f` on every additive monoid.  The statements on `V` use the iterate
 `(fwdDiff h)^[r] f` itself, for which Mathlib has its lemmas; the files on intervals and cubes use
 the name.  Expanded, `Δ_h^r f(x) = ∑_{l ≤ r} (-1)^(r-l) C(r, l) f(x + l h)`
-(`Rd.higherDiff_apply`), and a negative step reflects the difference:
+(`Rd.higherDiff_apply`); hence `|Δ_h^r f(x)| ≤ ∑_{l ≤ r} C(r, l) |f(x + l h)|`
+(`Rd.enorm_higherDiff_le_sum`), and `(x, h) ↦ |Δ_h^r f(x)|` is measurable for measurable `f`
+(`Rd.measurable_enorm_higherDiff_uncurry`). A negative step reflects the difference:
 `Δ_{-h}^r f(x) = (-1)^r Δ_h^r f(x - r h)` (`Rd.higherDiff_neg`). For a Haar
 measure `μ` the **modulus of smoothness** in `L_p(μ)` is
 `ω_r(f, t)_p = sup_{‖h‖ ≤ t} ‖Δ_h^r f‖_p` (`Rd.modulus`). It increases in `t`, is subadditive in
@@ -132,23 +134,37 @@ theorem fwdDiff_nsmul (m : ℕ) (h : V) (f : V → ℂ) :
     ring
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
-/-- `|Δ_h^r f| ≤ 2^r B` for `|f| ≤ B`. -/
+/-- `|Δ_h^r f(x)| ≤ ∑_{l ≤ r} C(r, l) |f(x + l h)|`, from the expansion of the difference. -/
+theorem enorm_higherDiff_le_sum (r : ℕ) (h : V) (f : V → ℂ) (x : V) :
+    ‖(fwdDiff h)^[r] f x‖ₑ ≤
+      ∑ l ∈ Finset.range (r + 1), (r.choose l : ℝ≥0∞) * ‖f (x + (l : ℝ) • h)‖ₑ := by
+  rw [higherDiff_apply]
+  refine (enorm_sum_le _ _).trans (Finset.sum_le_sum fun l _ => le_of_eq ?_)
+  rw [enorm_mul, enorm_mul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul,
+    ← ofReal_norm, Complex.norm_natCast, ENNReal.ofReal_natCast]
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- `|Δ_h^r f| ≤ 2^r B` for `|f| ≤ B`: the binomial weights of `Rd.enorm_higherDiff_le_sum` sum
+to `2^r` (Mathlib's `Nat.sum_range_choose`). -/
 theorem enorm_higherDiff_le_of_bound {f : V → ℂ} {B : ℝ≥0∞}
     (hf : ∀ y, ‖f y‖ₑ ≤ B) (r : ℕ) (h x : V) : ‖(fwdDiff h)^[r] f x‖ₑ ≤ 2 ^ r * B := by
-  rw [higherDiff_apply]
-  calc ‖∑ l ∈ Finset.range (r + 1), ((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) *
-        f (x + (l : ℝ) • h)‖ₑ
-      ≤ ∑ l ∈ Finset.range (r + 1), ‖((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) *
-          f (x + (l : ℝ) • h)‖ₑ := enorm_sum_le _ _
-    _ ≤ ∑ l ∈ Finset.range (r + 1), (r.choose l : ℝ≥0∞) * B := by
-        refine Finset.sum_le_sum fun l _ => ?_
-        rw [enorm_mul, enorm_mul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul,
-          ← ofReal_norm, Complex.norm_natCast, ENNReal.ofReal_natCast]
-        exact mul_le_mul' le_rfl (hf _)
-    _ = 2 ^ r * B := by
-        rw [← Finset.sum_mul]
-        congr 1
-        exact_mod_cast Nat.sum_range_choose r
+  refine (enorm_higherDiff_le_sum r h f x).trans
+    ((Finset.sum_le_sum fun l _ => mul_le_mul' le_rfl (hf _)).trans_eq ?_)
+  rw [← Finset.sum_mul]
+  congr 1
+  exact_mod_cast Nat.sum_range_choose r
+
+/-- For measurable `f` the differences `(x, h) ↦ |Δ_h^r f(x)|` are jointly measurable, by the
+expansion `Δ_h^r f(x) = ∑_{l ≤ r} (-1)^(r-l) C(r, l) f(x + l h)`. -/
+theorem measurable_enorm_higherDiff_uncurry {f : V → ℂ} (hf : Measurable f) (r : ℕ) :
+    Measurable fun z : V × V => ‖(fwdDiff z.2)^[r] f z.1‖ₑ := by
+  have heq : (fun z : V × V => (fwdDiff z.2)^[r] f z.1) = fun z =>
+      ∑ l ∈ Finset.range (r + 1), ((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) *
+        f (z.1 + (l : ℝ) • z.2) := funext fun z => higherDiff_apply r z.2 f z.1
+  refine Measurable.enorm ?_
+  rw [heq]
+  exact Finset.measurable_sum _ fun l _ => measurable_const.mul
+    (hf.comp (measurable_fst.add (measurable_snd.const_smul _)))
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- Translates of a.e. strongly measurable functions are a.e. strongly measurable. -/

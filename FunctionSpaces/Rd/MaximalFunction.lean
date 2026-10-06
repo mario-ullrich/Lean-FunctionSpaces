@@ -195,11 +195,12 @@ theorem measurable_maximal (g : V → ℝ≥0∞) : Measurable (maximal g) :=
 
 /-! ### Kernels with radial majorants -/
 
-/-- **Kernels bounded by a ball.** If `0 ≤ K ≤ A 1_{B(0,ρ)}`, then
-`∫ K(y) g(x - y) dy ≤ A |B(0,ρ)| M g(x)` for every `g : V → [0, ∞]` and every kernel `K`. -/
-theorem lintegral_mul_le_maximal_of_ball {K : V → ℝ≥0∞} {A : ℝ≥0∞} {ρ : ℝ} (hA : A ≠ ∞)
-    (hK : ∀ y, K y ≤ A * (ball (0 : V) ρ).indicator 1 y) (hρ : 0 < ρ) (g : V → ℝ≥0∞) (x : V) :
-    ∫⁻ y, K y * g (x - y) ≤ A * volume (ball (0 : V) ρ) * maximal g x := by
+/-- **Kernels bounded by a ball, before the maximal function**: if `0 ≤ K ≤ A 1_{B(0,ρ)}`
+with `A < ∞`, then `∫ K(y) g(x - y) dy ≤ A ∫_{B(x,ρ)} g` for every `g : V → [0, ∞]`, by the
+translation invariance of the Lebesgue measure. -/
+theorem lintegral_mul_le_setLIntegral_ball {K : V → ℝ≥0∞} {A : ℝ≥0∞} {ρ : ℝ} (hA : A ≠ ∞)
+    (hK : ∀ y, K y ≤ A * (ball (0 : V) ρ).indicator 1 y) (g : V → ℝ≥0∞) (x : V) :
+    ∫⁻ y, K y * g (x - y) ≤ A * ∫⁻ y in ball x ρ, g y := by
   have hpt : ∀ y, K y * g (x - y) ≤ A * (ball x ρ).indicator g (x - y) := fun y => by
     by_cases hy : y ∈ ball (0 : V) ρ
     · have hxy : x - y ∈ ball x ρ := by
@@ -216,9 +217,15 @@ theorem lintegral_mul_le_maximal_of_ball {K : V → ℝ≥0∞} {A : ℝ≥0∞}
       rw [lintegral_const_mul' A _ hA,
         lintegral_sub_left_eq_self (fun z => (ball x ρ).indicator g z) x,
         lintegral_indicator measurableSet_ball]
-    _ ≤ A * (volume (ball (0 : V) ρ) * maximal g x) := by
-      gcongr; exact setLIntegral_ball_le_mul_maximal hρ g x
-    _ = A * volume (ball (0 : V) ρ) * maximal g x := (mul_assoc _ _ _).symm
+
+/-- **Kernels bounded by a ball.** If `0 ≤ K ≤ A 1_{B(0,ρ)}`, then
+`∫ K(y) g(x - y) dy ≤ A |B(0,ρ)| M g(x)` for every `g : V → [0, ∞]` and every kernel `K`
+(`Rd.lintegral_mul_le_setLIntegral_ball` and the definition of `M g`). -/
+theorem lintegral_mul_le_maximal_of_ball {K : V → ℝ≥0∞} {A : ℝ≥0∞} {ρ : ℝ} (hA : A ≠ ∞)
+    (hK : ∀ y, K y ≤ A * (ball (0 : V) ρ).indicator 1 y) (hρ : 0 < ρ) (g : V → ℝ≥0∞) (x : V) :
+    ∫⁻ y, K y * g (x - y) ≤ A * volume (ball (0 : V) ρ) * maximal g x :=
+  (lintegral_mul_le_setLIntegral_ball hA hK g x).trans (by
+    rw [mul_assoc]; gcongr; exact setLIntegral_ball_le_mul_maximal hρ g x)
 
 /-- The dyadic **shell** `{y : ‖y‖ < 2^(i+1) ρ}` for `i = 0` and
 `{y : 2^i ρ ≤ ‖y‖ < 2^(i+1) ρ}` for `i ≥ 1`. -/

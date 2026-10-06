@@ -6020,7 +6020,8 @@ $\omega_r(f, t)_p = \sup_{\|h\| \leq t} \|\Delta_h^r f\|_p$.
 \lean{Rd.higherDiff_comp_add, Rd.fwdDiff_nsmul, Rd.aestronglyMeasurable_comp_add,
   Rd.eLpNorm_comp_add_right, Rd.ae_comp_add_right, Rd.aestronglyMeasurable_higherDiff,
   Rd.higherDiff_congr_ae, Rd.eLpNorm_higherDiff_le, Rd.integrable_higherDiff, Rd.conv_comp_add,
-  Rd.higherDiff_conv_ae, Rd.higherDiff_dilate, Rd.higherDiff_neg}
+  Rd.higherDiff_conv_ae, Rd.higherDiff_dilate, Rd.higherDiff_neg,
+  Rd.measurable_enorm_higherDiff_uncurry}
 \leanok
 \uses{def:rd-modulus, lem:conv-assoc, lem:dilate}
 Let $1 \leq p < \infty$, $f \in L_p$, $K \in L_1$, $\Phi : V \to \C$, $h, c \in V$, $m, r \in \N$
@@ -6032,7 +6033,9 @@ and $\lambda > 0$. Then:
   \item $\Delta_h^r K$ is integrable, and $\Delta_h^r (K * f) = (\Delta_h^r K) * f$ almost
     everywhere;
   \item $\Delta_h^r (\Phi_\lambda) = (\Delta_{\lambda h}^r \Phi)_\lambda$;
-  \item $\Delta_{-h}^r f(x) = (-1)^r \Delta_h^r f(x - r h)$ for every $x \in V$.
+  \item $\Delta_{-h}^r f(x) = (-1)^r \Delta_h^r f(x - r h)$ for every $x \in V$;
+  \item for every measurable $u : V \to \C$, $(x, v) \mapsto |\Delta_v^r u(x)|$ is measurable on
+    $V \times V$.
 \end{enumerate}
 \end{lemma}
 
@@ -6041,7 +6044,8 @@ and $\lambda > 0$. Then:
 Parts (1) and (4) follow by induction on $r$, and (2) holds since translations preserve Lebesgue
 measure. For (3), $(K * f)(x + c) = (K(\cdot + c) * f)(x)$ by the substitution $y \mapsto y + c$,
 and \Cref{lem:conv-assoc} gives the linearity in the kernel. Part (5) reflects the sum of
-\Cref{def:rd-modulus} at $l \mapsto r - l$, with $(-1)^r (-1)^{r-l} = (-1)^l$.
+\Cref{def:rd-modulus} at $l \mapsto r - l$, with $(-1)^r (-1)^{r-l} = (-1)^l$, and in (6) that
+sum is a finite sum of measurable functions of $(x, v)$.
 \end{proof}
 
 \begin{lemma}[Properties of the modulus]
@@ -7355,7 +7359,7 @@ Countable additivity of the integral, and \Cref{lem:dyadic-cells}.
 \label{lem:conv-pointwise}
 \lean{Rd.lintegral_closedBall_le, Rd.lintegral_kernel_mul_le, Rd.enorm_conv_le_of_bound,
   Rd.integrable_translate_mul_of_locallyIntegrable, Rd.conv_add_apply, Rd.higherDiff_conv_apply,
-  Rd.enorm_higherDiff_le_of_bound}
+  Rd.enorm_higherDiff_le_sum, Rd.enorm_higherDiff_le_of_bound}
 \leanok
 \uses{def:conv}
 Let $1 \leq p < \infty$, $g \in L_p$, and $|K| \leq A$ with $K = 0$ outside $\overline{B}(0, \rho)$.
@@ -7365,7 +7369,9 @@ Then $\int_{\overline{B}(x, \rho)} |g| \leq |\overline{B}(x, \rho)|^{1 - 1/p} \|
 \]
 For a continuous $K$ with compact support the integrals $\int K(y + v) g(x - y) \, dy$ converge
 absolutely, they equal $(K * g)(x + v)$, and $\Delta_h^r (K * g) = (\Delta_h^r K) * g$ at every point.
-If $|f| \leq B$, then $|\Delta_h^r f| \leq 2^r B$.
+For every $f : V \to \C$ and all $h, x \in V$,
+$|\Delta_h^r f(x)| \leq \sum_{l \leq r} \binom{r}{l} |f(x + l h)|$, and if $|f| \leq B$, then
+$|\Delta_h^r f| \leq 2^r B$.
 \end{lemma}
 
 \begin{proof}
@@ -9618,7 +9624,8 @@ The lemma holds for every $g$; the measurability comes from the open balls.
 
 \begin{lemma}[Convolutions with kernels under radial majorants]
 \label{lem:maximal-function-kernels}
-\lean{Rd.lintegral_mul_le_maximal_of_ball, Rd.dyadicShell, Rd.measurableSet_dyadicShell,
+\lean{Rd.lintegral_mul_le_setLIntegral_ball, Rd.lintegral_mul_le_maximal_of_ball, Rd.dyadicShell,
+  Rd.measurableSet_dyadicShell,
   Rd.iUnion_dyadicShell, Rd.kernel_le_of_mem_dyadicShell, Rd.volume_ball_two_pow_mul,
   Rd.tsum_two_inv_pow_mul_two_pow, Rd.lintegral_mul_le_maximal_of_decay, Rd.decayMaximalConst,
   Rd.decayMaximalConst_ne_top, Rd.inv_one_add_two_pow_mul_pow_le,
@@ -9630,7 +9637,7 @@ $C_{n,N} = |B(0, 1)| \, c_{n,N}$. For every $K : V \to [0, \infty]$, every
 $g : V \to [0, \infty]$, every $x \in V$, every $A \in [0, \infty)$ and every $\rho > 0$:
 \begin{enumerate}
   \item if $K \leq A \mathbf 1_{B(0, \rho)}$, then
-    $\int K(y) g(x - y) \, dy \leq A \, |B(0, \rho)| \, M g(x)$;
+    $\int K(y) g(x - y) \, dy \leq A \int_{B(x, \rho)} g \leq A \, |B(0, \rho)| \, M g(x)$;
   \item if $N > n$ is an integer, $K(y) \leq A$ for $\|y\| \leq \rho$ and
     $K(y) \leq A (\rho / \|y\|)^N$ for $\|y\| > \rho$, then
     $\int K(y) g(x - y) \, dy \leq c_{n,N} \, A \, |B(0, \rho)| \, M g(x)$;
@@ -11284,6 +11291,304 @@ Both bounds are \Cref{lem:torus-tl-local-means-lq}, with $L' = L_s$ for the seco
 \Cref{lem:torus-maximal-bounds-mixed-norm} for the families $2^{is} |\psi_i * f|$ and
 $2^{is} |k_i * f|$; the constants are finite as in \Cref{thm:tl-local-means}, and
 $C^{\T}_{p,q} < \infty$ by \Cref{thm:fefferman-stein-periodic}.
+\end{proof}
+
+\section{Ball means of differences}
+
+This section describes $F^s_{p,q}$ on $V$ by ball means of differences, in the range
+$1 < p < \infty$, $1 < q \leq \infty$, $0 < s < L$. As in the previous sections, $g$ is a bump of
+radius $R$, $m$ its moment kernel of order $L$, $k_j$ and $\eta_j$ are the local means kernels and
+the dual kernels, $A_{L,K}$ are the constants of \Cref{lem:dual-kernel-derivatives}, and
+$c^L_{ji} = 2^{-(j-i)L}$ for $i \leq j$, $c^L_{ji} = 1$ for $i > j$. Let $r = \lceil R \rceil$,
+the least natural number at least $R \geq 0$, so that $R < 2^r$, and $B_j = B(0, 2^{-j})$. Local
+means are differences of averaged differences, so they are bounded by ball means; conversely the
+differences of $\eta_i * u$ are bounded by the maximal function of $u$, and the reproducing
+formula, the almost diagonal estimate and the Fefferman--Stein inequality finish as for local
+means.
+
+\begin{definition}[Ball means of differences]
+\label{def:ball-means-differences}
+\lean{Rd.ballMeanDiff, Rd.one_div_two_pow_pos, Rd.volume_ball_mul_one_div_two_pow,
+  Rd.two_pow_mul_volume_ball_one_div, Rd.setLIntegral_eq_mul_ballMeanDiff, Rd.tlDiffNorm,
+  Rd.measurable_lqNorm_ballMeanDiff}
+\leanok
+\uses{def:rd-modulus, def:lq-norm, lem:lq-norm-means}
+For $f : V \to \C$, $L, j \in \N$ and $x \in V$ the ball mean of differences of order $L$ at
+level $j$ is
+\[
+  d_j f(x) = \frac{1}{|B_j|} \int_{B_j} |\Delta^L_h f(x)| \, dh \in [0, \infty] .
+\]
+For every $c > 0$ and $j \in \N$, $|B(0, c 2^{-j})| = c^n |B_j|$ and $2^{jn} |B_j| = |B(0,1)|$.
+Let $1 \leq p < \infty$, $s \in \R$ and $1 \leq q \leq \infty$. For $f \in L_p$ the ball means
+quasi-norm of Triebel--Lizorkin type is
+\[
+  \|f\|^{L}_{F^s_{p,q}, \Delta} = \|f\|_p + \Bigl\| x \mapsto \bigl\| (2^{js} d_j f(x))_{j \in \N}
+  \bigr\|_{\ell_q} \Bigr\|_{L_p},
+\]
+and $x \mapsto \|(2^{js} d_j f(x))_j\|_{\ell_q}$ is measurable.
+\end{definition}
+
+\begin{lemma}[Elementary properties of ball means]
+\label{lem:ball-means-basic}
+\lean{Rd.ballMeanDiff_le_of_forall, Rd.ballMeanDiff_level_add_le,
+  Rd.measurable_enorm_higherDiff_step,
+  Rd.measurable_ballMeanDiff, Rd.ballMeanDiff_congr_ae, Rd.ballMeanDiff_add_le,
+  Rd.ballMeanDiff_zero, Rd.ballMeanDiff_finsetSum_le}
+\leanok
+\uses{def:ball-means-differences, lem:rd-differences}
+For all $f, f' : V \to \C$, all $L, j, k \in \N$, every $x \in V$ and every $c \in [0, \infty]$:
+\begin{enumerate}
+  \item if $|\Delta^L_h f(x)| \leq c$ for every $h \in B_j$, then $d_j f(x) \leq c$;
+  \item $d_{j+k} f(x) \leq 2^{kn} d_j f(x)$;
+  \item if $f$ is measurable, then $h \mapsto |\Delta^L_h f(x)|$ and $d_j f$ are measurable;
+  \item if $f = f'$ almost everywhere, then $d_j f = d_j f'$ almost everywhere;
+  \item if $f$ is measurable, then $d_j(f + f')(x) \leq d_j f(x) + d_j f'(x)$, and
+    $d_j \bigl(\sum_{i \in S} f_i\bigr)(x) \leq \sum_{i \in S} d_j f_i(x)$ for every finite
+    family of measurable $f_i : V \to \C$; $d_j 0 = 0$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) is the mean of a bounded function, and (2) holds since $B_{j+k} \subseteq B_j$ and
+$|B_j| = 2^{kn} |B_{j+k}|$. (3) The function $(x, h) \mapsto |\Delta^L_h f(x)|$ is jointly
+measurable (\Cref{lem:rd-differences}), and Tonelli's theorem gives the measurability of
+$d_j f$. (4) At a point $x$ with
+$f(x) = f'(x)$ the values $f(x + l h)$ and $f'(x + l h)$, $1 \leq l \leq L$, agree for almost
+every $h$, since $h \mapsto x + l h$ maps null sets to null sets. (5) The triangle inequality
+and the additivity of the integral, which needs one measurable summand; finite sums by
+induction.
+\end{proof}
+
+\begin{lemma}[Ball means in $L_p$]
+\label{lem:ball-means-lp}
+\lean{Rd.ballMeanDiff_rpow_le, Rd.eLpNorm_ballMeanDiff_le_of_measurable,
+  Rd.eLpNorm_ballMeanDiff_le}
+\leanok
+\uses{lem:ball-means-basic, lem:weighted-jensen, lem:rd-differences, lem:lp-norm-nonnegative}
+For every measurable $f : V \to \C$, all $L, j \in \N$, every $P \geq 1$ and every $x \in V$,
+$(d_j f(x))^P \leq |B_j|^{-1} \int_{B_j} |\Delta^L_h f(x)|^P \, dh$. For all $L, j \in \N$,
+every $1 \leq p < \infty$ and every almost everywhere strongly measurable $f : V \to \C$,
+$\|d_j f\|_p \leq 2^L \|f\|_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first bound is \Cref{lem:weighted-jensen} for the probability measure
+$|B_j|^{-1} \mathbf 1_{B_j}(h) \, dh$. Integrating over $x$ and exchanging the integrals,
+$\int (d_j f)^p \leq |B_j|^{-1} \int_{B_j} \|\Delta^L_h f\|_p^p \, dh \leq (2^L \|f\|_p)^p$ by
+\Cref{lem:rd-differences}. A general $f$ agrees almost everywhere with a measurable function, and
+\Cref{lem:ball-means-basic} (4) transfers the bound.
+\end{proof}
+
+\begin{theorem}[Local means by ball means]
+\label{thm:local-means-by-ball-means}
+\lean{Rd.LocalMeansBump.iSup_enorm_lt_top, Rd.LocalMeansBump.ballMeanConst,
+  Rd.LocalMeansBump.ballMeanConst_ne_top, Rd.ofReal_abs_inv_neg_inv_two_pow_pow,
+  Rd.LocalMeansBump.smul_closedBall_subset_ball,
+  Rd.LocalMeansBump.lintegral_enorm_mul_higherDiff_le,
+  Rd.LocalMeansBump.enorm_localMean_le_ballMeanDiff}
+\leanok
+\uses{def:local-means, def:ball-means-differences, lem:conv-second-argument, lem:conv-assoc,
+  lem:schwartz-tails}
+Let
+\[
+  C^\Delta = \sup |g| \, |B(0,1)| \, 2^{rn} (1 + 2^n);
+\]
+then $C^\Delta < \infty$. For every $L \in \N$, every $1 \leq p < \infty$, every $f \in L_p$,
+almost every $x \in V$ and every $j \in \N$,
+\[
+  |(k_{j+r+1} * f)(x)| \leq C^\Delta \, d_j f(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $J = j + r$. Since $k_{J+1} = m_{2^{J+1}} - m_{2^J}$,
+$k_{J+1} * f = (f - m_{2^J} * f) - (f - m_{2^{J+1}} * f)$ almost everywhere, and by
+\Cref{lem:conv-second-argument}, for $c = 2^{J}$ and $c = 2^{J+1}$,
+$|f(x) - (m_c * f)(x)| \leq \int |g(z)| \, |\Delta^L_{-z/c} f(x)| \, dz$ almost everywhere. The
+bump vanishes outside $\bar B(0, R)$, and the substitution $h = -z/c$
+(\Cref{lem:schwartz-tails}) gives at most $\sup |g| \, c^n \int_{\bar B(0, R/c)}
+|\Delta^L_h f(x)| \, dh$. Since $R < 2^r$, $\bar B(0, R/c) \subseteq B_j$, and
+$c^n |B_j|$ is $2^{rn} |B(0,1)|$ for $c = 2^J$ and $2^{(r+1)n} |B(0,1)|$ for $c = 2^{J+1}$. The
+sum of the two bounds is $C^\Delta d_j f(x)$.
+\end{proof}
+
+Young's inequality bounds the first $r + 1$ local means by $\|f\|_p$
+(\Cref{thm:tl-ball-means}).
+
+\begin{lemma}[Tools for ball means of convolutions]
+\label{lem:moving-balls}
+\lean{Rd.enorm_le_inv_two_pow_of_mem_ball, Rd.dyadicWeight_mul_dyadicWeight_neg_of_le,
+  Rd.volume_setOf_dist_add_smul_lt_le, Rd.setLIntegral_setLIntegral_ball_le}
+\leanok
+\uses{def:ball-means-differences}
+For every $j \in \N$, every $h \in B_j$ has $|h| \leq 2^{-j}$. For all $i, j \in \N$ with
+$i \leq j$ and every $L \in \R$, $2^{iL} 2^{-jL} = 2^{-(j-i)L}$. For every real $l \geq 1$, all
+$a, \rho \in \R$, all $x, w \in V$ and every almost everywhere measurable
+$G : V \to [0, \infty]$, $|\{v : |x + l v - w| < \rho\}| \leq |B(0, \rho)|$ and
+\[
+  \int_{B(0,a)} \int_{B(x + l v, \rho)} G(w) \, dw \, dv \leq |B(0, \rho)|
+  \int_{B(x, \rho + l a)} G .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The set $\{v : |x + l v - w| < \rho\}$ is the ball $B((w - x)/l, \rho/l)$, of measure
+$l^{-n} |B(0,\rho)|$. For the double integral, exchange the integrals: a point $w$ contributes
+only through the $v$ in this ball, and only if $|w - x| < \rho + l a$.
+\end{proof}
+
+\begin{theorem}[Ball means of the dual kernels]
+\label{thm:ball-means-dual}
+\lean{Rd.LocalMeansBump.diffByLocalMeansConst, Rd.LocalMeansBump.diffByLocalMeansConst_ne_top,
+  Rd.LocalMeansBump.enorm_higherDiff_dual_le_mul,
+  Rd.LocalMeansBump.enorm_higherDiff_dual_le_indicator,
+  Rd.LocalMeansBump.enorm_higherDiff_conv_dual_le_of_le,
+  Rd.LocalMeansBump.ballMeanDiff_conv_dual_le_of_le, Rd.LocalMeansBump.enorm_dual_le_indicator,
+  Rd.LocalMeansBump.enorm_conv_dual_le, Rd.LocalMeansBump.enorm_conv_dual_le_maximal,
+  Rd.LocalMeansBump.laverage_enorm_conv_dual_add_smul_le_of_one_le,
+  Rd.LocalMeansBump.laverage_enorm_conv_dual_add_smul_le,
+  Rd.LocalMeansBump.ballMeanDiff_conv_dual_le_of_lt, Rd.LocalMeansBump.ballMeanDiff_conv_dual_le}
+\leanok
+\uses{lem:dual-kernel-derivatives, lem:dual-kernel-bounds, lem:dual-averaged-differences,
+  lem:smooth-differences, lem:conv-pointwise, lem:moving-balls, lem:maximal-function-kernels,
+  def:maximal-function, lem:ball-means-basic}
+Let $L \in \N$ and
+\[
+  E_L = |B(0,1)| \max\bigl( A_{L,L} (2LR + L + 1)^n, \;
+  2^L A_{L,0} (2LR + 1)^n (2LR + L + 1)^n \bigr);
+\]
+then $E_L < \infty$. For every locally integrable $u : V \to \C$, all $i, j \in \N$ and every
+$x \in V$,
+\[
+  d_j(\eta_i * u)(x) \leq E_L \, c^L_{ji} \, M|u|(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Case $i \leq j$. For $h \in B_j$, $\Delta^L_h (\eta_i * u) = (\Delta^L_h \eta_i) * u$
+(\Cref{lem:conv-pointwise}), and by \Cref{lem:smooth-differences} and
+\Cref{lem:dual-kernel-derivatives},
+$|\Delta^L_h \eta_i| \leq A_{L,L} 2^{in} 2^{iL} |h|^L \leq A_{L,L} 2^{in} 2^{-(j-i)L}$;
+the difference vanishes outside $B(0, (2LR + L + 1) 2^{-i})$
+(\Cref{lem:dual-averaged-differences}). \Cref{lem:maximal-function-kernels} (1) bounds
+$|\Delta^L_h (\eta_i * u)(x)|$ by $A_{L,L} (2LR + L + 1)^n |B(0,1)| 2^{-(j-i)L} M|u|(x)$ for
+every $h$, hence also the mean $d_j(\eta_i * u)(x)$.
+
+Case $i > j$. By \Cref{lem:conv-pointwise},
+$|\Delta^L_h (\eta_i * u)(x)| \leq \sum_{l \leq L} \binom{L}{l} |(\eta_i * u)(x + l h)|$, and
+$|\eta_i| \leq A_{L,0} 2^{in} \mathbf 1_{B(0, \rho_i)}$ with $\rho_i = (2LR + 1) 2^{-i}$
+(\Cref{lem:dual-kernel-bounds}), so
+$|(\eta_i * u)(v)| \leq A_{L,0} 2^{in} \int_{B(v, \rho_i)} |u|$ for every $v \in V$
+(\Cref{lem:maximal-function-kernels} (1)). For $l = 0$ this is at most
+$A_{L,0} (2LR + 1)^n |B(0,1)| M|u|(x)$. For $l \geq 1$ the mean over $h \in B_j$ is at most
+$|B_j|^{-1} A_{L,0} 2^{in} |B(0, \rho_i)| \int_{B(x, (2LR + L + 1) 2^{-j})} |u|$ by
+\Cref{lem:moving-balls}, since $\rho_i + l 2^{-j} \leq (2LR + L + 1) 2^{-j}$, and this is at most
+$A_{L,0} (2LR + 1)^n (2LR + L + 1)^n |B(0,1)| M|u|(x)$. The binomial weights sum to $2^L$.
+\end{proof}
+
+For a single step $h$ the ball $B(x + l h, \rho_i)$ lies in $B(x, (2LR + L + 1) 2^{-j})$, which
+costs the factor $2^{(i-j)n}$; the average over the steps $h \in B_j$ removes it.
+
+\begin{theorem}[Ball means by local means]
+\label{thm:ball-means-by-local-means}
+\lean{Rd.LocalMeansBump.ballMeanDiff_partialSum_le, Rd.LocalMeansBump.ballMeanDiff_le_tsum_add,
+  Rd.LocalMeansBump.tendsto_eLpNorm_ballMeanDiff_sub,
+  Rd.LocalMeansBump.ballMeanDiff_le_tsum_maximal}
+\leanok
+\uses{thm:ball-means-dual, lem:reproducing-formula, lem:reproducing-pointwise,
+  lem:ball-means-basic, lem:ball-means-lp, lem:limits-of-pointwise-bounds,
+  lem:maximal-function-basic, lem:maximal-function-measurable, def:tl-local-means, lem:conv-op}
+Let $L \in \N$ with $L \geq 1$ and $1 \leq p < \infty$. For every $f \in L_p$, almost every
+$x \in V$ and every $j \in \N$,
+\[
+  d_j f(x) \leq E_L \sum_{i \in \N} c^L_{ji} \, M|k_i * f|(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $F_J = m_{2^J} * m_{2^J} * f = \sum_{i \leq J} \eta_i * (k_i * f)$, an identity of continuous
+functions (\Cref{lem:reproducing-pointwise}). By \Cref{lem:ball-means-basic} (5) and
+\Cref{thm:ball-means-dual}, with $M|k_i * f|$ unchanged when $k_i * f$ changes on a null set,
+$d_j F_J(x) \leq E_L \sum_{i \leq J} c^L_{ji} M|k_i * f|(x)$ for every $x$, and
+$d_j f \leq d_j F_J + d_j(f - F_J)$ everywhere. Since $F_J \to f$ in $L_p$
+(\Cref{lem:reproducing-formula}), $\|d_j(f - F_J)\|_p \leq 2^L \|f - F_J\|_p \to 0$
+(\Cref{lem:ball-means-lp}), and \Cref{lem:limits-of-pointwise-bounds} gives the bound almost
+everywhere.
+\end{proof}
+
+\begin{theorem}[Ball means characterisation of Triebel--Lizorkin spaces]
+\label{thm:tl-ball-means}
+\lean{Rd.LocalMeansBump.enorm_le_tlLocalMeansNorm, Rd.LocalMeansBump.diffUpperConst,
+  Rd.LocalMeansBump.diffUpperConst_ne_top, Rd.LocalMeansBump.tlDiffNorm_le_tlLocalMeansNorm,
+  Rd.LocalMeansBump.diffLowerConst, Rd.LocalMeansBump.diffLowerConst_ne_top,
+  Rd.LocalMeansBump.eLpNorm_dyadicWeight_mul_conv_kernel_le,
+  Rd.LocalMeansBump.lqNorm_localMean_shift_le, Rd.LocalMeansBump.tlLocalMeansNorm_le_tlDiffNorm}
+\leanok
+\uses{thm:ball-means-by-local-means, thm:local-means-by-ball-means,
+  lem:almost-diagonal-pointwise, lem:maximal-bounds-mixed-norm, lem:reproducing-formula,
+  lem:dual-kernel-moduli, lem:conv-op, cor:mixed-norm-sandwich, lem:lq-basic,
+  thm:rd-atomic-synthesis, def:tl-local-means, def:ball-means-differences,
+  lem:lp-norm-nonnegative}
+Let $s \in \R$, $L \in \N$, $1 \leq p < \infty$ and $1 \leq q \leq \infty$, and let
+\[
+  D^\Delta_{L,s} = 2 \|m\|_1 \sum_{j \leq r} 2^{js} + 2^{(r+1)s} C^\Delta .
+\]
+Then $D^\Delta_{L,s} < \infty$, and for every $f \in L_p$,
+\[
+  \|f\|^{g,L}_{F^s_{p,q}} \leq D^\Delta_{L,s} \, \|f\|^{L}_{F^s_{p,q}, \Delta} .
+\]
+If $L \geq 1$, then $\|f\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} \|f\|^{g,L}_{F^s_{p,q}}$ for every
+$f \in L_p$. If moreover $1 < p$ and $1 < q$, let
+\[
+  U^\Delta_{L,p,q,s} = 2 \|m\|_1 (1 - 2^{-s})^{-1} + E_L A_{s,L} C_{n,p,q},
+\]
+with the constants $A_{s,L}$ of \Cref{lem:almost-diagonal-pointwise} and $C_{n,p,q}$ of
+\Cref{thm:fefferman-stein}; then $U^\Delta_{L,p,q,s} < \infty$ for $0 < s < L$, and for every
+$f \in L_p$,
+\[
+  \|f\|^{L}_{F^s_{p,q}, \Delta} \leq U^\Delta_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Lower bound: pointwise
+$\|(2^{js} |k_j * f(x)|)_j\|_{\ell_q} \leq \sum_{j \leq r} 2^{js} |k_j * f(x)| +
+\|(2^{(j+r+1)s} |k_{j+r+1} * f(x)|)_j\|_{\ell_q}$ (\Cref{lem:lq-basic}); the head is bounded by
+Young's inequality $\|k_j * f\|_p \leq 2 \|m\|_1 \|f\|_p$ (\Cref{lem:conv-op},
+\Cref{lem:dual-kernel-moduli}), the tail by \Cref{thm:local-means-by-ball-means}, almost
+everywhere, after $2^{(j+r+1)s} = 2^{(r+1)s} 2^{js}$.
+
+Upper bound: the reproducing formula $f = \sum_j \eta_j * k_j * f$ (\Cref{lem:reproducing-formula})
+with $\|\eta_j\|_1 \leq 2 \|m\|_1$ gives
+$\|f\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} \sup_j 2^{js} \|k_j * f\|_p$ (the series bound of
+\Cref{thm:rd-atomic-synthesis}), and $\sup_j 2^{js} \|k_j * f\|_p \leq \|f\|^{g,L}_{F^s_{p,q}}$
+by \Cref{cor:mixed-norm-sandwich} at $q = \infty$ and $\ell_q \subseteq \ell_\infty$.
+\Cref{thm:ball-means-by-local-means} and \Cref{lem:almost-diagonal-pointwise} bound
+$\|(2^{js} d_j f(x))_j\|_{\ell_q}$ by $E_L A_{s,L} \|(M(2^{is} |k_i * f|)(x))_i\|_{\ell_q}$
+almost everywhere, and \Cref{lem:maximal-bounds-mixed-norm} finishes.
+\end{proof}
+
+\begin{corollary}[Ball means describe $F^s_{p,q}$]
+\label{cor:tl-ball-means}
+\lean{Rd.memTriebelLizorkin_iff_tlDiffNorm_lt_top}
+\leanok
+\uses{thm:tl-ball-means, thm:tl-local-means, thm:smooth-atomic-decomposition}
+For every $1 < p < \infty$, every $1 < q \leq \infty$, every $L \in \N$, every $0 < s < L$ and
+every $f \in L_p$, $f \in F^s_{p,q}$ if and only if $\|f\|^{L}_{F^s_{p,q}, \Delta} < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+$L \geq 1$ since $0 < s < L$. Both conditions are equivalent to the finiteness of the local means
+quasi-norm of the standard bump (\Cref{thm:smooth-atomic-decomposition}), by
+\Cref{thm:tl-local-means} and \Cref{thm:tl-ball-means}.
 \end{proof}
 
 \chapter{Besov spaces on compact manifolds}

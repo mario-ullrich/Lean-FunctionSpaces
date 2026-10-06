@@ -142,6 +142,7 @@ public import FunctionSpaces.Rd.TriebelLizorkinLocalMeans
 public import FunctionSpaces.Torus.PeriodicLift
 public import FunctionSpaces.Torus.FeffermanStein
 public import FunctionSpaces.Torus.TriebelLizorkinLocalMeans
+public import FunctionSpaces.Rd.TriebelLizorkinDifferences
 
 /-!
 # Function spaces
@@ -440,4 +441,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   of periodic lifts on the period box, by localisation.
 * `FunctionSpaces.Torus.TriebelLizorkinLocalMeans`: the local means characterisation of
   `F^s_{p,q}(𝕋^d)` for `1 < p < ∞`, `1 < q ≤ ∞`, `0 < s < L`, through the periodic lift.
+* `FunctionSpaces.Rd.TriebelLizorkinDifferences`: ball means of differences, their pointwise
+  comparison with local means, and the characterisation of `F^s_{p,q}` by ball means of
+  differences for `1 < p < ∞`, `1 < q ≤ ∞`, `0 < s < L`.
 -/

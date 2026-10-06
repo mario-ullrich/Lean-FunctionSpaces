@@ -92,6 +92,16 @@ of the block.
   periodic lifts `h ∘ π`, and the Fefferman–Stein inequality holds for the maximal functions of
   lifts on the period box `(0, 1]^d`, with the constant `Torus.periodicFSConst d p q`
   (`Torus.feffermanStein_periodic`).
+* **Ball means of differences.** For `f : V → ℂ`, an order `L` and a level `j`, the ball mean
+  of differences is `d_j f(x) = |B(0,2^(-j))|⁻¹ ∫_{B(0,2^(-j))} |Δ^L_h f(x)| dh`
+  (`Rd.ballMeanDiff`), and for `f ∈ L_p(V)` the quasi-norm
+  `‖f‖_p + ‖ x ↦ ‖(2^(js) d_j f(x))_j‖_{ℓ_q} ‖_p` is `Rd.tlDiffNorm`. For `1 < p < ∞`,
+  `1 < q ≤ ∞`, `0 < s < L` and `f ∈ L_p(V)`, `f ∈ F^s_{p,q}` iff this quasi-norm is finite
+  (`Rd.memTriebelLizorkin_iff_tlDiffNorm_lt_top`), with explicit constants in both comparisons
+  with the local means quasi-norm of a bump (`Rd.LocalMeansBump.tlDiffNorm_le_tlLocalMeansNorm`,
+  `Rd.LocalMeansBump.tlLocalMeansNorm_le_tlDiffNorm`). Pointwise, a local mean is bounded by a
+  ball mean (`Rd.LocalMeansBump.enorm_localMean_le_ballMeanDiff`), and a ball mean by maximal
+  functions of the local means (`Rd.LocalMeansBump.ballMeanDiff_le_tsum_maximal`).
 
 ## What is formalised
 
@@ -107,7 +117,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The Fefferman–Stein inequality | ✅ | ✗ | `Rd/FeffermanStein` |
 | Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/KernelMajorants` |
 | Local means characterisation of Triebel–Lizorkin spaces | ✅ | ✗ | `Rd/TriebelLizorkinLocalMeans` |
-| Ball means of differences | ⬜ | ✗ | `Rd/TriebelLizorkinDifferences` |
+| Characterisation by ball means of differences | ✅ | ✗ | `Rd/TriebelLizorkinDifferences` |
 | Atomic characterisation | ⬜ | ✗ | `Rd/TriebelLizorkinAtoms` |
 | Triebel–Lizorkin spaces on the torus, the Besov sandwich | ✅ | ✗ | `Torus/TriebelLizorkin` |
 | The periodic lift: period boxes, lifted null sets, counting boxes | ✅ | ✗ | `Torus/PeriodicLift` |
