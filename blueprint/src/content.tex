@@ -8876,6 +8876,175 @@ This is how pointwise bounds pass to limits in $L_p$ for functions with values i
 $[0, \infty]$; Mathlib derives convergence in measure from convergence in $L_p$ for normed
 groups.
 
+\section{The spaces $F^s_{p,q}$ and the Besov sandwich}
+
+As in \Cref{ch:rd}, $V$ is a finite-dimensional real inner product space with Lebesgue measure
+and $L_p = L_p(V)$ for $1 \leq p < \infty$. The Littlewood--Paley kernels $\psi_j$ are those of
+\Cref{def:lp-kernels}, and the Besov space $\Besov{s}{p}{q}$ is the approximation space $A^s_q$
+of the band-limited scheme in $L_p$ (\Cref{thm:lp-band}).
+
+\begin{lemma}[Pointwise bound of a convolution]
+\label{lem:conv-pointwise-bound}
+\lean{Rd.enorm_conv_le_of_enorm_le}
+\leanok
+\uses{def:conv, lem:weighted-jensen}
+For every $1 \leq p < \infty$, every measurable $K : V \to \C$ and every $B \in [0, \infty]$ with
+$|K(y)| \leq B$ for all $y \in V$, every measurable $f : V \to \C$ and every $x \in V$,
+\[
+  |(K * f)(x)| \leq \|K\|_1^{1 - 1/p} \, B^{1/p} \, \|f\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By the weighted Jensen inequality (\Cref{lem:weighted-jensen}) with the weight $|K|$,
+\[
+  \Bigl( \int |K(y)| \, |f(x - y)| \, dy \Bigr)^p
+  \leq \|K\|_1^{p-1} \int |K(y)| \, |f(x - y)|^p \, dy ,
+\]
+and the last integral is at most $B \|f\|_p^p$ by the translation invariance of Lebesgue
+measure. Take the $p$-th root.
+\end{proof}
+
+The bound covers $p = 1$, where it reads $|(K * f)(x)| \leq B \|f\|_1$.
+
+\begin{definition}[Triebel--Lizorkin spaces]
+\label{def:triebel-lizorkin}
+\lean{Rd.blockFun, Rd.lpBlock_ae_eq_blockFun, Rd.aestronglyMeasurable_blockFun,
+  Rd.enorm_lpBlock_eq_eLpNorm_blockFun, Rd.triebelLizorkinNorm, Rd.MemTriebelLizorkin,
+  Rd.aemeasurable_lqNorm_blockFun, Rd.littlewoodPaleyNorm_eq_lqNorm_eLpNorm}
+\leanok
+\uses{def:lp-blocks, def:conv, def:lq-norm}
+Let $1 \leq p < \infty$, $s \in \R$ and $1 \leq q \leq \infty$. For $f \in L_p$ and $j \in \N$ the
+pointwise block is $\psi_j * f$, the convolution integral at every point of $V$; it represents
+the Littlewood--Paley block $\Delta_j f \in L_p$. The Triebel--Lizorkin quasi-norm of $f$ is
+\[
+  \|f\|_{F^s_{p,q}} = \Bigl\| x \mapsto \bigl\| (2^{js} |(\psi_j * f)(x)|)_{j \in \N}
+  \bigr\|_{\ell_q} \Bigr\|_{L_p},
+\]
+and $F^s_{p,q}$ consists of the $f \in L_p$ with $\|f\|_{F^s_{p,q}} < \infty$.
+\end{definition}
+
+The Littlewood--Paley quasi-norm of the Besov spaces (\Cref{def:lp-blocks}) takes the two norms
+in the other order, $\|f\|^{\mathrm{LP}}_{s,q} = \|(2^{js} \|\psi_j * f\|_p)_j\|_{\ell_q}$; in the
+notation of the mixed norms, $\|f\|_{F^s_{p,q}}$ is an $L_p(\ell_q)$ norm and
+$\|f\|^{\mathrm{LP}}_{s,q}$ an $\ell_q(L_p)$ norm of the same family.
+
+\begin{lemma}[The pointwise blocks]
+\label{lem:tl-pointwise-blocks}
+\lean{Rd.iSup_enorm_psi_lt_top, Rd.eLpNorm_psi_mul_iSup_psi_ne_top, Rd.enorm_blockFun_le,
+  Rd.blockFun_add_ae, Rd.blockFun_smul}
+\leanok
+\uses{def:triebel-lizorkin, lem:conv-pointwise-bound, lem:lp-kernels-basic, lem:conv-assoc}
+For every $1 \leq p < \infty$, all $f, g \in L_p$, every $c \in \C$, every $j \in \N$ and every
+$x \in V$,
+\[
+  |(\psi_j * f)(x)| \leq \|\psi_j\|_1^{1 - 1/p} \bigl( \sup |\psi_j| \bigr)^{1/p} \|f\|_p
+\]
+with $\|\psi_j\|_1^{1 - 1/p} ( \sup |\psi_j| )^{1/p} < \infty$, and
+$(\psi_j * (c f))(x) = c \, (\psi_j * f)(x)$. For almost every $x \in V$,
+$(\psi_j * (f + g))(x) = (\psi_j * f)(x) + (\psi_j * g)(x)$ for all $j \in \N$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bound is \Cref{lem:conv-pointwise-bound}; its constant is finite since $\psi_j$ is
+integrable and bounded (\Cref{lem:lp-kernels-basic}). Homogeneity holds for the integrals, and
+additivity holds almost everywhere for each $j$ by \Cref{lem:conv-assoc}, hence for all $j$ at
+once outside a countable union of null sets.
+\end{proof}
+
+\begin{proposition}[Elementary properties]
+\label{prop:tl-elementary}
+\lean{Rd.triebelLizorkinNorm_add_le, Rd.triebelLizorkinNorm_smul, Rd.triebelLizorkinNorm_zero,
+  Rd.triebelLizorkinNorm_mono_exponent, Rd.triebelLizorkinNorm_mono_smoothness,
+  Rd.MemTriebelLizorkin.mono_exponent, Rd.MemTriebelLizorkin.mono_smoothness,
+  Rd.MemTriebelLizorkin.add, Rd.MemTriebelLizorkin.smul, Rd.triebelLizorkinSpace,
+  Rd.mem_triebelLizorkinSpace}
+\leanok
+\uses{def:triebel-lizorkin, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-nonnegative}
+For every $1 \leq p < \infty$, all $s \leq t$ in $\R$, all $1 \leq q \leq r \leq \infty$, all
+$f, g \in L_p$ and every $c \in \C$,
+\[
+  \|f + g\|_{F^s_{p,q}} \leq \|f\|_{F^s_{p,q}} + \|g\|_{F^s_{p,q}}, \qquad
+  \|c f\|_{F^s_{p,q}} = |c| \, \|f\|_{F^s_{p,q}},
+\]
+\[
+  \|f\|_{F^s_{p,r}} \leq \|f\|_{F^s_{p,q}}, \qquad \|f\|_{F^s_{p,q}} \leq \|f\|_{F^t_{p,q}} .
+\]
+In particular $F^s_{p,q}$ is a linear subspace of $L_p$, $F^s_{p,q} \subseteq F^s_{p,r}$ and
+$F^t_{p,q} \subseteq F^s_{p,q}$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+At almost every point the blocks of $f + g$ are the sums of the blocks of $f$ and $g$
+(\Cref{lem:tl-pointwise-blocks}), so the triangle inequality in $\ell_q$
+(\Cref{lem:lq-basic}) and then in $L_p$ gives the first claim. The blocks of $c f$ are $c$ times
+those of $f$, and $|c|$ leaves the $\ell_q$ and the $L_p$ norm
+(\Cref{lem:lp-norm-nonnegative}). The monotonicity follows from
+$\|\cdot\|_{\ell_r} \leq \|\cdot\|_{\ell_q}$ and $2^{js} \leq 2^{jt}$ at every point.
+\end{proof}
+
+\begin{theorem}[$F^s_{p,p} = \Besov{s}{p}{p}$]
+\label{thm:tl-diagonal}
+\lean{Rd.triebelLizorkinNorm_eq_littlewoodPaleyNorm, Rd.memTriebelLizorkin_iff_memApprox,
+  Rd.memTriebelLizorkin_iff_modulus}
+\leanok
+\uses{def:triebel-lizorkin, cor:mixed-norm-sandwich, thm:lp-band, thm:rd-besov}
+For every $1 \leq p < \infty$, every $s \in \R$ and every $f \in L_p$,
+$\|f\|_{F^s_{p,p}} = \|f\|^{\mathrm{LP}}_{s,p}$. If moreover $s > 0$, then $f \in F^s_{p,p}$ if
+and only if $f \in \Besov{s}{p}{p}$, and for every $r \in \N$ with $s < r$, $f \in F^s_{p,p}$ if
+and only if $\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_p} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The $L_p$ norm of the pointwise block $\psi_j * f$ is $\|\Delta_j f\|_p$, so the identity is
+$\|g\|_{L_p(\ell_p)} = \|g\|_{\ell_p(L_p)}$ for $g_j = 2^{js} |\psi_j * f|$
+(\Cref{cor:mixed-norm-sandwich}). The two characterisations are \Cref{thm:lp-band} and
+\Cref{thm:rd-besov} with $q = p$.
+\end{proof}
+
+\begin{theorem}[The Besov sandwich]
+\label{thm:tl-besov-sandwich}
+\lean{Rd.littlewoodPaleyNorm_max_le_triebelLizorkinNorm,
+  Rd.triebelLizorkinNorm_le_littlewoodPaleyNorm_min, Rd.approxNormDyadic_le_triebelLizorkinNorm,
+  Rd.triebelLizorkinNorm_le_approxNormDyadic, Rd.memApprox_of_memTriebelLizorkin,
+  Rd.memTriebelLizorkin_of_memApprox}
+\leanok
+\uses{def:triebel-lizorkin, cor:mixed-norm-sandwich, thm:lp-band, def:dyadic-norm}
+For every $1 \leq p < \infty$, every $s \in \R$, every $1 \leq q \leq \infty$ and every
+$f \in L_p$,
+\[
+  \|f\|^{\mathrm{LP}}_{s,\max(p,q)} \leq \|f\|_{F^s_{p,q}} \leq \|f\|^{\mathrm{LP}}_{s,\min(p,q)} .
+\]
+If $s \geq 0$, then
+\[
+  \|f\|_{F^s_{p,q}} \leq 8 \cdot 8^s \, \|\Phi\|_1 \, \|f\|^{\mathrm{dy}}_{A^s_{\min(p,q)}}
+\]
+with the band-limited scheme. If $s > 0$, then
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_{\max(p,q)}} \leq 2 (1 - 2^{-s})^{-1} \, \|f\|_{F^s_{p,q}}
+\]
+and
+\[
+  \Besov{s}{p}{\min(p,q)} \subseteq F^s_{p,q} \subseteq \Besov{s}{p}{\max(p,q)} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first two inequalities are \Cref{cor:mixed-norm-sandwich} for the family
+$g_j = 2^{js} |\psi_j * f|$, whose $L_p$ norms are $2^{js} \|\Delta_j f\|_p$. The bounds by the
+approximation norms follow with \Cref{thm:lp-band} at the exponents $\max(p,q)$ and
+$\min(p,q)$, and so do the inclusions.
+\end{proof}
+
+For $q = 2$ the theorem places $F^s_{p,2}$ between $\Besov{s}{p}{\min(p,2)}$ and
+$\Besov{s}{p}{\max(p,2)}$: for $p \geq 2$ between $\Besov{s}{p}{2}$ and $\Besov{s}{p}{p}$, for
+$p \leq 2$ between $\Besov{s}{p}{p}$ and $\Besov{s}{p}{2}$.
+
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
 

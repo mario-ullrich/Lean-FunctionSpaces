@@ -31,6 +31,22 @@ of the block.
   and Minkowski's integral inequality for `ℓ_u`-valued functions,
   `‖(∫ g_i dμ)_i‖_{ℓ_u} ≤ ∫ ‖(g_i(x))_i‖_{ℓ_u} dμ(x)` for `1 ≤ u ≤ ∞`
   (`MeasureTheory.lqNorm_lintegral_le`).
+* **Triebel–Lizorkin spaces and the Besov sandwich on `ℝ^d`.** Let `V` be a finite-dimensional
+  real inner product space, such as `ℝ^d`, `1 ≤ p < ∞`, `s ∈ ℝ`, `1 ≤ q ≤ ∞`, and `ψ_j` the
+  Littlewood–Paley kernels of [Function spaces on `ℝ^d`](Rd.md). For `f ∈ L_p(V)` the
+  Triebel–Lizorkin quasi-norm is `‖f‖_{F^s_{p,q}} = ‖ x ↦ ‖(2^(js) |ψ_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p`
+  (`Rd.triebelLizorkinNorm`), and `F^s_{p,q}` consists of the `f` with `‖f‖_{F^s_{p,q}} < ∞`
+  (`Rd.MemTriebelLizorkin`, a subspace of `L_p`: `Rd.triebelLizorkinSpace`). Then
+  `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_{max(p,q)}} ≤ ‖f‖_{F^s_{p,q}}` and
+  `‖f‖_{F^s_{p,q}} ≤ ‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_{min(p,q)}}`
+  (`Rd.littlewoodPaleyNorm_max_le_triebelLizorkinNorm`,
+  `Rd.triebelLizorkinNorm_le_littlewoodPaleyNorm_min`), with equality for `q = p`
+  (`Rd.triebelLizorkinNorm_eq_littlewoodPaleyNorm`). Hence for `s > 0`,
+  `F^s_{p,p} = B^s_{p,p}` (`Rd.memTriebelLizorkin_iff_memApprox`) and
+  `B^s_{p,min(p,q)} ⊆ F^s_{p,q} ⊆ B^s_{p,max(p,q)}` (`Rd.memTriebelLizorkin_of_memApprox`,
+  `Rd.memApprox_of_memTriebelLizorkin`), where `B^s_{p,q}` is the approximation space `A^s_q` of
+  the band-limited classes, with explicit constants
+  (`Rd.approxNormDyadic_le_triebelLizorkinNorm`, `Rd.triebelLizorkinNorm_le_approxNormDyadic`).
 
 ## What is formalised
 
@@ -39,7 +55,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
 | Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`: Minkowski's inequalities for series and for `ℓ_u`-valued functions, comparison, limits of pointwise bounds | ✅ | ✗ | `Lp/MixedNorms` |
-| Triebel–Lizorkin spaces on `ℝ^d`: definition, `F_{p,p} = B_{p,p}`, the Besov sandwich | ⬜ | ✗ | `Rd/TriebelLizorkin` |
+| Triebel–Lizorkin spaces on `ℝ^d`: definition, `F_{p,p} = B_{p,p}`, the Besov sandwich | ✅ | ✗ | `Rd/TriebelLizorkin` |
 | Dyadic cubes of every level, the Lebesgue differentiation theorem along them | ⬜ | ✗ | `Rd/DyadicCubes` |
 | The Hardy–Littlewood maximal function, weighted weak and strong types | ⬜ | ✗ | `Rd/MaximalFunction` |
 | The Calderón–Zygmund decomposition | ⬜ | ✗ | `Rd/CalderonZygmund` |

@@ -129,6 +129,7 @@ public import FunctionSpaces.Rd.MixedAveragedDifferences
 public import FunctionSpaces.Rd.MixedLocalMeans
 public import FunctionSpaces.Rd.MixedLittlewoodPaley
 public import FunctionSpaces.Rd.HyperbolicCross
+public import FunctionSpaces.Rd.TriebelLizorkin
 
 /-!
 # Function spaces
@@ -396,4 +397,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   quasi-norm, and its equivalence with mixed local means and mixed differences.
 * `FunctionSpaces.Rd.HyperbolicCross`: levels, hyperbolic crosses, and the rate of approximation by
   the hyperbolic cross partial sums.
+* `FunctionSpaces.Rd.TriebelLizorkin`: the Triebel–Lizorkin quasi-norm by Littlewood–Paley
+  blocks, `F^s_{p,p} = B^s_{p,p}` and the sandwich
+  `B^s_{p,min(p,q)} ⊆ F^s_{p,q} ⊆ B^s_{p,max(p,q)}`.
 -/
