@@ -354,7 +354,7 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   respect to Lipschitz domains*, J. London Math. Soc. (2) **60** (1999), no. 1, 237–257. Local
   means and the universal extension operator for Lipschitz domains.
 * C. Schneider, J. Vybíral, *Non-smooth atomic decompositions, traces on Lipschitz domains, and
-  pointwise multipliers in function spaces*, preprint, 2012,
+  pointwise multipliers in function spaces*, J. Funct. Anal. **264** (2013), no. 5, 1197–1237,
   [arXiv:1201.2280](https://arxiv.org/abs/1201.2280). Atoms with bounds instead of smoothness, and
   traces on Lipschitz domains through atoms.
 * E. M. Stein, *Harmonic Analysis: Real-Variable Methods, Orthogonality, and Oscillatory
@@ -366,8 +366,8 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   Besov and Sobolev spaces and the equivalence of their definitions.
 * H. Triebel, *Theory of Function Spaces II*, Monographs in Mathematics **84**, Birkhäuser, 1992.
   Triebel–Lizorkin spaces, local means, ball means of differences and atoms.
-* T. Ullrich, *Function spaces with dominating mixed smoothness; characterization by
+* T. Ullrich, *Function spaces with dominating mixed smoothness, characterization by
   differences*, Jenaer Schriften zur Mathematik und Informatik Math/Inf/05/06, 2006. Mixed
   differences and mixed local means.
 * J. Vybíral, *Function spaces with dominating mixed smoothness*, Dissertationes Math. **436**
-  (2006). Tensor Littlewood–Paley decompositions of spaces of dominating mixed smoothness.
+  (2006), 1–73. Tensor Littlewood–Paley decompositions of spaces of dominating mixed smoothness.
