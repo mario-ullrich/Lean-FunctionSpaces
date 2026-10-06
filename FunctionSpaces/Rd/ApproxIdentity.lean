@@ -28,7 +28,8 @@ continuous in `L_p` (`Rd.continuous_eLpNorm_comp_sub_sub`, from Mathlib's contin
 action of `V` on `L_p` by translation of the domain), so the integrand tends to `0`, and dominated
 convergence applies with the bound `|Φ(z)| (2 ‖f‖_p)^p`. For the operators of `Rd.convLp` this
 reads `Φ_{c_i} ⋆ f → f` in `L_p` along any dilation factors `c_i → ∞`
-(`Rd.tendsto_convLp_dilate`).
+(`Rd.tendsto_convLp_dilate`). Uniformly bounded operators with `T_i f → f` also satisfy
+`T_i (T_i f) → f` (`tendsto_apply_apply_of_tendsto`).
 
 **At points of continuity** (`Rd.conv_dilate_near`): for `Φ` vanishing outside a ball,
 `(Φ_{2^J} ⋆ F_J)(z) → z₀` as `J → ∞` and `z → y` whenever `F_J(z) → z₀` as `J → ∞` and `z → y`.
@@ -293,6 +294,21 @@ theorem tendsto_convLp_dilate {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞)
   exact eLpNorm_congr_ae ((convLp_apply_ae hp _ f).sub (Filter.EventuallyEq.refl _ _)).symm
 
 end Rd
+
+/-- **Uniformly bounded operators applied twice**: if additive maps `T_i : E → E` satisfy
+`‖T_i g‖ ≤ C ‖g‖` for all `i` and `g`, and `T_i f → f`, then `T_i (T_i f) → f`, since
+`T_i (T_i f) - f = T_i (T_i f - f) + (T_i f - f)` has norm at most `(C + 1) ‖T_i f - f‖`. -/
+theorem tendsto_apply_apply_of_tendsto {ι E F : Type*} [SeminormedAddCommGroup E] [FunLike F E E]
+    [AddMonoidHomClass F E E] {l : Filter ι} {T : ι → F} {C : ℝ} (hT : ∀ i g, ‖T i g‖ ≤ C * ‖g‖)
+    {f : E} (h : Tendsto (fun i => T i f) l (𝓝 f)) : Tendsto (fun i => T i (T i f)) l (𝓝 f) := by
+  rw [tendsto_iff_norm_sub_tendsto_zero] at h ⊢
+  refine squeeze_zero (fun i => norm_nonneg _) (fun i => ?_) (by simpa using h.const_mul (C + 1))
+  calc ‖T i (T i f) - f‖ = ‖T i (T i f - f) + (T i f - f)‖ := by
+        rw [map_sub]
+        congr 1
+        abel
+    _ ≤ C * ‖T i f - f‖ + ‖T i f - f‖ := (norm_add_le _ _).trans (add_le_add (hT i _) le_rfl)
+    _ = (C + 1) * ‖T i f - f‖ := by ring
 
 namespace Rd
 

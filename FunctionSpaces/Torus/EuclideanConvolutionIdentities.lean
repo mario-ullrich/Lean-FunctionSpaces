@@ -22,7 +22,8 @@ of `L_p(𝕋^d)`, a bounded operator is determined by its values on them
 (`Torus.ext_mFourierLp`), and every identity between these operators is an identity of Fourier
 multipliers:
 
-* `K ⋆ (L ⋆ f) = (K ⋆ L) ⋆ f` (`Torus.econvLp_comp_econvLp`), from `𝓕(K ⋆ L) = 𝓕K · 𝓕L`
+* `K ⋆ (L ⋆ f) = (K ⋆ L) ⋆ f` (`Torus.econvLp_comp_econvLp`, and
+  `Torus.econvLp_comp_econvLp_of_eq` for a given `M = K ⋆ L`), from `𝓕(K ⋆ L) = 𝓕K · 𝓕L`
   (`Rd.fourier_conv`); in particular the operators commute (`Torus.econvLp_comm`);
 * the operator is additive in the kernel (`Torus.econvLp_add_kernel`,
   `Torus.econvLp_sub_kernel`);
@@ -105,6 +106,15 @@ theorem econvLp_comp_econvLp (hp : p ≠ ∞) {K L : EuclideanSpace ℝ d → �
       rw [ContinuousLinearMap.comp_apply, econvLp_mFourierLp, map_smul, econvLp_mFourierLp,
         smul_smul, econvLp_mFourierLp, Rd.fourier_conv hK hL, mul_comm]
   exact DFunLike.congr_fun h f
+
+/-- If `K ⋆ L = M` on `ℝ^d`, then `K ⋆ (L ⋆ f) = M ⋆ f` on `L_p(𝕋^d)`. -/
+theorem econvLp_comp_econvLp_of_eq (hp : p ≠ ∞) {K L M : EuclideanSpace ℝ d → ℂ}
+    (hK : Integrable K) (hL : Integrable L) (hM : Integrable M) (h : Rd.conv K L volume = M)
+    (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
+    econvLp hp hK (econvLp hp hL f) = econvLp hp hM f := by
+  rw [econvLp_comp_econvLp hp hK hL]
+  subst h
+  rfl
 
 /-- **Convolution operators commute**: `K ⋆ (L ⋆ f) = L ⋆ (K ⋆ f)` on `L_p(𝕋^d)`. -/
 theorem econvLp_comm (hp : p ≠ ∞) {K L : EuclideanSpace ℝ d → ℂ} (hK : Integrable K)

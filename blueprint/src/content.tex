@@ -2891,8 +2891,9 @@ $L_p(\T^d)$.
 
 \begin{lemma}[Identities of convolution operators on the torus]
 \label{lem:torus-econv-identities}
-\lean{Torus.ext_mFourierLp, Torus.econvLp_comp_econvLp, Torus.econvLp_comm,
-  Torus.econvLp_add_kernel, Torus.econvLp_sub_kernel, Torus.econvLp_eq_zero_of_mem}
+\lean{Torus.ext_mFourierLp, Torus.econvLp_comp_econvLp, Torus.econvLp_comp_econvLp_of_eq,
+  Torus.econvLp_comm, Torus.econvLp_add_kernel, Torus.econvLp_sub_kernel,
+  Torus.econvLp_eq_zero_of_mem}
 \leanok
 \uses{thm:torus-econv-fourier, lem:torus-econv-young, lem:fourier-conv, lem:fourier-dilate}
 Two bounded operators on $L_p(\T^d)$ that agree on every $e_m$, $m \in \Z^d$, are equal. For all
@@ -6375,7 +6376,8 @@ quasi-norm is $\|(2^{js} \|k_j * f\|_p)_j\|_{\ell_q}$.
 
 \begin{lemma}[The reproducing formula]
 \label{lem:reproducing-formula}
-\lean{Rd.LocalMeansBump.sum_dual_localMean, Rd.LocalMeansBump.tendsto_sum_dual_localMean}
+\lean{Rd.LocalMeansBump.sum_dual_localMean, Rd.LocalMeansBump.tendsto_sum_dual_localMean,
+  tendsto_apply_apply_of_tendsto}
 \leanok
 \uses{def:local-means, lem:conv-op, lem:conv-assoc, thm:approx-identity}
 With the notation of \Cref{def:local-means}, for every $J \in \N$ and $f \in L_p$,
@@ -6391,7 +6393,8 @@ The convolution operators commute (\Cref{lem:conv-op}), so
 $T_{\eta_j} T_{k_j} = T_{m_{2^j}}^2 - T_{m_{2^{j-1}}}^2$ for $j \geq 1$, from
 $a^2 - b^2 = (a + b)(a - b)$, and the sum telescopes. Since $m_{2^J} * f \to f$
 (\Cref{thm:approx-identity}) and $\|m_{2^J} * h\|_p \leq \|m\|_1 \|h\|_p$, also
-$m_{2^J} * m_{2^J} * f \to f$.
+$m_{2^J} * m_{2^J} * f \to f$: for uniformly bounded additive operators $T_J$ with $T_J f \to f$,
+$\|T_J T_J f - f\| \leq \|T_J (T_J f - f)\| + \|T_J f - f\| \leq (C + 1) \|T_J f - f\|$.
 \end{proof}
 
 \begin{lemma}[Local means are bounded by the modulus]
@@ -8989,7 +8992,7 @@ norm of each partial sum by $\sum_{i \in I} \|g_i\|_p$.
 \label{lem:minkowski-integral-lq}
 \lean{ENNReal.rpow_eq_mul_rpow_sub_one, ENNReal.one_lt_toReal, ENNReal.le_rpow_sum_rpow,
   MeasureTheory.sum_rpow_lintegral_le_mul, MeasureTheory.rpow_sum_rpow_lintegral_le,
-  MeasureTheory.lqNorm_lintegral_le}
+  MeasureTheory.lqNorm_lintegral_le, MeasureTheory.lqNorm_lintegral_le_eLpNorm}
 \leanok
 \uses{def:lq-norm}
 For every $1 \leq u \leq \infty$,
@@ -8997,6 +9000,8 @@ For every $1 \leq u \leq \infty$,
   \Bigl\| \Bigl( \int_X g_i \, d\mu \Bigr)_{i \in I} \Bigr\|_{\ell_u}
   \leq \int_X \|(g_i(x))_{i \in I}\|_{\ell_u} \, d\mu(x) .
 \]
+If $\mu$ is a probability measure, then for every $1 \leq p \leq \infty$ the left side is at most
+$\bigl\| x \mapsto \|(g_i(x))_{i \in I}\|_{\ell_u} \bigr\|_{L_p(\mu)}$.
 \end{lemma}
 
 \begin{proof}
@@ -9012,7 +9017,8 @@ $u'$, let $S \subseteq I$ be finite, $a_i = \int g_i$ and $T = \sum_{i \in S} a_
 by H\"older's inequality at every point, since $(u - 1) u' = u$. If $0 < T < \infty$, dividing by
 $T^{1/u'}$ gives $T^{1/u} \leq \int (\sum_{i \in S} g_i^u)^{1/u}$; if $T = \infty$, some $a_i$ is
 infinite and so is the right side, because $g_i \leq (\sum_{j \in S} g_j^u)^{1/u}$. The right side
-is at most $\int \|(g_i)_i\|_{\ell_u}$, and the supremum over $S$ gives the claim.
+is at most $\int \|(g_i)_i\|_{\ell_u}$, and the supremum over $S$ gives the claim. On a
+probability space the integral is the $L_1$ norm, which is at most the $L_p$ norm.
 \end{proof}
 
 \begin{theorem}[Comparison of mixed norms]
@@ -10929,6 +10935,356 @@ Both quasi-norms are compared with $\|f\|_{F^s_{p,q}}$ by \Cref{thm:tl-local-mea
 
 Every bump and every order $L > s$ describe the same space $F^s_{p,q}$, the space defined by
 the Littlewood--Paley blocks.
+
+\section{Local means on the torus}
+
+This section transfers the local means characterisation to the torus $\T^d$. The kernels $k_j$,
+$\eta_j$, $\psi_j$ and $\Theta_j$ on $\R^d$ act on $L_p(\T^d)$ by convolution
+(\Cref{def:torus-econv}), and the operator identities between them hold on the torus as
+identities of Fourier multipliers (\Cref{lem:torus-econv-identities}). For the pointwise bounds,
+a function $h$ on $\T^d$ is lifted to the $\Z^d$-periodic function $h \circ \pi$ on $\R^d$, with
+the quotient map $\pi$ of \Cref{lem:torus-proj}: since $(K * h)(\pi x) = (K * (h \circ \pi))(x)$,
+the bounds of the cross kernels on $\R^d$ apply to lifts, and the Fefferman--Stein inequality
+transfers by localisation. Throughout, $\#d$ is the dimension of the torus, $|\cdot|$ the
+Lebesgue measure on $\R^d$ and $M$ the maximal function of \Cref{def:maximal-function} on $\R^d$.
+The weights $c^L_{ji}$ and the constants $A_{s,L}$ are those of the previous section
+(\Cref{lem:almost-diagonal-pointwise}).
+
+\begin{definition}[Period boxes]
+\label{def:period-box}
+\lean{Torus.periodBox, Torus.tripleBox, Torus.measurableSet_periodBox,
+  Torus.measurableSet_tripleBox, Torus.mem_periodBox_intCast_iff, Torus.mem_periodBox_ceil,
+  Torus.pairwise_disjoint_periodBox, Torus.tripleBox_eq_biUnion}
+\leanok
+For $a \in \R^d$ the period box is
+$P_a = \{x \in \R^d : a_i < x_i \leq a_i + 1 \text{ for every } i\}$, and
+$T = \{y \in \R^d : -1 < y_i \leq 2 \text{ for every } i\}$ is the box of side $3$. Both are
+measurable. For every $m \in \Z^d$ and every $x \in \R^d$, $x \in P_m$ if and only if
+$\lceil x_i \rceil = m_i + 1$ for every $i$; in particular $x \in P_m$ for
+$m_i = \lceil x_i \rceil - 1$, the boxes $P_m$, $m \in \Z^d$, are pairwise disjoint, and $T$ is
+the union of the $P_m$ with $m \in \{-1, 0, 1\}^d$.
+\end{definition}
+
+\begin{lemma}[Period boxes are fundamental domains]
+\label{lem:period-box-measure}
+\lean{Torus.lintegral_periodBox, Torus.measurePreserving_proj_periodBox, Torus.volume_periodBox,
+  Torus.eLpNorm_comp_proj_periodBox, Torus.quasiMeasurePreserving_proj, Torus.ae_comp_proj}
+\leanok
+\uses{def:period-box, lem:torus-proj}
+For every $a \in \R^d$ and every $u : \T^d \to [0, \infty]$,
+\[
+  \int_{P_a} u(\pi x) \, dx = \int_{\T^d} u ,
+\]
+so $\pi$ maps the Lebesgue measure on $P_a$ to the Haar measure of $\T^d$, $|P_a| = 1$, and
+$\|F \circ \pi\|_{L_p(P_a)} = \|F\|_{L_p(\T^d)}$ for every $p \in [0, \infty]$ and every almost
+everywhere measurable $F$ on $\T^d$. For every null set $N \subseteq \T^d$, $\pi^{-1}(N)$ is a
+null set; hence for every property $P$ that holds at almost every point of $\T^d$, $P(\pi x)$
+holds for almost every $x \in \R^d$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The integral identity is Mathlib's \texttt{UnitAddTorus.\allowbreak lintegral\_\allowbreak
+preimage} on $\R^d$ with the product measure, carried to the Euclidean space by the
+volume-preserving identification of the two; for indicator functions it is the statement on
+measures. The boxes $P_m$, $m \in \Z^d$, cover $\R^d$ (\Cref{def:period-box}), and
+$|\pi^{-1}(N) \cap P_m| = |N| = 0$ for each of the countably many $m$.
+\end{proof}
+
+\begin{lemma}[Counting boxes]
+\label{lem:period-box-counting}
+\lean{Torus.ball_subset_iUnion_periodBox, Torus.card_Icc_ceil_le,
+  Torus.setLIntegral_ball_comp_proj_le, Torus.locallyIntegrable_comp_proj,
+  Torus.ball_subset_tripleBox, Torus.setLIntegral_tripleBox}
+\leanok
+\uses{lem:period-box-measure, def:period-box}
+For every $u : \T^d \to [0, \infty]$, every $x \in \R^d$ and every $r > 0$,
+\[
+  \int_{B(x, r)} u(\pi y) \, dy \leq (2r + 2)^{\#d} \int_{\T^d} u, \qquad
+  \int_T u(\pi y) \, dy = 3^{\#d} \int_{\T^d} u .
+\]
+For every $h \in L_1(\T^d)$, the lift $h \circ \pi$ is locally integrable on $\R^d$. For every
+$x \in P_0$ and every $r \leq 1$, $B(x, r) \subseteq T$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Every point $y$ of the ball lies in $P_m$ with $m_i = \lceil y_i \rceil - 1$, and
+$\lceil x_i - r \rceil - 1 \leq m_i \leq \lceil x_i + r \rceil - 1$ since $|y_i - x_i| < r$. These
+are at most $\lceil x_i + r \rceil - \lceil x_i - r \rceil + 1 \leq 2r + 2$ integers in each
+coordinate, and each box contributes $\int_{\T^d} u$ (\Cref{lem:period-box-measure}). The box $T$
+is the disjoint union of $3^{\#d}$ period boxes. Local integrability follows from the first
+bound for $u = |h|$ and $r = 1$. For $x \in P_0$ and $y \in B(x, r)$ with $r \leq 1$,
+$0 < x_i \leq 1$ and $|y_i - x_i| < 1$ give $-1 < y_i < 2$.
+\end{proof}
+For $r \leq 0$ the ball is empty, and the Lean statement of the first bound covers every real $r$.
+
+\begin{lemma}[Convolutions and differences of lifts]
+\label{lem:torus-lift-conv}
+\lean{Torus.econv_proj, Torus.higherDiff_comp_proj}
+\leanok
+\uses{def:torus-econv, lem:torus-proj, def:iter-diff}
+For every $\Phi : \R^d \to \C$, every $h : \T^d \to \C$, every $L \in \N$ and all
+$x, z \in \R^d$,
+\[
+  (\Phi * h)(\pi x) = (\Phi * (h \circ \pi))(x), \qquad
+  \Delta^L_{\pi z} h(\pi x) = \Delta^L_z (h \circ \pi)(x),
+\]
+with the convolution on $\R^d$ on the right of the first identity.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\pi$ is additive, so $h(\pi x - \pi y) = (h \circ \pi)(x - y)$ and
+$h(\pi x + l \pi z) = (h \circ \pi)(x + l z)$.
+\end{proof}
+
+\begin{lemma}[Localisation of the maximal function]
+\label{lem:torus-maximal-localisation}
+\lean{Torus.ofReal_two_mul_add_two_pow_le_volume_ball_mul, Torus.maximal_comp_proj_le,
+  Torus.lqNorm_maximal_comp_proj_le, Torus.maximal_enorm_comp_proj_congr_ae}
+\leanok
+\uses{def:maximal-function, lem:period-box-counting, def:period-box, lem:lq-basic,
+  lem:period-box-measure, lem:maximal-function-basic}
+For every $u : \T^d \to [0, \infty]$ and every $x \in P_0$,
+\[
+  M(u \circ \pi)(x) \leq M(\mathbf 1_T (u \circ \pi))(x) + 4^{\#d} |B(0,1)|^{-1}
+  \int_{\T^d} u .
+\]
+For every $1 \leq q \leq \infty$, every family $u_j : \T^d \to [0, \infty]$, $j \in \N$, and every
+$x \in P_0$,
+\begin{multline*}
+  \|(M(u_j \circ \pi)(x))_j\|_{\ell_q} \leq \|(M(\mathbf 1_T (u_j \circ \pi))(x))_j\|_{\ell_q} \\
+  + 4^{\#d} |B(0,1)|^{-1} \Bigl\| \Bigl(\int_{\T^d} u_j\Bigr)_j \Bigr\|_{\ell_q} .
+\end{multline*}
+For all $v, w : \T^d \to \C$ with $v = w$ almost everywhere,
+$M(|v| \circ \pi) = M(|w| \circ \pi)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $r \leq 1$ the ball $B(x, r)$ lies in $T$ (\Cref{lem:period-box-counting}), so its mean of
+$u \circ \pi$ is a mean of $\mathbf 1_T (u \circ \pi)$. For $r > 1$,
+\Cref{lem:period-box-counting} and $|B(0, r)| = r^{\#d} |B(0, 1)|$ with $2r + 2 \leq 4r$ bound
+the mean by $4^{\#d} |B(0,1)|^{-1} \int_{\T^d} u$. The second bound follows by the triangle
+inequality and homogeneity in $\ell_q$. If $v = w$ almost everywhere, the lifts agree almost
+everywhere (\Cref{lem:period-box-measure}), and the maximal function does not see the difference
+(\Cref{lem:maximal-function-basic}).
+\end{proof}
+
+\begin{theorem}[The Fefferman--Stein inequality for periodic lifts]
+\label{thm:fefferman-stein-periodic}
+\lean{Torus.eLpNorm_indicator_tripleBox, Torus.periodicFSConst, Torus.periodicFSConst_ne_top,
+  Torus.feffermanStein_periodic}
+\leanok
+\uses{thm:fefferman-stein, lem:torus-maximal-localisation, lem:period-box-counting,
+  lem:period-box-measure, lem:minkowski-integral-lq, lem:maximal-function-measurable,
+  lem:lp-norm-nonnegative, lem:fefferman-stein-split}
+Let $1 < p < \infty$ and $1 < q \leq \infty$, and let
+$C^{\T}_{p,q} = 3^{\#d/p} C_{\#d,p,q} + 4^{\#d} |B(0,1)|^{-1}$ with the constant $C_{\#d,p,q}$
+of \Cref{thm:fefferman-stein} on $\R^d$. Then $C^{\T}_{p,q} < \infty$, and for every family of
+almost everywhere measurable $u_j : \T^d \to [0, \infty]$, $j \in \N$,
+\[
+  \Bigl\| x \mapsto \|(M(u_j \circ \pi)(x))_j\|_{\ell_q} \Bigr\|_{L_p(P_0)}
+  \leq C^{\T}_{p,q} \Bigl\| t \mapsto \|(u_j(t))_j\|_{\ell_q} \Bigr\|_{L_p(\T^d)} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Write $G(t) = \|(u_j(t))_j\|_{\ell_q}$. By \Cref{lem:torus-maximal-localisation} the left side is
+at most the sum of two terms. The first is at most its norm in $L_p(\R^d)$, which
+\Cref{thm:fefferman-stein} bounds by $C_{\#d,p,q} \|\mathbf 1_T (G \circ \pi)\|_{L_p(\R^d)}
+= C_{\#d,p,q} \, 3^{\#d/p} \|G\|_{L_p(\T^d)}$ (\Cref{lem:period-box-counting}). The second is a
+constant on a set of measure $1$, and Minkowski's integral inequality
+(\Cref{lem:minkowski-integral-lq}) on the probability space $\T^d$
+gives $\|(\int u_j)_j\|_{\ell_q} \leq \|G\|_{L_p(\T^d)}$.
+\end{proof}
+
+\begin{lemma}[From maximal bounds on the lift to $L_p(\ell_q)$]
+\label{lem:torus-maximal-bounds-mixed-norm}
+\lean{Torus.eLpNorm_le_of_le_lqNorm_maximal_proj}
+\leanok
+\uses{thm:fefferman-stein-periodic, lem:period-box-measure, lem:lp-norm-nonnegative,
+  lem:maximal-function-measurable}
+Let $1 < p < \infty$, $1 < q \leq \infty$ and $C \in [0, \infty]$. For every almost everywhere
+measurable $F : \T^d \to [0, \infty]$ and every family of almost everywhere measurable
+$h_i : \T^d \to [0, \infty]$, $i \in \N$, with
+$F(\pi x) \leq C \|(M(h_i \circ \pi)(x))_i\|_{\ell_q}$ for almost every $x \in P_0$,
+\[
+  \|F\|_{L_p(\T^d)} \leq C \, C^{\T}_{p,q} \Bigl\| t \mapsto \|(h_i(t))_i\|_{\ell_q}
+  \Bigr\|_{L_p(\T^d)} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\|F\|_{L_p(\T^d)} = \|F \circ \pi\|_{L_p(P_0)}$ (\Cref{lem:period-box-measure}), then
+monotonicity and homogeneity of the $L_p$ norm and \Cref{thm:fefferman-stein-periodic}.
+\end{proof}
+
+\begin{definition}[Local means of Triebel--Lizorkin type on the torus]
+\label{def:torus-tl-local-means}
+\lean{Torus.tlLocalMeansNorm, Torus.aemeasurable_dyadicWeight_mul_econv_kernel,
+  Torus.aemeasurable_lqNorm_econv_kernel}
+\leanok
+\uses{def:tl-local-means, def:torus-econv, def:local-means, lem:lp-norm-nonnegative}
+Let $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $L \in \N$, and let $k_j$ be the
+local means kernels on $\R^d$ of a bump $g$ and the order $L$. For $f \in L_p(\T^d)$ the local
+means $(k_j * f)(t) = \int_{\R^d} k_j(y) f(t - \pi y) \, dy$ are almost everywhere measurable,
+and the local means quasi-norm of Triebel--Lizorkin type on the torus is
+\[
+  \|f\|^{g,L}_{F^s_{p,q}(\T^d)} = \Bigl\| t \mapsto \bigl\| (2^{js} |(k_j * f)(t)|)_{j \in \N}
+  \bigr\|_{\ell_q} \Bigr\|_{L_p(\T^d)} .
+\]
+\end{definition}
+
+\begin{lemma}[The reproducing formula on the torus]
+\label{lem:torus-reproducing-formula}
+\lean{Torus.sum_econvLp_dual_kernel, Torus.tendsto_sum_econvLp_dual_kernel,
+  Torus.econvLp_kernel_lpBlock}
+\leanok
+\uses{lem:torus-econv-identities, thm:torus-approx-identity, def:local-means,
+  lem:reproducing-formula, thm:kernel-identities, def:torus-lp-blocks}
+Let $1 \leq p < \infty$, $L \in \N$ and let $m$, $k_j$, $\eta_j$ be the moment kernel, the local
+means kernels and the dual kernels on $\R^d$ of a bump $g$ and the order $L$. For every
+$f \in L_p(\T^d)$ and every $J \in \N$,
+\[
+  \sum_{j \leq J} \eta_j * k_j * f = m_{2^J} * m_{2^J} * f ,
+\]
+and if $L \geq 1$, then $\sum_{j \leq J} \eta_j * k_j * f \to f$ in $L_p(\T^d)$ as $J \to \infty$.
+For all $i, j \in \N$, $k_j * \Delta_i f = (k_j * \Theta_i) * \Delta_i f$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+As on $V$ (\Cref{lem:reproducing-formula}): the operators commute and are additive in the
+kernel (\Cref{lem:torus-econv-identities}), so the partial sums telescope by
+$a^2 - b^2 = (a - b)(a + b)$. Since $\int m = 1$ for $L \geq 1$, $m_{2^J} * f \to f$
+(\Cref{thm:torus-approx-identity}), and the operators $m_{2^J} *$ are bounded by $\|m\|_1$. The
+last identity is $\Theta_i * \psi_i = \psi_i$ (\Cref{thm:kernel-identities}) and associativity.
+\end{proof}
+
+\begin{theorem}[Blocks by local means on the torus]
+\label{thm:torus-blocks-by-local-means}
+\lean{Torus.lpBlock_sum_econvLp_dual_ae, Torus.maximal_econvLp_kernel_proj,
+  Torus.ae_enorm_lpBlock_sum_proj_le, Torus.ae_enorm_comp_proj_le_of_tendsto_Lp,
+  Torus.enorm_blockFun_proj_le_tsum_maximal}
+\leanok
+\uses{thm:blocks-by-local-means, lem:torus-reproducing-formula, lem:torus-lift-conv,
+  lem:period-box-measure, lem:torus-econv-identities, lem:lp-limits-pointwise,
+  lem:torus-maximal-localisation, def:torus-triebel-lizorkin, def:torus-tl-local-means,
+  lem:torus-econv-young}
+Let $L, L' \in \N$ with $L, L' \geq 1$ and $1 \leq p < \infty$, and let $B_{L,L'}$ be the
+constant of \Cref{thm:blocks-by-local-means} on $\R^d$. For every $f \in L_p(\T^d)$, almost every
+$x \in P_0$ and every $j \in \N$,
+\[
+  |(\psi_j * f)(\pi x)| \leq B_{L,L'} \sum_{i \in \N} c^{L'}_{ji} \,
+  M\bigl(|k_i * f| \circ \pi\bigr)(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $G_J = \sum_{i \leq J} \eta_i * k_i * f$. By \Cref{lem:torus-econv-identities},
+$\psi_j * G_J = \sum_{i \leq J} (\psi_j * \eta_i) * (k_i * f)$ almost everywhere on $\T^d$, hence
+at $\pi x$ for almost every $x \in \R^d$ (\Cref{lem:period-box-measure}). There every term is the
+convolution on $\R^d$ of $\psi_j * \eta_i$ with the lift of $k_i * f$ (\Cref{lem:torus-lift-conv}),
+and the first bound of \Cref{thm:blocks-by-local-means}, which holds for every function, bounds
+it by $B_{L,L'} c^{L'}_{ji} M(|k_i * f| \circ \pi)(x)$; the maximal function does not see the
+choice of representative (\Cref{lem:torus-maximal-localisation}). Composition with $\pi$ is an
+isometry from $L_p(\T^d)$ to $L_p(P_0)$, $\psi_j * G_J \to \psi_j * f$ by
+\Cref{lem:torus-reproducing-formula}, and \Cref{lem:lp-limits-pointwise} on $P_0$ passes the
+bound to $f$.
+\end{proof}
+
+\begin{theorem}[Local means by blocks on the torus]
+\label{thm:torus-local-means-by-blocks}
+\lean{Torus.econvLp_kernel_sum_lpBlock_ae, Torus.maximal_lpBlock_proj,
+  Torus.ae_enorm_econvLp_kernel_sum_proj_le, Torus.enorm_econv_kernel_proj_le_tsum_maximal}
+\leanok
+\uses{thm:local-means-by-blocks, lem:torus-reproducing-formula, lem:torus-lift-conv,
+  lem:period-box-measure, lem:torus-lp-blocks, lem:lp-limits-pointwise,
+  lem:torus-maximal-localisation, def:torus-triebel-lizorkin, def:torus-tl-local-means,
+  lem:torus-econv-young, thm:torus-blocks-by-local-means}
+Let $L \in \N$ and $1 \leq p < \infty$, and let $B^\Theta_L$ be the constant of
+\Cref{thm:local-means-by-blocks} on $\R^d$. For every $f \in L_p(\T^d)$, almost every
+$x \in P_0$ and every $j \in \N$,
+\[
+  |(k_j * f)(\pi x)| \leq B^\Theta_L \sum_{i \in \N} c^L_{ji} \,
+  M\bigl(|\psi_i * f| \circ \pi\bigr)(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:torus-reproducing-formula},
+$k_j * \sum_{i < J} \Delta_i f = \sum_{i < J} (k_j * \Theta_i) * (\psi_i * f)$ almost everywhere,
+and the first bound of \Cref{thm:local-means-by-blocks} applies to the lifts at $\pi x$ as in
+\Cref{thm:torus-blocks-by-local-means}. The partial sums converge to $f$ in $L_p(\T^d)$
+(\Cref{lem:torus-lp-blocks}), and \Cref{lem:lp-limits-pointwise} on $P_0$ passes the bound to
+$f$.
+\end{proof}
+
+\begin{lemma}[The almost diagonal step on the torus]
+\label{lem:torus-tl-local-means-lq}
+\lean{Torus.lqNorm_blockFun_proj_le_lqNorm_maximal,
+  Torus.lqNorm_econv_kernel_proj_le_lqNorm_maximal}
+\leanok
+\uses{thm:torus-blocks-by-local-means, thm:torus-local-means-by-blocks,
+  lem:almost-diagonal-pointwise}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $s \in \R$ and $L, L' \in \N$. For every
+$f \in L_p(\T^d)$ and almost every $x \in P_0$,
+\[
+  \bigl\| (2^{js} |(k_j * f)(\pi x)|)_j \bigr\|_{\ell_q} \leq B^\Theta_L A_{s,L}
+  \bigl\| (M(2^{is} |\psi_i * f| \circ \pi)(x))_i \bigr\|_{\ell_q},
+\]
+and if $L \geq 1$ and $L' \geq 1$, then
+\[
+  \bigl\| (2^{js} |(\psi_j * f)(\pi x)|)_j \bigr\|_{\ell_q} \leq B_{L,L'} A_{s,L'}
+  \bigl\| (M(2^{is} |k_i * f| \circ \pi)(x))_i \bigr\|_{\ell_q} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{thm:torus-blocks-by-local-means} and \Cref{thm:torus-local-means-by-blocks} at a point,
+with \Cref{lem:almost-diagonal-pointwise}.
+\end{proof}
+
+\begin{theorem}[Local means characterisation of Triebel--Lizorkin spaces on the torus]
+\label{thm:torus-tl-local-means}
+\lean{Torus.tlUpperConst, Torus.tlUpperConst_ne_top, Torus.tlLowerConst,
+  Torus.tlLowerConst_ne_top, Torus.triebelLizorkinNorm_le_tlLocalMeansNorm,
+  Torus.tlLocalMeansNorm_le_triebelLizorkinNorm, Torus.memTriebelLizorkin_iff_tlLocalMeans}
+\leanok
+\uses{lem:torus-tl-local-means-lq, lem:torus-maximal-bounds-mixed-norm,
+  lem:almost-diagonal-pointwise, thm:fefferman-stein-periodic, def:torus-triebel-lizorkin,
+  def:torus-tl-local-means, thm:tl-local-means}
+Let $1 < p < \infty$, $1 < q \leq \infty$, $s \in \R$ and $L \in \N$, let
+$L_s = \lceil s \rceil_+ + 1$, and let
+\[
+  U^{\T}_{L,p,q,s} = B_{L,L_s} A_{s,L_s} C^{\T}_{p,q}, \qquad
+  D^{\T}_{L,p,q,s} = B^\Theta_L A_{s,L} C^{\T}_{p,q} .
+\]
+Then $U^{\T}_{L,p,q,s} < \infty$ for $s > 0$, and $D^{\T}_{L,p,q,s} < \infty$ for $0 < s < L$.
+For every $f \in L_p(\T^d)$,
+\[
+  \|f\|^{g,L}_{F^s_{p,q}(\T^d)} \leq D^{\T}_{L,p,q,s} \, \|f\|_{F^s_{p,q}(\T^d)},
+\]
+and if $L \geq 1$, then
+$\|f\|_{F^s_{p,q}(\T^d)} \leq U^{\T}_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}(\T^d)}$. In particular,
+for $L \geq 1$ and $0 < s < L$, $f \in F^s_{p,q}(\T^d)$ if and only if
+$\|f\|^{g,L}_{F^s_{p,q}(\T^d)} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Both bounds are \Cref{lem:torus-tl-local-means-lq}, with $L' = L_s$ for the second, followed by
+\Cref{lem:torus-maximal-bounds-mixed-norm} for the families $2^{is} |\psi_i * f|$ and
+$2^{is} |k_i * f|$; the constants are finite as in \Cref{thm:tl-local-means}, and
+$C^{\T}_{p,q} < \infty$ by \Cref{thm:fefferman-stein-periodic}.
+\end{proof}
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

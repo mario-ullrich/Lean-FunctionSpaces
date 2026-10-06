@@ -372,7 +372,8 @@ theorem sum_conv_dual_localMean_apply (hp : p ≠ ∞) (L J : ℕ)
   exact congrFun ((Continuous.ae_eq_iff_eq volume hcont1 hcont2).1 hae) y
 
 /-- **The reproducing formula**: `∑_j η_j ⋆ k_j ⋆ f = f` in `L_p`, since
-`m_{2^J} ⋆ m_{2^J} ⋆ f → f` (`m` is an approximate identity, `Rd.tendsto_convLp_dilate`). -/
+`m_{2^J} ⋆ m_{2^J} ⋆ f → f` (`m` is an approximate identity, `Rd.tendsto_convLp_dilate`, and the
+operators `m_{2^J} ⋆` are uniformly bounded, `tendsto_apply_apply_of_tendsto`). -/
 theorem tendsto_sum_dual_localMean (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L)
     (f : Lp ℂ p (volume : Measure V)) :
     Tendsto (fun J => ∑ j ∈ Finset.range (J + 1),
@@ -382,23 +383,10 @@ theorem tendsto_sum_dual_localMean (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L)
     tendsto_convLp_dilate hp (integrable_momentKernel b.integrable L)
       (integral_momentKernel b.integrable b.integral_eq_one hL) (c := fun J : ℕ => (2 : ℝ) ^ J)
       (fun J => pow_ne_zero J two_ne_zero) (tendsto_pow_atTop_atTop_of_one_lt one_lt_two) f
-  set C := (eLpNorm (momentKernel b.toFun L) 1 volume).toReal
-  rw [tendsto_iff_norm_sub_tendsto_zero] at h ⊢
-  refine squeeze_zero (fun J => norm_nonneg _) (fun J => ?_) (by simpa using h.const_mul (C + 1))
-  have hA : ∀ g : Lp ℂ p (volume : Measure V),
-      ‖convLp hp (b.integrable_scaled L J) g‖ ≤ C * ‖g‖ := fun g => by
-    have h1 := norm_convLp_le hp (b.integrable_scaled L J) g
-    rwa [b.eLpNorm_scaled_one] at h1
-  calc ‖convLp hp (b.integrable_scaled L J) (convLp hp (b.integrable_scaled L J) f) - f‖
-      = ‖convLp hp (b.integrable_scaled L J) (convLp hp (b.integrable_scaled L J) f - f) +
-          (convLp hp (b.integrable_scaled L J) f - f)‖ := by
-        rw [map_sub]
-        congr 1
-        abel
-    _ ≤ C * ‖convLp hp (b.integrable_scaled L J) f - f‖ +
-          ‖convLp hp (b.integrable_scaled L J) f - f‖ :=
-        (norm_add_le _ _).trans (add_le_add (hA _) le_rfl)
-    _ = (C + 1) * ‖convLp hp (b.integrable_scaled L J) f - f‖ := by ring
+  refine tendsto_apply_apply_of_tendsto (T := fun J => convLp hp (b.integrable_scaled L J))
+    (C := (eLpNorm (momentKernel b.toFun L) 1 volume).toReal) (fun J g => ?_) h
+  have h1 := norm_convLp_le hp (b.integrable_scaled L J) g
+  rwa [b.eLpNorm_scaled_one] at h1
 
 /-- The **local means quasi-norm** `‖(2^(js) ‖k_j ⋆ f‖_p)_j‖_{ℓ_q}`. -/
 noncomputable def localMeansNorm (hp : p ≠ ∞) (L : ℕ) (s : ℝ) (q : ℝ≥0∞)

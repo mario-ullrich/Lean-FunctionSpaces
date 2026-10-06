@@ -34,7 +34,8 @@ The tools are power identities and homogeneity of `eLpNorm` in `[0, ∞]`, monot
 `L_p` norms (`MeasureTheory.eLpNorm_iSup_of_directed`), Minkowski's inequality for series in `L_p`
 (`MeasureTheory.eLpNorm_tsum_le`) and Minkowski's integral inequality for `ℓ_u`-valued functions,
 `‖(∫ g_i)_i‖_{ℓ_u} ≤ ∫ ‖(g_i)_i‖_{ℓ_u}` (`MeasureTheory.lqNorm_lintegral_le`), proved by
-Hölder's inequality on finite sets, also for means (`MeasureTheory.lqNorm_laverage_le`).
+Hölder's inequality on finite sets, also for means (`MeasureTheory.lqNorm_laverage_le`) and, on
+a probability space, with the `L_p` norm on the right (`MeasureTheory.lqNorm_lintegral_le_eLpNorm`).
 Finally, a pointwise bound `u ≤ v + w_J` with `‖w_J‖_p → 0` gives `u ≤ v` almost everywhere
 (`MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm`), and a bound `|G_J| ≤ v` almost everywhere
 passes to the limit of `G_J` in `L_p` (`MeasureTheory.ae_enorm_le_of_tendsto_Lp`).
@@ -299,6 +300,21 @@ theorem measurable_lqNorm_comp {g : ι → α → ℝ≥0∞} (hg : ∀ i, Measu
     exact Measurable.iSup hg
   simp only [ENNReal.lqNorm_eq_tsum hq0 hq]
   exact (Measurable.tsum fun i => (hg i).pow_const _).pow_const _
+
+/-- **Minkowski's integral inequality on a probability space, in `L_p`**: for a probability
+measure `μ`, `1 ≤ p ≤ ∞`, `1 ≤ q ≤ ∞` and almost everywhere measurable `g_i : α → [0, ∞]`
+indexed by a countable set, `‖(∫ g_i dμ)_i‖_{ℓ_q} ≤ ‖ x ↦ ‖(g_i(x))_i‖_{ℓ_q} ‖_{L_p(μ)}`, by
+`MeasureTheory.lqNorm_lintegral_le` and `‖·‖_1 ≤ ‖·‖_p` (Mathlib's
+`eLpNorm_le_eLpNorm_of_exponent_le`). -/
+theorem lqNorm_lintegral_le_eLpNorm [IsProbabilityMeasure μ] (hp1 : 1 ≤ p) (hq : 1 ≤ q)
+    {g : ι → α → ℝ≥0∞} (hg : ∀ i, AEMeasurable (g i) μ) :
+    lqNorm q (fun i => ∫⁻ x, g i x ∂μ) ≤ eLpNorm (fun x => lqNorm q (fun i => g i x)) p μ :=
+  calc lqNorm q (fun i => ∫⁻ x, g i x ∂μ)
+      ≤ ∫⁻ x, lqNorm q (fun i => g i x) ∂μ := lqNorm_lintegral_le hq hg
+    _ = eLpNorm (fun x => lqNorm q (fun i => g i x)) 1 μ := by
+        rw [eLpNorm_one_eq_lintegral_enorm (aemeasurable_lqNorm_comp hg q).aestronglyMeasurable]
+        simp only [enorm_eq_self]
+    _ ≤ _ := eLpNorm_le_eLpNorm_of_exponent_le hp1
 
 /-- **Minkowski's integral inequality for means**: for `1 ≤ u ≤ ∞` and almost everywhere
 measurable `g_i : α → [0, ∞]` indexed by a countable set,

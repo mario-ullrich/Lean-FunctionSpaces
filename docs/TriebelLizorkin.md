@@ -81,6 +81,17 @@ of the block.
   order (`Rd.LocalMeansBump.tlLocalMeansNorm_lt_top_iff`). The proof bounds blocks and local
   means by maximal functions of each other at every point and applies the Fefferman–Stein
   inequality.
+* **Local means on the torus.** For a bump `g` on `ℝ^d` with local means kernels `k_j` of order
+  `L`, acting on the torus by `k_j ⋆ f(t) = ∫ k_j(y) f(t - π y) dy`, the quasi-norm
+  `‖f‖^{g,L}_{F^s_{p,q}(𝕋^d)} = ‖ t ↦ ‖(2^(js) |k_j ⋆ f(t)|)_j‖_{ℓ_q} ‖_p`
+  (`Torus.tlLocalMeansNorm`) satisfies the same two bounds with explicit constants
+  (`Torus.tlLocalMeansNorm_le_triebelLizorkinNorm`,
+  `Torus.triebelLizorkinNorm_le_tlLocalMeansNorm`), so for `1 < p < ∞`, `1 < q ≤ ∞`, `L ≥ 1`
+  and `0 < s < L`, `f ∈ F^s_{p,q}(𝕋^d)` iff `‖f‖^{g,L}_{F^s_{p,q}(𝕋^d)} < ∞`
+  (`Torus.memTriebelLizorkin_iff_tlLocalMeans`). The pointwise bounds of `ℝ^d` apply to the
+  periodic lifts `h ∘ π`, and the Fefferman–Stein inequality holds for the maximal functions of
+  lifts on the period box `(0, 1]^d`, with the constant `Torus.periodicFSConst d p q`
+  (`Torus.feffermanStein_periodic`).
 
 ## What is formalised
 
@@ -99,9 +110,9 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Ball means of differences | ⬜ | ✗ | `Rd/TriebelLizorkinDifferences` |
 | Atomic characterisation | ⬜ | ✗ | `Rd/TriebelLizorkinAtoms` |
 | Triebel–Lizorkin spaces on the torus, the Besov sandwich | ✅ | ✗ | `Torus/TriebelLizorkin` |
-| The periodic lift of functions on the torus | ⬜ | ✗ | `Torus/PeriodicLift` |
-| The Fefferman–Stein inequality for periodic lifts | ⬜ | ✗ | `Torus/FeffermanStein` |
-| Local means on the torus | ⬜ | ✗ | `Torus/TriebelLizorkinLocalMeans` |
+| The periodic lift: period boxes, lifted null sets, counting boxes | ✅ | ✗ | `Torus/PeriodicLift` |
+| The Fefferman–Stein inequality for periodic lifts | ✅ | ✗ | `Torus/FeffermanStein` |
+| Local means characterisation on the torus | ✅ | ✗ | `Torus/TriebelLizorkinLocalMeans` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

@@ -139,6 +139,9 @@ public import FunctionSpaces.Rd.CalderonZygmund
 public import FunctionSpaces.Rd.FeffermanStein
 public import FunctionSpaces.Rd.KernelMajorants
 public import FunctionSpaces.Rd.TriebelLizorkinLocalMeans
+public import FunctionSpaces.Torus.PeriodicLift
+public import FunctionSpaces.Torus.FeffermanStein
+public import FunctionSpaces.Torus.TriebelLizorkinLocalMeans
 
 /-!
 # Function spaces
@@ -430,4 +433,11 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.TriebelLizorkinLocalMeans`: the local means quasi-norm of
   Triebel–Lizorkin type, pointwise bounds of blocks and local means by maximal functions, and
   the local means characterisation of `F^s_{p,q}` for `1 < p < ∞`, `1 < q ≤ ∞`, `0 < s < L`.
+* `FunctionSpaces.Torus.PeriodicLift`: period boxes, the quotient map `ℝ^d → 𝕋^d` as a measure
+  preserving map on them, lifts of almost everywhere statements, convolutions and differences of
+  lifts, counting boxes in a ball.
+* `FunctionSpaces.Torus.FeffermanStein`: the Fefferman–Stein inequality for the maximal functions
+  of periodic lifts on the period box, by localisation.
+* `FunctionSpaces.Torus.TriebelLizorkinLocalMeans`: the local means characterisation of
+  `F^s_{p,q}(𝕋^d)` for `1 < p < ∞`, `1 < q ≤ ∞`, `0 < s < L`, through the periodic lift.
 -/
