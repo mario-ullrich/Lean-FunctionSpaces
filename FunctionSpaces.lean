@@ -35,6 +35,36 @@ public import FunctionSpaces.Wavelets.Examples.Haar
 public import FunctionSpaces.Wavelets.Examples.HaarBesov
 public import FunctionSpaces.Wavelets.Examples.Multiscale
 public import FunctionSpaces.Wavelets.Examples.Alpert
+public import FunctionSpaces.Wavelets.Daubechies.DaubechiesPolynomial
+public import FunctionSpaces.Wavelets.Daubechies.FourierIntegrable
+public import FunctionSpaces.Wavelets.Daubechies.FejerRiesz
+public import FunctionSpaces.Wavelets.Daubechies.Mask
+public import FunctionSpaces.Wavelets.Daubechies.MaskExistence
+public import FunctionSpaces.Wavelets.Daubechies.FilterIdentities
+public import FunctionSpaces.Wavelets.Daubechies.D4
+public import FunctionSpaces.Wavelets.Daubechies.SymbolProduct
+public import FunctionSpaces.Wavelets.Daubechies.TransferOperator
+public import FunctionSpaces.Wavelets.Daubechies.SymbolDecay
+public import FunctionSpaces.Wavelets.Daubechies.TransferExamples
+public import FunctionSpaces.Wavelets.Daubechies.ScalingFunction
+public import FunctionSpaces.Wavelets.Daubechies.Cascade
+public import FunctionSpaces.Wavelets.Daubechies.Orthonormality
+public import FunctionSpaces.Wavelets.Daubechies.ScalingMoments
+public import FunctionSpaces.Wavelets.Daubechies.PolynomialReproduction
+public import FunctionSpaces.Wavelets.Daubechies.SobolevRegularity
+public import FunctionSpaces.Wavelets.Daubechies.HolderRegularity
+public import FunctionSpaces.Wavelets.Daubechies.MatrixMethod
+public import FunctionSpaces.Wavelets.Daubechies.MatrixMethodD4
+public import FunctionSpaces.Wavelets.Daubechies.Expansion
+public import FunctionSpaces.Wavelets.Daubechies.ExpansionScaling
+public import FunctionSpaces.Wavelets.Daubechies.Projections
+public import FunctionSpaces.Wavelets.Daubechies.Wavelet
+public import FunctionSpaces.Wavelets.Daubechies.JacksonSmoothing
+public import FunctionSpaces.Wavelets.Daubechies.Jackson
+public import FunctionSpaces.Wavelets.Daubechies.Bernstein
+public import FunctionSpaces.Wavelets.Daubechies.Besov
+public import FunctionSpaces.Wavelets.Daubechies.D4Besov
+public import FunctionSpaces.Wavelets.Daubechies.OrderThree
 public import FunctionSpaces.Torus.Translation
 public import FunctionSpaces.Torus.Modulus
 public import FunctionSpaces.Torus.BesovModuli
@@ -212,6 +242,106 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Wavelets.Examples.Alpert`: multiwavelets of Alpert type, an orthonormal basis
   of the detail space, and the characterisation of `A^s_q` of piecewise polynomials, and of
   `B^s_{p,q}` for `0 < s < 1/p`, by multiwavelet coefficients.
+* `FunctionSpaces.Wavelets.Daubechies.DaubechiesPolynomial`: the Daubechies polynomial
+  `P_N(y) = ∑_{k<N} C(N-1+k, k) y^k`, its Bézout identity, its values and bounds, and its
+  trigonometric form `P_N(sin²(πξ))`.
+* `FunctionSpaces.Wavelets.Daubechies.FourierIntegrable`: the Fourier transform of integrable
+  functions on `ℝ`: continuity and bounds, translations and dilations, the multiplication formula,
+  Parseval's identity for integrable functions with integrable transforms, and the fundamental lemma
+  with Schwartz test functions.
+* `FunctionSpaces.Wavelets.Daubechies.FejerRiesz`: the Fejér–Riesz theorem: a real polynomial `Q`
+  positive on `[-1, 1]` satisfies `Q(cos θ) = |L(e^{iθ})|²` for a real polynomial `L` without zeros
+  in the closed unit disk.
+* `FunctionSpaces.Wavelets.Daubechies.Mask`: the point `e^{-2πiξ}` of the unit circle, masks of
+  order `N` (a real polynomial `L` of degree `< N` with `L(1) = 1` and
+  `|L(e^{-2πiξ})|² = P_N(sin²(πξ))`), the mask polynomial, the filter coefficients and the symbol
+  `m_0` with the quadrature mirror filter identity.
+* `FunctionSpaces.Wavelets.Daubechies.MaskExistence`: masks of every order `N ≥ 1` by the
+  Fejér–Riesz theorem applied to `P_N((1 - t)/2)`, the minimum-phase mask, whose polynomial `L`
+  has no zeros in the closed unit disk, and its identification with D4 for `N = 2`.
+* `FunctionSpaces.Wavelets.Daubechies.FilterIdentities`: identities of the filter coefficients:
+  orthogonality of the even shifts, the sum rules, parity sums and first moments, the vanishing
+  derivatives of the symbol at the half-integers, and the dual filter of the wavelet.
+* `FunctionSpaces.Wavelets.Daubechies.D4`: the Daubechies mask D4 of order `2` and its four filter
+  coefficients.
+* `FunctionSpaces.Wavelets.Daubechies.SymbolProduct`: the infinite product
+  `Φ(ξ) = ∏_{j ≥ 0} m_0(ξ/2^(j+1))`: convergence, continuity, the two-scale relation, zeros, and
+  `|Φ(ξ)|² = sinc(πξ)^(2N) ∏_j P(ξ/2^(j+1))` through Viète's cosine product.
+* `FunctionSpaces.Wavelets.Daubechies.TransferOperator`: the transfer operator
+  `T g(ξ) = P(ξ/2) g(ξ/2) + P((ξ+1)/2) g((ξ+1)/2)`, its adjoint identity, the integrals of the
+  dyadic products of `P` as integrals of `T^n 1`, and growth bounds.
+* `FunctionSpaces.Wavelets.Daubechies.SymbolDecay`: the decay of `Φ` on dyadic annuli:
+  `(1 + |ξ|)^(2s) |Φ|²` is integrable for `s < N - log₄ λ` and `(1 + |ξ|)^a |Φ|` for
+  `a < N - log₄ λ - 1/2` when `T^n 1 ≤ C λ^n`; `Φ ∈ L¹ ∩ L²` for `N ≥ 2`.
+* `FunctionSpaces.Wavelets.Daubechies.TransferExamples`: the transfer operator for `N = 2`
+  (`T 1 = 4`) and `N = 3` (eigenvalues `9` and `-4`), with the growth rates `4` and `9` and the
+  exponents `1` and `3 - log₂ 3`.
+* `FunctionSpaces.Wavelets.Daubechies.ScalingFunction`: the scaling function `φ = 𝓕⁻ Φ`, its
+  continuity and bound, the refinement equation `φ(x) = ∑_k c_k φ(2x - k)`, and the fact that `φ` is
+  real.
+* `FunctionSpaces.Wavelets.Daubechies.Cascade`: the cascade algorithm
+  `η_{n+1}(x) = ∑_k c_k η_n(2x - k)` from the indicator of `[0, 1)`, its Fourier transform, the
+  compact support of `φ` in `[0, 2N - 1]` by testing against Schwartz functions, and `𝓕 φ = Φ`,
+  `∫ φ = 1`.
+* `FunctionSpaces.Wavelets.Daubechies.Orthonormality`: `∫ w |Φ|² = ∫_0^1 w` for continuous
+  `1`-periodic `w` through the truncated products, and the orthonormality of the integer translates
+  of `φ`.
+* `FunctionSpaces.Wavelets.Daubechies.ScalingMoments`: the smoothness of `Φ`, its vanishing
+  derivatives of order `< N` at the nonzero integers, the constant periodised moments of `φ` by
+  Poisson summation, and the partition of unity `∑_k φ(x - k) = 1`.
+* `FunctionSpaces.Wavelets.Daubechies.PolynomialReproduction`: every polynomial of degree `< N` as a
+  combination of the translates of `φ` with polynomial coefficients, the recovery of coefficients by
+  orthonormality, and the projection identity `∑_k ⟨Q, φ(· - k)⟩ φ(x - k) = Q(x)`, also at every
+  level `j`.
+* `FunctionSpaces.Wavelets.Daubechies.SobolevRegularity`: the Fourier transform of differences,
+  Parseval for the differences of `φ`, and the bound `ω_r(φ, t)_p ≤ K t^s` for `p ≤ 2` and
+  `s < N - log₄ λ` under a growth bound of the transfer operator, with the instances `s < 1` for
+  `N = 2` and `s < 3 - log₂ 3` for `N = 3`.
+* `FunctionSpaces.Wavelets.Daubechies.HolderRegularity`: the differences of `φ` through the inverse
+  Fourier transform: the Hölder bound `|Δ_h^r φ(x)| ≤ K |h|^a` for `a < N - log₄ λ - 1/2`, the
+  modulus in `L_∞`, and the moduli in `L_p` for `p ≥ 2` by interpolation between `L²` and `L_∞`,
+  with the instances for `N = 2, 3`.
+* `FunctionSpaces.Wavelets.Daubechies.MatrixMethod`: the dyadic descent: two functions on `[0, 1)`
+  with halving and triangular recursions on the two halves have differences `O(ρ^n)` on dyadic
+  intervals of level `n`, which gives a Hölder bound with exponent `-log₂ ρ`.
+* `FunctionSpaces.Wavelets.Daubechies.MatrixMethodD4`: the matrix method of Daubechies and Lagarias
+  for D4 in scalar form: the scaling function of D4 is Hölder continuous of every order
+  `a ≤ 2 - log₂(1 + √3)`, and `2 - log₂(1 + √3) > 0.55`.
+* `FunctionSpaces.Wavelets.Daubechies.Expansion`: expansions `∑_k c_k g_{j,k}` in the dilated
+  translates `g_{j,k}(x) = 2^{j/2} g(2^j x - k)` of a compactly supported generator: finite sums at
+  each point, the window inequality, coefficient recovery under orthonormality, and the two-sided
+  stability `‖∑_k c_k g_{j,k}‖_p ≍ 2^{j(1/2 - 1/p)} ‖c‖_{ℓ_p}` with explicit constants.
+* `FunctionSpaces.Wavelets.Daubechies.ExpansionScaling`: the expansions in the scaling function:
+  `φ_{j,k}` with its support, orthonormality at every level, coefficient recovery, and the
+  refinement relation `φ_{j,k} = ∑_i (c_i/√2) φ_{j+1,2k+i}`.
+* `FunctionSpaces.Wavelets.Daubechies.Projections`: the projections
+  `P_j f = ∑_k ⟨f, φ_{j,k}⟩ φ_{j,k}`: uniform bounds on `L_p`, the local bound on dyadic cells,
+  reproduction of expansions and of polynomials of degree `< N`, the nested spaces `V_j`, density,
+  and the approximation scheme with its projection scheme.
+* `FunctionSpaces.Wavelets.Daubechies.Wavelet`: the Daubechies wavelet
+  `ψ(x) = ∑_k (-1)^k c_{1-k} φ(2x - k)`: support, orthonormality of its translates and orthogonality
+  to those of `φ`, the decomposition `P_{j+1} f - P_j f = ∑_k ⟨f, ψ_{j,k}⟩ ψ_{j,k}`, the norms of
+  the blocks through the wavelet coefficients, and the vanishing moments of order `< N`.
+* `FunctionSpaces.Wavelets.Daubechies.JacksonSmoothing`: Steklov smoothing on the whole line:
+  `‖f - S_δ f‖_p ≤ ω_r(f, rδ)_p` and `‖(S_δ f)^(r)‖_p ≤ 2^r δ^(-r) ω_r(f, rδ)_p` for continuous `f`,
+  in the dyadic form used by Jackson's inequality.
+* `FunctionSpaces.Wavelets.Daubechies.Jackson`: Jackson's inequality
+  `E_{2^j}(f)_p ≤ C_J ω_N(f, 2^(-j))_p` for the spaces `V_j`, from Steklov smoothing, Taylor
+  polynomials on the windows of the dyadic cells and the local reproduction of polynomials.
+* `FunctionSpaces.Wavelets.Daubechies.Bernstein`: Bernstein's inequality for the spaces `V_j`:
+  `ω_r(a, t)_p ≤ C ω_r(φ, 2^j t)_p ‖a‖_p` for `a ∈ V_j`, the bounds `ω_r(φ, t)_p ≤ K t^θ` from the
+  regularity theorems (also for D4 with its Hölder exponent), and the inverse inequality of the
+  scheme.
+* `FunctionSpaces.Wavelets.Daubechies.Besov`: the approximation spaces of the Daubechies scheme are
+  the Besov spaces: `A^s_q = B^s_{p,q}(ℝ)` for `0 < s < θ` under a Bernstein bound of order `θ`, and
+  `f ∈ B^s_{p,q}(ℝ)` iff its Daubechies coefficients lie in `b^s_{p,q}`, with the ranges
+  `s < N - log₄ λ` for `p ≤ 2` and the interpolated range for `p ≥ 2`.
+* `FunctionSpaces.Wavelets.Daubechies.D4Besov`: Besov spaces by D4 coefficients: the range
+  `0 < s < 1` for `p ≤ 2`, the interpolated range `0 < s < 2/p + (1 - 2/p)(2 - log₂(1 + √3))` for
+  `p ≥ 2`, and `0 < s < 2 - log₂(1 + √3)` for every `p`.
+* `FunctionSpaces.Wavelets.Daubechies.OrderThree`: masks of order three: `φ ∈ H^s` for
+  `s < 3 - log₂ 3`, Hölder continuity of order `9/10`, and Besov spaces by coefficients for
+  `0 < s < 3 - log₂ 3` if `p ≤ 2`, for `0 < s < 5/2 - log₂ 3 + 1/p` if `p ≥ 2`.
 * `FunctionSpaces.Torus.Translation`: translations on `L_2(𝕋^d)` and their Fourier
   multipliers.
 * `FunctionSpaces.Torus.Modulus`: the modulus of smoothness `ω(f, t)_2`, the growth of the

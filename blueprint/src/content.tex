@@ -292,7 +292,7 @@ With these, a constant $(1 - 2^{-\alpha})^{-1}$ is finite exactly for $\alpha > 
   ENNReal.dyadicWeight_le_of_le, ENNReal.dyadicWeight_anti, ENNReal.one_le_dyadicWeight,
   ENNReal.natCast_two_pow_rpow, ENNReal.two_rpow_neg_lt_one,
   ENNReal.one_sub_two_rpow_neg_inv_ne_top, ENNReal.one_le_one_sub_two_rpow_neg_inv,
-  ENNReal.lqNorm_dyadicWeight_neg_le}
+  ENNReal.lqNorm_dyadicWeight_neg_le, ENNReal.lqNorm_lt_top_iff_of_le_mul}
 \leanok
 For $q \in (0, \infty)$, a countable set $I$ and a family $a = (a_i)_{i \in I}$ in $[0, \infty]$,
 \[
@@ -4001,8 +4001,8 @@ over $m < 2^k$.
 
 \begin{theorem}[Multiwavelet characterisation]
 \label{thm:multiwavelet-besov}
-\lean{ENNReal.lqNorm_lt_top_iff_of_le_mul, Alpert.memApprox_ppScheme_iff_coeff,
-  Alpert.lqNorm_modulus_lt_top_iff_coeff, Alpert.lqNorm_perModulus_lt_top_iff_coeff}
+\lean{Alpert.memApprox_ppScheme_iff_coeff, Alpert.lqNorm_modulus_lt_top_iff_coeff,
+  Alpert.lqNorm_perModulus_lt_top_iff_coeff}
 \leanok
 \uses{thm:pp-multiscale, lem:multiwavelet-norms, thm:pp-besov, thm:pp-besov-per}
 Let $1 \leq p < \infty$, $r \geq 1$, $s > 0$ and $1 \leq q \leq \infty$. A function
@@ -12878,8 +12878,8 @@ $Y^2 - 1 = (Y - 1)(Y + 1)$ and \Cref{lem:moment-polynomial}.
   Rd.LocalMeansBump.actsBounded_lmRemainder, Rd.LocalMeansBump.mixedLocalMean_ae_eq,
   Rd.LocalMeansBump.enorm_mixedLocalMean_le, Rd.LocalMeansBump.mixedLocalMeansNorm_le}
 \leanok
-\uses{lem:kernel-dilation-sum, thm:tensor-averaged-differences, lem:acts-bounded,
-  lem:weighted-jensen, def:mixed-moduli}
+\uses{def:mixed-local-means, lem:kernel-dilation-sum, thm:tensor-averaged-differences,
+  lem:acts-bounded, lem:weighted-jensen, def:mixed-moduli}
 If the bump vanishes outside $[-1, 1]$, then
 $\|k_k * f\|_p \leq (\|g\|_1 (2^L + 1))^d \, \Omega^{e(k)}_L(f, 2^{-k})_p$. Hence the mixed local
 means quasi-norm is at most $(\|g\|_1 (2^L + 1))^d$ times the quasi-norm by differences.
@@ -13080,6 +13080,8 @@ level $n$, Hölder's inequality costs $(n + 1)^{(d-1)(1 - 1/q)}$ (\Cref{lem:leve
 \Cref{lem:rate-series} sums over $n > N$.
 \end{proof}
 
+\input{daubechies}
+
 \chapter{The representations of Besov spaces}
 \label{chap:representations}
 
@@ -13098,8 +13100,8 @@ The dimension of the underlying space is $n$.
   \item \emph{Approximation} (\Cref{def:approx-space,def:dyadic-norm}).
     $\|f\| + \|(2^{ks} E_{2^k}(f))_k\|_{\ell_q}$, where $E_m(f)$ is the error of best
     approximation of $f$ by the $m$-th set of a scheme: trigonometric polynomials, band-limited
-    functions, piecewise polynomials, splines, step functions, or combinations of $m$ elements of a
-    dictionary.
+    functions, piecewise polynomials, splines, step functions, the spans of the translates of a
+    Daubechies scaling function, or combinations of $m$ elements of a dictionary.
   \item \emph{Differences} (\Cref{def:rd-modulus,def:rd-modulus-on};
     \Cref{def:modulus,def:interval-modulus,def:iso-modulus,def:cube-modulus}).
     $\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_q}$ with a modulus of smoothness of
@@ -13126,9 +13128,10 @@ The dimension of the underlying space is $n$.
       \|\lambda\|_{b^s_{p,q}} = \bigl\|\bigl(2^{j(s - n/p)} \|\lambda_{j,\cdot}\|_{\ell_p}\bigr)_j
         \bigr\|_{\ell_q} .
     \]
-  \item \emph{Coefficients} (\Cref{def:haar,def:multiwavelets,def:spectral}).
+  \item \emph{Coefficients} (\Cref{def:haar,def:multiwavelets,def:daub-wavelet,def:spectral}).
     Weighted $\ell_q(\ell_p)$ norms of the coefficients of $f$ in a basis, level by level: Haar
-    functions, multiwavelets, the Fourier basis, a Hilbert basis of a spectral scheme.
+    functions, multiwavelets, Daubechies wavelets, the Fourier basis, a Hilbert basis of a
+    spectral scheme.
   \item \emph{Blocks} (\Cref{def:block-decomposition,def:blocks}).
     Decompositions $f = \sum_k g_k$ with $g_k$ in the $2^k$-th set of the scheme, measured by
     $\|(2^{ks} \|g_k\|)_k\|_{\ell_q}$; for a scheme with uniformly bounded projections $P_m$, the
@@ -13273,6 +13276,40 @@ Descriptions & Range & Result \\
 \end{tabular}
 \end{center}
 
+\paragraph{The line $\R$ with Daubechies wavelets.} The scheme consists of the spans $V_j$ of the
+functions $\varphi(2^j \cdot - k)$, $k \in \Z$, for the scaling function $\varphi$ of a Daubechies
+mask of order $N \geq 2$; the differences are of order $N$. The order $\theta$ is that of a bound
+$\omega_N(\varphi, t)_p \leq K t^\theta$ (\Cref{def:daub-bernstein-bound}), and $\lambda$ is the
+rate of a growth bound $T^n 1 \leq C \lambda^n$ for the transfer operator.
+\begin{center}
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
+\hline
+Descriptions & Range & Result \\
+\hline
+\raggedright Daubechies approximation and differences of order $N$ & $0 \leq s < \theta$
+  & \Cref{thm:daub-approx-modulus} \\
+\raggedright Daubechies approximation and wavelet coefficients & $s > 0$
+  & \Cref{thm:daub-approx-coeff} \\
+\raggedright Wavelet coefficients and differences of order $N$; Littlewood--Paley blocks if
+  $s < N$ & $0 < s < \theta$ & \Cref{thm:daub-besov} \\
+\raggedright Wavelet coefficients and differences, $1 \leq p \leq 2$
+  & $0 < s < N - \log_4 \lambda$ & \Cref{cor:daub-besov-le-two} \\
+\raggedright Wavelet coefficients and differences, $2 \leq p < \infty$, with
+  $s' < N - \log_4 \lambda$ and a H\"older exponent $a$ of $\varphi$
+  & $0 < s < \frac{2}{p} s' + (1 - \frac{2}{p}) a$ & \Cref{cor:daub-besov-two-le} \\
+\raggedright D4 coefficients and differences of order $2$, $1 \leq p \leq 2$; $2 \leq p < \infty$;
+  every $p$, with $\alpha = 2 - \log_2(1 + \sqrt{3})$
+  & $0 < s < 1$; $0 < s < \frac{2}{p} + (1 - \frac{2}{p}) \alpha$; $0 < s < \alpha$
+  & \Cref{thm:daub-besov-d4} \\
+\raggedright Coefficients of order three and differences of order $3$, $1 \leq p \leq 2$;
+  $2 \leq p < \infty$; every $p$
+  & $0 < s < 3 - \log_2 3$; $0 < s < \frac{5}{2} - \log_2 3 + \frac{1}{p}$;
+  $0 < s < \frac{5}{2} - \log_2 3$ & \Cref{thm:daub-besov-order-three} \\
+\hline
+\end{tabular}
+\end{center}
+
 \paragraph{Domains in $\R^n$.} Restrictions are taken from the functions on $\R^n$ with a
 finite quasi-norm of the same kind.
 \begin{center}
@@ -13397,7 +13434,10 @@ Differences of order $r$ detect $s < r$, and local means and atoms of order $L$ 
 Littlewood--Paley blocks and Fourier coefficients have no such bound. The approximation space of a scheme is defined for every $s$, and it is the Besov
 space below the inverse order $\theta$ of the scheme: $\theta = 1/p$ for piecewise polynomials and
 step functions, $\theta = r - 1 + 1/p$ for splines of order $r$, and every $\theta$ for
-band-limited functions (\Cref{thm:rd-besov}). A scheme of piecewise polynomials contains
+band-limited functions (\Cref{thm:rd-besov}). For the spaces of a Daubechies scaling function
+$\varphi$ it is the order of a bound $\omega_N(\varphi, t)_p \leq K t^\theta$, so the range of
+the wavelet coefficients is set by the regularity of $\varphi$ (\Cref{thm:daub-besov}). A scheme
+of piecewise polynomials contains
 functions with jumps, and these lie in its approximation spaces for every $s$ but in no Besov
 space of smoothness $s > 1/p$.
 
@@ -13458,6 +13498,20 @@ J.~Bergh, J.~L\"ofstr\"om,
 Grundlehren der mathematischen Wissenschaften \textbf{223}, Springer-Verlag, Berlin, 1976,
 \href{https://doi.org/10.1007/978-3-642-66451-9}{doi}.
 
+\bibitem{Daubechies}
+I.~Daubechies,
+\emph{Ten Lectures on Wavelets},
+CBMS-NSF Regional Conference Series in Applied Mathematics \textbf{61}, SIAM, Philadelphia,
+1992,
+\href{https://doi.org/10.1137/1.9781611970104}{doi}.
+
+\bibitem{DaubechiesLagarias}
+I.~Daubechies, J.~C.~Lagarias,
+\emph{Two-scale difference equations. II. Local regularity, infinite products of matrices and
+fractals},
+SIAM J.\ Math.\ Anal.\ \textbf{23} (1992), no.~4, 1031--1079,
+\href{https://doi.org/10.1137/0523059}{doi}.
+
 \bibitem{DeVoreLorentz}
 R.~A.~DeVore, G.~G.~Lorentz,
 \emph{Constructive Approximation},
@@ -13476,11 +13530,36 @@ C.~Fefferman, E.~M.~Stein,
 Amer.\ J.\ Math.\ \textbf{93} (1971), no.~1, 107--115,
 \href{https://doi.org/10.2307/2373450}{doi}.
 
+\bibitem{Eirola}
+T.~Eirola,
+\emph{Sobolev characterization of solutions of dilation equations},
+SIAM J.\ Math.\ Anal.\ \textbf{23} (1992), no.~4, 1015--1030,
+\href{https://doi.org/10.1137/0523058}{doi}.
+
+\bibitem{GuglielmiProtasov}
+N.~Guglielmi, V.~Yu.~Protasov,
+\emph{Invariant polytopes of linear operators with applications to regularity of wavelets and
+of subdivisions},
+SIAM J.\ Matrix Anal.\ Appl.\ \textbf{37} (2016), no.~1, 18--52,
+\href{https://arxiv.org/abs/1502.01192}{arXiv:1502.01192}.
+
+\bibitem{HernandezWeiss}
+E.~Hern\'andez, G.~Weiss,
+\emph{A First Course on Wavelets},
+Studies in Advanced Mathematics, CRC Press, Boca Raton, 1996.
+
 \bibitem{Nikolskii}
 S.~M.~Nikol'ski\u{\i},
 \emph{Approximation of Functions of Several Variables and Imbedding Theorems},
 Grundlehren der mathematischen Wissenschaften \textbf{205}, Springer-Verlag, Berlin, 1975,
 \href{https://doi.org/10.1007/978-3-642-65711-5}{doi}.
+
+\bibitem{Ojanen}
+H.~Ojanen,
+\emph{Orthonormal compactly supported wavelets with optimal Sobolev regularity: numerical
+results},
+Appl.\ Comput.\ Harmon.\ Anal.\ \textbf{10} (2001), no.~1, 93--98,
+\href{https://arxiv.org/abs/math/9807089}{arXiv:math/9807089}.
 
 \bibitem{Pietsch}
 A.~Pietsch,
@@ -13534,6 +13613,13 @@ T.~Ullrich,
 \emph{Function spaces with dominating mixed smoothness, characterization by differences},
 Jenaer Schriften zur Mathematik und Informatik Math/Inf/05/06, Friedrich-Schiller-Universit\"at
 Jena, 2006.
+
+\bibitem{Villemoes}
+L.~F.~Villemoes,
+\emph{Energy moments in time and frequency for two-scale difference equation solutions and
+wavelets},
+SIAM J.\ Math.\ Anal.\ \textbf{23} (1992), no.~6, 1519--1543,
+\href{https://doi.org/10.1137/0523085}{doi}.
 
 \bibitem{Vybiral}
 J.~Vyb\'{\i}ral,
