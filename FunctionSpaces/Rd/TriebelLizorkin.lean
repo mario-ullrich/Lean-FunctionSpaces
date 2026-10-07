@@ -177,7 +177,7 @@ theorem blockFun_smul (j : ℕ) (c : ℂ) (f : Lp ℂ p (volume : Measure V)) (x
 /-- The **Triebel–Lizorkin quasi-norm** `‖ x ↦ ‖(2^(js) |ψ_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p` of
 `f ∈ L_p`: the `ℓ_q` norm of the weighted blocks at each point, then the `L_p` norm. The
 Littlewood–Paley quasi-norm of the Besov spaces (`Rd.littlewoodPaleyNorm`) takes the two norms in
-the other order. -/
+the other order. For `q = 0` the quasi-norm is `0`; the results assume `1 ≤ q`. -/
 noncomputable def triebelLizorkinNorm (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p (volume : Measure V)) :
     ℝ≥0∞ :=
   eLpNorm (fun x => lqNorm q (fun j => dyadicWeight s j * ‖blockFun j f x‖ₑ)) p volume

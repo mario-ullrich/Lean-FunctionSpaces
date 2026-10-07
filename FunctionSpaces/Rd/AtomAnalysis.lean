@@ -165,7 +165,7 @@ theorem conv_tsum_of_finset {ι : Type*} {K : V → ℂ} (hKc : Continuous K)
   exact Finset.sum_congr rfl fun m _ => (conv_apply _ _ _ _).symm
 
 omit [MeasurableSpace V] [BorelSpace V] in
-/-- The cells split every function:`g(y) = ∑_m (1_{P_{j,m}} g)(y)`, where only the cell
+/-- The cells split every function: `g(y) = ∑_m (1_{P_{j,m}} g)(y)`, where only the cell
 containing `y` contributes. -/
 theorem tsum_indicator_cell (j : ℕ) (g : V → ℂ) (y : V) :
     ∑' m, (cell j m).indicator g y = g y := by

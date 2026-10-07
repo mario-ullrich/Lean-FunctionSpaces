@@ -5,10 +5,10 @@ Part of [Function spaces via approximation](../README.md). Blueprint chapters:
 
 Besov quasi-norms take the `L_p` norm of every Littlewood–Paley block `ψ_j ⋆ f` and then the
 `ℓ_q` norm over the levels; the Triebel–Lizorkin quasi-norm
-`‖ (∑_j 2^(jsq) |ψ_j ⋆ f|^q)^(1/q) ‖_p` takes the `ℓ_q` norm at every point first. This block
-develops the spaces `F^s_{p,q}` on `ℝ^d` and on the torus `𝕋^d` with the blocks of
-[Function spaces on `ℝ^d`](Rd.md). Its first part compares the two mixed norms `L_p(ℓ_q)` and
-`ℓ_q(L_p)` on every measure space.
+`‖ (∑_j 2^(jsq) |ψ_j ⋆ f|^q)^(1/q) ‖_p`, with the supremum over `j` for `q = ∞`, takes the
+`ℓ_q` norm at every point first. This block develops the spaces `F^s_{p,q}` on `ℝ^d` and on the
+torus `𝕋^d` with the blocks of [Function spaces on `ℝ^d`](Rd.md). Its first part compares the two
+mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)` on every measure space.
 
 ## Main results
 
@@ -74,8 +74,8 @@ develops the spaces `F^s_{p,q}` on `ℝ^d` and on the torus `𝕋^d` with the bl
   `‖f‖^{g,L}_{F^s_{p,q}} ≤ D ‖f‖_{F^s_{p,q}}` and, for `L ≥ 1`,
   `‖f‖_{F^s_{p,q}} ≤ U ‖f‖^{g,L}_{F^s_{p,q}}`, with explicit constants `D`, `U` that are
   finite for `0 < s < L` (`Rd.LocalMeansBump.tlLocalMeansNorm_le_triebelLizorkinNorm`,
-  `Rd.LocalMeansBump.triebelLizorkinNorm_le_tlLocalMeansNorm`). Hence for `L ≥ 1` and
-  `0 < s < L`, `f ∈ F^s_{p,q}` iff `‖f‖^{g,L}_{F^s_{p,q}} < ∞`
+  `Rd.LocalMeansBump.triebelLizorkinNorm_le_tlLocalMeansNorm`). Hence for `0 < s < L`,
+  `f ∈ F^s_{p,q}` iff `‖f‖^{g,L}_{F^s_{p,q}} < ∞`
   (`Rd.LocalMeansBump.memTriebelLizorkin_iff_tlLocalMeans`), for every bump and every such
   order (`Rd.LocalMeansBump.tlLocalMeansNorm_lt_top_iff`). The proof bounds blocks and local
   means by maximal functions of each other at every point and applies the Fefferman–Stein
@@ -85,8 +85,8 @@ develops the spaces `F^s_{p,q}` on `ℝ^d` and on the torus `𝕋^d` with the bl
   `‖f‖^{g,L}_{F^s_{p,q}(𝕋^d)} = ‖ t ↦ ‖(2^(js) |k_j ⋆ f(t)|)_j‖_{ℓ_q} ‖_p`
   (`Torus.tlLocalMeansNorm`) satisfies the same two bounds with explicit constants
   (`Torus.tlLocalMeansNorm_le_triebelLizorkinNorm`,
-  `Torus.triebelLizorkinNorm_le_tlLocalMeansNorm`), so for `1 < p < ∞`, `1 < q ≤ ∞`, `L ≥ 1`
-  and `0 < s < L`, `f ∈ F^s_{p,q}(𝕋^d)` iff `‖f‖^{g,L}_{F^s_{p,q}(𝕋^d)} < ∞`
+  `Torus.triebelLizorkinNorm_le_tlLocalMeansNorm`), so for `1 < p < ∞`, `1 < q ≤ ∞` and
+  `0 < s < L`, `f ∈ F^s_{p,q}(𝕋^d)` iff `‖f‖^{g,L}_{F^s_{p,q}(𝕋^d)} < ∞`
   (`Torus.memTriebelLizorkin_iff_tlLocalMeans`). The pointwise bounds of `ℝ^d` apply to the
   periodic lifts `h ∘ π`, and the Fefferman–Stein inequality holds for the maximal functions of
   lifts on the period box `(0, 1]^d`, with the constant `Torus.periodicFSConst d p q`
@@ -113,6 +113,9 @@ develops the spaces `F^s_{p,q}` on `ℝ^d` and on the torus `𝕋^d` with the bl
   (`Rd.LocalMeansBump.tlLocalMeansNorm_le_tlCoeffNorm`); the decomposition takes the cell atoms
   of `η_j ⋆ (k_j ⋆ F)` with the means of `|k_j ⋆ F|` over the cells as coefficients
   (`Rd.LocalMeansBump.tl_atomic_decomposition`, `Rd.LocalMeansBump.tlCoeffNorm_cellCoef_le`).
+  Triebel's *Theory of Function Spaces II* states the characterisation with `(s,p)`-atoms
+  normalised in `L_p`; the two forms correspond under `λ_{j,m} ↦ 2^(j(s - n/p)) λ_{j,m}`,
+  `n = dim V`.
 
 ## What is formalised
 
@@ -123,7 +126,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`: Minkowski's inequalities for series and for `ℓ_u`-valued functions, comparison, limits of pointwise bounds | ✅ | ✗ | `Lp/MixedNorms` |
 | Triebel–Lizorkin spaces on `ℝ^d`: definition, `F_{p,p} = B_{p,p}`, the Besov sandwich | ✅ | ✗ | `Rd/TriebelLizorkin` |
 | Dyadic cubes of every level, Lebesgue differentiation along them | ✅ | ✗ | `Rd/DyadicCubes` |
-| Hardy–Littlewood maximal function: weighted weak and strong types | ✅ | ✗ | `Rd/MaximalFunction` |
+| Hardy–Littlewood maximal function: weighted weak and strong types | ✅ | ✗ | `Rd/HardyLittlewoodMaximal` |
 | The Calderón–Zygmund decomposition on dyadic cubes | ✅ | ✗ | `Rd/CalderonZygmund` |
 | The Fefferman–Stein inequality | ✅ | ✗ | `Rd/FeffermanStein` |
 | Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/KernelMajorants` |

@@ -271,8 +271,8 @@ the torus traces in `FunctionSpaces/Traces/`; intervals, the cube, splines and w
 spaces on `ℝ^d`, domains and traces, and mixed smoothness share `FunctionSpaces/Rd/`, with the
 manifolds in `FunctionSpaces/Manifold/`; the Triebel–Lizorkin block is the mixed norms in
 `FunctionSpaces/Lp/MixedNorms.lean`, the files
-`FunctionSpaces/Rd/{DyadicCubes,MaximalFunction,CalderonZygmund,FeffermanStein,KernelMajorants}`
-and `FunctionSpaces/Rd/TriebelLizorkin*`, and
+`FunctionSpaces/Rd/{DyadicCubes,HardyLittlewoodMaximal,CalderonZygmund}`,
+`FunctionSpaces/Rd/{FeffermanStein,KernelMajorants}` and `FunctionSpaces/Rd/TriebelLizorkin*`, and
 `FunctionSpaces/Torus/{TriebelLizorkin,PeriodicLift,FeffermanStein,TriebelLizorkinLocalMeans}`.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
@@ -365,7 +365,8 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * H. Triebel, *Theory of Function Spaces*, Monographs in Mathematics **78**, Birkhäuser, 1983.
   Besov and Sobolev spaces and the equivalence of their definitions.
 * H. Triebel, *Theory of Function Spaces II*, Monographs in Mathematics **84**, Birkhäuser, 1992.
-  Triebel–Lizorkin spaces, local means, ball means of differences and atoms.
+  Triebel–Lizorkin spaces, local means, ball means of differences and atoms; the atoms there are
+  `(s,p)`-atoms normalised in `L_p`, here they are normalised in `L_∞`.
 * T. Ullrich, *Function spaces with dominating mixed smoothness, characterization by
   differences*, Jenaer Schriften zur Mathematik und Informatik Math/Inf/05/06, 2006. Mixed
   differences and mixed local means.

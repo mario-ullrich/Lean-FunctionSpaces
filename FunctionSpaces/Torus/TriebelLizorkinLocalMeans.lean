@@ -17,8 +17,8 @@ by `Torus.econv` and define the quasi-norm
 
 `‖f‖_{F^s_{p,q}(𝕋^d)}^{b,L} = ‖ t ↦ ‖(2^(js) |k_j ⋆ f(t)|)_j‖_{ℓ_q} ‖_{L_p(𝕋^d)}`
 
-(`Torus.tlLocalMeansNorm`). For `1 < p < ∞`, `1 < q ≤ ∞`, `0 < s < L` and `L ≥ 1` it is equivalent
-to the Triebel–Lizorkin quasi-norm of the torus, with explicit constants
+(`Torus.tlLocalMeansNorm`). For `1 < p < ∞`, `1 < q ≤ ∞` and `0 < s < L` it is equivalent to the
+Triebel–Lizorkin quasi-norm of the torus, with explicit constants
 (`Torus.triebelLizorkinNorm_le_tlLocalMeansNorm`, `Torus.tlLocalMeansNorm_le_triebelLizorkinNorm`),
 so `F^s_{p,q}(𝕋^d)` is described by local means (`Torus.memTriebelLizorkin_iff_tlLocalMeans`).
 
@@ -107,7 +107,7 @@ theorem sum_econvLp_dual_kernel (hp : p ≠ ∞) (L J : ℕ)
 /-- **The reproducing formula on the torus**: `∑_j η_j ⋆ k_j ⋆ f = f` in `L_p(𝕋^d)` for `L ≥ 1`,
 since `m_{2^J} ⋆ m_{2^J} ⋆ f → f` (`m` is an approximate identity on the torus,
 `Torus.tendsto_econvLp_dilate`, and the operators `m_{2^J} ⋆` are uniformly bounded,
-`tendsto_apply_apply_of_tendsto`). -/
+`Rd.tendsto_apply_apply_of_tendsto`). -/
 theorem tendsto_sum_econvLp_dual_kernel (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     Tendsto (fun J => ∑ j ∈ Finset.range (J + 1),
@@ -120,7 +120,7 @@ theorem tendsto_sum_econvLp_dual_kernel (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L
       (fun J => by positivity) (tendsto_pow_atTop_atTop_of_one_lt one_lt_two) f
   have hm : eLpNorm (Rd.momentKernel b.toFun L) 1 volume ≠ ∞ :=
     (memLp_one_iff_integrable.2 (Rd.integrable_momentKernel b.integrable L)).eLpNorm_ne_top
-  refine tendsto_apply_apply_of_tendsto (T := fun J => econvLp hp (b.integrable_scaled L J))
+  refine Rd.tendsto_apply_apply_of_tendsto (T := fun J => econvLp hp (b.integrable_scaled L J))
     (fun J g => norm_econvLp_le hp _ hm (by
       rw [← eLpNorm_one_eq_lintegral_enorm (b.integrable_scaled L J).1, b.eLpNorm_scaled_one]) g) h
 
@@ -428,12 +428,13 @@ theorem tlLocalMeansNorm_le_triebelLizorkinNorm (L : ℕ) (hp1 : 1 < p) (hp : p 
     (lqNorm_econv_kernel_proj_le_lqNorm_maximal b L hp hq1.le s f)
 
 /-- **The local means characterisation of Triebel–Lizorkin spaces on the torus**: for a bump
-`b` on `ℝ^d`, an order `L ≥ 1`, `1 < p < ∞`, `1 < q ≤ ∞` and `0 < s < L`, `f ∈ F^s_{p,q}(𝕋^d)`
-iff `‖f‖_{F^s_{p,q}}^{b,L} < ∞`. -/
-theorem memTriebelLizorkin_iff_tlLocalMeans {L : ℕ} (hL : 1 ≤ L) (hp1 : 1 < p) (hp : p ≠ ∞)
+`b` on `ℝ^d`, an order `L`, `1 < p < ∞`, `1 < q ≤ ∞` and `0 < s < L`, `f ∈ F^s_{p,q}(𝕋^d)`
+iff `‖f‖_{F^s_{p,q}}^{b,L} < ∞`. The order satisfies `L ≥ 1` since `0 < s < L`. -/
+theorem memTriebelLizorkin_iff_tlLocalMeans {L : ℕ} (hp1 : 1 < p) (hp : p ≠ ∞)
     {q : ℝ≥0∞} (hq1 : 1 < q) {s : ℝ} (hs : 0 < s) (hsL : s < L)
     {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} :
     MemTriebelLizorkin s q f ↔ tlLocalMeansNorm b L s q f < ∞ :=
+  have hL : 1 ≤ L := Nat.cast_pos.1 (hs.trans hsL)
   ⟨fun h => (tlLocalMeansNorm_le_triebelLizorkinNorm b L hp1 hp hq1 s f).trans_lt
       (ENNReal.mul_lt_top (tlLowerConst_ne_top b hp1 hp hq1 hs hsL).lt_top h),
     fun h => (triebelLizorkinNorm_le_tlLocalMeansNorm b hL hp1 hp hq1 s f).trans_lt

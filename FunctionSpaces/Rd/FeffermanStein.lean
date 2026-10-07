@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Rd.CalderonZygmund
-public import FunctionSpaces.Rd.MaximalFunction
+public import FunctionSpaces.Rd.HardyLittlewoodMaximal
 public import FunctionSpaces.Lp.MixedNorms
 
 /-!
@@ -20,10 +20,12 @@ constant `Rd.feffermanSteinConst` (`Rd.feffermanStein`). The cases:
 * `q = ∞` and `q = p` follow from the Hardy–Littlewood maximal theorem one function at a time
   (`Rd.feffermanStein_top`, `Rd.feffermanStein_self`);
 * `q < p` follows by duality with the weighted strong type, first for finitely many functions
-  (`Rd.lintegral_rpow_sum_maximal_le`) and then by monotone convergence
-  (`Rd.feffermanStein_of_gt`);
+  (`Rd.lintegral_rpow_sum_maximal_le`) and then by monotone convergence in the number of
+  functions (`Rd.lintegral_lqNorm_maximal_rpow_le_of_gt`), with the norm form
+  `Rd.feffermanStein_of_gt`;
 * `p < q` follows by interpolation between the case `q = p` and the vector-valued weak type
-  `(1,1)` (`Rd.volume_lqNorm_maximal_gt_le`, `Rd.feffermanStein_of_lt`).
+  `(1,1)` (`Rd.volume_lqNorm_maximal_gt_le`, `Rd.lintegral_lqNorm_maximal_rpow_le_of_lt`), with
+  the norm form `Rd.feffermanStein_of_lt`.
 
 The weak type rests on the Calderón–Zygmund decomposition of `G = ‖(g_j)_j‖_{ℓ_q}`: off the
 enlarged exceptional set, the maximal function of `1_Ω g` is at most `3^n` times the maximal
@@ -799,12 +801,14 @@ theorem interpolationConst_ne_zero {p q : ℝ} (hp : 0 < p) (hq : 0 < q) :
 dimension `n ≥ 1`, for `1 < p < q < ∞` and measurable `g_j : V → [0, ∞]`,
 `∫ ‖(M g_j(x))_j‖_{ℓ_q}^p dx ≤ C ∫ G^p` with `G = ‖(g_j)_j‖_{ℓ_q}` and
 `C = interpolationConst V p q`. The layer cake formula, the level estimate
-`Rd.volume_lqNorm_maximal_gt_mul_rpow_le` and the two Tonelli steps give it. -/
+`Rd.volume_lqNorm_maximal_gt_mul_rpow_le` and the two Tonelli steps give it. The bound
+`1 < p < q.toReal` forces `q < ∞`. -/
 theorem lintegral_lqNorm_maximal_rpow_le_of_lt_of_measurable [Nontrivial V] {p : ℝ}
-    {q : ℝ≥0∞} (hp1 : 1 < p) (hpq : p < q.toReal) (hq : q ≠ ∞) {g : ℕ → V → ℝ≥0∞}
+    {q : ℝ≥0∞} (hp1 : 1 < p) (hpq : p < q.toReal) {g : ℕ → V → ℝ≥0∞}
     (hg : ∀ j, Measurable (g j)) :
     ∫⁻ x, lqNorm q (fun j => maximal (g j) x) ^ p ≤
       interpolationConst V p q.toReal * ∫⁻ x, lqNorm q (fun j => g j x) ^ p := by
+  have hq : q ≠ ∞ := (ENNReal.toReal_pos_iff.1 ((zero_lt_one.trans hp1).trans hpq)).2.ne
   have hq1 : 1 < q :=
     (ENNReal.toReal_lt_toReal ENNReal.one_ne_top hq).1 (by simpa using hp1.trans hpq)
   have hr : 1 < q.toReal := hp1.trans hpq
@@ -864,7 +868,7 @@ theorem lintegral_lqNorm_maximal_rpow_le_of_lt [Nontrivial V] {p q : ℝ≥0∞}
   simp_rw [hmax]
   rw [hint]
   exact lintegral_lqNorm_maximal_rpow_le_of_lt_of_measurable (ENNReal.one_lt_toReal hp1 hp)
-    ((ENNReal.toReal_lt_toReal hp hq).2 hpq) hq fun j => (hg j).measurable_mk
+    ((ENNReal.toReal_lt_toReal hp hq).2 hpq) fun j => (hg j).measurable_mk
 
 /-! ### Duality for `q < p` -/
 

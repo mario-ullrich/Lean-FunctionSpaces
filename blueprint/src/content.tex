@@ -6381,7 +6381,7 @@ quasi-norm is $\|(2^{js} \|k_j * f\|_p)_j\|_{\ell_q}$.
 \begin{lemma}[The reproducing formula]
 \label{lem:reproducing-formula}
 \lean{Rd.LocalMeansBump.sum_dual_localMean, Rd.LocalMeansBump.tendsto_sum_dual_localMean,
-  tendsto_apply_apply_of_tendsto}
+  Rd.tendsto_apply_apply_of_tendsto}
 \leanok
 \uses{def:local-means, lem:conv-op, lem:conv-assoc, thm:approx-identity}
 With the notation of \Cref{def:local-means}, for every $J \in \N$ and $f \in L_p$,
@@ -8955,7 +8955,10 @@ norm over the levels at every point, and then the $L_p$ norm. This chapter start
 comparison of the two mixed norms on an arbitrary measure space. For $s > 0$ the spaces
 $\TL{s}{p}{q}$ and their descriptions by local means, ball means of differences and atoms are
 those of Triebel~\cite{TriebelII}; the descriptions are proved here for $1 < p < \infty$ and
-$1 < q \leq \infty$.
+$1 < q \leq \infty$. The atoms here are normalised in $L_\infty$ and the sequence space
+$f^s_{p,q}$ carries the weights $2^{js}$; Triebel states the atomic characterisation with
+$(s,p)$-atoms normalised in $L_p$, and the two forms correspond under
+$\lambda_{j,m} \mapsto 2^{j(s - n/p)} \lambda_{j,m}$.
 
 \section{Mixed norms}
 
@@ -8968,7 +8971,11 @@ norms of $g$ are
   \|g\|_{\ell_q(L_p)} = \bigl\| (\|g_i\|_{L_p})_{i \in I} \bigr\|_{\ell_q},
 \]
 with the $\ell_q$ norm of \Cref{def:lq-norm}. All functions take values in $[0, \infty]$, so
-every integral, series and norm has a value and no integrability conditions appear.
+every integral, series and norm has a value and no integrability conditions appear. The $L_p$
+norm of a function that is not almost everywhere measurable is $\infty$, so Minkowski's
+inequality for series (\Cref{lem:lp-series-minkowski}) and the bound
+$\|g\|_{L_p(\ell_q)} \leq \|g\|_{\ell_q(L_p)}$ of \Cref{thm:mixed-norms} hold for every family
+$g$ of functions $g_i : X \to [0, \infty]$: their right sides are then $\infty$.
 
 \begin{lemma}[{Homogeneity, powers and measurability in $[0, \infty]$}]
 \label{lem:lp-norm-nonnegative}
@@ -9461,7 +9468,7 @@ $Q_{k,m}$ is measurable, and for every $k \in \N$ it is the cell $P_{k,m}$, with
 \lean{Rd.repr_sub_zcellCenter, Rd.abs_repr_sub_zcellCenter_le, Rd.norm_sub_zcellCenter_le,
   Rd.zcell_subset_closedBall, Rd.ball_subset_zcell, Rd.zcell_disjoint, Rd.iUnion_zcell,
   Rd.zcell_eq_preimage, Rd.volume_zcell, Rd.volume_zcell_pos, Rd.volume_zcell_lt_top,
-  Rd.volume_real_zcell}
+  Rd.volume_real_zcell, Rd.volume_cell}
 \leanok
 \uses{def:dyadic-cubes, lem:dyadic-cells}
 For every $k \in \Z$, every $m \in \Z^n$ and every $x \in V$, the $i$-th coordinate of
@@ -9472,8 +9479,8 @@ $\|x - c_{k,m}\| \leq n 2^{-k}$. For every $k \in \Z$ and every $m \in \Z^n$,
   Q_{k,m} = \{x \in V : m_i 2^{-k} \leq x_i < (m_i + 1) 2^{-k} \text{ for all } i\},
 \]
 $B(c_{k,m}, 2^{-k}/2) \subseteq Q_{k,m} \subseteq \bar B(c_{k,m}, n 2^{-k})$ and
-$|Q_{k,m}| = 2^{-kn}$. For every $k \in \Z$ the cubes of level $k$ are pairwise disjoint and cover
-$V$.
+$|Q_{k,m}| = 2^{-kn}$, in particular $|P_{j,m}| = 2^{-jn}$ for $j \in \N$. For every $k \in \Z$
+the cubes of level $k$ are pairwise disjoint and cover $V$.
 \end{lemma}
 
 \begin{proof}
@@ -9488,10 +9495,9 @@ preserves the volume (Mathlib's \texttt{OrthonormalBasis.measurePreserving\_repr
 
 \begin{lemma}[Nesting of cubes]
 \label{lem:dyadic-cubes-nested}
-\lean{Rd.parent, Rd.zcell_succ_subset_parent, Rd.volume_zcell_parent, Rd.volume_zcell_sub,
-  Rd.ancestor,
-  Rd.ancestor_add, Rd.zcell_subset_ancestor, Rd.zcellIndex_sub_ancestor,
-  Rd.zcell_subset_or_disjoint}
+\lean{Rd.cubeParent, Rd.zcell_succ_subset_cubeParent, Rd.volume_zcell_cubeParent,
+  Rd.volume_zcell_sub, Rd.cubeAncestor, Rd.cubeAncestor_add, Rd.zcell_subset_cubeAncestor,
+  Rd.zcellIndex_sub_cubeAncestor, Rd.zcell_subset_or_disjoint}
 \leanok
 \uses{def:dyadic-cubes, lem:dyadic-cubes}
 For $m \in \Z^n$ let $\hat m = (\lfloor m_i / 2 \rfloor)_i$, and let $m^{(l)}$ be the result of
@@ -9837,8 +9843,8 @@ applied at an exponent other than $p$.
 
 The Calder\'on--Zygmund decomposition splits $V$ at a height $t$ into a union $\Omega$ of disjoint
 dyadic cubes, on which $G$ has average comparable to $t$, and its complement, on which $G \leq t$
-almost everywhere (for $n \geq 1$, $t > 0$ and an almost everywhere measurable $G$ with
-$\int G < \infty$). The Fefferman--Stein inequality applies it to the $\ell_q$ norm of a family
+almost everywhere if $n \geq 1$, $t > 0$ and $G$ is almost everywhere measurable with
+$\int G < \infty$. The Fefferman--Stein inequality applies it to the $\ell_q$ norm of a family
 of functions. As in \Cref{def:dyadic-cubes}, $Q_{k,m}$ is the dyadic cube of level $k$ and
 index $m$, $m^{(l)}$ the index of its ancestor $l$ levels up (\Cref{lem:dyadic-cubes-nested}),
 and $G_Q$ the average of $G$ over $Q$. Throughout, $G : V \to [0, \infty]$ and
@@ -10845,14 +10851,15 @@ Monotonicity and homogeneity of the $L_p$ norm, then \Cref{thm:fefferman-stein}.
 \uses{thm:cross-kernel-dual, thm:decay-kernels-maximal, lem:maximal-function-kernels,
   lem:reproducing-formula, lem:lp-limits-pointwise, lem:conv-op, lem:almost-diagonal-pointwise,
   def:triebel-lizorkin, def:tl-local-means}
-Let $L, L' \in \N$ with $L, L' \geq 1$ and $1 \leq p < \infty$, and let
+Let $L \in \N$ and $L' \geq 1$, and let
 $B_{L,L'} = C_{L,L',n+1} \, C_{n,n+1} < \infty$ with the constants of
 \Cref{thm:cross-kernel-dual} and \Cref{lem:maximal-function-kernels}. For every
 $h : V \to \C$, all $i, j \in \N$ and every $x \in V$,
 \[
   |((\psi_j * \eta_i) * h)(x)| \leq B_{L,L'} \, c^{L'}_{ji} \, M|h|(x) .
 \]
-For every $f \in L_p$, almost every $x \in V$ and every $j \in \N$,
+If $L \geq 1$ and $1 \leq p < \infty$, then for every $f \in L_p$, almost every $x \in V$ and
+every $j \in \N$,
 \[
   |(\psi_j * f)(x)| \leq B_{L,L'} \sum_{i \in \N} c^{L'}_{ji} \, M|k_i * f|(x) .
 \]
@@ -10958,7 +10965,7 @@ $f \in L_p$,
   \|f\|^{g,L}_{F^s_{p,q}} \leq D_{L,p,q,s} \, \|f\|_{F^s_{p,q}},
 \]
 and if $L \geq 1$, then $\|f\|_{F^s_{p,q}} \leq U_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}}$. In
-particular, for $L \geq 1$ and $0 < s < L$, $f \in \TL{s}{p}{q}$ if and only if
+particular, for $0 < s < L$, $f \in \TL{s}{p}{q}$ if and only if
 $\|f\|^{g,L}_{F^s_{p,q}} < \infty$.
 \end{theorem}
 
@@ -10968,7 +10975,7 @@ Both bounds are \Cref{lem:tl-local-means-lq}, with $L' = L_s$ for the second, fo
 \Cref{lem:maximal-bounds-mixed-norm} for the families $2^{is} |\psi_i * f|$ and
 $2^{is} |k_i * f|$. The constants $B_{L,L_s}$, $B^\Theta_L$ and $C_{n,p,q}$ are finite, and
 since $L_s > s$, \Cref{lem:almost-diagonal-pointwise} gives $A_{s,L_s} < \infty$ for $s > 0$
-and $A_{s,L} < \infty$ for $0 < s < L$.
+and $A_{s,L} < \infty$ for $0 < s < L$. For $0 < s < L$ the order satisfies $L \geq 1$.
 \end{proof}
 
 \begin{corollary}[Independence of the bump and the order]
@@ -10978,11 +10985,11 @@ and $A_{s,L} < \infty$ for $0 < s < L$.
 \leanok
 \uses{thm:tl-local-means}
 Let $1 < p < \infty$, $1 < q \leq \infty$ and $s \in \R$, and let $g, g'$ be two bumps with
-orders $L \geq 1$ and $L' \in \N$. For every $f \in L_p$,
+orders $L, L' \in \N$. If $L \geq 1$, then for every $f \in L_p$,
 \[
   \|f\|^{g',L'}_{F^s_{p,q}} \leq D'_{L',p,q,s} \, U_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}},
 \]
-with $D'$ the constant of \Cref{thm:tl-local-means} for $g'$. If $L' \geq 1$ and
+with $D'$ the constant of \Cref{thm:tl-local-means} for $g'$. If
 $0 < s < \min(L, L')$, then $\|f\|^{g,L}_{F^s_{p,q}} < \infty$ if and only if
 $\|f\|^{g',L'}_{F^s_{p,q}} < \infty$.
 \end{corollary}
@@ -11333,7 +11340,7 @@ For every $f \in L_p(\T^d)$,
 \]
 and if $L \geq 1$, then
 $\|f\|_{F^s_{p,q}(\T^d)} \leq U^{\T}_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}(\T^d)}$. In particular,
-for $L \geq 1$ and $0 < s < L$, $f \in \TL{s}{p}{q}(\T^d)$ if and only if
+for $0 < s < L$, $f \in \TL{s}{p}{q}(\T^d)$ if and only if
 $\|f\|^{g,L}_{F^s_{p,q}(\T^d)} < \infty$.
 \end{theorem}
 
@@ -11360,9 +11367,8 @@ means.
 
 \begin{definition}[Ball means of differences]
 \label{def:ball-means-differences}
-\lean{Rd.ballMeanDiff, Rd.one_div_two_pow_pos, Rd.volume_ball_mul_one_div_two_pow,
-  Rd.two_pow_mul_volume_ball_one_div, Rd.setLIntegral_eq_mul_ballMeanDiff, Rd.tlDiffNorm,
-  Rd.measurable_lqNorm_ballMeanDiff}
+\lean{Rd.ballMeanDiff, Rd.one_div_two_pow_pos, Rd.two_pow_mul_volume_ball_one_div,
+  Rd.setLIntegral_eq_mul_ballMeanDiff, Rd.tlDiffNorm, Rd.measurable_lqNorm_ballMeanDiff}
 \leanok
 \uses{def:rd-modulus, def:lq-norm, lem:lq-norm-means}
 For $f : V \to \C$, $L, j \in \N$ and $x \in V$ the ball mean of differences of order $L$ at
@@ -11370,7 +11376,8 @@ level $j$ is
 \[
   d_j f(x) = \frac{1}{|B_j|} \int_{B_j} |\Delta^L_h f(x)| \, dh \in [0, \infty] .
 \]
-For every $c > 0$ and $j \in \N$, $|B(0, c 2^{-j})| = c^n |B_j|$ and $2^{jn} |B_j| = |B(0,1)|$.
+For every $c > 0$ and $j \in \N$, $|B(0, c 2^{-j})| = c^n |B_j|$ (Mathlib's
+\texttt{MeasureTheory.Measure.addHaar\_ball\_mul\_of\_pos}) and $2^{jn} |B_j| = |B(0,1)|$.
 Let $1 \leq p < \infty$, $s \in \R$ and $1 \leq q \leq \infty$. For $f \in L_p$ the ball means
 quasi-norm of Triebel--Lizorkin type is
 \[
@@ -11473,13 +11480,19 @@ Young's inequality bounds the first $r + 1$ local means by $\|f\|_p$
 \begin{lemma}[Tools for ball means of convolutions]
 \label{lem:moving-balls}
 \lean{Rd.enorm_le_inv_two_pow_of_mem_ball, Rd.dyadicWeight_mul_dyadicWeight_neg_of_le,
-  Rd.volume_setOf_dist_add_smul_lt_le, Rd.setLIntegral_setLIntegral_ball_le}
+  Rd.volume_setOf_dist_add_smul_lt_le, Rd.indicator_ball_add_smul_le,
+  Rd.setLIntegral_indicator_ball_add_smul_le, Rd.setLIntegral_setLIntegral_ball_le}
 \leanok
 \uses{def:ball-means-differences}
 For every $j \in \N$, every $h \in B_j$ has $|h| \leq 2^{-j}$. For all $i, j \in \N$ with
 $i \leq j$ and every $L \in \R$, $2^{iL} 2^{-jL} = 2^{-(j-i)L}$. For every real $l \geq 1$, all
-$a, \rho \in \R$, all $x, w \in V$ and every almost everywhere measurable
-$G : V \to [0, \infty]$, $|\{v : |x + l v - w| < \rho\}| \leq |B(0, \rho)|$ and
+$a, \rho \in \R$, all $x, w \in V$ and every $G : V \to [0, \infty]$,
+$|\{v : |x + l v - w| < \rho\}| \leq |B(0, \rho)|$ and
+\[
+  \int_{B(0,a)} 1_{B(x + l v, \rho)}(w) \, G(w) \, dv \leq |B(0, \rho)| \,
+  1_{B(x, \rho + l a)}(w) \, G(w) ;
+\]
+if $G$ is almost everywhere measurable, then
 \[
   \int_{B(0,a)} \int_{B(x + l v, \rho)} G(w) \, dw \, dv \leq |B(0, \rho)|
   \int_{B(x, \rho + l a)} G .
@@ -11489,8 +11502,10 @@ $G : V \to [0, \infty]$, $|\{v : |x + l v - w| < \rho\}| \leq |B(0, \rho)|$ and
 \begin{proof}
 \leanok
 The set $\{v : |x + l v - w| < \rho\}$ is the ball $B((w - x)/l, \rho/l)$, of measure
-$l^{-n} |B(0,\rho)|$. For the double integral, exchange the integrals: a point $w$ contributes
-only through the $v$ in this ball, and only if $|w - x| < \rho + l a$.
+$l^{-n} |B(0,\rho)|$. A point $w$ of $B(x + l v, \rho)$ with $|v| < a$ satisfies
+$|w - x| < \rho + l a$ by the triangle inequality, and $v$ lies in this set, which gives the
+single integral. For the double integral, exchange the integrals and apply the single integral at
+every $w$.
 \end{proof}
 
 \begin{theorem}[Ball means of the dual kernels]
@@ -11596,7 +11611,7 @@ Then $D^\Delta_{L,s} < \infty$, and for every $f \in L_p$,
   \|f\|^{g,L}_{F^s_{p,q}} \leq D^\Delta_{L,s} \, \|f\|^{L}_{F^s_{p,q}, \Delta} .
 \]
 If $L \geq 1$, then $\|f\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} \|f\|^{g,L}_{F^s_{p,q}}$ for every
-$f \in L_p$. If moreover $1 < p$ and $1 < q$, let
+$f \in L_p$. If $L \geq 1$, $1 < p$ and $1 < q$, let
 \[
   U^\Delta_{L,p,q,s} = 2 \|m\|_1 (1 - 2^{-s})^{-1} + E_L A_{s,L} C_{n,p,q},
 \]
@@ -11657,7 +11672,9 @@ of \Cref{def:smooth-atoms}, normalised in $L_\infty$; their constants are nonneg
 decomposition of $F$ is the mean of $|k_j * F|$ over the cell, at most a multiple of
 $M(k_j * F)$ at every point of the cell. The Besov spaces use atoms normalised in $L_p$
 (\Cref{thm:atomic-characterisation}); here the maximal function bounds means in $L_1$, so the
-coefficients are $L_1$ means over the cells.
+coefficients are $L_1$ means over the cells. Triebel~\cite{TriebelII} uses $(s,p)$-atoms
+normalised in $L_p$; his coefficients are $2^{j(s - n/p)} \lambda_{j,m}$ for the coefficients
+$\lambda_{j,m}$ here.
 
 \begin{definition}[The sequence space $f^s_{p,q}$]
 \label{def:tl-sequence-space}
@@ -11678,7 +11695,7 @@ and $x \mapsto \|(2^{js} \lambda_j(x))_j\|_{\ell_q}$ is measurable.
 
 \begin{lemma}[Coefficients and the maximal function]
 \label{lem:coefficients-maximal}
-\lean{Rd.volume_cell, Rd.volume_ball_div_two_pow, Rd.dyadicWeight_mul_setLIntegral_ball_le,
+\lean{Rd.volume_ball_div_two_pow, Rd.dyadicWeight_mul_setLIntegral_ball_le,
   Rd.cellCoefFun_le_maximal, Rd.enorm_coef_le_maximal_cellCoefFun,
   Rd.dyadicWeight_mul_tsum_ite_le_maximal, ENNReal.tsum_mul_le_of_le}
 \leanok
@@ -11806,7 +11823,7 @@ $(2LR + d + n + 1)^n |B_1| 2^{-in} M \lambda_j(x)$.
 
 \begin{lemma}[Fine local means of atoms]
 \label{lem:fine-local-means-atoms}
-\lean{Rd.LocalMeansBump.enorm_mul_higherDiff_atom_le,
+\lean{Rd.IsSmoothAtom.higherDiff_eq_zero_of_lt, Rd.LocalMeansBump.enorm_mul_higherDiff_atom_le,
   Rd.LocalMeansBump.ae_enorm_atom_sub_conv_scaled_le, Rd.LocalMeansBump.momentAtomConst,
   Rd.LocalMeansBump.momentAtomConst_ne_top,
   Rd.LocalMeansBump.ae_enorm_conv_kernel_atom_le_of_lt, Rd.LocalMeansBump.tlAtomFineConst,
@@ -11847,7 +11864,8 @@ $|a(x) - (m^g_{2^k} * a)(x)| \leq \int |g(z)| \, |\Delta^L_{-2^{-k} z} a(x)| \, 
 everywhere. On the support of $g$ the step $h = -2^{-k} z$ has $\|h\| \leq R 2^{-k}$, so
 $|\Delta^L_h a(x)| \leq 2^L L^{L+1} A (2^j \|h\|)^L \leq 2^L L^{L+1} A R^L 2^{-(k-j)L}$
 (\Cref{lem:smooth-atoms-regular}, with the steps of \Cref{def:rd-modulus-on}). The difference
-is a sum of values $a(x + l h)$, $l \leq L$ (\Cref{def:rd-modulus}), which vanish unless
+is a sum of values $a(x + l h)$, $l \leq L$ (\Cref{def:rd-modulus}), which vanish when
+$\|x - c\| > d 2^{-j} + L \|h\|$; since $\|h\| \leq R 2^{-j}$, they vanish unless
 $\|x - c\| \leq (d + LR) 2^{-j}$. For the level, \Cref{lem:conv-atom-series} and
 \Cref{lem:coefficients-maximal} (5) give
 $|(k_i * f)(x)| \leq D_{L,A} 2^{-(i-j)L} \sum_{m : \|x - c_{j,m}\| \leq (d + LR) 2^{-j}}
@@ -11909,7 +11927,7 @@ For every almost everywhere strongly measurable $u : V \to \C$, every $j \in \N$
 $m \in \Z^n$, the coefficient $\lambda_{j,m}$ of $u$ with exponent $p = 1$
 (\Cref{def:cell-atoms}) satisfies $|\lambda_{j,m}| \leq 2^{jn} \int_{P_{j,m}} |u|$. For all
 almost everywhere strongly measurable $u_j : V \to \C$, $j \in \N$, the coefficients
-$\lambda_{j,m}$ of $u_j$ with exponent one satisfy, for every $0 < q \leq \infty$, every
+$\lambda_{j,m}$ of $u_j$ with exponent one satisfy, for every $q$, every
 $s \in \R$ and every $x \in V$,
 \[
   \|(2^{js} \lambda_j(x))_j\|_{\ell_q} \leq (2n + 1)^n |B_1| \,

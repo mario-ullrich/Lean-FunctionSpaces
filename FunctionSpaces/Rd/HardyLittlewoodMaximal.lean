@@ -63,6 +63,15 @@ theorem volume_ball_ne_zero {r : ℝ} (hr : 0 < r) : volume (ball (0 : V) r) ≠
 theorem volume_ball_ne_top (r : ℝ) : volume (ball (0 : V) r) ≠ ∞ :=
   measure_ball_lt_top.ne
 
+/-- **Volumes of dyadic balls**: a ball of radius `ρ 2^(-j)`, `ρ > 0`, around any centre has
+volume `ρ^n |B_1| 2^(-jn)`, where `|B_1|` is the volume of the unit ball. -/
+theorem volume_ball_div_two_pow {ρ : ℝ} (hρ : 0 < ρ) (j : ℕ) (z : V) :
+    volume (ball z (ρ / 2 ^ j)) = ENNReal.ofReal (ρ ^ finrank ℝ V) *
+      volume (ball (0 : V) 1) * ENNReal.dyadicWeight (-(finrank ℝ V : ℝ)) j := by
+  rw [Measure.addHaar_ball_of_pos _ _ (by positivity), div_eq_mul_one_div, mul_pow,
+    ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_one_div_two_pow_pow]
+  ring
+
 /-- Every mean over a ball centred at `x` is at most `M g(x)`. -/
 theorem le_maximal {r : ℝ} (hr : 0 < r) (g : V → ℝ≥0∞) (x : V) :
     (volume (ball (0 : V) r))⁻¹ * ∫⁻ y in ball x r, g y ≤ maximal g x :=
@@ -305,7 +314,7 @@ theorem tsum_two_inv_pow_mul_two_pow {n N : ℕ} (hN : n ≤ N) :
 
 /-- **Kernels with a power tail.** If `K ≤ A` on `B̄(0,ρ)` and `K(y) ≤ A (ρ/‖y‖)^N` outside, with
 `N > n`, then `∫ K(y) g(x - y) dy ≤ A |B(0,ρ)| 2^n (1 - 2^(-(N-n)))⁻¹ M g(x)` for every
-`g : V → [0, ∞]`. The proof splits `V` into the ball `B(0,2ρ)` and the dyadic shells
+`g : V → [0, ∞]`. The proof covers `V` by the ball `B(0,2ρ)` and the dyadic shells
 `2^i ρ ≤ ‖y‖ < 2^(i+1) ρ`, `i ≥ 1`, applies the ball bound on each, and sums a geometric
 series. -/
 theorem lintegral_mul_le_maximal_of_decay {K : V → ℝ≥0∞} {A : ℝ≥0∞} {ρ : ℝ} {N : ℕ}

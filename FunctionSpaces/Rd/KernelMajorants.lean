@@ -7,7 +7,7 @@ module
 
 public import FunctionSpaces.Rd.SmoothAtoms
 public import FunctionSpaces.Rd.BandInverse
-public import FunctionSpaces.Rd.MaximalFunction
+public import FunctionSpaces.Rd.HardyLittlewoodMaximal
 
 /-!
 # Kernel majorants

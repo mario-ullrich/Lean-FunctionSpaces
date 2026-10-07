@@ -17,8 +17,8 @@ For a bump `b` of radius `R` and an order `L`, the local means `k_j ⋆ f` of
 
 `‖f‖_{F^s_{p,q}}^{b,L} = ‖ x ↦ ‖(2^(js) |k_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p`
 
-(`Rd.LocalMeansBump.tlLocalMeansNorm`). For `1 < p < ∞`, `1 < q ≤ ∞`, `0 < s < L` and `L ≥ 1` it
-is equivalent to the Triebel–Lizorkin quasi-norm, with explicit constants
+(`Rd.LocalMeansBump.tlLocalMeansNorm`). For `1 < p < ∞`, `1 < q ≤ ∞` and `0 < s < L` it is
+equivalent to the Triebel–Lizorkin quasi-norm, with explicit constants
 (`Rd.LocalMeansBump.triebelLizorkinNorm_le_tlLocalMeansNorm`,
 `Rd.LocalMeansBump.tlLocalMeansNorm_le_triebelLizorkinNorm`), so `F^s_{p,q}` is described by
 local means (`Rd.LocalMeansBump.memTriebelLizorkin_iff_tlLocalMeans`), and every bump and every
@@ -428,12 +428,13 @@ theorem tlLocalMeansNorm_le_triebelLizorkinNorm (L : ℕ) (hp1 : 1 < p) (hp : p 
     (b.lqNorm_localMean_le_lqNorm_maximal L hp hq1.le s f)
 
 /-- **The local means characterisation of Triebel–Lizorkin spaces**: for a bump `b`, an order
-`L ≥ 1`, `1 < p < ∞`, `1 < q ≤ ∞` and `0 < s < L`, `f ∈ F^s_{p,q}` iff
-`‖f‖_{F^s_{p,q}}^{b,L} < ∞`. -/
-theorem memTriebelLizorkin_iff_tlLocalMeans {L : ℕ} (hL : 1 ≤ L) (hp1 : 1 < p) (hp : p ≠ ∞)
+`L`, `1 < p < ∞`, `1 < q ≤ ∞` and `0 < s < L`, `f ∈ F^s_{p,q}` iff
+`‖f‖_{F^s_{p,q}}^{b,L} < ∞`. The order satisfies `L ≥ 1` since `0 < s < L`. -/
+theorem memTriebelLizorkin_iff_tlLocalMeans {L : ℕ} (hp1 : 1 < p) (hp : p ≠ ∞)
     {q : ℝ≥0∞} (hq1 : 1 < q) {s : ℝ} (hs : 0 < s) (hsL : s < L)
     {f : Lp ℂ p (volume : Measure V)} :
     MemTriebelLizorkin s q f ↔ b.tlLocalMeansNorm L s q f < ∞ :=
+  have hL : 1 ≤ L := Nat.cast_pos.1 (hs.trans hsL)
   ⟨fun h => (b.tlLocalMeansNorm_le_triebelLizorkinNorm L hp1 hp hq1 s f).trans_lt
       (ENNReal.mul_lt_top (b.tlLowerConst_ne_top hp1 hp hq1 hs hsL).lt_top h),
     fun h => (b.triebelLizorkinNorm_le_tlLocalMeansNorm hL hp1 hp hq1 s f).trans_lt
@@ -453,15 +454,15 @@ theorem tlLocalMeansNorm_le_tlLocalMeansNorm (b' : LocalMeansBump V) {L : ℕ} (
   exact (b'.tlLocalMeansNorm_le_triebelLizorkinNorm L' hp1 hp hq1 s f).trans
     (by gcongr; exact b.triebelLizorkinNorm_le_tlLocalMeansNorm hL hp1 hp hq1 s f)
 
-/-- **The local means quasi-norms are equivalent**: for two bumps `b, b'`, orders `L, L' ≥ 1`,
+/-- **The local means quasi-norms are equivalent**: for two bumps `b, b'`, orders `L, L'`,
 `1 < p < ∞`, `1 < q ≤ ∞` and `0 < s < min(L, L')`, `‖f‖_{F^s_{p,q}}^{b,L} < ∞` iff
 `‖f‖_{F^s_{p,q}}^{b',L'} < ∞`. -/
-theorem tlLocalMeansNorm_lt_top_iff (b' : LocalMeansBump V) {L L' : ℕ} (hL : 1 ≤ L)
-    (hL' : 1 ≤ L') (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q) {s : ℝ} (hs : 0 < s)
-    (hsL : s < L) (hsL' : s < L') {f : Lp ℂ p (volume : Measure V)} :
+theorem tlLocalMeansNorm_lt_top_iff (b' : LocalMeansBump V) {L L' : ℕ} (hp1 : 1 < p)
+    (hp : p ≠ ∞) {q : ℝ≥0∞} (hq1 : 1 < q) {s : ℝ} (hs : 0 < s) (hsL : s < L) (hsL' : s < L')
+    {f : Lp ℂ p (volume : Measure V)} :
     b.tlLocalMeansNorm L s q f < ∞ ↔ b'.tlLocalMeansNorm L' s q f < ∞ := by
-  rw [← b.memTriebelLizorkin_iff_tlLocalMeans hL hp1 hp hq1 hs hsL,
-    ← b'.memTriebelLizorkin_iff_tlLocalMeans hL' hp1 hp hq1 hs hsL']
+  rw [← b.memTriebelLizorkin_iff_tlLocalMeans hp1 hp hq1 hs hsL,
+    ← b'.memTriebelLizorkin_iff_tlLocalMeans hp1 hp hq1 hs hsL']
 
 end LocalMeansBump
 

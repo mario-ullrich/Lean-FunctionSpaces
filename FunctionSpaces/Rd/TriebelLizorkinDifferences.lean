@@ -20,14 +20,16 @@ explicit constants (`Rd.LocalMeansBump.tlDiffNorm_le_tlLocalMeansNorm`,
 of differences (`Rd.memTriebelLizorkin_iff_tlDiffNorm_lt_top`).
 
 The proof is pointwise in `x`. A local mean is a difference of two averaged differences of `f`,
-so `|k_{j+r+1} ⋆ f(x)| ≤ C d_j f(x)` with `r = ⌈R⌉₊`, so that `R < 2^r`
+so `|k_{j+r+1} ⋆ f(x)| ≤ C d_j f(x)`, where `r = ⌈R⌉₊` gives `R < 2^r`
 (`Rd.LocalMeansBump.enorm_localMean_le_ballMeanDiff`). Conversely, the differences of
 `η_i ⋆ g` are bounded by the maximal function of `g`, with the factor `2^(-(j-i)L)` for `i ≤ j`
 from the smoothness of `η_i` and the factor `1` for `i > j` from averaging the shifts over the
 ball (`Rd.LocalMeansBump.ballMeanDiff_conv_dual_le`); the reproducing formula
 `f = ∑_i η_i ⋆ k_i ⋆ f` then gives `d_j f(x) ≤ C ∑_i c_{ji} M(k_i ⋆ f)(x)`
 (`Rd.LocalMeansBump.ballMeanDiff_le_tsum_maximal`), and the almost diagonal estimate and the
-Fefferman–Stein inequality finish.
+Fefferman–Stein inequality finish. In the bounds for `η_i ⋆ g`, the **fine levels** are the ball
+levels `j ≥ i`, at least the level `i` of the kernel, and the **coarse levels** are the ball
+levels `j < i`.
 -/
 
 @[expose] public section
@@ -53,18 +55,12 @@ noncomputable def ballMeanDiff (L j : ℕ) (f : V → ℂ) (x : V) : ℝ≥0∞ 
 /-- The radius `2^(-j)` of the balls of the ball means is positive. -/
 theorem one_div_two_pow_pos (j : ℕ) : (0 : ℝ) < 1 / 2 ^ j := by positivity
 
-/-- `|B(0, c 2^(-j))| = c^n |B(0, 2^(-j))|` for `c > 0`. -/
-theorem volume_ball_mul_one_div_two_pow {c : ℝ} (hc : 0 < c) (j : ℕ) :
-    volume (ball (0 : V) (c * (1 / 2 ^ j))) =
-      ENNReal.ofReal c ^ finrank ℝ V * volume (ball (0 : V) (1 / 2 ^ j)) := by
-  rw [Measure.addHaar_ball_mul_of_pos volume (0 : V) hc, ENNReal.ofReal_pow hc.le]
-
 /-- `2^(jn) |B(0, 2^(-j))| = |B(0, 1)|`. -/
 theorem two_pow_mul_volume_ball_one_div (j : ℕ) :
     2 ^ (j * finrank ℝ V) * volume (ball (0 : V) (1 / 2 ^ j)) = volume (ball (0 : V) 1) := by
-  have h := volume_ball_mul_one_div_two_pow (V := V) (c := 2 ^ j) (by positivity) j
-  rw [mul_one_div_cancel (by positivity), ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat,
-    ← pow_mul] at h
+  have h := Measure.addHaar_ball_mul_of_pos volume (0 : V) (r := 2 ^ j) (by positivity) (1 / 2 ^ j)
+  rw [ENNReal.ofReal_pow (pow_nonneg zero_le_two j), mul_one_div_cancel (by positivity),
+    ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat, ← pow_mul] at h
   exact h.symm
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
@@ -98,8 +94,10 @@ theorem ballMeanDiff_level_add_le (L j r : ℕ) (f : V → ℂ) (x : V) :
     ballMeanDiff L (j + r) f x ≤ 2 ^ (r * finrank ℝ V) * ballMeanDiff L j f x := by
   have hvol : volume (ball (0 : V) (1 / 2 ^ j)) =
       2 ^ (r * finrank ℝ V) * volume (ball (0 : V) (1 / 2 ^ (j + r))) := by
-    have h := volume_ball_mul_one_div_two_pow (V := V) (c := 2 ^ r) (by positivity) (j + r)
-    rw [ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat, ← pow_mul, pow_add,
+    have h := Measure.addHaar_ball_mul_of_pos volume (0 : V) (r := 2 ^ r) (by positivity)
+      (1 / 2 ^ (j + r))
+    rw [ENNReal.ofReal_pow (pow_nonneg zero_le_two r), ENNReal.ofReal_pow zero_le_two,
+      ENNReal.ofReal_ofNat, ← pow_mul, pow_add,
       show (2 : ℝ) ^ r * (1 / (2 ^ j * 2 ^ r)) = 1 / 2 ^ j by field_simp] at h
     rw [h, pow_add]
   have hsub : ball (0 : V) (1 / 2 ^ (j + r)) ⊆ ball (0 : V) (1 / 2 ^ j) :=
@@ -286,16 +284,60 @@ theorem volume_setOf_dist_add_smul_lt_le {l : ℝ} (hl : 1 ≤ l) (ρ : ℝ) (x 
   rw [abs_of_pos (inv_pos.2 (pow_pos hl0 _))]
   exact inv_le_one_of_one_le₀ (one_le_pow₀ hl)
 
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **A point of a moving ball**: for `l ≥ 0`, a step `v ∈ B(0,a)` and points `x, w`,
+`1_{B(x + l v, ρ)}(w) G(w) ≤ 1_{B(x, ρ + l a)}(w) G(w) 1_T(v)` with
+`T = {v' : dist(w, x + l v') < ρ}`: a point `w` of the ball `B(x + l v, ρ)` lies in
+`B(x, ρ + l a)` by the triangle inequality, and `v ∈ T` by definition. -/
+theorem indicator_ball_add_smul_le (G : V → ℝ≥0∞) {l : ℝ} (hl0 : 0 ≤ l) {a : ℝ} (ρ : ℝ)
+    (x : V) {v : V} (hv : v ∈ ball (0 : V) a) (w : V) :
+    (ball (x + l • v) ρ).indicator G w ≤
+      (ball x (ρ + l * a)).indicator G w * {v : V | dist w (x + l • v) < ρ}.indicator 1 v := by
+  by_cases hw : w ∈ ball (x + l • v) ρ
+  · have hwx : w ∈ ball x (ρ + l * a) := by
+      rw [mem_ball] at hw ⊢
+      rw [mem_ball_zero_iff] at hv
+      calc dist w x ≤ dist w (x + l • v) + dist (x + l • v) x := dist_triangle _ _ _
+        _ < ρ + l * a := by
+          rw [dist_eq_norm (x + l • v), add_sub_cancel_left, norm_smul, Real.norm_of_nonneg hl0]
+          exact add_lt_add_of_lt_of_le hw (mul_le_mul_of_nonneg_left hv.le hl0)
+    rw [indicator_of_mem hw, indicator_of_mem hwx,
+      indicator_of_mem (show v ∈ {v : V | dist w (x + l • v) < ρ} from hw), Pi.one_apply, mul_one]
+  · rw [indicator_of_notMem hw]
+    exact zero_le
+
+/-- **One point under moving balls**: for `l ≥ 1`, every `a, ρ` and points `x, w`,
+`∫_{B(0,a)} 1_{B(x + l v, ρ)}(w) G(w) dv ≤ 1_{B(x, ρ + l a)}(w) G(w) |B(0,ρ)|`: the integrand is
+at most `1_{B(x, ρ + l a)}(w) G(w)` times the indicator of the steps `v` whose ball contains `w`
+(`Rd.indicator_ball_add_smul_le`), a set of measure at most `|B(0,ρ)|`
+(`Rd.volume_setOf_dist_add_smul_lt_le`). -/
+theorem setLIntegral_indicator_ball_add_smul_le (G : V → ℝ≥0∞) {l : ℝ} (hl : 1 ≤ l) (a ρ : ℝ)
+    (x w : V) :
+    ∫⁻ v in ball (0 : V) a, (ball (x + l • v) ρ).indicator G w ≤
+      (ball x (ρ + l * a)).indicator G w * volume (ball (0 : V) ρ) := by
+  have hT : MeasurableSet {v : V | dist w (x + l • v) < ρ} :=
+    (isOpen_lt (continuous_const.dist (continuous_const.add (continuous_id.const_smul l)))
+      continuous_const).measurableSet
+  calc ∫⁻ v in ball (0 : V) a, (ball (x + l • v) ρ).indicator G w
+      ≤ ∫⁻ v in ball (0 : V) a, (ball x (ρ + l * a)).indicator G w *
+          {v : V | dist w (x + l • v) < ρ}.indicator 1 v :=
+        setLIntegral_mono' measurableSet_ball fun v hv =>
+          indicator_ball_add_smul_le G (zero_le_one.trans hl) ρ x hv w
+    _ ≤ ∫⁻ v, (ball x (ρ + l * a)).indicator G w *
+          {v : V | dist w (x + l • v) < ρ}.indicator 1 v := setLIntegral_le_lintegral _ _
+    _ = (ball x (ρ + l * a)).indicator G w * volume {v : V | dist w (x + l • v) < ρ} := by
+        rw [lintegral_const_mul _ (measurable_one.indicator hT), lintegral_indicator_one hT]
+    _ ≤ _ := mul_le_mul' le_rfl (volume_setOf_dist_add_smul_lt_le hl ρ x w)
+
 /-- **Averaging moving balls** (Tonelli): for `l ≥ 1`, every `a, ρ`, `x` and every almost
 everywhere measurable `G : V → [0, ∞]`,
 `∫_{B(0,a)} ∫_{B(x + l v, ρ)} G(w) dw dv ≤ |B(0,ρ)| ∫_{B(x, ρ + l a)} G`: a point `w` lies in
 `B(x + l v, ρ)` only for `v` in a set of measure at most `|B(0,ρ)|`, and only if
-`w ∈ B(x, ρ + l a)`. -/
+`w ∈ B(x, ρ + l a)` (`Rd.setLIntegral_indicator_ball_add_smul_le`). -/
 theorem setLIntegral_setLIntegral_ball_le {G : V → ℝ≥0∞} (hG : AEMeasurable G volume) {l : ℝ}
     (hl : 1 ≤ l) (a ρ : ℝ) (x : V) :
     ∫⁻ v in ball (0 : V) a, ∫⁻ w in ball (x + l • v) ρ, G w ≤
       volume (ball (0 : V) ρ) * ∫⁻ w in ball x (ρ + l * a), G w := by
-  have hl0 : 0 ≤ l := zero_le_one.trans hl
   have hS : MeasurableSet {z : V × V | dist z.2 (x + l • z.1) < ρ} :=
     (isOpen_lt (continuous_snd.dist (continuous_const.add (continuous_fst.const_smul l)))
       continuous_const).measurableSet
@@ -307,42 +349,13 @@ theorem setLIntegral_setLIntegral_ball_le {G : V → ℝ≥0∞} (hG : AEMeasura
       rfl
     rw [heq]
     exact hG.comp_snd.indicator hS
-  have hT : ∀ w : V, MeasurableSet {v : V | dist w (x + l • v) < ρ} := fun w =>
-    (isOpen_lt (continuous_const.dist (continuous_const.add (continuous_id.const_smul l)))
-      continuous_const).measurableSet
-  have hinner : ∀ w, ∫⁻ v in ball (0 : V) a, (ball (x + l • v) ρ).indicator G w ≤
-      (ball x (ρ + l * a)).indicator G w * volume (ball (0 : V) ρ) := fun w => by
-    calc ∫⁻ v in ball (0 : V) a, (ball (x + l • v) ρ).indicator G w
-        ≤ ∫⁻ v in ball (0 : V) a, (ball x (ρ + l * a)).indicator G w *
-            {v : V | dist w (x + l • v) < ρ}.indicator 1 v := by
-          refine setLIntegral_mono' measurableSet_ball fun v hv => ?_
-          by_cases hw : w ∈ ball (x + l • v) ρ
-          · have hwx : w ∈ ball x (ρ + l * a) := by
-              rw [mem_ball] at hw ⊢
-              rw [mem_ball_zero_iff] at hv
-              calc dist w x ≤ dist w (x + l • v) + dist (x + l • v) x := dist_triangle _ _ _
-                _ < ρ + l * a := by
-                  rw [dist_eq_norm (x + l • v), add_sub_cancel_left, norm_smul,
-                    Real.norm_of_nonneg hl0]
-                  exact add_lt_add_of_lt_of_le hw (mul_le_mul_of_nonneg_left hv.le hl0)
-            rw [indicator_of_mem hw, indicator_of_mem hwx,
-              indicator_of_mem (show v ∈ {v : V | dist w (x + l • v) < ρ} from hw),
-              Pi.one_apply, mul_one]
-          · rw [indicator_of_notMem hw]
-            exact zero_le
-      _ ≤ ∫⁻ v, (ball x (ρ + l * a)).indicator G w *
-            {v : V | dist w (x + l • v) < ρ}.indicator 1 v := setLIntegral_le_lintegral _ _
-      _ = (ball x (ρ + l * a)).indicator G w * volume {v : V | dist w (x + l • v) < ρ} := by
-          rw [lintegral_const_mul _ (measurable_one.indicator (hT w)),
-            lintegral_indicator_one (hT w)]
-      _ ≤ _ := mul_le_mul' le_rfl (volume_setOf_dist_add_smul_lt_le hl ρ x w)
   calc ∫⁻ v in ball (0 : V) a, ∫⁻ w in ball (x + l • v) ρ, G w
       = ∫⁻ v in ball (0 : V) a, ∫⁻ w, (ball (x + l • v) ρ).indicator G w := by
         simp only [lintegral_indicator measurableSet_ball]
     _ = ∫⁻ w, ∫⁻ v in ball (0 : V) a, (ball (x + l • v) ρ).indicator G w :=
         lintegral_lintegral_swap hmeas
     _ ≤ ∫⁻ w, (ball x (ρ + l * a)).indicator G w * volume (ball (0 : V) ρ) :=
-        lintegral_mono hinner
+        lintegral_mono fun w => setLIntegral_indicator_ball_add_smul_le G hl a ρ x w
     _ = volume (ball (0 : V) ρ) * ∫⁻ w in ball x (ρ + l * a), G w := by
         rw [lintegral_mul_const' _ _ (volume_ball_ne_top ρ), lintegral_indicator measurableSet_ball,
           mul_comm]
@@ -557,7 +570,8 @@ theorem enorm_higherDiff_conv_dual_le_of_le (L : ℕ) {i j : ℕ} (hij : i ≤ j
     (K := fun y => ‖(fwdDiff h)^[L] (b.dual L i) y‖ₑ) hA
     (b.enorm_higherDiff_dual_le_indicator L hij hh) (mul_pos hc (one_div_two_pow_pos i))
     (fun y => ‖g y‖ₑ) x).trans (le_of_eq ?_))
-  rw [volume_ball_mul_one_div_two_pow hc i, ← two_pow_mul_volume_ball_one_div (V := V) i]
+  rw [Measure.addHaar_ball_mul_of_pos volume (0 : V) hc, ENNReal.ofReal_pow hc.le,
+    ← two_pow_mul_volume_ball_one_div (V := V) i]
   ring
 
 /-- **Ball means of `η_i ⋆ g`, fine levels**: for `i ≤ j`, a locally integrable `g` and every
@@ -622,7 +636,8 @@ theorem enorm_conv_dual_le_maximal (L i : ℕ) (g : V → ℂ) (x : V) :
         mul_le_mul' le_rfl (setLIntegral_ball_le_mul_maximal
           (mul_pos hc (one_div_two_pow_pos i)) _ x)
     _ = _ := by
-        rw [volume_ball_mul_one_div_two_pow hc i, ← two_pow_mul_volume_ball_one_div (V := V) i]
+        rw [Measure.addHaar_ball_mul_of_pos volume (0 : V) hc, ENNReal.ofReal_pow hc.le,
+    ← two_pow_mul_volume_ball_one_div (V := V) i]
         ring
 
 /-- **Averages of shifted `η_i ⋆ g`**: for `j ≤ i`, `1 ≤ l ≤ L`, a locally integrable `g` and
@@ -670,7 +685,8 @@ theorem laverage_enorm_conv_dual_add_smul_le_of_one_le (L : ℕ) {i j : ℕ} (hj
         exact (lintegral_mono_set (ball_subset_ball hrad)).trans
           (setLIntegral_ball_le_mul_maximal (mul_pos hc2 (one_div_two_pow_pos j)) _ x)
     _ = _ := by
-        rw [volume_ball_mul_one_div_two_pow hc1 i, volume_ball_mul_one_div_two_pow hc2 j,
+        rw [Measure.addHaar_ball_mul_of_pos volume (0 : V) hc1, ENNReal.ofReal_pow hc1.le,
+          Measure.addHaar_ball_mul_of_pos volume (0 : V) hc2, ENNReal.ofReal_pow hc2.le,
           ← two_pow_mul_volume_ball_one_div (V := V) i]
         calc _ = ENNReal.ofReal (b.dualDerivConst L 0) *
               ENNReal.ofReal (2 * L * b.radius + 1) ^ finrank ℝ V *
@@ -1073,7 +1089,7 @@ theorem memTriebelLizorkin_iff_tlDiffNorm_lt_top {p : ℝ≥0∞} [Fact (1 ≤ p
   have hL : 1 ≤ L := Nat.one_le_iff_ne_zero.2 fun h => by
     rw [h, Nat.cast_zero] at hsL
     linarith
-  rw [(LocalMeansBump.std (V := V)).memTriebelLizorkin_iff_tlLocalMeans hL hp1 hp hq1 hs hsL]
+  rw [(LocalMeansBump.std (V := V)).memTriebelLizorkin_iff_tlLocalMeans hp1 hp hq1 hs hsL]
   exact ⟨fun h => ((LocalMeansBump.std (V := V)).tlDiffNorm_le_tlLocalMeansNorm hL hp1 hp hq1 s
       f).trans_lt (ENNReal.mul_lt_top
         ((LocalMeansBump.std (V := V)).diffUpperConst_ne_top hp1 hp hq1 hs hsL).lt_top h),

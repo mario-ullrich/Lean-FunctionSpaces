@@ -302,6 +302,25 @@ theorem IsSmoothAtom.enorm_higherDiff_le {Ω : Set V} (hΩ : Convex ℝ Ω)
       Real.rpow_natCast, ← ENNReal.ofReal_mul (by positivity)]
     exact ENNReal.ofReal_le_ofReal h1
 
+/-- **Differences of an atom vanish far from its centre**: for a smooth atom `a` with centre `c`
+and radius factor `d` at level `j`, a step `h` with `‖h‖ ≤ ρ` and a point `x` with
+`d 2^(-j) + r ρ < ‖x - c‖`, `Δ^r_h a(x) = 0`: every point `x + l h`, `l ≤ r`, has distance more
+than `d 2^(-j)` from `c`, where `a` vanishes. -/
+theorem IsSmoothAtom.higherDiff_eq_zero_of_lt {Ω : Set V} {K : ℕ} {d A : ℝ} {j : ℕ} {c : V}
+    {a : V → ℂ} (ha : IsSmoothAtom Ω K d A j c a) (r : ℕ) {ρ : ℝ} {h x : V} (hh : ‖h‖ ≤ ρ)
+    (hx : d / 2 ^ j + r * ρ < ‖x - c‖) :
+    (fwdDiff h)^[r] a x = 0 := by
+  rw [higherDiff_apply]
+  refine Finset.sum_eq_zero fun l hl => ?_
+  have hl' : (l : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hl)
+  have h2 : ‖(l : ℝ) • h‖ ≤ r * ρ := by
+    rw [norm_smul, Real.norm_of_nonneg (Nat.cast_nonneg l)]
+    exact mul_le_mul hl' hh (norm_nonneg _) (Nat.cast_nonneg r)
+  have h3 : ‖x - c‖ - ‖(l : ℝ) • h‖ ≤ ‖x + (l : ℝ) • h - c‖ := by
+    have hn := norm_sub_norm_le (x - c) (-((l : ℝ) • h))
+    rwa [norm_neg, sub_neg_eq_add, sub_add_eq_add_sub] at hn
+  rw [ha.eq_zero _ (by linarith), mul_zero]
+
 /-- **Smooth atoms are regular atoms**: on a measurable convex set `Ω` with nonempty interior, a
 smooth atom of order `K` is a regular atom on `Ω` of order and exponent `r` for `1 ≤ r ≤ K`, with
 the constant `2^r r^(r+1) A ((r + 1) d^n |B_1|)^(1/p)`. -/

@@ -17,9 +17,10 @@ are the big cubes whose strict ancestors are not big. They are pairwise disjoint
 `Rd.cz_avg_le`), and their union `Ω` (`Rd.czSet`) has measure at most `t⁻¹ ∫ G`
 (`Rd.cz_volume_le`). In dimension `n ≥ 1`, for `∫ G < ∞` and `0 < t`, cubes of large size have
 average at most `t` (`Rd.exists_forall_setLAverage_zcell_sub_le`), so every big cube lies in a
-maximal one (`Rd.exists_maximal_of_big`), and `G ≤ t` almost everywhere outside `Ω`
-(`Rd.cz_ae_le_of_notMem`). The union of the closed balls of radius `2n 2^(-k)` around the centres
-of the maximal cubes `Q_{k,m}`, twice the radius `n 2^(-k)` of a ball around the centre containing
+maximal one (`Rd.exists_maximal_of_big`); for a.e.-measurable `G` with `∫ G < ∞` and `0 < t`,
+`G ≤ t` almost everywhere outside `Ω` (`Rd.cz_ae_le_of_notMem`). The union of the closed balls of
+radius `2n 2^(-k)` around the centres of the maximal cubes `Q_{k,m}`, twice the radius `n 2^(-k)`
+of a ball around the centre containing
 the cube, is the enlarged set `Ω*` (`Rd.czEnlarged`).
 -/
 
@@ -81,31 +82,31 @@ theorem exists_forall_setLAverage_zcell_sub_le [Nontrivial V] (hGi : ∫⁻ x, G
 `Q_{k-l, m^{(l)}}`, `l ≥ 1`, does not. -/
 def czMaximal (G : V → ℝ≥0∞) (t : ℝ≥0∞) : Set (ℤ × (Fin (finrank ℝ V) → ℤ)) :=
   {km | t < ⨍⁻ y in zcell km.1 km.2, G y ∂volume ∧
-    ∀ l : ℕ, 0 < l → ¬ t < ⨍⁻ y in zcell (km.1 - l) (ancestor l km.2), G y ∂volume}
+    ∀ l : ℕ, 0 < l → ¬ t < ⨍⁻ y in zcell (km.1 - l) (cubeAncestor l km.2), G y ∂volume}
 
 /-- **Every big cube lies in a maximal one**: in dimension `n ≥ 1`, if `∫ G < ∞`, `0 < t` and
 the average of `G` over `Q_{k,m}` exceeds `t`, then for some `l ≥ 0` the ancestor
 `Q_{k-l, m^{(l)}}` is a maximal big cube, and it contains `Q_{k,m}`. -/
 theorem exists_maximal_of_big [Nontrivial V] (hGi : ∫⁻ x, G x ≠ ∞) (ht0 : 0 < t) {k : ℤ}
     {m : Fin (finrank ℝ V) → ℤ} (h : t < ⨍⁻ y in zcell k m, G y ∂volume) :
-    ∃ l : ℕ, (k - l, ancestor l m) ∈ czMaximal G t ∧
-      zcell k m ⊆ zcell (k - l) (ancestor l m) := by
+    ∃ l : ℕ, (k - l, cubeAncestor l m) ∈ czMaximal G t ∧
+      zcell k m ⊆ zcell (k - l) (cubeAncestor l m) := by
   classical
   obtain ⟨B, hB⟩ := exists_forall_setLAverage_zcell_sub_le hGi ht0 k
-  let P : ℕ → Prop := fun l => t < ⨍⁻ y in zcell (k - l) (ancestor l m), G y ∂volume
-  have hP0 : P 0 := by simpa [P, ancestor] using h
+  let P : ℕ → Prop := fun l => t < ⨍⁻ y in zcell (k - l) (cubeAncestor l m), G y ∂volume
+  have hP0 : P 0 := by simpa [P, cubeAncestor] using h
   obtain ⟨l₀, hl₀⟩ : ∃ l₀, Nat.findGreatest P B = l₀ := ⟨_, rfl⟩
   have hspec : P l₀ := hl₀ ▸ Nat.findGreatest_spec (Nat.zero_le B) hP0
   refine ⟨l₀, ⟨hspec, fun l hl hbig => ?_⟩, ?_⟩
   · have hk : k - ((l₀ + l : ℕ) : ℤ) = k - l₀ - l := by push_cast; ring
     have hbig' : P (l₀ + l) := by
-      change t < ⨍⁻ y in zcell (k - ((l₀ + l : ℕ) : ℤ)) (ancestor (l₀ + l) m), G y ∂volume
-      rwa [hk, add_comm, ← ancestor_add]
+      change t < ⨍⁻ y in zcell (k - ((l₀ + l : ℕ) : ℤ)) (cubeAncestor (l₀ + l) m), G y ∂volume
+      rwa [hk, add_comm, ← cubeAncestor_add]
     have hle : l₀ + l ≤ B := not_lt.1 fun hlt => (hB _ hlt _).not_gt hbig'
     have hmax := Nat.le_findGreatest hle hbig'
     rw [hl₀] at hmax
     omega
-  · have hsub := zcell_subset_ancestor (V := V) (k - l₀) l₀ m
+  · have hsub := zcell_subset_cubeAncestor (V := V) (k - l₀) l₀ m
     rwa [sub_add_cancel] at hsub
 
 /-- Two distinct maximal big cubes `Q_{k,m}` and `Q_{k',m'}` with `k ≤ k'` are disjoint: if the
@@ -117,12 +118,12 @@ theorem czMaximal_disjoint_of_le {k k' : ℤ} {m m' : Fin (finrank ℝ V) → �
   rcases Nat.eq_zero_or_pos l with rfl | hl
   · have hm : m' ≠ m := fun e => hne (by simp [e])
     simpa using zcell_disjoint (V := V) k hm
-  · have hanc : ancestor l m' ≠ m := by
+  · have hanc : cubeAncestor l m' ≠ m := by
       intro e
       have hnot := h'.2 l hl
       rw [add_sub_cancel_right, e] at hnot
       exact hnot h.1
-    exact (zcell_disjoint k hanc).mono_left (zcell_subset_ancestor k l m')
+    exact (zcell_disjoint k hanc).mono_left (zcell_subset_cubeAncestor k l m')
 
 /-- The maximal big cubes are **pairwise disjoint**. -/
 theorem czMaximal_pairwiseDisjoint :
@@ -145,16 +146,16 @@ theorem cz_avg_gt {k : ℤ} {m : Fin (finrank ℝ V) → ℤ} (h : (k, m) ∈ cz
 has `2^n` times the volume. -/
 theorem cz_avg_le {k : ℤ} {m : Fin (finrank ℝ V) → ℤ} (h : (k, m) ∈ czMaximal G t) :
     ⨍⁻ y in zcell k m, G y ∂volume ≤ 2 ^ finrank ℝ V * t := by
-  have hpar : ¬ t < ⨍⁻ y in zcell (k - 1) (parent m), G y ∂volume := by
-    simpa [ancestor] using h.2 1 one_pos
+  have hpar : ¬ t < ⨍⁻ y in zcell (k - 1) (cubeParent m), G y ∂volume := by
+    simpa [cubeAncestor] using h.2 1 one_pos
   rw [lt_setLAverage_zcell_iff, not_lt] at hpar
-  have hvol := volume_zcell_parent (V := V) (k - 1) m
-  have hsub := zcell_succ_subset_parent (V := V) (k - 1) m
+  have hvol := volume_zcell_cubeParent (V := V) (k - 1) m
+  have hsub := zcell_succ_subset_cubeParent (V := V) (k - 1) m
   rw [sub_add_cancel] at hvol hsub
   rw [setLAverage_eq]
   refine ENNReal.div_le_of_le_mul ?_
-  calc ∫⁻ y in zcell k m, G y ≤ ∫⁻ y in zcell (k - 1) (parent m), G y := lintegral_mono_set hsub
-    _ ≤ t * volume (zcell (V := V) (k - 1) (parent m)) := hpar
+  calc ∫⁻ y in zcell k m, G y ≤ ∫⁻ y in zcell (k - 1) (cubeParent m), G y := lintegral_mono_set hsub
+    _ ≤ t * volume (zcell (V := V) (k - 1) (cubeParent m)) := hpar
     _ = 2 ^ finrank ℝ V * t * volume (zcell (V := V) k m) := by rw [hvol]; ring
 
 /-- A maximal big cube `Q` has volume at most `t⁻¹ ∫_Q G`, for every height `t`, with

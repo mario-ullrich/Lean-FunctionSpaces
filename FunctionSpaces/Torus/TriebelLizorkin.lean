@@ -12,7 +12,7 @@ public import FunctionSpaces.Lp.MixedNorms
 /-!
 # Triebel–Lizorkin spaces on the torus
 
-For `1 ≤ p < ∞`, `s ∈ ℝ`, `1 ≤ q ≤ ∞` and `f ∈ L_p(𝕋^d)`, the **Triebel–Lizorkin quasi-norm**
+For `1 ≤ p ≤ ∞`, `s ∈ ℝ`, `1 ≤ q ≤ ∞` and `f ∈ L_p(𝕋^d)`, the **Triebel–Lizorkin quasi-norm**
 
 `‖f‖_{F^s_{p,q}} = ‖ t ↦ ‖(2^(js) |ψ_j ⋆ f(t)|)_j‖_{ℓ_q} ‖_p`
 
@@ -20,7 +20,8 @@ For `1 ≤ p < ∞`, `s ∈ ℝ`, `1 ≤ q ≤ ∞` and `f ∈ L_p(𝕋^d)`, the
 before the `L_p` norm. The blocks are the pointwise convolutions `ψ_j ⋆ f` with the kernels of
 `ℝ^d` (`Torus.blockFun`), representatives of `Torus.lpBlock`. The space `F^s_{p,q}(𝕋^d)` consists
 of the `f` with a finite quasi-norm (`Torus.MemTriebelLizorkin`); it is a subspace of `L_p` for
-`1 ≤ q ≤ ∞` (`Torus.triebelLizorkinSpace`), increasing in `q` and decreasing in `s`.
+`1 ≤ q ≤ ∞` (`Torus.triebelLizorkinSpace`), increasing in `q` and decreasing in `s`. The
+comparisons with Besov spaces below need `p < ∞`.
 
 The mixed-norm comparisons of `FunctionSpaces.Lp.MixedNorms` give, for every `s ∈ ℝ`,
 `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{max(p,q)}} ≤ ‖f‖_{F^s_{p,q}} ≤ ‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{min(p,q)}}`,

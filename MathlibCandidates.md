@@ -147,14 +147,14 @@ declarations.
   for countable index sets; `∑_k ∏_i f_i(k_i) ≤ ∏_i ∑_j f_i(j)` on `ℕ^d`
   (`Rd.tsum_prod_le_prod_tsum`).
 * **The layer cake formula for `[0, ∞]`-valued functions**
-  (`FunctionSpaces/Rd/MaximalFunction.lean`): `∫ F^p dν = p ∫_0^∞ ν{F > t} t^(p-1) dt` for
+  (`FunctionSpaces/Rd/HardyLittlewoodMaximal.lean`): `∫ F^p dν = p ∫_0^∞ ν{F > t} t^(p-1) dt` for
   `p > 0`, every measure and every a.e. measurable `F : α → [0, ∞]`
   (`MeasureTheory.lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal`); Mathlib's
   `lintegral_rpow_eq_lintegral_meas_lt_mul` is for real `f ≥ 0`. Also the `lintegral` of powers
   over intervals, `∫_{(0,b)} t^r dt = b^(r+1)/(r+1)` for `r > -1` and `b ≥ 0`
   (`MeasureTheory.lintegral_Ioo_rpow`) and
   `∫_{(0,∞)} t^r dt = ∞` (`MeasureTheory.lintegral_Ioi_rpow_eq_top`).
-* **The Hardy–Littlewood maximal function** (`FunctionSpaces/Rd/MaximalFunction.lean`): the
+* **The Hardy–Littlewood maximal function** (`FunctionSpaces/Rd/HardyLittlewoodMaximal.lean`): the
   centred maximal function on a finite-dimensional inner product space (`Rd.maximal`), its lower
   semicontinuity and measurability for every `g` (`Rd.lowerSemicontinuous_maximal`,
   `Rd.measurable_maximal`), the weighted weak type

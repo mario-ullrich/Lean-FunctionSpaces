@@ -26,7 +26,8 @@ of order `L` centred at the cells and `‖λ‖_{f^s_{p,q}} < ∞`. No moment co
   moments of `k_i` and the smoothness of the atoms give the factor `2^(-(i-j)L)`. Both bounds
   are maximal functions of the step functions of the coefficients
   (`Rd.LocalMeansBump.ae_enorm_conv_kernel_level_le`), and the almost diagonal estimate and the
-  Fefferman–Stein inequality finish.
+  Fefferman–Stein inequality finish. The **coarse local means** are those of levels `i ≤ j`, at
+  most the level `j` of the atoms, and the **fine local means** those of levels `i > j`.
 * **Analysis** (`Rd.LocalMeansBump.tl_atomic_decomposition`,
   `Rd.LocalMeansBump.tlCoeffNorm_cellCoef_le`). The atoms of `F` are the cell atoms of
   `η_j ⋆ (k_j ⋆ F)` with the coefficients `2^(jn) ∫_{P_{j,m}} |k_j ⋆ F|`, and each coefficient is
@@ -96,20 +97,6 @@ theorem aemeasurable_lqNorm_cellCoefFun (s : ℝ) (q : ℝ≥0∞)
     (fun j => ((measurable_cellCoefFun j coef).const_mul _).aemeasurable) q
 
 /-! ### Coefficients and the maximal function -/
-
-/-- The cells of level `j` have volume `2^(-jn)`. -/
-theorem volume_cell (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) :
-    volume (cell (V := V) j m) = dyadicWeight (-(finrank ℝ V : ℝ)) j := by
-  rw [← zcell_natCast, volume_zcell, zpow_natCast, ← one_div,
-    ← ENNReal.ofReal_pow (by positivity), ENNReal.ofReal_one_div_two_pow_pow]
-
-/-- The volume of a ball of radius `ρ 2^(-j)`, `ρ > 0`, is `ρ^n |B_1| 2^(-jn)`. -/
-theorem volume_ball_div_two_pow {ρ : ℝ} (hρ : 0 < ρ) (j : ℕ) (z : V) :
-    volume (ball z (ρ / 2 ^ j)) = ENNReal.ofReal (ρ ^ finrank ℝ V) *
-      volume (ball (0 : V) 1) * dyadicWeight (-(finrank ℝ V : ℝ)) j := by
-  rw [Measure.addHaar_ball_of_pos _ _ (by positivity), div_eq_mul_one_div, mul_pow,
-    ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_one_div_two_pow_pow]
-  ring
 
 /-- **Integrals over dyadic balls by the maximal function**:
 `2^(jn) ∫_{B(x, ρ 2^(-j))} g ≤ ρ^n |B_1| M g(x)` for `ρ > 0` and every `g : V → [0, ∞]`. -/
@@ -396,9 +383,9 @@ theorem lintegral_enorm_kernel_mul_atom_le (L : ℕ) {i j : ℕ} (hij : i ≤ j)
         rw [ha.eq_zero (x - y) (by linarith), enorm_zero, mul_zero]
     simp only [h0, lintegral_zero, mul_zero, le_refl]
 
-/-- The constant `C A d^n |B_1| (2LR + d + n + 1)^n |B_1|` of the coarse local means of atoms with
-radius factor `d` and constant `A`, with `C = Rd.LocalMeansBump.kernelSupConst L` and the radius
-`R` of the bump. -/
+/-- The constant `C A_+ d^n |B_1| (2LR + d + n + 1)^n |B_1|` of the coarse local means of atoms
+with radius factor `d` and constant `A`, where `A_+ = max(A, 0)`,
+`C = Rd.LocalMeansBump.kernelSupConst L` and `R` is the radius of the bump. -/
 noncomputable def tlAtomCoarseConst (L : ℕ) (d A : ℝ) : ℝ≥0∞ :=
   ENNReal.ofReal (b.kernelSupConst L) * (ENNReal.ofReal A *
     (ENNReal.ofReal (d ^ finrank ℝ V) * volume (ball (0 : V) 1))) *
@@ -457,7 +444,8 @@ theorem enorm_conv_kernel_level_le_of_le (L : ℕ) {i j : ℕ} (hij : i ≤ j) {
 /-- One step of the moment identity for an atom, pointwise in `z`: for a smooth atom `a` on `V`
 of level `j` and order `L ≥ 1` with centre `c`, radius factor `d` and constant `A`, and `k ≥ j`,
 `|g(z)| |Δ^L_{-2^(-k) z} a(x)| ≤ |g(z)| 2^L L^(L+1) A R^L 2^(-(k-j)L) 1_{|x - c| ≤ (d + LR) 2^(-j)}`
-for the bump `g` of radius `R`: on the support of `g` the step has length at most `2^(-k) R`. -/
+for the bump `g` of radius `R`: on the support of `g` the step has length at most `2^(-k) R`, and
+far from `c` the differences vanish (`Rd.IsSmoothAtom.higherDiff_eq_zero_of_lt`). -/
 theorem enorm_mul_higherDiff_atom_le {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} {j : ℕ}
     {c : V} {a : V → ℂ} (ha : IsSmoothAtom univ L d A j c a) {k : ℕ} (hjk : j ≤ k) (z x : V) :
     ‖b.toFun z‖ₑ * ‖(fwdDiff (-((2 : ℝ) ^ k)⁻¹ • z))^[L] a x‖ₑ ≤
@@ -491,21 +479,8 @@ theorem enorm_mul_higherDiff_atom_le {L : ℕ} (hL : 1 ≤ L) {d A : ℝ} {j : �
           ENNReal.ofReal_le_ofReal (pow_le_pow_left₀ (by positivity) h1 L)
       _ = ENNReal.ofReal (b.radius ^ L) * dyadicWeight (-(L : ℝ)) (k - j) := by
           rw [mul_pow, ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_one_div_two_pow_pow]
-  · have h0 : (fwdDiff (-((2 : ℝ) ^ k)⁻¹ • z))^[L] a x = 0 := by
-      rw [higherDiff_apply]
-      refine Finset.sum_eq_zero fun l hl => ?_
-      have hl' : (l : ℝ) ≤ L := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hl)
-      have h2 : ‖(l : ℝ) • (-((2 : ℝ) ^ k)⁻¹ • z)‖ ≤ L * b.radius / 2 ^ j := by
-        rw [norm_smul, Real.norm_of_nonneg (Nat.cast_nonneg l), mul_div_assoc]
-        exact mul_le_mul hl' (hh.trans hkj) (norm_nonneg _) (Nat.cast_nonneg L)
-      have h3 : ‖x - c‖ - ‖(l : ℝ) • (-((2 : ℝ) ^ k)⁻¹ • z)‖ ≤
-          ‖x + (l : ℝ) • (-((2 : ℝ) ^ k)⁻¹ • z) - c‖ := by
-        have h := norm_sub_norm_le (x - c) (-((l : ℝ) • (-((2 : ℝ) ^ k)⁻¹ • z)))
-        rwa [norm_neg, sub_neg_eq_add, sub_add_eq_add_sub] at h
-      push Not at hx
-      have h4 : (d + L * b.radius) / 2 ^ j = d / 2 ^ j + L * b.radius / 2 ^ j := add_div _ _ _
-      rw [ha.eq_zero _ (by linarith), mul_zero]
-    rw [h0, enorm_zero]
+  · push Not at hx
+    rw [ha.higherDiff_eq_zero_of_lt L (hh.trans hkj) (lt_of_eq_of_lt (by ring) hx), enorm_zero]
     exact zero_le
 
 /-- **One scale of the moment identity for an atom**: for a smooth atom `a` on `V` of level `j`
@@ -775,9 +750,11 @@ end LocalMeansBump
 
 /-! ### The atomic characterisation -/
 
-/-- **The atomic characterisation of Triebel–Lizorkin spaces**, the case `1 < p < ∞`,
-`1 < q ≤ ∞`, `s > 0` of the atomic characterisation in Triebel, *Theory of Function Spaces II*;
-for `s > 0` the atoms carry no moment conditions. For an order `L` with `0 < s < L`,
+/-- **The atomic characterisation of Triebel–Lizorkin spaces** for `1 < p < ∞`, `1 < q ≤ ∞`
+and `s > 0`, with atoms normalised in `L_∞` and the weights `2^(js)` in `f^s_{p,q}`; for `s > 0`
+the atoms carry no moment conditions. Triebel, *Theory of Function Spaces II*, states it with
+`(s,p)`-atoms normalised in `L_p`; the coefficients `λ_{j,m}` here correspond to his
+coefficients `2^(j(s - n/p)) λ_{j,m}`, `n = dim V`. For an order `L` with `0 < s < L`,
 `F ∈ F^s_{p,q}` iff `F = ∑_j f_j` in `L_p` with `f_j = ∑_m λ_{j,m} a_{j,m}` almost everywhere for
 smooth atoms `a_{j,m}` on `V` of level `j` and order `L` centred at the cells, with a common
 radius factor `d ≥ 0` and constant `A`, and `‖λ‖_{f^s_{p,q}} < ∞`. The atoms of `F` are the cell
@@ -797,7 +774,7 @@ theorem memTriebelLizorkin_iff_atomic {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp1 : 1
     rw [h, Nat.cast_zero] at hsL
     linarith
   obtain ⟨b⟩ : Nonempty (LocalMeansBump V) := ⟨LocalMeansBump.std⟩
-  rw [b.memTriebelLizorkin_iff_tlLocalMeans hL hp1 hp hq1 hs hsL]
+  rw [b.memTriebelLizorkin_iff_tlLocalMeans hp1 hp hq1 hs hsL]
   constructor
   · intro hF
     obtain ⟨hatom, hsum, hlim⟩ := b.tl_atomic_decomposition hL L hp F

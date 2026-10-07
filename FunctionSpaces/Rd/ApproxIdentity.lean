@@ -29,7 +29,7 @@ action of `V` on `L_p` by translation of the domain), so the integrand tends to 
 convergence applies with the bound `|Φ(z)| (2 ‖f‖_p)^p`. For the operators of `Rd.convLp` this
 reads `Φ_{c_i} ⋆ f → f` in `L_p` along any dilation factors `c_i → ∞`
 (`Rd.tendsto_convLp_dilate`). Uniformly bounded operators with `T_i f → f` also satisfy
-`T_i (T_i f) → f` (`tendsto_apply_apply_of_tendsto`).
+`T_i (T_i f) → f` (`Rd.tendsto_apply_apply_of_tendsto`).
 
 **At points of continuity** (`Rd.conv_dilate_near`): for `Φ` vanishing outside a ball,
 `(Φ_{2^J} ⋆ F_J)(z) → z₀` as `J → ∞` and `z → y` whenever `F_J(z) → z₀` as `J → ∞` and `z → y`.
@@ -295,6 +295,11 @@ theorem tendsto_convLp_dilate {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞)
 
 end Rd
 
+namespace Rd
+
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+  [MeasurableSpace V] [BorelSpace V]
+
 /-- **Uniformly bounded operators applied twice**: if additive maps `T_i : E → E` satisfy
 `‖T_i g‖ ≤ C ‖g‖` for all `i` and `g`, and `T_i f → f`, then `T_i (T_i f) → f`, since
 `T_i (T_i f) - f = T_i (T_i f - f) + (T_i f - f)` has norm at most `(C + 1) ‖T_i f - f‖`. -/
@@ -309,11 +314,6 @@ theorem tendsto_apply_apply_of_tendsto {ι E F : Type*} [SeminormedAddCommGroup 
         abel
     _ ≤ C * ‖T i f - f‖ + ‖T i f - f‖ := (norm_add_le _ _).trans (add_le_add (hT i _) le_rfl)
     _ = (C + 1) * ‖T i f - f‖ := by ring
-
-namespace Rd
-
-variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
-  [MeasurableSpace V] [BorelSpace V]
 
 /-! ### Approximate identities at points of continuity -/
 

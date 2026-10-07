@@ -19,7 +19,7 @@ is `Q_{k,m} = {x : ⌊2^k x_i⌋ = m_i for all i}` (`Rd.zcell`); for `k ∈ ℕ`
 `2^(-kn)` (`Rd.volume_zcell`), contain the ball of radius `2^(-k)/2` around their centre
 (`Rd.ball_subset_zcell`), and lie in the closed ball of radius `n 2^(-k)` around it
 (`Rd.zcell_subset_closedBall`). Cubes are **nested**: each cube of level `k + 1` lies in its
-parent of level `k` (`Rd.zcell_succ_subset_parent`), so two cubes are nested or disjoint
+parent of level `k` (`Rd.zcell_succ_subset_cubeParent`), so two cubes are nested or disjoint
 (`Rd.zcell_subset_or_disjoint`).
 
 **Lebesgue differentiation along cubes**: for a locally integrable `F`, the averages of `F` over
@@ -201,16 +201,22 @@ theorem volume_real_zcell (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
     volume.real (zcell (V := V) k m) = (((2 : ℝ) ^ k)⁻¹) ^ finrank ℝ V := by
   rw [measureReal_def, volume_zcell, ENNReal.toReal_pow, ENNReal.toReal_ofReal (by positivity)]
 
+/-- The cells of level `j ∈ ℕ` have volume `2^(-jn)`. -/
+theorem volume_cell (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) :
+    volume (cell (V := V) j m) = ENNReal.dyadicWeight (-(finrank ℝ V : ℝ)) j := by
+  rw [← zcell_natCast, volume_zcell, zpow_natCast, ← one_div,
+    ← ENNReal.ofReal_pow (by positivity), ENNReal.ofReal_one_div_two_pow_pow]
+
 end Measure
 
 /-! ### Nesting -/
 
 /-- The index of the **parent** cube: `⌊m_i / 2⌋` in every coordinate. -/
-def parent (m : Fin (finrank ℝ V) → ℤ) : Fin (finrank ℝ V) → ℤ := fun i => m i / 2
+def cubeParent (m : Fin (finrank ℝ V) → ℤ) : Fin (finrank ℝ V) → ℤ := fun i => m i / 2
 
 /-- Every cube of level `k + 1` lies in its parent of level `k`. -/
-theorem zcell_succ_subset_parent (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
-    zcell (V := V) (k + 1) m ⊆ zcell k (parent m) := by
+theorem zcell_succ_subset_cubeParent (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
+    zcell (V := V) (k + 1) m ⊆ zcell k (cubeParent m) := by
   intro x hx
   funext i
   have hm : ⌊(2 : ℝ) ^ (k + 1) * (gridBasis V).repr x i⌋ = m i := congrFun hx i
@@ -224,40 +230,40 @@ theorem zcell_succ_subset_parent (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
   rfl
 
 /-- The index of the ancestor `l` levels up: the parent map iterated `l` times. -/
-def ancestor (l : ℕ) (m : Fin (finrank ℝ V) → ℤ) : Fin (finrank ℝ V) → ℤ := parent^[l] m
+def cubeAncestor (l : ℕ) (m : Fin (finrank ℝ V) → ℤ) : Fin (finrank ℝ V) → ℤ := cubeParent^[l] m
 
 omit [FiniteDimensional ℝ V] in
 /-- Ancestors of ancestors are ancestors. -/
-theorem ancestor_add (l l' : ℕ) (m : Fin (finrank ℝ V) → ℤ) :
-    ancestor l (ancestor l' m) = ancestor (l + l') m :=
-  (Function.iterate_add_apply parent l l' m).symm
+theorem cubeAncestor_add (l l' : ℕ) (m : Fin (finrank ℝ V) → ℤ) :
+    cubeAncestor l (cubeAncestor l' m) = cubeAncestor (l + l') m :=
+  (Function.iterate_add_apply cubeParent l l' m).symm
 
 /-- Every cube of level `k + l` lies in its ancestor of level `k`. -/
-theorem zcell_subset_ancestor (k : ℤ) (l : ℕ) (m : Fin (finrank ℝ V) → ℤ) :
-    zcell (V := V) (k + l) m ⊆ zcell k (ancestor l m) := by
+theorem zcell_subset_cubeAncestor (k : ℤ) (l : ℕ) (m : Fin (finrank ℝ V) → ℤ) :
+    zcell (V := V) (k + l) m ⊆ zcell k (cubeAncestor l m) := by
   induction l generalizing k with
-  | zero => simp [ancestor]
+  | zero => simp [cubeAncestor]
   | succ l ih =>
     have hk : k + ((l + 1 : ℕ) : ℤ) = (k + 1) + l := by push_cast; ring
-    rw [hk, ancestor, Function.iterate_succ_apply']
-    exact (ih (k + 1)).trans (zcell_succ_subset_parent k _)
+    rw [hk, cubeAncestor, Function.iterate_succ_apply']
+    exact (ih (k + 1)).trans (zcell_succ_subset_cubeParent k _)
 
 /-- The index of level `k - l` is the ancestor of the index of level `k`. -/
-theorem zcellIndex_sub_ancestor (k : ℤ) (l : ℕ) (x : V) :
-    zcellIndex (k - l) x = ancestor l (zcellIndex k x) := by
+theorem zcellIndex_sub_cubeAncestor (k : ℤ) (l : ℕ) (x : V) :
+    zcellIndex (k - l) x = cubeAncestor l (zcellIndex k x) := by
   have hx : x ∈ zcell ((k - l) + l) (zcellIndex k x) := by
     rw [sub_add_cancel]
     exact mem_zcell_zcellIndex k x
-  exact zcell_subset_ancestor (k - l) l _ hx
+  exact zcell_subset_cubeAncestor (k - l) l _ hx
 
 /-- **Nested or disjoint**: for `k ≤ k'`, the cube `Q_{k',m'}` lies in the cube `Q_{k,m}` or is
 disjoint from it. -/
 theorem zcell_subset_or_disjoint {k k' : ℤ} (hk : k ≤ k') (m m' : Fin (finrank ℝ V) → ℤ) :
     zcell (V := V) k' m' ⊆ zcell k m ∨ Disjoint (zcell (V := V) k' m') (zcell k m) := by
   obtain ⟨l, hl⟩ := Int.le.dest hk
-  have hsub := zcell_subset_ancestor (V := V) k l m'
+  have hsub := zcell_subset_cubeAncestor (V := V) k l m'
   rw [hl] at hsub
-  by_cases h : ancestor l m' = m
+  by_cases h : cubeAncestor l m' = m
   · exact Or.inl (h ▸ hsub)
   · exact Or.inr ((zcell_disjoint k h).mono_left hsub)
 
@@ -266,8 +272,8 @@ section Measure
 variable [MeasurableSpace V] [BorelSpace V]
 
 /-- The parent cube has `2^n` times the volume of its child. -/
-theorem volume_zcell_parent (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
-    volume (zcell (V := V) k (parent m)) =
+theorem volume_zcell_cubeParent (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
+    volume (zcell (V := V) k (cubeParent m)) =
       2 ^ finrank ℝ V * volume (zcell (V := V) (k + 1) m) := by
   rw [volume_zcell, volume_zcell, ← mul_pow]
   congr 1

@@ -373,7 +373,7 @@ theorem sum_conv_dual_localMean_apply (hp : p ≠ ∞) (L J : ℕ)
 
 /-- **The reproducing formula**: `∑_j η_j ⋆ k_j ⋆ f = f` in `L_p`, since
 `m_{2^J} ⋆ m_{2^J} ⋆ f → f` (`m` is an approximate identity, `Rd.tendsto_convLp_dilate`, and the
-operators `m_{2^J} ⋆` are uniformly bounded, `tendsto_apply_apply_of_tendsto`). -/
+operators `m_{2^J} ⋆` are uniformly bounded, `Rd.tendsto_apply_apply_of_tendsto`). -/
 theorem tendsto_sum_dual_localMean (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L)
     (f : Lp ℂ p (volume : Measure V)) :
     Tendsto (fun J => ∑ j ∈ Finset.range (J + 1),
