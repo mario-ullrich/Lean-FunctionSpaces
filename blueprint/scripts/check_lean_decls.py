@@ -56,12 +56,13 @@ def cited_names(tex: str) -> list[str]:
 def lean_source(names: list[str]) -> str:
     """A Lean file that fails, naming them, if any of `names` is not declared."""
     imports = "".join(f"import {root}\n" for root in ROOTS)
-    listed = ",\n    ".join(f'"{name}"' for name in names)
+    # One string literal, split in Lean: a list literal with thousands of entries exceeds the
+    # elaborator's recursion depth.
+    listed = "\n".join(names)
     return f"""{imports}
 open Lean Elab Command in
 run_cmd do
-  let names : List String := [
-    {listed}]
+  let names : List String := "{listed}".splitOn "\\n"
   let env ← getEnv
   let missing := names.filter fun n => !env.contains n.toName
   unless missing.isEmpty do
