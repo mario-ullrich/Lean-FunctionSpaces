@@ -220,3 +220,16 @@ declarations.
   (`FunctionSpaces/Wavelets/Daubechies/FilterIdentities.lean`):
   `(d/dt)^l ∑_i a_i e^(b_i t) = ∑_i a_i b_i^l e^(b_i t)` for `t ∈ ℝ`
   (`Daubechies.iteratedDeriv_sum_mul_cexp`); Mathlib has these derivatives for a complex variable.
+* **Distributions and Schwartz functions** (`FunctionSpaces/Rd/WeakDerivatives.lean`):
+  directional derivatives commute on Schwartz functions and on test functions
+  (`SchwartzMap.lineDerivOp_comm`, `TestFunction.lineDerivOp_comm`), and a directional derivative
+  commutes with every iterated one as soon as two of them commute
+  (`LineDeriv.lineDerivOp_iteratedLineDerivOp_comm_of`); the transpose formulas
+  `∂^v T(φ) = (-1)^k T(∂^v φ)` for distributions and tempered distributions
+  (`Distribution.iteratedLineDerivOp_apply_apply`,
+  `TemperedDistribution.iteratedLineDerivOp_apply_apply`) and the iterated derivative of a
+  Schwartz function as a tempered distribution
+  (`TemperedDistribution.iteratedLineDerivOp_toTemperedDistributionCLM_eq`); the cut-offs
+  `χ(x/(n+1)) u(x)` of a Schwartz function converge to it in the Schwartz space
+  (`Rd.tendsto_cutoffMul`), so tempered distributions are determined by test functions
+  (`Rd.eq_zero_of_testSchwartz`).

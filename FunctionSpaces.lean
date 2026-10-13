@@ -174,6 +174,7 @@ public import FunctionSpaces.Torus.FeffermanStein
 public import FunctionSpaces.Torus.TriebelLizorkinLocalMeans
 public import FunctionSpaces.Rd.TriebelLizorkinDifferences
 public import FunctionSpaces.Rd.TriebelLizorkinAtoms
+public import FunctionSpaces.Rd.WeakDerivatives
 
 /-!
 # Function spaces
@@ -578,4 +579,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.TriebelLizorkinAtoms`: the sequence space `f^s_{p,q}`, local means of smooth
   atoms by maximal functions of the coefficients, and the atomic characterisation of `F^s_{p,q}`
   for `1 < p < ∞`, `1 < q ≤ ∞`, `0 < s < L`.
+* `FunctionSpaces.Rd.WeakDerivatives`: weak derivatives on open sets as equalities of
+  distributions, integration by parts against test functions, uniqueness, locality, limits in
+  `L_p`, the Sobolev spaces `W^m_p(Ω)` and `W^m_p(ℝ^d)`, and the identification with derivatives
+  of tempered distributions on `ℝ^d`.
 -/

@@ -12010,6 +12010,395 @@ The Besov analogue is \Cref{thm:atomic-characterisation}. Here the atoms are ind
 and centred at their centres, which takes the place of the bounded overlap condition there, and
 the atoms of the decomposition are smooth of every order.
 
+\chapter{Sobolev spaces on $\R^d$}
+\label{ch:sobolev-rd}
+
+This chapter works on a finite-dimensional real inner product space $V$ of dimension $n$, such
+as $\R^d$, with Lebesgue measure, and defines Sobolev spaces by weak derivatives. A weak
+derivative is an identity between distributions on an open set $\Omega \subseteq V$, in Mathlib's
+space $\mathcal D'(\Omega)$ of distributions tested against real smooth compactly supported
+functions. On the whole space $V$ and for $L_p$ functions it is the same as an identity between
+tempered distributions, the setting of Mathlib's Fourier transform and Bessel potential spaces.
+
+\section{Weak derivatives on open sets and cut-offs of Schwartz functions}
+
+Throughout this section $\Omega \subseteq V$ is open, $\mathcal D(\Omega)$ is the space of
+smooth functions $\varphi : V \to \R$ with compact support in $\Omega$, and
+$\mathcal S(V)$ is the space of complex Schwartz functions on $V$. For directions
+$v = (v_0, \dots, v_{k-1}) \in V^k$ let $\partial^v = \partial_{v_0} \cdots \partial_{v_{k-1}}$ be
+the iterated directional derivative, with $\partial^v = \mathrm{id}$ for $k = 0$. Mathlib
+differentiates a distribution $T$ on $\Omega$ by $\partial_w T(\varphi) = T(-\partial_w \varphi)$,
+a tempered distribution $T$ by $\partial_w T(u) = T(-\partial_w u)$, and identifies a locally
+integrable function $f$ on $\Omega$ with the distribution $\varphi \mapsto \int \varphi f$ and a
+function $f \in L_p(V)$, $1 \leq p \leq \infty$, with the tempered distribution
+$u \mapsto \int u f$.
+
+\begin{definition}[Test functions as Schwartz functions]
+\label{def:test-schwartz}
+\lean{Rd.testSchwartz, Rd.testSchwartz_apply}
+\leanok
+For every test function $\varphi \in \mathcal D(\Omega)$, the complex function
+$x \mapsto \varphi(x)$ on $V$ is a Schwartz function, again denoted $\varphi$.
+\end{definition}
+
+\begin{lemma}[Directional derivatives commute]
+\label{lem:directional-derivatives-commute}
+\lean{LineDeriv.lineDerivOp_iteratedLineDerivOp_comm_of, SchwartzMap.lineDerivOp_comm,
+  SchwartzMap.lineDerivOp_iteratedLineDerivOp_comm, Rd.lineDerivOp_testFunction_apply,
+  Rd.lineDerivOp_testSchwartz, Rd.iteratedLineDerivOp_testSchwartz,
+  Rd.coe_iteratedLineDerivOp_eq, TestFunction.lineDerivOp_comm,
+  TestFunction.lineDerivOp_iteratedLineDerivOp_comm}
+\leanok
+\uses{def:test-schwartz}
+For every Schwartz function $u$, every test function $\varphi \in \mathcal D(\Omega)$, all
+$a, b \in V$ and every $v \in V^k$,
+\[
+  \partial_a \partial_b u = \partial_b \partial_a u, \quad
+  \partial_a \partial^v u = \partial^v \partial_a u, \quad
+  \partial_a \partial_b \varphi = \partial_b \partial_a \varphi, \quad
+  \partial_a \partial^v \varphi = \partial^v \partial_a \varphi ,
+\]
+$\partial_a \varphi(x) = D\varphi(x) a$ for every $x \in V$, and $\partial^v \varphi$, as a
+Schwartz function, is the iterated derivative $\partial^v$ of the Schwartz function $\varphi$. For
+every open $\Omega' \subseteq V$ and every
+$\psi \in \mathcal D(\Omega')$ with the same values as $\varphi$, $\partial^v \psi$ and
+$\partial^v \varphi$ have the same values.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\partial_a \partial_b u(x) = D^2 u(x)(a, b)$ is symmetric in $a$ and $b$ because $u$ is $C^2$
+(Mathlib's \texttt{ContDiffAt.\allowbreak isSymmSndFDerivAt}). Passing from $\varphi$ to the
+complex function $\varphi$ commutes with $\partial_a$, since the derivative of $x \mapsto
+\varphi(x) \in \C$ is the derivative of $\varphi$ followed by the inclusion $\R \subseteq \C$; by
+induction on $k$ it commutes with $\partial^v$, and the symmetry for $u = \varphi$ gives that of
+$\varphi$. A directional derivative commutes with every iterated one by induction on $k$, using
+only the commutation of two directional derivatives. The derivatives of $\varphi$ depend only on
+its values.
+\end{proof}
+
+\begin{lemma}[Transpose formula]
+\label{lem:distribution-transpose}
+\lean{Distribution.iteratedLineDerivOp_apply_apply,
+  TemperedDistribution.iteratedLineDerivOp_apply_apply,
+  TemperedDistribution.iteratedLineDerivOp_toTemperedDistributionCLM_eq}
+\leanok
+\uses{lem:directional-derivatives-commute}
+For every distribution $T$ on $\Omega$, every tempered distribution $S$, every
+$\varphi \in \mathcal D(\Omega)$, every Schwartz function $u$ and every $v \in V^k$,
+\[
+  \partial^v T(\varphi) = (-1)^k \, T(\partial^v \varphi), \qquad
+  \partial^v S(u) = S\bigl((-1)^k \partial^v u\bigr),
+\]
+and the iterated derivative $\partial^v$ of a Schwartz function $u$ as a tempered distribution
+is the tempered distribution of the Schwartz function $\partial^v u$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Induction on $k$: $\partial^v T = \partial_{v_0} \partial^{v'} T$ with
+$v' = (v_1, \dots, v_{k-1})$, so
+$\partial^v T(\varphi) = \partial^{v'} T(-\partial_{v_0} \varphi)
+= (-1)^{k-1} \, T(-\partial^{v'} \partial_{v_0} \varphi)$, and
+$\partial^{v'} \partial_{v_0} \varphi = \partial_{v_0} \partial^{v'} \varphi = \partial^v \varphi$
+by \Cref{lem:directional-derivatives-commute}. The same induction works for $S$, and for the
+Schwartz function $u$ it iterates Mathlib's
+\texttt{TemperedDistribution.\allowbreak lineDerivOp\_\allowbreak
+toTemperedDistributionCLM\_\allowbreak eq}.
+\end{proof}
+
+\begin{definition}[Weak derivatives and Sobolev spaces]
+\label{def:weak-line-derivative}
+\lean{Rd.HasWeakLineDeriv, Rd.MemWeakSobolev, Rd.MemSobolev}
+\leanok
+For every $v \in V^k$, $g$ is the weak derivative $\partial^v f$ of $f$ on $\Omega$ if $f$ and $g$
+are locally integrable on $\Omega$ and $\partial^v f = g$ as distributions on $\Omega$. For every
+$m \in \N$ and every $1 \leq p \leq \infty$, $f$ lies in the Sobolev space $\Sob{m}{p}(\Omega)$ if
+$f \in L_p(\Omega)$ and for every $k \leq m$ and every $v \in V^k$ the weak derivative
+$\partial^v f$ exists on $\Omega$ and lies in $L_p(\Omega)$. For every $f \in L_p(V)$,
+$f \in \Sob{m}{p}(V)$ means $f \in \Sob{m}{p}(\Omega)$ with $\Omega = V$.
+\end{definition}
+
+Every function in $L_p(\Omega)$ with $p \geq 1$ is locally integrable on $\Omega$
+(\Cref{lem:weak-derivative-basic}), so the weak derivatives in the definition of
+$\Sob{m}{p}(\Omega)$ need no further hypothesis. The definition quantifies over all directions;
+a basis of $V$ enters only in proofs.
+
+\begin{lemma}[Weak derivatives by integration by parts]
+\label{lem:weak-derivative-integral}
+\lean{Rd.HasWeakLineDeriv.integral_eq, Rd.hasWeakLineDeriv_iff_integral}
+\leanok
+\uses{def:weak-line-derivative, lem:distribution-transpose}
+For all locally integrable $f$, $g$ on $\Omega$ and every $v \in V^k$, $g$ is the weak
+derivative $\partial^v f$ on $\Omega$ if and only if for every $\varphi \in \mathcal D(\Omega)$,
+\[
+  \int_V \varphi \, g = (-1)^k \int_V (\partial^v \varphi) \, f .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both distributions are determined by their values on test functions, the distribution of a
+locally integrable function is $\varphi \mapsto \int \varphi f$ (Mathlib's
+\texttt{Distribution.\allowbreak ofFun\_\allowbreak apply}), and
+$\partial^v f(\varphi) = (-1)^k f(\partial^v \varphi)$ by \Cref{lem:distribution-transpose}.
+\end{proof}
+
+\begin{lemma}[Properties of weak derivatives]
+\label{lem:weak-derivative-basic}
+\lean{Rd.HasWeakLineDeriv.unique, Rd.hasWeakLineDeriv_fin_zero, Rd.HasWeakLineDeriv.add,
+  Rd.HasWeakLineDeriv.neg, Rd.HasWeakLineDeriv.sub, Rd.HasWeakLineDeriv.smul,
+  Rd.HasWeakLineDeriv.congr_ae, Rd.HasWeakLineDeriv.mono, Rd.hasWeakLineDeriv_zero,
+  Rd.locallyIntegrableOn_of_memLp, Rd.memWeakSobolev_zero_iff, Rd.MemWeakSobolev.mono_order,
+  Rd.MemWeakSobolev.mono_set, Rd.zero_memWeakSobolev, Rd.MemWeakSobolev.add,
+  Rd.MemWeakSobolev.smul}
+\leanok
+\uses{def:weak-line-derivative, lem:weak-derivative-integral, lem:directional-derivatives-commute}
+For every $v \in V^k$, all functions $f, f', g, g'$ and every $c \in \C$:
+\begin{enumerate}
+  \item if $g$ and $g'$ are weak derivatives $\partial^v f$ on $\Omega$, then $g = g'$ almost
+    everywhere on $\Omega$;
+  \item for $k = 0$, every locally integrable $f$ on $\Omega$ is its own weak derivative;
+  \item if $g = \partial^v f$ and $g' = \partial^v f'$ weakly on $\Omega$, then
+    $g + g' = \partial^v (f + f')$, $-g = \partial^v(-f)$, $g - g' = \partial^v (f - f')$ and
+    $c g = \partial^v (c f)$ weakly on $\Omega$;
+  \item if $g = \partial^v f$ weakly on $\Omega$, $f = f'$ and $g = g'$ almost everywhere on
+    $\Omega$, then $g' = \partial^v f'$ weakly on $\Omega$;
+  \item if $g = \partial^v f$ weakly on $\Omega$, then $g = \partial^v f$ weakly on every open
+    $\Omega' \subseteq \Omega$;
+  \item $0 = \partial^v 0$ weakly on $\Omega$.
+\end{enumerate}
+For every $1 \leq p \leq \infty$, every $f \in L_p(\Omega)$ is locally integrable on $\Omega$
+and $\Sob{0}{p}(\Omega) = L_p(\Omega)$. For all $m, l \in \N$ with
+$l \leq m$, every $1 \leq p \leq \infty$ and every open $\Omega' \subseteq \Omega$,
+$\Sob{m}{p}(\Omega) \subseteq \Sob{l}{p}(\Omega)$, every $f \in \Sob{m}{p}(\Omega)$ lies in
+$\Sob{m}{p}(\Omega')$, and $\Sob{m}{p}(\Omega)$ is a complex vector space.
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) A locally integrable function is determined almost everywhere on $\Omega$ by its
+distribution (Mathlib's \texttt{Distribution.\allowbreak ofFun\_\allowbreak injective}). (2)
+$\partial^v$ is the identity for $k = 0$. (3) The distribution of a function and $\partial^v$ are
+additive; for complex $c$ use \Cref{lem:weak-derivative-integral}, since $c$ leaves both
+integrals. (4) The distribution of a function depends on it only almost everywhere on $\Omega$.
+(5) A test function $\varphi$ on $\Omega'$ is one on $\Omega$, with the same derivatives
+(\Cref{lem:directional-derivatives-commute}), so the identity of
+\Cref{lem:weak-derivative-integral} on $\Omega$ gives it on $\Omega'$. (6) The distribution of
+$0$ is $0$, and so are its derivatives. A function in $L_p(\Omega)$, $p \geq 1$, is integrable
+on every compact subset of $\Omega$, which has finite measure. The statements on $\Sob{m}{p}$
+follow, with $L_p(\Omega') \supseteq L_p(\Omega)|_{\Omega'}$.
+\end{proof}
+
+\begin{lemma}[Pairing with a test function]
+\label{lem:test-function-pairing}
+\lean{Rd.eLpNorm_testFunction_smul_le, Rd.eventually_memLp_of_tendsto,
+  Rd.tendsto_integral_testFunction_smul}
+\leanok
+For every $1 \leq p \leq \infty$, every $\varphi \in \mathcal D(\Omega)$ with support $K$ and
+every $h$ that is almost everywhere strongly measurable on $\Omega$,
+\[
+  \|\varphi h\|_{L_1(\Omega)} \leq \|\varphi\|_\infty \, |K|^{1 - 1/p} \, \|h\|_{L_p(\Omega)} .
+\]
+For every filter, every $h \in L_p(\Omega)$ and all $h_i$ with
+$\|h_i - h\|_{L_p(\Omega)} \to 0$, eventually $h_i \in L_p(\Omega)$ and
+$\int_V \varphi h_i \to \int_V \varphi h$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\varphi h$ vanishes off the compact set $K \subseteq \Omega$, so its $L_1(\Omega)$ norm is that on
+$K$, which is at most $|K|^{1 - 1/p}$ times its $L_p(K)$ norm (H\"older's inequality on the set
+$K$ of finite measure), and $\|\varphi h\|_{L_p(K)} \leq \|\varphi\|_\infty \|h\|_{L_p(\Omega)}$.
+Eventually $\|h_i - h\|_{L_p(\Omega)} < 1$, and then $h_i = (h_i - h) + h \in L_p(\Omega)$. The
+integrals over $V$ are integrals over $\Omega$, and the bound applied to $h_i - h$ gives the
+convergence in $L_1(\Omega)$ of $\varphi h_i$ to $\varphi h$.
+\end{proof}
+
+\begin{theorem}[Weak derivatives pass to limits]
+\label{thm:weak-derivative-limits}
+\lean{Rd.HasWeakLineDeriv.of_tendsto}
+\leanok
+\uses{lem:weak-derivative-integral, lem:test-function-pairing}
+For all $1 \leq p, r \leq \infty$, every $v \in V^k$, every nontrivial filter, every
+$f \in L_p(\Omega)$, every $g \in L_r(\Omega)$ and all $f_i$, $g_i$ with $g_i = \partial^v f_i$
+weakly on $\Omega$ for every $i$, $\|f_i - f\|_{L_p(\Omega)} \to 0$ and
+$\|g_i - g\|_{L_r(\Omega)} \to 0$, $g$ is the weak derivative $\partial^v f$ on $\Omega$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For every $\varphi \in \mathcal D(\Omega)$,
+$\int \varphi g_i = (-1)^k \int (\partial^v \varphi) f_i$ by
+\Cref{lem:weak-derivative-integral}; both sides converge by \Cref{lem:test-function-pairing},
+to $\int \varphi g$ and to $(-1)^k \int (\partial^v \varphi) f$, and limits in $\C$ are unique.
+\end{proof}
+
+The bridge to tempered distributions needs that tempered distributions are determined by their
+values on test functions. The cut-offs of a Schwartz function converge to it in the topology of
+$\mathcal S(V)$.
+
+\begin{definition}[Cut-offs of Schwartz functions]
+\label{def:schwartz-cutoff}
+\lean{Rd.hasCompactSupport_cutoff_smul_mul, Rd.cutoffMul, Rd.cutoffMul_apply,
+  Rd.hasCompactSupport_cutoffMul, Rd.cutoffMulBound, Rd.cutoffMulConst, Rd.cutoffMulConst_nonneg}
+\leanok
+\uses{def:lp-kernels, lem:lp-kernels-basic}
+For every Schwartz function $u$ and every $N \in \N$, the cut-off of $u$ at radius $N + 1$ is the
+smooth compactly supported function
+\[
+  \chi_N u : x \mapsto \chi_{1,2}\bigl(x / (N + 1)\bigr) \, u(x) .
+\]
+For all $k, m \in \N$ and $x \in V$ let
+\begin{align*}
+  B_m(x) &= \|D^m u(x)\| + \sum_{i=0}^m \binom{m}{i} \, p_{0,i}(\chi_{1,2}) \,
+  \|D^{m-i} u(x)\|, \\
+  C_{k,m}(u) &= p_{k+1,m}(u) + \sum_{i=0}^m \binom{m}{i} \, p_{0,i}(\chi_{1,2}) \,
+  p_{k+1,m-i}(u) \geq 0,
+\end{align*}
+where $p_{k,m}(w) = \sup_x \|x\|^k \|D^m w(x)\|$ are the Schwartz seminorms.
+\end{definition}
+
+\begin{lemma}[The cut-off estimate]
+\label{lem:schwartz-cutoff-estimate}
+\lean{Rd.cutoffMul_eventuallyEq, Rd.norm_iteratedFDeriv_cutoff_comp_smul_le,
+  Rd.norm_iteratedFDeriv_cutoffMul_le, Rd.norm_iteratedFDeriv_sub_cutoffMul_le,
+  Rd.iteratedFDeriv_sub_cutoffMul_eq_zero, Rd.norm_pow_succ_mul_cutoffMulBound_le,
+  Rd.seminorm_sub_cutoffMul_le}
+\leanok
+\uses{def:schwartz-cutoff}
+For every Schwartz function $u$ and all $k, m, N \in \N$,
+\[
+  p_{k,m}(u - \chi_N u) \leq \frac{C_{k,m}(u)}{N + 1} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $0 \leq c \leq 1$, $D^i(\chi_{1,2}(c \,\cdot))(x) = c^i D^i \chi_{1,2}(c x)$ has norm at most
+$p_{0,i}(\chi_{1,2})$, so the Leibniz rule (Mathlib's
+\texttt{norm\_\allowbreak iteratedFDeriv\_\allowbreak mul\_\allowbreak le}) gives
+$\|D^m (u - \chi_N u)(x)\| \leq B_m(x)$ for every $x$. On the open ball of radius $N + 1$ the
+cut-off is $1$, so $u - \chi_N u$ vanishes near each of its points and so do all its
+derivatives. For $\|x\| \geq N + 1$,
+$(N + 1) \|x\|^k B_m(x) \leq \|x\|^{k+1} B_m(x) \leq C_{k,m}(u)$.
+\end{proof}
+
+\begin{lemma}[Cut-offs converge in the Schwartz space]
+\label{lem:schwartz-cutoff-tendsto}
+\lean{Rd.tendsto_cutoffMul}
+\leanok
+\uses{lem:schwartz-cutoff-estimate}
+For every Schwartz function $u$, $\chi_N u \to u$ in $\mathcal S(V)$ as $N \to \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The topology of $\mathcal S(V)$ is that of the seminorms $p_{k,m}$ (Mathlib's
+\texttt{schwartz\_\allowbreak withSeminorms}), and each $p_{k,m}(\chi_N u - u)$ is at most
+$C_{k,m}(u) / (N + 1)$ by \Cref{lem:schwartz-cutoff-estimate}.
+\end{proof}
+
+Since every $\chi_N u$ is smooth with compact support, the smooth compactly supported complex
+functions are dense in $\mathcal S(V)$.
+
+\begin{theorem}[Test functions determine tempered distributions]
+\label{thm:test-functions-determine}
+\lean{Rd.exists_testSchwartz_eq, Rd.eq_zero_of_testSchwartz}
+\leanok
+\uses{lem:schwartz-cutoff-tendsto, def:test-schwartz}
+For every complex normed space $F$ and every tempered distribution $T$ with values in $F$ such
+that $T(\varphi) = 0$ for every $\varphi \in \mathcal D(V)$, $T = 0$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Every smooth compactly supported $w : V \to \C$ is $\operatorname{Re} w + i \operatorname{Im} w$
+with $\operatorname{Re} w, \operatorname{Im} w \in \mathcal D(V)$, so $T$ vanishes on it by
+linearity. For a Schwartz function $u$, $T(\chi_N u) = 0$ for every $N$ and
+$T(\chi_N u) \to T(u)$ by \Cref{lem:schwartz-cutoff-tendsto} and the continuity of $T$.
+\end{proof}
+
+For $1 \leq p \leq \infty$ and $f \in L_p(V)$ let $T_f$ be $f$ as a distribution on $V$ and
+$S_f$ be $f$ as a tempered distribution.
+
+\begin{lemma}[$L_p$ functions as distributions on $V$]
+\label{lem:lp-distribution-whole-space}
+\lean{Rd.volume_restrict_top, Rd.locallyIntegrableOn_top_Lp, Rd.ofFun_top_apply,
+  Rd.iteratedLineDerivOp_ofFun_top_apply}
+\leanok
+\uses{lem:distribution-transpose, def:test-schwartz, lem:directional-derivatives-commute,
+  lem:weak-derivative-basic}
+Lebesgue measure restricted to $\Omega = V$ is Lebesgue measure, so $L_p(\Omega) = L_p(V)$. For
+every $1 \leq p \leq \infty$, every $f \in L_p(V)$, every $\varphi \in \mathcal D(V)$ and
+every $v \in V^k$, $f$ is locally integrable on $V$, and
+\[
+  T_f(\varphi) = S_f(\varphi), \qquad \partial^v T_f(\varphi) = \partial^v S_f(\varphi),
+\]
+with $\varphi$ as a Schwartz function on the right.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both sides of the first identity are $\int \varphi f$. For the second, both sides are
+$(-1)^k \int (\partial^v \varphi) f$ by \Cref{lem:distribution-transpose}, since the Schwartz
+function $\partial^v \varphi$ is the iterated derivative of the Schwartz function $\varphi$
+(\Cref{lem:directional-derivatives-commute}).
+\end{proof}
+
+\begin{theorem}[Weak derivatives are derivatives of tempered distributions]
+\label{thm:weak-derivative-tempered}
+\lean{Rd.hasWeakLineDeriv_top_iff}
+\leanok
+\uses{lem:lp-distribution-whole-space, thm:test-functions-determine, def:weak-line-derivative}
+For all $1 \leq p, r \leq \infty$, every $f \in L_p(V)$, every $g \in L_r(V)$ and every
+$v \in V^k$, $g$ is the weak derivative $\partial^v f$ on $V$ if and only if $\partial^v f = g$
+as tempered distributions.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:lp-distribution-whole-space} the distribution $\partial^v T_f - T_g$ on $V$ and the
+tempered distribution $\partial^v S_f - S_g$ agree on test functions. If the tempered distribution
+is zero, so is the distribution. If the distribution is zero, the tempered distribution vanishes
+on test functions and is zero by \Cref{thm:test-functions-determine}.
+\end{proof}
+
+\begin{corollary}[Sobolev spaces by tempered distributions]
+\label{cor:sobolev-tempered}
+\lean{Rd.memSobolev_iff_tempered}
+\leanok
+\uses{thm:weak-derivative-tempered, lem:weak-derivative-basic}
+For every $1 \leq p \leq \infty$, every $m \in \N$ and every $f \in L_p(V)$, $f \in \Sob{m}{p}(V)$
+if and only if for every $k \leq m$ and every $v \in V^k$ there is $g \in L_p(V)$ with
+$\partial^v f = g$ as tempered distributions.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:weak-derivative-tempered}, with a function in $L_p(V)$ replaced by its class, which
+changes it only on a null set (\Cref{lem:weak-derivative-basic}).
+\end{proof}
+
+\begin{corollary}[Schwartz functions]
+\label{cor:weak-derivative-schwartz}
+\lean{Rd.iteratedLineDerivOp_toLp_eq, Rd.hasWeakLineDeriv_schwartz, Rd.memSobolev_toLp}
+\leanok
+\uses{lem:distribution-transpose, thm:weak-derivative-tempered, cor:sobolev-tempered,
+  lem:weak-derivative-basic}
+For every Schwartz function $\eta$, every $v \in V^k$ and every open $\Omega \subseteq V$, the
+classical derivative $\partial^v \eta$ is the weak derivative of $\eta$ on $\Omega$. For every
+$1 \leq p \leq \infty$ and every $m \in \N$, $\eta \in \Sob{m}{p}(V)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+As tempered distributions $\partial^v \eta$ is the Schwartz function $\partial^v \eta$
+(\Cref{lem:distribution-transpose}); \Cref{thm:weak-derivative-tempered} with $p = r = 2$ gives
+the weak derivative on $V$, and \Cref{lem:weak-derivative-basic} (5) on $\Omega$. The Sobolev
+statement is \Cref{cor:sobolev-tempered} with $g = \partial^v \eta$.
+\end{proof}
+
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
 

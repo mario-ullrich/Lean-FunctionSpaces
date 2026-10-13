@@ -92,16 +92,6 @@ theorem levelNorm_mono (p : ℝ≥0∞) {ι : Type*} [MeasurableSpace ι] [Count
     levelNorm p coef ≤ levelNorm p coef' :=
   ENNReal.lqNorm_mono h
 
-/-- `0 ≤ 1 - 1/p` for `p ≥ 1`. -/
-theorem one_sub_one_div_toReal_nonneg {p : ℝ≥0∞} (hp1 : 1 ≤ p) : 0 ≤ 1 - 1 / p.toReal := by
-  rcases eq_or_ne p ∞ with hpt | hpt
-  · simp [hpt]
-  · have : 1 ≤ p.toReal := by
-      rw [← ENNReal.toReal_one]
-      exact ENNReal.toReal_mono hpt hp1
-    rw [sub_nonneg, div_le_one (by linarith)]
-    exact this
-
 /-- The **coefficient quasi-norm** `‖λ‖_{b^s_{p,q}} = ‖(2^(j(s - n/p)) ‖λ_{j,·}‖_{ℓ_p})_j‖_{ℓ_q}`. -/
 noncomputable def coeffNorm (p : ℝ≥0∞) (n : ℕ) (s : ℝ) (q : ℝ≥0∞) {ι : Type*} [MeasurableSpace ι]
     (coef : ℕ → ι → ℂ) : ℝ≥0∞ :=

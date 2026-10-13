@@ -377,6 +377,16 @@ open Metric
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
 
+/-- `0 ≤ 1 - 1/p` for `p ≥ 1`. -/
+theorem one_sub_one_div_toReal_nonneg {p : ℝ≥0∞} (hp1 : 1 ≤ p) : 0 ≤ 1 - 1 / p.toReal := by
+  rcases eq_or_ne p ∞ with hpt | hpt
+  · simp [hpt]
+  · have : 1 ≤ p.toReal := by
+      rw [← ENNReal.toReal_one]
+      exact ENNReal.toReal_mono hpt hp1
+    rw [sub_nonneg, div_le_one (by linarith)]
+    exact this
+
 /-- **Hölder's inequality on a ball**: `∫_{B̄(x,ρ)} |g| ≤ |B̄(x,ρ)|^(1-1/p) ‖g‖_p`. -/
 theorem lintegral_closedBall_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {g : V → ℂ}
     (hg : AEStronglyMeasurable g volume) (x : V) (ρ : ℝ) :
