@@ -8,7 +8,9 @@ an identity between distributions on an open set, in Mathlib's distributions `�
 whole space and for `L_p` functions it is an identity between tempered distributions `𝓢'(V, ℂ)`,
 where Mathlib's Fourier transform and Bessel potential spaces live. For `p = 2` it identifies
 Mathlib's Bessel potential spaces `H^s`, `s ≥ 0`, with the Triebel–Lizorkin spaces `F^s_{2,2}`
-(and, for `s > 0`, with the Besov spaces `B^s_{2,2}`) and shows `W^1_2 = H^1`.
+(and, for `s > 0`, with the Besov spaces `B^s_{2,2}`) and shows `W^1_2 = H^1 = B^1_{2,2}`. On a
+bounded Lipschitz domain, `H^1` is the space of restrictions of `H^1(ℝ^d)`, with weak derivatives
+in `L_2` of the domain and boundary traces in `B^{1/2}_{2,2}` of the boundary.
 
 ## Main results
 
@@ -63,7 +65,30 @@ Mathlib's Bessel potential spaces `H^s`, `s ≥ 0`, with the Triebel–Lizorkin 
   If `g ∈ L_2(V)` is the weak derivative `∂_v f` and `J_1 f = h`, then `‖g‖_2 ≤ 2π ‖v‖ ‖h‖_2`
   (`Rd.enorm_le_of_hasWeakLineDeriv`); for the weak derivatives `g_i = ∂_{e_i} f` along any
   orthonormal basis `(e_i)`, `(2π)² ‖h‖_2² = (2π)² ‖f‖_2² + ∑_i ‖g_i‖_2²`
-  (`Rd.enorm_besselPotential_one_sq_eq`).
+  (`Rd.enorm_besselPotential_one_sq_eq`). For `F ∈ L_2(V)`, `F ∈ W^1_2(V)` iff `F` lies in the
+  Besov space `B^1_{2,2}(V)`, the approximation space of the band-limited classes
+  (`Rd.memSobolev_one_iff_memApprox`), iff
+  `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2} < ∞` for every order `r ≥ 2`
+  (`Rd.memSobolev_one_iff_modulus`).
+* **`H^1` on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary
+  `Γ`. `f ∈ L_2(V)` lies in `H^1(Ω)` if `f = F` almost everywhere on `Ω` for some
+  `F ∈ W^1_2(V)` (`Rd.BoundedLipschitzDomain.MemSobolevOn`); `H^1(Ω)` contains `0`, is closed
+  under sums and complex multiples, and depends only on the values on `Ω`. For every order
+  `r ≥ 2`, `f ∈ H^1(Ω)` iff
+  `‖f‖_{L_2(Ω)} + ‖(2^k ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞`, with the moduli of smoothness inside
+  `Ω` (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_modulusOn`). Every `f ∈ H^1(Ω)` lies in
+  `W^1_2(Ω)`: its weak derivatives on `Ω` exist and lie in `L_2(Ω)`
+  (`Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`). For every resolution of unity on
+  `Γ`, every `f ∈ H^1(Ω)` has a boundary trace in `B^{1/2}_{2,2}(Γ)`, unique almost everywhere
+  on `Γ` (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memSobolevOn`,
+  `Rd.BoundedLipschitzDomain.MemSobolevOn.isBoundaryTrace_unique`), and a function `g` lies in
+  `B^{1/2}_{2,2}(Γ)` iff it is the boundary trace of some `f ∈ H^1(Ω)`
+  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`). The extensions in the
+  definition of the boundary trace are the `F ∈ W^1_2(V)` with `F = f` on `Ω`
+  (`Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev`). The extension and trace
+  theorems for bounded Lipschitz domains are qualitative, and so are these statements; the
+  restriction direction has constant `1`
+  (`Rd.BoundedLipschitzDomain.modNormOn_le_modNorm_of_ae_eq`).
 
 ## What is formalised
 
@@ -72,7 +97,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
 | Weak derivatives and Sobolev spaces on open sets, integration by parts, uniqueness, locality, limits; cut-offs of Schwartz functions and the density of test functions in the Schwartz space; the bridge to tempered distributions | ✅ | ✗ | `Rd/WeakDerivatives` |
-| The convolution theorem on `L_2`, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1` | ✅ | ✗ | `Rd/SobolevTwoLittlewoodPaley` |
+| The convolution theorem on `L_2`, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/SobolevTwoLittlewoodPaley` |
+| `H^1` on bounded Lipschitz domains as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the weak gradient, and the trace space `B^{1/2}_{2,2}` of the boundary | ✅ | ✗ | `Rd/LipschitzDomainH1` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

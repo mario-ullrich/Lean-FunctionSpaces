@@ -22,7 +22,7 @@ Mathlib's Sobolev space `H^s(V)` consists of the tempered distributions `u` whos
 `J_s u = 𝓕⁻¹(⟨ξ⟩^s 𝓕u)`, `⟨ξ⟩^s = (1 + ‖ξ‖²)^(s/2)` (`Rd.besselWeight`), is an `L_2` function
 (`TemperedDistribution.MemSobolev s 2`). For `s ≥ 0` this file identifies `H^s(V)` with the
 Triebel–Lizorkin space `F^s_{2,2}(V)`, and for `s > 0` with the Besov space `B^s_{2,2}(V)`, with
-explicit constants, and proves `W^1_2(V) = H^1(V)`.
+explicit constants, and proves `W^1_2(V) = H^1(V) = B^1_{2,2}(V)`.
 
 * **Plancherel for the blocks**: `𝓕(K ⋆ f) = 𝓕K · 𝓕f` for an integrable `K` and `f ∈ L_2(V)`
   (`Rd.fourier_convLp`), so `‖ψ_j ⋆ f‖_2² = ∫ |𝓕ψ_j|² |𝓕f|²` (`Rd.enorm_lpBlock_sq`).
@@ -37,6 +37,8 @@ explicit constants, and proves `W^1_2(V) = H^1(V)`.
   (`Rd.exists_eq_toDistr_two`) follow.
 * **`W^1_2 = H^1`** (`Rd.memSobolev_one_iff`), with `‖∂_v f‖_2 ≤ 2π ‖v‖ ‖J_1 f‖_2` and
   `(2π)² ‖J_1 f‖_2² = (2π)² ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²` for an orthonormal basis `(e_i)`.
+* **`W^1_2 = B^1_{2,2}`** (`Rd.memSobolev_one_iff_memApprox`, `Rd.memSobolev_one_iff_modulus`):
+  `F ∈ W^1_2(V)` iff `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2} < ∞`, for every order `r ≥ 2`.
 
 Two facts about tempered distributions carry the proofs: the product of a temperate weight `w`
 with the distribution of an `L_p` function `g` is the distribution of `w g` when `w g` lies in
@@ -749,5 +751,29 @@ theorem enorm_besselPotential_one_sq_eq {ι : Type*} [Fintype ι] (b : Orthonorm
       ENNReal.ofReal (2 * π) ^ 2 * ‖f‖ₑ ^ 2 + ∑ i, ‖g i‖ₑ ^ 2 := by
   rw [enorm_sq_eq_lintegral_of_besselPotential_eq hfh]
   exact lintegral_besselWeight_one_sq_eq b fun i => hasWeakLineDeriv_top_iff.1 (hg i)
+
+/-! ### `W^1_2(V)` as a Besov space -/
+
+/-- **`W^1_2 = B^1_{2,2}`**: `F ∈ L_2(V)` lies in the Sobolev space `W^1_2(V)` iff it lies in the
+approximation space `A^1_2` of the band-limited functions, the Besov space `B^1_{2,2}(V)`. This
+combines `W^1_2 = H^1` (`Rd.memSobolev_one_iff`) and `H^1 = B^1_{2,2}`
+(`Rd.memSobolev_two_iff_exists_memApprox`); an `L_2` function is determined by its tempered
+distribution (Mathlib's `Lp.ker_toTemperedDistributionCLM_eq_bot`). -/
+theorem memSobolev_one_iff_memApprox (F : Lp ℂ 2 (volume : Measure V)) :
+    MemSobolev 1 F ↔ (bandScheme two_ne_top).MemApprox 1 2 F := by
+  rw [memSobolev_one_iff, memSobolev_two_iff_exists_memApprox one_pos]
+  refine ⟨fun ⟨f, hf, hfa⟩ => ?_, fun h => ⟨F, rfl, h⟩⟩
+  have hfF : f = F := LinearMap.ker_eq_bot.1 (Lp.ker_toTemperedDistributionCLM_eq_bot (F := ℂ)
+    (μ := (volume : Measure V)) (p := 2)) hf
+  rwa [← hfF]
+
+/-- **`W^1_2 = B^1_{2,2}` by differences**: for every order `r ≥ 2`, `F ∈ L_2(V)` lies in
+`W^1_2(V)` iff `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2} < ∞`
+(`Rd.memApprox_bandScheme_iff_modulus` with `s = 1 < r`). -/
+theorem memSobolev_one_iff_modulus {r : ℕ} (hr : 2 ≤ r) (F : Lp ℂ 2 (volume : Measure V)) :
+    MemSobolev 1 F ↔ ‖F‖ₑ + lqNorm 2 (fun k => dyadicWeight 1 k * lpModulus 2 r F k) < ∞ := by
+  rw [memSobolev_one_iff_memApprox]
+  have hr' : (1 : ℝ) < r := by exact_mod_cast Nat.lt_of_lt_of_le one_lt_two hr
+  exact memApprox_bandScheme_iff_modulus two_ne_top zero_le_one hr' one_le_two F
 
 end Rd

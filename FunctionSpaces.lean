@@ -176,6 +176,7 @@ public import FunctionSpaces.Rd.TriebelLizorkinDifferences
 public import FunctionSpaces.Rd.TriebelLizorkinAtoms
 public import FunctionSpaces.Rd.WeakDerivatives
 public import FunctionSpaces.Rd.SobolevTwoLittlewoodPaley
+public import FunctionSpaces.Rd.LipschitzDomainH1
 
 /-!
 # Function spaces
@@ -514,7 +515,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   approximation by the partial sums of the reproducing formula, change of chart, traces of products
   with smooth functions and of finite sums.
 * `FunctionSpaces.Rd.LipschitzBoundaryTrace`: almost everywhere on the boundary of a bounded
-  Lipschitz domain, Besov spaces on the boundary, the boundary trace and its trace space.
+  Lipschitz domain, Besov spaces on the boundary, the boundary trace, its existence and uniqueness
+  for functions with a finite intrinsic Besov norm, and its trace space.
 * `FunctionSpaces.Manifold.SmoothMeasure`: smooth measures on manifolds, integrals in charts and
   their comparison with integrals on the manifold.
 * `FunctionSpaces.Manifold.BesovAtlas`: Besov atlases, chart pieces in `L_p`, the changes of charts
@@ -587,5 +589,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.SobolevTwoLittlewoodPaley`: the convolution theorem on `L_2(ℝ^d)`, Mathlib's
   Sobolev spaces `H^s(ℝ^d)` as the Triebel–Lizorkin spaces `F^s_{2,2}(ℝ^d)` for `s ≥ 0` and the
   Besov spaces `B^s_{2,2}(ℝ^d)` for `s > 0`, with explicit constants, and
-  `W^1_2(ℝ^d) = H^1(ℝ^d)`.
+  `W^1_2(ℝ^d) = H^1(ℝ^d) = B^1_{2,2}(ℝ^d)`.
+* `FunctionSpaces.Rd.LipschitzDomainH1`: `H^1(Ω)` on a bounded Lipschitz domain `Ω` as the
+  space of restrictions of `H^1(ℝ^d)`, its description by intrinsic differences, the weak
+  gradient on `Ω`, and the boundary traces in `B^{1/2}_{2,2}(∂Ω)`, which form the trace space.
 -/

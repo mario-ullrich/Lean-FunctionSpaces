@@ -6620,6 +6620,24 @@ $h \mapsto 1_S h$ is a bounded linear operator on $L_p(\mu)$ of norm at most $1$
 $|1_S h| \leq |h|$ pointwise.
 \end{proof}
 
+\begin{lemma}[Restrictions in $L_p$]
+\label{lem:indicator-lp-eq-iff}
+\lean{Rd.indicatorLp_eq_iff_ae_eq_restrict}
+\leanok
+\uses{lem:indicator-lp}
+For every measure $\mu$ on $X$, every measurable $S \subseteq X$, every $1 \leq p \leq \infty$
+and all $F, f \in L_p(\mu)$, $1_S F = 1_S f$ in $L_p(\mu)$ if and only if $F = f$
+$\mu$-almost everywhere on $S$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both statements say that $1_S F = 1_S f$ $\mu$-almost everywhere (Mathlib's
+\texttt{MeasureTheory.\allowbreak ae\_\allowbreak eq\_\allowbreak restrict\_\allowbreak
+iff\_\allowbreak indicator\_\allowbreak ae\_\allowbreak eq}), and the class $1_S h$ of
+\Cref{lem:indicator-lp} agrees almost everywhere with the function $1_S h$.
+\end{proof}
+
 \begin{lemma}[The support principle]
 \label{lem:support-principle}
 \lean{Rd.LipschitzGraph.conv_indicator_eq, Rd.LipschitzGraph.cutoff,
@@ -8923,7 +8941,9 @@ Summing (\Cref{lem:trace-sums}), $\operatorname{Tr}_k F(x') = g(y)$, and
 \lean{Rd.add_one_div_toReal_lt, Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq_iff,
   Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_of_boundaryPartition,
   Rd.BoundedLipschitzDomain.IsBoundaryTrace, Rd.ae_eq_of_indicatorLp_eq,
-  Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_isBoundaryTrace}
+  Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_isBoundaryTrace,
+  Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_modNormOn_lt_top,
+  Rd.BoundedLipschitzDomain.IsBoundaryTrace.unique}
 \leanok
 \uses{thm:boundary-trace-bounded, thm:boundary-trace-extension, lem:boundary-trace-locality,
   thm:bounded-lipschitz-besov, lem:restriction-moduli}
@@ -8933,7 +8953,9 @@ for some $F$ with $\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_
 only if $g$ is the boundary trace of some $f$ with
 $\|f\|_{L_p(\Omega)} + \|(2^{k(s + 1/p)} \omega_L(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$, that
 is, $g = \operatorname{Tr}_\Gamma F$ almost everywhere on $\Gamma$ for every such $F$ that agrees with
-$f$ on $\Omega$. In particular $B^s_{p,q}(\Gamma)$ does not depend on the resolution of unity.
+$f$ on $\Omega$. Every such $f$ has a boundary trace in $B^s_{p,q}(\Gamma)$, and every two
+boundary traces of $f$ agree almost everywhere on $\Gamma$. In particular $B^s_{p,q}(\Gamma)$ does
+not depend on the resolution of unity.
 \end{theorem}
 
 \begin{proof}
@@ -8942,7 +8964,9 @@ This is \cite[Theorem 4.11]{SchneiderVybiral} for $p \geq 1$. The first equivale
 \Cref{thm:boundary-trace-bounded} and \Cref{thm:boundary-trace-extension}. For the second, the
 functions with a finite intrinsic norm on $\Omega$ are the restrictions of such $F$
 (\Cref{thm:bounded-lipschitz-besov}), and all of them have the same boundary trace
-(\Cref{lem:boundary-trace-locality}). Both resolutions of unity give the space of boundary traces,
+(\Cref{lem:boundary-trace-locality}); for one such $F$, $\operatorname{Tr}_\Gamma F$ is a boundary
+trace of $f$ in $B^s_{p,q}(\Gamma)$ (\Cref{thm:boundary-trace-bounded}), and every boundary trace
+of $f$ agrees with it. Both resolutions of unity give the space of boundary traces,
 and the boundary traces agree almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}).
 \end{proof}
 
@@ -12021,7 +12045,10 @@ functions. On the whole space $V$ and for $L_p$ functions it is the same as an i
 tempered distributions, the setting of Mathlib's Fourier transform and Bessel potential spaces.
 For $p = 2$, \Cref{sec:sobolev-two-littlewood-paley} identifies Mathlib's Bessel potential spaces
 $H^s(V)$, $s \geq 0$, with the Triebel--Lizorkin spaces $\TL{s}{2}{2}$ (and, for $s > 0$, with the
-Besov spaces $\Besov{s}{2}{2}$) and proves $\Sob{1}{2}(V) = H^1(V)$.
+Besov spaces $\Besov{s}{2}{2}$) and proves $\Sob{1}{2}(V) = H^1(V) = \Besov{1}{2}{2}$.
+\Cref{sec:lipschitz-domain-h1} restricts $H^1(V)$ to bounded Lipschitz domains, describes the
+restrictions by intrinsic differences, shows that they lie in $\Sob{1}{2}(\Omega)$, and
+identifies their boundary traces with $B^{1/2}_{2,2}(\Gamma)$.
 
 \section{Weak derivatives on open sets and cut-offs of Schwartz functions}
 
@@ -12154,7 +12181,8 @@ $\partial^v f(\varphi) = (-1)^k f(\partial^v \varphi)$ by \Cref{lem:distribution
   Rd.HasWeakLineDeriv.congr_ae, Rd.HasWeakLineDeriv.mono, Rd.hasWeakLineDeriv_zero,
   Rd.locallyIntegrableOn_of_memLp, Rd.memWeakSobolev_zero_iff, Rd.MemWeakSobolev.mono_order,
   Rd.MemWeakSobolev.mono_set, Rd.zero_memWeakSobolev, Rd.MemWeakSobolev.add,
-  Rd.MemWeakSobolev.smul}
+  Rd.MemWeakSobolev.smul, Rd.MemWeakSobolev.congr_ae, Rd.zero_memSobolev, Rd.MemSobolev.add,
+  Rd.MemSobolev.smul}
 \leanok
 \uses{def:weak-line-derivative, lem:weak-derivative-integral, lem:directional-derivatives-commute}
 For every $v \in V^k$, all functions $f, f', g, g'$ and every $c \in \C$:
@@ -12175,7 +12203,10 @@ For every $1 \leq p \leq \infty$, every $f \in L_p(\Omega)$ is locally integrabl
 and $\Sob{0}{p}(\Omega) = L_p(\Omega)$. For all $m, l \in \N$ with
 $l \leq m$, every $1 \leq p \leq \infty$ and every open $\Omega' \subseteq \Omega$,
 $\Sob{m}{p}(\Omega) \subseteq \Sob{l}{p}(\Omega)$, every $f \in \Sob{m}{p}(\Omega)$ lies in
-$\Sob{m}{p}(\Omega')$, and $\Sob{m}{p}(\Omega)$ is a complex vector space.
+$\Sob{m}{p}(\Omega')$, and $\Sob{m}{p}(\Omega)$ is a complex vector space. For every
+$f \in \Sob{m}{p}(\Omega)$ and every $f'$ with $f' = f$ almost everywhere on $\Omega$,
+$f' \in \Sob{m}{p}(\Omega)$. For $\Omega = V$, $\Sob{m}{p}(V)$ is a complex linear subspace of
+$L_p(V)$.
 \end{lemma}
 
 \begin{proof}
@@ -12190,7 +12221,9 @@ integrals. (4) The distribution of a function depends on it only almost everywhe
 \Cref{lem:weak-derivative-integral} on $\Omega$ gives it on $\Omega'$. (6) The distribution of
 $0$ is $0$, and so are its derivatives. A function in $L_p(\Omega)$, $p \geq 1$, is integrable
 on every compact subset of $\Omega$, which has finite measure. The statements on $\Sob{m}{p}$
-follow, with $L_p(\Omega') \supseteq L_p(\Omega)|_{\Omega'}$.
+follow, with $L_p(\Omega') \supseteq L_p(\Omega)|_{\Omega'}$ and (4); in $L_p(V)$, the zero class,
+and the class of a sum or a multiple, agree almost everywhere with $0$ and with the sum or the
+multiple of the representatives.
 \end{proof}
 
 \begin{lemma}[Pairing with a test function]
@@ -12778,6 +12811,183 @@ $\widehat h = \langle \cdot \rangle^1 \widehat f$ pointwise
 (\Cref{lem:derivative-fourier-l2,lem:bessel-potential-l2}) and uses \Cref{lem:plancherel-l2};
 the identity is \Cref{lem:derivative-fourier-l2} with
 $\|h\|_2^2 = \int (\langle \xi \rangle^1)^2 |\widehat f|^2$.
+\end{proof}
+
+\begin{theorem}[$\Sob{1}{2} = \Besov{1}{2}{2}$]
+\label{thm:sobolev-one-two-besov}
+\lean{Rd.memSobolev_one_iff_memApprox, Rd.memSobolev_one_iff_modulus}
+\leanok
+\uses{thm:sobolev-one-two, cor:sobolev-two-besov, thm:rd-besov}
+For every $F \in L_2(V)$, $F \in \Sob{1}{2}(V)$ if and only if $F$ lies in the approximation space
+$A^1_2$ of the band-limited scheme. For every integer $r \geq 2$ and every $F \in L_2(V)$,
+$F \in \Sob{1}{2}(V)$ if and only if
+$\|F\|_2 + \|(2^k \omega_r(F, 2^{-k})_2)_k\|_{\ell_2} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\Sob{1}{2}(V) = H^1(V)$ by \Cref{thm:sobolev-one-two}, and $H^1(V) = \Besov{1}{2}{2}$ by
+\Cref{cor:sobolev-two-besov}; an $L_2$ function is determined by its tempered distribution
+(Mathlib's \texttt{Lp.\allowbreak ker\_\allowbreak toTemperedDistributionCLM\_\allowbreak
+eq\_\allowbreak bot}). The second statement is \Cref{thm:rd-besov} with $p = q = 2$ and
+$s = 1 < r$.
+\end{proof}
+
+\section{\texorpdfstring{$H^1$}{H\^{}1} on bounded Lipschitz domains}
+\label{sec:lipschitz-domain-h1}
+
+Throughout this section $\Omega$ is a bounded Lipschitz domain (\Cref{def:bounded-lipschitz})
+with boundary $\Gamma$, and $L_2 = L_2(V)$. For $f \in L_2$, $\|f\|_{L_2(\Omega)}$ is the norm of
+$1_\Omega f$, and $\omega_r(f, t, \Omega)_2$ is the modulus of smoothness of $f$ inside $\Omega$
+(\Cref{def:rd-modulus-on}). The space $H^1(\Omega)$ below consists of the restrictions of
+$\Sob{1}{2}(V) = H^1(V)$; on $\Omega$ its functions have weak derivatives in $L_2(\Omega)$, and
+their boundary traces form $B^{1/2}_{2,2}(\Gamma)$.
+
+\begin{definition}[$H^1$ on a bounded Lipschitz domain]
+\label{def:sobolev-lipschitz-domain}
+\lean{Rd.BoundedLipschitzDomain.toOpens, Rd.BoundedLipschitzDomain.coe_toOpens,
+  Rd.BoundedLipschitzDomain.MemSobolevOn}
+\leanok
+\uses{def:bounded-lipschitz, def:weak-line-derivative}
+A function $f \in L_2(V)$ lies in $H^1(\Omega)$ if there is $F \in \Sob{1}{2}(V)$ with $F = f$
+almost everywhere on $\Omega$.
+\end{definition}
+
+Only the values of $f$ on $\Omega$ matter, and by \Cref{thm:sobolev-one-two} the functions $F$
+are those of Mathlib's $H^1(V)$. The open set $\Omega$ carries the distributions of
+\Cref{def:weak-line-derivative}. Every $f \in H^1(\Omega)$ lies in $\Sob{1}{2}(\Omega)$
+(\Cref{thm:sobolev-lipschitz-domain-weak}), and the two spaces agree by the extension theorem
+of Calder\'on and Stein \cite[Chapter VI]{SteinSingular}.
+
+\begin{lemma}[$H^1(\Omega)$ is a linear space]
+\label{lem:sobolev-lipschitz-domain-basic}
+\lean{Rd.BoundedLipschitzDomain.memSobolevOn_of_memSobolev,
+  Rd.BoundedLipschitzDomain.zero_memSobolevOn, Rd.BoundedLipschitzDomain.MemSobolevOn.congr_ae,
+  Rd.BoundedLipschitzDomain.MemSobolevOn.add, Rd.BoundedLipschitzDomain.MemSobolevOn.smul}
+\leanok
+\uses{def:sobolev-lipschitz-domain, lem:weak-derivative-basic}
+Every $f \in \Sob{1}{2}(V)$ lies in $H^1(\Omega)$. For all $f, f' \in L_2(V)$ with
+$f \in H^1(\Omega)$ and $f = f'$ almost everywhere on $\Omega$, $f' \in H^1(\Omega)$. The space
+$H^1(\Omega)$ is a complex linear subspace of $L_2(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $f \in \Sob{1}{2}(V)$ take $F = f$; in particular $0 \in H^1(\Omega)$
+(\Cref{lem:weak-derivative-basic}). For $f'$ with $f' = f$ on $\Omega$ take the same $F$. For
+sums and multiples take the sums and multiples of the functions $F$, which lie in
+$\Sob{1}{2}(V)$ by \Cref{lem:weak-derivative-basic}.
+\end{proof}
+
+\begin{theorem}[$H^1(\Omega)$ by intrinsic differences]
+\label{thm:sobolev-lipschitz-domain-intrinsic}
+\lean{Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_memApprox,
+  Rd.BoundedLipschitzDomain.memSobolevOn_iff_modulusOn,
+  Rd.BoundedLipschitzDomain.modNormOn_le_modNorm_of_ae_eq,
+  Rd.BoundedLipschitzDomain.MemSobolevOn.exists_modNorm_lt_top}
+\leanok
+\uses{def:sobolev-lipschitz-domain, thm:sobolev-one-two-besov, thm:bounded-lipschitz-besov,
+  lem:indicator-lp-eq-iff, lem:restriction-moduli}
+For every integer $r \geq 2$ and every $f \in L_2(V)$ the following are equivalent:
+\begin{enumerate}
+  \item $f \in H^1(\Omega)$;
+  \item there is $F$ in the approximation space $A^1_2$ of the band-limited scheme with $F = f$
+    almost everywhere on $\Omega$;
+  \item $\|f\|_{L_2(\Omega)} + \|(2^k \omega_r(f, 2^{-k}, \Omega)_2)_k\|_{\ell_2} < \infty$.
+\end{enumerate}
+For every integer $r \geq 2$ and every $f \in H^1(\Omega)$ there is $F \in L_2(V)$ with $F = f$
+almost everywhere on $\Omega$ and $\|F\|_2 + \|(2^k \omega_r(F, 2^{-k})_2)_k\|_{\ell_2} < \infty$.
+For every $r \in \N$ and all $F, f \in L_2(V)$ with $F = f$ almost everywhere on
+$\Omega$,
+\[
+  \|f\|_{L_2(\Omega)} + \|(2^k \omega_r(f, 2^{-k}, \Omega)_2)_k\|_{\ell_2}
+  \leq \|F\|_2 + \|(2^k \omega_r(F, 2^{-k})_2)_k\|_{\ell_2}.
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) and (2) agree by \Cref{thm:sobolev-one-two-besov}, with $F = f$ on $\Omega$ written as
+$1_\Omega F = 1_\Omega f$ (\Cref{lem:indicator-lp-eq-iff}). (2) and (3) agree by
+\Cref{thm:bounded-lipschitz-besov} with $p = q = 2$ and $s = 1 < r$. The function $F$ of
+\Cref{def:sobolev-lipschitz-domain} has the finite norm by \Cref{thm:sobolev-one-two-besov}. The
+inequality is \Cref{lem:restriction-moduli}.
+\end{proof}
+
+The extension theorem for bounded Lipschitz domains (\Cref{thm:bounded-lipschitz-besov}) and the
+trace theorem below are qualitative, so the statements on $H^1(\Omega)$ are too; the inequality
+gives the restriction with constant $1$.
+
+\begin{theorem}[The weak gradient]
+\label{thm:sobolev-lipschitz-domain-weak}
+\lean{Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev}
+\leanok
+\uses{def:sobolev-lipschitz-domain, lem:weak-derivative-basic}
+For every $f \in H^1(\Omega)$, $f \in \Sob{1}{2}(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The function $F \in \Sob{1}{2}(V)$ of \Cref{def:sobolev-lipschitz-domain} lies in
+$\Sob{1}{2}(\Omega)$, and so does $f$, which agrees with $F$ almost everywhere on $\Omega$
+(\Cref{lem:weak-derivative-basic}).
+\end{proof}
+
+In particular $f$ and its weak derivatives $\partial_v f$, $v \in V$, lie in $L_2(\Omega)$.
+
+For a resolution of unity $\psi$ on $\Gamma$ (\Cref{def:boundary-partition}), as in
+\Cref{thm:boundary-trace-space} with $p = q = 2$, $L = 2$ and $s + 1/p = 1$, a function $g$ on
+$V$ is a boundary trace of $f \in L_2(V)$ if $g = \operatorname{Tr}_\Gamma F$ almost everywhere
+on $\Gamma$ for every $F \in L_2(V)$ with $F = f$ almost everywhere on $\Omega$ and
+$\|F\|_2 + \|(2^k \omega_2(F, 2^{-k})_2)_k\|_{\ell_2} < \infty$. Both $B^{1/2}_{2,2}(\Gamma)$ and
+the boundary trace are taken with respect to $\psi$. By \Cref{thm:sobolev-one-two-besov} with
+$r = 2$, these $F$ are the $F \in \Sob{1}{2}(V)$ with $F = f$ almost everywhere on $\Omega$
+(\Cref{lem:sobolev-lipschitz-domain-trace-extensions}).
+
+\begin{lemma}[Boundary traces of $H^1$ functions]
+\label{lem:sobolev-lipschitz-domain-trace-extensions}
+\lean{Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev}
+\leanok
+\uses{thm:sobolev-one-two-besov, thm:boundary-trace-space, lem:indicator-lp-eq-iff}
+For every resolution of unity $\psi$ on $\Gamma$, every $f \in L_2(V)$ and every function $g$ on
+$V$, $g$ is a boundary trace of $f$ if and only if $g = \operatorname{Tr}_\Gamma F$ almost
+everywhere on $\Gamma$ for every $F \in \Sob{1}{2}(V)$ with $F = f$ almost everywhere on
+$\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{thm:sobolev-one-two-besov} with $r = 2$, $F \in \Sob{1}{2}(V)$ if and only if
+$\|F\|_2 + \|(2^k \omega_2(F, 2^{-k})_2)_k\|_{\ell_2} < \infty$, and $F = f$ almost everywhere on
+$\Omega$ if and only if $1_\Omega F = 1_\Omega f$ (\Cref{lem:indicator-lp-eq-iff}).
+\end{proof}
+
+\begin{theorem}[The trace space of $H^1(\Omega)$]
+\label{thm:sobolev-lipschitz-domain-trace}
+\lean{Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memSobolevOn,
+  Rd.BoundedLipschitzDomain.exists_memSobolevOn_of_memBoundaryBesov,
+  Rd.BoundedLipschitzDomain.MemSobolevOn.isBoundaryTrace_unique,
+  Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn}
+\leanok
+\uses{thm:sobolev-lipschitz-domain-intrinsic, def:boundary-besov, def:boundary-trace,
+  thm:boundary-trace-space}
+For every resolution of unity $\psi$ on $\Gamma$ (\Cref{def:boundary-partition}), with
+$B^{1/2}_{2,2}(\Gamma)$ and boundary traces taken with respect to $\psi$: for every
+$f \in H^1(\Omega)$ there is a boundary trace $g \in B^{1/2}_{2,2}(\Gamma)$ of $f$, and every two
+boundary traces of $f$ agree almost everywhere on $\Gamma$; for every function $g$ on $V$,
+$g \in B^{1/2}_{2,2}(\Gamma)$ if and only if $g$ is the boundary trace of some
+$f \in H^1(\Omega)$; in particular, for every $g \in B^{1/2}_{2,2}(\Gamma)$ there is
+$f \in H^1(\Omega)$ with boundary trace $g$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Here $s = 1/2$ and $p = 2$, so $s + 1/p = 1$, and by
+\Cref{thm:sobolev-lipschitz-domain-intrinsic} with $r = 2$ the functions of $H^1(\Omega)$ are those
+with
+$\|f\|_{L_2(\Omega)} + \|(2^k \omega_2(f, 2^{-k}, \Omega)_2)_k\|_{\ell_2} < \infty$. For them
+\Cref{thm:boundary-trace-space} gives existence and uniqueness of the boundary trace and the trace
+space.
 \end{proof}
 
 \chapter{Besov spaces on compact manifolds}
@@ -14350,6 +14560,11 @@ C.~Schneider, J.~Vyb\'{\i}ral,
 in function spaces}, J.\ Funct.\ Anal.\ \textbf{264} (2013), no.~5, 1197--1237,
 \href{https://doi.org/10.1016/j.jfa.2012.12.005}{doi},
 \href{https://arxiv.org/abs/1201.2280}{arXiv:1201.2280}.
+
+\bibitem{SteinSingular}
+E.~M.~Stein,
+\emph{Singular Integrals and Differentiability Properties of Functions},
+Princeton Mathematical Series \textbf{30}, Princeton University Press, Princeton, NJ, 1970.
 
 \bibitem{Stein}
 E.~M.~Stein,

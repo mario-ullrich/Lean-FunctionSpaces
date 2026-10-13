@@ -39,7 +39,10 @@ Let `Ω` be a bounded Lipschitz domain with boundary `Γ`: finitely many balls `
   and the functions with a finite intrinsic norm on `Ω` are the restrictions of such `F`
   (`Rd.BoundedLipschitzDomain.exists_besov_extension_of_modulusOn`): `B^s_{p,q}(Γ)` is the trace
   space of `B^{s+1/p}_{p,q}(Ω)`
-  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_isBoundaryTrace`). In particular
+  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_isBoundaryTrace`); every such function
+  has a boundary trace, unique almost everywhere on `Γ`
+  (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_modNormOn_lt_top`,
+  `Rd.BoundedLipschitzDomain.IsBoundaryTrace.unique`). In particular
   `B^s_{p,q}(Γ)` does not depend on the resolution of unity
   (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_of_boundaryPartition`).
 -/
@@ -553,6 +556,40 @@ theorem memBoundaryBesov_iff_exists_isBoundaryTrace (ψ : Ω.BoundaryPartition) 
   · rintro ⟨f, hf, hfg⟩
     obtain ⟨F, hFf, hF⟩ := Ω.exists_besov_extension_of_modulusOn hp (by positivity) hsL hq hf
     exact (Ω.memBoundaryBesov_boundaryTrace ψ hp hL1 hs hs1 hsL hq hF).congr (hfg F hFf hF)
+
+/-- **Existence of the boundary trace**: for `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞` and `L ≥ 2`,
+every `f` with `‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` has a boundary
+trace `g ∈ B^s_{p,q}(Γ)`, namely `Tr_Γ F` for an extension `F` of `f`
+(`Rd.BoundedLipschitzDomain.exists_besov_extension_of_modulusOn`). -/
+theorem exists_isBoundaryTrace_of_modNormOn_lt_top (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞)
+    {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q)
+    {f : Lp ℂ p (volume : Measure V)}
+    (hf : ‖indicatorLp Ω.measurableSet f‖ₑ + lqNorm q (fun k =>
+      dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p Ω.carrier L f k) < ∞) :
+    ∃ g : V → ℂ, Ω.MemBoundaryBesov p ψ s q g ∧
+      Ω.IsBoundaryTrace ψ hp L (s + 1 / p.toReal) q f g := by
+  have hsL := add_one_div_toReal_lt hp hs1 hL
+  have hL1 : 1 ≤ L := le_trans one_le_two hL
+  obtain ⟨F, hFf, hF⟩ := Ω.exists_besov_extension_of_modulusOn hp (by positivity) hsL hq hf
+  refine ⟨Ω.boundaryTrace ψ hp L F, Ω.memBoundaryBesov_boundaryTrace ψ hp hL1 hs hs1 hsL hq hF,
+    fun F' hF'f hF' => ?_⟩
+  exact Ω.boundaryTrace_congr ψ hp hL1 hs hsL hq hF' hF
+    (ae_eq_of_indicatorLp_eq Ω.measurableSet (hF'f.trans hFf.symm))
+
+variable {Ω} in
+/-- **Uniqueness of the boundary trace**: for `1 ≤ p < ∞`, `0 < σ < L` and `1 ≤ q ≤ ∞`, two
+boundary traces `g`, `g'` of an `f` with
+`‖f‖_{L_p(Ω)} + ‖(2^(kσ) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` agree almost everywhere on `Γ`: both
+are `Tr_Γ F` for one extension `F` of `f`
+(`Rd.BoundedLipschitzDomain.exists_besov_extension_of_modulusOn`). -/
+theorem IsBoundaryTrace.unique {ψ : Ω.BoundaryPartition} {hp : p ≠ ∞} {L : ℕ} {σ : ℝ}
+    (hσ : 0 < σ) (hσL : σ < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
+    (hf : ‖indicatorLp Ω.measurableSet f‖ₑ + lqNorm q (fun k =>
+      dyadicWeight σ k * lpModulusOn p Ω.carrier L f k) < ∞) {g g' : V → ℂ}
+    (hg : Ω.IsBoundaryTrace ψ hp L σ q f g) (hg' : Ω.IsBoundaryTrace ψ hp L σ q f g') :
+    g =ᶠ[Ω.aeBoundary] g' := by
+  obtain ⟨F, hFf, hF⟩ := Ω.exists_besov_extension_of_modulusOn hp hσ hσL hq hf
+  exact (hg F hFf hF).symm.trans (hg' F hFf hF)
 
 end BoundedLipschitzDomain
 

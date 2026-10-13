@@ -27,6 +27,8 @@ kernels, the local means kernels and the dual kernels of the cone bump are suppo
 `x ∈ Ω`, `(k ⋆ f)(x)` depends only on `f` on `Ω`, since `x - y ∈ x + K ⊆ Ω` whenever
 `k(y) ≠ 0`. On `L_p`, with the cut-off `f ↦ 1_Ω f` (`Rd.LipschitzGraph.cutoff`, from
 `Rd.indicatorLp`): `1_Ω (k ⋆ (1_Ω h)) = 1_Ω (k ⋆ h)` (`Rd.LipschitzGraph.cutoff_convLp_cutoff`).
+Two classes have the same cut-off iff they agree almost everywhere on the set
+(`Rd.indicatorLp_eq_iff_ae_eq_restrict`).
 -/
 
 @[expose] public section
@@ -98,6 +100,15 @@ theorem enorm_indicatorLp_le {s : Set α} (hs : MeasurableSet s) (g : Lp ℂ p �
     ‖indicatorLp hs g‖ₑ ≤ ‖g‖ₑ := by
   rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hs g)]
   exact eLpNorm_indicator_le _ hs
+
+/-- Two elements of `L_p` have the same restriction `1_s F = 1_s f` to a measurable set `s` iff
+they agree almost everywhere on `s`: Mathlib's `MeasureTheory.ae_eq_restrict_iff_indicator_ae_eq`
+for the classes in `L_p`. -/
+theorem indicatorLp_eq_iff_ae_eq_restrict {s : Set α} (hs : MeasurableSet s) {F f : Lp ℂ p μ} :
+    indicatorLp hs F = indicatorLp hs f ↔ (F : α → ℂ) =ᵐ[μ.restrict s] f := by
+  rw [ae_eq_restrict_iff_indicator_ae_eq hs, Lp.ext_iff]
+  exact ⟨fun h => (indicatorLp_apply_ae hs F).symm.trans (h.trans (indicatorLp_apply_ae hs f)),
+    fun h => (indicatorLp_apply_ae hs F).trans (h.trans (indicatorLp_apply_ae hs f).symm)⟩
 
 end Indicator
 

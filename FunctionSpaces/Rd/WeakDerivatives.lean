@@ -420,6 +420,29 @@ theorem MemWeakSobolev.smul {p : ℝ≥0∞} {m : ℕ} (hf : MemWeakSobolev Ω m
   obtain ⟨g, hg, hfg⟩ := hf.2 k hk v
   exact ⟨c • g, hg.const_smul c, hfg.smul c⟩
 
+/-- `W^m_p(Ω)` only sees `f` almost everywhere on `Ω`: if `f ∈ W^m_p(Ω)` and `f = f'` almost
+everywhere on `Ω`, then `f' ∈ W^m_p(Ω)`; the weak derivatives of `f` serve for `f'`
+(`Rd.HasWeakLineDeriv.congr_ae`). -/
+theorem MemWeakSobolev.congr_ae {p : ℝ≥0∞} {m : ℕ} (hf : MemWeakSobolev Ω m p f)
+    (hff' : f =ᵐ[volume.restrict Ω] f') : MemWeakSobolev Ω m p f' := by
+  refine ⟨MemLp.ae_eq hff' hf.1, fun k hk v => ?_⟩
+  obtain ⟨g, hg, hfg⟩ := hf.2 k hk v
+  exact ⟨g, hg, hfg.congr_ae hff' Filter.EventuallyEq.rfl⟩
+
+/-- The zero class lies in `W^m_p(V)`. -/
+theorem zero_memSobolev {p : ℝ≥0∞} {m : ℕ} : MemSobolev m (0 : Lp ℂ p (volume : Measure V)) :=
+  zero_memWeakSobolev.congr_ae (ae_restrict_of_ae (Lp.coeFn_zero ..).symm)
+
+/-- `W^m_p(V)` is closed under addition in `L_p(V)`. -/
+theorem MemSobolev.add {p : ℝ≥0∞} {m : ℕ} {F G : Lp ℂ p (volume : Measure V)}
+    (hF : MemSobolev m F) (hG : MemSobolev m G) : MemSobolev m (F + G) :=
+  (MemWeakSobolev.add hF hG).congr_ae (ae_restrict_of_ae (Lp.coeFn_add F G).symm)
+
+/-- `W^m_p(V)` is closed under multiplication by complex scalars in `L_p(V)`. -/
+theorem MemSobolev.smul {p : ℝ≥0∞} {m : ℕ} {F : Lp ℂ p (volume : Measure V)}
+    (hF : MemSobolev m F) (c : ℂ) : MemSobolev m (c • F) :=
+  (MemWeakSobolev.smul hF c).congr_ae (ae_restrict_of_ae (Lp.coeFn_smul c F).symm)
+
 /-! ### Limits -/
 
 /-- **Hölder bound for the pairing with a test function**: for `1 ≤ p`, a test function `φ` on

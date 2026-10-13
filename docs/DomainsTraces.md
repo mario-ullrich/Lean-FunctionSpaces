@@ -146,7 +146,10 @@ Besov spaces.
   `‖F‖_p + ‖(2^(k(s+1/p)) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
   (`Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq_iff`), and iff `g` is the boundary trace of
   some `f` with `‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
-  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_isBoundaryTrace`). The boundary trace
+  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_isBoundaryTrace`); every such `f` has a
+  boundary trace in `B^s_{p,q}(Γ)`, unique almost everywhere on `Γ`
+  (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_modNormOn_lt_top`,
+  `Rd.BoundedLipschitzDomain.IsBoundaryTrace.unique`). The boundary trace
   depends only on `F` on `Ω` (`Rd.BoundedLipschitzDomain.boundaryTrace_congr`), it is the
   restriction for continuous `F`
   (`Rd.BoundedLipschitzDomain.boundaryTrace_eventuallyEq_of_continuous`), and neither the trace nor
