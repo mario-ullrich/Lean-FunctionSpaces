@@ -12048,7 +12048,9 @@ $H^s(V)$, $s \geq 0$, with the Triebel--Lizorkin spaces $\TL{s}{2}{2}$ (and, for
 Besov spaces $\Besov{s}{2}{2}$) and proves $\Sob{1}{2}(V) = H^1(V) = \Besov{1}{2}{2}$.
 \Cref{sec:lipschitz-domain-h1} restricts $H^1(V)$ to bounded Lipschitz domains, describes the
 restrictions by intrinsic differences, shows that they lie in $\Sob{1}{2}(\Omega)$, and
-identifies their boundary traces with $B^{1/2}_{2,2}(\Gamma)$.
+identifies their boundary traces with $B^{1/2}_{2,2}(\Gamma)$. \Cref{sec:rellich-compactness}
+proves Rellich's theorem: the restriction from $H^1(V)$ to $L_2(\Omega)$ is compact for every
+bounded $\Omega \subseteq V$.
 
 \section{Weak derivatives on open sets and cut-offs of Schwartz functions}
 
@@ -12453,12 +12455,17 @@ $F$ (\texttt{Lp.\allowbreak fourier\_\allowbreak toTemperedDistribution\_\allowb
 \begin{lemma}[The Fourier transform of integrable functions]
 \label{lem:fourier-integrable}
 \lean{Rd.integral_fourier_smul_eq_of_integrable, Rd.norm_fourier_le_integral_norm,
-  Rd.memLp_top_fourier}
+  Rd.memLp_top_fourier, Rd.continuous_fourierInv_of_integrable,
+  Rd.norm_fourierInv_le_integral_norm, Rd.integral_fourierInv_smul_eq_of_integrable}
 \leanok
 \uses{lem:fourier-conv}
 For every Schwartz function $u$ and every integrable $g$ on $V$,
-$\int \widehat u \, g = \int u \, \widehat g$. For every integrable $K$ on $V$,
-$|\widehat K(\xi)| \leq \|K\|_1$ for every $\xi \in V$, and $\widehat K \in L_\infty$.
+$\int \widehat u \, g = \int u \, \widehat g$ and
+$\int (\mathcal F^{-1} u) \, g = \int u \, \mathcal F^{-1} g$. For every integrable $K$ on $V$,
+$|\widehat K(\xi)| \leq \|K\|_1$ for every $\xi \in V$, $\widehat K \in L_\infty$, and the inverse
+Fourier transform
+$\mathcal F^{-1} K(x) = \int e^{2 \pi i \langle \xi, x \rangle} K(\xi) \, d\xi$ is continuous
+with $|\mathcal F^{-1} K(x)| \leq \|K\|_1$ for every $x \in V$.
 \end{lemma}
 
 \begin{proof}
@@ -12466,7 +12473,12 @@ $|\widehat K(\xi)| \leq \|K\|_1$ for every $\xi \in V$, and $\widehat K \in L_\i
 Mathlib's \texttt{VectorFourier.\allowbreak integral\_\allowbreak fourierIntegral\_\allowbreak
 smul\_\allowbreak eq\_\allowbreak flip} and \texttt{VectorFourier.\allowbreak norm\_\allowbreak
 fourierIntegral\_\allowbreak le\_\allowbreak integral\_\allowbreak norm}; $\widehat K$ is
-continuous by \Cref{lem:fourier-conv}, hence measurable.
+continuous by \Cref{lem:fourier-conv}, hence measurable. For the inverse transform,
+$\mathcal F^{-1} K(x) = \widehat K(-x)$ (Mathlib's \texttt{Real.\allowbreak
+fourierInv\_\allowbreak eq\_\allowbreak fourier\_\allowbreak neg}), and the identity is
+\texttt{VectorFourier.\allowbreak integral\_\allowbreak fourierIntegral\_\allowbreak
+smul\_\allowbreak eq\_\allowbreak flip} for the pairing $(\xi, x) \mapsto -\langle \xi, x \rangle$,
+which is symmetric.
 \end{proof}
 
 \begin{lemma}[Plancherel's theorem]
@@ -12782,11 +12794,14 @@ each $e_i$.
 
 \begin{theorem}[$\Sob{1}{2} = H^1$]
 \label{thm:sobolev-one-two}
-\lean{Rd.memSobolev_one_iff, Rd.enorm_le_of_hasWeakLineDeriv, Rd.enorm_besselPotential_one_sq_eq}
+\lean{Rd.memSobolev_one_two_of_lineDerivOp_eq, Rd.memSobolev_one_iff,
+  Rd.enorm_le_of_hasWeakLineDeriv, Rd.enorm_besselPotential_one_sq_eq}
 \leanok
 \uses{def:weak-line-derivative, cor:sobolev-tempered, thm:weak-derivative-tempered,
   lem:derivative-fourier-l2, lem:bessel-potential-l2, def:dyadic-cells}
-For every $f \in L_2(V)$, $f \in \Sob{1}{2}(V)$ if and only if $f \in H^1(V)$. For every
+For every orthonormal basis $(e_i)_{i \in I}$ of $V$ and all $f, g_i \in L_2(V)$ such that
+$\partial_{e_i} f = g_i$ as tempered distributions for every $i \in I$, $f \in H^1(V)$. For every
+$f \in L_2(V)$, $f \in \Sob{1}{2}(V)$ if and only if $f \in H^1(V)$. For every
 $v \in V$ and all $f, g, h \in L_2(V)$ such that $g$ is the weak derivative $\partial_v f$ on $V$
 and $J_1 f = h$, $\|g\|_2 \leq 2 \pi |v| \, \|h\|_2$. For every orthonormal basis
 $(e_i)_{i \in I}$ of $V$ and all $f, h, g_i \in L_2(V)$ such that $g_i$ is the weak derivative
@@ -12799,11 +12814,12 @@ $\partial_{e_i} f$ on $V$ for every $i \in I$ and $J_1 f = h$,
 \begin{proof}
 \leanok
 Weak derivatives on $V$ of $L_2$ functions are derivatives of tempered distributions
-(\Cref{thm:weak-derivative-tempered,cor:sobolev-tempered}). If $f \in \Sob{1}{2}(V)$, the
-weak derivatives $g_i = \partial_{e_i} f \in L_2(V)$ along the orthonormal basis $(e_i)_i$ of
-\Cref{def:dyadic-cells} make
-$\int (\langle \xi \rangle^1)^2 |\widehat f|^2$ finite (\Cref{lem:derivative-fourier-l2}), so
-$f \in H^1(V)$ by \Cref{lem:bessel-potential-l2}. If $f \in H^1(V)$, then $\partial_v f \in
+(\Cref{thm:weak-derivative-tempered,cor:sobolev-tempered}). For derivatives
+$g_i = \partial_{e_i} f \in L_2(V)$ along an orthonormal basis $(e_i)_i$,
+$(2\pi)^2 \int (\langle \xi \rangle^1)^2 |\widehat f|^2 = (2\pi)^2 \|f\|_2^2 +
+\sum_i \|g_i\|_2^2$ is finite (\Cref{lem:derivative-fourier-l2}), so $f \in H^1(V)$ by
+\Cref{lem:bessel-potential-l2}; this applies to $f \in \Sob{1}{2}(V)$ with the orthonormal basis
+of \Cref{def:dyadic-cells}. If $f \in H^1(V)$, then $\partial_v f \in
 H^0(V) = L_2(V)$ for every $v \in V$ (Mathlib's \texttt{TemperedDistribution.\allowbreak
 MemSobolev.\allowbreak lineDerivOp}), and the derivative of order $0$ is $f$ itself. The bound
 compares $\widehat g = 2 \pi i \langle \cdot, v \rangle \widehat f$ with
@@ -12811,6 +12827,24 @@ $\widehat h = \langle \cdot \rangle^1 \widehat f$ pointwise
 (\Cref{lem:derivative-fourier-l2,lem:bessel-potential-l2}) and uses \Cref{lem:plancherel-l2};
 the identity is \Cref{lem:derivative-fourier-l2} with
 $\|h\|_2^2 = \int (\langle \xi \rangle^1)^2 |\widehat f|^2$.
+\end{proof}
+
+\begin{corollary}[The $H^1$ norm by a weak gradient]
+\label{cor:weak-gradient-sobolev-norm}
+\lean{Rd.enorm_besselPotential_one_sq_le, Rd.sq_norm_besselPotential_one_le}
+\leanok
+\uses{thm:sobolev-one-two}
+For every orthonormal basis $(e_i)_{i \in I}$ of $V$ and all $f, h, g_i \in L_2(V)$ such that
+$g_i$ is the weak derivative $\partial_{e_i} f$ on $V$ for every $i \in I$ and $J_1 f = h$,
+\[
+  \|h\|_2^2 \leq \|f\|_2^2 + \sum_i \|g_i\|_2^2 .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+The identity $(2\pi)^2 \|h\|_2^2 = (2\pi)^2 \|f\|_2^2 + \sum_i \|g_i\|_2^2$ of
+\Cref{thm:sobolev-one-two} and $(2\pi)^2 \geq 1$.
 \end{proof}
 
 \begin{theorem}[$\Sob{1}{2} = \Besov{1}{2}{2}$]
@@ -12988,6 +13022,334 @@ with
 $\|f\|_{L_2(\Omega)} + \|(2^k \omega_2(f, 2^{-k}, \Omega)_2)_k\|_{\ell_2} < \infty$. For them
 \Cref{thm:boundary-trace-space} gives existence and uniqueness of the boundary trace and the trace
 space.
+\end{proof}
+
+\section{Rellich compactness}
+\label{sec:rellich-compactness}
+
+Throughout this section $\Omega \subseteq V$ is an arbitrary bounded set, $L_2(\Omega)$ is the
+$L_2$ space of Lebesgue measure restricted to $\Omega$, and $F \mapsto F|_\Omega$ is the
+restriction from $L_2(V)$ to $L_2(\Omega)$, Mathlib's operator of norm at most $1$
+(\texttt{LpToLpRestrictCLM}). An element $F$ of Mathlib's bundled Sobolev space
+$H^1(V) = H^{1,2}(V, \C)$ (\texttt{BesselPotentialSpace}) is a tempered distribution $u$ together
+with the $L_2$ function $J_1 u$, and $\|F\|_{H^1} = \|J_1 u\|_2$. For $K \in \R$, $B_K$ is the
+closed ball of radius $K$ around $0$ in $V$. The proof of Rellich's theorem truncates in
+frequency: the part of $F$ with frequencies in $B_K$ is a bounded Lipschitz function on $V$, so
+the truncated operators are compact by the Arzel\`a--Ascoli theorem on the compact closure of
+$\Omega$, and they converge to the restriction in operator norm as $K \to \infty$.
+
+\begin{theorem}[The inverse Fourier transform on $L_1 \cap L_2$]
+\label{thm:fourier-inverse-l1-l2}
+\lean{Rd.fourierInv_Lp_ae_eq_of_integrable}
+\leanok
+\uses{lem:fourier-integrable}
+For every integrable $h \in L_2(V)$, the $L_2$ inverse Fourier transform of $h$ agrees almost
+everywhere with the function
+$x \mapsto \int e^{2 \pi i \langle \xi, x \rangle} h(\xi) \, d\xi$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Both functions are locally integrable, the second because it is continuous
+(\Cref{lem:fourier-integrable}). Two locally integrable functions with the same integrals
+against all smooth compactly supported $u$ agree almost everywhere (Mathlib's
+\texttt{ae\_\allowbreak eq\_\allowbreak of\_\allowbreak integral\_\allowbreak contDiff\_\allowbreak
+smul\_\allowbreak eq}), and such $u$ are Schwartz functions. The $L_2$ inverse Fourier transform
+agrees with the inverse Fourier transform of tempered distributions (Mathlib's
+\texttt{Lp.\allowbreak fourierInv\_\allowbreak toTemperedDistribution\_\allowbreak eq}), so
+$\int u \, \mathcal F^{-1} h = h(\mathcal F^{-1} u) = \int (\mathcal F^{-1} u) \, h$, which is
+$\int u \, \mathcal F^{-1} h$ for the pointwise inverse transform by
+\Cref{lem:fourier-integrable}.
+\end{proof}
+
+\begin{lemma}[The Bessel weight of order $-1$]
+\label{lem:bessel-weight-inverse}
+\lean{Rd.besselWeight_neg_one_eq_inv, Rd.besselWeight_neg_one_le_one,
+  Rd.besselWeight_neg_one_le_inv, Rd.norm_besselWeight_neg_one_le_one,
+  Rd.memLp_top_besselWeight_neg_one, Rd.besselInvMul, Rd.besselInvMul_apply_ae,
+  Rd.norm_besselInvMul_le_one}
+\leanok
+\uses{def:bessel-weight, lem:bessel-weight-basic}
+For every $\xi \in V$, $\langle \xi \rangle^{-1} = (\langle \xi \rangle^1)^{-1} \leq 1$, and for
+every $K > 0$ and every $\xi$ with $|\xi| \geq K$, $\langle \xi \rangle^{-1} \leq K^{-1}$. The
+multiplication $g \mapsto \langle \cdot \rangle^{-1} g$ is a bounded linear operator on $L_2(V)$
+of norm at most $1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\langle \xi \rangle^1 \geq \max(1, |\xi|)$ (\Cref{lem:bessel-weight-basic}). The weight
+$\langle \cdot \rangle^{-1}$ is continuous and bounded by $1$, hence lies in $L_\infty(V)$, and
+multiplication by an $L_\infty$ function is bounded on $L_2$ (Mathlib's Hölder multiplication
+\texttt{ContinuousLinearMap.\allowbreak holderL}), with norm at most the bound $1$ of the weight.
+\end{proof}
+
+\begin{definition}[$H^1$ functions as $L_2$ functions]
+\label{def:sobolev-one-to-l2}
+\lean{Rd.toL2, Rd.toL2_apply}
+\leanok
+\uses{lem:bessel-weight-inverse, lem:plancherel-l2}
+For $F \in H^1(V)$, $\iota F = \mathcal F^{-1}(\langle \cdot \rangle^{-1} \widehat{J_1 F})$,
+with the Fourier transform of $L_2(V)$; $\iota : H^1(V) \to L_2(V)$ is a bounded linear operator.
+\end{definition}
+
+\begin{lemma}[$\iota F$ represents $F$]
+\label{lem:sobolev-one-to-l2}
+\lean{Rd.fourier_toL2, Rd.fourier_toL2_ae_eq, Rd.toTemperedDistribution_toL2,
+  Rd.toL2_eq_of_toDistr_eq, Rd.norm_toL2_le}
+\leanok
+\uses{def:sobolev-one-to-l2, lem:temperate-weight-lp, lem:bessel-weight-inverse,
+  lem:plancherel-l2}
+For every $F \in H^1(V)$, given by the tempered distribution $u$, the Fourier transform of
+$\iota F$ is $\langle \cdot \rangle^{-1} \widehat{J_1 u}$, the tempered distribution of $\iota F$
+is $u$, and $\|\iota F\|_2 \leq \|F\|_{H^1}$. For every $F \in H^1(V)$ and every $f \in L_2(V)$
+whose tempered distribution is that of $F$, $\iota F = f$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$u = J_{-1}(J_1 u)$, and the Fourier transform of $J_{-1} g$ is $\langle \cdot \rangle^{-1}
+\widehat g$; for $g = J_1 u \in L_2(V)$ this is the tempered distribution of the $L_2$ function
+$\langle \cdot \rangle^{-1} \widehat g$ (\Cref{lem:temperate-weight-lp}), whose inverse Fourier
+transform is $\iota F$. An $L_2$ function is determined by its tempered distribution (Mathlib's
+\texttt{Lp.\allowbreak ker\_\allowbreak toTemperedDistributionCLM\_\allowbreak eq\_\allowbreak
+bot}). By \Cref{lem:plancherel-l2} and \Cref{lem:bessel-weight-inverse},
+$\|\iota F\|_2 = \|\langle \cdot \rangle^{-1} \widehat{J_1 u}\|_2 \leq \|\widehat{J_1 u}\|_2
+= \|J_1 u\|_2$.
+\end{proof}
+
+\begin{definition}[Truncation in frequency]
+\label{def:frequency-truncation}
+\lean{Rd.truncL2, Rd.truncL2_apply}
+\leanok
+\uses{def:sobolev-one-to-l2, lem:indicator-lp}
+For $K \in \R$ and $F \in H^1(V)$, $T_K F = \mathcal F^{-1}(1_{B_K} \widehat{\iota F})$; $T_K$
+is a bounded linear operator from $H^1(V)$ to $L_2(V)$.
+\end{definition}
+
+\begin{proposition}[The truncation error]
+\label{prop:frequency-truncation-error}
+\lean{Rd.norm_toL2_sub_truncL2_apply_le, Rd.norm_toL2_sub_truncL2_le, Rd.tendsto_truncL2}
+\leanok
+\uses{def:frequency-truncation, lem:sobolev-one-to-l2, lem:bessel-weight-inverse,
+  lem:plancherel-l2}
+For every $K > 0$ and every $F \in H^1(V)$, $\|\iota F - T_K F\|_2 \leq K^{-1} \|F\|_{H^1}$. For
+every $K > 0$, $\|\iota - T_K\| \leq K^{-1}$, and $T_K \to \iota$ in operator norm as
+$K \to \infty$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+By \Cref{lem:plancherel-l2} and \Cref{lem:sobolev-one-to-l2}, $\|\iota F - T_K F\|_2$ is the
+$L_2$ norm of $1_{V \setminus B_K} \langle \cdot \rangle^{-1} \widehat{J_1 F}$, and
+$\langle \xi \rangle^{-1} \leq K^{-1}$ for $|\xi| > K$ (\Cref{lem:bessel-weight-inverse}).
+\end{proof}
+
+\begin{definition}[The square root of the volume of a ball]
+\label{def:ball-volume-sqrt}
+\lean{Rd.ballVolumeSqrt, Rd.ballVolumeSqrt_nonneg}
+\leanok
+For $K \in \R$, $C_K = |B_K|^{1/2} \geq 0$, the square root of the Lebesgue measure of $B_K$.
+\end{definition}
+
+\begin{lemma}[Cauchy--Schwarz on a ball]
+\label{lem:cauchy-schwarz-ball}
+\lean{Rd.eLpNorm_one_indicator_closedBall_le, Rd.integrable_indicator_closedBall,
+  Rd.integral_norm_indicator_closedBall_le}
+\leanok
+\uses{def:ball-volume-sqrt}
+For every $h \in L_2(V)$ and every $K \in \R$, $1_{B_K} h$ is integrable and
+$\int |1_{B_K} h| \leq C_K \|h\|_2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Hölder's inequality on the finite measure space $B_K$ (Mathlib's
+\texttt{eLpNorm\_\allowbreak le\_\allowbreak eLpNorm\_\allowbreak mul\_\allowbreak rpow\_\allowbreak
+measure\_\allowbreak univ}).
+\end{proof}
+
+\begin{lemma}[The Fourier character is Lipschitz]
+\label{lem:fourier-character-lipschitz}
+\lean{Rd.norm_fourierChar_sub_le}
+\leanok
+For all $a, b \in \R$, $|e^{2 \pi i a} - e^{2 \pi i b}| \leq 2 \pi |a - b|$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$e^{2 \pi i a} - e^{2 \pi i b} = e^{2 \pi i b}(e^{2 \pi i (a - b)} - 1)$ and
+$|e^{i t} - 1| \leq |t|$ (Mathlib's \texttt{Real.\allowbreak norm\_\allowbreak
+exp\_\allowbreak I\_\allowbreak mul\_\allowbreak ofReal\_\allowbreak sub\_\allowbreak
+one\_\allowbreak le}).
+\end{proof}
+
+\begin{theorem}[Band-limited functions are bounded and Lipschitz]
+\label{thm:band-limited-lipschitz}
+\lean{Rd.norm_fourierInv_indicator_le, Rd.norm_fourierInv_sub_le,
+  Rd.lipschitzWith_fourierInv_indicator}
+\leanok
+\uses{lem:fourier-integrable, lem:cauchy-schwarz-ball,
+  lem:fourier-character-lipschitz}
+For every integrable $g$ on $V$, every $K \in \R$ such that $g(\xi) = 0$ for almost every $\xi$
+with $|\xi| > K$, and all $x, y \in V$,
+\[
+  |\mathcal F^{-1} g(x) - \mathcal F^{-1} g(y)| \leq 2 \pi K |x - y| \int |g| .
+\]
+For every $h \in L_2(V)$, every $K \in \R$ and all $x, y \in V$,
+$|\mathcal F^{-1}(1_{B_K} h)(x)| \leq C_K \|h\|_2$ and
+\[
+  |\mathcal F^{-1}(1_{B_K} h)(x) - \mathcal F^{-1}(1_{B_K} h)(y)|
+  \leq 2 \pi \max(K, 0) \, C_K \|h\|_2 \, |x - y| .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The difference is $\int (e^{2 \pi i \langle \xi, x \rangle} - e^{2 \pi i \langle \xi, y \rangle})
+g(\xi) \, d\xi$, and for $|\xi| \leq K$, \Cref{lem:fourier-character-lipschitz} and the
+Cauchy--Schwarz inequality give
+$|e^{2 \pi i \langle \xi, x \rangle} - e^{2 \pi i \langle \xi, y \rangle}| \leq
+2 \pi |\langle \xi, x - y \rangle| \leq 2 \pi K |x - y|$. For $g = 1_{B_K} h$, which vanishes for
+$|\xi| > \max(K, 0)$, combine this and \Cref{lem:fourier-integrable} with
+\Cref{lem:cauchy-schwarz-ball}.
+\end{proof}
+
+\begin{lemma}[Arzel\`a--Ascoli for Lipschitz functions]
+\label{lem:lipschitz-totally-bounded}
+\lean{Rd.totallyBounded_setOf_lipschitzWith}
+\leanok
+For every compact metric space $X$, every $C \in \R$ and every $L \geq 0$, the set of bounded
+continuous functions $g : X \to \C$ with $|g| \leq C$ that are Lipschitz with constant $L$ is
+totally bounded in the uniform norm.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The set is equicontinuous, since all its members have the Lipschitz constant $L$, and its
+functions take values in the compact disc of radius $C$; the Arzel\`a--Ascoli theorem (Mathlib's
+\texttt{BoundedContinuousFunction.\allowbreak arzela\_\allowbreak ascoli}) makes its closure
+compact.
+\end{proof}
+
+\begin{definition}[Continuous functions on the closure as $L_2(\Omega)$ functions]
+\label{def:closure-extension}
+\lean{Rd.extendClosure, Rd.closureToLp}
+\leanok
+For a bounded continuous function $g$ on $\overline \Omega$, $\tilde g$ is the function on $V$
+equal to $g$ on $\overline \Omega$ and to $0$ elsewhere, and $\Phi g \in L_2(\Omega)$ is its
+class.
+\end{definition}
+
+\begin{lemma}[The map $\Phi$ is Lipschitz]
+\label{lem:closure-extension}
+\lean{Rd.extendClosure_of_mem, Rd.measurable_extendClosure, Rd.norm_extendClosure_le,
+  Rd.norm_extendClosure_sub_le, Rd.memLp_extendClosure, Rd.dist_closureToLp_le,
+  Rd.lipschitzWith_closureToLp}
+\leanok
+\uses{def:closure-extension}
+For every bounded continuous $g$ on $\overline \Omega$, $\tilde g$ is measurable with
+$|\tilde g| \leq \|g\|_\infty$ and lies in $L_2(\Omega)$. For all bounded continuous $g, g'$ on
+$\overline \Omega$, $|\tilde g - \tilde g'| \leq \|g - g'\|_\infty$ and
+$\|\Phi g - \Phi g'\|_{L_2(\Omega)} \leq |\Omega|^{1/2} \|g - g'\|_\infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\overline \Omega$ is closed, hence measurable, and $\Omega$ has finite measure since it is
+bounded. The $L_2(\Omega)$ norm of a function bounded by $c$ is at most $|\Omega|^{1/2} c$.
+\end{proof}
+
+\begin{lemma}[The truncations on $\Omega$]
+\label{lem:truncation-restriction-image}
+\lean{Rd.truncL2_ae_eq_fourierInv_indicator, Rd.restr_truncL2_mem_closureToLp_image}
+\leanok
+\uses{def:frequency-truncation, lem:sobolev-one-to-l2, thm:fourier-inverse-l1-l2,
+  lem:cauchy-schwarz-ball, thm:band-limited-lipschitz, lem:closure-extension}
+For every $K \in \R$ and every $F \in H^1(V)$, $T_K F$ agrees almost everywhere with the function
+$G(x) = \int e^{2 \pi i \langle \xi, x \rangle} 1_{B_K}(\xi) \widehat{\iota F}(\xi) \, d\xi$.
+For every $K \in \R$ and every $F \in H^1(V)$ with $\|F\|_{H^1} \leq 1$, there is a bounded
+continuous function $g$ on $\overline \Omega$ with $|g| \leq C_K$, Lipschitz with constant
+$2 \pi \max(K, 0) \, C_K$, such that $(T_K F)|_\Omega = \Phi g$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Let $h = \widehat{\iota F}$. Then $1_{B_K} h$ is integrable (\Cref{lem:cauchy-schwarz-ball}),
+so $T_K F = \mathcal F^{-1}(1_{B_K} h) = G$ almost everywhere (\Cref{thm:fourier-inverse-l1-l2}).
+For $\|F\|_{H^1} \leq 1$, $\|h\|_2 = \|\iota F\|_2 \leq 1$ by \Cref{lem:sobolev-one-to-l2}; let
+$g$ be the restriction of $G$ to $\overline \Omega$. It has the bound and the Lipschitz constant
+by \Cref{thm:band-limited-lipschitz}, and $G = \tilde g$ on $\overline \Omega \supseteq \Omega$.
+\end{proof}
+
+\begin{proposition}[The truncations are compact]
+\label{prop:truncation-compact}
+\lean{Rd.isCompactOperator_restr_truncL2}
+\leanok
+\uses{lem:truncation-restriction-image, lem:lipschitz-totally-bounded, lem:closure-extension}
+For every $K \in \R$, $F \mapsto (T_K F)|_\Omega$ is a compact operator from $H^1(V)$ to
+$L_2(\Omega)$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+$\overline \Omega$ is compact. By \Cref{lem:truncation-restriction-image}, the image of the
+closed unit ball lies in the image under $\Phi$ of the set of \Cref{lem:lipschitz-totally-bounded}
+with $X = \overline \Omega$, $C = C_K$ and $L = 2 \pi \max(K, 0) \, C_K$, which is totally
+bounded; $\Phi$ is Lipschitz (\Cref{lem:closure-extension}), so the image of the unit ball is
+totally bounded, and its closure is compact since $L_2(\Omega)$ is complete.
+\end{proof}
+
+\begin{theorem}[Rellich's theorem]
+\label{thm:rellich-compactness}
+\lean{Rd.isCompactOperator_restr_toL2, Rd.exists_subseq_tendsto_restr}
+\leanok
+\uses{prop:frequency-truncation-error, prop:truncation-compact}
+For every bounded set $\Omega \subseteq V$, the restriction $F \mapsto (\iota F)|_\Omega$ from
+$H^1(V)$ to $L_2(\Omega)$ is a compact operator. For every bounded set $\Omega \subseteq V$, every
+$M \in \R$ and every sequence $(F_n)_n$ in $H^1(V)$ with $\|F_n\|_{H^1} \leq M$ for every $n$,
+there are a strictly increasing $\varphi : \N \to \N$ and $u \in L_2(\Omega)$ with
+$(\iota F_{\varphi(k)})|_\Omega \to u$ in $L_2(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The operators $F \mapsto (T_K F)|_\Omega$ are compact (\Cref{prop:truncation-compact}) and
+converge in operator norm to $F \mapsto (\iota F)|_\Omega$ as $K \to \infty$, since the
+restriction has norm at most $1$ (\Cref{prop:frequency-truncation-error}). A limit of compact
+operators in operator norm is compact (Mathlib's \texttt{isCompactOperator\_\allowbreak
+of\_\allowbreak tendsto}). The image of the closed ball of radius $M$ has compact closure, so the
+sequence $((\iota F_n)|_\Omega)_n$ has a convergent subsequence.
+\end{proof}
+
+By \Cref{lem:sobolev-one-to-l2}, $\iota F$ is $F$ itself, read as an $L_2$ function. The theorem
+holds for every bounded set $\Omega$. On a bounded Lipschitz domain the restriction space
+$H^1(\Omega)$ of \Cref{def:sobolev-lipschitz-domain} consists of the restrictions of the
+functions $\iota F$, since $\Sob{1}{2}(V) = H^1(V)$ (\Cref{thm:sobolev-one-two}) and every
+$f \in H^1(V)$ is $\iota F$ for an $F \in H^1(V)$ (\Cref{lem:sobolev-one-to-l2}).
+
+\begin{corollary}[Rellich's theorem by weak gradients]
+\label{cor:rellich-weak-gradient}
+\lean{Rd.exists_subseq_tendsto_restr_of_hasWeakLineDeriv}
+\leanok
+\uses{thm:rellich-compactness, thm:weak-derivative-tempered, thm:sobolev-one-two,
+  cor:weak-gradient-sobolev-norm, lem:sobolev-one-to-l2}
+Let $\Omega \subseteq V$ be bounded, $(e_i)_{i \in I}$ an orthonormal basis of $V$ and
+$M \in \R$. For every sequence $(f_n)_n$ in $L_2(V)$ and all $g_{n,i} \in L_2(V)$ such that,
+for every $n \in \N$, $g_{n,i}$ is the weak derivative $\partial_{e_i} f_n$ on $V$ for every
+$i \in I$ and $\|f_n\|_2^2 + \sum_i \|g_{n,i}\|_2^2 \leq M^2$, there are a strictly increasing
+$\varphi : \N \to \N$ and $u \in L_2(\Omega)$ with $f_{\varphi(k)}|_\Omega \to u$ in
+$L_2(\Omega)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+Weak derivatives on $V$ are derivatives of tempered distributions
+(\Cref{thm:weak-derivative-tempered}), so each $f_n$ lies in $H^1(V)$
+(\Cref{thm:sobolev-one-two}) and $f_n = \iota F_n$ for an $F_n \in H^1(V)$
+(\Cref{lem:sobolev-one-to-l2}) with $\|F_n\|_{H^1}^2 \leq M^2$
+(\Cref{cor:weak-gradient-sobolev-norm}). Apply \Cref{thm:rellich-compactness} with the bound
+$|M|$.
 \end{proof}
 
 \chapter{Besov spaces on compact manifolds}

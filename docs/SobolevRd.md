@@ -10,7 +10,8 @@ where Mathlib's Fourier transform and Bessel potential spaces live. For `p = 2` 
 Mathlib's Bessel potential spaces `H^s`, `s ≥ 0`, with the Triebel–Lizorkin spaces `F^s_{2,2}`
 (and, for `s > 0`, with the Besov spaces `B^s_{2,2}`) and shows `W^1_2 = H^1 = B^1_{2,2}`. On a
 bounded Lipschitz domain, `H^1` is the space of restrictions of `H^1(ℝ^d)`, with weak derivatives
-in `L_2` of the domain and boundary traces in `B^{1/2}_{2,2}` of the boundary.
+in `L_2` of the domain and boundary traces in `B^{1/2}_{2,2}` of the boundary. On every bounded
+set the restriction from `H^1(ℝ^d)` to `L_2` is compact (Rellich's theorem).
 
 ## Main results
 
@@ -65,7 +66,8 @@ in `L_2` of the domain and boundary traces in `B^{1/2}_{2,2}` of the boundary.
   If `g ∈ L_2(V)` is the weak derivative `∂_v f` and `J_1 f = h`, then `‖g‖_2 ≤ 2π ‖v‖ ‖h‖_2`
   (`Rd.enorm_le_of_hasWeakLineDeriv`); for the weak derivatives `g_i = ∂_{e_i} f` along any
   orthonormal basis `(e_i)`, `(2π)² ‖h‖_2² = (2π)² ‖f‖_2² + ∑_i ‖g_i‖_2²`
-  (`Rd.enorm_besselPotential_one_sq_eq`). For `F ∈ L_2(V)`, `F ∈ W^1_2(V)` iff `F` lies in the
+  (`Rd.enorm_besselPotential_one_sq_eq`), hence `‖h‖_2² ≤ ‖f‖_2² + ∑_i ‖g_i‖_2²`
+  (`Rd.sq_norm_besselPotential_one_le`). For `F ∈ L_2(V)`, `F ∈ W^1_2(V)` iff `F` lies in the
   Besov space `B^1_{2,2}(V)`, the approximation space of the band-limited classes
   (`Rd.memSobolev_one_iff_memApprox`), iff
   `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2} < ∞` for every order `r ≥ 2`
@@ -89,6 +91,21 @@ in `L_2` of the domain and boundary traces in `B^{1/2}_{2,2}` of the boundary.
   theorems for bounded Lipschitz domains are qualitative, and so are these statements; the
   restriction direction has constant `1`
   (`Rd.BoundedLipschitzDomain.modNormOn_le_modNorm_of_ae_eq`).
+* **Rellich's theorem.** For every bounded set `Ω ⊆ V`, of any shape, the restriction
+  `F ↦ F|_Ω` from Mathlib's `H^1(V) = H^{1,2}(V, ℂ)` to `L_2(Ω)` is a compact operator
+  (`Rd.isCompactOperator_restr_toL2`). Every bounded sequence in `H^1(V)` has a subsequence
+  whose restrictions converge in `L_2(Ω)` (`Rd.exists_subseq_tendsto_restr`), and so has every
+  sequence `f_n ∈ L_2(V)` with weak derivatives `∂_{e_i} f_n ∈ L_2(V)` along an orthonormal
+  basis `(e_i)` and `‖f_n‖_2² + ∑_i ‖∂_{e_i} f_n‖_2² ≤ M²`
+  (`Rd.exists_subseq_tendsto_restr_of_hasWeakLineDeriv`). The proof truncates in frequency:
+  cutting `𝓕F` off to the ball `|ξ| ≤ K` changes `F` by at most `K⁻¹ ‖F‖_{H^1}` in `L_2(V)`
+  (`Rd.norm_toL2_sub_truncL2_le`); the truncated functions are bounded by `|B_K|^{1/2}` and
+  Lipschitz with constant `2πK |B_K|^{1/2}` on `V` for `‖F‖_{H^1} ≤ 1`
+  (`Rd.norm_fourierInv_indicator_le`, `Rd.lipschitzWith_fourierInv_indicator`), so the
+  Arzelà–Ascoli theorem on the compact closure of `Ω` (`Rd.totallyBounded_setOf_lipschitzWith`)
+  makes the truncated operators compact (`Rd.isCompactOperator_restr_truncL2`). On the way, the
+  `L_2` inverse Fourier transform of an integrable `h ∈ L_2(V)` is the pointwise inverse
+  Fourier integral (`Rd.fourierInv_Lp_ae_eq_of_integrable`).
 
 ## What is formalised
 
@@ -97,8 +114,9 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
 | Weak derivatives and Sobolev spaces on open sets, integration by parts, uniqueness, locality, limits; cut-offs of Schwartz functions and the density of test functions in the Schwartz space; the bridge to tempered distributions | ✅ | ✗ | `Rd/WeakDerivatives` |
-| The convolution theorem on `L_2`, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/SobolevTwoLittlewoodPaley` |
+| Fourier transforms of integrable functions, the convolution theorem on `L_2`, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/SobolevTwoLittlewoodPaley` |
 | `H^1` on bounded Lipschitz domains as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the weak gradient, and the trace space `B^{1/2}_{2,2}` of the boundary | ✅ | ✗ | `Rd/LipschitzDomainH1` |
+| The inverse Fourier transform of integrable `L_2` functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, and Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω` | ✅ | ✗ | `Rd/RellichCompactness` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

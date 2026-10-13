@@ -233,3 +233,12 @@ declarations.
   `χ(x/(n+1)) u(x)` of a Schwartz function converge to it in the Schwartz space
   (`Rd.tendsto_cutoffMul`), so tempered distributions are determined by test functions
   (`Rd.eq_zero_of_testSchwartz`).
+* **The inverse Fourier transform on `L_1 ∩ L_2` and Rellich's theorem**
+  (`FunctionSpaces/Rd/RellichCompactness.lean`): for an integrable `h ∈ L_2(V)`, Mathlib's
+  `L_2` inverse Fourier transform of `h` is the pointwise inverse Fourier integral almost
+  everywhere (`Rd.fourierInv_Lp_ae_eq_of_integrable`). Mathlib has the `L_1` inverse transform
+  (`Real.Lp.fourierTransformInv`) and the `L_2` inverse transform, and identifies the two on
+  Schwartz functions (`SchwartzMap.toLp_fourierInv_eq`); this lemma identifies them on
+  `L_1 ∩ L_2`. For every bounded `Ω ⊆ V`, the restriction
+  from Mathlib's `H^{1,2}(V, ℂ)` to `L_2(Ω)` is a compact operator
+  (`Rd.isCompactOperator_restr_toL2`).

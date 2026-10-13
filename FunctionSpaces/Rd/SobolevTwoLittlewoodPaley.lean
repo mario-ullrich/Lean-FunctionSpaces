@@ -24,6 +24,9 @@ Mathlib's Sobolev space `H^s(V)` consists of the tempered distributions `u` whos
 Triebel–Lizorkin space `F^s_{2,2}(V)`, and for `s > 0` with the Besov space `B^s_{2,2}(V)`, with
 explicit constants, and proves `W^1_2(V) = H^1(V) = B^1_{2,2}(V)`.
 
+* **Integrable functions**: `𝓕K` and `𝓕⁻K` are continuous and bounded by `‖K‖_1`, and
+  `∫ 𝓕u · K = ∫ u · 𝓕K`, `∫ 𝓕⁻u · K = ∫ u · 𝓕⁻K` for Schwartz functions `u`
+  (`Rd.integral_fourier_smul_eq_of_integrable`, `Rd.integral_fourierInv_smul_eq_of_integrable`).
 * **Plancherel for the blocks**: `𝓕(K ⋆ f) = 𝓕K · 𝓕f` for an integrable `K` and `f ∈ L_2(V)`
   (`Rd.fourier_convLp`), so `‖ψ_j ⋆ f‖_2² = ∫ |𝓕ψ_j|² |𝓕f|²` (`Rd.enorm_lpBlock_sq`).
 * **The weight comparison**: at every frequency at most two blocks are nonzero, and their
@@ -36,7 +39,8 @@ explicit constants, and proves `W^1_2(V) = H^1(V) = B^1_{2,2}(V)`.
   (`Rd.memSobolev_two_iff_exists_memApprox`) and the bundled space `H^{s}(V)`
   (`Rd.exists_eq_toDistr_two`) follow.
 * **`W^1_2 = H^1`** (`Rd.memSobolev_one_iff`), with `‖∂_v f‖_2 ≤ 2π ‖v‖ ‖J_1 f‖_2` and
-  `(2π)² ‖J_1 f‖_2² = (2π)² ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²` for an orthonormal basis `(e_i)`.
+  `(2π)² ‖J_1 f‖_2² = (2π)² ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²` for an orthonormal basis `(e_i)`, hence
+  `‖J_1 f‖_2² ≤ ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²` (`Rd.sq_norm_besselPotential_one_le`).
 * **`W^1_2 = B^1_{2,2}`** (`Rd.memSobolev_one_iff_memApprox`, `Rd.memSobolev_one_iff_modulus`):
   `F ∈ W^1_2(V)` iff `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2} < ∞`, for every order `r ≥ 2`.
 
@@ -66,9 +70,9 @@ blocks and the band-limited scheme on `L_2`. Its type fixes `p = 2` before the r
 arguments are elaborated. -/
 theorem two_ne_top : (2 : ℝ≥0∞) ≠ ∞ := ENNReal.ofNat_ne_top
 
-/-- **The Fourier transform is self-adjoint**, `∫ 𝓕u · g = ∫ u · 𝓕g`, for a Schwartz function `u`
-and an integrable function `g` (Mathlib's `VectorFourier.integral_fourierIntegral_smul_eq_flip`
-for the Fourier transform of `V`). -/
+/-- **Duality for the Fourier transform** (the multiplication formula), `∫ 𝓕u · g = ∫ u · 𝓕g`,
+for a Schwartz function `u` and an integrable function `g` (Mathlib's
+`VectorFourier.integral_fourierIntegral_smul_eq_flip` for the Fourier transform of `V`). -/
 theorem integral_fourier_smul_eq_of_integrable (u : 𝓢(V, ℂ)) {g : V → ℂ} (hg : Integrable g) :
     ∫ ξ, 𝓕 u ξ • g ξ = ∫ x, u x • 𝓕 g x := by
   simpa using! VectorFourier.integral_fourierIntegral_smul_eq_flip (L := innerₗ V)
@@ -86,11 +90,41 @@ theorem memLp_top_fourier {K : V → ℂ} (hK : Integrable K) : MemLp (𝓕 K) �
   memLp_top_of_bound (continuous_fourier_of_integrable hK).aestronglyMeasurable _
     (ae_of_all _ (norm_fourier_le_integral_norm K))
 
+/-- The inverse Fourier transform `𝓕⁻g(x) = ∫ e^(2πi⟪ξ, x⟫) g(ξ) dξ` of an integrable function is
+continuous, since `𝓕⁻g(x) = 𝓕g(-x)` (Mathlib's `Real.fourierInv_eq_fourier_neg`). -/
+theorem continuous_fourierInv_of_integrable {g : V → ℂ} (hg : Integrable g) :
+    Continuous (𝓕⁻ g) := by
+  rw [show 𝓕⁻ g = fun x => 𝓕 g (-x) from funext (Real.fourierInv_eq_fourier_neg g)]
+  exact (continuous_fourier_of_integrable hg).comp continuous_neg
+
+/-- The inverse Fourier transform is bounded by the `L_1` norm: `|𝓕⁻g(x)| ≤ ∫ |g|` for every
+`x`. -/
+theorem norm_fourierInv_le_integral_norm (g : V → ℂ) (x : V) : ‖𝓕⁻ g x‖ ≤ ∫ ξ, ‖g ξ‖ := by
+  rw [Real.fourierInv_eq_fourier_neg]
+  exact norm_fourier_le_integral_norm g (-x)
+
+/-- **Duality for the inverse Fourier transform** (the multiplication formula),
+`∫ 𝓕⁻u · g = ∫ u · 𝓕⁻g`, for a Schwartz function `u` and an integrable function `g` (Mathlib's
+`VectorFourier.integral_fourierIntegral_smul_eq_flip` for the pairing `-⟪ξ, x⟫`). -/
+theorem integral_fourierInv_smul_eq_of_integrable (u : 𝓢(V, ℂ)) {g : V → ℂ}
+    (hg : Integrable g) : ∫ ξ, 𝓕⁻ u ξ • g ξ = ∫ x, u x • 𝓕⁻ g x := by
+  have hL : (-innerₗ V).flip = -innerₗ V := by
+    ext x y
+    simp [real_inner_comm]
+  have h := VectorFourier.integral_fourierIntegral_smul_eq_flip (L := -innerₗ V)
+    Real.continuous_fourierChar
+    (show Continuous fun p : V × V => -(inner ℝ p.1 p.2) from continuous_inner.neg)
+    (u.integrable (μ := volume)) hg
+  rw [hL] at h
+  rw [SchwartzMap.fourierInv_coe]
+  exact h
+
 /-- **`𝓕(K ⋆ φ) = 𝓕K · 𝓕φ` for Schwartz functions `φ`**, as an identity in `L_2(V)`: the `L_2`
 Fourier transform of `K ⋆ φ` is the product of the bounded function `𝓕K` with the `L_2` Fourier
 transform of `φ`, for every integrable `K`. Both sides are tested against Schwartz functions
-(Mathlib's `Lp.ker_toTemperedDistributionCLM_eq_bot`): `K ⋆ φ` is integrable, so the
-self-adjointness of `𝓕` and the pointwise convolution theorem `Rd.fourier_conv` apply. -/
+(Mathlib's `Lp.ker_toTemperedDistributionCLM_eq_bot`): `K ⋆ φ` is integrable, so the duality
+for `𝓕` (the multiplication formula) and the pointwise convolution theorem `Rd.fourier_conv`
+apply. -/
 theorem fourier_convLp_toLp {K : V → ℂ} (hK : Integrable K) (φ : 𝓢(V, ℂ)) :
     𝓕 (convLp two_ne_top hK (φ.toLp 2 (volume : Measure V))) =
       (ContinuousLinearMap.mul ℂ ℂ).holder 2 ((memLp_top_fourier hK).toLp _)
@@ -717,10 +751,25 @@ theorem lintegral_besselWeight_one_sq_eq {ι : Type*} [Fintype ι] (b : Orthonor
   · exact ((Complex.continuous_ofReal.comp (continuous_id.inner continuous_const)).measurable.enorm
       |>.pow_const 2).aemeasurable.mul hF
 
+/-- **A gradient in `L_2` gives `H^1`**: let `(e_i)` be an orthonormal basis of `V`. If
+`∂_{e_i} f = g_i` as tempered distributions for every `i`, with `f, g_i ∈ L_2(V)`, then
+`f ∈ H^1(V)`, since `(2π)² ∫ ⟨ξ⟩² |𝓕f|² = (2π)² ‖f‖_2² + ∑_i ‖g_i‖_2² < ∞`
+(`Rd.lintegral_besselWeight_one_sq_eq`, `Rd.memSobolev_two_of_lintegral_lt_top`). -/
+theorem memSobolev_one_two_of_lineDerivOp_eq {ι : Type*} [Fintype ι]
+    (b : OrthonormalBasis ι ℝ V) {f : Lp ℂ 2 (volume : Measure V)}
+    {g : ι → Lp ℂ 2 (volume : Measure V)} (hg : ∀ i, ∂_{b i} (f : 𝓢'(V, ℂ)) = (g i : 𝓢'(V, ℂ))) :
+    TemperedDistribution.MemSobolev 1 2 (f : 𝓢'(V, ℂ)) := by
+  refine memSobolev_two_of_lintegral_lt_top f (ENNReal.lt_top_of_mul_ne_top_right ?_
+    (ENNReal.pow_ne_zero (by simp [Real.pi_pos]) 2 : ENNReal.ofReal (2 * π) ^ 2 ≠ 0))
+  rw [lintegral_besselWeight_one_sq_eq b hg]
+  exact ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top (by finiteness)
+    (ENNReal.pow_ne_top enorm_ne_top), ENNReal.sum_ne_top.2 fun i _ =>
+      ENNReal.pow_ne_top enorm_ne_top⟩
+
 /-- **`W^1_2 = H^1`**: a function `f ∈ L_2(V)` lies in the Sobolev space `W^1_2(V)` of weak
 derivatives (`Rd.MemSobolev 1 f`) iff it lies in Mathlib's Sobolev space `H^1(V)`
 (`TemperedDistribution.MemSobolev 1 2`). `⇒`: the weak derivatives along the orthonormal basis
-`Rd.gridBasis V` bound `∫ ⟨ξ⟩² |𝓕f|²` (`Rd.lintegral_besselWeight_one_sq_eq`); `⇐`: Mathlib's
+`Rd.gridBasis V` give `f ∈ H^1` (`Rd.memSobolev_one_two_of_lineDerivOp_eq`); `⇐`: Mathlib's
 `TemperedDistribution.MemSobolev.lineDerivOp` maps `H^1` to `H^0 = L_2`. -/
 theorem memSobolev_one_iff (f : Lp ℂ 2 (volume : Measure V)) :
     MemSobolev 1 f ↔ TemperedDistribution.MemSobolev 1 2 (f : 𝓢'(V, ℂ)) := by
@@ -728,12 +777,7 @@ theorem memSobolev_one_iff (f : Lp ℂ 2 (volume : Measure V)) :
   constructor
   · intro hf
     choose g hg using fun i : Fin (finrank ℝ V) => hf 1 le_rfl (fun _ => gridBasis V i)
-    refine memSobolev_two_of_lintegral_lt_top f (ENNReal.lt_top_of_mul_ne_top_right ?_
-      (ENNReal.pow_ne_zero (by simp [Real.pi_pos]) 2 : ENNReal.ofReal (2 * π) ^ 2 ≠ 0))
-    rw [lintegral_besselWeight_one_sq_eq (gridBasis V) (g := g) hg]
-    exact ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top (by finiteness)
-      (ENNReal.pow_ne_top enorm_ne_top), ENNReal.sum_ne_top.2 fun i _ =>
-        ENNReal.pow_ne_top enorm_ne_top⟩
+    exact memSobolev_one_two_of_lineDerivOp_eq (gridBasis V) (g := g) hg
   · intro hf k hk v
     rcases Nat.le_one_iff_eq_zero_or_eq_one.1 hk with rfl | rfl
     · exact ⟨f, rfl⟩
@@ -751,6 +795,34 @@ theorem enorm_besselPotential_one_sq_eq {ι : Type*} [Fintype ι] (b : Orthonorm
       ENNReal.ofReal (2 * π) ^ 2 * ‖f‖ₑ ^ 2 + ∑ i, ‖g i‖ₑ ^ 2 := by
   rw [enorm_sq_eq_lintegral_of_besselPotential_eq hfh]
   exact lintegral_besselWeight_one_sq_eq b fun i => hasWeakLineDeriv_top_iff.1 (hg i)
+
+/-- **The `H^1` norm is at most the `W^1_2` norm**: under the hypotheses of
+`Rd.enorm_besselPotential_one_sq_eq`, `‖J_1 f‖_2² ≤ ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²`, since
+`(2π)² ≥ 1`. -/
+theorem enorm_besselPotential_one_sq_le {ι : Type*} [Fintype ι] (b : OrthonormalBasis ι ℝ V)
+    {f h : Lp ℂ 2 (volume : Measure V)} {g : ι → Lp ℂ 2 (volume : Measure V)}
+    (hg : ∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => b i) f (g i))
+    (hfh : besselPotential V ℂ 1 (f : 𝓢'(V, ℂ)) = (h : 𝓢'(V, ℂ))) :
+    ‖h‖ₑ ^ 2 ≤ ‖f‖ₑ ^ 2 + ∑ i, ‖g i‖ₑ ^ 2 := by
+  have hc1 : 1 ≤ ENNReal.ofReal (2 * π) ^ 2 := one_le_pow₀ (by
+    rw [← ENNReal.ofReal_one]
+    exact ENNReal.ofReal_le_ofReal (by linarith [Real.one_le_pi_div_two]))
+  refine (ENNReal.mul_le_mul_iff_right (zero_lt_one.trans_le hc1).ne' (by finiteness)).1 ?_
+  rw [enorm_besselPotential_one_sq_eq b hg hfh, mul_add]
+  gcongr
+  exact le_mul_of_one_le_left (by positivity) hc1
+
+/-- `‖J_1 f‖_2² ≤ ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²` in `ℝ` (`Rd.enorm_besselPotential_one_sq_le`). -/
+theorem sq_norm_besselPotential_one_le {ι : Type*} [Fintype ι] (b : OrthonormalBasis ι ℝ V)
+    {f h : Lp ℂ 2 (volume : Measure V)} {g : ι → Lp ℂ 2 (volume : Measure V)}
+    (hg : ∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => b i) f (g i))
+    (hfh : besselPotential V ℂ 1 (f : 𝓢'(V, ℂ)) = (h : 𝓢'(V, ℂ))) :
+    ‖h‖ ^ 2 ≤ ‖f‖ ^ 2 + ∑ i, ‖g i‖ ^ 2 := by
+  have hle := enorm_besselPotential_one_sq_le b hg hfh
+  simp only [← ofReal_norm, ← ENNReal.ofReal_pow (norm_nonneg _)] at hle
+  rw [← ENNReal.ofReal_sum_of_nonneg (fun i _ => by positivity),
+    ← ENNReal.ofReal_add (by positivity) (by positivity)] at hle
+  exact (ENNReal.ofReal_le_ofReal_iff (by positivity)).1 hle
 
 /-! ### `W^1_2(V)` as a Besov space -/
 
