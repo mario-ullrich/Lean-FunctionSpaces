@@ -12019,6 +12019,9 @@ derivative is an identity between distributions on an open set $\Omega \subseteq
 space $\mathcal D'(\Omega)$ of distributions tested against real smooth compactly supported
 functions. On the whole space $V$ and for $L_p$ functions it is the same as an identity between
 tempered distributions, the setting of Mathlib's Fourier transform and Bessel potential spaces.
+For $p = 2$, \Cref{sec:sobolev-two-littlewood-paley} identifies Mathlib's Bessel potential spaces
+$H^s(V)$, $s \geq 0$, with the Triebel--Lizorkin spaces $\TL{s}{2}{2}$ (and, for $s > 0$, with the
+Besov spaces $\Besov{s}{2}{2}$) and proves $\Sob{1}{2}(V) = H^1(V)$.
 
 \section{Weak derivatives on open sets and cut-offs of Schwartz functions}
 
@@ -12397,6 +12400,384 @@ As tempered distributions $\partial^v \eta$ is the Schwartz function $\partial^v
 (\Cref{lem:distribution-transpose}); \Cref{thm:weak-derivative-tempered} with $p = r = 2$ gives
 the weak derivative on $V$, and \Cref{lem:weak-derivative-basic} (5) on $\Omega$. The Sobolev
 statement is \Cref{cor:sobolev-tempered} with $g = \partial^v \eta$.
+\end{proof}
+
+\section{Mathlib's Sobolev spaces \texorpdfstring{$H^s$}{H\^{}s} by Littlewood--Paley blocks}
+\label{sec:sobolev-two-littlewood-paley}
+
+Mathlib defines the Bessel potential $J_s u = \mathcal F^{-1}(\langle \xi \rangle^s \widehat u)$ of
+a tempered distribution $u$, with $\langle \xi \rangle^s = (1 + |\xi|^2)^{s/2}$, and the Sobolev
+space $H^s(V)$ of the tempered distributions $u$ with $J_s u \in L_2(V)$
+(\texttt{TemperedDistribution.\allowbreak besselPotential},
+\texttt{TemperedDistribution.\allowbreak MemSobolev}; the bundled space is
+\texttt{BesselPotentialSpace}). This section identifies $H^s(V)$, $s \geq 0$, with the
+Triebel--Lizorkin space $\TL{s}{2}{2}$ of \Cref{def:triebel-lizorkin} and, for $s > 0$, with the
+Besov space $\Besov{s}{2}{2}$, with explicit constants, and proves $\Sob{1}{2}(V) = H^1(V)$. The
+Fourier transform $\widehat F$ of $F \in L_2(V)$ is Plancherel's, Mathlib's linear isometry of
+$L_2(V)$, and Mathlib identifies it with the Fourier transform of the tempered distribution of
+$F$ (\texttt{Lp.\allowbreak fourier\_\allowbreak toTemperedDistribution\_\allowbreak eq}).
+
+\begin{lemma}[The Fourier transform of integrable functions]
+\label{lem:fourier-integrable}
+\lean{Rd.integral_fourier_smul_eq_of_integrable, Rd.norm_fourier_le_integral_norm,
+  Rd.memLp_top_fourier}
+\leanok
+\uses{lem:fourier-conv}
+For every Schwartz function $u$ and every integrable $g$ on $V$,
+$\int \widehat u \, g = \int u \, \widehat g$. For every integrable $K$ on $V$,
+$|\widehat K(\xi)| \leq \|K\|_1$ for every $\xi \in V$, and $\widehat K \in L_\infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's \texttt{VectorFourier.\allowbreak integral\_\allowbreak fourierIntegral\_\allowbreak
+smul\_\allowbreak eq\_\allowbreak flip} and \texttt{VectorFourier.\allowbreak norm\_\allowbreak
+fourierIntegral\_\allowbreak le\_\allowbreak integral\_\allowbreak norm}; $\widehat K$ is
+continuous by \Cref{lem:fourier-conv}, hence measurable.
+\end{proof}
+
+\begin{lemma}[Plancherel's theorem]
+\label{lem:plancherel-l2}
+\lean{Rd.two_ne_top, Rd.enorm_fourier_Lp_two, Rd.enorm_sq_eq_lintegral}
+\leanok
+In $[0, \infty]$, $2 \neq \infty$. For every $F \in L_2(V)$, $\|\widehat F\|_2 = \|F\|_2$. On
+every measure space, $\|F\|_2^2 = \int |F|^2$ for every $F \in L_2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Fourier transform on $L_2(V)$ is a linear isometry in Mathlib
+(\texttt{Lp.\allowbreak norm\_\allowbreak fourier\_\allowbreak eq}), in particular continuous
+(\texttt{FourierTransform.\allowbreak continuous\_\allowbreak fourier}). The last identity is
+the definition of the $L_2$ norm.
+\end{proof}
+
+\begin{theorem}[The convolution theorem on $L_2$]
+\label{thm:convolution-theorem-l2}
+\lean{Rd.fourier_convLp_toLp, Rd.fourier_convLp, Rd.fourier_lpBlock, Rd.enorm_lpBlock_sq}
+\leanok
+\uses{lem:fourier-integrable, lem:fourier-conv, lem:plancherel-l2, lem:conv-op, def:lp-blocks,
+  lem:lp-kernels-basic}
+For every integrable $K$ on $V$ and every $f \in L_2(V)$,
+$\widehat{K * f} = \widehat K \, \widehat f$ almost everywhere. In particular, for every
+$f \in L_2(V)$ and every $j \in \N$, $\widehat{\Delta_j f} = \widehat{\psi_j} \, \widehat f$
+almost everywhere and
+\[
+  \|\Delta_j f\|_2^2 = \int_V |\widehat{\psi_j}(\xi)|^2 \, |\widehat f(\xi)|^2 \, d\xi .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let first $f = \varphi$ be a Schwartz function. Then $K * \varphi$ is integrable, and for every
+Schwartz function $u$, by \Cref{lem:fourier-integrable} and
+$\widehat{K * \varphi} = \widehat K \, \widehat \varphi$ for integrable functions
+(\Cref{lem:fourier-conv}),
+\[
+  \int \widehat u \, (K * \varphi) = \int u \, \widehat{K * \varphi}
+  = \int u \, \widehat K \, \widehat \varphi .
+\]
+The left side is the Fourier transform of the tempered distribution of $K * \varphi$ applied to
+$u$, which is the tempered distribution of the $L_2$ Fourier transform of $K * \varphi$ applied
+to $u$. So the tempered distributions of the $L_2$ functions $\widehat{K * \varphi}$ and
+$\widehat K \, \widehat \varphi$ agree, and an $L_2$ function is determined by its tempered
+distribution (Mathlib's
+\texttt{Lp.\allowbreak ker\_\allowbreak toTemperedDistributionCLM\_\allowbreak
+eq\_\allowbreak bot}). Both sides of the identity are continuous in $f \in L_2(V)$: the left by
+Young's inequality (\Cref{lem:conv-op}) and \Cref{lem:plancherel-l2}, the right because
+$\widehat K \in L_\infty$ (\Cref{lem:fourier-integrable}). Schwartz functions are dense in
+$L_2(V)$, so the identity holds for all $f$. The statement on the blocks is the case
+$K = \psi_j$, and the norm identity follows with \Cref{lem:plancherel-l2}.
+\end{proof}
+
+\begin{definition}[The Bessel weight]
+\label{def:bessel-weight}
+\lean{Rd.besselWeight}
+\leanok
+For $s \in \R$ and $\xi \in V$, $\langle \xi \rangle^s = (1 + |\xi|^2)^{s/2}$.
+\end{definition}
+
+The Bessel weight is the symbol of Mathlib's Bessel potential $J_s$:
+$\widehat{J_s u} = \langle \cdot \rangle^s \widehat u$.
+
+\begin{lemma}[Elementary properties of the weights]
+\label{lem:bessel-weight-basic}
+\lean{Rd.besselWeight_nonneg, Rd.hasTemperateGrowth_besselWeight, Rd.enorm_besselWeight,
+  Rd.ofReal_besselWeight_sq, Rd.norm_le_besselWeight_one, ENNReal.dyadicWeight_sq,
+  Rd.one_add_norm_sq_le_of_norm_lt}
+\leanok
+\uses{def:bessel-weight, def:lq-norm}
+For every $s \in \R$, the Bessel weight $\xi \mapsto \langle \xi \rangle^s$ is nonnegative and
+smooth with polynomially bounded derivatives, $(\langle \xi \rangle^s)^2 = (1 + |\xi|^2)^s$ and
+$|\xi| \leq \langle \xi \rangle^1$ for every $\xi \in V$, and $(2^{js})^2 = (4^j)^s$ for every
+$j \in \N$. For every $j \in \N$ and every $\xi \in V$ with $|\xi| < 2^{j+1}$,
+$1 + |\xi|^2 \leq 5 \cdot 4^j$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The smoothness and the growth bounds of $(1 + |\xi|^2)^{s/2}$ are in Mathlib. Further,
+$|\xi|^2 < 4^{j+1} = 4 \cdot 4^j$ and $1 \leq 4^j$.
+\end{proof}
+
+\begin{lemma}[Two elementary inequalities]
+\label{lem:elementary-square-inequalities}
+\lean{Rd.one_le_two_mul_enorm_sq_add, Rd.le_rpow_half_mul_of_sq_le}
+\leanok
+For all $x, y \in \C$ with $x + y = 1$, $1 \leq 2(|x|^2 + |y|^2)$. For all
+$a, b, c \in [0, \infty]$ with $a^2 \leq c \, b^2$, $a \leq c^{1/2} \, b$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$1 \leq |x| + |y|$ by the triangle inequality, and $(|x| + |y|)^2 \leq 2(|x|^2 + |y|^2)$
+(Mathlib's \texttt{add\_\allowbreak sq\_\allowbreak le}); and $(c^{1/2} b)^2 = c \, b^2$.
+\end{proof}
+
+\begin{lemma}[At most two blocks see a frequency]
+\label{lem:fourier-psi-window}
+\lean{Rd.norm_fourier_psi_le_one, Rd.enorm_fourier_psi_le_one, Rd.sum_range_fourier_psi,
+  Rd.exists_fourier_psi_window, Rd.four_pow_le_of_fourier_psi_ne_zero}
+\leanok
+\uses{def:lp-kernels, lem:lp-kernels-frequency}
+For every $j \in \N$ and every $\xi \in V$, $|\widehat{\psi_j}(\xi)| \leq 1$, and if
+$\widehat{\psi_j}(\xi) \neq 0$, then $4^j \leq 4(1 + |\xi|^2)$. For every $J \in \N$ and every
+$\xi \in V$, $\sum_{i=0}^J \widehat{\psi_i}(\xi) = \widehat{\Phi_J}(\xi)$. For every $\xi \in V$
+there is $a \in \N$ with $|\xi| < 2^{a+1}$,
+$\widehat{\psi_j}(\xi) = 0$ for every $j \notin \{a, a+1\}$, and
+$\widehat{\psi_a}(\xi) + \widehat{\psi_{a+1}}(\xi) = 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\widehat{\psi_0}(\xi) = \chi_{1,2}(\xi)$ and
+$\widehat{\psi_{j+1}}(\xi) = \chi_{1,2}(2^{-j-1}\xi) - \chi_{1,2}(2^{-j}\xi)$ with values of
+$\chi_{1,2}$ in $[0, 1]$ (\Cref{lem:lp-kernels-frequency}); the sum telescopes. If
+$\widehat{\psi_{i+1}}(\xi) \neq 0$, then $|\xi| > 2^i$ by \Cref{lem:lp-kernels-frequency}, so
+$4^{i+1} = 4 (2^i)^2 < 4 |\xi|^2$. Let $a$ be the least index with $|\xi| < 2^{a+1}$. For $j < a$,
+$|\xi| \geq 2^{j+1}$, so $\widehat{\psi_j}(\xi) = 0$; for $j \geq a + 2$, $j = i + 1$ with
+$|\xi| < 2^{a+1} \leq 2^i$, so $\widehat{\psi_j}(\xi) = 0$. Finally
+$\widehat{\psi_a}(\xi) + \widehat{\psi_{a+1}}(\xi) = \sum_{j=0}^{a+1} \widehat{\psi_j}(\xi)
+= \chi_{1,2}(2^{-a-1}\xi) = 1$.
+\end{proof}
+
+\begin{proposition}[The Bessel weight and the Littlewood--Paley weights]
+\label{prop:bessel-lp-weights}
+\lean{Rd.dyadicWeight_sq_le_of_fourier_psi_ne_zero, Rd.ofReal_besselWeight_sq_le_of_norm_lt,
+  Rd.tsum_dyadicWeight_fourier_psi_sq_le, Rd.ofReal_besselWeight_sq_le_tsum}
+\leanok
+\uses{lem:bessel-weight-basic, lem:elementary-square-inequalities, lem:fourier-psi-window}
+For every $s \geq 0$, every $j \in \N$ and every $\xi \in V$: if $\widehat{\psi_j}(\xi) \neq 0$,
+then $2^{2js} \leq 4^s \langle \xi \rangle^{2s}$; if $|\xi| < 2^{j+1}$, then
+$\langle \xi \rangle^{2s} \leq 5^s \, 2^{2js}$; and
+\[
+  \sum_{j \in \N} 2^{2js} |\widehat{\psi_j}(\xi)|^2 \leq 2 \cdot 4^s \langle \xi \rangle^{2s},
+  \qquad
+  \langle \xi \rangle^{2s} \leq 2 \cdot 5^s \sum_{j \in \N} 2^{2js} |\widehat{\psi_j}(\xi)|^2 .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+The first two bounds are $(4^j)^s \leq (4(1 + |\xi|^2))^s$ and
+$(1 + |\xi|^2)^s \leq (5 \cdot 4^j)^s$ (\Cref{lem:fourier-psi-window,lem:bessel-weight-basic}),
+using $s \geq 0$. Let $a$ be as in \Cref{lem:fourier-psi-window}. The sum has at most the two
+terms $j = a, a + 1$, each at most $4^s \langle \xi \rangle^{2s}$, since
+$|\widehat{\psi_j}(\xi)| \leq 1$. Both $j = a$ and $j = a + 1$ satisfy $|\xi| < 2^{j+1}$, and
+$1 \leq 2 (|\widehat{\psi_a}(\xi)|^2 + |\widehat{\psi_{a+1}}(\xi)|^2)$ by
+\Cref{lem:elementary-square-inequalities}, so
+$\langle \xi \rangle^{2s} \leq 2 \sum_{j \in \{a, a+1\}} \langle \xi \rangle^{2s}
+|\widehat{\psi_j}(\xi)|^2 \leq 2 \cdot 5^s \sum_{j \in \{a, a+1\}} 2^{2js}
+|\widehat{\psi_j}(\xi)|^2$.
+\end{proof}
+
+\begin{lemma}[Temperate weights and $L_p$ functions]
+\label{lem:temperate-weight-lp}
+\lean{Rd.smulLeftCLM_toTemperedDistribution_eq, Rd.ae_eq_of_smulLeftCLM_eq}
+\leanok
+Let $w$ be a smooth function on $V$ with polynomially bounded derivatives, and
+$1 \leq p, q \leq \infty$. For every $g \in L_p(V)$ with $w g \in L_q(V)$, the product of $w$
+with the tempered distribution of $g$ is the tempered distribution of $w g$. For every
+$G \in L_p(V)$ and every $H \in L_q(V)$ such that $w G = H$ as tempered distributions,
+$w G = H$ almost everywhere.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both distributions in the first statement send a Schwartz function $u$ to $\int u \, w g$. In
+the second, $w G$ and $H$ are locally integrable, and testing with the Schwartz functions
+$\varphi \in C^\infty_c(V)$ gives $\int \varphi \, w G = \int \varphi \, H$; such functions
+are equal almost everywhere (Mathlib's \texttt{ae\_\allowbreak eq\_\allowbreak of\_\allowbreak
+integral\_\allowbreak contDiff\_\allowbreak smul\_\allowbreak eq}).
+\end{proof}
+
+\begin{lemma}[Bessel potentials of $L_2$ functions]
+\label{lem:bessel-potential-l2}
+\lean{Rd.fourier_ae_eq_of_besselPotential_eq, Rd.enorm_sq_eq_lintegral_of_besselPotential_eq,
+  Rd.memLp_besselWeight_mul_fourier, Rd.memSobolev_two_of_lintegral_lt_top,
+  Rd.exists_toTemperedDistribution_eq_of_besselPotential_eq}
+\leanok
+\uses{def:bessel-weight, lem:bessel-weight-basic, lem:temperate-weight-lp, lem:plancherel-l2}
+Let $s \in \R$. For all $f, h \in L_2(V)$ with $J_s f = h$, $\widehat h = \langle \cdot \rangle^s
+\widehat f$ almost everywhere and
+\[
+  \|h\|_2^2 = \int_V \langle \xi \rangle^{2s} |\widehat f(\xi)|^2 \, d\xi .
+\]
+For every $f \in L_2(V)$ with $\int \langle \xi \rangle^{2s} |\widehat f(\xi)|^2 \, d\xi < \infty$,
+$\langle \cdot \rangle^s \widehat f \in L_2(V)$ and $f \in H^s(V)$. If $s \geq 0$, then every
+tempered distribution $u$ with $J_s u \in L_2(V)$ is an $L_2(V)$ function.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Fourier transform of $J_s f$ is $\langle \cdot \rangle^s \widehat f$ as tempered
+distributions, so the first identity is \Cref{lem:temperate-weight-lp}, and the second follows by
+\Cref{lem:plancherel-l2}. In the second statement, $\langle \cdot \rangle^s \widehat f$ is the
+Fourier transform of $J_s f$ by \Cref{lem:temperate-weight-lp}, so $J_s f$ is the inverse Fourier
+transform of an $L_2$ function (Mathlib's \texttt{TemperedDistribution.\allowbreak
+memSobolev\_\allowbreak iff\_\allowbreak exists\_\allowbreak smulLeftCLM\_\allowbreak fourier}).
+For the third, $u = J_{-s}(J_s u)$, and $J_{-s}$ maps $L_2(V) = H^0(V)$ into $L_2(V)$ for
+$-s \leq 0$ (Mathlib's \texttt{TemperedDistribution.\allowbreak MemSobolev.\allowbreak mono}).
+\end{proof}
+
+\begin{lemma}[The Triebel--Lizorkin norm of $\TL{s}{2}{2}$ on the frequency side]
+\label{lem:tl-two-fourier}
+\lean{Rd.triebelLizorkinNorm_two_sq, Rd.triebelLizorkinNorm_two_sq_le,
+  Rd.lintegral_besselWeight_sq_le}
+\leanok
+\uses{def:triebel-lizorkin, thm:tl-diagonal, thm:convolution-theorem-l2,
+  prop:bessel-lp-weights}
+For every $s \in \R$ and every $f \in L_2(V)$,
+\[
+  \|f\|_{F^s_{2,2}}^2 = \int_V \Bigl( \sum_{j \in \N} 2^{2js} |\widehat{\psi_j}(\xi)|^2 \Bigr)
+  |\widehat f(\xi)|^2 \, d\xi ,
+\]
+and if $s \geq 0$, then
+$\|f\|_{F^s_{2,2}}^2 \leq 2 \cdot 4^s \int_V \langle \xi \rangle^{2s} |\widehat f(\xi)|^2 \, d\xi$
+and $\int_V \langle \xi \rangle^{2s} |\widehat f(\xi)|^2 \, d\xi \leq 2 \cdot 5^s
+\|f\|_{F^s_{2,2}}^2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{thm:tl-diagonal}, $\|f\|_{F^s_{2,2}}^2 = \sum_j 2^{2js} \|\Delta_j f\|_2^2$; insert
+\Cref{thm:convolution-theorem-l2} and interchange sum and integral (Tonelli). The bounds follow
+from \Cref{prop:bessel-lp-weights} under the integral.
+\end{proof}
+
+\begin{theorem}[$H^s = \TL{s}{2}{2}$]
+\label{thm:sobolev-two-triebel-lizorkin}
+\lean{Rd.triebelLizorkinNorm_le_of_besselPotential_eq,
+  Rd.enorm_besselPotential_le_triebelLizorkinNorm, Rd.memSobolev_two_iff_memTriebelLizorkin}
+\leanok
+\uses{lem:bessel-potential-l2, lem:tl-two-fourier, lem:elementary-square-inequalities}
+For every $s \geq 0$ and all $f, h \in L_2(V)$ with $J_s f = h$,
+\[
+  \|f\|_{F^s_{2,2}} \leq (2 \cdot 4^s)^{1/2} \, \|h\|_2
+  \quad \text{and} \quad
+  \|h\|_2 \leq (2 \cdot 5^s)^{1/2} \, \|f\|_{F^s_{2,2}} .
+\]
+For every $s \geq 0$, a tempered distribution $u$ lies in $H^s(V)$ if and only if $u$ is a
+function $f \in L_2(V)$ with $f \in \TL{s}{2}{2}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:bessel-potential-l2}, $\|h\|_2^2 = \int \langle \xi \rangle^{2s} |\widehat f|^2$,
+and \Cref{lem:tl-two-fourier} gives both bounds after taking square roots
+(\Cref{lem:elementary-square-inequalities}). If $u \in H^s(V)$, then $u = f \in L_2(V)$ by
+\Cref{lem:bessel-potential-l2}, and the first bound shows $f \in \TL{s}{2}{2}$. Conversely, for
+$f \in \TL{s}{2}{2}$, $\int \langle \xi \rangle^{2s} |\widehat f|^2 < \infty$ by
+\Cref{lem:tl-two-fourier}, so $f \in H^s(V)$ by \Cref{lem:bessel-potential-l2}.
+\end{proof}
+
+\begin{corollary}[$H^s = \Besov{s}{2}{2}$]
+\label{cor:sobolev-two-besov}
+\lean{Rd.memSobolev_two_iff_exists_memApprox, Rd.memSobolev_two_iff_littlewoodPaleyNorm_lt_top,
+  Rd.exists_eq_toDistr_two}
+\leanok
+\uses{thm:sobolev-two-triebel-lizorkin, thm:tl-diagonal, def:band-space, def:lp-blocks,
+  lem:bessel-potential-l2}
+For every $s > 0$, a tempered distribution $u$ lies in $H^s(V)$ if and only if $u$ is a function
+$f \in L_2(V)$ with $f \in \Besov{s}{2}{2}$, the approximation space $A^s_2$ of the
+band-limited scheme. For every $s \geq 0$, $u \in H^s(V)$ if and only if $u$ is a function
+$f \in L_2(V)$ with $\|f\|^{\mathrm{LP}}_{s,2} < \infty$, and every element $F$ of Mathlib's
+bundled space $H^s(V)$ is a function $f \in \TL{s}{2}{2}$ with
+$\|f\|_{F^s_{2,2}} \leq (2 \cdot 4^s)^{1/2} \|F\|_{H^s}$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:sobolev-two-triebel-lizorkin} and \Cref{thm:tl-diagonal} with $p = 2$. An element $F$
+of the bundled space carries $J_s F$ as an $L_2$ function of norm $\|F\|_{H^s}$.
+\end{proof}
+
+\begin{lemma}[Derivatives on the frequency side]
+\label{lem:derivative-fourier-l2}
+\lean{Rd.fourier_ae_eq_of_lineDerivOp_eq, Rd.norm_two_pi_I_inner_le, Rd.lintegral_inner_sq_eq,
+  Rd.ofReal_besselWeight_one_sq, Rd.lintegral_besselWeight_one_sq_eq}
+\leanok
+\uses{lem:temperate-weight-lp, lem:plancherel-l2, lem:bessel-weight-basic}
+For every $v \in V$ and all $f, g \in L_2(V)$ with $\partial_v f = g$ as tempered distributions,
+$\widehat g(\xi) = 2 \pi i \langle \xi, v \rangle \widehat f(\xi)$ for almost every $\xi$ and
+\[
+  (2\pi)^2 \int_V \langle \xi, v \rangle^2 |\widehat f(\xi)|^2 \, d\xi = \|g\|_2^2 ;
+\]
+moreover $|2 \pi i \langle \xi, v \rangle| \leq 2 \pi |v| \langle \xi \rangle^1$ for every
+$\xi \in V$. For every orthonormal basis $(e_i)_{i \in I}$ of $V$,
+$(\langle \xi \rangle^1)^2 = 1 + \sum_i \langle \xi, e_i \rangle^2$ for every $\xi \in V$, and
+for all $f \in L_2(V)$ and $g_i \in L_2(V)$ with $\partial_{e_i} f = g_i$ as tempered
+distributions for every $i \in I$,
+\[
+  (2\pi)^2 \int_V (\langle \xi \rangle^1)^2 |\widehat f(\xi)|^2 \, d\xi
+  = (2\pi)^2 \|f\|_2^2 + \sum_i \|g_i\|_2^2 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Fourier transform of $\partial_v f$ is $2 \pi i \langle \cdot, v \rangle \widehat f$ as
+tempered distributions (Mathlib's \texttt{TemperedDistribution.\allowbreak fourier\_\allowbreak
+lineDerivOp\_\allowbreak eq}), so the first identity is \Cref{lem:temperate-weight-lp} and the
+second follows by \Cref{lem:plancherel-l2}. The bound is the Cauchy--Schwarz inequality with
+$|\xi| \leq \langle \xi \rangle^1$. Parseval's identity
+$|\xi|^2 = \sum_i \langle \xi, e_i \rangle^2$ (Mathlib's \texttt{OrthonormalBasis.\allowbreak
+sum\_\allowbreak sq\_\allowbreak inner\_\allowbreak left}) gives the expansion of
+$(\langle \xi \rangle^1)^2$; integrate it against $|\widehat f|^2$ and use the first part for
+each $e_i$.
+\end{proof}
+
+\begin{theorem}[$\Sob{1}{2} = H^1$]
+\label{thm:sobolev-one-two}
+\lean{Rd.memSobolev_one_iff, Rd.enorm_le_of_hasWeakLineDeriv, Rd.enorm_besselPotential_one_sq_eq}
+\leanok
+\uses{def:weak-line-derivative, cor:sobolev-tempered, thm:weak-derivative-tempered,
+  lem:derivative-fourier-l2, lem:bessel-potential-l2, def:dyadic-cells}
+For every $f \in L_2(V)$, $f \in \Sob{1}{2}(V)$ if and only if $f \in H^1(V)$. For every
+$v \in V$ and all $f, g, h \in L_2(V)$ such that $g$ is the weak derivative $\partial_v f$ on $V$
+and $J_1 f = h$, $\|g\|_2 \leq 2 \pi |v| \, \|h\|_2$. For every orthonormal basis
+$(e_i)_{i \in I}$ of $V$ and all $f, h, g_i \in L_2(V)$ such that $g_i$ is the weak derivative
+$\partial_{e_i} f$ on $V$ for every $i \in I$ and $J_1 f = h$,
+\[
+  (2\pi)^2 \|h\|_2^2 = (2\pi)^2 \|f\|_2^2 + \sum_i \|g_i\|_2^2 .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Weak derivatives on $V$ of $L_2$ functions are derivatives of tempered distributions
+(\Cref{thm:weak-derivative-tempered,cor:sobolev-tempered}). If $f \in \Sob{1}{2}(V)$, the
+weak derivatives $g_i = \partial_{e_i} f \in L_2(V)$ along the orthonormal basis $(e_i)_i$ of
+\Cref{def:dyadic-cells} make
+$\int (\langle \xi \rangle^1)^2 |\widehat f|^2$ finite (\Cref{lem:derivative-fourier-l2}), so
+$f \in H^1(V)$ by \Cref{lem:bessel-potential-l2}. If $f \in H^1(V)$, then $\partial_v f \in
+H^0(V) = L_2(V)$ for every $v \in V$ (Mathlib's \texttt{TemperedDistribution.\allowbreak
+MemSobolev.\allowbreak lineDerivOp}), and the derivative of order $0$ is $f$ itself. The bound
+compares $\widehat g = 2 \pi i \langle \cdot, v \rangle \widehat f$ with
+$\widehat h = \langle \cdot \rangle^1 \widehat f$ pointwise
+(\Cref{lem:derivative-fourier-l2,lem:bessel-potential-l2}) and uses \Cref{lem:plancherel-l2};
+the identity is \Cref{lem:derivative-fourier-l2} with
+$\|h\|_2^2 = \int (\langle \xi \rangle^1)^2 |\widehat f|^2$.
 \end{proof}
 
 \chapter{Besov spaces on compact manifolds}

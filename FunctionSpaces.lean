@@ -175,6 +175,7 @@ public import FunctionSpaces.Torus.TriebelLizorkinLocalMeans
 public import FunctionSpaces.Rd.TriebelLizorkinDifferences
 public import FunctionSpaces.Rd.TriebelLizorkinAtoms
 public import FunctionSpaces.Rd.WeakDerivatives
+public import FunctionSpaces.Rd.SobolevTwoLittlewoodPaley
 
 /-!
 # Function spaces
@@ -583,4 +584,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   distributions, integration by parts against test functions, uniqueness, locality, limits in
   `L_p`, the Sobolev spaces `W^m_p(Ω)` and `W^m_p(ℝ^d)`, and the identification with derivatives
   of tempered distributions on `ℝ^d`.
+* `FunctionSpaces.Rd.SobolevTwoLittlewoodPaley`: the convolution theorem on `L_2(ℝ^d)`, Mathlib's
+  Sobolev spaces `H^s(ℝ^d)` as the Triebel–Lizorkin spaces `F^s_{2,2}(ℝ^d)` for `s ≥ 0` and the
+  Besov spaces `B^s_{2,2}(ℝ^d)` for `s > 0`, with explicit constants, and
+  `W^1_2(ℝ^d) = H^1(ℝ^d)`.
 -/

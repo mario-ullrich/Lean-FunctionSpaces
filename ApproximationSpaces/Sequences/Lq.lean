@@ -343,6 +343,14 @@ theorem dyadicWeight_rpow (s p : ℝ) (k : ℕ) : dyadicWeight s k ^ p = dyadicW
 theorem dyadicWeight_eq_pow (s : ℝ) (k : ℕ) : dyadicWeight s k = ((2 : ℝ≥0∞) ^ s) ^ k := by
   rw [dyadicWeight, mul_comm, ENNReal.rpow_mul_natCast]
 
+/-- The squared dyadic weight: `(2^(ks))² = (4^k)^s`. -/
+theorem dyadicWeight_sq (s : ℝ) (k : ℕ) : dyadicWeight s k ^ 2 = ((4 : ℝ≥0∞) ^ k) ^ s := by
+  rw [dyadicWeight, ← ENNReal.rpow_mul_natCast, ← ENNReal.rpow_natCast (4 : ℝ≥0∞) k,
+    ← ENNReal.rpow_mul, show (4 : ℝ≥0∞) = 2 ^ (2 : ℝ) by norm_num, ← ENNReal.rpow_mul]
+  congr 1
+  push_cast
+  ring
+
 /-- For `s ≥ 0` the dyadic weights increase in `k`. -/
 theorem dyadicWeight_mono (hs : 0 ≤ s) : Monotone (dyadicWeight s) := fun _ _ hkj =>
   ENNReal.rpow_le_rpow_of_exponent_le one_le_two
