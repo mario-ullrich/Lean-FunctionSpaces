@@ -3,7 +3,7 @@
 A Lean 4 / Mathlib formalisation of **Besov, Triebel–Lizorkin and Sobolev spaces** on several
 domains, their equivalent **characterisations** and their **embedding theorems**, built on the
 theory of **approximation spaces**. The project is work in progress; the details are in ten
-documents under [`docs/`](docs/), listed under [What is formalised](#what-is-formalised).
+block documents under [`docs/`](docs/), listed under [What is formalised](#what-is-formalised).
 
 * **Blueprint** (a webpage explaining the mathematics):
   <https://mario-ullrich.github.io/Lean-FunctionSpaces/>
@@ -25,7 +25,8 @@ classical Besov space `B^s_{p,q}(ℝ^d)` consists of the `f ∈ L_p(ℝ^d)` with
 ω_r(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_p .
 ```
 
-Sobolev spaces appear as `W^m_2` through weak derivatives and as `H^s` through Fourier
+Sobolev spaces appear as `W^m_p` through weak derivatives on open subsets of `ℝ^d` and as `W^m_2`
+on the torus, as `H^s` through Mathlib's Bessel potentials on `ℝ^d` and through Fourier
 coefficients on the torus, and abstractly as every space with Jackson's and Bernstein's
 inequalities of order `s`, the form in which their embeddings are proved.
 
@@ -216,6 +217,32 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   (`Rd.memTriebelLizorkin_iff_tlDiffNorm_lt_top`). The block document also describes
   `F^s_{p,q}` by atoms.
 
+**Sobolev spaces on `ℝ^d`** ([details](docs/SobolevRd.md))
+
+* **The Mathlib bridge: `H^s(ℝ^d) = B^s_{2,2}(ℝ^d)`.** Let `V` be a finite-dimensional real
+  inner product space, such as `ℝ^d`, and `H^s(V)` Mathlib's Sobolev space of the tempered
+  distributions `u` with `J_s u = 𝓕⁻¹(⟨ξ⟩^s 𝓕u) ∈ L_2(V)`, `⟨ξ⟩ = (1 + ‖ξ‖²)^(1/2)`. For `s ≥ 0`,
+  `u ∈ H^s(V)` iff `u` is a function `f ∈ L_2(V)` in `F^s_{2,2}(V)`, and then
+  `(2 · 5^s)^(-1/2) ‖J_s f‖_2 ≤ ‖f‖_{F^s_{2,2}} ≤ (2 · 4^s)^(1/2) ‖J_s f‖_2`
+  (`Rd.memSobolev_two_iff_memTriebelLizorkin`, `Rd.triebelLizorkinNorm_le_of_besselPotential_eq`,
+  `Rd.enorm_besselPotential_le_triebelLizorkinNorm`); for `s > 0` this is the Besov space
+  `B^s_{2,2}(V)` (`Rd.memSobolev_two_iff_exists_memApprox`).
+* **Weak derivatives and `W^1_2 = H^1`.** For locally integrable `f`, `g` on an open set `Ω ⊆ V`,
+  `g` is the weak derivative `∂^v f = ∂_{v_0} ⋯ ∂_{v_{k-1}} f` on `Ω` iff
+  `∫ φ g = (-1)^k ∫ (∂^v φ) f` for every smooth compactly supported real `φ` in `Ω`
+  (`Rd.HasWeakLineDeriv`, `Rd.hasWeakLineDeriv_iff_integral`), and `f ∈ L_2(V)` lies in
+  `W^1_2(V)` iff it lies in `H^1(V)` (`Rd.memSobolev_one_iff`).
+* **`H^1` on bounded Lipschitz domains.** On a bounded Lipschitz domain `Ω` with boundary `Γ`,
+  `H^1(Ω)` consists of the `f ∈ L_2(V)` that agree on `Ω` with a function of `H^1(V)`
+  (`Rd.BoundedLipschitzDomain.MemSobolevOn`); for every order `r ≥ 2`, `f ∈ H^1(Ω)` iff
+  `‖f‖_{L_2(Ω)} + ‖(2^k ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞`
+  (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_modulusOn`); every `f ∈ H^1(Ω)` has weak
+  derivatives in `L_2(Ω)` (`Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`), and the
+  boundary traces of the functions of `H^1(Ω)` are the functions of `B^{1/2}_{2,2}(Γ)`
+  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`).
+* **Rellich's theorem.** For every bounded set `Ω ⊆ V`, the restriction from `H^1(V)` to
+  `L_2(Ω)` is a compact operator (`Rd.isCompactOperator_restr_toL2`).
+
 **Domains, manifolds and traces** ([details](docs/DomainsTraces.md))
 
 * **Besov spaces on bounded Lipschitz domains by intrinsic differences.** Let `Ω ⊆ V` be a bounded
@@ -268,7 +295,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
 | [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): mixed norms, maximal functions, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, local means, ball means of differences, atoms, the torus | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem | ✅ | ✗ |
 | [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 
@@ -294,9 +321,14 @@ manifolds in `FunctionSpaces/Manifold/`; the Triebel–Lizorkin block is the mix
 `FunctionSpaces/Lp/MixedNorms.lean`, the files
 `FunctionSpaces/Rd/{DyadicCubes,HardyLittlewoodMaximal,CalderonZygmund}`,
 `FunctionSpaces/Rd/{FeffermanStein,KernelMajorants}` and `FunctionSpaces/Rd/TriebelLizorkin*`, and
-`FunctionSpaces/Torus/{TriebelLizorkin,PeriodicLift,FeffermanStein,TriebelLizorkinLocalMeans}`.
+`FunctionSpaces/Torus/{TriebelLizorkin,PeriodicLift,FeffermanStein,TriebelLizorkinLocalMeans}`;
+Sobolev spaces on `ℝ^d` are `FunctionSpaces/Rd/{WeakDerivatives,SobolevTwoLittlewoodPaley}` and
+`FunctionSpaces/Rd/{LipschitzDomainH1,RellichCompactness}`.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
+[docs/FEECInterface.md](docs/FEECInterface.md) describes the interface to a FEEC/BEEC library
+built on this project: the Lean names of its interface items, the decisions behind them, and what
+that library builds itself.
 `blueprint/` holds the LaTeX source of the blueprint and the scripts that check and link its
 `\lean` references.
 
@@ -305,8 +337,7 @@ Each block document lists its files.
 * **Reiteration** for approximation and interpolation spaces.
 * **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,
   elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.
-* **Sobolev spaces for all `p`**: weak derivatives in `L_p`, Fourier multipliers and
-  `H^s_p = F^s_{p,2}`.
+* **Sobolev spaces for all `p`**: `W^m_p = F^m_{p,2}` and `H^s_p = F^s_{p,2}`.
 * **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and their ball means and atoms on the
   torus.
 * **Higher smoothness**: splines on domains; for the Daubechies wavelets the sharp `L_p`
@@ -356,9 +387,15 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 
 ## References
 
+* R. A. Adams, J. J. F. Fournier, *Sobolev Spaces*, 2nd ed., Pure and Applied Mathematics **140**,
+  Elsevier/Academic Press, 2003. Sobolev spaces on domains and their compact embeddings,
+  with the rooms-and-passages domains.
 * J. Bergh, J. Löfström, *Interpolation Spaces. An Introduction*, Grundlehren der
   mathematischen Wissenschaften **223**, Springer-Verlag, 1976. Real interpolation and the
   K-functional.
+* S. N. Chandler-Wilde, D. P. Hewett, A. Moiola, *Sobolev spaces on non-Lipschitz subsets of
+  ℝ^n with application to boundary integral equations on fractal screens*, Integral Equations
+  Operator Theory **87** (2017), no. 2, 179–224. Sobolev spaces on domains as restriction spaces.
 * I. Daubechies, *Ten Lectures on Wavelets*, CBMS-NSF Regional Conference Series in Applied
   Mathematics **61**, SIAM, 1992. The construction of the compactly supported wavelets and the
   cascade algorithm.
@@ -374,6 +411,8 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   Anal. **23** (1992), no. 4, 1015–1030. The transfer operator and the Sobolev exponent.
 * C. Fefferman, E. M. Stein, *Some maximal inequalities*, Amer. J. Math. **93** (1971), no. 1,
   107–115. The vector-valued maximal inequality.
+* W. McLean, *Strongly Elliptic Systems and Boundary Integral Equations*, Cambridge University
+  Press, 2000. Traces on Lipschitz domains and the kernel of the trace map.
 * S. M. Nikol'skii, *Approximation of Functions of Several Variables and Imbedding
   Theorems*, Grundlehren der mathematischen Wissenschaften **205**, Springer-Verlag, 1975.
   The Nikolskii inequality and the embedding theorems it yields.
@@ -386,6 +425,9 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   pointwise multipliers in function spaces*, J. Funct. Anal. **264** (2013), no. 5, 1197–1237,
   [arXiv:1201.2280](https://arxiv.org/abs/1201.2280). Atoms with bounds instead of smoothness, and
   traces on Lipschitz domains through atoms.
+* E. M. Stein, *Singular Integrals and Differentiability Properties of Functions*, Princeton
+  Mathematical Series **30**, Princeton University Press, 1970. The extension theorem for
+  Sobolev spaces on Lipschitz domains.
 * E. M. Stein, *Harmonic Analysis: Real-Variable Methods, Orthogonality, and Oscillatory
   Integrals*, Princeton Mathematical Series **43**, Princeton University Press, 1993. The
   maximal function and the Calderón–Zygmund decomposition.

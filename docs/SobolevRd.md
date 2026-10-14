@@ -11,7 +11,9 @@ Mathlib's Bessel potential spaces `H^s`, `s ≥ 0`, with the Triebel–Lizorkin 
 (and, for `s > 0`, with the Besov spaces `B^s_{2,2}`) and shows `W^1_2 = H^1 = B^1_{2,2}`. On a
 bounded Lipschitz domain, `H^1` is the space of restrictions of `H^1(ℝ^d)`, with weak derivatives
 in `L_2` of the domain and boundary traces in `B^{1/2}_{2,2}` of the boundary. On every bounded
-set the restriction from `H^1(ℝ^d)` to `L_2` is compact (Rellich's theorem).
+set the restriction from `H^1(ℝ^d)` to `L_2` is compact (Rellich's theorem). The
+[interface document](FEECInterface.md) lists these results for a FEEC/BEEC library built on this
+project, with the decisions behind their form.
 
 ## Main results
 

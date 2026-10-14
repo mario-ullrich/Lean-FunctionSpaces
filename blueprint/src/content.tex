@@ -12052,6 +12052,22 @@ identifies their boundary traces with $B^{1/2}_{2,2}(\Gamma)$. \Cref{sec:rellich
 proves Rellich's theorem: the restriction from $H^1(V)$ to $L_2(\Omega)$ is compact for every
 bounded $\Omega \subseteq V$.
 
+On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
+(\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
+Chandler-Wilde, Hewett and Moiola \cite{ChandlerWildeHewettMoiola}; for restrictions of $H^1(V)$,
+Rellich's theorem holds on every bounded set (\Cref{sec:rellich-compactness}). Every restriction
+lies in the space $\Sob{1}{2}(\Omega)$ of weak derivatives, on every open set. On bounded
+Lipschitz domains the two spaces agree by the extension theorem of Calder\'on and Stein
+\cite[Chapter VI]{SteinSingular}, which the libraries built on this one supply; on some bounded
+open sets $\Sob{1}{2}(\Omega)$ is strictly larger, as for a disc with a slit removed, and its
+embedding into $L_2(\Omega)$ can fail to be compact, as for the rooms-and-passages domains
+\cite[Chapter 6]{AdamsFournier}. The norm bounds of this chapter are explicit on $V$; on bounded
+Lipschitz domains the extension and trace theorems carry existential constants, and the
+statements are equivalences of membership. On bounded Lipschitz domains the functions of
+$H^1(\Omega)$ with boundary trace zero form the closure of the test functions in $H^1(\Omega)$
+\cite[Theorem 3.40]{McLean}; this statement needs the normed space
+of $H^1(\Omega)$, which the libraries built on this one supply as well.
+
 \section{Weak derivatives on open sets and cut-offs of Schwartz functions}
 
 Throughout this section $\Omega \subseteq V$ is open, $\mathcal D(\Omega)$ is the space of
@@ -14834,11 +14850,23 @@ theorem holds for every $s > 0$ (\Cref{thm:half-space-trace-space,thm:manifold-t
 \bpbibheading
 \begin{thebibliography}{99}
 
+\bibitem{AdamsFournier}
+R.~A.~Adams, J.~J.~F.~Fournier,
+\emph{Sobolev Spaces}, 2nd ed.,
+Pure and Applied Mathematics (Amsterdam) \textbf{140}, Elsevier/Academic Press, Amsterdam, 2003.
+
 \bibitem{BerghLofstrom}
 J.~Bergh, J.~L\"ofstr\"om,
 \emph{Interpolation Spaces. An Introduction},
 Grundlehren der mathematischen Wissenschaften \textbf{223}, Springer-Verlag, Berlin, 1976,
 \href{https://doi.org/10.1007/978-3-642-66451-9}{doi}.
+
+\bibitem{ChandlerWildeHewettMoiola}
+S.~N.~Chandler-Wilde, D.~P.~Hewett, A.~Moiola,
+\emph{Sobolev spaces on non-Lipschitz subsets of $\R^n$ with application to boundary integral
+equations on fractal screens},
+Integral Equations Operator Theory \textbf{87} (2017), no.~2, 179--224,
+\href{https://doi.org/10.1007/s00020-017-2342-5}{doi}.
 
 \bibitem{Daubechies}
 I.~Daubechies,
@@ -14889,6 +14917,11 @@ SIAM J.\ Matrix Anal.\ Appl.\ \textbf{37} (2016), no.~1, 18--52,
 E.~Hern\'andez, G.~Weiss,
 \emph{A First Course on Wavelets},
 Studies in Advanced Mathematics, CRC Press, Boca Raton, 1996.
+
+\bibitem{McLean}
+W.~McLean,
+\emph{Strongly Elliptic Systems and Boundary Integral Equations},
+Cambridge University Press, Cambridge, 2000.
 
 \bibitem{Nikolskii}
 S.~M.~Nikol'ski\u{\i},

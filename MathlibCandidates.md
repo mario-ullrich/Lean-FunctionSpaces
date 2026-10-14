@@ -233,6 +233,31 @@ declarations.
   `χ(x/(n+1)) u(x)` of a Schwartz function converge to it in the Schwartz space
   (`Rd.tendsto_cutoffMul`), so tempered distributions are determined by test functions
   (`Rd.eq_zero_of_testSchwartz`).
+* **The convolution theorem on `L_2`** (`FunctionSpaces/Rd/SobolevTwoLittlewoodPaley.lean`): for
+  integrable `K` and `f ∈ L_2(V)`, `𝓕(K ⋆ f) = 𝓕K · 𝓕f` almost everywhere, with Plancherel's
+  Fourier transform on `L_2` (`Rd.fourier_convLp`), from the multiplication formulas
+  `∫ 𝓕u · g = ∫ u · 𝓕g` and `∫ 𝓕⁻u · g = ∫ u · 𝓕⁻g` for Schwartz `u` and integrable `g`
+  (Mathlib's `VectorFourier.integral_fourierIntegral_smul_eq_flip`, in the `𝓕` form
+  `Rd.integral_fourier_smul_eq_of_integrable`, `Rd.integral_fourierInv_smul_eq_of_integrable`;
+  Mathlib's `SchwartzMap.integral_fourier_smul_eq` and `SchwartzMap.integral_fourierInv_smul_eq`
+  are the forms for two Schwartz functions).
+  Mathlib has the convolution theorem for integrable functions
+  (`Real.fourier_bilin_convolution_eq`) and for Schwartz functions.
+* **Temperate weights times `L_p` functions** (`FunctionSpaces/Rd/SobolevTwoLittlewoodPaley.lean`):
+  if `w` has temperate growth, `g ∈ L_p(V)` and `w g ∈ L_q(V)`, then the product of `w` with the
+  tempered distribution of `g` is the tempered distribution of `w g`
+  (`Rd.smulLeftCLM_toTemperedDistribution_eq`), and an identity `w G = H` of tempered
+  distributions with `G ∈ L_p(V)`, `H ∈ L_q(V)` holds almost everywhere
+  (`Rd.ae_eq_of_smulLeftCLM_eq`).
+* **`H^1` by derivatives in `L_2`** (`FunctionSpaces/Rd/SobolevTwoLittlewoodPaley.lean`): for
+  `f ∈ L_2(V)`, Mathlib's `TemperedDistribution.MemSobolev 1 2 f` holds iff every directional
+  derivative `∂_v f` of the tempered distribution `f` is an `L_2` function
+  (`Rd.memSobolev_one_iff` with `Rd.memSobolev_iff_tempered`); the derivatives along one
+  orthonormal basis `(e_i)` suffice (`Rd.memSobolev_one_two_of_lineDerivOp_eq`), and
+  `(2π)² ‖J_1 f‖_2² = (2π)² ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²`
+  (`Rd.lintegral_besselWeight_one_sq_eq`, `Rd.enorm_besselPotential_one_sq_eq`). Mathlib has
+  `∂_v : H^s → H^{s-1}` (`TemperedDistribution.MemSobolev.lineDerivOp`); the converse at `s = 1`
+  is new, and these results belong next to it in `Mathlib/Analysis/Distribution/Sobolev.lean`.
 * **The inverse Fourier transform on `L_1 ∩ L_2` and Rellich's theorem**
   (`FunctionSpaces/Rd/RellichCompactness.lean`): for an integrable `h ∈ L_2(V)`, Mathlib's
   `L_2` inverse Fourier transform of `h` is the pointwise inverse Fourier integral almost
