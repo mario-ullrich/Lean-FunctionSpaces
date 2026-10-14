@@ -217,10 +217,24 @@ elements with the restrictions to `Ω` of the functions of `Rd.BoundedLipschitzD
 abbrev SobolevOne (Ω : BoundedLipschitzDomain V) := RestrictionSpace 1 Ω.toOpens
 
 /-- **The canonical resolution of unity** on the boundary of `Ω`, a fixed choice among the
-resolutions of `Rd.BoundedLipschitzDomain.nonempty_boundaryPartition`. The trace kernel uses it,
-and does not depend on it (`Rd.BoundedLipschitzDomain.mem_traceKer_iff`). -/
+nonnegative resolutions of `Rd.BoundedLipschitzDomain.exists_boundaryPartition_nonneg`: `ψ_j ≥ 0`
+and `∑_j ψ_j ≤ 1` everywhere. The trace kernel uses it and does not depend on it
+(`Rd.BoundedLipschitzDomain.mem_traceKer_iff`); the surface measure and the unit normal use its
+nonnegativity. -/
 noncomputable def boundaryPartition (Ω : BoundedLipschitzDomain V) : Ω.BoundaryPartition :=
-  Classical.choice Ω.nonempty_boundaryPartition
+  Ω.exists_boundaryPartition_nonneg.choose
+
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- The functions of the canonical resolution of unity are nonnegative. -/
+theorem boundaryPartition_nonneg (Ω : BoundedLipschitzDomain V) (j : Fin Ω.N) (y : V) :
+    0 ≤ Ω.boundaryPartition.toFun j y :=
+  Ω.exists_boundaryPartition_nonneg.choose_spec.1 j y
+
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- The functions of the canonical resolution of unity sum to at most `1` everywhere. -/
+theorem sum_boundaryPartition_le_one (Ω : BoundedLipschitzDomain V) (y : V) :
+    ∑ j, Ω.boundaryPartition.toFun j y ≤ 1 :=
+  Ω.exists_boundaryPartition_nonneg.choose_spec.2 y
 
 namespace BoundaryPartition
 

@@ -398,9 +398,10 @@ boundary `Γ`, boundary balls `B_j = ball (Ω.center j) (Ω.radius j)` and chart
   `integral_surfaceMeasure` (for every resolution of unity `ψ`, of any sign, and every
   `σ`-integrable `f : V → ℂ`,
   `∫ f dσ = ∑ j, ∫ x', ψ.toComplex j (γ_j x') * f (γ_j x') * gram_j x'`; the single-chart form is
-  `integral_surfaceMeasure_of_support`), `lintegral_surfaceMeasure_le_sum`. A nonnegative
-  resolution of unity is `Rd.BoundedLipschitzDomain.nonnegPartition`
-  (`exists_boundaryPartition_nonneg`).
+  `integral_surfaceMeasure_of_support`), `lintegral_surfaceMeasure_le_sum`. The canonical
+  resolution of unity `Rd.BoundedLipschitzDomain.boundaryPartition` is nonnegative
+  (`boundaryPartition_nonneg`, from `exists_boundaryPartition_nonneg`), so the chart formula
+  applies to it.
 * Null sets: `ae_surfaceMeasure_iff_aeBoundary : (∀ᵐ y ∂σ, P y) ↔ ∀ᶠ y in Ω.aeBoundary, P y`
   for every property `P`, so the chart filter of Section 4.4 is "`σ`-almost everywhere", and
   `ae_surfaceMeasure_ball_iff` chart by chart; `volume_frontier : volume (frontier Ω.carrier) = 0`.
@@ -421,7 +422,7 @@ boundary `Γ`, boundary balls `B_j = ball (Ω.center j) (Ω.radius j)` and chart
 * `exists_traceL2_ae_eq`: every `g ∈ B^{1/2}_{2,2}(Γ)` is `traceL2 Ω t` for some
   `t ∈ H^{1/2}(Γ)`, `σ`-almost everywhere; hence `memLp_of_memBoundaryBesov`.
 * `Rd.BoundedLipschitzDomain.normal Ω : V → V`, the outward unit normal field
-  `∑_j ψ_j • ν_j ∘ P_j` with `ψ = nonnegPartition` and the chart normals of Section 4.7:
+  `∑_j ψ_j • ν_j ∘ P_j` with `ψ = boundaryPartition` and the chart normals of Section 4.7:
   `measurable_normal`, `norm_normal_le` (`‖ν y‖ ≤ 1` for every `y`). Its identity with the chart
   normals almost everywhere on `Γ` comes with Green's formula (in preparation, Section 9).
 
@@ -728,7 +729,9 @@ The formalisation of the surface measure settled the following points of the pla
   resolution of unity; with values in `[0, ∞]` this needs `ψ_j ≥ 0`, which
   `Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure` assumes. Smooth partitions of unity
   provide such resolutions (`Rd.BoundedLipschitzDomain.exists_boundaryPartition_nonneg`, with
-  `∑_j ψ_j ≤ 1` everywhere), and `Rd.BoundedLipschitzDomain.nonnegPartition` is a fixed one. For
+  `∑_j ψ_j ≤ 1` everywhere), and the canonical resolution of unity
+  `Rd.BoundedLipschitzDomain.boundaryPartition`, used by every definition on `Γ`, is chosen among
+  them (decision of 14 October 2026), so it is nonnegative. For
   complex integrals the chart formula holds for every resolution of unity
   (`Rd.BoundedLipschitzDomain.integral_surfaceMeasure`). The formula for a single chart,
   `Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure_of_support`, needs no resolution of unity,

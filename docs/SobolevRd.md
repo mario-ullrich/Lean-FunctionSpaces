@@ -221,8 +221,8 @@ a FEEC/BEEC library built on this project, with the decisions behind their form.
   every `g ∈ B^{1/2}_{2,2}(Γ)` is `τ t` for some `t`, so `B^{1/2}_{2,2}(Γ) ⊆ L_2(Γ)`
   (`Rd.BoundedLipschitzDomain.exists_traceL2_ae_eq`,
   `Rd.BoundedLipschitzDomain.memLp_of_memBoundaryBesov`). The outward unit normal field
-  `ν(y) = ∑_j ψ⁺_j(y) ν_j(P_j y)`, with the chart normals `ν_j` and the fixed nonnegative
-  resolution of unity `ψ⁺` (`Rd.BoundedLipschitzDomain.nonnegPartition`), is measurable with
+  `ν(y) = ∑_j ψ_j(y) ν_j(P_j y)`, with the chart normals `ν_j` and the canonical resolution of
+  unity `ψ` (`Rd.BoundedLipschitzDomain.boundaryPartition`, nonnegative), is measurable with
   `‖ν‖ ≤ 1` (`Rd.BoundedLipschitzDomain.normal`, `Rd.BoundedLipschitzDomain.norm_normal_le`).
 
 ## What is formalised

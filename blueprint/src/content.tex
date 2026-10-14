@@ -14295,16 +14295,33 @@ $\iota U$ (\Cref{lem:trace-linear}), which is at most $\sqrt 2 \, C_1 \|U\|$
 (\Cref{thm:sobolev-one-besov-constant}); so $C = K \sqrt 2 \, C_1$.
 \end{proof}
 
+\begin{lemma}[Nonnegative resolutions of unity]
+\label{lem:resolution-of-unity-nonneg}
+\lean{Rd.BoundedLipschitzDomain.exists_boundaryPartition_nonneg}
+\leanok
+\uses{def:boundary-partition, lem:resolution-of-unity}
+There is a resolution of unity $\psi$ on $\Gamma$ with $\psi_j \geq 0$ for every $j$ and
+$\sum_j \psi_j \leq 1$ on $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:resolution-of-unity} for the closed set $\Gamma$ and its open cover by the balls $B_j$.
+\end{proof}
+
 \begin{definition}[The setting of the trace space]
 \label{def:trace-space-setting}
 \lean{Rd.BoundedLipschitzDomain.SobolevOne, Rd.BoundedLipschitzDomain.boundaryPartition,
+  Rd.BoundedLipschitzDomain.boundaryPartition_nonneg,
+  Rd.BoundedLipschitzDomain.sum_boundaryPartition_le_one,
   Rd.BoundedLipschitzDomain.BoundaryPartition.derivBound,
   Rd.BoundedLipschitzDomain.BoundaryPartition.derivBound_spec,
   Rd.BoundedLipschitzDomain.BoundaryPartition.localize}
 \leanok
 \uses{def:sobolev-restriction-space, def:boundary-partition, lem:product-modulus,
-  lem:resolution-of-unity}
-$\psi^0$ is a fixed resolution of unity on $\Gamma$. For every resolution of unity $\psi$ and every
+  lem:resolution-of-unity, lem:resolution-of-unity-nonneg}
+$\psi^0$ is a fixed resolution of unity on $\Gamma$ with $\psi^0_j \geq 0$ for every $j$ and
+$\sum_j \psi^0_j \leq 1$ on $V$. For every resolution of unity $\psi$ and every
 $j$, $F \mapsto \psi_j F$ is the multiplication on $L_2(V)$, with a bound of the derivatives of
 $\psi_j$ of order at most $2$.
 \end{definition}
@@ -15059,31 +15076,6 @@ For $y \in B_j$, $y \in \Gamma$ if and only if $\gamma_j(P_j y) = y$ (\Cref{lem:
 and $\gamma_j(x') \in \Gamma$ for every $x'$ with $\gamma_j(x') \in B_j$.
 \end{proof}
 
-\begin{lemma}[Nonnegative resolutions of unity]
-\label{lem:resolution-of-unity-nonneg}
-\lean{Rd.BoundedLipschitzDomain.exists_boundaryPartition_nonneg}
-\leanok
-\uses{def:boundary-partition, lem:resolution-of-unity}
-There is a resolution of unity $\psi$ on $\Gamma$ with $\psi_j \geq 0$ for every $j$ and
-$\sum_j \psi_j \leq 1$ on $V$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\Cref{lem:resolution-of-unity} for the closed set $\Gamma$ and its open cover by the balls $B_j$.
-\end{proof}
-
-\begin{definition}[A nonnegative resolution of unity]
-\label{def:resolution-of-unity-nonneg}
-\lean{Rd.BoundedLipschitzDomain.nonnegPartition,
-  Rd.BoundedLipschitzDomain.nonnegPartition_nonneg,
-  Rd.BoundedLipschitzDomain.sum_nonnegPartition_le_one}
-\leanok
-\uses{lem:resolution-of-unity-nonneg}
-$\psi^+$ is a fixed resolution of unity on $\Gamma$ with $\psi^+_j \geq 0$ for every $j$ and
-$\sum_j \psi^+_j \leq 1$ on $V$.
-\end{definition}
-
 \begin{definition}[The surface measure]
 \label{def:surface-measure}
 \lean{Rd.BoundedLipschitzDomain.surfaceMeasure, Rd.BoundedLipschitzDomain.ae_mem_frontier,
@@ -15367,8 +15359,8 @@ $L_2(\Gamma)$.
 \label{def:boundary-normal}
 \lean{Rd.BoundedLipschitzDomain.normal}
 \leanok
-\uses{def:graph-normal, def:resolution-of-unity-nonneg}
-For $y \in V$, $\nu(y) = \sum_j \psi^+_j(y) \, \nu_j(P_j y)$, with the outward unit normals
+\uses{def:graph-normal, def:trace-space-setting}
+For $y \in V$, $\nu(y) = \sum_j \psi^0_j(y) \, \nu_j(P_j y)$, with the outward unit normals
 $\nu_j$ of the graph domains $\Omega_j$ (\Cref{def:graph-normal}).
 \end{definition}
 
@@ -15382,12 +15374,12 @@ $\nu$ is measurable, and $\|\nu(y)\| \leq 1$ for every $y \in V$.
 
 \begin{proof}
 \leanok
-The $\psi^+_j$ are continuous and the $\nu_j$ measurable (\Cref{lem:graph-normal}). For the bound,
-$\|\nu(y)\| \leq \sum_j \psi^+_j(y) \|\nu_j(P_j y)\| = \sum_j \psi^+_j(y) \leq 1$.
+The $\psi^0_j$ are continuous and the $\nu_j$ measurable (\Cref{lem:graph-normal}). For the bound,
+$\|\nu(y)\| \leq \sum_j \psi^0_j(y) \|\nu_j(P_j y)\| = \sum_j \psi^0_j(y) \leq 1$.
 \end{proof}
 
-For $y \in \Gamma$, $\sum_j \psi^+_j(y) = 1$, so $\nu(y)$ is a convex combination of the chart
-normals $\nu_j(P_j y)$ of the charts with $\psi^+_j(y) > 0$.
+For $y \in \Gamma$, $\sum_j \psi^0_j(y) = 1$, so $\nu(y)$ is a convex combination of the chart
+normals $\nu_j(P_j y)$ of the charts with $\psi^0_j(y) > 0$.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

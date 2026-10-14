@@ -34,9 +34,9 @@ graphs `γ_j(x') = x' + φ_j(x') e_j` over the hyperplanes `H_j`.
   (`Rd.BoundedLipschitzDomain.boundaryTraceL2_eq_ambientTraceL2`), whose kernel is the trace
   kernel (`Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`); `B^{1/2}_{2,2}(Γ) ⊆ L_2(Γ)`
   (`Rd.BoundedLipschitzDomain.memLp_of_memBoundaryBesov`).
-* **The outward unit normal** `ν(y) = ∑_j ψ⁺_j(y) ν_j(P_j y)`
+* **The outward unit normal** `ν(y) = ∑_j ψ_j(y) ν_j(P_j y)`
   (`Rd.BoundedLipschitzDomain.normal`) is pasted from the chart normals `ν_j` with the fixed
-  nonnegative resolution of unity `ψ⁺` (`Rd.BoundedLipschitzDomain.nonnegPartition`); it is
+  resolution of unity `ψ = Rd.BoundedLipschitzDomain.boundaryPartition`, which is nonnegative; it is
   measurable with `‖ν‖ ≤ 1`.
 -/
 
@@ -63,37 +63,6 @@ theorem frontier_inter_ball_eq (j : Fin Ω.N) :
   refine ⟨fun ⟨hy, hb⟩ => ⟨⟨_, (Ω.mem_frontier_iff j hb).1 hy⟩, hb⟩, ?_⟩
   rintro ⟨⟨x', rfl⟩, hb⟩
   exact ⟨Ω.graphMap_mem_frontier j hb, hb⟩
-
-/-! ### Nonnegative resolutions of unity -/
-
-section NonnegPartition
-
-variable [FiniteDimensional ℝ V]
-
-/-- **Nonnegative resolutions of unity on the boundary exist**: smooth `ψ_j ≥ 0` with
-`tsupport ψ_j ⊆ B_j`, `∑_j ψ_j = 1` on `Γ` and `∑_j ψ_j ≤ 1` everywhere, a smooth resolution of
-unity subordinate to the boundary balls (`Rd.exists_smooth_partition`). -/
-theorem exists_boundaryPartition_nonneg :
-    ∃ ψ : Ω.BoundaryPartition, (∀ j y, 0 ≤ ψ.toFun j y) ∧ ∀ y, ∑ j, ψ.toFun j y ≤ 1 := by
-  obtain ⟨ψ, hψ, hψU, hψ1, hψ0, hψle⟩ := exists_smooth_partition isClosed_frontier
-    (fun j => ball (Ω.center j) (Ω.radius j)) (fun _ => isOpen_ball) Ω.frontier_subset
-  exact ⟨⟨ψ, hψ, hψU, hψ1⟩, hψ0, hψle⟩
-
-/-- **A nonnegative resolution of unity** on the boundary, a fixed choice among those of
-`Rd.BoundedLipschitzDomain.exists_boundaryPartition_nonneg`; the unit normal field
-`Rd.BoundedLipschitzDomain.normal` uses it. -/
-noncomputable def nonnegPartition : Ω.BoundaryPartition :=
-  Ω.exists_boundaryPartition_nonneg.choose
-
-/-- The functions of the nonnegative resolution of unity are nonnegative. -/
-theorem nonnegPartition_nonneg (j : Fin Ω.N) (y : V) : 0 ≤ Ω.nonnegPartition.toFun j y :=
-  Ω.exists_boundaryPartition_nonneg.choose_spec.1 j y
-
-/-- The functions of the nonnegative resolution of unity sum to at most `1` everywhere. -/
-theorem sum_nonnegPartition_le_one (y : V) : ∑ j, Ω.nonnegPartition.toFun j y ≤ 1 :=
-  Ω.exists_boundaryPartition_nonneg.choose_spec.2 y
-
-end NonnegPartition
 
 variable [MeasurableSpace V] [BorelSpace V]
 
@@ -535,29 +504,29 @@ theorem memLp_of_memBoundaryBesov (ψ : Ω.BoundaryPartition) {g : V → ℂ}
 
 /-! ### The unit normal -/
 
-/-- **The outward unit normal field** `ν(y) = ∑_j ψ⁺_j(y) ν_j(P_j y)` of `Ω`, pasted from the
-outward unit normals `ν_j` of the charts (`Rd.LipschitzGraph.normalAt`) with the fixed nonnegative
-resolution of unity `ψ⁺ = Rd.BoundedLipschitzDomain.nonnegPartition`. It is defined on all of
-`V`, measurable and of norm at most `1`; for `y ∈ Γ` it is a convex combination of the chart
-normals `ν_j(P_j y)` with `ψ⁺_j(y) > 0`. -/
+/-- **The outward unit normal field** `ν(y) = ∑_j ψ_j(y) ν_j(P_j y)` of `Ω`, pasted from the
+outward unit normals `ν_j` of the charts (`Rd.LipschitzGraph.normalAt`) with the canonical
+resolution of unity `ψ = Rd.BoundedLipschitzDomain.boundaryPartition`, which is nonnegative. It
+is defined on all of `V`, measurable and of norm at most `1`; for `y ∈ Γ` it is a convex
+combination of the chart normals `ν_j(P_j y)` with `ψ_j(y) > 0`. -/
 noncomputable def normal (y : V) : V :=
-  ∑ j, Ω.nonnegPartition.toFun j y • (Ω.graph j).normalAt ((Ω.graph j).proj y)
+  ∑ j, Ω.boundaryPartition.toFun j y • (Ω.graph j).normalAt ((Ω.graph j).proj y)
 
 /-- The unit normal field is measurable. -/
 theorem measurable_normal : Measurable Ω.normal :=
   Finset.measurable_fun_sum _ fun j _ =>
-    (Ω.nonnegPartition.contDiff j).continuous.measurable.smul
+    (Ω.boundaryPartition.contDiff j).continuous.measurable.smul
       ((Ω.graph j).measurable_normalAt.comp (Ω.graph j).proj.continuous.measurable)
 
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- The unit normal field has norm at most `1`: `‖ν(y)‖ ≤ ∑_j ψ_j(y) ≤ 1`. -/
 theorem norm_normal_le (y : V) : ‖Ω.normal y‖ ≤ 1 := by
-  calc ‖Ω.normal y‖ ≤ ∑ j, ‖Ω.nonnegPartition.toFun j y • (Ω.graph j).normalAt
+  calc ‖Ω.normal y‖ ≤ ∑ j, ‖Ω.boundaryPartition.toFun j y • (Ω.graph j).normalAt
         ((Ω.graph j).proj y)‖ := norm_sum_le _ _
-    _ = ∑ j, Ω.nonnegPartition.toFun j y := Finset.sum_congr rfl fun j _ => by
-        rw [norm_smul, (Ω.graph j).norm_normalAt, mul_one, Real.norm_of_nonneg
-          (Ω.nonnegPartition_nonneg j y)]
-    _ ≤ 1 := Ω.sum_nonnegPartition_le_one y
+    _ = ∑ j, Ω.boundaryPartition.toFun j y := Finset.sum_congr rfl fun j _ => by
+        rw [norm_smul, (Ω.graph j).norm_normalAt, mul_one]
+        exact Real.norm_of_nonneg (Ω.boundaryPartition_nonneg j y)
+    _ ≤ 1 := Ω.sum_boundaryPartition_le_one y
 
 end BoundedLipschitzDomain
 

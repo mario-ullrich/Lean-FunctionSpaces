@@ -242,6 +242,15 @@ theorem nonempty_boundaryPartition [FiniteDimensional ℝ V] : Nonempty Ω.Bound
     (fun j => ball (Ω.center j) (Ω.radius j)) (fun _ => isOpen_ball) Ω.frontier_subset
   exact ⟨⟨ψ, hψ, hψU, hψ1⟩⟩
 
+/-- **Nonnegative resolutions of unity on the boundary exist**: smooth `ψ_j ≥ 0` with
+`tsupport ψ_j ⊆ B_j`, `∑_j ψ_j = 1` on `Γ` and `∑_j ψ_j ≤ 1` everywhere, a smooth resolution of
+unity subordinate to the boundary balls (`Rd.exists_smooth_partition`). -/
+theorem exists_boundaryPartition_nonneg [FiniteDimensional ℝ V] :
+    ∃ ψ : Ω.BoundaryPartition, (∀ j y, 0 ≤ ψ.toFun j y) ∧ ∀ y, ∑ j, ψ.toFun j y ≤ 1 := by
+  obtain ⟨ψ, hψ, hψU, hψ1, hψ0, hψle⟩ := exists_smooth_partition isClosed_frontier
+    (fun j => ball (Ω.center j) (Ω.radius j)) (fun _ => isOpen_ball) Ω.frontier_subset
+  exact ⟨⟨ψ, hψ, hψU, hψ1⟩, hψ0, hψle⟩
+
 variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
 
 /-! ### Almost everywhere on the boundary -/
