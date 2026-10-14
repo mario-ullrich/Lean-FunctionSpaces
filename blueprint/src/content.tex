@@ -8036,7 +8036,8 @@ function on $H$.
 \label{def:graph-map}
 \lean{Rd.LipschitzGraph.hyperplane, Rd.LipschitzGraph.e_ne_zero, Rd.LipschitzGraph.inner_e_self,
   Rd.LipschitzGraph.inner_coe_e, Rd.LipschitzGraph.sub_inner_smul_mem,
-  Rd.LipschitzGraph.finrank_hyperplane_add_one, Rd.LipschitzGraph.finrank_hyperplane_eq,
+  Rd.LipschitzGraph.finrank_hyperplane_add_one, Rd.LipschitzGraph.finrank_hyperplane_eq_sub_one,
+  Rd.LipschitzGraph.finrank_hyperplane_eq,
   Rd.LipschitzGraph.proj, Rd.LipschitzGraph.coe_proj, Rd.LipschitzGraph.norm_proj_le,
   Rd.LipschitzGraph.proj_coe, Rd.LipschitzGraph.proj_e, Rd.LipschitzGraph.graphMap,
   Rd.LipschitzGraph.proj_graphMap, Rd.LipschitzGraph.inner_graphMap,
@@ -12104,7 +12105,10 @@ proves Rellich's theorem: the restriction from $H^1(V)$ to $L_2(\Omega)$ is comp
 bounded $\Omega \subseteq V$. \Cref{sec:sobolev-restriction-spaces} builds the Hilbert spaces
 $H^s(\Omega)$, $\tilde H^s(\Omega)$ and $H^s_0(\Omega)$ inside $H^s(V)$, for every open
 $\Omega$ and every real $s$. \Cref{sec:sobolev-duality} proves the duality of
-$\tilde H^s(\Omega)$ and $H^{-s}(\Omega)$.
+$\tilde H^s(\Omega)$ and $H^{-s}(\Omega)$. \Cref{sec:boundary-trace-space} builds the trace space
+$H^{1/2}(\Gamma)$ of a bounded Lipschitz domain, and \Cref{sec:lipschitz-graph-area} proves the
+area formula for Lipschitz graphs, which expresses the Euclidean Hausdorff measure of the
+boundary of a Lipschitz graph domain in its chart.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -14492,6 +14496,516 @@ Mathlib's \texttt{Submodule.\allowbreak adjoint\_\allowbreak orthogonalProjectio
 of the orthogonal projection onto a closed subspace is the inclusion.
 \end{proof}
 
+\section{The area formula for Lipschitz graphs}
+\label{sec:lipschitz-graph-area}
+
+Throughout this section $\Omega = \{x : \varphi(x) < \langle x, e \rangle\}$ is a Lipschitz graph
+domain (\Cref{def:lipschitz-graph}) with Lipschitz constant $M$, hyperplane $H = e^\perp$ of
+dimension $n - 1$, projection $P$ and graph map $\gamma(x') = x' + \varphi(x') e$
+(\Cref{def:graph-map}). For $d \in \N$, $\mathcal H^d$ is Mathlib's $d$-dimensional Euclidean
+Hausdorff measure (\texttt{MeasureTheory.\allowbreak Measure.\allowbreak
+euclideanHausdorffMeasure}): the Hausdorff measure $\mu_H^d$ times the constant that makes it the
+Lebesgue measure on every $d$-dimensional inner product space (Mathlib's
+\texttt{InnerProductSpace.\allowbreak euclideanHausdorffMeasure\_\allowbreak eq\_\allowbreak
+volume}); isometries preserve it. The area formula expresses $\mathcal H^{n-1}$ on the boundary
+of $\Omega$ through the graph map. The proof is the one of Federer
+\cite[3.2.3]{Federer} and Evans and Gariepy \cite[Section 3.3]{EvansGariepy}, for a graph, which
+is injective and antilipschitz with constant $1$, so that every point of the graph has exactly one
+preimage.
+
+\begin{lemma}[Lipschitz maps and Euclidean Hausdorff measures]
+\label{lem:hausdorff-lipschitz-image}
+\lean{LipschitzOnWith.euclideanHausdorffMeasure_image_le,
+  Rd.euclideanHausdorffMeasure_image_le_of_near}
+\leanok
+For all metric spaces $X$, $Y$, every $K \geq 0$, every $s \subseteq X$, every $f : X \to Y$ that
+is $K$-Lipschitz on $s$ and every $d \in \N$,
+$\mathcal H^d(f(s)) \leq K^d \mathcal H^d(s)$. For all normed groups $X$, $Y$, all
+$f_1, f_2 : X \to Y$, $P \subseteq X$, $\delta \geq 0$ and $d \in \N$ with
+$\|x - y\| \leq \|f_2(x) - f_2(y)\|$ and
+$\|(f_1(x) - f_1(y)) - (f_2(x) - f_2(y))\| \leq \delta \|x - y\|$ for all $x, y \in P$,
+\[
+  \mathcal H^d(f_1(P)) \leq (1 + \delta)^d \, \mathcal H^d(f_2(P)).
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first bound is Mathlib's \texttt{LipschitzOnWith.\allowbreak hausdorffMeasure\_\allowbreak
+image\_\allowbreak le} for $\mu_H^d$, multiplied by the constant. For the second, $f_2$ is
+injective on $P$, so it has a left inverse $q$ on $P$ (Mathlib's
+\texttt{Function.\allowbreak invFunOn}); $f_1 \circ q$ maps $f_2(P)$ onto $f_1(P)$, and for
+$x, y \in P$,
+$\|f_1(x) - f_1(y)\| \leq \|f_2(x) - f_2(y)\| + \delta \|x - y\|
+\leq (1 + \delta) \|f_2(x) - f_2(y)\|$.
+\end{proof}
+
+\begin{definition}[The area factor]
+\label{def:area-factor}
+\lean{Rd.areaFactor}
+\leanok
+For $m \in \N$ and $\varepsilon \in \R$, the area factor is
+$C_\varepsilon = (1 + 2\varepsilon)^m (1 + \varepsilon)$.
+\end{definition}
+
+In the area formula $m = n - 1$: comparing a graph with a linear graph costs the factor
+$(1 + 2\varepsilon)^m$, and comparing the Gram density with a constant costs $1 + \varepsilon$.
+
+\begin{lemma}[Three elementary bounds]
+\label{lem:area-elementary}
+\lean{Rd.abs_sqrt_one_add_sq_sub_le, Rd.tendsto_areaFactor,
+  Rd.le_of_forall_pos_le_ofReal_mul_of_tendsto}
+\leanok
+\uses{def:area-factor}
+For all $a, b \in \R$, $|\sqrt{1 + a^2} - \sqrt{1 + b^2}| \leq |a - b|$. For every $m \in \N$,
+$C_\varepsilon \to 1$ as $\varepsilon \to 0+$. For all $a, b \in [0, \infty]$ and every
+$c : \R \to \R$ with $c(\varepsilon) \to 1$ as $\varepsilon \to 0+$ and
+$a \leq \max(c(\varepsilon), 0) \, b$ for every $\varepsilon > 0$, $a \leq b$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$|\sqrt{1 + a^2} - \sqrt{1 + b^2}| (\sqrt{1 + a^2} + \sqrt{1 + b^2}) = |a - b| |a + b|$ and
+$|a + b| \leq \sqrt{1 + a^2} + \sqrt{1 + b^2}$. The area factor is continuous in $\varepsilon$
+with value $1$ at $0$. In the last statement $\max(c(\varepsilon), 0) \, b \to b$ as
+$\varepsilon \to 0+$.
+\end{proof}
+
+\begin{definition}[Graphs over the hyperplane]
+\label{def:graph-over}
+\lean{Rd.LipschitzGraph.graphOver, Rd.LipschitzGraph.linearGraph,
+  Rd.LipschitzGraph.coe_linearGraph}
+\leanok
+\uses{def:graph-map}
+For $h : H \to \R$, the graph of $h$ over $H$ is the map $\gamma_h(x') = x' + h(x') e$ from $H$ to
+$V$. For $g \in H$, the linear graph of $g$ is the linear map
+$S_g = \gamma_{\langle g, \cdot \rangle}$, $S_g x' = x' + \langle g, x' \rangle e$, from $H$ to
+$V$.
+\end{definition}
+
+\begin{lemma}[Increments of graphs over the hyperplane]
+\label{lem:graph-over}
+\lean{Rd.LipschitzGraph.proj_graphOver, Rd.LipschitzGraph.graphOver_injective,
+  Rd.LipschitzGraph.norm_coe_add_smul_e_sq, Rd.LipschitzGraph.norm_le_norm_coe_add_smul_e,
+  Rd.LipschitzGraph.graphOver_sub, Rd.LipschitzGraph.norm_sub_le_norm_graphOver_sub,
+  Rd.LipschitzGraph.graphOver_sub_sub}
+\leanok
+\uses{def:graph-over}
+For all $h, h_1, h_2 : H \to \R$, $x', y' \in H$ and $a \in \R$: $P \gamma_h(x') = x'$, so
+$\gamma_h$ is injective; $\|x' + a e\|^2 = \|x'\|^2 + a^2$;
+the increment $\Delta_h = \gamma_h(x') - \gamma_h(y')$ is $(x' - y') + (h(x') - h(y')) e$, so
+$\|x' - y'\| \leq \|\Delta_h\|$; and
+\[
+  \Delta_{h_1} - \Delta_{h_2} = \bigl((h_1(x') - h_1(y')) - (h_2(x') - h_2(y'))\bigr) e .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$P e = 0$ and $P x' = x'$ on $H$ (\Cref{def:graph-map}); Pythagoras, since $x' \perp e$. The
+bound $\|x' - y'\| \leq \|\Delta_h\|$ holds since $x' - y' = P \Delta_h$ and $\|P z\| \leq \|z\|$.
+\end{proof}
+
+\begin{lemma}[Hausdorff measures of nearby graphs]
+\label{lem:graph-over-hausdorff}
+\lean{Rd.LipschitzGraph.euclideanHausdorffMeasure_graphOver_image_le}
+\leanok
+\uses{lem:graph-over, lem:hausdorff-lipschitz-image}
+For all $h_1, h_2 : H \to \R$, $P \subseteq H$, $\delta \geq 0$ and $d \in \N$ with
+$|(h_1(x') - h_1(y')) - (h_2(x') - h_2(y'))| \leq \delta \|x' - y'\|$ for all $x', y' \in P$,
+\[
+  \mathcal H^d(\gamma_{h_1}(P)) \leq (1 + \delta)^d \, \mathcal H^d(\gamma_{h_2}(P)).
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:hausdorff-lipschitz-image} with $f_2 = \gamma_{h_2}$, by \Cref{lem:graph-over}.
+\end{proof}
+
+For finite-dimensional real inner product spaces $U$, $W$, the norm determinant of a linear map
+$T : U \to W$ is $\sqrt{\det(T^* T)}$ (Mathlib's \texttt{LinearMap.\allowbreak normDet} and
+\texttt{LinearMap.\allowbreak normDet\_\allowbreak sq}), and
+$\mathcal H^{\dim U}(T(P)) = \sqrt{\det(T^* T)} \, |P|$ for every $P \subseteq U$ (Mathlib's
+\texttt{LinearMap.\allowbreak euclideanHausdorffMeasure\_\allowbreak image\_\allowbreak
+eq\_\allowbreak normDet\_\allowbreak mul\_\allowbreak volume}).
+
+\begin{lemma}[The norm determinant of a linear graph]
+\label{lem:linear-graph-normdet}
+\lean{Rd.LipschitzGraph.inner_linearGraph, Rd.LipschitzGraph.adjoint_comp_linearGraph,
+  Rd.LipschitzGraph.normDet_linearGraph}
+\leanok
+\uses{def:graph-over}
+For every $g \in H$ and all $x', y' \in H$,
+$\langle S_g x', S_g y' \rangle
+= \langle x', y' \rangle + \langle g, x' \rangle \langle g, y' \rangle$,
+$S_g^* S_g x' = x' + \langle g, x' \rangle g$, and $\sqrt{\det(S_g^* S_g)} = \sqrt{1 + \|g\|^2}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$x', y' \perp e$ and $\|e\| = 1$. Hence $\langle S_g^* S_g x', y' \rangle = \langle S_g x', S_g y'
+\rangle = \langle x' + \langle g, x' \rangle g, y' \rangle$ for all $y' \in H$. The map
+$x' \mapsto x' + \langle g, x' \rangle g$ is a transvection, of determinant
+$1 + \langle g, g \rangle$ (Mathlib's \texttt{LinearMap.\allowbreak transvection.\allowbreak det}).
+\end{proof}
+
+\begin{theorem}[The area formula for linear graphs]
+\label{thm:linear-graph-area}
+\lean{Rd.LipschitzGraph.euclideanHausdorffMeasure_linearGraph_image}
+\leanok
+\uses{lem:linear-graph-normdet}
+For every $g \in H$ and every $P \subseteq H$,
+\[
+  \mathcal H^{n-1}(S_g(P)) = \sqrt{1 + \|g\|^2} \, |P| ,
+\]
+with the Lebesgue measure $|P|$ of $H$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Mathlib's area formula for linear maps, with $\dim H = n - 1$ and the norm determinant of
+\Cref{lem:linear-graph-normdet}.
+\end{proof}
+
+\paragraph{The linear graph as a tilted stretch.} Explicitly, $S_g$ for $g \neq 0$ is a stretch of
+$H$ along $g/\|g\|$ followed by an isometry of $H$ into $V$ (\Cref{lem:tilt}); then
+$\mathcal H^{n-1}(S_g(P)) = |\det D| \, |P|$ for the stretch $D$, of determinant
+$\sqrt{1 + \|g\|^2}$ (\Cref{lem:det-stretch}, Mathlib's
+\texttt{MeasureTheory.\allowbreak Measure.\allowbreak addHaar\_\allowbreak image\_\allowbreak
+linearMap}).
+
+\begin{definition}[Stretches]
+\label{def:stretch}
+\lean{Rd.stretch, Rd.stretch_apply}
+\leanok
+Let $E$ be a real inner product space, $u \in E$ and $c \in \R$. The stretch by $c$ along $u$ is
+the linear map $D x = x + (c - 1) \langle u, x \rangle u$ of $E$.
+\end{definition}
+
+For a unit vector $u$, $D$ multiplies $u$ by $c$ and fixes the vectors orthogonal to $u$; it is
+Mathlib's transvection (\texttt{LinearMap.\allowbreak transvection}) of the linear form
+$(c - 1)\langle u, \cdot \rangle$ and the vector $u$.
+
+\begin{lemma}[The determinant of a stretch]
+\label{lem:det-stretch}
+\lean{Rd.det_stretch}
+\leanok
+\uses{def:stretch}
+For every finite-dimensional real inner product space $E$, every unit vector $u \in E$ and every
+$c \in \R$, the stretch by $c$ along $u$ has determinant $c$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+A transvection $x \mapsto x + f(x) u$ has determinant $1 + f(u)$ (Mathlib's
+\texttt{LinearMap.\allowbreak transvection.\allowbreak det}), here
+$1 + (c - 1) \langle u, u \rangle = c$.
+\end{proof}
+
+\begin{definition}[The tilt]
+\label{def:tilt}
+\lean{Rd.LipschitzGraph.tilt}
+\leanok
+\uses{def:graph-map}
+For $u \in H$ and $b \in \R$, with $c = \sqrt{1 + b^2}$, the tilt is the map
+$J x' = x' + \langle u, x' \rangle \bigl(c^{-1}(u + b e) - u\bigr)$ from $H$ to $V$.
+\end{definition}
+
+For a unit vector $u$ the tilt maps $u$ to the unit vector $(u + b e)/c$ and fixes the vectors of
+$H$ orthogonal to $u$.
+
+\begin{lemma}[Linear graphs are tilted stretches]
+\label{lem:tilt}
+\lean{Rd.LipschitzGraph.tilt_sub, Rd.LipschitzGraph.norm_tilt, Rd.LipschitzGraph.isometry_tilt,
+  Rd.LipschitzGraph.tilt_stretch, Rd.LipschitzGraph.linearGraph_eq_tilt_comp_stretch}
+\leanok
+\uses{def:tilt, def:stretch, def:graph-over}
+For every unit vector $u \in H$ and every $b \in \R$, the tilt $J$ is an isometry of $H$ into $V$,
+and $J(D x') = x' + b \langle u, x' \rangle e$ for every $x' \in H$, where $D$ is the stretch by
+$\sqrt{1 + b^2}$ along $u$. For every $g \in H \setminus \{0\}$, $S_g = J \circ D$ for
+$u = g/\|g\|$ and $b = \|g\|$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$J$ is linear. With $a = \langle u, x' \rangle$ and $w = c^{-1}(u + b e) - u$,
+$\langle x', w \rangle = a (c^{-1} - 1)$ and $\|w\|^2 = 2 - 2c^{-1}$, since $c^2 = 1 + b^2$, so
+$\|x' + a w\|^2 = \|x'\|^2$. Further $\langle u, D x' \rangle = c a$, and
+$D x' + c a w = x' + (c - 1) a u + a (u + b e) - c a u = x' + a b e$.
+\end{proof}
+
+\paragraph{The graph map and the Gram density.}
+
+\begin{lemma}[The graph map]
+\label{lem:graph-map-area}
+\lean{Rd.LipschitzGraph.phiH, Rd.LipschitzGraph.graphMap_eq_graphOver,
+  Rd.LipschitzGraph.graphMap_injective, Rd.LipschitzGraph.lipschitzWith_phiH,
+  Rd.LipschitzGraph.continuous_phiH, Rd.LipschitzGraph.lipschitzWith_graphMap,
+  Rd.LipschitzGraph.antilipschitzWith_graphMap, Rd.LipschitzGraph.range_graphMap,
+  Rd.LipschitzGraph.measurableEmbedding_graphMap}
+\leanok
+\uses{def:graph-over, lem:graph-over, lem:boundary-charts}
+The graph map is the graph $\gamma = \gamma_{\varphi|_H}$ of the $M$-Lipschitz function
+$\varphi|_H$ over $H$. It is injective, $(1 + M)$-Lipschitz, satisfies
+$\|x' - y'\| \leq \|\gamma(x') - \gamma(y')\|$ for all $x', y' \in H$, is a measurable embedding
+(measurable, injective, and it maps measurable sets to measurable sets), and its range is the
+boundary of $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:graph-over} and \Cref{def:graph-map}; an antilipschitz and uniformly continuous map of
+the complete space $H$ is a closed embedding, hence a measurable embedding. The boundary of
+$\Omega$ is $\{y : \gamma(Py) = y\}$ (\Cref{lem:boundary-charts}).
+\end{proof}
+
+\begin{lemma}[The graph map keeps null sets]
+\label{lem:graph-map-null}
+\lean{Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image_eq_zero}
+\leanok
+\uses{lem:graph-map-area, lem:hausdorff-lipschitz-image}
+For every null set $N \subseteq H$, $\mathcal H^{n-1}(\gamma(N)) = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\mathcal H^{n-1}(\gamma(N)) \leq (1 + M)^{n-1} \mathcal H^{n-1}(N)$ by
+\Cref{lem:hausdorff-lipschitz-image}, and $\mathcal H^{n-1}$ is the Lebesgue measure on $H$.
+\end{proof}
+
+\begin{definition}[The gradient and the Gram density]
+\label{def:graph-gradient}
+\lean{Rd.LipschitzGraph.gradPhi, Rd.LipschitzGraph.gram}
+\leanok
+\uses{lem:graph-map-area}
+For $x' \in H$, $\nabla\varphi(x') \in H$ is the gradient of $\varphi|_H$ at $x'$ (Mathlib's
+\texttt{gradient}, which is $0$ where $\varphi|_H$ is not differentiable), and
+$\sqrt{1 + \|\nabla\varphi(x')\|^2}$ is the Gram density of the graph map.
+\end{definition}
+
+\begin{lemma}[Properties of the gradient]
+\label{lem:graph-gradient}
+\lean{Rd.LipschitzGraph.inner_gradPhi, Rd.LipschitzGraph.norm_gradPhi_le,
+  Rd.LipschitzGraph.one_le_gram, Rd.LipschitzGraph.gram_pos, Rd.LipschitzGraph.gram_le,
+  Rd.LipschitzGraph.abs_gram_sub_le, Rd.LipschitzGraph.measurable_gradPhi,
+  Rd.LipschitzGraph.measurable_gram, Rd.LipschitzGraph.ae_differentiableAt_phiH}
+\leanok
+\uses{def:graph-gradient, lem:area-elementary}
+For all $x', v, g \in H$: $\langle \nabla\varphi(x'), v \rangle$ is the derivative of
+$\varphi|_H$ at $x'$ in the direction $v$, $\|\nabla\varphi(x')\| \leq M$,
+$1 \leq \sqrt{1 + \|\nabla\varphi(x')\|^2} \leq \sqrt{1 + M^2}$ and
+$|\sqrt{1 + \|\nabla\varphi(x')\|^2} - \sqrt{1 + \|g\|^2}| \leq \|\nabla\varphi(x') - g\|$. The
+gradient and the Gram density are measurable, and $\varphi|_H$ is differentiable almost
+everywhere on $H$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The derivative of an $M$-Lipschitz function has norm at most $M$; \Cref{lem:area-elementary} and
+the reverse triangle inequality. The derivative is measurable (Mathlib's
+\texttt{measurable\_\allowbreak fderiv}), and Rademacher's theorem (Mathlib's
+\texttt{LipschitzWith.\allowbreak ae\_\allowbreak differentiableAt}).
+\end{proof}
+
+\begin{definition}[Good pieces]
+\label{def:good-piece}
+\lean{Rd.LipschitzGraph.IsGoodPiece}
+\leanok
+\uses{def:graph-gradient}
+For $\varepsilon \in \R$ and $g \in H$, a set $P \subseteq H$ is a good piece if
+$|(\varphi(x') - \varphi(y')) - \langle g, x' - y' \rangle| \leq 2 \varepsilon \|x' - y'\|$ and
+$\|\nabla\varphi(x') - g\| \leq \varepsilon$ for all $x', y' \in P$.
+\end{definition}
+
+\begin{lemma}[The Gram density on good pieces]
+\label{lem:good-piece-gram}
+\lean{Rd.LipschitzGraph.IsGoodPiece.mono, Rd.LipschitzGraph.IsGoodPiece.sqrt_le_mul_gram,
+  Rd.LipschitzGraph.IsGoodPiece.gram_le_mul_sqrt}
+\leanok
+\uses{def:good-piece, lem:graph-gradient}
+For every $\varepsilon \geq 0$, every $g \in H$ and every good piece $P$ for $\varepsilon$ and $g$,
+every subset of $P$ is a good piece for $\varepsilon$ and $g$, and for every $x' \in P$,
+$\sqrt{1 + \|g\|^2} \leq (1 + \varepsilon) \sqrt{1 + \|\nabla\varphi(x')\|^2}$ and
+$\sqrt{1 + \|\nabla\varphi(x')\|^2} \leq (1 + \varepsilon) \sqrt{1 + \|g\|^2}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The two square roots differ by at most $\varepsilon$ (\Cref{lem:graph-gradient}), and both are at
+least $1$.
+\end{proof}
+
+\begin{lemma}[The area formula on good pieces, up to a factor]
+\label{lem:good-piece-bounds}
+\lean{Rd.LipschitzGraph.IsGoodPiece.euclideanHausdorffMeasure_image_le,
+  Rd.LipschitzGraph.IsGoodPiece.lintegral_gram_le}
+\leanok
+\uses{lem:good-piece-gram, lem:graph-over-hausdorff, thm:linear-graph-area, def:area-factor}
+For every $\varepsilon \geq 0$, every $g \in H$ and every good piece $P$ for $\varepsilon$ and $g$,
+with the area factor $C_\varepsilon$ for $m = n - 1$,
+\[
+  \mathcal H^{n-1}(\gamma(P)) \leq C_\varepsilon \int_P \sqrt{1 + \|\nabla\varphi(x')\|^2} \, dx'
+\]
+and
+\[
+  \int_P \sqrt{1 + \|\nabla\varphi(x')\|^2} \, dx' \leq C_\varepsilon \mathcal H^{n-1}(\gamma(P)).
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:graph-over-hausdorff} with $\delta = 2\varepsilon$, $\mathcal H^{n-1}(\gamma(P))$
+and $\mathcal H^{n-1}(S_g(P)) = \sqrt{1 + \|g\|^2} \, |P|$ (\Cref{thm:linear-graph-area}) differ
+at most by the factor $(1 + 2\varepsilon)^{n-1}$, and $\sqrt{1 + \|g\|^2} \, |P|$ and the integral
+differ at most by the factor $1 + \varepsilon$ (\Cref{lem:good-piece-gram}).
+\end{proof}
+
+\begin{definition}[Good sets]
+\label{def:good-set}
+\lean{Rd.LipschitzGraph.goodSet}
+\leanok
+\uses{def:graph-gradient}
+Let $(u_l)_l$ be a dense sequence in $H$. For $\varepsilon \in \R$ and $i, k \in \N$, the good set
+consists of the $x' \in H$ at which $\varphi|_H$ is differentiable, with
+$\|\nabla\varphi(x') - u_i\| < \varepsilon$ and
+$|\varphi(u_l) - \varphi(x') - \langle \nabla\varphi(x'), u_l - x' \rangle| \leq
+\varepsilon \|u_l - x'\|$ for every $l$ with $\|u_l - x'\| < 1/(k+1)$.
+\end{definition}
+
+\begin{lemma}[Good sets]
+\label{lem:good-set}
+\lean{Rd.LipschitzGraph.abs_taylor_le_of_mem_goodSet,
+  Rd.LipschitzGraph.isGoodPiece_goodSet_inter_ball,
+  Rd.LipschitzGraph.exists_mem_goodSet_inter_ball, Rd.LipschitzGraph.measurableSet_goodSet}
+\leanok
+\uses{def:good-set, def:good-piece, lem:graph-gradient}
+For every $\varepsilon \in \R$, all $i, k \in \N$ and every $x'$ in the good set,
+$|\varphi(y') - \varphi(x') - \langle \nabla\varphi(x'), y' - x' \rangle| \leq
+\varepsilon \|y' - x'\|$ for every $y' \in H$ with $\|y' - x'\| < 1/(k+1)$. For every
+$c \in H$, the intersection of the good set with the ball of radius $1/(2(k+1))$ around $c$ is a
+good piece for $\varepsilon$ and $u_i$. For every $\varepsilon > 0$ and every $x'$ at which
+$\varphi|_H$ is differentiable there are $i, k, j \in \N$ such that $x'$ lies in the good set of
+$i$ and $k$ and in the ball of radius $1/(2(k+1))$ around $u_j$. The good sets are measurable.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The inequality is closed in $y'$ and holds on the dense sequence. On the intersection with the
+ball, $\|x' - y'\| < 1/(k+1)$, and the bound at $y'$ together with
+$\|\nabla\varphi(y') - u_i\| < \varepsilon$ gives the good piece. For the covering, $k$ comes from
+the definition of the derivative, $i$ and $j$ from density. Measurability: the set of
+differentiability points is measurable (Mathlib's
+\texttt{measurableSet\_\allowbreak of\_\allowbreak differentiableAt}), the gradient is measurable,
+and the Taylor condition quantifies over countably many $l$.
+\end{proof}
+
+\begin{lemma}[A countable partition into good pieces]
+\label{lem:good-partition}
+\lean{Rd.LipschitzGraph.exists_goodPartition}
+\leanok
+\uses{lem:good-set, lem:good-piece-gram, lem:graph-gradient}
+For every $\varepsilon > 0$ there are pairwise disjoint measurable sets $Q_0, Q_1, \ldots
+\subseteq H$ whose union has a null complement, and $g_0, g_1, \ldots \in H$, such that every
+$Q_m$ is a good piece for $\varepsilon$ and $g_m$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Enumerate the intersections of \Cref{lem:good-set} by $\N$ and make them disjoint (Mathlib's
+\texttt{disjointed}); their union contains every point of differentiability, and the others form
+a null set by Rademacher's theorem.
+\end{proof}
+
+\begin{lemma}[The area formula up to a factor]
+\label{lem:area-fixed-accuracy}
+\lean{Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image_le_mul,
+  Rd.LipschitzGraph.lintegral_gram_le_mul}
+\leanok
+\uses{lem:good-partition, lem:good-piece-bounds, lem:graph-map-null, lem:graph-map-area}
+For every $\varepsilon > 0$ and every measurable $A \subseteq H$, with the area factor
+$C_\varepsilon$ for $m = n - 1$,
+\[
+  \mathcal H^{n-1}(\gamma(A)) \leq C_\varepsilon \int_A \sqrt{1 + \|\nabla\varphi(x')\|^2} \, dx'
+\]
+and
+\[
+  \int_A \sqrt{1 + \|\nabla\varphi(x')\|^2} \, dx' \leq C_\varepsilon \mathcal H^{n-1}(\gamma(A)).
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+With the partition of \Cref{lem:good-partition}, $A \cap Q_m$ is a good piece for every $m$
+(\Cref{lem:good-piece-gram}), and the rest of $A$ is a null set whose image is
+$\mathcal H^{n-1}$-null (\Cref{lem:graph-map-null}). Sum the bounds of \Cref{lem:good-piece-bounds}:
+$\mathcal H^{n-1}$ is countably subadditive, and the images $\gamma(A \cap Q_m)$ are pairwise
+disjoint and measurable (\Cref{lem:graph-map-area}).
+\end{proof}
+
+\begin{theorem}[The area formula for Lipschitz graphs]
+\label{thm:lipschitz-graph-area}
+\lean{Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image,
+  Rd.LipschitzGraph.map_graphMap_withDensity, Rd.LipschitzGraph.lintegral_graphMap}
+\leanok
+\uses{lem:area-fixed-accuracy, lem:area-elementary, lem:graph-map-area}
+For every measurable $A \subseteq H$,
+\[
+  \mathcal H^{n-1}(\gamma(A)) = \int_A \sqrt{1 + \|\nabla\varphi(x')\|^2} \, dx' .
+\]
+The image under $\gamma$ of the measure on $H$ with density $\sqrt{1 + \|\nabla\varphi\|^2}$ is
+$\mathcal H^{n-1}$ restricted to $\gamma(H)$, and for every $F : V \to [0, \infty]$,
+\[
+  \int_{\gamma(H)} F \, d\mathcal H^{n-1}
+  = \int_H F(\gamma(x')) \sqrt{1 + \|\nabla\varphi(x')\|^2} \, dx' .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{lem:area-fixed-accuracy} and the last two parts of \Cref{lem:area-elementary}, in both
+directions. The measure form follows on measurable sets $B \subseteq V$ with
+$\gamma(\gamma^{-1}(B)) = B \cap \gamma(H)$, and the integral form from it, since $\gamma$ is a
+measurable embedding and the density is finite.
+\end{proof}
+
+By \Cref{lem:graph-map-area}, $\gamma(H)$ is the boundary of $\Omega$, so the theorem expresses
+$\mathcal H^{n-1}$ on the boundary in the chart. The integral form holds for every $F$,
+measurable or not.
+
+\begin{definition}[The outward unit normal]
+\label{def:graph-normal}
+\lean{Rd.LipschitzGraph.normalAt}
+\leanok
+\uses{def:graph-gradient}
+For $x' \in H$, the outward unit normal at $\gamma(x')$ is
+$\nu(x') = (\nabla\varphi(x') - e)/\sqrt{1 + \|\nabla\varphi(x')\|^2}$.
+\end{definition}
+
+Where $\varphi|_H$ is differentiable, $\nu(x')$ is the normalised gradient at $\gamma(x')$ of
+$x \mapsto \varphi(Px) - \langle x, e \rangle$, a function that is negative on $\Omega$.
+
+\begin{lemma}[Properties of the normal]
+\label{lem:graph-normal}
+\lean{Rd.LipschitzGraph.norm_gradPhi_sub_e, Rd.LipschitzGraph.norm_normalAt,
+  Rd.LipschitzGraph.inner_normalAt_e, Rd.LipschitzGraph.inner_normalAt_neg_of_mem_cone,
+  Rd.LipschitzGraph.measurable_normalAt}
+\leanok
+\uses{def:graph-normal, lem:graph-gradient, lem:graph-over, lem:graph-cone}
+For every $x' \in H$, $\|\nabla\varphi(x') - e\| = \sqrt{1 + \|\nabla\varphi(x')\|^2}$,
+$\|\nu(x')\| = 1$, $\langle \nu(x'), e \rangle = -1/\sqrt{1 + \|\nabla\varphi(x')\|^2}$, and
+$\langle \nu(x'), y \rangle < 0$ for every $y$ in the cone $K$ of $\Omega$. The normal is
+measurable.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Pythagoras, since $\nabla\varphi(x') \perp e$. For $y \in K$,
+$\langle \nabla\varphi(x'), y \rangle
+= \langle \nabla\varphi(x'), y - \langle y, e \rangle e \rangle
+\leq M \|y - \langle y, e \rangle e\| < \langle y, e \rangle$.
+\end{proof}
+
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
 
@@ -16017,6 +16531,16 @@ R.~A.~DeVore, R.~C.~Sharpley,
 \emph{Besov spaces on domains in $\R^d$},
 Trans.\ Amer.\ Math.\ Soc.\ \textbf{335} (1993), no.~2, 843--864,
 \href{https://doi.org/10.1090/S0002-9947-1993-1152321-6}{doi}.
+
+\bibitem{EvansGariepy}
+L.~C.~Evans, R.~F.~Gariepy,
+\emph{Measure Theory and Fine Properties of Functions}, revised ed.,
+Textbooks in Mathematics, CRC Press, Boca Raton, 2015.
+
+\bibitem{Federer}
+H.~Federer,
+\emph{Geometric Measure Theory},
+Grundlehren der mathematischen Wissenschaften \textbf{153}, Springer-Verlag, New York, 1969.
 
 \bibitem{FeffermanStein}
 C.~Fefferman, E.~M.~Stein,

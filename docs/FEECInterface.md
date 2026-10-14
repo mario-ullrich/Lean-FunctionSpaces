@@ -326,7 +326,49 @@ boundary traces at `L = 2`, `p = q = 2`, `s = 1/2` (`Ω.boundaryTrace ψ two_ne_
   `dualTraceEquiv_apply`, uniqueness `eq_dualTraceEquiv_of_forall`), and
   `Rd.BoundedLipschitzDomain.adjoint_trace`: the adjoint of `γ` is `E`.
 
-### 4.7 Items X.1–X.5, X.7, X.8
+### 4.7 The area formula for Lipschitz graphs
+
+File `FunctionSpaces/Rd/LipschitzGraphArea.lean`, for a Lipschitz graph domain
+`Ω : Rd.LipschitzGraph V`, `n = dim V`, with the graph map `Ω.graphMap x' = x' + φ(x') e` over
+the hyperplane `H = Ω.hyperplane = e^⊥` and Mathlib's Euclidean Hausdorff measures `μHE[k]`
+(`MeasureTheory.Measure.euclideanHausdorffMeasure`), normalised to be the volume on every
+`k`-dimensional subspace:
+
+* `Rd.LipschitzGraph.gradPhi Ω x' : H`, the gradient of `φ` on `H` (Mathlib's `gradient`, `0`
+  where `φ|_H` is not differentiable, which happens only on a null set:
+  `ae_differentiableAt_phiH`), and `Rd.LipschitzGraph.gram Ω x' = √(1 + ‖gradPhi x'‖²)`, with
+  `1 ≤ gram x' ≤ √(1 + M²)` (`one_le_gram`, `gram_le`) and `measurable_gram`.
+* `Rd.LipschitzGraph.range_graphMap : Set.range Ω.graphMap = frontier Ω.domain`, and
+  `measurableEmbedding_graphMap`, `graphMap_injective`, `lipschitzWith_graphMap` (constant
+  `1 + M`), `antilipschitzWith_graphMap` (constant `1`).
+* The area formula `Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`, its measure form
+  `map_graphMap_withDensity` and its integral form `lintegral_graphMap`, the last for every
+  `F : V → ℝ≥0∞`, measurable or not:
+
+  ```lean
+  theorem euclideanHausdorffMeasure_graphMap_image {A : Set Ω.hyperplane}
+      (hA : MeasurableSet A) :
+      μHE[finrank ℝ V - 1] (Ω.graphMap '' A) = ∫⁻ x' in A, ENNReal.ofReal (Ω.gram x')
+  theorem map_graphMap_withDensity :
+      Measure.map Ω.graphMap
+          ((volume : Measure Ω.hyperplane).withDensity fun x' => ENNReal.ofReal (Ω.gram x')) =
+        (μHE[finrank ℝ V - 1] : Measure V).restrict (Set.range Ω.graphMap)
+  theorem lintegral_graphMap (F : V → ℝ≥0∞) :
+      ∫⁻ y in Set.range Ω.graphMap, F y ∂(μHE[finrank ℝ V - 1] : Measure V) =
+        ∫⁻ x', F (Ω.graphMap x') * ENNReal.ofReal (Ω.gram x')
+  ```
+* `Rd.LipschitzGraph.normalAt Ω x' = (gram x')⁻¹ • (gradPhi x' - e)`, the outward unit normal at
+  `Ω.graphMap x'`: `norm_normalAt` (`‖ν‖ = 1`), `inner_normalAt_e` (`⟪ν, e⟫ = -(gram x')⁻¹`),
+  `inner_normalAt_neg_of_mem_cone` (`⟪ν, y⟫ < 0` on the cone of `Ω`), `measurable_normalAt`.
+* General tools: `LipschitzOnWith.euclideanHausdorffMeasure_image_le`
+  (`μHE[k] (f '' s) ≤ K^k μHE[k] s` for `K`-Lipschitz maps on `s`),
+  `Rd.euclideanHausdorffMeasure_image_le_of_near`, and the linear
+  case `Rd.LipschitzGraph.euclideanHausdorffMeasure_linearGraph_image`
+  (`μHE[n-1] (S_g '' P) = √(1 + ‖g‖²) vol(P)` for `S_g x' = x' + ⟪g, x'⟫ e`, from the norm
+  determinant `Rd.LipschitzGraph.normDet_linearGraph` and Mathlib's
+  `LinearMap.euclideanHausdorffMeasure_image_eq_normDet_mul_volume`).
+
+### 4.8 Items X.1–X.5, X.7, X.8
 
 * X.1, bounded Lipschitz domains: `Rd.BoundedLipschitzDomain`
   (`FunctionSpaces/Rd/BoundedLipschitz.lean`).
@@ -346,7 +388,7 @@ boundary traces at `L = 2`, `p = q = 2`, `s = 1/2` (`Ω.boundaryTrace ψ two_ne_
 * X.8, Mathlib's distributions on open sets and differential forms: `Distribution` (`𝓓'(Ω, F)`),
   `extDeriv`.
 
-### 4.8 Later
+### 4.9 Later
 
 The next part of Lean-FunctionSpaces continues with the square function theorem
 `L_p = F^0_{p,2}`, `W^m_p = F^m_{p,2}` and Mathlib's `H^{s,p} = F^s_{p,2}` for all `1 < p < ∞`,
@@ -456,9 +498,9 @@ number of the proposal and the intended Lean statement.
 The first version of this document (commit `ec3c133`) left items 1–5 of Section 6 to the
 FEEC/BEEC library. Lean-FunctionSpaces now builds them itself, in its current part (Part Ib of
 its development plan). The space types, the isometry of H.4 and the duality are formalised,
-with their Lean names in Section 4.5, and the trace space, with its Lean names in Section 4.6;
-the other statements below are in preparation and enter Section 4 with their Lean names as they
-are formalised.
+with their Lean names in Section 4.5, the trace space, with its Lean names in Section 4.6, and
+the area formula for Lipschitz graphs, with its Lean names in Section 4.7; the other statements
+below are in preparation and enter Section 4 with their Lean names as they are formalised.
 
 * **Space types (formalised, Section 4.5).** `H^s(Ω)` for every open `Ω` and every real `s` as a
   Hilbert space: the orthogonal complement, in Mathlib's `H^{s}(ℝ^d)`, of the elements that
@@ -483,10 +525,14 @@ are formalised.
   `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)` (`Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`), and
   `H^{-1/2}(Γ)` as its dual (`Rd.BoundedLipschitzDomain.DualTraceSpace`). File
   `FunctionSpaces/Rd/BoundaryTraceSpace.lean`.
-* **The surface measure.** Mathlib's Hausdorff measure `μHE[d-1]` restricted to `Γ`, with no
-  charts in the definition. The area formula for Lipschitz graphs, proved here, expresses its
-  integrals in the charts with the Gram density `√(1 + ‖∇φ‖²)`; `L_2(Γ)` is the `L_2` space of
-  this measure, and the trace is an injective bounded operator `H^{1/2}(Γ) → L_2(Γ)`.
+* **The surface measure (area formula formalised, Section 4.7).** Mathlib's Hausdorff measure
+  `μHE[d-1]` restricted to `Γ`, with no charts in the definition. The area formula for Lipschitz
+  graphs (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`,
+  `Rd.LipschitzGraph.lintegral_graphMap`, file `FunctionSpaces/Rd/LipschitzGraphArea.lean`)
+  expresses its integrals in the charts with the Gram density `√(1 + ‖∇φ‖²)`; `L_2(Γ)` is the
+  `L_2` space of this measure, and the trace is an injective bounded operator
+  `H^{1/2}(Γ) → L_2(Γ)` (in preparation). The outward unit normal of a graph domain is
+  `Rd.LipschitzGraph.normalAt`.
 * **Green's formula** on bounded Lipschitz domains for `H^1` functions, in chart form and with
   the surface measure and the outward unit normal.
 * **`ker γ = H^1_0(Ω)`** (McLean, Theorem 3.40) and the HPS quotient
@@ -570,6 +616,40 @@ The formalisation of the trace space settled the following points of the plan.
   `Rd.BoundedLipschitzDomain.SobolevOne`, `H^{-1/2}(Γ)` is
   `Rd.BoundedLipschitzDomain.DualTraceSpace`, and the Riesz map is
   `Rd.BoundedLipschitzDomain.dualTraceEquiv`.
+
+The formalisation of the area formula settled the following points of the plan.
+
+* **The linear case is Mathlib's area formula for linear maps.** The linear graph
+  `S_g x' = x' + ⟪g, x'⟫ e` is the linear map `Rd.LipschitzGraph.linearGraph g : H →ₗ[ℝ] V`, the
+  graph of `⟪g, ·⟫` in the sense of `Rd.LipschitzGraph.graphOver`. Its Gram operator
+  `S_g* S_g` is the transvection `x' ↦ x' + ⟪g, x'⟫ g` of determinant `1 + ‖g‖²`, so its norm
+  determinant is `√(1 + ‖g‖²)` (`Rd.LipschitzGraph.normDet_linearGraph`, through
+  `LinearMap.normDet_sq` and `LinearMap.transvection.det`), and
+  `LinearMap.euclideanHausdorffMeasure_image_eq_normDet_mul_volume` gives the area. The file also
+  writes `S_g` explicitly as the stretch of `H` by `√(1 + ‖g‖²)` along `g/‖g‖` (`Rd.stretch`)
+  followed by an isometry of `H` into `V`, linear in `x'` (`Rd.LipschitzGraph.tilt`,
+  norm-preserving by an inner-product computation, `Rd.LipschitzGraph.isometry_tilt`).
+* **The comparison of nearby graphs** is one lemma for the graphs of any two functions on `H`
+  (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphOver_image_le`), applied in both
+  directions, on top of a general lemma for two maps with nearby increments
+  (`Rd.euclideanHausdorffMeasure_image_le_of_near`).
+* **Measurability of the good sets**: the Taylor condition is required only at the points of a
+  dense sequence of `H` (`Rd.LipschitzGraph.goodSet`, Mathlib's `TopologicalSpace.denseSeq`), so
+  the sets are countable intersections of measurable sets, and it extends to all nearby points
+  because it is closed (`Rd.LipschitzGraph.abs_taylor_le_of_mem_goodSet`). The cells of small
+  diameter are balls around the same dense sequence, made disjoint with Mathlib's `disjointed`
+  (`Rd.LipschitzGraph.exists_goodPartition`).
+* **Every dimension**: the formula holds for every `V`, including `dim V = 1`, where `H` is `{0}`
+  and the boundary a point; it is stated with `μHE[finrank ℝ V - 1]`
+  (`Rd.LipschitzGraph.finrank_hyperplane_eq_sub_one`, next to `finrank_hyperplane_add_one` in
+  `FunctionSpaces/Rd/GraphParametrization.lean`).
+* **Additions to the plan**: the integral form holds for every `F : V → [0, ∞]`, measurable or
+  not (`Rd.LipschitzGraph.lintegral_graphMap`, through
+  `lintegral_withDensity_eq_lintegral_mul_non_measurable`); the outward unit normal is
+  measurable (`Rd.LipschitzGraph.measurable_normalAt`); the bound
+  `LipschitzOnWith.euclideanHausdorffMeasure_image_le` holds on all metric spaces.
+* **Names**: the lemmas on `μHE` carry Mathlib's prefix `euclideanHausdorffMeasure_`, the area
+  formula included (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`).
 
 ## References
 

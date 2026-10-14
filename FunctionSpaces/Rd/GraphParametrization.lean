@@ -76,6 +76,12 @@ theorem finrank_hyperplane_add_one [FiniteDimensional ℝ V] :
   show finrank ℝ ↥(ℝ ∙ Ω.e)ᗮ + 1 = finrank ℝ V
   omega
 
+/-- `dim H = n - 1`, with the subtraction of natural numbers. -/
+theorem finrank_hyperplane_eq_sub_one [FiniteDimensional ℝ V] :
+    finrank ℝ Ω.hyperplane = finrank ℝ V - 1 := by
+  have h := Ω.finrank_hyperplane_add_one
+  omega
+
 /-- The **orthogonal projection** onto `H`. -/
 noncomputable def proj : V →L[ℝ] Ω.hyperplane := Ω.hyperplane.orthogonalProjectionOnto
 

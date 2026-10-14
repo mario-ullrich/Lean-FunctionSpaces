@@ -182,6 +182,7 @@ public import FunctionSpaces.Rd.RellichCompactness
 public import FunctionSpaces.Rd.SobolevRestrictionSpaces
 public import FunctionSpaces.Rd.SobolevDuality
 public import FunctionSpaces.Rd.BoundaryTraceSpace
+public import FunctionSpaces.Rd.LipschitzGraphArea
 
 /-!
 # Function spaces
@@ -619,4 +620,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   constants, the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the
   trace kernel, the trace space `H^{1/2}(Γ)` of the boundary `Γ` as its orthogonal complement
   with the trace and extension operators, and its dual `H^{-1/2}(Γ)`.
+* `FunctionSpaces.Rd.LipschitzGraphArea`: the area formula for Lipschitz graphs: the image of a
+  measurable set `A` of the hyperplane under the graph map has `(n-1)`-dimensional Euclidean
+  Hausdorff measure `∫_A √(1 + ‖∇φ‖²)`, where `n = dim V`; the outward unit normal of a Lipschitz
+  graph domain.
 -/

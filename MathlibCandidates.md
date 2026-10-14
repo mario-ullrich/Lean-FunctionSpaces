@@ -294,3 +294,18 @@ declarations.
   `f : V → ℂ` (`Rd.conj_fourier_apply`, `Rd.conj_fourierInv_apply` in
   `FunctionSpaces/Rd/LittlewoodPaleyKernels.lean`), next to `Real.fourierInv_eq_fourier_neg` in
   `Mathlib/Analysis/Fourier/FourierTransform.lean`.
+* **The area formula for Lipschitz graphs** (`FunctionSpaces/Rd/LipschitzGraphArea.lean`):
+  Mathlib has the area formula for linear maps, `μHE[dim U] (f '' s) = normDet f · vol(s)`
+  (`LinearMap.euclideanHausdorffMeasure_image`,
+  `LinearMap.euclideanHausdorffMeasure_image_eq_normDet_mul_volume`, with `LinearMap.normDet` in
+  `Mathlib/Analysis/InnerProductSpace/NormDet.lean`), and lacks the one for Lipschitz maps
+  (2026-10-14). Two steps are general: a map that is `K`-Lipschitz on `s` satisfies
+  `μHE[d] (f '' s) ≤ K^d μHE[d] s` (`LipschitzOnWith.euclideanHausdorffMeasure_image_le`, next to
+  `Isometry.euclideanHausdorffMeasure_image`), and images under two maps with nearby increments
+  have comparable measures (`Rd.euclideanHausdorffMeasure_image_le_of_near`). For the graph
+  `γ(x') = x' + φ(x') e` of a Lipschitz function over the hyperplane `H = e^⊥`, the area formula
+  `μHE[n-1] (γ '' A) = ∫_A √(1 + ‖∇φ‖²)` with its measure and integral forms
+  (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`,
+  `Rd.LipschitzGraph.map_graphMap_withDensity`, `Rd.LipschitzGraph.lintegral_graphMap`). For
+  Mathlib the graph would be stated for a Lipschitz function on a Euclidean space without the
+  structure `Rd.LipschitzGraph`.
