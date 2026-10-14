@@ -186,6 +186,7 @@ public import FunctionSpaces.Rd.LipschitzGraphArea
 public import FunctionSpaces.Rd.SurfaceMeasure
 public import FunctionSpaces.Rd.DilationFamilies
 public import FunctionSpaces.Rd.ConvolutionAdjoint
+public import FunctionSpaces.Rd.PlancherelBounds
 
 /-!
 # Function spaces
@@ -601,10 +602,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   distributions, integration by parts against test functions, uniqueness, locality, limits in
   `L_p`, the Sobolev spaces `W^m_p(Ω)` and `W^m_p(ℝ^d)`, and the identification with derivatives
   of tempered distributions on `ℝ^d`.
-* `FunctionSpaces.Rd.SobolevTwoLittlewoodPaley`: the convolution theorem on `L_2(ℝ^d)`,
-  Mathlib's Sobolev spaces `H^s(ℝ^d)` as the Triebel–Lizorkin spaces `F^s_{2,2}(ℝ^d)` for
-  `s ≥ 0` and the Besov spaces `B^s_{2,2}(ℝ^d)` for `s > 0`, with explicit constants, and
-  `W^1_2(ℝ^d) = H^1(ℝ^d) = B^1_{2,2}(ℝ^d)`.
+* `FunctionSpaces.Rd.SobolevTwoLittlewoodPaley`: the convolution theorem and Plancherel for a
+  convolution on `L_2(ℝ^d)`, Mathlib's Sobolev spaces `H^s(ℝ^d)` as the Triebel–Lizorkin spaces
+  `F^s_{2,2}(ℝ^d)` for `s ≥ 0` and the Besov spaces `B^s_{2,2}(ℝ^d)` for `s > 0`, with
+  explicit constants, and `W^1_2(ℝ^d) = H^1(ℝ^d) = B^1_{2,2}(ℝ^d)`.
 * `FunctionSpaces.Rd.LipschitzDomainH1`: `H^1(Ω)` on a bounded Lipschitz domain `Ω` as the
   space of restrictions of `H^1(ℝ^d)`, its description by intrinsic differences, the weak
   gradient on `Ω`, and the boundary traces in `B^{1/2}_{2,2}(∂Ω)`, which form the trace space.
@@ -639,4 +640,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `f ∈ L_p`, `g ∈ L_q` and the reflection `K^∨(x) = K(-x)`, derivatives of Schwartz kernels
   moved to the other Schwartz factor, and weak derivatives commuting with convolution by Schwartz
   functions.
+* `FunctionSpaces.Rd.PlancherelBounds`: the `L_2` bounds of the analysis operator
+  `f ↦ (θ_j ⋆ f)_j` and of the synthesis operators `(g_j)_j ↦ ∑_{j ∈ s} θ_j ⋆ g_j` for finite
+  sets `s` by the Fourier overlap `B`, for integrable kernels and for Calderón–Zygmund
+  families.
 -/

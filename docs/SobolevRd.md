@@ -21,8 +21,10 @@ boundary in the chart, with the Gram density `√(1 + ‖∇φ‖²)`. On a boun
 surface measure is this Hausdorff measure on the boundary `Γ`; it gives the space `L_2(Γ)`, into
 which `H^1(Ω)` and `H^{1/2}(Γ)` have bounded trace operators. The outward unit normal field is
 pasted from the chart normals. The theory for `1 < p < ∞` starts with families of dilated
-Schwartz kernels, their Fourier overlap and their Hörmander condition, and with the adjoint of a
-convolution, which moves kernels and their derivatives to the other side of an integral. The
+Schwartz kernels with their Fourier overlap and Hörmander condition, the adjoint of a
+convolution, which moves kernels and their derivatives to the other side of an integral, and the
+`L_2` bounds of the analysis and synthesis operators of every kernel family with bounded Fourier
+overlap. The
 [interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
 built on this project, with the decisions behind their form.
 
@@ -254,6 +256,14 @@ built on this project, with the decisions behind their form.
   `1 ≤ p, r ≤ ∞`, then `η ⋆ g = (∂^v η) ⋆ f` at every point
   (`Rd.conv_eq_conv_iteratedLineDerivOp`), and `(∂^v η) ⋆ f` is the weak derivative
   `∂^v (η ⋆ f)` for `f ∈ L_p(V)`, `1 ≤ p < ∞` (`Rd.hasWeakLineDeriv_conv`).
+* **Plancherel bounds.** For integrable kernels `θ_j` on `V` with `∑_j |𝓕θ_j(ξ)|² ≤ B` for
+  almost every `ξ`, the analysis operator satisfies `∑_j ‖θ_j ⋆ f‖_2² ≤ B ‖f‖_2²` for every
+  `f ∈ L_2(V)` (`Rd.tsum_enorm_convLp_sq_le`, `Rd.lintegral_lqNorm_conv_sq_le`), and the
+  synthesis operator satisfies `‖∑_{j ∈ s} θ_j ⋆ g_j‖_2² ≤ B ∑_{j ∈ s} ‖g_j‖_2²` for all
+  `g_j ∈ L_2(V)` and every finite set `s` (`Rd.enorm_sum_convLp_sq_le`,
+  `Rd.lintegral_enorm_sum_conv_sq_le`); in particular for every Calderón–Zygmund family with
+  overlap `B` (`Rd.IsCZFamily.lintegral_lqNorm_conv_sq_le`,
+  `Rd.IsCZFamily.lintegral_enorm_sum_conv_sq_le`).
 
 ## What is formalised
 
@@ -263,7 +273,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 |---|---|---|---|
 | Test functions as Schwartz functions, commuting directional derivatives, the transpose formula for distributions and tempered distributions; cut-offs of Schwartz functions converge in the Schwartz space (smooth compactly supported functions are dense), tempered distributions determined by test functions | ✅ | ✗ | `Rd/SchwartzCutoff` |
 | Weak derivatives and Sobolev spaces on open sets, integration by parts, uniqueness, locality, limits; the bridge to tempered distributions | ✅ | ✗ | `Rd/WeakDerivatives` |
-| The convolution theorem on `L_2`, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/SobolevTwoLittlewoodPaley` |
+| The convolution theorem and Plancherel for a convolution on `L_2`, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/SobolevTwoLittlewoodPaley` |
 | `H^1` on bounded Lipschitz domains as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the weak gradient, and the trace space `B^{1/2}_{2,2}` of the boundary | ✅ | ✗ | `Rd/LipschitzDomainH1` |
 | The inverse Fourier transform of integrable `L_2` functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, and Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω` | ✅ | ✗ | `Rd/RellichCompactness` |
 | The Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets inside Mathlib's `H^s(ℝ^d)`, `H^s(Ω)` as a quotient, Rellich's theorem for `H^1(Ω)`, the identification with the restriction space of a bounded Lipschitz domain, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)` | ✅ | ✗ | `Rd/SobolevRestrictionSpaces` |
@@ -273,6 +283,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The surface measure of a bounded Lipschitz domain as `μHE[n-1]` on the boundary, its chart form, finiteness and null sets, the boundary `Γ` as a Lebesgue null set, the boundary trace in `L_p(Γ)`, `L_2(Γ)` with the traces of `H^1(Ω)` and `H^{1/2}(Γ)`, and the outward unit normal field | ✅ | ✗ | `Rd/SurfaceMeasure` |
 | Dilation, reflection and conjugation of Schwartz functions, uniform Schwartz families, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families and their adjoints, the Littlewood–Paley blocks and the synthesis kernels as such families | ✅ | ✗ | `Rd/DilationFamilies` |
 | The adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for `f ∈ L_p`, `g ∈ L_q`, derivatives of Schwartz kernels moved to the other Schwartz factor, translates and reflections of Schwartz functions, and weak derivatives commuting with convolution by Schwartz functions | ✅ | ✗ | `Rd/ConvolutionAdjoint` |
+| The Cauchy–Schwarz inequality for finite sums, the `L_2` bounds of the analysis operator and of the synthesis operators on finite index sets for a kernel family with Fourier overlap `B`, and for every Calderón–Zygmund family | ✅ | ✗ | `Rd/PlancherelBounds` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

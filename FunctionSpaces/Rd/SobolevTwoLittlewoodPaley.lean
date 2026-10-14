@@ -24,7 +24,8 @@ Triebel–Lizorkin space `F^s_{2,2}(V)`, and for `s > 0` with the Besov space `B
 explicit constants, and proves `W^1_2(V) = H^1(V) = B^1_{2,2}(V)`.
 
 * **Plancherel for the blocks**: `𝓕(K ⋆ f) = 𝓕K · 𝓕f` for an integrable `K` and `f ∈ L_2(V)`
-  (`Rd.fourier_convLp`), so `‖ψ_j ⋆ f‖_2² = ∫ |𝓕ψ_j|² |𝓕f|²` (`Rd.enorm_lpBlock_sq`).
+  (`Rd.fourier_convLp`), so `‖K ⋆ f‖_2² = ∫ |𝓕K|² |𝓕f|²` (`Rd.enorm_convLp_sq`), in particular
+  `‖ψ_j ⋆ f‖_2² = ∫ |𝓕ψ_j|² |𝓕f|²` (`Rd.enorm_lpBlock_sq`).
 * **The weight comparison**: at every frequency at most two blocks are nonzero, and their
   Fourier transforms add up to `1` (`Rd.exists_fourier_psi_window`); hence, for `s ≥ 0`,
   `∑_j 2^{2js} |𝓕ψ_j(ξ)|² ≤ 2 · 4^s ⟨ξ⟩^{2s}` and `⟨ξ⟩^{2s} ≤ 2 · 5^s ∑_j 2^{2js} |𝓕ψ_j(ξ)|²`
@@ -150,15 +151,31 @@ theorem enorm_sq_eq_lintegral {α : Type*} [MeasurableSpace α] {μ : Measure α
   simp only [ENNReal.toReal_ofNat, ENNReal.rpow_two] at h
   rw [Lp.enorm_def, h]
 
-/-- **Plancherel for a block**: for `f ∈ L_2(V)`,
-`‖Δ_j f‖_2² = ∫ |𝓕ψ_j(ξ)|² |𝓕f(ξ)|² dξ`. -/
-theorem enorm_lpBlock_sq (f : Lp ℂ 2 (volume : Measure V)) (j : ℕ) :
-    ‖lpBlock two_ne_top j f‖ₑ ^ 2 =
-      ∫⁻ ξ, ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2 * ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2 := by
+/-- **The `L_2` norm of a function through its class**: for a function `f` with
+`∫ |f|² < ∞` (`MemLp f 2 μ`), `∫ |f|² = ‖[f]‖_2²` for the class `[f] = hf.toLp f` of `f` in
+`L_2(μ)`, on every measure space (`Rd.enorm_sq_eq_lintegral` and `[f] = f` almost everywhere). -/
+theorem lintegral_enorm_sq_eq_enorm_toLp {α : Type*} [MeasurableSpace α] {μ : Measure α}
+    {f : α → ℂ} (hf : MemLp f 2 μ) : ∫⁻ x, ‖f x‖ₑ ^ 2 ∂μ = ‖hf.toLp f‖ₑ ^ 2 := by
+  rw [enorm_sq_eq_lintegral]
+  exact lintegral_congr_ae (hf.coeFn_toLp.mono fun x hx => by dsimp only; rw [hx])
+
+/-- **Plancherel for a convolution**: for integrable `K` and `f ∈ L_2(V)`,
+`‖K ⋆ f‖_2² = ∫ |𝓕K(ξ)|² |𝓕f(ξ)|² dξ`, where `𝓕f` is the `L_2` Fourier transform
+(`Rd.fourier_convLp` and Plancherel's theorem `Rd.enorm_fourier_Lp_two`). -/
+theorem enorm_convLp_sq {K : V → ℂ} (hK : Integrable K) (f : Lp ℂ 2 (volume : Measure V)) :
+    ‖convLp two_ne_top hK f‖ₑ ^ 2 =
+      ∫⁻ ξ, ‖𝓕 K ξ‖ₑ ^ 2 * ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2 := by
   rw [← enorm_fourier_Lp_two, enorm_sq_eq_lintegral]
   refine lintegral_congr_ae ?_
-  filter_upwards [fourier_lpBlock f j] with ξ hξ
+  filter_upwards [fourier_convLp hK f] with ξ hξ
   rw [hξ, enorm_mul, mul_pow]
+
+/-- **Plancherel for a block**: for `f ∈ L_2(V)`,
+`‖Δ_j f‖_2² = ∫ |𝓕ψ_j(ξ)|² |𝓕f(ξ)|² dξ`, the case `K = ψ_j` of `Rd.enorm_convLp_sq`. -/
+theorem enorm_lpBlock_sq (f : Lp ℂ 2 (volume : Measure V)) (j : ℕ) :
+    ‖lpBlock two_ne_top j f‖ₑ ^ 2 =
+      ∫⁻ ξ, ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2 * ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2 :=
+  enorm_convLp_sq (integrable_psi j) f
 
 /-! ### The Bessel weight and the Littlewood–Paley weights -/
 
@@ -488,9 +505,7 @@ theorem exists_toTemperedDistribution_eq_of_besselPotential_eq {s : ℝ} (hs : 0
 theorem triebelLizorkinNorm_two_sq (s : ℝ) (f : Lp ℂ 2 (volume : Measure V)) :
     triebelLizorkinNorm s 2 f ^ 2 = ∫⁻ ξ, (∑' j, dyadicWeight s j ^ 2 *
       ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2) * ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2 := by
-  have hl := ENNReal.lqNorm_rpow two_ne_zero two_ne_top
-    (fun j => dyadicWeight s j * ‖lpBlock two_ne_top j f‖ₑ)
-  simp only [ENNReal.toReal_ofNat, ENNReal.rpow_two] at hl
+  have hl := ENNReal.lqNorm_two_sq (fun j => dyadicWeight s j * ‖lpBlock two_ne_top j f‖ₑ)
   have hm : ∀ j, AEMeasurable (fun ξ => dyadicWeight s j ^ 2 * ‖𝓕 (psi (V := V) j) ξ‖ₑ ^ 2 *
       ‖(𝓕 f : Lp ℂ 2 (volume : Measure V)) ξ‖ₑ ^ 2) volume := fun j =>
     ((((continuous_fourier_of_integrable (integrable_psi j)).measurable.enorm.pow_const

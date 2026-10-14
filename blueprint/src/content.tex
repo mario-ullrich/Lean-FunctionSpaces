@@ -283,7 +283,7 @@ With these, a constant $(1 - 2^{-\alpha})^{-1}$ is finite exactly for $\alpha > 
 \label{def:lq-norm}
 \lean{ENNReal.lqNorm, ENNReal.lqNorm_top, ENNReal.lqNorm_eq_tsum, ENNReal.dyadicWeight,
   ENNReal.aestronglyMeasurable_count, ENNReal.lqNorm_one, ENNReal.one_le_toReal_of_one_le,
-  ENNReal.lqNorm_rpow, ENNReal.lqNorm_zero_right, ENNReal.lqNorm_zero_left,
+  ENNReal.lqNorm_rpow, ENNReal.lqNorm_two_sq, ENNReal.lqNorm_zero_right, ENNReal.lqNorm_zero_left,
   ENNReal.dyadicWeight_zero_right, ENNReal.dyadicWeight_zero_left, ENNReal.dyadicWeight_ne_top,
   ENNReal.dyadicWeight_lt_top, ENNReal.dyadicWeight_pos, ENNReal.dyadicWeight_ne_zero,
   ENNReal.dyadicWeight_add, ENNReal.dyadicWeight_add_nat, ENNReal.dyadicWeight_succ,
@@ -12116,6 +12116,8 @@ traces into it.
 Schwartz kernels, their Fourier overlap and their H\"ormander condition.
 \Cref{sec:convolution-adjoint} moves convolution kernels and their derivatives to the other side
 of an integral and shows that weak derivatives commute with convolution by Schwartz functions.
+\Cref{sec:plancherel-bounds} bounds the analysis and synthesis operators of a family of
+integrable kernels on $L_2(V)$ by its Fourier overlap.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -12548,30 +12550,38 @@ $F$ (\texttt{Lp.\allowbreak fourier\_\allowbreak toTemperedDistribution\_\allowb
 
 \begin{lemma}[Plancherel's theorem]
 \label{lem:plancherel-l2}
-\lean{Rd.two_ne_top, Rd.enorm_fourier_Lp_two, Rd.enorm_sq_eq_lintegral}
+\lean{Rd.two_ne_top, Rd.enorm_fourier_Lp_two, Rd.enorm_sq_eq_lintegral,
+  Rd.lintegral_enorm_sq_eq_enorm_toLp}
 \leanok
 In $[0, \infty]$, $2 \neq \infty$. For every $F \in L_2(V)$, $\|\widehat F\|_2 = \|F\|_2$. On
-every measure space, $\|F\|_2^2 = \int |F|^2$ for every $F \in L_2$.
+every measure space, $\|F\|_2^2 = \int |F|^2$ for every $F \in L_2$, and
+$\int |f|^2 = \|[f]\|_2^2$ for every measurable function $f$ with $\int |f|^2 < \infty$ and its
+class $[f] \in L_2$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 The Fourier transform on $L_2(V)$ is a linear isometry in Mathlib
 (\texttt{Lp.\allowbreak norm\_\allowbreak fourier\_\allowbreak eq}), in particular continuous
-(\texttt{FourierTransform.\allowbreak continuous\_\allowbreak fourier}). The last identity is
-the definition of the $L_2$ norm.
+(\texttt{FourierTransform.\allowbreak continuous\_\allowbreak fourier}). The third identity is
+the definition of the $L_2$ norm, and the last one is the third for $F = [f]$, since $[f] = f$
+almost everywhere.
 \end{proof}
 
 \begin{theorem}[The convolution theorem on $L_2$]
 \label{thm:convolution-theorem-l2}
-\lean{Rd.fourier_convLp_toLp, Rd.fourier_convLp, Rd.fourier_lpBlock, Rd.enorm_lpBlock_sq}
+\lean{Rd.fourier_convLp_toLp, Rd.fourier_convLp, Rd.enorm_convLp_sq, Rd.fourier_lpBlock,
+  Rd.enorm_lpBlock_sq}
 \leanok
 \uses{lem:fourier-integrable, lem:fourier-conv, lem:plancherel-l2, lem:conv-op, def:lp-blocks,
   lem:lp-kernels-basic}
 For every integrable $K$ on $V$ and every $f \in L_2(V)$,
-$\widehat{K * f} = \widehat K \, \widehat f$ almost everywhere. In particular, for every
-$f \in L_2(V)$ and every $j \in \N$, $\widehat{\Delta_j f} = \widehat{\psi_j} \, \widehat f$
-almost everywhere and
+$\widehat{K * f} = \widehat K \, \widehat f$ almost everywhere and
+\[
+  \|K * f\|_2^2 = \int_V |\widehat K(\xi)|^2 \, |\widehat f(\xi)|^2 \, d\xi .
+\]
+In particular, for every $f \in L_2(V)$ and every $j \in \N$,
+$\widehat{\Delta_j f} = \widehat{\psi_j} \, \widehat f$ almost everywhere and
 \[
   \|\Delta_j f\|_2^2 = \int_V |\widehat{\psi_j}(\xi)|^2 \, |\widehat f(\xi)|^2 \, d\xi .
 \]
@@ -12596,8 +12606,8 @@ distribution (Mathlib's
 eq\_\allowbreak bot}). Both sides of the identity are continuous in $f \in L_2(V)$: the left by
 Young's inequality (\Cref{lem:conv-op}) and \Cref{lem:plancherel-l2}, the right because
 $\widehat K \in L_\infty$ (\Cref{lem:fourier-integrable}). Schwartz functions are dense in
-$L_2(V)$, so the identity holds for all $f$. The statement on the blocks is the case
-$K = \psi_j$, and the norm identity follows with \Cref{lem:plancherel-l2}.
+$L_2(V)$, so the identity holds for all $f$. The norm identity follows with
+\Cref{lem:plancherel-l2}, and the statements on the blocks are the case $K = \psi_j$.
 \end{proof}
 
 \begin{definition}[The Bessel weight]
@@ -15844,8 +15854,8 @@ give the rest.
 \section{The adjoint of a convolution}
 \label{sec:convolution-adjoint}
 
-The $L_2$ bound of the synthesis operator and the strong type for $2 < p < \infty$ are proved
-by duality, through convolution with reflected kernels, and the weak derivatives of
+The strong type for $2 < p < \infty$ is proved by duality, through convolution with
+reflected kernels, and the weak derivatives of
 $\Sob{m}{p}(V)$ meet the Littlewood--Paley blocks through convolutions with Schwartz kernels.
 This section moves a convolution kernel to the other side of an integral, moves derivatives
 from a Schwartz kernel to the other Schwartz factor, and shows that weak derivatives commute
@@ -15999,6 +16009,151 @@ For the second statement, $\eta * f$ and $(\partial^v \eta) * f$ lie in $L_p$ by
 \Cref{thm:young}, so they are locally integrable. For every test function $\varphi$ on $V$,
 \Cref{lem:conv-derivative-transfer} with the Schwartz function $u = \varphi$
 (\Cref{def:test-schwartz}) is the identity of \Cref{lem:weak-derivative-integral}.
+\end{proof}
+
+\section{Plancherel bounds}
+\label{sec:plancherel-bounds}
+
+A family $(\theta_j)_{j \in \N}$ of integrable kernels on $V$ defines the analysis operator
+$f \mapsto (\theta_j * f)_j$ and, for every finite set $s \subseteq \N$, the synthesis operator
+$(g_j)_j \mapsto \sum_{j \in s} \theta_j * g_j$. On $L_2(V)$ both are bounded by the Fourier
+overlap alone: Plancherel's theorem and the convolution theorem on $L_2$ turn them into
+multiplications by the functions $\widehat{\theta_j}$. Throughout, $T_K f = K * f$ is the
+convolution operator of \Cref{lem:conv-op} on $L_2(V)$, and $\widehat f$ the Fourier transform
+of $f \in L_2(V)$ of \Cref{sec:sobolev-two-littlewood-paley}.
+
+\begin{lemma}[Cauchy--Schwarz and squares of $L_2$ norms]
+\label{lem:l2-squares}
+\lean{enorm_sum_mul_sq_le, Rd.lintegral_enorm_conv_sq_eq}
+\leanok
+\uses{lem:plancherel-l2, lem:conv-op}
+For every seminormed ring $R$, such as $\C$, every finite set $s$ and all $a_j, b_j \in R$,
+$j \in s$,
+\[
+  \Bigl\|\sum_{j \in s} a_j b_j\Bigr\|^2 \leq \Bigl(\sum_{j \in s} \|a_j\|^2\Bigr)
+  \Bigl(\sum_{j \in s} \|b_j\|^2\Bigr).
+\]
+For every integrable $K$ on $V$ and every $f \in L_2(V)$,
+$\int_V |(K * f)(x)|^2 \, dx = \|T_K f\|_2^2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The inequality is the Cauchy--Schwarz inequality for the norms (Mathlib's
+\texttt{Finset.\allowbreak sum\_mul\_sq\_le\_sq\_mul\_sq}) after the triangle inequality and
+$\|a b\| \leq \|a\| \, \|b\|$. The identity follows from \Cref{lem:plancherel-l2}, since
+$T_K f = K * f$ almost everywhere (\Cref{lem:conv-op}).
+\end{proof}
+
+\begin{theorem}[The analysis bound on $L_2$]
+\label{thm:l2-analysis-bound}
+\lean{Rd.tsum_enorm_convLp_sq_le, Rd.lintegral_lqNorm_conv_sq_le}
+\leanok
+\uses{thm:convolution-theorem-l2, lem:plancherel-l2, lem:l2-squares, lem:fourier-integrable,
+  def:lq-norm}
+For every $B \in [0, \infty]$, every family $(\theta_j)_{j \in \N}$ of integrable kernels on $V$
+with $\sum_j |\widehat{\theta_j}(\xi)|^2 \leq B$ for almost every $\xi \in V$, and every
+$f \in L_2(V)$,
+\[
+  \sum_j \|\theta_j * f\|_2^2 \leq B \, \|f\|_2^2 , \qquad
+  \int_V \|((\theta_j * f)(x))_j\|_{\ell_2}^2 \, dx \leq B \int_V |f(x)|^2 \, dx .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:convolution-theorem-l2} and monotone convergence,
+\[
+  \sum_j \|\theta_j * f\|_2^2
+  = \int_V \Bigl(\sum_j |\widehat{\theta_j}(\xi)|^2\Bigr) |\widehat f(\xi)|^2 \, d\xi
+  \leq B \int_V |\widehat f(\xi)|^2 \, d\xi = B \, \|f\|_2^2
+\]
+by \Cref{lem:plancherel-l2}; the integrand is measurable since every $\widehat{\theta_j}$ lies
+in $L_\infty(V)$ (\Cref{lem:fourier-integrable}). The second inequality is the first for the
+class of $f$, written with $\|a\|_{\ell_2}^2 = \sum_j a_j^2$ (\Cref{def:lq-norm}),
+\Cref{lem:plancherel-l2}, \Cref{lem:l2-squares} and monotone convergence.
+\end{proof}
+
+\begin{lemma}[The Fourier transform of a sum of convolutions]
+\label{lem:fourier-sum-conv}
+\lean{Rd.fourier_sum_convLp}
+\leanok
+\uses{thm:convolution-theorem-l2}
+For every family $(\theta_j)_{j \in \N}$ of integrable kernels on $V$, all $g_j \in L_2(V)$ and
+every finite set $s \subseteq \N$,
+$\mathcal F\bigl(\sum_{j \in s} \theta_j * g_j\bigr)
+= \sum_{j \in s} \widehat{\theta_j} \, \widehat{g_j}$ almost everywhere.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Fourier transform on $L_2(V)$ is linear (Mathlib's
+\texttt{Fourier\allowbreak Transform.\allowbreak fourier\_\allowbreak sum}); apply
+\Cref{thm:convolution-theorem-l2} to each term.
+\end{proof}
+
+\begin{theorem}[The synthesis bound on $L_2$]
+\label{thm:l2-synthesis-bound}
+\lean{Rd.enorm_sum_convLp_sq_le, Rd.lintegral_enorm_sum_conv_sq_le}
+\leanok
+\uses{lem:fourier-sum-conv, lem:l2-squares, lem:plancherel-l2, def:lq-norm}
+For every $B \in [0, \infty]$, every family $(\theta_j)_{j \in \N}$ of integrable kernels on $V$
+with $\sum_j |\widehat{\theta_j}(\xi)|^2 \leq B$ for almost every $\xi \in V$, all
+$g_j \in L_2(V)$ and every finite set $s \subseteq \N$,
+\[
+  \Bigl\|\sum_{j \in s} \theta_j * g_j\Bigr\|_2^2 \leq B \sum_{j \in s} \|g_j\|_2^2
+\]
+and
+\[
+  \int_V \Bigl|\sum_{j \in s} (\theta_j * g_j)(x)\Bigr|^2 \, dx
+  \leq B \int_V \|(g_j(x))_j\|_{\ell_2}^2 \, dx .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:fourier-sum-conv} and the Cauchy--Schwarz inequality of \Cref{lem:l2-squares}, for
+almost every $\xi$,
+\[
+  \Bigl|\mathcal F\Bigl(\sum_{j \in s} \theta_j * g_j\Bigr)(\xi)\Bigr|^2
+  \leq \Bigl(\sum_{j \in s} |\widehat{\theta_j}(\xi)|^2\Bigr)
+  \sum_{j \in s} |\widehat{g_j}(\xi)|^2
+  \leq B \sum_{j \in s} |\widehat{g_j}(\xi)|^2 .
+\]
+Integration and \Cref{lem:plancherel-l2} on both sides give the first inequality. The second is
+the first for the classes of the $g_j$ (\Cref{lem:plancherel-l2}), with
+$\sum_{j \in s} |g_j(x)|^2 \leq \|(g_j(x))_j\|_{\ell_2}^2$ (\Cref{def:lq-norm}).
+\end{proof}
+
+\begin{corollary}[Plancherel bounds for Calder\'on--Zygmund families]
+\label{cor:cz-family-l2-bounds}
+\lean{Rd.IsCZFamily.tsum_enorm_convLp_sq_le, Rd.IsCZFamily.lintegral_lqNorm_conv_sq_le,
+  Rd.IsCZFamily.enorm_sum_convLp_sq_le, Rd.IsCZFamily.lintegral_enorm_sum_conv_sq_le}
+\leanok
+\uses{def:cz-family, thm:l2-analysis-bound, thm:l2-synthesis-bound}
+For all $B, H \in [0, \infty]$ and every Calder\'on--Zygmund family $(\theta_j)_{j \in \N}$ on
+$V$ with overlap $B$ and H\"ormander constant $H$,
+\[
+  \sum_j \|\theta_j * f\|_2^2 \leq B \, \|f\|_2^2 , \qquad
+  \int_V \|((\theta_j * f)(x))_j\|_{\ell_2}^2 \, dx \leq B \int_V |f(x)|^2 \, dx
+\]
+for every $f \in L_2(V)$, and
+\[
+  \Bigl\|\sum_{j \in s} \theta_j * g_j\Bigr\|_2^2 \leq B \sum_{j \in s} \|g_j\|_2^2
+\]
+and
+\[
+  \int_V \Bigl|\sum_{j \in s} (\theta_j * g_j)(x)\Bigr|^2 \, dx
+  \leq B \int_V \|(g_j(x))_j\|_{\ell_2}^2 \, dx
+\]
+for all $g_j \in L_2(V)$ and every finite set $s \subseteq \N$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+The kernels of a Calder\'on--Zygmund family are integrable, and the overlap bound holds at
+every $\xi$ (\Cref{def:cz-family}); apply \Cref{thm:l2-analysis-bound} and
+\Cref{thm:l2-synthesis-bound}.
 \end{proof}
 
 \chapter{Besov spaces on compact manifolds}

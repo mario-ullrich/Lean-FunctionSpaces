@@ -83,6 +83,12 @@ theorem lqNorm_rpow (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ι → ℝ≥0∞) :
   have hp : q.toReal ≠ 0 := (ENNReal.toReal_pos hq0 hq).ne'
   rw [lqNorm_eq_tsum hq0 hq, one_div, ENNReal.rpow_inv_rpow hp]
 
+/-- **The square of the `ℓ_2` norm** is the sum of the squares:
+`‖a‖_{ℓ_2}² = ∑_i a_i²` (`ENNReal.lqNorm_rpow` with `q = 2`, natural exponent). -/
+theorem lqNorm_two_sq (a : ι → ℝ≥0∞) : lqNorm 2 a ^ 2 = ∑' i, a i ^ 2 := by
+  have h := lqNorm_rpow two_ne_zero ofNat_ne_top a
+  simpa only [toReal_ofNat, rpow_two] using h
+
 omit [Countable ι] [MeasurableSingletonClass ι] in
 /-- The zero family has norm `0`. -/
 @[simp]
