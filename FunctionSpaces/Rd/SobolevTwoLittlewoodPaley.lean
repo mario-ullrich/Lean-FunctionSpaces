@@ -8,7 +8,6 @@ module
 public import FunctionSpaces.Rd.WeakDerivatives
 public import FunctionSpaces.Rd.TriebelLizorkin
 public import FunctionSpaces.Rd.DyadicGrid
-public import FunctionSpaces.Torus.EuclideanConvolutionIdentities
 public import Mathlib.Analysis.Fourier.Convolution
 public import Mathlib.Analysis.Fourier.LpSpace
 public import Mathlib.Analysis.Distribution.Sobolev
@@ -24,9 +23,6 @@ Mathlib's Sobolev space `H^s(V)` consists of the tempered distributions `u` whos
 Triebel–Lizorkin space `F^s_{2,2}(V)`, and for `s > 0` with the Besov space `B^s_{2,2}(V)`, with
 explicit constants, and proves `W^1_2(V) = H^1(V) = B^1_{2,2}(V)`.
 
-* **Integrable functions**: `𝓕K` and `𝓕⁻K` are continuous and bounded by `‖K‖_1`, and
-  `∫ 𝓕u · K = ∫ u · 𝓕K`, `∫ 𝓕⁻u · K = ∫ u · 𝓕⁻K` for Schwartz functions `u`
-  (`Rd.integral_fourier_smul_eq_of_integrable`, `Rd.integral_fourierInv_smul_eq_of_integrable`).
 * **Plancherel for the blocks**: `𝓕(K ⋆ f) = 𝓕K · 𝓕f` for an integrable `K` and `f ∈ L_2(V)`
   (`Rd.fourier_convLp`), so `‖ψ_j ⋆ f‖_2² = ∫ |𝓕ψ_j|² |𝓕f|²` (`Rd.enorm_lpBlock_sq`).
 * **The weight comparison**: at every frequency at most two blocks are nonzero, and their
@@ -69,55 +65,6 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 blocks and the band-limited scheme on `L_2`. Its type fixes `p = 2` before the remaining
 arguments are elaborated. -/
 theorem two_ne_top : (2 : ℝ≥0∞) ≠ ∞ := ENNReal.ofNat_ne_top
-
-/-- **Duality for the Fourier transform** (the multiplication formula), `∫ 𝓕u · g = ∫ u · 𝓕g`,
-for a Schwartz function `u` and an integrable function `g` (Mathlib's
-`VectorFourier.integral_fourierIntegral_smul_eq_flip` for the Fourier transform of `V`). -/
-theorem integral_fourier_smul_eq_of_integrable (u : 𝓢(V, ℂ)) {g : V → ℂ} (hg : Integrable g) :
-    ∫ ξ, 𝓕 u ξ • g ξ = ∫ x, u x • 𝓕 g x := by
-  simpa using! VectorFourier.integral_fourierIntegral_smul_eq_flip (L := innerₗ V)
-    Real.continuous_fourierChar continuous_inner u.integrable hg
-
-/-- The Fourier transform of a function is bounded by its `L_1` norm:
-`|𝓕K(ξ)| ≤ ∫ |K|` for every `ξ` (Mathlib's `VectorFourier.norm_fourierIntegral_le_integral_norm`).
--/
-theorem norm_fourier_le_integral_norm (K : V → ℂ) (ξ : V) : ‖𝓕 K ξ‖ ≤ ∫ x, ‖K x‖ :=
-  VectorFourier.norm_fourierIntegral_le_integral_norm 𝐞 volume (innerₗ V) K ξ
-
-/-- The Fourier transform of an integrable function lies in `L_∞`: it is continuous
-(`Rd.continuous_fourier_of_integrable`) and bounded by `‖K‖_1`. -/
-theorem memLp_top_fourier {K : V → ℂ} (hK : Integrable K) : MemLp (𝓕 K) ∞ volume :=
-  memLp_top_of_bound (continuous_fourier_of_integrable hK).aestronglyMeasurable _
-    (ae_of_all _ (norm_fourier_le_integral_norm K))
-
-/-- The inverse Fourier transform `𝓕⁻g(x) = ∫ e^(2πi⟪ξ, x⟫) g(ξ) dξ` of an integrable function is
-continuous, since `𝓕⁻g(x) = 𝓕g(-x)` (Mathlib's `Real.fourierInv_eq_fourier_neg`). -/
-theorem continuous_fourierInv_of_integrable {g : V → ℂ} (hg : Integrable g) :
-    Continuous (𝓕⁻ g) := by
-  rw [show 𝓕⁻ g = fun x => 𝓕 g (-x) from funext (Real.fourierInv_eq_fourier_neg g)]
-  exact (continuous_fourier_of_integrable hg).comp continuous_neg
-
-/-- The inverse Fourier transform is bounded by the `L_1` norm: `|𝓕⁻g(x)| ≤ ∫ |g|` for every
-`x`. -/
-theorem norm_fourierInv_le_integral_norm (g : V → ℂ) (x : V) : ‖𝓕⁻ g x‖ ≤ ∫ ξ, ‖g ξ‖ := by
-  rw [Real.fourierInv_eq_fourier_neg]
-  exact norm_fourier_le_integral_norm g (-x)
-
-/-- **Duality for the inverse Fourier transform** (the multiplication formula),
-`∫ 𝓕⁻u · g = ∫ u · 𝓕⁻g`, for a Schwartz function `u` and an integrable function `g` (Mathlib's
-`VectorFourier.integral_fourierIntegral_smul_eq_flip` for the pairing `-⟪ξ, x⟫`). -/
-theorem integral_fourierInv_smul_eq_of_integrable (u : 𝓢(V, ℂ)) {g : V → ℂ}
-    (hg : Integrable g) : ∫ ξ, 𝓕⁻ u ξ • g ξ = ∫ x, u x • 𝓕⁻ g x := by
-  have hL : (-innerₗ V).flip = -innerₗ V := by
-    ext x y
-    simp [real_inner_comm]
-  have h := VectorFourier.integral_fourierIntegral_smul_eq_flip (L := -innerₗ V)
-    Real.continuous_fourierChar
-    (show Continuous fun p : V × V => -(inner ℝ p.1 p.2) from continuous_inner.neg)
-    (u.integrable (μ := volume)) hg
-  rw [hL] at h
-  rw [SchwartzMap.fourierInv_coe]
-  exact h
 
 /-- **`𝓕(K ⋆ φ) = 𝓕K · 𝓕φ` for Schwartz functions `φ`**, as an identity in `L_2(V)`: the `L_2`
 Fourier transform of `K ⋆ φ` is the product of the bounded function `𝓕K` with the `L_2` Fourier

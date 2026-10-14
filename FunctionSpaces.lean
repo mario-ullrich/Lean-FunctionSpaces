@@ -174,6 +174,7 @@ public import FunctionSpaces.Torus.FeffermanStein
 public import FunctionSpaces.Torus.TriebelLizorkinLocalMeans
 public import FunctionSpaces.Rd.TriebelLizorkinDifferences
 public import FunctionSpaces.Rd.TriebelLizorkinAtoms
+public import FunctionSpaces.Rd.SchwartzCutoff
 public import FunctionSpaces.Rd.WeakDerivatives
 public import FunctionSpaces.Rd.SobolevTwoLittlewoodPaley
 public import FunctionSpaces.Rd.LipschitzDomainH1
@@ -450,8 +451,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   space, Young's inequality, associativity, and the convolution operators on `L_p`.
 * `FunctionSpaces.Rd.ApproxIdentity`: dilations, continuity of translation in `L_p`, and
   approximate identities.
-* `FunctionSpaces.Rd.LittlewoodPaleyKernels`: smooth frequency cut-offs, the kernels `Φ_k`,
-  `Θ_k`, `ψ_j` of the Littlewood–Paley decomposition, and their identities by Fourier inversion.
+* `FunctionSpaces.Rd.LittlewoodPaleyKernels`: the Fourier transform of integrable functions
+  (continuity, `L_1` bounds, convolutions, the multiplication formula), smooth frequency
+  cut-offs, the kernels `Φ_k`, `Θ_k`, `ψ_j` of the Littlewood–Paley decomposition, and their
+  identities by Fourier inversion.
 * `FunctionSpaces.Rd.BandLimited`: the band-limited classes `E_k` in `L_p(ℝ^d)` and their
   scheme.
 * `FunctionSpaces.Rd.LittlewoodPaley`: the Littlewood–Paley blocks, reconstruction, and the
@@ -583,14 +586,18 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.TriebelLizorkinAtoms`: the sequence space `f^s_{p,q}`, local means of smooth
   atoms by maximal functions of the coefficients, and the atomic characterisation of `F^s_{p,q}`
   for `1 < p < ∞`, `1 < q ≤ ∞`, `0 < s < L`.
+* `FunctionSpaces.Rd.SchwartzCutoff`: real test functions as complex Schwartz functions,
+  commuting directional derivatives, the transpose formula for iterated derivatives of
+  distributions and tempered distributions, and cut-offs converging in the Schwartz space, so
+  that test functions determine tempered distributions.
 * `FunctionSpaces.Rd.WeakDerivatives`: weak derivatives on open sets as equalities of
   distributions, integration by parts against test functions, uniqueness, locality, limits in
   `L_p`, the Sobolev spaces `W^m_p(Ω)` and `W^m_p(ℝ^d)`, and the identification with derivatives
   of tempered distributions on `ℝ^d`.
-* `FunctionSpaces.Rd.SobolevTwoLittlewoodPaley`: Fourier transforms of integrable functions, the
-  convolution theorem on `L_2(ℝ^d)`, Mathlib's Sobolev spaces `H^s(ℝ^d)` as the Triebel–Lizorkin
-  spaces `F^s_{2,2}(ℝ^d)` for `s ≥ 0` and the Besov spaces `B^s_{2,2}(ℝ^d)` for `s > 0`, with
-  explicit constants, and `W^1_2(ℝ^d) = H^1(ℝ^d) = B^1_{2,2}(ℝ^d)`.
+* `FunctionSpaces.Rd.SobolevTwoLittlewoodPaley`: the convolution theorem on `L_2(ℝ^d)`,
+  Mathlib's Sobolev spaces `H^s(ℝ^d)` as the Triebel–Lizorkin spaces `F^s_{2,2}(ℝ^d)` for
+  `s ≥ 0` and the Besov spaces `B^s_{2,2}(ℝ^d)` for `s > 0`, with explicit constants, and
+  `W^1_2(ℝ^d) = H^1(ℝ^d) = B^1_{2,2}(ℝ^d)`.
 * `FunctionSpaces.Rd.LipschitzDomainH1`: `H^1(Ω)` on a bounded Lipschitz domain `Ω` as the
   space of restrictions of `H^1(ℝ^d)`, its description by intrinsic differences, the weak
   gradient on `Ω`, and the boundary traces in `B^{1/2}_{2,2}(∂Ω)`, which form the trace space.

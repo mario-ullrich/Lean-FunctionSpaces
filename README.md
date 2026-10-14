@@ -322,8 +322,8 @@ manifolds in `FunctionSpaces/Manifold/`; the Triebel–Lizorkin block is the mix
 `FunctionSpaces/Rd/{DyadicCubes,HardyLittlewoodMaximal,CalderonZygmund}`,
 `FunctionSpaces/Rd/{FeffermanStein,KernelMajorants}` and `FunctionSpaces/Rd/TriebelLizorkin*`, and
 `FunctionSpaces/Torus/{TriebelLizorkin,PeriodicLift,FeffermanStein,TriebelLizorkinLocalMeans}`;
-Sobolev spaces on `ℝ^d` are `FunctionSpaces/Rd/{WeakDerivatives,SobolevTwoLittlewoodPaley}` and
-`FunctionSpaces/Rd/{LipschitzDomainH1,RellichCompactness}`.
+Sobolev spaces on `ℝ^d` are the files `SchwartzCutoff`, `WeakDerivatives`,
+`SobolevTwoLittlewoodPaley`, `LipschitzDomainH1` and `RellichCompactness` in `FunctionSpaces/Rd/`.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 [docs/FEECInterface.md](docs/FEECInterface.md) describes the interface to a FEEC/BEEC library

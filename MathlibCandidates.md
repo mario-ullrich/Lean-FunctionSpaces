@@ -220,7 +220,7 @@ declarations.
   (`FunctionSpaces/Wavelets/Daubechies/FilterIdentities.lean`):
   `(d/dt)^l ∑_i a_i e^(b_i t) = ∑_i a_i b_i^l e^(b_i t)` for `t ∈ ℝ`
   (`Daubechies.iteratedDeriv_sum_mul_cexp`); Mathlib has these derivatives for a complex variable.
-* **Distributions and Schwartz functions** (`FunctionSpaces/Rd/WeakDerivatives.lean`):
+* **Distributions and Schwartz functions** (`FunctionSpaces/Rd/SchwartzCutoff.lean`):
   directional derivatives commute on Schwartz functions and on test functions
   (`SchwartzMap.lineDerivOp_comm`, `TestFunction.lineDerivOp_comm`), and a directional derivative
   commutes with every iterated one as soon as two of them commute
@@ -238,7 +238,8 @@ declarations.
   Fourier transform on `L_2` (`Rd.fourier_convLp`), from the multiplication formulas
   `∫ 𝓕u · g = ∫ u · 𝓕g` and `∫ 𝓕⁻u · g = ∫ u · 𝓕⁻g` for Schwartz `u` and integrable `g`
   (Mathlib's `VectorFourier.integral_fourierIntegral_smul_eq_flip`, in the `𝓕` form
-  `Rd.integral_fourier_smul_eq_of_integrable`, `Rd.integral_fourierInv_smul_eq_of_integrable`;
+  `Rd.integral_fourier_smul_eq_of_integrable`, `Rd.integral_fourierInv_smul_eq_of_integrable`
+  of `FunctionSpaces/Rd/LittlewoodPaleyKernels.lean`;
   Mathlib's `SchwartzMap.integral_fourier_smul_eq` and `SchwartzMap.integral_fourierInv_smul_eq`
   are the forms for two Schwartz functions).
   Mathlib has the convolution theorem for integrable functions

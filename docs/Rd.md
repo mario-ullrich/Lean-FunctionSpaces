@@ -98,7 +98,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Young's inequality on measurable groups, weighted Jensen inequality, weighted averages in `L_p` | ✅ | ✗ | `Lp/Young` |
 | Convolution with integrable kernels on `ℝ^d`: Young's inequality, pointwise bounds, associativity, operators on `L_p` | ✅ | ✗ | `Rd/Convolution` |
 | Dilations, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ | ✗ | `Rd/ApproxIdentity` |
-| Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, kernel identities by Fourier inversion | ✅ | ✗ | `Rd/LittlewoodPaleyKernels` |
+| The Fourier transform of integrable functions (continuity, `L_1` bounds, convolutions, multiplication formula); Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, kernel identities by Fourier inversion | ✅ | ✗ | `Rd/LittlewoodPaleyKernels` |
 | Band-limited classes on `ℝ^d`, Littlewood–Paley blocks, `A^s_q(band-limited)` characterised by Littlewood–Paley blocks for `s > 0` | ✅ | ✗ | `Rd/BandLimited`, `Rd/LittlewoodPaley` |
 | Differences `higherDiff` on any additive monoid, steps of either sign; the modulus of smoothness on `ℝ^d`, dilation of the scale, differences of convolutions and dilations | ✅ | ✗ | `Rd/Differences`, `Rd/DilatedDifferences` |
 | Jackson's inequality for band-limited approximation | ✅ | ✗ | `Rd/BandJackson` |

@@ -2895,7 +2895,7 @@ $L_p(\T^d)$.
   Torus.econvLp_comm, Torus.econvLp_add_kernel, Torus.econvLp_sub_kernel,
   Torus.econvLp_eq_zero_of_mem}
 \leanok
-\uses{thm:torus-econv-fourier, lem:torus-econv-young, lem:fourier-conv, lem:fourier-dilate}
+\uses{thm:torus-econv-fourier, lem:torus-econv-young, lem:fourier-conv}
 Two bounded operators on $L_p(\T^d)$ that agree on every $e_m$, $m \in \Z^d$, are equal. For all
 $K, L \in L_1(\R^d)$ and every $f \in L_p(\T^d)$,
 \[
@@ -2911,7 +2911,7 @@ The characters span a dense subspace of $L_p(\T^d)$, so a bounded operator is de
 values on them. All operators in the identities are bounded (\Cref{lem:torus-econv-young}) and
 multiply $e_m$ by $\mathcal{F}K(m) \, \mathcal{F}L(m) = \mathcal{F}(K * L)(m)$, respectively by
 $\mathcal{F}K(m) \pm \mathcal{F}L(m) = \mathcal{F}(K \pm L)(m)$ (\Cref{thm:torus-econv-fourier},
-\Cref{lem:fourier-conv,lem:fourier-dilate}). The last claim holds on the characters $e_m$ with
+\Cref{lem:fourier-conv}). The last claim holds on the characters $e_m$ with
 $\deg m < n$, which span $\mathcal{T}_n$.
 \end{proof}
 
@@ -5745,12 +5745,11 @@ by $|\Phi(z)| (2 \|f\|_p)^p$; dominated convergence concludes.
 
 \begin{lemma}[Fourier transform of dilations]
 \label{lem:fourier-dilate}
-\lean{Rd.fourier_dilate, Rd.integrable_fourier_dilate, Rd.fourier_sub_apply}
+\lean{Rd.fourier_dilate, Rd.integrable_fourier_dilate}
 \leanok
 \uses{lem:dilate}
 For $c > 0$, $\Phi : V \to \C$ and $\xi \in V$, $\widehat{\Phi_c}(\xi) = \widehat\Phi(c^{-1} \xi)$.
-If $\widehat\Phi$ is integrable, so is $\widehat{\Phi_c}$. For integrable $f$ and $g$,
-$\widehat{f - g} = \widehat f - \widehat g$.
+If $\widehat\Phi$ is integrable, so is $\widehat{\Phi_c}$.
 \end{lemma}
 
 \begin{proof}
@@ -5760,14 +5759,14 @@ Substitute $y = c x$ and use $\langle c x, c^{-1} \xi \rangle = \langle x, \xi \
 
 \begin{lemma}[Fourier transforms of convolutions]
 \label{lem:fourier-conv}
-\lean{Rd.fourier_conv, Rd.fourier_add_apply, Rd.fourier_apply_zero,
-  Rd.continuous_fourier_of_integrable}
+\lean{Rd.fourier_conv, Rd.fourier_add_apply, Rd.fourier_sub_apply,
+  Rd.fourier_apply_zero, Rd.continuous_fourier_of_integrable}
 \leanok
 \uses{def:conv}
 For all integrable $K, L : V \to \C$ and every $\xi \in V$,
 \[
   \widehat{K * L}(\xi) = \widehat K(\xi) \, \widehat L(\xi), \qquad
-  \widehat{K + L}(\xi) = \widehat K(\xi) + \widehat L(\xi), \qquad
+  \widehat{K \pm L}(\xi) = \widehat K(\xi) \pm \widehat L(\xi), \qquad
   \widehat K(0) = \int_V K ,
 \]
 and $\widehat K$ is continuous.
@@ -5778,9 +5777,39 @@ and $\widehat K$ is continuous.
 The product formula is Fubini's theorem with $e^{-2\pi i \langle x + y, \xi \rangle} =
 e^{-2\pi i \langle x, \xi \rangle} e^{-2\pi i \langle y, \xi \rangle}$ (Mathlib's
 \texttt{Real.\allowbreak fourier\_\allowbreak bilin\_\allowbreak convolution\_\allowbreak eq}).
-The sum rule is the linearity of the integral (Mathlib's
-\texttt{VectorFourier.\allowbreak fourierIntegral\_\allowbreak add}), and the continuity follows
-from dominated convergence with the majorant $|K|$.
+The sum and difference rules are the linearity of the integral (Mathlib's
+\texttt{VectorFourier.\allowbreak fourierIntegral\_\allowbreak add} and
+\texttt{integral\_\allowbreak sub}), and the continuity follows from dominated convergence with
+the majorant $|K|$.
+\end{proof}
+
+\begin{lemma}[The Fourier transform of integrable functions]
+\label{lem:fourier-integrable}
+\lean{Rd.integral_fourier_smul_eq_of_integrable, Rd.norm_fourier_le_integral_norm,
+  Rd.memLp_top_fourier, Rd.continuous_fourierInv_of_integrable,
+  Rd.norm_fourierInv_le_integral_norm, Rd.integral_fourierInv_smul_eq_of_integrable}
+\leanok
+\uses{lem:fourier-conv}
+For every Schwartz function $u$ and every integrable $g$ on $V$,
+$\int \widehat u \, g = \int u \, \widehat g$ and
+$\int (\mathcal F^{-1} u) \, g = \int u \, \mathcal F^{-1} g$. For every integrable $K$ on $V$,
+$|\widehat K(\xi)| \leq \|K\|_1$ for every $\xi \in V$, $\widehat K \in L_\infty$, and the inverse
+Fourier transform
+$\mathcal F^{-1} K(x) = \int e^{2 \pi i \langle \xi, x \rangle} K(\xi) \, d\xi$ is continuous
+with $|\mathcal F^{-1} K(x)| \leq \|K\|_1$ for every $x \in V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's \texttt{VectorFourier.\allowbreak integral\_\allowbreak fourierIntegral\_\allowbreak
+smul\_\allowbreak eq\_\allowbreak flip} and \texttt{VectorFourier.\allowbreak norm\_\allowbreak
+fourierIntegral\_\allowbreak le\_\allowbreak integral\_\allowbreak norm}; $\widehat K$ is
+continuous by \Cref{lem:fourier-conv}, hence measurable. For the inverse transform,
+$\mathcal F^{-1} K(x) = \widehat K(-x)$ (Mathlib's \texttt{Real.\allowbreak
+fourierInv\_\allowbreak eq\_\allowbreak fourier\_\allowbreak neg}), and the identity is
+\texttt{VectorFourier.\allowbreak integral\_\allowbreak fourierIntegral\_\allowbreak
+smul\_\allowbreak eq\_\allowbreak flip} for the pairing $(\xi, x) \mapsto -\langle \xi, x \rangle$,
+which is symmetric.
 \end{proof}
 
 \begin{definition}[Cut-offs and kernels]
@@ -5831,7 +5860,7 @@ remaining claims follow from \Cref{lem:dilate} and the triangle inequality; the 
   Rd.fourier_Theta_eq_one, Rd.norm_lt_of_fourier_psi_ne_zero, Rd.fourier_psi_succ_eq_zero,
   Rd.fourier_Theta_succ_mul, Rd.fourier_Theta_mul_psi, Rd.fourier_psi_mul_Theta}
 \leanok
-\uses{lem:fourier-dilate, lem:lp-kernels-basic}
+\uses{lem:fourier-dilate, lem:fourier-conv, lem:lp-kernels-basic}
 For all $j, k \in \N$ and $\xi \in V$, $\widehat{\Phi_k}(\xi) = \chi_{1,2}(2^{-k} \xi)$ and
 $\widehat{\Theta_k}(\xi) = \chi_{2,4}(2^{-k} \xi)$, and $\widehat{\Phi_k}$, $\widehat{\Theta_k}$,
 $\widehat{\psi_j}$ are integrable. Moreover:
@@ -5849,11 +5878,12 @@ $\widehat{\psi_j}$ are integrable. Moreover:
 \begin{proof}
 \leanok
 The formulas follow from \Cref{lem:fourier-dilate}, with
-$\widehat{\psi_{j+1}} = \widehat{\Phi_{j+1}} - \widehat{\Phi_j}$, and (1)--(3) from the
-properties of the cut-offs; for (3), $\chi_{1,2}(2^{-j-1} \xi) = \chi_{1,2}(2^{-j} \xi) = 1$ if
-$|\xi| \leq 2^j$. For (4): where $\widehat{\Theta_k}(\xi) \neq 0$, $|\xi| < 2^{k+2}$ and
-$\widehat{\Theta_{k+1}}(\xi) = 1$; where $\widehat{\psi_j}(\xi) \neq 0$, $|\xi| < 2^{j+1}$ and
-$\widehat{\Theta_j}(\xi) = 1$; where $\widehat{\Theta_k}(\xi) \neq 0$ and $j \geq k + 3$,
+$\widehat{\psi_{j+1}} = \widehat{\Phi_{j+1}} - \widehat{\Phi_j}$ (\Cref{lem:fourier-conv}), and
+(1)--(3) from the properties of the cut-offs; for (3),
+$\chi_{1,2}(2^{-j-1} \xi) = \chi_{1,2}(2^{-j} \xi) = 1$ if $|\xi| \leq 2^j$. For (4): where
+$\widehat{\Theta_k}(\xi) \neq 0$, $|\xi| < 2^{k+2}$ and $\widehat{\Theta_{k+1}}(\xi) = 1$;
+where $\widehat{\psi_j}(\xi) \neq 0$, $|\xi| < 2^{j+1}$ and $\widehat{\Theta_j}(\xi) = 1$;
+where $\widehat{\Theta_k}(\xi) \neq 0$ and $j \geq k + 3$,
 $|\xi| < 2^{k+2} \leq 2^{j-1}$ and $\widehat{\psi_j}(\xi) = 0$.
 \end{proof}
 
@@ -5861,7 +5891,7 @@ $|\xi| < 2^{k+2} \leq 2^{j-1}$ and $\widehat{\psi_j}(\xi) = 0$.
 \label{lem:conv-of-fourier}
 \lean{Rd.conv_eq_of_fourier}
 \leanok
-\uses{def:conv}
+\uses{def:conv, lem:fourier-conv}
 Let $K, L, M \in L_1(V)$, with $L$ bounded and continuous, $M$ continuous and $\widehat M$
 integrable. If $\widehat K \widehat L = \widehat M$, then $K * L = M$.
 \end{lemma}
@@ -5869,8 +5899,9 @@ integrable. If $\widehat K \widehat L = \widehat M$, then $K * L = M$.
 \begin{proof}
 \leanok
 $K * L$ is integrable and continuous, and $\widehat{K * L} = \widehat K \widehat L = \widehat M$ is
-integrable. The inversion theorem for continuous integrable functions with integrable Fourier
-transform gives $K * L = \mathcal F^{-1} \widehat{K * L} = \mathcal F^{-1} \widehat M = M$.
+integrable (\Cref{lem:fourier-conv}). The inversion theorem for continuous integrable functions
+with integrable Fourier transform gives
+$K * L = \mathcal F^{-1} \widehat{K * L} = \mathcal F^{-1} \widehat M = M$.
 \end{proof}
 
 \begin{theorem}[Kernel identities]
@@ -12068,24 +12099,25 @@ $H^1(\Omega)$ with boundary trace zero form the closure of the test functions in
 \cite[Theorem 3.40]{McLean}; this statement needs the normed space
 of $H^1(\Omega)$, which the libraries built on this one supply as well.
 
-\section{Weak derivatives on open sets and cut-offs of Schwartz functions}
+\section{Test functions in the Schwartz space}
+\label{sec:schwartz-cutoff}
 
-Throughout this section $\Omega \subseteq V$ is open, $\mathcal D(\Omega)$ is the space of
+Throughout this chapter $\mathcal D(\Omega)$, for open $\Omega \subseteq V$, is the space of
 smooth functions $\varphi : V \to \R$ with compact support in $\Omega$, and
 $\mathcal S(V)$ is the space of complex Schwartz functions on $V$. For directions
 $v = (v_0, \dots, v_{k-1}) \in V^k$ let $\partial^v = \partial_{v_0} \cdots \partial_{v_{k-1}}$ be
 the iterated directional derivative, with $\partial^v = \mathrm{id}$ for $k = 0$. Mathlib
-differentiates a distribution $T$ on $\Omega$ by $\partial_w T(\varphi) = T(-\partial_w \varphi)$,
-a tempered distribution $T$ by $\partial_w T(u) = T(-\partial_w u)$, and identifies a locally
-integrable function $f$ on $\Omega$ with the distribution $\varphi \mapsto \int \varphi f$ and a
-function $f \in L_p(V)$, $1 \leq p \leq \infty$, with the tempered distribution
-$u \mapsto \int u f$.
+differentiates a distribution $T$ on $\Omega$ by $\partial_w T(\varphi) = T(-\partial_w \varphi)$
+and a tempered distribution $T$ by $\partial_w T(u) = T(-\partial_w u)$. This section shows that
+test functions are Schwartz functions with the same derivatives, and that they determine
+tempered distributions.
 
 \begin{definition}[Test functions as Schwartz functions]
 \label{def:test-schwartz}
 \lean{Rd.testSchwartz, Rd.testSchwartz_apply}
 \leanok
-For every test function $\varphi \in \mathcal D(\Omega)$, the complex function
+For every open $\Omega \subseteq V$ and every test function $\varphi \in \mathcal D(\Omega)$,
+the complex function
 $x \mapsto \varphi(x)$ on $V$ is a Schwartz function, again denoted $\varphi$.
 \end{definition}
 
@@ -12098,8 +12130,8 @@ $x \mapsto \varphi(x)$ on $V$ is a Schwartz function, again denoted $\varphi$.
   TestFunction.lineDerivOp_iteratedLineDerivOp_comm}
 \leanok
 \uses{def:test-schwartz}
-For every Schwartz function $u$, every test function $\varphi \in \mathcal D(\Omega)$, all
-$a, b \in V$ and every $v \in V^k$,
+For every open $\Omega \subseteq V$, every Schwartz function $u$, every test function
+$\varphi \in \mathcal D(\Omega)$, all $a, b \in V$ and every $v \in V^k$,
 \[
   \partial_a \partial_b u = \partial_b \partial_a u, \quad
   \partial_a \partial^v u = \partial^v \partial_a u, \quad
@@ -12132,8 +12164,9 @@ its values.
   TemperedDistribution.iteratedLineDerivOp_toTemperedDistributionCLM_eq}
 \leanok
 \uses{lem:directional-derivatives-commute}
-For every distribution $T$ on $\Omega$, every tempered distribution $S$, every
-$\varphi \in \mathcal D(\Omega)$, every Schwartz function $u$ and every $v \in V^k$,
+For every open $\Omega \subseteq V$, every distribution $T$ on $\Omega$, every tempered
+distribution $S$, every $\varphi \in \mathcal D(\Omega)$, every Schwartz function $u$ and every
+$v \in V^k$,
 \[
   \partial^v T(\varphi) = (-1)^k \, T(\partial^v \varphi), \qquad
   \partial^v S(u) = S\bigl((-1)^k \partial^v u\bigr),
@@ -12154,6 +12187,97 @@ Schwartz function $u$ it iterates Mathlib's
 \texttt{TemperedDistribution.\allowbreak lineDerivOp\_\allowbreak
 toTemperedDistributionCLM\_\allowbreak eq}.
 \end{proof}
+
+Tempered distributions are determined by their values on test functions, because the cut-offs
+of a Schwartz function converge to it in the topology of $\mathcal S(V)$.
+
+\begin{definition}[Cut-offs of Schwartz functions]
+\label{def:schwartz-cutoff}
+\lean{Rd.hasCompactSupport_cutoff_smul_mul, Rd.cutoffMul, Rd.cutoffMul_apply,
+  Rd.hasCompactSupport_cutoffMul, Rd.cutoffMulBound, Rd.cutoffMulConst, Rd.cutoffMulConst_nonneg}
+\leanok
+\uses{def:lp-kernels, lem:lp-kernels-basic}
+For every Schwartz function $u$ and every $N \in \N$, the cut-off of $u$ at radius $N + 1$ is the
+smooth compactly supported function
+\[
+  \chi_N u : x \mapsto \chi_{1,2}\bigl(x / (N + 1)\bigr) \, u(x) .
+\]
+For all $k, m \in \N$ and $x \in V$ let
+\begin{align*}
+  B_m(x) &= \|D^m u(x)\| + \sum_{i=0}^m \binom{m}{i} \, p_{0,i}(\chi_{1,2}) \,
+  \|D^{m-i} u(x)\|, \\
+  C_{k,m}(u) &= p_{k+1,m}(u) + \sum_{i=0}^m \binom{m}{i} \, p_{0,i}(\chi_{1,2}) \,
+  p_{k+1,m-i}(u) \geq 0,
+\end{align*}
+where $p_{k,m}(w) = \sup_x \|x\|^k \|D^m w(x)\|$ are the Schwartz seminorms.
+\end{definition}
+
+\begin{lemma}[The cut-off estimate]
+\label{lem:schwartz-cutoff-estimate}
+\lean{Rd.cutoffMul_eventuallyEq, Rd.norm_iteratedFDeriv_cutoff_comp_smul_le,
+  Rd.norm_iteratedFDeriv_cutoffMul_le, Rd.norm_iteratedFDeriv_sub_cutoffMul_le,
+  Rd.iteratedFDeriv_sub_cutoffMul_eq_zero, Rd.norm_pow_succ_mul_cutoffMulBound_le,
+  Rd.seminorm_sub_cutoffMul_le}
+\leanok
+\uses{def:schwartz-cutoff}
+For every Schwartz function $u$ and all $k, m, N \in \N$,
+\[
+  p_{k,m}(u - \chi_N u) \leq \frac{C_{k,m}(u)}{N + 1} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $0 \leq c \leq 1$, $D^i(\chi_{1,2}(c \,\cdot))(x) = c^i D^i \chi_{1,2}(c x)$ has norm at most
+$p_{0,i}(\chi_{1,2})$, so the Leibniz rule (Mathlib's
+\texttt{norm\_\allowbreak iteratedFDeriv\_\allowbreak mul\_\allowbreak le}) gives
+$\|D^m (u - \chi_N u)(x)\| \leq B_m(x)$ for every $x$. On the open ball of radius $N + 1$ the
+cut-off is $1$, so $u - \chi_N u$ vanishes near each of its points and so do all its
+derivatives. For $\|x\| \geq N + 1$,
+$(N + 1) \|x\|^k B_m(x) \leq \|x\|^{k+1} B_m(x) \leq C_{k,m}(u)$.
+\end{proof}
+
+\begin{lemma}[Cut-offs converge in the Schwartz space]
+\label{lem:schwartz-cutoff-tendsto}
+\lean{Rd.tendsto_cutoffMul}
+\leanok
+\uses{lem:schwartz-cutoff-estimate}
+For every Schwartz function $u$, $\chi_N u \to u$ in $\mathcal S(V)$ as $N \to \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The topology of $\mathcal S(V)$ is that of the seminorms $p_{k,m}$ (Mathlib's
+\texttt{schwartz\_\allowbreak withSeminorms}), and each $p_{k,m}(\chi_N u - u)$ is at most
+$C_{k,m}(u) / (N + 1)$ by \Cref{lem:schwartz-cutoff-estimate}.
+\end{proof}
+
+Since every $\chi_N u$ is smooth with compact support, the smooth compactly supported complex
+functions are dense in $\mathcal S(V)$.
+
+\begin{theorem}[Test functions determine tempered distributions]
+\label{thm:test-functions-determine}
+\lean{Rd.exists_testSchwartz_eq, Rd.eq_zero_of_testSchwartz}
+\leanok
+\uses{lem:schwartz-cutoff-tendsto, def:test-schwartz}
+For every complex normed space $F$ and every tempered distribution $T$ with values in $F$ such
+that $T(\varphi) = 0$ for every $\varphi \in \mathcal D(V)$, $T = 0$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Every smooth compactly supported $w : V \to \C$ is $\operatorname{Re} w + i \operatorname{Im} w$
+with $\operatorname{Re} w, \operatorname{Im} w \in \mathcal D(V)$, so $T$ vanishes on it by
+linearity. For a Schwartz function $u$, $T(\chi_N u) = 0$ for every $N$ and
+$T(\chi_N u) \to T(u)$ by \Cref{lem:schwartz-cutoff-tendsto} and the continuity of $T$.
+\end{proof}
+
+\section{Weak derivatives on open sets}
+\label{sec:weak-derivatives}
+
+Throughout this section $\Omega \subseteq V$ is open. Mathlib identifies a locally integrable
+function $f$ on $\Omega$ with the distribution $\varphi \mapsto \int \varphi f$ and a function
+$f \in L_p(V)$, $1 \leq p \leq \infty$, with the tempered distribution $u \mapsto \int u f$.
 
 \begin{definition}[Weak derivatives and Sobolev spaces]
 \label{def:weak-line-derivative}
@@ -12288,92 +12412,8 @@ $\int \varphi g_i = (-1)^k \int (\partial^v \varphi) f_i$ by
 to $\int \varphi g$ and to $(-1)^k \int (\partial^v \varphi) f$, and limits in $\C$ are unique.
 \end{proof}
 
-The bridge to tempered distributions needs that tempered distributions are determined by their
-values on test functions. The cut-offs of a Schwartz function converge to it in the topology of
-$\mathcal S(V)$.
-
-\begin{definition}[Cut-offs of Schwartz functions]
-\label{def:schwartz-cutoff}
-\lean{Rd.hasCompactSupport_cutoff_smul_mul, Rd.cutoffMul, Rd.cutoffMul_apply,
-  Rd.hasCompactSupport_cutoffMul, Rd.cutoffMulBound, Rd.cutoffMulConst, Rd.cutoffMulConst_nonneg}
-\leanok
-\uses{def:lp-kernels, lem:lp-kernels-basic}
-For every Schwartz function $u$ and every $N \in \N$, the cut-off of $u$ at radius $N + 1$ is the
-smooth compactly supported function
-\[
-  \chi_N u : x \mapsto \chi_{1,2}\bigl(x / (N + 1)\bigr) \, u(x) .
-\]
-For all $k, m \in \N$ and $x \in V$ let
-\begin{align*}
-  B_m(x) &= \|D^m u(x)\| + \sum_{i=0}^m \binom{m}{i} \, p_{0,i}(\chi_{1,2}) \,
-  \|D^{m-i} u(x)\|, \\
-  C_{k,m}(u) &= p_{k+1,m}(u) + \sum_{i=0}^m \binom{m}{i} \, p_{0,i}(\chi_{1,2}) \,
-  p_{k+1,m-i}(u) \geq 0,
-\end{align*}
-where $p_{k,m}(w) = \sup_x \|x\|^k \|D^m w(x)\|$ are the Schwartz seminorms.
-\end{definition}
-
-\begin{lemma}[The cut-off estimate]
-\label{lem:schwartz-cutoff-estimate}
-\lean{Rd.cutoffMul_eventuallyEq, Rd.norm_iteratedFDeriv_cutoff_comp_smul_le,
-  Rd.norm_iteratedFDeriv_cutoffMul_le, Rd.norm_iteratedFDeriv_sub_cutoffMul_le,
-  Rd.iteratedFDeriv_sub_cutoffMul_eq_zero, Rd.norm_pow_succ_mul_cutoffMulBound_le,
-  Rd.seminorm_sub_cutoffMul_le}
-\leanok
-\uses{def:schwartz-cutoff}
-For every Schwartz function $u$ and all $k, m, N \in \N$,
-\[
-  p_{k,m}(u - \chi_N u) \leq \frac{C_{k,m}(u)}{N + 1} .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-For $0 \leq c \leq 1$, $D^i(\chi_{1,2}(c \,\cdot))(x) = c^i D^i \chi_{1,2}(c x)$ has norm at most
-$p_{0,i}(\chi_{1,2})$, so the Leibniz rule (Mathlib's
-\texttt{norm\_\allowbreak iteratedFDeriv\_\allowbreak mul\_\allowbreak le}) gives
-$\|D^m (u - \chi_N u)(x)\| \leq B_m(x)$ for every $x$. On the open ball of radius $N + 1$ the
-cut-off is $1$, so $u - \chi_N u$ vanishes near each of its points and so do all its
-derivatives. For $\|x\| \geq N + 1$,
-$(N + 1) \|x\|^k B_m(x) \leq \|x\|^{k+1} B_m(x) \leq C_{k,m}(u)$.
-\end{proof}
-
-\begin{lemma}[Cut-offs converge in the Schwartz space]
-\label{lem:schwartz-cutoff-tendsto}
-\lean{Rd.tendsto_cutoffMul}
-\leanok
-\uses{lem:schwartz-cutoff-estimate}
-For every Schwartz function $u$, $\chi_N u \to u$ in $\mathcal S(V)$ as $N \to \infty$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The topology of $\mathcal S(V)$ is that of the seminorms $p_{k,m}$ (Mathlib's
-\texttt{schwartz\_\allowbreak withSeminorms}), and each $p_{k,m}(\chi_N u - u)$ is at most
-$C_{k,m}(u) / (N + 1)$ by \Cref{lem:schwartz-cutoff-estimate}.
-\end{proof}
-
-Since every $\chi_N u$ is smooth with compact support, the smooth compactly supported complex
-functions are dense in $\mathcal S(V)$.
-
-\begin{theorem}[Test functions determine tempered distributions]
-\label{thm:test-functions-determine}
-\lean{Rd.exists_testSchwartz_eq, Rd.eq_zero_of_testSchwartz}
-\leanok
-\uses{lem:schwartz-cutoff-tendsto, def:test-schwartz}
-For every complex normed space $F$ and every tempered distribution $T$ with values in $F$ such
-that $T(\varphi) = 0$ for every $\varphi \in \mathcal D(V)$, $T = 0$.
-\end{theorem}
-
-\begin{proof}
-\leanok
-Every smooth compactly supported $w : V \to \C$ is $\operatorname{Re} w + i \operatorname{Im} w$
-with $\operatorname{Re} w, \operatorname{Im} w \in \mathcal D(V)$, so $T$ vanishes on it by
-linearity. For a Schwartz function $u$, $T(\chi_N u) = 0$ for every $N$ and
-$T(\chi_N u) \to T(u)$ by \Cref{lem:schwartz-cutoff-tendsto} and the continuity of $T$.
-\end{proof}
-
-For $1 \leq p \leq \infty$ and $f \in L_p(V)$ let $T_f$ be $f$ as a distribution on $V$ and
+The bridge to tempered distributions rests on \Cref{thm:test-functions-determine}. For
+$1 \leq p \leq \infty$ and $f \in L_p(V)$ let $T_f$ be $f$ as a distribution on $V$ and
 $S_f$ be $f$ as a tempered distribution.
 
 \begin{lemma}[$L_p$ functions as distributions on $V$]
@@ -12467,35 +12507,6 @@ Besov space $\Besov{s}{2}{2}$, with explicit constants, and proves $\Sob{1}{2}(V
 Fourier transform $\widehat F$ of $F \in L_2(V)$ is Plancherel's, Mathlib's linear isometry of
 $L_2(V)$, and Mathlib identifies it with the Fourier transform of the tempered distribution of
 $F$ (\texttt{Lp.\allowbreak fourier\_\allowbreak toTemperedDistribution\_\allowbreak eq}).
-
-\begin{lemma}[The Fourier transform of integrable functions]
-\label{lem:fourier-integrable}
-\lean{Rd.integral_fourier_smul_eq_of_integrable, Rd.norm_fourier_le_integral_norm,
-  Rd.memLp_top_fourier, Rd.continuous_fourierInv_of_integrable,
-  Rd.norm_fourierInv_le_integral_norm, Rd.integral_fourierInv_smul_eq_of_integrable}
-\leanok
-\uses{lem:fourier-conv}
-For every Schwartz function $u$ and every integrable $g$ on $V$,
-$\int \widehat u \, g = \int u \, \widehat g$ and
-$\int (\mathcal F^{-1} u) \, g = \int u \, \mathcal F^{-1} g$. For every integrable $K$ on $V$,
-$|\widehat K(\xi)| \leq \|K\|_1$ for every $\xi \in V$, $\widehat K \in L_\infty$, and the inverse
-Fourier transform
-$\mathcal F^{-1} K(x) = \int e^{2 \pi i \langle \xi, x \rangle} K(\xi) \, d\xi$ is continuous
-with $|\mathcal F^{-1} K(x)| \leq \|K\|_1$ for every $x \in V$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-Mathlib's \texttt{VectorFourier.\allowbreak integral\_\allowbreak fourierIntegral\_\allowbreak
-smul\_\allowbreak eq\_\allowbreak flip} and \texttt{VectorFourier.\allowbreak norm\_\allowbreak
-fourierIntegral\_\allowbreak le\_\allowbreak integral\_\allowbreak norm}; $\widehat K$ is
-continuous by \Cref{lem:fourier-conv}, hence measurable. For the inverse transform,
-$\mathcal F^{-1} K(x) = \widehat K(-x)$ (Mathlib's \texttt{Real.\allowbreak
-fourierInv\_\allowbreak eq\_\allowbreak fourier\_\allowbreak neg}), and the identity is
-\texttt{VectorFourier.\allowbreak integral\_\allowbreak fourierIntegral\_\allowbreak
-smul\_\allowbreak eq\_\allowbreak flip} for the pairing $(\xi, x) \mapsto -\langle \xi, x \rangle$,
-which is symmetric.
-\end{proof}
 
 \begin{lemma}[Plancherel's theorem]
 \label{lem:plancherel-l2}

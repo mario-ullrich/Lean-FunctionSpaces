@@ -15,8 +15,16 @@ public import Mathlib.Analysis.Calculus.BumpFunction.InnerProduct
 # Littlewood–Paley kernels
 
 On a finite-dimensional real inner product space `V` with Lebesgue measure, the Fourier transform
-is `𝓕 f(ξ) = ∫ e^(-2πi⟪x, ξ⟫) f(x) dx` (Mathlib's `Real.fourier_eq`). The kernels of the
-Littlewood–Paley decomposition are inverse transforms of smooth cut-offs:
+is `𝓕 f(ξ) = ∫ e^(-2πi⟪x, ξ⟫) f(x) dx` (Mathlib's `Real.fourier_eq`). For integrable `K`, the
+transforms `𝓕K` and `𝓕⁻K` are continuous and bounded by `‖K‖_1`
+(`Rd.continuous_fourier_of_integrable`, `Rd.norm_fourier_le_integral_norm`,
+`Rd.continuous_fourierInv_of_integrable`, `Rd.norm_fourierInv_le_integral_norm`),
+`𝓕K ∈ L_∞` (`Rd.memLp_top_fourier`), the transform respects sums and differences
+(`Rd.fourier_add_apply`, `Rd.fourier_sub_apply`), `𝓕(K ⋆ L) = 𝓕K · 𝓕L` (`Rd.fourier_conv`),
+`𝓕K(0) = ∫ K` (`Rd.fourier_apply_zero`), and
+`∫ 𝓕u · K = ∫ u · 𝓕K`, `∫ 𝓕⁻u · K = ∫ u · 𝓕⁻K` for Schwartz functions `u`
+(`Rd.integral_fourier_smul_eq_of_integrable`, `Rd.integral_fourierInv_smul_eq_of_integrable`).
+The kernels of the Littlewood–Paley decomposition are inverse transforms of smooth cut-offs:
 
 * `Rd.cutoff a b`: a smooth function equal to `1` on the closed ball of radius `a` and to `0`
   outside the ball of radius `b` (Mathlib's `ContDiffBump`), a Schwartz function
@@ -30,8 +38,8 @@ Littlewood–Paley decomposition are inverse transforms of smooth cut-offs:
 On the frequency side `𝓕Φ_k` lives in the ball of radius `2^(k+1)`, `𝓕Θ_k` in the ball of radius
 `2^(k+2)` and equals `1` on the ball of radius `2^(k+1)`, and `𝓕ψ_{j+1}` lives in the annulus
 `2^j ≤ |ξ| ≤ 2^(j+2)`. The **kernel identities** follow by comparing Fourier transforms
-(`Rd.conv_eq_of_fourier`: if `𝓕K · 𝓕L = 𝓕M`, then `K ⋆ L = M`, by Mathlib's
-`Real.fourier_bilin_convolution_eq` and the inversion theorem `Continuous.fourierInv_fourier_eq`):
+(`Rd.conv_eq_of_fourier`: if `𝓕K · 𝓕L = 𝓕M`, then `K ⋆ L = M`, by `Rd.fourier_conv` and the
+inversion theorem `Continuous.fourierInv_fourier_eq`):
 
 * `Θ_{k+1} ⋆ Θ_k = Θ_k` (`Rd.conv_Theta_succ`): the band-limited classes increase;
 * `Θ_j ⋆ ψ_j = ψ_j` (`Rd.conv_Theta_psi`): the blocks are band-limited;
@@ -89,6 +97,15 @@ theorem integrable_fourier_dilate {Φ : V → ℂ} (hΦ : Integrable (𝓕 Φ)) 
   rw [show 𝓕 (dilate c Φ) = fun ξ => 𝓕 Φ (c⁻¹ • ξ) from funext (fourier_dilate Φ hc)]
   exact hΦ.comp_smul (inv_ne_zero hc.ne')
 
+/-! ### The Fourier transform of integrable functions -/
+
+/-- The Fourier transform of a sum of integrable functions is the sum of the transforms (Mathlib's
+`VectorFourier.fourierIntegral_add`). -/
+theorem fourier_add_apply {f g : V → ℂ} (hf : Integrable f) (hg : Integrable g) (ξ : V) :
+    𝓕 (f + g) ξ = 𝓕 f ξ + 𝓕 g ξ :=
+  congrFun (VectorFourier.fourierIntegral_add Real.continuous_fourierChar
+    (innerSL ℝ).continuous₂ hf hg) ξ
+
 /-- The Fourier transform of a difference of integrable functions is the difference of the
 transforms. -/
 theorem fourier_sub_apply {f g : V → ℂ} (hf : Integrable f) (hg : Integrable g) (ξ : V) :
@@ -97,13 +114,80 @@ theorem fourier_sub_apply {f g : V → ℂ} (hf : Integrable f) (hg : Integrable
   exact integral_sub ((Real.fourierIntegral_convergent_iff ξ).2 hf)
     ((Real.fourierIntegral_convergent_iff ξ).2 hg)
 
+/-- **The Fourier transform of a convolution** is the product of the transforms:
+`𝓕(K ⋆ L)(ξ) = 𝓕K(ξ) 𝓕L(ξ)` for integrable `K` and `L` (Mathlib's
+`Real.fourier_bilin_convolution_eq`). -/
+theorem fourier_conv {K L : V → ℂ} (hK : Integrable K) (hL : Integrable L) (ξ : V) :
+    𝓕 (conv K L volume) ξ = 𝓕 K ξ * 𝓕 L ξ := by
+  rw [conv, Real.fourier_bilin_convolution_eq _ hK hL]
+  rfl
+
+/-- **The Fourier transform at the origin is the integral**: `𝓕K(0) = ∫ K`. -/
+theorem fourier_apply_zero (K : V → ℂ) : 𝓕 K 0 = ∫ x, K x := by
+  simp [Real.fourier_eq]
+
+/-- **The Fourier transform of an integrable function is continuous** (Mathlib's
+`VectorFourier.fourierIntegral_continuous`). -/
+theorem continuous_fourier_of_integrable {K : V → ℂ} (hK : Integrable K) : Continuous (𝓕 K) :=
+  VectorFourier.fourierIntegral_continuous Real.continuous_fourierChar
+    (innerSL ℝ).continuous₂ hK
+
+/-- **Duality for the Fourier transform** (the multiplication formula), `∫ 𝓕u · g = ∫ u · 𝓕g`,
+for a Schwartz function `u` and an integrable function `g` (Mathlib's
+`VectorFourier.integral_fourierIntegral_smul_eq_flip` for the Fourier transform of `V`). -/
+theorem integral_fourier_smul_eq_of_integrable (u : 𝓢(V, ℂ)) {g : V → ℂ} (hg : Integrable g) :
+    ∫ ξ, 𝓕 u ξ • g ξ = ∫ x, u x • 𝓕 g x := by
+  simpa using! VectorFourier.integral_fourierIntegral_smul_eq_flip (L := innerₗ V)
+    Real.continuous_fourierChar continuous_inner u.integrable hg
+
+/-- The Fourier transform of a function is bounded by its `L_1` norm:
+`|𝓕K(ξ)| ≤ ∫ |K|` for every `ξ` (Mathlib's `VectorFourier.norm_fourierIntegral_le_integral_norm`).
+-/
+theorem norm_fourier_le_integral_norm (K : V → ℂ) (ξ : V) : ‖𝓕 K ξ‖ ≤ ∫ x, ‖K x‖ :=
+  VectorFourier.norm_fourierIntegral_le_integral_norm 𝐞 volume (innerₗ V) K ξ
+
+/-- The Fourier transform of an integrable function lies in `L_∞`: it is continuous
+(`Rd.continuous_fourier_of_integrable`) and bounded by `‖K‖_1`. -/
+theorem memLp_top_fourier {K : V → ℂ} (hK : Integrable K) : MemLp (𝓕 K) ∞ volume :=
+  memLp_top_of_bound (continuous_fourier_of_integrable hK).aestronglyMeasurable _
+    (ae_of_all _ (norm_fourier_le_integral_norm K))
+
+/-- The inverse Fourier transform `𝓕⁻g(x) = ∫ e^(2πi⟪ξ, x⟫) g(ξ) dξ` of an integrable function is
+continuous, since `𝓕⁻g(x) = 𝓕g(-x)` (Mathlib's `Real.fourierInv_eq_fourier_neg`). -/
+theorem continuous_fourierInv_of_integrable {g : V → ℂ} (hg : Integrable g) :
+    Continuous (𝓕⁻ g) := by
+  rw [show 𝓕⁻ g = fun x => 𝓕 g (-x) from funext (Real.fourierInv_eq_fourier_neg g)]
+  exact (continuous_fourier_of_integrable hg).comp continuous_neg
+
+/-- The inverse Fourier transform is bounded by the `L_1` norm: `|𝓕⁻g(x)| ≤ ∫ |g|` for every
+`x`. -/
+theorem norm_fourierInv_le_integral_norm (g : V → ℂ) (x : V) : ‖𝓕⁻ g x‖ ≤ ∫ ξ, ‖g ξ‖ := by
+  rw [Real.fourierInv_eq_fourier_neg]
+  exact norm_fourier_le_integral_norm g (-x)
+
+/-- **Duality for the inverse Fourier transform** (the multiplication formula),
+`∫ 𝓕⁻u · g = ∫ u · 𝓕⁻g`, for a Schwartz function `u` and an integrable function `g` (Mathlib's
+`VectorFourier.integral_fourierIntegral_smul_eq_flip` for the pairing `-⟪ξ, x⟫`). -/
+theorem integral_fourierInv_smul_eq_of_integrable (u : 𝓢(V, ℂ)) {g : V → ℂ}
+    (hg : Integrable g) : ∫ ξ, 𝓕⁻ u ξ • g ξ = ∫ x, u x • 𝓕⁻ g x := by
+  have hL : (-innerₗ V).flip = -innerₗ V := by
+    ext x y
+    simp [real_inner_comm]
+  have h := VectorFourier.integral_fourierIntegral_smul_eq_flip (L := -innerₗ V)
+    Real.continuous_fourierChar
+    (show Continuous fun p : V × V => -(inner ℝ p.1 p.2) from continuous_inner.neg)
+    (u.integrable (μ := volume)) hg
+  rw [hL] at h
+  rw [SchwartzMap.fourierInv_coe]
+  exact h
+
+/-! ### Smooth cut-offs -/
+
 omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- Schwartz functions are bounded. -/
 theorem bddAbove_schwartz [NormedSpace ℝ V] (f : 𝓢(V, ℂ)) :
     BddAbove (Set.range fun x => ‖f x‖) :=
   ⟨_, Set.forall_mem_range.2 fun x => SchwartzMap.norm_le_seminorm ℝ f x⟩
-
-/-! ### Smooth cut-offs -/
 
 /-- The **smooth cut-off** `χ_{a,b}` with `0 < a < b`: `1` on the closed ball of radius `a`, `0`
 outside the ball of radius `b`, with values in `[0, 1]` (Mathlib's `ContDiffBump`). -/
@@ -430,9 +514,9 @@ theorem fourier_psi_mul_Theta {j k : ℕ} (hjk : k + 3 ≤ j) (ξ : V) :
 
 /-- **Kernel identities from Fourier transforms**: if `K`, `L`, `M` are integrable, `L` is bounded
 and continuous, `M` is continuous with integrable Fourier transform, and `𝓕K · 𝓕L = 𝓕M`, then
-`K ⋆ L = M`. Both sides have the same transform (Mathlib's
-`Real.fourier_bilin_convolution_eq`), and the inversion theorem applies to continuous integrable
-functions with integrable transform (`Continuous.fourierInv_fourier_eq`). -/
+`K ⋆ L = M`. Both sides have the same transform (`Rd.fourier_conv`), and the inversion theorem
+applies to continuous integrable functions with integrable transform
+(`Continuous.fourierInv_fourier_eq`). -/
 theorem conv_eq_of_fourier {K L M : V → ℂ} (hK : Integrable K) (hL : Integrable L)
     (hLc : Continuous L) (hLb : BddAbove (Set.range fun x => ‖L x‖)) (hM : Integrable M)
     (hMc : Continuous M) (hFM : Integrable (𝓕 M)) (h : ∀ ξ, 𝓕 K ξ * 𝓕 L ξ = 𝓕 M ξ) :
@@ -441,9 +525,7 @@ theorem conv_eq_of_fourier {K L M : V → ℂ} (hK : Integrable K) (hL : Integra
     hK.integrable_convolution (ContinuousLinearMap.mul ℂ ℂ) hL
   have hc : Continuous (conv K L volume) :=
     hLb.continuous_convolution_right_of_integrable (ContinuousLinearMap.mul ℂ ℂ) hK hLc
-  have hF : 𝓕 (conv K L volume) = 𝓕 M := funext fun ξ => by
-    rw [← h ξ, conv, Real.fourier_bilin_convolution_eq _ hK hL]
-    rfl
+  have hF : 𝓕 (conv K L volume) = 𝓕 M := funext fun ξ => (fourier_conv hK hL ξ).trans (h ξ)
   have hFKL : Integrable (𝓕 (conv K L volume)) := by
     rw [hF]
     exact hFM

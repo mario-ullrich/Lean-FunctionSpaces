@@ -2636,7 +2636,7 @@ this transform is integrable, and $\Delta_h^r \varphi \in L_p(\R)$ for every $p 
 
 \begin{proof}
 \leanok
-\uses{lem:fourier-dilate, lem:daub-fourier-translate, lem:rd-differences,
+\uses{lem:fourier-conv, lem:daub-fourier-translate, lem:rd-differences,
   prop:daub-scaling-integrable, thm:daub-scaling-fourier, lem:daub-difference-multiplier,
   prop:daub-symbol-product-integrable, lem:daub-differences-lp}
 First, for every integrable $f : \R \to \C$, every $r \in \N$ and all $h, \xi \in \R$,
@@ -2645,7 +2645,7 @@ First, for every integrable $f : \R \to \C$, every $r \in \N$ and all $h, \xi \i
   \quad\text{and}\quad
   \mathcal F(\Delta_h^r f)(\xi) = (e^{2\pi i h \xi} - 1)^r \, \widehat f(\xi) ,
 \]
-since the transform is linear on integrable functions (\Cref{lem:fourier-dilate}) and
+since the transform is linear on integrable functions (\Cref{lem:fourier-conv}) and
 $\mathcal F[f(\cdot + h)](\xi) = e^{2\pi i h \xi} \widehat f(\xi)$
 (\Cref{lem:daub-fourier-translate}); the second identity follows by induction on $r$, since the
 differences of an integrable function are integrable (\Cref{lem:rd-differences}). Apply this to
@@ -2863,7 +2863,7 @@ and
 \begin{proof}
 \leanok
 \uses{lem:daub-difference-multiplier, cor:daub-decay-l1, thm:daub-symbol-product-continuous,
-  lem:fourier-dilate, lem:daub-fourier-translate, lem:daub-fourier-continuous}
+  lem:fourier-conv, lem:daub-fourier-translate, lem:daub-fourier-continuous}
 The first bound combines $|e^{2\pi i h \xi} - 1| \leq 2\pi \min(1, |h \xi|)$ and
 $\min(1, |h \xi|)^r \leq |h \xi|^a$ (\Cref{lem:daub-difference-multiplier}) with
 $|h \xi| \leq |h| (1 + |\xi|)$. The case $a = 0$ of \Cref{cor:daub-decay-l1} shows that $|\Phi|$
@@ -2882,7 +2882,7 @@ where the functions $\xi \mapsto e^{2\pi i h \xi} F(\xi)$ and
 $\xi \mapsto (e^{2\pi i h \xi} - 1)^r F(\xi)$ are integrable, since the first factor is continuous
 of modulus $1$ and the second is continuous of modulus at most $2^r$
 (\Cref{lem:daub-difference-multiplier}). Indeed, since $\mathcal F^{-1} F(x) = \widehat F(-x)$,
-the inverse transform is linear on integrable functions (\Cref{lem:fourier-dilate}):
+the inverse transform is linear on integrable functions (\Cref{lem:fourier-conv}):
 $\mathcal F^{-1}(F - G)(x) = \mathcal F^{-1} F(x) - \mathcal F^{-1} G(x)$ for all integrable
 $F, G$. By item~3 of \Cref{lem:daub-fourier-translate}, $\mathcal F^{-1} F(x + h)$ is the inverse
 transform of $e^{2\pi i h \xi} F(\xi)$, so linearity gives the case $r = 1$, and induction on $r$

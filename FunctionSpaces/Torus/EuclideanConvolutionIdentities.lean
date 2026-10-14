@@ -11,10 +11,6 @@ public import FunctionSpaces.Rd.LittlewoodPaleyKernels
 /-!
 # Identities of convolution operators on the torus
 
-The file starts with four facts on the Fourier transform on `ℝ^d`: the convolution and sum rules
-(`Rd.fourier_conv`, `Rd.fourier_add_apply`), `𝓕K(0) = ∫ K` (`Rd.fourier_apply_zero`) and the
-continuity of `𝓕K` for integrable `K` (`Rd.continuous_fourier_of_integrable`).
-
 The kernels `Φ` of `ℝ^d` act on `L_p(𝕋^d)`, `1 ≤ p < ∞`, by the bounded operators
 `f ↦ Φ ⋆ f` (`Torus.econvLp`), and the characters are their eigenfunctions,
 `Φ ⋆ e_m = 𝓕Φ(m) e_m` (`Torus.econvLp_mFourierLp`). Since the characters span a dense subspace
@@ -43,38 +39,6 @@ This applies to the dilations `K_c ⋆ f → f` of a kernel with `∫ K = 1`
 
 open MeasureTheory UnitAddTorus Set Filter Topology
 open scoped ENNReal FourierTransform TorusHaar
-
-namespace Rd
-
-variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
-  [MeasurableSpace V] [BorelSpace V]
-
-/-- **The Fourier transform of a convolution** is the product of the transforms:
-`𝓕(K ⋆ L)(ξ) = 𝓕K(ξ) 𝓕L(ξ)` for integrable `K` and `L` (Mathlib's
-`Real.fourier_bilin_convolution_eq`). -/
-theorem fourier_conv {K L : V → ℂ} (hK : Integrable K) (hL : Integrable L) (ξ : V) :
-    𝓕 (conv K L volume) ξ = 𝓕 K ξ * 𝓕 L ξ := by
-  rw [conv, Real.fourier_bilin_convolution_eq _ hK hL]
-  rfl
-
-/-- The Fourier transform of a sum of integrable functions is the sum of the transforms (Mathlib's
-`VectorFourier.fourierIntegral_add`). -/
-theorem fourier_add_apply {f g : V → ℂ} (hf : Integrable f) (hg : Integrable g) (ξ : V) :
-    𝓕 (f + g) ξ = 𝓕 f ξ + 𝓕 g ξ :=
-  congrFun (VectorFourier.fourierIntegral_add Real.continuous_fourierChar
-    (innerSL ℝ).continuous₂ hf hg) ξ
-
-/-- **The Fourier transform at the origin is the integral**: `𝓕K(0) = ∫ K`. -/
-theorem fourier_apply_zero (K : V → ℂ) : 𝓕 K 0 = ∫ x, K x := by
-  simp [Real.fourier_eq]
-
-/-- **The Fourier transform of an integrable function is continuous** (Mathlib's
-`VectorFourier.fourierIntegral_continuous`). -/
-theorem continuous_fourier_of_integrable {K : V → ℂ} (hK : Integrable K) : Continuous (𝓕 K) :=
-  VectorFourier.fourierIntegral_continuous Real.continuous_fourierChar
-    (innerSL ℝ).continuous₂ hK
-
-end Rd
 
 namespace Torus
 
