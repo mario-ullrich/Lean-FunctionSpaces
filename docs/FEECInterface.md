@@ -14,9 +14,10 @@ on top of them.
 Lean-FunctionSpaces formalises function-space foundations: Sobolev, Besov and Triebel–Lizorkin
 spaces, their characterisations, extensions, traces and embeddings. For the collaboration it
 supplies Mathlib's Hilbert spaces `H^s(ℝ^d)` as Besov spaces `B^s_{2,2}(ℝ^d)` (item I.8), weak
-derivatives, `H^1` on bounded Lipschitz domains with its weak gradient and its trace, and
-Rellich's compactness theorem for the restriction space (items I.6 and H.1 in that form,
-Section 4.5; the weak-derivative form needs H.2, Section 5). Forms, Hilbert complexes, duality,
+derivatives, `H^1` on bounded Lipschitz domains with its weak gradient and its trace, the
+Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets, and Rellich's compactness
+theorem for the restriction space (items I.6 and H.1 in that form, Section 4.5; the
+weak-derivative form needs H.2, Section 5). Forms, Hilbert complexes, duality,
 negative smoothness, the space types on domains and boundaries, and the surface measure belong
 to the FEEC/BEEC library (Section 6); Section 9 records how this division changes: most of
 Section 6 moves into Lean-FunctionSpaces, the forms layer stays with the FEEC/BEEC library.
@@ -204,9 +205,10 @@ File `FunctionSpaces/Rd/LipschitzDomainH1.lean`, on top of
   (`Rd.LipschitzGraph.modNorm_trace_le`); on bounded Lipschitz domains the trace statements are
   qualitative.
 
-### 4.5 I.6 and H.1 for the restriction space: Rellich's theorem
+### 4.5 I.6 and H.1 for the restriction space: Rellich's theorem and the Hilbert space `H^1(Ω)`
 
-File `FunctionSpaces/Rd/RellichCompactness.lean`.
+Files `FunctionSpaces/Rd/RellichCompactness.lean` (on `H^1(V)`) and
+`FunctionSpaces/Rd/SobolevRestrictionSpaces.lean` (the Hilbert spaces on open sets).
 
 * `Rd.toL2 : H^{1, 2}(V, ℂ) →L[ℂ] Lp ℂ 2 volume` reads an element of Mathlib's `H^1(V)` as the
   `L_2` function it is (`Rd.toTemperedDistribution_toL2`), with `‖toL2 F‖ ≤ ‖F‖`
@@ -220,20 +222,36 @@ File `FunctionSpaces/Rd/RellichCompactness.lean`.
   derivatives `∂_{e_i} f_n ∈ L_2(V)` along an orthonormal basis and
   `‖f_n‖_2² + ∑_i ‖∂_{e_i} f_n‖_2² ≤ M²`).
 
-Two further steps belong to the FEEC/BEEC library, which builds the quotient type (Section 6).
-On a bounded Lipschitz domain, the restrictions to `Ω` of the functions of `H^1(Ω)` of
-Section 4.3 form the image of `LpToLpRestrictCLM V ℂ ℂ volume 2 Ω.carrier ∘L toL2`, so the
-theorem above is H.1 for the restriction space. The ingredients for the way from the predicate
-to Mathlib's type: for `f ∈ L_2(V)`, `Rd.memSobolev_one_iff` turns `Rd.MemSobolev 1 f` into
-`TemperedDistribution.MemSobolev 1 2 (f : 𝓢'(V, ℂ))`, Mathlib's
-`TemperedDistribution.MemSobolev.toBesselPotentialSpace` makes this an element of
-`H^{1, 2}(V, ℂ)`, and `Rd.toL2_eq_of_toDistr_eq` shows that `toL2` of that element is `f`.
-With `H^1(Ω)` as a quotient of `H^{1, 2}(V, ℂ)` by the closed subspace of the `F` with
-`toL2 F = 0` almost everywhere on `Ω`, the restriction factors through the quotient, and the
-induced operator `H^1(Ω) → L_2(Ω)` is compact, since the unit ball of the quotient lies in the
-image of every ball of radius larger than `1`. This is I.6, for the restriction space, in the
-form that the proposal needs for Assumption F of Hiptmair, Pauly and Schulz (HPS), which asks
-for the compactness of `H^1(Ω) ↪ L_2(Ω)`.
+The Hilbert spaces on an open set `Ω : Opens V`, built inside Mathlib's `H^{s}(V)`, which is
+`H^{s, 2}(V, ℂ)`:
+
+* `Rd.RestrictionSpace s Ω`: `H^s(Ω)` for every real `s`, the orthogonal complement of
+  `Rd.vanishOn s Ω`, the elements whose distribution vanishes on every test function of `Ω`;
+  for `s = 1` these are the `F` with `toL2 F = 0` almost everywhere on `Ω`
+  (`Rd.mem_vanishOn_one_iff`). The restriction `Rd.restrictProj s Ω` is the orthogonal
+  projection, of norm at most `1`, and
+  `Rd.quotientEquivRestrictionSpace s Ω : (H^{s}(V) ⧸ vanishOn s Ω) ≃ₗᵢ[ℂ] RestrictionSpace s Ω`
+  makes it isometric to the quotient of CWHM, §3.1.4.
+* `Rd.restrictL2 Ω : RestrictionSpace 1 Ω →L[ℂ] Lp ℂ 2 (volume.restrict Ω)`, `u ↦ u|_Ω`, is
+  injective (`Rd.restrictL2_injective`) with norm at most `1` (`Rd.norm_restrictL2_apply_le`).
+* I.6 for the restriction space, the compactness that Assumption F of Hiptmair, Pauly and
+  Schulz (HPS) asks for: `Rd.isCompactOperator_restrictL2 (hΩ : Bornology.IsBounded Ω)`, for
+  every bounded open set.
+* The weak gradient: every `u ∈ H^1(Ω)` lies in `W^1_2(Ω)` (`Rd.memWeakSobolev_toL2`), and for an
+  orthonormal basis `(e_i)`, `‖u|_Ω‖_2² + (2π)⁻² ∑_i ‖∂_{e_i} u‖_{L_2(Ω)}² ≤ ‖u‖²`, with the weak
+  derivatives on `V` (`Rd.sq_norm_restr_add_sum_le`) or on `Ω`
+  (`Rd.sq_norm_restrictL2_add_sum_le`). The weight `(2π)⁻²` comes from Mathlib's normalisation
+  (`⟨ξ⟩ = (1 + ‖ξ‖²)^{1/2}` and the kernel `e^{-2πi⟨x, ξ⟩}`), so for the unweighted `W^{1,2}(Ω)`
+  norm the constant is `2π`.
+* The bridge to the predicate of Section 4.3: for a bounded Lipschitz domain `Ω` and
+  `f ∈ L_2(V)`, `Ω.MemSobolevOn f` iff `f|_Ω = restrictL2 Ω.toOpens u` for some
+  `u : RestrictionSpace 1 Ω.toOpens`
+  (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`). So the compactness above is
+  H.1 for the restriction space.
+* H.4 at `s = 1`: `Rd.tildeSpace s Ω` is `H̃^s(Ω)`, the closure of the test functions of `Ω` in
+  `H^{s}(V)`, and `Rd.zeroBoundarySpace s Ω` is `H^s_0(Ω)`, the closure of their restrictions in
+  `RestrictionSpace s Ω`. Restriction is an isometry of `H̃^1(Ω)` onto `H^1_0(Ω)` for every open
+  `Ω`: `Rd.tildeEquivZeroBoundary Ω : tildeSpace 1 Ω ≃ₗᵢ[ℂ] zeroBoundarySpace 1 Ω`.
 
 ### 4.6 Items X.1–X.5, X.7, X.8
 
@@ -271,7 +289,8 @@ and the Sobolev embeddings on `ℝ^d`. They generalise Sections 4.1 and 4.2 from
   constants hold on `V` (Sections 4.1 and 4.2).
 * **`H^s(Ω)` is the restriction space**, the definition of Chandler-Wilde, Hewett and Moiola (the
   proposal cites their §3.1.4). Rellich's theorem then holds on every bounded set. Every function
-  of `H^1(Ω)` lies in the weak-derivative space `W^1_2(Ω)`, on every open set. On bounded Lipschitz
+  of `H^1(Ω)` lies in the weak-derivative space `W^1_2(Ω)`, on every open set
+  (`Rd.memWeakSobolev_toL2`). On bounded Lipschitz
   domains the two spaces agree by the extension theorem for `W^{1,2}` of Calderón and Stein
   (Stein 1970, Chapter VI, §3), which the libraries built on this one supply (Section 6); on some
   bounded open sets they differ (a slit disc), and the embedding `W^1_2(Ω) ↪ L_2(Ω)` can fail to
@@ -282,10 +301,12 @@ and the Sobolev embeddings on `ℝ^d`. They generalise Sections 4.1 and 4.2 from
   charts, and "almost everywhere on `Γ`" is the chart filter `aeBoundary`, whose exceptional sets
   are, mathematically, the null sets of the surface measure. Boundary integral operators need the
   surface measure itself (Section 6).
-* **Predicates plus Mathlib's type.** The spaces of Lean-FunctionSpaces are predicates on
+* **Predicates plus Hilbert-space types.** The spaces of Lean-FunctionSpaces are predicates on
   `Lp ℂ p volume`; the Hilbert-space type on `V` is Mathlib's `H^{s, 2}(V, ℂ)`, tied to the
-  predicates by I.8 and `Rd.toL2`. Space types on `Ω` and `Γ` belong to the FEEC/BEEC library,
-  which knows which norms and which quotient or subspace structure it needs.
+  predicates by I.8 and `Rd.toL2`. The Hilbert spaces on open sets are closed subspaces of
+  `H^{s, 2}(V, ℂ)`, orthogonal complements and closures (Section 4.5), so Mathlib's Hilbert-space
+  theory (projections, duals, compact operators) applies to them directly; the quotient of CWHM
+  is an isometric copy.
 * **Weak derivatives in Mathlib's distributions on open sets**, along directions `v : Fin k → V`,
   so that they meet the Sobolev library prepared for Mathlib (Section 4.2) and the distributional
   exterior derivative that the FEEC/BEEC library builds on the same `𝓓'(Ω, ·)`; Mathlib's
@@ -328,7 +349,8 @@ move into Lean-FunctionSpaces (Section 9); the last item stays with the FEEC/BEE
    here, and a transfer lemma to the closed real subspace of real-valued functions where real
    Hilbert spaces are wanted.
 2. **Shapes.** I.8 is `Rd.memSobolev_two_iff_exists_memApprox` (Section 4.1). I.6 is
-   `Rd.isCompactOperator_restr_toL2` for the restriction space (Section 4.5). I.4 is the `ℝ^d`
+   `Rd.isCompactOperator_restr_toL2` for the restriction space, and
+   `Rd.isCompactOperator_restrictL2` for its Hilbert space `H^1(Ω)` (Section 4.5). I.4 is the `ℝ^d`
    version of `Daubechies.besov_iff_coeff`, with tensor-product wavelets on
    `EuclideanSpace ℝ (Fin d)`; it is on the list of later goals of Lean-FunctionSpaces.
 3. **I.8.** Yes, it is formalised for `p = 2` (Section 4.1); `H^s_p = F^s_{p,2}` for all
@@ -339,8 +361,9 @@ move into Lean-FunctionSpaces (Section 9); the last item stays with the FEEC/BEE
 5. **Vector values.** Scalar in Lean-FunctionSpaces; on `V` Mathlib's `H^{s,p}(V, F)` takes vector
    values directly, and on `Ω` and `Γ` the FEEC/BEEC library works with `Fin m → ℂ`-valued
    functions and componentwise lemmas.
-6. **Space types and surface measure.** Predicates and Mathlib's type on `V` here; the types on
-   `Ω` and `Γ` and the surface measure follow here as well (Section 9).
+6. **Space types and surface measure.** Predicates and Mathlib's type on `V` here, and the
+   Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets (Section 4.5); the types on `Γ`
+   and the surface measure follow here as well (Section 9).
 7. **Split and versions.** The split Lean-SNumbers / Lean-FunctionSpaces / FEEC/BEEC library is
    right. Lean-FunctionSpaces pins Lean and Mathlib `v4.35.0-rc2`, Lean-SNumbers moves to the
    same pin, and the FEEC/BEEC library takes it as well; the three move to the stable release
@@ -358,18 +381,24 @@ number of the proposal and the intended Lean statement.
 
 The first version of this document (commit `ec3c133`) left items 1–5 of Section 6 to the
 FEEC/BEEC library. Lean-FunctionSpaces now builds them itself, in its current part (Part Ib of
-its development plan); the statements below are in preparation and enter Section 4 with their
-Lean names as they are formalised.
+its development plan). The space types and the isometry of H.4 are formalised, with their
+Lean names in Section 4.5; the other statements below are in preparation and enter Section 4
+with their Lean names as they are formalised.
 
-* **Space types.** `H^s(Ω)` for every open `Ω` and every real `s` as a Hilbert space: the
-  orthogonal complement, in Mathlib's `H^{s}(ℝ^d)`, of the elements that vanish on `Ω`, hence
-  isometric to the quotient of CWHM, §3.1.4; `H̃^s(Ω)` as the closure of the test functions of
-  `Ω` in `H^s(ℝ^d)`, `H^s_0(Ω)` as their closure in `H^s(Ω)`; the restriction to `L_2(Ω)` as a
-  bounded injective operator, compact for bounded `Ω` (Rellich in operator form, HPS Assumption
-  F).
-* **H.4 and duality.** `H̃^1(Ω) ≅ H^1_0(Ω)` isometrically for every open `Ω`; for every real `s`
-  the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)` and `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` with the pairing of
-  `H^{-s}(ℝ^d)` and `H^s(ℝ^d)` (CWHM, Theorem 3.3).
+* **Space types (formalised, Section 4.5).** `H^s(Ω)` for every open `Ω` and every real `s` as a
+  Hilbert space: the orthogonal complement, in Mathlib's `H^{s}(ℝ^d)`, of the elements that
+  vanish on `Ω` (`Rd.RestrictionSpace`, with the restriction `Rd.restrictProj`), isometric to
+  the quotient of CWHM, §3.1.4 (`Rd.quotientEquivRestrictionSpace`); `H̃^s(Ω)` as the closure of
+  the test functions of `Ω` in `H^s(ℝ^d)` (`Rd.tildeSpace`), `H^s_0(Ω)` as their closure in
+  `H^s(Ω)` (`Rd.zeroBoundarySpace`); the restriction to `L_2(Ω)` as a bounded injective
+  operator (`Rd.restrictL2`), compact for bounded `Ω` (Rellich in operator form, HPS
+  Assumption F, `Rd.isCompactOperator_restrictL2`); the bridge to the predicate on bounded
+  Lipschitz domains (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`). File
+  `FunctionSpaces/Rd/SobolevRestrictionSpaces.lean`.
+* **H.4 and duality.** `H̃^1(Ω) ≅ H^1_0(Ω)` isometrically for every open `Ω` (formalised,
+  `Rd.tildeEquivZeroBoundary`, Section 4.5); for every real `s` the duality
+  `(H̃^s(Ω))^* ≅ H^{-s}(Ω)` and `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` with the pairing of `H^{-s}(ℝ^d)` and
+  `H^s(ℝ^d)` (CWHM, Theorem 3.3).
 * **The trace space.** `H^{1/2}(Γ)` as the orthogonal complement of the kernel of the trace in
   `H^1(Ω)`, with the trace as orthogonal projection and the extension as inclusion (both of norm
   one), `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` as its dual.
@@ -387,6 +416,32 @@ Lean names as they are formalised.
 
 The FEEC/BEEC library keeps the forms layer (`L^2Λ^k`, weak `d`, `HΛ^k`, regular
 decompositions, `H^{-1/2}(curl_Γ, Γ)`), Picard's theorem and the s-number track.
+
+The formalisation of the space types settled the following points of the plan.
+
+* **`H^s(Ω)` is the orthogonal complement** of the elements vanishing on `Ω`, a closed subspace
+  of `H^{s}(ℝ^d)`; the quotient of CWHM enters as the isometry
+  `Rd.quotientEquivRestrictionSpace`, and the norm of `H^s(Ω)` is the minimal norm of an
+  extension (`Rd.norm_restrictProj_le_of_mem`, `Rd.exists_norm_restrictProj_eq`).
+* **The `W^{1,2}(Ω)` bound carries Mathlib's normalisation**: the bound "with constant `1`" of
+  the plan is `‖u|_Ω‖_2² + (2π)⁻² ∑_i ‖∂_{e_i} u‖_{L_2(Ω)}² ≤ ‖u‖²`
+  (`Rd.sq_norm_restr_add_sum_le`); for the unweighted `W^{1,2}(Ω)` norm the constant is `2π`.
+  Two statements extend the plan: `Rd.memWeakSobolev_toL2` (every `u ∈ H^1(Ω)` lies in
+  `W^1_2(Ω)`) and `Rd.sq_norm_restrictL2_add_sum_le` (the bound with weak derivatives on `Ω`).
+* **The isometry `H̃^1(Ω) ≅ H^1_0(Ω)`** rests on the weak-gradient form of the `H^1(ℝ^d)` norm
+  (`Rd.sq_norm_eq_of_hasWeakLineDeriv`) and on disjoint supports
+  (`Rd.norm_le_norm_add_of_ae_eq_zero`, for every `L_p` space). Two lemmas on the span of the
+  test functions carry it: its elements are Schwartz functions supported in `Ω`
+  (`Rd.exists_schwartz_of_mem_testSpan`) and vanish near `ℝ^d \ Ω`
+  (`Rd.exists_opens_toL2_ae_eq_zero`). Weak derivatives of every order of an element vanishing
+  on `Ω` vanish on `Ω` (`Rd.weakDeriv_ae_zero_of_mem_vanishOn`, from the locality lemma
+  `Rd.HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero` of `FunctionSpaces/Rd/WeakDerivatives.lean`).
+  The literature reference is McLean, Theorem 3.33 (`H̃^s(Ω) = H^s_0(Ω)` on Lipschitz domains
+  for `s ≥ 0` with `s - 1/2 ∉ ℤ`, up to equivalence of norms), in place of CWHM, Lemma 3.31.
+* **Names**: `H^s_0(Ω)` is the submodule `Rd.zeroBoundarySpace`, in lower case like the other
+  submodules `Rd.vanishOn`, `Rd.testSpan` and `Rd.tildeSpace`; the quotient isometry is
+  `Rd.quotientEquivRestrictionSpace`, and evaluation at a Schwartz function is
+  `Rd.besselEvalCLM`.
 
 ## References
 

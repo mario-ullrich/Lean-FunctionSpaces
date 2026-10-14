@@ -179,6 +179,7 @@ public import FunctionSpaces.Rd.WeakDerivatives
 public import FunctionSpaces.Rd.SobolevTwoLittlewoodPaley
 public import FunctionSpaces.Rd.LipschitzDomainH1
 public import FunctionSpaces.Rd.RellichCompactness
+public import FunctionSpaces.Rd.SobolevRestrictionSpaces
 
 /-!
 # Function spaces
@@ -604,4 +605,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.RellichCompactness`: the inverse Fourier transform of integrable `L_2`
   functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, and
   Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω`.
+* `FunctionSpaces.Rd.SobolevRestrictionSpaces`: the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and
+  `H^s_0(Ω)` on open sets `Ω ⊆ ℝ^d` for real `s`, built inside Mathlib's `H^s(ℝ^d)`: restriction
+  as an orthogonal projection, `H^s(Ω)` as a quotient, the compact embedding
+  `H^1(Ω) → L_2(Ω)` for bounded `Ω`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)`.
 -/

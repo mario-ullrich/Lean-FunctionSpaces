@@ -11,7 +11,9 @@ Mathlib's Bessel potential spaces `H^s`, `s ≥ 0`, with the Triebel–Lizorkin 
 (and, for `s > 0`, with the Besov spaces `B^s_{2,2}`) and shows `W^1_2 = H^1 = B^1_{2,2}`. On a
 bounded Lipschitz domain, `H^1` is the space of restrictions of `H^1(ℝ^d)`, with weak derivatives
 in `L_2` of the domain and boundary traces in `B^{1/2}_{2,2}` of the boundary. On every bounded
-set the restriction from `H^1(ℝ^d)` to `L_2` is compact (Rellich's theorem). The
+set the restriction from `H^1(ℝ^d)` to `L_2` is compact (Rellich's theorem). On every open set
+the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)`, for real `s`, are built inside Mathlib's
+`H^s(ℝ^d)`. The
 [interface document](FEECInterface.md) lists these results for a FEEC/BEEC library built on this
 project, with the decisions behind their form.
 
@@ -108,6 +110,28 @@ project, with the decisions behind their form.
   makes the truncated operators compact (`Rd.isCompactOperator_restr_truncL2`). On the way, the
   `L_2` inverse Fourier transform of an integrable `h ∈ L_2(V)` is the pointwise inverse
   Fourier integral (`Rd.fourierInv_Lp_ae_eq_of_integrable`).
+* **Sobolev spaces on open sets as Hilbert spaces.** Let `Ω ⊆ V` be open and `s` real. The
+  elements of Mathlib's `H^s(V)` whose distribution vanishes on every test function of `Ω` form
+  a closed subspace (`Rd.vanishOn`); for `s = 1` they are the elements vanishing almost
+  everywhere on `Ω` (`Rd.mem_vanishOn_one_iff`). Its orthogonal complement is the Hilbert space
+  `H^s(Ω)` (`Rd.RestrictionSpace`), and the restriction `U ↦ U|_Ω` is the orthogonal projection
+  onto it (`Rd.restrictProj`). `H^s(Ω)` is isometric to the quotient of `H^s(V)` by the
+  elements vanishing on `Ω` (`Rd.quotientEquivRestrictionSpace`), so `‖U|_Ω‖` is the minimum
+  of `‖U + W‖` over the `W` vanishing on `Ω` (`Rd.norm_restrictProj_le_of_mem`,
+  `Rd.exists_norm_restrictProj_eq`).
+  The map `H^1(Ω) → L_2(Ω)` is injective with norm at most `1` (`Rd.restrictL2_injective`,
+  `Rd.norm_restrictL2_apply_le`) and compact for bounded `Ω` (`Rd.isCompactOperator_restrictL2`;
+  for the restriction space, this is the compactness of Assumption F of Hiptmair, Pauly and
+  Schulz). Every `u ∈ H^1(Ω)` lies in `W^1_2(Ω)` (`Rd.memWeakSobolev_toL2`), and for an
+  orthonormal basis `(e_i)` and the weak derivatives `∂_{e_i} u`,
+  `‖u|_Ω‖_2² + (2π)⁻² ∑_i ‖(∂_{e_i} u)|_Ω‖_2² ≤ ‖u‖²` (`Rd.sq_norm_restr_add_sum_le`,
+  `Rd.sq_norm_restrictL2_add_sum_le`), so the `W^1_2(Ω)` norm of `u|_Ω` is at most `2π ‖u‖`. On a
+  bounded Lipschitz domain, `f ∈ L_2(V)` lies in `H^1(Ω)` in the sense of
+  `Rd.BoundedLipschitzDomain.MemSobolevOn` iff `f|_Ω = u|_Ω` for some `u` in the Hilbert space
+  `H^1(Ω)` (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`). `H̃^s(Ω)` is the
+  closure of the test functions of `Ω` in `H^s(V)` (`Rd.tildeSpace`), `H^s_0(Ω)` the closure of
+  their restrictions in `H^s(Ω)` (`Rd.zeroBoundarySpace`); for every open `Ω`, restriction is an
+  isometry of `H̃^1(Ω)` onto `H^1_0(Ω)` (`Rd.tildeEquivZeroBoundary`).
 
 ## What is formalised
 
@@ -120,6 +144,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The convolution theorem on `L_2`, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/SobolevTwoLittlewoodPaley` |
 | `H^1` on bounded Lipschitz domains as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the weak gradient, and the trace space `B^{1/2}_{2,2}` of the boundary | ✅ | ✗ | `Rd/LipschitzDomainH1` |
 | The inverse Fourier transform of integrable `L_2` functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, and Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω` | ✅ | ✗ | `Rd/RellichCompactness` |
+| The Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets inside Mathlib's `H^s(ℝ^d)`, `H^s(Ω)` as a quotient, Rellich's theorem for `H^1(Ω)`, the identification with the restriction space of a bounded Lipschitz domain, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)` | ✅ | ✗ | `Rd/SobolevRestrictionSpaces` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

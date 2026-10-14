@@ -242,6 +242,13 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`).
 * **Rellich's theorem.** For every bounded set `Ω ⊆ V`, the restriction from `H^1(V)` to
   `L_2(Ω)` is a compact operator (`Rd.isCompactOperator_restr_toL2`).
+* **Sobolev spaces on open sets as Hilbert spaces.** For every open `Ω ⊆ V` and real `s`,
+  `H^s(Ω)` is the orthogonal complement in `H^s(V)` of the elements whose distribution vanishes
+  on every test function of `Ω` (`Rd.RestrictionSpace`), isometric to the quotient of `H^s(V)`
+  by them (`Rd.quotientEquivRestrictionSpace`); `H^1(Ω) → L_2(Ω)` is injective and, for
+  bounded `Ω`, compact (`Rd.restrictL2_injective`, `Rd.isCompactOperator_restrictL2`); and
+  restriction is an isometry from `H̃^1(Ω)`, the closure of the test functions in `H^1(V)`, onto
+  `H^1_0(Ω)`, the closure of their restrictions in `H^1(Ω)` (`Rd.tildeEquivZeroBoundary`).
 
 **Domains, manifolds and traces** ([details](docs/DomainsTraces.md))
 
@@ -295,7 +302,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
 | [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): mixed norms, maximal functions, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, local means, ball means of differences, atoms, the torus | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets | ✅ | ✗ |
 | [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 
@@ -323,7 +330,8 @@ manifolds in `FunctionSpaces/Manifold/`; the Triebel–Lizorkin block is the mix
 `FunctionSpaces/Rd/{FeffermanStein,KernelMajorants}` and `FunctionSpaces/Rd/TriebelLizorkin*`, and
 `FunctionSpaces/Torus/{TriebelLizorkin,PeriodicLift,FeffermanStein,TriebelLizorkinLocalMeans}`;
 Sobolev spaces on `ℝ^d` are the files `SchwartzCutoff`, `WeakDerivatives`,
-`SobolevTwoLittlewoodPaley`, `LipschitzDomainH1` and `RellichCompactness` in `FunctionSpaces/Rd/`.
+`SobolevTwoLittlewoodPaley`, `LipschitzDomainH1`, `RellichCompactness` and
+`SobolevRestrictionSpaces` in `FunctionSpaces/Rd/`.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 [docs/FEECInterface.md](docs/FEECInterface.md) describes the interface to a FEEC/BEEC library

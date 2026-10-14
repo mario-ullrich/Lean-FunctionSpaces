@@ -35,7 +35,8 @@ explicit constants, and proves `W^1_2(V) = H^1(V) = B^1_{2,2}(V)`.
   (`Rd.memSobolev_two_iff_exists_memApprox`) and the bundled space `H^{s}(V)`
   (`Rd.exists_eq_toDistr_two`) follow.
 * **`W^1_2 = H^1`** (`Rd.memSobolev_one_iff`), with `‖∂_v f‖_2 ≤ 2π ‖v‖ ‖J_1 f‖_2` and
-  `(2π)² ‖J_1 f‖_2² = (2π)² ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²` for an orthonormal basis `(e_i)`, hence
+  `(2π)² ‖J_1 f‖_2² = (2π)² ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²` for an orthonormal basis `(e_i)`
+  (`Rd.sq_norm_besselPotential_one_eq`), hence
   `‖J_1 f‖_2² ≤ ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²` (`Rd.sq_norm_besselPotential_one_le`).
 * **`W^1_2 = B^1_{2,2}`** (`Rd.memSobolev_one_iff_memApprox`, `Rd.memSobolev_one_iff_modulus`):
   `F ∈ W^1_2(V)` iff `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2} < ∞`, for every order `r ≥ 2`.
@@ -770,6 +771,21 @@ theorem sq_norm_besselPotential_one_le {ι : Type*} [Fintype ι] (b : Orthonorma
   rw [← ENNReal.ofReal_sum_of_nonneg (fun i _ => by positivity),
     ← ENNReal.ofReal_add (by positivity) (by positivity)] at hle
   exact (ENNReal.ofReal_le_ofReal_iff (by positivity)).1 hle
+
+/-- **The `H^1` norm by the weak gradient, in `ℝ`**: under the hypotheses of
+`Rd.enorm_besselPotential_one_sq_eq`, `(2π)² ‖h‖_2² = (2π)² ‖f‖_2² + ∑_i ‖g_i‖_2²`. -/
+theorem sq_norm_besselPotential_one_eq {ι : Type*} [Fintype ι] (b : OrthonormalBasis ι ℝ V)
+    {f h : Lp ℂ 2 (volume : Measure V)} {g : ι → Lp ℂ 2 (volume : Measure V)}
+    (hg : ∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => b i) f (g i))
+    (hfh : besselPotential V ℂ 1 (f : 𝓢'(V, ℂ)) = (h : 𝓢'(V, ℂ))) :
+    (2 * π) ^ 2 * ‖h‖ ^ 2 = (2 * π) ^ 2 * ‖f‖ ^ 2 + ∑ i, ‖g i‖ ^ 2 := by
+  have he := enorm_besselPotential_one_sq_eq b hg hfh
+  simp only [← ofReal_norm, ← ENNReal.ofReal_pow (norm_nonneg _),
+    ← ENNReal.ofReal_pow (by positivity : (0 : ℝ) ≤ 2 * π)] at he
+  rw [← ENNReal.ofReal_mul (by positivity), ← ENNReal.ofReal_mul (by positivity),
+    ← ENNReal.ofReal_sum_of_nonneg (fun i _ => by positivity),
+    ← ENNReal.ofReal_add (by positivity) (by positivity)] at he
+  exact (ENNReal.ofReal_eq_ofReal_iff (by positivity) (by positivity)).1 he
 
 /-! ### `W^1_2(V)` as a Besov space -/
 

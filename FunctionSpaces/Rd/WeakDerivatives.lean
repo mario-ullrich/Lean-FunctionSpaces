@@ -21,7 +21,8 @@ the distribution `φ ↦ ∫ φ f` on `Ω` (Mathlib's `Distribution.ofFun`, test
   that is, `∫ φ g = (-1)^k ∫ (∂^v φ) f` for every test function `φ`
   (`Rd.hasWeakLineDeriv_iff_integral`, by the transpose formula
   `Distribution.iteratedLineDerivOp_apply_apply`). They are unique almost everywhere on `Ω`,
-  linear, local (`Rd.HasWeakLineDeriv.mono`), classical on Schwartz functions
+  linear, local (`Rd.HasWeakLineDeriv.mono`), vanish where `f` vanishes
+  (`Rd.HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero`), classical on Schwartz functions
   (`Rd.hasWeakLineDeriv_schwartz`), and pass to limits in `L_p(Ω)`
   (`Rd.HasWeakLineDeriv.of_tendsto`).
 * **Sobolev spaces**: `Rd.MemWeakSobolev Ω m p f` says that `f` and all its weak derivatives of
@@ -163,6 +164,14 @@ theorem HasWeakLineDeriv.mono (h : HasWeakLineDeriv Ω v f g) (hΩ : Ω' ≤ Ω)
     simp [hΩ]
   have h' := h.integral_eq (TestFunction.monoCLM ℝ φ)
   rwa [coe_iteratedLineDerivOp_eq hφ, hφ] at h'
+
+/-- **Weak derivatives vanish where the function vanishes**: if `g` is a weak derivative `∂^v f`
+on `Ω`, `O ⊆ Ω` is open and `f = 0` almost everywhere on `O`, then `g = 0` almost everywhere on
+`O`, by locality (`Rd.HasWeakLineDeriv.mono`) and uniqueness (`Rd.HasWeakLineDeriv.unique`). -/
+theorem HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero {O : Opens V} (h : HasWeakLineDeriv Ω v f g)
+    (hO : O ≤ Ω) (hf : f =ᵐ[volume.restrict (O : Set V)] 0) :
+    g =ᵐ[volume.restrict (O : Set V)] 0 :=
+  ((h.mono hO).congr_ae hf EventuallyEq.rfl).unique hasWeakLineDeriv_zero
 
 /-! ### Sobolev spaces on open sets -/
 

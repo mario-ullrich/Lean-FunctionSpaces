@@ -268,3 +268,17 @@ declarations.
   `L_1 ∩ L_2`. For every bounded `Ω ⊆ V`, the restriction
   from Mathlib's `H^{1,2}(V, ℂ)` to `L_2(Ω)` is a compact operator
   (`Rd.isCompactOperator_restr_toL2`).
+* **Evaluation on `H^s` and Sobolev spaces on open sets**
+  (`FunctionSpaces/Rd/SobolevRestrictionSpaces.lean`): for every Schwartz function `φ`,
+  `U ↦ U(φ)` is a continuous linear functional on Mathlib's `H^{s,2}(V, ℂ)` (`Rd.besselEvalCLM`,
+  `Rd.continuous_toDistr_apply`), which belongs next to `BesselPotentialSpace` in
+  `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`. Mathlib's Sobolev spaces live
+  on the whole space; the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` of an open set, built
+  inside `H^{s,2}(V, ℂ)` as in Chandler-Wilde, Hewett and Moiola, extend them to open sets. Among
+  their properties, restriction is an isometry of `H̃^1(Ω)` onto `H^1_0(Ω)` for every open `Ω`
+  (`Rd.tildeEquivZeroBoundary`), a form with constant `1` of the identity
+  `H̃^1(Ω) = H^1_0(Ω)` that McLean (Theorem 3.33) proves on Lipschitz domains up to equivalence
+  of norms. A general `L_p` fact proved there has no Mathlib counterpart: if `a` vanishes almost
+  everywhere outside a measurable set `S` and `b` almost everywhere on `S`, then
+  `‖a‖_p ≤ ‖a + b‖_p` in every `Lp E p μ` (`Rd.norm_le_norm_add_of_ae_eq_zero`), which belongs
+  next to `Lp.norm_le_norm_of_ae_le` in `Mathlib/MeasureTheory/Function/LpSpace/Basic.lean`.

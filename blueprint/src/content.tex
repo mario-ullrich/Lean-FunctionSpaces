@@ -12081,7 +12081,9 @@ Besov spaces $\Besov{s}{2}{2}$) and proves $\Sob{1}{2}(V) = H^1(V) = \Besov{1}{2
 restrictions by intrinsic differences, shows that they lie in $\Sob{1}{2}(\Omega)$, and
 identifies their boundary traces with $B^{1/2}_{2,2}(\Gamma)$. \Cref{sec:rellich-compactness}
 proves Rellich's theorem: the restriction from $H^1(V)$ to $L_2(\Omega)$ is compact for every
-bounded $\Omega \subseteq V$.
+bounded $\Omega \subseteq V$. \Cref{sec:sobolev-restriction-spaces} builds the Hilbert spaces
+$H^s(\Omega)$, $\tilde H^s(\Omega)$ and $H^s_0(\Omega)$ inside $H^s(V)$, for every open
+$\Omega$ and every real $s$.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -12096,8 +12098,8 @@ embedding into $L_2(\Omega)$ can fail to be compact, as for the rooms-and-passag
 Lipschitz domains the extension and trace theorems carry existential constants, and the
 statements are equivalences of membership. On bounded Lipschitz domains the functions of
 $H^1(\Omega)$ with boundary trace zero form the closure of the test functions in $H^1(\Omega)$
-\cite[Theorem 3.40]{McLean}; this statement needs the normed space
-of $H^1(\Omega)$, which the libraries built on this one supply as well.
+\cite[Theorem 3.40]{McLean}; the spaces $H^1(\Omega)$ and $H^1_0(\Omega)$ of that theorem are
+the Hilbert spaces of \Cref{sec:sobolev-restriction-spaces}.
 
 \section{Test functions in the Schwartz space}
 \label{sec:schwartz-cutoff}
@@ -12321,6 +12323,7 @@ $\partial^v f(\varphi) = (-1)^k f(\partial^v \varphi)$ by \Cref{lem:distribution
 \lean{Rd.HasWeakLineDeriv.unique, Rd.hasWeakLineDeriv_fin_zero, Rd.HasWeakLineDeriv.add,
   Rd.HasWeakLineDeriv.neg, Rd.HasWeakLineDeriv.sub, Rd.HasWeakLineDeriv.smul,
   Rd.HasWeakLineDeriv.congr_ae, Rd.HasWeakLineDeriv.mono, Rd.hasWeakLineDeriv_zero,
+  Rd.HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero,
   Rd.locallyIntegrableOn_of_memLp, Rd.memWeakSobolev_zero_iff, Rd.MemWeakSobolev.mono_order,
   Rd.MemWeakSobolev.mono_set, Rd.zero_memWeakSobolev, Rd.MemWeakSobolev.add,
   Rd.MemWeakSobolev.smul, Rd.MemWeakSobolev.congr_ae, Rd.zero_memSobolev, Rd.MemSobolev.add,
@@ -12339,7 +12342,9 @@ For every $v \in V^k$, all functions $f, f', g, g'$ and every $c \in \C$:
     $\Omega$, then $g' = \partial^v f'$ weakly on $\Omega$;
   \item if $g = \partial^v f$ weakly on $\Omega$, then $g = \partial^v f$ weakly on every open
     $\Omega' \subseteq \Omega$;
-  \item $0 = \partial^v 0$ weakly on $\Omega$.
+  \item $0 = \partial^v 0$ weakly on $\Omega$;
+  \item if $g = \partial^v f$ weakly on $\Omega$, $O \subseteq \Omega$ is open and $f = 0$
+    almost everywhere on $O$, then $g = 0$ almost everywhere on $O$.
 \end{enumerate}
 For every $1 \leq p \leq \infty$, every $f \in L_p(\Omega)$ is locally integrable on $\Omega$
 and $\Sob{0}{p}(\Omega) = L_p(\Omega)$. For all $m, l \in \N$ with
@@ -12361,11 +12366,12 @@ integrals. (4) The distribution of a function depends on it only almost everywhe
 (5) A test function $\varphi$ on $\Omega'$ is one on $\Omega$, with the same derivatives
 (\Cref{lem:directional-derivatives-commute}), so the identity of
 \Cref{lem:weak-derivative-integral} on $\Omega$ gives it on $\Omega'$. (6) The distribution of
-$0$ is $0$, and so are its derivatives. A function in $L_p(\Omega)$, $p \geq 1$, is integrable
-on every compact subset of $\Omega$, which has finite measure. The statements on $\Sob{m}{p}$
-follow, with $L_p(\Omega') \supseteq L_p(\Omega)|_{\Omega'}$ and (4); in $L_p(V)$, the zero class,
-and the class of a sum or a multiple, agree almost everywhere with $0$ and with the sum or the
-multiple of the representatives.
+$0$ is $0$, and so are its derivatives. (7) By (5) and (4), $g = \partial^v 0$ weakly on $O$,
+so $g = 0$ almost everywhere on $O$ by (6) and (1). A function in $L_p(\Omega)$, $p \geq 1$, is
+integrable on every compact subset of $\Omega$, which has finite measure. The statements on
+$\Sob{m}{p}$ follow, with $L_p(\Omega') \supseteq L_p(\Omega)|_{\Omega'}$ and (4); in $L_p(V)$,
+the zero class, and the class of a sum or a multiple, agree almost everywhere with $0$ and with
+the sum or the multiple of the representatives.
 \end{proof}
 
 \begin{lemma}[Pairing with a test function]
@@ -12822,7 +12828,8 @@ each $e_i$.
 \begin{theorem}[$\Sob{1}{2} = H^1$]
 \label{thm:sobolev-one-two}
 \lean{Rd.memSobolev_one_two_of_lineDerivOp_eq, Rd.memSobolev_one_iff,
-  Rd.enorm_le_of_hasWeakLineDeriv, Rd.enorm_besselPotential_one_sq_eq}
+  Rd.enorm_le_of_hasWeakLineDeriv, Rd.enorm_besselPotential_one_sq_eq,
+  Rd.sq_norm_besselPotential_one_eq}
 \leanok
 \uses{def:weak-line-derivative, cor:sobolev-tempered, thm:weak-derivative-tempered,
   lem:derivative-fourier-l2, lem:bessel-potential-l2, def:dyadic-cells}
@@ -13378,6 +13385,420 @@ Weak derivatives on $V$ are derivatives of tempered distributions
 (\Cref{cor:weak-gradient-sobolev-norm}). Apply \Cref{thm:rellich-compactness} with the bound
 $|M|$.
 \end{proof}
+
+\section{Sobolev spaces on open sets as Hilbert spaces}
+\label{sec:sobolev-restriction-spaces}
+
+Throughout this section $\Omega \subseteq V$ is open and $s \in \R$. An element $U$ of Mathlib's
+bundled space $H^s(V) = H^{s,2}(V, \C)$ (\texttt{BesselPotentialSpace}) is a tempered
+distribution with $J_s U \in L_2(V)$, and the inner product
+$\langle U, W \rangle = \langle J_s U, J_s W \rangle_{L_2}$ makes $H^s(V)$ a Hilbert space. For
+a Schwartz function $u$, $U(u)$ is the value of the distribution $U$ at $u$, and a test function
+$\varphi \in \mathcal D(\Omega)$ is read as the Schwartz function of \Cref{def:test-schwartz}.
+The Sobolev spaces on $\Omega$ are built inside $H^s(V)$ from orthogonal complements, orthogonal
+projections and closures, as in Chandler-Wilde, Hewett and Moiola
+\cite[\S 3.1]{ChandlerWildeHewettMoiola} and McLean \cite[Chapter 3]{McLean}, so they are
+Hilbert spaces as well, and Mathlib's Hilbert space theory (quotients, projections, duals,
+compact operators) applies to them.
+
+\begin{lemma}[Evaluation is continuous]
+\label{lem:sobolev-evaluation-continuous}
+\lean{Rd.besselEvalCLM, Rd.besselEvalCLM_apply, Rd.continuous_toDistr_apply}
+\leanok
+For every $s \in \R$ and every Schwartz function $u$, the map $U \mapsto U(u)$ is a continuous
+linear functional on $H^s(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By Mathlib's \texttt{BesselPotentialSpace.\allowbreak besselPotential\_\allowbreak
+neg\_\allowbreak toLp\_\allowbreak eq}, $U = J_{-s}(J_s U)$, so $U \mapsto U(u)$ is the
+composition of $U \mapsto J_s U \in L_2(V)$, the embedding of $L_2(V)$ into the tempered
+distributions, $J_{-s}$, and evaluation at $u$, all continuous linear maps (Mathlib's
+\texttt{PointwiseConvergenceCLM.\allowbreak evalCLM}).
+\end{proof}
+
+\begin{definition}[Distributions vanishing on $\Omega$]
+\label{def:sobolev-vanishing}
+\lean{Rd.vanishOn, Rd.mem_vanishOn_iff}
+\leanok
+\uses{lem:sobolev-evaluation-continuous, def:test-schwartz}
+$N^s(\Omega)$ is the set of the $U \in H^s(V)$ with $U(\varphi) = 0$ for every
+$\varphi \in \mathcal D(\Omega)$.
+\end{definition}
+
+\begin{lemma}[$N^s(\Omega)$ is closed]
+\label{lem:sobolev-vanishing-closed}
+\lean{Rd.isClosed_vanishOn, Rd.completeSpace_vanishOn}
+\leanok
+\uses{def:sobolev-vanishing}
+For every $s \in \R$ and every open $\Omega$, $N^s(\Omega)$ is a closed subspace of $H^s(V)$,
+hence complete.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$N^s(\Omega)$ is the intersection of the kernels of the continuous linear functionals
+$U \mapsto U(\varphi)$, $\varphi \in \mathcal D(\Omega)$ (\Cref{lem:sobolev-evaluation-continuous}).
+\end{proof}
+
+\begin{proposition}[Vanishing on $\Omega$ for $s = 1$]
+\label{prop:sobolev-vanishing-one}
+\lean{Rd.toDistr_testSchwartz_eq_integral, Rd.mem_vanishOn_one_iff,
+  Rd.mem_vanishOn_one_iff_restrict_eq_zero, Rd.vanishOn_one_eq_ker}
+\leanok
+\uses{def:sobolev-vanishing, def:sobolev-one-to-l2, lem:sobolev-one-to-l2}
+For every $U \in H^1(V)$ and every $\varphi \in \mathcal D(\Omega)$,
+$U(\varphi) = \int \varphi \, \iota U$. For every $U \in H^1(V)$, $U \in N^1(\Omega)$ iff
+$\iota U = 0$ almost everywhere on $\Omega$, iff $(\iota U)|_\Omega = 0$ in $L_2(\Omega)$, and
+$N^1(\Omega)$ is the kernel of $U \mapsto (\iota U)|_\Omega$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+The tempered distribution of $\iota U$ is $U$ (\Cref{lem:sobolev-one-to-l2}). If $\iota U = 0$
+almost everywhere on $\Omega$, then $\varphi \, \iota U = 0$ almost everywhere, since
+$\varphi = 0$ outside $\Omega$. Conversely, $\iota U$ is locally integrable on $\Omega$ and has
+vanishing integrals against all smooth real functions with compact support in $\Omega$, so it
+vanishes almost everywhere on $\Omega$ (Mathlib's \texttt{IsOpen.\allowbreak ae\_\allowbreak
+eq\_\allowbreak zero\_\allowbreak of\_\allowbreak integral\_\allowbreak contDiff\_\allowbreak
+smul\_\allowbreak eq\_\allowbreak zero}).
+\end{proof}
+
+\begin{definition}[The Sobolev space $H^s(\Omega)$]
+\label{def:sobolev-restriction-space}
+\lean{Rd.RestrictionSpace, Rd.restrictProj}
+\leanok
+\uses{lem:sobolev-vanishing-closed}
+$H^s(\Omega) = N^s(\Omega)^\perp$ is the orthogonal complement of $N^s(\Omega)$ in $H^s(V)$, a
+Hilbert space, and the restriction $r_\Omega : H^s(V) \to H^s(\Omega)$ is the orthogonal
+projection onto it.
+\end{definition}
+
+\begin{lemma}[The restriction]
+\label{lem:sobolev-restriction-basic}
+\lean{Rd.norm_restrictProj_apply_le, Rd.restrictProj_eq_zero_iff, Rd.restrictProj_coe,
+  Rd.restrictProj_surjective, Rd.sub_restrictProj_mem}
+\leanok
+\uses{def:sobolev-restriction-space}
+For every $U \in H^s(V)$: $\|r_\Omega U\| \leq \|U\|$; $r_\Omega U = 0$ iff $U \in N^s(\Omega)$;
+and $U - r_\Omega U \in N^s(\Omega)$. For every $u \in H^s(\Omega)$, $r_\Omega u = u$, and
+$r_\Omega$ is surjective.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Properties of orthogonal projections onto $K^\perp$ for the closed subspace $K = N^s(\Omega)$,
+with $K^{\perp\perp} = K$ (Mathlib's \texttt{Submodule.\allowbreak orthogonal\_\allowbreak
+orthogonal}).
+\end{proof}
+
+\begin{theorem}[$H^s(\Omega)$ as a quotient]
+\label{thm:sobolev-restriction-quotient}
+\lean{Rd.quotientEquivRestrictionSpace, Rd.quotientEquivRestrictionSpace_mk,
+  Rd.norm_restrictProj_le_of_mem,
+  Rd.exists_norm_restrictProj_eq}
+\leanok
+\uses{lem:sobolev-restriction-basic}
+For every $s \in \R$ and every open $\Omega$, $[U] \mapsto r_\Omega U$ is an isometric
+isomorphism from $H^s(V) / N^s(\Omega)$ onto $H^s(\Omega)$. For every $U \in H^s(V)$,
+$\|r_\Omega U\| \leq \|U + W\|$ for every $W \in N^s(\Omega)$, with equality for some
+$W \in N^s(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+A Hilbert space modulo a closed subspace $K$ is isometric to $K^\perp$ (Mathlib's
+\texttt{Submodule.\allowbreak quotientEquivOrthogonal}), and $[U] = [r_\Omega U]$ by
+\Cref{lem:sobolev-restriction-basic}. The norm of $[U]$ is at most $\|U + W\|$ for
+$W \in N^s(\Omega)$, and $W = r_\Omega U - U$ gives equality.
+\end{proof}
+
+So the norm of $H^s(\Omega)$ is the minimal norm of an extension, the norm of the restriction
+space of Chandler-Wilde, Hewett and Moiola \cite[\S 3.1.4]{ChandlerWildeHewettMoiola}.
+
+\begin{definition}[$H^1(\Omega)$ in $L_2(\Omega)$]
+\label{def:sobolev-restriction-l2}
+\lean{Rd.restrictL2, Rd.restrictL2_apply}
+\leanok
+\uses{def:sobolev-restriction-space, def:sobolev-one-to-l2}
+For $u \in H^1(\Omega) \subseteq H^1(V)$, $R_\Omega u = (\iota u)|_\Omega \in L_2(\Omega)$;
+$R_\Omega$ is a bounded linear operator.
+\end{definition}
+
+\begin{proposition}[$R_\Omega$ is injective with norm at most $1$]
+\label{prop:sobolev-restriction-l2}
+\lean{Rd.restrictL2_injective, Rd.norm_restrictL2_apply_le, Rd.restrictL2_restrictProj}
+\leanok
+\uses{def:sobolev-restriction-l2, prop:sobolev-vanishing-one, lem:sobolev-restriction-basic,
+  lem:sobolev-one-to-l2}
+For every open $\Omega$, $R_\Omega$ is injective and $\|R_\Omega u\|_{L_2(\Omega)} \leq \|u\|$
+for every $u \in H^1(\Omega)$. For every $U \in H^1(V)$, $R_\Omega(r_\Omega U) =
+(\iota U)|_\Omega$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+If $R_\Omega u = 0$, then $u \in N^1(\Omega) \cap N^1(\Omega)^\perp = \{0\}$
+(\Cref{prop:sobolev-vanishing-one}). The bound is $\|\iota u\|_2 \leq \|u\|$
+(\Cref{lem:sobolev-one-to-l2}). $U - r_\Omega U$ lies in $N^1(\Omega)$, the kernel of
+$U \mapsto (\iota U)|_\Omega$.
+\end{proof}
+
+\begin{theorem}[Rellich's theorem for $H^1(\Omega)$]
+\label{thm:sobolev-restriction-rellich}
+\lean{Rd.isCompactOperator_restrictL2}
+\leanok
+\uses{def:sobolev-restriction-l2, thm:rellich-compactness}
+For every bounded open set $\Omega \subseteq V$, $R_\Omega : H^1(\Omega) \to L_2(\Omega)$ is a
+compact operator.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$R_\Omega$ is the compact operator $U \mapsto (\iota U)|_\Omega$ of
+\Cref{thm:rellich-compactness} composed with the bounded inclusion of $H^1(\Omega)$ into
+$H^1(V)$ (Mathlib's \texttt{IsCompactOperator.\allowbreak comp\_\allowbreak clm}).
+\end{proof}
+
+For every bounded open set, $R_\Omega$ is compact; for the restriction space $H^1(\Omega)$ this
+is the compactness that Hiptmair, Pauly and Schulz require (their Assumption F)
+\cite{HiptmairPaulySchulz}.
+
+\begin{lemma}[Weak derivatives of $H^1(V)$]
+\label{lem:sobolev-one-weak-gradient-norm}
+\lean{Rd.memSobolev_toL2, Rd.exists_hasWeakLineDeriv_toL2, Rd.sq_norm_eq_of_hasWeakLineDeriv}
+\leanok
+\uses{lem:sobolev-one-to-l2, thm:sobolev-one-two, cor:sobolev-tempered,
+  thm:weak-derivative-tempered}
+For every $U \in H^1(V)$, $\iota U \in \Sob{1}{2}(V)$, and for every $v \in V$ the weak
+derivative $\partial_v \iota U$ on $V$ exists in $L_2(V)$. For every orthonormal basis
+$(e_i)_{i \in I}$ of $V$, every $U \in H^1(V)$ and all $g_i \in L_2(V)$ such that $g_i$ is the
+weak derivative $\partial_{e_i} \iota U$ on $V$ for every $i \in I$,
+\[
+  \|U\|^2 = \|\iota U\|_2^2 + (2 \pi)^{-2} \sum_i \|g_i\|_2^2 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The tempered distribution of $\iota U$ is $U \in H^1(V)$ (\Cref{lem:sobolev-one-to-l2}), so
+$\iota U \in \Sob{1}{2}(V)$ by \Cref{thm:sobolev-one-two}, and its tempered derivatives are
+$L_2$ functions (\Cref{cor:sobolev-tempered}), which are weak derivatives
+(\Cref{thm:weak-derivative-tempered}). The identity is
+$(2\pi)^2 \|J_1 U\|_2^2 = (2\pi)^2 \|\iota U\|_2^2 + \sum_i \|g_i\|_2^2$ from
+\Cref{thm:sobolev-one-two}, with $\|U\| = \|J_1 U\|_2$.
+\end{proof}
+
+\begin{proposition}[The weak gradient on $\Omega$]
+\label{prop:sobolev-restriction-weak-gradient}
+\lean{Rd.memWeakSobolev_toL2, Rd.sq_norm_restr_add_sum_le, Rd.sq_norm_restrictL2_add_sum_le}
+\leanok
+\uses{lem:sobolev-one-weak-gradient-norm, def:sobolev-restriction-l2, lem:weak-derivative-basic}
+For every open $\Omega$ and every $U \in H^1(V)$, $\iota U \in \Sob{1}{2}(\Omega)$. For every
+orthonormal basis $(e_i)_{i \in I}$ of $V$, every $u \in H^1(\Omega)$ and all $g_i \in L_2(V)$
+such that $g_i$ is the weak derivative $\partial_{e_i} \iota u$ on $V$ for every $i \in I$,
+\[
+  \|R_\Omega u\|_{L_2(\Omega)}^2 + (2 \pi)^{-2} \sum_i \|g_i|_\Omega\|_{L_2(\Omega)}^2
+  \leq \|u\|^2 .
+\]
+For every orthonormal basis $(e_i)_{i \in I}$ of $V$, every $u \in H^1(\Omega)$ and all
+$g_i \in L_2(\Omega)$ such that $g_i$ is the weak derivative $\partial_{e_i} \iota u$ on $\Omega$
+for every $i \in I$,
+\[
+  \|R_\Omega u\|_{L_2(\Omega)}^2 + (2 \pi)^{-2} \sum_i \|g_i\|_{L_2(\Omega)}^2 \leq \|u\|^2 .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+$\iota U \in \Sob{1}{2}(V)$ (\Cref{lem:sobolev-one-weak-gradient-norm}), and weak derivatives on
+$V$ are weak derivatives on $\Omega$ (\Cref{lem:weak-derivative-basic}). Restriction to $\Omega$
+has norm at most $1$ on $L_2$; apply \Cref{lem:sobolev-one-weak-gradient-norm} to
+$u \in H^1(V)$. Weak derivatives on $\Omega$ agree almost everywhere on $\Omega$ with the
+restrictions of the weak derivatives on $V$ (\Cref{lem:weak-derivative-basic}).
+\end{proof}
+
+Since $(2\pi)^2 \geq 1$, the norm
+$\bigl(\|f\|_{L_2(\Omega)}^2 + \sum_i \|\partial_{e_i} f\|_{L_2(\Omega)}^2\bigr)^{1/2}$ of
+$\Sob{1}{2}(\Omega)$ satisfies $\|R_\Omega u\|_{\Sob{1}{2}(\Omega)} \leq 2\pi \|u\|$ for every
+$u \in H^1(\Omega)$.
+
+\begin{lemma}[Weak derivatives vanish where the function vanishes]
+\label{lem:weak-derivative-vanishing}
+\lean{Rd.weakDeriv_ae_zero_of_mem_vanishOn}
+\leanok
+\uses{lem:weak-derivative-basic, prop:sobolev-vanishing-one}
+For every $W \in N^1(\Omega)$, every $k \in \N$, every $v \in V^k$ and every weak derivative
+$g = \partial^v \iota W$ on $V$, $g = 0$ almost everywhere on $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\iota W = 0$ almost everywhere on $\Omega$ (\Cref{prop:sobolev-vanishing-one}), so $g = 0$
+almost everywhere on $\Omega$ (\Cref{lem:weak-derivative-basic}, item (7)).
+\end{proof}
+
+\begin{theorem}[$H^1(\Omega)$ of a bounded Lipschitz domain]
+\label{thm:sobolev-restriction-lipschitz}
+\lean{Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2}
+\leanok
+\uses{def:sobolev-lipschitz-domain, prop:sobolev-restriction-l2,
+  lem:sobolev-one-weak-gradient-norm, thm:sobolev-one-two, lem:sobolev-one-to-l2}
+For every bounded Lipschitz domain $\Omega$ and every $f \in L_2(V)$, $f$ lies in $H^1(\Omega)$
+in the sense of \Cref{def:sobolev-lipschitz-domain} iff $f|_\Omega = R_\Omega u$ for some $u$ in
+the Hilbert space $H^1(\Omega)$ of \Cref{def:sobolev-restriction-space}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+If $F \in \Sob{1}{2}(V)$ equals $f$ on $\Omega$, then $F = \iota U$ for some $U \in H^1(V)$
+(\Cref{thm:sobolev-one-two}, \Cref{lem:sobolev-one-to-l2}), and $u = r_\Omega U$ has
+$R_\Omega u = F|_\Omega = f|_\Omega$ (\Cref{prop:sobolev-restriction-l2}). Conversely,
+$F = \iota u$ lies in $\Sob{1}{2}(V)$ (\Cref{lem:sobolev-one-weak-gradient-norm}) and equals $f$
+almost everywhere on $\Omega$.
+\end{proof}
+
+\begin{definition}[$\tilde H^s(\Omega)$ and $H^s_0(\Omega)$]
+\label{def:sobolev-tilde-zero-boundary}
+\lean{Rd.ofTest, Rd.toDistr_ofTest, Rd.testSpan, Rd.tildeSpace, Rd.zeroBoundarySpace,
+  Rd.tildeToRestrictionL}
+\leanok
+\uses{def:sobolev-restriction-space, def:test-schwartz}
+Every $\varphi \in \mathcal D(\Omega)$, a Schwartz function, is an element of $H^s(V)$.
+$T^s(\Omega)$ is the complex linear span of these elements in $H^s(V)$, $\tilde H^s(\Omega)$
+its closure in $H^s(V)$, and $H^s_0(\Omega)$ the closure of $r_\Omega(T^s(\Omega))$ in
+$H^s(\Omega)$. The map
+$\tilde H^s(\Omega) \to H^s(\Omega)$, $U \mapsto r_\Omega U$, is a bounded linear operator.
+\end{definition}
+
+\begin{lemma}[$\tilde H^s(\Omega)$ and $H^s_0(\Omega)$ are Hilbert spaces]
+\label{lem:sobolev-tilde-zero-boundary-closed}
+\lean{Rd.isClosed_tildeSpace, Rd.completeSpace_tildeSpace, Rd.isClosed_zeroBoundarySpace,
+  Rd.completeSpace_zeroBoundarySpace}
+\leanok
+\uses{def:sobolev-tilde-zero-boundary}
+For every $s \in \R$ and every open $\Omega$, $\tilde H^s(\Omega)$ is closed in $H^s(V)$ and
+$H^s_0(\Omega)$ is closed in $H^s(\Omega)$; both are complete.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Closures are closed, and closed subspaces of complete spaces are complete.
+\end{proof}
+
+\begin{lemma}[Restriction maps $\tilde H^s(\Omega)$ into $H^s_0(\Omega)$]
+\label{lem:sobolev-tilde-restriction-range}
+\lean{Rd.range_tildeToRestrictionL_le, Rd.closure_range_tildeToRestrictionL}
+\leanok
+\uses{def:sobolev-tilde-zero-boundary, lem:sobolev-tilde-zero-boundary-closed}
+For every $s \in \R$ and every open $\Omega$, $r_\Omega(\tilde H^s(\Omega)) \subseteq
+H^s_0(\Omega)$, and $H^s_0(\Omega)$ is the closure of $r_\Omega(\tilde H^s(\Omega))$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$r_\Omega$ is continuous, so it maps the closure of $T^s(\Omega)$ into the closure of
+$r_\Omega(T^s(\Omega))$; and $r_\Omega(T^s(\Omega)) \subseteq r_\Omega(\tilde H^s(\Omega))$.
+\end{proof}
+
+\begin{lemma}[Test functions are Schwartz functions supported in $\Omega$]
+\label{lem:sobolev-test-span-schwartz}
+\lean{Rd.toL2_ofTest_ae, Rd.exists_schwartz_of_mem_testSpan, Rd.exists_opens_toL2_ae_eq_zero}
+\leanok
+\uses{def:sobolev-tilde-zero-boundary, lem:sobolev-one-to-l2}
+For every $\varphi \in \mathcal D(\Omega)$, $\iota \varphi = \varphi$ almost everywhere. For
+every $U \in T^s(\Omega)$ there is a Schwartz function $w$ with closed support in $\Omega$ whose
+tempered distribution is $U$. For every $U \in T^1(\Omega)$ there is an open set $O \supseteq
+V \setminus \Omega$ with $\iota U = 0$ almost everywhere on $O$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+An $L_2$ function is determined by its tempered distribution (\Cref{lem:sobolev-one-to-l2}).
+Sums and multiples of Schwartz functions with closed support in $\Omega$ are such functions. For
+$U \in T^1(\Omega)$, $\iota U = w$ almost everywhere, and $O$ is the complement of the closed
+support of $w$.
+\end{proof}
+
+\begin{lemma}[Functions with disjoint supports]
+\label{lem:norm-disjoint-supports}
+\lean{Rd.norm_le_norm_add_of_ae_eq_zero}
+\leanok
+For every measure space $(X, \mu)$, every normed group $E$, every $0 < p \leq \infty$, every
+measurable $S \subseteq X$ and all $a, b \in L_p(\mu; E)$ such that $a = 0$ almost everywhere on
+$X \setminus S$ and $b = 0$ almost everywhere on $S$, $\|a\|_p \leq \|a + b\|_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$|a + b| \geq |a|$ almost everywhere.
+\end{proof}
+
+\begin{proposition}[Adding a function vanishing on $\Omega$]
+\label{prop:sobolev-test-norm-minimal}
+\lean{Rd.norm_le_norm_add_of_mem_testSpan}
+\leanok
+\uses{lem:sobolev-one-weak-gradient-norm, lem:sobolev-test-span-schwartz,
+  lem:weak-derivative-vanishing, lem:norm-disjoint-supports, prop:sobolev-vanishing-one}
+For every $U \in T^1(\Omega)$ and every $W \in N^1(\Omega)$, $\|U\| \leq \|U + W\|$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+Let $(e_i)$ be an orthonormal basis of $V$ and $g_i$, $h_i$ the weak derivatives
+$\partial_{e_i}$ of $\iota U$ and $\iota W$ on $V$; $g_i + h_i$ is the one of $\iota(U + W)$.
+By \Cref{lem:sobolev-one-weak-gradient-norm},
+$\|U\|^2 = \|\iota U\|_2^2 + (2\pi)^{-2} \sum_i \|g_i\|_2^2$, and the same for $U + W$ with
+$\iota U + \iota W$ and $g_i + h_i$. $\iota U$ and the $g_i$ vanish almost everywhere outside
+$\Omega$ (\Cref{lem:sobolev-test-span-schwartz}, \Cref{lem:weak-derivative-vanishing}), and
+$\iota W$ and the $h_i$ vanish almost everywhere on $\Omega$
+(\Cref{prop:sobolev-vanishing-one}, \Cref{lem:weak-derivative-vanishing}), so every $L_2$ norm
+grows by \Cref{lem:norm-disjoint-supports}.
+\end{proof}
+
+\begin{theorem}[Restriction is isometric on $\tilde H^1(\Omega)$]
+\label{thm:sobolev-tilde-restriction-isometry}
+\lean{Rd.norm_restrictProj_of_mem_testSpan, Rd.norm_restrictProj_of_mem_tildeSpace,
+  Rd.tildeToRestriction, Rd.tildeToRestriction_apply}
+\leanok
+\uses{prop:sobolev-test-norm-minimal, thm:sobolev-restriction-quotient,
+  lem:sobolev-restriction-basic}
+For every open $\Omega \subseteq V$ and every $U \in \tilde H^1(\Omega)$,
+$\|r_\Omega U\| = \|U\|$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $U \in T^1(\Omega)$, $\|r_\Omega U\| = \|U + W\|$ for some $W \in N^1(\Omega)$
+(\Cref{thm:sobolev-restriction-quotient}), which is at least $\|U\|$
+(\Cref{prop:sobolev-test-norm-minimal}), and $\|r_\Omega U\| \leq \|U\|$
+(\Cref{lem:sobolev-restriction-basic}). Both sides are continuous in $U$, so the identity
+extends to the closure $\tilde H^1(\Omega)$.
+\end{proof}
+
+\begin{theorem}[$\tilde H^1(\Omega) = H^1_0(\Omega)$ isometrically]
+\label{thm:sobolev-tilde-zero-boundary}
+\lean{Rd.range_tildeToRestriction, Rd.tildeEquivZeroBoundary,
+  Rd.coe_tildeEquivZeroBoundary_apply}
+\leanok
+\uses{thm:sobolev-tilde-restriction-isometry, lem:sobolev-tilde-restriction-range,
+  lem:sobolev-tilde-zero-boundary-closed}
+For every open set $\Omega \subseteq V$, $U \mapsto r_\Omega U$ is an isometric isomorphism from
+$\tilde H^1(\Omega)$ onto $H^1_0(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:sobolev-tilde-restriction-isometry} the map is a linear isometry. Its range is
+complete, since $\tilde H^1(\Omega)$ is complete, hence closed, and its closure is
+$H^1_0(\Omega)$ (\Cref{lem:sobolev-tilde-restriction-range}).
+\end{proof}
+
+McLean proves $\tilde H^s(\Omega) = H^s_0(\Omega)$ on Lipschitz domains for $s \geq 0$ with
+$s - \frac12 \notin \Z$, in particular for $s = 1$, up to equivalence of norms
+\cite[Theorem 3.33]{McLean}. For $s = 1$, \Cref{thm:sobolev-tilde-zero-boundary} holds for every
+open set and with equal norms.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
@@ -14928,6 +15349,11 @@ SIAM J.\ Matrix Anal.\ Appl.\ \textbf{37} (2016), no.~1, 18--52,
 E.~Hern\'andez, G.~Weiss,
 \emph{A First Course on Wavelets},
 Studies in Advanced Mathematics, CRC Press, Boca Raton, 1996.
+
+\bibitem{HiptmairPaulySchulz}
+R.~Hiptmair, D.~Pauly, E.~Schulz,
+\emph{Traces for Hilbert complexes},
+J.\ Funct.\ Anal.\ \textbf{284} (2023), Paper No.~109905.
 
 \bibitem{McLean}
 W.~McLean,
