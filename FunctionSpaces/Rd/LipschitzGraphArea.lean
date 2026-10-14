@@ -26,8 +26,8 @@ gradient `∇φ(x') ∈ H` almost everywhere (`Rd.LipschitzGraph.gradPhi`). The 
 `μHE[n-1]`, normalised to be the volume on hyperplanes. In measure form, the image of the measure
 with density `√(1 + ‖∇φ‖²)` (`Rd.LipschitzGraph.gram`) is `μHE[n-1]` on `γ(H)`
 (`Rd.LipschitzGraph.map_graphMap_withDensity`), and in integral form
-`∫_{γ(H)} F dμHE[n-1] = ∫_H F(γ x') √(1 + ‖∇φ(x')‖²) dx'` for every `F : V → [0, ∞]`
-(`Rd.LipschitzGraph.lintegral_graphMap`).
+`∫_{γ(H)} F dμHE[n-1] = ∫_H F(γ x') √(1 + ‖∇φ(x')‖²) dx'` for every `F : V → [0, ∞]` and every
+`F : V → ℂ` (`Rd.LipschitzGraph.lintegral_graphMap`, `Rd.LipschitzGraph.integral_graphMap`).
 
 The proof is the one of Federer, 3.2.3, and Evans–Gariepy, §3.3, for a graph, which is injective
 and antilipschitz with constant `1`:
@@ -873,6 +873,18 @@ theorem lintegral_graphMap (F : V → ℝ≥0∞) :
     lintegral_withDensity_eq_lintegral_mul_non_measurable _ Ω.measurable_gram.ennreal_ofReal
       (ae_of_all _ fun _ => ENNReal.ofReal_lt_top)]
   simp only [Pi.mul_apply, mul_comm]
+
+/-- **The area formula for complex integrals**: for every `F : V → ℂ`,
+`∫_{γ(H)} F dμHE[n-1] = ∫_H F(γ x') √(1 + ‖∇φ(x')‖²) dx'`. It holds for every `F`, since `γ` is a
+measurable embedding and the density is finite (`Rd.LipschitzGraph.map_graphMap_withDensity`). -/
+theorem integral_graphMap (F : V → ℂ) :
+    ∫ y in Set.range Ω.graphMap, F y ∂(μHE[finrank ℝ V - 1] : Measure V) =
+      ∫ x', F (Ω.graphMap x') * (Ω.gram x' : ℂ) := by
+  rw [← Ω.map_graphMap_withDensity, Ω.measurableEmbedding_graphMap.integral_map,
+    integral_withDensity_eq_integral_toReal_smul Ω.measurable_gram.ennreal_ofReal
+      (ae_of_all _ fun _ => ENNReal.ofReal_lt_top)]
+  refine integral_congr_ae (ae_of_all _ fun x' => ?_)
+  simp only [ENNReal.toReal_ofReal (Ω.gram_pos x').le, Complex.real_smul, mul_comm]
 
 end LipschitzGraph
 

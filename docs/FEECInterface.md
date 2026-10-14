@@ -16,12 +16,13 @@ spaces, their characterisations, extensions, traces and embeddings. For the coll
 supplies Mathlib's Hilbert spaces `H^s(ℝ^d)` as Besov spaces `B^s_{2,2}(ℝ^d)` (item I.8), weak
 derivatives, `H^1` on bounded Lipschitz domains with its weak gradient and its trace, the
 Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets and their duality, the trace
-space `H^{1/2}(Γ)` of a bounded Lipschitz domain with its trace and extension operators, and
-Rellich's compactness theorem for the restriction space (items I.6 and H.1 in that form,
-Section 4.5; the weak-derivative form needs H.2, Section 5). Forms, Hilbert complexes, duality,
-negative smoothness, the space types on domains and boundaries, and the surface measure belong
-to the FEEC/BEEC library (Section 6); Section 9 records how this division changes: most of
-Section 6 moves into Lean-FunctionSpaces, the forms layer stays with the FEEC/BEEC library.
+space `H^{1/2}(Γ)` of a bounded Lipschitz domain with its trace and extension operators and its
+dual `H^{-1/2}(Γ)`, the area formula for Lipschitz graphs, the surface measure of `Γ` with
+`L_2(Γ)` and the trace into it, and Rellich's compactness theorem for the restriction space
+(items I.6 and H.1 in that form, Section 4.5; the weak-derivative form needs H.2, Section 5).
+Green's formula, `ker γ = H^1_0(Ω)` and the extension theorem H.2 are in preparation here; the
+forms layer, Hilbert complexes and Picard's theorem belong to the FEEC/BEEC library (Section 6).
+Section 9 records how this division differs from the first version of this document.
 
 ## 2. Depending on Lean-FunctionSpaces
 
@@ -63,12 +64,16 @@ the chapter *Function spaces on `ℝ^d`*.
   [BorelSpace V]`. For `ℝ^d` this is `EuclideanSpace ℝ (Fin d)` (the type `Fin d → ℝ` carries
   the sup norm). Mathlib's Bessel potential spaces use the same `V`, so both sides share the
   ambient type.
-* **Measure**: Lebesgue measure `volume`; on a set `Ω`, `volume.restrict Ω`.
+* **Measure**: Lebesgue measure `volume`; on a set `Ω`, `volume.restrict Ω`. On the boundary
+  `Γ` of a bounded Lipschitz domain, the surface measure `Ω.surfaceMeasure`, Mathlib's
+  `μHE[finrank ℝ V - 1]` restricted to `Γ` (Section 4.8).
 * **Function spaces are predicates** on `Lp ℂ p volume` (for weak derivatives on open sets, on
   functions `V → ℂ`), with quasi-norms in `ℝ≥0∞` (`‖f‖ₑ`, `eLpNorm`, `triebelLizorkinNorm`). The
   Hilbert-space type on `V` is Mathlib's `BesselPotentialSpace V ℂ s 2`, notation `H^{s}(V)` or
   `H^{s, 2}(V, ℂ)` (scoped in `BesselPotentialSpace`), a complete complex inner product space;
-  item I.8 below relates it to the predicates.
+  item I.8 below relates it to the predicates. The Hilbert-space types on open sets and on `Γ`
+  are orthogonal complements and closures of subspaces of `H^{s}(V)` (Sections 4.5 and 4.6), and
+  `L_2(Γ)` is `Lp ℂ 2 Ω.surfaceMeasure` (Section 4.8).
 * **Values**: scalar. Vector values are handled componentwise. Mathlib's `BesselPotentialSpace`
   takes every complete complex normed space `F` as value space, so `H^s(V; F)` exists on `V` for
   the form values `F = V [⋀^Fin k]→L[ℝ] ℂ` as well, the type of Mathlib's `extDeriv`, which
@@ -204,8 +209,9 @@ File `FunctionSpaces/Rd/LipschitzDomainH1.lean`, on top of
   `Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`.
 * The trace bound on one Lipschitz graph domain has an existential constant
   (`Rd.LipschitzGraph.modNorm_trace_le`); the trace statements of
-  `FunctionSpaces/Rd/LipschitzDomainH1.lean` on bounded Lipschitz domains are qualitative, and
-  Section 4.6 makes the trace a bounded operator on the Hilbert space `H^1(Ω)`.
+  `FunctionSpaces/Rd/LipschitzDomainH1.lean` on bounded Lipschitz domains are qualitative;
+  Section 4.6 makes the trace a bounded operator on the Hilbert space `H^1(Ω)`, and Section 4.8
+  a bounded operator into `L_2(Γ)`.
 
 ### 4.5 I.6, H.1 and H.4: Rellich's theorem, the Hilbert spaces on `Ω` and their duality
 
@@ -342,8 +348,8 @@ the hyperplane `H = Ω.hyperplane = e^⊥` and Mathlib's Euclidean Hausdorff mea
   `measurableEmbedding_graphMap`, `graphMap_injective`, `lipschitzWith_graphMap` (constant
   `1 + M`), `antilipschitzWith_graphMap` (constant `1`).
 * The area formula `Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`, its measure form
-  `map_graphMap_withDensity` and its integral form `lintegral_graphMap`, the last for every
-  `F : V → ℝ≥0∞`, measurable or not:
+  `map_graphMap_withDensity` and its integral forms `lintegral_graphMap`, for every
+  `F : V → ℝ≥0∞`, measurable or not, and `integral_graphMap`, for every `F : V → ℂ`:
 
   ```lean
   theorem euclideanHausdorffMeasure_graphMap_image {A : Set Ω.hyperplane}
@@ -356,6 +362,9 @@ the hyperplane `H = Ω.hyperplane = e^⊥` and Mathlib's Euclidean Hausdorff mea
   theorem lintegral_graphMap (F : V → ℝ≥0∞) :
       ∫⁻ y in Set.range Ω.graphMap, F y ∂(μHE[finrank ℝ V - 1] : Measure V) =
         ∫⁻ x', F (Ω.graphMap x') * ENNReal.ofReal (Ω.gram x')
+  theorem integral_graphMap (F : V → ℂ) :
+      ∫ y in Set.range Ω.graphMap, F y ∂(μHE[finrank ℝ V - 1] : Measure V) =
+        ∫ x', F (Ω.graphMap x') * (Ω.gram x' : ℂ)
   ```
 * `Rd.LipschitzGraph.normalAt Ω x' = (gram x')⁻¹ • (gradPhi x' - e)`, the outward unit normal at
   `Ω.graphMap x'`: `norm_normalAt` (`‖ν‖ = 1`), `inner_normalAt_e` (`⟪ν, e⟫ = -(gram x')⁻¹`),
@@ -368,7 +377,55 @@ the hyperplane `H = Ω.hyperplane = e^⊥` and Mathlib's Euclidean Hausdorff mea
   determinant `Rd.LipschitzGraph.normDet_linearGraph` and Mathlib's
   `LinearMap.euclideanHausdorffMeasure_image_eq_normDet_mul_volume`).
 
-### 4.8 Items X.1–X.5, X.7, X.8
+### 4.8 The surface measure, `L_2(Γ)` and the trace into it
+
+File `FunctionSpaces/Rd/SurfaceMeasure.lean`, for `Ω : Rd.BoundedLipschitzDomain V` with
+boundary `Γ`, boundary balls `B_j = ball (Ω.center j) (Ω.radius j)` and charts
+`(Ω.graph j).graphMap` over the hyperplanes `(Ω.graph j).hyperplane`:
+
+* `Rd.BoundedLipschitzDomain.surfaceMeasure Ω : Measure V`, defined as
+  `(μHE[finrank ℝ V - 1]).restrict (frontier Ω.carrier)`, with no charts in the definition;
+  `isFiniteMeasure_surfaceMeasure` (an instance), `ae_mem_frontier`,
+  `surfaceMeasure_compl_frontier`.
+* The chart form, from the area formula of Section 4.7: `surfaceMeasure_restrict_ball` (on `B_j`,
+  `σ` is `μHE[finrank ℝ V - 1]` on the graph), `lintegral_surfaceMeasure_of_support` (for every
+  `F : V → ℝ≥0∞` vanishing outside `B_j`,
+  `∫⁻ y, F y ∂σ = ∫⁻ x', F (γ_j x') * ENNReal.ofReal (gram_j x')`, measurable or not),
+  `lintegral_chart_eq` (two charts give the same integral for `F` vanishing outside
+  `B_j ∩ B_k`), `lintegral_surfaceMeasure` (for every resolution of unity `ψ` with `ψ_j ≥ 0` on
+  `Γ` and every `F`,
+  `∫⁻ F dσ = ∑ j, ∫⁻ x', ofReal (ψ_j (γ_j x')) * F (γ_j x') * ofReal (gram_j x')`),
+  `integral_surfaceMeasure` (for every resolution of unity `ψ`, of any sign, and every
+  `σ`-integrable `f : V → ℂ`,
+  `∫ f dσ = ∑ j, ∫ x', ψ.toComplex j (γ_j x') * f (γ_j x') * gram_j x'`; the single-chart form is
+  `integral_surfaceMeasure_of_support`), `lintegral_surfaceMeasure_le_sum`. A nonnegative
+  resolution of unity is `Rd.BoundedLipschitzDomain.nonnegPartition`
+  (`exists_boundaryPartition_nonneg`).
+* Null sets: `ae_surfaceMeasure_iff_aeBoundary : (∀ᵐ y ∂σ, P y) ↔ ∀ᶠ y in Ω.aeBoundary, P y`
+  for every property `P`, so the chart filter of Section 4.4 is "`σ`-almost everywhere", and
+  `ae_surfaceMeasure_ball_iff` chart by chart; `volume_frontier : volume (frontier Ω.carrier) = 0`.
+* The boundary trace in `L_p(Γ)`: `memLp_boundaryTrace` (hypotheses of the trace theorem,
+  every `1 ≤ p < ∞`), with the bound `lintegral_enorm_boundaryTrace_le`
+  (`∫_Γ |Tr_Γ F|^p dσ ≤ ∑_j √(1 + M_j²) ‖Tr_j F‖_p^p`).
+* `Rd.BoundedLipschitzDomain.BoundaryL2 Ω := Lp ℂ 2 Ω.surfaceMeasure`, the space `L_2(Γ)`, and
+  three bounded operators into it, each given almost everywhere on `Γ` by the boundary trace of
+  every resolution of unity `ψ`:
+  `ambientTraceL2 Ω : H^{1, 2}(V, ℂ) →L[ℂ] BoundaryL2 Ω` (`ambientTraceL2_apply_ae`; existential
+  constant, `exists_eLpNorm_boundaryTrace_toL2_le`),
+  `traceL2 Ω : TraceSpace Ω →L[ℂ] BoundaryL2 Ω` (`traceL2_apply_ae`, injective:
+  `traceL2_injective`), and `boundaryTraceL2 Ω : Ω.SobolevOne →L[ℂ] BoundaryL2 Ω`, equal to
+  `traceL2 Ω ∘L trace Ω` (`boundaryTraceL2_apply_ae`) and to `ambientTraceL2` on `H^1(Ω)`
+  (`boundaryTraceL2_eq_ambientTraceL2`), with
+  `ker_boundaryTraceL2 : (boundaryTraceL2 Ω).ker = traceKer Ω`. This is H.7 at `k = 0` as an
+  operator `γ : H^1(Ω) → L_2(Γ)`.
+* `exists_traceL2_ae_eq`: every `g ∈ B^{1/2}_{2,2}(Γ)` is `traceL2 Ω t` for some
+  `t ∈ H^{1/2}(Γ)`, `σ`-almost everywhere; hence `memLp_of_memBoundaryBesov`.
+* `Rd.BoundedLipschitzDomain.normal Ω : V → V`, the outward unit normal field
+  `∑_j ψ_j • ν_j ∘ P_j` with `ψ = nonnegPartition` and the chart normals of Section 4.7:
+  `measurable_normal`, `norm_normal_le` (`‖ν y‖ ≤ 1` for every `y`). Its identity with the chart
+  normals almost everywhere on `Γ` comes with Green's formula (in preparation, Section 9).
+
+### 4.9 Items X.1–X.5, X.7, X.8
 
 * X.1, bounded Lipschitz domains: `Rd.BoundedLipschitzDomain`
   (`FunctionSpaces/Rd/BoundedLipschitz.lean`).
@@ -388,7 +445,7 @@ the hyperplane `H = Ω.hyperplane = e^⊥` and Mathlib's Euclidean Hausdorff mea
 * X.8, Mathlib's distributions on open sets and differential forms: `Distribution` (`𝓓'(Ω, F)`),
   `extDeriv`.
 
-### 4.9 Later
+### 4.10 Later
 
 The next part of Lean-FunctionSpaces continues with the square function theorem
 `L_p = F^0_{p,2}`, `W^m_p = F^m_{p,2}` and Mathlib's `H^{s,p} = F^s_{p,2}` for all `1 < p < ∞`,
@@ -401,28 +458,36 @@ and the Sobolev embeddings on `ℝ^d`. They generalise Sections 4.1 and 4.2 from
   (Rychkov's extension, assembled with a resolution of unity) and the trace theorem carry
   existential constants, so the statements on `Ω` are equivalences of membership. The norm
   statements on `Ω` have constant `1`: the restriction bound, and on the trace space the trace,
-  the extension and the quotient isometry `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)` (Section 4.6). Norm
-  equivalences with explicit constants hold on `V` (Sections 4.1 and 4.2).
+  the extension and the quotient isometry `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)` (Section 4.6). The trace
+  into `L_2(Γ)` has an existential constant (Section 4.8). Norm equivalences with explicit
+  constants hold on `V` (Sections 4.1 and 4.2).
 * **`H^s(Ω)` is the restriction space**, the definition of Chandler-Wilde, Hewett and Moiola (the
   proposal cites their §3.1.4). Rellich's theorem then holds on every bounded set. Every function
   of `H^1(Ω)` lies in the weak-derivative space `W^1_2(Ω)`, on every open set
   (`Rd.memWeakSobolev_toL2`). On bounded Lipschitz
   domains the two spaces agree by the extension theorem for `W^{1,2}` of Calderón and Stein
-  (Stein 1970, Chapter VI, §3), which the libraries built on this one supply (Section 6); on some
+  (Stein 1970, Chapter VI, §3), which is in preparation here (Section 9); on some
   bounded open sets they differ (a slit disc), and the embedding `W^1_2(Ω) ↪ L_2(Ω)` can fail to
   be compact (the rooms-and-passages domains, Adams and Fournier, Chapter 6). This splits H.1
   and I.6: the restriction version is formalised for every bounded set, and the weak-derivative
   version on Lipschitz domains follows from it together with the extension theorem.
 * **`B^s_{p,q}(Γ)` is defined chart by chart**, with Lebesgue measure on the hyperplanes of the
   charts, and "almost everywhere on `Γ`" is the chart filter `aeBoundary`, whose exceptional sets
-  are, mathematically, the null sets of the surface measure. Boundary integral operators need the
-  surface measure itself (Section 6).
+  are exactly the null sets of the surface measure
+  (`Rd.BoundedLipschitzDomain.ae_surfaceMeasure_iff_aeBoundary`).
+* **The surface measure is Mathlib's Hausdorff measure** `μHE[d-1]` restricted to `Γ`, defined
+  without charts and normalised to be the volume on hyperplanes. The area formula for Lipschitz
+  graphs (Section 4.7) gives its chart form with the Gram density `√(1 + ‖∇φ_j‖²)`, so the
+  integrals of two charts agree on their overlap, both being integrals over `Γ`
+  (`Rd.BoundedLipschitzDomain.lintegral_chart_eq`); a resolution of unity enters only the chart
+  formula for whole integrals, with nonnegative `ψ_j`.
 * **Predicates plus Hilbert-space types.** The spaces of Lean-FunctionSpaces are predicates on
   `Lp ℂ p volume`; the Hilbert-space type on `V` is Mathlib's `H^{s, 2}(V, ℂ)`, tied to the
   predicates by I.8 and `Rd.toL2`. The Hilbert spaces on open sets are closed subspaces of
-  `H^{s, 2}(V, ℂ)`, orthogonal complements and closures (Section 4.5), so Mathlib's Hilbert-space
+  `H^{s, 2}(V, ℂ)`, orthogonal complements and closures (Section 4.5), and the trace space is the
+  orthogonal complement of the trace kernel in `H^1(Ω)` (Section 4.6), so Mathlib's Hilbert-space
   theory (projections, duals, compact operators) applies to them directly; the quotient of CWHM
-  is an isometric copy.
+  and the quotient `H^1(Ω)/ker γ` are isometric copies.
 * **Weak derivatives in Mathlib's distributions on open sets**, along directions `v : Fin k → V`,
   so that they meet the Sobolev library prepared for Mathlib (Section 4.2) and the distributional
   exterior derivative that the FEEC/BEEC library builds on the same `𝓓'(Ω, ·)`; Mathlib's
@@ -437,25 +502,21 @@ and the Sobolev embeddings on `ℝ^d`. They generalise Sections 4.1 and 4.2 from
 
 ## 6. What the FEEC/BEEC library builds
 
-The list below is the division of the first version of this document. Its first five items now
-move into Lean-FunctionSpaces (Section 9); the last item stays with the FEEC/BEEC library.
+The FEEC/BEEC library builds:
 
-* Space types on `Ω` and `Γ` with their norms: `H^1(Ω)` as a quotient or a closed subspace of
-  `H^{1, 2}(V, ℂ)`, `H^{1/2}(Γ)` as a normed type, restriction, extension and trace as bounded
-  operators.
-* `ker γ = H^1_0(Ω)` on Lipschitz domains (McLean, Theorem 3.40), needed for the HPS quotient
+* The forms layer: `L^2Λ^k`, the weak exterior derivative `d`, `HΛ^k`, regular decompositions,
+  and `H^{-1/2}(curl_Γ, Γ)`.
+* Picard's theorem from I.6, and the s-number track together with Lean-SNumbers.
+
+In preparation in Lean-FunctionSpaces (Section 9), and available to it once they land in
+Section 4:
+
+* Green's formula on bounded Lipschitz domains for `H^1` functions, in chart form and with the
+  surface measure and the outward unit normal of Section 4.8.
+* `ker γ = H^1_0(Ω)` on Lipschitz domains (McLean, Theorem 3.40) and the HPS quotient
   `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)`.
-* Negative order and duality: `H^{-1/2}(Γ)`, `H^{-1/2}(curl_Γ, Γ)`, `H̃^s(Ω)` and H.4.
-* The surface measure on `Γ` and `L_2(Γ)`: Mathlib's Hausdorff measure `μH[d-1]` restricted to
-  `Γ`, related to the charts by the area formula for Lipschitz graphs, a candidate for a Mathlib
-  contribution.
-* The extension theorem for `W^{1,2}` on Lipschitz domains, if the weak-derivative `H^1(Ω)` is
-  wanted on its own (two routes: Rychkov's extension operator of the library, shown bounded from
-  weak `W^{1,2}(Ω)` to `H^1(V)` by integrating its cone kernels by parts; or reflection in the
-  straightened coordinates of `FunctionSpaces/Rd/GraphStraightening.lean`, which needs a chain
-  rule for `W^{1,2}` under bi-Lipschitz maps and a Meyers–Serrin density theorem).
-* The forms layer (`L^2Λ^k`, weak `d`, `HΛ^k`, regular decompositions), Picard's theorem from I.6,
-  and the s-number track together with Lean-SNumbers.
+* The extension theorem H.2 for `W^{1,2}` on bounded Lipschitz domains, with Rellich and the
+  trace statements for the weak-derivative space.
 
 ## 7. Answers to the seven questions
 
@@ -471,15 +532,17 @@ move into Lean-FunctionSpaces (Section 9); the last item stays with the FEEC/BEE
    `EuclideanSpace ℝ (Fin d)`; it is on the list of later goals of Lean-FunctionSpaces.
 3. **I.8.** Yes, it is formalised for `p = 2` (Section 4.1); `H^s_p = F^s_{p,2}` for all
    `1 < p < ∞` follows in the next part of Lean-FunctionSpaces.
-4. **Rellich on bounded Lipschitz domains.** Yes for the restriction space, on every bounded set
-   (Section 4.5). For the weak-derivative space on Lipschitz domains it follows together with the
-   extension theorem for `W^{1,2}` (Section 5).
+4. **Rellich on bounded Lipschitz domains.** Yes for the restriction space, on every bounded set,
+   as the compact operator `H^1(Ω) → L_2(Ω)` (Section 4.5). For the weak-derivative space on
+   Lipschitz domains it follows together with the extension theorem for `W^{1,2}`, which is in
+   preparation here (Sections 5 and 9).
 5. **Vector values.** Scalar in Lean-FunctionSpaces; on `V` Mathlib's `H^{s,p}(V, F)` takes vector
    values directly, and on `Ω` and `Γ` the FEEC/BEEC library works with `Fin m → ℂ`-valued
    functions and componentwise lemmas.
-6. **Space types and surface measure.** Predicates and Mathlib's type on `V` here, and the
-   Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets (Section 4.5); the types on `Γ`
-   and the surface measure follow here as well (Section 9).
+6. **Space types and surface measure.** Predicates and Mathlib's type on `V` here, the Hilbert
+   spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets (Section 4.5), the trace space
+   `H^{1/2}(Γ)` and its dual `H^{-1/2}(Γ)` (Section 4.6), and the surface measure `μHE[d-1]` on
+   `Γ` with `L_2(Γ)` and the trace into it (Section 4.8).
 7. **Split and versions.** The split Lean-SNumbers / Lean-FunctionSpaces / FEEC/BEEC library is
    right. Lean-FunctionSpaces pins Lean and Mathlib `v4.35.0-rc2`, Lean-SNumbers moves to the
    same pin, and the FEEC/BEEC library takes it as well; the three move to the stable release
@@ -487,19 +550,21 @@ move into Lean-FunctionSpaces (Section 9); the last item stays with the FEEC/BEE
 
 ## 8. Versioning
 
-The Lean declarations cited here are those of commit `199a2ef` of `main`; later commits keep them
-unless this document says otherwise, and the commit that changes an interface name updates this
-document. Pin `rev` to a commit at or after the one that adds this document. Missing lemmas and
-wishes for other statement shapes go to the issue tracker of the GitHub repository, with the item
-number of the proposal and the intended Lean statement.
+The Lean declarations cited here are those of the commit of `main` that adds
+`FunctionSpaces/Rd/SurfaceMeasure.lean`; later commits keep them unless this document says
+otherwise, and the commit that changes an interface name updates this document. Pin `rev` to a
+commit at or after the one that adds this document. Missing lemmas and wishes for other statement
+shapes go to the issue tracker of the GitHub repository, with the item number of the proposal and
+the intended Lean statement.
 
 ## 9. Changes to the original plan (14 October 2026)
 
-The first version of this document (commit `ec3c133`) left items 1–5 of Section 6 to the
+The first version of this document (commit `ec3c133`) left items 1–5 of its Section 6 to the
 FEEC/BEEC library. Lean-FunctionSpaces now builds them itself, in its current part (Part Ib of
 its development plan). The space types, the isometry of H.4 and the duality are formalised,
-with their Lean names in Section 4.5, the trace space, with its Lean names in Section 4.6, and
-the area formula for Lipschitz graphs, with its Lean names in Section 4.7; the other statements
+with their Lean names in Section 4.5, the trace space, with its Lean names in Section 4.6, the
+area formula for Lipschitz graphs, with its Lean names in Section 4.7, and the surface measure
+with `L_2(Γ)` and the trace into it, with their Lean names in Section 4.8; the other statements
 below are in preparation and enter Section 4 with their Lean names as they are formalised.
 
 * **Space types (formalised, Section 4.5).** `H^s(Ω)` for every open `Ω` and every real `s` as a
@@ -525,14 +590,19 @@ below are in preparation and enter Section 4 with their Lean names as they are f
   `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)` (`Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`), and
   `H^{-1/2}(Γ)` as its dual (`Rd.BoundedLipschitzDomain.DualTraceSpace`). File
   `FunctionSpaces/Rd/BoundaryTraceSpace.lean`.
-* **The surface measure (area formula formalised, Section 4.7).** Mathlib's Hausdorff measure
-  `μHE[d-1]` restricted to `Γ`, with no charts in the definition. The area formula for Lipschitz
-  graphs (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`,
+* **The surface measure (formalised, Sections 4.7 and 4.8).** Mathlib's Hausdorff measure
+  `μHE[d-1]` restricted to `Γ`, with no charts in the definition
+  (`Rd.BoundedLipschitzDomain.surfaceMeasure`). The area formula for Lipschitz graphs
+  (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`,
   `Rd.LipschitzGraph.lintegral_graphMap`, file `FunctionSpaces/Rd/LipschitzGraphArea.lean`)
-  expresses its integrals in the charts with the Gram density `√(1 + ‖∇φ‖²)`; `L_2(Γ)` is the
-  `L_2` space of this measure, and the trace is an injective bounded operator
-  `H^{1/2}(Γ) → L_2(Γ)` (in preparation). The outward unit normal of a graph domain is
-  `Rd.LipschitzGraph.normalAt`.
+  expresses its integrals in the charts with the Gram density `√(1 + ‖∇φ‖²)`
+  (`Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure`); `L_2(Γ)` is the `L_2` space of this
+  measure (`Rd.BoundedLipschitzDomain.BoundaryL2`), the trace is an injective bounded operator
+  `H^{1/2}(Γ) → L_2(Γ)` (`Rd.BoundedLipschitzDomain.traceL2`), and `γ : H^1(Ω) → L_2(Γ)` has the
+  trace kernel as its kernel (`Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`). The outward unit
+  normal is `Rd.LipschitzGraph.normalAt` on a graph domain and
+  `Rd.BoundedLipschitzDomain.normal` on a bounded Lipschitz domain. File
+  `FunctionSpaces/Rd/SurfaceMeasure.lean`.
 * **Green's formula** on bounded Lipschitz domains for `H^1` functions, in chart form and with
   the surface measure and the outward unit normal.
 * **`ker γ = H^1_0(Ω)`** (McLean, Theorem 3.40) and the HPS quotient
@@ -650,6 +720,40 @@ The formalisation of the area formula settled the following points of the plan.
   `LipschitzOnWith.euclideanHausdorffMeasure_image_le` holds on all metric spaces.
 * **Names**: the lemmas on `μHE` carry Mathlib's prefix `euclideanHausdorffMeasure_`, the area
   formula included (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`).
+
+The formalisation of the surface measure settled the following points of the plan.
+
+* **The chart formula asks for a nonnegative resolution of unity.** The plan stated
+  `∫⁻ F dσ = ∑_j ∫⁻ x', ofReal (ψ_j (γ_j x')) * F (γ_j x') * ofReal (gram_j x')` for every
+  resolution of unity; with values in `[0, ∞]` this needs `ψ_j ≥ 0`, which
+  `Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure` assumes. Smooth partitions of unity
+  provide such resolutions (`Rd.BoundedLipschitzDomain.exists_boundaryPartition_nonneg`, with
+  `∑_j ψ_j ≤ 1` everywhere), and `Rd.BoundedLipschitzDomain.nonnegPartition` is a fixed one. For
+  complex integrals the chart formula holds for every resolution of unity
+  (`Rd.BoundedLipschitzDomain.integral_surfaceMeasure`). The formula for a single chart,
+  `Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure_of_support`, needs no resolution of unity,
+  and none of the chart formulas asks for measurability of `F`.
+* **Charts agree on overlaps for `F` supported in `B_j ∩ B_k`**
+  (`Rd.BoundedLipschitzDomain.lintegral_chart_eq`), without the condition `F = 0` off `Γ` of the
+  plan.
+* **`|Γ| = 0`** comes from the finiteness of `σ`: a set of finite `μHE[d-1]`-measure has
+  `μHE[d]`-measure zero (`MeasureTheory.Measure.euclideanHausdorffMeasure_zero_or_top`), and
+  `μHE[d]` is the volume (`Rd.BoundedLipschitzDomain.volume_frontier`).
+* **The unit normal field** `Rd.BoundedLipschitzDomain.normal` is pasted with the nonnegative
+  resolution of unity, so that `‖ν‖ ≤ 1` everywhere (`Rd.BoundedLipschitzDomain.norm_normal_le`).
+* **Additions to the plan**: the null sets of `σ` in one chart
+  (`Rd.BoundedLipschitzDomain.ae_surfaceMeasure_ball_iff`), the boundary trace in `L_p(Γ)` for
+  every `1 ≤ p < ∞` with an explicit bound by the chart traces
+  (`Rd.BoundedLipschitzDomain.memLp_boundaryTrace`,
+  `Rd.BoundedLipschitzDomain.lintegral_enorm_boundaryTrace_le`), the trace of `H^1(ℝ^d)` into
+  `L_2(Γ)` (`Rd.BoundedLipschitzDomain.ambientTraceL2`), which agrees with `boundaryTraceL2` on
+  `H^1(Ω)` (`Rd.BoundedLipschitzDomain.boundaryTraceL2_eq_ambientTraceL2`), its linearity on
+  `H^1(ℝ^d)` almost everywhere on `Γ`
+  (`Rd.BoundedLipschitzDomain.boundaryTrace_toL2_add`,
+  `Rd.BoundedLipschitzDomain.boundaryTrace_toL2_smul`), the bound of the trace of `H^1(ℝ^d)` on
+  one Lipschitz graph (`Rd.LipschitzGraph.exists_enorm_trace_toL2_le`), and every function of
+  `B^{1/2}_{2,2}(Γ)` as the trace of an element of `H^{1/2}(Γ)` in `L_2(Γ)`
+  (`Rd.BoundedLipschitzDomain.exists_traceL2_ae_eq`).
 
 ## References
 

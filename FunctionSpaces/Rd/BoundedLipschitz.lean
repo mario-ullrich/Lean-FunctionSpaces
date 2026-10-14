@@ -55,16 +55,20 @@ section Partition
 variable {V : Type*} [NormedAddCommGroup V] [NormedSpace ℝ V] [FiniteDimensional ℝ V]
 
 /-- **Smooth resolutions of unity**: for a closed set `s` and a finite open cover `(U_i)` of `s`
-there are smooth `ψ_i ≥ 0` with `tsupport ψ_i ⊆ U_i` and `∑_i ψ_i = 1` on `s` (Mathlib's
-`SmoothPartitionOfUnity.exists_isSubordinate`). -/
+there are smooth `ψ_i ≥ 0` with `tsupport ψ_i ⊆ U_i`, `∑_i ψ_i = 1` on `s` and `∑_i ψ_i ≤ 1`
+everywhere (Mathlib's `SmoothPartitionOfUnity.exists_isSubordinate`). -/
 theorem exists_smooth_partition {ι : Type*} [Fintype ι] {s : Set V} (hs : IsClosed s)
     (U : ι → Set V) (hU : ∀ i, IsOpen (U i)) (hcov : s ⊆ ⋃ i, U i) :
     ∃ ψ : ι → V → ℝ, (∀ i, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (ψ i)) ∧
-      (∀ i, tsupport (ψ i) ⊆ U i) ∧ ∀ x ∈ s, ∑ i, ψ i x = 1 := by
+      (∀ i, tsupport (ψ i) ⊆ U i) ∧ (∀ x ∈ s, ∑ i, ψ i x = 1) ∧ (∀ i x, 0 ≤ ψ i x) ∧
+        ∀ x, ∑ i, ψ i x ≤ 1 := by
   obtain ⟨f, hf⟩ := SmoothPartitionOfUnity.exists_isSubordinate 𝓘(ℝ, V) hs U hU hcov
-  refine ⟨fun i => f i, fun i => contMDiff_iff_contDiff.1 (f i).contMDiff, hf, fun x hx => ?_⟩
-  rw [← finsum_eq_sum_of_fintype]
-  exact f.sum_eq_one hx
+  refine ⟨fun i => f i, fun i => contMDiff_iff_contDiff.1 (f i).contMDiff, hf, fun x hx => ?_,
+    fun i x => f.nonneg i x, fun x => ?_⟩
+  · rw [← finsum_eq_sum_of_fintype]
+    exact f.sum_eq_one hx
+  · rw [← finsum_eq_sum_of_fintype]
+    exact f.sum_le_one x
 
 end Partition
 
@@ -129,7 +133,7 @@ theorem exists_pasting {ι : Type*} [Fintype ι] (hp : p ≠ ∞) {r : ℕ} {s :
     (hFf : ∀ i, ∀ᵐ x ∂(volume : Measure V), x ∈ O → x ∈ U i → F i x = f x) :
     ∃ G : Lp ℂ p (volume : Measure V), indicatorLp hO G = indicatorLp hO f ∧
       ‖G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r G k) < ∞ := by
-  obtain ⟨ψ, hψ, hψU, hψ1⟩ := exists_smooth_partition isClosed_closure U hUo hcov
+  obtain ⟨ψ, hψ, hψU, hψ1, -⟩ := exists_smooth_partition isClosed_closure U hUo hcov
   set ψC : ι → V → ℂ := fun i x => ((ψ i x : ℝ) : ℂ)
   have hψC : ∀ i, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (ψC i) := fun i =>
     Complex.ofRealCLM.contDiff.comp (hψ i)

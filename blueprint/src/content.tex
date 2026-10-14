@@ -7136,8 +7136,9 @@ minimum on the compact set $\overline{\Omega} \setminus \bigcup_j B(c_j, \rho_j 
 \lean{Rd.exists_smooth_partition, Rd.exists_iteratedFDeriv_bound}
 \leanok
 For a closed set $S \subseteq V$ and a finite open cover $(U_i)$ of $S$ there are smooth
-$\psi_i \geq 0$ with $\operatorname{supp} \psi_i \subseteq U_i$ and $\sum_i \psi_i = 1$ on $S$.
-Smooth functions with compact support have bounded derivatives of every order.
+$\psi_i \geq 0$ with $\operatorname{supp} \psi_i \subseteq U_i$, $\sum_i \psi_i = 1$ on $S$ and
+$\sum_i \psi_i \leq 1$ on $V$. Smooth functions with compact support have bounded derivatives of
+every order.
 \end{lemma}
 
 \begin{proof}
@@ -12108,7 +12109,9 @@ $\Omega$ and every real $s$. \Cref{sec:sobolev-duality} proves the duality of
 $\tilde H^s(\Omega)$ and $H^{-s}(\Omega)$. \Cref{sec:boundary-trace-space} builds the trace space
 $H^{1/2}(\Gamma)$ of a bounded Lipschitz domain, and \Cref{sec:lipschitz-graph-area} proves the
 area formula for Lipschitz graphs, which expresses the Euclidean Hausdorff measure of the
-boundary of a Lipschitz graph domain in its chart.
+boundary of a Lipschitz graph domain in its chart. \Cref{sec:surface-measure} builds the surface
+measure $\mathcal H^{n-1}$ on the boundary of a bounded Lipschitz domain, $L_2(\Gamma)$ and the
+traces into it.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -12116,7 +12119,7 @@ Chandler-Wilde, Hewett and Moiola \cite{ChandlerWildeHewettMoiola}; for restrict
 Rellich's theorem holds on every bounded set (\Cref{sec:rellich-compactness}). Every restriction
 lies in the space $\Sob{1}{2}(\Omega)$ of weak derivatives, on every open set. On bounded
 Lipschitz domains the two spaces agree by the extension theorem of Calder\'on and Stein
-\cite[Chapter VI]{SteinSingular}, which the libraries built on this one supply; on some bounded
+\cite[Chapter VI]{SteinSingular}, which is in preparation in this project; on some bounded
 open sets $\Sob{1}{2}(\Omega)$ is strictly larger, as for a disc with a slit removed, and its
 embedding into $L_2(\Omega)$ can fail to be compact, as for the rooms-and-passages domains
 \cite[Chapter 6]{AdamsFournier}. The norm bounds of this chapter are explicit on $V$; on bounded
@@ -14275,6 +14278,23 @@ eq}), so $\|J_1 \iota U\|_2 = \|U\|$. The second bound follows with \Cref{lem:be
 The finiteness in \Cref{thm:sobolev-one-besov-constant} is the hypothesis of the boundary trace
 theorems with $s = 1/2$ and $p = q = 2$.
 
+\begin{lemma}[The trace of $H^1(V)$ on a Lipschitz graph is bounded]
+\label{lem:graph-trace-sobolev-one}
+\lean{Rd.LipschitzGraph.exists_enorm_trace_toL2_le}
+\leanok
+\uses{lem:trace-linear, thm:sobolev-one-besov-constant}
+For every Lipschitz graph domain with hyperplane $H$ and trace $\operatorname{Tr}$
+(\Cref{thm:trace-graph}), taken with $L = 2$ and $p = 2$, there is $C < \infty$ with
+$\|\operatorname{Tr} \iota U\|_{L_2(H)} \leq C \|U\|$ for every $U \in H^1(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\|\operatorname{Tr} \iota U\|_{L_2(H)}$ is at most $K$ times the $B^{1/2}_{2,1}$ quantity of
+$\iota U$ (\Cref{lem:trace-linear}), which is at most $\sqrt 2 \, C_1 \|U\|$
+(\Cref{thm:sobolev-one-besov-constant}); so $C = K \sqrt 2 \, C_1$.
+\end{proof}
+
 \begin{definition}[The setting of the trace space]
 \label{def:trace-space-setting}
 \lean{Rd.BoundedLipschitzDomain.SobolevOne, Rd.BoundedLipschitzDomain.boundaryPartition,
@@ -14946,7 +14966,8 @@ disjoint and measurable (\Cref{lem:graph-map-area}).
 \begin{theorem}[The area formula for Lipschitz graphs]
 \label{thm:lipschitz-graph-area}
 \lean{Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image,
-  Rd.LipschitzGraph.map_graphMap_withDensity, Rd.LipschitzGraph.lintegral_graphMap}
+  Rd.LipschitzGraph.map_graphMap_withDensity, Rd.LipschitzGraph.lintegral_graphMap,
+  Rd.LipschitzGraph.integral_graphMap}
 \leanok
 \uses{lem:area-fixed-accuracy, lem:area-elementary, lem:graph-map-area}
 For every measurable $A \subseteq H$,
@@ -14957,8 +14978,10 @@ The image under $\gamma$ of the measure on $H$ with density $\sqrt{1 + \|\nabla\
 $\mathcal H^{n-1}$ restricted to $\gamma(H)$, and for every $F : V \to [0, \infty]$,
 \[
   \int_{\gamma(H)} F \, d\mathcal H^{n-1}
-  = \int_H F(\gamma(x')) \sqrt{1 + \|\nabla\varphi(x')\|^2} \, dx' .
+  = \int_H F(\gamma(x')) \sqrt{1 + \|\nabla\varphi(x')\|^2} \, dx' ,
 \]
+and the same identity holds for every $F : V \to \C$ that is $\mathcal H^{n-1}$-integrable on
+$\gamma(H)$.
 \end{theorem}
 
 \begin{proof}
@@ -14971,7 +14994,8 @@ measurable embedding and the density is finite.
 
 By \Cref{lem:graph-map-area}, $\gamma(H)$ is the boundary of $\Omega$, so the theorem expresses
 $\mathcal H^{n-1}$ on the boundary in the chart. The integral form holds for every $F$,
-measurable or not.
+measurable or not; in Lean the complex form holds for every $F : V \to \C$, both sides being $0$
+by Mathlib's convention when $F$ is not integrable.
 
 \begin{definition}[The outward unit normal]
 \label{def:graph-normal}
@@ -15005,6 +15029,365 @@ $\langle \nabla\varphi(x'), y \rangle
 = \langle \nabla\varphi(x'), y - \langle y, e \rangle e \rangle
 \leq M \|y - \langle y, e \rangle e\| < \langle y, e \rangle$.
 \end{proof}
+
+\section{The surface measure of a bounded Lipschitz domain}
+\label{sec:surface-measure}
+
+Throughout this section $\Omega$ is a bounded Lipschitz domain in $V$ with boundary $\Gamma$,
+boundary balls $B_j$, graph domains $\Omega_j$ with Lipschitz constants $M_j$ over the
+hyperplanes $H_j$, graph maps $\gamma_j(x') = x' + \varphi_j(x') e_j$ and gradients
+$\nabla\varphi_j$ (\Cref{def:bounded-lipschitz}, \Cref{def:graph-gradient}), and $\mathcal H^d$
+is the $d$-dimensional Euclidean Hausdorff measure of \Cref{sec:lipschitz-graph-area}. As in
+\Cref{sec:boundary-trace-space}, $\psi^0$ is the fixed resolution of unity on $\Gamma$,
+$\operatorname{Tr}_\Gamma$ the boundary trace, $N_\Gamma$ the trace kernel, $\gamma$ and $E$ the
+trace and the extension of the trace space $H^{1/2}(\Gamma)$, and boundary traces of $H^1$
+functions are taken with $L = 2$, $p = q = 2$ and $s = 1/2$. The surface measure of $\Gamma$ is
+$\mathcal H^{n-1}$ on $\Gamma$, defined without charts; the area formula for Lipschitz graphs
+(\Cref{thm:lipschitz-graph-area}) gives its form in the charts.
+
+\begin{lemma}[The boundary in a boundary ball]
+\label{lem:boundary-ball-graph}
+\lean{Rd.BoundedLipschitzDomain.frontier_inter_ball_eq}
+\leanok
+\uses{lem:boundary-charts}
+For every $j$, $\Gamma \cap B_j = \gamma_j(H_j) \cap B_j$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $y \in B_j$, $y \in \Gamma$ if and only if $\gamma_j(P_j y) = y$ (\Cref{lem:boundary-charts}),
+and $\gamma_j(x') \in \Gamma$ for every $x'$ with $\gamma_j(x') \in B_j$.
+\end{proof}
+
+\begin{lemma}[Nonnegative resolutions of unity]
+\label{lem:resolution-of-unity-nonneg}
+\lean{Rd.BoundedLipschitzDomain.exists_boundaryPartition_nonneg}
+\leanok
+\uses{def:boundary-partition, lem:resolution-of-unity}
+There is a resolution of unity $\psi$ on $\Gamma$ with $\psi_j \geq 0$ for every $j$ and
+$\sum_j \psi_j \leq 1$ on $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:resolution-of-unity} for the closed set $\Gamma$ and its open cover by the balls $B_j$.
+\end{proof}
+
+\begin{definition}[A nonnegative resolution of unity]
+\label{def:resolution-of-unity-nonneg}
+\lean{Rd.BoundedLipschitzDomain.nonnegPartition,
+  Rd.BoundedLipschitzDomain.nonnegPartition_nonneg,
+  Rd.BoundedLipschitzDomain.sum_nonnegPartition_le_one}
+\leanok
+\uses{lem:resolution-of-unity-nonneg}
+$\psi^+$ is a fixed resolution of unity on $\Gamma$ with $\psi^+_j \geq 0$ for every $j$ and
+$\sum_j \psi^+_j \leq 1$ on $V$.
+\end{definition}
+
+\begin{definition}[The surface measure]
+\label{def:surface-measure}
+\lean{Rd.BoundedLipschitzDomain.surfaceMeasure, Rd.BoundedLipschitzDomain.ae_mem_frontier,
+  Rd.BoundedLipschitzDomain.surfaceMeasure_compl_frontier}
+\leanok
+\uses{def:bounded-lipschitz}
+The surface measure of $\Gamma$ is the measure $\sigma$ on $V$ with
+$\sigma(B) = \mathcal H^{n-1}(B \cap \Gamma)$ for every measurable $B \subseteq V$. Almost every
+point of $V$ with respect to $\sigma$ lies on $\Gamma$, and $\sigma(V \setminus \Gamma) = 0$.
+\end{definition}
+
+On the part of $\Gamma$ that lies in a hyperplane $H$, $\sigma$ is the Lebesgue measure of $H$.
+
+\begin{theorem}[The surface measure in the charts]
+\label{thm:surface-measure-charts}
+\lean{Rd.BoundedLipschitzDomain.surfaceMeasure_restrict_ball,
+  Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure_of_support,
+  Rd.BoundedLipschitzDomain.lintegral_chart_eq,
+  Rd.BoundedLipschitzDomain.surfaceMeasure_eq_sum_withDensity,
+  Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure,
+  Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure_le_sum}
+\leanok
+\uses{def:surface-measure, lem:boundary-ball-graph, thm:lipschitz-graph-area,
+  def:boundary-partition}
+For every $j$, $\sigma$ restricted to $B_j$ is $\mathcal H^{n-1}$ restricted to
+$\gamma_j(H_j) \cap B_j$. For every $j$ and every $F : V \to [0, \infty]$ with $F = 0$ outside
+$B_j$,
+\[
+  \int_\Gamma F \, d\sigma
+  = \int_{H_j} F(\gamma_j(x')) \sqrt{1 + \|\nabla\varphi_j(x')\|^2} \, dx' .
+\]
+For all $j$, $k$ and every $F : V \to [0, \infty]$ with $F = 0$ outside $B_j \cap B_k$,
+\[
+  \int_{H_j} F(\gamma_j(x')) \sqrt{1 + \|\nabla\varphi_j(x')\|^2} \, dx'
+  = \int_{H_k} F(\gamma_k(y')) \sqrt{1 + \|\nabla\varphi_k(y')\|^2} \, dy' .
+\]
+For every resolution of unity $\psi$ on $\Gamma$ with $\psi_j \geq 0$ on $\Gamma$ for every $j$,
+$\sigma = \sum_j \psi_j \sigma$, and for every $F : V \to [0, \infty]$,
+\[
+  \int_\Gamma F \, d\sigma = \sum_j \int_{H_j} \psi_j(\gamma_j(x')) F(\gamma_j(x'))
+  \sqrt{1 + \|\nabla\varphi_j(x')\|^2} \, dx' .
+\]
+For every $F : V \to [0, \infty]$,
+\[
+  \int_\Gamma F \, d\sigma \leq \sum_j \int_{H_j} (\mathbf 1_{B_j} F)(\gamma_j(x'))
+  \sqrt{1 + \|\nabla\varphi_j(x')\|^2} \, dx' .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\Gamma \cap B_j = \gamma_j(H_j) \cap B_j$ (\Cref{lem:boundary-ball-graph}) gives the first
+statement. For $F = 0$ outside $B_j$, $\int_\Gamma F \, d\sigma$ is the integral of $F$ over
+$\gamma_j(H_j)$ with respect to $\mathcal H^{n-1}$, which is the chart integral by the area
+formula (\Cref{thm:lipschitz-graph-area}); the second statement follows by applying this in both
+charts. For the third, $\sum_j \psi_j = 1$ on $\Gamma$ and $\sigma$ is carried by $\Gamma$, so
+$\sigma = \sum_j \psi_j \sigma$; then
+$\int_\Gamma F \, d\sigma = \sum_j \int_\Gamma \psi_j F \, d\sigma$ and $\psi_j F = 0$ outside
+$B_j$. For the fourth, the balls $B_j$ cover $\Gamma$, so $\sigma$ is
+carried by $\bigcup_j B_j$ and $\int_\Gamma F \, d\sigma \leq \sum_j \int_\Gamma \mathbf 1_{B_j} F
+\, d\sigma$.
+\end{proof}
+
+Both sides of the second statement equal $\int_\Gamma F \, d\sigma$, so the chart integrals agree
+on the overlaps of the charts. None of the statements asks for $F$ to be measurable.
+
+\begin{theorem}[The surface measure in the charts, for complex integrals]
+\label{thm:surface-measure-charts-complex}
+\lean{Rd.BoundedLipschitzDomain.integral_surfaceMeasure_of_support,
+  Rd.BoundedLipschitzDomain.integral_surfaceMeasure}
+\leanok
+\uses{thm:surface-measure-charts, thm:lipschitz-graph-area, def:boundary-partition}
+For every $j$ and every $\sigma$-integrable $f : V \to \C$ with $f = 0$ outside $B_j$,
+\[
+  \int_\Gamma f \, d\sigma
+  = \int_{H_j} f(\gamma_j(x')) \sqrt{1 + \|\nabla\varphi_j(x')\|^2} \, dx' .
+\]
+For every resolution of unity $\psi$ on $\Gamma$ and every $\sigma$-integrable $f : V \to \C$,
+\[
+  \int_\Gamma f \, d\sigma = \sum_j \int_{H_j} \psi_j(\gamma_j(x')) f(\gamma_j(x'))
+  \sqrt{1 + \|\nabla\varphi_j(x')\|^2} \, dx' .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first statement is the complex form of the area formula (\Cref{thm:lipschitz-graph-area}) on
+$\gamma_j(H_j) \cap B_j = \Gamma \cap B_j$ (\Cref{thm:surface-measure-charts}). For the second,
+$f = \sum_j \psi_j f$ on $\Gamma$, each $\psi_j f$ is $\sigma$-integrable since $\psi_j$ is
+bounded, and $\psi_j f = 0$ outside $B_j$.
+\end{proof}
+
+The resolution of unity in the second statement may take negative values.
+
+\begin{theorem}[Finiteness and null sets of the surface measure]
+\label{thm:surface-measure-null-sets}
+\lean{Rd.BoundedLipschitzDomain.isFiniteMeasure_surfaceMeasure,
+  Rd.BoundedLipschitzDomain.ae_surfaceMeasure_ball_iff,
+  Rd.BoundedLipschitzDomain.ae_surfaceMeasure_iff_aeBoundary}
+\leanok
+\uses{thm:surface-measure-charts, thm:lipschitz-graph-area, lem:graph-gradient,
+  lem:graph-map-area, def:ae-boundary}
+$\sigma(V) < \infty$. For every $j$ and every property $P$ of the points of $V$, $P(y)$ holds for
+$\sigma$-almost every $y \in B_j$ if and only if $P(\gamma_j(x'))$ holds for almost every
+$x' \in H_j$ with $\gamma_j(x') \in B_j$. A property holds $\sigma$-almost everywhere if and only
+if it holds almost everywhere on $\Gamma$ in the sense of \Cref{def:ae-boundary}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By the fourth statement of \Cref{thm:surface-measure-charts} with $F = 1$ and
+$\sqrt{1 + \|\nabla\varphi_j\|^2} \leq \sqrt{1 + M_j^2}$ (\Cref{lem:graph-gradient}), we get
+\[
+  \sigma(V) \leq \sum_j \sqrt{1 + M_j^2} \, |\gamma_j^{-1}(B_j)| ,
+\]
+and $\gamma_j^{-1}(B_j)$ is
+bounded since $\|x' - y'\| \leq \|\gamma_j(x') - \gamma_j(y')\|$ (\Cref{lem:graph-map-area}). On
+$B_j$, $\sigma$ is the image under $\gamma_j$ of the measure on $H_j$ with density
+$\sqrt{1 + \|\nabla\varphi_j\|^2} \geq 1$ (\Cref{thm:lipschitz-graph-area},
+\Cref{thm:surface-measure-charts}), which has the null sets of the Lebesgue measure of $H_j$;
+this holds for every property, measurable or not, since $\gamma_j$ is a measurable embedding. The
+last statement follows since the balls $B_j$ cover $\Gamma$ and $\sigma$-almost every point lies
+on $\Gamma$.
+\end{proof}
+
+\begin{corollary}[The boundary is a null set]
+\label{cor:boundary-null}
+\lean{Rd.BoundedLipschitzDomain.volume_frontier}
+\leanok
+\uses{thm:surface-measure-null-sets, def:surface-measure}
+$|\Gamma| = 0$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+If there is no boundary ball, $\Gamma = \emptyset$. Otherwise $V$ contains a unit vector, so
+$n \geq 1$, and $\mathcal H^{n-1}(\Gamma) = \sigma(V) < \infty$
+(\Cref{thm:surface-measure-null-sets}). For $n - 1 < n$, every set has $\mathcal H^n$-measure
+zero or $\mathcal H^{n-1}$-measure infinity (Mathlib's \texttt{MeasureTheory.\allowbreak
+Measure.\allowbreak euclideanHausdorffMeasure\_\allowbreak zero\_\allowbreak or\_\allowbreak
+top}), and $\mathcal H^n$ is the Lebesgue measure of $V$.
+\end{proof}
+
+\paragraph{The trace in $L_2(\Gamma)$.}
+
+\begin{theorem}[The boundary trace in $L_p(\Gamma)$]
+\label{thm:boundary-trace-lp}
+\lean{Rd.BoundedLipschitzDomain.stronglyMeasurable_boundaryTrace,
+  Rd.BoundedLipschitzDomain.lintegral_enorm_boundaryTrace_le,
+  Rd.BoundedLipschitzDomain.memLp_boundaryTrace}
+\leanok
+\uses{def:boundary-trace, thm:boundary-trace-charts, thm:surface-measure-charts,
+  lem:graph-gradient}
+Let $1 \leq p < \infty$ and $\psi$ a resolution of unity on $\Gamma$. For every $L \in \N$ and
+every $F \in L_p(V)$, $\operatorname{Tr}_\Gamma F$ is measurable. Let moreover $L \geq 1$, $s > 0$,
+$s + 1/p < L$, $1 \leq q \leq \infty$ and
+$\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$. Then
+\[
+  \int_\Gamma |\operatorname{Tr}_\Gamma F|^p \, d\sigma
+  \leq \sum_j \sqrt{1 + M_j^2} \, \|\operatorname{Tr}_j F\|_{L_p(H_j)}^p ,
+\]
+and $\operatorname{Tr}_\Gamma F \in L_p(\sigma)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\operatorname{Tr}_\Gamma F = \sum_k \psi_k (\operatorname{Tr}_k F \circ P_k)$ is a finite sum of
+products of continuous functions with measurable functions composed with the continuous
+projections $P_k$. By the fourth statement of \Cref{thm:surface-measure-charts} the integral is at
+most $\sum_j \int_{H_j} (\mathbf 1_{B_j} |\operatorname{Tr}_\Gamma F|^p)(\gamma_j(x'))
+\sqrt{1 + \|\nabla\varphi_j(x')\|^2} \, dx'$, and on $\gamma_j^{-1}(B_j)$,
+$\operatorname{Tr}_\Gamma F \circ \gamma_j = \operatorname{Tr}_j F$ almost everywhere
+(\Cref{thm:boundary-trace-charts}) and the Gram density is at most $\sqrt{1 + M_j^2}$
+(\Cref{lem:graph-gradient}). Each $\operatorname{Tr}_j F$ lies in $L_p(H_j)$.
+\end{proof}
+
+\begin{definition}[The space $L_2(\Gamma)$]
+\label{def:boundary-l2}
+\lean{Rd.BoundedLipschitzDomain.BoundaryL2}
+\leanok
+\uses{def:surface-measure}
+$L_2(\Gamma)$ is the space $L_2(\sigma)$ of square integrable complex functions with respect to
+the surface measure, modulo $\sigma$-null sets.
+\end{definition}
+
+\begin{theorem}[The trace of $H^1(V)$ in $L_2(\Gamma)$]
+\label{thm:ambient-trace-l2}
+\lean{Rd.BoundedLipschitzDomain.memLp_boundaryTrace_toL2,
+  Rd.BoundedLipschitzDomain.exists_eLpNorm_boundaryTrace_toL2_le,
+  Rd.BoundedLipschitzDomain.boundaryTrace_toL2_add,
+  Rd.BoundedLipschitzDomain.boundaryTrace_toL2_smul,
+  Rd.BoundedLipschitzDomain.ambientTraceLinear, Rd.BoundedLipschitzDomain.ambientTraceL2,
+  Rd.BoundedLipschitzDomain.ambientTraceL2_apply_ae}
+\leanok
+\uses{thm:boundary-trace-lp, lem:graph-trace-sobolev-one, thm:sobolev-one-besov-constant,
+  thm:trace-kernel-boundary, thm:boundary-trace-charts, lem:trace-linear,
+  thm:surface-measure-null-sets, def:boundary-l2}
+For every resolution of unity $\psi$ on $\Gamma$ and every $U \in H^1(V)$,
+$\operatorname{Tr}_\Gamma \iota U \in L_2(\Gamma)$. There is $C < \infty$ with
+$\|\operatorname{Tr}_\Gamma \iota U\|_{L_2(\Gamma)} \leq C \|U\|$ for every resolution of unity
+$\psi$ and every $U \in H^1(V)$. For every resolution of unity $\psi$, all $U, W \in H^1(V)$ and
+every $c \in \C$, $\operatorname{Tr}_\Gamma \iota (U + W) = \operatorname{Tr}_\Gamma \iota U +
+\operatorname{Tr}_\Gamma \iota W$ and $\operatorname{Tr}_\Gamma \iota (c U) = c
+\operatorname{Tr}_\Gamma \iota U$ almost everywhere on $\Gamma$. The map
+$T_\Gamma U = \operatorname{Tr}_\Gamma \iota U$, with the boundary trace of $\psi^0$, is a bounded
+linear operator $T_\Gamma : H^1(V) \to L_2(\Gamma)$, and $T_\Gamma U = \operatorname{Tr}_\Gamma
+\iota U$ $\sigma$-almost everywhere for every resolution of unity $\psi$ and every
+$U \in H^1(V)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:boundary-trace-lp} applies with $s = 1/2$, $p = q = 2$, $L = 2$
+(\Cref{thm:sobolev-one-besov-constant}). With the constants $C_j$ of
+\Cref{lem:graph-trace-sobolev-one} for the graph domains $\Omega_j$,
+\[
+  \int_\Gamma |\operatorname{Tr}_\Gamma \iota U|^2 \, d\sigma
+  \leq \sum_j \sqrt{1 + M_j^2} \, C_j^2 \|U\|^2 ,
+\]
+so $C = (\sum_j \sqrt{1 + M_j^2} \, C_j^2)^{1/2}$. Additivity is \Cref{thm:trace-kernel-boundary}
+for $U + W$ and $W$. For homogeneity, in the chart $j$ the boundary trace is
+$\operatorname{Tr}_j$ (\Cref{thm:boundary-trace-charts}), which commutes with complex scalars
+(\Cref{lem:trace-linear}). Almost everywhere on $\Gamma$ is $\sigma$-almost everywhere
+(\Cref{thm:surface-measure-null-sets}), and the boundary traces of two resolutions of unity agree
+almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}).
+\end{proof}
+
+\begin{definition}[The traces into $L_2(\Gamma)$]
+\label{def:trace-l2}
+\lean{Rd.BoundedLipschitzDomain.traceL2, Rd.BoundedLipschitzDomain.boundaryTraceL2}
+\leanok
+\uses{thm:ambient-trace-l2, def:trace-space}
+The trace $\tau : H^{1/2}(\Gamma) \to L_2(\Gamma)$ is $\tau t = T_\Gamma E t$, reading
+$E t \in H^1(\Omega)$ as an element of $H^1(V)$, and the trace
+$\gamma_{L_2} : H^1(\Omega) \to L_2(\Gamma)$ is $\gamma_{L_2} = \tau \circ \gamma$. Both are
+bounded linear operators.
+\end{definition}
+
+\begin{theorem}[The traces in $L_2(\Gamma)$]
+\label{thm:trace-l2}
+\lean{Rd.BoundedLipschitzDomain.traceL2_apply_ae, Rd.BoundedLipschitzDomain.traceL2_injective,
+  Rd.BoundedLipschitzDomain.boundaryTraceL2_apply_ae,
+  Rd.BoundedLipschitzDomain.boundaryTraceL2_eq_ambientTraceL2,
+  Rd.BoundedLipschitzDomain.ker_boundaryTraceL2,
+  Rd.BoundedLipschitzDomain.exists_traceL2_ae_eq,
+  Rd.BoundedLipschitzDomain.memLp_of_memBoundaryBesov}
+\leanok
+\uses{def:trace-l2, thm:ambient-trace-l2, thm:trace-space-functions, thm:trace-kernel-boundary,
+  thm:surface-measure-null-sets}
+Let $\psi$ be a resolution of unity on $\Gamma$, with $B^{1/2}_{2,2}(\Gamma)$ and the boundary
+trace taken with respect to $\psi$. For every $t \in H^{1/2}(\Gamma)$,
+$\tau t = \operatorname{Tr}_\Gamma \iota E t$ $\sigma$-almost everywhere, and $\tau$ is injective.
+For every $u \in H^1(\Omega)$, $\gamma_{L_2} u = \operatorname{Tr}_\Gamma \iota u$
+$\sigma$-almost everywhere, $\gamma_{L_2} u = T_\Gamma u$ with $u$ read as an element of $H^1(V)$,
+and $\gamma_{L_2} u = 0$ if and only if $u \in N_\Gamma$. For every
+$g \in B^{1/2}_{2,2}(\Gamma)$ there is $t \in H^{1/2}(\Gamma)$ with $\tau t = g$
+$\sigma$-almost everywhere; in particular $g \in L_2(\Gamma)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first statement is \Cref{thm:ambient-trace-l2}. If $\tau t = \tau t'$, then
+$\operatorname{Tr}_\Gamma \iota E t = \operatorname{Tr}_\Gamma \iota E t'$ $\sigma$-almost
+everywhere, hence almost everywhere on $\Gamma$ (\Cref{thm:surface-measure-null-sets}), so
+$t = t'$ (\Cref{thm:trace-space-functions}). By \Cref{thm:trace-space-functions},
+$\operatorname{Tr}_\Gamma \iota E \gamma u = \operatorname{Tr}_\Gamma \iota u$ almost everywhere
+on $\Gamma$, which gives the formula for $\gamma_{L_2}$; with the formula for $T_\Gamma$
+(\Cref{thm:ambient-trace-l2}), $\gamma_{L_2} u = T_\Gamma u$. Then $\gamma_{L_2} u = 0$ if and
+only if
+$\operatorname{Tr}_\Gamma \iota u = 0$ almost everywhere on $\Gamma$, that is $u \in N_\Gamma$
+(\Cref{thm:trace-kernel-boundary}). The last statement is \Cref{thm:trace-space-functions}.
+\end{proof}
+
+So $\gamma_{L_2}$ is the trace $H^1(\Omega) \to L_2(\Gamma)$ as a bounded operator, with kernel
+$N_\Gamma$, and $\tau$ identifies $H^{1/2}(\Gamma)$ with $B^{1/2}_{2,2}(\Gamma)$ inside
+$L_2(\Gamma)$.
+
+\paragraph{The unit normal.}
+
+\begin{definition}[The outward unit normal field]
+\label{def:boundary-normal}
+\lean{Rd.BoundedLipschitzDomain.normal}
+\leanok
+\uses{def:graph-normal, def:resolution-of-unity-nonneg}
+For $y \in V$, $\nu(y) = \sum_j \psi^+_j(y) \, \nu_j(P_j y)$, with the outward unit normals
+$\nu_j$ of the graph domains $\Omega_j$ (\Cref{def:graph-normal}).
+\end{definition}
+
+\begin{lemma}[Properties of the normal field]
+\label{lem:boundary-normal}
+\lean{Rd.BoundedLipschitzDomain.measurable_normal, Rd.BoundedLipschitzDomain.norm_normal_le}
+\leanok
+\uses{def:boundary-normal, lem:graph-normal}
+$\nu$ is measurable, and $\|\nu(y)\| \leq 1$ for every $y \in V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The $\psi^+_j$ are continuous and the $\nu_j$ measurable (\Cref{lem:graph-normal}). For the bound,
+$\|\nu(y)\| \leq \sum_j \psi^+_j(y) \|\nu_j(P_j y)\| = \sum_j \psi^+_j(y) \leq 1$.
+\end{proof}
+
+For $y \in \Gamma$, $\sum_j \psi^+_j(y) = 1$, so $\nu(y)$ is a convex combination of the chart
+normals $\nu_j(P_j y)$ of the charts with $\psi^+_j(y) > 0$.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

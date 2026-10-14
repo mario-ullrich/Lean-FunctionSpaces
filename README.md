@@ -249,6 +249,11 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   bounded `Ω`, compact (`Rd.restrictL2_injective`, `Rd.isCompactOperator_restrictL2`); and
   restriction is an isometry from `H̃^1(Ω)`, the closure of the test functions in `H^1(V)`, onto
   `H^1_0(Ω)`, the closure of their restrictions in `H^1(Ω)` (`Rd.tildeEquivZeroBoundary`).
+* **Duality on open sets.** For every open `Ω ⊆ V` and real `s`, every bounded functional `ℓ` on
+  `H̃^s(Ω)` is `U ↦ ⟪J_{-s} W, J_s U⟫_{L_2}` for exactly one `W ∈ H^{-s}(Ω)`, with `‖W‖ = ‖ℓ‖`
+  (`Rd.dualEquiv`, `Rd.dualEquiv_apply`, `Rd.dualEquiv_eq_iff`), and likewise
+  `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` and `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` (`Rd.dualRestrictionEquiv`,
+  `Rd.dualZeroBoundaryEquiv`).
 * **The trace space `H^{1/2}(Γ)`.** On a bounded Lipschitz domain `Ω` with boundary `Γ`, the
   trace space `H^{1/2}(Γ)` is the orthogonal complement in `H^1(Ω)` of the `u` whose boundary
   trace vanishes almost everywhere on `Γ` (`Rd.BoundedLipschitzDomain.TraceSpace`,
@@ -257,6 +262,23 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   isometrically (`Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`), and the boundary traces
   of its elements are the functions of `B^{1/2}_{2,2}(Γ)` modulo null sets of `Γ`
   (`Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`).
+* **The area formula for Lipschitz graphs.** Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph
+  domain in `V`, `dim V = n`, with the graph map `γ(x') = x' + φ(x') e` over the hyperplane
+  `H = e^⊥` and the gradient `∇φ(x') ∈ H` of `φ` on `H`, which exists almost everywhere. For
+  every measurable `A ⊆ H`, `μHE[n-1] (γ(A)) = ∫_A √(1 + ‖∇φ(x')‖²) dx'` for Mathlib's
+  `(n-1)`-dimensional Euclidean Hausdorff measure `μHE[n-1]`, normalised to be the volume on
+  hyperplanes (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`).
+* **The surface measure and `L_2(Γ)`.** On a bounded Lipschitz domain `Ω` with boundary `Γ`,
+  charts `γ_j` over the hyperplanes `H_j` and boundary balls `B_j`, the surface measure `σ` is
+  `μHE[n-1]` restricted to `Γ` (`Rd.BoundedLipschitzDomain.surfaceMeasure`), and
+  `∫_Γ F dσ = ∫_{H_j} F(γ_j x') √(1 + ‖∇φ_j(x')‖²) dx'` for every `F : V → [0, ∞]` vanishing
+  outside `B_j` (`Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure_of_support`). It is finite,
+  `|Γ| = 0` (`Rd.BoundedLipschitzDomain.volume_frontier`), and the trace
+  `γ_{L_2} : H^1(Ω) → L_2(Γ) = L_2(σ)` is a bounded operator, given almost everywhere by the
+  boundary trace, with the trace kernel as its kernel (`Rd.BoundedLipschitzDomain.boundaryTraceL2`,
+  `Rd.BoundedLipschitzDomain.boundaryTraceL2_apply_ae`,
+  `Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`); on `H^{1/2}(Γ)` the trace into `L_2(Γ)` is
+  injective (`Rd.BoundedLipschitzDomain.traceL2_injective`).
 
 **Domains, manifolds and traces** ([details](docs/DomainsTraces.md))
 
@@ -310,7 +332,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
 | [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): mixed norms, maximal functions, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, local means, ball means of differences, atoms, the torus | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain with trace and extension operators, and the area formula for Lipschitz graphs with the outward unit normal | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, and the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it | ✅ | ✗ |
 | [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 
@@ -339,8 +361,8 @@ manifolds in `FunctionSpaces/Manifold/`; the Triebel–Lizorkin block is the mix
 `FunctionSpaces/Torus/{TriebelLizorkin,PeriodicLift,FeffermanStein,TriebelLizorkinLocalMeans}`;
 Sobolev spaces on `ℝ^d` are the files `SchwartzCutoff`, `WeakDerivatives`,
 `SobolevTwoLittlewoodPaley`, `LipschitzDomainH1`, `RellichCompactness`,
-`SobolevRestrictionSpaces`, `SobolevDuality`, `BoundaryTraceSpace` and `LipschitzGraphArea` in
-`FunctionSpaces/Rd/`.
+`SobolevRestrictionSpaces`, `SobolevDuality`, `BoundaryTraceSpace`, `LipschitzGraphArea` and
+`SurfaceMeasure` in `FunctionSpaces/Rd/`.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 [docs/FEECInterface.md](docs/FEECInterface.md) describes the interface to a FEEC/BEEC library

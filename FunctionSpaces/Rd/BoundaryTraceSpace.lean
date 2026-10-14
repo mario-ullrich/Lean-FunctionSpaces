@@ -21,7 +21,8 @@ product space `V`, such as `ℝ^d`, with Lebesgue measure, and `H^1(Ω)` the Hil
   (`Rd.modNorm_two_le_norm`), and the `B^{1/2}_{2,1}` quantity is at most `√2` times the
   `B^1_{2,2}` quantity (`Rd.modNorm_half_one_le`, by the Cauchy–Schwarz inequality
   `ENNReal.lqNorm_one_mul_le`); together `H^1(V) ⊆ B^{1/2}_{2,1}(V)` with constant `√2 C`
-  (`Rd.modNorm_half_one_le_norm`).
+  (`Rd.modNorm_half_one_le_norm`), so the trace of `H^1(V)` on one Lipschitz graph is bounded
+  (`Rd.LipschitzGraph.exists_enorm_trace_toL2_le`).
 * **Chart traces**: `u ↦ Tr_j(ψ_j u)` is a bounded operator from `H^1(Ω)` to `L_2` of the
   hyperplane of the chart `j` (`Rd.BoundedLipschitzDomain.chartTrace`), for the canonical
   resolution of unity `Rd.BoundedLipschitzDomain.boundaryPartition`.
@@ -188,6 +189,22 @@ theorem modNorm_toL2_lt_top (U : H^{1}(V)) :
   rw [hσ]
   exact (modNorm_two_le_norm U).trans_lt
     (ENNReal.mul_lt_top sobolevOneBesovConst_ne_top.lt_top enorm_lt_top)
+
+/-- **The trace of `H^1(V)` on a Lipschitz graph is bounded**: `‖Tr ι U‖_{L_2(H)} ≤ C ‖U‖` for every
+`U ∈ H^1(V)` with `L_2` function `ι U` (`Rd.toL2`), with `C = K √2 Rd.sobolevOneBesovConst V` for
+the constant `K` of the trace bound in the `B^{1/2}_{2,1}` quantity
+(`Rd.LipschitzGraph.enorm_trace_le`, `Rd.modNorm_half_one_le_norm`). -/
+theorem LipschitzGraph.exists_enorm_trace_toL2_le (Ω : LipschitzGraph V) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ U : H^{1}(V), ‖Ω.trace two_ne_top 2 (toL2 U)‖ₑ ≤ C * ‖U‖ₑ := by
+  obtain ⟨K, hK, hle⟩ := Ω.enorm_trace_le two_ne_top 2
+  refine ⟨K * (2 ^ (1 / 2 : ℝ) * sobolevOneBesovConst V), ENNReal.mul_ne_top hK
+    (ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by norm_num) (by norm_num))
+      sobolevOneBesovConst_ne_top), fun U => ?_⟩
+  have hw : 1 / (2 : ℝ≥0∞).toReal = 1 / 2 := by norm_num
+  have h1 := hle (toL2 U)
+  rw [hw] at h1
+  rw [mul_assoc]
+  exact h1.trans (mul_le_mul' le_rfl (modNorm_half_one_le_norm U))
 
 /-! ### The chart traces of `H^1(Ω)` -/
 

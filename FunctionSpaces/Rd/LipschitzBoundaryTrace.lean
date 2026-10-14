@@ -238,7 +238,7 @@ theorem graphMap_proj_graphMap (j k : Fin Ω.N) {x' : (Ω.graph j).hyperplane}
 
 /-- **Resolutions of unity on the boundary exist** (`Rd.exists_smooth_partition`). -/
 theorem nonempty_boundaryPartition [FiniteDimensional ℝ V] : Nonempty Ω.BoundaryPartition := by
-  obtain ⟨ψ, hψ, hψU, hψ1⟩ := exists_smooth_partition isClosed_frontier
+  obtain ⟨ψ, hψ, hψU, hψ1, -⟩ := exists_smooth_partition isClosed_frontier
     (fun j => ball (Ω.center j) (Ω.radius j)) (fun _ => isOpen_ball) Ω.frontier_subset
   exact ⟨⟨ψ, hψ, hψU, hψ1⟩⟩
 

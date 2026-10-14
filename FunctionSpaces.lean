@@ -183,6 +183,7 @@ public import FunctionSpaces.Rd.SobolevRestrictionSpaces
 public import FunctionSpaces.Rd.SobolevDuality
 public import FunctionSpaces.Rd.BoundaryTraceSpace
 public import FunctionSpaces.Rd.LipschitzGraphArea
+public import FunctionSpaces.Rd.SurfaceMeasure
 
 /-!
 # Function spaces
@@ -624,4 +625,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   measurable set `A` of the hyperplane under the graph map has `(n-1)`-dimensional Euclidean
   Hausdorff measure `∫_A √(1 + ‖∇φ‖²)`, where `n = dim V`; the outward unit normal of a Lipschitz
   graph domain.
+* `FunctionSpaces.Rd.SurfaceMeasure`: the surface measure of the boundary `Γ` of a bounded
+  Lipschitz domain as the `(n-1)`-dimensional Euclidean Hausdorff measure on `Γ`, its chart form,
+  `|Γ| = 0`, the space `L_2(Γ)`, the traces `H^1(Ω) → L_2(Γ)` and `H^{1/2}(Γ) → L_2(Γ)`, and the
+  outward unit normal field.
 -/

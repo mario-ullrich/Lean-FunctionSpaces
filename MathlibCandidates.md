@@ -309,3 +309,10 @@ declarations.
   `Rd.LipschitzGraph.map_graphMap_withDensity`, `Rd.LipschitzGraph.lintegral_graphMap`). For
   Mathlib the graph would be stated for a Lipschitz function on a Euclidean space without the
   structure `Rd.LipschitzGraph`.
+* **The boundary of a bounded Lipschitz domain is a null set**
+  (`FunctionSpaces/Rd/SurfaceMeasure.lean`): `volume (frontier Ω) = 0`
+  (`Rd.BoundedLipschitzDomain.volume_frontier`), since the boundary has finite `μHE[n-1]`-measure
+  and hence `μHE[n]`-measure zero (`MeasureTheory.Measure.euclideanHausdorffMeasure_zero_or_top`).
+  In Mathlib it would follow from the finiteness of `μHE[n-1]` on the graph of a Lipschitz
+  function over a bounded subset of a hyperplane, a consequence of
+  `LipschitzOnWith.euclideanHausdorffMeasure_image_le`.
