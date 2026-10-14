@@ -20,8 +20,10 @@ Lipschitz graph domain the area formula expresses Mathlib's Euclidean Hausdorff 
 boundary in the chart, with the Gram density `√(1 + ‖∇φ‖²)`. On a bounded Lipschitz domain the
 surface measure is this Hausdorff measure on the boundary `Γ`; it gives the space `L_2(Γ)`, into
 which `H^1(Ω)` and `H^{1/2}(Γ)` have bounded trace operators. The outward unit normal field is
-pasted from the chart normals. The [interface document](FEECInterface.md) lists these results for
-a FEEC/BEEC library built on this project, with the decisions behind their form.
+pasted from the chart normals. The theory for `1 < p < ∞` starts with families of dilated
+Schwartz kernels, their Fourier overlap and their Hörmander condition. The
+[interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
+built on this project, with the decisions behind their form.
 
 ## Main results
 
@@ -224,6 +226,24 @@ a FEEC/BEEC library built on this project, with the decisions behind their form.
   `ν(y) = ∑_j ψ_j(y) ν_j(P_j y)`, with the chart normals `ν_j` and the canonical resolution of
   unity `ψ` (`Rd.BoundedLipschitzDomain.boundaryPartition`, nonnegative), is measurable with
   `‖ν‖ ≤ 1` (`Rd.BoundedLipschitzDomain.normal`, `Rd.BoundedLipschitzDomain.norm_normal_le`).
+* **Dilation families and the Hörmander condition.** Let `(G_j)_{j ∈ ℕ}` be Schwartz functions
+  on `V`, `dim V = n`, whose Schwartz seminorms `sup_x ‖x‖^k ‖D^l G_j(x)‖` are at most `A_{k,l}`
+  for every `j` (`Rd.IsUniformSchwartz`), and `θ_j(x) = 2^(jn) G_j(2^j x)`. For every `y ∈ V`,
+  `∫_{‖x‖ > 2‖y‖} ‖(θ_j(x - y) - θ_j(x))_j‖_{ℓ_2} dx ≤ 4 H_A` with an explicit constant `H_A`
+  built from the bounds `A` (`Rd.lintegral_lqNorm_sub_le`, `Rd.familyHormanderConst`); the proof
+  bounds each term by `H_A min(2^j ‖y‖, (2^j ‖y‖)⁻¹)`
+  (`Rd.setLIntegral_enorm_dilate_sub_le_min`) and uses
+  `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4` for every `a ∈ [0, ∞]` (`ENNReal.tsum_min_two_pow_le`). A
+  Calderón–Zygmund family with Fourier overlap `B` and Hörmander constant `H`
+  (`Rd.IsCZFamily`) consists of integrable, continuous, bounded kernels `θ_j` with integrable
+  Fourier transforms, `∑_j |𝓕θ_j(ξ)|² ≤ B` for every `ξ`, and the Hörmander integral at most `H`
+  for every `y`; uniform dilation families with overlap `B` are such families with
+  `H = 4 H_A` (`Rd.IsCZFamily.of_dilation`), and so are the adjoint kernels
+  `θ_j^*(x) = conj θ_j(-x)` with the same `B` and `H` (`Rd.IsCZFamily.adjoint`). The
+  Littlewood–Paley blocks `ψ_j` form such a family with overlap `2` (`Rd.isCZFamily_psi`), and so
+  do the synthesis kernels `ψ̃_0 = Φ_1`, `ψ̃_1 = Φ_2`, `ψ̃_j = Φ_{j+1} - Φ_{j-2}` with overlap `4`
+  (`Rd.psiDual`, `Rd.isCZFamily_psiDual`), which reproduce the blocks: `ψ̃_j ⋆ ψ_j = ψ_j`
+  (`Rd.conv_psiDual_psi`).
 
 ## What is formalised
 
@@ -241,6 +261,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` with explicit constants, the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the trace kernel, the trace space `H^{1/2}(Γ)` with trace and extension operators, `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` | ✅ | ✗ | `Rd/BoundaryTraceSpace` |
 | The area formula for Lipschitz graphs: Lipschitz maps and Mathlib's Euclidean Hausdorff measure, the linear case by Mathlib's norm determinant, stretches and tilts, the gradient and the Gram density, good pieces, `μHE[n-1](γ(A)) = ∫_A √(1 + ‖∇φ‖²)` with `n = dim V` in set, measure and integral form; the outward unit normal | ✅ | ✗ | `Rd/LipschitzGraphArea` |
 | The surface measure of a bounded Lipschitz domain as `μHE[n-1]` on the boundary, its chart form, finiteness and null sets, the boundary `Γ` as a Lebesgue null set, the boundary trace in `L_p(Γ)`, `L_2(Γ)` with the traces of `H^1(Ω)` and `H^{1/2}(Γ)`, and the outward unit normal field | ✅ | ✗ | `Rd/SurfaceMeasure` |
+| Dilation, reflection and conjugation of Schwartz functions, uniform Schwartz families, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families and their adjoints, the Littlewood–Paley blocks and the synthesis kernels as such families | ✅ | ✗ | `Rd/DilationFamilies` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

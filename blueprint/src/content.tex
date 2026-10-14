@@ -12112,6 +12112,8 @@ area formula for Lipschitz graphs, which expresses the Euclidean Hausdorff measu
 boundary of a Lipschitz graph domain in its chart. \Cref{sec:surface-measure} builds the surface
 measure $\mathcal H^{n-1}$ on the boundary of a bounded Lipschitz domain, $L_2(\Gamma)$ and the
 traces into it.
+\Cref{sec:dilation-families} starts the theory for $1 < p < \infty$: families of dilated
+Schwartz kernels, their Fourier overlap and their H\"ormander condition.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -15380,6 +15382,462 @@ $\|\nu(y)\| \leq \sum_j \psi^0_j(y) \|\nu_j(P_j y)\| = \sum_j \psi^0_j(y) \leq 1
 
 For $y \in \Gamma$, $\sum_j \psi^0_j(y) = 1$, so $\nu(y)$ is a convex combination of the chart
 normals $\nu_j(P_j y)$ of the charts with $\psi^0_j(y) > 0$.
+
+\section{Dilation families and the H\"ormander condition}
+\label{sec:dilation-families}
+
+The Sobolev spaces $\Sob{m}{p}(V)$ and the Bessel potential spaces for $1 < p < \infty$ rest on
+vector-valued singular integrals whose kernels are families $\theta_j = (G_j)_{2^j}$,
+$j \in \N$, of dilated Schwartz functions $G_j$ with Schwartz seminorms bounded uniformly in
+$j$. Two numbers control such a family: the Fourier overlap $B$ with
+$\sum_j |\widehat{\theta_j}(\xi)|^2 \leq B$ for every $\xi$, which gives the $L_2$ bounds by
+Plancherel's theorem, and the H\"ormander constant $H$ with
+$\int_{\{\|x\| > 2\|y\|\}} \|(\theta_j(x - y) - \theta_j(x))_j\|_{\ell_2} \, dx \leq H$ for every
+$y$, which gives the weak type $(1,1)$ through the Calder\'on--Zygmund decomposition. This
+section proves the H\"ormander condition for every uniform family, with an explicit constant,
+and shows that the Littlewood--Paley blocks $\psi_j$ and the synthesis kernels of the square
+function theorem are such families. Throughout, $C_{G,r,N}$, $T_{G,r,N}$ and $I_M$ are the
+constants of \Cref{lem:schwartz-decay} and \Cref{lem:schwartz-tails},
+$\Delta_v F(x) = F(x + v) - F(x)$, and $\delta_c F = F_c$ denotes the dilation by $c$, which
+keeps it apart from the kernels $\Phi_k = \delta_{2^k} \Phi$. Inverses and minima of the
+quantities $2^j \|y\|$ are taken in $[0, \infty]$, with $0^{-1} = \infty$ and
+$\infty^{-1} = 0$; so at $y = 0$ the bounds below read $0 \leq 0$ or $0 \leq \infty$.
+
+\begin{definition}[Dilation, reflection and conjugation of Schwartz functions]
+\label{def:schwartz-dilate}
+\lean{Rd.schwartzDilate, Rd.coe_schwartzDilate, Rd.schwartzReflect, Rd.coe_schwartzReflect,
+  Rd.schwartzConj, Rd.coe_schwartzConj}
+\leanok
+\uses{lem:dilate}
+For every Schwartz function $G$ on $V$ and every real $c \neq 0$, the functions
+$G_c(x) = c^n G(c x)$, $x \mapsto G(-x)$ and $x \mapsto \overline{G(x)}$ are Schwartz functions.
+\end{definition}
+
+The first two are compositions of $G$ with linear equivalences of $V$ (Mathlib's
+\texttt{SchwartzMap.\allowbreak compCLMOfContinuousLinearEquiv}), the third the composition of
+the real-linear conjugation with $G$ (Mathlib's \texttt{SchwartzMap.\allowbreak postcompCLM}).
+
+\begin{lemma}[Dilations are linear and keep $L_1$ norms]
+\label{lem:dilate-sub-l1}
+\lean{Rd.dilate_sub, Rd.lintegral_enorm_dilate}
+\leanok
+\uses{lem:dilate, lem:schwartz-tails}
+For all functions $F, G : V \to \C$ and every real $c$, $(F - G)_c = F_c - G_c$, and for every
+real $c > 0$, $\int |F_c| = \int |F|$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first identity is pointwise. For the second, $|F_c(x)| = c^n |F(c x)|$ and the
+substitution $u = c x$ (\Cref{lem:schwartz-tails}).
+\end{proof}
+
+\begin{definition}[Uniform Schwartz families]
+\label{def:uniform-schwartz}
+\lean{Rd.IsUniformSchwartz, Rd.familyDecayConst, Rd.familyDecayConst_ne_top,
+  Rd.familyTailConst, Rd.familyTailConst_ne_top}
+\leanok
+\uses{lem:schwartz-decay, lem:schwartz-tails}
+A family $(G_j)_{j \in \N}$ of Schwartz functions is uniformly Schwartz with bounds
+$A = (A_{k,l})_{k, l \in \N}$ if $\sup_x \|x\|^k \|D^l G_j(x)\| \leq A_{k,l}$ for all
+$j, k, l \in \N$. For all $r, N \in \N$ let $C_{A,r,N} = 2^N (A_{0,r} + A_{N,r})$ and
+$T_{A,r,N} = C_{A,0,N+r+n+1} \, I_{n+1}$; both are finite.
+\end{definition}
+
+\begin{lemma}[Constants of uniform families]
+\label{lem:uniform-schwartz-constants}
+\lean{Rd.IsUniformSchwartz.of_forall_mem, Rd.IsUniformSchwartz.of_forall_eq_or_eq,
+  Rd.schwartzDecayConst_le_familyDecayConst, Rd.tailConst_le_familyTailConst}
+\leanok
+\uses{def:uniform-schwartz}
+For every uniform family $(G_j)$ with bounds $A$ and all $j, r, N \in \N$,
+$C_{G_j,r,N} \leq C_{A,r,N}$ and $T_{G_j,r,N} \leq T_{A,r,N}$. For every finite nonempty set $S$
+of Schwartz functions and every family $(G_j)$ with $G_j \in S$ for every $j$, $(G_j)$ is
+uniformly Schwartz with bounds $A_{k,l} = \max_{g \in S} \sup_x \|x\|^k \|D^l g(x)\|$; in
+particular for $S = \{G^0, G^1\}$ with
+$A_{k,l} = \max(\sup_x \|x\|^k \|D^l G^0(x)\|, \sup_x \|x\|^k \|D^l G^1(x)\|)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The constants increase with the seminorms.
+\end{proof}
+
+\begin{definition}[Gradient mass]
+\label{def:gradient-mass}
+\lean{Rd.gradMassConst, Rd.gradMassConst_ne_top, Rd.familyGradMass, Rd.familyGradMass_ne_top}
+\leanok
+\uses{def:uniform-schwartz}
+For every Schwartz function $G$ let $M_G = C_{G,1,n+1} \, I_{n+1}$, and for every family of
+bounds $A$ let $M_A = C_{A,1,n+1} \, I_{n+1}$; both are finite.
+\end{definition}
+
+\begin{lemma}[$L_1$ norms of directional derivatives]
+\label{lem:gradient-mass}
+\lean{Rd.enorm_iteratedFDeriv_schwartz_le, Rd.lintegral_enorm_lineDerivOp_le,
+  Rd.gradMassConst_le_familyGradMass}
+\leanok
+\uses{def:gradient-mass, lem:schwartz-decay, lem:schwartz-differences,
+  lem:uniform-schwartz-constants}
+For every Schwartz function $G$, all $r, N \in \N$ and all $x, v \in V$,
+$\|D^r G(x)\| \leq C_{G,r,N} (1 + \|x\|)^{-N}$ and $\int |\partial_v G| \leq \|v\| \, M_G$. For
+every uniform family $(G_j)$ with bounds $A$ and every $j \in \N$, $M_{G_j} \leq M_A$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first bound is $(1 + \|x\|)^N \|D^r G(x)\| \leq C_{G,r,N}$ (\Cref{lem:schwartz-decay}).
+With $|\partial_v G(x)| \leq \|v\| \, \|DG(x)\|$ (\Cref{lem:schwartz-differences}) and $r = 1$,
+$N = n + 1$, integration gives the second. The third follows from
+\Cref{lem:uniform-schwartz-constants}.
+\end{proof}
+
+\begin{lemma}[Short steps]
+\label{lem:hormander-short}
+\lean{Rd.lintegral_enorm_dilate_sub_le_mul}
+\leanok
+\uses{lem:gradient-mass, lem:dilate-sub-l1, lem:rd-differences, lem:schwartz-differences}
+For every Schwartz function $G$, every $j \in \N$ and every $y \in V$,
+\[
+  \int_V |G_{2^j}(x - y) - G_{2^j}(x)| \, dx \leq M_G \, 2^j \|y\| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$x \mapsto G_{2^j}(x - y) - G_{2^j}(x)$ is $\Delta_{-y} G_{2^j} = (\Delta_{-2^j y} G)_{2^j}$
+(\Cref{lem:rd-differences}), whose $L_1$ norm is $\|\Delta_{-2^j y} G\|_1$
+(\Cref{lem:dilate-sub-l1}). A difference of a Schwartz function is at most its directional
+derivative in $L_1$ (\Cref{lem:schwartz-differences}), and
+$\|\partial_{-2^j y} G\|_1 \leq 2^j \|y\| \, M_G$ (\Cref{lem:gradient-mass}).
+\end{proof}
+
+\begin{lemma}[Long steps]
+\label{lem:hormander-long}
+\lean{Rd.inv_one_add_ofReal_two_pow_mul_le, Rd.setLIntegral_enorm_dilate_sub_le_inv}
+\leanok
+\uses{lem:schwartz-tails}
+For every Schwartz function $G$, every $j \in \N$ and every $y \in V$,
+\[
+  \int_{\{\|x\| > 2\|y\|\}} |G_{2^j}(x - y) - G_{2^j}(x)| \, dx \leq
+  2 \, T_{G,0,1} \, (2^j \|y\|)^{-1} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $\|x\| > 2 \|y\|$ both $\|x\|$ and $\|x - y\| \geq \|x\| - \|y\|$ are at least $\|y\|$, so
+after the substitution $z = x - y$ each of the two terms is at most
+$\int_{\{\|z\| \geq \|y\|\}} |G_{2^j}(z)| \, dz \leq T_{G,0,1} (1 + 2^j \|y\|)^{-1}$
+(\Cref{lem:schwartz-tails}), and $(1 + t)^{-1} \leq t^{-1}$.
+\end{proof}
+
+\begin{definition}[H\"ormander constants]
+\label{def:hormander-const}
+\lean{Rd.hormanderConst, Rd.hormanderConst_ne_top, Rd.familyHormanderConst,
+  Rd.familyHormanderConst_ne_top}
+\leanok
+\uses{def:gradient-mass, def:uniform-schwartz}
+For every Schwartz function $G$ let $H_G = M_G + 2 \, T_{G,0,1}$, and for every family of bounds
+$A$ let $H_A = M_A + 2 \, T_{A,0,1}$; both are finite.
+\end{definition}
+
+\begin{proposition}[The H\"ormander bound for one dilate]
+\label{prop:hormander-one-dilate}
+\lean{Rd.setLIntegral_enorm_dilate_sub_le_min, Rd.hormanderConst_le_familyHormanderConst}
+\leanok
+\uses{def:hormander-const, lem:hormander-short, lem:hormander-long, lem:gradient-mass,
+  lem:uniform-schwartz-constants}
+For every Schwartz function $G$, every $j \in \N$ and every $y \in V$,
+\[
+  \int_{\{\|x\| > 2\|y\|\}} |G_{2^j}(x - y) - G_{2^j}(x)| \, dx \leq
+  H_G \min\bigl(2^j \|y\|, (2^j \|y\|)^{-1}\bigr) .
+\]
+For every uniform family $(G_j)$ with bounds $A$ and every $j \in \N$, $H_{G_j} \leq H_A$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+For $2^j \|y\| \leq 1$ the minimum is $2^j \|y\|$, and \Cref{lem:hormander-short} applies on all
+of $V$; otherwise it is $(2^j \|y\|)^{-1}$, and \Cref{lem:hormander-long} applies. The
+comparison of the constants follows from \Cref{lem:gradient-mass} and
+\Cref{lem:uniform-schwartz-constants}.
+\end{proof}
+
+\begin{lemma}[The dyadic sum of $\min(t, t^{-1})$]
+\label{lem:dyadic-min-sum}
+\lean{ENNReal.sum_range_two_pow_le, ENNReal.exists_one_lt_two_pow_mul,
+  ENNReal.sum_range_min_two_pow_le, ENNReal.tsum_min_two_pow_add_le,
+  ENNReal.tsum_min_two_pow_le}
+\leanok
+For every $a \in [0, \infty]$,
+\[
+  \sum_{j \in \N} \min\bigl(2^j a, (2^j a)^{-1}\bigr) \leq 4 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $a = 0$ every term is $0$. Otherwise some $j$ has $2^j a > 1$ (Mathlib's
+\texttt{ENNReal.\allowbreak exists\_\allowbreak nat\_\allowbreak mul\_\allowbreak gt} and
+$m < 2^m$); let $j_0$ be the least such $j$. For
+$j < j_0$ the terms are at most $2^j a$, and
+$\sum_{j < j_0} 2^j a \leq 2^{j_0} a = 2 \cdot 2^{j_0 - 1} a \leq 2$ when $j_0 \geq 1$. For
+$i \in \N$ the term of $j = i + j_0$ is at most
+$(2^{i + j_0} a)^{-1} = 2^{-i} (2^{j_0} a)^{-1} \leq 2^{-i}$, and $\sum_i 2^{-i} = 2$.
+\end{proof}
+
+\begin{theorem}[The H\"ormander condition for dilation families]
+\label{thm:hormander-dilation-family}
+\lean{Rd.lintegral_lqNorm_sub_le}
+\leanok
+\uses{prop:hormander-one-dilate, lem:dyadic-min-sum, def:lq-norm, lem:lq-basic}
+For every uniform family $(G_j)$ with bounds $A$, $\theta_j = (G_j)_{2^j}$, and every
+$y \in V$,
+\[
+  \int_{\{\|x\| > 2\|y\|\}} \|(\theta_j(x - y) - \theta_j(x))_j\|_{\ell_2} \, dx \leq 4 H_A .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The $\ell_2$ norm is at most the $\ell_1$ norm (\Cref{lem:lq-basic}). Exchanging sum and integral,
+the $j$-th integral is at most $H_A \min(2^j \|y\|, (2^j \|y\|)^{-1})$
+(\Cref{prop:hormander-one-dilate}), and the sum of the minima is at most $4$
+(\Cref{lem:dyadic-min-sum}).
+\end{proof}
+
+\begin{definition}[Calder\'on--Zygmund families]
+\label{def:cz-family}
+\lean{Rd.IsCZFamily}
+\leanok
+\uses{def:lq-norm}
+For all $B, H \in [0, \infty]$, a family $(\theta_j)_{j \in \N}$ of functions $V \to \C$ is a
+Calder\'on--Zygmund family with Fourier overlap $B$ and H\"ormander constant $H$ if every
+$\theta_j$ is integrable, continuous and bounded with integrable Fourier transform, if
+$\sum_j |\widehat{\theta_j}(\xi)|^2 \leq B$ for every $\xi \in V$, and if
+\[
+  \int_{\{\|x\| > 2\|y\|\}} \|(\theta_j(x - y) - \theta_j(x))_j\|_{\ell_2} \, dx \leq H
+\]
+for every $y \in V$.
+\end{definition}
+
+\begin{lemma}[Larger constants]
+\label{lem:cz-family-mono}
+\lean{Rd.IsCZFamily.mono}
+\leanok
+\uses{def:cz-family}
+For all $B \leq B'$ and $H \leq H'$ in $[0, \infty]$, every Calder\'on--Zygmund family with
+overlap $B$ and H\"ormander constant $H$ is a Calder\'on--Zygmund family with overlap $B'$ and
+H\"ormander constant $H'$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both conditions are upper bounds.
+\end{proof}
+
+\begin{lemma}[Adjoint families]
+\label{lem:cz-family-adjoint}
+\lean{Rd.fourier_conj_comp_neg, Rd.IsCZFamily.adjoint}
+\leanok
+\uses{def:cz-family, lem:fourier-conjugation}
+For every function $\theta : V \to \C$ and every $\xi \in V$, the Fourier transform of
+$x \mapsto \overline{\theta(-x)}$ at $\xi$ is $\overline{\widehat\theta(\xi)}$. For every
+Calder\'on--Zygmund family $(\theta_j)$ with overlap $B$ and H\"ormander constant $H$, the
+family $\theta_j^*(x) = \overline{\theta_j(-x)}$ is a Calder\'on--Zygmund family with overlap
+$B$ and H\"ormander constant $H$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\overline{\widehat\theta} = \mathcal F^{-1} \overline\theta$ (\Cref{lem:fourier-conjugation}),
+and $\mathcal F^{-1} f = \mathcal F (f(-\cdot))$ (Mathlib's
+\texttt{Real.\allowbreak fourierInv\_\allowbreak eq\_\allowbreak fourier\_\allowbreak
+comp\_\allowbreak neg}); so the overlap is unchanged. Integrability, continuity and boundedness
+pass through $x \mapsto -x$ and conjugation. In the H\"ormander integral,
+$|\theta_j^*(x - y) - \theta_j^*(x)| = |\theta_j(-x + y) - \theta_j(-x)|$; the substitution
+$x \mapsto -x$ keeps the region $\{\|x\| > 2\|y\|\}$ and turns the integral into the H\"ormander
+integral of $(\theta_j)$ at $-y$.
+\end{proof}
+
+\begin{theorem}[Dilation families are Calder\'on--Zygmund families]
+\label{thm:cz-family-dilation}
+\lean{Rd.IsCZFamily.of_dilation}
+\leanok
+\uses{def:cz-family, thm:hormander-dilation-family, lem:dilate, lem:fourier-dilate,
+  lem:lp-kernels-basic}
+For every uniform family $(G_j)$ with bounds $A$ and every $B \in [0, \infty]$ such that
+$\theta_j = (G_j)_{2^j}$ satisfies $\sum_j |\widehat{\theta_j}(\xi)|^2 \leq B$ for every
+$\xi \in V$, $(\theta_j)$ is a Calder\'on--Zygmund family with overlap $B$ and H\"ormander
+constant $4 H_A$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Schwartz functions are bounded (\Cref{lem:lp-kernels-basic}); their dilations are integrable,
+continuous and bounded (\Cref{lem:dilate}), and the Fourier transforms of the dilations are
+dilations of Schwartz functions (\Cref{lem:fourier-dilate}). The
+H\"ormander condition is \Cref{thm:hormander-dilation-family}.
+\end{proof}
+
+\paragraph{The Littlewood--Paley families.}
+
+\begin{lemma}[Values of the dilated cut-offs]
+\label{lem:fourier-phi-values}
+\lean{Rd.fourier_Phi_eq_one, Rd.fourier_Phi_eq_zero, Rd.exists_fourier_Phi_eq_ofReal,
+  Rd.norm_fourier_Phi_le_one, Rd.norm_fourier_Phi_sub_le_one}
+\leanok
+\uses{def:lp-kernels, lem:lp-kernels-frequency, lem:lp-kernels-basic}
+For all $k, l \in \N$ and every $\xi \in V$: $\widehat{\Phi_k}(\xi) = 1$ if
+$\|\xi\| \leq 2^k$, $\widehat{\Phi_k}(\xi) = 0$ if $\|\xi\| \geq 2^{k+1}$,
+$\widehat{\Phi_k}(\xi)$ is a real number in $[0, 1]$, $|\widehat{\Phi_k}(\xi)| \leq 1$ and
+$|\widehat{\Phi_k}(\xi) - \widehat{\Phi_l}(\xi)| \leq 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\widehat{\Phi_k}(\xi) = \chi_{1,2}(2^{-k} \xi)$ (\Cref{lem:lp-kernels-frequency}), and
+the smooth bump $\chi_{1,2}$ has values in $[0, 1]$, equals $1$ on the closed unit ball and
+vanishes outside the ball of radius $2$ (\Cref{lem:lp-kernels-basic}).
+\end{proof}
+
+\begin{definition}[The blocks as dilates]
+\label{def:psi-base}
+\lean{Rd.psiBase, Rd.psiBaseBound, Rd.psiBaseBound_nonneg}
+\leanok
+\uses{def:lp-kernels, def:schwartz-dilate}
+Let $G^{\psi}_0 = \Phi$ and $G^{\psi}_j = \Phi - \delta_{1/2} \Phi$ for $j \geq 1$, and for
+all $k, l \in \N$ let $A^{\psi}_{k,l} \geq 0$ be the larger of the seminorms
+$\sup_x \|x\|^k \|D^l \Phi(x)\|$ and $\sup_x \|x\|^k \|D^l (\Phi - \delta_{1/2} \Phi)(x)\|$.
+\end{definition}
+
+\begin{lemma}[The blocks form a uniform family]
+\label{lem:psi-base}
+\lean{Rd.dilate_psiBase, Rd.isUniformSchwartz_psiBase}
+\leanok
+\uses{def:psi-base, lem:dilate-sub-l1, def:moment-kernel, lem:uniform-schwartz-constants}
+For every $j \in \N$, $\psi_j = (G^{\psi}_j)_{2^j}$, and $(G^{\psi}_j)$ is uniformly Schwartz
+with bounds $A^{\psi}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\delta_c \delta_d = \delta_{cd}$ (\Cref{def:moment-kernel}), so
+$\delta_{2^{j+1}} \delta_{1/2} \Phi = \Phi_j$ and
+$\delta_{2^{j+1}} (\Phi - \delta_{1/2} \Phi) = \Phi_{j+1} - \Phi_j = \psi_{j+1}$
+(\Cref{lem:dilate-sub-l1}). The family takes the two values $\Phi$ and
+$\Phi - \delta_{1/2} \Phi$ (\Cref{lem:uniform-schwartz-constants}).
+\end{proof}
+
+\begin{theorem}[The blocks form a Calder\'on--Zygmund family]
+\label{thm:cz-family-psi}
+\lean{Rd.tsum_fourier_psi_sq_le, Rd.isCZFamily_psi}
+\leanok
+\uses{lem:psi-base, prop:bessel-lp-weights, thm:cz-family-dilation}
+For every $\xi \in V$, $\sum_j |\widehat{\psi_j}(\xi)|^2 \leq 2$, and $(\psi_j)$ is a
+Calder\'on--Zygmund family with overlap $2$ and H\"ormander constant $4 H_{A^{\psi}}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The overlap bound is the case $s = 0$ of \Cref{prop:bessel-lp-weights}: at most two blocks are
+nonzero at $\xi$, each of modulus at most $1$. \Cref{thm:cz-family-dilation} and
+\Cref{lem:psi-base} give the rest.
+\end{proof}
+
+\begin{definition}[Synthesis kernels]
+\label{def:psi-dual}
+\lean{Rd.psiDual, Rd.psiDualBase, Rd.psiDualBaseBound, Rd.psiDualBaseBound_nonneg}
+\leanok
+\uses{def:lp-kernels, def:schwartz-dilate}
+Let $\tilde\psi_0 = \Phi_1$, $\tilde\psi_1 = \Phi_2$ and
+$\tilde\psi_j = \Phi_{j+1} - \Phi_{j-2}$ for $j \geq 2$. Let
+$\tilde G_0 = \tilde G_1 = \delta_2 \Phi$ and $\tilde G_j = \delta_2 \Phi - \delta_{1/4} \Phi$ for
+$j \geq 2$, and for all $k, l \in \N$ let $\tilde A_{k,l} \geq 0$ be the larger of the seminorms
+$\sup_x \|x\|^k \|D^l \delta_2 \Phi(x)\|$ and
+$\sup_x \|x\|^k \|D^l (\delta_2 \Phi - \delta_{1/4} \Phi)(x)\|$.
+\end{definition}
+
+\begin{lemma}[Properties of the synthesis kernels]
+\label{lem:psi-dual-basic}
+\lean{Rd.dilate_psiDualBase, Rd.isUniformSchwartz_psiDualBase, Rd.integrable_psiDual,
+  Rd.continuous_psiDual, Rd.bddAbove_psiDual, Rd.integrable_fourier_psiDual,
+  Rd.eLpNorm_psiDual_one_le, Rd.fourier_psiDual_add_two}
+\leanok
+\uses{def:psi-dual, lem:dilate-sub-l1, def:moment-kernel, lem:uniform-schwartz-constants,
+  lem:dilate, lem:fourier-dilate, lem:lp-kernels-basic, lem:fourier-conv}
+For every $j \in \N$, $\tilde\psi_j = (\tilde G_j)_{2^j}$; $(\tilde G_j)$ is uniformly Schwartz with
+bounds $\tilde A$; $\tilde\psi_j$ is integrable, continuous and bounded with integrable Fourier
+transform; $\|\tilde\psi_j\|_1 \leq 2 \|\Phi\|_1$; and
+$\widehat{\tilde\psi_{j+2}} = \widehat{\Phi_{j+3}} - \widehat{\Phi_j}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\delta_{2^{j+2}} \delta_2 \Phi = \Phi_{j+3}$ and $\delta_{2^{j+2}} \delta_{1/4} \Phi = \Phi_j$
+(\Cref{def:moment-kernel}: $\delta_c \delta_d = \delta_{cd}$), and $\delta_1 \delta_2 \Phi =
+\Phi_1$, $\delta_2 \delta_2 \Phi = \Phi_2$. The family takes
+two values (\Cref{lem:uniform-schwartz-constants}); the remaining properties hold for dilations
+of Schwartz functions (\Cref{lem:dilate}, \Cref{lem:fourier-dilate}), and
+$\|\Phi_k\|_1 = \|\Phi\|_1$ (\Cref{lem:lp-kernels-basic}).
+\end{proof}
+
+\begin{lemma}[The synthesis kernels reproduce the blocks]
+\label{lem:psi-dual-reproduces}
+\lean{Rd.fourier_psiDual_mul_psi, Rd.conv_psiDual_psi}
+\leanok
+\uses{lem:psi-dual-basic, lem:fourier-phi-values, lem:lp-kernels-frequency,
+  lem:conv-of-fourier}
+For every $j \in \N$, $\widehat{\tilde\psi_j} \, \widehat{\psi_j} = \widehat{\psi_j}$ and
+$\tilde\psi_j * \psi_j = \psi_j$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Where $\widehat{\psi_j}(\xi) \neq 0$, $\|\xi\| < 2^{j+1}$, and for $j \geq 2$ also
+$\|\xi\| > 2^{j-1}$ (\Cref{lem:lp-kernels-frequency}). Then $\widehat{\Phi_{j+1}}(\xi) = 1$,
+and for $j \geq 2$ also $\widehat{\Phi_{j-2}}(\xi) = 0$ (\Cref{lem:fourier-phi-values}), so
+$\widehat{\tilde\psi_j}(\xi) = 1$. The convolution identity follows by \Cref{lem:conv-of-fourier}.
+\end{proof}
+
+\begin{lemma}[Frequencies of the synthesis kernels]
+\label{lem:psi-dual-frequency}
+\lean{Rd.enorm_fourier_psiDual_le_one, Rd.norm_lt_of_fourier_psiDual_ne_zero,
+  Rd.lt_norm_of_fourier_psiDual_ne_zero, Rd.mem_Icc_of_fourier_psiDual_ne_zero}
+\leanok
+\uses{lem:psi-dual-basic, lem:fourier-phi-values, lem:lp-kernels-frequency}
+For every $j \in \N$ and every $\xi \in V$, $|\widehat{\tilde\psi_j}(\xi)| \leq 1$, and if
+$\widehat{\tilde\psi_j}(\xi) \neq 0$, then $\|\xi\| < 2^{j+2}$, and $\|\xi\| > 2^{j-2}$ for
+$j \geq 2$. For all $a, j \in \N$ and every $\xi \in V$ with $\|\xi\| < 2^{a+1}$ and
+$\|\xi\| \geq 2^{i+1}$ for every $i < a$, if $\widehat{\tilde\psi_j}(\xi) \neq 0$, then
+$a - 1 \leq j \leq a + 2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bound and the localisation follow from \Cref{lem:fourier-phi-values}: if both cut-offs
+vanish at $\xi$, or both equal $1$, their difference vanishes. If
+$\widehat{\tilde\psi_j}(\xi) \neq 0$, then $\|\xi\| < 2^{j+2}$, so $a \leq j + 1$ by the
+minimality of $a$, and for $j \geq 2$, $2^{j-2} < \|\xi\| < 2^{a+1}$, so $j \leq a + 2$.
+\end{proof}
+
+\begin{theorem}[The synthesis kernels form a Calder\'on--Zygmund family]
+\label{thm:cz-family-psi-dual}
+\lean{Rd.tsum_fourier_psiDual_sq_le, Rd.isCZFamily_psiDual}
+\leanok
+\uses{lem:psi-dual-basic, lem:psi-dual-frequency, thm:cz-family-dilation}
+For every $\xi \in V$, $\sum_j |\widehat{\tilde\psi_j}(\xi)|^2 \leq 4$, and $(\tilde\psi_j)$ is a
+Calder\'on--Zygmund family with overlap $4$ and H\"ormander constant $4 H_{\tilde A}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+With $a$ the least index such that $\|\xi\| < 2^{a+1}$, at most the four kernels with
+$a - 1 \leq j \leq a + 2$ are nonzero at $\xi$, each of modulus at most $1$
+(\Cref{lem:psi-dual-frequency}). \Cref{thm:cz-family-dilation} and \Cref{lem:psi-dual-basic}
+give the rest.
+\end{proof}
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

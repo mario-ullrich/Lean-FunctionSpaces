@@ -184,6 +184,7 @@ public import FunctionSpaces.Rd.SobolevDuality
 public import FunctionSpaces.Rd.BoundaryTraceSpace
 public import FunctionSpaces.Rd.LipschitzGraphArea
 public import FunctionSpaces.Rd.SurfaceMeasure
+public import FunctionSpaces.Rd.DilationFamilies
 
 /-!
 # Function spaces
@@ -629,4 +630,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   Lipschitz domain as the `(n-1)`-dimensional Euclidean Hausdorff measure on `Γ`, its chart form,
   `|Γ| = 0`, the space `L_2(Γ)`, the traces `H^1(Ω) → L_2(Γ)` and `H^{1/2}(Γ) → L_2(Γ)`, and the
   outward unit normal field.
+* `FunctionSpaces.Rd.DilationFamilies`: families of dilated Schwartz kernels with uniformly
+  bounded seminorms, their Hörmander condition with explicit constants, Calderón–Zygmund
+  families and their adjoints, and the Littlewood–Paley blocks and synthesis kernels as such
+  families.
 -/
