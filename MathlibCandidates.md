@@ -282,3 +282,15 @@ declarations.
   everywhere outside a measurable set `S` and `b` almost everywhere on `S`, then
   `‖a‖_p ≤ ‖a + b‖_p` in every `Lp E p μ` (`Rd.norm_le_norm_add_of_ae_eq_zero`), which belongs
   next to `Lp.norm_le_norm_of_ae_le` in `Mathlib/MeasureTheory/Function/LpSpace/Basic.lean`.
+* **Duality of Bessel potential spaces** (`FunctionSpaces/Rd/SobolevDuality.lean`): the inner
+  product of Mathlib's `H^{s,2}(V, ℂ)` is that of the `L_2` functions `J_s U`
+  (`Rd.inner_toLp_toLp`); the isometry `J_{2s} : H^{s,2} → H^{-s,2}` (`Rd.besselShift`) and the
+  pairing `⟪J_{-s} W, J_s U⟫_{L_2}` of `H^{-s,2}` and `H^{s,2}` (`Rd.pairing`), which extends the
+  action of distributions on test functions (`Rd.pairing_ofTest_left`);
+  `⟪U, φ⟫ = conj ((J_{2s} U)(φ))` for real test functions `φ` (`Rd.inner_ofTest_eq`). These
+  belong in `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`. Also the reality of
+  the Bessel potential of real Schwartz functions (`Rd.conj_besselSchwartz_apply`), and the
+  conjugation identities `conj (𝓕 f) = 𝓕⁻(conj f)` and `conj (𝓕⁻ f) = 𝓕(conj f)` for
+  `f : V → ℂ` (`Rd.conj_fourier_apply`, `Rd.conj_fourierInv_apply` in
+  `FunctionSpaces/Rd/LittlewoodPaleyKernels.lean`), next to `Real.fourierInv_eq_fourier_neg` in
+  `Mathlib/Analysis/Fourier/FourierTransform.lean`.

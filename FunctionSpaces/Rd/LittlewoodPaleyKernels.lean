@@ -20,7 +20,9 @@ transforms `𝓕K` and `𝓕⁻K` are continuous and bounded by `‖K‖_1`
 (`Rd.continuous_fourier_of_integrable`, `Rd.norm_fourier_le_integral_norm`,
 `Rd.continuous_fourierInv_of_integrable`, `Rd.norm_fourierInv_le_integral_norm`),
 `𝓕K ∈ L_∞` (`Rd.memLp_top_fourier`), the transform respects sums and differences
-(`Rd.fourier_add_apply`, `Rd.fourier_sub_apply`), `𝓕(K ⋆ L) = 𝓕K · 𝓕L` (`Rd.fourier_conv`),
+(`Rd.fourier_add_apply`, `Rd.fourier_sub_apply`) and conjugation as `conj (𝓕 f) = 𝓕⁻(conj f)`,
+`conj (𝓕⁻ f) = 𝓕(conj f)` for every `f : V → ℂ` (`Rd.conj_fourier_apply`,
+`Rd.conj_fourierInv_apply`), `𝓕(K ⋆ L) = 𝓕K · 𝓕L` (`Rd.fourier_conv`),
 `𝓕K(0) = ∫ K` (`Rd.fourier_apply_zero`), and
 `∫ 𝓕u · K = ∫ u · 𝓕K`, `∫ 𝓕⁻u · K = ∫ u · 𝓕⁻K` for Schwartz functions `u`
 (`Rd.integral_fourier_smul_eq_of_integrable`, `Rd.integral_fourierInv_smul_eq_of_integrable`).
@@ -52,7 +54,7 @@ inversion theorem `Continuous.fourierInv_fourier_eq`):
 
 @[expose] public section
 
-open MeasureTheory Filter Topology Module
+open MeasureTheory Filter Topology Module ComplexConjugate
 open scoped ENNReal FourierTransform SchwartzMap Real
 
 namespace Rd
@@ -116,6 +118,24 @@ theorem fourier_sub_apply {f g : V → ℂ} (hf : Integrable f) (hg : Integrable
   simp only [Real.fourier_eq, Pi.sub_apply, smul_sub]
   exact integral_sub ((Real.fourierIntegral_convergent_iff ξ).2 hf)
     ((Real.fourierIntegral_convergent_iff ξ).2 hg)
+
+/-- **Conjugation and the Fourier transform**: for `f : V → ℂ` and `ξ ∈ V`,
+`conj (𝓕 f(ξ)) = 𝓕⁻(conj ∘ f)(ξ)`, since `conj e^{-2πi⟨x, ξ⟩} = e^{2πi⟨x, ξ⟩}`. -/
+theorem conj_fourier_apply (f : V → ℂ) (ξ : V) :
+    conj (𝓕 f ξ) = 𝓕⁻ (fun x => conj (f x)) ξ := by
+  rw [Real.fourier_eq, Real.fourierInv_eq, ← integral_conj]
+  congr 1 with x
+  rw [Circle.smul_def, Circle.smul_def, smul_eq_mul, smul_eq_mul, map_mul,
+    Circle.starRingEnd_addChar, neg_neg]
+
+/-- **Conjugation and the inverse Fourier transform**: for `f : V → ℂ` and `x ∈ V`,
+`conj (𝓕⁻ f(x)) = 𝓕(conj ∘ f)(x)`. -/
+theorem conj_fourierInv_apply (f : V → ℂ) (x : V) :
+    conj (𝓕⁻ f x) = 𝓕 (fun ξ => conj (f ξ)) x := by
+  rw [Real.fourierInv_eq, Real.fourier_eq, ← integral_conj]
+  congr 1 with ξ
+  rw [Circle.smul_def, Circle.smul_def, smul_eq_mul, smul_eq_mul, map_mul,
+    Circle.starRingEnd_addChar]
 
 /-- **The Fourier transform of a convolution** is the product of the transforms:
 `𝓕(K ⋆ L)(ξ) = 𝓕K(ξ) 𝓕L(ξ)` for integrable `K` and `L` (Mathlib's

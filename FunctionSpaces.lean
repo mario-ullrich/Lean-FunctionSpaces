@@ -180,6 +180,7 @@ public import FunctionSpaces.Rd.SobolevTwoLittlewoodPaley
 public import FunctionSpaces.Rd.LipschitzDomainH1
 public import FunctionSpaces.Rd.RellichCompactness
 public import FunctionSpaces.Rd.SobolevRestrictionSpaces
+public import FunctionSpaces.Rd.SobolevDuality
 
 /-!
 # Function spaces
@@ -453,9 +454,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.ApproxIdentity`: dilations, continuity of translation in `L_p`, and
   approximate identities.
 * `FunctionSpaces.Rd.LittlewoodPaleyKernels`: the Fourier transform of integrable functions
-  (continuity, `L_1` bounds, convolutions, the multiplication formula), smooth frequency
-  cut-offs, the kernels `Φ_k`, `Θ_k`, `ψ_j` of the Littlewood–Paley decomposition, and their
-  identities by Fourier inversion.
+  (continuity, `L_1` bounds, convolutions, the multiplication formula, conjugation), smooth
+  frequency cut-offs, the kernels `Φ_k`, `Θ_k`, `ψ_j` of the Littlewood–Paley decomposition, and
+  their identities by Fourier inversion.
 * `FunctionSpaces.Rd.BandLimited`: the band-limited classes `E_k` in `L_p(ℝ^d)` and their
   scheme.
 * `FunctionSpaces.Rd.LittlewoodPaley`: the Littlewood–Paley blocks, reconstruction, and the
@@ -609,4 +610,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `H^s_0(Ω)` on open sets `Ω ⊆ ℝ^d` for real `s`, built inside Mathlib's `H^s(ℝ^d)`: restriction
   as an orthogonal projection, `H^s(Ω)` as a quotient, the compact embedding
   `H^1(Ω) → L_2(Ω)` for bounded `Ω`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)`.
+* `FunctionSpaces.Rd.SobolevDuality`: the Bessel potential on Schwartz functions, the isometry
+  `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}(ℝ^d)` and `H^s(ℝ^d)`, and the
+  duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` and `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on
+  open sets for real `s`.
 -/

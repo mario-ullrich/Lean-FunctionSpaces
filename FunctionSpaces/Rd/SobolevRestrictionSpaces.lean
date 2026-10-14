@@ -41,7 +41,9 @@ and McLean (Chapter 3), and are Hilbert spaces as well.
 * **`H̃^s(Ω)` and `H^s_0(Ω)`**: every test function of `Ω` lies in every `H^s(V)` (`Rd.ofTest`).
   `Rd.tildeSpace s Ω` is the closure of the test functions of `Ω` in `H^s(V)`,
   `Rd.zeroBoundarySpace s Ω` the closure of their restrictions in `H^s(Ω)`. For `s = 1` and every
-  open `Ω`, restriction is an isometry of `H̃^1(Ω)` onto `H^1_0(Ω)` (`Rd.tildeEquivZeroBoundary`).
+  open `Ω`, restriction is an isometry of `H̃^1(Ω)` onto `H^1_0(Ω)` (`Rd.tildeEquivZeroBoundary`),
+  and inside `H^1(V)` the two are the same subspace (`Rd.tildeSpace_one_le_orthogonal`,
+  `Rd.coe_tildeEquivZeroBoundary_symm_apply`).
 -/
 
 @[expose] public section
@@ -586,6 +588,28 @@ noncomputable def tildeEquivZeroBoundary : tildeSpace 1 Ω ≃ₗᵢ[ℂ] zeroBo
 theorem coe_tildeEquivZeroBoundary_apply (U : tildeSpace 1 Ω) :
     (tildeEquivZeroBoundary Ω U : RestrictionSpace 1 Ω) = restrictProj 1 Ω U :=
   rfl
+
+/-- **`H̃^1(Ω)` lies in `H^1(Ω)`**: every element of `H̃^1(Ω)` is orthogonal to the elements
+vanishing on `Ω`. Restriction is the orthogonal projection onto `H^1(Ω)` and keeps the norm of
+`U ∈ H̃^1(Ω)` (`Rd.norm_restrictProj_of_mem_tildeSpace`), and a vector whose orthogonal
+projection has the same norm lies in the subspace (Mathlib's
+`Submodule.mem_iff_norm_starProjection`). -/
+theorem tildeSpace_one_le_orthogonal : tildeSpace 1 Ω ≤ (vanishOn 1 Ω)ᗮ := fun U hU =>
+  ((vanishOn 1 Ω)ᗮ.mem_iff_norm_starProjection U).2 (norm_restrictProj_of_mem_tildeSpace hU)
+
+/-- **The element of `H̃^1(Ω)` with restriction `u ∈ H^1_0(Ω)` is `u` itself**: inside `H^1(V)`,
+`H̃^1(Ω)` and `H^1_0(Ω)` are the same subspace, and the inverse of `Rd.tildeEquivZeroBoundary`
+is the identity (`Rd.tildeSpace_one_le_orthogonal`, `Rd.restrictProj_coe`). -/
+theorem coe_tildeEquivZeroBoundary_symm_apply (u : zeroBoundarySpace 1 Ω) :
+    (((tildeEquivZeroBoundary Ω).symm u : tildeSpace 1 Ω) : H^{1}(V)) =
+      ((u : RestrictionSpace 1 Ω) : H^{1}(V)) := by
+  have h := congrArg (fun v : zeroBoundarySpace 1 Ω => ((v : RestrictionSpace 1 Ω) : H^{1}(V)))
+    ((tildeEquivZeroBoundary Ω).apply_symm_apply u)
+  have h' := restrictProj_coe (⟨_, tildeSpace_one_le_orthogonal
+    ((tildeEquivZeroBoundary Ω).symm u).2⟩ : RestrictionSpace 1 Ω)
+  simp only [coe_tildeEquivZeroBoundary_apply] at h
+  rw [← h]
+  exact (congrArg Subtype.val h').symm
 
 /-! ### `H^1(Ω)` of a bounded Lipschitz domain -/
 

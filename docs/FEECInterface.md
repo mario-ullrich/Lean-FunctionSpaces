@@ -15,9 +15,9 @@ Lean-FunctionSpaces formalises function-space foundations: Sobolev, Besov and Tr
 spaces, their characterisations, extensions, traces and embeddings. For the collaboration it
 supplies Mathlib's Hilbert spaces `H^s(ℝ^d)` as Besov spaces `B^s_{2,2}(ℝ^d)` (item I.8), weak
 derivatives, `H^1` on bounded Lipschitz domains with its weak gradient and its trace, the
-Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets, and Rellich's compactness
-theorem for the restriction space (items I.6 and H.1 in that form, Section 4.5; the
-weak-derivative form needs H.2, Section 5). Forms, Hilbert complexes, duality,
+Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets and their duality, and
+Rellich's compactness theorem for the restriction space (items I.6 and H.1 in that form,
+Section 4.5; the weak-derivative form needs H.2, Section 5). Forms, Hilbert complexes, duality,
 negative smoothness, the space types on domains and boundaries, and the surface measure belong
 to the FEEC/BEEC library (Section 6); Section 9 records how this division changes: most of
 Section 6 moves into Lean-FunctionSpaces, the forms layer stays with the FEEC/BEEC library.
@@ -205,10 +205,11 @@ File `FunctionSpaces/Rd/LipschitzDomainH1.lean`, on top of
   (`Rd.LipschitzGraph.modNorm_trace_le`); on bounded Lipschitz domains the trace statements are
   qualitative.
 
-### 4.5 I.6 and H.1 for the restriction space: Rellich's theorem and the Hilbert space `H^1(Ω)`
+### 4.5 I.6, H.1 and H.4: Rellich's theorem, the Hilbert spaces on `Ω` and their duality
 
-Files `FunctionSpaces/Rd/RellichCompactness.lean` (on `H^1(V)`) and
-`FunctionSpaces/Rd/SobolevRestrictionSpaces.lean` (the Hilbert spaces on open sets).
+Files `FunctionSpaces/Rd/RellichCompactness.lean` (on `H^1(V)`),
+`FunctionSpaces/Rd/SobolevRestrictionSpaces.lean` (the Hilbert spaces on open sets) and
+`FunctionSpaces/Rd/SobolevDuality.lean` (their duality).
 
 * `Rd.toL2 : H^{1, 2}(V, ℂ) →L[ℂ] Lp ℂ 2 volume` reads an element of Mathlib's `H^1(V)` as the
   `L_2` function it is (`Rd.toTemperedDistribution_toL2`), with `‖toL2 F‖ ≤ ‖F‖`
@@ -251,7 +252,41 @@ The Hilbert spaces on an open set `Ω : Opens V`, built inside Mathlib's `H^{s}(
 * H.4 at `s = 1`: `Rd.tildeSpace s Ω` is `H̃^s(Ω)`, the closure of the test functions of `Ω` in
   `H^{s}(V)`, and `Rd.zeroBoundarySpace s Ω` is `H^s_0(Ω)`, the closure of their restrictions in
   `RestrictionSpace s Ω`. Restriction is an isometry of `H̃^1(Ω)` onto `H^1_0(Ω)` for every open
-  `Ω`: `Rd.tildeEquivZeroBoundary Ω : tildeSpace 1 Ω ≃ₗᵢ[ℂ] zeroBoundarySpace 1 Ω`.
+  `Ω`: `Rd.tildeEquivZeroBoundary Ω : tildeSpace 1 Ω ≃ₗᵢ[ℂ] zeroBoundarySpace 1 Ω`. Inside
+  `H^{1}(V)` the two are the same subspace: `Rd.tildeSpace_one_le_orthogonal` and
+  `Rd.coe_tildeEquivZeroBoundary_symm_apply` (the element of `H̃^1(Ω)` with restriction `u` is
+  `u`).
+
+Negative order and duality, for every open `Ω` and every real `s`
+(`FunctionSpaces/Rd/SobolevDuality.lean`):
+
+* `Rd.besselShift s : H^{s}(V) ≃ₗᵢ[ℂ] H^{-s}(V)` keeps the `L_2` function `J_s U` and is `J_{2s}`
+  on distributions (`Rd.toDistr_besselShift`).
+* The pairing `Rd.pairing s (W : H^{-s}(V)) (U : H^{s}(V)) : ℂ`, the `L_2` inner product of the
+  `L_2` functions of `W` and `U`, conjugate-linear in `W` and linear in `U`
+  (`Rd.pairing_add_left`, `Rd.pairing_smul_left`, `Rd.pairing_add_right`, `Rd.pairing_smul_right`),
+  and `U ↦ [W, U]` as `Rd.pairingCLM s W : H^{s}(V) →L[ℂ] ℂ`. It is bounded by `‖W‖ ‖U‖`
+  (`Rd.norm_pairing_le`), is the distribution `U(φ)` for a test function `φ` of `Ω` in the first
+  slot (`Rd.pairing_ofTest_left`, and `Rd.pairing_ofTest_right` for the second slot), and is the
+  `L_2` inner product `⟪ψ, U⟫` for a Schwartz function `ψ` at `s = 1` (`Rd.pairing_one_toLp`).
+* `Rd.tildeEquivRestriction s Ω : tildeSpace s Ω ≃ₗᵢ[ℂ] RestrictionSpace (-s) Ω` and
+  `Rd.restrictionEquivTilde s Ω : RestrictionSpace s Ω ≃ₗᵢ[ℂ] tildeSpace (-s) Ω`, both
+  `U ↦ J_{2s} U`; the key fact is `Rd.mem_orthogonal_tildeSpace_iff`: `U ⊥ H̃^s(Ω)` iff `J_{2s} U`
+  vanishes on `Ω`. Elements vanishing on `Ω` pair to zero with `H̃^s(Ω)`
+  (`Rd.pairing_eq_zero_of_mem_vanishOn_left`, `Rd.pairing_eq_zero_of_mem_vanishOn_right`).
+* The duality of CWHM, Theorem 3.3:
+  `Rd.dualEquiv s Ω : StrongDual ℂ (tildeSpace s Ω) ≃ₗᵢ⋆[ℂ] RestrictionSpace (-s) Ω` with
+  `ℓ U = pairing s (dualEquiv s Ω ℓ) U` (`Rd.dualEquiv_apply`), uniqueness of the representing
+  element (`Rd.dualEquiv_eq_iff`), and the same value for every extension `W'` of the
+  representing element to `V` (`Rd.dualEquiv_apply_of_restrictProj_eq`, hypothesis
+  `restrictProj (-s) Ω W' = dualEquiv s Ω ℓ`);
+  `Rd.dualRestrictionEquiv s Ω : StrongDual ℂ (RestrictionSpace s Ω) ≃ₗᵢ⋆[ℂ] tildeSpace (-s) Ω`,
+  with `ℓ (restrictProj s Ω U) = pairing s (dualRestrictionEquiv s Ω ℓ) U` for every
+  `U : H^{s}(V)` (`Rd.dualRestrictionEquiv_apply_restrictProj`); and
+  `Rd.dualZeroBoundaryEquiv Ω`, of type
+  `StrongDual ℂ (zeroBoundarySpace 1 Ω) ≃ₗᵢ⋆[ℂ] RestrictionSpace (-1) Ω`,
+  `H^{-1}(Ω) = (H^1_0(Ω))^*`, where `W` is paired with `u` itself
+  (`Rd.dualZeroBoundaryEquiv_apply`). Each has `_symm_apply` and `_eq_iff` lemmas.
 
 ### 4.6 Items X.1–X.5, X.7, X.8
 
@@ -381,9 +416,9 @@ number of the proposal and the intended Lean statement.
 
 The first version of this document (commit `ec3c133`) left items 1–5 of Section 6 to the
 FEEC/BEEC library. Lean-FunctionSpaces now builds them itself, in its current part (Part Ib of
-its development plan). The space types and the isometry of H.4 are formalised, with their
-Lean names in Section 4.5; the other statements below are in preparation and enter Section 4
-with their Lean names as they are formalised.
+its development plan). The space types, the isometry of H.4 and the duality are formalised,
+with their Lean names in Section 4.5; the other statements below are in preparation and enter
+Section 4 with their Lean names as they are formalised.
 
 * **Space types (formalised, Section 4.5).** `H^s(Ω)` for every open `Ω` and every real `s` as a
   Hilbert space: the orthogonal complement, in Mathlib's `H^{s}(ℝ^d)`, of the elements that
@@ -395,10 +430,12 @@ with their Lean names as they are formalised.
   Assumption F, `Rd.isCompactOperator_restrictL2`); the bridge to the predicate on bounded
   Lipschitz domains (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`). File
   `FunctionSpaces/Rd/SobolevRestrictionSpaces.lean`.
-* **H.4 and duality.** `H̃^1(Ω) ≅ H^1_0(Ω)` isometrically for every open `Ω` (formalised,
-  `Rd.tildeEquivZeroBoundary`, Section 4.5); for every real `s` the duality
+* **H.4 and duality (formalised, Section 4.5).** `H̃^1(Ω) ≅ H^1_0(Ω)` isometrically for every
+  open `Ω` (`Rd.tildeEquivZeroBoundary`); for every real `s` the duality
   `(H̃^s(Ω))^* ≅ H^{-s}(Ω)` and `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` with the pairing of `H^{-s}(ℝ^d)` and
-  `H^s(ℝ^d)` (CWHM, Theorem 3.3).
+  `H^s(ℝ^d)` (CWHM, Theorem 3.3; `Rd.dualEquiv`, `Rd.dualRestrictionEquiv`), and
+  `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` (`Rd.dualZeroBoundaryEquiv`). File
+  `FunctionSpaces/Rd/SobolevDuality.lean`.
 * **The trace space.** `H^{1/2}(Γ)` as the orthogonal complement of the kernel of the trace in
   `H^1(Ω)`, with the trace as orthogonal projection and the extension as inclusion (both of norm
   one), `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` as its dual.
@@ -417,7 +454,7 @@ with their Lean names as they are formalised.
 The FEEC/BEEC library keeps the forms layer (`L^2Λ^k`, weak `d`, `HΛ^k`, regular
 decompositions, `H^{-1/2}(curl_Γ, Γ)`), Picard's theorem and the s-number track.
 
-The formalisation of the space types settled the following points of the plan.
+The formalisation of the space types and of the duality settled the following points of the plan.
 
 * **`H^s(Ω)` is the orthogonal complement** of the elements vanishing on `Ω`, a closed subspace
   of `H^{s}(ℝ^d)`; the quotient of CWHM enters as the isometry
@@ -438,6 +475,26 @@ The formalisation of the space types settled the following points of the plan.
   `Rd.HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero` of `FunctionSpaces/Rd/WeakDerivatives.lean`).
   The literature reference is McLean, Theorem 3.33 (`H̃^s(Ω) = H^s_0(Ω)` on Lipschitz domains
   for `s ≥ 0` with `s - 1/2 ∉ ℤ`, up to equivalence of norms), in place of CWHM, Lemma 3.31.
+* **The duality** settled these points. The pairing `Rd.pairing` is sesquilinear,
+  conjugate-linear in the element of `H^{-s}(ℝ^d)`, the convention of Mathlib's inner products
+  and of its Riesz map `InnerProductSpace.toDual`, so the duality isomorphisms are
+  conjugate-linear isometries (`≃ₗᵢ⋆[ℂ]`). The orthogonal complement of `H̃^t(Ω)` is computed
+  once, for an isometry `e : H^t(ℝ^d) → H^{t'}(ℝ^d)` that acts as `J_{2t}` on distributions
+  (`Rd.orthogonal_tildeSpace_eq_comap`, `Rd.map_tildeSpace_eq_orthogonal`); this hypothesis
+  determines `e`, which exists only for `t' = -t`, and `t'` is free so that the lemmas apply to
+  both `Rd.besselShift s` and its inverse. This gives `H̃^s(Ω) ≅ H^{-s}(Ω)` and, beyond the
+  plan, `H^s(Ω) ≅ H̃^{-s}(Ω)` (`Rd.restrictionEquivTilde`). The conjugation lemma of the plan
+  holds for every real-valued Schwartz function: its Bessel potential `J_t`
+  (`Rd.besselSchwartz`) is real (`Rd.conj_besselSchwartz_apply`), from
+  `conj (𝓕 f) = 𝓕⁻(conj f)` on `ℝ^d` (`Rd.conj_fourier_apply`). Mathlib defines the inner product
+  of `H^{s}(ℝ^d)` as `⟪J_s U, J_s W⟫_{L_2}`, with the definition visible only inside its module;
+  `Rd.inner_toLp_toLp` states it as `⟪U, W⟫ = ⟪J_s U, J_s W⟫_{L_2}`. Additions to the plan: the
+  pairing extends distributions in both slots (`Rd.pairing_ofTest_left`,
+  `Rd.pairing_ofTest_right`), the representing element is unique (`Rd.dualEquiv_eq_iff`), every
+  extension of it to `ℝ^d` gives the same pairing (`Rd.dualEquiv_apply_of_restrictProj_eq`,
+  `Rd.dualRestrictionEquiv_apply_restrictProj`), and `H̃^1(Ω)` and `H^1_0(Ω)` are the same
+  subspace of `H^1(ℝ^d)` (`Rd.coe_tildeEquivZeroBoundary_symm_apply`), so the dual of
+  `H^1_0(Ω)` pairs `W` with `u` itself (`Rd.dualZeroBoundaryEquiv_apply`).
 * **Names**: `H^s_0(Ω)` is the submodule `Rd.zeroBoundarySpace`, in lower case like the other
   submodules `Rd.vanishOn`, `Rd.testSpan` and `Rd.tildeSpace`; the quotient isometry is
   `Rd.quotientEquivRestrictionSpace`, and evaluation at a Schwartz function is

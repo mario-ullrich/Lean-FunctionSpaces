@@ -5783,6 +5783,21 @@ The sum and difference rules are the linearity of the integral (Mathlib's
 the majorant $|K|$.
 \end{proof}
 
+\begin{lemma}[Conjugation and the Fourier transform]
+\label{lem:fourier-conjugation}
+\lean{Rd.conj_fourier_apply, Rd.conj_fourierInv_apply}
+\leanok
+For every $f : V \to \C$ and all $\xi, x \in V$,
+$\overline{\widehat f(\xi)} = \mathcal F^{-1}(\overline f)(\xi)$ and
+$\overline{\mathcal F^{-1} f(x)} = \mathcal F(\overline f)(x)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Conjugation commutes with the integral, and $\overline{e^{-2\pi i \langle x, \xi \rangle}} =
+e^{2\pi i \langle x, \xi \rangle}$.
+\end{proof}
+
 \begin{lemma}[The Fourier transform of integrable functions]
 \label{lem:fourier-integrable}
 \lean{Rd.integral_fourier_smul_eq_of_integrable, Rd.norm_fourier_le_integral_norm,
@@ -12083,7 +12098,8 @@ identifies their boundary traces with $B^{1/2}_{2,2}(\Gamma)$. \Cref{sec:rellich
 proves Rellich's theorem: the restriction from $H^1(V)$ to $L_2(\Omega)$ is compact for every
 bounded $\Omega \subseteq V$. \Cref{sec:sobolev-restriction-spaces} builds the Hilbert spaces
 $H^s(\Omega)$, $\tilde H^s(\Omega)$ and $H^s_0(\Omega)$ inside $H^s(V)$, for every open
-$\Omega$ and every real $s$.
+$\Omega$ and every real $s$. \Cref{sec:sobolev-duality} proves the duality of
+$\tilde H^s(\Omega)$ and $H^{-s}(\Omega)$.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -13799,6 +13815,360 @@ McLean proves $\tilde H^s(\Omega) = H^s_0(\Omega)$ on Lipschitz domains for $s \
 $s - \frac12 \notin \Z$, in particular for $s = 1$, up to equivalence of norms
 \cite[Theorem 3.33]{McLean}. For $s = 1$, \Cref{thm:sobolev-tilde-zero-boundary} holds for every
 open set and with equal norms.
+
+\begin{lemma}[$\tilde H^1(\Omega)$ lies in $H^1(\Omega)$]
+\label{lem:sobolev-tilde-in-restriction}
+\lean{Rd.tildeSpace_one_le_orthogonal, Rd.coe_tildeEquivZeroBoundary_symm_apply}
+\leanok
+\uses{thm:sobolev-tilde-restriction-isometry, thm:sobolev-tilde-zero-boundary}
+For every open set $\Omega \subseteq V$, $\tilde H^1(\Omega) \subseteq N^1(\Omega)^\perp =
+H^1(\Omega)$. For every $u \in H^1_0(\Omega)$, the element $\tilde u \in \tilde H^1(\Omega)$ with
+$r_\Omega \tilde u = u$ is $u$ itself, as an element of $H^1(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$r_\Omega$ is the orthogonal projection onto $H^1(\Omega)$, and $\|r_\Omega U\| = \|U\|$ for
+$U \in \tilde H^1(\Omega)$ (\Cref{thm:sobolev-tilde-restriction-isometry}). By Pythagoras,
+$\|U\|^2 = \|r_\Omega U\|^2 + \|U - r_\Omega U\|^2$, so $U = r_\Omega U \in H^1(\Omega)$ (Mathlib's
+\texttt{Submodule.\allowbreak mem\_\allowbreak iff\_\allowbreak norm\_\allowbreak
+starProjection}). Hence $u = r_\Omega \tilde u = \tilde u$.
+\end{proof}
+
+So $\tilde H^1(\Omega)$ and $H^1_0(\Omega)$ are the same subspace of $H^1(V)$, and the isometry of
+\Cref{thm:sobolev-tilde-zero-boundary} is the identity on it.
+
+\section{Duality of Sobolev spaces on open sets}
+\label{sec:sobolev-duality}
+
+Throughout this section $\Omega \subseteq V$ is open and $s \in \R$; the spaces $N^s(\Omega)$,
+$H^s(\Omega)$, $T^s(\Omega)$, $\tilde H^s(\Omega)$ and $H^s_0(\Omega)$ are those of
+\Cref{sec:sobolev-restriction-spaces}. For a Schwartz function $u$ and $t \in \R$ let
+$J_t u = \mathcal F^{-1}(\langle \cdot \rangle^t \widehat u)$, the Bessel potential on Schwartz
+functions; on tempered distributions $J_t$ is Mathlib's Bessel potential, and $J_s U \in L_2(V)$
+for $U \in H^s(V)$. The section proves that $\tilde H^s(\Omega)$ and $H^{-s}(\Omega)$ are dual to
+each other, as in Chandler-Wilde, Hewett and Moiola \cite[Theorem 3.3]{ChandlerWildeHewettMoiola},
+for every open set and every real $s$. The tool is the isometry $J_{2s} : H^s(V) \to H^{-s}(V)$:
+it carries the orthogonal complement of $\tilde H^s(\Omega)$ onto $N^{-s}(\Omega)$, hence
+$\tilde H^s(\Omega)$ onto $H^{-s}(\Omega)$, and Riesz's representation theorem does the rest.
+
+\begin{definition}[The Bessel potential on Schwartz functions]
+\label{def:bessel-schwartz}
+\lean{Rd.besselSchwartz}
+\leanok
+\uses{def:bessel-weight, lem:bessel-weight-basic}
+For $t \in \R$ and a Schwartz function $u$,
+$J_t u = \mathcal F^{-1}(\langle \cdot \rangle^t \widehat u)$, a continuous linear map of the
+Schwartz space.
+\end{definition}
+
+\begin{lemma}[$J_t$ on Schwartz functions and on distributions]
+\label{lem:bessel-schwartz-distribution}
+\lean{Rd.besselPotential_schwartz, Rd.besselSchwartz_apply}
+\leanok
+\uses{def:bessel-schwartz}
+For every $t \in \R$ and every Schwartz function $u$, the tempered distribution of $J_t u$ is
+Mathlib's $J_t$ of the tempered distribution of $u$, and
+$J_t u(x) = \mathcal F^{-1}(\langle \cdot \rangle^t \widehat u)(x)$ for every $x \in V$, with the
+Fourier integrals of functions.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's
+\texttt{TemperedDistribution.\allowbreak fourierMultiplierCLM\_\allowbreak
+toTemperedDistributionCLM\_\allowbreak eq}.
+\end{proof}
+
+\begin{lemma}[$J_t$ keeps real functions real]
+\label{lem:bessel-schwartz-real}
+\lean{Rd.besselSchwartz_apply_eq_fourier, Rd.conj_besselSchwartz_apply, Rd.conj_testSchwartz}
+\leanok
+\uses{lem:bessel-schwartz-distribution, lem:fourier-conjugation, def:test-schwartz}
+For every $t \in \R$, every Schwartz function $u$ and every $x \in V$,
+$J_t u(x) = \mathcal F(\langle \cdot \rangle^t \, \mathcal F^{-1} u)(x)$. For every $t \in \R$,
+every Schwartz function $u$ with real values and every $x \in V$, $J_t u(x)$ is real. For every
+$\varphi \in \mathcal D(\Omega)$, the Schwartz function of $\varphi$ (\Cref{def:test-schwartz})
+has real values.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\mathcal F^{-1} h(x) = \widehat{h}(-x)$, $\mathcal F^{-1} u(\xi) = \widehat u(-\xi)$, and the
+weight is even (Mathlib's \texttt{Real.\allowbreak fourierInv\_\allowbreak eq\_\allowbreak
+fourier\_\allowbreak comp\_\allowbreak neg}). By \Cref{lem:fourier-conjugation},
+$\overline{J_t u(x)} = \mathcal F(\langle \cdot \rangle^t \, \overline{\widehat u})(x) =
+\mathcal F(\langle \cdot \rangle^t \, \mathcal F^{-1} \overline u)(x)$, which is $J_t u(x)$ for
+real $u$ by the first statement.
+\end{proof}
+
+\begin{lemma}[The Bessel potential of an $L_2$ function at a Schwartz function]
+\label{lem:bessel-potential-l2-schwartz}
+\lean{Rd.besselPotential_toLp_apply, Rd.inner_toLp_besselSchwartz}
+\leanok
+\uses{lem:bessel-schwartz-real}
+For every $t \in \R$, every $g \in L_2(V)$ and every Schwartz function $u$,
+$(J_t g)(u) = \int J_t u \cdot g$. For every $t \in \R$, every Schwartz function $u$ with real
+values and every $g \in L_2(V)$, $\langle J_t u, g \rangle_{L_2} = (J_t g)(u)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's $J_t$ acts on tempered distributions by
+$(J_t g)(u) = g(\mathcal F(\langle \cdot \rangle^t \, \mathcal F^{-1} u))$, and
+$\mathcal F(\langle \cdot \rangle^t \, \mathcal F^{-1} u) = J_t u$
+(\Cref{lem:bessel-schwartz-real}). The inner product is $\int \overline{J_t u} \, g$, and
+$J_t u$ is real for real $u$.
+\end{proof}
+
+\begin{lemma}[Schwartz functions in $H^t(V)$]
+\label{lem:sobolev-schwartz-elements}
+\lean{Rd.inner_toLp_toLp, Rd.toLp_schwartz, Rd.toLp_ofTest, Rd.inner_ofTest_toLp,
+  Rd.inner_ofTest_left}
+\leanok
+\uses{lem:bessel-schwartz-distribution, lem:bessel-potential-l2-schwartz,
+  def:sobolev-tilde-zero-boundary}
+For every $t \in \R$ and all $U, W \in H^t(V)$,
+$\langle U, W \rangle = \langle J_t U, J_t W \rangle_{L_2}$. For every $t \in \R$ and every
+Schwartz function $u$, the $L_2$ function of $u \in H^t(V)$ is $J_t u$. For every $t \in \R$,
+every $\varphi \in \mathcal D(\Omega)$ and every $g \in L_2(V)$,
+$\langle J_t \varphi, g \rangle_{L_2} = (J_t g)(\varphi)$; for every $U \in H^t(V)$,
+$\langle \varphi, U \rangle = (J_t (J_t U))(\varphi)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$U \mapsto J_t U$ is a linear isometry onto $L_2(V)$, and linear isometries preserve inner
+products. The tempered distributions of $J_t u$ as an element of $L_2(V)$ and of $J_t$ applied to
+$u$ agree (\Cref{lem:bessel-schwartz-distribution}), and $L_2$ functions are determined by their
+distributions. The last two statements follow with \Cref{lem:bessel-potential-l2-schwartz}, since
+test functions are real (\Cref{lem:bessel-schwartz-real}).
+\end{proof}
+
+\begin{definition}[The isometry $J_{2s}$]
+\label{def:bessel-shift}
+\lean{Rd.besselShift}
+\leanok
+For $s \in \R$ and $U \in H^s(V)$, $\Theta_s U$ is the element of $H^{-s}(V)$ whose $L_2$
+function is $J_s U$. $\Theta_s : H^s(V) \to H^{-s}(V)$ is an isometric isomorphism, the
+composition of the isometries $H^s(V) \to L_2(V)$ and $L_2(V) \to H^{-s}(V)$.
+\end{definition}
+
+\begin{lemma}[$\Theta_s$ is $J_{2s}$]
+\label{lem:bessel-shift}
+\lean{Rd.toLp_toLpLinearIsometry_symm_apply, Rd.toLp_besselShift,
+  Rd.toDistr_besselShift_eq_besselPotential_toLp, Rd.toDistr_besselShift,
+  Rd.besselShift_symm_apply, Rd.toLp_besselShift_symm, Rd.toDistr_besselShift_symm,
+  Rd.inner_ofTest_eq}
+\leanok
+\uses{def:bessel-shift, lem:sobolev-schwartz-elements}
+For every $s \in \R$ and every $U \in H^s(V)$, $\Theta_s U$ is the tempered distribution
+$J_s(J_s U) = J_{2s} U$. For every $s \in \R$ and every $W \in H^{-s}(V)$,
+$\Theta_s^{-1} W = \Theta_{-s} W$, the element of $H^s(V)$ with $L_2$ function $J_{-s} W$, and its
+tempered distribution is $J_{-s}(J_{-s} W)$. For every $s \in \R$, every $U \in H^s(V)$ and every
+$\varphi \in \mathcal D(\Omega)$, $\langle U, \varphi \rangle = \overline{(\Theta_s U)(\varphi)}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The tempered distribution of an element $W$ of $H^{-s}(V)$ is $J_s$ of its $L_2$ function, and
+$J_s J_s = J_{2s}$. The last statement is \Cref{lem:sobolev-schwartz-elements}, conjugated.
+\end{proof}
+
+\begin{definition}[The pairing of $H^{-s}(V)$ and $H^s(V)$]
+\label{def:sobolev-pairing}
+\lean{Rd.pairing, Rd.pairing_add_left, Rd.pairing_sub_left, Rd.pairing_smul_left,
+  Rd.pairing_add_right, Rd.pairing_sub_right, Rd.pairing_smul_right, Rd.pairingCLM,
+  Rd.pairingCLM_apply}
+\leanok
+For $s \in \R$, $W \in H^{-s}(V)$ and $U \in H^s(V)$,
+$[W, U] = \langle J_{-s} W, J_s U \rangle_{L_2}$. It is conjugate-linear in $W$ and linear in $U$,
+and for every $W \in H^{-s}(V)$, $U \mapsto [W, U]$ is a continuous linear functional on
+$H^s(V)$.
+\end{definition}
+
+\begin{proposition}[Properties of the pairing]
+\label{prop:sobolev-pairing}
+\lean{Rd.norm_pairing_le, Rd.pairing_besselShift, Rd.pairing_ofTest_left,
+  Rd.pairing_ofTest_right, Rd.pairing_one_toLp}
+\leanok
+\uses{def:sobolev-pairing, lem:bessel-shift, lem:sobolev-schwartz-elements,
+  lem:sobolev-one-to-l2, lem:plancherel-l2}
+For every $s \in \R$, all $W \in H^{-s}(V)$ and $U \in H^s(V)$,
+$|[W, U]| \leq \|W\| \, \|U\|$. For every $s \in \R$ and all $U', U \in H^s(V)$,
+$[\Theta_s U', U] = \langle U', U \rangle$. For every $s \in \R$, every
+$\varphi \in \mathcal D(\Omega)$, every $U \in H^s(V)$ and every $W \in H^{-s}(V)$,
+$[\varphi, U] = U(\varphi)$ and $[W, \varphi] = \overline{W(\varphi)}$. For every Schwartz
+function $\psi$, regarded as an element of $H^{-1}(V)$, and every $U \in H^1(V)$, the pairing of
+$H^{-1}(V)$ and $H^1(V)$ satisfies $[\psi, U] = \langle \psi, \iota U \rangle_{L_2}$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+The bound is the Cauchy--Schwarz inequality in $L_2(V)$, and $[\Theta_s U', U] =
+\langle J_s U', J_s U \rangle_{L_2} = \langle U', U \rangle$
+(\Cref{lem:sobolev-schwartz-elements}). By \Cref{lem:sobolev-schwartz-elements},
+$[\varphi, U] = (J_{-s}(J_s U))(\varphi) = U(\varphi)$, and the second identity follows in the
+same way after conjugation. For the last identity, by Plancherel's theorem
+(\Cref{lem:plancherel-l2}) both sides are integrals over the frequencies,
+$\int \overline{\langle \xi \rangle^{-1} \widehat \psi(\xi)} \, \widehat{J_1 U}(\xi) \, d\xi$ and
+$\int \overline{\widehat \psi(\xi)} \, \langle \xi \rangle^{-1} \widehat{J_1 U}(\xi) \, d\xi$
+(\Cref{lem:sobolev-one-to-l2}), and the weight is real.
+\end{proof}
+
+At $s = 1$ the pairing is the $L_2$ inner product on Schwartz functions, and for every $s$ it
+extends the action of a distribution on test functions. So $[W, U]$ is the duality pairing of
+Chandler-Wilde, Hewett and Moiola, in the sesquilinear form of Mathlib's inner products.
+
+\begin{proposition}[The orthogonal complement of $\tilde H^t(\Omega)$]
+\label{prop:orthogonal-tilde}
+\lean{Rd.mem_orthogonal_tildeSpace_iff_toLp, Rd.orthogonal_tildeSpace_eq_comap,
+  Rd.map_tildeSpace_eq_orthogonal}
+\leanok
+\uses{lem:sobolev-schwartz-elements, def:sobolev-tilde-zero-boundary,
+  lem:sobolev-tilde-zero-boundary-closed, def:sobolev-vanishing, def:sobolev-restriction-space}
+For every $t \in \R$, every open $\Omega$ and every $U \in H^t(V)$, $U$ is orthogonal to
+$\tilde H^t(\Omega)$ iff $(J_t(J_t U))(\varphi) = 0$ for every $\varphi \in \mathcal D(\Omega)$.
+For all $t, t' \in \R$, every open $\Omega$ and every isometric isomorphism
+$e : H^t(V) \to H^{t'}(V)$ such that $e U$ is the tempered distribution $J_t(J_t U)$ for every
+$U \in H^t(V)$, $\tilde H^t(\Omega)^\perp = e^{-1}(N^{t'}(\Omega))$ and
+$e(\tilde H^t(\Omega)) = N^{t'}(\Omega)^\perp = H^{t'}(\Omega)$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+The orthogonal complement of a closure is that of the set, and orthogonality to $T^t(\Omega)$ is
+orthogonality to its generators $\varphi$, with
+$\langle \varphi, U \rangle = (J_t(J_t U))(\varphi)$ (\Cref{lem:sobolev-schwartz-elements}). This
+gives the first two statements. $\tilde H^t(\Omega)$ is closed
+(\Cref{lem:sobolev-tilde-zero-boundary-closed}), hence its own double orthogonal complement, and
+an isometric isomorphism maps orthogonal complements onto orthogonal complements (Mathlib's
+\texttt{Submodule.\allowbreak map\_\allowbreak orthogonal\_\allowbreak equiv}), so
+$e(\tilde H^t(\Omega)) = e(\tilde H^t(\Omega)^\perp)^\perp = N^{t'}(\Omega)^\perp$.
+\end{proof}
+
+The hypothesis on $e$ determines $e$, and such an $e$ exists only for $t' = -t$, namely
+$e = \Theta_t$. \Cref{prop:orthogonal-tilde} keeps $t'$ free so that it applies to both
+$\Theta_s$ and $\Theta_s^{-1}$, whose target $H^s(V)$ is $H^{-(-s)}(V)$ only up to the identity
+$-(-s) = s$.
+
+\begin{theorem}[$J_{2s}$ on $\tilde H^s(\Omega)$ and on $H^s(\Omega)$]
+\label{thm:tilde-restriction-shift}
+\lean{Rd.mem_orthogonal_tildeSpace_iff, Rd.map_tildeSpace_besselShift,
+  Rd.map_tildeSpace_besselShift_symm, Rd.tildeEquivRestriction,
+  Rd.coe_tildeEquivRestriction_apply, Rd.restrictionEquivTilde,
+  Rd.coe_restrictionEquivTilde_apply}
+\leanok
+\uses{prop:orthogonal-tilde, lem:bessel-shift, def:sobolev-restriction-space}
+For every open $\Omega$, every $s \in \R$ and every $U \in H^s(V)$, $U$ is orthogonal to
+$\tilde H^s(\Omega)$ iff $\Theta_s U \in N^{-s}(\Omega)$. For every open $\Omega$ and every
+$s \in \R$, $\Theta_s$ restricts to isometric isomorphisms of $\tilde H^s(\Omega)$ onto
+$H^{-s}(\Omega)$ and of $H^s(\Omega)$ onto $\tilde H^{-s}(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Apply \Cref{prop:orthogonal-tilde} to $e = \Theta_s$ with $t = s$, $t' = -s$, and to
+$e = \Theta_s^{-1}$ with $t = -s$, $t' = s$ (\Cref{lem:bessel-shift}): $\Theta_s$ maps
+$\tilde H^s(\Omega)$ onto $H^{-s}(\Omega)$, and $\Theta_s^{-1}$ maps $\tilde H^{-s}(\Omega)$ onto
+$H^s(\Omega)$.
+\end{proof}
+
+\begin{lemma}[Elements vanishing on $\Omega$ pair to zero]
+\label{lem:sobolev-pairing-vanishing}
+\lean{Rd.pairing_eq_zero_of_mem_vanishOn_left, Rd.pairing_eq_zero_of_mem_vanishOn_right}
+\leanok
+\uses{thm:tilde-restriction-shift, prop:sobolev-pairing}
+For every open $\Omega$, every $s \in \R$, every $W \in N^{-s}(\Omega)$ and every
+$U \in \tilde H^s(\Omega)$, $[W, U] = 0$. For every open $\Omega$, every $s \in \R$, every
+$W \in \tilde H^{-s}(\Omega)$ and every $U \in N^s(\Omega)$, $[W, U] = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$[W, U] = \langle \Theta_s^{-1} W, U \rangle$ (\Cref{prop:sobolev-pairing}). In the first case
+$\Theta_s^{-1} W$ is orthogonal to $\tilde H^s(\Omega)$, since $\Theta_s \Theta_s^{-1} W = W$ lies
+in $N^{-s}(\Omega)$; in the second case $\Theta_s^{-1} W$ lies in $H^s(\Omega)$, the orthogonal
+complement of $N^s(\Omega)$ (\Cref{thm:tilde-restriction-shift}).
+\end{proof}
+
+\begin{theorem}[The dual of $\tilde H^s(\Omega)$ is $H^{-s}(\Omega)$]
+\label{thm:sobolev-duality}
+\lean{Rd.dualEquiv, Rd.dualEquiv_apply, Rd.dualEquiv_symm_apply, Rd.dualEquiv_eq_iff,
+  Rd.norm_dualEquiv, Rd.dualEquiv_apply_of_restrictProj_eq}
+\leanok
+\uses{thm:tilde-restriction-shift, prop:sobolev-pairing, lem:sobolev-pairing-vanishing}
+For every open $\Omega$, every $s \in \R$ and every bounded linear functional $\ell$ on
+$\tilde H^s(\Omega)$ there is exactly one $W \in H^{-s}(\Omega)$ with $\ell(U) = [W, U]$ for every
+$U \in \tilde H^s(\Omega)$, and $\|W\| = \|\ell\|$. Then $\ell(U) = [W', U]$ for every
+$U \in \tilde H^s(\Omega)$ and every $W' \in H^{-s}(V)$ with $r_\Omega W' = W$. The map
+$\ell \mapsto W$ is a conjugate-linear isometric isomorphism of the dual of $\tilde H^s(\Omega)$
+onto $H^{-s}(\Omega)$, and for every $W \in H^{-s}(\Omega)$, $U \mapsto [W, U]$ is a bounded
+linear functional on $\tilde H^s(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By Riesz's representation theorem (Mathlib's \texttt{InnerProductSpace.\allowbreak toDual}),
+$\ell(U) = \langle y, U \rangle$ for exactly one $y \in \tilde H^s(\Omega)$, with
+$\|y\| = \|\ell\|$. Let $W = \Theta_s y \in H^{-s}(\Omega)$ (\Cref{thm:tilde-restriction-shift});
+then $[W, U] = \langle y, U \rangle$ (\Cref{prop:sobolev-pairing}) and $\|W\| = \|y\|$. If
+$r_\Omega W' = W$, then $W' - W \in N^{-s}(\Omega)$, and $[W' - W, U] = 0$
+(\Cref{lem:sobolev-pairing-vanishing}).
+\end{proof}
+
+Chandler-Wilde, Hewett and Moiola define the pairing of $H^{-s}(\Omega)$ and
+$\tilde H^s(\Omega)$ through an arbitrary extension of the element of $H^{-s}(\Omega)$ to $V$;
+the second statement of \Cref{thm:sobolev-duality} says that every extension gives the same
+value.
+
+\begin{corollary}[The dual of $H^s(\Omega)$ is $\tilde H^{-s}(\Omega)$]
+\label{cor:sobolev-duality-restriction}
+\lean{Rd.dualRestrictionEquiv, Rd.dualRestrictionEquiv_apply, Rd.dualRestrictionEquiv_symm_apply,
+  Rd.dualRestrictionEquiv_eq_iff, Rd.dualRestrictionEquiv_apply_restrictProj}
+\leanok
+\uses{thm:tilde-restriction-shift, prop:sobolev-pairing, lem:sobolev-pairing-vanishing}
+For every open $\Omega$, every $s \in \R$ and every bounded linear functional $\ell$ on
+$H^s(\Omega)$ there is exactly one $W \in \tilde H^{-s}(\Omega)$ with $\ell(u) = [W, u]$ for every
+$u \in H^s(\Omega)$, and $\|W\| = \|\ell\|$. Then $\ell(r_\Omega U) = [W, U]$ for every
+$U \in H^s(V)$. The map $\ell \mapsto W$ is a conjugate-linear isometric isomorphism of the dual
+of $H^s(\Omega)$ onto $\tilde H^{-s}(\Omega)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+Riesz's representation theorem on $H^s(\Omega)$ followed by $\Theta_s : H^s(\Omega) \to
+\tilde H^{-s}(\Omega)$ (\Cref{thm:tilde-restriction-shift}), with
+$[\Theta_s y, u] = \langle y, u \rangle$ (\Cref{prop:sobolev-pairing}). For $U \in H^s(V)$,
+$U - r_\Omega U \in N^s(\Omega)$, and $[W, U - r_\Omega U] = 0$
+(\Cref{lem:sobolev-pairing-vanishing}).
+\end{proof}
+
+\begin{corollary}[The dual of $H^1_0(\Omega)$ is $H^{-1}(\Omega)$]
+\label{cor:sobolev-duality-zero-boundary}
+\lean{Rd.dualZeroBoundaryEquiv, Rd.dualZeroBoundaryEquiv_apply,
+  Rd.dualZeroBoundaryEquiv_symm_apply, Rd.dualZeroBoundaryEquiv_eq_iff}
+\leanok
+\uses{thm:sobolev-tilde-zero-boundary, lem:sobolev-tilde-in-restriction,
+  thm:tilde-restriction-shift, prop:sobolev-pairing}
+For every open $\Omega$ and every bounded linear functional $\ell$ on $H^1_0(\Omega)$ there is
+exactly one $W \in H^{-1}(\Omega)$ with $\ell(u) = [W, u]$ for every $u \in H^1_0(\Omega)$, and
+$\|W\| = \|\ell\|$; here $u$ is read as an element of $H^1(V)$. The map $\ell \mapsto W$ is a
+conjugate-linear isometric isomorphism of the dual of $H^1_0(\Omega)$ onto $H^{-1}(\Omega)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+Riesz's representation theorem on $H^1_0(\Omega)$, the isometry $H^1_0(\Omega) \to
+\tilde H^1(\Omega)$ inverse to the restriction (\Cref{thm:sobolev-tilde-zero-boundary}), and
+$\Theta_1 : \tilde H^1(\Omega) \to H^{-1}(\Omega)$ (\Cref{thm:tilde-restriction-shift}); the
+isometry preserves inner products, and inside $H^1(V)$ it is the identity
+(\Cref{lem:sobolev-tilde-in-restriction}).
+\end{proof}
+
+$\tilde H^1(\Omega)$ and $H^1_0(\Omega)$ are the same subspace of $H^1(V)$
+(\Cref{lem:sobolev-tilde-in-restriction}), so in \Cref{cor:sobolev-duality-zero-boundary} $W$ is
+paired with $u$ itself.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
