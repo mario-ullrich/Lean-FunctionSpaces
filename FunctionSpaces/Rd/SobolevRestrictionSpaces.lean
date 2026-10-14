@@ -247,6 +247,18 @@ theorem restrictL2_apply (u : RestrictionSpace 1 Ω) :
     restrictL2 Ω u = LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V) (toL2 (u : H^{1}(V))) :=
   rfl
 
+/-- **`u|_Ω = f|_Ω` as an equation of functions**: for `u ∈ H^1(Ω)` and `f ∈ L_2(V)`,
+`restrictL2 Ω u` is the restriction of `f` to `Ω` iff the `L_2` function of `u` equals `f` almost
+everywhere on `Ω` (Mathlib's `LpToLpRestrictCLM_coeFn`). -/
+theorem restrictL2_eq_iff_ae_eq (u : RestrictionSpace 1 Ω) (f : Lp ℂ 2 (volume : Measure V)) :
+    restrictL2 Ω u = LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V) f ↔
+      (toL2 (u : H^{1}(V)) : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)] f := by
+  rw [restrictL2_apply, Lp.ext_iff]
+  exact ⟨fun h => (LpToLpRestrictCLM_coeFn ℂ _ _).symm.trans
+      (h.trans (LpToLpRestrictCLM_coeFn ℂ _ _)),
+    fun h => (LpToLpRestrictCLM_coeFn ℂ _ _).trans
+      (h.trans (LpToLpRestrictCLM_coeFn ℂ _ _).symm)⟩
+
 /-- **An element of `H^1(Ω)` is determined by its values on `Ω`**: `u ↦ u|_Ω` is injective,
 since its kernel lies in `vanishOn 1 Ω ⊓ (vanishOn 1 Ω)ᗮ = ⊥`
 (`Rd.mem_vanishOn_one_iff_restrict_eq_zero`, Mathlib's
@@ -633,10 +645,7 @@ theorem memSobolevOn_iff_exists_restrictL2 (Ω : BoundedLipschitzDomain V)
       (hFf.trans (LpToLpRestrictCLM_coeFn ℂ _ _).symm))
   · rintro ⟨u, hu⟩
     refine ⟨toL2 (u : H^{1}(V)), memSobolev_toL2 _, ?_⟩
-    have hu' : LpToLpRestrictCLM V ℂ ℂ volume 2 Ω.carrier (toL2 (u : H^{1}(V))) =
-        LpToLpRestrictCLM V ℂ ℂ volume 2 Ω.carrier f := hu
-    exact (LpToLpRestrictCLM_coeFn ℂ _ _).symm.trans
-      ((Lp.ext_iff.1 hu').trans (LpToLpRestrictCLM_coeFn ℂ _ _))
+    exact (restrictL2_eq_iff_ae_eq u f).1 hu
 
 end BoundedLipschitzDomain
 

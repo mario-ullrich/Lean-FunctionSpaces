@@ -15,7 +15,8 @@ Lean-FunctionSpaces formalises function-space foundations: Sobolev, Besov and Tr
 spaces, their characterisations, extensions, traces and embeddings. For the collaboration it
 supplies Mathlib's Hilbert spaces `H^s(ℝ^d)` as Besov spaces `B^s_{2,2}(ℝ^d)` (item I.8), weak
 derivatives, `H^1` on bounded Lipschitz domains with its weak gradient and its trace, the
-Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets and their duality, and
+Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets and their duality, the trace
+space `H^{1/2}(Γ)` of a bounded Lipschitz domain with its trace and extension operators, and
 Rellich's compactness theorem for the restriction space (items I.6 and H.1 in that form,
 Section 4.5; the weak-derivative form needs H.2, Section 5). Forms, Hilbert complexes, duality,
 negative smoothness, the space types on domains and boundaries, and the surface measure belong
@@ -202,8 +203,9 @@ File `FunctionSpaces/Rd/LipschitzDomainH1.lean`, on top of
   (`Rd.BoundedLipschitzDomain.exists_memSobolevOn_of_memBoundaryBesov`); together
   `Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`.
 * The trace bound on one Lipschitz graph domain has an existential constant
-  (`Rd.LipschitzGraph.modNorm_trace_le`); on bounded Lipschitz domains the trace statements are
-  qualitative.
+  (`Rd.LipschitzGraph.modNorm_trace_le`); the trace statements of
+  `FunctionSpaces/Rd/LipschitzDomainH1.lean` on bounded Lipschitz domains are qualitative, and
+  Section 4.6 makes the trace a bounded operator on the Hilbert space `H^1(Ω)`.
 
 ### 4.5 I.6, H.1 and H.4: Rellich's theorem, the Hilbert spaces on `Ω` and their duality
 
@@ -288,7 +290,43 @@ Negative order and duality, for every open `Ω` and every real `s`
   `H^{-1}(Ω) = (H^1_0(Ω))^*`, where `W` is paired with `u` itself
   (`Rd.dualZeroBoundaryEquiv_apply`). Each has `_symm_apply` and `_eq_iff` lemmas.
 
-### 4.6 Items X.1–X.5, X.7, X.8
+### 4.6 The trace space `H^{1/2}(Γ)` and `H^{-1/2}(Γ)`
+
+File `FunctionSpaces/Rd/BoundaryTraceSpace.lean`, with
+`Ω.SobolevOne := Rd.RestrictionSpace 1 Ω.toOpens`, the Hilbert space `H^1(Ω)` of Section 4.5, and
+boundary traces at `L = 2`, `p = q = 2`, `s = 1/2` (`Ω.boundaryTrace ψ two_ne_top 2`):
+
+* `Rd.modNorm_two_le_norm`: for `U : H^{1, 2}(V, ℂ)`,
+  `‖toL2 U‖_2 + ‖(2^k ω_2(toL2 U, 2^(-k))_2)_k‖_{ℓ_2} ≤ Rd.sobolevOneBesovConst V * ‖U‖`, an
+  explicit product of three constants; `Rd.modNorm_half_one_le`: the `B^{1/2}_{2,1}` quantity is
+  at most `√2` times this one; together `Rd.modNorm_half_one_le_norm`,
+  `‖toL2 U‖_2 + ∑_k 2^(k/2) ω_2(toL2 U, 2^(-k))_2 ≤ √2 * Rd.sobolevOneBesovConst V * ‖U‖`.
+* `Rd.BoundedLipschitzDomain.chartTrace Ω j : Ω.SobolevOne →L[ℂ] Lp ℂ 2 volume` (on the
+  hyperplane of the chart `j`), `u ↦ Tr_j(ψ_j u)` with the canonical resolution of unity
+  `Ω.boundaryPartition`, a fixed choice; its constant is existential
+  (`Rd.BoundedLipschitzDomain.exists_enorm_trace_localize_le`).
+* `Rd.BoundedLipschitzDomain.traceKer Ω`, the common kernel of the chart traces, a closed
+  subspace; `Rd.BoundedLipschitzDomain.mem_traceKer_iff`: for every resolution of unity `ψ`,
+  `u ∈ traceKer Ω` iff `Ω.boundaryTrace ψ two_ne_top 2 (toL2 u) =ᶠ[Ω.aeBoundary] 0`.
+* `Rd.BoundedLipschitzDomain.TraceSpace Ω := (traceKer Ω)ᗮ`, the space `H^{1/2}(Γ)`, with
+  `Rd.BoundedLipschitzDomain.trace Ω : Ω.SobolevOne →L[ℂ] TraceSpace Ω`, the orthogonal
+  projection, and `Rd.BoundedLipschitzDomain.extend Ω : TraceSpace Ω →L[ℂ] Ω.SobolevOne`, the
+  inclusion: `trace_extend` (`γ ∘ E = id`), `norm_trace_apply_le`, `norm_extend_apply`,
+  `ker_trace` (the kernel of `γ` is `traceKer Ω`), `sub_extend_trace_mem`, and
+  `quotientEquivTraceSpace Ω : (Ω.SobolevOne ⧸ traceKer Ω) ≃ₗᵢ[ℂ] TraceSpace Ω`, the quotient
+  `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)`.
+* The functions of `H^{1/2}(Γ)`, for every resolution of unity `ψ`:
+  `Rd.BoundedLipschitzDomain.trace_eq_iff` (`γ u = γ u'` iff the boundary traces agree almost
+  everywhere on `Γ`), `memBoundaryBesov_extend` (the boundary trace of `E t` lies in
+  `B^{1/2}_{2,2}(Γ)`), `exists_traceSpace_of_memBoundaryBesov` (every `g ∈ B^{1/2}_{2,2}(Γ)` is
+  the boundary trace of some `E t`), `boundaryTrace_extend_eventuallyEq_iff` (`t` is determined
+  by the boundary trace of `E t`).
+* `H^{-1/2}(Γ)`: `Rd.BoundedLipschitzDomain.DualTraceSpace Ω := StrongDual ℂ (TraceSpace Ω)`,
+  `Rd.BoundedLipschitzDomain.dualTraceEquiv Ω : DualTraceSpace Ω ≃ₗᵢ⋆[ℂ] TraceSpace Ω` (Riesz,
+  `dualTraceEquiv_apply`, uniqueness `eq_dualTraceEquiv_of_forall`), and
+  `Rd.BoundedLipschitzDomain.adjoint_trace`: the adjoint of `γ` is `E`.
+
+### 4.7 Items X.1–X.5, X.7, X.8
 
 * X.1, bounded Lipschitz domains: `Rd.BoundedLipschitzDomain`
   (`FunctionSpaces/Rd/BoundedLipschitz.lean`).
@@ -308,7 +346,7 @@ Negative order and duality, for every open `Ω` and every real `s`
 * X.8, Mathlib's distributions on open sets and differential forms: `Distribution` (`𝓓'(Ω, F)`),
   `extDeriv`.
 
-### 4.7 Later
+### 4.8 Later
 
 The next part of Lean-FunctionSpaces continues with the square function theorem
 `L_p = F^0_{p,2}`, `W^m_p = F^m_{p,2}` and Mathlib's `H^{s,p} = F^s_{p,2}` for all `1 < p < ∞`,
@@ -319,9 +357,10 @@ and the Sobolev embeddings on `ℝ^d`. They generalise Sections 4.1 and 4.2 from
 
 * **Statements on `Ω` are qualitative.** The extension theorem for bounded Lipschitz domains
   (Rychkov's extension, assembled with a resolution of unity) and the trace theorem carry
-  existential constants, so the statements on `Ω` are equivalences of membership, with the
-  restriction bound of constant `1` as the one norm statement. Norm equivalences with explicit
-  constants hold on `V` (Sections 4.1 and 4.2).
+  existential constants, so the statements on `Ω` are equivalences of membership. The norm
+  statements on `Ω` have constant `1`: the restriction bound, and on the trace space the trace,
+  the extension and the quotient isometry `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)` (Section 4.6). Norm
+  equivalences with explicit constants hold on `V` (Sections 4.1 and 4.2).
 * **`H^s(Ω)` is the restriction space**, the definition of Chandler-Wilde, Hewett and Moiola (the
   proposal cites their §3.1.4). Rellich's theorem then holds on every bounded set. Every function
   of `H^1(Ω)` lies in the weak-derivative space `W^1_2(Ω)`, on every open set
@@ -417,8 +456,9 @@ number of the proposal and the intended Lean statement.
 The first version of this document (commit `ec3c133`) left items 1–5 of Section 6 to the
 FEEC/BEEC library. Lean-FunctionSpaces now builds them itself, in its current part (Part Ib of
 its development plan). The space types, the isometry of H.4 and the duality are formalised,
-with their Lean names in Section 4.5; the other statements below are in preparation and enter
-Section 4 with their Lean names as they are formalised.
+with their Lean names in Section 4.5, and the trace space, with its Lean names in Section 4.6;
+the other statements below are in preparation and enter Section 4 with their Lean names as they
+are formalised.
 
 * **Space types (formalised, Section 4.5).** `H^s(Ω)` for every open `Ω` and every real `s` as a
   Hilbert space: the orthogonal complement, in Mathlib's `H^{s}(ℝ^d)`, of the elements that
@@ -436,9 +476,13 @@ Section 4 with their Lean names as they are formalised.
   `H^s(ℝ^d)` (CWHM, Theorem 3.3; `Rd.dualEquiv`, `Rd.dualRestrictionEquiv`), and
   `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` (`Rd.dualZeroBoundaryEquiv`). File
   `FunctionSpaces/Rd/SobolevDuality.lean`.
-* **The trace space.** `H^{1/2}(Γ)` as the orthogonal complement of the kernel of the trace in
-  `H^1(Ω)`, with the trace as orthogonal projection and the extension as inclusion (both of norm
-  one), `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` as its dual.
+* **The trace space (formalised, Section 4.6).** `H^{1/2}(Γ)` as the orthogonal complement of
+  the kernel of the trace in `H^1(Ω)` (`Rd.BoundedLipschitzDomain.TraceSpace`), with the trace as
+  orthogonal projection and the extension as inclusion (both of norm at most one;
+  `Rd.BoundedLipschitzDomain.trace`, `Rd.BoundedLipschitzDomain.extend`),
+  `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)` (`Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`), and
+  `H^{-1/2}(Γ)` as its dual (`Rd.BoundedLipschitzDomain.DualTraceSpace`). File
+  `FunctionSpaces/Rd/BoundaryTraceSpace.lean`.
 * **The surface measure.** Mathlib's Hausdorff measure `μHE[d-1]` restricted to `Γ`, with no
   charts in the definition. The area formula for Lipschitz graphs, proved here, expresses its
   integrals in the charts with the Gram density `√(1 + ‖∇φ‖²)`; `L_2(Γ)` is the `L_2` space of
@@ -499,6 +543,33 @@ The formalisation of the space types and of the duality settled the following po
   submodules `Rd.vanishOn`, `Rd.testSpan` and `Rd.tildeSpace`; the quotient isometry is
   `Rd.quotientEquivRestrictionSpace`, and evaluation at a Schwartz function is
   `Rd.besselEvalCLM`.
+
+The formalisation of the trace space settled the following points of the plan.
+
+* **The trace kernel is defined by chart traces.** `Rd.BoundedLipschitzDomain.traceKer` is the
+  common kernel of the bounded operators `u ↦ Tr_j(ψ_j u)` into `L_2` of the hyperplanes of the
+  charts, for the canonical resolution of unity `Ω.boundaryPartition`; that it consists of the
+  `u` whose boundary trace vanishes almost everywhere on `Γ`, for every resolution of unity, is a
+  theorem (`Rd.BoundedLipschitzDomain.mem_traceKer_iff`), so the kernel does not depend on the
+  choice.
+* **The bound `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` composes existing inclusions.** The moduli are
+  bounded by the band-limited approximation norm, that by the norm of `F^1_{2,2}`, and that by
+  the `H^1` norm, each with an explicit constant (`Rd.modNorm_two_le_norm`,
+  `Rd.sobolevOneBesovConst`); the step from `B^1_{2,2}` to `B^{1/2}_{2,1}` has constant `√2`
+  (`Rd.modNorm_half_one_le`, by the Cauchy–Schwarz inequality `ENNReal.lqNorm_one_mul_le`), and
+  `Rd.modNorm_half_one_le_norm` is the composite bound.
+* **Additions to the plan**: the trace of a Lipschitz graph domain commutes with complex scalars
+  (`Rd.LipschitzGraph.trace_smul`); the boundary trace is linear on `H^1(ℝ^d)`
+  (`Rd.BoundedLipschitzDomain.boundaryTrace_toL2_sub`); a function vanishes almost everywhere on
+  `Γ` iff its chart pieces vanish (`Rd.BoundedLipschitzDomain.eventuallyEq_zero_iff_forall_chart`);
+  the boundary trace of every element of `H^1(ℝ^d)` lies in `B^{1/2}_{2,2}(Γ)`
+  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_toL2`); and an element of `H^{1/2}(Γ)` is
+  determined by its boundary trace
+  (`Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`).
+* **Names**: `H^1(Ω)` of a bounded Lipschitz domain is the abbreviation
+  `Rd.BoundedLipschitzDomain.SobolevOne`, `H^{-1/2}(Γ)` is
+  `Rd.BoundedLipschitzDomain.DualTraceSpace`, and the Riesz map is
+  `Rd.BoundedLipschitzDomain.dualTraceEquiv`.
 
 ## References
 

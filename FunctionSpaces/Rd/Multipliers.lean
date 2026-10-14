@@ -284,6 +284,16 @@ theorem mulLp_sub {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : ∀ x
     Lp.coeFn_sub (mulLp hψ hψC F) (mulLp hψ hψC G)] with x h1 h2 h3 h4 h5
   rw [h1, h5, Pi.sub_apply, h2, h3, h4, Pi.sub_apply, mul_sub]
 
+omit [Fact (1 ≤ p)] in
+/-- Multiplication by `ψ` commutes with complex scalars: `ψ (c F) = c (ψ F)` in `L_p`. -/
+theorem mulLp_smul {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : ∀ x, ‖ψ x‖ ≤ C) (c : ℂ)
+    (F : Lp ℂ p (volume : Measure V)) : mulLp hψ hψC (c • F) = c • mulLp hψ hψC F := by
+  refine Lp.ext ?_
+  filter_upwards [mulLp_apply_ae hψ hψC (c • F), mulLp_apply_ae hψ hψC F, Lp.coeFn_smul c F,
+    Lp.coeFn_smul c (mulLp hψ hψC F)] with x h1 h2 h3 h4
+  rw [h1, h4, Pi.smul_apply, h2, h3, Pi.smul_apply, smul_eq_mul, smul_eq_mul]
+  ring
+
 /-- `‖ψ F‖_p ≤ C ‖F‖_p`. -/
 theorem enorm_mulLp_le {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : ∀ x, ‖ψ x‖ ≤ C)
     (F : Lp ℂ p (volume : Measure V)) : ‖mulLp hψ hψC F‖ₑ ≤ ENNReal.ofReal C * ‖F‖ₑ := by

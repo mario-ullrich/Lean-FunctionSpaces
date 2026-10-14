@@ -37,7 +37,8 @@ the coefficient quasi-norm on `H` is at most `‖(2^(j(s+1/p)) ‖h_j‖_p)_j‖
 `s - (n-1)/p = (s + 1/p) - n/p`, and the atomic synthesis on `H` (`Rd.modNorm_le_coeffNorm`)
 concludes (`Rd.LipschitzGraph.modNorm_traceSeries_le`).
 
-The trace is linear (`Rd.LipschitzGraph.trace_sub`) and bounded by the norm of `B^{1/p}_{p,1}`
+The trace is linear (`Rd.LipschitzGraph.trace_sub`, `Rd.LipschitzGraph.trace_smul`) and bounded
+by the norm of `B^{1/p}_{p,1}`
 (`Rd.LipschitzGraph.enorm_trace_le`), hence continuous along sequences that converge in this norm
 (`Rd.LipschitzGraph.tendsto_trace_of_modNorm_sub_le`).
 -/
@@ -550,6 +551,27 @@ theorem trace_sub (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0
       (h := fun j => Ω.cutoff (Ω.coneBump.localMean hp L j f₁)) h₁)
     (Ω.summable_traceTerm Ω.coneBump hp L hs hq
       (h := fun j => Ω.cutoff (Ω.coneBump.localMean hp L j f₂)) h₂)
+
+/-- The traces of the terms commute with complex scalars, since convolution does
+(`Rd.conv_smul`). -/
+theorem traceTerm_smul (b : LocalMeansBump V) (hp : p ≠ ∞) (L j : ℕ) (c : ℂ)
+    (h : Lp ℂ p (volume : Measure V)) :
+    Ω.traceTerm b hp L j (c • h) = c • Ω.traceTerm b hp L j h := by
+  refine Lp.ext ?_
+  filter_upwards [Ω.traceTerm_ae b hp L j (c • h), Ω.traceTerm_ae b hp L j h,
+    Lp.coeFn_smul c (Ω.traceTerm b hp L j h)] with x' h1 h2 h3
+  rw [h1, h3, Pi.smul_apply, h2, traceFun, traceFun, conv_congr_ae (Lp.coeFn_smul c h), conv_smul]
+  rfl
+
+/-- **The trace commutes with complex scalars**: `Tr (c f) = c Tr f` for every `f ∈ L_p(V)`, since
+every term of the trace series does and `∑' j, c x_j = c ∑' j, x_j` (Mathlib's
+`tsum_const_smul''`). With `Rd.LipschitzGraph.trace_sub` the trace is linear on the functions of
+finite intrinsic norm. -/
+theorem trace_smul (hp : p ≠ ∞) (L : ℕ) (c : ℂ) (f : Lp ℂ p (volume : Measure V)) :
+    Ω.trace hp L (c • f) = c • Ω.trace hp L f := by
+  simp only [trace, traceSeries, map_smul]
+  simp_rw [Ω.traceTerm_smul]
+  exact tsum_const_smul'' c
 
 /-- **The trace in `L_p(H)` is bounded by the `B^{1/p}_{p,1}`-norm**:
 `‖Tr f‖_{L_p(H)} ≤ K (‖f‖_p + ∑_k 2^(k/p) ω_L(f, 2^(-k))_p)`, by the bounds of the terms

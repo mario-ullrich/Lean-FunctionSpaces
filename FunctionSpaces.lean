@@ -181,6 +181,7 @@ public import FunctionSpaces.Rd.LipschitzDomainH1
 public import FunctionSpaces.Rd.RellichCompactness
 public import FunctionSpaces.Rd.SobolevRestrictionSpaces
 public import FunctionSpaces.Rd.SobolevDuality
+public import FunctionSpaces.Rd.BoundaryTraceSpace
 
 /-!
 # Function spaces
@@ -614,4 +615,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}(ℝ^d)` and `H^s(ℝ^d)`, and the
   duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` and `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on
   open sets for real `s`.
+* `FunctionSpaces.Rd.BoundaryTraceSpace`: `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` with explicit
+  constants, the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the
+  trace kernel, the trace space `H^{1/2}(Γ)` of the boundary `Γ` as its orthogonal complement
+  with the trace and extension operators, and its dual `H^{-1/2}(Γ)`.
 -/

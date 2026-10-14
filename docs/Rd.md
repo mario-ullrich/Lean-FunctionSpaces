@@ -107,7 +107,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Moduli of smoothness on subsets of `ℝ^d` | ✅ | ✗ | `Rd/DomainModuli` |
 | Moment kernels: averaged differences, approximation with the modulus, also on subsets | ✅ | ✗ | `Rd/MomentKernels` |
 | Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L` | ✅ | ✗ | `Rd/LocalMeans` |
-| Pointwise multipliers on `ℝ^d`: Leibniz's rule for differences, moduli of lower order | ✅ | ✗ | `Rd/Multipliers` |
+| Pointwise multipliers on `ℝ^d`: the multiplication operator on `L_p`, Leibniz's rule for differences, moduli of lower order | ✅ | ✗ | `Rd/Multipliers` |
 | Dyadic cells of `ℝ^d`: partition, counting of their centres, bounded overlap | ✅ | ✗ | `Rd/DyadicGrid` |
 | Atomic synthesis: bounded overlap, regular atoms on sets, coefficient quasi-norm | ✅ | ✗ | `Rd/AtomSynthesis` |
 | Atomic decomposition by cell atoms, atomic characterisation of Besov spaces | ✅ | ✗ | `Rd/AtomAnalysis` |

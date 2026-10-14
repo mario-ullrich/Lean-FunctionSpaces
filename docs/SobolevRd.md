@@ -13,7 +13,9 @@ bounded Lipschitz domain, `H^1` is the space of restrictions of `H^1(ℝ^d)`, wi
 in `L_2` of the domain and boundary traces in `B^{1/2}_{2,2}` of the boundary. On every bounded
 set the restriction from `H^1(ℝ^d)` to `L_2` is compact (Rellich's theorem). On every open set
 the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)`, for real `s`, are built inside Mathlib's
-`H^s(ℝ^d)`, with the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`. The
+`H^s(ℝ^d)`, with the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`. On a bounded Lipschitz domain the trace
+space `H^{1/2}(Γ)` is the orthogonal complement of the trace kernel in `H^1(Ω)`, a Hilbert space
+with trace and extension operators of norm at most `1`, and `H^{-1/2}(Γ)` is its dual. The
 [interface document](FEECInterface.md) lists these results for a FEEC/BEEC library built on this
 project, with the decisions behind their form.
 
@@ -149,6 +151,32 @@ project, with the decisions behind their form.
   `Rd.dualZeroBoundaryEquiv`). On the way, the Bessel potential `J_t` of a real Schwartz
   function is real (`Rd.conj_besselSchwartz_apply`), from `conj (𝓕 f) = 𝓕⁻(conj f)` on `V`
   (`Rd.conj_fourier_apply`).
+* **The trace space of a bounded Lipschitz domain.** For every `U ∈ H^1(V)` with `L_2` function
+  `ι U` (`Rd.toL2`), `‖ι U‖_2 + ‖(2^k ω_2(ι U, 2^(-k))_2)_k‖_{ℓ_2} ≤ C ‖U‖` with an explicit
+  constant (`Rd.modNorm_two_le_norm`, `Rd.sobolevOneBesovConst`), and the `B^{1/2}_{2,1}`
+  quantity is at most `√2` times this `B^1_{2,2}` quantity (`Rd.modNorm_half_one_le`), so
+  `‖ι U‖_2 + ∑_k 2^(k/2) ω_2(ι U, 2^(-k))_2 ≤ √2 C ‖U‖` (`Rd.modNorm_half_one_le_norm`). Let
+  `Ω` be a bounded Lipschitz domain with boundary `Γ` and `H^1(Ω)` the Hilbert space of the
+  restriction space (`Rd.BoundedLipschitzDomain.SobolevOne`). The chart traces
+  `u ↦ Tr_j(ψ_j u)` are bounded operators from `H^1(Ω)` to `L_2` of the hyperplanes of the charts
+  (`Rd.BoundedLipschitzDomain.chartTrace`), and their common kernel, the trace kernel
+  (`Rd.BoundedLipschitzDomain.traceKer`), consists of the `u` whose boundary trace vanishes
+  almost everywhere on `Γ`, for every resolution of unity
+  (`Rd.BoundedLipschitzDomain.mem_traceKer_iff`). Its orthogonal complement is the trace space
+  `H^{1/2}(Γ)` (`Rd.BoundedLipschitzDomain.TraceSpace`), with the trace, the orthogonal
+  projection, and the extension, the inclusion: `γ E = id`, `‖γ u‖ ≤ ‖u‖`, `‖E t‖ = ‖t‖`, the
+  kernel of `γ` is the trace kernel, and `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)` isometrically
+  (`Rd.BoundedLipschitzDomain.trace_extend`, `Rd.BoundedLipschitzDomain.ker_trace`,
+  `Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`). Two elements of `H^1(Ω)` have the same
+  trace iff their boundary traces agree almost everywhere on `Γ`
+  (`Rd.BoundedLipschitzDomain.trace_eq_iff`), and `t ↦ Tr_Γ(E t)` maps `H^{1/2}(Γ)` onto
+  `B^{1/2}_{2,2}(Γ)` modulo null sets of `Γ`
+  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_extend`,
+  `Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`,
+  `Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`). `H^{-1/2}(Γ)` is the dual
+  of the trace space (`Rd.BoundedLipschitzDomain.DualTraceSpace`), conjugate-linearly isometric
+  to it by Riesz (`Rd.BoundedLipschitzDomain.dualTraceEquiv`), and the adjoint of the trace is the
+  extension (`Rd.BoundedLipschitzDomain.adjoint_trace`).
 
 ## What is formalised
 
@@ -163,6 +191,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The inverse Fourier transform of integrable `L_2` functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, and Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω` | ✅ | ✗ | `Rd/RellichCompactness` |
 | The Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets inside Mathlib's `H^s(ℝ^d)`, `H^s(Ω)` as a quotient, Rellich's theorem for `H^1(Ω)`, the identification with the restriction space of a bounded Lipschitz domain, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)` | ✅ | ✗ | `Rd/SobolevRestrictionSpaces` |
 | The Bessel potential on Schwartz functions, the isometry `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}` and `H^s`, and the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)`, `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on open sets | ✅ | ✗ | `Rd/SobolevDuality` |
+| `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` with explicit constants, the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the trace kernel, the trace space `H^{1/2}(Γ)` with trace and extension operators, `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` | ✅ | ✗ | `Rd/BoundaryTraceSpace` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics
