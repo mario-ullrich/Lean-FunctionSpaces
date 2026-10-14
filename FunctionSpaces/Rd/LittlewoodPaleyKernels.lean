@@ -24,6 +24,9 @@ transforms `𝓕K` and `𝓕⁻K` are continuous and bounded by `‖K‖_1`
 `𝓕K(0) = ∫ K` (`Rd.fourier_apply_zero`), and
 `∫ 𝓕u · K = ∫ u · 𝓕K`, `∫ 𝓕⁻u · K = ∫ u · 𝓕⁻K` for Schwartz functions `u`
 (`Rd.integral_fourier_smul_eq_of_integrable`, `Rd.integral_fourierInv_smul_eq_of_integrable`).
+The character `t ↦ e^(2πit)` is `2π`-Lipschitz (`Rd.norm_fourierChar_sub_le`), so the inverse
+transform of an integrable `g` vanishing outside the ball of radius `K` is Lipschitz with
+constant `2πK ‖g‖_1` (`Rd.norm_fourierInv_sub_le`).
 The kernels of the Littlewood–Paley decomposition are inverse transforms of smooth cut-offs:
 
 * `Rd.cutoff a b`: a smooth function equal to `1` on the closed ball of radius `a` and to `0`
@@ -50,7 +53,7 @@ inversion theorem `Continuous.fourierInv_fourier_eq`):
 @[expose] public section
 
 open MeasureTheory Filter Topology Module
-open scoped ENNReal FourierTransform SchwartzMap
+open scoped ENNReal FourierTransform SchwartzMap Real
 
 namespace Rd
 
@@ -180,6 +183,41 @@ theorem integral_fourierInv_smul_eq_of_integrable (u : 𝓢(V, ℂ)) {g : V → 
   rw [hL] at h
   rw [SchwartzMap.fourierInv_coe]
   exact h
+
+/-- The character `t ↦ e^(2πit)` is `2π`-Lipschitz: `|e^(2πia) - e^(2πib)| ≤ 2π |a - b|`
+(Mathlib's `Real.norm_exp_I_mul_ofReal_sub_one_le`). -/
+theorem norm_fourierChar_sub_le (a b : ℝ) : ‖(𝐞 a : ℂ) - 𝐞 b‖ ≤ 2 * π * |a - b| := by
+  have h : (𝐞 a : ℂ) - 𝐞 b = 𝐞 b * (𝐞 (a - b) - 1) := by
+    rw [mul_sub, mul_one, ← Circle.coe_mul, ← AddChar.map_add_eq_mul, add_sub_cancel]
+  rw [h, norm_mul, Circle.norm_coe, one_mul, Real.fourierChar_apply, mul_comm _ Complex.I]
+  refine Real.norm_exp_I_mul_ofReal_sub_one_le.trans_eq ?_
+  rw [Real.norm_eq_abs, abs_mul, abs_of_pos Real.two_pi_pos]
+
+/-- **Band-limited functions are Lipschitz**: if `g` is integrable and `g(ξ) = 0` for almost
+every `ξ` with `|ξ| > K`, then `|𝓕⁻g(x) - 𝓕⁻g(y)| ≤ 2πK |x - y| ∫ |g|` for all `x, y`, since
+`|e^(2πi⟪ξ, x⟫) - e^(2πi⟪ξ, y⟫)| ≤ 2π |⟪ξ, x - y⟫| ≤ 2πK |x - y|` for `|ξ| ≤ K`. -/
+theorem norm_fourierInv_sub_le {g : V → ℂ} (hg : Integrable g) {K : ℝ}
+    (hgK : ∀ᵐ ξ, K < ‖ξ‖ → g ξ = 0) (x y : V) :
+    ‖𝓕⁻ g x - 𝓕⁻ g y‖ ≤ 2 * π * K * ‖x - y‖ * ∫ ξ, ‖g ξ‖ := by
+  have hi : ∀ w : V, Integrable (fun ξ => 𝐞 (inner ℝ ξ w) • g ξ) := fun w => by
+    simpa using (VectorFourier.fourierIntegral_convergent_iff Real.continuous_fourierChar
+      (show Continuous fun p : V × V => (-innerₗ V) p.1 p.2 from continuous_inner.neg)
+      (μ := volume) w).2 hg
+  rw [Real.fourierInv_eq, Real.fourierInv_eq, ← integral_sub (hi x) (hi y),
+    ← integral_const_mul]
+  refine norm_integral_le_of_norm_le (hg.norm.const_mul _) ?_
+  filter_upwards [hgK] with ξ hξK
+  simp only [Circle.smul_def, smul_eq_mul, ← sub_mul, norm_mul]
+  by_cases hξ : K < ‖ξ‖
+  · simp [hξK hξ]
+  · push Not at hξ
+    have h2 : |inner ℝ ξ x - inner ℝ ξ y| ≤ K * ‖x - y‖ := by
+      rw [← inner_sub_right]
+      exact (abs_real_inner_le_norm _ _).trans (mul_le_mul_of_nonneg_right hξ (norm_nonneg _))
+    gcongr
+    calc _ ≤ 2 * π * |inner ℝ ξ x - inner ℝ ξ y| := norm_fourierChar_sub_le _ _
+      _ ≤ 2 * π * (K * ‖x - y‖) := by gcongr
+      _ = _ := by ring
 
 /-! ### Smooth cut-offs -/
 
