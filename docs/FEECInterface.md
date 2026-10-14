@@ -18,7 +18,8 @@ derivatives, `H^1` on bounded Lipschitz domains with its weak gradient and its t
 Rellich's compactness theorem for the restriction space (items I.6 and H.1 in that form,
 Section 4.5; the weak-derivative form needs H.2, Section 5). Forms, Hilbert complexes, duality,
 negative smoothness, the space types on domains and boundaries, and the surface measure belong
-to the FEEC/BEEC library (Section 6).
+to the FEEC/BEEC library (Section 6); Section 9 records how this division changes: most of
+Section 6 moves into Lean-FunctionSpaces, the forms layer stays with the FEEC/BEEC library.
 
 ## 2. Depending on Lean-FunctionSpaces
 
@@ -299,6 +300,9 @@ and the Sobolev embeddings on `ℝ^d`. They generalise Sections 4.1 and 4.2 from
 
 ## 6. What the FEEC/BEEC library builds
 
+The list below is the division of the first version of this document. Its first five items now
+move into Lean-FunctionSpaces (Section 9); the last item stays with the FEEC/BEEC library.
+
 * Space types on `Ω` and `Γ` with their norms: `H^1(Ω)` as a quotient or a closed subspace of
   `H^{1, 2}(V, ℂ)`, `H^{1/2}(Γ)` as a normed type, restriction, extension and trace as bounded
   operators.
@@ -336,7 +340,7 @@ and the Sobolev embeddings on `ℝ^d`. They generalise Sections 4.1 and 4.2 from
    values directly, and on `Ω` and `Γ` the FEEC/BEEC library works with `Fin m → ℂ`-valued
    functions and componentwise lemmas.
 6. **Space types and surface measure.** Predicates and Mathlib's type on `V` here; the types on
-   `Ω` and `Γ`, and the surface measure, in the FEEC/BEEC library (Section 6).
+   `Ω` and `Γ` and the surface measure follow here as well (Section 9).
 7. **Split and versions.** The split Lean-SNumbers / Lean-FunctionSpaces / FEEC/BEEC library is
    right. Lean-FunctionSpaces pins Lean and Mathlib `v4.35.0-rc2`, Lean-SNumbers moves to the
    same pin, and the FEEC/BEEC library takes it as well; the three move to the stable release
@@ -349,6 +353,40 @@ unless this document says otherwise, and the commit that changes an interface na
 document. Pin `rev` to a commit at or after the one that adds this document. Missing lemmas and
 wishes for other statement shapes go to the issue tracker of the GitHub repository, with the item
 number of the proposal and the intended Lean statement.
+
+## 9. Changes to the original plan (14 October 2026)
+
+The first version of this document (commit `ec3c133`) left items 1–5 of Section 6 to the
+FEEC/BEEC library. Lean-FunctionSpaces now builds them itself, in its current part (Part Ib of
+its development plan); the statements below are in preparation and enter Section 4 with their
+Lean names as they are formalised.
+
+* **Space types.** `H^s(Ω)` for every open `Ω` and every real `s` as a Hilbert space: the
+  orthogonal complement, in Mathlib's `H^{s}(ℝ^d)`, of the elements that vanish on `Ω`, hence
+  isometric to the quotient of CWHM, §3.1.4; `H̃^s(Ω)` as the closure of the test functions of
+  `Ω` in `H^s(ℝ^d)`, `H^s_0(Ω)` as their closure in `H^s(Ω)`; the restriction to `L_2(Ω)` as a
+  bounded injective operator, compact for bounded `Ω` (Rellich in operator form, HPS Assumption
+  F).
+* **H.4 and duality.** `H̃^1(Ω) ≅ H^1_0(Ω)` isometrically for every open `Ω`; for every real `s`
+  the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)` and `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` with the pairing of
+  `H^{-s}(ℝ^d)` and `H^s(ℝ^d)` (CWHM, Theorem 3.3).
+* **The trace space.** `H^{1/2}(Γ)` as the orthogonal complement of the kernel of the trace in
+  `H^1(Ω)`, with the trace as orthogonal projection and the extension as inclusion (both of norm
+  one), `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` as its dual.
+* **The surface measure.** Mathlib's Hausdorff measure `μHE[d-1]` restricted to `Γ`, with no
+  charts in the definition. The area formula for Lipschitz graphs, proved here, expresses its
+  integrals in the charts with the Gram density `√(1 + ‖∇φ‖²)`; `L_2(Γ)` is the `L_2` space of
+  this measure, and the trace is an injective bounded operator `H^{1/2}(Γ) → L_2(Γ)`.
+* **Green's formula** on bounded Lipschitz domains for `H^1` functions, in chart form and with
+  the surface measure and the outward unit normal.
+* **`ker γ = H^1_0(Ω)`** (McLean, Theorem 3.40) and the HPS quotient
+  `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)`.
+* **The extension theorem H.2** for `W^{1,2}` on bounded Lipschitz domains (the restriction space
+  equals the weak-derivative space), by Rychkov's extension operator with local means of the
+  gradient; with it Rellich and the trace statements hold for the weak-derivative space.
+
+The FEEC/BEEC library keeps the forms layer (`L^2Λ^k`, weak `d`, `HΛ^k`, regular
+decompositions, `H^{-1/2}(curl_Γ, Γ)`), Picard's theorem and the s-number track.
 
 ## References
 
