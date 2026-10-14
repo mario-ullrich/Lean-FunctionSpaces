@@ -185,6 +185,7 @@ public import FunctionSpaces.Rd.BoundaryTraceSpace
 public import FunctionSpaces.Rd.LipschitzGraphArea
 public import FunctionSpaces.Rd.SurfaceMeasure
 public import FunctionSpaces.Rd.DilationFamilies
+public import FunctionSpaces.Rd.ConvolutionAdjoint
 
 /-!
 # Function spaces
@@ -634,4 +635,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   bounded seminorms, their Hörmander condition with explicit constants, Calderón–Zygmund
   families and their adjoints, and the Littlewood–Paley blocks and synthesis kernels as such
   families.
+* `FunctionSpaces.Rd.ConvolutionAdjoint`: the adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for
+  `f ∈ L_p`, `g ∈ L_q` and the reflection `K^∨(x) = K(-x)`, derivatives of Schwartz kernels
+  moved to the other Schwartz factor, and weak derivatives commuting with convolution by Schwartz
+  functions.
 -/

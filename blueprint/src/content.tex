@@ -12114,6 +12114,8 @@ measure $\mathcal H^{n-1}$ on the boundary of a bounded Lipschitz domain, $L_2(\
 traces into it.
 \Cref{sec:dilation-families} starts the theory for $1 < p < \infty$: families of dilated
 Schwartz kernels, their Fourier overlap and their H\"ormander condition.
+\Cref{sec:convolution-adjoint} moves convolution kernels and their derivatives to the other side
+of an integral and shows that weak derivatives commute with convolution by Schwartz functions.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -15837,6 +15839,166 @@ With $a$ the least index such that $\|\xi\| < 2^{a+1}$, at most the four kernels
 $a - 1 \leq j \leq a + 2$ are nonzero at $\xi$, each of modulus at most $1$
 (\Cref{lem:psi-dual-frequency}). \Cref{thm:cz-family-dilation} and \Cref{lem:psi-dual-basic}
 give the rest.
+\end{proof}
+
+\section{The adjoint of a convolution}
+\label{sec:convolution-adjoint}
+
+The $L_2$ bound of the synthesis operator and the strong type for $2 < p < \infty$ are proved
+by duality, through convolution with reflected kernels, and the weak derivatives of
+$\Sob{m}{p}(V)$ meet the Littlewood--Paley blocks through convolutions with Schwartz kernels.
+This section moves a convolution kernel to the other side of an integral, moves derivatives
+from a Schwartz kernel to the other Schwartz factor, and shows that weak derivatives commute
+with convolution by Schwartz functions. Throughout, $K * f$ is the convolution of
+\Cref{def:conv}, and for $v \in V^k$, $\partial^v$ is the iterated directional derivative of
+\Cref{sec:schwartz-cutoff}.
+
+\begin{definition}[Reflection]
+\label{def:reflect}
+\lean{Rd.reflect, Rd.reflect_apply}
+\leanok
+For every function $K : V \to \C$, the reflection of $K$ is $K^\vee(x) = K(-x)$.
+\end{definition}
+
+\begin{lemma}[Reflections and convolution integrals]
+\label{lem:reflect-basic}
+\lean{Rd.reflect_reflect, Rd.integrable_reflect, Rd.continuous_reflect, Rd.fourier_reflect,
+  Rd.conv_apply_eq_integral_sub, Rd.conv_reflect_apply}
+\leanok
+\uses{def:reflect, def:conv}
+For every function $K : V \to \C$, $(K^\vee)^\vee = K$, $K^\vee$ is integrable if $K$ is,
+$K^\vee$ is continuous if $K$ is, and $\widehat{K^\vee}(\xi) = \widehat K(-\xi)$ for every
+$\xi \in V$. For all functions $K, u : V \to \C$ and all $x, y \in V$,
+\[
+  (K * u)(x) = \int_V K(x - z) \, u(z) \, dz , \qquad
+  (K^\vee * u)(y) = \int_V K(z - y) \, u(z) \, dz .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Lebesgue measure is invariant under $x \mapsto -x$. The Fourier transform of $K^\vee$ is the
+substitution $x \mapsto -x$ in the defining integral (Mathlib's
+\texttt{Real.\allowbreak fourierInv\_eq\_fourier\_comp\_neg}). The first convolution formula is
+the substitution $z \mapsto x - z$ (Mathlib's
+\texttt{MeasureTheory.\allowbreak convolution\_mul\_swap}), and the second is the first for
+$K^\vee$.
+\end{proof}
+
+\begin{theorem}[The adjoint identity]
+\label{thm:convolution-adjoint}
+\lean{Rd.integrable_kernel_mul_mul, Rd.integral_conv_mul}
+\leanok
+\uses{lem:reflect-basic, thm:young}
+For all $1 \leq p < \infty$ and $1 < q \leq \infty$ with $1/p + 1/q = 1$, every $K \in L_1(V)$,
+every $f \in L_p(V)$ and every $g \in L_q(V)$, the function
+$(x, y) \mapsto K(x - y) f(y) g(x)$ is integrable on $V \times V$, and
+\[
+  \int_V (K * f)(x) \, g(x) \, dx = \int_V f(y) \, (K^\vee * g)(y) \, dy .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+For almost every $x$ the integral of $y \mapsto K(x - y) f(y)$ converges absolutely
+(\Cref{thm:young}). By \Cref{lem:reflect-basic},
+$\int_V |K(x - y)| \, |f(y)| \, dy = (|K| * |f|)(x)$ for every $x$, and $|K| * |f| \in L_p$ by
+Young's inequality, so $x \mapsto (|K| * |f|)(x) \, |g(x)|$ is integrable by H\"older's
+inequality. Together the two give the integrability on $V \times V$. Integrating first in $y$
+gives the left side by \Cref{lem:reflect-basic}, integrating first in $x$ gives the right side,
+and Fubini's theorem exchanges the integrations.
+\end{proof}
+
+\begin{lemma}[Translates and reflections of Schwartz functions]
+\label{lem:schwartz-shift-reflect}
+\lean{SchwartzMap.lineDerivOp_compSubConstCLM, SchwartzMap.iteratedLineDerivOp_compSubConstCLM,
+  Rd.lineDerivOp_schwartzReflect, Rd.iteratedLineDerivOp_schwartzReflect, Rd.shiftReflect,
+  Rd.shiftReflect_apply, Rd.conv_eq_integral_shiftReflect, Rd.iteratedLineDerivOp_shiftReflect}
+\leanok
+\uses{def:schwartz-dilate, lem:reflect-basic}
+For every Schwartz function $\eta$, all $x, y \in V$ and every $w \in V^k$, the functions
+$z \mapsto \eta(z - y)$ and $z \mapsto \eta(x - z)$ are Schwartz functions,
+\begin{gather*}
+  \partial^w \bigl(\eta(\cdot - y)\bigr) = (\partial^w \eta)(\cdot - y), \qquad
+  \partial^w \bigl(\eta(-\,\cdot)\bigr) = (-1)^k (\partial^w \eta)(-\,\cdot), \\
+  \partial^w \bigl(\eta(x - \cdot)\bigr) = (-1)^k (\partial^w \eta)(x - \cdot),
+\end{gather*}
+and for every function $f : V \to \C$, $(\eta * f)(x)$ is the integral of $f$ against the
+Schwartz function $\eta(x - \cdot)$:
+$(\eta * f)(x) = \int_V \eta(x - z) \, f(z) \, dz$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The derivative of $z \mapsto \eta(z - y)$ at $z$ is $D\eta(z - y)$, and the directional
+derivative of $\eta(-\,\cdot)$ in direction $v$ is $-(\partial_v \eta)(-\,\cdot)$ (Mathlib's
+\texttt{SchwartzMap.\allowbreak lineDerivOp\_compCLMOfContinuousLinearEquiv}); induction on $k$
+gives the iterated forms, and the third identity combines the first two. The convolution formula
+is \Cref{lem:reflect-basic}.
+\end{proof}
+
+\begin{lemma}[Derivatives move from the kernel to the Schwartz factor]
+\label{lem:conv-derivative-transfer}
+\lean{Rd.conv_reflect_lineDerivOp, Rd.integral_conv_lineDerivOp_mul,
+  Rd.integral_conv_iteratedLineDerivOp_mul}
+\leanok
+\uses{thm:convolution-adjoint, lem:schwartz-shift-reflect, lem:directional-derivatives-commute}
+For all Schwartz functions $\eta$, $u$ and all $v, y \in V$,
+$((\partial_v \eta)^\vee * u)(y) = -(\eta^\vee * \partial_v u)(y)$. For every
+$1 \leq p < \infty$, every $f \in L_p(V)$, all Schwartz functions $\eta$, $u$ and every
+$w \in V^k$,
+\[
+  \int_V \bigl((\partial^w \eta) * f\bigr)(x) \, u(x) \, dx
+  = (-1)^k \int_V (\eta * f)(x) \, \partial^w u(x) \, dx .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:reflect-basic},
+$((\partial_v \eta)^\vee * u)(y) = \int_V \partial_v \eta(z - y) \, u(z) \, dz$, and
+integration by parts for Schwartz functions (Mathlib's
+\texttt{SchwartzMap.\allowbreak integral\_mul\_lineDerivOp\_right\_eq\_neg\_left}), applied to
+$\eta(\cdot - y)$ and $u$, gives the first identity by \Cref{lem:schwartz-shift-reflect}. For
+$k = 1$, apply \Cref{thm:convolution-adjoint} with the conjugate exponent $q$ of $p$ to both
+sides; Schwartz functions lie in every $L_q$, and the two reflected convolutions differ by the
+sign. Induction on $k$ gives the general case, with
+$\partial_a \partial^w u = \partial^w \partial_a u$
+(\Cref{lem:directional-derivatives-commute}).
+\end{proof}
+
+\begin{theorem}[Weak derivatives commute with convolution]
+\label{thm:weak-derivative-convolution}
+\lean{Rd.conv_eq_conv_iteratedLineDerivOp, Rd.conv_eq_conv_iteratedLineDerivOp_of_memLp,
+  Rd.hasWeakLineDeriv_conv, Rd.hasWeakLineDeriv_toLp_conv}
+\leanok
+\uses{thm:weak-derivative-tempered, lem:distribution-transpose, lem:schwartz-shift-reflect,
+  lem:conv-derivative-transfer, lem:weak-derivative-integral, lem:weak-derivative-basic,
+  def:test-schwartz, thm:young}
+For all $1 \leq p, r \leq \infty$, every $f \in L_p(V)$, every $g \in L_r(V)$ and every
+$v \in V^k$ such that $g$ is the weak derivative $\partial^v f$ on $V$, every Schwartz
+function $\eta$ and every $x \in V$,
+\[
+  (\eta * g)(x) = \bigl((\partial^v \eta) * f\bigr)(x) .
+\]
+For every $1 \leq p < \infty$, every $f \in L_p(V)$, every Schwartz function $\eta$ and every
+$v \in V^k$, $(\partial^v \eta) * f$ is the weak derivative $\partial^v (\eta * f)$ on $V$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $S_f$ and $S_g$ be the tempered distributions of $f$ and $g$, and for every Schwartz
+function $\zeta$ let $\rho_x \zeta = \zeta(x - \cdot)$ be its reflected translate.
+By \Cref{lem:schwartz-shift-reflect}, $(\eta * g)(x) = S_g(\rho_x \eta)$, which is
+$\partial^v S_f(\rho_x \eta) = S_f\bigl((-1)^k \partial^v \rho_x \eta\bigr)$ by
+\Cref{thm:weak-derivative-tempered} and \Cref{lem:distribution-transpose}. Again by
+\Cref{lem:schwartz-shift-reflect}, $(-1)^k \partial^v \rho_x \eta = \rho_x(\partial^v \eta)$,
+and $S_f\bigl(\rho_x(\partial^v \eta)\bigr) = ((\partial^v \eta) * f)(x)$.
+
+For the second statement, $\eta * f$ and $(\partial^v \eta) * f$ lie in $L_p$ by
+\Cref{thm:young}, so they are locally integrable. For every test function $\varphi$ on $V$,
+\Cref{lem:conv-derivative-transfer} with the Schwartz function $u = \varphi$
+(\Cref{def:test-schwartz}) is the identity of \Cref{lem:weak-derivative-integral}.
 \end{proof}
 
 \chapter{Besov spaces on compact manifolds}

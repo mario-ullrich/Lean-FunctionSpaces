@@ -21,7 +21,8 @@ boundary in the chart, with the Gram density `√(1 + ‖∇φ‖²)`. On a boun
 surface measure is this Hausdorff measure on the boundary `Γ`; it gives the space `L_2(Γ)`, into
 which `H^1(Ω)` and `H^{1/2}(Γ)` have bounded trace operators. The outward unit normal field is
 pasted from the chart normals. The theory for `1 < p < ∞` starts with families of dilated
-Schwartz kernels, their Fourier overlap and their Hörmander condition. The
+Schwartz kernels, their Fourier overlap and their Hörmander condition, and with the adjoint of a
+convolution, which moves kernels and their derivatives to the other side of an integral. The
 [interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
 built on this project, with the decisions behind their form.
 
@@ -244,6 +245,15 @@ built on this project, with the decisions behind their form.
   do the synthesis kernels `ψ̃_0 = Φ_1`, `ψ̃_1 = Φ_2`, `ψ̃_j = Φ_{j+1} - Φ_{j-2}` with overlap `4`
   (`Rd.psiDual`, `Rd.isCZFamily_psiDual`), which reproduce the blocks: `ψ̃_j ⋆ ψ_j = ψ_j`
   (`Rd.conv_psiDual_psi`).
+* **The adjoint of a convolution.** For `K ∈ L_1(V)`, `f ∈ L_p(V)` and `g ∈ L_q(V)` with
+  `1/p + 1/q = 1`, `p < ∞`, and the reflection `K^∨(x) = K(-x)` (`Rd.reflect`),
+  `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` (`Rd.integral_conv_mul`). For Schwartz functions `η`, `u`,
+  `f ∈ L_p(V)`, `1 ≤ p < ∞`, and `w ∈ V^k`, `∫ ((∂^w η) ⋆ f) u = (-1)^k ∫ (η ⋆ f) ∂^w u`
+  (`Rd.integral_conv_iteratedLineDerivOp_mul`). Weak derivatives commute with convolution by a
+  Schwartz function `η`: if `g ∈ L_r(V)` is the weak derivative `∂^v f` of `f ∈ L_p(V)` on `V`,
+  `1 ≤ p, r ≤ ∞`, then `η ⋆ g = (∂^v η) ⋆ f` at every point
+  (`Rd.conv_eq_conv_iteratedLineDerivOp`), and `(∂^v η) ⋆ f` is the weak derivative
+  `∂^v (η ⋆ f)` for `f ∈ L_p(V)`, `1 ≤ p < ∞` (`Rd.hasWeakLineDeriv_conv`).
 
 ## What is formalised
 
@@ -262,6 +272,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The area formula for Lipschitz graphs: Lipschitz maps and Mathlib's Euclidean Hausdorff measure, the linear case by Mathlib's norm determinant, stretches and tilts, the gradient and the Gram density, good pieces, `μHE[n-1](γ(A)) = ∫_A √(1 + ‖∇φ‖²)` with `n = dim V` in set, measure and integral form; the outward unit normal | ✅ | ✗ | `Rd/LipschitzGraphArea` |
 | The surface measure of a bounded Lipschitz domain as `μHE[n-1]` on the boundary, its chart form, finiteness and null sets, the boundary `Γ` as a Lebesgue null set, the boundary trace in `L_p(Γ)`, `L_2(Γ)` with the traces of `H^1(Ω)` and `H^{1/2}(Γ)`, and the outward unit normal field | ✅ | ✗ | `Rd/SurfaceMeasure` |
 | Dilation, reflection and conjugation of Schwartz functions, uniform Schwartz families, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families and their adjoints, the Littlewood–Paley blocks and the synthesis kernels as such families | ✅ | ✗ | `Rd/DilationFamilies` |
+| The adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for `f ∈ L_p`, `g ∈ L_q`, derivatives of Schwartz kernels moved to the other Schwartz factor, translates and reflections of Schwartz functions, and weak derivatives commuting with convolution by Schwartz functions | ✅ | ✗ | `Rd/ConvolutionAdjoint` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics
