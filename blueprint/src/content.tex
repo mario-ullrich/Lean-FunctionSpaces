@@ -9972,12 +9972,14 @@ a distance greater than $n 2^{-k}$ from each maximal big cube $Q_{k,m}$.
 \begin{theorem}[Calder\'on--Zygmund decomposition]
 \label{thm:calderon-zygmund}
 \lean{Rd.exists_maximal_of_big, Rd.czMaximal_disjoint_of_le, Rd.czMaximal_pairwiseDisjoint,
-  Rd.cz_avg_gt, Rd.cz_avg_le, Rd.cz_volume_zcell_le, Rd.cz_volume_le, Rd.cz_ae_le_of_notMem}
+  Rd.subsingleton_czMaximal_mem_zcell, Rd.cz_avg_gt, Rd.cz_avg_le, Rd.cz_volume_zcell_le,
+  Rd.cz_volume_le, Rd.cz_ae_le_of_notMem}
 \leanok
 \uses{def:dyadic-cubes, lem:dyadic-cubes, lem:dyadic-cubes-nested, def:calderon-zygmund-cubes,
   lem:coarse-cubes-not-big, thm:lebesgue-differentiation-cubes}
 For every $G : V \to [0, \infty]$ and every $t \in [0, \infty]$, with $0^{-1} = \infty$, the
-maximal big cubes of $G$ at height $t$ are pairwise disjoint, every maximal big cube $Q$ satisfies
+maximal big cubes of $G$ at height $t$ are pairwise disjoint, every point of $V$ lies in at most
+one of them, every maximal big cube $Q$ satisfies
 \[
   t < G_Q \leq 2^n t, \qquad |Q| \leq t^{-1} \int_Q G,
 \]
@@ -10081,9 +10083,9 @@ is almost everywhere measurable if $h$ is.
 
 \begin{lemma}[Properties of the averages]
 \label{lem:calderon-zygmund-averages}
-\lean{Rd.czAverage_eq_of_mem, Rd.czAverage_eq_zero_of_notMem, Rd.lintegral_czAverage,
-  Rd.czAverage_self_le, Rd.maximal_indicator_czSet_le, Rd.volume_closedBall_zcellCenter,
-  Rd.volume_czEnlarged_le}
+\lean{Rd.czAverage_eq_of_mem, Rd.czAverage_eq_zero_of_notMem, Rd.tsum_setLIntegral_czMaximal,
+  Rd.tsum_le_mul_lintegral_of_le_setLIntegral, Rd.lintegral_czAverage, Rd.czAverage_self_le,
+  Rd.maximal_indicator_czSet_le, Rd.volume_closedBall_zcellCenter, Rd.volume_czEnlarged_le}
 \leanok
 \uses{def:calderon-zygmund-good-part, thm:calderon-zygmund, lem:maximal-off-enlarged,
   lem:dyadic-cubes}
@@ -10091,6 +10093,9 @@ For every $G : V \to [0, \infty]$, every $t \in [0, \infty]$ and every $h : V \t
 with $0^{-1} = \infty$:
 \begin{enumerate}
   \item $A h = h_Q$ on every maximal big cube $Q$, and $A h = 0$ outside $\Omega$;
+  \item $\sum_Q \int_Q h = \int_\Omega h$, the sum over the maximal big cubes, and every family of
+    numbers $a_Q \in [0, \infty]$ with $a_Q \leq c \int_Q h$ for all maximal big cubes $Q$ and
+    some $c \in [0, \infty]$ satisfies $\sum_Q a_Q \leq c \int h$;
   \item $\int A h = \int_\Omega h$, and $A G \leq 2^n t$;
   \item $M(\mathbf 1_\Omega h)(x) \leq 3^n M(A h)(x)$ for every $x \notin \Omega^*$;
   \item $|\Omega^*| \leq (2n)^n \, |B(0, 1)| \, t^{-1} \int G$.
@@ -10100,9 +10105,10 @@ with $0^{-1} = \infty$:
 \begin{proof}
 \leanok
 The maximal big cubes are disjoint, so at a point of $\Omega$ only one term of $A h$ survives,
-and $\int A h = \sum_Q h_Q |Q| = \sum_Q \int_Q h = \int_\Omega h$. The bound $G_Q \leq 2^n t$ is
+$\sum_Q \int_Q h = \int_\Omega h$, and then $\sum_Q a_Q \leq c \int_\Omega h \leq c \int h$ and
+$\int A h = \sum_Q h_Q |Q| = \sum_Q \int_Q h = \int_\Omega h$. The bound $G_Q \leq 2^n t$ is
 \Cref{thm:calderon-zygmund}. Every maximal big cube $Q_{k,m}$ lies in
-$\bar B(c_{k,m}, n 2^{-k})$ by \Cref{lem:dyadic-cubes}, so (3) is
+$\bar B(c_{k,m}, n 2^{-k})$ by \Cref{lem:dyadic-cubes}, so (4) is
 \Cref{lem:maximal-off-enlarged}. Finally
 $|\bar B(c_{k,m}, 2 n 2^{-k})| = (2n)^n |B(0,1)| \, |Q_{k,m}|$, and the sum over the disjoint
 maximal big cubes is $(2n)^n |B(0,1)| \, |\Omega| \leq (2n)^n |B(0,1)| \, t^{-1} \int G$.
@@ -10131,13 +10137,17 @@ a series.
 
 \begin{lemma}[The good parts]
 \label{lem:calderon-zygmund-good-parts}
-\lean{Rd.lqNorm_czGood_le, Rd.ae_lqNorm_czGood_le, Rd.lintegral_lqNorm_czGood_le,
-  Rd.maximal_le_maximal_czGood, Rd.lintegral_lqNorm_czGood_rpow_le}
+\lean{Rd.lintegral_czGood, Rd.ae_czGood_self_le, Rd.lqNorm_czGood_le, Rd.ae_lqNorm_czGood_le,
+  Rd.lintegral_lqNorm_czGood_le, Rd.maximal_le_maximal_czGood,
+  MeasureTheory.lintegral_rpow_le_mul_lintegral_of_ae_le, Rd.lintegral_lqNorm_czGood_rpow_le}
 \leanok
 \uses{def:calderon-zygmund-good-part, lem:calderon-zygmund-averages, lem:lq-norm-means,
   thm:calderon-zygmund, lem:maximal-function-basic, lem:lp-norm-nonnegative}
 Let $1 \leq q \leq \infty$ and let $\mathcal G$ be the good part for the decomposition of some
-$G' : V \to [0, \infty]$ at a height $t$. For every family of almost everywhere measurable
+$G' : V \to [0, \infty]$ at a height $t$. Every $h : V \to [0, \infty]$ satisfies
+$\int \mathcal G h = \int h$. If $n \geq 1$, $G'$ is almost everywhere measurable,
+$\int G' < \infty$ and $t > 0$, then $\mathcal G G'(x) \leq 2^n t$ for almost every $x \in V$.
+For every family of almost everywhere measurable
 $g_j : V \to [0, \infty]$, $j \in \N$, every $x \in V$ satisfies
 \[
   \|(\mathcal G g_j(x))_j\|_{\ell_q} \leq \mathbf 1_{V \setminus \Omega}(x) \, G(x) + A G(x),
@@ -10153,20 +10163,27 @@ for almost every $x$, and for $1 < q < \infty$
 \[
   \int \|(\mathcal G g_j(x))_j\|_{\ell_q}^q \, dx \leq (2^n t)^{q-1} \int G .
 \]
+For every measure space $(X, \mu)$, every $r \geq 1$, every $c \in [0, \infty]$ and every
+almost everywhere measurable $u : X \to [0, \infty]$ with $u \leq c$ almost everywhere,
+$\int u^r \, d\mu \leq c^{r-1} \int u \, d\mu$.
 \end{lemma}
 
 \begin{proof}
 \leanok
+By \Cref{lem:calderon-zygmund-averages},
+$\int \mathcal G h = \int_{V \setminus \Omega} h + \int A h = \int_{V \setminus \Omega} h
++ \int_\Omega h = \int h$. Outside $\Omega$, $\mathcal G G' = G' \leq t$ almost everywhere by
+\Cref{thm:calderon-zygmund}; on a maximal big cube $Q$, $\mathcal G G' = G'_Q \leq 2^n t$.
 Off $\Omega$ the good parts are the functions $g_j$ themselves. On a maximal big cube $Q$ they
 are the means $(g_j)_Q$, and \Cref{lem:lq-norm-means} gives
-$\|((g_j)_Q)_j\|_{\ell_q} \leq G_Q = A G$. Integrating, by
-\Cref{lem:calderon-zygmund-averages}, $\int (\mathbf 1_{V \setminus \Omega} G + A G)
-= \int_{V \setminus \Omega} G + \int_\Omega G = \int G$. For $x \notin \Omega^*$,
+$\|((g_j)_Q)_j\|_{\ell_q} \leq G_Q = A G$, so the left side is at most $\mathcal G G$, whose
+integral is $\int G$. For $x \notin \Omega^*$,
 $h = \mathbf 1_{V \setminus \Omega} h + \mathbf 1_\Omega h$, the first part is at most
 $\mathcal G h$, and $M(\mathbf 1_\Omega h)(x) \leq 3^n M(A h)(x) \leq 3^n M(\mathcal G h)(x)$.
-For $G' = G$, almost every $x \notin \Omega$ has $G(x) \leq t$, and $A G \leq 2^n t$, by
-\Cref{thm:calderon-zygmund}; then
-$\|\cdot\|_{\ell_q}^q \leq (2^n t)^{q-1} \|\cdot\|_{\ell_q}$ almost everywhere.
+For $G' = G$ the pointwise bound gives $\|(\mathcal G g_j(x))_j\|_{\ell_q} \leq \mathcal G G(x)
+\leq 2^n t$ for almost every $x$. Finally $u^r = u \, u^{r-1} \leq c^{r-1} u$ almost everywhere,
+which with $u = \|(\mathcal G g_j)_j\|_{\ell_q}$, $r = q$ and $c = 2^n t$ gives the bound of the
+$q$-th power.
 \end{proof}
 
 \begin{lemma}[The case $q = p$ in integral form]
@@ -12117,7 +12134,9 @@ Schwartz kernels, their Fourier overlap and their H\"ormander condition.
 \Cref{sec:convolution-adjoint} moves convolution kernels and their derivatives to the other side
 of an integral and shows that weak derivatives commute with convolution by Schwartz functions.
 \Cref{sec:plancherel-bounds} bounds the analysis and synthesis operators of a family of
-integrable kernels on $L_2(V)$ by its Fourier overlap.
+integrable kernels on $L_2(V)$ by its Fourier overlap. \Cref{sec:calderon-zygmund-signed}
+splits a function with values in a normed space, or a family of such functions, into a bounded
+good part and bad pieces with mean zero on dyadic cubes.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -16154,6 +16173,249 @@ for all $g_j \in L_2(V)$ and every finite set $s \subseteq \N$.
 The kernels of a Calder\'on--Zygmund family are integrable, and the overlap bound holds at
 every $\xi$ (\Cref{def:cz-family}); apply \Cref{thm:l2-analysis-bound} and
 \Cref{thm:l2-synthesis-bound}.
+\end{proof}
+
+\section{The signed Calder\'on--Zygmund decomposition}
+\label{sec:calderon-zygmund-signed}
+
+The Calder\'on--Zygmund decomposition of \Cref{thm:calderon-zygmund} selects the maximal big
+cubes of a function $G : V \to [0, \infty]$ at a height $t$. This section splits a function
+$f : V \to E$ with values in a real normed space $E$, such as $\C$, along these cubes into a
+good part, which is $f$ outside the exceptional set $\Omega$ and the mean of $f$ on each maximal
+big cube, and a bad part, which is a sum of pieces with mean zero, one on each cube. For
+$G = \|f\|$ the good part is bounded by $2^n t$; for a family $(g_j)_j$ the cubes of
+$G = \|(\|g_j\|)_j\|_{\ell_q}$ serve every $g_j$. The definitions and the bounds on the bad
+pieces hold for the cubes of every $G$. The bounds on the good part follow from a comparison
+with the nonnegative good part of \Cref{def:calderon-zygmund-good-part}, and those on the bad
+pieces from the bound of the norm of a mean in \Cref{lem:norm-mean-square-bound}. As there,
+$V$ has dimension $n$, and for a dyadic cube $Q$ and $f : V \to E$ the mean is
+$f_Q = |Q|^{-1} \int_Q f$, the Bochner integral, which is $0$ when $f$ is not integrable on $Q$.
+The Carleson project
+(\url{https://github.com/fpvandoorn/carleson}) has a scalar Calder\'on--Zygmund decomposition
+on doubling metric measure spaces.
+
+\begin{lemma}[Means of vector-valued functions]
+\label{lem:norm-mean-square-bound}
+\lean{MeasureTheory.enorm_average_le, MeasureTheory.measure_mul_enorm_setAverage_le,
+  MeasureTheory.setLIntegral_enorm_sub_setAverage_le,
+  MeasureTheory.measure_mul_lqNorm_setAverage_le,
+  MeasureTheory.setLIntegral_lqNorm_sub_setAverage_le,
+  MeasureTheory.lintegral_sq_le_mul_lintegral_of_ae_le}
+\leanok
+\uses{lem:lq-norm-means, lem:lq-basic, lem:calderon-zygmund-good-parts}
+For every measure space $(X, \mu)$, every real normed space $E$ and every $f : X \to E$,
+\[
+  \Bigl\| \frac{1}{\mu(X)} \int f \, d\mu \Bigr\| \leq \frac{1}{\mu(X)} \int \|f\| \, d\mu
+\]
+in $[0, \infty]$. For every set $s \subseteq X$ with $\mu(s) < \infty$ and the mean
+$f_s = \mu(s)^{-1} \int_s f \, d\mu$,
+\[
+  \mu(s) \, \|f_s\| \leq \int_s \|f\| \, d\mu ,
+  \qquad
+  \int_s \|f - f_s\| \, d\mu \leq 2 \int_s \|f\| \, d\mu .
+\]
+For every $1 \leq q \leq \infty$, every such $s$ and every countable family of functions
+$g_i : X \to E$, $i \in I$, that are almost everywhere strongly measurable on $s$,
+\[
+  \mu(s) \, \|(\|(g_i)_s\|)_i\|_{\ell_q} \leq \int_s \|(\|g_i\|)_i\|_{\ell_q} \, d\mu
+\]
+and
+\[
+  \int_s \|(\|g_i - (g_i)_s\|)_i\|_{\ell_q} \, d\mu \leq 2 \int_s \|(\|g_i\|)_i\|_{\ell_q} \, d\mu .
+\]
+For every almost everywhere measurable $u : X \to [0, \infty]$ and every
+$c \in [0, \infty]$ with $u \leq c$ almost everywhere, $\int u^2 \, d\mu \leq c \int u \, d\mu$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both means are integrals for the measure $\mu(X)^{-1} \mu$, and the norm of a Bochner integral
+is at most the integral of the norm. On $s$ this gives
+$\mu(s) \, \|f_s\| \leq \mu(s) \, \|f\|_s = \int_s \|f\|$, and with
+$\|f - f_s\| \leq \|f\| + \|f_s\|$ also
+$\int_s \|f - f_s\| \leq \int_s \|f\| + \mu(s) \, \|f_s\| \leq 2 \int_s \|f\|$. For the family,
+$\|(\|(g_i)_s\|)_i\|_{\ell_q} \leq \|(\|g_i\|_s)_i\|_{\ell_q} \leq \|(\|g_i\|)_i\|_{\ell_q, s}$ by
+\Cref{lem:lq-norm-means}, and Minkowski's inequality in $\ell_q$ (\Cref{lem:lq-basic}) replaces
+the triangle inequality. The last statement is the case $r = 2$ of
+\Cref{lem:calderon-zygmund-good-parts}.
+\end{proof}
+
+\begin{definition}[Signed averages, good parts and bad pieces]
+\label{def:calderon-zygmund-signed}
+\lean{Rd.czAverageC, Rd.hasSum_czAverageC,
+  Rd.stronglyMeasurable_czAverageC, Rd.czGoodC, Rd.aestronglyMeasurable_czGoodC, Rd.czBadC,
+  Rd.czBadPart}
+\leanok
+\uses{def:calderon-zygmund-cubes, def:calderon-zygmund-good-part, thm:calderon-zygmund}
+Let $E$ be a real normed space, $G : V \to [0, \infty]$, $t \in [0, \infty]$, and let $\Omega$
+be the exceptional set of the maximal big cubes of $G$ at height $t$. For $f : V \to E$ the
+signed averages, the good part and the bad part of $f$ are
+\[
+  A f = \sum_{Q \text{ maximal big}} f_Q \, \mathbf 1_Q ,
+  \qquad
+  \mathcal G f = \mathbf 1_{V \setminus \Omega} \, f + A f ,
+  \qquad
+  \mathcal B f = f - \mathcal G f ,
+\]
+and the bad piece of $f$ on a dyadic cube $Q$ is $b_Q f = \mathbf 1_Q \, (f - f_Q)$. The
+series converges at every point, the function $A f$ is strongly measurable, and $\mathcal G f$
+is almost everywhere strongly measurable if $f$ is.
+\end{definition}
+
+Every point lies in at most one maximal big cube (\Cref{thm:calderon-zygmund}), so at most one
+term of the series is nonzero. For functions $h : V \to [0, \infty]$ the same formulas are
+$A h$ and $\mathcal G h$ of \Cref{def:calderon-zygmund-good-part}; the signed versions are
+compared with them through the norm.
+
+\begin{lemma}[Signed averages and good parts]
+\label{lem:calderon-zygmund-signed-good}
+\lean{Rd.czAverageC_eq_of_mem, Rd.czAverageC_eq_zero_of_notMem, Rd.enorm_czAverageC_le,
+  Rd.enorm_czGoodC_le, Rd.lintegral_enorm_czGoodC_le, Rd.integrable_czGoodC}
+\leanok
+\uses{def:calderon-zygmund-signed, lem:calderon-zygmund-averages, lem:norm-mean-square-bound,
+  lem:calderon-zygmund-good-parts}
+For every real normed space $E$, every $G : V \to [0, \infty]$, every $t \in [0, \infty]$ and
+every $f : V \to E$:
+\begin{enumerate}
+  \item $A f = f_Q$ on every maximal big cube $Q$, and $A f = 0$ outside $\Omega$;
+  \item $\|A f(x)\| \leq A \|f\|(x)$ and $\|\mathcal G f(x)\| \leq \mathcal G \|f\|(x)$ for
+    every $x \in V$;
+  \item $\int \|\mathcal G f\| \leq \int \|f\|$, and $\mathcal G f$ is integrable if $f$ is.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+At a point of $\Omega$ only one term of $A f$ survives, and outside $\Omega$ none does. On a
+maximal big cube $Q$, $\|f_Q\| \leq \|f\|_Q$ by \Cref{lem:norm-mean-square-bound}, which gives
+the first bound, and the second follows with the triangle inequality. Integrating it,
+$\int \|\mathcal G f\| \leq \int \mathcal G \|f\| = \int \|f\|$ by
+\Cref{lem:calderon-zygmund-good-parts}.
+\end{proof}
+
+\begin{theorem}[Bounds of the signed good part]
+\label{thm:calderon-zygmund-signed-good-bounds}
+\lean{Rd.ae_enorm_czGoodC_le, Rd.lintegral_enorm_czGoodC_sq_le}
+\leanok
+\uses{lem:calderon-zygmund-signed-good, lem:calderon-zygmund-good-parts,
+  lem:norm-mean-square-bound}
+Let $n \geq 1$. For every real normed space $E$, every integrable $f : V \to E$ and every
+$t \in (0, \infty]$, the good part $\mathcal G f$ for the maximal big cubes of $\|f\|$ at
+height $t$ satisfies
+\[
+  \|\mathcal G f(x)\| \leq 2^n t \quad \text{for almost every } x \in V, \qquad
+  \int \|\mathcal G f\|^2 \leq 2^n t \int \|f\| .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:calderon-zygmund-signed-good}, $\|\mathcal G f\| \leq \mathcal G \|f\|$, which is
+at most $2^n t$ almost everywhere by \Cref{lem:calderon-zygmund-good-parts} with
+$G' = \|f\|$. Then \Cref{lem:norm-mean-square-bound} gives
+$\int \|\mathcal G f\|^2 \leq 2^n t \int \|\mathcal G f\| \leq 2^n t \int \|f\|$.
+\end{proof}
+
+\begin{lemma}[The bad part and its pieces]
+\label{lem:calderon-zygmund-bad-pieces}
+\lean{Rd.czBadPart_of_mem, Rd.czBadPart_of_notMem, Rd.czBadC_eq_zero_of_notMem,
+  Rd.czBadC_eq_of_mem, Rd.hasSum_czBadPart, Rd.czBadC_eq_tsum, Rd.integrable_czBadPart,
+  Rd.lintegral_enorm_czBadPart_le, Rd.integrable_czBadC,
+  Rd.lintegral_enorm_czBadC_le}
+\leanok
+\uses{def:calderon-zygmund-signed, lem:calderon-zygmund-signed-good, lem:norm-mean-square-bound,
+  lem:dyadic-cubes}
+For every real normed space $E$, every $G : V \to [0, \infty]$, every $t \in [0, \infty]$ and
+every $f : V \to E$:
+\begin{enumerate}
+  \item $\mathcal B f = 0$ outside $\Omega$, $\mathcal B f = f - f_Q$ on every maximal big
+    cube $Q$, and $\mathcal B f(x) = \sum_Q b_Q f(x)$ for every $x \in V$, the sum over the
+    maximal big cubes, with at most one nonzero term;
+  \item every dyadic cube $Q$ satisfies $\int \|b_Q f\| \leq 2 \int_Q \|f\|$, and $b_Q f$ is
+    integrable if $f$ is integrable on $Q$;
+  \item if $f$ is almost everywhere strongly measurable, then
+    $\int \|\mathcal B f\| \leq 2 \int \|f\|$, and $\mathcal B f$ is integrable if $f$ is.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first part follows from \Cref{lem:calderon-zygmund-signed-good}. Since
+$|Q| < \infty$ (\Cref{lem:dyadic-cubes}), \Cref{lem:norm-mean-square-bound} gives
+$\int \|b_Q f\| = \int_Q \|f - f_Q\| \leq 2 \int_Q \|f\|$. Finally
+$\|\mathcal B f\| \leq \|f\| + \|\mathcal G f\|$, and
+\Cref{lem:calderon-zygmund-signed-good} bounds the integral of the second term.
+\end{proof}
+
+\begin{theorem}[Mean zero and mass of the bad pieces]
+\label{thm:calderon-zygmund-bad-pieces-mean-mass}
+\lean{Rd.integral_czBadPart, Rd.setIntegral_czBadC, Rd.tsum_lintegral_enorm_czBadPart_le}
+\leanok
+\uses{lem:calderon-zygmund-bad-pieces, lem:calderon-zygmund-averages, lem:dyadic-cubes}
+For every real normed space $E$, every $f : V \to E$ and every dyadic cube $Q$,
+\[
+  \int b_Q f = 0 ,
+\]
+and for every $G : V \to [0, \infty]$, every $t \in [0, \infty]$ and every maximal big cube
+$Q$ of $G$ at height $t$, $\int_Q \mathcal B f = 0$. Moreover
+\[
+  \sum_{Q \text{ maximal big}} \int \|b_Q f\| \leq 2 \int \|f\| .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+If $f$ is integrable on $Q$, then $\int_Q (f - f_Q) = \int_Q f - |Q| \, f_Q = 0$ (Mathlib's
+\texttt{setAverage\_\allowbreak sub\_\allowbreak setAverage}); otherwise $f - f_Q$ is not
+integrable on $Q$ either, and both integrals are $0$ by convention, as they are for every
+function when $E$ is not complete. On a maximal big cube,
+$\mathcal B f = f - f_Q$ by \Cref{lem:calderon-zygmund-bad-pieces}. By the same lemma,
+$\int \|b_Q f\| \leq 2 \int_Q \|f\|$ for every maximal big cube $Q$, and
+\Cref{lem:calderon-zygmund-averages} sums these bounds to $2 \int \|f\|$.
+\end{proof}
+
+\begin{theorem}[The decomposition of a family]
+\label{thm:calderon-zygmund-signed-family}
+\lean{Rd.ae_lqNorm_czGoodC_le, Rd.lintegral_lqNorm_czGoodC_le, Rd.lintegral_lqNorm_czGoodC_sq_le,
+  Rd.lintegral_lqNorm_czBadPart_le, Rd.tsum_lintegral_lqNorm_czBadPart_le}
+\leanok
+\uses{lem:calderon-zygmund-signed-good, lem:calderon-zygmund-good-parts,
+  lem:norm-mean-square-bound, lem:calderon-zygmund-averages, lem:dyadic-cubes}
+Let $1 \leq q \leq \infty$, let $E$ be a real normed space, and let $g_j : V \to E$, $j \in \N$,
+be almost everywhere strongly measurable, with $G(x) = \|(\|g_j(x)\|)_j\|_{\ell_q}$. For every
+$G' : V \to [0, \infty]$ and every $t \in [0, \infty]$, with the good parts $\mathcal G g_j$ and
+the maximal big cubes of $G'$ at height $t$,
+\[
+  \int \|(\|\mathcal G g_j(x)\|)_j\|_{\ell_q} \, dx \leq \int G ,
+\]
+every dyadic cube $Q$ satisfies
+\[
+  \int \|(\|b_Q g_j(x)\|)_j\|_{\ell_q} \, dx \leq 2 \int_Q G ,
+\]
+and
+\[
+  \sum_{Q \text{ maximal big}} \int \|(\|b_Q g_j(x)\|)_j\|_{\ell_q} \, dx \leq 2 \int G .
+\]
+If moreover $n \geq 1$, $\int G < \infty$ and $t > 0$, then the good parts for the maximal big
+cubes of $G$ at height $t$ satisfy
+\[
+  \|(\|\mathcal G g_j(x)\|)_j\|_{\ell_q} \leq 2^n t \quad \text{for almost every } x \in V
+\]
+and
+\[
+  \int \|(\|\mathcal G g_j(x)\|)_j\|_{\ell_q}^2 \, dx \leq 2^n t \int G .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:calderon-zygmund-signed-good}, $\|\mathcal G g_j\| \leq \mathcal G \|g_j\|$ for
+every $j$, so the first and the fourth bound are those of
+\Cref{lem:calderon-zygmund-good-parts} for the family $(\|g_j\|)_j$, and the fifth follows by
+\Cref{lem:norm-mean-square-bound}. For the bad pieces,
+$\int \|(\|b_Q g_j\|)_j\|_{\ell_q} = \int_Q \|(\|g_j - (g_j)_Q\|)_j\|_{\ell_q} \leq 2 \int_Q G$
+by \Cref{lem:norm-mean-square-bound}, since $|Q| < \infty$ (\Cref{lem:dyadic-cubes}), and
+\Cref{lem:calderon-zygmund-averages} sums these bounds over the maximal big cubes.
 \end{proof}
 
 \chapter{Besov spaces on compact manifolds}

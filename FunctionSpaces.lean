@@ -187,6 +187,7 @@ public import FunctionSpaces.Rd.SurfaceMeasure
 public import FunctionSpaces.Rd.DilationFamilies
 public import FunctionSpaces.Rd.ConvolutionAdjoint
 public import FunctionSpaces.Rd.PlancherelBounds
+public import FunctionSpaces.Rd.CalderonZygmundSigned
 
 /-!
 # Function spaces
@@ -644,4 +645,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `f ↦ (θ_j ⋆ f)_j` and of the synthesis operators `(g_j)_j ↦ ∑_{j ∈ s} θ_j ⋆ g_j` for finite
   sets `s` by the Fourier overlap `B`, for integrable kernels and for Calderón–Zygmund
   families.
+* `FunctionSpaces.Rd.CalderonZygmundSigned`: the signed Calderón–Zygmund decomposition of
+  functions with values in a normed space and of families: the good part with its bounds
+  `2^n t` and `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, and the bad pieces with mean zero on their cubes and total
+  mass at most `2 ∫ ‖f‖`.
 -/

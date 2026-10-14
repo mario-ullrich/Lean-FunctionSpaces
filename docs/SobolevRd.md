@@ -22,9 +22,10 @@ surface measure is this Hausdorff measure on the boundary `Γ`; it gives the spa
 which `H^1(Ω)` and `H^{1/2}(Γ)` have bounded trace operators. The outward unit normal field is
 pasted from the chart normals. The theory for `1 < p < ∞` starts with families of dilated
 Schwartz kernels with their Fourier overlap and Hörmander condition, the adjoint of a
-convolution, which moves kernels and their derivatives to the other side of an integral, and the
+convolution, which moves kernels and their derivatives to the other side of an integral, the
 `L_2` bounds of the analysis and synthesis operators of every kernel family with bounded Fourier
-overlap. The
+overlap, and the Calderón–Zygmund decomposition of functions with values in a normed space, and
+of families of them, into a bounded good part and bad pieces with mean zero on dyadic cubes. The
 [interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
 built on this project, with the decisions behind their form.
 
@@ -264,6 +265,18 @@ built on this project, with the decisions behind their form.
   `Rd.lintegral_enorm_sum_conv_sq_le`); in particular for every Calderón–Zygmund family with
   overlap `B` (`Rd.IsCZFamily.lintegral_lqNorm_conv_sq_le`,
   `Rd.IsCZFamily.lintegral_enorm_sum_conv_sq_le`).
+* **The signed Calderón–Zygmund decomposition.** Let `E` be a real normed space, such as `ℂ`,
+  and `f : V → E`. For the maximal big dyadic cubes `Q` of a function `G : V → [0, ∞]` at height
+  `t`, the good part `czGoodC f` is `f` outside the cubes and the mean `⨍_Q f` on each cube
+  (`Rd.czGoodC`), and the bad part `f - czGoodC f` (`Rd.czBadC`) is the sum of the pieces
+  `b_Q = 1_Q (f - ⨍_Q f)` (`Rd.czBadPart`, `Rd.hasSum_czBadPart`). Every piece has mean zero
+  (`Rd.integral_czBadPart`), and `∑_Q ∫ ‖b_Q‖ ≤ 2 ∫ ‖f‖`
+  (`Rd.tsum_lintegral_enorm_czBadPart_le`). If `n = dim V ≥ 1`, `f` is integrable, `t > 0` and
+  `G = ‖f‖`, then `‖czGoodC f‖ ≤ 2^n t` almost everywhere and
+  `∫ ‖czGoodC f‖² ≤ 2^n t ∫ ‖f‖` (`Rd.ae_enorm_czGoodC_le`, `Rd.lintegral_enorm_czGoodC_sq_le`).
+  For a family `(g_j)_j` and `1 ≤ q ≤ ∞` the cubes of `G = ‖(‖g_j‖)_j‖_{ℓ_q}` serve every `g_j`,
+  with the same bounds for the pointwise `ℓ_q` norms (`Rd.ae_lqNorm_czGoodC_le`,
+  `Rd.lintegral_lqNorm_czGoodC_sq_le`, `Rd.tsum_lintegral_lqNorm_czBadPart_le`).
 
 ## What is formalised
 
@@ -284,6 +297,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Dilation, reflection and conjugation of Schwartz functions, uniform Schwartz families, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families and their adjoints, the Littlewood–Paley blocks and the synthesis kernels as such families | ✅ | ✗ | `Rd/DilationFamilies` |
 | The adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for `f ∈ L_p`, `g ∈ L_q`, derivatives of Schwartz kernels moved to the other Schwartz factor, translates and reflections of Schwartz functions, and weak derivatives commuting with convolution by Schwartz functions | ✅ | ✗ | `Rd/ConvolutionAdjoint` |
 | The Cauchy–Schwarz inequality for finite sums, the `L_2` bounds of the analysis operator and of the synthesis operators on finite index sets for a kernel family with Fourier overlap `B`, and for every Calderón–Zygmund family | ✅ | ✗ | `Rd/PlancherelBounds` |
+| The signed Calderón–Zygmund decomposition of functions with values in a normed space and of families: good parts bounded by `2^n t` with `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, bad pieces with mean zero on their cubes and total mass at most `2 ∫ ‖f‖` | ✅ | ✗ | `Rd/CalderonZygmundSigned` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

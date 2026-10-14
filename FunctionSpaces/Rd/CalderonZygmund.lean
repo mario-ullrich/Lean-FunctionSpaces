@@ -13,7 +13,8 @@ public import FunctionSpaces.Rd.DyadicCubes
 For `G : V → [0, ∞]` and a height `t ∈ [0, ∞]`, a dyadic cube `Q` is **big** when the average
 `⨍_Q G` exceeds `t` (`Rd.lt_setLAverage_zcell_iff`). The **maximal big cubes** (`Rd.czMaximal`)
 are the big cubes whose strict ancestors are not big. They are pairwise disjoint
-(`Rd.czMaximal_pairwiseDisjoint`), their averages lie in `(t, 2^n t]` (`Rd.cz_avg_gt`,
+(`Rd.czMaximal_pairwiseDisjoint`), so every point lies in at most one of them
+(`Rd.subsingleton_czMaximal_mem_zcell`), their averages lie in `(t, 2^n t]` (`Rd.cz_avg_gt`,
 `Rd.cz_avg_le`), and their union `Ω` (`Rd.czSet`) has measure at most `t⁻¹ ∫ G`
 (`Rd.cz_volume_le`). In dimension `n ≥ 1`, for `∫ G < ∞` and `0 < t`, cubes of large size have
 average at most `t` (`Rd.exists_forall_setLAverage_zcell_sub_le`), so every big cube lies in a
@@ -132,6 +133,12 @@ theorem czMaximal_pairwiseDisjoint :
   rcases le_total k k' with hk | hk
   · exact (czMaximal_disjoint_of_le h h' hk hne).symm
   · exact czMaximal_disjoint_of_le h' h hk hne.symm
+
+/-- Every point lies in **at most one maximal big cube**, since these cubes are disjoint
+(Mathlib's `Set.PairwiseDisjoint.elim_set`). -/
+theorem subsingleton_czMaximal_mem_zcell (x : V) :
+    {km : czMaximal G t | x ∈ zcell (V := V) km.1.1 km.1.2}.Subsingleton :=
+  fun a ha b hb => Subtype.ext (czMaximal_pairwiseDisjoint.elim_set a.2 b.2 x ha hb)
 
 /-- There are countably many maximal big cubes. -/
 theorem czMaximal_countable : (czMaximal G t).Countable :=

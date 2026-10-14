@@ -179,6 +179,13 @@ declarations.
   `M(1_{⋃ Q_i} g)(x) ≤ 3^n M g̃(x)` for countably many sets `Q_i ⊆ B̄(c_i, ρ_i)` of positive
   finite measure and `x` outside every `B̄(c_i, 2ρ_i)`, where `g̃ = ∑_i (⨍_{Q_i} g) 1_{Q_i}`
   (`Rd.maximal_indicator_iUnion_le`).
+* **Norms of means of vector-valued functions** (`FunctionSpaces/Rd/CalderonZygmundSigned.lean`):
+  `‖⨍ f‖ₑ ≤ ⨍⁻ ‖f‖ₑ` for `f` with values in a real normed space
+  (`MeasureTheory.enorm_average_le`), next to Mathlib's `enorm_integral_le_lintegral_enorm`; on
+  a set `s` of finite measure `μ s * ‖⨍_s f‖ₑ ≤ ∫⁻_s ‖f‖ₑ`
+  (`MeasureTheory.measure_mul_enorm_setAverage_le`) and `∫⁻_s ‖f - ⨍_s f‖ₑ ≤ 2 ∫⁻_s ‖f‖ₑ`
+  (`MeasureTheory.setLIntegral_enorm_sub_setAverage_le`), the step behind the mass of the bad
+  pieces of a Calderón–Zygmund decomposition.
 * **Integrals under a change of scale** (`FunctionSpaces/Rd/KernelMajorants.lean`):
   `∫ f(r x) dx = |r^(-n)| ∫ f` for `f : V → [0, ∞]` and `r ≠ 0` (`Rd.lintegral_comp_smul`),
   from Mathlib's `Measure.map_addHaar_smul`; Mathlib has the Bochner version

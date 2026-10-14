@@ -30,8 +30,8 @@ constant `Rd.feffermanSteinConst` (`Rd.feffermanStein`). The cases:
 The weak type rests on the Calderón–Zygmund decomposition of `G = ‖(g_j)_j‖_{ℓ_q}`: off the
 enlarged exceptional set, the maximal function of `1_Ω g` is at most `3^n` times the maximal
 function of the averages of `g` over the maximal big cubes (`Rd.maximal_indicator_iUnion_le`,
-`Rd.maximal_indicator_czSet_le`), and the good parts (`Rd.czGood`) have `ℓ_q` norm at most
-`2^n t`.
+`Rd.maximal_indicator_czSet_le`), and the good parts (`Rd.czGood`) keep the integral
+(`Rd.lintegral_czGood`) and have `ℓ_q` norm at most `2^n t` (`Rd.ae_czGood_self_le`).
 -/
 
 @[expose] public section
@@ -167,6 +167,19 @@ theorem lintegral_indicator_lt_le {p : ℝ} (hp : 1 ≤ p) {s : ℝ≥0∞} (hs0
   · rw [Set.indicator_of_notMem (show x ∉ {y | s < F y} from hx), mul_zero]
     exact zero_le
 
+/-- **Powers of a bounded function**: if `u ≤ c` almost everywhere, then
+`∫ u^r ≤ c^(r-1) ∫ u` for every `r ≥ 1` and every almost everywhere measurable `u : α → [0, ∞]`,
+since `u^r = u · u^(r-1) ≤ u · c^(r-1)`. -/
+theorem lintegral_rpow_le_mul_lintegral_of_ae_le {u : α → ℝ≥0∞} {c : ℝ≥0∞} {r : ℝ} (hr : 1 ≤ r)
+    (hu : AEMeasurable u μ) (h : ∀ᵐ x ∂μ, u x ≤ c) :
+    ∫⁻ x, u x ^ r ∂μ ≤ c ^ (r - 1) * ∫⁻ x, u x ∂μ :=
+  calc ∫⁻ x, u x ^ r ∂μ ≤ ∫⁻ x, u x * c ^ (r - 1) ∂μ :=
+        lintegral_mono_ae (h.mono fun x hx => by
+          rw [ENNReal.rpow_eq_mul_rpow_sub_one _ hr]
+          exact mul_le_mul_right (ENNReal.rpow_le_rpow hx (by linarith)) _)
+    _ = (∫⁻ x, u x ∂μ) * c ^ (r - 1) := lintegral_mul_const'' _ hu
+    _ = c ^ (r - 1) * ∫⁻ x, u x ∂μ := mul_comm _ _
+
 /-- For a measurable set `S ⊆ ℝ × α` and measurable `F : α → [0, ∞]`, the function
 `(τ, x) ↦ 1_{S_τ}(x) F(x)` with the sections `S_τ = {y : (τ, y) ∈ S}` is measurable. -/
 theorem measurable_indicator_section {S : Set (ℝ × α)} (hS : MeasurableSet S) {F : α → ℝ≥0∞}
@@ -263,9 +276,7 @@ theorem czAverage_eq_of_mem {k : ℤ} {m : Fin (finrank ℝ V) → ℤ} (hkm : (
   rw [czAverage, tsum_eq_single ⟨(k, m), hkm⟩ fun km hne => ?_]
   · exact Set.indicator_of_mem hx _
   refine Set.indicator_of_notMem (fun hx' => hne ?_) _
-  have hd := czMaximal_pairwiseDisjoint (V := V) (G := G) (t := t) km.2 hkm
-  by_contra hne'
-  exact Set.disjoint_left.1 (hd fun e => hne' (Subtype.ext e)) hx' hx
+  exact subsingleton_czMaximal_mem_zcell (G := G) (t := t) x hx' (show x ∈ zcell k m from hx)
 
 /-- Outside the exceptional set `Ω` the Calderón–Zygmund averages vanish. -/
 theorem czAverage_eq_zero_of_notMem (h : V → ℝ≥0∞) {x : V} (hx : x ∉ czSet G t) :
@@ -273,15 +284,33 @@ theorem czAverage_eq_zero_of_notMem (h : V → ℝ≥0∞) {x : V} (hx : x ∉ c
   ENNReal.tsum_eq_zero.2 fun km =>
     Set.indicator_of_notMem (fun hx' => hx (zcell_subset_czSet km.2 hx')) _
 
+/-- The sum over the maximal big cubes of the integrals of `h : V → [0, ∞]` over the cubes is
+the integral of `h` over the exceptional set `Ω`, since the cubes are disjoint. -/
+theorem tsum_setLIntegral_czMaximal (h : V → ℝ≥0∞) :
+    ∑' km : czMaximal G t, ∫⁻ z in zcell km.1.1 km.1.2, h z = ∫⁻ z in czSet G t, h z := by
+  rw [czSet, lintegral_biUnion czMaximal_countable (fun _ _ => measurableSet_zcell _ _)
+    czMaximal_pairwiseDisjoint]
+
+/-- **Summing bounds over the maximal big cubes**: if numbers `a_Q ∈ [0, ∞]` indexed by the
+maximal big cubes `Q` of `G` at height `t` satisfy `a_Q ≤ c ∫_Q H` for a function
+`H : V → [0, ∞]`, then `∑_Q a_Q ≤ c ∫ H`, since the cubes are disjoint
+(`Rd.tsum_setLIntegral_czMaximal`). -/
+theorem tsum_le_mul_lintegral_of_le_setLIntegral {a : czMaximal G t → ℝ≥0∞} {H : V → ℝ≥0∞}
+    (c : ℝ≥0∞) (h : ∀ km, a km ≤ c * ∫⁻ z in zcell km.1.1 km.1.2, H z) :
+    ∑' km, a km ≤ c * ∫⁻ z, H z :=
+  calc ∑' km, a km ≤ ∑' km : czMaximal G t, c * ∫⁻ z in zcell km.1.1 km.1.2, H z :=
+        ENNReal.tsum_le_tsum h
+    _ = c * ∫⁻ z in czSet G t, H z := by rw [ENNReal.tsum_mul_left, tsum_setLIntegral_czMaximal]
+    _ ≤ c * ∫⁻ z, H z := mul_le_mul_right (setLIntegral_le_lintegral _ _) _
+
 /-- **The averages keep the integral**: `∫ czAverage h = ∫_Ω h` for every `h : V → [0, ∞]`, since
 `|Q| ⨍_Q h = ∫_Q h` on each of the disjoint maximal big cubes `Q`. -/
 theorem lintegral_czAverage (h : V → ℝ≥0∞) :
     ∫⁻ x, czAverage G t h x = ∫⁻ x in czSet G t, h x := by
   simp only [czAverage]
   rw [lintegral_tsum fun _ =>
-      (measurable_const.indicator (measurableSet_zcell _ _)).aemeasurable, czSet,
-    lintegral_biUnion czMaximal_countable (fun _ _ => measurableSet_zcell _ _)
-      czMaximal_pairwiseDisjoint]
+      (measurable_const.indicator (measurableSet_zcell _ _)).aemeasurable,
+    ← tsum_setLIntegral_czMaximal]
   refine tsum_congr fun km => ?_
   rw [lintegral_indicator_const (measurableSet_zcell _ _), setLAverage_eq,
     ENNReal.div_mul_cancel (volume_zcell_pos _ _).ne' (volume_zcell_lt_top _ _).ne]
@@ -356,6 +385,29 @@ theorem aemeasurable_czGood {h : V → ℝ≥0∞} (hh : AEMeasurable h volume) 
     AEMeasurable (czGood G t h) volume :=
   (hh.indicator measurableSet_czSet.compl).add (measurable_czAverage h).aemeasurable
 
+/-- **The good part keeps the integral**: `∫ czGood h = ∫ h` for every `h : V → [0, ∞]`, since
+`h` is kept outside `Ω` and the averages keep the integral over `Ω` (`Rd.lintegral_czAverage`).
+-/
+theorem lintegral_czGood (h : V → ℝ≥0∞) : ∫⁻ x, czGood G t h x = ∫⁻ x, h x := by
+  simp only [czGood]
+  rw [lintegral_add_right' _ (measurable_czAverage h).aemeasurable,
+    lintegral_indicator measurableSet_czSet.compl, lintegral_czAverage, add_comm,
+    lintegral_add_compl _ measurableSet_czSet]
+
+/-- **The good part of `G` itself is bounded**: in dimension `n ≥ 1`, for an almost everywhere
+measurable `G` with finite integral and `0 < t`, the good part of `G` in its own decomposition
+at height `t` is at most `2^n t` almost everywhere: off `Ω` it is `G ≤ t`
+(`Rd.cz_ae_le_of_notMem`), on a maximal big cube it is the mean `G_Q ≤ 2^n t`. -/
+theorem ae_czGood_self_le [Nontrivial V] (hG : AEMeasurable G volume) (hGi : ∫⁻ x, G x ≠ ∞)
+    (ht0 : 0 < t) : ∀ᵐ x, czGood G t G x ≤ 2 ^ finrank ℝ V * t := by
+  filter_upwards [cz_ae_le_of_notMem hG hGi ht0] with x hx
+  by_cases hxΩ : x ∈ czSet G t
+  · rw [czGood, Set.indicator_of_notMem (Set.notMem_compl_iff.2 hxΩ), zero_add]
+    exact czAverage_self_le x
+  · rw [czGood, Set.indicator_of_mem (show x ∈ (czSet G t)ᶜ from hxΩ),
+      czAverage_eq_zero_of_notMem _ hxΩ, add_zero]
+    exact (hx hxΩ).trans (le_mul_of_one_le_left zero_le (one_le_pow₀ one_le_two))
+
 /-- **The pointwise `ℓ_q` norm of the good parts**: for a family `g_j` of almost everywhere
 measurable functions and `1 ≤ q ≤ ∞`, `‖(czGood g_j (x))_j‖_{ℓ_q} ≤ 1_{Ωᶜ} F(x) + czAverage F (x)`
 with `F(x) = ‖(g_j(x))_j‖_{ℓ_q}`: off `Ω` both sides are `F(x)`, and on a maximal big cube `Q` the
@@ -382,32 +434,17 @@ theorem ae_lqNorm_czGood_le [Nontrivial V] {q : ℝ≥0∞} (hq : 1 ≤ q) {g : 
     (ht0 : 0 < t) :
     ∀ᵐ x, lqNorm q (fun j => czGood (fun y => lqNorm q (fun j => g j y)) t (g j) x) ≤
       2 ^ finrank ℝ V * t := by
-  filter_upwards [cz_ae_le_of_notMem (aemeasurable_lqNorm_comp hg q) hGi ht0] with x hx
-  refine (lqNorm_czGood_le hq hg x).trans ?_
-  by_cases hxΩ : x ∈ czSet (fun y => lqNorm q (fun j => g j y)) t
-  · rw [Set.indicator_of_notMem (Set.notMem_compl_iff.2 hxΩ), zero_add]
-    exact czAverage_self_le x
-  · rw [Set.indicator_of_mem (show x ∈ _ from hxΩ),
-      czAverage_eq_zero_of_notMem _ hxΩ, add_zero]
-    exact (hx hxΩ).trans (le_mul_of_one_le_left zero_le (one_le_pow₀ one_le_two))
+  filter_upwards [ae_czGood_self_le (aemeasurable_lqNorm_comp hg q) hGi ht0] with x hx
+  exact (lqNorm_czGood_le hq hg x).trans hx
 
-/-- **The good parts keep the integral**: `∫ ‖(czGood g_j)_j‖_{ℓ_q} ≤ ∫ ‖(g_j)_j‖_{ℓ_q}` for
+/-- **The integral of the `ℓ_q` norm of the good parts is at most that of the family**:
+`∫ ‖(czGood g_j)_j‖_{ℓ_q} ≤ ∫ ‖(g_j)_j‖_{ℓ_q}` for
 `1 ≤ q ≤ ∞` and almost everywhere measurable `g_j`, for the decomposition of any `G` at any
 height. -/
 theorem lintegral_lqNorm_czGood_le {q : ℝ≥0∞} (hq : 1 ≤ q) {g : ℕ → V → ℝ≥0∞}
     (hg : ∀ j, AEMeasurable (g j) volume) :
-    ∫⁻ x, lqNorm q (fun j => czGood G t (g j) x) ≤ ∫⁻ x, lqNorm q (fun j => g j x) := by
-  have hF := aemeasurable_lqNorm_comp hg q
-  calc ∫⁻ x, lqNorm q (fun j => czGood G t (g j) x)
-      ≤ ∫⁻ x, ((czSet G t)ᶜ.indicator (fun y => lqNorm q (fun j => g j y)) x +
-          czAverage G t (fun y => lqNorm q (fun j => g j y)) x) :=
-        lintegral_mono fun x => lqNorm_czGood_le hq hg x
-    _ = (∫⁻ x in (czSet G t)ᶜ, lqNorm q (fun j => g j x)) +
-          ∫⁻ x in czSet G t, lqNorm q (fun j => g j x) := by
-        rw [lintegral_add_left' (hF.indicator measurableSet_czSet.compl),
-          lintegral_indicator measurableSet_czSet.compl, lintegral_czAverage]
-    _ = ∫⁻ x, lqNorm q (fun j => g j x) := by
-        rw [add_comm, lintegral_add_compl _ measurableSet_czSet]
+    ∫⁻ x, lqNorm q (fun j => czGood G t (g j) x) ≤ ∫⁻ x, lqNorm q (fun j => g j x) :=
+  (lintegral_mono fun x => lqNorm_czGood_le hq hg x).trans_eq (lintegral_czGood _)
 
 /-- **The maximal function off `Ω*` is controlled by the good part**: for `x ∉ Ω*` and almost
 everywhere measurable `g`, `M g(x) ≤ (1 + 3^n) M(czGood g)(x)`. Split `g = 1_{Ωᶜ} g + 1_Ω g`;
@@ -475,8 +512,9 @@ theorem weakTypeConst_ne_top {q : ℝ} (hq : 1 < q) : weakTypeConst V q ≠ ∞ 
 /-- **The `q`-th power of the good parts**: in dimension `n ≥ 1`, for `1 < q < ∞`, almost
 everywhere measurable `g_j` with `G = ‖(g_j)_j‖_{ℓ_q}` integrable, and `0 < t`, the good parts
 of the decomposition of `G` at height `t` satisfy
-`∫ ‖(czGood g_j (x))_j‖_{ℓ_q}^q dx ≤ 2^(n(q-1)) t^(q-1) ∫ G`: they are bounded by `2^n t` almost
-everywhere and keep the integral. -/
+`∫ ‖(czGood g_j (x))_j‖_{ℓ_q}^q dx ≤ 2^(n(q-1)) t^(q-1) ∫ G`: their `ℓ_q` norm is bounded by
+`2^n t` almost everywhere and has integral at most `∫ G`
+(`MeasureTheory.lintegral_rpow_le_mul_lintegral_of_ae_le`). -/
 theorem lintegral_lqNorm_czGood_rpow_le [Nontrivial V] {q : ℝ≥0∞} (hq1 : 1 < q) (hq : q ≠ ∞)
     {g : ℕ → V → ℝ≥0∞} (hg : ∀ j, AEMeasurable (g j) volume)
     (hGi : ∫⁻ x, lqNorm q (fun j => g j x) ≠ ∞) (ht0 : 0 < t) :
@@ -491,17 +529,9 @@ theorem lintegral_lqNorm_czGood_rpow_le [Nontrivial V] {q : ℝ≥0∞} (hq1 : 1
       lqNorm q (fun j => czGood (fun y => lqNorm q (fun j => g j y)) t (g j) x)) volume :=
     aemeasurable_lqNorm_comp (fun j => aemeasurable_czGood (hg j)) q
   rw [← hpow]
-  calc ∫⁻ x, lqNorm q (fun j => czGood (fun y => lqNorm q (fun j => g j y)) t (g j) x) ^ q.toReal
-      ≤ ∫⁻ x, lqNorm q (fun j => czGood (fun y => lqNorm q (fun j => g j y)) t (g j) x) *
-          (2 ^ finrank ℝ V * t) ^ (q.toReal - 1) := by
-        refine lintegral_mono_ae ((ae_lqNorm_czGood_le hq1.le hg hGi ht0).mono fun x hx => ?_)
-        rw [ENNReal.rpow_eq_mul_rpow_sub_one _ hr]
-        gcongr
-    _ = (∫⁻ x, lqNorm q (fun j => czGood (fun y => lqNorm q (fun j => g j y)) t (g j) x)) *
-          (2 ^ finrank ℝ V * t) ^ (q.toReal - 1) := lintegral_mul_const'' _ hL
-    _ ≤ (∫⁻ x, lqNorm q (fun j => g j x)) * (2 ^ finrank ℝ V * t) ^ (q.toReal - 1) := by
-        exact mul_le_mul_left (lintegral_lqNorm_czGood_le hq1.le hg) _
-    _ = _ := mul_comm _ _
+  exact (lintegral_rpow_le_mul_lintegral_of_ae_le hr hL
+    (ae_lqNorm_czGood_le hq1.le hg hGi ht0)).trans
+    (mul_le_mul_right (lintegral_lqNorm_czGood_le hq1.le hg) _)
 
 /-- **Chebyshev's inequality for the good parts**: in dimension `n ≥ 1`, for `1 < q < ∞`, almost
 everywhere measurable `g_j` with `G = ‖(g_j)_j‖_{ℓ_q}` integrable, and `0 < t < ∞`, let `czGood`
