@@ -25,8 +25,10 @@ Schwartz kernels with their Fourier overlap and Hörmander condition, the adjoin
 convolution, which moves kernels and their derivatives to the other side of an integral, the
 `L_2` bounds of the analysis and synthesis operators of every kernel family with bounded Fourier
 overlap, and the Calderón–Zygmund decomposition of functions with values in a normed space, and
-of families of them, into a bounded good part and bad pieces with mean zero on dyadic cubes. The
-[interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
+of families of them, into a bounded good part and bad pieces with mean zero on dyadic cubes.
+With these, the analysis and synthesis operators of every Calderón–Zygmund family are of weak
+type `(1,1)`.
+The [interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
 built on this project, with the decisions behind their form.
 
 ## Main results
@@ -277,6 +279,14 @@ built on this project, with the decisions behind their form.
   For a family `(g_j)_j` and `1 ≤ q ≤ ∞` the cubes of `G = ‖(‖g_j‖)_j‖_{ℓ_q}` serve every `g_j`,
   with the same bounds for the pointwise `ℓ_q` norms (`Rd.ae_lqNorm_czGoodC_le`,
   `Rd.lintegral_lqNorm_czGoodC_sq_le`, `Rd.tsum_lintegral_lqNorm_czBadPart_le`).
+* **The weak type `(1,1)` of vector-valued singular integrals.** Let `n = dim V ≥ 1` and let
+  `(θ_j)_j` be a Calderón–Zygmund family with overlap `B` and Hörmander constant `H`, and put
+  `C = 4 · 2^n B + (2n)^n |B(0, 1)| + 4H` (`Rd.vectorWeakConst`). For every `0 < t < ∞` and
+  every integrable `f : V → ℂ`, `|{x : ‖((θ_j ⋆ f)(x))_j‖_{ℓ_2} > t}| ≤ C t⁻¹ ∫ |f|`
+  (`Rd.IsCZFamily.volume_lqNorm_conv_gt_le`), and for every finite set `s` and all almost
+  everywhere strongly measurable `g_j` with `∫ ‖(g_j(x))_j‖_{ℓ_2} dx < ∞`,
+  `|{x : |∑_{j ∈ s} (θ_j ⋆ g_j)(x)| > t}| ≤ C t⁻¹ ∫ ‖(g_j(x))_j‖_{ℓ_2} dx`
+  (`Rd.IsCZFamily.volume_enorm_sum_conv_gt_le`).
 
 ## What is formalised
 
@@ -298,6 +308,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for `f ∈ L_p`, `g ∈ L_q`, derivatives of Schwartz kernels moved to the other Schwartz factor, translates and reflections of Schwartz functions, and weak derivatives commuting with convolution by Schwartz functions | ✅ | ✗ | `Rd/ConvolutionAdjoint` |
 | The Cauchy–Schwarz inequality for finite sums, the `L_2` bounds of the analysis operator and of the synthesis operators on finite index sets for a kernel family with Fourier overlap `B`, and for every Calderón–Zygmund family | ✅ | ✗ | `Rd/PlancherelBounds` |
 | The signed Calderón–Zygmund decomposition of functions with values in a normed space and of families: good parts bounded by `2^n t` with `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, bad pieces with mean zero on their cubes and total mass at most `2 ∫ ‖f‖` | ✅ | ✗ | `Rd/CalderonZygmundSigned` |
+| Chebyshev's inequality for split functions, the Hörmander condition around a cube, convolutions of pieces with mean zero, and the weak type `(1,1)` of the analysis and synthesis operators of a Calderón–Zygmund family with an explicit constant | ✅ | ✗ | `Rd/VectorValuedWeakType` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

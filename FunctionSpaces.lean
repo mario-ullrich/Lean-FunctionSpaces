@@ -188,6 +188,7 @@ public import FunctionSpaces.Rd.DilationFamilies
 public import FunctionSpaces.Rd.ConvolutionAdjoint
 public import FunctionSpaces.Rd.PlancherelBounds
 public import FunctionSpaces.Rd.CalderonZygmundSigned
+public import FunctionSpaces.Rd.VectorValuedWeakType
 
 /-!
 # Function spaces
@@ -649,4 +650,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   functions with values in a normed space and of families: the good part with its bounds
   `2^n t` and `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, and the bad pieces with mean zero on their cubes and total
   mass at most `2 ∫ ‖f‖`.
+* `FunctionSpaces.Rd.VectorValuedWeakType`: the weak type `(1,1)` of the analysis operator and
+  of the synthesis operators of a Calderón–Zygmund family, with the explicit constant
+  `4 · 2^n B + (2n)^n |B(0, 1)| + 4H`.
 -/

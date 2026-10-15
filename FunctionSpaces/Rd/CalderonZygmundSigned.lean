@@ -14,14 +14,14 @@ For a function `f : V → E` with values in a real normed space `E`, such as `�
 big cubes of a function `G : V → [0, ∞]` at height `t`, with exceptional set `Ω`, the **good
 part** `Rd.czGoodC` keeps `f` outside `Ω` and replaces it by its mean `⨍_Q f` on every maximal
 big cube `Q` (the averages `Rd.czAverageC`). The suffix `C` marks these signed versions of the
-`[0, ∞]`-valued `Rd.czAverage` and `Rd.czGood`. The **bad part** `Rd.czBadC = f - czGoodC` is
-the sum of the pieces `Rd.czBadPart`, which live on one cube each and have mean zero there
-(`Rd.hasSum_czBadPart`, `Rd.integral_czBadPart`), with total mass at most `2 ∫ ‖f‖`
-(`Rd.tsum_lintegral_enorm_czBadPart_le`). For `G = ‖f‖` the good part is bounded by `2^n t`
-almost everywhere (`Rd.ae_enorm_czGoodC_le`) and has `∫ ‖czGoodC‖² ≤ 2^n t ∫ ‖f‖`
-(`Rd.lintegral_enorm_czGoodC_sq_le`). For a family `(g_j)_j` and `G = ‖(‖g_j‖)_j‖_{ℓ_q}` the
-same cubes serve every `g_j`, and the bounds hold for the pointwise `ℓ_q` norms
-(`Rd.ae_lqNorm_czGoodC_le`, `Rd.lintegral_lqNorm_czGoodC_sq_le`,
+`[0, ∞]`-valued `Rd.czAverage` and `Rd.czGood`. The **bad part** `Rd.czBadC = f - czGoodC`
+(`Rd.czGoodC_add_czBadC`) is the sum of the pieces `Rd.czBadPart`, which live on one cube each
+and have mean zero there (`Rd.hasSum_czBadPart`, `Rd.integral_czBadPart`), with total mass at
+most `2 ∫ ‖f‖` (`Rd.tsum_lintegral_enorm_czBadPart_le`). For `G = ‖f‖` the good part is
+bounded by `2^n t` almost everywhere (`Rd.ae_enorm_czGoodC_le`) and has
+`∫ ‖czGoodC‖² ≤ 2^n t ∫ ‖f‖` (`Rd.lintegral_enorm_czGoodC_sq_le`). For a family `(g_j)_j` and
+`G = ‖(‖g_j‖)_j‖_{ℓ_q}` the same cubes serve every `g_j`, and the bounds hold for the pointwise
+`ℓ_q` norms (`Rd.ae_lqNorm_czGoodC_le`, `Rd.lintegral_lqNorm_czGoodC_sq_le`,
 `Rd.tsum_lintegral_lqNorm_czBadPart_le`).
 
 The definitions take the cube function `G` as an argument, so the scalar case and the family
@@ -243,6 +243,11 @@ theorem lintegral_enorm_czGoodC_sq_le [Nontrivial V] {f : V → E} (hf : Integra
 height `t`. -/
 noncomputable def czBadC (G : V → ℝ≥0∞) (t : ℝ≥0∞) (f : V → E) (x : V) : E :=
   f x - czGoodC G t f x
+
+/-- The signed good and bad parts add up to the function: `czGoodC f + czBadC f = f` for every
+`f : V → E`. -/
+theorem czGoodC_add_czBadC (f : V → E) : czGoodC G t f + czBadC G t f = f :=
+  funext fun x => add_sub_cancel (czGoodC G t f x) (f x)
 
 /-- The **bad piece** of `f : V → E` on the dyadic cube `Q = Q_{k,m}`: `f - ⨍_Q f` on `Q` and `0`
 outside. -/

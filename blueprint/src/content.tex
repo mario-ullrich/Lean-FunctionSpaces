@@ -12136,7 +12136,9 @@ of an integral and shows that weak derivatives commute with convolution by Schwa
 \Cref{sec:plancherel-bounds} bounds the analysis and synthesis operators of a family of
 integrable kernels on $L_2(V)$ by its Fourier overlap. \Cref{sec:calderon-zygmund-signed}
 splits a function with values in a normed space, or a family of such functions, into a bounded
-good part and bad pieces with mean zero on dyadic cubes.
+good part and bad pieces with mean zero on dyadic cubes. \Cref{sec:vector-valued-weak-type}
+proves the weak type $(1,1)$ of the analysis and synthesis operators of every
+Calder\'on--Zygmund family, with an explicit constant.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -14236,20 +14238,25 @@ following three results bound this norm on $H^1(V)$, with explicit constants.
 
 \begin{lemma}[The Cauchy--Schwarz inequality for sequences]
 \label{lem:lq-cauchy-schwarz}
-\lean{ENNReal.lqNorm_one_mul_le, ENNReal.lqNorm_two_dyadicWeight_neg_half}
+\lean{ENNReal.lqNorm_one_mul_le, ENNReal.sum_mul_le_lqNorm_two_mul,
+  ENNReal.lqNorm_two_dyadicWeight_neg_half}
 \leanok
 \uses{lem:hardy}
-For every countable index set and all families $(a_k)_k$ and $(b_k)_k$ in $[0, \infty]$ indexed by
-it,
-$\sum_k a_k b_k \leq \|(a_k)_k\|_{\ell_2} \|(b_k)_k\|_{\ell_2}$, and
+For every countable index set $I$, every finite set $s \subseteq I$ and all families
+$(a_k)_k$ and $(b_k)_k$ in $[0, \infty]$ indexed by $I$,
+$\sum_{k \in I} a_k b_k \leq \|(a_k)_k\|_{\ell_2} \|(b_k)_k\|_{\ell_2}$ and
+$\sum_{k \in s} a_k b_k \leq \|(a_k)_k\|_{\ell_2} \|(b_k)_k\|_{\ell_2}$. Moreover
 $\|(2^{-k/2})_k\|_{\ell_2} = \sqrt 2$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 Hölder's inequality for the counting measure (Mathlib's \texttt{ENNReal.\allowbreak
-lintegral\_\allowbreak mul\_\allowbreak le\_\allowbreak Lp\_\allowbreak mul\_\allowbreak Lq});
-$\sum_k 2^{-k} = 2$ (\Cref{lem:hardy}).
+lintegral\_\allowbreak mul\_\allowbreak le\_\allowbreak Lp\_\allowbreak mul\_\allowbreak Lq})
+gives the series; Hölder's inequality for finite sums (Mathlib's \texttt{ENNReal.\allowbreak
+inner\_\allowbreak le\_\allowbreak Lp\_\allowbreak mul\_\allowbreak Lq}) and the bound of a
+finite sum of squares by the series give the finite sums; $\sum_k 2^{-k} = 2$
+(\Cref{lem:hardy}).
 \end{proof}
 
 \begin{lemma}[$\Besov{1}{2}{2} \subseteq \Besov{1/2}{2}{1}$ with constant $\sqrt 2$]
@@ -16318,9 +16325,9 @@ $\int \|\mathcal G f\|^2 \leq 2^n t \int \|\mathcal G f\| \leq 2^n t \int \|f\|$
 
 \begin{lemma}[The bad part and its pieces]
 \label{lem:calderon-zygmund-bad-pieces}
-\lean{Rd.czBadPart_of_mem, Rd.czBadPart_of_notMem, Rd.czBadC_eq_zero_of_notMem,
-  Rd.czBadC_eq_of_mem, Rd.hasSum_czBadPart, Rd.czBadC_eq_tsum, Rd.integrable_czBadPart,
-  Rd.lintegral_enorm_czBadPart_le, Rd.integrable_czBadC,
+\lean{Rd.czGoodC_add_czBadC, Rd.czBadPart_of_mem, Rd.czBadPart_of_notMem,
+  Rd.czBadC_eq_zero_of_notMem, Rd.czBadC_eq_of_mem, Rd.hasSum_czBadPart, Rd.czBadC_eq_tsum,
+  Rd.integrable_czBadPart, Rd.lintegral_enorm_czBadPart_le, Rd.integrable_czBadC,
   Rd.lintegral_enorm_czBadC_le}
 \leanok
 \uses{def:calderon-zygmund-signed, lem:calderon-zygmund-signed-good, lem:norm-mean-square-bound,
@@ -16328,9 +16335,10 @@ $\int \|\mathcal G f\|^2 \leq 2^n t \int \|\mathcal G f\| \leq 2^n t \int \|f\|$
 For every real normed space $E$, every $G : V \to [0, \infty]$, every $t \in [0, \infty]$ and
 every $f : V \to E$:
 \begin{enumerate}
-  \item $\mathcal B f = 0$ outside $\Omega$, $\mathcal B f = f - f_Q$ on every maximal big
-    cube $Q$, and $\mathcal B f(x) = \sum_Q b_Q f(x)$ for every $x \in V$, the sum over the
-    maximal big cubes, with at most one nonzero term;
+  \item $\mathcal G f + \mathcal B f = f$, $\mathcal B f = 0$ outside $\Omega$,
+    $\mathcal B f = f - f_Q$ on every maximal big cube $Q$, and
+    $\mathcal B f(x) = \sum_Q b_Q f(x)$ for every $x \in V$, the sum over the maximal big cubes,
+    with at most one nonzero term;
   \item every dyadic cube $Q$ satisfies $\int \|b_Q f\| \leq 2 \int_Q \|f\|$, and $b_Q f$ is
     integrable if $f$ is integrable on $Q$;
   \item if $f$ is almost everywhere strongly measurable, then
@@ -16340,7 +16348,8 @@ every $f : V \to E$:
 
 \begin{proof}
 \leanok
-The first part follows from \Cref{lem:calderon-zygmund-signed-good}. Since
+The identity $\mathcal G f + \mathcal B f = f$ is the definition of $\mathcal B f$, and the rest
+of the first part follows from \Cref{lem:calderon-zygmund-signed-good}. Since
 $|Q| < \infty$ (\Cref{lem:dyadic-cubes}), \Cref{lem:norm-mean-square-bound} gives
 $\int \|b_Q f\| = \int_Q \|f - f_Q\| \leq 2 \int_Q \|f\|$. Finally
 $\|\mathcal B f\| \leq \|f\| + \|\mathcal G f\|$, and
@@ -16416,6 +16425,305 @@ every $j$, so the first and the fourth bound are those of
 $\int \|(\|b_Q g_j\|)_j\|_{\ell_q} = \int_Q \|(\|g_j - (g_j)_Q\|)_j\|_{\ell_q} \leq 2 \int_Q G$
 by \Cref{lem:norm-mean-square-bound}, since $|Q| < \infty$ (\Cref{lem:dyadic-cubes}), and
 \Cref{lem:calderon-zygmund-averages} sums these bounds over the maximal big cubes.
+\end{proof}
+
+\section{The weak type \texorpdfstring{$(1,1)$}{(1,1)} of vector-valued singular integrals}
+\label{sec:vector-valued-weak-type}
+
+Let $(\theta_j)_{j \in \N}$ be a Calder\'on--Zygmund family on $V$ with overlap $B$ and
+H\"ormander constant $H$ (\Cref{def:cz-family}). This section proves the weak type $(1,1)$ of
+the analysis operator $f \mapsto (\theta_j * f)_j$ and of the synthesis operators
+$(g_j)_j \mapsto \sum_{j \in s} \theta_j * g_j$ for finite sets $s \subseteq \N$. At a height
+$t$, the signed Calder\'on--Zygmund decomposition of \Cref{sec:calderon-zygmund-signed} splits
+$f$ into the good part $\mathcal G f$, which the Plancherel bounds of
+\Cref{cor:cz-family-l2-bounds} control in $L_2$, and the bad part $\mathcal B f$, a sum of
+pieces $b_Q f$ with mean zero. A maximal big cube $Q = Q_{k,m}$ has centre $c_Q$ and lies in the
+closed ball $\bar B(c_Q, \rho_Q)$ with $\rho_Q = n 2^{-k}$ (\Cref{lem:dyadic-cubes}), and the
+enlarged exceptional set $\Omega^*$ is the union of the balls $\bar B(c_Q, 2 \rho_Q)$
+(\Cref{def:calderon-zygmund-cubes}). Off $\Omega^*$ the mean zero of the pieces lets the
+H\"ormander condition act.
+
+\begin{lemma}[Elementary facts]
+\label{lem:weak-type-elementary}
+\lean{ENNReal.half_lt_or_half_lt_of_lt_add,
+  MeasureTheory.memLp_two_of_lintegral_enorm_sq_ne_top}
+\leanok
+For all $t, a, b \in [0, \infty]$ with $t < a + b$, $t/2 < a$ or $t/2 < b$. For every measure
+space $(X, \mu)$, every normed group $E$ and every almost everywhere strongly measurable
+$f : X \to E$ with $\int \|f\|^2 \, d\mu < \infty$, $f \in L_2(\mu)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $a \leq t/2$ and $b \leq t/2$, then $a + b \leq t$ (Mathlib's
+\texttt{lt\_\allowbreak or\_\allowbreak lt\_\allowbreak of\_\allowbreak add\_\allowbreak
+lt\_\allowbreak add}). The second statement is the definition of the $L_2$ norm.
+\end{proof}
+
+\begin{lemma}[Level sets of a split function]
+\label{lem:level-sets-split-function}
+\lean{MeasureTheory.measure_half_lt_le_lintegral_sq,
+  MeasureTheory.measure_half_lt_le_add_setLIntegral_compl,
+  MeasureTheory.measure_lt_le_of_ae_le_add}
+\leanok
+\uses{lem:weak-type-elementary}
+For every measure space $(X, \mu)$, every $t \in (0, \infty)$, all almost everywhere measurable
+$a, b : X \to [0, \infty]$ and every measurable set $S \subseteq X$,
+\[
+  \mu\{a > t/2\} \leq 4 t^{-2} \int a^2 \, d\mu , \qquad
+  \mu\{b > t/2\} \leq \mu(S) + 2 t^{-1} \int_{X \setminus S} b \, d\mu .
+\]
+For every $u : X \to [0, \infty]$ with $u \leq a + b$ almost everywhere and all
+$A, D, K, I \in [0, \infty]$ with
+\[
+  \int a^2 \, d\mu \leq A t I , \qquad \mu(S) \leq D t^{-1} I , \qquad
+  \int_{X \setminus S} b \, d\mu \leq K I ,
+\]
+$\mu\{u > t\} \leq (4A + D + 2K) \, t^{-1} I$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first bound is Chebyshev's inequality for $a^2$ at height $t^2/4$, the second Chebyshev's
+inequality for $\mathbf 1_{X \setminus S} \, b$ at height $t/2$. By
+\Cref{lem:weak-type-elementary}, almost every point of $\{u > t\}$ lies in
+$\{a > t/2\} \cup \{b > t/2\}$, and the two bounds give
+$\mu\{u > t\} \leq 4 t^{-2} A t I + D t^{-1} I + 2 t^{-1} K I$.
+\end{proof}
+
+\begin{lemma}[The H\"ormander condition around a cube]
+\label{lem:hormander-around-cube}
+\lean{Rd.IsCZFamily.setLIntegral_compl_closedBall_le, Rd.IsCZFamily.measurable_lqNorm_sub,
+  Rd.IsCZFamily.setLIntegral_compl_closedBall_setLIntegral_le}
+\leanok
+\uses{def:cz-family, def:lq-norm}
+For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family $(\theta_j)_j$ on $V$ with
+overlap $B$ and H\"ormander constant $H$, every $c \in V$, every $\rho \in \R$ and every
+$y \in V$ with $\|y - c\| \leq \rho$,
+\[
+  \int_{\{\|x - c\| > 2\rho\}} \|(\theta_j(x - y) - \theta_j(x - c))_j\|_{\ell_2} \, dx \leq H .
+\]
+The function $(x, y) \mapsto \|(\theta_j(x - y) - \theta_j(x - c))_j\|_{\ell_2}$ is measurable
+on $V \times V$, and for every measurable $Q \subseteq \bar B(c, \rho)$ and every almost
+everywhere measurable $m : V \to [0, \infty]$,
+\[
+  \int_{\{\|x - c\| > 2\rho\}} \int_Q \|(\theta_j(x - y) - \theta_j(x - c))_j\|_{\ell_2} \,
+  m(y) \, dy \, dx \leq H \int_Q m .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Every $x$ with $\|x - c\| > 2\rho$ satisfies $\|x - c\| > 2 \|y - c\|$. The substitution
+$x' = x - c$ turns the integral into one over a subset of $\{\|x'\| > 2 \|y - c\|\}$ with
+integrand $\|(\theta_j(x' - (y - c)) - \theta_j(x'))_j\|_{\ell_2}$, which is at most $H$ by the
+H\"ormander condition at $y - c$ (\Cref{def:cz-family}). The kernels are continuous, so the
+function on $V \times V$ is measurable. Tonelli's theorem exchanges the two integrals in the
+last bound, and the inner integral is at most $H$ for every $y \in Q$.
+\end{proof}
+
+\begin{lemma}[Convolutions of pieces with mean zero]
+\label{lem:mean-zero-pieces-conv}
+\lean{Rd.enorm_conv_le_setLIntegral_sub, Rd.IsCZFamily.lqNorm_conv_le_setLIntegral,
+  Rd.IsCZFamily.enorm_sum_conv_le_setLIntegral}
+\leanok
+\uses{def:cz-family, lem:reflect-basic, lem:minkowski-integral-lq, lem:lq-cauchy-schwarz}
+For every continuous bounded $K : V \to \C$, every set $Q \subseteq V$, every integrable
+$b : V \to \C$ with $b = 0$ outside $Q$ and $\int b = 0$, and all $c, x \in V$,
+\[
+  |(K * b)(x)| \leq \int_Q |K(x - y) - K(x - c)| \, |b(y)| \, dy .
+\]
+For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family $(\theta_j)_j$ with overlap
+$B$ and H\"ormander constant $H$, every such $b$ and all $c, x \in V$,
+\[
+  \|((\theta_j * b)(x))_j\|_{\ell_2}
+  \leq \int_Q \|(\theta_j(x - y) - \theta_j(x - c))_j\|_{\ell_2} \, |b(y)| \, dy ,
+\]
+and for every finite set $s \subseteq \N$ and all integrable $b_j : V \to \C$ with $b_j = 0$
+outside $Q$ and $\int b_j = 0$,
+\[
+  \Bigl|\sum_{j \in s} (\theta_j * b_j)(x)\Bigr|
+  \leq \int_Q \|(\theta_j(x - y) - \theta_j(x - c))_j\|_{\ell_2} \,
+  \|(b_j(y))_j\|_{\ell_2} \, dy .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:reflect-basic}, $(K * b)(x) = \int K(x - y) b(y) \, dy$, and since $\int b = 0$
+this is $\int (K(x - y) - K(x - c)) b(y) \, dy$; the integrand vanishes outside $Q$. The second
+bound follows by Minkowski's integral inequality in $\ell_2$
+(\Cref{lem:minkowski-integral-lq}). For the third, the triangle inequality and the first bound
+for each $j \in s$ give
+$\int_Q \sum_{j \in s} |\theta_j(x - y) - \theta_j(x - c)| \, |b_j(y)| \, dy$, and the
+Cauchy--Schwarz inequality of \Cref{lem:lq-cauchy-schwarz} applies at each $y$.
+\end{proof}
+
+\begin{lemma}[Convolution of the bad part]
+\label{lem:conv-bad-part}
+\lean{Rd.hasSum_conv_czBadPart}
+\leanok
+\uses{def:calderon-zygmund-signed, lem:calderon-zygmund-bad-pieces,
+  thm:calderon-zygmund-bad-pieces-mean-mass, lem:reflect-basic}
+For every $G : V \to [0, \infty]$ and every $t \in [0, \infty]$, with $Q$ running over the
+maximal big cubes of $G$ at height $t$: for every continuous bounded $K : V \to \C$, every
+integrable $f : V \to \C$ and every $x \in V$,
+\[
+  (K * \mathcal B f)(x) = \sum_Q (K * b_Q f)(x) ,
+\]
+and the series converges absolutely.
+\end{lemma}
+
+\begin{proof}
+\leanok
+With $|K| \leq M$,
+$\sum_Q \int |K(x - y)| \, |b_Q f(y)| \, dy \leq M \sum_Q \int |b_Q f| \leq 2 M \int |f|$
+by \Cref{thm:calderon-zygmund-bad-pieces-mean-mass}, so the series of the integrals
+$\int K(x - y) \, b_Q f(y) \, dy$ converges absolutely to the integral of the series, which is
+$\int K(x - y) \, \mathcal B f(y) \, dy$ by \Cref{lem:calderon-zygmund-bad-pieces}. Both sides
+are convolutions by \Cref{lem:reflect-basic}.
+\end{proof}
+
+\begin{lemma}[The bad part off the enlarged exceptional set]
+\label{lem:bad-part-off-enlarged}
+\lean{Rd.IsCZFamily.setLIntegral_compl_czEnlarged_tsum_le,
+  Rd.IsCZFamily.setLIntegral_lqNorm_conv_czBadC_le,
+  Rd.IsCZFamily.setLIntegral_enorm_sum_conv_czBadC_le}
+\leanok
+\uses{lem:hormander-around-cube, lem:mean-zero-pieces-conv, lem:conv-bad-part,
+  lem:lp-series-minkowski, thm:calderon-zygmund-bad-pieces-mean-mass,
+  thm:calderon-zygmund-signed-family, lem:dyadic-cubes, def:calderon-zygmund-cubes}
+For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family $(\theta_j)_j$ with overlap
+$B$ and H\"ormander constant $H$, every $G : V \to [0, \infty]$ and every $t \in [0, \infty]$,
+with the enlarged exceptional set $\Omega^*$ of the maximal big cubes $Q$ of $G$ at height $t$:
+for every family of almost everywhere measurable $m_Q : V \to [0, \infty]$,
+\[
+  \int_{V \setminus \Omega^*} \sum_Q \int_Q
+  \|(\theta_j(x - y) - \theta_j(x - c_Q))_j\|_{\ell_2} \, m_Q(y) \, dy \, dx
+  \leq H \sum_Q \int_Q m_Q ;
+\]
+for every integrable $f : V \to \C$,
+\[
+  \int_{V \setminus \Omega^*} \|((\theta_j * \mathcal B f)(x))_j\|_{\ell_2} \, dx
+  \leq 2 H \int |f| ;
+\]
+and for every finite set $s \subseteq \N$ and all integrable $g_j : V \to \C$,
+\[
+  \int_{V \setminus \Omega^*} \Bigl|\sum_{j \in s} (\theta_j * \mathcal B g_j)(x)\Bigr| \, dx
+  \leq 2 H \int \|(g_j(x))_j\|_{\ell_2} \, dx .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+A point $x \notin \Omega^*$ satisfies $\|x - c_Q\| > 2\rho_Q$ for every maximal big cube $Q$,
+and $Q \subseteq \bar B(c_Q, \rho_Q)$ (\Cref{lem:dyadic-cubes}). Monotone convergence and
+\Cref{lem:hormander-around-cube} for each $Q$ give the first bound. By \Cref{lem:conv-bad-part},
+Minkowski's inequality for series (\Cref{lem:lp-series-minkowski}) and
+\Cref{lem:mean-zero-pieces-conv},
+\[
+  \|((\theta_j * \mathcal B f)(x))_j\|_{\ell_2}
+  \leq \sum_Q \int_Q \|(\theta_j(x - y) - \theta_j(x - c_Q))_j\|_{\ell_2} \,
+  |b_Q f(y)| \, dy
+\]
+for every $x$, so the first bound with $m_Q = |b_Q f|$ and
+\Cref{thm:calderon-zygmund-bad-pieces-mean-mass} give the second. The third follows in the same
+way with $m_Q(y) = \|(b_Q g_j(y))_j\|_{\ell_2}$ and \Cref{thm:calderon-zygmund-signed-family}.
+\end{proof}
+
+\begin{lemma}[The good part and the splitting]
+\label{lem:good-part-split}
+\lean{Rd.IsCZFamily.ae_lqNorm_conv_le_add, Rd.IsCZFamily.ae_enorm_sum_conv_le_add,
+  Rd.IsCZFamily.lintegral_lqNorm_conv_czGoodC_sq_le,
+  Rd.IsCZFamily.lintegral_enorm_sum_conv_czGoodC_sq_le}
+\leanok
+\uses{cor:cz-family-l2-bounds, thm:calderon-zygmund-signed-good-bounds,
+  thm:calderon-zygmund-signed-family, lem:calderon-zygmund-signed-good,
+  lem:calderon-zygmund-bad-pieces, lem:conv-assoc, lem:weak-type-elementary, lem:lq-basic}
+For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family $(\theta_j)_j$ with overlap
+$B$ and H\"ormander constant $H$, every $G : V \to [0, \infty]$ and every $t \in [0, \infty]$:
+for every integrable $f : V \to \C$ and almost every $x \in V$,
+\[
+  \|((\theta_j * f)(x))_j\|_{\ell_2} \leq \|((\theta_j * \mathcal G f)(x))_j\|_{\ell_2}
+  + \|((\theta_j * \mathcal B f)(x))_j\|_{\ell_2} ,
+\]
+and for every finite set $s \subseteq \N$, all integrable $g_j : V \to \C$ and almost every
+$x \in V$,
+\[
+  \Bigl|\sum_{j \in s} (\theta_j * g_j)(x)\Bigr|
+  \leq \Bigl|\sum_{j \in s} (\theta_j * \mathcal G g_j)(x)\Bigr|
+  + \Bigl|\sum_{j \in s} (\theta_j * \mathcal B g_j)(x)\Bigr| .
+\]
+If moreover $n \geq 1$ and $0 < t < \infty$, then for every integrable $f : V \to \C$ and the
+cubes of $|f|$ at height $t$,
+\[
+  \int \|((\theta_j * \mathcal G f)(x))_j\|_{\ell_2}^2 \, dx \leq B \, 2^n t \int |f| ,
+\]
+and for every finite set $s \subseteq \N$, all almost everywhere strongly measurable
+$g_j : V \to \C$ with $\int \|(g_j(x))_j\|_{\ell_2} \, dx < \infty$ and the cubes of
+$x \mapsto \|(g_j(x))_j\|_{\ell_2}$ at height $t$,
+\[
+  \int \Bigl|\sum_{j \in s} (\theta_j * \mathcal G g_j)(x)\Bigr|^2 \, dx
+  \leq B \, 2^n t \int \|(g_j(x))_j\|_{\ell_2} \, dx .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:calderon-zygmund-bad-pieces}, $f = \mathcal G f + \mathcal B f$, and both parts
+are integrable
+(\Cref{lem:calderon-zygmund-signed-good}, \Cref{lem:calderon-zygmund-bad-pieces}); convolution
+is additive almost everywhere (\Cref{lem:conv-assoc}), and Minkowski's inequality in $\ell_2$
+(\Cref{lem:lq-basic}) gives the first bound, the triangle inequality the second. For the good
+parts, $\int |\mathcal G f|^2 \leq 2^n t \int |f| < \infty$
+(\Cref{thm:calderon-zygmund-signed-good-bounds}), and
+$|\mathcal G g_j| \leq \|(\mathcal G g_i)_i\|_{\ell_2}$, whose square has integral at most
+$2^n t \int \|(g_i)_i\|_{\ell_2}$ (\Cref{thm:calderon-zygmund-signed-family}). So the good parts
+lie in $L_2$ (\Cref{lem:weak-type-elementary}), and \Cref{cor:cz-family-l2-bounds} gives the
+last two bounds.
+\end{proof}
+
+\begin{definition}[The weak type constant]
+\label{def:vector-weak-const}
+\lean{Rd.vectorWeakConst, Rd.vectorWeakConst_ne_top}
+\leanok
+For all $B, H \in [0, \infty]$,
+\[
+  C_V(B, H) = 4 \cdot 2^n B + (2n)^n \, |B(0, 1)| + 4 H ,
+\]
+where $|B(0, 1)|$ is the volume of the unit ball of $V$. It is finite if $B$ and $H$ are.
+\end{definition}
+
+\begin{theorem}[The weak type $(1,1)$ of vector-valued singular integrals]
+\label{thm:vector-valued-weak-type}
+\lean{Rd.IsCZFamily.volume_lqNorm_conv_gt_le, Rd.IsCZFamily.volume_enorm_sum_conv_gt_le}
+\leanok
+\uses{lem:level-sets-split-function, lem:good-part-split, lem:bad-part-off-enlarged,
+  lem:calderon-zygmund-averages, def:vector-weak-const}
+Let $n \geq 1$. For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family
+$(\theta_j)_j$ on $V$ with overlap $B$ and H\"ormander constant $H$ and every
+$t \in (0, \infty)$:
+for every integrable $f : V \to \C$,
+\[
+  \bigl|\{x \in V : \|((\theta_j * f)(x))_j\|_{\ell_2} > t\}\bigr|
+  \leq C_V(B, H) \, t^{-1} \int |f| ,
+\]
+and for every finite set $s \subseteq \N$ and all almost everywhere strongly measurable
+$g_j : V \to \C$ with $\int \|(g_j(x))_j\|_{\ell_2} \, dx < \infty$,
+\[
+  \Bigl|\Bigl\{x \in V : \Bigl|\sum_{j \in s} (\theta_j * g_j)(x)\Bigr| > t\Bigr\}\Bigr|
+  \leq C_V(B, H) \, t^{-1} \int \|(g_j(x))_j\|_{\ell_2} \, dx .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Decompose $f$ along the maximal big cubes of $|f|$ at height $t$, and every $g_j$ along those
+of $\|(g_j)_j\|_{\ell_2}$; the $g_j$ are integrable, since $|g_j| \leq \|(g_i)_i\|_{\ell_2}$.
+Apply \Cref{lem:level-sets-split-function} with the sizes of the good and of the bad parts as $a$
+and $b$ and with $S = \Omega^*$: \Cref{lem:good-part-split} gives the splitting and $A = B 2^n$,
+\Cref{lem:calderon-zygmund-averages} gives $D = (2n)^n |B(0, 1)|$, and
+\Cref{lem:bad-part-off-enlarged} gives $K = 2H$. Then $4A + D + 2K = C_V(B, H)$.
 \end{proof}
 
 \chapter{Besov spaces on compact manifolds}

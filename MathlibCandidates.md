@@ -186,6 +186,17 @@ declarations.
   (`MeasureTheory.measure_mul_enorm_setAverage_le`) and `∫⁻_s ‖f - ⨍_s f‖ₑ ≤ 2 ∫⁻_s ‖f‖ₑ`
   (`MeasureTheory.setLIntegral_enorm_sub_setAverage_le`), the step behind the mass of the bad
   pieces of a Calderón–Zygmund decomposition.
+* **Level sets of a split function** (`FunctionSpaces/Rd/VectorValuedWeakType.lean`): if
+  `u ≤ a + b` almost everywhere, `∫⁻ a² ≤ A t I`, `μ S ≤ D t⁻¹ I` and `∫⁻_{Sᶜ} b ≤ K I`, then
+  `μ {u > t} ≤ (4A + D + 2K) t⁻¹ I` (`MeasureTheory.measure_lt_le_of_ae_le_add`), from the two
+  forms of Chebyshev's inequality at half height
+  (`MeasureTheory.measure_half_lt_le_lintegral_sq`,
+  `MeasureTheory.measure_half_lt_le_add_setLIntegral_compl`): the level-set bookkeeping of a
+  Calderón–Zygmund argument. The three lemmas assume `0 < t < ∞`; for Mathlib these hypotheses
+  would be removed, since at `t = ∞` the level sets are empty and at `t = 0` the bounds are
+  either `∞` or force the functions to vanish almost everywhere. Also `MemLp f 2 μ` from
+  `∫⁻ ‖f‖ₑ ^ 2 ∂μ ≠ ∞` (`MeasureTheory.memLp_two_of_lintegral_enorm_sq_ne_top`), with the
+  exponent `2 : ℕ`.
 * **Integrals under a change of scale** (`FunctionSpaces/Rd/KernelMajorants.lean`):
   `∫ f(r x) dx = |r^(-n)| ∫ f` for `f : V → [0, ∞]` and `r ≠ 0` (`Rd.lintegral_comp_smul`),
   from Mathlib's `Measure.map_addHaar_smul`; Mathlib has the Bochner version

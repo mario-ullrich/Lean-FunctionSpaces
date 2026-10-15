@@ -28,8 +28,9 @@ proofs for every sequence that enters.
 
 The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥0∞` scalars,
 **monotonicity in `q`** (`lqNorm r a ≤ lqNorm q a` for `1 ≤ q ≤ r`; Mathlib has only the
-inclusion `lp.monotone`, without the norm bound), the splitting off of the first term, the
-geometric sequence, and the **dyadic weights** `dyadicWeight s k = 2 ^ (k s)` that every
+inclusion `lp.monotone`, without the norm bound), the Cauchy–Schwarz inequality
+`∑_{k ∈ s} a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for finite `s`, the splitting off of the first term,
+the geometric sequence, and the **dyadic weights** `dyadicWeight s k = 2 ^ (k s)` that every
 approximation space uses.
 -/
 
@@ -88,6 +89,18 @@ theorem lqNorm_rpow (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ι → ℝ≥0∞) :
 theorem lqNorm_two_sq (a : ι → ℝ≥0∞) : lqNorm 2 a ^ 2 = ∑' i, a i ^ 2 := by
   have h := lqNorm_rpow two_ne_zero ofNat_ne_top a
   simpa only [toReal_ofNat, rpow_two] using h
+
+/-- **The Cauchy–Schwarz inequality for finite sums against `ℓ_2` norms**:
+`∑_{j ∈ s} a_j b_j ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for every finite set `s` and all families `a, b` in
+`[0, ∞]` indexed by a countable set: Mathlib's Hölder inequality for finite sums
+`ENNReal.inner_le_Lp_mul_Lq` with `p = q = 2`, and each finite sum of squares is at most the
+series (`ENNReal.sum_le_tsum`). -/
+theorem sum_mul_le_lqNorm_two_mul (s : Finset ι) (a b : ι → ℝ≥0∞) :
+    ∑ j ∈ s, a j * b j ≤ lqNorm 2 a * lqNorm 2 b := by
+  rw [lqNorm_eq_tsum two_ne_zero ofNat_ne_top, lqNorm_eq_tsum two_ne_zero ofNat_ne_top,
+    toReal_ofNat]
+  refine (ENNReal.inner_le_Lp_mul_Lq s a b Real.HolderConjugate.two_two).trans ?_
+  gcongr <;> exact ENNReal.sum_le_tsum s
 
 omit [Countable ι] [MeasurableSingletonClass ι] in
 /-- The zero family has norm `0`. -/
