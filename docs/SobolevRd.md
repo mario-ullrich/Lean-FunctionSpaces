@@ -27,7 +27,8 @@ convolution, which moves kernels and their derivatives to the other side of an i
 overlap, and the Calderón–Zygmund decomposition of functions with values in a normed space, and
 of families of them, into a bounded good part and bad pieces with mean zero on dyadic cubes.
 With these, the analysis and synthesis operators of every Calderón–Zygmund family are of weak
-type `(1,1)`.
+type `(1,1)`. Marcinkiewicz interpolation between weak type `(1,1)` and strong type `(2,2)`, in
+the terms of the Carleson project, gives strong type `(p,p)` for `1 < p < 2`.
 The [interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
 built on this project, with the decisions behind their form.
 
@@ -287,6 +288,20 @@ built on this project, with the decisions behind their form.
   everywhere strongly measurable `g_j` with `∫ ‖(g_j(x))_j‖_{ℓ_2} dx < ∞`,
   `|{x : |∑_{j ∈ s} (θ_j ⋆ g_j)(x)| > t}| ≤ C t⁻¹ ∫ ‖(g_j(x))_j‖_{ℓ_2} dx`
   (`Rd.IsCZFamily.volume_enorm_sum_conv_gt_le`).
+* **Marcinkiewicz interpolation.** With the Carleson project's definitions of weak type,
+  strong type and almost everywhere subadditive operators (`MeasureTheory.HasWeakType`,
+  `MeasureTheory.HasStrongType`, `MeasureTheory.AESubadditiveOn`): let `μ` be an s-finite
+  measure, `ν` a measure and `1 < p < 2`. If an operator `T` is almost everywhere subadditive
+  with constant `A` on `L_1(μ) ∪ L_2(μ)`, of weak type `(1,1)` with constant `C₁` and of strong
+  type `(2,2)` with constant `C₂`, and maps `L_p(μ)` to almost everywhere strongly measurable
+  functions, then it has strong type `(p,p)` with constant
+  `(p (2 A C₁/(p - 1) + 4 A² C₂²/(2 - p)))^(1/p)`
+  (`MeasureTheory.hasStrongType_of_hasWeakType_one_of_hasStrongType_two`). For operators on an
+  abstract input type with a size `G x` and restrictions to measurable sets (such as families of
+  functions with their pointwise `ℓ_2` norms) that are subadditive with constant `1`, satisfy
+  `ν{T x > t} ≤ C₁ t⁻¹ ∫ G x dμ` and `∫ (T x)² dν ≤ C₂ ∫ (G x)² dμ`, the bound is
+  `‖T x‖_{L_p(ν)} ≤ (p (2 C₁/(p - 1) + 4 C₂/(2 - p)))^(1/p) ‖G x‖_{L_p(μ)}`
+  (`MeasureTheory.eLpNorm_le_of_weak_one_strong_two`).
 
 ## What is formalised
 
@@ -309,6 +324,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The Cauchy–Schwarz inequality for finite sums, the `L_2` bounds of the analysis operator and of the synthesis operators on finite index sets for a kernel family with Fourier overlap `B`, and for every Calderón–Zygmund family | ✅ | ✗ | `Rd/PlancherelBounds` |
 | The signed Calderón–Zygmund decomposition of functions with values in a normed space and of families: good parts bounded by `2^n t` with `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, bad pieces with mean zero on their cubes and total mass at most `2 ∫ ‖f‖` | ✅ | ✗ | `Rd/CalderonZygmundSigned` |
 | Chebyshev's inequality for split functions, the Hörmander condition around a cube, convolutions of pieces with mean zero, and the weak type `(1,1)` of the analysis and synthesis operators of a Calderón–Zygmund family with an explicit constant | ✅ | ✗ | `Rd/VectorValuedWeakType` |
+| The distribution function, weak `L_p` norms, operators of weak and strong type and almost everywhere subadditive operators, with the definitions of the Carleson project, and their elementary properties | ✅ | ✗ | `Lp/WeakType` |
+| The parts of a function above and below a level, two Tonelli steps on s-finite measure spaces, integrals of powers from bounds at every level, and Marcinkiewicz interpolation between weak type `(1,1)` and strong type `(2,2)` with an explicit constant, for operators on an abstract input type and in the terms of the Carleson project | ✅ | ✗ | `Lp/Marcinkiewicz` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

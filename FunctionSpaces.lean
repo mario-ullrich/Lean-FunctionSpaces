@@ -189,6 +189,8 @@ public import FunctionSpaces.Rd.ConvolutionAdjoint
 public import FunctionSpaces.Rd.PlancherelBounds
 public import FunctionSpaces.Rd.CalderonZygmundSigned
 public import FunctionSpaces.Rd.VectorValuedWeakType
+public import FunctionSpaces.Lp.WeakType
+public import FunctionSpaces.Lp.Marcinkiewicz
 
 /-!
 # Function spaces
@@ -653,4 +655,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.VectorValuedWeakType`: the weak type `(1,1)` of the analysis operator and
   of the synthesis operators of a Calderón–Zygmund family, with the explicit constant
   `4 · 2^n B + (2n)^n |B(0, 1)| + 4H`.
+* `FunctionSpaces.Lp.WeakType`: the distribution function, weak `L_p` norms and operators of
+  weak and strong type, with the definitions of the Carleson project.
+* `FunctionSpaces.Lp.Marcinkiewicz`: Marcinkiewicz interpolation between weak type `(1,1)` and
+  strong type `(2,2)` for `1 < p < 2` with an explicit constant, by the layer cake argument, for
+  operators on an abstract input type and in the terms of the Carleson project.
 -/

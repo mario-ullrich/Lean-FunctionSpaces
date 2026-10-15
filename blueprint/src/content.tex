@@ -10238,12 +10238,11 @@ and \Cref{lem:calderon-zygmund-averages} bounds $|\Omega^*|$.
 \begin{lemma}[Splitting at a level]
 \label{lem:fefferman-stein-split}
 \lean{ENNReal.lqNorm_indicator, Rd.lqNorm_maximal_le_indicator_add,
-  Rd.volume_lqNorm_maximal_gt_le_split, MeasureTheory.lintegral_indicator_lt_le,
-  ENNReal.inv_half_mul_ofReal_rpow, ENNReal.inv_half_rpow_mul_ofReal_rpow,
-  Rd.volume_lqNorm_maximal_gt_mul_rpow_le}
+  Rd.volume_lqNorm_maximal_gt_le_split, Rd.volume_lqNorm_maximal_gt_mul_rpow_le}
 \leanok
 \uses{thm:vector-weak-type, lem:fefferman-stein-diagonal, lem:maximal-function-basic,
-  lem:maximal-function-measurable, lem:lq-norm-means}
+  lem:maximal-function-measurable, lem:lq-norm-means, lem:parts-above-below-level,
+  lem:marcinkiewicz-level}
 Let $n \geq 1$ and $1 < q < \infty$. For every family of almost everywhere measurable
 $g_j : V \to [0, \infty]$, $j \in \N$, every measurable $S \subseteq V$ with
 $\int_S G < \infty$ and every $0 < s < \infty$,
@@ -10251,8 +10250,7 @@ $\int_S G < \infty$ and every $0 < s < \infty$,
   \bigl|\{\overline M g > s\}\bigr|
   \leq \frac{2 C^{\mathrm w}_{n,q}}{s} \int_S G + \frac{2^q C_{n,q}}{s^q} \int_{V \setminus S} G^q .
 \]
-For every $p \geq 1$, every $F : V \to [0, \infty]$ and every $0 < s < \infty$,
-$\int_{\{F > s\}} F \leq s^{1-p} \int F^p$. For every $p > 1$, every family of measurable
+For every $p > 1$, every family of measurable
 $g_j : V \to [0, \infty]$, $j \in \N$, with $\int G^p < \infty$ and every $\tau > 0$,
 \[
   \bigl|\{\overline M g > \tau\}\bigr| \, \tau^{p-1}
@@ -10270,35 +10268,10 @@ $\overline M g \leq \overline M(\mathbf 1_S g) + \overline M(\mathbf 1_{V \setmi
 $\{\overline M g > s\}$ lies in
 $\{\overline M(\mathbf 1_S g) > s/2\} \cup \{\overline M(\mathbf 1_{V \setminus S} g) > s/2\}$.
 \Cref{thm:vector-weak-type} bounds the first set, Chebyshev's inequality and
-\Cref{lem:fefferman-stein-diagonal} the second. On $\{F > s\}$, $s^{p-1} F \leq F^p$. The last bound
-is the first for $S = \{G > \tau\}$, with $(\tau/2)^{-1} \tau^{p-1} = 2 \tau^{p-2}$ and
-$(\tau/2)^{-q} \tau^{p-1} = 2^q \tau^{p-1-q}$.
-\end{proof}
-
-\begin{lemma}[Two Tonelli steps]
-\label{lem:interpolation-tonelli}
-\lean{MeasureTheory.measurable_indicator_section, MeasureTheory.measurableSet_ofReal_lt,
-  Rd.lintegral_Ioi_lintegral_indicator_lt_mul_rpow, ENNReal.rpow_mul_rpow_sub_le,
-  Rd.lintegral_Ioi_lintegral_indicator_compl_mul_rpow_le}
-\leanok
-\uses{lem:power-integrals}
-For every measurable $F : V \to [0, \infty]$ and every $p > 1$,
-\[
-  \int_0^\infty \tau^{p-2} \int_{\{F > \tau\}} F \, dx \, d\tau = \frac{1}{p - 1} \int F^p ,
-\]
-and for every $r > 0$ and every $p < r$,
-\[
-  \int_0^\infty \tau^{p-1-r} \int_{\{F \leq \tau\}} F^r \, dx \, d\tau
-  \leq \frac{1}{r - p} \int F^p .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-The integrands are jointly measurable in $(\tau, x)$, so Tonelli's theorem exchanges the
-integrals. By \Cref{lem:power-integrals}, $\int_0^{F(x)} \tau^{p-2} \, d\tau = F(x)^{p-1}/(p-1)$
-and $\int_{F(x)}^\infty \tau^{p-1-r} \, d\tau = F(x)^{p-r}/(r-p)$, and
-$F^r F^{p-r} \leq F^p$ in $[0, \infty]$, with equality where $0 < F < \infty$.
+\Cref{lem:fefferman-stein-diagonal} the second. The last bound is the first for
+$S = \{G > \tau\}$, on which $G$ is integrable by \Cref{lem:parts-above-below-level}, with
+$(\tau/2)^{-1} \tau^{p-1} = 2 \tau^{p-2}$ and $(\tau/2)^{-q} \tau^{p-1} = 2^q \tau^{p-1-q}$
+(\Cref{lem:marcinkiewicz-level}).
 \end{proof}
 
 \begin{theorem}[The case $p < q$]
@@ -10307,7 +10280,7 @@ $F^r F^{p-r} \leq F^p$ in $[0, \infty]$, with equality where $0 < F < \infty$.
   Rd.lintegral_lqNorm_maximal_rpow_le_of_lt_of_measurable,
   Rd.lintegral_lqNorm_maximal_rpow_le_of_lt}
 \leanok
-\uses{lem:fefferman-stein-split, lem:interpolation-tonelli, lem:layer-cake,
+\uses{lem:fefferman-stein-split, lem:tonelli-steps-measure-space, lem:layer-cake,
   lem:maximal-function-basic, lem:maximal-function-measurable, lem:lq-norm-means}
 Let $n \geq 1$, $1 < p < q < \infty$ and
 \[
@@ -10325,7 +10298,7 @@ For every family of almost everywhere measurable $g_j : V \to [0, \infty]$,
 Replacing each $g_j$ by a measurable function equal to it almost everywhere leaves both sides
 unchanged. Let $\int G^p < \infty$. By \Cref{lem:layer-cake},
 $\int (\overline M g)^p = p \int_0^\infty |\{\overline M g > \tau\}| \, \tau^{p-1} \, d\tau$, and
-\Cref{lem:fefferman-stein-split} bounds the integrand. \Cref{lem:interpolation-tonelli} with
+\Cref{lem:fefferman-stein-split} bounds the integrand. \Cref{lem:tonelli-steps-measure-space} with
 $r = q$ evaluates the two resulting integrals.
 \end{proof}
 
@@ -10386,13 +10359,14 @@ that bound is used at the exponent $q$ for functions known only to lie in $L_p$.
 
 \begin{theorem}[Fefferman--Stein inequality]
 \label{thm:fefferman-stein}
-\lean{MeasureTheory.eLpNorm_le_rpow_mul_of_lintegral_le, Rd.feffermanStein_top,
+\lean{Rd.feffermanStein_top,
   Rd.feffermanStein_self, Rd.feffermanStein_of_gt, Rd.feffermanStein_of_lt,
   Rd.feffermanSteinConst, Rd.feffermanSteinConst_ne_top, Rd.feffermanStein}
 \leanok
 \uses{thm:fefferman-stein-duality, thm:fefferman-stein-interpolation,
   lem:fefferman-stein-diagonal, thm:maximal-strong-type, lem:maximal-function-basic,
-  lem:maximal-function-measurable, lem:lq-norm-means, lem:lp-norm-nonnegative}
+  lem:maximal-function-measurable, lem:lq-norm-means, lem:lp-norm-nonnegative,
+  lem:lp-norm-from-power-integrals}
 Let $1 < p < \infty$ and $1 < q \leq \infty$, and let $C_{n,p,q}$ be $1$ for $n = 0$, and
 otherwise $C_{n,p}^{1/p}$ for $q \in \{p, \infty\}$, $(C^{\mathrm d}_{n,p,q})^{1/p}$ for $q < p$
 and $(C^{\mathrm i}_{n,p,q})^{1/p}$ for $p < q < \infty$. Then $C_{n,p,q} < \infty$, and for
@@ -10409,8 +10383,8 @@ For $n = 0$, $M g_j = g_j$ by \Cref{lem:maximal-function-basic}. For $q = \infty
 $M g_j \leq M(\sup_k g_k)$ for every $j$, and \Cref{thm:maximal-strong-type} applies to
 $\sup_k g_k$; for every other $q$ the bound is the $p$-th root of
 \Cref{lem:fefferman-stein-diagonal} ($q = p$), \Cref{thm:fefferman-stein-duality} ($q < p$) or
-\Cref{thm:fefferman-stein-interpolation} ($p < q$), since
-$\|F\|_p^p = \int F^p$ for measurable $F$.
+\Cref{thm:fefferman-stein-interpolation} ($p < q$), by
+\Cref{lem:lp-norm-from-power-integrals}.
 \end{proof}
 
 The case $q = 2$ is the one behind the description of the spaces $H^s_p$ by Littlewood--Paley
@@ -16198,7 +16172,7 @@ pieces from the bound of the norm of a mean in \Cref{lem:norm-mean-square-bound}
 $V$ has dimension $n$, and for a dyadic cube $Q$ and $f : V \to E$ the mean is
 $f_Q = |Q|^{-1} \int_Q f$, the Bochner integral, which is $0$ when $f$ is not integrable on $Q$.
 The Carleson project
-(\url{https://github.com/fpvandoorn/carleson}) has a scalar Calder\'on--Zygmund decomposition
+\cite{CarlesonBlueprint,CarlesonLean} has a scalar Calder\'on--Zygmund decomposition
 on doubling metric measure spaces.
 
 \begin{lemma}[Means of vector-valued functions]
@@ -16724,6 +16698,393 @@ Apply \Cref{lem:level-sets-split-function} with the sizes of the good and of the
 and $b$ and with $S = \Omega^*$: \Cref{lem:good-part-split} gives the splitting and $A = B 2^n$,
 \Cref{lem:calderon-zygmund-averages} gives $D = (2n)^n |B(0, 1)|$, and
 \Cref{lem:bad-part-off-enlarged} gives $K = 2H$. Then $4A + D + 2K = C_V(B, H)$.
+\end{proof}
+
+\section{Weak \texorpdfstring{$L_p$}{L\_p} norms and operators of weak and strong type}
+\label{sec:weak-type-operators}
+
+The definitions of this section are those of the formalisation of Carleson's theorem
+\cite{CarlesonLean} (\url{https://github.com/fpvandoorn/carleson}), taken over with the same
+names and statements; that project intends them for Mathlib. Functions take values in a type
+$E$ with an extended norm $\|\cdot\| : E \to [0, \infty]$, such as $\C$ or $[0, \infty]$
+itself, and operators $T$ map functions on a measure space $(X, \mu)$ to functions on a measure
+space $(Y, \nu)$.
+
+\begin{definition}[Weak $L_p$ norms and weak type {\cite{CarlesonLean}}]
+\label{def:weak-type-operators}
+\lean{MeasureTheory.distribution, MeasureTheory.wnorm', MeasureTheory.wnorm,
+  MeasureTheory.MemWLp, MeasureTheory.HasWeakType, MeasureTheory.HasStrongType,
+  MeasureTheory.AESubadditiveOn}
+\leanok
+For every $f : X \to E$ and every $t \in [0, \infty]$, the distribution function of $f$ is
+$d_f(t) = \mu\{x \in X : \|f(x)\| > t\}$. For every real $q \neq 0$,
+\[
+  w_q(f) = \sup_{t \geq 0} t \, d_f(t)^{1/q} ;
+\]
+for $p \in (0, \infty)$ the weak $L_p$ norm is $\|f\|_{p, \infty} = w_p(f)$,
+$\|f\|_{\infty, \infty}$ is the essential supremum of $\|f\|$, and $\|f\|_{0, \infty} = \infty$;
+the function $f$ lies in weak $L_p(\mu)$ if it is almost everywhere strongly measurable and
+$\|f\|_{p, \infty} < \infty$. For all $p, q, C \in [0, \infty]$, an operator $T$ has weak type
+$(p, q)$ with constant $C$ if for every $f \in L_p(\mu)$ the function $T f$ is almost everywhere
+strongly measurable and $\|T f\|_{q, \infty} \leq C \|f\|_p$, and strong type $(p, q)$ with
+constant $C$ if for every $f \in L_p(\mu)$ the function $T f$ is almost everywhere strongly
+measurable and $\|T f\|_q \leq C \|f\|_p$. For every property $P$ of functions on $X$ and every
+$A \in [0, \infty]$, $T$ is almost everywhere subadditive on $P$ with constant $A$ if for all
+$f, g$ with property $P$,
+$\|T(f + g)(y)\| \leq A (\|T f(y)\| + \|T g(y)\|)$ for $\nu$-almost every $y \in Y$.
+\end{definition}
+
+The value $\|f\|_{0, \infty} = \infty$ comes from Lean's convention $1/0 = 0$, under which
+$\|f\|_{0, \infty} = \sup_{t \geq 0} t \, d_f(t)^0 = \sup_{t \geq 0} t$.
+
+\begin{lemma}[Elementary properties]
+\label{lem:distribution-weak-norm-basic}
+\lean{MeasureTheory.distribution_top, MeasureTheory.distribution_mono_left,
+  MeasureTheory.distribution_mono_right, MeasureTheory.distribution_add_le_of_enorm,
+  MeasureTheory.wnorm_ne_top, MeasureTheory.mul_distribution_le_wnorm_one,
+  MeasureTheory.distribution_le_inv_rpow_mul_eLpNorm_rpow, MeasureTheory.wnorm'_le_eLpNorm',
+  MeasureTheory.wnorm_le_eLpNorm, MeasureTheory.MemLp.memWLp, MeasureTheory.HasWeakType.memWLp,
+  MeasureTheory.HasStrongType.memLp, MeasureTheory.HasStrongType.hasWeakType}
+\leanok
+\uses{def:weak-type-operators}
+For all $f : X \to E$ and $s, t \in [0, \infty]$: $d_f(\infty) = 0$; if $s \leq t$, then
+$d_f(t) \leq d_f(s)$; for every type $E'$ with an extended norm and every $g : X \to E'$ with
+$\|f\| \leq \|g\|$ almost everywhere, $d_f(t) \leq d_g(t)$; for all types $E_1, E_2$ with
+extended norms, all $g_1 : X \to E_1$, $g_2 : X \to E_2$ and every $c \in [0, \infty]$ with
+$\|f\| \leq c (\|g_1\| + \|g_2\|)$ almost everywhere,
+\[
+  d_f(c (t + s)) \leq d_{g_1}(t) + d_{g_2}(s) ;
+\]
+and $t \, d_f(t) \leq \|f\|_{1, \infty}$. For every $p \in (0, \infty)$,
+$\|f\|_{p, \infty} = w_p(f)$, and for $t > 0$,
+\[
+  d_f(t) \leq t^{-p} \|f\|_p^p .
+\]
+For every almost everywhere strongly measurable $f$ and every $p \in (0, \infty]$,
+$\|f\|_{p, \infty} \leq \|f\|_p$, so $L_p(\mu)$ lies in weak $L_p(\mu)$. For all
+$p, q, C \in [0, \infty]$ with $C < \infty$, an operator of weak type $(p, q)$ with constant $C$
+maps $L_p(\mu)$ into weak $L_q(\nu)$, and one of strong type $(p, q)$ maps $L_p(\mu)$ into
+$L_q(\nu)$; for $q > 0$, strong type $(p, q)$ with constant $C$ implies weak type $(p, q)$ with
+constant $C$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first four statements compare the sets $\{\|f\| > t\}$: no extended norm exceeds $\infty$,
+the sets shrink as $t$ grows, they grow with $\|f\|$, and $\|g_1\| \leq t$, $\|g_2\| \leq s$
+force $\|f\| \leq c (t + s)$. The bound by $\|f\|_{1, \infty}$ is one term of the supremum, and
+$d_f(t) \leq t^{-p} \|f\|_p^p$ is Chebyshev's inequality (Mathlib's
+\texttt{meas\_\allowbreak ge\_\allowbreak le\_\allowbreak mul\_\allowbreak pow\_\allowbreak
+eLpNorm\_\allowbreak enorm}). It gives $t \, d_f(t)^{1/p} \leq \|f\|_p$ for every $t$, hence
+$\|f\|_{p, \infty} \leq \|f\|_p$; for $p = \infty$ both sides are the essential supremum. The
+statements on operators follow.
+\end{proof}
+
+\section{Marcinkiewicz interpolation}
+\label{sec:marcinkiewicz}
+
+For $1 < p < 2$, an operator that is almost everywhere subadditive with constant $A$, of weak
+type $(1,1)$ with constant $C_1$ and of strong type $(2,2)$ with constant $C_2$ has strong type
+$(p, p)$. Since strong type $(2,2)$ implies weak type $(2,2)$
+(\Cref{lem:distribution-weak-norm-basic}), the real interpolation theorem of the formalisation
+of Carleson's theorem \cite{CarlesonLean} with $(p_0, q_0) = (1, 1)$ and
+$(p_1, q_1) = (2, 2)$ gives strong type $(p, p)$ for $A \geq 1$ and positive finite constants.
+Here the layer cake argument gives it on s-finite measure spaces for every $A \geq 0$ and all
+$C_1, C_2 \in [0, \infty]$, with the constant
+$\bigl(p (2 A C_1/(p - 1) + 4 A^2 C_2^2/(2 - p))\bigr)^{1/p}$. The proof is the argument of
+\Cref{thm:fefferman-stein-interpolation} on a general measure space: at each level $\tau$ the
+input is split along the set where its size exceeds $\tau$, the weak type controls the large
+part and the $L_2$ bound the small part, and the layer cake formula of \Cref{lem:layer-cake}
+collects the levels. The measure $\mu$ on the input space is s-finite, so that Tonelli's theorem
+applies; $\nu$ is any measure.
+
+\begin{lemma}[The parts above and below a level]
+\label{lem:parts-above-below-level}
+\lean{MeasureTheory.lintegral_indicator_lt_le, MeasureTheory.lintegral_indicator_compl_rpow_le,
+  MeasureTheory.lintegral_indicator_lt_ne_top,
+  MeasureTheory.lintegral_indicator_compl_rpow_ne_top}
+\leanok
+For every measure space $(X, \mu)$, every $F : X \to [0, \infty]$, every $p \geq 1$ and every
+$s \in (0, \infty)$,
+\[
+  \int_{\{F > s\}} F \, d\mu \leq s^{1-p} \int F^p \, d\mu ,
+\]
+and for all real $p, r$ with $0 \leq p \leq r$ and $0 < r$ and every $s \in [0, \infty)$,
+\[
+  \int_{\{F \leq s\}} F^r \, d\mu \leq s^{r-p} \int F^p \, d\mu .
+\]
+In particular both left sides are finite if $\int F^p \, d\mu < \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $\{F > s\}$, $s^{p-1} F \leq F^p$; on $\{F \leq s\}$, $F^r = F^p F^{r-p} \leq F^p s^{r-p}$.
+\end{proof}
+
+\begin{lemma}[Two Tonelli steps]
+\label{lem:tonelli-steps-measure-space}
+\lean{MeasureTheory.measurable_indicator_section, MeasureTheory.measurableSet_ofReal_lt,
+  ENNReal.rpow_mul_rpow_sub_le, MeasureTheory.lintegral_Ioi_lintegral_indicator_lt_mul_rpow,
+  MeasureTheory.lintegral_Ioi_lintegral_indicator_compl_mul_rpow_le}
+\leanok
+\uses{lem:power-integrals}
+For every s-finite measure space $(X, \mu)$, every measurable $F : X \to [0, \infty]$ and every
+$p > 1$,
+\[
+  \int_0^\infty \tau^{p-2} \int_{\{F > \tau\}} F \, d\mu \, d\tau
+  = \frac{1}{p - 1} \int F^p \, d\mu ,
+\]
+and for every $r > 0$ and every $p < r$,
+\[
+  \int_0^\infty \tau^{p-1-r} \int_{\{F \leq \tau\}} F^r \, d\mu \, d\tau
+  \leq \frac{1}{r - p} \int F^p \, d\mu .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The integrands are jointly measurable in $(\tau, x)$, so Tonelli's theorem for the s-finite
+measure $\mu$ and Lebesgue measure on $(0, \infty)$ exchanges the integrals. By
+\Cref{lem:power-integrals}, $\int_0^{F(x)} \tau^{p-2} \, d\tau = F(x)^{p-1}/(p-1)$ and
+$\int_{F(x)}^\infty \tau^{p-1-r} \, d\tau = F(x)^{p-r}/(r-p)$, and $F^r F^{p-r} \leq F^p$ in
+$[0, \infty]$, with equality where $0 < F < \infty$.
+\end{proof}
+
+\begin{lemma}[Integrals of powers from bounds at every level]
+\label{lem:power-integral-from-levels}
+\lean{MeasureTheory.lintegral_rpow_le_of_measure_lt_mul_rpow_le}
+\leanok
+\uses{lem:layer-cake, lem:tonelli-steps-measure-space}
+For every s-finite measure space $(X, \mu)$, every measure space $(Y, \nu)$, every almost
+everywhere measurable $F : Y \to [0, \infty]$, every measurable $G : X \to [0, \infty]$, all
+real $p, r$ with $1 < p < r$ and all $K_1, K_2 \in [0, \infty]$: if for every $\tau > 0$
+\[
+  \nu\{F > \tau\} \, \tau^{p-1}
+  \leq K_1 \, \tau^{p-2} \int_{\{G > \tau\}} G \, d\mu
+  + K_2 \, \tau^{p-1-r} \int_{\{G \leq \tau\}} G^r \, d\mu ,
+\]
+then
+\[
+  \int F^p \, d\nu \leq p \Bigl( \frac{K_1}{p - 1} + \frac{K_2}{r - p} \Bigr) \int G^p \, d\mu .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:layer-cake}, $\int F^p \, d\nu = p \int_0^\infty \nu\{F > \tau\} \tau^{p-1} \,
+d\tau$. Bound the integrand by the hypothesis and evaluate the two integrals over $\tau$ by
+\Cref{lem:tonelli-steps-measure-space}.
+\end{proof}
+
+\begin{lemma}[The level estimate]
+\label{lem:marcinkiewicz-level}
+\lean{ENNReal.inv_half_mul_ofReal_rpow, ENNReal.inv_half_rpow_mul_ofReal_rpow,
+  MeasureTheory.measure_lt_mul_rpow_le_of_le_add}
+\leanok
+\uses{lem:distribution-weak-norm-basic}
+For every $\tau > 0$ and all real $p, r$,
+\[
+  (\tau/2)^{-1} \tau^{p-1} = 2 \tau^{p-2} , \qquad
+  (\tau/2)^{-r} \tau^{p-1} = 2^r \tau^{p-1-r} .
+\]
+For every measure space $(Y, \nu)$, all $F, F_1, F_2 : Y \to [0, \infty]$ with $F_2$ almost
+everywhere measurable and $F \leq F_1 + F_2$ almost everywhere, every $\tau > 0$, every real
+$p$ and all $C_1, C_2, I_1, I_2 \in [0, \infty]$ with
+\[
+  \nu\{F_1 > \tau/2\} \leq C_1 (\tau/2)^{-1} I_1 , \qquad \int F_2^2 \, d\nu \leq C_2 I_2 ,
+\]
+the bound
+$\nu\{F > \tau\} \, \tau^{p-1} \leq 2 C_1 \tau^{p-2} I_1 + 4 C_2 \tau^{p-3} I_2$ holds.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The identities are computations with real powers. Almost every point of $\{F > \tau\}$ lies in
+$\{F_1 > \tau/2\} \cup \{F_2 > \tau/2\}$ (the distribution of a sum in
+\Cref{lem:distribution-weak-norm-basic}, with $c = 1$), and Chebyshev's inequality gives
+$\nu\{F_2 > \tau/2\} \leq (\tau/2)^{-2} C_2 I_2$. The identities with $r = 2$ finish the proof.
+\end{proof}
+
+\begin{definition}[The Marcinkiewicz constants]
+\label{def:marcinkiewicz-const}
+\lean{MeasureTheory.marcinkiewiczConst, MeasureTheory.marcinkiewiczConst_ne_top,
+  MeasureTheory.marcinkiewiczNormConst, MeasureTheory.marcinkiewiczNormConst_ne_top}
+\leanok
+For $1 < p < 2$ and all $A, C_1, C_2 \in [0, \infty]$,
+\[
+  C^{\mathrm M}_p(C_1, C_2) = p \Bigl( \frac{2 C_1}{p - 1} + \frac{4 C_2}{2 - p} \Bigr)
+\]
+and $N_p(A, C_1, C_2) = C^{\mathrm M}_p(A C_1, A^2 C_2^2)^{1/p}$. Both are finite for finite
+$A$, $C_1$, $C_2$.
+\end{definition}
+
+\begin{theorem}[The layer cake argument of Marcinkiewicz interpolation]
+\label{thm:marcinkiewicz-layer-cake}
+\lean{MeasureTheory.lintegral_rpow_le_of_forall_le_add}
+\leanok
+\uses{lem:power-integral-from-levels, lem:marcinkiewicz-level, def:marcinkiewicz-const}
+Let $(X, \mu)$ be an s-finite measure space, $(Y, \nu)$ a measure space and $1 < p < 2$. For
+every almost everywhere measurable $F : Y \to [0, \infty]$, every measurable
+$G : X \to [0, \infty]$, all $C_1, C_2 \in [0, \infty]$ and all families
+$F_{1, \tau}, F_{2, \tau} : Y \to [0, \infty]$, $\tau > 0$, with $F_{2, \tau}$ almost everywhere
+measurable, $F \leq F_{1, \tau} + F_{2, \tau}$ almost everywhere,
+\[
+  \nu\{F_{1, \tau} > \tau/2\} \leq C_1 (\tau/2)^{-1} \int_{\{G > \tau\}} G \, d\mu
+\]
+and
+\[
+  \int F_{2, \tau}^2 \, d\nu \leq C_2 \int_{\{G \leq \tau\}} G^2 \, d\mu
+\]
+for every $\tau > 0$,
+\[
+  \int F^p \, d\nu \leq C^{\mathrm M}_p(C_1, C_2) \int G^p \, d\mu .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{lem:marcinkiewicz-level} gives the hypothesis of \Cref{lem:power-integral-from-levels}
+with $r = 2$, $K_1 = 2 C_1$ and $K_2 = 4 C_2$.
+\end{proof}
+
+\begin{lemma}[From integrals of powers to $L_p$ norms]
+\label{lem:lp-norm-from-power-integrals}
+\lean{MeasureTheory.eLpNorm_le_rpow_mul_of_lintegral_enorm_le,
+  MeasureTheory.eLpNorm_le_rpow_mul_of_lintegral_le,
+  MeasureTheory.lintegral_enorm_sq_eq_eLpNorm_sq}
+\leanok
+\uses{lem:minkowski-avg, lem:lp-norm-nonnegative}
+For all measure spaces $(X, \mu)$, $(Y, \nu)$, all types $E, E'$ with an extended norm, every
+$p \in (0, \infty)$, every $C \in [0, \infty]$ and all almost everywhere strongly measurable
+$F : Y \to E$, $G : X \to E'$ with $\int \|F\|^p \, d\nu \leq C \int \|G\|^p \, d\mu$,
+\[
+  \|F\|_{L_p(\nu)} \leq C^{1/p} \, \|G\|_{L_p(\mu)} .
+\]
+For every almost everywhere strongly measurable $g : X \to E$,
+$\int \|g\|^2 \, d\mu = \|g\|_{L_2(\mu)}^2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both follow from $\|F\|_p^p = \int \|F\|^p$ (the identity
+\texttt{MeasureTheory.\allowbreak eLpNorm\_\allowbreak rpow\_\allowbreak eq}, cited in
+\Cref{lem:minkowski-avg}; \Cref{lem:lp-norm-nonnegative} for $[0, \infty]$-valued functions),
+the first by taking $p$-th roots.
+\end{proof}
+
+The first form of the interpolation theorem works with an abstract input type: every input
+$x$ has a size $G_x : X \to [0, \infty]$, such as $|f|$ for a function $f$ or
+$\|(g_j)_j\|_{\ell_2}$ for a family $(g_j)_j$, and can be restricted to measurable sets.
+
+\begin{theorem}[Marcinkiewicz interpolation for operators on an abstract input type]
+\label{thm:marcinkiewicz-abstract}
+\lean{MeasureTheory.lintegral_rpow_le_of_weak_one_strong_two,
+  MeasureTheory.eLpNorm_le_of_weak_one_strong_two}
+\leanok
+\uses{thm:marcinkiewicz-layer-cake, lem:parts-above-below-level,
+  lem:lp-norm-from-power-integrals}
+Let $(X, \mu)$ be an s-finite measure space, $(Y, \nu)$ a measure space, $\mathcal X$ a set,
+$1 < p < 2$ and $C_1, C_2 \in [0, \infty]$. Let every $x \in \mathcal X$ carry a measurable
+$G_x : X \to [0, \infty]$ and an almost everywhere measurable $T x : Y \to [0, \infty]$, and let
+every measurable $S \subseteq X$ give an element $x|_S \in \mathcal X$ with
+$G_{x|_S} = \mathbf 1_S G_x$. Suppose that for every $x \in \mathcal X$
+\begin{itemize}
+  \item if $\int G_x^p \, d\mu < \infty$, then $T x \leq T(x|_S) + T(x|_{X \setminus S})$
+  $\nu$-almost everywhere for every measurable $S \subseteq X$;
+  \item if $\int G_x \, d\mu < \infty$, then $\nu\{T x > t\} \leq C_1 t^{-1} \int G_x \, d\mu$
+  for every $t \in (0, \infty)$;
+  \item if $\int G_x^2 \, d\mu < \infty$, then
+  $\int (T x)^2 \, d\nu \leq C_2 \int G_x^2 \, d\mu$.
+\end{itemize}
+Then for every $x \in \mathcal X$ with $\int G_x^p \, d\mu < \infty$,
+\[
+  \int (T x)^p \, d\nu \leq C^{\mathrm M}_p(C_1, C_2) \int G_x^p \, d\mu
+\]
+and
+\[
+  \|T x\|_{L_p(\nu)} \leq C^{\mathrm M}_p(C_1, C_2)^{1/p} \, \|G_x\|_{L_p(\mu)} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Apply \Cref{thm:marcinkiewicz-layer-cake} with $F = T x$, $G = G_x$,
+$F_{1, \tau} = T(x|_{S_\tau})$ and $F_{2, \tau} = T(x|_{X \setminus S_\tau})$ for
+$S_\tau = \{G_x > \tau\}$. The restricted inputs satisfy the finiteness conditions:
+$\int_{S_\tau} G_x \leq \tau^{1-p} \int G_x^p$ and
+$\int_{X \setminus S_\tau} G_x^2 \leq \tau^{2-p} \int G_x^p$ by
+\Cref{lem:parts-above-below-level}. \Cref{lem:lp-norm-from-power-integrals} turns the first
+bound into the second.
+\end{proof}
+
+\begin{lemma}[Truncation at a level]
+\label{lem:truncation-level}
+\lean{MeasureTheory.measure_lt_mul_enorm_le_wnorm_one,
+  MeasureTheory.lintegral_mul_enorm_sq_le_of_hasStrongType, MeasureTheory.ae_enorm_indicator_eq,
+  MeasureTheory.lintegral_enorm_indicator_rpow_eq, MeasureTheory.memLp_one_indicator_lt,
+  MeasureTheory.memLp_two_indicator_compl}
+\leanok
+\uses{def:weak-type-operators, lem:distribution-weak-norm-basic, lem:parts-above-below-level,
+  lem:lp-norm-from-power-integrals}
+For every measure space $(Y, \nu)$, every $g : Y \to E$, every $A \geq 0$ and every
+$t \in (0, \infty)$, $\nu\{A \|g\| > t\} \leq A t^{-1} \|g\|_{1, \infty}$. For every operator
+$T$ of strong type $(2, 2)$ with constant $C_2$, every $g \in L_2(\mu)$ and every $A \geq 0$,
+$\int (A \|T g\|)^2 \, d\nu \leq A^2 C_2^2 \int \|g\|^2 \, d\mu$. Let $E$ be a monoid with an
+extended seminorm, $f : X \to E$ almost everywhere strongly measurable and
+$G : X \to [0, \infty]$ measurable with $\|f\| = G$ almost everywhere. Then for every
+$S \subseteq X$, $\|\mathbf 1_S f\| = \mathbf 1_S G$ almost everywhere, and
+$\int \|\mathbf 1_S f\|^r = \int (\mathbf 1_S G)^r$ for every real $r$. If
+$\int G^p \, d\mu < \infty$, then $\mathbf 1_{\{G > \tau\}} f \in L_1(\mu)$ for $p \geq 1$ and
+every $\tau > 0$, and $\mathbf 1_{\{G \leq \tau\}} f \in L_2(\mu)$ for $0 \leq p \leq 2$ and
+every real $\tau$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $A > 0$, $\{A \|g\| > t\} = \{\|g\| > t/A\}$, and \Cref{lem:distribution-weak-norm-basic}
+gives $(t/A) \, d_g(t/A) \leq \|g\|_{1, \infty}$; for $A = 0$ the set is empty. The second bound
+is the square of $\|T g\|_2 \leq C_2 \|g\|_2$ (\Cref{lem:lp-norm-from-power-integrals}). The
+norm of $\mathbf 1_S f$ is $\mathbf 1_S \|f\|$. Finally
+$\int_{\{G > \tau\}} G \leq \tau^{1-p} \int G^p$ and
+$\int_{\{G \leq \tau\}} G^2 \leq \tau^{2-p} \int G^p$ (\Cref{lem:parts-above-below-level}).
+\end{proof}
+
+\begin{theorem}[Marcinkiewicz interpolation between weak type $(1,1)$ and strong type $(2,2)$]
+\label{thm:marcinkiewicz-interpolation}
+\lean{MeasureTheory.lintegral_enorm_rpow_le_of_hasWeakType_of_hasStrongType,
+  MeasureTheory.hasStrongType_of_hasWeakType_one_of_hasStrongType_two}
+\leanok
+\uses{thm:marcinkiewicz-layer-cake, lem:lp-norm-from-power-integrals, lem:truncation-level,
+  def:weak-type-operators, def:marcinkiewicz-const}
+Let $(X, \mu)$ be an s-finite measure space, $(Y, \nu)$ a measure space, $E$ a monoid with an
+extended seminorm, $Z$ a type with an extended norm, $A \geq 0$ and
+$C_1, C_2 \in [0, \infty]$. Let $T$ map functions $X \to E$ to functions $Y \to Z$, be almost
+everywhere subadditive with constant $A$ on the functions in $L_1(\mu)$ or $L_2(\mu)$, of weak
+type $(1, 1)$ with constant $C_1$ and of strong type $(2, 2)$ with constant $C_2$. Then for every
+real $p$ with $1 < p < 2$ and every almost everywhere strongly measurable $f : X \to E$ with
+$\int \|f\|^p \, d\mu < \infty$ and almost everywhere strongly measurable $T f$,
+\[
+  \int \|T f\|^p \, d\nu \leq C^{\mathrm M}_p(A C_1, A^2 C_2^2) \int \|f\|^p \, d\mu .
+\]
+If moreover $T f$ is almost everywhere strongly measurable for every $f \in L_p(\mu)$, then $T$
+has strong type $(p, p)$ with constant $N_p(A, C_1, C_2)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Choose a measurable $G$ with $\|f\| = G$ almost everywhere, and for $\tau > 0$ split
+$f = \mathbf 1_{\{G > \tau\}} f + \mathbf 1_{\{G \leq \tau\}} f$; the first part lies in
+$L_1(\mu)$, the second in $L_2(\mu)$ (\Cref{lem:truncation-level}). Subadditivity gives
+$\|T f\| \leq A \|T(\mathbf 1_{\{G > \tau\}} f)\| + A \|T(\mathbf 1_{\{G \leq \tau\}} f)\|$
+almost everywhere. By \Cref{lem:truncation-level}, the weak type $(1,1)$ gives
+\[
+  \nu\{A \|T(\mathbf 1_{\{G > \tau\}} f)\| > \tau/2\}
+  \leq A C_1 (\tau/2)^{-1} \int_{\{G > \tau\}} G ,
+\]
+and the strong type $(2,2)$ gives
+$\int A^2 \|T(\mathbf 1_{\{G \leq \tau\}} f)\|^2 \leq A^2 C_2^2 \int_{\{G \leq \tau\}} G^2$.
+\Cref{thm:marcinkiewicz-layer-cake} gives the first bound, and
+\Cref{lem:lp-norm-from-power-integrals} the strong type.
 \end{proof}
 
 \chapter{Besov spaces on compact manifolds}
@@ -18218,6 +18579,21 @@ J.~Bergh, J.~L\"ofstr\"om,
 \emph{Interpolation Spaces. An Introduction},
 Grundlehren der mathematischen Wissenschaften \textbf{223}, Springer-Verlag, Berlin, 1976,
 \href{https://doi.org/10.1007/978-3-642-66451-9}{doi}.
+
+\bibitem{CarlesonBlueprint}
+L.~Becker, M.~I.~de~Frutos-Fern\'andez, L.~Diedering, F.~van~Doorn, S.~Gou\"ezel,
+A.~Jamneshan, E.~Karunus, E.~van~de~Meent, P.~Monticone, J.~Mulder-Sohn, J.~Portegies,
+J.~Roos, M.~Rothgang, R.~Srivastava, J.~Sundstrom, J.~Tan, C.~Thiele,
+\emph{A blueprint for the formalization of Carleson's theorem on convergence of Fourier
+series}, preprint, 2024, revised 2025,
+\href{https://arxiv.org/abs/2405.06423}{arXiv:2405.06423}.
+
+\bibitem{CarlesonLean}
+L.~Becker, M.~I.~de~Frutos-Fern\'andez, L.~Diedering, F.~van~Doorn, S.~Gou\"ezel,
+E.~Karunus, E.~van~de~Meent, P.~Monticone, J.~Mulder-Sohn, J.~Portegies, J.~Roos,
+M.~Rothgang, J.~Sundstrom, J.~Tan,
+\emph{Formalizing Carleson's theorem in Lean}, preprint, 2026,
+\href{https://arxiv.org/abs/2609.31334}{arXiv:2609.31334}.
 
 \bibitem{ChandlerWildeHewettMoiola}
 S.~N.~Chandler-Wilde, D.~P.~Hewett, A.~Moiola,

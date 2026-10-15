@@ -197,6 +197,20 @@ declarations.
   either `∞` or force the functions to vanish almost everywhere. Also `MemLp f 2 μ` from
   `∫⁻ ‖f‖ₑ ^ 2 ∂μ ≠ ∞` (`MeasureTheory.memLp_two_of_lintegral_enorm_sq_ne_top`), with the
   exponent `2 : ℕ`.
+* **Marcinkiewicz interpolation between weak type `(1,1)` and strong type `(2,2)`**
+  (`FunctionSpaces/Lp/Marcinkiewicz.lean`): the two Tonelli steps
+  `∫_0^∞ τ^(p-2) ∫_{F > τ} F dμ dτ = (p - 1)⁻¹ ∫ F^p` and
+  `∫_0^∞ τ^(p-1-r) ∫_{F ≤ τ} F^r dμ dτ ≤ (r - p)⁻¹ ∫ F^p` on s-finite measure spaces
+  (`MeasureTheory.lintegral_Ioi_lintegral_indicator_lt_mul_rpow`,
+  `MeasureTheory.lintegral_Ioi_lintegral_indicator_compl_mul_rpow_le`), the layer cake argument
+  `MeasureTheory.lintegral_rpow_le_of_forall_le_add`, and the case `(1,1)`, `(2,2)` of real
+  interpolation with an explicit constant in the terms of the Carleson project
+  (`MeasureTheory.hasStrongType_of_hasWeakType_one_of_hasStrongType_two`); the definitions in
+  `FunctionSpaces/Lp/WeakType.lean` are the Carleson project's own candidates. The file still
+  imports `FunctionSpaces/Rd/HardyLittlewoodMaximal.lean` for the layer cake formula
+  `MeasureTheory.lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal` and the integrals of powers
+  `MeasureTheory.lintegral_Ioi_rpow_indicator_lt`, `MeasureTheory.lintegral_Ioi_rpow_indicator_ge`,
+  which are general measure theory as well.
 * **Integrals under a change of scale** (`FunctionSpaces/Rd/KernelMajorants.lean`):
   `∫ f(r x) dx = |r^(-n)| ∫ f` for `f : V → [0, ∞]` and `r ≠ 0` (`Rd.lintegral_comp_smul`),
   from Mathlib's `Measure.map_addHaar_smul`; Mathlib has the Bochner version

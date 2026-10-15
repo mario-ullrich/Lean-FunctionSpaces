@@ -363,7 +363,8 @@ Sobolev spaces on `ℝ^d` are the files `SchwartzCutoff`, `WeakDerivatives`,
 `SobolevTwoLittlewoodPaley`, `LipschitzDomainH1`, `RellichCompactness`,
 `SobolevRestrictionSpaces`, `SobolevDuality`, `BoundaryTraceSpace`, `LipschitzGraphArea`,
 `SurfaceMeasure`, `DilationFamilies`, `ConvolutionAdjoint`, `PlancherelBounds`,
-`CalderonZygmundSigned` and `VectorValuedWeakType` in `FunctionSpaces/Rd/`.
+`CalderonZygmundSigned` and `VectorValuedWeakType` in `FunctionSpaces/Rd/`, with `WeakType`
+and `Marcinkiewicz` in `FunctionSpaces/Lp/`.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 [docs/FEECInterface.md](docs/FEECInterface.md) describes the interface to a FEEC/BEEC library

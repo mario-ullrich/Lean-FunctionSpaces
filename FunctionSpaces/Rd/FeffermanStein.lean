@@ -7,6 +7,7 @@ module
 
 public import FunctionSpaces.Rd.CalderonZygmund
 public import FunctionSpaces.Rd.HardyLittlewoodMaximal
+public import FunctionSpaces.Lp.Marcinkiewicz
 public import FunctionSpaces.Lp.MixedNorms
 
 /-!
@@ -42,19 +43,6 @@ open ENNReal (lqNorm)
 
 namespace ENNReal
 
-/-- `a^r a^(p-r) ≤ a^p` in `[0, ∞]` for `0 < r` and `p < r`, with equality for `0 < a < ∞`; for
-`a = ∞` the left side is `∞ · 0 = 0`. -/
-theorem rpow_mul_rpow_sub_le (a : ℝ≥0∞) {p r : ℝ} (hr : 0 < r) (hpr : p < r) :
-    a ^ r * a ^ (p - r) ≤ a ^ p := by
-  rcases eq_or_ne a 0 with rfl | h0
-  · rw [ENNReal.zero_rpow_of_pos hr, zero_mul]
-    exact zero_le
-  rcases eq_or_ne a ∞ with rfl | ht
-  · rw [ENNReal.top_rpow_of_neg (by linarith : p - r < 0), mul_zero]
-    exact zero_le
-  rw [← ENNReal.rpow_add _ _ h0 ht]
-  exact le_of_eq (by ring_nf)
-
 /-- **Cancellation in Hölder's inequality**: for conjugate exponents `u, u'` and `X < ∞`, the
 bound `X ≤ K A^{1/u} X^{1/u'}` implies `X ≤ K^u A`, since `X = X^{1/u} X^{1/u'}`. -/
 theorem le_rpow_mul_of_le_mul_rpow {X K A : ℝ≥0∞} {u u' : ℝ} (h : u.HolderConjugate u')
@@ -75,28 +63,6 @@ theorem le_rpow_mul_of_le_mul_rpow {X K A : ℝ≥0∞} {u u' : ℝ} (h : u.Hold
     _ ≤ (K * A ^ (1 / u)) ^ u := ENNReal.rpow_le_rpow h1 hu.le
     _ = K ^ u * A := by
         rw [ENNReal.mul_rpow_of_nonneg _ _ hu.le, one_div, ENNReal.rpow_inv_rpow hu.ne']
-
-/-- `(τ/2)⁻¹ τ^(p-1) = 2 τ^(p-2)` in `[0, ∞]` for `τ > 0`. -/
-theorem inv_half_mul_ofReal_rpow {τ : ℝ} (hτ : 0 < τ) (p : ℝ) :
-    (ENNReal.ofReal τ / 2)⁻¹ * ENNReal.ofReal (τ ^ (p - 1)) = 2 * ENNReal.ofReal (τ ^ (p - 2)) := by
-  rw [ENNReal.inv_div (Or.inl ENNReal.ofNat_ne_top) (Or.inl two_ne_zero), div_eq_mul_inv,
-    mul_assoc, show p - 1 = 1 + (p - 2) by ring, Real.rpow_add hτ, Real.rpow_one,
-    ENNReal.ofReal_mul hτ.le, ← mul_assoc (ENNReal.ofReal τ)⁻¹,
-    ENNReal.inv_mul_cancel (ENNReal.ofReal_pos.2 hτ).ne' ENNReal.ofReal_ne_top, one_mul]
-
-/-- `((τ/2)^r)⁻¹ τ^(p-1) = 2^r τ^(p-1-r)` in `[0, ∞]` for `τ > 0`. -/
-theorem inv_half_rpow_mul_ofReal_rpow {τ : ℝ} (hτ : 0 < τ) (p r : ℝ) :
-    ((ENNReal.ofReal τ / 2) ^ r)⁻¹ * ENNReal.ofReal (τ ^ (p - 1)) =
-      2 ^ r * ENNReal.ofReal (τ ^ (p - 1 - r)) := by
-  have h2 : ENNReal.ofReal τ / 2 = ENNReal.ofReal (τ / 2) := by
-    rw [ENNReal.ofReal_div_of_pos two_pos, ENNReal.ofReal_ofNat]
-  have hreal : ((τ / 2) ^ r)⁻¹ * τ ^ (p - 1) = 2 ^ r * τ ^ (p - 1 - r) := by
-    rw [Real.div_rpow hτ.le zero_le_two, inv_div, Real.rpow_sub hτ (p - 1) r]
-    have : 0 < τ ^ r := Real.rpow_pos_of_pos hτ r
-    field_simp
-  rw [h2, ENNReal.ofReal_rpow_of_pos (by positivity), ← ENNReal.ofReal_inv_of_pos (by positivity),
-    ← ENNReal.ofReal_mul (by positivity), hreal, ENNReal.ofReal_mul (by positivity),
-    ← ENNReal.ofReal_rpow_of_pos two_pos, ENNReal.ofReal_ofNat]
 
 /-- Restricting every member of a family to a set `S` restricts its pointwise `ℓ_q` norm:
 `‖(1_S g_i(x))_i‖_{ℓ_q} = 1_S(x) ‖(g_i(x))_i‖_{ℓ_q}`. -/
@@ -138,35 +104,6 @@ namespace MeasureTheory
 
 variable {α : Type*} [MeasurableSpace α] {μ : Measure α}
 
-/-- **From integrals of powers to `L_p` norms**: if `∫ F^p ≤ C ∫ G^p` for `0 < p < ∞` and
-almost everywhere measurable `F, G : α → [0, ∞]`, then `‖F‖_p ≤ C^(1/p) ‖G‖_p`. -/
-theorem eLpNorm_le_rpow_mul_of_lintegral_le {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
-    {F G : α → ℝ≥0∞} (hF : AEMeasurable F μ) (hG : AEMeasurable G μ) {C : ℝ≥0∞}
-    (h : ∫⁻ x, F x ^ p.toReal ∂μ ≤ C * ∫⁻ x, G x ^ p.toReal ∂μ) :
-    eLpNorm F p μ ≤ C ^ (1 / p.toReal) * eLpNorm G p μ := by
-  have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  rw [← ENNReal.rpow_le_rpow_iff hr, ENNReal.mul_rpow_of_nonneg _ _ hr.le, one_div,
-    ENNReal.rpow_inv_rpow hr.ne', eLpNorm_rpow_eq_lintegral hp0 hp hF,
-    eLpNorm_rpow_eq_lintegral hp0 hp hG]
-  exact h
-
-/-- **The part above a level**: `∫_{F > s} F ≤ s^(1-p) ∫ F^p` for `p ≥ 1`, `0 < s < ∞` and every
-`F : α → [0, ∞]`, since `s^(p-1) F ≤ F^p` where `F > s`. -/
-theorem lintegral_indicator_lt_le {p : ℝ} (hp : 1 ≤ p) {s : ℝ≥0∞} (hs0 : s ≠ 0) (hs : s ≠ ∞)
-    (F : α → ℝ≥0∞) :
-    ∫⁻ x, {y | s < F y}.indicator F x ∂μ ≤ (s ^ (p - 1))⁻¹ * ∫⁻ x, F x ^ p ∂μ := by
-  have hc0 : s ^ (p - 1) ≠ 0 := (ENNReal.rpow_pos (pos_iff_ne_zero.2 hs0) hs).ne'
-  have hct : s ^ (p - 1) ≠ ∞ := ENNReal.rpow_ne_top_of_nonneg (by linarith) hs
-  rw [← ENNReal.mul_le_iff_le_inv hc0 hct]
-  refine (lintegral_const_mul_le _ _).trans (lintegral_mono fun x => ?_)
-  by_cases hx : s < F x
-  · rw [Set.indicator_of_mem (show x ∈ {y | s < F y} from hx)]
-    calc s ^ (p - 1) * F x = F x * s ^ (p - 1) := mul_comm _ _
-      _ ≤ F x * F x ^ (p - 1) := mul_le_mul_right (ENNReal.rpow_le_rpow hx.le (by linarith)) _
-      _ = F x ^ p := (ENNReal.rpow_eq_mul_rpow_sub_one _ hp).symm
-  · rw [Set.indicator_of_notMem (show x ∉ {y | s < F y} from hx), mul_zero]
-    exact zero_le
-
 /-- **Powers of a bounded function**: if `u ≤ c` almost everywhere, then
 `∫ u^r ≤ c^(r-1) ∫ u` for every `r ≥ 1` and every almost everywhere measurable `u : α → [0, ∞]`,
 since `u^r = u · u^(r-1) ≤ u · c^(r-1)`. -/
@@ -179,25 +116,6 @@ theorem lintegral_rpow_le_mul_lintegral_of_ae_le {u : α → ℝ≥0∞} {c : �
           exact mul_le_mul_right (ENNReal.rpow_le_rpow hx (by linarith)) _)
     _ = (∫⁻ x, u x ∂μ) * c ^ (r - 1) := lintegral_mul_const'' _ hu
     _ = c ^ (r - 1) * ∫⁻ x, u x ∂μ := mul_comm _ _
-
-/-- For a measurable set `S ⊆ ℝ × α` and measurable `F : α → [0, ∞]`, the function
-`(τ, x) ↦ 1_{S_τ}(x) F(x)` with the sections `S_τ = {y : (τ, y) ∈ S}` is measurable. -/
-theorem measurable_indicator_section {S : Set (ℝ × α)} (hS : MeasurableSet S) {F : α → ℝ≥0∞}
-    (hF : Measurable F) : Measurable fun z : ℝ × α => {y | (z.1, y) ∈ S}.indicator F z.2 := by
-  have h : (fun z : ℝ × α => {y | (z.1, y) ∈ S}.indicator F z.2) =
-      S.indicator (fun z => F z.2) := by
-    funext z
-    by_cases hz : z ∈ S
-    · rw [Set.indicator_of_mem (show z.2 ∈ {y | (z.1, y) ∈ S} from hz), Set.indicator_of_mem hz]
-    · rw [Set.indicator_of_notMem (show z.2 ∉ {y | (z.1, y) ∈ S} from hz),
-        Set.indicator_of_notMem hz]
-  rw [h]
-  exact (hF.comp measurable_snd).indicator hS
-
-/-- The set `{(τ, y) : ofReal τ < F(y)}` is measurable for measurable `F : α → [0, ∞]`. -/
-theorem measurableSet_ofReal_lt {F : α → ℝ≥0∞} (hF : Measurable F) :
-    MeasurableSet {z : ℝ × α | ENNReal.ofReal z.1 < F z.2} :=
-  measurableSet_lt (ENNReal.measurable_ofReal.comp measurable_fst) (hF.comp measurable_snd)
 
 end MeasureTheory
 
@@ -686,76 +604,6 @@ theorem volume_lqNorm_maximal_gt_le_split [Nontrivial V] {q : ℝ≥0∞} (hq1 :
           volume {x | s / 2 < lqNorm q (fun j => maximal (Sᶜ.indicator (g j)) x)} :=
         (measure_mono hsub).trans (measure_union_le _ _)
     _ ≤ _ := add_le_add h1 h2
-
-/-- **The first Tonelli step of the interpolation**: for measurable `F : V → [0, ∞]` and `p > 1`,
-`∫_0^∞ (∫_{F > τ} F) τ^(p-2) dτ = (p - 1)⁻¹ ∫ F^p`, since `∫_0^F τ^(p-2) dτ = F^(p-1)/(p-1)`. -/
-theorem lintegral_Ioi_lintegral_indicator_lt_mul_rpow {F : V → ℝ≥0∞} (hF : Measurable F)
-    {p : ℝ} (hp : 1 < p) :
-    ∫⁻ τ in Ioi (0 : ℝ), (∫⁻ x, {y | ENNReal.ofReal τ < F y}.indicator F x) *
-        ENNReal.ofReal (τ ^ (p - 2)) = (ENNReal.ofReal (p - 1))⁻¹ * ∫⁻ x, F x ^ p := by
-  have hJ : AEMeasurable (Function.uncurry fun (τ : ℝ) (x : V) =>
-      {y | ENNReal.ofReal τ < F y}.indicator F x * ENNReal.ofReal (τ ^ (p - 2)))
-      ((volume.restrict (Ioi (0 : ℝ))).prod volume) :=
-    ((measurable_indicator_section (measurableSet_ofReal_lt hF) hF).mul
-      (ENNReal.measurable_ofReal.comp (measurable_fst.pow_const _))).aemeasurable
-  have hpt : ∀ (τ : ℝ) (x : V), {y | ENNReal.ofReal τ < F y}.indicator F x *
-      ENNReal.ofReal (τ ^ (p - 2)) =
-      F x * {s : ℝ | ENNReal.ofReal s < F x}.indicator (fun s => ENNReal.ofReal (s ^ (p - 2))) τ :=
-      fun τ x => by
-    by_cases hτ : ENNReal.ofReal τ < F x
-    · rw [Set.indicator_of_mem (show x ∈ {y | ENNReal.ofReal τ < F y} from hτ),
-        Set.indicator_of_mem (show τ ∈ {s : ℝ | ENNReal.ofReal s < F x} from hτ)]
-    · rw [Set.indicator_of_notMem (show x ∉ {y | ENNReal.ofReal τ < F y} from hτ),
-        Set.indicator_of_notMem (show τ ∉ {s : ℝ | ENNReal.ofReal s < F x} from hτ), zero_mul,
-        mul_zero]
-  have hm : ∀ x, Measurable fun s : ℝ =>
-      {s : ℝ | ENNReal.ofReal s < F x}.indicator (fun s => ENNReal.ofReal (s ^ (p - 2))) s :=
-    fun x => (ENNReal.measurable_ofReal.comp (measurable_id.pow_const _)).indicator
-      (measurableSet_lt ENNReal.measurable_ofReal measurable_const)
-  simp_rw [← lintegral_mul_const' _ _ ENNReal.ofReal_ne_top]
-  rw [lintegral_lintegral_swap hJ, ← lintegral_const_mul' _ _
-    (ENNReal.inv_ne_top.2 (ENNReal.ofReal_pos.2 (by linarith)).ne')]
-  refine lintegral_congr fun x => ?_
-  simp_rw [hpt]
-  rw [lintegral_const_mul _ (hm x), lintegral_Ioi_rpow_indicator_lt (by linarith),
-    show p - 2 + 1 = p - 1 by ring, div_eq_mul_inv, ← mul_assoc,
-    ← ENNReal.rpow_eq_mul_rpow_sub_one _ hp.le, mul_comm]
-
-/-- **The second Tonelli step of the interpolation**: for measurable `F : V → [0, ∞]`, `0 < r` and
-`p < r`, `∫_0^∞ (∫_{F ≤ τ} F^r) τ^(p-1-r) dτ ≤ (r - p)⁻¹ ∫ F^p`, since
-`∫_F^∞ τ^(p-1-r) dτ = F^(p-r)/(r-p)` and `F^r F^(p-r) ≤ F^p`. -/
-theorem lintegral_Ioi_lintegral_indicator_compl_mul_rpow_le {F : V → ℝ≥0∞} (hF : Measurable F)
-    {p r : ℝ} (hr : 0 < r) (hpr : p < r) :
-    ∫⁻ τ in Ioi (0 : ℝ), (∫⁻ x, {y | ENNReal.ofReal τ < F y}ᶜ.indicator F x ^ r) *
-        ENNReal.ofReal (τ ^ (p - 1 - r)) ≤ (ENNReal.ofReal (r - p))⁻¹ * ∫⁻ x, F x ^ p := by
-  have hJ : AEMeasurable (Function.uncurry fun (τ : ℝ) (x : V) =>
-      {y | ENNReal.ofReal τ < F y}ᶜ.indicator F x ^ r * ENNReal.ofReal (τ ^ (p - 1 - r)))
-      ((volume.restrict (Ioi (0 : ℝ))).prod volume) :=
-    (((measurable_indicator_section (measurableSet_ofReal_lt hF).compl hF).pow_const r).mul
-      (ENNReal.measurable_ofReal.comp (measurable_fst.pow_const _))).aemeasurable
-  have hpt : ∀ (τ : ℝ) (x : V), {y | ENNReal.ofReal τ < F y}ᶜ.indicator F x ^ r *
-      ENNReal.ofReal (τ ^ (p - 1 - r)) = F x ^ r *
-        {s : ℝ | F x ≤ ENNReal.ofReal s}.indicator (fun s => ENNReal.ofReal (s ^ (p - 1 - r))) τ :=
-      fun τ x => by
-    by_cases hτ : ENNReal.ofReal τ < F x
-    · rw [Set.indicator_of_notMem (show x ∉ {y | ENNReal.ofReal τ < F y}ᶜ from not_not.2 hτ),
-        Set.indicator_of_notMem (show τ ∉ {s : ℝ | F x ≤ ENNReal.ofReal s} from not_le.2 hτ),
-        ENNReal.zero_rpow_of_pos hr, zero_mul, mul_zero]
-    · rw [Set.indicator_of_mem (show x ∈ {y | ENNReal.ofReal τ < F y}ᶜ from hτ),
-        Set.indicator_of_mem (show τ ∈ {s : ℝ | F x ≤ ENNReal.ofReal s} from not_lt.1 hτ)]
-  have hm : ∀ x, Measurable fun s : ℝ =>
-      {s : ℝ | F x ≤ ENNReal.ofReal s}.indicator (fun s => ENNReal.ofReal (s ^ (p - 1 - r))) s :=
-    fun x => (ENNReal.measurable_ofReal.comp (measurable_id.pow_const _)).indicator
-      (measurableSet_le measurable_const ENNReal.measurable_ofReal)
-  simp_rw [← lintegral_mul_const' _ _ ENNReal.ofReal_ne_top]
-  rw [lintegral_lintegral_swap hJ, ← lintegral_const_mul' _ _
-    (ENNReal.inv_ne_top.2 (ENNReal.ofReal_pos.2 (by linarith)).ne')]
-  refine lintegral_mono fun x => ?_
-  simp_rw [hpt]
-  rw [lintegral_const_mul _ (hm x), lintegral_Ioi_rpow_indicator_ge (by linarith),
-    show p - 1 - r + 1 = p - r by ring, show -(p - r) = r - p by ring, div_eq_mul_inv,
-    ← mul_assoc, mul_comm _ (ENNReal.ofReal (r - p))⁻¹]
-  exact mul_le_mul_right (ENNReal.rpow_mul_rpow_sub_le _ hr hpr) _
 
 /-- **The level sets of the vector-valued maximal function, weighted**: in dimension `n ≥ 1`,
 for `p > 1`, `1 < q < ∞`, measurable `g_j` with `∫ G^p < ∞` for `G = ‖(g_j)_j‖_{ℓ_q}`, and
