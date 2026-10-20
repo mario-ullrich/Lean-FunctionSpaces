@@ -120,7 +120,7 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Linear approximation from a sequence | ✅ | ✗ | `Instances/Span` |
 | `n`-term approximation from a dictionary | ✅ | ✗ | `Instances/NTerm` |
 | `ℓ_q` norms in `ℝ≥0∞`, Minkowski, Cauchy–Schwarz, monotonicity in `q`, tails, sequences with finitely many nonzero terms | ✅ | ✗ | `Sequences/Lq` |
-| Cauchy condensation with power weights | ✅ | ✗ | `Sequences/Dyadic` |
+| Cauchy condensation with power weights, the dyadic sum `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4`, finitely many changed terms, sums over the dyadic scales of an annulus | ✅ | ✗ | `Sequences/Dyadic` |
 | Countable Minkowski inequality, monotone convergence and truncations in `ℓ_q`, discrete Hardy inequalities, almost diagonal sums | ✅ | ✗ | `Sequences/Hardy` |
 | `A^s_q`, its dyadic quasi-norm and linear structure | ✅ | ✗ | `Norm`, `Dyadic`, `Space` |
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ | ✗ | `Embedding`, `Transfer` |

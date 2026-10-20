@@ -35,6 +35,10 @@ declarations.
   in both directions (`ENNReal.tsum_pow_mul_le_dyadic`, `ENNReal.dyadic_le_tsum_pow_mul`),
   generalising `ENNReal.le_tsum_condensed` / `ENNReal.tsum_condensed_le`; and
   `ENNReal.rpow_le_rpow_of_nonpos`, which exists for `ℝ` and `ℝ≥0` but not for `ℝ≥0∞`.
+* **A dyadic sum** (`ApproximationSpaces/Sequences/Dyadic.lean`):
+  `∑_{j ∈ ℕ} min(2^j a, (2^j a)⁻¹) ≤ 4` for every `a ∈ [0, ∞]` (`ENNReal.tsum_min_two_pow_le`),
+  the sum behind every Hörmander condition for dyadic dilations; the same bound holds for
+  `j ∈ ℤ`.
 * **Discrete Hardy inequalities** (`ApproximationSpaces/Sequences/Hardy.lean`):
   `ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`, and the almost diagonal estimate that
   combines both (`ENNReal.lqNorm_almostDiagonal_le`, in `FunctionSpaces/Rd/LocalMeans.lean`).
@@ -82,6 +86,12 @@ declarations.
   `L_p` (`Rd.convLp`), and Minkowski's integral inequality in the weighted form
   `‖∫ Φ(z) G(·, z) dz‖_p^p ≤ ‖Φ‖_1^(p-1) ∫ |Φ(z)| ‖G(·, z)‖_p^p dz`
   (`MeasureTheory.eLpNorm_integral_kernel_le`). Mathlib has only pointwise bounds of convolutions.
+* **The adjoint of a convolution** (`FunctionSpaces/Rd/ConvolutionAdjoint.lean`): for integrable
+  `K`, `f ∈ L_p(V)` and `g ∈ L_q(V)` with `1/p + 1/q = 1`, `p < ∞`, and the reflection
+  `K^∨(x) = K(-x)`, `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` (`Rd.integral_conv_mul`), and with the adjoint
+  kernel `K^*(x) = conj K(-x)`, `∫ (K ⋆ f) conj g = ∫ f conj(K^* ⋆ g)`
+  (`Rd.integral_conv_mul_conj`). Mathlib has the associativity of convolutions but no such
+  transpose formula for `L_p` functions.
 * **Approximate identities in `L_p`** (`FunctionSpaces/Rd/ApproxIdentity.lean`): for integrable
   `Φ` with `∫ Φ = 1`, `‖Φ_c ⋆ f - f‖_p → 0` as `c → ∞`, `Φ_c = c^n Φ(c ·)`
   (`Rd.tendsto_eLpNorm_conv_dilate_sub`, `Rd.tendsto_convLp_dilate`), and the continuity of
@@ -203,6 +213,22 @@ declarations.
   either `∞` or force the functions to vanish almost everywhere. Also `MemLp f 2 μ` from
   `∫⁻ ‖f‖ₑ ^ 2 ∂μ ≠ ∞` (`MeasureTheory.memLp_two_of_lintegral_enorm_sq_ne_top`), with the
   exponent `2 : ℕ`.
+* **The Hörmander condition for dilation families** (`FunctionSpaces/Rd/DilationFamilies.lean`):
+  for Schwartz functions `G_j` with seminorms bounded uniformly in `j` (`Rd.IsUniformSchwartz`) and
+  `θ_j = 2^(jn) G_j(2^j ·)`, `∫_{‖x‖ > 2‖y‖} ‖(θ_j(x - y) - θ_j(x))_j‖_{ℓ_2} dx ≤ 4 H_A` for every
+  `y`, with an explicit constant built from the seminorm bounds (`Rd.lintegral_lqNorm_sub_le`,
+  `Rd.familyHormanderConst`); such a family with bounded Fourier overlap is a Calderón–Zygmund
+  family (`Rd.IsCZFamily.of_dilation`), and so is its adjoint family (`Rd.IsCZFamily.adjoint`).
+* **Vector-valued singular integrals** (`FunctionSpaces/Rd/VectorValuedWeakType.lean`,
+  `FunctionSpaces/Rd/VectorValuedSingularIntegrals.lean`): for a Calderón–Zygmund family
+  `(θ_j)_j` with overlap `B` and Hörmander constant `H` on a space of dimension `n ≥ 1`, the
+  analysis operator `f ↦ ‖(θ_j ⋆ f)_j‖_{ℓ_2}` and the synthesis operators
+  `(g_j)_j ↦ ∑_{j ∈ s} θ_j ⋆ g_j` have weak type `(1,1)`
+  (`Rd.IsCZFamily.volume_lqNorm_conv_gt_le`, `Rd.IsCZFamily.volume_enorm_sum_conv_gt_le`) and
+  strong type `(p,p)` for `1 < p < ∞` (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`,
+  `Rd.IsCZFamily.eLpNorm_sum_conv_le`), with explicit constants (`Rd.vectorWeakConst`,
+  `Rd.czConst`). Mathlib has no singular integrals; the Carleson project has the scalar
+  Calderón–Zygmund theory on doubling metric measure spaces.
 * **Marcinkiewicz interpolation between weak type `(1,1)` and strong type `(2,2)`**
   (`FunctionSpaces/Lp/Marcinkiewicz.lean`): the two Tonelli steps
   `∫_0^∞ τ^(p-2) ∫_{F > τ} F dμ dτ = (p - 1)⁻¹ ∫ F^p` and
@@ -214,6 +240,9 @@ declarations.
   (`MeasureTheory.hasStrongType_of_hasWeakType_one_of_hasStrongType_two`); the definitions in
   `FunctionSpaces/Lp/WeakType.lean` are the Carleson project's own candidates. The file imports
   the layer cake formula and the integrals of powers from `FunctionSpaces/Lp/LayerCake.lean`.
+  The Carleson project proves the general real interpolation theorem for `A ≥ 1` and positive
+  finite constants; new here are s-finite input measures, every `A ≥ 0`, constants in `[0, ∞]`
+  and the explicit constant `(p (2 A C₁/(p - 1) + 4 A² C₂²/(2 - p)))^(1/p)`.
 * **`L_p` norms by duality** (`FunctionSpaces/Lp/NormingFamily.lean`): for `1 < p < ∞` with
   conjugate `q` and `v ∈ L_p(μ)`, if `|∫ v conj g| ≤ A ‖g‖_q` for every `g ∈ L_q(μ)`, then
   `‖v‖_p ≤ A` (`MeasureTheory.eLpNorm_le_of_forall_enorm_integral_mul_conj_le`), and the same

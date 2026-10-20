@@ -51,7 +51,8 @@ Nothing in this library mentions functions or measures.
 * `ApproximationSpaces.Sequences.Lq`: the `ℓ_q` norm `ENNReal.lqNorm` of a sequence in
   `ℝ≥0∞`, its monotonicity in `q`, and the dyadic weights `ENNReal.dyadicWeight`.
 * `ApproximationSpaces.Sequences.Dyadic`: Cauchy condensation with power weights, which
-  compares `∑ (n+1)^γ b n` with `∑ 2^(k(γ+1)) b (2^k)` for decreasing `b`.
+  compares `∑ (n+1)^γ b n` with `∑ 2^(k(γ+1)) b (2^k)` for decreasing `b`, and the dyadic sums
+  `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4` and `∑_j u_j ≤ (N + 1) M` for `N + 1` dyadic scales.
 * `ApproximationSpaces.Sequences.Hardy`: the countable Minkowski inequality and the two
   discrete Hardy inequalities.
 * `ApproximationSpaces.Norm`: Pietsch's quasi-norm `ApproximationScheme.approxNorm` of

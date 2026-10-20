@@ -19,11 +19,12 @@ Bessel potential on Schwartz functions, the Fourier multiplier with the Bessel w
 `Rd.besselSchwartz_schwartzDilate`, and `Rd.besselPotential_schwartzDilate` for Mathlib's
 `J_σ` on tempered distributions).
 
-* **Uniform families under continuous linear maps**: if `(G_j)` is uniformly Schwartz, so is
-  `(T G_j)` for every continuous linear map `T` of the Schwartz space, since every seminorm of
-  `T G` is bounded by finitely many seminorms of `G` (`Rd.IsUniformSchwartz.exists_map`, from
-  Mathlib's `Seminorm.bound_of_continuous`); in particular for `𝓕⁻¹`
-  (`Rd.exists_isUniformSchwartz_fourierInv`).
+* **Uniform families under continuous linear maps**: a family is uniformly Schwartz exactly
+  when its range is bounded in the Schwartz space
+  (`Rd.exists_isUniformSchwartz_iff_isVonNBounded`), so with `(G_j)` also `(T G_j)` is uniformly
+  Schwartz for every continuous linear map `T` of the Schwartz space
+  (`Rd.IsUniformSchwartz.exists_map`, from Mathlib's `Bornology.IsVonNBounded.image`); in
+  particular for `𝓕⁻¹` (`Rd.exists_isUniformSchwartz_fourierInv`).
 * **The shifted Bessel symbols** `(ε + ‖ζ‖²)^{σ/2}` (`Rd.besselSymbol`) have derivatives of every
   order bounded on an annulus `{a ≤ ‖ζ‖ ≤ b}`, `a > 0`, uniformly in `ε ∈ (0, 1]`
   (`Rd.exists_norm_iteratedFDeriv_besselSymbol_le`), by the Faà di Bruno bound for compositions
@@ -53,31 +54,35 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 /-! ### Uniform families under continuous linear maps -/
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **Uniform families are the bounded families**: a family `(G_j)` of Schwartz functions is
+uniformly Schwartz for some bounds exactly when its range is a bounded set of the Schwartz space
+in the sense of topological vector spaces (von Neumann bounded). Both say that every Schwartz
+seminorm is bounded on the family (Mathlib's `WithSeminorms.isVonNBounded_iff_seminorm_bddAbove`
+with `schwartz_withSeminorms`). -/
+theorem exists_isUniformSchwartz_iff_isVonNBounded (G : ℕ → 𝓢(V, ℂ)) :
+    (∃ A, IsUniformSchwartz G A) ↔ Bornology.IsVonNBounded ℝ (Set.range G) := by
+  rw [(schwartz_withSeminorms ℝ V ℂ).isVonNBounded_iff_seminorm_bddAbove]
+  constructor
+  · rintro ⟨A, hA⟩ ⟨k, l⟩
+    refine ⟨A k l, ?_⟩
+    rintro _ ⟨_, ⟨j, rfl⟩, rfl⟩
+    exact hA j k l
+  · intro h
+    choose A hA using h
+    exact ⟨fun k l => A (k, l), fun j k l => hA (k, l) ⟨G j, ⟨j, rfl⟩, rfl⟩⟩
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Continuous linear maps preserve uniform families**: if `(G_j)` is uniformly Schwartz and
-`T` is a continuous linear map of the Schwartz space, then `(T G_j)` is uniformly Schwartz. Each
-seminorm `G ↦ ‖T G‖_{k,l}` is continuous, hence bounded by `C` times the maximum of finitely
-many seminorms of `G` (Mathlib's `Seminorm.bound_of_continuous` with `schwartz_withSeminorms`),
-and these are bounded uniformly in `j`. -/
+`T` is a continuous linear map of the Schwartz space, then `(T G_j)` is uniformly Schwartz. This
+is the form for indexed families of Mathlib's `Bornology.IsVonNBounded.image`, since a family is
+uniformly Schwartz exactly when its range is bounded in `𝓢(V, ℂ)`
+(`Rd.exists_isUniformSchwartz_iff_isVonNBounded`). -/
 theorem IsUniformSchwartz.exists_map {G : ℕ → 𝓢(V, ℂ)} {A : ℕ → ℕ → ℝ}
     (h : IsUniformSchwartz G A) (T : 𝓢(V, ℂ) →L[ℝ] 𝓢(V, ℂ)) :
     ∃ A' : ℕ → ℕ → ℝ, IsUniformSchwartz (fun j => T (G j)) A' := by
-  have hq : ∀ kl : ℕ × ℕ,
-      Continuous ((SchwartzMap.seminorm ℝ kl.1 kl.2 : Seminorm ℝ 𝓢(V, ℂ)).comp T.toLinearMap) :=
-    fun kl => ((schwartz_withSeminorms ℝ V ℂ).continuous_seminorm kl).comp T.continuous
-  choose s C _ hC using fun kl : ℕ × ℕ =>
-    Seminorm.bound_of_continuous (schwartz_withSeminorms ℝ V ℂ) _ (hq kl)
-  refine ⟨fun k l => C (k, l) * ∑ i ∈ s (k, l), A i.1 i.2, fun j k l => ?_⟩
-  have hsup : (s (k, l)).sup (schwartzSeminormFamily ℝ V ℂ) (G j) ≤
-      ∑ i ∈ s (k, l), A i.1 i.2 :=
-    Seminorm.finset_sup_apply_le (Finset.sum_nonneg fun i _ => h.nonneg i.1 i.2) fun i hi =>
-      (h j i.1 i.2).trans (Finset.single_le_sum (f := fun i : ℕ × ℕ => A i.1 i.2)
-        (fun i _ => h.nonneg i.1 i.2) hi)
-  calc SchwartzMap.seminorm ℝ k l (T (G j))
-      = ((SchwartzMap.seminorm ℝ k l : Seminorm ℝ 𝓢(V, ℂ)).comp T.toLinearMap) (G j) := rfl
-    _ ≤ (C (k, l) • (s (k, l)).sup (schwartzSeminormFamily ℝ V ℂ)) (G j) :=
-        Seminorm.le_def.1 (hC (k, l)) (G j)
-    _ = C (k, l) * (s (k, l)).sup (schwartzSeminormFamily ℝ V ℂ) (G j) := rfl
-    _ ≤ C (k, l) * ∑ i ∈ s (k, l), A i.1 i.2 := by gcongr
+  rw [exists_isUniformSchwartz_iff_isVonNBounded, show Set.range (fun j => T (G j)) =
+    T '' Set.range G from Set.range_comp T G]
+  exact ((exists_isUniformSchwartz_iff_isVonNBounded G).1 ⟨A, h⟩).image T
 
 /-- **The inverse Fourier transform preserves uniform families**: `𝓕⁻` is a continuous linear
 map of the Schwartz space (`Rd.IsUniformSchwartz.exists_map`). -/
@@ -432,47 +437,6 @@ omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 theorem besselOverlap_ne_top (a : ℝ) (N : ℕ) (σ : ℝ) (ωhat : 𝓢(V, ℂ)) :
     besselOverlap a N σ ωhat ≠ ∞ :=
   ENNReal.mul_ne_top (by simp) (ENNReal.pow_ne_top ENNReal.ofReal_ne_top)
-
-/-- **Dyadic scales of an annulus**: for `a > 0`, if `a ≤ t / 2^j` and `t / 2^i ≤ 2^N a`, then
-`j ≤ i + N`, since `2^j a ≤ t ≤ 2^{i+N} a`. -/
-theorem _root_.Nat.le_add_of_dyadic_annulus {a t : ℝ} (ha : 0 < a) {i j N : ℕ}
-    (hj : a ≤ t / 2 ^ j) (hi : t / 2 ^ i ≤ 2 ^ N * a) : j ≤ i + N := by
-  rw [le_div_iff₀ (by positivity)] at hj
-  rw [div_le_iff₀ (by positivity)] at hi
-  have h : a * 2 ^ j ≤ a * 2 ^ (i + N) := by
-    calc a * 2 ^ j ≤ t := hj
-      _ ≤ 2 ^ N * a * 2 ^ i := hi
-      _ = a * 2 ^ (i + N) := by ring
-  exact (pow_le_pow_iff_right₀ one_lt_two).1 (le_of_mul_le_mul_left h ha)
-
-/-- **A sum with at most `N + 1` nonzero terms**: if `u_j ≤ M` for every `j` and `u_j ≠ 0` only
-for `i₀ ≤ j ≤ i₀ + N`, then `∑_j u_j ≤ (N + 1) M`. -/
-theorem _root_.ENNReal.tsum_le_of_mem_Icc {u : ℕ → ℝ≥0∞} {M : ℝ≥0∞} {i₀ N : ℕ}
-    (hM : ∀ j, u j ≤ M) (hu : ∀ j, u j ≠ 0 → j ∈ Finset.Icc i₀ (i₀ + N)) :
-    ∑' j, u j ≤ (N + 1) * M := by
-  rw [tsum_eq_sum (s := Finset.Icc i₀ (i₀ + N)) fun j hj => not_not.1 fun h => hj (hu j h)]
-  calc ∑ j ∈ Finset.Icc i₀ (i₀ + N), u j ≤ ∑ _j ∈ Finset.Icc i₀ (i₀ + N), M :=
-        Finset.sum_le_sum fun j _ => hM j
-    _ = (N + 1) * M := by
-        rw [Finset.sum_const, Nat.card_Icc, nsmul_eq_mul, show i₀ + N + 1 - i₀ = N + 1 by omega]
-        push_cast
-        rfl
-
-/-- **At most `N + 1` dyadic scales see a point of an annulus**: for `a > 0`, if `u_j ≤ M` for
-every `j` and `u_j ≠ 0` only when `t / 2^j` lies in the annulus `[a, 2^N a]`, then
-`∑_j u_j ≤ (N + 1) M`. With `i₀` the least `j` with `u_j ≠ 0`, every such `j` satisfies
-`i₀ ≤ j ≤ i₀ + N` (`Nat.le_add_of_dyadic_annulus`, `ENNReal.tsum_le_of_mem_Icc`). -/
-theorem _root_.ENNReal.tsum_le_of_dyadic_annulus {u : ℕ → ℝ≥0∞} {M : ℝ≥0∞} {a t : ℝ}
-    (ha : 0 < a) {N : ℕ} (hM : ∀ j, u j ≤ M)
-    (hu : ∀ j, u j ≠ 0 → a ≤ t / 2 ^ j ∧ t / 2 ^ j ≤ 2 ^ N * a) :
-    ∑' j, u j ≤ (N + 1) * M := by
-  classical
-  by_cases hex : ∃ j, u j ≠ 0
-  · exact ENNReal.tsum_le_of_mem_Icc hM fun j hj => Finset.mem_Icc.2
-      ⟨Nat.find_min' hex hj, Nat.le_add_of_dyadic_annulus ha (hu j hj).1
-        (hu _ (Nat.find_spec hex)).2⟩
-  · push Not at hex
-    simp [hex]
 
 /-- **At most `N + 1` dilated Bessel kernels see a frequency**: if `ω̂` vanishes outside the
 annulus `{a ≤ ‖ζ‖ ≤ 2^N a}`, `a > 0`, and `i₀` is the least index with `‖ξ‖ ≤ 2^{i₀+N} a`, then

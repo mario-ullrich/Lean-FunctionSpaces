@@ -446,23 +446,32 @@ boundary `Γ`, boundary balls `B_j = ball (Ω.center j) (Ω.radius j)` and chart
 * X.8, Mathlib's distributions on open sets and differential forms: `Distribution` (`𝓓'(Ω, F)`),
   `extDeriv`.
 
-### 4.10 Later
+### 4.10 Sobolev and Bessel potential spaces for `1 < p < ∞`
 
 The current part of Lean-FunctionSpaces proves, for all `1 < p < ∞`, `W^m_p = F^m_{p,2}` and,
 for Mathlib's Bessel potential space, `H^{s,p} ∩ L_p = F^s_{p,2}` for every real `s` and
-`H^{s,p} = F^s_{p,2}` for `s ≥ 0`, and the Sobolev embeddings on `ℝ^d`. Its tools are
-formalised: Plancherel bounds for families of convolution kernels, the weak type `(1,1)` of
-vector-valued singular integrals for families of dilated kernels, Marcinkiewicz interpolation, and
-the strong type `(p,p)`, `1 < p < ∞`, of the analysis and synthesis operators of every
-Calderón–Zygmund family (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`,
+`H^{s,p} = F^s_{p,2}` for `s ≥ 0`, and the Sobolev embeddings on `ℝ^d`
+(`Rd.exists_memLp_ae_eq_of_memSobolev`, `Rd.exists_boundedContinuous_ae_eq_of_memSobolev`). Its
+tools are formalised: Plancherel bounds for families of convolution kernels
+(`Rd.tsum_enorm_convLp_sq_le`, `Rd.enorm_sum_convLp_sq_le`), the weak type `(1,1)` of the
+analysis and synthesis operators of every Calderón–Zygmund family
+(`Rd.IsCZFamily.volume_lqNorm_conv_gt_le`, `Rd.IsCZFamily.volume_enorm_sum_conv_gt_le`),
+Marcinkiewicz interpolation
+(`MeasureTheory.hasStrongType_of_hasWeakType_one_of_hasStrongType_two`), and the strong type
+`(p,p)`, `1 < p < ∞`, of the analysis and synthesis operators of every Calderón–Zygmund family
+(`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`,
 `Rd.IsCZFamily.eLpNorm_sum_conv_le`) (blueprint chapter *Sobolev spaces on `ℝ^d`*, block document
-[Sobolev spaces on `ℝ^d`](SobolevRd.md)). The square function theorem `L_p = F^0_{p,2}` on `ℝ^d`,
+[Sobolev spaces on `ℝ^d`](SobolevRd.md)).
+
+The square function theorem `L_p = F^0_{p,2}` on `ℝ^d`,
 `d = dim V ≥ 1`, `1 < p < ∞`, is formalised with equivalent norms and explicit constants in both
 directions (`Rd.triebelLizorkinNorm_zero_two_le`, `Rd.enorm_le_triebelLizorkinNorm_zero_two`,
-`Rd.triebelLizorkinSpace_zero_two_eq_top`), and so is `W^m_p = F^m_{p,2}` for `1 < p < ∞`, with
-explicit constants and, for `m ≥ 1`, the Besov sandwich
-`B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}`
-(`Rd.memSobolev_iff_memTriebelLizorkin`). The identity `H^{s,p} = F^s_{p,2}` for Mathlib's
+`Rd.triebelLizorkinSpace_zero_two_eq_top`), and so is `W^m_p = F^m_{p,2}` for `1 < p < ∞`
+(`Rd.memSobolev_iff_memTriebelLizorkin`), with explicit constants
+(`Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv`,
+`Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin`) and, for `m ≥ 1`, the Besov sandwich
+`B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}` (`Rd.memSobolev_of_memApprox`,
+`Rd.memApprox_of_memSobolev`). The identity `H^{s,p} = F^s_{p,2}` for Mathlib's
 Bessel potential space, `1 < p < ∞`, is formalised with existential constants, on `L_p` for every
 real `s` and on all tempered distributions for `s ≥ 0`
 (`Rd.exists_besselPotential_eq_of_memTriebelLizorkin`,

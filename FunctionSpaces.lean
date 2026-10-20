@@ -687,7 +687,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   duality with the adjoint family for `p > 2`.
 * `FunctionSpaces.Rd.SquareFunction`: the square function theorem `L_p = F^0_{p,2}` for
   `1 < p < ∞`, with explicit constants in both directions, and the reproducing formula
-  `∑_{j < J} psiDual_j ⋆ (ψ_j ⋆ f) → f` in `L_p`.
+  `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p` with the synthesis kernels `ψ̃_j`.
 * `FunctionSpaces.Rd.DerivativeKernels`: the block `ψ_1` as a sum of derivatives of order `m` of
   Schwartz kernels, `ψ_1 = ∑_i ∂_{e_{i_0}} ⋯ ∂_{e_{i_{m-1}}} η_i`, the Fourier transforms of
   iterated derivatives, and the Calderón–Zygmund families of the dilated derivative kernels and of

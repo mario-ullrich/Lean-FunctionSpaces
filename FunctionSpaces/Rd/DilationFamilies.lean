@@ -10,6 +10,7 @@ public import FunctionSpaces.Rd.BandInverse
 public import FunctionSpaces.Rd.LittlewoodPaleyKernels
 public import FunctionSpaces.Rd.SobolevTwoLittlewoodPaley
 public import FunctionSpaces.Lp.MixedNorms
+public import ApproximationSpaces.Sequences.Dyadic
 
 /-!
 # Dilation families of Schwartz kernels and the Hörmander condition
@@ -24,8 +25,6 @@ bounded uniformly in `j` (`Rd.IsUniformSchwartz`). Two numbers control such a fa
 `δ_c F = F_c`, `F_c(x) = c^n F(c x)`, is the dilation by `c` (`Rd.dilate`), so that the
 Littlewood–Paley kernels are `Φ_k = δ_{2^k} Φ`.
 
-* **The dyadic sum** `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4` for `a ∈ [0, ∞]`
-  (`ENNReal.tsum_min_two_pow_le`).
 * **Schwartz forms of dilation, reflection and conjugation** (`Rd.schwartzDilate`,
   `Rd.schwartzReflect`, `Rd.schwartzConj`), with the chain rule
   `∂_{w_0} ⋯ ∂_{w_{k-1}} (G_c) = c^k (∂_{w_0} ⋯ ∂_{w_{k-1}} G)_c` for dilations
@@ -36,7 +35,8 @@ Littlewood–Paley kernels are `Φ_k = δ_{2^k} Φ`.
   times the `L_1` norm of the gradient (`Rd.lintegral_enorm_dilate_sub_le_mul`, constant
   `Rd.gradMassConst`), for long steps both terms are tails
   (`Rd.setLIntegral_enorm_dilate_sub_le_inv`).
-* **Uniform families**: with the dyadic sum, the Hörmander condition holds for every uniform
+* **Uniform families**: with the dyadic sum `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4`
+  (`ENNReal.tsum_min_two_pow_le`), the Hörmander condition holds for every uniform
   family with `H = 4 H_A` (`Rd.lintegral_lqNorm_sub_le`, `Rd.familyHormanderConst`), and
   `Rd.IsCZFamily.of_dilation`; finitely many members of a uniform family may be changed
   (`Rd.IsUniformSchwartz.of_forall_ge_eq`), also in a Calderón–Zygmund family of dilates
@@ -53,86 +53,6 @@ Littlewood–Paley kernels are `Φ_k = δ_{2^k} Φ`.
 
 open MeasureTheory Module Metric Filter Set ComplexConjugate
 open scoped ENNReal SchwartzMap FourierTransform LineDeriv
-
-namespace ENNReal
-
-/-! ### The dyadic sum -/
-
-/-- `∑_{j < N} 2^j ≤ 2^N` in `[0, ∞]`, from the geometric sum `∑_{j < N} 2^j + 1 = 2^N`
-(Mathlib's `geom_sum_mul_add` with `x = 1`). -/
-theorem sum_range_two_pow_le (N : ℕ) : ∑ j ∈ Finset.range N, (2 : ℝ≥0∞) ^ j ≤ 2 ^ N := by
-  have h := geom_sum_mul_add (1 : ℝ≥0∞) N
-  rw [one_add_one_eq_two, mul_one] at h
-  rw [← h]
-  exact le_self_add
-
-/-- For `a ≠ 0` in `[0, ∞]` there is `j ∈ ℕ` with `2^j a > 1`: Mathlib's
-`ENNReal.exists_nat_mul_gt` gives `n a > 1`, and `n < 2^n`. -/
-theorem exists_one_lt_two_pow_mul {a : ℝ≥0∞} (ha : a ≠ 0) : ∃ j : ℕ, 1 < 2 ^ j * a := by
-  obtain ⟨n, hn⟩ := exists_nat_mul_gt ha one_ne_top
-  refine ⟨n, hn.trans_le ?_⟩
-  gcongr
-  exact_mod_cast (Nat.lt_two_pow_self).le
-
-/-- The terms `min(2^j a, (2^j a)⁻¹)` with `2^j a ≤ 1`, the indices `j < j₀`, add up to at most
-`2`: they are at most `2^j a`, and `∑_{j < j₀} 2^j a ≤ 2^{j₀} a ≤ 2` when `2^{j₀ - 1} a ≤ 1`. -/
-theorem sum_range_min_two_pow_le {a : ℝ≥0∞} {j₀ : ℕ} (h : ∀ j < j₀, ¬ 1 < 2 ^ j * a) :
-    ∑ j ∈ Finset.range j₀, min (2 ^ j * a) (2 ^ j * a)⁻¹ ≤ 2 := by
-  cases j₀ with
-  | zero => simp
-  | succ m =>
-    have hm : 2 ^ m * a ≤ 1 := not_lt.1 (h m (Nat.lt_succ_self m))
-    calc ∑ j ∈ Finset.range (m + 1), min (2 ^ j * a) (2 ^ j * a)⁻¹
-        ≤ ∑ j ∈ Finset.range (m + 1), 2 ^ j * a := Finset.sum_le_sum fun j _ => min_le_left _ _
-      _ = (∑ j ∈ Finset.range (m + 1), (2 : ℝ≥0∞) ^ j) * a := (Finset.sum_mul _ _ _).symm
-      _ ≤ 2 ^ (m + 1) * a := by gcongr; exact sum_range_two_pow_le _
-      _ = 2 * (2 ^ m * a) := by ring
-      _ ≤ 2 * 1 := by gcongr
-      _ = 2 := mul_one 2
-
-/-- The terms `min(2^{i+j₀} a, (2^{i+j₀} a)⁻¹)` with `2^{j₀} a > 1` add up to at most `2`: they
-are at most `2^{-i}`. -/
-theorem tsum_min_two_pow_add_le {a : ℝ≥0∞} {j₀ : ℕ} (h : 1 < 2 ^ j₀ * a) :
-    ∑' i, min (2 ^ (i + j₀) * a) (2 ^ (i + j₀) * a)⁻¹ ≤ 2 := by
-  have hterm : ∀ i : ℕ, min (2 ^ (i + j₀) * a) (2 ^ (i + j₀) * a)⁻¹ ≤ 2⁻¹ ^ i := fun i => by
-    refine (min_le_right _ _).trans ?_
-    rw [pow_add, mul_assoc, ENNReal.mul_inv (Or.inl (pow_ne_zero _ two_ne_zero))
-      (Or.inl (ENNReal.pow_ne_top ENNReal.ofNat_ne_top)), ENNReal.inv_pow]
-    calc (2⁻¹ : ℝ≥0∞) ^ i * (2 ^ j₀ * a)⁻¹ ≤ 2⁻¹ ^ i * 1 := by
-          gcongr
-          exact ENNReal.inv_le_one.2 h.le
-      _ = 2⁻¹ ^ i := mul_one _
-  exact (ENNReal.tsum_le_tsum hterm).trans_eq ENNReal.tsum_geometric_two
-
-/-- **The dyadic sum of `min(t, t⁻¹)`**: for every `a ∈ [0, ∞]`,
-`∑_{j ∈ ℕ} min(2^j a, (2^j a)⁻¹) ≤ 4`. With `j₀` the least `j` such that `2^j a > 1`, the terms
-below `j₀` add up to at most `2` (`ENNReal.sum_range_min_two_pow_le`) and the terms from `j₀` on
-to at most `2` (`ENNReal.tsum_min_two_pow_add_le`). -/
-theorem tsum_min_two_pow_le (a : ℝ≥0∞) : ∑' j : ℕ, min (2 ^ j * a) (2 ^ j * a)⁻¹ ≤ 4 := by
-  classical
-  rcases eq_or_ne a 0 with rfl | ha
-  · simp
-  have hex := exists_one_lt_two_pow_mul ha
-  rw [← ENNReal.summable.sum_add_tsum_nat_add' (k := Nat.find hex)]
-  calc _ ≤ 2 + 2 := add_le_add (sum_range_min_two_pow_le fun j hj => Nat.find_min hex hj)
-        (tsum_min_two_pow_add_le (Nat.find_spec hex))
-    _ = 4 := by norm_num
-
-/-! ### Finitely many changed terms -/
-
-/-- **Finitely many changed terms**: if `u_j = v_j` for every `j ≥ N`, then
-`∑_j u_j ≤ ∑_j v_j + ∑_{i < N} u_i` in `[0, ∞]`. -/
-theorem tsum_le_tsum_add_sum_of_forall_ge_eq {u v : ℕ → ℝ≥0∞} {N : ℕ}
-    (h : ∀ j, N ≤ j → u j = v j) : ∑' j, u j ≤ ∑' j, v j + ∑ i ∈ Finset.range N, u i := by
-  calc ∑' j, u j = ∑ i ∈ Finset.range N, u i + ∑' i, u (i + N) :=
-        (ENNReal.summable (f := fun i => u (i + N))).sum_add_tsum_nat_add'.symm
-    _ = ∑ i ∈ Finset.range N, u i + ∑' i, v (i + N) := by
-        rw [tsum_congr fun i => h _ (Nat.le_add_left N i)]
-    _ ≤ ∑ i ∈ Finset.range N, u i + ∑' j, v j :=
-        add_le_add_right (ENNReal.tsum_comp_le_tsum_of_injective (add_left_injective N) v) _
-    _ = ∑' j, v j + ∑ i ∈ Finset.range N, u i := add_comm _ _
-
-end ENNReal
 
 namespace Rd
 

@@ -465,6 +465,67 @@ the block $k$, $(n+1)^\gamma$ lies between $2^{-\gamma_-} 2^{k\gamma}$ and
 $2^{\gamma_+} 2^{k\gamma}$, and $b_n$ lies between $b_{2^{k+1}}$ and $b_{2^k}$.
 \end{proof}
 
+Three sums over dyadic scales serve the vector-valued singular integrals of
+\Cref{sec:dilation-families} and the Bessel kernels of \Cref{sec:bessel-kernels}.
+
+\begin{lemma}[The dyadic sum of $\min(t, t^{-1})$]
+\label{lem:dyadic-min-sum}
+\lean{ENNReal.sum_range_two_pow_le, ENNReal.exists_one_lt_two_pow_mul,
+  ENNReal.sum_range_min_two_pow_le, ENNReal.tsum_min_two_pow_add_le,
+  ENNReal.tsum_min_two_pow_le}
+\leanok
+For every $a \in [0, \infty]$,
+\[
+  \sum_{j \in \N} \min\bigl(2^j a, (2^j a)^{-1}\bigr) \leq 4 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $a = 0$ every term is $0$. Otherwise some $j$ has $2^j a > 1$ (Mathlib's
+\texttt{ENNReal.\allowbreak exists\_\allowbreak nat\_\allowbreak mul\_\allowbreak gt} and
+$m < 2^m$); let $j_0$ be the least such $j$. For
+$j < j_0$ the terms are at most $2^j a$, and
+$\sum_{j < j_0} 2^j a \leq 2^{j_0} a = 2 \cdot 2^{j_0 - 1} a \leq 2$ when $j_0 \geq 1$. For
+$i \in \N$ the term of $j = i + j_0$ is at most
+$(2^{i + j_0} a)^{-1} = 2^{-i} (2^{j_0} a)^{-1} \leq 2^{-i}$, and $\sum_i 2^{-i} = 2$.
+\end{proof}
+
+\begin{lemma}[Finitely many changed terms]
+\label{lem:tsum-changed-terms}
+\lean{ENNReal.tsum_le_tsum_add_sum_of_forall_ge_eq}
+\leanok
+For all sequences $(u_j)$, $(v_j)$ in $[0, \infty]$ and every $N \in \N$ with $u_j = v_j$ for
+every $j \geq N$,
+\[
+  \sum_{j \in \N} u_j \leq \sum_{j \in \N} v_j + \sum_{i < N} u_i .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The sum of the $u_j$ is $\sum_{i < N} u_i + \sum_{i \geq N} v_i$.
+\end{proof}
+
+\begin{lemma}[Dyadic scales of an annulus]
+\label{lem:dyadic-annulus-count}
+\lean{Nat.le_add_of_dyadic_annulus, ENNReal.tsum_le_of_mem_Icc,
+  ENNReal.tsum_le_of_dyadic_annulus}
+\leanok
+Let $a > 0$ and $t$ be real and $N \in \N$. For all $i, j \in \N$ with $a \leq t / 2^j$ and
+$t / 2^i \leq 2^N a$, $j \leq i + N$. Let $M \in [0, \infty]$ and let $(u_j)_{j \in \N}$ be a
+sequence in $[0, \infty]$ with $u_j \leq M$ for every $j$. If there is $i_0 \in \N$ such that
+$u_j \neq 0$ implies $i_0 \leq j \leq i_0 + N$, or if $u_j \neq 0$ implies
+$a \leq t / 2^j \leq 2^N a$, then $\sum_j u_j \leq (N + 1) M$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$2^j a \leq t \leq 2^{i+N} a$ gives the first claim. In the first case at most $N + 1$ terms are
+nonzero. In the second, let $i_0$ be the least $j$ with $u_j \neq 0$; by the first claim every
+$j$ with $u_j \neq 0$ satisfies $i_0 \leq j \leq i_0 + N$.
+\end{proof}
+
 \chapter{Approximation spaces}
 \label{ch:approximation-spaces}
 
@@ -15550,8 +15611,10 @@ $\int_{\{\|x\| > 2\|y\|\}} \|(\theta_j(x - y) - \theta_j(x))_j\|_{\ell_2} \, dx 
 $y$, which gives the weak type $(1,1)$ through the Calder\'on--Zygmund decomposition. This
 section proves the H\"ormander condition for every uniform family, with an explicit constant,
 and shows that the Littlewood--Paley blocks $\psi_j$ and the synthesis kernels of the square
-function theorem are such families. Throughout, $C_{G,r,N}$, $T_{G,r,N}$ and $I_M$ are the
-constants of \Cref{lem:schwartz-decay} and \Cref{lem:schwartz-tails},
+function theorem are such families. The H\"ormander condition for kernels with values in a
+Hilbert space, here $\ell_2$, is the hypothesis of the classical theory of vector-valued
+singular integrals; see Stein~\cite{SteinSingular}. Throughout, $C_{G,r,N}$, $T_{G,r,N}$ and
+$I_M$ are the constants of \Cref{lem:schwartz-decay} and \Cref{lem:schwartz-tails},
 $\Delta_v F(x) = F(x + v) - F(x)$, and $\delta_c F = F_c$ denotes the dilation by $c$, which
 keeps it apart from the kernels $\Phi_k = \delta_{2^k} \Phi$. Inverses and minima of the
 quantities $2^j \|y\|$ are taken in $[0, \infty]$, with $0^{-1} = \infty$ and
@@ -15761,29 +15824,6 @@ comparison of the constants follows from \Cref{lem:gradient-mass} and
 \Cref{lem:uniform-schwartz-constants}.
 \end{proof}
 
-\begin{lemma}[The dyadic sum of $\min(t, t^{-1})$]
-\label{lem:dyadic-min-sum}
-\lean{ENNReal.sum_range_two_pow_le, ENNReal.exists_one_lt_two_pow_mul,
-  ENNReal.sum_range_min_two_pow_le, ENNReal.tsum_min_two_pow_add_le,
-  ENNReal.tsum_min_two_pow_le}
-\leanok
-For every $a \in [0, \infty]$,
-\[
-  \sum_{j \in \N} \min\bigl(2^j a, (2^j a)^{-1}\bigr) \leq 4 .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-For $a = 0$ every term is $0$. Otherwise some $j$ has $2^j a > 1$ (Mathlib's
-\texttt{ENNReal.\allowbreak exists\_\allowbreak nat\_\allowbreak mul\_\allowbreak gt} and
-$m < 2^m$); let $j_0$ be the least such $j$. For
-$j < j_0$ the terms are at most $2^j a$, and
-$\sum_{j < j_0} 2^j a \leq 2^{j_0} a = 2 \cdot 2^{j_0 - 1} a \leq 2$ when $j_0 \geq 1$. For
-$i \in \N$ the term of $j = i + j_0$ is at most
-$(2^{i + j_0} a)^{-1} = 2^{-i} (2^{j_0} a)^{-1} \leq 2^{-i}$, and $\sum_i 2^{-i} = 2$.
-\end{proof}
-
 \begin{theorem}[The H\"ormander condition for dilation families]
 \label{thm:hormander-dilation-family}
 \lean{Rd.lintegral_lqNorm_sub_le}
@@ -15880,13 +15920,11 @@ H\"ormander condition is \Cref{thm:hormander-dilation-family}.
 
 \begin{lemma}[Calder\'on--Zygmund families with exceptional members]
 \label{lem:cz-family-exceptions}
-\lean{ENNReal.tsum_le_tsum_add_sum_of_forall_ge_eq, Rd.enorm_fourier_dilate_le,
-  Rd.IsCZFamily.of_dilation_of_forall_ge_eq}
+\lean{Rd.enorm_fourier_dilate_le, Rd.IsCZFamily.of_dilation_of_forall_ge_eq}
 \leanok
 \uses{lem:uniform-schwartz-exceptions, thm:cz-family-dilation, lem:fourier-dilate,
-  def:cz-family, def:hormander-const}
-For all sequences $(u_j)$, $(v_j)$ in $[0, \infty]$ and every $N \in \N$ with $u_j = v_j$ for
-every $j \geq N$, $\sum_j u_j \leq \sum_j v_j + \sum_{i < N} u_i$. For every Schwartz function
+  def:cz-family, def:hormander-const, lem:tsum-changed-terms}
+For every Schwartz function
 $G$, every real $c > 0$ and every $\xi \in V$,
 $|\widehat{G_c}(\xi)| \leq \|\widehat G\|_{0,0}$. Let $(G_j)$ be a uniform family of Schwartz
 functions with bounds $A$ such that $\sum_j |\widehat{(G_j)_{2^j}}(\xi)|^2 \leq B$ for every
@@ -15898,10 +15936,10 @@ $A'_{k,l} = \max\bigl(A_{k,l}, \sum_{i < N} \|G'_i\|_{k,l}\bigr)$.
 
 \begin{proof}
 \leanok
-The sum of the $u_j$ is $\sum_{i < N} u_i + \sum_{i \geq N} v_i$. Next,
-$\widehat{G_c}(\xi) = \widehat G(c^{-1} \xi)$ (\Cref{lem:fourier-dilate}). The family $(G'_j)$
-is uniformly Schwartz with bounds $A'$ (\Cref{lem:uniform-schwartz-exceptions}); the first two
-claims bound its overlap, and \Cref{thm:cz-family-dilation} gives the family.
+First, $\widehat{G_c}(\xi) = \widehat G(c^{-1} \xi)$ (\Cref{lem:fourier-dilate}). The family
+$(G'_j)$ is uniformly Schwartz with bounds $A'$ (\Cref{lem:uniform-schwartz-exceptions}); the
+first claim and \Cref{lem:tsum-changed-terms} bound its overlap, and
+\Cref{thm:cz-family-dilation} gives the family.
 \end{proof}
 
 \paragraph{The Littlewood--Paley families.}
@@ -16408,7 +16446,8 @@ with the nonnegative good part of \Cref{def:calderon-zygmund-good-part}, and tho
 pieces from the bound of the norm of a mean in \Cref{lem:norm-mean-square-bound}. As there,
 $V$ has dimension $n$, and for a dyadic cube $Q$ and $f : V \to E$ the mean is
 $f_Q = |Q|^{-1} \int_Q f$, the Bochner integral, which is $0$ when $f$ is not integrable on $Q$.
-The Carleson project
+For scalar functions this is the decomposition of Calder\'on and Zygmund in Stein's
+book~\cite{SteinSingular}. The Carleson project
 \cite{CarlesonBlueprint,CarlesonLean} has a scalar Calder\'on--Zygmund decomposition
 on doubling metric measure spaces.
 
@@ -16652,7 +16691,8 @@ pieces $b_Q f$ with mean zero. A maximal big cube $Q = Q_{k,m}$ has centre $c_Q$
 closed ball $\bar B(c_Q, \rho_Q)$ with $\rho_Q = n 2^{-k}$ (\Cref{lem:dyadic-cubes}), and the
 enlarged exceptional set $\Omega^*$ is the union of the balls $\bar B(c_Q, 2 \rho_Q)$
 (\Cref{def:calderon-zygmund-cubes}). Off $\Omega^*$ the mean zero of the pieces lets the
-H\"ormander condition act.
+H\"ormander condition act. This is the classical argument for singular integrals with values in a
+Hilbert space; see Stein~\cite{SteinSingular}.
 
 \begin{lemma}[Elementary facts]
 \label{lem:weak-type-elementary}
@@ -17034,7 +17074,8 @@ $\bigl(p (2 A C_1/(p - 1) + 4 A^2 C_2^2/(2 - p))\bigr)^{1/p}$. The proof is the 
 input is split along the set where its size exceeds $\tau$, the weak type controls the large
 part and the $L_2$ bound the small part, and the layer cake formula of \Cref{lem:layer-cake}
 collects the levels. The measure $\mu$ on the input space is s-finite, so that Tonelli's theorem
-applies; $\nu$ is any measure.
+applies; $\nu$ is any measure. The theorem and this proof are classical; see
+Stein~\cite{SteinSingular}.
 
 \begin{lemma}[{Layer cake formula for functions with values in $[0, \infty]$}]
 \label{lem:layer-cake}
@@ -17520,7 +17561,8 @@ for an abstract input type (\Cref{thm:marcinkiewicz-abstract}), whose inputs are
 measurable functions. For $2 < p < \infty$, the adjoint identity exchanges the two operators of
 the adjoint family $\theta_j^*(x) = \overline{\theta_j(-x)}$, which has the same overlap and
 H\"ormander constant, at the conjugate exponent $p' < 2$, and \Cref{thm:lp-norm-duality}
-returns to $L_p$.
+returns to $L_p$. These are the classical $L_p$ bounds of vector-valued singular integrals; see
+Stein~\cite{SteinSingular}.
 
 \begin{theorem}[The strong type $(2,2)$]
 \label{thm:cz-strong-type-two}
@@ -17756,7 +17798,10 @@ function theorem says that this norm is equivalent to $\|f\|_p$ for $1 < p < \in
 $\TL{0}{p}{2} = L_p(V)$. The upper bound is the strong type of the analysis operator of the
 Calder\'on--Zygmund family $(\psi_j)_j$; the lower bound combines the reproducing formula
 $\sum_{j < J} \tilde\psi_j * (\psi_j * f) \to f$ with the strong type of the synthesis
-operators of the family $(\tilde\psi_j)_j$ (\Cref{thm:vector-valued-strong-type}).
+operators of the family $(\tilde\psi_j)_j$ (\Cref{thm:vector-valued-strong-type}). Stein's
+book~\cite{SteinSingular} proves the Littlewood--Paley theorem through vector-valued singular
+integrals, with the lower bound by duality, and Triebel~\cite{Triebel} states it as
+$\TL{0}{p}{2} = L_p(V)$.
 
 \begin{definition}[The square function constants]
 \label{def:square-function-consts}
@@ -18211,7 +18256,8 @@ $w \in V^k$, the derivatives $\sum_{j < J} (\partial^w \tilde\psi_j) * (\psi_j *
 of the reproducing sums converge in $L_p(V)$ by the synthesis bound of the dual derivative
 families (\Cref{thm:cz-family-dual-derivative}), and their limit is $\partial^w f$. With the
 Besov sandwich (\Cref{thm:tl-besov-sandwich}) this places $\Sob{m}{p}(V)$ between
-$\Besov{m}{p}{\min(p,2)}$ and $\Besov{m}{p}{\max(p,2)}$ for $m \geq 1$. In this section
+$\Besov{m}{p}{\min(p,2)}$ and $\Besov{m}{p}{\max(p,2)}$ for $m \geq 1$. The identity
+$\Sob{m}{p}(V) = \TL{m}{p}{2}$ is classical; see Triebel~\cite{Triebel}. In this section
 $e_\alpha$, $\eta_\alpha$, $\theta^\alpha_j$ and $\tilde\theta^w_j$ are those of
 \Cref{sec:derivative-kernels}.
 
@@ -18520,7 +18566,8 @@ With the bound of $\|f\|_{\TL{m}{p}{2}}$ by the weak derivatives
 (\Cref{thm:sobolev-to-triebel-lizorkin}) and $\Sob{m}{p}(V) \subseteq \Besov{m}{p}{\max(p,2)}$
 (\Cref{cor:sobolev-besov-sandwich}) this gives the Sobolev embeddings
 $\Sob{m}{p}(V) \hookrightarrow L_r(V)$ for $m > n(1/p - 1/r)$ and
-$\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, with explicit constants.
+$\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, with explicit constants. These embeddings
+are classical; see Nikol'ski\u{\i}~\cite{Nikolskii} and Triebel~\cite{Triebel}.
 
 \paragraph{Continuity of the blocks.}
 
@@ -18797,25 +18844,28 @@ function $G$.
 
 \begin{theorem}[Continuous linear maps preserve uniform families]
 \label{thm:uniform-schwartz-linear-map}
-\lean{Rd.IsUniformSchwartz.exists_map, Rd.exists_isUniformSchwartz_fourierInv}
+\lean{Rd.exists_isUniformSchwartz_iff_isVonNBounded, Rd.IsUniformSchwartz.exists_map,
+  Rd.exists_isUniformSchwartz_fourierInv}
 \leanok
-\uses{def:uniform-schwartz, lem:uniform-schwartz-exceptions}
-For every uniform family $(G_j)$ of Schwartz functions $V \to \C$ and every continuous real-linear
-map $T$ of the Schwartz space $\mathcal S(V)$ into itself, there are bounds $A'$ such that
-$(T G_j)$ is uniformly Schwartz with bounds $A'$. In particular, $(\mathcal F^{-1} G_j)$ is
-uniformly Schwartz with some bounds.
+\uses{def:uniform-schwartz}
+For every family $(G_j)_{j \in \N}$ of Schwartz functions $V \to \C$, there are bounds $A$ such
+that $(G_j)$ is uniformly Schwartz with bounds $A$ if and only if the set
+$\{G_j : j \in \N\}$ is bounded in $\mathcal S(V)$, that is, absorbed by every neighbourhood of
+$0$. For every uniform family $(G_j)$ and every continuous real-linear map $T$ of
+$\mathcal S(V)$ into itself, there are bounds $A'$ such that $(T G_j)$ is uniformly Schwartz with
+bounds $A'$. In particular, $(\mathcal F^{-1} G_j)$ is uniformly Schwartz with some bounds.
 \end{theorem}
 
 \begin{proof}
 \leanok
-Let $(G_j)$ have the bounds $A$, and fix $k, l \in \N$. The seminorm $G \mapsto \|T G\|_{k,l}$ is
-continuous, and the topology of $\mathcal S(V)$ is generated by the seminorms
-$\|\cdot\|_{k',l'}$. So there are a finite set $S$ of pairs $(k', l')$ and $C \geq 0$ with
-$\|T G\|_{k,l} \leq C \max_{(k',l') \in S} \|G\|_{k',l'}$ for every $G$ (Mathlib's
-\texttt{Seminorm.\allowbreak bound\_\allowbreak of\_\allowbreak continuous}), and
-$\|T G_j\|_{k,l} \leq C \sum_{(k',l') \in S} A_{k',l'}$ for every $j$, the bounds being
-nonnegative (\Cref{lem:uniform-schwartz-exceptions}). The inverse Fourier transform is a
-continuous linear map of $\mathcal S(V)$.
+The topology of $\mathcal S(V)$ is generated by the seminorms $\|\cdot\|_{k,l}$, so a set is
+bounded exactly when every seminorm is bounded on it (Mathlib's
+\texttt{WithSeminorms.\allowbreak isVonNBounded\_\allowbreak iff\_\allowbreak
+seminorm\_\allowbreak bddAbove} with \texttt{schwartz\_\allowbreak withSeminorms}); this is the
+first claim. Continuous linear maps send bounded sets to bounded sets (Mathlib's
+\texttt{Bornology.\allowbreak IsVonNBounded.\allowbreak image}), and $\{T G_j : j \in \N\}$ is
+the image of $\{G_j : j \in \N\}$ under $T$. The inverse Fourier transform is a continuous linear
+map of $\mathcal S(V)$.
 \end{proof}
 
 \paragraph{The shifted Bessel symbols.}
@@ -19061,25 +19111,6 @@ $\widehat\omega \colon V \to \C$ let
   \|\widehat\omega\|_{0,0} \bigr)^2 < \infty .
 \]
 \end{definition}
-
-\begin{lemma}[Dyadic scales of an annulus]
-\label{lem:dyadic-annulus-count}
-\lean{Nat.le_add_of_dyadic_annulus, ENNReal.tsum_le_of_mem_Icc,
-  ENNReal.tsum_le_of_dyadic_annulus}
-\leanok
-Let $a > 0$ and $t$ be real and $N \in \N$. For all $i, j \in \N$ with $a \leq t / 2^j$ and
-$t / 2^i \leq 2^N a$, $j \leq i + N$. Let $M \in [0, \infty]$ and let $(u_j)_{j \in \N}$ be a
-sequence in $[0, \infty]$ with $u_j \leq M$ for every $j$. If there is $i_0 \in \N$ such that
-$u_j \neq 0$ implies $i_0 \leq j \leq i_0 + N$, or if $u_j \neq 0$ implies
-$a \leq t / 2^j \leq 2^N a$, then $\sum_j u_j \leq (N + 1) M$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-$2^j a \leq t \leq 2^{i+N} a$ gives the first claim. In the first case at most $N + 1$ terms are
-nonzero. In the second, let $i_0$ be the least $j$ with $u_j \neq 0$; by the first claim every
-$j$ with $u_j \neq 0$ satisfies $i_0 \leq j \leq i_0 + N$.
-\end{proof}
 
 \begin{lemma}[Frequencies of the dilated Bessel kernels]
 \label{lem:bessel-kernel-frequency}

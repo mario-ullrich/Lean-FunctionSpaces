@@ -498,6 +498,17 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * R. A. Adams, J. J. F. Fournier, *Sobolev Spaces*, 2nd ed., Pure and Applied Mathematics **140**,
   Elsevier/Academic Press, 2003. Sobolev spaces on domains and their compact embeddings,
   with the rooms-and-passages domains.
+* L. Becker, M. I. de Frutos-Fernández, L. Diedering, F. van Doorn, S. Gouëzel, A. Jamneshan,
+  E. Karunus, E. van de Meent, P. Monticone, J. Mulder-Sohn, J. Portegies, J. Roos, M. Rothgang,
+  R. Srivastava, J. Sundstrom, J. Tan, C. Thiele, *A blueprint for the formalization of
+  Carleson's theorem on convergence of Fourier series*, preprint, 2024, revised 2025,
+  [arXiv:2405.06423](https://arxiv.org/abs/2405.06423). The Calderón–Zygmund decomposition on
+  doubling metric measure spaces.
+* L. Becker, M. I. de Frutos-Fernández, L. Diedering, F. van Doorn, S. Gouëzel, E. Karunus,
+  E. van de Meent, P. Monticone, J. Mulder-Sohn, J. Portegies, J. Roos, M. Rothgang,
+  J. Sundstrom, J. Tan, *Formalizing Carleson's theorem in Lean*, preprint, 2026,
+  [arXiv:2609.31334](https://arxiv.org/abs/2609.31334). The definitions of weak and strong type,
+  taken over here, and the real interpolation theorem.
 * J. Bergh, J. Löfström, *Interpolation Spaces. An Introduction*, Grundlehren der
   mathematischen Wissenschaften **223**, Springer-Verlag, 1976. Real interpolation and the
   K-functional.
@@ -517,13 +528,29 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   **335** (1993), no. 2, 843–864. The modulus of smoothness on a domain.
 * T. Eirola, *Sobolev characterization of solutions of dilation equations*, SIAM J. Math.
   Anal. **23** (1992), no. 4, 1015–1030. The transfer operator and the Sobolev exponent.
+* L. C. Evans, R. F. Gariepy, *Measure Theory and Fine Properties of Functions*, revised ed.,
+  Textbooks in Mathematics, CRC Press, 2015. The area formula.
+* H. Federer, *Geometric Measure Theory*, Grundlehren der mathematischen Wissenschaften **153**,
+  Springer-Verlag, 1969. The area formula.
 * C. Fefferman, E. M. Stein, *Some maximal inequalities*, Amer. J. Math. **93** (1971), no. 1,
   107–115. The vector-valued maximal inequality.
+* N. Guglielmi, V. Yu. Protasov, *Invariant polytopes of linear operators with applications to
+  regularity of wavelets and of subdivisions*, SIAM J. Matrix Anal. Appl. **37** (2016), no. 1,
+  18–52, [arXiv:1502.01192](https://arxiv.org/abs/1502.01192). Hölder exponents of the
+  Daubechies wavelets of higher order.
+* E. Hernández, G. Weiss, *A First Course on Wavelets*, Studies in Advanced Mathematics, CRC
+  Press, 1996. Multiresolution analyses.
+* R. Hiptmair, D. Pauly, E. Schulz, *Traces for Hilbert complexes*, J. Funct. Anal. **284**
+  (2023), Paper No. 109905. Assumption F, the compactness of the restriction to bounded domains.
 * W. McLean, *Strongly Elliptic Systems and Boundary Integral Equations*, Cambridge University
   Press, 2000. Traces on Lipschitz domains and the kernel of the trace map.
 * S. M. Nikol'skii, *Approximation of Functions of Several Variables and Imbedding
   Theorems*, Grundlehren der mathematischen Wissenschaften **205**, Springer-Verlag, 1975.
   The Nikolskii inequality and the embedding theorems it yields.
+* H. Ojanen, *Orthonormal compactly supported wavelets with optimal Sobolev regularity:
+  numerical results*, Appl. Comput. Harmon. Anal. **10** (2001), no. 1, 93–98,
+  [arXiv:math/9807089](https://arxiv.org/abs/math/9807089). The Sobolev exponents of the
+  Daubechies wavelets.
 * A. Pietsch, *Approximation spaces*, J. Approx. Theory **32** (1981), no. 2, 115–134.
   The definition of approximation schemes and spaces followed here.
 * V. S. Rychkov, *On restrictions and extensions of the Besov and Triebel–Lizorkin spaces with
@@ -535,14 +562,17 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   traces on Lipschitz domains through atoms.
 * E. M. Stein, *Singular Integrals and Differentiability Properties of Functions*, Princeton
   Mathematical Series **30**, Princeton University Press, 1970. The extension theorem for
-  Sobolev spaces on Lipschitz domains.
+  Sobolev spaces on Lipschitz domains, the Calderón–Zygmund decomposition, Marcinkiewicz
+  interpolation, vector-valued singular integrals, the Littlewood–Paley theorem and Calderón's
+  theorem `W^m_p = H^{m,p}`.
 * E. M. Stein, *Harmonic Analysis: Real-Variable Methods, Orthogonality, and Oscillatory
   Integrals*, Princeton Mathematical Series **43**, Princeton University Press, 1993. The
   maximal function and the Calderón–Zygmund decomposition.
 * V. Temlyakov, *Multivariate Approximation*, Cambridge University Press, 2018. Periodic
   function spaces and trigonometric approximation.
 * H. Triebel, *Theory of Function Spaces*, Monographs in Mathematics **78**, Birkhäuser, 1983.
-  Besov and Sobolev spaces and the equivalence of their definitions.
+  Besov and Sobolev spaces and the equivalence of their definitions, among them
+  `L_p = F^0_{p,2}`, `W^m_p = F^m_{p,2}` and `H^{s,p} = F^s_{p,2}`.
 * H. Triebel, *Theory of Function Spaces II*, Monographs in Mathematics **84**, Birkhäuser, 1992.
   Triebel–Lizorkin spaces, local means, ball means of differences and atoms; the atoms there are
   `(s,p)`-atoms normalised in `L_p`, here they are normalised in `L_∞`.
