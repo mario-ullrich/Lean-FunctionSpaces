@@ -509,9 +509,17 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   J. Sundstrom, J. Tan, *Formalizing Carleson's theorem in Lean*, preprint, 2026,
   [arXiv:2609.31334](https://arxiv.org/abs/2609.31334). The definitions of weak and strong type,
   taken over here, and the real interpolation theorem.
+* A. Benedek, A. P. Calderón, R. Panzone, *Convolution operators on Banach space valued
+  functions*, Proc. Nat. Acad. Sci. U.S.A. **48** (1962), no. 3, 356–365. Singular integrals
+  with values in a Hilbert space.
 * J. Bergh, J. Löfström, *Interpolation Spaces. An Introduction*, Grundlehren der
   mathematischen Wissenschaften **223**, Springer-Verlag, 1976. Real interpolation and the
   K-functional.
+* A. P. Calderón, *Lebesgue spaces of differentiable functions and distributions*, in: Partial
+  Differential Equations, Proc. Sympos. Pure Math. **4**, American Mathematical Society, 1961,
+  33–49. Sobolev spaces as Bessel potential spaces, `W^m_p = H^{m,p}`.
+* A. P. Calderón, A. Zygmund, *On the existence of certain singular integrals*, Acta Math.
+  **88** (1952), no. 1, 85–139. The Calderón–Zygmund decomposition.
 * S. N. Chandler-Wilde, D. P. Hewett, A. Moiola, *Sobolev spaces on non-Lipschitz subsets of
   ℝ^n with application to boundary integral equations on fractal screens*, Integral Equations
   Operator Theory **87** (2017), no. 2, 179–224. Sobolev spaces on domains as restriction spaces.
@@ -534,6 +542,9 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   Springer-Verlag, 1969. The area formula.
 * C. Fefferman, E. M. Stein, *Some maximal inequalities*, Amer. J. Math. **93** (1971), no. 1,
   107–115. The vector-valued maximal inequality.
+* L. Grafakos, *Classical Fourier Analysis*, 3rd ed., Graduate Texts in Mathematics **249**,
+  Springer, 2014. Littlewood–Paley theory, vector-valued singular integrals and Marcinkiewicz
+  interpolation.
 * N. Guglielmi, V. Yu. Protasov, *Invariant polytopes of linear operators with applications to
   regularity of wavelets and of subdivisions*, SIAM J. Matrix Anal. Appl. **37** (2016), no. 1,
   18–52, [arXiv:1502.01192](https://arxiv.org/abs/1502.01192). Hölder exponents of the
@@ -542,6 +553,10 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   Press, 1996. Multiresolution analyses.
 * R. Hiptmair, D. Pauly, E. Schulz, *Traces for Hilbert complexes*, J. Funct. Anal. **284**
   (2023), Paper No. 109905. Assumption F, the compactness of the restriction to bounded domains.
+* L. Hörmander, *Estimates for translation invariant operators in L^p spaces*, Acta Math.
+  **104** (1960), no. 1–2, 93–140. The Hörmander condition.
+* J. Marcinkiewicz, *Sur l'interpolation d'opérations*, C. R. Acad. Sci. Paris **208** (1939),
+  1272–1273. The interpolation theorem.
 * W. McLean, *Strongly Elliptic Systems and Boundary Integral Equations*, Cambridge University
   Press, 2000. Traces on Lipschitz domains and the kernel of the trace map.
 * S. M. Nikol'skii, *Approximation of Functions of Several Variables and Imbedding
