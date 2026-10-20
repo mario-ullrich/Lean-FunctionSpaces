@@ -22,7 +22,7 @@ The result replaces the graph of ``dep_graph_document.html``. A copy of the page
 ``dep_graph_grouped.html``, shows the same graph with its nodes **grouped into blocks**,
 framed and titled, along the blocks of the README, some of them split into parts
 (``BLOCKS``); the blocks are **stacked in columns** (``COLUMNS``). A node's block comes from the
-chapter, and for two long chapters the section, that holds its ``\\label`` in the blueprint
+chapter, and for the long chapters the section, that holds its ``\\label`` in the blueprint
 source. On both pages
 
 * the legend gains a line saying which nodes are not shown;
@@ -57,6 +57,8 @@ from pathlib import Path
 # with `\input`.
 R_D = r"Function spaces on $\R^d$"
 INTERVALS = "Polynomial approximation on intervals"
+TL = "Triebel--Lizorkin spaces"
+SOB = r"Sobolev spaces on $\R^d$"
 BLOCKS: list[tuple[str, list]] = [
     ("Approximation spaces: general theory", [
         "Approximation schemes", "Sequence spaces", "Approximation spaces",
@@ -108,6 +110,34 @@ BLOCKS: list[tuple[str, list]] = [
     ("Compact manifolds", ["Besov spaces on compact manifolds"]),
     ("Dominating mixed smoothness", [r"Dominating mixed smoothness on $\R^d$"]),
     ("Daubechies wavelets", ["Daubechies wavelets"]),
+    ("Maximal functions and the Fefferman–Stein inequality", [
+        (TL, ["Mixed norms", "Dyadic cubes and the Lebesgue differentiation theorem",
+              "The Hardy--Littlewood maximal function",
+              r"The Calder\'on--Zygmund decomposition", "The Fefferman--Stein inequality",
+              "Kernel majorants"])]),
+    ("Triebel–Lizorkin spaces", [
+        (TL, [r"The spaces $\TL{s}{p}{q}$ and the Besov sandwich",
+              "Triebel--Lizorkin spaces on the torus", "The local means characterisation",
+              "Local means on the torus", "Ball means of differences",
+              "The atomic characterisation"])]),
+    ("Sobolev spaces: the bridge for p = 2", [
+        (SOB, ["Test functions in the Schwartz space", "Weak derivatives on open sets",
+               r"Mathlib's Sobolev spaces \texorpdfstring{$H^s$}{H\^{}s} by Littlewood--Paley blocks",
+               r"\texorpdfstring{$H^1$}{H\^{}1} on bounded Lipschitz domains",
+               "Rellich compactness"])]),
+    ("Sobolev spaces on domains and boundaries", [
+        (SOB, ["Sobolev spaces on open sets as Hilbert spaces",
+               "Duality of Sobolev spaces on open sets",
+               "The trace space of a bounded Lipschitz domain",
+               "The area formula for Lipschitz graphs",
+               "The surface measure of a bounded Lipschitz domain"])]),
+    ("Vector-valued singular integrals", [
+        (SOB, [r'Dilation families and the H\"ormander condition',
+               "The adjoint of a convolution", "Plancherel bounds",
+               r"The signed Calder\'on--Zygmund decomposition",
+               r"The weak type \texorpdfstring{$(1,1)$}{(1,1)} of vector-valued singular integrals",
+               r"Weak \texorpdfstring{$L_p$}{L\_p} norms and operators of weak and strong type",
+               "Marcinkiewicz interpolation"])]),
 ]
 
 # Columns of blocks: in each list, every block is placed below the one before it. Without
@@ -125,6 +155,10 @@ COLUMNS: list[list[str]] = [
     ["Differences and local means", "Piecewise polynomials on intervals",
      "The Haar system and multiwavelets", "Splines", "The cube",
      "Dominating mixed smoothness"],
+    ["Convolution and Littlewood–Paley blocks",
+     "Maximal functions and the Fefferman–Stein inequality", "Triebel–Lizorkin spaces",
+     "Sobolev spaces: the bridge for p = 2", "Vector-valued singular integrals"],
+    ["Traces", "Sobolev spaces on domains and boundaries"],
 ]
 GAP = 2
 
