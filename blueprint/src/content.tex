@@ -313,7 +313,8 @@ coefficients of one level of atoms and wavelets.
   ENNReal.lqNorm_le_lqNorm_of_le, ENNReal.lqNorm_le_head_add_shift,
   ENNReal.lqNorm_le_sum_range_add_shift, ENNReal.lqNorm_le_lqNorm_one, ENNReal.lqNorm_geometric_le,
   ENNReal.lqNorm_shift_le, ENNReal.lqNorm_eq_sum, ENNReal.lqNorm_le_card_rpow_mul,
-  ENNReal.lqNorm_prod_rpow, ENNReal.lqNorm_le_sum_of_eq_zero, Rd.lqNorm_ite_eq}
+  ENNReal.lqNorm_prod_rpow, ENNReal.lqNorm_le_sum_of_eq_zero, Rd.lqNorm_ite_eq,
+  ENNReal.lqNorm_ite_le_eq}
 \leanok
 \uses{def:lq-norm}
 Let $1 \leq q \leq r \leq \infty$. For all sequences $a, b$ in $[0, \infty]$, all
@@ -328,7 +329,9 @@ $c, \rho \in [0, \infty]$ and all $n \in \N$:
   \item $\|(\rho^k)_k\|_{\ell_q} \leq (1 - \rho)^{-1}$;
   \item if $a_k = 0$ for every $k$ outside a finite set $s \subseteq \N$, then
     $\|a\|_{\ell_q} \leq \sum_{k \in s} a_k$, and the sequence equal to $c$ at $n$ and to $0$
-    elsewhere has $\ell_q$ norm $c$.
+    elsewhere has $\ell_q$ norm $c$;
+  \item if $q < \infty$, the tail $(0, \dots, 0, a_n, a_{n+1}, \dots)$ has the $\ell_q$ norm
+    $\|(a_{n+k})_k\|_{\ell_q}$.
 \end{enumerate}
 \end{lemma}
 
@@ -338,8 +341,9 @@ The first two items are immediate. The third is Minkowski's inequality for the f
 partial sums, followed by the supremum over them. For the fourth put $M = \|a\|_{\ell_q}$;
 then $a_k^r = a_k^{r-q} a_k^q \leq M^{r-q} a_k^q$, and summation gives
 $\|a\|_{\ell_r}^r \leq M^r$. The fifth is the third applied to $a_0 \delta_0$ and the rest,
-and induction on $m$. The sixth is the fourth and the geometric series, and the last is the
-fourth for a sequence with finitely many nonzero terms.
+and induction on $m$. The sixth is the fourth and the geometric series, the seventh is the
+fourth for a sequence with finitely many nonzero terms, and the last compares the series of the
+$q$-th powers term by term.
 \end{proof}
 
 \begin{lemma}[The Cauchy--Schwarz inequality for sequences]
@@ -9315,6 +9319,47 @@ $|F(x)| = \lim_k |G_{J_k}(x)| \leq v(x)$.
 For a bounded linear operator $T$ on $L_p$ the lemma applies to $T G_J \to T f$: a pointwise bound
 on $T G_J$ passes to $T f$.
 
+\begin{lemma}[Tails in $L_p(\ell_q)$]
+\label{lem:mixed-norm-tails}
+\lean{MeasureTheory.aemeasurable_lqNorm_ite, MeasureTheory.eLpNorm_lqNorm_ite_le,
+  ENNReal.tendsto_lqNorm_ite_le, MeasureTheory.tendsto_lintegral_lqNorm_ite_le_rpow,
+  MeasureTheory.tendsto_eLpNorm_lqNorm_ite_le}
+\leanok
+\uses{lem:lq-basic, lem:lp-norm-nonnegative}
+For every measure space $(X, \mu)$, all $p, q \in [0, \infty]$, every set $P \subseteq \N$ and
+all measurable $g_j \colon X \to [0, \infty]$, $j \in \N$, the function
+$x \mapsto \|(\mathbf 1_P(j) \, g_j(x))_j\|_{\ell_q}$ is measurable and
+\[
+  \bigl\| x \mapsto \|(\mathbf 1_P(j) \, g_j(x))_j\|_{\ell_q} \bigr\|_p
+  \leq \bigl\| x \mapsto \|(g_j(x))_j\|_{\ell_q} \bigr\|_p .
+\]
+Let $0 < p < \infty$ and $0 < q < \infty$. For every sequence $a$ in $[0, \infty]$ with
+$\|a\|_{\ell_q} < \infty$,
+\[
+  \|(0, \dots, 0, a_N, a_{N+1}, \dots)\|_{\ell_q} \to 0 \qquad (N \to \infty) .
+\]
+For every measure space $(X, \mu)$ and all measurable $g_j \colon X \to [0, \infty]$,
+$j \in \N$, with $\bigl\| x \mapsto \|(g_j(x))_j\|_{\ell_q} \bigr\|_p < \infty$, the tails
+\[
+  G_N(x) = \|(0, \dots, 0, g_N(x), g_{N+1}(x), \dots)\|_{\ell_q}
+\]
+satisfy
+\[
+  \int_X G_N^p \, d\mu \to 0 \quad \text{and} \quad \|G_N\|_p \to 0 \qquad (N \to \infty) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Setting terms to zero decreases the $\ell_q$ norm at every point (\Cref{lem:lq-basic}) and hence
+the $L_p$ norm. The $q$-th power of the norm of the tail is $\sum_{k \geq N} a_k^q$
+(\Cref{lem:lq-basic}), the
+tail of a convergent series. The functions $G_N^p$ are at most
+$\|(g_j(x))_j\|_{\ell_q}^p$, which is integrable and hence finite almost everywhere; where it is
+finite, $G_N^p \to 0$ by the first part. Dominated convergence gives $\int G_N^p \to 0$, and
+$\|G_N\|_p = (\int G_N^p)^{1/p}$ (\Cref{lem:lp-norm-nonnegative}).
+\end{proof}
+
 \section{The spaces $\TL{s}{p}{q}$ and the Besov sandwich}
 
 As in \Cref{ch:rd}, $V$ is a finite-dimensional real inner product space with Lebesgue measure
@@ -9372,12 +9417,12 @@ $\|f\|^{\mathrm{LP}}_{s,q}$ an $\ell_q(L_p)$ norm of the same family.
 \begin{lemma}[The pointwise blocks]
 \label{lem:tl-pointwise-blocks}
 \lean{Rd.iSup_enorm_psi_lt_top, Rd.eLpNorm_psi_mul_iSup_psi_ne_top, Rd.enorm_blockFun_le,
-  Rd.blockFun_add_ae, Rd.blockFun_smul, Rd.memLp_blockFun}
+  Rd.blockFun_add_ae, Rd.blockFun_smul, Rd.memLp_blockFun, Rd.eLpNorm_blockFun_zero_le}
 \leanok
 \uses{def:triebel-lizorkin, lem:conv-pointwise-bound, lem:lp-kernels-basic, lem:conv-assoc,
   thm:young}
 For every $1 \leq p < \infty$, all $f, g \in L_p$, every $c \in \C$, every $j \in \N$ and every
-$x \in V$, $\psi_j * f \in L_p$,
+$x \in V$, $\psi_j * f \in L_p$, $\|\psi_0 * f\|_p \leq \|\Phi\|_1 \, \|f\|_p$,
 \[
   |(\psi_j * f)(x)| \leq \|\psi_j\|_1^{1 - 1/p} \bigl( \sup |\psi_j| \bigr)^{1/p} \|f\|_p
 \]
@@ -9388,11 +9433,12 @@ $(\psi_j * (f + g))(x) = (\psi_j * f)(x) + (\psi_j * g)(x)$ for all $j \in \N$.
 
 \begin{proof}
 \leanok
-Young's inequality (\Cref{thm:young}) gives $\psi_j * f \in L_p$. The bound is
-\Cref{lem:conv-pointwise-bound}; its constant is finite since $\psi_j$ is
-integrable and bounded (\Cref{lem:lp-kernels-basic}). Homogeneity holds for the integrals, and
-additivity holds almost everywhere for each $j$ by \Cref{lem:conv-assoc}, hence for all $j$ at
-once outside a countable union of null sets.
+Young's inequality (\Cref{thm:young}) gives $\psi_j * f \in L_p$, and with
+$\|\psi_0\|_1 = \|\Phi_0\|_1 = \|\Phi\|_1$ (\Cref{lem:lp-kernels-basic}) the bound of
+$\psi_0 * f$. The pointwise bound is \Cref{lem:conv-pointwise-bound}; its constant is finite
+since $\psi_j$ is integrable and bounded (\Cref{lem:lp-kernels-basic}). Homogeneity holds for
+the integrals, and additivity holds almost everywhere for each $j$ by \Cref{lem:conv-assoc},
+hence for all $j$ at once outside a countable union of null sets.
 \end{proof}
 
 \begin{proposition}[Elementary properties]
@@ -12136,7 +12182,10 @@ Carleson's theorem, \Cref{sec:marcinkiewicz} proves Marcinkiewicz interpolation 
 type $(1,1)$ and strong type $(2,2)$, and \Cref{sec:lp-norm-duality} computes $L_p$ norms by
 duality. Together they give the strong type $(p,p)$, $1 < p < \infty$, of these operators in
 \Cref{sec:vector-valued-strong-type}, and \Cref{sec:square-function} proves the square function
-theorem $\TL{0}{p}{2} = L_p(V)$ with explicit constants.
+theorem $\TL{0}{p}{2} = L_p(V)$ with explicit constants. \Cref{sec:derivative-kernels} writes
+the Littlewood--Paley blocks as sums of derivatives of Schwartz kernels, and
+\Cref{sec:sobolev-triebel-lizorkin} proves $\Sob{m}{p}(V) = \TL{m}{p}{2}$ for
+$1 < p < \infty$, with explicit constants and the Besov sandwich.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -12380,7 +12429,7 @@ $\partial^v f(\varphi) = (-1)^k f(\partial^v \varphi)$ by \Cref{lem:distribution
   Rd.locallyIntegrableOn_of_memLp, Rd.memWeakSobolev_zero_iff, Rd.MemWeakSobolev.mono_order,
   Rd.MemWeakSobolev.mono_set, Rd.zero_memWeakSobolev, Rd.MemWeakSobolev.add,
   Rd.MemWeakSobolev.smul, Rd.MemWeakSobolev.congr_ae, Rd.zero_memSobolev, Rd.MemSobolev.add,
-  Rd.MemSobolev.smul}
+  Rd.MemSobolev.smul, Rd.HasWeakLineDeriv.sum, Rd.memSobolev_iff_exists_hasWeakLineDeriv}
 \leanok
 \uses{def:weak-line-derivative, lem:weak-derivative-integral, lem:directional-derivatives-commute}
 For every $v \in V^k$, all functions $f, f', g, g'$ and every $c \in \C$:
@@ -12390,7 +12439,9 @@ For every $v \in V^k$, all functions $f, f', g, g'$ and every $c \in \C$:
   \item for $k = 0$, every locally integrable $f$ on $\Omega$ is its own weak derivative;
   \item if $g = \partial^v f$ and $g' = \partial^v f'$ weakly on $\Omega$, then
     $g + g' = \partial^v (f + f')$, $-g = \partial^v(-f)$, $g - g' = \partial^v (f - f')$ and
-    $c g = \partial^v (c f)$ weakly on $\Omega$;
+    $c g = \partial^v (c f)$ weakly on $\Omega$; for a finite set $s$ and functions $F_j$,
+    $G_j$ with $G_j = \partial^v F_j$ weakly on $\Omega$ for every $j \in s$,
+    $\sum_{j \in s} G_j = \partial^v \sum_{j \in s} F_j$ weakly on $\Omega$;
   \item if $g = \partial^v f$ weakly on $\Omega$, $f = f'$ and $g = g'$ almost everywhere on
     $\Omega$, then $g' = \partial^v f'$ weakly on $\Omega$;
   \item if $g = \partial^v f$ weakly on $\Omega$, then $g = \partial^v f$ weakly on every open
@@ -12406,7 +12457,8 @@ $\Sob{m}{p}(\Omega) \subseteq \Sob{l}{p}(\Omega)$, every $f \in \Sob{m}{p}(\Omeg
 $\Sob{m}{p}(\Omega')$, and $\Sob{m}{p}(\Omega)$ is a complex vector space. For every
 $f \in \Sob{m}{p}(\Omega)$ and every $f'$ with $f' = f$ almost everywhere on $\Omega$,
 $f' \in \Sob{m}{p}(\Omega)$. For $\Omega = V$, $\Sob{m}{p}(V)$ is a complex linear subspace of
-$L_p(V)$.
+$L_p(V)$, and $f \in L_p(V)$ lies in $\Sob{m}{p}(V)$ if and only if for every $k \leq m$ and
+every $v \in V^k$ some $g \in L_p(V)$ is the weak derivative $\partial^v f$ on $V$.
 \end{lemma}
 
 \begin{proof}
@@ -12414,8 +12466,9 @@ $L_p(V)$.
 (1) A locally integrable function is determined almost everywhere on $\Omega$ by its
 distribution (Mathlib's \texttt{Distribution.\allowbreak ofFun\_\allowbreak injective}). (2)
 $\partial^v$ is the identity for $k = 0$. (3) The distribution of a function and $\partial^v$ are
-additive; for complex $c$ use \Cref{lem:weak-derivative-integral}, since $c$ leaves both
-integrals. (4) The distribution of a function depends on it only almost everywhere on $\Omega$.
+additive, and finite sums follow by induction; for complex $c$ use
+\Cref{lem:weak-derivative-integral}, since $c$ leaves both integrals. (4) The distribution of a
+function depends on it only almost everywhere on $\Omega$.
 (5) A test function $\varphi$ on $\Omega'$ is one on $\Omega$, with the same derivatives
 (\Cref{lem:directional-derivatives-commute}), so the identity of
 \Cref{lem:weak-derivative-integral} on $\Omega$ gives it on $\Omega'$. (6) The distribution of
@@ -12424,7 +12477,8 @@ so $g = 0$ almost everywhere on $O$ by (6) and (1). A function in $L_p(\Omega)$,
 integrable on every compact subset of $\Omega$, which has finite measure. The statements on
 $\Sob{m}{p}$ follow, with $L_p(\Omega') \supseteq L_p(\Omega)|_{\Omega'}$ and (4); in $L_p(V)$,
 the zero class, and the class of a sum or a multiple, agree almost everywhere with $0$ and with
-the sum or the multiple of the representatives.
+the sum or the multiple of the representatives, and a weak derivative in $L_p(V)$ may be
+replaced by its class (4).
 \end{proof}
 
 \begin{lemma}[Pairing with a test function]
@@ -18005,6 +18059,311 @@ $\sum_j |\widehat{\tilde\theta^w_j}(\xi)|^2 \leq ((8\pi)^k \prod_l \|w_l\|)^2
 (\Cref{thm:cz-family-psi-dual}). \Cref{thm:cz-family-dilation} and
 \Cref{lem:psi-dual-derivatives} give the rest.
 \end{proof}
+
+\section{Sobolev spaces as Triebel--Lizorkin spaces}
+\label{sec:sobolev-triebel-lizorkin}
+
+Let $n \geq 1$ and $1 < p < \infty$. This section proves $\Sob{m}{p}(V) = \TL{m}{p}{2}$ for every
+$m \in \N$, with explicit constants in both directions. For $f \in \Sob{m}{p}(V)$, the blocks
+$2^{jm} \psi_{j+1} * f$ are sums of convolutions of the weak derivatives of order $m$ with the
+dilated derivative kernels (\Cref{cor:psi-derivatives-dilated}), and the analysis bound of their
+Calder\'on--Zygmund families gives $f \in \TL{m}{p}{2}$. Conversely, for $f \in \TL{k}{p}{2}$ and
+$w \in V^k$, the derivatives $\sum_{j < J} (\partial^w \tilde\psi_j) * (\psi_j * f)$
+of the reproducing sums converge in $L_p(V)$ by the synthesis bound of the dual derivative
+families (\Cref{thm:cz-family-dual-derivative}), and their limit is $\partial^w f$. With the
+Besov sandwich (\Cref{thm:tl-besov-sandwich}) this places $\Sob{m}{p}(V)$ between
+$\Besov{m}{p}{\min(p,2)}$ and $\Besov{m}{p}{\max(p,2)}$ for $m \geq 1$. In this section
+$e_\alpha$, $\eta_\alpha$, $\theta^\alpha_j$ and $\tilde\theta^w_j$ are those of
+\Cref{sec:derivative-kernels}.
+
+\paragraph{From weak derivatives to the blocks.}
+
+\begin{definition}[The constants of the embedding into $\TL{m}{p}{2}$]
+\label{def:sobolev-to-tl-const}
+\lean{Rd.sobolevToTLConst, Rd.sobolevToTLConst_ne_top}
+\leanok
+\uses{def:cz-const, def:hormander-const, def:derivative-family}
+For $1 < p < \infty$, every $m \in \N$ and every multi-index $\alpha$,
+\[
+  K_{V,p,\alpha} = S_{V,p}\bigl(2, 4 H_{A^\alpha}\bigr) ,
+\]
+which is finite.
+\end{definition}
+
+\begin{lemma}[The blocks as convolutions with the derivatives]
+\label{lem:blocks-as-derivative-convolutions}
+\lean{Rd.enorm_two_pow_complex, Rd.two_pow_mul_blockFun_succ_ae,
+  Rd.lqNorm_blockFun_succ_le_sum_ae}
+\leanok
+\uses{cor:psi-derivatives-dilated, thm:weak-derivative-convolution, lem:averaged-differences,
+  def:derivative-family, def:triebel-lizorkin, lem:dyadic-weights-integer, lem:lq-basic,
+  lem:countable-minkowski}
+For every $l \in \N$, the complex number $2^l$ has absolute value $|2^l| = 2^l$.
+Let $1 \leq p < \infty$, $m \in \N$ and $f \in L_p(V)$, and for every multi-index $\alpha$ let
+$g_\alpha \in L_p(V)$ be the weak derivative $\partial^{e_\alpha} f$ on $V$. For almost every
+$x \in V$ and every $j \in \N$,
+\[
+  2^{jm} (\psi_{j+1} * f)(x) = \sum_\alpha (\theta^\alpha_j * g_\alpha)(x) ,
+\]
+and for almost every $x \in V$,
+\[
+  \bigl\| (2^{(j+1)m} |(\psi_{j+1} * f)(x)|)_j \bigr\|_{\ell_2}
+  \leq 2^m \sum_\alpha \bigl\| ((\theta^\alpha_j * g_\alpha)(x))_j \bigr\|_{\ell_2} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{cor:psi-derivatives-dilated}, $2^{jm} \psi_{j+1} * f$ is the convolution of $f$ with
+$\sum_\alpha \partial^{e_\alpha} \theta^\alpha_j$, which is
+$\sum_\alpha (\partial^{e_\alpha} \theta^\alpha_j) * f$ almost everywhere
+(\Cref{lem:averaged-differences}); each term is $\theta^\alpha_j * g_\alpha$ at every point
+(\Cref{thm:weak-derivative-convolution}). For the bound,
+$2^{(j+1)m} = 2^m 2^{jm}$ (\Cref{lem:dyadic-weights-integer}) and $|2^{jm}| = 2^{jm}$ in $\C$;
+the triangle inequality in $\C$,
+the homogeneity of the $\ell_2$ norm and Minkowski's inequality for finite sums
+(\Cref{lem:lq-basic}, \Cref{lem:countable-minkowski}) give the claim.
+\end{proof}
+
+\begin{theorem}[$\Sob{m}{p} \subseteq \TL{m}{p}{2}$]
+\label{thm:sobolev-to-triebel-lizorkin}
+\lean{Rd.eLpNorm_lqNorm_blockFun_succ_le, Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv,
+  Rd.memTriebelLizorkin_of_memSobolev}
+\leanok
+\uses{lem:blocks-as-derivative-convolutions, def:sobolev-to-tl-const, thm:cz-family-derivative,
+  thm:vector-valued-strong-type, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-nonnegative,
+  def:weak-line-derivative, lem:weak-derivative-basic}
+Let $n \geq 1$, $1 < p < \infty$, $m \in \N$ and $f \in L_p(V)$, and for every multi-index
+$\alpha$ let $g_\alpha \in L_p(V)$ be the weak derivative $\partial^{e_\alpha} f$ on $V$. Then
+\[
+  \bigl\| \|(2^{(j+1)m} |(\psi_{j+1} * f)(x)|)_j\|_{\ell_2} \bigr\|_p
+  \leq 2^m \sum_\alpha K_{V,p,\alpha} \|g_\alpha\|_p
+\]
+and
+\[
+  \|f\|_{\TL{m}{p}{2}} \leq \|\Phi\|_1 \, \|f\|_p + 2^m \sum_\alpha K_{V,p,\alpha} \,
+  \|g_\alpha\|_p .
+\]
+In particular, every $f \in \Sob{m}{p}(V)$ lies in $\TL{m}{p}{2}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For the first bound, take the $L_p$ norm in \Cref{lem:blocks-as-derivative-convolutions}, use
+the homogeneity of the $L_p$ norm (\Cref{lem:lp-norm-nonnegative}) and Minkowski's inequality in
+$L_p$, and bound each term by the strong type of the analysis operator
+(\Cref{thm:vector-valued-strong-type}) of the Calder\'on--Zygmund family $(\theta^\alpha_j)_j$
+with overlap $2$ and H\"ormander constant $4 H_{A^\alpha}$ (\Cref{thm:cz-family-derivative}).
+Splitting off the block $j = 0$ from the $\ell_2$ norm (\Cref{lem:lq-basic}), the triangle
+inequality in $L_p$ and $\|\psi_0 * f\|_p \leq \|\Phi\|_1 \, \|f\|_p$
+(\Cref{lem:tl-pointwise-blocks}) give the second bound.
+For $f \in \Sob{m}{p}(V)$ the weak derivatives $\partial^{e_\alpha} f$ exist in $L_p(V)$
+(\Cref{lem:weak-derivative-basic}), and the right side is finite.
+\end{proof}
+
+\paragraph{From the blocks to weak derivatives.}
+
+\begin{definition}[The constants of the embedding into $\Sob{m}{p}$]
+\label{def:tl-to-sobolev-const}
+\lean{Rd.tlToSobolevConst, Rd.tlToSobolevConst_ne_top}
+\leanok
+\uses{def:cz-const, def:hormander-const, def:dual-derivative-family}
+For $1 < p < \infty$, every $k \in \N$ and all $w \in V^k$,
+\[
+  C_{V,p,w} = S_{V,p}\bigl(B_w, 4 H_{\tilde A^w}\bigr) ,
+\]
+which is finite.
+\end{definition}
+
+\begin{lemma}[The weighted blocks and their tails]
+\label{lem:weighted-block-tails}
+\lean{Rd.eLpNorm_lqNorm_ite_blockFun_le, Rd.tendsto_eLpNorm_lqNorm_blockFun_tail}
+\leanok
+\uses{def:triebel-lizorkin, lem:mixed-norm-tails}
+Let $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p(V)$. For every set
+$P \subseteq \N$,
+\[
+  \bigl\| \|(\mathbf 1_P(j) \, 2^{js} |(\psi_j * f)(x)|)_j\|_{\ell_q} \bigr\|_p
+  \leq \|f\|_{\TL{s}{p}{q}} .
+\]
+If $q < \infty$ and $f \in \TL{s}{p}{q}$, then
+\[
+  \bigl\| \|(2^{js} |(\psi_j * f)(x)|)_{j \geq N}\|_{\ell_q} \bigr\|_p \to 0 \qquad
+  (N \to \infty) ,
+\]
+where the $\ell_q$ norm is taken of the sequence with the terms $j < N$ replaced by $0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both claims are \Cref{lem:mixed-norm-tails} for the functions
+$g_j = 2^{js} |\psi_j * f|$, whose mixed norm is $\|f\|_{\TL{s}{p}{q}}$
+(\Cref{def:triebel-lizorkin}).
+\end{proof}
+
+\begin{lemma}[The synthesis bound for derivatives of the synthesis kernels]
+\label{lem:derivative-synthesis-bound}
+\lean{Rd.eLpNorm_sum_conv_derivDual_le, Rd.derivSynthesisSum, Rd.memLp_derivSynthesisSum,
+  Rd.eLpNorm_derivSynthesisSum_sub_le}
+\leanok
+\uses{def:tl-to-sobolev-const, lem:psi-dual-derivatives, thm:cz-family-dual-derivative,
+  thm:vector-valued-strong-type, lem:tl-pointwise-blocks, thm:young,
+  lem:blocks-as-derivative-convolutions, lem:dyadic-weights-integer, lem:mixed-norm-tails}
+Let $n \geq 1$, $1 < p < \infty$, $k \in \N$, $w \in V^k$ and $f \in L_p(V)$. For every finite
+set $s \subseteq \N$,
+\begin{multline*}
+  \Bigl\| \sum_{j \in s} (\partial^w \tilde\psi_j) * (\psi_j * f) \Bigr\|_p \\
+  \leq C_{V,p,w} \, \bigl\| \|(\mathbf 1_s(j) \, 2^{jk} |(\psi_j * f)(x)|)_j\|_{\ell_2}
+  \bigr\|_p .
+\end{multline*}
+The partial sums $D_J = \sum_{j < J} (\partial^w \tilde\psi_j) * (\psi_j * f)$ lie in $L_p(V)$,
+and for all $N \leq N'$,
+\[
+  \|D_{N'} - D_N\|_p \leq C_{V,p,w} \,
+  \bigl\| \|(2^{jk} |(\psi_j * f)(x)|)_{j \geq N}\|_{\ell_2} \bigr\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\partial^w \tilde\psi_j = 2^{jk} \tilde\theta^w_j$ (\Cref{lem:psi-dual-derivatives}), so the
+sum is $\sum_{j \in s} \tilde\theta^w_j * h_j$ with $h_j = \mathbf 1_s(j) 2^{jk} \psi_j * f$,
+which lie in $L_p(V)$ (\Cref{lem:tl-pointwise-blocks}). Since $|2^{jk}| = 2^{jk}$ in $\C$
+(\Cref{lem:blocks-as-derivative-convolutions}),
+$|h_j| = \mathbf 1_s(j) 2^{jk} |\psi_j * f|$, with the weight $2^{jk}$ of smoothness $k$
+(\Cref{lem:dyadic-weights-integer}). The strong type of the synthesis
+operators (\Cref{thm:vector-valued-strong-type}) of the Calder\'on--Zygmund family
+$(\tilde\theta^w_j)_j$ (\Cref{thm:cz-family-dual-derivative}) gives the first bound. The partial
+sums lie in $L_p(V)$ by Young's inequality (\Cref{thm:young}), and $D_{N'} - D_N$ is the sum over
+$s = \{N, \dots, N' - 1\}$, whose sequence is at most the tail from $N$; the measurability is
+\Cref{lem:mixed-norm-tails}.
+\end{proof}
+
+\begin{lemma}[The partial sums of the derivative]
+\label{lem:derivative-partial-sums}
+\lean{Rd.cauchySeq_toLp_derivSynthesisSum, Rd.hasWeakLineDeriv_sum_conv_psiDual}
+\leanok
+\uses{lem:derivative-synthesis-bound, lem:weighted-block-tails, thm:weak-derivative-convolution,
+  lem:weak-derivative-basic, lem:psi-dual-derivatives}
+Let $n \geq 1$, $1 < p < \infty$, $k \in \N$, $w \in V^k$ and $f \in L_p(V)$. For every
+$J \in \N$, $D_J$ is the weak derivative $\partial^w$ of $\sum_{j < J} \tilde\psi_j * (\psi_j * f)$
+on $V$. If $f \in \TL{k}{p}{2}$, then $(D_J)_J$ is a Cauchy sequence in $L_p(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Each term $(\partial^w \tilde\psi_j) * (\psi_j * f)$ is the weak derivative of
+$\tilde\psi_j * (\psi_j * f)$ (\Cref{thm:weak-derivative-convolution}), and weak derivatives
+add up (\Cref{lem:weak-derivative-basic}). By \Cref{lem:derivative-synthesis-bound},
+$\|D_{N'} - D_N\|_p$ is at most $C_{V,p,w}$ times the tail from $N$, which is finite and tends
+to zero (\Cref{lem:weighted-block-tails}).
+\end{proof}
+
+\begin{theorem}[$\TL{m}{p}{2} \subseteq \Sob{m}{p}$]
+\label{thm:triebel-lizorkin-to-sobolev}
+\lean{Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin,
+  Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin_of_le, Rd.memSobolev_of_memTriebelLizorkin}
+\leanok
+\uses{lem:derivative-partial-sums, lem:derivative-synthesis-bound, lem:weighted-block-tails,
+  lem:square-function-reproducing, thm:weak-derivative-limits, lem:weak-derivative-basic,
+  def:tl-to-sobolev-const, prop:tl-elementary}
+Let $n \geq 1$, $1 < p < \infty$, $k \in \N$ and $w \in V^k$. For every $f \in \TL{k}{p}{2}$ the
+weak derivative $\partial^w f$ exists on $V$ as a function $g \in L_p(V)$ with
+\[
+  \|g\|_p \leq C_{V,p,w} \, \|f\|_{\TL{k}{p}{2}} .
+\]
+For every $m \geq k$ and every $f \in \TL{m}{p}{2}$, the weak derivative $g = \partial^w f$
+satisfies $\|g\|_p \leq C_{V,p,w} \, \|f\|_{\TL{m}{p}{2}}$. In particular,
+$\TL{m}{p}{2} \subseteq \Sob{m}{p}(V)$ for every $m \in \N$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $g$ be the limit of the Cauchy sequence $(D_J)_J$ in $L_p(V)$
+(\Cref{lem:derivative-partial-sums}). The reproducing sums tend to $f$ in $L_p(V)$
+(\Cref{lem:square-function-reproducing}), and $D_J$ is their weak derivative $\partial^w$, so
+$g = \partial^w f$ weakly on $V$ (\Cref{thm:weak-derivative-limits}). By
+\Cref{lem:derivative-synthesis-bound} with $s = \{0, \dots, J - 1\}$ and
+\Cref{lem:weighted-block-tails}, $\|D_J\|_p \leq C_{V,p,w} \|f\|_{\TL{k}{p}{2}}$ for every $J$,
+and the bound passes to the limit. For $m \geq k$, $\TL{m}{p}{2} \subseteq \TL{k}{p}{2}$ with
+$\|f\|_{\TL{k}{p}{2}} \leq \|f\|_{\TL{m}{p}{2}}$ (\Cref{prop:tl-elementary}). The last claim is
+\Cref{lem:weak-derivative-basic}.
+\end{proof}
+
+\paragraph{Consequences.}
+
+\begin{corollary}[$\Sob{m}{p} = \TL{m}{p}{2}$]
+\label{cor:sobolev-triebel-lizorkin}
+\lean{Rd.memSobolev_iff_memTriebelLizorkin}
+\leanok
+\uses{thm:sobolev-to-triebel-lizorkin, thm:triebel-lizorkin-to-sobolev}
+For every $n \geq 1$, every $1 < p < \infty$, every $m \in \N$ and every $f \in L_p(V)$,
+$f \in \Sob{m}{p}(V)$ if and only if $f \in \TL{m}{p}{2}$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:sobolev-to-triebel-lizorkin} and \Cref{thm:triebel-lizorkin-to-sobolev}.
+\end{proof}
+
+For $m = 0$ both sides are all of $L_p(V)$; the case $m = 0$ of $\TL{m}{p}{2}$ is the square
+function theorem (\Cref{cor:square-function-theorem}).
+
+\begin{corollary}[The Besov sandwich for $\Sob{m}{p}$]
+\label{cor:sobolev-besov-sandwich}
+\lean{Rd.memTriebelLizorkin_two_of_memApprox, Rd.memApprox_of_memSobolev,
+  Rd.memSobolev_of_memApprox, Rd.approxNormDyadic_le_of_hasWeakLineDeriv,
+  Rd.exists_hasWeakLineDeriv_of_memApprox}
+\leanok
+\uses{cor:sobolev-triebel-lizorkin, thm:sobolev-to-triebel-lizorkin,
+  thm:triebel-lizorkin-to-sobolev, thm:tl-besov-sandwich, thm:square-function-upper}
+Let $n \geq 1$ and $1 < p < \infty$. For every $s \geq 0$,
+$\Besov{s}{p}{\min(p,2)} \subseteq \TL{s}{p}{2}$. For every $m \in \N$,
+\[
+  \Besov{m}{p}{\min(p,2)} \subseteq \Sob{m}{p}(V) ,
+\]
+and for every $m \geq 1$,
+\[
+  \Sob{m}{p}(V) \subseteq \Besov{m}{p}{\max(p,2)} .
+\]
+For every $m \geq 1$ and every $f \in L_p(V)$ with weak derivatives
+$g_\alpha = \partial^{e_\alpha} f \in L_p(V)$ for every multi-index $\alpha$ of length $m$,
+\[
+  \|f\|^{\mathrm{dy}}_{A^m_{\max(p,2)}} \leq 2 (1 - 2^{-m})^{-1}
+  \Bigl( \|\Phi\|_1 \, \|f\|_p + 2^m \sum_\alpha K_{V,p,\alpha} \, \|g_\alpha\|_p \Bigr) .
+\]
+For every $m \in \N$, every $f \in \Besov{m}{p}{\min(p,2)}$, every $k \leq m$ and all
+$w \in V^k$, the weak derivative $\partial^w f$ is a function $g \in L_p(V)$ with
+\[
+  \|g\|_p \leq C_{V,p,w} \cdot 8 \cdot 8^m \, \|\Phi\|_1 \, \|f\|^{\mathrm{dy}}_{A^m_{\min(p,2)}} .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+For $s > 0$ the first inclusion is the Besov sandwich for $q = 2$ (\Cref{thm:tl-besov-sandwich});
+for $s = 0$ it holds since $\TL{0}{p}{2} = L_p(V)$ (\Cref{thm:square-function-upper}). With
+\Cref{cor:sobolev-triebel-lizorkin} it gives the second inclusion, and the Besov sandwich for
+$s = m > 0$ gives the third. The bounds combine \Cref{thm:sobolev-to-triebel-lizorkin} and
+\Cref{thm:triebel-lizorkin-to-sobolev} with the bounds of \Cref{thm:tl-besov-sandwich}.
+\end{proof}
+
+\begin{corollary}[$\Sob{m}{2} = \Besov{m}{2}{2}$]
+\label{cor:sobolev-integer-two-besov}
+\lean{Rd.memSobolev_two_iff_memApprox}
+\leanok
+\uses{cor:sobolev-triebel-lizorkin, thm:tl-diagonal}
+For every $n \geq 1$, every $m \geq 1$ and every $f \in L_2(V)$, $f \in \Sob{m}{2}(V)$ if and
+only if $f \in \Besov{m}{2}{2}$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{cor:sobolev-triebel-lizorkin} and $\TL{m}{2}{2} = \Besov{m}{2}{2}$ (\Cref{thm:tl-diagonal}).
+\end{proof}
+
+This extends \Cref{thm:sobolev-one-two-besov}, the case $m = 1$ (in every dimension), to every
+order $m$ when $n \geq 1$.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

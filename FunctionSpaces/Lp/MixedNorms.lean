@@ -38,7 +38,11 @@ Hölder's inequality on finite sets, also for means (`MeasureTheory.lqNorm_laver
 a probability space, with the `L_p` norm on the right (`MeasureTheory.lqNorm_lintegral_le_eLpNorm`).
 Finally, a pointwise bound `u ≤ v + w_J` with `‖w_J‖_p → 0` gives `u ≤ v` almost everywhere
 (`MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm`), and a bound `|G_J| ≤ v` almost everywhere
-passes to the limit of `G_J` in `L_p` (`MeasureTheory.ae_enorm_le_of_tendsto_Lp`).
+passes to the limit of `G_J` in `L_p` (`MeasureTheory.ae_enorm_le_of_tendsto_Lp`). Setting
+terms of a family to zero decreases its mixed norm (`MeasureTheory.eLpNorm_lqNorm_ite_le`). For
+a family with a finite mixed norm, the tails `x ↦ ‖(g_j(x))_{j ≥ N}‖_{ℓ_q}` tend to zero in `L_p`
+by dominated convergence (`MeasureTheory.tendsto_eLpNorm_lqNorm_ite_le`), since the tails of a
+single sequence in `ℓ_q` do (`ENNReal.tendsto_lqNorm_ite_le`).
 
 Two facts on conjugate exponents serve the duality arguments: a power cancels in Hölder's
 inequality, `X ≤ K A^{1/u} X^{1/u'}` with `X < ∞` gives `X ≤ K^u A`
@@ -53,6 +57,25 @@ open scoped ENNReal
 open ENNReal (lqNorm dyadicWeight)
 
 namespace ENNReal
+
+/-! ### Tails of sequences -/
+
+/-- **The tails of a sequence in `ℓ_q` tend to zero**: for `0 < q < ∞` and `‖a‖_{ℓ_q} < ∞`,
+`‖(0, …, 0, a_N, a_{N+1}, …)‖_{ℓ_q} → 0` as `N → ∞`, since the tails `∑_{k ≥ N} a_k^q` of a
+convergent series tend to zero (Mathlib's `ENNReal.tendsto_sum_nat_add`). -/
+theorem tendsto_lqNorm_ite_le {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q ≠ ∞) {a : ℕ → ℝ≥0∞}
+    (ha : lqNorm q a ≠ ∞) :
+    Tendsto (fun N => lqNorm q (fun j => if N ≤ j then a j else 0)) atTop (𝓝 0) := by
+  have hpos : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
+  have hsum : ∑' j, a j ^ q.toReal ≠ ∞ := by
+    rw [← lqNorm_rpow hq0 hq]
+    exact ENNReal.rpow_ne_top_of_nonneg hpos.le ha
+  have h := ((ENNReal.continuous_rpow_const (y := 1 / q.toReal)).tendsto 0).comp
+    (ENNReal.tendsto_sum_nat_add _ hsum)
+  rw [ENNReal.zero_rpow_of_pos (one_div_pos.2 hpos)] at h
+  refine h.congr fun N => ?_
+  rw [Function.comp_apply, lqNorm_ite_le_eq hq0 hq, lqNorm_eq_tsum hq0 hq]
+  simp_rw [add_comm N]
 
 /-! ### Powers in `[0, ∞]` -/
 
@@ -609,5 +632,84 @@ theorem ae_enorm_le_of_tendsto_Lp {E : Type*} [NormedAddCommGroup E] [Fact (1 �
   obtain ⟨ns, -, hns⟩ := (tendstoInMeasure_of_tendsto_Lp hG).exists_seq_tendsto_ae
   filter_upwards [hns, ae_all_iff.2 fun k => h (ns k)] with x hx hk
   exact le_of_tendsto' hx.enorm hk
+
+/-! ### Families with terms set to zero -/
+
+/-- **Measurability with terms set to zero**: if every `g_j : α → [0, ∞]` is measurable, then for
+every predicate `P` on `ℕ` the function `x ↦ ‖(1_P(j) g_j(x))_j‖_{ℓ_q}` is measurable, where
+`1_P(j) g_j(x)` is `g_j(x)` if `P j` holds and `0` otherwise. -/
+theorem aemeasurable_lqNorm_ite {P : ℕ → Prop} [DecidablePred P] {g : ℕ → α → ℝ≥0∞}
+    (hg : ∀ j, AEMeasurable (g j) μ) (q : ℝ≥0∞) :
+    AEMeasurable (fun x => lqNorm q fun j => if P j then g j x else 0) μ :=
+  aemeasurable_lqNorm_comp (fun j => by
+    split_ifs
+    · exact hg j
+    · exact aemeasurable_const) q
+
+/-- **Setting terms to zero decreases the mixed norm**: for measurable `g_j : α → [0, ∞]` and every
+predicate `P` on `ℕ`,
+`‖x ↦ ‖(1_P(j) g_j(x))_j‖_{ℓ_q}‖_p ≤ ‖x ↦ ‖(g_j(x))_j‖_{ℓ_q}‖_p`, by the monotonicity of the
+`ℓ_q` norm and of the `L_p` norm. -/
+theorem eLpNorm_lqNorm_ite_le {P : ℕ → Prop} [DecidablePred P] {g : ℕ → α → ℝ≥0∞}
+    (hg : ∀ j, AEMeasurable (g j) μ) :
+    eLpNorm (fun x => lqNorm q fun j => if P j then g j x else 0) p μ ≤
+      eLpNorm (fun x => lqNorm q fun j => g j x) p μ :=
+  eLpNorm_mono_enorm (aemeasurable_lqNorm_ite hg q).aestronglyMeasurable fun x => by
+    simp only [enorm_eq_self]
+    exact ENNReal.lqNorm_mono fun j => by split_ifs <;> simp
+
+/-! ### Tails in `L_p(ℓ_q)` -/
+
+/-- **Dominated convergence for tails in `L_p(ℓ_q)`**: for `0 < p, q < ∞` and measurable
+`g_j : α → [0, ∞]` with `‖x ↦ ‖(g_j(x))_j‖_{ℓ_q}‖_p < ∞`,
+`∫ ‖(0, …, 0, g_N(x), g_{N+1}(x), …)‖_{ℓ_q}^p dμ(x) → 0` as `N → ∞`: the integrands are at most
+`‖(g_j(x))_j‖_{ℓ_q}^p`, which is integrable and hence finite almost everywhere, and tend to zero
+wherever it is finite (`ENNReal.tendsto_lqNorm_ite_le`; Mathlib's
+`tendsto_lintegral_of_dominated_convergence'`). -/
+theorem tendsto_lintegral_lqNorm_ite_le_rpow (hp0 : p ≠ 0) (hp : p ≠ ∞) (hq0 : q ≠ 0)
+    (hq : q ≠ ∞) {g : ℕ → α → ℝ≥0∞} (hg : ∀ j, AEMeasurable (g j) μ)
+    (hG : eLpNorm (fun x => lqNorm q fun j => g j x) p μ ≠ ∞) :
+    Tendsto (fun N => ∫⁻ x, (lqNorm q fun j => if N ≤ j then g j x else 0) ^ p.toReal ∂μ)
+      atTop (𝓝 0) := by
+  have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  have hGm : AEMeasurable (fun x => lqNorm q fun j => g j x) μ := aemeasurable_lqNorm_comp hg q
+  have hint : ∫⁻ x, (lqNorm q fun j => g j x) ^ p.toReal ∂μ ≠ ∞ := by
+    rw [← eLpNorm_rpow_eq_lintegral hp0 hp hGm]
+    exact ENNReal.rpow_ne_top_of_nonneg hr.le hG
+  have hFm : ∀ N, AEMeasurable (fun x => lqNorm q fun j => if N ≤ j then g j x else 0) μ :=
+    fun N => aemeasurable_lqNorm_ite hg q
+  have hae : ∀ᵐ x ∂μ, Tendsto (fun N => (lqNorm q fun j => if N ≤ j then g j x else 0) ^ p.toReal)
+      atTop (𝓝 0) := by
+    filter_upwards [ae_lt_top' (hGm.pow_const p.toReal) hint] with x hx
+    have hx' := ((ENNReal.rpow_lt_top_iff_of_pos hr).1 hx).ne
+    have h := ((ENNReal.continuous_rpow_const (y := p.toReal)).tendsto 0).comp
+      (ENNReal.tendsto_lqNorm_ite_le hq0 hq hx')
+    rwa [ENNReal.zero_rpow_of_pos hr] at h
+  have hlim : Tendsto (fun N => ∫⁻ x, (lqNorm q fun j => if N ≤ j then g j x else 0) ^ p.toReal ∂μ)
+      atTop (𝓝 (∫⁻ _, 0 ∂μ)) := by
+    refine tendsto_lintegral_of_dominated_convergence' _ (fun N => (hFm N).pow_const _)
+      (fun N => ae_of_all _ fun x => ?_) hint hae
+    refine ENNReal.rpow_le_rpow (ENNReal.lqNorm_mono fun j => ?_) hr.le
+    split_ifs
+    · exact le_rfl
+    · exact zero_le
+  rwa [lintegral_zero] at hlim
+
+/-- **Tails in `L_p(ℓ_q)` tend to zero**: for `0 < p, q < ∞` and measurable `g_j : α → [0, ∞]`
+with `‖x ↦ ‖(g_j(x))_j‖_{ℓ_q}‖_p < ∞`,
+`‖x ↦ ‖(0, …, 0, g_N(x), g_{N+1}(x), …)‖_{ℓ_q}‖_p → 0` as `N → ∞`
+(`MeasureTheory.tendsto_lintegral_lqNorm_ite_le_rpow`). -/
+theorem tendsto_eLpNorm_lqNorm_ite_le (hp0 : p ≠ 0) (hp : p ≠ ∞) (hq0 : q ≠ 0) (hq : q ≠ ∞)
+    {g : ℕ → α → ℝ≥0∞} (hg : ∀ j, AEMeasurable (g j) μ)
+    (hG : eLpNorm (fun x => lqNorm q fun j => g j x) p μ ≠ ∞) :
+    Tendsto (fun N => eLpNorm (fun x => lqNorm q fun j => if N ≤ j then g j x else 0) p μ)
+      atTop (𝓝 0) := by
+  have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  have h := ((ENNReal.continuous_rpow_const (y := 1 / p.toReal)).tendsto 0).comp
+    (tendsto_lintegral_lqNorm_ite_le_rpow hp0 hp hq0 hq hg hG)
+  rw [ENNReal.zero_rpow_of_pos (one_div_pos.2 hr)] at h
+  refine h.congr fun N => ?_
+  rw [Function.comp_apply, ← eLpNorm_rpow_eq_lintegral hp0 hp (aemeasurable_lqNorm_ite hg q),
+    ← ENNReal.rpow_mul, mul_one_div_cancel hr.ne', ENNReal.rpow_one]
 
 end MeasureTheory

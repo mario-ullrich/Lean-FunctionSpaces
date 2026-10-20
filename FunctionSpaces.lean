@@ -196,6 +196,7 @@ public import FunctionSpaces.Lp.NormingFamily
 public import FunctionSpaces.Rd.VectorValuedSingularIntegrals
 public import FunctionSpaces.Rd.SquareFunction
 public import FunctionSpaces.Rd.DerivativeKernels
+public import FunctionSpaces.Rd.SobolevTriebelLizorkin
 
 /-!
 # Function spaces
@@ -685,4 +686,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   Schwartz kernels, `ψ_1 = ∑_i ∂_{e_{i_0}} ⋯ ∂_{e_{i_{m-1}}} η_i`, the Fourier transforms of
   iterated derivatives, and the Calderón–Zygmund families of the dilated derivative kernels and of
   the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels.
+* `FunctionSpaces.Rd.SobolevTriebelLizorkin`: the Sobolev spaces `W^m_p = F^m_{p,2}` for
+  `1 < p < ∞` with explicit constants in both directions, and, for `m ≥ 1`, the Besov sandwich
+  `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}`.
 -/

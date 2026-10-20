@@ -458,7 +458,10 @@ Calderón–Zygmund family (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`,
 [Sobolev spaces on `ℝ^d`](SobolevRd.md)). The square function theorem `L_p = F^0_{p,2}` on `ℝ^d`,
 `d = dim V ≥ 1`, `1 < p < ∞`, is formalised with equivalent norms and explicit constants in both
 directions (`Rd.triebelLizorkinNorm_zero_two_le`, `Rd.enorm_le_triebelLizorkinNorm_zero_two`,
-`Rd.triebelLizorkinSpace_zero_two_eq_top`). These results generalise Sections 4.1 and 4.2 from
+`Rd.triebelLizorkinSpace_zero_two_eq_top`), and so is `W^m_p = F^m_{p,2}` for `1 < p < ∞`, with
+explicit constants and, for `m ≥ 1`, the Besov sandwich
+`B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}`
+(`Rd.memSobolev_iff_memTriebelLizorkin`). These results generalise Sections 4.1 and 4.2 from
 `p = 2`; the `p = 2` statements above stay, with their explicit constants.
 
 ## 5. Decisions and reasons

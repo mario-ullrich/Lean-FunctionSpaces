@@ -289,6 +289,24 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   (`Rd.triebelLizorkinSpace_zero_two_eq_top`). The proof is the strong type `(p,p)` of
   vector-valued singular integrals with Calderón–Zygmund kernel families
   (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`, `Rd.IsCZFamily.eLpNorm_sum_conv_le`).
+* **`W^m_p = F^m_{p,2}`.** Let `dim V ≥ 1`, `1 < p < ∞` and `m ∈ ℕ`. For `f ∈ L_p(V)`,
+  `f ∈ W^m_p(V)` iff `f ∈ F^m_{p,2}(V)` (`Rd.memSobolev_iff_memTriebelLizorkin`), with explicit
+  constants in both directions. If the weak derivatives
+  `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f` along the orthonormal basis `e` of `Rd.gridBasis` lie in
+  `L_p(V)` for all multi-indices `α`, then
+  `‖f‖_{F^m_{p,2}} ≤ ‖Φ‖_1 ‖f‖_p + 2^m ∑_α K_{V,p,α} ‖g_α‖_p`
+  (`Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv`, `Rd.sobolevToTLConst`); if
+  `f ∈ F^k_{p,2}(V)`, then for all directions `w ∈ V^k` the weak derivative `∂^w f` is a
+  function `g ∈ L_p(V)` with `‖g‖_p ≤ C_{V,p,w} ‖f‖_{F^k_{p,2}}`
+  (`Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin`, `Rd.tlToSobolevConst`). The constants are
+  strong type constants of the Calderón–Zygmund families of the dilated derivative kernels and of
+  the rescaled derivatives of the synthesis kernels. This gives the Besov sandwich:
+  `B^m_{p,min(p,2)} ⊆ W^m_p(V)` and, for `m ≥ 1`, `W^m_p(V) ⊆ B^m_{p,max(p,2)}`
+  (`Rd.memSobolev_of_memApprox`, `Rd.memApprox_of_memSobolev`, with norm bounds
+  `Rd.exists_hasWeakLineDeriv_of_memApprox`, `Rd.approxNormDyadic_le_of_hasWeakLineDeriv`), and
+  `W^m_2 = B^m_{2,2}` for `m ≥ 1` (`Rd.memSobolev_two_iff_memApprox`).
+  The proof writes the blocks through the weak derivatives and back, with the strong type of
+  the Calderón–Zygmund families of the derivative kernels.
 
 **Domains, manifolds and traces** ([details](docs/DomainsTraces.md))
 
@@ -342,7 +360,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
 | [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): mixed norms, maximal functions, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, local means, ball means of differences, atoms, the torus | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it, and the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞` | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, and `W^m_p = F^m_{p,2}` with the Besov sandwich | ✅ | ✗ |
 | [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 
@@ -373,9 +391,9 @@ Sobolev spaces on `ℝ^d` are the files `SchwartzCutoff`, `WeakDerivatives`,
 `SobolevTwoLittlewoodPaley`, `LipschitzDomainH1`, `RellichCompactness`,
 `SobolevRestrictionSpaces`, `SobolevDuality`, `BoundaryTraceSpace`, `LipschitzGraphArea`,
 `SurfaceMeasure`, `DilationFamilies`, `ConvolutionAdjoint`, `PlancherelBounds`,
-`CalderonZygmundSigned`, `VectorValuedWeakType`, `VectorValuedSingularIntegrals` and
-`SquareFunction` in `FunctionSpaces/Rd/`, with `WeakType`, `LayerCake`, `Marcinkiewicz` and
-`NormingFamily` in `FunctionSpaces/Lp/`.
+`CalderonZygmundSigned`, `VectorValuedWeakType`, `VectorValuedSingularIntegrals`,
+`SquareFunction`, `DerivativeKernels` and `SobolevTriebelLizorkin` in `FunctionSpaces/Rd/`,
+with `WeakType`, `LayerCake`, `Marcinkiewicz` and `NormingFamily` in `FunctionSpaces/Lp/`.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 [docs/FEECInterface.md](docs/FEECInterface.md) describes the interface to a FEEC/BEEC library
@@ -389,7 +407,7 @@ that library builds itself.
 * **Reiteration** for approximation and interpolation spaces.
 * **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,
   elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.
-* **Sobolev spaces for all `p`**: `W^m_p = F^m_{p,2}` and `H^s_p = F^s_{p,2}`.
+* **Bessel potential spaces for all `p`**: `H^s_p = F^s_{p,2}`.
 * **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and their ball means and atoms on the
   torus.
 * **Higher smoothness**: splines on domains; for the Daubechies wavelets the sharp `L_p`

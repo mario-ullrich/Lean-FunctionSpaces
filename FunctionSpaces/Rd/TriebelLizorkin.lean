@@ -21,9 +21,10 @@ before the `L_p` norm, the reverse of the order in the Littlewood–Paley quasi-
 spaces (`Rd.littlewoodPaleyNorm`). The blocks are the pointwise convolutions `ψ_j ⋆ f`
 (`Rd.blockFun`), bounded at every point by the weighted Jensen inequality
 (`Rd.enorm_conv_le_of_enorm_le`, `Rd.enorm_blockFun_le`) with a finite constant
-(`Rd.eLpNorm_psi_mul_iSup_psi_ne_top`). The space `F^s_{p,q}` consists of the `f` with a
-finite quasi-norm (`Rd.MemTriebelLizorkin`); it is a subspace of `L_p` for `1 ≤ q ≤ ∞`
-(`Rd.triebelLizorkinSpace`), increasing in `q` and decreasing in `s`.
+(`Rd.eLpNorm_psi_mul_iSup_psi_ne_top`), and they lie in `L_p` by Young's inequality
+(`Rd.memLp_blockFun`, `Rd.eLpNorm_blockFun_zero_le`). The space `F^s_{p,q}` consists of the
+`f` with a finite quasi-norm (`Rd.MemTriebelLizorkin`); it is a subspace of `L_p` for
+`1 ≤ q ≤ ∞` (`Rd.triebelLizorkinSpace`), increasing in `q` and decreasing in `s`.
 
 The mixed-norm comparisons of `FunctionSpaces.Lp.MixedNorms` give, for every `s ∈ ℝ`,
 `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{max(p,q)}} ≤ ‖f‖_{F^s_{p,q}} ≤ ‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{min(p,q)}}`,
@@ -120,6 +121,14 @@ inequality (`Rd.memLp_conv`). -/
 theorem memLp_blockFun (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     MemLp (blockFun j f) p volume :=
   memLp_conv Fact.out hp (integrable_psi j) (Lp.memLp f)
+
+/-- **The first block**: `‖ψ_0 ⋆ f‖_p ≤ ‖Φ‖_1 ‖f‖_p` for `1 ≤ p < ∞`, by Young's inequality,
+since `ψ_0 = Φ_0` and `‖Φ_0‖_1 = ‖Φ‖_1`. -/
+theorem eLpNorm_blockFun_zero_le (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure V)) :
+    eLpNorm (blockFun 0 f) p volume ≤ eLpNorm (lpKernel (V := V)) 1 volume * ‖f‖ₑ := by
+  rw [Lp.enorm_def, ← eLpNorm_Phi_one 0]
+  exact eLpNorm_conv_le Fact.out hp (integrable_Phi 0).aestronglyMeasurable
+    (Lp.aestronglyMeasurable f)
 
 /-- `‖Δ_j f‖_p` is the `L_p` norm of the pointwise block `ψ_j ⋆ f`. -/
 theorem enorm_lpBlock_eq_eLpNorm_blockFun (hp : p ≠ ∞) (j : ℕ)

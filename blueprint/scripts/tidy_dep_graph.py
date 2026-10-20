@@ -142,7 +142,7 @@ BLOCKS: list[tuple[str, list]] = [
                "The strong type of vector-valued singular integrals",
                "The square function theorem"])]),
     ("Sobolev spaces W^m_p", [
-        (SOB, ["Derivative kernels"])]),
+        (SOB, ["Derivative kernels", "Sobolev spaces as Triebel--Lizorkin spaces"])]),
 ]
 
 # Columns of blocks: in each list, every block is placed below the one before it. Without

@@ -31,9 +31,9 @@ The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥
 inclusion `lp.monotone`, without the norm bound), the Cauchy–Schwarz inequality
 `∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for series and for finite sums
 (`ENNReal.lqNorm_one_mul_le`, `ENNReal.sum_mul_le_lqNorm_two_mul`), the splitting off of the
-first term, sequences with one nonzero term (`Rd.lqNorm_ite_eq`), the geometric sequence, and
-the **dyadic weights** `dyadicWeight s k = 2 ^ (k s)` that
-every approximation space uses.
+first term, tails of sequences (`ENNReal.lqNorm_ite_le_eq`), sequences with one nonzero term
+(`Rd.lqNorm_ite_eq`), the geometric sequence, and the **dyadic weights**
+`dyadicWeight s k = 2 ^ (k s)` that every approximation space uses.
 -/
 
 @[expose] public section
@@ -578,6 +578,16 @@ theorem tsum_ite_ge_eq (j : ℕ) (g : ℕ → ℝ≥0∞) :
     simp [not_le.2 (by simpa using hK : j < K)]]
   exact Finset.sum_congr rfl fun K hK => by
     simp [Nat.lt_succ_iff.1 (Finset.mem_range.1 hK)]
+
+/-- **The `ℓ_q` norm of a tail is the norm of the shifted sequence**: for `0 < q < ∞`,
+`‖(0, …, 0, a_N, a_{N+1}, …)‖_{ℓ_q} = ‖(a_{N+k})_k‖_{ℓ_q}` (`ENNReal.tsum_ite_le_eq`). -/
+theorem lqNorm_ite_le_eq {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ℕ → ℝ≥0∞) (N : ℕ) :
+    lqNorm q (fun j => if N ≤ j then a j else 0) = lqNorm q (fun k => a (N + k)) := by
+  have hpos : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
+  rw [lqNorm_eq_tsum hq0 hq, lqNorm_eq_tsum hq0 hq, ← tsum_ite_le_eq N (fun n => a n ^ q.toReal)]
+  congr 1
+  refine tsum_congr fun j => ?_
+  split_ifs <;> simp [ENNReal.zero_rpow_of_pos hpos]
 
 end ENNReal
 

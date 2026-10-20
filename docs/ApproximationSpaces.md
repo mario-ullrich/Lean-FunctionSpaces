@@ -119,7 +119,7 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Error of best approximation and its calculus | ✅ | ✗ | `Error` |
 | Linear approximation from a sequence | ✅ | ✗ | `Instances/Span` |
 | `n`-term approximation from a dictionary | ✅ | ✗ | `Instances/NTerm` |
-| `ℓ_q` norms in `ℝ≥0∞`, Minkowski, Cauchy–Schwarz, monotonicity in `q`, sequences with finitely many nonzero terms | ✅ | ✗ | `Sequences/Lq` |
+| `ℓ_q` norms in `ℝ≥0∞`, Minkowski, Cauchy–Schwarz, monotonicity in `q`, tails, sequences with finitely many nonzero terms | ✅ | ✗ | `Sequences/Lq` |
 | Cauchy condensation with power weights | ✅ | ✗ | `Sequences/Dyadic` |
 | Countable Minkowski inequality, monotone convergence and truncations in `ℓ_q`, discrete Hardy inequalities, almost diagonal sums | ✅ | ✗ | `Sequences/Hardy` |
 | `A^s_q`, its dyadic quasi-norm and linear structure | ✅ | ✗ | `Norm`, `Dyadic`, `Space` |

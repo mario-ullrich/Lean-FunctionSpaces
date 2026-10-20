@@ -33,7 +33,9 @@ the adjoint family extends it to `2 < p < ∞`, for the analysis and the synthes
 Applied to the Littlewood–Paley blocks and their synthesis kernels, this gives the square
 function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`. For `W^m_p`, the block `ψ_1` is a sum of
 derivatives of order `m` of Schwartz kernels, whose dilates form Calderón–Zygmund families, and
-so do the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels.
+so do the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels. With them,
+`W^m_p = F^m_{p,2}` for `1 < p < ∞`, with explicit constants in both directions, and, for
+`m ≥ 1`, `W^m_p` lies between the Besov spaces `B^m_{p,min(p,2)}` and `B^m_{p,max(p,2)}`.
 The [interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
 built on this project, with the decisions behind their form.
 
@@ -347,6 +349,26 @@ built on this project, with the decisions behind their form.
   (`SchwartzMap.fourier_iteratedLineDerivOp_apply`) and
   `∂^w (G_c) = c^k (∂^w G)_c` for the dilation `G_c(x) = c^n G(cx)`
   (`Rd.iteratedLineDerivOp_schwartzDilate`).
+* **`W^m_p = F^m_{p,2}`.** Let `dim V ≥ 1`, `1 < p < ∞` and `m ∈ ℕ`. For `f ∈ L_p(V)`,
+  `f ∈ W^m_p(V)` iff `f ∈ F^m_{p,2}(V)` (`Rd.memSobolev_iff_memTriebelLizorkin`), with explicit
+  constants in both directions. If the weak derivatives
+  `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f` along the orthonormal basis `e` of `Rd.gridBasis` lie in
+  `L_p(V)` for all multi-indices `α`, then
+  `‖f‖_{F^m_{p,2}} ≤ ‖Φ‖_1 ‖f‖_p + 2^m ∑_α K_{V,p,α} ‖g_α‖_p`
+  (`Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv`, `Rd.sobolevToTLConst`); if
+  `f ∈ F^k_{p,2}(V)`, then for all directions `w ∈ V^k` the weak derivative `∂^w f` is a
+  function `g ∈ L_p(V)` with `‖g‖_p ≤ C_{V,p,w} ‖f‖_{F^k_{p,2}}`
+  (`Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin`, `Rd.tlToSobolevConst`). The constants are
+  strong type constants of the Calderón–Zygmund families of the dilated derivative kernels and of
+  the rescaled derivatives of the synthesis kernels. This gives the Besov sandwich:
+  `B^m_{p,min(p,2)} ⊆ W^m_p(V)` and, for `m ≥ 1`, `W^m_p(V) ⊆ B^m_{p,max(p,2)}`
+  (`Rd.memSobolev_of_memApprox`, `Rd.memApprox_of_memSobolev`, with norm bounds
+  `Rd.exists_hasWeakLineDeriv_of_memApprox`, `Rd.approxNormDyadic_le_of_hasWeakLineDeriv`), and
+  `W^m_2 = B^m_{2,2}` for `m ≥ 1` (`Rd.memSobolev_two_iff_memApprox`).
+  The bound of `‖f‖_{F^m_{p,2}}` writes `2^{jm} ψ_{j+1} ⋆ f` as `∑_α (η_α)_{2^j} ⋆ g_α`; the
+  bound for `∂^w f` obtains `∂^w f` as the limit in `L_p` of the derivatives
+  `∑_{j < J} (∂^w ψ̃_j) ⋆ (ψ_j ⋆ f)` of the reproducing sums (`Rd.derivSynthesisSum`), whose
+  tails in `L_p(ℓ_2)` tend to zero (`MeasureTheory.tendsto_eLpNorm_lqNorm_ite_le`).
 
 ## What is formalised
 
@@ -355,7 +377,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
 | Test functions as Schwartz functions, commuting directional derivatives, the transpose formula for distributions and tempered distributions; cut-offs of Schwartz functions converge in the Schwartz space (smooth compactly supported functions are dense), tempered distributions determined by test functions | ✅ | ✗ | `Rd/SchwartzCutoff` |
-| Weak derivatives and Sobolev spaces on open sets, integration by parts, uniqueness, locality, limits; the bridge to tempered distributions | ✅ | ✗ | `Rd/WeakDerivatives` |
+| Weak derivatives and Sobolev spaces on open sets, integration by parts, uniqueness, locality, finite sums, limits; the bridge to tempered distributions | ✅ | ✗ | `Rd/WeakDerivatives` |
 | The convolution theorem and Plancherel for a convolution on `L_2`, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/SobolevTwoLittlewoodPaley` |
 | `H^1` on bounded Lipschitz domains as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the weak gradient, and the trace space `B^{1/2}_{2,2}` of the boundary | ✅ | ✗ | `Rd/LipschitzDomainH1` |
 | The inverse Fourier transform of integrable `L_2` functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, and Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω` | ✅ | ✗ | `Rd/RellichCompactness` |
@@ -376,6 +398,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The strong type `(p,p)`, `1 < p < ∞`, of the analysis and synthesis operators of a Calderón–Zygmund family with explicit constants: Plancherel for `p = 2`, Marcinkiewicz interpolation for `p < 2`, duality with the adjoint family for `p > 2` | ✅ | ✗ | `Rd/VectorValuedSingularIntegrals` |
 | The square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞` with explicit constants in both directions, and the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p` | ✅ | ✗ | `Rd/SquareFunction` |
 | Fourier transforms of iterated derivatives, the derivative symbols and kernels, the block `ψ_1` as a sum of derivatives of order `m`, and the Calderón–Zygmund families of the dilated derivative kernels and of the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels | ✅ | ✗ | `Rd/DerivativeKernels` |
+| `W^m_p = F^m_{p,2}` for `1 < p < ∞` with explicit constants in both directions: the blocks as convolutions with the weak derivatives, the derivatives of the reproducing sums and their limit, the Besov sandwich `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}` and `W^m_2 = B^m_{2,2}` for `m ≥ 1` | ✅ | ✗ | `Rd/SobolevTriebelLizorkin` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics
