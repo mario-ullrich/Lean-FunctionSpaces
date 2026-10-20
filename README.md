@@ -444,6 +444,10 @@ that library builds itself.
   elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.
 * **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and their ball means and atoms on the
   torus.
+* **Sobolev spaces**: Sobolev spaces on the torus for all `p`, the critical Sobolev embedding,
+  Mihlin multipliers and `H^{s,p}` for `s < 0`.
+* **Lipschitz domains**: Green's formula, `ker γ = H^1_0(Ω)` and the extension theorem for
+  `W^{1,2}`.
 * **Higher smoothness**: splines on domains; for the Daubechies wavelets the sharp `L_p`
   exponents of the scaling functions, Hölder exponents beyond D4, and `ℝ^d`.
 * **The quasi-Banach range** `0 < p, q < 1`, the setting of nonlinear `n`-term approximation.
