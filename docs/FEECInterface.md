@@ -448,10 +448,13 @@ boundary `Γ`, boundary balls `B_j = ball (Ω.center j) (Ω.radius j)` and chart
 
 ### 4.10 Later
 
-The next part of Lean-FunctionSpaces continues with the square function theorem
-`L_p = F^0_{p,2}`, `W^m_p = F^m_{p,2}` and Mathlib's `H^{s,p} = F^s_{p,2}` for all `1 < p < ∞`,
-and the Sobolev embeddings on `ℝ^d`. They generalise Sections 4.1 and 4.2 from `p = 2`; the
-`p = 2` statements above stay, with their explicit constants.
+The current part of Lean-FunctionSpaces proves the square function theorem `L_p = F^0_{p,2}`,
+`W^m_p = F^m_{p,2}` and Mathlib's `H^{s,p} = F^s_{p,2}` for all `1 < p < ∞`, and the Sobolev
+embeddings on `ℝ^d`. Its tools are formalised: Plancherel bounds for families of convolution
+kernels, the weak type `(1,1)` of vector-valued singular integrals for families of dilated
+kernels, and Marcinkiewicz interpolation (blueprint chapter *Sobolev spaces on `ℝ^d`*, block
+document [Sobolev spaces on `ℝ^d`](SobolevRd.md)). These results generalise Sections 4.1 and 4.2
+from `p = 2`; the `p = 2` statements above stay, with their explicit constants.
 
 ## 5. Decisions and reasons
 
@@ -611,6 +614,11 @@ below are in preparation and enter Section 4 with their Lean names as they are f
 * **The extension theorem H.2** for `W^{1,2}` on bounded Lipschitz domains (the restriction space
   equals the weak-derivative space), by Rychkov's extension operator with local means of the
   gradient; with it Rellich and the trace statements hold for the weak-derivative space.
+* **Order (decision of 14 October 2026).** These three statements follow the part on `L_p`
+  Sobolev spaces of Section 4.10. The square-function estimate in the proof of H.2, the bound
+  `∑_j ‖K_j ⋆ g‖_2² ≤ B ‖g‖_2²` for a family of integrable kernels whose Fourier transforms
+  satisfy `∑_j |𝓕K_j(ξ)|² ≤ B`, is formalised there (`Rd.tsum_enorm_convLp_sq_le`, file
+  `FunctionSpaces/Rd/PlancherelBounds.lean`).
 
 The FEEC/BEEC library keeps the forms layer (`L^2Λ^k`, weak `d`, `HΛ^k`, regular
 decompositions, `H^{-1/2}(curl_Γ, Γ)`), Picard's theorem and the s-number track.
