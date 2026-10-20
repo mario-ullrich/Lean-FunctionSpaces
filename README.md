@@ -307,6 +307,25 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `W^m_2 = B^m_{2,2}` for `m ≥ 1` (`Rd.memSobolev_two_iff_memApprox`).
   The proof writes the blocks through the weak derivatives and back, with the strong type of
   the Calderón–Zygmund families of the derivative kernels.
+* **Sobolev and Besov embeddings on `ℝ^d`.** Let `n = dim V`, `1 ≤ p ≤ r ≤ ∞`, `p < ∞` and
+  `1 ≤ q ≤ ∞`. For `s > n(1/p - 1/r)`, every `f ∈ B^s_{p,q}(V)` agrees almost everywhere with
+  some `g ∈ L_r(V)` with `‖g‖_r ≤ K_{V,p,r,s} ‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q}`
+  (`Rd.exists_memLp_ae_eq_of_memApprox`, `Rd.besovEmbeddingConst`); for `s > n/p` it agrees
+  almost everywhere with a bounded continuous function `a` with
+  `sup |a| ≤ K_{V,p,∞,s} ‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q}`
+  (`Rd.exists_boundedContinuous_ae_eq_of_memApprox`). For `n ≥ 1`, `1 < p < ∞` and `f ∈ L_p(V)`
+  whose weak derivatives `g_α = ∂^α f` of order `m` along a basis lie in `L_p(V)`, put
+  `M_f = ‖Φ‖_1 ‖f‖_p + 2^m ∑_α K_α ‖g_α‖_p` (`Rd.sobolevToTLConst`). If `m > n(1/p - 1/r)`,
+  then `f` agrees almost everywhere with some `u ∈ L_r(V)` with `‖u‖_r ≤ K_{V,p,r,m} M_f`
+  (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv`); if `m > n/p`, then `f` agrees almost
+  everywhere with a bounded continuous function `a` with `sup |a| ≤ K_{V,p,∞,m} M_f`
+  (`Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv`). In particular every
+  `f ∈ W^m_p(V)` has such representatives (`Rd.exists_memLp_ae_eq_of_memSobolev`,
+  `Rd.exists_boundedContinuous_ae_eq_of_memSobolev`). The proof is the Nikolskii inequality
+  `‖ψ_j ⋆ f‖_r ≤ N_p^(1-p/r) 2^(jn(1/p - 1/r)) ‖ψ_j ⋆ f‖_p` for the Littlewood–Paley blocks
+  (`Rd.eLpNorm_blockFun_le_nikolskii`, `Rd.nikolskiiBlockConst`) and the bound of
+  `‖f‖_{F^m_{p,2}}` by `M_f`; the critical case `1/r = 1/p - m/n` with `r < ∞` (Sobolev's
+  inequality) is not covered.
 
 **Domains, manifolds and traces** ([details](docs/DomainsTraces.md))
 
@@ -360,7 +379,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
 | [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): mixed norms, maximal functions, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, local means, ball means of differences, atoms, the torus | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, and `W^m_p = F^m_{p,2}` with the Besov sandwich | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, `W^m_p = F^m_{p,2}` with the Besov sandwich, and the Sobolev embeddings | ✅ | ✗ |
 | [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 
@@ -392,8 +411,9 @@ Sobolev spaces on `ℝ^d` are the files `SchwartzCutoff`, `WeakDerivatives`,
 `SobolevRestrictionSpaces`, `SobolevDuality`, `BoundaryTraceSpace`, `LipschitzGraphArea`,
 `SurfaceMeasure`, `DilationFamilies`, `ConvolutionAdjoint`, `PlancherelBounds`,
 `CalderonZygmundSigned`, `VectorValuedWeakType`, `VectorValuedSingularIntegrals`,
-`SquareFunction`, `DerivativeKernels` and `SobolevTriebelLizorkin` in `FunctionSpaces/Rd/`,
-with `WeakType`, `LayerCake`, `Marcinkiewicz` and `NormingFamily` in `FunctionSpaces/Lp/`.
+`SquareFunction`, `DerivativeKernels`, `SobolevTriebelLizorkin` and `SobolevEmbedding` in
+`FunctionSpaces/Rd/`, with `WeakType`, `LayerCake`, `Marcinkiewicz` and `NormingFamily` in
+`FunctionSpaces/Lp/`.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 [docs/FEECInterface.md](docs/FEECInterface.md) describes the interface to a FEEC/BEEC library

@@ -409,6 +409,14 @@ theorem natCast_two_pow_rpow (s : ℝ) (k : ℕ) :
     ((2 ^ k : ℕ) : ℝ≥0∞) ^ s = dyadicWeight s k := by
   rw [dyadicWeight, ENNReal.rpow_natCast_mul, Nat.cast_pow, Nat.cast_ofNat]
 
+/-- `(2^(jn))^t = 2^(j n t)`: a power of the volume factor `2^(jn)` is a dyadic weight. -/
+theorem two_pow_rpow_eq_dyadicWeight (j n : ℕ) (t : ℝ) :
+    ((2 : ℝ≥0∞) ^ (j * n)) ^ t = dyadicWeight (n * t) j := by
+  rw [dyadicWeight, ← ENNReal.rpow_natCast, ← ENNReal.rpow_mul]
+  congr 1
+  push_cast
+  ring
+
 /-- For `α > 0` the ratio `2 ^ (-α)` of the decaying weights is `< 1`. -/
 theorem two_rpow_neg_lt_one {α : ℝ} (hα : 0 < α) : (2 : ℝ≥0∞) ^ (-α) < 1 :=
   ENNReal.rpow_lt_one_of_one_lt_of_neg one_lt_two (neg_neg_iff_pos.2 hα)

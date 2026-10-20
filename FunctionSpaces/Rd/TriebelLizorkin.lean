@@ -57,6 +57,17 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 
 /-! ### Pointwise bounds of convolutions -/
 
+/-- **A bounded function has a finite supremum in `[0, ∞]`**: if the norms `‖K y‖` are bounded
+above, then `sup_y ‖K y‖ₑ < ∞` (Mathlib's `ENNReal.iSup_coe_lt_top`). This is the constant `B` of
+the pointwise bound of convolutions with a bounded kernel. -/
+theorem iSup_enorm_lt_top_of_bddAbove {α E : Type*} [SeminormedAddCommGroup E] {K : α → E}
+    (h : BddAbove (Set.range fun y => ‖K y‖)) : (⨆ y, ‖K y‖ₑ) < ∞ := by
+  refine ENNReal.iSup_coe_lt_top.2 ?_
+  obtain ⟨A, hA⟩ := h
+  refine ⟨⟨max A 0, le_max_right _ _⟩, ?_⟩
+  rintro _ ⟨y, rfl⟩
+  exact (le_max_left _ _).trans' (hA ⟨y, rfl⟩)
+
 omit [Fact (1 ≤ p)] in
 /-- **Pointwise bound of a convolution with a bounded kernel**: for `1 ≤ p < ∞`, a measurable
 kernel `K` with `|K| ≤ B` and a measurable `f`, at every point `x`,
@@ -138,12 +149,8 @@ theorem enorm_lpBlock_eq_eLpNorm_blockFun (hp : p ≠ ∞) (j : ℕ)
 
 /-- The supremum `sup |ψ_j|` of the Littlewood–Paley kernel `ψ_j` is finite, since `ψ_j` is
 bounded (`Rd.bddAbove_psi`). -/
-theorem iSup_enorm_psi_lt_top (j : ℕ) : (⨆ y, ‖psi (V := V) j y‖ₑ) < ∞ := by
-  obtain ⟨A, hA⟩ := bddAbove_psi (V := V) j
-  refine (iSup_le fun y => ?_ : (⨆ y, ‖psi (V := V) j y‖ₑ) ≤ ENNReal.ofReal A).trans_lt
-    ENNReal.ofReal_lt_top
-  rw [← ofReal_norm]
-  exact ENNReal.ofReal_le_ofReal (hA ⟨y, rfl⟩)
+theorem iSup_enorm_psi_lt_top (j : ℕ) : (⨆ y, ‖psi (V := V) j y‖ₑ) < ∞ :=
+  iSup_enorm_lt_top_of_bddAbove (bddAbove_psi j)
 
 /-- The constant `‖ψ_j‖_1^(1-1/p) (sup |ψ_j|)^(1/p)` of the pointwise bound of the blocks is
 finite for `1 ≤ p < ∞`, since `ψ_j` is integrable (`Rd.integrable_psi`) and bounded

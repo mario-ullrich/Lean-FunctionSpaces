@@ -290,9 +290,10 @@ With these, a constant $(1 - 2^{-\alpha})^{-1}$ is finite exactly for $\alpha > 
   ENNReal.dyadicWeight_neg, ENNReal.dyadicWeight_neg_mul_self, ENNReal.dyadicWeight_mul_neg_self,
   ENNReal.dyadicWeight_rpow, ENNReal.dyadicWeight_eq_pow, ENNReal.dyadicWeight_mono,
   ENNReal.dyadicWeight_le_of_le, ENNReal.dyadicWeight_anti, ENNReal.one_le_dyadicWeight,
-  ENNReal.natCast_two_pow_rpow, ENNReal.two_rpow_neg_lt_one,
-  ENNReal.one_sub_two_rpow_neg_inv_ne_top, ENNReal.one_le_one_sub_two_rpow_neg_inv,
-  ENNReal.lqNorm_dyadicWeight_neg_le, ENNReal.lqNorm_lt_top_iff_of_le_mul}
+  ENNReal.natCast_two_pow_rpow, ENNReal.two_pow_rpow_eq_dyadicWeight,
+  ENNReal.two_rpow_neg_lt_one, ENNReal.one_sub_two_rpow_neg_inv_ne_top,
+  ENNReal.one_le_one_sub_two_rpow_neg_inv, ENNReal.lqNorm_dyadicWeight_neg_le,
+  ENNReal.lqNorm_lt_top_iff_of_le_mul}
 \leanok
 For $q \in (0, \infty)$, a countable set $I$ and a family $a = (a_i)_{i \in I}$ in $[0, \infty]$,
 \[
@@ -1503,18 +1504,22 @@ vanishes almost everywhere does so in both spaces.
 
 \begin{lemma}[Interpolation between $L_p$ and $L_\infty$]
 \label{lem:lp-interpolation}
-\lean{MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow, MeasureTheory.toReal_eLpNorm_le_rpow_mul}
+\lean{ENNReal.one_sub_toReal_div_nonneg, MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow,
+  MeasureTheory.toReal_eLpNorm_le_rpow_mul, MeasureTheory.MemLp.mono_exponent_of_enorm_le}
 \leanok
 Let $0 < p \leq r < \infty$ and $M \geq 0$. For every measurable $f$ with $|f| \leq M$
 almost everywhere,
 \[
   \|f\|_r \leq M^{1 - p/r} \, \|f\|_p^{p/r} .
 \]
+For every $0 < p \leq r \leq \infty$ and every $f \in L_p$ with $|f| \leq M < \infty$ almost
+everywhere, $f \in L_r$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-Integrate $|f|^r \leq M^{r-p} |f|^p$.
+Integrate $|f|^r \leq M^{r-p} |f|^p$. The exponent $1 - p/r$ is nonnegative, so the right-hand
+side is finite for $f \in L_p$; for $r = \infty$, $\|f\|_\infty \leq M$.
 \end{proof}
 
 \begin{lemma}[Bounded continuous functions in $L_\infty$]
@@ -1614,7 +1619,8 @@ $C_b(\Omega) \to L_p$, of norm at most $\mu(\Omega)^{1/p}$.
 \begin{definition}[Nikolskii property]
 \label{def:nikolskii-property}
 \lean{FunctionScheme.HasNikolskii, nikolskiiExponent, nikolskiiExponent_nonneg,
-  nikolskiiExponent_top, nikolskiiExponent_self, FunctionScheme.toReal_eLpNorm_top_le_norm}
+  one_le_of_nikolskiiExponent_lt, nikolskiiExponent_top, nikolskiiExponent_self,
+  FunctionScheme.toReal_eLpNorm_top_le_norm}
 \leanok
 \uses{def:function-scheme}
 Let $S$ be a scheme of functions and $D \in \R$. The scheme has the \emph{Nikolskii property}
@@ -9369,7 +9375,7 @@ of the band-limited scheme in $L_p$ (\Cref{thm:lp-band}).
 
 \begin{lemma}[Pointwise bound of a convolution]
 \label{lem:conv-pointwise-bound}
-\lean{Rd.enorm_conv_le_of_enorm_le}
+\lean{Rd.iSup_enorm_lt_top_of_bddAbove, Rd.enorm_conv_le_of_enorm_le}
 \leanok
 \uses{def:conv, lem:weighted-jensen}
 For every $1 \leq p < \infty$, every measurable $K : V \to \C$ and every $B \in [0, \infty]$ with
@@ -9377,6 +9383,7 @@ $|K(y)| \leq B$ for all $y \in V$, every measurable $f : V \to \C$ and every $x 
 \[
   |(K * f)(x)| \leq \|K\|_1^{1 - 1/p} \, B^{1/p} \, \|f\|_p .
 \]
+For bounded $K$, the supremum $B = \sup_{y \in V} |K(y)|$ is finite.
 \end{lemma}
 
 \begin{proof}
@@ -12185,7 +12192,11 @@ duality. Together they give the strong type $(p,p)$, $1 < p < \infty$, of these 
 theorem $\TL{0}{p}{2} = L_p(V)$ with explicit constants. \Cref{sec:derivative-kernels} writes
 the Littlewood--Paley blocks as sums of derivatives of Schwartz kernels, and
 \Cref{sec:sobolev-triebel-lizorkin} proves $\Sob{m}{p}(V) = \TL{m}{p}{2}$ for
-$1 < p < \infty$, with explicit constants and the Besov sandwich.
+$1 < p < \infty$, with explicit constants and the Besov sandwich. \Cref{sec:sobolev-embedding}
+proves the Nikolskii inequality for the blocks and from it the embeddings of Besov spaces into
+$L_r(V)$ and into the bounded continuous functions, and the Sobolev embeddings
+$\Sob{m}{p}(V) \hookrightarrow L_r(V)$ for $m > n(1/p - 1/r)$ and
+$\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, all with explicit constants.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -18128,7 +18139,7 @@ the homogeneity of the $\ell_2$ norm and Minkowski's inequality for finite sums
 \begin{theorem}[$\Sob{m}{p} \subseteq \TL{m}{p}{2}$]
 \label{thm:sobolev-to-triebel-lizorkin}
 \lean{Rd.eLpNorm_lqNorm_blockFun_succ_le, Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv,
-  Rd.memTriebelLizorkin_of_memSobolev}
+  Rd.memTriebelLizorkin_of_hasWeakLineDeriv, Rd.memTriebelLizorkin_of_memSobolev}
 \leanok
 \uses{lem:blocks-as-derivative-convolutions, def:sobolev-to-tl-const, thm:cz-family-derivative,
   thm:vector-valued-strong-type, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-nonnegative,
@@ -18144,7 +18155,7 @@ and
   \|f\|_{\TL{m}{p}{2}} \leq \|\Phi\|_1 \, \|f\|_p + 2^m \sum_\alpha K_{V,p,\alpha} \,
   \|g_\alpha\|_p .
 \]
-In particular, every $f \in \Sob{m}{p}(V)$ lies in $\TL{m}{p}{2}$.
+In particular, $f \in \TL{m}{p}{2}$, and every $f \in \Sob{m}{p}(V)$ lies in $\TL{m}{p}{2}$.
 \end{theorem}
 
 \begin{proof}
@@ -18364,6 +18375,275 @@ only if $f \in \Besov{m}{2}{2}$.
 
 This extends \Cref{thm:sobolev-one-two-besov}, the case $m = 1$ (in every dimension), to every
 order $m$ when $n \geq 1$.
+
+\section{Sobolev embeddings}
+\label{sec:sobolev-embedding}
+
+Let $1 \leq p < \infty$ and, for $p \leq r \leq \infty$, let
+$\alpha(n, p, r) = n (1/p - 1/r)$ be the Nikolskii exponent of \Cref{def:nikolskii-property}
+with $D = n$, so that $\alpha(n, p, \infty) = n/p$. This section proves the embeddings of
+$\Besov{s}{p}{q}$ into $L_r(V)$ for $s > \alpha(n, p, r)$ and into the bounded continuous
+functions for $s > n/p$, directly from the Littlewood--Paley blocks: a block is band-limited, so
+its supremum is at most $N_p 2^{jn/p}$ times its $L_p$ norm (\Cref{def:nikolskii-block-const}),
+and interpolation gives the Nikolskii inequality
+$\|\psi_j * f\|_r \lesssim 2^{j \alpha(n,p,r)} \|\psi_j * f\|_p$. For $s > \alpha$
+the series $\sum_j \psi_j * f$ then converges absolutely in $L_r(V)$, and for $s > n/p$ uniformly.
+With the bound of $\|f\|_{\TL{m}{p}{2}}$ by the weak derivatives
+(\Cref{thm:sobolev-to-triebel-lizorkin}) and $\Sob{m}{p}(V) \subseteq \Besov{m}{p}{\max(p,2)}$
+(\Cref{cor:sobolev-besov-sandwich}) this gives the Sobolev embeddings
+$\Sob{m}{p}(V) \hookrightarrow L_r(V)$ for $m > n(1/p - 1/r)$ and
+$\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, with explicit constants.
+
+\paragraph{Continuity of the blocks.}
+
+\begin{lemma}[Convolutions with integrable bounded kernels]
+\label{lem:bounded-kernel-conv-continuous}
+\lean{Rd.integrable_mul_sub_of_enorm_le, Rd.conv_sub_apply_of_enorm_le,
+  Rd.continuous_conv_of_enorm_le, Rd.continuous_conv_schwartz, Rd.coe_schwartzDilate_psiBase,
+  Rd.coe_schwartzDilate_bandKernelS, Rd.continuous_blockFun}
+\leanok
+\uses{def:conv, lem:conv-pointwise-bound, lem:lp-interpolation, lem:schwartz-decay,
+  def:schwartz-dilate, lem:psi-base, def:lp-kernels, def:triebel-lizorkin}
+Let $1 \leq p \leq \infty$, let $K : V \to \C$ be integrable with $|K(y)| \leq B$ for all
+$y \in V$ and some $B < \infty$, and let $f, g \in L_p(V)$. For every $x \in V$ the function
+$y \mapsto K(y) f(x - y)$ is integrable, and
+\[
+  (K * f)(x) - (K * g)(x) = (K * (f - g))(x) .
+\]
+If $p < \infty$, then $K * f$ is continuous; in particular $G * f$ is continuous for every
+$G \in \mathcal S(V)$. For every $j \in \N$, $\psi_j$ and $\Theta_j$ are Schwartz functions: the
+Schwartz dilations $(G^{\psi}_j)_{2^j}$ and $\Theta_{2^j}$ of \Cref{def:schwartz-dilate}. For
+every $1 \leq p < \infty$, every $f \in L_p(V)$ and every $j \in \N$ the block $\psi_j * f$ is
+continuous.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Since $K \in L_1$ and $|K| \leq B$, $K \in L_{p'}$ (\Cref{lem:lp-interpolation}), so the integrand
+is integrable by H\"older's inequality, and the identity is the linearity of the integral. For
+$p < \infty$ choose continuous functions $g_k$ with compact support and
+$\|f - g_k\|_p \leq 1/k$ (Mathlib's density theorem); each $K * g_k$ is continuous.
+\Cref{lem:conv-pointwise-bound} gives
+$|(K * f)(x) - (K * g_k)(x)| \leq \|K\|_1^{1-1/p} B^{1/p} / k$ for every $x$, so $K * g_k \to K * f$
+uniformly and $K * f$ is continuous. A Schwartz function $G$ is integrable and bounded by its
+decay constant (\Cref{lem:schwartz-decay}). The kernels $\psi_j$ and $\Theta_j$ are dilations of
+Schwartz functions (\Cref{def:schwartz-dilate}, \Cref{lem:psi-base}, \Cref{def:lp-kernels}).
+\end{proof}
+
+\paragraph{The Nikolskii inequality for blocks.}
+
+\begin{definition}[The Nikolskii constant of the blocks]
+\label{def:nikolskii-block-const}
+\lean{Rd.iSup_enorm_bandKernel_lt_top, Rd.nikolskiiBlockConst, Rd.nikolskiiBlockConst_ne_top}
+\leanok
+\uses{def:lp-kernels, lem:lp-kernels-basic, lem:conv-pointwise-bound}
+For $1 \leq p \leq \infty$,
+\[
+  N_p = \|\Theta\|_1^{1 - 1/p} \, \bigl(\sup |\Theta|\bigr)^{1/p} ,
+\]
+with $1/\infty = 0$. The supremum $\sup |\Theta|$ and $N_p$ are finite.
+\end{definition}
+
+\begin{lemma}[The blocks are band-limited at every point]
+\label{lem:blocks-band-limited-pointwise}
+\lean{Rd.enorm_Theta_le, Rd.conv_Theta_blockFun}
+\leanok
+\uses{def:lp-kernels, lem:lp-kernels-basic, lem:schwartz-decay, thm:kernel-identities,
+  lem:conv-assoc, lem:bounded-kernel-conv-continuous, lem:tl-pointwise-blocks}
+For every $j \in \N$ and every $y \in V$, $|\Theta_j(y)| \leq 2^{jn} \sup |\Theta|$. For every
+$1 \leq p < \infty$, every $f \in L_p(V)$, every $j \in \N$ and every $x \in V$,
+\[
+  (\Theta_j * (\psi_j * f))(x) = (\psi_j * f)(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\Theta_j(y) = 2^{jn} \Theta(2^j y)$. Almost everywhere,
+$\Theta_j * (\psi_j * f) = (\Theta_j * \psi_j) * f = \psi_j * f$ by \Cref{lem:conv-assoc} and
+\Cref{thm:kernel-identities}. Both sides are continuous (\Cref{lem:bounded-kernel-conv-continuous},
+with $\psi_j * f \in L_p$ by \Cref{lem:tl-pointwise-blocks}), and continuous functions that agree
+almost everywhere agree everywhere.
+\end{proof}
+
+\begin{theorem}[The Nikolskii inequality for blocks]
+\label{thm:nikolskii-blocks}
+\lean{Rd.enorm_blockFun_le_nikolskii, Rd.eLpNorm_blockFun_le_nikolskii,
+  Rd.memLp_blockFun_of_le}
+\leanok
+\uses{def:nikolskii-block-const, lem:blocks-band-limited-pointwise, lem:conv-pointwise-bound,
+  lem:lp-kernels-basic, lem:lp-interpolation, def:nikolskii-property, def:lq-norm,
+  lem:tl-pointwise-blocks}
+Let $1 \leq p < \infty$ and $f \in L_p(V)$. For every $j \in \N$ and every $x \in V$,
+\[
+  |(\psi_j * f)(x)| \leq N_p \, 2^{jn/p} \, \|\psi_j * f\|_p ,
+\]
+and for every $p \leq r \leq \infty$,
+\[
+  \|\psi_j * f\|_r \leq N_p^{1 - p/r} \, 2^{j \alpha(n, p, r)} \, \|\psi_j * f\|_p ;
+\]
+in particular $\psi_j * f \in L_r(V)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:blocks-band-limited-pointwise}, $\psi_j * f = \Theta_j * (\psi_j * f)$ at every
+point, and \Cref{lem:conv-pointwise-bound} with $\|\Theta_j\|_1 = \|\Theta\|_1$
+(\Cref{lem:lp-kernels-basic}) and $B = 2^{jn} \sup |\Theta|$ gives the first bound, since
+$(2^{jn})^{1/p} = 2^{jn/p}$. For $r = \infty$ the first bound is the second. For $r < \infty$,
+interpolation (\Cref{lem:lp-interpolation}) with $M = N_p 2^{jn/p} \|\psi_j * f\|_p$ gives
+$\|\psi_j * f\|_r \leq M^{1 - p/r} \|\psi_j * f\|_p^{p/r}$, and
+$(n/p)(1 - p/r) = \alpha(n, p, r)$.
+\end{proof}
+
+\paragraph{Besov embeddings.}
+
+\begin{lemma}[The series of the blocks converges almost everywhere]
+\label{lem:blocks-ae-convergence}
+\lean{Rd.ae_hasSum_blockFun}
+\leanok
+\uses{def:lp-blocks, def:lq-norm, lem:hardy, lem:lp-blocks, def:triebel-lizorkin}
+Let $1 \leq p < \infty$, $s > 0$, $1 \leq q \leq \infty$ and $f \in L_p(V)$ with
+$\|f\|^{\mathrm{LP}}_{s,q} < \infty$. Then for almost every $x \in V$,
+\[
+  \sum_{j=0}^\infty (\psi_j * f)(x) = f(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\sum_j \|\Delta_j f\|_p \leq (1 - 2^{-s})^{-1} \|f\|^{\mathrm{LP}}_{s,q} < \infty$
+(\Cref{lem:hardy}), and $\sum_j \Delta_j f = f$ in $L_p$ (\Cref{lem:lp-blocks}). A series that
+converges absolutely in $L_p$ converges almost everywhere to its sum (Mathlib's
+\texttt{MeasureTheory.\allowbreak Lp.\allowbreak hasSum\_\allowbreak coeFn\_\allowbreak tsum}),
+and $\Delta_j f = \psi_j * f$ almost everywhere (\Cref{def:triebel-lizorkin}).
+\end{proof}
+
+\begin{definition}[The constant of the Besov embedding]
+\label{def:besov-embedding-const}
+\lean{Rd.besovEmbeddingConst, Rd.besovEmbeddingConst_ne_top}
+\leanok
+\uses{def:nikolskii-block-const, def:nikolskii-property}
+For $1 \leq p \leq r \leq \infty$ and $s \in \R$,
+\[
+  K_{V,p,r,s} = N_p^{1 - p/r} \, \bigl(1 - 2^{-(s - \alpha(n, p, r))}\bigr)^{-1} ,
+\]
+which is finite for $s > \alpha(n, p, r)$.
+\end{definition}
+
+\begin{lemma}[The Nikolskii bounds are summable]
+\label{lem:nikolskii-blocks-summable}
+\lean{Rd.tsum_nikolskii_le, Rd.tsum_eLpNorm_blockFun_le}
+\leanok
+\uses{def:besov-embedding-const, thm:nikolskii-blocks, lem:hardy, def:lq-norm, def:lp-blocks,
+  def:triebel-lizorkin}
+Let $1 \leq p \leq r \leq \infty$, $p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and
+$f \in L_p(V)$. Then
+\[
+  \sum_{j=0}^\infty \|\psi_j * f\|_r
+  \leq \sum_{j=0}^\infty N_p^{1 - p/r} \, 2^{j \alpha(n,p,r)} \, \|\psi_j * f\|_p
+  \leq K_{V,p,r,s} \, \|f\|^{\mathrm{LP}}_{s,q} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first inequality is \Cref{thm:nikolskii-blocks}. For the second, with
+$\alpha = \alpha(n, p, r)$, $2^{j(s - \alpha)} 2^{j\alpha} = 2^{js}$ and
+$\|\psi_j * f\|_p = \|\Delta_j f\|_p$, so \Cref{lem:hardy} for the sequence
+$(2^{j\alpha} \|\psi_j * f\|_p)_j$ and the weight $2^{j(s-\alpha)}$ gives the bound.
+\end{proof}
+
+\begin{theorem}[The Besov embedding into $L_r$]
+\label{thm:besov-embedding-rd}
+\lean{Rd.exists_memLp_ae_eq_of_memApprox}
+\leanok
+\uses{lem:nikolskii-blocks-summable, thm:nikolskii-blocks, lem:blocks-ae-convergence,
+  def:besov-embedding-const, thm:lp-band, def:nikolskii-property}
+Let $1 \leq p \leq r \leq \infty$, $p < \infty$, $s > \alpha(n, p, r)$ and $1 \leq q \leq \infty$.
+For every $f \in \Besov{s}{p}{q}$ there is $g \in L_r(V)$ with $g = f$ almost everywhere and
+\[
+  \|g\|_r \leq K_{V,p,r,s} \, \|f\|^{\mathrm{LP}}_{s,q} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Since $\alpha(n, p, r) \geq 0$, $s > 0$, and $\|f\|^{\mathrm{LP}}_{s,q} < \infty$
+(\Cref{thm:lp-band}). The blocks lie in $L_r(V)$ (\Cref{thm:nikolskii-blocks}), and the series of
+their $L_r$ norms is at most $K_{V,p,r,s} \|f\|^{\mathrm{LP}}_{s,q} < \infty$
+(\Cref{lem:nikolskii-blocks-summable}). So $\sum_j \psi_j * f$ converges absolutely in $L_r(V)$
+to some $g$ with $\|g\|_r \leq K_{V,p,r,s} \|f\|^{\mathrm{LP}}_{s,q}$, and almost everywhere to
+$g$. By \Cref{lem:blocks-ae-convergence} it converges almost everywhere to $f$, so $g = f$ almost
+everywhere.
+\end{proof}
+
+\begin{theorem}[The Besov embedding into bounded continuous functions]
+\label{thm:besov-embedding-bounded-continuous-rd}
+\lean{Rd.exists_boundedContinuous_ae_eq_of_memApprox}
+\leanok
+\uses{lem:nikolskii-blocks-summable, thm:nikolskii-blocks, lem:bounded-kernel-conv-continuous,
+  lem:blocks-ae-convergence, def:besov-embedding-const, thm:lp-band, def:nikolskii-property}
+Let $1 \leq p < \infty$, $s > n/p$ and $1 \leq q \leq \infty$. For every $f \in \Besov{s}{p}{q}$
+there is a bounded continuous function $a : V \to \C$ with $a = f$ almost everywhere and
+\[
+  \sup_{x \in V} |a(x)| \leq K_{V,p,\infty,s} \, \|f\|^{\mathrm{LP}}_{s,q} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+As before, $\|f\|^{\mathrm{LP}}_{s,q} < \infty$ (\Cref{thm:lp-band}). The blocks are continuous
+(\Cref{lem:bounded-kernel-conv-continuous}) and bounded at every point by
+$b_j = N_p 2^{jn/p} \|\psi_j * f\|_p$ (\Cref{thm:nikolskii-blocks}), and
+$\sum_j b_j \leq K_{V,p,\infty,s} \|f\|^{\mathrm{LP}}_{s,q} < \infty$
+(\Cref{lem:nikolskii-blocks-summable}). So $a(x) = \sum_j (\psi_j * f)(x)$ converges uniformly,
+$a$ is continuous with $|a(x)| \leq \sum_j b_j$ for every $x$ (Weierstrass' test, Mathlib's
+\texttt{continuous\_\allowbreak tsum}), so $\sup_{x \in V} |a(x)| \leq \sum_j b_j$, and $a = f$
+almost everywhere by \Cref{lem:blocks-ae-convergence}.
+\end{proof}
+
+\paragraph{Sobolev embeddings.}
+
+\begin{corollary}[Sobolev embeddings]
+\label{cor:sobolev-embedding}
+\lean{Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv,
+  Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv, Rd.exists_memLp_ae_eq_of_memSobolev,
+  Rd.exists_boundedContinuous_ae_eq_of_memSobolev}
+\leanok
+\uses{thm:sobolev-to-triebel-lizorkin, def:sobolev-to-tl-const, thm:tl-besov-sandwich,
+  cor:sobolev-besov-sandwich, thm:besov-embedding-rd, thm:besov-embedding-bounded-continuous-rd,
+  def:besov-embedding-const, def:nikolskii-property}
+Let $n \geq 1$, $1 < p < \infty$ and $m \in \N$, and let $f \in L_p(V)$ have the weak
+derivatives $g_\alpha = \partial^{e_\alpha} f \in L_p(V)$ of \Cref{thm:sobolev-to-triebel-lizorkin}
+for every multi-index $\alpha$ of order $m$. Put
+\[
+  M_f = \|\Phi\|_1 \, \|f\|_p + 2^m \sum_\alpha K_{V,p,\alpha} \, \|g_\alpha\|_p .
+\]
+\begin{enumerate}
+  \item For every $p \leq r \leq \infty$ with $m > n(1/p - 1/r)$ there is $u \in L_r(V)$ with
+    $u = f$ almost everywhere and $\|u\|_r \leq K_{V,p,r,m} \, M_f$.
+  \item If $m > n/p$, then there is a bounded continuous function $a : V \to \C$ with $a = f$
+    almost everywhere and $\sup_{x \in V} |a(x)| \leq K_{V,p,\infty,m} \, M_f$.
+\end{enumerate}
+In particular, for every $p \leq r \leq \infty$ with $m > n(1/p - 1/r)$, every
+$f \in \Sob{m}{p}(V)$ has a representative in $L_r(V)$, and if $m > n/p$, every
+$f \in \Sob{m}{p}(V)$ has a bounded continuous representative.
+\end{corollary}
+
+\begin{proof}
+\leanok
+In both cases $m > 0$, so $m \geq 1$. By \Cref{thm:sobolev-to-triebel-lizorkin},
+$f \in \TL{m}{p}{2}$ with $\|f\|_{\TL{m}{p}{2}} \leq M_f$, and \Cref{thm:tl-besov-sandwich} gives
+$f \in \Besov{m}{p}{\max(p,2)}$ with $\|f\|^{\mathrm{LP}}_{m,\max(p,2)} \leq M_f$.
+\Cref{thm:besov-embedding-rd} and \Cref{thm:besov-embedding-bounded-continuous-rd} with $s = m$
+and $q = \max(p, 2)$ give the claims. For $f \in \Sob{m}{p}(V)$,
+$f \in \Besov{m}{p}{\max(p,2)}$ by \Cref{cor:sobolev-besov-sandwich}.
+\end{proof}
+
+For $r < \infty$ the condition $m > n(1/p - 1/r)$ says $1/r > 1/p - m/n$. The critical case
+$1/r = 1/p - m/n$ with $m < n/p$, Sobolev's inequality
+$\|f\|_{r} \lesssim \|f\|_{\Sob{m}{p}}$, is not covered here.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

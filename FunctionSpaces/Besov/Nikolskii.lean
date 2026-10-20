@@ -53,6 +53,13 @@ theorem nikolskiiExponent_nonneg {D : ℝ} (hD : 0 ≤ D) {p r : ℝ≥0∞} (hp
   exact inv_anti₀ (ENNReal.toReal_pos (zero_lt_one.trans_le hp).ne' hp')
     (ENNReal.toReal_mono hr hpr)
 
+/-- A natural number `m` above the Nikolskii exponent is at least `1`: for `D ≥ 0`,
+`1 ≤ p ≤ r` and `m ∈ ℕ` with `m > D(1/p - 1/r)`, `m ≥ 1`, since the exponent is nonnegative
+(`nikolskiiExponent_nonneg`). -/
+theorem one_le_of_nikolskiiExponent_lt {D : ℝ} (hD : 0 ≤ D) {p r : ℝ≥0∞} (hp : 1 ≤ p)
+    (hpr : p ≤ r) {m : ℕ} (hm : nikolskiiExponent D p r < m) : 1 ≤ m :=
+  Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 ((nikolskiiExponent_nonneg hD hp hpr).trans_lt hm)).ne'
+
 /-- `α(D, p, ∞) = D/p`. -/
 @[simp]
 theorem nikolskiiExponent_top (D : ℝ) (p : ℝ≥0∞) : nikolskiiExponent D p ∞ = D * p.toReal⁻¹ := by
@@ -103,7 +110,7 @@ theorem HasNikolskii.eLpNorm_le (h : S.HasNikolskii μ D) {p r : ℝ≥0∞} (hp
   have hpp : 0 < p.toReal := ENNReal.toReal_pos hp0 hp'
   have hrr : 0 < r.toReal := ENNReal.toReal_pos hr0 hr
   set θ := p.toReal / r.toReal
-  have hθ1 : 0 ≤ 1 - θ := sub_nonneg.2 (div_le_one_of_le₀ (ENNReal.toReal_mono hr hpr) hrr.le)
+  have hθ1 : 0 ≤ 1 - θ := ENNReal.one_sub_toReal_div_nonneg hpr
   refine ⟨C ^ (1 - θ), Real.rpow_nonneg hC _, fun n hn a ha => ?_⟩
   have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
   set Np := (eLpNorm a p μ).toReal

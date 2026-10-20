@@ -36,6 +36,10 @@ derivatives of order `m` of Schwartz kernels, whose dilates form Calderón–Zyg
 so do the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels. With them,
 `W^m_p = F^m_{p,2}` for `1 < p < ∞`, with explicit constants in both directions, and, for
 `m ≥ 1`, `W^m_p` lies between the Besov spaces `B^m_{p,min(p,2)}` and `B^m_{p,max(p,2)}`.
+The Littlewood–Paley blocks are continuous and satisfy the Nikolskii inequality, which gives the
+embeddings of `B^s_{p,q}` into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions
+for `s > n/p`, and with `W^m_p ⊆ F^m_{p,2}` the Sobolev embeddings `W^m_p ↪ L_r` and
+`W^m_p ↪ C_b`, all with explicit constants.
 The [interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
 built on this project, with the decisions behind their form.
 
@@ -369,6 +373,23 @@ built on this project, with the decisions behind their form.
   bound for `∂^w f` obtains `∂^w f` as the limit in `L_p` of the derivatives
   `∑_{j < J} (∂^w ψ̃_j) ⋆ (ψ_j ⋆ f)` of the reproducing sums (`Rd.derivSynthesisSum`), whose
   tails in `L_p(ℓ_2)` tend to zero (`MeasureTheory.tendsto_eLpNorm_lqNorm_ite_le`).
+* **Sobolev and Besov embeddings.** Let `n = dim V`, `1 ≤ p ≤ r ≤ ∞`, `p < ∞`,
+  `α = n(1/p - 1/r)` (`nikolskiiExponent`) and `1 ≤ q ≤ ∞`. The blocks `ψ_j ⋆ f` of
+  `f ∈ L_p(V)` are continuous (`Rd.continuous_blockFun`) and satisfy the Nikolskii inequality
+  `‖ψ_j ⋆ f‖_r ≤ N_p^(1-p/r) 2^(jα) ‖ψ_j ⋆ f‖_p` (`Rd.eLpNorm_blockFun_le_nikolskii`,
+  `Rd.nikolskiiBlockConst`). For `s > α`, every `f ∈ B^s_{p,q}` has a representative `g ∈ L_r(V)`
+  with `‖g‖_r ≤ K_{V,p,r,s} ‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q}`
+  (`Rd.exists_memLp_ae_eq_of_memApprox`, `Rd.besovEmbeddingConst`); for `s > n/p` it has a
+  bounded continuous representative with the same bound for `r = ∞`
+  (`Rd.exists_boundedContinuous_ae_eq_of_memApprox`). For `dim V ≥ 1`, `1 < p < ∞` and
+  `f ∈ L_p(V)` whose weak derivatives `g_α` of order `m` along the basis of `Rd.gridBasis` lie
+  in `L_p(V)`, put `M_f = ‖Φ‖_1 ‖f‖_p + 2^m ∑_α K_α ‖g_α‖_p` (`Rd.sobolevToTLConst`). If
+  `m > n(1/p - 1/r)`, `f` has a representative `u ∈ L_r(V)` with `‖u‖_r ≤ K_{V,p,r,m} M_f`
+  (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv`); if `m > n/p`, a bounded continuous one with
+  `sup |a| ≤ K_{V,p,∞,m} M_f` (`Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv`). In
+  particular every `f ∈ W^m_p(V)` has these representatives
+  (`Rd.exists_memLp_ae_eq_of_memSobolev`, `Rd.exists_boundedContinuous_ae_eq_of_memSobolev`).
+  The critical case `1/r = 1/p - m/n` with `r < ∞` (Sobolev's inequality) is not covered.
 
 ## What is formalised
 
@@ -399,6 +420,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞` with explicit constants in both directions, and the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p` | ✅ | ✗ | `Rd/SquareFunction` |
 | Fourier transforms of iterated derivatives, the derivative symbols and kernels, the block `ψ_1` as a sum of derivatives of order `m`, and the Calderón–Zygmund families of the dilated derivative kernels and of the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels | ✅ | ✗ | `Rd/DerivativeKernels` |
 | `W^m_p = F^m_{p,2}` for `1 < p < ∞` with explicit constants in both directions: the blocks as convolutions with the weak derivatives, the derivatives of the reproducing sums and their limit, the Besov sandwich `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}` and `W^m_2 = B^m_{2,2}` for `m ≥ 1` | ✅ | ✗ | `Rd/SobolevTriebelLizorkin` |
+| Continuity of convolutions of integrable bounded kernels with `L_p` functions, the Nikolskii inequality for the Littlewood–Paley blocks, almost everywhere convergence of the block series, the Besov embeddings into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions for `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with explicit constants | ✅ | ✗ | `Rd/SobolevEmbedding` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

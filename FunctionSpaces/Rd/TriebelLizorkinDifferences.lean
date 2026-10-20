@@ -370,10 +370,7 @@ variable (b : LocalMeansBump V)
 support. -/
 theorem iSup_enorm_lt_top : (⨆ z, ‖b.toFun z‖ₑ) < ∞ := by
   obtain ⟨A, hA⟩ := b.contDiff.continuous.bounded_above_of_compact_support b.hasCompactSupport
-  refine (iSup_le fun z => ?_ : (⨆ z, ‖b.toFun z‖ₑ) ≤ ENNReal.ofReal A).trans_lt
-    ENNReal.ofReal_lt_top
-  rw [← ofReal_norm]
-  exact ENNReal.ofReal_le_ofReal (hA z)
+  exact iSup_enorm_lt_top_of_bddAbove ⟨A, Set.forall_mem_range.2 hA⟩
 
 /-- The constant `sup |b| |B(0,1)| 2^(rn) (1 + 2^n)` of the bound of the local means by ball
 means, with `r = ⌈R⌉₊`, the least natural number at least the radius `R` of the bump `b`. -/

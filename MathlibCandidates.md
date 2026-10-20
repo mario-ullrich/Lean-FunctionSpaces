@@ -44,7 +44,9 @@ declarations.
   subgroup inclusion `MeasureTheory.Lp.antitone` but no bundled map.
 * **Interpolation between `L_p` and `L_∞`** (`FunctionSpaces/Lp/Interpolation.lean`):
   `eLpNorm f r μ ≤ M^(1-p/r) eLpNorm f p μ^(p/r)` for `‖f‖ ≤ M` a.e.
-  (`MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow`).
+  (`MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow`), and its consequence that a bounded
+  function in `L_p` lies in `L_r` for every `r ≥ p`
+  (`MeasureTheory.MemLp.mono_exponent_of_enorm_le`).
 * **`L_∞` norm of bounded continuous functions** (`FunctionSpaces/Lp/BoundedContinuous.lean`):
   for a measure charging open sets, `‖toLp ∞ μ a‖ = ‖a‖`, and the range is closed
   (`BoundedContinuousFunction.norm_toLp_top`, `.isClosed_range_toLp_top`).
@@ -124,6 +126,10 @@ declarations.
   `|(K ⋆ g)(x)| ≤ sup |K| |B(0, ρ)|^(1-1/p) ‖g‖_p` for `K` vanishing outside `B(0, ρ)`
   (`Rd.enorm_conv_le_of_bound`), and `Δ_h^r (K ⋆ g) = (Δ_h^r K) ⋆ g` at every point
   (`Rd.higherDiff_conv_apply`).
+* **Continuity of convolutions with `L_p` functions** (`FunctionSpaces/Rd/SobolevEmbedding.lean`):
+  for `1 ≤ p < ∞`, an integrable bounded kernel `K` and `f ∈ L_p`, `K ⋆ f` is continuous
+  (`Rd.continuous_conv_of_enorm_le`). Mathlib's `HasCompactSupport.continuous_convolution_right`
+  needs a continuous function of compact support.
 * **Approximate identities at points of continuity** (`FunctionSpaces/Rd/GraphTrace.lean`): for
   integrable `Φ` with `∫ Φ = 1` and bounded support, `(Φ_{2^J} ⋆ F_J)(z) → z₀` as `J → ∞` and
   `z → y` whenever `F_J(z) → z₀` (`Rd.conv_dilate_near`). Mathlib's `convolution_tendsto_right`

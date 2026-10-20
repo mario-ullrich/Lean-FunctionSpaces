@@ -17,7 +17,8 @@ and lie in `L_p(V)`) iff it lies in the Triebel–Lizorkin space `F^m_{p,2}(V)`
 (`Rd.MemTriebelLizorkin`: `‖ x ↦ ‖(2^{jm} (ψ_j ⋆ f)(x))_j‖_{ℓ_2} ‖_p < ∞`), see
 `Rd.memSobolev_iff_memTriebelLizorkin`. Both directions have explicit constants.
 
-* **`W^m_p ⊆ F^m_{p,2}`** (`Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv`): with the weak
+* **`W^m_p ⊆ F^m_{p,2}`** (`Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv`,
+  `Rd.memTriebelLizorkin_of_hasWeakLineDeriv`): with the weak
   derivatives `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f` along the orthonormal basis `e` of
   `Rd.gridBasis`, `‖f‖_{F^m_{p,2}} ≤ ‖Φ‖_1 ‖f‖_p + 2^m ∑_α K_α ‖g_α‖_p`
   (`Rd.sobolevToTLConst`). Young's inequality bounds `ψ_0 ⋆ f`; the dilated derivative kernels
@@ -195,20 +196,31 @@ theorem triebelLizorkinNorm_le_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) 
           exact eLpNorm_blockFun_zero_le hp f
         · exact eLpNorm_lqNorm_blockFun_succ_le hp1 hp hg
 
+/-- **The weak derivatives of order `m` along the basis vectors give `f ∈ F^m_{p,2}`**: in
+dimension `n ≥ 1`, for `1 < p < ∞`, if the weak derivatives `g_α = ∂^α f` of order `m` along the
+basis `e` of `Rd.gridBasis` lie in `L_p(V)` for every multi-index `α`, then `f ∈ F^m_{p,2}(V)`,
+since the bound `Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv` is finite. -/
+theorem memTriebelLizorkin_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
+    {m : ℕ} {f : Lp ℂ p (volume : Measure V)}
+    {g : (Fin m → Fin (finrank ℝ V)) → Lp ℂ p (volume : Measure V)}
+    (hg : ∀ i, HasWeakLineDeriv ⊤ (fun k => gridBasis V (i k)) f (g i)) :
+    MemTriebelLizorkin (m : ℝ) 2 f :=
+  (triebelLizorkinNorm_le_of_hasWeakLineDeriv hp1 hp hg).trans_lt
+    (ENNReal.add_lt_top.2 ⟨ENNReal.mul_lt_top
+      (memLp_one_iff_integrable.2 integrable_lpKernel).eLpNorm_lt_top enorm_lt_top,
+      ENNReal.mul_lt_top (ENNReal.pow_lt_top ENNReal.ofNat_lt_top) (ENNReal.sum_lt_top.2 fun i _ =>
+        ENNReal.mul_lt_top (sobolevToTLConst_ne_top hp1 hp i).lt_top enorm_lt_top)⟩)
+
 /-- **`W^m_p ⊆ F^m_{p,2}`**: in dimension `n ≥ 1`, for `1 < p < ∞`, every `f ∈ W^m_p(V)` lies in
 `F^m_{p,2}(V)`; the weak derivatives of order `m` along the basis vectors suffice
-(`Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv`). -/
+(`Rd.memTriebelLizorkin_of_hasWeakLineDeriv`). -/
 theorem memTriebelLizorkin_of_memSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
     {f : Lp ℂ p (volume : Measure V)} (hf : MemSobolev m f) : MemTriebelLizorkin (m : ℝ) 2 f := by
   have hd : ∀ i : Fin m → Fin (finrank ℝ V), ∃ g : Lp ℂ p (volume : Measure V),
       HasWeakLineDeriv ⊤ (fun k => gridBasis V (i k)) f g := fun i =>
     (memSobolev_iff_exists_hasWeakLineDeriv f).1 hf m le_rfl _
   choose g hg using hd
-  refine (triebelLizorkinNorm_le_of_hasWeakLineDeriv hp1 hp hg).trans_lt
-    (ENNReal.add_lt_top.2 ⟨ENNReal.mul_lt_top ?_ enorm_lt_top, ENNReal.mul_lt_top
-      (ENNReal.pow_lt_top ENNReal.ofNat_lt_top) (ENNReal.sum_lt_top.2 fun i _ =>
-        ENNReal.mul_lt_top (sobolevToTLConst_ne_top hp1 hp i).lt_top enorm_lt_top)⟩)
-  exact (memLp_one_iff_integrable.2 integrable_lpKernel).eLpNorm_lt_top
+  exact memTriebelLizorkin_of_hasWeakLineDeriv hp1 hp hg
 
 /-! ### `F^m_{p,2} ⊆ W^m_p` -/
 

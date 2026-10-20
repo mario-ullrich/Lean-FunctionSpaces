@@ -18,12 +18,22 @@ For a function bounded by `M` and `0 < p ≤ r < ∞`,
 elementary case of log-convexity of `p ↦ ‖f‖_p`; Mathlib has Hölder's inequality but not this
 form.  It reduces every Nikolskii inequality `‖a‖_r ≲ n^(D(1/p-1/r)) ‖a‖_p` to the case
 `r = ∞`.  The real-valued form `toReal_eLpNorm_le_rpow_mul` is the one used in estimates.
+A consequence is `MemLp.mono_exponent_of_enorm_le`: a bounded function in `L_p` lies in `L_r` for
+every `r ≥ p`.  The exponent `1 - p/r` is nonnegative for `p ≤ r ≤ ∞`
+(`ENNReal.one_sub_toReal_div_nonneg`).
 -/
 
 @[expose] public section
 
 open MeasureTheory
 open scoped ENNReal
+
+/-- The interpolation exponent is nonnegative: `0 ≤ 1 - p/r` for `p ≤ r ≤ ∞`, with `1/∞ = 0`. -/
+theorem ENNReal.one_sub_toReal_div_nonneg {p r : ℝ≥0∞} (hpr : p ≤ r) :
+    0 ≤ 1 - p.toReal / r.toReal := by
+  rcases eq_or_ne r ∞ with rfl | hr
+  · simp
+  · exact sub_nonneg.2 (div_le_one_of_le₀ (ENNReal.toReal_mono hr hpr) ENNReal.toReal_nonneg)
 
 namespace MeasureTheory
 
@@ -59,6 +69,21 @@ theorem eLpNorm_le_rpow_mul_eLpNorm_rpow (hf : AEStronglyMeasurable f μ) {M : �
           ← ENNReal.rpow_mul]
         congr 2 <;> field_simp
 
+/-- **Bounded functions in `L_p` lie in `L_r` for every `r ≥ p`**: if `f ∈ L_p` with `p > 0` and
+`‖f‖ ≤ M < ∞` almost everywhere, then `f ∈ L_r` for every `p ≤ r ≤ ∞`, by
+`MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow` for `r < ∞` and the essential supremum for
+`r = ∞`. -/
+theorem MemLp.mono_exponent_of_enorm_le (hf : MemLp f p μ) {M : ℝ≥0∞}
+    (hM : ∀ᵐ x ∂μ, ‖f x‖ₑ ≤ M) (hMtop : M ≠ ∞) (hp0 : p ≠ 0) (hpr : p ≤ r) : MemLp f r μ := by
+  refine memLp_iff.2 ?_
+  rcases eq_or_ne r ∞ with rfl | hr
+  · rw [eLpNorm_exponent_top hf.aestronglyMeasurable]
+    exact (eLpNormEssSup_le_of_ae_enorm_bound hM).trans_lt hMtop.lt_top
+  · refine (eLpNorm_le_rpow_mul_eLpNorm_rpow hf.aestronglyMeasurable hM hp0 hpr hr).trans_lt
+      (ENNReal.mul_lt_top ?_ ?_)
+    · exact ENNReal.rpow_lt_top_of_nonneg (ENNReal.one_sub_toReal_div_nonneg hpr) hMtop
+    · exact ENNReal.rpow_lt_top_of_nonneg (by positivity) hf.eLpNorm_ne_top
+
 /-- The interpolation inequality in real numbers, for a bounded function on a finite measure
 space: `‖f‖_r ≤ M^(1 - p/r) ‖f‖_p^(p/r)` for `0 < p ≤ r < ∞`. -/
 theorem toReal_eLpNorm_le_rpow_mul [IsFiniteMeasure μ] (hf : AEStronglyMeasurable f μ) {M : ℝ}
@@ -71,11 +96,7 @@ theorem toReal_eLpNorm_le_rpow_mul [IsFiniteMeasure μ] (hf : AEStronglyMeasurab
   have hp : p ≠ ∞ := ne_top_of_le_ne_top hr hpr
   have hfp : eLpNorm f p μ ≠ ∞ :=
     ((memLp_const (p := p) (μ := μ) M).mono' hf hM).eLpNorm_ne_top
-  have hexp : 0 ≤ 1 - p.toReal / r.toReal := by
-    rw [sub_nonneg]
-    rcases eq_or_ne r.toReal 0 with h | h
-    · simp [h]
-    · exact div_le_one_of_le₀ (ENNReal.toReal_mono hr hpr) ENNReal.toReal_nonneg
+  have hexp : 0 ≤ 1 - p.toReal / r.toReal := ENNReal.one_sub_toReal_div_nonneg hpr
   have h := eLpNorm_le_rpow_mul_eLpNorm_rpow hf hM' hp0 hpr hr
   calc (eLpNorm f r μ).toReal
       ≤ (ENNReal.ofReal M ^ (1 - p.toReal / r.toReal) *

@@ -197,6 +197,7 @@ public import FunctionSpaces.Rd.VectorValuedSingularIntegrals
 public import FunctionSpaces.Rd.SquareFunction
 public import FunctionSpaces.Rd.DerivativeKernels
 public import FunctionSpaces.Rd.SobolevTriebelLizorkin
+public import FunctionSpaces.Rd.SobolevEmbedding
 
 /-!
 # Function spaces
@@ -689,4 +690,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.SobolevTriebelLizorkin`: the Sobolev spaces `W^m_p = F^m_{p,2}` for
   `1 < p < ∞` with explicit constants in both directions, and, for `m ≥ 1`, the Besov sandwich
   `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}`.
+* `FunctionSpaces.Rd.SobolevEmbedding`: continuity of convolutions of integrable bounded
+  kernels with `L_p` functions, the Nikolskii inequality for the Littlewood–Paley blocks, the
+  Besov embeddings into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions for
+  `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with explicit
+  constants.
 -/
