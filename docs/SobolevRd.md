@@ -31,7 +31,9 @@ type `(1,1)`. Marcinkiewicz interpolation between weak type `(1,1)` and strong t
 the terms of the Carleson project, gives strong type `(p,p)` for `1 < p < 2`, and duality with
 the adjoint family extends it to `2 < p < ∞`, for the analysis and the synthesis operators.
 Applied to the Littlewood–Paley blocks and their synthesis kernels, this gives the square
-function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`.
+function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`. For `W^m_p`, the block `ψ_1` is a sum of
+derivatives of order `m` of Schwartz kernels, whose dilates form Calderón–Zygmund families, and
+so do the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels.
 The [interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
 built on this project, with the decisions behind their form.
 
@@ -328,6 +330,23 @@ built on this project, with the decisions behind their form.
   Hence `F^0_{p,2} = L_p(V)` (`Rd.triebelLizorkinSpace_zero_two_eq_top`). The lower bound uses
   the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p(V)`
   (`Rd.tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub`).
+* **Derivative kernels.** Let `e_0, …, e_{n-1}` be an orthonormal basis of `V` (`Rd.gridBasis`)
+  and `m ∈ ℕ`. For every multi-index `α = (α_0, …, α_{m-1})` with entries below `n`, the
+  derivative kernel `η_α` is the Schwartz function with Fourier transform
+  `∏_k ⟪ξ, e_{α_k}⟫ / ((2πi)^m ‖ξ‖^{2m}) · 𝓕ψ_1(ξ)` (`Rd.derivSymbol`, `Rd.derivKernel`), and
+  `ψ_1 = ∑_α ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} η_α` (`Rd.sum_iteratedLineDerivOp_derivKernel`), by
+  `‖ξ‖^{2m} = ∑_α ∏_k ⟪ξ, e_{α_k}⟫²` (`Rd.norm_pow_eq_sum_prod_inner`). Dilated,
+  `2^{jm} ψ_{j+1} = ∑_α ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} ((η_α)_{2^j})` for every `j`
+  (`Rd.two_pow_smul_psi_succ_eq_sum`), and the dilates `((η_α)_{2^j})_j` form a
+  Calderón–Zygmund family with overlap `2` (`Rd.isCZFamily_derivFamily`). For directions
+  `w ∈ V^k`, `∂^w ψ̃_j = 2^{jk} (∂^w G̃_j)_{2^j}` with the Schwartz functions `G̃_j` behind the
+  synthesis kernels (`Rd.iteratedLineDerivOp_psiDualS`), and the dilates `((∂^w G̃_j)_{2^j})_j`
+  form a Calderón–Zygmund family with overlap `4 ((8π)^k ∏_l ‖w_l‖)²`
+  (`Rd.isCZFamily_derivDualFamily`). On the way, `𝓕(∂^w G)(ξ) = ∏_l 2πi ⟪ξ, w_l⟫ 𝓕G(ξ)` for
+  Schwartz functions `G` with values in a complex normed space
+  (`SchwartzMap.fourier_iteratedLineDerivOp_apply`) and
+  `∂^w (G_c) = c^k (∂^w G)_c` for the dilation `G_c(x) = c^n G(cx)`
+  (`Rd.iteratedLineDerivOp_schwartzDilate`).
 
 ## What is formalised
 
@@ -345,7 +364,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` with explicit constants, the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the trace kernel, the trace space `H^{1/2}(Γ)` with trace and extension operators, `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` | ✅ | ✗ | `Rd/BoundaryTraceSpace` |
 | The area formula for Lipschitz graphs: Lipschitz maps and Mathlib's Euclidean Hausdorff measure, the linear case by Mathlib's norm determinant, stretches and tilts, the gradient and the Gram density, good pieces, `μHE[n-1](γ(A)) = ∫_A √(1 + ‖∇φ‖²)` with `n = dim V` in set, measure and integral form; the outward unit normal | ✅ | ✗ | `Rd/LipschitzGraphArea` |
 | The surface measure of a bounded Lipschitz domain as `μHE[n-1]` on the boundary, its chart form, finiteness and null sets, the boundary `Γ` as a Lebesgue null set, the boundary trace in `L_p(Γ)`, `L_2(Γ)` with the traces of `H^1(Ω)` and `H^{1/2}(Γ)`, and the outward unit normal field | ✅ | ✗ | `Rd/SurfaceMeasure` |
-| Dilation, reflection and conjugation of Schwartz functions, uniform Schwartz families, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families and their adjoints, the Littlewood–Paley blocks and the synthesis kernels as such families | ✅ | ✗ | `Rd/DilationFamilies` |
+| Dilation, reflection and conjugation of Schwartz functions, derivatives of dilations, uniform Schwartz families, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families and their adjoints, the Littlewood–Paley blocks and the synthesis kernels as such families | ✅ | ✗ | `Rd/DilationFamilies` |
 | The adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for `f ∈ L_p`, `g ∈ L_q`, and its form `∫ (K ⋆ f) conj g = ∫ f conj(K^* ⋆ g)` with the adjoint kernel, derivatives of Schwartz kernels moved to the other Schwartz factor, translates and reflections of Schwartz functions, and weak derivatives commuting with convolution by Schwartz functions | ✅ | ✗ | `Rd/ConvolutionAdjoint` |
 | The Cauchy–Schwarz inequality for finite sums, the `L_2` bounds of the analysis operator and of the synthesis operators on finite index sets for a kernel family with Fourier overlap `B`, and for every Calderón–Zygmund family | ✅ | ✗ | `Rd/PlancherelBounds` |
 | The signed Calderón–Zygmund decomposition of functions with values in a normed space and of families: good parts bounded by `2^n t` with `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, bad pieces with mean zero on their cubes and total mass at most `2 ∫ ‖f‖` | ✅ | ✗ | `Rd/CalderonZygmundSigned` |
@@ -356,6 +375,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | `L_p` and `L_p(ℓ_2)` norms by duality for `1 < p < ∞` through the norming family, Hölder's inequality for `[0, ∞]`-valued functions in `L_p` norms, and families in `L_p` vanishing outside a finite set | ✅ | ✗ | `Lp/NormingFamily` |
 | The strong type `(p,p)`, `1 < p < ∞`, of the analysis and synthesis operators of a Calderón–Zygmund family with explicit constants: Plancherel for `p = 2`, Marcinkiewicz interpolation for `p < 2`, duality with the adjoint family for `p > 2` | ✅ | ✗ | `Rd/VectorValuedSingularIntegrals` |
 | The square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞` with explicit constants in both directions, and the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p` | ✅ | ✗ | `Rd/SquareFunction` |
+| Fourier transforms of iterated derivatives, the derivative symbols and kernels, the block `ψ_1` as a sum of derivatives of order `m`, and the Calderón–Zygmund families of the dilated derivative kernels and of the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels | ✅ | ✗ | `Rd/DerivativeKernels` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

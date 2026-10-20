@@ -141,6 +141,8 @@ BLOCKS: list[tuple[str, list]] = [
                r"\texorpdfstring{$L_p$}{L\_p} norms by duality",
                "The strong type of vector-valued singular integrals",
                "The square function theorem"])]),
+    ("Sobolev spaces W^m_p", [
+        (SOB, ["Derivative kernels"])]),
 ]
 
 # Columns of blocks: in each list, every block is placed below the one before it. Without
@@ -160,7 +162,8 @@ COLUMNS: list[list[str]] = [
      "Dominating mixed smoothness"],
     ["Convolution and Littlewood–Paley blocks",
      "Maximal functions and the Fefferman–Stein inequality", "Triebel–Lizorkin spaces",
-     "Sobolev spaces: the bridge for p = 2", "Vector-valued singular integrals"],
+     "Sobolev spaces: the bridge for p = 2", "Vector-valued singular integrals",
+     "Sobolev spaces W^m_p"],
     ["Traces", "Sobolev spaces on domains and boundaries"],
 ]
 GAP = 2

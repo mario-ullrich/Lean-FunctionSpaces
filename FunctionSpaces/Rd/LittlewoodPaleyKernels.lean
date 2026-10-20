@@ -549,6 +549,11 @@ theorem fourier_psi_succ_eq_zero {i : ℕ} {ξ : V} (h : ‖ξ‖ ≤ 2 ^ i) :
       | exact h
       | exact h.trans (pow_le_pow_right₀ one_le_two (Nat.le_succ i))
 
+/-- Where `𝓕ψ_{i+1}(ξ) ≠ 0`, `‖ξ‖ > 2^i`: the contrapositive of `Rd.fourier_psi_succ_eq_zero`. -/
+theorem lt_norm_of_fourier_psi_succ_ne_zero {i : ℕ} {ξ : V}
+    (h : 𝓕 (psi (V := V) (i + 1)) ξ ≠ 0) : 2 ^ i < ‖ξ‖ :=
+  not_le.1 fun h' => h (fourier_psi_succ_eq_zero h')
+
 /-- `𝓕Θ_{k+1} · 𝓕Θ_k = 𝓕Θ_k`. -/
 theorem fourier_Theta_succ_mul (k : ℕ) (ξ : V) :
     𝓕 (Theta (V := V) (k + 1)) ξ * 𝓕 (Theta (V := V) k) ξ = 𝓕 (Theta (V := V) k) ξ := by

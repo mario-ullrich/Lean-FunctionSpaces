@@ -195,6 +195,7 @@ public import FunctionSpaces.Lp.Marcinkiewicz
 public import FunctionSpaces.Lp.NormingFamily
 public import FunctionSpaces.Rd.VectorValuedSingularIntegrals
 public import FunctionSpaces.Rd.SquareFunction
+public import FunctionSpaces.Rd.DerivativeKernels
 
 /-!
 # Function spaces
@@ -641,10 +642,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   Lipschitz domain as the `(n-1)`-dimensional Euclidean Hausdorff measure on `Γ`, its chart form,
   `|Γ| = 0`, the space `L_2(Γ)`, the traces `H^1(Ω) → L_2(Γ)` and `H^{1/2}(Γ) → L_2(Γ)`, and the
   outward unit normal field.
-* `FunctionSpaces.Rd.DilationFamilies`: families of dilated Schwartz kernels with uniformly
-  bounded seminorms, their Hörmander condition with explicit constants, Calderón–Zygmund
-  families and their adjoints, and the Littlewood–Paley blocks and synthesis kernels as such
-  families.
+* `FunctionSpaces.Rd.DilationFamilies`: dilations of Schwartz functions and their derivatives,
+  families of dilated Schwartz kernels with uniformly bounded seminorms, their Hörmander
+  condition with explicit constants, Calderón–Zygmund families and their adjoints, and the
+  Littlewood–Paley blocks and synthesis kernels as such families.
 * `FunctionSpaces.Rd.ConvolutionAdjoint`: the adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for
   `f ∈ L_p`, `g ∈ L_q` and the reflection `K^∨(x) = K(-x)`, derivatives of Schwartz kernels
   moved to the other Schwartz factor, and weak derivatives commuting with convolution by Schwartz
@@ -680,4 +681,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.SquareFunction`: the square function theorem `L_p = F^0_{p,2}` for
   `1 < p < ∞`, with explicit constants in both directions, and the reproducing formula
   `∑_{j < J} psiDual_j ⋆ (ψ_j ⋆ f) → f` in `L_p`.
+* `FunctionSpaces.Rd.DerivativeKernels`: the block `ψ_1` as a sum of derivatives of order `m` of
+  Schwartz kernels, `ψ_1 = ∑_i ∂_{e_{i_0}} ⋯ ∂_{e_{i_{m-1}}} η_i`, the Fourier transforms of
+  iterated derivatives, and the Calderón–Zygmund families of the dilated derivative kernels and of
+  the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels.
 -/

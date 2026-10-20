@@ -5903,7 +5903,8 @@ remaining claims follow from \Cref{lem:dilate} and the triangle inequality; the 
   Rd.integrable_fourier_Phi, Rd.integrable_fourier_Theta, Rd.integrable_fourier_psi,
   Rd.norm_lt_of_fourier_Phi_ne_zero, Rd.norm_lt_of_fourier_Theta_ne_zero,
   Rd.fourier_Theta_eq_one, Rd.norm_lt_of_fourier_psi_ne_zero, Rd.fourier_psi_succ_eq_zero,
-  Rd.fourier_Theta_succ_mul, Rd.fourier_Theta_mul_psi, Rd.fourier_psi_mul_Theta}
+  Rd.lt_norm_of_fourier_psi_succ_ne_zero, Rd.fourier_Theta_succ_mul, Rd.fourier_Theta_mul_psi,
+  Rd.fourier_psi_mul_Theta}
 \leanok
 \uses{lem:fourier-dilate, lem:fourier-conv, lem:lp-kernels-basic}
 For all $j, k \in \N$ and $\xi \in V$, $\widehat{\Phi_k}(\xi) = \chi_{1,2}(2^{-k} \xi)$ and
@@ -5913,7 +5914,8 @@ $\widehat{\psi_j}$ are integrable. Moreover:
   \item $\widehat{\Phi_k}(\xi) = \widehat{\psi_k}(\xi) = 0$ if $|\xi| \geq 2^{k+1}$, and
     $\widehat{\Theta_k}(\xi) = 0$ if $|\xi| \geq 2^{k+2}$;
   \item $\widehat{\Theta_k}(\xi) = 1$ if $|\xi| \leq 2^{k+1}$;
-  \item $\widehat{\psi_{j+1}}(\xi) = 0$ if $|\xi| \leq 2^j$;
+  \item $\widehat{\psi_{j+1}}(\xi) = 0$ if $|\xi| \leq 2^j$, so $|\xi| > 2^j$ wherever
+    $\widehat{\psi_{j+1}}(\xi) \neq 0$;
   \item $\widehat{\Theta_{k+1}} \widehat{\Theta_k} = \widehat{\Theta_k}$,
     $\widehat{\Theta_j} \widehat{\psi_j} = \widehat{\psi_j}$, and
     $\widehat{\psi_j} \widehat{\Theta_k} = 0$ if $j \geq k + 3$.
@@ -15420,6 +15422,28 @@ The first two are compositions of $G$ with linear equivalences of $V$ (Mathlib's
 \texttt{SchwartzMap.\allowbreak compCLMOfContinuousLinearEquiv}), the third the composition of
 the real-linear conjugation with $G$ (Mathlib's \texttt{SchwartzMap.\allowbreak postcompCLM}).
 
+\begin{lemma}[Derivatives of dilations]
+\label{lem:derivative-dilate}
+\lean{Rd.schwartzDilate_sum, Rd.lineDerivOp_schwartzDilate,
+  Rd.iteratedLineDerivOp_schwartzDilate}
+\leanok
+\uses{def:schwartz-dilate}
+Let $c \neq 0$ be real. For every finite family $(G_i)$ of Schwartz functions,
+$(\sum_i G_i)_c = \sum_i (G_i)_c$. For every Schwartz function $G$, every $v \in V$, every
+$k \in \N$ and all $w \in V^k$,
+\[
+  \partial_v (G_c) = c \, (\partial_v G)_c , \qquad \partial^w (G_c) = c^k (\partial^w G)_c .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$G_c$ is $c^n$ times the composition of $G$ with the linear map $x \mapsto c x$, so the chain rule
+gives $\partial_v (G_c) = c^n (\partial_{c v} G)(c \, \cdot) = c \, (\partial_v G)_c$ (Mathlib's
+\texttt{SchwartzMap.\allowbreak lineDerivOp\_\allowbreak compCLMOfContinuousLinearEquiv}).
+Induction on $k$ gives the second identity; the first holds since $G \mapsto G_c$ is linear.
+\end{proof}
+
 \begin{lemma}[Dilations are linear and keep $L_1$ norms]
 \label{lem:dilate-sub-l1}
 \lean{Rd.dilate_sub, Rd.lintegral_enorm_dilate}
@@ -15449,12 +15473,15 @@ $T_{A,r,N} = C_{A,0,N+r+n+1} \, I_{n+1}$; both are finite.
 
 \begin{lemma}[Constants of uniform families]
 \label{lem:uniform-schwartz-constants}
-\lean{Rd.IsUniformSchwartz.of_forall_mem, Rd.IsUniformSchwartz.of_forall_eq_or_eq,
-  Rd.schwartzDecayConst_le_familyDecayConst, Rd.tailConst_le_familyTailConst}
+\lean{Rd.IsUniformSchwartz.const, Rd.IsUniformSchwartz.of_forall_mem,
+  Rd.IsUniformSchwartz.of_forall_eq_or_eq, Rd.schwartzDecayConst_le_familyDecayConst,
+  Rd.tailConst_le_familyTailConst}
 \leanok
 \uses{def:uniform-schwartz}
 For every uniform family $(G_j)$ with bounds $A$ and all $j, r, N \in \N$,
-$C_{G_j,r,N} \leq C_{A,r,N}$ and $T_{G_j,r,N} \leq T_{A,r,N}$. For every finite nonempty set $S$
+$C_{G_j,r,N} \leq C_{A,r,N}$ and $T_{G_j,r,N} \leq T_{A,r,N}$. For every Schwartz function $G$,
+the constant family $(G)_j$ is uniformly Schwartz with bounds
+$A_{k,l} = \sup_x \|x\|^k \|D^l G(x)\|$. For every finite nonempty set $S$
 of Schwartz functions and every family $(G_j)$ with $G_j \in S$ for every $j$, $(G_j)$ is
 uniformly Schwartz with bounds $A_{k,l} = \max_{g \in S} \sup_x \|x\|^k \|D^l g(x)\|$; in
 particular for $S = \{G^0, G^1\}$ with
@@ -17648,6 +17675,335 @@ $f \in L_p(V)$,
 \begin{proof}
 \leanok
 \Cref{thm:square-function-upper} and \Cref{thm:square-function-lower}.
+\end{proof}
+
+\section{Derivative kernels}
+\label{sec:derivative-kernels}
+
+The Sobolev space $\Sob{m}{p}(V)$ is described by weak derivatives, the space $\TL{m}{p}{2}$ by the
+Littlewood--Paley blocks. This section provides the kernels that connect the two: the block
+$\psi_1$ is a sum of derivatives of order $m$ of Schwartz functions, and after dilation
+$2^{jm} \psi_{j+1}$ is a sum of derivatives of the dilated kernels. Let $e_0, \dots, e_{n-1}$ be
+the orthonormal basis of \Cref{def:dyadic-cells}. For $m \in \N$ a multi-index is a tuple
+$\alpha = (\alpha_0, \dots, \alpha_{m-1})$ with entries in $\{0, \dots, n-1\}$; write
+$e_\alpha = (e_{\alpha_0}, \dots, e_{\alpha_{m-1}}) \in V^m$, so that
+$\partial^{e_\alpha} = \partial_{e_{\alpha_0}} \cdots \partial_{e_{\alpha_{m-1}}}$, and sums over
+$\alpha$ run over all $n^m$ multi-indices. On the Fourier side $\partial^{e_\alpha}$ multiplies by
+$\prod_k 2\pi i \langle \xi, e_{\alpha_k} \rangle$, and
+$\sum_\alpha \prod_k \langle \xi, e_{\alpha_k} \rangle^2 = \|\xi\|^{2m}$. The kernel $\eta_\alpha$
+is chosen so that $\partial^{e_\alpha} \eta_\alpha$ has the Fourier transform
+$\prod_k \langle \xi, e_{\alpha_k} \rangle^2 \|\xi\|^{-2m} \widehat{\psi_1}(\xi)$; the division by
+$\|\xi\|^{2m}$ keeps $\widehat{\eta_\alpha}$ smooth because $\widehat{\psi_1}$ vanishes near $0$.
+For every $w \in V^k$, the rescaled derivatives $2^{-jk} \partial^w \tilde\psi_j$ of the synthesis
+kernels (\Cref{def:psi-dual}) form Calder\'on--Zygmund families as well.
+
+\begin{lemma}[Fourier transforms of iterated derivatives]
+\label{lem:fourier-iterated-derivative}
+\lean{SchwartzMap.fourier_iteratedLineDerivOp_apply}
+\leanok
+For every complex normed space $E$, every Schwartz function $G \colon V \to E$, every $k \in \N$,
+all $w \in V^k$ and every $\xi \in V$,
+\[
+  \widehat{\partial^w G}(\xi) = \Bigl( \prod_{l < k} 2\pi i \langle \xi, w_l \rangle \Bigr)
+  \widehat G(\xi) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Induction on $k$, with $\widehat{\partial_v G}(\xi) = 2\pi i \langle \xi, v \rangle \widehat G(\xi)$
+(Mathlib's \texttt{SchwartzMap.\allowbreak fourier\_\allowbreak lineDerivOp\_\allowbreak eq}).
+\end{proof}
+
+\begin{lemma}[Powers of the norm in coordinates]
+\label{lem:norm-power-coordinates}
+\lean{Rd.norm_pow_eq_sum_prod_inner}
+\leanok
+\uses{def:dyadic-cells}
+For every $\xi \in V$ and every $m \in \N$,
+\[
+  \|\xi\|^{2m} = \sum_\alpha \prod_{k < m} \langle \xi, e_{\alpha_k} \rangle^2 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\|\xi\|^2 = \sum_{i < n} \langle \xi, e_i \rangle^2$ (Mathlib's
+\texttt{OrthonormalBasis.\allowbreak sum\_\allowbreak sq\_\allowbreak inner\_\allowbreak left}),
+and the $m$-th power of this sum expands into the sum over all multi-indices (Mathlib's
+\texttt{Fintype.\allowbreak sum\_\allowbreak pow}).
+\end{proof}
+
+\begin{definition}[Derivative symbols]
+\label{def:derivative-symbol}
+\lean{Rd.derivSymbol}
+\leanok
+\uses{def:dyadic-cells}
+For every $m \in \N$, every multi-index $\alpha$ and every $\xi \in V$,
+\[
+  \sigma_\alpha(\xi) = \frac{\prod_{k < m} \langle \xi, e_{\alpha_k} \rangle}
+    {(2\pi i)^m \|\xi\|^{2m}} ,
+\]
+with the convention $t / 0 = 0$.
+\end{definition}
+
+\begin{lemma}[Properties of the derivative symbols]
+\label{lem:derivative-symbol}
+\lean{Rd.sum_prod_mul_derivSymbol, Rd.norm_derivSymbol_le, Rd.contDiffOn_derivSymbol}
+\leanok
+\uses{def:derivative-symbol, lem:norm-power-coordinates}
+Let $m \in \N$. For every $\xi \in V \setminus \{0\}$,
+\[
+  \sum_\alpha \Bigl( \prod_{k < m} 2\pi i \langle \xi, e_{\alpha_k} \rangle \Bigr)
+  \sigma_\alpha(\xi) = 1 .
+\]
+For every multi-index $\alpha$, $|\sigma_\alpha(\xi)| \leq 1$ for every $\xi \in V$ with
+$\|\xi\| \geq 1$, and $\sigma_\alpha$ is smooth on $V \setminus \{0\}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The term of $\alpha$ in the sum is $\prod_k \langle \xi, e_{\alpha_k} \rangle^2 / \|\xi\|^{2m}$, and
+these terms add up to $1$ by \Cref{lem:norm-power-coordinates}. Since
+$|\langle \xi, e_i \rangle| \leq \|\xi\|$,
+$|\sigma_\alpha(\xi)| \leq (2\pi)^{-m} \|\xi\|^m / \|\xi\|^{2m} \leq 1$ for $\|\xi\| \geq 1$.
+Products of linear functions and $\|\xi\|^{2m} = (\|\xi\|^2)^m$ are smooth, and the latter
+vanishes only at $0$.
+\end{proof}
+
+\begin{lemma}[The block $\psi_1$]
+\label{lem:psi-one}
+\lean{Rd.psiOneS, Rd.coe_psiOneS, Rd.fourier_psiOneS_apply, Rd.dilate_psi_one,
+  Rd.fourier_psi_succ_eq_fourier_psi_one, Rd.one_lt_norm_of_fourier_psi_one_ne_zero}
+\leanok
+\uses{def:psi-base, lem:psi-base, def:moment-kernel, lem:fourier-dilate,
+  lem:lp-kernels-frequency}
+The block $\psi_1$ is the Schwartz function $\delta_2 G^{\psi}_1$. For every $j \in \N$ and every
+$\xi \in V$, $\psi_{j+1} = (\psi_1)_{2^j}$ and
+$\widehat{\psi_{j+1}}(\xi) = \widehat{\psi_1}(2^{-j} \xi)$. For every $\xi \in V$ with
+$\widehat{\psi_1}(\xi) \neq 0$, $\|\xi\| > 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\psi_{j+1} = \delta_{2^{j+1}} G^{\psi}_{j+1}$ (\Cref{lem:psi-base}) and
+$G^{\psi}_{j+1} = G^{\psi}_1$ (\Cref{def:psi-base}); with $j = 0$ this is the first claim, and
+$\delta_{2^j} \delta_2 = \delta_{2^{j+1}}$ (\Cref{def:moment-kernel}) gives the second. The third
+is \Cref{lem:fourier-dilate}, and the last is the case $j = 0$ of
+\Cref{lem:lp-kernels-frequency}.
+\end{proof}
+
+\begin{lemma}[Derivative kernels]
+\label{lem:derivative-kernel}
+\lean{Rd.contDiff_derivSymbol_mul_fourier_psi_one,
+  Rd.hasCompactSupport_derivSymbol_mul_fourier_psi_one, Rd.derivKernelHat, Rd.derivKernel,
+  Rd.fourier_derivKernel}
+\leanok
+\uses{lem:derivative-symbol, lem:psi-one, lem:lp-kernels-frequency, def:lp-kernels}
+For every $m \in \N$ and every multi-index $\alpha$, the function
+$\sigma_\alpha \widehat{\psi_1}$ is smooth with compact support, and the derivative kernel
+\[
+  \eta_\alpha = \mathcal F^{-1} \bigl( \sigma_\alpha \widehat{\psi_1} \bigr)
+\]
+is a Schwartz function with $\widehat{\eta_\alpha} = \sigma_\alpha \widehat{\psi_1}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\widehat{\psi_1}$ is the Fourier transform of a Schwartz function (\Cref{lem:psi-one}), hence
+smooth, and it vanishes on the closed unit ball and outside the ball of radius $4$
+(\Cref{lem:lp-kernels-frequency}). So the product vanishes near $0$ and outside the closed ball
+of radius $4$, and away from $0$ it is smooth by \Cref{lem:derivative-symbol}. Smooth functions
+with compact support are Schwartz functions (Mathlib's
+\texttt{HasCompactSupport.\allowbreak toSchwartzMap}), and $\mathcal F$ inverts
+$\mathcal F^{-1}$ on Schwartz functions.
+\end{proof}
+
+\begin{theorem}[$\psi_1$ as a sum of derivatives]
+\label{thm:psi-one-derivatives}
+\lean{Rd.sum_iteratedLineDerivOp_derivKernel}
+\leanok
+\uses{lem:fourier-iterated-derivative, lem:derivative-symbol, lem:derivative-kernel,
+  lem:psi-one, lem:lp-kernels-frequency}
+For every $m \in \N$,
+\[
+  \psi_1 = \sum_\alpha \partial^{e_\alpha} \eta_\alpha .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:fourier-iterated-derivative} and \Cref{lem:derivative-kernel}, the Fourier transform
+of the right side at $\xi$ is
+$\bigl( \sum_\alpha \prod_k 2\pi i \langle \xi, e_{\alpha_k} \rangle \, \sigma_\alpha(\xi) \bigr)
+\widehat{\psi_1}(\xi)$. For $\xi \neq 0$ the sum is $1$ (\Cref{lem:derivative-symbol}), and
+$\widehat{\psi_1}(0) = 0$ (\Cref{lem:lp-kernels-frequency}). The Fourier transform is injective on
+Schwartz functions.
+\end{proof}
+
+\begin{corollary}[The dilated identity]
+\label{cor:psi-derivatives-dilated}
+\lean{Rd.two_pow_smul_psi_succ_eq_sum}
+\leanok
+\uses{thm:psi-one-derivatives, lem:derivative-dilate, lem:psi-one}
+For all $m, j \in \N$,
+\[
+  2^{jm} \psi_{j+1} = \sum_\alpha \partial^{e_\alpha} \bigl( (\eta_\alpha)_{2^j} \bigr) .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+By \Cref{lem:derivative-dilate},
+$\partial^{e_\alpha} ((\eta_\alpha)_{2^j}) = 2^{jm} (\partial^{e_\alpha} \eta_\alpha)_{2^j}$, and
+the sum over $\alpha$ is $2^{jm} (\psi_1)_{2^j} = 2^{jm} \psi_{j+1}$ by
+\Cref{thm:psi-one-derivatives}, the linearity of the dilation and \Cref{lem:psi-one}.
+\end{proof}
+
+\paragraph{The derivative families.}
+
+\begin{definition}[Derivative families]
+\label{def:derivative-family}
+\lean{Rd.derivFamily, Rd.derivKernelBound}
+\leanok
+\uses{lem:derivative-kernel, def:uniform-schwartz}
+For every $m \in \N$, every multi-index $\alpha$ and every $j \in \N$ let
+$\theta^\alpha_j = (\eta_\alpha)_{2^j}$, and for all $k, l \in \N$ let
+$A^\alpha_{k,l} = \sup_x \|x\|^k \|D^l \eta_\alpha(x)\|$.
+\end{definition}
+
+\begin{lemma}[Frequencies of the derivative families]
+\label{lem:derivative-family-frequency}
+\lean{Rd.fourier_derivFamily, Rd.enorm_fourier_derivFamily_le}
+\leanok
+\uses{def:derivative-family, lem:fourier-dilate, lem:derivative-kernel, lem:psi-one,
+  lem:derivative-symbol}
+For every $m \in \N$, every multi-index $\alpha$, every $j \in \N$ and every $\xi \in V$,
+\[
+  \widehat{\theta^\alpha_j}(\xi) = \sigma_\alpha(2^{-j} \xi) \, \widehat{\psi_{j+1}}(\xi)
+  \quad \text{and} \quad
+  |\widehat{\theta^\alpha_j}(\xi)| \leq |\widehat{\psi_{j+1}}(\xi)| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The identity follows from \Cref{lem:fourier-dilate}, \Cref{lem:derivative-kernel} and
+\Cref{lem:psi-one}. Where $\widehat{\psi_{j+1}}(\xi) = \widehat{\psi_1}(2^{-j} \xi) \neq 0$,
+$\|2^{-j} \xi\| > 1$ (\Cref{lem:psi-one}), so $|\sigma_\alpha(2^{-j} \xi)| \leq 1$
+(\Cref{lem:derivative-symbol}).
+\end{proof}
+
+\begin{theorem}[The derivative families form Calder\'on--Zygmund families]
+\label{thm:cz-family-derivative}
+\lean{Rd.tsum_fourier_derivFamily_sq_le, Rd.isUniformSchwartz_derivKernel,
+  Rd.isCZFamily_derivFamily}
+\leanok
+\uses{lem:derivative-family-frequency, thm:cz-family-psi, def:derivative-family,
+  lem:uniform-schwartz-constants, thm:cz-family-dilation, def:hormander-const}
+For every $m \in \N$, every multi-index $\alpha$ and every $\xi \in V$,
+$\sum_j |\widehat{\theta^\alpha_j}(\xi)|^2 \leq 2$. The constant family $(\eta_\alpha)_j$ is
+uniformly Schwartz with bounds $A^\alpha$, and $(\theta^\alpha_j)_j$ is a Calder\'on--Zygmund
+family with overlap $2$ and H\"ormander constant $4 H_{A^\alpha}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:derivative-family-frequency},
+$\sum_j |\widehat{\theta^\alpha_j}(\xi)|^2 \leq \sum_j |\widehat{\psi_{j+1}}(\xi)|^2 \leq 2$
+(\Cref{thm:cz-family-psi}). The bounds are the seminorms of $\eta_\alpha$ themselves
+(\Cref{lem:uniform-schwartz-constants}), and \Cref{thm:cz-family-dilation} gives the rest.
+\end{proof}
+
+\paragraph{The dual derivative families.}
+
+\begin{definition}[Dual derivative families]
+\label{def:dual-derivative-family}
+\lean{Rd.derivDualBase, Rd.derivDualFamily, Rd.derivDualBound, Rd.derivDualOverlap,
+  Rd.derivDualOverlap_ne_top}
+\leanok
+\uses{def:psi-dual, def:schwartz-dilate}
+For every $k \in \N$, all $w \in V^k$ and every $j \in \N$ let
+$\tilde G^w_j = \partial^w \tilde G_j$ and $\tilde\theta^w_j = (\tilde G^w_j)_{2^j}$. For all
+$a, l \in \N$ let $\tilde A^w_{a,l}$ be the larger of the seminorms
+$\sup_x \|x\|^a \|D^l \tilde G^w_0(x)\|$ and $\sup_x \|x\|^a \|D^l \tilde G^w_2(x)\|$, and let
+\[
+  B_w = 4 \Bigl( (8\pi)^k \prod_{l < k} \|w_l\| \Bigr)^2 ,
+\]
+which is finite.
+\end{definition}
+
+\begin{lemma}[Derivatives of the synthesis kernels]
+\label{lem:psi-dual-derivatives}
+\lean{Rd.psiDualS, Rd.coe_psiDualS, Rd.iteratedLineDerivOp_psiDualS,
+  Rd.isUniformSchwartz_derivDualBase}
+\leanok
+\uses{def:dual-derivative-family, lem:psi-dual-basic, lem:derivative-dilate,
+  lem:uniform-schwartz-constants}
+For every $j \in \N$, the synthesis kernel $\tilde\psi_j$ is the Schwartz function
+$(\tilde G_j)_{2^j}$. For every $k \in \N$, all $w \in V^k$ and every $j \in \N$,
+\[
+  \partial^w \tilde\psi_j = 2^{jk} \, \tilde\theta^w_j ,
+\]
+and $(\tilde G^w_j)_j$ is uniformly Schwartz with bounds $\tilde A^w$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\tilde\psi_j = (\tilde G_j)_{2^j}$ (\Cref{lem:psi-dual-basic}), and \Cref{lem:derivative-dilate}
+with $c = 2^j$ gives the identity. The family $(\tilde G^w_j)_j$ takes the two values
+$\tilde G^w_0$ and $\tilde G^w_2$ (\Cref{lem:uniform-schwartz-constants}).
+\end{proof}
+
+\begin{lemma}[Frequencies of the dual derivative families]
+\label{lem:dual-derivative-frequency}
+\lean{Rd.fourier_derivDualFamily, Rd.enorm_prod_inner_le, Rd.enorm_fourier_derivDualFamily_le}
+\leanok
+\uses{def:dual-derivative-family, lem:fourier-dilate, lem:fourier-iterated-derivative,
+  lem:psi-dual-basic, lem:psi-dual-frequency}
+Let $k \in \N$ and $w \in V^k$. For every real $R$ and every $\zeta \in V$ with
+$\|\zeta\| \leq R$,
+$|\prod_{l < k} 2\pi i \langle \zeta, w_l \rangle| \leq (2\pi R)^k \prod_{l < k} \|w_l\|$. For every
+$j \in \N$ and every $\xi \in V$,
+\[
+  \widehat{\tilde\theta^w_j}(\xi) = \Bigl( \prod_{l < k} 2\pi i \langle 2^{-j} \xi, w_l \rangle
+  \Bigr) \widehat{\tilde\psi_j}(\xi)
+\]
+and
+\[
+  |\widehat{\tilde\theta^w_j}(\xi)| \leq (8\pi)^k \Bigl( \prod_{l < k} \|w_l\| \Bigr)
+  |\widehat{\tilde\psi_j}(\xi)| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first bound is the Cauchy--Schwarz inequality
+$|\langle \zeta, w_l \rangle| \leq \|\zeta\| \|w_l\|$. The identity follows from
+\Cref{lem:fourier-dilate}, \Cref{lem:fourier-iterated-derivative} and
+$\tilde\psi_j = (\tilde G_j)_{2^j}$ (\Cref{lem:psi-dual-basic}). Where
+$\widehat{\tilde\psi_j}(\xi) \neq 0$, $\|\xi\| < 2^{j+2}$ (\Cref{lem:psi-dual-frequency}), so
+$\|2^{-j} \xi\| < 4$ and the first bound with $R = 4$ applies.
+\end{proof}
+
+\begin{theorem}[The dual derivative families form Calder\'on--Zygmund families]
+\label{thm:cz-family-dual-derivative}
+\lean{Rd.tsum_fourier_derivDualFamily_sq_le, Rd.isCZFamily_derivDualFamily}
+\leanok
+\uses{lem:dual-derivative-frequency, thm:cz-family-psi-dual, lem:psi-dual-derivatives,
+  thm:cz-family-dilation, def:hormander-const}
+For every $k \in \N$, all $w \in V^k$ and every $\xi \in V$,
+$\sum_j |\widehat{\tilde\theta^w_j}(\xi)|^2 \leq B_w$, and $(\tilde\theta^w_j)_j$ is a
+Calder\'on--Zygmund family with overlap $B_w$ and H\"ormander constant $4 H_{\tilde A^w}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:dual-derivative-frequency},
+$\sum_j |\widehat{\tilde\theta^w_j}(\xi)|^2 \leq ((8\pi)^k \prod_l \|w_l\|)^2
+\sum_j |\widehat{\tilde\psi_j}(\xi)|^2$, and the last sum is at most $4$
+(\Cref{thm:cz-family-psi-dual}). \Cref{thm:cz-family-dilation} and
+\Cref{lem:psi-dual-derivatives} give the rest.
 \end{proof}
 
 \chapter{Besov spaces on compact manifolds}

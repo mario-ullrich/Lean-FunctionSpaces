@@ -27,7 +27,9 @@ Littlewood–Paley kernels are `Φ_k = δ_{2^k} Φ`.
 * **The dyadic sum** `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4` for `a ∈ [0, ∞]`
   (`ENNReal.tsum_min_two_pow_le`).
 * **Schwartz forms of dilation, reflection and conjugation** (`Rd.schwartzDilate`,
-  `Rd.schwartzReflect`, `Rd.schwartzConj`).
+  `Rd.schwartzReflect`, `Rd.schwartzConj`), with the chain rule
+  `∂_{w_0} ⋯ ∂_{w_{k-1}} (G_c) = c^k (∂_{w_0} ⋯ ∂_{w_{k-1}} G)_c` for dilations
+  (`Rd.iteratedLineDerivOp_schwartzDilate`).
 * **One dilate** (`Rd.setLIntegral_enorm_dilate_sub_le_min`): the Hörmander integral of
   `G_{2^j}` is at most `H_G min(2^j ‖y‖, (2^j ‖y‖)⁻¹)` with the explicit `H_G`
   (`Rd.hormanderConst`): for short steps the `L_1` norm of the difference is at most the step
@@ -138,6 +140,36 @@ theorem coe_schwartzDilate (c : ℝ) (hc : c ≠ 0) (G : 𝓢(V, ℂ)) :
   funext x
   simp [schwartzDilate, dilate, Units.smul_def]
 
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- The dilation of Schwartz functions is additive: `(∑_i G_i)_c = ∑_i (G_i)_c`. -/
+theorem schwartzDilate_sum {ι : Type*} (s : Finset ι) (c : ℝ) (hc : c ≠ 0) (G : ι → 𝓢(V, ℂ)) :
+    schwartzDilate c hc (∑ i ∈ s, G i) = ∑ i ∈ s, schwartzDilate c hc (G i) := by
+  simp only [schwartzDilate, map_sum, Finset.smul_sum]
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **The chain rule for dilations**: `∂_v (G_c) = c (∂_v G)_c` for every Schwartz function `G`
+and every `c ≠ 0`, from Mathlib's `SchwartzMap.lineDerivOp_compCLMOfContinuousLinearEquiv` and
+`∂_{c v} = c ∂_v`. -/
+theorem lineDerivOp_schwartzDilate (c : ℝ) (hc : c ≠ 0) (G : 𝓢(V, ℂ)) (v : V) :
+    ∂_{v} (schwartzDilate c hc G) = (c : ℂ) • schwartzDilate c hc (∂_{v} G) := by
+  unfold schwartzDilate
+  rw [LineDeriv.lineDerivOp_smul, SchwartzMap.lineDerivOp_compCLMOfContinuousLinearEquiv,
+    show (ContinuousLinearEquiv.smulLeft (R₁ := ℝ) (Units.mk0 c hc)) v = c • v from rfl,
+    LineDeriv.lineDerivOp_left_smul, smul_comm]
+  congr 1
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **Iterated derivatives of dilations**: for directions `w ∈ V^k`,
+`∂_{w_0} ⋯ ∂_{w_{k-1}} (G_c) = c^k (∂_{w_0} ⋯ ∂_{w_{k-1}} G)_c`. -/
+theorem iteratedLineDerivOp_schwartzDilate (c : ℝ) (hc : c ≠ 0) (G : 𝓢(V, ℂ)) {k : ℕ}
+    (w : Fin k → V) :
+    ∂^{w} (schwartzDilate c hc G) = ((c : ℂ) ^ k) • schwartzDilate c hc (∂^{w} G) := by
+  induction k with
+  | zero => simp
+  | succ k ih =>
+    rw [LineDeriv.iteratedLineDerivOp_succ_left, ih, LineDeriv.lineDerivOp_smul,
+      lineDerivOp_schwartzDilate, smul_smul, ← pow_succ, ← LineDeriv.iteratedLineDerivOp_succ_left]
+
 /-- The **reflection of a Schwartz function**, `x ↦ G(-x)`. -/
 noncomputable def schwartzReflect (G : 𝓢(V, ℂ)) : 𝓢(V, ℂ) :=
   SchwartzMap.compCLMOfContinuousLinearEquiv ℂ (ContinuousLinearEquiv.neg ℝ) G
@@ -199,6 +231,12 @@ theorem IsUniformSchwartz.of_forall_eq_or_eq {G : ℕ → 𝓢(V, ℂ)} {G₀ G�
   rcases h j with hj | hj <;> rw [hj]
   · exact le_max_left _ _
   · exact le_max_right _ _
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- A constant family `j ↦ G` is uniformly Schwartz, with the seminorms of `G` as bounds. -/
+theorem IsUniformSchwartz.const (G : 𝓢(V, ℂ)) :
+    IsUniformSchwartz (fun _ => G) fun k l => SchwartzMap.seminorm ℝ k l G :=
+  fun _ _ _ => le_rfl
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- A family taking its values in a finite nonempty set `s` of Schwartz functions is uniformly
