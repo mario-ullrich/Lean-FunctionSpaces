@@ -145,7 +145,8 @@ BLOCKS: list[tuple[str, list]] = [
         (SOB, ["Derivative kernels", "Sobolev spaces as Triebel--Lizorkin spaces",
                "Sobolev embeddings"])]),
     ("Bessel potential spaces", [
-        (SOB, ["Uniform Schwartz families and the Bessel kernels"])]),
+        (SOB, ["Uniform Schwartz families and the Bessel kernels",
+               "Bessel potential spaces as Triebel--Lizorkin spaces"])]),
 ]
 
 # Columns of blocks: in each list, every block is placed below the one before it. Without

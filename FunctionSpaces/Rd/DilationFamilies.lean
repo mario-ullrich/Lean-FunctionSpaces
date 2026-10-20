@@ -39,7 +39,9 @@ Littlewood–Paley kernels are `Φ_k = δ_{2^k} Φ`.
 * **Uniform families**: with the dyadic sum, the Hörmander condition holds for every uniform
   family with `H = 4 H_A` (`Rd.lintegral_lqNorm_sub_le`, `Rd.familyHormanderConst`), and
   `Rd.IsCZFamily.of_dilation`; finitely many members of a uniform family may be changed
-  (`Rd.IsUniformSchwartz.of_forall_ge_eq`).
+  (`Rd.IsUniformSchwartz.of_forall_ge_eq`), also in a Calderón–Zygmund family of dilates
+  (`Rd.IsCZFamily.of_dilation_of_forall_ge_eq`, with `ENNReal.tsum_le_tsum_add_sum_of_forall_ge_eq`
+  for the overlap).
 * **Adjoints**: `θ_j^*(x) = conj θ_j(-x)` has the same overlap and Hörmander constants
   (`Rd.IsCZFamily.adjoint`).
 * **The Littlewood–Paley families**: the blocks `ψ_j` (`Rd.isCZFamily_psi`, overlap `2`) and the
@@ -115,6 +117,20 @@ theorem tsum_min_two_pow_le (a : ℝ≥0∞) : ∑' j : ℕ, min (2 ^ j * a) (2 
   calc _ ≤ 2 + 2 := add_le_add (sum_range_min_two_pow_le fun j hj => Nat.find_min hex hj)
         (tsum_min_two_pow_add_le (Nat.find_spec hex))
     _ = 4 := by norm_num
+
+/-! ### Finitely many changed terms -/
+
+/-- **Finitely many changed terms**: if `u_j = v_j` for every `j ≥ N`, then
+`∑_j u_j ≤ ∑_j v_j + ∑_{i < N} u_i` in `[0, ∞]`. -/
+theorem tsum_le_tsum_add_sum_of_forall_ge_eq {u v : ℕ → ℝ≥0∞} {N : ℕ}
+    (h : ∀ j, N ≤ j → u j = v j) : ∑' j, u j ≤ ∑' j, v j + ∑ i ∈ Finset.range N, u i := by
+  calc ∑' j, u j = ∑ i ∈ Finset.range N, u i + ∑' i, u (i + N) :=
+        (ENNReal.summable (f := fun i => u (i + N))).sum_add_tsum_nat_add'.symm
+    _ = ∑ i ∈ Finset.range N, u i + ∑' i, v (i + N) := by
+        rw [tsum_congr fun i => h _ (Nat.le_add_left N i)]
+    _ ≤ ∑ i ∈ Finset.range N, u i + ∑' j, v j :=
+        add_le_add_right (ENNReal.tsum_comp_le_tsum_of_injective (add_left_injective N) v) _
+    _ = ∑' j, v j + ∑ i ∈ Finset.range N, u i := add_comm _ _
 
 end ENNReal
 
@@ -637,6 +653,35 @@ theorem IsCZFamily.of_dilation {G : ℕ → 𝓢(V, ℂ)} {A : ℕ → ℕ → �
     (by rw [← SchwartzMap.fourier_coe]; exact (𝓕 (G j)).integrable) (by positivity)
   overlap := hB
   hormander := lintegral_lqNorm_sub_le h
+
+/-- The Fourier transform of a dilate of a Schwartz function `G` is bounded by the supremum of
+`𝓕G`: `|𝓕(G_c)(ξ)| ≤ ‖𝓕G‖_{0,0}` for `c > 0` (`Rd.fourier_dilate`). -/
+theorem enorm_fourier_dilate_le (G : 𝓢(V, ℂ)) {c : ℝ} (hc : 0 < c) (ξ : V) :
+    ‖𝓕 (dilate c (G : V → ℂ)) ξ‖ₑ ≤ ENNReal.ofReal (SchwartzMap.seminorm ℝ 0 0 (𝓕 G)) := by
+  rw [fourier_dilate _ hc, ← SchwartzMap.fourier_coe, ← ofReal_norm]
+  exact ENNReal.ofReal_le_ofReal (SchwartzMap.norm_le_seminorm ℝ _ _)
+
+/-- **Dilation families with finitely many exceptional members**: let `(G_j)` be uniformly
+Schwartz with bounds `A` and let its dilates `(G_j)_{2^j}` have the Fourier overlap `B`. If
+`G'_j = G_j` for every `j ≥ N`, then the dilates `(G'_j)_{2^j}` form a Calderón–Zygmund family
+with overlap `B + ∑_{i < N} ‖𝓕G'_i‖_{0,0}²` and Hörmander constant `4 H_{A'}`, where
+`A'_{k,l} = max(A_{k,l}, ∑_{i < N} ‖G'_i‖_{k,l})` (`Rd.IsUniformSchwartz.of_forall_ge_eq`,
+`ENNReal.tsum_le_tsum_add_sum_of_forall_ge_eq`, `Rd.IsCZFamily.of_dilation`). -/
+theorem IsCZFamily.of_dilation_of_forall_ge_eq {G G' : ℕ → 𝓢(V, ℂ)} {A : ℕ → ℕ → ℝ}
+    {B : ℝ≥0∞} (h : IsUniformSchwartz G A)
+    (hB : ∀ ξ, ∑' j, ‖𝓕 (dilate (2 ^ j) (G j : V → ℂ)) ξ‖ₑ ^ 2 ≤ B) {N : ℕ}
+    (hG : ∀ j, N ≤ j → G' j = G j) :
+    IsCZFamily (fun j => dilate (2 ^ j) (G' j : V → ℂ))
+      (B + ∑ i ∈ Finset.range N, ENNReal.ofReal (SchwartzMap.seminorm ℝ 0 0 (𝓕 (G' i))) ^ 2)
+      (4 * familyHormanderConst V fun k l =>
+        max (A k l) (∑ i ∈ Finset.range N, SchwartzMap.seminorm ℝ k l (G' i))) :=
+  IsCZFamily.of_dilation (h.of_forall_ge_eq hG) fun ξ =>
+    (ENNReal.tsum_le_tsum_add_sum_of_forall_ge_eq
+      (v := fun j => ‖𝓕 (dilate (2 ^ j) (G j : V → ℂ)) ξ‖ₑ ^ 2) fun j hj => by
+        rw [hG j hj]).trans
+      (add_le_add (hB ξ) (Finset.sum_le_sum fun i _ => by
+        gcongr
+        exact enorm_fourier_dilate_le _ (by positivity) ξ))
 
 /-! ### The Littlewood–Paley kernels as dilation families -/
 

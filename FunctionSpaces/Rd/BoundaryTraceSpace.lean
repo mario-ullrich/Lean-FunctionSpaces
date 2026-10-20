@@ -53,7 +53,7 @@ open scoped ENNReal SchwartzMap BesselPotentialSpace InnerProductSpace
 open TemperedDistribution (besselPotential)
 open ENNReal (lqNorm dyadicWeight)
 
-/-! ### Two facts on dyadic weights and on Bessel potential spaces -/
+/-! ### A sum of dyadic weights -/
 
 namespace ENNReal
 
@@ -65,19 +65,6 @@ theorem lqNorm_two_dyadicWeight_neg_half :
   norm_num [ENNReal.tsum_dyadicWeight_neg_one]
 
 end ENNReal
-
-namespace BesselPotentialSpace
-
-variable {E F : Type*} [NormedAddCommGroup E] [NormedAddCommGroup F] [InnerProductSpace ℝ E]
-  [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] [CompleteSpace F] [NormedSpace ℂ F]
-  {s : ℝ} {p : ℝ≥0∞} [Fact (1 ≤ p)]
-
-/-- `‖J_s U‖_p = ‖U‖` in `ℝ≥0∞`, for `U ∈ H^{s,p}(E, F)`: the norm of the Bessel potential space
-is the norm of the `L_p` function `J_s U` (Mathlib's `BesselPotentialSpace.norm_toLp_eq`). -/
-theorem enorm_toLp_eq (U : H^{s, p}(E, F)) : ‖U.toLp‖ₑ = ‖U‖ₑ := by
-  rw [← ofReal_norm, ← ofReal_norm, norm_toLp_eq]
-
-end BesselPotentialSpace
 
 namespace Rd
 

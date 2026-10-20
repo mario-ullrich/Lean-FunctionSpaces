@@ -53,14 +53,6 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 
 /-! ### The Bessel potential on Schwartz functions -/
 
-/-- **The transpose form of `J_t`**: `J_t u(x) = 𝓕(⟨ξ⟩^t 𝓕⁻u)(x)`, since the weight is even and
-`𝓕⁻ h(x) = 𝓕 h(-x)` (Mathlib's `Real.fourierInv_eq_fourier_comp_neg`). -/
-theorem besselSchwartz_apply_eq_fourier (t : ℝ) (u : 𝓢(V, ℂ)) (x : V) :
-    besselSchwartz t u x = 𝓕 (fun ξ => (besselWeight t ξ : ℂ) * 𝓕⁻ (u : V → ℂ) ξ) x := by
-  rw [besselSchwartz_apply, Real.fourierInv_eq_fourier_comp_neg]
-  refine congrFun (congrArg _ (funext fun ξ => ?_)) x
-  rw [Real.fourierInv_eq_fourier_neg, besselWeight, besselWeight, norm_neg]
-
 /-- **`J_t` keeps real functions real**: for a Schwartz function `u` with real values,
 `conj (J_t u(x)) = J_t u(x)` (`Rd.conj_fourierInv_apply`, `Rd.conj_fourier_apply`,
 `Rd.besselSchwartz_apply_eq_fourier`). -/
@@ -80,20 +72,12 @@ theorem conj_testSchwartz {Ω : Opens V} (φ : 𝓓(Ω, ℝ)) (x : V) :
   simp
 
 /-- **The Bessel potential of an `L_2` function at a Schwartz function**: for `g ∈ L_2(V)` and a
-Schwartz function `u`, `(J_t g)(u) = ∫ J_t u · g`. Mathlib's `J_t` acts on distributions by
-`(J_t g)(u) = g(𝓕(⟨ξ⟩^t 𝓕⁻u))`, and `𝓕(⟨ξ⟩^t 𝓕⁻u) = J_t u`
-(`Rd.besselSchwartz_apply_eq_fourier`). -/
+Schwartz function `u`, `(J_t g)(u) = ∫ J_t u · g`, since Mathlib's `J_t` acts by the transpose
+(`Rd.besselPotential_apply_apply`). -/
 theorem besselPotential_toLp_apply (t : ℝ) (g : Lp ℂ 2 (volume : Measure V)) (u : 𝓢(V, ℂ)) :
     besselPotential V ℂ t (g : 𝓢'(V, ℂ)) u = ∫ x, besselSchwartz t u x * g x := by
-  have hJ : besselPotential V ℂ t =
-      TemperedDistribution.fourierMultiplierCLM ℂ fun ξ => (besselWeight t ξ : ℂ) :=
-    rfl
-  rw [hJ, TemperedDistribution.fourierMultiplierCLM_apply_apply, Lp.toTemperedDistribution_apply]
-  refine integral_congr_ae (Eventually.of_forall fun x => ?_)
-  dsimp only
-  rw [smul_eq_mul, besselSchwartz_apply_eq_fourier, SchwartzMap.fourier_coe,
-    SchwartzMap.smulLeftCLM_apply (hasTemperateGrowth_besselWeight t), SchwartzMap.fourierInv_coe]
-  rfl
+  rw [besselPotential_apply_apply, Lp.toTemperedDistribution_apply]
+  simp only [smul_eq_mul]
 
 /-- **`J_t` of a real Schwartz function against `L_2`**: for a Schwartz function `u` with real
 values and `g ∈ L_2(V)`, `⟪J_t u, g⟫_{L_2} = (J_t g)(u)`: the inner product is
@@ -118,8 +102,7 @@ theorem inner_toLp_toLp {t : ℝ} (U W : H^{t}(V)) : ⟪U.toLp, W.toLp⟫_ℂ = 
 
 /-- **The `L_2` function of a Schwartz function in `H^t(V)`**: for a Schwartz function `u`, the
 element `u ∈ H^t(V)` (Mathlib's `SchwartzMap.memSobolev`) has `J_t u` as its `L_2` function, since
-`L_2` functions are determined by their distributions (Mathlib's
-`Lp.ker_toTemperedDistributionCLM_eq_bot`). -/
+`L_2` functions are determined by their distributions (`Rd.eq_of_toTemperedDistribution_eq`). -/
 theorem toLp_schwartz (t : ℝ) (u : 𝓢(V, ℂ)) :
     (u.memSobolev (s := t) (p := 2)).toBesselPotentialSpace.toLp =
       (besselSchwartz t u).toLp 2 := by
@@ -129,8 +112,7 @@ theorem toLp_schwartz (t : ℝ) (u : 𝓢(V, ℂ)) :
     rw [← BesselPotentialSpace.bessel_toDistr_eq_toLp,
       TemperedDistribution.MemSobolev.toBesselPotentialSpace_toDistr, besselPotential_schwartz,
       Lp.toTemperedDistribution_toLp_eq]
-  exact LinearMap.ker_eq_bot.1 (Lp.ker_toTemperedDistributionCLM_eq_bot (F := ℂ)
-    (μ := (volume : Measure V)) (p := 2)) h
+  exact eq_of_toTemperedDistribution_eq h
 
 /-- The `L_2` function of a test function `φ` in `H^t(V)` is `J_t φ` (`Rd.toLp_schwartz`). -/
 theorem toLp_ofTest {Ω : Opens V} (t : ℝ) (φ : 𝓓(Ω, ℝ)) :

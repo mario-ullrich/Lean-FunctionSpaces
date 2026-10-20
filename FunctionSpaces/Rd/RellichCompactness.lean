@@ -183,12 +183,11 @@ theorem toTemperedDistribution_toL2 (F : H^{1, 2}(V, ℂ)) :
   rfl
 
 /-- An `L_2` function `f` is `toL2 F` as soon as its tempered distribution is `F.toDistr`:
-`L_2` functions are determined by their distributions (Mathlib's
-`Lp.ker_toTemperedDistributionCLM_eq_bot`). -/
+`L_2` functions are determined by their distributions (`Rd.eq_of_toTemperedDistribution_eq`).
+-/
 theorem toL2_eq_of_toDistr_eq (F : H^{1, 2}(V, ℂ)) {f : Lp ℂ 2 (volume : Measure V)}
     (hf : (f : 𝓢'(V, ℂ)) = F.toDistr) : toL2 F = f :=
-  LinearMap.ker_eq_bot.1 (Lp.ker_toTemperedDistributionCLM_eq_bot (F := ℂ)
-    (μ := (volume : Measure V)) (p := 2)) ((toTemperedDistribution_toL2 F).trans hf.symm)
+  eq_of_toTemperedDistribution_eq ((toTemperedDistribution_toL2 F).trans hf.symm)
 
 /-- **`‖F‖_2 ≤ ‖F‖_{H^1}`**: by Plancherel, `‖toL2 F‖_2 = ‖⟨ξ⟩⁻¹ 𝓕(J_1 F)‖_2 ≤ ‖𝓕(J_1 F)‖_2`
 (`Rd.norm_besselInvMul_le_one`), and `‖𝓕(J_1 F)‖_2 = ‖F‖_{H^1}` (Mathlib's

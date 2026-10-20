@@ -26,7 +26,7 @@ classical Besov space `B^s_{p,q}(ℝ^d)` consists of the `f ∈ L_p(ℝ^d)` with
 ```
 
 Sobolev spaces appear as `W^m_p` through weak derivatives on open subsets of `ℝ^d` and as `W^m_2`
-on the torus, as `H^s` through Mathlib's Bessel potentials on `ℝ^d` and through Fourier
+on the torus, as `H^{s,p}` through Mathlib's Bessel potentials on `ℝ^d`, as `H^s` through Fourier
 coefficients on the torus, and abstractly as every space with Jackson's and Bernstein's
 inequalities of order `s`, the form in which their embeddings are proved.
 
@@ -307,6 +307,21 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `W^m_2 = B^m_{2,2}` for `m ≥ 1` (`Rd.memSobolev_two_iff_memApprox`).
   The proof writes the blocks through the weak derivatives and back, with the strong type of
   the Calderón–Zygmund families of the derivative kernels.
+* **`H^{s,p} = F^s_{p,2}` and `W^m_p = H^{m,p}`.** Let `dim V ≥ 1` and `1 < p < ∞`, and let
+  `J_s` be Mathlib's Bessel potential, the Fourier multiplier with `(1 + ‖ξ‖²)^{s/2}`; a tempered
+  distribution `f` lies in Mathlib's Bessel potential space `H^{s,p}(V)` iff `J_s f ∈ L_p(V)`.
+  For every real `s` there is `C < ∞` such that for every `f ∈ F^s_{p,2}(V)`, `J_s f` is a
+  function `h ∈ L_p(V)` with `‖h‖_p ≤ C ‖f‖_{F^s_{p,2}}`
+  (`Rd.exists_besselPotential_eq_of_memTriebelLizorkin`). For every real `s ≥ 0` there is
+  `C < ∞` such that every tempered distribution `f` with `J_s f = h ∈ L_p(V)` is a function
+  `g ∈ F^s_{p,2}(V)` with `‖g‖_{F^s_{p,2}} ≤ C ‖h‖_p`
+  (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`). For every real `s`, `f ∈ L_p(V)` lies
+  in `F^s_{p,2}(V)` iff it lies in `H^{s,p}(V)` (`Rd.memTriebelLizorkin_iff_memSobolev_bessel`),
+  and for every `m ∈ ℕ`, `f ∈ W^m_p(V)` iff `f ∈ H^{m,p}(V)`, Calderón's theorem
+  (`Rd.memSobolev_iff_memSobolev_bessel`). The constants are existential: the kernels are the
+  Bessel potentials of the Littlewood–Paley blocks and of their synthesis kernels, which form
+  Calderón–Zygmund families whose Schwartz bounds come from bounded derivatives on a compact
+  annulus and the continuity of the inverse Fourier transform on the Schwartz space.
 * **Sobolev and Besov embeddings on `ℝ^d`.** Let `n = dim V`, `1 ≤ p ≤ r ≤ ∞`, `p < ∞` and
   `1 ≤ q ≤ ∞`. For `s > n(1/p - 1/r)`, every `f ∈ B^s_{p,q}(V)` agrees almost everywhere with
   some `g ∈ L_r(V)` with `‖g‖_r ≤ K_{V,p,r,s} ‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q}`
@@ -379,7 +394,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
 | [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): mixed norms, maximal functions, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, local means, ball means of differences, atoms, the torus | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, `W^m_p = F^m_{p,2}` with the Besov sandwich, and the Sobolev embeddings | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0` and `W^m_p = H^{m,p}` | ✅ | ✗ |
 | [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 
@@ -411,9 +426,9 @@ Sobolev spaces on `ℝ^d` are the files `SchwartzCutoff`, `WeakDerivatives`,
 `SobolevRestrictionSpaces`, `SobolevDuality`, `BoundaryTraceSpace`, `LipschitzGraphArea`,
 `SurfaceMeasure`, `DilationFamilies`, `ConvolutionAdjoint`, `PlancherelBounds`,
 `CalderonZygmundSigned`, `VectorValuedWeakType`, `VectorValuedSingularIntegrals`,
-`SquareFunction`, `DerivativeKernels`, `SobolevTriebelLizorkin` and `SobolevEmbedding` in
-`FunctionSpaces/Rd/`, with `WeakType`, `LayerCake`, `Marcinkiewicz` and `NormingFamily` in
-`FunctionSpaces/Lp/`.
+`SquareFunction`, `DerivativeKernels`, `SobolevTriebelLizorkin`, `SobolevEmbedding`,
+`UniformSchwartzFamilies` and `BesselPotentialLifting` in `FunctionSpaces/Rd/`, with
+`WeakType`, `LayerCake`, `Marcinkiewicz` and `NormingFamily` in `FunctionSpaces/Lp/`.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 [docs/FEECInterface.md](docs/FEECInterface.md) describes the interface to a FEEC/BEEC library
@@ -427,7 +442,6 @@ that library builds itself.
 * **Reiteration** for approximation and interpolation spaces.
 * **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,
   elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.
-* **Bessel potential spaces for all `p`**: `H^s_p = F^s_{p,2}`.
 * **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and their ball means and atoms on the
   torus.
 * **Higher smoothness**: splines on domains; for the Daubechies wavelets the sharp `L_p`

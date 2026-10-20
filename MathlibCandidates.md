@@ -338,6 +338,27 @@ declarations.
   `f : V → ℂ` (`Rd.conj_fourier_apply`, `Rd.conj_fourierInv_apply` in
   `FunctionSpaces/Rd/LittlewoodPaleyKernels.lean`), next to `Real.fourierInv_eq_fourier_neg` in
   `Mathlib/Analysis/Fourier/FourierTransform.lean`.
+* **`H^{s,p} = F^s_{p,2}` and `W^m_p = H^{m,p}`**
+  (`FunctionSpaces/Rd/BesselPotentialLifting.lean`): for `dim V ≥ 1` and `1 < p < ∞`, every
+  `f ∈ F^s_{p,2}(V)` lies in Mathlib's `H^{s,p}(V)` (`TemperedDistribution.MemSobolev s p`,
+  `BesselPotentialSpace`) for every real `s` (`Rd.exists_besselPotential_eq_of_memTriebelLizorkin`),
+  an `f ∈ L_p(V)` lies in `F^s_{p,2}(V)` iff it lies in `H^{s,p}(V)`, for every real `s`
+  (`Rd.memTriebelLizorkin_iff_memSobolev_bessel`), for `s ≥ 0` every element of `H^{s,p}(V)` is
+  an `L_p` function in `F^s_{p,2}(V)` (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`),
+  and `W^m_p(V) = H^{m,p}(V)`, Calderón's theorem (`Rd.memSobolev_iff_memSobolev_bessel`), with
+  existential constants. Mathlib has `H^{s,p}` with `∂_v : H^{s,p} → H^{s-1,p}`
+  (`TemperedDistribution.MemSobolev.lineDerivOp`); this project identifies it with `F^s_{2,2}`
+  for `p = 2` by Plancherel (`FunctionSpaces/Rd/SobolevTwoLittlewoodPaley.lean`), and for all
+  `1 < p < ∞` through its vector-valued singular integrals and Triebel–Lizorkin spaces, so the
+  identity would follow them into Mathlib. Three general facts on Mathlib's Fourier multipliers
+  are short and self-contained: an even multiplier acts on tempered distributions by the
+  transpose, `(m(D) T)(u) = T(m(D) u)` (`Rd.fourierMultiplierCLM_apply_apply_of_even`, in
+  `FunctionSpaces/Rd/SobolevTwoLittlewoodPaley.lean`, with the Bessel case
+  `Rd.besselPotential_apply_apply`), every multiplier commutes with translations of Schwartz
+  functions and an even one with reflections (`Rd.fourierMultiplierCLM_compSubConstCLM`,
+  `Rd.fourierMultiplierCLM_schwartzReflect`, with the Fourier transform of a translate
+  `Rd.fourier_compSubConstCLM_apply`); they belong in
+  `Mathlib/Analysis/Distribution/FourierMultiplier.lean` and next to `SchwartzMap.compSubConstCLM`.
 * **The area formula for Lipschitz graphs** (`FunctionSpaces/Rd/LipschitzGraphArea.lean`):
   Mathlib has the area formula for linear maps, `μHE[dim U] (f '' s) = normDet f · vol(s)`
   (`LinearMap.euclideanHausdorffMeasure_image`,

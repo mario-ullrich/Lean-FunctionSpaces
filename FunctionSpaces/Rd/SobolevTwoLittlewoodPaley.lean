@@ -28,6 +28,10 @@ explicit constants, and proves `W^1_2(V) = H^1(V) = B^1_{2,2}(V)`.
   `‖ψ_j ⋆ f‖_2² = ∫ |𝓕ψ_j|² |𝓕f|²` (`Rd.enorm_lpBlock_sq`).
 * **The Bessel potential on Schwartz functions**: `J_t u = 𝓕⁻(⟨ξ⟩^t 𝓕u)` (`Rd.besselSchwartz`)
   is Mathlib's `J_t` on the tempered distribution of `u` (`Rd.besselPotential_schwartz`).
+  Mathlib's Fourier multiplier of an even temperate symbol `m` acts on tempered distributions by
+  the transpose, `(m(D) T)(u) = T(m(D) u)` (`Rd.fourierMultiplierCLM_apply_apply_of_even`); for
+  the even Bessel weight this is `(J_t T)(u) = T(J_t u)` (`Rd.besselPotential_apply_apply`), so
+  `J_t` is symmetric on Schwartz functions (`Rd.integral_besselSchwartz_mul`).
 * **The weight comparison**: at every frequency at most two blocks are nonzero, and their
   Fourier transforms add up to `1` (`Rd.exists_fourier_psi_window`, in
   `FunctionSpaces.Rd.LittlewoodPaleyKernels`); hence, for `s ≥ 0`,
@@ -48,7 +52,10 @@ explicit constants, and proves `W^1_2(V) = H^1(V) = B^1_{2,2}(V)`.
 Two facts about tempered distributions carry the proofs: the product of a temperate weight `w`
 with the distribution of an `L_p` function `g` is the distribution of `w g` when `w g` lies in
 `L_q` (`Rd.smulLeftCLM_toTemperedDistribution_eq`), and an identity `w g = h` of distributions,
-with `g` and `h` in `L_p` spaces, holds almost everywhere (`Rd.ae_eq_of_smulLeftCLM_eq`).
+with `g` and `h` in `L_p` spaces, holds almost everywhere (`Rd.ae_eq_of_smulLeftCLM_eq`). An
+`L_p` function is determined by its tempered distribution (`Rd.eq_of_toTemperedDistribution_eq`),
+and the norm of Mathlib's `H^{s,p}` is the `L_p` norm of `J_s U`, also in `ℝ≥0∞`
+(`BesselPotentialSpace.enorm_toLp_eq`).
 -/
 
 @[expose] public section
@@ -56,6 +63,19 @@ with `g` and `h` in `L_p` spaces, holds almost everywhere (`Rd.ae_eq_of_smulLeft
 open MeasureTheory Filter Module
 open scoped ENNReal SchwartzMap FourierTransform LineDeriv Real BesselPotentialSpace
 open TemperedDistribution (besselPotential)
+
+namespace BesselPotentialSpace
+
+variable {E F : Type*} [NormedAddCommGroup E] [NormedAddCommGroup F] [InnerProductSpace ℝ E]
+  [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] [CompleteSpace F] [NormedSpace ℂ F]
+  {s : ℝ} {p : ℝ≥0∞} [Fact (1 ≤ p)]
+
+/-- `‖J_s U‖_p = ‖U‖` in `ℝ≥0∞`, for `U ∈ H^{s,p}(E, F)`: the norm of the Bessel potential space
+is the norm of the `L_p` function `J_s U` (Mathlib's `BesselPotentialSpace.norm_toLp_eq`). -/
+theorem enorm_toLp_eq (U : H^{s, p}(E, F)) : ‖U.toLp‖ₑ = ‖U‖ₑ := by
+  rw [← ofReal_norm, ← ofReal_norm, norm_toLp_eq]
+
+end BesselPotentialSpace
 
 namespace Rd
 
@@ -71,21 +91,26 @@ blocks and the band-limited scheme on `L_2`. Its type fixes `p = 2` before the r
 arguments are elaborated. -/
 theorem two_ne_top : (2 : ℝ≥0∞) ≠ ∞ := ENNReal.ofNat_ne_top
 
+/-- `L_p` functions are determined by their tempered distributions (Mathlib's
+`Lp.ker_toTemperedDistributionCLM_eq_bot`). -/
+theorem eq_of_toTemperedDistribution_eq {p : ℝ≥0∞} [Fact (1 ≤ p)]
+    {f g : Lp ℂ p (volume : Measure V)} (h : (f : 𝓢'(V, ℂ)) = g) : f = g :=
+  LinearMap.ker_eq_bot.1 (Lp.ker_toTemperedDistributionCLM_eq_bot (F := ℂ)
+    (μ := (volume : Measure V)) (p := p)) h
+
 /-- **`𝓕(K ⋆ φ) = 𝓕K · 𝓕φ` for Schwartz functions `φ`**, as an identity in `L_2(V)`: the `L_2`
 Fourier transform of `K ⋆ φ` is the product of the bounded function `𝓕K` with the `L_2` Fourier
 transform of `φ`, for every integrable `K`. Both sides are tested against Schwartz functions
-(Mathlib's `Lp.ker_toTemperedDistributionCLM_eq_bot`): `K ⋆ φ` is integrable, so the duality
+(`Rd.eq_of_toTemperedDistribution_eq`): `K ⋆ φ` is integrable, so the duality
 for `𝓕` (the multiplication formula) and the pointwise convolution theorem `Rd.fourier_conv`
 apply. -/
 theorem fourier_convLp_toLp {K : V → ℂ} (hK : Integrable K) (φ : 𝓢(V, ℂ)) :
     𝓕 (convLp two_ne_top hK (φ.toLp 2 (volume : Measure V))) =
       (ContinuousLinearMap.mul ℂ ℂ).holder 2 ((memLp_top_fourier hK).toLp _)
         (𝓕 (φ.toLp 2 (volume : Measure V))) := by
-  apply (LinearMap.ker_eq_bot.1 (Lp.ker_toTemperedDistributionCLM_eq_bot (F := ℂ)
-    (μ := (volume : Measure V)) (p := 2)))
+  apply eq_of_toTemperedDistribution_eq
   ext u
-  simp only [ContinuousLinearMap.coe_coe, Lp.toTemperedDistributionCLM_apply,
-    ← Lp.fourier_toTemperedDistribution_eq, TemperedDistribution.fourier_apply,
+  simp only [← Lp.fourier_toTemperedDistribution_eq, TemperedDistribution.fourier_apply,
     Lp.toTemperedDistribution_apply]
   have hc : Integrable (conv K φ volume) := integrable_conv hK φ.integrable
   have hF : ((𝓕 (φ.toLp 2 (volume : Measure V)) : Lp ℂ 2 (volume : Measure V)) : V → ℂ)
@@ -191,6 +216,11 @@ omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [Bo
 theorem besselWeight_nonneg (s : ℝ) (ξ : V) : 0 ≤ besselWeight s ξ :=
   Real.rpow_nonneg (by positivity) _
 
+omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- The Bessel weight is even: `⟨-ξ⟩^s = ⟨ξ⟩^s`. -/
+theorem besselWeight_neg (s : ℝ) (ξ : V) : besselWeight s (-ξ) = besselWeight s ξ := by
+  rw [besselWeight, besselWeight, norm_neg]
+
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The Bessel weight is smooth with polynomially bounded derivatives, so it multiplies tempered
 distributions. -/
@@ -218,6 +248,67 @@ theorem besselSchwartz_apply (t : ℝ) (u : 𝓢(V, ℂ)) (x : V) :
   rw [besselSchwartz, SchwartzMap.fourierMultiplierCLM_apply, SchwartzMap.fourierInv_coe,
     SchwartzMap.smulLeftCLM_apply (hasTemperateGrowth_besselWeight t), SchwartzMap.fourier_coe]
   rfl
+
+/-- **The transpose form of an even Fourier multiplier**: for an even symbol `m` of temperate
+growth, `m(-ξ) = m(ξ)`, Mathlib's Fourier multiplier `m(D) u = 𝓕⁻(m 𝓕u)` on Schwartz functions
+is also `m(D) u(x) = 𝓕(m 𝓕⁻u)(x)`, since `𝓕⁻ h(x) = 𝓕 h(-x)` (Mathlib's
+`Real.fourierInv_eq_fourier_comp_neg`, `Real.fourierInv_eq_fourier_neg`). -/
+theorem fourierMultiplierCLM_apply_eq_fourier {m : V → ℂ} (hm : m.HasTemperateGrowth)
+    (heven : ∀ ξ, m (-ξ) = m ξ) (u : 𝓢(V, ℂ)) (x : V) :
+    SchwartzMap.fourierMultiplierCLM ℂ m u x = 𝓕 (fun ξ => m ξ * 𝓕⁻ (u : V → ℂ) ξ) x := by
+  rw [SchwartzMap.fourierMultiplierCLM_apply, SchwartzMap.fourierInv_coe,
+    SchwartzMap.smulLeftCLM_apply hm, SchwartzMap.fourier_coe,
+    Real.fourierInv_eq_fourier_comp_neg]
+  refine congrFun (congrArg _ (funext fun ξ => ?_)) x
+  rw [smul_eq_mul, heven, Real.fourierInv_eq_fourier_neg]
+
+/-- **Even Fourier multipliers act by the transpose**: for an even symbol `m` of temperate growth,
+every tempered distribution `T` and every Schwartz function `u`, `(m(D) T)(u) = T(m(D) u)`.
+Mathlib defines `(m(D) T)(u) = T(𝓕(m 𝓕⁻u))`, and `𝓕(m 𝓕⁻u) = m(D) u`
+(`Rd.fourierMultiplierCLM_apply_eq_fourier`). -/
+theorem fourierMultiplierCLM_apply_apply_of_even {m : V → ℂ} (hm : m.HasTemperateGrowth)
+    (heven : ∀ ξ, m (-ξ) = m ξ) (T : 𝓢'(V, ℂ)) (u : 𝓢(V, ℂ)) :
+    TemperedDistribution.fourierMultiplierCLM ℂ m T u =
+      T (SchwartzMap.fourierMultiplierCLM ℂ m u) := by
+  rw [TemperedDistribution.fourierMultiplierCLM_apply_apply]
+  congr 1
+  ext x
+  rw [fourierMultiplierCLM_apply_eq_fourier hm heven, SchwartzMap.fourier_coe,
+    SchwartzMap.smulLeftCLM_apply hm, SchwartzMap.fourierInv_coe]
+  rfl
+
+/-- **The transpose form of `J_t`**: `J_t u(x) = 𝓕(⟨ξ⟩^t 𝓕⁻u)(x)`, since the Bessel weight is
+even (`Rd.besselWeight_neg`, `Rd.fourierMultiplierCLM_apply_eq_fourier`). -/
+theorem besselSchwartz_apply_eq_fourier (t : ℝ) (u : 𝓢(V, ℂ)) (x : V) :
+    besselSchwartz t u x = 𝓕 (fun ξ => (besselWeight t ξ : ℂ) * 𝓕⁻ (u : V → ℂ) ξ) x :=
+  fourierMultiplierCLM_apply_eq_fourier (hasTemperateGrowth_besselWeight t)
+    (fun ξ => by rw [besselWeight_neg]) u x
+
+/-- **Mathlib's Bessel potential acts by the transpose**: for every tempered distribution `T`
+and every Schwartz function `u`, `(J_t T)(u) = T(J_t u)`, since the Bessel weight is even
+(`Rd.besselWeight_neg`, `Rd.fourierMultiplierCLM_apply_apply_of_even`). -/
+theorem besselPotential_apply_apply (t : ℝ) (T : 𝓢'(V, ℂ)) (u : 𝓢(V, ℂ)) :
+    besselPotential V ℂ t T u = T (besselSchwartz t u) :=
+  fourierMultiplierCLM_apply_apply_of_even (hasTemperateGrowth_besselWeight t)
+    (fun ξ => by rw [besselWeight_neg]) T u
+
+/-- **`J_t` is symmetric on Schwartz functions**: `∫ J_t φ · u = ∫ φ · J_t u` for Schwartz
+functions `φ`, `u`. Both sides are `(J_t φ)(u)` for the tempered distribution of `φ`
+(`Rd.besselPotential_apply_apply`, `Rd.besselPotential_schwartz`). -/
+theorem integral_besselSchwartz_mul (t : ℝ) (φ u : 𝓢(V, ℂ)) :
+    ∫ x, besselSchwartz t φ x * u x = ∫ x, φ x * besselSchwartz t u x := by
+  have h := besselPotential_apply_apply t (φ : 𝓢'(V, ℂ)) u
+  rw [besselPotential_schwartz, SchwartzMap.coe_apply, SchwartzMap.coe_apply] at h
+  simp only [smul_eq_mul] at h
+  calc ∫ x, besselSchwartz t φ x * u x = ∫ x, u x * besselSchwartz t φ x := by
+        congr 1
+        funext x
+        ring
+    _ = ∫ x, besselSchwartz t u x * φ x := h
+    _ = ∫ x, φ x * besselSchwartz t u x := by
+        congr 1
+        funext x
+        ring
 
 omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The Bessel weight as a complex number has absolute value `⟨ξ⟩^s`. -/
@@ -559,7 +650,7 @@ theorem exists_eq_toDistr_two {s : ℝ} (hs : 0 ≤ s) (F : H^{s}(V)) :
     F.bessel_toDistr_eq_toLp
   have hb := triebelLizorkinNorm_le_of_besselPotential_eq hs (f := f)
     (hf ▸ F.bessel_toDistr_eq_toLp)
-  rw [← ofReal_norm F.toLp, BesselPotentialSpace.norm_toLp_eq, ofReal_norm] at hb
+  rw [BesselPotentialSpace.enorm_toLp_eq] at hb
   exact ⟨f, hf, hb.trans_lt (ENNReal.mul_lt_top (by finiteness) enorm_lt_top), hb⟩
 
 /-! ### `W^1_2 = H^1` -/
@@ -751,14 +842,12 @@ theorem sq_norm_besselPotential_one_eq {ι : Type*} [Fintype ι] (b : Orthonorma
 approximation space `A^1_2` of the band-limited functions, the Besov space `B^1_{2,2}(V)`. This
 combines `W^1_2 = H^1` (`Rd.memSobolev_one_iff`) and `H^1 = B^1_{2,2}`
 (`Rd.memSobolev_two_iff_exists_memApprox`); an `L_2` function is determined by its tempered
-distribution (Mathlib's `Lp.ker_toTemperedDistributionCLM_eq_bot`). -/
+distribution (`Rd.eq_of_toTemperedDistribution_eq`). -/
 theorem memSobolev_one_iff_memApprox (F : Lp ℂ 2 (volume : Measure V)) :
     MemSobolev 1 F ↔ (bandScheme two_ne_top).MemApprox 1 2 F := by
   rw [memSobolev_one_iff, memSobolev_two_iff_exists_memApprox one_pos]
   refine ⟨fun ⟨f, hf, hfa⟩ => ?_, fun h => ⟨F, rfl, h⟩⟩
-  have hfF : f = F := LinearMap.ker_eq_bot.1 (Lp.ker_toTemperedDistributionCLM_eq_bot (F := ℂ)
-    (μ := (volume : Measure V)) (p := 2)) hf
-  rwa [← hfF]
+  rwa [← eq_of_toTemperedDistribution_eq hf]
 
 /-- **`W^1_2 = B^1_{2,2}` by differences**: for every order `r ≥ 2`, `F ∈ L_2(V)` lies in
 `W^1_2(V)` iff `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2} < ∞`

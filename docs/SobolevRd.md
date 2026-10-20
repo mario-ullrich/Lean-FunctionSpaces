@@ -44,7 +44,9 @@ For the Bessel potential spaces, uniform Schwartz families stay uniform under co
 maps of the Schwartz space, and the Bessel potential maps the dilates of every Schwartz function
 to multiples of the dilates of its Bessel kernels; when the Fourier transform of the function
 lives in an annulus, the Bessel kernels form a uniform Schwartz family and their dilates a
-Calderón–Zygmund family.
+Calderón–Zygmund family. Applied to the Littlewood–Paley blocks and their synthesis kernels, this
+gives, for `1 < p < ∞` and with existential constants, `H^{s,p} ∩ L_p = F^s_{p,2}` for every
+real `s`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, and Calderón's theorem `W^m_p = H^{m,p}`.
 The [interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
 built on this project, with the decisions behind their form.
 
@@ -415,6 +417,25 @@ built on this project, with the decisions behind their form.
   of `δ_2 Φ - δ_{1/4} Φ` vanish outside such annuli
   (`Rd.mem_annulus_of_fourier_psiOneS_ne_zero`, `Rd.mem_annulus_of_fourier_psiBase_ne_zero`,
   `Rd.mem_annulus_of_fourier_psiDualBase_ne_zero`).
+* **Bessel potential spaces `H^{s,p} = F^s_{p,2}`.** Let `V` have dimension `n ≥ 1`,
+  `1 < p < ∞`, and let `J_s` be Mathlib's Bessel potential, the Fourier multiplier with
+  `⟨ξ⟩^s = (1 + ‖ξ‖²)^{s/2}`; a tempered distribution `f` lies in Mathlib's Bessel potential
+  space `H^{s,p}(V)` iff `J_s f ∈ L_p(V)` (`TemperedDistribution.MemSobolev`). For every real `s`
+  there is a finite `C` such that for every `f ∈ F^s_{p,2}(V)`, `J_s f` is an `L_p` function `h`
+  with `‖h‖_p ≤ C ‖f‖_{F^s_{p,2}}` (`Rd.exists_besselPotential_eq_of_memTriebelLizorkin`; for
+  Mathlib's bundled space `Rd.exists_enorm_toBesselPotentialSpace_le`), and a
+  finite `C` such that `‖g‖_{F^s_{p,2}} ≤ C ‖J_s g‖_p` for every `g ∈ L_p(V)` with
+  `J_s g ∈ L_p(V)` (`Rd.exists_triebelLizorkinNorm_le_of_besselPotential_eq`). Hence, for every
+  real `s`, `f ∈ L_p(V)` lies in `F^s_{p,2}(V)` iff it lies in `H^{s,p}(V)`
+  (`Rd.memTriebelLizorkin_iff_memSobolev_bessel`). For `s ≥ 0` there
+  is a finite `C` such that every tempered distribution `f` with `J_s f = h ∈ L_p(V)` is an `L_p`
+  function `g ∈ F^s_{p,2}(V)` with `‖g‖_{F^s_{p,2}} ≤ C ‖h‖_p`
+  (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`; for Mathlib's bundled space
+  `Rd.exists_memTriebelLizorkin_toDistr`), and `W^m_p(V) = H^{m,p}(V)` for every `m ∈ ℕ`
+  (Calderón; `Rd.memSobolev_iff_memSobolev_bessel`). The constants are existential.
+  The kernels are the Bessel potentials of the blocks and of the synthesis kernels, dilates of
+  Bessel kernels up to `2^{±js}` (`Rd.besselBase`), which form Calderón–Zygmund families
+  (`Rd.exists_isCZFamily_besselBase_psiBase`, `Rd.exists_isCZFamily_besselBase_psiDualBase`).
 
 ## What is formalised
 
@@ -424,7 +445,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 |---|---|---|---|
 | Test functions as Schwartz functions, commuting directional derivatives, the transpose formula for distributions and tempered distributions; cut-offs of Schwartz functions converge in the Schwartz space (smooth compactly supported functions are dense), tempered distributions determined by test functions | ✅ | ✗ | `Rd/SchwartzCutoff` |
 | Weak derivatives and Sobolev spaces on open sets, integration by parts, uniqueness, locality, finite sums, limits; the bridge to tempered distributions | ✅ | ✗ | `Rd/WeakDerivatives` |
-| The convolution theorem and Plancherel for a convolution on `L_2`, the Bessel potential on Schwartz functions, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/SobolevTwoLittlewoodPaley` |
+| The convolution theorem and Plancherel for a convolution on `L_2`, the Bessel potential on Schwartz functions, even Fourier multipliers acting by the transpose, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/SobolevTwoLittlewoodPaley` |
 | `H^1` on bounded Lipschitz domains as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the weak gradient, and the trace space `B^{1/2}_{2,2}` of the boundary | ✅ | ✗ | `Rd/LipschitzDomainH1` |
 | The inverse Fourier transform of integrable `L_2` functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, and Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω` | ✅ | ✗ | `Rd/RellichCompactness` |
 | The Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets inside Mathlib's `H^s(ℝ^d)`, `H^s(Ω)` as a quotient, Rellich's theorem for `H^1(Ω)`, the identification with the restriction space of a bounded Lipschitz domain, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)` | ✅ | ✗ | `Rd/SobolevRestrictionSpaces` |
@@ -432,7 +453,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` with explicit constants, the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the trace kernel, the trace space `H^{1/2}(Γ)` with trace and extension operators, `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` | ✅ | ✗ | `Rd/BoundaryTraceSpace` |
 | The area formula for Lipschitz graphs: Lipschitz maps and Mathlib's Euclidean Hausdorff measure, the linear case by Mathlib's norm determinant, stretches and tilts, the gradient and the Gram density, good pieces, `μHE[n-1](γ(A)) = ∫_A √(1 + ‖∇φ‖²)` with `n = dim V` in set, measure and integral form; the outward unit normal | ✅ | ✗ | `Rd/LipschitzGraphArea` |
 | The surface measure of a bounded Lipschitz domain as `μHE[n-1]` on the boundary, its chart form, finiteness and null sets, the boundary `Γ` as a Lebesgue null set, the boundary trace in `L_p(Γ)`, `L_2(Γ)` with the traces of `H^1(Ω)` and `H^{1/2}(Γ)`, and the outward unit normal field | ✅ | ✗ | `Rd/SurfaceMeasure` |
-| Dilation, reflection and conjugation of Schwartz functions, derivatives of dilations, uniform Schwartz families and finitely many exceptions in them, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families and their adjoints, the Littlewood–Paley blocks and the synthesis kernels as such families | ✅ | ✗ | `Rd/DilationFamilies` |
+| Dilation, reflection and conjugation of Schwartz functions, derivatives of dilations, uniform Schwartz families and finitely many exceptions in them, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families, also with finitely many exceptional members, and their adjoints, the Littlewood–Paley blocks and the synthesis kernels as such families | ✅ | ✗ | `Rd/DilationFamilies` |
 | The adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for `f ∈ L_p`, `g ∈ L_q`, and its form `∫ (K ⋆ f) conj g = ∫ f conj(K^* ⋆ g)` with the adjoint kernel, derivatives of Schwartz kernels moved to the other Schwartz factor, translates and reflections of Schwartz functions, and weak derivatives commuting with convolution by Schwartz functions | ✅ | ✗ | `Rd/ConvolutionAdjoint` |
 | The Cauchy–Schwarz inequality for finite sums, the `L_2` bounds of the analysis operator and of the synthesis operators on finite index sets for a kernel family with Fourier overlap `B`, and for every Calderón–Zygmund family | ✅ | ✗ | `Rd/PlancherelBounds` |
 | The signed Calderón–Zygmund decomposition of functions with values in a normed space and of families: good parts bounded by `2^n t` with `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, bad pieces with mean zero on their cubes and total mass at most `2 ∫ ‖f‖` | ✅ | ✗ | `Rd/CalderonZygmundSigned` |
@@ -447,6 +468,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | `W^m_p = F^m_{p,2}` for `1 < p < ∞` with explicit constants in both directions: the blocks as convolutions with the weak derivatives, the derivatives of the reproducing sums and their limit, the Besov sandwich `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}` and `W^m_2 = B^m_{2,2}` for `m ≥ 1` | ✅ | ✗ | `Rd/SobolevTriebelLizorkin` |
 | Continuity of convolutions of integrable bounded kernels with `L_p` functions, the Nikolskii inequality for the Littlewood–Paley blocks, almost everywhere convergence of the block series, the Besov embeddings into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions for `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with explicit constants | ✅ | ✗ | `Rd/SobolevEmbedding` |
 | Uniform Schwartz families under continuous linear maps, the shifted Bessel symbols `(ε + ‖ζ‖²)^{σ/2}` with derivative bounds on annuli uniform in `ε`, the Bessel symbol and kernel families as uniform Schwartz families, the Bessel potential of a dilate, sums over the dyadic scales of an annulus, the dilated Bessel kernels as a Calderón–Zygmund family with explicit overlap, and the annuli of the Littlewood–Paley kernels | ✅ | ✗ | `Rd/UniformSchwartzFamilies` |
+| Even Fourier multipliers, among them Mathlib's Bessel potential, commuting with translations and reflections of Schwartz functions and with convolutions, the Bessel kernels of the Littlewood–Paley kernels, convergent synthesis sums, `H^{s,p} ∩ L_p = F^s_{p,2}` for real `s`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0` and `W^m_p = H^{m,p}` for `1 < p < ∞`, with existential constants | ✅ | ✗ | `Rd/BesselPotentialLifting` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

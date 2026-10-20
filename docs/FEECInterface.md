@@ -448,8 +448,9 @@ boundary `Γ`, boundary balls `B_j = ball (Ω.center j) (Ω.radius j)` and chart
 
 ### 4.10 Later
 
-The current part of Lean-FunctionSpaces proves `W^m_p = F^m_{p,2}` and Mathlib's
-`H^{s,p} = F^s_{p,2}` for all `1 < p < ∞`, and the Sobolev embeddings on `ℝ^d`. Its tools are
+The current part of Lean-FunctionSpaces proves, for all `1 < p < ∞`, `W^m_p = F^m_{p,2}` and,
+for Mathlib's Bessel potential space, `H^{s,p} ∩ L_p = F^s_{p,2}` for every real `s` and
+`H^{s,p} = F^s_{p,2}` for `s ≥ 0`, and the Sobolev embeddings on `ℝ^d`. Its tools are
 formalised: Plancherel bounds for families of convolution kernels, the weak type `(1,1)` of
 vector-valued singular integrals for families of dilated kernels, Marcinkiewicz interpolation, and
 the strong type `(p,p)`, `1 < p < ∞`, of the analysis and synthesis operators of every
@@ -461,7 +462,13 @@ directions (`Rd.triebelLizorkinNorm_zero_two_le`, `Rd.enorm_le_triebelLizorkinNo
 `Rd.triebelLizorkinSpace_zero_two_eq_top`), and so is `W^m_p = F^m_{p,2}` for `1 < p < ∞`, with
 explicit constants and, for `m ≥ 1`, the Besov sandwich
 `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}`
-(`Rd.memSobolev_iff_memTriebelLizorkin`). These results generalise Sections 4.1 and 4.2 from
+(`Rd.memSobolev_iff_memTriebelLizorkin`). The identity `H^{s,p} = F^s_{p,2}` for Mathlib's
+Bessel potential space, `1 < p < ∞`, is formalised with existential constants, on `L_p` for every
+real `s` and on all tempered distributions for `s ≥ 0`
+(`Rd.exists_besselPotential_eq_of_memTriebelLizorkin`,
+`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`,
+`Rd.memTriebelLizorkin_iff_memSobolev_bessel`), and with it `W^m_p = H^{m,p}`
+(`Rd.memSobolev_iff_memSobolev_bessel`). These results generalise Sections 4.1 and 4.2 from
 `p = 2`; the `p = 2` statements above stay, with their explicit constants.
 
 ## 5. Decisions and reasons
@@ -542,8 +549,10 @@ Section 4:
    `Rd.isCompactOperator_restrictL2` for its Hilbert space `H^1(Ω)` (Section 4.5). I.4 is the `ℝ^d`
    version of `Daubechies.besov_iff_coeff`, with tensor-product wavelets on
    `EuclideanSpace ℝ (Fin d)`; it is on the list of later goals of Lean-FunctionSpaces.
-3. **I.8.** Yes, it is formalised for `p = 2` (Section 4.1); `H^s_p = F^s_{p,2}` for all
-   `1 < p < ∞` follows in the next part of Lean-FunctionSpaces.
+3. **I.8.** Yes, it is formalised for `p = 2` (Section 4.1), and for all `1 < p < ∞` with
+   existential constants: `H^{s,p} ∩ L_p = F^s_{p,2}` for every real `s`
+   (`Rd.memTriebelLizorkin_iff_memSobolev_bessel`) and `H^{s,p} = F^s_{p,2}` for `s ≥ 0`
+   (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`, Section 4.10).
 4. **Rellich on bounded Lipschitz domains.** Yes for the restriction space, on every bounded set,
    as the compact operator `H^1(Ω) → L_2(Ω)` (Section 4.5). For the weak-derivative space on
    Lipschitz domains it follows together with the extension theorem for `W^{1,2}`, which is in

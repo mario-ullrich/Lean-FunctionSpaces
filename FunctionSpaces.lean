@@ -199,6 +199,7 @@ public import FunctionSpaces.Rd.DerivativeKernels
 public import FunctionSpaces.Rd.SobolevTriebelLizorkin
 public import FunctionSpaces.Rd.SobolevEmbedding
 public import FunctionSpaces.Rd.UniformSchwartzFamilies
+public import FunctionSpaces.Rd.BesselPotentialLifting
 
 /-!
 # Function spaces
@@ -616,7 +617,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `L_p`, the Sobolev spaces `W^m_p(Ω)` and `W^m_p(ℝ^d)`, and the identification with derivatives
   of tempered distributions on `ℝ^d`.
 * `FunctionSpaces.Rd.SobolevTwoLittlewoodPaley`: the convolution theorem and Plancherel for a
-  convolution on `L_2(ℝ^d)`, the Bessel potential on Schwartz functions, Mathlib's Sobolev
+  convolution on `L_2(ℝ^d)`, the Bessel potential on Schwartz functions, even Fourier
+  multipliers acting on tempered distributions by the transpose, Mathlib's Sobolev
   spaces `H^s(ℝ^d)` as the Triebel–Lizorkin spaces `F^s_{2,2}(ℝ^d)` for `s ≥ 0` and the Besov
   spaces `B^s_{2,2}(ℝ^d)` for `s > 0`, with explicit constants, and
   `W^1_2(ℝ^d) = H^1(ℝ^d) = B^1_{2,2}(ℝ^d)`.
@@ -648,8 +650,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   outward unit normal field.
 * `FunctionSpaces.Rd.DilationFamilies`: dilations of Schwartz functions and their derivatives,
   families of dilated Schwartz kernels with uniformly bounded seminorms, their Hörmander
-  condition with explicit constants, Calderón–Zygmund families and their adjoints, and the
-  Littlewood–Paley blocks and synthesis kernels as such families.
+  condition with explicit constants, Calderón–Zygmund families with finitely many exceptional
+  members and their adjoints, and the Littlewood–Paley blocks and synthesis kernels as such
+  families.
 * `FunctionSpaces.Rd.ConvolutionAdjoint`: the adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for
   `f ∈ L_p`, `g ∈ L_q` and the reflection `K^∨(x) = K(-x)`, derivatives of Schwartz kernels
   moved to the other Schwartz factor, and weak derivatives commuting with convolution by Schwartz
@@ -702,4 +705,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `K_j = 𝓕⁻¹[(2^{-2j} + ‖ζ‖²)^{σ/2} ω̂]` with `J_σ ω_{2^j} = 2^{jσ} (K_j)_{2^j}`, sums over
   the dyadic scales of an annulus, and the Calderón–Zygmund family of the dilated Bessel kernels
   for `ω̂` supported in an annulus.
+* `FunctionSpaces.Rd.BesselPotentialLifting`: even Fourier multipliers, among them Mathlib's
+  Bessel potential `J_s`, against translations, reflections and convolutions, the
+  Calderón–Zygmund families of the Bessel kernels of the Littlewood–Paley kernels,
+  `H^{s,p} ∩ L_p = F^s_{p,2}` for real `s` and `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, for
+  `1 < p < ∞` with existential constants, and `W^m_p = H^{m,p}`.
 -/

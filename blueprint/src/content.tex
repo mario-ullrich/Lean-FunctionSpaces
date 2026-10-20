@@ -10459,8 +10459,8 @@ $\sup_k g_k$; for every other $q$ the bound is the $p$-th root of
 \Cref{lem:lp-norm-from-power-integrals}.
 \end{proof}
 
-The case $q = 2$ is the one behind the description of the spaces $H^s_p$ by Littlewood--Paley
-blocks.
+The case $q = 2$ is the one behind the description of the spaces $H^{s,p}$ by Littlewood--Paley
+blocks (\Cref{sec:bessel-potential-lifting}).
 
 \section{Kernel majorants}
 
@@ -12202,6 +12202,9 @@ $\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, all with explicit constant
 dilates of every Schwartz function to multiples of the dilates of its Bessel kernels; when the
 Fourier transform of the function lives in an annulus, the Bessel kernels form a uniform Schwartz
 family and their dilates a Calder\'on--Zygmund family.
+\Cref{sec:bessel-potential-lifting} proves $\TL{s}{p}{2} \subseteq H^{s,p}(V)$ for every real
+$s$ and $H^{s,p}(V) = \TL{s}{p}{2}$ for $s \geq 0$ and $1 < p < \infty$, hence Calder\'on's
+theorem $\Sob{m}{p}(V) = H^{m,p}(V)$, with existential constants.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -12657,13 +12660,40 @@ the definition of the $L_2$ norm, and the last one is the third for $F = [f]$, s
 almost everywhere.
 \end{proof}
 
+\begin{lemma}[$L_p$ functions as tempered distributions]
+\label{lem:lp-distribution-determined}
+\lean{Rd.eq_of_toTemperedDistribution_eq}
+\leanok
+For every $1 \leq p \leq \infty$, all $f, g \in L_p(V)$ with the same tempered distribution are
+equal.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's \texttt{Lp.\allowbreak ker\_\allowbreak toTemperedDistributionCLM\_\allowbreak
+eq\_\allowbreak bot}.
+\end{proof}
+
+\begin{lemma}[The norm of Mathlib's $H^{s,p}$]
+\label{lem:bessel-space-enorm}
+\lean{BesselPotentialSpace.enorm_toLp_eq}
+\leanok
+For every $s \in \R$, every $1 \leq p \leq \infty$ and every $U \in H^{s,p}(V)$,
+$\|J_s U\|_p = \|U\|$ in $[0, \infty]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's \texttt{BesselPotentialSpace.\allowbreak norm\_\allowbreak toLp\_\allowbreak eq}.
+\end{proof}
+
 \begin{theorem}[The convolution theorem on $L_2$]
 \label{thm:convolution-theorem-l2}
 \lean{Rd.fourier_convLp_toLp, Rd.fourier_convLp, Rd.enorm_convLp_sq, Rd.fourier_lpBlock,
   Rd.enorm_lpBlock_sq}
 \leanok
 \uses{lem:fourier-integrable, lem:fourier-conv, lem:plancherel-l2, lem:conv-op, def:lp-blocks,
-  lem:lp-kernels-basic}
+  lem:lp-kernels-basic, lem:lp-distribution-determined}
 For every integrable $K$ on $V$ and every $f \in L_2(V)$,
 $\widehat{K * f} = \widehat K \, \widehat f$ almost everywhere and
 \[
@@ -12690,9 +12720,8 @@ The left side is the Fourier transform of the tempered distribution of $K * \var
 $u$, which is the tempered distribution of the $L_2$ Fourier transform of $K * \varphi$ applied
 to $u$. So the tempered distributions of the $L_2$ functions $\widehat{K * \varphi}$ and
 $\widehat K \, \widehat \varphi$ agree, and an $L_2$ function is determined by its tempered
-distribution (Mathlib's
-\texttt{Lp.\allowbreak ker\_\allowbreak toTemperedDistributionCLM\_\allowbreak
-eq\_\allowbreak bot}). Both sides of the identity are continuous in $f \in L_2(V)$: the left by
+distribution (\Cref{lem:lp-distribution-determined}). Both sides of the identity are continuous
+in $f \in L_2(V)$: the left by
 Young's inequality (\Cref{lem:conv-op}) and \Cref{lem:plancherel-l2}, the right because
 $\widehat K \in L_\infty$ (\Cref{lem:fourier-integrable}). Schwartz functions are dense in
 $L_2(V)$, so the identity holds for all $f$. The norm identity follows with
@@ -12711,13 +12740,13 @@ $\widehat{J_s u} = \langle \cdot \rangle^s \widehat u$.
 
 \begin{lemma}[Elementary properties of the weights]
 \label{lem:bessel-weight-basic}
-\lean{Rd.besselWeight_nonneg, Rd.hasTemperateGrowth_besselWeight, Rd.enorm_besselWeight,
-  Rd.ofReal_besselWeight_sq, Rd.norm_le_besselWeight_one, ENNReal.dyadicWeight_sq,
-  Rd.one_add_norm_sq_le_of_norm_lt}
+\lean{Rd.besselWeight_nonneg, Rd.besselWeight_neg, Rd.hasTemperateGrowth_besselWeight,
+  Rd.enorm_besselWeight, Rd.ofReal_besselWeight_sq, Rd.norm_le_besselWeight_one,
+  ENNReal.dyadicWeight_sq, Rd.one_add_norm_sq_le_of_norm_lt}
 \leanok
 \uses{def:bessel-weight, def:lq-norm}
-For every $s \in \R$, the Bessel weight $\xi \mapsto \langle \xi \rangle^s$ is nonnegative and
-smooth with polynomially bounded derivatives, $(\langle \xi \rangle^s)^2 = (1 + |\xi|^2)^s$ and
+For every $s \in \R$, the Bessel weight $\xi \mapsto \langle \xi \rangle^s$ is nonnegative, even
+and smooth with polynomially bounded derivatives, $(\langle \xi \rangle^s)^2 = (1 + |\xi|^2)^s$ and
 $|\xi| \leq \langle \xi \rangle^1$ for every $\xi \in V$, and $(2^{js})^2 = (4^j)^s$ for every
 $j \in \N$. For every $j \in \N$ and every $\xi \in V$ with $|\xi| < 2^{j+1}$,
 $1 + |\xi|^2 \leq 5 \cdot 4^j$.
@@ -12725,8 +12754,9 @@ $1 + |\xi|^2 \leq 5 \cdot 4^j$.
 
 \begin{proof}
 \leanok
-The smoothness and the growth bounds of $(1 + |\xi|^2)^{s/2}$ are in Mathlib. Further,
-$|\xi|^2 < 4^{j+1} = 4 \cdot 4^j$ and $1 \leq 4^j$.
+The weight depends on $|\xi|$ only, and the smoothness and the growth bounds of
+$(1 + |\xi|^2)^{s/2}$ are in Mathlib. Further, $|\xi|^2 < 4^{j+1} = 4 \cdot 4^j$ and
+$1 \leq 4^j$.
 \end{proof}
 
 \begin{definition}[The Bessel potential on Schwartz functions]
@@ -12755,6 +12785,58 @@ Fourier integrals of functions.
 Mathlib's
 \texttt{TemperedDistribution.\allowbreak fourierMultiplierCLM\_\allowbreak
 toTemperedDistributionCLM\_\allowbreak eq}.
+\end{proof}
+
+For a function $m$ on $V$ that is smooth with polynomially bounded derivatives,
+$m(D) u = \mathcal F^{-1}(m \, \widehat u)$ is Mathlib's Fourier multiplier on Schwartz functions
+and on tempered distributions (\texttt{SchwartzMap.\allowbreak fourier\allowbreak MultiplierCLM},
+\texttt{TemperedDistribution.\allowbreak fourier\allowbreak MultiplierCLM}); $J_t$ is the case
+$m = \langle \cdot \rangle^t$. Mathlib lets $m(D)$ act on a tempered distribution $T$ by
+$(m(D) T)(u) = T\bigl(\mathcal F(m \, \mathcal F^{-1} u)\bigr)$. The symbol $m$ is even if
+$m(-\xi) = m(\xi)$ for every $\xi \in V$.
+
+\begin{lemma}[Even Fourier multipliers act by the transpose]
+\label{lem:even-multiplier-transpose}
+\lean{Rd.fourierMultiplierCLM_apply_eq_fourier, Rd.fourierMultiplierCLM_apply_apply_of_even}
+\leanok
+\uses{lem:bessel-schwartz-distribution}
+Let $m$ be an even function on $V$, smooth with polynomially bounded derivatives. For every
+Schwartz function $u$ and every $x \in V$,
+$m(D) u(x) = \mathcal F(m \, \mathcal F^{-1} u)(x)$, and for every tempered distribution $T$,
+$(m(D) T)(u) = T(m(D) u)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\mathcal F^{-1} h(x) = \widehat{h}(-x)$ and $\mathcal F^{-1} u(\xi) = \widehat u(-\xi)$ (Mathlib's
+\texttt{Real.\allowbreak fourierInv\_\allowbreak eq\_\allowbreak fourier\_\allowbreak
+comp\_\allowbreak neg}), so
+$m(D) u(x) = \mathcal F(m(-\cdot) \, \widehat u(-\cdot))(x) = \mathcal F(m \, \mathcal F^{-1} u)(x)$
+since $m$ is even. The second identity is Mathlib's definition of $m(D) T$ with the first.
+\end{proof}
+
+\begin{lemma}[The transpose of the Bessel potential]
+\label{lem:bessel-potential-transpose}
+\lean{Rd.besselSchwartz_apply_eq_fourier, Rd.besselPotential_apply_apply,
+  Rd.integral_besselSchwartz_mul}
+\leanok
+\uses{def:bessel-schwartz, lem:bessel-weight-basic, lem:bessel-schwartz-distribution,
+  lem:even-multiplier-transpose}
+For every $t \in \R$, every Schwartz function $u$ and every $x \in V$,
+$J_t u(x) = \mathcal F(\langle \cdot \rangle^t \, \mathcal F^{-1} u)(x)$. For every $t \in \R$,
+every tempered distribution $T$ and all Schwartz functions $\varphi, u$,
+\[
+  (J_t T)(u) = T(J_t u) \qquad \text{and} \qquad
+  \int_V J_t \varphi \, u = \int_V \varphi \, J_t u .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Bessel weight is even (\Cref{lem:bessel-weight-basic}), so \Cref{lem:even-multiplier-transpose}
+gives the first two identities. For the tempered distribution of $\varphi$ the second gives
+$\int_V J_t u \, \varphi = (J_t \varphi)(u) = \int_V u \, J_t \varphi$
+(\Cref{lem:bessel-schwartz-distribution}).
 \end{proof}
 
 \begin{lemma}[Two elementary inequalities]
@@ -12907,7 +12989,7 @@ $f \in \TL{s}{2}{2}$, $\int \langle \xi \rangle^{2s} |\widehat f|^2 < \infty$ by
   Rd.exists_eq_toDistr_two}
 \leanok
 \uses{thm:sobolev-two-triebel-lizorkin, thm:tl-diagonal, def:band-space, def:lp-blocks,
-  lem:bessel-potential-l2}
+  lem:bessel-potential-l2, lem:bessel-space-enorm}
 For every $s > 0$, a tempered distribution $u$ lies in $H^s(V)$ if and only if $u$ is a function
 $f \in L_2(V)$ with $f \in \Besov{s}{2}{2}$, the approximation space $A^s_2$ of the
 band-limited scheme. For every $s \geq 0$, $u \in H^s(V)$ if and only if $u$ is a function
@@ -12919,7 +13001,8 @@ $\|f\|_{F^s_{2,2}} \leq (2 \cdot 4^s)^{1/2} \|F\|_{H^s}$.
 \begin{proof}
 \leanok
 \Cref{thm:sobolev-two-triebel-lizorkin} and \Cref{thm:tl-diagonal} with $p = 2$. An element $F$
-of the bundled space carries $J_s F$ as an $L_2$ function of norm $\|F\|_{H^s}$.
+of the bundled space carries $J_s F$ as an $L_2$ function of norm $\|F\|_{H^s}$
+(\Cref{lem:bessel-space-enorm}).
 \end{proof}
 
 \begin{lemma}[Derivatives on the frequency side]
@@ -13017,7 +13100,7 @@ The identity $(2\pi)^2 \|h\|_2^2 = (2\pi)^2 \|f\|_2^2 + \sum_i \|g_i\|_2^2$ of
 \label{thm:sobolev-one-two-besov}
 \lean{Rd.memSobolev_one_iff_memApprox, Rd.memSobolev_one_iff_modulus}
 \leanok
-\uses{thm:sobolev-one-two, cor:sobolev-two-besov, thm:rd-besov}
+\uses{thm:sobolev-one-two, cor:sobolev-two-besov, thm:rd-besov, lem:lp-distribution-determined}
 For every $F \in L_2(V)$, $F \in \Sob{1}{2}(V)$ if and only if $F$ lies in the approximation space
 $A^1_2$ of the band-limited scheme. For every integer $r \geq 2$ and every $F \in L_2(V)$,
 $F \in \Sob{1}{2}(V)$ if and only if
@@ -13028,8 +13111,8 @@ $\|F\|_2 + \|(2^k \omega_r(F, 2^{-k})_2)_k\|_{\ell_2} < \infty$.
 \leanok
 $\Sob{1}{2}(V) = H^1(V)$ by \Cref{thm:sobolev-one-two}, and $H^1(V) = \Besov{1}{2}{2}$ by
 \Cref{cor:sobolev-two-besov}; an $L_2$ function is determined by its tempered distribution
-(Mathlib's \texttt{Lp.\allowbreak ker\_\allowbreak toTemperedDistributionCLM\_\allowbreak
-eq\_\allowbreak bot}). The second statement is \Cref{thm:rd-besov} with $p = q = 2$ and
+(\Cref{lem:lp-distribution-determined}). The second statement is \Cref{thm:rd-besov} with
+$p = q = 2$ and
 $s = 1 < r$.
 \end{proof}
 
@@ -13265,7 +13348,7 @@ with the Fourier transform of $L_2(V)$; $\iota : H^1(V) \to L_2(V)$ is a bounded
   Rd.toL2_eq_of_toDistr_eq, Rd.norm_toL2_le}
 \leanok
 \uses{def:sobolev-one-to-l2, lem:temperate-weight-lp, lem:bessel-weight-inverse,
-  lem:plancherel-l2}
+  lem:plancherel-l2, lem:lp-distribution-determined}
 For every $F \in H^1(V)$, given by the tempered distribution $u$, the Fourier transform of
 $\iota F$ is $\langle \cdot \rangle^{-1} \widehat{J_1 u}$, the tempered distribution of $\iota F$
 is $u$, and $\|\iota F\|_2 \leq \|F\|_{H^1}$. For every $F \in H^1(V)$ and every $f \in L_2(V)$
@@ -13277,9 +13360,9 @@ whose tempered distribution is that of $F$, $\iota F = f$.
 $u = J_{-1}(J_1 u)$, and the Fourier transform of $J_{-1} g$ is $\langle \cdot \rangle^{-1}
 \widehat g$; for $g = J_1 u \in L_2(V)$ this is the tempered distribution of the $L_2$ function
 $\langle \cdot \rangle^{-1} \widehat g$ (\Cref{lem:temperate-weight-lp}), whose inverse Fourier
-transform is $\iota F$. An $L_2$ function is determined by its tempered distribution (Mathlib's
-\texttt{Lp.\allowbreak ker\_\allowbreak toTemperedDistributionCLM\_\allowbreak eq\_\allowbreak
-bot}). By \Cref{lem:plancherel-l2} and \Cref{lem:bessel-weight-inverse},
+transform is $\iota F$. An $L_2$ function is determined by its tempered distribution
+(\Cref{lem:lp-distribution-determined}). By \Cref{lem:plancherel-l2} and
+\Cref{lem:bessel-weight-inverse},
 $\|\iota F\|_2 = \|\langle \cdot \rangle^{-1} \widehat{J_1 u}\|_2 \leq \|\widehat{J_1 u}\|_2
 = \|J_1 u\|_2$.
 \end{proof}
@@ -13972,31 +14055,29 @@ and Riesz's representation theorem does the rest.
 
 \begin{lemma}[$J_t$ keeps real functions real]
 \label{lem:bessel-schwartz-real}
-\lean{Rd.besselSchwartz_apply_eq_fourier, Rd.conj_besselSchwartz_apply, Rd.conj_testSchwartz}
+\lean{Rd.conj_besselSchwartz_apply, Rd.conj_testSchwartz}
 \leanok
-\uses{lem:bessel-schwartz-distribution, lem:fourier-conjugation, def:test-schwartz}
-For every $t \in \R$, every Schwartz function $u$ and every $x \in V$,
-$J_t u(x) = \mathcal F(\langle \cdot \rangle^t \, \mathcal F^{-1} u)(x)$. For every $t \in \R$,
-every Schwartz function $u$ with real values and every $x \in V$, $J_t u(x)$ is real. For every
+\uses{lem:bessel-schwartz-distribution, lem:bessel-potential-transpose, lem:fourier-conjugation,
+  def:test-schwartz}
+For every $t \in \R$, every Schwartz function $u$ with real values and every $x \in V$,
+$J_t u(x)$ is real. For every
 $\varphi \in \mathcal D(\Omega)$, the Schwartz function of $\varphi$ (\Cref{def:test-schwartz})
 has real values.
 \end{lemma}
 
 \begin{proof}
 \leanok
-$\mathcal F^{-1} h(x) = \widehat{h}(-x)$, $\mathcal F^{-1} u(\xi) = \widehat u(-\xi)$, and the
-weight is even (Mathlib's \texttt{Real.\allowbreak fourierInv\_\allowbreak eq\_\allowbreak
-fourier\_\allowbreak comp\_\allowbreak neg}). By \Cref{lem:fourier-conjugation},
+By \Cref{lem:fourier-conjugation},
 $\overline{J_t u(x)} = \mathcal F(\langle \cdot \rangle^t \, \overline{\widehat u})(x) =
 \mathcal F(\langle \cdot \rangle^t \, \mathcal F^{-1} \overline u)(x)$, which is $J_t u(x)$ for
-real $u$ by the first statement.
+real $u$ (\Cref{lem:bessel-potential-transpose}).
 \end{proof}
 
 \begin{lemma}[The Bessel potential of an $L_2$ function at a Schwartz function]
 \label{lem:bessel-potential-l2-schwartz}
 \lean{Rd.besselPotential_toLp_apply, Rd.inner_toLp_besselSchwartz}
 \leanok
-\uses{lem:bessel-schwartz-real}
+\uses{lem:bessel-schwartz-real, lem:bessel-potential-transpose}
 For every $t \in \R$, every $g \in L_2(V)$ and every Schwartz function $u$,
 $(J_t g)(u) = \int J_t u \cdot g$. For every $t \in \R$, every Schwartz function $u$ with real
 values and every $g \in L_2(V)$, $\langle J_t u, g \rangle_{L_2} = (J_t g)(u)$.
@@ -14004,10 +14085,8 @@ values and every $g \in L_2(V)$, $\langle J_t u, g \rangle_{L_2} = (J_t g)(u)$.
 
 \begin{proof}
 \leanok
-Mathlib's $J_t$ acts on tempered distributions by
-$(J_t g)(u) = g(\mathcal F(\langle \cdot \rangle^t \, \mathcal F^{-1} u))$, and
-$\mathcal F(\langle \cdot \rangle^t \, \mathcal F^{-1} u) = J_t u$
-(\Cref{lem:bessel-schwartz-real}). The inner product is $\int \overline{J_t u} \, g$, and
+$(J_t g)(u) = g(J_t u) = \int J_t u \cdot g$ (\Cref{lem:bessel-potential-transpose}). The inner
+product is $\int \overline{J_t u} \, g$, and
 $J_t u$ is real for real $u$.
 \end{proof}
 
@@ -14017,7 +14096,7 @@ $J_t u$ is real for real $u$.
   Rd.inner_ofTest_left}
 \leanok
 \uses{lem:bessel-schwartz-distribution, lem:bessel-potential-l2-schwartz,
-  def:sobolev-tilde-zero-boundary}
+  def:sobolev-tilde-zero-boundary, lem:lp-distribution-determined}
 For every $t \in \R$ and all $U, W \in H^t(V)$,
 $\langle U, W \rangle = \langle J_t U, J_t W \rangle_{L_2}$. For every $t \in \R$ and every
 Schwartz function $u$, the $L_2$ function of $u \in H^t(V)$ is $J_t u$. For every $t \in \R$,
@@ -14031,7 +14110,8 @@ $\langle \varphi, U \rangle = (J_t (J_t U))(\varphi)$.
 $U \mapsto J_t U$ is a linear isometry onto $L_2(V)$, and linear isometries preserve inner
 products. The tempered distributions of $J_t u$ as an element of $L_2(V)$ and of $J_t$ applied to
 $u$ agree (\Cref{lem:bessel-schwartz-distribution}), and $L_2$ functions are determined by their
-distributions. The last two statements follow with \Cref{lem:bessel-potential-l2-schwartz}, since
+distributions (\Cref{lem:lp-distribution-determined}). The last two statements follow with
+\Cref{lem:bessel-potential-l2-schwartz}, since
 test functions are real (\Cref{lem:bessel-schwartz-real}).
 \end{proof}
 
@@ -14317,14 +14397,13 @@ $\sum_k 2^{k/2} \omega_k \leq \sqrt 2 \, \|(2^k \omega_k)_k\|_{\ell_2}$; and $1 
 
 \begin{theorem}[$H^1(V)$ in Besov spaces, with explicit constants]
 \label{thm:sobolev-one-besov-constant}
-\lean{BesselPotentialSpace.enorm_toLp_eq, Rd.sobolevOneBesovConst,
-  Rd.sobolevOneBesovConst_ne_top, Rd.modNorm_two_le_norm, Rd.modNorm_half_one_le_norm,
-  Rd.modNorm_toL2_lt_top}
+\lean{Rd.sobolevOneBesovConst, Rd.sobolevOneBesovConst_ne_top, Rd.modNorm_two_le_norm,
+  Rd.modNorm_half_one_le_norm, Rd.modNorm_toL2_lt_top}
 \leanok
 \uses{thm:modulus-coincidence, thm:rd-besov, thm:tl-besov-sandwich,
-  thm:sobolev-two-triebel-lizorkin, lem:sobolev-one-to-l2, lem:besov-half-one}
-For every $s \in \R$, every $1 \leq p \leq \infty$ and every $U \in H^{s,p}(V)$,
-$\|J_s U\|_p = \|U\|$. Let $K$ be the constant of the inverse direction of
+  thm:sobolev-two-triebel-lizorkin, lem:sobolev-one-to-l2, lem:besov-half-one,
+  lem:bessel-space-enorm}
+Let $K$ be the constant of the inverse direction of
 \Cref{thm:modulus-coincidence} for the band-limited scheme with the moduli of order $2$
 (\Cref{thm:rd-besov}) at smoothness $1$, and
 $C_1 = K \cdot 2 (1 - 2^{-1})^{-1} \cdot (2 \cdot 4)^{1/2}$. Then $C_1 < \infty$, and for every
@@ -14348,9 +14427,8 @@ $A^1_2$ of the band-limited scheme (\Cref{thm:modulus-coincidence}), which is at
 $2 (1 - 2^{-1})^{-1} \|\iota U\|_{F^1_{2,2}}$ (\Cref{thm:tl-besov-sandwich}), and
 $\|\iota U\|_{F^1_{2,2}} \leq (2 \cdot 4)^{1/2} \|J_1 \iota U\|_2$
 (\Cref{thm:sobolev-two-triebel-lizorkin}), where $J_1 \iota U$ is the $L_2$ function of $U$
-(\Cref{lem:sobolev-one-to-l2}). The norm of $H^{s,p}(V)$ is the norm of the $L_p$ function
-$J_s U$ (Mathlib's \texttt{BesselPotentialSpace.\allowbreak norm\_\allowbreak toLp\_\allowbreak
-eq}), so $\|J_1 \iota U\|_2 = \|U\|$. The second bound follows with \Cref{lem:besov-half-one}.
+(\Cref{lem:sobolev-one-to-l2}), and $\|J_1 \iota U\|_2 = \|U\|$ (\Cref{lem:bessel-space-enorm}).
+The second bound follows with \Cref{lem:besov-half-one}.
 \end{proof}
 
 The finiteness in \Cref{thm:sobolev-one-besov-constant} is the hypothesis of the boundary trace
@@ -15798,6 +15876,32 @@ Schwartz functions are bounded (\Cref{lem:lp-kernels-basic}); their dilations ar
 continuous and bounded (\Cref{lem:dilate}), and the Fourier transforms of the dilations are
 dilations of Schwartz functions (\Cref{lem:fourier-dilate}). The
 H\"ormander condition is \Cref{thm:hormander-dilation-family}.
+\end{proof}
+
+\begin{lemma}[Calder\'on--Zygmund families with exceptional members]
+\label{lem:cz-family-exceptions}
+\lean{ENNReal.tsum_le_tsum_add_sum_of_forall_ge_eq, Rd.enorm_fourier_dilate_le,
+  Rd.IsCZFamily.of_dilation_of_forall_ge_eq}
+\leanok
+\uses{lem:uniform-schwartz-exceptions, thm:cz-family-dilation, lem:fourier-dilate,
+  def:cz-family, def:hormander-const}
+For all sequences $(u_j)$, $(v_j)$ in $[0, \infty]$ and every $N \in \N$ with $u_j = v_j$ for
+every $j \geq N$, $\sum_j u_j \leq \sum_j v_j + \sum_{i < N} u_i$. For every Schwartz function
+$G$, every real $c > 0$ and every $\xi \in V$,
+$|\widehat{G_c}(\xi)| \leq \|\widehat G\|_{0,0}$. Let $(G_j)$ be a uniform family of Schwartz
+functions with bounds $A$ such that $\sum_j |\widehat{(G_j)_{2^j}}(\xi)|^2 \leq B$ for every
+$\xi \in V$, let $N \in \N$, and let $(G'_j)$ be Schwartz functions with $G'_j = G_j$ for every
+$j \geq N$. Then $((G'_j)_{2^j})_j$ is a Calder\'on--Zygmund family with overlap
+$B + \sum_{i < N} \|\widehat{G'_i}\|_{0,0}^2$ and H\"ormander constant $4 H_{A'}$, where
+$A'_{k,l} = \max\bigl(A_{k,l}, \sum_{i < N} \|G'_i\|_{k,l}\bigr)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The sum of the $u_j$ is $\sum_{i < N} u_i + \sum_{i \geq N} v_i$. Next,
+$\widehat{G_c}(\xi) = \widehat G(c^{-1} \xi)$ (\Cref{lem:fourier-dilate}). The family $(G'_j)$
+is uniformly Schwartz with bounds $A'$ (\Cref{lem:uniform-schwartz-exceptions}); the first two
+claims bound its overlap, and \Cref{thm:cz-family-dilation} gives the family.
 \end{proof}
 
 \paragraph{The Littlewood--Paley families.}
@@ -19065,6 +19169,416 @@ $\widehat{\tilde G_{j+2}}(\zeta) \neq 0$ gives $1 < 4 \|\zeta\| < 16$
 So \Cref{thm:cz-family-bessel} applies to $\widehat{\psi_1}$ with $a = 1$, $N = 2$, to
 $\widehat{G^{\psi}_{j+1}}$ with $a = 1/2$, $N = 2$, and to $\widehat{\tilde G_{j+2}}$ with
 $a = 1/4$, $N = 4$.
+
+\section{Bessel potential spaces as Triebel--Lizorkin spaces}
+\label{sec:bessel-potential-lifting}
+
+Mathlib's Bessel potential space $H^{s,p}(V)$, $s \in \R$, consists of the tempered
+distributions $f$ with $J_s f \in L_p(V)$, where $J_s$ multiplies the Fourier transform by
+$\langle \xi \rangle^s$ (\texttt{TemperedDistribution.\allowbreak besselPotential} and
+\texttt{TemperedDistribution.\allowbreak MemSobolev}). Its bundled form, Mathlib's
+\texttt{BesselPotentialSpace}, has the norm $\|f\| = \|J_s f\|_p$. This section proves, for
+$n \geq 1$ and $1 < p < \infty$, that $H^{s,p}(V) \cap L_p(V) = \TL{s}{p}{2}$ for every real $s$
+and $H^{s,p}(V) = \TL{s}{p}{2}$ for $s \geq 0$ \cite{Triebel}, and hence
+$\Sob{m}{p}(V) = H^{m,p}(V)$, Calder\'on's theorem \cite[Chapter V]{SteinSingular}. The constants
+come from the uniform Schwartz bounds of \Cref{sec:bessel-kernels} and are existential. The
+kernels are the Bessel potentials of the blocks $\psi_j$ and of the synthesis kernels
+$\tilde\psi_j$: up to the factors $2^{\pm js}$ they are dilates of Bessel kernels, and these form
+Calder\'on--Zygmund families. So $J_s f$ is the limit of the synthesis sums
+$\sum_{j < J} (J_s \tilde\psi_j) * (\psi_j * f)$, and the weighted blocks $2^{js} \psi_j * f$ of
+$f = J_{-s} h$ are the analysis operator of a Calder\'on--Zygmund family applied to $h$. The
+first two paragraphs hold for every even Fourier multiplier $m(D)$ of
+\Cref{sec:sobolev-two-littlewood-paley}.
+
+\paragraph{Even Fourier multipliers, translations and reflections.}
+
+\begin{lemma}[Even Fourier multipliers commute with translations and reflections]
+\label{lem:bessel-schwartz-translation}
+\lean{Rd.fourier_fourierMultiplierCLM_apply, Rd.fourier_besselSchwartz_apply,
+  Rd.fourier_compSubConstCLM_apply, Rd.fourierMultiplierCLM_compSubConstCLM,
+  Rd.besselSchwartz_compSubConstCLM, Rd.fourierMultiplierCLM_schwartzReflect,
+  Rd.fourierMultiplierCLM_shiftReflect}
+\leanok
+\uses{def:bessel-schwartz, lem:bessel-weight-basic, lem:reflect-basic, lem:schwartz-shift-reflect,
+  def:schwartz-dilate}
+Let $m$ be a function on $V$, smooth with polynomially bounded derivatives. For all Schwartz
+functions $\varphi, \eta$ and all $x, y, \xi \in V$,
+\begin{gather*}
+  \widehat{m(D) \varphi}(\xi) = m(\xi) \, \widehat\varphi(\xi), \qquad
+  \widehat{\varphi(\cdot - y)}(\xi) = e^{-2\pi i \langle y, \xi \rangle} \,
+  \widehat\varphi(\xi), \\
+  m(D) \bigl(\varphi(\cdot - y)\bigr) = (m(D) \varphi)(\cdot - y),
+\end{gather*}
+in particular $\widehat{J_t \varphi} = \langle \cdot \rangle^t \widehat\varphi$ and
+$J_t (\varphi(\cdot - y)) = (J_t \varphi)(\cdot - y)$ for every $t \in \R$. If $m$ is even, then
+\[
+  m(D) \bigl(\varphi(-\,\cdot)\bigr) = (m(D) \varphi)(-\,\cdot), \qquad
+  m(D) \bigl(\eta(x - \cdot)\bigr) = (m(D) \eta)(x - \cdot) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first identity is Fourier inversion on Schwartz functions, the second the substitution
+$z \mapsto z + y$ (Mathlib's
+\texttt{VectorFourier.\allowbreak fourierIntegral\_\allowbreak comp\_\allowbreak add\_\allowbreak
+right}). The Fourier transform is injective on Schwartz functions, and the Fourier transforms of
+the two sides of the third identity are both
+$m(\xi) e^{-2\pi i \langle y, \xi \rangle} \widehat\varphi(\xi)$, those of the
+fourth both $m(\xi) \widehat\varphi(-\xi) = m(-\xi) \widehat\varphi(-\xi)$
+(\Cref{lem:reflect-basic}). The function $\eta(x - \cdot)$ is the translate by $x$ of
+$\eta(-\,\cdot)$. For $J_t$, $m$ is the Bessel weight (\Cref{def:bessel-schwartz}).
+\end{proof}
+
+\paragraph{Even Fourier multipliers and convolutions.}
+
+\begin{lemma}[Convolutions with Fourier multipliers, pointwise]
+\label{lem:bessel-potential-convolution-pointwise}
+\lean{Rd.conv_eq_toTemperedDistribution_shiftReflect, Rd.conv_fourierMultiplierCLM_eq,
+  Rd.conv_eq_conv_fourierMultiplierCLM, Rd.conv_eq_conv_besselSchwartz}
+\leanok
+\uses{lem:schwartz-shift-reflect, lem:even-multiplier-transpose,
+  lem:bessel-schwartz-translation, lem:bessel-weight-basic}
+Let $1 \leq q, r \leq \infty$, let $m$ be an even function on $V$, smooth with polynomially bounded
+derivatives, $\eta$ a Schwartz function and $x \in V$. For every $g \in L_q(V)$,
+$(\eta * g)(x)$ is the tempered distribution of $g$ at $\eta(x - \cdot)$. For every
+$h \in L_r(V)$,
+\[
+  \bigl((m(D) \eta) * h\bigr)(x) = (m(D) h)\bigl(\eta(x - \cdot)\bigr) .
+\]
+For all $g \in L_q(V)$ and $h \in L_r(V)$ with $g = m(D) h$ as tempered distributions,
+$(\eta * g)(x) = ((m(D) \eta) * h)(x)$; in particular, for every $t \in \R$ and all
+$g \in L_q(V)$, $h \in L_r(V)$ with $g = J_t h$, $(\eta * g)(x) = ((J_t \eta) * h)(x)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first claim is \Cref{lem:schwartz-shift-reflect}. For the second,
+$(m(D) h)(\eta(x - \cdot)) = h(m(D)(\eta(x - \cdot))) = h((m(D) \eta)(x - \cdot))$ by
+\Cref{lem:even-multiplier-transpose} and \Cref{lem:bessel-schwartz-translation}, and this is
+$((m(D) \eta) * h)(x)$ by the first claim. The third combines the first two, and the Bessel
+weight is even (\Cref{lem:bessel-weight-basic}).
+\end{proof}
+
+\begin{theorem}[The Bessel potential of a convolution]
+\label{thm:bessel-potential-convolution}
+\lean{Rd.integral_besselSchwartz_mul_conv, Rd.besselPotential_toLp_conv}
+\leanok
+\uses{thm:convolution-adjoint, lem:reflect-basic, lem:bessel-potential-transpose,
+  lem:bessel-schwartz-translation, thm:young}
+For every $1 \leq p < \infty$, every $F \in L_p(V)$, every $t \in \R$ and all Schwartz functions
+$\eta, u$,
+\[
+  \int_V J_t u \, (\eta * F) = \int_V u \, \bigl((J_t \eta) * F\bigr) ,
+\]
+and $J_t(\eta * F) = (J_t \eta) * F$ as tempered distributions.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Schwartz functions lie in $L_q(V)$ for the conjugate exponent $q$ of $p$, so by
+\Cref{thm:convolution-adjoint} the two sides are $\int_V F(y) (\eta^\vee * J_t u)(y) \, dy$ and
+$\int_V F(y) ((J_t \eta)^\vee * u)(y) \, dy$. By \Cref{lem:reflect-basic},
+\Cref{lem:bessel-potential-transpose} and \Cref{lem:bessel-schwartz-translation},
+\begin{align*}
+  (\eta^\vee * J_t u)(y) &= \int_V \eta(z - y) \, J_t u(z) \, dz \\
+  &= \int_V (J_t \eta)(z - y) \, u(z) \, dz = \bigl((J_t \eta)^\vee * u\bigr)(y) .
+\end{align*}
+Both convolutions lie in $L_p(V)$ by Young's inequality (\Cref{thm:young}), and the identity of
+tempered distributions is the first identity with \Cref{lem:bessel-potential-transpose}.
+\end{proof}
+
+\begin{lemma}[The Bessel potential of a limit of synthesis sums]
+\label{lem:bessel-potential-limits}
+\lean{Rd.besselPotential_eq_of_tendsto}
+\leanok
+\uses{thm:bessel-potential-convolution}
+Let $1 \leq p < \infty$, $t \in \R$, and for every $j \in \N$ let $\eta_j$ be a Schwartz
+function and $F_j \in L_p(V)$. For all $f, g \in L_p(V)$ with
+$\sum_{j < J} \eta_j * F_j \to f$ and $\sum_{j < J} (J_t \eta_j) * F_j \to g$ in $L_p(V)$ as
+$J \to \infty$, $J_t f = g$ as tempered distributions.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The partial sums satisfy the identity by \Cref{thm:bessel-potential-convolution} and the
+linearity of $J_t$. The embedding of $L_p(V)$ into the tempered distributions and $J_t$ are
+continuous, and limits of tempered distributions are unique.
+\end{proof}
+
+\paragraph{The Bessel kernels of the Littlewood--Paley kernels.}
+
+\begin{definition}[Bessel kernels of a family]
+\label{def:bessel-base}
+\lean{Rd.besselBase}
+\leanok
+\uses{def:bessel-kernel-family}
+For every real $\sigma$, every family $\omega = (\omega_j)_{j \in \N}$ of Schwartz functions and
+every $j \in \N$, let $K^\sigma_j[\omega]$ be the $j$-th Bessel kernel of $\widehat{\omega_j}$
+(\Cref{def:bessel-kernel-family}):
+\[
+  K^\sigma_j[\omega] = \mathcal F^{-1} \bigl( \beta_{2^{-2j},\sigma} \, \widehat{\omega_j}
+  \bigr) .
+\]
+\end{definition}
+
+By \Cref{thm:bessel-potential-dilate},
+$J_\sigma (\omega_j)_{2^j} = 2^{j\sigma} (K^\sigma_j[\omega])_{2^j}$. For the bases $G^{\psi}$ and
+$\tilde G$ of \Cref{def:psi-base} and \Cref{def:psi-dual}, $(G^{\psi}_j)_{2^j} = \psi_j$ and
+$(\tilde G_j)_{2^j} = \tilde\psi_j$.
+
+\begin{theorem}[The Bessel kernels of the Littlewood--Paley kernels]
+\label{thm:cz-family-bessel-base}
+\lean{Rd.exists_isCZFamily_besselBase, Rd.exists_isCZFamily_besselBase_psiDualBase,
+  Rd.exists_isCZFamily_besselBase_psiBase}
+\leanok
+\uses{def:bessel-base, thm:bessel-kernels-uniform, thm:cz-family-bessel, def:bessel-overlap,
+  lem:cz-family-exceptions, lem:littlewood-paley-annuli, def:psi-base, def:psi-dual}
+Let $a > 0$ be real, $M, N \in \N$, and let $(\omega_j)$ be Schwartz functions with
+$\omega_j = \omega_M$ for every $j \geq M$ such that $\widehat{\omega_M}$ vanishes outside the
+annulus $\{a \leq \|\zeta\| \leq 2^N a\}$. Then for every real $\sigma$ there are
+$B, H < \infty$ such that $((K^\sigma_j[\omega])_{2^j})_j$ is a Calder\'on--Zygmund family with
+overlap $B$ and H\"ormander constant $H$. In particular, for every real $\sigma$ there are such
+$B, H$ for $\omega = G^{\psi}$ and for $\omega = \tilde G$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $j \geq M$, $K^\sigma_j[\omega]$ is the Bessel kernel $K_j$ of $\widehat{\omega_M}$. These
+kernels are uniformly Schwartz, and their dilates have the overlap
+$B_{a,N,\sigma,\widehat{\omega_M}}$ (\Cref{thm:bessel-kernels-uniform},
+\Cref{thm:cz-family-bessel}, \Cref{def:bessel-overlap}); \Cref{lem:cz-family-exceptions} adds the
+first $M$ kernels. The family $G^{\psi}$ is constant from $j = 1$ on, with $a = 1/2$ and
+$N = 2$, and $\tilde G$ from $j = 2$ on, with $a = 1/4$ and $N = 4$ (\Cref{def:psi-base},
+\Cref{def:psi-dual}, \Cref{lem:littlewood-paley-annuli}).
+\end{proof}
+
+\begin{lemma}[Convolutions with Bessel potentials of dilates]
+\label{lem:bessel-dilate-convolution}
+\lean{Rd.enorm_two_pow_rpow, Rd.conv_besselSchwartz_schwartzDilate}
+\leanok
+\uses{def:bessel-base, thm:bessel-potential-dilate, def:schwartz-dilate}
+For every $j \in \N$ and every real $\sigma$, $|(2^j)^\sigma| = 2^{j\sigma}$. For every family
+$(\omega_j)$ of Schwartz functions, every $F \colon V \to \C$ and every $x \in V$,
+\[
+  \bigl( (J_\sigma (\omega_j)_{2^j}) * F \bigr)(x)
+  = \bigl( (K^\sigma_j[\omega])_{2^j} * (2^{j\sigma} F) \bigr)(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{thm:bessel-potential-dilate} and the linearity of the convolution.
+\end{proof}
+
+\begin{theorem}[The synthesis bound for Bessel potentials of dilates]
+\label{thm:bessel-synthesis-bound}
+\lean{Rd.eLpNorm_sum_conv_besselSchwartz_le}
+\leanok
+\uses{lem:bessel-dilate-convolution, thm:vector-valued-strong-type, def:cz-const,
+  def:triebel-lizorkin, lem:tl-pointwise-blocks}
+Let $n \geq 1$, $1 < p < \infty$, $\sigma$ real, and let $(\omega_j)$ be Schwartz functions such
+that $((K^\sigma_j[\omega])_{2^j})_j$ is a Calder\'on--Zygmund family with overlap $B$ and
+H\"ormander constant $H$. Then for every finite set $t \subseteq \N$ and every $f \in L_p(V)$,
+\[
+  \Bigl\| \sum_{j \in t} \bigl(J_\sigma (\omega_j)_{2^j}\bigr) * (\psi_j * f) \Bigr\|_p
+  \leq S_{V,p}(B, H) \, \Bigl\| x \mapsto \bigl\| \bigl(\mathbf 1_t(j) \, 2^{j\sigma}
+  |(\psi_j * f)(x)|\bigr)_j \bigr\|_{\ell_2} \Bigr\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:bessel-dilate-convolution} the sum is
+$\sum_{j \in t} (K^\sigma_j[\omega])_{2^j} * g_j$ with $g_j = 2^{j\sigma} \psi_j * f \in L_p(V)$
+for $j \in t$ (\Cref{lem:tl-pointwise-blocks}) and $g_j = 0$ otherwise, and
+$|g_j| = \mathbf 1_t(j) \, 2^{j\sigma} |\psi_j * f|$. The synthesis bound of
+\Cref{thm:vector-valued-strong-type} applies.
+\end{proof}
+
+\paragraph{Convergent synthesis sums.}
+
+\begin{lemma}[Convergent synthesis sums]
+\label{lem:synthesis-sums-convergent}
+\lean{Rd.memLp_sum_conv_blockFun, Rd.cauchySeq_toLp_sum_conv_blockFun,
+  Rd.exists_tendsto_sum_conv_blockFun}
+\leanok
+\uses{def:triebel-lizorkin, thm:young, lem:weighted-block-tails, lem:tl-pointwise-blocks}
+Let $1 \leq p < \infty$, $\sigma$ real, $f \in \TL{\sigma}{p}{2}$, $C < \infty$ and $K_j$ Schwartz
+functions with
+\[
+  \Bigl\| \sum_{j \in t} K_j * (\psi_j * f) \Bigr\|_p \leq C \, \Bigl\| x \mapsto
+  \bigl\| \bigl(\mathbf 1_t(j) \, 2^{j\sigma} |(\psi_j * f)(x)|\bigr)_j \bigr\|_{\ell_2}
+  \Bigr\|_p
+\]
+for every finite set $t \subseteq \N$. Then the sums $\sum_{j \in t} K_j * (\psi_j * f)$ lie in
+$L_p(V)$, the partial sums $\sum_{j < J} K_j * (\psi_j * f)$ form a Cauchy sequence in $L_p(V)$,
+and they converge to some $g \in L_p(V)$ with $\|g\|_p \leq C \|f\|_{F^\sigma_{p,2}}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The blocks $\psi_j * f$ lie in $L_p(V)$ (\Cref{lem:tl-pointwise-blocks}), so the sums lie in
+$L_p(V)$ by Young's inequality (\Cref{thm:young}). For $N \leq N'$ the difference of the partial
+sums at $N'$ and $N$ is the sum over $t = \{N, \dots, N' - 1\}$, whose norm is at most $C$ times
+the norm of the weighted blocks with $j \geq N$; these tails tend to zero
+(\Cref{lem:weighted-block-tails}). The limit $g$ exists since $L_p(V)$ is complete, and each
+partial sum has norm at most $C \|f\|_{F^\sigma_{p,2}}$ (\Cref{lem:weighted-block-tails}).
+\end{proof}
+
+\paragraph{Triebel--Lizorkin spaces in Bessel potential spaces.}
+
+\begin{theorem}[$\TL{s}{p}{2} \subseteq H^{s,p}$]
+\label{thm:triebel-lizorkin-to-bessel}
+\lean{Rd.exists_besselPotential_eq_of_memTriebelLizorkin,
+  Rd.memSobolev_bessel_of_memTriebelLizorkin}
+\leanok
+\uses{thm:cz-family-bessel-base, thm:bessel-synthesis-bound, lem:synthesis-sums-convergent,
+  lem:bessel-potential-limits, lem:square-function-reproducing, lem:psi-dual-derivatives}
+Let $n \geq 1$ and $1 < p < \infty$. For every real $s$ there is $C < \infty$ such that for every
+$f \in \TL{s}{p}{2}$ there is $h \in L_p(V)$ with $J_s f = h$ as tempered distributions and
+$\|h\|_p \leq C \|f\|_{F^s_{p,2}}$. In particular $f \in H^{s,p}(V)$ for every
+$f \in \TL{s}{p}{2}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $B, H$ be the constants of \Cref{thm:cz-family-bessel-base} for $\omega = \tilde G$ and
+$\sigma = s$, and $C = S_{V,p}(B, H)$. Since $(\tilde G_j)_{2^j} = \tilde\psi_j$
+(\Cref{lem:psi-dual-derivatives}), \Cref{thm:bessel-synthesis-bound} gives the hypothesis of
+\Cref{lem:synthesis-sums-convergent} for $K_j = J_s \tilde\psi_j$, so
+$\sum_{j < J} (J_s \tilde\psi_j) * (\psi_j * f)$ converges to some $h \in L_p(V)$ with
+$\|h\|_p \leq C \|f\|_{F^s_{p,2}}$. The sums $\sum_{j < J} \tilde\psi_j * (\psi_j * f)$ tend to
+$f$ (\Cref{lem:square-function-reproducing}), and \Cref{lem:bessel-potential-limits} gives
+$J_s f = h$.
+\end{proof}
+
+\paragraph{Bessel potential spaces in Triebel--Lizorkin spaces.}
+
+\begin{lemma}[The blocks of a Bessel potential]
+\label{lem:bessel-potential-blocks}
+\lean{Rd.dyadicWeight_mul_enorm_blockFun_eq}
+\leanok
+\uses{lem:bessel-potential-convolution-pointwise, lem:bessel-dilate-convolution, lem:psi-base,
+  def:bessel-base, def:triebel-lizorkin}
+Let $1 \leq q, r \leq \infty$ and $s$ real. For all $g \in L_q(V)$ and $h \in L_r(V)$ with
+$g = J_{-s} h$ as tempered distributions, every $j \in \N$ and every $x \in V$,
+\[
+  2^{js} \, |(\psi_j * g)(x)| = \bigl| \bigl( (K^{-s}_j[G^{\psi}])_{2^j} * h \bigr)(x) \bigr| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\psi_j = (G^{\psi}_j)_{2^j}$ (\Cref{lem:psi-base}), so
+$(\psi_j * g)(x) = ((J_{-s} \psi_j) * h)(x)$ (\Cref{lem:bessel-potential-convolution-pointwise})
+$= 2^{-js} ((K^{-s}_j[G^{\psi}])_{2^j} * h)(x)$ (\Cref{lem:bessel-dilate-convolution}).
+\end{proof}
+
+\begin{theorem}[$H^{s,p} \subseteq \TL{s}{p}{2}$ on $L_p$]
+\label{thm:bessel-to-triebel-lizorkin-lp}
+\lean{Rd.exists_triebelLizorkinNorm_le_of_besselPotential_eq}
+\leanok
+\uses{lem:bessel-potential-blocks, thm:cz-family-bessel-base, thm:vector-valued-strong-type,
+  def:cz-const}
+Let $n \geq 1$ and $1 < p < \infty$. For every real $s$ there is $C < \infty$ such that
+$\|g\|_{F^s_{p,2}} \leq C \|h\|_p$ for all $g, h \in L_p(V)$ with $J_s g = h$ as tempered
+distributions.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $B, H$ be the constants of \Cref{thm:cz-family-bessel-base} for $\omega = G^{\psi}$ and
+$\sigma = -s$, and $C = S_{V,p}(B, H)$. Since $g = J_{-s} h$ (Mathlib's
+\texttt{TemperedDistribution.\allowbreak besselPotential\_\allowbreak neg\_\allowbreak
+apply\_\allowbreak eq\_\allowbreak iff}), \Cref{lem:bessel-potential-blocks} writes the weighted
+blocks of $g$ as the analysis operator of the family $((K^{-s}_j[G^{\psi}])_{2^j})_j$ at $h$,
+and \Cref{thm:vector-valued-strong-type} bounds it.
+\end{proof}
+
+\begin{theorem}[$H^{s,p} \subseteq \TL{s}{p}{2}$ for $s \geq 0$]
+\label{thm:bessel-to-triebel-lizorkin}
+\lean{Rd.exists_memTriebelLizorkin_of_besselPotential_eq}
+\leanok
+\uses{thm:triebel-lizorkin-to-bessel, thm:bessel-to-triebel-lizorkin-lp,
+  thm:square-function-upper, prop:tl-elementary}
+Let $n \geq 1$, $1 < p < \infty$ and $s \geq 0$ real. There is $C < \infty$ such that for every
+tempered distribution $f$ and every $h \in L_p(V)$ with $J_s f = h$ there is $g \in L_p(V)$ with
+$g = f$ as tempered distributions, $g \in \TL{s}{p}{2}$ and $\|g\|_{F^s_{p,2}} \leq C \|h\|_p$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $C$ be the constant of \Cref{thm:bessel-to-triebel-lizorkin-lp}. Since
+$h \in L_p(V) = \TL{0}{p}{2}$ (\Cref{thm:square-function-upper}) and $-s \leq 0$,
+$h \in \TL{-s}{p}{2}$ (\Cref{prop:tl-elementary}), so \Cref{thm:triebel-lizorkin-to-bessel} for
+$-s$ gives $g \in L_p(V)$ with $J_{-s} h = g$. Then $g = J_{-s} J_s f = f$ (Mathlib's
+\texttt{TemperedDistribution.\allowbreak besselPotential\_\allowbreak neg\_\allowbreak
+apply\_\allowbreak eq\_\allowbreak iff}), $J_s g = h$, and
+\Cref{thm:bessel-to-triebel-lizorkin-lp} bounds $\|g\|_{F^s_{p,2}}$.
+\end{proof}
+
+On $L_p(V)$ the two spaces agree for every real $s$ (\Cref{cor:bessel-triebel-lizorkin}). For
+$s < 0$, $H^{s,p}(V)$ also contains tempered distributions outside $L_p(V)$, and
+\Cref{thm:bessel-to-triebel-lizorkin} is the statement for $s \geq 0$, where every element of
+$H^{s,p}(V)$ is an $L_p$ function.
+
+\paragraph{The bundled spaces and Calder\'on's theorem.}
+
+\begin{corollary}[The bundled spaces]
+\label{cor:bessel-bundled}
+\lean{Rd.exists_enorm_toBesselPotentialSpace_le, Rd.exists_memTriebelLizorkin_toDistr}
+\leanok
+\uses{thm:triebel-lizorkin-to-bessel, thm:bessel-to-triebel-lizorkin,
+  lem:lp-distribution-determined, lem:bessel-space-enorm}
+Let $n \geq 1$ and $1 < p < \infty$. For every real $s$ there is $C < \infty$ such that every
+$f \in \TL{s}{p}{2}$, as an element of Mathlib's $H^{s,p}(V)$, has
+$\|f\|_{H^{s,p}} \leq C \|f\|_{F^s_{p,2}}$. For every real $s \geq 0$ there is $C < \infty$ such
+that for every $F \in H^{s,p}(V)$ there is $g \in \TL{s}{p}{2}$ with $g = F$ as tempered
+distributions and $\|g\|_{F^s_{p,2}} \leq C \|F\|_{H^{s,p}}$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+The norm of $F \in H^{s,p}(V)$ is $\|J_s F\|_p$ (\Cref{lem:bessel-space-enorm}), and the
+$L_p$ function $J_s f$ of $f \in \TL{s}{p}{2}$ is the function $h$ of
+\Cref{thm:triebel-lizorkin-to-bessel}, since both represent the same tempered distribution
+(\Cref{lem:lp-distribution-determined}). The second claim is
+\Cref{thm:bessel-to-triebel-lizorkin} for the distribution $F$ and its $L_p$ function $J_s F$.
+\end{proof}
+
+\begin{corollary}[$\TL{s}{p}{2} = H^{s,p} \cap L_p$]
+\label{cor:bessel-triebel-lizorkin}
+\lean{Rd.memTriebelLizorkin_iff_memSobolev_bessel}
+\leanok
+\uses{thm:triebel-lizorkin-to-bessel, thm:bessel-to-triebel-lizorkin-lp}
+For every $n \geq 1$, every $1 < p < \infty$, every real $s$ and every $f \in L_p(V)$,
+$f \in \TL{s}{p}{2}$ if and only if $f \in H^{s,p}(V)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:triebel-lizorkin-to-bessel}; conversely, if $J_s f = h \in L_p(V)$, then
+$\|f\|_{F^s_{p,2}} \leq C \|h\|_p < \infty$ (\Cref{thm:bessel-to-triebel-lizorkin-lp}).
+\end{proof}
+
+\begin{corollary}[$\Sob{m}{p} = H^{m,p}$]
+\label{cor:sobolev-bessel}
+\lean{Rd.memSobolev_iff_memSobolev_bessel}
+\leanok
+\uses{cor:sobolev-triebel-lizorkin, cor:bessel-triebel-lizorkin}
+For every $n \geq 1$, every $1 < p < \infty$, every $m \in \N$ and every $f \in L_p(V)$,
+$f \in \Sob{m}{p}(V)$ if and only if $f \in H^{m,p}(V)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+Both are $\TL{m}{p}{2}$ (\Cref{cor:sobolev-triebel-lizorkin},
+\Cref{cor:bessel-triebel-lizorkin}).
+\end{proof}
+
+For $p = 2$, \Cref{sec:sobolev-two-littlewood-paley} proves $H^s(V) = \TL{s}{2}{2}$ directly by
+Plancherel's theorem, with explicit constants (\Cref{thm:sobolev-two-triebel-lizorkin}).
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
