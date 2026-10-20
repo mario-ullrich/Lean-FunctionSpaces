@@ -192,6 +192,8 @@ public import FunctionSpaces.Rd.VectorValuedWeakType
 public import FunctionSpaces.Lp.WeakType
 public import FunctionSpaces.Lp.LayerCake
 public import FunctionSpaces.Lp.Marcinkiewicz
+public import FunctionSpaces.Lp.NormingFamily
+public import FunctionSpaces.Rd.VectorValuedSingularIntegrals
 
 /-!
 # Function spaces
@@ -210,7 +212,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Lp.BoundedContinuous`: bounded continuous functions in `L_p`; for a measure
   charging open sets, `L_∞` restricted to them is the sup norm.
 * `FunctionSpaces.Lp.MixedNorms`: the mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)` and their
-  comparison, from Minkowski's integral inequality for `ℓ_u`-valued functions.
+  comparison, from Minkowski's integral inequality for `ℓ_u`-valued functions, and the
+  cancellation of a power in Hölder's inequality.
 * `FunctionSpaces.Scheme`: schemes of functions `FunctionScheme` and their transport
   `FunctionScheme.toLp` to every `L_p(μ)`, compatible with the inclusions.
 * `FunctionSpaces.Besov.Basic`: the Besov spaces `B^s_{p,q}(Ω, S) = A^s_q(L_p(μ), S)`.
@@ -665,4 +668,12 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Lp.Marcinkiewicz`: Marcinkiewicz interpolation between weak type `(1,1)` and
   strong type `(2,2)` for `1 < p < 2` with an explicit constant, by the layer cake argument, for
   operators on an abstract input type and in the terms of the Carleson project.
+* `FunctionSpaces.Lp.NormingFamily`: `L_p` norms and `L_p(ℓ_2)` norms of families vanishing
+  outside a finite set by duality, `1 < p < ∞`, through the norming family
+  `u_j ‖(u_i)_i‖_{ℓ_2}^{p-2}`, and Hölder's inequality for `[0, ∞]`-valued functions in `L_p`
+  norms.
+* `FunctionSpaces.Rd.VectorValuedSingularIntegrals`: the strong type `(p,p)`, `1 < p < ∞`, of
+  the analysis operator and of the synthesis operators of a Calderón–Zygmund family with
+  explicit constants: Plancherel for `p = 2`, Marcinkiewicz interpolation for `p < 2` and
+  duality with the adjoint family for `p > 2`.
 -/

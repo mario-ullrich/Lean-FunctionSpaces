@@ -22,10 +22,10 @@ integrable kernel `K` with `f ∈ L_p` is `(K ⋆ f)(x) = ∫ K(y) f(x - y) dy` 
 of the group `V` of `MeasureTheory.eLpNorm_convolution_le`. The integral of the convolution
 converges absolutely at almost every point (`MeasureTheory.ae_convolutionExistsAt`), so
 convolution is linear in `f` almost everywhere (`Rd.conv_add_ae`, `Rd.conv_sub_ae`,
-`Rd.conv_finsetSum_ae`) and defines a bounded operator on `L_p` of norm at
-most `‖K‖_1` (`Rd.convLp`). These operators compose like their kernels, `K ⋆ (L ⋆ f) = (K ⋆ L) ⋆ f`
-(`Rd.convLp_convLp`, from the associativity `Rd.conv_conv_ae`), and are linear in the kernel
-(`Rd.convLp_sub_kernel`).
+`Rd.conv_finsetSum_ae`, and `Rd.conv_add_ae_of_memLp` for `f ∈ L_p`, `g ∈ L_r`) and defines a
+bounded operator on `L_p` of norm at most `‖K‖_1` (`Rd.convLp`). These operators compose like
+their kernels, `K ⋆ (L ⋆ f) = (K ⋆ L) ⋆ f` (`Rd.convLp_convLp`, from the associativity
+`Rd.conv_conv_ae`), and are linear in the kernel (`Rd.convLp_sub_kernel`).
 
 **Pointwise
 bounds**: if `|K| ≤ A` and `K = 0` outside `B̄(0, ρ)`, Hölder's inequality on balls gives
@@ -85,13 +85,23 @@ theorem memLp_conv {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K f : V �
     (memLp_one_iff_integrable.2 hK).eLpNorm_ne_top hf.eLpNorm_ne_top)
     (eLpNorm_conv_le hp1 hp hK.aestronglyMeasurable hf.aestronglyMeasurable))
 
-/-- **Convolution is additive** in `f ∈ L_p` almost everywhere. -/
-theorem conv_add_ae {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K f g : V → ℂ}
-    (hK : Integrable K μ) (hf : MemLp f p μ) (hg : MemLp g p μ) :
+/-- **Convolution is additive** almost everywhere, in the two-exponent form: for `f ∈ L_p` and
+`g ∈ L_r` with `1 ≤ p, r < ∞`, `K ⋆ (f + g) = K ⋆ f + K ⋆ g` almost everywhere, since both
+convolution integrals converge absolutely at almost every point
+(`MeasureTheory.ae_convolutionExistsAt`). -/
+theorem conv_add_ae_of_memLp {p r : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) (hr1 : 1 ≤ r) (hr : r ≠ ∞)
+    {K f g : V → ℂ} (hK : Integrable K μ) (hf : MemLp f p μ) (hg : MemLp g r μ) :
     conv K (f + g) μ =ᵐ[μ] conv K f μ + conv K g μ := by
-  filter_upwards [ae_convolutionExistsAt hp1 hp hK hf, ae_convolutionExistsAt hp1 hp hK hg]
+  filter_upwards [ae_convolutionExistsAt hp1 hp hK hf, ae_convolutionExistsAt hr1 hr hK hg]
     with x hfx hgx
   exact hfx.distrib_add hgx
+
+/-- **Convolution is additive** in `f ∈ L_p` almost everywhere: the case of equal exponents of
+`Rd.conv_add_ae_of_memLp`. -/
+theorem conv_add_ae {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {K f g : V → ℂ}
+    (hK : Integrable K μ) (hf : MemLp f p μ) (hg : MemLp g p μ) :
+    conv K (f + g) μ =ᵐ[μ] conv K f μ + conv K g μ :=
+  conv_add_ae_of_memLp hp1 hp hp1 hp hK hf hg
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] [μ.IsAddHaarMeasure] in
 /-- Convolution is homogeneous in `f`. -/

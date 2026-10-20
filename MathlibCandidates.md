@@ -208,6 +208,15 @@ declarations.
   (`MeasureTheory.hasStrongType_of_hasWeakType_one_of_hasStrongType_two`); the definitions in
   `FunctionSpaces/Lp/WeakType.lean` are the Carleson project's own candidates. The file imports
   the layer cake formula and the integrals of powers from `FunctionSpaces/Lp/LayerCake.lean`.
+* **`L_p` norms by duality** (`FunctionSpaces/Lp/NormingFamily.lean`): for `1 < p < ∞` with
+  conjugate `q` and `v ∈ L_p(μ)`, if `|∫ v conj g| ≤ A ‖g‖_q` for every `g ∈ L_q(μ)`, then
+  `‖v‖_p ≤ A` (`MeasureTheory.eLpNorm_le_of_forall_enorm_integral_mul_conj_le`), and the same
+  for the `L_p(ℓ_2)` norm of a family in `L_p` vanishing outside a finite set
+  (`MeasureTheory.eLpNorm_lqNorm_le_of_forall_enorm_sum_integral_le`), by testing on
+  `u_j ‖(u_i)_i‖_{ℓ_2}^{p-2}`; Mathlib's `MeasureTheory/Function/Holder.lean` has the pairing
+  of `L_p` and `L_q` with its upper bound (`lpPairing`), and this is the converse. Also
+  Hölder's inequality for `[0, ∞]`-valued functions written with `eLpNorm`
+  (`MeasureTheory.lintegral_mul_le_eLpNorm_mul_eLpNorm`).
 * **Integrals under a change of scale** (`FunctionSpaces/Rd/KernelMajorants.lean`):
   `∫ f(r x) dx = |r^(-n)| ∫ f` for `f : V → [0, ∞]` and `r ≠ 0` (`Rd.lintegral_comp_smul`),
   from Mathlib's `Measure.map_addHaar_smul`; Mathlib has the Bochner version

@@ -24,7 +24,8 @@ first controls partial sums of dyadic blocks (Bernstein side), the second contro
 geometric kernel `w i = 2^(-iα)`.  The proof writes the convolution as a series of shifted
 copies of `c` and uses the **countable Minkowski inequality** `lqNorm_tsum_le`, which follows
 from Mathlib's finite version (`MeasureTheory.eLpNorm_sum_le`) by monotone convergence
-(`lqNorm_iSup`).
+(`lqNorm_iSup`); monotone convergence also gives the norm of a sequence as the supremum of the
+norms of its truncations, which increase (`lqNorm_eq_iSup_lqNorm_ite`, `monotone_ite_lt`).
 
 Together they bound an **almost diagonal sum**: with `c_{ij} = 2^(-(i-j)L)` for `j ≤ i` and
 `c_{ij} = 1` for `j > i`, `‖(2^(is) ∑_j c_{ij} a_j)_i‖_q ≤ C ‖(2^(js) a_j)_j‖_q` for `0 < s < L`
@@ -59,6 +60,30 @@ theorem lqNorm_iSup {F : ℕ → ℕ → ℝ≥0∞} (hF : Monotone F) :
     simp_rw [lintegral_count]
   simp_rw [h1, h2]
   exact (ENNReal.orderIsoRpow (1 / q.toReal) (by positivity)).map_iSup _
+
+/-- **The truncations of a sequence increase**: `J ↦ (a_j 1_{j < J})_j` is monotone. -/
+theorem monotone_ite_lt (a : ℕ → ℝ≥0∞) :
+    Monotone fun (J j : ℕ) => if j < J then a j else 0 := by
+  intro J J' hJ j
+  dsimp only
+  split_ifs with h1 h2
+  · exact le_rfl
+  · exact absurd (lt_of_lt_of_le h1 hJ) h2
+  · exact zero_le
+  · exact le_rfl
+
+/-- **`ℓ_q` norms of truncations increase to the norm**: for every sequence `a` in `[0, ∞]`,
+`‖a‖_{ℓ_q} = sup_J ‖(a_j 1_{j < J})_j‖_{ℓ_q}`, the case of `ENNReal.lqNorm_iSup` for the
+truncations of `a`. -/
+theorem lqNorm_eq_iSup_lqNorm_ite (a : ℕ → ℝ≥0∞) :
+    lqNorm q a = ⨆ J : ℕ, lqNorm q (fun j => if j < J then a j else 0) := by
+  rw [← lqNorm_iSup (monotone_ite_lt a)]
+  congr 1
+  funext j
+  refine le_antisymm (le_iSup_of_le (j + 1) (by simp)) (iSup_le fun J => ?_)
+  split_ifs
+  · exact le_rfl
+  · exact zero_le
 
 /-- **Minkowski's inequality for finite sums** of sequences. -/
 theorem lqNorm_sum_le (hq : 1 ≤ q) {ι : Type*} (s : Finset ι) (f : ι → ℕ → ℝ≥0∞) :

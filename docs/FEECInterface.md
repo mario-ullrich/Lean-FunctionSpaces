@@ -452,7 +452,9 @@ The current part of Lean-FunctionSpaces proves the square function theorem `L_p 
 `W^m_p = F^m_{p,2}` and Mathlib's `H^{s,p} = F^s_{p,2}` for all `1 < p < ∞`, and the Sobolev
 embeddings on `ℝ^d`. Its tools are formalised: Plancherel bounds for families of convolution
 kernels, the weak type `(1,1)` of vector-valued singular integrals for families of dilated
-kernels, and Marcinkiewicz interpolation (blueprint chapter *Sobolev spaces on `ℝ^d`*, block
+kernels, Marcinkiewicz interpolation, and the strong type `(p,p)`, `1 < p < ∞`, of the analysis
+and synthesis operators of every Calderón–Zygmund family (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`,
+`Rd.IsCZFamily.eLpNorm_sum_conv_le`) (blueprint chapter *Sobolev spaces on `ℝ^d`*, block
 document [Sobolev spaces on `ℝ^d`](SobolevRd.md)). These results generalise Sections 4.1 and 4.2
 from `p = 2`; the `p = 2` statements above stay, with their explicit constants.
 

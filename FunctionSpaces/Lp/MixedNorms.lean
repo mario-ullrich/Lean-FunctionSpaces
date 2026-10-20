@@ -39,6 +39,11 @@ a probability space, with the `L_p` norm on the right (`MeasureTheory.lqNorm_lin
 Finally, a pointwise bound `u ≤ v + w_J` with `‖w_J‖_p → 0` gives `u ≤ v` almost everywhere
 (`MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm`), and a bound `|G_J| ≤ v` almost everywhere
 passes to the limit of `G_J` in `L_p` (`MeasureTheory.ae_enorm_le_of_tendsto_Lp`).
+
+Two facts on conjugate exponents serve the duality arguments: a power cancels in Hölder's
+inequality, `X ≤ K A^{1/u} X^{1/u'}` with `X < ∞` gives `X ≤ K^u A`
+(`ENNReal.le_rpow_mul_of_le_mul_rpow`), and the conjugate exponent of `p > 2` is below `2`
+(`ENNReal.HolderConjugate.lt_two_of_two_lt`).
 -/
 
 @[expose] public section
@@ -69,6 +74,38 @@ theorem le_rpow_sum_rpow {ι : Type*} {S : Finset ι} {a : ι → ℝ≥0∞} {i
   calc a i = (a i ^ r) ^ (1 / r) := by rw [one_div, ENNReal.rpow_rpow_inv hr.ne']
     _ ≤ _ := ENNReal.rpow_le_rpow
           (Finset.single_le_sum (f := fun j => a j ^ r) (fun j _ => zero_le) hi) (by positivity)
+
+/-- **Conjugate exponents of exponents above `2`**: if `1/p + 1/q = 1` and `p > 2`, then
+`q < 2`, since `1/q = 1 - 1/p > 1/2`. -/
+theorem HolderConjugate.lt_two_of_two_lt {p q : ℝ≥0∞} [p.HolderConjugate q] (hp : 2 < p) :
+    q < 2 := by
+  have h1 : p⁻¹ < 2⁻¹ := ENNReal.inv_lt_inv.2 hp
+  refine ENNReal.inv_lt_inv.1 (lt_of_not_ge fun hle => ?_)
+  have h2 : p⁻¹ + q⁻¹ < 2⁻¹ + 2⁻¹ := ENNReal.add_lt_add_of_lt_of_le
+    (ENNReal.inv_ne_top.2 (HolderConjugate.ne_zero q p)) h1 hle
+  rw [HolderConjugate.inv_add_inv_eq_one p q, ENNReal.inv_two_add_inv_two] at h2
+  exact lt_irrefl _ h2
+
+/-- **Cancellation in Hölder's inequality**: for conjugate exponents `u, u'` and `X < ∞`, the
+bound `X ≤ K A^{1/u} X^{1/u'}` implies `X ≤ K^u A`, since `X = X^{1/u} X^{1/u'}`. -/
+theorem le_rpow_mul_of_le_mul_rpow {X K A : ℝ≥0∞} {u u' : ℝ} (h : u.HolderConjugate u')
+    (hX : X ≠ ∞) (hle : X ≤ K * A ^ (1 / u) * X ^ (1 / u')) : X ≤ K ^ u * A := by
+  rcases eq_or_ne X 0 with rfl | hX0
+  · exact zero_le
+  have hu : 0 < u := h.pos
+  have hsplit : X = X ^ (1 / u) * X ^ (1 / u') := by
+    rw [← ENNReal.rpow_add _ _ hX0 hX, one_div, one_div, h.inv_add_inv_eq_one, ENNReal.rpow_one]
+  have hc0 : X ^ (1 / u') ≠ 0 := (ENNReal.rpow_pos (pos_iff_ne_zero.2 hX0) hX).ne'
+  have hct : X ^ (1 / u') ≠ ∞ :=
+    ENNReal.rpow_ne_top_of_nonneg (one_div_nonneg.2 h.symm.pos.le) hX
+  have h1 : X ^ (1 / u) ≤ K * A ^ (1 / u) := by
+    refine (ENNReal.mul_le_mul_iff_left hc0 hct).1 ?_
+    rw [← hsplit]
+    exact hle
+  calc X = (X ^ (1 / u)) ^ u := by rw [one_div, ENNReal.rpow_inv_rpow hu.ne']
+    _ ≤ (K * A ^ (1 / u)) ^ u := ENNReal.rpow_le_rpow h1 hu.le
+    _ = K ^ u * A := by
+        rw [ENNReal.mul_rpow_of_nonneg _ _ hu.le, one_div, ENNReal.rpow_inv_rpow hu.ne']
 
 section Countable
 

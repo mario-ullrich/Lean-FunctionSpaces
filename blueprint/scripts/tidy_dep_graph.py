@@ -137,7 +137,9 @@ BLOCKS: list[tuple[str, list]] = [
                r"The signed Calder\'on--Zygmund decomposition",
                r"The weak type \texorpdfstring{$(1,1)$}{(1,1)} of vector-valued singular integrals",
                r"Weak \texorpdfstring{$L_p$}{L\_p} norms and operators of weak and strong type",
-               "Marcinkiewicz interpolation"])]),
+               "Marcinkiewicz interpolation",
+               r"\texorpdfstring{$L_p$}{L\_p} norms by duality",
+               "The strong type of vector-valued singular integrals"])]),
 ]
 
 # Columns of blocks: in each list, every block is placed below the one before it. Without

@@ -31,7 +31,8 @@ The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥
 inclusion `lp.monotone`, without the norm bound), the Cauchy–Schwarz inequality
 `∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for series and for finite sums
 (`ENNReal.lqNorm_one_mul_le`, `ENNReal.sum_mul_le_lqNorm_two_mul`), the splitting off of the
-first term, the geometric sequence, and the **dyadic weights** `dyadicWeight s k = 2 ^ (k s)` that
+first term, sequences with one nonzero term (`Rd.lqNorm_ite_eq`), the geometric sequence, and
+the **dyadic weights** `dyadicWeight s k = 2 ^ (k s)` that
 every approximation space uses.
 -/
 
@@ -195,6 +196,12 @@ theorem lqNorm_le_lqNorm_of_le (hq : 1 ≤ q) (hqr : q ≤ r) (a : ι → ℝ≥
 /-- `‖a‖_{ℓ_q} ≤ ‖a‖_{ℓ_1} = ∑_i a_i` for `q ≥ 1`. -/
 theorem lqNorm_le_lqNorm_one (hq : 1 ≤ q) (a : ι → ℝ≥0∞) : lqNorm q a ≤ ∑' n, a n := by
   simpa [lqNorm_one] using lqNorm_le_lqNorm_of_le le_rfl hq a
+
+/-- A family that vanishes outside a finite set `s` has `‖a‖_{ℓ_q} ≤ ∑_{i ∈ s} a_i` for
+`q ≥ 1` (`ENNReal.lqNorm_le_lqNorm_one`). -/
+theorem lqNorm_le_sum_of_eq_zero (hq : 1 ≤ q) (s : Finset ι) (ha : ∀ i ∉ s, a i = 0) :
+    lqNorm q a ≤ ∑ i ∈ s, a i :=
+  (lqNorm_le_lqNorm_one hq a).trans_eq (tsum_eq_sum ha)
 
 /-- For a finite index set, `‖a‖_{ℓ_q} = (∑_i a_i^q)^(1/q)` for `0 < q < ∞`. -/
 theorem lqNorm_eq_sum [Fintype ι] (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ι → ℝ≥0∞) :
@@ -583,3 +590,24 @@ theorem one_add_pow_le_two_pow_mul {t : ℝ} (ht : 0 ≤ t) (N : ℕ) :
       gcongr
       · exact one_le_two
       · exact Nat.sub_le N 1
+
+namespace Rd
+
+open ENNReal (lqNorm)
+
+/-- `‖(…, 0, x, 0, …)‖_{ℓ_q} = x` for a sequence with one nonzero term. -/
+theorem lqNorm_ite_eq {q : ℝ≥0∞} (hq : 1 ≤ q) (j : ℕ) (x : ℝ≥0∞) :
+    lqNorm q (fun i => if i = j then x else 0) = x := by
+  rcases eq_or_ne q ∞ with rfl | hqt
+  · rw [ENNReal.lqNorm_top]
+    refine le_antisymm (iSup_le fun i => ?_) (le_iSup_of_le j (by simp))
+    split_ifs <;> simp
+  · have hq0 : q ≠ 0 := (zero_lt_one.trans_le hq).ne'
+    have hpos : 0 < q.toReal := ENNReal.toReal_pos hq0 hqt
+    rw [ENNReal.lqNorm_eq_tsum hq0 hqt]
+    have h : (fun i => (if i = j then x else 0) ^ q.toReal) =
+        fun i => if i = j then x ^ q.toReal else 0 := funext fun i => by
+      split_ifs <;> simp [ENNReal.zero_rpow_of_pos hpos]
+    rw [h, tsum_ite_eq, one_div, ENNReal.rpow_rpow_inv hpos.ne']
+
+end Rd

@@ -19,7 +19,9 @@ convolution `(K ⋆ f)(x) = ∫ K(y) f(x - y) dy` (`Rd.conv`) and `K^∨(x) = K(
 * **The adjoint identity** (`Rd.integral_conv_mul`): for integrable `K`, `f ∈ L_p`, `g ∈ L_q`
   with `1/p + 1/q = 1`, `p < ∞`, `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)`, by Fubini's theorem; the double
   integral converges absolutely by Young's and Hölder's inequalities
-  (`Rd.integrable_kernel_mul_mul`).
+  (`Rd.integrable_kernel_mul_mul`). With conjugation it reads
+  `∫ (K ⋆ f) conj g = ∫ f conj(K^* ⋆ g)` for the adjoint kernel `K^*(x) = conj K(-x)`
+  (`Rd.integral_conv_mul_conj`).
 * **Derivatives move to the Schwartz factor** (`Rd.integral_conv_iteratedLineDerivOp_mul`): for
   Schwartz functions `η`, `u` and `f ∈ L_p`, `1 ≤ p < ∞`,
   `∫ ((∂^w η) ⋆ f) u = (-1)^k ∫ (η ⋆ f) ∂^w u`, by the adjoint identity and integration by
@@ -36,7 +38,7 @@ convolution `(K ⋆ f)(x) = ∫ K(y) f(x - y) dy` (`Rd.conv`) and `K^∨(x) = K(
 @[expose] public section
 
 open MeasureTheory TopologicalSpace
-open scoped ENNReal SchwartzMap FourierTransform LineDeriv
+open scoped ENNReal SchwartzMap FourierTransform LineDeriv ComplexConjugate
 
 namespace SchwartzMap
 
@@ -173,6 +175,29 @@ theorem integral_conv_mul {p q : ℝ≥0∞} [p.HolderConjugate q] (hp : p ≠ �
         congr 1
         funext x
         ring
+
+/-- **Reflection and conjugation**: `(K^∨ ⋆ conj u)(x) = conj((K^* ⋆ u)(x))` at every point, for
+the adjoint kernel `K^*(z) = conj K(-z)` and the reflection `K^∨(z) = K(-z)`; both sides are
+`∫ K(y - x) conj u(y) dy`. -/
+theorem conv_reflect_conj (K u : V → ℂ) (x : V) :
+    conv (reflect K) (fun y => conj (u y)) volume x =
+      conj (conv (fun z => conj (K (-z))) u volume x) := by
+  rw [conv_apply_eq_integral_sub, conv_apply_eq_integral_sub, ← integral_conj]
+  congr 1
+  funext y
+  rw [map_mul, Complex.conj_conj, reflect_apply]
+
+/-- **The adjoint identity with conjugation**: for integrable `K`, `f ∈ L_p` and `g ∈ L_q` with
+`1/p + 1/q = 1`, `p < ∞`, `∫ (K ⋆ f) conj g = ∫ f conj(K^* ⋆ g)` with the adjoint kernel
+`K^*(z) = conj K(-z)` (`Rd.integral_conv_mul` for `conj g` and `Rd.conv_reflect_conj`). -/
+theorem integral_conv_mul_conj {p q : ℝ≥0∞} [p.HolderConjugate q] (hp : p ≠ ∞) {K f g : V → ℂ}
+    (hK : Integrable K) (hf : MemLp f p) (hg : MemLp g q) :
+    ∫ x, conv K f volume x * conj (g x) =
+      ∫ y, f y * conj (conv (fun z => conj (K (-z))) g volume y) := by
+  rw [integral_conv_mul (g := fun x => conj (g x)) hp hK hf hg.star]
+  congr 1
+  funext y
+  rw [conv_reflect_conj]
 
 /-! ### Translates and reflections of Schwartz functions -/
 

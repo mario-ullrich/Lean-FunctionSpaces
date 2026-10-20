@@ -463,21 +463,6 @@ theorem modNorm_le_coeffNorm {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) 
   have e : ∀ k, lpModulusOn p Set.univ r F k = lpModulus p r F k := fun k => modulusOn_univ r p _ _
   simpa only [Set.indicator_univ, e, ← Lp.enorm_def] using h
 
-/-- `‖(…, 0, x, 0, …)‖_{ℓ_q} = x` for a sequence with one nonzero term. -/
-theorem lqNorm_ite_eq {q : ℝ≥0∞} (hq : 1 ≤ q) (j : ℕ) (x : ℝ≥0∞) :
-    lqNorm q (fun i => if i = j then x else 0) = x := by
-  rcases eq_or_ne q ∞ with rfl | hqt
-  · rw [ENNReal.lqNorm_top]
-    refine le_antisymm (iSup_le fun i => ?_) (le_iSup_of_le j (by simp))
-    split_ifs <;> simp
-  · have hq0 : q ≠ 0 := (zero_lt_one.trans_le hq).ne'
-    have hpos : 0 < q.toReal := ENNReal.toReal_pos hq0 hqt
-    rw [ENNReal.lqNorm_eq_tsum hq0 hqt]
-    have h : (fun i => (if i = j then x else 0) ^ q.toReal) =
-        fun i => if i = j then x ^ q.toReal else 0 := funext fun i => by
-      split_ifs <;> simp [ENNReal.zero_rpow_of_pos hpos]
-    rw [h, tsum_ite_eq, one_div, ENNReal.rpow_rpow_inv hpos.ne']
-
 /-- The zero function is a regular atom on every set at every level. -/
 theorem isRegularAtomOn_zero {Ω : Set V} {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : ℝ} {C : ℝ≥0∞} {j : ℕ}
     {c : V} : IsRegularAtomOn Ω p σ r d C j c (0 : V → ℂ) where

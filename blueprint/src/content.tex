@@ -313,7 +313,7 @@ coefficients of one level of atoms and wavelets.
   ENNReal.lqNorm_le_lqNorm_of_le, ENNReal.lqNorm_le_head_add_shift,
   ENNReal.lqNorm_le_sum_range_add_shift, ENNReal.lqNorm_le_lqNorm_one, ENNReal.lqNorm_geometric_le,
   ENNReal.lqNorm_shift_le, ENNReal.lqNorm_eq_sum, ENNReal.lqNorm_le_card_rpow_mul,
-  ENNReal.lqNorm_prod_rpow}
+  ENNReal.lqNorm_prod_rpow, ENNReal.lqNorm_le_sum_of_eq_zero, Rd.lqNorm_ite_eq}
 \leanok
 \uses{def:lq-norm}
 Let $1 \leq q \leq r \leq \infty$. For all sequences $a, b$ in $[0, \infty]$, all
@@ -325,7 +325,10 @@ $c, \rho \in [0, \infty]$ and all $n \in \N$:
   \item $\|a\|_{\ell_r} \leq \|a\|_{\ell_q} \leq \|a\|_{\ell_1}$;
   \item $\|a\|_{\ell_q} \leq a_0 + \|(a_{k+1})_k\|_{\ell_q}$, and
     $\|a\|_{\ell_q} \leq a_0 + \cdots + a_{m-1} + \|(a_{k+m})_k\|_{\ell_q}$ for every $m \in \N$;
-  \item $\|(\rho^k)_k\|_{\ell_q} \leq (1 - \rho)^{-1}$.
+  \item $\|(\rho^k)_k\|_{\ell_q} \leq (1 - \rho)^{-1}$;
+  \item if $a_k = 0$ for every $k$ outside a finite set $s \subseteq \N$, then
+    $\|a\|_{\ell_q} \leq \sum_{k \in s} a_k$, and the sequence equal to $c$ at $n$ and to $0$
+    elsewhere has $\ell_q$ norm $c$.
 \end{enumerate}
 \end{lemma}
 
@@ -335,7 +338,8 @@ The first two items are immediate. The third is Minkowski's inequality for the f
 partial sums, followed by the supremum over them. For the fourth put $M = \|a\|_{\ell_q}$;
 then $a_k^r = a_k^{r-q} a_k^q \leq M^{r-q} a_k^q$, and summation gives
 $\|a\|_{\ell_r}^r \leq M^r$. The fifth is the third applied to $a_0 \delta_0$ and the rest,
-and induction on $m$. The last is the fourth and the geometric series.
+and induction on $m$. The sixth is the fourth and the geometric series, and the last is the
+fourth for a sequence with finitely many nonzero terms.
 \end{proof}
 
 \begin{lemma}[The Cauchy--Schwarz inequality for sequences]
@@ -359,23 +363,28 @@ Lp\_\allowbreak mul\_\allowbreak Lq}) with exponents $2$ and $2$; the first hold
 term is nonnegative.
 \end{proof}
 
-\begin{lemma}[Countable Minkowski inequality]
+\begin{lemma}[Countable Minkowski inequality and monotone convergence in $\ell_q$]
 \label{lem:countable-minkowski}
-\lean{ENNReal.lqNorm_sum_le, ENNReal.lqNorm_iSup, ENNReal.lqNorm_tsum_le}
+\lean{ENNReal.lqNorm_sum_le, ENNReal.lqNorm_iSup, ENNReal.lqNorm_tsum_le,
+  ENNReal.monotone_ite_lt, ENNReal.lqNorm_eq_iSup_lqNorm_ite}
 \leanok
 \uses{lem:lq-basic}
-Let $1 \leq q \leq \infty$. For every family $(f_{i,k})_{i, k \in \N}$ in $[0, \infty]$,
+For every $1 \leq q \leq \infty$ and every family $(f_{i,k})_{i, k \in \N}$ in $[0, \infty]$,
 \[
   \Bigl\| \Bigl(\sum_{i=0}^\infty f_{i,k}\Bigr)_k \Bigr\|_{\ell_q}
   \leq \sum_{i=0}^\infty \|(f_{i,k})_k\|_{\ell_q} .
 \]
+For every $q \in (0, \infty]$ and every sequence $a$ in $[0, \infty]$, the truncations
+$(a_k \mathbf 1_{\{k < J\}})_k$ increase with $J$ and
+$\|a\|_{\ell_q} = \sup_{J \in \N} \|(a_k \mathbf 1_{\{k < J\}})_k\|_{\ell_q}$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 For finite sums this follows from \Cref{lem:lq-basic} by induction. The partial sums increase
 to the series, and the $\ell_q$ norm of an increasing family of sequences is the supremum of
-their norms, by monotone convergence.
+their norms, by monotone convergence. The truncations of $a$ increase to $a$, so the same
+argument gives the last identity.
 \end{proof}
 
 The following two inequalities are the discrete Hardy inequalities: a tail sum and a partial
@@ -5670,14 +5679,14 @@ for almost every $x$.
 
 \begin{lemma}[Linearity and associativity]
 \label{lem:conv-assoc}
-\lean{Rd.conv_add_ae, Rd.add_conv_ae, Rd.sub_conv_ae, Rd.ae_integrable_conv_conv,
-  Rd.conv_conv_ae, Rd.conv_comm}
+\lean{Rd.conv_add_ae, Rd.conv_add_ae_of_memLp, Rd.add_conv_ae, Rd.sub_conv_ae,
+  Rd.ae_integrable_conv_conv, Rd.conv_conv_ae, Rd.conv_comm}
 \leanok
 \uses{thm:young}
 Let $1 \leq p < \infty$, $K, K', L \in L_1$ and $f, g \in L_p$. Almost everywhere on $V$,
 $K * (f + g) = K * f + K * g$, $(K + K') * f = K * f + K' * f$,
-$(K - K') * f = K * f - K' * f$ and $(K * L) * f = K * (L * f)$. For all $K, L : V \to \C$,
-$K * L = L * K$.
+$(K - K') * f = K * f - K' * f$ and $(K * L) * f = K * (L * f)$. The first identity also holds
+for every $g \in L_r$, $1 \leq r < \infty$. For all $K, L : V \to \C$, $K * L = L * K$.
 \end{lemma}
 
 \begin{proof}
@@ -7414,9 +7423,9 @@ since $2^{js} b_j = 2^{j(s - n/p)} \|\lambda_{j,\cdot}\|_{\ell_p}$.
 
 \begin{lemma}[Synthesis of one level]
 \label{lem:single-level}
-\lean{Rd.lqNorm_ite_eq, Rd.isRegularAtomOn_zero, Rd.modNorm_level_le}
+\lean{Rd.isRegularAtomOn_zero, Rd.modNorm_level_le}
 \leanok
-\uses{thm:rd-atomic-synthesis}
+\uses{thm:rd-atomic-synthesis, lem:lq-basic}
 For regular atoms of level $j$ with the overlap of \Cref{lem:level-sums}, $F = \sum_m \lambda_m a_m$
 in $L_p$ and $0 < s < \sigma$,
 $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq K 2^{j(s - n/p)} \|\lambda\|_{\ell_p}$,
@@ -7426,7 +7435,8 @@ with the constant $K$ of \Cref{thm:rd-atomic-synthesis}.
 \begin{proof}
 \leanok
 \Cref{thm:rd-atomic-synthesis} with the coefficients and atoms of the other levels equal to $0$; the
-zero function is a regular atom, and a sequence with one nonzero term $x$ has $\ell_q$-norm $x$.
+zero function is a regular atom, and a sequence with one nonzero term $x$ has $\ell_q$-norm $x$
+(\Cref{lem:lq-basic}).
 \end{proof}
 
 \begin{lemma}[Atoms from pointwise bounds]
@@ -9185,6 +9195,22 @@ is at most $\int \|(g_i)_i\|_{\ell_u}$, and the supremum over $S$ gives the clai
 probability space the integral is the $L_1$ norm, which is at most the $L_p$ norm.
 \end{proof}
 
+\begin{lemma}[Conjugate exponents and cancellation in H\"older's inequality]
+\label{lem:cancel-conjugate-power}
+\lean{ENNReal.le_rpow_mul_of_le_mul_rpow, ENNReal.HolderConjugate.lt_two_of_two_lt}
+\leanok
+For all conjugate exponents $1 < u, u' < \infty$ and all $X, K, A \in [0, \infty]$ with
+$X < \infty$ and $X \leq K A^{1/u} X^{1/u'}$, $X \leq K^u A$. For all $p, q \in [1, \infty]$
+with $1/p + 1/q = 1$ and $p > 2$, $q < 2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $X = 0$ the bound holds. Otherwise $X = X^{1/u} X^{1/u'}$ with
+$0 < X^{1/u'} < \infty$, so $X^{1/u} \leq K A^{1/u}$; take the $u$-th power. For the second
+statement, $1/q = 1 - 1/p > 1/2$.
+\end{proof}
+
 \begin{theorem}[Comparison of mixed norms]
 \label{thm:mixed-norms}
 \lean{MeasureTheory.eLpNorm_lqNorm_eq_lqNorm_eLpNorm,
@@ -10300,20 +10326,6 @@ unchanged. Let $\int G^p < \infty$. By \Cref{lem:layer-cake},
 $\int (\overline M g)^p = p \int_0^\infty |\{\overline M g > \tau\}| \, \tau^{p-1} \, d\tau$, and
 \Cref{lem:fefferman-stein-split} bounds the integrand. \Cref{lem:tonelli-steps-measure-space} with
 $r = q$ evaluates the two resulting integrals.
-\end{proof}
-
-\begin{lemma}[Cancellation in H\"older's inequality]
-\label{lem:cancel-conjugate-power}
-\lean{ENNReal.le_rpow_mul_of_le_mul_rpow}
-\leanok
-For all conjugate exponents $1 < u, u' < \infty$ and all $X, K, A \in [0, \infty]$ with
-$X < \infty$ and $X \leq K A^{1/u} X^{1/u'}$, $X \leq K^u A$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-For $X = 0$ there is nothing to show. Otherwise $X = X^{1/u} X^{1/u'}$ with
-$0 < X^{1/u'} < \infty$, so $X^{1/u} \leq K A^{1/u}$; take the $u$-th power.
 \end{proof}
 
 \begin{theorem}[The case $q < p$]
@@ -15888,6 +15900,32 @@ gives the left side by \Cref{lem:reflect-basic}, integrating first in $x$ gives 
 and Fubini's theorem exchanges the integrations.
 \end{proof}
 
+With complex conjugation, the reflection becomes the adjoint kernel
+$K^*(z) = \overline{K(-z)}$, the form in which the duality arguments for $p > 2$ use the
+identity.
+
+\begin{corollary}[The adjoint identity with conjugation]
+\label{cor:convolution-adjoint-conj}
+\lean{Rd.conv_reflect_conj, Rd.integral_conv_mul_conj}
+\leanok
+\uses{thm:convolution-adjoint, lem:reflect-basic}
+For all functions $K, u : V \to \C$ and every $x \in V$,
+$(K^\vee * \overline u)(x) = \overline{(K^* * u)(x)}$. For all $1 \leq p < \infty$ and
+$1 < q \leq \infty$ with $1/p + 1/q = 1$, every $K \in L_1(V)$, every $f \in L_p(V)$ and every
+$g \in L_q(V)$,
+\[
+  \int_V (K * f)(x) \, \overline{g(x)} \, dx
+  = \int_V f(y) \, \overline{(K^* * g)(y)} \, dy .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+By \Cref{lem:reflect-basic} both sides of the first identity are
+$\int_V K(y - x) \, \overline{u(y)} \, dy$. \Cref{thm:convolution-adjoint} for $\overline g \in
+L_q(V)$ and the first identity give the second.
+\end{proof}
+
 \begin{lemma}[Translates and reflections of Schwartz functions]
 \label{lem:schwartz-shift-reflect}
 \lean{SchwartzMap.lineDerivOp_compSubConstCLM, SchwartzMap.iteratedLineDerivOp_compSubConstCLM,
@@ -17103,6 +17141,380 @@ and the strong type $(2,2)$ gives
 $\int A^2 \|T(\mathbf 1_{\{G \leq \tau\}} f)\|^2 \leq A^2 C_2^2 \int_{\{G \leq \tau\}} G^2$.
 \Cref{thm:marcinkiewicz-layer-cake} gives the first bound, and
 \Cref{lem:lp-norm-from-power-integrals} the strong type.
+\end{proof}
+
+\section{\texorpdfstring{$L_p$}{L\_p} norms by duality}
+\label{sec:lp-norm-duality}
+
+For $1 < p < \infty$ with conjugate exponent $p' = p/(p - 1)$, a function in $L_p$ whose
+pairings with all functions of $L_{p'}$ are bounded by $A$ times their $L_{p'}$ norm has $L_p$
+norm at most $A$, and likewise for the mixed norm of $L_p(\ell_2)$ and families in $L_p$ that
+vanish outside a finite set. The proof tests the pairing on one explicit family, the norming
+family, and uses only H\"older's inequality. Throughout, $(X, \mu)$ is a measure space.
+
+\begin{lemma}[H\"older's inequality in $L_p$ norms]
+\label{lem:holder-lp-norms}
+\lean{MeasureTheory.lintegral_mul_le_eLpNorm_mul_eLpNorm}
+\leanok
+\uses{lem:lp-norm-nonnegative}
+For all $p, q \in (1, \infty)$ with $1/p + 1/q = 1$ and all almost everywhere measurable
+$F, G : X \to [0, \infty]$,
+\[
+  \int F G \, d\mu \leq \|F\|_{L_p(\mu)} \|G\|_{L_q(\mu)} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+This is H\"older's inequality (Mathlib's
+\texttt{ENNReal.\allowbreak lintegral\_\allowbreak mul\_\allowbreak le\_\allowbreak
+Lp\_\allowbreak mul\_\allowbreak Lq}) written with $\|F\|_p^p = \int F^p$
+(\Cref{lem:lp-norm-nonnegative}).
+\end{proof}
+
+\begin{lemma}[Families vanishing outside a finite set]
+\label{lem:finite-families-lp-l2}
+\lean{MeasureTheory.lqNorm_enorm_ne_top_of_finite, MeasureTheory.eLpNorm_lqNorm_ne_top_of_finite,
+  MeasureTheory.lintegral_lqNorm_rpow_ne_top_of_finite,
+  MeasureTheory.memLp_of_lintegral_lqNorm_rpow_ne_top}
+\leanok
+\uses{def:lq-norm, lem:lq-basic, lem:lp-series-minkowski, lem:lp-norm-nonnegative}
+For every $p \geq 1$, every finite set $s \subseteq \N$ and all $u_j \in L_p(\mu)$, $j \in \N$,
+with $u_j = 0$ for $j \notin s$, the pointwise norm $\|(u_j(x))_j\|_{\ell_2}$ is finite at every
+$x \in X$ and $\bigl\| \|(u_j)_j\|_{\ell_2} \bigr\|_{L_p(\mu)} < \infty$; if moreover
+$p < \infty$, then $\int \|(u_j)_j\|_{\ell_2}^p \, d\mu < \infty$. For every
+$p \in (0, \infty)$, every family of functions $g_i : X \to \C$, $i \in \N$, and every $j \in \N$
+with $g_j$ almost everywhere strongly measurable and
+$\int \|(g_i)_i\|_{\ell_2}^p \, d\mu < \infty$, $g_j \in L_p(\mu)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\|(u_j(x))_j\|_{\ell_2} \leq \sum_{j \in s} |u_j(x)|$ (\Cref{lem:lq-basic}), and Minkowski's
+inequality (\Cref{lem:lp-series-minkowski}) bounds the $L_p$ norm of the right side by
+$\sum_{j \in s} \|u_j\|_p$; the integral is the $p$-th power of this norm
+(\Cref{lem:lp-norm-nonnegative}). The last statement holds since
+$|g_j| \leq \|(g_i)_i\|_{\ell_2}$ (\Cref{lem:lq-basic}).
+\end{proof}
+
+\begin{definition}[The norming family]
+\label{def:norming-family}
+\lean{MeasureTheory.normingFamily, MeasureTheory.aestronglyMeasurable_normingFamily}
+\leanok
+\uses{def:lq-norm}
+For every real $p$ and every family $u = (u_j)_{j \in \N}$ of functions $X \to \C$, the
+norming family of $u$ is
+\[
+  N_j(x) = u_j(x) \, \|(u_i(x))_i\|_{\ell_2}^{p-2} , \qquad j \in \N, \ x \in X,
+\]
+where the norm $\infty$ is replaced by $0$ before the real power is taken. If every $u_j$ is
+almost everywhere strongly measurable, so is every $N_j$.
+\end{definition}
+
+\begin{lemma}[Size and pairing of the norming family]
+\label{lem:norming-family}
+\lean{MeasureTheory.lqNorm_normingFamily, MeasureTheory.sum_mul_conj_normingFamily,
+  MeasureTheory.eLpNorm_lqNorm_normingFamily, MeasureTheory.memLp_normingFamily,
+  MeasureTheory.enorm_sum_integral_mul_conj_normingFamily}
+\leanok
+\uses{def:norming-family, lem:lq-basic, lem:finite-families-lp-l2, lem:lp-norm-nonnegative}
+For every real $p > 1$, every family $u$ of functions $X \to \C$ and every $x \in X$ with
+$\|(u_i(x))_i\|_{\ell_2} < \infty$,
+$\|(N_j(x))_j\|_{\ell_2} = \|(u_i(x))_i\|_{\ell_2}^{p-1}$. For every real $p > 0$, every finite
+set $s \subseteq \N$ and every $x \in X$ with $u_j(x) = 0$ for $j \notin s$,
+\[
+  \sum_{j \in s} u_j(x) \, \overline{N_j(x)} = \|(u_i(x))_i\|_{\ell_2}^p .
+\]
+For all $1 < p < \infty$ and $q$ with $1/p + 1/q = 1$, every finite set $s \subseteq \N$ and all
+$u_j \in L_p(\mu)$ with $u_j = 0$ for $j \notin s$, the integral
+$I_u = \int \|(u_j)_j\|_{\ell_2}^p \, d\mu$ is finite, every $N_j$ lies in $L_q(\mu)$,
+\[
+  \bigl\| \|(N_j)_j\|_{\ell_2} \bigr\|_{L_q(\mu)} = I_u^{1/q} \qquad\text{and}\qquad
+  \Bigl| \sum_{j \in s} \int u_j \, \overline{N_j} \, d\mu \Bigr| = I_u .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Every member of $u$ is multiplied by $r^{p-2}$ with $r = \|(u_i(x))_i\|_{\ell_2}$, so the
+$\ell_2$ norm is $r^{p-2} r = r^{p-1}$ (\Cref{lem:lq-basic}). Since
+$u_j \overline{u_j} = |u_j|^2$ and $\sum_{j \in s} |u_j(x)|^2 = r^2$, the sum is
+$r^{p-2} r^2 = r^p$. For the last statement, $I_u < \infty$ by \Cref{lem:finite-families-lp-l2};
+the first identity and $(p - 1) q = p$ give the norm of $(N_j)_j$, and $N_j \in L_q(\mu)$ since
+$|N_j| \leq \|(N_i)_i\|_{\ell_2}$. The pairing is the integral of the second identity, a
+nonnegative real function.
+\end{proof}
+
+\begin{theorem}[$L_p$ norms by duality]
+\label{thm:lp-norm-duality}
+\lean{MeasureTheory.eLpNorm_lqNorm_le_of_forall_enorm_sum_integral_le,
+  MeasureTheory.eLpNorm_le_of_forall_enorm_integral_mul_conj_le}
+\leanok
+\uses{lem:norming-family, lem:cancel-conjugate-power, lem:lp-norm-nonnegative, lem:lq-basic}
+Let $1 < p < \infty$, $1/p + 1/q = 1$ and $A \in [0, \infty]$. For every finite set
+$s \subseteq \N$ and all $u_j \in L_p(\mu)$, $j \in \N$, with $u_j = 0$ for $j \notin s$: if
+\[
+  \Bigl| \sum_{j \in s} \int u_j \, \overline{g_j} \, d\mu \Bigr|
+  \leq A \, \bigl\| \|(g_j)_j\|_{\ell_2} \bigr\|_{L_q(\mu)}
+\]
+for every family of functions $g_j \in L_q(\mu)$, $j \in \N$, then
+$\bigl\| \|(u_j)_j\|_{\ell_2} \bigr\|_{L_p(\mu)} \leq A$. For every $v \in L_p(\mu)$: if
+$\bigl| \int v \, \overline g \, d\mu \bigr| \leq A \|g\|_{L_q(\mu)}$ for every
+$g \in L_q(\mu)$, then $\|v\|_{L_p(\mu)} \leq A$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Test the hypothesis on the norming family $g = N$ for the exponent $p$
+(\Cref{lem:norming-family}): $I_u \leq A I_u^{1/q}$ with $I_u < \infty$, so $I_u \leq A^p$ by
+\Cref{lem:cancel-conjugate-power}, and
+$\bigl\| \|(u_j)_j\|_{\ell_2} \bigr\|_p = I_u^{1/p} \leq A$. The second statement is the first
+for the family $u_0 = v$, $u_j = 0$ for $j \geq 1$, since
+$|g_0| \leq \|(g_j)_j\|_{\ell_2}$ and $\|(v(x), 0, 0, \dots)\|_{\ell_2} = |v(x)|$
+(\Cref{lem:lq-basic}).
+\end{proof}
+
+\section{The strong type of vector-valued singular integrals}
+\label{sec:vector-valued-strong-type}
+
+Let $(\theta_j)_{j \in \N}$ be a Calder\'on--Zygmund family on $V$ with overlap $B$ and
+H\"ormander constant $H$ (\Cref{def:cz-family}). This section proves, for every
+$1 < p < \infty$, the strong type $(p, p)$ of the analysis operator
+$f \mapsto \|((\theta_j * f)(x))_j\|_{\ell_2}$ and of the synthesis operators
+$(g_j)_j \mapsto \sum_{j \in s} \theta_j * g_j$ for finite sets $s \subseteq \N$, with explicit
+constants. For $p = 2$ these are the Plancherel bounds. For $1 < p < 2$ Marcinkiewicz
+interpolation between the weak type $(1,1)$ of \Cref{thm:vector-valued-weak-type} and the
+$L_2$ bounds applies: to the analysis operator in the form of the formalisation of Carleson's
+theorem (\Cref{thm:marcinkiewicz-interpolation}), and to the synthesis operators in the form
+for an abstract input type (\Cref{thm:marcinkiewicz-abstract}), whose inputs are families of
+measurable functions. For $2 < p < \infty$, the adjoint identity exchanges the two operators of
+the adjoint family $\theta_j^*(x) = \overline{\theta_j(-x)}$, which has the same overlap and
+H\"ormander constant, at the conjugate exponent $p' < 2$, and \Cref{thm:lp-norm-duality}
+returns to $L_p$.
+
+\begin{theorem}[The strong type $(2,2)$]
+\label{thm:cz-strong-type-two}
+\lean{Rd.IsCZFamily.hasStrongType_lqNorm_conv_two, Rd.IsCZFamily.eLpNorm_lqNorm_conv_two_le,
+  Rd.IsCZFamily.eLpNorm_sum_conv_two_le}
+\leanok
+\uses{cor:cz-family-l2-bounds, lem:lp-norm-from-power-integrals, def:weak-type-operators,
+  lem:lp-norm-nonnegative}
+For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family $(\theta_j)_j$ on $V$ with
+overlap $B$ and H\"ormander constant $H$, every $f \in L_2(V)$, every finite set
+$s \subseteq \N$ and all $g_j \in L_2(V)$,
+\[
+  \bigl\| \|((\theta_j * f)(x))_j\|_{\ell_2} \bigr\|_2 \leq B^{1/2} \|f\|_2 , \qquad
+  \Bigl\| \sum_{j \in s} \theta_j * g_j \Bigr\|_2
+  \leq B^{1/2} \bigl\| \|(g_j(x))_j\|_{\ell_2} \bigr\|_2 .
+\]
+In particular the analysis operator has strong type $(2, 2)$ with constant $B^{1/2}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The function $x \mapsto \|((\theta_j * f)(x))_j\|_{\ell_2}$ is almost everywhere measurable
+(\Cref{lem:lp-norm-nonnegative}). \Cref{lem:lp-norm-from-power-integrals} with $p = 2$ and
+$C = B$ turns the integral bounds of \Cref{cor:cz-family-l2-bounds} into the norm bounds.
+\end{proof}
+
+\begin{lemma}[Subadditivity and weak type $(1,1)$ of the analysis operator]
+\label{lem:analysis-subadditive-weak-type}
+\lean{Rd.IsCZFamily.aeSubadditiveOn_lqNorm_conv, Rd.IsCZFamily.hasWeakType_lqNorm_conv}
+\leanok
+\uses{def:cz-family, lem:conv-assoc, lem:lq-basic, thm:vector-valued-weak-type,
+  def:weak-type-operators, def:vector-weak-const, lem:distribution-weak-norm-basic}
+For all $B, H \in [0, \infty]$ and every Calder\'on--Zygmund family $(\theta_j)_j$ on $V$ with
+overlap $B$ and H\"ormander constant $H$, the analysis operator
+$f \mapsto \|((\theta_j * f)(x))_j\|_{\ell_2}$ is almost everywhere subadditive with constant
+$1$ on the functions in $L_1(V)$ or $L_2(V)$. If $n \geq 1$, it has weak type $(1, 1)$ with
+constant $C_V(B, H)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $f \in L_p(V)$ and $g \in L_r(V)$ with $p, r \in \{1, 2\}$,
+$\theta_j * (f + g) = \theta_j * f + \theta_j * g$ almost everywhere for every $j$
+(\Cref{lem:conv-assoc}), and Minkowski's inequality in $\ell_2$ (\Cref{lem:lq-basic}) gives the
+subadditivity. For $t > 0$, \Cref{thm:vector-valued-weak-type} gives
+$t \, |\{\|((\theta_j * f)(x))_j\|_{\ell_2} > t\}| \leq C_V(B, H) \int |f|$, and for $t = 0$
+the left side vanishes; the supremum over $t$ is the weak $L_1$ norm
+(\Cref{lem:distribution-weak-norm-basic}).
+\end{proof}
+
+\begin{definition}[The strong type constant below $2$]
+\label{def:cz-const-below}
+\lean{Rd.czConstBelow, Rd.czConstBelow_ne_top}
+\leanok
+\uses{def:marcinkiewicz-const, def:vector-weak-const}
+For $1 < p < 2$ and $B, H \in [0, \infty]$,
+\[
+  S^-_{V,p}(B, H) = C^{\mathrm M}_p\bigl(C_V(B, H), B\bigr)^{1/p} .
+\]
+It is finite if $B$ and $H$ are.
+\end{definition}
+
+\begin{theorem}[The analysis operator for $1 < p < 2$]
+\label{thm:cz-analysis-below-two}
+\lean{Rd.IsCZFamily.hasStrongType_lqNorm_conv_of_lt, Rd.IsCZFamily.eLpNorm_lqNorm_conv_le_of_lt}
+\leanok
+\uses{thm:marcinkiewicz-interpolation, lem:analysis-subadditive-weak-type,
+  thm:cz-strong-type-two, def:cz-const-below}
+Let $n \geq 1$ and $1 < p < 2$. For all $B, H \in [0, \infty]$ and every Calder\'on--Zygmund
+family $(\theta_j)_j$ on $V$ with overlap $B$ and H\"ormander constant $H$, the analysis
+operator has strong type $(p, p)$ with constant $S^-_{V,p}(B, H)$: for every $f \in L_p(V)$,
+\[
+  \bigl\| \|((\theta_j * f)(x))_j\|_{\ell_2} \bigr\|_p \leq S^-_{V,p}(B, H) \, \|f\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:marcinkiewicz-interpolation} applies with $A = 1$, $C_1 = C_V(B, H)$ and
+$C_2 = B^{1/2}$ (\Cref{lem:analysis-subadditive-weak-type}, \Cref{thm:cz-strong-type-two}), and
+$N_p(1, C_V(B, H), B^{1/2}) = S^-_{V,p}(B, H)$.
+\end{proof}
+
+\begin{theorem}[The synthesis operators for $1 < p < 2$]
+\label{thm:cz-synthesis-below-two}
+\lean{Rd.IsCZFamily.eLpNorm_sum_conv_le_of_lt_of_measurable,
+  Rd.IsCZFamily.eLpNorm_sum_conv_le_of_lt}
+\leanok
+\uses{thm:marcinkiewicz-abstract, thm:vector-valued-weak-type, cor:cz-family-l2-bounds,
+  lem:finite-families-lp-l2, lem:fefferman-stein-split, lem:conv-assoc, def:conv,
+  def:cz-const-below}
+Let $n \geq 1$ and $1 < p < 2$. For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family
+$(\theta_j)_j$ on $V$ with overlap $B$ and H\"ormander constant $H$, every finite set
+$s \subseteq \N$ and all $g_j \in L_p(V)$, $j \in \N$,
+\[
+  \Bigl\| \sum_{j \in s} \theta_j * g_j \Bigr\|_p
+  \leq S^-_{V,p}(B, H) \, \bigl\| \|(g_j(x))_j\|_{\ell_2} \bigr\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+First let every $g_j$ be measurable with
+$\bigl\| \|(g_j)_j\|_{\ell_2} \bigr\|_p < \infty$. Apply \Cref{thm:marcinkiewicz-abstract} to
+the families of measurable functions, with the size $G_g = \|(g_j)_j\|_{\ell_2}$, the
+restriction $g|_S = (\mathbf 1_S g_j)_j$, whose size is $\mathbf 1_S G_g$
+(\Cref{lem:fefferman-stein-split}), and
+$T g = \bigl|\sum_{j \in s} \theta_j * g_j\bigr|$. If $\int G_g^p < \infty$, every $g_j$ lies in
+$L_p(V)$ (\Cref{lem:finite-families-lp-l2}), so convolution is additive almost everywhere
+(\Cref{lem:conv-assoc}) and $T g \leq T(g|_S) + T(g|_{V \setminus S})$.
+\Cref{thm:vector-valued-weak-type} gives the weak bound with $C_1 = C_V(B, H)$ and
+\Cref{cor:cz-family-l2-bounds} the $L_2$ bound with $C_2 = B$. In general, replace $g_j$ by a
+measurable function equal to it almost everywhere for $j \in s$ and by $0$ for $j \notin s$: the
+sum is unchanged (\Cref{def:conv}), the right side can only decrease, and it becomes finite
+(\Cref{lem:finite-families-lp-l2}).
+\end{proof}
+
+\begin{lemma}[Pairings through the adjoint family]
+\label{lem:cz-pairings-adjoint}
+\lean{Rd.IsCZFamily.enorm_sum_integral_conv_mul_conj_le,
+  Rd.IsCZFamily.enorm_integral_sum_conv_mul_conj_le}
+\leanok
+\uses{cor:convolution-adjoint-conj, lem:cz-family-adjoint, thm:cz-analysis-below-two,
+  thm:cz-synthesis-below-two, lem:holder-lp-norms, lem:lq-cauchy-schwarz-sequences,
+  thm:young}
+Let $n \geq 1$, $1 < q < 2$ and $p = q/(q - 1)$. For all $B, H \in [0, \infty]$, every
+Calder\'on--Zygmund family $(\theta_j)_j$ on $V$ with overlap $B$ and H\"ormander constant $H$
+and every finite set $s \subseteq \N$: for every $f \in L_p(V)$ and all $g_j \in L_q(V)$,
+\[
+  \Bigl| \sum_{j \in s} \int_V (\theta_j * f) \, \overline{g_j} \Bigr|
+  \leq S^-_{V,q}(B, H) \, \|f\|_p \, \bigl\| \|(g_j(x))_j\|_{\ell_2} \bigr\|_q ,
+\]
+and for all $g_j \in L_p(V)$ and every $u \in L_q(V)$,
+\[
+  \Bigl| \int_V \Bigl(\sum_{j \in s} \theta_j * g_j\Bigr) \overline u \Bigr|
+  \leq S^-_{V,q}(B, H) \, \bigl\| \|(g_j(x))_j\|_{\ell_2} \bigr\|_p \, \|u\|_q .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{cor:convolution-adjoint-conj}, every pairing moves $\theta_j$ to the other factor as
+$\theta_j^*$, and $(\theta_j^*)_j$ is a Calder\'on--Zygmund family with overlap $B$ and
+H\"ormander constant $H$ (\Cref{lem:cz-family-adjoint}). The first pairing becomes
+$\int_V f \, \overline{\sum_{j \in s} \theta_j^* * g_j}$, and H\"older's inequality
+(\Cref{lem:holder-lp-norms}) and \Cref{thm:cz-synthesis-below-two} for the adjoint family
+at $q$ bound it. The second becomes
+$\sum_{j \in s} \int_V g_j \, \overline{\theta_j^* * u}$; the Cauchy--Schwarz inequality at
+every point (\Cref{lem:lq-cauchy-schwarz-sequences}), H\"older's inequality and
+\Cref{thm:cz-analysis-below-two} for the adjoint family at $q$ bound it.
+\end{proof}
+
+\begin{theorem}[The strong type for $2 < p < \infty$]
+\label{thm:cz-above-two}
+\lean{Rd.IsCZFamily.eLpNorm_lqNorm_conv_le_of_two_lt, Rd.IsCZFamily.eLpNorm_sum_conv_le_of_two_lt}
+\leanok
+\uses{lem:cz-pairings-adjoint, thm:lp-norm-duality, lem:countable-minkowski, thm:young,
+  lem:cancel-conjugate-power, lem:lp-series-minkowski, def:cz-const-below}
+Let $n \geq 1$, $2 < p < \infty$ and $p' = p/(p - 1)$. For all $B, H \in [0, \infty]$ and every
+Calder\'on--Zygmund family $(\theta_j)_j$ on $V$ with overlap $B$ and H\"ormander constant $H$:
+for every $f \in L_p(V)$,
+\[
+  \bigl\| \|((\theta_j * f)(x))_j\|_{\ell_2} \bigr\|_p \leq S^-_{V,p'}(B, H) \, \|f\|_p ,
+\]
+and for every finite set $s \subseteq \N$ and all $g_j \in L_p(V)$,
+\[
+  \Bigl\| \sum_{j \in s} \theta_j * g_j \Bigr\|_p
+  \leq S^-_{V,p'}(B, H) \, \bigl\| \|(g_j(x))_j\|_{\ell_2} \bigr\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:cancel-conjugate-power}, $1 < p' < 2$. For every $J \in \N$, the family
+$u_j = \theta_j * f$ for $j < J$ and $u_j = 0$ for $j \geq J$ lies in $L_p(V)$
+(\Cref{thm:young}), and the first bound of \Cref{lem:cz-pairings-adjoint} is the hypothesis of
+\Cref{thm:lp-norm-duality} with $A = S^-_{V,p'}(B, H) \|f\|_p$. The truncated $\ell_2$ norms
+increase to $\|((\theta_j * f)(x))_j\|_{\ell_2}$ (\Cref{lem:countable-minkowski}), and monotone
+convergence in $L_p$ (\Cref{lem:lp-series-minkowski}) gives the first inequality. The second
+is \Cref{thm:lp-norm-duality} for
+$v = \sum_{j \in s} \theta_j * g_j \in L_p(V)$ (\Cref{thm:young}) with the second bound of
+\Cref{lem:cz-pairings-adjoint}.
+\end{proof}
+
+\begin{definition}[The strong type constant]
+\label{def:cz-const}
+\lean{Rd.czConst, Rd.czConst_ne_top}
+\leanok
+\uses{def:cz-const-below}
+For $1 < p < \infty$ and $B, H \in [0, \infty]$,
+\[
+  S_{V,p}(B, H) =
+  \begin{cases}
+    S^-_{V,p}(B, H) & \text{for } p < 2, \\
+    B^{1/2} & \text{for } p = 2, \\
+    S^-_{V,p/(p-1)}(B, H) & \text{for } p > 2 .
+  \end{cases}
+\]
+It is finite if $B$ and $H$ are.
+\end{definition}
+
+\begin{theorem}[The strong type of vector-valued singular integrals]
+\label{thm:vector-valued-strong-type}
+\lean{Rd.IsCZFamily.eLpNorm_lqNorm_conv_le, Rd.IsCZFamily.eLpNorm_sum_conv_le}
+\leanok
+\uses{thm:cz-strong-type-two, thm:cz-analysis-below-two, thm:cz-synthesis-below-two,
+  thm:cz-above-two, def:cz-const}
+Let $n \geq 1$ and $1 < p < \infty$. For all $B, H \in [0, \infty]$, every
+Calder\'on--Zygmund family $(\theta_j)_j$ on $V$ with overlap $B$ and H\"ormander constant $H$,
+every $f \in L_p(V)$, every finite set $s \subseteq \N$ and all $g_j \in L_p(V)$,
+\[
+  \bigl\| \|((\theta_j * f)(x))_j\|_{\ell_2} \bigr\|_p \leq S_{V,p}(B, H) \, \|f\|_p
+\]
+and
+\[
+  \Bigl\| \sum_{j \in s} \theta_j * g_j \Bigr\|_p
+  \leq S_{V,p}(B, H) \, \bigl\| \|(g_j(x))_j\|_{\ell_2} \bigr\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:cz-analysis-below-two} and \Cref{thm:cz-synthesis-below-two} for $p < 2$,
+\Cref{thm:cz-strong-type-two} for $p = 2$, and \Cref{thm:cz-above-two} for $p > 2$.
 \end{proof}
 
 \chapter{Besov spaces on compact manifolds}

@@ -43,27 +43,6 @@ open ENNReal (lqNorm)
 
 namespace ENNReal
 
-/-- **Cancellation in Hölder's inequality**: for conjugate exponents `u, u'` and `X < ∞`, the
-bound `X ≤ K A^{1/u} X^{1/u'}` implies `X ≤ K^u A`, since `X = X^{1/u} X^{1/u'}`. -/
-theorem le_rpow_mul_of_le_mul_rpow {X K A : ℝ≥0∞} {u u' : ℝ} (h : u.HolderConjugate u')
-    (hX : X ≠ ∞) (hle : X ≤ K * A ^ (1 / u) * X ^ (1 / u')) : X ≤ K ^ u * A := by
-  rcases eq_or_ne X 0 with rfl | hX0
-  · exact zero_le
-  have hu : 0 < u := h.pos
-  have hsplit : X = X ^ (1 / u) * X ^ (1 / u') := by
-    rw [← ENNReal.rpow_add _ _ hX0 hX, one_div, one_div, h.inv_add_inv_eq_one, ENNReal.rpow_one]
-  have hc0 : X ^ (1 / u') ≠ 0 := (ENNReal.rpow_pos (pos_iff_ne_zero.2 hX0) hX).ne'
-  have hct : X ^ (1 / u') ≠ ∞ :=
-    ENNReal.rpow_ne_top_of_nonneg (one_div_nonneg.2 h.symm.pos.le) hX
-  have h1 : X ^ (1 / u) ≤ K * A ^ (1 / u) := by
-    refine (ENNReal.mul_le_mul_iff_left hc0 hct).1 ?_
-    rw [← hsplit]
-    exact hle
-  calc X = (X ^ (1 / u)) ^ u := by rw [one_div, ENNReal.rpow_inv_rpow hu.ne']
-    _ ≤ (K * A ^ (1 / u)) ^ u := ENNReal.rpow_le_rpow h1 hu.le
-    _ = K ^ u * A := by
-        rw [ENNReal.mul_rpow_of_nonneg _ _ hu.le, one_div, ENNReal.rpow_inv_rpow hu.ne']
-
 /-- Restricting every member of a family to a set `S` restricts its pointwise `ℓ_q` norm:
 `‖(1_S g_i(x))_i‖_{ℓ_q} = 1_S(x) ‖(g_i(x))_i‖_{ℓ_q}`. -/
 theorem lqNorm_indicator {α ι : Type*} [MeasurableSpace ι] [Countable ι]
