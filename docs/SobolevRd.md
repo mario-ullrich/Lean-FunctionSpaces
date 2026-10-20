@@ -30,6 +30,8 @@ With these, the analysis and synthesis operators of every Calderón–Zygmund fa
 type `(1,1)`. Marcinkiewicz interpolation between weak type `(1,1)` and strong type `(2,2)`, in
 the terms of the Carleson project, gives strong type `(p,p)` for `1 < p < 2`, and duality with
 the adjoint family extends it to `2 < p < ∞`, for the analysis and the synthesis operators.
+Applied to the Littlewood–Paley blocks and their synthesis kernels, this gives the square
+function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`.
 The [interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
 built on this project, with the decisions behind their form.
 
@@ -314,6 +316,18 @@ built on this project, with the decisions behind their form.
   For `p > 2` the norms are bounded through their pairings with `L_{p/(p-1)}`
   (`MeasureTheory.eLpNorm_lqNorm_le_of_forall_enorm_sum_integral_le`), tested on the norming
   family `u_j ‖(u_i)_i‖_{ℓ_2}^{p-2}` (`MeasureTheory.normingFamily`).
+* **The square function theorem.** Let `n = dim V ≥ 1` and `1 < p < ∞`. For every `f ∈ L_p(V)`
+  the square function `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}` of the Littlewood–Paley blocks has `L_p`
+  norm `‖f‖_{F^0_{p,2}}` (`Rd.triebelLizorkinNorm_zero_two_eq`), and
+  `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p` (`Rd.triebelLizorkinNorm_zero_two_le`) and
+  `‖f‖_p ≤ Q̃_{V,p} ‖f‖_{F^0_{p,2}}` (`Rd.enorm_le_triebelLizorkinNorm_zero_two`) with the
+  explicit constants `Q_{V,p} = S_{V,p}(2, 4 H_{A^ψ})` and `Q̃_{V,p} = S_{V,p}(4, 4 H_Ã)` of the
+  Calderón–Zygmund families of the blocks and of the synthesis kernels
+  (`Rd.squareFunctionConst`, `Rd.squareSynthesisConst`), where `A^ψ` and `Ã` are the seminorm
+  bounds of the blocks and of the synthesis kernels (`Rd.psiBaseBound`, `Rd.psiDualBaseBound`).
+  Hence `F^0_{p,2} = L_p(V)` (`Rd.triebelLizorkinSpace_zero_two_eq_top`). The lower bound uses
+  the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p(V)`
+  (`Rd.tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub`).
 
 ## What is formalised
 
@@ -341,6 +355,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The parts of a function above and below a level, two Tonelli steps on s-finite measure spaces, integrals of powers from bounds at every level, and Marcinkiewicz interpolation between weak type `(1,1)` and strong type `(2,2)` with an explicit constant, for operators on an abstract input type and in the terms of the Carleson project | ✅ | ✗ | `Lp/Marcinkiewicz` |
 | `L_p` and `L_p(ℓ_2)` norms by duality for `1 < p < ∞` through the norming family, Hölder's inequality for `[0, ∞]`-valued functions in `L_p` norms, and families in `L_p` vanishing outside a finite set | ✅ | ✗ | `Lp/NormingFamily` |
 | The strong type `(p,p)`, `1 < p < ∞`, of the analysis and synthesis operators of a Calderón–Zygmund family with explicit constants: Plancherel for `p = 2`, Marcinkiewicz interpolation for `p < 2`, duality with the adjoint family for `p > 2` | ✅ | ✗ | `Rd/VectorValuedSingularIntegrals` |
+| The square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞` with explicit constants in both directions, and the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p` | ✅ | ✗ | `Rd/SquareFunction` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

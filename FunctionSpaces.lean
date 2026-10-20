@@ -194,6 +194,7 @@ public import FunctionSpaces.Lp.LayerCake
 public import FunctionSpaces.Lp.Marcinkiewicz
 public import FunctionSpaces.Lp.NormingFamily
 public import FunctionSpaces.Rd.VectorValuedSingularIntegrals
+public import FunctionSpaces.Rd.SquareFunction
 
 /-!
 # Function spaces
@@ -676,4 +677,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   the analysis operator and of the synthesis operators of a Calderón–Zygmund family with
   explicit constants: Plancherel for `p = 2`, Marcinkiewicz interpolation for `p < 2` and
   duality with the adjoint family for `p > 2`.
+* `FunctionSpaces.Rd.SquareFunction`: the square function theorem `L_p = F^0_{p,2}` for
+  `1 < p < ∞`, with explicit constants in both directions, and the reproducing formula
+  `∑_{j < J} psiDual_j ⋆ (ψ_j ⋆ f) → f` in `L_p`.
 -/

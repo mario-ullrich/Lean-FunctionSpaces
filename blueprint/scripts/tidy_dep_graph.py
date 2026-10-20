@@ -139,7 +139,8 @@ BLOCKS: list[tuple[str, list]] = [
                r"Weak \texorpdfstring{$L_p$}{L\_p} norms and operators of weak and strong type",
                "Marcinkiewicz interpolation",
                r"\texorpdfstring{$L_p$}{L\_p} norms by duality",
-               "The strong type of vector-valued singular integrals"])]),
+               "The strong type of vector-valued singular integrals",
+               "The square function theorem"])]),
 ]
 
 # Columns of blocks: in each list, every block is placed below the one before it. Without

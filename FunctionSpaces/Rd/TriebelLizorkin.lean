@@ -115,6 +115,12 @@ theorem aestronglyMeasurable_blockFun (j : ℕ) (f : Lp ℂ p (volume : Measure 
     AEStronglyMeasurable (blockFun j f) volume :=
   aestronglyMeasurable_conv (integrable_psi j).aestronglyMeasurable (Lp.aestronglyMeasurable f)
 
+/-- The pointwise blocks `ψ_j ⋆ f` of `f ∈ L_p(V)` lie in `L_p(V)`, for `1 ≤ p < ∞`, by Young's
+inequality (`Rd.memLp_conv`). -/
+theorem memLp_blockFun (hp : p ≠ ∞) (j : ℕ) (f : Lp ℂ p (volume : Measure V)) :
+    MemLp (blockFun j f) p volume :=
+  memLp_conv Fact.out hp (integrable_psi j) (Lp.memLp f)
+
 /-- `‖Δ_j f‖_p` is the `L_p` norm of the pointwise block `ψ_j ⋆ f`. -/
 theorem enorm_lpBlock_eq_eLpNorm_blockFun (hp : p ≠ ∞) (j : ℕ)
     (f : Lp ℂ p (volume : Measure V)) : ‖lpBlock hp j f‖ₑ = eLpNorm (blockFun j f) p volume := by
@@ -231,6 +237,14 @@ omit [Fact (1 ≤ p)] in
 theorem triebelLizorkinNorm_zero (s : ℝ) (q : ℝ≥0∞) :
     triebelLizorkinNorm s q (0 : Lp ℂ p (volume : Measure V)) = 0 := by
   simpa using triebelLizorkinNorm_smul s q (0 : ℂ) (0 : Lp ℂ p (volume : Measure V))
+
+omit [Fact (1 ≤ p)] in
+/-- **Smoothness `0`**: `‖f‖_{F^0_{p,q}} = ‖ x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_q} ‖_p` for every `q`,
+since the weights `2^(j·0)` are `1`. -/
+theorem triebelLizorkinNorm_zero_left (q : ℝ≥0∞) (f : Lp ℂ p (volume : Measure V)) :
+    triebelLizorkinNorm 0 q f =
+      eLpNorm (fun x => lqNorm q fun j => ‖blockFun j f x‖ₑ) p volume := by
+  simp only [triebelLizorkinNorm, ENNReal.dyadicWeight_zero_left, one_mul]
 
 omit [Fact (1 ≤ p)] in
 /-- **The quasi-norm decreases in `q`**: `‖f‖_{F^s_{p,r}} ≤ ‖f‖_{F^s_{p,q}}` for

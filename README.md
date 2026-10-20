@@ -279,6 +279,16 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `Rd.BoundedLipschitzDomain.boundaryTraceL2_apply_ae`,
   `Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`); on `H^{1/2}(Γ)` the trace into `L_2(Γ)` is
   injective (`Rd.BoundedLipschitzDomain.traceL2_injective`).
+* **The square function theorem.** Let `dim V ≥ 1` and `1 < p < ∞`. For every `f ∈ L_p(V)`,
+  the square function `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}` of the Littlewood–Paley blocks `ψ_j ⋆ f`
+  has `L_p` norm `‖f‖_{F^0_{p,2}}` (`Rd.triebelLizorkinNorm_zero_two_eq`), and
+  `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p`, `‖f‖_p ≤ Q̃_{V,p} ‖f‖_{F^0_{p,2}}`
+  (`Rd.triebelLizorkinNorm_zero_two_le`, `Rd.enorm_le_triebelLizorkinNorm_zero_two`), with the
+  strong type constants of the Calderón–Zygmund families of the blocks and of the synthesis
+  kernels (`Rd.squareFunctionConst`, `Rd.squareSynthesisConst`); hence `F^0_{p,2} = L_p(V)`
+  (`Rd.triebelLizorkinSpace_zero_two_eq_top`). The proof is the strong type `(p,p)` of
+  vector-valued singular integrals with Calderón–Zygmund kernel families
+  (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`, `Rd.IsCZFamily.eLpNorm_sum_conv_le`).
 
 **Domains, manifolds and traces** ([details](docs/DomainsTraces.md))
 
@@ -332,7 +342,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
 | [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): mixed norms, maximal functions, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, local means, ball means of differences, atoms, the torus | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, and the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it, and the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞` | ✅ | ✗ |
 | [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 
@@ -363,9 +373,9 @@ Sobolev spaces on `ℝ^d` are the files `SchwartzCutoff`, `WeakDerivatives`,
 `SobolevTwoLittlewoodPaley`, `LipschitzDomainH1`, `RellichCompactness`,
 `SobolevRestrictionSpaces`, `SobolevDuality`, `BoundaryTraceSpace`, `LipschitzGraphArea`,
 `SurfaceMeasure`, `DilationFamilies`, `ConvolutionAdjoint`, `PlancherelBounds`,
-`CalderonZygmundSigned`, `VectorValuedWeakType` and `VectorValuedSingularIntegrals` in
-`FunctionSpaces/Rd/`, with `WeakType`, `LayerCake`, `Marcinkiewicz` and `NormingFamily` in
-`FunctionSpaces/Lp/`.
+`CalderonZygmundSigned`, `VectorValuedWeakType`, `VectorValuedSingularIntegrals` and
+`SquareFunction` in `FunctionSpaces/Rd/`, with `WeakType`, `LayerCake`, `Marcinkiewicz` and
+`NormingFamily` in `FunctionSpaces/Lp/`.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 [docs/FEECInterface.md](docs/FEECInterface.md) describes the interface to a FEEC/BEEC library

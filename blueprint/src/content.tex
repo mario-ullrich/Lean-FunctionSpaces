@@ -9370,11 +9370,12 @@ $\|f\|^{\mathrm{LP}}_{s,q}$ an $\ell_q(L_p)$ norm of the same family.
 \begin{lemma}[The pointwise blocks]
 \label{lem:tl-pointwise-blocks}
 \lean{Rd.iSup_enorm_psi_lt_top, Rd.eLpNorm_psi_mul_iSup_psi_ne_top, Rd.enorm_blockFun_le,
-  Rd.blockFun_add_ae, Rd.blockFun_smul}
+  Rd.blockFun_add_ae, Rd.blockFun_smul, Rd.memLp_blockFun}
 \leanok
-\uses{def:triebel-lizorkin, lem:conv-pointwise-bound, lem:lp-kernels-basic, lem:conv-assoc}
+\uses{def:triebel-lizorkin, lem:conv-pointwise-bound, lem:lp-kernels-basic, lem:conv-assoc,
+  thm:young}
 For every $1 \leq p < \infty$, all $f, g \in L_p$, every $c \in \C$, every $j \in \N$ and every
-$x \in V$,
+$x \in V$, $\psi_j * f \in L_p$,
 \[
   |(\psi_j * f)(x)| \leq \|\psi_j\|_1^{1 - 1/p} \bigl( \sup |\psi_j| \bigr)^{1/p} \|f\|_p
 \]
@@ -9385,7 +9386,8 @@ $(\psi_j * (f + g))(x) = (\psi_j * f)(x) + (\psi_j * g)(x)$ for all $j \in \N$.
 
 \begin{proof}
 \leanok
-The bound is \Cref{lem:conv-pointwise-bound}; its constant is finite since $\psi_j$ is
+Young's inequality (\Cref{thm:young}) gives $\psi_j * f \in L_p$. The bound is
+\Cref{lem:conv-pointwise-bound}; its constant is finite since $\psi_j$ is
 integrable and bounded (\Cref{lem:lp-kernels-basic}). Homogeneity holds for the integrals, and
 additivity holds almost everywhere for each $j$ by \Cref{lem:conv-assoc}, hence for all $j$ at
 once outside a countable union of null sets.
@@ -9394,10 +9396,10 @@ once outside a countable union of null sets.
 \begin{proposition}[Elementary properties]
 \label{prop:tl-elementary}
 \lean{Rd.triebelLizorkinNorm_add_le, Rd.triebelLizorkinNorm_smul, Rd.triebelLizorkinNorm_zero,
-  Rd.triebelLizorkinNorm_mono_exponent, Rd.triebelLizorkinNorm_mono_smoothness,
-  Rd.MemTriebelLizorkin.mono_exponent, Rd.MemTriebelLizorkin.mono_smoothness,
-  Rd.MemTriebelLizorkin.add, Rd.MemTriebelLizorkin.smul, Rd.triebelLizorkinSpace,
-  Rd.mem_triebelLizorkinSpace}
+  Rd.triebelLizorkinNorm_zero_left, Rd.triebelLizorkinNorm_mono_exponent,
+  Rd.triebelLizorkinNorm_mono_smoothness, Rd.MemTriebelLizorkin.mono_exponent,
+  Rd.MemTriebelLizorkin.mono_smoothness, Rd.MemTriebelLizorkin.add, Rd.MemTriebelLizorkin.smul,
+  Rd.triebelLizorkinSpace, Rd.mem_triebelLizorkinSpace}
 \leanok
 \uses{def:triebel-lizorkin, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-nonnegative}
 For every $1 \leq p < \infty$, all $s \leq t$ in $\R$, all $1 \leq q \leq r \leq \infty$, all
@@ -9407,8 +9409,9 @@ $f, g \in L_p$ and every $c \in \C$,
   \|c f\|_{F^s_{p,q}} = |c| \, \|f\|_{F^s_{p,q}},
 \]
 \[
-  \|f\|_{F^s_{p,r}} \leq \|f\|_{F^s_{p,q}}, \qquad \|f\|_{F^s_{p,q}} \leq \|f\|_{F^t_{p,q}} .
+  \|f\|_{F^s_{p,r}} \leq \|f\|_{F^s_{p,q}}, \qquad \|f\|_{F^s_{p,q}} \leq \|f\|_{F^t_{p,q}} ,
 \]
+and $\|f\|_{F^0_{p,q}} = \bigl\| x \mapsto \|((\psi_j * f)(x))_j\|_{\ell_q} \bigr\|_{L_p}$.
 In particular $\TL{s}{p}{q}$ is a linear subspace of $L_p$,
 $\TL{s}{p}{q} \subseteq \TL{s}{p}{r}$ and $\TL{t}{p}{q} \subseteq \TL{s}{p}{q}$.
 \end{proposition}
@@ -9420,7 +9423,8 @@ At almost every point the blocks of $f + g$ are the sums of the blocks of $f$ an
 (\Cref{lem:lq-basic}) and then in $L_p$ gives the first claim. The blocks of $c f$ are $c$ times
 those of $f$, and $|c|$ leaves the $\ell_q$ and the $L_p$ norm
 (\Cref{lem:lp-norm-nonnegative}). The monotonicity follows from
-$\|\cdot\|_{\ell_r} \leq \|\cdot\|_{\ell_q}$ and $2^{js} \leq 2^{jt}$ at every point.
+$\|\cdot\|_{\ell_r} \leq \|\cdot\|_{\ell_q}$ and $2^{js} \leq 2^{jt}$ at every point. For
+$s = 0$ the weights $2^{j \cdot 0}$ are $1$.
 \end{proof}
 
 \begin{theorem}[$\TL{s}{p}{p} = \Besov{s}{p}{p}$]
@@ -12124,7 +12128,13 @@ integrable kernels on $L_2(V)$ by its Fourier overlap. \Cref{sec:calderon-zygmun
 splits a function with values in a normed space, or a family of such functions, into a bounded
 good part and bad pieces with mean zero on dyadic cubes. \Cref{sec:vector-valued-weak-type}
 proves the weak type $(1,1)$ of the analysis and synthesis operators of every
-Calder\'on--Zygmund family, with an explicit constant.
+Calder\'on--Zygmund family, with an explicit constant. \Cref{sec:weak-type-operators} takes over
+the weak $L_p$ norms and the operators of weak and strong type of the formalisation of
+Carleson's theorem, \Cref{sec:marcinkiewicz} proves Marcinkiewicz interpolation between weak
+type $(1,1)$ and strong type $(2,2)$, and \Cref{sec:lp-norm-duality} computes $L_p$ norms by
+duality. Together they give the strong type $(p,p)$, $1 < p < \infty$, of these operators in
+\Cref{sec:vector-valued-strong-type}, and \Cref{sec:square-function} proves the square function
+theorem $\TL{0}{p}{2} = L_p(V)$ with explicit constants.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -17515,6 +17525,129 @@ and
 \leanok
 \Cref{thm:cz-analysis-below-two} and \Cref{thm:cz-synthesis-below-two} for $p < 2$,
 \Cref{thm:cz-strong-type-two} for $p = 2$, and \Cref{thm:cz-above-two} for $p > 2$.
+\end{proof}
+
+\section{The square function theorem}
+\label{sec:square-function}
+
+For $f \in L_p(V)$ the square function $x \mapsto \|((\psi_j * f)(x))_j\|_{\ell_2}$ collects the
+Littlewood--Paley blocks at every point, and its $L_p$ norm is $\|f\|_{\TL{0}{p}{2}}$. The square
+function theorem says that this norm is equivalent to $\|f\|_p$ for $1 < p < \infty$, so
+$\TL{0}{p}{2} = L_p(V)$. The upper bound is the strong type of the analysis operator of the
+Calder\'on--Zygmund family $(\psi_j)_j$; the lower bound combines the reproducing formula
+$\sum_{j < J} \tilde\psi_j * (\psi_j * f) \to f$ with the strong type of the synthesis
+operators of the family $(\tilde\psi_j)_j$ (\Cref{thm:vector-valued-strong-type}).
+
+\begin{definition}[The square function constants]
+\label{def:square-function-consts}
+\lean{Rd.squareFunctionConst, Rd.squareFunctionConst_ne_top, Rd.squareSynthesisConst,
+  Rd.squareSynthesisConst_ne_top}
+\leanok
+\uses{def:cz-const, def:hormander-const, def:psi-base, def:psi-dual}
+For $1 < p < \infty$,
+\[
+  Q_{V,p} = S_{V,p}\bigl(2, 4 H_{A^{\psi}}\bigr) , \qquad
+  \tilde Q_{V,p} = S_{V,p}\bigl(4, 4 H_{\tilde A}\bigr) .
+\]
+Both are finite.
+\end{definition}
+
+\begin{theorem}[The upper square function bound]
+\label{thm:square-function-upper}
+\lean{Rd.triebelLizorkinNorm_zero_two_eq, Rd.triebelLizorkinNorm_zero_two_le,
+  Rd.memTriebelLizorkin_zero_two}
+\leanok
+\uses{def:triebel-lizorkin, prop:tl-elementary, thm:cz-family-psi,
+  thm:vector-valued-strong-type, def:square-function-consts}
+For every $1 \leq p < \infty$ and every $f \in L_p(V)$,
+\[
+  \|f\|_{\TL{0}{p}{2}} = \bigl\| \|((\psi_j * f)(x))_j\|_{\ell_2} \bigr\|_p .
+\]
+If moreover $n \geq 1$ and $1 < p < \infty$, then
+\[
+  \|f\|_{\TL{0}{p}{2}} \leq Q_{V,p} \, \|f\|_p ,
+\]
+and in particular $f \in \TL{0}{p}{2}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The equality is the case $q = 2$ of \Cref{prop:tl-elementary}. The blocks form a
+Calder\'on--Zygmund family with overlap $2$ and H\"ormander constant $4 H_{A^{\psi}}$
+(\Cref{thm:cz-family-psi}), and \Cref{thm:vector-valued-strong-type} bounds its analysis
+operator.
+\end{proof}
+
+\begin{lemma}[The reproducing formula]
+\label{lem:square-function-reproducing}
+\lean{Rd.conv_psiDual_blockFun_ae, Rd.sum_conv_psiDual_blockFun_ae,
+  Rd.tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub}
+\leanok
+\uses{def:triebel-lizorkin, lem:conv-assoc, lem:psi-dual-reproduces, lem:lp-blocks,
+  lem:lp-kernels-basic, lem:psi-dual-basic}
+Let $1 \leq p < \infty$ and $f \in L_p(V)$. For every $j \in \N$,
+$\tilde\psi_j * (\psi_j * f) = \psi_j * f$ almost everywhere. For every finite set
+$s \subseteq \N$,
+\[
+  \sum_{j \in s} \tilde\psi_j * (\psi_j * f) = \sum_{j \in s} \Delta_j f
+\]
+almost everywhere, and $\sum_{j < J} \tilde\psi_j * (\psi_j * f) \to f$ in $L_p(V)$ as
+$J \to \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The kernels $\psi_j$ and $\tilde\psi_j$ are integrable (\Cref{lem:lp-kernels-basic},
+\Cref{lem:psi-dual-basic}). By associativity (\Cref{lem:conv-assoc}) and
+$\tilde\psi_j * \psi_j = \psi_j$ (\Cref{lem:psi-dual-reproduces}),
+$\tilde\psi_j * (\psi_j * f) = (\tilde\psi_j * \psi_j) * f = \psi_j * f$ almost everywhere, and
+$\psi_j * f$ represents $\Delta_j f$ (\Cref{def:triebel-lizorkin}). The partial sums
+$\sum_{j < J} \Delta_j f$ tend to $f$ in $L_p(V)$ (\Cref{lem:lp-blocks}).
+\end{proof}
+
+\begin{theorem}[The lower square function bound]
+\label{thm:square-function-lower}
+\lean{Rd.enorm_le_triebelLizorkinNorm_zero_two}
+\leanok
+\uses{lem:square-function-reproducing, thm:cz-family-psi-dual, thm:vector-valued-strong-type,
+  thm:square-function-upper, def:square-function-consts, lem:lp-blocks, lem:tl-pointwise-blocks}
+Let $n \geq 1$ and $1 < p < \infty$. For every $f \in L_p(V)$,
+\[
+  \|f\|_p \leq \tilde Q_{V,p} \, \|f\|_{\TL{0}{p}{2}} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The blocks $\psi_j * f$ lie in $L_p(V)$ (\Cref{lem:tl-pointwise-blocks}). For every $J \in \N$,
+\Cref{lem:square-function-reproducing} and
+\Cref{thm:vector-valued-strong-type} for the Calder\'on--Zygmund family $(\tilde\psi_j)_j$ with
+overlap $4$ and H\"ormander constant $4 H_{\tilde A}$ (\Cref{thm:cz-family-psi-dual}) give
+\begin{multline*}
+  \Bigl\| \sum_{j < J} \Delta_j f \Bigr\|_p
+  = \Bigl\| \sum_{j < J} \tilde\psi_j * (\psi_j * f) \Bigr\|_p \\
+  \leq \tilde Q_{V,p} \, \bigl\| \|((\psi_j * f)(x))_j\|_{\ell_2} \bigr\|_p
+  = \tilde Q_{V,p} \, \|f\|_{\TL{0}{p}{2}} ,
+\end{multline*}
+and the left side tends to $\|f\|_p$ as $J \to \infty$ (\Cref{lem:lp-blocks}).
+\end{proof}
+
+\begin{corollary}[The square function theorem]
+\label{cor:square-function-theorem}
+\lean{Rd.triebelLizorkinSpace_zero_two_eq_top}
+\leanok
+\uses{thm:square-function-upper, thm:square-function-lower, prop:tl-elementary}
+Let $n \geq 1$ and $1 < p < \infty$. Then $\TL{0}{p}{2} = L_p(V)$, and for every
+$f \in L_p(V)$,
+\[
+  \|f\|_p \leq \tilde Q_{V,p} \, \|f\|_{\TL{0}{p}{2}} , \qquad
+  \|f\|_{\TL{0}{p}{2}} \leq Q_{V,p} \, \|f\|_p .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:square-function-upper} and \Cref{thm:square-function-lower}.
 \end{proof}
 
 \chapter{Besov spaces on compact manifolds}
