@@ -144,6 +144,8 @@ BLOCKS: list[tuple[str, list]] = [
     ("Sobolev spaces W^m_p", [
         (SOB, ["Derivative kernels", "Sobolev spaces as Triebel--Lizorkin spaces",
                "Sobolev embeddings"])]),
+    ("Bessel potential spaces", [
+        (SOB, ["Uniform Schwartz families and the Bessel kernels"])]),
 ]
 
 # Columns of blocks: in each list, every block is placed below the one before it. Without
@@ -164,7 +166,7 @@ COLUMNS: list[list[str]] = [
     ["Convolution and Littlewood–Paley blocks",
      "Maximal functions and the Fefferman–Stein inequality", "Triebel–Lizorkin spaces",
      "Sobolev spaces: the bridge for p = 2", "Vector-valued singular integrals",
-     "Sobolev spaces W^m_p"],
+     "Sobolev spaces W^m_p", "Bessel potential spaces"],
     ["Traces", "Sobolev spaces on domains and boundaries"],
 ]
 GAP = 2

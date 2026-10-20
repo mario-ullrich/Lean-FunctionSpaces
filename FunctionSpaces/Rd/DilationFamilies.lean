@@ -38,7 +38,8 @@ Littlewood–Paley kernels are `Φ_k = δ_{2^k} Φ`.
   (`Rd.setLIntegral_enorm_dilate_sub_le_inv`).
 * **Uniform families**: with the dyadic sum, the Hörmander condition holds for every uniform
   family with `H = 4 H_A` (`Rd.lintegral_lqNorm_sub_le`, `Rd.familyHormanderConst`), and
-  `Rd.IsCZFamily.of_dilation`.
+  `Rd.IsCZFamily.of_dilation`; finitely many members of a uniform family may be changed
+  (`Rd.IsUniformSchwartz.of_forall_ge_eq`).
 * **Adjoints**: `θ_j^*(x) = conj θ_j(-x)` has the same overlap and Hörmander constants
   (`Rd.IsCZFamily.adjoint`).
 * **The Littlewood–Paley families**: the blocks `ψ_j` (`Rd.isCZFamily_psi`, overlap `2`) and the
@@ -245,6 +246,27 @@ theorem IsUniformSchwartz.of_forall_mem {G : ℕ → 𝓢(V, ℂ)} {s : Finset �
     (hs : s.Nonempty) (h : ∀ j, G j ∈ s) :
     IsUniformSchwartz G fun k l => s.sup' hs fun g => SchwartzMap.seminorm ℝ k l g :=
   fun j k l => Finset.le_sup' (fun g => SchwartzMap.seminorm ℝ k l g) (h j)
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- The seminorm bounds `A k l` of a uniform family are nonnegative, since they dominate a
+seminorm. -/
+theorem IsUniformSchwartz.nonneg {G : ℕ → 𝓢(V, ℂ)} {A : ℕ → ℕ → ℝ} (h : IsUniformSchwartz G A)
+    (k l : ℕ) : 0 ≤ A k l :=
+  (apply_nonneg _ _).trans (h 0 k l)
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **Finitely many exceptions**: a family `(G'_j)` that agrees with a uniform family `(G_j)` for
+`j ≥ N` is uniformly Schwartz, with the bounds `max(A_{k,l}, ∑_{i < N} ‖G'_i‖_{k,l})`. -/
+theorem IsUniformSchwartz.of_forall_ge_eq {G G' : ℕ → 𝓢(V, ℂ)} {A : ℕ → ℕ → ℝ}
+    (h : IsUniformSchwartz G A) {N : ℕ} (hG : ∀ j, N ≤ j → G' j = G j) :
+    IsUniformSchwartz G' fun k l =>
+      max (A k l) (∑ i ∈ Finset.range N, SchwartzMap.seminorm ℝ k l (G' i)) := by
+  intro j k l
+  by_cases hj : N ≤ j
+  · rw [hG j hj]
+    exact (h j k l).trans (le_max_left _ _)
+  · exact le_max_of_le_right (Finset.single_le_sum (f := fun i => SchwartzMap.seminorm ℝ k l (G' i))
+      (fun _ _ => apply_nonneg _ _) (Finset.mem_range.2 (not_le.1 hj)))
 
 /-- The decay constant `2^N (A_{0,r} + A_{N,r})` of a uniform family, the analogue of
 `Rd.schwartzDecayConst` with the seminorms replaced by their bounds. -/

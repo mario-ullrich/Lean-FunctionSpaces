@@ -198,6 +198,7 @@ public import FunctionSpaces.Rd.SquareFunction
 public import FunctionSpaces.Rd.DerivativeKernels
 public import FunctionSpaces.Rd.SobolevTriebelLizorkin
 public import FunctionSpaces.Rd.SobolevEmbedding
+public import FunctionSpaces.Rd.UniformSchwartzFamilies
 
 /-!
 # Function spaces
@@ -615,9 +616,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `L_p`, the Sobolev spaces `W^m_p(Ω)` and `W^m_p(ℝ^d)`, and the identification with derivatives
   of tempered distributions on `ℝ^d`.
 * `FunctionSpaces.Rd.SobolevTwoLittlewoodPaley`: the convolution theorem and Plancherel for a
-  convolution on `L_2(ℝ^d)`, Mathlib's Sobolev spaces `H^s(ℝ^d)` as the Triebel–Lizorkin spaces
-  `F^s_{2,2}(ℝ^d)` for `s ≥ 0` and the Besov spaces `B^s_{2,2}(ℝ^d)` for `s > 0`, with
-  explicit constants, and `W^1_2(ℝ^d) = H^1(ℝ^d) = B^1_{2,2}(ℝ^d)`.
+  convolution on `L_2(ℝ^d)`, the Bessel potential on Schwartz functions, Mathlib's Sobolev
+  spaces `H^s(ℝ^d)` as the Triebel–Lizorkin spaces `F^s_{2,2}(ℝ^d)` for `s ≥ 0` and the Besov
+  spaces `B^s_{2,2}(ℝ^d)` for `s > 0`, with explicit constants, and
+  `W^1_2(ℝ^d) = H^1(ℝ^d) = B^1_{2,2}(ℝ^d)`.
 * `FunctionSpaces.Rd.LipschitzDomainH1`: `H^1(Ω)` on a bounded Lipschitz domain `Ω` as the
   space of restrictions of `H^1(ℝ^d)`, its description by intrinsic differences, the weak
   gradient on `Ω`, and the boundary traces in `B^{1/2}_{2,2}(∂Ω)`, which form the trace space.
@@ -628,10 +630,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `H^s_0(Ω)` on open sets `Ω ⊆ ℝ^d` for real `s`, built inside Mathlib's `H^s(ℝ^d)`: restriction
   as an orthogonal projection, `H^s(Ω)` as a quotient, the compact embedding
   `H^1(Ω) → L_2(Ω)` for bounded `Ω`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)`.
-* `FunctionSpaces.Rd.SobolevDuality`: the Bessel potential on Schwartz functions, the isometry
-  `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}(ℝ^d)` and `H^s(ℝ^d)`, and the
-  duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` and `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on
-  open sets for real `s`.
+* `FunctionSpaces.Rd.SobolevDuality`: the Bessel potential of real Schwartz functions as a real
+  function, the isometry `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}(ℝ^d)` and
+  `H^s(ℝ^d)`, and the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` and
+  `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on open sets for real `s`.
 * `FunctionSpaces.Rd.BoundaryTraceSpace`: `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` with explicit
   constants, the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the
   trace kernel, the trace space `H^{1/2}(Γ)` of the boundary `Γ` as its orthogonal complement
@@ -695,4 +697,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   Besov embeddings into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions for
   `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with explicit
   constants.
+* `FunctionSpaces.Rd.UniformSchwartzFamilies`: uniform Schwartz families under continuous linear
+  maps, the shifted Bessel symbols `(ε + ‖ζ‖²)^{σ/2}`, the Bessel kernels
+  `K_j = 𝓕⁻¹[(2^{-2j} + ‖ζ‖²)^{σ/2} ω̂]` with `J_σ ω_{2^j} = 2^{jσ} (K_j)_{2^j}`, sums over
+  the dyadic scales of an annulus, and the Calderón–Zygmund family of the dilated Bessel kernels
+  for `ω̂` supported in an annulus.
 -/

@@ -101,6 +101,11 @@ theorem fourier_dilate (Φ : V → ℂ) {c : ℝ} (hc : 0 < c) (ξ : V) :
     (fun y => 𝐞 (-inner ℝ y (c⁻¹ • ξ)) • Φ y) c, abs_of_pos (inv_pos.2 hpow), Complex.real_smul,
     ← mul_assoc, ← Complex.ofReal_mul, mul_inv_cancel₀ hpow.ne', Complex.ofReal_one, one_mul]
 
+/-- The dilation formula read backwards: `𝓕Φ(ζ) = 𝓕(Φ_c)(c ζ)` for `c > 0`. -/
+theorem fourier_eq_fourier_dilate (Φ : V → ℂ) {c : ℝ} (hc : 0 < c) (ζ : V) :
+    𝓕 Φ ζ = 𝓕 (dilate c Φ) (c • ζ) := by
+  rw [fourier_dilate _ hc, inv_smul_smul₀ hc.ne']
+
 /-- The Fourier transform of a dilation is integrable if that of the function is. -/
 theorem integrable_fourier_dilate {Φ : V → ℂ} (hΦ : Integrable (𝓕 Φ)) {c : ℝ} (hc : 0 < c) :
     Integrable (𝓕 (dilate c Φ)) := by

@@ -16,9 +16,10 @@ Let `V` be a finite-dimensional real inner product space, such as `ℝ^d`, with 
 `FunctionSpaces/Rd/SobolevRestrictionSpaces.lean` are dual to each other, as in Chandler-Wilde,
 Hewett and Moiola (Theorem 3.3), for every open set and every real `s`.
 
-* **The Bessel potential on Schwartz functions**: `J_t u = 𝓕⁻(⟨ξ⟩^t 𝓕u)` (`Rd.besselSchwartz`)
-  is real for real `u` (`Rd.conj_besselSchwartz_apply`); for `g ∈ L_2(V)`,
-  `(J_t g)(u) = ∫ J_t u · g` (`Rd.besselPotential_toLp_apply`).
+* **The Bessel potential on Schwartz functions**: `J_t u = 𝓕⁻(⟨ξ⟩^t 𝓕u)` (`Rd.besselSchwartz`, in
+  `FunctionSpaces.Rd.SobolevTwoLittlewoodPaley`) is real for real `u`
+  (`Rd.conj_besselSchwartz_apply`); for `g ∈ L_2(V)`, `(J_t g)(u) = ∫ J_t u · g`
+  (`Rd.besselPotential_toLp_apply`).
 * **`J_{2s}` as an isometry**: `Rd.besselShift s : H^s(V) ≃ₗᵢ[ℂ] H^{-s}(V)` keeps the `L_2`
   function `J_s U` and acts on distributions as `J_{2s}` (`Rd.toDistr_besselShift`).
 * **The pairing** `[W, U] = ⟪J_{-s} W, J_s U⟫_{L_2}` of `W ∈ H^{-s}(V)` and `U ∈ H^s(V)`
@@ -51,26 +52,6 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
   [MeasurableSpace V] [BorelSpace V]
 
 /-! ### The Bessel potential on Schwartz functions -/
-
-/-- **The Bessel potential on Schwartz functions**: `J_t u = 𝓕⁻(⟨ξ⟩^t 𝓕u)` with the weight
-`⟨ξ⟩^t = (1 + ‖ξ‖²)^{t/2}` (`Rd.besselWeight`), a continuous linear map of the Schwartz space
-(Mathlib's `SchwartzMap.fourierMultiplierCLM`). -/
-noncomputable def besselSchwartz (t : ℝ) : 𝓢(V, ℂ) →L[ℂ] 𝓢(V, ℂ) :=
-  SchwartzMap.fourierMultiplierCLM ℂ fun ξ => (besselWeight t ξ : ℂ)
-
-/-- The Bessel potential `J_t` of Mathlib's tempered distributions restricts to `J_t` on Schwartz
-functions (Mathlib's `TemperedDistribution.fourierMultiplierCLM_toTemperedDistributionCLM_eq`). -/
-theorem besselPotential_schwartz (t : ℝ) (u : 𝓢(V, ℂ)) :
-    besselPotential V ℂ t (u : 𝓢'(V, ℂ)) = (besselSchwartz t u : 𝓢'(V, ℂ)) :=
-  TemperedDistribution.fourierMultiplierCLM_toTemperedDistributionCLM_eq
-    (hasTemperateGrowth_besselWeight t) u
-
-/-- `J_t u(x) = 𝓕⁻(⟨ξ⟩^t 𝓕u)(x)`, with the Fourier integrals of functions. -/
-theorem besselSchwartz_apply (t : ℝ) (u : 𝓢(V, ℂ)) (x : V) :
-    besselSchwartz t u x = 𝓕⁻ (fun ξ => (besselWeight t ξ : ℂ) * 𝓕 (u : V → ℂ) ξ) x := by
-  rw [besselSchwartz, SchwartzMap.fourierMultiplierCLM_apply, SchwartzMap.fourierInv_coe,
-    SchwartzMap.smulLeftCLM_apply (hasTemperateGrowth_besselWeight t), SchwartzMap.fourier_coe]
-  rfl
 
 /-- **The transpose form of `J_t`**: `J_t u(x) = 𝓕(⟨ξ⟩^t 𝓕⁻u)(x)`, since the weight is even and
 `𝓕⁻ h(x) = 𝓕 h(-x)` (Mathlib's `Real.fourierInv_eq_fourier_comp_neg`). -/

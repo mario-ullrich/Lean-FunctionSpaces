@@ -5785,10 +5785,11 @@ by $|\Phi(z)| (2 \|f\|_p)^p$; dominated convergence concludes.
 
 \begin{lemma}[Fourier transform of dilations]
 \label{lem:fourier-dilate}
-\lean{Rd.fourier_dilate, Rd.integrable_fourier_dilate}
+\lean{Rd.fourier_dilate, Rd.fourier_eq_fourier_dilate, Rd.integrable_fourier_dilate}
 \leanok
 \uses{lem:dilate}
-For $c > 0$, $\Phi : V \to \C$ and $\xi \in V$, $\widehat{\Phi_c}(\xi) = \widehat\Phi(c^{-1} \xi)$.
+For $c > 0$, $\Phi : V \to \C$ and $\xi \in V$, $\widehat{\Phi_c}(\xi) = \widehat\Phi(c^{-1} \xi)$,
+equivalently $\widehat\Phi(\xi) = \widehat{\Phi_c}(c \xi)$.
 If $\widehat\Phi$ is integrable, so is $\widehat{\Phi_c}$.
 \end{lemma}
 
@@ -12197,6 +12198,10 @@ proves the Nikolskii inequality for the blocks and from it the embeddings of Bes
 $L_r(V)$ and into the bounded continuous functions, and the Sobolev embeddings
 $\Sob{m}{p}(V) \hookrightarrow L_r(V)$ for $m > n(1/p - 1/r)$ and
 $\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, all with explicit constants.
+\Cref{sec:bessel-kernels} prepares the Bessel potential spaces: the Bessel potential maps the
+dilates of every Schwartz function to multiples of the dilates of its Bessel kernels; when the
+Fourier transform of the function lives in an annulus, the Bessel kernels form a uniform Schwartz
+family and their dilates a Calder\'on--Zygmund family.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -12722,6 +12727,34 @@ $1 + |\xi|^2 \leq 5 \cdot 4^j$.
 \leanok
 The smoothness and the growth bounds of $(1 + |\xi|^2)^{s/2}$ are in Mathlib. Further,
 $|\xi|^2 < 4^{j+1} = 4 \cdot 4^j$ and $1 \leq 4^j$.
+\end{proof}
+
+\begin{definition}[The Bessel potential on Schwartz functions]
+\label{def:bessel-schwartz}
+\lean{Rd.besselSchwartz}
+\leanok
+\uses{def:bessel-weight, lem:bessel-weight-basic}
+For $t \in \R$ and a Schwartz function $u$,
+$J_t u = \mathcal F^{-1}(\langle \cdot \rangle^t \widehat u)$, a continuous linear map of the
+Schwartz space.
+\end{definition}
+
+\begin{lemma}[$J_t$ on Schwartz functions and on distributions]
+\label{lem:bessel-schwartz-distribution}
+\lean{Rd.besselPotential_schwartz, Rd.besselSchwartz_apply}
+\leanok
+\uses{def:bessel-schwartz}
+For every $t \in \R$ and every Schwartz function $u$, the tempered distribution of $J_t u$ is
+Mathlib's $J_t$ of the tempered distribution of $u$, and
+$J_t u(x) = \mathcal F^{-1}(\langle \cdot \rangle^t \widehat u)(x)$ for every $x \in V$, with the
+Fourier integrals of functions.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's
+\texttt{TemperedDistribution.\allowbreak fourierMultiplierCLM\_\allowbreak
+toTemperedDistributionCLM\_\allowbreak eq}.
 \end{proof}
 
 \begin{lemma}[Two elementary inequalities]
@@ -13927,42 +13960,15 @@ So $\tilde H^1(\Omega)$ and $H^1_0(\Omega)$ are the same subspace of $H^1(V)$, a
 
 Throughout this section $\Omega \subseteq V$ is open and $s \in \R$; the spaces $N^s(\Omega)$,
 $H^s(\Omega)$, $T^s(\Omega)$, $\tilde H^s(\Omega)$ and $H^s_0(\Omega)$ are those of
-\Cref{sec:sobolev-restriction-spaces}. For a Schwartz function $u$ and $t \in \R$ let
-$J_t u = \mathcal F^{-1}(\langle \cdot \rangle^t \widehat u)$, the Bessel potential on Schwartz
-functions; on tempered distributions $J_t$ is Mathlib's Bessel potential, and $J_s U \in L_2(V)$
-for $U \in H^s(V)$. The section proves that $\tilde H^s(\Omega)$ and $H^{-s}(\Omega)$ are dual to
-each other, as in Chandler-Wilde, Hewett and Moiola \cite[Theorem 3.3]{ChandlerWildeHewettMoiola},
-for every open set and every real $s$. The tool is the isometry $J_{2s} : H^s(V) \to H^{-s}(V)$:
-it carries the orthogonal complement of $\tilde H^s(\Omega)$ onto $N^{-s}(\Omega)$, hence
-$\tilde H^s(\Omega)$ onto $H^{-s}(\Omega)$, and Riesz's representation theorem does the rest.
-
-\begin{definition}[The Bessel potential on Schwartz functions]
-\label{def:bessel-schwartz}
-\lean{Rd.besselSchwartz}
-\leanok
-\uses{def:bessel-weight, lem:bessel-weight-basic}
-For $t \in \R$ and a Schwartz function $u$,
-$J_t u = \mathcal F^{-1}(\langle \cdot \rangle^t \widehat u)$, a continuous linear map of the
-Schwartz space.
-\end{definition}
-
-\begin{lemma}[$J_t$ on Schwartz functions and on distributions]
-\label{lem:bessel-schwartz-distribution}
-\lean{Rd.besselPotential_schwartz, Rd.besselSchwartz_apply}
-\leanok
-\uses{def:bessel-schwartz}
-For every $t \in \R$ and every Schwartz function $u$, the tempered distribution of $J_t u$ is
-Mathlib's $J_t$ of the tempered distribution of $u$, and
-$J_t u(x) = \mathcal F^{-1}(\langle \cdot \rangle^t \widehat u)(x)$ for every $x \in V$, with the
-Fourier integrals of functions.
-\end{lemma}
-
-\begin{proof}
-\leanok
-Mathlib's
-\texttt{TemperedDistribution.\allowbreak fourierMultiplierCLM\_\allowbreak
-toTemperedDistributionCLM\_\allowbreak eq}.
-\end{proof}
+\Cref{sec:sobolev-restriction-spaces}. For a Schwartz function $u$ and $t \in \R$,
+$J_t u = \mathcal F^{-1}(\langle \cdot \rangle^t \widehat u)$ is the Bessel potential on Schwartz
+functions (\Cref{def:bessel-schwartz}); on tempered distributions $J_t$ is Mathlib's Bessel
+potential, and $J_s U \in L_2(V)$ for $U \in H^s(V)$. The section proves that
+$\tilde H^s(\Omega)$ and $H^{-s}(\Omega)$ are dual to each other, as in Chandler-Wilde, Hewett
+and Moiola \cite[Theorem 3.3]{ChandlerWildeHewettMoiola}, for every open set and every real $s$.
+The tool is the isometry $J_{2s} : H^s(V) \to H^{-s}(V)$: it carries the orthogonal complement
+of $\tilde H^s(\Omega)$ onto $N^{-s}(\Omega)$, hence $\tilde H^s(\Omega)$ onto $H^{-s}(\Omega)$,
+and Riesz's representation theorem does the rest.
 
 \begin{lemma}[$J_t$ keeps real functions real]
 \label{lem:bessel-schwartz-real}
@@ -15556,6 +15562,24 @@ $A_{k,l} = \max(\sup_x \|x\|^k \|D^l G^0(x)\|, \sup_x \|x\|^k \|D^l G^1(x)\|)$.
 \begin{proof}
 \leanok
 The constants increase with the seminorms.
+\end{proof}
+
+\begin{lemma}[Bounds of uniform families]
+\label{lem:uniform-schwartz-exceptions}
+\lean{Rd.IsUniformSchwartz.nonneg, Rd.IsUniformSchwartz.of_forall_ge_eq}
+\leanok
+\uses{def:uniform-schwartz}
+For every uniform family $(G_j)$ with bounds $A$, $A_{k,l} \geq 0$ for all $k, l \in \N$. For
+every $N \in \N$ and every family $(G'_j)$ of Schwartz functions with $G'_j = G_j$ for every
+$j \geq N$, $(G'_j)$ is uniformly Schwartz with bounds
+$\max \bigl( A_{k,l}, \sum_{i < N} \sup_x \|x\|^k \|D^l G'_i(x)\| \bigr)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$A_{k,l}$ dominates the seminorm $\sup_x \|x\|^k \|D^l G_0(x)\| \geq 0$. For $j \geq N$,
+$G'_j = G_j$ has seminorms at most $A_{k,l}$, and for $j < N$ the seminorm of $G'_j$ is a term of
+the sum.
 \end{proof}
 
 \begin{definition}[Gradient mass]
@@ -18644,6 +18668,403 @@ $f \in \Besov{m}{p}{\max(p,2)}$ by \Cref{cor:sobolev-besov-sandwich}.
 For $r < \infty$ the condition $m > n(1/p - 1/r)$ says $1/r > 1/p - m/n$. The critical case
 $1/r = 1/p - m/n$ with $m < n/p$, Sobolev's inequality
 $\|f\|_{r} \lesssim \|f\|_{\Sob{m}{p}}$, is not covered here.
+
+\section{Uniform Schwartz families and the Bessel kernels}
+\label{sec:bessel-kernels}
+
+The Bessel potential $J_\sigma$ on Schwartz functions (\Cref{def:bessel-schwartz}) multiplies
+the Fourier transform by the Bessel weight
+$\langle \xi \rangle^\sigma = (1 + \|\xi\|^2)^{\sigma/2}$ (\Cref{def:bessel-weight}). Since
+$1 + \|2^j \zeta\|^2 = 2^{2j} (2^{-2j} + \|\zeta\|^2)$, for every Schwartz function $\omega$ the
+Bessel potential of the dilate $\omega_{2^j}$ is $2^{j\sigma} (K_j)_{2^j}$ with the Bessel kernel
+$K_j = \mathcal F^{-1} \bigl( (2^{-2j} + \|\cdot\|^2)^{\sigma/2} \, \widehat\omega \bigr)$, also
+for Mathlib's Bessel potential on tempered distributions. Let now $\widehat\omega$ vanish outside
+an annulus $\{a \leq \|\zeta\| \leq b\}$ with $a > 0$, as for the block $\psi_1$ or the bases
+$G^{\psi}_{j+1}$ and $\tilde G_{j+2}$ of \Cref{def:psi-base} and \Cref{def:psi-dual}. The
+symbols $(\varepsilon + \|\zeta\|^2)^{\sigma/2}$, $0 < \varepsilon \leq 1$, have bounded
+derivatives on the annulus uniformly in $\varepsilon$, so the kernels $K_j$ form a uniform
+Schwartz family (\Cref{def:uniform-schwartz}), and their dilates form a Calder\'on--Zygmund family
+(\Cref{def:cz-family}) with an explicit overlap. The seminorm bounds of the family come from
+compactness and from the continuity of $\mathcal F^{-1}$ on Schwartz functions; they are
+existential. Write $\|G\|_{k,l} = \sup_x \|x\|^k \|D^l G(x)\|$ for the seminorms of a Schwartz
+function $G$.
+
+\paragraph{Uniform families under linear maps.}
+
+\begin{theorem}[Continuous linear maps preserve uniform families]
+\label{thm:uniform-schwartz-linear-map}
+\lean{Rd.IsUniformSchwartz.exists_map, Rd.exists_isUniformSchwartz_fourierInv}
+\leanok
+\uses{def:uniform-schwartz, lem:uniform-schwartz-exceptions}
+For every uniform family $(G_j)$ of Schwartz functions $V \to \C$ and every continuous real-linear
+map $T$ of the Schwartz space $\mathcal S(V)$ into itself, there are bounds $A'$ such that
+$(T G_j)$ is uniformly Schwartz with bounds $A'$. In particular, $(\mathcal F^{-1} G_j)$ is
+uniformly Schwartz with some bounds.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $(G_j)$ have the bounds $A$, and fix $k, l \in \N$. The seminorm $G \mapsto \|T G\|_{k,l}$ is
+continuous, and the topology of $\mathcal S(V)$ is generated by the seminorms
+$\|\cdot\|_{k',l'}$. So there are a finite set $S$ of pairs $(k', l')$ and $C \geq 0$ with
+$\|T G\|_{k,l} \leq C \max_{(k',l') \in S} \|G\|_{k',l'}$ for every $G$ (Mathlib's
+\texttt{Seminorm.\allowbreak bound\_\allowbreak of\_\allowbreak continuous}), and
+$\|T G_j\|_{k,l} \leq C \sum_{(k',l') \in S} A_{k',l'}$ for every $j$, the bounds being
+nonnegative (\Cref{lem:uniform-schwartz-exceptions}). The inverse Fourier transform is a
+continuous linear map of $\mathcal S(V)$.
+\end{proof}
+
+\paragraph{The shifted Bessel symbols.}
+
+\begin{definition}[Shifted Bessel symbols]
+\label{def:shifted-bessel-symbol}
+\lean{Rd.besselSymbol, Rd.besselSymbol_eq_comp, Rd.besselSymbol_one}
+\leanok
+\uses{def:bessel-weight}
+For all real $\varepsilon$ and $\sigma$ and every $\zeta \in V$ let
+\[
+  \beta_{\varepsilon,\sigma}(\zeta) = (\varepsilon + \|\zeta\|^2)^{\sigma/2} ,
+\]
+so that $\beta_{\varepsilon,\sigma} = g_\sigma \circ (\varepsilon + \|\cdot\|^2)$ with
+$g_\sigma(t) = t^{\sigma/2}$, and $\beta_{1,\sigma} = \langle \cdot \rangle^\sigma$.
+\end{definition}
+
+\begin{lemma}[Scaling of the Bessel weight]
+\label{lem:bessel-weight-scaling}
+\lean{Rd.besselWeight_eq_mul_besselSymbol}
+\leanok
+\uses{def:shifted-bessel-symbol, def:bessel-weight}
+For every real $c > 0$, every real $\sigma$ and every $\xi \in V$,
+\[
+  \langle \xi \rangle^\sigma = c^\sigma \, \beta_{c^{-2},\sigma}(c^{-1} \xi) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$c^{-2} + \|c^{-1} \xi\|^2 = c^{-2} (1 + \|\xi\|^2)$, and
+$(c^{-2})^{\sigma/2} = c^{-\sigma}$.
+\end{proof}
+
+\begin{lemma}[Smoothness and growth of the shifted symbols]
+\label{lem:shifted-bessel-symbol-smooth}
+\lean{Complex.contDiffOn_ofReal_rpow_const, Rd.contDiff_besselSymbol, Rd.besselSymbol_eq_mul,
+  Rd.hasTemperateGrowth_besselSymbol}
+\leanok
+\uses{def:shifted-bessel-symbol, lem:bessel-weight-scaling}
+For every real $\tau$, the function $t \mapsto t^\tau$ is smooth on $(0, \infty)$. For every
+real $\varepsilon > 0$ and $\sigma$, $\beta_{\varepsilon,\sigma}$ is smooth, has temperate growth,
+and $\beta_{\varepsilon,\sigma}(\zeta) = \varepsilon^{\sigma/2} \langle \varepsilon^{-1/2} \zeta
+\rangle^\sigma$ for every $\zeta \in V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The function $\zeta \mapsto \varepsilon + \|\zeta\|^2$ is smooth and positive, and real powers
+are smooth on $(0, \infty)$. The identity is \Cref{lem:bessel-weight-scaling} with
+$c = \varepsilon^{-1/2}$ at the point $c \zeta$. The Bessel weight
+has temperate growth (Mathlib's
+\texttt{Function.\allowbreak hasTemperateGrowth\_\allowbreak one\_\allowbreak add\_\allowbreak
+norm\_\allowbreak sq\_\allowbreak rpow}), and so have its compositions with linear maps and its
+multiples.
+\end{proof}
+
+\begin{lemma}[Bounded derivatives on compact sets]
+\label{lem:bounded-derivatives-compact}
+\lean{ContDiffOn.exists_norm_iteratedFDerivWithin_le}
+\leanok
+Let $E, F$ be real normed spaces, let $f \colon E \to F$ be smooth on a set $s \subseteq E$ of
+unique differentiability, let $K \subseteq s$ be compact and $r \in \N$. Then there is $C$ with
+$\|D^i_s f(x)\| \leq C$ for every $i \leq r$ and every $x \in K$, where $D^i_s$ is the $i$-th
+derivative within $s$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The function $x \mapsto \sum_{i \leq r} \|D^i_s f(x)\|$ is continuous on $s$, hence bounded on
+$K$.
+\end{proof}
+
+\begin{lemma}[Derivatives of the shifted square norm]
+\label{lem:norm-sq-derivatives}
+\lean{Rd.exists_norm_iteratedFDeriv_add_norm_sq_le}
+\leanok
+\uses{lem:bounded-derivatives-compact}
+For every real $b$ and every $r \in \N$ there is $D$ with
+$\|D^i (\varepsilon + \|\cdot\|^2)(\zeta)\| \leq D^i$ for every real $\varepsilon$, every
+$1 \leq i \leq r$ and every $\zeta \in V$ with $\|\zeta\| \leq b$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The derivatives of positive order of $\varepsilon + \|\cdot\|^2$ are those of $\|\cdot\|^2$;
+\Cref{lem:bounded-derivatives-compact} with $s = V$ and the closed ball of radius $b$ bounds them
+by some $C$, and $D = \max(1, C)$ satisfies $C \leq D \leq D^i$ for $i \geq 1$.
+\end{proof}
+
+\begin{lemma}[Bounds of the shifted symbols on an annulus]
+\label{lem:shifted-bessel-symbol-bounds}
+\lean{Rd.exists_norm_iteratedFDeriv_besselSymbol_le, Rd.besselSymbolBound,
+  Rd.besselSymbolBound_nonneg, Rd.norm_besselSymbol_le}
+\leanok
+\uses{lem:shifted-bessel-symbol-smooth, lem:bounded-derivatives-compact,
+  lem:norm-sq-derivatives}
+Let $a > 0$ and $b, \sigma$ be real. For every $r \in \N$ there is $C_r \geq 0$ with
+$\|D^r \beta_{\varepsilon,\sigma}(\zeta)\| \leq C_r$ for every $\varepsilon \in (0, 1]$ and every
+$\zeta \in V$ with $a \leq \|\zeta\| \leq b$. Moreover, with
+\[
+  M_{a,b,\sigma} = \max \bigl( (a^2)^{\sigma/2}, (1 + b^2)^{\sigma/2} \bigr) \geq 0 ,
+\]
+$|\beta_{\varepsilon,\sigma}(\zeta)| \leq M_{a,b,\sigma}$ for every $\varepsilon \in [0, 1]$ and
+every $\zeta \in V$ with $a \leq \|\zeta\| \leq b$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Write $\beta_{\varepsilon,\sigma} = g_\sigma \circ f_\varepsilon$ with $f_\varepsilon(\zeta) =
+\varepsilon + \|\zeta\|^2$. For $\varepsilon \in (0, 1]$, $f_\varepsilon > 0$ on all of $V$, so
+its range lies in $(0, \infty)$ as Mathlib's bound for compositions requires. For
+$\varepsilon \in [0, 1]$ and $a \leq \|\zeta\| \leq b$, $f_\varepsilon(\zeta)$ lies in the compact
+interval $[a^2, 1 + b^2] \subseteq (0, \infty)$, where the derivatives of $g_\sigma$ of the orders
+$i \leq r$ are bounded by some $C$ (\Cref{lem:shifted-bessel-symbol-smooth},
+\Cref{lem:bounded-derivatives-compact}), and the derivatives of $f_\varepsilon$ of the orders
+$1 \leq i \leq r$ are at most $D^i$ (\Cref{lem:norm-sq-derivatives}). The Fa\`a di Bruno bound
+for compositions (Mathlib's
+\texttt{norm\_\allowbreak iteratedFDeriv\_\allowbreak comp\_\allowbreak le'}) gives
+$C_r = \max(0, r! \, C D^r)$. The second claim holds since $t \mapsto t^{\sigma/2}$ is monotone on
+$[a^2, 1 + b^2]$, increasing for $\sigma \geq 0$ and decreasing for $\sigma < 0$.
+\end{proof}
+
+\paragraph{The Bessel kernels.}
+
+\begin{definition}[Bessel symbol and kernel families]
+\label{def:bessel-kernel-family}
+\lean{Rd.besselSymbolFamily, Rd.coe_besselSymbolFamily, Rd.besselKernelFamily,
+  Rd.fourier_besselKernelFamily}
+\leanok
+\uses{def:shifted-bessel-symbol, lem:shifted-bessel-symbol-smooth}
+For every Schwartz function $\widehat\omega \colon V \to \C$, every real $\sigma$ and every
+$j \in \N$ let $S_j = \beta_{2^{-2j},\sigma} \, \widehat\omega$ and
+$K_j = \mathcal F^{-1} S_j$. Both are Schwartz functions, and
+$\widehat{K_j} = \beta_{2^{-2j},\sigma} \, \widehat\omega$.
+\end{definition}
+
+The product $S_j$ is a Schwartz function because $\beta_{2^{-2j},\sigma}$ has temperate growth
+(\Cref{lem:shifted-bessel-symbol-smooth}; Mathlib's
+\texttt{SchwartzMap.\allowbreak smulLeftCLM}), and $\mathcal F$ inverts $\mathcal F^{-1}$ on
+Schwartz functions.
+
+\begin{lemma}[Leibniz bound against a Schwartz function]
+\label{lem:leibniz-schwartz}
+\lean{Rd.norm_iteratedFDeriv_mul_schwartz_le}
+\leanok
+For every smooth $g \colon V \to \C$, every Schwartz function $\omega \colon V \to \C$, every
+$l \in \N$, every $x \in V$ and all reals $C_0, \dots, C_l$ with $\|D^i g(x)\| \leq C_i$ for
+every $i \leq l$,
+\[
+  \|D^l (g \omega)(x)\| \leq \sum_{i \leq l} \binom{l}{i} C_i \, \|\omega\|_{0,l-i} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Leibniz rule (Mathlib's
+\texttt{norm\_\allowbreak iteratedFDeriv\_\allowbreak mul\_\allowbreak le}) with
+$\|D^{l-i} \omega(x)\| \leq \|\omega\|_{0,l-i}$.
+\end{proof}
+
+\begin{lemma}[Supports in an annulus]
+\label{lem:tsupport-annulus}
+\lean{Rd.mem_annulus_of_mem_tsupport}
+\leanok
+For all reals $a, b$ and every $f \colon V \to \C$ that vanishes outside the annulus
+$\{a \leq \|\zeta\| \leq b\}$, the closure of the support of $f$ lies in that annulus.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The annulus is closed.
+\end{proof}
+
+\begin{theorem}[The Bessel kernels are uniformly Schwartz]
+\label{thm:bessel-kernels-uniform}
+\lean{Rd.exists_isUniformSchwartz_besselSymbolFamily,
+  Rd.exists_isUniformSchwartz_besselKernelFamily}
+\leanok
+\uses{def:bessel-kernel-family, lem:shifted-bessel-symbol-bounds, lem:leibniz-schwartz,
+  lem:tsupport-annulus, thm:uniform-schwartz-linear-map, def:uniform-schwartz}
+Let $a > 0$ and $b$ be real, and let $\widehat\omega \colon V \to \C$ be a Schwartz function
+that vanishes outside the annulus $\{a \leq \|\zeta\| \leq b\}$. Then for every real $\sigma$
+there are bounds $A$ such that $(S_j)$ is uniformly Schwartz with bounds $A$, and bounds $A'$
+such that $(K_j)$ is uniformly Schwartz with bounds $A'$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $C_r \geq 0$ be the bounds of \Cref{lem:shifted-bessel-symbol-bounds}; note
+$2^{-2j} \in (0, 1]$. At a point $x$ outside the closure of the support of $\widehat\omega$
+every derivative of $S_j$ vanishes. At a point $x$ of that closure, $a \leq \|x\| \leq b$
+(\Cref{lem:tsupport-annulus}), so $\|x\|^k \leq |b|^k$ and
+\[
+  \|x\|^k \|D^l S_j(x)\| \leq |b|^k \sum_{i \leq l} \binom{l}{i} C_i \,
+  \|\widehat\omega\|_{0,l-i}
+\]
+by \Cref{lem:leibniz-schwartz}, for every $j$. The kernels follow by
+\Cref{thm:uniform-schwartz-linear-map}.
+\end{proof}
+
+\begin{theorem}[Bessel potentials of dilates]
+\label{thm:bessel-potential-dilate}
+\lean{Rd.besselSchwartz_schwartzDilate, Rd.besselPotential_schwartzDilate}
+\leanok
+\uses{def:bessel-kernel-family, lem:bessel-weight-scaling, def:schwartz-dilate,
+  lem:fourier-dilate, lem:bessel-weight-basic, def:bessel-schwartz,
+  lem:bessel-schwartz-distribution}
+For every Schwartz function $\omega \colon V \to \C$, every real $\sigma$ and every $j \in \N$,
+let $K_j$ be the Bessel kernels of $\widehat\omega$. Then
+\[
+  J_\sigma \omega_{2^j} = 2^{j\sigma} (K_j)_{2^j} ,
+\]
+and Mathlib's Bessel potential $J_\sigma$ maps the tempered distribution of $\omega_{2^j}$ to
+that of $2^{j\sigma} (K_j)_{2^j}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Both sides are Schwartz functions, and the Fourier transform is injective on them. At $\xi$,
+the Fourier transform of the left side is $\langle \xi \rangle^\sigma \widehat\omega(2^{-j}\xi)$
+(\Cref{lem:fourier-dilate}), and that of the right side is
+$2^{j\sigma} \, \beta_{2^{-2j},\sigma}(2^{-j} \xi) \, \widehat\omega(2^{-j} \xi)$
+(\Cref{lem:fourier-dilate}, \Cref{def:bessel-kernel-family}). They agree by
+\Cref{lem:bessel-weight-scaling} with $c = 2^j$. The statement on tempered distributions follows
+with \Cref{lem:bessel-schwartz-distribution}.
+\end{proof}
+
+The identity holds for every Schwartz function $\omega$; the annulus condition of
+\Cref{thm:bessel-kernels-uniform} makes the kernels $K_j$ uniform in $j$.
+
+\paragraph{The dilated Bessel kernels.}
+
+\begin{definition}[Overlap of the Bessel kernels]
+\label{def:bessel-overlap}
+\lean{Rd.besselOverlap, Rd.besselOverlap_ne_top}
+\leanok
+\uses{lem:shifted-bessel-symbol-bounds}
+For every real $a$, every $N \in \N$, every real $\sigma$ and every Schwartz function
+$\widehat\omega \colon V \to \C$ let
+\[
+  B_{a,N,\sigma,\widehat\omega} = (N + 1) \bigl( M_{a, 2^N a, \sigma} \,
+  \|\widehat\omega\|_{0,0} \bigr)^2 < \infty .
+\]
+\end{definition}
+
+\begin{lemma}[Dyadic scales of an annulus]
+\label{lem:dyadic-annulus-count}
+\lean{Nat.le_add_of_dyadic_annulus, ENNReal.tsum_le_of_mem_Icc,
+  ENNReal.tsum_le_of_dyadic_annulus}
+\leanok
+Let $a > 0$ and $t$ be real and $N \in \N$. For all $i, j \in \N$ with $a \leq t / 2^j$ and
+$t / 2^i \leq 2^N a$, $j \leq i + N$. Let $M \in [0, \infty]$ and let $(u_j)_{j \in \N}$ be a
+sequence in $[0, \infty]$ with $u_j \leq M$ for every $j$. If there is $i_0 \in \N$ such that
+$u_j \neq 0$ implies $i_0 \leq j \leq i_0 + N$, or if $u_j \neq 0$ implies
+$a \leq t / 2^j \leq 2^N a$, then $\sum_j u_j \leq (N + 1) M$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$2^j a \leq t \leq 2^{i+N} a$ gives the first claim. In the first case at most $N + 1$ terms are
+nonzero. In the second, let $i_0$ be the least $j$ with $u_j \neq 0$; by the first claim every
+$j$ with $u_j \neq 0$ satisfies $i_0 \leq j \leq i_0 + N$.
+\end{proof}
+
+\begin{lemma}[Frequencies of the dilated Bessel kernels]
+\label{lem:bessel-kernel-frequency}
+\lean{Rd.fourier_dilate_besselKernelFamily,
+  Rd.mem_annulus_of_fourier_dilate_besselKernelFamily_ne_zero,
+  Rd.enorm_fourier_dilate_besselKernelFamily_le,
+  Rd.mem_Icc_of_fourier_dilate_besselKernelFamily_ne_zero}
+\leanok
+\uses{def:bessel-kernel-family, lem:fourier-dilate, lem:shifted-bessel-symbol-bounds,
+  lem:dyadic-annulus-count}
+Let $\widehat\omega \colon V \to \C$ be a Schwartz function, $\sigma$ real and $K_j$ the Bessel
+kernels of $\widehat\omega$. For every $j \in \N$ and every $\xi \in V$, with
+$\zeta = 2^{-j} \xi$,
+\[
+  \widehat{(K_j)_{2^j}}(\xi) = \beta_{2^{-2j},\sigma}(\zeta) \, \widehat\omega(\zeta) .
+\]
+Let $a > 0$ and $b$ be real, and let $\widehat\omega$ vanish outside the annulus
+$\{a \leq \|\zeta\| \leq b\}$. Then for every $j \in \N$ and every $\xi \in V$,
+$|\widehat{(K_j)_{2^j}}(\xi)| \leq M_{a,b,\sigma} \|\widehat\omega\|_{0,0}$, and if
+$\widehat{(K_j)_{2^j}}(\xi) \neq 0$, then $a \leq 2^{-j} \|\xi\| \leq b$. If moreover
+$b = 2^N a$ with $N \in \N$, and $i_0 \in \N$ is the least index with
+$\|\xi\| \leq 2^{i_0} 2^N a$, then $\widehat{(K_j)_{2^j}}(\xi) \neq 0$ implies
+$i_0 \leq j \leq i_0 + N$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The identity is \Cref{lem:fourier-dilate} with \Cref{def:bessel-kernel-family}. If
+$\widehat\omega(\zeta) \neq 0$, then $a \leq \|\zeta\| = 2^{-j} \|\xi\| \leq b$, and
+$|\beta_{2^{-2j},\sigma}(\zeta)| \leq M_{a,b,\sigma}$ (\Cref{lem:shifted-bessel-symbol-bounds}). For
+$b = 2^N a$, $\|\xi\| \leq 2^j 2^N a$ gives $i_0 \leq j$, and \Cref{lem:dyadic-annulus-count}
+with $t = \|\xi\|$ gives $j \leq i_0 + N$.
+\end{proof}
+
+\begin{theorem}[The dilated Bessel kernels form a Calder\'on--Zygmund family]
+\label{thm:cz-family-bessel}
+\lean{Rd.tsum_fourier_dilate_besselKernelFamily_sq_le, Rd.exists_isCZFamily_besselKernelFamily}
+\leanok
+\uses{lem:bessel-kernel-frequency, def:bessel-overlap, lem:dyadic-annulus-count,
+  thm:bessel-kernels-uniform, thm:cz-family-dilation, def:hormander-const}
+Let $a > 0$ be real, $N \in \N$, and let $\widehat\omega \colon V \to \C$ be a Schwartz function
+that vanishes outside the annulus $\{a \leq \|\zeta\| \leq 2^N a\}$. Then for every real $\sigma$
+and every $\xi \in V$,
+\[
+  \sum_j |\widehat{(K_j)_{2^j}}(\xi)|^2 \leq B_{a,N,\sigma,\widehat\omega} ,
+\]
+and there is $H < \infty$ such that $((K_j)_{2^j})_j$ is a Calder\'on--Zygmund family with
+overlap $B_{a,N,\sigma,\widehat\omega}$ and H\"ormander constant $H$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:bessel-kernel-frequency} every term is at most
+$(M_{a,2^N a,\sigma} \|\widehat\omega\|_{0,0})^2$, and a nonzero term needs
+$a \leq 2^{-j} \|\xi\| \leq 2^N a$; \Cref{lem:dyadic-annulus-count} with $t = \|\xi\|$ bounds the
+sum. The kernels $K_j$
+are uniformly Schwartz with some bounds $A$ (\Cref{thm:bessel-kernels-uniform}), and
+\Cref{thm:cz-family-dilation} gives the family with $H = 4 H_A$.
+\end{proof}
+
+\paragraph{Annuli of the Littlewood--Paley kernels.}
+
+\begin{lemma}[Annuli of the Littlewood--Paley kernels]
+\label{lem:littlewood-paley-annuli}
+\lean{Rd.mem_annulus_of_fourier_psiOneS_ne_zero, Rd.mem_annulus_of_fourier_psiBase_ne_zero,
+  Rd.mem_annulus_of_fourier_psiDualBase_ne_zero}
+\leanok
+\uses{lem:fourier-dilate, lem:psi-one, lem:psi-base, lem:psi-dual-basic,
+  lem:psi-dual-frequency, lem:lp-kernels-frequency}
+For every $j \in \N$ and every $\zeta \in V$:
+if $\widehat{\psi_1}(\zeta) \neq 0$, then $1 \leq \|\zeta\| \leq 2^2 \cdot 1$; if
+$\widehat{G^{\psi}_{j+1}}(\zeta) \neq 0$, then $1/2 \leq \|\zeta\| \leq 2^2 \cdot 1/2$; and if
+$\widehat{\tilde G_{j+2}}(\zeta) \neq 0$, then $1/4 \leq \|\zeta\| \leq 2^4 \cdot 1/4$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first claim is \Cref{lem:psi-one} with \Cref{lem:lp-kernels-frequency}. Further
+$G^{\psi}_{j+1} = G^{\psi}_1$ and $\psi_1 = (G^{\psi}_1)_2$ (\Cref{lem:psi-base}), so
+$\widehat{G^{\psi}_{j+1}}(\zeta) = \widehat{\psi_1}(2 \zeta)$ (\Cref{lem:fourier-dilate}), and the
+first claim gives $1 \leq 2 \|\zeta\| \leq 4$. Likewise $\tilde G_{j+2} = \tilde G_2$ and
+$\tilde\psi_2 = (\tilde G_2)_4$ (\Cref{lem:psi-dual-basic}), so
+$\widehat{\tilde G_{j+2}}(\zeta) \neq 0$ gives $1 < 4 \|\zeta\| < 16$
+(\Cref{lem:fourier-dilate}, \Cref{lem:psi-dual-frequency}).
+\end{proof}
+
+So \Cref{thm:cz-family-bessel} applies to $\widehat{\psi_1}$ with $a = 1$, $N = 2$, to
+$\widehat{G^{\psi}_{j+1}}$ with $a = 1/2$, $N = 2$, and to $\widehat{\tilde G_{j+2}}$ with
+$a = 1/4$, $N = 4$.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
