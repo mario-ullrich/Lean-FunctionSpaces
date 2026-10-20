@@ -190,6 +190,7 @@ public import FunctionSpaces.Rd.PlancherelBounds
 public import FunctionSpaces.Rd.CalderonZygmundSigned
 public import FunctionSpaces.Rd.VectorValuedWeakType
 public import FunctionSpaces.Lp.WeakType
+public import FunctionSpaces.Lp.LayerCake
 public import FunctionSpaces.Lp.Marcinkiewicz
 
 /-!
@@ -657,6 +658,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `4 · 2^n B + (2n)^n |B(0, 1)| + 4H`.
 * `FunctionSpaces.Lp.WeakType`: the distribution function, weak `L_p` norms and operators of
   weak and strong type, with the definitions of the Carleson project.
+* `FunctionSpaces.Lp.LayerCake`: the layer cake formula
+  `∫ F^p dν = p ∫_0^∞ ν{F > t} t^(p-1) dt` for `[0, ∞]`-valued functions on every measure space,
+  and the integrals of powers of `t` over `(0, b)`, `(0, ∞)` and the level sets `{t < a}`,
+  `{t ≥ a}`.
 * `FunctionSpaces.Lp.Marcinkiewicz`: Marcinkiewicz interpolation between weak type `(1,1)` and
   strong type `(2,2)` for `1 < p < 2` with an explicit constant, by the layer cake argument, for
   operators on an abstract input type and in the terms of the Carleson project.

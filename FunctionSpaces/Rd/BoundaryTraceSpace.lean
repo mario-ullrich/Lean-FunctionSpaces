@@ -20,9 +20,10 @@ product space `V`, such as `ℝ^d`, with Lebesgue measure, and `H^1(Ω)` the Hil
   (`Rd.toL2`), `‖ι U‖_2 + ‖(2^k ω_2(ι U, 2^(-k))_2)_k‖_{ℓ_2} ≤ C ‖U‖` with an explicit `C`
   (`Rd.modNorm_two_le_norm`), and the `B^{1/2}_{2,1}` quantity is at most `√2` times the
   `B^1_{2,2}` quantity (`Rd.modNorm_half_one_le`, by the Cauchy–Schwarz inequality
-  `ENNReal.lqNorm_one_mul_le`); together `H^1(V) ⊆ B^{1/2}_{2,1}(V)` with constant `√2 C`
-  (`Rd.modNorm_half_one_le_norm`), so the trace of `H^1(V)` on one Lipschitz graph is bounded
-  (`Rd.LipschitzGraph.exists_enorm_trace_toL2_le`).
+  `ENNReal.lqNorm_one_mul_le` and `‖(2^(-k/2))_k‖_{ℓ_2} = √2`,
+  `ENNReal.lqNorm_two_dyadicWeight_neg_half`); together `H^1(V) ⊆ B^{1/2}_{2,1}(V)` with
+  constant `√2 C` (`Rd.modNorm_half_one_le_norm`), so the trace of `H^1(V)` on one Lipschitz
+  graph is bounded (`Rd.LipschitzGraph.exists_enorm_trace_toL2_le`).
 * **Chart traces**: `u ↦ Tr_j(ψ_j u)` is a bounded operator from `H^1(Ω)` to `L_2` of the
   hyperplane of the chart `j` (`Rd.BoundedLipschitzDomain.chartTrace`), for the canonical
   resolution of unity `Rd.BoundedLipschitzDomain.boundaryPartition`.
@@ -52,22 +53,9 @@ open scoped ENNReal SchwartzMap BesselPotentialSpace InnerProductSpace
 open TemperedDistribution (besselPotential)
 open ENNReal (lqNorm dyadicWeight)
 
-/-! ### Two facts on sequences and on Bessel potential spaces -/
+/-! ### Two facts on dyadic weights and on Bessel potential spaces -/
 
 namespace ENNReal
-
-/-- **The Cauchy–Schwarz inequality for nonnegative sequences**:
-`∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for sequences indexed by a countable set (Mathlib's
-`ENNReal.lintegral_mul_le_Lp_mul_Lq` for the counting measure). -/
-theorem lqNorm_one_mul_le {ι : Type*} [MeasurableSpace ι] [Countable ι]
-    [MeasurableSingletonClass ι] (a b : ι → ℝ≥0∞) :
-    lqNorm 1 (fun k => a k * b k) ≤ lqNorm 2 a * lqNorm 2 b := by
-  have h := ENNReal.lintegral_mul_le_Lp_mul_Lq (Measure.count : Measure ι)
-    Real.HolderConjugate.two_two (measurable_of_countable a).aemeasurable
-    (measurable_of_countable b).aemeasurable
-  rw [ENNReal.lqNorm_one, ENNReal.lqNorm_eq_tsum two_ne_zero ENNReal.ofNat_ne_top,
-    ENNReal.lqNorm_eq_tsum two_ne_zero ENNReal.ofNat_ne_top]
-  simpa [lintegral_count] using h
 
 /-- `‖(2^(-k/2))_k‖_{ℓ_2} = √2`, since `∑_k 2^(-k) = 2`. -/
 theorem lqNorm_two_dyadicWeight_neg_half :

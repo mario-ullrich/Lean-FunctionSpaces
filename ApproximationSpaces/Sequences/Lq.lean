@@ -29,9 +29,10 @@ proofs for every sequence that enters.
 The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥0∞` scalars,
 **monotonicity in `q`** (`lqNorm r a ≤ lqNorm q a` for `1 ≤ q ≤ r`; Mathlib has only the
 inclusion `lp.monotone`, without the norm bound), the Cauchy–Schwarz inequality
-`∑_{k ∈ s} a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for finite `s`, the splitting off of the first term,
-the geometric sequence, and the **dyadic weights** `dyadicWeight s k = 2 ^ (k s)` that every
-approximation space uses.
+`∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for series and for finite sums
+(`ENNReal.lqNorm_one_mul_le`, `ENNReal.sum_mul_le_lqNorm_two_mul`), the splitting off of the
+first term, the geometric sequence, and the **dyadic weights** `dyadicWeight s k = 2 ^ (k s)` that
+every approximation space uses.
 -/
 
 @[expose] public section
@@ -90,17 +91,25 @@ theorem lqNorm_two_sq (a : ι → ℝ≥0∞) : lqNorm 2 a ^ 2 = ∑' i, a i ^ 2
   have h := lqNorm_rpow two_ne_zero ofNat_ne_top a
   simpa only [toReal_ofNat, rpow_two] using h
 
+/-- **The Cauchy–Schwarz inequality for nonnegative sequences**:
+`∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for families `a, b` in `[0, ∞]` indexed by a countable set
+(Mathlib's `ENNReal.lintegral_mul_le_Lp_mul_Lq` for the counting measure). -/
+theorem lqNorm_one_mul_le (a b : ι → ℝ≥0∞) :
+    lqNorm 1 (fun k => a k * b k) ≤ lqNorm 2 a * lqNorm 2 b := by
+  have h := ENNReal.lintegral_mul_le_Lp_mul_Lq (Measure.count : Measure ι)
+    Real.HolderConjugate.two_two (measurable_of_countable a).aemeasurable
+    (measurable_of_countable b).aemeasurable
+  rw [lqNorm_one, lqNorm_eq_tsum two_ne_zero ofNat_ne_top, lqNorm_eq_tsum two_ne_zero ofNat_ne_top]
+  simpa [lintegral_count] using h
+
 /-- **The Cauchy–Schwarz inequality for finite sums against `ℓ_2` norms**:
 `∑_{j ∈ s} a_j b_j ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for every finite set `s` and all families `a, b` in
-`[0, ∞]` indexed by a countable set: Mathlib's Hölder inequality for finite sums
-`ENNReal.inner_le_Lp_mul_Lq` with `p = q = 2`, and each finite sum of squares is at most the
-series (`ENNReal.sum_le_tsum`). -/
+`[0, ∞]` indexed by a countable set: a finite sum is at most the series
+(`ENNReal.sum_le_tsum`), which is the `ℓ_1` norm of the products (`ENNReal.lqNorm_one`), and
+`ENNReal.lqNorm_one_mul_le` bounds that. -/
 theorem sum_mul_le_lqNorm_two_mul (s : Finset ι) (a b : ι → ℝ≥0∞) :
-    ∑ j ∈ s, a j * b j ≤ lqNorm 2 a * lqNorm 2 b := by
-  rw [lqNorm_eq_tsum two_ne_zero ofNat_ne_top, lqNorm_eq_tsum two_ne_zero ofNat_ne_top,
-    toReal_ofNat]
-  refine (ENNReal.inner_le_Lp_mul_Lq s a b Real.HolderConjugate.two_two).trans ?_
-  gcongr <;> exact ENNReal.sum_le_tsum s
+    ∑ j ∈ s, a j * b j ≤ lqNorm 2 a * lqNorm 2 b :=
+  (ENNReal.sum_le_tsum s).trans ((lqNorm_one _).symm.trans_le (lqNorm_one_mul_le a b))
 
 omit [Countable ι] [MeasurableSingletonClass ι] in
 /-- The zero family has norm `0`. -/

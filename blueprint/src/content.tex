@@ -338,6 +338,27 @@ $\|a\|_{\ell_r}^r \leq M^r$. The fifth is the third applied to $a_0 \delta_0$ an
 and induction on $m$. The last is the fourth and the geometric series.
 \end{proof}
 
+\begin{lemma}[The Cauchy--Schwarz inequality for sequences]
+\label{lem:lq-cauchy-schwarz-sequences}
+\lean{ENNReal.lqNorm_one_mul_le, ENNReal.sum_mul_le_lqNorm_two_mul}
+\leanok
+\uses{def:lq-norm}
+For every countable index set $I$, every finite set $s \subseteq I$ and all families
+$(a_k)_k$ and $(b_k)_k$ in $[0, \infty]$ indexed by $I$,
+\[
+  \sum_{k \in s} a_k b_k \leq \sum_{k \in I} a_k b_k
+  \leq \|(a_k)_k\|_{\ell_2} \, \|(b_k)_k\|_{\ell_2} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The second inequality is Hölder's inequality for the counting measure on $I$ (Mathlib's
+\texttt{ENNReal.\allowbreak lintegral\_\allowbreak mul\_\allowbreak le\_\allowbreak
+Lp\_\allowbreak mul\_\allowbreak Lq}) with exponents $2$ and $2$; the first holds since every
+term is nonnegative.
+\end{proof}
+
 \begin{lemma}[Countable Minkowski inequality]
 \label{lem:countable-minkowski}
 \lean{ENNReal.lqNorm_sum_le, ENNReal.lqNorm_iSup, ENNReal.lqNorm_tsum_le}
@@ -5902,6 +5923,33 @@ where $\widehat{\Theta_k}(\xi) \neq 0$ and $j \geq k + 3$,
 $|\xi| < 2^{k+2} \leq 2^{j-1}$ and $\widehat{\psi_j}(\xi) = 0$.
 \end{proof}
 
+\begin{lemma}[At most two blocks see a frequency]
+\label{lem:fourier-psi-window}
+\lean{Rd.norm_fourier_psi_le_one, Rd.enorm_fourier_psi_le_one, Rd.sum_range_fourier_psi,
+  Rd.exists_fourier_psi_window, Rd.four_pow_le_of_fourier_psi_ne_zero}
+\leanok
+\uses{def:lp-kernels, lem:lp-kernels-frequency}
+For every $j \in \N$ and every $\xi \in V$, $|\widehat{\psi_j}(\xi)| \leq 1$, and if
+$\widehat{\psi_j}(\xi) \neq 0$, then $4^j \leq 4(1 + |\xi|^2)$. For every $J \in \N$ and every
+$\xi \in V$, $\sum_{i=0}^J \widehat{\psi_i}(\xi) = \widehat{\Phi_J}(\xi)$. For every $\xi \in V$
+there is $a \in \N$ with $|\xi| < 2^{a+1}$,
+$\widehat{\psi_j}(\xi) = 0$ for every $j \notin \{a, a+1\}$, and
+$\widehat{\psi_a}(\xi) + \widehat{\psi_{a+1}}(\xi) = 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\widehat{\psi_0}(\xi) = \chi_{1,2}(\xi)$ and
+$\widehat{\psi_{j+1}}(\xi) = \chi_{1,2}(2^{-j-1}\xi) - \chi_{1,2}(2^{-j}\xi)$ with values of
+$\chi_{1,2}$ in $[0, 1]$ (\Cref{lem:lp-kernels-frequency}); the sum telescopes. If
+$\widehat{\psi_{i+1}}(\xi) \neq 0$, then $|\xi| > 2^i$ by \Cref{lem:lp-kernels-frequency}, so
+$4^{i+1} = 4 (2^i)^2 < 4 |\xi|^2$. Let $a$ be the least index with $|\xi| < 2^{a+1}$. For $j < a$,
+$|\xi| \geq 2^{j+1}$, so $\widehat{\psi_j}(\xi) = 0$; for $j \geq a + 2$, $j = i + 1$ with
+$|\xi| < 2^{a+1} \leq 2^i$, so $\widehat{\psi_j}(\xi) = 0$. Finally
+$\widehat{\psi_a}(\xi) + \widehat{\psi_{a+1}}(\xi) = \sum_{j=0}^{a+1} \widehat{\psi_j}(\xi)
+= \chi_{1,2}(2^{-a-1}\xi) = 1$.
+\end{proof}
+
 \begin{lemma}[Kernel identities by Fourier inversion]
 \label{lem:conv-of-fourier}
 \lean{Rd.conv_eq_of_fourier}
@@ -9818,54 +9866,6 @@ disjoint.
 The theorem holds for all $g$ and $w$: the radii are bounded by $R$ on each $E_R$, and the
 exhaustion in $R$ takes the place of a bound of the radii by $\int g$.
 
-\begin{lemma}[{Layer cake formula for functions with values in $[0, \infty]$}]
-\label{lem:layer-cake}
-\lean{ENNReal.lt_toReal_min_natCast_iff, MeasureTheory.lintegral_min_natCast_rpow_eq,
-  ENNReal.iSup_min_natCast_rpow, MeasureTheory.lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal}
-\leanok
-For every measure space $(X, \nu)$, every almost everywhere measurable
-$F : X \to [0, \infty]$ and every $p > 0$,
-\[
-  \int F^p \, d\nu = p \int_0^\infty \nu(\{F > t\}) \, t^{p-1} \, dt .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-For the truncation $\min(F, N)$, $N \in \N$, this is Mathlib's layer cake formula for real
-functions (\texttt{lintegral\_rpow\_eq\_lintegral\_meas\_lt\_mul}), and for $t > 0$,
-$\min(F, N) > t$ holds exactly when $F > t$ and $N > t$, so the right side is the integral
-over $(0, N)$. As $N \to \infty$ the left side converges by monotone convergence and the right
-side by the increasing union $\bigcup_N (0, N) = (0, \infty)$.
-\end{proof}
-
-\begin{lemma}[Integrals of powers]
-\label{lem:power-integrals}
-\lean{MeasureTheory.lintegral_Ioo_rpow, MeasureTheory.lintegral_Ioi_rpow_eq_top,
-  MeasureTheory.lintegral_Ioi_rpow_indicator_lt, MeasureTheory.lintegral_Ioi_rpow_indicator_ge}
-\leanok
-For every $r > -1$ and every $a \in [0, \infty]$,
-\[
-  \int_{(0, \infty)} \mathbf 1_{\{t < a\}} \, t^r \, dt = \frac{a^{r+1}}{r + 1} .
-\]
-For every $r < -1$ and every $a \in [0, \infty]$,
-\[
-  \int_{(0, \infty)} \mathbf 1_{\{t \geq a\}} \, t^r \, dt = \frac{a^{r+1}}{-(r + 1)} .
-\]
-Here $\infty^{r+1} = \infty$ and $0^{r+1} = 0$ for $r + 1 > 0$, and $\infty^{r+1} = 0$ and
-$0^{r+1} = \infty$ for $r + 1 < 0$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-For $0 < a < \infty$ these are the integrals of $t^r$ over $(0, a)$ and $[a, \infty)$ (Mathlib's
-\texttt{integral\_rpow} and \texttt{integral\_Ioi\_rpow\_of\_lt}), and the first formula also
-holds for $a = 0$. The integral of $t^r$ over $(0, \infty)$ is infinite for every $r$, since
-$t^r$ is not integrable on $(0, \infty)$ (Mathlib's \texttt{not\_integrableOn\_Ioi\_rpow}); this
-is the first integral for $a = \infty$ and the second for $a = 0$. For $a = \infty$ the second
-integral vanishes.
-\end{proof}
-
 \begin{theorem}[Weighted strong type and the Hardy--Littlewood maximal theorem]
 \label{thm:maximal-strong-type}
 \lean{Rd.maximalConst, Rd.maximalConst_ne_top, Rd.setLIntegral_maximal_gt_le_indicator,
@@ -12649,33 +12649,6 @@ $1 \leq |x| + |y|$ by the triangle inequality, and $(|x| + |y|)^2 \leq 2(|x|^2 +
 (Mathlib's \texttt{add\_\allowbreak sq\_\allowbreak le}); and $(c^{1/2} b)^2 = c \, b^2$.
 \end{proof}
 
-\begin{lemma}[At most two blocks see a frequency]
-\label{lem:fourier-psi-window}
-\lean{Rd.norm_fourier_psi_le_one, Rd.enorm_fourier_psi_le_one, Rd.sum_range_fourier_psi,
-  Rd.exists_fourier_psi_window, Rd.four_pow_le_of_fourier_psi_ne_zero}
-\leanok
-\uses{def:lp-kernels, lem:lp-kernels-frequency}
-For every $j \in \N$ and every $\xi \in V$, $|\widehat{\psi_j}(\xi)| \leq 1$, and if
-$\widehat{\psi_j}(\xi) \neq 0$, then $4^j \leq 4(1 + |\xi|^2)$. For every $J \in \N$ and every
-$\xi \in V$, $\sum_{i=0}^J \widehat{\psi_i}(\xi) = \widehat{\Phi_J}(\xi)$. For every $\xi \in V$
-there is $a \in \N$ with $|\xi| < 2^{a+1}$,
-$\widehat{\psi_j}(\xi) = 0$ for every $j \notin \{a, a+1\}$, and
-$\widehat{\psi_a}(\xi) + \widehat{\psi_{a+1}}(\xi) = 1$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-$\widehat{\psi_0}(\xi) = \chi_{1,2}(\xi)$ and
-$\widehat{\psi_{j+1}}(\xi) = \chi_{1,2}(2^{-j-1}\xi) - \chi_{1,2}(2^{-j}\xi)$ with values of
-$\chi_{1,2}$ in $[0, 1]$ (\Cref{lem:lp-kernels-frequency}); the sum telescopes. If
-$\widehat{\psi_{i+1}}(\xi) \neq 0$, then $|\xi| > 2^i$ by \Cref{lem:lp-kernels-frequency}, so
-$4^{i+1} = 4 (2^i)^2 < 4 |\xi|^2$. Let $a$ be the least index with $|\xi| < 2^{a+1}$. For $j < a$,
-$|\xi| \geq 2^{j+1}$, so $\widehat{\psi_j}(\xi) = 0$; for $j \geq a + 2$, $j = i + 1$ with
-$|\xi| < 2^{a+1} \leq 2^i$, so $\widehat{\psi_j}(\xi) = 0$. Finally
-$\widehat{\psi_a}(\xi) + \widehat{\psi_{a+1}}(\xi) = \sum_{j=0}^{a+1} \widehat{\psi_j}(\xi)
-= \chi_{1,2}(2^{-a-1}\xi) = 1$.
-\end{proof}
-
 \begin{proposition}[The Bessel weight and the Littlewood--Paley weights]
 \label{prop:bessel-lp-weights}
 \lean{Rd.dyadicWeight_sq_le_of_fourier_psi_ne_zero, Rd.ofReal_besselWeight_sq_le_of_norm_lt,
@@ -14210,34 +14183,30 @@ to the functions of $B^{1/2}_{2,2}(\Gamma)$ modulo null sets of $\Gamma$.
 The chart traces are bounded by the norm of $B^{1/2}_{2,1}(V)$ (\Cref{lem:trace-linear}). The
 following three results bound this norm on $H^1(V)$, with explicit constants.
 
-\begin{lemma}[The Cauchy--Schwarz inequality for sequences]
+\begin{lemma}[The $\ell_2$ norm of $(2^{-k/2})_k$]
 \label{lem:lq-cauchy-schwarz}
-\lean{ENNReal.lqNorm_one_mul_le, ENNReal.sum_mul_le_lqNorm_two_mul,
-  ENNReal.lqNorm_two_dyadicWeight_neg_half}
+\lean{ENNReal.lqNorm_two_dyadicWeight_neg_half}
 \leanok
-\uses{lem:hardy}
-For every countable index set $I$, every finite set $s \subseteq I$ and all families
-$(a_k)_k$ and $(b_k)_k$ in $[0, \infty]$ indexed by $I$,
-$\sum_{k \in I} a_k b_k \leq \|(a_k)_k\|_{\ell_2} \|(b_k)_k\|_{\ell_2}$ and
-$\sum_{k \in s} a_k b_k \leq \|(a_k)_k\|_{\ell_2} \|(b_k)_k\|_{\ell_2}$. Moreover
-$\|(2^{-k/2})_k\|_{\ell_2} = \sqrt 2$.
+\uses{lem:hardy, lem:lq-cauchy-schwarz-sequences}
+$\|(2^{-k/2})_{k \in \N}\|_{\ell_2} = \sqrt 2$. In particular, by the Cauchy--Schwarz
+inequality of \Cref{lem:lq-cauchy-schwarz-sequences}, for every family $(b_k)_{k \in \N}$ in
+$[0, \infty]$,
+\[
+  \sum_{k \in \N} 2^{-k/2} b_k \leq \sqrt 2 \, \|(b_k)_k\|_{\ell_2} .
+\]
 \end{lemma}
 
 \begin{proof}
 \leanok
-Hölder's inequality for the counting measure (Mathlib's \texttt{ENNReal.\allowbreak
-lintegral\_\allowbreak mul\_\allowbreak le\_\allowbreak Lp\_\allowbreak mul\_\allowbreak Lq})
-gives the series; Hölder's inequality for finite sums (Mathlib's \texttt{ENNReal.\allowbreak
-inner\_\allowbreak le\_\allowbreak Lp\_\allowbreak mul\_\allowbreak Lq}) and the bound of a
-finite sum of squares by the series give the finite sums; $\sum_k 2^{-k} = 2$
-(\Cref{lem:hardy}).
+$\|(2^{-k/2})_k\|_{\ell_2}^2 = \sum_k 2^{-k} = 2$ (\Cref{lem:hardy}), and the inequality is
+\Cref{lem:lq-cauchy-schwarz-sequences} with $a_k = 2^{-k/2}$.
 \end{proof}
 
 \begin{lemma}[$\Besov{1}{2}{2} \subseteq \Besov{1/2}{2}{1}$ with constant $\sqrt 2$]
 \label{lem:besov-half-one}
 \lean{Rd.modNorm_half_one_le}
 \leanok
-\uses{lem:lq-cauchy-schwarz}
+\uses{lem:lq-cauchy-schwarz-sequences, lem:lq-cauchy-schwarz}
 For every $F \in L_2(V)$,
 \[
   \|F\|_2 + \sum_k 2^{k/2} \omega_2(F, 2^{-k})_2
@@ -16501,7 +16470,8 @@ last bound, and the inner integral is at most $H$ for every $y \in Q$.
 \lean{Rd.enorm_conv_le_setLIntegral_sub, Rd.IsCZFamily.lqNorm_conv_le_setLIntegral,
   Rd.IsCZFamily.enorm_sum_conv_le_setLIntegral}
 \leanok
-\uses{def:cz-family, lem:reflect-basic, lem:minkowski-integral-lq, lem:lq-cauchy-schwarz}
+\uses{def:cz-family, lem:reflect-basic, lem:minkowski-integral-lq,
+  lem:lq-cauchy-schwarz-sequences}
 For every continuous bounded $K : V \to \C$, every set $Q \subseteq V$, every integrable
 $b : V \to \C$ with $b = 0$ outside $Q$ and $\int b = 0$, and all $c, x \in V$,
 \[
@@ -16530,7 +16500,7 @@ bound follows by Minkowski's integral inequality in $\ell_2$
 (\Cref{lem:minkowski-integral-lq}). For the third, the triangle inequality and the first bound
 for each $j \in s$ give
 $\int_Q \sum_{j \in s} |\theta_j(x - y) - \theta_j(x - c)| \, |b_j(y)| \, dy$, and the
-Cauchy--Schwarz inequality of \Cref{lem:lq-cauchy-schwarz} applies at each $y$.
+Cauchy--Schwarz inequality of \Cref{lem:lq-cauchy-schwarz-sequences} applies at each $y$.
 \end{proof}
 
 \begin{lemma}[Convolution of the bad part]
@@ -16797,6 +16767,54 @@ input is split along the set where its size exceeds $\tau$, the weak type contro
 part and the $L_2$ bound the small part, and the layer cake formula of \Cref{lem:layer-cake}
 collects the levels. The measure $\mu$ on the input space is s-finite, so that Tonelli's theorem
 applies; $\nu$ is any measure.
+
+\begin{lemma}[{Layer cake formula for functions with values in $[0, \infty]$}]
+\label{lem:layer-cake}
+\lean{ENNReal.lt_toReal_min_natCast_iff, MeasureTheory.lintegral_min_natCast_rpow_eq,
+  ENNReal.iSup_min_natCast_rpow, MeasureTheory.lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal}
+\leanok
+For every measure space $(X, \nu)$, every almost everywhere measurable
+$F : X \to [0, \infty]$ and every $p > 0$,
+\[
+  \int F^p \, d\nu = p \int_0^\infty \nu(\{F > t\}) \, t^{p-1} \, dt .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For the truncation $\min(F, N)$, $N \in \N$, this is Mathlib's layer cake formula for real
+functions (\texttt{lintegral\_rpow\_eq\_lintegral\_meas\_lt\_mul}), and for $t > 0$,
+$\min(F, N) > t$ holds exactly when $F > t$ and $N > t$, so the right side is the integral
+over $(0, N)$. As $N \to \infty$ the left side converges by monotone convergence and the right
+side by the increasing union $\bigcup_N (0, N) = (0, \infty)$.
+\end{proof}
+
+\begin{lemma}[Integrals of powers]
+\label{lem:power-integrals}
+\lean{MeasureTheory.lintegral_Ioo_rpow, MeasureTheory.lintegral_Ioi_rpow_eq_top,
+  MeasureTheory.lintegral_Ioi_rpow_indicator_lt, MeasureTheory.lintegral_Ioi_rpow_indicator_ge}
+\leanok
+For every $r > -1$ and every $a \in [0, \infty]$,
+\[
+  \int_{(0, \infty)} \mathbf 1_{\{t < a\}} \, t^r \, dt = \frac{a^{r+1}}{r + 1} .
+\]
+For every $r < -1$ and every $a \in [0, \infty]$,
+\[
+  \int_{(0, \infty)} \mathbf 1_{\{t \geq a\}} \, t^r \, dt = \frac{a^{r+1}}{-(r + 1)} .
+\]
+Here $\infty^{r+1} = \infty$ and $0^{r+1} = 0$ for $r + 1 > 0$, and $\infty^{r+1} = 0$ and
+$0^{r+1} = \infty$ for $r + 1 < 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $0 < a < \infty$ these are the integrals of $t^r$ over $(0, a)$ and $[a, \infty)$ (Mathlib's
+\texttt{integral\_rpow} and \texttt{integral\_Ioi\_rpow\_of\_lt}), and the first formula also
+holds for $a = 0$. The integral of $t^r$ over $(0, \infty)$ is infinite for every $r$, since
+$t^r$ is not integrable on $(0, \infty)$ (Mathlib's \texttt{not\_integrableOn\_Ioi\_rpow}); this
+is the first integral for $a = \infty$ and the second for $a = 0$. For $a = \infty$ the second
+integral vanishes.
+\end{proof}
 
 \begin{lemma}[The parts above and below a level]
 \label{lem:parts-above-below-level}

@@ -42,9 +42,14 @@ The kernels of the Littlewood–Paley decomposition are inverse transforms of sm
 
 On the frequency side `𝓕Φ_k` lives in the ball of radius `2^(k+1)`, `𝓕Θ_k` in the ball of radius
 `2^(k+2)` and equals `1` on the ball of radius `2^(k+1)`, and `𝓕ψ_{j+1}` lives in the annulus
-`2^j ≤ |ξ| ≤ 2^(j+2)`. The **kernel identities** follow by comparing Fourier transforms
-(`Rd.conv_eq_of_fourier`: if `𝓕K · 𝓕L = 𝓕M`, then `K ⋆ L = M`, by `Rd.fourier_conv` and the
-inversion theorem `Continuous.fourierInv_fourier_eq`):
+`2^j ≤ |ξ| ≤ 2^(j+2)`. The transforms of the blocks satisfy `|𝓕ψ_j| ≤ 1`
+(`Rd.norm_fourier_psi_le_one`, `Rd.enorm_fourier_psi_le_one`) and telescope,
+`∑_{j ≤ J} 𝓕ψ_j = 𝓕Φ_J` (`Rd.sum_range_fourier_psi`); at every frequency `ξ` at most the two
+blocks `a`, `a + 1` are nonzero, and their transforms add up to `1`
+(`Rd.exists_fourier_psi_window`); and where `𝓕ψ_j(ξ) ≠ 0`, `4^j ≤ 4(1 + |ξ|²)`
+(`Rd.four_pow_le_of_fourier_psi_ne_zero`). The **kernel identities** follow by comparing Fourier
+transforms (`Rd.conv_eq_of_fourier`: if `𝓕K · 𝓕L = 𝓕M`, then `K ⋆ L = M`, by `Rd.fourier_conv`
+and the inversion theorem `Continuous.fourierInv_fourier_eq`):
 
 * `Θ_{k+1} ⋆ Θ_k = Θ_k` (`Rd.conv_Theta_succ`): the band-limited classes increase;
 * `Θ_j ⋆ ψ_j = ψ_j` (`Rd.conv_Theta_psi`): the blocks are band-limited;
@@ -567,6 +572,86 @@ theorem fourier_psi_mul_Theta {j k : ℕ} (hjk : k + 3 ≤ j) (ξ : V) :
     rw [fourier_psi_succ_eq_zero, zero_mul]
     exact (norm_lt_of_fourier_Theta_ne_zero h).le.trans
       (pow_le_pow_right₀ one_le_two (by omega))
+
+/-- **The Fourier transforms of the blocks are bounded by `1`**: `|𝓕ψ_j(ξ)| ≤ 1`, since
+`𝓕ψ_0 = χ(ξ)` and `𝓕ψ_{j+1} = χ(2^(-j-1) ξ) - χ(2^(-j) ξ)` with a cut-off `χ` with values in
+`[0, 1]`. -/
+theorem norm_fourier_psi_le_one (j : ℕ) (ξ : V) : ‖𝓕 (psi (V := V) j) ξ‖ ≤ 1 := by
+  set b : ContDiffBump (0 : V) := ⟨1, 2, one_pos, one_lt_two⟩
+  have h : ∀ x : V, cutoff 1 2 one_pos one_lt_two x = ((b x : ℝ) : ℂ) := fun x => rfl
+  cases j with
+  | zero =>
+    rw [show psi (V := V) 0 = Phi 0 from rfl, fourier_Phi, h, Complex.norm_real,
+      Real.norm_of_nonneg b.nonneg]
+    exact b.le_one
+  | succ j =>
+    rw [fourier_psi_succ, fourier_Phi, fourier_Phi, h, h, ← Complex.ofReal_sub,
+      Complex.norm_real, Real.norm_eq_abs, abs_sub_le_iff]
+    constructor <;> linarith [b.nonneg' (((2 : ℝ) ^ (j + 1))⁻¹ • ξ),
+      b.nonneg' (((2 : ℝ) ^ j)⁻¹ • ξ), b.le_one (x := ((2 : ℝ) ^ (j + 1))⁻¹ • ξ),
+      b.le_one (x := ((2 : ℝ) ^ j)⁻¹ • ξ)]
+
+/-- `|𝓕ψ_j(ξ)| ≤ 1` in `ℝ≥0∞`. -/
+theorem enorm_fourier_psi_le_one (j : ℕ) (ξ : V) : ‖𝓕 (psi (V := V) j) ξ‖ₑ ≤ 1 := by
+  rw [← ofReal_norm, ← ENNReal.ofReal_one]
+  exact ENNReal.ofReal_le_ofReal (norm_fourier_psi_le_one j ξ)
+
+/-- **The Fourier transforms of the blocks telescope**:
+`∑_{j ≤ J} 𝓕ψ_j(ξ) = 𝓕Φ_J(ξ)`. -/
+theorem sum_range_fourier_psi (J : ℕ) (ξ : V) :
+    ∑ j ∈ Finset.range (J + 1), 𝓕 (psi (V := V) j) ξ = 𝓕 (Phi (V := V) J) ξ := by
+  induction J with
+  | zero => simp [psi]
+  | succ J ih => rw [Finset.sum_range_succ, ih, fourier_psi_succ]; ring
+
+/-- **At most two blocks see a frequency**: for every `ξ ∈ V` there is `a ∈ ℕ` with
+`‖ξ‖ < 2^(a+1)` such that `𝓕ψ_j(ξ) = 0` for `j ∉ {a, a+1}` and
+`𝓕ψ_a(ξ) + 𝓕ψ_{a+1}(ξ) = 1`. Here `a` is the least index with `‖ξ‖ < 2^(a+1)`: the blocks below
+`a` vanish at `ξ` since `𝓕ψ_j` lives on `‖ξ‖ < 2^(j+1)`, those above `a + 1` since `𝓕ψ_{i+1}`
+vanishes on `‖ξ‖ ≤ 2^i`, and the sum of all blocks up to `a + 1` is `𝓕Φ_{a+1}(ξ) = 1`. -/
+theorem exists_fourier_psi_window (ξ : V) : ∃ a : ℕ, ‖ξ‖ < 2 ^ (a + 1) ∧
+    (∀ j, 𝓕 (psi (V := V) j) ξ ≠ 0 → j = a ∨ j = a + 1) ∧
+    𝓕 (psi (V := V) a) ξ + 𝓕 (psi (V := V) (a + 1)) ξ = 1 := by
+  classical
+  have hex : ∃ a : ℕ, ‖ξ‖ < 2 ^ (a + 1) := by
+    obtain ⟨n, hn⟩ := pow_unbounded_of_one_lt ‖ξ‖ (one_lt_two : (1 : ℝ) < 2)
+    exact ⟨n, hn.trans (pow_lt_pow_right₀ one_lt_two n.lt_succ_self)⟩
+  obtain ⟨a, ha, hmin⟩ : ∃ a : ℕ, ‖ξ‖ < 2 ^ (a + 1) ∧ ∀ j < a, ¬ ‖ξ‖ < 2 ^ (j + 1) :=
+    ⟨Nat.find hex, Nat.find_spec hex, fun j hj => Nat.find_min hex hj⟩
+  have hlow : ∀ j < a, 𝓕 (psi (V := V) j) ξ = 0 := fun j hj => by
+    by_contra h
+    exact hmin j hj (norm_lt_of_fourier_psi_ne_zero h)
+  have hhigh : ∀ j, a + 1 < j → 𝓕 (psi (V := V) j) ξ = 0 := by
+    intro j hj
+    obtain ⟨i, rfl⟩ : ∃ i, j = i + 1 := ⟨j - 1, by omega⟩
+    exact fourier_psi_succ_eq_zero (ha.le.trans (pow_le_pow_right₀ one_le_two (by omega)))
+  refine ⟨a, ha, fun j hj => ?_, ?_⟩
+  · by_contra hne
+    push Not at hne
+    rcases lt_or_gt_of_ne hne.1 with h | h
+    · exact hj (hlow j h)
+    · exact hj (hhigh j (by omega))
+  · have hsum := sum_range_fourier_psi (V := V) (a + 1) ξ
+    rw [fourier_Phi, cutoff_eq_one _ _ (by
+      rw [norm_two_pow_inv_smul, div_le_one (by positivity)]; exact ha.le)] at hsum
+    rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_eq_zero
+      (fun j hj => hlow j (Finset.mem_range.1 hj)), zero_add] at hsum
+    exact hsum
+
+/-- Where the block `ψ_j` sees the frequency `ξ`, its scale is at most that of `ξ`: if
+`𝓕ψ_j(ξ) ≠ 0`, then `4^j ≤ 4(1 + ‖ξ‖²)` (for `j ≥ 1`, `‖ξ‖ > 2^(j-1)`). -/
+theorem four_pow_le_of_fourier_psi_ne_zero {j : ℕ} {ξ : V} (h : 𝓕 (psi (V := V) j) ξ ≠ 0) :
+    (4 : ℝ) ^ j ≤ 4 * (1 + ‖ξ‖ ^ 2) := by
+  cases j with
+  | zero => nlinarith [sq_nonneg ‖ξ‖]
+  | succ i =>
+    have hi : (2 : ℝ) ^ i < ‖ξ‖ := not_le.1 fun h' => h (fourier_psi_succ_eq_zero h')
+    have h4 : (4 : ℝ) ^ (i + 1) = 4 * ((2 : ℝ) ^ i) ^ 2 := by
+      rw [← pow_mul, pow_succ, mul_comm i 2, pow_mul]
+      norm_num
+      ring
+    rw [h4]
+    nlinarith [pow_pos (two_pos : (0 : ℝ) < 2) i]
 
 /-! ### Kernel identities -/
 

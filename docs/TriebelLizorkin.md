@@ -126,7 +126,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`: Minkowski's inequalities for series and for `ℓ_u`-valued functions, comparison, limits of pointwise bounds | ✅ | ✗ | `Lp/MixedNorms` |
 | Triebel–Lizorkin spaces on `ℝ^d`: definition, `F_{p,p} = B_{p,p}`, the Besov sandwich | ✅ | ✗ | `Rd/TriebelLizorkin` |
 | Dyadic cubes of every level, Lebesgue differentiation along them | ✅ | ✗ | `Rd/DyadicCubes` |
-| Hardy–Littlewood maximal function: weighted weak and strong types | ✅ | ✗ | `Rd/HardyLittlewoodMaximal` |
+| Hardy–Littlewood maximal function: measurability, convolutions with kernels under radial majorants, weighted weak type `(1,1)` and weighted strong type, the maximal theorem | ✅ | ✗ | `Rd/HardyLittlewoodMaximal` |
 | The Calderón–Zygmund decomposition on dyadic cubes | ✅ | ✗ | `Rd/CalderonZygmund` |
 | The Fefferman–Stein inequality | ✅ | ✗ | `Rd/FeffermanStein` |
 | Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/KernelMajorants` |

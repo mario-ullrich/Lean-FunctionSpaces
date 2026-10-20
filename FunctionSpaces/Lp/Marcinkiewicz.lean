@@ -7,7 +7,8 @@ module
 
 public import FunctionSpaces.Lp.WeakType
 public import FunctionSpaces.Lp.LintegralForm
-public import FunctionSpaces.Rd.HardyLittlewoodMaximal
+public import FunctionSpaces.Lp.MixedNorms
+public import FunctionSpaces.Lp.LayerCake
 
 /-!
 # Marcinkiewicz interpolation between weak type `(1,1)` and strong type `(2,2)`
@@ -45,7 +46,7 @@ is s-finite.
   `(p (2 A C₁/(p - 1) + 4 A² C₂²/(2 - p)))^(1/p)`.
 
 The layer cake formula and the integrals of powers over `(0, ∞)` come from
-`FunctionSpaces.Rd.HardyLittlewoodMaximal`.
+`FunctionSpaces.Lp.LayerCake`.
 -/
 
 @[expose] public section

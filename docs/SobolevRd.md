@@ -325,6 +325,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The signed Calderón–Zygmund decomposition of functions with values in a normed space and of families: good parts bounded by `2^n t` with `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, bad pieces with mean zero on their cubes and total mass at most `2 ∫ ‖f‖` | ✅ | ✗ | `Rd/CalderonZygmundSigned` |
 | Chebyshev's inequality for split functions, the Hörmander condition around a cube, convolutions of pieces with mean zero, and the weak type `(1,1)` of the analysis and synthesis operators of a Calderón–Zygmund family with an explicit constant | ✅ | ✗ | `Rd/VectorValuedWeakType` |
 | The distribution function, weak `L_p` norms, operators of weak and strong type and almost everywhere subadditive operators, with the definitions of the Carleson project, and their elementary properties | ✅ | ✗ | `Lp/WeakType` |
+| The layer cake formula `∫ F^p dν = p ∫_0^∞ ν{F > t} t^(p-1) dt` for `[0, ∞]`-valued functions on every measure space, and the integrals of powers of `t` over `(0, b)`, `(0, ∞)` and the level sets `{t < a}`, `{t ≥ a}` | ✅ | ✗ | `Lp/LayerCake` |
 | The parts of a function above and below a level, two Tonelli steps on s-finite measure spaces, integrals of powers from bounds at every level, and Marcinkiewicz interpolation between weak type `(1,1)` and strong type `(2,2)` with an explicit constant, for operators on an abstract input type and in the terms of the Carleson project | ✅ | ✗ | `Lp/Marcinkiewicz` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.

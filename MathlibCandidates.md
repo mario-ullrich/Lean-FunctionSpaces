@@ -147,7 +147,7 @@ declarations.
   for countable index sets; `∑_k ∏_i f_i(k_i) ≤ ∏_i ∑_j f_i(j)` on `ℕ^d`
   (`Rd.tsum_prod_le_prod_tsum`).
 * **The layer cake formula for `[0, ∞]`-valued functions**
-  (`FunctionSpaces/Rd/HardyLittlewoodMaximal.lean`): `∫ F^p dν = p ∫_0^∞ ν{F > t} t^(p-1) dt` for
+  (`FunctionSpaces/Lp/LayerCake.lean`): `∫ F^p dν = p ∫_0^∞ ν{F > t} t^(p-1) dt` for
   `p > 0`, every measure and every a.e. measurable `F : α → [0, ∞]`
   (`MeasureTheory.lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal`); Mathlib's
   `lintegral_rpow_eq_lintegral_meas_lt_mul` is for real `f ≥ 0`. Also the `lintegral` of powers
@@ -206,11 +206,8 @@ declarations.
   `MeasureTheory.lintegral_rpow_le_of_forall_le_add`, and the case `(1,1)`, `(2,2)` of real
   interpolation with an explicit constant in the terms of the Carleson project
   (`MeasureTheory.hasStrongType_of_hasWeakType_one_of_hasStrongType_two`); the definitions in
-  `FunctionSpaces/Lp/WeakType.lean` are the Carleson project's own candidates. The file still
-  imports `FunctionSpaces/Rd/HardyLittlewoodMaximal.lean` for the layer cake formula
-  `MeasureTheory.lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal` and the integrals of powers
-  `MeasureTheory.lintegral_Ioi_rpow_indicator_lt`, `MeasureTheory.lintegral_Ioi_rpow_indicator_ge`,
-  which are general measure theory as well.
+  `FunctionSpaces/Lp/WeakType.lean` are the Carleson project's own candidates. The file imports
+  the layer cake formula and the integrals of powers from `FunctionSpaces/Lp/LayerCake.lean`.
 * **Integrals under a change of scale** (`FunctionSpaces/Rd/KernelMajorants.lean`):
   `∫ f(r x) dx = |r^(-n)| ∫ f` for `f : V → [0, ∞]` and `r ≠ 0` (`Rd.lintegral_comp_smul`),
   from Mathlib's `Measure.map_addHaar_smul`; Mathlib has the Bochner version
