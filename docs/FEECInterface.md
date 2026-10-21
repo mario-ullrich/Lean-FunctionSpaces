@@ -159,6 +159,18 @@ that library is in Mathlib. The De Giorgi–Nash–Moser library of Armstrong an
 `HasWeakPartialDeriv` and `HasWeakGrad` by test-function integrals, the form of
 `Rd.hasWeakLineDeriv_iff_integral` with `v` a coordinate direction.
 
+TauCeti (`github.com/TauCetiProject/TauCeti`, Lean `v4.36.0-rc1` and Mathlib master as of
+21 October 2026) has `W^{1,p}` spaces as submodules with total weak derivatives and, merged
+between 14 and 19 October 2026, Lipschitz domains (`Set.IsLipschitzDomainWith`), a bounded
+`W^{1,p}` extension operator on bounded Lipschitz domains for `1 ≤ p ≤ ∞` by reflection across
+the graph (`TauCeti.W1p.exists_extensionL_of_isLipschitzDomainWith`), Rellich's theorem on
+bounded Lipschitz domains, `ker γ = H^1_0(Ω)` with the traces of the charts
+(`W1p.exists_iInf_ker_lipschitzChartTrace_eq_of_isLipschitzDomainWith`), the area formula for
+injective Lipschitz maps, and Gauss–Green on the half-space. Gauss–Green on Lipschitz domains,
+the outward unit normal and one trace into `L_2(Γ)` with the surface measure are formalised here
+and not there. Its toolchain differs from the pin of Section 2, so neither library can import the
+other; Lean-FunctionSpaces follows its statement shapes where that costs nothing.
+
 ### 4.3 `H^1` on bounded Lipschitz domains (step 2 of the proposal; the inclusion half of H.2)
 
 File `FunctionSpaces/Rd/LipschitzDomainH1.lean`; `Ω : Rd.BoundedLipschitzDomain V` (X.1), with
@@ -640,6 +652,12 @@ below are in preparation and enter Section 4 with their Lean names as they are f
 * **The extension theorem H.2** for `W^{1,2}` on bounded Lipschitz domains (the restriction space
   equals the weak-derivative space), by Rychkov's extension operator with local means of the
   gradient; with it Rellich and the trace statements hold for the weak-derivative space.
+  **Extended (decision of 21 October 2026):** H.2 is stated for every `1 < p < ∞`, every
+  function of `W^{1,p}(Ω)` is the restriction of a function of `W^{1,p}(ℝ^d)`, through the
+  `L_p` bounds of the part on `L_p` Sobolev spaces; Rellich in the weak-derivative form and the
+  equivalence of the quotient norm of `H^1(Ω)` with the `W^{1,2}(Ω)` norm stay at `p = 2`. The
+  local means of the gradient come from writing the difference of two dilates of a bump as a
+  divergence, `d/dt (m_t) = t⁻¹ div(x m_t)`, which works for every bump of the construction.
 * **Order (decision of 14 October 2026).** These three statements follow the part on `L_p`
   Sobolev spaces of Section 4.10. The square-function estimate in the proof of H.2, the bound
   `∑_j ‖K_j ⋆ g‖_2² ≤ B ‖g‖_2²` for a family of integrable kernels whose Fourier transforms
@@ -812,3 +830,4 @@ The formalisation of the surface measure settled the following points of the pla
   respect to Lipschitz domains*, J. London Math. Soc. (2) **60** (1999), no. 1, 237–257.
 * E. M. Stein, *Singular Integrals and Differentiability Properties of Functions*, Princeton
   Mathematical Series **30**, Princeton University Press, Princeton, NJ, 1970.
+* *TauCeti*, a Lean library downstream of Mathlib, `github.com/TauCetiProject/TauCeti`.
