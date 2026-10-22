@@ -18,10 +18,11 @@ derivatives, `H^1` on bounded Lipschitz domains with its weak gradient and its t
 Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets and their duality, the trace
 space `H^{1/2}(Γ)` of a bounded Lipschitz domain with its trace and extension operators and its
 dual `H^{-1/2}(Γ)`, the area formula for Lipschitz graphs, the surface measure of `Γ` with
-`L_2(Γ)` and the trace into it, and Rellich's compactness theorem for the restriction space
-(items I.6 and H.1 in that form, Section 4.5; the weak-derivative form needs H.2, Section 5).
-Green's formula, `ker γ = H^1_0(Ω)` and the extension theorem H.2 are in preparation here; the
-forms layer, Hilbert complexes and Picard's theorem belong to the FEEC/BEEC library (Section 6).
+`L_2(Γ)` and the trace into it, Rellich's compactness theorem for the restriction space
+(items I.6 and H.1 in that form, Section 4.5), and the extension theorem H.2 for `W^{1,p}`,
+`1 < p < ∞`, with `H^1(Ω) = W^{1,2}(Ω)` and Rellich's theorem in the weak-derivative form
+(Section 4.3). Green's formula and `ker γ = H^1_0(Ω)` are in preparation here; the forms layer,
+Hilbert complexes and Picard's theorem belong to the FEEC/BEEC library (Section 6).
 Section 9 records how this division differs from the first version of this document.
 
 ## 2. Depending on Lean-FunctionSpaces
@@ -171,10 +172,11 @@ the outward unit normal and one trace into `L_2(Γ)` with the surface measure ar
 and not there. Its toolchain differs from the pin of Section 2, so neither library can import the
 other; Lean-FunctionSpaces follows its statement shapes where that costs nothing.
 
-### 4.3 `H^1` on bounded Lipschitz domains (step 2 of the proposal; the inclusion half of H.2)
+### 4.3 `H^1` on bounded Lipschitz domains and the extension theorem H.2 (step 2 of the proposal)
 
-File `FunctionSpaces/Rd/LipschitzDomainH1.lean`; `Ω : Rd.BoundedLipschitzDomain V` (X.1), with
-`Ω.carrier` the open set and `Ω.toOpens : Opens V` the same set as an element of `Opens V`.
+Files `FunctionSpaces/Rd/LipschitzDomainH1.lean` and `FunctionSpaces/Rd/SobolevExtension.lean`;
+`Ω : Rd.BoundedLipschitzDomain V` (X.1), with `Ω.carrier` the open set and
+`Ω.toOpens : Opens V` the same set as an element of `Opens V`.
 
 * `Rd.BoundedLipschitzDomain.MemSobolevOn Ω f`: `H^1(Ω)` as the restriction space,
   `∃ F, Rd.MemSobolev 1 F ∧ F =ᵐ[volume.restrict Ω.carrier] f`; only the values of `f` on `Ω`
@@ -186,12 +188,36 @@ File `FunctionSpaces/Rd/LipschitzDomainH1.lean`; `Ω : Rd.BoundedLipschitzDomain
   `Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_memApprox`.
 * The weak gradient, `Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`: every
   `f ∈ H^1(Ω)` satisfies `Rd.MemWeakSobolev Ω.toOpens 1 2 f`, so its weak derivatives on `Ω`
-  exist and lie in `L_2(Ω)`. The converse inclusion, and with it H.2, needs the extension
-  theorem for `W^{1,2}` (Section 5).
+  exist and lie in `L_2(Ω)`.
+* H.2, the extension theorem of Calderón and Stein for `W^{1,p}`, `1 < p < ∞`, with the bound in
+  dimension `d ≥ 1` (`[Nontrivial V]`) and the weak derivatives along the orthonormal basis
+  `e_i = Rd.gridBasis V i`: `Rd.BoundedLipschitzDomain.exists_extendsSobolev (hp1 : 1 < p)
+  (hp : p ≠ ∞) : ∃ C, C ≠ ∞ ∧ Rd.ExtendsSobolev p Ω.toOpens Ω.carrier C`, that is, every
+  `f ∈ L_p(Ω)` with weak derivatives `g_i = ∂_{e_i} f ∈ L_p(Ω)` agrees almost everywhere on `Ω`
+  with some `F ∈ W^{1,p}(ℝ^d)` with weak derivatives `G_i = ∂_{e_i} F` and
+  `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`. Membership form:
+  `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev (hp1) (hp) (f : V → ℂ) :
+  MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p volume, MemSobolev 1 F ∧
+  (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f`, and the direction
+  `Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev`, in every dimension (for
+  `d = 0`, `Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`).
+* `H^1(Ω) = W^{1,2}(Ω)`: `Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev
+  (f : Lp ℂ 2 volume) : Ω.MemSobolevOn f ↔ MemWeakSobolev Ω.toOpens 1 2 f`, and with the
+  Hilbert space of Section 4.5,
+  `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_restrictL2`.
+* Rellich's theorem in `W^{1,2}(Ω)` (I.6 and H.1 in the weak-derivative form, `d ≥ 1`):
+  `Rd.BoundedLipschitzDomain.exists_subseq_tendsto_of_memWeakSobolev`: every sequence `f_n` with
+  weak derivatives `g_{n,i}` on `Ω` and `‖f_n‖_{L_2(Ω)} + ∑_i ‖g_{n,i}‖_{L_2(Ω)} ≤ M`
+  (`eLpNorm` on `volume.restrict Ω.carrier`), `M ≠ ∞`, has a subsequence converging in `L_2(Ω)`.
+* The quotient norm of the Hilbert space `H^1(Ω)` and the `W^{1,2}(Ω)` norm are equivalent
+  (`d ≥ 1`):
+  `Rd.BoundedLipschitzDomain.exists_norm_le_restrictL2` (`‖u‖ ≤ C (‖u|_Ω‖_2 + ∑_i ‖g_i‖_2)` for the
+  weak derivatives `g_i ∈ L_2(Ω)` on `Ω`) and `Rd.sq_norm_restrictL2_add_sum_le` (Section 4.5).
 * Norms on `Ω`: the restriction direction has constant `1`: the intrinsic quantity of `f` is at
   most `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2}` for every `F` with `F = f` on `Ω`
   (`Rd.BoundedLipschitzDomain.modNormOn_le_modNorm_of_ae_eq`). The extension direction is
-  qualitative (Section 5).
+  qualitative for the intrinsic moduli; for the `W^{1,p}(Ω)` norm of the weak gradient it has an
+  existential constant (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`, Section 5).
 
 ### 4.4 The trace (H.7 at `k = 0` in qualitative form, X.3)
 
@@ -219,6 +245,11 @@ File `FunctionSpaces/Rd/LipschitzDomainH1.lean`, on top of
   `g ∈ B^{1/2}_{2,2}(Γ)` is the boundary trace of some `f ∈ H^1(Ω)`
   (`Rd.BoundedLipschitzDomain.exists_memSobolevOn_of_memBoundaryBesov`); together
   `Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`.
+* The same holds for the weak-derivative space `W^{1,2}(Ω)` through
+  `Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev` (Section 4.3): every `f ∈ L_2(V)`
+  with `MemWeakSobolev Ω.toOpens 1 2 f` has a boundary trace in `B^{1/2}_{2,2}(Γ)`
+  (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memWeakSobolev`), unique almost
+  everywhere on `Γ` (`Rd.BoundedLipschitzDomain.isBoundaryTrace_unique_of_memWeakSobolev`).
 * The trace bound on one Lipschitz graph domain has an existential constant
   (`Rd.LipschitzGraph.modNorm_trace_le`); the trace statements of
   `FunctionSpaces/Rd/LipschitzDomainH1.lean` on bounded Lipschitz domains are qualitative;
@@ -496,7 +527,8 @@ real `s` and on all tempered distributions for `s ≥ 0`
 
 * **Statements on `Ω` are qualitative.** The extension theorem for bounded Lipschitz domains
   (Rychkov's extension, assembled with a resolution of unity) and the trace theorem carry
-  existential constants, so the statements on `Ω` are equivalences of membership. The norm
+  existential constants, so the statements on `Ω` are equivalences of membership, and the
+  extension bound for `W^{1,p}` (Section 4.3) is `∃ C, C ≠ ∞ ∧ …`. The norm
   statements on `Ω` have constant `1`: the restriction bound, and on the trace space the trace,
   the extension and the quotient isometry `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)` (Section 4.6). The trace
   into `L_2(Γ)` has an existential constant (Section 4.8). Norm equivalences with explicit
@@ -506,11 +538,13 @@ real `s` and on all tempered distributions for `s ≥ 0`
   of `H^1(Ω)` lies in the weak-derivative space `W^1_2(Ω)`, on every open set
   (`Rd.memWeakSobolev_toL2`). On bounded Lipschitz
   domains the two spaces agree by the extension theorem for `W^{1,2}` of Calderón and Stein
-  (Stein 1970, Chapter VI, §3), which is in preparation here (Section 9); on some
+  (Stein 1970, Chapter VI, §3), formalised here for every `W^{1,p}`, `1 < p < ∞`
+  (Section 4.3); on some
   bounded open sets they differ (a slit disc), and the embedding `W^1_2(Ω) ↪ L_2(Ω)` can fail to
   be compact (the rooms-and-passages domains, Adams and Fournier, Chapter 6). This splits H.1
   and I.6: the restriction version is formalised for every bounded set, and the weak-derivative
-  version on Lipschitz domains follows from it together with the extension theorem.
+  version on Lipschitz domains follows from it together with the extension theorem
+  (`Rd.BoundedLipschitzDomain.exists_subseq_tendsto_of_memWeakSobolev`, Section 4.3).
 * **`B^s_{p,q}(Γ)` is defined chart by chart**, with Lebesgue measure on the hyperplanes of the
   charts, and "almost everywhere on `Γ`" is the chart filter `aeBoundary`, whose exceptional sets
   are exactly the null sets of the surface measure
@@ -555,8 +589,6 @@ Section 4:
   surface measure and the outward unit normal of Section 4.8.
 * `ker γ = H^1_0(Ω)` on Lipschitz domains (McLean, Theorem 3.40) and the HPS quotient
   `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)`.
-* The extension theorem H.2 for `W^{1,2}` on bounded Lipschitz domains, with Rellich and the
-  trace statements for the weak-derivative space.
 
 ## 7. Answers to the seven questions
 
@@ -575,9 +607,9 @@ Section 4:
    (`Rd.memTriebelLizorkin_iff_memSobolev_bessel`) and `H^{s,p} = F^s_{p,2}` for `s ≥ 0`
    (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`, Section 4.10).
 4. **Rellich on bounded Lipschitz domains.** Yes for the restriction space, on every bounded set,
-   as the compact operator `H^1(Ω) → L_2(Ω)` (Section 4.5). For the weak-derivative space on
-   Lipschitz domains it follows together with the extension theorem for `W^{1,2}`, which is in
-   preparation here (Sections 5 and 9).
+   as the compact operator `H^1(Ω) → L_2(Ω)` (Section 4.5), and for the weak-derivative space
+   on bounded Lipschitz domains through the extension theorem
+   (`Rd.BoundedLipschitzDomain.exists_subseq_tendsto_of_memWeakSobolev`, Section 4.3).
 5. **Vector values.** Scalar in Lean-FunctionSpaces; on `V` Mathlib's `H^{s,p}(V, F)` takes vector
    values directly, and on `Ω` and `Γ` the FEEC/BEEC library works with `Fin m → ℂ`-valued
    functions and componentwise lemmas.
@@ -606,8 +638,9 @@ FEEC/BEEC library. Lean-FunctionSpaces now builds them itself, in its current pa
 its development plan). The space types, the isometry of H.4 and the duality are formalised,
 with their Lean names in Section 4.5, the trace space, with its Lean names in Section 4.6, the
 area formula for Lipschitz graphs, with its Lean names in Section 4.7, and the surface measure
-with `L_2(Γ)` and the trace into it, with their Lean names in Section 4.8; the other statements
-below are in preparation and enter Section 4 with their Lean names as they are formalised.
+with `L_2(Γ)` and the trace into it, with their Lean names in Section 4.8, and the extension
+theorem H.2, with its Lean names in Section 4.3; the other statements below are in preparation
+and enter Section 4 with their Lean names as they are formalised.
 
 * **Space types (formalised, Section 4.5).** `H^s(Ω)` for every open `Ω` and every real `s` as a
   Hilbert space: the orthogonal complement, in Mathlib's `H^{s}(ℝ^d)`, of the elements that
@@ -649,9 +682,13 @@ below are in preparation and enter Section 4 with their Lean names as they are f
   the surface measure and the outward unit normal.
 * **`ker γ = H^1_0(Ω)`** (McLean, Theorem 3.40) and the HPS quotient
   `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)`.
-* **The extension theorem H.2** for `W^{1,2}` on bounded Lipschitz domains (the restriction space
-  equals the weak-derivative space), by Rychkov's extension operator with local means of the
-  gradient; with it Rellich and the trace statements hold for the weak-derivative space.
+* **The extension theorem H.2 (formalised, Section 4.3)** for `W^{1,2}` on bounded Lipschitz
+  domains (the restriction space equals the weak-derivative space), by Rychkov's extension
+  operator with local means of the gradient; with it Rellich and the trace statements hold for
+  the weak-derivative space (`Rd.BoundedLipschitzDomain.exists_subseq_tendsto_of_memWeakSobolev`,
+  `Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memWeakSobolev`,
+  `Rd.BoundedLipschitzDomain.isBoundaryTrace_unique_of_memWeakSobolev`). Files
+  `FunctionSpaces/Rd/DivergenceKernels.lean` and `FunctionSpaces/Rd/SobolevExtension.lean`.
   **Extended (decision of 21 October 2026):** H.2 is stated for every `1 < p < ∞`, every
   function of `W^{1,p}(Ω)` is the restriction of a function of `W^{1,p}(ℝ^d)`, through the
   `L_p` bounds of the part on `L_p` Sobolev spaces; Rellich in the weak-derivative form and the

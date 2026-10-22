@@ -39,7 +39,11 @@ a probability space, with the `L_p` norm on the right (`MeasureTheory.lqNorm_lin
 Finally, a pointwise bound `u ≤ v + w_J` with `‖w_J‖_p → 0` gives `u ≤ v` almost everywhere
 (`MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm`), and a bound `|G_J| ≤ v` almost everywhere
 passes to the limit of `G_J` in `L_p` (`MeasureTheory.ae_enorm_le_of_tendsto_Lp`). Setting
-terms of a family to zero decreases its mixed norm (`MeasureTheory.eLpNorm_lqNorm_ite_le`). For
+terms of a family to zero decreases its mixed norm (`MeasureTheory.eLpNorm_lqNorm_ite_le`), and
+one member is bounded by the mixed norm,
+`2^(js) ‖h_j‖_p ≤ ‖ x ↦ ‖(2^(is) |h_i(x)|)_i‖_{ℓ_q} ‖_p`
+(`MeasureTheory.dyadicWeight_mul_enorm_le_eLpNorm_lqNorm`,
+`MeasureTheory.enorm_le_dyadicWeight_neg_mul_eLpNorm_lqNorm`). For
 a family with a finite mixed norm, the tails `x ↦ ‖(g_j(x))_{j ≥ N}‖_{ℓ_q}` tend to zero in `L_p`
 by dominated convergence (`MeasureTheory.tendsto_eLpNorm_lqNorm_ite_le`), since the tails of a
 single sequence in `ℓ_q` do (`ENNReal.tendsto_lqNorm_ite_le`).
@@ -171,6 +175,31 @@ theorem eLpNorm_const_mul_ennreal (c : ℝ≥0∞) {h : α → ℝ≥0∞} (hh :
   simp_rw [ENNReal.mul_rpow_of_nonneg _ _ hr.le]
   rw [lintegral_const_mul'' _ (hh.pow_const _), ENNReal.mul_rpow_of_nonneg _ _ (by positivity),
     ← ENNReal.rpow_mul, mul_one_div_cancel hr.ne', ENNReal.rpow_one]
+
+/-- **One weighted term of a family is bounded by the mixed norm**: for `q ≠ 0`, a family
+`h_i ∈ L_p(μ)` and every `j`, `2^(js) ‖h_j‖_p ≤ ‖ x ↦ ‖(2^(is) |h_i(x)|)_i‖_{ℓ_q} ‖_p`, since
+pointwise `2^(js) |h_j(x)|` is at most the `ℓ_q` norm (`ENNReal.le_lqNorm`). -/
+theorem dyadicWeight_mul_enorm_le_eLpNorm_lqNorm {E : Type*} [NormedAddCommGroup E]
+    (hq : q ≠ 0) (s : ℝ) (h : ℕ → Lp E p μ) (j : ℕ) :
+    dyadicWeight s j * ‖h j‖ₑ ≤
+      eLpNorm (fun x => lqNorm q (fun i => dyadicWeight s i * ‖h i x‖ₑ)) p μ := by
+  rw [Lp.enorm_def, ← eLpNorm_enorm _ (Lp.aestronglyMeasurable (h j)),
+    ← eLpNorm_const_mul_ennreal _ (Lp.aestronglyMeasurable (h j)).enorm]
+  refine eLpNorm_mono_enorm
+    (((Lp.aestronglyMeasurable (h j)).enorm.const_mul _).aestronglyMeasurable) fun x => ?_
+  simp only [enorm_eq_self]
+  exact ENNReal.le_lqNorm hq (fun i => dyadicWeight s i * ‖h i x‖ₑ) j
+
+/-- **One term of a family is bounded by the mixed norm**: for `q ≠ 0`, a family `h_i ∈ L_p(μ)`
+and every `j`, `‖h_j‖_p ≤ 2^(-js) ‖ x ↦ ‖(2^(is) |h_i(x)|)_i‖_{ℓ_q} ‖_p`
+(`MeasureTheory.dyadicWeight_mul_enorm_le_eLpNorm_lqNorm`). -/
+theorem enorm_le_dyadicWeight_neg_mul_eLpNorm_lqNorm {E : Type*} [NormedAddCommGroup E]
+    (hq : q ≠ 0) (s : ℝ) (h : ℕ → Lp E p μ) (j : ℕ) :
+    ‖h j‖ₑ ≤ dyadicWeight (-s) j *
+      eLpNorm (fun x => lqNorm q (fun i => dyadicWeight s i * ‖h i x‖ₑ)) p μ :=
+  calc ‖h j‖ₑ = dyadicWeight (-s) j * (dyadicWeight s j * ‖h j‖ₑ) := by
+        rw [← mul_assoc, ENNReal.dyadicWeight_neg_mul_self, one_mul]
+    _ ≤ _ := by gcongr; exact dyadicWeight_mul_enorm_le_eLpNorm_lqNorm hq s h j
 
 /-- `‖g‖_p^p = ∫ g^p` for `0 < p < ∞` and `g : α → [0, ∞]` measurable: the case `[0, ∞]` of
 `MeasureTheory.eLpNorm_rpow_eq`, with `‖g(x)‖ₑ = g(x)`. -/

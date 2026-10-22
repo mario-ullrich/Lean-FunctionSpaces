@@ -17,6 +17,8 @@ A **Lipschitz graph domain** in `V` is `Ω = {x : φ(x) < ⟪x, e⟫}` for a uni
 `K = {y : M ‖y - ⟪y, e⟫ e‖ < ⟪y, e⟫}` (`Rd.LipschitzGraph.cone`), `Ω + K ⊆ Ω`
 (`Rd.LipschitzGraph.add_mem`): a step into the cone raises `⟪·, e⟫` faster than `φ`. The cone is
 closed under positive scaling and contains a ball around `e/4` (`Rd.LipschitzGraph.ball_subset_cone`).
+The closed cone `K̄ = {y : M ‖y - ⟪y, e⟫ e‖ ≤ ⟪y, e⟫}` (`Rd.LipschitzGraph.closedCone`) is closed
+under nonnegative scaling, and still `Ω + K̄ ⊆ Ω` (`Rd.LipschitzGraph.add_mem_of_mem_closedCone`).
 
 The **cone bump** (`Rd.LipschitzGraph.coneBump`) is a bump for local means supported in
 `-K ∩ B(0, 1/2)`. A kernel `k` is **supported in `-K`** if `k(y) ≠ 0` implies `-y ∈ K`
@@ -141,8 +143,18 @@ def domain : Set V := {x | Ω.phi x < inner ℝ x Ω.e}
 /-- The cone `K = {y : M ‖y - ⟪y, e⟫ e‖ < ⟪y, e⟫}`. -/
 def cone : Set V := {y | Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ < inner ℝ y Ω.e}
 
-/-- **Steps into the cone stay in the domain**: `Ω + K ⊆ Ω`. -/
-theorem add_mem {x y : V} (hx : x ∈ Ω.domain) (hy : y ∈ Ω.cone) : x + y ∈ Ω.domain := by
+/-- The closed cone `K̄ = {y : M ‖y - ⟪y, e⟫ e‖ ≤ ⟪y, e⟫}`, which contains `K`. -/
+def closedCone : Set V := {y | Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ ≤ inner ℝ y Ω.e}
+
+/-- The cone lies in the closed cone. -/
+theorem cone_subset_closedCone : Ω.cone ⊆ Ω.closedCone := fun y hy => by
+  have hy' : Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ < inner ℝ y Ω.e := hy
+  exact hy'.le
+
+/-- **Steps into the closed cone stay in the domain**: `Ω + K̄ ⊆ Ω`, since the domain is defined by
+a strict inequality. -/
+theorem add_mem_of_mem_closedCone {x y : V} (hx : x ∈ Ω.domain) (hy : y ∈ Ω.closedCone) :
+    x + y ∈ Ω.domain := by
   set d := y - inner ℝ y Ω.e • Ω.e
   have h1 : Ω.phi (x + y) = Ω.phi (x + d) := by
     rw [← Ω.const (x + d) (inner ℝ y Ω.e)]
@@ -154,10 +166,15 @@ theorem add_mem {x y : V} (hx : x ∈ Ω.domain) (hy : y ∈ Ω.cone) : x + y �
     rw [add_sub_cancel_left] at h
     linarith [le_abs_self (Ω.phi (x + d) - Ω.phi x)]
   have hx' : Ω.phi x < inner ℝ x Ω.e := hx
-  have hy' : Ω.M * ‖d‖ < inner ℝ y Ω.e := hy
+  have hy' : Ω.M * ‖d‖ ≤ inner ℝ y Ω.e := hy
   show Ω.phi (x + y) < inner ℝ (x + y) Ω.e
   rw [inner_add_left, h1]
   linarith
+
+/-- **Steps into the cone stay in the domain**: `Ω + K ⊆ Ω`, the case `K ⊆ K̄` of
+`Rd.LipschitzGraph.add_mem_of_mem_closedCone`. -/
+theorem add_mem {x y : V} (hx : x ∈ Ω.domain) (hy : y ∈ Ω.cone) : x + y ∈ Ω.domain :=
+  Ω.add_mem_of_mem_closedCone hx (Ω.cone_subset_closedCone hy)
 
 /-- The cone is closed under positive scaling. -/
 theorem smul_mem_cone {c : ℝ} (hc : 0 < c) {y : V} (hy : y ∈ Ω.cone) : c • y ∈ Ω.cone := by
@@ -172,6 +189,19 @@ theorem add_nsmul_mem {x h : V} (hx : x ∈ Ω.domain) (hh : h ∈ Ω.cone) (l :
   rcases Nat.eq_zero_or_pos l with rfl | hl
   · simpa using hx
   · exact Ω.add_mem hx (Ω.smul_mem_cone (by exact_mod_cast hl) hh)
+
+/-- The closed cone is closed. -/
+theorem isClosed_closedCone : IsClosed Ω.closedCone :=
+  isClosed_le (continuous_const.mul ((continuous_id.sub ((continuous_id.inner continuous_const).smul
+    continuous_const)).norm)) (continuous_id.inner continuous_const)
+
+/-- The closed cone is closed under nonnegative scaling. -/
+theorem smul_mem_closedCone {c : ℝ} (hc : 0 ≤ c) {y : V} (hy : y ∈ Ω.closedCone) :
+    c • y ∈ Ω.closedCone := by
+  have hy' : Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ ≤ inner ℝ y Ω.e := hy
+  show Ω.M * ‖c • y - inner ℝ (c • y) Ω.e • Ω.e‖ ≤ inner ℝ (c • y) Ω.e
+  rw [real_inner_smul_left, ← smul_smul, ← smul_sub, norm_smul, Real.norm_of_nonneg hc]
+  nlinarith
 
 /-- The graph function is continuous. -/
 theorem continuous_phi : Continuous Ω.phi :=

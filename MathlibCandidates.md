@@ -410,3 +410,23 @@ declarations.
   In Mathlib it would follow from the finiteness of `μHE[n-1]` on the graph of a Lipschitz
   function over a bounded subset of a hyperplane, a consequence of
   `LipschitzOnWith.euclideanHausdorffMeasure_image_le`.
+* **Smoothness of parametric integrals** (`FunctionSpaces/Rd/DivergenceKernels.lean`): if
+  `(x, t) ↦ F(x, t)` is smooth on `H × ℝ`, `H` finite dimensional, then `x ↦ ∫_a^b F(x, t) dt` is
+  smooth (`intervalIntegral.contDiff_parametric_intervalIntegral_of_contDiff`), with the
+  derivative under the integral sign for jointly `C^1` integrands
+  (`intervalIntegral.hasFDerivAt_integral_of_contDiff`,
+  `intervalIntegral.fderiv_integral_apply_of_contDiff`). Mathlib has the derivative at one point
+  under a domination hypothesis (`intervalIntegral.hasFDerivAt_integral_of_dominated_of_fderiv_le`)
+  and the continuity (`intervalIntegral.continuous_parametric_intervalIntegral_of_continuous'`);
+  the smoothness follows by induction on the order, with all target spaces in one universe
+  (`intervalIntegral.contDiff_parametric_intervalIntegral_of_contDiff_aux`), reached through
+  `ULift` as in `contDiffOn_convolution_right_with_param`.
+* **Weak derivatives on open sets** (`FunctionSpaces/Rd/WeakDerivatives.lean`,
+  `FunctionSpaces/Rd/ConvolutionAdjoint.lean`): for Mathlib's distributions `𝓓'(Ω, ℂ)`, the
+  integration by parts against smooth compactly supported complex functions with support in
+  `Ω` (`Rd.HasWeakLineDeriv.integral_mul_eq`, through
+  `Rd.exists_testSchwartz_eq_of_tsupport_subset`), the product rule with smooth real functions
+  (`Rd.HasWeakLineDeriv.mul_contDiff`), and `(η ⋆ g)(x) = ((∂^v η) ⋆ f)(x)` for a compactly
+  supported Schwartz `η` whose reflected translate lies in `Ω`
+  (`Rd.conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv`); these belong next to the weak
+  derivatives of the Sobolev library prepared for Mathlib.

@@ -18,7 +18,8 @@ On a finite-dimensional real inner product space `V` with Lebesgue measure, the 
 is `𝓕 f(ξ) = ∫ e^(-2πi⟪x, ξ⟫) f(x) dx` (Mathlib's `Real.fourier_eq`). For integrable `K`, the
 transforms `𝓕K` and `𝓕⁻K` are continuous and bounded by `‖K‖_1`
 (`Rd.continuous_fourier_of_integrable`, `Rd.norm_fourier_le_integral_norm`,
-`Rd.continuous_fourierInv_of_integrable`, `Rd.norm_fourierInv_le_integral_norm`),
+`Rd.enorm_fourier_le_lintegral`, `Rd.continuous_fourierInv_of_integrable`,
+`Rd.norm_fourierInv_le_integral_norm`),
 `𝓕K ∈ L_∞` (`Rd.memLp_top_fourier`), the transform respects sums and differences
 (`Rd.fourier_add_apply`, `Rd.fourier_sub_apply`) and conjugation as `conj (𝓕 f) = 𝓕⁻(conj f)`,
 `conj (𝓕⁻ f) = 𝓕(conj f)` for every `f : V → ℂ` (`Rd.conj_fourier_apply`,
@@ -178,6 +179,13 @@ theorem integral_fourier_smul_eq_of_integrable (u : 𝓢(V, ℂ)) {g : V → ℂ
 -/
 theorem norm_fourier_le_integral_norm (K : V → ℂ) (ξ : V) : ‖𝓕 K ξ‖ ≤ ∫ x, ‖K x‖ :=
   VectorFourier.norm_fourierIntegral_le_integral_norm 𝐞 volume (innerₗ V) K ξ
+
+/-- The Fourier transform of a function is bounded by its `L_1` norm, in `ℝ≥0∞`:
+`|𝓕K(ξ)| ≤ ∫ |K|` for every `K` and `ξ` (Mathlib's `enorm_integral_le_lintegral_enorm`, with
+`|e^(-2πi⟪x, ξ⟫)| = 1`). -/
+theorem enorm_fourier_le_lintegral (K : V → ℂ) (ξ : V) : ‖𝓕 K ξ‖ₑ ≤ ∫⁻ x, ‖K x‖ₑ := by
+  rw [Real.fourier_eq]
+  simpa using enorm_integral_le_lintegral_enorm (fun v => 𝐞 (-inner ℝ v ξ) • K v)
 
 /-- The Fourier transform of an integrable function lies in `L_∞`: it is continuous
 (`Rd.continuous_fourier_of_integrable`) and bounded by `‖K‖_1`. -/

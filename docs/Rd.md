@@ -97,7 +97,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 |---|---|---|---|
 | Young's inequality on measurable groups, weighted Jensen inequality, weighted averages in `L_p` | ✅ | ✗ | `Lp/Young` |
 | Convolution with integrable kernels on `ℝ^d`: Young's inequality, pointwise bounds, associativity, operators on `L_p` | ✅ | ✗ | `Rd/Convolution` |
-| Dilations, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ | ✗ | `Rd/ApproxIdentity` |
+| Dilations and their first moments, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ | ✗ | `Rd/ApproxIdentity` |
 | The Fourier transform of integrable functions (continuity, `L_1` bounds, convolutions, multiplication formula, conjugation, Lipschitz bound for band-limited inverse transforms); Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, the kernels on the frequency side with `|𝓕ψ_j| ≤ 1`, telescoping sums and at most two blocks at every frequency, kernel identities by Fourier inversion | ✅ | ✗ | `Rd/LittlewoodPaleyKernels` |
 | Band-limited classes on `ℝ^d`, Littlewood–Paley blocks, `A^s_q(band-limited)` characterised by Littlewood–Paley blocks for `s > 0` | ✅ | ✗ | `Rd/BandLimited`, `Rd/LittlewoodPaley` |
 | Differences `higherDiff` on any additive monoid, steps of either sign; the modulus of smoothness on `ℝ^d`, dilation of the scale, differences of convolutions and dilations | ✅ | ✗ | `Rd/Differences`, `Rd/DilatedDifferences` |
@@ -105,7 +105,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Differences of Schwartz functions in `L_1`, inverse inequality for band-limited functions | ✅ | ✗ | `Rd/BandInverse` |
 | Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ | ✗ | `Rd/BesovDifferences` |
 | Moduli of smoothness on subsets of `ℝ^d` | ✅ | ✗ | `Rd/DomainModuli` |
-| Moment kernels: averaged differences, approximation with the modulus, also on subsets | ✅ | ✗ | `Rd/MomentKernels` |
+| Moment kernels: averaged differences, approximation with the modulus, also on subsets, vanishing first moments of the moment kernels of order two | ✅ | ✗ | `Rd/MomentKernels` |
 | Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L` | ✅ | ✗ | `Rd/LocalMeans` |
 | Pointwise multipliers on `ℝ^d`: the multiplication operator on `L_p`, Leibniz's rule for differences, moduli of lower order | ✅ | ✗ | `Rd/Multipliers` |
 | Dyadic cells of `ℝ^d`: partition, counting of their centres, bounded overlap | ✅ | ✗ | `Rd/DyadicGrid` |

@@ -200,6 +200,8 @@ public import FunctionSpaces.Rd.SobolevTriebelLizorkin
 public import FunctionSpaces.Rd.SobolevEmbedding
 public import FunctionSpaces.Rd.UniformSchwartzFamilies
 public import FunctionSpaces.Rd.BesselPotentialLifting
+public import FunctionSpaces.Rd.DivergenceKernels
+public import FunctionSpaces.Rd.SobolevExtension
 
 /-!
 # Function spaces
@@ -710,4 +712,14 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   Calderón–Zygmund families of the Bessel kernels of the Littlewood–Paley kernels,
   `H^{s,p} ∩ L_p = F^s_{p,2}` for real `s` and `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, for
   `1 < p < ∞` with existential constants, and `W^m_p = H^{m,p}`.
+* `FunctionSpaces.Rd.DivergenceKernels`: smoothness of parametric integrals, the dilation identity
+  `m_2 - m = ∑_i ∂_{e_i} K_i` with `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, the divergence kernels
+  as Schwartz functions with mean zero when `m` has vanishing first moments, and the
+  Calderón–Zygmund families of the dilates of mean-zero Schwartz functions.
+* `FunctionSpaces.Rd.SobolevExtension`: the local means of order two by the gradient, the local
+  means of Triebel–Lizorkin type on a set, bounded extensions from the patches of a bounded
+  Lipschitz domain pasted in `W^1_p(ℝ^d)`, and the extension theorem
+  `W^1_p(Ω) = W^1_p(ℝ^d)|_Ω` for `1 < p < ∞` with a bound; for `p = 2`, `H^1(Ω) = W^1_2(Ω)`,
+  Rellich's theorem in `W^1_2(Ω)`, the equivalence of the quotient norm of `H^1(Ω)` with the
+  `W^1_2(Ω)` norm, and the boundary traces of `W^1_2(Ω)`.
 -/

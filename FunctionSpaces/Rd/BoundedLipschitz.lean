@@ -30,7 +30,10 @@ The proof follows Schneider–Vybíral §3: a covering `Ω̄ ⊆ K_0 ∪ ⋃_j K
 * The balls shrink: `Γ ⊆ ⋃_j B(c_j, ρ_j - 2ε)` for some `ε > 0`
   (`Rd.BoundedLipschitzDomain.exists_shrink`), and the points of `Ω` outside these balls keep a
   distance `> 2δ` from `Ωᶜ` (`Rd.BoundedLipschitzDomain.exists_interior_margin`), both by
-  compactness.
+  compactness; `Ωᶜ` is nonempty in dimension `n ≥ 1`
+  (`Rd.BoundedLipschitzDomain.nonempty_compl`). The shrunk balls and the inner patch are bounded
+  open sets that cover `Ω̄` (`Rd.BoundedLipschitzDomain.patch`,
+  `Rd.BoundedLipschitzDomain.closure_subset_iUnion_patch`).
 * Local extensions (`Rd.LocalMeansBump.exists_local_extension`) on the boundary patches
   `Ω ∩ B(c_j, ρ_j - 2ε)`, with the cone bump of `Ω_j` rescaled to radius `≤ ε / r`, and on the
   inner patch `{infDist(·, Ωᶜ) > 2δ}`, with a centred bump of radius `≤ δ / r`.
@@ -247,6 +250,14 @@ theorem exists_shrink :
   rw [h2]
   exact hx
 
+omit [FiniteDimensional ℝ V] in
+/-- In dimension `n ≥ 1` the complement of a bounded Lipschitz domain is nonempty, since `V` is
+unbounded (Mathlib's `NormedSpace.unbounded_univ`). -/
+theorem nonempty_compl [Nontrivial V] : (Ω.carrierᶜ).Nonempty := by
+  by_contra h
+  rw [Set.not_nonempty_iff_eq_empty, Set.compl_empty_iff] at h
+  exact NormedSpace.unbounded_univ ℝ V (h ▸ Ω.isBounded)
+
 /-- **The interior margin**: if `Ωᶜ` is nonempty and `Γ ⊆ ⋃_j B(c_j, ρ_j - 2ε)`, the points of
 `Ω` outside these balls have distance `> 2δ` from `Ωᶜ` for some `δ > 0`, by compactness. -/
 theorem exists_interior_margin (hc : (Ω.carrierᶜ).Nonempty) {ε : ℝ}
@@ -273,6 +284,49 @@ theorem exists_interior_margin (hc : (Ω.carrierᶜ).Nonempty) {ε : ℝ}
     have h2 := hpos x₀ (hKΩ hx₀)
     simp only [Set.mem_ofPred_eq] at h1
     linarith
+
+/-- The **patches** of `Ω` for `ε, δ`: the inner patch `{infDist(·, Ωᶜ) > 2δ}` (index `none`) and
+the shrunk boundary balls `B(c_j, ρ_j - 2ε)` (index `some j`). -/
+def patch (ε δ : ℝ) (i : Option (Fin Ω.N)) : Set V :=
+  i.elim {x : V | 2 * δ < infDist x Ω.carrierᶜ} fun j => ball (Ω.center j) (Ω.radius j - 2 * ε)
+
+omit [FiniteDimensional ℝ V] in
+/-- The patches are open. -/
+theorem isOpen_patch (ε δ : ℝ) (i : Option (Fin Ω.N)) : IsOpen (Ω.patch ε δ i) := by
+  cases i with
+  | none => exact isOpen_lt continuous_const (continuous_infDist_pt _)
+  | some j => exact isOpen_ball
+
+omit [FiniteDimensional ℝ V] in
+/-- The patches are bounded for `δ ≥ 0`: the inner patch lies in `Ω`
+(`Rd.setOf_lt_infDist_compl_subset`). -/
+theorem isBounded_patch (ε : ℝ) {δ : ℝ} (hδ : 0 ≤ δ) (i : Option (Fin Ω.N)) :
+    Bornology.IsBounded (Ω.patch ε δ i) := by
+  cases i with
+  | none => exact Ω.isBounded.subset (setOf_lt_infDist_compl_subset _ (by positivity))
+  | some j => exact isBounded_ball
+
+omit [FiniteDimensional ℝ V] in
+/-- **The patches cover `Ω̄`** if the shrunk balls cover `Γ` and the points of `Ω` outside them
+have distance `> 2δ` from `Ωᶜ` (`Rd.BoundedLipschitzDomain.exists_shrink`,
+`Rd.BoundedLipschitzDomain.exists_interior_margin`). -/
+theorem closure_subset_iUnion_patch {ε δ : ℝ}
+    (hε : frontier Ω.carrier ⊆ ⋃ j, ball (Ω.center j) (Ω.radius j - 2 * ε))
+    (hδ : ∀ x ∈ Ω.carrier, (∀ j, x ∉ ball (Ω.center j) (Ω.radius j - 2 * ε)) →
+      2 * δ < infDist x Ω.carrierᶜ) :
+    closure Ω.carrier ⊆ ⋃ i, Ω.patch ε δ i := by
+  intro x hx
+  by_cases hxf : x ∈ frontier Ω.carrier
+  · obtain ⟨j, hj⟩ := Set.mem_iUnion.1 (hε hxf)
+    exact Set.mem_iUnion.2 ⟨some j, hj⟩
+  · have hxΩ : x ∈ Ω.carrier := by
+      have : x ∈ closure Ω.carrier \ frontier Ω.carrier := ⟨hx, hxf⟩
+      rwa [closure_sdiff_frontier, Ω.isOpen.interior_eq] at this
+    by_cases hxb : ∃ j, x ∈ ball (Ω.center j) (Ω.radius j - 2 * ε)
+    · obtain ⟨j, hj⟩ := hxb
+      exact Set.mem_iUnion.2 ⟨some j, hj⟩
+    · push Not at hxb
+      exact Set.mem_iUnion.2 ⟨none, hδ x hxΩ hxb⟩
 
 variable [MeasurableSpace V] [BorelSpace V] {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
@@ -365,12 +419,8 @@ theorem exists_local_extension_interior (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r
           nlinarith
   have hU := measurableSet_infDist_gt Ω.carrier (2 * δ)
   have hW := measurableSet_infDist_gt Ω.carrier δ
-  have hUΩ : {x : V | 2 * δ < infDist x Ω.carrierᶜ} ⊆ Ω.carrier := fun x hx => by
-    by_contra h
-    have h0 : infDist x Ω.carrierᶜ = 0 := infDist_zero_of_mem h
-    simp only [Set.mem_ofPred_eq] at hx
-    linarith
-  obtain ⟨F, hF, hFf⟩ := b.exists_local_extension hp hr hs hsr hq hU hW Ω.measurableSet hUΩ
+  obtain ⟨F, hF, hFf⟩ := b.exists_local_extension hp hr hs hsr hq hU hW Ω.measurableSet
+    (setOf_lt_infDist_compl_subset _ (by positivity))
     (fun x hx j y hy => interior_patch_support Ω.carrier
       (fun y hy => (not_lt.1 fun h => hy (b.dual_eq_zero r j h)).trans hLR) x hx y hy)
     (fun c hc z hz => interior_patch_step Ω.carrier (by
@@ -418,33 +468,9 @@ theorem exists_besov_extension_of_modulusOn (hp : p ≠ ∞) {r : ℕ} {s : ℝ}
   obtain ⟨δ, hδ0, hδ⟩ := Ω.exists_interior_margin hc hε
   choose Fb hFb hFbf using fun j => Ω.exists_local_extension_boundary hp hr hs hsr hq hε0 j f hf
   obtain ⟨F0, hF0, hF0f⟩ := Ω.exists_local_extension_interior hp hr hs hsr hq hδ0 f hf
-  have hUΩ : {x : V | 2 * δ < infDist x Ω.carrierᶜ} ⊆ Ω.carrier := fun x hx => by
-    by_contra h
-    have h0 : infDist x Ω.carrierᶜ = 0 := infDist_zero_of_mem h
-    simp only [Set.mem_ofPred_eq] at hx
-    linarith
-  refine exists_pasting (ι := Option (Fin Ω.N)) hp hsr hq Ω.measurableSet
-    (fun i => i.elim {x : V | 2 * δ < infDist x Ω.carrierᶜ}
-      fun j => ball (Ω.center j) (Ω.radius j - 2 * ε))
-    (fun i => ?_) (fun i => ?_) ?_ f (fun i => i.elim F0 Fb) (fun i => ?_) (fun i => ?_)
-  · cases i with
-    | none => exact isOpen_lt continuous_const (continuous_infDist_pt _)
-    | some j => exact isOpen_ball
-  · cases i with
-    | none => exact Ω.isBounded.subset hUΩ
-    | some j => exact isBounded_ball
-  · intro x hx
-    by_cases hxf : x ∈ frontier Ω.carrier
-    · obtain ⟨j, hj⟩ := Set.mem_iUnion.1 (hε hxf)
-      exact Set.mem_iUnion.2 ⟨some j, hj⟩
-    · have hxΩ : x ∈ Ω.carrier := by
-        have : x ∈ closure Ω.carrier \ frontier Ω.carrier := ⟨hx, hxf⟩
-        rwa [closure_sdiff_frontier, Ω.isOpen.interior_eq] at this
-      by_cases hxb : ∃ j, x ∈ ball (Ω.center j) (Ω.radius j - 2 * ε)
-      · obtain ⟨j, hj⟩ := hxb
-        exact Set.mem_iUnion.2 ⟨some j, hj⟩
-      · push Not at hxb
-        exact Set.mem_iUnion.2 ⟨none, hδ x hxΩ hxb⟩
+  refine exists_pasting (ι := Option (Fin Ω.N)) hp hsr hq Ω.measurableSet (Ω.patch ε δ)
+    (Ω.isOpen_patch ε δ) (Ω.isBounded_patch ε hδ0.le) (Ω.closure_subset_iUnion_patch hε hδ) f
+    (fun i => i.elim F0 Fb) (fun i => ?_) (fun i => ?_)
   · cases i with
     | none => exact hF0
     | some j => exact hFb j

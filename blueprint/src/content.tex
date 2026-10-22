@@ -472,17 +472,19 @@ Three sums over dyadic scales serve the vector-valued singular integrals of
 \label{lem:dyadic-min-sum}
 \lean{ENNReal.sum_range_two_pow_le, ENNReal.exists_one_lt_two_pow_mul,
   ENNReal.sum_range_min_two_pow_le, ENNReal.tsum_min_two_pow_add_le,
-  ENNReal.tsum_min_two_pow_le}
+  ENNReal.tsum_min_two_pow_le, ENNReal.min_inv_sq_le}
 \leanok
 For every $a \in [0, \infty]$,
 \[
-  \sum_{j \in \N} \min\bigl(2^j a, (2^j a)^{-1}\bigr) \leq 4 .
+  \sum_{j \in \N} \min\bigl(2^j a, (2^j a)^{-1}\bigr) \leq 4 ,
 \]
+and $\min(x, x^{-1})^2 \leq \min(x, x^{-1})$ for every $x \in [0, \infty]$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-For $a = 0$ every term is $0$. Otherwise some $j$ has $2^j a > 1$ (Mathlib's
+The second claim holds since $\min(x, x^{-1}) \leq 1$. For $a = 0$ every term is $0$.
+Otherwise some $j$ has $2^j a > 1$ (Mathlib's
 \texttt{ENNReal.\allowbreak exists\_\allowbreak nat\_\allowbreak mul\_\allowbreak gt} and
 $m < 2^m$); let $j_0$ be the least such $j$. For
 $j < j_0$ the terms are at most $2^j a$, and
@@ -5791,19 +5793,40 @@ Linearity and the identities hold almost everywhere by \Cref{lem:conv-assoc}, an
 \begin{lemma}[Dilations]
 \label{lem:dilate}
 \lean{Rd.dilate, Rd.integrable_dilate, Rd.integral_dilate, Rd.eLpNorm_dilate_one,
-  Rd.conv_dilate_apply, Rd.ae_integrable_dilate_mul, Rd.continuous_dilate, Rd.bddAbove_dilate}
+  Rd.conv_dilate_apply, Rd.ae_integrable_dilate_mul, Rd.continuous_dilate, Rd.bddAbove_dilate,
+  Rd.hasCompactSupport_dilate}
 \leanok
 \uses{def:conv}
 For $c > 0$ and $\Phi : V \to \C$ let $\Phi_c(x) = c^n \Phi(c x)$. If $\Phi$ is integrable, then
 $\Phi_c$ is integrable with $\int \Phi_c = \int \Phi$ and $\|\Phi_c\|_1 = \|\Phi\|_1$. For all
 $f : V \to \C$ and $x \in V$, $(\Phi_c * f)(x) = \int_V \Phi(z) f(x - c^{-1} z) \, dz$, and for
 $f \in L_p$, $1 \leq p < \infty$, the integrand is integrable for almost every $x$. Dilations of
-continuous functions are continuous, and dilations of bounded functions are bounded.
+continuous functions are continuous, dilations of bounded functions are bounded, and dilations
+of compactly supported functions have compact support.
 \end{lemma}
 
 \begin{proof}
 \leanok
 Substitute $y = c x$, which multiplies Lebesgue measure by $c^{-n}$.
+\end{proof}
+
+\begin{lemma}[First moments of dilates]
+\label{lem:first-moments-dilate}
+\lean{Rd.inner_mul_dilate_eq, Rd.integral_inner_mul_dilate}
+\leanok
+\uses{lem:dilate}
+For every $m \colon V \to \C$, every $w \in V$, every $c \neq 0$ and every $x \in V$,
+$\langle w, x \rangle \, m_c(x) = c^{-1} \bigl(\langle w, \cdot \rangle m\bigr)_c(x)$, and for
+every $c > 0$,
+\[
+  \int_V \langle w, x \rangle \, m_c(x) \, dx = c^{-1} \int_V \langle w, x \rangle \, m(x) \, dx .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\langle w, x \rangle = c^{-1} \langle w, c x \rangle$, and dilations keep the integral
+(\Cref{lem:dilate}).
 \end{proof}
 
 \begin{lemma}[Continuity of translation]
@@ -5903,7 +5926,7 @@ e^{2\pi i \langle x, \xi \rangle}$.
 \begin{lemma}[The Fourier transform of integrable functions]
 \label{lem:fourier-integrable}
 \lean{Rd.integral_fourier_smul_eq_of_integrable, Rd.norm_fourier_le_integral_norm,
-  Rd.memLp_top_fourier, Rd.continuous_fourierInv_of_integrable,
+  Rd.enorm_fourier_le_lintegral, Rd.memLp_top_fourier, Rd.continuous_fourierInv_of_integrable,
   Rd.norm_fourierInv_le_integral_norm, Rd.integral_fourierInv_smul_eq_of_integrable}
 \leanok
 \uses{lem:fourier-conv}
@@ -6355,6 +6378,22 @@ Its dilations are $m_c = \sum_{l=1}^L (-1)^{l+1} \binom{L}{l} \, g_{c/l}$ for $c
 $\int_V m = 1$ for $L \geq 1$.
 \end{definition}
 
+\begin{lemma}[First moments of the moment kernels of order two]
+\label{lem:moment-kernel-first-moment}
+\lean{Rd.integral_inner_mul_momentKernel_two}
+\leanok
+\uses{def:moment-kernel, lem:first-moments-dilate}
+For every $w \in V$ and every $g \colon V \to \C$ such that $x \mapsto \langle w, x \rangle g(x)$
+is integrable, the moment kernel $m = 2 g - g_{1/2}$ of order two satisfies
+$\int_V \langle w, x \rangle \, m(x) \, dx = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:first-moments-dilate} the first moment is $2 M - 2 M = 0$ with
+$M = \int_V \langle w, x \rangle g(x) \, dx$.
+\end{proof}
+
 \begin{lemma}[Averaged differences]
 \label{lem:averaged-differences}
 \lean{Rd.conv_finsetSum_kernel_ae, Rd.ae_sub_sum_conv_dilate_eq,
@@ -6736,19 +6775,26 @@ For $V = \R^d$ and $e = e_d$ this is $\Omega = \{x : x_d > \varphi(x_1, \dots, x
 \lean{Rd.LipschitzGraph.add_mem, Rd.LipschitzGraph.smul_mem_cone,
   Rd.LipschitzGraph.add_nsmul_mem, Rd.LipschitzGraph.coneRadius,
   Rd.LipschitzGraph.coneRadius_pos, Rd.LipschitzGraph.coneRadius_le,
-  Rd.LipschitzGraph.two_mul_add_one_mul_coneRadius_le, Rd.LipschitzGraph.ball_subset_cone}
+  Rd.LipschitzGraph.two_mul_add_one_mul_coneRadius_le, Rd.LipschitzGraph.ball_subset_cone,
+  Rd.LipschitzGraph.closedCone, Rd.LipschitzGraph.cone_subset_closedCone,
+  Rd.LipschitzGraph.isClosed_closedCone, Rd.LipschitzGraph.smul_mem_closedCone,
+  Rd.LipschitzGraph.add_mem_of_mem_closedCone}
 \leanok
 \uses{def:lipschitz-graph}
 $\Omega + K \subseteq \Omega$ and $c K \subseteq K$ for $c > 0$, so $x + l h \in \Omega$ for
 $x \in \Omega$, $h \in K$ and $l \in \N$. The cone $K$ contains the ball of radius
-$\rho = 1/(8(M + 1))$ around $e/4$.
+$\rho = 1/(8(M + 1))$ around $e/4$. The closed cone
+$\bar K = \{y : M \|y - \langle y, e \rangle e\| \leq \langle y, e \rangle\}$ is closed, contains
+$K$, satisfies $c \bar K \subseteq \bar K$ for $c \geq 0$, and $\Omega + \bar K \subseteq \Omega$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 Write $y = d + \langle y, e \rangle e$ with $d \perp e$. Since $\varphi$ is constant along $e$,
 $\varphi(x + y) = \varphi(x + d) \leq \varphi(x) + M \|d\| < \langle x, e \rangle + \langle y, e \rangle$
-for $x \in \Omega$ and $y \in K$. For $\|y - e/4\| < \rho$, $\langle y, e \rangle > 1/4 - \rho$ and
+for $x \in \Omega$ and $y \in \bar K$, strict since $\varphi(x) < \langle x, e \rangle$; this gives
+$\Omega + \bar K \subseteq \Omega$, and $\Omega + K \subseteq \Omega$ follows from
+$K \subseteq \bar K$. For $\|y - e/4\| < \rho$, $\langle y, e \rangle > 1/4 - \rho$ and
 $\|y - \langle y, e \rangle e\| < 2\rho$, and $2 M \rho \leq 1/4 - \rho$.
 \end{proof}
 
@@ -7153,8 +7199,9 @@ $g_{c'}$ with $c' \geq 1/L$.
 
 \begin{lemma}[Patches]
 \label{lem:patches}
-\lean{Rd.LipschitzGraph.patch_support, Rd.LipschitzGraph.patch_step,
-  Rd.interior_patch_support, Rd.interior_patch_step, Rd.measurableSet_infDist_gt}
+\lean{Rd.LipschitzGraph.sub_mem_patch_of_mem_closedCone, Rd.LipschitzGraph.patch_support,
+  Rd.LipschitzGraph.patch_step, Rd.setOf_lt_infDist_compl_subset, Rd.interior_patch_support,
+  Rd.interior_patch_step, Rd.measurableSet_infDist_gt}
 \leanok
 \uses{lem:graph-cone, lem:bumps-every-radius, def:rd-modulus-on}
 Let $g$ be a bump of radius $R$, $L \in \N$ and $\varepsilon, \delta, \rho > 0$.
@@ -7168,6 +7215,10 @@ Let $g$ be a bump of radius $R$, $L \in \N$ and $\varepsilon, \delta, \rho > 0$.
     $\eta_j(y) \neq 0$, $\operatorname{dist}(x - y, O^c) > \delta$, and the same steps satisfy
     $\{\operatorname{dist}(\cdot, O^c) > \delta\} \subseteq O_{Lh}$.
 \end{enumerate}
+For a Lipschitz graph domain $\Omega$ with the closed cone $\bar K$, every
+$x \in \Omega \cap B(c, \rho - \varepsilon)$ and every $y$ with $-y \in \bar K$ and
+$\|y\| \leq \varepsilon$, $x - y \in \Omega \cap B(c, \rho)$. For every $O \subseteq V$ and every
+$r \geq 0$, $\{\operatorname{dist}(\cdot, O^c) > r\} \subseteq O$.
 \end{lemma}
 
 \begin{proof}
@@ -7204,7 +7255,11 @@ As in \Cref{lem:intrinsic-upper}, with \Cref{thm:moment-approx} for the two sets
 \lean{Rd.LocalMeansBump.localExtTerm, Rd.LocalMeansBump.localExtension,
   Rd.LocalMeansBump.summable_localExtTerm, Rd.LocalMeansBump.tendsto_sum_localExtTerm,
   Rd.LocalMeansBump.modNorm_localExtension_le, Rd.LocalMeansBump.indicatorLp_localExtension,
-  Rd.LocalMeansBump.exists_local_extension}
+  Rd.LocalMeansBump.exists_local_extension, Rd.LocalMeansBump.tendsto_sum_localExtTerm_of_summable,
+  Rd.LocalMeansBump.indicatorLp_localExtension_of_summable,
+  Rd.LocalMeansBump.enorm_localExtTerm_le_of_forall_le,
+  Rd.LocalMeansBump.tsum_enorm_localExtTerm_le,
+  Rd.LocalMeansBump.summable_localExtTerm_of_forall_le}
 \leanok
 \uses{lem:support-principle-two, lem:local-means-on-sets, lem:reproducing-formula,
   lem:local-means-synthesis}
@@ -7214,7 +7269,9 @@ for $x \in U$ and $\eta_j(y) \neq 0$, and with $W \subseteq T_{Lh}$ for the step
 $h = -c^{-1} z$, $c \geq 1$, $g(z) \neq 0$. If
 $\|f\|_{L_p(T)} + \|(2^{ks} \omega_L(f, 2^{-k}, T)_p)_k\|_{\ell_q} < \infty$, then there is
 $F \in L_p$ with $\|F\|_p + \|(2^{ks} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$ and $F = f$
-almost everywhere on $U$.
+almost everywhere on $U$. For every measurable $W$, every $s > 0$ and every $f \in L_p$ with
+$2^{js} \|\mathbf 1_W (k_j * f)\|_p \leq X < \infty$ for every $j$,
+$\sum_j \|\eta_j * \mathbf 1_W (k_j * f)\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} X$.
 \end{theorem}
 
 \begin{proof}
@@ -7222,7 +7279,7 @@ almost everywhere on $U$.
 Take $F = \sum_j \eta_j * 1_W (k_j * 1_T f)$, which converges by \Cref{lem:local-means-on-sets}
 and has the bound of \Cref{lem:local-means-synthesis}. On $U$, \Cref{lem:support-principle-two}
 removes the cut-off $1_W$, and the reproducing formula (\Cref{lem:reproducing-formula}) gives
-$1_T f = f$.
+$1_T f = f$. The agreement on $U$ uses only the convergence of the series.
 \end{proof}
 
 The extension operator of \Cref{thm:graph-extension} is the case $U = W = T = \Omega$.
@@ -7246,12 +7303,18 @@ direction $e_j$ of each graph domain replaces the rotations.
 
 \begin{lemma}[Shrinking and the inner margin]
 \label{lem:bounded-lipschitz-geometry}
-\lean{Rd.BoundedLipschitzDomain.exists_shrink, Rd.BoundedLipschitzDomain.exists_interior_margin}
+\lean{Rd.BoundedLipschitzDomain.exists_shrink, Rd.BoundedLipschitzDomain.nonempty_compl,
+  Rd.BoundedLipschitzDomain.exists_interior_margin, Rd.BoundedLipschitzDomain.patch,
+  Rd.BoundedLipschitzDomain.isOpen_patch, Rd.BoundedLipschitzDomain.isBounded_patch,
+  Rd.BoundedLipschitzDomain.closure_subset_iUnion_patch}
 \leanok
-\uses{def:bounded-lipschitz}
+\uses{def:bounded-lipschitz, lem:patches}
 There is $\varepsilon > 0$ with $\partial\Omega \subseteq \bigcup_j B(c_j, \rho_j - 2\varepsilon)$.
-If $\Omega \neq V$, there is $\delta > 0$ with $\operatorname{dist}(x, \Omega^c) > 2\delta$ for every
-$x \in \Omega$ outside these balls.
+In dimension $n \geq 1$, $\Omega \neq V$. If $\Omega \neq V$, there is $\delta > 0$ with
+$\operatorname{dist}(x, \Omega^c) > 2\delta$ for every $x \in \Omega$ outside these balls. For
+such $\varepsilon$ and $\delta \geq 0$ the patches $B(c_j, \rho_j - 2\varepsilon)$ and
+$\{\operatorname{dist}(\cdot, \Omega^c) > 2\delta\}$ are bounded open sets that cover
+$\overline\Omega$.
 \end{lemma}
 
 \begin{proof}
@@ -7259,7 +7322,9 @@ $x \in \Omega$ outside these balls.
 Both by compactness: $\partial\Omega$ is covered by the increasing open sets
 $\bigcup_j B(c_j, \rho_j - 1/(n+1))$, and $\operatorname{dist}(\cdot, \Omega^c)$ attains a positive
 minimum on the compact set $\overline{\Omega} \setminus \bigcup_j B(c_j, \rho_j - 2\varepsilon)
-\subseteq \Omega$.
+\subseteq \Omega$. In dimension $n \geq 1$ the space $V$ is unbounded and $\Omega$ is bounded.
+The inner patch lies in $\Omega$ (\Cref{lem:patches}), and a point of $\overline\Omega$ lies on
+$\partial\Omega$, in one of the balls, or in $\Omega$ outside them.
 \end{proof}
 
 \begin{lemma}[Resolutions of unity]
@@ -9387,6 +9452,28 @@ $|F(x)| = \lim_k |G_{J_k}(x)| \leq v(x)$.
 For a bounded linear operator $T$ on $L_p$ the lemma applies to $T G_J \to T f$: a pointwise bound
 on $T G_J$ passes to $T f$.
 
+\begin{lemma}[One member of a family]
+\label{lem:mixed-norm-member}
+\lean{MeasureTheory.dyadicWeight_mul_enorm_le_eLpNorm_lqNorm,
+  MeasureTheory.enorm_le_dyadicWeight_neg_mul_eLpNorm_lqNorm}
+\leanok
+\uses{lem:lq-basic}
+For every measure space $(X, \mu)$, every normed group $E$, all $p, q \in [0, \infty]$ with
+$q \neq 0$, every $s \in \R$, every family $h_i \in L_p(X; E)$, $i \in \N$, and every $j \in \N$,
+\[
+  2^{js} \|h_j\|_p \leq \bigl\| x \mapsto \|(2^{is} |h_i(x)|)_i\|_{\ell_q} \bigr\|_p
+\]
+and
+\[
+  \|h_j\|_p \leq 2^{-js} \, \bigl\| x \mapsto \|(2^{is} |h_i(x)|)_i\|_{\ell_q} \bigr\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Pointwise $2^{js} |h_j(x)| \leq \|(2^{is} |h_i(x)|)_i\|_{\ell_q}$ (\Cref{lem:lq-basic}).
+\end{proof}
+
 \begin{lemma}[Tails in $L_p(\ell_q)$]
 \label{lem:mixed-norm-tails}
 \lean{MeasureTheory.aemeasurable_lqNorm_ite, MeasureTheory.eLpNorm_lqNorm_ite_le,
@@ -11046,7 +11133,7 @@ Monotonicity and homogeneity of the $L_p$ norm, then \Cref{thm:fefferman-stein}.
 \label{thm:blocks-by-local-means}
 \lean{Rd.LocalMeansBump.blockByLocalMeansConst, Rd.LocalMeansBump.blockByLocalMeansConst_ne_top,
   Rd.LocalMeansBump.enorm_conv_conv_psi_dual_le, Rd.LocalMeansBump.lpBlock_sum_dual_localMean_ae,
-  Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dual_le,
+  Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dual_le, Rd.LocalMeansBump.maximal_enorm_localMean,
   Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximal}
 \leanok
 \uses{thm:cross-kernel-dual, thm:decay-kernels-maximal, lem:maximal-function-kernels,
@@ -11177,6 +11264,33 @@ Both bounds are \Cref{lem:tl-local-means-lq}, with $L' = L_s$ for the second, fo
 $2^{is} |k_i * f|$. The constants $B_{L,L_s}$, $B^\Theta_L$ and $C_{n,p,q}$ are finite, and
 since $L_s > s$, \Cref{lem:almost-diagonal-pointwise} gives $A_{s,L_s} < \infty$ for $s > 0$
 and $A_{s,L} < \infty$ for $0 < s < L$. For $0 < s < L$ the order satisfies $L \geq 1$.
+\end{proof}
+
+\begin{theorem}[Synthesis in Triebel--Lizorkin spaces]
+\label{thm:tl-synthesis-dual}
+\lean{Rd.LocalMeansBump.lpBlock_sum_dual_ae,
+  Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dual_le_tsum_maximal,
+  Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximal_of_tendsto,
+  Rd.LocalMeansBump.triebelLizorkinNorm_le_of_tendsto_sum_dual}
+\leanok
+\uses{thm:blocks-by-local-means, thm:tl-local-means, lem:lp-limits-pointwise, lem:conv-op,
+  lem:almost-diagonal-pointwise, lem:maximal-bounds-mixed-norm}
+Let $g$ be a bump with the dual kernels $\eta_i$ of order $L$, let $1 < p < \infty$,
+$1 < q \leq \infty$ and $s \in \R$. For every family $h_i \in L_p$ and every $F \in L_p$ with
+$\sum_{i \leq J} \eta_i * h_i \to F$ in $L_p$,
+\[
+  \|F\|_{F^s_{p,q}} \leq C \, \bigl\| x \mapsto \|(2^{is} |h_i(x)|)_i\|_{\ell_q} \bigr\|_p
+\]
+with the constant $C$ of \Cref{thm:tl-local-means}, finite for $s > 0$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The proof of \Cref{thm:blocks-by-local-means} with $h_i$ in place of $k_i * f$ gives
+$|(\psi_j * F)(x)| \leq B_{L,L'} \sum_i c^{L'}_{ji} M|h_i|(x)$ almost everywhere, for
+$L' = \lceil s \rceil + 1$; the almost diagonal estimate (\Cref{lem:almost-diagonal-pointwise})
+and the Fefferman--Stein inequality (\Cref{lem:maximal-bounds-mixed-norm}) finish as in
+\Cref{thm:tl-local-means}.
 \end{proof}
 
 \begin{corollary}[Independence of the bump and the order]
@@ -12509,7 +12623,8 @@ $\partial^v f(\varphi) = (-1)^k f(\partial^v \varphi)$ by \Cref{lem:distribution
   Rd.locallyIntegrableOn_of_memLp, Rd.memWeakSobolev_zero_iff, Rd.MemWeakSobolev.mono_order,
   Rd.MemWeakSobolev.mono_set, Rd.zero_memWeakSobolev, Rd.MemWeakSobolev.add,
   Rd.MemWeakSobolev.smul, Rd.MemWeakSobolev.congr_ae, Rd.zero_memSobolev, Rd.MemSobolev.add,
-  Rd.MemSobolev.smul, Rd.HasWeakLineDeriv.sum, Rd.memSobolev_iff_exists_hasWeakLineDeriv}
+  Rd.MemSobolev.smul, Rd.HasWeakLineDeriv.sum, Rd.memSobolev_iff_exists_hasWeakLineDeriv,
+  Rd.MemSobolev.sum}
 \leanok
 \uses{def:weak-line-derivative, lem:weak-derivative-integral, lem:directional-derivatives-commute}
 For every $v \in V^k$, all functions $f, f', g, g'$ and every $c \in \C$:
@@ -12559,6 +12674,51 @@ $\Sob{m}{p}$ follow, with $L_p(\Omega') \supseteq L_p(\Omega)|_{\Omega'}$ and (4
 the zero class, and the class of a sum or a multiple, agree almost everywhere with $0$ and with
 the sum or the multiple of the representatives, and a weak derivative in $L_p(V)$ may be
 replaced by its class (4).
+\end{proof}
+
+\begin{lemma}[Complex test functions]
+\label{lem:weak-derivative-complex-test}
+\lean{Rd.exists_testSchwartz_eq_of_tsupport_subset, Rd.HasWeakLineDeriv.integral_mul_eq}
+\leanok
+\uses{lem:weak-derivative-integral, def:test-schwartz, lem:directional-derivatives-commute}
+Every smooth compactly supported $w \colon V \to \C$ with support in $\Omega$ is
+$w = a + i b$ for real test functions $a, b \in \mathcal D(\Omega)$. For every $v \in V^k$, all
+$f$, $g$ with $g = \partial^v f$ weakly on $\Omega$ and every such $w$,
+\[
+  \int_V w \, g = (-1)^k \int_V (\partial^v w) \, f .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Take $a = \operatorname{Re} w$ and $b = \operatorname{Im} w$, whose supports lie in that of $w$.
+Then $\partial^v w = \partial^v a + i \, \partial^v b$
+(\Cref{lem:directional-derivatives-commute}), and \Cref{lem:weak-derivative-integral} for $a$ and
+$b$ gives the identity.
+\end{proof}
+
+\begin{lemma}[The product rule for weak derivatives]
+\label{lem:weak-derivative-product}
+\lean{Rd.testFunctionMul, Rd.testFunctionMul_apply, Rd.lineDerivOp_testFunctionMul_apply,
+  Rd.HasWeakLineDeriv.mul_contDiff}
+\leanok
+\uses{lem:weak-derivative-integral}
+For every test function $\varphi \in \mathcal D(\Omega)$ and every smooth real function $\chi$
+on $V$, $\varphi \chi \in \mathcal D(\Omega)$ with
+$\partial_w (\varphi \chi) = (\partial_w \varphi) \chi + \varphi \, \partial_w \chi$. For every
+$w \in V$, all $f$, $g$ with $g = \partial_w f$ weakly on $\Omega$ and every smooth real $\chi$,
+$\chi g + (\partial_w \chi) f = \partial_w (\chi f)$ weakly on $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The products of $\chi$ and $\partial_w \chi$ with locally integrable functions on $\Omega$ are
+locally integrable on $\Omega$. For $\varphi \in \mathcal D(\Omega)$,
+\[
+  \int \varphi \bigl(\chi g + (\partial_w \chi) f\bigr) = -\int \partial_w(\varphi \chi) \, f
+  + \int \varphi \, (\partial_w \chi) f = -\int (\partial_w \varphi) \, \chi f
+\]
+by \Cref{lem:weak-derivative-integral} for the test function $\varphi \chi$.
 \end{proof}
 
 \begin{lemma}[Pairing with a test function]
@@ -13844,7 +14004,8 @@ is the compactness that Hiptmair, Pauly and Schulz require (their Assumption F)
 
 \begin{lemma}[Weak derivatives of $H^1(V)$]
 \label{lem:sobolev-one-weak-gradient-norm}
-\lean{Rd.memSobolev_toL2, Rd.exists_hasWeakLineDeriv_toL2, Rd.sq_norm_eq_of_hasWeakLineDeriv}
+\lean{Rd.memSobolev_toL2, Rd.exists_hasWeakLineDeriv_toL2, Rd.sq_norm_eq_of_hasWeakLineDeriv,
+  Rd.norm_le_norm_toL2_add_sum}
 \leanok
 \uses{lem:sobolev-one-to-l2, thm:sobolev-one-two, cor:sobolev-tempered,
   thm:weak-derivative-tempered}
@@ -13853,8 +14014,9 @@ derivative $\partial_v \iota U$ on $V$ exists in $L_2(V)$. For every orthonormal
 $(e_i)_{i \in I}$ of $V$, every $U \in H^1(V)$ and all $g_i \in L_2(V)$ such that $g_i$ is the
 weak derivative $\partial_{e_i} \iota U$ on $V$ for every $i \in I$,
 \[
-  \|U\|^2 = \|\iota U\|_2^2 + (2 \pi)^{-2} \sum_i \|g_i\|_2^2 .
+  \|U\|^2 = \|\iota U\|_2^2 + (2 \pi)^{-2} \sum_i \|g_i\|_2^2 ,
 \]
+and in particular $\|U\| \leq \|\iota U\|_2 + \sum_i \|g_i\|_2$.
 \end{lemma}
 
 \begin{proof}
@@ -13864,7 +14026,8 @@ $\iota U \in \Sob{1}{2}(V)$ by \Cref{thm:sobolev-one-two}, and its tempered deri
 $L_2$ functions (\Cref{cor:sobolev-tempered}), which are weak derivatives
 (\Cref{thm:weak-derivative-tempered}). The identity is
 $(2\pi)^2 \|J_1 U\|_2^2 = (2\pi)^2 \|\iota U\|_2^2 + \sum_i \|g_i\|_2^2$ from
-\Cref{thm:sobolev-one-two}, with $\|U\| = \|J_1 U\|_2$.
+\Cref{thm:sobolev-one-two}, with $\|U\| = \|J_1 U\|_2$. The bound follows from
+$(2\pi)^{-2} \leq 1$ and $\sum_i a_i^2 \leq (\sum_i a_i)^2$ for $a_i \geq 0$.
 \end{proof}
 
 \begin{proposition}[The weak gradient on $\Omega$]
@@ -16286,6 +16449,25 @@ For the second statement, $\eta * f$ and $(\partial^v \eta) * f$ lie in $L_p$ by
 \Cref{thm:young}, so they are locally integrable. For every test function $\varphi$ on $V$,
 \Cref{lem:conv-derivative-transfer} with the Schwartz function $u = \varphi$
 (\Cref{def:test-schwartz}) is the identity of \Cref{lem:weak-derivative-integral}.
+\end{proof}
+
+\begin{lemma}[Weak derivatives and convolution on open sets]
+\label{lem:weak-derivative-convolution-local}
+\lean{Rd.coe_shiftReflect_eq_comp, Rd.hasCompactSupport_shiftReflect,
+  Rd.tsupport_shiftReflect_subset, Rd.conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv}
+\leanok
+\uses{lem:schwartz-shift-reflect, lem:weak-derivative-complex-test}
+Let $\Omega \subseteq V$ be open, $v \in V^k$, $g = \partial^v f$ weakly on $\Omega$, $\eta$ a
+Schwartz function with compact support and $x \in V$ with $x - y \in \Omega$ for every $y$ in the
+support of $\eta$. Then $(\eta * g)(x) = ((\partial^v \eta) * f)(x)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The reflected translate $\rho_x \eta = \eta(x - \cdot)$ has compact support in $\Omega$, so
+\Cref{lem:weak-derivative-complex-test} and \Cref{lem:schwartz-shift-reflect} give
+$(\eta * g)(x) = \int \rho_x \eta \, g = (-1)^k \int (\partial^v \rho_x \eta) \, f
+= \int \rho_x(\partial^v \eta) \, f = ((\partial^v \eta) * f)(x)$.
 \end{proof}
 
 \section{Plancherel bounds}
@@ -19616,6 +19798,712 @@ Both are $\TL{m}{p}{2}$ (\Cref{cor:sobolev-triebel-lizorkin},
 
 For $p = 2$, \Cref{sec:sobolev-two-littlewood-paley} proves $H^s(V) = \TL{s}{2}{2}$ directly by
 Plancherel's theorem, with explicit constants (\Cref{thm:sobolev-two-triebel-lizorkin}).
+
+\section{Divergence kernels}
+\label{sec:divergence-kernels}
+
+This section writes the difference $m_2 - m$ of two dilates of a smooth function $m$ as a
+divergence $\sum_i \partial_{e_i} K_i$ of smooth kernels that vanish where $m$ vanishes along the
+rays from the origin, with mean zero when the first moments of $m$ vanish. Dilates of a
+mean-zero Schwartz function form a Calder\'on--Zygmund family, so the divergence kernels carry
+the strong type of \Cref{thm:vector-valued-strong-type}. Throughout, $(e_i)_{i \in I}$ is an
+orthonormal basis of $V$ and $\Phi_c(x) = c^n \Phi(c x)$ (\Cref{lem:dilate}).
+
+\paragraph{Parametric integrals.}
+
+\begin{lemma}[Smoothness of parametric integrals]
+\label{lem:parametric-integral-smooth}
+\lean{intervalIntegral.hasFDerivAt_integral_of_contDiff,
+  intervalIntegral.fderiv_integral_apply_of_contDiff,
+  intervalIntegral.contDiff_parametric_intervalIntegral_of_contDiff_aux,
+  intervalIntegral.contDiff_parametric_intervalIntegral_of_contDiff}
+\leanok
+Let $H$ be a finite-dimensional real normed space, $E$ a real normed space and $a, b \in \R$.
+For every continuously differentiable $F \colon H \times \R \to E$ and all $x_0, v \in H$, the
+function $x \mapsto \int_a^b F(x, t) \, dt$ is differentiable at $x_0$ with
+\[
+  D\Bigl(\int_a^b F(\cdot, t) \, dt\Bigr)(x_0) \, v = \int_a^b D_x F(x_0, t) \, v \, dt .
+\]
+For every smooth $F \colon H \times \R \to E$ the function $x \mapsto \int_a^b F(x, t) \, dt$
+is smooth.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The partial derivative $(x, t) \mapsto D_x F(x, t)$ is continuous, hence bounded on the compact
+set $\bar B(x_0, 1) \times [a, b]$, and Mathlib's differentiation under the integral sign
+with a dominating bound gives the derivative. For smooth $F$ the derivative is again a
+parametric integral, of the smooth function
+$D_x F$ with values in the bounded linear maps $H \to E$, so the parametric integral is
+$k$ times continuously differentiable for every $k$, by induction on $k$. The induction runs
+through the spaces $E$, $L(H, E)$, $L(H, L(H, E))$, \dots, which Lean needs in one universe; a
+lift of $E$ to the universe of $H$ provides it.
+\end{proof}
+
+Mathlib has the derivative under the integral sign and the continuity of parametric integrals;
+\Cref{lem:parametric-integral-smooth} adds their smoothness.
+
+\paragraph{The dilation identity.}
+
+\begin{lemma}[Exponential dilations]
+\label{lem:exponential-dilation}
+\lean{Rd.contDiff_dilate_exp, Rd.continuous_dilate_exp, Rd.fderiv_dilate_apply,
+  Rd.hasDerivAt_dilate_exp}
+\leanok
+\uses{lem:dilate}
+For every continuous $m \colon V \to \C$ the function $(x, s) \mapsto m_{e^s}(x)$ on
+$V \times \R$ is continuous, and it is $k$ times continuously differentiable if $m$ is. For every
+differentiable $m$, every $c \in \R$ and all $x, v \in V$,
+$D(m_c)(x) \, v = c^n \, Dm(c x)(c v)$, and for every $x \in V$ and every $s \in \R$,
+\[
+  \frac{d}{ds} \, m_{e^s}(x) = n \, m_{e^s}(x) + D(m_{e^s})(x) \, x .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$m_{e^s}(x) = e^{ns} m(e^s x)$; the product and chain rules give
+$\frac{d}{ds} m_{e^s}(x) = n e^{ns} m(e^s x) + e^{ns} Dm(e^s x)(e^s x)$, and the second term is
+$D(m_{e^s})(x) \, x$.
+\end{proof}
+
+\begin{definition}[Divergence kernels]
+\label{def:divergence-kernel}
+\lean{Rd.dilationAverage, Rd.divergenceKernel}
+\leanok
+\uses{lem:exponential-dilation}
+For $m \colon V \to \C$ and $w \in V$, the \emph{dilation average} and the \emph{divergence
+kernel} in the direction $w$ are
+\[
+  A_m(x) = \int_0^{\log 2} m_{e^s}(x) \, ds , \qquad K^m_w(x) = \langle w, x \rangle \, A_m(x) .
+\]
+\end{definition}
+
+The substitution $t = e^s$ gives the form $\int_1^2 t^{-1} m_t(x) \, dt$ of the dilation average.
+
+\begin{lemma}[The dilation average after substitution]
+\label{lem:dilation-average-substitution}
+\lean{Rd.dilationAverage_eq_integral_inv_mul}
+\leanok
+\uses{def:divergence-kernel}
+For every continuous $m \colon V \to \C$ and every $x \in V$,
+$A_m(x) = \int_1^2 t^{-1} m_t(x) \, dt$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Substitute $t = e^s$, $dt = e^s \, ds$.
+\end{proof}
+
+\begin{lemma}[Smoothness of the divergence kernels]
+\label{lem:divergence-kernel-smooth}
+\lean{Rd.contDiff_dilationAverage, Rd.contDiff_divergenceKernel,
+  Rd.differentiable_dilationAverage}
+\leanok
+\uses{def:divergence-kernel, lem:parametric-integral-smooth, lem:exponential-dilation}
+For every smooth $m \colon V \to \C$ and every $w \in V$, $A_m$ and $K^m_w$ are smooth. For every
+continuously differentiable $m$, $A_m$ is differentiable.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$(x, s) \mapsto m_{e^s}(x)$ is as smooth as $m$ (\Cref{lem:exponential-dilation}), and
+\Cref{lem:parametric-integral-smooth} applies.
+\end{proof}
+
+\begin{lemma}[Supports of the divergence kernels]
+\label{lem:divergence-kernel-support}
+\lean{Rd.dilationAverage_eq_zero, Rd.divergenceKernel_eq_zero,
+  Rd.divergenceKernel_eq_zero_of_lt, Rd.hasCompactSupport_divergenceKernel}
+\leanok
+\uses{def:divergence-kernel}
+For every $m \colon V \to \C$, every $w \in V$ and every $x \in V$ with $m(t x) = 0$ for every
+$t \in [1, 2]$, $A_m(x) = 0$ and $K^m_w(x) = 0$. For every $R \in \R$ and every $m$ vanishing
+outside the closed ball $\bar B(0, R)$, every $K^m_w$ vanishes outside $\bar B(0, R)$ and has
+compact support.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $s \in [0, \log 2]$, $e^s \in [1, 2]$, so the integrand of $A_m(x)$ vanishes. For
+$\|x\| > R$ and $t \geq 1$, $\|t x\| \geq \|x\| > R$.
+\end{proof}
+
+\begin{definition}[Divergence kernels as Schwartz functions]
+\label{def:divergence-schwartz}
+\lean{Rd.divergenceSchwartz, Rd.coe_divergenceSchwartz}
+\leanok
+\uses{lem:divergence-kernel-smooth, lem:divergence-kernel-support}
+For every smooth $m \colon V \to \C$ that vanishes outside a ball and every $w \in V$, the
+divergence kernel $K^m_w$, smooth with compact support, is a Schwartz function.
+\end{definition}
+
+\begin{theorem}[The dilation identity]
+\label{thm:dilation-divergence}
+\lean{Rd.fderiv_dilationAverage_apply, Rd.continuous_fderiv_dilate_exp_apply,
+  Rd.dilate_two_sub_eq, Rd.sum_fderiv_divergenceKernel, Rd.sum_lineDerivOp_divergenceSchwartz,
+  Rd.sum_lineDerivOp_schwartzDilate_divergenceSchwartz}
+\leanok
+\uses{def:divergence-kernel, lem:exponential-dilation, lem:parametric-integral-smooth,
+  lem:divergence-kernel-smooth, def:divergence-schwartz, lem:derivative-dilate}
+For every continuously differentiable $m \colon V \to \C$ and every $x \in V$,
+\[
+  m_2(x) - m(x) = n \, A_m(x) + D A_m(x) \, x = \sum_{i \in I} \partial_{e_i} K^m_{e_i}(x) .
+\]
+If $m$ is smooth and vanishes outside a ball, then for every $c \neq 0$ and every $x \in V$,
+\[
+  \sum_{i \in I} \partial_{e_i} \bigl(K^m_{e_i}\bigr)_c (x) = c \, (m_2 - m)_c(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:parametric-integral-smooth},
+$D A_m(x) \, x = \int_0^{\log 2} D(m_{e^s})(x) \, x \, ds$,
+so by \Cref{lem:exponential-dilation} $n A_m(x) + D A_m(x) \, x$ is the integral of the
+derivative of $s \mapsto m_{e^s}(x)$ over $[0, \log 2]$, which is
+$m_2(x) - m_1(x) = m_2(x) - m(x)$ by the fundamental theorem of calculus. The product rule gives
+$\partial_{e_i} K^m_{e_i}(x) = \langle e_i, e_i \rangle A_m(x) +
+\langle e_i, x \rangle \, D A_m(x) \, e_i$, and the sum over $i$ is
+$n A_m(x) + D A_m(x) \bigl(\sum_i \langle e_i, x \rangle e_i\bigr) = n A_m(x) + D A_m(x) \, x$.
+The second identity follows with $\partial_w (G_c) = c \, (\partial_w G)_c$
+(\Cref{lem:derivative-dilate}).
+\end{proof}
+
+\paragraph{The mean.}
+
+\begin{lemma}[The divergence kernels have mean zero]
+\label{lem:divergence-kernel-mean}
+\lean{Rd.integrable_inner_mul_dilate_exp, Rd.integral_divergenceKernel}
+\leanok
+\uses{def:divergence-kernel, lem:first-moments-dilate}
+For every continuous $m \colon V \to \C$ that vanishes outside a ball and every $w \in V$ with
+$\int_V \langle w, x \rangle \, m(x) \, dx = 0$, $\int_V K^m_w = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The function $(x, s) \mapsto \langle w, x \rangle m_{e^s}(x)$ is continuous and vanishes for
+$s \in [0, \log 2]$ outside the compact set $\bar B(0, R) \times [0, \log 2]$, so it is
+integrable on
+$V \times (0, \log 2]$, and Fubini's theorem gives
+$\int K^m_w = \int_0^{\log 2} \int_V \langle w, x \rangle m_{e^s}(x) \, dx \, ds
+= \int_0^{\log 2} e^{-s} \cdot 0 \, ds = 0$ by \Cref{lem:first-moments-dilate}.
+\end{proof}
+
+\paragraph{Mean-zero kernels as Calder\'on--Zygmund families.}
+
+\begin{lemma}[Fourier transforms of mean-zero kernels]
+\label{lem:mean-zero-fourier}
+\lean{Rd.norm_fourier_le_of_integral_eq_zero, Rd.ofReal_mul_enorm_mul_enorm_fourier_le,
+  Rd.enorm_fourier_le_mul_min}
+\leanok
+\uses{lem:fourier-character-lipschitz, lem:fourier-integrable, def:gradient-mass,
+  lem:gradient-mass}
+For every Schwartz function $G$ and every $\xi \in V$,
+$2 \pi \|\xi\| \, |\widehat G(\xi)| \leq C_G$ with the gradient mass $C_G$ of
+\Cref{def:gradient-mass}. If moreover $\int G = 0$, then
+$|\widehat G(\xi)| \leq 2 \pi \|\xi\| \int_V \|x\| \, |G(x)| \, dx$ and
+\[
+  |\widehat G(\xi)| \leq C \min\bigl(\|\xi\|, \|\xi\|^{-1}\bigr), \qquad
+  C = 2 \pi \int_V \|x\| \, |G(x)| \, dx + \frac{C_G}{2 \pi} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\widehat{\partial_\xi G}(\xi) = 2 \pi i \|\xi\|^2 \widehat G(\xi)$ (Mathlib's
+\texttt{SchwartzMap.\allowbreak fourier\_\allowbreak lineDerivOp\_\allowbreak eq}), and
+$|\widehat{\partial_\xi G}(\xi)| \leq \|\partial_\xi G\|_1 \leq \|\xi\| C_G$
+(\Cref{lem:fourier-integrable}, \Cref{lem:gradient-mass}). If $\int G = 0$,
+$\widehat G(\xi) = \int (e^{-2 \pi i \langle x, \xi \rangle} - 1) \, G(x) \, dx$, and
+$|e^{-2 \pi i a} - 1| \leq 2 \pi |a|$ (\Cref{lem:fourier-character-lipschitz}) with
+$|\langle x, \xi \rangle| \leq \|x\| \|\xi\|$.
+\end{proof}
+
+\begin{theorem}[Dilates of mean-zero kernels]
+\label{thm:mean-zero-cz-family}
+\lean{Rd.meanZeroOverlap, Rd.meanZeroOverlap_ne_top, Rd.tsum_enorm_fourier_dilate_sq_le,
+  Rd.isCZFamily_dilate_of_integral_eq_zero, Rd.isCZFamily_divergenceSchwartz}
+\leanok
+\uses{lem:mean-zero-fourier, lem:dyadic-min-sum, lem:fourier-dilate, thm:cz-family-dilation,
+  lem:uniform-schwartz-constants, def:cz-family, def:hormander-const,
+  lem:divergence-kernel-mean, def:divergence-schwartz}
+For every Schwartz function $G$ with $\int G = 0$ and every $\xi \in V$,
+\[
+  \sum_{j \in \N} \bigl|\widehat{G_{2^j}}(\xi)\bigr|^2 \leq 4 C^2
+\]
+with the constant $C$ of \Cref{lem:mean-zero-fourier}, and the dilates $(G_{2^j})_{j \in \N}$
+form a Calder\'on--Zygmund family with Fourier overlap $4 C^2$ and H\"ormander constant $4 H_A$
+for the seminorms $A_{k,l}$ of $G$ (\Cref{def:hormander-const}). In particular, for every smooth
+$m$ that vanishes outside a ball and every $w \in V$ with
+$\int_V \langle w, x \rangle \, m(x) \, dx = 0$, the dilates
+$\bigl((K^m_w)_{2^j}\bigr)_{j \in \N}$ form a Calder\'on--Zygmund family.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\widehat{G_{2^j}}(\xi) = \widehat G(2^{-j} \xi)$ (\Cref{lem:fourier-dilate}). For $\xi = 0$ every
+term vanishes. Otherwise, with $a = \|\xi\|^{-1}$ and $t_j = 2^j a$, \Cref{lem:mean-zero-fourier}
+gives $|\widehat G(2^{-j} \xi)|^2 \leq C^2 \min(t_j, t_j^{-1})^2 \leq C^2 \min(t_j, t_j^{-1})$,
+and $\sum_j \min(t_j, t_j^{-1}) \leq 4$ (\Cref{lem:dyadic-min-sum}). The constant family $G$ is
+uniformly Schwartz (\Cref{lem:uniform-schwartz-constants}), and \Cref{thm:cz-family-dilation}
+applies. The divergence kernels have mean zero by \Cref{lem:divergence-kernel-mean}.
+\end{proof}
+
+\section{The extension theorem for Sobolev spaces}
+\label{sec:sobolev-extension}
+
+Let $\Omega$ be a bounded Lipschitz domain (\Cref{def:bounded-lipschitz}) in $V$ of dimension
+$n \geq 1$, let $(e_i)_{i \in I}$ be the orthonormal basis of the dyadic grid of $V$ and
+$1 < p < \infty$. The extension theorem of Calder\'on and Stein \cite[Chapter VI]{SteinSingular}
+says that every $f \in \Sob{1}{p}(\Omega)$ is the restriction of some $F \in \Sob{1}{p}(V)$ with
+$\|F\|_{\Sob{1}{p}(V)} \leq C \|f\|_{\Sob{1}{p}(\Omega)}$ (\Cref{thm:sobolev-extension}). The
+proof is Rychkov's local extension \cite{Rychkov} of \Cref{thm:local-extension}, here with the
+local means of the gradient: the local means kernels of order two are divergences of dilated
+divergence kernels (\Cref{lem:bump-divergence-identity}), the derivatives move onto $f$, and the
+strong type of the Calder\'on--Zygmund families of the divergence kernels
+(\Cref{thm:vector-valued-strong-type}) bounds the local means of Triebel--Lizorkin type of $f$ on
+a patch by $\|f\|_{\Sob{1}{p}(\Omega)}$. The local extensions lie in
+$\TL{1}{p}{2} = \Sob{1}{p}(V)$ and are pasted in $\Sob{1}{p}(V)$.
+
+\paragraph{Local means by the gradient.}
+
+\begin{definition}[The divergence kernels of a bump]
+\label{def:bump-divergence-kernels}
+\lean{Rd.LocalMeansBump.momentKernel_two_eq_zero, Rd.LocalMeansBump.divKernel,
+  Rd.LocalMeansBump.hasCompactSupport_divKernel, Rd.LocalMeansBump.divKernel_eq_zero}
+\leanok
+\uses{def:local-means, def:moment-kernel, def:divergence-schwartz,
+  lem:divergence-kernel-support}
+For a bump $g$ of radius $R$ (\Cref{def:local-means}) with the moment kernel $m$ of order two,
+the \emph{divergence kernels} of $g$ are the Schwartz functions $K_i = K^m_{e_i}$, $i \in I$. The
+moment kernel vanishes outside $\bar B(0, 2R)$, the $K_i$ have compact support, and
+$K_i(y) \neq 0$ only if $m(t y) \neq 0$ for some $t \in [1, 2]$.
+\end{definition}
+
+\begin{lemma}[The local means kernels as divergences]
+\label{lem:bump-divergence-identity}
+\lean{Rd.LocalMeansBump.kernel_two_succ, Rd.LocalMeansBump.kernel_two_succ_apply,
+  Rd.LocalMeansBump.integral_inner_mul_momentKernel, Rd.LocalMeansBump.isCZFamily_divKernel}
+\leanok
+\uses{def:bump-divergence-kernels, thm:dilation-divergence, lem:moment-kernel-first-moment,
+  thm:mean-zero-cz-family}
+Let $g$ be a bump with the moment kernel $m$ of order two, the local means kernels $k_j$ of order
+two and the divergence kernels $K_i$. For every $j \in \N$ and every $y \in V$,
+\[
+  k_{j+1} = (m_2 - m)_{2^j} , \qquad
+  k_{j+1}(y) = 2^{-j} \sum_{i \in I} \partial_{e_i} (K_i)_{2^j}(y) .
+\]
+For every $w \in V$, $\int_V \langle w, x \rangle \, m(x) \, dx = 0$, and for every $i$,
+$((K_i)_{2^j})_{j \in \N}$ is a Calder\'on--Zygmund family with the constants $B_i$, $H_i$ of
+\Cref{thm:mean-zero-cz-family}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$k_{j+1} = m_{2^{j+1}} - m_{2^j} = (m_2 - m)_{2^j}$, and \Cref{thm:dilation-divergence} with
+$c = 2^j$ writes it as a divergence. The first moments vanish by
+\Cref{lem:moment-kernel-first-moment}, and \Cref{thm:mean-zero-cz-family} gives the
+Calder\'on--Zygmund families.
+\end{proof}
+
+\begin{lemma}[Local means by the gradient at a point]
+\label{lem:local-means-gradient-point}
+\lean{Rd.LocalMeansBump.conv_kernel_two_succ_eq,
+  Rd.LocalMeansBump.dyadicWeight_mul_enorm_conv_kernel_le}
+\leanok
+\uses{def:bump-divergence-kernels, lem:bump-divergence-identity,
+  lem:weak-derivative-convolution-local, lem:weak-derivative-basic, lem:dilate}
+Let $g$ be a bump with the divergence kernels $K_i$, let $T \subseteq V$ be open,
+$1 \leq p \leq \infty$, $f \in L_p(T)$ with weak derivatives $g_i = \partial_{e_i} f$ on $T$,
+$j \in \N$ and $x \in V$ with $x - y \in T$ for every $i$ and every $y$ in the support of
+$(K_i)_{2^j}$. Then
+\[
+  \bigl(k_{j+1} * \mathbf 1_T f\bigr)(x) = 2^{-j} \sum_{i \in I}
+  \bigl((K_i)_{2^j} * \mathbf 1_T g_i\bigr)(x) ,
+\]
+and therefore
+\[
+  2^{j+1} \bigl|\bigl(k_{j+1} * \mathbf 1_T f\bigr)(x)\bigr| \leq 2 \sum_{i \in I}
+  \bigl|\bigl((K_i)_{2^j} * \mathbf 1_T g_i\bigr)(x)\bigr| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:bump-divergence-identity},
+$(k_{j+1} * \mathbf 1_T f)(x) = 2^{-j} \sum_i ((\partial_{e_i} (K_i)_{2^j}) * \mathbf 1_T f)(x)$,
+and $\mathbf 1_T g_i = \partial_{e_i} (\mathbf 1_T f)$ weakly on $T$
+(\Cref{lem:weak-derivative-basic}), so \Cref{lem:weak-derivative-convolution-local} moves each
+derivative to $\mathbf 1_T f$. The bound follows from $2^{j+1} 2^{-j} = 2$.
+\end{proof}
+
+\begin{definition}[Local means of Triebel--Lizorkin type on a set]
+\label{def:tl-local-norm-on}
+\lean{Rd.LocalMeansBump.tlLocalNormOn}
+\leanok
+\uses{def:local-means}
+For a bump $g$, a measurable $W \subseteq V$, $L \in \N$, $s \in \R$, $q \in [0, \infty]$ and
+$f \in L_p(V)$, $1 \leq p < \infty$, let
+\[
+  \|f\|^{W,L}_{s,q} = \Bigl\| x \mapsto \bigl\| \bigl(2^{js} \, |\mathbf 1_W (k_j * f)(x)|\bigr)_j
+  \bigr\|_{\ell_q} \Bigr\|_p .
+\]
+\end{definition}
+
+\begin{lemma}[The local extension in Triebel--Lizorkin spaces]
+\label{lem:tl-local-extension}
+\lean{Rd.LocalMeansBump.enorm_indicatorLp_localMean_le,
+  Rd.LocalMeansBump.dyadicWeight_mul_enorm_indicatorLp_localMean_le,
+  Rd.LocalMeansBump.enorm_localExtTerm_le, Rd.LocalMeansBump.summable_localExtTerm_of_tlLocalNormOn,
+  Rd.LocalMeansBump.enorm_localExtension_le_of_tlLocalNormOn,
+  Rd.LocalMeansBump.triebelLizorkinNorm_localExtension_le}
+\leanok
+\uses{def:tl-local-norm-on, thm:local-extension, lem:mixed-norm-member, thm:tl-synthesis-dual}
+Let $g$ be a bump, $W \subseteq V$ measurable, $L \in \N$, $1 \leq p < \infty$, $s > 0$,
+$q \neq 0$ and $f \in L_p(V)$ with $X = \|f\|^{W,L}_{s,q} < \infty$. Then
+$2^{js} \|\mathbf 1_W (k_j * f)\|_p \leq X$ for every $j$, the terms of the local extension
+satisfy $\|\eta_j * \mathbf 1_W (k_j * f)\|_p \leq 2 \|m\|_1 2^{-js} X$, the local extension
+$F = \sum_j \eta_j * \mathbf 1_W (k_j * f)$ converges in $L_p$ with
+$\|F\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} X$, and for $1 < p < \infty$ and $1 < q \leq \infty$,
+$\|F\|_{F^s_{p,q}} \leq C X$ with the constant $C$ of \Cref{thm:tl-local-means}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Each member of a sequence is at most its $\ell_q$ norm, so
+$2^{js} \|\mathbf 1_W (k_j * f)\|_p \leq X$ (\Cref{lem:mixed-norm-member}); the bounds of the
+terms and the convergence follow as in \Cref{thm:local-extension}, and
+\Cref{thm:tl-synthesis-dual} with $h_j = \mathbf 1_W (k_j * f)$ bounds $\|F\|_{F^s_{p,q}}$.
+\end{proof}
+
+\begin{theorem}[The local means of Triebel--Lizorkin type by the gradient]
+\label{thm:tl-local-means-gradient}
+\lean{Rd.LocalMeansBump.gradientConst, Rd.LocalMeansBump.gradientConst_ne_top,
+  Rd.LocalMeansBump.ae_lqNorm_le_of_hasWeakLineDeriv,
+  Rd.LocalMeansBump.eLpNorm_lqNorm_conv_divKernel_le,
+  Rd.LocalMeansBump.tlLocalNormOn_le_of_hasWeakLineDeriv, Rd.sum_mul_le_sum_mul_sum,
+  Rd.LocalMeansBump.patchConst, Rd.LocalMeansBump.patchConst_ne_top,
+  Rd.LocalMeansBump.tlLocalNormOn_le_patchConst}
+\leanok
+\uses{lem:local-means-gradient-point, def:tl-local-norm-on, lem:bump-divergence-identity,
+  thm:vector-valued-strong-type, def:cz-const, lem:local-means-on-sets, lem:lq-basic,
+  lem:countable-minkowski}
+Let $n \geq 1$, $1 < p < \infty$, $g$ a bump with the moment kernel $m$ of order two and the
+divergence kernels $K_i$, $W \subseteq V$ measurable, $T \subseteq V$ open, $f \in L_p(T)$ with
+weak derivatives $g_i = \partial_{e_i} f \in L_p(T)$ on $T$, and assume $x - y \in T$ for every
+$x \in W$, every $j \in \N$, every $i$ and every $y$ in the support of $(K_i)_{2^j}$. Then
+$F = \mathbf 1_T f \in L_p(V)$ satisfies
+\[
+  \|F\|^{W,2}_{1,2} \leq \|m\|_1 \|f\|_{L_p(T)} + 2 \sum_{i \in I} S_{V,p}(B_i, H_i)
+  \|g_i\|_{L_p(T)} ,
+\]
+hence
+\[
+  \|F\|^{W,2}_{1,2} \leq C_g \Bigl(\|f\|_{L_p(T)} + \sum_{i \in I} \|g_i\|_{L_p(T)}\Bigr) ,
+\]
+with the constants $S_{V,p}$ of \Cref{def:cz-const} and
+$C_g = \|m\|_1 + 2 \sum_i S_{V,p}(B_i, H_i)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Almost everywhere $\mathbf 1_W (k_j * F) = \mathbf 1_W (k_j * \mathbf 1_T f)$. Split off the term
+$j = 0$ (\Cref{lem:lq-basic}); for $x \in W$, \Cref{lem:local-means-gradient-point} bounds the
+other terms, and Minkowski's inequality in $\ell_2$ (\Cref{lem:countable-minkowski}) gives
+\[
+  \bigl\|(2^j |\mathbf 1_W (k_j * F)(x)|)_j\bigr\|_{\ell_2} \leq |\mathbf 1_W (k_0 * F)(x)|
+  + 2 \sum_i \bigl\|\bigl(((K_i)_{2^j} * \mathbf 1_T g_i)(x)\bigr)_j\bigr\|_{\ell_2}
+\]
+almost everywhere. The first term has $L_p$ norm at most $\|m\|_1 \|F\|_p$
+(\Cref{lem:local-means-on-sets}), and the analysis operators of the Calder\'on--Zygmund
+families $((K_i)_{2^j})_j$ are bounded by $S_{V,p}(B_i, H_i)$
+(\Cref{thm:vector-valued-strong-type}). Finally
+$\sum_i a_i b_i \leq (\sum_i a_i)(\sum_i b_i)$ for $a_i, b_i \in [0, \infty]$.
+\end{proof}
+
+\paragraph{Extensions from patches.}
+
+\begin{definition}[Bounded extensions]
+\label{def:extends-sobolev}
+\lean{Rd.ExtendsSobolev}
+\leanok
+\uses{def:weak-line-derivative}
+Let $O \subseteq V$ be open, $U \subseteq V$, $1 \leq p \leq \infty$ and $C \in [0, \infty]$.
+\emph{Sobolev functions on $O$ extend from $U$ with the constant $C$} if for every
+$f \in L_p(O)$ with weak derivatives $g_i = \partial_{e_i} f \in L_p(O)$ on $O$ there are
+$F \in \Sob{1}{p}(V)$ with $F = f$ almost everywhere on $U$ and weak derivatives
+$G_i = \partial_{e_i} F \in L_p(V)$ on $V$ with
+\[
+  \|F\|_p + \sum_{i \in I} \|G_i\|_p \leq C \Bigl(\|f\|_{L_p(O)} + \sum_{i \in I}
+  \|g_i\|_{L_p(O)}\Bigr) .
+\]
+\end{definition}
+
+\begin{lemma}[Bounded extensions on larger sets]
+\label{lem:extends-sobolev-mono}
+\lean{Rd.ExtendsSobolev.of_le}
+\leanok
+\uses{def:extends-sobolev, lem:weak-derivative-basic}
+For all open $T \subseteq O \subseteq V$, every $U \subseteq V$, every $1 \leq p \leq \infty$ and
+every $C \in [0, \infty]$: if Sobolev functions on $T$ extend from $U$ with the constant $C$, then
+Sobolev functions on $O$ extend from $U$ with the constant $C$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Weak derivatives on $O$ restrict to $T$ (\Cref{lem:weak-derivative-basic}), and
+$\|h\|_{L_p(T)} \leq \|h\|_{L_p(O)}$.
+\end{proof}
+
+\begin{theorem}[The extension from one patch]
+\label{thm:one-patch-extension}
+\lean{Rd.LocalMeansBump.extensionConst, Rd.LocalMeansBump.extensionConst_ne_top,
+  Rd.LocalMeansBump.extendsSobolev}
+\leanok
+\uses{thm:tl-local-means-gradient, lem:tl-local-extension, def:extends-sobolev,
+  thm:triebel-lizorkin-to-sobolev, thm:local-extension, lem:support-principle-two}
+Let $n \geq 1$, $1 < p < \infty$, $g$ a bump with the dual kernels $\eta_j$ of order two and the
+divergence kernels $K_i$, let $U, W \subseteq V$ be measurable and $T \subseteq V$ open with
+$U \subseteq T$, $x - y \in W$ for every $x \in U$, every $j$ and every $y$ with
+$\eta_j(y) \neq 0$, and $x - y \in T$ for every $x \in W$, every $j$, every $i$ and every $y$ in
+the support of $(K_i)_{2^j}$. Then Sobolev functions on $T$ extend from $U$ with the constant
+$\bigl(2 \|m\|_1 (1 - 2^{-1})^{-1} + (\sum_i D_{p, e_i}) A\bigr) C_g$, where $A$ is the constant
+$C$ of \Cref{thm:tl-local-means} for $L = 2$, $q = 2$, $s = 1$, $D_{p,e_i}$ the constants of
+\Cref{thm:triebel-lizorkin-to-sobolev}, and $C_g$ that of \Cref{thm:tl-local-means-gradient}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $F_0 = \mathbf 1_T f \in L_p(V)$ and $F = \sum_j \eta_j * \mathbf 1_W (k_j * F_0)$. By
+\Cref{thm:tl-local-means-gradient} and \Cref{lem:tl-local-extension}, $F$ converges, lies in
+$\TL{1}{p}{2}$ and its $L_p$ and $F^1_{p,2}$ norms are bounded by the right side; $F$ lies in
+$\Sob{1}{p}(V)$ with $\|\partial_{e_i} F\|_p \leq D_{p,e_i} \|F\|_{F^1_{p,2}}$
+(\Cref{thm:triebel-lizorkin-to-sobolev}). On $U$ the terms are those of the reproducing formula
+(\Cref{lem:support-principle-two}, as in \Cref{thm:local-extension}), so $F = F_0 = f$ almost
+everywhere on $U$.
+\end{proof}
+
+\paragraph{Pasting in $\Sob{1}{p}(V)$.}
+
+\begin{lemma}[The product rule in $L_p$]
+\label{lem:product-rule-lp}
+\lean{Rd.hasWeakLineDeriv_mulLp, Rd.MemSobolev.mulLp}
+\leanok
+\uses{lem:weak-derivative-product, lem:product-modulus, lem:weak-derivative-basic}
+Let $1 \leq p \leq \infty$, $w \in V$, $F, G \in L_p(V)$ with $G = \partial_w F$ weakly on $V$,
+and $\chi$ a smooth real function with $\chi$ and $\partial_w \chi$ bounded. Then
+$\chi G + (\partial_w \chi) F = \partial_w (\chi F)$ weakly on $V$, with the products in
+$L_p(V)$. For every $F \in \Sob{1}{p}(V)$ and every smooth real $\chi$ with compact support,
+$\chi F \in \Sob{1}{p}(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:weak-derivative-product} for the representatives, and
+\Cref{lem:weak-derivative-basic}. A smooth function with compact support is bounded with all its
+derivatives.
+\end{proof}
+
+\begin{theorem}[Pasting bounded extensions]
+\label{thm:pasting-sobolev}
+\lean{Rd.pasting_bound, Rd.extendsSobolev_of_cover}
+\leanok
+\uses{def:extends-sobolev, lem:product-rule-lp, lem:resolution-of-unity, lem:product-modulus,
+  lem:weak-derivative-basic}
+Let $O \subseteq V$ be open, $1 \leq p \leq \infty$, and $(U_k)_{k \in \kappa}$ a finite family of
+bounded open sets covering the closure of $O$. If for every $k$ Sobolev functions on $O$ extend
+from $O \cap U_k$ with a finite constant $C_k$, then Sobolev functions on $O$ extend from $O$
+with a finite constant.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $(\psi_k)$ be a smooth resolution of unity on the closure of $O$ subordinate to $(U_k)$
+(\Cref{lem:resolution-of-unity}), with $|\psi_k| \leq a_k$ and $|\partial_{e_i} \psi_k| \leq
+d_{k,i}$. For $f$ and its extensions $F_k$ with weak derivatives $G_{k,i}$, the function
+$F = \sum_k \psi_k F_k$ equals $\sum_k \psi_k f = f$ almost everywhere on $O$, since
+$\psi_k = 0$ outside $U_k$; it lies in $\Sob{1}{p}(V)$ with the weak derivatives
+$G_i = \sum_k (\psi_k G_{k,i} + (\partial_{e_i} \psi_k) F_k)$ (\Cref{lem:product-rule-lp}), and
+\[
+  \|F\|_p + \sum_i \|G_i\|_p \leq \sum_k \Bigl(a_k + \sum_i d_{k,i}\Bigr)
+  \Bigl(\|F_k\|_p + \sum_i \|G_{k,i}\|_p\Bigr) ,
+\]
+which is at most $\sum_k (a_k + \sum_i d_{k,i}) C_k Y$ with
+$Y = \|f\|_{L_p(O)} + \sum_i \|g_i\|_{L_p(O)}$.
+\end{proof}
+
+\paragraph{The extension theorem.}
+
+\begin{lemma}[Supports of the dilated divergence kernels]
+\label{lem:divergence-kernel-supports}
+\lean{Rd.LocalMeansBump.exists_momentKernel_ne_zero_of_divKernel_ne_zero,
+  Rd.LocalMeansBump.tsupport_dilate_divKernel_subset,
+  Rd.LocalMeansBump.tsupport_dilate_divKernel_subset_closedBall,
+  Rd.LipschitzGraph.tsupport_dilate_divKernel_subset, Rd.LipschitzGraph.patch_support_divKernel}
+\leanok
+\uses{def:bump-divergence-kernels, lem:graph-cone, def:cone-supported, lem:patches}
+Let $g$ be a bump of radius $R$ with the divergence kernels $K_i$. For every $i$ and every
+$j \in \N$ the support of $(K_i)_{2^j}$ lies in $\bar B(0, 2R)$. If $g$ is supported in $-K$ for a
+Lipschitz graph domain $\Omega$ with the closed cone $\bar K$ (\Cref{lem:graph-cone}), the support
+of $(K_i)_{2^j}$ lies in $\{y : -y \in \bar K, \|y\| \leq 2R\}$, and for every
+$\varepsilon \geq 2R$,
+every $\rho$ and every $c \in V$, $x - y \in \Omega \cap B(c, \rho)$ for every
+$x \in \Omega \cap B(c, \rho - \varepsilon)$ and every $y$ in the support of $(K_i)_{2^j}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$K_i(y) \neq 0$ only if $m(t y) \neq 0$ for some $t \in [1, 2]$, so $\|y\| \leq \|t y\| \leq 2R$,
+and $-t y \in K$ if $g$ is supported in $-K$, so $-y \in \bar K$. These sets are closed and
+contain $y$ whenever they contain $c y$ for some $c \geq 1$, so they contain the supports of the
+dilates. Finally $\Omega + \bar K \subseteq \Omega$ (\Cref{lem:graph-cone}) and
+$\|x - y - c\| < \rho - \varepsilon + 2R \leq \rho$.
+\end{proof}
+
+\begin{lemma}[The patches of a bounded Lipschitz domain]
+\label{lem:sobolev-patches}
+\lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary,
+  Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior}
+\leanok
+\uses{thm:one-patch-extension, lem:divergence-kernel-supports, lem:patches,
+  lem:bumps-every-radius, lem:cone-bump, def:bounded-lipschitz, lem:extends-sobolev-mono}
+Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$ with boundary balls
+$B(c_j, \rho_j)$. For every $1 < p < \infty$, every $\varepsilon > 0$, every $\delta > 0$ and
+every $j$, Sobolev functions on $\Omega$ extend with finite constants from
+$\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$ and from
+$\{x \in \Omega : \dist(x, V \setminus \Omega) > 2 \delta\}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For the boundary patch take the cone bump of the graph
+domain $\Omega_j$ rescaled to a radius $R$ with $2R \leq \varepsilon$ (\Cref{lem:cone-bump},
+\Cref{lem:bumps-every-radius}), $U = \Omega_j \cap B(c_j, \rho_j - 2\varepsilon)$,
+$W = \Omega_j \cap B(c_j, \rho_j - \varepsilon)$ and $T = \Omega_j \cap B(c_j, \rho_j)
+= \Omega \cap B(c_j, \rho_j)$; the dual kernels satisfy the support condition by
+\Cref{lem:patches} and the divergence kernels by \Cref{lem:divergence-kernel-supports}. For the
+inner patch take the centred bump of radius $\delta/2$ and $T = \Omega$. In both cases
+\Cref{thm:one-patch-extension} applies, and \Cref{lem:extends-sobolev-mono} passes from $T$ to
+$\Omega$.
+\end{proof}
+
+\begin{theorem}[The extension theorem]
+\label{thm:sobolev-extension}
+\lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev,
+  Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton,
+  Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev,
+  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev}
+\leanok
+\uses{lem:sobolev-patches, thm:pasting-sobolev, lem:bounded-lipschitz-geometry,
+  def:extends-sobolev, lem:weak-derivative-basic}
+For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$ and every $1 < p < \infty$
+there is $C < \infty$ such that for every $f \in L_p(\Omega)$ with weak derivatives
+$g_i = \partial_{e_i} f \in L_p(\Omega)$ on $\Omega$ there are $F \in \Sob{1}{p}(V)$ with $F = f$
+almost everywhere on $\Omega$ and weak derivatives $G_i = \partial_{e_i} F \in L_p(V)$ on $V$
+with
+\[
+  \|F\|_p + \sum_{i \in I} \|G_i\|_p \leq C \Bigl(\|f\|_{L_p(\Omega)} + \sum_{i \in I}
+  \|g_i\|_{L_p(\Omega)}\Bigr) .
+\]
+For every bounded Lipschitz domain $\Omega$ in $V$ of any dimension, every $1 < p < \infty$ and
+every $f \colon V \to \C$, $f \in \Sob{1}{p}(\Omega)$ if and only if $f = F$ almost everywhere on
+$\Omega$ for some $F \in \Sob{1}{p}(V)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:bounded-lipschitz-geometry} the boundary is covered by the balls
+$B(c_j, \rho_j - 2\varepsilon)$ for some $\varepsilon > 0$, and the points of $\Omega$ outside
+them have distance more than $2\delta$ from $V \setminus \Omega$ for some $\delta > 0$. These sets
+cover the closure of $\Omega$; \Cref{lem:sobolev-patches} and \Cref{thm:pasting-sobolev} give the
+first claim. For the second, the weak derivatives of $F \in \Sob{1}{p}(V)$ restrict to $\Omega$
+(\Cref{lem:weak-derivative-basic}); conversely the first claim gives $F$ for $n \geq 1$, and for
+$n = 0$ the open set $\Omega$ is empty, where $F = 0$ serves, or all of $V$, where $F = f$
+serves.
+\end{proof}
+
+\begin{corollary}[$H^1(\Omega) = \Sob{1}{2}(\Omega)$]
+\label{cor:sobolev-extension-two}
+\lean{Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev,
+  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_restrictL2}
+\leanok
+\uses{thm:sobolev-extension, def:sobolev-lipschitz-domain, thm:sobolev-restriction-lipschitz}
+For every bounded Lipschitz domain $\Omega$ and every $f \in L_2(V)$, the following are
+equivalent: $f$ lies in the restriction space $H^1(\Omega)$ of
+\Cref{def:sobolev-lipschitz-domain}; $f \in \Sob{1}{2}(\Omega)$; the restriction of $f$ to
+$\Omega$ is $u|_\Omega$ for some $u$ in the Hilbert space $H^1(\Omega)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:sobolev-extension} for $p = 2$ and \Cref{thm:sobolev-restriction-lipschitz}.
+\end{proof}
+
+\begin{corollary}[The boundary traces of $\Sob{1}{2}(\Omega)$]
+\label{cor:weak-sobolev-trace}
+\lean{Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memWeakSobolev,
+  Rd.BoundedLipschitzDomain.isBoundaryTrace_unique_of_memWeakSobolev}
+\leanok
+\uses{cor:sobolev-extension-two, thm:sobolev-lipschitz-domain-trace}
+For every bounded Lipschitz domain $\Omega$, every resolution of unity $\psi$ on $\Gamma$ and
+every $f \in L_2(V)$ with $f \in \Sob{1}{2}(\Omega)$, there is a boundary trace
+$g \in B^{1/2}_{2,2}(\Gamma)$ of $f$, and every two boundary traces of $f$ agree almost everywhere
+on $\Gamma$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+By \Cref{cor:sobolev-extension-two}, $f \in H^1(\Omega)$, and
+\Cref{thm:sobolev-lipschitz-domain-trace} applies.
+\end{proof}
+
+\begin{corollary}[Rellich's theorem in $\Sob{1}{2}(\Omega)$]
+\label{cor:rellich-weak-sobolev}
+\lean{Rd.sq_norm_add_sum_sq_le, Rd.BoundedLipschitzDomain.exists_subseq_tendsto_of_memWeakSobolev}
+\leanok
+\uses{thm:sobolev-extension, cor:rellich-weak-gradient}
+For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$, every $M < \infty$ and all
+$f_k \in L_2(\Omega)$ with weak derivatives $g_{k,i} = \partial_{e_i} f_k \in L_2(\Omega)$ on
+$\Omega$ and $\|f_k\|_{L_2(\Omega)} + \sum_i \|g_{k,i}\|_{L_2(\Omega)} \leq M$ for every
+$k \in \N$, some subsequence of $(f_k)$ converges in $L_2(\Omega)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+The extensions $F_k$ of \Cref{thm:sobolev-extension} satisfy
+$\|F_k\|_2 + \sum_i \|G_{k,i}\|_2 \leq C M$, hence
+$\|F_k\|_2^2 + \sum_i \|G_{k,i}\|_2^2 \leq (C M)^2$, and \Cref{cor:rellich-weak-gradient} gives
+a subsequence whose restrictions to $\Omega$ converge in $L_2(\Omega)$; they are the $f_k$.
+\end{proof}
+
+\begin{corollary}[The quotient norm of $H^1(\Omega)$]
+\label{cor:sobolev-quotient-norm}
+\lean{Rd.BoundedLipschitzDomain.exists_norm_le_restrictL2}
+\leanok
+\uses{thm:sobolev-extension, lem:sobolev-one-weak-gradient-norm, prop:sobolev-restriction-l2,
+  def:sobolev-restriction-space, thm:sobolev-one-two}
+For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$ there is $C$ such that for
+every $u$ in the Hilbert space $H^1(\Omega)$ and all $g_i \in L_2(\Omega)$ that are weak
+derivatives $\partial_{e_i}$ of the $L_2$ function of $u$ on $\Omega$,
+\[
+  \|u\|_{H^1(\Omega)} \leq C \Bigl(\|u|_\Omega\|_{L_2(\Omega)} + \sum_{i \in I}
+  \|g_i\|_{L_2(\Omega)}\Bigr) .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+The extension $F$ of $u|_\Omega$ (\Cref{thm:sobolev-extension}) is an element $U$ of $H^1(V)$
+(\Cref{thm:sobolev-one-two}) whose restriction to $\Omega$ is $u$, since both have the same
+restriction to $L_2(\Omega)$ and that map is injective (\Cref{prop:sobolev-restriction-l2}). The
+norm of $u$ is at most $\|U\| \leq \|F\|_2 + \sum_i \|G_i\|_2$
+(\Cref{lem:sobolev-one-weak-gradient-norm}).
+\end{proof}
+
+With \Cref{prop:sobolev-restriction-weak-gradient}, the quotient norm of $H^1(\Omega)$ and the
+norm of $\Sob{1}{2}(\Omega)$ are equivalent on bounded Lipschitz domains.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

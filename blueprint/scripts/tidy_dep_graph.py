@@ -130,7 +130,9 @@ BLOCKS: list[tuple[str, list]] = [
                "Duality of Sobolev spaces on open sets",
                "The trace space of a bounded Lipschitz domain",
                "The area formula for Lipschitz graphs",
-               "The surface measure of a bounded Lipschitz domain"])]),
+               "The surface measure of a bounded Lipschitz domain",
+               "Divergence kernels",
+               "The extension theorem for Sobolev spaces"])]),
     ("Vector-valued singular integrals", [
         (SOB, [r'Dilation families and the H\"ormander condition',
                "The adjoint of a convolution", "Plancherel bounds",

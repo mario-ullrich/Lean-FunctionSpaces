@@ -15,7 +15,8 @@ public import Mathlib.MeasureTheory.Integral.Lebesgue.DominatedConvergence
 # Approximate identities in `L_p`
 
 The **dilation** `Φ_c(x) = c^n Φ(c x)`, `n = dim V`, keeps the integral and the `L_1` norm of `Φ`
-(`Rd.integral_dilate`, `Rd.eLpNorm_dilate_one`), and the convolution with `Φ_c` averages `f` over
+(`Rd.integral_dilate`, `Rd.eLpNorm_dilate_one`) and compact supports
+(`Rd.hasCompactSupport_dilate`), and the convolution with `Φ_c` averages `f` over
 the shifts `c^(-1) z` weighted by `Φ(z)`: `(Φ_c ⋆ f)(x) = ∫ Φ(z) f(x - c^(-1) z) dz`
 (`Rd.conv_dilate_apply`, Mathlib's `Measure.integral_comp_smul`).
 
@@ -33,6 +34,9 @@ reads `Φ_{c_i} ⋆ f → f` in `L_p` along any dilation factors `c_i → ∞`
 
 **At points of continuity** (`Rd.conv_dilate_near`): for `Φ` vanishing outside a ball,
 `(Φ_{2^J} ⋆ F_J)(z) → z₀` as `J → ∞` and `z → y` whenever `F_J(z) → z₀` as `J → ∞` and `z → y`.
+
+**First moments of dilates** (`Rd.integral_inner_mul_dilate`): `∫ ⟪w, x⟫ Φ_c(x) dx` is `c⁻¹` times
+the first moment of `Φ`, since `⟪w, x⟫ Φ_c(x) = c⁻¹ (⟪w, ·⟫ Φ)_c(x)` (`Rd.inner_mul_dilate_eq`).
 -/
 
 @[expose] public section
@@ -82,6 +86,12 @@ noncomputable def dilate (c : ℝ) (Φ : V → ℂ) (x : V) : ℂ :=
 theorem integrable_dilate {Φ : V → ℂ} (hΦ : Integrable Φ μ) {c : ℝ} (hc : c ≠ 0) :
     Integrable (dilate c Φ) μ :=
   (hΦ.comp_smul hc).const_mul _
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- Dilates of compactly supported functions have compact support. -/
+theorem hasCompactSupport_dilate {K : V → ℂ} (hK : HasCompactSupport K) {c : ℝ} (hc : c ≠ 0) :
+    HasCompactSupport (dilate c K) :=
+  (hK.comp_homeomorph (Homeomorph.smulOfNeZero c hc)).mul_left
 
 /-- **The dilation keeps the integral**: `∫ Φ_c = ∫ Φ` for `c > 0` (Mathlib's
 `Measure.integral_comp_smul`). -/
@@ -401,5 +411,26 @@ theorem conv_dilate_near {Φ : V → ℂ} (hΦ : Integrable Φ) (h1 : ∫ x, Φ 
     _ < ε := by
         rw [div_lt_iff₀ (by positivity)]
         nlinarith
+
+/-! ### First moments of dilates -/
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- `⟪w, x⟫ m_c(x) = c⁻¹ (⟪w, ·⟫ m)_c(x)` for `c ≠ 0`. -/
+theorem inner_mul_dilate_eq (m : V → ℂ) (w : V) {c : ℝ} (hc : c ≠ 0) (x : V) :
+    (inner ℝ w x : ℂ) * dilate c m x =
+      ((c⁻¹ : ℝ) : ℂ) * dilate c (fun y => (inner ℝ w y : ℂ) * m y) x := by
+  have hc0 : (c : ℂ) ≠ 0 := by exact_mod_cast hc
+  simp only [dilate, inner_smul_right, Complex.ofReal_mul, Complex.ofReal_inv]
+  field_simp
+
+/-- **First moments of a dilate**: `∫ ⟪w, x⟫ m_c(x) dx = c⁻¹ ∫ ⟪w, x⟫ m(x) dx` for `c > 0`
+and every additive Haar measure, since `⟪w, x⟫ m_c(x) = c⁻¹ (⟪w, ·⟫ m)_c(x)`
+(`Rd.inner_mul_dilate_eq`, `Rd.integral_dilate`). -/
+theorem integral_inner_mul_dilate {μ : Measure V} [μ.IsAddHaarMeasure] (m : V → ℂ) (w : V) {c : ℝ}
+    (hc : 0 < c) :
+    ∫ x, (inner ℝ w x : ℂ) * dilate c m x ∂μ =
+      ((c⁻¹ : ℝ) : ℂ) * ∫ x, (inner ℝ w x : ℂ) * m x ∂μ := by
+  simp_rw [inner_mul_dilate_eq m w hc.ne']
+  rw [integral_const_mul, integral_dilate _ hc]
 
 end Rd

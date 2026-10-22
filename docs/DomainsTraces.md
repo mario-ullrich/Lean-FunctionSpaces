@@ -165,11 +165,11 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| Lipschitz graph domains: cone, cone bump, support principle | ✅ | ✗ | `Rd/LipschitzGraph` |
+| Lipschitz graph domains: cone and closed cone, cone bump, support principle | ✅ | ✗ | `Rd/LipschitzGraph` |
 | Rychkov's extension, restrictions to Lipschitz graph domains by intrinsic local means | ✅ | ✗ | `Rd/RychkovExtension` |
 | Restrictions to Lipschitz graph domains by intrinsic differences | ✅ | ✗ | `Rd/LipschitzGraphBesov` |
-| Local versions of Rychkov's extension: boundary and inner patches | ✅ | ✗ | `Rd/LocalExtension` |
-| Bounded Lipschitz domains: restrictions by intrinsic differences | ✅ | ✗ | `Rd/BoundedLipschitz` |
+| Local versions of Rychkov's extension: boundary and inner patches, short steps into the closed cone, absolute convergence from bounds of the weighted local means, agreement on the patch for every convergent local extension | ✅ | ✗ | `Rd/LocalExtension` |
+| Bounded Lipschitz domains: the patches covering the closure, restrictions by intrinsic differences | ✅ | ✗ | `Rd/BoundedLipschitz` |
 | The half-space and the models of manifolds as Besov domains | ✅ | ✗ | `Rd/HalfSpace` |
 | Traces of every order on the half-space: trace theorem, extension, trace space | ✅ | ✗ | `Rd/HalfSpaceTrace` |
 | Graph map of a Lipschitz graph domain, restrictions of atoms to the graph | ✅ | ✗ | `Rd/GraphParametrization` |

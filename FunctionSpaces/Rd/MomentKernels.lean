@@ -31,6 +31,9 @@ instead. If `g` vanishes outside the ball of radius `R`, then
 `‖f - m_c ⋆ f‖_p ≤ ‖g‖_1 ω_L(f, R/c)_p` (`Rd.enorm_sub_convLp_momentKernel_le`), and if the steps
 `-c^(-1) z`, `g(z) ≠ 0`, take a set `U` into a set `T`, then
 `‖1_U (f - m_c ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, R/c, T)_p` (`Rd.eLpNorm_indicator_sub_convLp_momentKernel_le`).
+
+In an inner product space the moment kernel of order two `m = 2 g - g_{1/2}` has vanishing first
+moments, `∫ ⟪w, x⟫ m(x) dx = 0` (`Rd.integral_inner_mul_momentKernel_two`).
 -/
 
 @[expose] public section
@@ -309,5 +312,36 @@ theorem enorm_sub_convLp_momentKernel_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp :
   have h := eLpNorm_indicator_sub_convLp_momentKernel_le hp hg h1 hgR L hc MeasurableSet.univ
     (T := Set.univ) (fun _ _ => by rw [stepSet_univ]) f
   rwa [Set.indicator_univ, modulusOn_univ, ← Lp.enorm_def] at h
+
+end Rd
+
+namespace Rd
+
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+  [MeasurableSpace V] [BorelSpace V] {μ : Measure V} [μ.IsAddHaarMeasure]
+
+/-! ### First moments of the moment kernels of order two -/
+
+/-- **The moment kernel of order two has vanishing first moments**: for
+`m = 2 g - g_{1/2}` (`Rd.momentKernel g 2`) and every `w`, `∫ ⟪w, x⟫ m(x) dx = 0`, since the first
+moment of `g_c` is `c⁻¹` times that of `g` (`Rd.integral_inner_mul_dilate`). -/
+theorem integral_inner_mul_momentKernel_two {g : V → ℂ} (w : V)
+    (hg : Integrable (fun x => (inner ℝ w x : ℂ) * g x) μ) :
+    ∫ x, (inner ℝ w x : ℂ) * momentKernel g 2 x ∂μ = 0 := by
+  have hint : ∀ {c : ℝ}, c ≠ 0 → Integrable (fun x => (inner ℝ w x : ℂ) * dilate c g x) μ :=
+    fun hc => by
+      simp_rw [inner_mul_dilate_eq g w hc]
+      exact (integrable_dilate hg hc).const_mul _
+  have hpt : ∀ x, (inner ℝ w x : ℂ) * momentKernel g 2 x =
+      2 * ((inner ℝ w x : ℂ) * dilate 1 g x) - (inner ℝ w x : ℂ) * dilate (1 / 2) g x :=
+    fun x => by
+      simp [momentKernel, Finset.sum_range_succ, jacksonCoeff, one_add_one_eq_two]
+      ring
+  simp_rw [hpt]
+  rw [integral_sub ((hint one_ne_zero).const_mul _) (hint (by norm_num)), integral_const_mul,
+    integral_inner_mul_dilate g w one_pos,
+    integral_inner_mul_dilate g w (by norm_num : (0 : ℝ) < 1 / 2)]
+  push_cast
+  ring
 
 end Rd

@@ -130,7 +130,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The Calderón–Zygmund decomposition on dyadic cubes | ✅ | ✗ | `Rd/CalderonZygmund` |
 | The Fefferman–Stein inequality | ✅ | ✗ | `Rd/FeffermanStein` |
 | Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/KernelMajorants` |
-| Local means characterisation of Triebel–Lizorkin spaces | ✅ | ✗ | `Rd/TriebelLizorkinLocalMeans` |
+| Local means characterisation of Triebel–Lizorkin spaces, and synthesis with the dual kernels in `F^s_{p,q}` | ✅ | ✗ | `Rd/TriebelLizorkinLocalMeans` |
 | Characterisation by ball means of differences | ✅ | ✗ | `Rd/TriebelLizorkinDifferences` |
 | `f^s_{p,q}`, atomic analysis, synthesis, characterisation | ✅ | ✗ | `Rd/TriebelLizorkinAtoms` |
 | Triebel–Lizorkin spaces on the torus, the Besov sandwich | ✅ | ✗ | `Torus/TriebelLizorkin` |

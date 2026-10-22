@@ -31,7 +31,10 @@ convolution `(K ⋆ f)(x) = ∫ K(y) f(x - y) dy` (`Rd.conv`) and `K^∨(x) = K(
   of `∂^w η` (`Rd.iteratedLineDerivOp_shiftReflect`).
 * **Weak derivatives commute with convolution**: if `g ∈ L_r` is the weak derivative `∂^v f` of
   `f ∈ L_p` on `V`, `1 ≤ p, r ≤ ∞`, then `η ⋆ g = (∂^v η) ⋆ f` at every point
-  (`Rd.conv_eq_conv_iteratedLineDerivOp`), and `∂^v (η ⋆ f) = (∂^v η) ⋆ f` weakly for
+  (`Rd.conv_eq_conv_iteratedLineDerivOp`); locally, if `∂^v f = g` weakly on an open set `Ω`
+  and `η` has compact support with `x - supp η ⊆ Ω`, then `(η ⋆ g)(x) = ((∂^v η) ⋆ f)(x)`
+  (`Rd.conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv`); and
+  `∂^v (η ⋆ f) = (∂^v η) ⋆ f` weakly for
   `f ∈ L_p`, `1 ≤ p < ∞` (`Rd.hasWeakLineDeriv_conv`).
 -/
 
@@ -362,5 +365,45 @@ theorem hasWeakLineDeriv_toLp_conv {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ 
       (memLp_conv hp1 hp (∂^{v} η : 𝓢(V, ℂ)).integrable hf).toLp := by
   refine (hasWeakLineDeriv_conv hp1 hp hf η v).congr_ae ?_ ?_ <;> rw [volume_restrict_top]
   exacts [(MemLp.coeFn_toLp _).symm, (MemLp.coeFn_toLp _).symm]
+
+/-! ### Weak derivatives on open sets and convolution -/
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- The reflected translate `y ↦ η(x - y)` is `η` composed with the homeomorphism `y ↦ x - y`. -/
+theorem coe_shiftReflect_eq_comp (η : 𝓢(V, ℂ)) (x : V) :
+    (shiftReflect η x : V → ℂ) = (η : V → ℂ) ∘ Homeomorph.subLeft x :=
+  funext fun y => by simp
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- The reflected translate of a compactly supported Schwartz function has compact support. -/
+theorem hasCompactSupport_shiftReflect {η : 𝓢(V, ℂ)} (hη : HasCompactSupport (η : V → ℂ))
+    (x : V) : HasCompactSupport (shiftReflect η x : V → ℂ) := by
+  rw [coe_shiftReflect_eq_comp]
+  exact hη.comp_homeomorph _
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- The support of the reflected translate `y ↦ η(x - y)` lies in `S` if `x - y ∈ S` for every
+`y` in the support of `η`. -/
+theorem tsupport_shiftReflect_subset {η : 𝓢(V, ℂ)} {x : V} {S : Set V}
+    (hS : ∀ y ∈ tsupport (η : V → ℂ), x - y ∈ S) : tsupport (shiftReflect η x : V → ℂ) ⊆ S := by
+  rw [coe_shiftReflect_eq_comp, tsupport_comp_eq_preimage]
+  intro z hz
+  simpa using hS _ hz
+
+/-- **Weak derivatives commute with convolution, locally**: if `g = ∂^v f` weakly on an open set
+`Ω` and `η` is a compactly supported Schwartz function with `x - y ∈ Ω` for every `y` in the
+support of `η`, then `(η ⋆ g)(x) = ((∂^v η) ⋆ f)(x)`: the reflected translate `y ↦ η(x - y)` is a
+complex test function on `Ω` (`Rd.HasWeakLineDeriv.integral_mul_eq`,
+`Rd.iteratedLineDerivOp_shiftReflect`). -/
+theorem conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv {Ω : Opens V} {k : ℕ}
+    {v : Fin k → V} {f g : V → ℂ} (h : HasWeakLineDeriv Ω v f g) {η : 𝓢(V, ℂ)}
+    (hη : HasCompactSupport (η : V → ℂ)) {x : V} (hx : ∀ y ∈ tsupport (η : V → ℂ), x - y ∈ Ω) :
+    conv η g volume x = conv (∂^{v} η : 𝓢(V, ℂ)) f volume x := by
+  rw [conv_eq_integral_shiftReflect, conv_eq_integral_shiftReflect,
+    h.integral_mul_eq _ (hasCompactSupport_shiftReflect hη x) (tsupport_shiftReflect_subset hx),
+    iteratedLineDerivOp_shiftReflect]
+  simp only [smul_apply, smul_eq_mul, mul_assoc]
+  rw [integral_const_mul, ← mul_assoc, ← mul_pow]
+  simp
 
 end Rd

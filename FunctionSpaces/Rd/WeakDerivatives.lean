@@ -23,12 +23,16 @@ the distribution `φ ↦ ∫ φ f` on `Ω` (Mathlib's `Distribution.ofFun`, test
   `Distribution.iteratedLineDerivOp_apply_apply`). They are unique almost everywhere on `Ω`,
   linear, local (`Rd.HasWeakLineDeriv.mono`), vanish where `f` vanishes
   (`Rd.HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero`), additive over finite sums
-  (`Rd.HasWeakLineDeriv.sum`), classical on Schwartz functions
+  (`Rd.HasWeakLineDeriv.sum`), tested also by smooth compactly supported complex functions
+  (`Rd.HasWeakLineDeriv.integral_mul_eq`), satisfy the product rule with smooth real functions
+  (`Rd.HasWeakLineDeriv.mul_contDiff`, through the test functions `Rd.testFunctionMul`),
+  are classical on Schwartz functions
   (`Rd.hasWeakLineDeriv_schwartz`), and pass to limits in `L_p(Ω)`
   (`Rd.HasWeakLineDeriv.of_tendsto`).
 * **Sobolev spaces**: `Rd.MemWeakSobolev Ω m p f` says that `f` and all its weak derivatives of
   order at most `m` lie in `L_p(Ω)`; `Rd.MemSobolev m f` is the case `Ω = V` for `f ∈ L_p(V)`,
-  with the weak derivatives as classes in `L_p(V)` (`Rd.memSobolev_iff_exists_hasWeakLineDeriv`).
+  with the weak derivatives as classes in `L_p(V)` (`Rd.memSobolev_iff_exists_hasWeakLineDeriv`),
+  closed under finite sums (`Rd.MemSobolev.sum`).
 * **The bridge to tempered distributions** (`Rd.hasWeakLineDeriv_top_iff`): for `f ∈ L_p(V)`,
   `g ∈ L_r(V)`, the weak derivative on `V` is the derivative of tempered distributions,
   `∂^v f = g` in `𝓢'(V, ℂ)`, since a tempered distribution that vanishes on all test functions
@@ -188,6 +192,99 @@ theorem HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero {O : Opens V} (h : HasWeakLine
     g =ᵐ[volume.restrict (O : Set V)] 0 :=
   ((h.mono hO).congr_ae hf EventuallyEq.rfl).unique hasWeakLineDeriv_zero
 
+/-- **The integral form with complex test functions**: if `g = ∂^v f` weakly on `Ω`, then
+`∫ w g = (-1)^k ∫ (∂^v w) f` for every smooth compactly supported complex `w` (a Schwartz function)
+with `tsupport w ⊆ Ω`, by splitting `w = Re w + i Im w` into real test functions
+(`Rd.exists_testSchwartz_eq_of_tsupport_subset`). -/
+theorem HasWeakLineDeriv.integral_mul_eq (h : HasWeakLineDeriv Ω v f g) (w : 𝓢(V, ℂ))
+    (hw : HasCompactSupport w) (hwΩ : tsupport w ⊆ Ω) :
+    ∫ x, w x * g x = (-1 : ℂ) ^ k * ∫ x, (∂^{v} w : 𝓢(V, ℂ)) x * f x := by
+  obtain ⟨a, b, rfl⟩ := exists_testSchwartz_eq_of_tsupport_subset w hw hwΩ
+  have hc : ∀ (φ : 𝓓(Ω, ℝ)) (u : V → ℂ), (fun x => ((φ x : ℝ) : ℂ) * u x) =
+      fun x => φ x • u x := fun φ u => funext fun x => (Complex.real_smul ..).symm
+  have hsplit : ∀ (φ ψ : 𝓓(Ω, ℝ)) (u : V → ℂ), LocallyIntegrableOn u Ω volume →
+      ∫ x, (testSchwartz φ + Complex.I • testSchwartz ψ) x * u x =
+        (∫ x, φ x • u x) + Complex.I * ∫ x, ψ x • u x := fun φ ψ u hu => by
+    have h1 := φ.integrable_smul hu
+    have h2 := (ψ.integrable_smul hu).const_mul Complex.I
+    rw [← integral_const_mul, ← integral_add h1 h2]
+    refine integral_congr_ae (ae_of_all _ fun x => ?_)
+    simp only [add_apply, smul_apply, testSchwartz_apply, smul_eq_mul,
+      Complex.real_smul]
+    ring
+  rw [LineDeriv.iteratedLineDerivOp_add, LineDeriv.iteratedLineDerivOp_smul,
+    iteratedLineDerivOp_testSchwartz, iteratedLineDerivOp_testSchwartz, hsplit a b g h.2,
+    hsplit _ _ f h.1, h.integral_eq a, h.integral_eq b]
+  simp only [Complex.real_smul, Complex.ofReal_pow, Complex.ofReal_neg, Complex.ofReal_one]
+  ring
+
+/-- The product `φ χ` of a real test function `φ` on `Ω` with a smooth real function `χ` is a test
+function on `Ω`. -/
+noncomputable def testFunctionMul (φ : 𝓓(Ω, ℝ)) {χ : V → ℝ}
+    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) : 𝓓(Ω, ℝ) :=
+  ⟨fun x => φ x * χ x, φ.contDiff.mul hχ, φ.hasCompactSupport.mul_right,
+    (tsupport_mul_subset_left).trans φ.tsupport_subset⟩
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- The values of `Rd.testFunctionMul`: `(φ χ)(x) = φ(x) χ(x)`. -/
+theorem testFunctionMul_apply (φ : 𝓓(Ω, ℝ)) {χ : V → ℝ}
+    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (x : V) :
+    testFunctionMul φ hχ x = φ x * χ x :=
+  rfl
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **The product rule for test functions**: `∂_w (φ χ) = (∂_w φ) χ + φ ∂_w χ`. -/
+theorem lineDerivOp_testFunctionMul_apply (φ : 𝓓(Ω, ℝ)) {χ : V → ℝ}
+    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (w x : V) :
+    (∂_{w} (testFunctionMul φ hχ)) x = (∂_{w} φ) x * χ x + φ x * fderiv ℝ χ x w := by
+  have hφ : DifferentiableAt ℝ φ x := (φ.contDiff.differentiable (by simp)).differentiableAt
+  have hχx : DifferentiableAt ℝ χ x := (hχ.differentiable (by simp)).differentiableAt
+  rw [lineDerivOp_testFunction_apply, lineDerivOp_testFunction_apply]
+  change fderiv ℝ (fun y => φ y * χ y) x w = _
+  rw [fderiv_fun_mul hφ hχx]
+  simp only [add_apply, smul_apply, smul_eq_mul]
+  ring
+
+/-- **The product rule for weak derivatives**: if `g = ∂_w f` weakly on `Ω` and `χ` is a smooth
+real function, then `χ g + (∂_w χ) f = ∂_w (χ f)` weakly on `Ω`. Tested against `φ`, this is the
+weak derivative tested against the test function `φ χ` (`Rd.lineDerivOp_testFunctionMul_apply`). -/
+theorem HasWeakLineDeriv.mul_contDiff {w : V} (h : HasWeakLineDeriv Ω (fun _ : Fin 1 => w) f g)
+    {χ : V → ℝ} (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) :
+    HasWeakLineDeriv Ω (fun _ : Fin 1 => w) (fun x => (χ x : ℂ) * f x)
+      (fun x => (χ x : ℂ) * g x + (fderiv ℝ χ x w : ℂ) * f x) := by
+  have hχ' : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) fun x => fderiv ℝ χ x w :=
+    (hχ.fderiv_right (by simp)).clm_apply contDiff_const
+  have hc : Continuous fun x => (χ x : ℂ) := Complex.continuous_ofReal.comp hχ.continuous
+  have hc' : Continuous fun x => (fderiv ℝ χ x w : ℂ) :=
+    Complex.continuous_ofReal.comp hχ'.continuous
+  have hlo : IsLocallyClosed (Ω : Set V) := Ω.isOpen.isLocallyClosed
+  refine (hasWeakLineDeriv_iff_integral (h.1.continuousOn_mul hc.continuousOn hlo)
+    ((h.2.continuousOn_mul hc.continuousOn hlo).add
+      (h.1.continuousOn_mul hc'.continuousOn hlo))).2 fun φ => ?_
+  have h1 := h.integral_eq (testFunctionMul φ hχ)
+  have i1 := (testFunctionMul φ hχ).integrable_smul h.2
+  have i2 := (testFunctionMul φ hχ').integrable_smul h.1
+  have i3 := (testFunctionMul (∂_{w} φ) hχ).integrable_smul h.1
+  rw [LineDeriv.iteratedLineDerivOp_one] at h1 ⊢
+  have e1 : (fun x => φ x • ((χ x : ℂ) * g x + (fderiv ℝ χ x w : ℂ) * f x)) =
+      fun x => testFunctionMul φ hχ x • g x + testFunctionMul φ hχ' x • f x := funext fun x => by
+    simp only [testFunctionMul_apply, Complex.real_smul, Complex.ofReal_mul]
+    ring
+  have e2 : (fun x => (∂_{w} (testFunctionMul φ hχ)) x • f x) =
+      fun x => testFunctionMul (∂_{w} φ) hχ x • f x + testFunctionMul φ hχ' x • f x :=
+    funext fun x => by
+      simp only [lineDerivOp_testFunctionMul_apply, testFunctionMul_apply, Complex.real_smul,
+        Complex.ofReal_mul, Complex.ofReal_add]
+      ring
+  have e3 : (fun x => (∂_{w} φ) x • ((χ x : ℂ) * f x)) =
+      fun x => testFunctionMul (∂_{w} φ) hχ x • f x := funext fun x => by
+    simp only [testFunctionMul_apply, Complex.real_smul, Complex.ofReal_mul]
+    ring
+  simp only [Pi.add_apply]
+  rw [e1, integral_add i1 i2, h1, e2, integral_add i3 i2, e3]
+  simp only [pow_one, neg_one_smul]
+  abel
+
 /-! ### Sobolev spaces on open sets -/
 
 /-- `W^0_p(Ω) = L_p(Ω)` for `1 ≤ p`. -/
@@ -252,6 +349,18 @@ theorem MemSobolev.add {p : ℝ≥0∞} {m : ℕ} {F G : Lp ℂ p (volume : Meas
 theorem MemSobolev.smul {p : ℝ≥0∞} {m : ℕ} {F : Lp ℂ p (volume : Measure V)}
     (hF : MemSobolev m F) (c : ℂ) : MemSobolev m (c • F) :=
   (MemWeakSobolev.smul hF c).congr_ae (ae_restrict_of_ae (Lp.coeFn_smul c F).symm)
+
+/-- `W^m_p(V)` is closed under finite sums in `L_p(V)` (`Rd.MemSobolev.add`). -/
+theorem MemSobolev.sum {p : ℝ≥0∞} {m : ℕ} {ι : Type*} (s : Finset ι)
+    {F : ι → Lp ℂ p (volume : Measure V)} (hF : ∀ i ∈ s, MemSobolev m (F i)) :
+    MemSobolev m (∑ i ∈ s, F i) := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simpa using (zero_memSobolev : MemSobolev m (0 : Lp ℂ p (volume : Measure V)))
+  | insert i s hi ih =>
+    rw [Finset.sum_insert hi]
+    exact (hF i (Finset.mem_insert_self i s)).add
+      (ih fun j hj => hF j (Finset.mem_insert_of_mem hj))
 
 /-- **`W^m_p(V)` with derivatives in `L_p(V)`**: `f ∈ L_p(V)` lies in `W^m_p(V)` iff for every
 order `k ≤ m` and all directions `v ∈ V^k` some class `g ∈ L_p(V)` is the weak derivative

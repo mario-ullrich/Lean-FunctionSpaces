@@ -31,7 +31,15 @@ Two kinds of patches satisfy the conditions:
   `W = Ω ∩ B(c, ρ - ε)`, `T = Ω ∩ B(c, ρ)`, for a bump supported in the reflected cone with
   `L R ≤ ε` (`Rd.LipschitzGraph.patch_support`, `Rd.LipschitzGraph.patch_step`);
 * **interior patches** of an open set `O`, `U = {infDist(·, Oᶜ) > 2δ}`, `W = {infDist(·, Oᶜ) > δ}`,
-  `T = O`, for any bump with `L R ≤ δ` (`Rd.interior_patch_support`, `Rd.interior_patch_step`).
+  `T = O`, for any bump with `L R ≤ δ` (`Rd.interior_patch_support`, `Rd.interior_patch_step`);
+  these sets lie in `O` (`Rd.setOf_lt_infDist_compl_subset`).
+
+Short steps `-y ∈ K̄`, `‖y‖ ≤ ε`, take `Ω ∩ B(c, ρ - ε)` into `Ω ∩ B(c, ρ)`
+(`Rd.LipschitzGraph.sub_mem_patch_of_mem_closedCone`); this gives the support conditions of all
+cone-supported kernels of small support. A bound `2^(js) ‖1_W (k_j ⋆ f)‖_p ≤ X < ∞` makes the
+local extension converge absolutely (`Rd.LocalMeansBump.enorm_localExtTerm_le_of_forall_le`,
+`Rd.LocalMeansBump.tsum_enorm_localExtTerm_le`,
+`Rd.LocalMeansBump.summable_localExtTerm_of_forall_le`).
 
 Bumps of every radius come from rescaling (`Rd.LocalMeansBump.rescale`) and from the normalised
 smooth bump centred at `0` (`Rd.LocalMeansBump.centered`).
@@ -161,24 +169,34 @@ theorem coneSupported_rescale {b : LocalMeansBump V} (hb : Ω.ConeSupported b.to
     (hc : 0 < c) : Ω.ConeSupported (b.rescale hc).toFun :=
   hb.dilate hc
 
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **Short steps into the reflected closed cone stay in a patch**: if `x ∈ Ω ∩ B(c, ρ - ε)`,
+`-y ∈ K̄` and `‖y‖ ≤ ε`, then `x - y ∈ Ω ∩ B(c, ρ)` (`Rd.LipschitzGraph.add_mem_of_mem_closedCone`
+and the triangle inequality). -/
+theorem sub_mem_patch_of_mem_closedCone {ε ρ : ℝ} {c x y : V}
+    (hx : x ∈ Ω.domain ∩ ball c (ρ - ε)) (hy : -y ∈ Ω.closedCone) (hyR : ‖y‖ ≤ ε) :
+    x - y ∈ Ω.domain ∩ ball c ρ := by
+  obtain ⟨hxΩ, hxc⟩ := hx
+  refine ⟨by simpa [sub_eq_add_neg] using Ω.add_mem_of_mem_closedCone hxΩ hy, ?_⟩
+  rw [mem_ball] at hxc ⊢
+  calc dist (x - y) c ≤ dist x c + ‖y‖ := by
+        rw [dist_eq_norm, dist_eq_norm, sub_right_comm]
+        exact norm_sub_le _ _
+    _ < ρ - ε + ε := by linarith
+    _ = ρ := by ring
+
 /-- **Boundary patches, the support condition**: for a bump supported in `-K` with `L R ≤ ε`, the
-dual kernels at points of `Ω ∩ B(c, ρ - 2ε)` only see `Ω ∩ B(c, ρ - ε)`. -/
+dual kernels at points of `Ω ∩ B(c, ρ - 2ε)` only see `Ω ∩ B(c, ρ - ε)`
+(`Rd.LipschitzGraph.sub_mem_patch_of_mem_closedCone`). -/
 theorem patch_support {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun) {L : ℕ} {ε ρ : ℝ}
     {c : V} (hLR : L * b.radius ≤ ε) :
     ∀ x ∈ Ω.domain ∩ ball c (ρ - 2 * ε), ∀ j y, b.dual L j y ≠ 0 →
       x - y ∈ Ω.domain ∩ ball c (ρ - ε) := by
-  rintro x ⟨hxΩ, hxc⟩ j y hy
-  have hyK : -y ∈ Ω.cone := Ω.coneSupported_dual_of hb L j y hy
+  intro x hx j y hy
   have hyR : ‖y‖ ≤ L * b.radius := not_lt.1 fun h => hy (b.dual_eq_zero L j h)
-  refine ⟨?_, ?_⟩
-  · have h := Ω.add_mem hxΩ hyK
-    rwa [← sub_eq_add_neg] at h
-  · rw [mem_ball] at hxc ⊢
-    calc dist (x - y) c ≤ dist x c + ‖y‖ := by
-          rw [dist_eq_norm, dist_eq_norm, sub_right_comm]
-          exact norm_sub_le _ _
-      _ < ρ - 2 * ε + ε := by linarith
-      _ = ρ - ε := by ring
+  rw [show ρ - 2 * ε = ρ - ε - ε by ring] at hx
+  exact Ω.sub_mem_patch_of_mem_closedCone hx
+    (Ω.cone_subset_closedCone (Ω.coneSupported_dual_of hb L j y hy)) (hyR.trans hLR)
 
 /-- **Boundary patches, the step condition**: for a bump supported in `-K` with `L R ≤ ε`, the steps
 `-c'^(-1) z`, `c' ≥ 1`, `b(z) ≠ 0`, take `Ω ∩ B(c, ρ - ε)` into `Ω ∩ B(c, ρ)`. -/
@@ -212,6 +230,15 @@ theorem patch_step {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun) {L : �
 end LipschitzGraph
 
 /-! ### Interior patches -/
+
+omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- Points at distance more than `r ≥ 0` from the complement of `s` lie in `s`. -/
+theorem setOf_lt_infDist_compl_subset (s : Set V) {r : ℝ} (hr : 0 ≤ r) :
+    {x : V | r < infDist x sᶜ} ⊆ s := fun x hx => by
+  by_contra h
+  have h0 : infDist x sᶜ = 0 := infDist_zero_of_mem h
+  simp only [Set.mem_ofPred_eq] at hx
+  linarith
 
 omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Interior patches, the support condition**: if the dual kernels vanish outside the ball of
@@ -267,32 +294,64 @@ noncomputable def localExtension (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSe
     (f : Lp ℂ p (volume : Measure V)) : Lp ℂ p (volume : Measure V) :=
   ∑' j, b.localExtTerm hp hW L j f
 
+/-- **The terms of the local extension from a bound on the weighted local means**: if
+`2^(js) ‖1_W (k_j ⋆ f)‖_p ≤ X` for every `j`, then `‖η_j ⋆ 1_W (k_j ⋆ f)‖_p ≤ 2 ‖m‖_1 2^(-js) X`. -/
+theorem enorm_localExtTerm_le_of_forall_le (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W)
+    (L : ℕ) {s : ℝ} {f : Lp ℂ p (volume : Measure V)} {X : ℝ≥0∞}
+    (hX : ∀ j, dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ ≤ X) (j : ℕ) :
+    ‖b.localExtTerm hp hW L j f‖ₑ ≤
+      2 * eLpNorm (momentKernel b.toFun L) 1 volume * (dyadicWeight (-s) j * X) :=
+  calc ‖b.localExtTerm hp hW L j f‖ₑ
+      ≤ eLpNorm (b.dual L j) 1 volume * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ :=
+        enorm_convLp_le hp _ _
+    _ ≤ 2 * eLpNorm (momentKernel b.toFun L) 1 volume * (dyadicWeight (-s) j *
+          (dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ)) := by
+        rw [← mul_assoc (dyadicWeight (-s) j), ENNReal.dyadicWeight_neg_mul_self, one_mul]
+        exact mul_le_mul' (b.eLpNorm_dual_one_le L j) le_rfl
+    _ ≤ _ := by gcongr; exact hX j
+
+/-- **The sum of the norms of the terms**: if `2^(js) ‖1_W (k_j ⋆ f)‖_p ≤ X` for every `j`, then
+`∑_j ‖η_j ⋆ 1_W (k_j ⋆ f)‖_p ≤ 2 ‖m‖_1 (1 - 2^(-s))⁻¹ X`
+(`Rd.LocalMeansBump.enorm_localExtTerm_le_of_forall_le`, `ENNReal.tsum_dyadicWeight_neg`). -/
+theorem tsum_enorm_localExtTerm_le (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L : ℕ)
+    {s : ℝ} {f : Lp ℂ p (volume : Measure V)} {X : ℝ≥0∞}
+    (hX : ∀ j, dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ ≤ X) :
+    ∑' j, ‖b.localExtTerm hp hW L j f‖ₑ ≤
+      2 * eLpNorm (momentKernel b.toFun L) 1 volume * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
+  refine (ENNReal.tsum_le_tsum (b.enorm_localExtTerm_le_of_forall_le hp hW L hX)).trans_eq ?_
+  rw [ENNReal.tsum_mul_left, ENNReal.tsum_mul_right, ENNReal.tsum_dyadicWeight_neg]
+  ring
+
+/-- **The local extension converges absolutely** for `s > 0` if
+`2^(js) ‖1_W (k_j ⋆ f)‖_p ≤ X < ∞` for every `j`
+(`Rd.LocalMeansBump.tsum_enorm_localExtTerm_le`). -/
+theorem summable_localExtTerm_of_forall_le (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W)
+    (L : ℕ) {s : ℝ} (hs : 0 < s) {f : Lp ℂ p (volume : Measure V)} {X : ℝ≥0∞} (hXf : X ≠ ∞)
+    (hX : ∀ j, dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ ≤ X) :
+    Summable fun j => b.localExtTerm hp hW L j f := by
+  have htsum : ∑' j, ‖b.localExtTerm hp hW L j f‖ₑ ≠ ∞ :=
+    ne_top_of_le_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num)
+      (memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top)
+      (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)) hXf) (b.tsum_enorm_localExtTerm_le hp hW L hX)
+  exact Summable.of_norm (by simpa using ENNReal.summable_toReal htsum)
+
 /-- **The local extension converges absolutely** for `s > 0` and a finite local means
-quasi-norm on `W`: `‖η_j ⋆ 1_W (k_j ⋆ f)‖_p ≤ 2 ‖m‖_1 2^(-js) ‖f‖_W`. -/
+quasi-norm on `W`: `‖η_j ⋆ 1_W (k_j ⋆ f)‖_p ≤ 2 ‖m‖_1 2^(-js) ‖f‖_W`
+(`Rd.LocalMeansBump.summable_localExtTerm_of_forall_le`). -/
 theorem summable_localExtTerm (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L : ℕ) {s : ℝ}
     (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
-    (hf : b.localNormOn hp hW L s q f < ∞) : Summable fun j => b.localExtTerm hp hW L j f := by
-  set X := b.localNormOn hp hW L s q f
-  set M := eLpNorm (momentKernel b.toFun L) 1 volume
-  have hle : ∀ j, ‖b.localExtTerm hp hW L j f‖ₑ ≤ 2 * M * (dyadicWeight (-s) j * X) := fun j => by
-    have hX : dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ ≤ X :=
-      ENNReal.le_lqNorm (zero_lt_one.trans_le hq).ne'
-        (fun j => dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ) j
-    calc ‖b.localExtTerm hp hW L j f‖ₑ
-        ≤ eLpNorm (b.dual L j) 1 volume * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ :=
-          enorm_convLp_le hp _ _
-      _ ≤ 2 * M * (dyadicWeight (-s) j *
-            (dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ)) := by
-          rw [← mul_assoc (dyadicWeight (-s) j), ENNReal.dyadicWeight_neg_mul_self, one_mul]
-          exact mul_le_mul' (b.eLpNorm_dual_one_le L j) le_rfl
-      _ ≤ 2 * M * (dyadicWeight (-s) j * X) := by gcongr
-  have htsum : ∑' j, ‖b.localExtTerm hp hW L j f‖ₑ ≠ ∞ := by
-    refine ne_top_of_le_ne_top ?_ (ENNReal.tsum_le_tsum hle)
-    rw [ENNReal.tsum_mul_left, ENNReal.tsum_mul_right, ENNReal.tsum_dyadicWeight_neg]
-    exact ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num)
-      (memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top)
-      (ENNReal.mul_ne_top (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs) hf.ne)
-  exact Summable.of_norm (by simpa using ENNReal.summable_toReal htsum)
+    (hf : b.localNormOn hp hW L s q f < ∞) : Summable fun j => b.localExtTerm hp hW L j f :=
+  b.summable_localExtTerm_of_forall_le hp hW L hs hf.ne fun j =>
+    ENNReal.le_lqNorm (zero_lt_one.trans_le hq).ne'
+      (fun j => dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ) j
+
+/-- The partial sums of the local extension converge to it if its terms are summable. -/
+theorem tendsto_sum_localExtTerm_of_summable (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W)
+    (L : ℕ) {f : Lp ℂ p (volume : Measure V)}
+    (hsum : Summable fun j => b.localExtTerm hp hW L j f) :
+    Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), b.localExtTerm hp hW L j f) atTop
+      (𝓝 (b.localExtension hp hW L f)) :=
+  (hsum.hasSum.tendsto_sum_nat).comp (tendsto_add_atTop_nat 1)
 
 /-- The partial sums of the local extension converge to it. -/
 theorem tendsto_sum_localExtTerm (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L : ℕ)
@@ -300,8 +359,7 @@ theorem tendsto_sum_localExtTerm (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSe
     (hf : b.localNormOn hp hW L s q f < ∞) :
     Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), b.localExtTerm hp hW L j f) atTop
       (𝓝 (b.localExtension hp hW L f)) :=
-  ((b.summable_localExtTerm hp hW L hs hq hf).hasSum.tendsto_sum_nat).comp
-    (tendsto_add_atTop_nat 1)
+  b.tendsto_sum_localExtTerm_of_summable hp hW L (b.summable_localExtTerm hp hW L hs hq hf)
 
 /-- **The local extension satisfies the Besov condition by differences**: for `0 < s`,
 `‖F‖_p + ‖(2^(is) ω_L(F, 2^(-i))_p)_i‖_{ℓ_q} ≤ C ‖(2^(js) ‖1_W (k_j ⋆ f)‖_p)_j‖_{ℓ_q}`. -/
@@ -313,14 +371,14 @@ theorem modNorm_localExtension_le (hp : p ≠ ∞) {W : Set V} (hW : MeasurableS
       b.synthConst L s * b.localNormOn hp hW L s q f :=
   b.modNorm_le_of_tendsto hp L s hq (b.tendsto_sum_localExtTerm hp hW L hs hq hf)
 
-/-- **The local extension agrees with `f` on `U`** if the dual kernels at points of `U` only see
-`W`: on `U` the terms are those of the reproducing formula. -/
-theorem indicatorLp_localExtension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {U W : Set V}
+/-- **The local extension agrees with `f` on `U`** if its terms are summable and the dual kernels
+at points of `U` only see `W`: on `U` the terms are those of the reproducing formula. -/
+theorem indicatorLp_localExtension_of_summable (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {U W : Set V}
     (hU : MeasurableSet U) (hW : MeasurableSet W)
-    (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
-    (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)} (hf : b.localNormOn hp hW L s q f < ∞) :
+    (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W) {f : Lp ℂ p (volume : Measure V)}
+    (hsum : Summable fun j => b.localExtTerm hp hW L j f) :
     indicatorLp hU (b.localExtension hp hW L f) = indicatorLp hU f := by
-  have hsum : ∀ J, indicatorLp hU (∑ j ∈ Finset.range (J + 1), b.localExtTerm hp hW L j f) =
+  have hsum' : ∀ J, indicatorLp hU (∑ j ∈ Finset.range (J + 1), b.localExtTerm hp hW L j f) =
       indicatorLp hU (∑ j ∈ Finset.range (J + 1),
         convLp hp (b.integrable_dual L j) (b.localMean hp L j f)) := fun J => by
     rw [map_sum, map_sum]
@@ -328,12 +386,23 @@ theorem indicatorLp_localExtension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {U 
       indicatorLp_convLp_indicatorLp hp _ hU hW (fun x hx y hy => hUW x hx j y hy) _
   have h1 : Tendsto (fun J => indicatorLp hU (∑ j ∈ Finset.range (J + 1),
       b.localExtTerm hp hW L j f)) atTop (𝓝 (indicatorLp hU (b.localExtension hp hW L f))) :=
-    ((indicatorLp hU).continuous.tendsto _).comp (b.tendsto_sum_localExtTerm hp hW L hs hq hf)
+    ((indicatorLp hU).continuous.tendsto _).comp
+      (b.tendsto_sum_localExtTerm_of_summable hp hW L hsum)
   have h2 : Tendsto (fun J => indicatorLp hU (∑ j ∈ Finset.range (J + 1),
       convLp hp (b.integrable_dual L j) (b.localMean hp L j f))) atTop (𝓝 (indicatorLp hU f)) :=
     ((indicatorLp hU).continuous.tendsto _).comp (b.tendsto_sum_dual_localMean hp hL f)
-  simp_rw [hsum] at h1
+  simp_rw [hsum'] at h1
   exact tendsto_nhds_unique h1 h2
+
+/-- **The local extension agrees with `f` on `U`** if the dual kernels at points of `U` only see
+`W`: on `U` the terms are those of the reproducing formula. -/
+theorem indicatorLp_localExtension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {U W : Set V}
+    (hU : MeasurableSet U) (hW : MeasurableSet W)
+    (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
+    (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)} (hf : b.localNormOn hp hW L s q f < ∞) :
+    indicatorLp hU (b.localExtension hp hW L f) = indicatorLp hU f :=
+  b.indicatorLp_localExtension_of_summable hp hL hU hW hUW
+    (b.summable_localExtTerm hp hW L hs hq hf)
 
 /-! ### Local means and moduli on a set -/
 

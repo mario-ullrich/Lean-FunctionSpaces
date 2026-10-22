@@ -16,7 +16,9 @@ public import Mathlib.Analysis.Distribution.TemperedDistribution
 Let `V` be a real normed space; in the section on cut-offs, `V` is a finite-dimensional real inner
 product space, such as `ℝ^d`. A real test function `φ ∈ 𝓓(Ω, ℝ)` on an open set `Ω ⊆ V` is a
 complex Schwartz function on `V` (`Rd.testSchwartz`), with the same iterated directional
-derivatives `∂^v = ∂_{v_0} ⋯ ∂_{v_{k-1}}` (`Rd.iteratedLineDerivOp_testSchwartz`).
+derivatives `∂^v = ∂_{v_0} ⋯ ∂_{v_{k-1}}` (`Rd.iteratedLineDerivOp_testSchwartz`); conversely
+a compactly supported complex Schwartz function with support in `Ω` is `a + i b` for real test
+functions `a`, `b` on `Ω` (`Rd.exists_testSchwartz_eq_of_tsupport_subset`).
 
 * **Directional derivatives commute** on Schwartz functions (`SchwartzMap.lineDerivOp_comm`, by
   Mathlib's symmetry of second derivatives) and on test functions
@@ -142,15 +144,23 @@ theorem coe_iteratedLineDerivOp_eq {Ω Ω' : Opens V} {k : ℕ} {φ : 𝓓(Ω, �
   simp only [testSchwartz_apply, Complex.ofReal_inj] at hx
   exact hx
 
+/-- A smooth compactly supported complex function `w` (given as a Schwartz function) whose support
+lies in the open set `Ω` is `Re w + i Im w` with real test functions `Re w`, `Im w` on `Ω`. -/
+theorem exists_testSchwartz_eq_of_tsupport_subset {Ω : Opens V} (w : 𝓢(V, ℂ))
+    (hw : HasCompactSupport w) (hwΩ : tsupport w ⊆ Ω) :
+    ∃ a b : 𝓓(Ω, ℝ), w = testSchwartz a + Complex.I • testSchwartz b := by
+  refine ⟨⟨fun x => (w x).re, Complex.reCLM.contDiff.comp (w.smooth ⊤),
+    hw.comp_left Complex.zero_re, (tsupport_comp_subset Complex.zero_re _).trans hwΩ⟩,
+    ⟨fun x => (w x).im, Complex.imCLM.contDiff.comp (w.smooth ⊤), hw.comp_left Complex.zero_im,
+      (tsupport_comp_subset Complex.zero_im _).trans hwΩ⟩, ?_⟩
+  ext x
+  apply Complex.ext <;> simp <;> rfl
+
 /-- A smooth compactly supported complex function `w` (given as a Schwartz function) is
 `Re w + i Im w` with real test functions `Re w`, `Im w` on `V`. -/
 theorem exists_testSchwartz_eq (w : 𝓢(V, ℂ)) (hw : HasCompactSupport w) :
-    ∃ a b : 𝓓((⊤ : Opens V), ℝ), w = testSchwartz a + Complex.I • testSchwartz b := by
-  refine ⟨⟨fun x => (w x).re, Complex.reCLM.contDiff.comp (w.smooth ⊤),
-    hw.comp_left Complex.zero_re, by simp⟩, ⟨fun x => (w x).im,
-    Complex.imCLM.contDiff.comp (w.smooth ⊤), hw.comp_left Complex.zero_im, by simp⟩, ?_⟩
-  ext x
-  apply Complex.ext <;> simp <;> rfl
+    ∃ a b : 𝓓((⊤ : Opens V), ℝ), w = testSchwartz a + Complex.I • testSchwartz b :=
+  exists_testSchwartz_eq_of_tsupport_subset w hw (by simp)
 
 end Rd
 

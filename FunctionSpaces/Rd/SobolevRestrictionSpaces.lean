@@ -33,7 +33,8 @@ and McLean (Chapter 3), and are Hilbert spaces as well.
   (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`).
 * **Weak derivatives**: the `L_2` function of `U ∈ H^1(V)` lies in `W^1_2(V)` and in `W^1_2(Ω)`
   for every open `Ω` (`Rd.memSobolev_toL2`, `Rd.memWeakSobolev_toL2`), with
-  `‖U‖² = ‖U‖_2² + (2π)⁻² ∑_i ‖∂_{e_i} U‖_2²` (`Rd.sq_norm_eq_of_hasWeakLineDeriv`); the weak
+  `‖U‖² = ‖U‖_2² + (2π)⁻² ∑_i ‖∂_{e_i} U‖_2²` (`Rd.sq_norm_eq_of_hasWeakLineDeriv`), so
+  `‖U‖ ≤ ‖U‖_2 + ∑_i ‖∂_{e_i} U‖_2` (`Rd.norm_le_norm_toL2_add_sum`); the weak
   derivatives of an element vanishing on `Ω` vanish on `Ω`. For `u ∈ H^1(Ω)`, the `L_2(Ω)` norm
   of `u` and `(2π)⁻¹` times the `L_2(Ω)` norm of its weak gradient are bounded by the norm of
   `H^1(Ω)`: `‖u|_Ω‖_2² + (2π)⁻² ∑_i ‖(∂_{e_i} u)|_Ω‖_2² ≤ ‖u‖²` (`Rd.sq_norm_restr_add_sum_le`,
@@ -333,6 +334,24 @@ theorem sq_norm_eq_of_hasWeakLineDeriv {ι : Type*} [Fintype ι] (b : Orthonorma
   rw [inv_pow]
   field_simp
   linarith
+
+/-- **The norm of `H^1(V)` by `W^1_2(V)` norms**: for an orthonormal basis `(e_i)` of `V` and
+`U ∈ H^1(V)` whose `L_2` function has the weak derivatives `G_i = ∂_{e_i}` on `V`,
+`‖U‖ ≤ ‖U‖_2 + ∑_i ‖G_i‖_2`, since `‖U‖² = ‖U‖_2² + (2π)⁻² ∑_i ‖G_i‖_2²`
+(`Rd.sq_norm_eq_of_hasWeakLineDeriv`). -/
+theorem norm_le_norm_toL2_add_sum {ι : Type*} [Fintype ι] (b : OrthonormalBasis ι ℝ V)
+    (U : H^{1}(V)) {G : ι → Lp ℂ 2 (volume : Measure V)}
+    (hG : ∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => b i) (toL2 U) (G i)) :
+    ‖U‖ ≤ ‖toL2 U‖ + ∑ i, ‖G i‖ := by
+  have h := sq_norm_eq_of_hasWeakLineDeriv b U hG
+  have hπ : (2 * π)⁻¹ ^ 2 ≤ 1 := pow_le_one₀ (by positivity)
+    (inv_le_one_of_one_le₀ (by linarith [Real.two_le_pi]))
+  have hs := Finset.sum_sq_le_sq_sum_of_nonneg (s := Finset.univ) fun i _ => norm_nonneg (G i)
+  have h0 : 0 ≤ ∑ i, ‖G i‖ := Finset.sum_nonneg fun i _ => norm_nonneg _
+  have hsum : 0 ≤ ∑ i, ‖G i‖ ^ 2 := Finset.sum_nonneg fun i _ => sq_nonneg _
+  refine (pow_le_pow_iff_left₀ (norm_nonneg U) (by positivity) two_ne_zero).1 ?_
+  rw [h]
+  nlinarith [norm_nonneg (toL2 U)]
 
 /-- **The weak gradient on `Ω` is bounded by the `H^1(Ω)` norm**: let `(e_i)` be an orthonormal
 basis of `V`, `u ∈ H^1(Ω)`, and `g_i ∈ L_2(V)` the weak derivatives `∂_{e_i}` on `V` of the `L_2`

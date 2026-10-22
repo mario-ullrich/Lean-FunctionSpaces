@@ -34,7 +34,8 @@ the dyadic one `‖(2^(ks) E_{2^k})ₖ‖_q`.
 Three sums over dyadic scales close the file:
 
 * **the dyadic sum** `∑_{j ∈ ℕ} min(2^j a, (2^j a)⁻¹) ≤ 4` for `a ∈ [0, ∞]`
-  (`tsum_min_two_pow_le`), the sum behind the Hörmander condition for dyadic dilations;
+  (`tsum_min_two_pow_le`), the sum behind the Hörmander condition for dyadic dilations, with
+  `min(x, x⁻¹)² ≤ min(x, x⁻¹)` for its squares (`min_inv_sq_le`);
 * **finitely many changed terms**: `∑_j u_j ≤ ∑_j v_j + ∑_{i < N} u_i` when `u_j = v_j` for
   `j ≥ N` (`tsum_le_tsum_add_sum_of_forall_ge_eq`);
 * **dyadic scales of an annulus**: a sequence bounded by `M` whose nonzero terms have `t / 2^j`
@@ -257,6 +258,14 @@ theorem tsum_min_two_pow_le (a : ℝ≥0∞) : ∑' j : ℕ, min (2 ^ j * a) (2 
   calc _ ≤ 2 + 2 := add_le_add (sum_range_min_two_pow_le fun j hj => Nat.find_min hex hj)
         (tsum_min_two_pow_add_le (Nat.find_spec hex))
     _ = 4 := by norm_num
+
+/-- `min(x, x⁻¹)² ≤ min(x, x⁻¹)` in `ℝ≥0∞`, since `min(x, x⁻¹) ≤ 1` (Mathlib's `sq_le`). -/
+theorem min_inv_sq_le (x : ℝ≥0∞) : min x x⁻¹ ^ 2 ≤ min x x⁻¹ := by
+  have h1 : min x x⁻¹ ≤ 1 := by
+    rcases le_total x 1 with h | h
+    · exact (min_le_left _ _).trans h
+    · exact (min_le_right _ _).trans (ENNReal.inv_le_one.2 h)
+  exact sq_le zero_le h1
 
 /-! ### Finitely many changed terms -/
 

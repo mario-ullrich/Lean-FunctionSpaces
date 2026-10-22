@@ -341,6 +341,21 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   (`Rd.eLpNorm_blockFun_le_nikolskii`, `Rd.nikolskiiBlockConst`) and the bound of
   `‖f‖_{F^m_{p,2}}` by `M_f`; the critical case `1/r = 1/p - m/n` with `r < ∞` (Sobolev's
   inequality) is not covered.
+* **The extension theorem for `W^1_p` on bounded Lipschitz domains.** Let `Ω` be a bounded
+  Lipschitz domain in `V`, `dim V ≥ 1`, `(e_i)` the orthonormal basis `Rd.gridBasis V` and
+  `1 < p < ∞`. There
+  is a finite `C` such that every `f ∈ L_p(Ω)` whose weak derivatives `g_i = ∂_{e_i} f` on `Ω` lie
+  in `L_p(Ω)` agrees almost everywhere on `Ω` with some `F ∈ W^1_p(V)` with
+  `‖F‖_p + ∑_i ‖∂_{e_i} F‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`
+  (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`); so `f ∈ W^1_p(Ω)` iff `f` agrees on `Ω`
+  with some `F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`).
+  For `p = 2`, `f ∈ L_2(V)` lies in `H^1(Ω)` iff it lies in `W^1_2(Ω)`
+  (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`), every sequence bounded in
+  `W^1_2(Ω)` has a subsequence converging in `L_2(Ω)`
+  (`Rd.BoundedLipschitzDomain.exists_subseq_tendsto_of_memWeakSobolev`), and the quotient norm of
+  `H^1(Ω)` is equivalent to the `W^1_2(Ω)` norm
+  (`Rd.BoundedLipschitzDomain.exists_norm_le_restrictL2`,
+  `Rd.sq_norm_restrictL2_add_sum_le`).
 
 **Domains, manifolds and traces** ([details](docs/DomainsTraces.md))
 
@@ -394,7 +409,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
 | [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): mixed norms, maximal functions, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, local means, ball means of differences, atoms, the torus | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0` and `W^m_p = H^{m,p}` | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, and the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)` | ✅ | ✗ |
 | [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 
@@ -446,8 +461,7 @@ that library builds itself.
   torus.
 * **Sobolev spaces**: Sobolev spaces on the torus for all `p`, the critical Sobolev embedding,
   Mihlin multipliers and `H^{s,p}` for `s < 0`.
-* **Lipschitz domains**: Green's formula, `ker γ = H^1_0(Ω)` and the extension theorem for
-  `W^{1,2}`.
+* **Lipschitz domains**: Green's formula and `ker γ = H^1_0(Ω)`.
 * **Higher smoothness**: splines on domains; for the Daubechies wavelets the sharp `L_p`
   exponents of the scaling functions, Hölder exponents beyond D4, and `ℝ^d`.
 * **The quasi-Banach range** `0 < p, q < 1`, the setting of nonlinear `n`-term approximation.
