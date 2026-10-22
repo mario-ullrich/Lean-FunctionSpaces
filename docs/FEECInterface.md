@@ -554,7 +554,8 @@ File `FunctionSpaces/Rd/LipschitzGraphGreen.lean` (the trace operator in
   functions `w` (`traceH1_ofSchwartz_ae`).
 * Green's formula, for `W^1_2(ℝ^d)` functions with their weak derivatives and the traces of the
   trace theorem; for elements of `H^{1, 2}(V, ℂ)` with `Rd.weakDerivL2` it is
-  `setIntegral_green_besselPotentialSpace`, in surface form `setIntegral_green_surface`
+  `Rd.LipschitzGraph.setIntegral_green_besselPotentialSpace`, in surface form
+  `Rd.LipschitzGraph.setIntegral_green_surface`
   (`∫_{range γ} Tr U (P y) * Tr W (P y) * ⟪v, ν (P y)⟫ ∂μHE[n-1]`):
 
   ```lean
@@ -601,8 +602,8 @@ File `FunctionSpaces/Rd/LipschitzDomainGreen.lean`, namespace `Rd.BoundedLipschi
   equal to the same boundary integral.
 * The chart form, for every resolution of unity `ψ : Ω.BoundaryPartition` of any sign, for
   `W^1_2(ℝ^d)` functions with their weak derivatives and the traces of the graph domains
-  (`setIntegral_green_besselPotentialSpace` for elements of `H^{1, 2}(V, ℂ)` with
-  `Rd.LipschitzGraph.traceH1`):
+  (`Rd.BoundedLipschitzDomain.setIntegral_green_besselPotentialSpace` for elements of
+  `H^{1, 2}(V, ℂ)` with `Rd.LipschitzGraph.traceH1`):
 
   ```lean
   theorem setIntegral_green (ψ : Ω.BoundaryPartition) (f g : Lp ℂ 2 (volume : Measure V))
