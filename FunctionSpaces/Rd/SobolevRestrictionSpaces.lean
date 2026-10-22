@@ -28,8 +28,10 @@ and McLean (Chapter 3), and are Hilbert spaces as well.
   quotient `H^s(V) ⧸ vanishOn s Ω` (`Rd.quotientEquivRestrictionSpace`), so its norm is the
   minimum of the norms of the extensions.
 * **`H^1(Ω)` in `L_2(Ω)`**: `Rd.restrictL2` is injective, has norm at most `1`, and is compact
-  for bounded `Ω` (Rellich's theorem, `Rd.isCompactOperator_restrictL2`). On a bounded Lipschitz
-  domain the elements of `H^1(Ω)` are the functions of `Rd.BoundedLipschitzDomain.MemSobolevOn`
+  for bounded `Ω` (Rellich's theorem, `Rd.isCompactOperator_restrictL2`); `U|_Ω = u` whenever
+  `U ∈ H^1(V)` agrees with `u ∈ H^1(Ω)` on `Ω` (`Rd.restrictProj_eq_of_ae_eq`). On a bounded
+  Lipschitz domain the elements of `H^1(Ω)` are the functions of
+  `Rd.BoundedLipschitzDomain.MemSobolevOn`
   (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`).
 * **Weak derivatives**: the `L_2` function of `U ∈ H^1(V)` lies in `W^1_2(V)` and in `W^1_2(Ω)`
   for every open `Ω` (`Rd.memSobolev_toL2`, `Rd.memWeakSobolev_toL2`), every function of
@@ -45,7 +47,9 @@ and McLean (Chapter 3), and are Hilbert spaces as well.
 * **Schwartz functions are dense**: the Schwartz functions form a dense subspace of every
   `H^s(V)` (`Rd.ofSchwartz`, a continuous linear map, `Rd.denseRange_ofSchwartz`), and so do the
   compactly supported ones (`Rd.dense_ofSchwartz_hasCompactSupport`).
-* **`H̃^s(Ω)` and `H^s_0(Ω)`**: every test function of `Ω` lies in every `H^s(V)` (`Rd.ofTest`).
+* **`H̃^s(Ω)` and `H^s_0(Ω)`**: every test function of `Ω` lies in every `H^s(V)` (`Rd.ofTest`),
+  and every Schwartz function with compact support in `Ω` lies in the span of the test functions
+  (`Rd.ofSchwartz_mem_testSpan`).
   `Rd.tildeSpace s Ω` is the closure of the test functions of `Ω` in `H^s(V)`,
   `Rd.zeroBoundarySpace s Ω` the closure of their restrictions in `H^s(Ω)`. For `s = 1` and every
   open `Ω`, restriction is an isometry of `H̃^1(Ω)` onto `H^1_0(Ω)` (`Rd.tildeEquivZeroBoundary`),
@@ -290,6 +294,16 @@ theorem restrictL2_restrictProj (U : H^{1}(V)) :
   have h := (mem_vanishOn_one_iff_restrict_eq_zero _).1 (sub_restrictProj_mem (s := 1) (Ω := Ω) U)
   rw [map_sub, map_sub, sub_eq_zero] at h
   exact h.symm
+
+/-- **The restriction of an element that agrees with `u` on `Ω`**: if `U ∈ H^1(V)` and
+`u ∈ H^1(Ω)` agree almost everywhere on `Ω`, then `U|_Ω = u`, since both have the restriction
+`(ι U)|_Ω` in `L_2(Ω)` (`Rd.restrictL2_restrictProj`, `Rd.restrictL2_eq_iff_ae_eq`) and
+`u ↦ u|_Ω` is injective (`Rd.restrictL2_injective`). -/
+theorem restrictProj_eq_of_ae_eq {U : H^{1}(V)} {u : RestrictionSpace 1 Ω}
+    (h : (toL2 U : V → ℂ) =ᵐ[volume.restrict (Ω : Set V)] toL2 (u : H^{1}(V))) :
+    restrictProj 1 Ω U = u :=
+  restrictL2_injective ((restrictL2_restrictProj U).trans
+    ((restrictL2_eq_iff_ae_eq u (toL2 U)).2 h.symm).symm)
 
 /-- **Rellich's theorem for `H^1(Ω)`**: for every bounded open set `Ω ⊆ V`, the embedding
 `H^1(Ω) → L_2(Ω)` is a compact operator. For the restriction space `H^1(Ω)`, this is the
@@ -593,17 +607,27 @@ theorem dense_ofSchwartz_hasCompactSupport :
     (Eventually.of_forall fun n => ⟨_, hasCompactSupport_cutoffMul n w, rfl⟩)
 
 variable (s) in
+/-- **Compactly supported Schwartz functions in `Ω` lie in the span of the test functions**: a
+Schwartz function `w` with compact support in the open set `Ω` is `Re w + i Im w` with real test
+functions of `Ω` (`Rd.exists_testSchwartz_eq_of_tsupport_subset`), so `w ∈ testSpan s Ω` for every
+real `s`. -/
+theorem ofSchwartz_mem_testSpan {w : 𝓢(V, ℂ)} (hw : HasCompactSupport w)
+    (hwΩ : tsupport w ⊆ Ω) : ofSchwartz s w ∈ testSpan s Ω := by
+  obtain ⟨a, b, rfl⟩ := exists_testSchwartz_eq_of_tsupport_subset w hw hwΩ
+  rw [map_add, map_smul, ← ofTest_eq_ofSchwartz, ← ofTest_eq_ofSchwartz]
+  exact (testSpan s Ω).add_mem (Submodule.subset_span ⟨a, rfl⟩)
+    ((testSpan s Ω).smul_mem _ (Submodule.subset_span ⟨b, rfl⟩))
+
+variable (s) in
 /-- **`H̃^s(V) = H^s(V)`**: on the whole space, the test functions are dense in `H^s(V)` for every
-real `s`, since every compactly supported Schwartz function is a complex combination of two real
-test functions (`Rd.exists_testSchwartz_eq`, `Rd.dense_ofSchwartz_hasCompactSupport`). -/
+real `s`, since the compactly supported Schwartz functions are dense
+(`Rd.dense_ofSchwartz_hasCompactSupport`) and lie in the span of the test functions
+(`Rd.ofSchwartz_mem_testSpan`). -/
 theorem tildeSpace_top : tildeSpace s (⊤ : Opens V) = ⊤ := by
   rw [tildeSpace, ← Submodule.dense_iff_topologicalClosure_eq_top]
   refine (dense_ofSchwartz_hasCompactSupport s).mono ?_
   rintro _ ⟨w, hw, rfl⟩
-  obtain ⟨a, b, rfl⟩ := exists_testSchwartz_eq w hw
-  rw [map_add, map_smul, ← ofTest_eq_ofSchwartz, ← ofTest_eq_ofSchwartz]
-  exact (testSpan s ⊤).add_mem (Submodule.subset_span ⟨a, rfl⟩)
-    ((testSpan s ⊤).smul_mem _ (Submodule.subset_span ⟨b, rfl⟩))
+  exact ofSchwartz_mem_testSpan s hw (by simp)
 
 variable (s Ω) in
 /-- **The space `H^s_0(Ω)`**: the closure in `H^s(Ω)` of the restrictions of the test functions

@@ -18,7 +18,11 @@ A **Lipschitz graph domain** in `V` is `Ω = {x : φ(x) < ⟪x, e⟫}` for a uni
 (`Rd.LipschitzGraph.add_mem`): a step into the cone raises `⟪·, e⟫` faster than `φ`. The cone is
 closed under positive scaling and contains a ball around `e/4` (`Rd.LipschitzGraph.ball_subset_cone`).
 The closed cone `K̄ = {y : M ‖y - ⟪y, e⟫ e‖ ≤ ⟪y, e⟫}` (`Rd.LipschitzGraph.closedCone`) is closed
-under nonnegative scaling, and still `Ω + K̄ ⊆ Ω` (`Rd.LipschitzGraph.add_mem_of_mem_closedCone`).
+under nonnegative scaling, and still `Ω + K̄ ⊆ Ω` (`Rd.LipschitzGraph.add_mem_of_mem_closedCone`);
+for the closure, `Ω̄ + K ⊆ Ω` (`Rd.LipschitzGraph.add_mem_of_mem_closure`). Both rest on
+`φ(x + y) ≤ φ(x) + M ‖y - ⟪y, e⟫ e‖` (`Rd.LipschitzGraph.phi_add_le`). If the closed support of
+`η` lies in `K`, so does that of every dilate `η_c`, `c > 0`
+(`Rd.LipschitzGraph.mem_cone_of_mem_tsupport_dilate`).
 
 The **cone bump** (`Rd.LipschitzGraph.coneBump`) is a bump for local means supported in
 `-K ∩ B(0, 1/2)`. A kernel `k` is **supported in `-K`** if `k(y) ≠ 0` implies `-y ∈ K`
@@ -166,25 +170,29 @@ theorem cone_subset_closedCone : Ω.cone ⊆ Ω.closedCone := fun y hy => by
   have hy' : Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ < inner ℝ y Ω.e := hy
   exact hy'.le
 
-/-- **Steps into the closed cone stay in the domain**: `Ω + K̄ ⊆ Ω`, since the domain is defined by
-a strict inequality. -/
-theorem add_mem_of_mem_closedCone {x y : V} (hx : x ∈ Ω.domain) (hy : y ∈ Ω.closedCone) :
-    x + y ∈ Ω.domain := by
+/-- **The graph function along a step**: `φ(x + y) ≤ φ(x) + M ‖y - ⟪y, e⟫ e‖`, since `φ` is
+constant along `e` and `M`-Lipschitz. -/
+theorem phi_add_le (x y : V) : Ω.phi (x + y) ≤ Ω.phi x + Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ := by
   set d := y - inner ℝ y Ω.e • Ω.e
   have h1 : Ω.phi (x + y) = Ω.phi (x + d) := by
     rw [← Ω.const (x + d) (inner ℝ y Ω.e)]
     congr 1
     simp only [d]
     abel
-  have h2 : Ω.phi (x + d) ≤ Ω.phi x + Ω.M * ‖d‖ := by
-    have h := Ω.lipschitz (x + d) x
-    rw [add_sub_cancel_left] at h
-    linarith [le_abs_self (Ω.phi (x + d) - Ω.phi x)]
+  have h := Ω.lipschitz (x + d) x
+  rw [add_sub_cancel_left] at h
+  rw [h1]
+  linarith [le_abs_self (Ω.phi (x + d) - Ω.phi x)]
+
+/-- **Steps into the closed cone stay in the domain**: `Ω + K̄ ⊆ Ω`, since the domain is defined by
+a strict inequality (`Rd.LipschitzGraph.phi_add_le`). -/
+theorem add_mem_of_mem_closedCone {x y : V} (hx : x ∈ Ω.domain) (hy : y ∈ Ω.closedCone) :
+    x + y ∈ Ω.domain := by
   have hx' : Ω.phi x < inner ℝ x Ω.e := hx
-  have hy' : Ω.M * ‖d‖ ≤ inner ℝ y Ω.e := hy
+  have hy' : Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ ≤ inner ℝ y Ω.e := hy
   show Ω.phi (x + y) < inner ℝ (x + y) Ω.e
-  rw [inner_add_left, h1]
-  linarith
+  rw [inner_add_left]
+  linarith [Ω.phi_add_le x y]
 
 /-- **Steps into the cone stay in the domain**: `Ω + K ⊆ Ω`, the case `K ⊆ K̄` of
 `Rd.LipschitzGraph.add_mem_of_mem_closedCone`. -/
@@ -223,6 +231,18 @@ theorem continuous_phi : Continuous Ω.phi :=
   (LipschitzWith.of_dist_le_mul (K := ⟨Ω.M, Ω.M_nonneg⟩) fun x y => by
     rw [Real.dist_eq, dist_eq_norm]
     exact Ω.lipschitz x y).continuous
+
+/-- **Steps into the open cone from the closure stay in the domain**: `Ω̄ + K ⊆ Ω`, since
+`φ(x) ≤ ⟪x, e⟫` on the closure of `Ω` and the cone is defined by a strict inequality
+(`Rd.LipschitzGraph.phi_add_le`). -/
+theorem add_mem_of_mem_closure {x y : V} (hx : x ∈ closure Ω.domain) (hy : y ∈ Ω.cone) :
+    x + y ∈ Ω.domain := by
+  have hx' : Ω.phi x ≤ inner ℝ x Ω.e :=
+    closure_lt_subset_le Ω.continuous_phi (continuous_id.inner continuous_const) hx
+  have hy' : Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ < inner ℝ y Ω.e := hy
+  show Ω.phi (x + y) < inner ℝ (x + y) Ω.e
+  rw [inner_add_left]
+  linarith [Ω.phi_add_le x y]
 
 /-- The domain is open. -/
 theorem isOpen_domain : IsOpen Ω.domain :=
@@ -311,6 +331,17 @@ theorem ConeSupported.dilate {k : V → ℂ} (hk : Ω.ConeSupported k) {c : ℝ}
   have hky : k (c • y) ≠ 0 := fun h => hy (by simp [Rd.dilate, h])
   have h := Ω.smul_mem_cone (inv_pos.2 hc) (hk (c • y) hky)
   rwa [smul_neg, inv_smul_smul₀ hc.ne'] at h
+
+variable (Ω) in
+/-- **Dilates of a cone kernel are cone kernels**: if the closed support of `η` lies in the cone
+`K` and `c > 0`, so does the closed support of `η_c`, since `c x ∈ supp η` for `x ∈ supp η_c`
+(`Rd.smul_mem_tsupport_of_mem_tsupport_dilate`) and `c⁻¹ K ⊆ K`
+(`Rd.LipschitzGraph.smul_mem_cone`). -/
+theorem mem_cone_of_mem_tsupport_dilate {η : V → ℂ} (hη : tsupport η ⊆ Ω.cone) {c : ℝ}
+    (hc : 0 < c) {x : V} (hx : x ∈ tsupport (Rd.dilate c η)) : x ∈ Ω.cone := by
+  have h := Ω.smul_mem_cone (inv_pos.2 hc)
+    (hη (smul_mem_tsupport_of_mem_tsupport_dilate hc.ne' hx))
+  rwa [inv_smul_smul₀ hc.ne'] at h
 
 /-- Finite combinations of kernels supported in `-K` are supported in `-K`. -/
 theorem ConeSupported.finsetSum {ι : Type*} (s : Finset ι) (a : ι → ℂ) {k : ι → V → ℂ}

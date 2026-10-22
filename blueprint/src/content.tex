@@ -5794,7 +5794,8 @@ Linearity and the identities hold almost everywhere by \Cref{lem:conv-assoc}, an
 \label{lem:dilate}
 \lean{Rd.dilate, Rd.integrable_dilate, Rd.integral_dilate, Rd.eLpNorm_dilate_one,
   Rd.conv_dilate_apply, Rd.ae_integrable_dilate_mul, Rd.continuous_dilate, Rd.bddAbove_dilate,
-  Rd.hasCompactSupport_dilate}
+  Rd.hasCompactSupport_dilate, Rd.smul_mem_tsupport_of_mem_tsupport_dilate,
+  Rd.norm_le_of_mem_tsupport_dilate, Rd.eventually_tsupport_dilate_add_subset_thickening}
 \leanok
 \uses{def:conv}
 For $c > 0$ and $\Phi : V \to \C$ let $\Phi_c(x) = c^n \Phi(c x)$. If $\Phi$ is integrable, then
@@ -5802,12 +5803,20 @@ $\Phi_c$ is integrable with $\int \Phi_c = \int \Phi$ and $\|\Phi_c\|_1 = \|\Phi
 $f : V \to \C$ and $x \in V$, $(\Phi_c * f)(x) = \int_V \Phi(z) f(x - c^{-1} z) \, dz$, and for
 $f \in L_p$, $1 \leq p < \infty$, the integrand is integrable for almost every $x$. Dilations of
 continuous functions are continuous, dilations of bounded functions are bounded, and dilations
-of compactly supported functions have compact support.
+of compactly supported functions have compact support. For every $\Phi$, every $c \neq 0$ and
+every $x \in \operatorname{supp} \Phi_c$, $c x \in \operatorname{supp} \Phi$; if moreover $c > 0$
+and $\operatorname{supp} \Phi \subseteq \bar B(0, R)$, then $\|x\| \leq R/c$. For every $\Phi$
+with $\operatorname{supp} \Phi \subseteq \bar B(0, R)$, every $\delta > 0$ and every
+$S \subseteq V$, $\operatorname{supp} \Phi_{2^k} + S$ lies in the $\delta$-neighbourhood of $S$
+for all large $k$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-Substitute $y = c x$, which multiplies Lebesgue measure by $c^{-n}$.
+Substitute $y = c x$, which multiplies Lebesgue measure by $c^{-n}$. The support of $\Phi_c$ is
+the preimage of $\operatorname{supp} \Phi$ under $x \mapsto c x$, so
+$\operatorname{supp} \Phi_{2^k} \subseteq B(0, \delta)$ once $R / 2^k < \delta$, and
+$B(0, \delta) + S$ is the $\delta$-neighbourhood of $S$.
 \end{proof}
 
 \begin{lemma}[First moments of dilates]
@@ -6778,12 +6787,13 @@ For $V = \R^d$ and $e = e_d$ this is $\Omega = \{x : x_d > \varphi(x_1, \dots, x
   Rd.LipschitzGraph.two_mul_add_one_mul_coneRadius_le, Rd.LipschitzGraph.ball_subset_cone,
   Rd.LipschitzGraph.closedCone, Rd.LipschitzGraph.cone_subset_closedCone,
   Rd.LipschitzGraph.isClosed_closedCone, Rd.LipschitzGraph.smul_mem_closedCone,
-  Rd.LipschitzGraph.add_mem_of_mem_closedCone}
+  Rd.LipschitzGraph.phi_add_le, Rd.LipschitzGraph.add_mem_of_mem_closedCone}
 \leanok
 \uses{def:lipschitz-graph}
 $\Omega + K \subseteq \Omega$ and $c K \subseteq K$ for $c > 0$, so $x + l h \in \Omega$ for
 $x \in \Omega$, $h \in K$ and $l \in \N$. The cone $K$ contains the ball of radius
-$\rho = 1/(8(M + 1))$ around $e/4$. The closed cone
+$\rho = 1/(8(M + 1))$ around $e/4$. For all $x, y \in V$,
+$\varphi(x + y) \leq \varphi(x) + M \|y - \langle y, e \rangle e\|$. The closed cone
 $\bar K = \{y : M \|y - \langle y, e \rangle e\| \leq \langle y, e \rangle\}$ is closed, contains
 $K$, satisfies $c \bar K \subseteq \bar K$ for $c \geq 0$, and $\Omega + \bar K \subseteq \Omega$.
 \end{lemma}
@@ -6791,7 +6801,8 @@ $K$, satisfies $c \bar K \subseteq \bar K$ for $c \geq 0$, and $\Omega + \bar K 
 \begin{proof}
 \leanok
 Write $y = d + \langle y, e \rangle e$ with $d \perp e$. Since $\varphi$ is constant along $e$,
-$\varphi(x + y) = \varphi(x + d) \leq \varphi(x) + M \|d\| < \langle x, e \rangle + \langle y, e \rangle$
+$\varphi(x + y) = \varphi(x + d) \leq \varphi(x) + M \|d\|$, and
+$\varphi(x) + M \|d\| < \langle x, e \rangle + \langle y, e \rangle$
 for $x \in \Omega$ and $y \in \bar K$, strict since $\varphi(x) < \langle x, e \rangle$; this gives
 $\Omega + \bar K \subseteq \Omega$, and $\Omega + K \subseteq \Omega$ follows from
 $K \subseteq \bar K$. For $\|y - e/4\| < \rho$, $\langle y, e \rangle > 1/4 - \rho$ and
@@ -6808,6 +6819,26 @@ $\|y - \langle y, e \rangle e\| < 2\rho$, and $2 M \rho \leq 1/4 - \rho$.
 A function $k : V \to \C$ is supported in $-K$ if $k(y) \neq 0$ implies $-y \in K$. Linear
 combinations of such functions and their dilations $k_c$, $c > 0$, are supported in $-K$.
 \end{definition}
+
+\begin{lemma}[The closure of a graph domain]
+\label{lem:graph-domain-closure-cone}
+\lean{Rd.LipschitzGraph.add_mem_of_mem_closure, Rd.LipschitzGraph.mem_cone_of_mem_tsupport_dilate}
+\leanok
+\uses{def:lipschitz-graph, lem:graph-cone, lem:dilate}
+For every Lipschitz graph domain $\Omega_0 = \{x : \varphi(x) < \langle x, e \rangle\}$ with cone
+$K$, every $x \in \overline{\Omega_0}$ and every $y \in K$, $x + y \in \Omega_0$. For every
+$\eta \colon V \to \C$ with $\operatorname{supp} \eta \subseteq K$, every $c > 0$ and every
+$x \in \operatorname{supp} \eta_c$, $x \in K$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $\overline{\Omega_0}$, $\varphi(x) \leq \langle x, e \rangle$ by continuity of $\varphi$, and
+$\varphi(x + y) \leq \varphi(x) + M \|y - \langle y, e \rangle e\| < \langle x + y, e \rangle$ by
+\Cref{lem:graph-cone} and the strict inequality of the cone. If
+$x \in \operatorname{supp} \eta_c$, then $c x \in K$ (\Cref{lem:dilate}), and
+$c^{-1} K \subseteq K$.
+\end{proof}
 
 \begin{lemma}[The cone bump]
 \label{lem:cone-bump}
@@ -12389,6 +12420,11 @@ family and their dilates a Calder\'on--Zygmund family.
 \Cref{sec:bessel-potential-lifting} proves $\TL{s}{p}{2} \subseteq H^{s,p}(V)$ for every real
 $s$ and $H^{s,p}(V) = \TL{s}{p}{2}$ for $s \geq 0$ and $1 < p < \infty$, hence Calder\'on's
 theorem $\Sob{m}{p}(V) = H^{m,p}(V)$, with existential constants.
+\Cref{sec:divergence-kernels} and \Cref{sec:sobolev-extension} prove the extension theorem for
+$\Sob{1}{p}$ on bounded Lipschitz domains, $1 < p < \infty$. \Cref{sec:lipschitz-graph-green}
+and \Cref{sec:lipschitz-domain-green} prove Gauss--Green on Lipschitz graph domains and Green's
+formula on bounded Lipschitz domains, and \Cref{sec:trace-kernel} proves that the kernel of the
+trace is $H^1_0(\Omega)$.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -12396,15 +12432,15 @@ Chandler-Wilde, Hewett and Moiola \cite{ChandlerWildeHewettMoiola}; for restrict
 Rellich's theorem holds on every bounded set (\Cref{sec:rellich-compactness}). Every restriction
 lies in the space $\Sob{1}{2}(\Omega)$ of weak derivatives, on every open set. On bounded
 Lipschitz domains the two spaces agree by the extension theorem of Calder\'on and Stein
-\cite[Chapter VI]{SteinSingular}, which is in preparation in this project; on some bounded
+\cite[Chapter VI]{SteinSingular} (\Cref{thm:sobolev-extension}); on some bounded
 open sets $\Sob{1}{2}(\Omega)$ is strictly larger, as for a disc with a slit removed, and its
 embedding into $L_2(\Omega)$ can fail to be compact, as for the rooms-and-passages domains
 \cite[Chapter 6]{AdamsFournier}. The norm bounds of this chapter are explicit on $V$; on bounded
 Lipschitz domains the extension and trace theorems carry existential constants, and the
 statements are equivalences of membership. On bounded Lipschitz domains the functions of
 $H^1(\Omega)$ with boundary trace zero form the closure of the test functions in $H^1(\Omega)$
-\cite[Theorem 3.40]{McLean}; the spaces $H^1(\Omega)$ and $H^1_0(\Omega)$ of that theorem are
-the Hilbert spaces of \Cref{sec:sobolev-restriction-spaces}.
+\cite[Theorem 3.40]{McLean} (\Cref{thm:trace-kernel-zero-boundary}); the spaces $H^1(\Omega)$ and
+$H^1_0(\Omega)$ of that theorem are the Hilbert spaces of \Cref{sec:sobolev-restriction-spaces}.
 
 \section{Test functions in the Schwartz space}
 \label{sec:schwartz-cutoff}
@@ -13581,14 +13617,14 @@ with the Fourier transform of $L_2(V)$; $\iota : H^1(V) \to L_2(V)$ is a bounded
 \begin{lemma}[$\iota F$ represents $F$]
 \label{lem:sobolev-one-to-l2}
 \lean{Rd.fourier_toL2, Rd.fourier_toL2_ae_eq, Rd.toTemperedDistribution_toL2,
-  Rd.toL2_eq_of_toDistr_eq, Rd.norm_toL2_le}
+  Rd.toL2_eq_of_toDistr_eq, Rd.toL2_injective, Rd.norm_toL2_le}
 \leanok
 \uses{def:sobolev-one-to-l2, lem:temperate-weight-lp, lem:bessel-weight-inverse,
   lem:plancherel-l2, lem:lp-distribution-determined}
 For every $F \in H^1(V)$, given by the tempered distribution $u$, the Fourier transform of
 $\iota F$ is $\langle \cdot \rangle^{-1} \widehat{J_1 u}$, the tempered distribution of $\iota F$
 is $u$, and $\|\iota F\|_2 \leq \|F\|_{H^1}$. For every $F \in H^1(V)$ and every $f \in L_2(V)$
-whose tempered distribution is that of $F$, $\iota F = f$.
+whose tempered distribution is that of $F$, $\iota F = f$. The map $\iota$ is injective.
 \end{lemma}
 
 \begin{proof}
@@ -13597,7 +13633,8 @@ $u = J_{-1}(J_1 u)$, and the Fourier transform of $J_{-1} g$ is $\langle \cdot \
 \widehat g$; for $g = J_1 u \in L_2(V)$ this is the tempered distribution of the $L_2$ function
 $\langle \cdot \rangle^{-1} \widehat g$ (\Cref{lem:temperate-weight-lp}), whose inverse Fourier
 transform is $\iota F$. An $L_2$ function is determined by its tempered distribution
-(\Cref{lem:lp-distribution-determined}). By \Cref{lem:plancherel-l2} and
+(\Cref{lem:lp-distribution-determined}), and $F$ by $u$, so $\iota$ is injective. By
+\Cref{lem:plancherel-l2} and
 \Cref{lem:bessel-weight-inverse},
 $\|\iota F\|_2 = \|\langle \cdot \rangle^{-1} \widehat{J_1 u}\|_2 \leq \|\widehat{J_1 u}\|_2
 = \|J_1 u\|_2$.
@@ -13980,13 +14017,15 @@ $R_\Omega u = f|_\Omega$ if and only if $\iota u = f$ almost everywhere on $\Ome
 
 \begin{proposition}[$R_\Omega$ is injective with norm at most $1$]
 \label{prop:sobolev-restriction-l2}
-\lean{Rd.restrictL2_injective, Rd.norm_restrictL2_apply_le, Rd.restrictL2_restrictProj}
+\lean{Rd.restrictL2_injective, Rd.norm_restrictL2_apply_le, Rd.restrictL2_restrictProj,
+  Rd.restrictProj_eq_of_ae_eq}
 \leanok
 \uses{def:sobolev-restriction-l2, prop:sobolev-vanishing-one, lem:sobolev-restriction-basic,
   lem:sobolev-one-to-l2}
 For every open $\Omega$, $R_\Omega$ is injective and $\|R_\Omega u\|_{L_2(\Omega)} \leq \|u\|$
 for every $u \in H^1(\Omega)$. For every $U \in H^1(V)$, $R_\Omega(r_\Omega U) =
-(\iota U)|_\Omega$.
+(\iota U)|_\Omega$. For every $U \in H^1(V)$ and every $u \in H^1(\Omega)$ with
+$\iota U = \iota u$ almost everywhere on $\Omega$, $r_\Omega U = u$.
 \end{proposition}
 
 \begin{proof}
@@ -13994,7 +14033,8 @@ for every $u \in H^1(\Omega)$. For every $U \in H^1(V)$, $R_\Omega(r_\Omega U) =
 If $R_\Omega u = 0$, then $u \in N^1(\Omega) \cap N^1(\Omega)^\perp = \{0\}$
 (\Cref{prop:sobolev-vanishing-one}). The bound is $\|\iota u\|_2 \leq \|u\|$
 (\Cref{lem:sobolev-one-to-l2}). $U - r_\Omega U$ lies in $N^1(\Omega)$, the kernel of
-$U \mapsto (\iota U)|_\Omega$.
+$U \mapsto (\iota U)|_\Omega$. If $\iota U = \iota u$ on $\Omega$, then
+$R_\Omega(r_\Omega U) = (\iota U)|_\Omega = R_\Omega u$, and $R_\Omega$ is injective.
 \end{proof}
 
 \begin{theorem}[Rellich's theorem for $H^1(\Omega)$]
@@ -14224,12 +14264,15 @@ $\partial_v w$ is the weak derivative of $w$ (\Cref{cor:weak-derivative-schwartz
 
 \begin{theorem}[Schwartz functions are dense in $H^s(V)$]
 \label{thm:sobolev-schwartz-dense}
-\lean{Rd.denseRange_ofSchwartz, Rd.dense_ofSchwartz_hasCompactSupport, Rd.tildeSpace_top}
+\lean{Rd.denseRange_ofSchwartz, Rd.dense_ofSchwartz_hasCompactSupport,
+  Rd.ofSchwartz_mem_testSpan, Rd.tildeSpace_top}
 \leanok
 \uses{lem:sobolev-of-schwartz, lem:bessel-schwartz-distribution, lem:schwartz-cutoff-tendsto,
-  thm:test-functions-determine, def:sobolev-tilde-zero-boundary}
+  lem:weak-derivative-complex-test, def:sobolev-tilde-zero-boundary}
 For every $s \in \R$, the Schwartz functions and the compactly supported Schwartz functions are
-dense in $H^s(V)$, and $\tilde H^s(V) = H^s(V)$.
+dense in $H^s(V)$. For every $s \in \R$, every open $\Omega \subseteq V$ and every Schwartz
+function $w$ with compact support in $\Omega$, $w \in T^s(\Omega)$. For every $s \in \R$,
+$\tilde H^s(V) = H^s(V)$.
 \end{theorem}
 
 \begin{proof}
@@ -14239,8 +14282,9 @@ $J_s$ maps the Schwartz space onto itself, with inverse $J_{-s}$
 \texttt{SchwartzMap.\allowbreak denseRange\_\allowbreak toLpCLM}), and $J_s$ is an isometry of
 $H^s(V)$ onto $L_2(V)$. The cut-offs of a Schwartz function converge to it in the Schwartz space
 (\Cref{lem:schwartz-cutoff-tendsto}), hence in $H^s(V)$ by \Cref{lem:sobolev-of-schwartz}. A
-compactly supported Schwartz function is $a + i b$ with real test functions $a, b$ on $V$
-(\Cref{thm:test-functions-determine}), so it lies in $T^s(V)$.
+Schwartz function with compact support in $\Omega$ is $a + i b$ with real test functions
+$a, b \in \mathcal D(\Omega)$ (\Cref{lem:weak-derivative-complex-test}), so it lies in
+$T^s(\Omega)$; for $\Omega = V$ this gives $\tilde H^s(V) = H^s(V)$.
 \end{proof}
 
 \begin{lemma}[Functions with disjoint supports]
@@ -16568,6 +16612,22 @@ For the second statement, $\eta * f$ and $(\partial^v \eta) * f$ lie in $L_p$ by
 \Cref{thm:young}, so they are locally integrable. For every test function $\varphi$ on $V$,
 \Cref{lem:conv-derivative-transfer} with the Schwartz function $u = \varphi$
 (\Cref{def:test-schwartz}) is the identity of \Cref{lem:weak-derivative-integral}.
+\end{proof}
+
+\begin{lemma}[Weak derivatives of convolutions in $L_p$]
+\label{lem:weak-derivative-convolution-lp}
+\lean{Rd.hasWeakLineDeriv_convLp}
+\leanok
+\uses{thm:weak-derivative-convolution, lem:conv-op}
+For all $1 \leq p, r < \infty$, every $k$, all directions $v = (v_1, \dots, v_k) \in V^k$, every
+Schwartz function $\eta$, every $f \in L_p(V)$ and every $g \in L_r(V)$ with $g = \partial^v f$
+weakly on $V$, $\eta * g = \partial^v (\eta * f)$ weakly on $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The weak derivative of $\eta * f$ is $(\partial^v \eta) * f$, and $(\partial^v \eta) * f =
+\eta * g$ at every point (\Cref{thm:weak-derivative-convolution}).
 \end{proof}
 
 \begin{lemma}[Weak derivatives and convolution on open sets]
@@ -21562,6 +21622,283 @@ $\operatorname{Tr}_j F = 0$ there (\Cref{thm:traces-both-sides}). Hence the boun
 vanishes almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}), and
 $u \in N_\Gamma$ (\Cref{thm:trace-kernel-boundary}).
 \end{proof}
+
+\section{The kernel of the trace}
+\label{sec:trace-kernel}
+
+Throughout this section $\Omega$ is a bounded Lipschitz domain in $V$, $\dim V = n$, with boundary
+$\Gamma$, boundary balls $B_j$ and graph domains $\Omega_j$ with cones $K_j$
+(\Cref{def:bounded-lipschitz}, \Cref{lem:graph-cone}); $\tilde H^1(\Omega)$ and $H^1_0(\Omega)$ are
+the spaces of \Cref{def:sobolev-tilde-zero-boundary}, $r_\Omega$ is the restriction to
+$H^1(\Omega)$,
+$N_\Gamma$ is the trace kernel (\Cref{def:trace-kernel}), $H^{1/2}(\Gamma)$ the trace space
+(\Cref{def:trace-space}) and $\Phi_c(x) = c^n \Phi(c x)$ (\Cref{lem:dilate}). The kernel of the
+trace is $H^1_0(\Omega)$ (McLean \cite[Theorem 3.40]{McLean}; Hiptmair, Pauly and Schulz
+\cite{HiptmairPaulySchulz} cite it in this form). By \Cref{thm:zero-extension-trace-kernel},
+$u \in N_\Gamma$ if and only if the zero extension $\mathbf 1_\Omega \iota u$ lies in
+$\Sob{1}{2}(V)$, so
+the theorem says that the elements of $H^1(V)$ vanishing outside $\Omega$ are the elements of
+$\tilde H^1(\Omega)$. Such a function is cut into pieces near the boundary and an interior piece;
+each boundary piece vanishes outside the closure of a graph domain, and convolution with the dilates
+of a smooth function supported in the cone of the graph moves this closure into the graph domain.
+The mollified pieces are test functions of $\Omega$ and converge in $H^1(V)$.
+
+\paragraph{Mollification in $H^1(V)$.}
+
+\begin{lemma}[Convergence in $H^1(V)$]
+\label{lem:sobolev-one-convergence}
+\lean{Rd.tendsto_of_tendsto_toL2}
+\leanok
+\uses{lem:sobolev-one-weak-gradient-norm, lem:sobolev-one-weak-derivative-operator}
+For every filter, every family $(W_i)$ in $H^1(V)$ and every $U \in H^1(V)$ with
+$\iota W_i \to \iota U$ and $\partial_v W_i \to \partial_v U$ in $L_2(V)$ for every $v \in V$,
+$W_i \to U$ in $H^1(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For an orthonormal basis $(e_k)$, $\|W_i - U\| \leq \|\iota W_i - \iota U\|_2 + \sum_k
+\|\partial_{e_k} W_i - \partial_{e_k} U\|_2$ (\Cref{lem:sobolev-one-weak-gradient-norm}), since
+$\partial_{e_k}$ is linear (\Cref{lem:sobolev-one-weak-derivative-operator}).
+\end{proof}
+
+\begin{theorem}[Mollification in $H^1(V)$]
+\label{thm:sobolev-one-mollification}
+\lean{Rd.tendsto_of_toL2_eq_convLp}
+\leanok
+\uses{lem:weak-derivative-convolution-lp, lem:sobolev-one-convergence, thm:approx-identity,
+  def:schwartz-dilate, lem:dilate, lem:sobolev-one-weak-derivative-operator}
+For every Schwartz function $\eta$ with $\int \eta = 1$, every filter, every family $(c_i)$ of
+nonzero reals with $c_i \to \infty$, every $U \in H^1(V)$ and every family $(W_i)$ in $H^1(V)$ with
+$\iota W_i = \eta_{c_i} * \iota U$, $W_i \to U$ in $H^1(V)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The dilates $\eta_{c_i}$ are Schwartz functions (\Cref{def:schwartz-dilate}), so
+$\partial_v W_i = \eta_{c_i} * \partial_v U$ (\Cref{lem:weak-derivative-convolution-lp}). Both
+$\eta_{c_i} * \iota U \to \iota U$ and $\eta_{c_i} * \partial_v U \to \partial_v U$ in $L_2(V)$
+(\Cref{thm:approx-identity}), and \Cref{lem:sobolev-one-convergence} concludes.
+\end{proof}
+
+\paragraph{Smooth functions supported in $\Omega$.}
+
+\begin{lemma}[Smoothing with compact support]
+\label{lem:smoothing-compact-support}
+\lean{Rd.exists_schwartz_eq_conv}
+\leanok
+\uses{lem:conv-derivatives, def:conv}
+For every smooth $K \colon V \to \C$ with compact support, every compact $S \subseteq V$ and
+every locally integrable $f$ vanishing outside $S$, $K * f$ is a Schwartz function with compact
+support in $\operatorname{supp} K + S$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$K * f$ is smooth (\Cref{lem:conv-derivatives}), and its support lies in
+$\operatorname{supp} K + S$, which is compact, hence closed.
+\end{proof}
+
+\begin{definition}[Bump mollifiers]
+\label{def:bump-mollifier}
+\lean{Rd.bumpMollifier, Rd.contDiff_bumpMollifier, Rd.tsupport_bumpMollifier_subset,
+  Rd.hasCompactSupport_bumpMollifier, Rd.integral_bumpMollifier}
+\leanok
+For every smooth bump function $f$ around $c \in V$ with outer radius $r$ (Mathlib's
+\texttt{ContDiffBump}), the bump mollifier of $f$ is $f / \int f$ with complex values. It is
+smooth with support in $\bar B(c, r)$, compactly supported, and has integral $1$.
+\end{definition}
+
+\begin{theorem}[Mollified functions in $\tilde H^1$]
+\label{thm:tilde-space-mollified}
+\lean{Rd.mem_tildeSpace_of_dilate, Rd.mem_tildeSpace_of_isCompact}
+\leanok
+\uses{thm:sobolev-one-mollification, lem:smoothing-compact-support, def:bump-mollifier,
+  def:sobolev-tilde-zero-boundary, thm:sobolev-schwartz-dense, lem:dilate,
+  lem:dual-kernel-derivatives, lem:conv-op, def:conv, lem:sobolev-of-schwartz}
+For every open $\Omega' \subseteq V$, every $U \in H^1(V)$, every compact $S \subseteq V$ with
+$\iota U = 0$ almost everywhere outside $S$, and every smooth $\eta$ with compact support and
+$\int \eta = 1$ such that $\operatorname{supp} \eta_{2^k} + S \subseteq \Omega'$ for all large
+$k$, $U \in \tilde H^1(\Omega')$. For every open $\Omega' \subseteq V$, every compact
+$S \subseteq \Omega'$ and every $U \in H^1(V)$ with $\iota U = 0$ almost everywhere outside $S$,
+$U \in \tilde H^1(\Omega')$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Replace $\iota U$ by $\mathbf 1_S \iota U$, equal almost everywhere. For every $k$,
+$\eta_{2^k} * \mathbf 1_S \iota U$ is a Schwartz function $w_k$ with compact support in
+$\operatorname{supp} \eta_{2^k} + S$ (\Cref{lem:smoothing-compact-support}); as an element of
+$H^1(V)$ it converges to $U$ (\Cref{thm:sobolev-one-mollification}), and for large $k$ it lies in
+$T^1(\Omega')$ (\Cref{thm:sobolev-schwartz-dense}). For compact $S \subseteq \Omega'$ take
+$\delta > 0$ such that the $\delta$-neighbourhood of $S$ lies in $\Omega'$, and the bump
+mollifier $\eta$ of a bump around $0$ with outer radius $1$ (\Cref{def:bump-mollifier}): for
+large $k$, $\operatorname{supp} \eta_{2^k} + S$ lies in the $\delta$-neighbourhood of $S$
+(\Cref{lem:dilate}).
+\end{proof}
+
+\paragraph{Cone mollifiers.}
+
+\begin{definition}[The cone mollifier]
+\label{def:cone-mollifier}
+\lean{Rd.LipschitzGraph.coneMollifierBase, Rd.LipschitzGraph.coneMollifier,
+  Rd.LipschitzGraph.tsupport_coneMollifier_subset}
+\leanok
+\uses{def:bump-mollifier, lem:graph-cone}
+For every Lipschitz graph domain with cone $K$, unit vector $e$ and $\rho = 1/(8(M + 1))$, the cone
+mollifier is the bump mollifier of the smooth bump around $e/4$ with radii $\rho/4$ and $\rho/2$.
+Its support lies in $K \cap \bar B(0, 1/2)$.
+\end{definition}
+
+The support is $\bar B(e/4, \rho/2) \subseteq B(e/4, \rho) \subseteq K$ (\Cref{lem:graph-cone}),
+and $\|e/4\| + \rho/2 \leq 1/2$.
+
+\paragraph{$\tilde H^1(\Omega)$ by supports.}
+
+\begin{lemma}[$\tilde H^1$ and vanishing outside $\Omega$]
+\label{lem:tilde-space-vanishes-outside}
+\lean{Rd.toL2_ae_eq_zero_of_mem_tildeSpace, Rd.indicatorLp_toL2_restrictProj}
+\leanok
+\uses{def:sobolev-tilde-zero-boundary, lem:sobolev-test-span-schwartz,
+  prop:sobolev-vanishing-one, lem:sobolev-restriction-basic, lem:indicator-lp}
+For every open $\Omega' \subseteq V$ and every $U \in \tilde H^1(\Omega')$, $\iota U = 0$ almost
+everywhere outside $\Omega'$. For every open $\Omega' \subseteq V$ and every $U \in H^1(V)$ with
+$\iota U = 0$ almost everywhere outside $\Omega'$, $\mathbf 1_{\Omega'} \iota (r_{\Omega'} U) =
+\iota U$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The $U$ with $\iota U = 0$ almost everywhere outside $\Omega'$ form the kernel of a bounded
+operator into $L_2(V \setminus \Omega')$, a closed subspace that contains $T^1(\Omega')$
+(\Cref{lem:sobolev-test-span-schwartz}), hence $\tilde H^1(\Omega')$. $U - r_{\Omega'} U$ vanishes
+on $\Omega'$ (\Cref{lem:sobolev-restriction-basic}), so $\iota (r_{\Omega'} U) = \iota U$ almost
+everywhere on $\Omega'$ (\Cref{prop:sobolev-vanishing-one}).
+\end{proof}
+
+\begin{lemma}[Chart pieces]
+\label{lem:tilde-space-chart-pieces}
+\lean{Rd.BoundedLipschitzDomain.mem_tildeSpace_of_mulLp_chart,
+  Rd.BoundedLipschitzDomain.eq_sum_add_of_ae_eq_zero}
+\leanok
+\uses{thm:tilde-space-mollified, def:cone-mollifier, lem:graph-domain-closure-cone,
+  lem:dilate, def:bounded-lipschitz, lem:green-pieces, lem:sobolev-one-to-l2,
+  lem:product-modulus, def:trace-space-setting, def:boundary-partition}
+For every $j$, every $U \in H^1(V)$ with $\iota U = 0$ almost everywhere outside $\Omega$, every
+continuous bounded real $\zeta$ with $\operatorname{supp} \zeta \subseteq B_j$ and every
+$W \in H^1(V)$ with $\iota W = \zeta \, \iota U$, $W \in \tilde H^1(\Omega)$. For every resolution
+of unity $\psi$ on $\Gamma$, every continuous bounded real $\chi$ with $\chi + \sum_j \psi_j = 1$
+on $\Omega$, every $U \in H^1(V)$ with $\iota U = 0$ almost everywhere outside $\Omega$ and all
+$W_j, W_0 \in H^1(V)$ with $\iota W_j = \psi_j \, \iota U$ and $\iota W_0 = \chi \, \iota U$,
+$U = \sum_j W_j + W_0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Since $\Omega \cap B_j = \Omega_j \cap B_j$, $\iota W$ vanishes almost everywhere outside the
+compact set $S = \overline{\Omega_j} \cap \operatorname{supp} \zeta$. Let $\eta$ be the cone
+mollifier of $\Omega_j$ (\Cref{def:cone-mollifier}) and $\delta > 0$ such that
+the $\delta$-neighbourhood of $\operatorname{supp} \zeta$ lies in $B_j$. For large $k$,
+$z \in \operatorname{supp} \eta_{2^k}$ and $y \in S$, $z \in K_j$
+(\Cref{lem:graph-domain-closure-cone}), so $z + y \in \Omega_j$, and $z + y$ lies in the
+$\delta$-neighbourhood of $S$ (\Cref{lem:dilate}), so $z + y \in B_j$; hence
+$z + y \in \Omega$, and \Cref{thm:tilde-space-mollified} applies. The decomposition holds almost
+everywhere on $\Omega$ (\Cref{lem:green-pieces}), both sides vanish almost everywhere outside
+$\Omega$, and $\iota$ is injective (\Cref{lem:sobolev-one-to-l2}).
+\end{proof}
+
+\begin{theorem}[$\tilde H^1(\Omega)$ by supports]
+\label{thm:tilde-space-supports}
+\lean{Rd.BoundedLipschitzDomain.mem_tildeSpace_of_ae_eq_zero,
+  Rd.BoundedLipschitzDomain.mem_tildeSpace_iff}
+\leanok
+\uses{lem:tilde-space-chart-pieces, thm:tilde-space-mollified, lem:boundary-partition-nhds,
+  lem:sobolev-one-products, lem:tilde-space-vanishes-outside, lem:product-modulus,
+  def:boundary-partition}
+For every $U \in H^1(V)$, $U \in \tilde H^1(\Omega)$ if and only if $\iota U = 0$ almost everywhere
+outside $\Omega$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+One direction is \Cref{lem:tilde-space-vanishes-outside}. Conversely, take a resolution of unity
+$\psi$ on $\Gamma$ equal to one near $\Gamma$ and the interior cut-off $\chi$
+(\Cref{lem:boundary-partition-nhds}), and $W_j, W_0 \in H^1(V)$ with $\iota W_j = \psi_j \iota U$
+and $\iota W_0 = \chi \iota U$ (\Cref{lem:sobolev-one-products}). Then $U = \sum_j W_j + W_0$,
+the $W_j$ lie in $\tilde H^1(\Omega)$ (\Cref{lem:tilde-space-chart-pieces}), and $W_0$ vanishes
+outside the compact set $\operatorname{supp} \chi \subseteq \Omega$
+(\Cref{thm:tilde-space-mollified}).
+\end{proof}
+
+In the language of McLean \cite[Theorem 3.29]{McLean}, $\tilde H^1(\Omega)$ is the space of
+the elements of $H^1(V)$ supported in $\overline\Omega$, since $\Gamma$ is a null set
+(\Cref{cor:boundary-null}).
+
+\paragraph{The kernel of the trace.}
+
+\begin{theorem}[The kernel of the trace is $H^1_0(\Omega)$]
+\label{thm:trace-kernel-zero-boundary}
+\lean{Rd.BoundedLipschitzDomain.zeroBoundarySpace_le_traceKer,
+  Rd.BoundedLipschitzDomain.traceKer_le_zeroBoundarySpace,
+  Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace}
+\leanok
+\uses{thm:tilde-space-supports, lem:tilde-space-vanishes-outside,
+  thm:zero-extension-trace-kernel, thm:sobolev-tilde-zero-boundary,
+  lem:sobolev-one-weak-gradient-norm, def:trace-kernel, lem:indicator-lp,
+  prop:sobolev-restriction-l2}
+$N_\Gamma = H^1_0(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Every element of $H^1_0(\Omega)$ is $r_\Omega U$ for some $U \in \tilde H^1(\Omega)$
+(\Cref{thm:sobolev-tilde-zero-boundary}); $U$ vanishes outside $\Omega$, so
+$\mathbf 1_\Omega \iota (r_\Omega U) = \iota U \in \Sob{1}{2}(V)$
+(\Cref{lem:tilde-space-vanishes-outside}) and $r_\Omega U \in N_\Gamma$
+(\Cref{thm:zero-extension-trace-kernel}). Conversely, for $u \in N_\Gamma$,
+$\mathbf 1_\Omega \iota u = \iota U$ for some $U \in H^1(V)$
+(\Cref{thm:zero-extension-trace-kernel}, \Cref{lem:sobolev-one-weak-gradient-norm}); $U$ vanishes
+outside $\Omega$, so $U \in \tilde H^1(\Omega)$ (\Cref{thm:tilde-space-supports}), and
+$u = r_\Omega U \in H^1_0(\Omega)$ (\Cref{prop:sobolev-restriction-l2},
+\Cref{thm:sobolev-tilde-zero-boundary}).
+\end{proof}
+
+\begin{corollary}[The quotient by $H^1_0(\Omega)$ and the dual of the trace kernel]
+\label{cor:trace-kernel-quotient-duals}
+\lean{Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace,
+  Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace_mk,
+  Rd.BoundedLipschitzDomain.tildeEquivTraceKer,
+  Rd.BoundedLipschitzDomain.coe_tildeEquivTraceKer_apply,
+  Rd.BoundedLipschitzDomain.coe_tildeEquivTraceKer_symm_apply,
+  Rd.BoundedLipschitzDomain.dualTraceKerEquiv, Rd.BoundedLipschitzDomain.dualTraceKerEquiv_apply,
+  Rd.BoundedLipschitzDomain.dualTraceKerEquiv_symm_apply,
+  Rd.BoundedLipschitzDomain.dualTraceKerEquiv_eq_iff}
+\leanok
+\uses{thm:trace-kernel-zero-boundary, thm:trace-space-operators, thm:sobolev-tilde-zero-boundary,
+  lem:sobolev-tilde-in-restriction, thm:tilde-restriction-shift, prop:sobolev-pairing,
+  cor:sobolev-duality-zero-boundary}
+The map $[u] \mapsto \gamma u$ is an isometric isomorphism of $H^1(\Omega) / H^1_0(\Omega)$ onto
+$H^{1/2}(\Gamma)$. The restriction $U \mapsto r_\Omega U$ is an isometric isomorphism of
+$\tilde H^1(\Omega)$ onto $N_\Gamma$, and the element of $\tilde H^1(\Omega)$ with restriction
+$u \in N_\Gamma$ is $u$ itself, read in $H^1(V)$. For every bounded linear functional $\ell$ on
+$N_\Gamma$ there is exactly one $W \in H^{-1}(\Omega)$ with $\ell(u) = [W, u]$ for every
+$u \in N_\Gamma$, and $\|W\| = \|\ell\|$; the map $\ell \mapsto W$ is a conjugate-linear isometric
+isomorphism of the dual of $N_\Gamma$ onto $H^{-1}(\Omega)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+$H^1(\Omega) / K \cong K^\perp$ for the closed subspace $K = H^1_0(\Omega) = N_\Gamma$, whose
+orthogonal complement is $H^{1/2}(\Gamma)$, and $u - E \gamma u \in N_\Gamma$
+(\Cref{thm:trace-space-operators}). The isometry is that of
+\Cref{thm:sobolev-tilde-zero-boundary} followed by $H^1_0(\Omega) = N_\Gamma$, with
+\Cref{lem:sobolev-tilde-in-restriction} for the inverse. The dual is Riesz's representation
+theorem on $N_\Gamma$, this isometry and $\Theta_1 \colon \tilde H^1(\Omega) \to H^{-1}(\Omega)$
+(\Cref{thm:tilde-restriction-shift}), as in \Cref{cor:sobolev-duality-zero-boundary}.
+\end{proof}
+
+For the trace spaces of Hiptmair, Pauly and Schulz \cite{HiptmairPaulySchulz} at $k = 0$ the
+quotient $H^1(\Omega) / H^1_0(\Omega)$ is the classical $H^{1/2}(\Gamma)$.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

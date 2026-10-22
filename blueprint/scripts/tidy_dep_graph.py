@@ -134,7 +134,8 @@ BLOCKS: list[tuple[str, list]] = [
                "Divergence kernels",
                "The extension theorem for Sobolev spaces",
                "Gauss--Green on Lipschitz graph domains",
-               "Green's formula on bounded Lipschitz domains"])]),
+               "Green's formula on bounded Lipschitz domains",
+               "The kernel of the trace"])]),
     ("Vector-valued singular integrals", [
         (SOB, [r'Dilation families and the H\"ormander condition',
                "The adjoint of a convolution", "Plancherel bounds",

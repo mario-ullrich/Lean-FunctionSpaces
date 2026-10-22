@@ -461,3 +461,11 @@ declarations.
   integrals over two sets that agree inside a set `B` agree for functions vanishing outside `B`
   (`Rd.setIntegral_eq_of_inter_eq`), and line derivatives vanish outside the closed support
   (`Rd.lineDeriv_eq_zero_of_notMem_tsupport`).
+* **Mollification in `H^1`** (`FunctionSpaces/Rd/ConvolutionAdjoint.lean`,
+  `FunctionSpaces/Rd/TraceKernel.lean`): if `g = ∂^v f` weakly on `V` for `f ∈ L_p(V)`,
+  `g ∈ L_r(V)`, `1 ≤ p, r < ∞`, then `η ⋆ g = ∂^v (η ⋆ f)` weakly for every Schwartz
+  function `η` (`Rd.hasWeakLineDeriv_convLp`); hence the mollified `η_c ⋆ U` converge to `U` in
+  `H^{1,2}(V, ℂ)` as `c → ∞` for `∫ η = 1` (`Rd.tendsto_of_toL2_eq_convLp`), and the elements of
+  `H^{1,2}(V, ℂ)` vanishing outside a compact subset of an open set `Ω` lie in the closure of the
+  test functions of `Ω` (`Rd.mem_tildeSpace_of_isCompact`). Mathlib's convolution files cover the
+  smoothness of `η ⋆ f`; these statements add its weak derivatives.

@@ -21,10 +21,11 @@ dual `H^{-1/2}(Γ)`, the area formula for Lipschitz graphs, the surface measure 
 `L_2(Γ)` and the trace into it, Rellich's compactness theorem for the restriction space
 (items I.6 and H.1 in that form, Section 4.5), and the extension theorem H.2 for `W^{1,p}`,
 `1 < p < ∞`, with `H^1(Ω) = W^{1,2}(Ω)` and Rellich's theorem in the weak-derivative form
-(Section 4.3), Gauss–Green and Green's formula on Lipschitz graph domains (Section 4.11), and
+(Section 4.3), Gauss–Green and Green's formula on Lipschitz graph domains (Section 4.11),
 Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing
-trace (Section 4.12). `ker γ = H^1_0(Ω)` is in preparation here; the forms layer, Hilbert
-complexes and Picard's theorem belong to the FEEC/BEEC library (Section 6).
+trace (Section 4.12), and `ker γ = H^1_0(Ω)` with the quotient `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)` of
+Hiptmair, Pauly and Schulz (Section 4.13). The forms layer, Hilbert complexes and Picard's
+theorem belong to the FEEC/BEEC library (Section 6).
 Section 9 records how this division differs from the first version of this document.
 
 ## 2. Depending on Lean-FunctionSpaces
@@ -633,6 +634,39 @@ File `FunctionSpaces/Rd/LipschitzDomainGreen.lean`, namespace `Rd.BoundedLipschi
   domain below a graph, `Rd.LipschitzGraph.lower`, with the traces from both sides of the graph
   equal (`Rd.LipschitzGraph.traceH1_ae_eq_traceH1_lower`).
 
+### 4.13 The kernel of the trace (H.7 at `k = 0`, the HPS quotient)
+
+File `FunctionSpaces/Rd/TraceKernel.lean`, namespace `Rd.BoundedLipschitzDomain`, for
+`Ω : Rd.BoundedLipschitzDomain V` with the notation of Sections 4.5 and 4.6:
+
+* `ker γ = H^1_0(Ω)` (McLean, Theorem 3.40; HPS cite it in this form); the trace kernel is the
+  common kernel of the chart traces, `⨅ j, (Ω.chartTrace j).ker`, the shape of TauCeti's
+  `W1p.exists_iInf_ker_lipschitzChartTrace_eq_of_isLipschitzDomainWith`:
+
+  ```lean
+  theorem traceKer_eq_zeroBoundarySpace : Ω.traceKer = Rd.zeroBoundarySpace 1 Ω.toOpens
+  ```
+* The HPS quotient, the trace space of Hiptmair, Pauly and Schulz for `k = 0`, with the class of
+  `u` going to `γ u` (`quotientZeroBoundaryEquivTraceSpace_mk`):
+
+  ```lean
+  noncomputable def quotientZeroBoundaryEquivTraceSpace :
+      (Ω.SobolevOne ⧸ Rd.zeroBoundarySpace 1 Ω.toOpens) ≃ₗᵢ[ℂ] Ω.TraceSpace
+  ```
+* `H̃^1(Ω) ≅ ker γ` by restriction (`tildeEquivTraceKer : Rd.tildeSpace 1 Ω.toOpens ≃ₗᵢ[ℂ]
+  Ω.traceKer`), and the dual of the trace kernel as `H^{-1}(Ω)`
+  (`dualTraceKerEquiv : StrongDual ℂ Ω.traceKer ≃ₗᵢ⋆[ℂ] Rd.RestrictionSpace (-1) Ω.toOpens`, with
+  `dualTraceKerEquiv_apply : ℓ u = Rd.pairing 1 (Ω.dualTraceKerEquiv ℓ) u` and the uniqueness
+  `dualTraceKerEquiv_eq_iff`).
+* `H̃^1(Ω)` by supports: `mem_tildeSpace_iff (U : H^{1, 2}(V, ℂ)) : U ∈ Rd.tildeSpace 1 Ω.toOpens ↔
+  ∀ᵐ x ∂volume, x ∉ Ω.carrier → toL2 U x = 0`; the direction `⇒` holds for every open set
+  (`Rd.toL2_ae_eq_zero_of_mem_tildeSpace`).
+* General tools: weak derivatives commute with convolution by Schwartz functions in every
+  `L_p`, `1 ≤ p < ∞` (`Rd.hasWeakLineDeriv_convLp`, file
+  `FunctionSpaces/Rd/ConvolutionAdjoint.lean`); mollification converges in `H^1(ℝ^d)`
+  (`Rd.tendsto_of_toL2_eq_convLp`); every element of `H^1(ℝ^d)` vanishing outside a compact subset
+  of an open set `Ω` lies in `H̃^1(Ω)` (`Rd.mem_tildeSpace_of_isCompact`).
+
 ## 5. Decisions and reasons
 
 * **Statements on `Ω` are qualitative.** The extension theorem for bounded Lipschitz domains
@@ -692,11 +726,9 @@ The FEEC/BEEC library builds:
   and `H^{-1/2}(curl_Γ, Γ)`.
 * Picard's theorem from I.6, and the s-number track together with Lean-SNumbers.
 
-In preparation in Lean-FunctionSpaces (Section 9), and available to it once it lands in
-Section 4:
-
-* `ker γ = H^1_0(Ω)` on Lipschitz domains (McLean, Theorem 3.40) and the HPS quotient
-  `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)`.
+Of the interface items, I.4 on `ℝ^d` (tensor-product Daubechies wavelets) is a later goal of
+Lean-FunctionSpaces (Section 7, answer 2); the other items are formalised here (Section 4), and
+the FEEC/BEEC library builds the layers above on them.
 
 ## 7. Answers to the seven questions
 
@@ -723,8 +755,9 @@ Section 4:
    functions and componentwise lemmas.
 6. **Space types and surface measure.** Predicates and Mathlib's type on `V` here, the Hilbert
    spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets (Section 4.5), the trace space
-   `H^{1/2}(Γ)` and its dual `H^{-1/2}(Γ)` (Section 4.6), and the surface measure `μHE[d-1]` on
-   `Γ` with `L_2(Γ)` and the trace into it (Section 4.8).
+   `H^{1/2}(Γ)` and its dual `H^{-1/2}(Γ)` (Section 4.6), the surface measure `μHE[d-1]` on
+   `Γ` with `L_2(Γ)` and the trace into it (Section 4.8), and `H^1_0(Ω) = ker γ` with the quotient
+   `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)` (Section 4.13).
 7. **Split and versions.** The split Lean-SNumbers / Lean-FunctionSpaces / FEEC/BEEC library is
    right. Lean-FunctionSpaces pins Lean and Mathlib `v4.35.0-rc2`, Lean-SNumbers moves to the
    same pin, and the FEEC/BEEC library takes it as well; the three move to the stable release
@@ -733,7 +766,7 @@ Section 4:
 ## 8. Versioning
 
 The Lean declarations cited here are those of the commit of `main` that adds
-`FunctionSpaces/Rd/SurfaceMeasure.lean`; later commits keep them unless this document says
+`FunctionSpaces/Rd/TraceKernel.lean`; later commits keep them unless this document says
 otherwise, and the commit that changes an interface name updates this document. Pin `rev` to a
 commit at or after the one that adds this document. Missing lemmas and wishes for other statement
 shapes go to the issue tracker of the GitHub repository, with the item number of the proposal and
@@ -747,9 +780,8 @@ its development plan). The space types, the isometry of H.4 and the duality are 
 with their Lean names in Section 4.5, the trace space, with its Lean names in Section 4.6, the
 area formula for Lipschitz graphs, with its Lean names in Section 4.7, and the surface measure
 with `L_2(Γ)` and the trace into it, with their Lean names in Section 4.8, and the extension
-theorem H.2, with its Lean names in Section 4.3, and Green's formula, with its Lean names in
-Section 4.12; the other statements below are in preparation and enter Section 4 with their Lean
-names as they are formalised.
+theorem H.2, with its Lean names in Section 4.3, Green's formula, with its Lean names in
+Section 4.12, and `ker γ = H^1_0(Ω)`, with its Lean names in Section 4.13.
 
 * **Space types (formalised, Section 4.5).** `H^s(Ω)` for every open `Ω` and every real `s` as a
   Hilbert space: the orthogonal complement, in Mathlib's `H^{s}(ℝ^d)`, of the elements that
@@ -794,8 +826,11 @@ names as they are formalised.
   extension of functions with vanishing trace
   (`Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_iff_mem_traceKer`). File
   `FunctionSpaces/Rd/LipschitzDomainGreen.lean`.
-* **`ker γ = H^1_0(Ω)`** (McLean, Theorem 3.40) and the HPS quotient
-  `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)`.
+* **`ker γ = H^1_0(Ω)` (formalised, Section 4.13)** (McLean, Theorem 3.40;
+  `Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`) and the HPS quotient
+  `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)`
+  (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace`). File
+  `FunctionSpaces/Rd/TraceKernel.lean`.
 * **The extension theorem H.2 (formalised, Section 4.3)** for `W^{1,2}` on bounded Lipschitz
   domains (the restriction space equals the weak-derivative space), by Rychkov's extension
   operator with local means of the gradient; with it Rellich and the trace statements hold for
@@ -960,6 +995,24 @@ The formalisation of the surface measure settled the following points of the pla
   one Lipschitz graph (`Rd.LipschitzGraph.exists_enorm_trace_toL2_le`), and every function of
   `B^{1/2}_{2,2}(Γ)` as the trace of an element of `H^{1/2}(Γ)` in `L_2(Γ)`
   (`Rd.BoundedLipschitzDomain.exists_traceL2_ae_eq`).
+
+The formalisation of the trace kernel settled the following points of the plan.
+
+* **One mollifier per chart** (decision of 21 October 2026) pushes the chart pieces into `Ω` and
+  smooths them in one step: its support lies in the open cone of the chart
+  (`Rd.LipschitzGraph.coneMollifier`), and the closure of a graph domain plus the open cone lies
+  in the domain (`Rd.LipschitzGraph.add_mem_of_mem_closure`), so its dilates map a function that
+  vanishes outside the closure of `Ω_j` to smooth functions with compact support in `Ω`
+  (`Rd.BoundedLipschitzDomain.mem_tildeSpace_of_mulLp_chart`).
+* **`H̃^1(Ω)` by supports.** The theorem is proved as
+  `ker γ → (zero extension) → H̃^1(Ω) → H^1_0(Ω)`: by Section 4.12, `u ∈ ker γ` iff
+  `1_Ω u ∈ H^1(ℝ^d)`, and an element of `H^1(ℝ^d)` lies in `H̃^1(Ω)` iff it vanishes outside `Ω`
+  (`Rd.BoundedLipschitzDomain.mem_tildeSpace_iff`); the isometry `H̃^1(Ω) ≅ H^1_0(Ω)` of
+  Section 4.5 finishes. The inclusion `H^1_0(Ω) ⊆ ker γ` runs the same chain backwards.
+* **Names**: the quotient isometry is
+  `Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace`, the isometry
+  `H̃^1(Ω) ≅ ker γ` is `Rd.BoundedLipschitzDomain.tildeEquivTraceKer`, and the dual of the trace
+  kernel is `Rd.BoundedLipschitzDomain.dualTraceKerEquiv`.
 
 ## References
 

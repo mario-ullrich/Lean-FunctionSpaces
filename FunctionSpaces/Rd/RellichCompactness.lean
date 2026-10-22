@@ -28,8 +28,8 @@ gradients and `‖f_n‖_2² + ∑_i ‖∂_{e_i} f_n‖_2² ≤ M²`
   inverse Fourier transform is the pointwise inverse Fourier integral
   (`Rd.fourierInv_Lp_ae_eq_of_integrable`).
 * **`H^1(V)` in `L_2(V)`**: an element `F` of `H^{1,2}(V, ℂ)` is the `L_2` function
-  `𝓕⁻(⟨ξ⟩⁻¹ 𝓕(J_1 F))` (`Rd.toL2`, `Rd.toTemperedDistribution_toL2`), and `‖F‖_2 ≤ ‖F‖_{H^1}`
-  (`Rd.norm_toL2_le`).
+  `𝓕⁻(⟨ξ⟩⁻¹ 𝓕(J_1 F))` (`Rd.toL2`, `Rd.toTemperedDistribution_toL2`), which determines `F`
+  (`Rd.toL2_injective`), and `‖F‖_2 ≤ ‖F‖_{H^1}` (`Rd.norm_toL2_le`).
 * **Fourier truncation**: cutting `𝓕F` off to the ball `|ξ| ≤ K` changes `F` by at most
   `K⁻¹ ‖F‖_{H^1}` in `L_2(V)`, since `⟨ξ⟩⁻¹ ≤ K⁻¹` outside the ball
   (`Rd.norm_toL2_sub_truncL2_le`), so the truncations converge in operator norm
@@ -188,6 +188,13 @@ theorem toTemperedDistribution_toL2 (F : H^{1, 2}(V, ℂ)) :
 theorem toL2_eq_of_toDistr_eq (F : H^{1, 2}(V, ℂ)) {f : Lp ℂ 2 (volume : Measure V)}
     (hf : (f : 𝓢'(V, ℂ)) = F.toDistr) : toL2 F = f :=
   eq_of_toTemperedDistribution_eq ((toTemperedDistribution_toL2 F).trans hf.symm)
+
+/-- **`H^1(V)` is determined by its `L_2` functions**: `F ↦ toL2 F` is injective, since the
+tempered distribution of `toL2 F` is `F.toDistr` (`Rd.toTemperedDistribution_toL2`) and an element
+of `H^1(V)` is determined by its distribution (Mathlib's `BesselPotentialSpace.ext`). -/
+theorem toL2_injective : Function.Injective (toL2 (V := V)) :=
+  fun U W h => BesselPotentialSpace.ext (by
+    rw [← toTemperedDistribution_toL2, h, toTemperedDistribution_toL2])
 
 /-- **`‖F‖_2 ≤ ‖F‖_{H^1}`**: by Plancherel, `‖toL2 F‖_2 = ‖⟨ξ⟩⁻¹ 𝓕(J_1 F)‖_2 ≤ ‖𝓕(J_1 F)‖_2`
 (`Rd.norm_besselInvMul_le_one`), and `‖𝓕(J_1 F)‖_2 = ‖F‖_{H^1}` (Mathlib's

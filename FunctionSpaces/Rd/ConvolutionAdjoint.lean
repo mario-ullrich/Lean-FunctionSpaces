@@ -35,7 +35,8 @@ convolution `(K ⋆ f)(x) = ∫ K(y) f(x - y) dy` (`Rd.conv`) and `K^∨(x) = K(
   and `η` has compact support with `x - supp η ⊆ Ω`, then `(η ⋆ g)(x) = ((∂^v η) ⋆ f)(x)`
   (`Rd.conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv`); and
   `∂^v (η ⋆ f) = (∂^v η) ⋆ f` weakly for
-  `f ∈ L_p`, `1 ≤ p < ∞` (`Rd.hasWeakLineDeriv_conv`).
+  `f ∈ L_p`, `1 ≤ p < ∞` (`Rd.hasWeakLineDeriv_conv`); for the operators of `Rd.convLp`,
+  `η ⋆ g = ∂^v (η ⋆ f)` weakly (`Rd.hasWeakLineDeriv_convLp`).
 -/
 
 @[expose] public section
@@ -365,6 +366,23 @@ theorem hasWeakLineDeriv_toLp_conv {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ 
       (memLp_conv hp1 hp (∂^{v} η : 𝓢(V, ℂ)).integrable hf).toLp := by
   refine (hasWeakLineDeriv_conv hp1 hp hf η v).congr_ae ?_ ?_ <;> rw [volume_restrict_top]
   exacts [(MemLp.coeFn_toLp _).symm, (MemLp.coeFn_toLp _).symm]
+
+/-- **Weak derivatives commute with convolution by Schwartz functions, in `L_p`**: if `g = ∂^v f`
+weakly on `V` for `f ∈ L_p(V)`, `g ∈ L_r(V)`, `1 ≤ p, r < ∞`, `v ∈ V^k`, and the kernel `K` is
+a Schwartz function `η`, then `K ⋆ g = ∂^v (K ⋆ f)` weakly on `V`, for the operators `Rd.convLp`.
+The weak derivative of `η ⋆ f` is `(∂^v η) ⋆ f` (`Rd.hasWeakLineDeriv_conv`), which equals
+`η ⋆ g` at every point (`Rd.conv_eq_conv_iteratedLineDerivOp`). -/
+theorem hasWeakLineDeriv_convLp {p r : ℝ≥0∞} [Fact (1 ≤ p)] [Fact (1 ≤ r)] (hp : p ≠ ∞)
+    (hr : r ≠ ∞) (η : 𝓢(V, ℂ)) {K : V → ℂ} (hK : Integrable K) (hηK : (η : V → ℂ) = K) {k : ℕ}
+    {v : Fin k → V} {f : Lp ℂ p (volume : Measure V)} {g : Lp ℂ r (volume : Measure V)}
+    (h : HasWeakLineDeriv ⊤ v f g) :
+    HasWeakLineDeriv ⊤ v (convLp hp hK f) (convLp hr hK g) := by
+  subst hηK
+  refine (hasWeakLineDeriv_conv Fact.out hp (Lp.memLp f) η v).congr_ae ?_ ?_ <;>
+    rw [volume_restrict_top]
+  · exact (convLp_apply_ae hp _ f).symm
+  · filter_upwards [convLp_apply_ae hr η.integrable g] with x hx
+    rw [hx, conv_eq_conv_iteratedLineDerivOp h η x]
 
 /-! ### Weak derivatives on open sets and convolution -/
 

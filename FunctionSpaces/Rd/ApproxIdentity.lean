@@ -16,7 +16,10 @@ public import Mathlib.MeasureTheory.Integral.Lebesgue.DominatedConvergence
 
 The **dilation** `Φ_c(x) = c^n Φ(c x)`, `n = dim V`, keeps the integral and the `L_1` norm of `Φ`
 (`Rd.integral_dilate`, `Rd.eLpNorm_dilate_one`) and compact supports
-(`Rd.hasCompactSupport_dilate`), and the convolution with `Φ_c` averages `f` over
+(`Rd.hasCompactSupport_dilate`); every `x` in its support has `c x` in the support of `Φ`, so the
+support shrinks into small balls as `c → ∞` (`Rd.smul_mem_tsupport_of_mem_tsupport_dilate`,
+`Rd.norm_le_of_mem_tsupport_dilate`, `Rd.eventually_tsupport_dilate_add_subset_thickening`).
+The convolution with `Φ_c` averages `f` over
 the shifts `c^(-1) z` weighted by `Φ(z)`: `(Φ_c ⋆ f)(x) = ∫ Φ(z) f(x - c^(-1) z) dz`
 (`Rd.conv_dilate_apply`, Mathlib's `Measure.integral_comp_smul`).
 
@@ -92,6 +95,49 @@ omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 theorem hasCompactSupport_dilate {K : V → ℂ} (hK : HasCompactSupport K) {c : ℝ} (hc : c ≠ 0) :
     HasCompactSupport (dilate c K) :=
   (hK.comp_homeomorph (Homeomorph.smulOfNeZero c hc)).mul_left
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **The support of a dilation**: if `x` lies in the closed support of `Φ_c`, `c ≠ 0`, then
+`c x` lies in the closed support of `Φ`; the closed support of `Φ_c` lies in the preimage of that
+of `Φ` under `x ↦ c x` (Mathlib's `tsupport_comp_eq_preimage`). -/
+theorem smul_mem_tsupport_of_mem_tsupport_dilate {η : V → ℂ} {c : ℝ} (hc : c ≠ 0) {x : V}
+    (hx : x ∈ tsupport (dilate c η)) : c • x ∈ tsupport η := by
+  have h1 : tsupport (dilate c η) ⊆ tsupport (η ∘ Homeomorph.smulOfNeZero c hc) :=
+    tsupport_mul_subset_right (f := fun _ => (((c ^ finrank ℝ V : ℝ)) : ℂ))
+  have h2 := h1 hx
+  rw [tsupport_comp_eq_preimage] at h2
+  exact h2
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **Dilated supports shrink**: if the closed support of `η` lies in `B̄(0, R)` and `c > 0`, the
+closed support of `η_c` lies in `B̄(0, R/c)`. -/
+theorem norm_le_of_mem_tsupport_dilate {η : V → ℂ} {R : ℝ}
+    (hηR : tsupport η ⊆ Metric.closedBall 0 R) {c : ℝ} (hc : 0 < c) {x : V}
+    (hx : x ∈ tsupport (dilate c η)) : ‖x‖ ≤ R / c := by
+  have h := hηR (smul_mem_tsupport_of_mem_tsupport_dilate hc.ne' hx)
+  rw [mem_closedBall_zero_iff, norm_smul, Real.norm_of_nonneg hc.le] at h
+  rw [le_div_iff₀ hc]
+  linarith
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+open scoped Pointwise in
+/-- **Dilated supports plus a set lie in a thickening**: if the closed support of `η` lies in
+`B̄(0, R)` and `δ > 0`, then `supp η_{2^n} + S` lies in the `δ`-neighbourhood of `S` for all large
+`n`: once `R / 2^n < δ`, `supp η_{2^n} ⊆ B(0, δ)` (`Rd.norm_le_of_mem_tsupport_dilate`), and
+`B(0, δ) + S` is the `δ`-neighbourhood of `S` (Mathlib's `ball_add_zero`). -/
+theorem eventually_tsupport_dilate_add_subset_thickening {η : V → ℂ} {R δ : ℝ}
+    (hηR : tsupport η ⊆ Metric.closedBall 0 R) (hδ : 0 < δ) (S : Set V) :
+    ∀ᶠ n : ℕ in atTop, tsupport (dilate ((2 : ℝ) ^ n) η) + S ⊆ Metric.thickening δ S := by
+  filter_upwards [(tendsto_pow_atTop_atTop_of_one_lt one_lt_two).eventually_gt_atTop (R / δ)]
+    with n hn
+  have hpos : (0 : ℝ) < 2 ^ n := by positivity
+  rw [div_lt_iff₀ hδ] at hn
+  rw [← ball_add_zero]
+  refine Set.add_subset_add (fun z hz => ?_) subset_rfl
+  rw [mem_ball_zero_iff]
+  refine (norm_le_of_mem_tsupport_dilate hηR hpos hz).trans_lt ?_
+  rw [div_lt_iff₀ hpos]
+  linarith
 
 /-- **The dilation keeps the integral**: `∫ Φ_c = ∫ Φ` for `c > 0` (Mathlib's
 `Measure.integral_comp_smul`). -/

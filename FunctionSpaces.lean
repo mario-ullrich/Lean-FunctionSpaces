@@ -204,6 +204,7 @@ public import FunctionSpaces.Rd.DivergenceKernels
 public import FunctionSpaces.Rd.SobolevExtension
 public import FunctionSpaces.Rd.LipschitzGraphGreen
 public import FunctionSpaces.Rd.LipschitzDomainGreen
+public import FunctionSpaces.Rd.TraceKernel
 
 /-!
 # Function spaces
@@ -475,8 +476,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   of the coordinate and the isotropic Besov conditions for `0 < s < r - 1 + 1/p`.
 * `FunctionSpaces.Rd.Convolution`: convolution with integrable kernels on a finite-dimensional
   space, Young's inequality, associativity, and the convolution operators on `L_p`.
-* `FunctionSpaces.Rd.ApproxIdentity`: dilations, continuity of translation in `L_p`, and
-  approximate identities.
+* `FunctionSpaces.Rd.ApproxIdentity`: dilations and their supports, continuity of translation
+  in `L_p`, and approximate identities.
 * `FunctionSpaces.Rd.LittlewoodPaleyKernels`: the Fourier transform of integrable functions
   (continuity, `L_1` bounds, convolutions, the multiplication formula, conjugation), smooth
   frequency cut-offs, the kernels `Φ_k`, `Θ_k`, `ψ_j` of the Littlewood–Paley decomposition, and
@@ -502,8 +503,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   Littlewood–Paley blocks and by differences.
 * `FunctionSpaces.Rd.LocalMeans`: local means with moment kernels, the reproducing formula, and
   the characterisation of Besov spaces by local means.
-* `FunctionSpaces.Rd.LipschitzGraph`: Lipschitz graph domains, their cones, the cone bump, the
-  support principle, the cut-off on `L_p`, and integrals over a set as `L_2` pairings.
+* `FunctionSpaces.Rd.LipschitzGraph`: Lipschitz graph domains, their cones, the closure of the
+  domain plus the cone, the cone bump, the support principle, the cut-off on `L_p`, and integrals
+  over a set as `L_2` pairings.
 * `FunctionSpaces.Rd.RychkovExtension`: intrinsic local means on a Lipschitz graph domain,
   Rychkov's extension, and the restrictions of Besov spaces described by intrinsic local means.
 * `FunctionSpaces.Rd.LipschitzGraphBesov`: the restrictions of Besov spaces to Lipschitz graph
@@ -631,13 +633,16 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   gradient on `Ω`, and the boundary traces in `B^{1/2}_{2,2}(∂Ω)`, which form the trace space.
 * `FunctionSpaces.Rd.RellichCompactness`: the inverse Fourier transform of integrable `L_2`
   functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, and
-  Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω`.
+  Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω`;
+  an element of `H^1(ℝ^d)` is determined by its `L_2` function.
 * `FunctionSpaces.Rd.SobolevRestrictionSpaces`: the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and
   `H^s_0(Ω)` on open sets `Ω ⊆ ℝ^d` for real `s`, built inside Mathlib's `H^s(ℝ^d)`: restriction
-  as an orthogonal projection, `H^s(Ω)` as a quotient, the compact embedding
+  as an orthogonal projection, `H^s(Ω)` as a quotient, elements of `H^1(Ω)` determined by their
+  values on `Ω`, the compact embedding
   `H^1(Ω) → L_2(Ω)` for bounded `Ω`, the weak derivatives `∂_v : H^1(ℝ^d) → L_2(ℝ^d)` as
   bounded operators, the density of the compactly supported Schwartz functions in `H^s(ℝ^d)`,
-  so `H̃^s(ℝ^d) = H^s(ℝ^d)`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)`.
+  Schwartz functions with compact support in `Ω` in the span of the test functions,
+  `H̃^s(ℝ^d) = H^s(ℝ^d)`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)`.
 * `FunctionSpaces.Rd.SobolevDuality`: the Bessel potential of real Schwartz functions as a real
   function, the isometry `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}(ℝ^d)` and
   `H^s(ℝ^d)`, and the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` and
@@ -663,7 +668,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.ConvolutionAdjoint`: the adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for
   `f ∈ L_p`, `g ∈ L_q` and the reflection `K^∨(x) = K(-x)`, derivatives of Schwartz kernels
   moved to the other Schwartz factor, and weak derivatives commuting with convolution by Schwartz
-  functions.
+  functions, also for the convolution operators on `L_p`.
 * `FunctionSpaces.Rd.PlancherelBounds`: the `L_2` bounds of the analysis operator
   `f ↦ (θ_j ⋆ f)_j` and of the synthesis operators `(g_j)_j ↦ ∑_{j ∈ s} θ_j ⋆ g_j` for finite
   sets `s` by the Fourier overlap `B`, for integrable kernels and for Calderón–Zygmund
@@ -738,4 +743,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   everywhere on the boundary, the surface form `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ u · γ w ⟪v, ν⟫ dσ`
   for `u, w ∈ H^1(Ω)`, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u`
   vanishes.
+* `FunctionSpaces.Rd.TraceKernel`: the kernel of the trace on a bounded Lipschitz domain:
+  mollification converges in `H^1(ℝ^d)`, mollifiers supported in the cone of a chart, `H̃^1(Ω)`
+  as the space of `H^1(ℝ^d)` functions vanishing outside `Ω`, `ker γ = H^1_0(Ω)` (McLean,
+  Theorem 3.40), `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and
+  `(ker γ)^* ≅ H^{-1}(Ω)`.
 -/

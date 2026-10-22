@@ -62,6 +62,11 @@ the trace `γ_{L_2} : H^1(Ω) → L_2(Γ)`, pasted from the
 graph domains with a resolution of unity equal to one near the boundary; the outward unit normal
 is the chart normal almost everywhere on the boundary, and the zero extension of `u ∈ H^1(Ω)` lies
 in `W^1_2(ℝ^d)` iff the trace of `u` vanishes.
+The kernel of the trace is `H^1_0(Ω)`: mollification converges in `H^1(ℝ^d)`, and mollifiers
+supported in the cone of a chart push the pieces of a function that vanishes outside `Ω` into
+`Ω`, so `H̃^1(Ω)` consists of the functions of `H^1(ℝ^d)` that vanish outside `Ω`; with the zero
+extension this gives `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)` and
+`(ker γ)^* ≅ H^{-1}(Ω)`.
 The [interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
 built on this project, with the decisions behind their form.
 
@@ -544,6 +549,27 @@ built on this project, with the decisions behind their form.
   agree almost everywhere because Gauss–Green for `C^1` functions in two charts gives the same
   boundary integrals (`Rd.BoundedLipschitzDomain.normalAt_graphMap_ae_eq`), and the traces from
   above and from below a graph agree (`Rd.LipschitzGraph.traceH1_ae_eq_traceH1_lower`).
+* **The kernel of the trace.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`, `H^1(Ω)`
+  the Hilbert space of restrictions of `H^1(V)`, `H̃^1(Ω)` the closure of the test functions of
+  `Ω` in `H^1(V)`, `H^1_0(Ω)` the closure of their restrictions in `H^1(Ω)`, and `ker γ` the
+  `u ∈ H^1(Ω)` whose boundary trace vanishes almost everywhere on `Γ`. Then
+  `ker γ = H^1_0(Ω)` (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`; McLean,
+  Theorem 3.40). For every `U ∈ H^1(V)`, `U ∈ H̃^1(Ω)` iff the `L_2` function of `U` vanishes
+  almost everywhere outside `Ω` (`Rd.BoundedLipschitzDomain.mem_tildeSpace_iff`). The map
+  sending the class of `u` modulo `H^1_0(Ω)` to `γ u` is an isometric isomorphism
+  `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`
+  (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace`), restriction is an isometric
+  isomorphism `H̃^1(Ω) ≅ ker γ` (`Rd.BoundedLipschitzDomain.tildeEquivTraceKer`), and every
+  bounded functional `ℓ` on `ker γ` is `u ↦ [W, u]` for exactly one `W ∈ H^{-1}(Ω)` with
+  `‖W‖ = ‖ℓ‖` (`Rd.BoundedLipschitzDomain.dualTraceKerEquiv`,
+  `Rd.BoundedLipschitzDomain.dualTraceKerEquiv_apply`,
+  `Rd.BoundedLipschitzDomain.dualTraceKerEquiv_eq_iff`). The proof mollifies: for a Schwartz
+  function `η` with `∫ η = 1` and `c_i → ∞`, `η_{c_i} ⋆ U → U` in `H^1(V)`
+  (`Rd.tendsto_of_toL2_eq_convLp`), since weak derivatives commute with convolution
+  (`Rd.hasWeakLineDeriv_convLp`); the pieces of `U` near the boundary vanish outside the closure
+  of a graph domain, which convolution with a mollifier supported in the cone of the graph moves
+  into the domain (`Rd.LipschitzGraph.coneMollifier`,
+  `Rd.BoundedLipschitzDomain.mem_tildeSpace_of_mulLp_chart`).
 
 ## What is formalised
 
@@ -555,14 +581,14 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Weak derivatives and Sobolev spaces on open sets, integration by parts, also against complex test functions, uniqueness, locality, finite sums, the product rule with smooth functions, limits; the bridge to tempered distributions | ✅ | ✗ | `Rd/WeakDerivatives` |
 | The convolution theorem and Plancherel for a convolution on `L_2`, the Bessel potential on Schwartz functions, even Fourier multipliers acting by the transpose, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/SobolevTwoLittlewoodPaley` |
 | `H^1` on bounded Lipschitz domains as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the weak gradient, and the trace space `B^{1/2}_{2,2}` of the boundary | ✅ | ✗ | `Rd/LipschitzDomainH1` |
-| The inverse Fourier transform of integrable `L_2` functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, and Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω` | ✅ | ✗ | `Rd/RellichCompactness` |
-| The Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets inside Mathlib's `H^s(ℝ^d)`, `H^s(Ω)` as a quotient, Rellich's theorem for `H^1(Ω)`, the identification with the restriction space of a bounded Lipschitz domain, the bound of the `H^1` norm by the `W^1_2` norm, the weak derivatives as bounded operators on `H^1(ℝ^d)`, the density of compactly supported Schwartz functions in `H^s(ℝ^d)` with `H̃^s(ℝ^d) = H^s(ℝ^d)`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)` | ✅ | ✗ | `Rd/SobolevRestrictionSpaces` |
+| The inverse Fourier transform of integrable `L_2` functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, the injectivity of `H^1(ℝ^d) → L_2(ℝ^d)`, and Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω` | ✅ | ✗ | `Rd/RellichCompactness` |
+| The Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets inside Mathlib's `H^s(ℝ^d)`, `H^s(Ω)` as a quotient, Rellich's theorem for `H^1(Ω)`, the identification with the restriction space of a bounded Lipschitz domain, the restriction of an element agreeing with `u ∈ H^1(Ω)` on `Ω`, the bound of the `H^1` norm by the `W^1_2` norm, the weak derivatives as bounded operators on `H^1(ℝ^d)`, the density of compactly supported Schwartz functions in `H^s(ℝ^d)`, Schwartz functions with compact support in `Ω` in the span of the test functions, `H̃^s(ℝ^d) = H^s(ℝ^d)`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)` | ✅ | ✗ | `Rd/SobolevRestrictionSpaces` |
 | The Bessel potential of real Schwartz functions as a real function, the isometry `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}` and `H^s`, and the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)`, `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on open sets | ✅ | ✗ | `Rd/SobolevDuality` |
 | `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` with explicit constants, the trace of `H^1(ℝ^d)` on a Lipschitz graph and the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the trace kernel, the trace space `H^{1/2}(Γ)` with trace and extension operators, `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` | ✅ | ✗ | `Rd/BoundaryTraceSpace` |
 | The area formula for Lipschitz graphs: Lipschitz maps and Mathlib's Euclidean Hausdorff measure, the linear case by Mathlib's norm determinant, stretches and tilts, the gradient and the Gram density, good pieces, `μHE[n-1](γ(A)) = ∫_A √(1 + ‖∇φ‖²)` with `n = dim V` in set, measure and integral form; the outward unit normal | ✅ | ✗ | `Rd/LipschitzGraphArea` |
 | The surface measure of a bounded Lipschitz domain as `μHE[n-1]` on the boundary, its chart form, finiteness and null sets, the boundary `Γ` as a Lebesgue null set, the boundary trace in `L_p(Γ)`, `L_2(Γ)` with the traces of `H^1(Ω)` and `H^{1/2}(Γ)`, and the outward unit normal field | ✅ | ✗ | `Rd/SurfaceMeasure` |
 | Dilation, reflection and conjugation of Schwartz functions, derivatives of dilations, uniform Schwartz families and finitely many exceptions in them, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families, also with finitely many exceptional members, and their adjoints, the Littlewood–Paley blocks and the synthesis kernels as such families | ✅ | ✗ | `Rd/DilationFamilies` |
-| The adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for `f ∈ L_p`, `g ∈ L_q`, and its form `∫ (K ⋆ f) conj g = ∫ f conj(K^* ⋆ g)` with the adjoint kernel, derivatives of Schwartz kernels moved to the other Schwartz factor, translates and reflections of Schwartz functions, and weak derivatives commuting with convolution by Schwartz functions, on `ℝ^d` and on open sets | ✅ | ✗ | `Rd/ConvolutionAdjoint` |
+| The adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for `f ∈ L_p`, `g ∈ L_q`, and its form `∫ (K ⋆ f) conj g = ∫ f conj(K^* ⋆ g)` with the adjoint kernel, derivatives of Schwartz kernels moved to the other Schwartz factor, translates and reflections of Schwartz functions, and weak derivatives commuting with convolution by Schwartz functions, on `ℝ^d`, in `L_p` and on open sets | ✅ | ✗ | `Rd/ConvolutionAdjoint` |
 | The Cauchy–Schwarz inequality for finite sums, the `L_2` bounds of the analysis operator and of the synthesis operators on finite index sets for a kernel family with Fourier overlap `B`, and for every Calderón–Zygmund family | ✅ | ✗ | `Rd/PlancherelBounds` |
 | The signed Calderón–Zygmund decomposition of functions with values in a normed space and of families: good parts bounded by `2^n t` with `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, bad pieces with mean zero on their cubes and total mass at most `2 ∫ ‖f‖` | ✅ | ✗ | `Rd/CalderonZygmundSigned` |
 | Chebyshev's inequality for split functions, the Hörmander condition around a cube, convolutions of pieces with mean zero, and the weak type `(1,1)` of the analysis and synthesis operators of a Calderón–Zygmund family with an explicit constant | ✅ | ✗ | `Rd/VectorValuedWeakType` |
@@ -581,6 +607,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The local means of order two by the gradient, local means of Triebel–Lizorkin type on a set, bounded extensions from one patch, pasting in `W^1_p(ℝ^d)`, the extension theorem (`W^1_p(Ω)` is the space of restrictions of `W^1_p(ℝ^d)`) for `1 < p < ∞` with a bound, and for `p = 2` `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the quotient norm of `H^1(Ω)` and the boundary traces of `W^1_2(Ω)` | ✅ | ✗ | `Rd/SobolevExtension` |
 | Gauss–Green on Lipschitz graph domains: product coordinates and Fubini, ray integrals, integrals of line derivatives of Lipschitz functions, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and surface form, the product rule for line derivatives, and Green's formula `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)` | ✅ | ✗ | `Rd/LipschitzGraphGreen` |
 | Green's formula on bounded Lipschitz domains: integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary, the chart form for every resolution of unity, the outward unit normal as the chart normal and a unit vector almost everywhere on the boundary, `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, the traces from both sides of a graph, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u` vanishes | ✅ | ✗ | `Rd/LipschitzDomainGreen` |
+| The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, smoothing with compact support, bump mollifiers and cone mollifiers, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)` | ✅ | ✗ | `Rd/TraceKernel` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics
