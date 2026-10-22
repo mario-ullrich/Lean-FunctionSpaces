@@ -7332,18 +7332,21 @@ $\partial\Omega$, in one of the balls, or in $\Omega$ outside them.
 
 \begin{lemma}[Resolutions of unity]
 \label{lem:resolution-of-unity}
-\lean{Rd.exists_smooth_partition, Rd.exists_iteratedFDeriv_bound}
+\lean{Rd.exists_smooth_partition, Rd.exists_smooth_partition_nhds, Rd.exists_iteratedFDeriv_bound}
 \leanok
 For a closed set $S \subseteq V$ and a finite open cover $(U_i)$ of $S$ there are smooth
 $\psi_i \geq 0$ with $\operatorname{supp} \psi_i \subseteq U_i$, $\sum_i \psi_i = 1$ on $S$ and
-$\sum_i \psi_i \leq 1$ on $V$. Smooth functions with compact support have bounded derivatives of
-every order.
+$\sum_i \psi_i \leq 1$ on $V$; if $S$ is compact, they can be chosen with $\sum_i \psi_i = 1$ on a
+neighbourhood of $S$. Smooth functions with compact support have bounded derivatives of every
+order.
 \end{lemma}
 
 \begin{proof}
 \leanok
 Mathlib's smooth partitions of unity on manifolds, for the model space $V$; the derivatives are
-continuous with compact support.
+continuous with compact support. For compact $S$, apply the first statement to a compact $L$ with
+$S \subseteq \operatorname{int} L \subseteq L \subseteq \bigcup_i U_i$ (Mathlib's
+\texttt{exists\_\allowbreak compact\_\allowbreak between}).
 \end{proof}
 
 \begin{lemma}[Pasting local extensions]
@@ -12630,7 +12633,7 @@ $\partial^v f(\varphi) = (-1)^k f(\partial^v \varphi)$ by \Cref{lem:distribution
   Rd.MemWeakSobolev.mono_set, Rd.zero_memWeakSobolev, Rd.MemWeakSobolev.add,
   Rd.MemWeakSobolev.smul, Rd.MemWeakSobolev.congr_ae, Rd.zero_memSobolev, Rd.MemSobolev.add,
   Rd.MemSobolev.smul, Rd.HasWeakLineDeriv.sum, Rd.memSobolev_iff_exists_hasWeakLineDeriv,
-  Rd.MemSobolev.sum, Rd.HasWeakLineDeriv.eq_of_top}
+  Rd.MemSobolev.sum, Rd.HasWeakLineDeriv.eq_of_top, Rd.memSobolev_one_of_forall_hasWeakLineDeriv}
 \leanok
 \uses{def:weak-line-derivative, lem:weak-derivative-integral, lem:directional-derivatives-commute}
 For every $v \in V^k$, all functions $f, f', g, g'$ and every $c \in \C$:
@@ -12660,7 +12663,9 @@ $\Sob{m}{p}(\Omega')$, and $\Sob{m}{p}(\Omega)$ is a complex vector space. For e
 $f \in \Sob{m}{p}(\Omega)$ and every $f'$ with $f' = f$ almost everywhere on $\Omega$,
 $f' \in \Sob{m}{p}(\Omega)$. For $\Omega = V$, $\Sob{m}{p}(V)$ is a complex linear subspace of
 $L_p(V)$, and $f \in L_p(V)$ lies in $\Sob{m}{p}(V)$ if and only if for every $k \leq m$ and
-every $v \in V^k$ some $g \in L_p(V)$ is the weak derivative $\partial^v f$ on $V$.
+every $v \in V^k$ some $g \in L_p(V)$ is the weak derivative $\partial^v f$ on $V$; for $m = 1$
+it suffices that for every $v \in V$ some $g \in L_p(V)$ is the weak derivative $\partial_v f$
+on $V$.
 \end{lemma}
 
 \begin{proof}
@@ -12680,7 +12685,7 @@ integrable on every compact subset of $\Omega$, which has finite measure. The st
 $\Sob{m}{p}$ follow, with $L_p(\Omega') \supseteq L_p(\Omega)|_{\Omega'}$ and (4); in $L_p(V)$,
 the zero class, and the class of a sum or a multiple, agree almost everywhere with $0$ and with
 the sum or the multiple of the representatives, and a weak derivative in $L_p(V)$ may be
-replaced by its class (4).
+replaced by its class (4). For $m = 1$ the order $k = 0$ is (2).
 \end{proof}
 
 \begin{lemma}[Complex test functions]
@@ -14014,13 +14019,14 @@ is the compactness that Hiptmair, Pauly and Schulz require (their Assumption F)
 
 \begin{lemma}[Weak derivatives of $H^1(V)$]
 \label{lem:sobolev-one-weak-gradient-norm}
-\lean{Rd.memSobolev_toL2, Rd.exists_hasWeakLineDeriv_toL2, Rd.sq_norm_eq_of_hasWeakLineDeriv,
-  Rd.norm_le_norm_toL2_add_sum}
+\lean{Rd.memSobolev_toL2, Rd.exists_toL2_eq_of_memSobolev, Rd.exists_hasWeakLineDeriv_toL2,
+  Rd.sq_norm_eq_of_hasWeakLineDeriv, Rd.norm_le_norm_toL2_add_sum}
 \leanok
 \uses{lem:sobolev-one-to-l2, thm:sobolev-one-two, cor:sobolev-tempered,
   thm:weak-derivative-tempered}
 For every $U \in H^1(V)$, $\iota U \in \Sob{1}{2}(V)$, and for every $v \in V$ the weak
-derivative $\partial_v \iota U$ on $V$ exists in $L_2(V)$. For every orthonormal basis
+derivative $\partial_v \iota U$ on $V$ exists in $L_2(V)$. For every $f \in L_2(V)$ with
+$f \in \Sob{1}{2}(V)$ there is $U \in H^1(V)$ with $\iota U = f$. For every orthonormal basis
 $(e_i)_{i \in I}$ of $V$, every $U \in H^1(V)$ and all $g_i \in L_2(V)$ such that $g_i$ is the
 weak derivative $\partial_{e_i} \iota U$ on $V$ for every $i \in I$,
 \[
@@ -14034,7 +14040,9 @@ and in particular $\|U\| \leq \|\iota U\|_2 + \sum_i \|g_i\|_2$.
 The tempered distribution of $\iota U$ is $U \in H^1(V)$ (\Cref{lem:sobolev-one-to-l2}), so
 $\iota U \in \Sob{1}{2}(V)$ by \Cref{thm:sobolev-one-two}, and its tempered derivatives are
 $L_2$ functions (\Cref{cor:sobolev-tempered}), which are weak derivatives
-(\Cref{thm:weak-derivative-tempered}). The identity is
+(\Cref{thm:weak-derivative-tempered}). Conversely, for $f \in \Sob{1}{2}(V)$ the tempered
+distribution of $f$ lies in $H^1(V)$ (\Cref{thm:sobolev-one-two}), and $f$ is its $L_2$ function
+(\Cref{lem:sobolev-one-to-l2}). The identity is
 $(2\pi)^2 \|J_1 U\|_2^2 = (2\pi)^2 \|\iota U\|_2^2 + \sum_i \|g_i\|_2^2$ from
 \Cref{thm:sobolev-one-two}, with $\|U\| = \|J_1 U\|_2$. The bound follows from
 $(2\pi)^{-2} \leq 1$ and $\sum_i a_i^2 \leq (\sum_i a_i)^2$ for $a_i \geq 0$.
@@ -15660,14 +15668,17 @@ The resolution of unity in the second statement may take negative values.
 \label{thm:surface-measure-null-sets}
 \lean{Rd.BoundedLipschitzDomain.isFiniteMeasure_surfaceMeasure,
   Rd.BoundedLipschitzDomain.ae_surfaceMeasure_ball_iff,
+  Rd.BoundedLipschitzDomain.ae_graphMap_of_ae_surfaceMeasure,
   Rd.BoundedLipschitzDomain.ae_surfaceMeasure_iff_aeBoundary}
 \leanok
 \uses{thm:surface-measure-charts, thm:lipschitz-graph-area, lem:graph-gradient,
   lem:graph-map-area, def:ae-boundary}
 $\sigma(V) < \infty$. For every $j$ and every property $P$ of the points of $V$, $P(y)$ holds for
 $\sigma$-almost every $y \in B_j$ if and only if $P(\gamma_j(x'))$ holds for almost every
-$x' \in H_j$ with $\gamma_j(x') \in B_j$. A property holds $\sigma$-almost everywhere if and only
-if it holds almost everywhere on $\Gamma$ in the sense of \Cref{def:ae-boundary}.
+$x' \in H_j$ with $\gamma_j(x') \in B_j$; in particular, for every $j$, a property that holds
+$\sigma$-almost everywhere holds at $\gamma_j(x')$ for almost every $x' \in H_j$ with
+$\gamma_j(x') \in B_j$. A property holds $\sigma$-almost everywhere if and only if it holds
+almost everywhere on $\Gamma$ in the sense of \Cref{def:ae-boundary}.
 \end{theorem}
 
 \begin{proof}
@@ -15865,7 +15876,9 @@ $\|\nu(y)\| \leq \sum_j \psi^0_j(y) \|\nu_j(P_j y)\| = \sum_j \psi^0_j(y) \leq 1
 \end{proof}
 
 For $y \in \Gamma$, $\sum_j \psi^0_j(y) = 1$, so $\nu(y)$ is a convex combination of the chart
-normals $\nu_j(P_j y)$ of the charts with $\psi^0_j(y) > 0$.
+normals $\nu_j(P_j y)$ of the charts with $\psi^0_j(y) > 0$. These agree $\sigma$-almost
+everywhere by the Gauss--Green theorem in two charts (\Cref{thm:chart-normals-agree}), so that
+$\nu = \nu_j \circ P_j$ $\sigma$-almost everywhere on $B_j$ (\Cref{thm:boundary-normal-chart}).
 
 \section{Dilation families and the H\"ormander condition}
 \label{sec:dilation-families}
@@ -20930,13 +20943,21 @@ $\int_\Omega \partial_v g = \int_\Gamma g \langle v, \nu \rangle \, d\sigma$.
 
 \begin{lemma}[Continuity of both sides of Green's formula]
 \label{lem:green-continuous}
-\lean{Rd.LipschitzGraph.integral_mul_mul_normalWeight_eq,
+\lean{Rd.setIntegral_weakDeriv_mul_add_eq, Rd.continuous_setIntegral_weakDeriv_mul_add,
+  Rd.LipschitzGraph.integral_mul_mul_normalWeight_eq,
   Rd.LipschitzGraph.continuous_setIntegral_weakDeriv_mul_add,
   Rd.LipschitzGraph.continuous_integral_traceH1_mul_normalWeight}
 \leanok
 \uses{lem:sobolev-one-weak-derivative-operator, lem:graph-trace-sobolev-one-operator,
   lem:normal-weight, lem:indicator-lp}
-For every $v \in V$, the maps
+For every measurable $s \subseteq V$, every $v \in V$ and all $U, W \in H^1(V)$,
+\[
+  \int_s (\partial_v U) \, \iota W + \iota U \, \partial_v W
+  = \langle \mathbf 1_s \partial_v U, \iota W \rangle + \langle \mathbf 1_s \iota U,
+    \partial_v W \rangle
+\]
+with the bilinear pairing of $L_2(V)$ with itself, and this integral is continuous in
+$(U, W) \in H^1(V) \times H^1(V)$. For every $v \in V$, the maps
 \[
   (U, W) \mapsto \int_\Omega (\partial_v U) \, W + U \, \partial_v W ,
   \qquad
@@ -20949,7 +20970,7 @@ $\int_H a b \, n_v = \langle a, n_v b \rangle$ with the bilinear pairing of $L_2
 
 \begin{proof}
 \leanok
-$\int_\Omega a b$ for $a, b \in L_2(V)$ is the bounded bilinear pairing of $\mathbf 1_\Omega a$
+$\int_s a b$ for $a, b \in L_2(V)$ is the bounded bilinear pairing of $\mathbf 1_s a$
 with $b$ (\Cref{lem:indicator-lp}), and multiplication by
 $n_v \in L_\infty(H)$ is a bounded operator of $L_2(H)$ (Mathlib's
 \texttt{ContinuousLinearMap.\allowbreak holderL}). The operators $\partial_v$, $\iota$, the
@@ -20988,8 +21009,8 @@ $w_1 w_2$, with $\iota w_i = w_i$, $\partial_v \iota w_i = \partial_v w_i$
   Rd.LipschitzGraph.setIntegral_green_surface}
 \leanok
 \uses{lem:green-schwartz, lem:green-continuous, thm:sobolev-schwartz-dense,
-  lem:sobolev-one-weak-derivative-operator, thm:sobolev-one-two, thm:lipschitz-graph-area,
-  lem:normal-weight}
+  lem:sobolev-one-weak-derivative-operator, lem:sobolev-one-weak-gradient-norm,
+  thm:lipschitz-graph-area, lem:normal-weight}
 For all $U, W \in H^1(V)$ and every $v \in V$,
 \begin{align*}
   \int_\Omega (\partial_v U) \, W + U \, \partial_v W
@@ -21012,8 +21033,534 @@ Both sides of the first identity are continuous on $H^1(V) \times H^1(V)$
 (\Cref{lem:green-schwartz}), which are dense (\Cref{thm:sobolev-schwartz-dense}). The second
 form is the area formula (\Cref{thm:lipschitz-graph-area}) with \Cref{lem:normal-weight}. For
 $f, g \in \Sob{1}{2}(V)$, $f = \iota U$ and $g = \iota W$ for some $U, W \in H^1(V)$
-(\Cref{thm:sobolev-one-two}), and $f_v = \partial_v U$, $g_v = \partial_v W$ by uniqueness of
+(\Cref{lem:sobolev-one-weak-gradient-norm}), and $f_v = \partial_v U$, $g_v = \partial_v W$
+by uniqueness of
 weak derivatives (\Cref{lem:sobolev-one-weak-derivative-operator}).
+\end{proof}
+
+\section{Green's formula on bounded Lipschitz domains}
+\label{sec:lipschitz-domain-green}
+
+Throughout this section $\Omega$ is a bounded Lipschitz domain in $V$, $\dim V = n$, with boundary
+$\Gamma$, boundary balls $B_j$ and graph domains $\Omega_j$ over the hyperplanes $H_j$, with graph
+maps $\gamma_j$, projections $P_j$, traces $\operatorname{Tr}_j$, normal weights
+$n^j_v = \langle \nabla\varphi_j, v \rangle - \langle v, e_j \rangle$ (\Cref{def:normal-weight})
+and chart normals $\nu_j$ (\Cref{def:graph-normal}); $\sigma$ is the surface measure,
+$T_\Gamma \colon H^1(V) \to L_2(\Gamma)$ and $\gamma_{L_2} \colon H^1(\Omega) \to L_2(\Gamma)$ are
+the traces of \Cref{sec:surface-measure}, $\nu$ is the unit normal field
+(\Cref{def:boundary-normal}) and $N_\Gamma$ the trace kernel (\Cref{def:trace-kernel}). For
+$U \in H^1(V)$, $\partial_v U \in L_2(V)$ is the weak derivative of $\iota U$. Green's formula on
+$\Omega$ (McLean \cite[Theorem 3.34]{McLean}) is pasted from Green's formula on the graph domains
+(\Cref{thm:graph-green}) with a resolution of unity that equals one near $\Gamma$; the interior
+piece integrates to zero by integration by parts on $V$. The chart normals agree almost
+everywhere on the overlaps of the balls, by Gauss--Green in two charts, so the boundary term is
+$\int_\Gamma \gamma_{L_2} u \, \gamma_{L_2} w \, \langle v, \nu \rangle \, d\sigma$. For $u$ in
+the trace kernel, Green's formula has no boundary term and gives the weak derivatives
+$\partial_v(\mathbf 1_\Omega \iota u) = \mathbf 1_\Omega \partial_v u$; the traces from both sides
+of each graph give the converse.
+
+\paragraph{Integration by parts in $H^1(V)$.}
+
+\begin{lemma}[Weak derivatives in $H^1(V)$ are local]
+\label{lem:sobolev-one-weak-derivative-local}
+\lean{Rd.weakDerivL2_ae_eq_zero_of_ae_eq_zero, Rd.weakDerivL2_ae_eq_of_ae_eq}
+\leanok
+\uses{lem:sobolev-one-weak-derivative-operator, lem:weak-derivative-basic}
+For every open $O \subseteq V$, every $v \in V$ and all $U, W \in H^1(V)$ with $\iota U = \iota W$
+almost everywhere on $O$, $\partial_v U = \partial_v W$ almost everywhere on $O$; in particular
+$\partial_v U = 0$ almost everywhere on $O$ if $\iota U = 0$ almost everywhere on $O$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+A weak derivative on $V$ is one on $O$, and it vanishes almost everywhere on $O$ where the
+function does (\Cref{lem:weak-derivative-basic}); apply this to $U - W$.
+\end{proof}
+
+\begin{lemma}[Green's integrand]
+\label{lem:green-integrand}
+\lean{Rd.integrable_weakDeriv_mul_add, Rd.setIntegral_weakDeriv_mul_add_sum,
+  Rd.setIntegral_weakDeriv_mul_add_add, Rd.continuous_integral_weakDeriv_mul_add}
+\leanok
+\uses{lem:green-continuous, lem:sobolev-one-weak-derivative-operator}
+For every $v \in V$ and all $U, W \in H^1(V)$, $(\partial_v U) \, \iota W + \iota U \,
+\partial_v W$ is integrable on $V$. For every measurable $s \subseteq V$, every $v \in V$, every
+$U \in H^1(V)$ and every finite family $(W_i)_{i \in I}$ in $H^1(V)$,
+\[
+  \int_s (\partial_v U) \, \iota \Bigl(\sum_i W_i\Bigr)
+    + \iota U \, \partial_v \Bigl(\sum_i W_i\Bigr)
+  = \sum_i \int_s (\partial_v U) \, \iota W_i + \iota U \, \partial_v W_i ,
+\]
+in particular for two summands, and for every $v \in V$,
+$(U, W) \mapsto \int_V (\partial_v U) \, \iota W + \iota U \, \partial_v W$ is continuous on
+$H^1(V) \times H^1(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Products of two $L_2$ functions are integrable. By \Cref{lem:green-continuous} the integral over
+$s$ is a sum of bilinear pairings, linear in $W$ since $\iota$ and $\partial_v$ are linear
+(\Cref{lem:sobolev-one-weak-derivative-operator}), and continuous; for $s = V$ this is the
+continuity.
+\end{proof}
+
+\begin{theorem}[Integration by parts in $H^1(V)$]
+\label{thm:sobolev-one-integration-by-parts}
+\lean{Rd.integral_lineDerivOp_mul_add_eq_zero, Rd.integral_weakDeriv_mul_add_eq_zero,
+  Rd.integral_mul_add_eq_zero_of_hasWeakLineDeriv}
+\leanok
+\uses{lem:green-integrand, thm:sobolev-schwartz-dense, lem:sobolev-of-schwartz,
+  lem:sobolev-one-weak-gradient-norm, lem:sobolev-one-weak-derivative-operator}
+For every $v \in V$ and all Schwartz functions $w_1, w_2$,
+$\int_V (\partial_v w_1) \, w_2 + w_1 \, \partial_v w_2 = 0$. For every $v \in V$ and all
+$U, W \in H^1(V)$,
+\[
+  \int_V (\partial_v U) \, \iota W + \iota U \, \partial_v W = 0 .
+\]
+For all $f, g \in L_2(V)$ with $f, g \in \Sob{1}{2}(V)$, every $v \in V$ and all
+$f_v, g_v \in L_2(V)$ with $f_v = \partial_v f$ and $g_v = \partial_v g$ weakly on $V$,
+$\int_V f_v \, g + f \, g_v = 0$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For Schwartz functions this is Mathlib's integration by parts
+\texttt{SchwartzMap.\allowbreak integral\_\allowbreak mul\_\allowbreak lineDerivOp\_\allowbreak
+right\_\allowbreak eq\_\allowbreak neg\_\allowbreak left}. Both sides of the second identity are
+continuous on $H^1(V) \times H^1(V)$ (\Cref{lem:green-integrand}), and they agree on pairs of
+Schwartz functions (\Cref{lem:sobolev-of-schwartz}), which are dense
+(\Cref{thm:sobolev-schwartz-dense}). For $f, g \in \Sob{1}{2}(V)$, $f = \iota U$ and
+$g = \iota W$ (\Cref{lem:sobolev-one-weak-gradient-norm}), and $f_v = \partial_v U$,
+$g_v = \partial_v W$ by uniqueness of weak derivatives
+(\Cref{lem:sobolev-one-weak-derivative-operator}).
+\end{proof}
+
+\paragraph{Localisation.}
+
+\begin{lemma}[Localisation of integrals]
+\label{lem:localisation-integrals}
+\lean{Rd.setIntegral_eq_of_inter_eq, Rd.integral_smul_indicatorLp_eq_setIntegral_mul,
+  Rd.lineDeriv_eq_zero_of_notMem_tsupport}
+\leanok
+\uses{lem:indicator-lp}
+For every measure space, all measurable sets $s, t$ and every set $B$ with
+$s \cap B = t \cap B$, and every $F$ with values in a real normed space that vanishes almost
+everywhere outside $B$, $\int_s F = \int_t F$. For every measurable $s \subseteq V$, every
+$F \in L_p(V)$, every $\phi \colon V \to \R$ and every $h \colon V \to \C$ with $h = \phi$ almost
+everywhere, $\int_V \phi \, \mathbf 1_s F = \int_s F h$. For every $g \colon V \to \C$, every
+$x \notin \operatorname{supp} g$ and every $v \in V$, $\partial_v g(x) = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Almost everywhere $\mathbf 1_s F = \mathbf 1_t F$: inside $B$ the indicators agree and outside
+$B$ the function vanishes. The zero extension $\mathbf 1_s F$ in $L_p(V)$ is $F$ on $s$ and $0$
+outside almost everywhere (\Cref{lem:indicator-lp}). A function that vanishes on a neighbourhood
+of $x$ has zero directional derivatives at $x$.
+\end{proof}
+
+\begin{lemma}[Products with smooth functions]
+\label{lem:sobolev-one-products}
+\lean{Rd.exists_toL2_eq_mulLp, Rd.ae_weakDeriv_mul_add_eq_zero_of_mulLp,
+  Rd.BoundedLipschitzDomain.BoundaryPartition.hasCompactSupport,
+  Rd.BoundedLipschitzDomain.BoundaryPartition.exists_toL2_eq_localize}
+\leanok
+\uses{lem:product-rule-lp, lem:sobolev-one-weak-gradient-norm,
+  lem:sobolev-one-weak-derivative-local, def:trace-space-setting}
+For every smooth real $\chi$ with compact support and every $W \in H^1(V)$ there is
+$W' \in H^1(V)$ with $\iota W' = \chi \, \iota W$. For every continuous bounded real $\chi$, all
+$U, W, W' \in H^1(V)$ with $\iota W' = \chi \, \iota W$ and every $v \in V$,
+$(\partial_v U) \, \iota W' + \iota U \, \partial_v W' = 0$ almost everywhere outside
+$\operatorname{supp} \chi$. For every resolution of unity $\psi$ on $\Gamma$ and every $j$,
+$\psi_j$ has compact support, and for every $W \in H^1(V)$ there is $W' \in H^1(V)$ with
+$\iota W' = \psi_j \, \iota W$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\iota W \in \Sob{1}{2}(V)$, so $\chi \, \iota W \in \Sob{1}{2}(V)$ (\Cref{lem:product-rule-lp}),
+and it is $\iota W'$ (\Cref{lem:sobolev-one-weak-gradient-norm}). Outside
+$\operatorname{supp} \chi$, an open set,
+$\iota W' = 0$, hence $\partial_v W' = 0$ almost everywhere there
+(\Cref{lem:sobolev-one-weak-derivative-local}). The $\psi_j$ are smooth with closed support in
+the bounded ball $B_j$.
+\end{proof}
+
+\paragraph{Test functions on the hyperplane and the domain below the graph.}
+
+\begin{lemma}[Test functions on the hyperplane are restrictions]
+\label{lem:hyperplane-test-restriction}
+\lean{Rd.LipschitzGraph.exists_contDiff_comp_graphMap_eq}
+\leanok
+\uses{def:graph-map, lem:resolution-of-unity}
+For every Lipschitz graph domain with hyperplane $H$, graph map $\gamma$ and projection $P$, every
+open $W \subseteq V$ and every smooth $\phi \colon H \to \R$ with compact support in
+$\gamma^{-1}(W)$, there is a smooth $g \colon V \to \R$ with compact support in $W$ and
+$g(\gamma(x')) = \phi(x')$ for every $x' \in H$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$K = \gamma(\operatorname{supp} \phi)$ is a compact subset of $W$, so there is a smooth $\chi$
+with support in the bounded open set $W \cap \{y : \operatorname{dist}(y, K) < 1\}$ that equals
+$1$ on a neighbourhood of $K$ (\Cref{lem:resolution-of-unity} with one open set); its support is
+compact. Then $g(x) = \phi(P x) \, \chi(x)$, since $P \gamma(x') = x'$.
+\end{proof}
+
+\begin{definition}[The domain below the graph]
+\label{def:lower-graph-domain}
+\lean{Rd.LipschitzGraph.lower}
+\leanok
+\uses{def:lipschitz-graph}
+For a Lipschitz graph domain $\Omega = \{x : \varphi(x) < \langle x, e \rangle\}$ with Lipschitz
+constant $M$, the lower graph domain $\Omega_-$ is the Lipschitz graph domain with direction $-e$,
+function $-\varphi$ and Lipschitz constant $M$.
+\end{definition}
+
+\begin{lemma}[The domain below the graph]
+\label{lem:lower-graph-domain}
+\lean{Rd.LipschitzGraph.mem_lower_domain_iff, Rd.LipschitzGraph.notMem_domain_of_mem_lower_domain,
+  Rd.LipschitzGraph.lower_graphMap_proj_graphMap}
+\leanok
+\uses{def:lower-graph-domain, lem:boundary-charts}
+For every Lipschitz graph domain $\Omega$ with graph map $\gamma$ and lower graph domain
+$\Omega_-$ with graph map $\gamma_-$ and projection $P_-$:
+$\Omega_- = \{x : \langle x, e \rangle < \varphi(x)\}$, $\Omega_- \cap \Omega = \emptyset$, and
+$\gamma_-(P_- \gamma(x')) = \gamma(x')$ for every $x' \in H$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$-\varphi(x) < \langle x, -e \rangle$ means $\langle x, e \rangle < \varphi(x)$. A point
+$y = \gamma(x')$ has $\langle y, e \rangle = \varphi(y)$, so it lies on the graph of $\Omega_-$
+(\Cref{lem:boundary-charts}).
+\end{proof}
+
+\begin{theorem}[The traces from both sides of a graph]
+\label{thm:traces-both-sides}
+\lean{Rd.LipschitzGraph.traceH1_ae_eq_traceH1_lower, Rd.LipschitzGraph.traceH1_ae_eq_zero_of_lower}
+\leanok
+\uses{lem:lower-graph-domain, thm:change-of-chart, lem:trace-locality,
+  lem:graph-trace-sobolev-one-operator}
+For every Lipschitz graph domain $\Omega$ and every $U \in H^1(V)$,
+$\operatorname{Tr} U(x') = \operatorname{Tr}_- U(P_- \gamma(x'))$ for almost every $x' \in H$,
+with the trace $\operatorname{Tr}_-$ of the lower graph domain $\Omega_-$. For every open
+$O \subseteq V$ and every $U \in H^1(V)$ with $\iota U = 0$ almost everywhere on $\Omega_- \cap O$,
+$\operatorname{Tr} U(x') = 0$ for almost every $x' \in H$ with $\gamma(x') \in O$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The two graphs coincide (\Cref{lem:lower-graph-domain}), so the change of chart
+(\Cref{thm:change-of-chart}) identifies the two traces. If $\iota U = 0$ on $\Omega_- \cap O$, the
+trace from below vanishes on $\gamma_-^{-1}(O)$ (\Cref{lem:trace-locality}); the null sets of
+$H_-$ correspond to null sets of $H$ (\Cref{thm:change-of-chart}).
+\end{proof}
+
+\paragraph{Green's formula in chart form.}
+
+\begin{lemma}[A resolution of unity equal to one near the boundary]
+\label{lem:boundary-partition-nhds}
+\lean{Rd.BoundedLipschitzDomain.exists_boundaryPartition_nhds,
+  Rd.BoundedLipschitzDomain.indicator_one_sub_sum_eventuallyEq_zero,
+  Rd.BoundedLipschitzDomain.exists_interior_cutoff}
+\leanok
+\uses{lem:resolution-of-unity, def:boundary-partition, def:bounded-lipschitz}
+There is a resolution of unity $\psi$ on $\Gamma$ with $\psi_j \geq 0$ for every $j$,
+$\sum_j \psi_j \leq 1$ on $V$ and $\sum_j \psi_j = 1$ on a neighbourhood of $\Gamma$. For every
+resolution of unity $\psi$ with $\sum_j \psi_j = 1$ on a neighbourhood of $\Gamma$, the function
+$\mathbf 1_\Omega (1 - \sum_j \psi_j)$ vanishes on a neighbourhood of every point of
+$V \setminus \Omega$, and there is a smooth real $\chi$ with compact support in $\Omega$ and
+$\chi + \sum_j \psi_j = 1$ on $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:resolution-of-unity} for the compact set $\Gamma$ and the balls $B_j$. A point outside
+$\Omega$ lies on $\Gamma$, where $\sum_j \psi_j = 1$ nearby, or outside
+$\overline\Omega$. So $\chi = \mathbf 1_\Omega (1 - \sum_j \psi_j)$ agrees near every point with
+a smooth function, $1 - \sum_j \psi_j$ inside $\Omega$ and $0$ elsewhere, and its closed support
+lies in the bounded set $\Omega$.
+\end{proof}
+
+\begin{lemma}[The pieces of Green's formula]
+\label{lem:green-pieces}
+\lean{Rd.BoundedLipschitzDomain.setIntegral_weakDeriv_mul_add_localize,
+  Rd.BoundedLipschitzDomain.setIntegral_weakDeriv_mul_add_mulLp_eq_zero,
+  Rd.BoundedLipschitzDomain.toL2_ae_eq_sum_add}
+\leanok
+\uses{lem:sobolev-one-products, lem:localisation-integrals, thm:graph-green, lem:trace-products,
+  thm:sobolev-one-integration-by-parts}
+For every resolution of unity $\psi$ on $\Gamma$, every $j$, all $U, W, W' \in H^1(V)$ with
+$\iota W' = \psi_j \, \iota W$ and every $v \in V$,
+\[
+  \int_\Omega (\partial_v U) \, \iota W' + \iota U \, \partial_v W'
+  = \int_{H_j} \psi_j(\gamma_j(x')) \operatorname{Tr}_j U(x') \operatorname{Tr}_j W(x') \,
+    n^j_v(x') \, dx' .
+\]
+For every continuous bounded real $\chi$ with closed support in $\Omega$, all
+$U, W, W' \in H^1(V)$ with $\iota W' = \chi \, \iota W$ and every $v \in V$,
+$\int_\Omega (\partial_v U) \, \iota W' + \iota U \, \partial_v W' = 0$. For every resolution of
+unity $\psi$, every continuous bounded real $\chi$ with $\chi + \sum_j \psi_j = 1$ on $\Omega$, and
+all $W, W_j, W_0 \in H^1(V)$ with $\iota W_j = \psi_j \, \iota W$ and $\iota W_0 = \chi \, \iota W$,
+$\iota W = \iota (\sum_j W_j + W_0)$ almost everywhere on $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first integrand vanishes almost everywhere outside $B_j$ (\Cref{lem:sobolev-one-products}),
+and $\Omega \cap B_j = \Omega_j \cap B_j$, so the integral over $\Omega$ is the integral over
+$\Omega_j$ (\Cref{lem:localisation-integrals}); Green's formula on $\Omega_j$
+(\Cref{thm:graph-green}) and $\operatorname{Tr}_j (\psi_j \iota W) = (\psi_j \circ \gamma_j)
+\operatorname{Tr}_j W$ (\Cref{lem:trace-products}) give the right side. The second integrand
+vanishes almost everywhere outside $\Omega$, so its integral over $\Omega$ is its integral over
+$V$, which vanishes (\Cref{thm:sobolev-one-integration-by-parts}). The third statement is
+$\sum_j \psi_j + \chi = 1$ on $\Omega$.
+\end{proof}
+
+\begin{theorem}[Green's formula in chart form]
+\label{thm:domain-green-charts-nhds}
+\lean{Rd.BoundedLipschitzDomain.setIntegral_green_of_nhds}
+\leanok
+\uses{lem:boundary-partition-nhds, lem:green-pieces, lem:green-integrand,
+  lem:sobolev-one-weak-derivative-local}
+For every resolution of unity $\psi$ on $\Gamma$ with $\sum_j \psi_j = 1$ on a neighbourhood of
+$\Gamma$, all $U, W \in H^1(V)$ and every $v \in V$,
+\[
+  \int_\Omega (\partial_v U) \, \iota W + \iota U \, \partial_v W
+  = \sum_j \int_{H_j} \psi_j(\gamma_j(x')) \operatorname{Tr}_j U(x') \operatorname{Tr}_j W(x') \,
+    n^j_v(x') \, dx' .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Take $\chi$ from \Cref{lem:boundary-partition-nhds} and $W_j$, $W_0$ with
+$\iota W_j = \psi_j \, \iota W$, $\iota W_0 = \chi \, \iota W$ (\Cref{lem:sobolev-one-products}).
+On the open set $\Omega$, $\iota W = \iota (\sum_j W_j + W_0)$, hence also
+$\partial_v W = \partial_v (\sum_j W_j + W_0)$ (\Cref{lem:green-pieces},
+\Cref{lem:sobolev-one-weak-derivative-local}). The integral is linear in $W$
+(\Cref{lem:green-integrand}), and \Cref{lem:green-pieces} evaluates the pieces.
+\end{proof}
+
+\paragraph{The unit normal.}
+
+\begin{lemma}[Gauss--Green in one chart]
+\label{lem:domain-gauss-green-chart}
+\lean{Rd.BoundedLipschitzDomain.setIntegral_lineDeriv_eq_chart,
+  Rd.BoundedLipschitzDomain.integrable_mul_inner_normalAt,
+  Rd.BoundedLipschitzDomain.integral_mul_inner_normalAt_sub_eq_zero,
+  Rd.BoundedLipschitzDomain.integral_graphMap_mul_inner_normalAt_sub_eq_zero,
+  Rd.BoundedLipschitzDomain.locallyIntegrable_inner_normalAt_sub_mul_gram}
+\leanok
+\uses{thm:graph-gauss-green, lem:localisation-integrals, thm:surface-measure-charts-complex,
+  thm:surface-measure-null-sets, lem:graph-normal, lem:graph-gradient}
+For every $j$, every $C^1$ function $g \colon V \to \C$ with closed support in $B_j$ and every
+$v \in V$,
+\[
+  \int_\Omega \partial_v g = \int_\Gamma g(y) \langle v, \nu_j(P_j y) \rangle \, d\sigma(y) .
+\]
+For every $j$, every continuous $g \colon V \to \C$ with compact support and every $v \in V$,
+$y \mapsto g(y) \langle v, \nu_j(P_j y) \rangle$ is $\sigma$-integrable. For all $j, k$, every
+$C^1$ function $g \colon V \to \C$ with closed support in $B_j \cap B_k$
+and every $v \in V$,
+\[
+  \int_{H_j} g(\gamma_j(x')) \bigl\langle v, \nu_j(x') - \nu_k(P_k \gamma_j(x')) \bigr\rangle
+    \sqrt{1 + \|\nabla\varphi_j(x')\|^2} \, dx' = 0 ,
+\]
+and the density in this integral is locally integrable on $H_j$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+A closed subset of the ball $B_j$ is compact. Inside $B_j$, $\Omega$ agrees with $\Omega_j$ and
+$\partial_v g$ vanishes outside the support of $g$ (\Cref{lem:localisation-integrals}), so the
+left side is Gauss--Green on $\Omega_j$
+(\Cref{thm:graph-gauss-green}), and the surface measure in the chart
+(\Cref{thm:surface-measure-charts-complex}) gives the right side. For $g$ supported in
+$B_j \cap B_k$, both charts give $\int_\Omega \partial_v g$, the boundary integrands are bounded
+(\Cref{thm:surface-measure-null-sets}: $\sigma$ is finite), and the difference in the chart $j$ is
+the second identity. The density is measurable and bounded by
+$2 \|v\| \sqrt{1 + M_j^2}$ (\Cref{lem:graph-normal}, \Cref{lem:graph-gradient}).
+\end{proof}
+
+\begin{theorem}[The chart normals agree]
+\label{thm:chart-normals-agree}
+\lean{Rd.BoundedLipschitzDomain.normalAt_graphMap_ae_eq,
+  Rd.BoundedLipschitzDomain.normalAt_proj_ae_eq}
+\leanok
+\uses{lem:domain-gauss-green-chart, lem:hyperplane-test-restriction,
+  thm:surface-measure-null-sets, lem:graph-gradient}
+For all $j, k$, $\nu_j(x') = \nu_k(P_k \gamma_j(x'))$ for almost every $x' \in H_j$ with
+$\gamma_j(x') \in B_j \cap B_k$, and $\nu_j(P_j y) = \nu_k(P_k y)$ for $\sigma$-almost every
+$y \in B_j \cap B_k$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For every vector $v$ of an orthonormal basis of $V$, the density of
+\Cref{lem:domain-gauss-green-chart} integrates to zero against every smooth $\phi$ with compact
+support in the open set $\gamma_j^{-1}(B_j \cap B_k)$, since $\phi = g \circ \gamma_j$ for a smooth
+$g$ with compact support in $B_j \cap B_k$ (\Cref{lem:hyperplane-test-restriction}). So it vanishes
+almost everywhere on that set (Mathlib's \texttt{IsOpen.\allowbreak ae\_\allowbreak eq\_\allowbreak
+zero\_\allowbreak of\_\allowbreak integral\_\allowbreak contDiff\_\allowbreak smul\_\allowbreak
+eq\_\allowbreak zero}), and the Gram density is positive (\Cref{lem:graph-gradient}). The second
+statement is the first in the chart $j$ (\Cref{thm:surface-measure-null-sets}).
+\end{proof}
+
+\begin{theorem}[The unit normal]
+\label{thm:boundary-normal-chart}
+\lean{Rd.BoundedLipschitzDomain.normal_ae_eq_normalAt, Rd.BoundedLipschitzDomain.norm_normal_ae,
+  Rd.BoundedLipschitzDomain.inner_normal_neg_ae}
+\leanok
+\uses{thm:chart-normals-agree, def:boundary-normal, lem:graph-normal, def:surface-measure}
+For every $j$ and $\sigma$-almost every $y \in B_j$, $\nu(y) = \nu_j(P_j y)$ and
+$\langle \nu(y), w \rangle < 0$ for every $w$ in the cone of $\Omega_j$. For $\sigma$-almost every
+$y$, $\|\nu(y)\| = 1$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $\sigma$-almost every $y \in \Gamma \cap B_j$, every chart normal $\nu_k(P_k y)$ with
+$\psi^0_k(y) \neq 0$ equals $\nu_j(P_j y)$ (\Cref{thm:chart-normals-agree}), and
+$\sum_k \psi^0_k(y) = 1$. The chart normals are unit vectors and point away from the cone
+(\Cref{lem:graph-normal}), and the balls cover $\Gamma$, which carries $\sigma$.
+\end{proof}
+
+\paragraph{Green's formula.}
+
+\begin{lemma}[The boundary integral in the charts]
+\label{lem:boundary-integral-charts}
+\lean{Rd.BoundedLipschitzDomain.ambientTraceL2_graphMap_ae,
+  Rd.BoundedLipschitzDomain.normal_graphMap_ae,
+  Rd.BoundedLipschitzDomain.integrable_ambientTraceL2_mul_inner_normal,
+  Rd.BoundedLipschitzDomain.integral_ambientTraceL2_mul_inner_normal_eq}
+\leanok
+\uses{thm:surface-measure-null-sets, thm:ambient-trace-l2, thm:boundary-trace-charts,
+  thm:boundary-normal-chart, lem:boundary-normal, thm:surface-measure-charts-complex,
+  lem:normal-weight}
+For every $j$ and every
+$U \in H^1(V)$, $T_\Gamma U(\gamma_j(x')) = \operatorname{Tr}_j U(x')$ and
+$\nu(\gamma_j(x')) = \nu_j(x')$ for almost every $x' \in H_j$ with $\gamma_j(x') \in B_j$. For all
+$U, W \in H^1(V)$ and every $v \in V$, $T_\Gamma U \, T_\Gamma W \langle v, \nu \rangle$ is
+$\sigma$-integrable, and for every resolution of unity $\psi$ on $\Gamma$,
+\[
+  \int_\Gamma T_\Gamma U \, T_\Gamma W \langle v, \nu \rangle \, d\sigma
+  = \sum_j \int_{H_j} \psi_j(\gamma_j(x')) \operatorname{Tr}_j U(x') \operatorname{Tr}_j W(x') \,
+    n^j_v(x') \, dx' .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The null sets of $\sigma$ on $B_j$ are those of the chart (\Cref{thm:surface-measure-null-sets}).
+$T_\Gamma U$ is the boundary trace $\sigma$-almost everywhere (\Cref{thm:ambient-trace-l2}), which
+is $\operatorname{Tr}_j U$ in the chart (\Cref{thm:boundary-trace-charts}), and $\nu = \nu_j \circ
+P_j$ (\Cref{thm:boundary-normal-chart}). The integrand is a product of two $L_2(\Gamma)$
+functions and a function bounded by $\|v\|$ (\Cref{lem:boundary-normal}). The surface measure in
+the charts (\Cref{thm:surface-measure-charts-complex}) and
+$\langle v, \nu_j \rangle \sqrt{1 + \|\nabla\varphi_j\|^2} = n^j_v$ (\Cref{lem:normal-weight})
+give the identity.
+\end{proof}
+
+\begin{theorem}[Green's formula on a bounded Lipschitz domain]
+\label{thm:domain-green}
+\lean{Rd.BoundedLipschitzDomain.setIntegral_green_surface,
+  Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne,
+  Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne_of_hasWeakLineDeriv,
+  Rd.BoundedLipschitzDomain.setIntegral_green_besselPotentialSpace,
+  Rd.BoundedLipschitzDomain.setIntegral_green}
+\leanok
+\uses{thm:domain-green-charts-nhds, lem:boundary-integral-charts, lem:boundary-partition-nhds,
+  thm:trace-l2, lem:sobolev-one-weak-gradient-norm, lem:sobolev-one-weak-derivative-operator,
+  lem:weak-derivative-basic}
+For every resolution of unity $\psi$ on $\Gamma$, all $U, W \in H^1(V)$ and every $v \in V$,
+\begin{align*}
+  \int_\Omega (\partial_v U) \, \iota W + \iota U \, \partial_v W
+  &= \int_\Gamma T_\Gamma U \, T_\Gamma W \langle v, \nu \rangle \, d\sigma \\
+  &= \sum_j \int_{H_j} \psi_j(\gamma_j(x')) \operatorname{Tr}_j U(x') \operatorname{Tr}_j W(x') \,
+    n^j_v(x') \, dx' .
+\end{align*}
+For all $u, w \in H^1(\Omega)$ and every $v \in V$,
+\[
+  \int_\Omega (\partial_v u) \, w + u \, \partial_v w
+  = \int_\Gamma \gamma_{L_2} u \, \gamma_{L_2} w \langle v, \nu \rangle \, d\sigma ,
+\]
+with $u, w$ read as elements of $H^1(V)$ on the left, and the same holds with $\partial_v u$,
+$\partial_v w$ replaced by any weak derivatives $u_v$, $w_v$ of $u$, $w$ on $\Omega$. For every
+resolution of unity $\psi$, all
+$f, g \in L_2(V)$ with $f, g \in \Sob{1}{2}(V)$, every $v \in V$ and all $f_v, g_v \in L_2(V)$ with
+$f_v = \partial_v f$ and $g_v = \partial_v g$ weakly on $V$,
+\[
+  \int_\Omega f_v \, g + f \, g_v
+  = \sum_j \int_{H_j} \psi_j(\gamma_j(x')) \operatorname{Tr}_j f(x') \operatorname{Tr}_j g(x') \,
+    n^j_v(x') \, dx' .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+With a resolution of unity equal to one near $\Gamma$ (\Cref{lem:boundary-partition-nhds}), the
+left side is the chart form of \Cref{thm:domain-green-charts-nhds}, which is the boundary integral
+by \Cref{lem:boundary-integral-charts}; the same lemma for any $\psi$ gives the chart form for
+$\psi$. For $u, w \in H^1(\Omega)$, $\gamma_{L_2} u = T_\Gamma u$ (\Cref{thm:trace-l2}), and
+weak derivatives on $\Omega$ agree almost everywhere on $\Omega$ with the weak derivatives on $V$
+(\Cref{lem:weak-derivative-basic}). For $f, g \in \Sob{1}{2}(V)$, $f = \iota U$ and
+$g = \iota W$ (\Cref{lem:sobolev-one-weak-gradient-norm}), and $f_v = \partial_v U$,
+$g_v = \partial_v W$
+by uniqueness of weak derivatives (\Cref{lem:sobolev-one-weak-derivative-operator}).
+\end{proof}
+
+In chart form the formula holds for every resolution of unity, of any sign.
+
+\paragraph{The zero extension.}
+
+\begin{lemma}[Functions with vanishing trace]
+\label{lem:green-trace-kernel}
+\lean{Rd.BoundedLipschitzDomain.setIntegral_green_of_mem_traceKer,
+  Rd.BoundedLipschitzDomain.hasWeakLineDeriv_indicatorLp_of_mem_traceKer}
+\leanok
+\uses{thm:domain-green, thm:trace-l2, lem:weak-derivative-integral, lem:sobolev-of-schwartz,
+  def:test-schwartz, lem:directional-derivatives-commute, lem:localisation-integrals}
+For every $u \in N_\Gamma$, every $W \in H^1(V)$ and every $v \in V$,
+$\int_\Omega (\partial_v u) \, \iota W + \iota u \, \partial_v W = 0$, and
+$\mathbf 1_\Omega \partial_v u$ is the weak derivative $\partial_v (\mathbf 1_\Omega \iota u)$
+on $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\gamma_{L_2} u = 0$ (\Cref{thm:trace-l2}), so the boundary term of \Cref{thm:domain-green}
+vanishes. For a real test function $\phi$ on $V$, take $W$ the Schwartz function $\phi$
+(\Cref{lem:sobolev-of-schwartz}); then
+$\int_V \phi \, \mathbf 1_\Omega \partial_v u = -\int_V (\partial_v \phi) \mathbf 1_\Omega \iota u$,
+which is the weak derivative (\Cref{lem:weak-derivative-integral}).
+\end{proof}
+
+\begin{theorem}[The zero extension and the trace kernel]
+\label{thm:zero-extension-trace-kernel}
+\lean{Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_of_mem_traceKer,
+  Rd.BoundedLipschitzDomain.mem_traceKer_of_memSobolev_indicatorLp,
+  Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_iff_mem_traceKer}
+\leanok
+\uses{lem:green-trace-kernel, lem:weak-derivative-basic, thm:traces-both-sides,
+  lem:trace-locality, lem:lower-graph-domain, thm:trace-kernel-boundary, thm:boundary-trace-charts,
+  lem:sobolev-one-weak-gradient-norm}
+For every $u \in H^1(\Omega)$, $\mathbf 1_\Omega \iota u \in \Sob{1}{2}(V)$ if and only if
+$u \in N_\Gamma$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+If $u \in N_\Gamma$, the weak derivatives of $\mathbf 1_\Omega \iota u$ are
+$\mathbf 1_\Omega \partial_v u \in L_2(V)$ (\Cref{lem:green-trace-kernel}). Conversely, let
+$F = \mathbf 1_\Omega \iota u = \iota U$ with $U \in H^1(V)$ and fix $j$. On $\Omega_j \cap B_j =
+\Omega \cap B_j$, $F = \iota u$, so $\operatorname{Tr}_j u = \operatorname{Tr}_j F$ almost
+everywhere on $\gamma_j^{-1}(B_j)$ (\Cref{lem:trace-locality}); the lower graph domain of $\Omega_j$
+meets $B_j$ outside $\Omega$ (\Cref{lem:lower-graph-domain}), where $F = 0$, so
+$\operatorname{Tr}_j F = 0$ there (\Cref{thm:traces-both-sides}). Hence the boundary trace of $u$
+vanishes almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}), and
+$u \in N_\Gamma$ (\Cref{thm:trace-kernel-boundary}).
 \end{proof}
 
 \chapter{Besov spaces on compact manifolds}

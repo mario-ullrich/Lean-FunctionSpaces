@@ -115,7 +115,8 @@ declarations.
   (`Rd.norm_higherDiff_le_of_iteratedFDeriv`).
 * **Smooth resolutions of unity in a finite-dimensional space**
   (`FunctionSpaces/Rd/BoundedLipschitz.lean`): `Rd.exists_smooth_partition`, with `ContDiff`
-  functions, from Mathlib's manifold version, and bounded derivatives of compactly supported smooth
+  functions, from Mathlib's manifold version, its form equal to `1` on a neighbourhood of a compact
+  set (`Rd.exists_smooth_partition_nhds`), and bounded derivatives of compactly supported smooth
   functions (`Rd.exists_iteratedFDeriv_bound`, `FunctionSpaces/Rd/Multipliers.lean`).
 * **Multiplication by an indicator on `L_p`** (`FunctionSpaces/Rd/LipschitzGraph.lean`): for a
   measurable set `s`, `g ↦ 1_s g` as a continuous linear operator of norm at most `1` on
@@ -452,3 +453,11 @@ declarations.
   compactly supported Schwartz functions in Mathlib's `H^{s,2}(V, ℂ)` (`Rd.denseRange_ofSchwartz`,
   `Rd.dense_ofSchwartz_hasCompactSupport`, `FunctionSpaces/Rd/SobolevRestrictionSpaces.lean`)
   belongs in `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`.
+* **Integration by parts in `H^1`** (`FunctionSpaces/Rd/LipschitzDomainGreen.lean`): for
+  `U, W ∈ H^{1,2}(V, ℂ)` and every direction `v`, `∫ (∂_v U) W + U ∂_v W = 0`
+  (`Rd.integral_weakDeriv_mul_add_eq_zero`), and the weak derivatives of `H^1(V)` are local
+  (`Rd.weakDerivL2_ae_eq_of_ae_eq`); both belong next to the density of the Schwartz functions in
+  `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`. Two general facts are short:
+  integrals over two sets that agree inside a set `B` agree for functions vanishing outside `B`
+  (`Rd.setIntegral_eq_of_inter_eq`), and line derivatives vanish outside the closed support
+  (`Rd.lineDeriv_eq_zero_of_notMem_tsupport`).

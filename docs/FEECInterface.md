@@ -21,9 +21,10 @@ dual `H^{-1/2}(Γ)`, the area formula for Lipschitz graphs, the surface measure 
 `L_2(Γ)` and the trace into it, Rellich's compactness theorem for the restriction space
 (items I.6 and H.1 in that form, Section 4.5), and the extension theorem H.2 for `W^{1,p}`,
 `1 < p < ∞`, with `H^1(Ω) = W^{1,2}(Ω)` and Rellich's theorem in the weak-derivative form
-(Section 4.3), Gauss–Green and Green's formula on Lipschitz graph domains (Section 4.11).
-Green's formula on bounded Lipschitz domains and `ker γ = H^1_0(Ω)` are in preparation here; the
-forms layer, Hilbert complexes and Picard's theorem belong to the FEEC/BEEC library (Section 6).
+(Section 4.3), Gauss–Green and Green's formula on Lipschitz graph domains (Section 4.11), and
+Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing
+trace (Section 4.12). `ker γ = H^1_0(Ω)` is in preparation here; the forms layer, Hilbert
+complexes and Picard's theorem belong to the FEEC/BEEC library (Section 6).
 Section 9 records how this division differs from the first version of this document.
 
 ## 2. Depending on Lean-FunctionSpaces
@@ -467,8 +468,8 @@ boundary `Γ`, boundary balls `B_j = ball (Ω.center j) (Ω.radius j)` and chart
   `t ∈ H^{1/2}(Γ)`, `σ`-almost everywhere; hence `memLp_of_memBoundaryBesov`.
 * `Rd.BoundedLipschitzDomain.normal Ω : V → V`, the outward unit normal field
   `∑_j ψ_j • ν_j ∘ P_j` with `ψ = boundaryPartition` and the chart normals of Section 4.7:
-  `measurable_normal`, `norm_normal_le` (`‖ν y‖ ≤ 1` for every `y`). Its identity with the chart
-  normals almost everywhere on `Γ` comes with Green's formula (in preparation, Section 9).
+  `measurable_normal`, `norm_normal_le` (`‖ν y‖ ≤ 1` for every `y`). On every boundary ball it is
+  the chart normal `σ`-almost everywhere, a unit vector `σ`-almost everywhere (Section 4.12).
 
 ### 4.9 Items X.1–X.5, X.7, X.8
 
@@ -571,6 +572,67 @@ File `FunctionSpaces/Rd/LipschitzGraphGreen.lean` (the trace operator in
   (`Rd.denseRange_ofSchwartz`), also with compact support
   (`Rd.dense_ofSchwartz_hasCompactSupport`), so `Rd.tildeSpace_top : tildeSpace s ⊤ = ⊤`.
 
+### 4.12 Green's formula on bounded Lipschitz domains
+
+File `FunctionSpaces/Rd/LipschitzDomainGreen.lean`, namespace `Rd.BoundedLipschitzDomain`, for
+`Ω : Rd.BoundedLipschitzDomain V` with the notation of Sections 4.6–4.8 and 4.11:
+
+* Green's formula with the surface measure and the outward unit normal (McLean, Theorem 3.34),
+  for elements of `H^{1, 2}(V, ℂ)` with the trace `ambientTraceL2` and for `H^1(Ω)` with
+  `boundaryTraceL2`:
+
+  ```lean
+  theorem setIntegral_green_surface (U W : H^{1, 2}(V, ℂ)) (v : V) :
+      ∫ x in Ω.carrier, weakDerivL2 v U x * toL2 W x + toL2 U x * weakDerivL2 v W x =
+        ∫ y, Ω.ambientTraceL2 U y * Ω.ambientTraceL2 W y * (inner ℝ v (Ω.normal y) : ℂ)
+          ∂Ω.surfaceMeasure
+  theorem setIntegral_green_sobolevOne (u w : Ω.SobolevOne) (v : V) :
+      ∫ x in Ω.carrier, weakDerivL2 v (u : H^{1, 2}(V, ℂ)) x * toL2 (w : H^{1, 2}(V, ℂ)) x +
+          toL2 (u : H^{1, 2}(V, ℂ)) x * weakDerivL2 v (w : H^{1, 2}(V, ℂ)) x =
+        ∫ y, Ω.boundaryTraceL2 u y * Ω.boundaryTraceL2 w y * (inner ℝ v (Ω.normal y) : ℂ)
+          ∂Ω.surfaceMeasure
+  ```
+
+  For a FEEC user holding weak derivatives `u_v`, `w_v` on `Ω` itself
+  (`HasWeakLineDeriv Ω.toOpens (fun _ : Fin 1 => v) (toL2 (u : H^{1, 2}(V, ℂ))) uv`, and likewise
+  for `w`), `setIntegral_green_sobolevOne_of_hasWeakLineDeriv` gives
+  `∫ x in Ω.carrier, uv x * toL2 (w : H^{1, 2}(V, ℂ)) x + toL2 (u : H^{1, 2}(V, ℂ)) x * wv x`
+  equal to the same boundary integral.
+* The chart form, for every resolution of unity `ψ : Ω.BoundaryPartition` of any sign, for
+  `W^1_2(ℝ^d)` functions with their weak derivatives and the traces of the graph domains
+  (`setIntegral_green_besselPotentialSpace` for elements of `H^{1, 2}(V, ℂ)` with
+  `Rd.LipschitzGraph.traceH1`):
+
+  ```lean
+  theorem setIntegral_green (ψ : Ω.BoundaryPartition) (f g : Lp ℂ 2 (volume : Measure V))
+      (hf : MemSobolev 1 f) (hg : MemSobolev 1 g) (v : V) {fv gv : Lp ℂ 2 (volume : Measure V)}
+      (hfv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) f fv)
+      (hgv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) g gv) :
+      ∫ x in Ω.carrier, fv x * g x + f x * gv x =
+        ∑ j, ∫ x', ψ.toComplex j ((Ω.graph j).graphMap x') *
+          (Ω.graph j).trace two_ne_top 2 f x' * (Ω.graph j).trace two_ne_top 2 g x' *
+            ((Ω.graph j).normalWeight v x' : ℂ)
+  ```
+* The unit normal: `normal_ae_eq_normalAt (j) : ∀ᵐ y ∂Ω.surfaceMeasure, y ∈ ball (Ω.center j)
+  (Ω.radius j) → Ω.normal y = (Ω.graph j).normalAt ((Ω.graph j).proj y)`, `norm_normal_ae`
+  (`‖ν‖ = 1` `σ`-almost everywhere) and `inner_normal_neg_ae` (`⟪ν, w⟫ < 0` for `w` in the cone
+  of the chart).
+* The zero extension, the bounded Lipschitz domain form of TauCeti's half-space statement
+  `TauCeti.W1p.extendByZeroₗᵢ_mem_w1pSubmodule_iff_halfSpaceTrace_eq_zero`, with the weak
+  derivatives `1_Ω ∂_v u` (`hasWeakLineDeriv_indicatorLp_of_mem_traceKer`):
+
+  ```lean
+  theorem memSobolev_indicatorLp_iff_mem_traceKer (u : Ω.SobolevOne) :
+      MemSobolev 1 (indicatorLp Ω.measurableSet (toL2 (u : H^{1, 2}(V, ℂ)))) ↔ u ∈ Ω.traceKer
+  ```
+* General tools: integration by parts in `H^1(ℝ^d)`, `Rd.integral_weakDeriv_mul_add_eq_zero`,
+  and for `W^1_2(ℝ^d)` functions, `Rd.integral_mul_add_eq_zero_of_hasWeakLineDeriv`;
+  smooth resolutions of unity equal to one near a compact set, `Rd.exists_smooth_partition_nhds`
+  (`FunctionSpaces/Rd/BoundedLipschitz.lean`), and `exists_boundaryPartition_nhds`
+  (`FunctionSpaces/Rd/LipschitzBoundaryTrace.lean`); the graph
+  domain below a graph, `Rd.LipschitzGraph.lower`, with the traces from both sides of the graph
+  equal (`Rd.LipschitzGraph.traceH1_ae_eq_traceH1_lower`).
+
 ## 5. Decisions and reasons
 
 * **Statements on `Ω` are qualitative.** The extension theorem for bounded Lipschitz domains
@@ -630,12 +692,9 @@ The FEEC/BEEC library builds:
   and `H^{-1/2}(curl_Γ, Γ)`.
 * Picard's theorem from I.6, and the s-number track together with Lean-SNumbers.
 
-In preparation in Lean-FunctionSpaces (Section 9), and available to it once they land in
+In preparation in Lean-FunctionSpaces (Section 9), and available to it once it lands in
 Section 4:
 
-* Green's formula on bounded Lipschitz domains for `H^1` functions, in chart form and with the
-  surface measure and the outward unit normal of Section 4.8; on one Lipschitz graph domain it is
-  formalised (Section 4.11).
 * `ker γ = H^1_0(Ω)` on Lipschitz domains (McLean, Theorem 3.40) and the HPS quotient
   `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)`.
 
@@ -688,8 +747,9 @@ its development plan). The space types, the isometry of H.4 and the duality are 
 with their Lean names in Section 4.5, the trace space, with its Lean names in Section 4.6, the
 area formula for Lipschitz graphs, with its Lean names in Section 4.7, and the surface measure
 with `L_2(Γ)` and the trace into it, with their Lean names in Section 4.8, and the extension
-theorem H.2, with its Lean names in Section 4.3; the other statements below are in preparation
-and enter Section 4 with their Lean names as they are formalised.
+theorem H.2, with its Lean names in Section 4.3, and Green's formula, with its Lean names in
+Section 4.12; the other statements below are in preparation and enter Section 4 with their Lean
+names as they are formalised.
 
 * **Space types (formalised, Section 4.5).** `H^s(Ω)` for every open `Ω` and every real `s` as a
   Hilbert space: the orthogonal complement, in Mathlib's `H^{s}(ℝ^d)`, of the elements that
@@ -727,8 +787,13 @@ and enter Section 4 with their Lean names as they are formalised.
   normal is `Rd.LipschitzGraph.normalAt` on a graph domain and
   `Rd.BoundedLipschitzDomain.normal` on a bounded Lipschitz domain. File
   `FunctionSpaces/Rd/SurfaceMeasure.lean`.
-* **Green's formula** on bounded Lipschitz domains for `H^1` functions, in chart form and with
-  the surface measure and the outward unit normal.
+* **Green's formula (formalised, Section 4.12)** on bounded Lipschitz domains for `H^1`
+  functions, in chart form and with the surface measure and the outward unit normal
+  (`Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne`), with the unit normal as the chart
+  normal almost everywhere (`Rd.BoundedLipschitzDomain.normal_ae_eq_normalAt`) and the zero
+  extension of functions with vanishing trace
+  (`Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_iff_mem_traceKer`). File
+  `FunctionSpaces/Rd/LipschitzDomainGreen.lean`.
 * **`ker γ = H^1_0(Ω)`** (McLean, Theorem 3.40) and the HPS quotient
   `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)`.
 * **The extension theorem H.2 (formalised, Section 4.3)** for `W^{1,2}` on bounded Lipschitz

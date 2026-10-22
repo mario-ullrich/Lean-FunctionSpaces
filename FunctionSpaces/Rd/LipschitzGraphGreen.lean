@@ -329,6 +329,48 @@ theorem lineDeriv_mul_schwartz (w₁ w₂ : 𝓢(V, ℂ)) (v x : V) :
 
 end ProductRule
 
+/-! ### Green's integrand -/
+
+section GreenIntegrand
+
+variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
+  [MeasurableSpace V] [BorelSpace V]
+
+/-- **The integral of Green's integrand as a pairing**: for a measurable set `s` and
+`U, W ∈ H^1(V)`, `∫_s (∂_v U) W + U ∂_v W = ⟨1_s ∂_v U, W⟩ + ⟨1_s U, ∂_v W⟩` with the bilinear
+pairing of `L_2(V)` with itself (`Rd.setIntegral_mul_eq_lpPairing`). -/
+theorem setIntegral_weakDeriv_mul_add_eq {s : Set V} (hs : MeasurableSet s) (v : V)
+    (U W : H^{1}(V)) :
+    ∫ x in s, weakDerivL2 v U x * toL2 W x + toL2 U x * weakDerivL2 v W x =
+      (ContinuousLinearMap.mul ℂ ℂ).lpPairing volume 2 2 (indicatorLp hs (weakDerivL2 v U))
+          (toL2 W) +
+        (ContinuousLinearMap.mul ℂ ℂ).lpPairing volume 2 2 (indicatorLp hs (toL2 U))
+          (weakDerivL2 v W) := by
+  rw [← setIntegral_mul_eq_lpPairing, ← setIntegral_mul_eq_lpPairing, integral_add]
+  · exact ((Lp.memLp _).integrable_mul (Lp.memLp _)).restrict
+  · exact ((Lp.memLp _).integrable_mul (Lp.memLp _)).restrict
+
+/-- The left side of Green's formula on a measurable set `s`,
+`(U, W) ↦ ∫_s (∂_v U) W + U ∂_v W`, is continuous on `H^1(V) × H^1(V)`: a sum of bounded
+bilinear pairings (`Rd.setIntegral_weakDeriv_mul_add_eq`). -/
+theorem continuous_setIntegral_weakDeriv_mul_add {s : Set V} (hs : MeasurableSet s) (v : V) :
+    Continuous fun p : H^{1}(V) × H^{1}(V) =>
+      ∫ x in s, weakDerivL2 v p.1 x * toL2 p.2 x + toL2 p.1 x * weakDerivL2 v p.2 x := by
+  set P := (ContinuousLinearMap.mul ℂ ℂ).lpPairing (volume : Measure V) 2 2
+  set I := indicatorLp (p := 2) (μ := (volume : Measure V)) hs
+  simp only [setIntegral_weakDeriv_mul_add_eq hs]
+  have h1 : Continuous fun p : H^{1}(V) × H^{1}(V) => I (weakDerivL2 v p.1) :=
+    I.continuous.comp ((weakDerivL2 v).continuous.comp continuous_fst)
+  have h2 : Continuous fun p : H^{1}(V) × H^{1}(V) => I (toL2 p.1) :=
+    I.continuous.comp (toL2.continuous.comp continuous_fst)
+  have h3 : Continuous fun p : H^{1}(V) × H^{1}(V) => toL2 p.2 :=
+    toL2.continuous.comp continuous_snd
+  have h4 : Continuous fun p : H^{1}(V) × H^{1}(V) => weakDerivL2 v p.2 :=
+    (weakDerivL2 v).continuous.comp continuous_snd
+  exact ((P.continuous.comp h1).clm_apply h3).add ((P.continuous.comp h2).clm_apply h4)
+
+end GreenIntegrand
+
 namespace LipschitzGraph
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
@@ -751,27 +793,10 @@ theorem integral_mul_mul_normalWeight_eq (v : V) (a b : Lp ℂ 2 (volume : Measu
   ring
 
 /-- The left side of Green's formula, `(U, W) ↦ ∫_Ω (∂_v U) W + U ∂_v W`, is continuous on
-`H^1(V) × H^1(V)`. -/
+`H^1(V) × H^1(V)` (`Rd.continuous_setIntegral_weakDeriv_mul_add`). -/
 theorem continuous_setIntegral_weakDeriv_mul_add (v : V) : Continuous fun p : H^{1}(V) × H^{1}(V) =>
-    ∫ x in Ω.domain, weakDerivL2 v p.1 x * toL2 p.2 x + toL2 p.1 x * weakDerivL2 v p.2 x := by
-  set P := (ContinuousLinearMap.mul ℂ ℂ).lpPairing (volume : Measure V) 2 2
-  set I := indicatorLp (p := 2) (μ := (volume : Measure V)) Ω.measurableSet_domain
-  have he : ∀ p : H^{1}(V) × H^{1}(V),
-      ∫ x in Ω.domain, weakDerivL2 v p.1 x * toL2 p.2 x + toL2 p.1 x * weakDerivL2 v p.2 x =
-        P (I (weakDerivL2 v p.1)) (toL2 p.2) + P (I (toL2 p.1)) (weakDerivL2 v p.2) := fun p => by
-    rw [← setIntegral_mul_eq_lpPairing, ← setIntegral_mul_eq_lpPairing, integral_add]
-    · exact ((Lp.memLp _).integrable_mul (Lp.memLp _)).restrict
-    · exact ((Lp.memLp _).integrable_mul (Lp.memLp _)).restrict
-  simp only [he]
-  have h1 : Continuous fun p : H^{1}(V) × H^{1}(V) => I (weakDerivL2 v p.1) :=
-    I.continuous.comp ((weakDerivL2 v).continuous.comp continuous_fst)
-  have h2 : Continuous fun p : H^{1}(V) × H^{1}(V) => I (toL2 p.1) :=
-    I.continuous.comp (toL2.continuous.comp continuous_fst)
-  have h3 : Continuous fun p : H^{1}(V) × H^{1}(V) => toL2 p.2 :=
-    toL2.continuous.comp continuous_snd
-  have h4 : Continuous fun p : H^{1}(V) × H^{1}(V) => weakDerivL2 v p.2 :=
-    (weakDerivL2 v).continuous.comp continuous_snd
-  exact ((P.continuous.comp h1).clm_apply h3).add ((P.continuous.comp h2).clm_apply h4)
+    ∫ x in Ω.domain, weakDerivL2 v p.1 x * toL2 p.2 x + toL2 p.1 x * weakDerivL2 v p.2 x :=
+  Rd.continuous_setIntegral_weakDeriv_mul_add Ω.measurableSet_domain v
 
 /-- The right side of Green's formula, `(U, W) ↦ ∫_H Tr U · Tr W · n_v`, is continuous on
 `H^1(V) × H^1(V)`. -/
@@ -844,12 +869,8 @@ theorem setIntegral_green (f g : Lp ℂ 2 (volume : Measure V)) (hf : MemSobolev
     (hgv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) g gv) :
     ∫ x in Ω.domain, fv x * g x + f x * gv x =
       ∫ x', Ω.trace two_ne_top 2 f x' * Ω.trace two_ne_top 2 g x' * (Ω.normalWeight v x' : ℂ) := by
-  obtain ⟨U, rfl⟩ : ∃ U : H^{1}(V), toL2 U = f :=
-    ⟨_, toL2_eq_of_toDistr_eq ((memSobolev_one_iff f).1 hf).toBesselPotentialSpace
-      (TemperedDistribution.MemSobolev.toBesselPotentialSpace_toDistr _).symm⟩
-  obtain ⟨W, rfl⟩ : ∃ W : H^{1}(V), toL2 W = g :=
-    ⟨_, toL2_eq_of_toDistr_eq ((memSobolev_one_iff g).1 hg).toBesselPotentialSpace
-      (TemperedDistribution.MemSobolev.toBesselPotentialSpace_toDistr _).symm⟩
+  obtain ⟨U, rfl⟩ := exists_toL2_eq_of_memSobolev hf
+  obtain ⟨W, rfl⟩ := exists_toL2_eq_of_memSobolev hg
   rw [← weakDerivL2_eq hfv, ← weakDerivL2_eq hgv]
   exact Ω.setIntegral_green_besselPotentialSpace U W v
 

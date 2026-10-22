@@ -177,11 +177,15 @@ theorem sum_toComplex_eq_one {y : V} (hy : y ∈ frontier Ω.carrier) :
 
 variable [FiniteDimensional ℝ V]
 
-/-- The `ψ_j` have compact support. -/
-theorem hasCompactSupport_toComplex (j : Fin Ω.N) : HasCompactSupport (ψ.toComplex j) := by
-  have h : HasCompactSupport (ψ.toFun j) := isCompact_of_isClosed_isBounded (isClosed_tsupport _)
+/-- The functions of a resolution of unity on the boundary have compact support: closed supports
+inside the bounded balls `B_j`. -/
+theorem hasCompactSupport (j : Fin Ω.N) : HasCompactSupport (ψ.toFun j) :=
+  isCompact_of_isClosed_isBounded (isClosed_tsupport _)
     (isBounded_ball.subset (ψ.tsupport_subset j))
-  exact h.comp_left Complex.ofReal_zero
+
+/-- The `ψ_j` have compact support. -/
+theorem hasCompactSupport_toComplex (j : Fin Ω.N) : HasCompactSupport (ψ.toComplex j) :=
+  (ψ.hasCompactSupport j).comp_left Complex.ofReal_zero
 
 /-- **Cut-offs for the resolution of unity**: smooth `ζ_j` with compact support, `ζ_j ≠ 0` only in
 `B_j` and `ζ_j = 1` where `ψ_j ≠ 0`; a bump function equal to `1` on a ball around `tsupport ψ_j`
@@ -250,6 +254,16 @@ theorem exists_boundaryPartition_nonneg [FiniteDimensional ℝ V] :
   obtain ⟨ψ, hψ, hψU, hψ1, hψ0, hψle⟩ := exists_smooth_partition isClosed_frontier
     (fun j => ball (Ω.center j) (Ω.radius j)) (fun _ => isOpen_ball) Ω.frontier_subset
   exact ⟨⟨ψ, hψ, hψU, hψ1⟩, hψ0, hψle⟩
+
+/-- **Resolutions of unity equal to one near the boundary**: there is a resolution of unity `ψ`
+on the boundary with `ψ_j ≥ 0`, `∑_j ψ_j ≤ 1` everywhere and `∑_j ψ_j = 1` on a neighbourhood of
+`Γ` (`Rd.exists_smooth_partition_nhds` for the compact `Γ`). -/
+theorem exists_boundaryPartition_nhds [FiniteDimensional ℝ V] :
+    ∃ ψ : Ω.BoundaryPartition, (∀ j y, 0 ≤ ψ.toFun j y) ∧ (∀ y, ∑ j, ψ.toFun j y ≤ 1) ∧
+      ∀ᶠ y in 𝓝ˢ (frontier Ω.carrier), ∑ j, ψ.toFun j y = 1 := by
+  obtain ⟨ψ, hψ, hψU, hψ1, hψ0, hψle⟩ := exists_smooth_partition_nhds Ω.isCompact_frontier
+    (fun j => ball (Ω.center j) (Ω.radius j)) (fun _ => isOpen_ball) Ω.frontier_subset
+  exact ⟨⟨ψ, hψ, hψU, hψ1.self_of_nhdsSet⟩, hψ0, hψle, hψ1⟩
 
 variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
 

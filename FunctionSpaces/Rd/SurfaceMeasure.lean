@@ -241,6 +241,15 @@ theorem ae_surfaceMeasure_ball_iff (j : Fin Ω.N) {P : V → Prop} :
     (ae_of_all _ fun x' => (ENNReal.ofReal_pos.2 ((Ω.graph j).gram_pos x')).ne')
   exact ⟨fun h => hac.ae_le h, fun h => (withDensity_absolutelyContinuous _ _).ae_le h⟩
 
+/-- **`σ`-almost everywhere statements in a chart**: if `P` holds `σ`-almost everywhere, then
+`P(γ_j x')` holds for almost every `x' ∈ H_j` with `γ_j(x') ∈ B_j`
+(`Rd.BoundedLipschitzDomain.ae_surfaceMeasure_ball_iff`). -/
+theorem ae_graphMap_of_ae_surfaceMeasure (j : Fin Ω.N) {P : V → Prop}
+    (h : ∀ᵐ y ∂Ω.surfaceMeasure, P y) :
+    ∀ᵐ x' ∂(volume : Measure (Ω.graph j).hyperplane),
+      (Ω.graph j).graphMap x' ∈ ball (Ω.center j) (Ω.radius j) → P ((Ω.graph j).graphMap x') :=
+  (Ω.ae_surfaceMeasure_ball_iff j).1 (h.mono fun _ hy _ => hy)
+
 /-- **The null sets of the surface measure are those of the charts**: a property holds
 `σ`-almost everywhere iff it holds almost everywhere on the boundary in the sense of the charts
 (`Rd.BoundedLipschitzDomain.aeBoundary`), since the balls `B_j` cover `Γ`. -/
@@ -508,7 +517,9 @@ theorem memLp_of_memBoundaryBesov (ψ : Ω.BoundaryPartition) {g : V → ℂ}
 outward unit normals `ν_j` of the charts (`Rd.LipschitzGraph.normalAt`) with the canonical
 resolution of unity `ψ = Rd.BoundedLipschitzDomain.boundaryPartition`, which is nonnegative. It
 is defined on all of `V`, measurable and of norm at most `1`; for `y ∈ Γ` it is a convex
-combination of the chart normals `ν_j(P_j y)` with `ψ_j(y) > 0`. -/
+combination of the chart normals `ν_j(P_j y)` with `ψ_j(y) > 0`. On each boundary ball `B_j` it
+is the chart normal `ν_j(P_j y)` for `σ`-almost every `y`, by the Gauss–Green theorem in two
+charts (`Rd.BoundedLipschitzDomain.normal_ae_eq_normalAt`). -/
 noncomputable def normal (y : V) : V :=
   ∑ j, Ω.boundaryPartition.toFun j y • (Ω.graph j).normalAt ((Ω.graph j).proj y)
 

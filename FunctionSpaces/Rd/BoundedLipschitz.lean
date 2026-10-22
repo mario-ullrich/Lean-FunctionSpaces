@@ -40,6 +40,9 @@ The proof follows Schneider–Vybíral §3: a covering `Ω̄ ⊆ K_0 ∪ ⋃_j K
 * A smooth resolution of unity subordinate to these patches (Mathlib's
   `SmoothPartitionOfUnity.exists_isSubordinate`, `Rd.exists_smooth_partition`) pastes the local
   extensions (`Rd.exists_pasting`), by the pointwise multipliers of `Rd.modNorm_mulLp_lt_top`.
+
+For a compact set, the smooth resolutions of unity can be chosen equal to `1` on a neighbourhood
+of it (`Rd.exists_smooth_partition_nhds`).
 -/
 
 @[expose] public section
@@ -72,6 +75,20 @@ theorem exists_smooth_partition {ι : Type*} [Fintype ι] {s : Set V} (hs : IsCl
     exact f.sum_eq_one hx
   · rw [← finsum_eq_sum_of_fintype]
     exact f.sum_le_one x
+
+/-- **Smooth resolutions of unity equal to one near a compact set**: for a compact set `s` and a
+finite open cover `(U_i)` of `s` there are smooth `ψ_i ≥ 0` with `tsupport ψ_i ⊆ U_i`,
+`∑_i ψ_i = 1` on a neighbourhood of `s` and `∑_i ψ_i ≤ 1` everywhere: `Rd.exists_smooth_partition`
+for a compact `L` with `s ⊆ interior L ⊆ L ⊆ ⋃_i U_i` (Mathlib's `exists_compact_between`). -/
+theorem exists_smooth_partition_nhds {ι : Type*} [Fintype ι] {s : Set V} (hs : IsCompact s)
+    (U : ι → Set V) (hU : ∀ i, IsOpen (U i)) (hcov : s ⊆ ⋃ i, U i) :
+    ∃ ψ : ι → V → ℝ, (∀ i, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (ψ i)) ∧
+      (∀ i, tsupport (ψ i) ⊆ U i) ∧ (∀ᶠ x in 𝓝ˢ s, ∑ i, ψ i x = 1) ∧ (∀ i x, 0 ≤ ψ i x) ∧
+        ∀ x, ∑ i, ψ i x ≤ 1 := by
+  obtain ⟨L, hL, hsL, hLU⟩ := exists_compact_between hs (isOpen_iUnion hU) hcov
+  obtain ⟨ψ, hψ, hψU, hψ1, hψ0, hψle⟩ := exists_smooth_partition hL.isClosed U hU hLU
+  exact ⟨ψ, hψ, hψU, eventually_of_mem (isOpen_interior.mem_nhdsSet.2 hsL) fun x hx =>
+    hψ1 x (interior_subset hx), hψ0, hψle⟩
 
 end Partition
 

@@ -32,8 +32,10 @@ the distribution `φ ↦ ∫ φ f` on `Ω` (Mathlib's `Distribution.ofFun`, test
   (`Rd.HasWeakLineDeriv.of_tendsto`).
 * **Sobolev spaces**: `Rd.MemWeakSobolev Ω m p f` says that `f` and all its weak derivatives of
   order at most `m` lie in `L_p(Ω)`; `Rd.MemSobolev m f` is the case `Ω = V` for `f ∈ L_p(V)`,
-  with the weak derivatives as classes in `L_p(V)` (`Rd.memSobolev_iff_exists_hasWeakLineDeriv`),
-  closed under finite sums (`Rd.MemSobolev.sum`).
+  with the weak derivatives as classes in `L_p(V)` (`Rd.memSobolev_iff_exists_hasWeakLineDeriv`;
+  for `m = 1`, weak derivatives in every direction suffice,
+  `Rd.memSobolev_one_of_forall_hasWeakLineDeriv`), closed under finite sums
+  (`Rd.MemSobolev.sum`).
 * **The bridge to tempered distributions** (`Rd.hasWeakLineDeriv_top_iff`): for `f ∈ L_p(V)`,
   `g ∈ L_r(V)`, the weak derivative on `V` is the derivative of tempered distributions,
   `∂^v f = g` in `𝓢'(V, ℂ)`, since a tempered distribution that vanishes on all test functions
@@ -493,6 +495,19 @@ variable {p r : ℝ≥0∞} [Fact (1 ≤ p)] [Fact (1 ≤ r)]
 theorem locallyIntegrableOn_top_Lp (f : Lp ℂ p (volume : Measure V)) :
     LocallyIntegrableOn f ((⊤ : Opens V) : Set V) volume :=
   locallyIntegrableOn_of_memLp Fact.out (by simpa using Lp.memLp f)
+
+/-- **`W^1_p(V)` from first-order weak derivatives**: a function `f ∈ L_p(V)`, `1 ≤ p`, with a
+weak derivative `∂_v f ∈ L_p(V)` in every direction `v` lies in `W^1_p(V)`
+(`Rd.memSobolev_iff_exists_hasWeakLineDeriv`; the derivative of order zero is `f` itself). -/
+theorem memSobolev_one_of_forall_hasWeakLineDeriv {f : Lp ℂ p (volume : Measure V)}
+    (h : ∀ v : V, ∃ g : Lp ℂ p (volume : Measure V), HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) f g) :
+    MemSobolev 1 f := by
+  refine (memSobolev_iff_exists_hasWeakLineDeriv _).2 fun k hk v => ?_
+  rcases Nat.le_one_iff_eq_zero_or_eq_one.1 hk with rfl | rfl
+  · exact ⟨_, hasWeakLineDeriv_fin_zero v (locallyIntegrableOn_top_Lp _)⟩
+  have hv : v = fun _ => v 0 := funext fun i => congrArg v (Subsingleton.elim i 0)
+  rw [hv]
+  exact h (v 0)
 
 /-- On `Ω = V`, the distribution of `f ∈ L_p(V)` applied to a test function `φ` is the tempered
 distribution of `f` applied to the Schwartz function `φ`: both are `∫ φ f`. -/

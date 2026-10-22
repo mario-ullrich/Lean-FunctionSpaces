@@ -32,7 +32,8 @@ and McLean (Chapter 3), and are Hilbert spaces as well.
   domain the elements of `H^1(Ω)` are the functions of `Rd.BoundedLipschitzDomain.MemSobolevOn`
   (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`).
 * **Weak derivatives**: the `L_2` function of `U ∈ H^1(V)` lies in `W^1_2(V)` and in `W^1_2(Ω)`
-  for every open `Ω` (`Rd.memSobolev_toL2`, `Rd.memWeakSobolev_toL2`), with
+  for every open `Ω` (`Rd.memSobolev_toL2`, `Rd.memWeakSobolev_toL2`), every function of
+  `W^1_2(V)` is one (`Rd.exists_toL2_eq_of_memSobolev`), with
   `‖U‖² = ‖U‖_2² + (2π)⁻² ∑_i ‖∂_{e_i} U‖_2²` (`Rd.sq_norm_eq_of_hasWeakLineDeriv`), so
   `‖U‖ ≤ ‖U‖_2 + ∑_i ‖∂_{e_i} U‖_2` (`Rd.norm_le_norm_toL2_add_sum`); the weak derivative
   `∂_v` is a bounded operator `H^1(V) → L_2(V)` of norm at most `2π ‖v‖` (`Rd.weakDerivL2`,
@@ -307,6 +308,14 @@ theorem isCompactOperator_restrictL2 (hΩ : Bornology.IsBounded (Ω : Set V)) :
 theorem memSobolev_toL2 (U : H^{1}(V)) : MemSobolev 1 (toL2 U) := by
   rw [memSobolev_one_iff, toTemperedDistribution_toL2]
   exact U.memSobolev_toDistr
+
+/-- **`W^1_2(V)` functions are elements of `H^1(V)`**: for `f ∈ L_2(V)` with `f ∈ W^1_2(V)` there
+is `U ∈ H^1(V)` whose `L_2` function is `f` (`Rd.memSobolev_one_iff`, `Rd.toL2_eq_of_toDistr_eq`);
+the converse of `Rd.memSobolev_toL2`. -/
+theorem exists_toL2_eq_of_memSobolev {f : Lp ℂ 2 (volume : Measure V)} (hf : MemSobolev 1 f) :
+    ∃ U : H^{1}(V), toL2 U = f :=
+  ⟨_, toL2_eq_of_toDistr_eq ((memSobolev_one_iff f).1 hf).toBesselPotentialSpace
+    (TemperedDistribution.MemSobolev.toBesselPotentialSpace_toDistr _).symm⟩
 
 variable (Ω) in
 /-- **`H^1(V) ⊆ W^1_2(Ω)`**: for every open `Ω`, the `L_2` function of `U ∈ H^1(V)` lies in the

@@ -203,6 +203,7 @@ public import FunctionSpaces.Rd.BesselPotentialLifting
 public import FunctionSpaces.Rd.DivergenceKernels
 public import FunctionSpaces.Rd.SobolevExtension
 public import FunctionSpaces.Rd.LipschitzGraphGreen
+public import FunctionSpaces.Rd.LipschitzDomainGreen
 
 /-!
 # Function spaces
@@ -731,4 +732,10 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   functions, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and
   surface form, the product rule for line derivatives, and Green's formula
   `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)`.
+* `FunctionSpaces.Rd.LipschitzDomainGreen`: Green's formula on a bounded Lipschitz domain:
+  integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary, the
+  chart form `∑_j ∫_{H_j} ψ_j Tr_j f · Tr_j g · n^j_v`, the unit normal as the chart normal almost
+  everywhere on the boundary, the surface form `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ u · γ w ⟪v, ν⟫ dσ`
+  for `u, w ∈ H^1(Ω)`, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u`
+  vanishes.
 -/

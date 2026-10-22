@@ -56,6 +56,12 @@ On a Lipschitz graph domain, the Gauss–Green theorem `∫_Ω ∂_v g = ∫_Γ 
 compactly supported `C^1` functions, and Green's formula
 `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)`, by the density of
 the compactly supported Schwartz functions in every `H^s(ℝ^d)`.
+On a bounded Lipschitz domain, Green's formula
+`∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` holds for `u, w ∈ H^1(Ω)`, with
+the trace `γ_{L_2} : H^1(Ω) → L_2(Γ)`, pasted from the
+graph domains with a resolution of unity equal to one near the boundary; the outward unit normal
+is the chart normal almost everywhere on the boundary, and the zero extension of `u ∈ H^1(Ω)` lies
+in `W^1_2(ℝ^d)` iff the trace of `u` vanishes.
 The [interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
 built on this project, with the decisions behind their form.
 
@@ -512,6 +518,32 @@ built on this project, with the decisions behind their form.
   (`Rd.dense_ofSchwartz_hasCompactSupport`; hence `H̃^s(V) = H^s(V)`, `Rd.tildeSpace_top`), with
   the weak derivative `∂_v` as a bounded operator `H^1(V) → L_2(V)` (`Rd.weakDerivL2`,
   `Rd.norm_weakDerivL2_le`).
+* **Green's formula on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with
+  boundary `Γ`, surface measure `σ`, outward unit normal field `ν`
+  (`Rd.BoundedLipschitzDomain.normal`), boundary balls `B_j`, graph domains `Ω_j` with traces
+  `Tr_j`, graph maps `γ_j` and normal weights `n^j_v`. For all `U, W ∈ H^1(V)` and every `v ∈ V`,
+  `∫_Ω (∂_v U) W + U ∂_v W = ∫_Γ T_Γ U · T_Γ W ⟪v, ν⟫ dσ` with the trace `T_Γ : H^1(V) → L_2(Γ)`
+  (`Rd.BoundedLipschitzDomain.setIntegral_green_surface`), and for all `u, w ∈ H^1(Ω)`,
+  `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` with the trace
+  `γ_{L_2} : H^1(Ω) → L_2(Γ)` (`Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne`), also
+  with weak derivatives on `Ω`
+  (`Rd.BoundedLipschitzDomain.setIntegral_green_sobolevOne_of_hasWeakLineDeriv`). In chart form,
+  for every resolution of unity `ψ` on `Γ`, all `f, g ∈ W^1_2(V)` and the weak derivatives
+  `f_v = ∂_v f`, `g_v = ∂_v g` in `L_2(V)`,
+  `∫_Ω f_v g + f g_v = ∑_j ∫_{H_j} ψ_j(γ_j x') Tr_j f(x') Tr_j g(x') n^j_v(x') dx'`
+  (`Rd.BoundedLipschitzDomain.setIntegral_green`). On every ball `B_j`, `ν = ν_j ∘ P_j`
+  `σ`-almost everywhere, so `‖ν‖ = 1` `σ`-almost everywhere
+  (`Rd.BoundedLipschitzDomain.normal_ae_eq_normalAt`, `Rd.BoundedLipschitzDomain.norm_normal_ae`).
+  For every `u ∈ H^1(Ω)`, the zero extension `1_Ω u` lies in `W^1_2(V)` iff the trace of `u`
+  vanishes (`Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_iff_mem_traceKer`), and then
+  `∂_v (1_Ω u) = 1_Ω ∂_v u`
+  (`Rd.BoundedLipschitzDomain.hasWeakLineDeriv_indicatorLp_of_mem_traceKer`). The proof pastes
+  Green's formula on the graph domains with a resolution of unity equal to one near `Γ`
+  (`Rd.BoundedLipschitzDomain.setIntegral_green_of_nhds`); the interior piece integrates to zero
+  by integration by parts in `H^1(V)` (`Rd.integral_weakDeriv_mul_add_eq_zero`). The chart normals
+  agree almost everywhere because Gauss–Green for `C^1` functions in two charts gives the same
+  boundary integrals (`Rd.BoundedLipschitzDomain.normalAt_graphMap_ae_eq`), and the traces from
+  above and from below a graph agree (`Rd.LipschitzGraph.traceH1_ae_eq_traceH1_lower`).
 
 ## What is formalised
 
@@ -548,6 +580,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Smoothness of parametric integrals, the dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, their supports and mean zero, and the Calderón–Zygmund families of the dilates of mean-zero Schwartz functions | ✅ | ✗ | `Rd/DivergenceKernels` |
 | The local means of order two by the gradient, local means of Triebel–Lizorkin type on a set, bounded extensions from one patch, pasting in `W^1_p(ℝ^d)`, the extension theorem (`W^1_p(Ω)` is the space of restrictions of `W^1_p(ℝ^d)`) for `1 < p < ∞` with a bound, and for `p = 2` `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the quotient norm of `H^1(Ω)` and the boundary traces of `W^1_2(Ω)` | ✅ | ✗ | `Rd/SobolevExtension` |
 | Gauss–Green on Lipschitz graph domains: product coordinates and Fubini, ray integrals, integrals of line derivatives of Lipschitz functions, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and surface form, the product rule for line derivatives, and Green's formula `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)` | ✅ | ✗ | `Rd/LipschitzGraphGreen` |
+| Green's formula on bounded Lipschitz domains: integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary, the chart form for every resolution of unity, the outward unit normal as the chart normal and a unit vector almost everywhere on the boundary, `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, the traces from both sides of a graph, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u` vanishes | ✅ | ✗ | `Rd/LipschitzDomainGreen` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

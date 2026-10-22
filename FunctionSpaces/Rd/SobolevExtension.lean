@@ -559,16 +559,12 @@ theorem MemSobolev.mulLp [Fact (1 ≤ p)] {F : Lp ℂ p (volume : Measure V)} (h
     {χ : V → ℝ} (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (hcs : HasCompactSupport χ) {C : ℝ}
     (hc : Continuous fun x => (χ x : ℂ)) (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C) :
     MemSobolev 1 (mulLp hc hC F) := by
-  refine (memSobolev_iff_exists_hasWeakLineDeriv _).2 fun k hk v => ?_
-  rcases Nat.le_one_iff_eq_zero_or_eq_one.1 hk with rfl | rfl
-  · exact ⟨_, hasWeakLineDeriv_fin_zero v (locallyIntegrableOn_top_Lp _)⟩
-  have hv : v = fun _ => v 0 := funext fun i => congrArg v (Subsingleton.elim i 0)
-  obtain ⟨G, hG⟩ := (memSobolev_iff_exists_hasWeakLineDeriv F).1 hF 1 le_rfl fun _ => v 0
-  have hc' : Continuous fun x => (fderiv ℝ χ x (v 0) : ℂ) :=
+  refine memSobolev_one_of_forall_hasWeakLineDeriv fun v => ?_
+  obtain ⟨G, hG⟩ := (memSobolev_iff_exists_hasWeakLineDeriv F).1 hF 1 le_rfl fun _ => v
+  have hc' : Continuous fun x => (fderiv ℝ χ x v : ℂ) :=
     Complex.continuous_ofReal.comp ((hχ.continuous_fderiv (by simp)).clm_apply continuous_const)
   obtain ⟨C', hC'⟩ := hc'.bounded_above_of_compact_support
-    ((hcs.fderiv_apply (𝕜 := ℝ) (v 0)).comp_left Complex.ofReal_zero)
-  rw [hv]
+    ((hcs.fderiv_apply (𝕜 := ℝ) v).comp_left Complex.ofReal_zero)
   exact ⟨_, hasWeakLineDeriv_mulLp hG hχ hc hC hc' hC'⟩
 
 /-- **The arithmetic of the pasting bound**: if `‖F‖ ≤ ∑_k a_k x_k`,
