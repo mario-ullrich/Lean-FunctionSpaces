@@ -20,8 +20,9 @@ the distribution `φ ↦ ∫ φ f` on `Ω` (Mathlib's `Distribution.ofFun`, test
 * **Weak derivatives** (`Rd.HasWeakLineDeriv Ω v f g`): `∂^v f = g` as distributions on `Ω`,
   that is, `∫ φ g = (-1)^k ∫ (∂^v φ) f` for every test function `φ`
   (`Rd.hasWeakLineDeriv_iff_integral`, by the transpose formula
-  `Distribution.iteratedLineDerivOp_apply_apply`). They are unique almost everywhere on `Ω`,
-  linear, local (`Rd.HasWeakLineDeriv.mono`), vanish where `f` vanishes
+  `Distribution.iteratedLineDerivOp_apply_apply`). They are unique almost everywhere on `Ω`
+  and, on `V`, unique as elements of `L_r(V)` (`Rd.HasWeakLineDeriv.eq_of_top`), linear, local
+  (`Rd.HasWeakLineDeriv.mono`), vanish where `f` vanishes
   (`Rd.HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero`), additive over finite sums
   (`Rd.HasWeakLineDeriv.sum`), tested also by smooth compactly supported complex functions
   (`Rd.HasWeakLineDeriv.integral_mul_eq`), satisfy the product rule with smooth real functions
@@ -113,6 +114,14 @@ theorem hasWeakLineDeriv_iff_integral (hf : LocallyIntegrableOn f Ω volume)
 theorem HasWeakLineDeriv.unique (h : HasWeakLineDeriv Ω v f g) (h' : HasWeakLineDeriv Ω v f g') :
     g =ᵐ[volume.restrict Ω] g' :=
   Distribution.ofFun_injective h.2 h'.2 (h.eq.symm.trans h'.eq)
+
+/-- **Weak derivatives on `V` are unique classes**: two weak derivatives `G`, `G' ∈ L_r(V)` of the
+same function on the whole space `V` are equal in `L_r(V)` (`Rd.HasWeakLineDeriv.unique`). -/
+theorem HasWeakLineDeriv.eq_of_top {r : ℝ≥0∞} {G G' : Lp ℂ r (volume : Measure V)}
+    (h : HasWeakLineDeriv ⊤ v f G) (h' : HasWeakLineDeriv ⊤ v f G') : G = G' := by
+  have hu := h.unique h'
+  rw [volume_restrict_top] at hu
+  exact Lp.ext hu
 
 /-- The derivative of order zero: a locally integrable `f` is its own weak derivative along the
 empty family of directions. -/

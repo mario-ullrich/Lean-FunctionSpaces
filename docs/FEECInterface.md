@@ -21,8 +21,9 @@ dual `H^{-1/2}(Γ)`, the area formula for Lipschitz graphs, the surface measure 
 `L_2(Γ)` and the trace into it, Rellich's compactness theorem for the restriction space
 (items I.6 and H.1 in that form, Section 4.5), and the extension theorem H.2 for `W^{1,p}`,
 `1 < p < ∞`, with `H^1(Ω) = W^{1,2}(Ω)` and Rellich's theorem in the weak-derivative form
-(Section 4.3). Green's formula and `ker γ = H^1_0(Ω)` are in preparation here; the forms layer,
-Hilbert complexes and Picard's theorem belong to the FEEC/BEEC library (Section 6).
+(Section 4.3), Gauss–Green and Green's formula on Lipschitz graph domains (Section 4.11).
+Green's formula on bounded Lipschitz domains and `ker γ = H^1_0(Ω)` are in preparation here; the
+forms layer, Hilbert complexes and Picard's theorem belong to the FEEC/BEEC library (Section 6).
 Section 9 records how this division differs from the first version of this document.
 
 ## 2. Depending on Lean-FunctionSpaces
@@ -523,6 +524,53 @@ real `s` and on all tempered distributions for `s ≥ 0`
 (`Rd.memSobolev_iff_memSobolev_bessel`). These results generalise Sections 4.1 and 4.2 from
 `p = 2`; the `p = 2` statements above stay, with their explicit constants.
 
+### 4.11 Green's formula on Lipschitz graph domains
+
+File `FunctionSpaces/Rd/LipschitzGraphGreen.lean` (the trace operator in
+`FunctionSpaces/Rd/BoundaryTraceSpace.lean`), for a Lipschitz graph domain
+`Ω : Rd.LipschitzGraph V`, `n = dim V`, with the notation of Section 4.7 and the normal weight
+`Rd.LipschitzGraph.normalWeight Ω v x' = ⟪gradPhi x', v⟫ - ⟪v, e⟫`, which is
+`⟪v, normalAt x'⟫ * gram x'` (`inner_normalAt_mul_gram`) and bounded by `(M + 1) ‖v‖`
+(`abs_normalWeight_le`):
+
+* Gauss–Green for `C^1` functions with compact support, in chart form and in surface form, with
+  the corollaries `setIntegral_lineDeriv_eq_normal`, `setIntegral_lineDeriv_e` and
+  `setIntegral_lineDeriv_hyperplane`, and Fubini in product coordinates
+  (`setIntegral_domain_eq`, `setIntegral_domain_eq_graphMap`):
+
+  ```lean
+  theorem setIntegral_lineDeriv_eq (hg : ContDiff ℝ 1 g) (hgc : HasCompactSupport g) (v : V) :
+      ∫ x in Ω.domain, lineDeriv ℝ g x v = ∫ x', g (Ω.graphMap x') * Ω.normalWeight v x'
+  theorem setIntegral_lineDeriv_eq_surface (hg : ContDiff ℝ 1 g) (hgc : HasCompactSupport g)
+      (v : V) :
+      ∫ x in Ω.domain, lineDeriv ℝ g x v = ∫ y in range Ω.graphMap,
+        g y * (inner ℝ v (Ω.normalAt (Ω.proj y)) : ℂ) ∂(μHE[finrank ℝ V - 1] : Measure V)
+  ```
+* The trace of `H^1(ℝ^d)` on the graph as an operator,
+  `Rd.LipschitzGraph.traceH1 Ω : H^{1, 2}(V, ℂ) →L[ℂ] Lp ℂ 2 (volume : Measure Ω.hyperplane)`,
+  with `traceH1 U = Ω.trace two_ne_top 2 (toL2 U)` (`traceH1_apply`) and `w ∘ γ` for Schwartz
+  functions `w` (`traceH1_ofSchwartz_ae`).
+* Green's formula, for `W^1_2(ℝ^d)` functions with their weak derivatives and the traces of the
+  trace theorem; for elements of `H^{1, 2}(V, ℂ)` with `Rd.weakDerivL2` it is
+  `setIntegral_green_besselPotentialSpace`, in surface form `setIntegral_green_surface`
+  (`∫_{range γ} Tr U (P y) * Tr W (P y) * ⟪v, ν (P y)⟫ ∂μHE[n-1]`):
+
+  ```lean
+  theorem setIntegral_green (f g : Lp ℂ 2 (volume : Measure V)) (hf : MemSobolev 1 f)
+      (hg : MemSobolev 1 g) (v : V) {fv gv : Lp ℂ 2 (volume : Measure V)}
+      (hfv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) f fv)
+      (hgv : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) g gv) :
+      ∫ x in Ω.domain, fv x * g x + f x * gv x =
+        ∫ x', Ω.trace two_ne_top 2 f x' * Ω.trace two_ne_top 2 g x' *
+          (Ω.normalWeight v x' : ℂ)
+  ```
+* General tools (`FunctionSpaces/Rd/SobolevRestrictionSpaces.lean`): the weak derivative
+  `Rd.weakDerivL2 v : H^{1, 2}(V, ℂ) →L[ℂ] Lp ℂ 2 volume`, of norm at most `2π ‖v‖`
+  (`norm_weakDerivL2_le`, `hasWeakLineDeriv_weakDerivL2`, `weakDerivL2_eq`); the Schwartz
+  functions in every `H^s(V)`, `Rd.ofSchwartz s : 𝓢(V, ℂ) →L[ℂ] H^{s, 2}(V, ℂ)`, dense
+  (`Rd.denseRange_ofSchwartz`), also with compact support
+  (`Rd.dense_ofSchwartz_hasCompactSupport`), so `Rd.tildeSpace_top : tildeSpace s ⊤ = ⊤`.
+
 ## 5. Decisions and reasons
 
 * **Statements on `Ω` are qualitative.** The extension theorem for bounded Lipschitz domains
@@ -586,7 +634,8 @@ In preparation in Lean-FunctionSpaces (Section 9), and available to it once they
 Section 4:
 
 * Green's formula on bounded Lipschitz domains for `H^1` functions, in chart form and with the
-  surface measure and the outward unit normal of Section 4.8.
+  surface measure and the outward unit normal of Section 4.8; on one Lipschitz graph domain it is
+  formalised (Section 4.11).
 * `ker γ = H^1_0(Ω)` on Lipschitz domains (McLean, Theorem 3.40) and the HPS quotient
   `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)`.
 

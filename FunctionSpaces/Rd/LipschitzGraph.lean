@@ -30,7 +30,8 @@ kernels, the local means kernels and the dual kernels of the cone bump are suppo
 `k(y) ≠ 0`. On `L_p`, with the cut-off `f ↦ 1_Ω f` (`Rd.LipschitzGraph.cutoff`, from
 `Rd.indicatorLp`): `1_Ω (k ⋆ (1_Ω h)) = 1_Ω (k ⋆ h)` (`Rd.LipschitzGraph.cutoff_convLp_cutoff`).
 Two classes have the same cut-off iff they agree almost everywhere on the set
-(`Rd.indicatorLp_eq_iff_ae_eq_restrict`).
+(`Rd.indicatorLp_eq_iff_ae_eq_restrict`), and `∫_s a b = ⟨1_s a, b⟩` for `a, b ∈ L_2`
+(`Rd.setIntegral_mul_eq_lpPairing`).
 -/
 
 @[expose] public section
@@ -96,6 +97,20 @@ noncomputable def indicatorLp {s : Set α} (hs : MeasurableSet s) : Lp ℂ p μ 
 theorem indicatorLp_apply_ae {s : Set α} (hs : MeasurableSet s) (g : Lp ℂ p μ) :
     indicatorLp hs g =ᵐ[μ] s.indicator g :=
   MemLp.coeFn_toLp (memLp_indicator_coe hs g)
+
+/-- **Integrals over a set as a pairing**: `∫_s a b = ⟨1_s a, b⟩` for `a, b ∈ L_2(μ)` and a
+measurable set `s`, with Mathlib's bounded bilinear pairing of `L_2` with `L_2`
+(`ContinuousLinearMap.lpPairing`). -/
+theorem setIntegral_mul_eq_lpPairing {s : Set α} (hs : MeasurableSet s) (a b : Lp ℂ 2 μ) :
+    ∫ x in s, a x * b x ∂μ =
+      (ContinuousLinearMap.mul ℂ ℂ).lpPairing μ 2 2 (indicatorLp hs a) b := by
+  rw [ContinuousLinearMap.lpPairing_eq_integral, ← integral_indicator hs]
+  refine integral_congr_ae ?_
+  filter_upwards [indicatorLp_apply_ae hs a] with x hx
+  rw [ContinuousLinearMap.mul_apply', hx]
+  by_cases h : x ∈ s
+  · rw [Set.indicator_of_mem h, Set.indicator_of_mem h]
+  · rw [Set.indicator_of_notMem h, Set.indicator_of_notMem h, zero_mul]
 
 /-- `‖1_s g‖_p ≤ ‖g‖_p`. -/
 theorem enorm_indicatorLp_le {s : Set α} (hs : MeasurableSet s) (g : Lp ℂ p μ) :

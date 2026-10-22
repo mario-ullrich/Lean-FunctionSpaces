@@ -13,7 +13,8 @@ public import FunctionSpaces.Rd.LipschitzGraph
 
 For a Lipschitz graph domain `Ω = {x : φ(x) < ⟪x, e⟫}` (`Rd.LipschitzGraph`), the boundary is the
 graph of `φ` over the hyperplane `H = e^⊥` (`Rd.LipschitzGraph.hyperplane`), of dimension `n - 1`
-(`Rd.LipschitzGraph.finrank_hyperplane_add_one`), with the Lebesgue measure of its inner product.
+(`Rd.LipschitzGraph.finrank_hyperplane_add_one`), with `H^⊥ = ℝ e`
+(`Rd.LipschitzGraph.orthogonal_hyperplane`) and the Lebesgue measure of its inner product.
 The **graph map** `γ(x') = x' + φ(x') e` (`Rd.LipschitzGraph.graphMap`) satisfies `P(γ x') = x'`
 for the orthogonal projection `Px = x - ⟪x, e⟫ e` onto `H` (`Rd.LipschitzGraph.proj`), and it is
 Lipschitz with constant `1 + M` (`Rd.LipschitzGraph.norm_graphMap_sub_le`).
@@ -50,6 +51,10 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] (Ω : Lips
 
 /-- The **hyperplane** `H = e^⊥` over which the boundary of `Ω` is a graph. -/
 noncomputable abbrev hyperplane : Submodule ℝ V := (ℝ ∙ Ω.e)ᗮ
+
+/-- The orthogonal complement of the hyperplane is the line `ℝ e` (Mathlib's
+`Submodule.orthogonal_orthogonal`). -/
+theorem orthogonal_hyperplane : Ω.hyperplaneᗮ = ℝ ∙ Ω.e := Submodule.orthogonal_orthogonal _
 
 /-- The upward direction is nonzero. -/
 theorem e_ne_zero : Ω.e ≠ 0 := fun h => by simpa [h] using Ω.norm_e
@@ -92,6 +97,12 @@ theorem coe_proj (x : V) : (Ω.proj x : V) = x - inner ℝ x Ω.e • Ω.e := by
     fun w hw => ?_
   rw [sub_sub_cancel, real_inner_smul_left,
     Submodule.mem_orthogonal_singleton_iff_inner_right.1 hw, mul_zero]
+
+/-- For `a ∈ H`, `⟪a, v⟫ = ⟪a, Pv⟫`: Mathlib's
+`Submodule.inner_orthogonalProjectionOnto_eq_of_mem_left`. -/
+theorem inner_coe_eq_inner_proj (a : Ω.hyperplane) (v : V) :
+    inner ℝ (a : V) v = inner ℝ a (Ω.proj v) :=
+  (Ω.hyperplane.inner_orthogonalProjectionOnto_eq_of_mem_left a v).symm
 
 /-- `‖Px‖ ≤ ‖x‖`. -/
 theorem norm_proj_le (x : V) : ‖Ω.proj x‖ ≤ ‖x‖ :=

@@ -34,23 +34,29 @@ and McLean (Chapter 3), and are Hilbert spaces as well.
 * **Weak derivatives**: the `L_2` function of `U ∈ H^1(V)` lies in `W^1_2(V)` and in `W^1_2(Ω)`
   for every open `Ω` (`Rd.memSobolev_toL2`, `Rd.memWeakSobolev_toL2`), with
   `‖U‖² = ‖U‖_2² + (2π)⁻² ∑_i ‖∂_{e_i} U‖_2²` (`Rd.sq_norm_eq_of_hasWeakLineDeriv`), so
-  `‖U‖ ≤ ‖U‖_2 + ∑_i ‖∂_{e_i} U‖_2` (`Rd.norm_le_norm_toL2_add_sum`); the weak
-  derivatives of an element vanishing on `Ω` vanish on `Ω`. For `u ∈ H^1(Ω)`, the `L_2(Ω)` norm
-  of `u` and `(2π)⁻¹` times the `L_2(Ω)` norm of its weak gradient are bounded by the norm of
-  `H^1(Ω)`: `‖u|_Ω‖_2² + (2π)⁻² ∑_i ‖(∂_{e_i} u)|_Ω‖_2² ≤ ‖u‖²` (`Rd.sq_norm_restr_add_sum_le`,
+  `‖U‖ ≤ ‖U‖_2 + ∑_i ‖∂_{e_i} U‖_2` (`Rd.norm_le_norm_toL2_add_sum`); the weak derivative
+  `∂_v` is a bounded operator `H^1(V) → L_2(V)` of norm at most `2π ‖v‖` (`Rd.weakDerivL2`,
+  `Rd.norm_weakDerivL2_le`); the weak derivatives of an element vanishing on `Ω` vanish on `Ω`.
+  For `u ∈ H^1(Ω)`, the `L_2(Ω)` norm of `u` and `(2π)⁻¹` times the `L_2(Ω)` norm of its weak
+  gradient are bounded by the norm of `H^1(Ω)`:
+  `‖u|_Ω‖_2² + (2π)⁻² ∑_i ‖(∂_{e_i} u)|_Ω‖_2² ≤ ‖u‖²` (`Rd.sq_norm_restr_add_sum_le`,
   `Rd.sq_norm_restrictL2_add_sum_le`).
+* **Schwartz functions are dense**: the Schwartz functions form a dense subspace of every
+  `H^s(V)` (`Rd.ofSchwartz`, a continuous linear map, `Rd.denseRange_ofSchwartz`), and so do the
+  compactly supported ones (`Rd.dense_ofSchwartz_hasCompactSupport`).
 * **`H̃^s(Ω)` and `H^s_0(Ω)`**: every test function of `Ω` lies in every `H^s(V)` (`Rd.ofTest`).
   `Rd.tildeSpace s Ω` is the closure of the test functions of `Ω` in `H^s(V)`,
   `Rd.zeroBoundarySpace s Ω` the closure of their restrictions in `H^s(Ω)`. For `s = 1` and every
   open `Ω`, restriction is an isometry of `H̃^1(Ω)` onto `H^1_0(Ω)` (`Rd.tildeEquivZeroBoundary`),
   and inside `H^1(V)` the two are the same subspace (`Rd.tildeSpace_one_le_orthogonal`,
-  `Rd.coe_tildeEquivZeroBoundary_symm_apply`).
+  `Rd.coe_tildeEquivZeroBoundary_symm_apply`). On the whole space, `H̃^s(V) = H^s(V)`
+  (`Rd.tildeSpace_top`).
 -/
 
 @[expose] public section
 
 open MeasureTheory Filter Topology TopologicalSpace
-open scoped ENNReal SchwartzMap Real BesselPotentialSpace Distributions
+open scoped ENNReal SchwartzMap Real BesselPotentialSpace Distributions LineDeriv
 open TemperedDistribution (besselPotential)
 
 namespace Rd
@@ -316,6 +322,69 @@ theorem exists_hasWeakLineDeriv_toL2 (U : H^{1}(V)) (v : V) :
   obtain ⟨g, hg⟩ := (memSobolev_iff_tempered _).1 (memSobolev_toL2 U) 1 le_rfl fun _ => v
   exact ⟨g, hasWeakLineDeriv_top_iff.2 hg⟩
 
+/-- **The weak derivatives of `H^1(V)` are bounded**: if `g ∈ L_2(V)` is the weak derivative
+`∂_v` on `V` of the `L_2` function of `U ∈ H^1(V)`, then `‖g‖_2 ≤ 2π ‖v‖ ‖U‖`
+(`Rd.enorm_le_of_hasWeakLineDeriv` with `J_1 f = U`). -/
+theorem norm_le_of_hasWeakLineDeriv_toL2 {v : V} {U : H^{1}(V)}
+    {g : Lp ℂ 2 (volume : Measure V)} (h : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) (toL2 U) g) :
+    ‖g‖ ≤ 2 * π * ‖v‖ * ‖U‖ := by
+  have hfh : besselPotential V ℂ 1 ((toL2 U : Lp ℂ 2 (volume : Measure V)) : 𝓢'(V, ℂ)) =
+      (U.toLp : 𝓢'(V, ℂ)) := by
+    rw [toTemperedDistribution_toL2]
+    exact U.bessel_toDistr_eq_toLp
+  have he := enorm_le_of_hasWeakLineDeriv h hfh
+  rw [← ofReal_norm, ← ofReal_norm, ← ofReal_norm, ← ENNReal.ofReal_mul (by positivity),
+    ← ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_le_ofReal_iff (by positivity),
+    BesselPotentialSpace.norm_toLp_eq] at he
+  exact he
+
+/-- The weak derivative `∂_v` of the `L_2` functions of `H^1(V)` as a linear map: `U` goes to the
+weak derivative chosen in `Rd.exists_hasWeakLineDeriv_toL2`, which is linear in `U` because weak
+derivatives on `V` are unique classes (`Rd.HasWeakLineDeriv.eq_of_top`). -/
+noncomputable def weakDerivL2Linear (v : V) : H^{1}(V) →ₗ[ℂ] Lp ℂ 2 (volume : Measure V) where
+  toFun U := (exists_hasWeakLineDeriv_toL2 U v).choose
+  map_add' U W := by
+    refine HasWeakLineDeriv.eq_of_top (exists_hasWeakLineDeriv_toL2 (U + W) v).choose_spec ?_
+    refine ((exists_hasWeakLineDeriv_toL2 U v).choose_spec.add
+      (exists_hasWeakLineDeriv_toL2 W v).choose_spec).congr_ae ?_ ?_
+    · rw [map_add]
+      exact ae_restrict_of_ae (Lp.coeFn_add _ _).symm
+    · exact ae_restrict_of_ae (Lp.coeFn_add _ _).symm
+  map_smul' c U := by
+    refine HasWeakLineDeriv.eq_of_top (exists_hasWeakLineDeriv_toL2 (c • U) v).choose_spec ?_
+    refine ((exists_hasWeakLineDeriv_toL2 U v).choose_spec.smul c).congr_ae ?_ ?_
+    · rw [map_smul]
+      exact ae_restrict_of_ae (Lp.coeFn_smul _ _).symm
+    · exact ae_restrict_of_ae (Lp.coeFn_smul _ _).symm
+
+/-- `weakDerivL2Linear v U` is the weak derivative `∂_v` of the `L_2` function of `U`. -/
+theorem hasWeakLineDeriv_weakDerivL2Linear (v : V) (U : H^{1}(V)) :
+    HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) (toL2 U) (weakDerivL2Linear v U) :=
+  (exists_hasWeakLineDeriv_toL2 U v).choose_spec
+
+/-- **The weak derivative `∂_v` as an operator** `H^1(V) → L_2(V)`, of norm at most `2π ‖v‖`
+(`Rd.norm_le_of_hasWeakLineDeriv_toL2`): `∂_v U` is the weak derivative on `V` of the `L_2`
+function of `U` (`Rd.hasWeakLineDeriv_weakDerivL2`). -/
+noncomputable def weakDerivL2 (v : V) : H^{1}(V) →L[ℂ] Lp ℂ 2 (volume : Measure V) :=
+  (weakDerivL2Linear v).mkContinuous (2 * π * ‖v‖) fun U =>
+    norm_le_of_hasWeakLineDeriv_toL2 (hasWeakLineDeriv_weakDerivL2Linear v U)
+
+/-- **The operator norm of the weak derivative**: `‖∂_v‖ ≤ 2π ‖v‖` as an operator
+`H^1(V) → L_2(V)` (Mathlib's `LinearMap.mkContinuous_norm_le`). -/
+theorem norm_weakDerivL2_le (v : V) : ‖weakDerivL2 v‖ ≤ 2 * π * ‖v‖ :=
+  LinearMap.mkContinuous_norm_le _ (by positivity) _
+
+/-- `weakDerivL2 v U` is the weak derivative `∂_v` on `V` of the `L_2` function of `U`. -/
+theorem hasWeakLineDeriv_weakDerivL2 (v : V) (U : H^{1}(V)) :
+    HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) (toL2 U) (weakDerivL2 v U) :=
+  hasWeakLineDeriv_weakDerivL2Linear v U
+
+/-- Every weak derivative `g ∈ L_2(V)` of the `L_2` function of `U` along `v` is
+`weakDerivL2 v U`. -/
+theorem weakDerivL2_eq {v : V} {U : H^{1}(V)} {g : Lp ℂ 2 (volume : Measure V)}
+    (h : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) (toL2 U) g) : weakDerivL2 v U = g :=
+  (hasWeakLineDeriv_weakDerivL2 v U).eq_of_top h
+
 /-- **The `H^1(V)` norm by the weak gradient, in `ℝ`**: let `(e_i)` be an orthonormal basis of
 `V`, `f` the `L_2` function of `U ∈ H^1(V)`, and `g_i ∈ L_2(V)` the weak derivatives
 `∂_{e_i} f` on `V`. Then `‖U‖² = ‖f‖_2² + (2π)⁻² ∑_i ‖g_i‖_2²`
@@ -432,6 +501,100 @@ theorem isClosed_tildeSpace : IsClosed (tildeSpace s Ω : Set H^{s}(V)) :=
 /-- `H̃^s(Ω)` is complete, as a closed subspace of `H^s(V)`. -/
 instance completeSpace_tildeSpace (s : ℝ) (Ω : Opens V) : CompleteSpace (tildeSpace s Ω) :=
   (isClosed_tildeSpace s Ω).completeSpace_coe
+
+/-! ### Schwartz functions are dense in `H^s(V)` -/
+
+variable (s) in
+/-- **Schwartz functions in `H^s(V)`, continuously**: `w ↦ w ∈ H^s(V)` as a continuous linear
+map from the Schwartz space: `w` is the element of `H^s(V)` whose Bessel potential `J_s w ∈ L_2(V)`
+(Mathlib's `BesselPotentialSpace.toLp`) is the Schwartz function `Rd.besselSchwartz s w`
+(`Rd.toDistr_ofSchwartz`). -/
+noncomputable def ofSchwartz : 𝓢(V, ℂ) →L[ℂ] H^{s}(V) :=
+  (BesselPotentialSpace.toLpₗᵢ V ℂ s 2).symm.toLinearIsometry.toContinuousLinearMap ∘L
+    SchwartzMap.toLpCLM ℂ ℂ 2 volume ∘L besselSchwartz s
+
+variable (s) in
+/-- The tempered distribution of `ofSchwartz s w` is the Schwartz function `w`, since
+`J_{-s} J_s = J_0 = id` (Mathlib's `TemperedDistribution.besselPotential_besselPotential_apply`). -/
+@[simp]
+theorem toDistr_ofSchwartz (w : 𝓢(V, ℂ)) : (ofSchwartz s w).toDistr = (w : 𝓢'(V, ℂ)) := by
+  simp only [ofSchwartz, ContinuousLinearMap.coe_comp, Function.comp_apply,
+    LinearIsometry.coe_toContinuousLinearMap, LinearIsometryEquiv.coe_toLinearIsometry,
+    BesselPotentialSpace.toLpₗᵢ_symm_apply, SchwartzMap.toLpCLM_apply]
+  rw [Lp.toTemperedDistribution_toLp_eq, ← besselPotential_schwartz]
+  have h := TemperedDistribution.besselPotential_besselPotential_apply (E := V) (F := ℂ) s (-s)
+    (w : 𝓢'(V, ℂ))
+  rw [show s + -s = 0 by ring, TemperedDistribution.besselPotential_zero] at h
+  exact h
+
+variable (s) in
+/-- `ofSchwartz s w` is the element of `H^s(V)` given by Mathlib's `SchwartzMap.memSobolev`. -/
+theorem ofSchwartz_eq (w : 𝓢(V, ℂ)) :
+    ofSchwartz s w = (w.memSobolev (s := s) (p := 2)).toBesselPotentialSpace :=
+  BesselPotentialSpace.ext (by simp)
+
+variable (s) in
+/-- A test function of `Ω` in `H^s(V)` is its Schwartz function: `ofTest s φ = ofSchwartz s φ`. -/
+theorem ofTest_eq_ofSchwartz (φ : 𝓓(Ω, ℝ)) : ofTest s φ = ofSchwartz s (testSchwartz φ) :=
+  BesselPotentialSpace.ext (by simp)
+
+/-- The `L_2` function of a Schwartz function `w` in `H^1(V)` is `w`
+(`Rd.toL2_eq_of_toDistr_eq`). -/
+theorem toL2_ofSchwartz (w : 𝓢(V, ℂ)) : toL2 (ofSchwartz 1 w) = w.toLp 2 :=
+  toL2_eq_of_toDistr_eq _ (by rw [Lp.toTemperedDistribution_toLp_eq, toDistr_ofSchwartz])
+
+/-- **The weak derivative of a Schwartz function in `H^1(V)`** is its classical derivative:
+`∂_v (ofSchwartz 1 w) = ∂_v w` in `L_2(V)` (`Rd.hasWeakLineDeriv_schwartz`). -/
+theorem weakDerivL2_ofSchwartz (v : V) (w : 𝓢(V, ℂ)) :
+    weakDerivL2 v (ofSchwartz 1 w) = (∂_{v} w).toLp 2 := by
+  refine weakDerivL2_eq ?_
+  have h := hasWeakLineDeriv_schwartz ⊤ w (fun _ : Fin 1 => v)
+  rw [LineDeriv.iteratedLineDerivOp_one] at h
+  refine h.congr_ae ?_ ?_
+  · rw [volume_restrict_top, toL2_ofSchwartz]
+    exact (w.coeFn_toLp 2 volume).symm
+  · rw [volume_restrict_top]
+    exact ((∂_{v} w).coeFn_toLp 2 volume).symm
+
+variable (s) in
+/-- **The Schwartz functions are dense in `H^s(V)`**, for every real `s`: `J_s` is an isometry of
+`H^s(V)` onto `L_2(V)` (Mathlib's `BesselPotentialSpace.toLpₗᵢ`), it maps the Schwartz functions
+onto the Schwartz functions (`Rd.besselSchwartz_besselSchwartz_neg`), and these are dense in
+`L_2(V)` (Mathlib's `SchwartzMap.denseRange_toLpCLM`). -/
+theorem denseRange_ofSchwartz : DenseRange (ofSchwartz (V := V) s) := by
+  have hJ : Function.Surjective (besselSchwartz (V := V) s) :=
+    fun w => ⟨_, besselSchwartz_besselSchwartz_neg s w⟩
+  have h1 : DenseRange fun w : 𝓢(V, ℂ) =>
+      SchwartzMap.toLpCLM ℂ ℂ 2 volume (besselSchwartz s w) :=
+    (SchwartzMap.denseRange_toLpCLM (F := ℂ) (μ := (volume : Measure V)) two_ne_top).comp
+      hJ.denseRange (SchwartzMap.toLpCLM ℂ ℂ 2 volume).continuous
+  exact (BesselPotentialSpace.toLpₗᵢ V ℂ s 2).symm.surjective.denseRange.comp h1
+    (BesselPotentialSpace.toLpₗᵢ V ℂ s 2).symm.continuous
+
+variable (s) in
+/-- **Compactly supported Schwartz functions are dense in `H^s(V)`**, for every real `s`: the
+cut-offs `χ_n w` of a Schwartz function converge to `w` in the Schwartz space
+(`Rd.tendsto_cutoffMul`), hence in `H^s(V)`, and the Schwartz functions are dense
+(`Rd.denseRange_ofSchwartz`). -/
+theorem dense_ofSchwartz_hasCompactSupport :
+    Dense (ofSchwartz (V := V) s '' {w | HasCompactSupport w}) := by
+  refine dense_closure.1 ((denseRange_ofSchwartz s).mono ?_)
+  rintro _ ⟨w, rfl⟩
+  exact mem_closure_of_tendsto (((ofSchwartz s).continuous.tendsto w).comp (tendsto_cutoffMul w))
+    (Eventually.of_forall fun n => ⟨_, hasCompactSupport_cutoffMul n w, rfl⟩)
+
+variable (s) in
+/-- **`H̃^s(V) = H^s(V)`**: on the whole space, the test functions are dense in `H^s(V)` for every
+real `s`, since every compactly supported Schwartz function is a complex combination of two real
+test functions (`Rd.exists_testSchwartz_eq`, `Rd.dense_ofSchwartz_hasCompactSupport`). -/
+theorem tildeSpace_top : tildeSpace s (⊤ : Opens V) = ⊤ := by
+  rw [tildeSpace, ← Submodule.dense_iff_topologicalClosure_eq_top]
+  refine (dense_ofSchwartz_hasCompactSupport s).mono ?_
+  rintro _ ⟨w, hw, rfl⟩
+  obtain ⟨a, b, rfl⟩ := exists_testSchwartz_eq w hw
+  rw [map_add, map_smul, ← ofTest_eq_ofSchwartz, ← ofTest_eq_ofSchwartz]
+  exact (testSpan s ⊤).add_mem (Submodule.subset_span ⟨a, rfl⟩)
+    ((testSpan s ⊤).smul_mem _ (Submodule.subset_span ⟨b, rfl⟩))
 
 variable (s Ω) in
 /-- **The space `H^s_0(Ω)`**: the closure in `H^s(Ω)` of the restrictions of the test functions

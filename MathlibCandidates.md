@@ -430,3 +430,25 @@ declarations.
   supported Schwartz `η` whose reflected translate lies in `Ω`
   (`Rd.conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv`); these belong next to the weak
   derivatives of the Sobolev library prepared for Mathlib.
+* **Gauss–Green on Lipschitz graph domains** (`FunctionSpaces/Rd/LipschitzGraphGreen.lean`): for
+  a Lipschitz graph domain `Ω = {φ < ⟪·, e⟫}`, Fubini in the product coordinates
+  `(x', t) ↦ x' + t e` and `(x', t) ↦ γ(x') + t e` of `H × ℝ`
+  (`Rd.LipschitzGraph.setIntegral_domain_eq`, `Rd.LipschitzGraph.setIntegral_domain_eq_graphMap`),
+  the vertical and horizontal directions (`Rd.LipschitzGraph.setIntegral_lineDeriv_e`, and
+  `Rd.LipschitzGraph.setIntegral_lineDeriv_hyperplane`, a Leibniz rule with a Lipschitz lower
+  limit in integrated form), and the divergence theorem `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dμHE[n-1]` for
+  compactly supported `C^1` functions (`Rd.LipschitzGraph.setIntegral_lineDeriv_eq`,
+  `Rd.LipschitzGraph.setIntegral_lineDeriv_eq_surface`). Mathlib's divergence theorem is the one
+  on boxes (`MeasureTheory.integral_divergence_of_hasFDerivAt_off_countable`, checked
+  2026-10-22); these results extend it to Lipschitz graph domains. Three general facts are short:
+  the line derivative of a compactly supported Lipschitz function is integrable and integrates to
+  zero (`Rd.integrable_lineDeriv`, `Rd.integral_lineDeriv_eq_zero`,
+  `Rd.integral_lineDeriv_eq_zero_complex`, next to `LipschitzWith.integral_lineDeriv_mul_eq` in
+  `Mathlib/Analysis/Calculus/Rademacher.lean`), the product rule for line derivatives
+  (`Rd.lineDeriv_mul`, next to `DifferentiableAt.lineDeriv_eq_fderiv`), and the ray integral
+  `∫_0^∞ g(y + t w) dt` of a compactly supported `C^1` function is differentiable with bounded
+  derivative and derivative `-g` along the ray (`Rd.hasFDerivAt_rayIntegral`,
+  `Rd.fderiv_rayIntegral_self`, `Rd.exists_norm_fderiv_rayIntegral_le`). The density of the
+  compactly supported Schwartz functions in Mathlib's `H^{s,2}(V, ℂ)` (`Rd.denseRange_ofSchwartz`,
+  `Rd.dense_ofSchwartz_hasCompactSupport`, `FunctionSpaces/Rd/SobolevRestrictionSpaces.lean`)
+  belongs in `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`.

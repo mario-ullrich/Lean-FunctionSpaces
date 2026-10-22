@@ -27,7 +27,8 @@ explicit constants, and proves `W^1_2(V) = H^1(V) = B^1_{2,2}(V)`.
   (`Rd.fourier_convLp`), so `‖K ⋆ f‖_2² = ∫ |𝓕K|² |𝓕f|²` (`Rd.enorm_convLp_sq`), in particular
   `‖ψ_j ⋆ f‖_2² = ∫ |𝓕ψ_j|² |𝓕f|²` (`Rd.enorm_lpBlock_sq`).
 * **The Bessel potential on Schwartz functions**: `J_t u = 𝓕⁻(⟨ξ⟩^t 𝓕u)` (`Rd.besselSchwartz`)
-  is Mathlib's `J_t` on the tempered distribution of `u` (`Rd.besselPotential_schwartz`).
+  is Mathlib's `J_t` on the tempered distribution of `u` (`Rd.besselPotential_schwartz`), with
+  inverse `J_{-t}` (`Rd.besselSchwartz_besselSchwartz_neg`).
   Mathlib's Fourier multiplier of an even temperate symbol `m` acts on tempered distributions by
   the transpose, `(m(D) T)(u) = T(m(D) u)` (`Rd.fourierMultiplierCLM_apply_apply_of_even`); for
   the even Bessel weight this is `(J_t T)(u) = T(J_t u)` (`Rd.besselPotential_apply_apply`), so
@@ -241,6 +242,22 @@ theorem besselPotential_schwartz (t : ℝ) (u : 𝓢(V, ℂ)) :
     besselPotential V ℂ t (u : 𝓢'(V, ℂ)) = (besselSchwartz t u : 𝓢'(V, ℂ)) :=
   TemperedDistribution.fourierMultiplierCLM_toTemperedDistributionCLM_eq
     (hasTemperateGrowth_besselWeight t) u
+
+/-- **`J_{-t}` inverts `J_t` on Schwartz functions**: `J_t (J_{-t} u) = u`, since the product of
+the Bessel weights is `⟨ξ⟩^t ⟨ξ⟩^{-t} = 1` (Mathlib's
+`SchwartzMap.fourierMultiplierCLM_fourierMultiplierCLM_apply` and
+`SchwartzMap.fourierMultiplierCLM_const`). -/
+theorem besselSchwartz_besselSchwartz_neg (t : ℝ) (u : 𝓢(V, ℂ)) :
+    besselSchwartz t (besselSchwartz (-t) u) = u := by
+  rw [besselSchwartz, besselSchwartz, SchwartzMap.fourierMultiplierCLM_fourierMultiplierCLM_apply
+    (hasTemperateGrowth_besselWeight t) (hasTemperateGrowth_besselWeight (-t))]
+  have h : ((fun ξ : V => (besselWeight t ξ : ℂ)) * fun ξ => (besselWeight (-t) ξ : ℂ)) =
+      fun _ => (1 : ℂ) := funext fun ξ => by
+    have hpos : 0 < 1 + ‖ξ‖ ^ 2 := by positivity
+    rw [Pi.mul_apply, besselWeight, besselWeight, ← Complex.ofReal_mul, ← Real.rpow_add hpos,
+      show t / 2 + -t / 2 = 0 by ring, Real.rpow_zero, Complex.ofReal_one]
+  rw [h, SchwartzMap.fourierMultiplierCLM_const, one_smul]
+  rfl
 
 /-- `J_t u(x) = 𝓕⁻(⟨ξ⟩^t 𝓕u)(x)`, with the Fourier integrals of functions. -/
 theorem besselSchwartz_apply (t : ℝ) (u : 𝓢(V, ℂ)) (x : V) :

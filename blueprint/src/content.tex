@@ -6832,15 +6832,18 @@ $\|y + e/4\| < \rho$, so $-y$ lies in the ball of radius $\rho$ around $e/4$ and
 \begin{lemma}[Multiplication by an indicator]
 \label{lem:indicator-lp}
 \lean{Rd.memLp_indicator_coe, Rd.norm_toLp_indicator_le, Rd.indicatorLp,
-  Rd.indicatorLp_apply_ae, Rd.enorm_indicatorLp_le}
+  Rd.indicatorLp_apply_ae, Rd.setIntegral_mul_eq_lpPairing, Rd.enorm_indicatorLp_le}
 \leanok
 Let $\mu$ be a measure on $X$, $S \subseteq X$ measurable and $1 \leq p \leq \infty$. Then
-$h \mapsto 1_S h$ is a bounded linear operator on $L_p(\mu)$ of norm at most $1$.
+$h \mapsto 1_S h$ is a bounded linear operator on $L_p(\mu)$ of norm at most $1$. For all
+$a, b \in L_2(\mu)$, $\int_S a b \, d\mu = \langle 1_S a, b \rangle$ with the bilinear pairing
+$\langle a, b \rangle = \int a b \, d\mu$ of $L_2(\mu)$ with itself.
 \end{lemma}
 
 \begin{proof}
 \leanok
-$|1_S h| \leq |h|$ pointwise.
+$|1_S h| \leq |h|$ pointwise, and $1_S a = a$ on $S$, $1_S a = 0$ off $S$ (Mathlib's
+\texttt{ContinuousLinearMap.\allowbreak lpPairing\_\allowbreak eq\_\allowbreak integral}).
 \end{proof}
 
 \begin{lemma}[Restrictions in $L_p$]
@@ -8236,7 +8239,8 @@ function on $H$.
   Rd.LipschitzGraph.inner_coe_e, Rd.LipschitzGraph.sub_inner_smul_mem,
   Rd.LipschitzGraph.finrank_hyperplane_add_one, Rd.LipschitzGraph.finrank_hyperplane_eq_sub_one,
   Rd.LipschitzGraph.finrank_hyperplane_eq,
-  Rd.LipschitzGraph.proj, Rd.LipschitzGraph.coe_proj, Rd.LipschitzGraph.norm_proj_le,
+  Rd.LipschitzGraph.orthogonal_hyperplane, Rd.LipschitzGraph.proj, Rd.LipschitzGraph.coe_proj,
+  Rd.LipschitzGraph.inner_coe_eq_inner_proj, Rd.LipschitzGraph.norm_proj_le,
   Rd.LipschitzGraph.proj_coe, Rd.LipschitzGraph.proj_e, Rd.LipschitzGraph.graphMap,
   Rd.LipschitzGraph.proj_graphMap, Rd.LipschitzGraph.inner_graphMap,
   Rd.LipschitzGraph.phi_graphMap, Rd.LipschitzGraph.norm_graphMap_sub_le,
@@ -8245,7 +8249,9 @@ function on $H$.
 \leanok
 \uses{def:lipschitz-graph, lem:graph-cone}
 Let $P x = x - \langle x, e \rangle e$ be the orthogonal projection onto $H$ and
-$\gamma(x') = x' + \phi(x') e$ for $x' \in H$. Then $P \gamma(x') = x'$,
+$\gamma(x') = x' + \phi(x') e$ for $x' \in H$. Then $H^\perp = \R e$,
+$\langle a, v \rangle = \langle a, P v \rangle$ for all $a \in H$ and $v \in V$,
+$P \gamma(x') = x'$,
 $\langle \gamma(x'), e \rangle = \phi(x') = \phi(\gamma(x'))$,
 $\|\gamma(x') - \gamma(y')\| \leq (1 + M) \|x' - y'\|$, $\|x' - Pc\| \leq \|\gamma(x') - c\|$, and
 $\gamma(x') + K \subseteq \Omega$ for the cone $K$ of \Cref{lem:graph-cone}.
@@ -12624,13 +12630,14 @@ $\partial^v f(\varphi) = (-1)^k f(\partial^v \varphi)$ by \Cref{lem:distribution
   Rd.MemWeakSobolev.mono_set, Rd.zero_memWeakSobolev, Rd.MemWeakSobolev.add,
   Rd.MemWeakSobolev.smul, Rd.MemWeakSobolev.congr_ae, Rd.zero_memSobolev, Rd.MemSobolev.add,
   Rd.MemSobolev.smul, Rd.HasWeakLineDeriv.sum, Rd.memSobolev_iff_exists_hasWeakLineDeriv,
-  Rd.MemSobolev.sum}
+  Rd.MemSobolev.sum, Rd.HasWeakLineDeriv.eq_of_top}
 \leanok
 \uses{def:weak-line-derivative, lem:weak-derivative-integral, lem:directional-derivatives-commute}
 For every $v \in V^k$, all functions $f, f', g, g'$ and every $c \in \C$:
 \begin{enumerate}
   \item if $g$ and $g'$ are weak derivatives $\partial^v f$ on $\Omega$, then $g = g'$ almost
-    everywhere on $\Omega$;
+    everywhere on $\Omega$; for $\Omega = V$, every $r \in [0, \infty]$ and
+    $g, g' \in L_r(V)$, $g = g'$ in $L_r(V)$;
   \item for $k = 0$, every locally integrable $f$ on $\Omega$ is its own weak derivative;
   \item if $g = \partial^v f$ and $g' = \partial^v f'$ weakly on $\Omega$, then
     $g + g' = \partial^v (f + f')$, $-g = \partial^v(-f)$, $g - g' = \partial^v (f - f')$ and
@@ -12992,20 +12999,23 @@ Schwartz space.
 
 \begin{lemma}[$J_t$ on Schwartz functions and on distributions]
 \label{lem:bessel-schwartz-distribution}
-\lean{Rd.besselPotential_schwartz, Rd.besselSchwartz_apply}
+\lean{Rd.besselPotential_schwartz, Rd.besselSchwartz_apply,
+  Rd.besselSchwartz_besselSchwartz_neg}
 \leanok
 \uses{def:bessel-schwartz}
 For every $t \in \R$ and every Schwartz function $u$, the tempered distribution of $J_t u$ is
-Mathlib's $J_t$ of the tempered distribution of $u$, and
+Mathlib's $J_t$ of the tempered distribution of $u$,
 $J_t u(x) = \mathcal F^{-1}(\langle \cdot \rangle^t \widehat u)(x)$ for every $x \in V$, with the
-Fourier integrals of functions.
+Fourier integrals of functions, and $J_t J_{-t} u = u$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 Mathlib's
 \texttt{TemperedDistribution.\allowbreak fourierMultiplierCLM\_\allowbreak
-toTemperedDistributionCLM\_\allowbreak eq}.
+toTemperedDistributionCLM\_\allowbreak eq}; the composition of two Fourier multipliers is the
+multiplier of the product of their symbols, here
+$\langle \xi \rangle^t \langle \xi \rangle^{-t} = 1$.
 \end{proof}
 
 For a function $m$ on $V$ that is smooth with polynomially bounded derivatives,
@@ -14030,6 +14040,26 @@ $(2\pi)^2 \|J_1 U\|_2^2 = (2\pi)^2 \|\iota U\|_2^2 + \sum_i \|g_i\|_2^2$ from
 $(2\pi)^{-2} \leq 1$ and $\sum_i a_i^2 \leq (\sum_i a_i)^2$ for $a_i \geq 0$.
 \end{proof}
 
+\begin{lemma}[The weak derivative as an operator]
+\label{lem:sobolev-one-weak-derivative-operator}
+\lean{Rd.norm_le_of_hasWeakLineDeriv_toL2, Rd.weakDerivL2Linear,
+  Rd.hasWeakLineDeriv_weakDerivL2Linear, Rd.weakDerivL2, Rd.norm_weakDerivL2_le,
+  Rd.hasWeakLineDeriv_weakDerivL2, Rd.weakDerivL2_eq}
+\leanok
+\uses{lem:sobolev-one-weak-gradient-norm, thm:sobolev-one-two, lem:weak-derivative-basic}
+For every $v \in V$, every $U \in H^1(V)$ and every $g \in L_2(V)$ that is the weak derivative
+$\partial_v \iota U$ on $V$, $\|g\|_2 \leq 2 \pi \|v\| \|U\|$. For every $v \in V$, the map
+$\partial_v \colon H^1(V) \to L_2(V)$ that sends $U$ to the weak derivative $\partial_v \iota U$
+on $V$ is a bounded linear operator of norm at most $2 \pi \|v\|$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bound is $\|\partial_v f\|_2 \leq 2 \pi \|v\| \|J_1 f\|_2$ of \Cref{thm:sobolev-one-two} with
+$J_1 \iota U = U$. The weak derivative exists (\Cref{lem:sobolev-one-weak-gradient-norm}) and is
+unique in $L_2(V)$ (\Cref{lem:weak-derivative-basic}), hence linear in $U$.
+\end{proof}
+
 \begin{proposition}[The weak gradient on $\Omega$]
 \label{prop:sobolev-restriction-weak-gradient}
 \lean{Rd.memWeakSobolev_toL2, Rd.sq_norm_restr_add_sum_le, Rd.sq_norm_restrictL2_add_sum_le}
@@ -14159,6 +14189,50 @@ An $L_2$ function is determined by its tempered distribution (\Cref{lem:sobolev-
 Sums and multiples of Schwartz functions with closed support in $\Omega$ are such functions. For
 $U \in T^1(\Omega)$, $\iota U = w$ almost everywhere, and $O$ is the complement of the closed
 support of $w$.
+\end{proof}
+
+\begin{lemma}[Schwartz functions in $H^s(V)$]
+\label{lem:sobolev-of-schwartz}
+\lean{Rd.ofSchwartz, Rd.toDistr_ofSchwartz, Rd.ofSchwartz_eq, Rd.ofTest_eq_ofSchwartz,
+  Rd.toL2_ofSchwartz, Rd.weakDerivL2_ofSchwartz}
+\leanok
+\uses{lem:bessel-schwartz-distribution, def:sobolev-tilde-zero-boundary, lem:sobolev-one-to-l2,
+  lem:sobolev-one-weak-derivative-operator, cor:weak-derivative-schwartz}
+For every $s \in \R$, the map that sends a Schwartz function $w$ to the element of $H^s(V)$ with
+the tempered distribution $w$ is a continuous linear map from the Schwartz space to $H^s(V)$; on
+$\mathcal D(\Omega)$ it is the inclusion of \Cref{def:sobolev-tilde-zero-boundary}. For every
+Schwartz function $w$, regarded as an element of $H^1(V)$ ($s = 1$), and every $v \in V$,
+$\iota w = w$ and $\partial_v \iota w = \partial_v w$ in $L_2(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$w \mapsto J_s w$ is continuous on the Schwartz space, the inclusion of the Schwartz space into
+$L_2(V)$ is continuous, and $J_s$ is an isometry of $H^s(V)$ onto $L_2(V)$; the tempered
+distribution of the image is $J_{-s} J_s w = w$ (\Cref{lem:bessel-schwartz-distribution}). An
+$L_2$ function is determined by its tempered distribution (\Cref{lem:sobolev-one-to-l2}), and
+$\partial_v w$ is the weak derivative of $w$ (\Cref{cor:weak-derivative-schwartz}).
+\end{proof}
+
+\begin{theorem}[Schwartz functions are dense in $H^s(V)$]
+\label{thm:sobolev-schwartz-dense}
+\lean{Rd.denseRange_ofSchwartz, Rd.dense_ofSchwartz_hasCompactSupport, Rd.tildeSpace_top}
+\leanok
+\uses{lem:sobolev-of-schwartz, lem:bessel-schwartz-distribution, lem:schwartz-cutoff-tendsto,
+  thm:test-functions-determine, def:sobolev-tilde-zero-boundary}
+For every $s \in \R$, the Schwartz functions and the compactly supported Schwartz functions are
+dense in $H^s(V)$, and $\tilde H^s(V) = H^s(V)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$J_s$ maps the Schwartz space onto itself, with inverse $J_{-s}$
+(\Cref{lem:bessel-schwartz-distribution}), the Schwartz functions are dense in $L_2(V)$ (Mathlib's
+\texttt{SchwartzMap.\allowbreak denseRange\_\allowbreak toLpCLM}), and $J_s$ is an isometry of
+$H^s(V)$ onto $L_2(V)$. The cut-offs of a Schwartz function converge to it in the Schwartz space
+(\Cref{lem:schwartz-cutoff-tendsto}), hence in $H^s(V)$ by \Cref{lem:sobolev-of-schwartz}. A
+compactly supported Schwartz function is $a + i b$ with real test functions $a, b$ on $V$
+(\Cref{thm:test-functions-determine}), so it lies in $T^s(V)$.
 \end{proof}
 
 \begin{lemma}[Functions with disjoint supports]
@@ -14673,6 +14747,38 @@ $\|\operatorname{Tr} \iota U\|_{L_2(H)} \leq C \|U\|$ for every $U \in H^1(V)$.
 $\|\operatorname{Tr} \iota U\|_{L_2(H)}$ is at most $K$ times the $B^{1/2}_{2,1}$ quantity of
 $\iota U$ (\Cref{lem:trace-linear}), which is at most $\sqrt 2 \, C_1 \|U\|$
 (\Cref{thm:sobolev-one-besov-constant}); so $C = K \sqrt 2 \, C_1$.
+\end{proof}
+
+\begin{lemma}[The trace of $H^1(V)$ on a Lipschitz graph as an operator]
+\label{lem:graph-trace-sobolev-one-operator}
+\lean{Rd.LipschitzGraph.intrinsicNorm_toL2_lt_top, Rd.LipschitzGraph.traceH1Linear,
+  Rd.LipschitzGraph.traceH1, Rd.LipschitzGraph.traceH1_apply}
+\leanok
+\uses{thm:trace-graph, lem:graph-trace-sobolev-one, lem:trace-linear,
+  thm:sobolev-one-besov-constant}
+For every Lipschitz graph domain with hyperplane $H$, $U \mapsto \operatorname{Tr} \iota U$
+(\Cref{thm:trace-graph}, $L = 2$, $p = 2$) is a bounded linear operator $H^1(V) \to L_2(H)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The trace is linear on $H^1(V)$ (\Cref{lem:trace-linear}, \Cref{thm:sobolev-one-besov-constant})
+and bounded (\Cref{lem:graph-trace-sobolev-one}).
+\end{proof}
+
+\begin{lemma}[Traces of Schwartz functions]
+\label{lem:graph-trace-schwartz}
+\lean{Rd.LipschitzGraph.traceH1_ofSchwartz_ae}
+\leanok
+\uses{lem:graph-trace-sobolev-one-operator, thm:trace-continuous, lem:sobolev-of-schwartz}
+For every Lipschitz graph domain with graph map $\gamma$ and every Schwartz function $w$, the
+trace of $w \in H^1(V)$ is $w \circ \gamma$ almost everywhere on $H$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\iota w = w$ is continuous (\Cref{lem:sobolev-of-schwartz}), and \Cref{thm:trace-continuous}
+applies.
 \end{proof}
 
 \begin{lemma}[Nonnegative resolutions of unity]
@@ -20504,6 +20610,411 @@ norm of $u$ is at most $\|U\| \leq \|F\|_2 + \sum_i \|G_i\|_2$
 
 With \Cref{prop:sobolev-restriction-weak-gradient}, the quotient norm of $H^1(\Omega)$ and the
 norm of $\Sob{1}{2}(\Omega)$ are equivalent on bounded Lipschitz domains.
+
+\section{Gauss--Green on Lipschitz graph domains}
+\label{sec:lipschitz-graph-green}
+
+Throughout this section $\Omega = \{x : \varphi(x) < \langle x, e \rangle\}$ is a Lipschitz graph
+domain (\Cref{def:lipschitz-graph}) in $V$, $\dim V = n$, with Lipschitz constant $M$, hyperplane
+$H = e^\perp$ of dimension $n - 1$, projection $P$ and graph map $\gamma(x') = x' + \varphi(x') e$
+(\Cref{def:graph-map}), with the gradient $\nabla\varphi$, the Gram density
+$\sqrt{1 + \|\nabla\varphi\|^2}$ and the outward unit normal $\nu$ of
+\Cref{sec:lipschitz-graph-area}; $\mathcal H^{n-1}$ is Mathlib's Euclidean Hausdorff measure. The
+divergence theorem on $\Omega$ is proved
+first for compactly supported $C^1$ functions (\Cref{thm:graph-gauss-green}), then for products
+of $H^1(V)$ functions with their traces as boundary values (\Cref{thm:graph-green}), as in McLean
+\cite[Chapter 3]{McLean}. The vertical direction $e$ is the fundamental theorem of calculus on the
+vertical lines above the graph. For the horizontal directions the proof needs of $\varphi$ only
+Rademacher's theorem: the integral $\Psi(y) = \int_0^\infty g(y + t e) \, dt$ is
+differentiable with bounded derivative and $\partial_e \Psi = -g$, the function
+$\Psi \circ \gamma$ on $H$ is Lipschitz with compact support, and the integral over $H$ of its
+directional derivatives vanishes.
+
+\paragraph{Product coordinates.}
+
+\begin{lemma}[Product coordinates]
+\label{lem:graph-product-coordinates}
+\lean{Rd.LipschitzGraph.lineEquiv, Rd.LipschitzGraph.coe_lineEquiv, Rd.LipschitzGraph.prodEquiv,
+  Rd.LipschitzGraph.prodEquiv_apply, Rd.LipschitzGraph.measurePreserving_prodEquiv,
+  Rd.LipschitzGraph.graphShear, Rd.LipschitzGraph.measurePreserving_graphShear,
+  Rd.LipschitzGraph.graphEquiv, Rd.LipschitzGraph.graphEquiv_apply,
+  Rd.LipschitzGraph.measurePreserving_graphEquiv, Rd.LipschitzGraph.prodEquiv_mem_domain_iff,
+  Rd.LipschitzGraph.graphMap_add_smul_mem_domain_iff}
+\leanok
+\uses{def:lipschitz-graph, def:graph-map}
+The map $t \mapsto t e$ is a linear isometry of $\R$ onto $H^\perp = \R e$. The maps
+$(x', t) \mapsto x' + t e$ and $(x', t) \mapsto \gamma(x') + t e$ are measurable
+bijections of $H \times \R$ onto $V$ with measurable inverses that carry the product of the
+Lebesgue measures of $H$ and $\R$ to the Lebesgue measure of $V$. For every $x' \in H$ and every
+$t \in \R$, $x' + t e \in \Omega$ if and only if $\varphi(x') < t$, and
+$\gamma(x') + t e \in \Omega$ if and only if $t > 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$V$ is the orthogonal sum of $H$ and $H^\perp = \R e$, and Mathlib's
+\texttt{Submodule.\allowbreak measurePreserving\_\allowbreak measurableEquivProd} carries
+$\mathcal H^n$, which is the Lebesgue measure of $V$, to the product of the Lebesgue measures of
+$H$ and $H^\perp$; $t \mapsto t e$ is an isometry of $\R$ onto $H^\perp$ and preserves the
+Lebesgue measures. The second map is the first after the shear
+$(x', t) \mapsto (x', t + \varphi(x'))$, which translates each vertical line and so preserves the
+product measure. Finally $\varphi(x' + t e) = \varphi(x')$, $\langle x' + t e, e \rangle = t$ and
+$\gamma(x') + t e = x' + (\varphi(x') + t) e$.
+\end{proof}
+
+\begin{theorem}[Fubini on a Lipschitz graph domain]
+\label{thm:graph-fubini}
+\lean{Rd.LipschitzGraph.setIntegral_domain_eq_of_measurePreserving,
+  Rd.LipschitzGraph.setIntegral_domain_eq, Rd.LipschitzGraph.setIntegral_domain_eq_graphMap}
+\leanok
+\uses{lem:graph-product-coordinates}
+For every real Banach space $E$ and every $F \colon V \to E$ integrable on $\Omega$,
+\[
+  \int_\Omega F = \int_H \int_{\varphi(x')}^\infty F(x' + t e) \, dt \, dx'
+  = \int_H \int_0^\infty F(\gamma(x') + t e) \, dt \, dx' .
+\]
+More generally, for every measure preserving measurable bijection $T$ of $H \times \R$ onto $V$
+with measurable inverse and every $a \colon H \to \R$ with $T(x', t) \in \Omega$ if and only if
+$a(x') < t$,
+$\int_\Omega F = \int_H \int_{a(x')}^\infty F(T(x', t)) \, dt \, dx'$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For a measure preserving bijection $T$ of $H \times \R$ onto $V$ with $T(x', t) \in \Omega$ if
+and only if $a(x') < t$, the change of variables and Fubini's theorem (Mathlib's
+\texttt{MeasurePreserving.\allowbreak integral\_\allowbreak comp'} and
+\texttt{integral\_\allowbreak prod}) applied to $\mathbf 1_\Omega F$ give
+$\int_\Omega F = \int_H \int_{a(x')}^\infty F(T(x', t)) \, dt \, dx'$. The two maps of
+\Cref{lem:graph-product-coordinates} have $a = \varphi$ and $a = 0$.
+\end{proof}
+
+\paragraph{Ray integrals.}
+
+\begin{definition}[Ray integrals]
+\label{def:ray-integral}
+\lean{Rd.rayIntegral}
+\leanok
+For a function $g$ on $V$ with values in a real Banach space $E$, a vector $w$ and $y \in V$,
+the ray integral is $\Psi(y) = \int_0^\infty g(y + t w) \, dt$.
+\end{definition}
+
+\begin{lemma}[Compactly supported functions along lines]
+\label{lem:compact-support-lines}
+\lean{Rd.abs_add_inner_le_of_norm_add_smul_le, Rd.apply_add_smul_eq_zero_of_notMem_Icc,
+  Rd.hasCompactSupport_comp_add_smul,
+  Rd.integrable_comp_add_smul, Rd.hasDerivAt_comp_add_smul}
+\leanok
+For every unit vector $w$, every $R \in \R$, every function $h$ on $V$ with closed support in
+$\bar B(0, R)$ and every $y \in V$, $h(y + t w) = 0$ for every $t$ outside the interval
+$[-\langle y, w \rangle - R, -\langle y, w \rangle + R]$; so $t \mapsto h(y + t w)$ has compact
+support, and it is integrable on $\R$ when $h$ is continuous. For every $C^1$ function $g$ and all
+$y, w \in V$, $t \mapsto g(y + t w)$ has the derivative $Dg(y + t w) w$ at every $t$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$t + \langle y, w \rangle = \langle y + t w, w \rangle$ has absolute value at most
+$\|y + t w\|$, which is at most $R$ where $h(y + t w) \neq 0$. The derivative is the chain rule.
+\end{proof}
+
+\begin{lemma}[Derivatives of ray integrals]
+\label{lem:ray-integral-derivative}
+\lean{Rd.hasFDerivAt_rayIntegral, Rd.fderiv_rayIntegral_apply, Rd.fderiv_rayIntegral_self,
+  Rd.exists_norm_fderiv_rayIntegral_le, Rd.exists_lipschitzWith_rayIntegral}
+\leanok
+\uses{def:ray-integral, lem:compact-support-lines}
+For every $C^1$ function $g \colon V \to E$ with compact support and every unit vector $w$, the
+ray integral $\Psi$ is differentiable at every $y \in V$ with
+\[
+  D\Psi(y) v = \int_0^\infty Dg(y + t w) v \, dt \quad \text{for every } v \in V ,
+  \qquad D\Psi(y) w = -g(y) ,
+\]
+and there is $K < \infty$ with $\|D\Psi(y)\| \leq K$ for every $y$; in particular $\Psi$ is
+Lipschitz.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Let $\|Dg\| \leq C$ and the closed support of $g$ lie in $\bar B(0, R)$. For $y$ in the unit ball
+about $y_0$, $Dg(y + t w) = 0$ unless $|t| \leq \|y_0\| + 1 + R$
+(\Cref{lem:compact-support-lines}), so differentiation under the integral sign (Mathlib's
+\texttt{hasFDerivAt\_\allowbreak integral\_\allowbreak of\_\allowbreak dominated\_\allowbreak
+of\_\allowbreak fderiv\_\allowbreak le}) applies with the integrable bound $C$ times the
+indicator of that interval. In the direction $w$ the integrand is the derivative of
+$t \mapsto g(y + t w)$, which vanishes for large $t$, and the fundamental theorem of calculus on
+$(0, \infty)$ gives $-g(y)$. Each line meets the support of $g$ in an interval of length at most
+$2R$, so $\|D\Psi(y)\| \leq 2 R C$, and the mean value inequality gives the Lipschitz bound.
+\end{proof}
+
+\begin{lemma}[Line derivatives of Lipschitz functions integrate to zero]
+\label{lem:integral-line-derivative-zero}
+\lean{Rd.integral_lineDeriv_eq_zero, Rd.integrable_lineDeriv,
+  Rd.integral_lineDeriv_eq_zero_complex}
+\leanok
+For every finite-dimensional real normed space $F$ with a Haar measure, every Lipschitz function
+$f \colon F \to \R$ with compact support and every $v \in F$, $\int \partial_v f = 0$. For every
+real Banach space $G$, every Lipschitz function $f \colon F \to G$ with compact support and every
+$v \in F$, $\partial_v f$ is integrable. For every Lipschitz function $f \colon F \to \C$ with
+compact support and every $v \in F$, $\int \partial_v f = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Integration by parts for Lipschitz functions with the constant function $1$, whose line
+derivatives vanish (Mathlib's \texttt{LipschitzWith.\allowbreak integral\_\allowbreak
+lineDeriv\_\allowbreak mul\_\allowbreak eq}). $\partial_v f$ is measurable (Mathlib's
+\texttt{aestronglyMeasurable\_\allowbreak lineDeriv}), bounded by $C \|v\|$ for the Lipschitz
+constant $C$, and zero outside the closed support of $f$. For complex $f$, $f$ is
+differentiable almost everywhere by Rademacher's theorem, so the real and imaginary parts of
+$\partial_v f$ are almost everywhere the line derivatives of the Lipschitz functions
+$\operatorname{Re} f$ and $\operatorname{Im} f$.
+\end{proof}
+
+\paragraph{The normal weight and the ray integral from the graph.}
+
+\begin{definition}[The normal weight]
+\label{def:normal-weight}
+\lean{Rd.LipschitzGraph.normalWeight}
+\leanok
+\uses{def:graph-gradient}
+For $v \in V$ and $x' \in H$, the normal weight is
+$n_v(x') = \langle \nabla\varphi(x'), v \rangle - \langle v, e \rangle$.
+\end{definition}
+
+\begin{lemma}[Properties of the normal weight]
+\label{lem:normal-weight}
+\lean{Rd.LipschitzGraph.inner_normalAt_mul_gram, Rd.LipschitzGraph.abs_normalWeight_le,
+  Rd.LipschitzGraph.measurable_normalWeight, Rd.LipschitzGraph.memLp_top_normalWeight}
+\leanok
+\uses{def:normal-weight, def:graph-normal, lem:graph-gradient}
+For every $v \in V$ and every $x' \in H$,
+$n_v(x') = \langle v, \nu(x') \rangle \sqrt{1 + \|\nabla\varphi(x')\|^2}$ and
+$|n_v(x')| \leq (M + 1) \|v\|$; $n_v$ is measurable, hence in $L_\infty(H)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\nu = (\nabla\varphi - e)/\sqrt{1 + \|\nabla\varphi\|^2}$, $\|\nabla\varphi\| \leq M$
+(\Cref{lem:graph-gradient}) and $\|e\| = 1$.
+\end{proof}
+
+\begin{definition}[The ray integral from the graph]
+\label{def:graph-ray-integral}
+\lean{Rd.LipschitzGraph.graphRayIntegral}
+\leanok
+\uses{def:ray-integral, def:graph-map}
+For $g \colon V \to \C$ and $x' \in H$, the ray integral from the graph is the ray integral of
+$g$ in the direction $e$ at $\gamma(x')$,
+$\Psi(\gamma(x')) = \int_0^\infty g(\gamma(x') + t e) \, dt
+= \int_{\varphi(x')}^\infty g(x' + t e) \, dt$.
+\end{definition}
+
+\begin{lemma}[Properties of the ray integral from the graph]
+\label{lem:graph-ray-integral}
+\lean{Rd.LipschitzGraph.norm_le_norm_graphMap_add_smul,
+  Rd.LipschitzGraph.apply_graphMap_add_smul_eq_zero_of_norm_lt,
+  Rd.LipschitzGraph.hasCompactSupport_graphRayIntegral,
+  Rd.LipschitzGraph.exists_lipschitzWith_graphRayIntegral, Rd.LipschitzGraph.hasFDerivAt_graphMap,
+  Rd.LipschitzGraph.lineDeriv_graphRayIntegral}
+\leanok
+\uses{def:graph-ray-integral, lem:ray-integral-derivative, lem:graph-gradient, lem:graph-over}
+For every $x' \in H$ and every $t \in \R$, $\|x'\| \leq \|\gamma(x') + t e\|$; so if a function
+$h$ has closed support in $\bar B(0, R)$ and $\|x'\| > R$, then $h(\gamma(x') + t e) = 0$ for
+every $t$. For every $C^1$ function $g \colon V \to \C$ with compact support, $\Psi \circ \gamma$
+has compact support and is Lipschitz, and at every $x' \in H$ where $\varphi|_H$ is
+differentiable, $D\gamma(x') v' = v' + D\varphi(x') v' \, e$ and
+\[
+  \partial_{v'} (\Psi \circ \gamma)(x') = D\Psi(\gamma(x')) v'
+    - \langle \nabla\varphi(x'), v' \rangle \, g(\gamma(x'))
+  \quad \text{for every } v' \in H .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$x'$ is the projection of $\gamma(x') + t e = x' + (\varphi(x') + t) e$ onto $H$. The ray
+integral is Lipschitz (\Cref{lem:ray-integral-derivative}) and so is $\gamma$. The derivative is
+the chain rule with $D\Psi(\gamma(x')) e = -g(\gamma(x'))$
+(\Cref{lem:ray-integral-derivative}) and
+$D\varphi(x') v' = \langle \nabla\varphi(x'), v' \rangle$ (\Cref{lem:graph-gradient}).
+\end{proof}
+
+\begin{lemma}[Integrability on the hyperplane]
+\label{lem:hyperplane-integrable}
+\lean{Rd.integrable_of_norm_le_of_forall_norm_gt_eq_zero,
+  Rd.LipschitzGraph.integrable_comp_graphMap,
+  Rd.LipschitzGraph.integrable_fderiv_rayIntegral,
+  Rd.LipschitzGraph.integrable_inner_gradPhi_mul}
+\leanok
+\uses{lem:graph-ray-integral, lem:ray-integral-derivative, lem:graph-gradient}
+On every proper normed group $F$ with a measure that is finite on compact sets, every a.e.
+strongly measurable $f$ with $\|f\| \leq C$ and $f(x) = 0$ for $\|x\| > R$ is integrable. For
+every $C^1$ function $g \colon V \to \C$ with compact support and all $v \in V$, $v' \in H$, the
+functions $x' \mapsto g(\gamma(x'))$, $x' \mapsto D\Psi(\gamma(x')) v$ and
+$x' \mapsto \langle \nabla\varphi(x'), v' \rangle g(\gamma(x'))$ are integrable on $H$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+A bounded function on a closed ball of finite measure is integrable there. The three functions
+are measurable (Mathlib's \texttt{measurable\_\allowbreak fderiv} for $D\Psi$), bounded
+(\Cref{lem:ray-integral-derivative}, \Cref{lem:graph-gradient}), and vanish for $\|x'\| > R$ when
+the closed support of $g$ lies in $\bar B(0, R)$ (\Cref{lem:graph-ray-integral}).
+\end{proof}
+
+\begin{theorem}[The horizontal directions]
+\label{thm:graph-horizontal}
+\lean{Rd.LipschitzGraph.integral_fderiv_rayIntegral_graphMap}
+\leanok
+\uses{lem:graph-ray-integral, lem:integral-line-derivative-zero, lem:hyperplane-integrable,
+  lem:graph-gradient}
+For every $C^1$ function $g \colon V \to \C$ with compact support and every $v' \in H$,
+\[
+  \int_H D\Psi(\gamma(x')) v' \, dx'
+  = \int_H \langle \nabla\varphi(x'), v' \rangle \, g(\gamma(x')) \, dx' .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\varphi|_H$ is differentiable almost everywhere (Rademacher's theorem,
+\Cref{lem:graph-gradient}), so almost everywhere $\partial_{v'} (\Psi \circ \gamma)$ is the
+difference of the two integrands (\Cref{lem:graph-ray-integral}), which are integrable
+(\Cref{lem:hyperplane-integrable}). $\Psi \circ \gamma$ is Lipschitz with compact support, so
+the integral of $\partial_{v'} (\Psi \circ \gamma)$ vanishes
+(\Cref{lem:integral-line-derivative-zero}).
+\end{proof}
+
+\paragraph{Gauss--Green for $C^1$ functions.}
+
+\begin{theorem}[Gauss--Green on a Lipschitz graph domain]
+\label{thm:graph-gauss-green}
+\lean{Rd.LipschitzGraph.setIntegral_lineDeriv_eq, Rd.LipschitzGraph.setIntegral_lineDeriv_eq_normal,
+  Rd.LipschitzGraph.setIntegral_lineDeriv_e, Rd.LipschitzGraph.setIntegral_lineDeriv_hyperplane,
+  Rd.LipschitzGraph.setIntegral_lineDeriv_eq_surface}
+\leanok
+\uses{thm:graph-fubini, lem:ray-integral-derivative, thm:graph-horizontal, lem:normal-weight,
+  lem:hyperplane-integrable, thm:lipschitz-graph-area, def:graph-map}
+For every $C^1$ function $g \colon V \to \C$ with compact support and every $v \in V$,
+\begin{align*}
+  \int_\Omega \partial_v g &= \int_H g(\gamma(x')) \, n_v(x') \, dx' \\
+  &= \int_H g(\gamma(x')) \langle v, \nu(x') \rangle \sqrt{1 + \|\nabla\varphi(x')\|^2} \, dx' \\
+  &= \int_{\gamma(H)} g(y) \langle v, \nu(P y) \rangle \, d\mathcal H^{n-1}(y) .
+\end{align*}
+In particular, for every $v' \in H$,
+\[
+  \int_\Omega \partial_e g = -\int_H g(\gamma(x')) \, dx' ,
+  \qquad
+  \int_\Omega \partial_{v'} g = \int_H g(\gamma(x')) \langle \nabla\varphi(x'), v' \rangle \, dx' .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:graph-fubini} in graph coordinates and \Cref{lem:ray-integral-derivative},
+$\int_\Omega \partial_v g = \int_H D\Psi(\gamma(x')) v \, dx'$. With
+$v = Pv + \langle v, e \rangle e$ and $D\Psi e = -g$ the integrand is
+$D\Psi(\gamma(x')) Pv - \langle v, e \rangle g(\gamma(x'))$, and \Cref{thm:graph-horizontal}
+for $v' = Pv$ replaces the first term by $\langle \nabla\varphi(x'), Pv \rangle g(\gamma(x'))$,
+where $\langle \nabla\varphi(x'), Pv \rangle = \langle \nabla\varphi(x'), v \rangle$
+(\Cref{def:graph-map}). The second form is \Cref{lem:normal-weight}, the third the area
+formula \Cref{thm:lipschitz-graph-area}, and $n_e = -1$ and
+$n_{v'} = \langle \nabla\varphi, v' \rangle$ for $v' \in H$.
+\end{proof}
+
+With the surface measure $\sigma$ of $\Gamma = \gamma(H)$ the theorem reads
+$\int_\Omega \partial_v g = \int_\Gamma g \langle v, \nu \rangle \, d\sigma$.
+
+\paragraph{Green's formula for $H^1(V)$.}
+
+\begin{lemma}[Continuity of both sides of Green's formula]
+\label{lem:green-continuous}
+\lean{Rd.LipschitzGraph.integral_mul_mul_normalWeight_eq,
+  Rd.LipschitzGraph.continuous_setIntegral_weakDeriv_mul_add,
+  Rd.LipschitzGraph.continuous_integral_traceH1_mul_normalWeight}
+\leanok
+\uses{lem:sobolev-one-weak-derivative-operator, lem:graph-trace-sobolev-one-operator,
+  lem:normal-weight, lem:indicator-lp}
+For every $v \in V$, the maps
+\[
+  (U, W) \mapsto \int_\Omega (\partial_v U) \, W + U \, \partial_v W ,
+  \qquad
+  (U, W) \mapsto \int_H \operatorname{Tr} U \cdot \operatorname{Tr} W \cdot n_v
+\]
+are continuous on $H^1(V) \times H^1(V)$, with $\partial_v U \in L_2(V)$ the weak derivative of
+$\iota U$. For all $a, b \in L_2(H)$,
+$\int_H a b \, n_v = \langle a, n_v b \rangle$ with the bilinear pairing of $L_2(H)$ with itself.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\int_\Omega a b$ for $a, b \in L_2(V)$ is the bounded bilinear pairing of $\mathbf 1_\Omega a$
+with $b$ (\Cref{lem:indicator-lp}), and multiplication by
+$n_v \in L_\infty(H)$ is a bounded operator of $L_2(H)$ (Mathlib's
+\texttt{ContinuousLinearMap.\allowbreak holderL}). The operators $\partial_v$, $\iota$, the
+indicator and the trace are bounded (\Cref{lem:sobolev-one-weak-derivative-operator},
+\Cref{lem:indicator-lp}, \Cref{lem:graph-trace-sobolev-one-operator}).
+\end{proof}
+
+\begin{lemma}[Green's formula for Schwartz functions]
+\label{lem:green-schwartz}
+\lean{Rd.lineDeriv_mul, Rd.lineDeriv_mul_schwartz, Rd.LipschitzGraph.setIntegral_green_ofSchwartz}
+\leanok
+\uses{thm:graph-gauss-green, lem:graph-trace-schwartz, lem:sobolev-of-schwartz}
+For all $f, g \colon V \to \C$ differentiable at $x$ and every $v \in V$,
+$\partial_v (f g)(x) = \partial_v f(x) \, g(x) + f(x) \, \partial_v g(x)$. For all Schwartz
+functions $w_1, w_2$ and every $v \in V$,
+$\partial_v (w_1 w_2) = (\partial_v w_1) w_2 + w_1 \partial_v w_2$, and if $w_1$ has compact
+support,
+\[
+  \int_\Omega (\partial_v w_1) \, w_2 + w_1 \, \partial_v w_2
+  = \int_H \operatorname{Tr} w_1 \cdot \operatorname{Tr} w_2 \cdot n_v .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The product rule is that of derivatives (Mathlib's \texttt{fderiv\_\allowbreak
+fun\_\allowbreak mul}). Then \Cref{thm:graph-gauss-green} for the compactly supported $C^1$ function
+$w_1 w_2$, with $\iota w_i = w_i$, $\partial_v \iota w_i = \partial_v w_i$
+(\Cref{lem:sobolev-of-schwartz}) and $\operatorname{Tr} w_i = w_i \circ \gamma$
+(\Cref{lem:graph-trace-schwartz}).
+\end{proof}
+
+\begin{theorem}[Green's formula on a Lipschitz graph domain]
+\label{thm:graph-green}
+\lean{Rd.LipschitzGraph.setIntegral_green_besselPotentialSpace, Rd.LipschitzGraph.setIntegral_green,
+  Rd.LipschitzGraph.setIntegral_green_surface}
+\leanok
+\uses{lem:green-schwartz, lem:green-continuous, thm:sobolev-schwartz-dense,
+  lem:sobolev-one-weak-derivative-operator, thm:sobolev-one-two, thm:lipschitz-graph-area,
+  lem:normal-weight}
+For all $U, W \in H^1(V)$ and every $v \in V$,
+\begin{align*}
+  \int_\Omega (\partial_v U) \, W + U \, \partial_v W
+  &= \int_H \operatorname{Tr} U \cdot \operatorname{Tr} W \cdot n_v \\
+  &= \int_{\gamma(H)} \operatorname{Tr} U(P y) \operatorname{Tr} W(P y)
+    \langle v, \nu(P y) \rangle \, d\mathcal H^{n-1}(y) .
+\end{align*}
+For all $f, g \in L_2(V)$ with $f, g \in \Sob{1}{2}(V)$, every $v \in V$ and all
+$f_v, g_v \in L_2(V)$ with $f_v = \partial_v f$ and $g_v = \partial_v g$ weakly on $V$,
+\[
+  \int_\Omega f_v \, g + f \, g_v
+  = \int_H \operatorname{Tr} f \cdot \operatorname{Tr} g \cdot n_v .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Both sides of the first identity are continuous on $H^1(V) \times H^1(V)$
+(\Cref{lem:green-continuous}) and agree on pairs of compactly supported Schwartz functions
+(\Cref{lem:green-schwartz}), which are dense (\Cref{thm:sobolev-schwartz-dense}). The second
+form is the area formula (\Cref{thm:lipschitz-graph-area}) with \Cref{lem:normal-weight}. For
+$f, g \in \Sob{1}{2}(V)$, $f = \iota U$ and $g = \iota W$ for some $U, W \in H^1(V)$
+(\Cref{thm:sobolev-one-two}), and $f_v = \partial_v U$, $g_v = \partial_v W$ by uniqueness of
+weak derivatives (\Cref{lem:sobolev-one-weak-derivative-operator}).
+\end{proof}
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

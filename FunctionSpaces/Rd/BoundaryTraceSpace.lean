@@ -23,7 +23,9 @@ product space `V`, such as `ℝ^d`, with Lebesgue measure, and `H^1(Ω)` the Hil
   `ENNReal.lqNorm_one_mul_le` and `‖(2^(-k/2))_k‖_{ℓ_2} = √2`,
   `ENNReal.lqNorm_two_dyadicWeight_neg_half`); together `H^1(V) ⊆ B^{1/2}_{2,1}(V)` with
   constant `√2 C` (`Rd.modNorm_half_one_le_norm`), so the trace of `H^1(V)` on one Lipschitz
-  graph is bounded (`Rd.LipschitzGraph.exists_enorm_trace_toL2_le`).
+  graph is bounded (`Rd.LipschitzGraph.exists_enorm_trace_toL2_le`): a bounded operator
+  `H^1(V) → L_2(H)` (`Rd.LipschitzGraph.traceH1`), equal to `w ∘ γ` for Schwartz functions `w`
+  (`Rd.LipschitzGraph.traceH1_ofSchwartz_ae`).
 * **Chart traces**: `u ↦ Tr_j(ψ_j u)` is a bounded operator from `H^1(Ω)` to `L_2` of the
   hyperplane of the chart `j` (`Rd.BoundedLipschitzDomain.chartTrace`), for the canonical
   resolution of unity `Rd.BoundedLipschitzDomain.boundaryPartition`.
@@ -180,6 +182,56 @@ theorem LipschitzGraph.exists_enorm_trace_toL2_le (Ω : LipschitzGraph V) :
   rw [hw] at h1
   rw [mul_assoc]
   exact h1.trans (mul_le_mul' le_rfl (modNorm_half_one_le_norm U))
+
+/-! ### The trace of `H^1(V)` on a Lipschitz graph as an operator -/
+
+namespace LipschitzGraph
+
+variable (Ω : LipschitzGraph V)
+
+/-- The `L_2` functions of `H^1(V)` satisfy the hypothesis of the trace theorem on `Ω` at
+`s = 1/2`, `p = q = 2` and order `2` (`Rd.modNorm_toL2_lt_top`). -/
+theorem intrinsicNorm_toL2_lt_top (U : H^{1}(V)) :
+    Ω.intrinsicNorm two_ne_top 2 (1 / 2 + 1 / (2 : ℝ≥0∞).toReal) 2 (toL2 U) < ∞ :=
+  (Ω.intrinsicNorm_lt_top_of_modNorm' two_ne_top 2 one_le_two (modNorm_toL2_lt_top U)).2
+
+/-- The trace of `H^1(V)` on the graph as a linear map, `U ↦ Tr(ι U)` for the `L_2` function
+`ι U` (`Rd.LipschitzGraph.trace_sub`, `Rd.LipschitzGraph.trace_smul`). -/
+noncomputable def traceH1Linear : H^{1}(V) →ₗ[ℂ] Lp ℂ 2 (volume : Measure Ω.hyperplane) where
+  toFun U := Ω.trace two_ne_top 2 (toL2 U)
+  map_add' U W := by
+    have h := Ω.trace_sub two_ne_top 2 (s := 1 / 2) (by norm_num) one_le_two
+      (Ω.intrinsicNorm_toL2_lt_top (U + W)) (Ω.intrinsicNorm_toL2_lt_top W)
+    rw [map_add, add_sub_cancel_right] at h
+    rw [map_add, h, sub_add_cancel]
+  map_smul' c U := by
+    simp only [map_smul, RingHom.id_apply, LipschitzGraph.trace_smul]
+
+/-- **The trace of `H^1(V)` on a Lipschitz graph** as a bounded operator `H^1(V) → L_2(H)`,
+`U ↦ Tr(ι U)` (`Rd.LipschitzGraph.exists_enorm_trace_toL2_le`). -/
+noncomputable def traceH1 : H^{1}(V) →L[ℂ] Lp ℂ 2 (volume : Measure Ω.hyperplane) :=
+  (Ω.traceH1Linear).mkContinuousOfExistsBound (by
+    obtain ⟨C, hC, hle⟩ := Ω.exists_enorm_trace_toL2_le
+    refine ⟨C.toReal, fun U => ?_⟩
+    rw [← toReal_enorm, ← toReal_enorm U, ← ENNReal.toReal_mul]
+    exact ENNReal.toReal_mono (ENNReal.mul_ne_top hC enorm_ne_top) (hle U))
+
+/-- `traceH1 U = Tr(ι U)`. -/
+theorem traceH1_apply (U : H^{1}(V)) : Ω.traceH1 U = Ω.trace two_ne_top 2 (toL2 U) :=
+  rfl
+
+/-- **The trace of a Schwartz function** is its restriction to the graph: `Tr w = w ∘ γ` almost
+everywhere on `H` (`Rd.LipschitzGraph.trace_ae_eq_comp_graphMap`). -/
+theorem traceH1_ofSchwartz_ae (w : 𝓢(V, ℂ)) :
+    (Ω.traceH1 (ofSchwartz 1 w) : Ω.hyperplane → ℂ) =ᵐ[volume] fun x' => w (Ω.graphMap x') := by
+  rw [traceH1_apply]
+  refine Ω.trace_ae_eq_comp_graphMap two_ne_top (L := 2) one_le_two (s := 1 / 2) (by norm_num)
+    one_le_two (Ω.intrinsicNorm_lt_top_of_modNorm' two_ne_top 2 one_le_two
+      (modNorm_toL2_lt_top (ofSchwartz 1 w))).1 w.continuous ?_
+  rw [toL2_ofSchwartz]
+  exact w.coeFn_toLp 2 volume
+
+end LipschitzGraph
 
 /-! ### The chart traces of `H^1(Ω)` -/
 

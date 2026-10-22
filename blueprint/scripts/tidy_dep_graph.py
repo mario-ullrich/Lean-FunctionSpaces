@@ -132,7 +132,8 @@ BLOCKS: list[tuple[str, list]] = [
                "The area formula for Lipschitz graphs",
                "The surface measure of a bounded Lipschitz domain",
                "Divergence kernels",
-               "The extension theorem for Sobolev spaces"])]),
+               "The extension theorem for Sobolev spaces",
+               "Gauss--Green on Lipschitz graph domains"])]),
     ("Vector-valued singular integrals", [
         (SOB, [r'Dilation families and the H\"ormander condition',
                "The adjoint of a convolution", "Plancherel bounds",

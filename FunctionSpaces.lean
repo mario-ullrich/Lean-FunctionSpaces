@@ -202,6 +202,7 @@ public import FunctionSpaces.Rd.UniformSchwartzFamilies
 public import FunctionSpaces.Rd.BesselPotentialLifting
 public import FunctionSpaces.Rd.DivergenceKernels
 public import FunctionSpaces.Rd.SobolevExtension
+public import FunctionSpaces.Rd.LipschitzGraphGreen
 
 /-!
 # Function spaces
@@ -501,7 +502,7 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.LocalMeans`: local means with moment kernels, the reproducing formula, and
   the characterisation of Besov spaces by local means.
 * `FunctionSpaces.Rd.LipschitzGraph`: Lipschitz graph domains, their cones, the cone bump, the
-  support principle and the cut-off on `L_p`.
+  support principle, the cut-off on `L_p`, and integrals over a set as `L_2` pairings.
 * `FunctionSpaces.Rd.RychkovExtension`: intrinsic local means on a Lipschitz graph domain,
   Rychkov's extension, and the restrictions of Besov spaces described by intrinsic local means.
 * `FunctionSpaces.Rd.LipschitzGraphBesov`: the restrictions of Besov spaces to Lipschitz graph
@@ -633,15 +634,18 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.SobolevRestrictionSpaces`: the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and
   `H^s_0(Ω)` on open sets `Ω ⊆ ℝ^d` for real `s`, built inside Mathlib's `H^s(ℝ^d)`: restriction
   as an orthogonal projection, `H^s(Ω)` as a quotient, the compact embedding
-  `H^1(Ω) → L_2(Ω)` for bounded `Ω`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)`.
+  `H^1(Ω) → L_2(Ω)` for bounded `Ω`, the weak derivatives `∂_v : H^1(ℝ^d) → L_2(ℝ^d)` as
+  bounded operators, the density of the compactly supported Schwartz functions in `H^s(ℝ^d)`,
+  so `H̃^s(ℝ^d) = H^s(ℝ^d)`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)`.
 * `FunctionSpaces.Rd.SobolevDuality`: the Bessel potential of real Schwartz functions as a real
   function, the isometry `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}(ℝ^d)` and
   `H^s(ℝ^d)`, and the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` and
   `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on open sets for real `s`.
 * `FunctionSpaces.Rd.BoundaryTraceSpace`: `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` with explicit
-  constants, the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the
-  trace kernel, the trace space `H^{1/2}(Γ)` of the boundary `Γ` as its orthogonal complement
-  with the trace and extension operators, and its dual `H^{-1/2}(Γ)`.
+  constants, the trace of `H^1(ℝ^d)` on a Lipschitz graph and the chart traces of `H^1(Ω)` on a
+  bounded Lipschitz domain as bounded operators, the trace kernel, the trace space `H^{1/2}(Γ)`
+  of the boundary `Γ` as its orthogonal complement with the trace and extension operators, and
+  its dual `H^{-1/2}(Γ)`.
 * `FunctionSpaces.Rd.LipschitzGraphArea`: the area formula for Lipschitz graphs: the image of a
   measurable set `A` of the hyperplane under the graph map has `(n-1)`-dimensional Euclidean
   Hausdorff measure `∫_A √(1 + ‖∇φ‖²)`, where `n = dim V`; the outward unit normal of a Lipschitz
@@ -722,4 +726,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   `W^1_p(Ω) = W^1_p(ℝ^d)|_Ω` for `1 < p < ∞` with a bound; for `p = 2`, `H^1(Ω) = W^1_2(Ω)`,
   Rellich's theorem in `W^1_2(Ω)`, the equivalence of the quotient norm of `H^1(Ω)` with the
   `W^1_2(Ω)` norm, and the boundary traces of `W^1_2(Ω)`.
+* `FunctionSpaces.Rd.LipschitzGraphGreen`: Gauss–Green on a Lipschitz graph domain: product
+  coordinates and Fubini, ray integrals and integrals of line derivatives of Lipschitz
+  functions, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and
+  surface form, the product rule for line derivatives, and Green's formula
+  `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)`.
 -/
