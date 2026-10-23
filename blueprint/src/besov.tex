@@ -33,13 +33,14 @@ each quasi-norm by a constant times the other. The dimension of the underlying s
 \label{sec:descriptions}
 
 \begin{enumerate}
-  \item \emph{Approximation} (\Cref{def:approx-space,def:dyadic-norm}).
+  \item \emph{Approximation} (\Cref{def:approx-space} and \Cref{def:dyadic-norm}).
     $\|f\| + \|(2^{ks} E_{2^k}(f))_k\|_{\ell_q}$, where $E_m(f)$ is the error of best
     approximation of $f$ by the $m$-th set of a scheme: trigonometric polynomials, band-limited
     functions, piecewise polynomials, splines, step functions, the spans of the translates of a
     Daubechies scaling function, or combinations of $m$ elements of a dictionary.
-  \item \emph{Differences} (\Cref{def:rd-modulus,def:rd-modulus-on};
-    \Cref{def:modulus,def:interval-modulus,def:iso-modulus,def:cube-modulus}).
+  \item \emph{Differences} (\Cref{def:rd-modulus} and \Cref{def:rd-modulus-on};
+    \Cref{def:modulus}, \Cref{def:interval-modulus}, \Cref{def:iso-modulus} and
+    \Cref{def:cube-modulus}).
     $\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_q}$ with a modulus of smoothness of
     order $r$ on a group such as $\R^n$ or $\T^n$, or on a set $\Omega$, where only the
     differences with all their points in $\Omega$ count. The moduli on the torus and on an interval
@@ -57,22 +58,23 @@ each quasi-norm by a constant times the other. The dimension of the underlying s
   \item \emph{Local means} (\Cref{def:local-means}).
     $\|(2^{js} \|k_j * f\|_p)_j\|_{\ell_q}$ with kernels $k_j$ supported in balls of radius
     $C 2^{-j}$, all built from one bump.
-  \item \emph{Atoms} (\Cref{def:atomic-system,def:regular-atoms}).
+  \item \emph{Atoms} (\Cref{def:atomic-system} and \Cref{def:regular-atoms}).
     Decompositions into atoms $a_{j,m}$ of level $j$, supported near a cube of side $2^{-j}$,
     $f = \sum_j \sum_m \lambda_{j,m} a_{j,m}$, measured by
     \[
       \|\lambda\|_{b^s_{p,q}} = \bigl\|\bigl(2^{j(s - n/p)} \|\lambda_{j,\cdot}\|_{\ell_p}\bigr)_j
         \bigr\|_{\ell_q} .
     \]
-  \item \emph{Coefficients} (\Cref{def:haar,def:multiwavelets,def:daub-wavelet,def:spectral}).
+  \item \emph{Coefficients} (\Cref{def:haar}, \Cref{def:multiwavelets}, \Cref{def:daub-wavelet} and
+    \Cref{def:spectral}).
     Weighted $\ell_q(\ell_p)$ norms of the coefficients of $f$ in a basis, level by level: Haar
     functions, multiwavelets, Daubechies wavelets, the Fourier basis, a Hilbert basis of a
     spectral scheme.
-  \item \emph{Blocks} (\Cref{def:block-decomposition,def:blocks}).
+  \item \emph{Blocks} (\Cref{def:block-decomposition} and \Cref{def:blocks}).
     Decompositions $f = \sum_k g_k$ with $g_k$ in the $2^k$-th set of the scheme, measured by
     $\|(2^{ks} \|g_k\|)_k\|_{\ell_q}$; for a scheme with uniformly bounded projections $P_m$, the
     dyadic blocks $P_{2^{k+1}} f - P_{2^k} f$, among them martingale differences.
-  \item \emph{Interpolation} (\Cref{def:k-functional,def:interpolation}).
+  \item \emph{Interpolation} (\Cref{def:k-functional} and \Cref{def:interpolation}).
     The real interpolation space $(X, Y)_{s/r, q}$ between $X$ and a space $Y$ of smoothness $r$,
     defined through the K-functional on the grid $t = 2^{-kr}$ (the discrete $K$-method).
 \end{enumerate}
@@ -82,7 +84,7 @@ infimum of a quasi-norm on $\R^n$ over all extensions of $f$, and the \emph{intr
 means} $\|(2^{js} \|k_j * f\|_{L_p(\Omega)})_j\|_{\ell_q}$ (\Cref{def:intrinsic-local-means}).
 Spaces of \emph{dominating mixed smoothness} replace the level $k \in \N$ by $k \in \N^n$, the
 weight $2^{ks}$ by $2^{s|k|_1}$, and every kernel by a tensor product
-(\Cref{def:mixed-moduli,def:mixed-local-means,def:mixed-lp}).
+(\Cref{def:mixed-moduli}, \Cref{def:mixed-local-means} and \Cref{def:mixed-lp}).
 
 \section{Where each description is proved}
 \label{sec:where}
@@ -325,10 +327,10 @@ Descriptions & Range & Result \\
 
 \paragraph{Triebel--Lizorkin spaces.} The space $\TL{s}{p}{q}$ takes the $\ell_q$ norm of the
 Littlewood--Paley blocks at every point before the $L_p$ norm
-(\Cref{def:triebel-lizorkin,def:torus-triebel-lizorkin}); each row compares a description of
-$\TL{s}{p}{q}$ with this definition, on $\R^n$ unless $\T^n$ is named. The descriptions also take
+(\Cref{def:triebel-lizorkin} and \Cref{def:torus-triebel-lizorkin}); each row compares a description
+of $\TL{s}{p}{q}$ with this definition, on $\R^n$ unless $\T^n$ is named. The descriptions also take
 the $\ell_q$ norm at every point first: the local means of
-\Cref{def:tl-local-means,def:torus-tl-local-means}, the ball means of differences of
+\Cref{def:tl-local-means} and \Cref{def:torus-tl-local-means}, the ball means of differences of
 \Cref{def:ball-means-differences} and the coefficient space $f^s_{p,q}$ of
 \Cref{def:tl-sequence-space}. The first two rows hold for $1 \leq p < \infty$, the others for
 $1 < p < \infty$ and $1 < q \leq \infty$.
@@ -383,13 +385,13 @@ order $r > s$ coincide. The same holds for local means of any order $L > s$
 (\Cref{thm:local-means}) and their mixed analogues (\Cref{thm:mixed-lp}).
 
 \paragraph{Fourier analysis and $p$.} Fourier coefficients describe the spaces only for $p = 2$,
-through Parseval's identity (\Cref{thm:torus-coefficients,thm:spectral-coefficients}). For other
-$p$ the sharp dyadic blocks are replaced by the smooth kernels $\psi_j$. The proofs here need
-only integrable kernels, Young's inequality and the kernel identities
-(\Cref{thm:young,thm:kernel-identities}). On the torus the kernels of $\R^n$ act by convolution
-with their periodisations, and their Fourier transforms at the lattice points are Fourier
-multipliers; this transfers Jackson's and Bernstein's inequalities to every $L_p(\T^n)$
-(\Cref{thm:torus-econv-fourier,thm:torus-lp-moduli}), and the smooth blocks $\psi_j * f$
+through Parseval's identity (\Cref{thm:torus-coefficients} and \Cref{thm:spectral-coefficients}).
+For other $p$ the sharp dyadic blocks are replaced by the smooth kernels $\psi_j$. The proofs here
+need only integrable kernels, Young's inequality and the kernel identities
+(\Cref{thm:young} and \Cref{thm:kernel-identities}). On the torus the kernels of $\R^n$ act by
+convolution with their periodisations, and their Fourier transforms at the lattice points are
+Fourier multipliers; this transfers Jackson's and Bernstein's inequalities to every $L_p(\T^n)$
+(\Cref{thm:torus-econv-fourier} and \Cref{thm:torus-lp-moduli}), and the smooth blocks $\psi_j * f$
 describe $\Besov{s}{p}{q}(\T^n)$ for every $1 \leq p < \infty$ (\Cref{thm:torus-lp-besov}).
 
 \paragraph{Besov and Triebel--Lizorkin spaces.} A Besov quasi-norm takes the $L_p$ norm of each
@@ -415,15 +417,16 @@ $\Omega$, the restriction quasi-norm uses extensions to $\R^n$, and the intrinsi
 the values in $\Omega$ through kernels supported in a cone. On Lipschitz domains they agree, by
 Rychkov's extension operator (\Cref{thm:graph-extension}), which is linear and is one operator for
 all $0 < s < L$, $p$ and $q$; on bounded Lipschitz domains the graph domains are glued by a
-partition of unity and pointwise multipliers (\Cref{thm:multipliers,thm:local-extension}).
+partition of unity and pointwise multipliers (\Cref{thm:multipliers} and
+\Cref{thm:local-extension}).
 
 \paragraph{Traces.} Restriction to a hypersurface costs the smoothness $1/p$. On the torus every
 $s > 0$ is allowed (\Cref{thm:trace-torus}). On the boundary of a Lipschitz domain the Besov space
 is defined in charts by differences of order $1$, the order that a Lipschitz change of variables
 preserves, and the trace theorem holds for $0 < s < 1$
-(\Cref{thm:graph-trace-space,thm:boundary-trace-space}). Smooth changes of charts keep
+(\Cref{thm:graph-trace-space} and \Cref{thm:boundary-trace-space}). Smooth changes of charts keep
 differences of every order, so on the half-space and on compact manifolds with boundary the trace
-theorem holds for every $s > 0$ (\Cref{thm:half-space-trace-space,thm:manifold-trace}).
+theorem holds for every $s > 0$ (\Cref{thm:half-space-trace-space} and \Cref{thm:manifold-trace}).
 
 \chapter{The torus}
 \label{ch:torus}
@@ -1244,8 +1247,8 @@ $j \geq i + \#d + 1$, then $\Delta_j a = 0$ for every $a \in \mathcal{T}_{2^i}$,
 \begin{proof}
 \leanok
 If $\mathcal{F}\psi_j(m) \neq 0$, then $\deg m \leq |m| < 2^{j+1}$
-(\Cref{lem:lp-kernels-frequency,lem:torus-proj}), so \Cref{thm:torus-econv-fourier} gives the
-first claim. For $j = k + 1$ with $k \geq i + \#d$ and $\deg m < 2^i$,
+(\Cref{lem:lp-kernels-frequency} and \Cref{lem:torus-proj}), so \Cref{thm:torus-econv-fourier} gives
+the first claim. For $j = k + 1$ with $k \geq i + \#d$ and $\deg m < 2^i$,
 $|m| \leq \#d \deg m < 2^{\#d} 2^i \leq 2^k$, hence $\mathcal{F}\psi_j(m) = 0$
 (\Cref{lem:lp-kernels-frequency}) and $\Delta_j a = 0$ (\Cref{lem:torus-econv-identities}).
 Hence $\Delta_j f = \Delta_j (f - a)$ for $a \in \mathcal{T}_{2^i}$, and \Cref{lem:torus-lp-blocks}
@@ -1604,7 +1607,7 @@ approximation space $A^s_q$ of the Haar scheme if and only if
 \leanok
 \Cref{thm:martingale}, with \Cref{lem:haar-density} for the density, the formula for
 $E[f \mid \mathcal{F}_0]$ from \Cref{lem:dyadic-condexp}, and
-\Cref{lem:haar-martingale,lem:haar-level} for the martingale differences.
+\Cref{lem:haar-martingale} and \Cref{lem:haar-level} for the martingale differences.
 \end{proof}
 
 For $0 < s < 1/p$ this approximation space is the classical Besov space

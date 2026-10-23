@@ -567,9 +567,9 @@ $\langle \xi \rangle^{2s} \leq 5^s \, 2^{2js}$; and
 \begin{proof}
 \leanok
 The first two bounds are $(4^j)^s \leq (4(1 + |\xi|^2))^s$ and
-$(1 + |\xi|^2)^s \leq (5 \cdot 4^j)^s$ (\Cref{lem:fourier-psi-window,lem:bessel-weight-basic}),
-using $s \geq 0$. Let $a$ be as in \Cref{lem:fourier-psi-window}. The sum has at most the two
-terms $j = a, a + 1$, each at most $4^s \langle \xi \rangle^{2s}$, since
+$(1 + |\xi|^2)^s \leq (5 \cdot 4^j)^s$ (\Cref{lem:fourier-psi-window} and
+\Cref{lem:bessel-weight-basic}), using $s \geq 0$. Let $a$ be as in \Cref{lem:fourier-psi-window}.
+The sum has at most the two terms $j = a, a + 1$, each at most $4^s \langle \xi \rangle^{2s}$, since
 $|\widehat{\psi_j}(\xi)| \leq 1$. Both $j = a$ and $j = a + 1$ satisfy $|\xi| < 2^{j+1}$, and
 $1 \leq 2 (|\widehat{\psi_a}(\xi)|^2 + |\widehat{\psi_{a+1}}(\xi)|^2)$ by
 \Cref{lem:elementary-square-inequalities}, so
@@ -758,7 +758,7 @@ $\partial_{e_i} f$ on $V$ for every $i \in I$ and $J_1 f = h$,
 \begin{proof}
 \leanok
 Weak derivatives on $V$ of $L_2$ functions are derivatives of tempered distributions
-(\Cref{thm:weak-derivative-tempered,cor:sobolev-tempered}). For derivatives
+(\Cref{thm:weak-derivative-tempered} and \Cref{cor:sobolev-tempered}). For derivatives
 $g_i = \partial_{e_i} f \in L_2(V)$ along an orthonormal basis $(e_i)_i$,
 $(2\pi)^2 \int (\langle \xi \rangle^1)^2 |\widehat f|^2 = (2\pi)^2 \|f\|_2^2 +
 \sum_i \|g_i\|_2^2$ is finite (\Cref{lem:derivative-fourier-l2}), so $f \in H^1(V)$ by
@@ -768,8 +768,8 @@ H^0(V) = L_2(V)$ for every $v \in V$ (Mathlib's \texttt{TemperedDistribution.\al
 MemSobolev.\allowbreak lineDerivOp}), and the derivative of order $0$ is $f$ itself. The bound
 compares $\widehat g = 2 \pi i \langle \cdot, v \rangle \widehat f$ with
 $\widehat h = \langle \cdot \rangle^1 \widehat f$ pointwise
-(\Cref{lem:derivative-fourier-l2,lem:bessel-potential-l2}) and uses \Cref{lem:plancherel-l2};
-the identity is \Cref{lem:derivative-fourier-l2} with
+(\Cref{lem:derivative-fourier-l2} and \Cref{lem:bessel-potential-l2}) and uses
+\Cref{lem:plancherel-l2}; the identity is \Cref{lem:derivative-fourier-l2} with
 $\|h\|_2^2 = \int (\langle \xi \rangle^1)^2 |\widehat f|^2$.
 \end{proof}
 

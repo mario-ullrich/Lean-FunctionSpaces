@@ -1069,8 +1069,8 @@ The factors satisfy $|m_0(\eta)|^2 = \cos(\pi\eta)^{2N} P(\eta)$
 (\Cref{prop:daub-symbol-modulus}), the cosines multiply to
 $\prod_{j \geq 0} \cos(\pi\xi/2^{j+1}) = \operatorname{sinc}(\pi\xi)$
 (\Cref{prop:daub-cos-product}), and the products of $P$ and of the factors of $\Phi$ converge
-(\Cref{lem:daub-fun-product,lem:daub-symbol-product-factors}). The factorwise product of two
-convergent products converges to the product of their values.
+(\Cref{lem:daub-fun-product} and \Cref{lem:daub-symbol-product-factors}). The factorwise product of
+two convergent products converges to the product of their values.
 \end{proof}
 
 \begin{proposition}[A bound by finite products]
@@ -1215,7 +1215,7 @@ First, the case $n = 1$: for all continuous $h, g : \R \to \R$ with period $1$,
   = 2 \int_{-1/2}^{1/2} h(2\eta) P(\eta) g(\eta) \, d\eta .
 \]
 Indeed, the function $f(u) = h(2u) P(u) g(u)$ is continuous and has period $1$
-(\Cref{lem:daub-halving,lem:daub-fun-symmetry}), and the integrand on the left is
+(\Cref{lem:daub-halving} and \Cref{lem:daub-fun-symmetry}), and the integrand on the left is
 $f(\eta/2) + f((\eta + 1)/2)$, since $h(\eta + 1) = h(\eta)$; apply \Cref{lem:daub-halving}.
 
 Now induction on $n$: $T^{n+1} g = T (T^n g)$, the case $n = 1$ for the continuous $1$-periodic
@@ -1289,8 +1289,8 @@ in particular for $S = [-2^n/2, 2^n/2]$.
 \begin{proof}
 \leanok
 \uses{prop:daub-transfer-products, lem:daub-fun-symmetry, prop:daub-fun-bounds}
-$P$ is continuous and nonnegative (\Cref{lem:daub-fun-symmetry,prop:daub-fun-bounds}). The
-first bound integrates $T^n 1 \leq C \lambda^n$ over an interval of length $1$. The integrand of
+$P$ is continuous and nonnegative (\Cref{lem:daub-fun-symmetry} and \Cref{prop:daub-fun-bounds}).
+The first bound integrates $T^n 1 \leq C \lambda^n$ over an interval of length $1$. The integrand of
 the second is nonnegative, so the integral over $S$ is at most the integral over
 $[-2^n/2, 2^n/2]$, which equals the first integral by \Cref{prop:daub-transfer-products}.
 \end{proof}
@@ -1357,8 +1357,9 @@ for every $\xi \in A_n$. Since $|\xi| \leq 2^n/2$ on $A_n$,
   |\Phi(\xi)|^2 \leq \exp\Bigl(\binom{2N-1}{N} \frac{\pi^2}{12}\Bigr)
   \Bigl(\frac{4}{\pi 2^n}\Bigr)^{2N} \prod_{j<n} P\Bigl(\frac{\xi}{2^{j+1}}\Bigr) .
 \]
-Both sides are continuous (\Cref{thm:daub-symbol-product-continuous,lem:daub-growth-integrals});
-integrate over $A_n \subseteq [-2^n/2, 2^n/2]$ and apply \Cref{lem:daub-growth-integrals}.
+Both sides are continuous (\Cref{thm:daub-symbol-product-continuous} and
+\Cref{lem:daub-growth-integrals}); integrate over $A_n \subseteq [-2^n/2, 2^n/2]$ and apply
+\Cref{lem:daub-growth-integrals}.
 \end{proof}
 
 Since $(4/(\pi 2^n))^{2N} = (4/\pi)^{2N} 4^{-Nn}$, these bounds decay geometrically in $n$, with
@@ -1931,7 +1932,7 @@ and the function $\widehat{\eta_n}$ is continuous.
 By item~3 of \Cref{lem:daub-fourier-dilate} with $a = 2$ and $b = k$, the transform of
 $x \mapsto \eta_n(2x - k)$ is $\xi \mapsto \frac12 e^{-2\pi i k \xi/2} \widehat{\eta_n}(\xi/2)$.
 The transform is linear on the integrable summands of $\eta_{n+1}$
-(\Cref{lem:daub-cascade-integrable,lem:daub-fourier-linear}), and
+(\Cref{lem:daub-cascade-integrable} and \Cref{lem:daub-fourier-linear}), and
 $\frac12 \sum_k c_k e^{-2\pi i k \xi/2} = m_0(\xi/2)$ (\Cref{lem:daub-symbol-sum}). The product
 formula follows by induction on $n$ with \Cref{lem:daub-symbol-product-split}. Transforms of
 integrable functions are continuous (\Cref{lem:daub-fourier-continuous}).
@@ -2031,7 +2032,7 @@ $\varphi \in L_p(\R)$ for every $p \in [0, \infty]$.
 \leanok
 \uses{prop:daub-scaling-continuous, thm:daub-scaling-support}
 $\varphi$ is continuous with compact support
-(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}).
+(\Cref{prop:daub-scaling-continuous} and \Cref{thm:daub-scaling-support}).
 \end{proof}
 
 \begin{theorem}[The Fourier transform of the scaling function]
@@ -2054,10 +2055,10 @@ every Daubechies mask of order $N \geq 2$ the function $\widehat\Phi$ is integra
 $\mathcal F^{-1} \Phi(x) = \widehat\Phi(-x)$ for every $x \in \R$, and $\varphi$ is integrable
 (\Cref{prop:daub-scaling-integrable}), hence so is $\widehat\Phi$. The function $\Phi$ is
 continuous and integrable
-(\Cref{thm:daub-symbol-product-continuous,prop:daub-symbol-product-integrable}) with integrable
-transform, so the Fourier inversion theorem gives $\mathcal F \mathcal F^{-1} \Phi = \Phi$.
-Finally $\int \varphi = \widehat\varphi(0) = \Phi(0) = 1$
-(\Cref{lem:daub-fourier-zero,prop:daub-symbol-product-basic}).
+(\Cref{thm:daub-symbol-product-continuous} and \Cref{prop:daub-symbol-product-integrable}) with
+integrable transform, so the Fourier inversion theorem gives
+$\mathcal F \mathcal F^{-1} \Phi = \Phi$. Finally $\int \varphi = \widehat\varphi(0) = \Phi(0) = 1$
+(\Cref{lem:daub-fourier-zero} and \Cref{prop:daub-symbol-product-basic}).
 \end{proof}
 
 So $\varphi$ is a continuous function with support in $[0, 2N - 1]$, integral $1$ and Fourier
@@ -2173,9 +2174,10 @@ interval of length $1$.
 
 Now induction on $n$, for all continuous $1$-periodic $w$ at once; the case $n = 0$ is the last
 identity. For the step, the function $\zeta \mapsto w(2\zeta) |m_0(\zeta)|^2$ is continuous with
-period $1$ (\Cref{lem:daub-symbol-props,lem:daub-halving-symbol}), so the induction hypothesis
-turns the right side of the step identity into $2 \int_0^1 w(2\zeta) |m_0(\zeta)|^2 \, d\zeta$,
-which is $\int_0^1 w$ by \Cref{lem:daub-halving-symbol}.
+period $1$ (\Cref{lem:daub-symbol-props} and \Cref{lem:daub-halving-symbol}), so the induction
+hypothesis turns the right side of the step identity into
+$2 \int_0^1 w(2\zeta) |m_0(\zeta)|^2 \, d\zeta$, which is $\int_0^1 w$ by
+\Cref{lem:daub-halving-symbol}.
 \end{proof}
 
 \paragraph{Orthonormality.}
@@ -2213,9 +2215,9 @@ $\Phi(\xi) = \prod_{j<n} m_0(\xi/2^{j+1}) \cdot \Phi(\xi/2^n)$
 other $\xi$, $\Phi_n(\xi) = 0$.
 
 Now $\Phi$ is continuous and square integrable
-(\Cref{thm:daub-symbol-product-continuous,prop:daub-symbol-product-integrable}), so $|\Phi|^2$
-is integrable. Take $\kappa$ from \Cref{prop:daub-symbol-product-nonzero} and a bound $B$ of the
-continuous periodic function $|w|$. The functions $w |\Phi_n|^2$ converge pointwise to
+(\Cref{thm:daub-symbol-product-continuous} and \Cref{prop:daub-symbol-product-integrable}), so
+$|\Phi|^2$ is integrable. Take $\kappa$ from \Cref{prop:daub-symbol-product-nonzero} and a bound $B$
+of the continuous periodic function $|w|$. The functions $w |\Phi_n|^2$ converge pointwise to
 $w |\Phi|^2$ and are bounded by the integrable function $B \kappa^{-2} |\Phi|^2$. By dominated
 convergence and \Cref{prop:daub-trunc-integral},
 $\int w |\Phi|^2 = \lim_n \int w |\Phi_n|^2 = \int_0^1 w$.
@@ -2253,9 +2255,10 @@ by \Cref{prop:daub-periodic-integral} for the continuous function $w(\xi) = e^{-
 with $\int_0^1 e^{-2\pi i k \xi} \, d\xi = \delta_{k0}$ (\Cref{lem:daub-exp-orthonormal}).
 
 Now let $l = 0$. The function $\varphi$ is continuous and integrable
-(\Cref{prop:daub-scaling-continuous,prop:daub-scaling-integrable}) with the integrable transform
-$\widehat\varphi = \Phi$ (\Cref{thm:daub-scaling-fourier,prop:daub-symbol-product-integrable}),
-and $\mathcal F[\varphi(\cdot - k)](\xi) = e^{-2\pi i k \xi} \Phi(\xi)$
+(\Cref{prop:daub-scaling-continuous} and \Cref{prop:daub-scaling-integrable}) with the integrable
+transform $\widehat\varphi = \Phi$ (\Cref{thm:daub-scaling-fourier} and
+\Cref{prop:daub-symbol-product-integrable}), and
+$\mathcal F[\varphi(\cdot - k)](\xi) = e^{-2\pi i k \xi} \Phi(\xi)$
 (\Cref{lem:daub-fourier-translate}). Parseval's identity (\Cref{prop:daub-parseval}) turns the
 integral into $\int_\R e^{-2\pi i k \xi} |\Phi(\xi)|^2 \, d\xi = \delta_{k0}$. The substitution
 $x \mapsto x + l$ gives the case of two translates, and $\overline{\varphi} = \varphi$
@@ -2292,8 +2295,8 @@ $\Phi^{(l)}(2n + 1) = 0$ for every $n \in \Z$.
   prop:daub-symbol-zeros}
 First, $\Phi$ is infinitely differentiable: for every $n \in \N$ the function
 $x \mapsto |x|^n |\varphi(x)|$ is integrable, being continuous with compact support
-(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}); the Fourier transform of a
-function with integrable moments of every order is infinitely differentiable, by
+(\Cref{prop:daub-scaling-continuous} and \Cref{thm:daub-scaling-support}); the Fourier transform of
+a function with integrable moments of every order is infinitely differentiable, by
 differentiation under the integral sign; and $\Phi = \widehat\varphi$
 (\Cref{thm:daub-scaling-fourier}). Now differentiate $\Phi(2\xi) = m_0(\xi) \Phi(\xi)$
 (\Cref{prop:daub-refinement-identity}) $l$ times, by the chain rule on the left and by the
@@ -2323,7 +2326,8 @@ $j \in \Z \setminus \{0\}$,
   thm:daub-scaling-fourier}
 First, the derivatives of $\Phi$ as Fourier transforms: for every $l \in \N$ the function
 $x \mapsto x^l \varphi(x)$ is integrable, being continuous with compact support
-(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}), and for every $\xi \in \R$
+(\Cref{prop:daub-scaling-continuous} and \Cref{thm:daub-scaling-support}), and for every
+$\xi \in \R$
 \[
   \Phi^{(l)}(\xi) = (-2\pi i)^l \, \mathcal F\bigl[x \mapsto x^l \varphi(x)\bigr](\xi) ,
 \]
@@ -2372,8 +2376,8 @@ the periodisation as the Fourier series $\sum_n \widehat f(n) e^{2\pi i n x}$, a
 nonzero term is $\widehat f(0) = \int_\R f$ (\Cref{lem:daub-fourier-zero}).
 
 Now the function $f(y) = y^l \varphi(y)$ is continuous, vanishes outside $[0, 2N - 1]$
-(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}), and $\widehat f(n) = 0$ for
-every $n \in \Z \setminus \{0\}$ (\Cref{prop:daub-symbol-product-integer-zeros}). Hence
+(\Cref{prop:daub-scaling-continuous} and \Cref{thm:daub-scaling-support}), and $\widehat f(n) = 0$
+for every $n \in \Z \setminus \{0\}$ (\Cref{prop:daub-symbol-product-integer-zeros}). Hence
 $\sum_n f(x + n) = \int_\R f$, and the substitution $k = -n$ turns the sum into the sum over
 the points $x - k$.
 \end{proof}
@@ -2499,8 +2503,8 @@ Indeed, if both factors are nonzero at $y$, then $y - j, y - k \in [0, 2N - 1]$
 (\Cref{thm:daub-scaling-support}), so $|j - k| \leq 2N - 1$. The product of the integrable
 function $\varphi(\cdot - j)$ (\Cref{prop:daub-scaling-integrable}) and the bounded continuous
 function $\overline{\varphi(\cdot - k)} = \varphi(\cdot - k)$
-(\Cref{prop:daub-scaling-continuous,prop:daub-scaling-real}) is integrable. Hence the integrand
-is a finite sum over the $j$ with $|j - k| \leq 2N - 1$, and orthonormality
+(\Cref{prop:daub-scaling-continuous} and \Cref{prop:daub-scaling-real}) is integrable. Hence the
+integrand is a finite sum over the $j$ with $|j - k| \leq 2N - 1$, and orthonormality
 (\Cref{thm:daub-orthonormal}) leaves the term $j = k$.
 
 Now write $Q = \sum_j a(j) \varphi(\cdot - j)$ with a polynomial $a$
@@ -2654,7 +2658,7 @@ $\mathcal F[f(\cdot + h)](\xi) = e^{2\pi i h \xi} \widehat f(\xi)$
 (\Cref{lem:daub-fourier-translate}); the second identity follows by induction on $r$, since the
 differences of an integrable function are integrable (\Cref{lem:rd-differences}). Apply this to
 the integrable function $\varphi$ with $\widehat\varphi = \Phi$
-(\Cref{prop:daub-scaling-integrable,thm:daub-scaling-fourier}). The factor
+(\Cref{prop:daub-scaling-integrable} and \Cref{thm:daub-scaling-fourier}). The factor
 $(e^{2\pi i h \xi} - 1)^r$ is continuous with modulus at most $2^r$
 (\Cref{lem:daub-difference-multiplier}), and $\Phi$ is integrable
 (\Cref{prop:daub-symbol-product-integrable}). Finally $\varphi \in L_p$
@@ -2690,9 +2694,9 @@ $h \in \R$,
   = \int_\R |e^{2\pi i h \xi} - 1|^{2r} \, |\Phi(\xi)|^2 \, d\xi .
 \]
 Indeed, $\Delta_h^r \varphi$ is continuous and integrable
-(\Cref{lem:daub-differences-lp,lem:rd-differences} with
-\Cref{prop:daub-scaling-continuous,prop:daub-scaling-integrable}), with the integrable transform
-of \Cref{lem:daub-scaling-difference-fourier}; apply the case $g = f$ of
+(\Cref{lem:daub-differences-lp} and \Cref{lem:rd-differences} with
+\Cref{prop:daub-scaling-continuous} and \Cref{prop:daub-scaling-integrable}), with the integrable
+transform of \Cref{lem:daub-scaling-difference-fourier}; apply the case $g = f$ of
 \Cref{prop:daub-parseval}, and $\|g\|_2^2 = \int |g|^2$ (\Cref{lem:daub-differences-lp}). By the
 last bound of \Cref{lem:daub-difference-multiplier} and $|h|^{2s} = (|h|^s)^2$,
 \[
@@ -2796,7 +2800,7 @@ with $\omega_r(\varphi, t)_p \leq K t^s$ for every $t \in (0, 1]$.
 \begin{proof}
 \leanok
 \uses{prop:daub-modulus-l2, lem:daub-modulus-lp-l2}
-By \Cref{prop:daub-modulus-l2,lem:daub-modulus-lp-l2} one can take
+By \Cref{prop:daub-modulus-l2} and \Cref{lem:daub-modulus-lp-l2} one can take
 $K = (2N - 1 + 2r)^{1/p - 1/2} K_2$ with the constant $K_2$ of the $L_2$ bound.
 \end{proof}
 
@@ -2820,8 +2824,8 @@ every $t \in (0, 1]$.
   thm:daub-modulus-lp}
 The growth bounds $\lambda = 4$ for $N = 2$ and $\lambda = 9$ for $N = 3$ have
 $2 - \log_4 4 = 1$ and $3 - \log_4 9 = 3 - \log_2 3$
-(\Cref{prop:daub-transfer-two,prop:daub-transfer-three}). Apply \Cref{prop:daub-modulus-l2} for
-$p = 2$ and \Cref{thm:daub-modulus-lp} for the other $p$.
+(\Cref{prop:daub-transfer-two} and \Cref{prop:daub-transfer-three}). Apply
+\Cref{prop:daub-modulus-l2} for $p = 2$ and \Cref{thm:daub-modulus-lp} for the other $p$.
 \end{proof}
 
 By the theorem of Eirola~\cite{Eirola} and Villemoes~\cite{Villemoes}, $\varphi \in H^s$ holds
@@ -2963,7 +2967,7 @@ Moreover $\log_2 3 > \frac32$.
 \leanok
 \uses{prop:daub-transfer-two, prop:daub-transfer-three, thm:daub-holder-fourier}
 $2^3 < 3^2$ gives $\log_2 3 > \frac32$. The growth bounds $\lambda = 4$ for $N = 2$ and
-$\lambda = 9$ for $N = 3$ (\Cref{prop:daub-transfer-two,prop:daub-transfer-three}) give
+$\lambda = 9$ for $N = 3$ (\Cref{prop:daub-transfer-two} and \Cref{prop:daub-transfer-three}) give
 $N - \log_4 \lambda - \frac12 = \frac12$ and $N - \log_4 \lambda - \frac12 = \frac52 - \log_2 3$,
 both less than $1$, so \Cref{thm:daub-holder-fourier} applies.
 \end{proof}
@@ -3112,7 +3116,7 @@ $\omega_r(\varphi, t)_p \leq K t^\theta$ for every $t \in (0, 1]$.
 \uses{prop:daub-transfer-two, prop:daub-transfer-three, thm:daub-modulus-interp}
 Condition~2 of \Cref{thm:daub-modulus-interp} with the growth bounds $\lambda = 4$ for $N = 2$
 and $\lambda = 9$ for $N = 3$, for which $N - \log_4 \lambda$ is $1$ and $3 - \log_2 3$
-(\Cref{prop:daub-transfer-two,prop:daub-transfer-three}), so that
+(\Cref{prop:daub-transfer-two} and \Cref{prop:daub-transfer-three}), so that
 $N - \log_4 \lambda - \frac12$ is $\frac12$ and $\frac52 - \log_2 3$.
 \end{proof}
 
@@ -3845,8 +3849,8 @@ $[a, b]$. For every measurable $f : \R \to \C$ and every $j \in \N$,
   \Bigl\|\sum_{k \in \Z} \langle f, \gamma_{j,k} \rangle \gamma_{j,k}\Bigr\|_p
   \leq C_\gamma C'_\gamma \|f\|_p
 \]
-with the constants of \Cref{thm:daub-upper-stability,prop:daub-coeff-estimate}. If $\gamma$ is
-continuous and $f \in L_p(\R)$, this expansion lies in $L_p(\R)$.
+with the constants of \Cref{thm:daub-upper-stability} and \Cref{prop:daub-coeff-estimate}. If
+$\gamma$ is continuous and $f \in L_p(\R)$, this expansion lies in $L_p(\R)$.
 \end{lemma}
 
 \begin{proof}
@@ -3859,8 +3863,8 @@ vanishes outside $[a, b]$ lies in $L_p(\R)$ and in $L_{p'}(\R)$
 
 \paragraph{The scaling functions of every level.}
 The scaling function of a mask of order $N \geq 2$ is continuous and vanishes outside
-$[0, 2N - 1]$ (\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}), so everything
-above applies to $\gamma = \varphi$ with $a = 0$, $b = 2N - 1$ and $M = 2N$.
+$[0, 2N - 1]$ (\Cref{prop:daub-scaling-continuous} and \Cref{thm:daub-scaling-support}), so
+everything above applies to $\gamma = \varphi$ with $a = 0$, $b = 2N - 1$ and $M = 2N$.
 
 \begin{definition}[The functions $\varphi_{j,k}$]
 \label{def:daub-scaled}
@@ -3888,7 +3892,7 @@ $\lambda : \Z \to \C$.
 \uses{lem:daub-generators-orthonormal, prop:daub-generators-recovery, thm:daub-orthonormal,
   prop:daub-scaling-continuous, thm:daub-scaling-support}
 The integer translates of $\varphi$ are orthonormal (\Cref{thm:daub-orthonormal}); apply
-\Cref{lem:daub-generators-orthonormal,prop:daub-generators-recovery} with $a = 0$ and
+\Cref{lem:daub-generators-orthonormal} and \Cref{prop:daub-generators-recovery} with $a = 0$ and
 $b = 2N - 1$.
 \end{proof}
 
@@ -4117,8 +4121,8 @@ has only finitely many nonzero terms. For every locally integrable $f : \R \to \
 \uses{def:daub-scaled, prop:daub-scaling-real, thm:daub-scaling-fourier,
   lem:daub-dyadic-substitution, cor:daub-partition-of-unity, lem:daub-support-window,
   lem:daub-window-overlap, lem:daub-proj-fun-basic}
-\Cref{lem:daub-support-window,lem:daub-window-overlap} with $a = 0$ and $b = 2N - 1$ give the
-first part. Next, the partition of unity at level $j$: for every $k \in \Z$ the function
+\Cref{lem:daub-support-window} and \Cref{lem:daub-window-overlap} with $a = 0$ and $b = 2N - 1$ give
+the first part. Next, the partition of unity at level $j$: for every $k \in \Z$ the function
 $\overline{\varphi_{j,k}}$ is integrable,
 \[
   \varphi_{j,k}(x) \int_\R \overline{\varphi_{j,k}(y)} \, dy = \varphi(2^j x - k)
@@ -4126,7 +4130,7 @@ $\overline{\varphi_{j,k}}$ is integrable,
   \sum_{k \in \Z} \varphi_{j,k}(x) \int_\R \overline{\varphi_{j,k}(y)} \, dy = 1 .
 \]
 Indeed, $\varphi$ is real with $\int_\R \varphi = 1$
-(\Cref{prop:daub-scaling-real,thm:daub-scaling-fourier}), so the substitution $u = 2^j y$
+(\Cref{prop:daub-scaling-real} and \Cref{thm:daub-scaling-fourier}), so the substitution $u = 2^j y$
 (\Cref{lem:daub-dyadic-substitution}) gives $\int_\R \overline{\varphi_{j,k}} = 2^{j/2} 2^{-j}$,
 and $2^{j/2} 2^{j/2} 2^{-j} = 1$; the partition of unity (\Cref{cor:daub-partition-of-unity}) at
 the point $2^j x$ gives the sum. Subtract
@@ -4210,8 +4214,8 @@ $V_i \subseteq V_j$ for all $i \leq j$.
 \leanok
 \uses{prop:daub-proj-reproduction, prop:daub-expand-succ, lem:daub-proj-fun-basic}
 The pointwise identities $P_j P_j f = P_j f$ and $P_{j+1} P_j f = P_j f$
-(\Cref{prop:daub-proj-reproduction,prop:daub-expand-succ}), since $P_j f$ depends only on the
-class of $f$ (\Cref{lem:daub-proj-fun-basic}).
+(\Cref{prop:daub-proj-reproduction} and \Cref{prop:daub-expand-succ}), since $P_j f$ depends only on
+the class of $f$ (\Cref{lem:daub-proj-fun-basic}).
 \end{proof}
 
 \begin{definition}[The Daubechies scheme]
@@ -4246,8 +4250,8 @@ $f \in L_p(\R)$, $P_j f \to f$ in $L_p(\R)$ as $j \to \infty$.
 First, for every continuous $g : \R \to \C$ with compact support and every $0 < p \leq \infty$,
 $\|g - P_j g\|_p \to 0$ as $j \to \infty$. Indeed, $g$ is uniformly continuous, and $\varphi$ is
 bounded, being continuous with compact support
-(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}). For $\eta > 0$ and all large
-$j$ the hypothesis of item~2 of \Cref{prop:daub-proj-error} holds, since for every $c \in \R$
+(\Cref{prop:daub-scaling-continuous} and \Cref{thm:daub-scaling-support}). For $\eta > 0$ and all
+large $j$ the hypothesis of item~2 of \Cref{prop:daub-proj-error} holds, since for every $c \in \R$
 and every $\delta > 0$ there is $J \in \N$ with $c/2^J < \delta$ ($2^J > J$, so any
 $J > c/\delta$ serves), and the bound there is a fixed multiple of $\eta$. Continuous functions
 with compact support are dense in $L_p(\R)$, and such a $g$ is the limit of $P_j g \in V_j$. The
@@ -4390,10 +4394,11 @@ $\int_\R \psi(x - k) \overline{\varphi(x - l)} \, dx = 0$.
 \uses{lem:daub-wavelet-refine, prop:daub-scaled-refine, lem:daub-finite-expansions,
   lem:daub-shifted-filters, prop:daub-dual-orthogonality}
 Both functions are expansions of level $j + 1$, with the coefficients $g_{n-2k}/\sqrt 2$ and
-$g_{n-2l}/\sqrt 2$, or $c_{n-2l}/\sqrt 2$ (\Cref{lem:daub-wavelet-refine,prop:daub-scaled-refine}).
-By \Cref{lem:daub-finite-expansions,lem:daub-shifted-filters} the inner products are
-$\frac12 \sum_i g_i g_{i + 2(k-l)} = \delta_{kl}$ and
-$\frac12 \sum_i c_i g_{i + 2(l-k)} = 0$ (\Cref{prop:daub-dual-orthogonality}).
+$g_{n-2l}/\sqrt 2$, or $c_{n-2l}/\sqrt 2$ (\Cref{lem:daub-wavelet-refine} and
+\Cref{prop:daub-scaled-refine}). By \Cref{lem:daub-finite-expansions} and
+\Cref{lem:daub-shifted-filters} the inner products are
+$\frac12 \sum_i g_i g_{i + 2(k-l)} = \delta_{kl}$ and $\frac12 \sum_i c_i g_{i + 2(l-k)} = 0$
+(\Cref{prop:daub-dual-orthogonality}).
 \end{proof}
 
 \paragraph{The block identity.}
@@ -4497,13 +4502,13 @@ $k \in \Z$,
   = \sum_{n \in \Z} \frac{g_{n-2k}}{\sqrt 2} \langle f, \varphi_{j+1,n} \rangle ,
 \]
 since $\varphi_{j,k}$ and $\psi_{j,k}$ are expansions of level $j + 1$
-(\Cref{prop:daub-scaled-refine,lem:daub-wavelet-refine}) whose coefficients vanish outside a
-finite set (\Cref{lem:daub-shifted-filters}); insert them into the first identity of
+(\Cref{prop:daub-scaled-refine} and \Cref{lem:daub-wavelet-refine}) whose coefficients vanish
+outside a finite set (\Cref{lem:daub-shifted-filters}); insert them into the first identity of
 \Cref{lem:daub-finite-expansions}, where the filters are real. Let
 $\lambda_n = \langle f, \varphi_{j+1,n} \rangle$. These identities say that the coefficients of
 $P_j f$ and $Q_j f$ are $H \lambda$ and $G \lambda$, so by
-\Cref{prop:daub-expand-succ,lem:daub-expand-wavelet-succ} both are expansions of level $j + 1$,
-with the coefficients $H^* H \lambda$ and $G^* G \lambda$. These add up to $\lambda$
+\Cref{prop:daub-expand-succ} and \Cref{lem:daub-expand-wavelet-succ} both are expansions of level
+$j + 1$, with the coefficients $H^* H \lambda$ and $G^* G \lambda$. These add up to $\lambda$
 (\Cref{prop:daub-perfect-reconstruction}), and the expansion of $\lambda$ is $P_{j+1} f$. The
 wavelet is continuous and vanishes outside $[1 - N, N]$ (\Cref{lem:daub-wavelet-basic}), so
 $Q_j f \in L_p(\R)$ by \Cref{lem:daub-expand-coeff}.
@@ -4531,9 +4536,9 @@ $K_0(x, y) = \sum_{k \in \Z} \varphi(x - k) \varphi(y - k)$ is the kernel of $P_
   lem:daub-expand-wavelet-succ, prop:daub-perfect-reconstruction}
 Let $\lambda_n = \varphi_{j+1,n}(y)$. As functions of $x$, $K_j$ and $K^\psi_j$ are expansions of
 level $j$ with the coefficients $\varphi_{j,k}(y) = (H \lambda)_k$ and
-$\psi_{j,k}(y) = (G \lambda)_k$ (\Cref{prop:daub-scaled-refine,lem:daub-wavelet-refine}), hence
-expansions of level $j + 1$ with the coefficients $H^* H \lambda$ and $G^* G \lambda$
-(\Cref{prop:daub-expand-succ,lem:daub-expand-wavelet-succ}), which add up to $\lambda$
+$\psi_{j,k}(y) = (G \lambda)_k$ (\Cref{prop:daub-scaled-refine} and \Cref{lem:daub-wavelet-refine}),
+hence expansions of level $j + 1$ with the coefficients $H^* H \lambda$ and $G^* G \lambda$
+(\Cref{prop:daub-expand-succ} and \Cref{lem:daub-expand-wavelet-succ}), which add up to $\lambda$
 (\Cref{prop:daub-perfect-reconstruction}). For $j = 0$,
 $\gamma_{1,n}(x) \gamma_{1,n}(y) = 2 \gamma(2x - n) \gamma(2y - n)$.
 \end{proof}
@@ -4609,7 +4614,7 @@ $\int_\R x^l \psi(x) \, dx = 0$.
 First, the moments of the dilated translates of $\varphi$: for all $l, i \in \N$ and every
 $k \in \Z$ the functions $x \mapsto x^l \varphi(2x - k)$ and $y \mapsto y^i \varphi(y)$ are
 integrable, being continuous with compact support
-(\Cref{prop:daub-scaling-continuous,thm:daub-scaling-support}), and
+(\Cref{prop:daub-scaling-continuous} and \Cref{thm:daub-scaling-support}), and
 \[
   \int_\R x^l \varphi(2x - k) \, dx
   = 2^{-(l+1)} \sum_{i=0}^{l} \binom{l}{i} k^{l-i} \int_\R y^i \varphi(y) \, dy
@@ -4812,7 +4817,8 @@ $\|S^{(N)}\|_p \leq 2^N N^N 2^{jN} \omega_N(f, 2^{-j})_p$, so by \Cref{prop:daub
   \|S - P_j S\|_p \leq C_S 2^{-jN} \, 2^N N^N 2^{jN} \omega_N(f, 2^{-j})_p
   = 2^N N^N C_S \, \omega_N(f, 2^{-j})_p .
 \]
-Both sides depend only on the class of $f$ (\Cref{lem:daub-proj-fun-basic,lem:rd-modulus}).
+Both sides depend only on the class of $f$ (\Cref{lem:daub-proj-fun-basic} and
+\Cref{lem:rd-modulus}).
 \end{proof}
 
 \begin{theorem}[Jackson's inequality]
@@ -4830,7 +4836,7 @@ Daubechies scheme, satisfies
   \|f - P_j f\|_p \leq (1 + C_P) \, C_J \, \omega_N(f, 2^{-j})_p
 \]
 with the constants $C_P$ and $C_J < \infty$ of
-\Cref{thm:daub-proj-bound,prop:daub-jackson-continuous}.
+\Cref{thm:daub-proj-bound} and \Cref{prop:daub-jackson-continuous}.
 \end{theorem}
 
 \begin{proof}
@@ -5117,7 +5123,7 @@ order $N$. Let $0 < s < \theta$ and $f \in L_p(\R)$.
 \leanok
 \uses{thm:daub-approx-modulus, thm:daub-approx-coeff, thm:rd-besov}
 Both conditions of item~1 say $f \in A^s_q$
-(\Cref{thm:daub-approx-modulus,thm:daub-approx-coeff}). For $0 < s < N$, item~2 of
+(\Cref{thm:daub-approx-modulus} and \Cref{thm:daub-approx-coeff}). For $0 < s < N$, item~2 of
 \Cref{thm:rd-besov} with $r = N$ makes $\|f\|^{\mathrm{LP}}_{s,q} < \infty$ equivalent to
 $\|f\|^{\omega}_{s,q} < \infty$.
 \end{proof}
@@ -5282,7 +5288,7 @@ $w = 2/p$ lies in $[0, 1]$ (\Cref{lem:daub-interpolated-orders}), so this with $
 $b = 1$ gives $s' \in [0, 1)$ with $s < \theta = (2/p) s' + (1 - 2/p) \alpha$. The case D4 of
 \Cref{prop:daub-bernstein-bounds}, with $r = 2$ and $a = \alpha \geq 0$, gives a Bernstein bound
 of order $\theta$, and $\theta \leq 1$ since $s' < 1$ and $\alpha < 1$
-(\Cref{lem:daub-d4-alpha-bounds,lem:daub-interpolated-orders}).
+(\Cref{lem:daub-d4-alpha-bounds} and \Cref{lem:daub-interpolated-orders}).
 \end{proof}
 
 \begin{theorem}[Besov spaces by D4 coefficients]
@@ -5823,7 +5829,7 @@ and only if $N \geq 1$.
 \uses{thm:daub-fejer-riesz, lem:daub-cos-poly-values, def:daub-cos-poly,
   lem:daub-fejer-riesz-readings}
 $Q_N$ is positive on $[-1, 1]$ and has degree at most $N - 1$
-(\Cref{lem:daub-cos-poly-values,def:daub-cos-poly}). The Fej\'er--Riesz theorem
+(\Cref{lem:daub-cos-poly-values} and \Cref{def:daub-cos-poly}). The Fej\'er--Riesz theorem
 (\Cref{thm:daub-fejer-riesz}) gives a real polynomial $L$ with $\deg L \leq N - 1$, $L(1) > 0$,
 no zeros in the closed unit disk and $|L(e^{i\theta})|^2 = Q_N(\cos\theta)$ for every
 $\theta \in \R$. Such an $L$ is a mask: for every $N \in \N$ and every real polynomial $L$ with
@@ -5832,7 +5838,7 @@ $|L(e^{-2\pi i \xi})|^2 = P(\xi)$ for every $\xi \in \R$, since at $\theta = -2\
 $e^{i\theta} = e^{-2\pi i \xi}$ and $Q_N(\cos(-2\pi\xi)) = Q_N(\cos 2\pi\xi) = P(\xi)$
 (\Cref{lem:daub-cos-poly-values}); and $L(1) = 1$ if $N \geq 1$ and $L(1) > 0$, since at
 $\theta = 0$ the identity reads $L(1)^2 = Q_N(1) = 1$
-(\Cref{lem:daub-fejer-riesz-readings,lem:daub-cos-poly-values}). Hence, if moreover
+(\Cref{lem:daub-fejer-riesz-readings} and \Cref{lem:daub-cos-poly-values}). Hence, if moreover
 $\deg L < N$ and $L(1) > 0$, then $L$ is a Daubechies mask of order $N$, where $N \geq 1$ since
 a polynomial of degree less than $N$ exists only for $N \geq 1$. Conversely, every mask has
 order $N \geq 1$ (\Cref{def:daub-mask}).
