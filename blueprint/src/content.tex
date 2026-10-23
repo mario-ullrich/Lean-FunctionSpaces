@@ -940,11 +940,13 @@ $\|f\|_{\theta, q} < \infty$. It is a linear subspace of $X$, and $\|\cdot\|_{\t
 satisfies the triangle inequality.
 \end{definition}
 
-The textbook definition samples $K(t, f)$ on the grid $t = 2^{-k}$, which is $\rho = 1$;
-the representation theorem produces the grid $t = 2^{-kr}$. Grids for different $\rho > 0$
-give equivalent norms, since $K(t, f)$ increases and $K(t, f)/t$ decreases in $t$; this is
-not formalised. The term $\|f\|$ replaces the negative indices $k < 0$ of the textbook
-definition.
+This is the discrete $K$-method. The textbook definition samples $K(t, f)$ on the grid
+$t = 2^{-k}$, which is $\rho = 1$; the representation theorem produces the grid $t = 2^{-kr}$.
+Grids for different $\rho > 0$ give equivalent norms, since $K(t, f)$ increases and $K(t, f)/t$
+decreases in $t$, and the continuous $K$-method
+$\bigl(\int_0^\infty (t^{-\theta} K(t, f))^q \, dt/t\bigr)^{1/q}$ gives an equivalent norm as
+well; these equivalences are not formalised. The term $\|f\|$ replaces the negative indices
+$k < 0$ of the textbook definition.
 
 \begin{lemma}[Errors and the $K$-functional]
 \label{lem:error-k-functional}
@@ -1003,6 +1005,9 @@ and the second Hardy inequality (\Cref{lem:hardy}) with exponent $r - s > 0$ bou
 partial sums. The tolerances are made arbitrarily small at the end. Only finitely many
 lifts enter each $z_k$, so $Y$ need not be complete.
 \end{proof}
+
+Here $(X, Y)_{s/r, q}$ is the discrete $K$-method on the grid $t = 2^{-kr}$
+(\Cref{def:interpolation}); its equivalence with the continuous $K$-method is not formalised.
 
 \begin{corollary}[Schemes with the same Jackson and Bernstein inequalities]
 \label{cor:equal-spaces}
@@ -1695,6 +1700,9 @@ of dimension $D$ if for every $1 \leq p \leq \infty$ there is $C \geq 0$ with
 For $1 \leq p \leq r \leq \infty$ put $\alpha(D, p, r) = D(1/p - 1/r)$.
 \end{definition}
 
+The Nikolskii property enters the theorems below as a hypothesis on the scheme; the
+trigonometric polynomials on the torus have it (\Cref{thm:torus-nikolskii}).
+
 \begin{lemma}[Nikolskii inequality]
 \label{lem:nikolskii-inequality}
 \lean{FunctionScheme.HasNikolskii.eLpNorm_le, FunctionScheme.HasNikolskii.liftBound}
@@ -1753,7 +1761,10 @@ theorem needs $\alpha < s$.
 \label{ch:sobolev}
 
 The setting is that of \Cref{ch:besov}. A Sobolev space enters through its Jackson and
-Bernstein inequalities, as a smoothness space for the scheme in $L_p$.
+Bernstein inequalities, as a smoothness space for the scheme in $L_p$. The definition below is a
+hypothesis whose content is these two inequalities; its instances are the spaces $H^s$ with
+$p = 2$ on the torus (\Cref{def:torus-sobolev}) and for a continuous spectral basis
+(\Cref{thm:continuous-spectral-basis-besov}).
 
 \begin{definition}[Sobolev space for a scheme]
 \label{def:sobolev-scheme}
@@ -1950,9 +1961,11 @@ form a scheme of functions on $M$, and its classes in $L_2(\mu)$ form the spectr
 $(e_i, \lambda)$.
 \end{definition}
 
-For the Laplace--Beltrami operator, $\tilde e_i$ are the eigenfunctions and
-$\lambda(i) = \lfloor \sqrt{\lambda_i} \rfloor$. The Besov spaces $\Besov{s}{p}{q}(M)$ of the
-scheme $(\mathcal{E}_n)$ are defined for every $1 \leq p \leq \infty$ by \Cref{def:besov}.
+The structure enters the theorems below as a hypothesis; the Fourier basis of the torus is an
+instance (\Cref{prop:fourier-eigenbasis}). For the Laplace--Beltrami operator, $\tilde e_i$ are
+the eigenfunctions and $\lambda(i) = \lfloor \sqrt{\lambda_i} \rfloor$. The Besov spaces
+$\Besov{s}{p}{q}(M)$ of the scheme $(\mathcal{E}_n)$ are defined for every $1 \leq p \leq \infty$
+by \Cref{def:besov}.
 
 \begin{theorem}[Besov and Sobolev spaces of a continuous spectral basis]
 \label{thm:continuous-spectral-basis-besov}
@@ -1999,7 +2012,8 @@ constant $C \geq 0$ if
 \end{definition}
 
 For the Laplace--Beltrami operator of a compact Riemannian manifold of dimension $d$ this is
-H\"ormander's local Weyl law, with $D = d$.
+H\"ormander's local Weyl law, with $D = d$. The bound enters the theorems below as a
+hypothesis; the Fourier basis of the torus satisfies it (\Cref{prop:fourier-eigenbasis}).
 
 \begin{theorem}[Nikolskii inequality from the local Weyl bound]
 \label{thm:local-weyl-nikolskii}
@@ -2360,6 +2374,9 @@ the trigonometric scheme of $\T^{n+1}$ to that of $\T^n$ in $L_p$, and by
 $C' = 1$. Apply \Cref{thm:trace-transfer} with $s + 1/p$ in place of $s$, and
 \Cref{thm:trace-surjective}.
 \end{proof}
+
+The map $\operatorname{Tr}$ is $f \mapsto f(0, \cdot)$ on trigonometric polynomials; its
+identification with the restriction of a continuous function is not formalised.
 
 \chapter{Filtrations and martingale differences}
 \label{ch:filtrations}
@@ -3179,6 +3196,9 @@ f(k)$ for every $k \in \Z^d$. For $m \in \N$, the Sobolev space $\Sob{m}{2}(\T^d
 of the $f \in L_2(\T^d)$ that have a weak derivative $\partial^\alpha f \in L_2(\T^d)$ for
 every $\alpha$ with $|\alpha| \leq m$.
 \end{definition}
+
+The definition is for $p = 2$; Sobolev spaces $\Sob{m}{p}(\T^d)$ for other $p$ are not
+formalised on the torus.
 
 \begin{lemma}[Existence and uniqueness of weak derivatives]
 \label{lem:weak-derivative}
@@ -7346,7 +7366,9 @@ Lipschitz graph domains $\Omega_j$ with $B_j \cap \Omega = B_j \cap \Omega_j$.
 \end{definition}
 
 This is the definition of Stein and Triebel, as in \cite[Remark 3.2]{SchneiderVybiral}; the
-direction $e_j$ of each graph domain replaces the rotations.
+direction $e_j$ of each graph domain replaces the rotations. In Lean the balls and the graph
+domains are data of the structure; a constructor from the set-level definition and concrete
+instances such as balls are not formalised.
 
 \begin{lemma}[Shrinking and the inner margin]
 \label{lem:bounded-lipschitz-geometry}
@@ -8216,6 +8238,11 @@ agrees on $\Omega$ with some $F \in L_p(V)$ with
 $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq C N_\Omega(f)$. The space $V$ is a
 Besov domain, with $F = f$.
 \end{definition}
+
+The extension is part of the definition, so a Besov domain is a hypothesis. Its instances are
+$V$, the closed half-space and the models of manifolds (\Cref{thm:half-space-besov-domain}).
+The class consists of closed convex sets, so non-convex domains lie outside it; among the convex
+ones, closed balls, cubes and quadrants are not yet proved instances.
 
 \begin{theorem}[Invariance on Besov domains]
 \label{thm:besov-domain-invariance}
@@ -9667,6 +9694,9 @@ the Littlewood--Paley block $\Delta_j f \in L_p$. The Triebel--Lizorkin quasi-no
 and $\TL{s}{p}{q}$ consists of the $f \in L_p$ with $\|f\|_{F^s_{p,q}} < \infty$.
 \end{definition}
 
+For $s < 0$ this is the part $\TL{s}{p}{q} \cap L_p$ of the classical space of tempered
+distributions.
+
 The Littlewood--Paley quasi-norm of the Besov spaces (\Cref{def:lp-blocks}) takes the two norms
 in the other order, $\|f\|^{\mathrm{LP}}_{s,q} = \|(2^{js} \|\psi_j * f\|_p)_j\|_{\ell_q}$; in the
 notation of the mixed norms, $\|f\|_{F^s_{p,q}}$ is an $L_p(\ell_q)$ norm and
@@ -9705,7 +9735,7 @@ hence for all $j$ at once outside a countable union of null sets.
   Rd.triebelLizorkinNorm_zero_left, Rd.triebelLizorkinNorm_mono_exponent,
   Rd.triebelLizorkinNorm_mono_smoothness, Rd.MemTriebelLizorkin.mono_exponent,
   Rd.MemTriebelLizorkin.mono_smoothness, Rd.MemTriebelLizorkin.add, Rd.MemTriebelLizorkin.smul,
-  Rd.triebelLizorkinSpace, Rd.mem_triebelLizorkinSpace}
+  Rd.triebelLizorkinSpace, Rd.mem_triebelLizorkinSpace, Rd.triebelLizorkinNorm_zero_two_eq}
 \leanok
 \uses{def:triebel-lizorkin, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-nonnegative}
 For every $1 \leq p < \infty$, all $s \leq t$ in $\R$, all $1 \leq q \leq r \leq \infty$, all
@@ -9730,7 +9760,7 @@ At almost every point the blocks of $f + g$ are the sums of the blocks of $f$ an
 those of $f$, and $|c|$ leaves the $\ell_q$ and the $L_p$ norm
 (\Cref{lem:lp-norm-nonnegative}). The monotonicity follows from
 $\|\cdot\|_{\ell_r} \leq \|\cdot\|_{\ell_q}$ and $2^{js} \leq 2^{jt}$ at every point. For
-$s = 0$ the weights $2^{j \cdot 0}$ are $1$.
+$s = 0$ the weights $2^{j \cdot 0}$ are $1$, for every $q$ and in particular for $q = 2$.
 \end{proof}
 
 \begin{theorem}[$\TL{s}{p}{p} = \Besov{s}{p}{p}$]
@@ -12446,10 +12476,11 @@ proves Rellich's theorem: the restriction from $H^1(V)$ to $L_2(\Omega)$ is comp
 bounded $\Omega \subseteq V$. \Cref{sec:sobolev-restriction-spaces} builds the Hilbert spaces
 $H^s(\Omega)$, $\tilde H^s(\Omega)$ and $H^s_0(\Omega)$ inside $H^s(V)$, for every open
 $\Omega$ and every real $s$. \Cref{sec:sobolev-duality} proves the duality of
-$\tilde H^s(\Omega)$ and $H^{-s}(\Omega)$. \Cref{sec:boundary-trace-space} builds the trace space
-$H^{1/2}(\Gamma)$ of a bounded Lipschitz domain, and \Cref{sec:lipschitz-graph-area} proves the
-area formula for Lipschitz graphs, which expresses the Euclidean Hausdorff measure of the
-boundary of a Lipschitz graph domain in its chart. \Cref{sec:surface-measure} builds the surface
+$\tilde H^s(\Omega)$ and $H^{-s}(\Omega)$. \Cref{sec:boundary-trace-space} defines the trace space
+$H^{1/2}(\Gamma)$ of a bounded Lipschitz domain as the orthogonal complement of the trace kernel
+in $H^1(\Omega)$, and \Cref{sec:lipschitz-graph-area} proves the area formula for Lipschitz
+graphs, which expresses the Euclidean Hausdorff measure of the boundary of a Lipschitz graph
+domain in its chart. \Cref{sec:surface-measure} builds the surface
 measure $\mathcal H^{n-1}$ on the boundary of a bounded Lipschitz domain, $L_2(\Gamma)$ and the
 traces into it.
 \Cref{sec:dilation-families} starts the theory for $1 < p < \infty$: families of dilated
@@ -12467,14 +12498,16 @@ Carleson's theorem, \Cref{sec:marcinkiewicz} proves Marcinkiewicz interpolation 
 type $(1,1)$ and strong type $(2,2)$, and \Cref{sec:lp-norm-duality} computes $L_p$ norms by
 duality. Together they give the strong type $(p,p)$, $1 < p < \infty$, of these operators in
 \Cref{sec:vector-valued-strong-type}, and \Cref{sec:square-function} proves the square function
-theorem $\TL{0}{p}{2} = L_p(V)$ with explicit constants. \Cref{sec:derivative-kernels} writes
-the Littlewood--Paley blocks as sums of derivatives of Schwartz kernels, and
+theorem $\TL{0}{p}{2} = L_p(V)$, the two-sided bound of $\|f\|_{\TL{0}{p}{2}}$ by $\|f\|_p$, with
+named constants. \Cref{sec:derivative-kernels} writes the Littlewood--Paley blocks as sums of
+derivatives of Schwartz kernels, and
 \Cref{sec:sobolev-triebel-lizorkin} proves $\Sob{m}{p}(V) = \TL{m}{p}{2}$ for
-$1 < p < \infty$, with explicit constants and the Besov sandwich. \Cref{sec:sobolev-embedding}
+$1 < p < \infty$, with named constants and the Besov sandwich. \Cref{sec:sobolev-embedding}
 proves the Nikolskii inequality for the blocks and from it the embeddings of Besov spaces into
 $L_r(V)$ and into the bounded continuous functions, and the Sobolev embeddings
 $\Sob{m}{p}(V) \hookrightarrow L_r(V)$ for $m > n(1/p - 1/r)$ and
-$\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, all with explicit constants.
+$\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, all with named constants. These named
+constants are formulas in norms and Schwartz seminorms of fixed kernels, proved finite.
 \Cref{sec:bessel-kernels} prepares the Bessel potential spaces: the Bessel potential maps the
 dilates of every Schwartz function to multiples of the dilates of its Bessel kernels; when the
 Fourier transform of the function lives in an annulus, the Bessel kernels form a uniform Schwartz
@@ -12483,22 +12516,24 @@ family and their dilates a Calder\'on--Zygmund family.
 $s$ and $H^{s,p}(V) = \TL{s}{p}{2}$ for $s \geq 0$ and $1 < p < \infty$, hence Calder\'on's
 theorem $\Sob{m}{p}(V) = H^{m,p}(V)$, with existential constants.
 \Cref{sec:divergence-kernels} and \Cref{sec:sobolev-extension} prove the extension theorem for
-$\Sob{1}{p}$ on bounded Lipschitz domains, $1 < p < \infty$. \Cref{sec:lipschitz-graph-green}
-and \Cref{sec:lipschitz-domain-green} prove Gauss--Green on Lipschitz graph domains and Green's
+$\Sob{1}{p}$ on bounded Lipschitz domains, $1 < p < \infty$, of first order and with an
+extension for each function. \Cref{sec:lipschitz-graph-green} and
+\Cref{sec:lipschitz-domain-green} prove Gauss--Green on Lipschitz graph domains and Green's
 formula on bounded Lipschitz domains, and \Cref{sec:trace-kernel} proves that the kernel of the
 trace is $H^1_0(\Omega)$.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
 Chandler-Wilde, Hewett and Moiola \cite{ChandlerWildeHewettMoiola}; for restrictions of $H^1(V)$,
-Rellich's theorem holds on every bounded set (\Cref{sec:rellich-compactness}). Every restriction
-lies in the space $\Sob{1}{2}(\Omega)$ of weak derivatives, on every open set. On bounded
-Lipschitz domains the two spaces agree by the extension theorem of Calder\'on and Stein
-\cite[Chapter VI]{SteinSingular} (\Cref{thm:sobolev-extension}); on some bounded
-open sets $\Sob{1}{2}(\Omega)$ is strictly larger, as for a disc with a slit removed, and its
-embedding into $L_2(\Omega)$ can fail to be compact, as for the rooms-and-passages domains
-\cite[Chapter 6]{AdamsFournier}. The norm bounds of this chapter are explicit on $V$; on bounded
-Lipschitz domains the extension and trace theorems carry existential constants, and the
+Rellich's theorem holds on every bounded set (\Cref{sec:rellich-compactness}). By this definition
+every restriction lies in the space $\Sob{1}{2}(\Omega)$ of weak derivatives, on every open set;
+the converse inclusion is the extension theorem. On bounded Lipschitz domains the two spaces
+agree by the extension theorem of Calder\'on and Stein \cite[Chapter VI]{SteinSingular}
+(\Cref{thm:sobolev-extension}); on some bounded open sets $\Sob{1}{2}(\Omega)$ is strictly
+larger, as for a disc with a slit removed, and its embedding into $L_2(\Omega)$ can fail to be
+compact, as for the rooms-and-passages domains \cite[Chapter 6]{AdamsFournier}. The norm bounds
+of this chapter are explicit or named on $V$; on bounded Lipschitz domains the extension and
+trace theorems carry existential constants, and the
 statements are equivalences of membership. On bounded Lipschitz domains the functions of
 $H^1(\Omega)$ with boundary trace zero form the closure of the test functions in $H^1(\Omega)$
 \cite[Theorem 3.40]{McLean} (\Cref{thm:trace-kernel-zero-boundary}); the spaces $H^1(\Omega)$ and
@@ -13550,7 +13585,9 @@ $\Sob{1}{2}(\Omega)$, and so does $f$, which agrees with $F$ almost everywhere o
 (\Cref{lem:weak-derivative-basic}).
 \end{proof}
 
-In particular $f$ and its weak derivatives $\partial_v f$, $v \in V$, lie in $L_2(\Omega)$.
+In particular $f$ and its weak derivatives $\partial_v f$, $v \in V$, lie in $L_2(\Omega)$. This
+inclusion holds by the definition of $H^1(\Omega)$ through extensions; the converse inclusion is
+the extension theorem (\Cref{cor:sobolev-extension-two}).
 
 For a resolution of unity $\psi$ on $\Gamma$ (\Cref{def:boundary-partition}), as in
 \Cref{thm:boundary-trace-space} with $p = q = 2$, $L = 2$ and $s + 1/p = 1$, a function $g$ on
@@ -14768,10 +14805,12 @@ $\Omega_j$ (\Cref{thm:trace-graph}). $H^1(\Omega)$ is the Hilbert space of
 \Cref{def:sobolev-restriction-space} for the open set $\Omega$, inside $H^1(V)$, and $\iota$ reads
 an element of $H^1(V)$ as an $L_2$ function (\Cref{def:sobolev-one-to-l2}). Boundary traces are
 taken with differences of order $L = 2$, $p = q = 2$ and $s = 1/2$, so that $s + 1/p = 1$. The
-trace space $H^{1/2}(\Gamma)$ is the orthogonal complement in $H^1(\Omega)$ of the kernel of the
-trace, so that it is a Hilbert space with a trace and an extension of norm at most $1$; by the
-trace theorem of $H^1(\Omega)$ (\Cref{thm:sobolev-lipschitz-domain-trace}) its elements correspond
-to the functions of $B^{1/2}_{2,2}(\Gamma)$ modulo null sets of $\Gamma$.
+trace space $H^{1/2}(\Gamma)$ is defined as the orthogonal complement in $H^1(\Omega)$ of the kernel
+of the trace, so that by this definition it is a Hilbert space with a trace and an extension of
+norm at most $1$; by the trace theorem of $H^1(\Omega)$ (\Cref{thm:sobolev-lipschitz-domain-trace})
+its elements correspond to the functions of $B^{1/2}_{2,2}(\Gamma)$ modulo null sets of $\Gamma$.
+This correspondence is qualitative: a norm equivalence of $H^{1/2}(\Gamma)$ with
+$B^{1/2}_{2,2}(\Gamma)$ is not formalised.
 
 The chart traces are bounded by the norm of $B^{1/2}_{2,1}(V)$ (\Cref{lem:trace-linear}). The
 following three results bound this norm on $H^1(V)$, with explicit constants.
@@ -15108,7 +15147,7 @@ $\operatorname{Tr}_\Gamma \iota u = g$ almost everywhere on $\Gamma$
 \end{proof}
 
 So $t \mapsto \operatorname{Tr}_\Gamma \iota E t$ is a bijection of $H^{1/2}(\Gamma)$ onto
-$B^{1/2}_{2,2}(\Gamma)$ modulo null sets of $\Gamma$.
+$B^{1/2}_{2,2}(\Gamma)$ modulo null sets of $\Gamma$, without a comparison of the norms.
 
 \begin{definition}[The space $H^{-1/2}(\Gamma)$]
 \label{def:dual-trace-space}
@@ -18226,10 +18265,11 @@ and
 \label{sec:square-function}
 
 For $f \in L_p(V)$ the square function $x \mapsto \|((\psi_j * f)(x))_j\|_{\ell_2}$ collects the
-Littlewood--Paley blocks at every point, and its $L_p$ norm is $\|f\|_{\TL{0}{p}{2}}$. The square
-function theorem says that this norm is equivalent to $\|f\|_p$ for $1 < p < \infty$, so
-$\TL{0}{p}{2} = L_p(V)$. The upper bound is the strong type of the analysis operator of the
-Calder\'on--Zygmund family $(\psi_j)_j$; the lower bound combines the reproducing formula
+Littlewood--Paley blocks at every point, and its $L_p$ norm is $\|f\|_{\TL{0}{p}{2}}$ by the
+definition of the Triebel--Lizorkin norm. The square function theorem is the two-sided bound of
+this norm by $\|f\|_p$ for $1 < p < \infty$, so $\TL{0}{p}{2} = L_p(V)$. The upper bound is the
+strong type of the analysis operator of the Calder\'on--Zygmund family $(\psi_j)_j$; the lower
+bound combines the reproducing formula
 $\sum_{j < J} \tilde\psi_j * (\psi_j * f) \to f$ with the strong type of the synthesis
 operators of the family $(\tilde\psi_j)_j$ (\Cref{thm:vector-valued-strong-type}). Stein's
 book~\cite{SteinSingular} proves the Littlewood--Paley theorem through vector-valued singular
@@ -18251,18 +18291,16 @@ For $1 < p < \infty$,
 Both are finite.
 \end{definition}
 
+The constants are formulas in the Schwartz seminorms $A^\psi$ and $\tilde A$ of the fixed blocks
+and synthesis kernels.
+
 \begin{theorem}[The upper square function bound]
 \label{thm:square-function-upper}
-\lean{Rd.triebelLizorkinNorm_zero_two_eq, Rd.triebelLizorkinNorm_zero_two_le,
-  Rd.memTriebelLizorkin_zero_two}
+\lean{Rd.triebelLizorkinNorm_zero_two_le, Rd.memTriebelLizorkin_zero_two}
 \leanok
 \uses{def:triebel-lizorkin, prop:tl-elementary, thm:cz-family-psi,
   thm:vector-valued-strong-type, def:square-function-consts}
-For every $1 \leq p < \infty$ and every $f \in L_p(V)$,
-\[
-  \|f\|_{\TL{0}{p}{2}} = \bigl\| \|((\psi_j * f)(x))_j\|_{\ell_2} \bigr\|_p .
-\]
-If moreover $n \geq 1$ and $1 < p < \infty$, then
+For every $n \geq 1$, every $1 < p < \infty$ and every $f \in L_p(V)$,
 \[
   \|f\|_{\TL{0}{p}{2}} \leq Q_{V,p} \, \|f\|_p ,
 \]
@@ -18271,10 +18309,10 @@ and in particular $f \in \TL{0}{p}{2}$.
 
 \begin{proof}
 \leanok
-The equality is the case $q = 2$ of \Cref{prop:tl-elementary}. The blocks form a
-Calder\'on--Zygmund family with overlap $2$ and H\"ormander constant $4 H_{A^{\psi}}$
-(\Cref{thm:cz-family-psi}), and \Cref{thm:vector-valued-strong-type} bounds its analysis
-operator.
+By \Cref{prop:tl-elementary} the norm $\|f\|_{\TL{0}{p}{2}}$ is the $L_p$ norm of the square
+function. The blocks form a Calder\'on--Zygmund family with overlap $2$ and H\"ormander
+constant $4 H_{A^{\psi}}$ (\Cref{thm:cz-family-psi}), and \Cref{thm:vector-valued-strong-type}
+bounds its analysis operator.
 \end{proof}
 
 \begin{lemma}[The reproducing formula]
@@ -18682,7 +18720,8 @@ $\sum_j |\widehat{\tilde\theta^w_j}(\xi)|^2 \leq ((8\pi)^k \prod_l \|w_l\|)^2
 \label{sec:sobolev-triebel-lizorkin}
 
 Let $n \geq 1$ and $1 < p < \infty$. This section proves $\Sob{m}{p}(V) = \TL{m}{p}{2}$ for every
-$m \in \N$, with explicit constants in both directions. For $f \in \Sob{m}{p}(V)$, the blocks
+$m \in \N$, with named constants in both directions, formulas in the Schwartz seminorms of fixed
+kernels that are proved finite. For $f \in \Sob{m}{p}(V)$, the blocks
 $2^{jm} \psi_{j+1} * f$ are sums of convolutions of the weak derivatives of order $m$ with the
 dilated derivative kernels (\Cref{cor:psi-derivatives-dilated}), and the analysis bound of their
 Calder\'on--Zygmund families gives $f \in \TL{m}{p}{2}$. Conversely, for $f \in \TL{k}{p}{2}$ and
@@ -19000,8 +19039,9 @@ With the bound of $\|f\|_{\TL{m}{p}{2}}$ by the weak derivatives
 (\Cref{thm:sobolev-to-triebel-lizorkin}) and $\Sob{m}{p}(V) \subseteq \Besov{m}{p}{\max(p,2)}$
 (\Cref{cor:sobolev-besov-sandwich}) this gives the Sobolev embeddings
 $\Sob{m}{p}(V) \hookrightarrow L_r(V)$ for $m > n(1/p - 1/r)$ and
-$\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, with explicit constants. These embeddings
-are classical; see Nikol'ski\u{\i}~\cite{Nikolskii} and Triebel~\cite{Triebel}.
+$\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, with named constants, formulas in norms
+and Schwartz seminorms of fixed kernels that are proved finite. These embeddings are classical;
+see Nikol'ski\u{\i}~\cite{Nikolskii} and Triebel~\cite{Triebel}.
 
 \paragraph{Continuity of the blocks.}
 
@@ -20671,6 +20711,9 @@ $n = 0$ the open set $\Omega$ is empty, where $F = 0$ serves, or all of $V$, whe
 serves.
 \end{proof}
 
+The theorem is of first order and gives, for each $f$, an extension with this bound; a bounded
+linear extension operator and the exponents $p \in \{1, \infty\}$ are not formalised.
+
 \begin{corollary}[$H^1(\Omega) = \Sob{1}{2}(\Omega)$]
 \label{cor:sobolev-extension-two}
 \lean{Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev,
@@ -21975,7 +22018,10 @@ This chapter works on a compact manifold $M$ modelled on a finite-dimensional re
 space $E$ with corners $I$, in the sense of Mathlib: charts $e$ map open sets of $M$ to open sets
 of a model space $H$, and the extended charts $\kappa = e.\mathrm{extend}\, I$ take values in the
 closed set $\Omega = \operatorname{range} I \subseteq E$, the half-space for manifolds with
-boundary and $E$ itself for manifolds without boundary.
+boundary and $E$ itself for manifolds without boundary. The results assume that $\Omega$ is a
+Besov domain (\Cref{def:besov-domain}), which holds for these two models
+(\Cref{thm:half-space-besov-domain}), so manifolds with corners are not covered; the boundary
+trace is built for the half-space model.
 
 \section{Smooth measures}
 
@@ -23101,7 +23147,7 @@ The dimension of the underlying space is $n$.
     dyadic blocks $P_{2^{k+1}} f - P_{2^k} f$, among them martingale differences.
   \item \emph{Interpolation} (\Cref{def:k-functional,def:interpolation}).
     The real interpolation space $(X, Y)_{s/r, q}$ between $X$ and a space $Y$ of smoothness $r$,
-    defined through the K-functional.
+    defined through the K-functional on the grid $t = 2^{-kr}$ (the discrete $K$-method).
 \end{enumerate}
 
 On a domain $\Omega$ two further quasi-norms enter: the \emph{restriction} quasi-norm, the

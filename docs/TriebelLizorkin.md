@@ -35,7 +35,8 @@ mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)` on every measure space.
   Littlewood–Paley kernels of [Function spaces on `ℝ^d`](Rd.md). For `f ∈ L_p(V)` the
   Triebel–Lizorkin quasi-norm is `‖f‖_{F^s_{p,q}} = ‖ x ↦ ‖(2^(js) |ψ_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p`
   (`Rd.triebelLizorkinNorm`), and `F^s_{p,q}` consists of the `f` with `‖f‖_{F^s_{p,q}} < ∞`
-  (`Rd.MemTriebelLizorkin`, a subspace of `L_p`: `Rd.triebelLizorkinSpace`). Then
+  (`Rd.MemTriebelLizorkin`, a subspace of `L_p`: `Rd.triebelLizorkinSpace`; for `s < 0` this is
+  `F^s_{p,q} ∩ L_p`). Then
   `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_{max(p,q)}} ≤ ‖f‖_{F^s_{p,q}}` and
   `‖f‖_{F^s_{p,q}} ≤ ‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_{min(p,q)}}`
   (`Rd.littlewoodPaleyNorm_max_le_triebelLizorkinNorm`,

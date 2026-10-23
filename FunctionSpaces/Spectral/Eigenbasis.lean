@@ -52,7 +52,8 @@ continuous functions `ẽ_i` whose `L_2` classes are the `e_i`. The eigenfunctio
 Laplace–Beltrami operator of a compact Riemannian manifold, with the level `⌊√λ⌋` of the
 eigenvalue `λ`, are the model; their existence rests on Rellich's compactness and elliptic
 regularity. The structure consists of the basis, its levels and its continuous
-representatives. -/
+representatives; it enters the theorems as a hypothesis, and the Fourier basis of the torus is
+an instance (`Torus.fourierEigenbasis`). -/
 structure ContinuousSpectralBasis (ι : Type*) (μ : Measure M) [IsFiniteMeasure μ]
     extends SpectralScheme ι (Lp ℂ 2 μ) where
   /-- The continuous representatives of the basis elements. -/

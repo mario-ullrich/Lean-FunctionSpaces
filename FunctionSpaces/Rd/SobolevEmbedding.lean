@@ -39,8 +39,9 @@ Let `V` have dimension `n`, `1 ≤ p < ∞` and `α(n, p, r) = n (1/p - 1/r)` fo
   `Rd.exists_boundedContinuous_ae_eq_of_memSobolev`): for `n ≥ 1` and `1 < p < ∞`, the bound
   `‖f‖_{F^m_{p,2}} ≤ ‖Φ‖_1 ‖f‖_p + 2^m ∑_α K_α ‖∂^α f‖_p` bounds the Littlewood–Paley quasi-norm
   of `B^m_{p,max(p,2)}`, which gives `W^m_p ↪ L_r` for `m > n(1/p - 1/r)` and `W^m_p ↪ C_b` for
-  `m > n/p`, with explicit constants. The critical case `1/r = 1/p - m/n` with `r < ∞`
-  (Sobolev's inequality) is not covered.
+  `m > n/p`, with named constants, formulas in norms and Schwartz seminorms of fixed kernels
+  that are proved finite. The critical case `1/r = 1/p - m/n` with `r < ∞` (Sobolev's
+  inequality) is not covered.
 -/
 
 @[expose] public section
@@ -406,7 +407,7 @@ theorem exists_boundedContinuous_ae_eq_of_memApprox (hp : p ≠ ∞) {s : ℝ}
 
 /-! ### Sobolev embeddings -/
 
-/-- **The Sobolev embedding into `L_r` with explicit constants**: let `n ≥ 1`, `1 < p ≤ r ≤ ∞`,
+/-- **The Sobolev embedding into `L_r` with named constants**: let `n ≥ 1`, `1 < p ≤ r ≤ ∞`,
 `p < ∞` and `m > n(1/p - 1/r)`, and let `f ∈ L_p(V)` have weak derivatives `g_α ∈ L_p(V)` of
 order `m` along the basis `e` of `Rd.gridBasis` for every multi-index `α`. Then there is
 `u ∈ L_r(V)` with `u = f` almost everywhere and
@@ -433,7 +434,7 @@ theorem exists_memLp_ae_eq_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) (hp 
   exact (littlewoodPaleyNorm_max_le_triebelLizorkinNorm hp one_le_two f).trans
     (triebelLizorkinNorm_le_of_hasWeakLineDeriv hp1 hp hg)
 
-/-- **The Sobolev embedding into bounded continuous functions with explicit constants**: let
+/-- **The Sobolev embedding into bounded continuous functions with named constants**: let
 `n ≥ 1`, `1 < p < ∞` and `m > n/p`, and let `f ∈ L_p(V)` have weak derivatives `g_α ∈ L_p(V)` of
 order `m` along the basis `e` of `Rd.gridBasis` for every multi-index `α`. Then there is a
 bounded continuous function `a` with `a = f` almost everywhere and

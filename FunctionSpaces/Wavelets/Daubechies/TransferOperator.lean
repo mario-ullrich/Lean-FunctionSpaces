@@ -287,7 +287,10 @@ theorem integral_prod_daubFun (N n : ℕ) :
 /-- **A growth bound for the transfer operator** of order `N`, with rate `λ` (the argument `lam`)
 and constant `C`: `λ > 0`, and `(T^n 1)(ξ) ≤ C λ^n` for every `n ∈ ℕ` and every `ξ ∈ ℝ`. Such a
 bound controls the decay of the symbol product `Φ` of a Daubechies mask of order `N`:
-`∫ (1 + |ξ|)^(2s) |Φ(ξ)|² dξ < ∞` for `s < N - log₄ λ`. -/
+`∫ (1 + |ξ|)^(2s) |Φ(ξ)|² dξ < ∞` for `s < N - log₄ λ`. It is a hypothesis; it is proved with
+`λ = 4` for `N = 2`, `λ = 9` for `N = 3` (`Daubechies.transferGrowth_two`,
+`Daubechies.transferGrowth_three`) and with a crude rate for every `N`
+(`Daubechies.transferGrowth_crude`). -/
 def TransferGrowth (N : ℕ) (lam C : ℝ) : Prop :=
   0 < lam ∧ ∀ (n : ℕ) (ξ : ℝ), (transfer N)^[n] (fun _ => 1) ξ ≤ C * lam ^ n
 

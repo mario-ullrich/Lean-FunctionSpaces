@@ -14,8 +14,9 @@ in `L_2` of the domain and boundary traces in `B^{1/2}_{2,2}` of the boundary. O
 set the restriction from `H^1(ℝ^d)` to `L_2` is compact (Rellich's theorem). On every open set
 the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)`, for real `s`, are built inside Mathlib's
 `H^s(ℝ^d)`, with the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`. On a bounded Lipschitz domain the trace
-space `H^{1/2}(Γ)` is the orthogonal complement of the trace kernel in `H^1(Ω)`, a Hilbert space
-with trace and extension operators of norm at most `1`, and `H^{-1/2}(Γ)` is its dual. On a
+space `H^{1/2}(Γ)` is defined as the orthogonal complement of the trace kernel in `H^1(Ω)`, a
+Hilbert space whose trace and extension operators have norm at most `1` by this definition, and
+`H^{-1/2}(Γ)` is its dual; the link to `B^{1/2}_{2,2}(Γ)` is qualitative. On a
 Lipschitz graph domain the area formula expresses Mathlib's Euclidean Hausdorff measure of the
 boundary in the chart, with the Gram density `√(1 + ‖∇φ‖²)`. On a bounded Lipschitz domain the
 surface measure is this Hausdorff measure on the boundary `Γ`; it gives the space `L_2(Γ)`, into
@@ -31,15 +32,17 @@ type `(1,1)`. Marcinkiewicz interpolation between weak type `(1,1)` and strong t
 the terms of the Carleson project, gives strong type `(p,p)` for `1 < p < 2`, and duality with
 the adjoint family extends it to `2 < p < ∞`, for the analysis and the synthesis operators.
 Applied to the Littlewood–Paley blocks and their synthesis kernels, this gives the square
-function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`. For `W^m_p`, the block `ψ_1` is a sum of
-derivatives of order `m` of Schwartz kernels, whose dilates form Calderón–Zygmund families, and
-so do the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels. With them,
-`W^m_p = F^m_{p,2}` for `1 < p < ∞`, with explicit constants in both directions, and, for
-`m ≥ 1`, `W^m_p` lies between the Besov spaces `B^m_{p,min(p,2)}` and `B^m_{p,max(p,2)}`.
+function theorem, the two-sided bound of `‖f‖_{F^0_{p,2}}` by `‖f‖_p`, for `1 < p < ∞`. For
+`W^m_p`, the block `ψ_1` is a sum of derivatives of order `m` of Schwartz kernels, whose dilates
+form Calderón–Zygmund families, and so do the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the
+synthesis kernels. With them, `W^m_p = F^m_{p,2}` for `1 < p < ∞`, with named constants in both
+directions, and, for `m ≥ 1`, `W^m_p` lies between the Besov spaces `B^m_{p,min(p,2)}` and
+`B^m_{p,max(p,2)}`.
 The Littlewood–Paley blocks are continuous and satisfy the Nikolskii inequality, which gives the
 embeddings of `B^s_{p,q}` into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions
 for `s > n/p`, and with `W^m_p ⊆ F^m_{p,2}` the Sobolev embeddings `W^m_p ↪ L_r` and
-`W^m_p ↪ C_b`, all with explicit constants.
+`W^m_p ↪ C_b`, all with named constants: formulas in norms and Schwartz seminorms of fixed
+kernels, proved finite.
 For the Bessel potential spaces, uniform Schwartz families stay uniform under continuous linear
 maps of the Schwartz space, and the Bessel potential maps the dilates of every Schwartz function
 to multiples of the dilates of its Bessel kernels; when the Fourier transform of the function
@@ -48,10 +51,10 @@ Calderón–Zygmund family. Applied to the Littlewood–Paley blocks and their s
 gives, for `1 < p < ∞` and with existential constants, `H^{s,p} ∩ L_p = F^s_{p,2}` for every
 real `s`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, and Calderón's theorem `W^m_p = H^{m,p}`.
 On a bounded Lipschitz domain, every function of `W^1_p(Ω)`, `1 < p < ∞`, is the restriction of
-a function of `W^1_p(ℝ^d)` with a bounded extension, by Rychkov's local extension with the local
-means of the gradient: the local means kernels of order two are divergences of dilated kernels
-with mean zero, which form Calderón–Zygmund families. For `p = 2` this identifies `H^1(Ω)` with
-`W^1_2(Ω)`.
+a function of `W^1_p(ℝ^d)` with a bound, an extension for each `f` separately, by Rychkov's
+local extension with the local means of the gradient: the local means kernels of order two are
+divergences of dilated kernels with mean zero, which form Calderón–Zygmund families. For `p = 2`
+this identifies `H^1(Ω)` with `W^1_2(Ω)`.
 On a Lipschitz graph domain, the Gauss–Green theorem `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` holds for
 compactly supported `C^1` functions, and Green's formula
 `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)`, by the density of
@@ -129,27 +132,26 @@ built on this project, with the decisions behind their form.
   (`Rd.memSobolev_one_iff_memApprox`), iff
   `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2} < ∞` for every order `r ≥ 2`
   (`Rd.memSobolev_one_iff_modulus`).
-* **`H^1` on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary
-  `Γ`. `f ∈ L_2(V)` lies in `H^1(Ω)` if `f = F` almost everywhere on `Ω` for some
-  `F ∈ W^1_2(V)` (`Rd.BoundedLipschitzDomain.MemSobolevOn`); `H^1(Ω)` contains `0`, is closed
-  under sums and complex multiples, and depends only on the values on `Ω`. For every order
-  `r ≥ 2`, `f ∈ H^1(Ω)` iff
-  `‖f‖_{L_2(Ω)} + ‖(2^k ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞`, with the moduli of smoothness inside
-  `Ω` (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_modulusOn`). Every `f ∈ H^1(Ω)` lies in
-  `W^1_2(Ω)`: its weak derivatives on `Ω` exist and lie in `L_2(Ω)`
-  (`Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`). For every resolution of unity on
-  `Γ`, every `f ∈ H^1(Ω)` has a boundary trace in `B^{1/2}_{2,2}(Γ)`, unique almost everywhere
-  on `Γ` (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memSobolevOn`,
+* **`H^1` on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`.
+  `f ∈ L_2(V)` lies in `H^1(Ω)` if `f = F` almost everywhere on `Ω` for some `F ∈ W^1_2(V)`
+  (`Rd.BoundedLipschitzDomain.MemSobolevOn`, a definition by extension); `H^1(Ω)` contains `0`, is
+  closed under sums and complex multiples, and depends only on the values on `Ω`. For every order
+  `r ≥ 2`, `f ∈ H^1(Ω)` iff `‖f‖_{L_2(Ω)} + ‖(2^k ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞`, with the
+  moduli of smoothness inside `Ω` (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_modulusOn`). Every
+  `f ∈ H^1(Ω)` lies in `W^1_2(Ω)`: its weak derivatives on `Ω` exist and lie in `L_2(Ω)`
+  (`Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`); this direction holds by the definition,
+  and the converse is the extension theorem below. For every resolution of unity on `Γ`, every
+  `f ∈ H^1(Ω)` has a boundary trace in `B^{1/2}_{2,2}(Γ)`, unique almost everywhere on `Γ`
+  (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memSobolevOn`,
   `Rd.BoundedLipschitzDomain.MemSobolevOn.isBoundaryTrace_unique`), and a function `g` lies in
   `B^{1/2}_{2,2}(Γ)` iff it is the boundary trace of some `f ∈ H^1(Ω)`
   (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`). The extensions in the
   definition of the boundary trace are the `F ∈ W^1_2(V)` with `F = f` on `Ω`
-  (`Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev`), and `f` has the
-  boundary trace `g` with a finite intrinsic norm iff `f ∈ H^1(Ω)` and `g` is its boundary trace
-  (`Rd.BoundedLipschitzDomain.hasBoundaryTrace_iff_memSobolevOn`). The extension and trace
-  theorems for bounded Lipschitz domains are qualitative, and so are these statements; the
-  restriction direction has constant `1`
-  (`Rd.BoundedLipschitzDomain.modNormOn_le_modNorm_of_ae_eq`).
+  (`Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev`), and `f` has the boundary
+  trace `g` with a finite intrinsic norm iff `f ∈ H^1(Ω)` and `g` is its boundary trace
+  (`Rd.BoundedLipschitzDomain.hasBoundaryTrace_iff_memSobolevOn`). The extension and trace theorems
+  for bounded Lipschitz domains are qualitative, and so are these statements; the restriction
+  direction has constant `1` (`Rd.BoundedLipschitzDomain.modNormOn_le_modNorm_of_ae_eq`).
 * **Rellich's theorem.** For every bounded set `Ω ⊆ V`, of any shape, the restriction
   `F ↦ F|_Ω` from Mathlib's `H^1(V) = H^{1,2}(V, ℂ)` to `L_2(Ω)` is a compact operator
   (`Rd.isCompactOperator_restr_toL2`). Every bounded sequence in `H^1(V)` has a subsequence
@@ -170,8 +172,9 @@ built on this project, with the decisions behind their form.
   a closed subspace (`Rd.vanishOn`); for `s = 1` they are the elements vanishing almost
   everywhere on `Ω` (`Rd.mem_vanishOn_one_iff`). Its orthogonal complement is the Hilbert space
   `H^s(Ω)` (`Rd.RestrictionSpace`), and the restriction `U ↦ U|_Ω` is the orthogonal projection
-  onto it (`Rd.restrictProj`). `H^s(Ω)` is isometric to the quotient of `H^s(V)` by the
-  elements vanishing on `Ω` (`Rd.quotientEquivRestrictionSpace`), so `‖U|_Ω‖` is the minimum
+  onto it (`Rd.restrictProj`). By this definition as an orthogonal complement, `H^s(Ω)` is
+  isometric to the quotient of `H^s(V)` by the elements vanishing on `Ω`
+  (`Rd.quotientEquivRestrictionSpace`), so `‖U|_Ω‖` is the minimum
   of `‖U + W‖` over the `W` vanishing on `Ω` (`Rd.norm_restrictProj_le_of_mem`,
   `Rd.exists_norm_restrictProj_eq`).
   The map `H^1(Ω) → L_2(Ω)` is injective with norm at most `1` (`Rd.restrictL2_injective`,
@@ -206,28 +209,28 @@ built on this project, with the decisions behind their form.
   (`Rd.conj_fourier_apply`).
 * **The trace space of a bounded Lipschitz domain.** For every `U ∈ H^1(V)` with `L_2` function
   `ι U` (`Rd.toL2`), `‖ι U‖_2 + ‖(2^k ω_2(ι U, 2^(-k))_2)_k‖_{ℓ_2} ≤ C ‖U‖` with an explicit
-  constant (`Rd.modNorm_two_le_norm`, `Rd.sobolevOneBesovConst`), and the `B^{1/2}_{2,1}`
-  quantity is at most `√2` times this `B^1_{2,2}` quantity (`Rd.modNorm_half_one_le`), so
-  `‖ι U‖_2 + ∑_k 2^(k/2) ω_2(ι U, 2^(-k))_2 ≤ √2 C ‖U‖` (`Rd.modNorm_half_one_le_norm`). Let
-  `Ω` be a bounded Lipschitz domain with boundary `Γ` and `H^1(Ω)` the Hilbert space of the
-  restriction space (`Rd.BoundedLipschitzDomain.SobolevOne`). The chart traces
-  `u ↦ Tr_j(ψ_j u)` are bounded operators from `H^1(Ω)` to `L_2` of the hyperplanes of the charts
+  constant (`Rd.modNorm_two_le_norm`, `Rd.sobolevOneBesovConst`), and the `B^{1/2}_{2,1}` quantity
+  is at most `√2` times this `B^1_{2,2}` quantity (`Rd.modNorm_half_one_le`), so
+  `‖ι U‖_2 + ∑_k 2^(k/2) ω_2(ι U, 2^(-k))_2 ≤ √2 C ‖U‖` (`Rd.modNorm_half_one_le_norm`). Let `Ω` be
+  a bounded Lipschitz domain with boundary `Γ` and `H^1(Ω)` the Hilbert space of the restriction
+  space (`Rd.BoundedLipschitzDomain.SobolevOne`). The chart traces `u ↦ Tr_j(ψ_j u)` are bounded
+  operators from `H^1(Ω)` to `L_2` of the hyperplanes of the charts
   (`Rd.BoundedLipschitzDomain.chartTrace`), and their common kernel, the trace kernel
-  (`Rd.BoundedLipschitzDomain.traceKer`), consists of the `u` whose boundary trace vanishes
-  almost everywhere on `Γ`, for every resolution of unity
-  (`Rd.BoundedLipschitzDomain.mem_traceKer_iff`). Its orthogonal complement is the trace space
-  `H^{1/2}(Γ)` (`Rd.BoundedLipschitzDomain.TraceSpace`), with the trace, the orthogonal
-  projection, and the extension, the inclusion: `γ E = id`, `‖γ u‖ ≤ ‖u‖`, `‖E t‖ = ‖t‖`, the
-  kernel of `γ` is the trace kernel, and `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)` isometrically
+  (`Rd.BoundedLipschitzDomain.traceKer`), consists of the `u` whose boundary trace vanishes almost
+  everywhere on `Γ`, for every resolution of unity (`Rd.BoundedLipschitzDomain.mem_traceKer_iff`).
+  The trace space `H^{1/2}(Γ)` is defined as its orthogonal complement
+  (`Rd.BoundedLipschitzDomain.TraceSpace`), with the trace, the orthogonal projection, and the
+  extension, the inclusion. By this definition `γ E = id`, `‖γ u‖ ≤ ‖u‖`, `‖E t‖ = ‖t‖`, the kernel
+  of `γ` is the trace kernel, and `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)` isometrically
   (`Rd.BoundedLipschitzDomain.trace_extend`, `Rd.BoundedLipschitzDomain.ker_trace`,
-  `Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`). Two elements of `H^1(Ω)` have the same
-  trace iff their boundary traces agree almost everywhere on `Γ`
+  `Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`). Two elements of `H^1(Ω)` have the same trace
+  iff their boundary traces agree almost everywhere on `Γ`
   (`Rd.BoundedLipschitzDomain.trace_eq_iff`), and `t ↦ Tr_Γ(E t)` maps `H^{1/2}(Γ)` onto
-  `B^{1/2}_{2,2}(Γ)` modulo null sets of `Γ`
-  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_extend`,
+  `B^{1/2}_{2,2}(Γ)` modulo null sets of `Γ` (`Rd.BoundedLipschitzDomain.memBoundaryBesov_extend`,
   `Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`,
-  `Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`). `H^{-1/2}(Γ)` is the dual
-  of the trace space (`Rd.BoundedLipschitzDomain.DualTraceSpace`), conjugate-linearly isometric
+  `Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`); this link is qualitative, a
+  norm equivalence of `H^{1/2}(Γ)` with `B^{1/2}_{2,2}(Γ)` is not formalised. `H^{-1/2}(Γ)` is the
+  dual of the trace space (`Rd.BoundedLipschitzDomain.DualTraceSpace`), conjugate-linearly isometric
   to it by Riesz (`Rd.BoundedLipschitzDomain.dualTraceEquiv`), and the adjoint of the trace is the
   extension (`Rd.BoundedLipschitzDomain.adjoint_trace`).
 * **The area formula for Lipschitz graphs.** Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph
@@ -353,15 +356,18 @@ built on this project, with the decisions behind their form.
   For `p > 2` the norms are bounded through their pairings with `L_{p/(p-1)}`
   (`MeasureTheory.eLpNorm_lqNorm_le_of_forall_enorm_sum_integral_le`), tested on the norming
   family `u_j ‖(u_i)_i‖_{ℓ_2}^{p-2}` (`MeasureTheory.normingFamily`).
-* **The square function theorem.** Let `n = dim V ≥ 1` and `1 < p < ∞`. For every `f ∈ L_p(V)`
-  the square function `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}` of the Littlewood–Paley blocks has `L_p`
-  norm `‖f‖_{F^0_{p,2}}` (`Rd.triebelLizorkinNorm_zero_two_eq`), and
+* **The square function theorem.** Let `n = dim V ≥ 1` and `1 < p < ∞`. By definition,
+  `‖f‖_{F^0_{p,2}}` is the `L_p` norm of the square function `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}` of
+  the Littlewood–Paley blocks (`Rd.triebelLizorkinNorm_zero_two_eq`). The theorem is the
+  two-sided bound: for every `f ∈ L_p(V)`,
   `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p` (`Rd.triebelLizorkinNorm_zero_two_le`) and
   `‖f‖_p ≤ Q̃_{V,p} ‖f‖_{F^0_{p,2}}` (`Rd.enorm_le_triebelLizorkinNorm_zero_two`) with the
-  explicit constants `Q_{V,p} = S_{V,p}(2, 4 H_{A^ψ})` and `Q̃_{V,p} = S_{V,p}(4, 4 H_Ã)` of the
+  named constants `Q_{V,p} = S_{V,p}(2, 4 H_{A^ψ})` and `Q̃_{V,p} = S_{V,p}(4, 4 H_Ã)` of the
   Calderón–Zygmund families of the blocks and of the synthesis kernels
   (`Rd.squareFunctionConst`, `Rd.squareSynthesisConst`), where `A^ψ` and `Ã` are the seminorm
-  bounds of the blocks and of the synthesis kernels (`Rd.psiBaseBound`, `Rd.psiDualBaseBound`).
+  bounds of the blocks and of the synthesis kernels (`Rd.psiBaseBound`, `Rd.psiDualBaseBound`),
+  formulas in Schwartz seminorms of fixed kernels, proved finite
+  (`Rd.squareFunctionConst_ne_top`, `Rd.squareSynthesisConst_ne_top`).
   Hence `F^0_{p,2} = L_p(V)` (`Rd.triebelLizorkinSpace_zero_two_eq_top`). The lower bound uses
   the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p(V)`
   (`Rd.tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub`).
@@ -383,7 +389,7 @@ built on this project, with the decisions behind their form.
   `∂^w (G_c) = c^k (∂^w G)_c` for the dilation `G_c(x) = c^n G(cx)`
   (`Rd.iteratedLineDerivOp_schwartzDilate`).
 * **`W^m_p = F^m_{p,2}`.** Let `dim V ≥ 1`, `1 < p < ∞` and `m ∈ ℕ`. For `f ∈ L_p(V)`,
-  `f ∈ W^m_p(V)` iff `f ∈ F^m_{p,2}(V)` (`Rd.memSobolev_iff_memTriebelLizorkin`), with explicit
+  `f ∈ W^m_p(V)` iff `f ∈ F^m_{p,2}(V)` (`Rd.memSobolev_iff_memTriebelLizorkin`), with named
   constants in both directions. If the weak derivatives
   `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f` along the orthonormal basis `e` of `Rd.gridBasis` lie in
   `L_p(V)` for all multi-indices `α`, then
@@ -393,7 +399,9 @@ built on this project, with the decisions behind their form.
   function `g ∈ L_p(V)` with `‖g‖_p ≤ C_{V,p,w} ‖f‖_{F^k_{p,2}}`
   (`Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin`, `Rd.tlToSobolevConst`). The constants are
   strong type constants of the Calderón–Zygmund families of the dilated derivative kernels and of
-  the rescaled derivatives of the synthesis kernels. This gives the Besov sandwich:
+  the rescaled derivatives of the synthesis kernels, formulas in Schwartz seminorms of these fixed
+  kernels, proved finite (`Rd.sobolevToTLConst_ne_top`, `Rd.tlToSobolevConst_ne_top`). This gives
+  the Besov sandwich:
   `B^m_{p,min(p,2)} ⊆ W^m_p(V)` and, for `m ≥ 1`, `W^m_p(V) ⊆ B^m_{p,max(p,2)}`
   (`Rd.memSobolev_of_memApprox`, `Rd.memApprox_of_memSobolev`, with norm bounds
   `Rd.exists_hasWeakLineDeriv_of_memApprox`, `Rd.approxNormDyadic_le_of_hasWeakLineDeriv`), and
@@ -418,7 +426,9 @@ built on this project, with the decisions behind their form.
   `sup |a| ≤ K_{V,p,∞,m} M_f` (`Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv`). In
   particular every `f ∈ W^m_p(V)` has these representatives
   (`Rd.exists_memLp_ae_eq_of_memSobolev`, `Rd.exists_boundedContinuous_ae_eq_of_memSobolev`).
-  The critical case `1/r = 1/p - m/n` with `r < ∞` (Sobolev's inequality) is not covered.
+  The constants are named formulas in norms and Schwartz seminorms of fixed kernels, proved
+  finite (`Rd.besovEmbeddingConst_ne_top`, `Rd.sobolevToTLConst_ne_top`). The critical case
+  `1/r = 1/p - m/n` with `r < ∞` (Sobolev's inequality) is not covered.
 * **Bessel kernels.** A family `(G_j)` of Schwartz functions is uniformly Schwartz for some
   bounds iff `{G_j}` is a bounded set of the Schwartz space
   (`Rd.exists_isUniformSchwartz_iff_isVonNBounded`). If `(G_j)` is a uniform Schwartz family and
@@ -501,7 +511,9 @@ built on this project, with the decisions behind their form.
   Triebel–Lizorkin type of `f` on the patch (`Rd.LocalMeansBump.tlLocalNormOn_le_patchConst`), the
   local extension lies in `F^1_{p,2} = W^1_p` (`Rd.LocalMeansBump.extendsSobolev`), and a smooth
   resolution of unity pastes the local extensions in `W^1_p(V)` (`Rd.extendsSobolev_of_cover`).
-  The constants are existential.
+  The constants are existential. The theorem is of first order and gives, for each `f`, an
+  extension with this bound; a bounded linear extension operator and the exponents `p ∈ {1, ∞}`
+  are not formalised.
 * **Gauss–Green on Lipschitz graph domains.** Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph
   domain with the graph map `γ(x') = x' + φ(x') e` over the hyperplane `H = e^⊥`, the gradient
   `∇φ` of `φ|_H`, the outward unit normal `ν` and `n = dim V`, and let
@@ -582,11 +594,11 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Test functions as Schwartz functions and compactly supported complex Schwartz functions as complex test functions, commuting directional derivatives, the transpose formula for distributions and tempered distributions; cut-offs of Schwartz functions converge in the Schwartz space (smooth compactly supported functions are dense), tempered distributions determined by test functions | ✅ | ✗ | `Rd/SchwartzCutoff` |
 | Weak derivatives and Sobolev spaces on open sets, integration by parts, also against complex test functions, uniqueness, locality, finite sums, the product rule with smooth functions, limits; the bridge to tempered distributions | ✅ | ✗ | `Rd/WeakDerivatives` |
 | The convolution theorem and Plancherel for a convolution on `L_2`, the Bessel potential on Schwartz functions, even Fourier multipliers acting by the transpose, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/SobolevTwoLittlewoodPaley` |
-| `H^1` on bounded Lipschitz domains as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the weak gradient, and the trace space `B^{1/2}_{2,2}` of the boundary | ✅ | ✗ | `Rd/LipschitzDomainH1` |
+| `H^1` on bounded Lipschitz domains defined as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the weak gradient, and the boundary traces, which form `B^{1/2}_{2,2}(Γ)` | ✅ | ✗ | `Rd/LipschitzDomainH1` |
 | The inverse Fourier transform of integrable `L_2` functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, the injectivity of `H^1(ℝ^d) → L_2(ℝ^d)`, and Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω` | ✅ | ✗ | `Rd/RellichCompactness` |
 | The Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets inside Mathlib's `H^s(ℝ^d)`, `H^s(Ω)` as a quotient, Rellich's theorem for `H^1(Ω)`, the identification with the restriction space of a bounded Lipschitz domain, the restriction of an element agreeing with `u ∈ H^1(Ω)` on `Ω`, the bound of the `H^1` norm by the `W^1_2` norm, the weak derivatives as bounded operators on `H^1(ℝ^d)`, the density of compactly supported Schwartz functions in `H^s(ℝ^d)`, Schwartz functions with compact support in `Ω` in the span of the test functions, `H̃^s(ℝ^d) = H^s(ℝ^d)`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)` | ✅ | ✗ | `Rd/SobolevRestrictionSpaces` |
 | The Bessel potential of real Schwartz functions as a real function, the isometry `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}` and `H^s`, and the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)`, `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on open sets | ✅ | ✗ | `Rd/SobolevDuality` |
-| `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` with explicit constants, the trace of `H^1(ℝ^d)` on a Lipschitz graph and the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the trace kernel, the trace space `H^{1/2}(Γ)` with trace and extension operators, `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` | ✅ | ✗ | `Rd/BoundaryTraceSpace` |
+| `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` with explicit constants, the trace of `H^1(ℝ^d)` on a Lipschitz graph and the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the trace kernel, the trace space `H^{1/2}(Γ)` defined as its orthogonal complement, with trace and extension operators, `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` | ✅ | ✗ | `Rd/BoundaryTraceSpace` |
 | The area formula for Lipschitz graphs: Lipschitz maps and Mathlib's Euclidean Hausdorff measure, the linear case by Mathlib's norm determinant, stretches and tilts, the gradient and the Gram density, good pieces, `μHE[n-1](γ(A)) = ∫_A √(1 + ‖∇φ‖²)` with `n = dim V` in set, measure and integral form; the outward unit normal | ✅ | ✗ | `Rd/LipschitzGraphArea` |
 | The surface measure of a bounded Lipschitz domain as `μHE[n-1]` on the boundary, its chart form, finiteness and null sets, the boundary `Γ` as a Lebesgue null set, the boundary trace in `L_p(Γ)`, `L_2(Γ)` with the traces of `H^1(Ω)` and `H^{1/2}(Γ)`, and the outward unit normal field | ✅ | ✗ | `Rd/SurfaceMeasure` |
 | Dilation, reflection and conjugation of Schwartz functions, derivatives of dilations, uniform Schwartz families and finitely many exceptions in them, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families, also with finitely many exceptional members, and their adjoints, the Littlewood–Paley blocks and the synthesis kernels as such families | ✅ | ✗ | `Rd/DilationFamilies` |
@@ -599,10 +611,10 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The parts of a function above and below a level, two Tonelli steps on s-finite measure spaces, integrals of powers from bounds at every level, and Marcinkiewicz interpolation between weak type `(1,1)` and strong type `(2,2)` with an explicit constant, for operators on an abstract input type and in the terms of the Carleson project | ✅ | ✗ | `Lp/Marcinkiewicz` |
 | `L_p` and `L_p(ℓ_2)` norms by duality for `1 < p < ∞` through the norming family, Hölder's inequality for `[0, ∞]`-valued functions in `L_p` norms, and families in `L_p` vanishing outside a finite set | ✅ | ✗ | `Lp/NormingFamily` |
 | The strong type `(p,p)`, `1 < p < ∞`, of the analysis and synthesis operators of a Calderón–Zygmund family with explicit constants: Plancherel for `p = 2`, Marcinkiewicz interpolation for `p < 2`, duality with the adjoint family for `p > 2` | ✅ | ✗ | `Rd/VectorValuedSingularIntegrals` |
-| The square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞` with explicit constants in both directions, and the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p` | ✅ | ✗ | `Rd/SquareFunction` |
+| The square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, the two-sided bound with named constants, and the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p` | ✅ | ✗ | `Rd/SquareFunction` |
 | Fourier transforms of iterated derivatives, the derivative symbols and kernels, the block `ψ_1` as a sum of derivatives of order `m`, and the Calderón–Zygmund families of the dilated derivative kernels and of the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels | ✅ | ✗ | `Rd/DerivativeKernels` |
-| `W^m_p = F^m_{p,2}` for `1 < p < ∞` with explicit constants in both directions: the blocks as convolutions with the weak derivatives, the derivatives of the reproducing sums and their limit, the Besov sandwich `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}` and `W^m_2 = B^m_{2,2}` for `m ≥ 1` | ✅ | ✗ | `Rd/SobolevTriebelLizorkin` |
-| Continuity of convolutions of integrable bounded kernels with `L_p` functions, the Nikolskii inequality for the Littlewood–Paley blocks, almost everywhere convergence of the block series, the Besov embeddings into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions for `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with explicit constants | ✅ | ✗ | `Rd/SobolevEmbedding` |
+| `W^m_p = F^m_{p,2}` for `1 < p < ∞` with named constants in both directions: the blocks as convolutions with the weak derivatives, the derivatives of the reproducing sums and their limit, the Besov sandwich `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}` and `W^m_2 = B^m_{2,2}` for `m ≥ 1` | ✅ | ✗ | `Rd/SobolevTriebelLizorkin` |
+| Continuity of convolutions of integrable bounded kernels with `L_p` functions, the Nikolskii inequality for the Littlewood–Paley blocks, almost everywhere convergence of the block series, the Besov embeddings into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions for `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with named constants | ✅ | ✗ | `Rd/SobolevEmbedding` |
 | Uniform Schwartz families as bounded sets and under continuous linear maps, the shifted Bessel symbols `(ε + ‖ζ‖²)^{σ/2}` with derivative bounds on annuli uniform in `ε`, the Bessel symbol and kernel families as uniform Schwartz families, the Bessel potential of a dilate, the dilated Bessel kernels as a Calderón–Zygmund family with explicit overlap, and the annuli of the Littlewood–Paley kernels | ✅ | ✗ | `Rd/UniformSchwartzFamilies` |
 | Even Fourier multipliers, among them Mathlib's Bessel potential, commuting with translations and reflections of Schwartz functions and with convolutions, the Bessel kernels of the Littlewood–Paley kernels, convergent synthesis sums, `H^{s,p} ∩ L_p = F^s_{p,2}` for real `s`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0` and `W^m_p = H^{m,p}` for `1 < p < ∞`, with existential constants | ✅ | ✗ | `Rd/BesselPotentialLifting` |
 | Smoothness of parametric integrals, the dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, their supports and mean zero, and the Calderón–Zygmund families of the dilates of mean-zero Schwartz functions | ✅ | ✗ | `Rd/DivergenceKernels` |

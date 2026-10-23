@@ -15,7 +15,9 @@ Let `V` have dimension `n ≥ 1`, `1 < p < ∞` and `m ∈ ℕ`. A function `f �
 Sobolev space `W^m_p(V)` (`Rd.MemSobolev`: all weak derivatives `∂^w f` of order `k ≤ m` exist
 and lie in `L_p(V)`) iff it lies in the Triebel–Lizorkin space `F^m_{p,2}(V)`
 (`Rd.MemTriebelLizorkin`: `‖ x ↦ ‖(2^{jm} (ψ_j ⋆ f)(x))_j‖_{ℓ_2} ‖_p < ∞`), see
-`Rd.memSobolev_iff_memTriebelLizorkin`. Both directions have explicit constants.
+`Rd.memSobolev_iff_memTriebelLizorkin`. Both directions have named constants
+(`Rd.sobolevToTLConst`, `Rd.tlToSobolevConst`), formulas in the Schwartz seminorms of fixed
+kernels that are proved finite.
 
 * **`W^m_p ⊆ F^m_{p,2}`** (`Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv`,
   `Rd.memTriebelLizorkin_of_hasWeakLineDeriv`): with the weak
@@ -165,7 +167,7 @@ theorem eLpNorm_lqNorm_blockFun_succ_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠
         rw [Lp.enorm_def]
         exact (isCZFamily_derivFamily i).eLpNorm_lqNorm_conv_le hp1 hp (Lp.memLp (g i))
 
-/-- **`W^m_p ⊆ F^m_{p,2}` with explicit constants**: in dimension `n ≥ 1`, for `1 < p < ∞` and
+/-- **`W^m_p ⊆ F^m_{p,2}` with named constants**: in dimension `n ≥ 1`, for `1 < p < ∞` and
 `f ∈ L_p(V)` whose weak derivatives `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f` along the orthonormal
 basis `e` of `Rd.gridBasis` lie in `L_p(V)` for every multi-index `α`,
 `‖f‖_{F^m_{p,2}} ≤ ‖Φ‖_1 ‖f‖_p + 2^m ∑_α K_α ‖g_α‖_p` with `K_α = Rd.sobolevToTLConst V p α`.
@@ -377,7 +379,7 @@ theorem hasWeakLineDeriv_sum_conv_psiDual (hp : p ≠ ∞) {k : ℕ} (w : Fin k 
   rw [Finset.sum_fn, Finset.sum_fn] at h
   exact h
 
-/-- **`F^k_{p,2} ⊆ W^k_p` with explicit constants**: in dimension `n ≥ 1`, for `1 < p < ∞`,
+/-- **`F^k_{p,2} ⊆ W^k_p` with named constants**: in dimension `n ≥ 1`, for `1 < p < ∞`,
 directions `w ∈ V^k` and `f ∈ F^k_{p,2}(V)`, the weak derivative `∂^w f` exists on `V` as a
 class `g ∈ L_p(V)` with `‖g‖_p ≤ C_w ‖f‖_{F^k_{p,2}}`, `C_w = Rd.tlToSobolevConst p w`.
 The function `g` is the limit of the partial sums `Rd.derivSynthesisSum w f J`
@@ -404,7 +406,7 @@ theorem exists_hasWeakLineDeriv_of_memTriebelLizorkin [Nontrivial V] (hp1 : 1 < 
     gcongr
     exact eLpNorm_lqNorm_ite_blockFun_le _ _ f
 
-/-- **`F^m_{p,2} ⊆ W^m_p` with explicit constants**: in dimension `n ≥ 1`, for `1 < p < ∞`,
+/-- **`F^m_{p,2} ⊆ W^m_p` with named constants**: in dimension `n ≥ 1`, for `1 < p < ∞`,
 `k ≤ m`, directions `w ∈ V^k` and `f ∈ F^m_{p,2}(V)`, the weak derivative `∂^w f` exists on `V`
 as a class `g ∈ L_p(V)` with `‖g‖_p ≤ C_w ‖f‖_{F^m_{p,2}}`, `C_w = Rd.tlToSobolevConst p w`
 (`Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin` and
@@ -479,7 +481,7 @@ theorem memSobolev_two_iff_memApprox [Nontrivial V] {m : ℕ} (hm : 1 ≤ m)
   rw [memSobolev_iff_memTriebelLizorkin ENNReal.one_lt_two two_ne_top,
     memTriebelLizorkin_iff_memApprox two_ne_top (Nat.cast_pos.2 hm)]
 
-/-- **`W^m_p ⊆ B^m_{p,max(p,2)}` with explicit constants**: under the hypotheses of
+/-- **`W^m_p ⊆ B^m_{p,max(p,2)}` with named constants**: under the hypotheses of
 `Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv` and `m ≥ 1`, the approximation norm of `f` in
 `A^m_{max(p,2)}` of the band-limited scheme is at most
 `2 (1 - 2^{-m})⁻¹ (‖Φ‖_1 ‖f‖_p + 2^m ∑_α K_α ‖g_α‖_p)`
@@ -494,7 +496,7 @@ theorem approxNormDyadic_le_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) (hp
   (approxNormDyadic_le_triebelLizorkinNorm hp (Nat.cast_pos.2 hm) one_le_two f).trans
     (by gcongr; exact triebelLizorkinNorm_le_of_hasWeakLineDeriv hp1 hp hg)
 
-/-- **`B^m_{p,min(p,2)} ⊆ W^m_p` with explicit constants**: in dimension `n ≥ 1`, for `1 < p < ∞`,
+/-- **`B^m_{p,min(p,2)} ⊆ W^m_p` with named constants**: in dimension `n ≥ 1`, for `1 < p < ∞`,
 `m ∈ ℕ`, `k ≤ m`, directions `w ∈ V^k` and `f` in the approximation space `A^m_{min(p,2)}` of
 the band-limited scheme, the weak derivative `∂^w f` is a class `g ∈ L_p(V)` with
 `‖g‖_p ≤ C_w · 8 · 2^{3m} ‖Φ‖_1 ‖f‖_{A^m_{min(p,2)}}`, `C_w = Rd.tlToSobolevConst p w`

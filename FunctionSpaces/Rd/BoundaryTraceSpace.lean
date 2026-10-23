@@ -14,7 +14,9 @@ public import Mathlib.Analysis.InnerProductSpace.Adjoint
 Let `Ω` be a bounded Lipschitz domain with boundary `Γ` in a finite-dimensional real inner
 product space `V`, such as `ℝ^d`, with Lebesgue measure, and `H^1(Ω)` the Hilbert space
 `Rd.RestrictionSpace 1 Ω` (`Rd.BoundedLipschitzDomain.SobolevOne`). The trace space
-`H^{1/2}(Γ)` is a Hilbert space with bounded trace and extension operators.
+`H^{1/2}(Γ)` is defined as the orthogonal complement of the trace kernel in `H^1(Ω)`, a Hilbert
+space; the trace, the extension and the quotient isometry below hold by this definition. Its link
+to `B^{1/2}_{2,2}(Γ)` is qualitative; a norm equivalence is not formalised.
 
 * **`H^1(V)` in Besov spaces, with constants**: for `U ∈ H^1(V)` with `L_2` function `ι U`
   (`Rd.toL2`), `‖ι U‖_2 + ‖(2^k ω_2(ι U, 2^(-k))_2)_k‖_{ℓ_2} ≤ C ‖U‖` with an explicit `C`
@@ -479,9 +481,10 @@ theorem boundaryTrace_toL2_sub (ψ : Ω.BoundaryPartition) (U W : H^{1}(V)) :
 
 /-! ### The trace space `H^{1/2}(Γ)` -/
 
-/-- **The trace space `H^{1/2}(Γ)`** of a bounded Lipschitz domain, as a Hilbert space: the
-orthogonal complement of the trace kernel in `H^1(Ω)`. By the trace theorem of `H^1(Ω)`, the
-boundary traces of its elements are the functions of `B^{1/2}_{2,2}(Γ)`, up to null sets of `Γ`
+/-- **The trace space `H^{1/2}(Γ)`** of a bounded Lipschitz domain, as a Hilbert space, defined
+as the orthogonal complement of the trace kernel in `H^1(Ω)`. By the trace theorem of `H^1(Ω)`,
+the boundary traces of its elements are the functions of `B^{1/2}_{2,2}(Γ)`, up to null sets of
+`Γ`, without a norm equivalence
 (`Rd.BoundedLipschitzDomain.memBoundaryBesov_extend`,
 `Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`,
 `Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`). -/
@@ -529,7 +532,8 @@ theorem sub_extend_trace_mem (u : Ω.SobolevOne) : u - Ω.extend (Ω.trace u) �
   rwa [Submodule.orthogonal_orthogonal] at h
 
 /-- **`H^{1/2}(Γ)` as a quotient**: `H^1(Ω) ⧸ ker γ` is isometrically isomorphic to the trace
-space (Mathlib's `Submodule.quotientEquivOrthogonal`); the class of `u` corresponds to `γ u`
+space, by the definition of the trace space as an orthogonal complement (Mathlib's
+`Submodule.quotientEquivOrthogonal`); the class of `u` corresponds to `γ u`
 (`Rd.BoundedLipschitzDomain.quotientEquivTraceSpace_mk`). -/
 noncomputable def quotientEquivTraceSpace : (Ω.SobolevOne ⧸ Ω.traceKer) ≃ₗᵢ[ℂ] Ω.TraceSpace :=
   Submodule.quotientEquivOrthogonal _

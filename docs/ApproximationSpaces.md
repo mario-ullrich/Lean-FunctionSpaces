@@ -13,8 +13,9 @@ interpolation space, block, projection and atomic decompositions, abstract trace
 theorems, and the comparison with spaces defined by moduli of smoothness (`ModulusData`). A
 smoothness space of order `r` is a Banach space with an injective bounded map into `X` satisfying
 Jackson's and Bernstein's inequalities of order `r` (`ApproximationScheme.JacksonBound`,
-`ApproximationScheme.SmoothnessSpace`); Sobolev spaces are the examples. Nothing in this block
-mentions functions or measures; the other blocks instantiate it.
+`ApproximationScheme.SmoothnessSpace`, a hypothesis structure whose fields are the embedding, the
+order and Jackson's and Bernstein's inequalities); Sobolev spaces are the motivating examples.
+Nothing in this block mentions functions or measures; the other blocks instantiate it.
 
 ## Main results
 
@@ -56,12 +57,14 @@ mentions functions or measures; the other blocks instantiate it.
 * **The representation theorem.** Let `ι : Y → X` satisfy Jackson's inequality
   `E_n(ι y) ≤ C n^(-r) ‖y‖` and Bernstein's inequality (every `a ∈ A_n` is `ι y` with
   `‖y‖ ≤ C n^r ‖a‖`) of order `r`. Then for `0 < s < r` and `1 ≤ q ≤ ∞`, `A^s_q` is the real
-  interpolation space `(X, Y)_{s/r, q}`, with equivalent norms
-  (`ApproximationScheme.memApprox_iff_memInterp`,
-  `.approxNormDyadic_le_interpNorm_of_jackson`,
-  `.interpNorm_le_approxNormDyadic_of_bernstein`). In particular two schemes with Jackson and
-  Bernstein inequalities of the same order for the same `ι` have the same approximation
-  spaces (`ApproximationScheme.approxSpace_eq_of_jackson_bernstein`).
+  interpolation space `(X, Y)_{s/r, q}` of the discrete K-method on the grid `t = 2^(-kr)`, the `f`
+  with `‖f‖ + ‖(2^(ks) K(2^(-kr), f))_k‖_{ℓ_q} < ∞` (`ApproximationScheme.MemInterp`), with
+  equivalent norms (`ApproximationScheme.memApprox_iff_memInterp`,
+  `.approxNormDyadic_le_interpNorm_of_jackson`, `.interpNorm_le_approxNormDyadic_of_bernstein`). The
+  equivalence with the continuous K-method `(∫_0^∞ (t^(-s/r) K(t, f))^q dt/t)^(1/q)` is not
+  formalised. In particular two schemes with Jackson and Bernstein inequalities of the same order
+  for the same `ι` have the same approximation spaces
+  (`ApproximationScheme.approxSpace_eq_of_jackson_bernstein`).
 * **Moduli of smoothness and approximation.** Let `ω(f, 2^(-k))` be subadditive with
   `ω(f, t) ≤ C₀ ‖f‖`, and assume a Jackson inequality `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for
   `k ≥ k₀` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then

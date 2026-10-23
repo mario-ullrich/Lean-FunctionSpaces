@@ -16,8 +16,10 @@ if for every `1 ≤ p ≤ ∞` there is `C` with
 
 `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p`   for all `a ∈ S n`, `n ≥ 1`
 
-(`FunctionScheme.HasNikolskii`).  For trigonometric polynomials of degree `< n` on `𝕋^d` this
-holds with `D = d`.  The property is stated against the sup norm only; the general
+(`FunctionScheme.HasNikolskii`), a hypothesis on the scheme.  For trigonometric polynomials of
+degree `< n` on `𝕋^d` it holds with `D = d` (`Torus.trigScheme_hasNikolskii`,
+`Torus.hasNikolskii_fourierEigenbasis`); these torus instances are the ones proved in this
+library.  The property is stated against the sup norm only; the general
 **Nikolskii inequality**
 
 `‖a‖_r ≤ C' n^(D (1/p - 1/r)) ‖a‖_p`,   `p ≤ r`
@@ -75,7 +77,8 @@ namespace FunctionScheme
 variable {Ω : Type*} [TopologicalSpace Ω] [MeasurableSpace Ω] [BorelSpace Ω]
 
 /-- The **Nikolskii property of dimension `D`**: for every `1 ≤ p ≤ ∞`,
-`‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all approximants `a ∈ S n`, `n ≥ 1`. -/
+`‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all approximants `a ∈ S n`, `n ≥ 1`. A hypothesis on the scheme;
+the torus has it (`Torus.trigScheme_hasNikolskii`). -/
 structure HasNikolskii (S : FunctionScheme Ω) (μ : Measure Ω) (D : ℝ) : Prop where
   exists_const : ∀ p : ℝ≥0∞, 1 ≤ p → ∃ C : ℝ, 0 ≤ C ∧ ∀ n : ℕ, 1 ≤ n → ∀ a ∈ S n,
     ‖a‖ ≤ C * (n : ℝ) ^ (D * p.toReal⁻¹) * (eLpNorm a p μ).toReal

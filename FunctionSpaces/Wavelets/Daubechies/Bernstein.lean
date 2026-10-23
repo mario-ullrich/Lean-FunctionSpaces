@@ -231,9 +231,11 @@ end Lp
 
 /-- **A Bernstein bound of order `θ`** for the scaling function `φ` in `L_p`, with differences
 of order `r`: there is a finite constant `K` with `ω_r(φ, t)_p ≤ K t^θ` for all `0 < t ≤ 1`.
-The regularity theorems for `φ` have this form (`Daubechies.bernsteinBound_of_le_two`,
-`Daubechies.bernsteinBound_interp`), and a Bernstein bound gives the inverse inequality of the
-Daubechies scheme (`Daubechies.inverse_scheme`). -/
+It is a hypothesis on the mask; the regularity theorems for `φ` prove it
+(`Daubechies.bernsteinBound_of_le_two`, `Daubechies.bernsteinBound_interp`), for instance for
+`N = 2` and `N = 3` with `p ≤ 2` and for D4 with `p ≥ 2` (`Daubechies.bernsteinBound_order_two`,
+`Daubechies.bernsteinBound_order_three`, `Daubechies.bernsteinBound_d4`), and a Bernstein bound
+gives the inverse inequality of the Daubechies scheme (`Daubechies.inverse_scheme`). -/
 def BernsteinBound (p : ℝ≥0∞) (θ : ℝ) (r : ℕ) : Prop :=
   ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ t ∈ Set.Ioc (0 : ℝ) 1,
     Rd.modulus volume r p (scalingFun m) t ≤ K * ENNReal.ofReal (t ^ θ)

@@ -3,14 +3,14 @@
 Part of [Function spaces via approximation](../README.md). Blueprint chapters: *The torus*,
 *Classical definitions on the torus*.
 
-On `𝕋^d` with its normalised Haar measure, the scheme consists of the trigonometric
-polynomials of degree `< n`. They satisfy the Nikolskii inequality, so all the embeddings of
-[Besov and Sobolev spaces](BesovSobolev.md) hold on `𝕋^d`. For `p = 2` the Fourier coefficients
-describe `B^s_{2,q}`, `H^s` and the Sobolev spaces of weak derivatives. For every `1 ≤ p < ∞`
-the Besov spaces are described by moduli of smoothness of every order: the kernels of `ℝ^d` act
-on `𝕋^d` by convolution with their periodisations, using Young's inequality on measurable groups
-and the band-limited approximation of [Function spaces on `ℝ^d`](Rd.md); the same kernels give
-smooth Littlewood–Paley blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. The
+On `𝕋^d` with its normalised Haar measure, the scheme consists of the trigonometric polynomials of
+degree `< n`. They satisfy the Nikolskii inequality, so all the embeddings of [Besov and Sobolev
+spaces](BesovSobolev.md) hold on `𝕋^d`. For `p = 2` the Fourier coefficients describe `B^s_{2,q}`,
+`H^s` and the Sobolev spaces `W^m_2` of weak derivatives, defined by Fourier multipliers. For every
+`1 ≤ p < ∞` the Besov spaces are described by moduli of smoothness of every order: the kernels of
+`ℝ^d` act on `𝕋^d` by convolution with their periodisations, using Young's inequality on measurable
+groups and the band-limited approximation of [Function spaces on `ℝ^d`](Rd.md); the same kernels
+give smooth Littlewood–Paley blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. The
 restriction to a face of `𝕋^(n+1)` is the model case of the trace theorem.
 
 ## Main results
@@ -41,7 +41,9 @@ restriction to a face of `𝕋^(n+1)` is the model case of the trace theorem.
 * **Traces on the torus.** For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `s > 0`, the restriction
   `f ↦ f(0, ·)` to the face `{x_0 = 0}` of `𝕋^(n+1)` extends from trigonometric polynomials to
   a map from `B^{s+1/p}_{p,q}(𝕋^(n+1))` into `B^s_{p,q}(𝕋^n)`, and every element of
-  `B^s_{p,q}(𝕋^n)` is a trace (`Torus.trace_besov`). The proof uses the trace inequality
+  `B^s_{p,q}(𝕋^n)` is a trace (`Torus.trace_besov`). The trace equals `f(0, ·)` on
+  trigonometric polynomials; its identification with the restriction of a continuous function
+  is not formalised. The proof uses the trace inequality
   `‖a(0, ·)‖_p ≤ (2⌈p/2⌉ m)^(1/p) ‖a‖_p` for polynomials of degree `< m`
   (`Torus.eLpNorm_restrictFace_le`) and an extension by the normalised Fejér kernel.
 * **Sobolev spaces through weak derivatives.** Call `g ∈ L_2(𝕋^d)` the weak derivative
@@ -49,7 +51,8 @@ restriction to a face of `𝕋^(n+1)` is the model case of the trace theorem.
   `W^m_2(𝕋^d)` consist of the `f` all of whose weak derivatives of order `|α| ≤ m` lie in
   `L_2`. Then `f ∈ W^m_2(𝕋^d)` iff `∑_k (1 + max_i |k_i|)^(2m) |f̂(k)|² < ∞`
   (`Torus.memSobolev_iff`), and for `m ≥ 1`, `W^m_2(𝕋^d) = B^m_{2,2}(𝕋^d)`
-  (`Torus.memSobolev_iff_memBesov`).
+  (`Torus.memSobolev_iff_memBesov`). This Fourier-multiplier definition covers `p = 2`;
+  classical derivatives and `W^m_p` for other `p` are not formalised on the torus.
 * **The torus.** For a trigonometric polynomial `T` of degree `< n` on `𝕋^d`, `n ≥ 1`, and
   `1 ≤ p < ∞`, `‖T‖_∞ ≤ (2⌈p/2⌉)^(d/p) n^(d/p) ‖T‖_p`
   (`Torus.norm_le_rpow_mul_eLpNorm`). Hence the trigonometric polynomials have the

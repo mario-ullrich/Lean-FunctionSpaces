@@ -37,8 +37,8 @@ Bernstein's inequalities identify its approximation spaces with the Besov spaces
   degree `< N` satisfies `∑_k ⟨Q, φ(· - k)⟩ φ(x - k) = Q(x)` for all `x`
   (`Daubechies.sum_inner_poly_mul_scalingFun`).
 * **Sobolev regularity.** Let `T g(ξ) = P(ξ/2) g(ξ/2) + P((ξ+1)/2) g((ξ+1)/2)` with
-  `P(ξ) = P_N(sin²(πξ))` (`Daubechies.transfer`). If `T^n 1 ≤ C λ^n` for all `n`
-  (`Daubechies.TransferGrowth`), then `∫ (1 + |ξ|)^(2s) |Φ(ξ)|² dξ < ∞` for every
+  `P(ξ) = P_N(sin²(πξ))` (`Daubechies.transfer`). If `T^n 1 ≤ C λ^n` for all `n` (the
+  hypothesis `Daubechies.TransferGrowth`), then `∫ (1 + |ξ|)^(2s) |Φ(ξ)|² dξ < ∞` for every
   `s < N - log₄ λ` (`Daubechies.integrable_rpow_mul_normSq`), and for `p ≤ 2`, `0 ≤ s ≤ r` and
   `0 < t ≤ 1`, `ω_r(φ, t)_p ≤ K t^s` (`Daubechies.modulus_scalingFun_le_two`). For `N = 2`,
   `T 1 = 4`, and for `N = 3`, `T^n 1 ≤ 2 · 9^n` (`Daubechies.transferGrowth_two`,
@@ -51,7 +51,8 @@ Bernstein's inequalities identify its approximation spaces with the Besov spaces
   `Daubechies.two_sub_logb_two_one_add_sqrt_three_gt`).
 * **Besov spaces by Daubechies coefficients.** Let `ψ(x) = ∑_k (-1)^k c_(1-k) φ(2x - k)`
   (`Daubechies.wavelet`) and `g_{j,k}(x) = 2^(j/2) g(2^j x - k)`. Let `N ≥ 2`, `1 ≤ p < ∞`,
-  `1 ≤ q ≤ ∞`, assume `ω_N(φ, t)_p ≤ K t^θ` for `0 < t ≤ 1` (`Daubechies.BernsteinBound`) and
+  `1 ≤ q ≤ ∞`, assume `ω_N(φ, t)_p ≤ K t^θ` for `0 < t ≤ 1` (the hypothesis
+  `Daubechies.BernsteinBound`, proved by the regularity theorems above) and
   let `0 < s < θ`. Then `f ∈ L_p(ℝ)` satisfies the Besov condition
   `‖f‖_p + ‖(2^(ks) ω_N(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff it satisfies the coefficient condition
   `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s+1/2-1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`

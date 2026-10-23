@@ -69,7 +69,8 @@ theorem mem_levelSet {n : ℕ} {i : ι} : i ∈ B.levelSet n ↔ B.level i < n :
   simp [levelSet]
 
 /-- The **local Weyl bound** of dimension `D` with constant `C ≥ 0`:
-`∑_{λ(i) < n} |ẽ_i(x)|² ≤ C n^D` for every point `x` and every `n ≥ 1`. -/
+`∑_{λ(i) < n} |ẽ_i(x)|² ≤ C n^D` for every point `x` and every `n ≥ 1`. A hypothesis on the
+basis; the torus satisfies it (`Torus.localWeylBound_fourierEigenbasis`). -/
 structure LocalWeylBound (D C : ℝ) : Prop where
   /-- The constant is nonnegative. -/
   nonneg : 0 ≤ C

@@ -26,14 +26,18 @@ classical Besov space `B^s_{p,q}(ℝ^d)` consists of the `f ∈ L_p(ℝ^d)` with
 ```
 
 Sobolev spaces appear as `W^m_p` through weak derivatives on open subsets of `ℝ^d` and as `W^m_2`
-on the torus, as `H^{s,p}` through Mathlib's Bessel potentials on `ℝ^d`, as `H^s` through Fourier
-coefficients on the torus, and abstractly as every space with Jackson's and Bernstein's
-inequalities of order `s`, the form in which their embeddings are proved.
+on the torus, defined there by Fourier multipliers, as `H^{s,p}` through Mathlib's Bessel
+potentials on `ℝ^d`, as `H^s` through Fourier coefficients on the torus, and abstractly through
+the hypothesis structure `FunctionScheme.SobolevSpace`: a space with Jackson's and Bernstein's
+inequalities of order `s`, the form in which the embeddings on measure spaces are proved.
 
 **Triebel–Lizorkin spaces** `F^s_{p,q}(ℝ^d)` take the `ℓ_q` norm of the Littlewood–Paley blocks
 `ψ_j ⋆ f` at every point before the `L_p` norm: they consist of the `f ∈ L_p(ℝ^d)` with
 `‖ x ↦ ‖(2^(js) |ψ_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p < ∞`. For `q = p` and `s > 0` they are the Besov
-spaces `B^s_{p,p}`.
+spaces `B^s_{p,p}`. All Besov and Triebel–Lizorkin spaces here are subspaces of `L_p` with
+`1 ≤ p`, in most results with `1 ≤ q` and `p < ∞`. The Triebel–Lizorkin spaces and the
+Littlewood–Paley descriptions on `ℝ^d` use one fixed family `ψ_j`; for `s < 0`, `F^s_{p,q}` is
+the part `F^s_{p,q} ∩ L_p` of the classical space.
 
 **Characterisations and domains.** Each setting has its natural descriptions of these spaces:
 Fourier coefficients and Littlewood–Paley blocks on the torus and on `ℝ^d`, splines and Haar or
@@ -83,8 +87,10 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 * **The representation theorem.** Let `ι : Y → X` satisfy Jackson's inequality
   `E_n(ι y) ≤ C n^(-r) ‖y‖` and Bernstein's inequality (every `a ∈ A_n` is `ι y` with
   `‖y‖ ≤ C n^r ‖a‖`) of order `r`. Then for `0 < s < r` and `1 ≤ q ≤ ∞`, `A^s_q` is the real
-  interpolation space `(X, Y)_{s/r, q}`, with equivalent norms
-  (`ApproximationScheme.memApprox_iff_memInterp`).
+  interpolation space `(X, Y)_{s/r, q}` of the discrete K-method on the grid `t = 2^(-kr)`,
+  the `f` with `‖f‖ + ‖(2^(ks) K(2^(-kr), f))_k‖_{ℓ_q} < ∞`, with equivalent norms
+  (`ApproximationScheme.memApprox_iff_memInterp`). The equivalence with the continuous K-method
+  `(∫_0^∞ (t^(-s/r) K(t, f))^q dt/t)^(1/q)` is not formalised.
 * **Moduli of smoothness and approximation.** Let `ω(f, 2^(-k))` be subadditive with
   `ω(f, t) ≤ C₀ ‖f‖`, and assume a Jackson inequality `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for
   `k ≥ k₀` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
@@ -93,23 +99,26 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 
 **Besov and Sobolev spaces on measure spaces** ([details](docs/BesovSobolev.md))
 
-* **Besov embeddings.** Let `μ` be a finite measure on `Ω` and `S` a scheme of bounded
-  continuous functions with the Nikolskii property of dimension `D ≥ 0`: for every
-  `1 ≤ p ≤ ∞` there is `C` with `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all `a ∈ S_n`, `n ≥ 1`. Let
-  `1 ≤ p ≤ r ≤ ∞`, `1 ≤ q ≤ ∞` and `α = D (1/p - 1/r) < s`. Then every `f ∈ B^s_{p,q}`
-  belongs to `L_r` and to `B^{s-α}_{r,q}`, with `‖f‖_{B^{s-α}_{r,q}} ≤ K ‖f‖_{B^s_{p,q}}`
-  (`FunctionScheme.MemBesov.exists_inclusion_eq_of_nikolskii`). If `μ` charges every nonempty
-  open set and `s > D/p`, every `f ∈ B^s_{p,q}` has a bounded continuous representative
+* **Besov embeddings.** Let `μ` be a finite measure on `Ω` and `S` a scheme of bounded continuous
+  functions with the Nikolskii property of dimension `D ≥ 0`: for every `1 ≤ p ≤ ∞` there is `C`
+  with `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all `a ∈ S_n`, `n ≥ 1`. Let `1 ≤ p ≤ r ≤ ∞`, `1 ≤ q ≤ ∞` and
+  `α = D (1/p - 1/r) < s`. Then every `f ∈ B^s_{p,q}` belongs to `L_r` and to `B^{s-α}_{r,q}`, with
+  `‖f‖_{B^{s-α}_{r,q}} ≤ K ‖f‖_{B^s_{p,q}}`
+  (`FunctionScheme.MemBesov.exists_inclusion_eq_of_nikolskii`). The Nikolskii property is the
+  hypothesis `FunctionScheme.HasNikolskii`, proved for the trigonometric polynomials on the torus
+  (`Torus.trigScheme_hasNikolskii`). If `μ` charges every nonempty open set and `s > D/p`, every
+  `f ∈ B^s_{p,q}` has a bounded continuous representative
   (`FunctionScheme.MemBesov.exists_boundedContinuous`).
-* **Sobolev embeddings.** Call a Banach space `V` with an injective bounded map into `L_p(μ)`
-  a Sobolev space of order `s` for `S` if it satisfies Jackson's inequality
-  `E_n(f)_p ≤ C n^(-s) ‖f‖_V` and Bernstein's inequality (every `a ∈ S_n` lies in `V` with
-  `‖a‖_V ≤ C n^s ‖a‖_p`). For `S` with the Nikolskii property of dimension `D ≥ 0`, Sobolev
-  spaces `V` of order `s` in `L_p` and `V'` of order `t` in `L_r`, `p ≤ r` and
-  `t - D/r < s - D/p`, every element of `V` lies in `V'`
-  (`FunctionScheme.SobolevSpace.exists_eq_inclusion'`); for `s > D/p` every element of `V`
-  has a bounded continuous representative
-  (`FunctionScheme.SobolevSpace.exists_boundedContinuous`).
+* **Sobolev embeddings.** Call a Banach space `V` with an injective bounded map into `L_p(μ)` a
+  Sobolev space of order `s` for `S` (the hypothesis structure `FunctionScheme.SobolevSpace`) if it
+  satisfies Jackson's inequality `E_n(f)_p ≤ C n^(-s) ‖f‖_V` and Bernstein's inequality (every
+  `a ∈ S_n` lies in `V` with `‖a‖_V ≤ C n^s ‖a‖_p`). For `S` with the Nikolskii property of
+  dimension `D ≥ 0`, Sobolev spaces `V` of order `s` in `L_p` and `V'` of order `t` in `L_r`,
+  `p ≤ r` and `t - D/r < s - D/p`, every element of `V` lies in `V'`
+  (`FunctionScheme.SobolevSpace.exists_eq_inclusion'`); for `s > D/p` every element of `V` has a
+  bounded continuous representative (`FunctionScheme.SobolevSpace.exists_boundedContinuous`). The
+  instances of the structure are the spaces `H^s`, `p = 2`, on the torus and for a continuous
+  spectral basis (`Torus.sobolevSpace`, `ContinuousSpectralBasis.sobolevSpace`).
 
 **The torus** ([details](docs/Torus.md))
 
@@ -152,21 +161,22 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 
 **Daubechies wavelets** ([details](docs/Daubechies.md))
 
-* **Daubechies wavelets and Besov spaces.** For a mask of order `N ≥ 2` with filter
-  coefficients `c_k`, a real polynomial `L` of degree `< N` with `L(1) = 1` and
+* **Daubechies wavelets and Besov spaces.** For a mask of order `N ≥ 2` with filter coefficients
+  `c_k`, a real polynomial `L` of degree `< N` with `L(1) = 1` and
   `|L(e^(-2πiξ))|² = ∑_{k<N} C(N-1+k, k) sin^(2k)(πξ)`, which exists by the Fejér–Riesz theorem
   (`Daubechies.nonempty_mask_iff`, `Polynomial.fejer_riesz`), the scaling function `φ` is
   continuous, vanishes outside `[0, 2N - 1]`, satisfies `φ(x) = ∑_k c_k φ(2x - k)` and has
-  orthonormal integer translates (`Daubechies.scalingFun_eq_zero`,
-  `Daubechies.scalingFun_refine`, `Daubechies.integral_scalingFun_translate_mul_conj_translate`).
-  Let `ψ` be the wavelet and `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`. If `ω_N(φ, t)_p ≤ K t^θ` and `0 < s < θ`,
-  then `f ∈ L_p(ℝ)` lies in `B^s_{p,q}(ℝ)` iff
+  orthonormal integer translates (`Daubechies.scalingFun_eq_zero`, `Daubechies.scalingFun_refine`,
+  `Daubechies.integral_scalingFun_translate_mul_conj_translate`). Let `ψ` be the wavelet and
+  `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`. If `ω_N(φ, t)_p ≤ K t^θ` (the hypothesis `Daubechies.BernsteinBound`)
+  and `0 < s < θ`, then `f ∈ L_p(ℝ)` lies in `B^s_{p,q}(ℝ)` iff
   `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s+1/2-1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
-  (`Daubechies.besov_iff_coeff`). The bound holds for `p ≤ 2` and every
-  `θ < N - log₄ λ` whenever the transfer operator satisfies `T^n 1 ≤ C λ^n`
-  (`Daubechies.besov_iff_coeff_of_le_two`); `λ = 4` for `N = 2` and `λ = 9` for `N = 3`, the
-  Sobolev exponents `1` and `3 - log₂ 3`. The scaling function of D4 is Hölder continuous of
-  every order `a ≤ 2 - log₂(1 + √3) ≈ 0.55` (`Daubechies.holder_d4`).
+  (`Daubechies.besov_iff_coeff`). The bound holds for `p ≤ 2` and every `θ < N - log₄ λ` whenever
+  the transfer operator satisfies `T^n 1 ≤ C λ^n` (the hypothesis `Daubechies.TransferGrowth`;
+  `Daubechies.besov_iff_coeff_of_le_two`), which is proved with `λ = 4` for `N = 2` and `λ = 9` for
+  `N = 3` (`Daubechies.transferGrowth_two`, `Daubechies.transferGrowth_three`), the Sobolev
+  exponents `1` and `3 - log₂ 3`. The scaling function of D4 is Hölder continuous of every order
+  `a ≤ 2 - log₂(1 + √3) ≈ 0.55` (`Daubechies.holder_d4`).
 
 **Function spaces on `ℝ^d`** ([details](docs/Rd.md))
 
@@ -197,7 +207,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 * **Triebel–Lizorkin spaces and the Besov sandwich.** For `1 ≤ p < ∞`, `s ∈ ℝ` and
   `1 ≤ q ≤ ∞`, `F^s_{p,q}` consists of the `f ∈ L_p(V)` with
   `‖ x ↦ ‖(2^(js) |ψ_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p < ∞`, for the Littlewood–Paley kernels `ψ_j` of
-  `ℝ^d` above. For `s > 0`, `F^s_{p,p} = B^s_{p,p}` and
+  `ℝ^d` above (for `s < 0` this is `F^s_{p,q} ∩ L_p`). For `s > 0`, `F^s_{p,p} = B^s_{p,p}` and
   `B^s_{p,min(p,q)} ⊆ F^s_{p,q} ⊆ B^s_{p,max(p,q)}`, where `B^s_{p,q}` is the approximation space
   `A^s_q` of the band-limited classes (`Rd.memTriebelLizorkin_iff_memApprox`,
   `Rd.memTriebelLizorkin_of_memApprox`, `Rd.memApprox_of_memTriebelLizorkin`). The same holds on
@@ -237,15 +247,19 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   (`Rd.BoundedLipschitzDomain.MemSobolevOn`); for every order `r ≥ 2`, `f ∈ H^1(Ω)` iff
   `‖f‖_{L_2(Ω)} + ‖(2^k ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞`
   (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_modulusOn`); every `f ∈ H^1(Ω)` has weak
-  derivatives in `L_2(Ω)` (`Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`), and the
-  boundary traces of the functions of `H^1(Ω)` are the functions of `B^{1/2}_{2,2}(Γ)`
-  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`).
+  derivatives in `L_2(Ω)` (`Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`, which holds
+  by the definition through extensions; the converse is the extension theorem below), and the
+  boundary traces of the functions of `H^1(Ω)` are the functions of `B^{1/2}_{2,2}(Γ)`, defined
+  chart by chart with first differences, which describe the Besov spaces of the boundary for
+  `0 < s < 1` (`Rd.BoundedLipschitzDomain.MemBoundaryBesov`,
+  `Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`).
 * **Rellich's theorem.** For every bounded set `Ω ⊆ V`, the restriction from `H^1(V)` to
   `L_2(Ω)` is a compact operator (`Rd.isCompactOperator_restr_toL2`).
 * **Sobolev spaces on open sets as Hilbert spaces.** For every open `Ω ⊆ V` and real `s`,
   `H^s(Ω)` is the orthogonal complement in `H^s(V)` of the elements whose distribution vanishes
-  on every test function of `Ω` (`Rd.RestrictionSpace`), isometric to the quotient of `H^s(V)`
-  by them (`Rd.quotientEquivRestrictionSpace`); `H^1(Ω) → L_2(Ω)` is injective and, for
+  on every test function of `Ω` (`Rd.RestrictionSpace`), and by this definition as an orthogonal
+  complement it is isometric to the quotient of `H^s(V)` by them
+  (`Rd.quotientEquivRestrictionSpace`); `H^1(Ω) → L_2(Ω)` is injective and, for
   bounded `Ω`, compact (`Rd.restrictL2_injective`, `Rd.isCompactOperator_restrictL2`); and
   restriction is an isometry from `H̃^1(Ω)`, the closure of the test functions in `H^1(V)`, onto
   `H^1_0(Ω)`, the closure of their restrictions in `H^1(Ω)` (`Rd.tildeEquivZeroBoundary`).
@@ -254,14 +268,15 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   (`Rd.dualEquiv`, `Rd.dualEquiv_apply`, `Rd.dualEquiv_eq_iff`), and likewise
   `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` and `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` (`Rd.dualRestrictionEquiv`,
   `Rd.dualZeroBoundaryEquiv`).
-* **The trace space `H^{1/2}(Γ)`.** On a bounded Lipschitz domain `Ω` with boundary `Γ`, the
-  trace space `H^{1/2}(Γ)` is the orthogonal complement in `H^1(Ω)` of the `u` whose boundary
+* **The trace space `H^{1/2}(Γ)`.** On a bounded Lipschitz domain `Ω` with boundary `Γ`, the trace
+  space `H^{1/2}(Γ)` is defined as the orthogonal complement in `H^1(Ω)` of the `u` whose boundary
   trace vanishes almost everywhere on `Γ` (`Rd.BoundedLipschitzDomain.TraceSpace`,
-  `Rd.BoundedLipschitzDomain.mem_traceKer_iff`). The trace is the orthogonal projection onto it
-  and the extension is the inclusion, both of norm at most `1`, `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)`
-  isometrically (`Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`), and the boundary traces
-  of its elements are the functions of `B^{1/2}_{2,2}(Γ)` modulo null sets of `Γ`
-  (`Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`).
+  `Rd.BoundedLipschitzDomain.mem_traceKer_iff`). By this definition the trace is the orthogonal
+  projection onto it and the extension is the inclusion, both of norm at most `1`, and
+  `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)` isometrically (`Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`).
+  The boundary traces of its elements are the functions of `B^{1/2}_{2,2}(Γ)` modulo null sets of
+  `Γ` (`Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`); this link is qualitative,
+  a norm equivalence of `H^{1/2}(Γ)` with `B^{1/2}_{2,2}(Γ)` is not formalised.
 * **The area formula for Lipschitz graphs.** Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph
   domain in `V`, `dim V = n`, with the graph map `γ(x') = x' + φ(x') e` over the hyperplane
   `H = e^⊥` and the gradient `∇φ(x') ∈ H` of `φ` on `H`, which exists almost everywhere. For
@@ -279,34 +294,35 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `Rd.BoundedLipschitzDomain.boundaryTraceL2_apply_ae`,
   `Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`); on `H^{1/2}(Γ)` the trace into `L_2(Γ)` is
   injective (`Rd.BoundedLipschitzDomain.traceL2_injective`).
-* **The square function theorem.** Let `dim V ≥ 1` and `1 < p < ∞`. For every `f ∈ L_p(V)`,
-  the square function `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}` of the Littlewood–Paley blocks `ψ_j ⋆ f`
-  has `L_p` norm `‖f‖_{F^0_{p,2}}` (`Rd.triebelLizorkinNorm_zero_two_eq`), and
-  `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p`, `‖f‖_p ≤ Q̃_{V,p} ‖f‖_{F^0_{p,2}}`
+* **The square function theorem.** Let `dim V ≥ 1` and `1 < p < ∞`. By definition,
+  `‖f‖_{F^0_{p,2}}` is the `L_p` norm of the square function `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}` of
+  the Littlewood–Paley blocks `ψ_j ⋆ f` (`Rd.triebelLizorkinNorm_zero_two_eq`). The theorem is
+  the two-sided bound: for every `f ∈ L_p(V)`,
+  `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p` and `‖f‖_p ≤ Q̃_{V,p} ‖f‖_{F^0_{p,2}}`
   (`Rd.triebelLizorkinNorm_zero_two_le`, `Rd.enorm_le_triebelLizorkinNorm_zero_two`), with the
   strong type constants of the Calderón–Zygmund families of the blocks and of the synthesis
-  kernels (`Rd.squareFunctionConst`, `Rd.squareSynthesisConst`); hence `F^0_{p,2} = L_p(V)`
+  kernels (`Rd.squareFunctionConst`, `Rd.squareSynthesisConst`), named formulas in Schwartz
+  seminorms of these fixed kernels, proved finite; hence `F^0_{p,2} = L_p(V)`
   (`Rd.triebelLizorkinSpace_zero_two_eq_top`). The proof is the strong type `(p,p)` of
   vector-valued singular integrals with Calderón–Zygmund kernel families
   (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`, `Rd.IsCZFamily.eLpNorm_sum_conv_le`).
 * **`W^m_p = F^m_{p,2}`.** Let `dim V ≥ 1`, `1 < p < ∞` and `m ∈ ℕ`. For `f ∈ L_p(V)`,
-  `f ∈ W^m_p(V)` iff `f ∈ F^m_{p,2}(V)` (`Rd.memSobolev_iff_memTriebelLizorkin`), with explicit
-  constants in both directions. If the weak derivatives
-  `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f` along the orthonormal basis `e` of `Rd.gridBasis` lie in
-  `L_p(V)` for all multi-indices `α`, then
+  `f ∈ W^m_p(V)` iff `f ∈ F^m_{p,2}(V)` (`Rd.memSobolev_iff_memTriebelLizorkin`), with named
+  constants in both directions, formulas in Schwartz seminorms of fixed kernels, proved finite. If
+  the weak derivatives `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f` along the orthonormal basis `e` of
+  `Rd.gridBasis` lie in `L_p(V)` for all multi-indices `α`, then
   `‖f‖_{F^m_{p,2}} ≤ ‖Φ‖_1 ‖f‖_p + 2^m ∑_α K_{V,p,α} ‖g_α‖_p`
-  (`Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv`, `Rd.sobolevToTLConst`); if
-  `f ∈ F^k_{p,2}(V)`, then for all directions `w ∈ V^k` the weak derivative `∂^w f` is a
-  function `g ∈ L_p(V)` with `‖g‖_p ≤ C_{V,p,w} ‖f‖_{F^k_{p,2}}`
-  (`Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin`, `Rd.tlToSobolevConst`). The constants are
-  strong type constants of the Calderón–Zygmund families of the dilated derivative kernels and of
-  the rescaled derivatives of the synthesis kernels. This gives the Besov sandwich:
-  `B^m_{p,min(p,2)} ⊆ W^m_p(V)` and, for `m ≥ 1`, `W^m_p(V) ⊆ B^m_{p,max(p,2)}`
-  (`Rd.memSobolev_of_memApprox`, `Rd.memApprox_of_memSobolev`, with norm bounds
-  `Rd.exists_hasWeakLineDeriv_of_memApprox`, `Rd.approxNormDyadic_le_of_hasWeakLineDeriv`), and
-  `W^m_2 = B^m_{2,2}` for `m ≥ 1` (`Rd.memSobolev_two_iff_memApprox`).
-  The proof writes the blocks through the weak derivatives and back, with the strong type of
-  the Calderón–Zygmund families of the derivative kernels.
+  (`Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv`, `Rd.sobolevToTLConst`); if `f ∈ F^k_{p,2}(V)`,
+  then for all directions `w ∈ V^k` the weak derivative `∂^w f` is a function `g ∈ L_p(V)` with
+  `‖g‖_p ≤ C_{V,p,w} ‖f‖_{F^k_{p,2}}` (`Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin`,
+  `Rd.tlToSobolevConst`). The constants are strong type constants of the Calderón–Zygmund families
+  of the dilated derivative kernels and of the rescaled derivatives of the synthesis kernels. This
+  gives the Besov sandwich: `B^m_{p,min(p,2)} ⊆ W^m_p(V)` and, for `m ≥ 1`,
+  `W^m_p(V) ⊆ B^m_{p,max(p,2)}` (`Rd.memSobolev_of_memApprox`, `Rd.memApprox_of_memSobolev`, with
+  norm bounds `Rd.exists_hasWeakLineDeriv_of_memApprox`,
+  `Rd.approxNormDyadic_le_of_hasWeakLineDeriv`), and `W^m_2 = B^m_{2,2}` for `m ≥ 1`
+  (`Rd.memSobolev_two_iff_memApprox`). The proof writes the blocks through the weak derivatives and
+  back, with the strong type of the Calderón–Zygmund families of the derivative kernels.
 * **`H^{s,p} = F^s_{p,2}` and `W^m_p = H^{m,p}`.** Let `dim V ≥ 1` and `1 < p < ∞`, and let
   `J_s` be Mathlib's Bessel potential, the Fourier multiplier with `(1 + ‖ξ‖²)^{s/2}`; a tempered
   distribution `f` lies in Mathlib's Bessel potential space `H^{s,p}(V)` iff `J_s f ∈ L_p(V)`.
@@ -339,7 +355,8 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `Rd.exists_boundedContinuous_ae_eq_of_memSobolev`). The proof is the Nikolskii inequality
   `‖ψ_j ⋆ f‖_r ≤ N_p^(1-p/r) 2^(jn(1/p - 1/r)) ‖ψ_j ⋆ f‖_p` for the Littlewood–Paley blocks
   (`Rd.eLpNorm_blockFun_le_nikolskii`, `Rd.nikolskiiBlockConst`) and the bound of
-  `‖f‖_{F^m_{p,2}}` by `M_f`; the critical case `1/r = 1/p - m/n` with `r < ∞` (Sobolev's
+  `‖f‖_{F^m_{p,2}}` by `M_f`. The constants are named formulas in norms and Schwartz seminorms
+  of fixed kernels, proved finite. The critical case `1/r = 1/p - m/n` with `r < ∞` (Sobolev's
   inequality) is not covered.
 * **The extension theorem for `W^1_p` on bounded Lipschitz domains.** Let `Ω` be a bounded
   Lipschitz domain in `V`, `dim V ≥ 1`, `(e_i)` the orthonormal basis `Rd.gridBasis V` and
@@ -349,6 +366,8 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `‖F‖_p + ∑_i ‖∂_{e_i} F‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`
   (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`); so `f ∈ W^1_p(Ω)` iff `f` agrees on `Ω`
   with some `F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`).
+  The theorem is of first order and gives, for each `f`, an extension with this bound; a bounded
+  linear extension operator and the exponents `p ∈ {1, ∞}` are not formalised.
   For `p = 2`, `f ∈ L_2(V)` lies in `H^1(Ω)` iff it lies in `W^1_2(Ω)`
   (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`), every sequence bounded in
   `W^1_2(Ω)` has a subsequence converging in `L_2(Ω)`
@@ -394,19 +413,22 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 * **Besov spaces on bounded Lipschitz domains by intrinsic differences.** Let `Ω ⊆ V` be a bounded
   Lipschitz domain: a bounded open set whose boundary is covered by finitely many open balls
   `B_j`, centred on the boundary, with `B_j ∩ Ω = B_j ∩ Ω_j` for Lipschitz graph domains `Ω_j`
-  (`Rd.BoundedLipschitzDomain`), and let
+  (`Rd.BoundedLipschitzDomain`, a structure that carries the balls and graph domains as data; a
+  constructor from the set-level definition and concrete instances are not formalised), and let
   `ω_r(f, t, Ω)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_{L_p(Ω_{rh})}` with
   `Ω_{rh} = {x : x, x + h, …, x + rh ∈ Ω}`. For `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`,
   `f ∈ L_p(V)` agrees on `Ω` with some `F ∈ L_p(V)` with
   `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
   (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`).
-* **Besov spaces on compact manifolds.** Let `M` be a compact smooth manifold, with or without
-  boundary, and `μ` a smooth measure. A Besov atlas consists of finitely many charts `κ_i`, a
-  smooth partition of unity `ψ_i` subordinate to them and cut-offs (`Manifold.BesovAtlas`), and
-  `f ∈ B^s_{p,q}(M)` if every piece `(ψ_i f) ∘ κ_i⁻¹` has finite intrinsic Besov quasi-norm on the
-  model space. For `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞` this depends neither on the atlas nor on
-  the order of the differences (`Manifold.memBesov_iff`,
+* **Besov spaces on compact manifolds.** Let `M` be a compact smooth manifold, without boundary or
+  with boundary modelled on the half-space, and `μ` a smooth measure; the range of the model is a
+  Besov domain, a hypothesis class with the half-space and the whole space as instances
+  (`Rd.BesovDomain`), so manifolds with corners are not covered. A Besov atlas consists of finitely
+  many charts `κ_i`, a smooth partition of unity `ψ_i` subordinate to them and cut-offs
+  (`Manifold.BesovAtlas`), and `f ∈ B^s_{p,q}(M)` if every piece `(ψ_i f) ∘ κ_i⁻¹` has finite
+  intrinsic Besov quasi-norm on the model space. For `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞` this
+  depends neither on the atlas nor on the order of the differences (`Manifold.memBesov_iff`,
   `Manifold.BesovAtlas.memBesov_iff_besovNorm_lt_top`).
 * **The trace theorem on compact manifolds with boundary.** Let `M` be as above with boundary,
   modelled on the half-space `{y ∈ ℝ^n : y_0 ≥ 0}`, and let `B^s_{p,q}(∂M)` consist of the `g`
@@ -415,21 +437,25 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `B^{s+1/p}_{p,q}(M)`: `g ∈ B^s_{p,q}(∂M)` iff the boundary pieces of `g` agree almost
   everywhere with those of the trace `Tr_A f` of some `f ∈ B^{s+1/p}_{p,q}(M)`
   (`Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace`). For the closure of a smooth
-  bounded domain this is the trace theorem on its boundary for every `s > 0`.
+  bounded domain this is the trace theorem on its boundary for every `s > 0` (`Rd.SmoothDomain`,
+  a bounded Lipschitz domain with smooth graph functions as data; like
+  `Rd.BoundedLipschitzDomain` it has no constructor from the set-level definition and no
+  concrete instance yet).
 
 **Dominating mixed smoothness** ([details](docs/MixedSmoothness.md))
 
 * **Mixed smoothness and hyperbolic crosses.** For `1 ≤ p < ∞`, `0 < s < L`, `1 ≤ q ≤ ∞` and
   `f ∈ L_p(ℝ^d)`, the mixed moduli `Ω^{e(k)}_L` in the coordinates `e(k) = {i : k_i ≠ 0}`, the
-  tensor local means kernels `k_k` and the tensor Littlewood–Paley kernels `δ_k = ⊗_i ψ_{k_i}`
+  tensor local means kernels `k_k` of a bump vanishing outside `[-1, 1]` and the tensor
+  Littlewood–Paley kernels `δ_k = ⊗_i ψ_{k_i}`
   describe the same space:
   `‖(2^(s|k|_1) Ω^{e(k)}_L(f, 2^(-k))_p)_{k ∈ ℕ^d}‖_{ℓ_q} < ∞` iff
   `‖(2^(s|k|_1) ‖k_k ⋆ f‖_p)_k‖_{ℓ_q} < ∞` iff `‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q} < ∞`
   (`Rd.LocalMeansBump.mixedBesov_iff_mixedLocalMeans`, `Rd.mixedBesov_iff_mixedLP`). The
   hyperbolic cross sums `S_N f = ∑_{|k|_1 ≤ N} δ_k ⋆ f` satisfy
   `‖f - S_N f‖_p ≤ C 2^(-sN) (N + 1)^((d-1)(1-1/q)) ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}` with
-  the finite constant `C = ∑_l 2^(-sl) (l + 1)^((d-1)(1-1/q))`
-  (`Rd.enorm_sub_hyperbolicSum_le_of_pos`).
+  the constant `C = ∑_l 2^(-sl) (l + 1)^((d-1)(1-1/q))`, finite for `s > 0`
+  (`Rd.hyperbolicCrossConst_ne_top`, `Rd.enorm_sub_hyperbolicSum_le_of_pos`).
 
 ## What is formalised
 
@@ -437,12 +463,12 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 |---|---|---|
 | [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
 | [**Besov and Sobolev spaces on measure spaces**](docs/BesovSobolev.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, spectral schemes, continuous spectral bases | ✅ | ✗ |
-| [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness and smooth Littlewood–Paley blocks for all `p`, weak derivatives, traces | ✅ | ✗ |
+| [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness and smooth Littlewood–Paley blocks for all `p`, `W^m_2` by Fourier multipliers, the trace on a face | ✅ | ✗ |
 | [**Intervals, the cube, splines and wavelets**](docs/IntervalCube.md): piecewise polynomials and splines on `[0, 1]`, the circle and `[0, 1]^d`, Whitney's inequality, coordinate and isotropic moduli, multiwavelets, the Haar system | ✅ | ✗ |
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
 | [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): mixed norms, maximal functions, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, local means, ball means of differences, atoms, the torus | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, and `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)` | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, and `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)` | ✅ | ✗ |
 | [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 

@@ -102,7 +102,8 @@ theorem mem_closure_iff_of_inter_eq {V : Type*} [TopologicalSpace V] {S T B : Se
 /-! ### Smooth domains and their straighteners -/
 
 /-- A **smooth bounded domain** in `ℝ^n`: a bounded Lipschitz domain whose graph functions are
-smooth. -/
+smooth. Like `Rd.BoundedLipschitzDomain`, it carries its charts as data; a constructor from the
+set-level definition and concrete instances are not formalised. -/
 structure SmoothDomain (n : ℕ) [NeZero n] extends BoundedLipschitzDomain (EuclideanSpace ℝ (Fin n))
     where
   contDiff_phi : ∀ j, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (graph j).phi

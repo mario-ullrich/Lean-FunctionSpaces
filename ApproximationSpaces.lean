@@ -71,7 +71,7 @@ Nothing in this library mentions functions or measures.
 * `ApproximationSpaces.Jackson`: Jackson's inequality, `ι(Y) ⊆ A^r_∞`, and smoothness spaces
   `ApproximationScheme.SmoothnessSpace` with `A^r_1 ⊆ Y ⊆ A^r_∞`.
 * `ApproximationSpaces.KFunctional`: the Peetre K-functional and the real interpolation
-  spaces `(X, Y)_{θ,q}`.
+  spaces `(X, Y)_{θ,q}` of the discrete K-method on a dyadic grid.
 * `ApproximationSpaces.Representation`: the representation theorem `A^s_q = (X, Y)_{s/r,q}`
   under Jackson's and Bernstein's inequalities of order `r`.
 * `ApproximationSpaces.Decompositions.Projection`: schemes with uniformly bounded projections

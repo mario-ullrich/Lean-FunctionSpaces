@@ -40,8 +40,10 @@ Besov spaces.
 * **Besov spaces on bounded Lipschitz domains by intrinsic differences.** Let `Ω ⊆ V` be a bounded
   Lipschitz domain: a bounded open set whose boundary is covered by finitely many open balls `B_j`,
   centred on the boundary, with `B_j ∩ Ω = B_j ∩ Ω_j` for Lipschitz graph domains `Ω_j`
-  (`Rd.BoundedLipschitzDomain`). For `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`, `f ∈ L_p(V)` agrees
-  on `Ω` with some `F ∈ L_p(V)` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
+  (`Rd.BoundedLipschitzDomain`, a structure that carries the balls and graph domains as data; a
+  constructor from the set-level definition and concrete instances are not formalised). For
+  `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`, `f ∈ L_p(V)` agrees on `Ω` with some `F ∈ L_p(V)`
+  with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, and the same condition describes the
   restrictions of the band-limited approximation spaces
   (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`,
@@ -82,14 +84,17 @@ Besov spaces.
   (`Rd.LipschitzGraph.trace_flatExtension`).
 * **The half-space is a Besov domain.** A Besov domain is a closed convex set with nonempty
   interior whose functions of finite intrinsic quasi-norm extend to `V` with a bound
-  (`Rd.BesovDomain`, see [Function spaces on `ℝ^d`](Rd.md)). The closed half-space is a Besov
-  domain (`Rd.BesovDomain.closedHalfSpace`), and so are the models of manifolds with and without
-  boundary (`Rd.BesovDomain.range_euclideanHalfSpace`, `Rd.BesovDomain.range_of_boundaryless`).
+  (`Rd.BesovDomain`, see [Function spaces on `ℝ^d`](Rd.md)), a hypothesis class whose field is
+  this extension. The closed half-space is a Besov domain (`Rd.BesovDomain.closedHalfSpace`), and
+  so are `V` and the models of manifolds with and without boundary (`Rd.BesovDomain.univ`,
+  `Rd.BesovDomain.range_euclideanHalfSpace`, `Rd.BesovDomain.range_of_boundaryless`). The class
+  consists of closed convex sets, so non-convex domains lie outside it; among the convex ones,
+  closed balls, cubes and quadrants are not yet proved instances.
 * **Besov spaces on compact manifolds.** Let `M` be a compact smooth manifold modelled on `E` with
-  corners `I` whose range is a Besov domain (the half-space or `E`), `μ` a smooth measure (in
-  every chart a continuous positive density with respect to the Lebesgue measure,
-  `Manifold.IsSmoothMeasure`) and `1 ≤ p < ∞`. A Besov atlas consists of finitely many charts
-  `κ_i`, a smooth partition of unity `ψ_i` subordinate to them and cut-offs
+  corners `I` whose range is a Besov domain (the half-space or `E`; manifolds with corners are not
+  covered), `μ` a smooth measure (in every chart a continuous positive density with respect to
+  the Lebesgue measure, `Manifold.IsSmoothMeasure`) and `1 ≤ p < ∞`. A Besov atlas consists of
+  finitely many charts `κ_i`, a smooth partition of unity `ψ_i` subordinate to them and cut-offs
   (`Manifold.BesovAtlas`); every compact manifold has one (`Manifold.BesovAtlas.nonempty`). Its
   Besov quasi-norm is `‖f‖_{A,r,s,q} = ∑_i N_Ω((ψ_i f) ∘ κ_i⁻¹)` with
   `N_Ω(G) = ‖G‖_{L_p(Ω)} + ‖(2^(ks) ω_r(G, 2^(-k), Ω)_p)_k‖_{ℓ_q}`, `Ω = range I`
@@ -110,7 +115,9 @@ Besov spaces.
   `f ∈ L_p(closure Ω)` lies in the Besov space `B^s_{p,q}` of this manifold iff
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
   (`Rd.SmoothDomain.memBesov_iff_modNormOn_lt_top`): the descriptions by charts, by intrinsic
-  differences and as restrictions of `B^s_{p,q}(ℝ^n)` coincide.
+  differences and as restrictions of `B^s_{p,q}(ℝ^n)` coincide. Like `Rd.BoundedLipschitzDomain`,
+  `Rd.SmoothDomain` carries its charts as data; a constructor from the set-level definition and
+  concrete instances are not formalised.
 * **Besov spaces on the boundary of a compact manifold.** Let `M` be a compact smooth manifold
   with boundary modelled on the half-space `{y ∈ ℝ^n : y_0 ≥ 0}`. The changes of charts map the
   boundary hyperplane `H₀ = {y_0 = 0}` into itself (`Manifold.coordChange_mem_bdry`), and their
@@ -139,7 +146,8 @@ Besov spaces.
   `γ_j(x') ∈ B_j` (`Rd.BoundedLipschitzDomain.aeBoundary`), and `g ∈ B^s_{p,q}(Γ)` if every chart
   piece `(ψ_j g) ∘ γ_j` agrees almost everywhere with some `G_j ∈ L_p(H_j)` with
   `‖G_j‖_p + ‖(2^(ks) ω_1(G_j, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
-  (`Rd.BoundedLipschitzDomain.MemBoundaryBesov`). The boundary trace is
+  (`Rd.BoundedLipschitzDomain.MemBoundaryBesov`); first differences describe the range
+  `0 < s < 1` of the trace theorem. The boundary trace is
   `Tr_Γ F(y) = ∑_k ψ_k(y) Tr_k F(P_k y)` (`Rd.BoundedLipschitzDomain.boundaryTrace`). For
   `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞` and `L ≥ 2`, `g ∈ B^s_{p,q}(Γ)` iff `g = Tr_Γ F` almost
   everywhere on `Γ` for some `F ∈ L_p(V)` with

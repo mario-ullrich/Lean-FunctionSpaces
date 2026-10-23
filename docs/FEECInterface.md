@@ -16,8 +16,9 @@ spaces, their characterisations, extensions, traces and embeddings. For the coll
 supplies Mathlib's Hilbert spaces `H^s(ℝ^d)` as Besov spaces `B^s_{2,2}(ℝ^d)` (item I.8), weak
 derivatives, `H^1` on bounded Lipschitz domains with its weak gradient and its trace, the
 Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets and their duality, the trace
-space `H^{1/2}(Γ)` of a bounded Lipschitz domain with its trace and extension operators and its
-dual `H^{-1/2}(Γ)`, the area formula for Lipschitz graphs, the surface measure of `Γ` with
+space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the
+trace kernel in `H^1(Ω)`, with its trace and extension operators and its dual `H^{-1/2}(Γ)`, the
+area formula for Lipschitz graphs, the surface measure of `Γ` with
 `L_2(Γ)` and the trace into it, Rellich's compactness theorem for the restriction space
 (items I.6 and H.1 in that form, Section 4.5), and the extension theorem H.2 for `W^{1,p}`,
 `1 < p < ∞`, with `H^1(Ω) = W^{1,2}(Ω)` and Rellich's theorem in the weak-derivative form
@@ -191,14 +192,17 @@ Files `FunctionSpaces/Rd/LipschitzDomainH1.lean` and `FunctionSpaces/Rd/SobolevE
   `Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_memApprox`.
 * The weak gradient, `Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`: every
   `f ∈ H^1(Ω)` satisfies `Rd.MemWeakSobolev Ω.toOpens 1 2 f`, so its weak derivatives on `Ω`
-  exist and lie in `L_2(Ω)`.
+  exist and lie in `L_2(Ω)`. This direction holds by the definition through extensions; the
+  converse is the extension theorem H.2 below.
 * H.2, the extension theorem of Calderón and Stein for `W^{1,p}`, `1 < p < ∞`, with the bound in
   dimension `d ≥ 1` (`[Nontrivial V]`) and the weak derivatives along the orthonormal basis
   `e_i = Rd.gridBasis V i`: `Rd.BoundedLipschitzDomain.exists_extendsSobolev (hp1 : 1 < p)
   (hp : p ≠ ∞) : ∃ C, C ≠ ∞ ∧ Rd.ExtendsSobolev p Ω.toOpens Ω.carrier C`, that is, every
   `f ∈ L_p(Ω)` with weak derivatives `g_i = ∂_{e_i} f ∈ L_p(Ω)` agrees almost everywhere on `Ω`
   with some `F ∈ W^{1,p}(ℝ^d)` with weak derivatives `G_i = ∂_{e_i} F` and
-  `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`. Membership form:
+  `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`. The theorem is of first order
+  and gives an extension for each `f`; a bounded linear extension operator and `p ∈ {1, ∞}` are
+  not formalised. Membership form:
   `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev (hp1) (hp) (f : V → ℂ) :
   MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p volume, MemSobolev 1 F ∧
   (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f`, and the direction
@@ -365,19 +369,21 @@ boundary traces at `L = 2`, `p = q = 2`, `s = 1/2` (`Ω.boundaryTrace ψ two_ne_
 * `Rd.BoundedLipschitzDomain.traceKer Ω`, the common kernel of the chart traces, a closed
   subspace; `Rd.BoundedLipschitzDomain.mem_traceKer_iff`: for every resolution of unity `ψ`,
   `u ∈ traceKer Ω` iff `Ω.boundaryTrace ψ two_ne_top 2 (toL2 u) =ᶠ[Ω.aeBoundary] 0`.
-* `Rd.BoundedLipschitzDomain.TraceSpace Ω := (traceKer Ω)ᗮ`, the space `H^{1/2}(Γ)`, with
-  `Rd.BoundedLipschitzDomain.trace Ω : Ω.SobolevOne →L[ℂ] TraceSpace Ω`, the orthogonal
-  projection, and `Rd.BoundedLipschitzDomain.extend Ω : TraceSpace Ω →L[ℂ] Ω.SobolevOne`, the
-  inclusion: `trace_extend` (`γ ∘ E = id`), `norm_trace_apply_le`, `norm_extend_apply`,
+* `Rd.BoundedLipschitzDomain.TraceSpace Ω := (traceKer Ω)ᗮ`, the definition of the space
+  `H^{1/2}(Γ)`, with `Rd.BoundedLipschitzDomain.trace Ω : Ω.SobolevOne →L[ℂ] TraceSpace Ω`, the
+  orthogonal projection, and `Rd.BoundedLipschitzDomain.extend Ω : TraceSpace Ω →L[ℂ] Ω.SobolevOne`,
+  the inclusion: `trace_extend` (`γ ∘ E = id`), `norm_trace_apply_le`, `norm_extend_apply`,
   `ker_trace` (the kernel of `γ` is `traceKer Ω`), `sub_extend_trace_mem`, and
   `quotientEquivTraceSpace Ω : (Ω.SobolevOne ⧸ traceKer Ω) ≃ₗᵢ[ℂ] TraceSpace Ω`, the quotient
-  `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)`.
+  `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)`. These operator statements hold by the definition of the trace space
+  as an orthogonal complement (Mathlib's projection and quotient lemmas).
 * The functions of `H^{1/2}(Γ)`, for every resolution of unity `ψ`:
   `Rd.BoundedLipschitzDomain.trace_eq_iff` (`γ u = γ u'` iff the boundary traces agree almost
   everywhere on `Γ`), `memBoundaryBesov_extend` (the boundary trace of `E t` lies in
   `B^{1/2}_{2,2}(Γ)`), `exists_traceSpace_of_memBoundaryBesov` (every `g ∈ B^{1/2}_{2,2}(Γ)` is
   the boundary trace of some `E t`), `boundaryTrace_extend_eventuallyEq_iff` (`t` is determined
-  by the boundary trace of `E t`).
+  by the boundary trace of `E t`). This link to `B^{1/2}_{2,2}(Γ)` is qualitative: a norm
+  equivalence of `H^{1/2}(Γ)` with `B^{1/2}_{2,2}(Γ)` is not formalised.
 * `H^{-1/2}(Γ)`: `Rd.BoundedLipschitzDomain.DualTraceSpace Ω := StrongDual ℂ (TraceSpace Ω)`,
   `Rd.BoundedLipschitzDomain.dualTraceEquiv Ω : DualTraceSpace Ω ≃ₗᵢ⋆[ℂ] TraceSpace Ω` (Riesz,
   `dualTraceEquiv_apply`, uniqueness `eq_dualTraceEquiv_of_forall`), and
@@ -514,11 +520,13 @@ Marcinkiewicz interpolation
 `Rd.IsCZFamily.eLpNorm_sum_conv_le`) (blueprint chapter *Sobolev spaces on `ℝ^d`*, block document
 [Sobolev spaces on `ℝ^d`](SobolevRd.md)).
 
-The square function theorem `L_p = F^0_{p,2}` on `ℝ^d`,
-`d = dim V ≥ 1`, `1 < p < ∞`, is formalised with equivalent norms and explicit constants in both
-directions (`Rd.triebelLizorkinNorm_zero_two_le`, `Rd.enorm_le_triebelLizorkinNorm_zero_two`,
+The square function theorem `L_p = F^0_{p,2}` on `ℝ^d`, `d = dim V ≥ 1`, `1 < p < ∞`, is
+formalised as the two-sided bound of `‖f‖_{F^0_{p,2}}` (by definition the `L_p` norm of the
+square function) in terms of `‖f‖_p`, with named constants (formulas in Schwartz seminorms of
+fixed kernels, proved finite) in both directions
+(`Rd.triebelLizorkinNorm_zero_two_le`, `Rd.enorm_le_triebelLizorkinNorm_zero_two`,
 `Rd.triebelLizorkinSpace_zero_two_eq_top`), and so is `W^m_p = F^m_{p,2}` for `1 < p < ∞`
-(`Rd.memSobolev_iff_memTriebelLizorkin`), with explicit constants
+(`Rd.memSobolev_iff_memTriebelLizorkin`), with named constants of the same kind
 (`Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv`,
 `Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin`) and, for `m ≥ 1`, the Besov sandwich
 `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}` (`Rd.memSobolev_of_memApprox`,
@@ -678,11 +686,13 @@ File `FunctionSpaces/Rd/TraceKernel.lean`, namespace `Rd.BoundedLipschitzDomain`
 * **Statements on `Ω` are qualitative.** The extension theorem for bounded Lipschitz domains
   (Rychkov's extension, assembled with a resolution of unity) and the trace theorem carry
   existential constants, so the statements on `Ω` are equivalences of membership, and the
-  extension bound for `W^{1,p}` (Section 4.3) is `∃ C, C ≠ ∞ ∧ …`. The norm
-  statements on `Ω` have constant `1`: the restriction bound, and on the trace space the trace,
-  the extension and the quotient isometry `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)` (Section 4.6). The trace
-  into `L_2(Γ)` has an existential constant (Section 4.8). Norm equivalences with explicit
-  constants hold on `V` (Sections 4.1 and 4.2).
+  extension bound for `W^{1,p}` (Section 4.3) is `∃ C, C ≠ ∞ ∧ …`. The norm statements on `Ω`
+  have constant `1`: the restriction bound, and on the trace space the trace, the extension and
+  the quotient isometry `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)` (Section 4.6), which hold by the definition
+  of `H^{1/2}(Γ)` as the orthogonal complement of the trace kernel; its link with
+  `B^{1/2}_{2,2}(Γ)` is qualitative, without a norm comparison. The trace into `L_2(Γ)` has an
+  existential constant (Section 4.8). Norm equivalences with explicit constants hold on `V`
+  (Sections 4.1 and 4.2).
 * **`H^s(Ω)` is the restriction space**, the definition of Chandler-Wilde, Hewett and Moiola (the
   proposal cites their §3.1.4). Rellich's theorem then holds on every bounded set. Every function
   of `H^1(Ω)` lies in the weak-derivative space `W^1_2(Ω)`, on every open set
@@ -805,8 +815,8 @@ Section 4.12, and `ker γ = H^1_0(Ω)`, with its Lean names in Section 4.13.
   `H^s(ℝ^d)` (CWHM, Theorem 3.3; `Rd.dualEquiv`, `Rd.dualRestrictionEquiv`), and
   `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` (`Rd.dualZeroBoundaryEquiv`). File
   `FunctionSpaces/Rd/SobolevDuality.lean`.
-* **The trace space (formalised, Section 4.6).** `H^{1/2}(Γ)` as the orthogonal complement of
-  the kernel of the trace in `H^1(Ω)` (`Rd.BoundedLipschitzDomain.TraceSpace`), with the trace as
+* **The trace space (formalised, Section 4.6).** `H^{1/2}(Γ)` defined as the orthogonal complement
+  of the kernel of the trace in `H^1(Ω)` (`Rd.BoundedLipschitzDomain.TraceSpace`), with the trace as
   orthogonal projection and the extension as inclusion (both of norm at most one;
   `Rd.BoundedLipschitzDomain.trace`, `Rd.BoundedLipschitzDomain.extend`),
   `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)` (`Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`), and

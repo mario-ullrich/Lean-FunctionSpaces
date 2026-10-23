@@ -502,7 +502,13 @@ end ModNormOn
 
 /-- A **Besov domain**: a closed convex set with nonempty interior on which every function of
 finite intrinsic Besov quasi-norm agrees with a function on `V` whose Besov quasi-norm is bounded
-by a constant times the intrinsic one, for `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`. -/
+by a constant times the intrinsic one, for `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`. The
+extension is a field of the class, so the class is a hypothesis; its instances are `univ`, the
+closed half-space and the models of manifolds (`Rd.BesovDomain.univ`,
+`Rd.BesovDomain.closedHalfSpace`, `Rd.BesovDomain.range_euclideanHalfSpace`,
+`Rd.BesovDomain.range_of_boundaryless`). The class consists of closed convex sets, so non-convex
+domains lie outside it; among the convex ones, closed balls, cubes and quadrants are not yet proved
+instances. -/
 class BesovDomain (Ω : Set V) : Prop where
   convex : Convex ℝ Ω
   isClosed : IsClosed Ω

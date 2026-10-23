@@ -16,7 +16,9 @@ Let `ι : Y → X` satisfy Jackson's and Bernstein's inequalities of order `r > 
 
 `A^s_q = (X, Y)_{s/r, q}`   with equivalent norms
 
-(DeVore–Lorentz, Chapter 7, Theorem 9.1; Pietsch).  The two halves:
+(DeVore–Lorentz, Chapter 7, Theorem 9.1; Pietsch), where `(X, Y)_{s/r, q}` is the discrete
+K-method on the grid `t = 2^(-kr)` (`ApproximationScheme.MemInterp`).  The equivalence with the
+continuous K-method `(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)` is not formalised.  The two halves:
 
 * **Jackson** (`approxNormDyadic_le_interpNorm_of_jackson`):
   `E_n(f) ≤ max(1, C) K(n^(-r), f)` (`approxSeq_le_kFunctional_of_jackson`), so at the
@@ -191,7 +193,8 @@ theorem interpNorm_le_approxNormDyadic_of_bernstein (hB : LiftBound ι A r C) (h
     _ = reprConst C r s * N := by simp only [reprConst, K, Cr]; ring
 
 /-- **The representation theorem**: under Jackson's and Bernstein's inequalities of order `r`
-and for `0 < s < r`, `f ∈ A^s_q` if and only if `f ∈ (X, Y)_{s/r,q}`. -/
+and for `0 < s < r`, `f ∈ A^s_q` if and only if `f ∈ (X, Y)_{s/r,q}`, the real interpolation
+space of the discrete K-method on the grid `t = 2^(-kr)`. -/
 theorem memApprox_iff_memInterp {C₁ C₂ : ℝ} (hJ : JacksonBound ι A r C₁) (hC₁ : 0 ≤ C₁)
     (hB : LiftBound ι A r C₂) (hC₂ : 0 ≤ C₂) (hs : 0 < s) (hsr : s < r) (hq : 1 ≤ q) {f : X} :
     A.MemApprox s q f ↔ MemInterp ι (s / r) r q f := by

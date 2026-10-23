@@ -214,7 +214,8 @@ theorem sub_restrictProj_mem (U : H^{s}(V)) :
   rwa [Submodule.orthogonal_orthogonal] at h
 
 /-- **`H^s(Ω)` as a quotient**: `H^s(V) ⧸ vanishOn s Ω` is isometrically isomorphic to
-`H^s(Ω)` (Mathlib's `Submodule.quotientEquivOrthogonal`). -/
+`H^s(Ω)`. This holds by the definition of `H^s(Ω)` as an orthogonal complement (Mathlib's
+`Submodule.quotientEquivOrthogonal`). -/
 noncomputable def quotientEquivRestrictionSpace (s : ℝ) (Ω : Opens V) :
     (H^{s}(V) ⧸ vanishOn s Ω) ≃ₗᵢ[ℂ] RestrictionSpace s Ω :=
   Submodule.quotientEquivOrthogonal _

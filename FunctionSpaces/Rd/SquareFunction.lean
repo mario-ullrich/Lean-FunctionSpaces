@@ -13,8 +13,10 @@ public import FunctionSpaces.Rd.TriebelLizorkin
 
 Let `V` have dimension `n ≥ 1` and `1 < p < ∞`. The **square function** of `f ∈ L_p(V)` is
 `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}`, and its `L_p` norm is the Triebel–Lizorkin norm
-`‖f‖_{F^0_{p,2}}` (`Rd.triebelLizorkinNorm_zero_two_eq`). The square function theorem says
-that it is equivalent to `‖f‖_p`, with explicit constants:
+`‖f‖_{F^0_{p,2}}` by definition (`Rd.triebelLizorkinNorm_zero_two_eq`). The square
+function theorem is the two-sided bound of this norm by `‖f‖_p`, with named constants,
+formulas in the Schwartz seminorms of the fixed blocks and synthesis kernels that are proved
+finite (`Rd.squareFunctionConst_ne_top`, `Rd.squareSynthesisConst_ne_top`):
 
 * `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p` (`Rd.triebelLizorkinNorm_zero_two_le`, constant
   `Rd.squareFunctionConst`): the analysis bound of the Calderón–Zygmund family `(ψ_j)_j`;
@@ -75,8 +77,8 @@ theorem squareSynthesisConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ �
 
 omit [Fact (1 ≤ p)] in
 /-- **The norm of `F^0_{p,2}` is the `L_p` norm of the square function**:
-`‖f‖_{F^0_{p,2}} = ‖ x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2} ‖_p`, the case `q = 2` of
-`Rd.triebelLizorkinNorm_zero_left`. -/
+`‖f‖_{F^0_{p,2}} = ‖ x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2} ‖_p`, the definition of the norm, unfolded as
+the case `q = 2` of `Rd.triebelLizorkinNorm_zero_left`. -/
 theorem triebelLizorkinNorm_zero_two_eq (f : Lp ℂ p (volume : Measure V)) :
     triebelLizorkinNorm 0 2 f =
       eLpNorm (fun x => lqNorm 2 fun j => ‖blockFun j f x‖ₑ) p volume :=

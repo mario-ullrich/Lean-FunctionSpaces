@@ -1263,6 +1263,10 @@ numbers $\lambda > 0$ and $C$ with
 Every growth bound has $C \geq 1$.
 \end{definition}
 
+Growth bounds enter the regularity theorems as hypotheses; \Cref{prop:daub-transfer-two} and
+\Cref{prop:daub-transfer-three} prove them for $N = 2$ and $N = 3$, and a crude bound holds for
+every $N$ (\Cref{prop:daub-symbol-product-integrable}).
+
 \begin{lemma}[Integrals under a growth bound]
 \label{lem:daub-growth-integrals}
 \lean{Daubechies.prod_daubFun_nonneg, Daubechies.continuous_prod_daubFun,
@@ -4911,6 +4915,9 @@ Daubechies mask has a \emph{Bernstein bound} of order $\theta$ in $L_p$ with dif
 $r$ if there is a constant $K < \infty$ with $\omega_r(\varphi, t)_p \leq K t^\theta$ for every
 $t \in (0, 1]$. A Bernstein bound of order $\theta$ is one of every order $\theta_1 \leq \theta$.
 \end{definition}
+
+Bernstein bounds enter the characterisation by Daubechies coefficients as a hypothesis;
+\Cref{prop:daub-bernstein-bounds} proves them from the regularity of $\varphi$.
 
 \begin{proposition}[Bernstein bounds from the regularity of $\varphi$]
 \label{prop:daub-bernstein-bounds}

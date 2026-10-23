@@ -25,7 +25,9 @@ The **real interpolation space** `(X, Y)_{θ,q}`, `0 < θ < 1`, consists of the 
 The usual definition takes `ρ = 1` and all `k ∈ ℤ`; the terms with `k < 0` (that is `t > 1`)
 are controlled by `‖f‖` since `K(t, f) ≤ ‖f‖`, which is why `‖f‖` appears here.  A scale
 `ρ > 0` of the dyadic grid is allowed because the representation theorem produces the grid
-`t = 2^(-kr)`; different scales give equivalent norms, which is not needed here.
+`t = 2^(-kr)`.  So `MemInterp` is the **discrete K-method** on the grid `t = 2^(-kρ)`; its
+equivalence with other scales and with the continuous K-method
+`(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)` is not formalised.
 -/
 
 @[expose] public section
@@ -123,7 +125,8 @@ noncomputable def interpNorm (θ ρ : ℝ) (q : ℝ≥0∞) (f : X) : ℝ≥0∞
   ‖f‖ₑ + lqNorm q (interpSeq ι θ ρ f)
 
 variable (ι) in
-/-- `f` belongs to the **real interpolation space** `(X, Y)_{θ,q}`. -/
+/-- `f` belongs to the **real interpolation space** `(X, Y)_{θ,q}` of the discrete K-method on
+the grid `t = 2^(-kρ)`: `‖f‖ + ‖(2^(kρθ) K(2^(-kρ), f))_k‖_{ℓ_q} < ∞`. -/
 def MemInterp (θ ρ : ℝ) (q : ℝ≥0∞) (f : X) : Prop := interpNorm ι θ ρ q f < ∞
 
 variable {θ ρ : ℝ} {q : ℝ≥0∞}

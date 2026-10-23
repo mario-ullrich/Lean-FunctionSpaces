@@ -198,7 +198,9 @@ variable (V) in
 /-- A **bounded Lipschitz domain** (Stein; Triebel; Schneider–Vybíral, Remark 3.2): a bounded open
 set whose boundary is covered by finitely many open balls `B_j`, centred on the boundary, with
 `B_j ∩ Ω = B_j ∩ Ω_j` for Lipschitz graph domains `Ω_j`; the free direction of each graph domain
-replaces the rotations of the usual definition. -/
+replaces the rotations of the usual definition. The structure carries the balls and the graph
+domains as data; a constructor from the set-level definition and concrete instances are not
+formalised. -/
 structure BoundedLipschitzDomain where
   /-- The domain. -/
   carrier : Set V

@@ -234,8 +234,9 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   inequality `‖a‖_r ≲ n^(D(1/p-1/r)) ‖a‖_p` it implies.
 * `FunctionSpaces.Besov.Embeddings`: the Besov embeddings into `B^{s-α}_{r,q}`, `L_∞` and
   bounded continuous functions.
-* `FunctionSpaces.Sobolev.Embeddings`: Sobolev spaces as smoothness spaces for a scheme, the
-  Sobolev embedding `W^s_p ↪ W^t_r` and the embedding into bounded continuous functions.
+* `FunctionSpaces.Sobolev.Embeddings`: Sobolev spaces for a scheme as a hypothesis structure
+  (smoothness spaces), the Sobolev embedding `W^s_p ↪ W^t_r` and the embedding into bounded
+  continuous functions.
 * `FunctionSpaces.Torus.Measure`: Mathlib's normalised Haar measure on the torus as a scoped
   instance, `open scoped TorusHaar`.
 * `FunctionSpaces.Torus.Scheme`: trigonometric polynomials of degree `< n` and their scheme
@@ -650,8 +651,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Rd.BoundaryTraceSpace`: `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` with explicit
   constants, the trace of `H^1(ℝ^d)` on a Lipschitz graph and the chart traces of `H^1(Ω)` on a
   bounded Lipschitz domain as bounded operators, the trace kernel, the trace space `H^{1/2}(Γ)`
-  of the boundary `Γ` as its orthogonal complement with the trace and extension operators, and
-  its dual `H^{-1/2}(Γ)`.
+  of the boundary `Γ`, defined as its orthogonal complement, with the trace and extension
+  operators, and its dual `H^{-1/2}(Γ)`.
 * `FunctionSpaces.Rd.LipschitzGraphArea`: the area formula for Lipschitz graphs: the image of a
   measurable set `A` of the hyperplane under the graph map has `(n-1)`-dimensional Euclidean
   Hausdorff measure `∫_A √(1 + ‖∇φ‖²)`, where `n = dim V`; the outward unit normal of a Lipschitz
@@ -698,19 +699,19 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   explicit constants: Plancherel for `p = 2`, Marcinkiewicz interpolation for `p < 2` and
   duality with the adjoint family for `p > 2`.
 * `FunctionSpaces.Rd.SquareFunction`: the square function theorem `L_p = F^0_{p,2}` for
-  `1 < p < ∞`, with explicit constants in both directions, and the reproducing formula
+  `1 < p < ∞`, with named constants in both directions, and the reproducing formula
   `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p` with the synthesis kernels `ψ̃_j`.
 * `FunctionSpaces.Rd.DerivativeKernels`: the block `ψ_1` as a sum of derivatives of order `m` of
   Schwartz kernels, `ψ_1 = ∑_i ∂_{e_{i_0}} ⋯ ∂_{e_{i_{m-1}}} η_i`, the Fourier transforms of
   iterated derivatives, and the Calderón–Zygmund families of the dilated derivative kernels and of
   the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels.
 * `FunctionSpaces.Rd.SobolevTriebelLizorkin`: the Sobolev spaces `W^m_p = F^m_{p,2}` for
-  `1 < p < ∞` with explicit constants in both directions, and, for `m ≥ 1`, the Besov sandwich
+  `1 < p < ∞` with named constants in both directions, and, for `m ≥ 1`, the Besov sandwich
   `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}`.
 * `FunctionSpaces.Rd.SobolevEmbedding`: continuity of convolutions of integrable bounded
   kernels with `L_p` functions, the Nikolskii inequality for the Littlewood–Paley blocks, the
   Besov embeddings into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions for
-  `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with explicit
+  `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with named
   constants.
 * `FunctionSpaces.Rd.UniformSchwartzFamilies`: uniform Schwartz families under continuous linear
   maps, the shifted Bessel symbols `(ε + ‖ζ‖²)^{σ/2}`, the Bessel kernels

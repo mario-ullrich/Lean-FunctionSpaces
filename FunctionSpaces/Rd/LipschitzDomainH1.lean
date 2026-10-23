@@ -24,6 +24,8 @@ only on the values of `f` on `Ω` (`Rd.BoundedLipschitzDomain.MemSobolevOn.congr
   on `Ω` (`Rd.BoundedLipschitzDomain.modNormOn_le_modNorm_of_ae_eq`).
 * **The weak gradient** (`Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`): every
   `f ∈ H^1(Ω)` lies in `W^1_2(Ω)`, so its weak derivatives on `Ω` exist and lie in `L_2(Ω)`.
+  This direction holds by the definition through extensions; the converse is the extension
+  theorem (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`).
 * **The trace**: every `f ∈ H^1(Ω)` has a boundary trace in `B^{1/2}_{2,2}(Γ)`, unique almost
   everywhere on `Γ` (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memSobolevOn`,
   `Rd.BoundedLipschitzDomain.MemSobolevOn.isBoundaryTrace_unique`), and the boundary traces of the
@@ -68,9 +70,11 @@ variable (Ω : BoundedLipschitzDomain V)
 /-- **The Sobolev space `H^1(Ω)`** of a bounded Lipschitz domain, as the space of restrictions:
 `f ∈ L_2(V)` lies in `H^1(Ω)` if `f = F` almost everywhere on `Ω` for some `F ∈ W^1_2(V)`, which is
 Mathlib's `H^1(V)` (`Rd.memSobolev_one_iff`). Only the values of `f` on `Ω` matter
-(`Rd.BoundedLipschitzDomain.MemSobolevOn.congr_ae`). Every such `f` lies in the Sobolev space
-`W^1_2(Ω)` of weak derivatives on `Ω` (`Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`);
-the two spaces agree by the extension theorem of Calderón and Stein (Stein 1970, Chapter VI). -/
+(`Rd.BoundedLipschitzDomain.MemSobolevOn.congr_ae`). By this definition every such `f` lies in
+the Sobolev space `W^1_2(Ω)` of weak derivatives on `Ω`
+(`Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`); the converse is the extension theorem
+of Calderón and Stein (Stein 1970, Chapter VI;
+`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`). -/
 def MemSobolevOn (f : Lp ℂ 2 (volume : Measure V)) : Prop :=
   ∃ F : Lp ℂ 2 (volume : Measure V), MemSobolev 1 F ∧
     (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f
