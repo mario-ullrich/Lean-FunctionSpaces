@@ -16,8 +16,10 @@ graph of `φ` over the hyperplane `H = e^⊥` (`Rd.LipschitzGraph.hyperplane`), 
 (`Rd.LipschitzGraph.finrank_hyperplane_add_one`), with `H^⊥ = ℝ e`
 (`Rd.LipschitzGraph.orthogonal_hyperplane`) and the Lebesgue measure of its inner product.
 The **graph map** `γ(x') = x' + φ(x') e` (`Rd.LipschitzGraph.graphMap`) satisfies `P(γ x') = x'`
-for the orthogonal projection `Px = x - ⟪x, e⟫ e` onto `H` (`Rd.LipschitzGraph.proj`), and it is
-Lipschitz with constant `1 + M` (`Rd.LipschitzGraph.norm_graphMap_sub_le`).
+for the orthogonal projection `Px = x - ⟪x, e⟫ e` onto `H` (`Rd.LipschitzGraph.proj`, from the
+formula for the projection onto the hyperplane of any unit vector,
+`Rd.coe_orthogonalProjectionOnto_orthogonalComplement_singleton`), and it is Lipschitz with
+constant `1 + M` (`Rd.LipschitzGraph.norm_graphMap_sub_le`).
 
 **Traces of atoms** (`Rd.LipschitzGraph.isRegularAtom_comp_graphMap`): a continuous `a` on `V`
 that vanishes outside `B̄(c, d 2^(-j))`, with `|a| ≤ A` and `|a(x + h) - a(x)| ≤ A min(1, 2^j ‖h‖)`,
@@ -42,6 +44,15 @@ theorem min_one_mul_le {K : ℝ≥0∞} (hK : 1 ≤ K) (t : ℝ≥0∞) : min 1 
     exact min_le_right _ _
   · rw [min_eq_left ht, mul_one]
     exact (min_le_left _ _).trans hK
+
+/-- The orthogonal projection onto the hyperplane `ν^⊥` of a unit vector `ν` is
+`P w = w - ⟪ν, w⟫ ν`: the identity minus Mathlib's projection onto the line `ℝ ν`
+(`Submodule.starProjection_unit_singleton`). -/
+theorem coe_orthogonalProjectionOnto_orthogonalComplement_singleton {V : Type*}
+    [NormedAddCommGroup V] [InnerProductSpace ℝ V] {ν : V} (hν : ‖ν‖ = 1) (w : V) :
+    ((ℝ ∙ ν)ᗮ.orthogonalProjectionOnto w : V) = w - inner ℝ ν w • ν := by
+  rw [Submodule.orthogonalProjectionOnto_orthogonal, Submodule.coe_mk,
+    Submodule.starProjection_unit_singleton ℝ hν]
 
 namespace LipschitzGraph
 
@@ -92,11 +103,7 @@ noncomputable def proj : V →L[ℝ] Ω.hyperplane := Ω.hyperplane.orthogonalPr
 
 /-- `Px = x - ⟪x, e⟫ e`. -/
 theorem coe_proj (x : V) : (Ω.proj x : V) = x - inner ℝ x Ω.e • Ω.e := by
-  rw [proj, Submodule.coe_orthogonalProjectionOnto_apply]
-  refine Submodule.eq_starProjection_of_mem_of_inner_eq_zero (Ω.sub_inner_smul_mem x)
-    fun w hw => ?_
-  rw [sub_sub_cancel, real_inner_smul_left,
-    Submodule.mem_orthogonal_singleton_iff_inner_right.1 hw, mul_zero]
+  rw [proj, coe_orthogonalProjectionOnto_orthogonalComplement_singleton Ω.norm_e, real_inner_comm]
 
 /-- For `a ∈ H`, `⟪a, v⟫ = ⟪a, Pv⟫`: Mathlib's
 `Submodule.inner_orthogonalProjectionOnto_eq_of_mem_left`. -/

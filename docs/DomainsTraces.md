@@ -13,7 +13,8 @@ the trace theorem holds for every `s > 0`. Compact manifolds with boundary carry
 the charts of a Besov atlas; the invariance under changes of variables makes them independent of
 the atlas, and the trace theorem of the half-space carries over to the boundary for every
 `s > 0`. Smooth bounded domains are such manifolds, and their chart spaces are the intrinsic
-Besov spaces.
+Besov spaces. In finite dimension the bounded Lipschitz domains are the sets of the usual
+definition by local Lipschitz graphs, the open balls among them.
 
 On a bounded Lipschitz domain, `H^1` is the space of restrictions of `H^1(ℝ^d)`, with weak
 derivatives in `L_2` of the domain and boundary traces in `B^{1/2}_{2,2}` of the boundary. On every
@@ -71,8 +72,11 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
 * **Besov spaces on bounded Lipschitz domains by intrinsic differences.** Let `Ω ⊆ V` be a bounded
   Lipschitz domain: a bounded open set whose boundary is covered by finitely many open balls `B_j`,
   centred on the boundary, with `B_j ∩ Ω = B_j ∩ Ω_j` for Lipschitz graph domains `Ω_j`
-  (`Rd.BoundedLipschitzDomain`, a structure that carries the balls and graph domains as data; a
-  constructor from the set-level definition and concrete instances are not formalised). For
+  (`Rd.BoundedLipschitzDomain`, a structure that carries the balls and graph domains as data).
+  Every bounded open set that agrees near each boundary point with the region above a Lipschitz
+  graph in some direction (the usual definition, `Rd.IsBoundedLipschitzDomain`) is the carrier of
+  such a structure, and conversely (`Rd.isBoundedLipschitzDomain_iff_exists`); every open ball is
+  such a carrier (`Rd.BoundedLipschitzDomain.ball`). For
   `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`, `f ∈ L_p(V)` agrees on `Ω` with some `F ∈ L_p(V)`
   with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, and the same condition describes the
@@ -146,9 +150,9 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   `f ∈ L_p(closure Ω)` lies in the Besov space `B^s_{p,q}` of this manifold iff
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
   (`Rd.SmoothDomain.memBesov_iff_modNormOn_lt_top`): the descriptions by charts, by intrinsic
-  differences and as restrictions of `B^s_{p,q}(ℝ^n)` coincide. Like `Rd.BoundedLipschitzDomain`,
-  `Rd.SmoothDomain` carries its charts as data; a constructor from the set-level definition and
-  concrete instances are not formalised.
+  differences and as restrictions of `B^s_{p,q}(ℝ^n)` coincide. `Rd.SmoothDomain` carries its
+  charts as data; a constructor from the set-level definition and concrete instances are not
+  formalised.
 * **Besov spaces on the boundary of a compact manifold.** Let `M` be a compact smooth manifold
   with boundary modelled on the half-space `{y ∈ ℝ^n : y_0 ≥ 0}`. The changes of charts map the
   boundary hyperplane `H₀ = {y_0 = 0}` into itself (`Manifold.coordChange_mem_bdry`), and their
@@ -483,6 +487,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Gauss–Green on Lipschitz graph domains: product coordinates and Fubini, ray integrals, integrals of line derivatives of Lipschitz functions, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and surface form, the product rule for line derivatives, and Green's formula `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)` | ✅ | ✗ | `Domains/Sobolev/LipschitzGraphGreen` |
 | Green's formula on bounded Lipschitz domains: integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary, the chart form for every resolution of unity, the outward unit normal as the chart normal and a unit vector almost everywhere on the boundary, `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, the traces from both sides of a graph, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u` vanishes | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainGreen` |
 | The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, smoothing with compact support, bump mollifiers and cone mollifiers, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)` | ✅ | ✗ | `Domains/Traces/TraceKernel` |
+| Bounded Lipschitz domains from the set-level definition: sets Lipschitz near a point, local graphs as Lipschitz graph domains, McShane's extension of local graphs, the structure from finitely many charts and the converse, the ball | ✅ | ✗ | `Domains/Lipschitz/LocalLipschitzGraphs` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

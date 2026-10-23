@@ -322,14 +322,17 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 * **Besov spaces on bounded Lipschitz domains by intrinsic differences.** Let `Ω ⊆ V` be a bounded
   Lipschitz domain: a bounded open set whose boundary is covered by finitely many open balls
   `B_j`, centred on the boundary, with `B_j ∩ Ω = B_j ∩ Ω_j` for Lipschitz graph domains `Ω_j`
-  (`Rd.BoundedLipschitzDomain`, a structure that carries the balls and graph domains as data; a
-  constructor from the set-level definition and concrete instances are not formalised), and let
-  `ω_r(f, t, Ω)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_{L_p(Ω_{rh})}` with
+  (`Rd.BoundedLipschitzDomain`, a structure that carries the balls and graph domains as data), and
+  let `ω_r(f, t, Ω)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_{L_p(Ω_{rh})}` with
   `Ω_{rh} = {x : x, x + h, …, x + rh ∈ Ω}`. For `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`,
   `f ∈ L_p(V)` agrees on `Ω` with some `F ∈ L_p(V)` with
   `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
   (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`).
+  Every bounded open set that agrees near each boundary point with the region above a Lipschitz
+  graph in some direction (the usual definition, `Rd.IsBoundedLipschitzDomain`) is the carrier of
+  such a structure, and conversely (`Rd.isBoundedLipschitzDomain_iff_exists`); every open ball is
+  such a carrier (`Rd.BoundedLipschitzDomain.ball`).
 * **`H^1` on bounded Lipschitz domains.** On a bounded Lipschitz domain `Ω` with boundary `Γ`,
   `H^1(Ω)` consists of the `f ∈ L_2(V)` that agree on `Ω` with a function of `H^1(V)`
   (`Rd.BoundedLipschitzDomain.MemSobolevOn`); for every order `r ≥ 2`, `f ∈ H^1(Ω)` iff
@@ -446,9 +449,8 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   everywhere with those of the trace `Tr_A f` of some `f ∈ B^{s+1/p}_{p,q}(M)`
   (`Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace`). For the closure of a smooth
   bounded domain this is the trace theorem on its boundary for every `s > 0` (`Rd.SmoothDomain`,
-  a bounded Lipschitz domain with smooth graph functions as data; like
-  `Rd.BoundedLipschitzDomain` it has no constructor from the set-level definition and no
-  concrete instance yet).
+  a bounded Lipschitz domain with smooth graph functions as data, with no constructor from the
+  set-level definition and no concrete instance yet).
 
 ## What is formalised
 
@@ -494,8 +496,8 @@ that library builds itself.
 
 ## What is left to do
 
-* **Lipschitz domains as sets**: a constructor of `Rd.BoundedLipschitzDomain` from the set-level
-  definition, with the ball and bounded convex sets as instances.
+* **Lipschitz domains as sets**: bounded open convex sets as bounded Lipschitz domains; the ball,
+  and bounded open sets with smooth local graphs, as smooth domains (`Rd.SmoothDomain`).
 * **Interpolation**: the continuous K-method, so that the representation theorem reads
   `A^s_q = (X, Y)_{s/r,q}`; the interpolation property of the K-method (an operator bounded on
   both spaces of a couple is bounded on its interpolation spaces) and reiteration.
@@ -606,6 +608,8 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * L. Grafakos, *Classical Fourier Analysis*, 3rd ed., Graduate Texts in Mathematics **249**,
   Springer, 2014. Littlewood–Paley theory, vector-valued singular integrals and Marcinkiewicz
   interpolation.
+* P. Grisvard, *Elliptic Problems in Nonsmooth Domains*, Monographs and Studies in Mathematics
+  **24**, Pitman, 1985. The usual definition of Lipschitz domains by local graphs.
 * N. Guglielmi, V. Yu. Protasov, *Invariant polytopes of linear operators with applications to
   regularity of wavelets and of subdivisions*, SIAM J. Matrix Anal. Appl. **37** (2016), no. 1,
   18–52, [arXiv:1502.01192](https://arxiv.org/abs/1502.01192). Hölder exponents of the

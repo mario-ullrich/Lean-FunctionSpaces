@@ -28,7 +28,8 @@ they are described by intrinsic differences, by pasting local extensions
 (\Cref{thm:local-extension} and \Cref{thm:bounded-lipschitz-besov}). The area formula for Lipschitz graphs
 (\Cref{thm:lipschitz-graph-area}) expresses the Euclidean Hausdorff measure of the boundary in a
 chart, and \Cref{sec:surface-measure} builds from it the surface measure, $L_2(\Gamma)$ and the
-traces into it.
+traces into it. \Cref{sec:local-lipschitz-graphs} shows that the bounded Lipschitz domains are
+the sets of the usual definition by local Lipschitz graphs, with the open balls as examples.
 
 \section{Lipschitz graph domains}
 
@@ -474,7 +475,7 @@ The extension operator of \Cref{thm:graph-extension} is the case $U = W = T = \O
 \label{def:bounded-lipschitz}
 \lean{Rd.BoundedLipschitzDomain, Rd.BoundedLipschitzDomain.inter_ball_eq,
   Rd.BoundedLipschitzDomain.measurableSet, Rd.BoundedLipschitzDomain.isCompact_closure,
-  Rd.BoundedLipschitzDomain.isCompact_frontier}
+  Rd.BoundedLipschitzDomain.isCompact_frontier, Rd.isCompact_frontier_of_isBounded}
 \leanok
 \uses{def:lipschitz-graph}
 A bounded Lipschitz domain is a bounded open set $\Omega \subseteq V$ with finitely many open balls
@@ -484,8 +485,9 @@ Lipschitz graph domains $\Omega_j$ with $B_j \cap \Omega = B_j \cap \Omega_j$.
 
 This is the definition of Stein and Triebel, as in \cite[Remark 3.2]{SchneiderVybiral}; the
 direction $e_j$ of each graph domain replaces the rotations. In Lean the balls and the graph
-domains are data of the structure; a constructor from the set-level definition and concrete
-instances such as balls are not formalised.
+domains are data of the structure. In finite dimension the carriers of these structures are
+exactly the sets of the usual definition, and the open balls are among them
+(\Cref{thm:bounded-lipschitz-sets} and \Cref{thm:ball-lipschitz}).
 
 \begin{lemma}[Shrinking and the inner margin]
 \label{lem:bounded-lipschitz-geometry}
@@ -1467,6 +1469,214 @@ For $y \in \Gamma$, $\sum_j \psi^0_j(y) = 1$, so $\nu(y)$ is a convex combinatio
 normals $\nu_j(P_j y)$ of the charts with $\psi^0_j(y) > 0$. These agree $\sigma$-almost
 everywhere by the Gauss--Green theorem in two charts (\Cref{thm:chart-normals-agree}), so that
 $\nu = \nu_j \circ P_j$ $\sigma$-almost everywhere on $B_j$ (\Cref{thm:boundary-normal-chart}).
+
+\section{Bounded Lipschitz domains from local graphs}
+\label{sec:local-lipschitz-graphs}
+
+The bounded Lipschitz domains of \Cref{def:bounded-lipschitz} carry their balls and graph domains
+as data. This section starts from the usual definition, a condition on a set, and shows that in
+finite dimension it describes exactly the carriers of these structures; the open balls are
+examples. In this section $V$ is any real inner product space; finite dimension enters only
+through the compactness of $\partial\Omega$. For a unit vector $\nu \in V$, $P_\nu$ is the
+orthogonal projection onto the hyperplane $\nu^\perp$.
+
+\begin{definition}[Sets that are Lipschitz near a point]
+\label{def:lipschitz-near-point}
+\lean{Rd.IsLipschitzDomainAt, Rd.IsBoundedLipschitzDomain}
+\leanok
+Let $\Omega \subseteq V$ and $z \in V$. The set $\Omega$ is Lipschitz near $z$ if there are
+$r > 0$, a unit vector $\nu \in V$, $L \geq 0$ and an $L$-Lipschitz function
+$\varphi : \nu^\perp \to \R$ with
+\[
+  \Omega \cap B(z, r)
+  = \{x \in V : \varphi(P_\nu(x - z)) < \langle \nu, x - z \rangle\} \cap B(z, r) .
+\]
+The set $\Omega$ is a bounded Lipschitz set if it is open and bounded and Lipschitz near every
+$z \in \partial\Omega$.
+\end{definition}
+
+Near $z$, $\Omega$ lies above the graph of $\varphi$ in the direction $\nu$. This is the local
+condition of \cite[Definition 1.2.1.1]{Grisvard} for open sets with Lipschitz boundary, with
+boundedness added, the rotation of coordinates replaced by the direction $\nu$, and balls in place
+of hypercubes. At a boundary point $\varphi(0) = 0$, so a small cylinder around $z$ lies in the
+ball and a small ball lies in each cylinder; both forms define the same sets.
+
+\begin{lemma}[The projection onto a hyperplane]
+\label{lem:hyperplane-projection}
+\lean{Rd.coe_orthogonalProjectionOnto_orthogonalComplement_singleton,
+  Rd.norm_sub_smul_sq_eq_norm_orthogonalProjectionOnto_sq_add}
+\leanok
+For every unit vector $\nu \in V$, every $w \in V$ and every $a \in \R$,
+$P_\nu w = w - \langle \nu, w \rangle \nu$ and
+\[
+  \|w - a \nu\|^2 = \|P_\nu w\|^2 + (\langle \nu, w \rangle - a)^2 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first formula is Mathlib's projection onto a line
+(\texttt{Submodule.\allowbreak starProjection\_\allowbreak unit\_\allowbreak singleton}),
+subtracted from the identity. Then
+$w - a \nu = P_\nu w + (\langle \nu, w \rangle - a) \nu$ with $P_\nu w \perp \nu$, and Pythagoras
+gives the identity.
+\end{proof}
+
+\begin{lemma}[Local graphs and Lipschitz graph domains]
+\label{lem:local-graph-domain}
+\lean{Rd.LipschitzGraph.ofLocal, Rd.LipschitzGraph.domain_ofLocal, Rd.LipschitzGraph.localPhi,
+  Rd.LipschitzGraph.lipschitzWith_localPhi, Rd.LipschitzGraph.domain_eq_localPhi}
+\leanok
+\uses{def:lipschitz-graph, def:graph-map, lem:hyperplane-projection}
+For every $z \in V$, every unit vector $\nu \in V$, every $L \geq 0$ and every $L$-Lipschitz
+$\varphi : \nu^\perp \to \R$, the function
+$x \mapsto \langle z, \nu \rangle + \varphi(P_\nu(x - z))$ is $L$-Lipschitz and constant along
+$\nu$, and its Lipschitz graph domain with direction $\nu$ is
+$\{x \in V : \varphi(P_\nu(x - z)) < \langle \nu, x - z \rangle\}$. For every Lipschitz graph
+domain $\Omega = \{x : \psi(x) < \langle x, e \rangle\}$ with graph function $\psi$ and constant
+$M$, and every $z \in V$, the function $\psi_z(y) = \psi(z + y) - \langle z, e \rangle$ on
+$H = e^\perp$ is $M$-Lipschitz and
+\[
+  \Omega = \{x \in V : \psi_z(P_e(x - z)) < \langle e, x - z \rangle\} ,
+\]
+with $P_e$ the orthogonal projection onto $H$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$P_\nu \nu = 0$ (Mathlib's \texttt{Submodule.\allowbreak orthogonalProjectionOnto\_\allowbreak
+orthogonalComplement\_\allowbreak singleton\_\allowbreak eq\_\allowbreak zero}) gives the
+constancy along $\nu$, and $\|P_\nu y\| \leq \|y\|$ the Lipschitz bound; the domain is
+$\langle z, \nu \rangle + \varphi(P_\nu(x - z)) < \langle x, \nu \rangle$, which is the stated
+inequality. For the second statement,
+$z + P_e(x - z) = x - \langle x - z, e \rangle e$, so $\psi(z + P_e(x - z)) = \psi(x)$ since
+$\psi$ is constant along $e$.
+\end{proof}
+
+\begin{theorem}[Lipschitz near a point by graph domains]
+\label{thm:lipschitz-near-point}
+\lean{Rd.isLipschitzDomainAt_of_ball_inter_eq, Rd.IsLipschitzDomainAt.exists_ball_inter_eq,
+  Rd.isLipschitzDomainAt_iff, Rd.isLipschitzDomainAt_of_lipschitzOnWith}
+\leanok
+\uses{def:lipschitz-near-point, lem:local-graph-domain}
+For every $\Omega \subseteq V$ and every $z \in V$, $\Omega$ is Lipschitz near $z$ if and only if
+there are $r > 0$ and a Lipschitz graph domain $\Omega'$ with
+$B(z, r) \cap \Omega = B(z, r) \cap \Omega'$. For every $\Omega \subseteq V$, every $z \in V$,
+every $r > 0$, every unit vector $\nu \in V$, every $L \geq 0$ and every
+$\varphi : \nu^\perp \to \R$ that is $L$-Lipschitz on $\{y \in \nu^\perp : \|y\| < r\}$ with
+$\Omega \cap B(z, r) = \{x : \varphi(P_\nu(x - z)) < \langle \nu, x - z \rangle\} \cap B(z, r)$, the
+set $\Omega$ is Lipschitz near $z$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Both directions of the equivalence are \Cref{lem:local-graph-domain}. For the second statement,
+McShane's extension (Mathlib's \texttt{LipschitzOnWith.\allowbreak extend\_\allowbreak real})
+gives an $L$-Lipschitz $\psi : \nu^\perp \to \R$ equal to $\varphi$ on the ball of radius $r$,
+and $\|P_\nu(x - z)\| \leq \|x - z\| < r$ for $x \in B(z, r)$.
+\end{proof}
+
+So the condition can be checked with a function that is Lipschitz only on the part of the
+hyperplane that the ball sees.
+
+\begin{theorem}[Bounded Lipschitz sets and bounded Lipschitz domains]
+\label{thm:bounded-lipschitz-sets}
+\lean{Rd.IsBoundedLipschitzDomain.exists_chart, Rd.IsBoundedLipschitzDomain.chart,
+  Rd.IsBoundedLipschitzDomain.chart_fst_pos, Rd.IsBoundedLipschitzDomain.ball_inter_chart,
+  Rd.IsBoundedLipschitzDomain.exists_finset_cover, Rd.IsBoundedLipschitzDomain.centers,
+  Rd.IsBoundedLipschitzDomain.frontier_subset_centers, Rd.IsBoundedLipschitzDomain.centerAt,
+  Rd.BoundedLipschitzDomain.ofIsBoundedLipschitzDomain,
+  Rd.BoundedLipschitzDomain.carrier_ofIsBoundedLipschitzDomain,
+  Rd.BoundedLipschitzDomain.isLipschitzDomainAt,
+  Rd.BoundedLipschitzDomain.isBoundedLipschitzDomain, Rd.isBoundedLipschitzDomain_iff_exists}
+\leanok
+\uses{def:bounded-lipschitz, thm:lipschitz-near-point}
+For every bounded Lipschitz domain $\Omega$ and every $z \in \partial\Omega$, $\Omega$ is
+Lipschitz near $z$; in particular $\Omega$ is a bounded Lipschitz set. If $V$ is
+finite-dimensional, then for every $\Omega \subseteq V$, $\Omega$ is a bounded Lipschitz set if and
+only if it is the carrier of a bounded Lipschitz domain.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $\Omega$ be a bounded Lipschitz domain and $z \in \partial\Omega$. Then $z \in B(c_j, \rho_j)$
+for some $j$, the ball $B(z, \rho_j - \|z - c_j\|)$ lies in $B(c_j, \rho_j)$, and on it $\Omega$
+agrees with $\Omega_j$; \Cref{thm:lipschitz-near-point} applies. Conversely, let $\Omega$ be a
+bounded Lipschitz set. \Cref{thm:lipschitz-near-point} gives for each $z \in \partial\Omega$ a
+ball $B(z, r_z)$ and a Lipschitz graph domain that agrees with $\Omega$ on it. In finite dimension
+the boundary of the bounded set $\Omega$ is compact, so finitely many of these balls cover it
+(Mathlib's \texttt{IsCompact.\allowbreak elim\_\allowbreak finite\_\allowbreak subcover}); their
+centres, radii and graph domains form a bounded Lipschitz domain with carrier $\Omega$.
+\end{proof}
+
+\begin{definition}[The sphere profile]
+\label{def:sphere-profile}
+\lean{Rd.sphereProfile}
+\leanok
+For $R, s \in \R$ let $g_R(s) = R - \sqrt{R^2 - \min(s, R/2)^2}$.
+\end{definition}
+
+For $R > 0$, near a point $z$ of the sphere $\|x - c\| = R$, the ball $B(c, R)$ is the region
+above the graph of $y \mapsto g_R(\|y\|)$ over the tangent hyperplane (\Cref{thm:ball-lipschitz}).
+
+\begin{lemma}[The sphere profile is $1$-Lipschitz]
+\label{lem:sphere-profile}
+\lean{Rd.abs_sqrt_sq_sub_sq_sub_le, Rd.abs_sphereProfile_sub_le,
+  Rd.lipschitzWith_sphereProfile_norm}
+\leanok
+\uses{def:sphere-profile}
+For every $R > 0$ and all $s_1, s_2 \in [0, R/2]$,
+$|\sqrt{R^2 - s_1^2} - \sqrt{R^2 - s_2^2}| \leq |s_1 - s_2|$. For every $R > 0$ and all
+$s_1, s_2 \geq 0$, $|g_R(s_1) - g_R(s_2)| \leq |s_1 - s_2|$. For every $R > 0$ and every normed
+group $E$, the function $y \mapsto g_R(\|y\|)$ on $E$ is $1$-Lipschitz.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both square roots are at least $R/2$, and
+\[
+  |\sqrt{R^2 - s_1^2} - \sqrt{R^2 - s_2^2}| \, (\sqrt{R^2 - s_1^2} + \sqrt{R^2 - s_2^2})
+  = |s_1 - s_2| \, (s_1 + s_2)
+\]
+with $s_1 + s_2 \leq R$. The function $s \mapsto \min(s, R/2)$ is $1$-Lipschitz, and so is the
+norm. The bound for the square roots is the argument of the Lean project
+\texttt{quadratic-\allowbreak forms-\allowbreak sobolev-\allowbreak lean}, available at
+\url{https://github.com/dbenbenn/quadratic-forms-sobolev-lean}.
+\end{proof}
+
+\begin{theorem}[The ball]
+\label{thm:ball-lipschitz}
+\lean{Rd.mem_ball_iff_sphereProfile_lt, Rd.isLipschitzDomainAt_ball,
+  Rd.isBoundedLipschitzDomain_ball, Rd.BoundedLipschitzDomain.ball,
+  Rd.BoundedLipschitzDomain.carrier_ball}
+\leanok
+\uses{lem:hyperplane-projection, def:sphere-profile, lem:sphere-profile,
+  def:lipschitz-near-point, thm:bounded-lipschitz-sets}
+Let $c \in V$.
+\begin{enumerate}
+  \item For every $R > 0$, every unit vector $\nu \in V$ and all $z, x \in V$ with $c - z = R \nu$
+    and $\|x - z\| < R/2$, $x \in B(c, R)$ if and only if
+    $g_R(\|P_\nu(x - z)\|) < \langle \nu, x - z \rangle$.
+  \item For every $R > 0$ and every $z \in V$ with $\|z - c\| = R$, the ball $B(c, R)$ is
+    Lipschitz near $z$.
+  \item For every $R \in \R$, the ball $B(c, R)$ is a bounded Lipschitz set; if $V$ is
+    finite-dimensional, it is the carrier of a bounded Lipschitz domain.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $t = \langle \nu, x - z \rangle$ and $p = P_\nu(x - z)$. By \Cref{lem:hyperplane-projection},
+$\|x - z\|^2 = \|p\|^2 + t^2$ and $\|x - c\|^2 = \|x - z - R\nu\|^2 = \|p\|^2 + (t - R)^2$. From
+$\|x - z\| < R/2$, $\|p\| < R/2$ and $t < R/2$, so $g_R(\|p\|) = R - \sqrt{R^2 - \|p\|^2}$ and
+$R - t > 0$; then $\|x - c\| < R$ if and only if $(R - t)^2 < R^2 - \|p\|^2$, that is
+$R - t < \sqrt{R^2 - \|p\|^2}$. For $z$ on the sphere take radius $R/2$, $\nu = (c - z)/R$, so
+that $c - z = R\nu$, and $\varphi(y) = g_R(\|y\|)$, which is $1$-Lipschitz by
+\Cref{lem:sphere-profile}; the first statement gives the condition of
+\Cref{def:lipschitz-near-point}. For $R > 0$ the boundary of the ball lies in the sphere
+$\|z - c\| = R$; for $R \leq 0$ the ball is empty. The last statement is
+\Cref{thm:bounded-lipschitz-sets}.
+\end{proof}
 
 \chapter{Traces on Lipschitz domains}
 \label{ch:traces-lipschitz}

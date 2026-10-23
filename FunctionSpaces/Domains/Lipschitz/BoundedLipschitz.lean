@@ -179,13 +179,21 @@ end Pasting
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
 
+/-- In finite dimension the **frontier of a bounded set is compact**: it is a closed subset of the
+compact closure (Mathlib's `Bornology.IsBounded.isCompact_closure`). -/
+theorem isCompact_frontier_of_isBounded [FiniteDimensional ℝ V] {s : Set V}
+    (hs : Bornology.IsBounded s) : IsCompact (frontier s) :=
+  hs.isCompact_closure.of_isClosed_subset isClosed_frontier frontier_subset_closure
+
 variable (V) in
 /-- A **bounded Lipschitz domain** (Stein; Triebel; Schneider–Vybíral, Remark 3.2): a bounded open
 set whose boundary is covered by finitely many open balls `B_j`, centred on the boundary, with
 `B_j ∩ Ω = B_j ∩ Ω_j` for Lipschitz graph domains `Ω_j`; the free direction of each graph domain
 replaces the rotations of the usual definition. The structure carries the balls and the graph
-domains as data; a constructor from the set-level definition and concrete instances are not
-formalised. -/
+domains as data; in finite dimension every set satisfying the usual definition
+(`Rd.IsBoundedLipschitzDomain`) is the carrier of one
+(`Rd.BoundedLipschitzDomain.ofIsBoundedLipschitzDomain`, `Rd.isBoundedLipschitzDomain_iff_exists`),
+every open ball among them (`Rd.BoundedLipschitzDomain.ball`). -/
 structure BoundedLipschitzDomain where
   /-- The domain. -/
   carrier : Set V
@@ -231,7 +239,7 @@ theorem isCompact_closure : IsCompact (closure Ω.carrier) := Ω.isBounded.isCom
 
 /-- The boundary of a bounded Lipschitz domain is compact. -/
 theorem isCompact_frontier : IsCompact (frontier Ω.carrier) :=
-  Ω.isCompact_closure.of_isClosed_subset isClosed_frontier frontier_subset_closure
+  isCompact_frontier_of_isBounded Ω.isBounded
 
 /-- **Shrinking the boundary balls**: `Γ ⊆ ⋃_j B(c_j, ρ_j - 2ε)` for some `ε > 0`, by
 compactness of `Γ`. -/

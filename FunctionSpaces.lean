@@ -113,6 +113,7 @@ public import FunctionSpaces.Domains.Extension.SobolevExtension
 public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen
 public import FunctionSpaces.Domains.Traces.TraceKernel
+public import FunctionSpaces.Domains.Lipschitz.LocalLipschitzGraphs
 public import FunctionSpaces.Torus.Measure
 public import FunctionSpaces.Torus.Scheme
 public import FunctionSpaces.Torus.Nikolskii
@@ -535,6 +536,10 @@ and the theorems that their characterisations agree. The library builds on
   domain: mollification converges in `H^1(ℝ^d)`, mollifiers supported in the cone of a chart,
   `H̃^1(Ω)` as the space of `H^1(ℝ^d)` functions vanishing outside `Ω`, `ker γ = H^1_0(Ω)` (McLean,
   Theorem 3.40), `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)`.
+* `FunctionSpaces.Domains.Lipschitz.LocalLipschitzGraphs`: the usual set-level definition of
+  bounded Lipschitz domains by local Lipschitz graphs, local graphs as Lipschitz graph domains,
+  McShane's extension of local graphs, the bounded Lipschitz domain of a set satisfying the
+  definition and the converse, and the ball as a bounded Lipschitz domain.
 
 ### The torus
 
