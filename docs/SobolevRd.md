@@ -144,7 +144,9 @@ built on this project, with the decisions behind their form.
   `B^{1/2}_{2,2}(Γ)` iff it is the boundary trace of some `f ∈ H^1(Ω)`
   (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`). The extensions in the
   definition of the boundary trace are the `F ∈ W^1_2(V)` with `F = f` on `Ω`
-  (`Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev`). The extension and trace
+  (`Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev`), and `f` has the
+  boundary trace `g` with a finite intrinsic norm iff `f ∈ H^1(Ω)` and `g` is its boundary trace
+  (`Rd.BoundedLipschitzDomain.hasBoundaryTrace_iff_memSobolevOn`). The extension and trace
   theorems for bounded Lipschitz domains are qualitative, and so are these statements; the
   restriction direction has constant `1`
   (`Rd.BoundedLipschitzDomain.modNormOn_le_modNorm_of_ae_eq`).

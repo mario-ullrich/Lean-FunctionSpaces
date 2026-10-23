@@ -30,7 +30,9 @@ only on the values of `f` on `Ω` (`Rd.BoundedLipschitzDomain.MemSobolevOn.congr
   functions of `H^1(Ω)` are the functions of `B^{1/2}_{2,2}(Γ)`
   (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`). The extensions in the
   definition of the boundary trace are the `F ∈ W^1_2(V)` with `F = f` on `Ω`
-  (`Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev`).
+  (`Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev`), and `f` has the boundary
+  trace `g` with a finite intrinsic norm iff `f ∈ H^1(Ω)` and `g` is its boundary trace
+  (`Rd.BoundedLipschitzDomain.hasBoundaryTrace_iff_memSobolevOn`).
 -/
 
 @[expose] public section
@@ -188,6 +190,16 @@ theorem isBoundaryTrace_iff_forall_memSobolev (ψ : Ω.BoundaryPartition)
   refine forall_congr' fun F => ?_
   rw [memSobolev_one_iff_modulus le_rfl F, indicatorLp_eq_iff_ae_eq_restrict]
   exact ⟨fun h hF hFf => h hFf hF, fun h hFf hF => h hF hFf⟩
+
+/-- **Boundary traces of `H^1` functions with a finite intrinsic norm**: for `L = 2`, `σ = 1` and
+`q = 2`, `f` has the boundary trace `g` (`Rd.BoundedLipschitzDomain.HasBoundaryTrace`) iff
+`f ∈ H^1(Ω)` and `g` is the boundary trace of `f`, since the finite intrinsic norm describes
+`H^1(Ω)` (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_modulusOn` with `r = 2`). -/
+theorem hasBoundaryTrace_iff_memSobolevOn (ψ : Ω.BoundaryPartition)
+    (f : Lp ℂ 2 (volume : Measure V)) (g : V → ℂ) :
+    Ω.HasBoundaryTrace ψ two_ne_top 2 1 2 f g ↔
+      Ω.MemSobolevOn f ∧ Ω.IsBoundaryTrace ψ two_ne_top 2 1 2 f g := by
+  rw [hasBoundaryTrace_iff, Ω.memSobolevOn_iff_modulusOn le_rfl f]
 
 /-- **The trace space of `H^1(Ω)`**: for every resolution of unity `ψ` on the boundary `Γ`, a
 function `g` on `Γ` lies in `B^{1/2}_{2,2}(Γ)` iff it is the boundary trace of some `f ∈ H^1(Ω)`.

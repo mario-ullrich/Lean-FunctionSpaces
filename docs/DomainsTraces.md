@@ -149,7 +149,11 @@ Besov spaces.
   (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_isBoundaryTrace`); every such `f` has a
   boundary trace in `B^s_{p,q}(Γ)`, unique almost everywhere on `Γ`
   (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_modNormOn_lt_top`,
-  `Rd.BoundedLipschitzDomain.IsBoundaryTrace.unique`). The boundary trace
+  `Rd.BoundedLipschitzDomain.IsBoundaryTrace.unique`). The same statements hold for the
+  predicate `Rd.BoundedLipschitzDomain.HasBoundaryTrace`, which contains the finite intrinsic
+  norm of `f` (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_hasBoundaryTrace`,
+  `Rd.BoundedLipschitzDomain.exists_hasBoundaryTrace_of_modNormOn_lt_top`,
+  `Rd.BoundedLipschitzDomain.HasBoundaryTrace.unique`). The boundary trace
   depends only on `F` on `Ω` (`Rd.BoundedLipschitzDomain.boundaryTrace_congr`), it is the
   restriction for continuous `F`
   (`Rd.BoundedLipschitzDomain.boundaryTrace_eventuallyEq_of_continuous`), and neither the trace nor

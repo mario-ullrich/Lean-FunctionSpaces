@@ -201,12 +201,6 @@ theorem enorm_le_dyadicWeight_neg_mul_eLpNorm_lqNorm {E : Type*} [NormedAddCommG
         rw [← mul_assoc, ENNReal.dyadicWeight_neg_mul_self, one_mul]
     _ ≤ _ := by gcongr; exact dyadicWeight_mul_enorm_le_eLpNorm_lqNorm hq s h j
 
-/-- `‖g‖_p^p = ∫ g^p` for `0 < p < ∞` and `g : α → [0, ∞]` measurable: the case `[0, ∞]` of
-`MeasureTheory.eLpNorm_rpow_eq`, with `‖g(x)‖ₑ = g(x)`. -/
-theorem eLpNorm_rpow_eq_lintegral (hp0 : p ≠ 0) (hp : p ≠ ∞) {g : α → ℝ≥0∞}
-    (hg : AEMeasurable g μ) : eLpNorm g p μ ^ p.toReal = ∫⁻ x, g x ^ p.toReal ∂μ := by
-  simpa only [enorm_eq_self] using eLpNorm_rpow_eq hg.aestronglyMeasurable hp0 hp
-
 /-- **Powers inside an `L_p` norm**: `‖g^r‖_p = ‖g‖_{p r}^r` for `r > 0` and `g : α → [0, ∞]`
 measurable (Mathlib's `eLpNorm_enorm_rpow`). -/
 theorem eLpNorm_fun_rpow {g : α → ℝ≥0∞} (hg : AEMeasurable g μ) {r : ℝ} (hr : 0 < r)

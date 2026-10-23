@@ -1820,8 +1820,8 @@ scheme in $H$, the \emph{spectral scheme} of $(e_i, \lambda)$.
 
 On the torus, $e_k$ is the Fourier basis and $\lambda(k) = \max_j |k_j|$. On a compact
 manifold, $e_i$ are the eigenfunctions of the Laplacian and $\lambda$ a function of the
-eigenvalue; \Cref{sec:eigenbases} treats this case with the existence of the eigenbasis as a
-hypothesis.
+eigenvalue; \Cref{sec:continuous-spectral-bases} assumes an orthonormal basis of continuous
+functions with levels, the structure this case provides.
 
 \begin{definition}[Sobolev embedding of $\ell_2$]
 \label{def:sobolev-embed}
@@ -1923,42 +1923,46 @@ for $\lambda(i) = 0$; and $\omega_i \leq (1 + \lambda(i))^{2s} \leq 4^s \omega_i
 \end{proof}
 
 
-\section{Eigenbases of continuous functions}
-\label{sec:eigenbases}
+\section{Continuous spectral bases}
+\label{sec:continuous-spectral-bases}
 
 Let $M$ be a topological space with a finite Borel measure $\mu$. On a compact Riemannian
 manifold the eigenfunctions of the Laplace--Beltrami operator form an orthonormal basis of
 $L_2(M)$; they are continuous by elliptic regularity, and the eigenvalues $\lambda_i$ tend to
 infinity. Mathlib has neither the operator nor these facts. The statements below therefore assume
 an orthonormal basis of continuous functions with levels, and every one of them is proved from
-this assumption; the torus satisfies it (\Cref{prop:fourier-eigenbasis}).
+this assumption; the torus satisfies it (\Cref{prop:fourier-eigenbasis}). The assumption
+consists of the basis, its levels and its continuous representatives alone.
 
-\begin{definition}[Eigenbasis]
-\label{def:laplace-eigenbasis}
-\lean{LaplaceEigenbasis, LaplaceEigenbasis.eigenSpan, LaplaceEigenbasis.eigenScheme,
-  LaplaceEigenbasis.eigenSpan_zero, LaplaceEigenbasis.eigenSpan_mono,
-  LaplaceEigenbasis.eigenfun_mem_eigenSpan, LaplaceEigenbasis.mem_eigenScheme,
-  LaplaceEigenbasis.toLp_eigenScheme_eq}
+\begin{definition}[Continuous spectral basis]
+\label{def:continuous-spectral-basis}
+\lean{ContinuousSpectralBasis, ContinuousSpectralBasis.basisSpan,
+  ContinuousSpectralBasis.basisScheme,
+  ContinuousSpectralBasis.basisSpan_zero, ContinuousSpectralBasis.basisSpan_mono,
+  ContinuousSpectralBasis.basisFun_mem_basisSpan, ContinuousSpectralBasis.mem_basisScheme,
+  ContinuousSpectralBasis.toLp_basisScheme_eq}
 \leanok
 \uses{def:spectral, def:function-scheme}
-An \emph{eigenbasis} of $M$ is a spectral scheme $(e_i, \lambda)$ in $L_2(\mu)$ together with
-bounded continuous functions $\tilde e_i$ whose classes are the $e_i$. The spaces
-$\mathcal{E}_n = \spn\{\tilde e_i : \lambda(i) < n\}$ of bounded continuous functions form a scheme
-of functions on $M$, and its classes in $L_2(\mu)$ form the spectral scheme of $(e_i, \lambda)$.
+A \emph{continuous spectral basis} of $L_2(\mu)$ is a spectral scheme $(e_i, \lambda)$ in
+$L_2(\mu)$ together with bounded continuous functions $\tilde e_i$ whose classes are the $e_i$.
+The spaces $\mathcal{E}_n = \spn\{\tilde e_i : \lambda(i) < n\}$ of bounded continuous functions
+form a scheme of functions on $M$, and its classes in $L_2(\mu)$ form the spectral scheme of
+$(e_i, \lambda)$.
 \end{definition}
 
 For the Laplace--Beltrami operator, $\tilde e_i$ are the eigenfunctions and
 $\lambda(i) = \lfloor \sqrt{\lambda_i} \rfloor$. The Besov spaces $\Besov{s}{p}{q}(M)$ of the
 scheme $(\mathcal{E}_n)$ are defined for every $1 \leq p \leq \infty$ by \Cref{def:besov}.
 
-\begin{theorem}[Besov and Sobolev spaces of an eigenbasis]
-\label{thm:eigenbasis-besov}
-\lean{LaplaceEigenbasis.memBesov_two_two_iff, LaplaceEigenbasis.memBesov_two_iff_blockNorm_lt_top,
-  LaplaceEigenbasis.sobolevSpace, LaplaceEigenbasis.sobolevSpace_order,
-  LaplaceEigenbasis.sobolevSpace_incl, LaplaceEigenbasis.mem_range_sobolev_iff,
-  LaplaceEigenbasis.sobolev_memBesov_top, LaplaceEigenbasis.exists_sobolev_of_memBesov}
+\begin{theorem}[Besov and Sobolev spaces of a continuous spectral basis]
+\label{thm:continuous-spectral-basis-besov}
+\lean{ContinuousSpectralBasis.memBesov_two_two_iff,
+  ContinuousSpectralBasis.memBesov_two_iff_blockNorm_lt_top,
+  ContinuousSpectralBasis.sobolevSpace, ContinuousSpectralBasis.sobolevSpace_order,
+  ContinuousSpectralBasis.sobolevSpace_incl, ContinuousSpectralBasis.mem_range_sobolev_iff,
+  ContinuousSpectralBasis.sobolev_memBesov_top, ContinuousSpectralBasis.exists_sobolev_of_memBesov}
 \leanok
-\uses{def:laplace-eigenbasis, thm:spectral-coefficients, prop:spectral-jackson-bernstein,
+\uses{def:continuous-spectral-basis, thm:spectral-coefficients, prop:spectral-jackson-bernstein,
   def:sobolev-scheme}
 Let $s > 0$ and $1 \leq q \leq \infty$. For $f \in L_2(\mu)$:
 \begin{enumerate}
@@ -1975,17 +1979,19 @@ Let $s > 0$ and $1 \leq q \leq \infty$. For $f \in L_2(\mu)$:
 
 \begin{proof}
 \leanok
-The classes in $L_2$ of the scheme form the spectral scheme (\Cref{def:laplace-eigenbasis}), so
-\Cref{thm:spectral-coefficients} and \Cref{prop:spectral-jackson-bernstein} apply.
+The classes in $L_2$ of the scheme form the spectral scheme
+(\Cref{def:continuous-spectral-basis}), so \Cref{thm:spectral-coefficients} and
+\Cref{prop:spectral-jackson-bernstein} apply.
 \end{proof}
 
 \begin{definition}[Local Weyl bound]
 \label{def:local-weyl}
-\lean{LaplaceEigenbasis.LocalWeylBound, LaplaceEigenbasis.levelSet,
-  LaplaceEigenbasis.mem_levelSet}
+\lean{ContinuousSpectralBasis.LocalWeylBound, ContinuousSpectralBasis.levelSet,
+  ContinuousSpectralBasis.mem_levelSet}
 \leanok
-\uses{def:laplace-eigenbasis}
-An eigenbasis satisfies the \emph{local Weyl bound} of dimension $D$ with constant $C \geq 0$ if
+\uses{def:continuous-spectral-basis}
+A continuous spectral basis satisfies the \emph{local Weyl bound} of dimension $D$ with
+constant $C \geq 0$ if
 \[
   \sum_{\lambda(i) < n} |\tilde e_i(x)|^2 \leq C n^D
   \qquad \text{for every } x \in M \text{ and every } n \geq 1 .
@@ -1997,13 +2003,14 @@ H\"ormander's local Weyl law, with $D = d$.
 
 \begin{theorem}[Nikolskii inequality from the local Weyl bound]
 \label{thm:local-weyl-nikolskii}
-\lean{LaplaceEigenbasis.norm_sq_le_of_localWeyl, LaplaceEigenbasis.norm_le_sqrt_mul_of_localWeyl,
-  LaplaceEigenbasis.norm_rpow_le_of_localWeyl, LaplaceEigenbasis.norm_le_of_localWeyl,
-  LaplaceEigenbasis.exists_sum_of_mem_eigenSpan, LaplaceEigenbasis.norm_toLp_sum_sq}
+\lean{ContinuousSpectralBasis.norm_sq_le_of_localWeyl,
+  ContinuousSpectralBasis.norm_le_sqrt_mul_of_localWeyl,
+  ContinuousSpectralBasis.norm_rpow_le_of_localWeyl, ContinuousSpectralBasis.norm_le_of_localWeyl,
+  ContinuousSpectralBasis.exists_sum_of_mem_basisSpan, ContinuousSpectralBasis.norm_toLp_sum_sq}
 \leanok
 \uses{def:local-weyl, lem:lp-interpolation}
-Let the eigenbasis satisfy the local Weyl bound of dimension $D$ with constant $C$. For every
-$n \geq 1$, every $a \in \mathcal{E}_n$ and every $1 \leq p \leq 2$,
+Let the continuous spectral basis satisfy the local Weyl bound of dimension $D$ with constant
+$C$. For every $n \geq 1$, every $a \in \mathcal{E}_n$ and every $1 \leq p \leq 2$,
 \[
   \|a\|_\infty^2 \leq C n^D \|a\|_2^2 ,
   \qquad
@@ -2021,21 +2028,23 @@ $\|a\|_\infty^{2-p}$ gives the second inequality.
 \end{proof}
 
 For $p > 2$ the inequality $\|a\|_\infty \leq C' n^{D/p} \|a\|_p$ does not follow in this way:
-the proof on the torus raises polynomials to powers (\Cref{thm:torus-nikolskii}), and products of
-eigenfunctions are no eigenfunctions. The embeddings of \Cref{thm:besov-embedding} hold for the
-scheme $(\mathcal{E}_n)$ whenever it has the Nikolskii property of \Cref{def:nikolskii-property}.
+the proof on the torus raises polynomials to powers (\Cref{thm:torus-nikolskii}), which lie in
+$\mathcal{E}_{mn}$ (\Cref{lem:trig-products}); for a general basis, products of functions of
+$\mathcal{E}_n$ need not lie in any $\mathcal{E}_m$. The embeddings of \Cref{thm:besov-embedding}
+hold for the scheme $(\mathcal{E}_n)$ whenever it has the Nikolskii property of
+\Cref{def:nikolskii-property}.
 The embedding into continuous functions needs only the local Weyl bound.
 
 \begin{theorem}[Continuity of $H^s(M)$]
 \label{thm:local-weyl-continuity}
-\lean{LaplaceEigenbasis.exists_continuous_of_localWeyl, LaplaceEigenbasis.partialSum,
-  LaplaceEigenbasis.partialSum_mem_eigenSpan, LaplaceEigenbasis.toLp_partialSum,
-  LaplaceEigenbasis.norm_truncate_sub_truncate_le,
-  LaplaceEigenbasis.norm_partialSum_succ_sub_le, Real.natCast_two_pow_rpow}
+\lean{ContinuousSpectralBasis.exists_continuous_of_localWeyl, ContinuousSpectralBasis.partialSum,
+  ContinuousSpectralBasis.partialSum_mem_basisSpan, ContinuousSpectralBasis.toLp_partialSum,
+  ContinuousSpectralBasis.norm_truncate_sub_truncate_le,
+  ContinuousSpectralBasis.norm_partialSum_succ_sub_le, Real.natCast_two_pow_rpow}
 \leanok
-\uses{thm:local-weyl-nikolskii, thm:eigenbasis-besov}
-Let the eigenbasis satisfy the local Weyl bound of dimension $D$, and let $s > 0$ with
-$2s > D$. Every $f \in L_2(\mu)$ with
+\uses{thm:local-weyl-nikolskii, thm:continuous-spectral-basis-besov}
+Let the continuous spectral basis satisfy the local Weyl bound of dimension $D$, and let
+$s > 0$ with $2s > D$. Every $f \in L_2(\mu)$ with
 $\sum_i (1 + \lambda(i))^{2s} |\langle e_i, f \rangle|^2 < \infty$ is the class of a bounded
 continuous function.
 \end{theorem}
@@ -2162,17 +2171,21 @@ The weight $(1 + \max_j |k_j|)^{2s}$ is equivalent to the more common $(1 + |k|^
 constants depending on $d$ and $s$; the degree is used because it indexes the trigonometric
 polynomials.
 
-\begin{proposition}[The Fourier basis as an eigenbasis]
+The monomials $e_k$ are the eigenfunctions of the Laplacian on $\T^d$,
+$\Delta e_k = -4\pi^2 |k|^2 e_k$, and the degree groups them into the levels of a continuous
+spectral basis.
+
+\begin{proposition}[The Fourier basis as a continuous spectral basis]
 \label{prop:fourier-eigenbasis}
-\lean{Torus.fourierEigenbasis, Torus.fourierEigenbasis_level, Torus.fourierEigenbasis_eigenfun,
-  Torus.eigenSpan_fourierEigenbasis, Torus.eigenScheme_fourierEigenbasis,
+\lean{Torus.fourierEigenbasis, Torus.fourierEigenbasis_level, Torus.fourierEigenbasis_basisFun,
+  Torus.basisSpan_fourierEigenbasis, Torus.basisScheme_fourierEigenbasis,
   Torus.levelSet_fourierEigenbasis, Torus.localWeylBound_fourierEigenbasis,
   Torus.hasNikolskii_fourierEigenbasis}
 \leanok
-\uses{def:laplace-eigenbasis, def:local-weyl, def:torus-sobolev, thm:torus-nikolskii}
-The trigonometric monomials $e_k$ with the level $\deg$ form an eigenbasis of $\T^d$ whose scheme
-is the trigonometric scheme. It satisfies the local Weyl bound of dimension $d$ with constant
-$2^d$, and its scheme has the Nikolskii property of dimension $d$.
+\uses{def:continuous-spectral-basis, def:local-weyl, def:torus-sobolev, thm:torus-nikolskii}
+The trigonometric monomials $e_k$ with the level $\deg$ form a continuous spectral basis of
+$L_2(\T^d)$ whose scheme is the trigonometric scheme. It satisfies the local Weyl bound of
+dimension $d$ with constant $2^d$, and its scheme has the Nikolskii property of dimension $d$.
 \end{proposition}
 
 \begin{proof}
@@ -9260,6 +9273,55 @@ of $f$ agrees with it. Both resolutions of unity give the space of boundary trac
 and the boundary traces agree almost everywhere on $\Gamma$ (\Cref{thm:boundary-trace-charts}).
 \end{proof}
 
+A boundary trace of $f$ in the sense of \Cref{thm:boundary-trace-space} is a condition on all
+$F$ that agree with $f$ on $\Omega$ and have a finite norm; when $0 < \sigma < L$, $q \geq 1$ and
+$f$ has a finite intrinsic norm on $\Omega$, at least one such $F$ exists
+(\Cref{thm:bounded-lipschitz-besov}). The following notion contains this finiteness.
+
+\begin{definition}[Boundary traces of functions with a finite intrinsic norm]
+\label{def:boundary-trace-finite-norm}
+\lean{Rd.BoundedLipschitzDomain.HasBoundaryTrace, Rd.BoundedLipschitzDomain.hasBoundaryTrace_iff}
+\leanok
+\uses{def:boundary-trace, def:ae-boundary, def:rd-modulus-on}
+Let $1 \leq p < \infty$, $\sigma \in \R$, $L \in \N$ and $1 \leq q \leq \infty$. A function
+$f \in L_p(V)$ \emph{has the boundary trace} $g$ if
+$\|f\|_{L_p(\Omega)} + \|(2^{k\sigma} \omega_L(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$ and
+$g = \operatorname{Tr}_\Gamma F$ almost everywhere on $\Gamma$ for every $F \in L_p(V)$ with
+$F = f$ almost everywhere on $\Omega$ and
+$\|F\|_p + \|(2^{k\sigma} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+\end{definition}
+
+For $0 < \sigma < L$ the trace condition concerns at least one $F$.
+
+\begin{theorem}[The trace space with finite intrinsic norms]
+\label{thm:boundary-trace-space-finite-norm}
+\lean{Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_hasBoundaryTrace,
+  Rd.BoundedLipschitzDomain.HasBoundaryTrace.memBoundaryBesov,
+  Rd.BoundedLipschitzDomain.exists_hasBoundaryTrace_of_modNormOn_lt_top,
+  Rd.BoundedLipschitzDomain.HasBoundaryTrace.unique}
+\leanok
+\uses{def:boundary-trace-finite-norm, thm:boundary-trace-space, def:boundary-besov,
+  thm:bounded-lipschitz-besov}
+Let $1 \leq p < \infty$ and $1 \leq q \leq \infty$.
+\begin{enumerate}
+  \item For every $0 < s < 1$, every $L \geq 2$ and every function $g$ on $V$,
+    $g \in B^s_{p,q}(\Gamma)$ if and only if some $f \in L_p(V)$ has the boundary trace $g$
+    for $\sigma = s + 1/p$; every $f$ with
+    $\|f\|_{L_p(\Omega)} + \|(2^{k(s + 1/p)} \omega_L(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$
+    has a boundary trace $g \in B^s_{p,q}(\Gamma)$ for $\sigma = s + 1/p$.
+  \item For every $L \in \N$ and every $0 < \sigma < L$, any two boundary traces $g, g'$ of the
+    same $f$ for $\sigma$ agree almost everywhere on $\Gamma$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first statement is the corresponding one of \Cref{thm:boundary-trace-space}, whose hypothesis
+of a finite intrinsic norm is part of \Cref{def:boundary-trace-finite-norm}. For the second, by
+\Cref{thm:bounded-lipschitz-besov} with $r = L$ some admissible $F$ exists, and
+$g = \operatorname{Tr}_\Gamma F = g'$ almost everywhere on $\Gamma$.
+\end{proof}
+
 \chapter{Triebel--Lizorkin spaces}
 \label{ch:triebel-lizorkin}
 
@@ -13501,20 +13563,26 @@ $r = 2$, these $F$ are the $F \in \Sob{1}{2}(V)$ with $F = f$ almost everywhere 
 
 \begin{lemma}[Boundary traces of $H^1$ functions]
 \label{lem:sobolev-lipschitz-domain-trace-extensions}
-\lean{Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev}
+\lean{Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev,
+  Rd.BoundedLipschitzDomain.hasBoundaryTrace_iff_memSobolevOn}
 \leanok
-\uses{thm:sobolev-one-two-besov, thm:boundary-trace-space, lem:indicator-lp-eq-iff}
+\uses{thm:sobolev-one-two-besov, thm:boundary-trace-space, lem:indicator-lp-eq-iff,
+  def:boundary-trace-finite-norm, thm:sobolev-lipschitz-domain-intrinsic}
 For every resolution of unity $\psi$ on $\Gamma$, every $f \in L_2(V)$ and every function $g$ on
 $V$, $g$ is a boundary trace of $f$ if and only if $g = \operatorname{Tr}_\Gamma F$ almost
 everywhere on $\Gamma$ for every $F \in \Sob{1}{2}(V)$ with $F = f$ almost everywhere on
-$\Omega$.
+$\Omega$. For $L = 2$, $\sigma = 1$ and $q = 2$, $f$ has the boundary trace $g$ in the sense of
+\Cref{def:boundary-trace-finite-norm} if and only if $f \in H^1(\Omega)$ and $g$ is a boundary
+trace of $f$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 By \Cref{thm:sobolev-one-two-besov} with $r = 2$, $F \in \Sob{1}{2}(V)$ if and only if
 $\|F\|_2 + \|(2^k \omega_2(F, 2^{-k})_2)_k\|_{\ell_2} < \infty$, and $F = f$ almost everywhere on
-$\Omega$ if and only if $1_\Omega F = 1_\Omega f$ (\Cref{lem:indicator-lp-eq-iff}).
+$\Omega$ if and only if $1_\Omega F = 1_\Omega f$ (\Cref{lem:indicator-lp-eq-iff}). By
+\Cref{thm:sobolev-lipschitz-domain-intrinsic} with $r = 2$, the finite intrinsic norm of
+\Cref{def:boundary-trace-finite-norm} describes $H^1(\Omega)$.
 \end{proof}
 
 \begin{theorem}[The trace space of $H^1(\Omega)$]
@@ -22952,16 +23020,21 @@ $n + 1 \leq (n - N + 1)(N + 1)$ for $n \geq N$.
 
 \begin{theorem}[Hyperbolic cross approximation]
 \label{thm:hyperbolic-cross}
-\lean{Rd.enorm_sub_hyperbolicSum_le, Rd.enorm_sub_hyperbolicSum_le_mixedLPNorm}
+\lean{Rd.enorm_sub_hyperbolicSum_le, Rd.enorm_sub_hyperbolicSum_le_mixedLPNorm,
+  Rd.hyperbolicCrossConst, Rd.hyperbolicCrossConst_ne_top, Rd.enorm_sub_hyperbolicSum_le_of_pos}
 \leanok
 \uses{def:hyperbolic-cross, lem:level-count, lem:rate-series, def:mixed-lp}
-For $s > 0$, $1 \leq q \leq \infty$ and $N \in \N$,
+For every $1 \leq p < \infty$, every $f \in L_p(\R^d)$, every $s > 0$, every
+$1 \leq q \leq \infty$ and every $N \in \N$, the constant
+$C = \sum_l 2^{-sl} (l + 1)^{(d-1)(1 - 1/q)}$ is finite and
 \[
   \|f - S_N f\|_p \leq C \, 2^{-sN} (N + 1)^{(d-1)(1 - 1/q)} \,
-    \|(2^{s|k|_1} \|\delta_k * f\|_p)_k\|_{\ell_q}
+    \|(2^{s|k|_1} \|\delta_k * f\|_p)_k\|_{\ell_q} .
 \]
-with the constant $C$ of \Cref{lem:rate-series} for $a = (d - 1)(1 - 1/q)$.
 \end{theorem}
+
+The inequality itself holds for every real $s$, with $C \in [0, \infty]$; for $s \leq 0$ the
+series $C$ is $\infty$.
 
 \begin{proof}
 \leanok
@@ -23090,9 +23163,9 @@ Descriptions & Range & Result \\
 \end{tabular}
 \end{center}
 
-\paragraph{Spaces with an eigenbasis.} The scheme consists of the spans of continuous
-eigenfunctions (\Cref{def:laplace-eigenbasis}); the eigenbasis is a hypothesis, and the torus
-satisfies it (\Cref{prop:fourier-eigenbasis}).
+\paragraph{Spaces with a continuous spectral basis.} The scheme consists of the spans of the
+continuous basis functions (\Cref{def:continuous-spectral-basis}); the basis is a hypothesis, and
+the torus satisfies it (\Cref{prop:fourier-eigenbasis}).
 \begin{center}
 \small
 \begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
@@ -23100,7 +23173,7 @@ satisfies it (\Cref{prop:fourier-eigenbasis}).
 Descriptions & Range & Result \\
 \hline
 \raggedright Approximation and coefficients, $p = 2$; $\Besov{s}{2}{2} = H^s$ & $s > 0$
-  & \Cref{thm:eigenbasis-besov} \\
+  & \Cref{thm:continuous-spectral-basis-besov} \\
 \raggedright $H^s$ and continuous functions, under the local Weyl bound of dimension $D$
   & $s > D/2$ & \Cref{thm:local-weyl-continuity} \\
 \hline

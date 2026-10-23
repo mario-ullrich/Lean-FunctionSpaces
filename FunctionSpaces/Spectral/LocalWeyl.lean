@@ -11,29 +11,33 @@ public import FunctionSpaces.Lp.Interpolation
 /-!
 # The local Weyl bound, the Nikolskii inequality and continuity
 
-An eigenbasis `(e_i)` on `M` (`LaplaceEigenbasis`) satisfies the **local Weyl bound** of
-dimension `D` with constant `C` (`LaplaceEigenbasis.LocalWeylBound`) if
+A continuous spectral basis `(e_i)` on `M` (`ContinuousSpectralBasis`), with continuous basis
+functions `ẽ_i`, satisfies the **local Weyl bound** of dimension `D` with constant `C`
+(`ContinuousSpectralBasis.LocalWeylBound`) if
 
-`∑_{λ(i) < n} |e_i(x)|² ≤ C n^D`   for every `x ∈ M` and `n ≥ 1`.
+`∑_{λ(i) < n} |ẽ_i(x)|² ≤ C n^D`   for every `x ∈ M` and `n ≥ 1`.
 
 For the Laplace–Beltrami operator of a compact Riemannian manifold of dimension `d` this is
 Hörmander's local Weyl law with `D = d`; on the torus `𝕋^d` it is the count of at most `(2n)^d`
 frequencies of degree `< n` (`Torus.localWeylBound_fourierEigenbasis`).
 
 * **The Nikolskii inequality from `L_2` to `L_∞`**
-  (`LaplaceEigenbasis.norm_sq_le_of_localWeyl`): for `a` in the span of the eigenfunctions of
-  level `< n`, `‖a‖_∞² ≤ C n^D ‖a‖_2²`, by the Cauchy–Schwarz inequality in
-  `a(x) = ∑_i c_i e_i(x)` and Parseval's identity `‖a‖_2² = ∑_i |c_i|²`.
-* **The Nikolskii inequality for `1 ≤ p ≤ 2`** (`LaplaceEigenbasis.norm_rpow_le_of_localWeyl`):
-  `‖a‖_∞^p ≤ C n^D ‖a‖_p^p`, since `‖a‖_2² ≤ ‖a‖_∞^(2-p) ‖a‖_p^p`. For `p > 2` the inequality with
-  `n^(D/p)` does not follow this way (the torus proof squares polynomials, which eigenfunctions do
-  not allow); the embedding theorems of `FunctionSpaces.Besov.Embeddings` apply to the
-  eigenfunction scheme under the hypothesis `FunctionScheme.HasNikolskii`.
-* **Continuity of `H^s` for `s > D/2`** (`LaplaceEigenbasis.exists_continuous_of_localWeyl`):
-  every `f ∈ L_2(μ)` with `∑_i (1 + λ(i))^(2s) |⟨e_i, f⟩|² < ∞` has a bounded continuous
-  representative. The partial sums `S_n f = ∑_{λ(i) < n} ⟨e_i, f⟩ e_i` are continuous
-  (`LaplaceEigenbasis.partialSum`), and on the dyadic levels the Nikolskii inequality and the
-  truncation error `‖f - P_n f‖_2 ≤ n^(-s) ‖c‖` give
+  (`ContinuousSpectralBasis.norm_sq_le_of_localWeyl`): for `a` in the span of the basis
+  functions of level `< n`, `‖a‖_∞² ≤ C n^D ‖a‖_2²`, by the Cauchy–Schwarz inequality in
+  `a(x) = ∑_i c_i ẽ_i(x)` and Parseval's identity `‖a‖_2² = ∑_i |c_i|²`.
+* **The Nikolskii inequality for `1 ≤ p ≤ 2`**
+  (`ContinuousSpectralBasis.norm_rpow_le_of_localWeyl`): `‖a‖_∞^p ≤ C n^D ‖a‖_p^p`, since
+  `‖a‖_2² ≤ ‖a‖_∞^(2-p) ‖a‖_p^p`. For `p > 2` the inequality with `n^(D/p)` does not follow this
+  way: the proof on the torus raises trigonometric polynomials of degree `< n` to the power `m`,
+  which have degree `< mn`; for a general basis, products of functions of `basisSpan n` need not
+  lie in any `basisSpan m`. The embedding theorems of `FunctionSpaces.Besov.Embeddings` apply to
+  the scheme of the basis functions under the hypothesis `FunctionScheme.HasNikolskii`.
+* **Continuity of `H^s` for `s > D/2`**
+  (`ContinuousSpectralBasis.exists_continuous_of_localWeyl`): every `f ∈ L_2(μ)` with
+  `∑_i (1 + λ(i))^(2s) |⟨e_i, f⟩|² < ∞` has a bounded continuous representative. The partial
+  sums `S_n f = ∑_{λ(i) < n} ⟨e_i, f⟩ ẽ_i` are continuous
+  (`ContinuousSpectralBasis.partialSum`), and on the dyadic levels the Nikolskii inequality and
+  the truncation error `‖f - P_n f‖_2 ≤ n^(-s) ‖c‖` give
   `‖S_{2^(k+1)} f - S_{2^k} f‖_∞ ≤ C^(1/2) 2^(D/2) ‖c‖ (2^(D/2 - s))^k`, a geometric series; the
   uniform limit represents `f`.
 -/
@@ -52,9 +56,9 @@ theorem Real.natCast_two_pow_rpow (t : ℝ) (k : ℕ) : ((2 ^ k : ℕ) : ℝ) ^ 
 
 variable {M : Type*} [TopologicalSpace M] [MeasurableSpace M] [BorelSpace M]
 
-namespace LaplaceEigenbasis
+namespace ContinuousSpectralBasis
 
-variable {ι : Type*} {μ : Measure M} [IsFiniteMeasure μ] (B : LaplaceEigenbasis ι μ)
+variable {ι : Type*} {μ : Measure M} [IsFiniteMeasure μ] (B : ContinuousSpectralBasis ι μ)
 
 /-- The finite set of the indices of level `< n`. -/
 noncomputable def levelSet (n : ℕ) : Finset ι := (B.finite_level n).toFinset
@@ -65,31 +69,34 @@ theorem mem_levelSet {n : ℕ} {i : ι} : i ∈ B.levelSet n ↔ B.level i < n :
   simp [levelSet]
 
 /-- The **local Weyl bound** of dimension `D` with constant `C ≥ 0`:
-`∑_{λ(i) < n} |e_i(x)|² ≤ C n^D` for every point `x` and every `n ≥ 1`. -/
+`∑_{λ(i) < n} |ẽ_i(x)|² ≤ C n^D` for every point `x` and every `n ≥ 1`. -/
 structure LocalWeylBound (D C : ℝ) : Prop where
+  /-- The constant is nonnegative. -/
   nonneg : 0 ≤ C
-  le : ∀ n : ℕ, 1 ≤ n → ∀ x : M, ∑ i ∈ B.levelSet n, ‖B.eigenfun i x‖ ^ 2 ≤ C * (n : ℝ) ^ D
+  /-- `∑_{λ(i) < n} |ẽ_i(x)|² ≤ C n^D` for every `n ≥ 1` and every `x`. -/
+  le : ∀ n : ℕ, 1 ≤ n → ∀ x : M, ∑ i ∈ B.levelSet n, ‖B.basisFun i x‖ ^ 2 ≤ C * (n : ℝ) ^ D
 
-/-- An element of the span of level `< n` is a combination `∑_{λ(i) < n} c_i e_i`. -/
-theorem exists_sum_of_mem_eigenSpan {n : ℕ} {a : M →ᵇ ℂ} (ha : a ∈ B.eigenSpan n) :
-    ∃ c : ι → ℂ, a = ∑ i ∈ B.levelSet n, c i • B.eigenfun i := by
+/-- An element of the span of level `< n` is a combination `∑_{λ(i) < n} c_i ẽ_i`. -/
+theorem exists_sum_of_mem_basisSpan {n : ℕ} {a : M →ᵇ ℂ} (ha : a ∈ B.basisSpan n) :
+    ∃ c : ι → ℂ, a = ∑ i ∈ B.levelSet n, c i • B.basisFun i := by
   classical
   obtain ⟨t, ht, c, hc⟩ := (Submodule.mem_span_image_iff_exists_fun ℂ).1 ha
   have hsub : t ⊆ B.levelSet n := fun i hi => B.mem_levelSet.2 (ht hi)
   refine ⟨fun i => if hi : i ∈ t then c ⟨i, hi⟩ else 0, ?_⟩
-  calc a = ∑ i ∈ t, (if hi : i ∈ t then c ⟨i, hi⟩ else 0) • B.eigenfun i := by
+  calc a = ∑ i ∈ t, (if hi : i ∈ t then c ⟨i, hi⟩ else 0) • B.basisFun i := by
         rw [← hc, ← Finset.sum_coe_sort t]
         refine Finset.sum_congr rfl fun i _ => ?_
         simp
     _ = _ := Finset.sum_subset hsub fun i _ hi => by simp [hi]
 
-/-- **Parseval's identity for combinations of eigenfunctions**: `‖∑ c_i e_i‖_2² = ∑ |c_i|²`. -/
+/-- **Parseval's identity for combinations of the basis functions**:
+`‖∑ c_i ẽ_i‖_2² = ∑ |c_i|²`. -/
 theorem norm_toLp_sum_sq (t : Finset ι) (c : ι → ℂ) :
-    ‖BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ (∑ i ∈ t, c i • B.eigenfun i)‖ ^ 2 =
+    ‖BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ (∑ i ∈ t, c i • B.basisFun i)‖ ^ 2 =
       ∑ i ∈ t, ‖c i‖ ^ 2 := by
-  have hsum : BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ (∑ i ∈ t, c i • B.eigenfun i) =
+  have hsum : BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ (∑ i ∈ t, c i • B.basisFun i) =
       ∑ i ∈ t, c i • B.basis i := by
-    rw [map_sum]; simp_rw [map_smul, B.toLp_eigenfun]
+    rw [map_sum]; simp_rw [map_smul, B.toLp_basisFun]
   rw [hsum, @norm_sq_eq_re_inner ℂ, B.basis.orthonormal.inner_sum c c t, map_sum]
   refine Finset.sum_congr rfl fun i _ => ?_
   rw [RCLike.conj_mul]
@@ -100,33 +107,33 @@ variable {B}
 /-- **The Nikolskii inequality from `L_2` to `L_∞`** under the local Weyl bound: for `a` in the
 span of level `< n`, `n ≥ 1`, `‖a‖_∞² ≤ C n^D ‖a‖_2²`. -/
 theorem norm_sq_le_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : ℕ} (hn : 1 ≤ n)
-    {a : M →ᵇ ℂ} (ha : a ∈ B.eigenSpan n) :
+    {a : M →ᵇ ℂ} (ha : a ∈ B.basisSpan n) :
     ‖a‖ ^ 2 ≤ C * (n : ℝ) ^ D * ‖BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ a‖ ^ 2 := by
-  obtain ⟨c, rfl⟩ := B.exists_sum_of_mem_eigenSpan ha
+  obtain ⟨c, rfl⟩ := B.exists_sum_of_mem_basisSpan ha
   rw [B.norm_toLp_sum_sq]
   set t := B.levelSet n
   set N := ∑ i ∈ t, ‖c i‖ ^ 2
   have hK : 0 ≤ C * (n : ℝ) ^ D := mul_nonneg hW.nonneg (by positivity)
   have hN : 0 ≤ N := Finset.sum_nonneg fun _ _ => by positivity
-  have hpt : ∀ x, ‖(∑ i ∈ t, c i • B.eigenfun i) x‖ ≤ Real.sqrt (C * (n : ℝ) ^ D * N) :=
+  have hpt : ∀ x, ‖(∑ i ∈ t, c i • B.basisFun i) x‖ ≤ Real.sqrt (C * (n : ℝ) ^ D * N) :=
     fun x => by
       rw [Real.le_sqrt (norm_nonneg _) (by positivity)]
-      calc ‖(∑ i ∈ t, c i • B.eigenfun i) x‖ ^ 2 = ‖∑ i ∈ t, c i * B.eigenfun i x‖ ^ 2 := by
+      calc ‖(∑ i ∈ t, c i • B.basisFun i) x‖ ^ 2 = ‖∑ i ∈ t, c i * B.basisFun i x‖ ^ 2 := by
             simp [BoundedContinuousFunction.coe_sum, Finset.sum_apply]
-        _ ≤ (∑ i ∈ t, ‖c i‖ * ‖B.eigenfun i x‖) ^ 2 := by
+        _ ≤ (∑ i ∈ t, ‖c i‖ * ‖B.basisFun i x‖) ^ 2 := by
             gcongr
             exact (norm_sum_le _ _).trans (Finset.sum_le_sum fun i _ => (norm_mul _ _).le)
-        _ ≤ N * ∑ i ∈ t, ‖B.eigenfun i x‖ ^ 2 := Finset.sum_mul_sq_le_sq_mul_sq t _ _
+        _ ≤ N * ∑ i ∈ t, ‖B.basisFun i x‖ ^ 2 := Finset.sum_mul_sq_le_sq_mul_sq t _ _
         _ ≤ N * (C * (n : ℝ) ^ D) := by gcongr; exact hW.le n hn x
         _ = C * (n : ℝ) ^ D * N := by ring
   have hsup := (BoundedContinuousFunction.norm_le (Real.sqrt_nonneg _)).2 hpt
-  calc ‖∑ i ∈ t, c i • B.eigenfun i‖ ^ 2 ≤ Real.sqrt (C * (n : ℝ) ^ D * N) ^ 2 := by gcongr
+  calc ‖∑ i ∈ t, c i • B.basisFun i‖ ^ 2 ≤ Real.sqrt (C * (n : ℝ) ^ D * N) ^ 2 := by gcongr
     _ = C * (n : ℝ) ^ D * N := Real.sq_sqrt (by positivity)
 
 /-- The Nikolskii inequality from `L_2` to `L_∞`, unsquared:
 `‖a‖_∞ ≤ (C n^D)^(1/2) ‖a‖_2`. -/
 theorem norm_le_sqrt_mul_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : ℕ}
-    (hn : 1 ≤ n) {a : M →ᵇ ℂ} (ha : a ∈ B.eigenSpan n) :
+    (hn : 1 ≤ n) {a : M →ᵇ ℂ} (ha : a ∈ B.basisSpan n) :
     ‖a‖ ≤ Real.sqrt (C * (n : ℝ) ^ D) * ‖BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ a‖ := by
   rw [← Real.sqrt_sq (norm_nonneg (BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ a)),
     ← Real.sqrt_mul (mul_nonneg hW.nonneg (by positivity))]
@@ -137,7 +144,7 @@ of level `< n`, `n ≥ 1`, `‖a‖_∞^p ≤ C n^D ‖a‖_p^p`. The case `p = 
 `‖a‖_∞² ≤ C n^D ‖a‖_2²`, and `‖a‖_2² ≤ ‖a‖_∞^(2-p) ‖a‖_p^p`
 (`MeasureTheory.toReal_eLpNorm_le_rpow_mul`). -/
 theorem norm_rpow_le_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : ℕ} (hn : 1 ≤ n)
-    {a : M →ᵇ ℂ} (ha : a ∈ B.eigenSpan n) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp2 : p ≤ 2) :
+    {a : M →ᵇ ℂ} (ha : a ∈ B.basisSpan n) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp2 : p ≤ 2) :
     ‖a‖ ^ p.toReal ≤ C * (n : ℝ) ^ D * (eLpNorm a p μ).toReal ^ p.toReal := by
   have hp' : p ≠ ∞ := ne_top_of_le_ne_top (by norm_num) hp2
   set P := p.toReal
@@ -180,7 +187,7 @@ theorem norm_rpow_le_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : �
 /-- **The Nikolskii inequality for `1 ≤ p ≤ 2`**, unpowered:
 `‖a‖_∞ ≤ C^(1/p) n^(D/p) ‖a‖_p`. -/
 theorem norm_le_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : ℕ} (hn : 1 ≤ n)
-    {a : M →ᵇ ℂ} (ha : a ∈ B.eigenSpan n) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp2 : p ≤ 2) :
+    {a : M →ᵇ ℂ} (ha : a ∈ B.basisSpan n) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp2 : p ≤ 2) :
     ‖a‖ ≤ C ^ p.toReal⁻¹ * (n : ℝ) ^ (D * p.toReal⁻¹) * (eLpNorm a p μ).toReal := by
   have hp' : p ≠ ∞ := ne_top_of_le_ne_top (by norm_num) hp2
   set P := p.toReal
@@ -199,20 +206,20 @@ theorem norm_le_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {n : ℕ} (
 
 variable (B)
 
-/-- The **partial sum** `S_n f = ∑_{λ(i) < n} ⟨e_i, f⟩ e_i`, a bounded continuous function. -/
+/-- The **partial sum** `S_n f = ∑_{λ(i) < n} ⟨e_i, f⟩ ẽ_i`, a bounded continuous function. -/
 noncomputable def partialSum (n : ℕ) (f : Lp ℂ 2 μ) : M →ᵇ ℂ :=
-  ∑ i ∈ B.levelSet n, B.basis.repr f i • B.eigenfun i
+  ∑ i ∈ B.levelSet n, B.basis.repr f i • B.basisFun i
 
 /-- The partial sum lies in the span of level `< n`. -/
-theorem partialSum_mem_eigenSpan (n : ℕ) (f : Lp ℂ 2 μ) : B.partialSum n f ∈ B.eigenSpan n :=
+theorem partialSum_mem_basisSpan (n : ℕ) (f : Lp ℂ 2 μ) : B.partialSum n f ∈ B.basisSpan n :=
   Submodule.sum_mem _ fun _ hi =>
-    Submodule.smul_mem _ _ (B.eigenfun_mem_eigenSpan (B.mem_levelSet.1 hi))
+    Submodule.smul_mem _ _ (B.basisFun_mem_basisSpan (B.mem_levelSet.1 hi))
 
 /-- The `L_2` class of the partial sum is the truncation `P_n f`. -/
 theorem toLp_partialSum (n : ℕ) (f : Lp ℂ 2 μ) :
     BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ (B.partialSum n f) = B.truncate n f := by
   rw [partialSum, map_sum]
-  simp_rw [map_smul, B.toLp_eigenfun]
+  simp_rw [map_smul, B.toLp_basisFun]
   rfl
 
 /-- For `m ≤ n`, `‖P_n f - P_m f‖_2 ≤ ‖f - P_m f‖_2`: the difference keeps the coefficients of
@@ -237,10 +244,10 @@ theorem norm_partialSum_succ_sub_le {D C : ℝ} (hW : B.LocalWeylBound D C) {s :
       Real.sqrt C * (2 : ℝ) ^ (D / 2) * ‖c‖ * ((2 : ℝ) ^ (D / 2 - s)) ^ k := by
   set f := B.sobolevEmbed s hs c
   have hC := hW.nonneg
-  have hmem : B.partialSum (2 ^ (k + 1)) f - B.partialSum (2 ^ k) f ∈ B.eigenSpan (2 ^ (k + 1)) :=
-    Submodule.sub_mem _ (B.partialSum_mem_eigenSpan _ f)
-      (B.eigenSpan_mono (Nat.pow_le_pow_right two_pos (Nat.le_succ k))
-        (B.partialSum_mem_eigenSpan _ f))
+  have hmem : B.partialSum (2 ^ (k + 1)) f - B.partialSum (2 ^ k) f ∈ B.basisSpan (2 ^ (k + 1)) :=
+    Submodule.sub_mem _ (B.partialSum_mem_basisSpan _ f)
+      (B.basisSpan_mono (Nat.pow_le_pow_right two_pos (Nat.le_succ k))
+        (B.partialSum_mem_basisSpan _ f))
   have hL2 : ‖BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ
       (B.partialSum (2 ^ (k + 1)) f - B.partialSum (2 ^ k) f)‖ ≤
         ((2 ^ k : ℕ) : ℝ) ^ (-s) * ‖c‖ := by
@@ -293,4 +300,4 @@ theorem exists_continuous_of_localWeyl {D C : ℝ} (hW : B.LocalWeylBound D C) {
   rw [B.toLp_partialSum, norm_sub_rev]
   exact B.norm_sub_truncate_le s hs.le Nat.one_le_two_pow c
 
-end LaplaceEigenbasis
+end ContinuousSpectralBasis

@@ -242,6 +242,11 @@ File `FunctionSpaces/Rd/LipschitzDomainH1.lean`, on top of
   `Rd.BoundedLipschitzDomain.aeBoundary`.
   For `H^1(Ω)` the admissible extensions are the `F ∈ W^1_2(V)` with `F = f` on `Ω`
   (`Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev`).
+* `Rd.BoundedLipschitzDomain.HasBoundaryTrace Ω ψ hp L σ q f g`: `f` has a finite intrinsic
+  norm on `Ω` and `g` is its boundary trace; for `L = 2`, `σ = 1`, `q = 2` this says
+  `f ∈ H^1(Ω)` and `g` is its boundary trace
+  (`Rd.BoundedLipschitzDomain.hasBoundaryTrace_iff_memSobolevOn`), and two such `g` agree almost
+  everywhere on `Γ` (`Rd.BoundedLipschitzDomain.HasBoundaryTrace.unique`).
 * Every `f ∈ H^1(Ω)` has a boundary trace in `B^{1/2}_{2,2}(Γ)`
   (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memSobolevOn`), unique almost everywhere
   on `Γ` (`Rd.BoundedLipschitzDomain.MemSobolevOn.isBoundaryTrace_unique`), and every

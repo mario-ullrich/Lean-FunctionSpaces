@@ -251,13 +251,13 @@ bounded continuous functions, and their embedding theorems.  The library builds 
   characterisation of their approximation spaces and `H^s = A^s_2`.
 * `FunctionSpaces.Torus.Coefficients`: `B^s_{2,2}(𝕋^d) = H^s(𝕋^d)` and the Littlewood–Paley
   characterisation of `B^s_{2,q}(𝕋^d)`.
-* `FunctionSpaces.Spectral.Eigenbasis`: eigenbases of continuous functions on a space with a
-  finite measure (the eigenfunctions of a Laplacian, as hypotheses), their scheme, `B^s_{2,2} = H^s`
-  and the Sobolev spaces.
+* `FunctionSpaces.Spectral.Eigenbasis`: continuous spectral bases, Hilbert bases of `L_2` of a
+  finite measure represented by bounded continuous functions (modelled on the eigenfunctions of a
+  Laplacian), their scheme, `B^s_{2,2} = H^s` and the Sobolev spaces.
 * `FunctionSpaces.Spectral.LocalWeyl`: the local Weyl bound, the Nikolskii inequality for
   `p ≤ 2` and the continuity of `H^s` for `s > D/2`.
-* `FunctionSpaces.Torus.Eigenbasis`: the Fourier basis as an eigenbasis, with the local Weyl
-  bound and the Nikolskii property.
+* `FunctionSpaces.Torus.Eigenbasis`: the Fourier basis as a continuous spectral basis, with the
+  local Weyl bound and the Nikolskii property.
 * `FunctionSpaces.Wavelets.Filtration`: conditional expectations as contractions on `L_p`,
   filtration schemes (the Haar system for the dyadic filtration) and the characterisation of
   their approximation spaces by martingale differences.

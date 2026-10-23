@@ -32,10 +32,10 @@ at the rate `2^(-sN) (N + 1)^((d-1)(1-1/q))`.
   the levels.
 * **Hyperbolic cross approximation.** With `S_N f = ∑_{|k|_1 ≤ N} δ_k ⋆ f`, `|k|_1 = ∑_i k_i`
   (`Rd.hyperbolicSum`), for `s > 0`, `1 ≤ q ≤ ∞` and `N ∈ ℕ`,
-  `‖f - S_N f‖_p ≤ C 2^(-sN) (N + 1)^((d-1)(1-1/q)) ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}`
-  (`Rd.enorm_sub_hyperbolicSum_le_mixedLPNorm`), with `C < ∞`
-  (`Rd.tsum_dyadicWeight_mul_rpow_ne_top`) and `#{k : |k|_1 = n} ≤ (n + 1)^(d-1)`
-  (`Rd.card_levelSet_le`).
+  `‖f - S_N f‖_p ≤ C 2^(-sN) (N + 1)^((d-1)(1-1/q)) ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}` with the
+  finite constant `C = ∑_l 2^(-sl) (l + 1)^((d-1)(1-1/q))` (`Rd.hyperbolicCrossConst`,
+  `Rd.enorm_sub_hyperbolicSum_le_of_pos`); the counting step is
+  `#{k : |k|_1 = n} ≤ (n + 1)^(d-1)` (`Rd.card_levelSet_le`).
 
 ## What is formalised
 

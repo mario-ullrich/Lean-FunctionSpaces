@@ -8,10 +8,11 @@ Besov space is `B^s_{p,q}(Ω, S) = A^s_q(L_p(μ), S)`, and the embedding theorem
 Nikolskii transfer theorem of [Approximation spaces](ApproximationSpaces.md) together with a
 Nikolskii inequality for the scheme. Spectral schemes in a Hilbert space give the Sobolev spaces
 `H^s` with Jackson and Bernstein constants `1`, and their dyadic Fourier blocks characterise
-`A^s_q` (`SpectralScheme.memApprox_iff_blockNorm_lt_top`). Eigenbases of continuous functions,
-such as the eigenfunctions of the Laplacian on a compact manifold, enter as a hypothesis. The
-`L_p` norms are handled through integrals of powers (`MeasureTheory.eLpNorm_rpow_eq`). The torus
-is the first instance ([The torus](Torus.md)).
+`A^s_q` (`SpectralScheme.memApprox_iff_blockNorm_lt_top`). Orthonormal bases of continuous
+functions with levels (continuous spectral bases), modelled on the eigenfunctions of the
+Laplacian on a compact manifold, enter as a hypothesis. The `L_p` norms are handled through
+integrals of powers (`MeasureTheory.eLpNorm_rpow_eq`). The torus is the first instance
+([The torus](Torus.md)).
 
 ## Main results
 
@@ -34,17 +35,18 @@ is the first instance ([The torus](Torus.md)).
   has a bounded continuous representative
   (`FunctionScheme.SobolevSpace.exists_boundedContinuous`). The limiting cases are not
   covered.
-* **Spaces with an eigenbasis.** Let `μ` be a finite Borel measure on a topological space `M`,
-  and `(e_i)` an orthonormal basis of `L_2(μ)` of bounded continuous functions with levels
-  `λ(i) ∈ ℕ`, finitely many of each level, as the eigenfunctions of the Laplacian on a compact
-  Riemannian manifold with `λ(i) = ⌊√λ_i⌋`. The existence of such a basis is a hypothesis here
-  (`LaplaceEigenbasis`); the torus satisfies it (`Torus.fourierEigenbasis`). For the scheme of the
-  spans of `{e_i : λ(i) < n}` and `s > 0`, `f ∈ B^s_{2,2}` iff
-  `∑_i (1 + λ(i))^(2s) |⟨e_i, f⟩|² < ∞` (`LaplaceEigenbasis.memBesov_two_two_iff`). If moreover
-  `∑_{λ(i) < n} |e_i(x)|² ≤ C n^D` for all `x` and `n ≥ 1` (the local Weyl bound), then
+* **Spaces with a continuous spectral basis.** Let `μ` be a finite Borel measure on a
+  topological space `M`, and `(e_i)` an orthonormal basis of `L_2(μ)` of bounded continuous
+  functions with levels `λ(i) ∈ ℕ`, finitely many of each level (`ContinuousSpectralBasis`). The
+  model is the eigenbasis of the Laplacian on a compact Riemannian manifold with
+  `λ(i) = ⌊√λ_i⌋`; the structure consists of the basis, its levels and its continuous
+  representatives, and the torus is an instance (`Torus.fourierEigenbasis`). For the scheme of
+  the spans of `{e_i : λ(i) < n}` and `s > 0`, `f ∈ B^s_{2,2}` iff
+  `∑_i (1 + λ(i))^(2s) |⟨e_i, f⟩|² < ∞` (`ContinuousSpectralBasis.memBesov_two_two_iff`). If
+  moreover `∑_{λ(i) < n} |e_i(x)|² ≤ C n^D` for all `x` and `n ≥ 1` (the local Weyl bound), then
   `‖a‖_∞^p ≤ C n^D ‖a‖_p^p` for `1 ≤ p ≤ 2` and `a` in the span of level `< n`
-  (`LaplaceEigenbasis.norm_rpow_le_of_localWeyl`), and for `2s > D` every such `f` has a bounded
-  continuous representative (`LaplaceEigenbasis.exists_continuous_of_localWeyl`).
+  (`ContinuousSpectralBasis.norm_rpow_le_of_localWeyl`), and for `2s > D` every such `f` has a
+  bounded continuous representative (`ContinuousSpectralBasis.exists_continuous_of_localWeyl`).
 
 ## What is formalised
 
@@ -58,7 +60,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Sobolev embeddings | ✅ | ✗ | `Sobolev/Embeddings` |
 | Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ | ✗ | `Spectral/Basic` |
 | Coefficient characterisations of spectral schemes, `H^s = B^s_{2,2}` | ✅ | ✗ | `Spectral/Blocks` |
-| Eigenbases of continuous functions (hypothesis), `B^s_{2,2} = H^s`, local Weyl bound, Nikolskii for `p ≤ 2`, continuity of `H^s` for `s > D/2` | ✅ | ✗ | `Spectral/Eigenbasis`, `Spectral/LocalWeyl` |
+| Continuous spectral bases (hypothesis), `B^s_{2,2} = H^s`, local Weyl bound, Nikolskii for `p ≤ 2`, continuity of `H^s` for `s > D/2` | ✅ | ✗ | `Spectral/Eigenbasis`, `Spectral/LocalWeyl` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

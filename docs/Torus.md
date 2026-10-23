@@ -68,9 +68,9 @@ restriction to a face of `𝕋^(n+1)` is the model case of the trace theorem.
 * **Fourier coefficients and dyadic blocks on the torus.** For the Fourier basis on `𝕋^d` the
   dyadic blocks of the abstract theory give the Littlewood–Paley characterisation of
   `B^s_{2,q}(𝕋^d)` (`Torus.memBesov_two_iff_blockNorm_lt_top`), and for `q = 2`
-  `B^s_{2,2}(𝕋^d) = H^s(𝕋^d)` (`Torus.memBesov_two_two_iff`). The Fourier basis is a Laplace
-  eigenbasis with the local Weyl bound of dimension `d` (`Torus.fourierEigenbasis`,
-  `Torus.localWeylBound_fourierEigenbasis`).
+  `B^s_{2,2}(𝕋^d) = H^s(𝕋^d)` (`Torus.memBesov_two_two_iff`). The Fourier basis, an eigenbasis
+  of the Laplacian, is a continuous spectral basis with the local Weyl bound of dimension `d`
+  (`Torus.fourierEigenbasis`, `Torus.localWeylBound_fourierEigenbasis`).
 
 ## What is formalised
 
@@ -81,7 +81,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The torus: trigonometric polynomials, Nikolskii inequality | ✅ | ✗ | `Torus/Measure`, `Torus/Scheme`, `Torus/Nikolskii` |
 | The torus: `H^s(𝕋^d)`, Besov and Sobolev embeddings, `H^s(𝕋^d) ↪ C(𝕋^d)` | ✅ | ✗ | `Torus/Sobolev`, `Torus/Embeddings` |
 | Fourier-coefficient characterisations, `H^s(𝕋^d) = B^s_{2,2}(𝕋^d)` | ✅ | ✗ | `Torus/Coefficients` |
-| The Fourier basis as a Laplace eigenbasis with the local Weyl bound | ✅ | ✗ | `Torus/Eigenbasis` |
+| The Fourier basis as a continuous spectral basis with the local Weyl bound | ✅ | ✗ | `Torus/Eigenbasis` |
 | Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ | ✗ | `Torus/Translation`, `Torus/Modulus`, `Torus/BesovModuli` |
 | Convolution on the torus with kernels on `ℝ^d`: Young's inequality, Fourier multipliers, differences | ✅ | ✗ | `Torus/EuclideanConvolution` |
 | Jackson's and Bernstein's inequalities in `L_p(𝕋^d)`, moduli of every order | ✅ | ✗ | `Torus/LpJackson` |

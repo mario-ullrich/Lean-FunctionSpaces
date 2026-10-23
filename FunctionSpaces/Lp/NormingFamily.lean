@@ -45,7 +45,8 @@ variable {α : Type*} [MeasurableSpace α] {μ : Measure α}
 
 /-- **Hölder's inequality for functions with values in `[0, ∞]`, in `L_p` norms**: for
 conjugate exponents `1 < p, q < ∞` and almost everywhere measurable `F, G`,
-`∫ F G ≤ ‖F‖_p ‖G‖_q` (Mathlib's `ENNReal.lintegral_mul_le_Lp_mul_Lq`). -/
+`∫ F G ≤ ‖F‖_p ‖G‖_q`. This is Mathlib's `ENNReal.lintegral_mul_le_Lp_mul_Lq`, which writes the
+right side with the integrals `(∫ F^p)^(1/p) (∫ G^q)^(1/q)` and real exponents. -/
 theorem lintegral_mul_le_eLpNorm_mul_eLpNorm {p q : ℝ≥0∞} [p.HolderConjugate q] (hp : p ≠ ∞)
     (hq : q ≠ ∞) {F G : α → ℝ≥0∞} (hF : AEMeasurable F μ) (hG : AEMeasurable G μ) :
     ∫⁻ x, F x * G x ∂μ ≤ eLpNorm F p μ * eLpNorm G q μ := by

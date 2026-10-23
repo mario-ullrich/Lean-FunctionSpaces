@@ -21,10 +21,12 @@ The **level** of `k ∈ ℕ^d` is `|k|_1 = ∑_i k_i` (`Rd.level`), and the **hy
   tensor Littlewood–Paley decomposition.
 * **Counting** (`Rd.card_levelSet_le`): `#{k ∈ ℕ^d : |k|_1 = n} ≤ (n + 1)^(d-1)`, since an index of
   level `n` is determined by its first `d - 1` coordinates.
-* **The rate** (`Rd.enorm_sub_hyperbolicSum_le_mixedLPNorm`): for `s > 0` and `1 ≤ q ≤ ∞`,
-  `‖f - S_N f‖_p ≤ C 2^(-sN) (N + 1)^((d-1)(1-1/q)) ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}`: on each
-  level Hölder's inequality costs `#{|k|_1 = n}^(1-1/q) ≤ (n + 1)^((d-1)(1-1/q))`, and
-  `∑_{n > N} 2^(-sn) (n + 1)^a ≤ C 2^(-sN) (N + 1)^a`.
+* **The rate** (`Rd.enorm_sub_hyperbolicSum_le_mixedLPNorm`): for real `s` and `1 ≤ q ≤ ∞`,
+  `‖f - S_N f‖_p ≤ C 2^(-sN) (N + 1)^((d-1)(1-1/q)) ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}` with
+  `C = ∑_l 2^(-sl) (l + 1)^((d-1)(1-1/q))` (`Rd.hyperbolicCrossConst`): on each level Hölder's
+  inequality costs `#{|k|_1 = n}^(1-1/q) ≤ (n + 1)^((d-1)(1-1/q))`, and
+  `∑_{n > N} 2^(-sn) (n + 1)^a ≤ C 2^(-sN) (N + 1)^a`. For `s > 0` the constant is finite
+  (`Rd.hyperbolicCrossConst_ne_top`, `Rd.enorm_sub_hyperbolicSum_le_of_pos`).
 -/
 
 @[expose] public section
@@ -248,16 +250,30 @@ theorem enorm_sub_hyperbolicSum_le (hp : p ≠ ∞) (N : ℕ)
   refine tsum_congr fun k => ?_
   by_cases h : level k ≤ N <;> simp [u, h]
 
-/-- **Hyperbolic cross approximation**: for `s > 0`, `1 ≤ q ≤ ∞` and `N ∈ ℕ`,
+/-- The **constant of hyperbolic cross approximation**,
+`C(d, s, q) = ∑_l 2^(-sl) (l + 1)^((d-1)(1-1/q)) ∈ [0, ∞]`. -/
+noncomputable def hyperbolicCrossConst (d : ℕ) (s : ℝ) (q : ℝ≥0∞) : ℝ≥0∞ :=
+  ∑' l : ℕ, dyadicWeight (-s) l * ((l + 1 : ℕ) : ℝ≥0∞) ^ (((d - 1 : ℕ) : ℝ) * (1 - 1 / q.toReal))
+
+/-- The constant of hyperbolic cross approximation is finite for `s > 0` and `1 ≤ q ≤ ∞`
+(`Rd.tsum_dyadicWeight_mul_rpow_ne_top` with `a = (d-1)(1-1/q) ≥ 0`). -/
+theorem hyperbolicCrossConst_ne_top {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q) :
+    hyperbolicCrossConst d s q ≠ ∞ :=
+  tsum_dyadicWeight_mul_rpow_ne_top hs
+    (mul_nonneg (Nat.cast_nonneg _) (one_sub_one_div_toReal_nonneg hq))
+
+/-- **Hyperbolic cross approximation**: for `1 ≤ p < ∞`, `f ∈ L_p(ℝ^d)`, real `s`, `1 ≤ q ≤ ∞`
+and `N ∈ ℕ`,
 `‖f - S_N f‖_p ≤ C 2^(-sN) (N + 1)^((d-1)(1-1/q)) ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}` with
-`C = ∑_l 2^(-sl) (l + 1)^((d-1)(1-1/q)) < ∞` (`Rd.tsum_dyadicWeight_mul_rpow_ne_top`). -/
+`C = Rd.hyperbolicCrossConst d s q ∈ [0, ∞]`. The constant is finite for `s > 0` and `∞` for
+`s ≤ 0`; `Rd.enorm_sub_hyperbolicSum_le_of_pos` states the bound for `s > 0` with `C` as a real
+number. -/
 theorem enorm_sub_hyperbolicSum_le_mixedLPNorm (hp : p ≠ ∞) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (N : ℕ) (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
-    ‖f - hyperbolicSum hp N f‖ₑ ≤
-      (∑' l : ℕ, dyadicWeight (-s) l *
-          ((l + 1 : ℕ) : ℝ≥0∞) ^ (((d - 1 : ℕ) : ℝ) * (1 - 1 / q.toReal))) *
+    ‖f - hyperbolicSum hp N f‖ₑ ≤ hyperbolicCrossConst d s q *
         (dyadicWeight (-s) N * ((N + 1 : ℕ) : ℝ≥0∞) ^ (((d - 1 : ℕ) : ℝ) * (1 - 1 / q.toReal))) *
         mixedLPNorm hp s q f := by
+  unfold hyperbolicCrossConst
   set a := ((d - 1 : ℕ) : ℝ) * (1 - 1 / q.toReal)
   have hq1 := one_sub_one_div_toReal_nonneg hq
   have ha : 0 ≤ a := mul_nonneg (Nat.cast_nonneg _) hq1
@@ -295,5 +311,17 @@ theorem enorm_sub_hyperbolicSum_le_mixedLPNorm (hp : p ≠ ∞) (s : ℝ) {q : �
     _ = (∑' n : ℕ, (if N < n then dyadicWeight (-s) n * ((n + 1 : ℕ) : ℝ≥0∞) ^ a else 0)) * X :=
         ENNReal.tsum_mul_right
     _ ≤ _ := mul_le_mul' (tsum_tail_le s ha N) le_rfl
+
+/-- **Hyperbolic cross approximation for `s > 0`**: for `1 ≤ p < ∞`, `f ∈ L_p(ℝ^d)`, `s > 0`,
+`1 ≤ q ≤ ∞` and `N ∈ ℕ`, with the real constant `C = C(d, s, q) < ∞`,
+`‖f - S_N f‖_p ≤ C 2^(-sN) (N + 1)^((d-1)(1-1/q)) ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}`
+(`Rd.enorm_sub_hyperbolicSum_le_mixedLPNorm`, `Rd.hyperbolicCrossConst_ne_top`). -/
+theorem enorm_sub_hyperbolicSum_le_of_pos (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
+    (hq : 1 ≤ q) (N : ℕ) (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
+    ‖f - hyperbolicSum hp N f‖ₑ ≤ ((hyperbolicCrossConst d s q).toNNReal : ℝ≥0∞) *
+        (dyadicWeight (-s) N * ((N + 1 : ℕ) : ℝ≥0∞) ^ (((d - 1 : ℕ) : ℝ) * (1 - 1 / q.toReal))) *
+        mixedLPNorm hp s q f := by
+  rw [ENNReal.coe_toNNReal (hyperbolicCrossConst_ne_top hs hq)]
+  exact enorm_sub_hyperbolicSum_le_mixedLPNorm hp s hq N f
 
 end Rd

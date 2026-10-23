@@ -48,7 +48,10 @@ theorem inclusionOfExponentLe_toLp (hpr : p ≤ r) (a : α →ᵇ E) :
     coeFn_toLp (E := E) r μ 𝕜 a, coeFn_toLp (E := E) p μ 𝕜 a] with x h1 h2 h3
   rw [h1, h2, h3]
 
-/-- The `L_p` norm of the class of a bounded continuous function is its `eLpNorm`. -/
+/-- The `L_p` norm of the class of a bounded continuous function is its `eLpNorm`: the bounded
+continuous analogue of Mathlib's `MeasureTheory.Lp.norm_toLp`, proved from
+`MeasureTheory.Lp.norm_def` with the class `toLp p μ 𝕜 a` equal to `a` almost everywhere
+(`BoundedContinuousFunction.coeFn_toLp`). -/
 theorem norm_toLp_eq_toReal_eLpNorm (a : α →ᵇ E) :
     ‖toLp (E := E) p μ 𝕜 a‖ = (eLpNorm a p μ).toReal := by
   rw [Lp.norm_def, eLpNorm_congr_ae (coeFn_toLp (E := E) p μ 𝕜 a)]

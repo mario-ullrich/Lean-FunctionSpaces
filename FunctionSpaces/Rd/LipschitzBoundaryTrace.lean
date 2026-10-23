@@ -45,6 +45,14 @@ Let `Ω` be a bounded Lipschitz domain with boundary `Γ`: finitely many balls `
   `Rd.BoundedLipschitzDomain.IsBoundaryTrace.unique`). In particular
   `B^s_{p,q}(Γ)` does not depend on the resolution of unity
   (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_of_boundaryPartition`).
+* **Boundary traces with a finite intrinsic norm**
+  (`Rd.BoundedLipschitzDomain.HasBoundaryTrace`): `f` has the boundary trace `g` if `f` has a
+  finite intrinsic norm on `Ω` and `g` is its boundary trace. The trace space, the existence and
+  the uniqueness of the trace hold in this form
+  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_hasBoundaryTrace`,
+  `Rd.BoundedLipschitzDomain.HasBoundaryTrace.memBoundaryBesov`,
+  `Rd.BoundedLipschitzDomain.exists_hasBoundaryTrace_of_modNormOn_lt_top`,
+  `Rd.BoundedLipschitzDomain.HasBoundaryTrace.unique`).
 -/
 
 @[expose] public section
@@ -549,8 +557,11 @@ theorem memBoundaryBesov_iff_of_boundaryPartition (ψ ψ' : Ω.BoundaryPartition
 
 /-- `g` is **the boundary trace of `f`**: `Tr_Γ F = g` almost everywhere on `Γ` for every `F` with
 `F = f` on `Ω` and `‖F‖_p + ‖(2^(kσ) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞`. For `f` with a finite intrinsic
-norm on `Ω` such `F` exist (`Rd.BoundedLipschitzDomain.exists_besov_extension_of_modulusOn`), and
-they all have the same boundary trace (`Rd.BoundedLipschitzDomain.boundaryTrace_congr`). -/
+norm on `Ω`, `0 < σ < L` and `1 ≤ q` such `F` exist
+(`Rd.BoundedLipschitzDomain.exists_besov_extension_of_modulusOn`), and they all have the same
+boundary trace (`Rd.BoundedLipschitzDomain.boundaryTrace_congr`). The predicate makes a statement
+only when an admissible `F` exists; `Rd.BoundedLipschitzDomain.HasBoundaryTrace` adds the finite
+intrinsic norm. -/
 def IsBoundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) (L : ℕ) (σ : ℝ) (q : ℝ≥0∞)
     (f : Lp ℂ p (volume : Measure V)) (g : V → ℂ) : Prop :=
   ∀ F : Lp ℂ p (volume : Measure V), indicatorLp Ω.measurableSet F = indicatorLp Ω.measurableSet f →
@@ -613,6 +624,80 @@ theorem IsBoundaryTrace.unique {ψ : Ω.BoundaryPartition} {hp : p ≠ ∞} {L :
     g =ᶠ[Ω.aeBoundary] g' := by
   obtain ⟨F, hFf, hF⟩ := Ω.exists_besov_extension_of_modulusOn hp hσ hσL hq hf
   exact (hg F hFf hF).symm.trans (hg' F hFf hF)
+
+/-! ### Boundary traces of functions with a finite intrinsic norm -/
+
+/-- `f` **has the boundary trace `g`**: `f` has a finite intrinsic norm on `Ω`,
+`‖f‖_{L_p(Ω)} + ‖(2^(kσ) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, and `g` is the boundary trace of `f`
+in the sense of `Rd.BoundedLipschitzDomain.IsBoundaryTrace`: `Tr_Γ F = g` almost everywhere on `Γ`
+for every `F` with `F = f` on `Ω` and `‖F‖_p + ‖(2^(kσ) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞`. For
+`0 < σ < L` and `1 ≤ q` the finite intrinsic norm provides such an `F`
+(`Rd.BoundedLipschitzDomain.exists_besov_extension_of_modulusOn`), so the trace condition is a
+statement about at least one extension. -/
+structure HasBoundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) (L : ℕ) (σ : ℝ) (q : ℝ≥0∞)
+    (f : Lp ℂ p (volume : Measure V)) (g : V → ℂ) : Prop where
+  /-- The intrinsic norm of `f` on `Ω` is finite, written out as in the hypotheses of the
+  `IsBoundaryTrace` theorems above. -/
+  modNormOn_lt_top : ‖indicatorLp Ω.measurableSet f‖ₑ + lqNorm q (fun k =>
+    dyadicWeight σ k * lpModulusOn p Ω.carrier L f k) < ∞
+  /-- `g` is the boundary trace of every admissible extension of `f`. -/
+  isBoundaryTrace : Ω.IsBoundaryTrace ψ hp L σ q f g
+
+/-- `f` **has the boundary trace `g`** iff the intrinsic norm
+`‖f‖_{L_p(Ω)} + ‖(2^(kσ) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}` is finite and `g` is the boundary trace of
+`f` in the sense of `Rd.BoundedLipschitzDomain.IsBoundaryTrace`: the two fields of
+`Rd.BoundedLipschitzDomain.HasBoundaryTrace`. -/
+theorem hasBoundaryTrace_iff {ψ : Ω.BoundaryPartition} {hp : p ≠ ∞} {L : ℕ} {σ : ℝ} {q : ℝ≥0∞}
+    {f : Lp ℂ p (volume : Measure V)} {g : V → ℂ} :
+    Ω.HasBoundaryTrace ψ hp L σ q f g ↔
+      ‖indicatorLp Ω.measurableSet f‖ₑ + lqNorm q (fun k =>
+        dyadicWeight σ k * lpModulusOn p Ω.carrier L f k) < ∞ ∧
+      Ω.IsBoundaryTrace ψ hp L σ q f g :=
+  ⟨fun h => ⟨h.1, h.2⟩, fun h => ⟨h.1, h.2⟩⟩
+
+/-- **The trace space of `B^{s+1/p}_{p,q}(Ω)`**, with `Rd.BoundedLipschitzDomain.HasBoundaryTrace`:
+for `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞` and `L ≥ 2`, `g ∈ B^s_{p,q}(Γ)` iff some `f` with a
+finite intrinsic norm of order `s + 1/p` on `Ω` has the boundary trace `g`
+(`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_isBoundaryTrace`). -/
+theorem memBoundaryBesov_iff_exists_hasBoundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞)
+    {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q)
+    (g : V → ℂ) :
+    Ω.MemBoundaryBesov p ψ s q g ↔ ∃ f : Lp ℂ p (volume : Measure V),
+      Ω.HasBoundaryTrace ψ hp L (s + 1 / p.toReal) q f g := by
+  simp only [hasBoundaryTrace_iff]
+  exact Ω.memBoundaryBesov_iff_exists_isBoundaryTrace ψ hp hL hs hs1 hq g
+
+/-- **Boundary traces lie in `B^s_{p,q}(Γ)`**: for `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞` and
+`L ≥ 2`, if `f` has the boundary trace `g` for the order `s + 1/p`, then `g ∈ B^s_{p,q}(Γ)`. -/
+theorem HasBoundaryTrace.memBoundaryBesov {ψ : Ω.BoundaryPartition} {hp : p ≠ ∞} {L : ℕ}
+    (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q)
+    {f : Lp ℂ p (volume : Measure V)} {g : V → ℂ}
+    (h : Ω.HasBoundaryTrace ψ hp L (s + 1 / p.toReal) q f g) : Ω.MemBoundaryBesov p ψ s q g :=
+  (Ω.memBoundaryBesov_iff_exists_hasBoundaryTrace ψ hp hL hs hs1 hq g).2 ⟨f, h⟩
+
+/-- **Existence of the boundary trace**, with `Rd.BoundedLipschitzDomain.HasBoundaryTrace`: for
+`1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞` and `L ≥ 2`, every `f` with
+`‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` has a boundary trace
+`g ∈ B^s_{p,q}(Γ)` (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_modNormOn_lt_top`). -/
+theorem exists_hasBoundaryTrace_of_modNormOn_lt_top (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞)
+    {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q)
+    {f : Lp ℂ p (volume : Measure V)}
+    (hf : ‖indicatorLp Ω.measurableSet f‖ₑ + lqNorm q (fun k =>
+      dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p Ω.carrier L f k) < ∞) :
+    ∃ g : V → ℂ, Ω.MemBoundaryBesov p ψ s q g ∧
+      Ω.HasBoundaryTrace ψ hp L (s + 1 / p.toReal) q f g := by
+  obtain ⟨g, hg, hfg⟩ := Ω.exists_isBoundaryTrace_of_modNormOn_lt_top ψ hp hL hs hs1 hq hf
+  exact ⟨g, hg, hf, hfg⟩
+
+variable {Ω} in
+/-- **Uniqueness of the boundary trace**, with `Rd.BoundedLipschitzDomain.HasBoundaryTrace`: for
+`1 ≤ p < ∞`, `0 < σ < L` and `1 ≤ q ≤ ∞`, two boundary traces `g`, `g'` of `f` agree almost
+everywhere on `Γ` (`Rd.BoundedLipschitzDomain.IsBoundaryTrace.unique`). -/
+theorem HasBoundaryTrace.unique {ψ : Ω.BoundaryPartition} {hp : p ≠ ∞} {L : ℕ} {σ : ℝ}
+    (hσ : 0 < σ) (hσL : σ < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
+    {g g' : V → ℂ} (hg : Ω.HasBoundaryTrace ψ hp L σ q f g)
+    (hg' : Ω.HasBoundaryTrace ψ hp L σ q f g') : g =ᶠ[Ω.aeBoundary] g' :=
+  hg.isBoundaryTrace.unique hσ hσL hq hg.modNormOn_lt_top hg'.isBoundaryTrace
 
 end BoundedLipschitzDomain
 
