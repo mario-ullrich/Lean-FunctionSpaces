@@ -32,6 +32,9 @@ refs/
 # Archive of deleted files, a local working aid (see old/README.md)
 old/
 
+# Working plans, a local working aid
+plans/
+
 # LaTeX intermediate files
 *.aux
 *.bbl
