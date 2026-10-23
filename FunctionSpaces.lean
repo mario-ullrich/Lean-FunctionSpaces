@@ -208,11 +208,13 @@ public import FunctionSpaces.Wavelets.Daubechies.D4Besov
 public import FunctionSpaces.Wavelets.Daubechies.OrderThree
 
 /-!
-# Function spaces
+# Characterizations of function spaces
 
-Besov and Sobolev spaces on a finite measure space, defined through approximation schemes of
-bounded continuous functions, and their embedding theorems.  The library builds on
-`ApproximationSpaces`.
+Besov, Triebel–Lizorkin, Sobolev and Bessel potential spaces on finite measure spaces, `ℝ^d`,
+the torus, intervals, the cube, Lipschitz domains and compact manifolds, their embedding theorems,
+and the theorems that their characterisations agree. The library builds on
+`ApproximationSpaces`. The folders follow the settings, with one folder per characterisation;
+`Analysis` holds the tools without function-space content.
 
 ## Layout
 

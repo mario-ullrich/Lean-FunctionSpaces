@@ -1,6 +1,6 @@
 # Lean-FunctionSpaces for FEEC and BEEC: the interface
 
-Part of [Function spaces via approximation](../README.md). Blueprint chapter: *Sobolev spaces on
+Part of [Characterizations of Function Spaces](../README.md). Blueprint chapter: *Sobolev spaces on
 `ℝ^d`*. Block document: [Sobolev spaces on `ℝ^d`](SobolevRd.md).
 
 ## 1. Purpose
@@ -785,12 +785,12 @@ the FEEC/BEEC library builds the layers above on them.
 
 The Lean declarations cited here are those of the commit of `main` that adds the trace kernel
 (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`); later commits keep them unless this
-document says otherwise, and the commit that changes an interface name updates this document.
-The module paths are those of the folder layout by setting (Section 9): declaration names do not
-depend on folders, so a downstream file changes only its `import` lines. Pin `rev` to a commit at
-or after the one that moves the files into this layout. Missing lemmas and wishes for other statement
-shapes go to the issue tracker of the GitHub repository, with the item number of the proposal and
-the intended Lean statement.
+document says otherwise, and the commit that changes an interface name updates this document. The
+module paths are those of the folder layout by setting (Section 9): declaration names do not depend
+on folders, so a downstream file changes only its `import` lines. Pin `rev` to a commit at or after
+the one that moves the files into this layout. Missing lemmas and wishes for other statement shapes
+go to the issue tracker of the GitHub repository, with the item number of the proposal and the
+intended Lean statement.
 
 ## 9. Changes to the original plan (14 October 2026)
 

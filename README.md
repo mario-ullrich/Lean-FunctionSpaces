@@ -1,9 +1,13 @@
-# Function spaces via approximation in Lean 4 / Mathlib
+# Characterizations of Function Spaces in Lean 4 / Mathlib
 
-A Lean 4 / Mathlib formalisation of **Besov, Triebel–Lizorkin and Sobolev spaces** on several
-domains, their equivalent **characterisations** and their **embedding theorems**, built on the
-theory of **approximation spaces**. The project is work in progress; the details are in ten
-block documents under [`docs/`](docs/), listed under [What is formalised](#what-is-formalised).
+A Lean 4 / Mathlib formalisation of the **characterisations** of Besov, Triebel–Lizorkin,
+Sobolev and Bessel potential spaces, and of the theorems that they agree: by approximation,
+moduli of smoothness, Littlewood–Paley blocks, local means, atoms, wavelet and spline
+coefficients, weak derivatives, Bessel potentials, interpolation, restriction and traces, on
+`ℝ^d`, the torus, intervals, the cube, Lipschitz domains and compact manifolds, together with
+the **embedding theorems**. The abstract theory of **approximation spaces** is one part of it. The
+project is work in progress; the details are in ten block documents under [`docs/`](docs/),
+listed under [What is formalised](#what-is-formalised).
 
 * **Blueprint** (a webpage explaining the mathematics):
   <https://mario-ullrich.github.io/Lean-FunctionSpaces/>

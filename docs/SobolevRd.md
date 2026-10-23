@@ -1,6 +1,6 @@
 # Sobolev spaces on `ℝ^d`
 
-Part of [Function spaces via approximation](../README.md). Blueprint chapters: *Sobolev spaces on
+Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *Sobolev spaces on
 `ℝ^d`*.
 
 This block develops the Sobolev spaces `W^m_p` defined by weak derivatives. A weak derivative is

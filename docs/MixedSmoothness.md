@@ -1,6 +1,6 @@
 # Dominating mixed smoothness
 
-Part of [Function spaces via approximation](../README.md). Blueprint chapters: *Dominating mixed
+Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *Dominating mixed
 smoothness on `ℝ^d`*.
 
 On `ℝ^d = Fin d → ℝ` the spaces of dominating mixed smoothness measure differences in several

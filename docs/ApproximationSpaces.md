@@ -1,6 +1,6 @@
 # Approximation spaces
 
-Part of [Function spaces via approximation](../README.md). Blueprint chapters: *Approximation
+Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *Approximation
 schemes*, *Sequence spaces*, *Approximation spaces*, *Lifting and the Nikolskii transfer theorem*,
 *Interpolation and the representation theorem*, *Block decompositions and projections*, *Traces and
 intrinsic norms*, *Moduli of smoothness and approximation*.

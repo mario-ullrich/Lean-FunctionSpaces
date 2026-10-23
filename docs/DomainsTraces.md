@@ -1,7 +1,7 @@
 # Domains, manifolds and traces
 
-Part of [Function spaces via approximation](../README.md). Blueprint chapters: the domain and trace
-sections of Function spaces on `ℝ^d`, *Besov spaces on compact manifolds*.
+Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: the domain and
+trace sections of Function spaces on `ℝ^d`, *Besov spaces on compact manifolds*.
 
 With `V` and the kernels of [Function spaces on `ℝ^d`](Rd.md), the Besov spaces of a domain
 `Ω ⊆ V` are described by intrinsic differences on `Ω` and as restrictions of `B^s_{p,q}(V)`, for

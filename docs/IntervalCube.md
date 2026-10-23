@@ -1,6 +1,6 @@
 # Intervals, the cube, splines and wavelets
 
-Part of [Function spaces via approximation](../README.md). Blueprint chapters: *Filtrations and
+Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *Filtrations and
 martingale differences*, *Polynomial approximation on intervals*, *Approximation on the cube*.
 
 On `[0, 1]`, the circle and the cube `[0, 1]^d`, the schemes are dyadic piecewise polynomials

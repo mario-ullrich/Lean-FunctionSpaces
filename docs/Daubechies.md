@@ -1,6 +1,6 @@
 # Daubechies wavelets
 
-Part of [Function spaces via approximation](../README.md). Blueprint chapters: *Daubechies
+Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *Daubechies
 wavelets*.
 
 The compactly supported orthonormal wavelets of Daubechies on `ℝ`, built from the filter up, and

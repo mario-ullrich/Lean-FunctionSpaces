@@ -1,7 +1,7 @@
 # Function spaces on `ℝ^d`
 
-Part of [Function spaces via approximation](../README.md). Blueprint chapters: *Function spaces on
-`ℝ^d`, up to the invariance under changes of variables*.
+Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *Function spaces
+on `ℝ^d`, up to the invariance under changes of variables*.
 
 Here `V` is a finite-dimensional real inner product space, such as `ℝ^d`, with its Lebesgue
 measure, and `1 ≤ p < ∞`. The scheme consists of the band-limited classes

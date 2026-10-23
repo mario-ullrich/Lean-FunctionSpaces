@@ -1,6 +1,6 @@
 # The torus
 
-Part of [Function spaces via approximation](../README.md). Blueprint chapters: *The torus*,
+Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *The torus*,
 *Classical definitions on the torus*.
 
 On `𝕋^d` with its normalised Haar measure, the scheme consists of the trigonometric polynomials of

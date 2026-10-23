@@ -1,6 +1,6 @@
 # Besov and Sobolev spaces on measure spaces
 
-Part of [Function spaces via approximation](../README.md). Blueprint chapters: *Besov spaces and
+Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *Besov spaces and
 their embeddings*, *Sobolev spaces and their embeddings*, *Spectral schemes*.
 
 For a finite measure space `(Ω, μ)` and a scheme `S` of bounded continuous functions, the

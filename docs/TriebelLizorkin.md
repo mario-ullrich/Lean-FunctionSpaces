@@ -1,6 +1,6 @@
 # Triebel–Lizorkin spaces
 
-Part of [Function spaces via approximation](../README.md). Blueprint chapters:
+Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters:
 *Triebel–Lizorkin spaces*.
 
 Besov quasi-norms take the `L_p` norm of every Littlewood–Paley block `ψ_j ⋆ f` and then the
