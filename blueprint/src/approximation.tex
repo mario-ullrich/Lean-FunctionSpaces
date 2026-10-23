@@ -1,0 +1,2081 @@
+% !TEX root = print.tex
+
+\part{Approximation spaces}
+\label{part:approximation}
+
+This part develops the abstract theory: approximation schemes in a normed space, the
+approximation spaces $A^s_q$ and their embeddings, Jackson's and Bernstein's inequalities with
+the Nikolskii transfer theorem, the representation of $A^s_q$ as a real interpolation space of
+the discrete $K$-method, block decompositions and projections, traces and intrinsic norms, and
+moduli of smoothness. Its last three chapters apply the theory to schemes of functions on a
+finite measure space, whose approximation spaces are Besov spaces with embeddings from a
+Nikolskii inequality, and to spectral schemes in a Hilbert space. The characterisations proved
+here are the abstract ones: by the error of best approximation, by blocks, by real interpolation
+(the discrete $K$-method) and by moduli of smoothness.
+
+\chapter{Approximation schemes}
+\label{ch:schemes}
+
+An approximation scheme is an increasing family of sets $A_0 \subseteq A_1 \subseteq \cdots$ in a
+normed space, and $f$ belongs to the approximation space $A^s_q$ in the sense of
+Pietsch~\cite{Pietsch} when its errors of best approximation $E_n(f) = \dist(f, A_n)$ decay like
+$n^{-s}$ in the $\ell_q$ sense.
+
+Throughout, $X$ and $Y$ are real normed spaces. Complex spaces, such as $L_p$ spaces of
+complex-valued functions, are regarded as real ones.
+
+\begin{definition}[Approximation scheme]
+\label{def:scheme}
+\lean{ApproximationScheme, ApproximationScheme.coe_zero, ApproximationScheme.ext}
+\leanok
+An \emph{approximation scheme} in $X$ is a sequence of subsets
+$A_0 \subseteq A_1 \subseteq A_2 \subseteq \cdots$ of $X$ such that
+\begin{enumerate}
+  \item $A_0 = \{0\}$,
+  \item $c\,a \in A_n$ for all $c \in \R$, $n \in \N$ and $a \in A_n$,
+  \item $a + b \in A_{m+n}$ for all $m, n \in \N$, $a \in A_m$ and $b \in A_n$.
+\end{enumerate}
+\end{definition}
+
+The elements of $A_n$ are the approximants of complexity $n$. The sets need not be linear
+subspaces: in the $n$-term scheme of \Cref{def:nterm} they are unions of subspaces. A family
+indexed by a degree enters with a strict inequality, $A_n = \{\text{degree} < n\}$, so that
+$A_0 = \{0\}$ holds.
+
+\begin{lemma}[Elementary properties]
+\label{lem:scheme-basic}
+\lean{ApproximationScheme.zero_mem, ApproximationScheme.nonempty, ApproximationScheme.neg_mem,
+  ApproximationScheme.sub_mem, ApproximationScheme.sum_mem, ApproximationScheme.smul_set_eq,
+  ApproximationScheme.sub_mem_pow_add_two, ApproximationScheme.mem_of_le,
+  ApproximationScheme.add_mem, ApproximationScheme.add_mem_pow_succ,
+  ApproximationScheme.sub_mem_pow_succ, ApproximationScheme.iUnionSubmodule,
+  ApproximationScheme.coe_iUnionSubmodule}
+\leanok
+\uses{def:scheme}
+Let $A$ be an approximation scheme in $X$. Then for all $m, n, k \in \N$:
+\begin{enumerate}
+  \item $0 \in A_n$; in particular $A_n$ is nonempty;
+  \item $a - b \in A_{m+n}$ for all $a \in A_m$ and $b \in A_n$;
+  \item $\sum_{i \in I} a_i \in A_{\sum_{i \in I} n_i}$ for every finite family with
+    $a_i \in A_{n_i}$;
+  \item $c\,A_n = A_n$ for every $c \in \R \setminus \{0\}$;
+  \item $a - b \in A_{2^{k+2}}$ for all $a \in A_{2^{k+1}}$ and $b \in A_{2^k}$;
+  \item $\bigcup_n A_n$ is a linear subspace of $X$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first item follows from $A_0 = \{0\} \subseteq A_n$, the second from $-b = (-1)\,b$, and
+the third by induction over $I$. For the fourth, $c^{-1} a \in A_n$ for $a \in A_n$. The fifth
+follows from the second and $2^{k+1} + 2^k \leq 2^{k+2}$, and the last from the axioms
+$A_m + A_n \subseteq A_{m+n}$ and $c\,A_n \subseteq A_n$.
+\end{proof}
+
+\begin{definition}[Preimage and image of a scheme]
+\label{def:comap}
+\lean{ApproximationScheme.comap, ApproximationScheme.map, ApproximationScheme.ofSubmodules,
+  ApproximationScheme.ofMonotoneSubmodules, ApproximationScheme.mem_ofMonotoneSubmodules_zero,
+  ApproximationScheme.mem_ofMonotoneSubmodules,
+  ApproximationScheme.mem_ofMonotoneSubmodules_two_pow, ApproximationScheme.mem_comap,
+  ApproximationScheme.mem_map, ApproximationScheme.mem_map_of_mem,
+  ApproximationScheme.mem_ofSubmodules}
+\leanok
+\uses{def:scheme}
+Let $A$ be an approximation scheme in $X$. For an injective linear map $\iota : Y \to X$, the
+sets $\iota^{-1}(A_n)$ form an approximation scheme in $Y$. For a linear map $T : X \to Y$, the
+sets $T(A_n)$ form an approximation scheme in $Y$. An increasing sequence of linear subspaces
+$V_0 \subseteq V_1 \subseteq \cdots$ of $X$ with $V_0 = \{0\}$ is an approximation scheme. For
+every increasing sequence of linear subspaces $V_0 \subseteq V_1 \subseteq \cdots$, the sets
+$A_0 = \{0\}$ and $A_n = V_{\lfloor \log_2 n \rfloor}$, $n \geq 1$, form an approximation scheme,
+the \emph{dyadic scheme} of $(V_k)_k$, with $A_{2^k} = V_k$.
+\end{definition}
+
+Injectivity of $\iota$ is what gives $\iota^{-1}(\{0\}) = \{0\}$.
+
+\section{The error of best approximation}
+
+\begin{definition}[Error of best approximation]
+\label{def:error}
+\lean{ApproximationScheme.approxError, ApproximationScheme.approxError_nonneg,
+  ApproximationScheme.approxError_le_norm_sub}
+\leanok
+\uses{def:scheme}
+Let $A$ be an approximation scheme in $X$. For $n \in \N$ and $f \in X$,
+\[
+  E_n(f) = \dist(f, A_n) = \inf_{a \in A_n} \|f - a\|.
+\]
+\end{definition}
+
+\begin{lemma}[Calculus of the error]
+\label{lem:error-basic}
+\lean{ApproximationScheme.approxError_zero_left, ApproximationScheme.approxError_le_norm,
+  ApproximationScheme.approxError_anti, ApproximationScheme.approxError_smul,
+  ApproximationScheme.approxError_add_le, ApproximationScheme.abs_approxError_sub_le,
+  ApproximationScheme.approxSeq_le_approxSeq_add_enorm, ApproximationScheme.approxError_zero_right,
+  ApproximationScheme.approxError_eq_zero_of_mem,
+  ApproximationScheme.approxError_eq_zero_of_mem_closure,
+  ApproximationScheme.approxError_anti_scheme, ApproximationScheme.le_approxError_iff,
+  ApproximationScheme.exists_mem_norm_sub_lt, ApproximationScheme.exists_mem_norm_sub_le_add,
+  ApproximationScheme.le_mul_approxError_of_forall_mem,
+  ApproximationScheme.approxError_add_le_pow_succ, ApproximationScheme.approxError_neg,
+  ApproximationScheme.approxError_le_approxError_add_norm,
+  ApproximationScheme.continuous_approxError, ApproximationScheme.approxSeq_anti,
+  ApproximationScheme.approxSeq_zero_left, ApproximationScheme.approxSeq_zero_right,
+  ApproximationScheme.approxSeq_le_enorm, ApproximationScheme.approxSeq_ne_top,
+  ApproximationScheme.approxSeq_le_of_mem, ApproximationScheme.approxSeq_eq_zero_of_mem,
+  ApproximationScheme.approxSeq_add_le, ApproximationScheme.approxSeq_add_le_pow_succ,
+  ApproximationScheme.approxSeq_smul, ApproximationScheme.approxSeq_neg,
+  ApproximationScheme.approxSeq_anti_scheme}
+\leanok
+\uses{def:error, lem:scheme-basic}
+Let $A$ be an approximation scheme in $X$. For all $f, g \in X$, $c \in \R$ and
+$m, n \in \N$:
+\begin{enumerate}
+  \item $E_0(f) = \|f\|$ and $E_n(f) \leq \|f\|$;
+  \item $E_n(f) \leq E_m(f)$ whenever $m \leq n$;
+  \item $E_n(c f) = |c| \, E_n(f)$;
+  \item $E_{m+n}(f + g) \leq E_m(f) + E_n(g)$;
+  \item $|E_n(f) - E_n(g)| \leq \|f - g\|$, so $E_n$ is continuous;
+  \item $E_n(f) = 0$ for $f$ in the closure of $A_n$, in particular $E_n(0) = 0$;
+  \item a scheme with larger sets has smaller errors;
+  \item for every $\varepsilon > 0$ there is $a \in A_n$ with
+    $\|f - a\| \leq E_n(f) + \varepsilon$.
+\end{enumerate}
+The same statements hold for the errors as elements of $[0, \infty]$, the form used by the
+approximation spaces.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first item holds because $A_0 = \{0\}$ and $0 \in A_n$, the second because the sets
+increase, the third because $c A_n = A_n$ for $c \neq 0$. For the fourth, given
+$\varepsilon > 0$ choose $a \in A_m$ and $b \in A_n$ with $\|f - a\| \leq E_m(f) +
+\varepsilon$ and $\|g - b\| \leq E_n(g) + \varepsilon$; then $a + b \in A_{m+n}$ and the
+triangle inequality gives the bound up to $2\varepsilon$. The fifth item is the
+$1$-Lipschitz property of the distance to a set, the sixth holds because the distance to a set
+equals the distance to its closure, the seventh because the infimum over a larger set is
+smaller, and the last is the definition of the infimum.
+\end{proof}
+
+A best approximant, an $a \in A_n$ with $\|f - a\| = E_n(f)$, need not exist, since the sets
+$A_n$ need not be closed. The proofs work with near-best approximants as in the proof of the
+fourth item.
+
+\begin{lemma}[Convergence of the errors]
+\label{lem:error-tendsto}
+\lean{ApproximationScheme.tendsto_approxError_zero_iff,
+  ApproximationScheme.tendsto_approxError_zero_of_pow}
+\leanok
+\uses{lem:error-basic}
+Let $A$ be an approximation scheme in $X$ and $f \in X$. Then $E_n(f) \to 0$ as
+$n \to \infty$ if and only if $f$ lies in the closure of $\bigcup_n A_n$, and this holds as
+soon as $E_{2^k}(f) \to 0$ as $k \to \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $\|f - a\| < \varepsilon$ for some $a \in A_m$, then $E_n(f) < \varepsilon$ for all
+$n \geq m$ since the errors decrease. Conversely $E_n(f) < \varepsilon$ gives such an $a$.
+The errors decrease, so convergence along $2^k$ gives convergence.
+\end{proof}
+
+\begin{lemma}[Bounds by a modulus extend from a dense set]
+\label{lem:error-dense}
+\lean{ApproximationScheme.approxSeq_le_of_dense}
+\leanok
+\uses{lem:error-basic}
+Let $A$ be an approximation scheme in $X$, $n \in \N$, $D \subseteq X$ dense,
+$C, C_0 \in [0, \infty)$, and let $\omega : X \to [0, \infty]$ satisfy
+$\omega(f + g) \leq \omega(f) + \omega(g)$ and $\omega(f) \leq C_0 \|f\|$ for all
+$f, g \in X$. If $E_n(g) \leq C \omega(g)$ for every $g \in D$, then $E_n(f) \leq C \omega(f)$
+for every $f \in X$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $g \in D$, $E_n(f) \leq E_n(g) + \|f - g\|$ and $\omega(g) \leq \omega(f) + C_0 \|f - g\|$,
+so $E_n(f) \leq C \omega(f) + (C C_0 + 1) \|f - g\|$, and $\|f - g\|$ is arbitrarily small.
+\end{proof}
+
+\begin{lemma}[Functoriality of the error]
+\label{lem:error-map}
+\lean{ApproximationScheme.approxError_map_le}
+\leanok
+\uses{def:error}
+Let $A$ and $B$ be approximation schemes in $X$ and $Y$, and let $T : X \to Y$ be a bounded
+linear map with $T(A_n) \subseteq B_n$ for all $n$. Then for all $n \in \N$ and $f \in X$,
+\[
+  E^B_n(T f) \leq \|T\| \, E^A_n(f).
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $a \in A_n$, $E^B_n(Tf) \leq \|Tf - Ta\| \leq \|T\| \, \|f - a\|$; take the infimum
+over $a$.
+\end{proof}
+
+\section{Two schemes}
+
+\begin{definition}[Linear approximation]
+\label{def:ofspan}
+\lean{ApproximationScheme.ofSpan, ApproximationScheme.ofSpan_apply,
+  ApproximationScheme.finiteDimensional_span_ofSpan}
+\leanok
+\uses{def:scheme}
+For a sequence $(e_i)_{i \in \N}$ in $X$, the sets $A_n = \spn\{e_i : i < n\}$ form an
+approximation scheme.
+\end{definition}
+
+\begin{lemma}
+\label{lem:ofspan}
+\lean{ApproximationScheme.isClosed_ofSpan, ApproximationScheme.iUnion_ofSpan,
+  ApproximationScheme.tendsto_approxError_ofSpan_iff}
+\leanok
+\uses{def:ofspan, lem:error-tendsto}
+For the scheme of \Cref{def:ofspan}, every $A_n$ is closed, $\bigcup_n A_n = \spn\{e_i : i
+\in \N\}$, and $E_n(f) \to 0$ if and only if $f$ lies in the closed span of $(e_i)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The sets are finite-dimensional subspaces and therefore closed. The union of an increasing
+family of spans is the span of the union. The last statement is \Cref{lem:error-tendsto}.
+\end{proof}
+
+\begin{definition}[$n$-term approximation]
+\label{def:nterm}
+\lean{ApproximationScheme.nTerm, ApproximationScheme.mem_nTerm,
+  ApproximationScheme.mem_nTerm_of_mem}
+\leanok
+\uses{def:scheme}
+For a set $D \subseteq X$, the \emph{dictionary}, let $A_n$ be the set of linear combinations
+of at most $n$ elements of $D$. These sets form an approximation scheme.
+\end{definition}
+
+The third axiom holds because a combination of $m$ and one of $n$ elements of $D$ together
+use at most $m + n$ elements.
+
+\begin{lemma}
+\label{lem:nterm-ofspan}
+\lean{ApproximationScheme.ofSpan_subset_nTerm, ApproximationScheme.approxError_nTerm_le_ofSpan}
+\leanok
+\uses{def:ofspan, def:nterm, lem:error-basic}
+For a sequence $(e_i)$ in $X$, the linear scheme of $(e_i)$ is contained in the $n$-term
+scheme of the dictionary $\{e_i : i \in \N\}$, and hence the $n$-term errors are at most the
+linear ones.
+\end{lemma}
+
+\begin{proof}
+\leanok
+An element of $\spn\{e_i : i < n\}$ uses the $n$ elements $e_0, \dots, e_{n-1}$.
+\end{proof}
+
+\chapter{Sequence spaces}
+\label{ch:sequences}
+
+The quasi-norms of this blueprint take values in $[0, \infty]$, and a function belongs to a
+space when its quasi-norm is finite. Every series of elements of $[0, \infty]$ converges, so
+no summability conditions are needed. Arithmetic in $[0, \infty]$ uses the conventions
+$0 \cdot \infty = 0$, $0^{-1} = \infty$, $\infty^{-1} = 0$, and $x - y = 0$ for $x \leq y$.
+With these, a constant $(1 - 2^{-\alpha})^{-1}$ is finite exactly for $\alpha > 0$.
+
+\begin{definition}[$\ell_q$ norm and dyadic weights]
+\label{def:lq-norm}
+\lean{ENNReal.lqNorm, ENNReal.lqNorm_top, ENNReal.lqNorm_eq_tsum, ENNReal.dyadicWeight,
+  ENNReal.aestronglyMeasurable_count, ENNReal.lqNorm_one, ENNReal.one_le_toReal_of_one_le,
+  ENNReal.lqNorm_rpow, ENNReal.lqNorm_two_sq, ENNReal.lqNorm_zero_right, ENNReal.lqNorm_zero_left,
+  ENNReal.dyadicWeight_zero_right, ENNReal.dyadicWeight_zero_left, ENNReal.dyadicWeight_ne_top,
+  ENNReal.dyadicWeight_lt_top, ENNReal.dyadicWeight_pos, ENNReal.dyadicWeight_ne_zero,
+  ENNReal.dyadicWeight_add, ENNReal.dyadicWeight_add_nat, ENNReal.dyadicWeight_succ,
+  ENNReal.dyadicWeight_neg, ENNReal.dyadicWeight_neg_mul_self, ENNReal.dyadicWeight_mul_neg_self,
+  ENNReal.dyadicWeight_rpow, ENNReal.dyadicWeight_eq_pow, ENNReal.dyadicWeight_mono,
+  ENNReal.dyadicWeight_le_of_le, ENNReal.dyadicWeight_anti, ENNReal.one_le_dyadicWeight,
+  ENNReal.natCast_two_pow_rpow, ENNReal.two_pow_rpow_eq_dyadicWeight,
+  ENNReal.two_rpow_neg_lt_one, ENNReal.one_sub_two_rpow_neg_inv_ne_top,
+  ENNReal.one_le_one_sub_two_rpow_neg_inv, ENNReal.lqNorm_dyadicWeight_neg_le,
+  ENNReal.lqNorm_lt_top_iff_of_le_mul}
+\leanok
+For $q \in (0, \infty)$, a countable set $I$ and a family $a = (a_i)_{i \in I}$ in $[0, \infty]$,
+\[
+  \|a\|_{\ell_q} = \Bigl(\sum_{i \in I} a_i^q\Bigr)^{1/q},
+  \qquad
+  \|a\|_{\ell_\infty} = \sup_{i \in I} a_i .
+\]
+For $s \in \R$ and $k \in \N$, the \emph{dyadic weight} is $2^{ks}$.
+\end{definition}
+
+In Lean, $\|a\|_{\ell_q}$ is the $L_q$ norm of $a$ for the counting measure on $I$. The index set
+is $\N$ for sequences, $\N^d$ for dominating mixed smoothness, and a finite set for the
+coefficients of one level of atoms and wavelets.
+
+\begin{lemma}[Properties of the $\ell_q$ norm]
+\label{lem:lq-basic}
+\lean{ENNReal.lqNorm_mono, ENNReal.le_lqNorm, ENNReal.lqNorm_const_mul, ENNReal.lqNorm_add_le,
+  ENNReal.lqNorm_le_lqNorm_of_le, ENNReal.lqNorm_le_head_add_shift,
+  ENNReal.lqNorm_le_sum_range_add_shift, ENNReal.lqNorm_le_lqNorm_one, ENNReal.lqNorm_geometric_le,
+  ENNReal.lqNorm_shift_le, ENNReal.lqNorm_eq_sum, ENNReal.lqNorm_le_card_rpow_mul,
+  ENNReal.lqNorm_prod_rpow, ENNReal.lqNorm_le_sum_of_eq_zero, Rd.lqNorm_ite_eq,
+  ENNReal.lqNorm_ite_le_eq}
+\leanok
+\uses{def:lq-norm}
+Let $1 \leq q \leq r \leq \infty$. For all sequences $a, b$ in $[0, \infty]$, all
+$c, \rho \in [0, \infty]$ and all $n \in \N$:
+\begin{enumerate}
+  \item if $a_k \leq b_k$ for every $k$, then $\|a\|_{\ell_q} \leq \|b\|_{\ell_q}$;
+  \item $a_n \leq \|a\|_{\ell_q}$ and $\|c\,a\|_{\ell_q} = c \, \|a\|_{\ell_q}$;
+  \item $\|a + b\|_{\ell_q} \leq \|a\|_{\ell_q} + \|b\|_{\ell_q}$;
+  \item $\|a\|_{\ell_r} \leq \|a\|_{\ell_q} \leq \|a\|_{\ell_1}$;
+  \item $\|a\|_{\ell_q} \leq a_0 + \|(a_{k+1})_k\|_{\ell_q}$, and
+    $\|a\|_{\ell_q} \leq a_0 + \cdots + a_{m-1} + \|(a_{k+m})_k\|_{\ell_q}$ for every $m \in \N$;
+  \item $\|(\rho^k)_k\|_{\ell_q} \leq (1 - \rho)^{-1}$;
+  \item if $a_k = 0$ for every $k$ outside a finite set $s \subseteq \N$, then
+    $\|a\|_{\ell_q} \leq \sum_{k \in s} a_k$, and the sequence equal to $c$ at $n$ and to $0$
+    elsewhere has $\ell_q$ norm $c$;
+  \item if $q < \infty$, the tail $(0, \dots, 0, a_n, a_{n+1}, \dots)$ has the $\ell_q$ norm
+    $\|(a_{n+k})_k\|_{\ell_q}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first two items are immediate. The third is Minkowski's inequality for the finite
+partial sums, followed by the supremum over them. For the fourth put $M = \|a\|_{\ell_q}$;
+then $a_k^r = a_k^{r-q} a_k^q \leq M^{r-q} a_k^q$, and summation gives
+$\|a\|_{\ell_r}^r \leq M^r$. The fifth is the third applied to $a_0 \delta_0$ and the rest,
+and induction on $m$. The sixth is the fourth and the geometric series, the seventh is the
+fourth for a sequence with finitely many nonzero terms, and the last compares the series of the
+$q$-th powers term by term.
+\end{proof}
+
+\begin{lemma}[The Cauchy--Schwarz inequality for sequences]
+\label{lem:lq-cauchy-schwarz-sequences}
+\lean{ENNReal.lqNorm_one_mul_le, ENNReal.sum_mul_le_lqNorm_two_mul}
+\leanok
+\uses{def:lq-norm}
+For every countable index set $I$, every finite set $s \subseteq I$ and all families
+$(a_k)_k$ and $(b_k)_k$ in $[0, \infty]$ indexed by $I$,
+\[
+  \sum_{k \in s} a_k b_k \leq \sum_{k \in I} a_k b_k
+  \leq \|(a_k)_k\|_{\ell_2} \, \|(b_k)_k\|_{\ell_2} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The second inequality is Hölder's inequality for the counting measure on $I$ (Mathlib's
+\texttt{ENNReal.\allowbreak lintegral\_\allowbreak mul\_\allowbreak le\_\allowbreak
+Lp\_\allowbreak mul\_\allowbreak Lq}) with exponents $2$ and $2$; the first holds since every
+term is nonnegative.
+\end{proof}
+
+\begin{lemma}[Countable Minkowski inequality and monotone convergence in $\ell_q$]
+\label{lem:countable-minkowski}
+\lean{ENNReal.lqNorm_sum_le, ENNReal.lqNorm_iSup, ENNReal.lqNorm_tsum_le,
+  ENNReal.monotone_ite_lt, ENNReal.lqNorm_eq_iSup_lqNorm_ite}
+\leanok
+\uses{lem:lq-basic}
+For every $1 \leq q \leq \infty$ and every family $(f_{i,k})_{i, k \in \N}$ in $[0, \infty]$,
+\[
+  \Bigl\| \Bigl(\sum_{i=0}^\infty f_{i,k}\Bigr)_k \Bigr\|_{\ell_q}
+  \leq \sum_{i=0}^\infty \|(f_{i,k})_k\|_{\ell_q} .
+\]
+For every $q \in (0, \infty]$ and every sequence $a$ in $[0, \infty]$, the truncations
+$(a_k \mathbf 1_{\{k < J\}})_k$ increase with $J$ and
+$\|a\|_{\ell_q} = \sup_{J \in \N} \|(a_k \mathbf 1_{\{k < J\}})_k\|_{\ell_q}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For finite sums this follows from \Cref{lem:lq-basic} by induction. The partial sums increase
+to the series, and the $\ell_q$ norm of an increasing family of sequences is the supremum of
+their norms, by monotone convergence. The truncations of $a$ increase to $a$, so the same
+argument gives the last identity.
+\end{proof}
+
+The following two inequalities are the discrete Hardy inequalities: a tail sum and a partial
+sum are controlled in a dyadically weighted $\ell_q$ norm.
+
+\begin{lemma}[Hardy inequalities]
+\label{lem:hardy}
+\lean{ENNReal.hardy_tail_le, ENNReal.hardy_sum_le, ENNReal.lqNorm_shift_le',
+  ENNReal.lqNorm_shiftRight_le, ENNReal.tsum_dyadicWeight_neg, ENNReal.tsum_le_lqNorm_dyadicWeight,
+  ENNReal.tsum_dyadicWeight_neg_one, ENNReal.lqNorm_dyadicWeight_neg_one_le, ENNReal.tsum_ite_le_eq,
+  ENNReal.tsum_ite_ge_eq}
+\leanok
+\uses{lem:countable-minkowski}
+Let $\alpha \in \R$ and $1 \leq q \leq \infty$. For every sequence $b$ in $[0, \infty]$,
+\[
+  \Bigl\| \Bigl(2^{k\alpha} \sum_{i=0}^\infty b_{k+i}\Bigr)_k \Bigr\|_{\ell_q}
+  \leq (1 - 2^{-\alpha})^{-1} \, \|(2^{k\alpha} b_k)_k\|_{\ell_q}
+\]
+and
+\[
+  \Bigl\| \Bigl(2^{-k\alpha} \sum_{j=0}^{k} b_j\Bigr)_k \Bigr\|_{\ell_q}
+  \leq (1 - 2^{-\alpha})^{-1} \, \|(2^{-k\alpha} b_k)_k\|_{\ell_q} .
+\]
+In particular, $\sum_k b_k \leq (1 - 2^{-\alpha})^{-1} \, \|(2^{k\alpha} b_k)_k\|_{\ell_q}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Write $2^{k\alpha} \sum_i b_{k+i} = \sum_i 2^{-i\alpha} \, 2^{(k+i)\alpha} b_{k+i}$. By
+\Cref{lem:countable-minkowski} the left side is at most
+$\sum_i 2^{-i\alpha} \|(2^{(k+i)\alpha} b_{k+i})_k\|_{\ell_q}$, a shift does not increase the
+norm, and $\sum_i 2^{-i\alpha} = (1 - 2^{-\alpha})^{-1}$. The second inequality is the same
+argument with $2^{-k\alpha} \sum_{j \leq k} b_j = \sum_{i \leq k} 2^{-i\alpha} \,
+2^{-(k-i)\alpha} b_{k-i}$ and the shift to the right. The term $k = 0$ of the first inequality
+gives the last one.
+\end{proof}
+
+The comparison of Pietsch's quasi-norm with its dyadic form rests on Cauchy's condensation
+test with power weights.
+
+\begin{lemma}[Cauchy condensation with power weights]
+\label{lem:condensation}
+\lean{ENNReal.tsum_pow_mul_le_dyadic, ENNReal.dyadic_le_tsum_pow_mul,
+  ENNReal.iSup_pow_mul_le_dyadic, ENNReal.dyadic_le_iSup_pow_mul, ENNReal.sum_range_two_pow_eq,
+  ENNReal.rpow_le_rpow_of_nonpos, ENNReal.natCast_two_pow_eq, ENNReal.card_Ico_two_pow,
+  ENNReal.natCast_succ_rpow_le, ENNReal.dyadicWeight_le_natCast_succ_rpow,
+  ENNReal.sum_Ico_pow_mul_le, ENNReal.le_sum_Ico_pow_mul}
+\leanok
+\uses{def:lq-norm}
+Let $b$ be a decreasing sequence in $[0, \infty]$, let $\gamma \in \R$, and put
+$\gamma_+ = \max(\gamma, 0)$ and $\gamma_- = \max(-\gamma, 0)$. Then
+\[
+  \sum_{n=0}^\infty (n+1)^\gamma b_n \leq b_0 + 2^{\gamma_+} \sum_{k=0}^\infty
+    2^{k(\gamma+1)} b_{2^k}
+\]
+and
+\[
+  \sum_{k=0}^\infty 2^{k(\gamma+1)} b_{2^{k+1}} \leq 2^{\gamma_-} \sum_{n=0}^\infty
+    (n+1)^\gamma b_n ,
+\]
+and for every $s \geq 0$,
+\[
+  \sup_n (n+1)^s b_n \leq b_0 + 2^s \sup_k 2^{ks} b_{2^k},
+  \qquad
+  \sup_k 2^{ks} b_{2^k} \leq \sup_n (n+1)^s b_n .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Split $\N \setminus \{0\}$ into the blocks $2^k \leq n < 2^{k+1}$ of $2^k$ elements each. On
+the block $k$, $(n+1)^\gamma$ lies between $2^{-\gamma_-} 2^{k\gamma}$ and
+$2^{\gamma_+} 2^{k\gamma}$, and $b_n$ lies between $b_{2^{k+1}}$ and $b_{2^k}$.
+\end{proof}
+
+Three sums over dyadic scales serve the vector-valued singular integrals of
+\Cref{sec:dilation-families} and the Bessel kernels of \Cref{sec:bessel-kernels}.
+
+\begin{lemma}[The dyadic sum of $\min(t, t^{-1})$]
+\label{lem:dyadic-min-sum}
+\lean{ENNReal.sum_range_two_pow_le, ENNReal.exists_one_lt_two_pow_mul,
+  ENNReal.sum_range_min_two_pow_le, ENNReal.tsum_min_two_pow_add_le,
+  ENNReal.tsum_min_two_pow_le, ENNReal.min_inv_sq_le}
+\leanok
+For every $a \in [0, \infty]$,
+\[
+  \sum_{j \in \N} \min\bigl(2^j a, (2^j a)^{-1}\bigr) \leq 4 ,
+\]
+and $\min(x, x^{-1})^2 \leq \min(x, x^{-1})$ for every $x \in [0, \infty]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The second claim holds since $\min(x, x^{-1}) \leq 1$. For $a = 0$ every term is $0$.
+Otherwise some $j$ has $2^j a > 1$ (Mathlib's
+\texttt{ENNReal.\allowbreak exists\_\allowbreak nat\_\allowbreak mul\_\allowbreak gt} and
+$m < 2^m$); let $j_0$ be the least such $j$. For
+$j < j_0$ the terms are at most $2^j a$, and
+$\sum_{j < j_0} 2^j a \leq 2^{j_0} a = 2 \cdot 2^{j_0 - 1} a \leq 2$ when $j_0 \geq 1$. For
+$i \in \N$ the term of $j = i + j_0$ is at most
+$(2^{i + j_0} a)^{-1} = 2^{-i} (2^{j_0} a)^{-1} \leq 2^{-i}$, and $\sum_i 2^{-i} = 2$.
+\end{proof}
+
+\begin{lemma}[Finitely many changed terms]
+\label{lem:tsum-changed-terms}
+\lean{ENNReal.tsum_le_tsum_add_sum_of_forall_ge_eq}
+\leanok
+For all sequences $(u_j)$, $(v_j)$ in $[0, \infty]$ and every $N \in \N$ with $u_j = v_j$ for
+every $j \geq N$,
+\[
+  \sum_{j \in \N} u_j \leq \sum_{j \in \N} v_j + \sum_{i < N} u_i .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The sum of the $u_j$ is $\sum_{i < N} u_i + \sum_{i \geq N} v_i$.
+\end{proof}
+
+\begin{lemma}[Dyadic scales of an annulus]
+\label{lem:dyadic-annulus-count}
+\lean{Nat.le_add_of_dyadic_annulus, ENNReal.tsum_le_of_mem_Icc,
+  ENNReal.tsum_le_of_dyadic_annulus}
+\leanok
+Let $a > 0$ and $t$ be real and $N \in \N$. For all $i, j \in \N$ with $a \leq t / 2^j$ and
+$t / 2^i \leq 2^N a$, $j \leq i + N$. Let $M \in [0, \infty]$ and let $(u_j)_{j \in \N}$ be a
+sequence in $[0, \infty]$ with $u_j \leq M$ for every $j$. If there is $i_0 \in \N$ such that
+$u_j \neq 0$ implies $i_0 \leq j \leq i_0 + N$, or if $u_j \neq 0$ implies
+$a \leq t / 2^j \leq 2^N a$, then $\sum_j u_j \leq (N + 1) M$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$2^j a \leq t \leq 2^{i+N} a$ gives the first claim. In the first case at most $N + 1$ terms are
+nonzero. In the second, let $i_0$ be the least $j$ with $u_j \neq 0$; by the first claim every
+$j$ with $u_j \neq 0$ satisfies $i_0 \leq j \leq i_0 + N$.
+\end{proof}
+
+\chapter{Approximation spaces}
+\label{ch:approximation-spaces}
+
+Throughout, $A$ is an approximation scheme in $X$. The following definition is
+Pietsch's~\cite{Pietsch}, with his sequence $(n^{s-1/q} E_{n-1}(f))_{n \geq 1}$ indexed
+from $0$.
+
+\begin{definition}[Approximation space]
+\label{def:approx-space}
+\lean{ApproximationScheme.approxSeq, ApproximationScheme.approxNorm, ApproximationScheme.MemApprox,
+  ApproximationScheme.approxNorm_top, ApproximationScheme.approxNorm_rpow,
+  ApproximationScheme.memApprox_iff, ApproximationScheme.MemApprox.approxNorm_ne_top}
+\leanok
+\uses{def:error, def:lq-norm}
+Let $s \in \R$ and $1 \leq q \leq \infty$. For $f \in X$,
+\[
+  \|f\|_{A^s_q} = \bigl\| \bigl((n+1)^{s - 1/q} E_n(f)\bigr)_{n \in \N} \bigr\|_{\ell_q}
+  \in [0, \infty],
+\]
+with $1/\infty = 0$. The \emph{approximation space} $A^s_q$ consists of the $f \in X$ with
+$\|f\|_{A^s_q} < \infty$.
+\end{definition}
+
+\begin{definition}[Dyadic quasi-norm]
+\label{def:dyadic-norm}
+\lean{ApproximationScheme.approxSeqDyadic, ApproximationScheme.approxNormDyadic,
+  ApproximationScheme.approxSeqDyadic_le_lqNorm, ApproximationScheme.enorm_le_approxNormDyadic,
+  ApproximationScheme.lqNorm_le_approxNormDyadic, ApproximationScheme.approxSeqDyadic_rpow,
+  ApproximationScheme.approxSeqDyadic_zero, ApproximationScheme.approxNormDyadic_zero,
+  ApproximationScheme.approxSeqDyadic_smul, ApproximationScheme.approxNormDyadic_smul,
+  ApproximationScheme.one_le_two_rpow, ApproximationScheme.two_rpow_ne_top}
+\leanok
+\uses{def:error, def:lq-norm}
+Let $s \in \R$ and $1 \leq q \leq \infty$. For $f \in X$,
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_q} = \|f\| + \bigl\| \bigl(2^{ks} E_{2^k}(f)\bigr)_{k \in \N}
+  \bigr\|_{\ell_q} .
+\]
+\end{definition}
+
+The term $\|f\| = E_0(f)$ is needed because the dyadic sequence starts at $E_1$. The dyadic
+form is the working norm: every later theorem is stated for it, and the next theorem
+transports it to Pietsch's definition.
+
+\begin{theorem}[Dyadic form of the quasi-norm]
+\label{thm:dyadic-norm}
+\lean{ApproximationScheme.approxNorm_le_approxNormDyadic,
+  ApproximationScheme.approxNormDyadic_le_approxNorm,
+  ApproximationScheme.memApprox_iff_approxNormDyadic_lt_top,
+  ApproximationScheme.lqNorm_dyadic_succ_le,
+  ApproximationScheme.memApprox_iff_lqNorm_dyadic_lt_top}
+\leanok
+\uses{def:approx-space, def:dyadic-norm, lem:condensation, lem:lq-basic}
+Let $s \geq 0$ and $1 \leq q \leq \infty$. For every $f \in X$,
+\[
+  \|f\|_{A^s_q} \leq 2^s \, \|f\|^{\mathrm{dy}}_{A^s_q}
+  \qquad \text{and} \qquad
+  \|f\|^{\mathrm{dy}}_{A^s_q} \leq 4 \cdot 2^s \, \|f\|_{A^s_q} .
+\]
+In particular $f \in A^s_q$ if and only if $\|f\|^{\mathrm{dy}}_{A^s_q} < \infty$, that is, if and
+only if $(2^{ks} E_{2^k}(f))_k \in \ell_q$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:error-basic}
+For $q < \infty$ raise both sides to the power $q$: $\|f\|_{A^s_q}^q = \sum_n (n+1)^{sq-1}
+E_n(f)^q$. The errors decrease, so \Cref{lem:condensation} with $\gamma = sq - 1$ and
+$b_n = E_n(f)^q$ compares this series with $E_0(f)^q + \sum_k 2^{ksq} E_{2^k}(f)^q$ in both
+directions, and $E_0(f) = \|f\|$. Taking $q$-th roots costs at most the factors stated,
+using $(x + y)^{1/q} \leq x^{1/q} + y^{1/q}$ and, for the second bound,
+$2^{(k+1)s} = 2^s 2^{ks}$ and $E_1(f) \leq \|f\|$. For $q = \infty$ use the supremum form of
+\Cref{lem:condensation}.
+\end{proof}
+
+\begin{proposition}[Linear structure]
+\label{prop:approx-linear}
+\lean{ApproximationScheme.approxNorm_smul, ApproximationScheme.enorm_le_approxNorm,
+  ApproximationScheme.approxNorm_eq_zero_iff, ApproximationScheme.approxNormDyadic_add_le,
+  ApproximationScheme.approxNorm_add_le, ApproximationScheme.memApprox_of_mem,
+  ApproximationScheme.approxSpace, ApproximationScheme.mem_approxSpace,
+  ApproximationScheme.approxNorm_zero, ApproximationScheme.memApprox_zero,
+  ApproximationScheme.MemApprox.smul, ApproximationScheme.MemApprox.neg,
+  ApproximationScheme.approxNorm_anti_scheme, ApproximationScheme.MemApprox.of_subset_scheme,
+  ApproximationScheme.approxSeqDyadic_add_le_succ, ApproximationScheme.MemApprox.add,
+  ApproximationScheme.MemApprox.sub, ApproximationScheme.MemApprox.sum,
+  ApproximationScheme.iUnion_subset_approxSpace}
+\leanok
+\uses{thm:dyadic-norm, lem:error-basic}
+Let $s \geq 0$ and $1 \leq q \leq \infty$. For all $f, g \in X$, $c \in \R$ and $m \in \N$:
+\begin{enumerate}
+  \item $\|c f\|_{A^s_q} = |c| \, \|f\|_{A^s_q}$;
+  \item $\|f\| \leq \|f\|_{A^s_q}$, and $\|f\|_{A^s_q} = 0$ only for $f = 0$;
+  \item $\|f + g\|^{\mathrm{dy}}_{A^s_q} \leq 2 \cdot 2^s \bigl(\|f\|^{\mathrm{dy}}_{A^s_q} +
+    \|g\|^{\mathrm{dy}}_{A^s_q}\bigr)$ and
+    $\|f + g\|_{A^s_q} \leq 8 \cdot 8^s \bigl(\|f\|_{A^s_q} + \|g\|_{A^s_q}\bigr)$;
+  \item $A_m \subseteq A^s_q$;
+  \item a scheme with larger sets has smaller quasi-norms and larger approximation spaces.
+\end{enumerate}
+In particular $A^s_q$ is a linear subspace of $X$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+The first item follows from $E_n(cf) = |c| E_n(f)$, the second from the term $n = 0$, which
+is $E_0(f) = \|f\|$. For the third, $E_{2^{k+1}}(f + g) \leq E_{2^k}(f) + E_{2^k}(g)$ by
+\Cref{lem:error-basic}, so $2^{(k+1)s} E_{2^{k+1}}(f+g) \leq 2^s (2^{ks} E_{2^k}(f) +
+2^{ks} E_{2^k}(g))$; the term $k = 0$ is at most $\|f + g\|$, and Minkowski's inequality
+gives the dyadic bound. Pietsch's form follows by \Cref{thm:dyadic-norm}. For the fourth,
+$E_n(a) = 0$ for $a \in A_m$ and $n \geq m$, so only finitely many terms are nonzero.
+\end{proof}
+
+The constants are not optimised. The quasi-triangle inequality is all that is needed: Mathlib
+has no class of quasi-normed spaces, so $A^s_q$ is a linear subspace of $X$ together with a
+function into $[0, \infty]$, in the way Mathlib treats $L_p$ through \texttt{eLpNorm}.
+
+\begin{lemma}[Approximation spaces lie in the closure]
+\label{lem:approx-closure}
+\lean{ApproximationScheme.approxSeq_pow_le,
+  ApproximationScheme.tendsto_approxError_pow_zero_of_memApprox,
+  ApproximationScheme.mem_closure_iUnion_of_memApprox,
+  ApproximationScheme.approxSpace_subset_closure}
+\leanok
+\uses{def:dyadic-norm, lem:error-tendsto}
+Let $s > 0$ and $1 \leq q \leq \infty$. For every $f \in A^s_q$ and $k \in \N$,
+$E_{2^k}(f) \leq 2^{-ks} \|f\|^{\mathrm{dy}}_{A^s_q}$, and $f$ lies in the closure of
+$\bigcup_n A_n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:dyadic-norm}
+The bound is $2^{ks} E_{2^k}(f) \leq \|(2^{js} E_{2^j}(f))_j\|_{\ell_q}$. It tends to zero,
+and \Cref{lem:error-tendsto} applies.
+\end{proof}
+
+\begin{theorem}[Embeddings between approximation spaces]
+\label{thm:approx-embedding}
+\lean{ApproximationScheme.approxNormDyadic_mono_exponent,
+  ApproximationScheme.approxNormDyadic_le_of_lt, ApproximationScheme.MemApprox.mono,
+  ApproximationScheme.approxSpace_mono, ApproximationScheme.MemApprox.lqNorm_one_lt_top,
+  ApproximationScheme.approxSeqDyadic_eq_mul, ApproximationScheme.approxNorm_le_of_exponent_le,
+  ApproximationScheme.approxNorm_le_of_lt, ApproximationScheme.MemApprox.mono_exponent,
+  ApproximationScheme.MemApprox.of_lt}
+\leanok
+\uses{def:dyadic-norm, lem:lq-basic, thm:dyadic-norm}
+Let $1 \leq q, r \leq \infty$, let $s, t \in \R$ and $f \in X$.
+\begin{enumerate}
+  \item If $q \leq r$, then $\|f\|^{\mathrm{dy}}_{A^s_r} \leq \|f\|^{\mathrm{dy}}_{A^s_q}$.
+  \item If $t < s$, then $\|f\|^{\mathrm{dy}}_{A^t_r} \leq (1 - 2^{-(s-t)})^{-1}
+    \|f\|^{\mathrm{dy}}_{A^s_q}$.
+  \item If $0 \leq t$, and $t < s$ or $t = s$ and $q \leq r$, then $A^s_q \subseteq A^t_r$.
+  \item For Pietsch's quasi-norm: if $s \geq 0$ and $q \leq r$, then
+    $\|f\|_{A^s_r} \leq 2^s \cdot 4 \cdot 2^s \, \|f\|_{A^s_q}$; if $0 \leq t < s$, then
+    $\|f\|_{A^t_r} \leq 2^t (1 - 2^{-(s-t)})^{-1} \cdot 4 \cdot 2^s \, \|f\|_{A^s_q}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first item is the monotonicity of the $\ell_q$ norms in $q$, since the dyadic weights do
+not depend on $q$; Pietsch's weights do, which is why the dyadic form is used. For the
+second, $2^{kt} E_{2^k}(f) = 2^{-k(s-t)} \, 2^{ks} E_{2^k}(f) \leq 2^{-k(s-t)}
+\|(2^{js} E_{2^j}(f))_j\|_{\ell_q}$, and $\|(2^{-k(s-t)})_k\|_{\ell_r} \leq (1 -
+2^{-(s-t)})^{-1}$. The third follows by \Cref{thm:dyadic-norm}, and the fourth from the first
+two and the two comparisons of \Cref{thm:dyadic-norm}.
+\end{proof}
+
+\begin{lemma}[Functoriality]
+\label{lem:approx-functorial}
+\lean{ApproximationScheme.approxSeq_map_le, ApproximationScheme.approxNorm_map_le,
+  ApproximationScheme.approxNormDyadic_map_le, ApproximationScheme.MemApprox.map,
+  ApproximationScheme.approxSpace_map_le, ApproximationScheme.mem_map_of_mem'}
+\leanok
+\uses{lem:error-map, def:approx-space, def:dyadic-norm}
+Let $A$ and $B$ be approximation schemes in $X$ and $Y$, and let $T : X \to Y$ be a bounded
+linear map with $T(A_n) \subseteq B_n$ for all $n$. Then for all $s \in \R$,
+$1 \leq q \leq \infty$ and $f \in X$,
+\[
+  \|Tf\|_{B^s_q} \leq \|T\| \, \|f\|_{A^s_q}
+  \qquad \text{and} \qquad
+  \|Tf\|^{\mathrm{dy}}_{B^s_q} \leq \|T\| \, \|f\|^{\mathrm{dy}}_{A^s_q} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Apply \Cref{lem:error-map} to every term, and $\|Tf\| \leq \|T\| \|f\|$.
+\end{proof}
+
+\chapter{Lifting and the Nikolskii transfer theorem}
+\label{ch:lifting}
+
+Throughout, $A$ is an approximation scheme in $X$, and $\iota : Y \to X$ is a bounded linear
+map. One hypothesis covers two classical inequalities. If $\iota$ is the embedding of a
+space of smooth functions, it is a Bernstein inequality; if $\iota$ is the inclusion
+$L_r \hookrightarrow L_p$, it is a Nikolskii inequality.
+
+\begin{definition}[Lifting bound]
+\label{def:lift-bound}
+\lean{ApproximationScheme.LiftBound, ApproximationScheme.LiftBound.exists_enorm_le}
+\leanok
+\uses{def:scheme}
+Let $\beta, C \in \R$. The map $\iota$ satisfies the \emph{lifting bound} of exponent $\beta$
+and constant $C$ for $A$ if for every $n \geq 1$ and every $a \in A_n$ there is $y \in Y$ with
+$\iota y = a$ and $\|y\| \leq C \, n^\beta \, \|a\|$.
+\end{definition}
+
+\begin{lemma}[Near-best dyadic approximants]
+\label{lem:near-best}
+\lean{ApproximationScheme.DyadicApprox, ApproximationScheme.exists_dyadicApprox,
+  ApproximationScheme.DyadicApprox.sub_mem, ApproximationScheme.DyadicApprox.enorm_sub_succ_le,
+  ApproximationScheme.DyadicApprox.tendsto, ApproximationScheme.DyadicApprox.enorm_zero_le}
+\leanok
+\uses{lem:error-basic, lem:scheme-basic}
+Let $f \in X$ and let $(t_k)_k$ be a sequence in $(0, \infty)$. There are $a_k \in A_{2^k}$
+with $\|f - a_k\| \leq E_{2^k}(f) + t_k$ for every $k$. Every such sequence satisfies
+$a_{k+1} - a_k \in A_{2^{k+2}}$; if $(t_k)$ decreases, then
+$\|a_{k+1} - a_k\| \leq 2 (E_{2^k}(f) + t_k)$; and if $E_{2^k}(f) \to 0$ and $t_k \to 0$, then
+$a_k \to f$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The approximants exist by the definition of the infimum. The rest is
+\Cref{lem:scheme-basic}(5), the triangle inequality and the monotonicity of the errors.
+\end{proof}
+
+The tolerances $t_k$ replace best approximants, which need not exist. The proofs below take
+$t_k = \|f\| \, 2^{-k(\sigma+1)}$ for a suitable $\sigma$, so that
+$\sum_k 2^{k\sigma} t_k \leq 2 \|f\|$.
+
+\begin{theorem}[Lifting theorem]
+\label{thm:lift}
+\lean{ApproximationScheme.exists_preimage_of_liftBound, ApproximationScheme.liftConst,
+  ApproximationScheme.DyadicApprox.exists_lift, ApproximationScheme.DyadicApprox.exists_preimage,
+  ApproximationScheme.tolerance, ApproximationScheme.liftConst_ne_top,
+  ApproximationScheme.DyadicApprox.exists_lift_partial, ApproximationScheme.tolerance_ne_zero,
+  ApproximationScheme.tolerance_ne_top, ApproximationScheme.tolerance_anti,
+  ApproximationScheme.tolerance_zero, ApproximationScheme.dyadicWeight_mul_tolerance_le,
+  ApproximationScheme.tsum_dyadicWeight_mul_tolerance_le, ApproximationScheme.tendsto_tolerance,
+  ApproximationScheme.tsum_tolerance_le, ApproximationScheme.lqNorm_dyadicWeight_mul_tolerance_le}
+\leanok
+\uses{def:lift-bound, lem:near-best, def:dyadic-norm}
+Let $Y$ be a Banach space, let $\beta \geq 0$ and $C \geq 0$, and let $\iota$ satisfy the
+lifting bound of exponent $\beta$ and constant $C$ for $A$. For every $f \in X$ with
+$\sum_k 2^{k\beta} E_{2^k}(f) < \infty$ there is $y \in Y$ with $\iota y = f$ and
+\[
+  \|y\| \leq (3C + 6C \cdot 4^\beta) \Bigl(\|f\| + \sum_{k=0}^\infty 2^{k\beta}
+    E_{2^k}(f)\Bigr) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $f = 0$ take $y = 0$. Otherwise choose near-best approximants $a_k$ with tolerances
+$t_k = \|f\| 2^{-k(\beta+1)}$ by \Cref{lem:near-best}. Lift $a_0 \in A_1$ to $y_0$ and
+$a_{k+1} - a_k \in A_{2^{k+2}}$ to $d_k$, so that $\|y_0\| \leq C \|a_0\| \leq 3C\|f\|$
+and $\|d_k\| \leq C \, 2^{(k+2)\beta} \cdot 2(E_{2^k}(f) + t_k) = 2C \, 4^\beta \,
+2^{k\beta} (E_{2^k}(f) + t_k)$. The series $\sum_k \|d_k\|$ converges, so
+$y = y_0 + \sum_k d_k$ exists in $Y$. By continuity of $\iota$, $\iota y$ is the limit of
+$\iota(y_0 + \sum_{j<k} d_j) = a_k$, which is $f$ since $E_{2^k}(f) \to 0$. Adding the bounds
+gives the constant.
+\end{proof}
+
+The same construction gives the next theorem, the transfer of approximation spaces along an
+injective map with a Nikolskii inequality.
+
+\begin{theorem}[Nikolskii transfer theorem]
+\label{thm:nikolskii-transfer}
+\lean{ApproximationScheme.exists_preimage_of_nikolskii,
+  ApproximationScheme.MemApprox.exists_preimage_of_nikolskii, ApproximationScheme.nikolskiiConst,
+  ApproximationScheme.nikolskiiConst_ne_top}
+\leanok
+\uses{thm:lift, lem:hardy, thm:approx-embedding, def:comap}
+Let $Y$ be a Banach space, let $\iota$ be injective, let $C \geq 0$ and $0 \leq \alpha < s$,
+and let $\iota$ satisfy the lifting bound of exponent $\alpha$ and constant $C$ for $A$. Let
+$B$ be the scheme $B_n = \iota^{-1}(A_n)$ in $Y$, and let $1 \leq q \leq \infty$. For every
+$f \in A^s_q$ there is $y \in Y$ with $\iota y = f$ and
+\[
+  \|y\|^{\mathrm{dy}}_{B^{s-\alpha}_q} \leq K \, \|f\|^{\mathrm{dy}}_{A^s_q},
+  \qquad
+  K = 3C + 6C \cdot 4^\alpha (1 - 2^{-(s-\alpha)})^{-1} + 4C \cdot 4^\alpha .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:approx-embedding}, $\sum_k 2^{k\alpha} E_{2^k}(f) < \infty$, so the
+construction of \Cref{thm:lift} applies, now with tolerances $t_k = \|f\| 2^{-k(s+1)}$. The
+partial lifts $z_k = y_0 + \sum_{j<k} d_j$ satisfy $\iota z_k = a_k \in A_{2^k}$, so
+$z_k \in B_{2^k}$ and
+\[
+  E^B_{2^k}(y) \leq \|y - z_k\| \leq \sum_{i=0}^\infty \|d_{k+i}\|
+  \leq 2C \, 4^\alpha \sum_{i=0}^\infty 2^{(k+i)\alpha} \bigl(E_{2^{k+i}}(f) + t_{k+i}\bigr).
+\]
+Multiply by $2^{k(s-\alpha)}$ and apply the first Hardy inequality (\Cref{lem:hardy}) with
+exponent $s - \alpha > 0$: the weights combine to $2^{k(s-\alpha)} 2^{k\alpha} = 2^{ks}$,
+and $\|(2^{ks} t_k)_k\|_{\ell_q} \leq 2\|f\|$.
+\end{proof}
+
+\section{Jackson and Bernstein inequalities}
+
+\begin{definition}[Jackson inequality]
+\label{def:jackson}
+\lean{ApproximationScheme.JacksonBound, ApproximationScheme.JacksonBound.approxSeq_le}
+\leanok
+\uses{def:error}
+Let $r, C \in \R$. The map $\iota$ satisfies \emph{Jackson's inequality} of order $r$ and
+constant $C$ for $A$ if $E_n(\iota y) \leq C \, n^{-r} \|y\|$ for every $n \geq 1$ and every
+$y \in Y$.
+\end{definition}
+
+\begin{lemma}[Jackson's inequality gives $Y \subseteq A^r_\infty$]
+\label{lem:jackson-top}
+\lean{ApproximationScheme.approxNormDyadic_top_le_of_jackson,
+  ApproximationScheme.memApprox_top_of_jackson}
+\leanok
+\uses{def:jackson, def:dyadic-norm, thm:dyadic-norm}
+Let $\iota$ satisfy Jackson's inequality of order $r \geq 0$ and constant $C \geq 0$. Then
+$\|\iota y\|^{\mathrm{dy}}_{A^r_\infty} \leq (\|\iota\| + C) \|y\|$ for every $y \in Y$; in
+particular $\iota y \in A^r_\infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$2^{kr} E_{2^k}(\iota y) \leq C \|y\|$ for every $k$, and $\|\iota y\| \leq \|\iota\| \|y\|$.
+\end{proof}
+
+\begin{definition}[Smoothness space]
+\label{def:smoothness}
+\lean{ApproximationScheme.SmoothnessSpace}
+\leanok
+\uses{def:jackson, def:lift-bound}
+A \emph{smoothness space} of order $r > 0$ for $A$ is a normed space $Y$ with an injective
+bounded linear map $\iota : Y \to X$ that satisfies Jackson's inequality of order $r$ and the
+lifting bound of exponent $r$ for $A$, both with nonnegative constants.
+\end{definition}
+
+The lifting bound is then Bernstein's inequality $\|\iota^{-1} a\|_Y \leq C n^r \|a\|$ for
+$a \in A_n$. Sobolev spaces of order $r$ inside $L_p$ are the motivating example.
+
+\begin{proposition}[Smoothness spaces between $A^r_1$ and $A^r_\infty$]
+\label{prop:smoothness}
+\lean{ApproximationScheme.SmoothnessSpace.memApprox_top,
+  ApproximationScheme.SmoothnessSpace.exists_eq_of_memApprox_one,
+  ApproximationScheme.SmoothnessSpace.exists_eq_of_lt, ApproximationScheme.SmoothnessSpace.congr}
+\leanok
+\uses{def:smoothness, lem:jackson-top, thm:lift, thm:approx-embedding}
+Let $(Y, \iota)$ be a smoothness space of order $r$ for $A$. Then $\iota(Y) \subseteq
+A^r_\infty$. If $Y$ is a Banach space, then $A^r_1 \subseteq \iota(Y)$, and
+$A^s_q \subseteq \iota(Y)$ for every $s > r$ and $1 \leq q \leq \infty$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+The first inclusion is \Cref{lem:jackson-top}, the second \Cref{thm:lift} with $\beta = r$.
+The third follows from the second and $A^s_q \subseteq A^r_1$ (\Cref{thm:approx-embedding}).
+\end{proof}
+
+\chapter{Interpolation and the representation theorem}
+\label{ch:interpolation}
+
+Throughout, $\iota : Y \to X$ is a bounded linear map. The $K$-functional of Peetre measures
+how well $f \in X$ is approximated by elements of $Y$ of controlled norm; the real
+interpolation spaces are defined from it~\cite{BerghLofstrom}.
+
+\begin{definition}[$K$-functional]
+\label{def:k-functional}
+\lean{ApproximationScheme.kFunctional, ApproximationScheme.kFunctional_le}
+\leanok
+For $t \in [0, \infty]$ and $f \in X$,
+\[
+  K(t, f) = \inf_{y \in Y} \bigl(\|f - \iota y\| + t \|y\|\bigr) .
+\]
+\end{definition}
+
+\begin{lemma}[Properties of the $K$-functional]
+\label{lem:k-functional}
+\lean{ApproximationScheme.kFunctional_le_enorm, ApproximationScheme.kFunctional_mono,
+  ApproximationScheme.kFunctional_add_le, ApproximationScheme.kFunctional_smul_le,
+  ApproximationScheme.kFunctional_zero_right}
+\leanok
+\uses{def:k-functional}
+For all $t \leq u$ in $[0, \infty]$, $f, g \in X$ and $c \in \R$: $K(t, f) \leq \|f\|$,
+$K(t, f) \leq K(u, f)$, $K(t, f + g) \leq K(t, f) + K(t, g)$ and
+$K(t, c f) \leq |c| \, K(t, f)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Take $y = 0$ for the first bound; the others hold for each $y$ before the infimum.
+\end{proof}
+
+\begin{definition}[Real interpolation space]
+\label{def:interpolation}
+\lean{ApproximationScheme.interpSeq, ApproximationScheme.interpNorm, ApproximationScheme.MemInterp,
+  ApproximationScheme.interpSpace, ApproximationScheme.interpNorm_add_le,
+  ApproximationScheme.enorm_le_interpNorm, ApproximationScheme.interpNorm_smul_le,
+  ApproximationScheme.mem_interpSpace}
+\leanok
+\uses{def:k-functional, def:lq-norm, lem:k-functional}
+Let $\theta, \rho \in \R$ and $1 \leq q \leq \infty$. For $f \in X$,
+\[
+  \|f\|_{\theta, q} = \|f\| + \bigl\| \bigl(2^{k\rho\theta} K(2^{-k\rho}, f)\bigr)_{k \in \N}
+  \bigr\|_{\ell_q} .
+\]
+The \emph{real interpolation space} $(X, Y)_{\theta, q}$ consists of the $f \in X$ with
+$\|f\|_{\theta, q} < \infty$. It is a linear subspace of $X$, and $\|\cdot\|_{\theta, q}$
+satisfies the triangle inequality.
+\end{definition}
+
+This is the discrete $K$-method. The textbook definition samples $K(t, f)$ on the grid
+$t = 2^{-k}$, which is $\rho = 1$; the representation theorem produces the grid $t = 2^{-kr}$.
+Grids for different $\rho > 0$ give equivalent norms, since $K(t, f)$ increases and $K(t, f)/t$
+decreases in $t$, and the continuous $K$-method
+$\bigl(\int_0^\infty (t^{-\theta} K(t, f))^q \, dt/t\bigr)^{1/q}$ gives an equivalent norm as
+well; these equivalences are not formalised. The term $\|f\|$ replaces the negative indices
+$k < 0$ of the textbook definition.
+
+\begin{lemma}[Errors and the $K$-functional]
+\label{lem:error-k-functional}
+\lean{ApproximationScheme.approxSeq_le_kFunctional_of_jackson}
+\leanok
+\uses{def:k-functional, def:jackson}
+Let $A$ be an approximation scheme in $X$, and let $\iota$ satisfy Jackson's inequality of
+order $r$ and constant $C \geq 0$. For every $n \geq 1$ and $f \in X$,
+$E_n(f) \leq \max(1, C) \, K(n^{-r}, f)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:error-basic}
+For every $y \in Y$, $E_n(f) \leq \|f - \iota y\| + E_n(\iota y) \leq \|f - \iota y\| + C
+n^{-r} \|y\|$.
+\end{proof}
+
+The representation theorem identifies approximation spaces with interpolation spaces, as in
+DeVore and Lorentz~\cite[Chapter~7]{DeVoreLorentz}.
+
+\begin{theorem}[Representation theorem]
+\label{thm:representation}
+\lean{ApproximationScheme.approxNormDyadic_le_interpNorm_of_jackson,
+  ApproximationScheme.interpSeq_le_of_lift,
+  ApproximationScheme.interpNorm_le_approxNormDyadic_of_bernstein, ApproximationScheme.reprConst,
+  ApproximationScheme.memApprox_iff_memInterp, ApproximationScheme.approxSpace_eq_interpSpace,
+  ApproximationScheme.SmoothnessSpace.memApprox_iff_memInterp, ApproximationScheme.reprConst_ne_top}
+\leanok
+\uses{lem:error-k-functional, def:interpolation, lem:near-best, lem:hardy,
+  def:lift-bound, def:dyadic-norm}
+Let $A$ be an approximation scheme in $X$, let $r \in \R$ and $C_1, C_2 \geq 0$, and let
+$\iota$ satisfy Jackson's inequality of order $r$ and constant $C_1$ and the lifting bound of
+exponent $r$ and constant $C_2$. Let $0 < s < r$ and $1 \leq q \leq \infty$. Then for every
+$f \in X$,
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_q} \leq \max(1, C_1) \, \|f\|_{s/r, q}
+  \qquad \text{and} \qquad
+  \|f\|_{s/r, q} \leq K \, \|f\|^{\mathrm{dy}}_{A^s_q},
+\]
+where $K = 3 + (3C_2 + 4C_2 \cdot 4^r)(1 - 2^{-(r-s)})^{-1}$ and the interpolation norm is
+taken on the grid $\rho = r$. In particular $A^s_q = (X, Y)_{s/r, q}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For the first inequality apply \Cref{lem:error-k-functional} with $n = 2^k$: then
+$n^{-r} = 2^{-kr}$ and $2^{ks} = 2^{kr \cdot s/r}$. For the second choose near-best
+approximants $a_k$ (\Cref{lem:near-best}) and lift them as in \Cref{thm:lift}: the partial
+lifts $z_k = y_0 + \sum_{j<k} d_j$ satisfy $\iota z_k = a_k$ and
+$\|z_k\| \leq 3C_2 \|f\| + 2C_2 4^r \sum_{j<k} 2^{jr} (E_{2^j}(f) + t_j)$. Hence
+\[
+  2^{ks} K(2^{-kr}, f) \leq 2^{ks} \|f - a_k\| + 2^{-k(r-s)} \|z_k\| ,
+\]
+and the second Hardy inequality (\Cref{lem:hardy}) with exponent $r - s > 0$ bounds the
+partial sums. The tolerances are made arbitrarily small at the end. Only finitely many
+lifts enter each $z_k$, so $Y$ need not be complete.
+\end{proof}
+
+Here $(X, Y)_{s/r, q}$ is the discrete $K$-method on the grid $t = 2^{-kr}$
+(\Cref{def:interpolation}); its equivalence with the continuous $K$-method is not formalised.
+
+\begin{corollary}[Schemes with the same Jackson and Bernstein inequalities]
+\label{cor:equal-spaces}
+\lean{ApproximationScheme.approxSpace_eq_of_jackson_bernstein}
+\leanok
+\uses{thm:representation}
+Let $A$ and $B$ be approximation schemes in $X$, let $r \in \R$, and let $\iota$ satisfy
+Jackson's inequality of order $r$ and the lifting bound of exponent $r$ for $A$ and for $B$,
+with nonnegative constants. Then $A^s_q = B^s_q$ for all $0 < s < r$ and
+$1 \leq q \leq \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+Both are $(X, Y)_{s/r, q}$ by \Cref{thm:representation}.
+\end{proof}
+
+This is how approximation by trigonometric polynomials, splines and wavelets are seen to
+define the same spaces.
+
+\chapter{Block decompositions and projections}
+\label{ch:decompositions}
+
+Throughout, $A$ is an approximation scheme in $X$. Approximation spaces can be described by
+block decompositions $f = \sum_k g_k$ into blocks $g_k \in A_{2^k}$~\cite[Chapter~7]{DeVoreLorentz}.
+Each block is a whole level; atomic decompositions refine the blocks into localised atoms with
+coefficients, and wavelet decompositions expand them in a basis.
+
+\begin{definition}[Block decomposition norm]
+\label{def:block-decomposition}
+\lean{ApproximationScheme.blockDecompNorm, ApproximationScheme.sum_range_two_pow_lt,
+  ApproximationScheme.blockDecompNorm_le, ApproximationScheme.sum_range_mem}
+\leanok
+\uses{def:scheme, def:lq-norm}
+Let $s \in \R$ and $1 \leq q \leq \infty$. For $f \in X$, $\|f\|^{\mathrm{dec}}_{s,q}$ is
+the infimum of $\|(2^{ks} \|g_k\|)_k\|_{\ell_q}$ over all sequences $(g_k)_k$ with
+$g_k \in A_{2^k}$ for every $k$ and $\sum_k g_k = f$, the series converging in $X$.
+\end{definition}
+
+\begin{theorem}[Block decompositions]
+\label{thm:block-decomposition}
+\lean{ApproximationScheme.approxNormDyadic_le_of_hasSum,
+  ApproximationScheme.approxNormDyadic_le_blockDecompNorm,
+  ApproximationScheme.blockDecompNorm_le_approxNormDyadic,
+  ApproximationScheme.memApprox_iff_blockDecompNorm_lt_top,
+  ApproximationScheme.DyadicApprox.blocks}
+\leanok
+\uses{def:block-decomposition, def:dyadic-norm, lem:hardy, lem:near-best, lem:approx-closure}
+Let $s > 0$ and $1 \leq q \leq \infty$. For every $f \in X$,
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_q} \leq 2 (1 - 2^{-s})^{-1} \, \|f\|^{\mathrm{dec}}_{s,q} .
+\]
+If $X$ is a Banach space, then for every $f \in X$,
+\[
+  \|f\|^{\mathrm{dec}}_{s,q} \leq (3 \cdot 2^s + 4 \cdot 4^s) \, \|f\|^{\mathrm{dy}}_{A^s_q},
+\]
+and $f \in A^s_q$ if and only if $\|f\|^{\mathrm{dec}}_{s,q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:scheme-basic}
+Let $f = \sum_k g_k$ with $g_k \in A_{2^k}$. Since $\sum_{j<k} 2^j < 2^k$, the partial sum
+$\sum_{j<k} g_j$ lies in $A_{2^k}$, so $E_{2^k}(f) \leq T_k = \sum_{i \geq 0} \|g_{k+i}\|$,
+and also $\|f\| \leq T_0$. The first Hardy inequality bounds $\|(2^{ks} T_k)_k\|_{\ell_q}$,
+which gives the first inequality. Conversely, take near-best approximants $a_k$ with
+tolerances $\|f\| 2^{-k(s+1)}$ and the blocks $g_0 = 0$, $g_1 = a_0$, $g_{k+2} =
+a_{k+1} - a_k \in A_{2^{k+2}}$. Their partial sums are the $a_k$, which converge to $f$ by
+\Cref{lem:approx-closure}, and $\|g_{k+2}\| \leq 2(E_{2^k}(f) + t_k)$ gives the bound.
+\end{proof}
+
+\section{Projection schemes}
+
+\begin{definition}[Projection scheme]
+\label{def:projection-scheme}
+\lean{ApproximationScheme.ProjectionScheme, ApproximationScheme.ProjectionScheme.bound_nonneg,
+  ApproximationScheme.ProjectionScheme.enorm_apply_le}
+\leanok
+\uses{def:scheme}
+A \emph{projection scheme} for $A$ is a sequence of bounded linear maps $P_n : X \to X$ with
+$P_n(X) \subseteq A_n$, $P_n a = a$ for every $a \in A_n$, and $\|P_n\| \leq M$ for all $n$,
+for some $M \geq 0$.
+\end{definition}
+
+\begin{lemma}[Lebesgue inequality]
+\label{lem:lebesgue}
+\lean{ApproximationScheme.ProjectionScheme.approxSeq_le_enorm_sub,
+  ApproximationScheme.ProjectionScheme.enorm_sub_le_approxSeq,
+  ApproximationScheme.ProjectionScheme.tendsto_of_dense}
+\leanok
+\uses{def:projection-scheme, def:error, lem:error-tendsto}
+Let $(P_n)$ be a projection scheme for $A$ with bound $M$. For every $n \in \N$ and
+$f \in X$,
+\[
+  E_n(f) \leq \|f - P_n f\| \leq (1 + M) \, E_n(f) .
+\]
+If $\bigcup_n A_n$ is dense in $X$, then $P_n f \to f$ for every $f \in X$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $a \in A_n$, $f - P_n f = (f - a) - P_n(f - a)$. The last statement follows from
+$E_n(f) \to 0$.
+\end{proof}
+
+\begin{definition}[Dyadic blocks]
+\label{def:blocks}
+\lean{ApproximationScheme.ProjectionScheme.block,
+  ApproximationScheme.ProjectionScheme.blockNorm}
+\leanok
+\uses{def:projection-scheme, def:lq-norm}
+For a projection scheme $(P_n)$, $k \in \N$ and $f \in X$, the \emph{dyadic block} is
+$\Delta_k f = P_{2^{k+1}} f - P_{2^k} f$. For $s \in \R$ and $1 \leq q \leq \infty$,
+\[
+  \|f\|^{\mathrm{bl}}_{s,q} = \|P_1 f\| + \bigl\| \bigl(2^{ks} \|\Delta_k f\|\bigr)_k
+  \bigr\|_{\ell_q} .
+\]
+\end{definition}
+
+\begin{theorem}[Characterisation by dyadic blocks]
+\label{thm:blocks}
+\lean{ApproximationScheme.ProjectionScheme.enorm_block_le,
+  ApproximationScheme.ProjectionScheme.blockNorm_le_approxNormDyadic,
+  ApproximationScheme.ProjectionScheme.enorm_sub_le_tsum_block,
+  ApproximationScheme.ProjectionScheme.approxNormDyadic_le_blockNorm,
+  ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top,
+  ApproximationScheme.ProjectionScheme.sum_block}
+\leanok
+\uses{def:blocks, lem:lebesgue, lem:hardy, def:dyadic-norm}
+Let $(P_n)$ be a projection scheme for $A$ with bound $M$, let $s \in \R$ and
+$1 \leq q \leq \infty$. For every $f \in X$,
+\[
+  \|f\|^{\mathrm{bl}}_{s,q} \leq (M + 2(1 + M)) \, \|f\|^{\mathrm{dy}}_{A^s_q} .
+\]
+If $P_n f \to f$, then
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_q} \leq \bigl(1 + 2(1 - 2^{-s})^{-1}\bigr) \,
+  \|f\|^{\mathrm{bl}}_{s,q} .
+\]
+In particular, if $\bigcup_n A_n$ is dense in $X$ and $s > 0$, then $f \in A^s_q$ if and
+only if $\|f\|^{\mathrm{bl}}_{s,q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:lebesgue}, $\|\Delta_k f\| \leq \|f - P_{2^{k+1}} f\| + \|f - P_{2^k} f\| \leq
+2(1 + M) E_{2^k}(f)$, and $\|P_1 f\| \leq M \|f\|$. Conversely, if $P_n f \to f$, then
+$f - P_{2^k} f = \sum_{i \geq 0} \Delta_{k+i} f$, so $E_{2^k}(f) \leq \sum_{i \geq 0}
+\|\Delta_{k+i} f\|$ and $\|f\| \leq \|P_1 f\| + \sum_{i \geq 0} \|\Delta_i f\|$; the first
+Hardy inequality concludes.
+\end{proof}
+
+\section{Synthesis with decay and atoms}
+
+Atoms of a function space lie in no fixed set of approximants. Their blocks satisfy a weaker
+condition: they are small and approximable at a rate $\sigma$ from their own level on.
+
+\begin{definition}[Linear scheme]
+\label{def:linear-scheme}
+\lean{ApproximationScheme.IsLinear, ApproximationScheme.isLinear_ofSubmodules,
+  ApproximationScheme.isLinear_ofMonotoneSubmodules,
+  ApproximationScheme.approxSeq_add_le_of_isLinear,
+  ApproximationScheme.approxSeq_sum_le_of_isLinear, ApproximationScheme.IsLinear.map,
+  ApproximationScheme.approxError_add_le_of_isLinear}
+\leanok
+\uses{def:scheme, def:error}
+An approximation scheme is \emph{linear} if $a + b \in A_n$ for all $n \in \N$ and
+$a, b \in A_n$. For a linear scheme, $E_n(f + g) \leq E_n(f) + E_n(g)$ for all $n$, $f$, $g$.
+\end{definition}
+
+\begin{theorem}[Synthesis with decay]
+\label{thm:synthesis-decay}
+\lean{ApproximationScheme.approxNormDyadic_le_of_hasSum_decay,
+  ApproximationScheme.dyadicWeight_mul_dyadicWeight_sub}
+\leanok
+\uses{def:linear-scheme, def:dyadic-norm, lem:hardy, lem:error-basic}
+Let $A$ be a linear scheme, $\sigma \in \R$, $C \in [0, \infty]$ and $1 \leq q \leq \infty$.
+Let $f = \sum_j g_j$ in $X$, and let $(\varepsilon_j)_j$ in $[0, \infty]$ satisfy
+$\|g_j\| \leq \varepsilon_j$ for every $j$ and $E_{2^k}(g_j) \leq C \, 2^{-(k-j)\sigma}
+\varepsilon_j$ for all $j \leq k$. Then for every $s \in \R$,
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_q} \leq \bigl(2 (1 - 2^{-s})^{-1} + C (1 - 2^{-(\sigma - s)})^{-1}\bigr)
+  \bigl\|(2^{js} \varepsilon_j)_j\bigr\|_{\ell_q} ,
+\]
+a finite constant for $0 < s < \sigma$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Split $f$ at level $k$: $E_{2^k}(f) \leq \sum_{j \leq k} E_{2^k}(g_j) + \|\sum_{j > k} g_j\|$
+by linearity. The first sum is at most $C \, 2^{-k\sigma} \sum_{j \leq k} 2^{j\sigma}
+\varepsilon_j$, and after multiplication by $2^{ks}$ the second Hardy inequality with exponent
+$\sigma - s$ applies. The second term is at most $\sum_{i \geq 0} \varepsilon_{k+i}$, and the
+first Hardy inequality with exponent $s$ applies; it also bounds $\|f\| \leq \sum_j
+\varepsilon_j$.
+\end{proof}
+
+This is the pattern of the proof of \Cref{thm:moduli-coincidence}. For atoms the size
+$\varepsilon_j$ is that of a whole level, measured by the coefficients.
+
+\begin{definition}[Atomic system and the sequence space $b^s_{p,q}$]
+\label{def:atomic-system}
+\lean{ApproximationScheme.AtomicSystem, ApproximationScheme.bNorm}
+\leanok
+\uses{def:scheme, def:error, def:lq-norm}
+Let $M_j$ be finite sets, $1 \leq p \leq \infty$ and $\delta, \sigma \in \R$. An \emph{atomic
+system} for $A$ consists of sets $\mathcal{A}_{j,m} \subseteq X$ of admissible atoms, $j \in
+\N$, $m \in M_j$, each containing $0$, and a constant $C < \infty$ such that for every $j$,
+every choice $a_m \in \mathcal{A}_{j,m}$ and all real coefficients $c = (c_m)_{m \in M_j}$,
+\[
+  \Bigl\| \sum_m c_m a_m \Bigr\| \leq C \, 2^{-j\delta} \|c\|_{\ell_p}
+\]
+and, for every $k \geq j$,
+\[
+  E_{2^k}\Bigl(\sum_m c_m a_m\Bigr) \leq 2^{-(k-j)\sigma} \, C \, 2^{-j\delta} \|c\|_{\ell_p} .
+\]
+For coefficients $\lambda = (\lambda_{j,m})$ and $s, q$ as before,
+$\|\lambda\|_{b^s_{p,q}} = \|(2^{j(s-\delta)} \|\lambda_{j,\cdot}\|_{\ell_p})_j\|_{\ell_q}$.
+\end{definition}
+
+On a domain of dimension $d$ in $L_p$, the positions are the dyadic cubes of side $2^{-j}$ and
+$\delta = d/p$. The size bound expresses the normalisation and the bounded overlap of the
+supports, the decay bound the smoothness $\sigma$ of the atoms relative to the scheme, and
+$b^s_{p,q}$ is the sequence space of Schneider and Vyb\'{\i}ral~\cite{SchneiderVybiral}.
+
+\begin{theorem}[Atomic synthesis]
+\label{thm:atomic-synthesis}
+\lean{ApproximationScheme.AtomicSystem.approxNormDyadic_le_bNorm,
+  ApproximationScheme.AtomicSystem.memApprox_of_bNorm_lt_top,
+  ApproximationScheme.AtomicSystem.synthConst, ApproximationScheme.AtomicSystem.synthConst_ne_top}
+\leanok
+\uses{def:atomic-system, thm:synthesis-decay}
+Let $A$ be a linear scheme with an atomic system as in \Cref{def:atomic-system}, let
+$0 < s < \sigma$ and $1 \leq q \leq \infty$. Let $a_{j,m} \in \mathcal{A}_{j,m}$, let
+$\lambda_{j,m} \in \R$, and let $f = \sum_j \sum_m \lambda_{j,m} a_{j,m}$, the series over $j$
+converging in $X$. Then
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_q} \leq \bigl(2 (1 - 2^{-s})^{-1} + (1 - 2^{-(\sigma - s)})^{-1}\bigr)
+  \, C \, \|\lambda\|_{b^s_{p,q}} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Apply \Cref{thm:synthesis-decay} to the levels $g_j = \sum_m \lambda_{j,m} a_{j,m}$ with
+$\varepsilon_j = C \, 2^{-j\delta} \|\lambda_{j,\cdot}\|_{\ell_p}$; then
+$2^{js} \varepsilon_j = C \, 2^{j(s - \delta)} \|\lambda_{j,\cdot}\|_{\ell_p}$.
+\end{proof}
+
+\begin{lemma}[Block decompositions with bounds]
+\label{lem:exists-blocks}
+\lean{ApproximationScheme.exists_blocks, ApproximationScheme.DyadicApprox.hasSum_blocks,
+  ApproximationScheme.DyadicApprox.lqNorm_blocks_le,
+  ApproximationScheme.DyadicApprox.tsum_enorm_blocks_ne_top,
+  ApproximationScheme.DyadicApprox.blocks_mem, ApproximationScheme.DyadicApprox.sum_range_blocks,
+  ApproximationScheme.DyadicApprox.blockDecompNorm_le}
+\leanok
+\uses{thm:block-decomposition}
+Let $X$ be a Banach space, $s > 0$, $1 \leq q \leq \infty$ and $f \in A^s_q$. There are
+$g_k \in A_{2^k}$ with $f = \sum_k g_k$, $\sum_k \|g_k\| < \infty$ and
+$\|(2^{ks} \|g_k\|)_k\|_{\ell_q} \leq (3 \cdot 2^s + 4 \cdot 4^s) \|f\|^{\mathrm{dy}}_{A^s_q}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+These are the blocks of near-best approximants from the proof of
+\Cref{thm:block-decomposition}.
+\end{proof}
+
+\begin{theorem}[Atomic analysis]
+\label{thm:atomic-analysis}
+\lean{ApproximationScheme.AtomicSystem.StableExpansion,
+  ApproximationScheme.AtomicSystem.exists_atomic_decomposition,
+  ApproximationScheme.AtomicSystem.memApprox_iff_exists_atomic}
+\leanok
+\uses{def:atomic-system, lem:exists-blocks, thm:atomic-synthesis}
+Let $X$ be a Banach space with an atomic system for $A$, and let $C' \geq 0$ be such that every
+$x \in A_{2^j}$ is $\sum_m c_m a_m$ with $a_m \in \mathcal{A}_{j,m}$ and
+$\|c\|_{\ell_p} \leq C' \, 2^{j\delta} \|x\|$. Let $s > 0$ and $1 \leq q \leq \infty$. Then
+every $f \in A^s_q$ is $\sum_j \sum_m \lambda_{j,m} a_{j,m}$ with $a_{j,m} \in
+\mathcal{A}_{j,m}$ and
+\[
+  \|\lambda\|_{b^s_{p,q}} \leq C' (3 \cdot 2^s + 4 \cdot 4^s) \|f\|^{\mathrm{dy}}_{A^s_q} .
+\]
+If moreover $A$ is linear, $C' < \infty$ and $s < \sigma$, then $f \in A^s_q$ if and only if
+$f$ is such an atomic sum with $\|\lambda\|_{b^s_{p,q}} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Expand every block of \Cref{lem:exists-blocks} in atoms of its level; then
+$2^{j(s-\delta)} \|\lambda_{j,\cdot}\|_{\ell_p} \leq C' \, 2^{js} \|g_j\|$. The converse is
+\Cref{thm:atomic-synthesis}.
+\end{proof}
+
+Local bases on dyadic grids, such as the Haar functions, have the expansion property of
+\Cref{thm:atomic-analysis}.
+
+\chapter{Traces and intrinsic norms}
+\label{ch:traces-abstract}
+
+Throughout, $A$ is an approximation scheme in $X$ and $B$ one in $Y$. Two questions about
+function spaces on domains become statements about approximation spaces: the restriction of
+functions to a hypersurface, a map defined only on smooth functions, and the comparison of the
+intrinsic norm of a domain with the norm of restrictions.
+
+\begin{definition}[Trace bound]
+\label{def:trace-bound}
+\lean{ApproximationScheme.TraceBound, ApproximationScheme.TraceBound.ofSubmodule,
+  ApproximationScheme.TraceBound.ofSubmodule_T, ApproximationScheme.traceConst,
+  ApproximationScheme.traceConst_ne_top, ApproximationScheme.TraceBound.enorm_apply_le,
+  ApproximationScheme.TraceBound.enorm_apply_sub_succ_le,
+  ApproximationScheme.TraceBound.edist_apply_succ_le}
+\leanok
+\uses{def:scheme}
+Let $\beta \in \R$. A \emph{trace bound} of exponent $\beta$ is a linear map $T : X \to Y$ with
+$T(A_n) \subseteq B_n$ for every $n$ and a constant $C < \infty$ with
+$\|T a\| \leq C n^\beta \|a\|$ for all $n \geq 1$ and $a \in A_n$.
+\end{definition}
+
+Only the values of $T$ on $\bigcup_n A_n$ matter, and a linear map defined on the span of the
+approximants extends linearly to $X$. The model is the restriction of functions to a
+hyperplane, defined on continuous functions and unbounded on $L_p$, with $\beta = 1/p$.
+
+\begin{lemma}[The trace]
+\label{lem:trace-ext}
+\lean{ApproximationScheme.TraceBound.ext, ApproximationScheme.canonicalApprox,
+  ApproximationScheme.TraceBound.tendsto_ext, ApproximationScheme.TraceBound.tendsto_edist_apply,
+  ApproximationScheme.TraceBound.cauchySeq_apply, ApproximationScheme.TraceBound.ext_eq_of_mem,
+  ApproximationScheme.TraceBound.ext_add, ApproximationScheme.TraceBound.ext_smul,
+  ApproximationScheme.TraceBound.extLinear, ApproximationScheme.TraceBound.enorm_ext_le,
+  ApproximationScheme.mem_iUnionSubmodule,
+  ApproximationScheme.DyadicApprox.tendsto_dyadicWeight_mul_enorm_sub,
+  ApproximationScheme.tsum_canonical_ne_top, ApproximationScheme.TraceBound.tendsto_canonical,
+  ApproximationScheme.TraceBound.ext_zero}
+\leanok
+\uses{def:trace-bound, lem:near-best, def:dyadic-norm}
+Let $T$ be a trace bound of exponent $\beta \geq 0$ and let $Y$ be a Banach space. For every
+$f \in A^\beta_1$ there is $\operatorname{Tr} f \in Y$ such that $T c_k \to \operatorname{Tr} f$
+for all $\gamma \in \N$ and all $c_k \in A_{2^{k+\gamma}}$ with
+$2^{k\beta} \|f - c_k\| \to 0$. The map $\operatorname{Tr}$ is linear on $A^\beta_1$, agrees
+with $T$ on every $A_m$, and
+$\|\operatorname{Tr} f\| \leq (3C + 6C \cdot 4^\beta) \|f\|^{\mathrm{dy}}_{A^\beta_1}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For near-best approximants $a_k$, $\|T a_{k+1} - T a_k\| \leq C \, 2^{(k+2)\beta} \cdot
+2 (E_{2^k}(f) + t_k)$, which is summable; so $T a_k$ is a Cauchy sequence. Two admissible
+sequences differ by $c_k - c'_k \in A_{2^{k+\gamma+\gamma'+1}}$ with
+$\|T(c_k - c'_k)\| \lesssim 2^{k\beta} (\|f - c_k\| + \|f - c'_k\|) \to 0$. Linearity follows
+by applying this to $a_k(f) + a_k(g)$ and $r a_k(f)$; on $A_m$ take $c_k = a$. The bound is the
+telescoping sum, as in \Cref{thm:lift}.
+\end{proof}
+
+\begin{theorem}[Trace transfer]
+\label{thm:trace-transfer}
+\lean{ApproximationScheme.TraceBound.approxNormDyadic_ext_le,
+  ApproximationScheme.TraceBound.memApprox_ext, ApproximationScheme.traceTransferConst,
+  ApproximationScheme.TraceBound.edist_apply_ext_le, ApproximationScheme.traceTransferConst_ne_top,
+  ApproximationScheme.TraceBound.enorm_ext_le_of_dyadicApprox}
+\leanok
+\uses{lem:trace-ext, lem:hardy}
+Let $T$ be a trace bound of exponent $\beta$ with constant $C$, let $Y$ be a Banach space, and
+let $0 \leq \beta < s$ and $1 \leq q \leq \infty$. For every $f \in A^s_q$,
+\[
+  \|\operatorname{Tr} f\|^{\mathrm{dy}}_{B^{s-\beta}_q} \leq
+  \bigl(3C + 6C \cdot 4^\beta (1 - 2^{-(s-\beta)})^{-1} + 4C \cdot 4^\beta\bigr)
+  \|f\|^{\mathrm{dy}}_{A^s_q} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Since $T a_k \in B_{2^k}$, $E^B_{2^k}(\operatorname{Tr} f) \leq \sum_{i \geq 0}
+\|T a_{k+i+1} - T a_{k+i}\|$. The proof of \Cref{thm:nikolskii-transfer} then applies word for
+word; that theorem is the case $T = \iota^{-1}$ on the approximants.
+\end{proof}
+
+\begin{theorem}[Surjectivity of the trace]
+\label{thm:trace-surjective}
+\lean{ApproximationScheme.TraceBound.RightInverseBound, ApproximationScheme.shiftSeq,
+  ApproximationScheme.shiftSeq_add, ApproximationScheme.shiftSeq_of_lt,
+  ApproximationScheme.hasSum_shiftSeq, ApproximationScheme.shiftSeq_mem,
+  ApproximationScheme.lqNorm_shiftSeq_le, ApproximationScheme.TraceBound.ext_eq_of_hasSum_lift,
+  ApproximationScheme.TraceBound.exists_ext_eq, ApproximationScheme.traceSurjConst,
+  ApproximationScheme.traceSurjConst_ne_top}
+\leanok
+\uses{thm:trace-transfer, lem:exists-blocks, thm:block-decomposition}
+Let $X$ and $Y$ be Banach spaces, $T$ a trace bound of exponent $\beta \geq 0$, and let
+$\gamma \in \N$ and $C' < \infty$ be such that every $b \in B_{2^k}$ is $T a$ for some
+$a \in A_{2^{k+\gamma}}$ with $\|a\| \leq C' \, 2^{-k\beta} \|b\|$. Let $s > 0$ and
+$1 \leq q \leq \infty$. For every $g \in B^s_q$ there is $f \in A^{s+\beta}_q$ with
+$\operatorname{Tr} f = g$ and
+\[
+  \|f\|^{\mathrm{dy}}_{A^{s+\beta}_q} \leq 2 (1 - 2^{-(s+\beta)})^{-1} \, 2^{\gamma(s+\beta)}
+  \, C' \, (3 \cdot 2^s + 4 \cdot 4^s) \, \|g\|^{\mathrm{dy}}_{B^s_q} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Lift the blocks $b_j \in B_{2^j}$ of \Cref{lem:exists-blocks} for $g$ to $a_j \in
+A_{2^{j+\gamma}}$ and put $f = \sum_j a_j$. The blocks $a_j$, placed at level $j + \gamma$,
+form a block decomposition of $f$, and $2^{(j+\gamma)(s+\beta)} \|a_j\| \leq
+2^{\gamma(s+\beta)} C' \, 2^{js} \|b_j\|$, so \Cref{thm:block-decomposition} gives the bound.
+The partial sums $c_K = \sum_{j < K} a_j$ satisfy $2^{K\beta} \|f - c_K\| \leq C' \sum_{m \geq 0}
+\|b_{m+K}\| \to 0$, so $T c_K \to \operatorname{Tr} f$ by \Cref{lem:trace-ext}, while
+$T c_K = \sum_{j < K} b_j \to g$.
+\end{proof}
+
+This is where block decompositions are used: they turn the right inverse on approximants into
+a right inverse of the trace.
+
+\begin{definition}[Approximation-preserving extension]
+\label{def:approx-extension}
+\lean{ApproximationScheme.ApproxExtension, ApproximationScheme.restrictionNorm}
+\leanok
+\uses{def:error}
+Let $R : X \to Y$ be a bounded linear map. An \emph{approximation-preserving extension} is a
+map $E : Y \to X$, not necessarily linear, with $R(E g) = g$, $\|E g\| \leq C \|g\|$ and
+$E^A_{2^{k+\gamma}}(E g) \leq C \, E^B_{2^k}(g)$ for all $g \in Y$ and $k \in \N$, for some
+$C < \infty$ and $\gamma \in \N$. The \emph{restriction quasi-norm} of $g \in Y$ is
+$\inf\{\|f\|^{\mathrm{dy}}_{A^s_q} : R f = g\}$.
+\end{definition}
+
+\begin{theorem}[Intrinsic and restriction quasi-norms]
+\label{thm:retract}
+\lean{ApproximationScheme.approxNormDyadic_extension_le, ApproximationScheme.extensionConst,
+  ApproximationScheme.approxNormDyadic_le_iInf_restrict,
+  ApproximationScheme.restrictionNorm_le_approxNormDyadic,
+  ApproximationScheme.memApprox_iff_exists_restrict, ApproximationScheme.extensionConst_ne_top}
+\leanok
+\uses{def:approx-extension, lem:approx-functorial}
+Let $R : X \to Y$ be a bounded linear map with $R(A_n) \subseteq B_n$ for every $n$, with an
+approximation-preserving extension $E$. Let $s \geq 0$ and $1 \leq q \leq \infty$. Then for
+every $g \in Y$,
+\[
+  \|g\|^{\mathrm{dy}}_{B^s_q} \leq \inf_{R f = g} \|R\| \, \|f\|^{\mathrm{dy}}_{A^s_q}
+  \qquad \text{and} \qquad
+  \|E g\|^{\mathrm{dy}}_{A^s_q} \leq C \bigl(1 + (\gamma + 1) 2^{\gamma s}\bigr)
+  \|g\|^{\mathrm{dy}}_{B^s_q} ,
+\]
+and $g \in B^s_q$ if and only if $g = R f$ for some $f \in A^s_q$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first inequality is \Cref{lem:approx-functorial}. For the second, the terms $k < \gamma$
+are at most $2^{\gamma s} C \|g\|$, and for $k = j + \gamma$,
+$2^{ks} E^A_{2^k}(E g) \leq 2^{\gamma s} C \, 2^{js} E^B_{2^j}(g)$.
+\end{proof}
+
+For a domain $\Omega \subseteq \R^d$, $X = L_p(\R^d)$, $Y = L_p(\Omega)$ and $R$ the restriction,
+the quasi-norm of $B^s_q$ uses only $g$ on $\Omega$: it is intrinsic. The theorem reduces the
+existence of an intrinsic norm to an approximation-preserving extension, which DeVore and
+Sharpley~\cite{DeVoreSharpley} construct on Lipschitz domains from near-best local
+polynomials. The extension may be
+nonlinear on purpose: in parts of the quasi-Banach range no linear extension exists.
+
+\chapter{Moduli of smoothness and approximation}
+\label{ch:moduli-abstract}
+
+Classical function spaces are defined by moduli of smoothness, approximation spaces by errors
+of approximation. A Jackson inequality and an inverse inequality make them coincide. This
+chapter states this once for every scheme; the examples are the trigonometric polynomials, the
+piecewise polynomials, splines and wavelets.
+
+\begin{definition}[Modulus compatible with a scheme]
+\label{def:modulus-data}
+\lean{ApproximationScheme.ModulusData, ApproximationScheme.ModulusData.modNorm,
+  ApproximationScheme.ModulusData.modulus_zero, ApproximationScheme.ModulusData.modulus_sum_le}
+\leanok
+\uses{def:scheme, def:error}
+Let $\theta \in \R$. A \emph{modulus compatible with $A$ of inverse order $\theta$} is a family
+$\omega(f, k) \in [0, \infty]$, $f \in X$, $k \in \N$ (the modulus of smoothness at the scale
+$2^{-k}$), together with a level $k_0 \in \N$ and constants $C_0, C_J, C_B < \infty$ such that for
+all $f, g \in X$ and $j, k \in \N$
+\[
+  \omega(f + g, k) \leq \omega(f, k) + \omega(g, k), \qquad \omega(f, k) \leq C_0 \|f\|,
+\]
+\[
+  E_{2^k}(f) \leq C_J \, \omega(f, k) \quad (k \geq k_0), \qquad
+  \omega(a, k) \leq C_B \, 2^{-(k - j)_+ \theta} \|a\| \quad (a \in A_{2^j}) .
+\]
+The \emph{classical quasi-norm} is
+$\|f\|^{\omega}_{s,q} = \|f\| + \|(2^{ks} \omega(f, k))_k\|_{\ell_q}$.
+\end{definition}
+
+\begin{theorem}[Coincidence of approximation and moduli]
+\label{thm:modulus-coincidence}
+\lean{ApproximationScheme.ModulusData.directConst,
+  ApproximationScheme.ModulusData.directConst_ne_top,
+  ApproximationScheme.ModulusData.approxNormDyadic_le_modNorm,
+  ApproximationScheme.ModulusData.dyadicWeight_neg_sub_two_le,
+  ApproximationScheme.ModulusData.inverseConst, ApproximationScheme.ModulusData.inverseConst_ne_top,
+  ApproximationScheme.ModulusData.modulus_le_of_dyadicApprox,
+  ApproximationScheme.ModulusData.dyadicWeight_mul_modulus_le_of_dyadicApprox,
+  ApproximationScheme.ModulusData.modNorm_le_approxNormDyadic,
+  ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top}
+\leanok
+\uses{def:modulus-data, def:dyadic-norm, lem:hardy}
+Let $\omega$ be a modulus compatible with $A$ of inverse order $\theta$ and $1 \leq q \leq
+\infty$. Then for every $f \in X$ and $s \geq 0$,
+$\|f\|^{\mathrm{dy}}_{A^s_q} \leq (1 + \sum_{k < k_0} 2^{ks} + C_J) \|f\|^{\omega}_{s,q}$, and
+for $0 \leq s < \theta$,
+\[
+  \|f\|^{\omega}_{s,q} \leq \bigl(1 + 3 C_0 + C_B (3 + 6 \cdot 4^{\theta})
+  (1 - 2^{-(\theta - s)})^{-1}\bigr) \|f\|^{\mathrm{dy}}_{A^s_q} .
+\]
+In particular $f \in A^s_q$ if and only if $\|f\|^{\omega}_{s,q} < \infty$, for $0 \leq s < \theta$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first bound is Jackson's inequality for $k \geq k_0$ and $E_{2^k}(f) \leq \|f\|$ for
+$k < k_0$. For the second,
+let $a_k \in A_{2^k}$ be near-best approximants and write
+$f = (f - a_k) + a_0 + \sum_{j < k} (a_{j+1} - a_j)$, where $a_{j+1} - a_j \in A_{2^{j+2}}$. Then
+\begin{multline*}
+  2^{ks} \omega(f, k) \leq C_0 \, 2^{ks} \|f - a_k\| + C_B \, 2^{-k(\theta - s)} \|a_0\| \\
+  + 2 C_B 4^{\theta} \, 2^{-k(\theta - s)} \sum_{j \leq k} 2^{j(\theta - s)} \,
+  2^{js} (E_{2^j}(f) + t_j),
+\end{multline*}
+and the last sum is bounded in $\ell_q$ by Hardy's inequality (\Cref{lem:hardy}) with exponent
+$\theta - s > 0$.
+\end{proof}
+
+\chapter{Besov spaces and their embeddings}
+\label{ch:besov}
+
+Throughout, $\Omega$ is a topological space with its Borel $\sigma$-algebra and $\mu$ is a
+finite measure on it. For $1 \leq p \leq \infty$, $L_p = L_p(\mu)$ is the space of
+complex-valued $p$-integrable functions, and $C_b(\Omega)$ is the space of bounded continuous
+complex-valued functions with the supremum norm.
+
+\section{Three facts on \texorpdfstring{$L_p$}{L\_p}}
+
+\begin{lemma}[The inclusion $L_r \hookrightarrow L_p$]
+\label{lem:inclusion}
+\lean{MeasureTheory.Lp.inclusionOfExponentLe, MeasureTheory.Lp.inclusionConst,
+  MeasureTheory.Lp.coeFn_inclusionOfExponentLe, MeasureTheory.Lp.norm_inclusionOfExponentLe_le,
+  MeasureTheory.Lp.norm_inclusionOfExponentLe_apply_le_of_prob,
+  MeasureTheory.Lp.inclusionOfExponentLe_injective, MeasureTheory.Lp.inclusionOfExponentLe_comp,
+  MeasureTheory.Lp.inclusionOfExponentLeLinear, MeasureTheory.Lp.coeFn_inclusionOfExponentLeLinear,
+  MeasureTheory.Lp.inclusionConst_nonneg, MeasureTheory.Lp.inclusionConst_of_isProbabilityMeasure,
+  MeasureTheory.Lp.norm_inclusionOfExponentLeLinear_apply_le,
+  MeasureTheory.Lp.norm_inclusionOfExponentLe_apply_le,
+  MeasureTheory.Lp.inclusionOfExponentLe_self}
+\leanok
+Let $1 \leq p \leq r \leq \infty$. The identity of functions defines an injective bounded
+linear map $\iota_{r,p} : L_r \to L_p$ with $\|\iota_{r,p}\| \leq
+\mu(\Omega)^{1/p - 1/r}$, and $\iota_{t,p} \circ \iota_{r,t} = \iota_{r,p}$ for every
+$p \leq t \leq r$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+H\"older's inequality gives $\|f\|_p \leq \mu(\Omega)^{1/p - 1/r} \|f\|_r$. A function that
+vanishes almost everywhere does so in both spaces.
+\end{proof}
+
+\begin{lemma}[Interpolation between $L_p$ and $L_\infty$]
+\label{lem:lp-interpolation}
+\lean{ENNReal.one_sub_toReal_div_nonneg, MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow,
+  MeasureTheory.toReal_eLpNorm_le_rpow_mul, MeasureTheory.MemLp.mono_exponent_of_enorm_le}
+\leanok
+Let $0 < p \leq r < \infty$ and $M \geq 0$. For every measurable $f$ with $|f| \leq M$
+almost everywhere,
+\[
+  \|f\|_r \leq M^{1 - p/r} \, \|f\|_p^{p/r} .
+\]
+For every $0 < p \leq r \leq \infty$ and every $f \in L_p$ with $|f| \leq M < \infty$ almost
+everywhere, $f \in L_r$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Integrate $|f|^r \leq M^{r-p} |f|^p$. The exponent $1 - p/r$ is nonnegative, so the right-hand
+side is finite for $f \in L_p$; for $r = \infty$, $\|f\|_\infty \leq M$.
+\end{proof}
+
+\begin{lemma}[Bounded continuous functions in $L_\infty$]
+\label{lem:bc-linfty}
+\lean{BoundedContinuousFunction.norm_toLp_top, BoundedContinuousFunction.isometry_toLp_top,
+  BoundedContinuousFunction.isClosed_range_toLp_top}
+\leanok
+Assume that $\mu(U) > 0$ for every nonempty open $U \subseteq \Omega$. Then
+$\|a\|_{L_\infty} = \sup_{x \in \Omega} |a(x)|$ for every $a \in C_b(\Omega)$, and the classes
+of bounded continuous functions form a closed subspace of $L_\infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $|a(x)| > c$ for some $x$, the open set $\{|a| > c\}$ has positive measure, so
+$\|a\|_{L_\infty} \geq c$. The map $C_b(\Omega) \to L_\infty$ is therefore an isometry, and
+its range is complete, hence closed.
+\end{proof}
+
+\section{Schemes of functions and Besov spaces}
+
+\begin{definition}[Scheme of functions]
+\label{def:function-scheme}
+\lean{FunctionScheme, FunctionScheme.toLp, FunctionScheme.mem_toLp, FunctionScheme.toLp_mem_toLp,
+  FunctionScheme.inclusion_mem_toLp}
+\leanok
+\uses{def:scheme, def:comap}
+A \emph{scheme of functions} on $\Omega$ is an approximation scheme $S$ in $C_b(\Omega)$. For
+$1 \leq p \leq \infty$, the classes in $L_p$ of the functions in $S_n$ form an approximation
+scheme $S^{(p)}$ in $L_p$.
+\end{definition}
+
+Taking the approximants continuous and bounded makes them elements of every $L_p$ at once,
+so that one scheme serves all exponents.
+
+\begin{lemma}[Compatibility with the inclusions]
+\label{lem:function-scheme-inclusion}
+\lean{FunctionScheme.image_toLp_of_le, FunctionScheme.comap_toLp_of_le,
+  BoundedContinuousFunction.inclusionOfExponentLe_toLp,
+  BoundedContinuousFunction.norm_toLp_eq_toReal_eLpNorm, FunctionScheme.mem_toLp_of_inclusion_mem,
+  FunctionScheme.exists_toLp_of_mem}
+\leanok
+\uses{def:function-scheme, lem:inclusion}
+Let $S$ be a scheme of functions and $1 \leq p \leq r \leq \infty$. For every $n \in \N$,
+$\iota_{r,p}(S^{(r)}_n) = S^{(p)}_n$ and $\iota_{r,p}^{-1}(S^{(p)}_n) = S^{(r)}_n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The map $\iota_{r,p}$ sends the class of $a$ in $L_r$ to its class in $L_p$, and it is
+injective.
+\end{proof}
+
+\begin{definition}[Besov space]
+\label{def:besov}
+\lean{FunctionScheme.besovNorm, FunctionScheme.MemBesov, FunctionScheme.besovSpace,
+  FunctionScheme.besovSpaceSup}
+\leanok
+\uses{def:function-scheme, def:approx-space, prop:approx-linear}
+Let $S$ be a scheme of functions, $s \geq 0$ and $1 \leq p, q \leq \infty$. The
+\emph{Besov space} is $\Besov{s}{p}{q}(\Omega, S) = A^s_q(L_p, S^{(p)})$, the approximation
+space of $L_p$ for the scheme $S^{(p)}$. Its errors $E_n(f)_p$ are the errors of best
+approximation of \Cref{def:error} for the scheme $S^{(p)}$.
+\end{definition}
+
+On the torus $\T^d$ with $S_n$ the trigonometric polynomials of degree $< n$, these are the
+classical periodic Besov spaces (\Cref{thm:moduli-coincidence}).
+
+\begin{proposition}[Elementary embeddings]
+\label{prop:besov-elementary}
+\lean{FunctionScheme.MemBesov.mono, FunctionScheme.besovNorm_inclusion_le,
+  FunctionScheme.MemBesov.inclusion, FunctionScheme.MemBesov.of_sup}
+\leanok
+\uses{def:besov, thm:approx-embedding, lem:approx-functorial,
+  lem:function-scheme-inclusion}
+Let $S$ be a scheme of functions and $1 \leq p, q, q' \leq \infty$.
+\begin{enumerate}
+  \item If $0 \leq t$, and $t < s$ or $t = s$ and $q \leq q'$, then
+    $\Besov{s}{p}{q} \subseteq \Besov{t}{p}{q'}$.
+  \item If $p \leq r$, then $\iota_{r,p} f \in \Besov{s}{p}{q}$ and
+    $\|\iota_{r,p} f\|_{\Besov{s}{p}{q}} \leq \|\iota_{r,p}\| \, \|f\|_{\Besov{s}{r}{q}}$ for
+    every $f \in \Besov{s}{r}{q}$.
+  \item The class in $L_p$ of every $a \in A^s_q(C_b(\Omega), S)$ lies in
+    $\Besov{s}{p}{q}$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+\leanok
+The first item is \Cref{thm:approx-embedding}. The others are \Cref{lem:approx-functorial}
+for $T = \iota_{r,p}$, using \Cref{lem:function-scheme-inclusion}, and for the map
+$C_b(\Omega) \to L_p$, of norm at most $\mu(\Omega)^{1/p}$.
+\end{proof}
+
+\section{The Nikolskii inequality and the Besov embeddings}
+
+\begin{definition}[Nikolskii property]
+\label{def:nikolskii-property}
+\lean{FunctionScheme.HasNikolskii, nikolskiiExponent, nikolskiiExponent_nonneg,
+  one_le_of_nikolskiiExponent_lt, nikolskiiExponent_top, nikolskiiExponent_self,
+  FunctionScheme.toReal_eLpNorm_top_le_norm}
+\leanok
+\uses{def:function-scheme}
+Let $S$ be a scheme of functions and $D \in \R$. The scheme has the \emph{Nikolskii property}
+of dimension $D$ if for every $1 \leq p \leq \infty$ there is $C \geq 0$ with
+\[
+  \sup_{x \in \Omega} |a(x)| \leq C \, n^{D/p} \, \|a\|_{L_p}
+  \qquad \text{for all } n \geq 1 \text{ and } a \in S_n .
+\]
+For $1 \leq p \leq r \leq \infty$ put $\alpha(D, p, r) = D(1/p - 1/r)$.
+\end{definition}
+
+The Nikolskii property enters the theorems below as a hypothesis on the scheme; the
+trigonometric polynomials on the torus have it (\Cref{thm:torus-nikolskii}).
+
+\begin{lemma}[Nikolskii inequality]
+\label{lem:nikolskii-inequality}
+\lean{FunctionScheme.HasNikolskii.eLpNorm_le, FunctionScheme.HasNikolskii.liftBound}
+\leanok
+\uses{def:nikolskii-property, lem:lp-interpolation, def:lift-bound,
+  lem:function-scheme-inclusion}
+Let $S$ have the Nikolskii property of dimension $D$, and let $1 \leq p \leq r \leq \infty$.
+There is $C \geq 0$ with $\|a\|_{L_r} \leq C \, n^{\alpha(D,p,r)} \|a\|_{L_p}$ for all
+$n \geq 1$ and $a \in S_n$. In particular $\iota_{r,p}$ satisfies the lifting bound of
+exponent $\alpha(D, p, r)$ for $S^{(p)}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $r = \infty$, $\|a\|_{L_\infty} \leq \sup |a|$. For $r < \infty$, \Cref{lem:lp-interpolation}
+with $M = \sup|a| \leq C n^{D/p} \|a\|_p$ gives $\|a\|_r \leq C^{1-p/r} n^{(D/p)(1-p/r)}
+\|a\|_p$, and $(D/p)(1 - p/r) = \alpha(D, p, r)$. The class of $a$ in $L_r$ lifts the class
+in $L_p$.
+\end{proof}
+
+\begin{theorem}[Besov embeddings]
+\label{thm:besov-embedding}
+\lean{FunctionScheme.exists_inclusion_eq_of_nikolskii,
+  FunctionScheme.MemBesov.exists_inclusion_eq_of_nikolskii,
+  FunctionScheme.MemBesov.exists_inclusion_eq_top,
+  FunctionScheme.MemBesov.exists_boundedContinuous}
+\leanok
+\uses{lem:nikolskii-inequality, thm:nikolskii-transfer, lem:function-scheme-inclusion,
+  lem:approx-closure, lem:bc-linfty}
+Let $S$ have the Nikolskii property of dimension $D \geq 0$, let $1 \leq p \leq r \leq
+\infty$ and $1 \leq q \leq \infty$, and let $s > \alpha = \alpha(D, p, r)$.
+\begin{enumerate}
+  \item There is $K < \infty$ such that for every $f \in \Besov{s}{p}{q}$ there is $g \in L_r$
+    with $\iota_{r,p} g = f$ and $\|g\|^{\mathrm{dy}}_{\Besov{s-\alpha}{r}{q}} \leq K
+    \|f\|^{\mathrm{dy}}_{\Besov{s}{p}{q}}$.
+  \item If $\mu(U) > 0$ for every nonempty open $U \subseteq \Omega$ and $s > D/p$, then every
+    $f \in \Besov{s}{p}{q}$ is the class of a bounded continuous function.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+For the first item apply \Cref{thm:nikolskii-transfer} to $\iota = \iota_{r,p}$, which is
+injective and satisfies the lifting bound of exponent $\alpha$ by
+\Cref{lem:nikolskii-inequality}; the preimage scheme is $S^{(r)}$ by
+\Cref{lem:function-scheme-inclusion}, and $L_r$ is complete. For the second take
+$r = \infty$: then $g \in \Besov{s - D/p}{\infty}{q}$ with $s - D/p > 0$, so $g$ lies in the
+closure of $\bigcup_n S^{(\infty)}_n$ (\Cref{lem:approx-closure}), which is contained in the
+closed set of classes of bounded continuous functions (\Cref{lem:bc-linfty}).
+\end{proof}
+
+The limiting case $s = \alpha$ is out of reach of this method, since the Nikolskii transfer
+theorem needs $\alpha < s$.
+
+\chapter{Sobolev spaces and their embeddings}
+\label{ch:sobolev}
+
+The setting is that of \Cref{ch:besov}. A Sobolev space enters through its Jackson and
+Bernstein inequalities, as a smoothness space for the scheme in $L_p$. The definition below is a
+hypothesis whose content is these two inequalities; its instances are the spaces $H^s$ with
+$p = 2$ on the torus (\Cref{def:torus-sobolev}) and for a continuous spectral basis
+(\Cref{thm:continuous-spectral-basis-besov}).
+
+\begin{definition}[Sobolev space for a scheme]
+\label{def:sobolev-scheme}
+\lean{FunctionScheme.SobolevSpace}
+\leanok
+\uses{def:smoothness, def:function-scheme}
+Let $S$ be a scheme of functions and $1 \leq p \leq \infty$. A \emph{Sobolev space} of order
+$s > 0$ for $S$ in $L_p$ is a smoothness space of order $s$ for $S^{(p)}$: a normed space $V$
+with an injective bounded linear map $\iota : V \to L_p$, Jackson's inequality
+$E_n(\iota v)_p \leq C n^{-s} \|v\|$ and Bernstein's inequality, every $a \in S^{(p)}_n$ being
+$\iota v$ with $\|v\| \leq C n^s \|a\|_p$.
+\end{definition}
+
+\begin{theorem}[Sobolev embeddings]
+\label{thm:sobolev-embedding}
+\lean{FunctionScheme.SobolevSpace.exists_eq_inclusion,
+  FunctionScheme.SobolevSpace.exists_eq_inclusion',
+  FunctionScheme.SobolevSpace.exists_boundedContinuous}
+\leanok
+\uses{def:sobolev-scheme, thm:besov-embedding, prop:smoothness}
+Let $S$ have the Nikolskii property of dimension $D \geq 0$, and let $1 \leq p \leq r \leq
+\infty$. Let $(V, \iota)$ be a Sobolev space of order $s$ for $S$ in $L_p$.
+\begin{enumerate}
+  \item Let $(V', \iota')$ be a Sobolev space of order $t$ for $S$ in $L_r$ with $V'$ a Banach
+    space, and let $t - D/r < s - D/p$. For every $v \in V$ there is $v' \in V'$ with
+    $\iota_{r,p}(\iota' v') = \iota v$.
+  \item If $\mu(U) > 0$ for every nonempty open $U \subseteq \Omega$ and $s > D/p$, then
+    $\iota v$ is the class of a bounded continuous function for every $v \in V$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+The condition $t - D/r < s - D/p$ is $t < s - \alpha(D, p, r)$, and it implies $s > \alpha$
+since $t > 0$. By \Cref{prop:smoothness}, $\iota v \in \Besov{s}{p}{\infty}$. By
+\Cref{thm:besov-embedding}, $\iota v = \iota_{r,p} g$ with $g \in
+\Besov{s-\alpha}{r}{\infty}$, and $g \in \iota'(V')$ by \Cref{prop:smoothness}, as
+$s - \alpha > t$. The second item is \Cref{thm:besov-embedding}(2) with $q = \infty$.
+\end{proof}
+
+The limiting cases $t - D/r = s - D/p$ and $s = D/p$ are not reached: the passage from $V$
+to $\Besov{s}{p}{\infty}$ and back from $\Besov{t}{r}{1}$ to $V'$ loses the fine index at
+both ends.
+
+\chapter{Spectral schemes}
+\label{ch:spectral}
+
+Throughout, $H$ is a complex Hilbert space with a Hilbert basis $(e_i)_{i \in I}$, and
+$\hat f(i) = \langle e_i, f \rangle$ are the coefficients of $f \in H$.
+
+\begin{definition}[Spectral scheme]
+\label{def:spectral}
+\lean{SpectralScheme, SpectralScheme.span, SpectralScheme.toScheme, SpectralScheme.weight,
+  SpectralScheme.span_zero, SpectralScheme.span_mono, SpectralScheme.mem_toScheme,
+  SpectralScheme.weight_pos, SpectralScheme.one_le_weight, SpectralScheme.norm_ofReal_inv_weight,
+  SpectralScheme.norm_ofReal_weight, SpectralScheme.ofReal_weight_ne_zero,
+  SpectralScheme.inv_weight_le, SpectralScheme.weight_le}
+\leanok
+\uses{def:comap}
+A \emph{level function} is a map $\lambda : I \to \N$ such that $\{i : \lambda(i) < n\}$ is
+finite for every $n$. The sets $A_n = \spn\{e_i : \lambda(i) < n\}$ form an approximation
+scheme in $H$, the \emph{spectral scheme} of $(e_i, \lambda)$.
+\end{definition}
+
+On the torus, $e_k$ is the Fourier basis and $\lambda(k) = \max_j |k_j|$. On a compact
+manifold, $e_i$ are the eigenfunctions of the Laplacian and $\lambda$ a function of the
+eigenvalue; \Cref{sec:continuous-spectral-bases} assumes an orthonormal basis of continuous
+functions with levels, the structure this case provides.
+
+\begin{definition}[Sobolev embedding of $\ell_2$]
+\label{def:sobolev-embed}
+\lean{SpectralScheme.sobolevEmbed, SpectralScheme.repr_sobolevEmbed,
+  SpectralScheme.sobolevEmbed_injective, SpectralScheme.diagInvWeight,
+  SpectralScheme.diagInvWeight_apply}
+\leanok
+\uses{def:spectral}
+For $s \geq 0$ let $J_s : \ell_2(I) \to H$ be the bounded injective linear map
+\[
+  J_s c = \sum_{i \in I} (1 + \lambda(i))^{-s} c_i \, e_i .
+\]
+\end{definition}
+
+\begin{lemma}[Range of the Sobolev embedding]
+\label{lem:sobolev-range}
+\lean{SpectralScheme.mem_range_sobolevEmbed_iff, SpectralScheme.sobolevEmbed_weighted}
+\leanok
+\uses{def:sobolev-embed}
+Let $s \geq 0$. An element $f \in H$ lies in $J_s(\ell_2(I))$ if and only if
+$\sum_i (1 + \lambda(i))^{2s} |\hat f(i)|^2 < \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The preimage is $c_i = (1 + \lambda(i))^s \hat f(i)$.
+\end{proof}
+
+\begin{proposition}[Jackson and Bernstein inequalities]
+\label{prop:spectral-jackson-bernstein}
+\lean{SpectralScheme.norm_sub_truncate_le, SpectralScheme.jacksonBound, SpectralScheme.liftBound,
+  SpectralScheme.toSmoothnessSpace, SpectralScheme.truncate,
+  SpectralScheme.repr_eq_zero_of_mem_span, SpectralScheme.truncate_mem_span,
+  SpectralScheme.repr_truncate, SpectralScheme.repr_sub_truncate}
+\leanok
+\uses{def:sobolev-embed, def:jackson, def:lift-bound, def:smoothness}
+Let $s \geq 0$. For every $n \geq 1$ and $c \in \ell_2(I)$, $E_n(J_s c) \leq n^{-s} \|c\|$;
+and every $a \in A_n$ is $J_s c$ for some $c$ with $\|c\| \leq n^s \|a\|$. For $s > 0$,
+$(\ell_2(I), J_s)$ is a smoothness space of order $s$ for the spectral scheme, with
+constants $1$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+The truncation $P_n f = \sum_{\lambda(i) < n} \hat f(i) e_i$ lies in $A_n$, and by
+Parseval's identity $\|J_s c - P_n J_s c\|^2 = \sum_{\lambda(i) \geq n} (1 +
+\lambda(i))^{-2s} |c_i|^2 \leq n^{-2s} \|c\|^2$. An element $a \in A_n$ has $\hat a(i) = 0$
+for $\lambda(i) \geq n$, and $c_i = (1 + \lambda(i))^s \hat a(i)$ satisfies
+$|c_i| \leq n^s |\hat a(i)|$.
+\end{proof}
+
+\begin{proposition}[Spectral projections]
+\label{prop:spectral-projections}
+\lean{SpectralScheme.projectionScheme, SpectralScheme.truncateCLM,
+  SpectralScheme.closure_iUnion_toScheme, SpectralScheme.repr_block, SpectralScheme.enorm_block_sq,
+  SpectralScheme.truncate_add, SpectralScheme.truncate_smul, SpectralScheme.norm_truncate_le,
+  SpectralScheme.truncateCLM_apply, SpectralScheme.truncate_of_mem,
+  SpectralScheme.projectionScheme_P, SpectralScheme.iUnion_span, SpectralScheme.enorm_sq_eq_tsum}
+\leanok
+\uses{def:spectral, def:projection-scheme, def:blocks}
+The truncations $P_n$ form a projection scheme with bound $1$ for the spectral scheme, the
+union $\bigcup_n A_n$ is dense in $H$, and for every $k \in \N$ and $f \in H$
+\[
+  \Delta_k f = \sum_{2^k \leq \lambda(i) < 2^{k+1}} \hat f(i) \, e_i ,
+  \qquad
+  \|\Delta_k f\|^2 = \sum_{2^k \leq \lambda(i) < 2^{k+1}} |\hat f(i)|^2 .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+Truncation is the orthogonal projection onto $A_n$. The union contains the span of the
+basis, which is dense. The formulas are Parseval's identity.
+\end{proof}
+
+\begin{theorem}[Coefficient characterisation]
+\label{thm:spectral-coefficients}
+\lean{SpectralScheme.memApprox_iff_blockNorm_lt_top, SpectralScheme.memApprox_two_iff,
+  SpectralScheme.mem_l2_iff, SpectralScheme.tsum_ite_block_eq, SpectralScheme.enorm_weight_mul_sq}
+\leanok
+\uses{prop:spectral-projections, thm:blocks, lem:sobolev-range}
+Let $s > 0$ and $1 \leq q \leq \infty$. An element $f \in H$ lies in $A^s_q$ if and only if
+\[
+  \Bigl(\sum_{\lambda(i) = 0} |\hat f(i)|^2\Bigr)^{1/2} + \Bigl\| \Bigl(2^{ks}
+    \Bigl(\sum_{2^k \leq \lambda(i) < 2^{k+1}} |\hat f(i)|^2\Bigr)^{1/2}\Bigr)_k
+    \Bigr\|_{\ell_q} < \infty .
+\]
+It lies in $A^s_2$ if and only if $\sum_i (1 + \lambda(i))^{2s} |\hat f(i)|^2 < \infty$; that
+is, $A^s_2 = J_s(\ell_2(I))$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first statement is \Cref{thm:blocks} with the formulas of
+\Cref{prop:spectral-projections}, since $P_1 f = \sum_{\lambda(i) = 0} \hat f(i) e_i$. For
+$q = 2$ the square of the block norm is comparable with $\sum_i \omega_i |\hat f(i)|^2$,
+where $\omega_i = 2^{2ks}$ on the block $2^k \leq \lambda(i) < 2^{k+1}$ and $\omega_i = 1$
+for $\lambda(i) = 0$; and $\omega_i \leq (1 + \lambda(i))^{2s} \leq 4^s \omega_i$.
+\end{proof}
+
+
+\section{Continuous spectral bases}
+\label{sec:continuous-spectral-bases}
+
+Let $M$ be a topological space with a finite Borel measure $\mu$. On a compact Riemannian
+manifold the eigenfunctions of the Laplace--Beltrami operator form an orthonormal basis of
+$L_2(M)$; they are continuous by elliptic regularity, and the eigenvalues $\lambda_i$ tend to
+infinity. Mathlib has neither the operator nor these facts. The statements below therefore assume
+an orthonormal basis of continuous functions with levels, and every one of them is proved from
+this assumption; the torus satisfies it (\Cref{prop:fourier-eigenbasis}). The assumption
+consists of the basis, its levels and its continuous representatives alone.
+
+\begin{definition}[Continuous spectral basis]
+\label{def:continuous-spectral-basis}
+\lean{ContinuousSpectralBasis, ContinuousSpectralBasis.basisSpan,
+  ContinuousSpectralBasis.basisScheme,
+  ContinuousSpectralBasis.basisSpan_zero, ContinuousSpectralBasis.basisSpan_mono,
+  ContinuousSpectralBasis.basisFun_mem_basisSpan, ContinuousSpectralBasis.mem_basisScheme,
+  ContinuousSpectralBasis.toLp_basisScheme_eq}
+\leanok
+\uses{def:spectral, def:function-scheme}
+A \emph{continuous spectral basis} of $L_2(\mu)$ is a spectral scheme $(e_i, \lambda)$ in
+$L_2(\mu)$ together with bounded continuous functions $\tilde e_i$ whose classes are the $e_i$.
+The spaces $\mathcal{E}_n = \spn\{\tilde e_i : \lambda(i) < n\}$ of bounded continuous functions
+form a scheme of functions on $M$, and its classes in $L_2(\mu)$ form the spectral scheme of
+$(e_i, \lambda)$.
+\end{definition}
+
+The structure enters the theorems below as a hypothesis; the Fourier basis of the torus is an
+instance (\Cref{prop:fourier-eigenbasis}). For the Laplace--Beltrami operator, $\tilde e_i$ are
+the eigenfunctions and $\lambda(i) = \lfloor \sqrt{\lambda_i} \rfloor$. The Besov spaces
+$\Besov{s}{p}{q}(M)$ of the scheme $(\mathcal{E}_n)$ are defined for every $1 \leq p \leq \infty$
+by \Cref{def:besov}.
+
+\begin{theorem}[Besov and Sobolev spaces of a continuous spectral basis]
+\label{thm:continuous-spectral-basis-besov}
+\lean{ContinuousSpectralBasis.memBesov_two_two_iff,
+  ContinuousSpectralBasis.memBesov_two_iff_blockNorm_lt_top,
+  ContinuousSpectralBasis.sobolevSpace, ContinuousSpectralBasis.sobolevSpace_order,
+  ContinuousSpectralBasis.sobolevSpace_incl, ContinuousSpectralBasis.mem_range_sobolev_iff,
+  ContinuousSpectralBasis.sobolev_memBesov_top, ContinuousSpectralBasis.exists_sobolev_of_memBesov}
+\leanok
+\uses{def:continuous-spectral-basis, thm:spectral-coefficients, prop:spectral-jackson-bernstein,
+  def:sobolev-scheme}
+Let $s > 0$ and $1 \leq q \leq \infty$. For $f \in L_2(\mu)$:
+\begin{enumerate}
+  \item $f \in \Besov{s}{2}{2}(M)$ if and only if
+    $\sum_i (1 + \lambda(i))^{2s} |\langle e_i, f \rangle|^2 < \infty$;
+  \item $f \in \Besov{s}{2}{q}(M)$ if and only if the block norm of \Cref{thm:spectral-coefficients}
+    is finite;
+  \item the space $H^s(M)$ of the $f$ with
+    $\sum_i (1 + \lambda(i))^{2s} |\langle e_i, f \rangle|^2 < \infty$ is a Sobolev space of order
+    $s$ for the scheme in $L_2$, with constants $1$; $H^s(M) \subseteq \Besov{s}{2}{\infty}(M)$, and
+    $\Besov{t}{2}{q}(M) \subseteq H^s(M)$ for $t > s$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+The classes in $L_2$ of the scheme form the spectral scheme
+(\Cref{def:continuous-spectral-basis}), so \Cref{thm:spectral-coefficients} and
+\Cref{prop:spectral-jackson-bernstein} apply.
+\end{proof}
+
+\begin{definition}[Local Weyl bound]
+\label{def:local-weyl}
+\lean{ContinuousSpectralBasis.LocalWeylBound, ContinuousSpectralBasis.levelSet,
+  ContinuousSpectralBasis.mem_levelSet}
+\leanok
+\uses{def:continuous-spectral-basis}
+A continuous spectral basis satisfies the \emph{local Weyl bound} of dimension $D$ with
+constant $C \geq 0$ if
+\[
+  \sum_{\lambda(i) < n} |\tilde e_i(x)|^2 \leq C n^D
+  \qquad \text{for every } x \in M \text{ and every } n \geq 1 .
+\]
+\end{definition}
+
+For the Laplace--Beltrami operator of a compact Riemannian manifold of dimension $d$ this is
+H\"ormander's local Weyl law, with $D = d$. The bound enters the theorems below as a
+hypothesis; the Fourier basis of the torus satisfies it (\Cref{prop:fourier-eigenbasis}).
+
+\begin{theorem}[Nikolskii inequality from the local Weyl bound]
+\label{thm:local-weyl-nikolskii}
+\lean{ContinuousSpectralBasis.norm_sq_le_of_localWeyl,
+  ContinuousSpectralBasis.norm_le_sqrt_mul_of_localWeyl,
+  ContinuousSpectralBasis.norm_rpow_le_of_localWeyl, ContinuousSpectralBasis.norm_le_of_localWeyl,
+  ContinuousSpectralBasis.exists_sum_of_mem_basisSpan, ContinuousSpectralBasis.norm_toLp_sum_sq}
+\leanok
+\uses{def:local-weyl, lem:lp-interpolation}
+Let the continuous spectral basis satisfy the local Weyl bound of dimension $D$ with constant
+$C$. For every $n \geq 1$, every $a \in \mathcal{E}_n$ and every $1 \leq p \leq 2$,
+\[
+  \|a\|_\infty^2 \leq C n^D \|a\|_2^2 ,
+  \qquad
+  \|a\|_\infty^p \leq C n^D \|a\|_p^p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Write $a = \sum_{\lambda(i) < n} c_i \tilde e_i$. By the Cauchy--Schwarz inequality and the local
+Weyl bound, $|a(x)|^2 \leq \sum_i |c_i|^2 \sum_{\lambda(i) < n} |\tilde e_i(x)|^2 \leq C n^D
+\sum_i |c_i|^2$, and $\sum_i |c_i|^2 = \|a\|_2^2$ by Parseval's identity. For $p \leq 2$,
+$\|a\|_2^2 \leq \|a\|_\infty^{2-p} \|a\|_p^p$ (\Cref{lem:lp-interpolation}); dividing by
+$\|a\|_\infty^{2-p}$ gives the second inequality.
+\end{proof}
+
+For $p > 2$ the inequality $\|a\|_\infty \leq C' n^{D/p} \|a\|_p$ does not follow in this way:
+the proof on the torus raises polynomials to powers (\Cref{thm:torus-nikolskii}), which lie in
+$\mathcal{E}_{mn}$ (\Cref{lem:trig-products}); for a general basis, products of functions of
+$\mathcal{E}_n$ need not lie in any $\mathcal{E}_m$. The embeddings of \Cref{thm:besov-embedding}
+hold for the scheme $(\mathcal{E}_n)$ whenever it has the Nikolskii property of
+\Cref{def:nikolskii-property}.
+The embedding into continuous functions needs only the local Weyl bound.
+
+\begin{theorem}[Continuity of $H^s(M)$]
+\label{thm:local-weyl-continuity}
+\lean{ContinuousSpectralBasis.exists_continuous_of_localWeyl, ContinuousSpectralBasis.partialSum,
+  ContinuousSpectralBasis.partialSum_mem_basisSpan, ContinuousSpectralBasis.toLp_partialSum,
+  ContinuousSpectralBasis.norm_truncate_sub_truncate_le,
+  ContinuousSpectralBasis.norm_partialSum_succ_sub_le, Real.natCast_two_pow_rpow}
+\leanok
+\uses{thm:local-weyl-nikolskii, thm:continuous-spectral-basis-besov}
+Let the continuous spectral basis satisfy the local Weyl bound of dimension $D$, and let
+$s > 0$ with $2s > D$. Every $f \in L_2(\mu)$ with
+$\sum_i (1 + \lambda(i))^{2s} |\langle e_i, f \rangle|^2 < \infty$ is the class of a bounded
+continuous function.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $f = J_s c$ and $S_n f = \sum_{\lambda(i) < n} \langle e_i, f \rangle \tilde e_i$, a bounded
+continuous function whose class is the truncation $P_n f$. The difference
+$S_{2^{k+1}} f - S_{2^k} f$ lies in $\mathcal{E}_{2^{k+1}}$, and its $L_2$ norm is at most
+$\|f - P_{2^k} f\|_2 \leq 2^{-ks} \|c\|$ (\Cref{prop:spectral-jackson-bernstein}). By
+\Cref{thm:local-weyl-nikolskii}
+\[
+  \|S_{2^{k+1}} f - S_{2^k} f\|_\infty \leq C^{1/2} 2^{(k+1)D/2} 2^{-ks} \|c\|
+  = C^{1/2} 2^{D/2} \|c\| \, (2^{D/2 - s})^k ,
+\]
+a geometric sequence since $D/2 < s$. So $(S_{2^k} f)_k$ converges uniformly to a bounded
+continuous $g$, and the class of $g$ is the $L_2$ limit $\lim_k P_{2^k} f = f$.
+\end{proof}

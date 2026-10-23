@@ -1,0 +1,2854 @@
+% !TEX root = print.tex
+
+\part{Sobolev and Bessel potential spaces}
+\label{part:sobolev}
+
+This part treats the Sobolev spaces $\Sob{m}{p}$ defined by weak derivatives and Mathlib's
+Bessel potential spaces $H^{s,p}$ on $\R^d$. \Cref{ch:sobolev-rd} identifies Mathlib's $H^s$,
+$s \geq 0$, with $\TL{s}{2}{2}$ (and, for $s > 0$, with $\Besov{s}{2}{2}$), proves Rellich's
+theorem, and, from the vector-valued singular integrals of \Cref{ch:singular-integrals}, proves
+$\Sob{m}{p} = \TL{m}{p}{2}$ for $1 < p < \infty$ and the Sobolev embeddings;
+\Cref{ch:bessel-potential-spaces} proves, also from them, $H^{s,p} = \TL{s}{p}{2}$ for
+$s \geq 0$ and Calder\'on's theorem $\Sob{m}{p} = H^{m,p}$.
+
+\chapter{Sobolev spaces on \texorpdfstring{$\R^d$}{R\^{}d}}
+\label{ch:sobolev-rd}
+
+This chapter works on a finite-dimensional real inner product space $V$ of dimension $n$, such
+as $\R^d$, with Lebesgue measure, and defines Sobolev spaces by weak derivatives. A weak
+derivative is an identity between distributions on an open set $\Omega \subseteq V$, in Mathlib's
+space $\mathcal D'(\Omega)$ of distributions tested against real smooth compactly supported
+functions (\Cref{sec:schwartz-cutoff}). On the whole space $V$ and for $L_p$ functions it is the
+same as an identity between tempered distributions, the setting of Mathlib's Fourier transform
+and Bessel potential spaces (\Cref{sec:weak-derivatives}). For $p = 2$,
+\Cref{sec:sobolev-two-littlewood-paley} identifies Mathlib's Bessel potential spaces $H^s(V)$,
+$s \geq 0$, with the Triebel--Lizorkin spaces $\TL{s}{2}{2}$ (and, for $s > 0$, with the Besov
+spaces $\Besov{s}{2}{2}$) and proves $\Sob{1}{2}(V) = H^1(V) = \Besov{1}{2}{2}$.
+\Cref{sec:rellich-compactness} proves Rellich's theorem: the restriction from $H^1(V)$ to
+$L_2(\Omega)$ is compact for every bounded $\Omega \subseteq V$. \Cref{sec:derivative-kernels}
+writes the Littlewood--Paley blocks as sums of derivatives of Schwartz kernels, and
+\Cref{sec:sobolev-triebel-lizorkin} proves $\Sob{m}{p}(V) = \TL{m}{p}{2}$ for $1 < p < \infty$,
+with named constants and the Besov sandwich, from the strong type of vector-valued singular
+integrals (\Cref{ch:singular-integrals}). \Cref{sec:sobolev-embedding} proves the Nikolskii
+inequality for the blocks and from it the embeddings of Besov spaces into $L_r(V)$ and into the
+bounded continuous functions, and the Sobolev embeddings $\Sob{m}{p}(V) \hookrightarrow L_r(V)$
+for $m > n(1/p - 1/r)$ and $\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, all with named
+constants. These named constants are formulas in norms and Schwartz seminorms of fixed kernels,
+proved finite. The Bessel potential spaces $H^{s,p}(V)$ for $1 < p < \infty$ follow in
+\Cref{ch:bessel-potential-spaces}, the Sobolev spaces on open sets and on bounded Lipschitz
+domains in \Cref{ch:sobolev-domains}.
+
+\section{Weak derivatives on open sets}
+\label{sec:weak-derivatives}
+
+Throughout this section $\Omega \subseteq V$ is open. Mathlib identifies a locally integrable
+function $f$ on $\Omega$ with the distribution $\varphi \mapsto \int \varphi f$ and a function
+$f \in L_p(V)$, $1 \leq p \leq \infty$, with the tempered distribution $u \mapsto \int u f$.
+
+\begin{definition}[Weak derivatives and Sobolev spaces]
+\label{def:weak-line-derivative}
+\lean{Rd.HasWeakLineDeriv, Rd.MemWeakSobolev, Rd.MemSobolev}
+\leanok
+For every $v \in V^k$, $g$ is the weak derivative $\partial^v f$ of $f$ on $\Omega$ if $f$ and $g$
+are locally integrable on $\Omega$ and $\partial^v f = g$ as distributions on $\Omega$. For every
+$m \in \N$ and every $1 \leq p \leq \infty$, $f$ lies in the Sobolev space $\Sob{m}{p}(\Omega)$ if
+$f \in L_p(\Omega)$ and for every $k \leq m$ and every $v \in V^k$ the weak derivative
+$\partial^v f$ exists on $\Omega$ and lies in $L_p(\Omega)$. For every $f \in L_p(V)$,
+$f \in \Sob{m}{p}(V)$ means $f \in \Sob{m}{p}(\Omega)$ with $\Omega = V$.
+\end{definition}
+
+Every function in $L_p(\Omega)$ with $p \geq 1$ is locally integrable on $\Omega$
+(\Cref{lem:weak-derivative-basic}), so the weak derivatives in the definition of
+$\Sob{m}{p}(\Omega)$ need no further hypothesis. The definition quantifies over all directions;
+a basis of $V$ enters only in proofs.
+
+\begin{lemma}[Weak derivatives by integration by parts]
+\label{lem:weak-derivative-integral}
+\lean{Rd.HasWeakLineDeriv.integral_eq, Rd.hasWeakLineDeriv_iff_integral}
+\leanok
+\uses{def:weak-line-derivative, lem:distribution-transpose}
+For all locally integrable $f$, $g$ on $\Omega$ and every $v \in V^k$, $g$ is the weak
+derivative $\partial^v f$ on $\Omega$ if and only if for every $\varphi \in \mathcal D(\Omega)$,
+\[
+  \int_V \varphi \, g = (-1)^k \int_V (\partial^v \varphi) \, f .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both distributions are determined by their values on test functions, the distribution of a
+locally integrable function is $\varphi \mapsto \int \varphi f$ (Mathlib's
+\texttt{Distribution.\allowbreak ofFun\_\allowbreak apply}), and
+$\partial^v f(\varphi) = (-1)^k f(\partial^v \varphi)$ by \Cref{lem:distribution-transpose}.
+\end{proof}
+
+\begin{lemma}[Properties of weak derivatives]
+\label{lem:weak-derivative-basic}
+\lean{Rd.HasWeakLineDeriv.unique, Rd.hasWeakLineDeriv_fin_zero, Rd.HasWeakLineDeriv.add,
+  Rd.HasWeakLineDeriv.neg, Rd.HasWeakLineDeriv.sub, Rd.HasWeakLineDeriv.smul,
+  Rd.HasWeakLineDeriv.congr_ae, Rd.HasWeakLineDeriv.mono, Rd.hasWeakLineDeriv_zero,
+  Rd.HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero,
+  Rd.locallyIntegrableOn_of_memLp, Rd.memWeakSobolev_zero_iff, Rd.MemWeakSobolev.mono_order,
+  Rd.MemWeakSobolev.mono_set, Rd.zero_memWeakSobolev, Rd.MemWeakSobolev.add,
+  Rd.MemWeakSobolev.smul, Rd.MemWeakSobolev.congr_ae, Rd.zero_memSobolev, Rd.MemSobolev.add,
+  Rd.MemSobolev.smul, Rd.HasWeakLineDeriv.sum, Rd.memSobolev_iff_exists_hasWeakLineDeriv,
+  Rd.MemSobolev.sum, Rd.HasWeakLineDeriv.eq_of_top, Rd.memSobolev_one_of_forall_hasWeakLineDeriv}
+\leanok
+\uses{def:weak-line-derivative, lem:weak-derivative-integral, lem:directional-derivatives-commute}
+For every $v \in V^k$, all functions $f, f', g, g'$ and every $c \in \C$:
+\begin{enumerate}
+  \item if $g$ and $g'$ are weak derivatives $\partial^v f$ on $\Omega$, then $g = g'$ almost
+    everywhere on $\Omega$; for $\Omega = V$, every $r \in [0, \infty]$ and
+    $g, g' \in L_r(V)$, $g = g'$ in $L_r(V)$;
+  \item for $k = 0$, every locally integrable $f$ on $\Omega$ is its own weak derivative;
+  \item if $g = \partial^v f$ and $g' = \partial^v f'$ weakly on $\Omega$, then
+    $g + g' = \partial^v (f + f')$, $-g = \partial^v(-f)$, $g - g' = \partial^v (f - f')$ and
+    $c g = \partial^v (c f)$ weakly on $\Omega$; for a finite set $s$ and functions $F_j$,
+    $G_j$ with $G_j = \partial^v F_j$ weakly on $\Omega$ for every $j \in s$,
+    $\sum_{j \in s} G_j = \partial^v \sum_{j \in s} F_j$ weakly on $\Omega$;
+  \item if $g = \partial^v f$ weakly on $\Omega$, $f = f'$ and $g = g'$ almost everywhere on
+    $\Omega$, then $g' = \partial^v f'$ weakly on $\Omega$;
+  \item if $g = \partial^v f$ weakly on $\Omega$, then $g = \partial^v f$ weakly on every open
+    $\Omega' \subseteq \Omega$;
+  \item $0 = \partial^v 0$ weakly on $\Omega$;
+  \item if $g = \partial^v f$ weakly on $\Omega$, $O \subseteq \Omega$ is open and $f = 0$
+    almost everywhere on $O$, then $g = 0$ almost everywhere on $O$.
+\end{enumerate}
+For every $1 \leq p \leq \infty$, every $f \in L_p(\Omega)$ is locally integrable on $\Omega$
+and $\Sob{0}{p}(\Omega) = L_p(\Omega)$. For all $m, l \in \N$ with
+$l \leq m$, every $1 \leq p \leq \infty$ and every open $\Omega' \subseteq \Omega$,
+$\Sob{m}{p}(\Omega) \subseteq \Sob{l}{p}(\Omega)$, every $f \in \Sob{m}{p}(\Omega)$ lies in
+$\Sob{m}{p}(\Omega')$, and $\Sob{m}{p}(\Omega)$ is a complex vector space. For every
+$f \in \Sob{m}{p}(\Omega)$ and every $f'$ with $f' = f$ almost everywhere on $\Omega$,
+$f' \in \Sob{m}{p}(\Omega)$. For $\Omega = V$, $\Sob{m}{p}(V)$ is a complex linear subspace of
+$L_p(V)$, and $f \in L_p(V)$ lies in $\Sob{m}{p}(V)$ if and only if for every $k \leq m$ and
+every $v \in V^k$ some $g \in L_p(V)$ is the weak derivative $\partial^v f$ on $V$; for $m = 1$
+it suffices that for every $v \in V$ some $g \in L_p(V)$ is the weak derivative $\partial_v f$
+on $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) A locally integrable function is determined almost everywhere on $\Omega$ by its
+distribution (Mathlib's \texttt{Distribution.\allowbreak ofFun\_\allowbreak injective}). (2)
+$\partial^v$ is the identity for $k = 0$. (3) The distribution of a function and $\partial^v$ are
+additive, and finite sums follow by induction; for complex $c$ use
+\Cref{lem:weak-derivative-integral}, since $c$ leaves both integrals. (4) The distribution of a
+function depends on it only almost everywhere on $\Omega$.
+(5) A test function $\varphi$ on $\Omega'$ is one on $\Omega$, with the same derivatives
+(\Cref{lem:directional-derivatives-commute}), so the identity of
+\Cref{lem:weak-derivative-integral} on $\Omega$ gives it on $\Omega'$. (6) The distribution of
+$0$ is $0$, and so are its derivatives. (7) By (5) and (4), $g = \partial^v 0$ weakly on $O$,
+so $g = 0$ almost everywhere on $O$ by (6) and (1). A function in $L_p(\Omega)$, $p \geq 1$, is
+integrable on every compact subset of $\Omega$, which has finite measure. The statements on
+$\Sob{m}{p}$ follow, with $L_p(\Omega') \supseteq L_p(\Omega)|_{\Omega'}$ and (4); in $L_p(V)$,
+the zero class, and the class of a sum or a multiple, agree almost everywhere with $0$ and with
+the sum or the multiple of the representatives, and a weak derivative in $L_p(V)$ may be
+replaced by its class (4). For $m = 1$ the order $k = 0$ is (2).
+\end{proof}
+
+\begin{lemma}[Complex test functions]
+\label{lem:weak-derivative-complex-test}
+\lean{Rd.exists_testSchwartz_eq_of_tsupport_subset, Rd.HasWeakLineDeriv.integral_mul_eq}
+\leanok
+\uses{lem:weak-derivative-integral, def:test-schwartz, lem:directional-derivatives-commute}
+Every smooth compactly supported $w \colon V \to \C$ with support in $\Omega$ is
+$w = a + i b$ for real test functions $a, b \in \mathcal D(\Omega)$. For every $v \in V^k$, all
+$f$, $g$ with $g = \partial^v f$ weakly on $\Omega$ and every such $w$,
+\[
+  \int_V w \, g = (-1)^k \int_V (\partial^v w) \, f .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Take $a = \operatorname{Re} w$ and $b = \operatorname{Im} w$, whose supports lie in that of $w$.
+Then $\partial^v w = \partial^v a + i \, \partial^v b$
+(\Cref{lem:directional-derivatives-commute}), and \Cref{lem:weak-derivative-integral} for $a$ and
+$b$ gives the identity.
+\end{proof}
+
+\begin{lemma}[The product rule for weak derivatives]
+\label{lem:weak-derivative-product}
+\lean{Rd.testFunctionMul, Rd.testFunctionMul_apply, Rd.lineDerivOp_testFunctionMul_apply,
+  Rd.HasWeakLineDeriv.mul_contDiff}
+\leanok
+\uses{lem:weak-derivative-integral}
+For every test function $\varphi \in \mathcal D(\Omega)$ and every smooth real function $\chi$
+on $V$, $\varphi \chi \in \mathcal D(\Omega)$ with
+$\partial_w (\varphi \chi) = (\partial_w \varphi) \chi + \varphi \, \partial_w \chi$. For every
+$w \in V$, all $f$, $g$ with $g = \partial_w f$ weakly on $\Omega$ and every smooth real $\chi$,
+$\chi g + (\partial_w \chi) f = \partial_w (\chi f)$ weakly on $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The products of $\chi$ and $\partial_w \chi$ with locally integrable functions on $\Omega$ are
+locally integrable on $\Omega$. For $\varphi \in \mathcal D(\Omega)$,
+\[
+  \int \varphi \bigl(\chi g + (\partial_w \chi) f\bigr) = -\int \partial_w(\varphi \chi) \, f
+  + \int \varphi \, (\partial_w \chi) f = -\int (\partial_w \varphi) \, \chi f
+\]
+by \Cref{lem:weak-derivative-integral} for the test function $\varphi \chi$.
+\end{proof}
+
+\begin{lemma}[Pairing with a test function]
+\label{lem:test-function-pairing}
+\lean{Rd.eLpNorm_testFunction_smul_le, Rd.eventually_memLp_of_tendsto,
+  Rd.tendsto_integral_testFunction_smul}
+\leanok
+For every $1 \leq p \leq \infty$, every $\varphi \in \mathcal D(\Omega)$ with support $K$ and
+every $h$ that is almost everywhere strongly measurable on $\Omega$,
+\[
+  \|\varphi h\|_{L_1(\Omega)} \leq \|\varphi\|_\infty \, |K|^{1 - 1/p} \, \|h\|_{L_p(\Omega)} .
+\]
+For every filter, every $h \in L_p(\Omega)$ and all $h_i$ with
+$\|h_i - h\|_{L_p(\Omega)} \to 0$, eventually $h_i \in L_p(\Omega)$ and
+$\int_V \varphi h_i \to \int_V \varphi h$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\varphi h$ vanishes off the compact set $K \subseteq \Omega$, so its $L_1(\Omega)$ norm is that on
+$K$, which is at most $|K|^{1 - 1/p}$ times its $L_p(K)$ norm (H\"older's inequality on the set
+$K$ of finite measure), and $\|\varphi h\|_{L_p(K)} \leq \|\varphi\|_\infty \|h\|_{L_p(\Omega)}$.
+Eventually $\|h_i - h\|_{L_p(\Omega)} < 1$, and then $h_i = (h_i - h) + h \in L_p(\Omega)$. The
+integrals over $V$ are integrals over $\Omega$, and the bound applied to $h_i - h$ gives the
+convergence in $L_1(\Omega)$ of $\varphi h_i$ to $\varphi h$.
+\end{proof}
+
+\begin{theorem}[Weak derivatives pass to limits]
+\label{thm:weak-derivative-limits}
+\lean{Rd.HasWeakLineDeriv.of_tendsto}
+\leanok
+\uses{lem:weak-derivative-integral, lem:test-function-pairing}
+For all $1 \leq p, r \leq \infty$, every $v \in V^k$, every nontrivial filter, every
+$f \in L_p(\Omega)$, every $g \in L_r(\Omega)$ and all $f_i$, $g_i$ with $g_i = \partial^v f_i$
+weakly on $\Omega$ for every $i$, $\|f_i - f\|_{L_p(\Omega)} \to 0$ and
+$\|g_i - g\|_{L_r(\Omega)} \to 0$, $g$ is the weak derivative $\partial^v f$ on $\Omega$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For every $\varphi \in \mathcal D(\Omega)$,
+$\int \varphi g_i = (-1)^k \int (\partial^v \varphi) f_i$ by
+\Cref{lem:weak-derivative-integral}; both sides converge by \Cref{lem:test-function-pairing},
+to $\int \varphi g$ and to $(-1)^k \int (\partial^v \varphi) f$, and limits in $\C$ are unique.
+\end{proof}
+
+The bridge to tempered distributions rests on \Cref{thm:test-functions-determine}. For
+$1 \leq p \leq \infty$ and $f \in L_p(V)$ let $T_f$ be $f$ as a distribution on $V$ and
+$S_f$ be $f$ as a tempered distribution.
+
+\begin{lemma}[$L_p$ functions as distributions on $V$]
+\label{lem:lp-distribution-whole-space}
+\lean{Rd.volume_restrict_top, Rd.locallyIntegrableOn_top_Lp, Rd.ofFun_top_apply,
+  Rd.iteratedLineDerivOp_ofFun_top_apply}
+\leanok
+\uses{lem:distribution-transpose, def:test-schwartz, lem:directional-derivatives-commute,
+  lem:weak-derivative-basic}
+Lebesgue measure restricted to $\Omega = V$ is Lebesgue measure, so $L_p(\Omega) = L_p(V)$. For
+every $1 \leq p \leq \infty$, every $f \in L_p(V)$, every $\varphi \in \mathcal D(V)$ and
+every $v \in V^k$, $f$ is locally integrable on $V$, and
+\[
+  T_f(\varphi) = S_f(\varphi), \qquad \partial^v T_f(\varphi) = \partial^v S_f(\varphi),
+\]
+with $\varphi$ as a Schwartz function on the right.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both sides of the first identity are $\int \varphi f$. For the second, both sides are
+$(-1)^k \int (\partial^v \varphi) f$ by \Cref{lem:distribution-transpose}, since the Schwartz
+function $\partial^v \varphi$ is the iterated derivative of the Schwartz function $\varphi$
+(\Cref{lem:directional-derivatives-commute}).
+\end{proof}
+
+\begin{theorem}[Weak derivatives are derivatives of tempered distributions]
+\label{thm:weak-derivative-tempered}
+\lean{Rd.hasWeakLineDeriv_top_iff}
+\leanok
+\uses{lem:lp-distribution-whole-space, thm:test-functions-determine, def:weak-line-derivative}
+For all $1 \leq p, r \leq \infty$, every $f \in L_p(V)$, every $g \in L_r(V)$ and every
+$v \in V^k$, $g$ is the weak derivative $\partial^v f$ on $V$ if and only if $\partial^v f = g$
+as tempered distributions.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:lp-distribution-whole-space} the distribution $\partial^v T_f - T_g$ on $V$ and the
+tempered distribution $\partial^v S_f - S_g$ agree on test functions. If the tempered distribution
+is zero, so is the distribution. If the distribution is zero, the tempered distribution vanishes
+on test functions and is zero by \Cref{thm:test-functions-determine}.
+\end{proof}
+
+\begin{corollary}[Sobolev spaces by tempered distributions]
+\label{cor:sobolev-tempered}
+\lean{Rd.memSobolev_iff_tempered}
+\leanok
+\uses{thm:weak-derivative-tempered, lem:weak-derivative-basic}
+For every $1 \leq p \leq \infty$, every $m \in \N$ and every $f \in L_p(V)$, $f \in \Sob{m}{p}(V)$
+if and only if for every $k \leq m$ and every $v \in V^k$ there is $g \in L_p(V)$ with
+$\partial^v f = g$ as tempered distributions.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:weak-derivative-tempered}, with a function in $L_p(V)$ replaced by its class, which
+changes it only on a null set (\Cref{lem:weak-derivative-basic}).
+\end{proof}
+
+\begin{corollary}[Schwartz functions]
+\label{cor:weak-derivative-schwartz}
+\lean{Rd.iteratedLineDerivOp_toLp_eq, Rd.hasWeakLineDeriv_schwartz, Rd.memSobolev_toLp}
+\leanok
+\uses{lem:distribution-transpose, thm:weak-derivative-tempered, cor:sobolev-tempered,
+  lem:weak-derivative-basic}
+For every Schwartz function $\eta$, every $v \in V^k$ and every open $\Omega \subseteq V$, the
+classical derivative $\partial^v \eta$ is the weak derivative of $\eta$ on $\Omega$. For every
+$1 \leq p \leq \infty$ and every $m \in \N$, $\eta \in \Sob{m}{p}(V)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+As tempered distributions $\partial^v \eta$ is the Schwartz function $\partial^v \eta$
+(\Cref{lem:distribution-transpose}); \Cref{thm:weak-derivative-tempered} with $p = r = 2$ gives
+the weak derivative on $V$, and \Cref{lem:weak-derivative-basic} (5) on $\Omega$. The Sobolev
+statement is \Cref{cor:sobolev-tempered} with $g = \partial^v \eta$.
+\end{proof}
+
+\section{Mathlib's Sobolev spaces \texorpdfstring{$H^s$}{H\^{}s} by Littlewood--Paley blocks}
+\label{sec:sobolev-two-littlewood-paley}
+
+Mathlib defines the Bessel potential $J_s u = \mathcal F^{-1}(\langle \xi \rangle^s \widehat u)$ of
+a tempered distribution $u$, with $\langle \xi \rangle^s = (1 + |\xi|^2)^{s/2}$, and the Sobolev
+space $H^s(V)$ of the tempered distributions $u$ with $J_s u \in L_2(V)$
+(\texttt{TemperedDistribution.\allowbreak besselPotential},
+\texttt{TemperedDistribution.\allowbreak MemSobolev}; the bundled space is
+\texttt{BesselPotentialSpace}). This section identifies $H^s(V)$, $s \geq 0$, with the
+Triebel--Lizorkin space $\TL{s}{2}{2}$ of \Cref{def:triebel-lizorkin} and, for $s > 0$, with the
+Besov space $\Besov{s}{2}{2}$, with explicit constants, and proves $\Sob{1}{2}(V) = H^1(V)$. The
+Fourier transform $\widehat F$ of $F \in L_2(V)$ is Plancherel's, Mathlib's linear isometry of
+$L_2(V)$, and Mathlib identifies it with the Fourier transform of the tempered distribution of
+$F$ (\texttt{Lp.\allowbreak fourier\_\allowbreak toTemperedDistribution\_\allowbreak eq}).
+
+\begin{lemma}[Plancherel's theorem]
+\label{lem:plancherel-l2}
+\lean{Rd.two_ne_top, Rd.enorm_fourier_Lp_two, Rd.enorm_sq_eq_lintegral,
+  Rd.lintegral_enorm_sq_eq_enorm_toLp}
+\leanok
+In $[0, \infty]$, $2 \neq \infty$. For every $F \in L_2(V)$, $\|\widehat F\|_2 = \|F\|_2$. On
+every measure space, $\|F\|_2^2 = \int |F|^2$ for every $F \in L_2$, and
+$\int |f|^2 = \|[f]\|_2^2$ for every measurable function $f$ with $\int |f|^2 < \infty$ and its
+class $[f] \in L_2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Fourier transform on $L_2(V)$ is a linear isometry in Mathlib
+(\texttt{Lp.\allowbreak norm\_\allowbreak fourier\_\allowbreak eq}), in particular continuous
+(\texttt{FourierTransform.\allowbreak continuous\_\allowbreak fourier}). The third identity is
+the definition of the $L_2$ norm, and the last one is the third for $F = [f]$, since $[f] = f$
+almost everywhere.
+\end{proof}
+
+\begin{lemma}[$L_p$ functions as tempered distributions]
+\label{lem:lp-distribution-determined}
+\lean{Rd.eq_of_toTemperedDistribution_eq}
+\leanok
+For every $1 \leq p \leq \infty$, all $f, g \in L_p(V)$ with the same tempered distribution are
+equal.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's \texttt{Lp.\allowbreak ker\_\allowbreak toTemperedDistributionCLM\_\allowbreak
+eq\_\allowbreak bot}.
+\end{proof}
+
+\begin{lemma}[The norm of Mathlib's $H^{s,p}$]
+\label{lem:bessel-space-enorm}
+\lean{BesselPotentialSpace.enorm_toLp_eq}
+\leanok
+For every $s \in \R$, every $1 \leq p \leq \infty$ and every $U \in H^{s,p}(V)$,
+$\|J_s U\|_p = \|U\|$ in $[0, \infty]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's \texttt{BesselPotentialSpace.\allowbreak norm\_\allowbreak toLp\_\allowbreak eq}.
+\end{proof}
+
+\begin{theorem}[The convolution theorem on $L_2$]
+\label{thm:convolution-theorem-l2}
+\lean{Rd.fourier_convLp_toLp, Rd.fourier_convLp, Rd.enorm_convLp_sq, Rd.fourier_lpBlock,
+  Rd.enorm_lpBlock_sq}
+\leanok
+\uses{lem:fourier-integrable, lem:fourier-conv, lem:plancherel-l2, lem:conv-op, def:lp-blocks,
+  lem:lp-kernels-basic, lem:lp-distribution-determined}
+For every integrable $K$ on $V$ and every $f \in L_2(V)$,
+$\widehat{K * f} = \widehat K \, \widehat f$ almost everywhere and
+\[
+  \|K * f\|_2^2 = \int_V |\widehat K(\xi)|^2 \, |\widehat f(\xi)|^2 \, d\xi .
+\]
+In particular, for every $f \in L_2(V)$ and every $j \in \N$,
+$\widehat{\Delta_j f} = \widehat{\psi_j} \, \widehat f$ almost everywhere and
+\[
+  \|\Delta_j f\|_2^2 = \int_V |\widehat{\psi_j}(\xi)|^2 \, |\widehat f(\xi)|^2 \, d\xi .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let first $f = \varphi$ be a Schwartz function. Then $K * \varphi$ is integrable, and for every
+Schwartz function $u$, by \Cref{lem:fourier-integrable} and
+$\widehat{K * \varphi} = \widehat K \, \widehat \varphi$ for integrable functions
+(\Cref{lem:fourier-conv}),
+\[
+  \int \widehat u \, (K * \varphi) = \int u \, \widehat{K * \varphi}
+  = \int u \, \widehat K \, \widehat \varphi .
+\]
+The left side is the Fourier transform of the tempered distribution of $K * \varphi$ applied to
+$u$, which is the tempered distribution of the $L_2$ Fourier transform of $K * \varphi$ applied
+to $u$. So the tempered distributions of the $L_2$ functions $\widehat{K * \varphi}$ and
+$\widehat K \, \widehat \varphi$ agree, and an $L_2$ function is determined by its tempered
+distribution (\Cref{lem:lp-distribution-determined}). Both sides of the identity are continuous
+in $f \in L_2(V)$: the left by
+Young's inequality (\Cref{lem:conv-op}) and \Cref{lem:plancherel-l2}, the right because
+$\widehat K \in L_\infty$ (\Cref{lem:fourier-integrable}). Schwartz functions are dense in
+$L_2(V)$, so the identity holds for all $f$. The norm identity follows with
+\Cref{lem:plancherel-l2}, and the statements on the blocks are the case $K = \psi_j$.
+\end{proof}
+
+\begin{definition}[The Bessel weight]
+\label{def:bessel-weight}
+\lean{Rd.besselWeight}
+\leanok
+For $s \in \R$ and $\xi \in V$, $\langle \xi \rangle^s = (1 + |\xi|^2)^{s/2}$.
+\end{definition}
+
+The Bessel weight is the symbol of Mathlib's Bessel potential $J_s$:
+$\widehat{J_s u} = \langle \cdot \rangle^s \widehat u$.
+
+\begin{lemma}[Elementary properties of the weights]
+\label{lem:bessel-weight-basic}
+\lean{Rd.besselWeight_nonneg, Rd.besselWeight_neg, Rd.hasTemperateGrowth_besselWeight,
+  Rd.enorm_besselWeight, Rd.ofReal_besselWeight_sq, Rd.norm_le_besselWeight_one,
+  ENNReal.dyadicWeight_sq, Rd.one_add_norm_sq_le_of_norm_lt}
+\leanok
+\uses{def:bessel-weight, def:lq-norm}
+For every $s \in \R$, the Bessel weight $\xi \mapsto \langle \xi \rangle^s$ is nonnegative, even
+and smooth with polynomially bounded derivatives, $(\langle \xi \rangle^s)^2 = (1 + |\xi|^2)^s$ and
+$|\xi| \leq \langle \xi \rangle^1$ for every $\xi \in V$, and $(2^{js})^2 = (4^j)^s$ for every
+$j \in \N$. For every $j \in \N$ and every $\xi \in V$ with $|\xi| < 2^{j+1}$,
+$1 + |\xi|^2 \leq 5 \cdot 4^j$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The weight depends on $|\xi|$ only, and the smoothness and the growth bounds of
+$(1 + |\xi|^2)^{s/2}$ are in Mathlib. Further, $|\xi|^2 < 4^{j+1} = 4 \cdot 4^j$ and
+$1 \leq 4^j$.
+\end{proof}
+
+\begin{definition}[The Bessel potential on Schwartz functions]
+\label{def:bessel-schwartz}
+\lean{Rd.besselSchwartz}
+\leanok
+\uses{def:bessel-weight, lem:bessel-weight-basic}
+For $t \in \R$ and a Schwartz function $u$,
+$J_t u = \mathcal F^{-1}(\langle \cdot \rangle^t \widehat u)$, a continuous linear map of the
+Schwartz space.
+\end{definition}
+
+\begin{lemma}[$J_t$ on Schwartz functions and on distributions]
+\label{lem:bessel-schwartz-distribution}
+\lean{Rd.besselPotential_schwartz, Rd.besselSchwartz_apply,
+  Rd.besselSchwartz_besselSchwartz_neg}
+\leanok
+\uses{def:bessel-schwartz}
+For every $t \in \R$ and every Schwartz function $u$, the tempered distribution of $J_t u$ is
+Mathlib's $J_t$ of the tempered distribution of $u$,
+$J_t u(x) = \mathcal F^{-1}(\langle \cdot \rangle^t \widehat u)(x)$ for every $x \in V$, with the
+Fourier integrals of functions, and $J_t J_{-t} u = u$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's
+\texttt{TemperedDistribution.\allowbreak fourierMultiplierCLM\_\allowbreak
+toTemperedDistributionCLM\_\allowbreak eq}; the composition of two Fourier multipliers is the
+multiplier of the product of their symbols, here
+$\langle \xi \rangle^t \langle \xi \rangle^{-t} = 1$.
+\end{proof}
+
+For a function $m$ on $V$ that is smooth with polynomially bounded derivatives,
+$m(D) u = \mathcal F^{-1}(m \, \widehat u)$ is Mathlib's Fourier multiplier on Schwartz functions
+and on tempered distributions (\texttt{SchwartzMap.\allowbreak fourier\allowbreak MultiplierCLM},
+\texttt{TemperedDistribution.\allowbreak fourier\allowbreak MultiplierCLM}); $J_t$ is the case
+$m = \langle \cdot \rangle^t$. Mathlib lets $m(D)$ act on a tempered distribution $T$ by
+$(m(D) T)(u) = T\bigl(\mathcal F(m \, \mathcal F^{-1} u)\bigr)$. The symbol $m$ is even if
+$m(-\xi) = m(\xi)$ for every $\xi \in V$.
+
+\begin{lemma}[Even Fourier multipliers act by the transpose]
+\label{lem:even-multiplier-transpose}
+\lean{Rd.fourierMultiplierCLM_apply_eq_fourier, Rd.fourierMultiplierCLM_apply_apply_of_even}
+\leanok
+\uses{lem:bessel-schwartz-distribution}
+Let $m$ be an even function on $V$, smooth with polynomially bounded derivatives. For every
+Schwartz function $u$ and every $x \in V$,
+$m(D) u(x) = \mathcal F(m \, \mathcal F^{-1} u)(x)$, and for every tempered distribution $T$,
+$(m(D) T)(u) = T(m(D) u)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\mathcal F^{-1} h(x) = \widehat{h}(-x)$ and $\mathcal F^{-1} u(\xi) = \widehat u(-\xi)$ (Mathlib's
+\texttt{Real.\allowbreak fourierInv\_\allowbreak eq\_\allowbreak fourier\_\allowbreak
+comp\_\allowbreak neg}), so
+$m(D) u(x) = \mathcal F(m(-\cdot) \, \widehat u(-\cdot))(x) = \mathcal F(m \, \mathcal F^{-1} u)(x)$
+since $m$ is even. The second identity is Mathlib's definition of $m(D) T$ with the first.
+\end{proof}
+
+\begin{lemma}[The transpose of the Bessel potential]
+\label{lem:bessel-potential-transpose}
+\lean{Rd.besselSchwartz_apply_eq_fourier, Rd.besselPotential_apply_apply,
+  Rd.integral_besselSchwartz_mul}
+\leanok
+\uses{def:bessel-schwartz, lem:bessel-weight-basic, lem:bessel-schwartz-distribution,
+  lem:even-multiplier-transpose}
+For every $t \in \R$, every Schwartz function $u$ and every $x \in V$,
+$J_t u(x) = \mathcal F(\langle \cdot \rangle^t \, \mathcal F^{-1} u)(x)$. For every $t \in \R$,
+every tempered distribution $T$ and all Schwartz functions $\varphi, u$,
+\[
+  (J_t T)(u) = T(J_t u) \qquad \text{and} \qquad
+  \int_V J_t \varphi \, u = \int_V \varphi \, J_t u .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Bessel weight is even (\Cref{lem:bessel-weight-basic}), so \Cref{lem:even-multiplier-transpose}
+gives the first two identities. For the tempered distribution of $\varphi$ the second gives
+$\int_V J_t u \, \varphi = (J_t \varphi)(u) = \int_V u \, J_t \varphi$
+(\Cref{lem:bessel-schwartz-distribution}).
+\end{proof}
+
+\begin{lemma}[Two elementary inequalities]
+\label{lem:elementary-square-inequalities}
+\lean{Rd.one_le_two_mul_enorm_sq_add, Rd.le_rpow_half_mul_of_sq_le}
+\leanok
+For all $x, y \in \C$ with $x + y = 1$, $1 \leq 2(|x|^2 + |y|^2)$. For all
+$a, b, c \in [0, \infty]$ with $a^2 \leq c \, b^2$, $a \leq c^{1/2} \, b$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$1 \leq |x| + |y|$ by the triangle inequality, and $(|x| + |y|)^2 \leq 2(|x|^2 + |y|^2)$
+(Mathlib's \texttt{add\_\allowbreak sq\_\allowbreak le}); and $(c^{1/2} b)^2 = c \, b^2$.
+\end{proof}
+
+\begin{proposition}[The Bessel weight and the Littlewood--Paley weights]
+\label{prop:bessel-lp-weights}
+\lean{Rd.dyadicWeight_sq_le_of_fourier_psi_ne_zero, Rd.ofReal_besselWeight_sq_le_of_norm_lt,
+  Rd.tsum_dyadicWeight_fourier_psi_sq_le, Rd.ofReal_besselWeight_sq_le_tsum}
+\leanok
+\uses{lem:bessel-weight-basic, lem:elementary-square-inequalities, lem:fourier-psi-window}
+For every $s \geq 0$, every $j \in \N$ and every $\xi \in V$: if $\widehat{\psi_j}(\xi) \neq 0$,
+then $2^{2js} \leq 4^s \langle \xi \rangle^{2s}$; if $|\xi| < 2^{j+1}$, then
+$\langle \xi \rangle^{2s} \leq 5^s \, 2^{2js}$; and
+\[
+  \sum_{j \in \N} 2^{2js} |\widehat{\psi_j}(\xi)|^2 \leq 2 \cdot 4^s \langle \xi \rangle^{2s},
+  \qquad
+  \langle \xi \rangle^{2s} \leq 2 \cdot 5^s \sum_{j \in \N} 2^{2js} |\widehat{\psi_j}(\xi)|^2 .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+The first two bounds are $(4^j)^s \leq (4(1 + |\xi|^2))^s$ and
+$(1 + |\xi|^2)^s \leq (5 \cdot 4^j)^s$ (\Cref{lem:fourier-psi-window,lem:bessel-weight-basic}),
+using $s \geq 0$. Let $a$ be as in \Cref{lem:fourier-psi-window}. The sum has at most the two
+terms $j = a, a + 1$, each at most $4^s \langle \xi \rangle^{2s}$, since
+$|\widehat{\psi_j}(\xi)| \leq 1$. Both $j = a$ and $j = a + 1$ satisfy $|\xi| < 2^{j+1}$, and
+$1 \leq 2 (|\widehat{\psi_a}(\xi)|^2 + |\widehat{\psi_{a+1}}(\xi)|^2)$ by
+\Cref{lem:elementary-square-inequalities}, so
+$\langle \xi \rangle^{2s} \leq 2 \sum_{j \in \{a, a+1\}} \langle \xi \rangle^{2s}
+|\widehat{\psi_j}(\xi)|^2 \leq 2 \cdot 5^s \sum_{j \in \{a, a+1\}} 2^{2js}
+|\widehat{\psi_j}(\xi)|^2$.
+\end{proof}
+
+\begin{lemma}[Temperate weights and $L_p$ functions]
+\label{lem:temperate-weight-lp}
+\lean{Rd.smulLeftCLM_toTemperedDistribution_eq, Rd.ae_eq_of_smulLeftCLM_eq}
+\leanok
+Let $w$ be a smooth function on $V$ with polynomially bounded derivatives, and
+$1 \leq p, q \leq \infty$. For every $g \in L_p(V)$ with $w g \in L_q(V)$, the product of $w$
+with the tempered distribution of $g$ is the tempered distribution of $w g$. For every
+$G \in L_p(V)$ and every $H \in L_q(V)$ such that $w G = H$ as tempered distributions,
+$w G = H$ almost everywhere.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both distributions in the first statement send a Schwartz function $u$ to $\int u \, w g$. In
+the second, $w G$ and $H$ are locally integrable, and testing with the Schwartz functions
+$\varphi \in C^\infty_c(V)$ gives $\int \varphi \, w G = \int \varphi \, H$; such functions
+are equal almost everywhere (Mathlib's \texttt{ae\_\allowbreak eq\_\allowbreak of\_\allowbreak
+integral\_\allowbreak contDiff\_\allowbreak smul\_\allowbreak eq}).
+\end{proof}
+
+\begin{lemma}[Bessel potentials of $L_2$ functions]
+\label{lem:bessel-potential-l2}
+\lean{Rd.fourier_ae_eq_of_besselPotential_eq, Rd.enorm_sq_eq_lintegral_of_besselPotential_eq,
+  Rd.memLp_besselWeight_mul_fourier, Rd.memSobolev_two_of_lintegral_lt_top,
+  Rd.exists_toTemperedDistribution_eq_of_besselPotential_eq}
+\leanok
+\uses{def:bessel-weight, lem:bessel-weight-basic, lem:temperate-weight-lp, lem:plancherel-l2}
+Let $s \in \R$. For all $f, h \in L_2(V)$ with $J_s f = h$, $\widehat h = \langle \cdot \rangle^s
+\widehat f$ almost everywhere and
+\[
+  \|h\|_2^2 = \int_V \langle \xi \rangle^{2s} |\widehat f(\xi)|^2 \, d\xi .
+\]
+For every $f \in L_2(V)$ with $\int \langle \xi \rangle^{2s} |\widehat f(\xi)|^2 \, d\xi < \infty$,
+$\langle \cdot \rangle^s \widehat f \in L_2(V)$ and $f \in H^s(V)$. If $s \geq 0$, then every
+tempered distribution $u$ with $J_s u \in L_2(V)$ is an $L_2(V)$ function.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Fourier transform of $J_s f$ is $\langle \cdot \rangle^s \widehat f$ as tempered
+distributions, so the first identity is \Cref{lem:temperate-weight-lp}, and the second follows by
+\Cref{lem:plancherel-l2}. In the second statement, $\langle \cdot \rangle^s \widehat f$ is the
+Fourier transform of $J_s f$ by \Cref{lem:temperate-weight-lp}, so $J_s f$ is the inverse Fourier
+transform of an $L_2$ function (Mathlib's \texttt{TemperedDistribution.\allowbreak
+memSobolev\_\allowbreak iff\_\allowbreak exists\_\allowbreak smulLeftCLM\_\allowbreak fourier}).
+For the third, $u = J_{-s}(J_s u)$, and $J_{-s}$ maps $L_2(V) = H^0(V)$ into $L_2(V)$ for
+$-s \leq 0$ (Mathlib's \texttt{TemperedDistribution.\allowbreak MemSobolev.\allowbreak mono}).
+\end{proof}
+
+\begin{lemma}[The Triebel--Lizorkin norm of $\TL{s}{2}{2}$ on the frequency side]
+\label{lem:tl-two-fourier}
+\lean{Rd.triebelLizorkinNorm_two_sq, Rd.triebelLizorkinNorm_two_sq_le,
+  Rd.lintegral_besselWeight_sq_le}
+\leanok
+\uses{def:triebel-lizorkin, thm:tl-diagonal, thm:convolution-theorem-l2,
+  prop:bessel-lp-weights}
+For every $s \in \R$ and every $f \in L_2(V)$,
+\[
+  \|f\|_{F^s_{2,2}}^2 = \int_V \Bigl( \sum_{j \in \N} 2^{2js} |\widehat{\psi_j}(\xi)|^2 \Bigr)
+  |\widehat f(\xi)|^2 \, d\xi ,
+\]
+and if $s \geq 0$, then
+$\|f\|_{F^s_{2,2}}^2 \leq 2 \cdot 4^s \int_V \langle \xi \rangle^{2s} |\widehat f(\xi)|^2 \, d\xi$
+and $\int_V \langle \xi \rangle^{2s} |\widehat f(\xi)|^2 \, d\xi \leq 2 \cdot 5^s
+\|f\|_{F^s_{2,2}}^2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{thm:tl-diagonal}, $\|f\|_{F^s_{2,2}}^2 = \sum_j 2^{2js} \|\Delta_j f\|_2^2$; insert
+\Cref{thm:convolution-theorem-l2} and interchange sum and integral (Tonelli). The bounds follow
+from \Cref{prop:bessel-lp-weights} under the integral.
+\end{proof}
+
+\begin{theorem}[$H^s = \TL{s}{2}{2}$]
+\label{thm:sobolev-two-triebel-lizorkin}
+\lean{Rd.triebelLizorkinNorm_le_of_besselPotential_eq,
+  Rd.enorm_besselPotential_le_triebelLizorkinNorm, Rd.memSobolev_two_iff_memTriebelLizorkin}
+\leanok
+\uses{lem:bessel-potential-l2, lem:tl-two-fourier, lem:elementary-square-inequalities}
+For every $s \geq 0$ and all $f, h \in L_2(V)$ with $J_s f = h$,
+\[
+  \|f\|_{F^s_{2,2}} \leq (2 \cdot 4^s)^{1/2} \, \|h\|_2
+  \quad \text{and} \quad
+  \|h\|_2 \leq (2 \cdot 5^s)^{1/2} \, \|f\|_{F^s_{2,2}} .
+\]
+For every $s \geq 0$, a tempered distribution $u$ lies in $H^s(V)$ if and only if $u$ is a
+function $f \in L_2(V)$ with $f \in \TL{s}{2}{2}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:bessel-potential-l2}, $\|h\|_2^2 = \int \langle \xi \rangle^{2s} |\widehat f|^2$,
+and \Cref{lem:tl-two-fourier} gives both bounds after taking square roots
+(\Cref{lem:elementary-square-inequalities}). If $u \in H^s(V)$, then $u = f \in L_2(V)$ by
+\Cref{lem:bessel-potential-l2}, and the first bound shows $f \in \TL{s}{2}{2}$. Conversely, for
+$f \in \TL{s}{2}{2}$, $\int \langle \xi \rangle^{2s} |\widehat f|^2 < \infty$ by
+\Cref{lem:tl-two-fourier}, so $f \in H^s(V)$ by \Cref{lem:bessel-potential-l2}.
+\end{proof}
+
+\begin{corollary}[$H^s = \Besov{s}{2}{2}$]
+\label{cor:sobolev-two-besov}
+\lean{Rd.memSobolev_two_iff_exists_memApprox, Rd.memSobolev_two_iff_littlewoodPaleyNorm_lt_top,
+  Rd.exists_eq_toDistr_two}
+\leanok
+\uses{thm:sobolev-two-triebel-lizorkin, thm:tl-diagonal, def:band-space, def:lp-blocks,
+  lem:bessel-potential-l2, lem:bessel-space-enorm}
+For every $s > 0$, a tempered distribution $u$ lies in $H^s(V)$ if and only if $u$ is a function
+$f \in L_2(V)$ with $f \in \Besov{s}{2}{2}$, the approximation space $A^s_2$ of the
+band-limited scheme. For every $s \geq 0$, $u \in H^s(V)$ if and only if $u$ is a function
+$f \in L_2(V)$ with $\|f\|^{\mathrm{LP}}_{s,2} < \infty$, and every element $F$ of Mathlib's
+bundled space $H^s(V)$ is a function $f \in \TL{s}{2}{2}$ with
+$\|f\|_{F^s_{2,2}} \leq (2 \cdot 4^s)^{1/2} \|F\|_{H^s}$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:sobolev-two-triebel-lizorkin} and \Cref{thm:tl-diagonal} with $p = 2$. An element $F$
+of the bundled space carries $J_s F$ as an $L_2$ function of norm $\|F\|_{H^s}$
+(\Cref{lem:bessel-space-enorm}).
+\end{proof}
+
+\begin{lemma}[Derivatives on the frequency side]
+\label{lem:derivative-fourier-l2}
+\lean{Rd.fourier_ae_eq_of_lineDerivOp_eq, Rd.norm_two_pi_I_inner_le, Rd.lintegral_inner_sq_eq,
+  Rd.ofReal_besselWeight_one_sq, Rd.lintegral_besselWeight_one_sq_eq}
+\leanok
+\uses{lem:temperate-weight-lp, lem:plancherel-l2, lem:bessel-weight-basic}
+For every $v \in V$ and all $f, g \in L_2(V)$ with $\partial_v f = g$ as tempered distributions,
+$\widehat g(\xi) = 2 \pi i \langle \xi, v \rangle \widehat f(\xi)$ for almost every $\xi$ and
+\[
+  (2\pi)^2 \int_V \langle \xi, v \rangle^2 |\widehat f(\xi)|^2 \, d\xi = \|g\|_2^2 ;
+\]
+moreover $|2 \pi i \langle \xi, v \rangle| \leq 2 \pi |v| \langle \xi \rangle^1$ for every
+$\xi \in V$. For every orthonormal basis $(e_i)_{i \in I}$ of $V$,
+$(\langle \xi \rangle^1)^2 = 1 + \sum_i \langle \xi, e_i \rangle^2$ for every $\xi \in V$, and
+for all $f \in L_2(V)$ and $g_i \in L_2(V)$ with $\partial_{e_i} f = g_i$ as tempered
+distributions for every $i \in I$,
+\[
+  (2\pi)^2 \int_V (\langle \xi \rangle^1)^2 |\widehat f(\xi)|^2 \, d\xi
+  = (2\pi)^2 \|f\|_2^2 + \sum_i \|g_i\|_2^2 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Fourier transform of $\partial_v f$ is $2 \pi i \langle \cdot, v \rangle \widehat f$ as
+tempered distributions (Mathlib's \texttt{TemperedDistribution.\allowbreak fourier\_\allowbreak
+lineDerivOp\_\allowbreak eq}), so the first identity is \Cref{lem:temperate-weight-lp} and the
+second follows by \Cref{lem:plancherel-l2}. The bound is the Cauchy--Schwarz inequality with
+$|\xi| \leq \langle \xi \rangle^1$. Parseval's identity
+$|\xi|^2 = \sum_i \langle \xi, e_i \rangle^2$ (Mathlib's \texttt{OrthonormalBasis.\allowbreak
+sum\_\allowbreak sq\_\allowbreak inner\_\allowbreak left}) gives the expansion of
+$(\langle \xi \rangle^1)^2$; integrate it against $|\widehat f|^2$ and use the first part for
+each $e_i$.
+\end{proof}
+
+\begin{theorem}[$\Sob{1}{2} = H^1$]
+\label{thm:sobolev-one-two}
+\lean{Rd.memSobolev_one_two_of_lineDerivOp_eq, Rd.memSobolev_one_iff,
+  Rd.enorm_le_of_hasWeakLineDeriv, Rd.enorm_besselPotential_one_sq_eq,
+  Rd.sq_norm_besselPotential_one_eq}
+\leanok
+\uses{def:weak-line-derivative, cor:sobolev-tempered, thm:weak-derivative-tempered,
+  lem:derivative-fourier-l2, lem:bessel-potential-l2, def:dyadic-cells}
+For every orthonormal basis $(e_i)_{i \in I}$ of $V$ and all $f, g_i \in L_2(V)$ such that
+$\partial_{e_i} f = g_i$ as tempered distributions for every $i \in I$, $f \in H^1(V)$. For every
+$f \in L_2(V)$, $f \in \Sob{1}{2}(V)$ if and only if $f \in H^1(V)$. For every
+$v \in V$ and all $f, g, h \in L_2(V)$ such that $g$ is the weak derivative $\partial_v f$ on $V$
+and $J_1 f = h$, $\|g\|_2 \leq 2 \pi |v| \, \|h\|_2$. For every orthonormal basis
+$(e_i)_{i \in I}$ of $V$ and all $f, h, g_i \in L_2(V)$ such that $g_i$ is the weak derivative
+$\partial_{e_i} f$ on $V$ for every $i \in I$ and $J_1 f = h$,
+\[
+  (2\pi)^2 \|h\|_2^2 = (2\pi)^2 \|f\|_2^2 + \sum_i \|g_i\|_2^2 .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Weak derivatives on $V$ of $L_2$ functions are derivatives of tempered distributions
+(\Cref{thm:weak-derivative-tempered,cor:sobolev-tempered}). For derivatives
+$g_i = \partial_{e_i} f \in L_2(V)$ along an orthonormal basis $(e_i)_i$,
+$(2\pi)^2 \int (\langle \xi \rangle^1)^2 |\widehat f|^2 = (2\pi)^2 \|f\|_2^2 +
+\sum_i \|g_i\|_2^2$ is finite (\Cref{lem:derivative-fourier-l2}), so $f \in H^1(V)$ by
+\Cref{lem:bessel-potential-l2}; this applies to $f \in \Sob{1}{2}(V)$ with the orthonormal basis
+of \Cref{def:dyadic-cells}. If $f \in H^1(V)$, then $\partial_v f \in
+H^0(V) = L_2(V)$ for every $v \in V$ (Mathlib's \texttt{TemperedDistribution.\allowbreak
+MemSobolev.\allowbreak lineDerivOp}), and the derivative of order $0$ is $f$ itself. The bound
+compares $\widehat g = 2 \pi i \langle \cdot, v \rangle \widehat f$ with
+$\widehat h = \langle \cdot \rangle^1 \widehat f$ pointwise
+(\Cref{lem:derivative-fourier-l2,lem:bessel-potential-l2}) and uses \Cref{lem:plancherel-l2};
+the identity is \Cref{lem:derivative-fourier-l2} with
+$\|h\|_2^2 = \int (\langle \xi \rangle^1)^2 |\widehat f|^2$.
+\end{proof}
+
+\begin{corollary}[The $H^1$ norm by a weak gradient]
+\label{cor:weak-gradient-sobolev-norm}
+\lean{Rd.enorm_besselPotential_one_sq_le, Rd.sq_norm_besselPotential_one_le}
+\leanok
+\uses{thm:sobolev-one-two}
+For every orthonormal basis $(e_i)_{i \in I}$ of $V$ and all $f, h, g_i \in L_2(V)$ such that
+$g_i$ is the weak derivative $\partial_{e_i} f$ on $V$ for every $i \in I$ and $J_1 f = h$,
+\[
+  \|h\|_2^2 \leq \|f\|_2^2 + \sum_i \|g_i\|_2^2 .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+The identity $(2\pi)^2 \|h\|_2^2 = (2\pi)^2 \|f\|_2^2 + \sum_i \|g_i\|_2^2$ of
+\Cref{thm:sobolev-one-two} and $(2\pi)^2 \geq 1$.
+\end{proof}
+
+\begin{theorem}[$\Sob{1}{2} = \Besov{1}{2}{2}$]
+\label{thm:sobolev-one-two-besov}
+\lean{Rd.memSobolev_one_iff_memApprox, Rd.memSobolev_one_iff_modulus}
+\leanok
+\uses{thm:sobolev-one-two, cor:sobolev-two-besov, thm:rd-besov, lem:lp-distribution-determined}
+For every $F \in L_2(V)$, $F \in \Sob{1}{2}(V)$ if and only if $F$ lies in the approximation space
+$A^1_2$ of the band-limited scheme. For every integer $r \geq 2$ and every $F \in L_2(V)$,
+$F \in \Sob{1}{2}(V)$ if and only if
+$\|F\|_2 + \|(2^k \omega_r(F, 2^{-k})_2)_k\|_{\ell_2} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\Sob{1}{2}(V) = H^1(V)$ by \Cref{thm:sobolev-one-two}, and $H^1(V) = \Besov{1}{2}{2}$ by
+\Cref{cor:sobolev-two-besov}; an $L_2$ function is determined by its tempered distribution
+(\Cref{lem:lp-distribution-determined}). The second statement is \Cref{thm:rd-besov} with
+$p = q = 2$ and
+$s = 1 < r$.
+\end{proof}
+
+\section{Rellich compactness}
+\label{sec:rellich-compactness}
+
+Throughout this section $\Omega \subseteq V$ is an arbitrary bounded set, $L_2(\Omega)$ is the
+$L_2$ space of Lebesgue measure restricted to $\Omega$, and $F \mapsto F|_\Omega$ is the
+restriction from $L_2(V)$ to $L_2(\Omega)$, Mathlib's operator of norm at most $1$
+(\texttt{LpToLpRestrictCLM}). An element $F$ of Mathlib's bundled Sobolev space
+$H^1(V) = H^{1,2}(V, \C)$ (\texttt{BesselPotentialSpace}) is a tempered distribution $u$ together
+with the $L_2$ function $J_1 u$, and $\|F\|_{H^1} = \|J_1 u\|_2$. For $K \in \R$, $B_K$ is the
+closed ball of radius $K$ around $0$ in $V$. The proof of Rellich's theorem truncates in
+frequency: the part of $F$ with frequencies in $B_K$ is a bounded Lipschitz function on $V$, so
+the truncated operators are compact by the Arzel\`a--Ascoli theorem on the compact closure of
+$\Omega$, and they converge to the restriction in operator norm as $K \to \infty$.
+
+\begin{theorem}[The inverse Fourier transform on $L_1 \cap L_2$]
+\label{thm:fourier-inverse-l1-l2}
+\lean{Rd.fourierInv_Lp_ae_eq_of_integrable}
+\leanok
+\uses{lem:fourier-integrable}
+For every integrable $h \in L_2(V)$, the $L_2$ inverse Fourier transform of $h$ agrees almost
+everywhere with the function
+$x \mapsto \int e^{2 \pi i \langle \xi, x \rangle} h(\xi) \, d\xi$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Both functions are locally integrable, the second because it is continuous
+(\Cref{lem:fourier-integrable}). Two locally integrable functions with the same integrals
+against all smooth compactly supported $u$ agree almost everywhere (Mathlib's
+\texttt{ae\_\allowbreak eq\_\allowbreak of\_\allowbreak integral\_\allowbreak contDiff\_\allowbreak
+smul\_\allowbreak eq}), and such $u$ are Schwartz functions. The $L_2$ inverse Fourier transform
+agrees with the inverse Fourier transform of tempered distributions (Mathlib's
+\texttt{Lp.\allowbreak fourierInv\_\allowbreak toTemperedDistribution\_\allowbreak eq}), so
+$\int u \, \mathcal F^{-1} h = h(\mathcal F^{-1} u) = \int (\mathcal F^{-1} u) \, h$, which is
+$\int u \, \mathcal F^{-1} h$ for the pointwise inverse transform by
+\Cref{lem:fourier-integrable}.
+\end{proof}
+
+\begin{lemma}[The Bessel weight of order $-1$]
+\label{lem:bessel-weight-inverse}
+\lean{Rd.besselWeight_neg_one_eq_inv, Rd.besselWeight_neg_one_le_one,
+  Rd.besselWeight_neg_one_le_inv, Rd.norm_besselWeight_neg_one_le_one,
+  Rd.memLp_top_besselWeight_neg_one, Rd.besselInvMul, Rd.besselInvMul_apply_ae,
+  Rd.norm_besselInvMul_le_one}
+\leanok
+\uses{def:bessel-weight, lem:bessel-weight-basic}
+For every $\xi \in V$, $\langle \xi \rangle^{-1} = (\langle \xi \rangle^1)^{-1} \leq 1$, and for
+every $K > 0$ and every $\xi$ with $|\xi| \geq K$, $\langle \xi \rangle^{-1} \leq K^{-1}$. The
+multiplication $g \mapsto \langle \cdot \rangle^{-1} g$ is a bounded linear operator on $L_2(V)$
+of norm at most $1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\langle \xi \rangle^1 \geq \max(1, |\xi|)$ (\Cref{lem:bessel-weight-basic}). The weight
+$\langle \cdot \rangle^{-1}$ is continuous and bounded by $1$, hence lies in $L_\infty(V)$, and
+multiplication by an $L_\infty$ function is bounded on $L_2$ (Mathlib's Hölder multiplication
+\texttt{ContinuousLinearMap.\allowbreak holderL}), with norm at most the bound $1$ of the weight.
+\end{proof}
+
+\begin{definition}[$H^1$ functions as $L_2$ functions]
+\label{def:sobolev-one-to-l2}
+\lean{Rd.toL2, Rd.toL2_apply}
+\leanok
+\uses{lem:bessel-weight-inverse, lem:plancherel-l2}
+For $F \in H^1(V)$, $\iota F = \mathcal F^{-1}(\langle \cdot \rangle^{-1} \widehat{J_1 F})$,
+with the Fourier transform of $L_2(V)$; $\iota : H^1(V) \to L_2(V)$ is a bounded linear operator.
+\end{definition}
+
+\begin{lemma}[$\iota F$ represents $F$]
+\label{lem:sobolev-one-to-l2}
+\lean{Rd.fourier_toL2, Rd.fourier_toL2_ae_eq, Rd.toTemperedDistribution_toL2,
+  Rd.toL2_eq_of_toDistr_eq, Rd.toL2_injective, Rd.norm_toL2_le}
+\leanok
+\uses{def:sobolev-one-to-l2, lem:temperate-weight-lp, lem:bessel-weight-inverse,
+  lem:plancherel-l2, lem:lp-distribution-determined}
+For every $F \in H^1(V)$, given by the tempered distribution $u$, the Fourier transform of
+$\iota F$ is $\langle \cdot \rangle^{-1} \widehat{J_1 u}$, the tempered distribution of $\iota F$
+is $u$, and $\|\iota F\|_2 \leq \|F\|_{H^1}$. For every $F \in H^1(V)$ and every $f \in L_2(V)$
+whose tempered distribution is that of $F$, $\iota F = f$. The map $\iota$ is injective.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$u = J_{-1}(J_1 u)$, and the Fourier transform of $J_{-1} g$ is $\langle \cdot \rangle^{-1}
+\widehat g$; for $g = J_1 u \in L_2(V)$ this is the tempered distribution of the $L_2$ function
+$\langle \cdot \rangle^{-1} \widehat g$ (\Cref{lem:temperate-weight-lp}), whose inverse Fourier
+transform is $\iota F$. An $L_2$ function is determined by its tempered distribution
+(\Cref{lem:lp-distribution-determined}), and $F$ by $u$, so $\iota$ is injective. By
+\Cref{lem:plancherel-l2} and
+\Cref{lem:bessel-weight-inverse},
+$\|\iota F\|_2 = \|\langle \cdot \rangle^{-1} \widehat{J_1 u}\|_2 \leq \|\widehat{J_1 u}\|_2
+= \|J_1 u\|_2$.
+\end{proof}
+
+\begin{definition}[Truncation in frequency]
+\label{def:frequency-truncation}
+\lean{Rd.truncL2, Rd.truncL2_apply}
+\leanok
+\uses{def:sobolev-one-to-l2, lem:indicator-lp}
+For $K \in \R$ and $F \in H^1(V)$, $T_K F = \mathcal F^{-1}(1_{B_K} \widehat{\iota F})$; $T_K$
+is a bounded linear operator from $H^1(V)$ to $L_2(V)$.
+\end{definition}
+
+\begin{proposition}[The truncation error]
+\label{prop:frequency-truncation-error}
+\lean{Rd.norm_toL2_sub_truncL2_apply_le, Rd.norm_toL2_sub_truncL2_le, Rd.tendsto_truncL2}
+\leanok
+\uses{def:frequency-truncation, lem:sobolev-one-to-l2, lem:bessel-weight-inverse,
+  lem:plancherel-l2}
+For every $K > 0$ and every $F \in H^1(V)$, $\|\iota F - T_K F\|_2 \leq K^{-1} \|F\|_{H^1}$. For
+every $K > 0$, $\|\iota - T_K\| \leq K^{-1}$, and $T_K \to \iota$ in operator norm as
+$K \to \infty$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+By \Cref{lem:plancherel-l2} and \Cref{lem:sobolev-one-to-l2}, $\|\iota F - T_K F\|_2$ is the
+$L_2$ norm of $1_{V \setminus B_K} \langle \cdot \rangle^{-1} \widehat{J_1 F}$, and
+$\langle \xi \rangle^{-1} \leq K^{-1}$ for $|\xi| > K$ (\Cref{lem:bessel-weight-inverse}).
+\end{proof}
+
+\begin{definition}[The square root of the volume of a ball]
+\label{def:ball-volume-sqrt}
+\lean{Rd.ballVolumeSqrt, Rd.ballVolumeSqrt_nonneg}
+\leanok
+For $K \in \R$, $C_K = |B_K|^{1/2} \geq 0$, the square root of the Lebesgue measure of $B_K$.
+\end{definition}
+
+\begin{lemma}[Cauchy--Schwarz on a ball]
+\label{lem:cauchy-schwarz-ball}
+\lean{Rd.eLpNorm_one_indicator_closedBall_le, Rd.integrable_indicator_closedBall,
+  Rd.integral_norm_indicator_closedBall_le}
+\leanok
+\uses{def:ball-volume-sqrt}
+For every $h \in L_2(V)$ and every $K \in \R$, $1_{B_K} h$ is integrable and
+$\int |1_{B_K} h| \leq C_K \|h\|_2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Hölder's inequality on the finite measure space $B_K$ (Mathlib's
+\texttt{eLpNorm\_\allowbreak le\_\allowbreak eLpNorm\_\allowbreak mul\_\allowbreak rpow\_\allowbreak
+measure\_\allowbreak univ}).
+\end{proof}
+
+\begin{lemma}[The Fourier character is Lipschitz]
+\label{lem:fourier-character-lipschitz}
+\lean{Rd.norm_fourierChar_sub_le}
+\leanok
+For all $a, b \in \R$, $|e^{2 \pi i a} - e^{2 \pi i b}| \leq 2 \pi |a - b|$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$e^{2 \pi i a} - e^{2 \pi i b} = e^{2 \pi i b}(e^{2 \pi i (a - b)} - 1)$ and
+$|e^{i t} - 1| \leq |t|$ (Mathlib's \texttt{Real.\allowbreak norm\_\allowbreak
+exp\_\allowbreak I\_\allowbreak mul\_\allowbreak ofReal\_\allowbreak sub\_\allowbreak
+one\_\allowbreak le}).
+\end{proof}
+
+\begin{theorem}[Band-limited functions are bounded and Lipschitz]
+\label{thm:band-limited-lipschitz}
+\lean{Rd.norm_fourierInv_indicator_le, Rd.norm_fourierInv_sub_le,
+  Rd.lipschitzWith_fourierInv_indicator}
+\leanok
+\uses{lem:fourier-integrable, lem:cauchy-schwarz-ball,
+  lem:fourier-character-lipschitz}
+For every integrable $g$ on $V$, every $K \in \R$ such that $g(\xi) = 0$ for almost every $\xi$
+with $|\xi| > K$, and all $x, y \in V$,
+\[
+  |\mathcal F^{-1} g(x) - \mathcal F^{-1} g(y)| \leq 2 \pi K |x - y| \int |g| .
+\]
+For every $h \in L_2(V)$, every $K \in \R$ and all $x, y \in V$,
+$|\mathcal F^{-1}(1_{B_K} h)(x)| \leq C_K \|h\|_2$ and
+\[
+  |\mathcal F^{-1}(1_{B_K} h)(x) - \mathcal F^{-1}(1_{B_K} h)(y)|
+  \leq 2 \pi \max(K, 0) \, C_K \|h\|_2 \, |x - y| .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The difference is $\int (e^{2 \pi i \langle \xi, x \rangle} - e^{2 \pi i \langle \xi, y \rangle})
+g(\xi) \, d\xi$, and for $|\xi| \leq K$, \Cref{lem:fourier-character-lipschitz} and the
+Cauchy--Schwarz inequality give
+$|e^{2 \pi i \langle \xi, x \rangle} - e^{2 \pi i \langle \xi, y \rangle}| \leq
+2 \pi |\langle \xi, x - y \rangle| \leq 2 \pi K |x - y|$. For $g = 1_{B_K} h$, which vanishes for
+$|\xi| > \max(K, 0)$, combine this and \Cref{lem:fourier-integrable} with
+\Cref{lem:cauchy-schwarz-ball}.
+\end{proof}
+
+\begin{lemma}[Arzel\`a--Ascoli for Lipschitz functions]
+\label{lem:lipschitz-totally-bounded}
+\lean{Rd.totallyBounded_setOf_lipschitzWith}
+\leanok
+For every compact metric space $X$, every $C \in \R$ and every $L \geq 0$, the set of bounded
+continuous functions $g : X \to \C$ with $|g| \leq C$ that are Lipschitz with constant $L$ is
+totally bounded in the uniform norm.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The set is equicontinuous, since all its members have the Lipschitz constant $L$, and its
+functions take values in the compact disc of radius $C$; the Arzel\`a--Ascoli theorem (Mathlib's
+\texttt{BoundedContinuousFunction.\allowbreak arzela\_\allowbreak ascoli}) makes its closure
+compact.
+\end{proof}
+
+\begin{definition}[Continuous functions on the closure as $L_2(\Omega)$ functions]
+\label{def:closure-extension}
+\lean{Rd.extendClosure, Rd.closureToLp}
+\leanok
+For a bounded continuous function $g$ on $\overline \Omega$, $\tilde g$ is the function on $V$
+equal to $g$ on $\overline \Omega$ and to $0$ elsewhere, and $\Phi g \in L_2(\Omega)$ is its
+class.
+\end{definition}
+
+\begin{lemma}[The map $\Phi$ is Lipschitz]
+\label{lem:closure-extension}
+\lean{Rd.extendClosure_of_mem, Rd.measurable_extendClosure, Rd.norm_extendClosure_le,
+  Rd.norm_extendClosure_sub_le, Rd.memLp_extendClosure, Rd.dist_closureToLp_le,
+  Rd.lipschitzWith_closureToLp}
+\leanok
+\uses{def:closure-extension}
+For every bounded continuous $g$ on $\overline \Omega$, $\tilde g$ is measurable with
+$|\tilde g| \leq \|g\|_\infty$ and lies in $L_2(\Omega)$. For all bounded continuous $g, g'$ on
+$\overline \Omega$, $|\tilde g - \tilde g'| \leq \|g - g'\|_\infty$ and
+$\|\Phi g - \Phi g'\|_{L_2(\Omega)} \leq |\Omega|^{1/2} \|g - g'\|_\infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\overline \Omega$ is closed, hence measurable, and $\Omega$ has finite measure since it is
+bounded. The $L_2(\Omega)$ norm of a function bounded by $c$ is at most $|\Omega|^{1/2} c$.
+\end{proof}
+
+\begin{lemma}[The truncations on $\Omega$]
+\label{lem:truncation-restriction-image}
+\lean{Rd.truncL2_ae_eq_fourierInv_indicator, Rd.restr_truncL2_mem_closureToLp_image}
+\leanok
+\uses{def:frequency-truncation, lem:sobolev-one-to-l2, thm:fourier-inverse-l1-l2,
+  lem:cauchy-schwarz-ball, thm:band-limited-lipschitz, lem:closure-extension}
+For every $K \in \R$ and every $F \in H^1(V)$, $T_K F$ agrees almost everywhere with the function
+$G(x) = \int e^{2 \pi i \langle \xi, x \rangle} 1_{B_K}(\xi) \widehat{\iota F}(\xi) \, d\xi$.
+For every $K \in \R$ and every $F \in H^1(V)$ with $\|F\|_{H^1} \leq 1$, there is a bounded
+continuous function $g$ on $\overline \Omega$ with $|g| \leq C_K$, Lipschitz with constant
+$2 \pi \max(K, 0) \, C_K$, such that $(T_K F)|_\Omega = \Phi g$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Let $h = \widehat{\iota F}$. Then $1_{B_K} h$ is integrable (\Cref{lem:cauchy-schwarz-ball}),
+so $T_K F = \mathcal F^{-1}(1_{B_K} h) = G$ almost everywhere (\Cref{thm:fourier-inverse-l1-l2}).
+For $\|F\|_{H^1} \leq 1$, $\|h\|_2 = \|\iota F\|_2 \leq 1$ by \Cref{lem:sobolev-one-to-l2}; let
+$g$ be the restriction of $G$ to $\overline \Omega$. It has the bound and the Lipschitz constant
+by \Cref{thm:band-limited-lipschitz}, and $G = \tilde g$ on $\overline \Omega \supseteq \Omega$.
+\end{proof}
+
+\begin{proposition}[The truncations are compact]
+\label{prop:truncation-compact}
+\lean{Rd.isCompactOperator_restr_truncL2}
+\leanok
+\uses{lem:truncation-restriction-image, lem:lipschitz-totally-bounded, lem:closure-extension}
+For every $K \in \R$, $F \mapsto (T_K F)|_\Omega$ is a compact operator from $H^1(V)$ to
+$L_2(\Omega)$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+$\overline \Omega$ is compact. By \Cref{lem:truncation-restriction-image}, the image of the
+closed unit ball lies in the image under $\Phi$ of the set of \Cref{lem:lipschitz-totally-bounded}
+with $X = \overline \Omega$, $C = C_K$ and $L = 2 \pi \max(K, 0) \, C_K$, which is totally
+bounded; $\Phi$ is Lipschitz (\Cref{lem:closure-extension}), so the image of the unit ball is
+totally bounded, and its closure is compact since $L_2(\Omega)$ is complete.
+\end{proof}
+
+\begin{theorem}[Rellich's theorem]
+\label{thm:rellich-compactness}
+\lean{Rd.isCompactOperator_restr_toL2, Rd.exists_subseq_tendsto_restr}
+\leanok
+\uses{prop:frequency-truncation-error, prop:truncation-compact}
+For every bounded set $\Omega \subseteq V$, the restriction $F \mapsto (\iota F)|_\Omega$ from
+$H^1(V)$ to $L_2(\Omega)$ is a compact operator. For every bounded set $\Omega \subseteq V$, every
+$M \in \R$ and every sequence $(F_n)_n$ in $H^1(V)$ with $\|F_n\|_{H^1} \leq M$ for every $n$,
+there are a strictly increasing $\varphi : \N \to \N$ and $u \in L_2(\Omega)$ with
+$(\iota F_{\varphi(k)})|_\Omega \to u$ in $L_2(\Omega)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The operators $F \mapsto (T_K F)|_\Omega$ are compact (\Cref{prop:truncation-compact}) and
+converge in operator norm to $F \mapsto (\iota F)|_\Omega$ as $K \to \infty$, since the
+restriction has norm at most $1$ (\Cref{prop:frequency-truncation-error}). A limit of compact
+operators in operator norm is compact (Mathlib's \texttt{isCompactOperator\_\allowbreak
+of\_\allowbreak tendsto}). The image of the closed ball of radius $M$ has compact closure, so the
+sequence $((\iota F_n)|_\Omega)_n$ has a convergent subsequence.
+\end{proof}
+
+By \Cref{lem:sobolev-one-to-l2}, $\iota F$ is $F$ itself, read as an $L_2$ function. The theorem
+holds for every bounded set $\Omega$. On a bounded Lipschitz domain the restriction space
+$H^1(\Omega)$ of \Cref{def:sobolev-lipschitz-domain} consists of the restrictions of the
+functions $\iota F$, since $\Sob{1}{2}(V) = H^1(V)$ (\Cref{thm:sobolev-one-two}) and every
+$f \in H^1(V)$ is $\iota F$ for an $F \in H^1(V)$ (\Cref{lem:sobolev-one-to-l2}).
+
+\begin{corollary}[Rellich's theorem by weak gradients]
+\label{cor:rellich-weak-gradient}
+\lean{Rd.exists_subseq_tendsto_restr_of_hasWeakLineDeriv}
+\leanok
+\uses{thm:rellich-compactness, thm:weak-derivative-tempered, thm:sobolev-one-two,
+  cor:weak-gradient-sobolev-norm, lem:sobolev-one-to-l2}
+Let $\Omega \subseteq V$ be bounded, $(e_i)_{i \in I}$ an orthonormal basis of $V$ and
+$M \in \R$. For every sequence $(f_n)_n$ in $L_2(V)$ and all $g_{n,i} \in L_2(V)$ such that,
+for every $n \in \N$, $g_{n,i}$ is the weak derivative $\partial_{e_i} f_n$ on $V$ for every
+$i \in I$ and $\|f_n\|_2^2 + \sum_i \|g_{n,i}\|_2^2 \leq M^2$, there are a strictly increasing
+$\varphi : \N \to \N$ and $u \in L_2(\Omega)$ with $f_{\varphi(k)}|_\Omega \to u$ in
+$L_2(\Omega)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+Weak derivatives on $V$ are derivatives of tempered distributions
+(\Cref{thm:weak-derivative-tempered}), so each $f_n$ lies in $H^1(V)$
+(\Cref{thm:sobolev-one-two}) and $f_n = \iota F_n$ for an $F_n \in H^1(V)$
+(\Cref{lem:sobolev-one-to-l2}) with $\|F_n\|_{H^1}^2 \leq M^2$
+(\Cref{cor:weak-gradient-sobolev-norm}). Apply \Cref{thm:rellich-compactness} with the bound
+$|M|$.
+\end{proof}
+
+\section{Derivative kernels}
+\label{sec:derivative-kernels}
+
+The Sobolev space $\Sob{m}{p}(V)$ is described by weak derivatives, the space $\TL{m}{p}{2}$ by the
+Littlewood--Paley blocks. This section provides the kernels that connect the two: the block
+$\psi_1$ is a sum of derivatives of order $m$ of Schwartz functions, and after dilation
+$2^{jm} \psi_{j+1}$ is a sum of derivatives of the dilated kernels. Let $e_0, \dots, e_{n-1}$ be
+the orthonormal basis of \Cref{def:dyadic-cells}. For $m \in \N$ a multi-index is a tuple
+$\alpha = (\alpha_0, \dots, \alpha_{m-1})$ with entries in $\{0, \dots, n-1\}$; write
+$e_\alpha = (e_{\alpha_0}, \dots, e_{\alpha_{m-1}}) \in V^m$, so that
+$\partial^{e_\alpha} = \partial_{e_{\alpha_0}} \cdots \partial_{e_{\alpha_{m-1}}}$, and sums over
+$\alpha$ run over all $n^m$ multi-indices. On the Fourier side $\partial^{e_\alpha}$ multiplies by
+$\prod_k 2\pi i \langle \xi, e_{\alpha_k} \rangle$, and
+$\sum_\alpha \prod_k \langle \xi, e_{\alpha_k} \rangle^2 = \|\xi\|^{2m}$. The kernel $\eta_\alpha$
+is chosen so that $\partial^{e_\alpha} \eta_\alpha$ has the Fourier transform
+$\prod_k \langle \xi, e_{\alpha_k} \rangle^2 \|\xi\|^{-2m} \widehat{\psi_1}(\xi)$; the division by
+$\|\xi\|^{2m}$ keeps $\widehat{\eta_\alpha}$ smooth because $\widehat{\psi_1}$ vanishes near $0$.
+For every $w \in V^k$, the rescaled derivatives $2^{-jk} \partial^w \tilde\psi_j$ of the synthesis
+kernels (\Cref{def:psi-dual}) form Calder\'on--Zygmund families as well.
+
+\begin{lemma}[Fourier transforms of iterated derivatives]
+\label{lem:fourier-iterated-derivative}
+\lean{SchwartzMap.fourier_iteratedLineDerivOp_apply}
+\leanok
+For every complex normed space $E$, every Schwartz function $G \colon V \to E$, every $k \in \N$,
+all $w \in V^k$ and every $\xi \in V$,
+\[
+  \widehat{\partial^w G}(\xi) = \Bigl( \prod_{l < k} 2\pi i \langle \xi, w_l \rangle \Bigr)
+  \widehat G(\xi) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Induction on $k$, with $\widehat{\partial_v G}(\xi) = 2\pi i \langle \xi, v \rangle \widehat G(\xi)$
+(Mathlib's \texttt{SchwartzMap.\allowbreak fourier\_\allowbreak lineDerivOp\_\allowbreak eq}).
+\end{proof}
+
+\begin{lemma}[Powers of the norm in coordinates]
+\label{lem:norm-power-coordinates}
+\lean{Rd.norm_pow_eq_sum_prod_inner}
+\leanok
+\uses{def:dyadic-cells}
+For every $\xi \in V$ and every $m \in \N$,
+\[
+  \|\xi\|^{2m} = \sum_\alpha \prod_{k < m} \langle \xi, e_{\alpha_k} \rangle^2 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\|\xi\|^2 = \sum_{i < n} \langle \xi, e_i \rangle^2$ (Mathlib's
+\texttt{OrthonormalBasis.\allowbreak sum\_\allowbreak sq\_\allowbreak inner\_\allowbreak left}),
+and the $m$-th power of this sum expands into the sum over all multi-indices (Mathlib's
+\texttt{Fintype.\allowbreak sum\_\allowbreak pow}).
+\end{proof}
+
+\begin{definition}[Derivative symbols]
+\label{def:derivative-symbol}
+\lean{Rd.derivSymbol}
+\leanok
+\uses{def:dyadic-cells}
+For every $m \in \N$, every multi-index $\alpha$ and every $\xi \in V$,
+\[
+  \sigma_\alpha(\xi) = \frac{\prod_{k < m} \langle \xi, e_{\alpha_k} \rangle}
+    {(2\pi i)^m \|\xi\|^{2m}} ,
+\]
+with the convention $t / 0 = 0$.
+\end{definition}
+
+\begin{lemma}[Properties of the derivative symbols]
+\label{lem:derivative-symbol}
+\lean{Rd.sum_prod_mul_derivSymbol, Rd.norm_derivSymbol_le, Rd.contDiffOn_derivSymbol}
+\leanok
+\uses{def:derivative-symbol, lem:norm-power-coordinates}
+Let $m \in \N$. For every $\xi \in V \setminus \{0\}$,
+\[
+  \sum_\alpha \Bigl( \prod_{k < m} 2\pi i \langle \xi, e_{\alpha_k} \rangle \Bigr)
+  \sigma_\alpha(\xi) = 1 .
+\]
+For every multi-index $\alpha$, $|\sigma_\alpha(\xi)| \leq 1$ for every $\xi \in V$ with
+$\|\xi\| \geq 1$, and $\sigma_\alpha$ is smooth on $V \setminus \{0\}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The term of $\alpha$ in the sum is $\prod_k \langle \xi, e_{\alpha_k} \rangle^2 / \|\xi\|^{2m}$, and
+these terms add up to $1$ by \Cref{lem:norm-power-coordinates}. Since
+$|\langle \xi, e_i \rangle| \leq \|\xi\|$,
+$|\sigma_\alpha(\xi)| \leq (2\pi)^{-m} \|\xi\|^m / \|\xi\|^{2m} \leq 1$ for $\|\xi\| \geq 1$.
+Products of linear functions and $\|\xi\|^{2m} = (\|\xi\|^2)^m$ are smooth, and the latter
+vanishes only at $0$.
+\end{proof}
+
+\begin{lemma}[The block $\psi_1$]
+\label{lem:psi-one}
+\lean{Rd.psiOneS, Rd.coe_psiOneS, Rd.fourier_psiOneS_apply, Rd.dilate_psi_one,
+  Rd.fourier_psi_succ_eq_fourier_psi_one, Rd.one_lt_norm_of_fourier_psi_one_ne_zero}
+\leanok
+\uses{def:psi-base, lem:psi-base, def:moment-kernel, lem:fourier-dilate,
+  lem:lp-kernels-frequency}
+The block $\psi_1$ is the Schwartz function $\delta_2 G^{\psi}_1$. For every $j \in \N$ and every
+$\xi \in V$, $\psi_{j+1} = (\psi_1)_{2^j}$ and
+$\widehat{\psi_{j+1}}(\xi) = \widehat{\psi_1}(2^{-j} \xi)$. For every $\xi \in V$ with
+$\widehat{\psi_1}(\xi) \neq 0$, $\|\xi\| > 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\psi_{j+1} = \delta_{2^{j+1}} G^{\psi}_{j+1}$ (\Cref{lem:psi-base}) and
+$G^{\psi}_{j+1} = G^{\psi}_1$ (\Cref{def:psi-base}); with $j = 0$ this is the first claim, and
+$\delta_{2^j} \delta_2 = \delta_{2^{j+1}}$ (\Cref{def:moment-kernel}) gives the second. The third
+is \Cref{lem:fourier-dilate}, and the last is the case $j = 0$ of
+\Cref{lem:lp-kernels-frequency}.
+\end{proof}
+
+\begin{lemma}[Derivative kernels]
+\label{lem:derivative-kernel}
+\lean{Rd.contDiff_derivSymbol_mul_fourier_psi_one,
+  Rd.hasCompactSupport_derivSymbol_mul_fourier_psi_one, Rd.derivKernelHat, Rd.derivKernel,
+  Rd.fourier_derivKernel}
+\leanok
+\uses{lem:derivative-symbol, lem:psi-one, lem:lp-kernels-frequency, def:lp-kernels}
+For every $m \in \N$ and every multi-index $\alpha$, the function
+$\sigma_\alpha \widehat{\psi_1}$ is smooth with compact support, and the derivative kernel
+\[
+  \eta_\alpha = \mathcal F^{-1} \bigl( \sigma_\alpha \widehat{\psi_1} \bigr)
+\]
+is a Schwartz function with $\widehat{\eta_\alpha} = \sigma_\alpha \widehat{\psi_1}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\widehat{\psi_1}$ is the Fourier transform of a Schwartz function (\Cref{lem:psi-one}), hence
+smooth, and it vanishes on the closed unit ball and outside the ball of radius $4$
+(\Cref{lem:lp-kernels-frequency}). So the product vanishes near $0$ and outside the closed ball
+of radius $4$, and away from $0$ it is smooth by \Cref{lem:derivative-symbol}. Smooth functions
+with compact support are Schwartz functions (Mathlib's
+\texttt{HasCompactSupport.\allowbreak toSchwartzMap}), and $\mathcal F$ inverts
+$\mathcal F^{-1}$ on Schwartz functions.
+\end{proof}
+
+\begin{theorem}[$\psi_1$ as a sum of derivatives]
+\label{thm:psi-one-derivatives}
+\lean{Rd.sum_iteratedLineDerivOp_derivKernel}
+\leanok
+\uses{lem:fourier-iterated-derivative, lem:derivative-symbol, lem:derivative-kernel,
+  lem:psi-one, lem:lp-kernels-frequency}
+For every $m \in \N$,
+\[
+  \psi_1 = \sum_\alpha \partial^{e_\alpha} \eta_\alpha .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:fourier-iterated-derivative} and \Cref{lem:derivative-kernel}, the Fourier transform
+of the right side at $\xi$ is
+$\bigl( \sum_\alpha \prod_k 2\pi i \langle \xi, e_{\alpha_k} \rangle \, \sigma_\alpha(\xi) \bigr)
+\widehat{\psi_1}(\xi)$. For $\xi \neq 0$ the sum is $1$ (\Cref{lem:derivative-symbol}), and
+$\widehat{\psi_1}(0) = 0$ (\Cref{lem:lp-kernels-frequency}). The Fourier transform is injective on
+Schwartz functions.
+\end{proof}
+
+\begin{corollary}[The dilated identity]
+\label{cor:psi-derivatives-dilated}
+\lean{Rd.two_pow_smul_psi_succ_eq_sum}
+\leanok
+\uses{thm:psi-one-derivatives, lem:derivative-dilate, lem:psi-one}
+For all $m, j \in \N$,
+\[
+  2^{jm} \psi_{j+1} = \sum_\alpha \partial^{e_\alpha} \bigl( (\eta_\alpha)_{2^j} \bigr) .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+By \Cref{lem:derivative-dilate},
+$\partial^{e_\alpha} ((\eta_\alpha)_{2^j}) = 2^{jm} (\partial^{e_\alpha} \eta_\alpha)_{2^j}$, and
+the sum over $\alpha$ is $2^{jm} (\psi_1)_{2^j} = 2^{jm} \psi_{j+1}$ by
+\Cref{thm:psi-one-derivatives}, the linearity of the dilation and \Cref{lem:psi-one}.
+\end{proof}
+
+\paragraph{The derivative families.}
+
+\begin{definition}[Derivative families]
+\label{def:derivative-family}
+\lean{Rd.derivFamily, Rd.derivKernelBound}
+\leanok
+\uses{lem:derivative-kernel, def:uniform-schwartz}
+For every $m \in \N$, every multi-index $\alpha$ and every $j \in \N$ let
+$\theta^\alpha_j = (\eta_\alpha)_{2^j}$, and for all $k, l \in \N$ let
+$A^\alpha_{k,l} = \sup_x \|x\|^k \|D^l \eta_\alpha(x)\|$.
+\end{definition}
+
+\begin{lemma}[Frequencies of the derivative families]
+\label{lem:derivative-family-frequency}
+\lean{Rd.fourier_derivFamily, Rd.enorm_fourier_derivFamily_le}
+\leanok
+\uses{def:derivative-family, lem:fourier-dilate, lem:derivative-kernel, lem:psi-one,
+  lem:derivative-symbol}
+For every $m \in \N$, every multi-index $\alpha$, every $j \in \N$ and every $\xi \in V$,
+\[
+  \widehat{\theta^\alpha_j}(\xi) = \sigma_\alpha(2^{-j} \xi) \, \widehat{\psi_{j+1}}(\xi)
+  \quad \text{and} \quad
+  |\widehat{\theta^\alpha_j}(\xi)| \leq |\widehat{\psi_{j+1}}(\xi)| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The identity follows from \Cref{lem:fourier-dilate}, \Cref{lem:derivative-kernel} and
+\Cref{lem:psi-one}. Where $\widehat{\psi_{j+1}}(\xi) = \widehat{\psi_1}(2^{-j} \xi) \neq 0$,
+$\|2^{-j} \xi\| > 1$ (\Cref{lem:psi-one}), so $|\sigma_\alpha(2^{-j} \xi)| \leq 1$
+(\Cref{lem:derivative-symbol}).
+\end{proof}
+
+\begin{theorem}[The derivative families form Calder\'on--Zygmund families]
+\label{thm:cz-family-derivative}
+\lean{Rd.tsum_fourier_derivFamily_sq_le, Rd.isUniformSchwartz_derivKernel,
+  Rd.isCZFamily_derivFamily}
+\leanok
+\uses{lem:derivative-family-frequency, thm:cz-family-psi, def:derivative-family,
+  lem:uniform-schwartz-constants, thm:cz-family-dilation, def:hormander-const}
+For every $m \in \N$, every multi-index $\alpha$ and every $\xi \in V$,
+$\sum_j |\widehat{\theta^\alpha_j}(\xi)|^2 \leq 2$. The constant family $(\eta_\alpha)_j$ is
+uniformly Schwartz with bounds $A^\alpha$, and $(\theta^\alpha_j)_j$ is a Calder\'on--Zygmund
+family with overlap $2$ and H\"ormander constant $4 H_{A^\alpha}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:derivative-family-frequency},
+$\sum_j |\widehat{\theta^\alpha_j}(\xi)|^2 \leq \sum_j |\widehat{\psi_{j+1}}(\xi)|^2 \leq 2$
+(\Cref{thm:cz-family-psi}). The bounds are the seminorms of $\eta_\alpha$ themselves
+(\Cref{lem:uniform-schwartz-constants}), and \Cref{thm:cz-family-dilation} gives the rest.
+\end{proof}
+
+\paragraph{The dual derivative families.}
+
+\begin{definition}[Dual derivative families]
+\label{def:dual-derivative-family}
+\lean{Rd.derivDualBase, Rd.derivDualFamily, Rd.derivDualBound, Rd.derivDualOverlap,
+  Rd.derivDualOverlap_ne_top}
+\leanok
+\uses{def:psi-dual, def:schwartz-dilate}
+For every $k \in \N$, all $w \in V^k$ and every $j \in \N$ let
+$\tilde G^w_j = \partial^w \tilde G_j$ and $\tilde\theta^w_j = (\tilde G^w_j)_{2^j}$. For all
+$a, l \in \N$ let $\tilde A^w_{a,l}$ be the larger of the seminorms
+$\sup_x \|x\|^a \|D^l \tilde G^w_0(x)\|$ and $\sup_x \|x\|^a \|D^l \tilde G^w_2(x)\|$, and let
+\[
+  B_w = 4 \Bigl( (8\pi)^k \prod_{l < k} \|w_l\| \Bigr)^2 ,
+\]
+which is finite.
+\end{definition}
+
+\begin{lemma}[Derivatives of the synthesis kernels]
+\label{lem:psi-dual-derivatives}
+\lean{Rd.psiDualS, Rd.coe_psiDualS, Rd.iteratedLineDerivOp_psiDualS,
+  Rd.isUniformSchwartz_derivDualBase}
+\leanok
+\uses{def:dual-derivative-family, lem:psi-dual-basic, lem:derivative-dilate,
+  lem:uniform-schwartz-constants}
+For every $j \in \N$, the synthesis kernel $\tilde\psi_j$ is the Schwartz function
+$(\tilde G_j)_{2^j}$. For every $k \in \N$, all $w \in V^k$ and every $j \in \N$,
+\[
+  \partial^w \tilde\psi_j = 2^{jk} \, \tilde\theta^w_j ,
+\]
+and $(\tilde G^w_j)_j$ is uniformly Schwartz with bounds $\tilde A^w$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\tilde\psi_j = (\tilde G_j)_{2^j}$ (\Cref{lem:psi-dual-basic}), and \Cref{lem:derivative-dilate}
+with $c = 2^j$ gives the identity. The family $(\tilde G^w_j)_j$ takes the two values
+$\tilde G^w_0$ and $\tilde G^w_2$ (\Cref{lem:uniform-schwartz-constants}).
+\end{proof}
+
+\begin{lemma}[Frequencies of the dual derivative families]
+\label{lem:dual-derivative-frequency}
+\lean{Rd.fourier_derivDualFamily, Rd.enorm_prod_inner_le, Rd.enorm_fourier_derivDualFamily_le}
+\leanok
+\uses{def:dual-derivative-family, lem:fourier-dilate, lem:fourier-iterated-derivative,
+  lem:psi-dual-basic, lem:psi-dual-frequency}
+Let $k \in \N$ and $w \in V^k$. For every real $R$ and every $\zeta \in V$ with
+$\|\zeta\| \leq R$,
+$|\prod_{l < k} 2\pi i \langle \zeta, w_l \rangle| \leq (2\pi R)^k \prod_{l < k} \|w_l\|$. For every
+$j \in \N$ and every $\xi \in V$,
+\[
+  \widehat{\tilde\theta^w_j}(\xi) = \Bigl( \prod_{l < k} 2\pi i \langle 2^{-j} \xi, w_l \rangle
+  \Bigr) \widehat{\tilde\psi_j}(\xi)
+\]
+and
+\[
+  |\widehat{\tilde\theta^w_j}(\xi)| \leq (8\pi)^k \Bigl( \prod_{l < k} \|w_l\| \Bigr)
+  |\widehat{\tilde\psi_j}(\xi)| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first bound is the Cauchy--Schwarz inequality
+$|\langle \zeta, w_l \rangle| \leq \|\zeta\| \|w_l\|$. The identity follows from
+\Cref{lem:fourier-dilate}, \Cref{lem:fourier-iterated-derivative} and
+$\tilde\psi_j = (\tilde G_j)_{2^j}$ (\Cref{lem:psi-dual-basic}). Where
+$\widehat{\tilde\psi_j}(\xi) \neq 0$, $\|\xi\| < 2^{j+2}$ (\Cref{lem:psi-dual-frequency}), so
+$\|2^{-j} \xi\| < 4$ and the first bound with $R = 4$ applies.
+\end{proof}
+
+\begin{theorem}[The dual derivative families form Calder\'on--Zygmund families]
+\label{thm:cz-family-dual-derivative}
+\lean{Rd.tsum_fourier_derivDualFamily_sq_le, Rd.isCZFamily_derivDualFamily}
+\leanok
+\uses{lem:dual-derivative-frequency, thm:cz-family-psi-dual, lem:psi-dual-derivatives,
+  thm:cz-family-dilation, def:hormander-const}
+For every $k \in \N$, all $w \in V^k$ and every $\xi \in V$,
+$\sum_j |\widehat{\tilde\theta^w_j}(\xi)|^2 \leq B_w$, and $(\tilde\theta^w_j)_j$ is a
+Calder\'on--Zygmund family with overlap $B_w$ and H\"ormander constant $4 H_{\tilde A^w}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:dual-derivative-frequency},
+$\sum_j |\widehat{\tilde\theta^w_j}(\xi)|^2 \leq ((8\pi)^k \prod_l \|w_l\|)^2
+\sum_j |\widehat{\tilde\psi_j}(\xi)|^2$, and the last sum is at most $4$
+(\Cref{thm:cz-family-psi-dual}). \Cref{thm:cz-family-dilation} and
+\Cref{lem:psi-dual-derivatives} give the rest.
+\end{proof}
+
+\section{Sobolev spaces as Triebel--Lizorkin spaces}
+\label{sec:sobolev-triebel-lizorkin}
+
+Let $n \geq 1$ and $1 < p < \infty$. This section proves $\Sob{m}{p}(V) = \TL{m}{p}{2}$ for every
+$m \in \N$, with named constants in both directions, formulas in the Schwartz seminorms of fixed
+kernels that are proved finite. For $f \in \Sob{m}{p}(V)$, the blocks
+$2^{jm} \psi_{j+1} * f$ are sums of convolutions of the weak derivatives of order $m$ with the
+dilated derivative kernels (\Cref{cor:psi-derivatives-dilated}), and the analysis bound of their
+Calder\'on--Zygmund families gives $f \in \TL{m}{p}{2}$. Conversely, for $f \in \TL{k}{p}{2}$ and
+$w \in V^k$, the derivatives $\sum_{j < J} (\partial^w \tilde\psi_j) * (\psi_j * f)$
+of the reproducing sums converge in $L_p(V)$ by the synthesis bound of the dual derivative
+families (\Cref{thm:cz-family-dual-derivative}), and their limit is $\partial^w f$. With the
+Besov sandwich (\Cref{thm:tl-besov-sandwich}) this places $\Sob{m}{p}(V)$ between
+$\Besov{m}{p}{\min(p,2)}$ and $\Besov{m}{p}{\max(p,2)}$ for $m \geq 1$. The identity
+$\Sob{m}{p}(V) = \TL{m}{p}{2}$ is classical; see Triebel~\cite{Triebel}. In this section
+$e_\alpha$, $\eta_\alpha$, $\theta^\alpha_j$ and $\tilde\theta^w_j$ are those of
+\Cref{sec:derivative-kernels}.
+
+\paragraph{From weak derivatives to the blocks.}
+
+\begin{definition}[The constants of the embedding into $\TL{m}{p}{2}$]
+\label{def:sobolev-to-tl-const}
+\lean{Rd.sobolevToTLConst, Rd.sobolevToTLConst_ne_top}
+\leanok
+\uses{def:cz-const, def:hormander-const, def:derivative-family}
+For $1 < p < \infty$, every $m \in \N$ and every multi-index $\alpha$,
+\[
+  K_{V,p,\alpha} = S_{V,p}\bigl(2, 4 H_{A^\alpha}\bigr) ,
+\]
+which is finite.
+\end{definition}
+
+\begin{lemma}[The blocks as convolutions with the derivatives]
+\label{lem:blocks-as-derivative-convolutions}
+\lean{Rd.enorm_two_pow_complex, Rd.two_pow_mul_blockFun_succ_ae,
+  Rd.lqNorm_blockFun_succ_le_sum_ae}
+\leanok
+\uses{cor:psi-derivatives-dilated, thm:weak-derivative-convolution, lem:averaged-differences,
+  def:derivative-family, def:triebel-lizorkin, lem:dyadic-weights-integer, lem:lq-basic,
+  lem:countable-minkowski}
+For every $l \in \N$, the complex number $2^l$ has absolute value $|2^l| = 2^l$.
+Let $1 \leq p < \infty$, $m \in \N$ and $f \in L_p(V)$, and for every multi-index $\alpha$ let
+$g_\alpha \in L_p(V)$ be the weak derivative $\partial^{e_\alpha} f$ on $V$. For almost every
+$x \in V$ and every $j \in \N$,
+\[
+  2^{jm} (\psi_{j+1} * f)(x) = \sum_\alpha (\theta^\alpha_j * g_\alpha)(x) ,
+\]
+and for almost every $x \in V$,
+\[
+  \bigl\| (2^{(j+1)m} |(\psi_{j+1} * f)(x)|)_j \bigr\|_{\ell_2}
+  \leq 2^m \sum_\alpha \bigl\| ((\theta^\alpha_j * g_\alpha)(x))_j \bigr\|_{\ell_2} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{cor:psi-derivatives-dilated}, $2^{jm} \psi_{j+1} * f$ is the convolution of $f$ with
+$\sum_\alpha \partial^{e_\alpha} \theta^\alpha_j$, which is
+$\sum_\alpha (\partial^{e_\alpha} \theta^\alpha_j) * f$ almost everywhere
+(\Cref{lem:averaged-differences}); each term is $\theta^\alpha_j * g_\alpha$ at every point
+(\Cref{thm:weak-derivative-convolution}). For the bound,
+$2^{(j+1)m} = 2^m 2^{jm}$ (\Cref{lem:dyadic-weights-integer}) and $|2^{jm}| = 2^{jm}$ in $\C$;
+the triangle inequality in $\C$,
+the homogeneity of the $\ell_2$ norm and Minkowski's inequality for finite sums
+(\Cref{lem:lq-basic}, \Cref{lem:countable-minkowski}) give the claim.
+\end{proof}
+
+\begin{theorem}[$\Sob{m}{p} \subseteq \TL{m}{p}{2}$]
+\label{thm:sobolev-to-triebel-lizorkin}
+\lean{Rd.eLpNorm_lqNorm_blockFun_succ_le, Rd.triebelLizorkinNorm_le_of_hasWeakLineDeriv,
+  Rd.memTriebelLizorkin_of_hasWeakLineDeriv, Rd.memTriebelLizorkin_of_memSobolev}
+\leanok
+\uses{lem:blocks-as-derivative-convolutions, def:sobolev-to-tl-const, thm:cz-family-derivative,
+  thm:vector-valued-strong-type, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-nonnegative,
+  def:weak-line-derivative, lem:weak-derivative-basic}
+Let $n \geq 1$, $1 < p < \infty$, $m \in \N$ and $f \in L_p(V)$, and for every multi-index
+$\alpha$ let $g_\alpha \in L_p(V)$ be the weak derivative $\partial^{e_\alpha} f$ on $V$. Then
+\[
+  \bigl\| \|(2^{(j+1)m} |(\psi_{j+1} * f)(x)|)_j\|_{\ell_2} \bigr\|_p
+  \leq 2^m \sum_\alpha K_{V,p,\alpha} \|g_\alpha\|_p
+\]
+and
+\[
+  \|f\|_{\TL{m}{p}{2}} \leq \|\Phi\|_1 \, \|f\|_p + 2^m \sum_\alpha K_{V,p,\alpha} \,
+  \|g_\alpha\|_p .
+\]
+In particular, $f \in \TL{m}{p}{2}$, and every $f \in \Sob{m}{p}(V)$ lies in $\TL{m}{p}{2}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For the first bound, take the $L_p$ norm in \Cref{lem:blocks-as-derivative-convolutions}, use
+the homogeneity of the $L_p$ norm (\Cref{lem:lp-norm-nonnegative}) and Minkowski's inequality in
+$L_p$, and bound each term by the strong type of the analysis operator
+(\Cref{thm:vector-valued-strong-type}) of the Calder\'on--Zygmund family $(\theta^\alpha_j)_j$
+with overlap $2$ and H\"ormander constant $4 H_{A^\alpha}$ (\Cref{thm:cz-family-derivative}).
+Splitting off the block $j = 0$ from the $\ell_2$ norm (\Cref{lem:lq-basic}), the triangle
+inequality in $L_p$ and $\|\psi_0 * f\|_p \leq \|\Phi\|_1 \, \|f\|_p$
+(\Cref{lem:tl-pointwise-blocks}) give the second bound.
+For $f \in \Sob{m}{p}(V)$ the weak derivatives $\partial^{e_\alpha} f$ exist in $L_p(V)$
+(\Cref{lem:weak-derivative-basic}), and the right side is finite.
+\end{proof}
+
+\paragraph{From the blocks to weak derivatives.}
+
+\begin{definition}[The constants of the embedding into $\Sob{m}{p}$]
+\label{def:tl-to-sobolev-const}
+\lean{Rd.tlToSobolevConst, Rd.tlToSobolevConst_ne_top}
+\leanok
+\uses{def:cz-const, def:hormander-const, def:dual-derivative-family}
+For $1 < p < \infty$, every $k \in \N$ and all $w \in V^k$,
+\[
+  C_{V,p,w} = S_{V,p}\bigl(B_w, 4 H_{\tilde A^w}\bigr) ,
+\]
+which is finite.
+\end{definition}
+
+\begin{lemma}[The weighted blocks and their tails]
+\label{lem:weighted-block-tails}
+\lean{Rd.eLpNorm_lqNorm_ite_blockFun_le, Rd.tendsto_eLpNorm_lqNorm_blockFun_tail}
+\leanok
+\uses{def:triebel-lizorkin, lem:mixed-norm-tails}
+Let $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p(V)$. For every set
+$P \subseteq \N$,
+\[
+  \bigl\| \|(\mathbf 1_P(j) \, 2^{js} |(\psi_j * f)(x)|)_j\|_{\ell_q} \bigr\|_p
+  \leq \|f\|_{\TL{s}{p}{q}} .
+\]
+If $q < \infty$ and $f \in \TL{s}{p}{q}$, then
+\[
+  \bigl\| \|(2^{js} |(\psi_j * f)(x)|)_{j \geq N}\|_{\ell_q} \bigr\|_p \to 0 \qquad
+  (N \to \infty) ,
+\]
+where the $\ell_q$ norm is taken of the sequence with the terms $j < N$ replaced by $0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both claims are \Cref{lem:mixed-norm-tails} for the functions
+$g_j = 2^{js} |\psi_j * f|$, whose mixed norm is $\|f\|_{\TL{s}{p}{q}}$
+(\Cref{def:triebel-lizorkin}).
+\end{proof}
+
+\begin{lemma}[The synthesis bound for derivatives of the synthesis kernels]
+\label{lem:derivative-synthesis-bound}
+\lean{Rd.eLpNorm_sum_conv_derivDual_le, Rd.derivSynthesisSum, Rd.memLp_derivSynthesisSum,
+  Rd.eLpNorm_derivSynthesisSum_sub_le}
+\leanok
+\uses{def:tl-to-sobolev-const, lem:psi-dual-derivatives, thm:cz-family-dual-derivative,
+  thm:vector-valued-strong-type, lem:tl-pointwise-blocks, thm:young,
+  lem:blocks-as-derivative-convolutions, lem:dyadic-weights-integer, lem:mixed-norm-tails}
+Let $n \geq 1$, $1 < p < \infty$, $k \in \N$, $w \in V^k$ and $f \in L_p(V)$. For every finite
+set $s \subseteq \N$,
+\begin{multline*}
+  \Bigl\| \sum_{j \in s} (\partial^w \tilde\psi_j) * (\psi_j * f) \Bigr\|_p \\
+  \leq C_{V,p,w} \, \bigl\| \|(\mathbf 1_s(j) \, 2^{jk} |(\psi_j * f)(x)|)_j\|_{\ell_2}
+  \bigr\|_p .
+\end{multline*}
+The partial sums $D_J = \sum_{j < J} (\partial^w \tilde\psi_j) * (\psi_j * f)$ lie in $L_p(V)$,
+and for all $N \leq N'$,
+\[
+  \|D_{N'} - D_N\|_p \leq C_{V,p,w} \,
+  \bigl\| \|(2^{jk} |(\psi_j * f)(x)|)_{j \geq N}\|_{\ell_2} \bigr\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\partial^w \tilde\psi_j = 2^{jk} \tilde\theta^w_j$ (\Cref{lem:psi-dual-derivatives}), so the
+sum is $\sum_{j \in s} \tilde\theta^w_j * h_j$ with $h_j = \mathbf 1_s(j) 2^{jk} \psi_j * f$,
+which lie in $L_p(V)$ (\Cref{lem:tl-pointwise-blocks}). Since $|2^{jk}| = 2^{jk}$ in $\C$
+(\Cref{lem:blocks-as-derivative-convolutions}),
+$|h_j| = \mathbf 1_s(j) 2^{jk} |\psi_j * f|$, with the weight $2^{jk}$ of smoothness $k$
+(\Cref{lem:dyadic-weights-integer}). The strong type of the synthesis
+operators (\Cref{thm:vector-valued-strong-type}) of the Calder\'on--Zygmund family
+$(\tilde\theta^w_j)_j$ (\Cref{thm:cz-family-dual-derivative}) gives the first bound. The partial
+sums lie in $L_p(V)$ by Young's inequality (\Cref{thm:young}), and $D_{N'} - D_N$ is the sum over
+$s = \{N, \dots, N' - 1\}$, whose sequence is at most the tail from $N$; the measurability is
+\Cref{lem:mixed-norm-tails}.
+\end{proof}
+
+\begin{lemma}[The partial sums of the derivative]
+\label{lem:derivative-partial-sums}
+\lean{Rd.cauchySeq_toLp_derivSynthesisSum, Rd.hasWeakLineDeriv_sum_conv_psiDual}
+\leanok
+\uses{lem:derivative-synthesis-bound, lem:weighted-block-tails, thm:weak-derivative-convolution,
+  lem:weak-derivative-basic, lem:psi-dual-derivatives}
+Let $n \geq 1$, $1 < p < \infty$, $k \in \N$, $w \in V^k$ and $f \in L_p(V)$. For every
+$J \in \N$, $D_J$ is the weak derivative $\partial^w$ of $\sum_{j < J} \tilde\psi_j * (\psi_j * f)$
+on $V$. If $f \in \TL{k}{p}{2}$, then $(D_J)_J$ is a Cauchy sequence in $L_p(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Each term $(\partial^w \tilde\psi_j) * (\psi_j * f)$ is the weak derivative of
+$\tilde\psi_j * (\psi_j * f)$ (\Cref{thm:weak-derivative-convolution}), and weak derivatives
+add up (\Cref{lem:weak-derivative-basic}). By \Cref{lem:derivative-synthesis-bound},
+$\|D_{N'} - D_N\|_p$ is at most $C_{V,p,w}$ times the tail from $N$, which is finite and tends
+to zero (\Cref{lem:weighted-block-tails}).
+\end{proof}
+
+\begin{theorem}[$\TL{m}{p}{2} \subseteq \Sob{m}{p}$]
+\label{thm:triebel-lizorkin-to-sobolev}
+\lean{Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin,
+  Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin_of_le, Rd.memSobolev_of_memTriebelLizorkin}
+\leanok
+\uses{lem:derivative-partial-sums, lem:derivative-synthesis-bound, lem:weighted-block-tails,
+  lem:square-function-reproducing, thm:weak-derivative-limits, lem:weak-derivative-basic,
+  def:tl-to-sobolev-const, prop:tl-elementary}
+Let $n \geq 1$, $1 < p < \infty$, $k \in \N$ and $w \in V^k$. For every $f \in \TL{k}{p}{2}$ the
+weak derivative $\partial^w f$ exists on $V$ as a function $g \in L_p(V)$ with
+\[
+  \|g\|_p \leq C_{V,p,w} \, \|f\|_{\TL{k}{p}{2}} .
+\]
+For every $m \geq k$ and every $f \in \TL{m}{p}{2}$, the weak derivative $g = \partial^w f$
+satisfies $\|g\|_p \leq C_{V,p,w} \, \|f\|_{\TL{m}{p}{2}}$. In particular,
+$\TL{m}{p}{2} \subseteq \Sob{m}{p}(V)$ for every $m \in \N$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $g$ be the limit of the Cauchy sequence $(D_J)_J$ in $L_p(V)$
+(\Cref{lem:derivative-partial-sums}). The reproducing sums tend to $f$ in $L_p(V)$
+(\Cref{lem:square-function-reproducing}), and $D_J$ is their weak derivative $\partial^w$, so
+$g = \partial^w f$ weakly on $V$ (\Cref{thm:weak-derivative-limits}). By
+\Cref{lem:derivative-synthesis-bound} with $s = \{0, \dots, J - 1\}$ and
+\Cref{lem:weighted-block-tails}, $\|D_J\|_p \leq C_{V,p,w} \|f\|_{\TL{k}{p}{2}}$ for every $J$,
+and the bound passes to the limit. For $m \geq k$, $\TL{m}{p}{2} \subseteq \TL{k}{p}{2}$ with
+$\|f\|_{\TL{k}{p}{2}} \leq \|f\|_{\TL{m}{p}{2}}$ (\Cref{prop:tl-elementary}). The last claim is
+\Cref{lem:weak-derivative-basic}.
+\end{proof}
+
+\paragraph{Consequences.}
+
+\begin{corollary}[$\Sob{m}{p} = \TL{m}{p}{2}$]
+\label{cor:sobolev-triebel-lizorkin}
+\lean{Rd.memSobolev_iff_memTriebelLizorkin}
+\leanok
+\uses{thm:sobolev-to-triebel-lizorkin, thm:triebel-lizorkin-to-sobolev}
+For every $n \geq 1$, every $1 < p < \infty$, every $m \in \N$ and every $f \in L_p(V)$,
+$f \in \Sob{m}{p}(V)$ if and only if $f \in \TL{m}{p}{2}$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:sobolev-to-triebel-lizorkin} and \Cref{thm:triebel-lizorkin-to-sobolev}.
+\end{proof}
+
+For $m = 0$ both sides are all of $L_p(V)$; the case $m = 0$ of $\TL{m}{p}{2}$ is the square
+function theorem (\Cref{cor:square-function-theorem}).
+
+\begin{corollary}[The Besov sandwich for $\Sob{m}{p}$]
+\label{cor:sobolev-besov-sandwich}
+\lean{Rd.memTriebelLizorkin_two_of_memApprox, Rd.memApprox_of_memSobolev,
+  Rd.memSobolev_of_memApprox, Rd.approxNormDyadic_le_of_hasWeakLineDeriv,
+  Rd.exists_hasWeakLineDeriv_of_memApprox}
+\leanok
+\uses{cor:sobolev-triebel-lizorkin, thm:sobolev-to-triebel-lizorkin,
+  thm:triebel-lizorkin-to-sobolev, thm:tl-besov-sandwich, thm:square-function-upper}
+Let $n \geq 1$ and $1 < p < \infty$. For every $s \geq 0$,
+$\Besov{s}{p}{\min(p,2)} \subseteq \TL{s}{p}{2}$. For every $m \in \N$,
+\[
+  \Besov{m}{p}{\min(p,2)} \subseteq \Sob{m}{p}(V) ,
+\]
+and for every $m \geq 1$,
+\[
+  \Sob{m}{p}(V) \subseteq \Besov{m}{p}{\max(p,2)} .
+\]
+For every $m \geq 1$ and every $f \in L_p(V)$ with weak derivatives
+$g_\alpha = \partial^{e_\alpha} f \in L_p(V)$ for every multi-index $\alpha$ of length $m$,
+\[
+  \|f\|^{\mathrm{dy}}_{A^m_{\max(p,2)}} \leq 2 (1 - 2^{-m})^{-1}
+  \Bigl( \|\Phi\|_1 \, \|f\|_p + 2^m \sum_\alpha K_{V,p,\alpha} \, \|g_\alpha\|_p \Bigr) .
+\]
+For every $m \in \N$, every $f \in \Besov{m}{p}{\min(p,2)}$, every $k \leq m$ and all
+$w \in V^k$, the weak derivative $\partial^w f$ is a function $g \in L_p(V)$ with
+\[
+  \|g\|_p \leq C_{V,p,w} \cdot 8 \cdot 8^m \, \|\Phi\|_1 \, \|f\|^{\mathrm{dy}}_{A^m_{\min(p,2)}} .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+For $s > 0$ the first inclusion is the Besov sandwich for $q = 2$ (\Cref{thm:tl-besov-sandwich});
+for $s = 0$ it holds since $\TL{0}{p}{2} = L_p(V)$ (\Cref{thm:square-function-upper}). With
+\Cref{cor:sobolev-triebel-lizorkin} it gives the second inclusion, and the Besov sandwich for
+$s = m > 0$ gives the third. The bounds combine \Cref{thm:sobolev-to-triebel-lizorkin} and
+\Cref{thm:triebel-lizorkin-to-sobolev} with the bounds of \Cref{thm:tl-besov-sandwich}.
+\end{proof}
+
+\begin{corollary}[$\Sob{m}{2} = \Besov{m}{2}{2}$]
+\label{cor:sobolev-integer-two-besov}
+\lean{Rd.memSobolev_two_iff_memApprox}
+\leanok
+\uses{cor:sobolev-triebel-lizorkin, thm:tl-diagonal}
+For every $n \geq 1$, every $m \geq 1$ and every $f \in L_2(V)$, $f \in \Sob{m}{2}(V)$ if and
+only if $f \in \Besov{m}{2}{2}$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{cor:sobolev-triebel-lizorkin} and $\TL{m}{2}{2} = \Besov{m}{2}{2}$ (\Cref{thm:tl-diagonal}).
+\end{proof}
+
+This extends \Cref{thm:sobolev-one-two-besov}, the case $m = 1$ (in every dimension), to every
+order $m$ when $n \geq 1$.
+
+\section{Sobolev embeddings}
+\label{sec:sobolev-embedding}
+
+Let $1 \leq p < \infty$ and, for $p \leq r \leq \infty$, let
+$\alpha(n, p, r) = n (1/p - 1/r)$ be the Nikolskii exponent of \Cref{def:nikolskii-property}
+with $D = n$, so that $\alpha(n, p, \infty) = n/p$. This section proves the embeddings of
+$\Besov{s}{p}{q}$ into $L_r(V)$ for $s > \alpha(n, p, r)$ and into the bounded continuous
+functions for $s > n/p$, directly from the Littlewood--Paley blocks: a block is band-limited, so
+its supremum is at most $N_p 2^{jn/p}$ times its $L_p$ norm (\Cref{def:nikolskii-block-const}),
+and interpolation gives the Nikolskii inequality
+$\|\psi_j * f\|_r \lesssim 2^{j \alpha(n,p,r)} \|\psi_j * f\|_p$. For $s > \alpha$
+the series $\sum_j \psi_j * f$ then converges absolutely in $L_r(V)$, and for $s > n/p$ uniformly.
+With the bound of $\|f\|_{\TL{m}{p}{2}}$ by the weak derivatives
+(\Cref{thm:sobolev-to-triebel-lizorkin}) and $\Sob{m}{p}(V) \subseteq \Besov{m}{p}{\max(p,2)}$
+(\Cref{cor:sobolev-besov-sandwich}) this gives the Sobolev embeddings
+$\Sob{m}{p}(V) \hookrightarrow L_r(V)$ for $m > n(1/p - 1/r)$ and
+$\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, with named constants, formulas in norms
+and Schwartz seminorms of fixed kernels that are proved finite. These embeddings are classical;
+see Nikol'ski\u{\i}~\cite{Nikolskii} and Triebel~\cite{Triebel}.
+
+\paragraph{Continuity of the blocks.}
+
+\begin{lemma}[Convolutions with integrable bounded kernels]
+\label{lem:bounded-kernel-conv-continuous}
+\lean{Rd.integrable_mul_sub_of_enorm_le, Rd.conv_sub_apply_of_enorm_le,
+  Rd.continuous_conv_of_enorm_le, Rd.continuous_conv_schwartz, Rd.coe_schwartzDilate_psiBase,
+  Rd.coe_schwartzDilate_bandKernelS, Rd.continuous_blockFun}
+\leanok
+\uses{def:conv, lem:conv-pointwise-bound, lem:lp-interpolation, lem:schwartz-decay,
+  def:schwartz-dilate, lem:psi-base, def:lp-kernels, def:triebel-lizorkin}
+Let $1 \leq p \leq \infty$, let $K : V \to \C$ be integrable with $|K(y)| \leq B$ for all
+$y \in V$ and some $B < \infty$, and let $f, g \in L_p(V)$. For every $x \in V$ the function
+$y \mapsto K(y) f(x - y)$ is integrable, and
+\[
+  (K * f)(x) - (K * g)(x) = (K * (f - g))(x) .
+\]
+If $p < \infty$, then $K * f$ is continuous; in particular $G * f$ is continuous for every
+$G \in \mathcal S(V)$. For every $j \in \N$, $\psi_j$ and $\Theta_j$ are Schwartz functions: the
+Schwartz dilations $(G^{\psi}_j)_{2^j}$ and $\Theta_{2^j}$ of \Cref{def:schwartz-dilate}. For
+every $1 \leq p < \infty$, every $f \in L_p(V)$ and every $j \in \N$ the block $\psi_j * f$ is
+continuous.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Since $K \in L_1$ and $|K| \leq B$, $K \in L_{p'}$ (\Cref{lem:lp-interpolation}), so the integrand
+is integrable by H\"older's inequality, and the identity is the linearity of the integral. For
+$p < \infty$ choose continuous functions $g_k$ with compact support and
+$\|f - g_k\|_p \leq 1/k$ (Mathlib's density theorem); each $K * g_k$ is continuous.
+\Cref{lem:conv-pointwise-bound} gives
+$|(K * f)(x) - (K * g_k)(x)| \leq \|K\|_1^{1-1/p} B^{1/p} / k$ for every $x$, so $K * g_k \to K * f$
+uniformly and $K * f$ is continuous. A Schwartz function $G$ is integrable and bounded by its
+decay constant (\Cref{lem:schwartz-decay}). The kernels $\psi_j$ and $\Theta_j$ are dilations of
+Schwartz functions (\Cref{def:schwartz-dilate}, \Cref{lem:psi-base}, \Cref{def:lp-kernels}).
+\end{proof}
+
+\paragraph{The Nikolskii inequality for blocks.}
+
+\begin{definition}[The Nikolskii constant of the blocks]
+\label{def:nikolskii-block-const}
+\lean{Rd.iSup_enorm_bandKernel_lt_top, Rd.nikolskiiBlockConst, Rd.nikolskiiBlockConst_ne_top}
+\leanok
+\uses{def:lp-kernels, lem:lp-kernels-basic, lem:conv-pointwise-bound}
+For $1 \leq p \leq \infty$,
+\[
+  N_p = \|\Theta\|_1^{1 - 1/p} \, \bigl(\sup |\Theta|\bigr)^{1/p} ,
+\]
+with $1/\infty = 0$. The supremum $\sup |\Theta|$ and $N_p$ are finite.
+\end{definition}
+
+\begin{lemma}[The blocks are band-limited at every point]
+\label{lem:blocks-band-limited-pointwise}
+\lean{Rd.enorm_Theta_le, Rd.conv_Theta_blockFun}
+\leanok
+\uses{def:lp-kernels, lem:lp-kernels-basic, lem:schwartz-decay, thm:kernel-identities,
+  lem:conv-assoc, lem:bounded-kernel-conv-continuous, lem:tl-pointwise-blocks}
+For every $j \in \N$ and every $y \in V$, $|\Theta_j(y)| \leq 2^{jn} \sup |\Theta|$. For every
+$1 \leq p < \infty$, every $f \in L_p(V)$, every $j \in \N$ and every $x \in V$,
+\[
+  (\Theta_j * (\psi_j * f))(x) = (\psi_j * f)(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\Theta_j(y) = 2^{jn} \Theta(2^j y)$. Almost everywhere,
+$\Theta_j * (\psi_j * f) = (\Theta_j * \psi_j) * f = \psi_j * f$ by \Cref{lem:conv-assoc} and
+\Cref{thm:kernel-identities}. Both sides are continuous (\Cref{lem:bounded-kernel-conv-continuous},
+with $\psi_j * f \in L_p$ by \Cref{lem:tl-pointwise-blocks}), and continuous functions that agree
+almost everywhere agree everywhere.
+\end{proof}
+
+\begin{theorem}[The Nikolskii inequality for blocks]
+\label{thm:nikolskii-blocks}
+\lean{Rd.enorm_blockFun_le_nikolskii, Rd.eLpNorm_blockFun_le_nikolskii,
+  Rd.memLp_blockFun_of_le}
+\leanok
+\uses{def:nikolskii-block-const, lem:blocks-band-limited-pointwise, lem:conv-pointwise-bound,
+  lem:lp-kernels-basic, lem:lp-interpolation, def:nikolskii-property, def:lq-norm,
+  lem:tl-pointwise-blocks}
+Let $1 \leq p < \infty$ and $f \in L_p(V)$. For every $j \in \N$ and every $x \in V$,
+\[
+  |(\psi_j * f)(x)| \leq N_p \, 2^{jn/p} \, \|\psi_j * f\|_p ,
+\]
+and for every $p \leq r \leq \infty$,
+\[
+  \|\psi_j * f\|_r \leq N_p^{1 - p/r} \, 2^{j \alpha(n, p, r)} \, \|\psi_j * f\|_p ;
+\]
+in particular $\psi_j * f \in L_r(V)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:blocks-band-limited-pointwise}, $\psi_j * f = \Theta_j * (\psi_j * f)$ at every
+point, and \Cref{lem:conv-pointwise-bound} with $\|\Theta_j\|_1 = \|\Theta\|_1$
+(\Cref{lem:lp-kernels-basic}) and $B = 2^{jn} \sup |\Theta|$ gives the first bound, since
+$(2^{jn})^{1/p} = 2^{jn/p}$. For $r = \infty$ the first bound is the second. For $r < \infty$,
+interpolation (\Cref{lem:lp-interpolation}) with $M = N_p 2^{jn/p} \|\psi_j * f\|_p$ gives
+$\|\psi_j * f\|_r \leq M^{1 - p/r} \|\psi_j * f\|_p^{p/r}$, and
+$(n/p)(1 - p/r) = \alpha(n, p, r)$.
+\end{proof}
+
+\paragraph{Besov embeddings.}
+
+\begin{lemma}[The series of the blocks converges almost everywhere]
+\label{lem:blocks-ae-convergence}
+\lean{Rd.ae_hasSum_blockFun}
+\leanok
+\uses{def:lp-blocks, def:lq-norm, lem:hardy, lem:lp-blocks, def:triebel-lizorkin}
+Let $1 \leq p < \infty$, $s > 0$, $1 \leq q \leq \infty$ and $f \in L_p(V)$ with
+$\|f\|^{\mathrm{LP}}_{s,q} < \infty$. Then for almost every $x \in V$,
+\[
+  \sum_{j=0}^\infty (\psi_j * f)(x) = f(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\sum_j \|\Delta_j f\|_p \leq (1 - 2^{-s})^{-1} \|f\|^{\mathrm{LP}}_{s,q} < \infty$
+(\Cref{lem:hardy}), and $\sum_j \Delta_j f = f$ in $L_p$ (\Cref{lem:lp-blocks}). A series that
+converges absolutely in $L_p$ converges almost everywhere to its sum (Mathlib's
+\texttt{MeasureTheory.\allowbreak Lp.\allowbreak hasSum\_\allowbreak coeFn\_\allowbreak tsum}),
+and $\Delta_j f = \psi_j * f$ almost everywhere (\Cref{def:triebel-lizorkin}).
+\end{proof}
+
+\begin{definition}[The constant of the Besov embedding]
+\label{def:besov-embedding-const}
+\lean{Rd.besovEmbeddingConst, Rd.besovEmbeddingConst_ne_top}
+\leanok
+\uses{def:nikolskii-block-const, def:nikolskii-property}
+For $1 \leq p \leq r \leq \infty$ and $s \in \R$,
+\[
+  K_{V,p,r,s} = N_p^{1 - p/r} \, \bigl(1 - 2^{-(s - \alpha(n, p, r))}\bigr)^{-1} ,
+\]
+which is finite for $s > \alpha(n, p, r)$.
+\end{definition}
+
+\begin{lemma}[The Nikolskii bounds are summable]
+\label{lem:nikolskii-blocks-summable}
+\lean{Rd.tsum_nikolskii_le, Rd.tsum_eLpNorm_blockFun_le}
+\leanok
+\uses{def:besov-embedding-const, thm:nikolskii-blocks, lem:hardy, def:lq-norm, def:lp-blocks,
+  def:triebel-lizorkin}
+Let $1 \leq p \leq r \leq \infty$, $p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and
+$f \in L_p(V)$. Then
+\[
+  \sum_{j=0}^\infty \|\psi_j * f\|_r
+  \leq \sum_{j=0}^\infty N_p^{1 - p/r} \, 2^{j \alpha(n,p,r)} \, \|\psi_j * f\|_p
+  \leq K_{V,p,r,s} \, \|f\|^{\mathrm{LP}}_{s,q} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first inequality is \Cref{thm:nikolskii-blocks}. For the second, with
+$\alpha = \alpha(n, p, r)$, $2^{j(s - \alpha)} 2^{j\alpha} = 2^{js}$ and
+$\|\psi_j * f\|_p = \|\Delta_j f\|_p$, so \Cref{lem:hardy} for the sequence
+$(2^{j\alpha} \|\psi_j * f\|_p)_j$ and the weight $2^{j(s-\alpha)}$ gives the bound.
+\end{proof}
+
+\begin{theorem}[The Besov embedding into $L_r$]
+\label{thm:besov-embedding-rd}
+\lean{Rd.exists_memLp_ae_eq_of_memApprox}
+\leanok
+\uses{lem:nikolskii-blocks-summable, thm:nikolskii-blocks, lem:blocks-ae-convergence,
+  def:besov-embedding-const, thm:lp-band, def:nikolskii-property}
+Let $1 \leq p \leq r \leq \infty$, $p < \infty$, $s > \alpha(n, p, r)$ and $1 \leq q \leq \infty$.
+For every $f \in \Besov{s}{p}{q}$ there is $g \in L_r(V)$ with $g = f$ almost everywhere and
+\[
+  \|g\|_r \leq K_{V,p,r,s} \, \|f\|^{\mathrm{LP}}_{s,q} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Since $\alpha(n, p, r) \geq 0$, $s > 0$, and $\|f\|^{\mathrm{LP}}_{s,q} < \infty$
+(\Cref{thm:lp-band}). The blocks lie in $L_r(V)$ (\Cref{thm:nikolskii-blocks}), and the series of
+their $L_r$ norms is at most $K_{V,p,r,s} \|f\|^{\mathrm{LP}}_{s,q} < \infty$
+(\Cref{lem:nikolskii-blocks-summable}). So $\sum_j \psi_j * f$ converges absolutely in $L_r(V)$
+to some $g$ with $\|g\|_r \leq K_{V,p,r,s} \|f\|^{\mathrm{LP}}_{s,q}$, and almost everywhere to
+$g$. By \Cref{lem:blocks-ae-convergence} it converges almost everywhere to $f$, so $g = f$ almost
+everywhere.
+\end{proof}
+
+\begin{theorem}[The Besov embedding into bounded continuous functions]
+\label{thm:besov-embedding-bounded-continuous-rd}
+\lean{Rd.exists_boundedContinuous_ae_eq_of_memApprox}
+\leanok
+\uses{lem:nikolskii-blocks-summable, thm:nikolskii-blocks, lem:bounded-kernel-conv-continuous,
+  lem:blocks-ae-convergence, def:besov-embedding-const, thm:lp-band, def:nikolskii-property}
+Let $1 \leq p < \infty$, $s > n/p$ and $1 \leq q \leq \infty$. For every $f \in \Besov{s}{p}{q}$
+there is a bounded continuous function $a : V \to \C$ with $a = f$ almost everywhere and
+\[
+  \sup_{x \in V} |a(x)| \leq K_{V,p,\infty,s} \, \|f\|^{\mathrm{LP}}_{s,q} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+As before, $\|f\|^{\mathrm{LP}}_{s,q} < \infty$ (\Cref{thm:lp-band}). The blocks are continuous
+(\Cref{lem:bounded-kernel-conv-continuous}) and bounded at every point by
+$b_j = N_p 2^{jn/p} \|\psi_j * f\|_p$ (\Cref{thm:nikolskii-blocks}), and
+$\sum_j b_j \leq K_{V,p,\infty,s} \|f\|^{\mathrm{LP}}_{s,q} < \infty$
+(\Cref{lem:nikolskii-blocks-summable}). So $a(x) = \sum_j (\psi_j * f)(x)$ converges uniformly,
+$a$ is continuous with $|a(x)| \leq \sum_j b_j$ for every $x$ (Weierstrass' test, Mathlib's
+\texttt{continuous\_\allowbreak tsum}), so $\sup_{x \in V} |a(x)| \leq \sum_j b_j$, and $a = f$
+almost everywhere by \Cref{lem:blocks-ae-convergence}.
+\end{proof}
+
+\paragraph{Sobolev embeddings.}
+
+\begin{corollary}[Sobolev embeddings]
+\label{cor:sobolev-embedding}
+\lean{Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv,
+  Rd.exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv, Rd.exists_memLp_ae_eq_of_memSobolev,
+  Rd.exists_boundedContinuous_ae_eq_of_memSobolev}
+\leanok
+\uses{thm:sobolev-to-triebel-lizorkin, def:sobolev-to-tl-const, thm:tl-besov-sandwich,
+  cor:sobolev-besov-sandwich, thm:besov-embedding-rd, thm:besov-embedding-bounded-continuous-rd,
+  def:besov-embedding-const, def:nikolskii-property}
+Let $n \geq 1$, $1 < p < \infty$ and $m \in \N$, and let $f \in L_p(V)$ have the weak
+derivatives $g_\alpha = \partial^{e_\alpha} f \in L_p(V)$ of \Cref{thm:sobolev-to-triebel-lizorkin}
+for every multi-index $\alpha$ of order $m$. Put
+\[
+  M_f = \|\Phi\|_1 \, \|f\|_p + 2^m \sum_\alpha K_{V,p,\alpha} \, \|g_\alpha\|_p .
+\]
+\begin{enumerate}
+  \item For every $p \leq r \leq \infty$ with $m > n(1/p - 1/r)$ there is $u \in L_r(V)$ with
+    $u = f$ almost everywhere and $\|u\|_r \leq K_{V,p,r,m} \, M_f$.
+  \item If $m > n/p$, then there is a bounded continuous function $a : V \to \C$ with $a = f$
+    almost everywhere and $\sup_{x \in V} |a(x)| \leq K_{V,p,\infty,m} \, M_f$.
+\end{enumerate}
+In particular, for every $p \leq r \leq \infty$ with $m > n(1/p - 1/r)$, every
+$f \in \Sob{m}{p}(V)$ has a representative in $L_r(V)$, and if $m > n/p$, every
+$f \in \Sob{m}{p}(V)$ has a bounded continuous representative.
+\end{corollary}
+
+\begin{proof}
+\leanok
+In both cases $m > 0$, so $m \geq 1$. By \Cref{thm:sobolev-to-triebel-lizorkin},
+$f \in \TL{m}{p}{2}$ with $\|f\|_{\TL{m}{p}{2}} \leq M_f$, and \Cref{thm:tl-besov-sandwich} gives
+$f \in \Besov{m}{p}{\max(p,2)}$ with $\|f\|^{\mathrm{LP}}_{m,\max(p,2)} \leq M_f$.
+\Cref{thm:besov-embedding-rd} and \Cref{thm:besov-embedding-bounded-continuous-rd} with $s = m$
+and $q = \max(p, 2)$ give the claims. For $f \in \Sob{m}{p}(V)$,
+$f \in \Besov{m}{p}{\max(p,2)}$ by \Cref{cor:sobolev-besov-sandwich}.
+\end{proof}
+
+For $r < \infty$ the condition $m > n(1/p - 1/r)$ says $1/r > 1/p - m/n$. The critical case
+$1/r = 1/p - m/n$ with $m < n/p$, Sobolev's inequality
+$\|f\|_{r} \lesssim \|f\|_{\Sob{m}{p}}$, is not covered here.
+
+\chapter{Bessel potential spaces}
+\label{ch:bessel-potential-spaces}
+
+In this chapter $V$ is a finite-dimensional real inner product space of dimension $n \geq 1$
+with Lebesgue measure, and $1 < p < \infty$. It identifies Mathlib's Bessel potential spaces
+$H^{s,p}(V)$, the tempered distributions $f$ with $J_s f \in L_p(V)$, with the Triebel--Lizorkin
+spaces $\TL{s}{p}{2}$. \Cref{sec:bessel-kernels} shows that the Bessel potentials of the
+dilated Littlewood--Paley kernels are multiples of the dilates of Bessel kernels, which form
+uniform Schwartz families whose dilates are Calder\'on--Zygmund families (\Cref{def:cz-family});
+\Cref{sec:bessel-potential-lifting} proves $\TL{s}{p}{2} \subseteq H^{s,p}(V)$ for every real
+$s$, $H^{s,p}(V) = \TL{s}{p}{2}$ for $s \geq 0$, and Calder\'on's theorem
+$\Sob{m}{p}(V) = H^{m,p}(V)$ (\Cref{cor:sobolev-bessel}). The constants come from uniform
+Schwartz bounds and are existential.
+
+\section{Uniform Schwartz families and the Bessel kernels}
+\label{sec:bessel-kernels}
+
+The Bessel potential $J_\sigma$ on Schwartz functions (\Cref{def:bessel-schwartz}) multiplies
+the Fourier transform by the Bessel weight
+$\langle \xi \rangle^\sigma = (1 + \|\xi\|^2)^{\sigma/2}$ (\Cref{def:bessel-weight}). Since
+$1 + \|2^j \zeta\|^2 = 2^{2j} (2^{-2j} + \|\zeta\|^2)$, for every Schwartz function $\omega$ the
+Bessel potential of the dilate $\omega_{2^j}$ is $2^{j\sigma} (K_j)_{2^j}$ with the Bessel kernel
+$K_j = \mathcal F^{-1} \bigl( (2^{-2j} + \|\cdot\|^2)^{\sigma/2} \, \widehat\omega \bigr)$, also
+for Mathlib's Bessel potential on tempered distributions. Let now $\widehat\omega$ vanish outside
+an annulus $\{a \leq \|\zeta\| \leq b\}$ with $a > 0$, as for the block $\psi_1$ or the bases
+$G^{\psi}_{j+1}$ and $\tilde G_{j+2}$ of \Cref{def:psi-base} and \Cref{def:psi-dual}. The
+symbols $(\varepsilon + \|\zeta\|^2)^{\sigma/2}$, $0 < \varepsilon \leq 1$, have bounded
+derivatives on the annulus uniformly in $\varepsilon$, so the kernels $K_j$ form a uniform
+Schwartz family (\Cref{def:uniform-schwartz}), and their dilates form a Calder\'on--Zygmund family
+(\Cref{def:cz-family}) with an explicit overlap. The seminorm bounds of the family come from
+compactness and from the continuity of $\mathcal F^{-1}$ on Schwartz functions; they are
+existential. Write $\|G\|_{k,l} = \sup_x \|x\|^k \|D^l G(x)\|$ for the seminorms of a Schwartz
+function $G$.
+
+\paragraph{Uniform families under linear maps.}
+
+\begin{theorem}[Continuous linear maps preserve uniform families]
+\label{thm:uniform-schwartz-linear-map}
+\lean{Rd.exists_isUniformSchwartz_iff_isVonNBounded, Rd.IsUniformSchwartz.exists_map,
+  Rd.exists_isUniformSchwartz_fourierInv}
+\leanok
+\uses{def:uniform-schwartz}
+For every family $(G_j)_{j \in \N}$ of Schwartz functions $V \to \C$, there are bounds $A$ such
+that $(G_j)$ is uniformly Schwartz with bounds $A$ if and only if the set
+$\{G_j : j \in \N\}$ is bounded in $\mathcal S(V)$, that is, absorbed by every neighbourhood of
+$0$. For every uniform family $(G_j)$ and every continuous real-linear map $T$ of
+$\mathcal S(V)$ into itself, there are bounds $A'$ such that $(T G_j)$ is uniformly Schwartz with
+bounds $A'$. In particular, $(\mathcal F^{-1} G_j)$ is uniformly Schwartz with some bounds.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The topology of $\mathcal S(V)$ is generated by the seminorms $\|\cdot\|_{k,l}$, so a set is
+bounded exactly when every seminorm is bounded on it (Mathlib's
+\texttt{WithSeminorms.\allowbreak isVonNBounded\_\allowbreak iff\_\allowbreak
+seminorm\_\allowbreak bddAbove} with \texttt{schwartz\_\allowbreak withSeminorms}); this is the
+first claim. Continuous linear maps send bounded sets to bounded sets (Mathlib's
+\texttt{Bornology.\allowbreak IsVonNBounded.\allowbreak image}), and $\{T G_j : j \in \N\}$ is
+the image of $\{G_j : j \in \N\}$ under $T$. The inverse Fourier transform is a continuous linear
+map of $\mathcal S(V)$.
+\end{proof}
+
+\paragraph{The shifted Bessel symbols.}
+
+\begin{definition}[Shifted Bessel symbols]
+\label{def:shifted-bessel-symbol}
+\lean{Rd.besselSymbol, Rd.besselSymbol_eq_comp, Rd.besselSymbol_one}
+\leanok
+\uses{def:bessel-weight}
+For all real $\varepsilon$ and $\sigma$ and every $\zeta \in V$ let
+\[
+  \beta_{\varepsilon,\sigma}(\zeta) = (\varepsilon + \|\zeta\|^2)^{\sigma/2} ,
+\]
+so that $\beta_{\varepsilon,\sigma} = g_\sigma \circ (\varepsilon + \|\cdot\|^2)$ with
+$g_\sigma(t) = t^{\sigma/2}$, and $\beta_{1,\sigma} = \langle \cdot \rangle^\sigma$.
+\end{definition}
+
+\begin{lemma}[Scaling of the Bessel weight]
+\label{lem:bessel-weight-scaling}
+\lean{Rd.besselWeight_eq_mul_besselSymbol}
+\leanok
+\uses{def:shifted-bessel-symbol, def:bessel-weight}
+For every real $c > 0$, every real $\sigma$ and every $\xi \in V$,
+\[
+  \langle \xi \rangle^\sigma = c^\sigma \, \beta_{c^{-2},\sigma}(c^{-1} \xi) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$c^{-2} + \|c^{-1} \xi\|^2 = c^{-2} (1 + \|\xi\|^2)$, and
+$(c^{-2})^{\sigma/2} = c^{-\sigma}$.
+\end{proof}
+
+\begin{lemma}[Smoothness and growth of the shifted symbols]
+\label{lem:shifted-bessel-symbol-smooth}
+\lean{Complex.contDiffOn_ofReal_rpow_const, Rd.contDiff_besselSymbol, Rd.besselSymbol_eq_mul,
+  Rd.hasTemperateGrowth_besselSymbol}
+\leanok
+\uses{def:shifted-bessel-symbol, lem:bessel-weight-scaling}
+For every real $\tau$, the function $t \mapsto t^\tau$ is smooth on $(0, \infty)$. For every
+real $\varepsilon > 0$ and $\sigma$, $\beta_{\varepsilon,\sigma}$ is smooth, has temperate growth,
+and $\beta_{\varepsilon,\sigma}(\zeta) = \varepsilon^{\sigma/2} \langle \varepsilon^{-1/2} \zeta
+\rangle^\sigma$ for every $\zeta \in V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The function $\zeta \mapsto \varepsilon + \|\zeta\|^2$ is smooth and positive, and real powers
+are smooth on $(0, \infty)$. The identity is \Cref{lem:bessel-weight-scaling} with
+$c = \varepsilon^{-1/2}$ at the point $c \zeta$. The Bessel weight
+has temperate growth (Mathlib's
+\texttt{Function.\allowbreak hasTemperateGrowth\_\allowbreak one\_\allowbreak add\_\allowbreak
+norm\_\allowbreak sq\_\allowbreak rpow}), and so have its compositions with linear maps and its
+multiples.
+\end{proof}
+
+\begin{lemma}[Bounded derivatives on compact sets]
+\label{lem:bounded-derivatives-compact}
+\lean{ContDiffOn.exists_norm_iteratedFDerivWithin_le}
+\leanok
+Let $E, F$ be real normed spaces, let $f \colon E \to F$ be smooth on a set $s \subseteq E$ of
+unique differentiability, let $K \subseteq s$ be compact and $r \in \N$. Then there is $C$ with
+$\|D^i_s f(x)\| \leq C$ for every $i \leq r$ and every $x \in K$, where $D^i_s$ is the $i$-th
+derivative within $s$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The function $x \mapsto \sum_{i \leq r} \|D^i_s f(x)\|$ is continuous on $s$, hence bounded on
+$K$.
+\end{proof}
+
+\begin{lemma}[Derivatives of the shifted square norm]
+\label{lem:norm-sq-derivatives}
+\lean{Rd.exists_norm_iteratedFDeriv_add_norm_sq_le}
+\leanok
+\uses{lem:bounded-derivatives-compact}
+For every real $b$ and every $r \in \N$ there is $D$ with
+$\|D^i (\varepsilon + \|\cdot\|^2)(\zeta)\| \leq D^i$ for every real $\varepsilon$, every
+$1 \leq i \leq r$ and every $\zeta \in V$ with $\|\zeta\| \leq b$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The derivatives of positive order of $\varepsilon + \|\cdot\|^2$ are those of $\|\cdot\|^2$;
+\Cref{lem:bounded-derivatives-compact} with $s = V$ and the closed ball of radius $b$ bounds them
+by some $C$, and $D = \max(1, C)$ satisfies $C \leq D \leq D^i$ for $i \geq 1$.
+\end{proof}
+
+\begin{lemma}[Bounds of the shifted symbols on an annulus]
+\label{lem:shifted-bessel-symbol-bounds}
+\lean{Rd.exists_norm_iteratedFDeriv_besselSymbol_le, Rd.besselSymbolBound,
+  Rd.besselSymbolBound_nonneg, Rd.norm_besselSymbol_le}
+\leanok
+\uses{lem:shifted-bessel-symbol-smooth, lem:bounded-derivatives-compact,
+  lem:norm-sq-derivatives}
+Let $a > 0$ and $b, \sigma$ be real. For every $r \in \N$ there is $C_r \geq 0$ with
+$\|D^r \beta_{\varepsilon,\sigma}(\zeta)\| \leq C_r$ for every $\varepsilon \in (0, 1]$ and every
+$\zeta \in V$ with $a \leq \|\zeta\| \leq b$. Moreover, with
+\[
+  M_{a,b,\sigma} = \max \bigl( (a^2)^{\sigma/2}, (1 + b^2)^{\sigma/2} \bigr) \geq 0 ,
+\]
+$|\beta_{\varepsilon,\sigma}(\zeta)| \leq M_{a,b,\sigma}$ for every $\varepsilon \in [0, 1]$ and
+every $\zeta \in V$ with $a \leq \|\zeta\| \leq b$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Write $\beta_{\varepsilon,\sigma} = g_\sigma \circ f_\varepsilon$ with $f_\varepsilon(\zeta) =
+\varepsilon + \|\zeta\|^2$. For $\varepsilon \in (0, 1]$, $f_\varepsilon > 0$ on all of $V$, so
+its range lies in $(0, \infty)$ as Mathlib's bound for compositions requires. For
+$\varepsilon \in [0, 1]$ and $a \leq \|\zeta\| \leq b$, $f_\varepsilon(\zeta)$ lies in the compact
+interval $[a^2, 1 + b^2] \subseteq (0, \infty)$, where the derivatives of $g_\sigma$ of the orders
+$i \leq r$ are bounded by some $C$ (\Cref{lem:shifted-bessel-symbol-smooth},
+\Cref{lem:bounded-derivatives-compact}), and the derivatives of $f_\varepsilon$ of the orders
+$1 \leq i \leq r$ are at most $D^i$ (\Cref{lem:norm-sq-derivatives}). The Fa\`a di Bruno bound
+for compositions (Mathlib's
+\texttt{norm\_\allowbreak iteratedFDeriv\_\allowbreak comp\_\allowbreak le'}) gives
+$C_r = \max(0, r! \, C D^r)$. The second claim holds since $t \mapsto t^{\sigma/2}$ is monotone on
+$[a^2, 1 + b^2]$, increasing for $\sigma \geq 0$ and decreasing for $\sigma < 0$.
+\end{proof}
+
+\paragraph{The Bessel kernels.}
+
+\begin{definition}[Bessel symbol and kernel families]
+\label{def:bessel-kernel-family}
+\lean{Rd.besselSymbolFamily, Rd.coe_besselSymbolFamily, Rd.besselKernelFamily,
+  Rd.fourier_besselKernelFamily}
+\leanok
+\uses{def:shifted-bessel-symbol, lem:shifted-bessel-symbol-smooth}
+For every Schwartz function $\widehat\omega \colon V \to \C$, every real $\sigma$ and every
+$j \in \N$ let $S_j = \beta_{2^{-2j},\sigma} \, \widehat\omega$ and
+$K_j = \mathcal F^{-1} S_j$. Both are Schwartz functions, and
+$\widehat{K_j} = \beta_{2^{-2j},\sigma} \, \widehat\omega$.
+\end{definition}
+
+The product $S_j$ is a Schwartz function because $\beta_{2^{-2j},\sigma}$ has temperate growth
+(\Cref{lem:shifted-bessel-symbol-smooth}; Mathlib's
+\texttt{SchwartzMap.\allowbreak smulLeftCLM}), and $\mathcal F$ inverts $\mathcal F^{-1}$ on
+Schwartz functions.
+
+\begin{lemma}[Leibniz bound against a Schwartz function]
+\label{lem:leibniz-schwartz}
+\lean{Rd.norm_iteratedFDeriv_mul_schwartz_le}
+\leanok
+For every smooth $g \colon V \to \C$, every Schwartz function $\omega \colon V \to \C$, every
+$l \in \N$, every $x \in V$ and all reals $C_0, \dots, C_l$ with $\|D^i g(x)\| \leq C_i$ for
+every $i \leq l$,
+\[
+  \|D^l (g \omega)(x)\| \leq \sum_{i \leq l} \binom{l}{i} C_i \, \|\omega\|_{0,l-i} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Leibniz rule (Mathlib's
+\texttt{norm\_\allowbreak iteratedFDeriv\_\allowbreak mul\_\allowbreak le}) with
+$\|D^{l-i} \omega(x)\| \leq \|\omega\|_{0,l-i}$.
+\end{proof}
+
+\begin{lemma}[Supports in an annulus]
+\label{lem:tsupport-annulus}
+\lean{Rd.mem_annulus_of_mem_tsupport}
+\leanok
+For all reals $a, b$ and every $f \colon V \to \C$ that vanishes outside the annulus
+$\{a \leq \|\zeta\| \leq b\}$, the closure of the support of $f$ lies in that annulus.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The annulus is closed.
+\end{proof}
+
+\begin{theorem}[The Bessel kernels are uniformly Schwartz]
+\label{thm:bessel-kernels-uniform}
+\lean{Rd.exists_isUniformSchwartz_besselSymbolFamily,
+  Rd.exists_isUniformSchwartz_besselKernelFamily}
+\leanok
+\uses{def:bessel-kernel-family, lem:shifted-bessel-symbol-bounds, lem:leibniz-schwartz,
+  lem:tsupport-annulus, thm:uniform-schwartz-linear-map, def:uniform-schwartz}
+Let $a > 0$ and $b$ be real, and let $\widehat\omega \colon V \to \C$ be a Schwartz function
+that vanishes outside the annulus $\{a \leq \|\zeta\| \leq b\}$. Then for every real $\sigma$
+there are bounds $A$ such that $(S_j)$ is uniformly Schwartz with bounds $A$, and bounds $A'$
+such that $(K_j)$ is uniformly Schwartz with bounds $A'$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $C_r \geq 0$ be the bounds of \Cref{lem:shifted-bessel-symbol-bounds}; note
+$2^{-2j} \in (0, 1]$. At a point $x$ outside the closure of the support of $\widehat\omega$
+every derivative of $S_j$ vanishes. At a point $x$ of that closure, $a \leq \|x\| \leq b$
+(\Cref{lem:tsupport-annulus}), so $\|x\|^k \leq |b|^k$ and
+\[
+  \|x\|^k \|D^l S_j(x)\| \leq |b|^k \sum_{i \leq l} \binom{l}{i} C_i \,
+  \|\widehat\omega\|_{0,l-i}
+\]
+by \Cref{lem:leibniz-schwartz}, for every $j$. The kernels follow by
+\Cref{thm:uniform-schwartz-linear-map}.
+\end{proof}
+
+\begin{theorem}[Bessel potentials of dilates]
+\label{thm:bessel-potential-dilate}
+\lean{Rd.besselSchwartz_schwartzDilate, Rd.besselPotential_schwartzDilate}
+\leanok
+\uses{def:bessel-kernel-family, lem:bessel-weight-scaling, def:schwartz-dilate,
+  lem:fourier-dilate, lem:bessel-weight-basic, def:bessel-schwartz,
+  lem:bessel-schwartz-distribution}
+For every Schwartz function $\omega \colon V \to \C$, every real $\sigma$ and every $j \in \N$,
+let $K_j$ be the Bessel kernels of $\widehat\omega$. Then
+\[
+  J_\sigma \omega_{2^j} = 2^{j\sigma} (K_j)_{2^j} ,
+\]
+and Mathlib's Bessel potential $J_\sigma$ maps the tempered distribution of $\omega_{2^j}$ to
+that of $2^{j\sigma} (K_j)_{2^j}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Both sides are Schwartz functions, and the Fourier transform is injective on them. At $\xi$,
+the Fourier transform of the left side is $\langle \xi \rangle^\sigma \widehat\omega(2^{-j}\xi)$
+(\Cref{lem:fourier-dilate}), and that of the right side is
+$2^{j\sigma} \, \beta_{2^{-2j},\sigma}(2^{-j} \xi) \, \widehat\omega(2^{-j} \xi)$
+(\Cref{lem:fourier-dilate}, \Cref{def:bessel-kernel-family}). They agree by
+\Cref{lem:bessel-weight-scaling} with $c = 2^j$. The statement on tempered distributions follows
+with \Cref{lem:bessel-schwartz-distribution}.
+\end{proof}
+
+The identity holds for every Schwartz function $\omega$; the annulus condition of
+\Cref{thm:bessel-kernels-uniform} makes the kernels $K_j$ uniform in $j$.
+
+\paragraph{The dilated Bessel kernels.}
+
+\begin{definition}[Overlap of the Bessel kernels]
+\label{def:bessel-overlap}
+\lean{Rd.besselOverlap, Rd.besselOverlap_ne_top}
+\leanok
+\uses{lem:shifted-bessel-symbol-bounds}
+For every real $a$, every $N \in \N$, every real $\sigma$ and every Schwartz function
+$\widehat\omega \colon V \to \C$ let
+\[
+  B_{a,N,\sigma,\widehat\omega} = (N + 1) \bigl( M_{a, 2^N a, \sigma} \,
+  \|\widehat\omega\|_{0,0} \bigr)^2 < \infty .
+\]
+\end{definition}
+
+\begin{lemma}[Frequencies of the dilated Bessel kernels]
+\label{lem:bessel-kernel-frequency}
+\lean{Rd.fourier_dilate_besselKernelFamily,
+  Rd.mem_annulus_of_fourier_dilate_besselKernelFamily_ne_zero,
+  Rd.enorm_fourier_dilate_besselKernelFamily_le,
+  Rd.mem_Icc_of_fourier_dilate_besselKernelFamily_ne_zero}
+\leanok
+\uses{def:bessel-kernel-family, lem:fourier-dilate, lem:shifted-bessel-symbol-bounds,
+  lem:dyadic-annulus-count}
+Let $\widehat\omega \colon V \to \C$ be a Schwartz function, $\sigma$ real and $K_j$ the Bessel
+kernels of $\widehat\omega$. For every $j \in \N$ and every $\xi \in V$, with
+$\zeta = 2^{-j} \xi$,
+\[
+  \widehat{(K_j)_{2^j}}(\xi) = \beta_{2^{-2j},\sigma}(\zeta) \, \widehat\omega(\zeta) .
+\]
+Let $a > 0$ and $b$ be real, and let $\widehat\omega$ vanish outside the annulus
+$\{a \leq \|\zeta\| \leq b\}$. Then for every $j \in \N$ and every $\xi \in V$,
+$|\widehat{(K_j)_{2^j}}(\xi)| \leq M_{a,b,\sigma} \|\widehat\omega\|_{0,0}$, and if
+$\widehat{(K_j)_{2^j}}(\xi) \neq 0$, then $a \leq 2^{-j} \|\xi\| \leq b$. If moreover
+$b = 2^N a$ with $N \in \N$, and $i_0 \in \N$ is the least index with
+$\|\xi\| \leq 2^{i_0} 2^N a$, then $\widehat{(K_j)_{2^j}}(\xi) \neq 0$ implies
+$i_0 \leq j \leq i_0 + N$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The identity is \Cref{lem:fourier-dilate} with \Cref{def:bessel-kernel-family}. If
+$\widehat\omega(\zeta) \neq 0$, then $a \leq \|\zeta\| = 2^{-j} \|\xi\| \leq b$, and
+$|\beta_{2^{-2j},\sigma}(\zeta)| \leq M_{a,b,\sigma}$ (\Cref{lem:shifted-bessel-symbol-bounds}). For
+$b = 2^N a$, $\|\xi\| \leq 2^j 2^N a$ gives $i_0 \leq j$, and \Cref{lem:dyadic-annulus-count}
+with $t = \|\xi\|$ gives $j \leq i_0 + N$.
+\end{proof}
+
+\begin{theorem}[The dilated Bessel kernels form a Calder\'on--Zygmund family]
+\label{thm:cz-family-bessel}
+\lean{Rd.tsum_fourier_dilate_besselKernelFamily_sq_le, Rd.exists_isCZFamily_besselKernelFamily}
+\leanok
+\uses{lem:bessel-kernel-frequency, def:bessel-overlap, lem:dyadic-annulus-count,
+  thm:bessel-kernels-uniform, thm:cz-family-dilation, def:hormander-const}
+Let $a > 0$ be real, $N \in \N$, and let $\widehat\omega \colon V \to \C$ be a Schwartz function
+that vanishes outside the annulus $\{a \leq \|\zeta\| \leq 2^N a\}$. Then for every real $\sigma$
+and every $\xi \in V$,
+\[
+  \sum_j |\widehat{(K_j)_{2^j}}(\xi)|^2 \leq B_{a,N,\sigma,\widehat\omega} ,
+\]
+and there is $H < \infty$ such that $((K_j)_{2^j})_j$ is a Calder\'on--Zygmund family with
+overlap $B_{a,N,\sigma,\widehat\omega}$ and H\"ormander constant $H$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:bessel-kernel-frequency} every term is at most
+$(M_{a,2^N a,\sigma} \|\widehat\omega\|_{0,0})^2$, and a nonzero term needs
+$a \leq 2^{-j} \|\xi\| \leq 2^N a$; \Cref{lem:dyadic-annulus-count} with $t = \|\xi\|$ bounds the
+sum. The kernels $K_j$
+are uniformly Schwartz with some bounds $A$ (\Cref{thm:bessel-kernels-uniform}), and
+\Cref{thm:cz-family-dilation} gives the family with $H = 4 H_A$.
+\end{proof}
+
+\paragraph{Annuli of the Littlewood--Paley kernels.}
+
+\begin{lemma}[Annuli of the Littlewood--Paley kernels]
+\label{lem:littlewood-paley-annuli}
+\lean{Rd.mem_annulus_of_fourier_psiOneS_ne_zero, Rd.mem_annulus_of_fourier_psiBase_ne_zero,
+  Rd.mem_annulus_of_fourier_psiDualBase_ne_zero}
+\leanok
+\uses{lem:fourier-dilate, lem:psi-one, lem:psi-base, lem:psi-dual-basic,
+  lem:psi-dual-frequency, lem:lp-kernels-frequency}
+For every $j \in \N$ and every $\zeta \in V$:
+if $\widehat{\psi_1}(\zeta) \neq 0$, then $1 \leq \|\zeta\| \leq 2^2 \cdot 1$; if
+$\widehat{G^{\psi}_{j+1}}(\zeta) \neq 0$, then $1/2 \leq \|\zeta\| \leq 2^2 \cdot 1/2$; and if
+$\widehat{\tilde G_{j+2}}(\zeta) \neq 0$, then $1/4 \leq \|\zeta\| \leq 2^4 \cdot 1/4$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first claim is \Cref{lem:psi-one} with \Cref{lem:lp-kernels-frequency}. Further
+$G^{\psi}_{j+1} = G^{\psi}_1$ and $\psi_1 = (G^{\psi}_1)_2$ (\Cref{lem:psi-base}), so
+$\widehat{G^{\psi}_{j+1}}(\zeta) = \widehat{\psi_1}(2 \zeta)$ (\Cref{lem:fourier-dilate}), and the
+first claim gives $1 \leq 2 \|\zeta\| \leq 4$. Likewise $\tilde G_{j+2} = \tilde G_2$ and
+$\tilde\psi_2 = (\tilde G_2)_4$ (\Cref{lem:psi-dual-basic}), so
+$\widehat{\tilde G_{j+2}}(\zeta) \neq 0$ gives $1 < 4 \|\zeta\| < 16$
+(\Cref{lem:fourier-dilate}, \Cref{lem:psi-dual-frequency}).
+\end{proof}
+
+So \Cref{thm:cz-family-bessel} applies to $\widehat{\psi_1}$ with $a = 1$, $N = 2$, to
+$\widehat{G^{\psi}_{j+1}}$ with $a = 1/2$, $N = 2$, and to $\widehat{\tilde G_{j+2}}$ with
+$a = 1/4$, $N = 4$.
+
+\section{Bessel potential spaces as Triebel--Lizorkin spaces}
+\label{sec:bessel-potential-lifting}
+
+Mathlib's Bessel potential space $H^{s,p}(V)$, $s \in \R$, consists of the tempered
+distributions $f$ with $J_s f \in L_p(V)$, where $J_s$ multiplies the Fourier transform by
+$\langle \xi \rangle^s$ (\texttt{TemperedDistribution.\allowbreak besselPotential} and
+\texttt{TemperedDistribution.\allowbreak MemSobolev}). Its bundled form, Mathlib's
+\texttt{BesselPotentialSpace}, has the norm $\|f\| = \|J_s f\|_p$. This section proves, for
+$n \geq 1$ and $1 < p < \infty$, that $H^{s,p}(V) \cap L_p(V) = \TL{s}{p}{2}$ for every real $s$
+and $H^{s,p}(V) = \TL{s}{p}{2}$ for $s \geq 0$ \cite{Triebel}, and hence
+$\Sob{m}{p}(V) = H^{m,p}(V)$, Calder\'on's theorem~\cite{Calderon1961} (see also
+\cite[Chapter V]{SteinSingular}). The constants come from the uniform Schwartz bounds of
+\Cref{sec:bessel-kernels} and are existential. The kernels are the Bessel potentials of the
+blocks $\psi_j$ and of the synthesis kernels
+$\tilde\psi_j$: up to the factors $2^{\pm js}$ they are dilates of Bessel kernels, and these form
+Calder\'on--Zygmund families. So $J_s f$ is the limit of the synthesis sums
+$\sum_{j < J} (J_s \tilde\psi_j) * (\psi_j * f)$, and the weighted blocks $2^{js} \psi_j * f$ of
+$f = J_{-s} h$ are the analysis operator of a Calder\'on--Zygmund family applied to $h$. The
+first two paragraphs hold for every even Fourier multiplier $m(D)$ of
+\Cref{sec:sobolev-two-littlewood-paley}.
+
+\paragraph{Even Fourier multipliers, translations and reflections.}
+
+\begin{lemma}[Even Fourier multipliers commute with translations and reflections]
+\label{lem:bessel-schwartz-translation}
+\lean{Rd.fourier_fourierMultiplierCLM_apply, Rd.fourier_besselSchwartz_apply,
+  Rd.fourier_compSubConstCLM_apply, Rd.fourierMultiplierCLM_compSubConstCLM,
+  Rd.besselSchwartz_compSubConstCLM, Rd.fourierMultiplierCLM_schwartzReflect,
+  Rd.fourierMultiplierCLM_shiftReflect}
+\leanok
+\uses{def:bessel-schwartz, lem:bessel-weight-basic, lem:reflect-basic, lem:schwartz-shift-reflect,
+  def:schwartz-dilate}
+Let $m$ be a function on $V$, smooth with polynomially bounded derivatives. For all Schwartz
+functions $\varphi, \eta$ and all $x, y, \xi \in V$,
+\begin{gather*}
+  \widehat{m(D) \varphi}(\xi) = m(\xi) \, \widehat\varphi(\xi), \qquad
+  \widehat{\varphi(\cdot - y)}(\xi) = e^{-2\pi i \langle y, \xi \rangle} \,
+  \widehat\varphi(\xi), \\
+  m(D) \bigl(\varphi(\cdot - y)\bigr) = (m(D) \varphi)(\cdot - y),
+\end{gather*}
+in particular $\widehat{J_t \varphi} = \langle \cdot \rangle^t \widehat\varphi$ and
+$J_t (\varphi(\cdot - y)) = (J_t \varphi)(\cdot - y)$ for every $t \in \R$. If $m$ is even, then
+\[
+  m(D) \bigl(\varphi(-\,\cdot)\bigr) = (m(D) \varphi)(-\,\cdot), \qquad
+  m(D) \bigl(\eta(x - \cdot)\bigr) = (m(D) \eta)(x - \cdot) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first identity is Fourier inversion on Schwartz functions, the second the substitution
+$z \mapsto z + y$ (Mathlib's
+\texttt{VectorFourier.\allowbreak fourierIntegral\_\allowbreak comp\_\allowbreak add\_\allowbreak
+right}). The Fourier transform is injective on Schwartz functions, and the Fourier transforms of
+the two sides of the third identity are both
+$m(\xi) e^{-2\pi i \langle y, \xi \rangle} \widehat\varphi(\xi)$, those of the
+fourth both $m(\xi) \widehat\varphi(-\xi) = m(-\xi) \widehat\varphi(-\xi)$
+(\Cref{lem:reflect-basic}). The function $\eta(x - \cdot)$ is the translate by $x$ of
+$\eta(-\,\cdot)$. For $J_t$, $m$ is the Bessel weight (\Cref{def:bessel-schwartz}).
+\end{proof}
+
+\paragraph{Even Fourier multipliers and convolutions.}
+
+\begin{lemma}[Convolutions with Fourier multipliers, pointwise]
+\label{lem:bessel-potential-convolution-pointwise}
+\lean{Rd.conv_eq_toTemperedDistribution_shiftReflect, Rd.conv_fourierMultiplierCLM_eq,
+  Rd.conv_eq_conv_fourierMultiplierCLM, Rd.conv_eq_conv_besselSchwartz}
+\leanok
+\uses{lem:schwartz-shift-reflect, lem:even-multiplier-transpose,
+  lem:bessel-schwartz-translation, lem:bessel-weight-basic}
+Let $1 \leq q, r \leq \infty$, let $m$ be an even function on $V$, smooth with polynomially bounded
+derivatives, $\eta$ a Schwartz function and $x \in V$. For every $g \in L_q(V)$,
+$(\eta * g)(x)$ is the tempered distribution of $g$ at $\eta(x - \cdot)$. For every
+$h \in L_r(V)$,
+\[
+  \bigl((m(D) \eta) * h\bigr)(x) = (m(D) h)\bigl(\eta(x - \cdot)\bigr) .
+\]
+For all $g \in L_q(V)$ and $h \in L_r(V)$ with $g = m(D) h$ as tempered distributions,
+$(\eta * g)(x) = ((m(D) \eta) * h)(x)$; in particular, for every $t \in \R$ and all
+$g \in L_q(V)$, $h \in L_r(V)$ with $g = J_t h$, $(\eta * g)(x) = ((J_t \eta) * h)(x)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first claim is \Cref{lem:schwartz-shift-reflect}. For the second,
+$(m(D) h)(\eta(x - \cdot)) = h(m(D)(\eta(x - \cdot))) = h((m(D) \eta)(x - \cdot))$ by
+\Cref{lem:even-multiplier-transpose} and \Cref{lem:bessel-schwartz-translation}, and this is
+$((m(D) \eta) * h)(x)$ by the first claim. The third combines the first two, and the Bessel
+weight is even (\Cref{lem:bessel-weight-basic}).
+\end{proof}
+
+\begin{theorem}[The Bessel potential of a convolution]
+\label{thm:bessel-potential-convolution}
+\lean{Rd.integral_besselSchwartz_mul_conv, Rd.besselPotential_toLp_conv}
+\leanok
+\uses{thm:convolution-adjoint, lem:reflect-basic, lem:bessel-potential-transpose,
+  lem:bessel-schwartz-translation, thm:young}
+For every $1 \leq p < \infty$, every $F \in L_p(V)$, every $t \in \R$ and all Schwartz functions
+$\eta, u$,
+\[
+  \int_V J_t u \, (\eta * F) = \int_V u \, \bigl((J_t \eta) * F\bigr) ,
+\]
+and $J_t(\eta * F) = (J_t \eta) * F$ as tempered distributions.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Schwartz functions lie in $L_q(V)$ for the conjugate exponent $q$ of $p$, so by
+\Cref{thm:convolution-adjoint} the two sides are $\int_V F(y) (\eta^\vee * J_t u)(y) \, dy$ and
+$\int_V F(y) ((J_t \eta)^\vee * u)(y) \, dy$. By \Cref{lem:reflect-basic},
+\Cref{lem:bessel-potential-transpose} and \Cref{lem:bessel-schwartz-translation},
+\begin{align*}
+  (\eta^\vee * J_t u)(y) &= \int_V \eta(z - y) \, J_t u(z) \, dz \\
+  &= \int_V (J_t \eta)(z - y) \, u(z) \, dz = \bigl((J_t \eta)^\vee * u\bigr)(y) .
+\end{align*}
+Both convolutions lie in $L_p(V)$ by Young's inequality (\Cref{thm:young}), and the identity of
+tempered distributions is the first identity with \Cref{lem:bessel-potential-transpose}.
+\end{proof}
+
+\begin{lemma}[The Bessel potential of a limit of synthesis sums]
+\label{lem:bessel-potential-limits}
+\lean{Rd.besselPotential_eq_of_tendsto}
+\leanok
+\uses{thm:bessel-potential-convolution}
+Let $1 \leq p < \infty$, $t \in \R$, and for every $j \in \N$ let $\eta_j$ be a Schwartz
+function and $F_j \in L_p(V)$. For all $f, g \in L_p(V)$ with
+$\sum_{j < J} \eta_j * F_j \to f$ and $\sum_{j < J} (J_t \eta_j) * F_j \to g$ in $L_p(V)$ as
+$J \to \infty$, $J_t f = g$ as tempered distributions.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The partial sums satisfy the identity by \Cref{thm:bessel-potential-convolution} and the
+linearity of $J_t$. The embedding of $L_p(V)$ into the tempered distributions and $J_t$ are
+continuous, and limits of tempered distributions are unique.
+\end{proof}
+
+\paragraph{The Bessel kernels of the Littlewood--Paley kernels.}
+
+\begin{definition}[Bessel kernels of a family]
+\label{def:bessel-base}
+\lean{Rd.besselBase}
+\leanok
+\uses{def:bessel-kernel-family}
+For every real $\sigma$, every family $\omega = (\omega_j)_{j \in \N}$ of Schwartz functions and
+every $j \in \N$, let $K^\sigma_j[\omega]$ be the $j$-th Bessel kernel of $\widehat{\omega_j}$
+(\Cref{def:bessel-kernel-family}):
+\[
+  K^\sigma_j[\omega] = \mathcal F^{-1} \bigl( \beta_{2^{-2j},\sigma} \, \widehat{\omega_j}
+  \bigr) .
+\]
+\end{definition}
+
+By \Cref{thm:bessel-potential-dilate},
+$J_\sigma (\omega_j)_{2^j} = 2^{j\sigma} (K^\sigma_j[\omega])_{2^j}$. For the bases $G^{\psi}$ and
+$\tilde G$ of \Cref{def:psi-base} and \Cref{def:psi-dual}, $(G^{\psi}_j)_{2^j} = \psi_j$ and
+$(\tilde G_j)_{2^j} = \tilde\psi_j$.
+
+\begin{theorem}[The Bessel kernels of the Littlewood--Paley kernels]
+\label{thm:cz-family-bessel-base}
+\lean{Rd.exists_isCZFamily_besselBase, Rd.exists_isCZFamily_besselBase_psiDualBase,
+  Rd.exists_isCZFamily_besselBase_psiBase}
+\leanok
+\uses{def:bessel-base, thm:bessel-kernels-uniform, thm:cz-family-bessel, def:bessel-overlap,
+  lem:cz-family-exceptions, lem:littlewood-paley-annuli, def:psi-base, def:psi-dual}
+Let $a > 0$ be real, $M, N \in \N$, and let $(\omega_j)$ be Schwartz functions with
+$\omega_j = \omega_M$ for every $j \geq M$ such that $\widehat{\omega_M}$ vanishes outside the
+annulus $\{a \leq \|\zeta\| \leq 2^N a\}$. Then for every real $\sigma$ there are
+$B, H < \infty$ such that $((K^\sigma_j[\omega])_{2^j})_j$ is a Calder\'on--Zygmund family with
+overlap $B$ and H\"ormander constant $H$. In particular, for every real $\sigma$ there are such
+$B, H$ for $\omega = G^{\psi}$ and for $\omega = \tilde G$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $j \geq M$, $K^\sigma_j[\omega]$ is the Bessel kernel $K_j$ of $\widehat{\omega_M}$. These
+kernels are uniformly Schwartz, and their dilates have the overlap
+$B_{a,N,\sigma,\widehat{\omega_M}}$ (\Cref{thm:bessel-kernels-uniform},
+\Cref{thm:cz-family-bessel}, \Cref{def:bessel-overlap}); \Cref{lem:cz-family-exceptions} adds the
+first $M$ kernels. The family $G^{\psi}$ is constant from $j = 1$ on, with $a = 1/2$ and
+$N = 2$, and $\tilde G$ from $j = 2$ on, with $a = 1/4$ and $N = 4$ (\Cref{def:psi-base},
+\Cref{def:psi-dual}, \Cref{lem:littlewood-paley-annuli}).
+\end{proof}
+
+\begin{lemma}[Convolutions with Bessel potentials of dilates]
+\label{lem:bessel-dilate-convolution}
+\lean{Rd.enorm_two_pow_rpow, Rd.conv_besselSchwartz_schwartzDilate}
+\leanok
+\uses{def:bessel-base, thm:bessel-potential-dilate, def:schwartz-dilate}
+For every $j \in \N$ and every real $\sigma$, $|(2^j)^\sigma| = 2^{j\sigma}$. For every family
+$(\omega_j)$ of Schwartz functions, every $F \colon V \to \C$ and every $x \in V$,
+\[
+  \bigl( (J_\sigma (\omega_j)_{2^j}) * F \bigr)(x)
+  = \bigl( (K^\sigma_j[\omega])_{2^j} * (2^{j\sigma} F) \bigr)(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{thm:bessel-potential-dilate} and the linearity of the convolution.
+\end{proof}
+
+\begin{theorem}[The synthesis bound for Bessel potentials of dilates]
+\label{thm:bessel-synthesis-bound}
+\lean{Rd.eLpNorm_sum_conv_besselSchwartz_le}
+\leanok
+\uses{lem:bessel-dilate-convolution, thm:vector-valued-strong-type, def:cz-const,
+  def:triebel-lizorkin, lem:tl-pointwise-blocks}
+Let $n \geq 1$, $1 < p < \infty$, $\sigma$ real, and let $(\omega_j)$ be Schwartz functions such
+that $((K^\sigma_j[\omega])_{2^j})_j$ is a Calder\'on--Zygmund family with overlap $B$ and
+H\"ormander constant $H$. Then for every finite set $t \subseteq \N$ and every $f \in L_p(V)$,
+\[
+  \Bigl\| \sum_{j \in t} \bigl(J_\sigma (\omega_j)_{2^j}\bigr) * (\psi_j * f) \Bigr\|_p
+  \leq S_{V,p}(B, H) \, \Bigl\| x \mapsto \bigl\| \bigl(\mathbf 1_t(j) \, 2^{j\sigma}
+  |(\psi_j * f)(x)|\bigr)_j \bigr\|_{\ell_2} \Bigr\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:bessel-dilate-convolution} the sum is
+$\sum_{j \in t} (K^\sigma_j[\omega])_{2^j} * g_j$ with $g_j = 2^{j\sigma} \psi_j * f \in L_p(V)$
+for $j \in t$ (\Cref{lem:tl-pointwise-blocks}) and $g_j = 0$ otherwise, and
+$|g_j| = \mathbf 1_t(j) \, 2^{j\sigma} |\psi_j * f|$. The synthesis bound of
+\Cref{thm:vector-valued-strong-type} applies.
+\end{proof}
+
+\paragraph{Convergent synthesis sums.}
+
+\begin{lemma}[Convergent synthesis sums]
+\label{lem:synthesis-sums-convergent}
+\lean{Rd.memLp_sum_conv_blockFun, Rd.cauchySeq_toLp_sum_conv_blockFun,
+  Rd.exists_tendsto_sum_conv_blockFun}
+\leanok
+\uses{def:triebel-lizorkin, thm:young, lem:weighted-block-tails, lem:tl-pointwise-blocks}
+Let $1 \leq p < \infty$, $\sigma$ real, $f \in \TL{\sigma}{p}{2}$, $C < \infty$ and $K_j$ Schwartz
+functions with
+\[
+  \Bigl\| \sum_{j \in t} K_j * (\psi_j * f) \Bigr\|_p \leq C \, \Bigl\| x \mapsto
+  \bigl\| \bigl(\mathbf 1_t(j) \, 2^{j\sigma} |(\psi_j * f)(x)|\bigr)_j \bigr\|_{\ell_2}
+  \Bigr\|_p
+\]
+for every finite set $t \subseteq \N$. Then the sums $\sum_{j \in t} K_j * (\psi_j * f)$ lie in
+$L_p(V)$, the partial sums $\sum_{j < J} K_j * (\psi_j * f)$ form a Cauchy sequence in $L_p(V)$,
+and they converge to some $g \in L_p(V)$ with $\|g\|_p \leq C \|f\|_{F^\sigma_{p,2}}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The blocks $\psi_j * f$ lie in $L_p(V)$ (\Cref{lem:tl-pointwise-blocks}), so the sums lie in
+$L_p(V)$ by Young's inequality (\Cref{thm:young}). For $N \leq N'$ the difference of the partial
+sums at $N'$ and $N$ is the sum over $t = \{N, \dots, N' - 1\}$, whose norm is at most $C$ times
+the norm of the weighted blocks with $j \geq N$; these tails tend to zero
+(\Cref{lem:weighted-block-tails}). The limit $g$ exists since $L_p(V)$ is complete, and each
+partial sum has norm at most $C \|f\|_{F^\sigma_{p,2}}$ (\Cref{lem:weighted-block-tails}).
+\end{proof}
+
+\paragraph{Triebel--Lizorkin spaces in Bessel potential spaces.}
+
+\begin{theorem}[$\TL{s}{p}{2} \subseteq H^{s,p}$]
+\label{thm:triebel-lizorkin-to-bessel}
+\lean{Rd.exists_besselPotential_eq_of_memTriebelLizorkin,
+  Rd.memSobolev_bessel_of_memTriebelLizorkin}
+\leanok
+\uses{thm:cz-family-bessel-base, thm:bessel-synthesis-bound, lem:synthesis-sums-convergent,
+  lem:bessel-potential-limits, lem:square-function-reproducing, lem:psi-dual-derivatives}
+Let $n \geq 1$ and $1 < p < \infty$. For every real $s$ there is $C < \infty$ such that for every
+$f \in \TL{s}{p}{2}$ there is $h \in L_p(V)$ with $J_s f = h$ as tempered distributions and
+$\|h\|_p \leq C \|f\|_{F^s_{p,2}}$. In particular $f \in H^{s,p}(V)$ for every
+$f \in \TL{s}{p}{2}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $B, H$ be the constants of \Cref{thm:cz-family-bessel-base} for $\omega = \tilde G$ and
+$\sigma = s$, and $C = S_{V,p}(B, H)$. Since $(\tilde G_j)_{2^j} = \tilde\psi_j$
+(\Cref{lem:psi-dual-derivatives}), \Cref{thm:bessel-synthesis-bound} gives the hypothesis of
+\Cref{lem:synthesis-sums-convergent} for $K_j = J_s \tilde\psi_j$, so
+$\sum_{j < J} (J_s \tilde\psi_j) * (\psi_j * f)$ converges to some $h \in L_p(V)$ with
+$\|h\|_p \leq C \|f\|_{F^s_{p,2}}$. The sums $\sum_{j < J} \tilde\psi_j * (\psi_j * f)$ tend to
+$f$ (\Cref{lem:square-function-reproducing}), and \Cref{lem:bessel-potential-limits} gives
+$J_s f = h$.
+\end{proof}
+
+\paragraph{Bessel potential spaces in Triebel--Lizorkin spaces.}
+
+\begin{lemma}[The blocks of a Bessel potential]
+\label{lem:bessel-potential-blocks}
+\lean{Rd.dyadicWeight_mul_enorm_blockFun_eq}
+\leanok
+\uses{lem:bessel-potential-convolution-pointwise, lem:bessel-dilate-convolution, lem:psi-base,
+  def:bessel-base, def:triebel-lizorkin}
+Let $1 \leq q, r \leq \infty$ and $s$ real. For all $g \in L_q(V)$ and $h \in L_r(V)$ with
+$g = J_{-s} h$ as tempered distributions, every $j \in \N$ and every $x \in V$,
+\[
+  2^{js} \, |(\psi_j * g)(x)| = \bigl| \bigl( (K^{-s}_j[G^{\psi}])_{2^j} * h \bigr)(x) \bigr| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\psi_j = (G^{\psi}_j)_{2^j}$ (\Cref{lem:psi-base}), so
+$(\psi_j * g)(x) = ((J_{-s} \psi_j) * h)(x)$ (\Cref{lem:bessel-potential-convolution-pointwise})
+$= 2^{-js} ((K^{-s}_j[G^{\psi}])_{2^j} * h)(x)$ (\Cref{lem:bessel-dilate-convolution}).
+\end{proof}
+
+\begin{theorem}[$H^{s,p} \subseteq \TL{s}{p}{2}$ on $L_p$]
+\label{thm:bessel-to-triebel-lizorkin-lp}
+\lean{Rd.exists_triebelLizorkinNorm_le_of_besselPotential_eq}
+\leanok
+\uses{lem:bessel-potential-blocks, thm:cz-family-bessel-base, thm:vector-valued-strong-type,
+  def:cz-const}
+Let $n \geq 1$ and $1 < p < \infty$. For every real $s$ there is $C < \infty$ such that
+$\|g\|_{F^s_{p,2}} \leq C \|h\|_p$ for all $g, h \in L_p(V)$ with $J_s g = h$ as tempered
+distributions.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $B, H$ be the constants of \Cref{thm:cz-family-bessel-base} for $\omega = G^{\psi}$ and
+$\sigma = -s$, and $C = S_{V,p}(B, H)$. Since $g = J_{-s} h$ (Mathlib's
+\texttt{TemperedDistribution.\allowbreak besselPotential\_\allowbreak neg\_\allowbreak
+apply\_\allowbreak eq\_\allowbreak iff}), \Cref{lem:bessel-potential-blocks} writes the weighted
+blocks of $g$ as the analysis operator of the family $((K^{-s}_j[G^{\psi}])_{2^j})_j$ at $h$,
+and \Cref{thm:vector-valued-strong-type} bounds it.
+\end{proof}
+
+\begin{theorem}[$H^{s,p} \subseteq \TL{s}{p}{2}$ for $s \geq 0$]
+\label{thm:bessel-to-triebel-lizorkin}
+\lean{Rd.exists_memTriebelLizorkin_of_besselPotential_eq}
+\leanok
+\uses{thm:triebel-lizorkin-to-bessel, thm:bessel-to-triebel-lizorkin-lp,
+  thm:square-function-upper, prop:tl-elementary}
+Let $n \geq 1$, $1 < p < \infty$ and $s \geq 0$ real. There is $C < \infty$ such that for every
+tempered distribution $f$ and every $h \in L_p(V)$ with $J_s f = h$ there is $g \in L_p(V)$ with
+$g = f$ as tempered distributions, $g \in \TL{s}{p}{2}$ and $\|g\|_{F^s_{p,2}} \leq C \|h\|_p$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $C$ be the constant of \Cref{thm:bessel-to-triebel-lizorkin-lp}. Since
+$h \in L_p(V) = \TL{0}{p}{2}$ (\Cref{thm:square-function-upper}) and $-s \leq 0$,
+$h \in \TL{-s}{p}{2}$ (\Cref{prop:tl-elementary}), so \Cref{thm:triebel-lizorkin-to-bessel} for
+$-s$ gives $g \in L_p(V)$ with $J_{-s} h = g$. Then $g = J_{-s} J_s f = f$ (Mathlib's
+\texttt{TemperedDistribution.\allowbreak besselPotential\_\allowbreak neg\_\allowbreak
+apply\_\allowbreak eq\_\allowbreak iff}), $J_s g = h$, and
+\Cref{thm:bessel-to-triebel-lizorkin-lp} bounds $\|g\|_{F^s_{p,2}}$.
+\end{proof}
+
+On $L_p(V)$ the two spaces agree for every real $s$ (\Cref{cor:bessel-triebel-lizorkin}). For
+$s < 0$, $H^{s,p}(V)$ also contains tempered distributions outside $L_p(V)$, and
+\Cref{thm:bessel-to-triebel-lizorkin} is the statement for $s \geq 0$, where every element of
+$H^{s,p}(V)$ is an $L_p$ function.
+
+\paragraph{The bundled spaces and Calder\'on's theorem.}
+
+\begin{corollary}[The bundled spaces]
+\label{cor:bessel-bundled}
+\lean{Rd.exists_enorm_toBesselPotentialSpace_le, Rd.exists_memTriebelLizorkin_toDistr}
+\leanok
+\uses{thm:triebel-lizorkin-to-bessel, thm:bessel-to-triebel-lizorkin,
+  lem:lp-distribution-determined, lem:bessel-space-enorm}
+Let $n \geq 1$ and $1 < p < \infty$. For every real $s$ there is $C < \infty$ such that every
+$f \in \TL{s}{p}{2}$, as an element of Mathlib's $H^{s,p}(V)$, has
+$\|f\|_{H^{s,p}} \leq C \|f\|_{F^s_{p,2}}$. For every real $s \geq 0$ there is $C < \infty$ such
+that for every $F \in H^{s,p}(V)$ there is $g \in \TL{s}{p}{2}$ with $g = F$ as tempered
+distributions and $\|g\|_{F^s_{p,2}} \leq C \|F\|_{H^{s,p}}$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+The norm of $F \in H^{s,p}(V)$ is $\|J_s F\|_p$ (\Cref{lem:bessel-space-enorm}), and the
+$L_p$ function $J_s f$ of $f \in \TL{s}{p}{2}$ is the function $h$ of
+\Cref{thm:triebel-lizorkin-to-bessel}, since both represent the same tempered distribution
+(\Cref{lem:lp-distribution-determined}). The second claim is
+\Cref{thm:bessel-to-triebel-lizorkin} for the distribution $F$ and its $L_p$ function $J_s F$.
+\end{proof}
+
+\begin{corollary}[$\TL{s}{p}{2} = H^{s,p} \cap L_p$]
+\label{cor:bessel-triebel-lizorkin}
+\lean{Rd.memTriebelLizorkin_iff_memSobolev_bessel}
+\leanok
+\uses{thm:triebel-lizorkin-to-bessel, thm:bessel-to-triebel-lizorkin-lp}
+For every $n \geq 1$, every $1 < p < \infty$, every real $s$ and every $f \in L_p(V)$,
+$f \in \TL{s}{p}{2}$ if and only if $f \in H^{s,p}(V)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:triebel-lizorkin-to-bessel}; conversely, if $J_s f = h \in L_p(V)$, then
+$\|f\|_{F^s_{p,2}} \leq C \|h\|_p < \infty$ (\Cref{thm:bessel-to-triebel-lizorkin-lp}).
+\end{proof}
+
+\begin{corollary}[$\Sob{m}{p} = H^{m,p}$]
+\label{cor:sobolev-bessel}
+\lean{Rd.memSobolev_iff_memSobolev_bessel}
+\leanok
+\uses{cor:sobolev-triebel-lizorkin, cor:bessel-triebel-lizorkin}
+For every $n \geq 1$, every $1 < p < \infty$, every $m \in \N$ and every $f \in L_p(V)$,
+$f \in \Sob{m}{p}(V)$ if and only if $f \in H^{m,p}(V)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+Both are $\TL{m}{p}{2}$ (\Cref{cor:sobolev-triebel-lizorkin},
+\Cref{cor:bessel-triebel-lizorkin}).
+\end{proof}
+
+For $p = 2$, \Cref{sec:sobolev-two-littlewood-paley} proves $H^s(V) = \TL{s}{2}{2}$ directly by
+Plancherel's theorem, with explicit constants (\Cref{thm:sobolev-two-triebel-lizorkin}).

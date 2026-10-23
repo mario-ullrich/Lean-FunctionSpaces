@@ -1,0 +1,3593 @@
+% !TEX root = print.tex
+
+\part{Triebel--Lizorkin spaces}
+\label{part:triebel-lizorkin}
+
+This part treats the Triebel--Lizorkin spaces $\TL{s}{p}{q}$ on $\R^d$ and on the torus: the
+Besov sandwich from the comparison of mixed norms, and, with the Fefferman--Stein inequality, the
+characterisation by local means on both, and the characterisations by ball means of differences
+and by atoms on $\R^d$ (\Cref{ch:triebel-lizorkin}). \Cref{ch:singular-integrals} proves the
+strong type of vector-valued singular integrals with Calder\'on--Zygmund kernel families and,
+from it, the square function theorem $\TL{0}{p}{2} = L_p$ for $n \geq 1$ and $1 < p < \infty$
+(\Cref{cor:square-function-theorem}).
+
+\chapter{Triebel--Lizorkin spaces}
+\label{ch:triebel-lizorkin}
+
+Besov quasi-norms take the $L_p$ norm of every Littlewood--Paley block and then the $\ell_q$ norm
+over the levels. Triebel--Lizorkin quasi-norms take the two norms in the other order: the $\ell_q$
+norm over the levels at every point, and then the $L_p$ norm. This chapter works on a
+finite-dimensional real inner product space $V$ of dimension $n$ with Lebesgue measure, as in
+\Cref{ch:rd}, and on the torus; the two mixed norms are compared in \Cref{thm:mixed-norms}, and
+the maximal function and the Fefferman--Stein inequality are those of
+\Cref{ch:maximal-functions}. For $s > 0$ the spaces
+$\TL{s}{p}{q}$ and their descriptions by local means, ball means of differences and atoms are
+those of Triebel~\cite{TriebelII}; the descriptions are proved here for $1 < p < \infty$ and
+$1 < q \leq \infty$. The atoms here are normalised in $L_\infty$ and the sequence space
+$f^s_{p,q}$ carries the weights $2^{js}$; Triebel states the atomic characterisation with
+$(s,p)$-atoms normalised in $L_p$, and the two forms correspond under
+$\lambda_{j,m} \mapsto 2^{j(s - n/p)} \lambda_{j,m}$.
+
+\section{The spaces \texorpdfstring{$\TL{s}{p}{q}$}{F\^{}s\_\{p,q\}} and the Besov sandwich}
+
+As in \Cref{ch:rd}, $V$ is a finite-dimensional real inner product space with Lebesgue measure
+and $L_p = L_p(V)$ for $1 \leq p < \infty$. The Littlewood--Paley kernels $\psi_j$ are those of
+\Cref{def:lp-kernels}, and the Besov space $\Besov{s}{p}{q}$ is the approximation space $A^s_q$
+of the band-limited scheme in $L_p$ (\Cref{thm:lp-band}).
+
+\begin{lemma}[Pointwise bound of a convolution]
+\label{lem:conv-pointwise-bound}
+\lean{Rd.iSup_enorm_lt_top_of_bddAbove, Rd.enorm_conv_le_of_enorm_le}
+\leanok
+\uses{def:conv, lem:weighted-jensen}
+For every $1 \leq p < \infty$, every measurable $K : V \to \C$ and every $B \in [0, \infty]$ with
+$|K(y)| \leq B$ for all $y \in V$, every measurable $f : V \to \C$ and every $x \in V$,
+\[
+  |(K * f)(x)| \leq \|K\|_1^{1 - 1/p} \, B^{1/p} \, \|f\|_p .
+\]
+For bounded $K$, the supremum $B = \sup_{y \in V} |K(y)|$ is finite.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By the weighted Jensen inequality (\Cref{lem:weighted-jensen}) with the weight $|K|$,
+\[
+  \Bigl( \int |K(y)| \, |f(x - y)| \, dy \Bigr)^p
+  \leq \|K\|_1^{p-1} \int |K(y)| \, |f(x - y)|^p \, dy ,
+\]
+and the last integral is at most $B \|f\|_p^p$ by the translation invariance of Lebesgue
+measure. Take the $p$-th root.
+\end{proof}
+
+The bound covers $p = 1$, where it reads $|(K * f)(x)| \leq B \|f\|_1$.
+
+\begin{definition}[Triebel--Lizorkin spaces]
+\label{def:triebel-lizorkin}
+\lean{Rd.blockFun, Rd.lpBlock_ae_eq_blockFun, Rd.aestronglyMeasurable_blockFun,
+  Rd.enorm_lpBlock_eq_eLpNorm_blockFun, Rd.triebelLizorkinNorm, Rd.MemTriebelLizorkin,
+  Rd.aemeasurable_lqNorm_blockFun, Rd.littlewoodPaleyNorm_eq_lqNorm_eLpNorm}
+\leanok
+\uses{def:lp-blocks, def:conv, def:lq-norm}
+Let $1 \leq p < \infty$, $s \in \R$ and $1 \leq q \leq \infty$. For $f \in L_p$ and $j \in \N$ the
+pointwise block is $\psi_j * f$, the convolution integral at every point of $V$; it represents
+the Littlewood--Paley block $\Delta_j f \in L_p$. The Triebel--Lizorkin quasi-norm of $f$ is
+\[
+  \|f\|_{F^s_{p,q}} = \Bigl\| x \mapsto \bigl\| (2^{js} |(\psi_j * f)(x)|)_{j \in \N}
+  \bigr\|_{\ell_q} \Bigr\|_{L_p},
+\]
+and $\TL{s}{p}{q}$ consists of the $f \in L_p$ with $\|f\|_{F^s_{p,q}} < \infty$.
+\end{definition}
+
+For $s < 0$ this is the part $\TL{s}{p}{q} \cap L_p$ of the classical space of tempered
+distributions.
+
+The Littlewood--Paley quasi-norm of the Besov spaces (\Cref{def:lp-blocks}) takes the two norms
+in the other order, $\|f\|^{\mathrm{LP}}_{s,q} = \|(2^{js} \|\psi_j * f\|_p)_j\|_{\ell_q}$; in the
+notation of the mixed norms, $\|f\|_{F^s_{p,q}}$ is an $L_p(\ell_q)$ norm and
+$\|f\|^{\mathrm{LP}}_{s,q}$ an $\ell_q(L_p)$ norm of the same family.
+
+\begin{lemma}[The pointwise blocks]
+\label{lem:tl-pointwise-blocks}
+\lean{Rd.iSup_enorm_psi_lt_top, Rd.eLpNorm_psi_mul_iSup_psi_ne_top, Rd.enorm_blockFun_le,
+  Rd.blockFun_add_ae, Rd.blockFun_smul, Rd.memLp_blockFun, Rd.eLpNorm_blockFun_zero_le}
+\leanok
+\uses{def:triebel-lizorkin, lem:conv-pointwise-bound, lem:lp-kernels-basic, lem:conv-assoc,
+  thm:young}
+For every $1 \leq p < \infty$, all $f, g \in L_p$, every $c \in \C$, every $j \in \N$ and every
+$x \in V$, $\psi_j * f \in L_p$, $\|\psi_0 * f\|_p \leq \|\Phi\|_1 \, \|f\|_p$,
+\[
+  |(\psi_j * f)(x)| \leq \|\psi_j\|_1^{1 - 1/p} \bigl( \sup |\psi_j| \bigr)^{1/p} \|f\|_p
+\]
+with $\|\psi_j\|_1^{1 - 1/p} ( \sup |\psi_j| )^{1/p} < \infty$, and
+$(\psi_j * (c f))(x) = c \, (\psi_j * f)(x)$. For almost every $x \in V$,
+$(\psi_j * (f + g))(x) = (\psi_j * f)(x) + (\psi_j * g)(x)$ for all $j \in \N$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Young's inequality (\Cref{thm:young}) gives $\psi_j * f \in L_p$, and with
+$\|\psi_0\|_1 = \|\Phi_0\|_1 = \|\Phi\|_1$ (\Cref{lem:lp-kernels-basic}) the bound of
+$\psi_0 * f$. The pointwise bound is \Cref{lem:conv-pointwise-bound}; its constant is finite
+since $\psi_j$ is integrable and bounded (\Cref{lem:lp-kernels-basic}). Homogeneity holds for
+the integrals, and additivity holds almost everywhere for each $j$ by \Cref{lem:conv-assoc},
+hence for all $j$ at once outside a countable union of null sets.
+\end{proof}
+
+\begin{proposition}[Elementary properties]
+\label{prop:tl-elementary}
+\lean{Rd.triebelLizorkinNorm_add_le, Rd.triebelLizorkinNorm_smul, Rd.triebelLizorkinNorm_zero,
+  Rd.triebelLizorkinNorm_zero_left, Rd.triebelLizorkinNorm_mono_exponent,
+  Rd.triebelLizorkinNorm_mono_smoothness, Rd.MemTriebelLizorkin.mono_exponent,
+  Rd.MemTriebelLizorkin.mono_smoothness, Rd.MemTriebelLizorkin.add, Rd.MemTriebelLizorkin.smul,
+  Rd.triebelLizorkinSpace, Rd.mem_triebelLizorkinSpace, Rd.triebelLizorkinNorm_zero_two_eq}
+\leanok
+\uses{def:triebel-lizorkin, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-nonnegative}
+For every $1 \leq p < \infty$, all $s \leq t$ in $\R$, all $1 \leq q \leq r \leq \infty$, all
+$f, g \in L_p$ and every $c \in \C$,
+\[
+  \|f + g\|_{F^s_{p,q}} \leq \|f\|_{F^s_{p,q}} + \|g\|_{F^s_{p,q}}, \qquad
+  \|c f\|_{F^s_{p,q}} = |c| \, \|f\|_{F^s_{p,q}},
+\]
+\[
+  \|f\|_{F^s_{p,r}} \leq \|f\|_{F^s_{p,q}}, \qquad \|f\|_{F^s_{p,q}} \leq \|f\|_{F^t_{p,q}} ,
+\]
+and $\|f\|_{F^0_{p,q}} = \bigl\| x \mapsto \|((\psi_j * f)(x))_j\|_{\ell_q} \bigr\|_{L_p}$.
+In particular $\TL{s}{p}{q}$ is a linear subspace of $L_p$,
+$\TL{s}{p}{q} \subseteq \TL{s}{p}{r}$ and $\TL{t}{p}{q} \subseteq \TL{s}{p}{q}$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+At almost every point the blocks of $f + g$ are the sums of the blocks of $f$ and $g$
+(\Cref{lem:tl-pointwise-blocks}), so the triangle inequality in $\ell_q$
+(\Cref{lem:lq-basic}) and then in $L_p$ gives the first claim. The blocks of $c f$ are $c$ times
+those of $f$, and $|c|$ leaves the $\ell_q$ and the $L_p$ norm
+(\Cref{lem:lp-norm-nonnegative}). The monotonicity follows from
+$\|\cdot\|_{\ell_r} \leq \|\cdot\|_{\ell_q}$ and $2^{js} \leq 2^{jt}$ at every point. For
+$s = 0$ the weights $2^{j \cdot 0}$ are $1$, for every $q$ and in particular for $q = 2$.
+\end{proof}
+
+\begin{theorem}[$\TL{s}{p}{p} = \Besov{s}{p}{p}$]
+\label{thm:tl-diagonal}
+\lean{Rd.triebelLizorkinNorm_eq_littlewoodPaleyNorm, Rd.memTriebelLizorkin_iff_memApprox,
+  Rd.memTriebelLizorkin_iff_modulus}
+\leanok
+\uses{def:triebel-lizorkin, cor:mixed-norm-sandwich, thm:lp-band, thm:rd-besov}
+For every $1 \leq p < \infty$, every $s \in \R$ and every $f \in L_p$,
+$\|f\|_{F^s_{p,p}} = \|f\|^{\mathrm{LP}}_{s,p}$. If moreover $s > 0$, then $f \in \TL{s}{p}{p}$ if
+and only if $f \in \Besov{s}{p}{p}$, and for every $r \in \N$ with $s < r$, $f \in \TL{s}{p}{p}$ if
+and only if $\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_p} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The $L_p$ norm of the pointwise block $\psi_j * f$ is $\|\Delta_j f\|_p$, so the identity is
+$\|g\|_{L_p(\ell_p)} = \|g\|_{\ell_p(L_p)}$ for $g_j = 2^{js} |\psi_j * f|$
+(\Cref{cor:mixed-norm-sandwich}). The two characterisations are \Cref{thm:lp-band} and
+\Cref{thm:rd-besov} with $q = p$.
+\end{proof}
+
+\begin{theorem}[The Besov sandwich]
+\label{thm:tl-besov-sandwich}
+\lean{Rd.littlewoodPaleyNorm_max_le_triebelLizorkinNorm,
+  Rd.triebelLizorkinNorm_le_littlewoodPaleyNorm_min, Rd.approxNormDyadic_le_triebelLizorkinNorm,
+  Rd.triebelLizorkinNorm_le_approxNormDyadic, Rd.memApprox_of_memTriebelLizorkin,
+  Rd.memTriebelLizorkin_of_memApprox}
+\leanok
+\uses{def:triebel-lizorkin, cor:mixed-norm-sandwich, thm:lp-band, def:dyadic-norm}
+For every $1 \leq p < \infty$, every $s \in \R$, every $1 \leq q \leq \infty$ and every
+$f \in L_p$,
+\[
+  \|f\|^{\mathrm{LP}}_{s,\max(p,q)} \leq \|f\|_{F^s_{p,q}} \leq \|f\|^{\mathrm{LP}}_{s,\min(p,q)} .
+\]
+If $s \geq 0$, then
+\[
+  \|f\|_{F^s_{p,q}} \leq 8 \cdot 8^s \, \|\Phi\|_1 \, \|f\|^{\mathrm{dy}}_{A^s_{\min(p,q)}}
+\]
+with the band-limited scheme. If $s > 0$, then
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_{\max(p,q)}} \leq 2 (1 - 2^{-s})^{-1} \, \|f\|_{F^s_{p,q}}
+\]
+and
+\[
+  \Besov{s}{p}{\min(p,q)} \subseteq \TL{s}{p}{q} \subseteq \Besov{s}{p}{\max(p,q)} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first two inequalities are \Cref{cor:mixed-norm-sandwich} for the family
+$g_j = 2^{js} |\psi_j * f|$, whose $L_p$ norms are $2^{js} \|\Delta_j f\|_p$. The bounds by the
+approximation norms follow with \Cref{thm:lp-band} at the exponents $\max(p,q)$ and
+$\min(p,q)$, and so do the inclusions.
+\end{proof}
+
+For $q = 2$ the theorem places $\TL{s}{p}{2}$ between $\Besov{s}{p}{\min(p,2)}$ and
+$\Besov{s}{p}{\max(p,2)}$: for $p \geq 2$ between $\Besov{s}{p}{2}$ and $\Besov{s}{p}{p}$, for
+$p \leq 2$ between $\Besov{s}{p}{p}$ and $\Besov{s}{p}{2}$.
+
+\section{Triebel--Lizorkin spaces on the torus}
+
+The Littlewood--Paley blocks on the torus are those of \Cref{def:torus-lp-blocks}, and
+$\Besov{s}{p}{q}(\T^d)$ is the approximation space of the trigonometric polynomials in
+$L_p(\T^d)$, $1 \leq p < \infty$.
+
+\begin{definition}[Triebel--Lizorkin spaces on the torus]
+\label{def:torus-triebel-lizorkin}
+\lean{Torus.blockFun, Torus.lpBlock_ae_eq_blockFun, Torus.aestronglyMeasurable_blockFun,
+  Torus.enorm_lpBlock_eq_eLpNorm_blockFun, Torus.triebelLizorkinNorm, Torus.MemTriebelLizorkin,
+  Torus.aemeasurable_lqNorm_blockFun, Torus.littlewoodPaleyNorm_eq_lqNorm_eLpNorm}
+\leanok
+\uses{def:torus-lp-blocks, def:torus-econv, def:lq-norm}
+Let $1 \leq p < \infty$, $s \in \R$ and $1 \leq q \leq \infty$. For $f \in L_p(\T^d)$ and
+$j \in \N$ the pointwise block is $(\psi_j * f)(t) = \int_{\R^d} \psi_j(y) f(t - \pi y) \, dy$
+at every $t \in \T^d$; it represents the block $\Delta_j f \in L_p(\T^d)$. The
+Triebel--Lizorkin quasi-norm of $f$ is
+\[
+  \|f\|_{F^s_{p,q}} = \Bigl\| t \mapsto \bigl\| (2^{js} |(\psi_j * f)(t)|)_{j \in \N}
+  \bigr\|_{\ell_q} \Bigr\|_{L_p(\T^d)},
+\]
+and $\TL{s}{p}{q}(\T^d)$ consists of the $f \in L_p(\T^d)$ with $\|f\|_{F^s_{p,q}} < \infty$.
+\end{definition}
+
+\begin{proposition}[Elementary properties on the torus]
+\label{prop:torus-tl-elementary}
+\lean{Torus.blockFun_add_ae, Torus.blockFun_smul_ae, Torus.triebelLizorkinNorm_add_le,
+  Torus.triebelLizorkinNorm_smul, Torus.triebelLizorkinNorm_zero,
+  Torus.triebelLizorkinNorm_mono_exponent, Torus.triebelLizorkinNorm_mono_smoothness,
+  Torus.MemTriebelLizorkin.mono_exponent, Torus.MemTriebelLizorkin.mono_smoothness,
+  Torus.MemTriebelLizorkin.add, Torus.MemTriebelLizorkin.smul, Torus.triebelLizorkinSpace,
+  Torus.mem_triebelLizorkinSpace}
+\leanok
+\uses{def:torus-triebel-lizorkin, lem:torus-econv-young, lem:lq-basic, lem:lp-norm-nonnegative}
+For every $1 \leq p < \infty$, all $s \leq t$ in $\R$, all $1 \leq q \leq r \leq \infty$, all
+$f, g \in L_p(\T^d)$ and every $c \in \C$, for almost every $x \in \T^d$ and all $j \in \N$,
+\[
+  (\psi_j * (f + g))(x) = (\psi_j * f)(x) + (\psi_j * g)(x), \qquad
+  (\psi_j * (c f))(x) = c \, (\psi_j * f)(x),
+\]
+and
+\[
+  \|f + g\|_{F^s_{p,q}} \leq \|f\|_{F^s_{p,q}} + \|g\|_{F^s_{p,q}}, \qquad
+  \|c f\|_{F^s_{p,q}} = |c| \, \|f\|_{F^s_{p,q}},
+\]
+\[
+  \|f\|_{F^s_{p,r}} \leq \|f\|_{F^s_{p,q}}, \qquad \|f\|_{F^s_{p,q}} \leq \|f\|_{F^t_{p,q}} .
+\]
+In particular $\TL{s}{p}{q}(\T^d)$ is a linear subspace of $L_p(\T^d)$,
+$\TL{s}{p}{q}(\T^d) \subseteq \TL{s}{p}{r}(\T^d)$ and
+$\TL{t}{p}{q}(\T^d) \subseteq \TL{s}{p}{q}(\T^d)$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+The pointwise block depends on $f$ only through its class, and the convolution integral is
+linear in $f$. Since $L_p(\T^d) \subseteq L_1(\T^d)$, the integrals converge absolutely at almost
+every point (\Cref{lem:torus-econv-young}), which gives the identities for the pointwise blocks,
+for all $j$ at once. The rest is the proof of \Cref{prop:tl-elementary}.
+\end{proof}
+
+\begin{theorem}[$\TL{s}{p}{p}(\T^d) = \Besov{s}{p}{p}(\T^d)$ and the Besov sandwich on the torus]
+\label{thm:torus-tl-besov-sandwich}
+\lean{Torus.triebelLizorkinNorm_eq_littlewoodPaleyNorm, Torus.memTriebelLizorkin_iff_memBesov,
+  Torus.memTriebelLizorkin_iff_modulus, Torus.littlewoodPaleyNorm_max_le_triebelLizorkinNorm,
+  Torus.triebelLizorkinNorm_le_littlewoodPaleyNorm_min,
+  Torus.approxNormDyadic_le_triebelLizorkinNorm, Torus.triebelLizorkinNorm_le_approxNormDyadic,
+  Torus.memBesov_of_memTriebelLizorkin, Torus.memTriebelLizorkin_of_memBesov}
+\leanok
+\uses{def:torus-triebel-lizorkin, cor:mixed-norm-sandwich, thm:torus-lp-besov, def:dyadic-norm,
+  thm:torus-lp-moduli}
+For every $1 \leq p < \infty$, every $s \in \R$, every $1 \leq q \leq \infty$ and every
+$f \in L_p(\T^d)$,
+\[
+  \|f\|^{\mathrm{LP}}_{s,\max(p,q)} \leq \|f\|_{F^s_{p,q}} \leq \|f\|^{\mathrm{LP}}_{s,\min(p,q)} ,
+  \qquad \|f\|_{F^s_{p,p}} = \|f\|^{\mathrm{LP}}_{s,p} .
+\]
+Let $A$ be the scheme of trigonometric polynomials in $L_p(\T^d)$. If $s \geq 0$, then
+\[
+  \|f\|_{F^s_{p,q}} \leq 2 (\#d + 1) \, 2^{(\#d + 1) s} \, \|\Phi\|_1 \,
+  \|f\|^{\mathrm{dy}}_{A^s_{\min(p,q)}} .
+\]
+If $s > 0$, then
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_{\max(p,q)}} \leq 2 \cdot 2^s (1 - 2^{-s})^{-1} \, \|f\|_{F^s_{p,q}} ,
+\]
+$f \in \TL{s}{p}{p}(\T^d)$ if and only if $f \in \Besov{s}{p}{p}(\T^d)$, for every $r \in \N$ with
+$s < r$, $f \in \TL{s}{p}{p}(\T^d)$ if and only if
+$\|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_p} < \infty$, and
+\[
+  \Besov{s}{p}{\min(p,q)}(\T^d) \subseteq \TL{s}{p}{q}(\T^d)
+  \subseteq \Besov{s}{p}{\max(p,q)}(\T^d) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The $L_p$ norm of the pointwise block $\psi_j * f$ is $\|\Delta_j f\|_p$, so the bounds are
+\Cref{cor:mixed-norm-sandwich} for the family $g_j = 2^{js} |\psi_j * f|$ on $\T^d$. The
+characterisation of $\Besov{s}{p}{q}(\T^d)$ by Littlewood--Paley blocks
+(\Cref{thm:torus-lp-besov}) at the exponents $p$, $\max(p,q)$ and $\min(p,q)$ gives the
+bounds by the approximation norms and the statements on spaces; the description by moduli of
+smoothness is \Cref{thm:torus-lp-moduli} with $q = p$.
+\end{proof}
+
+As on $\R^n$, for $q = 2$ the theorem places $\TL{s}{p}{2}(\T^d)$ between
+$\Besov{s}{p}{\min(p,2)}(\T^d)$ and $\Besov{s}{p}{\max(p,2)}(\T^d)$.
+
+\section{Kernel majorants}
+
+The characterisations of the spaces $\TL{s}{p}{q}$ compare two kinds of blocks pointwise: a block of
+one kind is a sum of blocks of the other kind, each convolved with a cross kernel. This section
+bounds the cross kernels by the Peetre weights $2^{\nu n} (1 + 2^\nu \|y\|)^{-N}$ times a factor
+$c_{ji}$, a power $2^{-(j-i)L}$ that decays geometrically in $j - i$ for $i \leq j$ and $1$ for
+$i > j$, and such kernels act below the maximal function. As throughout this chapter, $V$ has
+dimension $n$; the kernels $\Phi$, $\Theta$, $\psi_j$ are those of \Cref{def:lp-kernels}, $g$ is
+a bump of radius $R$ with the kernels $m$, $k_j$, $\eta_j$ of \Cref{def:local-means}, and every
+constant is explicit.
+
+\begin{lemma}[Peetre weights]
+\label{lem:peetre-weights}
+\lean{ENNReal.inv_le_mul_inv_of_le, ENNReal.one_add_ne_zero, ENNReal.inv_one_add_mul_pow_le,
+  Rd.inv_one_add_mul_enorm_sub_pow_le, ENNReal.inv_one_add_mul_pow_anti,
+  ENNReal.inv_one_add_mul_pow_le_two_pow, ENNReal.inv_one_add_pow_mul_pow_le,
+  Rd.ofReal_one_add_norm_rpow_neg, Rd.ofReal_inv_one_add_mul_norm_pow,
+  Rd.two_pow_mul_enorm_le_ofReal, Rd.ofReal_one_add_two_pow_mul_norm,
+  ENNReal.one_le_ofReal_mul_inv_of_le, Rd.inv_one_add_ofReal_half_pow_le,
+  Rd.inv_one_add_ofReal_div_pow_le, ENNReal.inv_one_add_pow_two_mul_mul_pow}
+\leanok
+For every $N \in \N$, all $i, j, j', L \in \N$, all $0 \leq a \leq b < \infty$, every
+$u \in [0, \infty]$ and all $y, w \in V$:
+\begin{enumerate}
+  \item $(1 + a \|y - w\|)^{-N} \leq (1 + a \|w\|)^N (1 + a \|y\|)^{-N}$;
+  \item $(1 + b u)^{-N} \leq (1 + a u)^{-N}$ and $(1 + a u)^{-N} \leq 2^N (1 + 2 a u)^{-N}$;
+  \item $(1 + a)^{-(k + r + m)} a^r \leq (1 + a)^{-k} (1 + a)^{-m}$ and
+    $(1 + a)^{-2N} (1 + a)^N = (1 + a)^{-N}$ for all $k, r, m \in \N$;
+  \item if $a \leq b$, then $1 \leq (1 + b)^N (1 + a)^{-N}$;
+  \item $(1 + 2^i \|y\| / 2)^{-N} \leq 2^N (1 + 2^j \|y\|)^{-N}$ for all $j \leq i$;
+  \item $(1 + 2^{j'} \|w\| / (2 L))^{-N} \leq (8 L)^N (1 + 2^i \|w\|)^{-N}$ for all
+    $L \geq 1$ and $i \leq j' + 2$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) follows from $\|y\| \leq \|w\| + \|y - w\|$ and
+$1 + a (s + t) \leq (1 + a s)(1 + a t)$; (5) from $1 + 2^j \|y\| \leq 2 (1 + 2^i \|y\| / 2)$, and
+(6) from $1 + 2^i \|w\| \leq 8 L + 4 \cdot 2^{j'} \|w\| = 8 L (1 + 2^{j'} \|w\| / (2 L))$. The
+other claims are elementary. Each inequality $X^{-1} \leq c Y^{-1}$ follows from $Y \leq c X$
+for $0 < c < \infty$.
+\end{proof}
+
+\begin{lemma}[Decay of Schwartz functions and of their differences]
+\label{lem:schwartz-decay}
+\lean{Rd.schwartzDecayConst, Rd.schwartzDecayConst_ne_top, Rd.one_add_norm_pow_mul_le_schwartz,
+  Rd.one_add_norm_le_mul_of_mem_Icc, Rd.norm_iteratedFDeriv_schwartz_le_of_mem_Icc,
+  Rd.enorm_higherDiff_schwartz_le, Rd.enorm_schwartz_le, Rd.enorm_two_pow_smul,
+  Rd.enorm_dilate_two_pow, Rd.enorm_dilate_schwartz_le, Rd.enorm_higherDiff_dilate_schwartz_le}
+\leanok
+\uses{lem:differences-segment, lem:peetre-weights, lem:dilate, lem:rd-differences,
+  thm:band-jackson}
+For every Schwartz function $G : V \to \C$ and all $r, N \in \N$ let
+\[
+  C_{G,r,N} = 2^N \Bigl( \sup_x \|D^r G(x)\| + \sup_x \|x\|^N \|D^r G(x)\| \Bigr) < \infty .
+\]
+For all $v, y, h \in V$ and $j \in \N$,
+\[
+  |\Delta_v^r G(y)| \leq C_{G,r,N} \|v\|^r (1 + r \|v\|)^N (1 + \|y\|)^{-N},
+\]
+\[
+  |\Delta_h^r G_{2^j}(y)| \leq C_{G,r,N} \|2^j h\|^r (1 + r \|2^j h\|)^N \, 2^{jn}
+  (1 + 2^j \|y\|)^{-N} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$(1 + \|x\|)^N \leq 2^N (1 + \|x\|^N)$ gives $\|D^r G(x)\| \leq C_{G,r,N} (1 + \|x\|)^{-N}$
+(Mathlib's \texttt{SchwartzMap.\allowbreak one\_\allowbreak add\_\allowbreak le\_\allowbreak
+sup\_\allowbreak seminorm\_\allowbreak apply} is the same kind of bound with a supremum over
+seminorms), and $1 + \|y\| \leq (1 + \|y + t v\|)(1 + r \|v\|)$ for $0 \leq t \leq r$ moves the
+weight from $y + t v$ to $y$; \Cref{lem:differences-segment} concludes. For the dilations,
+$|G_{2^j}(y)| = 2^{jn} |G(2^j y)|$ and $\Delta_h^r G_{2^j} = (\Delta_{2^j h}^r G)_{2^j}$
+(\Cref{lem:rd-differences}).
+\end{proof}
+
+With $r = 0$ the two bounds are the decay $|G(y)| \leq C_{G,0,N} (1 + \|y\|)^{-N}$ and
+$|G_{2^j}(y)| \leq C_{G,0,N} \, 2^{jn} (1 + 2^j \|y\|)^{-N}$.
+
+\begin{lemma}[Tails and changes of scale]
+\label{lem:schwartz-tails}
+\lean{Rd.peetreIntegral, Rd.peetreIntegral_ne_top, Rd.tailConst, Rd.tailConst_ne_top,
+  Rd.enorm_mul_enorm_pow_le_of_le, Rd.lintegral_tail_schwartz_le, Rd.lintegral_comp_smul,
+  Rd.setLIntegral_comp_smul, Rd.smul_setOf_le_norm, Rd.lintegral_comp_two_pow_smul,
+  Rd.lintegral_dilate_peetre, Rd.setLIntegral_enorm_dilate_schwartz_le}
+\leanok
+\uses{lem:schwartz-decay, lem:peetre-weights}
+For every $M \in \N$ let $I_M = \int_V (1 + \|u\|)^{-M} \, du$; then $I_M < \infty$ for $M > n$.
+For every Schwartz function $G$ and all $r, N \in \N$ let
+$T_{G,r,N} = C_{G,0,N+r+n+1} \, I_{n+1} < \infty$, and write $t_+ = \max(t, 0)$. For all
+$\rho, a \in \R$ and $j \in \N$,
+\[
+  \int_{\{\|z\| \geq \rho\}} |G(z)| \, \|z\|^r \, dz \leq T_{G,r,N} (1 + \rho_+)^{-N},
+\]
+\[
+  \int_{\{\|z\| \geq a\}} |G_{2^j}(z)| \, dz \leq T_{G,0,N} (1 + (2^j a)_+)^{-N},
+\]
+and $\int_V 2^{jn} (1 + 2^j \|u\|)^{-N} \, du = I_N$. For every $f : V \to [0, \infty]$, every
+$c \neq 0$ and every $S \subseteq V$, $\int_S f(c x) \, dx = |c|^{-n} \int_{c S} f$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$I_M < \infty$ is Mathlib's \texttt{finite\_integral\_one\_add\_norm}. On $\{\|z\| \geq \rho\}$,
+\Cref{lem:schwartz-decay} and part (3) of \Cref{lem:peetre-weights} give
+$|G(z)| \|z\|^r \leq C_{G,0,N+r+n+1} (1 + \rho_+)^{-N} (1 + \|z\|)^{-(n+1)}$. The change of scale
+is the image of Lebesgue measure under $x \mapsto c x$ (Mathlib's
+\texttt{Measure.\allowbreak map\_\allowbreak addHaar\_\allowbreak smul}), restricted to $c S$;
+with $c = 2^j$ it turns the tail of $G_{2^j}$ beyond $a$ into the tail of $G$ beyond $2^j a$.
+\end{proof}
+
+For $S = V$ the change of scale reads $\int_V f(c x) \, dx = |c|^{-n} \int_V f$.
+
+\begin{lemma}[Two Peetre bumps]
+\label{lem:two-decay-bumps}
+\lean{Rd.peetre_mul_peetre_le, Rd.lintegral_peetre_mul_le}
+\leanok
+\uses{lem:peetre-weights, lem:schwartz-tails}
+For all $i \leq j$ in $\N$, every $N \in \N$ and every $y \in V$,
+\[
+  \int_V 2^{jn} (1 + 2^j \|y - w\|)^{-2N} \, 2^{in} (1 + 2^i \|w\|)^{-N} \, dw
+  \leq I_N \, 2^{in} (1 + 2^i \|y\|)^{-N} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By part (1) of \Cref{lem:peetre-weights} and $2^i \leq 2^j$,
+$(1 + 2^i \|w\|)^{-N} \leq (1 + 2^j \|y - w\|)^N (1 + 2^i \|y\|)^{-N}$, which leaves
+$\int_V 2^{jn} (1 + 2^j \|y - w\|)^{-N} \, dw = I_N$ by the substitution $u = 2^j (y - w)$.
+\end{proof}
+
+The bound holds for every $N$; it is useful for $N > n$, where $I_N < \infty$.
+
+\begin{lemma}[Dyadic weights of integer order]
+\label{lem:dyadic-weights-integer}
+\lean{ENNReal.dyadicWeight_natCast, ENNReal.dyadicWeight_neg_natCast,
+  ENNReal.dyadicWeight_neg_sub_le, ENNReal.one_le_two_pow_mul_dyadicWeight_neg,
+  ENNReal.dyadicWeight_mul_dyadicWeight_neg_eq}
+\leanok
+\uses{def:lq-norm}
+For all $L, i, j', k, m \in \N$: $2^{-mL} = (2^m)^{-L}$; if $i \leq j' \leq k$, then
+$2^{-(k-i)L} \leq 2^L \, 2^{-(j'+1-i)L}$; if $m \leq 1$, then $1 \leq 2^L 2^{-mL}$; and if
+$i \leq j' + 2$, then $2^{iL} 2^{-j'L} = 4^L \, 2^{-(j'+2-i)L}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The exponents add: $2^{-(j'+2-i)L} 2^{-iL} = 2^{-j'L} 2^{-2L}$.
+\end{proof}
+
+\begin{lemma}[Convolution in the second argument and averaged differences]
+\label{lem:conv-second-argument}
+\lean{Rd.conv_sub_ae, Rd.conv_finsetSum_ae, Rd.ae_enorm_sub_conv_dilate_momentKernel_le}
+\leanok
+\uses{lem:conv-assoc, lem:averaged-differences}
+Let $1 \leq p < \infty$ and $K \in L_1$. For all $f, f' \in L_p$ and every finite family
+$(f_i)_{i \in S}$ in $L_p$, almost everywhere on $V$,
+\[
+  K * (f - f') = K * f - K * f', \qquad K * \sum_{i \in S} f_i = \sum_{i \in S} K * f_i .
+\]
+For every $L \in \N$, every $g \in L_1$ with $\int_V g = 1$ and its moment kernel $m^g$ of
+order $L$, every $c > 0$, every $f \in L_p$ and almost every $x \in V$,
+\[
+  |f(x) - (m^g_c * f)(x)| \leq \int_V |g(z)| \, |\Delta^L_{-c^{-1} z} f(x)| \, dz .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first two identities follow from the additivity in \Cref{lem:conv-assoc}, by induction over
+$S$ for the sum. The bound is \Cref{lem:averaged-differences} with the triangle inequality for
+the integral.
+\end{proof}
+
+\begin{lemma}[Bounds of the local means kernels]
+\label{lem:local-means-kernel-bounds}
+\lean{Rd.LocalMeansBump.kernelSupConst, Rd.LocalMeansBump.kernelSupConst_nonneg,
+  Rd.LocalMeansBump.norm_scaled_le, Rd.LocalMeansBump.norm_kernel_le,
+  Rd.LocalMeansBump.kernel_eq_zero_of_lt, Rd.LocalMeansBump.enorm_kernel_le}
+\leanok
+\uses{def:local-means, lem:dual-kernel-bounds}
+Let $L \in \N$ and $A_L = 2 \sup_V |m|$. For all $j \in \N$ and $y \in V$,
+$|m_{2^j}(y)| \leq 2^{jn} \sup_V |m|$ and $|k_j(y)| \leq A_L 2^{jn}$, and $k_j(y) = 0$ if
+$\|y\| > 2 L R \, 2^{-j}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$m_{2^j}(y) = 2^{jn} m(2^j y)$, and $k_j$ is a difference of two such terms, each supported in
+$\overline B(0, L R \, 2^{-(j-1)})$ by \Cref{lem:dual-kernel-bounds}.
+\end{proof}
+
+\begin{lemma}[Local means kernels from one scale]
+\label{lem:local-means-one-scale}
+\lean{Rd.LocalMeansBump.ae_enorm_conv_kernel_le_of_scaled}
+\leanok
+\uses{def:local-means, lem:conv-assoc, lem:dyadic-weights-integer}
+For every $L \in \N$, all $j < i$, every $f \in L_1$, every $C \in [0, \infty]$ and every
+$u : V \to [0, \infty]$ such that for every $k \geq j$ almost everywhere
+$|f(x) - (m_{2^k} * f)(x)| \leq C \, 2^{-(k-j)L} u(x)$, almost everywhere
+\[
+  |(k_i * f)(x)| \leq 2 \cdot 2^L \, C \, 2^{-(i-j)L} u(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Since $i \geq 1$, $k_i = m_{2^i} - m_{2^{i-1}}$, so
+$k_i * f = (f - m_{2^{i-1}} * f) - (f - m_{2^i} * f)$ almost everywhere (\Cref{lem:conv-assoc}),
+and $2^{-(k-j)L} \leq 2^L \, 2^{-(i-j)L}$ for $k \in \{i - 1, i\}$
+(\Cref{lem:dyadic-weights-integer}).
+\end{proof}
+
+\begin{theorem}[The cross kernel of local means and band-limiting kernels]
+\label{thm:cross-kernel-theta}
+\lean{Rd.LocalMeansBump.enorm_mul_higherDiff_Theta_le,
+  Rd.LocalMeansBump.ae_enorm_Theta_sub_conv_scaled_le, Rd.LocalMeansBump.kernelThetaMomentConst,
+  Rd.LocalMeansBump.kernelThetaMomentConst_ne_top,
+  Rd.LocalMeansBump.ae_enorm_conv_kernel_Theta_le_of_lt,
+  Rd.LocalMeansBump.kernelThetaSupportConst, Rd.LocalMeansBump.kernelThetaSupportConst_ne_top,
+  Rd.LocalMeansBump.lintegral_Theta_mul_kernel_le_near,
+  Rd.LocalMeansBump.lintegral_Theta_mul_kernel_le_far,
+  Rd.LocalMeansBump.enorm_conv_kernel_Theta_le_of_le, Rd.LocalMeansBump.kernelThetaConst,
+  Rd.LocalMeansBump.kernelThetaConst_ne_top, Rd.LocalMeansBump.enorm_conv_kernel_Theta_le}
+\leanok
+\uses{lem:local-means-kernel-bounds, lem:local-means-one-scale, lem:conv-second-argument,
+  lem:schwartz-decay, lem:schwartz-tails, lem:peetre-weights, lem:dyadic-weights-integer,
+  lem:lp-kernels-basic, lem:conv-assoc, lem:weighted-jensen}
+Let $L, N \in \N$, let
+\[
+  C^{\mathrm m}_{L,N} = 2 \|g\|_1 (2R)^L (1 + 2LR)^N C_{\Theta,L,N},
+\]
+\[
+  C^{\mathrm s}_{L,N} = A_L \bigl( \|\Theta\|_1 (1 + 4LR)^N + 2^N T_{\Theta,0,N} \bigr),
+\]
+and $C^\Theta_{L,N} = C^{\mathrm m}_{L,N} + C^{\mathrm s}_{L,N} < \infty$.
+For all $i, j \in \N$, with $\nu = \min(i, j)$, $c_{ji} = 2^{-(j-i)L}$ for $i \leq j$ and
+$c_{ji} = 1$ for $i > j$, and for almost every $y \in V$,
+\[
+  |(k_j * \Theta_i)(y)| \leq C^\Theta_{L,N} \, c_{ji} \, 2^{\nu n} (1 + 2^\nu \|y\|)^{-N} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\emph{Moment case $i < j$.} By \Cref{lem:local-means-one-scale} it suffices to bound
+$|\Theta_i - m_c * \Theta_i|$ for $c = 2^k$, $k \geq i$. \Cref{lem:conv-second-argument} bounds
+$|\Theta_i - m_c * \Theta_i|(y)$ by $\int |g(z)| |\Delta^L_{-2^{-k} z} \Theta_i(y)| \, dz$. On the
+support of $g$ the step $2^i \cdot 2^{-k} z$ of the dilated difference has length at most
+$2^{-(k-i)} R \leq R$, and \Cref{lem:schwartz-decay} for $G = \Theta$ gives
+$|\Delta^L_{-2^{-k} z} \Theta_i(y)| \leq C_{\Theta,L,N} R^L 2^{-(k-i)L} (1 + LR)^N 2^{in}
+(1 + 2^i \|y\|)^{-N}$; \Cref{lem:dyadic-weights-integer} replaces $2^{-(k-i)L}$ by
+$2^L 2^{-(j-i)L}$.
+
+\emph{Support case $i \geq j$.} By commutativity,
+$|(k_j * \Theta_i)(y)| \leq \int |\Theta_i(z)| |k_j(y - z)| \, dz$, and
+$|k_j| \leq A_L 2^{jn}$ vanishes outside $\overline B(0, 2LR \, 2^{-j})$
+(\Cref{lem:local-means-kernel-bounds}). For $\|y\| \leq 4LR \, 2^{-j}$ the integral is at most
+$A_L 2^{jn} \|\Theta\|_1$, and $1 \leq (1 + 4LR)^N (1 + 2^j \|y\|)^{-N}$. For
+$\|y\| > 4LR \, 2^{-j}$ the integrand vanishes unless $\|z\| \geq \|y\|/2$, and
+\Cref{lem:schwartz-tails} bounds the tail of $\Theta_i$ by
+$T_{\Theta,0,N} (1 + 2^i \|y\|/2)^{-N} \leq 2^N T_{\Theta,0,N} (1 + 2^j \|y\|)^{-N}$ (part (5)
+of \Cref{lem:peetre-weights}). For $i = j$ the weight is $c_{jj} = 1$.
+\end{proof}
+
+The moment case uses only $\int g = 1$, through the averaged differences, so the bound holds
+for every bump $g$ and every order $L$.
+
+\begin{lemma}[The moment kernels of the Littlewood--Paley kernel]
+\label{lem:lp-moment-kernels}
+\lean{Rd.fourier_dilate_momentKernel, Rd.continuous_momentKernel, Rd.bddAbove_momentKernel,
+  Rd.lpMoment, Rd.lpMomentScaled, Rd.integrable_lpMomentScaled, Rd.continuous_lpMomentScaled,
+  Rd.bddAbove_lpMomentScaled, Rd.fourier_lpMomentScaled_eq_zero, Rd.conv_psi_lpMomentScaled}
+\leanok
+\uses{def:moment-kernel, lem:fourier-dilate, lem:lp-kernels-basic, lem:lp-kernels-frequency,
+  lem:conv-of-fourier}
+For every integrable $h : V \to \C$, every $L \in \N$, every $c > 0$ and every $\xi \in V$, the
+moment kernel $m^h$ of order $L$ of $h$ satisfies
+\[
+  \widehat{(m^h)_c}(\xi) = \sum_{l=1}^L (-1)^{l+1} \binom{L}{l} \, \widehat h(l c^{-1} \xi) .
+\]
+Let $\mu$ be the moment kernel of order $L$ of $\Phi$. For all $j \in \N$ and $\xi \in V$ with
+$\|\xi\| \geq 2^{j+1}$, $\widehat{\mu_{2^j}}(\xi) = 0$, and $\psi_{j+2} * \mu_{2^j} = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The formula follows from \Cref{def:moment-kernel} and \Cref{lem:fourier-dilate}, term by term.
+For $\|\xi\| \geq 2^{j+1}$ and $l \geq 1$, $\|l \, 2^{-j} \xi\| \geq 2$, where
+$\widehat\Phi = \chi_{1,2}$ vanishes. Since $\widehat{\psi_{j+2}}$ vanishes on the ball of
+radius $2^{j+1}$ (\Cref{lem:lp-kernels-frequency}), $\widehat{\psi_{j+2}} \widehat{\mu_{2^j}} = 0$,
+and \Cref{lem:conv-of-fourier} applies to the bounded continuous kernel $\mu_{2^j}$.
+\end{proof}
+
+\begin{lemma}[Decay of the Littlewood--Paley blocks]
+\label{lem:lp-blocks-decay}
+\lean{Rd.psiDecayConst, Rd.psiDecayConst_ne_top, Rd.enorm_psi_le}
+\leanok
+\uses{lem:schwartz-decay, lem:peetre-weights, def:lp-kernels}
+For every $N \in \N$ let $P_N = (1 + 2^N) C_{\Phi,0,N} < \infty$. For every $j \in \N$ and every
+$y \in V$, $|\psi_j(y)| \leq P_N 2^{jn} (1 + 2^j \|y\|)^{-N}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\psi_j = \Phi_j - \Phi_{j-1}$ for $j \geq 1$; \Cref{lem:schwartz-decay} bounds both dilations,
+and $(1 + 2^{j-1} \|y\|)^{-N} \leq 2^N (1 + 2^j \|y\|)^{-N}$.
+\end{proof}
+
+\begin{lemma}[Kernels of small support against Peetre weights]
+\label{lem:small-support-decay}
+\lean{Rd.lintegral_mul_peetre_le_of_support}
+\leanok
+\uses{lem:peetre-weights}
+Let $k, N \in \N$, $\rho \geq 0$, $C \in [0, \infty]$, and let $\eta, \psi : V \to \C$ with
+$\eta$ almost everywhere strongly measurable, $\eta = 0$ outside $\overline B(0, \rho 2^{-k})$
+and $|\psi(z)| \leq C 2^{kn} (1 + 2^k \|z\|)^{-N}$ for all $z$. For every $y \in V$,
+\[
+  \int_V |\eta(w)| \, |\psi(y - w)| \, dw \leq \|\eta\|_1 \, C (1 + \rho)^N 2^{kn}
+  (1 + 2^k \|y\|)^{-N} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+On the support of $\eta$, $2^k \|w\| \leq \rho$, and part (1) of \Cref{lem:peetre-weights} gives
+$(1 + 2^k \|y - w\|)^{-N} \leq (1 + \rho)^N (1 + 2^k \|y\|)^{-N}$.
+\end{proof}
+
+\begin{lemma}[Averaged differences of the dual kernels]
+\label{lem:dual-averaged-differences}
+\lean{Rd.LocalMeansBump.enorm_higherDiff_dual_le, Rd.LocalMeansBump.higherDiff_dual_eq_zero,
+  Rd.LocalMeansBump.lintegral_lpKernel_mul_higherDiff_dual_le, Rd.LocalMeansBump.dualTailConst,
+  Rd.LocalMeansBump.dualTailConst_ne_top, Rd.LocalMeansBump.higherDiff_dual_eq_zero_of_norm_lt,
+  Rd.LocalMeansBump.ae_enorm_dual_sub_conv_lpMomentScaled_le}
+\leanok
+\uses{lem:dual-kernel-derivatives, lem:dual-kernel-bounds, lem:smooth-differences,
+  lem:conv-second-argument, lem:schwartz-tails, lem:peetre-weights, lem:dyadic-weights-integer,
+  lem:lp-moment-kernels, lem:lp-kernels-basic}
+Let $L, N \in \N$, $L' \geq 1$, let $\mu$ be the moment kernel of order $L'$ of $\Phi$, let
+$A_{L,L'}$ be the constant of \Cref{lem:dual-kernel-derivatives} for the order $K = L'$, and
+\[
+  D_{L,L',N} = A_{L,L'} \, 4^{L'} (8 L')^N (1 + 4LR)^N \, T_{\Phi,L',N} < \infty .
+\]
+For all $i, j' \in \N$ with $i \leq j' + 2$ and almost every $w \in V$,
+\[
+  |\eta_i(w) - (\mu_{2^{j'}} * \eta_i)(w)| \leq D_{L,L',N} \, 2^{-(j'+2-i)L'} \, 2^{in}
+  (1 + 2^i \|w\|)^{-N} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:conv-second-argument} the left side is at most
+$\int |\Phi(z)| |\Delta^{L'}_{-2^{-j'} z} \eta_i(w)| \, dz$. By \Cref{lem:smooth-differences} and
+\Cref{lem:dual-kernel-derivatives},
+$|\Delta^{L'}_{-2^{-j'} z} \eta_i(w)| \leq A_{L,L'} 2^{in} 2^{iL'} 2^{-j'L'} \|z\|^{L'}$, and
+the difference vanishes if $\|w\| > 2LR \, 2^{-i} + L' 2^{-j'} \|z\|$, since $\eta_i$ vanishes
+outside $\overline B(0, 2LR \, 2^{-i})$. For $\|w\| \leq 4LR \, 2^{-i}$, \Cref{lem:schwartz-tails}
+with $\rho = 0$ bounds the integral by $T_{\Phi,L',N}$, and
+$1 \leq (1 + 4LR)^N (1 + 2^i \|w\|)^{-N}$. For $\|w\| > 4LR \, 2^{-i}$ only
+$\|z\| \geq 2^{j'} \|w\| / (2L')$ contributes, and the tail bound with part (6) of
+\Cref{lem:peetre-weights} gives the factor $(8L')^N (1 + 2^i \|w\|)^{-N}$. Finally
+$2^{iL'} 2^{-j'L'} = 4^{L'} 2^{-(j'+2-i)L'}$ (\Cref{lem:dyadic-weights-integer}).
+\end{proof}
+
+\begin{theorem}[The cross kernel of blocks and dual kernels]
+\label{thm:cross-kernel-dual}
+\lean{Rd.LocalMeansBump.psiDualSupportConst, Rd.LocalMeansBump.psiDualSupportConst_ne_top,
+  Rd.LocalMeansBump.lintegral_enorm_dual_le,
+  Rd.LocalMeansBump.enorm_conv_psi_dual_le_of_lt,
+  Rd.LocalMeansBump.enorm_conv_psi_dual_le_of_le_one, Rd.LocalMeansBump.conv_psi_dual_ae_eq,
+  Rd.LocalMeansBump.ae_enorm_conv_psi_dual_le_of_two_le, Rd.LocalMeansBump.psiDualConst,
+  Rd.LocalMeansBump.psiDualConst_ne_top, Rd.LocalMeansBump.enorm_conv_psi_dual_le}
+\leanok
+\uses{lem:lp-blocks-decay, lem:small-support-decay, lem:dual-averaged-differences,
+  lem:lp-moment-kernels, lem:two-decay-bumps, lem:dual-kernel-bounds, lem:dual-kernel-moduli,
+  lem:dyadic-weights-integer, lem:conv-assoc, lem:conv-second-argument, lem:weighted-jensen}
+Let $L, N \in \N$ and $L' \geq 1$, and let
+\[
+  S_{L,N} = 2 P_N (1 + 2LR)^N \|m\|_1,
+\]
+\[
+  C_{L,L',N} = (1 + 2^{n + L'}) S_{L,N} + D_{L,L',N} \, P_{2N} \, I_N ,
+\]
+with $C_{L,L',N} < \infty$ for $N > n$. For all $i, j \in \N$, with $\nu = \min(i, j)$,
+$c_{ji} = 2^{-(j-i)L'}$ for $i \leq j$ and $c_{ji} = 1$ for $i > j$, and for almost every
+$y \in V$,
+\[
+  |(\psi_j * \eta_i)(y)| \leq C_{L,L',N} \, c_{ji} \, 2^{\nu n} (1 + 2^\nu \|y\|)^{-N} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By commutativity, $|(\psi_j * \eta_i)(y)| \leq \int |\eta_i(w)| |\psi_j(y - w)| \, dw$, and
+$\|\eta_i\|_1 \leq 2 \|m\|_1$ (\Cref{lem:dual-kernel-moduli}).
+
+\emph{Case $i > j$.} $\eta_i$ vanishes outside $\overline B(0, 2LR \, 2^{-i})$, which lies in
+$\overline B(0, 2LR \, 2^{-j})$; \Cref{lem:small-support-decay} with $k = j$ and
+\Cref{lem:lp-blocks-decay} give the bound $S_{L,N} 2^{jn} (1 + 2^j \|y\|)^{-N}$.
+
+\emph{Case $i \leq j \leq 1$.} The same with $k = i$, since
+$|\psi_j(z)| \leq 2^n P_N 2^{in} (1 + 2^i \|z\|)^{-N}$, and $1 \leq 2^{L'} 2^{-(j-i)L'}$.
+
+\emph{Case $i \leq j$, $j \geq 2$.} By \Cref{lem:lp-moment-kernels} and associativity,
+$\psi_j * (\mu_{2^{j-2}} * \eta_i) = (\psi_j * \mu_{2^{j-2}}) * \eta_i = 0$ almost everywhere,
+so $\psi_j * \eta_i = \psi_j * (\eta_i - \mu_{2^{j-2}} * \eta_i)$ almost everywhere.
+\Cref{lem:dual-averaged-differences} with $j' = j - 2$, \Cref{lem:lp-blocks-decay} with the
+order $2N$ and \Cref{lem:two-decay-bumps} give the bound
+$D_{L,L',N} P_{2N} I_N \, 2^{-(j-i)L'} 2^{in} (1 + 2^i \|y\|)^{-N}$.
+\end{proof}
+
+The order $L'$ of the moment kernel of $\Phi$ is free, so the decay $2^{-(j-i)L'}$ is available
+for every $L'$, independently of the order $L$ of the local means.
+
+\begin{theorem}[Convolutions under Peetre majorants]
+\label{thm:decay-kernels-maximal}
+\lean{Rd.enorm_conv_le_maximal_of_decay}
+\leanok
+\uses{lem:maximal-function-kernels, def:conv, lem:weighted-jensen}
+Let $N > n$ and $\nu \geq 0$ be integers, $C \in [0, \infty)$, and let $K : V \to \C$
+satisfy $|K(y)| \leq C 2^{\nu n} (1 + 2^\nu \|y\|)^{-N}$ for almost every $y$. For every
+$h : V \to \C$ and every $x \in V$,
+\[
+  |(K * h)(x)| \leq C_{n,N} \, C \, M|h|(x),
+\]
+with the constant $C_{n,N}$ of \Cref{lem:maximal-function-kernels}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$|(K * h)(x)| \leq \int |K(y)| |h(x - y)| \, dy$; the majorant holds almost everywhere, so it
+bounds the integral from above, and part (3) of \Cref{lem:maximal-function-kernels} applies to
+it.
+\end{proof}
+
+The bound holds for every function $h$, periodic functions included.
+
+\section{The local means characterisation}
+
+This section describes $\TL{s}{p}{q}$ by the local means of \Cref{def:local-means}, in the range
+$1 < p < \infty$, $1 < q \leq \infty$, $0 < s < L$. As in the previous section, $g$ is a bump of
+radius $R$, $m$ its moment kernel of order $L$, and $k_j$, $\eta_j$ are the local means kernels
+and the dual kernels; $M$ is the maximal function of \Cref{def:maximal-function}. For a real
+$L$ the weights are $c^L_{ji} = 2^{-(j-i)L}$ for $i \leq j$ and $c^L_{ji} = 1$ for $i > j$.
+Both directions of the characterisation are pointwise bounds by the cross kernels of the
+previous section, summed in $\ell_q$ by the almost diagonal estimate and integrated by the
+Fefferman--Stein inequality. Rychkov~\cite{Rychkov} describes $\TL{s}{p}{q}$ by local means for
+all $0 < p < \infty$ and $0 < q \leq \infty$, with the Peetre maximal function in place of $M$.
+
+\begin{definition}[Local means of Triebel--Lizorkin type]
+\label{def:tl-local-means}
+\lean{Rd.LocalMeansBump.tlLocalMeansNorm, Rd.LocalMeansBump.localMean_ae_eq,
+  Rd.LocalMeansBump.continuous_conv_kernel,
+  Rd.LocalMeansBump.measurable_dyadicWeight_mul_conv_kernel,
+  Rd.LocalMeansBump.aemeasurable_lqNorm_conv_kernel}
+\leanok
+\uses{def:local-means, def:lq-norm, lem:reproducing-pointwise, lem:conv-op,
+  lem:lp-norm-nonnegative}
+Let $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $L \in \N$. For $f \in L_p$ the
+local means $k_j * f$ are continuous functions on $V$, defined at every point, and represent the
+local means $k_j * f \in L_p$. The local means quasi-norm of Triebel--Lizorkin type is
+\[
+  \|f\|^{g,L}_{F^s_{p,q}} = \Bigl\| x \mapsto \bigl\| (2^{js} |(k_j * f)(x)|)_{j \in \N}
+  \bigr\|_{\ell_q} \Bigr\|_{L_p} .
+\]
+\end{definition}
+
+The local means quasi-norm of the Besov spaces (\Cref{def:local-means}) takes the two norms in
+the other order.
+
+\begin{lemma}[Almost diagonal sums at one point]
+\label{lem:almost-diagonal-pointwise}
+\lean{Rd.ite_dyadicWeight_ne_top, Rd.almostDiagonalConst, Rd.almostDiagonalConst_ne_top,
+  Rd.lqNorm_le_almostDiagonalConst_mul_of_le, Rd.dyadicWeight_mul_maximal}
+\leanok
+\uses{lem:almost-diagonal, lem:maximal-function-basic}
+For all $s, L \in \R$ let $A_{s,L} = (1 - 2^{-(L-s)})^{-1} + (1 - 2^{-s})^{-1}$; then
+$A_{s,L} < \infty$ for $0 < s < L$, and $c^L_{ji} < \infty$ for all $i, j \in \N$. Let
+$1 \leq q \leq \infty$ and $C \in [0, \infty]$. For all sequences $a, m$ in $[0, \infty]$ with
+$a_j \leq C \sum_i c^L_{ji} m_i$ for every $j \in \N$,
+\[
+  \|(2^{js} a_j)_j\|_{\ell_q} \leq C A_{s,L} \, \|(2^{is} m_i)_i\|_{\ell_q} .
+\]
+For every $h : V \to [0, \infty]$, every $i \in \N$ and every $x \in V$,
+$2^{is} M h(x) = M(2^{is} h)(x)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Multiply the bound by $2^{js}$, take the $\ell_q$ norm and apply \Cref{lem:almost-diagonal}, which
+holds for all $s, L \in \R$, to $(m_i)_i$. The second claim is part (3) of
+\Cref{lem:maximal-function-basic}.
+\end{proof}
+
+\begin{lemma}[From pointwise maximal bounds to $L_p(\ell_q)$]
+\label{lem:maximal-bounds-mixed-norm}
+\lean{Rd.eLpNorm_le_of_le_lqNorm_maximal}
+\leanok
+\uses{thm:fefferman-stein, lem:lp-norm-nonnegative, lem:maximal-function-measurable}
+Let $1 < p < \infty$, $1 < q \leq \infty$ and $C \in [0, \infty]$. For every almost everywhere
+measurable $F : V \to [0, \infty]$ and every family of almost everywhere measurable
+$h_i : V \to [0, \infty]$, $i \in \N$, with $F(x) \leq C \|(M h_i(x))_i\|_{\ell_q}$ for almost
+every $x$,
+\[
+  \|F\|_p \leq C \, C_{n,p,q} \Bigl\| x \mapsto \|(h_i(x))_i\|_{\ell_q} \Bigr\|_p ,
+\]
+with the constant $C_{n,p,q}$ of \Cref{thm:fefferman-stein}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Monotonicity and homogeneity of the $L_p$ norm, then \Cref{thm:fefferman-stein}.
+\end{proof}
+
+\begin{theorem}[Blocks by local means]
+\label{thm:blocks-by-local-means}
+\lean{Rd.LocalMeansBump.blockByLocalMeansConst, Rd.LocalMeansBump.blockByLocalMeansConst_ne_top,
+  Rd.LocalMeansBump.enorm_conv_conv_psi_dual_le, Rd.LocalMeansBump.lpBlock_sum_dual_localMean_ae,
+  Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dual_le, Rd.LocalMeansBump.maximal_enorm_localMean,
+  Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximal}
+\leanok
+\uses{thm:cross-kernel-dual, thm:decay-kernels-maximal, lem:maximal-function-kernels,
+  lem:reproducing-formula, lem:lp-limits-pointwise, lem:conv-op, lem:almost-diagonal-pointwise,
+  def:triebel-lizorkin, def:tl-local-means}
+Let $L \in \N$ and $L' \geq 1$, and let
+$B_{L,L'} = C_{L,L',n+1} \, C_{n,n+1} < \infty$ with the constants of
+\Cref{thm:cross-kernel-dual} and \Cref{lem:maximal-function-kernels}. For every
+$h : V \to \C$, all $i, j \in \N$ and every $x \in V$,
+\[
+  |((\psi_j * \eta_i) * h)(x)| \leq B_{L,L'} \, c^{L'}_{ji} \, M|h|(x) .
+\]
+If $L \geq 1$ and $1 \leq p < \infty$, then for every $f \in L_p$, almost every $x \in V$ and
+every $j \in \N$,
+\[
+  |(\psi_j * f)(x)| \leq B_{L,L'} \sum_{i \in \N} c^{L'}_{ji} \, M|k_i * f|(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first bound is \Cref{thm:cross-kernel-dual} with $N = n + 1$ and
+\Cref{thm:decay-kernels-maximal}, with the finite weights $c^{L'}_{ji}$ of
+\Cref{lem:almost-diagonal-pointwise}. Let
+$G_J = \sum_{i \leq J} \eta_i * k_i * f$. By associativity (\Cref{lem:conv-op}),
+$\psi_j * G_J = \sum_{i \leq J} (\psi_j * \eta_i) * (k_i * f)$ almost everywhere, so
+$|\psi_j * G_J| \leq B_{L,L'} \sum_i c^{L'}_{ji} M|k_i * f|$ almost everywhere. Since
+$G_J \to f$ in $L_p$ (\Cref{lem:reproducing-formula}) and $f \mapsto \psi_j * f$ is bounded on
+$L_p$, $\psi_j * G_J \to \psi_j * f$ in $L_p$, and \Cref{lem:lp-limits-pointwise} passes the
+bound to $f$.
+\end{proof}
+
+\begin{theorem}[Local means by blocks]
+\label{thm:local-means-by-blocks}
+\lean{Rd.LocalMeansBump.localMeansByBlockConst, Rd.LocalMeansBump.localMeansByBlockConst_ne_top,
+  Rd.LocalMeansBump.enorm_conv_conv_kernel_Theta_le, Rd.LocalMeansBump.localMean_lpBlock,
+  Rd.LocalMeansBump.localMean_sum_lpBlock_ae, Rd.LocalMeansBump.ae_enorm_localMean_sum_lpBlock_le,
+  Rd.LocalMeansBump.enorm_localMean_le_tsum_maximal}
+\leanok
+\uses{thm:cross-kernel-theta, thm:decay-kernels-maximal, lem:maximal-function-kernels,
+  lem:lp-blocks, thm:kernel-identities, lem:lp-limits-pointwise, lem:conv-op,
+  lem:almost-diagonal-pointwise, def:triebel-lizorkin, def:tl-local-means}
+Let $L \in \N$ and $1 \leq p < \infty$, and let
+$B^\Theta_L = C^\Theta_{L,n+1} \, C_{n,n+1} < \infty$ with the constants of
+\Cref{thm:cross-kernel-theta} and \Cref{lem:maximal-function-kernels}. For every
+$h : V \to \C$, all $i, j \in \N$ and every $x \in V$,
+\[
+  |((k_j * \Theta_i) * h)(x)| \leq B^\Theta_L \, c^L_{ji} \, M|h|(x) .
+\]
+For every $f \in L_p$, almost every $x \in V$ and every $j \in \N$,
+\[
+  |(k_j * f)(x)| \leq B^\Theta_L \sum_{i \in \N} c^L_{ji} \, M|\psi_i * f|(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first bound is \Cref{thm:cross-kernel-theta} with $N = n + 1$ and
+\Cref{thm:decay-kernels-maximal}, with the finite weights $c^L_{ji}$ of
+\Cref{lem:almost-diagonal-pointwise}. Since
+$\Theta_i * \psi_i = \psi_i$ (\Cref{thm:kernel-identities}),
+$k_j * \Delta_i f = (k_j * \Theta_i) * \Delta_i f$ in $L_p$, so
+$k_j * \sum_{i < J} \Delta_i f = \sum_{i < J} (k_j * \Theta_i) * (\psi_i * f)$ almost
+everywhere. The partial sums converge to $f$ in $L_p$ (\Cref{lem:lp-blocks}), so their local
+means converge to $k_j * f$, and \Cref{lem:lp-limits-pointwise} passes the bound to $f$.
+\end{proof}
+
+The theorem holds for every order $L \in \N$: the cross kernel $k_j * \Theta_i$ uses only
+$\int g = 1$.
+
+\begin{lemma}[The almost diagonal step]
+\label{lem:tl-local-means-lq}
+\lean{Rd.LocalMeansBump.lqNorm_blockFun_le_lqNorm_maximal,
+  Rd.LocalMeansBump.lqNorm_localMean_le_lqNorm_maximal}
+\leanok
+\uses{thm:blocks-by-local-means, thm:local-means-by-blocks, lem:almost-diagonal-pointwise}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $s \in \R$ and $L, L' \in \N$. For every
+$f \in L_p$ and almost every $x \in V$,
+\[
+  \bigl\| (2^{js} |(k_j * f)(x)|)_j \bigr\|_{\ell_q} \leq B^\Theta_L A_{s,L}
+  \bigl\| (M(2^{is} |\psi_i * f|)(x))_i \bigr\|_{\ell_q},
+\]
+and if $L \geq 1$ and $L' \geq 1$, then
+\[
+  \bigl\| (2^{js} |(\psi_j * f)(x)|)_j \bigr\|_{\ell_q} \leq B_{L,L'} A_{s,L'}
+  \bigl\| (M(2^{is} |k_i * f|)(x))_i \bigr\|_{\ell_q} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{thm:blocks-by-local-means} and \Cref{thm:local-means-by-blocks} at a point, with
+\Cref{lem:almost-diagonal-pointwise}.
+\end{proof}
+
+\begin{theorem}[Local means characterisation of Triebel--Lizorkin spaces]
+\label{thm:tl-local-means}
+\lean{Rd.LocalMeansBump.tlUpperConst, Rd.LocalMeansBump.tlUpperConst_ne_top,
+  Rd.LocalMeansBump.tlLowerConst, Rd.LocalMeansBump.tlLowerConst_ne_top,
+  Rd.LocalMeansBump.triebelLizorkinNorm_le_tlLocalMeansNorm,
+  Rd.LocalMeansBump.tlLocalMeansNorm_le_triebelLizorkinNorm,
+  Rd.LocalMeansBump.memTriebelLizorkin_iff_tlLocalMeans}
+\leanok
+\uses{lem:tl-local-means-lq, lem:maximal-bounds-mixed-norm, lem:almost-diagonal-pointwise,
+  thm:blocks-by-local-means, thm:local-means-by-blocks, thm:fefferman-stein,
+  def:triebel-lizorkin, def:tl-local-means}
+Let $1 < p < \infty$, $1 < q \leq \infty$, $s \in \R$ and $L \in \N$, let
+$L_s = \lceil s \rceil_+ + 1$, where $\lceil s \rceil_+ = \max(\lceil s \rceil, 0)$ is the least
+natural number at least $s$, and let
+\[
+  U_{L,p,q,s} = B_{L,L_s} A_{s,L_s} C_{n,p,q}, \qquad
+  D_{L,p,q,s} = B^\Theta_L A_{s,L} C_{n,p,q} .
+\]
+Then $U_{L,p,q,s} < \infty$ for $s > 0$, and $D_{L,p,q,s} < \infty$ for $0 < s < L$. For every
+$f \in L_p$,
+\[
+  \|f\|^{g,L}_{F^s_{p,q}} \leq D_{L,p,q,s} \, \|f\|_{F^s_{p,q}},
+\]
+and if $L \geq 1$, then $\|f\|_{F^s_{p,q}} \leq U_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}}$. In
+particular, for $0 < s < L$, $f \in \TL{s}{p}{q}$ if and only if
+$\|f\|^{g,L}_{F^s_{p,q}} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Both bounds are \Cref{lem:tl-local-means-lq}, with $L' = L_s$ for the second, followed by
+\Cref{lem:maximal-bounds-mixed-norm} for the families $2^{is} |\psi_i * f|$ and
+$2^{is} |k_i * f|$. The constants $B_{L,L_s}$, $B^\Theta_L$ and $C_{n,p,q}$ are finite, and
+since $L_s > s$, \Cref{lem:almost-diagonal-pointwise} gives $A_{s,L_s} < \infty$ for $s > 0$
+and $A_{s,L} < \infty$ for $0 < s < L$. For $0 < s < L$ the order satisfies $L \geq 1$.
+\end{proof}
+
+\begin{theorem}[Synthesis in Triebel--Lizorkin spaces]
+\label{thm:tl-synthesis-dual}
+\lean{Rd.LocalMeansBump.lpBlock_sum_dual_ae,
+  Rd.LocalMeansBump.ae_enorm_lpBlock_sum_dual_le_tsum_maximal,
+  Rd.LocalMeansBump.enorm_blockFun_le_tsum_maximal_of_tendsto,
+  Rd.LocalMeansBump.triebelLizorkinNorm_le_of_tendsto_sum_dual}
+\leanok
+\uses{thm:blocks-by-local-means, thm:tl-local-means, lem:lp-limits-pointwise, lem:conv-op,
+  lem:almost-diagonal-pointwise, lem:maximal-bounds-mixed-norm}
+Let $g$ be a bump with the dual kernels $\eta_i$ of order $L$, let $1 < p < \infty$,
+$1 < q \leq \infty$ and $s \in \R$. For every family $h_i \in L_p$ and every $F \in L_p$ with
+$\sum_{i \leq J} \eta_i * h_i \to F$ in $L_p$,
+\[
+  \|F\|_{F^s_{p,q}} \leq C \, \bigl\| x \mapsto \|(2^{is} |h_i(x)|)_i\|_{\ell_q} \bigr\|_p
+\]
+with the constant $C$ of \Cref{thm:tl-local-means}, finite for $s > 0$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The proof of \Cref{thm:blocks-by-local-means} with $h_i$ in place of $k_i * f$ gives
+$|(\psi_j * F)(x)| \leq B_{L,L'} \sum_i c^{L'}_{ji} M|h_i|(x)$ almost everywhere, for
+$L' = \lceil s \rceil + 1$; the almost diagonal estimate (\Cref{lem:almost-diagonal-pointwise})
+and the Fefferman--Stein inequality (\Cref{lem:maximal-bounds-mixed-norm}) finish as in
+\Cref{thm:tl-local-means}.
+\end{proof}
+
+\begin{corollary}[Independence of the bump and the order]
+\label{cor:tl-local-means-independence}
+\lean{Rd.LocalMeansBump.tlLocalMeansNorm_le_tlLocalMeansNorm,
+  Rd.LocalMeansBump.tlLocalMeansNorm_lt_top_iff}
+\leanok
+\uses{thm:tl-local-means}
+Let $1 < p < \infty$, $1 < q \leq \infty$ and $s \in \R$, and let $g, g'$ be two bumps with
+orders $L, L' \in \N$. If $L \geq 1$, then for every $f \in L_p$,
+\[
+  \|f\|^{g',L'}_{F^s_{p,q}} \leq D'_{L',p,q,s} \, U_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}},
+\]
+with $D'$ the constant of \Cref{thm:tl-local-means} for $g'$. If
+$0 < s < \min(L, L')$, then $\|f\|^{g,L}_{F^s_{p,q}} < \infty$ if and only if
+$\|f\|^{g',L'}_{F^s_{p,q}} < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+Both quasi-norms are compared with $\|f\|_{F^s_{p,q}}$ by \Cref{thm:tl-local-means}.
+\end{proof}
+
+Every bump and every order $L > s$ describe the same space $\TL{s}{p}{q}$, the space defined by
+the Littlewood--Paley blocks.
+
+\section{Local means on the torus}
+
+This section transfers the local means characterisation to the torus $\T^d$. The kernels $k_j$,
+$\eta_j$, $\psi_j$ and $\Theta_j$ on $\R^d$ act on $L_p(\T^d)$ by convolution
+(\Cref{def:torus-econv}), and the operator identities between them hold on the torus as
+identities of Fourier multipliers (\Cref{lem:torus-econv-identities}). For the pointwise bounds,
+a function $h$ on $\T^d$ is lifted to the $\Z^d$-periodic function $h \circ \pi$ on $\R^d$, with
+the quotient map $\pi$ of \Cref{lem:torus-proj}: since $(K * h)(\pi x) = (K * (h \circ \pi))(x)$,
+the bounds of the cross kernels on $\R^d$ apply to lifts, and the Fefferman--Stein inequality
+transfers by localisation. Throughout, $\#d$ is the dimension of the torus, $|\cdot|$ the
+Lebesgue measure on $\R^d$ and $M$ the maximal function of \Cref{def:maximal-function} on $\R^d$.
+The weights $c^L_{ji}$ and the constants $A_{s,L}$ are those of the previous section
+(\Cref{lem:almost-diagonal-pointwise}).
+
+\begin{definition}[Period boxes]
+\label{def:period-box}
+\lean{Torus.periodBox, Torus.tripleBox, Torus.measurableSet_periodBox,
+  Torus.measurableSet_tripleBox, Torus.mem_periodBox_intCast_iff, Torus.mem_periodBox_ceil,
+  Torus.pairwise_disjoint_periodBox, Torus.tripleBox_eq_biUnion}
+\leanok
+For $a \in \R^d$ the period box is
+$P_a = \{x \in \R^d : a_i < x_i \leq a_i + 1 \text{ for every } i\}$, and
+$T = \{y \in \R^d : -1 < y_i \leq 2 \text{ for every } i\}$ is the box of side $3$. Both are
+measurable. For every $m \in \Z^d$ and every $x \in \R^d$, $x \in P_m$ if and only if
+$\lceil x_i \rceil = m_i + 1$ for every $i$; in particular $x \in P_m$ for
+$m_i = \lceil x_i \rceil - 1$, the boxes $P_m$, $m \in \Z^d$, are pairwise disjoint, and $T$ is
+the union of the $P_m$ with $m \in \{-1, 0, 1\}^d$.
+\end{definition}
+
+\begin{lemma}[Period boxes are fundamental domains]
+\label{lem:period-box-measure}
+\lean{Torus.lintegral_periodBox, Torus.measurePreserving_proj_periodBox, Torus.volume_periodBox,
+  Torus.eLpNorm_comp_proj_periodBox, Torus.quasiMeasurePreserving_proj, Torus.ae_comp_proj}
+\leanok
+\uses{def:period-box, lem:torus-proj}
+For every $a \in \R^d$ and every $u : \T^d \to [0, \infty]$,
+\[
+  \int_{P_a} u(\pi x) \, dx = \int_{\T^d} u ,
+\]
+so $\pi$ maps the Lebesgue measure on $P_a$ to the Haar measure of $\T^d$, $|P_a| = 1$, and
+$\|F \circ \pi\|_{L_p(P_a)} = \|F\|_{L_p(\T^d)}$ for every $p \in [0, \infty]$ and every almost
+everywhere measurable $F$ on $\T^d$. For every null set $N \subseteq \T^d$, $\pi^{-1}(N)$ is a
+null set; hence for every property $P$ that holds at almost every point of $\T^d$, $P(\pi x)$
+holds for almost every $x \in \R^d$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The integral identity is Mathlib's \texttt{UnitAddTorus.\allowbreak lintegral\_\allowbreak
+preimage} on $\R^d$ with the product measure, carried to the Euclidean space by the
+volume-preserving identification of the two; for indicator functions it is the statement on
+measures. The boxes $P_m$, $m \in \Z^d$, cover $\R^d$ (\Cref{def:period-box}), and
+$|\pi^{-1}(N) \cap P_m| = |N| = 0$ for each of the countably many $m$.
+\end{proof}
+
+\begin{lemma}[Counting boxes]
+\label{lem:period-box-counting}
+\lean{Torus.ball_subset_iUnion_periodBox, Torus.card_Icc_ceil_le,
+  Torus.setLIntegral_ball_comp_proj_le, Torus.locallyIntegrable_comp_proj,
+  Torus.ball_subset_tripleBox, Torus.setLIntegral_tripleBox}
+\leanok
+\uses{lem:period-box-measure, def:period-box}
+For every $u : \T^d \to [0, \infty]$, every $x \in \R^d$ and every $r > 0$,
+\[
+  \int_{B(x, r)} u(\pi y) \, dy \leq (2r + 2)^{\#d} \int_{\T^d} u, \qquad
+  \int_T u(\pi y) \, dy = 3^{\#d} \int_{\T^d} u .
+\]
+For every $h \in L_1(\T^d)$, the lift $h \circ \pi$ is locally integrable on $\R^d$. For every
+$x \in P_0$ and every $r \leq 1$, $B(x, r) \subseteq T$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Every point $y$ of the ball lies in $P_m$ with $m_i = \lceil y_i \rceil - 1$, and
+$\lceil x_i - r \rceil - 1 \leq m_i \leq \lceil x_i + r \rceil - 1$ since $|y_i - x_i| < r$. These
+are at most $\lceil x_i + r \rceil - \lceil x_i - r \rceil + 1 \leq 2r + 2$ integers in each
+coordinate, and each box contributes $\int_{\T^d} u$ (\Cref{lem:period-box-measure}). The box $T$
+is the disjoint union of $3^{\#d}$ period boxes. Local integrability follows from the first
+bound for $u = |h|$ and $r = 1$. For $x \in P_0$ and $y \in B(x, r)$ with $r \leq 1$,
+$0 < x_i \leq 1$ and $|y_i - x_i| < 1$ give $-1 < y_i < 2$.
+\end{proof}
+For $r \leq 0$ the ball is empty, and the Lean statement of the first bound covers every real $r$.
+
+\begin{lemma}[Convolutions and differences of lifts]
+\label{lem:torus-lift-conv}
+\lean{Torus.econv_proj, Torus.higherDiff_comp_proj}
+\leanok
+\uses{def:torus-econv, lem:torus-proj, def:iter-diff}
+For every $\Phi : \R^d \to \C$, every $h : \T^d \to \C$, every $L \in \N$ and all
+$x, z \in \R^d$,
+\[
+  (\Phi * h)(\pi x) = (\Phi * (h \circ \pi))(x), \qquad
+  \Delta^L_{\pi z} h(\pi x) = \Delta^L_z (h \circ \pi)(x),
+\]
+with the convolution on $\R^d$ on the right of the first identity.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\pi$ is additive, so $h(\pi x - \pi y) = (h \circ \pi)(x - y)$ and
+$h(\pi x + l \pi z) = (h \circ \pi)(x + l z)$.
+\end{proof}
+
+\begin{lemma}[Localisation of the maximal function]
+\label{lem:torus-maximal-localisation}
+\lean{Torus.ofReal_two_mul_add_two_pow_le_volume_ball_mul, Torus.maximal_comp_proj_le,
+  Torus.lqNorm_maximal_comp_proj_le, Torus.maximal_enorm_comp_proj_congr_ae}
+\leanok
+\uses{def:maximal-function, lem:period-box-counting, def:period-box, lem:lq-basic,
+  lem:period-box-measure, lem:maximal-function-basic}
+For every $u : \T^d \to [0, \infty]$ and every $x \in P_0$,
+\[
+  M(u \circ \pi)(x) \leq M(\mathbf 1_T (u \circ \pi))(x) + 4^{\#d} |B(0,1)|^{-1}
+  \int_{\T^d} u .
+\]
+For every $1 \leq q \leq \infty$, every family $u_j : \T^d \to [0, \infty]$, $j \in \N$, and every
+$x \in P_0$,
+\begin{multline*}
+  \|(M(u_j \circ \pi)(x))_j\|_{\ell_q} \leq \|(M(\mathbf 1_T (u_j \circ \pi))(x))_j\|_{\ell_q} \\
+  + 4^{\#d} |B(0,1)|^{-1} \Bigl\| \Bigl(\int_{\T^d} u_j\Bigr)_j \Bigr\|_{\ell_q} .
+\end{multline*}
+For all $v, w : \T^d \to \C$ with $v = w$ almost everywhere,
+$M(|v| \circ \pi) = M(|w| \circ \pi)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $r \leq 1$ the ball $B(x, r)$ lies in $T$ (\Cref{lem:period-box-counting}), so its mean of
+$u \circ \pi$ is a mean of $\mathbf 1_T (u \circ \pi)$. For $r > 1$,
+\Cref{lem:period-box-counting} and $|B(0, r)| = r^{\#d} |B(0, 1)|$ with $2r + 2 \leq 4r$ bound
+the mean by $4^{\#d} |B(0,1)|^{-1} \int_{\T^d} u$. The second bound follows by the triangle
+inequality and homogeneity in $\ell_q$. If $v = w$ almost everywhere, the lifts agree almost
+everywhere (\Cref{lem:period-box-measure}), and the maximal function does not see the difference
+(\Cref{lem:maximal-function-basic}).
+\end{proof}
+
+\begin{theorem}[The Fefferman--Stein inequality for periodic lifts]
+\label{thm:fefferman-stein-periodic}
+\lean{Torus.eLpNorm_indicator_tripleBox, Torus.periodicFSConst, Torus.periodicFSConst_ne_top,
+  Torus.feffermanStein_periodic}
+\leanok
+\uses{thm:fefferman-stein, lem:torus-maximal-localisation, lem:period-box-counting,
+  lem:period-box-measure, lem:minkowski-integral-lq, lem:maximal-function-measurable,
+  lem:lp-norm-nonnegative, lem:fefferman-stein-split}
+Let $1 < p < \infty$ and $1 < q \leq \infty$, and let
+$C^{\T}_{p,q} = 3^{\#d/p} C_{\#d,p,q} + 4^{\#d} |B(0,1)|^{-1}$ with the constant $C_{\#d,p,q}$
+of \Cref{thm:fefferman-stein} on $\R^d$. Then $C^{\T}_{p,q} < \infty$, and for every family of
+almost everywhere measurable $u_j : \T^d \to [0, \infty]$, $j \in \N$,
+\[
+  \Bigl\| x \mapsto \|(M(u_j \circ \pi)(x))_j\|_{\ell_q} \Bigr\|_{L_p(P_0)}
+  \leq C^{\T}_{p,q} \Bigl\| t \mapsto \|(u_j(t))_j\|_{\ell_q} \Bigr\|_{L_p(\T^d)} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Write $G(t) = \|(u_j(t))_j\|_{\ell_q}$. By \Cref{lem:torus-maximal-localisation} the left side is
+at most the sum of two terms. The first is at most its norm in $L_p(\R^d)$, which
+\Cref{thm:fefferman-stein} bounds by $C_{\#d,p,q} \|\mathbf 1_T (G \circ \pi)\|_{L_p(\R^d)}
+= C_{\#d,p,q} \, 3^{\#d/p} \|G\|_{L_p(\T^d)}$ (\Cref{lem:period-box-counting}). The second is a
+constant on a set of measure $1$, and Minkowski's integral inequality
+(\Cref{lem:minkowski-integral-lq}) on the probability space $\T^d$
+gives $\|(\int u_j)_j\|_{\ell_q} \leq \|G\|_{L_p(\T^d)}$.
+\end{proof}
+
+\begin{lemma}[From maximal bounds on the lift to $L_p(\ell_q)$]
+\label{lem:torus-maximal-bounds-mixed-norm}
+\lean{Torus.eLpNorm_le_of_le_lqNorm_maximal_proj}
+\leanok
+\uses{thm:fefferman-stein-periodic, lem:period-box-measure, lem:lp-norm-nonnegative,
+  lem:maximal-function-measurable}
+Let $1 < p < \infty$, $1 < q \leq \infty$ and $C \in [0, \infty]$. For every almost everywhere
+measurable $F : \T^d \to [0, \infty]$ and every family of almost everywhere measurable
+$h_i : \T^d \to [0, \infty]$, $i \in \N$, with
+$F(\pi x) \leq C \|(M(h_i \circ \pi)(x))_i\|_{\ell_q}$ for almost every $x \in P_0$,
+\[
+  \|F\|_{L_p(\T^d)} \leq C \, C^{\T}_{p,q} \Bigl\| t \mapsto \|(h_i(t))_i\|_{\ell_q}
+  \Bigr\|_{L_p(\T^d)} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\|F\|_{L_p(\T^d)} = \|F \circ \pi\|_{L_p(P_0)}$ (\Cref{lem:period-box-measure}), then
+monotonicity and homogeneity of the $L_p$ norm and \Cref{thm:fefferman-stein-periodic}.
+\end{proof}
+
+\begin{definition}[Local means of Triebel--Lizorkin type on the torus]
+\label{def:torus-tl-local-means}
+\lean{Torus.tlLocalMeansNorm, Torus.aemeasurable_dyadicWeight_mul_econv_kernel,
+  Torus.aemeasurable_lqNorm_econv_kernel}
+\leanok
+\uses{def:tl-local-means, def:torus-econv, def:local-means, lem:lp-norm-nonnegative}
+Let $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $L \in \N$, and let $k_j$ be the
+local means kernels on $\R^d$ of a bump $g$ and the order $L$. For $f \in L_p(\T^d)$ the local
+means $(k_j * f)(t) = \int_{\R^d} k_j(y) f(t - \pi y) \, dy$ are almost everywhere measurable,
+and the local means quasi-norm of Triebel--Lizorkin type on the torus is
+\[
+  \|f\|^{g,L}_{F^s_{p,q}(\T^d)} = \Bigl\| t \mapsto \bigl\| (2^{js} |(k_j * f)(t)|)_{j \in \N}
+  \bigr\|_{\ell_q} \Bigr\|_{L_p(\T^d)} .
+\]
+\end{definition}
+
+\begin{lemma}[The reproducing formula on the torus]
+\label{lem:torus-reproducing-formula}
+\lean{Torus.sum_econvLp_dual_kernel, Torus.tendsto_sum_econvLp_dual_kernel,
+  Torus.econvLp_kernel_lpBlock}
+\leanok
+\uses{lem:torus-econv-identities, thm:torus-approx-identity, def:local-means,
+  lem:reproducing-formula, thm:kernel-identities, def:torus-lp-blocks}
+Let $1 \leq p < \infty$, $L \in \N$ and let $m$, $k_j$, $\eta_j$ be the moment kernel, the local
+means kernels and the dual kernels on $\R^d$ of a bump $g$ and the order $L$. For every
+$f \in L_p(\T^d)$ and every $J \in \N$,
+\[
+  \sum_{j \leq J} \eta_j * k_j * f = m_{2^J} * m_{2^J} * f ,
+\]
+and if $L \geq 1$, then $\sum_{j \leq J} \eta_j * k_j * f \to f$ in $L_p(\T^d)$ as $J \to \infty$.
+For all $i, j \in \N$, $k_j * \Delta_i f = (k_j * \Theta_i) * \Delta_i f$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+As on $V$ (\Cref{lem:reproducing-formula}): the operators commute and are additive in the
+kernel (\Cref{lem:torus-econv-identities}), so the partial sums telescope by
+$a^2 - b^2 = (a - b)(a + b)$. Since $\int m = 1$ for $L \geq 1$, $m_{2^J} * f \to f$
+(\Cref{thm:torus-approx-identity}), and the operators $m_{2^J} *$ are bounded by $\|m\|_1$. The
+last identity is $\Theta_i * \psi_i = \psi_i$ (\Cref{thm:kernel-identities}) and associativity.
+\end{proof}
+
+\begin{theorem}[Blocks by local means on the torus]
+\label{thm:torus-blocks-by-local-means}
+\lean{Torus.lpBlock_sum_econvLp_dual_ae, Torus.maximal_econvLp_kernel_proj,
+  Torus.ae_enorm_lpBlock_sum_proj_le, Torus.ae_enorm_comp_proj_le_of_tendsto_Lp,
+  Torus.enorm_blockFun_proj_le_tsum_maximal}
+\leanok
+\uses{thm:blocks-by-local-means, lem:torus-reproducing-formula, lem:torus-lift-conv,
+  lem:period-box-measure, lem:torus-econv-identities, lem:lp-limits-pointwise,
+  lem:torus-maximal-localisation, def:torus-triebel-lizorkin, def:torus-tl-local-means,
+  lem:torus-econv-young}
+Let $L, L' \in \N$ with $L, L' \geq 1$ and $1 \leq p < \infty$, and let $B_{L,L'}$ be the
+constant of \Cref{thm:blocks-by-local-means} on $\R^d$. For every $f \in L_p(\T^d)$, almost every
+$x \in P_0$ and every $j \in \N$,
+\[
+  |(\psi_j * f)(\pi x)| \leq B_{L,L'} \sum_{i \in \N} c^{L'}_{ji} \,
+  M\bigl(|k_i * f| \circ \pi\bigr)(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $G_J = \sum_{i \leq J} \eta_i * k_i * f$. By \Cref{lem:torus-econv-identities},
+$\psi_j * G_J = \sum_{i \leq J} (\psi_j * \eta_i) * (k_i * f)$ almost everywhere on $\T^d$, hence
+at $\pi x$ for almost every $x \in \R^d$ (\Cref{lem:period-box-measure}). There every term is the
+convolution on $\R^d$ of $\psi_j * \eta_i$ with the lift of $k_i * f$ (\Cref{lem:torus-lift-conv}),
+and the first bound of \Cref{thm:blocks-by-local-means}, which holds for every function, bounds
+it by $B_{L,L'} c^{L'}_{ji} M(|k_i * f| \circ \pi)(x)$; the maximal function does not see the
+choice of representative (\Cref{lem:torus-maximal-localisation}). Composition with $\pi$ is an
+isometry from $L_p(\T^d)$ to $L_p(P_0)$, $\psi_j * G_J \to \psi_j * f$ by
+\Cref{lem:torus-reproducing-formula}, and \Cref{lem:lp-limits-pointwise} on $P_0$ passes the
+bound to $f$.
+\end{proof}
+
+\begin{theorem}[Local means by blocks on the torus]
+\label{thm:torus-local-means-by-blocks}
+\lean{Torus.econvLp_kernel_sum_lpBlock_ae, Torus.maximal_lpBlock_proj,
+  Torus.ae_enorm_econvLp_kernel_sum_proj_le, Torus.enorm_econv_kernel_proj_le_tsum_maximal}
+\leanok
+\uses{thm:local-means-by-blocks, lem:torus-reproducing-formula, lem:torus-lift-conv,
+  lem:period-box-measure, lem:torus-lp-blocks, lem:lp-limits-pointwise,
+  lem:torus-maximal-localisation, def:torus-triebel-lizorkin, def:torus-tl-local-means,
+  lem:torus-econv-young, thm:torus-blocks-by-local-means}
+Let $L \in \N$ and $1 \leq p < \infty$, and let $B^\Theta_L$ be the constant of
+\Cref{thm:local-means-by-blocks} on $\R^d$. For every $f \in L_p(\T^d)$, almost every
+$x \in P_0$ and every $j \in \N$,
+\[
+  |(k_j * f)(\pi x)| \leq B^\Theta_L \sum_{i \in \N} c^L_{ji} \,
+  M\bigl(|\psi_i * f| \circ \pi\bigr)(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:torus-reproducing-formula},
+$k_j * \sum_{i < J} \Delta_i f = \sum_{i < J} (k_j * \Theta_i) * (\psi_i * f)$ almost everywhere,
+and the first bound of \Cref{thm:local-means-by-blocks} applies to the lifts at $\pi x$ as in
+\Cref{thm:torus-blocks-by-local-means}. The partial sums converge to $f$ in $L_p(\T^d)$
+(\Cref{lem:torus-lp-blocks}), and \Cref{lem:lp-limits-pointwise} on $P_0$ passes the bound to
+$f$.
+\end{proof}
+
+\begin{lemma}[The almost diagonal step on the torus]
+\label{lem:torus-tl-local-means-lq}
+\lean{Torus.lqNorm_blockFun_proj_le_lqNorm_maximal,
+  Torus.lqNorm_econv_kernel_proj_le_lqNorm_maximal}
+\leanok
+\uses{thm:torus-blocks-by-local-means, thm:torus-local-means-by-blocks,
+  lem:almost-diagonal-pointwise}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$, $s \in \R$ and $L, L' \in \N$. For every
+$f \in L_p(\T^d)$ and almost every $x \in P_0$,
+\[
+  \bigl\| (2^{js} |(k_j * f)(\pi x)|)_j \bigr\|_{\ell_q} \leq B^\Theta_L A_{s,L}
+  \bigl\| (M(2^{is} |\psi_i * f| \circ \pi)(x))_i \bigr\|_{\ell_q},
+\]
+and if $L \geq 1$ and $L' \geq 1$, then
+\[
+  \bigl\| (2^{js} |(\psi_j * f)(\pi x)|)_j \bigr\|_{\ell_q} \leq B_{L,L'} A_{s,L'}
+  \bigl\| (M(2^{is} |k_i * f| \circ \pi)(x))_i \bigr\|_{\ell_q} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{thm:torus-blocks-by-local-means} and \Cref{thm:torus-local-means-by-blocks} at a point,
+with \Cref{lem:almost-diagonal-pointwise}.
+\end{proof}
+
+\begin{theorem}[Local means characterisation of Triebel--Lizorkin spaces on the torus]
+\label{thm:torus-tl-local-means}
+\lean{Torus.tlUpperConst, Torus.tlUpperConst_ne_top, Torus.tlLowerConst,
+  Torus.tlLowerConst_ne_top, Torus.triebelLizorkinNorm_le_tlLocalMeansNorm,
+  Torus.tlLocalMeansNorm_le_triebelLizorkinNorm, Torus.memTriebelLizorkin_iff_tlLocalMeans}
+\leanok
+\uses{lem:torus-tl-local-means-lq, lem:torus-maximal-bounds-mixed-norm,
+  lem:almost-diagonal-pointwise, thm:fefferman-stein-periodic, def:torus-triebel-lizorkin,
+  def:torus-tl-local-means, thm:tl-local-means}
+Let $1 < p < \infty$, $1 < q \leq \infty$, $s \in \R$ and $L \in \N$, let
+$L_s = \lceil s \rceil_+ + 1$, and let
+\[
+  U^{\T}_{L,p,q,s} = B_{L,L_s} A_{s,L_s} C^{\T}_{p,q}, \qquad
+  D^{\T}_{L,p,q,s} = B^\Theta_L A_{s,L} C^{\T}_{p,q} .
+\]
+Then $U^{\T}_{L,p,q,s} < \infty$ for $s > 0$, and $D^{\T}_{L,p,q,s} < \infty$ for $0 < s < L$.
+For every $f \in L_p(\T^d)$,
+\[
+  \|f\|^{g,L}_{F^s_{p,q}(\T^d)} \leq D^{\T}_{L,p,q,s} \, \|f\|_{F^s_{p,q}(\T^d)},
+\]
+and if $L \geq 1$, then
+$\|f\|_{F^s_{p,q}(\T^d)} \leq U^{\T}_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}(\T^d)}$. In particular,
+for $0 < s < L$, $f \in \TL{s}{p}{q}(\T^d)$ if and only if
+$\|f\|^{g,L}_{F^s_{p,q}(\T^d)} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Both bounds are \Cref{lem:torus-tl-local-means-lq}, with $L' = L_s$ for the second, followed by
+\Cref{lem:torus-maximal-bounds-mixed-norm} for the families $2^{is} |\psi_i * f|$ and
+$2^{is} |k_i * f|$; the constants are finite as in \Cref{thm:tl-local-means}, and
+$C^{\T}_{p,q} < \infty$ by \Cref{thm:fefferman-stein-periodic}.
+\end{proof}
+
+\section{Ball means of differences}
+
+This section describes $\TL{s}{p}{q}$ on $V$ by ball means of differences, in the range
+$1 < p < \infty$, $1 < q \leq \infty$, $0 < s < L$. As in the previous sections, $g$ is a bump of
+radius $R$, $m$ its moment kernel of order $L$, $k_j$ and $\eta_j$ are the local means kernels and
+the dual kernels, $A_{L,K}$ are the constants of \Cref{lem:dual-kernel-derivatives}, and
+$c^L_{ji} = 2^{-(j-i)L}$ for $i \leq j$, $c^L_{ji} = 1$ for $i > j$. Let $r = \lceil R \rceil$,
+the least natural number at least $R \geq 0$, so that $R < 2^r$, and $B_j = B(0, 2^{-j})$. Local
+means are differences of averaged differences, so they are bounded by ball means; conversely the
+differences of $\eta_i * u$ are bounded by the maximal function of $u$, and the reproducing
+formula, the almost diagonal estimate and the Fefferman--Stein inequality finish as for local
+means.
+
+\begin{definition}[Ball means of differences]
+\label{def:ball-means-differences}
+\lean{Rd.ballMeanDiff, Rd.one_div_two_pow_pos, Rd.two_pow_mul_volume_ball_one_div,
+  Rd.setLIntegral_eq_mul_ballMeanDiff, Rd.tlDiffNorm, Rd.measurable_lqNorm_ballMeanDiff}
+\leanok
+\uses{def:rd-modulus, def:lq-norm, lem:lq-norm-means}
+For $f : V \to \C$, $L, j \in \N$ and $x \in V$ the ball mean of differences of order $L$ at
+level $j$ is
+\[
+  d_j f(x) = \frac{1}{|B_j|} \int_{B_j} |\Delta^L_h f(x)| \, dh \in [0, \infty] .
+\]
+For every $c > 0$ and $j \in \N$, $|B(0, c 2^{-j})| = c^n |B_j|$ (Mathlib's
+\texttt{MeasureTheory.Measure.addHaar\_ball\_mul\_of\_pos}) and $2^{jn} |B_j| = |B(0,1)|$.
+Let $1 \leq p < \infty$, $s \in \R$ and $1 \leq q \leq \infty$. For $f \in L_p$ the ball means
+quasi-norm of Triebel--Lizorkin type is
+\[
+  \|f\|^{L}_{F^s_{p,q}, \Delta} = \|f\|_p + \Bigl\| x \mapsto \bigl\| (2^{js} d_j f(x))_{j \in \N}
+  \bigr\|_{\ell_q} \Bigr\|_{L_p},
+\]
+and $x \mapsto \|(2^{js} d_j f(x))_j\|_{\ell_q}$ is measurable.
+\end{definition}
+
+\begin{lemma}[Elementary properties of ball means]
+\label{lem:ball-means-basic}
+\lean{Rd.ballMeanDiff_le_of_forall, Rd.ballMeanDiff_level_add_le,
+  Rd.measurable_enorm_higherDiff_step,
+  Rd.measurable_ballMeanDiff, Rd.ballMeanDiff_congr_ae, Rd.ballMeanDiff_add_le,
+  Rd.ballMeanDiff_zero, Rd.ballMeanDiff_finsetSum_le}
+\leanok
+\uses{def:ball-means-differences, lem:rd-differences}
+For all $f, f' : V \to \C$, all $L, j, k \in \N$, every $x \in V$ and every $c \in [0, \infty]$:
+\begin{enumerate}
+  \item if $|\Delta^L_h f(x)| \leq c$ for every $h \in B_j$, then $d_j f(x) \leq c$;
+  \item $d_{j+k} f(x) \leq 2^{kn} d_j f(x)$;
+  \item if $f$ is measurable, then $h \mapsto |\Delta^L_h f(x)|$ and $d_j f$ are measurable;
+  \item if $f = f'$ almost everywhere, then $d_j f = d_j f'$ almost everywhere;
+  \item if $f$ is measurable, then $d_j(f + f')(x) \leq d_j f(x) + d_j f'(x)$, and
+    $d_j \bigl(\sum_{i \in S} f_i\bigr)(x) \leq \sum_{i \in S} d_j f_i(x)$ for every finite
+    family of measurable $f_i : V \to \C$; $d_j 0 = 0$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) is the mean of a bounded function, and (2) holds since $B_{j+k} \subseteq B_j$ and
+$|B_j| = 2^{kn} |B_{j+k}|$. (3) The function $(x, h) \mapsto |\Delta^L_h f(x)|$ is jointly
+measurable (\Cref{lem:rd-differences}), and Tonelli's theorem gives the measurability of
+$d_j f$. (4) At a point $x$ with
+$f(x) = f'(x)$ the values $f(x + l h)$ and $f'(x + l h)$, $1 \leq l \leq L$, agree for almost
+every $h$, since $h \mapsto x + l h$ maps null sets to null sets. (5) The triangle inequality
+and the additivity of the integral, which needs one measurable summand; finite sums by
+induction.
+\end{proof}
+
+\begin{lemma}[Ball means in $L_p$]
+\label{lem:ball-means-lp}
+\lean{Rd.ballMeanDiff_rpow_le, Rd.eLpNorm_ballMeanDiff_le_of_measurable,
+  Rd.eLpNorm_ballMeanDiff_le}
+\leanok
+\uses{lem:ball-means-basic, lem:weighted-jensen, lem:rd-differences, lem:lp-norm-nonnegative}
+For every measurable $f : V \to \C$, all $L, j \in \N$, every $P \geq 1$ and every $x \in V$,
+$(d_j f(x))^P \leq |B_j|^{-1} \int_{B_j} |\Delta^L_h f(x)|^P \, dh$. For all $L, j \in \N$,
+every $1 \leq p < \infty$ and every almost everywhere strongly measurable $f : V \to \C$,
+$\|d_j f\|_p \leq 2^L \|f\|_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first bound is \Cref{lem:weighted-jensen} for the probability measure
+$|B_j|^{-1} \mathbf 1_{B_j}(h) \, dh$. Integrating over $x$ and exchanging the integrals,
+$\int (d_j f)^p \leq |B_j|^{-1} \int_{B_j} \|\Delta^L_h f\|_p^p \, dh \leq (2^L \|f\|_p)^p$ by
+\Cref{lem:rd-differences}. A general $f$ agrees almost everywhere with a measurable function, and
+\Cref{lem:ball-means-basic} (4) transfers the bound.
+\end{proof}
+
+\begin{theorem}[Local means by ball means]
+\label{thm:local-means-by-ball-means}
+\lean{Rd.LocalMeansBump.iSup_enorm_lt_top, Rd.LocalMeansBump.ballMeanConst,
+  Rd.LocalMeansBump.ballMeanConst_ne_top, Rd.ofReal_abs_inv_neg_inv_two_pow_pow,
+  Rd.LocalMeansBump.smul_closedBall_subset_ball,
+  Rd.LocalMeansBump.lintegral_enorm_mul_higherDiff_le,
+  Rd.LocalMeansBump.enorm_localMean_le_ballMeanDiff}
+\leanok
+\uses{def:local-means, def:ball-means-differences, lem:conv-second-argument, lem:conv-assoc,
+  lem:schwartz-tails}
+Let
+\[
+  C^\Delta = \sup |g| \, |B(0,1)| \, 2^{rn} (1 + 2^n);
+\]
+then $C^\Delta < \infty$. For every $L \in \N$, every $1 \leq p < \infty$, every $f \in L_p$,
+almost every $x \in V$ and every $j \in \N$,
+\[
+  |(k_{j+r+1} * f)(x)| \leq C^\Delta \, d_j f(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $J = j + r$. Since $k_{J+1} = m_{2^{J+1}} - m_{2^J}$,
+$k_{J+1} * f = (f - m_{2^J} * f) - (f - m_{2^{J+1}} * f)$ almost everywhere, and by
+\Cref{lem:conv-second-argument}, for $c = 2^{J}$ and $c = 2^{J+1}$,
+$|f(x) - (m_c * f)(x)| \leq \int |g(z)| \, |\Delta^L_{-z/c} f(x)| \, dz$ almost everywhere. The
+bump vanishes outside $\bar B(0, R)$, and the substitution $h = -z/c$
+(\Cref{lem:schwartz-tails}) gives at most $\sup |g| \, c^n \int_{\bar B(0, R/c)}
+|\Delta^L_h f(x)| \, dh$. Since $R < 2^r$, $\bar B(0, R/c) \subseteq B_j$, and
+$c^n |B_j|$ is $2^{rn} |B(0,1)|$ for $c = 2^J$ and $2^{(r+1)n} |B(0,1)|$ for $c = 2^{J+1}$. The
+sum of the two bounds is $C^\Delta d_j f(x)$.
+\end{proof}
+
+Young's inequality bounds the first $r + 1$ local means by $\|f\|_p$
+(\Cref{thm:tl-ball-means}).
+
+\begin{lemma}[Tools for ball means of convolutions]
+\label{lem:moving-balls}
+\lean{Rd.enorm_le_inv_two_pow_of_mem_ball, Rd.dyadicWeight_mul_dyadicWeight_neg_of_le,
+  Rd.volume_setOf_dist_add_smul_lt_le, Rd.indicator_ball_add_smul_le,
+  Rd.setLIntegral_indicator_ball_add_smul_le, Rd.setLIntegral_setLIntegral_ball_le}
+\leanok
+\uses{def:ball-means-differences}
+For every $j \in \N$, every $h \in B_j$ has $|h| \leq 2^{-j}$. For all $i, j \in \N$ with
+$i \leq j$ and every $L \in \R$, $2^{iL} 2^{-jL} = 2^{-(j-i)L}$. For every real $l \geq 1$, all
+$a, \rho \in \R$, all $x, w \in V$ and every $G : V \to [0, \infty]$,
+$|\{v : |x + l v - w| < \rho\}| \leq |B(0, \rho)|$ and
+\[
+  \int_{B(0,a)} 1_{B(x + l v, \rho)}(w) \, G(w) \, dv \leq |B(0, \rho)| \,
+  1_{B(x, \rho + l a)}(w) \, G(w) ;
+\]
+if $G$ is almost everywhere measurable, then
+\[
+  \int_{B(0,a)} \int_{B(x + l v, \rho)} G(w) \, dw \, dv \leq |B(0, \rho)|
+  \int_{B(x, \rho + l a)} G .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The set $\{v : |x + l v - w| < \rho\}$ is the ball $B((w - x)/l, \rho/l)$, of measure
+$l^{-n} |B(0,\rho)|$. A point $w$ of $B(x + l v, \rho)$ with $|v| < a$ satisfies
+$|w - x| < \rho + l a$ by the triangle inequality, and $v$ lies in this set, which gives the
+single integral. For the double integral, exchange the integrals and apply the single integral at
+every $w$.
+\end{proof}
+
+\begin{theorem}[Ball means of the dual kernels]
+\label{thm:ball-means-dual}
+\lean{Rd.LocalMeansBump.diffByLocalMeansConst, Rd.LocalMeansBump.diffByLocalMeansConst_ne_top,
+  Rd.LocalMeansBump.enorm_higherDiff_dual_le_mul,
+  Rd.LocalMeansBump.enorm_higherDiff_dual_le_indicator,
+  Rd.LocalMeansBump.enorm_higherDiff_conv_dual_le_of_le,
+  Rd.LocalMeansBump.ballMeanDiff_conv_dual_le_of_le, Rd.LocalMeansBump.enorm_dual_le_indicator,
+  Rd.LocalMeansBump.enorm_conv_dual_le, Rd.LocalMeansBump.enorm_conv_dual_le_maximal,
+  Rd.LocalMeansBump.laverage_enorm_conv_dual_add_smul_le_of_one_le,
+  Rd.LocalMeansBump.laverage_enorm_conv_dual_add_smul_le,
+  Rd.LocalMeansBump.ballMeanDiff_conv_dual_le_of_lt, Rd.LocalMeansBump.ballMeanDiff_conv_dual_le}
+\leanok
+\uses{lem:dual-kernel-derivatives, lem:dual-kernel-bounds, lem:dual-averaged-differences,
+  lem:smooth-differences, lem:conv-pointwise, lem:moving-balls, lem:maximal-function-kernels,
+  def:maximal-function, lem:ball-means-basic}
+Let $L \in \N$ and
+\[
+  E_L = |B(0,1)| \max\bigl( A_{L,L} (2LR + L + 1)^n, \;
+  2^L A_{L,0} (2LR + 1)^n (2LR + L + 1)^n \bigr);
+\]
+then $E_L < \infty$. For every locally integrable $u : V \to \C$, all $i, j \in \N$ and every
+$x \in V$,
+\[
+  d_j(\eta_i * u)(x) \leq E_L \, c^L_{ji} \, M|u|(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Case $i \leq j$. For $h \in B_j$, $\Delta^L_h (\eta_i * u) = (\Delta^L_h \eta_i) * u$
+(\Cref{lem:conv-pointwise}), and by \Cref{lem:smooth-differences} and
+\Cref{lem:dual-kernel-derivatives},
+$|\Delta^L_h \eta_i| \leq A_{L,L} 2^{in} 2^{iL} |h|^L \leq A_{L,L} 2^{in} 2^{-(j-i)L}$;
+the difference vanishes outside $B(0, (2LR + L + 1) 2^{-i})$
+(\Cref{lem:dual-averaged-differences}). \Cref{lem:maximal-function-kernels} (1) bounds
+$|\Delta^L_h (\eta_i * u)(x)|$ by $A_{L,L} (2LR + L + 1)^n |B(0,1)| 2^{-(j-i)L} M|u|(x)$ for
+every $h$, hence also the mean $d_j(\eta_i * u)(x)$.
+
+Case $i > j$. By \Cref{lem:conv-pointwise},
+$|\Delta^L_h (\eta_i * u)(x)| \leq \sum_{l \leq L} \binom{L}{l} |(\eta_i * u)(x + l h)|$, and
+$|\eta_i| \leq A_{L,0} 2^{in} \mathbf 1_{B(0, \rho_i)}$ with $\rho_i = (2LR + 1) 2^{-i}$
+(\Cref{lem:dual-kernel-bounds}), so
+$|(\eta_i * u)(v)| \leq A_{L,0} 2^{in} \int_{B(v, \rho_i)} |u|$ for every $v \in V$
+(\Cref{lem:maximal-function-kernels} (1)). For $l = 0$ this is at most
+$A_{L,0} (2LR + 1)^n |B(0,1)| M|u|(x)$. For $l \geq 1$ the mean over $h \in B_j$ is at most
+$|B_j|^{-1} A_{L,0} 2^{in} |B(0, \rho_i)| \int_{B(x, (2LR + L + 1) 2^{-j})} |u|$ by
+\Cref{lem:moving-balls}, since $\rho_i + l 2^{-j} \leq (2LR + L + 1) 2^{-j}$, and this is at most
+$A_{L,0} (2LR + 1)^n (2LR + L + 1)^n |B(0,1)| M|u|(x)$. The binomial weights sum to $2^L$.
+\end{proof}
+
+For a single step $h$ the ball $B(x + l h, \rho_i)$ lies in $B(x, (2LR + L + 1) 2^{-j})$, which
+costs the factor $2^{(i-j)n}$; the average over the steps $h \in B_j$ removes it.
+
+\begin{theorem}[Ball means by local means]
+\label{thm:ball-means-by-local-means}
+\lean{Rd.LocalMeansBump.ballMeanDiff_partialSum_le, Rd.LocalMeansBump.ballMeanDiff_le_tsum_add,
+  Rd.LocalMeansBump.tendsto_eLpNorm_ballMeanDiff_sub,
+  Rd.LocalMeansBump.ballMeanDiff_le_tsum_maximal}
+\leanok
+\uses{thm:ball-means-dual, lem:reproducing-formula, lem:reproducing-pointwise,
+  lem:ball-means-basic, lem:ball-means-lp, lem:limits-of-pointwise-bounds,
+  lem:maximal-function-basic, lem:maximal-function-measurable, def:tl-local-means, lem:conv-op}
+Let $L \in \N$ with $L \geq 1$ and $1 \leq p < \infty$. For every $f \in L_p$, almost every
+$x \in V$ and every $j \in \N$,
+\[
+  d_j f(x) \leq E_L \sum_{i \in \N} c^L_{ji} \, M|k_i * f|(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $F_J = m_{2^J} * m_{2^J} * f = \sum_{i \leq J} \eta_i * (k_i * f)$, an identity of continuous
+functions (\Cref{lem:reproducing-pointwise}). By \Cref{lem:ball-means-basic} (5) and
+\Cref{thm:ball-means-dual}, with $M|k_i * f|$ unchanged when $k_i * f$ changes on a null set,
+$d_j F_J(x) \leq E_L \sum_{i \leq J} c^L_{ji} M|k_i * f|(x)$ for every $x$, and
+$d_j f \leq d_j F_J + d_j(f - F_J)$ everywhere. Since $F_J \to f$ in $L_p$
+(\Cref{lem:reproducing-formula}), $\|d_j(f - F_J)\|_p \leq 2^L \|f - F_J\|_p \to 0$
+(\Cref{lem:ball-means-lp}), and \Cref{lem:limits-of-pointwise-bounds} gives the bound almost
+everywhere.
+\end{proof}
+
+\begin{theorem}[Ball means characterisation of Triebel--Lizorkin spaces]
+\label{thm:tl-ball-means}
+\lean{Rd.LocalMeansBump.enorm_le_tlLocalMeansNorm, Rd.LocalMeansBump.diffUpperConst,
+  Rd.LocalMeansBump.diffUpperConst_ne_top, Rd.LocalMeansBump.tlDiffNorm_le_tlLocalMeansNorm,
+  Rd.LocalMeansBump.diffLowerConst, Rd.LocalMeansBump.diffLowerConst_ne_top,
+  Rd.LocalMeansBump.eLpNorm_dyadicWeight_mul_conv_kernel_le,
+  Rd.LocalMeansBump.lqNorm_localMean_shift_le, Rd.LocalMeansBump.tlLocalMeansNorm_le_tlDiffNorm}
+\leanok
+\uses{thm:ball-means-by-local-means, thm:local-means-by-ball-means,
+  lem:almost-diagonal-pointwise, lem:maximal-bounds-mixed-norm, lem:reproducing-formula,
+  lem:dual-kernel-moduli, lem:conv-op, cor:mixed-norm-sandwich, lem:lq-basic,
+  thm:rd-atomic-synthesis, def:tl-local-means, def:ball-means-differences,
+  lem:lp-norm-nonnegative}
+Let $s \in \R$, $L \in \N$, $1 \leq p < \infty$ and $1 \leq q \leq \infty$, and let
+\[
+  D^\Delta_{L,s} = 2 \|m\|_1 \sum_{j \leq r} 2^{js} + 2^{(r+1)s} C^\Delta .
+\]
+Then $D^\Delta_{L,s} < \infty$, and for every $f \in L_p$,
+\[
+  \|f\|^{g,L}_{F^s_{p,q}} \leq D^\Delta_{L,s} \, \|f\|^{L}_{F^s_{p,q}, \Delta} .
+\]
+If $L \geq 1$, then $\|f\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} \|f\|^{g,L}_{F^s_{p,q}}$ for every
+$f \in L_p$. If $L \geq 1$, $1 < p$ and $1 < q$, let
+\[
+  U^\Delta_{L,p,q,s} = 2 \|m\|_1 (1 - 2^{-s})^{-1} + E_L A_{s,L} C_{n,p,q},
+\]
+with the constants $A_{s,L}$ of \Cref{lem:almost-diagonal-pointwise} and $C_{n,p,q}$ of
+\Cref{thm:fefferman-stein}; then $U^\Delta_{L,p,q,s} < \infty$ for $0 < s < L$, and for every
+$f \in L_p$,
+\[
+  \|f\|^{L}_{F^s_{p,q}, \Delta} \leq U^\Delta_{L,p,q,s} \, \|f\|^{g,L}_{F^s_{p,q}} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Lower bound: pointwise
+$\|(2^{js} |k_j * f(x)|)_j\|_{\ell_q} \leq \sum_{j \leq r} 2^{js} |k_j * f(x)| +
+\|(2^{(j+r+1)s} |k_{j+r+1} * f(x)|)_j\|_{\ell_q}$ (\Cref{lem:lq-basic}); the head is bounded by
+Young's inequality $\|k_j * f\|_p \leq 2 \|m\|_1 \|f\|_p$ (\Cref{lem:conv-op},
+\Cref{lem:dual-kernel-moduli}), the tail by \Cref{thm:local-means-by-ball-means}, almost
+everywhere, after $2^{(j+r+1)s} = 2^{(r+1)s} 2^{js}$.
+
+Upper bound: the reproducing formula $f = \sum_j \eta_j * k_j * f$ (\Cref{lem:reproducing-formula})
+with $\|\eta_j\|_1 \leq 2 \|m\|_1$ gives
+$\|f\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} \sup_j 2^{js} \|k_j * f\|_p$ (the series bound of
+\Cref{thm:rd-atomic-synthesis}), and $\sup_j 2^{js} \|k_j * f\|_p \leq \|f\|^{g,L}_{F^s_{p,q}}$
+by \Cref{cor:mixed-norm-sandwich} at $q = \infty$ and $\ell_q \subseteq \ell_\infty$.
+\Cref{thm:ball-means-by-local-means} and \Cref{lem:almost-diagonal-pointwise} bound
+$\|(2^{js} d_j f(x))_j\|_{\ell_q}$ by $E_L A_{s,L} \|(M(2^{is} |k_i * f|)(x))_i\|_{\ell_q}$
+almost everywhere, and \Cref{lem:maximal-bounds-mixed-norm} finishes.
+\end{proof}
+
+\begin{corollary}[Ball means describe $\TL{s}{p}{q}$]
+\label{cor:tl-ball-means}
+\lean{Rd.memTriebelLizorkin_iff_tlDiffNorm_lt_top}
+\leanok
+\uses{thm:tl-ball-means, thm:tl-local-means, thm:smooth-atomic-decomposition}
+For every $1 < p < \infty$, every $1 < q \leq \infty$, every $L \in \N$, every $0 < s < L$ and
+every $f \in L_p$, $f \in \TL{s}{p}{q}$ if and only if $\|f\|^{L}_{F^s_{p,q}, \Delta} < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+$L \geq 1$ since $0 < s < L$. Both conditions are equivalent to the finiteness of the local means
+quasi-norm of the standard bump (\Cref{thm:smooth-atomic-decomposition}), by
+\Cref{thm:tl-local-means} and \Cref{thm:tl-ball-means}.
+\end{proof}
+
+\section{The atomic characterisation}
+
+This section describes $\TL{s}{p}{q}$ by atomic decompositions, in the range $1 < p < \infty$,
+$1 < q \leq \infty$, $0 < s < L$. As in the previous sections, $g$ is a bump of radius $R$,
+$m^g$ its moment kernel of order $L$, $A_L = 2 \sup_V |m^g|$ the constant of
+\Cref{lem:local-means-kernel-bounds}, $k_j$ and $\eta_j$ are the local means kernels and the dual
+kernels, and $c^L_{ij} = 2^{-(i-j)L}$ for $j \leq i$, $c^L_{ij} = 1$ for $j > i$. The cells
+$P_{j,m}$ and their centres $c_{j,m}$ are those of \Cref{def:dyadic-cells}, $|B_1|$ is the
+volume of the unit ball, and $A_+ = \max(A, 0)$ for $A \in \R$. The atoms are the smooth atoms
+of \Cref{def:smooth-atoms}, normalised in $L_\infty$; their constants are nonnegative
+(\Cref{lem:smooth-atoms-basic}), so $A_+ = A$ for them. The coefficient of a cell in the
+decomposition of $F$ is the mean of $|k_j * F|$ over the cell, at most a multiple of
+$M(k_j * F)$ at every point of the cell. The Besov spaces use atoms normalised in $L_p$
+(\Cref{thm:atomic-characterisation}); here the maximal function bounds means in $L_1$, so the
+coefficients are $L_1$ means over the cells. Triebel~\cite{TriebelII} uses $(s,p)$-atoms
+normalised in $L_p$; his coefficients are $2^{j(s - n/p)} \lambda_{j,m}$ for the coefficients
+$\lambda_{j,m}$ here.
+
+\begin{definition}[The sequence space $f^s_{p,q}$]
+\label{def:tl-sequence-space}
+\lean{Rd.cellCoefFun, Rd.cellCoefFun_of_mem, Rd.measurable_cellCoefFun, Rd.tlCoeffNorm,
+  Rd.aemeasurable_lqNorm_cellCoefFun}
+\leanok
+\uses{def:dyadic-cells, def:lq-norm, lem:lp-norm-nonnegative}
+Let $\lambda = (\lambda_{j,m})_{j \in \N, m \in \Z^n}$ be complex coefficients. For $j \in \N$ and
+$x \in V$ let $\lambda_j(x) = |\lambda_{j,m}|$ for the index $m$ of the cell $P_{j,m}$ of level
+$j$ that contains $x$. The function $\lambda_j : V \to [0, \infty)$ is measurable. For
+$1 \leq p < \infty$, $s \in \R$ and $1 \leq q \leq \infty$,
+\[
+  \|\lambda\|_{f^s_{p,q}} = \Bigl\| x \mapsto \bigl\| (2^{js} \lambda_j(x))_{j \in \N}
+  \bigr\|_{\ell_q} \Bigr\|_{L_p} ,
+\]
+and $x \mapsto \|(2^{js} \lambda_j(x))_j\|_{\ell_q}$ is measurable.
+\end{definition}
+
+\begin{lemma}[Coefficients and the maximal function]
+\label{lem:coefficients-maximal}
+\lean{Rd.volume_ball_div_two_pow, Rd.dyadicWeight_mul_setLIntegral_ball_le,
+  Rd.cellCoefFun_le_maximal, Rd.enorm_coef_le_maximal_cellCoefFun,
+  Rd.dyadicWeight_mul_tsum_ite_le_maximal, ENNReal.tsum_mul_le_of_le}
+\leanok
+\uses{def:tl-sequence-space, def:maximal-function, lem:dyadic-cubes, lem:dyadic-cells,
+  lem:cells-partition, lem:product-modulus}
+Let $\lambda$ be complex coefficients and $j \in \N$.
+\begin{enumerate}
+  \item For every $m \in \Z^n$, $|P_{j,m}| = 2^{-jn}$; for every $\rho > 0$ and every $z \in V$,
+    $|B(z, \rho 2^{-j})| = \rho^n |B_1| 2^{-jn}$, and for every $u : V \to [0, \infty]$ and every
+    $x \in V$, $2^{jn} \int_{B(x, \rho 2^{-j})} u \leq \rho^n |B_1| \, M u(x)$.
+  \item For every $u : V \to [0, \infty]$ with $|\lambda_{j,m}| \leq 2^{jn} \int_{P_{j,m}} u$
+    for every $m \in \Z^n$, and every $x \in V$,
+    $\lambda_j(x) \leq (2n + 1)^n |B_1| \, M u(x)$.
+  \item For every $\rho \in \R$, every $m \in \Z^n$ and every $x \in V$ with
+    $\|x - c_{j,m}\| \leq \rho 2^{-j}$, $|\lambda_{j,m}| \leq (2(\rho + 1))^n M \lambda_j(x)$.
+  \item For every $i \leq j$, every $\rho \geq 0$ and every $x \in V$,
+    \[
+      2^{-jn} \sum_{m : \|x - c_{j,m}\| \leq \rho 2^{-i}} |\lambda_{j,m}| \leq
+      (\rho + n + 1)^n |B_1| \, 2^{-in} M \lambda_j(x) .
+    \]
+  \item For every family $(\mu_m)$ in $[0, \infty]$, every predicate $P$ on the indices, every
+    $B \in [0, \infty]$ and all $u_m \in [0, \infty]$ with $u_m \leq B \, \mathbf 1_{P(m)}$,
+    $\sum_m \mu_m u_m \leq B \sum_{m : P(m)} \mu_m$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The cell is a cube of side $2^{-j}$ (\Cref{lem:dyadic-cubes}), the volume of balls scales
+with the $n$-th power of the radius, $(2^{-j})^n = 2^{-jn}$ (\Cref{lem:product-modulus}), and
+\Cref{def:maximal-function}. (2) The cell of $x$ lies in
+$B(x, (2n + 1) 2^{-j})$, since all its points have distance at most $n 2^{-j}$ from its centre
+(\Cref{lem:dyadic-cells}); apply (1). (3) $\rho \geq 0$ since $\|x - c_{j,m}\| \geq 0$. The ball
+$B(c_{j,m}, 2^{-j}/2)$ lies in $P_{j,m}$
+(\Cref{lem:dyadic-cubes}), where $\lambda_j = |\lambda_{j,m}|$, and in
+$B(x, (\rho + 1) 2^{-j})$, whose volume is $(2(\rho + 1))^n$ times as large. (4) The cells in the
+sum lie in $B(x, (\rho + n + 1) 2^{-i})$, and $2^{-jn} |\lambda_{j,m}| = \int_{P_{j,m}} \lambda_j$;
+the cells are disjoint (\Cref{lem:cells-partition}), and (1) at level $i$ finishes. (5) is
+termwise.
+\end{proof}
+
+\begin{lemma}[Smooth atoms on $V$]
+\label{lem:smooth-atoms-basic}
+\lean{Rd.IsSmoothAtom.norm_le, Rd.IsSmoothAtom.const_nonneg, Rd.IsSmoothAtom.continuous,
+  Rd.IsSmoothAtom.hasCompactSupport, Rd.IsSmoothAtom.integrable,
+  Rd.IsSmoothAtom.lintegral_enorm_le}
+\leanok
+\uses{def:smooth-atoms, lem:pointwise-atoms}
+Let $a$ be a smooth atom on a set $\Omega$ of level $j$ with centre $c$, radius factor $d$ and
+constant $A$. Then $|a| \leq A$ on $\Omega$, and $a$ has compact support. If $\Omega = V$, then
+$A \geq 0$, $a$ is continuous and integrable, and for $d \geq 0$,
+$\int_V |a| \leq A \, d^n |B_1| \, 2^{-jn}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bound is the case $l = 0$ of \Cref{def:smooth-atoms}; for $\Omega = V$ it gives
+$0 \leq |a(0)| \leq A$. The atom vanishes outside $\overline B(c, d 2^{-j})$, whose volume is
+$d^n |B_1| 2^{-jn}$ (\Cref{lem:pointwise-atoms}).
+\end{proof}
+
+\begin{lemma}[Convolution with a series of atoms]
+\label{lem:conv-atom-series}
+\lean{Rd.conv_tsum_atom, Rd.enorm_conv_le_tsum_atom}
+\leanok
+\uses{lem:smooth-atoms-basic, lem:cells-partition, lem:bounded-overlap, lem:cell-decomposition,
+  def:conv}
+Let $K$ be continuous with $K = 0$ outside $\overline B(0, \rho)$, $\rho \geq 0$, let $d \geq 0$,
+and for every $m \in \Z^n$ let $a_m$ be a smooth atom on $V$ of level $j$ with centre $c_{j,m}$,
+radius factor $d$ and constant $A$. For all complex $\lambda_m$ and every $x \in V$,
+\[
+  \Bigl(K * \sum_m \lambda_m a_m\Bigr)(x) = \sum_m \lambda_m (K * a_m)(x) ,
+\]
+and for every $f : V \to \C$ with $f = \sum_m \lambda_m a_m$ almost everywhere,
+$|(K * f)(x)| \leq \sum_m |\lambda_m| \, |(K * a_m)(x)|$ for every $x \in V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $K(y) \neq 0$ and $a_m(x - y) \neq 0$, then $\|x - c_{j,m}\| \leq \rho + d 2^{-j}$; only
+finitely many centres satisfy this (\Cref{lem:cells-partition}, \Cref{lem:bounded-overlap}), so
+\Cref{lem:cell-decomposition} (3) applies to $u_m = \lambda_m a_m$. The bound follows since
+$K * f = K * \sum_m \lambda_m a_m$ (\Cref{def:conv}).
+\end{proof}
+
+\begin{lemma}[Coarse local means of atoms]
+\label{lem:coarse-local-means-atoms}
+\lean{Rd.LocalMeansBump.lintegral_enorm_kernel_mul_atom_le,
+  Rd.LocalMeansBump.tlAtomCoarseConst, Rd.LocalMeansBump.tlAtomCoarseConst_ne_top,
+  Rd.LocalMeansBump.enorm_conv_kernel_level_le_of_le}
+\leanok
+\uses{lem:local-means-kernel-bounds, lem:reproducing-pointwise, lem:dyadic-weights-integer,
+  lem:smooth-atoms-basic, lem:conv-atom-series, lem:coefficients-maximal, lem:weighted-jensen}
+Let $L \in \N$, $d \geq 0$ and $A \in \R$, and let
+\[
+  C^{\mathrm c}_{L,d,A} = A_L \, A_+ \, d^n |B_1| \, (2LR + d + n + 1)^n |B_1| ;
+\]
+then $C^{\mathrm c}_{L,d,A} < \infty$. For all $i \leq j$, every smooth atom $a$ on $V$ of level
+$j$ with centre $c$, radius factor $d$ and constant $A$, and every $x \in V$,
+\[
+  \int_V |k_i(y)| \, |a(x - y)| \, dy \leq A_L \, A_+ \, d^n |B_1| \, 2^{in} 2^{-jn}
+  \mathbf 1_{\|x - c\| \leq (2LR + d) 2^{-i}} .
+\]
+For all $i \leq j$, all coefficients $\lambda$, smooth atoms $a_{j,m}$ on $V$ of level $j$ with
+centres $c_{j,m}$, radius factor $d$ and constant $A$, every $f : V \to \C$ with
+$f = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere and every $x \in V$,
+\[
+  |(k_i * f)(x)| \leq C^{\mathrm c}_{L,d,A} \, M \lambda_j(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The kernel $k_i$ is continuous (\Cref{lem:reproducing-pointwise}), and
+$|k_i| \leq A_L 2^{in}$ vanishes outside $\overline B(0, 2LR 2^{-i})$
+(\Cref{lem:local-means-kernel-bounds}, \Cref{lem:dyadic-weights-integer}). Moreover
+$\int |a| \leq A d^n |B_1| 2^{-jn}$ with $A = A_+$ (\Cref{lem:smooth-atoms-basic}); if
+$\|x - c\| > (2LR + d) 2^{-i}$, then $\|x - y - c\| > d 2^{-i} \geq d 2^{-j}$ wherever
+$k_i(y) \neq 0$. By \Cref{lem:conv-atom-series} and \Cref{lem:weighted-jensen},
+$|(k_i * f)(x)| \leq A_L A_+ d^n |B_1| 2^{in} \cdot 2^{-jn}
+\sum_{m : \|x - c_{j,m}\| \leq (2LR + d) 2^{-i}} |\lambda_{j,m}|$, and
+\Cref{lem:coefficients-maximal} (4) bounds the last factor by
+$(2LR + d + n + 1)^n |B_1| 2^{-in} M \lambda_j(x)$.
+\end{proof}
+
+\begin{lemma}[Fine local means of atoms]
+\label{lem:fine-local-means-atoms}
+\lean{Rd.IsSmoothAtom.higherDiff_eq_zero_of_lt, Rd.LocalMeansBump.enorm_mul_higherDiff_atom_le,
+  Rd.LocalMeansBump.ae_enorm_atom_sub_conv_scaled_le, Rd.LocalMeansBump.momentAtomConst,
+  Rd.LocalMeansBump.momentAtomConst_ne_top,
+  Rd.LocalMeansBump.ae_enorm_conv_kernel_atom_le_of_lt, Rd.LocalMeansBump.tlAtomFineConst,
+  Rd.LocalMeansBump.tlAtomFineConst_ne_top,
+  Rd.LocalMeansBump.ae_enorm_conv_kernel_level_le_of_lt}
+\leanok
+\uses{lem:smooth-atoms-regular, lem:local-means-one-scale, lem:conv-second-argument,
+  def:local-means, lem:local-means-kernel-bounds, lem:reproducing-pointwise, def:rd-modulus,
+  def:rd-modulus-on, lem:smooth-atoms-basic, lem:conv-atom-series, lem:coefficients-maximal}
+Let $L \in \N$ with $L \geq 1$, $d \geq 0$ and $A \in \R$, and let
+\[
+  D_{L,A} = 2 \|g\|_1 \, 2^L L^{L+1} A_+ \, (2R)^L , \qquad
+  C^{\mathrm f}_{L,d,A} = D_{L,A} \, (d + LR + n + 1)^n |B_1| ;
+\]
+then both are finite. For all $j < i$ and every smooth atom $a$ on $V$ of level $j$ and order
+$L$ with centre $c$, radius factor $d$ and constant $A$, almost everywhere
+\[
+  |(k_i * a)(x)| \leq D_{L,A} \, 2^{-(i-j)L} \, \mathbf 1_{\|x - c\| \leq (d + LR) 2^{-j}} .
+\]
+For all $j < i$, all coefficients $\lambda$, smooth atoms $a_{j,m}$ on $V$ of level $j$ and order
+$L$ with centres $c_{j,m}$, radius factor $d$ and constant $A$, and every $f : V \to \C$ with
+$f = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, almost everywhere
+\[
+  |(k_i * f)(x)| \leq C^{\mathrm f}_{L,d,A} \, 2^{-(i-j)L} \, M \lambda_j(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:local-means-one-scale} it suffices to show, for every $k \geq j$ and almost every
+$x$,
+\[
+  |a(x) - (m^g_{2^k} * a)(x)| \leq \|g\|_1 \, 2^L L^{L+1} A_+ R^L \, 2^{-(k-j)L}
+  \mathbf 1_{\|x - c\| \leq (d + LR) 2^{-j}} ,
+\]
+since $2 \cdot 2^L$ times this constant is $D_{L,A}$. By \Cref{lem:conv-second-argument},
+$|a(x) - (m^g_{2^k} * a)(x)| \leq \int |g(z)| \, |\Delta^L_{-2^{-k} z} a(x)| \, dz$ almost
+everywhere. On the support of $g$ the step $h = -2^{-k} z$ has $\|h\| \leq R 2^{-k}$, so
+$|\Delta^L_h a(x)| \leq 2^L L^{L+1} A (2^j \|h\|)^L \leq 2^L L^{L+1} A R^L 2^{-(k-j)L}$
+(\Cref{lem:smooth-atoms-regular}, with the steps of \Cref{def:rd-modulus-on}). The difference
+is a sum of values $a(x + l h)$, $l \leq L$ (\Cref{def:rd-modulus}), which vanish when
+$\|x - c\| > d 2^{-j} + L \|h\|$; since $\|h\| \leq R 2^{-j}$, they vanish unless
+$\|x - c\| \leq (d + LR) 2^{-j}$. For the level, \Cref{lem:conv-atom-series} and
+\Cref{lem:coefficients-maximal} (5) give
+$|(k_i * f)(x)| \leq D_{L,A} 2^{-(i-j)L} \sum_{m : \|x - c_{j,m}\| \leq (d + LR) 2^{-j}}
+|\lambda_{j,m}|$, and \Cref{lem:coefficients-maximal} (4) with $i = j$ bounds the sum by
+$(d + LR + n + 1)^n |B_1| M \lambda_j(x)$.
+\end{proof}
+
+The fine local means need no moment conditions on the atoms: the moments of the kernel $k_i$ and
+the smoothness of the atoms give the decay $2^{-(i-j)L}$.
+
+\begin{theorem}[Synthesis from atoms]
+\label{thm:tl-atomic-synthesis}
+\lean{Rd.LocalMeansBump.tlAtomSynthesisConst, Rd.LocalMeansBump.tlAtomSynthesisConst_ne_top,
+  Rd.LocalMeansBump.ae_enorm_conv_kernel_level_le,
+  Rd.LocalMeansBump.enorm_conv_kernel_le_tsum_level,
+  Rd.LocalMeansBump.enorm_localMean_le_tsum_maximal_cellCoefFun,
+  Rd.LocalMeansBump.tlLocalMeansNorm_le_tlCoeffNorm}
+\leanok
+\uses{lem:coarse-local-means-atoms, lem:fine-local-means-atoms, lem:lp-limits-pointwise,
+  def:tl-local-means, lem:conv-op, lem:almost-diagonal-pointwise, lem:maximal-bounds-mixed-norm,
+  def:tl-sequence-space}
+Let $L \in \N$ with $L \geq 1$, $d \geq 0$, $A \in \R$, and
+$C^{\mathrm a}_{L,d,A} = \max(C^{\mathrm c}_{L,d,A}, C^{\mathrm f}_{L,d,A}) < \infty$. Let
+$1 < p < \infty$, $1 < q \leq \infty$ and $s \in \R$. For all coefficients $\lambda$, all smooth
+atoms $a_{j,m}$ on $V$ of level $j$ and order $L$ with centres $c_{j,m}$, radius factor $d$ and
+constant $A$, all $f_j \in L_p$ with $f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, and
+every $F \in L_p$ with $\sum_{j \leq J} f_j \to F$ in $L_p$, almost everywhere and for all
+$i \in \N$
+\[
+  |(k_i * F)(x)| \leq C^{\mathrm a}_{L,d,A} \sum_{j \in \N} c^L_{ij} \, M \lambda_j(x) ,
+\]
+and
+\[
+  \|F\|^{g,L}_{F^s_{p,q}} \leq C^{\mathrm a}_{L,d,A} \, A_{s,L} \, C_{n,p,q} \,
+  \|\lambda\|_{f^s_{p,q}} ,
+\]
+with the constants $A_{s,L}$ of \Cref{lem:almost-diagonal-pointwise}, finite for $0 < s < L$,
+and $C_{n,p,q}$ of \Cref{thm:fefferman-stein}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{lem:coarse-local-means-atoms} for $j \geq i$ and \Cref{lem:fine-local-means-atoms} for
+$j < i$ give $|(k_i * f_j)(x)| \leq C^{\mathrm a}_{L,d,A} c^L_{ij} M \lambda_j(x)$ almost
+everywhere. The local mean $k_i *$ is continuous on $L_p$ (\Cref{lem:conv-op}), so
+$k_i * \sum_{j \leq J} f_j \to k_i * F$, and the bound
+$|k_i * \sum_{j \leq J} f_j| \leq \sum_j |k_i * f_j|$ of the partial sums passes to $F$
+(\Cref{lem:lp-limits-pointwise}). \Cref{lem:almost-diagonal-pointwise} with the local means index
+$i$ and the level $j$ and \Cref{lem:maximal-bounds-mixed-norm} for the functions
+$2^{js} \lambda_j$ finish.
+\end{proof}
+
+\begin{lemma}[Coefficients with exponent one]
+\label{lem:cell-coefficients-exponent-one}
+\lean{Rd.enorm_cellCoef_one_le, Rd.lqNorm_cellCoefFun_le_lqNorm_maximal}
+\leanok
+\uses{def:cell-atoms, lem:coefficients-maximal, lem:almost-diagonal-pointwise, lem:lq-basic}
+For every almost everywhere strongly measurable $u : V \to \C$, every $j \in \N$ and every
+$m \in \Z^n$, the coefficient $\lambda_{j,m}$ of $u$ with exponent $p = 1$
+(\Cref{def:cell-atoms}) satisfies $|\lambda_{j,m}| \leq 2^{jn} \int_{P_{j,m}} |u|$. For all
+almost everywhere strongly measurable $u_j : V \to \C$, $j \in \N$, the coefficients
+$\lambda_{j,m}$ of $u_j$ with exponent one satisfy, for every $q$, every
+$s \in \R$ and every $x \in V$,
+\[
+  \|(2^{js} \lambda_j(x))_j\|_{\ell_q} \leq (2n + 1)^n |B_1| \,
+  \|(M(2^{js} |u_j|)(x))_j\|_{\ell_q} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\lambda_{j,m} = 2^{jn} \|1_{P_{j,m}} u\|_1$ when this is finite, and $0$ otherwise. The second
+bound is \Cref{lem:coefficients-maximal} (2) for every level, with the weights moved inside the
+maximal function (\Cref{lem:almost-diagonal-pointwise}).
+\end{proof}
+
+\begin{theorem}[Atomic decomposition of Triebel--Lizorkin type]
+\label{thm:tl-atomic-decomposition}
+\lean{Rd.LocalMeansBump.tl_atomic_decomposition, Rd.LocalMeansBump.tlCoeffNorm_cellCoef_le}
+\leanok
+\uses{lem:cell-atoms-smooth, lem:cell-decomposition, def:cell-atoms, lem:reproducing-formula,
+  def:tl-local-means, lem:cell-coefficients-exponent-one, lem:maximal-bounds-mixed-norm,
+  thm:young, def:local-means}
+Let $L \in \N$ with $L \geq 1$, $K \in \N$, $1 \leq p < \infty$ and $F \in L_p$, and let
+$u_j = k_j * F$. Then $u_j \in L_p$. For $j \in \N$ and $m \in \Z^n$ let
+\[
+  \lambda_{j,m} = 2^{jn} \int_{P_{j,m}} |u_j| , \qquad
+  a_{j,m} = \lambda_{j,m}^{-1} \, \eta_j * (1_{P_{j,m}} u_j) ,
+\]
+with $a_{j,m} = 0$ if $\lambda_{j,m} = 0$: the coefficients and cell atoms with exponent $p = 1$
+of \Cref{def:cell-atoms} for the kernel $\eta_j$ and $g = u_j$. Then:
+\begin{enumerate}
+  \item every $a_{j,m}$ is a smooth atom on $V$ of level $j$ and order $K$ with centre $c_{j,m}$,
+    radius factor $2LR + n$ and constant $A_{L,K}$ of \Cref{lem:dual-kernel-derivatives};
+  \item $(\eta_j * u_j)(x) = \sum_m \lambda_{j,m} a_{j,m}(x)$ for every $j \in \N$ and every
+    $x \in V$;
+  \item $\sum_{j \leq J} \eta_j * u_j \to F$ in $L_p$;
+  \item if $p > 1$, then for every $1 < q \leq \infty$ and every $s \in \R$,
+    \[
+      \|\lambda\|_{f^s_{p,q}} \leq (2n + 1)^n |B_1| \, C_{n,p,q} \, \|F\|^{g,L}_{F^s_{p,q}} .
+    \]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+$u_j \in L_p$ by Young's inequality (\Cref{thm:young}), so $1_{P_{j,m}} u_j \in L_1$
+(\Cref{lem:cell-decomposition}) and $\lambda_{j,m}$ is the finite integral. (1) is
+\Cref{lem:cell-atoms-smooth} at $p = 1$, where the factor $((2LR)^n |B_1|)^{1 - 1/p}$ is $1$,
+applied to $1_{P_{j,m}} u_j$; the atom of a cell depends only on $u_j$ on that cell
+(\Cref{def:cell-atoms}). (2) is \Cref{lem:cell-decomposition} (4), and (3) is the reproducing
+formula (\Cref{lem:reproducing-formula}). (4) is \Cref{lem:cell-coefficients-exponent-one} for
+the continuous $u_j$ and \Cref{lem:maximal-bounds-mixed-norm} for the functions $2^{js} |u_j|$.
+\end{proof}
+
+The bound (4) uses neither $L \geq 1$ nor the order $K$.
+
+\begin{corollary}[Atoms describe $\TL{s}{p}{q}$]
+\label{cor:tl-atomic}
+\lean{Rd.memTriebelLizorkin_iff_atomic}
+\leanok
+\uses{thm:tl-atomic-synthesis, thm:tl-atomic-decomposition, thm:tl-local-means,
+  thm:smooth-atomic-decomposition}
+For every $1 < p < \infty$, every $1 < q \leq \infty$, every $L \in \N$, every $0 < s < L$ and
+every $F \in L_p$, $F \in \TL{s}{p}{q}$ if and only if there are $\rho \geq 0$, $A \in \R$,
+complex coefficients $\lambda_{j,m}$, smooth atoms $a_{j,m}$ on $V$ of level $j$ and order $L$
+with centres $c_{j,m}$, radius factor $\rho$ and constant $A$, and $f_j \in L_p$ with
+$f_j = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, $\sum_{j \leq J} f_j \to F$ in $L_p$ and
+$\|\lambda\|_{f^s_{p,q}} < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+$L \geq 1$ since $0 < s < L$, and $F \in \TL{s}{p}{q}$ iff the local means quasi-norm of a bump is
+finite (\Cref{thm:tl-local-means}, with the bump of \Cref{thm:smooth-atomic-decomposition}).
+Forward: \Cref{thm:tl-atomic-decomposition} with $K = L$, $\rho = 2LR + n$, $A = A_{L,L}$ and
+$f_j = \eta_j * (k_j * F)$. Backward: \Cref{thm:tl-atomic-synthesis}, since
+$A_{s,L} < \infty$.
+\end{proof}
+
+The Besov analogue is \Cref{thm:atomic-characterisation}. Here the atoms are indexed by the cells
+and centred at their centres, which takes the place of the bounded overlap condition there, and
+the atoms of the decomposition are smooth of every order.
+
+\chapter{Vector-valued singular integrals}
+\label{ch:singular-integrals}
+
+This chapter works on a finite-dimensional real inner product space $V$ of dimension $n$ with
+Lebesgue measure. It proves the strong type $(p,p)$, $1 < p < \infty$, of the analysis operator
+$f \mapsto (\theta_j * f)_j$ and of the synthesis operators
+$(g_j)_j \mapsto \sum_{j \in s} \theta_j * g_j$, $s \subseteq \N$ finite, of a
+Calder\'on--Zygmund family $(\theta_j)_j$, with explicit constants. For the weak and strong
+type, $n \geq 1$. \Cref{sec:dilation-families} introduces these families and proves the
+H\"ormander condition for the dilates of uniform Schwartz families;
+\Cref{sec:convolution-adjoint} moves convolution kernels and their derivatives to the other side
+of an integral; \Cref{sec:plancherel-bounds} gives the bounds on $L_2(V)$;
+\Cref{sec:vector-valued-weak-type} proves the weak type $(1,1)$ with the signed
+Calder\'on--Zygmund decomposition of \Cref{sec:calderon-zygmund-signed}; and
+\Cref{sec:vector-valued-strong-type} interpolates with the theorems of
+\Cref{ch:operator-interpolation}. \Cref{sec:square-function} applies the strong type to the
+Littlewood--Paley blocks and proves the square function theorem $\TL{0}{p}{2} = L_p(V)$. The same
+families give $\Sob{m}{p}(V) = \TL{m}{p}{2}$ (\Cref{ch:sobolev-rd}),
+$H^{s,p}(V) = \TL{s}{p}{2}$ (\Cref{ch:bessel-potential-spaces}) and the extension theorem for
+$\Sob{1}{p}$ (\Cref{ch:sobolev-domains}).
+
+\section{Dilation families and the H\"ormander condition}
+\label{sec:dilation-families}
+
+The Sobolev spaces $\Sob{m}{p}(V)$ and the Bessel potential spaces for $1 < p < \infty$ rest on
+vector-valued singular integrals whose kernels are families $\theta_j = (G_j)_{2^j}$,
+$j \in \N$, of dilated Schwartz functions $G_j$ with Schwartz seminorms bounded uniformly in
+$j$. Two numbers control such a family: the Fourier overlap $B$ with
+$\sum_j |\widehat{\theta_j}(\xi)|^2 \leq B$ for every $\xi$, which gives the $L_2$ bounds by
+Plancherel's theorem, and the H\"ormander constant $H$ with
+$\int_{\{\|x\| > 2\|y\|\}} \|(\theta_j(x - y) - \theta_j(x))_j\|_{\ell_2} \, dx \leq H$ for every
+$y$, which gives the weak type $(1,1)$ through the Calder\'on--Zygmund decomposition. This
+section proves the H\"ormander condition for every uniform family, with an explicit constant,
+and shows that the Littlewood--Paley blocks $\psi_j$ and the synthesis kernels of the square
+function theorem are such families. The H\"ormander condition for kernels with values in a
+Hilbert space, here $\ell_2$, is the hypothesis of the theory of vector-valued singular
+integrals of Benedek, Calder\'on and Panzone~\cite{BenedekCalderonPanzone}, which extends
+H\"ormander's condition for scalar kernels~\cite{Hormander1960}; see also
+Stein~\cite{SteinSingular}. Throughout, $C_{G,r,N}$, $T_{G,r,N}$ and
+$I_M$ are the constants of \Cref{lem:schwartz-decay} and \Cref{lem:schwartz-tails},
+$\Delta_v F(x) = F(x + v) - F(x)$, and $\delta_c F = F_c$ denotes the dilation by $c$, which
+keeps it apart from the kernels $\Phi_k = \delta_{2^k} \Phi$. Inverses and minima of the
+quantities $2^j \|y\|$ are taken in $[0, \infty]$, with $0^{-1} = \infty$ and
+$\infty^{-1} = 0$; so at $y = 0$ the bounds below read $0 \leq 0$ or $0 \leq \infty$.
+
+\begin{definition}[Dilation, reflection and conjugation of Schwartz functions]
+\label{def:schwartz-dilate}
+\lean{Rd.schwartzDilate, Rd.coe_schwartzDilate, Rd.schwartzReflect, Rd.coe_schwartzReflect,
+  Rd.schwartzConj, Rd.coe_schwartzConj}
+\leanok
+\uses{lem:dilate}
+For every Schwartz function $G$ on $V$ and every real $c \neq 0$, the functions
+$G_c(x) = c^n G(c x)$, $x \mapsto G(-x)$ and $x \mapsto \overline{G(x)}$ are Schwartz functions.
+\end{definition}
+
+The first two are compositions of $G$ with linear equivalences of $V$ (Mathlib's
+\texttt{SchwartzMap.\allowbreak compCLMOfContinuousLinearEquiv}), the third the composition of
+the real-linear conjugation with $G$ (Mathlib's \texttt{SchwartzMap.\allowbreak postcompCLM}).
+
+\begin{lemma}[Derivatives of dilations]
+\label{lem:derivative-dilate}
+\lean{Rd.schwartzDilate_sum, Rd.lineDerivOp_schwartzDilate,
+  Rd.iteratedLineDerivOp_schwartzDilate}
+\leanok
+\uses{def:schwartz-dilate}
+Let $c \neq 0$ be real. For every finite family $(G_i)$ of Schwartz functions,
+$(\sum_i G_i)_c = \sum_i (G_i)_c$. For every Schwartz function $G$, every $v \in V$, every
+$k \in \N$ and all $w \in V^k$,
+\[
+  \partial_v (G_c) = c \, (\partial_v G)_c , \qquad \partial^w (G_c) = c^k (\partial^w G)_c .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$G_c$ is $c^n$ times the composition of $G$ with the linear map $x \mapsto c x$, so the chain rule
+gives $\partial_v (G_c) = c^n (\partial_{c v} G)(c \, \cdot) = c \, (\partial_v G)_c$ (Mathlib's
+\texttt{SchwartzMap.\allowbreak lineDerivOp\_\allowbreak compCLMOfContinuousLinearEquiv}).
+Induction on $k$ gives the second identity; the first holds since $G \mapsto G_c$ is linear.
+\end{proof}
+
+\begin{lemma}[Dilations are linear and keep $L_1$ norms]
+\label{lem:dilate-sub-l1}
+\lean{Rd.dilate_sub, Rd.lintegral_enorm_dilate}
+\leanok
+\uses{lem:dilate, lem:schwartz-tails}
+For all functions $F, G : V \to \C$ and every real $c$, $(F - G)_c = F_c - G_c$, and for every
+real $c > 0$, $\int |F_c| = \int |F|$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first identity is pointwise. For the second, $|F_c(x)| = c^n |F(c x)|$ and the
+substitution $u = c x$ (\Cref{lem:schwartz-tails}).
+\end{proof}
+
+\begin{definition}[Uniform Schwartz families]
+\label{def:uniform-schwartz}
+\lean{Rd.IsUniformSchwartz, Rd.familyDecayConst, Rd.familyDecayConst_ne_top,
+  Rd.familyTailConst, Rd.familyTailConst_ne_top}
+\leanok
+\uses{lem:schwartz-decay, lem:schwartz-tails}
+A family $(G_j)_{j \in \N}$ of Schwartz functions is uniformly Schwartz with bounds
+$A = (A_{k,l})_{k, l \in \N}$ if $\sup_x \|x\|^k \|D^l G_j(x)\| \leq A_{k,l}$ for all
+$j, k, l \in \N$. For all $r, N \in \N$ let $C_{A,r,N} = 2^N (A_{0,r} + A_{N,r})$ and
+$T_{A,r,N} = C_{A,0,N+r+n+1} \, I_{n+1}$; both are finite.
+\end{definition}
+
+\begin{lemma}[Constants of uniform families]
+\label{lem:uniform-schwartz-constants}
+\lean{Rd.IsUniformSchwartz.const, Rd.IsUniformSchwartz.of_forall_mem,
+  Rd.IsUniformSchwartz.of_forall_eq_or_eq, Rd.schwartzDecayConst_le_familyDecayConst,
+  Rd.tailConst_le_familyTailConst}
+\leanok
+\uses{def:uniform-schwartz}
+For every uniform family $(G_j)$ with bounds $A$ and all $j, r, N \in \N$,
+$C_{G_j,r,N} \leq C_{A,r,N}$ and $T_{G_j,r,N} \leq T_{A,r,N}$. For every Schwartz function $G$,
+the constant family $(G)_j$ is uniformly Schwartz with bounds
+$A_{k,l} = \sup_x \|x\|^k \|D^l G(x)\|$. For every finite nonempty set $S$
+of Schwartz functions and every family $(G_j)$ with $G_j \in S$ for every $j$, $(G_j)$ is
+uniformly Schwartz with bounds $A_{k,l} = \max_{g \in S} \sup_x \|x\|^k \|D^l g(x)\|$; in
+particular for $S = \{G^0, G^1\}$ with
+$A_{k,l} = \max(\sup_x \|x\|^k \|D^l G^0(x)\|, \sup_x \|x\|^k \|D^l G^1(x)\|)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The constants increase with the seminorms.
+\end{proof}
+
+\begin{lemma}[Bounds of uniform families]
+\label{lem:uniform-schwartz-exceptions}
+\lean{Rd.IsUniformSchwartz.nonneg, Rd.IsUniformSchwartz.of_forall_ge_eq}
+\leanok
+\uses{def:uniform-schwartz}
+For every uniform family $(G_j)$ with bounds $A$, $A_{k,l} \geq 0$ for all $k, l \in \N$. For
+every $N \in \N$ and every family $(G'_j)$ of Schwartz functions with $G'_j = G_j$ for every
+$j \geq N$, $(G'_j)$ is uniformly Schwartz with bounds
+$\max \bigl( A_{k,l}, \sum_{i < N} \sup_x \|x\|^k \|D^l G'_i(x)\| \bigr)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$A_{k,l}$ dominates the seminorm $\sup_x \|x\|^k \|D^l G_0(x)\| \geq 0$. For $j \geq N$,
+$G'_j = G_j$ has seminorms at most $A_{k,l}$, and for $j < N$ the seminorm of $G'_j$ is a term of
+the sum.
+\end{proof}
+
+\begin{definition}[Gradient mass]
+\label{def:gradient-mass}
+\lean{Rd.gradMassConst, Rd.gradMassConst_ne_top, Rd.familyGradMass, Rd.familyGradMass_ne_top}
+\leanok
+\uses{def:uniform-schwartz}
+For every Schwartz function $G$ let $M_G = C_{G,1,n+1} \, I_{n+1}$, and for every family of
+bounds $A$ let $M_A = C_{A,1,n+1} \, I_{n+1}$; both are finite.
+\end{definition}
+
+\begin{lemma}[$L_1$ norms of directional derivatives]
+\label{lem:gradient-mass}
+\lean{Rd.enorm_iteratedFDeriv_schwartz_le, Rd.lintegral_enorm_lineDerivOp_le,
+  Rd.gradMassConst_le_familyGradMass}
+\leanok
+\uses{def:gradient-mass, lem:schwartz-decay, lem:schwartz-differences,
+  lem:uniform-schwartz-constants}
+For every Schwartz function $G$, all $r, N \in \N$ and all $x, v \in V$,
+$\|D^r G(x)\| \leq C_{G,r,N} (1 + \|x\|)^{-N}$ and $\int |\partial_v G| \leq \|v\| \, M_G$. For
+every uniform family $(G_j)$ with bounds $A$ and every $j \in \N$, $M_{G_j} \leq M_A$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first bound is $(1 + \|x\|)^N \|D^r G(x)\| \leq C_{G,r,N}$ (\Cref{lem:schwartz-decay}).
+With $|\partial_v G(x)| \leq \|v\| \, \|DG(x)\|$ (\Cref{lem:schwartz-differences}) and $r = 1$,
+$N = n + 1$, integration gives the second. The third follows from
+\Cref{lem:uniform-schwartz-constants}.
+\end{proof}
+
+\begin{lemma}[Short steps]
+\label{lem:hormander-short}
+\lean{Rd.lintegral_enorm_dilate_sub_le_mul}
+\leanok
+\uses{lem:gradient-mass, lem:dilate-sub-l1, lem:rd-differences, lem:schwartz-differences}
+For every Schwartz function $G$, every $j \in \N$ and every $y \in V$,
+\[
+  \int_V |G_{2^j}(x - y) - G_{2^j}(x)| \, dx \leq M_G \, 2^j \|y\| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$x \mapsto G_{2^j}(x - y) - G_{2^j}(x)$ is $\Delta_{-y} G_{2^j} = (\Delta_{-2^j y} G)_{2^j}$
+(\Cref{lem:rd-differences}), whose $L_1$ norm is $\|\Delta_{-2^j y} G\|_1$
+(\Cref{lem:dilate-sub-l1}). A difference of a Schwartz function is at most its directional
+derivative in $L_1$ (\Cref{lem:schwartz-differences}), and
+$\|\partial_{-2^j y} G\|_1 \leq 2^j \|y\| \, M_G$ (\Cref{lem:gradient-mass}).
+\end{proof}
+
+\begin{lemma}[Long steps]
+\label{lem:hormander-long}
+\lean{Rd.inv_one_add_ofReal_two_pow_mul_le, Rd.setLIntegral_enorm_dilate_sub_le_inv}
+\leanok
+\uses{lem:schwartz-tails}
+For every Schwartz function $G$, every $j \in \N$ and every $y \in V$,
+\[
+  \int_{\{\|x\| > 2\|y\|\}} |G_{2^j}(x - y) - G_{2^j}(x)| \, dx \leq
+  2 \, T_{G,0,1} \, (2^j \|y\|)^{-1} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $\|x\| > 2 \|y\|$ both $\|x\|$ and $\|x - y\| \geq \|x\| - \|y\|$ are at least $\|y\|$, so
+after the substitution $z = x - y$ each of the two terms is at most
+$\int_{\{\|z\| \geq \|y\|\}} |G_{2^j}(z)| \, dz \leq T_{G,0,1} (1 + 2^j \|y\|)^{-1}$
+(\Cref{lem:schwartz-tails}), and $(1 + t)^{-1} \leq t^{-1}$.
+\end{proof}
+
+\begin{definition}[H\"ormander constants]
+\label{def:hormander-const}
+\lean{Rd.hormanderConst, Rd.hormanderConst_ne_top, Rd.familyHormanderConst,
+  Rd.familyHormanderConst_ne_top}
+\leanok
+\uses{def:gradient-mass, def:uniform-schwartz}
+For every Schwartz function $G$ let $H_G = M_G + 2 \, T_{G,0,1}$, and for every family of bounds
+$A$ let $H_A = M_A + 2 \, T_{A,0,1}$; both are finite.
+\end{definition}
+
+\begin{proposition}[The H\"ormander bound for one dilate]
+\label{prop:hormander-one-dilate}
+\lean{Rd.setLIntegral_enorm_dilate_sub_le_min, Rd.hormanderConst_le_familyHormanderConst}
+\leanok
+\uses{def:hormander-const, lem:hormander-short, lem:hormander-long, lem:gradient-mass,
+  lem:uniform-schwartz-constants}
+For every Schwartz function $G$, every $j \in \N$ and every $y \in V$,
+\[
+  \int_{\{\|x\| > 2\|y\|\}} |G_{2^j}(x - y) - G_{2^j}(x)| \, dx \leq
+  H_G \min\bigl(2^j \|y\|, (2^j \|y\|)^{-1}\bigr) .
+\]
+For every uniform family $(G_j)$ with bounds $A$ and every $j \in \N$, $H_{G_j} \leq H_A$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+For $2^j \|y\| \leq 1$ the minimum is $2^j \|y\|$, and \Cref{lem:hormander-short} applies on all
+of $V$; otherwise it is $(2^j \|y\|)^{-1}$, and \Cref{lem:hormander-long} applies. The
+comparison of the constants follows from \Cref{lem:gradient-mass} and
+\Cref{lem:uniform-schwartz-constants}.
+\end{proof}
+
+\begin{theorem}[The H\"ormander condition for dilation families]
+\label{thm:hormander-dilation-family}
+\lean{Rd.lintegral_lqNorm_sub_le}
+\leanok
+\uses{prop:hormander-one-dilate, lem:dyadic-min-sum, def:lq-norm, lem:lq-basic}
+For every uniform family $(G_j)$ with bounds $A$, $\theta_j = (G_j)_{2^j}$, and every
+$y \in V$,
+\[
+  \int_{\{\|x\| > 2\|y\|\}} \|(\theta_j(x - y) - \theta_j(x))_j\|_{\ell_2} \, dx \leq 4 H_A .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The $\ell_2$ norm is at most the $\ell_1$ norm (\Cref{lem:lq-basic}). Exchanging sum and integral,
+the $j$-th integral is at most $H_A \min(2^j \|y\|, (2^j \|y\|)^{-1})$
+(\Cref{prop:hormander-one-dilate}), and the sum of the minima is at most $4$
+(\Cref{lem:dyadic-min-sum}).
+\end{proof}
+
+\begin{definition}[Calder\'on--Zygmund families]
+\label{def:cz-family}
+\lean{Rd.IsCZFamily}
+\leanok
+\uses{def:lq-norm}
+For all $B, H \in [0, \infty]$, a family $(\theta_j)_{j \in \N}$ of functions $V \to \C$ is a
+Calder\'on--Zygmund family with Fourier overlap $B$ and H\"ormander constant $H$ if every
+$\theta_j$ is integrable, continuous and bounded with integrable Fourier transform, if
+$\sum_j |\widehat{\theta_j}(\xi)|^2 \leq B$ for every $\xi \in V$, and if
+\[
+  \int_{\{\|x\| > 2\|y\|\}} \|(\theta_j(x - y) - \theta_j(x))_j\|_{\ell_2} \, dx \leq H
+\]
+for every $y \in V$.
+\end{definition}
+
+\begin{lemma}[Larger constants]
+\label{lem:cz-family-mono}
+\lean{Rd.IsCZFamily.mono}
+\leanok
+\uses{def:cz-family}
+For all $B \leq B'$ and $H \leq H'$ in $[0, \infty]$, every Calder\'on--Zygmund family with
+overlap $B$ and H\"ormander constant $H$ is a Calder\'on--Zygmund family with overlap $B'$ and
+H\"ormander constant $H'$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both conditions are upper bounds.
+\end{proof}
+
+\begin{lemma}[Adjoint families]
+\label{lem:cz-family-adjoint}
+\lean{Rd.fourier_conj_comp_neg, Rd.IsCZFamily.adjoint}
+\leanok
+\uses{def:cz-family, lem:fourier-conjugation}
+For every function $\theta : V \to \C$ and every $\xi \in V$, the Fourier transform of
+$x \mapsto \overline{\theta(-x)}$ at $\xi$ is $\overline{\widehat\theta(\xi)}$. For every
+Calder\'on--Zygmund family $(\theta_j)$ with overlap $B$ and H\"ormander constant $H$, the
+family $\theta_j^*(x) = \overline{\theta_j(-x)}$ is a Calder\'on--Zygmund family with overlap
+$B$ and H\"ormander constant $H$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\overline{\widehat\theta} = \mathcal F^{-1} \overline\theta$ (\Cref{lem:fourier-conjugation}),
+and $\mathcal F^{-1} f = \mathcal F (f(-\cdot))$ (Mathlib's
+\texttt{Real.\allowbreak fourierInv\_\allowbreak eq\_\allowbreak fourier\_\allowbreak
+comp\_\allowbreak neg}); so the overlap is unchanged. Integrability, continuity and boundedness
+pass through $x \mapsto -x$ and conjugation. In the H\"ormander integral,
+$|\theta_j^*(x - y) - \theta_j^*(x)| = |\theta_j(-x + y) - \theta_j(-x)|$; the substitution
+$x \mapsto -x$ keeps the region $\{\|x\| > 2\|y\|\}$ and turns the integral into the H\"ormander
+integral of $(\theta_j)$ at $-y$.
+\end{proof}
+
+\begin{theorem}[Dilation families are Calder\'on--Zygmund families]
+\label{thm:cz-family-dilation}
+\lean{Rd.IsCZFamily.of_dilation}
+\leanok
+\uses{def:cz-family, thm:hormander-dilation-family, lem:dilate, lem:fourier-dilate,
+  lem:lp-kernels-basic}
+For every uniform family $(G_j)$ with bounds $A$ and every $B \in [0, \infty]$ such that
+$\theta_j = (G_j)_{2^j}$ satisfies $\sum_j |\widehat{\theta_j}(\xi)|^2 \leq B$ for every
+$\xi \in V$, $(\theta_j)$ is a Calder\'on--Zygmund family with overlap $B$ and H\"ormander
+constant $4 H_A$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Schwartz functions are bounded (\Cref{lem:lp-kernels-basic}); their dilations are integrable,
+continuous and bounded (\Cref{lem:dilate}), and the Fourier transforms of the dilations are
+dilations of Schwartz functions (\Cref{lem:fourier-dilate}). The
+H\"ormander condition is \Cref{thm:hormander-dilation-family}.
+\end{proof}
+
+\begin{lemma}[Calder\'on--Zygmund families with exceptional members]
+\label{lem:cz-family-exceptions}
+\lean{Rd.enorm_fourier_dilate_le, Rd.IsCZFamily.of_dilation_of_forall_ge_eq}
+\leanok
+\uses{lem:uniform-schwartz-exceptions, thm:cz-family-dilation, lem:fourier-dilate,
+  def:cz-family, def:hormander-const, lem:tsum-changed-terms}
+For every Schwartz function
+$G$, every real $c > 0$ and every $\xi \in V$,
+$|\widehat{G_c}(\xi)| \leq \|\widehat G\|_{0,0}$. Let $(G_j)$ be a uniform family of Schwartz
+functions with bounds $A$ such that $\sum_j |\widehat{(G_j)_{2^j}}(\xi)|^2 \leq B$ for every
+$\xi \in V$, let $N \in \N$, and let $(G'_j)$ be Schwartz functions with $G'_j = G_j$ for every
+$j \geq N$. Then $((G'_j)_{2^j})_j$ is a Calder\'on--Zygmund family with overlap
+$B + \sum_{i < N} \|\widehat{G'_i}\|_{0,0}^2$ and H\"ormander constant $4 H_{A'}$, where
+$A'_{k,l} = \max\bigl(A_{k,l}, \sum_{i < N} \|G'_i\|_{k,l}\bigr)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+First, $\widehat{G_c}(\xi) = \widehat G(c^{-1} \xi)$ (\Cref{lem:fourier-dilate}). The family
+$(G'_j)$ is uniformly Schwartz with bounds $A'$ (\Cref{lem:uniform-schwartz-exceptions}); the
+first claim and \Cref{lem:tsum-changed-terms} bound its overlap, and
+\Cref{thm:cz-family-dilation} gives the family.
+\end{proof}
+
+\paragraph{The Littlewood--Paley families.}
+
+\begin{lemma}[Values of the dilated cut-offs]
+\label{lem:fourier-phi-values}
+\lean{Rd.fourier_Phi_eq_one, Rd.fourier_Phi_eq_zero, Rd.exists_fourier_Phi_eq_ofReal,
+  Rd.norm_fourier_Phi_le_one, Rd.norm_fourier_Phi_sub_le_one}
+\leanok
+\uses{def:lp-kernels, lem:lp-kernels-frequency, lem:lp-kernels-basic}
+For all $k, l \in \N$ and every $\xi \in V$: $\widehat{\Phi_k}(\xi) = 1$ if
+$\|\xi\| \leq 2^k$, $\widehat{\Phi_k}(\xi) = 0$ if $\|\xi\| \geq 2^{k+1}$,
+$\widehat{\Phi_k}(\xi)$ is a real number in $[0, 1]$, $|\widehat{\Phi_k}(\xi)| \leq 1$ and
+$|\widehat{\Phi_k}(\xi) - \widehat{\Phi_l}(\xi)| \leq 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\widehat{\Phi_k}(\xi) = \chi_{1,2}(2^{-k} \xi)$ (\Cref{lem:lp-kernels-frequency}), and
+the smooth bump $\chi_{1,2}$ has values in $[0, 1]$, equals $1$ on the closed unit ball and
+vanishes outside the ball of radius $2$ (\Cref{lem:lp-kernels-basic}).
+\end{proof}
+
+\begin{definition}[The blocks as dilates]
+\label{def:psi-base}
+\lean{Rd.psiBase, Rd.psiBaseBound, Rd.psiBaseBound_nonneg}
+\leanok
+\uses{def:lp-kernels, def:schwartz-dilate}
+Let $G^{\psi}_0 = \Phi$ and $G^{\psi}_j = \Phi - \delta_{1/2} \Phi$ for $j \geq 1$, and for
+all $k, l \in \N$ let $A^{\psi}_{k,l} \geq 0$ be the larger of the seminorms
+$\sup_x \|x\|^k \|D^l \Phi(x)\|$ and $\sup_x \|x\|^k \|D^l (\Phi - \delta_{1/2} \Phi)(x)\|$.
+\end{definition}
+
+\begin{lemma}[The blocks form a uniform family]
+\label{lem:psi-base}
+\lean{Rd.dilate_psiBase, Rd.isUniformSchwartz_psiBase}
+\leanok
+\uses{def:psi-base, lem:dilate-sub-l1, def:moment-kernel, lem:uniform-schwartz-constants}
+For every $j \in \N$, $\psi_j = (G^{\psi}_j)_{2^j}$, and $(G^{\psi}_j)$ is uniformly Schwartz
+with bounds $A^{\psi}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\delta_c \delta_d = \delta_{cd}$ (\Cref{def:moment-kernel}), so
+$\delta_{2^{j+1}} \delta_{1/2} \Phi = \Phi_j$ and
+$\delta_{2^{j+1}} (\Phi - \delta_{1/2} \Phi) = \Phi_{j+1} - \Phi_j = \psi_{j+1}$
+(\Cref{lem:dilate-sub-l1}). The family takes the two values $\Phi$ and
+$\Phi - \delta_{1/2} \Phi$ (\Cref{lem:uniform-schwartz-constants}).
+\end{proof}
+
+\begin{theorem}[The blocks form a Calder\'on--Zygmund family]
+\label{thm:cz-family-psi}
+\lean{Rd.tsum_fourier_psi_sq_le, Rd.isCZFamily_psi}
+\leanok
+\uses{lem:psi-base, prop:bessel-lp-weights, thm:cz-family-dilation}
+For every $\xi \in V$, $\sum_j |\widehat{\psi_j}(\xi)|^2 \leq 2$, and $(\psi_j)$ is a
+Calder\'on--Zygmund family with overlap $2$ and H\"ormander constant $4 H_{A^{\psi}}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The overlap bound is the case $s = 0$ of \Cref{prop:bessel-lp-weights}: at most two blocks are
+nonzero at $\xi$, each of modulus at most $1$. \Cref{thm:cz-family-dilation} and
+\Cref{lem:psi-base} give the rest.
+\end{proof}
+
+\begin{definition}[Synthesis kernels]
+\label{def:psi-dual}
+\lean{Rd.psiDual, Rd.psiDualBase, Rd.psiDualBaseBound, Rd.psiDualBaseBound_nonneg}
+\leanok
+\uses{def:lp-kernels, def:schwartz-dilate}
+Let $\tilde\psi_0 = \Phi_1$, $\tilde\psi_1 = \Phi_2$ and
+$\tilde\psi_j = \Phi_{j+1} - \Phi_{j-2}$ for $j \geq 2$. Let
+$\tilde G_0 = \tilde G_1 = \delta_2 \Phi$ and $\tilde G_j = \delta_2 \Phi - \delta_{1/4} \Phi$ for
+$j \geq 2$, and for all $k, l \in \N$ let $\tilde A_{k,l} \geq 0$ be the larger of the seminorms
+$\sup_x \|x\|^k \|D^l \delta_2 \Phi(x)\|$ and
+$\sup_x \|x\|^k \|D^l (\delta_2 \Phi - \delta_{1/4} \Phi)(x)\|$.
+\end{definition}
+
+\begin{lemma}[Properties of the synthesis kernels]
+\label{lem:psi-dual-basic}
+\lean{Rd.dilate_psiDualBase, Rd.isUniformSchwartz_psiDualBase, Rd.integrable_psiDual,
+  Rd.continuous_psiDual, Rd.bddAbove_psiDual, Rd.integrable_fourier_psiDual,
+  Rd.eLpNorm_psiDual_one_le, Rd.fourier_psiDual_add_two}
+\leanok
+\uses{def:psi-dual, lem:dilate-sub-l1, def:moment-kernel, lem:uniform-schwartz-constants,
+  lem:dilate, lem:fourier-dilate, lem:lp-kernels-basic, lem:fourier-conv}
+For every $j \in \N$, $\tilde\psi_j = (\tilde G_j)_{2^j}$; $(\tilde G_j)$ is uniformly Schwartz with
+bounds $\tilde A$; $\tilde\psi_j$ is integrable, continuous and bounded with integrable Fourier
+transform; $\|\tilde\psi_j\|_1 \leq 2 \|\Phi\|_1$; and
+$\widehat{\tilde\psi_{j+2}} = \widehat{\Phi_{j+3}} - \widehat{\Phi_j}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\delta_{2^{j+2}} \delta_2 \Phi = \Phi_{j+3}$ and $\delta_{2^{j+2}} \delta_{1/4} \Phi = \Phi_j$
+(\Cref{def:moment-kernel}: $\delta_c \delta_d = \delta_{cd}$), and $\delta_1 \delta_2 \Phi =
+\Phi_1$, $\delta_2 \delta_2 \Phi = \Phi_2$. The family takes
+two values (\Cref{lem:uniform-schwartz-constants}); the remaining properties hold for dilations
+of Schwartz functions (\Cref{lem:dilate}, \Cref{lem:fourier-dilate}), and
+$\|\Phi_k\|_1 = \|\Phi\|_1$ (\Cref{lem:lp-kernels-basic}).
+\end{proof}
+
+\begin{lemma}[The synthesis kernels reproduce the blocks]
+\label{lem:psi-dual-reproduces}
+\lean{Rd.fourier_psiDual_mul_psi, Rd.conv_psiDual_psi}
+\leanok
+\uses{lem:psi-dual-basic, lem:fourier-phi-values, lem:lp-kernels-frequency,
+  lem:conv-of-fourier}
+For every $j \in \N$, $\widehat{\tilde\psi_j} \, \widehat{\psi_j} = \widehat{\psi_j}$ and
+$\tilde\psi_j * \psi_j = \psi_j$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Where $\widehat{\psi_j}(\xi) \neq 0$, $\|\xi\| < 2^{j+1}$, and for $j \geq 2$ also
+$\|\xi\| > 2^{j-1}$ (\Cref{lem:lp-kernels-frequency}). Then $\widehat{\Phi_{j+1}}(\xi) = 1$,
+and for $j \geq 2$ also $\widehat{\Phi_{j-2}}(\xi) = 0$ (\Cref{lem:fourier-phi-values}), so
+$\widehat{\tilde\psi_j}(\xi) = 1$. The convolution identity follows by \Cref{lem:conv-of-fourier}.
+\end{proof}
+
+\begin{lemma}[Frequencies of the synthesis kernels]
+\label{lem:psi-dual-frequency}
+\lean{Rd.enorm_fourier_psiDual_le_one, Rd.norm_lt_of_fourier_psiDual_ne_zero,
+  Rd.lt_norm_of_fourier_psiDual_ne_zero, Rd.mem_Icc_of_fourier_psiDual_ne_zero}
+\leanok
+\uses{lem:psi-dual-basic, lem:fourier-phi-values, lem:lp-kernels-frequency}
+For every $j \in \N$ and every $\xi \in V$, $|\widehat{\tilde\psi_j}(\xi)| \leq 1$, and if
+$\widehat{\tilde\psi_j}(\xi) \neq 0$, then $\|\xi\| < 2^{j+2}$, and $\|\xi\| > 2^{j-2}$ for
+$j \geq 2$. For all $a, j \in \N$ and every $\xi \in V$ with $\|\xi\| < 2^{a+1}$ and
+$\|\xi\| \geq 2^{i+1}$ for every $i < a$, if $\widehat{\tilde\psi_j}(\xi) \neq 0$, then
+$a - 1 \leq j \leq a + 2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bound and the localisation follow from \Cref{lem:fourier-phi-values}: if both cut-offs
+vanish at $\xi$, or both equal $1$, their difference vanishes. If
+$\widehat{\tilde\psi_j}(\xi) \neq 0$, then $\|\xi\| < 2^{j+2}$, so $a \leq j + 1$ by the
+minimality of $a$, and for $j \geq 2$, $2^{j-2} < \|\xi\| < 2^{a+1}$, so $j \leq a + 2$.
+\end{proof}
+
+\begin{theorem}[The synthesis kernels form a Calder\'on--Zygmund family]
+\label{thm:cz-family-psi-dual}
+\lean{Rd.tsum_fourier_psiDual_sq_le, Rd.isCZFamily_psiDual}
+\leanok
+\uses{lem:psi-dual-basic, lem:psi-dual-frequency, thm:cz-family-dilation}
+For every $\xi \in V$, $\sum_j |\widehat{\tilde\psi_j}(\xi)|^2 \leq 4$, and $(\tilde\psi_j)$ is a
+Calder\'on--Zygmund family with overlap $4$ and H\"ormander constant $4 H_{\tilde A}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+With $a$ the least index such that $\|\xi\| < 2^{a+1}$, at most the four kernels with
+$a - 1 \leq j \leq a + 2$ are nonzero at $\xi$, each of modulus at most $1$
+(\Cref{lem:psi-dual-frequency}). \Cref{thm:cz-family-dilation} and \Cref{lem:psi-dual-basic}
+give the rest.
+\end{proof}
+
+\section{The adjoint of a convolution}
+\label{sec:convolution-adjoint}
+
+The strong type for $2 < p < \infty$ is proved by duality, through convolution with
+reflected kernels, and the weak derivatives of
+$\Sob{m}{p}(V)$ meet the Littlewood--Paley blocks through convolutions with Schwartz kernels.
+This section moves a convolution kernel to the other side of an integral, moves derivatives
+from a Schwartz kernel to the other Schwartz factor, and shows that weak derivatives commute
+with convolution by Schwartz functions. Throughout, $K * f$ is the convolution of
+\Cref{def:conv}, and for $v \in V^k$, $\partial^v$ is the iterated directional derivative of
+\Cref{sec:schwartz-cutoff}.
+
+\begin{definition}[Reflection]
+\label{def:reflect}
+\lean{Rd.reflect, Rd.reflect_apply}
+\leanok
+For every function $K : V \to \C$, the reflection of $K$ is $K^\vee(x) = K(-x)$.
+\end{definition}
+
+\begin{lemma}[Reflections and convolution integrals]
+\label{lem:reflect-basic}
+\lean{Rd.reflect_reflect, Rd.integrable_reflect, Rd.continuous_reflect, Rd.fourier_reflect,
+  Rd.conv_apply_eq_integral_sub, Rd.conv_reflect_apply}
+\leanok
+\uses{def:reflect, def:conv}
+For every function $K : V \to \C$, $(K^\vee)^\vee = K$, $K^\vee$ is integrable if $K$ is,
+$K^\vee$ is continuous if $K$ is, and $\widehat{K^\vee}(\xi) = \widehat K(-\xi)$ for every
+$\xi \in V$. For all functions $K, u : V \to \C$ and all $x, y \in V$,
+\[
+  (K * u)(x) = \int_V K(x - z) \, u(z) \, dz , \qquad
+  (K^\vee * u)(y) = \int_V K(z - y) \, u(z) \, dz .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Lebesgue measure is invariant under $x \mapsto -x$. The Fourier transform of $K^\vee$ is the
+substitution $x \mapsto -x$ in the defining integral (Mathlib's
+\texttt{Real.\allowbreak fourierInv\_eq\_fourier\_comp\_neg}). The first convolution formula is
+the substitution $z \mapsto x - z$ (Mathlib's
+\texttt{MeasureTheory.\allowbreak convolution\_mul\_swap}), and the second is the first for
+$K^\vee$.
+\end{proof}
+
+\begin{theorem}[The adjoint identity]
+\label{thm:convolution-adjoint}
+\lean{Rd.integrable_kernel_mul_mul, Rd.integral_conv_mul}
+\leanok
+\uses{lem:reflect-basic, thm:young}
+For all $1 \leq p < \infty$ and $1 < q \leq \infty$ with $1/p + 1/q = 1$, every $K \in L_1(V)$,
+every $f \in L_p(V)$ and every $g \in L_q(V)$, the function
+$(x, y) \mapsto K(x - y) f(y) g(x)$ is integrable on $V \times V$, and
+\[
+  \int_V (K * f)(x) \, g(x) \, dx = \int_V f(y) \, (K^\vee * g)(y) \, dy .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+For almost every $x$ the integral of $y \mapsto K(x - y) f(y)$ converges absolutely
+(\Cref{thm:young}). By \Cref{lem:reflect-basic},
+$\int_V |K(x - y)| \, |f(y)| \, dy = (|K| * |f|)(x)$ for every $x$, and $|K| * |f| \in L_p$ by
+Young's inequality, so $x \mapsto (|K| * |f|)(x) \, |g(x)|$ is integrable by H\"older's
+inequality. Together the two give the integrability on $V \times V$. Integrating first in $y$
+gives the left side by \Cref{lem:reflect-basic}, integrating first in $x$ gives the right side,
+and Fubini's theorem exchanges the integrations.
+\end{proof}
+
+With complex conjugation, the reflection becomes the adjoint kernel
+$K^*(z) = \overline{K(-z)}$, the form in which the duality arguments for $p > 2$ use the
+identity.
+
+\begin{corollary}[The adjoint identity with conjugation]
+\label{cor:convolution-adjoint-conj}
+\lean{Rd.conv_reflect_conj, Rd.integral_conv_mul_conj}
+\leanok
+\uses{thm:convolution-adjoint, lem:reflect-basic}
+For all functions $K, u : V \to \C$ and every $x \in V$,
+$(K^\vee * \overline u)(x) = \overline{(K^* * u)(x)}$. For all $1 \leq p < \infty$ and
+$1 < q \leq \infty$ with $1/p + 1/q = 1$, every $K \in L_1(V)$, every $f \in L_p(V)$ and every
+$g \in L_q(V)$,
+\[
+  \int_V (K * f)(x) \, \overline{g(x)} \, dx
+  = \int_V f(y) \, \overline{(K^* * g)(y)} \, dy .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+By \Cref{lem:reflect-basic} both sides of the first identity are
+$\int_V K(y - x) \, \overline{u(y)} \, dy$. \Cref{thm:convolution-adjoint} for $\overline g \in
+L_q(V)$ and the first identity give the second.
+\end{proof}
+
+\begin{lemma}[Translates and reflections of Schwartz functions]
+\label{lem:schwartz-shift-reflect}
+\lean{SchwartzMap.lineDerivOp_compSubConstCLM, SchwartzMap.iteratedLineDerivOp_compSubConstCLM,
+  Rd.lineDerivOp_schwartzReflect, Rd.iteratedLineDerivOp_schwartzReflect, Rd.shiftReflect,
+  Rd.shiftReflect_apply, Rd.conv_eq_integral_shiftReflect, Rd.iteratedLineDerivOp_shiftReflect}
+\leanok
+\uses{def:schwartz-dilate, lem:reflect-basic}
+For every Schwartz function $\eta$, all $x, y \in V$ and every $w \in V^k$, the functions
+$z \mapsto \eta(z - y)$ and $z \mapsto \eta(x - z)$ are Schwartz functions,
+\begin{gather*}
+  \partial^w \bigl(\eta(\cdot - y)\bigr) = (\partial^w \eta)(\cdot - y), \qquad
+  \partial^w \bigl(\eta(-\,\cdot)\bigr) = (-1)^k (\partial^w \eta)(-\,\cdot), \\
+  \partial^w \bigl(\eta(x - \cdot)\bigr) = (-1)^k (\partial^w \eta)(x - \cdot),
+\end{gather*}
+and for every function $f : V \to \C$, $(\eta * f)(x)$ is the integral of $f$ against the
+Schwartz function $\eta(x - \cdot)$:
+$(\eta * f)(x) = \int_V \eta(x - z) \, f(z) \, dz$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The derivative of $z \mapsto \eta(z - y)$ at $z$ is $D\eta(z - y)$, and the directional
+derivative of $\eta(-\,\cdot)$ in direction $v$ is $-(\partial_v \eta)(-\,\cdot)$ (Mathlib's
+\texttt{SchwartzMap.\allowbreak lineDerivOp\_compCLMOfContinuousLinearEquiv}); induction on $k$
+gives the iterated forms, and the third identity combines the first two. The convolution formula
+is \Cref{lem:reflect-basic}.
+\end{proof}
+
+\begin{lemma}[Derivatives move from the kernel to the Schwartz factor]
+\label{lem:conv-derivative-transfer}
+\lean{Rd.conv_reflect_lineDerivOp, Rd.integral_conv_lineDerivOp_mul,
+  Rd.integral_conv_iteratedLineDerivOp_mul}
+\leanok
+\uses{thm:convolution-adjoint, lem:schwartz-shift-reflect, lem:directional-derivatives-commute}
+For all Schwartz functions $\eta$, $u$ and all $v, y \in V$,
+$((\partial_v \eta)^\vee * u)(y) = -(\eta^\vee * \partial_v u)(y)$. For every
+$1 \leq p < \infty$, every $f \in L_p(V)$, all Schwartz functions $\eta$, $u$ and every
+$w \in V^k$,
+\[
+  \int_V \bigl((\partial^w \eta) * f\bigr)(x) \, u(x) \, dx
+  = (-1)^k \int_V (\eta * f)(x) \, \partial^w u(x) \, dx .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:reflect-basic},
+$((\partial_v \eta)^\vee * u)(y) = \int_V \partial_v \eta(z - y) \, u(z) \, dz$, and
+integration by parts for Schwartz functions (Mathlib's
+\texttt{SchwartzMap.\allowbreak integral\_mul\_lineDerivOp\_right\_eq\_neg\_left}), applied to
+$\eta(\cdot - y)$ and $u$, gives the first identity by \Cref{lem:schwartz-shift-reflect}. For
+$k = 1$, apply \Cref{thm:convolution-adjoint} with the conjugate exponent $q$ of $p$ to both
+sides; Schwartz functions lie in every $L_q$, and the two reflected convolutions differ by the
+sign. Induction on $k$ gives the general case, with
+$\partial_a \partial^w u = \partial^w \partial_a u$
+(\Cref{lem:directional-derivatives-commute}).
+\end{proof}
+
+\begin{theorem}[Weak derivatives commute with convolution]
+\label{thm:weak-derivative-convolution}
+\lean{Rd.conv_eq_conv_iteratedLineDerivOp, Rd.conv_eq_conv_iteratedLineDerivOp_of_memLp,
+  Rd.hasWeakLineDeriv_conv, Rd.hasWeakLineDeriv_toLp_conv}
+\leanok
+\uses{thm:weak-derivative-tempered, lem:distribution-transpose, lem:schwartz-shift-reflect,
+  lem:conv-derivative-transfer, lem:weak-derivative-integral, lem:weak-derivative-basic,
+  def:test-schwartz, thm:young}
+For all $1 \leq p, r \leq \infty$, every $f \in L_p(V)$, every $g \in L_r(V)$ and every
+$v \in V^k$ such that $g$ is the weak derivative $\partial^v f$ on $V$, every Schwartz
+function $\eta$ and every $x \in V$,
+\[
+  (\eta * g)(x) = \bigl((\partial^v \eta) * f\bigr)(x) .
+\]
+For every $1 \leq p < \infty$, every $f \in L_p(V)$, every Schwartz function $\eta$ and every
+$v \in V^k$, $(\partial^v \eta) * f$ is the weak derivative $\partial^v (\eta * f)$ on $V$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $S_f$ and $S_g$ be the tempered distributions of $f$ and $g$, and for every Schwartz
+function $\zeta$ let $\rho_x \zeta = \zeta(x - \cdot)$ be its reflected translate.
+By \Cref{lem:schwartz-shift-reflect}, $(\eta * g)(x) = S_g(\rho_x \eta)$, which is
+$\partial^v S_f(\rho_x \eta) = S_f\bigl((-1)^k \partial^v \rho_x \eta\bigr)$ by
+\Cref{thm:weak-derivative-tempered} and \Cref{lem:distribution-transpose}. Again by
+\Cref{lem:schwartz-shift-reflect}, $(-1)^k \partial^v \rho_x \eta = \rho_x(\partial^v \eta)$,
+and $S_f\bigl(\rho_x(\partial^v \eta)\bigr) = ((\partial^v \eta) * f)(x)$.
+
+For the second statement, $\eta * f$ and $(\partial^v \eta) * f$ lie in $L_p$ by
+\Cref{thm:young}, so they are locally integrable. For every test function $\varphi$ on $V$,
+\Cref{lem:conv-derivative-transfer} with the Schwartz function $u = \varphi$
+(\Cref{def:test-schwartz}) is the identity of \Cref{lem:weak-derivative-integral}.
+\end{proof}
+
+\begin{lemma}[Weak derivatives of convolutions in $L_p$]
+\label{lem:weak-derivative-convolution-lp}
+\lean{Rd.hasWeakLineDeriv_convLp}
+\leanok
+\uses{thm:weak-derivative-convolution, lem:conv-op}
+For all $1 \leq p, r < \infty$, every $k$, all directions $v = (v_1, \dots, v_k) \in V^k$, every
+Schwartz function $\eta$, every $f \in L_p(V)$ and every $g \in L_r(V)$ with $g = \partial^v f$
+weakly on $V$, $\eta * g = \partial^v (\eta * f)$ weakly on $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The weak derivative of $\eta * f$ is $(\partial^v \eta) * f$, and $(\partial^v \eta) * f =
+\eta * g$ at every point (\Cref{thm:weak-derivative-convolution}).
+\end{proof}
+
+\begin{lemma}[Weak derivatives and convolution on open sets]
+\label{lem:weak-derivative-convolution-local}
+\lean{Rd.coe_shiftReflect_eq_comp, Rd.hasCompactSupport_shiftReflect,
+  Rd.tsupport_shiftReflect_subset, Rd.conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv}
+\leanok
+\uses{lem:schwartz-shift-reflect, lem:weak-derivative-complex-test}
+Let $\Omega \subseteq V$ be open, $v \in V^k$, $g = \partial^v f$ weakly on $\Omega$, $\eta$ a
+Schwartz function with compact support and $x \in V$ with $x - y \in \Omega$ for every $y$ in the
+support of $\eta$. Then $(\eta * g)(x) = ((\partial^v \eta) * f)(x)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The reflected translate $\rho_x \eta = \eta(x - \cdot)$ has compact support in $\Omega$, so
+\Cref{lem:weak-derivative-complex-test} and \Cref{lem:schwartz-shift-reflect} give
+$(\eta * g)(x) = \int \rho_x \eta \, g = (-1)^k \int (\partial^v \rho_x \eta) \, f
+= \int \rho_x(\partial^v \eta) \, f = ((\partial^v \eta) * f)(x)$.
+\end{proof}
+
+\section{Plancherel bounds}
+\label{sec:plancherel-bounds}
+
+A family $(\theta_j)_{j \in \N}$ of integrable kernels on $V$ defines the analysis operator
+$f \mapsto (\theta_j * f)_j$ and, for every finite set $s \subseteq \N$, the synthesis operator
+$(g_j)_j \mapsto \sum_{j \in s} \theta_j * g_j$. On $L_2(V)$ both are bounded by the Fourier
+overlap alone: Plancherel's theorem and the convolution theorem on $L_2$ turn them into
+multiplications by the functions $\widehat{\theta_j}$. Throughout, $T_K f = K * f$ is the
+convolution operator of \Cref{lem:conv-op} on $L_2(V)$, and $\widehat f$ the Fourier transform
+of $f \in L_2(V)$ of \Cref{sec:sobolev-two-littlewood-paley}.
+
+\begin{lemma}[Cauchy--Schwarz and squares of $L_2$ norms]
+\label{lem:l2-squares}
+\lean{enorm_sum_mul_sq_le, Rd.lintegral_enorm_conv_sq_eq}
+\leanok
+\uses{lem:plancherel-l2, lem:conv-op}
+For every seminormed ring $R$, such as $\C$, every finite set $s$ and all $a_j, b_j \in R$,
+$j \in s$,
+\[
+  \Bigl\|\sum_{j \in s} a_j b_j\Bigr\|^2 \leq \Bigl(\sum_{j \in s} \|a_j\|^2\Bigr)
+  \Bigl(\sum_{j \in s} \|b_j\|^2\Bigr).
+\]
+For every integrable $K$ on $V$ and every $f \in L_2(V)$,
+$\int_V |(K * f)(x)|^2 \, dx = \|T_K f\|_2^2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The inequality is the Cauchy--Schwarz inequality for the norms (Mathlib's
+\texttt{Finset.\allowbreak sum\_mul\_sq\_le\_sq\_mul\_sq}) after the triangle inequality and
+$\|a b\| \leq \|a\| \, \|b\|$. The identity follows from \Cref{lem:plancherel-l2}, since
+$T_K f = K * f$ almost everywhere (\Cref{lem:conv-op}).
+\end{proof}
+
+\begin{theorem}[The analysis bound on $L_2$]
+\label{thm:l2-analysis-bound}
+\lean{Rd.tsum_enorm_convLp_sq_le, Rd.lintegral_lqNorm_conv_sq_le}
+\leanok
+\uses{thm:convolution-theorem-l2, lem:plancherel-l2, lem:l2-squares, lem:fourier-integrable,
+  def:lq-norm}
+For every $B \in [0, \infty]$, every family $(\theta_j)_{j \in \N}$ of integrable kernels on $V$
+with $\sum_j |\widehat{\theta_j}(\xi)|^2 \leq B$ for almost every $\xi \in V$, and every
+$f \in L_2(V)$,
+\[
+  \sum_j \|\theta_j * f\|_2^2 \leq B \, \|f\|_2^2 , \qquad
+  \int_V \|((\theta_j * f)(x))_j\|_{\ell_2}^2 \, dx \leq B \int_V |f(x)|^2 \, dx .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:convolution-theorem-l2} and monotone convergence,
+\[
+  \sum_j \|\theta_j * f\|_2^2
+  = \int_V \Bigl(\sum_j |\widehat{\theta_j}(\xi)|^2\Bigr) |\widehat f(\xi)|^2 \, d\xi
+  \leq B \int_V |\widehat f(\xi)|^2 \, d\xi = B \, \|f\|_2^2
+\]
+by \Cref{lem:plancherel-l2}; the integrand is measurable since every $\widehat{\theta_j}$ lies
+in $L_\infty(V)$ (\Cref{lem:fourier-integrable}). The second inequality is the first for the
+class of $f$, written with $\|a\|_{\ell_2}^2 = \sum_j a_j^2$ (\Cref{def:lq-norm}),
+\Cref{lem:plancherel-l2}, \Cref{lem:l2-squares} and monotone convergence.
+\end{proof}
+
+\begin{lemma}[The Fourier transform of a sum of convolutions]
+\label{lem:fourier-sum-conv}
+\lean{Rd.fourier_sum_convLp}
+\leanok
+\uses{thm:convolution-theorem-l2}
+For every family $(\theta_j)_{j \in \N}$ of integrable kernels on $V$, all $g_j \in L_2(V)$ and
+every finite set $s \subseteq \N$,
+$\mathcal F\bigl(\sum_{j \in s} \theta_j * g_j\bigr)
+= \sum_{j \in s} \widehat{\theta_j} \, \widehat{g_j}$ almost everywhere.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Fourier transform on $L_2(V)$ is linear (Mathlib's
+\texttt{Fourier\allowbreak Transform.\allowbreak fourier\_\allowbreak sum}); apply
+\Cref{thm:convolution-theorem-l2} to each term.
+\end{proof}
+
+\begin{theorem}[The synthesis bound on $L_2$]
+\label{thm:l2-synthesis-bound}
+\lean{Rd.enorm_sum_convLp_sq_le, Rd.lintegral_enorm_sum_conv_sq_le}
+\leanok
+\uses{lem:fourier-sum-conv, lem:l2-squares, lem:plancherel-l2, def:lq-norm}
+For every $B \in [0, \infty]$, every family $(\theta_j)_{j \in \N}$ of integrable kernels on $V$
+with $\sum_j |\widehat{\theta_j}(\xi)|^2 \leq B$ for almost every $\xi \in V$, all
+$g_j \in L_2(V)$ and every finite set $s \subseteq \N$,
+\[
+  \Bigl\|\sum_{j \in s} \theta_j * g_j\Bigr\|_2^2 \leq B \sum_{j \in s} \|g_j\|_2^2
+\]
+and
+\[
+  \int_V \Bigl|\sum_{j \in s} (\theta_j * g_j)(x)\Bigr|^2 \, dx
+  \leq B \int_V \|(g_j(x))_j\|_{\ell_2}^2 \, dx .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+For almost every $\xi$, \Cref{lem:fourier-sum-conv} and the Cauchy--Schwarz inequality of
+\Cref{lem:l2-squares} give
+\[
+  \Bigl|\mathcal F\Bigl(\sum_{j \in s} \theta_j * g_j\Bigr)(\xi)\Bigr|^2
+  \leq \Bigl(\sum_{j \in s} |\widehat{\theta_j}(\xi)|^2\Bigr)
+  \sum_{j \in s} |\widehat{g_j}(\xi)|^2
+  \leq B \sum_{j \in s} |\widehat{g_j}(\xi)|^2 .
+\]
+Integration and \Cref{lem:plancherel-l2} on both sides give the first inequality. The second is
+the first for the classes of the $g_j$ (\Cref{lem:plancherel-l2}), with
+$\sum_{j \in s} |g_j(x)|^2 \leq \|(g_j(x))_j\|_{\ell_2}^2$ (\Cref{def:lq-norm}).
+\end{proof}
+
+\begin{corollary}[Plancherel bounds for Calder\'on--Zygmund families]
+\label{cor:cz-family-l2-bounds}
+\lean{Rd.IsCZFamily.tsum_enorm_convLp_sq_le, Rd.IsCZFamily.lintegral_lqNorm_conv_sq_le,
+  Rd.IsCZFamily.enorm_sum_convLp_sq_le, Rd.IsCZFamily.lintegral_enorm_sum_conv_sq_le}
+\leanok
+\uses{def:cz-family, thm:l2-analysis-bound, thm:l2-synthesis-bound}
+For all $B, H \in [0, \infty]$ and every Calder\'on--Zygmund family $(\theta_j)_{j \in \N}$ on
+$V$ with overlap $B$ and H\"ormander constant $H$,
+\[
+  \sum_j \|\theta_j * f\|_2^2 \leq B \, \|f\|_2^2 , \qquad
+  \int_V \|((\theta_j * f)(x))_j\|_{\ell_2}^2 \, dx \leq B \int_V |f(x)|^2 \, dx
+\]
+for every $f \in L_2(V)$, and
+\[
+  \Bigl\|\sum_{j \in s} \theta_j * g_j\Bigr\|_2^2 \leq B \sum_{j \in s} \|g_j\|_2^2
+\]
+and
+\[
+  \int_V \Bigl|\sum_{j \in s} (\theta_j * g_j)(x)\Bigr|^2 \, dx
+  \leq B \int_V \|(g_j(x))_j\|_{\ell_2}^2 \, dx
+\]
+for all $g_j \in L_2(V)$ and every finite set $s \subseteq \N$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+The kernels of a Calder\'on--Zygmund family are integrable, and the overlap bound holds at
+every $\xi$ (\Cref{def:cz-family}); apply \Cref{thm:l2-analysis-bound} and
+\Cref{thm:l2-synthesis-bound}.
+\end{proof}
+
+\section{The weak type \texorpdfstring{$(1,1)$}{(1,1)} of vector-valued singular integrals}
+\label{sec:vector-valued-weak-type}
+
+Let $(\theta_j)_{j \in \N}$ be a Calder\'on--Zygmund family on $V$ with overlap $B$ and
+H\"ormander constant $H$ (\Cref{def:cz-family}). This section proves the weak type $(1,1)$ of
+the analysis operator $f \mapsto (\theta_j * f)_j$ and of the synthesis operators
+$(g_j)_j \mapsto \sum_{j \in s} \theta_j * g_j$ for finite sets $s \subseteq \N$. At a height
+$t$, the signed Calder\'on--Zygmund decomposition of \Cref{sec:calderon-zygmund-signed} splits
+$f$ into the good part $\mathcal G f$, which the Plancherel bounds of
+\Cref{cor:cz-family-l2-bounds} control in $L_2$, and the bad part $\mathcal B f$, a sum of
+pieces $b_Q f$ with mean zero. A maximal big cube $Q = Q_{k,m}$ has centre $c_Q$ and lies in the
+closed ball $\bar B(c_Q, \rho_Q)$ with $\rho_Q = n 2^{-k}$ (\Cref{lem:dyadic-cubes}), and the
+enlarged exceptional set $\Omega^*$ is the union of the balls $\bar B(c_Q, 2 \rho_Q)$
+(\Cref{def:calderon-zygmund-cubes}). Off $\Omega^*$ the mean zero of the pieces lets the
+H\"ormander condition act. This is the classical argument for singular integrals with values in a
+Hilbert space~\cite{BenedekCalderonPanzone}; see also Stein~\cite{SteinSingular} and
+Grafakos~\cite{Grafakos}.
+
+\begin{lemma}[Elementary facts]
+\label{lem:weak-type-elementary}
+\lean{ENNReal.half_lt_or_half_lt_of_lt_add,
+  MeasureTheory.memLp_two_of_lintegral_enorm_sq_ne_top}
+\leanok
+For all $t, a, b \in [0, \infty]$ with $t < a + b$, $t/2 < a$ or $t/2 < b$. For every measure
+space $(X, \mu)$, every normed group $E$ and every almost everywhere strongly measurable
+$f : X \to E$ with $\int \|f\|^2 \, d\mu < \infty$, $f \in L_2(\mu)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $a \leq t/2$ and $b \leq t/2$, then $a + b \leq t$ (Mathlib's
+\texttt{lt\_\allowbreak or\_\allowbreak lt\_\allowbreak of\_\allowbreak add\_\allowbreak
+lt\_\allowbreak add}). The second statement is the definition of the $L_2$ norm.
+\end{proof}
+
+\begin{lemma}[Level sets of a split function]
+\label{lem:level-sets-split-function}
+\lean{MeasureTheory.measure_half_lt_le_lintegral_sq,
+  MeasureTheory.measure_half_lt_le_add_setLIntegral_compl,
+  MeasureTheory.measure_lt_le_of_ae_le_add}
+\leanok
+\uses{lem:weak-type-elementary}
+For every measure space $(X, \mu)$, every $t \in (0, \infty)$, all almost everywhere measurable
+$a, b : X \to [0, \infty]$ and every measurable set $S \subseteq X$,
+\[
+  \mu\{a > t/2\} \leq 4 t^{-2} \int a^2 \, d\mu , \qquad
+  \mu\{b > t/2\} \leq \mu(S) + 2 t^{-1} \int_{X \setminus S} b \, d\mu .
+\]
+For every $u : X \to [0, \infty]$ with $u \leq a + b$ almost everywhere and all
+$A, D, K, I \in [0, \infty]$ with
+\[
+  \int a^2 \, d\mu \leq A t I , \qquad \mu(S) \leq D t^{-1} I , \qquad
+  \int_{X \setminus S} b \, d\mu \leq K I ,
+\]
+$\mu\{u > t\} \leq (4A + D + 2K) \, t^{-1} I$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first bound is Chebyshev's inequality for $a^2$ at height $t^2/4$, the second Chebyshev's
+inequality for $\mathbf 1_{X \setminus S} \, b$ at height $t/2$. By
+\Cref{lem:weak-type-elementary}, almost every point of $\{u > t\}$ lies in
+$\{a > t/2\} \cup \{b > t/2\}$, and the two bounds give
+$\mu\{u > t\} \leq 4 t^{-2} A t I + D t^{-1} I + 2 t^{-1} K I$.
+\end{proof}
+
+\begin{lemma}[The H\"ormander condition around a cube]
+\label{lem:hormander-around-cube}
+\lean{Rd.IsCZFamily.setLIntegral_compl_closedBall_le, Rd.IsCZFamily.measurable_lqNorm_sub,
+  Rd.IsCZFamily.setLIntegral_compl_closedBall_setLIntegral_le}
+\leanok
+\uses{def:cz-family, def:lq-norm}
+For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family $(\theta_j)_j$ on $V$ with
+overlap $B$ and H\"ormander constant $H$, every $c \in V$, every $\rho \in \R$ and every
+$y \in V$ with $\|y - c\| \leq \rho$,
+\[
+  \int_{\{\|x - c\| > 2\rho\}} \|(\theta_j(x - y) - \theta_j(x - c))_j\|_{\ell_2} \, dx \leq H .
+\]
+The function $(x, y) \mapsto \|(\theta_j(x - y) - \theta_j(x - c))_j\|_{\ell_2}$ is measurable
+on $V \times V$, and for every measurable $Q \subseteq \bar B(c, \rho)$ and every almost
+everywhere measurable $m : V \to [0, \infty]$,
+\[
+  \int_{\{\|x - c\| > 2\rho\}} \int_Q \|(\theta_j(x - y) - \theta_j(x - c))_j\|_{\ell_2} \,
+  m(y) \, dy \, dx \leq H \int_Q m .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Every $x$ with $\|x - c\| > 2\rho$ satisfies $\|x - c\| > 2 \|y - c\|$. The substitution
+$x' = x - c$ turns the integral into one over a subset of $\{\|x'\| > 2 \|y - c\|\}$ with
+integrand $\|(\theta_j(x' - (y - c)) - \theta_j(x'))_j\|_{\ell_2}$, which is at most $H$ by the
+H\"ormander condition at $y - c$ (\Cref{def:cz-family}). The kernels are continuous, so the
+function on $V \times V$ is measurable. Tonelli's theorem exchanges the two integrals in the
+last bound, and the inner integral is at most $H$ for every $y \in Q$.
+\end{proof}
+
+\begin{lemma}[Convolutions of pieces with mean zero]
+\label{lem:mean-zero-pieces-conv}
+\lean{Rd.enorm_conv_le_setLIntegral_sub, Rd.IsCZFamily.lqNorm_conv_le_setLIntegral,
+  Rd.IsCZFamily.enorm_sum_conv_le_setLIntegral}
+\leanok
+\uses{def:cz-family, lem:reflect-basic, lem:minkowski-integral-lq,
+  lem:lq-cauchy-schwarz-sequences}
+For every continuous bounded $K : V \to \C$, every set $Q \subseteq V$, every integrable
+$b : V \to \C$ with $b = 0$ outside $Q$ and $\int b = 0$, and all $c, x \in V$,
+\[
+  |(K * b)(x)| \leq \int_Q |K(x - y) - K(x - c)| \, |b(y)| \, dy .
+\]
+For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family $(\theta_j)_j$ with overlap
+$B$ and H\"ormander constant $H$, every such $b$ and all $c, x \in V$,
+\[
+  \|((\theta_j * b)(x))_j\|_{\ell_2}
+  \leq \int_Q \|(\theta_j(x - y) - \theta_j(x - c))_j\|_{\ell_2} \, |b(y)| \, dy ,
+\]
+and for every finite set $s \subseteq \N$ and all integrable $b_j : V \to \C$ with $b_j = 0$
+outside $Q$ and $\int b_j = 0$,
+\[
+  \Bigl|\sum_{j \in s} (\theta_j * b_j)(x)\Bigr|
+  \leq \int_Q \|(\theta_j(x - y) - \theta_j(x - c))_j\|_{\ell_2} \,
+  \|(b_j(y))_j\|_{\ell_2} \, dy .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:reflect-basic}, $(K * b)(x) = \int K(x - y) b(y) \, dy$, and since $\int b = 0$
+this is $\int (K(x - y) - K(x - c)) b(y) \, dy$; the integrand vanishes outside $Q$. The second
+bound follows by Minkowski's integral inequality in $\ell_2$
+(\Cref{lem:minkowski-integral-lq}). For the third, the triangle inequality and the first bound
+for each $j \in s$ give
+$\int_Q \sum_{j \in s} |\theta_j(x - y) - \theta_j(x - c)| \, |b_j(y)| \, dy$, and the
+Cauchy--Schwarz inequality of \Cref{lem:lq-cauchy-schwarz-sequences} applies at each $y$.
+\end{proof}
+
+\begin{lemma}[Convolution of the bad part]
+\label{lem:conv-bad-part}
+\lean{Rd.hasSum_conv_czBadPart}
+\leanok
+\uses{def:calderon-zygmund-signed, lem:calderon-zygmund-bad-pieces,
+  thm:calderon-zygmund-bad-pieces-mean-mass, lem:reflect-basic}
+For every $G : V \to [0, \infty]$ and every $t \in [0, \infty]$, with $Q$ running over the
+maximal big cubes of $G$ at height $t$: for every continuous bounded $K : V \to \C$, every
+integrable $f : V \to \C$ and every $x \in V$,
+\[
+  (K * \mathcal B f)(x) = \sum_Q (K * b_Q f)(x) ,
+\]
+and the series converges absolutely.
+\end{lemma}
+
+\begin{proof}
+\leanok
+With $|K| \leq M$,
+$\sum_Q \int |K(x - y)| \, |b_Q f(y)| \, dy \leq M \sum_Q \int |b_Q f| \leq 2 M \int |f|$
+by \Cref{thm:calderon-zygmund-bad-pieces-mean-mass}, so the series of the integrals
+$\int K(x - y) \, b_Q f(y) \, dy$ converges absolutely to the integral of the series, which is
+$\int K(x - y) \, \mathcal B f(y) \, dy$ by \Cref{lem:calderon-zygmund-bad-pieces}. Both sides
+are convolutions by \Cref{lem:reflect-basic}.
+\end{proof}
+
+\begin{lemma}[The bad part off the enlarged exceptional set]
+\label{lem:bad-part-off-enlarged}
+\lean{Rd.IsCZFamily.setLIntegral_compl_czEnlarged_tsum_le,
+  Rd.IsCZFamily.setLIntegral_lqNorm_conv_czBadC_le,
+  Rd.IsCZFamily.setLIntegral_enorm_sum_conv_czBadC_le}
+\leanok
+\uses{lem:hormander-around-cube, lem:mean-zero-pieces-conv, lem:conv-bad-part,
+  lem:lp-series-minkowski, thm:calderon-zygmund-bad-pieces-mean-mass,
+  thm:calderon-zygmund-signed-family, lem:dyadic-cubes, def:calderon-zygmund-cubes}
+For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family $(\theta_j)_j$ with overlap
+$B$ and H\"ormander constant $H$, every $G : V \to [0, \infty]$ and every $t \in [0, \infty]$,
+with the enlarged exceptional set $\Omega^*$ of the maximal big cubes $Q$ of $G$ at height $t$:
+for every family of almost everywhere measurable $m_Q : V \to [0, \infty]$,
+\[
+  \int_{V \setminus \Omega^*} \sum_Q \int_Q
+  \|(\theta_j(x - y) - \theta_j(x - c_Q))_j\|_{\ell_2} \, m_Q(y) \, dy \, dx
+  \leq H \sum_Q \int_Q m_Q ;
+\]
+for every integrable $f : V \to \C$,
+\[
+  \int_{V \setminus \Omega^*} \|((\theta_j * \mathcal B f)(x))_j\|_{\ell_2} \, dx
+  \leq 2 H \int |f| ;
+\]
+and for every finite set $s \subseteq \N$ and all integrable $g_j : V \to \C$,
+\[
+  \int_{V \setminus \Omega^*} \Bigl|\sum_{j \in s} (\theta_j * \mathcal B g_j)(x)\Bigr| \, dx
+  \leq 2 H \int \|(g_j(x))_j\|_{\ell_2} \, dx .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+A point $x \notin \Omega^*$ satisfies $\|x - c_Q\| > 2\rho_Q$ for every maximal big cube $Q$,
+and $Q \subseteq \bar B(c_Q, \rho_Q)$ (\Cref{lem:dyadic-cubes}). Monotone convergence and
+\Cref{lem:hormander-around-cube} for each $Q$ give the first bound. By \Cref{lem:conv-bad-part},
+Minkowski's inequality for series (\Cref{lem:lp-series-minkowski}) and
+\Cref{lem:mean-zero-pieces-conv},
+\[
+  \|((\theta_j * \mathcal B f)(x))_j\|_{\ell_2}
+  \leq \sum_Q \int_Q \|(\theta_j(x - y) - \theta_j(x - c_Q))_j\|_{\ell_2} \,
+  |b_Q f(y)| \, dy
+\]
+for every $x$, so the first bound with $m_Q = |b_Q f|$ and
+\Cref{thm:calderon-zygmund-bad-pieces-mean-mass} give the second. The third follows in the same
+way with $m_Q(y) = \|(b_Q g_j(y))_j\|_{\ell_2}$ and \Cref{thm:calderon-zygmund-signed-family}.
+\end{proof}
+
+\begin{lemma}[The good part and the splitting]
+\label{lem:good-part-split}
+\lean{Rd.IsCZFamily.ae_lqNorm_conv_le_add, Rd.IsCZFamily.ae_enorm_sum_conv_le_add,
+  Rd.IsCZFamily.lintegral_lqNorm_conv_czGoodC_sq_le,
+  Rd.IsCZFamily.lintegral_enorm_sum_conv_czGoodC_sq_le}
+\leanok
+\uses{cor:cz-family-l2-bounds, thm:calderon-zygmund-signed-good-bounds,
+  thm:calderon-zygmund-signed-family, lem:calderon-zygmund-signed-good,
+  lem:calderon-zygmund-bad-pieces, lem:conv-assoc, lem:weak-type-elementary, lem:lq-basic}
+For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family $(\theta_j)_j$ with overlap
+$B$ and H\"ormander constant $H$, every $G : V \to [0, \infty]$ and every $t \in [0, \infty]$:
+for every integrable $f : V \to \C$ and almost every $x \in V$,
+\[
+  \|((\theta_j * f)(x))_j\|_{\ell_2} \leq \|((\theta_j * \mathcal G f)(x))_j\|_{\ell_2}
+  + \|((\theta_j * \mathcal B f)(x))_j\|_{\ell_2} ,
+\]
+and for every finite set $s \subseteq \N$, all integrable $g_j : V \to \C$ and almost every
+$x \in V$,
+\[
+  \Bigl|\sum_{j \in s} (\theta_j * g_j)(x)\Bigr|
+  \leq \Bigl|\sum_{j \in s} (\theta_j * \mathcal G g_j)(x)\Bigr|
+  + \Bigl|\sum_{j \in s} (\theta_j * \mathcal B g_j)(x)\Bigr| .
+\]
+If moreover $n \geq 1$ and $0 < t < \infty$, then for every integrable $f : V \to \C$ and the
+cubes of $|f|$ at height $t$,
+\[
+  \int \|((\theta_j * \mathcal G f)(x))_j\|_{\ell_2}^2 \, dx \leq B \, 2^n t \int |f| ,
+\]
+and for every finite set $s \subseteq \N$, all almost everywhere strongly measurable
+$g_j : V \to \C$ with $\int \|(g_j(x))_j\|_{\ell_2} \, dx < \infty$ and the cubes of
+$x \mapsto \|(g_j(x))_j\|_{\ell_2}$ at height $t$,
+\[
+  \int \Bigl|\sum_{j \in s} (\theta_j * \mathcal G g_j)(x)\Bigr|^2 \, dx
+  \leq B \, 2^n t \int \|(g_j(x))_j\|_{\ell_2} \, dx .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:calderon-zygmund-bad-pieces}, $f = \mathcal G f + \mathcal B f$, and both parts
+are integrable
+(\Cref{lem:calderon-zygmund-signed-good}, \Cref{lem:calderon-zygmund-bad-pieces}); convolution
+is additive almost everywhere (\Cref{lem:conv-assoc}), and Minkowski's inequality in $\ell_2$
+(\Cref{lem:lq-basic}) gives the first bound, the triangle inequality the second. For the good
+parts, $\int |\mathcal G f|^2 \leq 2^n t \int |f| < \infty$
+(\Cref{thm:calderon-zygmund-signed-good-bounds}), and
+$|\mathcal G g_j| \leq \|(\mathcal G g_i)_i\|_{\ell_2}$, whose square has integral at most
+$2^n t \int \|(g_i)_i\|_{\ell_2}$ (\Cref{thm:calderon-zygmund-signed-family}). So the good parts
+lie in $L_2$ (\Cref{lem:weak-type-elementary}), and \Cref{cor:cz-family-l2-bounds} gives the
+last two bounds.
+\end{proof}
+
+\begin{definition}[The weak type constant]
+\label{def:vector-weak-const}
+\lean{Rd.vectorWeakConst, Rd.vectorWeakConst_ne_top}
+\leanok
+For all $B, H \in [0, \infty]$,
+\[
+  C_V(B, H) = 4 \cdot 2^n B + (2n)^n \, |B(0, 1)| + 4 H ,
+\]
+where $|B(0, 1)|$ is the volume of the unit ball of $V$. It is finite if $B$ and $H$ are.
+\end{definition}
+
+\begin{theorem}[The weak type $(1,1)$ of vector-valued singular integrals]
+\label{thm:vector-valued-weak-type}
+\lean{Rd.IsCZFamily.volume_lqNorm_conv_gt_le, Rd.IsCZFamily.volume_enorm_sum_conv_gt_le}
+\leanok
+\uses{lem:level-sets-split-function, lem:good-part-split, lem:bad-part-off-enlarged,
+  lem:calderon-zygmund-averages, def:vector-weak-const}
+Let $n \geq 1$. For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family
+$(\theta_j)_j$ on $V$ with overlap $B$ and H\"ormander constant $H$ and every
+$t \in (0, \infty)$:
+for every integrable $f : V \to \C$,
+\[
+  \bigl|\{x \in V : \|((\theta_j * f)(x))_j\|_{\ell_2} > t\}\bigr|
+  \leq C_V(B, H) \, t^{-1} \int |f| ,
+\]
+and for every finite set $s \subseteq \N$ and all almost everywhere strongly measurable
+$g_j : V \to \C$ with $\int \|(g_j(x))_j\|_{\ell_2} \, dx < \infty$,
+\[
+  \Bigl|\Bigl\{x \in V : \Bigl|\sum_{j \in s} (\theta_j * g_j)(x)\Bigr| > t\Bigr\}\Bigr|
+  \leq C_V(B, H) \, t^{-1} \int \|(g_j(x))_j\|_{\ell_2} \, dx .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Decompose $f$ along the maximal big cubes of $|f|$ at height $t$, and every $g_j$ along those
+of $\|(g_j)_j\|_{\ell_2}$; the $g_j$ are integrable, since $|g_j| \leq \|(g_i)_i\|_{\ell_2}$.
+Apply \Cref{lem:level-sets-split-function} with the sizes of the good and of the bad parts as $a$
+and $b$ and with $S = \Omega^*$: \Cref{lem:good-part-split} gives the splitting and $A = B 2^n$,
+\Cref{lem:calderon-zygmund-averages} gives $D = (2n)^n |B(0, 1)|$, and
+\Cref{lem:bad-part-off-enlarged} gives $K = 2H$. Then $4A + D + 2K = C_V(B, H)$.
+\end{proof}
+
+\section{The strong type of vector-valued singular integrals}
+\label{sec:vector-valued-strong-type}
+
+Let $(\theta_j)_{j \in \N}$ be a Calder\'on--Zygmund family on $V$ with overlap $B$ and
+H\"ormander constant $H$ (\Cref{def:cz-family}). This section proves, for every
+$1 < p < \infty$, the strong type $(p, p)$ of the analysis operator
+$f \mapsto \|((\theta_j * f)(x))_j\|_{\ell_2}$ and of the synthesis operators
+$(g_j)_j \mapsto \sum_{j \in s} \theta_j * g_j$ for finite sets $s \subseteq \N$, with explicit
+constants. For $p = 2$ these are the Plancherel bounds. For $1 < p < 2$ Marcinkiewicz
+interpolation between the weak type $(1,1)$ of \Cref{thm:vector-valued-weak-type} and the
+$L_2$ bounds applies: to the analysis operator in the form of the formalisation of Carleson's
+theorem (\Cref{thm:marcinkiewicz-interpolation}), and to the synthesis operators in the form
+for an abstract input type (\Cref{thm:marcinkiewicz-abstract}), whose inputs are families of
+measurable functions. For $2 < p < \infty$, the adjoint identity exchanges the two operators of
+the adjoint family $\theta_j^*(x) = \overline{\theta_j(-x)}$, which has the same overlap and
+H\"ormander constant, at the conjugate exponent $p' < 2$, and \Cref{thm:lp-norm-duality}
+returns to $L_p$. These are the classical $L_p$ bounds of vector-valued singular
+integrals~\cite{BenedekCalderonPanzone}; see also Stein~\cite{SteinSingular}.
+
+\begin{theorem}[The strong type $(2,2)$]
+\label{thm:cz-strong-type-two}
+\lean{Rd.IsCZFamily.hasStrongType_lqNorm_conv_two, Rd.IsCZFamily.eLpNorm_lqNorm_conv_two_le,
+  Rd.IsCZFamily.eLpNorm_sum_conv_two_le}
+\leanok
+\uses{cor:cz-family-l2-bounds, lem:lp-norm-from-power-integrals, def:weak-type-operators,
+  lem:lp-norm-nonnegative}
+For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family $(\theta_j)_j$ on $V$ with
+overlap $B$ and H\"ormander constant $H$, every $f \in L_2(V)$, every finite set
+$s \subseteq \N$ and all $g_j \in L_2(V)$,
+\[
+  \bigl\| \|((\theta_j * f)(x))_j\|_{\ell_2} \bigr\|_2 \leq B^{1/2} \|f\|_2 , \qquad
+  \Bigl\| \sum_{j \in s} \theta_j * g_j \Bigr\|_2
+  \leq B^{1/2} \bigl\| \|(g_j(x))_j\|_{\ell_2} \bigr\|_2 .
+\]
+In particular the analysis operator has strong type $(2, 2)$ with constant $B^{1/2}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The function $x \mapsto \|((\theta_j * f)(x))_j\|_{\ell_2}$ is almost everywhere measurable
+(\Cref{lem:lp-norm-nonnegative}). \Cref{lem:lp-norm-from-power-integrals} with $p = 2$ and
+$C = B$ turns the integral bounds of \Cref{cor:cz-family-l2-bounds} into the norm bounds.
+\end{proof}
+
+\begin{lemma}[Subadditivity and weak type $(1,1)$ of the analysis operator]
+\label{lem:analysis-subadditive-weak-type}
+\lean{Rd.IsCZFamily.aeSubadditiveOn_lqNorm_conv, Rd.IsCZFamily.hasWeakType_lqNorm_conv}
+\leanok
+\uses{def:cz-family, lem:conv-assoc, lem:lq-basic, thm:vector-valued-weak-type,
+  def:weak-type-operators, def:vector-weak-const, lem:distribution-weak-norm-basic}
+For all $B, H \in [0, \infty]$ and every Calder\'on--Zygmund family $(\theta_j)_j$ on $V$ with
+overlap $B$ and H\"ormander constant $H$, the analysis operator
+$f \mapsto \|((\theta_j * f)(x))_j\|_{\ell_2}$ is almost everywhere subadditive with constant
+$1$ on the functions in $L_1(V)$ or $L_2(V)$. If $n \geq 1$, it has weak type $(1, 1)$ with
+constant $C_V(B, H)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $f \in L_p(V)$ and $g \in L_r(V)$ with $p, r \in \{1, 2\}$,
+$\theta_j * (f + g) = \theta_j * f + \theta_j * g$ almost everywhere for every $j$
+(\Cref{lem:conv-assoc}), and Minkowski's inequality in $\ell_2$ (\Cref{lem:lq-basic}) gives the
+subadditivity. For $t > 0$, \Cref{thm:vector-valued-weak-type} gives
+$t \, |\{\|((\theta_j * f)(x))_j\|_{\ell_2} > t\}| \leq C_V(B, H) \int |f|$, and for $t = 0$
+the left side vanishes; the supremum over $t$ is the weak $L_1$ norm
+(\Cref{lem:distribution-weak-norm-basic}).
+\end{proof}
+
+\begin{definition}[The strong type constant below $2$]
+\label{def:cz-const-below}
+\lean{Rd.czConstBelow, Rd.czConstBelow_ne_top}
+\leanok
+\uses{def:marcinkiewicz-const, def:vector-weak-const}
+For $1 < p < 2$ and $B, H \in [0, \infty]$,
+\[
+  S^-_{V,p}(B, H) = C^{\mathrm M}_p\bigl(C_V(B, H), B\bigr)^{1/p} .
+\]
+It is finite if $B$ and $H$ are.
+\end{definition}
+
+\begin{theorem}[The analysis operator for $1 < p < 2$]
+\label{thm:cz-analysis-below-two}
+\lean{Rd.IsCZFamily.hasStrongType_lqNorm_conv_of_lt, Rd.IsCZFamily.eLpNorm_lqNorm_conv_le_of_lt}
+\leanok
+\uses{thm:marcinkiewicz-interpolation, lem:analysis-subadditive-weak-type,
+  thm:cz-strong-type-two, def:cz-const-below}
+Let $n \geq 1$ and $1 < p < 2$. For all $B, H \in [0, \infty]$ and every Calder\'on--Zygmund
+family $(\theta_j)_j$ on $V$ with overlap $B$ and H\"ormander constant $H$, the analysis
+operator has strong type $(p, p)$ with constant $S^-_{V,p}(B, H)$: for every $f \in L_p(V)$,
+\[
+  \bigl\| \|((\theta_j * f)(x))_j\|_{\ell_2} \bigr\|_p \leq S^-_{V,p}(B, H) \, \|f\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:marcinkiewicz-interpolation} applies with $A = 1$, $C_1 = C_V(B, H)$ and
+$C_2 = B^{1/2}$ (\Cref{lem:analysis-subadditive-weak-type}, \Cref{thm:cz-strong-type-two}), and
+$N_p(1, C_V(B, H), B^{1/2}) = S^-_{V,p}(B, H)$.
+\end{proof}
+
+\begin{theorem}[The synthesis operators for $1 < p < 2$]
+\label{thm:cz-synthesis-below-two}
+\lean{Rd.IsCZFamily.eLpNorm_sum_conv_le_of_lt_of_measurable,
+  Rd.IsCZFamily.eLpNorm_sum_conv_le_of_lt}
+\leanok
+\uses{thm:marcinkiewicz-abstract, thm:vector-valued-weak-type, cor:cz-family-l2-bounds,
+  lem:finite-families-lp-l2, lem:fefferman-stein-split, lem:conv-assoc, def:conv,
+  def:cz-const-below}
+Let $n \geq 1$ and $1 < p < 2$. For all $B, H \in [0, \infty]$, every Calder\'on--Zygmund family
+$(\theta_j)_j$ on $V$ with overlap $B$ and H\"ormander constant $H$, every finite set
+$s \subseteq \N$ and all $g_j \in L_p(V)$, $j \in \N$,
+\[
+  \Bigl\| \sum_{j \in s} \theta_j * g_j \Bigr\|_p
+  \leq S^-_{V,p}(B, H) \, \bigl\| \|(g_j(x))_j\|_{\ell_2} \bigr\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+First let every $g_j$ be measurable with
+$\bigl\| \|(g_j)_j\|_{\ell_2} \bigr\|_p < \infty$. Apply \Cref{thm:marcinkiewicz-abstract} to
+the families of measurable functions, with the size $G_g = \|(g_j)_j\|_{\ell_2}$, the
+restriction $g|_S = (\mathbf 1_S g_j)_j$, whose size is $\mathbf 1_S G_g$
+(\Cref{lem:fefferman-stein-split}), and
+$T g = \bigl|\sum_{j \in s} \theta_j * g_j\bigr|$. If $\int G_g^p < \infty$, every $g_j$ lies in
+$L_p(V)$ (\Cref{lem:finite-families-lp-l2}), so convolution is additive almost everywhere
+(\Cref{lem:conv-assoc}) and $T g \leq T(g|_S) + T(g|_{V \setminus S})$.
+\Cref{thm:vector-valued-weak-type} gives the weak bound with $C_1 = C_V(B, H)$ and
+\Cref{cor:cz-family-l2-bounds} the $L_2$ bound with $C_2 = B$. In general, replace $g_j$ by a
+measurable function equal to it almost everywhere for $j \in s$ and by $0$ for $j \notin s$: the
+sum is unchanged (\Cref{def:conv}), the right side can only decrease, and it becomes finite
+(\Cref{lem:finite-families-lp-l2}).
+\end{proof}
+
+\begin{lemma}[Pairings through the adjoint family]
+\label{lem:cz-pairings-adjoint}
+\lean{Rd.IsCZFamily.enorm_sum_integral_conv_mul_conj_le,
+  Rd.IsCZFamily.enorm_integral_sum_conv_mul_conj_le}
+\leanok
+\uses{cor:convolution-adjoint-conj, lem:cz-family-adjoint, thm:cz-analysis-below-two,
+  thm:cz-synthesis-below-two, lem:holder-lp-norms, lem:lq-cauchy-schwarz-sequences,
+  thm:young}
+Let $n \geq 1$, $1 < q < 2$ and $p = q/(q - 1)$. For all $B, H \in [0, \infty]$, every
+Calder\'on--Zygmund family $(\theta_j)_j$ on $V$ with overlap $B$ and H\"ormander constant $H$
+and every finite set $s \subseteq \N$: for every $f \in L_p(V)$ and all $g_j \in L_q(V)$,
+\[
+  \Bigl| \sum_{j \in s} \int_V (\theta_j * f) \, \overline{g_j} \Bigr|
+  \leq S^-_{V,q}(B, H) \, \|f\|_p \, \bigl\| \|(g_j(x))_j\|_{\ell_2} \bigr\|_q ,
+\]
+and for all $g_j \in L_p(V)$ and every $u \in L_q(V)$,
+\[
+  \Bigl| \int_V \Bigl(\sum_{j \in s} \theta_j * g_j\Bigr) \overline u \Bigr|
+  \leq S^-_{V,q}(B, H) \, \bigl\| \|(g_j(x))_j\|_{\ell_2} \bigr\|_p \, \|u\|_q .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{cor:convolution-adjoint-conj}, every pairing moves $\theta_j$ to the other factor as
+$\theta_j^*$, and $(\theta_j^*)_j$ is a Calder\'on--Zygmund family with overlap $B$ and
+H\"ormander constant $H$ (\Cref{lem:cz-family-adjoint}). The first pairing becomes
+$\int_V f \, \overline{\sum_{j \in s} \theta_j^* * g_j}$, and H\"older's inequality
+(\Cref{lem:holder-lp-norms}) and \Cref{thm:cz-synthesis-below-two} for the adjoint family
+at $q$ bound it. The second becomes
+$\sum_{j \in s} \int_V g_j \, \overline{\theta_j^* * u}$; the Cauchy--Schwarz inequality at
+every point (\Cref{lem:lq-cauchy-schwarz-sequences}), H\"older's inequality and
+\Cref{thm:cz-analysis-below-two} for the adjoint family at $q$ bound it.
+\end{proof}
+
+\begin{theorem}[The strong type for $2 < p < \infty$]
+\label{thm:cz-above-two}
+\lean{Rd.IsCZFamily.eLpNorm_lqNorm_conv_le_of_two_lt, Rd.IsCZFamily.eLpNorm_sum_conv_le_of_two_lt}
+\leanok
+\uses{lem:cz-pairings-adjoint, thm:lp-norm-duality, lem:countable-minkowski, thm:young,
+  lem:cancel-conjugate-power, lem:lp-series-minkowski, def:cz-const-below}
+Let $n \geq 1$, $2 < p < \infty$ and $p' = p/(p - 1)$. For all $B, H \in [0, \infty]$ and every
+Calder\'on--Zygmund family $(\theta_j)_j$ on $V$ with overlap $B$ and H\"ormander constant $H$:
+for every $f \in L_p(V)$,
+\[
+  \bigl\| \|((\theta_j * f)(x))_j\|_{\ell_2} \bigr\|_p \leq S^-_{V,p'}(B, H) \, \|f\|_p ,
+\]
+and for every finite set $s \subseteq \N$ and all $g_j \in L_p(V)$,
+\[
+  \Bigl\| \sum_{j \in s} \theta_j * g_j \Bigr\|_p
+  \leq S^-_{V,p'}(B, H) \, \bigl\| \|(g_j(x))_j\|_{\ell_2} \bigr\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:cancel-conjugate-power}, $1 < p' < 2$. For every $J \in \N$, the family
+$u_j = \theta_j * f$ for $j < J$ and $u_j = 0$ for $j \geq J$ lies in $L_p(V)$
+(\Cref{thm:young}), and the first bound of \Cref{lem:cz-pairings-adjoint} is the hypothesis of
+\Cref{thm:lp-norm-duality} with $A = S^-_{V,p'}(B, H) \|f\|_p$. The truncated $\ell_2$ norms
+increase to $\|((\theta_j * f)(x))_j\|_{\ell_2}$ (\Cref{lem:countable-minkowski}), and monotone
+convergence in $L_p$ (\Cref{lem:lp-series-minkowski}) gives the first inequality. The second
+is \Cref{thm:lp-norm-duality} for
+$v = \sum_{j \in s} \theta_j * g_j \in L_p(V)$ (\Cref{thm:young}) with the second bound of
+\Cref{lem:cz-pairings-adjoint}.
+\end{proof}
+
+\begin{definition}[The strong type constant]
+\label{def:cz-const}
+\lean{Rd.czConst, Rd.czConst_ne_top}
+\leanok
+\uses{def:cz-const-below}
+For $1 < p < \infty$ and $B, H \in [0, \infty]$,
+\[
+  S_{V,p}(B, H) =
+  \begin{cases}
+    S^-_{V,p}(B, H) & \text{for } p < 2, \\
+    B^{1/2} & \text{for } p = 2, \\
+    S^-_{V,p/(p-1)}(B, H) & \text{for } p > 2 .
+  \end{cases}
+\]
+It is finite if $B$ and $H$ are.
+\end{definition}
+
+\begin{theorem}[The strong type of vector-valued singular integrals]
+\label{thm:vector-valued-strong-type}
+\lean{Rd.IsCZFamily.eLpNorm_lqNorm_conv_le, Rd.IsCZFamily.eLpNorm_sum_conv_le}
+\leanok
+\uses{thm:cz-strong-type-two, thm:cz-analysis-below-two, thm:cz-synthesis-below-two,
+  thm:cz-above-two, def:cz-const}
+Let $n \geq 1$ and $1 < p < \infty$. For all $B, H \in [0, \infty]$, every
+Calder\'on--Zygmund family $(\theta_j)_j$ on $V$ with overlap $B$ and H\"ormander constant $H$,
+every $f \in L_p(V)$, every finite set $s \subseteq \N$ and all $g_j \in L_p(V)$,
+\[
+  \bigl\| \|((\theta_j * f)(x))_j\|_{\ell_2} \bigr\|_p \leq S_{V,p}(B, H) \, \|f\|_p
+\]
+and
+\[
+  \Bigl\| \sum_{j \in s} \theta_j * g_j \Bigr\|_p
+  \leq S_{V,p}(B, H) \, \bigl\| \|(g_j(x))_j\|_{\ell_2} \bigr\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:cz-analysis-below-two} and \Cref{thm:cz-synthesis-below-two} for $p < 2$,
+\Cref{thm:cz-strong-type-two} for $p = 2$, and \Cref{thm:cz-above-two} for $p > 2$.
+\end{proof}
+
+\section{The square function theorem}
+\label{sec:square-function}
+
+For $f \in L_p(V)$ the square function $x \mapsto \|((\psi_j * f)(x))_j\|_{\ell_2}$ collects the
+Littlewood--Paley blocks at every point, and its $L_p$ norm is $\|f\|_{\TL{0}{p}{2}}$ by the
+definition of the Triebel--Lizorkin norm. The square function theorem is the two-sided bound of
+this norm by $\|f\|_p$ for $1 < p < \infty$, so $\TL{0}{p}{2} = L_p(V)$. The upper bound is the
+strong type of the analysis operator of the Calder\'on--Zygmund family $(\psi_j)_j$; the lower
+bound combines the reproducing formula
+$\sum_{j < J} \tilde\psi_j * (\psi_j * f) \to f$ with the strong type of the synthesis
+operators of the family $(\tilde\psi_j)_j$ (\Cref{thm:vector-valued-strong-type}). Stein's
+book~\cite{SteinSingular} proves the Littlewood--Paley theorem through vector-valued singular
+integrals, with the lower bound by duality, and Triebel~\cite{Triebel} states it as
+$\TL{0}{p}{2} = L_p(V)$. Grafakos~\cite{Grafakos} gives a textbook account of the
+Littlewood--Paley theorem and of vector-valued singular integrals.
+
+\begin{definition}[The square function constants]
+\label{def:square-function-consts}
+\lean{Rd.squareFunctionConst, Rd.squareFunctionConst_ne_top, Rd.squareSynthesisConst,
+  Rd.squareSynthesisConst_ne_top}
+\leanok
+\uses{def:cz-const, def:hormander-const, def:psi-base, def:psi-dual}
+For $1 < p < \infty$,
+\[
+  Q_{V,p} = S_{V,p}\bigl(2, 4 H_{A^{\psi}}\bigr) , \qquad
+  \tilde Q_{V,p} = S_{V,p}\bigl(4, 4 H_{\tilde A}\bigr) .
+\]
+Both are finite.
+\end{definition}
+
+The constants are formulas in the Schwartz seminorms $A^\psi$ and $\tilde A$ of the fixed blocks
+and synthesis kernels.
+
+\begin{theorem}[The upper square function bound]
+\label{thm:square-function-upper}
+\lean{Rd.triebelLizorkinNorm_zero_two_le, Rd.memTriebelLizorkin_zero_two}
+\leanok
+\uses{def:triebel-lizorkin, prop:tl-elementary, thm:cz-family-psi,
+  thm:vector-valued-strong-type, def:square-function-consts}
+For every $n \geq 1$, every $1 < p < \infty$ and every $f \in L_p(V)$,
+\[
+  \|f\|_{\TL{0}{p}{2}} \leq Q_{V,p} \, \|f\|_p ,
+\]
+and in particular $f \in \TL{0}{p}{2}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{prop:tl-elementary} the norm $\|f\|_{\TL{0}{p}{2}}$ is the $L_p$ norm of the square
+function. The blocks form a Calder\'on--Zygmund family with overlap $2$ and H\"ormander
+constant $4 H_{A^{\psi}}$ (\Cref{thm:cz-family-psi}), and \Cref{thm:vector-valued-strong-type}
+bounds its analysis operator.
+\end{proof}
+
+\begin{lemma}[The reproducing formula]
+\label{lem:square-function-reproducing}
+\lean{Rd.conv_psiDual_blockFun_ae, Rd.sum_conv_psiDual_blockFun_ae,
+  Rd.tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub}
+\leanok
+\uses{def:triebel-lizorkin, lem:conv-assoc, lem:psi-dual-reproduces, lem:lp-blocks,
+  lem:lp-kernels-basic, lem:psi-dual-basic}
+Let $1 \leq p < \infty$ and $f \in L_p(V)$. For every $j \in \N$,
+$\tilde\psi_j * (\psi_j * f) = \psi_j * f$ almost everywhere. For every finite set
+$s \subseteq \N$,
+\[
+  \sum_{j \in s} \tilde\psi_j * (\psi_j * f) = \sum_{j \in s} \Delta_j f
+\]
+almost everywhere, and $\sum_{j < J} \tilde\psi_j * (\psi_j * f) \to f$ in $L_p(V)$ as
+$J \to \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The kernels $\psi_j$ and $\tilde\psi_j$ are integrable (\Cref{lem:lp-kernels-basic},
+\Cref{lem:psi-dual-basic}). By associativity (\Cref{lem:conv-assoc}) and
+$\tilde\psi_j * \psi_j = \psi_j$ (\Cref{lem:psi-dual-reproduces}),
+$\tilde\psi_j * (\psi_j * f) = (\tilde\psi_j * \psi_j) * f = \psi_j * f$ almost everywhere, and
+$\psi_j * f$ represents $\Delta_j f$ (\Cref{def:triebel-lizorkin}). The partial sums
+$\sum_{j < J} \Delta_j f$ tend to $f$ in $L_p(V)$ (\Cref{lem:lp-blocks}).
+\end{proof}
+
+\begin{theorem}[The lower square function bound]
+\label{thm:square-function-lower}
+\lean{Rd.enorm_le_triebelLizorkinNorm_zero_two}
+\leanok
+\uses{lem:square-function-reproducing, thm:cz-family-psi-dual, thm:vector-valued-strong-type,
+  thm:square-function-upper, def:square-function-consts, lem:lp-blocks, lem:tl-pointwise-blocks}
+Let $n \geq 1$ and $1 < p < \infty$. For every $f \in L_p(V)$,
+\[
+  \|f\|_p \leq \tilde Q_{V,p} \, \|f\|_{\TL{0}{p}{2}} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The blocks $\psi_j * f$ lie in $L_p(V)$ (\Cref{lem:tl-pointwise-blocks}). For every $J \in \N$,
+\Cref{lem:square-function-reproducing} and
+\Cref{thm:vector-valued-strong-type} for the Calder\'on--Zygmund family $(\tilde\psi_j)_j$ with
+overlap $4$ and H\"ormander constant $4 H_{\tilde A}$ (\Cref{thm:cz-family-psi-dual}) give
+\begin{multline*}
+  \Bigl\| \sum_{j < J} \Delta_j f \Bigr\|_p
+  = \Bigl\| \sum_{j < J} \tilde\psi_j * (\psi_j * f) \Bigr\|_p \\
+  \leq \tilde Q_{V,p} \, \bigl\| \|((\psi_j * f)(x))_j\|_{\ell_2} \bigr\|_p
+  = \tilde Q_{V,p} \, \|f\|_{\TL{0}{p}{2}} ,
+\end{multline*}
+and the left side tends to $\|f\|_p$ as $J \to \infty$ (\Cref{lem:lp-blocks}).
+\end{proof}
+
+\begin{corollary}[The square function theorem]
+\label{cor:square-function-theorem}
+\lean{Rd.triebelLizorkinSpace_zero_two_eq_top}
+\leanok
+\uses{thm:square-function-upper, thm:square-function-lower, prop:tl-elementary}
+Let $n \geq 1$ and $1 < p < \infty$. Then $\TL{0}{p}{2} = L_p(V)$, and for every
+$f \in L_p(V)$,
+\[
+  \|f\|_p \leq \tilde Q_{V,p} \, \|f\|_{\TL{0}{p}{2}} , \qquad
+  \|f\|_{\TL{0}{p}{2}} \leq Q_{V,p} \, \|f\|_p .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:square-function-upper} and \Cref{thm:square-function-lower}.
+\end{proof}

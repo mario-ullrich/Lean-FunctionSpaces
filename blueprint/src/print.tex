@@ -59,7 +59,7 @@
 
 % \leanok marks a formalized statement or proof. Everything in this blueprint
 % is formalized, so printing a marker on every one of them would be noise;
-% the convention is stated once in the first chapter instead.
+% the convention is stated once in the introduction instead.
 \renewcommand{\leanok}{}
 
 % Give TeX extra inter-word stretch before it lets a line overflow into the
@@ -78,7 +78,16 @@
 \newcommand{\bpbibheading}{%
   \clearpage
   \phantomsection
-  \addcontentsline{toc}{chapter}{References}}
+  \addcontentsline{toc}{part}{References}}
+
+% --- introduction ----------------------------------------------------------
+% An unnumbered chapter before the first part, with a line in the table of
+% contents; \phantomsection gives that line a hyperref anchor on its page.
+% The web build defines \bpintroheading differently -- see web.tex.
+\newcommand{\bpintroheading}{%
+  \chapter*{Introduction}%
+  \phantomsection
+  \addcontentsline{toc}{chapter}{Introduction}}
 
 % --- theorem environments -------------------------------------------------
 \newtheorem{theorem}{Theorem}[chapter]

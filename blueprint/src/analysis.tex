@@ -1,0 +1,2555 @@
+% !TEX root = print.tex
+
+\part{Tools from analysis}
+\label{part:analysis}
+
+This part collects the tools from harmonic and real analysis on which the characterisations on
+$\R^d$ and on domains rest: convolution, approximate identities, the Littlewood--Paley kernels and
+test functions (\Cref{ch:fourier-rd}); mixed norms, the Hardy--Littlewood maximal function, the
+Calder\'on--Zygmund decomposition and the Fefferman--Stein inequality
+(\Cref{ch:maximal-functions}); and operators of weak and strong type, Marcinkiewicz interpolation
+and $L_p$ norms by duality (\Cref{ch:operator-interpolation}).
+
+\chapter{Convolution and the Fourier transform on \texorpdfstring{$\R^d$}{R\^{}d}}
+\label{ch:fourier-rd}
+
+This chapter works on a finite-dimensional real inner product space $V$ of dimension $n$, such
+as $\R^d$, with Lebesgue measure, and with $L_p = L_p(V)$ for $1 \leq p < \infty$. Convolution
+with integrable kernels takes the place of the Fourier multipliers of the classical theory: for
+$s > 0$ the Besov spaces lie in $L_p$, and every statement about frequencies becomes an identity
+between integrable kernels, proved by Fourier inversion. The Fourier transform is
+$\widehat f(\xi) = \int_V e^{-2\pi i \langle x, \xi \rangle} f(x) \, dx$. The chapter proves
+Young's inequality (\Cref{thm:young}), the convergence of approximate identities in $L_p$
+(\Cref{thm:approx-identity}), the identities between the Littlewood--Paley kernels
+(\Cref{thm:kernel-identities}), and that test functions are Schwartz functions which determine
+tempered distributions (\Cref{thm:test-functions-determine}). These kernels define the
+band-limited scheme of \Cref{ch:rd} and the Triebel--Lizorkin spaces of
+\Cref{ch:triebel-lizorkin}, and they characterise the Sobolev spaces of \Cref{ch:sobolev-rd}.
+
+\section{Convolution and Young's inequality}
+
+\begin{definition}[Convolution]
+\label{def:conv}
+\lean{Rd.conv, Rd.conv_apply, Rd.aestronglyMeasurable_conv, Rd.conv_smul, Rd.smul_conv,
+  Rd.conv_congr_ae, Rd.integrable_conv}
+\leanok
+For $K, f : V \to \C$ the convolution is $(K * f)(x) = \int_V K(y) f(x - y) \, dy$. It depends
+on $f$ only through its class modulo null sets, it is homogeneous in $K$ and in $f$, and $K * L$
+is integrable for integrable $K$ and $L$.
+\end{definition}
+
+\begin{lemma}[Weighted Jensen inequality]
+\label{lem:weighted-jensen}
+\lean{MeasureTheory.lintegral_mul_rpow_le, Rd.enorm_conv_le_lintegral,
+  MeasureTheory.lintegral_rpow_lintegral_mul_le, MeasureTheory.aemeasurable_kernel_rpow,
+  MeasureTheory.aemeasurable_lintegral_kernel, MeasureTheory.lintegral_rpow_lintegral_le,
+  MeasureTheory.eLpNorm_integral_kernel_le, MeasureTheory.eLpNorm_integral_kernel_le_of_bound}
+\leanok
+Let $1 \leq p < \infty$. For every measure $\mu$ and all measurable $a, g \geq 0$,
+\[
+  \Bigl( \int a g \, d\mu \Bigr)^p \leq \Bigl( \int a \, d\mu \Bigr)^{p-1} \int a g^p \, d\mu .
+\]
+For all measurable $a, b \geq 0$ on a measurable group $G$ with a right-invariant $s$-finite
+measure, such as $V$ and the torus,
+\[
+  \int_G \Bigl( \int_G a(y) \, b(x - y) \, dy \Bigr)^p dx
+  \leq \Bigl( \int_G a \Bigr)^p \int_G b^p ,
+\]
+and for $s$-finite measure spaces $X$, $Z$, every measurable $\Phi : Z \to \C$ and every measurable
+$G : X \times Z \to \C$,
+\[
+  \Bigl\| \int_Z \Phi(z) \, G(\cdot, z) \, dz \Bigr\|_{L_p(X)}^p
+  \leq \|\Phi\|_1^{p-1} \int_Z |\Phi(z)| \, \|G(\cdot, z)\|_{L_p(X)}^p \, dz .
+\]
+In particular, if $0 < \|\Phi\|_1 < \infty$ and $\|G(\cdot, z)\|_p \leq M$ whenever
+$\Phi(z) \neq 0$, then $\| \int_Z \Phi(z) \, G(\cdot, z) \, dz \|_p \leq \|\Phi\|_1 M$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first inequality is Hölder's inequality with the conjugate exponent $p'$ for
+$a g = a^{1/p'} \cdot a^{1/p} g$. For the second apply the first for fixed $x$, integrate over
+$x$, exchange the integrals by Tonelli's theorem, and use $\int_V b(x - y)^p \, dx = \int_V b^p$.
+The third follows in the same way from the first with $a = |\Phi|$ and $g = |G(x, \cdot)|$,
+and it gives the last one.
+\end{proof}
+
+\begin{theorem}[Young's inequality]
+\label{thm:young}
+\lean{Rd.eLpNorm_conv_le, Rd.memLp_conv, MeasureTheory.enorm_convolution_le_lintegral,
+  MeasureTheory.eLpNorm_convolution_le, MeasureTheory.memLp_convolution,
+  MeasureTheory.ae_convolutionExistsAt}
+\leanok
+\uses{def:conv, lem:weighted-jensen}
+Let $1 \leq p < \infty$, $K \in L_1$ and $f \in L_p$, on $V$ or on a measurable group with a
+right-invariant $s$-finite measure. The integral defining $(K * f)(x)$ converges absolutely for
+almost every $x$, and
+\[
+  \|K * f\|_p \leq \|K\|_1 \|f\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+$|(K * f)(x)| \leq \int_V |K(y)| |f(x - y)| \, dy$; apply \Cref{lem:weighted-jensen} with
+$a = |K|$ and $b = |f|$. The same bound shows that $\int_V |K(y)| |f(x - y)| \, dy$ is finite
+for almost every $x$.
+\end{proof}
+
+\begin{lemma}[Linearity and associativity]
+\label{lem:conv-assoc}
+\lean{Rd.conv_add_ae, Rd.conv_add_ae_of_memLp, Rd.add_conv_ae, Rd.sub_conv_ae,
+  Rd.ae_integrable_conv_conv, Rd.conv_conv_ae, Rd.conv_comm}
+\leanok
+\uses{thm:young}
+Let $1 \leq p < \infty$, $K, K', L \in L_1$ and $f, g \in L_p$. Almost everywhere on $V$,
+$K * (f + g) = K * f + K * g$, $(K + K') * f = K * f + K' * f$,
+$(K - K') * f = K * f - K' * f$ and $(K * L) * f = K * (L * f)$. The first identity also holds
+for every $g \in L_r$, $1 \leq r < \infty$. For all $K, L : V \to \C$, $K * L = L * K$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first three follow from the absolute convergence in \Cref{thm:young}. For the last, for
+almost every $x$ the function $(y, z) \mapsto K(z) L(y - z) f(x - y)$ is integrable on
+$V \times V$, by \Cref{thm:young} applied to $|L| * |f|$, and Fubini's theorem exchanges the
+integrations. Commutativity is the substitution $y \mapsto x - y$.
+\end{proof}
+
+\begin{lemma}[Convolution operators]
+\label{lem:conv-op}
+\lean{Rd.norm_toLp_conv_le, Rd.convLp, Rd.convLp_apply_ae, Rd.norm_convLp_le,
+  Rd.enorm_convLp_le, Rd.convLp_convLp, Rd.convLp_convLp_of_eq, Rd.convLp_of_eq_zero,
+  Rd.convLp_sub_kernel, Rd.convLp_comm, Rd.convLp_add_kernel}
+\leanok
+\uses{thm:young, lem:conv-assoc}
+Let $1 \leq p < \infty$. For $K \in L_1$, $T_K f = K * f$ defines a bounded linear operator on
+$L_p$ with $\|T_K\| \leq \|K\|_1$. For $K, L \in L_1$, $T_K T_L = T_{K * L} = T_L T_K$,
+$T_{K + L} = T_K + T_L$ and $T_{K - L} = T_K - T_L$, and $T_0 = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Linearity and the identities hold almost everywhere by \Cref{lem:conv-assoc}, and the bound is
+\Cref{thm:young}.
+\end{proof}
+
+\section{Approximate identities}
+
+\begin{lemma}[Dilations]
+\label{lem:dilate}
+\lean{Rd.dilate, Rd.integrable_dilate, Rd.integral_dilate, Rd.eLpNorm_dilate_one,
+  Rd.conv_dilate_apply, Rd.ae_integrable_dilate_mul, Rd.continuous_dilate, Rd.bddAbove_dilate,
+  Rd.hasCompactSupport_dilate, Rd.smul_mem_tsupport_of_mem_tsupport_dilate,
+  Rd.norm_le_of_mem_tsupport_dilate, Rd.eventually_tsupport_dilate_add_subset_thickening}
+\leanok
+\uses{def:conv}
+For $c > 0$ and $\Phi : V \to \C$ let $\Phi_c(x) = c^n \Phi(c x)$. If $\Phi$ is integrable, then
+$\Phi_c$ is integrable with $\int \Phi_c = \int \Phi$ and $\|\Phi_c\|_1 = \|\Phi\|_1$. For all
+$f : V \to \C$ and $x \in V$, $(\Phi_c * f)(x) = \int_V \Phi(z) f(x - c^{-1} z) \, dz$, and for
+$f \in L_p$, $1 \leq p < \infty$, the integrand is integrable for almost every $x$. Dilations of
+continuous functions are continuous, dilations of bounded functions are bounded, and dilations
+of compactly supported functions have compact support. For every $\Phi$, every $c \neq 0$ and
+every $x \in \operatorname{supp} \Phi_c$, $c x \in \operatorname{supp} \Phi$; if moreover $c > 0$
+and $\operatorname{supp} \Phi \subseteq \bar B(0, R)$, then $\|x\| \leq R/c$. For every $\Phi$
+with $\operatorname{supp} \Phi \subseteq \bar B(0, R)$, every $\delta > 0$ and every
+$S \subseteq V$, $\operatorname{supp} \Phi_{2^k} + S$ lies in the $\delta$-neighbourhood of $S$
+for all large $k$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Substitute $y = c x$, which multiplies Lebesgue measure by $c^{-n}$. The support of $\Phi_c$ is
+the preimage of $\operatorname{supp} \Phi$ under $x \mapsto c x$, so
+$\operatorname{supp} \Phi_{2^k} \subseteq B(0, \delta)$ once $R / 2^k < \delta$, and
+$B(0, \delta) + S$ is the $\delta$-neighbourhood of $S$.
+\end{proof}
+
+\begin{lemma}[First moments of dilates]
+\label{lem:first-moments-dilate}
+\lean{Rd.inner_mul_dilate_eq, Rd.integral_inner_mul_dilate}
+\leanok
+\uses{lem:dilate}
+For every $m \colon V \to \C$, every $w \in V$, every $c \neq 0$ and every $x \in V$,
+$\langle w, x \rangle \, m_c(x) = c^{-1} \bigl(\langle w, \cdot \rangle m\bigr)_c(x)$, and for
+every $c > 0$,
+\[
+  \int_V \langle w, x \rangle \, m_c(x) \, dx = c^{-1} \int_V \langle w, x \rangle \, m(x) \, dx .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\langle w, x \rangle = c^{-1} \langle w, c x \rangle$, and dilations keep the integral
+(\Cref{lem:dilate}).
+\end{proof}
+
+\begin{lemma}[Continuity of translation]
+\label{lem:translation-continuity}
+\lean{Rd.continuous_eLpNorm_comp_sub_sub, Rd.eLpNorm_comp_sub_right}
+\leanok
+Let $1 \leq p < \infty$ and $f \in L_p$. For every $w \in V$, $\|f(\cdot - w)\|_p = \|f\|_p$,
+and $w \mapsto \|f(\cdot - w) - f\|_p$ is continuous on $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Translations preserve Lebesgue measure, and the action of $V$ on $L_p$ by translation of the
+domain is continuous.
+\end{proof}
+
+\begin{theorem}[Approximate identities]
+\label{thm:approx-identity}
+\lean{Rd.ae_enorm_conv_dilate_sub_le, Rd.eLpNorm_conv_dilate_sub_le,
+  Rd.tendsto_eLpNorm_conv_dilate_sub, Rd.tendsto_convLp_dilate}
+\leanok
+\uses{lem:dilate, lem:translation-continuity, lem:weighted-jensen, lem:conv-op}
+Let $1 \leq p < \infty$, $\Phi \in L_1$ with $\int \Phi = 1$, and $f \in L_p$. Then
+$\|\Phi_c * f - f\|_p \to 0$ as $c \to \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Since $\int \Phi = 1$, $(\Phi_c * f)(x) - f(x) = \int_V \Phi(z) (f(x - c^{-1} z) - f(x)) \, dz$,
+and \Cref{lem:weighted-jensen} gives
+\[
+  \|\Phi_c * f - f\|_p^p
+  \leq \|\Phi\|_1^{p-1} \int_V |\Phi(z)| \, \|f(\cdot - c^{-1} z) - f\|_p^p \, dz .
+\]
+By \Cref{lem:translation-continuity} the integrand tends to $0$ for every $z$, and it is bounded
+by $|\Phi(z)| (2 \|f\|_p)^p$; dominated convergence concludes.
+\end{proof}
+
+\section{Littlewood--Paley kernels}
+
+\begin{lemma}[Fourier transform of dilations]
+\label{lem:fourier-dilate}
+\lean{Rd.fourier_dilate, Rd.fourier_eq_fourier_dilate, Rd.integrable_fourier_dilate}
+\leanok
+\uses{lem:dilate}
+For $c > 0$, $\Phi : V \to \C$ and $\xi \in V$, $\widehat{\Phi_c}(\xi) = \widehat\Phi(c^{-1} \xi)$,
+equivalently $\widehat\Phi(\xi) = \widehat{\Phi_c}(c \xi)$.
+If $\widehat\Phi$ is integrable, so is $\widehat{\Phi_c}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Substitute $y = c x$ and use $\langle c x, c^{-1} \xi \rangle = \langle x, \xi \rangle$.
+\end{proof}
+
+\begin{lemma}[Fourier transforms of convolutions]
+\label{lem:fourier-conv}
+\lean{Rd.fourier_conv, Rd.fourier_add_apply, Rd.fourier_sub_apply,
+  Rd.fourier_apply_zero, Rd.continuous_fourier_of_integrable}
+\leanok
+\uses{def:conv}
+For all integrable $K, L : V \to \C$ and every $\xi \in V$,
+\[
+  \widehat{K * L}(\xi) = \widehat K(\xi) \, \widehat L(\xi), \qquad
+  \widehat{K \pm L}(\xi) = \widehat K(\xi) \pm \widehat L(\xi), \qquad
+  \widehat K(0) = \int_V K ,
+\]
+and $\widehat K$ is continuous.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The product formula is Fubini's theorem with $e^{-2\pi i \langle x + y, \xi \rangle} =
+e^{-2\pi i \langle x, \xi \rangle} e^{-2\pi i \langle y, \xi \rangle}$ (Mathlib's
+\texttt{Real.\allowbreak fourier\_\allowbreak bilin\_\allowbreak convolution\_\allowbreak eq}).
+The sum and difference rules are the linearity of the integral (Mathlib's
+\texttt{VectorFourier.\allowbreak fourierIntegral\_\allowbreak add} and
+\texttt{integral\_\allowbreak sub}), and the continuity follows from dominated convergence with
+the majorant $|K|$.
+\end{proof}
+
+\begin{lemma}[Conjugation and the Fourier transform]
+\label{lem:fourier-conjugation}
+\lean{Rd.conj_fourier_apply, Rd.conj_fourierInv_apply}
+\leanok
+For every $f : V \to \C$ and all $\xi, x \in V$,
+$\overline{\widehat f(\xi)} = \mathcal F^{-1}(\overline f)(\xi)$ and
+$\overline{\mathcal F^{-1} f(x)} = \mathcal F(\overline f)(x)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Conjugation commutes with the integral, and $\overline{e^{-2\pi i \langle x, \xi \rangle}} =
+e^{2\pi i \langle x, \xi \rangle}$.
+\end{proof}
+
+\begin{lemma}[The Fourier transform of integrable functions]
+\label{lem:fourier-integrable}
+\lean{Rd.integral_fourier_smul_eq_of_integrable, Rd.norm_fourier_le_integral_norm,
+  Rd.enorm_fourier_le_lintegral, Rd.memLp_top_fourier, Rd.continuous_fourierInv_of_integrable,
+  Rd.norm_fourierInv_le_integral_norm, Rd.integral_fourierInv_smul_eq_of_integrable}
+\leanok
+\uses{lem:fourier-conv}
+For every Schwartz function $u$ and every integrable $g$ on $V$,
+$\int \widehat u \, g = \int u \, \widehat g$ and
+$\int (\mathcal F^{-1} u) \, g = \int u \, \mathcal F^{-1} g$. For every integrable $K$ on $V$,
+$|\widehat K(\xi)| \leq \|K\|_1$ for every $\xi \in V$, $\widehat K \in L_\infty$, and the inverse
+Fourier transform
+$\mathcal F^{-1} K(x) = \int e^{2 \pi i \langle \xi, x \rangle} K(\xi) \, d\xi$ is continuous
+with $|\mathcal F^{-1} K(x)| \leq \|K\|_1$ for every $x \in V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's \texttt{VectorFourier.\allowbreak integral\_\allowbreak fourierIntegral\_\allowbreak
+smul\_\allowbreak eq\_\allowbreak flip} and \texttt{VectorFourier.\allowbreak norm\_\allowbreak
+fourierIntegral\_\allowbreak le\_\allowbreak integral\_\allowbreak norm}; $\widehat K$ is
+continuous by \Cref{lem:fourier-conv}, hence measurable. For the inverse transform,
+$\mathcal F^{-1} K(x) = \widehat K(-x)$ (Mathlib's \texttt{Real.\allowbreak
+fourierInv\_\allowbreak eq\_\allowbreak fourier\_\allowbreak neg}), and the identity is
+\texttt{VectorFourier.\allowbreak integral\_\allowbreak fourierIntegral\_\allowbreak
+smul\_\allowbreak eq\_\allowbreak flip} for the pairing $(\xi, x) \mapsto -\langle \xi, x \rangle$,
+which is symmetric.
+\end{proof}
+
+\begin{definition}[Cut-offs and kernels]
+\label{def:lp-kernels}
+\lean{Rd.cutoff, Rd.cutoffSchwartz, Rd.coe_cutoffSchwartz, Rd.lpKernelS, Rd.bandKernelS,
+  Rd.lpKernel, Rd.bandKernel, Rd.Phi, Rd.Theta, Rd.psi}
+\leanok
+\uses{lem:dilate}
+For $0 < a < b$ let $\chi_{a,b}$ be a smooth function on $V$ with values in $[0, 1]$, equal to
+$1$ on the closed ball of radius $a$ and to $0$ outside the ball of radius $b$. The
+Littlewood--Paley kernel is $\Phi = \mathcal F^{-1} \chi_{1,2}$ and the band-limiting kernel is
+$\Theta = \mathcal F^{-1} \chi_{2,4}$. For $k \in \N$ let $\Phi_k = \Phi_{2^k}$ and
+$\Theta_k = \Theta_{2^k}$ be their dilations, and let $\psi_0 = \Phi_0$ and
+$\psi_j = \Phi_j - \Phi_{j-1}$ for $j \geq 1$.
+\end{definition}
+
+\begin{lemma}[Properties of the kernels]
+\label{lem:lp-kernels-basic}
+\lean{Rd.cutoff_eq_one, Rd.cutoff_eq_zero, Rd.norm_lt_of_cutoff_ne_zero, Rd.contDiff_cutoff,
+  Rd.hasCompactSupport_cutoff, Rd.bddAbove_schwartz, Rd.fourier_lpKernel, Rd.fourier_bandKernel,
+  Rd.integrable_lpKernel, Rd.integrable_bandKernel, Rd.continuous_lpKernel,
+  Rd.continuous_bandKernel, Rd.bddAbove_lpKernel, Rd.bddAbove_bandKernel,
+  Rd.integrable_fourier_lpKernel, Rd.integrable_fourier_bandKernel, Rd.integral_lpKernel,
+  Rd.sum_psi, Rd.integrable_Phi, Rd.integrable_Theta, Rd.integrable_psi, Rd.continuous_Phi,
+  Rd.continuous_Theta, Rd.continuous_psi, Rd.bddAbove_Phi, Rd.bddAbove_Theta, Rd.bddAbove_psi,
+  Rd.eLpNorm_Phi_one, Rd.eLpNorm_Theta_one, Rd.eLpNorm_psi_one_le, Rd.integral_Phi}
+\leanok
+\uses{def:lp-kernels, lem:dilate}
+The cut-offs are Schwartz functions, $\widehat\Phi = \chi_{1,2}$ and $\widehat\Theta = \chi_{2,4}$,
+and $\Phi$, $\Theta$, $\widehat\Phi$, $\widehat\Theta$ are integrable. For all $j, k, J \in \N$, the
+kernels $\Phi_k$, $\Theta_k$ and $\psi_j$ are integrable, continuous and bounded,
+$\int \Phi_k = 1$, $\|\Phi_k\|_1 = \|\Phi\|_1$, $\|\Theta_k\|_1 = \|\Theta\|_1$,
+$\|\psi_j\|_1 \leq 2 \|\Phi\|_1$, and $\sum_{j=0}^J \psi_j = \Phi_J$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Schwartz functions are integrable, continuous and bounded, and $\mathcal F$ inverts
+$\mathcal F^{-1}$ on Schwartz functions. $\int \Phi = \widehat\Phi(0) = \chi_{1,2}(0) = 1$. The
+remaining claims follow from \Cref{lem:dilate} and the triangle inequality; the sum telescopes.
+\end{proof}
+
+\begin{lemma}[The kernels on the frequency side]
+\label{lem:lp-kernels-frequency}
+\lean{Rd.norm_two_pow_inv_smul, Rd.fourier_Phi, Rd.fourier_Theta, Rd.fourier_psi_succ,
+  Rd.integrable_fourier_Phi, Rd.integrable_fourier_Theta, Rd.integrable_fourier_psi,
+  Rd.norm_lt_of_fourier_Phi_ne_zero, Rd.norm_lt_of_fourier_Theta_ne_zero,
+  Rd.fourier_Theta_eq_one, Rd.norm_lt_of_fourier_psi_ne_zero, Rd.fourier_psi_succ_eq_zero,
+  Rd.lt_norm_of_fourier_psi_succ_ne_zero, Rd.fourier_Theta_succ_mul, Rd.fourier_Theta_mul_psi,
+  Rd.fourier_psi_mul_Theta}
+\leanok
+\uses{lem:fourier-dilate, lem:fourier-conv, lem:lp-kernels-basic}
+For all $j, k \in \N$ and $\xi \in V$, $\widehat{\Phi_k}(\xi) = \chi_{1,2}(2^{-k} \xi)$ and
+$\widehat{\Theta_k}(\xi) = \chi_{2,4}(2^{-k} \xi)$, and $\widehat{\Phi_k}$, $\widehat{\Theta_k}$,
+$\widehat{\psi_j}$ are integrable. Moreover:
+\begin{enumerate}
+  \item $\widehat{\Phi_k}(\xi) = \widehat{\psi_k}(\xi) = 0$ if $|\xi| \geq 2^{k+1}$, and
+    $\widehat{\Theta_k}(\xi) = 0$ if $|\xi| \geq 2^{k+2}$;
+  \item $\widehat{\Theta_k}(\xi) = 1$ if $|\xi| \leq 2^{k+1}$;
+  \item $\widehat{\psi_{j+1}}(\xi) = 0$ if $|\xi| \leq 2^j$, so $|\xi| > 2^j$ wherever
+    $\widehat{\psi_{j+1}}(\xi) \neq 0$;
+  \item $\widehat{\Theta_{k+1}} \widehat{\Theta_k} = \widehat{\Theta_k}$,
+    $\widehat{\Theta_j} \widehat{\psi_j} = \widehat{\psi_j}$, and
+    $\widehat{\psi_j} \widehat{\Theta_k} = 0$ if $j \geq k + 3$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The formulas follow from \Cref{lem:fourier-dilate}, with
+$\widehat{\psi_{j+1}} = \widehat{\Phi_{j+1}} - \widehat{\Phi_j}$ (\Cref{lem:fourier-conv}), and
+(1)--(3) from the properties of the cut-offs; for (3),
+$\chi_{1,2}(2^{-j-1} \xi) = \chi_{1,2}(2^{-j} \xi) = 1$ if $|\xi| \leq 2^j$. For (4): where
+$\widehat{\Theta_k}(\xi) \neq 0$, $|\xi| < 2^{k+2}$ and $\widehat{\Theta_{k+1}}(\xi) = 1$;
+where $\widehat{\psi_j}(\xi) \neq 0$, $|\xi| < 2^{j+1}$ and $\widehat{\Theta_j}(\xi) = 1$;
+where $\widehat{\Theta_k}(\xi) \neq 0$ and $j \geq k + 3$,
+$|\xi| < 2^{k+2} \leq 2^{j-1}$ and $\widehat{\psi_j}(\xi) = 0$.
+\end{proof}
+
+\begin{lemma}[At most two blocks see a frequency]
+\label{lem:fourier-psi-window}
+\lean{Rd.norm_fourier_psi_le_one, Rd.enorm_fourier_psi_le_one, Rd.sum_range_fourier_psi,
+  Rd.exists_fourier_psi_window, Rd.four_pow_le_of_fourier_psi_ne_zero}
+\leanok
+\uses{def:lp-kernels, lem:lp-kernels-frequency}
+For every $j \in \N$ and every $\xi \in V$, $|\widehat{\psi_j}(\xi)| \leq 1$, and if
+$\widehat{\psi_j}(\xi) \neq 0$, then $4^j \leq 4(1 + |\xi|^2)$. For every $J \in \N$ and every
+$\xi \in V$, $\sum_{i=0}^J \widehat{\psi_i}(\xi) = \widehat{\Phi_J}(\xi)$. For every $\xi \in V$
+there is $a \in \N$ with $|\xi| < 2^{a+1}$,
+$\widehat{\psi_j}(\xi) = 0$ for every $j \notin \{a, a+1\}$, and
+$\widehat{\psi_a}(\xi) + \widehat{\psi_{a+1}}(\xi) = 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\widehat{\psi_0}(\xi) = \chi_{1,2}(\xi)$ and
+$\widehat{\psi_{j+1}}(\xi) = \chi_{1,2}(2^{-j-1}\xi) - \chi_{1,2}(2^{-j}\xi)$ with values of
+$\chi_{1,2}$ in $[0, 1]$ (\Cref{lem:lp-kernels-frequency}); the sum telescopes. If
+$\widehat{\psi_{i+1}}(\xi) \neq 0$, then $|\xi| > 2^i$ by \Cref{lem:lp-kernels-frequency}, so
+$4^{i+1} = 4 (2^i)^2 < 4 |\xi|^2$. Let $a$ be the least index with $|\xi| < 2^{a+1}$. For $j < a$,
+$|\xi| \geq 2^{j+1}$, so $\widehat{\psi_j}(\xi) = 0$; for $j \geq a + 2$, $j = i + 1$ with
+$|\xi| < 2^{a+1} \leq 2^i$, so $\widehat{\psi_j}(\xi) = 0$. Finally
+$\widehat{\psi_a}(\xi) + \widehat{\psi_{a+1}}(\xi) = \sum_{j=0}^{a+1} \widehat{\psi_j}(\xi)
+= \chi_{1,2}(2^{-a-1}\xi) = 1$.
+\end{proof}
+
+\begin{lemma}[Kernel identities by Fourier inversion]
+\label{lem:conv-of-fourier}
+\lean{Rd.conv_eq_of_fourier}
+\leanok
+\uses{def:conv, lem:fourier-conv}
+Let $K, L, M \in L_1(V)$, with $L$ bounded and continuous, $M$ continuous and $\widehat M$
+integrable. If $\widehat K \widehat L = \widehat M$, then $K * L = M$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$K * L$ is integrable and continuous, and $\widehat{K * L} = \widehat K \widehat L = \widehat M$ is
+integrable (\Cref{lem:fourier-conv}). The inversion theorem for continuous integrable functions
+with integrable Fourier transform gives
+$K * L = \mathcal F^{-1} \widehat{K * L} = \mathcal F^{-1} \widehat M = M$.
+\end{proof}
+
+\begin{theorem}[Kernel identities]
+\label{thm:kernel-identities}
+\lean{Rd.conv_Theta_succ, Rd.conv_Theta_psi, Rd.conv_psi_Theta}
+\leanok
+\uses{lem:conv-of-fourier, lem:lp-kernels-frequency, lem:lp-kernels-basic}
+For all $j, k \in \N$, $\Theta_{k+1} * \Theta_k = \Theta_k$ and $\Theta_j * \psi_j = \psi_j$,
+and $\psi_j * \Theta_k = 0$ if $j \geq k + 3$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Combine \Cref{lem:conv-of-fourier} with part (4) of \Cref{lem:lp-kernels-frequency}.
+\end{proof}
+
+\section{Test functions in the Schwartz space}
+\label{sec:schwartz-cutoff}
+
+In this section, in \Cref{ch:sobolev-rd} and in \Cref{ch:sobolev-domains},
+$\mathcal D(\Omega)$, for open $\Omega \subseteq V$, is the space of smooth functions
+$\varphi : V \to \R$ with compact support in $\Omega$, and $\mathcal S(V)$ is the space of
+complex Schwartz functions on $V$. For directions $v = (v_0, \dots, v_{k-1}) \in V^k$ let
+$\partial^v = \partial_{v_0} \cdots \partial_{v_{k-1}}$ be the iterated directional derivative,
+with $\partial^v = \mathrm{id}$ for $k = 0$. Mathlib
+differentiates a distribution $T$ on $\Omega$ by $\partial_w T(\varphi) = T(-\partial_w \varphi)$
+and a tempered distribution $T$ by $\partial_w T(u) = T(-\partial_w u)$. This section shows that
+test functions are Schwartz functions with the same derivatives, and that they determine
+tempered distributions.
+
+\begin{definition}[Test functions as Schwartz functions]
+\label{def:test-schwartz}
+\lean{Rd.testSchwartz, Rd.testSchwartz_apply}
+\leanok
+For every open $\Omega \subseteq V$ and every test function $\varphi \in \mathcal D(\Omega)$,
+the complex function
+$x \mapsto \varphi(x)$ on $V$ is a Schwartz function, again denoted $\varphi$.
+\end{definition}
+
+\begin{lemma}[Directional derivatives commute]
+\label{lem:directional-derivatives-commute}
+\lean{LineDeriv.lineDerivOp_iteratedLineDerivOp_comm_of, SchwartzMap.lineDerivOp_comm,
+  SchwartzMap.lineDerivOp_iteratedLineDerivOp_comm, Rd.lineDerivOp_testFunction_apply,
+  Rd.lineDerivOp_testSchwartz, Rd.iteratedLineDerivOp_testSchwartz,
+  Rd.coe_iteratedLineDerivOp_eq, TestFunction.lineDerivOp_comm,
+  TestFunction.lineDerivOp_iteratedLineDerivOp_comm}
+\leanok
+\uses{def:test-schwartz}
+For every open $\Omega \subseteq V$, every Schwartz function $u$, every test function
+$\varphi \in \mathcal D(\Omega)$, all $a, b \in V$ and every $v \in V^k$,
+\[
+  \partial_a \partial_b u = \partial_b \partial_a u, \quad
+  \partial_a \partial^v u = \partial^v \partial_a u, \quad
+  \partial_a \partial_b \varphi = \partial_b \partial_a \varphi, \quad
+  \partial_a \partial^v \varphi = \partial^v \partial_a \varphi ,
+\]
+$\partial_a \varphi(x) = D\varphi(x) a$ for every $x \in V$, and $\partial^v \varphi$, as a
+Schwartz function, is the iterated derivative $\partial^v$ of the Schwartz function $\varphi$. For
+every open $\Omega' \subseteq V$ and every
+$\psi \in \mathcal D(\Omega')$ with the same values as $\varphi$, $\partial^v \psi$ and
+$\partial^v \varphi$ have the same values.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\partial_a \partial_b u(x) = D^2 u(x)(a, b)$ is symmetric in $a$ and $b$ because $u$ is $C^2$
+(Mathlib's \texttt{ContDiffAt.\allowbreak isSymmSndFDerivAt}). Passing from $\varphi$ to the
+complex function $\varphi$ commutes with $\partial_a$, since the derivative of $x \mapsto
+\varphi(x) \in \C$ is the derivative of $\varphi$ followed by the inclusion $\R \subseteq \C$; by
+induction on $k$ it commutes with $\partial^v$, and the symmetry for $u = \varphi$ gives that of
+$\varphi$. A directional derivative commutes with every iterated one by induction on $k$, using
+only the commutation of two directional derivatives. The derivatives of $\varphi$ depend only on
+its values.
+\end{proof}
+
+\begin{lemma}[Transpose formula]
+\label{lem:distribution-transpose}
+\lean{Distribution.iteratedLineDerivOp_apply_apply,
+  TemperedDistribution.iteratedLineDerivOp_apply_apply,
+  TemperedDistribution.iteratedLineDerivOp_toTemperedDistributionCLM_eq}
+\leanok
+\uses{lem:directional-derivatives-commute}
+For every open $\Omega \subseteq V$, every distribution $T$ on $\Omega$, every tempered
+distribution $S$, every $\varphi \in \mathcal D(\Omega)$, every Schwartz function $u$ and every
+$v \in V^k$,
+\[
+  \partial^v T(\varphi) = (-1)^k \, T(\partial^v \varphi), \qquad
+  \partial^v S(u) = S\bigl((-1)^k \partial^v u\bigr),
+\]
+and the iterated derivative $\partial^v$ of a Schwartz function $u$ as a tempered distribution
+is the tempered distribution of the Schwartz function $\partial^v u$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Induction on $k$: $\partial^v T = \partial_{v_0} \partial^{v'} T$ with
+$v' = (v_1, \dots, v_{k-1})$, so
+$\partial^v T(\varphi) = \partial^{v'} T(-\partial_{v_0} \varphi)
+= (-1)^{k-1} \, T(-\partial^{v'} \partial_{v_0} \varphi)$, and
+$\partial^{v'} \partial_{v_0} \varphi = \partial_{v_0} \partial^{v'} \varphi = \partial^v \varphi$
+by \Cref{lem:directional-derivatives-commute}. The same induction works for $S$, and for the
+Schwartz function $u$ it iterates Mathlib's
+\texttt{TemperedDistribution.\allowbreak lineDerivOp\_\allowbreak
+toTemperedDistributionCLM\_\allowbreak eq}.
+\end{proof}
+
+Tempered distributions are determined by their values on test functions, because the cut-offs
+of a Schwartz function converge to it in the topology of $\mathcal S(V)$.
+
+\begin{definition}[Cut-offs of Schwartz functions]
+\label{def:schwartz-cutoff}
+\lean{Rd.hasCompactSupport_cutoff_smul_mul, Rd.cutoffMul, Rd.cutoffMul_apply,
+  Rd.hasCompactSupport_cutoffMul, Rd.cutoffMulBound, Rd.cutoffMulConst, Rd.cutoffMulConst_nonneg}
+\leanok
+\uses{def:lp-kernels, lem:lp-kernels-basic}
+For every Schwartz function $u$ and every $N \in \N$, the cut-off of $u$ at radius $N + 1$ is the
+smooth compactly supported function
+\[
+  \chi_N u : x \mapsto \chi_{1,2}\bigl(x / (N + 1)\bigr) \, u(x) .
+\]
+For all $k, m \in \N$ and $x \in V$ let
+\begin{align*}
+  B_m(x) &= \|D^m u(x)\| + \sum_{i=0}^m \binom{m}{i} \, p_{0,i}(\chi_{1,2}) \,
+  \|D^{m-i} u(x)\|, \\
+  C_{k,m}(u) &= p_{k+1,m}(u) + \sum_{i=0}^m \binom{m}{i} \, p_{0,i}(\chi_{1,2}) \,
+  p_{k+1,m-i}(u) \geq 0,
+\end{align*}
+where $p_{k,m}(w) = \sup_x \|x\|^k \|D^m w(x)\|$ are the Schwartz seminorms.
+\end{definition}
+
+\begin{lemma}[The cut-off estimate]
+\label{lem:schwartz-cutoff-estimate}
+\lean{Rd.cutoffMul_eventuallyEq, Rd.norm_iteratedFDeriv_cutoff_comp_smul_le,
+  Rd.norm_iteratedFDeriv_cutoffMul_le, Rd.norm_iteratedFDeriv_sub_cutoffMul_le,
+  Rd.iteratedFDeriv_sub_cutoffMul_eq_zero, Rd.norm_pow_succ_mul_cutoffMulBound_le,
+  Rd.seminorm_sub_cutoffMul_le}
+\leanok
+\uses{def:schwartz-cutoff}
+For every Schwartz function $u$ and all $k, m, N \in \N$,
+\[
+  p_{k,m}(u - \chi_N u) \leq \frac{C_{k,m}(u)}{N + 1} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $0 \leq c \leq 1$, $D^i(\chi_{1,2}(c \,\cdot))(x) = c^i D^i \chi_{1,2}(c x)$ has norm at most
+$p_{0,i}(\chi_{1,2})$, so the Leibniz rule (Mathlib's
+\texttt{norm\_\allowbreak iteratedFDeriv\_\allowbreak mul\_\allowbreak le}) gives
+$\|D^m (u - \chi_N u)(x)\| \leq B_m(x)$ for every $x$. On the open ball of radius $N + 1$ the
+cut-off is $1$, so $u - \chi_N u$ vanishes near each of its points and so do all its
+derivatives. For $\|x\| \geq N + 1$,
+$(N + 1) \|x\|^k B_m(x) \leq \|x\|^{k+1} B_m(x) \leq C_{k,m}(u)$.
+\end{proof}
+
+\begin{lemma}[Cut-offs converge in the Schwartz space]
+\label{lem:schwartz-cutoff-tendsto}
+\lean{Rd.tendsto_cutoffMul}
+\leanok
+\uses{lem:schwartz-cutoff-estimate}
+For every Schwartz function $u$, $\chi_N u \to u$ in $\mathcal S(V)$ as $N \to \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The topology of $\mathcal S(V)$ is that of the seminorms $p_{k,m}$ (Mathlib's
+\texttt{schwartz\_\allowbreak withSeminorms}), and each $p_{k,m}(\chi_N u - u)$ is at most
+$C_{k,m}(u) / (N + 1)$ by \Cref{lem:schwartz-cutoff-estimate}.
+\end{proof}
+
+Since every $\chi_N u$ is smooth with compact support, the smooth compactly supported complex
+functions are dense in $\mathcal S(V)$.
+
+\begin{theorem}[Test functions determine tempered distributions]
+\label{thm:test-functions-determine}
+\lean{Rd.exists_testSchwartz_eq, Rd.eq_zero_of_testSchwartz}
+\leanok
+\uses{lem:schwartz-cutoff-tendsto, def:test-schwartz}
+For every complex normed space $F$ and every tempered distribution $T$ with values in $F$ such
+that $T(\varphi) = 0$ for every $\varphi \in \mathcal D(V)$, $T = 0$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Every smooth compactly supported $w : V \to \C$ is $\operatorname{Re} w + i \operatorname{Im} w$
+with $\operatorname{Re} w, \operatorname{Im} w \in \mathcal D(V)$, so $T$ vanishes on it by
+linearity. For a Schwartz function $u$, $T(\chi_N u) = 0$ for every $N$ and
+$T(\chi_N u) \to T(u)$ by \Cref{lem:schwartz-cutoff-tendsto} and the continuity of $T$.
+\end{proof}
+
+\chapter{Maximal functions}
+\label{ch:maximal-functions}
+
+This chapter collects the real-variable tools behind the Triebel--Lizorkin spaces and the
+vector-valued singular integrals. It starts on an arbitrary measure space with the two mixed norms
+$L_p(\ell_q)$ and $\ell_q(L_p)$ of a family of functions and their comparison
+(\Cref{thm:mixed-norms}). From the dyadic cubes on, $V$ is a finite-dimensional real inner
+product space of dimension $n$, such as $\R^d$, with Lebesgue measure $|\cdot|$, and the chapter
+proves Lebesgue's differentiation theorem along dyadic cubes
+(\Cref{thm:lebesgue-differentiation-cubes}), the weighted weak and strong type of the
+Hardy--Littlewood maximal function (\Cref{thm:maximal-weak-type} and
+\Cref{thm:maximal-strong-type}), the Calder\'on--Zygmund decomposition
+(\Cref{thm:calderon-zygmund}), the Fefferman--Stein inequality
+for the $L_p(\ell_q)$ norm of a family of maximal functions (\Cref{thm:fefferman-stein}), and the
+decomposition of functions with values in a normed space into a bounded good part and bad pieces
+with mean zero (\Cref{sec:calderon-zygmund-signed}). The Fefferman--Stein inequality drives the
+characterisations of \Cref{ch:triebel-lizorkin}; the signed decomposition gives the weak type
+$(1,1)$ of \Cref{ch:singular-integrals}.
+
+\section{Mixed norms}
+
+Throughout this section $(X, \mu)$ is a measure space, $I$ a countable set, and
+$g = (g_i)_{i \in I}$ a family of measurable functions $g_i : X \to [0, \infty]$. The two mixed
+norms of $g$ are
+\[
+  \|g\|_{L_p(\ell_q)} = \Bigl\| x \mapsto \|(g_i(x))_{i \in I}\|_{\ell_q} \Bigr\|_{L_p},
+  \qquad
+  \|g\|_{\ell_q(L_p)} = \bigl\| (\|g_i\|_{L_p})_{i \in I} \bigr\|_{\ell_q},
+\]
+with the $\ell_q$ norm of \Cref{def:lq-norm}. All functions take values in $[0, \infty]$, so
+every integral, series and norm has a value and no integrability conditions appear. The $L_p$
+norm of a function that is not almost everywhere measurable is $\infty$, so Minkowski's
+inequality for series (\Cref{lem:lp-series-minkowski}) and the bound
+$\|g\|_{L_p(\ell_q)} \leq \|g\|_{\ell_q(L_p)}$ of \Cref{thm:mixed-norms} hold for every family
+$g$ of functions $g_i : X \to [0, \infty]$: their right sides are then $\infty$.
+
+\begin{lemma}[{Homogeneity, powers and measurability in $[0, \infty]$}]
+\label{lem:lp-norm-nonnegative}
+\lean{MeasureTheory.eLpNorm_const_mul_ennreal, MeasureTheory.eLpNorm_rpow_eq_lintegral,
+  MeasureTheory.eLpNorm_fun_rpow, ENNReal.lqNorm_fun_rpow, MeasureTheory.aemeasurable_lqNorm_comp}
+\leanok
+\uses{def:lq-norm}
+For every measurable $h : X \to [0, \infty]$, every $c \in [0, \infty]$, every
+$p \in [0, \infty]$ and every $r > 0$,
+\[
+  \|c h\|_p = c \, \|h\|_p, \qquad \|h^r\|_p = \|h\|_{pr}^r,
+\]
+and $\|h\|_p^p = \int h^p \, d\mu$ if $0 < p < \infty$.
+
+For every family $a$ in $[0, \infty]$ indexed by $I$, every $u \in [0, \infty]$ and every
+$r > 0$, $\|(a_i^r)_i\|_{\ell_u} = \|a\|_{\ell_{ur}}^r$.
+
+For every $q \in [0, \infty]$ the function $x \mapsto \|(g_i(x))_i\|_{\ell_q}$ is measurable.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $0 < p < \infty$ the norm is $(\int h^p)^{1/p}$, and constants leave the integral; for
+$p = \infty$ the essential supremum is homogeneous. The power rule is Mathlib's
+\texttt{eLpNorm\_enorm\_rpow}, and for the counting measure on $I$ it is the statement on
+$\ell_u$ norms. The pointwise $\ell_q$ norm is a countable supremum for $q = \infty$ and the
+$1/q$-th power of a series of measurable functions for $0 < q < \infty$.
+\end{proof}
+
+\begin{lemma}[Monotone convergence and Minkowski's inequality for series in $L_p$]
+\label{lem:lp-series-minkowski}
+\lean{MeasureTheory.eLpNorm_iSup_of_directed, MeasureTheory.eLpNorm_tsum_le}
+\leanok
+\uses{lem:lp-norm-nonnegative}
+For every countable directed family $(F_b)_b$ of measurable functions $F_b : X \to [0, \infty]$
+and every $p \in [0, \infty]$,
+$\|\sup_b F_b\|_p = \sup_b \|F_b\|_p$. For every $1 \leq p \leq \infty$,
+\[
+  \Bigl\| \sum_{i \in I} g_i \Bigr\|_p \leq \sum_{i \in I} \|g_i\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $0 < p < \infty$, $\|\sup_b F_b\|_p^p = \int \sup_b F_b^p = \sup_b \int F_b^p$ by the
+monotone convergence theorem for directed families; for $p = \infty$, almost everywhere
+$F_b \leq \|F_b\|_\infty$ for all $b$ at once, since there are countably many. The series is the
+supremum of its finite partial sums, a directed family, and Minkowski's inequality bounds the
+norm of each partial sum by $\sum_{i \in I} \|g_i\|_p$.
+\end{proof}
+
+\begin{lemma}[Minkowski's integral inequality for $\ell_u$-valued functions]
+\label{lem:minkowski-integral-lq}
+\lean{ENNReal.rpow_eq_mul_rpow_sub_one, ENNReal.one_lt_toReal, ENNReal.le_rpow_sum_rpow,
+  MeasureTheory.sum_rpow_lintegral_le_mul, MeasureTheory.rpow_sum_rpow_lintegral_le,
+  MeasureTheory.lqNorm_lintegral_le, MeasureTheory.lqNorm_lintegral_le_eLpNorm}
+\leanok
+\uses{def:lq-norm}
+For every $1 \leq u \leq \infty$,
+\[
+  \Bigl\| \Bigl( \int_X g_i \, d\mu \Bigr)_{i \in I} \Bigr\|_{\ell_u}
+  \leq \int_X \|(g_i(x))_{i \in I}\|_{\ell_u} \, d\mu(x) .
+\]
+If $\mu$ is a probability measure, then for every $1 \leq p \leq \infty$ the left side is at most
+$\bigl\| x \mapsto \|(g_i(x))_{i \in I}\|_{\ell_u} \bigr\|_{L_p(\mu)}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $u = 1$ both sides are equal by Tonelli's theorem, and for $u = \infty$ the supremum of the
+integrals is at most the integral of the supremum. Let $1 < u < \infty$ with conjugate exponent
+$u'$, let $S \subseteq I$ be finite, $a_i = \int g_i$ and $T = \sum_{i \in S} a_i^u$. Then
+\[
+  T = \sum_{i \in S} a_i \, a_i^{u-1}
+  = \int \sum_{i \in S} g_i(x) \, a_i^{u-1} \, d\mu(x)
+  \leq \int \Bigl( \sum_{i \in S} g_i^u \Bigr)^{1/u} d\mu \cdot T^{1/u'}
+\]
+by H\"older's inequality at every point, since $(u - 1) u' = u$. If $0 < T < \infty$, dividing by
+$T^{1/u'}$ gives $T^{1/u} \leq \int (\sum_{i \in S} g_i^u)^{1/u}$; if $T = \infty$, some $a_i$ is
+infinite and so is the right side, because $g_i \leq (\sum_{j \in S} g_j^u)^{1/u}$. The right side
+is at most $\int \|(g_i)_i\|_{\ell_u}$, and the supremum over $S$ gives the claim. On a
+probability space the integral is the $L_1$ norm, which is at most the $L_p$ norm.
+\end{proof}
+
+\begin{lemma}[Conjugate exponents and cancellation in H\"older's inequality]
+\label{lem:cancel-conjugate-power}
+\lean{ENNReal.le_rpow_mul_of_le_mul_rpow, ENNReal.HolderConjugate.lt_two_of_two_lt}
+\leanok
+For all conjugate exponents $1 < u, u' < \infty$ and all $X, K, A \in [0, \infty]$ with
+$X < \infty$ and $X \leq K A^{1/u} X^{1/u'}$, $X \leq K^u A$. For all $p, q \in [1, \infty]$
+with $1/p + 1/q = 1$ and $p > 2$, $q < 2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $X = 0$ the bound holds. Otherwise $X = X^{1/u} X^{1/u'}$ with
+$0 < X^{1/u'} < \infty$, so $X^{1/u} \leq K A^{1/u}$; take the $u$-th power. For the second
+statement, $1/q = 1 - 1/p > 1/2$.
+\end{proof}
+
+\begin{theorem}[Comparison of mixed norms]
+\label{thm:mixed-norms}
+\lean{MeasureTheory.eLpNorm_lqNorm_eq_lqNorm_eLpNorm,
+  MeasureTheory.lqNorm_eLpNorm_le_eLpNorm_lqNorm, MeasureTheory.eLpNorm_lqNorm_le_lqNorm_eLpNorm}
+\leanok
+\uses{lem:lp-norm-nonnegative, lem:lp-series-minkowski, lem:minkowski-integral-lq,
+  lem:lq-basic}
+For every $0 < p < \infty$,
+$\|g\|_{L_p(\ell_p)} = \|g\|_{\ell_p(L_p)}$. For all $0 < p \leq q \leq \infty$,
+$\|g\|_{\ell_q(L_p)} \leq \|g\|_{L_p(\ell_q)}$. For all $0 < q \leq p < \infty$,
+$\|g\|_{L_p(\ell_q)} \leq \|g\|_{\ell_q(L_p)}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The $p$-th powers of both sides of the identity are $\sum_i \int g_i^p$, by Tonelli's theorem
+for series. For $p \leq q < \infty$ put $U = q/p \geq 1$; by \Cref{lem:lp-norm-nonnegative}
+\[
+  \|g\|_{\ell_q(L_p)}^p = \Bigl\| \Bigl( \int g_i^p \Bigr)_i \Bigr\|_{\ell_U}
+  \leq \int \|(g_i^p)_i\|_{\ell_U} = \|g\|_{L_p(\ell_q)}^p
+\]
+by \Cref{lem:minkowski-integral-lq}; for $q = \infty$ each $g_i$ is at most the pointwise
+supremum. For $q \leq p$ put $U = p/q \geq 1$; then
+\[
+  \|g\|_{L_p(\ell_q)}^q = \Bigl\| \sum_i g_i^q \Bigr\|_U \leq \sum_i \|g_i^q\|_U
+  = \sum_i \|g_i\|_p^q = \|g\|_{\ell_q(L_p)}^q
+\]
+by \Cref{lem:lp-series-minkowski}.
+\end{proof}
+
+\begin{corollary}[The mixed-norm sandwich]
+\label{cor:mixed-norm-sandwich}
+\lean{MeasureTheory.eLpNorm_lqNorm_le_lqNorm_min, MeasureTheory.lqNorm_max_le_eLpNorm_lqNorm,
+  MeasureTheory.eLpNorm_const_mul_enorm, MeasureTheory.eLpNorm_lqNorm_weighted_eq,
+  MeasureTheory.eLpNorm_lqNorm_weighted_le_min, MeasureTheory.lqNorm_max_weighted_le,
+  MeasureTheory.eLpNorm_lqNorm_dyadicWeight_eq, MeasureTheory.eLpNorm_lqNorm_dyadicWeight_le_min,
+  MeasureTheory.lqNorm_max_dyadicWeight_le}
+\leanok
+\uses{thm:mixed-norms, lem:lp-norm-nonnegative, lem:lq-basic}
+For all $1 \leq p < \infty$ and $1 \leq q \leq \infty$,
+\[
+  \|g\|_{\ell_{\max(p,q)}(L_p)} \leq \|g\|_{L_p(\ell_q)} \leq \|g\|_{\ell_{\min(p,q)}(L_p)} .
+\]
+For every normed group $E$, all measurable functions $u_j : X \to E$ and all weights
+$w_j \in [0, \infty]$, indexed by $j \in I$, the family $g_j = w_j \|u_j(\cdot)\|_E$ satisfies
+$\|g_j\|_p = w_j \|u_j\|_p$ for every $p$, the two inequalities above, and
+$\|g\|_{L_p(\ell_p)} = \|g\|_{\ell_p(L_p)}$ for $0 < p < \infty$. This holds in particular for
+$I = \N$ and the weights $w_j = 2^{js}$ with $s \in \R$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+For $p \leq q$ the lower bound is \Cref{thm:mixed-norms}, and the upper bound follows from the
+pointwise inequality $\|\cdot\|_{\ell_q} \leq \|\cdot\|_{\ell_p}$ of \Cref{lem:lq-basic} and the
+identity $L_p(\ell_p) = \ell_p(L_p)$. For $q \leq p$ the roles are exchanged. The weighted family
+is the case $g_j = w_j \|u_j(\cdot)\|_E$, by homogeneity (\Cref{lem:lp-norm-nonnegative}).
+\end{proof}
+
+With $u_j$ the Littlewood--Paley blocks of a function $f$ and $w_j = 2^{js}$, the corollary
+places the Triebel--Lizorkin quasi-norm between the Besov quasi-norms with $\ell_{\max(p,q)}$
+and $\ell_{\min(p,q)}$, with equality for $q = p$.
+
+\begin{lemma}[Limits of pointwise bounds]
+\label{lem:limits-of-pointwise-bounds}
+\lean{MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm}
+\leanok
+For every $0 < p \leq \infty$, all measurable $u, v : X \to [0, \infty]$ and every sequence of
+functions $w_J : X \to [0, \infty]$ with $u \leq v + w_J$ almost everywhere for every $J$ and
+$\|w_J\|_p \to 0$, we have $u \leq v$ almost everywhere.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The truncated difference $(u - v)_+$ is measurable and at most $w_J$ almost everywhere, so
+$\|(u - v)_+\|_p \leq \|w_J\|_p$ for every $J$. Hence $\|(u - v)_+\|_p = 0$, and $(u - v)_+ = 0$
+almost everywhere.
+\end{proof}
+
+This is how pointwise bounds pass to limits in $L_p$ for functions with values in
+$[0, \infty]$; Mathlib derives convergence in measure from convergence in $L_p$ for normed
+groups.
+
+\begin{lemma}[Pointwise bounds under limits in $L_p$]
+\label{lem:lp-limits-pointwise}
+\lean{MeasureTheory.ae_enorm_le_of_tendsto_Lp}
+\leanok
+Let $(X, \mu)$ be a measure space, $E$ a normed group and $1 \leq p \leq \infty$. For every
+$F \in L_p(X; E)$, every sequence $(G_J)_{J \in \N}$ in $L_p(X; E)$ with $G_J \to F$ in $L_p$
+and every $v : X \to [0, \infty]$ with $|G_J| \leq v$ almost everywhere for every $J$, we have
+$|F| \leq v$ almost everywhere.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Convergence in $L_p$ implies convergence in measure, so a subsequence $G_{J_k}$ converges to $F$
+almost everywhere (Mathlib). At every point where it converges and all the bounds hold,
+$|F(x)| = \lim_k |G_{J_k}(x)| \leq v(x)$.
+\end{proof}
+
+For a bounded linear operator $T$ on $L_p$ the lemma applies to $T G_J \to T f$: a pointwise bound
+on $T G_J$ passes to $T f$.
+
+\begin{lemma}[One member of a family]
+\label{lem:mixed-norm-member}
+\lean{MeasureTheory.dyadicWeight_mul_enorm_le_eLpNorm_lqNorm,
+  MeasureTheory.enorm_le_dyadicWeight_neg_mul_eLpNorm_lqNorm}
+\leanok
+\uses{lem:lq-basic}
+For every measure space $(X, \mu)$, every normed group $E$, all $p, q \in [0, \infty]$ with
+$q \neq 0$, every $s \in \R$, every family $h_i \in L_p(X; E)$, $i \in \N$, and every $j \in \N$,
+\[
+  2^{js} \|h_j\|_p \leq \bigl\| x \mapsto \|(2^{is} |h_i(x)|)_i\|_{\ell_q} \bigr\|_p
+\]
+and
+\[
+  \|h_j\|_p \leq 2^{-js} \, \bigl\| x \mapsto \|(2^{is} |h_i(x)|)_i\|_{\ell_q} \bigr\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Pointwise $2^{js} |h_j(x)| \leq \|(2^{is} |h_i(x)|)_i\|_{\ell_q}$ (\Cref{lem:lq-basic}).
+\end{proof}
+
+\begin{lemma}[Tails in $L_p(\ell_q)$]
+\label{lem:mixed-norm-tails}
+\lean{MeasureTheory.aemeasurable_lqNorm_ite, MeasureTheory.eLpNorm_lqNorm_ite_le,
+  ENNReal.tendsto_lqNorm_ite_le, MeasureTheory.tendsto_lintegral_lqNorm_ite_le_rpow,
+  MeasureTheory.tendsto_eLpNorm_lqNorm_ite_le}
+\leanok
+\uses{lem:lq-basic, lem:lp-norm-nonnegative}
+For every measure space $(X, \mu)$, all $p, q \in [0, \infty]$, every set $P \subseteq \N$ and
+all measurable $g_j \colon X \to [0, \infty]$, $j \in \N$, the function
+$x \mapsto \|(\mathbf 1_P(j) \, g_j(x))_j\|_{\ell_q}$ is measurable and
+\[
+  \bigl\| x \mapsto \|(\mathbf 1_P(j) \, g_j(x))_j\|_{\ell_q} \bigr\|_p
+  \leq \bigl\| x \mapsto \|(g_j(x))_j\|_{\ell_q} \bigr\|_p .
+\]
+Let $0 < p < \infty$ and $0 < q < \infty$. For every sequence $a$ in $[0, \infty]$ with
+$\|a\|_{\ell_q} < \infty$,
+\[
+  \|(0, \dots, 0, a_N, a_{N+1}, \dots)\|_{\ell_q} \to 0 \qquad (N \to \infty) .
+\]
+For every measure space $(X, \mu)$ and all measurable $g_j \colon X \to [0, \infty]$,
+$j \in \N$, with $\bigl\| x \mapsto \|(g_j(x))_j\|_{\ell_q} \bigr\|_p < \infty$, the tails
+\[
+  G_N(x) = \|(0, \dots, 0, g_N(x), g_{N+1}(x), \dots)\|_{\ell_q}
+\]
+satisfy
+\[
+  \int_X G_N^p \, d\mu \to 0 \quad \text{and} \quad \|G_N\|_p \to 0 \qquad (N \to \infty) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Setting terms to zero decreases the $\ell_q$ norm at every point (\Cref{lem:lq-basic}) and hence
+the $L_p$ norm. The $q$-th power of the norm of the tail is $\sum_{k \geq N} a_k^q$
+(\Cref{lem:lq-basic}), the
+tail of a convergent series. The functions $G_N^p$ are at most
+$\|(g_j(x))_j\|_{\ell_q}^p$, which is integrable and hence finite almost everywhere; where it is
+finite, $G_N^p \to 0$ by the first part. Dominated convergence gives $\int G_N^p \to 0$, and
+$\|G_N\|_p = (\int G_N^p)^{1/p}$ (\Cref{lem:lp-norm-nonnegative}).
+\end{proof}
+
+\section{Dyadic cubes and the Lebesgue differentiation theorem}
+
+The Calder\'on--Zygmund decomposition stops at dyadic cubes of every size, so the cells of
+\Cref{def:dyadic-cells} are extended to all integer levels. Throughout, $V$ is a
+finite-dimensional real inner product space of dimension $n$ with Lebesgue measure $|\cdot|$,
+$(b_i)_{i=1}^n$ is the orthonormal basis of \Cref{def:dyadic-cells}, $x_i = \langle b_i, x \rangle$
+are the coordinates of $x \in V$, and for a measure $\mu$ and a set $Q$,
+$F_Q = \mu(Q)^{-1} \int_Q F \, d\mu$ is the average of $F$ over $Q$ (with $\mu = |\cdot|$ on $V$;
+as in Mathlib, $F_Q = 0$ when $\mu(Q)$ is $0$ or $\infty$).
+
+\begin{definition}[Dyadic cubes]
+\label{def:dyadic-cubes}
+\lean{Rd.zcellIndex, Rd.zcell, Rd.zcellCenter, Rd.zcellIndex_natCast, Rd.zcell_natCast,
+  Rd.zcellCenter_natCast, Rd.mem_zcell_zcellIndex, Rd.repr_zcellCenter, Rd.measurable_zcellIndex,
+  Rd.measurableSet_zcell, Rd.cubeAt, Rd.mem_cubeAt}
+\leanok
+\uses{def:dyadic-cells}
+For $k \in \Z$ and $m \in \Z^n$ the dyadic cube of level $k$ and index $m$ is
+$Q_{k,m} = \{x \in V : \lfloor 2^k x_i \rfloor = m_i \text{ for all } i\}$, with centre
+$c_{k,m} = \sum_i (m_i + 1/2) 2^{-k} b_i$. Every $x$ lies in the cube $Q_k(x)$ of level $k$ with
+index $(\lfloor 2^k x_i \rfloor)_i$. For every $k \in \Z$ and every $m \in \Z^n$ the cube
+$Q_{k,m}$ is measurable, and for every $k \in \N$ it is the cell $P_{k,m}$, with the same centre.
+\end{definition}
+
+\begin{lemma}[Size, partition and volume of cubes]
+\label{lem:dyadic-cubes}
+\lean{Rd.repr_sub_zcellCenter, Rd.abs_repr_sub_zcellCenter_le, Rd.norm_sub_zcellCenter_le,
+  Rd.zcell_subset_closedBall, Rd.ball_subset_zcell, Rd.zcell_disjoint, Rd.iUnion_zcell,
+  Rd.zcell_eq_preimage, Rd.volume_zcell, Rd.volume_zcell_pos, Rd.volume_zcell_lt_top,
+  Rd.volume_real_zcell, Rd.volume_cell}
+\leanok
+\uses{def:dyadic-cubes, lem:dyadic-cells}
+For every $k \in \Z$, every $m \in \Z^n$ and every $x \in V$, the $i$-th coordinate of
+$x - c_{k,m}$ is $(2^k x_i - m_i - 1/2) 2^{-k}$. For every $k \in \Z$, every $m \in \Z^n$ and
+every $x \in Q_{k,m}$, every coordinate of $x - c_{k,m}$ is at most $2^{-k}/2$ in modulus and
+$\|x - c_{k,m}\| \leq n 2^{-k}$. For every $k \in \Z$ and every $m \in \Z^n$,
+\[
+  Q_{k,m} = \{x \in V : m_i 2^{-k} \leq x_i < (m_i + 1) 2^{-k} \text{ for all } i\},
+\]
+$B(c_{k,m}, 2^{-k}/2) \subseteq Q_{k,m} \subseteq \bar B(c_{k,m}, n 2^{-k})$ and
+$|Q_{k,m}| = 2^{-kn}$, in particular $|P_{j,m}| = 2^{-jn}$ for $j \in \N$. For every $k \in \Z$
+the cubes of level $k$ are pairwise disjoint and cover $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bounds are those of \Cref{lem:dyadic-cells} with $2^{-k}$ in place of $2^{-j}$. A point of
+the ball has coordinates within less than $2^{-k}/2$ of $(m_i + 1/2) 2^{-k}$, so
+$\lfloor 2^k x_i \rfloor = m_i$. The description as a set of inequalities is
+$\lfloor t \rfloor = m_i \iff m_i \leq t < m_i + 1$; in the coordinates of the basis the cube is
+therefore the box $\prod_i [m_i 2^{-k}, (m_i + 1) 2^{-k})$, and the coordinate map $V \to \R^n$
+preserves the volume (Mathlib's \texttt{OrthonormalBasis.measurePreserving\_repr}).
+\end{proof}
+
+\begin{lemma}[Nesting of cubes]
+\label{lem:dyadic-cubes-nested}
+\lean{Rd.cubeParent, Rd.zcell_succ_subset_cubeParent, Rd.volume_zcell_cubeParent,
+  Rd.volume_zcell_sub, Rd.cubeAncestor, Rd.cubeAncestor_add, Rd.zcell_subset_cubeAncestor,
+  Rd.zcellIndex_sub_cubeAncestor, Rd.zcell_subset_or_disjoint}
+\leanok
+\uses{def:dyadic-cubes, lem:dyadic-cubes}
+For $m \in \Z^n$ let $\hat m = (\lfloor m_i / 2 \rfloor)_i$, and let $m^{(l)}$ be the result of
+$l$ applications of $m \mapsto \hat m$. For every $k \in \Z$, every $l \in \N$ and every
+$m \in \Z^n$,
+\[
+  Q_{k+1,m} \subseteq Q_{k,\hat m}, \qquad |Q_{k,\hat m}| = 2^n |Q_{k+1,m}|, \qquad
+  Q_{k+l,m} \subseteq Q_{k,m^{(l)}}.
+\]
+For every $k \in \Z$, every $l \in \N$ and all $m, m' \in \Z^n$,
+$|Q_{k-l,m'}| = 2^{ln} |Q_{k,m}|$. For every $k \in \Z$, every $l \in \N$ and every $x \in V$,
+the index of $Q_{k-l}(x)$ is $p^{(l)}$, where $p = (\lfloor 2^k x_i \rfloor)_i$ is the index of
+$Q_k(x)$. For all integers
+$k \leq k'$ and all $m, m' \in \Z^n$, either $Q_{k',m'} \subseteq Q_{k,m}$ or
+$Q_{k',m'} \cap Q_{k,m} = \emptyset$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For real $t$, $\lfloor 2^k t \rfloor = \lfloor 2^{k+1} t / 2 \rfloor
+= \lfloor \lfloor 2^{k+1} t \rfloor / 2 \rfloor$, which gives the first inclusion; the volumes
+are those of \Cref{lem:dyadic-cubes}, and the third inclusion follows by induction on $l$. For
+$k \leq k'$ the cube $Q_{k',m'}$ lies in the cube of level $k$ with index $m'^{(k'-k)}$, which is
+$Q_{k,m}$ or disjoint from it.
+\end{proof}
+
+\begin{lemma}[Averages over a subset]
+\label{lem:average-subset}
+\lean{Rd.abs_setAverage_sub_le, Rd.setLAverage_eq_ofReal_setAverage}
+\leanok
+For every measure space $(X, \mu)$, all sets $Q \subseteq B \subseteq X$ with $\mu(Q) > 0$ and
+$\mu(B) < \infty$, every $F : X \to \R$ integrable on $B$ and every $c \in \R$,
+\[
+  |F_Q - c| \leq \frac{\mu(B)}{\mu(Q)} \, (|F - c|)_B .
+\]
+For every measure space $(X, \mu)$, every set $Q \subseteq X$ and every $G : X \to [0, \infty]$,
+almost everywhere measurable on $Q$ with $\int_Q G \, d\mu < \infty$, the average $G_Q$ equals the
+average over $Q$ of the real function equal to $G$ where $G < \infty$ and to $0$ elsewhere.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$F_Q - c = \mu(Q)^{-1} \int_Q (F - c) \, d\mu$, and
+$\int_Q |F - c| \, d\mu \leq \int_B |F - c| \, d\mu$. In the second statement $G$ is finite almost
+everywhere on $Q$, so both functions have the same integral over $Q$ (Mathlib's
+\texttt{toReal\_setLAverage}).
+\end{proof}
+
+\begin{theorem}[Lebesgue differentiation along dyadic cubes]
+\label{thm:lebesgue-differentiation-cubes}
+\lean{Rd.cubeAt_subset_closedBall, Rd.volume_real_closedBall_div_cubeAt,
+  Rd.ae_tendsto_average_cubeAt, Rd.ae_le_of_forall_laverage_le}
+\leanok
+\uses{def:dyadic-cubes, lem:dyadic-cubes, lem:average-subset}
+For every locally integrable $F : V \to \R$ and almost every $x \in V$,
+\[
+  F_{Q_k(x)} \to F(x) \qquad (k \to \infty, \ k \in \N) .
+\]
+For every almost everywhere measurable $G : V \to [0, \infty]$ with $\int G < \infty$ and every
+$t \in [0, \infty]$, almost every $x \in V$ with $G_{Q_k(x)} \leq t$ for all $k \in \N$
+satisfies $G(x) \leq t$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $w_k$ be the centre of $Q_k(x)$ and $\delta_k = (n + 1) 2^{-k}$. By \Cref{lem:dyadic-cubes},
+$Q_k(x)$ lies in the closed ball $\bar B_k = \bar B(w_k, \delta_k)$, which contains $x$, and
+$|\bar B_k| = (n + 1)^n |B(0,1)| \, |Q_k(x)|$. By \Cref{lem:average-subset},
+\[
+  |F_{Q_k(x)} - F(x)| \leq (n + 1)^n |B(0,1)| \, (|F - F(x)|)_{\bar B_k} .
+\]
+Lebesgue measure is doubling, and Mathlib's Lebesgue differentiation theorem for doubling
+measures (\texttt{IsUnifLocDoublingMeasure.\allowbreak ae\_tendsto\_average\_norm\_sub}) shows
+that the right side tends to $0$ at almost every $x$, since the radii $\delta_k$ tend to $0$.
+For $G$ apply this to the integrable real function $F$ equal to $G$ where $G < \infty$ and to $0$
+elsewhere; $G$ is finite almost everywhere, so the averages of $F$ over the cubes are those of $G$
+(\Cref{lem:average-subset}), and the bound $t$ passes to the limit.
+\end{proof}
+
+\section{The Hardy--Littlewood maximal function}
+
+The maximal function is the tool that turns pointwise bounds of convolutions into $L_p$ bounds
+when the $\ell_q$ norm over the levels is taken before the $L_p$ norm. As in the previous section,
+$V$ is a finite-dimensional real inner product space of dimension $n$ with Lebesgue measure
+$|\cdot|$, and $B(x, r)$ and $\bar B(x, r)$ are the open and the closed ball. All functions in
+this section take values in $[0, \infty]$, so every integral has a value; for a function that
+is not measurable, $\int$ is the lower Lebesgue integral, as in Mathlib. The maximal theorem and
+the Calder\'on--Zygmund decomposition of the next section are classical; see
+Stein~\cite{Stein}.
+
+\begin{definition}[Hardy--Littlewood maximal function]
+\label{def:maximal-function}
+\lean{Rd.maximal, Rd.volume_ball_ne_zero, Rd.volume_ball_ne_top, Rd.le_maximal,
+  Rd.setLIntegral_ball_le_mul_maximal, Rd.maximal_le_of_forall}
+\leanok
+For $g : V \to [0, \infty]$ and $x \in V$,
+\[
+  M g(x) = \sup_{r > 0} \frac{1}{|B(0, r)|} \int_{B(x, r)} g(y) \, dy \in [0, \infty] .
+\]
+For every $r > 0$, $0 < |B(0, r)| < \infty$. For every $g$, every $x \in V$ and every $r > 0$,
+$\int_{B(x,r)} g \leq |B(0,r)| \, M g(x)$, and for every $c \in [0, \infty]$ with
+$\int_{B(x,r)} g \leq |B(0,r)| \, c$ for all $r > 0$, $M g(x) \leq c$.
+\end{definition}
+
+The normalisation by $|B(0, r)| = |B(x, r)|$ keeps the factor independent of $x$.
+
+\begin{lemma}[Elementary properties of the maximal function]
+\label{lem:maximal-function-basic}
+\lean{Rd.maximal_mono, Rd.maximal_add_le, Rd.maximal_const_mul, Rd.maximal_le_of_ae_le,
+  Rd.maximal_const, Rd.maximal_congr_ae, Rd.maximal_indicator_le, Rd.maximal_iSup_of_monotone,
+  Rd.maximal_eq_self_of_subsingleton, Rd.maximal_le_eLpNorm_top,
+  Rd.maximal_le_maximal_indicator_add}
+\leanok
+\uses{def:maximal-function}
+For all $g, h : V \to [0, \infty]$, every $x \in V$, every $c \in [0, \infty]$, every
+$s \in [0, \infty]$ and every set $S \subseteq V$:
+\begin{enumerate}
+  \item if $g \leq h$, then $M g \leq M h$; in particular $M(\mathbf 1_S g) \leq M g$;
+  \item if $g$ is almost everywhere measurable, then $M(g + h)(x) \leq M g(x) + M h(x)$;
+  \item if $c < \infty$, then $M(c g) = c \, M g$; and $M c = c$ for the constant function $c$;
+  \item if $g \leq s$ almost everywhere, then $M g \leq s$; in particular $M g \leq \|g\|_\infty$;
+  \item if $g = h$ almost everywhere, then $M g = M h$;
+  \item if $g$ is measurable, then $M g(x) \leq M(\mathbf 1_{\{g > s\}} g)(x) + s$;
+  \item if $n = 0$, then $M g = g$.
+\end{enumerate}
+For every increasing sequence $(g_N)_{N \in \N}$ of almost everywhere measurable functions
+$g_N : V \to [0, \infty]$, $M(\sup_N g_N) = \sup_N M g_N$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Each property holds for the integrals over every ball $B(x, r)$ and passes to the supremum over
+$r$: monotonicity and additivity of the integral (additivity needs one measurable summand),
+homogeneity, the integral of a constant, and the monotone convergence theorem on each ball,
+followed by an exchange of the two suprema. The cut at height $s$ uses
+$g \leq \mathbf 1_{\{g > s\}} g + s$. For $n = 0$ every ball of positive radius is the whole
+one-point space.
+\end{proof}
+
+\begin{lemma}[Measurability of the maximal function]
+\label{lem:maximal-function-measurable}
+\lean{Rd.lowerSemicontinuous_setLIntegral_ball, Rd.lowerSemicontinuous_maximal,
+  Rd.measurable_maximal}
+\leanok
+\uses{def:maximal-function}
+For every $g : V \to [0, \infty]$ and every $r \in \R$, the function
+$x \mapsto \int_{B(x,r)} g$ is lower semicontinuous. For every $g : V \to [0, \infty]$, $M g$ is
+lower semicontinuous, hence measurable.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The ball $B(x_0, r)$ is the increasing union of the balls $B(x_0, r - 1/(m+1))$, so
+$\int_{B(x_0, r)} g > a$ implies $\int_{B(x_0, r - 1/(m+1))} g > a$ for some $m$, and this ball
+lies in $B(x, r)$ for every $x$ with $\|x - x_0\| < 1/(m+1)$. A supremum of lower semicontinuous
+functions is lower semicontinuous, and lower semicontinuous functions are Borel measurable.
+\end{proof}
+
+The lemma holds for every $g$; the measurability comes from the open balls.
+
+\begin{lemma}[Convolutions with kernels under radial majorants]
+\label{lem:maximal-function-kernels}
+\lean{Rd.lintegral_mul_le_setLIntegral_ball, Rd.lintegral_mul_le_maximal_of_ball, Rd.dyadicShell,
+  Rd.measurableSet_dyadicShell,
+  Rd.iUnion_dyadicShell, Rd.kernel_le_of_mem_dyadicShell, Rd.volume_ball_two_pow_mul,
+  Rd.tsum_two_inv_pow_mul_two_pow, Rd.lintegral_mul_le_maximal_of_decay, Rd.decayMaximalConst,
+  Rd.decayMaximalConst_ne_top, Rd.inv_one_add_two_pow_mul_pow_le,
+  Rd.lintegral_mul_le_maximal_of_one_add_norm}
+\leanok
+\uses{def:maximal-function}
+For every integer $N > n$ let $c_{n,N} = 2^n \bigl(1 - 2^{-(N - n)}\bigr)^{-1}$ and
+$C_{n,N} = |B(0, 1)| \, c_{n,N}$. For every $K : V \to [0, \infty]$, every
+$g : V \to [0, \infty]$, every $x \in V$, every $A \in [0, \infty)$ and every $\rho > 0$:
+\begin{enumerate}
+  \item if $K \leq A \mathbf 1_{B(0, \rho)}$, then
+    $\int K(y) g(x - y) \, dy \leq A \int_{B(x, \rho)} g \leq A \, |B(0, \rho)| \, M g(x)$;
+  \item if $N > n$ is an integer, $K(y) \leq A$ for $\|y\| \leq \rho$ and
+    $K(y) \leq A (\rho / \|y\|)^N$ for $\|y\| > \rho$, then
+    $\int K(y) g(x - y) \, dy \leq c_{n,N} \, A \, |B(0, \rho)| \, M g(x)$;
+  \item if $N > n$ and $j \geq 0$ are integers and
+    $K(y) \leq A \, 2^{jn} (1 + 2^j \|y\|)^{-N}$ for all $y$, then
+    $\int K(y) g(x - y) \, dy \leq C_{n,N} \, A \, M g(x)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The integrand is at most $A \mathbf 1_{B(x, \rho)}(x - y) \, g(x - y)$; translation
+invariance gives $A \int_{B(x, \rho)} g \leq A \, |B(0, \rho)| \, M g(x)$. (2) The shells
+$S_0 = B(0, 2\rho)$ and $S_i = \{2^i \rho \leq \|y\| < 2^{i+1} \rho\}$, $i \geq 1$, cover $V$,
+and $K \leq A 2^{-iN} \mathbf 1_{B(0, 2^{i+1} \rho)}$ on $S_i$. By (1) and
+$|B(0, 2^{i+1} \rho)| = 2^{(i+1) n} |B(0, \rho)|$, the integral over $S_i$ is at most
+$A \, |B(0, \rho)| \, 2^n 2^{-i(N - n)} M g(x)$, and the geometric series sums to the bound.
+(3) is (2) with $\rho = 2^{-j}$: $(1 + 2^j \|y\|)^{-N} \leq 1$, and
+$(1 + 2^j \|y\|)^{-N} \leq (2^{-j} / \|y\|)^N$, and $2^{jn} |B(0, 2^{-j})| = |B(0, 1)|$.
+\end{proof}
+
+Only the integral of $g$ over subsets of $V$ enters, so the lemma holds for all $K$ and $g$, and
+$C_{n,N}$ is the same for every level $j$.
+
+\begin{theorem}[Weighted weak type $(1,1)$]
+\label{thm:maximal-weak-type}
+\lean{Rd.setLIntegral_closedBall_le_maximal, Rd.mul_setLIntegral_closedBall_le, Rd.bigBallSet,
+  Rd.bigBallSet_mono, Rd.setOf_lt_maximal_subset, Rd.mul_setLIntegral_bigBallSet_le,
+  Rd.setLIntegral_maximal_gt_le, Rd.volume_maximal_gt_le}
+\leanok
+\uses{def:maximal-function, lem:maximal-function-basic}
+For all $g, w : V \to [0, \infty]$ and every $t \in (0, \infty]$,
+\[
+  \int_{\{M g > t\}} w(x) \, dx \leq \frac{5^n}{t} \int g(x) \, M w(x) \, dx,
+  \qquad
+  |\{M g > t\}| \leq \frac{5^n}{t} \int g(x) \, dx .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The second inequality is the first for $w = 1$, since $M 1 = 1$. For $t = \infty$ the level set
+is empty. For $t < \infty$ and $R > 0$ let $E_R$ be the set of $x$ with a radius
+$0 < r \leq R$ such that $t \, |B(0, r)| < \int_{B(x, r)} g$. If $M g(x) > t$, some radius
+$r$ satisfies this, so $\{M g > t\}$ is the increasing union of the sets $E_N$, $N \in \N$, and
+it suffices to show $t \int_{E_R} w \leq 5^n \int g \, M w$ for every $R$.
+
+Choose such a radius $r_x \leq R$ for every $x \in E_R$. Vitali's covering lemma (Mathlib's
+\texttt{Vitali.\allowbreak exists\_disjoint\_subfamily\_\allowbreak
+covering\_enlargement\_closedBall}) gives a
+set $U \subseteq E_R$ such that the balls $\bar B(b, r_b)$, $b \in U$, are pairwise disjoint and
+the balls $\bar B(b, 4 r_b)$ cover $E_R$; $U$ is countable, since the disjoint open balls
+$B(b, r_b)$ are nonempty. For $b \in U$ and $y \in B(b, r_b)$,
+$\bar B(b, 4 r_b) \subseteq B(y, 5 r_b)$, so
+$W_b = \int_{\bar B(b, 4 r_b)} w \leq 5^n |B(0, r_b)| \, M w(y)$. Hence
+\[
+  t \, |B(0, r_b)| \, W_b \leq W_b \int_{B(b, r_b)} g
+  \leq 5^n |B(0, r_b)| \int_{B(b, r_b)} g \, M w ,
+\]
+and after division by $|B(0, r_b)|$ the sum over $b \in U$ gives
+$t \int_{E_R} w \leq \sum_b t \, W_b \leq 5^n \int g \, M w$, as the balls $B(b, r_b)$ are
+disjoint.
+\end{proof}
+
+The theorem holds for all $g$ and $w$: the radii are bounded by $R$ on each $E_R$, and the
+exhaustion in $R$ takes the place of a bound of the radii by $\int g$.
+
+\begin{theorem}[Weighted strong type and the Hardy--Littlewood maximal theorem]
+\label{thm:maximal-strong-type}
+\lean{Rd.maximalConst, Rd.maximalConst_ne_top, Rd.setLIntegral_maximal_gt_le_indicator,
+  Rd.withDensity_maximal_gt_mul_le, Rd.measurable_indicator_half_lt,
+  MeasureTheory.lintegral_Ioi_indicator_half_lt_mul_rpow,
+  Rd.lintegral_Ioi_lintegral_indicator_mul_rpow,
+  Rd.lintegral_maximal_rpow_mul_le_of_measurable, Rd.lintegral_maximal_rpow_mul_le,
+  Rd.maximalConst_ne_zero, Rd.eLpNorm_maximal_le, Rd.maximal_lt_top_ae}
+\leanok
+\uses{thm:maximal-weak-type, lem:maximal-function-basic, lem:maximal-function-measurable,
+  lem:layer-cake, lem:power-integrals}
+Let $1 < p < \infty$ and $C_{n,p} = p \, 2^p \, 5^n / (p - 1)$. For all almost everywhere
+measurable $g, w : V \to [0, \infty]$,
+\[
+  \int (M g)^p \, w \leq C_{n,p} \int g^p \, M w .
+\]
+For every $g : V \to [0, \infty]$,
+\[
+  \|M g\|_p \leq C_{n,p}^{1/p} \|g\|_p .
+\]
+For every $g : V \to [0, \infty]$ with $\|g\|_p < \infty$, $M g$ is finite almost everywhere.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Changing $g$ or $w$ on a null set changes neither side, so let $g$ and $w$ be measurable, and let
+$\nu$ be the measure $w(x) \, dx$. By \Cref{lem:layer-cake},
+$\int (M g)^p w = p \int_0^\infty \nu(\{M g > t\}) \, t^{p-1} \, dt$. For $t > 0$,
+$M g \leq M(\mathbf 1_{\{g > t/2\}} g) + t/2$ by \Cref{lem:maximal-function-basic}, so
+$\{M g > t\} \subseteq \{M(\mathbf 1_{\{g > t/2\}} g) > t/2\}$ and \Cref{thm:maximal-weak-type}
+gives
+\[
+  \nu(\{M g > t\}) \leq \frac{2 \cdot 5^n}{t} \int_{\{g > t/2\}} g \, M w .
+\]
+By Tonelli's theorem and \Cref{lem:power-integrals} with $r = p - 2 > -1$,
+\[
+  \int_0^\infty t^{p-2} \int_{\{g > t/2\}} g \, M w \, dx \, dt
+  = \int g \, M w \, \frac{(2 g)^{p-1}}{p - 1} \, dx
+  = \frac{2^{p-1}}{p - 1} \int g^p \, M w ,
+\]
+which gives the weighted bound. For $w = 1$, $M w = 1$, and taking $p$-th roots gives the bound
+in $L_p$ for almost everywhere measurable $g$; for every other $g$, $\|g\|_p = \infty$ in
+Mathlib, and $C_{n,p} > 0$ makes the right side infinite. If $\|g\|_p < \infty$, then
+$\int (M g)^p < \infty$, so $M g < \infty$ almost everywhere.
+\end{proof}
+
+The weighted bound holds for every almost everywhere measurable $g$, with both sides possibly
+infinite; this is what the duality argument for the Fefferman--Stein inequality uses, where it is
+applied at an exponent other than $p$.
+
+\section{The Calder\'on--Zygmund decomposition}
+
+The Calder\'on--Zygmund decomposition splits $V$ at a height $t$ into a union $\Omega$ of disjoint
+dyadic cubes, on which $G$ has average comparable to $t$, and its complement, on which $G \leq t$
+almost everywhere if $n \geq 1$, $t > 0$ and $G$ is almost everywhere measurable with
+$\int G < \infty$. The Fefferman--Stein inequality applies it to the $\ell_q$ norm of a family
+of functions. As in \Cref{def:dyadic-cubes}, $Q_{k,m}$ is the dyadic cube of level $k$ and
+index $m$, $m^{(l)}$ the index of its ancestor $l$ levels up (\Cref{lem:dyadic-cubes-nested}),
+and $G_Q$ the average of $G$ over $Q$. Throughout, $G : V \to [0, \infty]$ and
+$t \in [0, \infty]$; a cube $Q$ is \emph{big} if $G_Q > t$.
+
+\begin{lemma}[Coarse cubes are not big]
+\label{lem:coarse-cubes-not-big}
+\lean{Rd.lt_setLAverage_zcell_iff, Rd.exists_forall_setLAverage_zcell_sub_le}
+\leanok
+\uses{def:dyadic-cubes, lem:dyadic-cubes, lem:dyadic-cubes-nested}
+For every $G : V \to [0, \infty]$, every $t \in [0, \infty]$ and every cube $Q$, $G_Q > t$ holds
+if and only if $t \, |Q| < \int_Q G$. If $n \geq 1$, then for every $G : V \to [0, \infty]$ with
+$\int G < \infty$, every $t \in (0, \infty]$ and every $k \in \Z$ there is $B \in \N$ such that
+$G_{Q_{k-l,m'}} \leq t$ for every integer $l > B$ and every $m' \in \Z^n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:dyadic-cubes}, $G_Q = |Q|^{-1} \int_Q G$ with $0 < |Q| < \infty$. For $t = \infty$
+no cube is big. For $t < \infty$ choose $B \in \N$ with $\int G < B \, t \, |Q_{k,0}|$. For
+$l > B$, $2^{ln} \geq 2^l > B$ since $n \geq 1$, so by \Cref{lem:dyadic-cubes-nested}
+$t \, |Q_{k-l,m'}| = 2^{ln} \, t \, |Q_{k,0}| > \int G \geq \int_{Q_{k-l,m'}} G$.
+\end{proof}
+
+For $n = 0$ the space $V$ is a single point and every cube is $V$, so the last statement needs
+$n \geq 1$.
+
+\begin{definition}[Maximal big cubes and the exceptional sets]
+\label{def:calderon-zygmund-cubes}
+\lean{Rd.czMaximal, Rd.czMaximal_countable, Rd.czSet, Rd.czEnlarged, Rd.measurableSet_czSet,
+  Rd.measurableSet_czEnlarged, Rd.zcell_subset_czSet, Rd.czSet_subset_czEnlarged}
+\leanok
+\uses{def:dyadic-cubes, lem:dyadic-cubes, lem:dyadic-cubes-nested}
+A pair $(k, m) \in \Z \times \Z^n$ is a maximal big cube of $G$ at height $t$ if
+$G_{Q_{k,m}} > t$ and $G_{Q_{k-l,m^{(l)}}} \leq t$ for every integer $l \geq 1$. The exceptional
+set $\Omega$ is the union of the maximal big cubes $Q_{k,m}$, and the enlarged exceptional set is
+\[
+  \Omega^* = \bigcup_{(k, m) \text{ maximal big}} \bar B\bigl(c_{k,m}, 2 n 2^{-k}\bigr) .
+\]
+There are countably many maximal big cubes, $\Omega$ and $\Omega^*$ are measurable, and every
+maximal big cube lies in $\Omega \subseteq \Omega^*$.
+\end{definition}
+
+The inclusion $\Omega \subseteq \Omega^*$ holds since $Q_{k,m} \subseteq \bar B(c_{k,m}, n 2^{-k})$
+by \Cref{lem:dyadic-cubes}; the factor $2$ in the radius keeps every point outside $\Omega^*$ at
+a distance greater than $n 2^{-k}$ from each maximal big cube $Q_{k,m}$.
+
+\begin{theorem}[Calder\'on--Zygmund decomposition]
+\label{thm:calderon-zygmund}
+\lean{Rd.exists_maximal_of_big, Rd.czMaximal_disjoint_of_le, Rd.czMaximal_pairwiseDisjoint,
+  Rd.subsingleton_czMaximal_mem_zcell, Rd.cz_avg_gt, Rd.cz_avg_le, Rd.cz_volume_zcell_le,
+  Rd.cz_volume_le, Rd.cz_ae_le_of_notMem}
+\leanok
+\uses{def:dyadic-cubes, lem:dyadic-cubes, lem:dyadic-cubes-nested, def:calderon-zygmund-cubes,
+  lem:coarse-cubes-not-big, thm:lebesgue-differentiation-cubes}
+For every $G : V \to [0, \infty]$ and every $t \in [0, \infty]$, with $0^{-1} = \infty$, the
+maximal big cubes of $G$ at height $t$ are pairwise disjoint, every point of $V$ lies in at most
+one of them, every maximal big cube $Q$ satisfies
+\[
+  t < G_Q \leq 2^n t, \qquad |Q| \leq t^{-1} \int_Q G,
+\]
+and $|\Omega| \leq t^{-1} \int G$. If moreover $n \geq 1$, $\int G < \infty$ and $t > 0$, then
+every big cube $Q_{k,m}$ lies in a maximal big cube $Q_{k-l,m^{(l)}}$ for some $l \in \N$, and if
+in addition $G$ is almost everywhere measurable, then $G(x) \leq t$ for almost every
+$x \in V \setminus \Omega$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $Q_{k,m}$ and $Q_{k',m'}$ be distinct maximal big cubes with $k \leq k'$. For $k = k'$ they
+are distinct cubes of one level, hence disjoint. For $k' = k + l$ with $l \geq 1$, the cube
+$Q_{k',m'}$ lies in its ancestor $Q_{k,m'^{(l)}}$, which is not big by maximality, so
+$m'^{(l)} \neq m$ and the two cubes of level $k$ are disjoint. The bound $G_Q > t$ is the
+definition. The parent $P$ of $Q$ is not big and $|P| = 2^n |Q|$, so
+$\int_Q G \leq \int_P G \leq t \, |P| = 2^n t \, |Q|$. From $t \, |Q| < \int_Q G$ follows
+$|Q| \leq t^{-1} \int_Q G$, for $t = 0$ since then $\int_Q G > 0$ and the right side is
+$\infty$, and summing over the disjoint maximal cubes gives
+$|\Omega| \leq t^{-1} \int_\Omega G \leq t^{-1} \int G$.
+
+Let $Q_{k,m}$ be big. By \Cref{lem:coarse-cubes-not-big} the set of $l \in \N$ with
+$Q_{k-l,m^{(l)}}$ big is bounded and contains $0$; for its largest element $l_0$ the cube
+$Q_{k-l_0,m^{(l_0)}}$ is a maximal big cube, since its ancestors are the cubes
+$Q_{k-l,m^{(l)}}$ with $l > l_0$, and it contains $Q_{k,m}$ by \Cref{lem:dyadic-cubes-nested}.
+Hence for $x \notin \Omega$ no cube $Q_k(x)$, $k \in \N$, is big, so $G_{Q_k(x)} \leq t$ for
+all $k$, and \Cref{thm:lebesgue-differentiation-cubes} gives $G(x) \leq t$ for almost every
+such $x$.
+\end{proof}
+
+\section{The Fefferman--Stein inequality}
+
+The Fefferman--Stein inequality bounds the $L_p(\ell_q)$ norm of a family of maximal functions
+by the $L_p(\ell_q)$ norm of the family. As in the previous sections, $V$ has dimension $n$, all
+functions take values in $[0, \infty]$, and $g = (g_j)_{j \in \N}$ is a family of almost
+everywhere measurable functions $g_j : V \to [0, \infty]$. Write
+\[
+  G(x) = \|(g_j(x))_j\|_{\ell_q}, \qquad \overline M g(x) = \|(M g_j(x))_j\|_{\ell_q}
+\]
+for the pointwise $\ell_q$ norms of the family and of its maximal functions.
+The cases $q = \infty$ and $q = p$ follow from the maximal theorem one function at a time. The
+case $q < p$ is a duality argument with the weighted strong type, and the case $p < q$ an
+interpolation between the case $q = p$ and a vector-valued weak type $(1,1)$, whose proof
+combines the Calder\'on--Zygmund decomposition of $G$ with the positivity of $M$. This is the
+pattern of the original proof by Fefferman and Stein~\cite{FeffermanStein}.
+
+\begin{lemma}[The maximal function off enlarged sets]
+\label{lem:maximal-off-enlarged}
+\lean{Metric.subset_ball_three_mul_of_inter_nonempty, Rd.setLIntegral_inter_ball_le,
+  Rd.maximal_indicator_iUnion_le}
+\leanok
+\uses{def:maximal-function}
+Let $I$ be a countable set, and for every $i \in I$ let $Q_i \subseteq \bar B(c_i, \rho_i)$ be
+a measurable set with $0 < |Q_i| < \infty$. For every $g : V \to [0, \infty]$ and every
+$x \in V$ with $x \notin \bar B(c_i, 2 \rho_i)$ for all $i \in I$,
+\[
+  M\bigl(\mathbf 1_{\bigcup_i Q_i} \, g\bigr)(x)
+  \leq 3^n \, M\Bigl( \sum_{i \in I} \Bigl( \frac{1}{|Q_i|} \int_{Q_i} g \Bigr)
+    \mathbf 1_{Q_i} \Bigr)(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Let $r > 0$. If the ball $B(x, r)$ meets $Q_i$ in a point $y$, then
+$r > \|x - y\| \geq \|x - c_i\| - \rho_i > \rho_i$, and every $z \in Q_i$ satisfies
+$\|x - z\| < r + 2 \rho_i < 3 r$, so $Q_i \subseteq B(x, 3r)$. Write $\tilde g$ for the sum on
+the right and $g_{Q_i}$ for the mean of $g$ over $Q_i$. Hence, by the subadditivity of the
+integral over a union,
+\begin{multline*}
+  \int_{B(x, r)} \mathbf 1_{\bigcup_i Q_i} \, g
+  \leq \sum_{i \in I} \int_{Q_i \cap B(x, r)} g
+  \leq \sum_{i \in I} g_{Q_i} \, |Q_i \cap B(x, 3r)| \\
+  = \int_{B(x, 3r)} \tilde g
+  \leq |B(0, 3r)| \, M \tilde g(x),
+\end{multline*}
+where the $i$-th integral of the first sum vanishes if $Q_i$ misses $B(x, r)$ and is at most
+$\int_{Q_i} g = g_{Q_i} |Q_i|$ otherwise.
+Since $|B(0, 3r)| = 3^n |B(0, r)|$, the bound holds for every $r$, hence for the supremum.
+\end{proof}
+
+The bound holds for arbitrary, possibly overlapping sets $Q_i$ and every
+$g : V \to [0, \infty]$.
+
+\begin{definition}[Calder\'on--Zygmund averages and good parts]
+\label{def:calderon-zygmund-good-part}
+\lean{Rd.czAverage, Rd.measurable_czAverage, Rd.czGood, Rd.aemeasurable_czGood}
+\leanok
+\uses{def:calderon-zygmund-cubes}
+Let $G : V \to [0, \infty]$, $t \in [0, \infty]$, and let $\Omega$ be the exceptional set of
+the maximal big cubes of $G$ at height $t$. For $h : V \to [0, \infty]$ the
+Calder\'on--Zygmund averages and the good part of $h$ are
+\[
+  A h = \sum_{Q \text{ maximal big}} h_Q \, \mathbf 1_Q,
+  \qquad
+  \mathcal G h = \mathbf 1_{V \setminus \Omega} \, h + A h,
+\]
+with the means $h_Q$ of $h$ over the cubes. The function $A h$ is measurable, and $\mathcal G h$
+is almost everywhere measurable if $h$ is.
+\end{definition}
+
+\begin{lemma}[Properties of the averages]
+\label{lem:calderon-zygmund-averages}
+\lean{Rd.czAverage_eq_of_mem, Rd.czAverage_eq_zero_of_notMem, Rd.tsum_setLIntegral_czMaximal,
+  Rd.tsum_le_mul_lintegral_of_le_setLIntegral, Rd.lintegral_czAverage, Rd.czAverage_self_le,
+  Rd.maximal_indicator_czSet_le, Rd.volume_closedBall_zcellCenter, Rd.volume_czEnlarged_le}
+\leanok
+\uses{def:calderon-zygmund-good-part, thm:calderon-zygmund, lem:maximal-off-enlarged,
+  lem:dyadic-cubes}
+For every $G : V \to [0, \infty]$, every $t \in [0, \infty]$ and every $h : V \to [0, \infty]$,
+with $0^{-1} = \infty$:
+\begin{enumerate}
+  \item $A h = h_Q$ on every maximal big cube $Q$, and $A h = 0$ outside $\Omega$;
+  \item $\sum_Q \int_Q h = \int_\Omega h$, the sum over the maximal big cubes, and every family of
+    numbers $a_Q \in [0, \infty]$ with $a_Q \leq c \int_Q h$ for all maximal big cubes $Q$ and
+    some $c \in [0, \infty]$ satisfies $\sum_Q a_Q \leq c \int h$;
+  \item $\int A h = \int_\Omega h$, and $A G \leq 2^n t$;
+  \item $M(\mathbf 1_\Omega h)(x) \leq 3^n M(A h)(x)$ for every $x \notin \Omega^*$;
+  \item $|\Omega^*| \leq (2n)^n \, |B(0, 1)| \, t^{-1} \int G$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The maximal big cubes are disjoint, so at a point of $\Omega$ only one term of $A h$ survives,
+$\sum_Q \int_Q h = \int_\Omega h$, and then $\sum_Q a_Q \leq c \int_\Omega h \leq c \int h$ and
+$\int A h = \sum_Q h_Q |Q| = \sum_Q \int_Q h = \int_\Omega h$. The bound $G_Q \leq 2^n t$ is
+\Cref{thm:calderon-zygmund}. Every maximal big cube $Q_{k,m}$ lies in
+$\bar B(c_{k,m}, n 2^{-k})$ by \Cref{lem:dyadic-cubes}, so (4) is
+\Cref{lem:maximal-off-enlarged}. Finally
+$|\bar B(c_{k,m}, 2 n 2^{-k})| = (2n)^n |B(0,1)| \, |Q_{k,m}|$, and the sum over the disjoint
+maximal big cubes is $(2n)^n |B(0,1)| \, |\Omega| \leq (2n)^n |B(0,1)| \, t^{-1} \int G$.
+\end{proof}
+
+\begin{lemma}[Means of $\ell_q$-valued functions]
+\label{lem:lq-norm-means}
+\lean{MeasureTheory.lqNorm_laverage_le, MeasureTheory.measurable_lqNorm_comp}
+\leanok
+\uses{lem:minkowski-integral-lq, lem:lp-norm-nonnegative}
+For every measure space $(X, \mu)$, every $1 \leq u \leq \infty$, every countable set $I$ and
+every family of almost everywhere measurable functions $g_i : X \to [0, \infty]$, $i \in I$,
+\[
+  \Bigl\| \Bigl( \frac{1}{\mu(X)} \int g_i \, d\mu \Bigr)_i \Bigr\|_{\ell_u}
+  \leq \frac{1}{\mu(X)} \int \|(g_i(x))_i\|_{\ell_u} \, d\mu(x) .
+\]
+If every $g_i$ is measurable, then so is $x \mapsto \|(g_i(x))_i\|_{\ell_u}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The mean is the integral for the measure $\mu(X)^{-1} \mu$, so the inequality is
+\Cref{lem:minkowski-integral-lq}. The measurability is that of a countable supremum or a power of
+a series.
+\end{proof}
+
+\begin{lemma}[The good parts]
+\label{lem:calderon-zygmund-good-parts}
+\lean{Rd.lintegral_czGood, Rd.ae_czGood_self_le, Rd.lqNorm_czGood_le, Rd.ae_lqNorm_czGood_le,
+  Rd.lintegral_lqNorm_czGood_le, Rd.maximal_le_maximal_czGood,
+  MeasureTheory.lintegral_rpow_le_mul_lintegral_of_ae_le, Rd.lintegral_lqNorm_czGood_rpow_le}
+\leanok
+\uses{def:calderon-zygmund-good-part, lem:calderon-zygmund-averages, lem:lq-norm-means,
+  thm:calderon-zygmund, lem:maximal-function-basic, lem:lp-norm-nonnegative}
+Let $1 \leq q \leq \infty$ and let $\mathcal G$ be the good part for the decomposition of some
+$G' : V \to [0, \infty]$ at a height $t$. Every $h : V \to [0, \infty]$ satisfies
+$\int \mathcal G h = \int h$. If $n \geq 1$, $G'$ is almost everywhere measurable,
+$\int G' < \infty$ and $t > 0$, then $\mathcal G G'(x) \leq 2^n t$ for almost every $x \in V$.
+For every family of almost everywhere measurable
+$g_j : V \to [0, \infty]$, $j \in \N$, every $x \in V$ satisfies
+\[
+  \|(\mathcal G g_j(x))_j\|_{\ell_q} \leq \mathbf 1_{V \setminus \Omega}(x) \, G(x) + A G(x),
+\]
+and
+\[
+  \int \|(\mathcal G g_j(x))_j\|_{\ell_q} \, dx \leq \int G .
+\]
+For every almost everywhere measurable $h : V \to [0, \infty]$ and every
+$x \notin \Omega^*$, $M h(x) \leq (1 + 3^n) \, M(\mathcal G h)(x)$. If moreover $n \geq 1$,
+$G' = G$, $\int G < \infty$ and $t > 0$, then $\|(\mathcal G g_j(x))_j\|_{\ell_q} \leq 2^n t$
+for almost every $x$, and for $1 < q < \infty$
+\[
+  \int \|(\mathcal G g_j(x))_j\|_{\ell_q}^q \, dx \leq (2^n t)^{q-1} \int G .
+\]
+For every measure space $(X, \mu)$, every $r \geq 1$, every $c \in [0, \infty]$ and every
+almost everywhere measurable $u : X \to [0, \infty]$ with $u \leq c$ almost everywhere,
+$\int u^r \, d\mu \leq c^{r-1} \int u \, d\mu$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:calderon-zygmund-averages},
+$\int \mathcal G h = \int_{V \setminus \Omega} h + \int A h = \int_{V \setminus \Omega} h
++ \int_\Omega h = \int h$. Outside $\Omega$, $\mathcal G G' = G' \leq t$ almost everywhere by
+\Cref{thm:calderon-zygmund}; on a maximal big cube $Q$, $\mathcal G G' = G'_Q \leq 2^n t$.
+Off $\Omega$ the good parts are the functions $g_j$ themselves. On a maximal big cube $Q$ they
+are the means $(g_j)_Q$, and \Cref{lem:lq-norm-means} gives
+$\|((g_j)_Q)_j\|_{\ell_q} \leq G_Q = A G$, so the left side is at most $\mathcal G G$, whose
+integral is $\int G$. For $x \notin \Omega^*$,
+$h = \mathbf 1_{V \setminus \Omega} h + \mathbf 1_\Omega h$, the first part is at most
+$\mathcal G h$, and $M(\mathbf 1_\Omega h)(x) \leq 3^n M(A h)(x) \leq 3^n M(\mathcal G h)(x)$.
+For $G' = G$ the pointwise bound gives $\|(\mathcal G g_j(x))_j\|_{\ell_q} \leq \mathcal G G(x)
+\leq 2^n t$ for almost every $x$. Finally $u^r = u \, u^{r-1} \leq c^{r-1} u$ almost everywhere,
+which with $u = \|(\mathcal G g_j)_j\|_{\ell_q}$, $r = q$ and $c = 2^n t$ gives the bound of the
+$q$-th power.
+\end{proof}
+
+\begin{lemma}[The case $q = p$ in integral form]
+\label{lem:fefferman-stein-diagonal}
+\lean{Rd.lintegral_maximal_rpow_le, Rd.lintegral_lqNorm_maximal_rpow_le}
+\leanok
+\uses{thm:maximal-strong-type, lem:lp-norm-nonnegative, lem:maximal-function-measurable}
+For every $p > 1$ and every almost everywhere measurable $g : V \to [0, \infty]$,
+$\int (M g)^p \leq C_{n,p} \int g^p$. For every $1 < q < \infty$ and every family of almost
+everywhere measurable $g_j : V \to [0, \infty]$, $j \in \N$,
+\[
+  \int \|(M g_j(x))_j\|_{\ell_q}^q \, dx \leq C_{n,q} \int \|(g_j(x))_j\|_{\ell_q}^q \, dx .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first bound is \Cref{thm:maximal-strong-type} with $w = 1$. Both sides of the second are
+$\sum_j \int (\cdot)^q$ by Tonelli's theorem, and the first bound applies to each $j$.
+\end{proof}
+
+\begin{theorem}[Vector-valued weak type $(1,1)$]
+\label{thm:vector-weak-type}
+\lean{Rd.weakTypeConst, Rd.weakTypeConst_ne_top, Rd.volume_lt_mul_lqNorm_maximal_czGood_le,
+  Rd.volume_lqNorm_maximal_gt_le}
+\leanok
+\uses{lem:calderon-zygmund-good-parts, lem:calderon-zygmund-averages,
+  lem:fefferman-stein-diagonal, def:calderon-zygmund-good-part, lem:maximal-function-measurable,
+  lem:lq-norm-means}
+Let $n \geq 1$, $1 < q < \infty$ and
+$C^{\mathrm w}_{n,q} = (2n)^n |B(0,1)| + (1 + 3^n)^q \, 2^{n(q-1)} \, C_{n,q}$. For every family
+of almost everywhere measurable $g_j : V \to [0, \infty]$ with $\int G < \infty$ and every
+$0 < t < \infty$,
+\[
+  \bigl|\{x : \|(M g_j(x))_j\|_{\ell_q} > t\}\bigr| \leq \frac{C^{\mathrm w}_{n,q}}{t} \int G .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Decompose $G$ at height $t$. Off $\Omega^*$, \Cref{lem:calderon-zygmund-good-parts} gives
+$\overline M g \leq (1 + 3^n) \|(M(\mathcal G g_j))_j\|_{\ell_q}$, so the level set lies in the
+union of $\Omega^*$ and the set $E$ where the right side exceeds $t$. By Chebyshev's inequality,
+\Cref{lem:fefferman-stein-diagonal} and \Cref{lem:calderon-zygmund-good-parts},
+\[
+  t^q |E| \leq (1 + 3^n)^q \, C_{n,q} \int \|(\mathcal G g_j(x))_j\|_{\ell_q}^q \, dx
+  \leq (1 + 3^n)^q \, C_{n,q} \, (2^n t)^{q-1} \int G,
+\]
+and \Cref{lem:calderon-zygmund-averages} bounds $|\Omega^*|$.
+\end{proof}
+
+\begin{lemma}[Splitting at a level]
+\label{lem:fefferman-stein-split}
+\lean{ENNReal.lqNorm_indicator, Rd.lqNorm_maximal_le_indicator_add,
+  Rd.volume_lqNorm_maximal_gt_le_split, Rd.volume_lqNorm_maximal_gt_mul_rpow_le}
+\leanok
+\uses{thm:vector-weak-type, lem:fefferman-stein-diagonal, lem:maximal-function-basic,
+  lem:maximal-function-measurable, lem:lq-norm-means, lem:parts-above-below-level,
+  lem:marcinkiewicz-level}
+Let $n \geq 1$ and $1 < q < \infty$. For every family of almost everywhere measurable
+$g_j : V \to [0, \infty]$, $j \in \N$, every measurable $S \subseteq V$ with
+$\int_S G < \infty$ and every $0 < s < \infty$,
+\[
+  \bigl|\{\overline M g > s\}\bigr|
+  \leq \frac{2 C^{\mathrm w}_{n,q}}{s} \int_S G + \frac{2^q C_{n,q}}{s^q} \int_{V \setminus S} G^q .
+\]
+For every $p > 1$, every family of measurable
+$g_j : V \to [0, \infty]$, $j \in \N$, with $\int G^p < \infty$ and every $\tau > 0$,
+\[
+  \bigl|\{\overline M g > \tau\}\bigr| \, \tau^{p-1}
+  \leq 2 C^{\mathrm w}_{n,q} \, \tau^{p-2} \int_{\{G > \tau\}} G
+    + 2^q C_{n,q} \, \tau^{p-1-q} \int_{\{G \leq \tau\}} G^q .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The pointwise $\ell_q$ norm of $(\mathbf 1_S g_j)_j$ is $\mathbf 1_S G$. Since
+$g_j = \mathbf 1_S g_j + \mathbf 1_{V \setminus S} g_j$, the subadditivity of $M$ and
+Minkowski's inequality in $\ell_q$ give
+$\overline M g \leq \overline M(\mathbf 1_S g) + \overline M(\mathbf 1_{V \setminus S} g)$, so
+$\{\overline M g > s\}$ lies in
+$\{\overline M(\mathbf 1_S g) > s/2\} \cup \{\overline M(\mathbf 1_{V \setminus S} g) > s/2\}$.
+\Cref{thm:vector-weak-type} bounds the first set, Chebyshev's inequality and
+\Cref{lem:fefferman-stein-diagonal} the second. The last bound is the first for
+$S = \{G > \tau\}$, on which $G$ is integrable by \Cref{lem:parts-above-below-level}, with
+$(\tau/2)^{-1} \tau^{p-1} = 2 \tau^{p-2}$ and $(\tau/2)^{-q} \tau^{p-1} = 2^q \tau^{p-1-q}$
+(\Cref{lem:marcinkiewicz-level}).
+\end{proof}
+
+\begin{theorem}[The case $p < q$]
+\label{thm:fefferman-stein-interpolation}
+\lean{Rd.interpolationConst, Rd.interpolationConst_ne_top, Rd.interpolationConst_ne_zero,
+  Rd.lintegral_lqNorm_maximal_rpow_le_of_lt_of_measurable,
+  Rd.lintegral_lqNorm_maximal_rpow_le_of_lt}
+\leanok
+\uses{lem:fefferman-stein-split, lem:tonelli-steps-measure-space, lem:layer-cake,
+  lem:maximal-function-basic, lem:maximal-function-measurable, lem:lq-norm-means}
+Let $n \geq 1$, $1 < p < q < \infty$ and
+\[
+  C^{\mathrm i}_{n,p,q} = p \Bigl( \frac{2 C^{\mathrm w}_{n,q}}{p - 1}
+    + \frac{2^q C_{n,q}}{q - p} \Bigr) .
+\]
+For every family of almost everywhere measurable $g_j : V \to [0, \infty]$,
+\[
+  \int \|(M g_j(x))_j\|_{\ell_q}^p \, dx \leq C^{\mathrm i}_{n,p,q} \int G^p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Replacing each $g_j$ by a measurable function equal to it almost everywhere leaves both sides
+unchanged. Let $\int G^p < \infty$. By \Cref{lem:layer-cake},
+$\int (\overline M g)^p = p \int_0^\infty |\{\overline M g > \tau\}| \, \tau^{p-1} \, d\tau$, and
+\Cref{lem:fefferman-stein-split} bounds the integrand. \Cref{lem:tonelli-steps-measure-space} with
+$r = q$ evaluates the two resulting integrals.
+\end{proof}
+
+\begin{theorem}[The case $q < p$]
+\label{thm:fefferman-stein-duality}
+\lean{Rd.dualityConst, Rd.dualityConst_ne_top, Rd.dualityConst_ne_zero,
+  Rd.lintegral_rpow_sum_maximal_ne_top, Rd.lintegral_rpow_sum_maximal_le_mul,
+  Rd.lintegral_rpow_sum_maximal_le, Rd.lintegral_lqNorm_maximal_rpow_le_of_gt}
+\leanok
+\uses{thm:maximal-strong-type, lem:fefferman-stein-diagonal, lem:cancel-conjugate-power,
+  lem:maximal-function-measurable}
+Let $1 < q < p < \infty$, $u = p/q$, $u' = p/(p - q)$ and
+$C^{\mathrm d}_{n,p,q} = \bigl( C_{n,q} \, C_{n,u'}^{1/u'} \bigr)^{u}$. For every finite set
+$S \subseteq \N$ and every family of almost everywhere measurable $g_j : V \to [0, \infty]$,
+\[
+  \int \Bigl( \sum_{j \in S} (M g_j)^q \Bigr)^{p/q}
+  \leq C^{\mathrm d}_{n,p,q} \int \Bigl( \sum_{j \in S} g_j^q \Bigr)^{p/q}
+\]
+and
+\[
+  \int \|(M g_j(x))_j\|_{\ell_q}^p \, dx \leq C^{\mathrm d}_{n,p,q} \int G^p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $A = \int (\sum_{j \in S} g_j^q)^u < \infty$, $H = \sum_{j \in S} (M g_j)^q$ and
+$X = \int H^u$. Each $g_j^p$ is at most $(\sum_{j \in S} g_j^q)^u$, so by the maximal theorem
+and $(\sum_{j \in S} a_j)^u \leq |S|^{u-1} \sum_{j \in S} a_j^u$, $X < \infty$. With
+$w = H^{u-1}$, $\int w^{u'} = X$, and the weighted strong type of \Cref{thm:maximal-strong-type}
+at the exponent $q$, H\"older's inequality and the maximal theorem in $L_{u'}$ give
+\[
+  X = \sum_{j \in S} \int (M g_j)^q \, w
+  \leq C_{n,q} \int \Bigl( \sum_{j \in S} g_j^q \Bigr) M w
+  \leq C_{n,q} \, A^{1/u} \, \bigl( C_{n,u'} X \bigr)^{1/u'} ,
+\]
+and \Cref{lem:cancel-conjugate-power} gives the first bound. Since
+$\|a\|_{\ell_q}^p = \sup_J (\sum_{j < J} a_j^q)^{p/q}$, the monotone convergence theorem gives the
+second.
+\end{proof}
+
+The duality argument works in every dimension and rests on the weighted strong type alone;
+that bound is used at the exponent $q$ for functions known only to lie in $L_p$.
+
+\begin{theorem}[Fefferman--Stein inequality]
+\label{thm:fefferman-stein}
+\lean{Rd.feffermanStein_top,
+  Rd.feffermanStein_self, Rd.feffermanStein_of_gt, Rd.feffermanStein_of_lt,
+  Rd.feffermanSteinConst, Rd.feffermanSteinConst_ne_top, Rd.feffermanStein}
+\leanok
+\uses{thm:fefferman-stein-duality, thm:fefferman-stein-interpolation,
+  lem:fefferman-stein-diagonal, thm:maximal-strong-type, lem:maximal-function-basic,
+  lem:maximal-function-measurable, lem:lq-norm-means, lem:lp-norm-nonnegative,
+  lem:lp-norm-from-power-integrals}
+Let $1 < p < \infty$ and $1 < q \leq \infty$, and let $C_{n,p,q}$ be $1$ for $n = 0$, and
+otherwise $C_{n,p}^{1/p}$ for $q \in \{p, \infty\}$, $(C^{\mathrm d}_{n,p,q})^{1/p}$ for $q < p$
+and $(C^{\mathrm i}_{n,p,q})^{1/p}$ for $p < q < \infty$. Then $C_{n,p,q} < \infty$, and for
+every family of almost everywhere measurable $g_j : V \to [0, \infty]$, $j \in \N$,
+\[
+  \Bigl\| x \mapsto \|(M g_j(x))_j\|_{\ell_q} \Bigr\|_p
+  \leq C_{n,p,q} \Bigl\| x \mapsto \|(g_j(x))_j\|_{\ell_q} \Bigr\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $n = 0$, $M g_j = g_j$ by \Cref{lem:maximal-function-basic}. For $q = \infty$,
+$M g_j \leq M(\sup_k g_k)$ for every $j$, and \Cref{thm:maximal-strong-type} applies to
+$\sup_k g_k$; for every other $q$ the bound is the $p$-th root of
+\Cref{lem:fefferman-stein-diagonal} ($q = p$), \Cref{thm:fefferman-stein-duality} ($q < p$) or
+\Cref{thm:fefferman-stein-interpolation} ($p < q$), by
+\Cref{lem:lp-norm-from-power-integrals}.
+\end{proof}
+
+The case $q = 2$ is the one behind the description of the spaces $H^{s,p}$ by Littlewood--Paley
+blocks (\Cref{sec:bessel-potential-lifting}).
+
+\section{The signed Calder\'on--Zygmund decomposition}
+\label{sec:calderon-zygmund-signed}
+
+The Calder\'on--Zygmund decomposition of \Cref{thm:calderon-zygmund} selects the maximal big
+cubes of a function $G : V \to [0, \infty]$ at a height $t$. This section splits a function
+$f : V \to E$ with values in a real normed space $E$, such as $\C$, along these cubes into a
+good part, which is $f$ outside the exceptional set $\Omega$ and the mean of $f$ on each maximal
+big cube, and a bad part, which is a sum of pieces with mean zero, one on each cube. For
+$G = \|f\|$ the good part is bounded by $2^n t$; for a family $(g_j)_j$ the cubes of
+$G = \|(\|g_j\|)_j\|_{\ell_q}$ serve every $g_j$. The definitions and the bounds on the bad
+pieces hold for the cubes of every $G$. The bounds on the good part follow from a comparison
+with the nonnegative good part of \Cref{def:calderon-zygmund-good-part}, and those on the bad
+pieces from the bound of the norm of a mean in \Cref{lem:norm-mean-square-bound}. As there,
+$V$ has dimension $n$, and for a dyadic cube $Q$ and $f : V \to E$ the mean is
+$f_Q = |Q|^{-1} \int_Q f$, the Bochner integral, which is $0$ when $f$ is not integrable on $Q$.
+For scalar functions this is the decomposition of Calder\'on and
+Zygmund~\cite{CalderonZygmund1952}; see also Stein's book~\cite{SteinSingular}. The Carleson
+project
+\cite{CarlesonBlueprint,CarlesonLean} has a scalar Calder\'on--Zygmund decomposition
+on doubling metric measure spaces.
+
+\begin{lemma}[Means of vector-valued functions]
+\label{lem:norm-mean-square-bound}
+\lean{MeasureTheory.enorm_average_le, MeasureTheory.measure_mul_enorm_setAverage_le,
+  MeasureTheory.setLIntegral_enorm_sub_setAverage_le,
+  MeasureTheory.measure_mul_lqNorm_setAverage_le,
+  MeasureTheory.setLIntegral_lqNorm_sub_setAverage_le,
+  MeasureTheory.lintegral_sq_le_mul_lintegral_of_ae_le}
+\leanok
+\uses{lem:lq-norm-means, lem:lq-basic, lem:calderon-zygmund-good-parts}
+For every measure space $(X, \mu)$, every real normed space $E$ and every $f : X \to E$,
+\[
+  \Bigl\| \frac{1}{\mu(X)} \int f \, d\mu \Bigr\| \leq \frac{1}{\mu(X)} \int \|f\| \, d\mu
+\]
+in $[0, \infty]$. For every set $s \subseteq X$ with $\mu(s) < \infty$ and the mean
+$f_s = \mu(s)^{-1} \int_s f \, d\mu$,
+\[
+  \mu(s) \, \|f_s\| \leq \int_s \|f\| \, d\mu ,
+  \qquad
+  \int_s \|f - f_s\| \, d\mu \leq 2 \int_s \|f\| \, d\mu .
+\]
+For every $1 \leq q \leq \infty$, every such $s$ and every countable family of functions
+$g_i : X \to E$, $i \in I$, that are almost everywhere strongly measurable on $s$,
+\[
+  \mu(s) \, \|(\|(g_i)_s\|)_i\|_{\ell_q} \leq \int_s \|(\|g_i\|)_i\|_{\ell_q} \, d\mu
+\]
+and
+\[
+  \int_s \|(\|g_i - (g_i)_s\|)_i\|_{\ell_q} \, d\mu \leq 2 \int_s \|(\|g_i\|)_i\|_{\ell_q} \, d\mu .
+\]
+For every almost everywhere measurable $u : X \to [0, \infty]$ and every
+$c \in [0, \infty]$ with $u \leq c$ almost everywhere, $\int u^2 \, d\mu \leq c \int u \, d\mu$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both means are integrals for the measure $\mu(X)^{-1} \mu$, and the norm of a Bochner integral
+is at most the integral of the norm. On $s$ this gives
+$\mu(s) \, \|f_s\| \leq \mu(s) \, \|f\|_s = \int_s \|f\|$, and with
+$\|f - f_s\| \leq \|f\| + \|f_s\|$ also
+$\int_s \|f - f_s\| \leq \int_s \|f\| + \mu(s) \, \|f_s\| \leq 2 \int_s \|f\|$. For the family,
+$\|(\|(g_i)_s\|)_i\|_{\ell_q} \leq \|(\|g_i\|_s)_i\|_{\ell_q} \leq \|(\|g_i\|)_i\|_{\ell_q, s}$ by
+\Cref{lem:lq-norm-means}, and Minkowski's inequality in $\ell_q$ (\Cref{lem:lq-basic}) replaces
+the triangle inequality. The last statement is the case $r = 2$ of
+\Cref{lem:calderon-zygmund-good-parts}.
+\end{proof}
+
+\begin{definition}[Signed averages, good parts and bad pieces]
+\label{def:calderon-zygmund-signed}
+\lean{Rd.czAverageC, Rd.hasSum_czAverageC,
+  Rd.stronglyMeasurable_czAverageC, Rd.czGoodC, Rd.aestronglyMeasurable_czGoodC, Rd.czBadC,
+  Rd.czBadPart}
+\leanok
+\uses{def:calderon-zygmund-cubes, def:calderon-zygmund-good-part, thm:calderon-zygmund}
+Let $E$ be a real normed space, $G : V \to [0, \infty]$, $t \in [0, \infty]$, and let $\Omega$
+be the exceptional set of the maximal big cubes of $G$ at height $t$. For $f : V \to E$ the
+signed averages, the good part and the bad part of $f$ are
+\[
+  A f = \sum_{Q \text{ maximal big}} f_Q \, \mathbf 1_Q ,
+  \qquad
+  \mathcal G f = \mathbf 1_{V \setminus \Omega} \, f + A f ,
+  \qquad
+  \mathcal B f = f - \mathcal G f ,
+\]
+and the bad piece of $f$ on a dyadic cube $Q$ is $b_Q f = \mathbf 1_Q \, (f - f_Q)$. The
+series converges at every point, the function $A f$ is strongly measurable, and $\mathcal G f$
+is almost everywhere strongly measurable if $f$ is.
+\end{definition}
+
+Every point lies in at most one maximal big cube (\Cref{thm:calderon-zygmund}), so at most one
+term of the series is nonzero. For functions $h : V \to [0, \infty]$ the same formulas are
+$A h$ and $\mathcal G h$ of \Cref{def:calderon-zygmund-good-part}; the signed versions are
+compared with them through the norm.
+
+\begin{lemma}[Signed averages and good parts]
+\label{lem:calderon-zygmund-signed-good}
+\lean{Rd.czAverageC_eq_of_mem, Rd.czAverageC_eq_zero_of_notMem, Rd.enorm_czAverageC_le,
+  Rd.enorm_czGoodC_le, Rd.lintegral_enorm_czGoodC_le, Rd.integrable_czGoodC}
+\leanok
+\uses{def:calderon-zygmund-signed, lem:calderon-zygmund-averages, lem:norm-mean-square-bound,
+  lem:calderon-zygmund-good-parts}
+For every real normed space $E$, every $G : V \to [0, \infty]$, every $t \in [0, \infty]$ and
+every $f : V \to E$:
+\begin{enumerate}
+  \item $A f = f_Q$ on every maximal big cube $Q$, and $A f = 0$ outside $\Omega$;
+  \item $\|A f(x)\| \leq A \|f\|(x)$ and $\|\mathcal G f(x)\| \leq \mathcal G \|f\|(x)$ for
+    every $x \in V$;
+  \item $\int \|\mathcal G f\| \leq \int \|f\|$, and $\mathcal G f$ is integrable if $f$ is.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+At a point of $\Omega$ only one term of $A f$ survives, and outside $\Omega$ none does. On a
+maximal big cube $Q$, $\|f_Q\| \leq \|f\|_Q$ by \Cref{lem:norm-mean-square-bound}, which gives
+the first bound, and the second follows with the triangle inequality. Integrating it,
+$\int \|\mathcal G f\| \leq \int \mathcal G \|f\| = \int \|f\|$ by
+\Cref{lem:calderon-zygmund-good-parts}.
+\end{proof}
+
+\begin{theorem}[Bounds of the signed good part]
+\label{thm:calderon-zygmund-signed-good-bounds}
+\lean{Rd.ae_enorm_czGoodC_le, Rd.lintegral_enorm_czGoodC_sq_le}
+\leanok
+\uses{lem:calderon-zygmund-signed-good, lem:calderon-zygmund-good-parts,
+  lem:norm-mean-square-bound}
+Let $n \geq 1$. For every real normed space $E$, every integrable $f : V \to E$ and every
+$t \in (0, \infty]$, the good part $\mathcal G f$ for the maximal big cubes of $\|f\|$ at
+height $t$ satisfies
+\[
+  \|\mathcal G f(x)\| \leq 2^n t \quad \text{for almost every } x \in V, \qquad
+  \int \|\mathcal G f\|^2 \leq 2^n t \int \|f\| .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:calderon-zygmund-signed-good}, $\|\mathcal G f\| \leq \mathcal G \|f\|$, which is
+at most $2^n t$ almost everywhere by \Cref{lem:calderon-zygmund-good-parts} with
+$G' = \|f\|$. Then \Cref{lem:norm-mean-square-bound} gives
+$\int \|\mathcal G f\|^2 \leq 2^n t \int \|\mathcal G f\| \leq 2^n t \int \|f\|$.
+\end{proof}
+
+\begin{lemma}[The bad part and its pieces]
+\label{lem:calderon-zygmund-bad-pieces}
+\lean{Rd.czGoodC_add_czBadC, Rd.czBadPart_of_mem, Rd.czBadPart_of_notMem,
+  Rd.czBadC_eq_zero_of_notMem, Rd.czBadC_eq_of_mem, Rd.hasSum_czBadPart, Rd.czBadC_eq_tsum,
+  Rd.integrable_czBadPart, Rd.lintegral_enorm_czBadPart_le, Rd.integrable_czBadC,
+  Rd.lintegral_enorm_czBadC_le}
+\leanok
+\uses{def:calderon-zygmund-signed, lem:calderon-zygmund-signed-good, lem:norm-mean-square-bound,
+  lem:dyadic-cubes}
+For every real normed space $E$, every $G : V \to [0, \infty]$, every $t \in [0, \infty]$ and
+every $f : V \to E$:
+\begin{enumerate}
+  \item $\mathcal G f + \mathcal B f = f$, $\mathcal B f = 0$ outside $\Omega$,
+    $\mathcal B f = f - f_Q$ on every maximal big cube $Q$, and
+    $\mathcal B f(x) = \sum_Q b_Q f(x)$ for every $x \in V$, the sum over the maximal big cubes,
+    with at most one nonzero term;
+  \item every dyadic cube $Q$ satisfies $\int \|b_Q f\| \leq 2 \int_Q \|f\|$, and $b_Q f$ is
+    integrable if $f$ is integrable on $Q$;
+  \item if $f$ is almost everywhere strongly measurable, then
+    $\int \|\mathcal B f\| \leq 2 \int \|f\|$, and $\mathcal B f$ is integrable if $f$ is.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The identity $\mathcal G f + \mathcal B f = f$ is the definition of $\mathcal B f$, and the rest
+of the first part follows from \Cref{lem:calderon-zygmund-signed-good}. Since
+$|Q| < \infty$ (\Cref{lem:dyadic-cubes}), \Cref{lem:norm-mean-square-bound} gives
+$\int \|b_Q f\| = \int_Q \|f - f_Q\| \leq 2 \int_Q \|f\|$. Finally
+$\|\mathcal B f\| \leq \|f\| + \|\mathcal G f\|$, and
+\Cref{lem:calderon-zygmund-signed-good} bounds the integral of the second term.
+\end{proof}
+
+\begin{theorem}[Mean zero and mass of the bad pieces]
+\label{thm:calderon-zygmund-bad-pieces-mean-mass}
+\lean{Rd.integral_czBadPart, Rd.setIntegral_czBadC, Rd.tsum_lintegral_enorm_czBadPart_le}
+\leanok
+\uses{lem:calderon-zygmund-bad-pieces, lem:calderon-zygmund-averages, lem:dyadic-cubes}
+For every real normed space $E$, every $f : V \to E$ and every dyadic cube $Q$,
+\[
+  \int b_Q f = 0 ,
+\]
+and for every $G : V \to [0, \infty]$, every $t \in [0, \infty]$ and every maximal big cube
+$Q$ of $G$ at height $t$, $\int_Q \mathcal B f = 0$. Moreover
+\[
+  \sum_{Q \text{ maximal big}} \int \|b_Q f\| \leq 2 \int \|f\| .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+If $f$ is integrable on $Q$, then $\int_Q (f - f_Q) = \int_Q f - |Q| \, f_Q = 0$ (Mathlib's
+\texttt{setAverage\_\allowbreak sub\_\allowbreak setAverage}); otherwise $f - f_Q$ is not
+integrable on $Q$ either, and both integrals are $0$ by convention, as they are for every
+function when $E$ is not complete. On a maximal big cube,
+$\mathcal B f = f - f_Q$ by \Cref{lem:calderon-zygmund-bad-pieces}. By the same lemma,
+$\int \|b_Q f\| \leq 2 \int_Q \|f\|$ for every maximal big cube $Q$, and
+\Cref{lem:calderon-zygmund-averages} sums these bounds to $2 \int \|f\|$.
+\end{proof}
+
+\begin{theorem}[The decomposition of a family]
+\label{thm:calderon-zygmund-signed-family}
+\lean{Rd.ae_lqNorm_czGoodC_le, Rd.lintegral_lqNorm_czGoodC_le, Rd.lintegral_lqNorm_czGoodC_sq_le,
+  Rd.lintegral_lqNorm_czBadPart_le, Rd.tsum_lintegral_lqNorm_czBadPart_le}
+\leanok
+\uses{lem:calderon-zygmund-signed-good, lem:calderon-zygmund-good-parts,
+  lem:norm-mean-square-bound, lem:calderon-zygmund-averages, lem:dyadic-cubes}
+Let $1 \leq q \leq \infty$, let $E$ be a real normed space, and let $g_j : V \to E$, $j \in \N$,
+be almost everywhere strongly measurable, with $G(x) = \|(\|g_j(x)\|)_j\|_{\ell_q}$. For every
+$G' : V \to [0, \infty]$ and every $t \in [0, \infty]$, with the good parts $\mathcal G g_j$ and
+the maximal big cubes of $G'$ at height $t$,
+\[
+  \int \|(\|\mathcal G g_j(x)\|)_j\|_{\ell_q} \, dx \leq \int G ,
+\]
+every dyadic cube $Q$ satisfies
+\[
+  \int \|(\|b_Q g_j(x)\|)_j\|_{\ell_q} \, dx \leq 2 \int_Q G ,
+\]
+and
+\[
+  \sum_{Q \text{ maximal big}} \int \|(\|b_Q g_j(x)\|)_j\|_{\ell_q} \, dx \leq 2 \int G .
+\]
+If moreover $n \geq 1$, $\int G < \infty$ and $t > 0$, then the good parts for the maximal big
+cubes of $G$ at height $t$ satisfy
+\[
+  \|(\|\mathcal G g_j(x)\|)_j\|_{\ell_q} \leq 2^n t \quad \text{for almost every } x \in V
+\]
+and
+\[
+  \int \|(\|\mathcal G g_j(x)\|)_j\|_{\ell_q}^2 \, dx \leq 2^n t \int G .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:calderon-zygmund-signed-good}, $\|\mathcal G g_j\| \leq \mathcal G \|g_j\|$ for
+every $j$, so the first and the fourth bound are those of
+\Cref{lem:calderon-zygmund-good-parts} for the family $(\|g_j\|)_j$, and the fifth follows by
+\Cref{lem:norm-mean-square-bound}. For the bad pieces,
+$\int \|(\|b_Q g_j\|)_j\|_{\ell_q} = \int_Q \|(\|g_j - (g_j)_Q\|)_j\|_{\ell_q} \leq 2 \int_Q G$
+by \Cref{lem:norm-mean-square-bound}, since $|Q| < \infty$ (\Cref{lem:dyadic-cubes}), and
+\Cref{lem:calderon-zygmund-averages} sums these bounds over the maximal big cubes.
+\end{proof}
+
+\chapter{Interpolation of operators}
+\label{ch:operator-interpolation}
+
+This chapter works on general measure spaces. It takes over the weak $L_p$ norms and the operators
+of weak and strong type of the formalisation of Carleson's theorem \cite{CarlesonLean}
+(\Cref{sec:weak-type-operators}), proves Marcinkiewicz interpolation between weak type $(1,1)$
+and strong type $(2,2)$ with an explicit constant by the layer cake formula
+(\Cref{sec:marcinkiewicz}), and computes $L_p$ and $L_p(\ell_2)$ norms by duality
+(\Cref{sec:lp-norm-duality}). With the weak type $(1,1)$ and the $L_2$ bounds of
+\Cref{ch:singular-integrals}, these give the strong type $(p,p)$ of vector-valued singular
+integrals for $1 < p < \infty$.
+
+\section{Weak \texorpdfstring{$L_p$}{L\_p} norms and operators of weak and strong type}
+\label{sec:weak-type-operators}
+
+The definitions of this section are those of the formalisation of Carleson's theorem
+\cite{CarlesonLean} (\url{https://github.com/fpvandoorn/carleson}), taken over with the same
+names and statements; that project intends them for Mathlib. Functions take values in a type
+$E$ with an extended norm $\|\cdot\| : E \to [0, \infty]$, such as $\C$ or $[0, \infty]$
+itself, and operators $T$ map functions on a measure space $(X, \mu)$ to functions on a measure
+space $(Y, \nu)$.
+
+\begin{definition}[Weak $L_p$ norms and weak type {\cite{CarlesonLean}}]
+\label{def:weak-type-operators}
+\lean{MeasureTheory.distribution, MeasureTheory.wnorm', MeasureTheory.wnorm,
+  MeasureTheory.MemWLp, MeasureTheory.HasWeakType, MeasureTheory.HasStrongType,
+  MeasureTheory.AESubadditiveOn}
+\leanok
+For every $f : X \to E$ and every $t \in [0, \infty]$, the distribution function of $f$ is
+$d_f(t) = \mu\{x \in X : \|f(x)\| > t\}$. For every real $q \neq 0$,
+\[
+  w_q(f) = \sup_{t \geq 0} t \, d_f(t)^{1/q} ;
+\]
+for $p \in (0, \infty)$ the weak $L_p$ norm is $\|f\|_{p, \infty} = w_p(f)$,
+$\|f\|_{\infty, \infty}$ is the essential supremum of $\|f\|$, and $\|f\|_{0, \infty} = \infty$;
+the function $f$ lies in weak $L_p(\mu)$ if it is almost everywhere strongly measurable and
+$\|f\|_{p, \infty} < \infty$. For all $p, q, C \in [0, \infty]$, an operator $T$ has weak type
+$(p, q)$ with constant $C$ if for every $f \in L_p(\mu)$ the function $T f$ is almost everywhere
+strongly measurable and $\|T f\|_{q, \infty} \leq C \|f\|_p$, and strong type $(p, q)$ with
+constant $C$ if for every $f \in L_p(\mu)$ the function $T f$ is almost everywhere strongly
+measurable and $\|T f\|_q \leq C \|f\|_p$. For every property $P$ of functions on $X$ and every
+$A \in [0, \infty]$, $T$ is almost everywhere subadditive on $P$ with constant $A$ if for all
+$f, g$ with property $P$,
+$\|T(f + g)(y)\| \leq A (\|T f(y)\| + \|T g(y)\|)$ for $\nu$-almost every $y \in Y$.
+\end{definition}
+
+The value $\|f\|_{0, \infty} = \infty$ comes from Lean's convention $1/0 = 0$, under which
+$\|f\|_{0, \infty} = \sup_{t \geq 0} t \, d_f(t)^0 = \sup_{t \geq 0} t$.
+
+\begin{lemma}[Elementary properties]
+\label{lem:distribution-weak-norm-basic}
+\lean{MeasureTheory.distribution_top, MeasureTheory.distribution_mono_left,
+  MeasureTheory.distribution_mono_right, MeasureTheory.distribution_add_le_of_enorm,
+  MeasureTheory.wnorm_ne_top, MeasureTheory.mul_distribution_le_wnorm_one,
+  MeasureTheory.distribution_le_inv_rpow_mul_eLpNorm_rpow, MeasureTheory.wnorm'_le_eLpNorm',
+  MeasureTheory.wnorm_le_eLpNorm, MeasureTheory.MemLp.memWLp, MeasureTheory.HasWeakType.memWLp,
+  MeasureTheory.HasStrongType.memLp, MeasureTheory.HasStrongType.hasWeakType}
+\leanok
+\uses{def:weak-type-operators}
+For all $f : X \to E$ and $s, t \in [0, \infty]$: $d_f(\infty) = 0$; if $s \leq t$, then
+$d_f(t) \leq d_f(s)$; for every type $E'$ with an extended norm and every $g : X \to E'$ with
+$\|f\| \leq \|g\|$ almost everywhere, $d_f(t) \leq d_g(t)$; for all types $E_1, E_2$ with
+extended norms, all $g_1 : X \to E_1$, $g_2 : X \to E_2$ and every $c \in [0, \infty]$ with
+$\|f\| \leq c (\|g_1\| + \|g_2\|)$ almost everywhere,
+\[
+  d_f(c (t + s)) \leq d_{g_1}(t) + d_{g_2}(s) ;
+\]
+and $t \, d_f(t) \leq \|f\|_{1, \infty}$. For every $p \in (0, \infty)$,
+$\|f\|_{p, \infty} = w_p(f)$, and for $t > 0$,
+\[
+  d_f(t) \leq t^{-p} \|f\|_p^p .
+\]
+For every almost everywhere strongly measurable $f$ and every $p \in (0, \infty]$,
+$\|f\|_{p, \infty} \leq \|f\|_p$, so $L_p(\mu)$ lies in weak $L_p(\mu)$. For all
+$p, q, C \in [0, \infty]$ with $C < \infty$, an operator of weak type $(p, q)$ with constant $C$
+maps $L_p(\mu)$ into weak $L_q(\nu)$, and one of strong type $(p, q)$ maps $L_p(\mu)$ into
+$L_q(\nu)$; for $q > 0$, strong type $(p, q)$ with constant $C$ implies weak type $(p, q)$ with
+constant $C$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first four statements compare the sets $\{\|f\| > t\}$: no extended norm exceeds $\infty$,
+the sets shrink as $t$ grows, they grow with $\|f\|$, and $\|g_1\| \leq t$, $\|g_2\| \leq s$
+force $\|f\| \leq c (t + s)$. The bound by $\|f\|_{1, \infty}$ is one term of the supremum, and
+$d_f(t) \leq t^{-p} \|f\|_p^p$ is Chebyshev's inequality (Mathlib's
+\texttt{meas\_\allowbreak ge\_\allowbreak le\_\allowbreak mul\_\allowbreak pow\_\allowbreak
+eLpNorm\_\allowbreak enorm}). It gives $t \, d_f(t)^{1/p} \leq \|f\|_p$ for every $t$, hence
+$\|f\|_{p, \infty} \leq \|f\|_p$; for $p = \infty$ both sides are the essential supremum. The
+statements on operators follow.
+\end{proof}
+
+\section{Marcinkiewicz interpolation}
+\label{sec:marcinkiewicz}
+
+For $1 < p < 2$, an operator that is almost everywhere subadditive with constant $A$, of weak
+type $(1,1)$ with constant $C_1$ and of strong type $(2,2)$ with constant $C_2$ has strong type
+$(p, p)$. Since strong type $(2,2)$ implies weak type $(2,2)$
+(\Cref{lem:distribution-weak-norm-basic}), the real interpolation theorem of the formalisation
+of Carleson's theorem \cite{CarlesonLean} with $(p_0, q_0) = (1, 1)$ and
+$(p_1, q_1) = (2, 2)$ gives strong type $(p, p)$ for $A \geq 1$ and positive finite constants.
+Here the layer cake argument gives it on s-finite measure spaces for every $A \geq 0$ and all
+$C_1, C_2 \in [0, \infty]$, with the constant
+$\bigl(p (2 A C_1/(p - 1) + 4 A^2 C_2^2/(2 - p))\bigr)^{1/p}$. The proof is the argument of
+\Cref{thm:fefferman-stein-interpolation} on a general measure space: at each level $\tau$ the
+input is split along the set where its size exceeds $\tau$, the weak type controls the large
+part and the $L_2$ bound the small part, and the layer cake formula of \Cref{lem:layer-cake}
+collects the levels. The measure $\mu$ on the input space is s-finite, so that Tonelli's theorem
+applies; $\nu$ is any measure. The theorem is Marcinkiewicz's~\cite{Marcinkiewicz1939}, and
+this proof is classical; see Stein~\cite{SteinSingular} and Grafakos~\cite{Grafakos}.
+
+\begin{lemma}[{Layer cake formula for functions with values in $[0, \infty]$}]
+\label{lem:layer-cake}
+\lean{ENNReal.lt_toReal_min_natCast_iff, MeasureTheory.lintegral_min_natCast_rpow_eq,
+  ENNReal.iSup_min_natCast_rpow, MeasureTheory.lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal}
+\leanok
+For every measure space $(X, \nu)$, every almost everywhere measurable
+$F : X \to [0, \infty]$ and every $p > 0$,
+\[
+  \int F^p \, d\nu = p \int_0^\infty \nu(\{F > t\}) \, t^{p-1} \, dt .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For the truncation $\min(F, N)$, $N \in \N$, this is Mathlib's layer cake formula for real
+functions (\texttt{lintegral\_rpow\_eq\_lintegral\_meas\_lt\_mul}), and for $t > 0$,
+$\min(F, N) > t$ holds exactly when $F > t$ and $N > t$, so the right side is the integral
+over $(0, N)$. As $N \to \infty$ the left side converges by monotone convergence and the right
+side by the increasing union $\bigcup_N (0, N) = (0, \infty)$.
+\end{proof}
+
+\begin{lemma}[Integrals of powers]
+\label{lem:power-integrals}
+\lean{MeasureTheory.lintegral_Ioo_rpow, MeasureTheory.lintegral_Ioi_rpow_eq_top,
+  MeasureTheory.lintegral_Ioi_rpow_indicator_lt, MeasureTheory.lintegral_Ioi_rpow_indicator_ge}
+\leanok
+For every $r > -1$ and every $a \in [0, \infty]$,
+\[
+  \int_{(0, \infty)} \mathbf 1_{\{t < a\}} \, t^r \, dt = \frac{a^{r+1}}{r + 1} .
+\]
+For every $r < -1$ and every $a \in [0, \infty]$,
+\[
+  \int_{(0, \infty)} \mathbf 1_{\{t \geq a\}} \, t^r \, dt = \frac{a^{r+1}}{-(r + 1)} .
+\]
+Here $\infty^{r+1} = \infty$ and $0^{r+1} = 0$ for $r + 1 > 0$, and $\infty^{r+1} = 0$ and
+$0^{r+1} = \infty$ for $r + 1 < 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $0 < a < \infty$ these are the integrals of $t^r$ over $(0, a)$ and $[a, \infty)$ (Mathlib's
+\texttt{integral\_rpow} and \texttt{integral\_Ioi\_rpow\_of\_lt}), and the first formula also
+holds for $a = 0$. The integral of $t^r$ over $(0, \infty)$ is infinite for every $r$, since
+$t^r$ is not integrable on $(0, \infty)$ (Mathlib's \texttt{not\_integrableOn\_Ioi\_rpow}); this
+is the first integral for $a = \infty$ and the second for $a = 0$. For $a = \infty$ the second
+integral vanishes.
+\end{proof}
+
+\begin{lemma}[The parts above and below a level]
+\label{lem:parts-above-below-level}
+\lean{MeasureTheory.lintegral_indicator_lt_le, MeasureTheory.lintegral_indicator_compl_rpow_le,
+  MeasureTheory.lintegral_indicator_lt_ne_top,
+  MeasureTheory.lintegral_indicator_compl_rpow_ne_top}
+\leanok
+For every measure space $(X, \mu)$, every $F : X \to [0, \infty]$, every $p \geq 1$ and every
+$s \in (0, \infty)$,
+\[
+  \int_{\{F > s\}} F \, d\mu \leq s^{1-p} \int F^p \, d\mu ,
+\]
+and for all real $p, r$ with $0 \leq p \leq r$ and $0 < r$ and every $s \in [0, \infty)$,
+\[
+  \int_{\{F \leq s\}} F^r \, d\mu \leq s^{r-p} \int F^p \, d\mu .
+\]
+In particular both left sides are finite if $\int F^p \, d\mu < \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $\{F > s\}$, $s^{p-1} F \leq F^p$; on $\{F \leq s\}$, $F^r = F^p F^{r-p} \leq F^p s^{r-p}$.
+\end{proof}
+
+\begin{lemma}[Two Tonelli steps]
+\label{lem:tonelli-steps-measure-space}
+\lean{MeasureTheory.measurable_indicator_section, MeasureTheory.measurableSet_ofReal_lt,
+  ENNReal.rpow_mul_rpow_sub_le, MeasureTheory.lintegral_Ioi_lintegral_indicator_lt_mul_rpow,
+  MeasureTheory.lintegral_Ioi_lintegral_indicator_compl_mul_rpow_le}
+\leanok
+\uses{lem:power-integrals}
+For every s-finite measure space $(X, \mu)$, every measurable $F : X \to [0, \infty]$ and every
+$p > 1$,
+\[
+  \int_0^\infty \tau^{p-2} \int_{\{F > \tau\}} F \, d\mu \, d\tau
+  = \frac{1}{p - 1} \int F^p \, d\mu ,
+\]
+and for every $r > 0$ and every $p < r$,
+\[
+  \int_0^\infty \tau^{p-1-r} \int_{\{F \leq \tau\}} F^r \, d\mu \, d\tau
+  \leq \frac{1}{r - p} \int F^p \, d\mu .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The integrands are jointly measurable in $(\tau, x)$, so Tonelli's theorem for the s-finite
+measure $\mu$ and Lebesgue measure on $(0, \infty)$ exchanges the integrals. By
+\Cref{lem:power-integrals}, $\int_0^{F(x)} \tau^{p-2} \, d\tau = F(x)^{p-1}/(p-1)$ and
+$\int_{F(x)}^\infty \tau^{p-1-r} \, d\tau = F(x)^{p-r}/(r-p)$, and $F^r F^{p-r} \leq F^p$ in
+$[0, \infty]$, with equality where $0 < F < \infty$.
+\end{proof}
+
+\begin{lemma}[Integrals of powers from bounds at every level]
+\label{lem:power-integral-from-levels}
+\lean{MeasureTheory.lintegral_rpow_le_of_measure_lt_mul_rpow_le}
+\leanok
+\uses{lem:layer-cake, lem:tonelli-steps-measure-space}
+For every s-finite measure space $(X, \mu)$, every measure space $(Y, \nu)$, every almost
+everywhere measurable $F : Y \to [0, \infty]$, every measurable $G : X \to [0, \infty]$, all
+real $p, r$ with $1 < p < r$ and all $K_1, K_2 \in [0, \infty]$: if for every $\tau > 0$
+\[
+  \nu\{F > \tau\} \, \tau^{p-1}
+  \leq K_1 \, \tau^{p-2} \int_{\{G > \tau\}} G \, d\mu
+  + K_2 \, \tau^{p-1-r} \int_{\{G \leq \tau\}} G^r \, d\mu ,
+\]
+then
+\[
+  \int F^p \, d\nu \leq p \Bigl( \frac{K_1}{p - 1} + \frac{K_2}{r - p} \Bigr) \int G^p \, d\mu .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:layer-cake}, $\int F^p \, d\nu = p \int_0^\infty \nu\{F > \tau\} \tau^{p-1} \,
+d\tau$. Bound the integrand by the hypothesis and evaluate the two integrals over $\tau$ by
+\Cref{lem:tonelli-steps-measure-space}.
+\end{proof}
+
+\begin{lemma}[The level estimate]
+\label{lem:marcinkiewicz-level}
+\lean{ENNReal.inv_half_mul_ofReal_rpow, ENNReal.inv_half_rpow_mul_ofReal_rpow,
+  MeasureTheory.measure_lt_mul_rpow_le_of_le_add}
+\leanok
+\uses{lem:distribution-weak-norm-basic}
+For every $\tau > 0$ and all real $p, r$,
+\[
+  (\tau/2)^{-1} \tau^{p-1} = 2 \tau^{p-2} , \qquad
+  (\tau/2)^{-r} \tau^{p-1} = 2^r \tau^{p-1-r} .
+\]
+For every measure space $(Y, \nu)$, all $F, F_1, F_2 : Y \to [0, \infty]$ with $F_2$ almost
+everywhere measurable and $F \leq F_1 + F_2$ almost everywhere, every $\tau > 0$, every real
+$p$ and all $C_1, C_2, I_1, I_2 \in [0, \infty]$ with
+\[
+  \nu\{F_1 > \tau/2\} \leq C_1 (\tau/2)^{-1} I_1 , \qquad \int F_2^2 \, d\nu \leq C_2 I_2 ,
+\]
+the bound
+$\nu\{F > \tau\} \, \tau^{p-1} \leq 2 C_1 \tau^{p-2} I_1 + 4 C_2 \tau^{p-3} I_2$ holds.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The identities are computations with real powers. Almost every point of $\{F > \tau\}$ lies in
+$\{F_1 > \tau/2\} \cup \{F_2 > \tau/2\}$ (the distribution of a sum in
+\Cref{lem:distribution-weak-norm-basic}, with $c = 1$), and Chebyshev's inequality gives
+$\nu\{F_2 > \tau/2\} \leq (\tau/2)^{-2} C_2 I_2$. The identities with $r = 2$ finish the proof.
+\end{proof}
+
+\begin{definition}[The Marcinkiewicz constants]
+\label{def:marcinkiewicz-const}
+\lean{MeasureTheory.marcinkiewiczConst, MeasureTheory.marcinkiewiczConst_ne_top,
+  MeasureTheory.marcinkiewiczNormConst, MeasureTheory.marcinkiewiczNormConst_ne_top}
+\leanok
+For $1 < p < 2$ and all $A, C_1, C_2 \in [0, \infty]$,
+\[
+  C^{\mathrm M}_p(C_1, C_2) = p \Bigl( \frac{2 C_1}{p - 1} + \frac{4 C_2}{2 - p} \Bigr)
+\]
+and $N_p(A, C_1, C_2) = C^{\mathrm M}_p(A C_1, A^2 C_2^2)^{1/p}$. Both are finite for finite
+$A$, $C_1$, $C_2$.
+\end{definition}
+
+\begin{theorem}[The layer cake argument of Marcinkiewicz interpolation]
+\label{thm:marcinkiewicz-layer-cake}
+\lean{MeasureTheory.lintegral_rpow_le_of_forall_le_add}
+\leanok
+\uses{lem:power-integral-from-levels, lem:marcinkiewicz-level, def:marcinkiewicz-const}
+Let $(X, \mu)$ be an s-finite measure space, $(Y, \nu)$ a measure space and $1 < p < 2$. For
+every almost everywhere measurable $F : Y \to [0, \infty]$, every measurable
+$G : X \to [0, \infty]$, all $C_1, C_2 \in [0, \infty]$ and all families
+$F_{1, \tau}, F_{2, \tau} : Y \to [0, \infty]$, $\tau > 0$, with $F_{2, \tau}$ almost everywhere
+measurable, $F \leq F_{1, \tau} + F_{2, \tau}$ almost everywhere,
+\[
+  \nu\{F_{1, \tau} > \tau/2\} \leq C_1 (\tau/2)^{-1} \int_{\{G > \tau\}} G \, d\mu
+\]
+and
+\[
+  \int F_{2, \tau}^2 \, d\nu \leq C_2 \int_{\{G \leq \tau\}} G^2 \, d\mu
+\]
+for every $\tau > 0$,
+\[
+  \int F^p \, d\nu \leq C^{\mathrm M}_p(C_1, C_2) \int G^p \, d\mu .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{lem:marcinkiewicz-level} gives the hypothesis of \Cref{lem:power-integral-from-levels}
+with $r = 2$, $K_1 = 2 C_1$ and $K_2 = 4 C_2$.
+\end{proof}
+
+\begin{lemma}[From integrals of powers to $L_p$ norms]
+\label{lem:lp-norm-from-power-integrals}
+\lean{MeasureTheory.eLpNorm_le_rpow_mul_of_lintegral_enorm_le,
+  MeasureTheory.eLpNorm_le_rpow_mul_of_lintegral_le,
+  MeasureTheory.lintegral_enorm_sq_eq_eLpNorm_sq}
+\leanok
+\uses{lem:minkowski-avg, lem:lp-norm-nonnegative}
+For all measure spaces $(X, \mu)$, $(Y, \nu)$, all types $E, E'$ with an extended norm, every
+$p \in (0, \infty)$, every $C \in [0, \infty]$ and all almost everywhere strongly measurable
+$F : Y \to E$, $G : X \to E'$ with $\int \|F\|^p \, d\nu \leq C \int \|G\|^p \, d\mu$,
+\[
+  \|F\|_{L_p(\nu)} \leq C^{1/p} \, \|G\|_{L_p(\mu)} .
+\]
+For every almost everywhere strongly measurable $g : X \to E$,
+$\int \|g\|^2 \, d\mu = \|g\|_{L_2(\mu)}^2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both follow from $\|F\|_p^p = \int \|F\|^p$ (the identity
+\texttt{MeasureTheory.\allowbreak eLpNorm\_\allowbreak rpow\_\allowbreak eq}, cited in
+\Cref{lem:minkowski-avg}; \Cref{lem:lp-norm-nonnegative} for $[0, \infty]$-valued functions),
+the first by taking $p$-th roots.
+\end{proof}
+
+The first form of the interpolation theorem works with an abstract input type: every input
+$x$ has a size $G_x : X \to [0, \infty]$, such as $|f|$ for a function $f$ or
+$\|(g_j)_j\|_{\ell_2}$ for a family $(g_j)_j$, and can be restricted to measurable sets.
+
+\begin{theorem}[Marcinkiewicz interpolation for operators on an abstract input type]
+\label{thm:marcinkiewicz-abstract}
+\lean{MeasureTheory.lintegral_rpow_le_of_weak_one_strong_two,
+  MeasureTheory.eLpNorm_le_of_weak_one_strong_two}
+\leanok
+\uses{thm:marcinkiewicz-layer-cake, lem:parts-above-below-level,
+  lem:lp-norm-from-power-integrals}
+Let $(X, \mu)$ be an s-finite measure space, $(Y, \nu)$ a measure space, $\mathcal X$ a set,
+$1 < p < 2$ and $C_1, C_2 \in [0, \infty]$. Let every $x \in \mathcal X$ carry a measurable
+$G_x : X \to [0, \infty]$ and an almost everywhere measurable $T x : Y \to [0, \infty]$, and let
+every measurable $S \subseteq X$ give an element $x|_S \in \mathcal X$ with
+$G_{x|_S} = \mathbf 1_S G_x$. Suppose that for every $x \in \mathcal X$
+\begin{itemize}
+  \item if $\int G_x^p \, d\mu < \infty$, then $T x \leq T(x|_S) + T(x|_{X \setminus S})$
+  $\nu$-almost everywhere for every measurable $S \subseteq X$;
+  \item if $\int G_x \, d\mu < \infty$, then $\nu\{T x > t\} \leq C_1 t^{-1} \int G_x \, d\mu$
+  for every $t \in (0, \infty)$;
+  \item if $\int G_x^2 \, d\mu < \infty$, then
+  $\int (T x)^2 \, d\nu \leq C_2 \int G_x^2 \, d\mu$.
+\end{itemize}
+Then for every $x \in \mathcal X$ with $\int G_x^p \, d\mu < \infty$,
+\[
+  \int (T x)^p \, d\nu \leq C^{\mathrm M}_p(C_1, C_2) \int G_x^p \, d\mu
+\]
+and
+\[
+  \|T x\|_{L_p(\nu)} \leq C^{\mathrm M}_p(C_1, C_2)^{1/p} \, \|G_x\|_{L_p(\mu)} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Apply \Cref{thm:marcinkiewicz-layer-cake} with $F = T x$, $G = G_x$,
+$F_{1, \tau} = T(x|_{S_\tau})$ and $F_{2, \tau} = T(x|_{X \setminus S_\tau})$ for
+$S_\tau = \{G_x > \tau\}$. The restricted inputs satisfy the finiteness conditions:
+$\int_{S_\tau} G_x \leq \tau^{1-p} \int G_x^p$ and
+$\int_{X \setminus S_\tau} G_x^2 \leq \tau^{2-p} \int G_x^p$ by
+\Cref{lem:parts-above-below-level}. \Cref{lem:lp-norm-from-power-integrals} turns the first
+bound into the second.
+\end{proof}
+
+\begin{lemma}[Truncation at a level]
+\label{lem:truncation-level}
+\lean{MeasureTheory.measure_lt_mul_enorm_le_wnorm_one,
+  MeasureTheory.lintegral_mul_enorm_sq_le_of_hasStrongType, MeasureTheory.ae_enorm_indicator_eq,
+  MeasureTheory.lintegral_enorm_indicator_rpow_eq, MeasureTheory.memLp_one_indicator_lt,
+  MeasureTheory.memLp_two_indicator_compl}
+\leanok
+\uses{def:weak-type-operators, lem:distribution-weak-norm-basic, lem:parts-above-below-level,
+  lem:lp-norm-from-power-integrals}
+For every measure space $(Y, \nu)$, every $g : Y \to E$, every $A \geq 0$ and every
+$t \in (0, \infty)$, $\nu\{A \|g\| > t\} \leq A t^{-1} \|g\|_{1, \infty}$. For every operator
+$T$ of strong type $(2, 2)$ with constant $C_2$, every $g \in L_2(\mu)$ and every $A \geq 0$,
+$\int (A \|T g\|)^2 \, d\nu \leq A^2 C_2^2 \int \|g\|^2 \, d\mu$. Let $E$ be a monoid with an
+extended seminorm, $f : X \to E$ almost everywhere strongly measurable and
+$G : X \to [0, \infty]$ measurable with $\|f\| = G$ almost everywhere. Then for every
+$S \subseteq X$, $\|\mathbf 1_S f\| = \mathbf 1_S G$ almost everywhere, and
+$\int \|\mathbf 1_S f\|^r = \int (\mathbf 1_S G)^r$ for every real $r$. If
+$\int G^p \, d\mu < \infty$, then $\mathbf 1_{\{G > \tau\}} f \in L_1(\mu)$ for $p \geq 1$ and
+every $\tau > 0$, and $\mathbf 1_{\{G \leq \tau\}} f \in L_2(\mu)$ for $0 \leq p \leq 2$ and
+every real $\tau$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $A > 0$, $\{A \|g\| > t\} = \{\|g\| > t/A\}$, and \Cref{lem:distribution-weak-norm-basic}
+gives $(t/A) \, d_g(t/A) \leq \|g\|_{1, \infty}$; for $A = 0$ the set is empty. The second bound
+is the square of $\|T g\|_2 \leq C_2 \|g\|_2$ (\Cref{lem:lp-norm-from-power-integrals}). The
+norm of $\mathbf 1_S f$ is $\mathbf 1_S \|f\|$. Finally
+$\int_{\{G > \tau\}} G \leq \tau^{1-p} \int G^p$ and
+$\int_{\{G \leq \tau\}} G^2 \leq \tau^{2-p} \int G^p$ (\Cref{lem:parts-above-below-level}).
+\end{proof}
+
+\begin{theorem}[Marcinkiewicz interpolation between weak type $(1,1)$ and strong type $(2,2)$]
+\label{thm:marcinkiewicz-interpolation}
+\lean{MeasureTheory.lintegral_enorm_rpow_le_of_hasWeakType_of_hasStrongType,
+  MeasureTheory.hasStrongType_of_hasWeakType_one_of_hasStrongType_two}
+\leanok
+\uses{thm:marcinkiewicz-layer-cake, lem:lp-norm-from-power-integrals, lem:truncation-level,
+  def:weak-type-operators, def:marcinkiewicz-const}
+Let $(X, \mu)$ be an s-finite measure space, $(Y, \nu)$ a measure space, $E$ a monoid with an
+extended seminorm, $Z$ a type with an extended norm, $A \geq 0$ and
+$C_1, C_2 \in [0, \infty]$. Let $T$ map functions $X \to E$ to functions $Y \to Z$, be almost
+everywhere subadditive with constant $A$ on the functions in $L_1(\mu)$ or $L_2(\mu)$, of weak
+type $(1, 1)$ with constant $C_1$ and of strong type $(2, 2)$ with constant $C_2$. Then for every
+real $p$ with $1 < p < 2$ and every almost everywhere strongly measurable $f : X \to E$ with
+$\int \|f\|^p \, d\mu < \infty$ and almost everywhere strongly measurable $T f$,
+\[
+  \int \|T f\|^p \, d\nu \leq C^{\mathrm M}_p(A C_1, A^2 C_2^2) \int \|f\|^p \, d\mu .
+\]
+If moreover $T f$ is almost everywhere strongly measurable for every $f \in L_p(\mu)$, then $T$
+has strong type $(p, p)$ with constant $N_p(A, C_1, C_2)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Choose a measurable $G$ with $\|f\| = G$ almost everywhere, and for $\tau > 0$ split
+$f = \mathbf 1_{\{G > \tau\}} f + \mathbf 1_{\{G \leq \tau\}} f$; the first part lies in
+$L_1(\mu)$, the second in $L_2(\mu)$ (\Cref{lem:truncation-level}). Subadditivity gives
+$\|T f\| \leq A \|T(\mathbf 1_{\{G > \tau\}} f)\| + A \|T(\mathbf 1_{\{G \leq \tau\}} f)\|$
+almost everywhere. By \Cref{lem:truncation-level}, the weak type $(1,1)$ gives
+\[
+  \nu\{A \|T(\mathbf 1_{\{G > \tau\}} f)\| > \tau/2\}
+  \leq A C_1 (\tau/2)^{-1} \int_{\{G > \tau\}} G ,
+\]
+and the strong type $(2,2)$ gives
+$\int A^2 \|T(\mathbf 1_{\{G \leq \tau\}} f)\|^2 \leq A^2 C_2^2 \int_{\{G \leq \tau\}} G^2$.
+\Cref{thm:marcinkiewicz-layer-cake} gives the first bound, and
+\Cref{lem:lp-norm-from-power-integrals} the strong type.
+\end{proof}
+
+\section{\texorpdfstring{$L_p$}{L\_p} norms by duality}
+\label{sec:lp-norm-duality}
+
+For $1 < p < \infty$ with conjugate exponent $p' = p/(p - 1)$, a function in $L_p$ whose
+pairings with all functions of $L_{p'}$ are bounded by $A$ times their $L_{p'}$ norm has $L_p$
+norm at most $A$, and likewise for the mixed norm of $L_p(\ell_2)$ and families in $L_p$ that
+vanish outside a finite set. The proof tests the pairing on one explicit family, the norming
+family, and uses only H\"older's inequality. Throughout, $(X, \mu)$ is a measure space.
+
+\begin{lemma}[H\"older's inequality in $L_p$ norms]
+\label{lem:holder-lp-norms}
+\lean{MeasureTheory.lintegral_mul_le_eLpNorm_mul_eLpNorm}
+\leanok
+\uses{lem:lp-norm-nonnegative}
+For all $p, q \in (1, \infty)$ with $1/p + 1/q = 1$ and all almost everywhere measurable
+$F, G : X \to [0, \infty]$,
+\[
+  \int F G \, d\mu \leq \|F\|_{L_p(\mu)} \|G\|_{L_q(\mu)} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+This is H\"older's inequality (Mathlib's
+\texttt{ENNReal.\allowbreak lintegral\_\allowbreak mul\_\allowbreak le\_\allowbreak
+Lp\_\allowbreak mul\_\allowbreak Lq}) written with $\|F\|_p^p = \int F^p$
+(\Cref{lem:lp-norm-nonnegative}).
+\end{proof}
+
+\begin{lemma}[Families vanishing outside a finite set]
+\label{lem:finite-families-lp-l2}
+\lean{MeasureTheory.lqNorm_enorm_ne_top_of_finite, MeasureTheory.eLpNorm_lqNorm_ne_top_of_finite,
+  MeasureTheory.lintegral_lqNorm_rpow_ne_top_of_finite,
+  MeasureTheory.memLp_of_lintegral_lqNorm_rpow_ne_top}
+\leanok
+\uses{def:lq-norm, lem:lq-basic, lem:lp-series-minkowski, lem:lp-norm-nonnegative}
+For every $p \geq 1$, every finite set $s \subseteq \N$ and all $u_j \in L_p(\mu)$, $j \in \N$,
+with $u_j = 0$ for $j \notin s$, the pointwise norm $\|(u_j(x))_j\|_{\ell_2}$ is finite at every
+$x \in X$ and $\bigl\| \|(u_j)_j\|_{\ell_2} \bigr\|_{L_p(\mu)} < \infty$; if moreover
+$p < \infty$, then $\int \|(u_j)_j\|_{\ell_2}^p \, d\mu < \infty$. For every
+$p \in (0, \infty)$, every family of functions $g_i : X \to \C$, $i \in \N$, and every $j \in \N$
+with $g_j$ almost everywhere strongly measurable and
+$\int \|(g_i)_i\|_{\ell_2}^p \, d\mu < \infty$, $g_j \in L_p(\mu)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\|(u_j(x))_j\|_{\ell_2} \leq \sum_{j \in s} |u_j(x)|$ (\Cref{lem:lq-basic}), and Minkowski's
+inequality (\Cref{lem:lp-series-minkowski}) bounds the $L_p$ norm of the right side by
+$\sum_{j \in s} \|u_j\|_p$; the integral is the $p$-th power of this norm
+(\Cref{lem:lp-norm-nonnegative}). The last statement holds since
+$|g_j| \leq \|(g_i)_i\|_{\ell_2}$ (\Cref{lem:lq-basic}).
+\end{proof}
+
+\begin{definition}[The norming family]
+\label{def:norming-family}
+\lean{MeasureTheory.normingFamily, MeasureTheory.aestronglyMeasurable_normingFamily}
+\leanok
+\uses{def:lq-norm}
+For every real $p$ and every family $u = (u_j)_{j \in \N}$ of functions $X \to \C$, the
+norming family of $u$ is
+\[
+  N_j(x) = u_j(x) \, \|(u_i(x))_i\|_{\ell_2}^{p-2} , \qquad j \in \N, \ x \in X,
+\]
+where the norm $\infty$ is replaced by $0$ before the real power is taken. If every $u_j$ is
+almost everywhere strongly measurable, so is every $N_j$.
+\end{definition}
+
+\begin{lemma}[Size and pairing of the norming family]
+\label{lem:norming-family}
+\lean{MeasureTheory.lqNorm_normingFamily, MeasureTheory.sum_mul_conj_normingFamily,
+  MeasureTheory.eLpNorm_lqNorm_normingFamily, MeasureTheory.memLp_normingFamily,
+  MeasureTheory.enorm_sum_integral_mul_conj_normingFamily}
+\leanok
+\uses{def:norming-family, lem:lq-basic, lem:finite-families-lp-l2, lem:lp-norm-nonnegative}
+For every real $p > 1$, every family $u$ of functions $X \to \C$ and every $x \in X$ with
+$\|(u_i(x))_i\|_{\ell_2} < \infty$,
+$\|(N_j(x))_j\|_{\ell_2} = \|(u_i(x))_i\|_{\ell_2}^{p-1}$. For every real $p > 0$, every finite
+set $s \subseteq \N$ and every $x \in X$ with $u_j(x) = 0$ for $j \notin s$,
+\[
+  \sum_{j \in s} u_j(x) \, \overline{N_j(x)} = \|(u_i(x))_i\|_{\ell_2}^p .
+\]
+For all $1 < p < \infty$ and $q$ with $1/p + 1/q = 1$, every finite set $s \subseteq \N$ and all
+$u_j \in L_p(\mu)$ with $u_j = 0$ for $j \notin s$, the integral
+$I_u = \int \|(u_j)_j\|_{\ell_2}^p \, d\mu$ is finite, every $N_j$ lies in $L_q(\mu)$,
+\[
+  \bigl\| \|(N_j)_j\|_{\ell_2} \bigr\|_{L_q(\mu)} = I_u^{1/q} \qquad\text{and}\qquad
+  \Bigl| \sum_{j \in s} \int u_j \, \overline{N_j} \, d\mu \Bigr| = I_u .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Every member of $u$ is multiplied by $r^{p-2}$ with $r = \|(u_i(x))_i\|_{\ell_2}$, so the
+$\ell_2$ norm is $r^{p-2} r = r^{p-1}$ (\Cref{lem:lq-basic}). Since
+$u_j \overline{u_j} = |u_j|^2$ and $\sum_{j \in s} |u_j(x)|^2 = r^2$, the sum is
+$r^{p-2} r^2 = r^p$. For the last statement, $I_u < \infty$ by \Cref{lem:finite-families-lp-l2};
+the first identity and $(p - 1) q = p$ give the norm of $(N_j)_j$, and $N_j \in L_q(\mu)$ since
+$|N_j| \leq \|(N_i)_i\|_{\ell_2}$. The pairing is the integral of the second identity, a
+nonnegative real function.
+\end{proof}
+
+\begin{theorem}[$L_p$ norms by duality]
+\label{thm:lp-norm-duality}
+\lean{MeasureTheory.eLpNorm_lqNorm_le_of_forall_enorm_sum_integral_le,
+  MeasureTheory.eLpNorm_le_of_forall_enorm_integral_mul_conj_le}
+\leanok
+\uses{lem:norming-family, lem:cancel-conjugate-power, lem:lp-norm-nonnegative, lem:lq-basic}
+Let $1 < p < \infty$, $1/p + 1/q = 1$ and $A \in [0, \infty]$. For every finite set
+$s \subseteq \N$ and all $u_j \in L_p(\mu)$, $j \in \N$, with $u_j = 0$ for $j \notin s$: if
+\[
+  \Bigl| \sum_{j \in s} \int u_j \, \overline{g_j} \, d\mu \Bigr|
+  \leq A \, \bigl\| \|(g_j)_j\|_{\ell_2} \bigr\|_{L_q(\mu)}
+\]
+for every family of functions $g_j \in L_q(\mu)$, $j \in \N$, then
+$\bigl\| \|(u_j)_j\|_{\ell_2} \bigr\|_{L_p(\mu)} \leq A$. For every $v \in L_p(\mu)$: if
+$\bigl| \int v \, \overline g \, d\mu \bigr| \leq A \|g\|_{L_q(\mu)}$ for every
+$g \in L_q(\mu)$, then $\|v\|_{L_p(\mu)} \leq A$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Test the hypothesis on the norming family $g = N$ for the exponent $p$
+(\Cref{lem:norming-family}): $I_u \leq A I_u^{1/q}$ with $I_u < \infty$, so $I_u \leq A^p$ by
+\Cref{lem:cancel-conjugate-power}, and
+$\bigl\| \|(u_j)_j\|_{\ell_2} \bigr\|_p = I_u^{1/p} \leq A$. The second statement is the first
+for the family $u_0 = v$, $u_j = 0$ for $j \geq 1$, since
+$|g_0| \leq \|(g_j)_j\|_{\ell_2}$ and $\|(v(x), 0, 0, \dots)\|_{\ell_2} = |v(x)|$
+(\Cref{lem:lq-basic}).
+\end{proof}

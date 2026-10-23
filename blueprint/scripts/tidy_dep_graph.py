@@ -55,10 +55,9 @@ from pathlib import Path
 # and the chapters it holds; a chapter given as (chapter, [sections]) contributes only those
 # sections. The titles are those of `blueprint/src/content.tex` and of the files it includes
 # with `\input`.
-R_D = r"Function spaces on $\R^d$"
 INTERVALS = "Polynomial approximation on intervals"
-TL = "Triebel--Lizorkin spaces"
-SOB = r"Sobolev spaces on $\R^d$"
+BESOV_RD = r"Besov spaces on \texorpdfstring{$\R^d$}{R\^{}d}"
+SOB = r"Sobolev spaces on \texorpdfstring{$\R^d$}{R\^{}d}"
 BLOCKS: list[tuple[str, list]] = [
     ("Approximation spaces: general theory", [
         "Approximation schemes", "Sequence spaces", "Approximation spaces",
@@ -70,6 +69,10 @@ BLOCKS: list[tuple[str, list]] = [
     ("Besov and Sobolev spaces on measure spaces", [
         "Besov spaces and their embeddings", "Sobolev spaces and their embeddings",
         "Spectral schemes"]),
+    ("Convolution and the Fourier transform", [
+        r"Convolution and the Fourier transform on \texorpdfstring{$\R^d$}{R\^{}d}"]),
+    ("Maximal functions and the Fefferman–Stein inequality", ["Maximal functions"]),
+    ("Interpolation of operators", ["Interpolation of operators"]),
     ("The torus", ["The torus", "Classical definitions on the torus"]),
     ("The Haar system and multiwavelets", [
         "Filtrations and martingale differences",
@@ -85,73 +88,33 @@ BLOCKS: list[tuple[str, list]] = [
                      "Jackson's inequality for splines and the coincidence theorem",
                      "Splines on the circle", "Differences of every order"])]),
     ("The cube", ["Approximation on the cube"]),
-    ("Convolution and Littlewood–Paley blocks", [
-        (R_D, ["Convolution and Young's inequality", "Approximate identities",
-               "Littlewood--Paley kernels", "Band-limited approximation",
-               "The Littlewood--Paley decomposition"])]),
+    ("Littlewood–Paley blocks", [
+        (BESOV_RD, ["Band-limited approximation", "The Littlewood--Paley decomposition"])]),
     ("Differences and local means", [
-        (R_D, ["Differences and moduli of smoothness", "Moduli of smoothness on subsets",
-               "Moment kernels", "Jackson's inequality", "The inverse inequality",
-               "Besov spaces by differences", "Local means"])]),
+        (BESOV_RD, ["Differences and moduli of smoothness", "Moduli of smoothness on subsets",
+                    "Moment kernels", "Jackson's inequality", "The inverse inequality",
+                    "Besov spaces by differences", "Local means"])]),
     ("Multipliers and atoms", [
-        (R_D, ["Pointwise multipliers", "Atoms", "Atomic decompositions"])]),
+        (BESOV_RD, ["Pointwise multipliers", "Atoms", "Atomic decompositions"])]),
     ("Smooth atoms and changes of variables", [
-        (R_D, ["Smooth atoms", "Invariance under changes of variables"])]),
-    ("Lipschitz domains", [
-        (R_D, ["Lipschitz graph domains",
-               "The extension operator for Lipschitz graph domains",
-               "Intrinsic differences on Lipschitz graph domains", "Local extensions",
-               "Bounded Lipschitz domains"])]),
-    ("Traces", [
-        (R_D, ["Traces on Lipschitz graph domains",
-               "The trace space of a Lipschitz graph domain",
-               "Traces of every order on the half-space", "Traces in charts",
-               "Traces on bounded Lipschitz domains"])]),
-    ("Compact manifolds", ["Besov spaces on compact manifolds"]),
-    ("Dominating mixed smoothness", [r"Dominating mixed smoothness on $\R^d$"]),
+        (BESOV_RD, ["Smooth atoms", "Invariance under changes of variables"])]),
     ("Daubechies wavelets", ["Daubechies wavelets"]),
-    ("Maximal functions and the Fefferman–Stein inequality", [
-        (TL, ["Mixed norms", "Dyadic cubes and the Lebesgue differentiation theorem",
-              "The Hardy--Littlewood maximal function",
-              r"The Calder\'on--Zygmund decomposition", "The Fefferman--Stein inequality",
-              "Kernel majorants"])]),
-    ("Triebel–Lizorkin spaces", [
-        (TL, [r"The spaces $\TL{s}{p}{q}$ and the Besov sandwich",
-              "Triebel--Lizorkin spaces on the torus", "The local means characterisation",
-              "Local means on the torus", "Ball means of differences",
-              "The atomic characterisation"])]),
+    ("Dominating mixed smoothness", [
+        r"Dominating mixed smoothness on \texorpdfstring{$\R^d$}{R\^{}d}"]),
+    ("Triebel–Lizorkin spaces", ["Triebel--Lizorkin spaces"]),
+    ("Vector-valued singular integrals", ["Vector-valued singular integrals"]),
     ("Sobolev spaces: the bridge for p = 2", [
-        (SOB, ["Test functions in the Schwartz space", "Weak derivatives on open sets",
+        (SOB, ["Weak derivatives on open sets",
                r"Mathlib's Sobolev spaces \texorpdfstring{$H^s$}{H\^{}s} by Littlewood--Paley blocks",
-               r"\texorpdfstring{$H^1$}{H\^{}1} on bounded Lipschitz domains",
                "Rellich compactness"])]),
-    ("Sobolev spaces on domains and boundaries", [
-        (SOB, ["Sobolev spaces on open sets as Hilbert spaces",
-               "Duality of Sobolev spaces on open sets",
-               "The trace space of a bounded Lipschitz domain",
-               "The area formula for Lipschitz graphs",
-               "The surface measure of a bounded Lipschitz domain",
-               "Divergence kernels",
-               "The extension theorem for Sobolev spaces",
-               "Gauss--Green on Lipschitz graph domains",
-               "Green's formula on bounded Lipschitz domains",
-               "The kernel of the trace"])]),
-    ("Vector-valued singular integrals", [
-        (SOB, [r'Dilation families and the H\"ormander condition',
-               "The adjoint of a convolution", "Plancherel bounds",
-               r"The signed Calder\'on--Zygmund decomposition",
-               r"The weak type \texorpdfstring{$(1,1)$}{(1,1)} of vector-valued singular integrals",
-               r"Weak \texorpdfstring{$L_p$}{L\_p} norms and operators of weak and strong type",
-               "Marcinkiewicz interpolation",
-               r"\texorpdfstring{$L_p$}{L\_p} norms by duality",
-               "The strong type of vector-valued singular integrals",
-               "The square function theorem"])]),
     ("Sobolev spaces W^m_p", [
         (SOB, ["Derivative kernels", "Sobolev spaces as Triebel--Lizorkin spaces",
                "Sobolev embeddings"])]),
-    ("Bessel potential spaces", [
-        (SOB, ["Uniform Schwartz families and the Bessel kernels",
-               "Bessel potential spaces as Triebel--Lizorkin spaces"])]),
+    ("Bessel potential spaces", ["Bessel potential spaces"]),
+    ("Lipschitz domains", ["Lipschitz domains"]),
+    ("Traces", ["Traces on Lipschitz domains"]),
+    ("Sobolev spaces on domains and boundaries", ["Sobolev spaces on domains"]),
+    ("Compact manifolds", ["Besov spaces on compact manifolds"]),
 ]
 
 # Columns of blocks: in each list, every block is placed below the one before it. Without
@@ -161,18 +124,18 @@ BLOCKS: list[tuple[str, list]] = [
 # free row between the frames.
 COLUMNS: list[list[str]] = [
     ["Approximation spaces: general theory", "Decompositions, traces and moduli",
-     "Besov and Sobolev spaces on measure spaces", "Convolution and Littlewood–Paley blocks",
-     "Differences and local means", "Lipschitz domains", "Multipliers and atoms",
-     "Smooth atoms and changes of variables", "Traces", "Compact manifolds",
-     "Dominating mixed smoothness"],
+     "Besov and Sobolev spaces on measure spaces", "Convolution and the Fourier transform",
+     "Littlewood–Paley blocks", "Differences and local means", "Lipschitz domains",
+     "Multipliers and atoms", "Smooth atoms and changes of variables", "Traces",
+     "Compact manifolds", "Dominating mixed smoothness"],
     ["Besov and Sobolev spaces on measure spaces", "The torus", "Daubechies wavelets"],
     ["Differences and local means", "Piecewise polynomials on intervals",
      "The Haar system and multiwavelets", "Splines", "The cube",
      "Dominating mixed smoothness"],
-    ["Convolution and Littlewood–Paley blocks",
+    ["Convolution and the Fourier transform",
      "Maximal functions and the Fefferman–Stein inequality", "Triebel–Lizorkin spaces",
-     "Sobolev spaces: the bridge for p = 2", "Vector-valued singular integrals",
-     "Sobolev spaces W^m_p", "Bessel potential spaces"],
+     "Sobolev spaces: the bridge for p = 2", "Interpolation of operators",
+     "Vector-valued singular integrals", "Sobolev spaces W^m_p", "Bessel potential spaces"],
     ["Traces", "Sobolev spaces on domains and boundaries"],
 ]
 GAP = 2
