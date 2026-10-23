@@ -1,17 +1,18 @@
 # The torus
 
-Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *The torus*,
-*Classical definitions on the torus*.
+Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Besov spaces*,
+chapters *The torus* and *Classical definitions on the torus*.
 
 On `𝕋^d` with its normalised Haar measure, the scheme consists of the trigonometric polynomials of
 degree `< n`. They satisfy the Nikolskii inequality, so all the embeddings of [Besov and Sobolev
-spaces](BesovSobolev.md) hold on `𝕋^d`. For `p = 2` the Fourier coefficients describe `B^s_{2,q}`,
-`H^s` and the Sobolev spaces `W^m_2` of weak derivatives, defined by Fourier multipliers. For every
-`1 ≤ p < ∞` the Besov spaces are described by moduli of smoothness of every order: the kernels of
-`ℝ^d` act on `𝕋^d` by convolution with their periodisations, using Young's inequality on measurable
-groups and the band-limited approximation of [Function spaces on `ℝ^d`](Rd.md); the same kernels
-give smooth Littlewood–Paley blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. The
-restriction to a face of `𝕋^(n+1)` is the model case of the trace theorem.
+spaces on measure spaces](MeasureSpaces.md) hold on `𝕋^d`. For `p = 2` the Fourier coefficients
+describe `B^s_{2,q}`, `H^s` and the Sobolev spaces `W^m_2` of weak derivatives, defined by Fourier
+multipliers. For every `1 ≤ p < ∞` the Besov spaces are described by moduli of smoothness of every
+order: the kernels of `ℝ^d` act on `𝕋^d` by convolution with their periodisations, using Young's
+inequality on measurable groups of [Tools from analysis](Analysis.md) and the band-limited
+approximation of [Besov spaces on `ℝ^d`](Rd.md); the same kernels give smooth Littlewood–Paley
+blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. The restriction to a face of
+`𝕋^(n+1)` is the model case of the trace theorem.
 
 ## Main results
 
@@ -30,7 +31,7 @@ restriction to a face of `𝕋^(n+1)` is the model case of the trace theorem.
   Jackson's inequality (`Torus.approxSeq_trigScheme_le`) and Bernstein's inequality
   (`Torus.lpModulus_le_of_mem_trigPolyLp`) from band-limited approximation on `ℝ^d`.
 * **Besov spaces on the torus through Littlewood–Paley blocks.** Let `ψ_j` be the
-  Littlewood–Paley kernels on `ℝ^d` of [Function spaces on `ℝ^d`](Rd.md), acting on `𝕋^d` by
+  Littlewood–Paley kernels on `ℝ^d` of [Besov spaces on `ℝ^d`](Rd.md), acting on `𝕋^d` by
   convolution, and `Δ_j f = ψ_j ⋆ f` (`Torus.lpBlock`). For every `1 ≤ p < ∞`, `s > 0` and
   `1 ≤ q ≤ ∞`, `f ∈ B^s_{p,q}(𝕋^d)` iff `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_q} < ∞`
   (`Torus.memBesov_iff_littlewoodPaleyNorm_lt_top`), with explicit constants in both directions
@@ -57,7 +58,7 @@ restriction to a face of `𝕋^(n+1)` is the model case of the trace theorem.
   `1 ≤ p < ∞`, `‖T‖_∞ ≤ (2⌈p/2⌉)^(d/p) n^(d/p) ‖T‖_p`
   (`Torus.norm_le_rpow_mul_eLpNorm`). Hence the trigonometric polynomials have the
   Nikolskii property of dimension `d` (`Torus.trigScheme_hasNikolskii`), and all the Besov
-  embeddings of [Besov and Sobolev spaces](BesovSobolev.md) hold on
+  embeddings of [Besov and Sobolev spaces on measure spaces](MeasureSpaces.md) hold on
   `𝕋^d` with `α = d (1/p - 1/r)`
   (`Torus.memBesov_exists_inclusion_eq`, `Torus.memBesov_exists_continuous`).
 * **The Sobolev embedding on the torus.** Let `s > d/2` and `f ∈ L_2(𝕋^d)` with

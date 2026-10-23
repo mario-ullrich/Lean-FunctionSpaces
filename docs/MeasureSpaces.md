@@ -1,7 +1,8 @@
 # Besov and Sobolev spaces on measure spaces
 
-Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *Besov spaces and
-their embeddings*, *Sobolev spaces and their embeddings*, *Spectral schemes*.
+Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Approximation
+spaces*, chapters *Besov spaces and their embeddings*, *Sobolev spaces and their embeddings* and
+*Spectral schemes*.
 
 For a finite measure space `(Ω, μ)` and a scheme `S` of bounded continuous functions, the
 Besov space is `B^s_{p,q}(Ω, S) = A^s_q(L_p(μ), S)`, and the embedding theorems follow from the
@@ -10,9 +11,8 @@ Nikolskii inequality for the scheme. Spectral schemes in a Hilbert space give th
 `H^s` with Jackson and Bernstein constants `1`, and their dyadic Fourier blocks characterise
 `A^s_q` (`SpectralScheme.memApprox_iff_blockNorm_lt_top`). Orthonormal bases of continuous
 functions with levels (continuous spectral bases), modelled on the eigenfunctions of the
-Laplacian on a compact manifold, enter as a hypothesis. The `L_p` norms are handled through
-integrals of powers (`MeasureTheory.eLpNorm_rpow_eq`). The torus is the first instance
-([The torus](Torus.md)).
+Laplacian on a compact manifold, enter as a hypothesis. The torus is the first instance
+([The torus](Torus.md)). The `L_p` tools are in [Tools from analysis](Analysis.md).
 
 ## Main results
 
@@ -57,10 +57,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| `L_p` norms through integrals of powers | ✅ | ✗ | `Analysis/Lp/LintegralForm` |
-| Multiplication by an indicator as an operator on `L_p`, integrals over a set as `L_2` pairings | ✅ | ✗ | `Analysis/Lp/IndicatorOperator` |
-| Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces, elementary embeddings | ✅ | ✗ | `Analysis/Lp/Inclusion`, `Analysis/Lp/BoundedContinuous`, `Scheme`, `MeasureSpaces/Besov/Basic`, `MeasureSpaces/Besov/Trivial` |
-| Interpolation `L_p`–`L_∞`, Nikolskii property, Besov embeddings | ✅ | ✗ | `Analysis/Lp/Interpolation`, `MeasureSpaces/Besov/Nikolskii`, `MeasureSpaces/Besov/Embeddings` |
+| Schemes of functions, Besov spaces, elementary embeddings | ✅ | ✗ | `MeasureSpaces/Scheme`, `MeasureSpaces/Besov/Basic`, `MeasureSpaces/Besov/Trivial` |
+| Nikolskii property, Besov embeddings | ✅ | ✗ | `MeasureSpaces/Besov/Nikolskii`, `MeasureSpaces/Besov/Embeddings` |
 | Sobolev spaces as a hypothesis structure, Sobolev embeddings | ✅ | ✗ | `MeasureSpaces/Sobolev/Embeddings` |
 | Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ | ✗ | `MeasureSpaces/Spectral/Basic` |
 | Coefficient characterisations of spectral schemes, `H^s = B^s_{2,2}` | ✅ | ✗ | `MeasureSpaces/Spectral/Blocks` |

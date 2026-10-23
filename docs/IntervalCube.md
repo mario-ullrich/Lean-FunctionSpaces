@@ -1,14 +1,16 @@
 # Intervals, the cube, splines and wavelets
 
-Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *Filtrations and
-martingale differences*, *Polynomial approximation on intervals*, *Approximation on the cube*.
+Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Besov spaces*,
+chapters *Filtrations and martingale differences*, *Polynomial approximation on intervals* and
+*Approximation on the cube*.
 
 On `[0, 1]`, the circle and the cube `[0, 1]^d`, the schemes are dyadic piecewise polynomials
 and splines, and the approximation spaces are the Besov spaces defined by moduli of smoothness:
 for `0 < s < 1/p` with piecewise polynomials and for `0 < s < r - 1 + 1/p` with splines of order
 `r`. The tools are differences and moduli on intervals, Whitney's inequality, Steklov smoothing,
 B-splines with Marsden's identity and quasi-interpolants; on the cube, operators act on slices
-one coordinate at a time, and the translation algebra `ℂ[ℝ^d]` relates the isotropic modulus to
+one coordinate at a time, and the translation algebra `ℂ[ℝ^d]` of
+[Tools from analysis](Analysis.md) relates the isotropic modulus to
 the moduli in the coordinates. Martingale differences of a filtration on a finite measure space
 are the general theorem behind the Haar characterisation, and multiwavelets refine it to higher
 degree.
@@ -158,7 +160,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Piecewise polynomials on the cube: tensor projection, tensor-product description, Whitney, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p` | ✅ | ✗ | `Cube/PiecewisePoly`, `Cube/PiecewiseJackson`, `Cube/PiecewiseInverse` |
 | Tensor splines on the cube: quasi-interpolant as a kernel operator, tensor-product description, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Cube/Splines`, `Cube/SplineJackson`, `Cube/SplineInverse` |
 | Differences of every order: difference bound for polynomials, piecewise polynomials (gain `1/p`), splines (gain `m` below order `r`), steps of either sign | ✅ | ✗ | `Interval/PolyDifferences`, `Interval/LowerDifferences` |
-| Translation algebra of an additive monoid, differences as its powers; isotropic differences and their expansion into mixed coordinate differences | ✅ | ✗ | `TranslationAlgebra`, `Cube/Translation` |
+| Isotropic differences and their expansion into mixed coordinate differences | ✅ | ✗ | `Cube/Translation` |
 | Isotropic modulus on the cube, comparison with the moduli in the coordinates | ✅ | ✗ | `Cube/IsoModulus` |
 | Isotropic inverse inequalities, `A^s_q` with the isotropic modulus, coordinate and isotropic Besov conditions agree for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Cube/IsoInverse`, `Cube/IsoCoincidence` |
 | Filtration schemes (Haar), martingale-difference characterisation | ✅ | ✗ | `Wavelets/Filtration` |

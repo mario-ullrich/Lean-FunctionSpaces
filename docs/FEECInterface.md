@@ -1,7 +1,10 @@
 # Lean-FunctionSpaces for FEEC and BEEC: the interface
 
-Part of [Characterizations of Function Spaces](../README.md). Blueprint chapter: *Sobolev spaces on
-`ℝ^d`*. Block document: [Sobolev spaces on `ℝ^d`](SobolevRd.md).
+Part of [Characterizations of Function Spaces](../README.md). Blueprint: parts *Sobolev and
+Bessel potential spaces* and *Domains, traces and manifolds*, chapters *Sobolev spaces on `ℝ^d`*,
+*Bessel potential spaces*, *Lipschitz domains*, *Traces on Lipschitz domains* and *Sobolev spaces
+on domains*. Block documents: [Sobolev spaces on `ℝ^d`](SobolevRd.md) and [Domains, traces and
+manifolds](DomainsTraces.md).
 
 ## 1. Purpose
 
@@ -59,8 +62,11 @@ The blueprint states every result with its proof and its Lean name:
 <https://mario-ullrich.github.io/Lean-FunctionSpaces/>, as PDF
 <https://mario-ullrich.github.io/Lean-FunctionSpaces/blueprint.pdf>, and the dependency graph
 <https://mario-ullrich.github.io/Lean-FunctionSpaces/dep_graph_document.html>. The results of this
-document are in its chapter *Sobolev spaces on `ℝ^d`*, the bounded Lipschitz domains and traces in
-the chapter *Function spaces on `ℝ^d`*.
+document on `ℝ^d` are in its chapters *Sobolev spaces on `ℝ^d`* and *Bessel potential spaces*;
+the bounded Lipschitz domains, the area formula and the surface measure are in the chapter
+*Lipschitz domains*, the traces in *Traces on Lipschitz domains*, and the Sobolev spaces on open
+sets and on bounded Lipschitz domains, the trace space, the extension theorem, Green's formula and
+the kernel of the trace in *Sobolev spaces on domains*.
 
 ## 3. Conventions (item I.0)
 
@@ -123,7 +129,7 @@ File `FunctionSpaces/Rd/Sobolev/SobolevTwoLittlewoodPaley.lean`.
   `‖f‖_{F^s_{2,2}} ≤ (2 · 4^s)^{1/2} ‖F‖`.
 
 Through I.8 every description of `B^s_{2,2}(V)` in the library applies to `H^s(V)`: moduli of
-smoothness (`Rd.memApprox_bandScheme_iff_modulus`), local means and atoms (chapter *Function
+smoothness (`Rd.memApprox_bandScheme_iff_modulus`), local means and atoms (chapter *Besov
 spaces on `ℝ^d`* of the blueprint).
 
 ### 4.2 Weak derivatives
@@ -518,8 +524,9 @@ Marcinkiewicz interpolation
 (`MeasureTheory.hasStrongType_of_hasWeakType_one_of_hasStrongType_two`), and the strong type
 `(p,p)`, `1 < p < ∞`, of the analysis and synthesis operators of every Calderón–Zygmund family
 (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`,
-`Rd.IsCZFamily.eLpNorm_sum_conv_le`) (blueprint chapter *Sobolev spaces on `ℝ^d`*, block document
-[Sobolev spaces on `ℝ^d`](SobolevRd.md)).
+`Rd.IsCZFamily.eLpNorm_sum_conv_le`) (blueprint chapters *Vector-valued singular integrals* and
+*Interpolation of operators*, block documents [Triebel–Lizorkin spaces](TriebelLizorkin.md) and
+[Tools from analysis](Analysis.md)).
 
 The square function theorem `L_p = F^0_{p,2}` on `ℝ^d`, `d = dim V ≥ 1`, `1 < p < ∞`, is
 formalised as the two-sided bound of `‖f‖_{F^0_{p,2}}` (by definition the `L_p` norm of the

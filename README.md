@@ -6,7 +6,7 @@ moduli of smoothness, Littlewood–Paley blocks, local means, atoms, wavelet and
 coefficients, weak derivatives, Bessel potentials, interpolation, restriction and traces, on
 `ℝ^d`, the torus, intervals, the cube, Lipschitz domains and compact manifolds, together with
 the **embedding theorems**. The abstract theory of **approximation spaces** is one part of it. The
-project is work in progress; the details are in ten block documents under [`docs/`](docs/),
+project is work in progress; the details are in eleven block documents under [`docs/`](docs/),
 listed under [What is formalised](#what-is-formalised).
 
 * **Blueprint** (a webpage explaining the mathematics):
@@ -49,9 +49,9 @@ multiwavelet coefficients on intervals and the cube, local means and atoms on `�
 differences and extensions on Lipschitz domains, chart pieces on manifolds, traces on
 boundaries, and mixed differences for dominating mixed smoothness. Triebel–Lizorkin spaces are
 described by local means on `ℝ^d` and on the torus, and by ball means of differences and atoms
-on `ℝ^d`. The project proves them
-equivalent; the last chapter of the blueprint, *The representations of Besov spaces*, lists
-them with their settings and ranges of parameters and explains how they differ.
+on `ℝ^d`. The project proves them equivalent; the first chapter of the Besov part of the
+blueprint, *The representations of Besov spaces*, lists them with their settings and ranges of
+parameters and explains how they differ.
 
 **Approximation spaces.** Let `X` be a real normed space. An **approximation scheme** is a
 sequence of subsets `A₀ ⊆ A₁ ⊆ A₂ ⊆ ⋯` of `X` with `A₀ = {0}`, `c · a ∈ A_n` for real `c` and
@@ -81,7 +81,8 @@ a Nikolskii inequality.
 The list below gives some results of each block; the block documents list all of them, and the
 blueprint chapter *The representations of Besov spaces* collects the characterisations.
 
-**Approximation spaces** ([details](docs/ApproximationSpaces.md))
+**Approximation spaces and function spaces on measure spaces**
+([approximation spaces](docs/ApproximationSpaces.md), [measure spaces](docs/MeasureSpaces.md))
 
 * **Nikolskii transfer theorem.** Let `ι : Y → X` be an injective bounded linear map from a
   Banach space `Y`, let `0 ≤ α < s`, and let every `a ∈ A_n` be `ι y` with `‖y‖ ≤ C n^α ‖a‖`
@@ -100,9 +101,6 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `k ≥ k₀` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
   for `0 ≤ s < θ` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff `‖f‖ + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q} < ∞`,
   with equivalent quasi-norms (`ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top`).
-
-**Besov and Sobolev spaces on measure spaces** ([details](docs/BesovSobolev.md))
-
 * **Besov embeddings.** Let `μ` be a finite measure on `Ω` and `S` a scheme of bounded continuous
   functions with the Nikolskii property of dimension `D ≥ 0`: for every `1 ≤ p ≤ ∞` there is `C`
   with `‖a‖_∞ ≤ C n^(D/p) ‖a‖_p` for all `a ∈ S_n`, `n ≥ 1`. Let `1 ≤ p ≤ r ≤ ∞`, `1 ≤ q ≤ ∞` and
@@ -124,7 +122,9 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   instances of the structure are the spaces `H^s`, `p = 2`, on the torus and for a continuous
   spectral basis (`Torus.sobolevSpace`, `ContinuousSpectralBasis.sobolevSpace`).
 
-**The torus** ([details](docs/Torus.md))
+**Besov spaces** ([the torus](docs/Torus.md), [intervals and the cube](docs/IntervalCube.md),
+[Daubechies wavelets](docs/Daubechies.md), [`ℝ^d`](docs/Rd.md),
+[mixed smoothness](docs/MixedSmoothness.md))
 
 * **Besov spaces on the torus through moduli of smoothness.** For `1 ≤ p < ∞`, `0 < s < r` and
   `1 ≤ q ≤ ∞`, `f ∈ B^s_{p,q}(𝕋^d)` iff `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` for
@@ -141,9 +141,6 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   on `𝕋^d`, `n ≥ 1`, and `1 ≤ p < ∞`, `‖T‖_∞ ≤ (2⌈p/2⌉)^(d/p) n^(d/p) ‖T‖_p`
   (`Torus.norm_le_rpow_mul_eLpNorm`). Hence the Besov embeddings hold on `𝕋^d` with
   `α = d (1/p - 1/r)` (`Torus.memBesov_exists_inclusion_eq`, `Torus.memBesov_exists_continuous`).
-
-**Intervals, the cube, splines and wavelets** ([details](docs/IntervalCube.md))
-
 * **Splines and higher smoothness.** Let `S_k ⊆ L_p[0, 1]` consist of the splines of order
   `r ≥ 1` on the dyadic grid of level `k`: piecewise polynomials of degree `< r` that are `r - 2`
   times continuously differentiable, and let
@@ -162,9 +159,6 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   length `2^(-⌊log₂ n⌋)`. For `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q(L_p[0, 1))` iff
   `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
   (`Haar.memApprox_iff_haarCoeff`).
-
-**Daubechies wavelets** ([details](docs/Daubechies.md))
-
 * **Daubechies wavelets and Besov spaces.** For a mask of order `N ≥ 2` with filter coefficients
   `c_k`, a real polynomial `L` of degree `< N` with `L(1) = 1` and
   `|L(e^(-2πiξ))|² = ∑_{k<N} C(N-1+k, k) sin^(2k)(πξ)`, which exists by the Fejér–Riesz theorem
@@ -181,9 +175,6 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `N = 3` (`Daubechies.transferGrowth_two`, `Daubechies.transferGrowth_three`), the Sobolev
   exponents `1` and `3 - log₂ 3`. The scaling function of D4 is Hölder continuous of every order
   `a ≤ 2 - log₂(1 + √3) ≈ 0.55` (`Daubechies.holder_d4`).
-
-**Function spaces on `ℝ^d`** ([details](docs/Rd.md))
-
 * **Besov spaces on `ℝ^d` by differences.** Let `V` be a finite-dimensional real inner product
   space, `1 ≤ p < ∞`, `E_k = {g ∈ L_p(V) : Θ_k ⋆ g = g}` the band-limited classes, with
   `𝓕Θ_k = 1` on the ball of radius `2^(k+1)` and `0` outside the ball of radius `2^(k+2)`, `ψ_j`
@@ -199,8 +190,21 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `‖F‖_p + ‖(2^(ks) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff `F = ∑_j ∑_m λ_{j,m} a_{j,m}` with
   regular atoms of order and exponent `L` whose centres have bounded overlap at every level, and
   `‖(2^(j(s - n/p)) ‖λ_{j,·}‖_{ℓ_p})_j‖_{ℓ_q} < ∞` (`Rd.LocalMeansBump.besov_iff_atomic`).
+* **Mixed smoothness and hyperbolic crosses.** For `1 ≤ p < ∞`, `0 < s < L`, `1 ≤ q ≤ ∞` and
+  `f ∈ L_p(ℝ^d)`, the mixed moduli `Ω^{e(k)}_L` in the coordinates `e(k) = {i : k_i ≠ 0}`, the
+  tensor local means kernels `k_k` of a bump vanishing outside `[-1, 1]` and the tensor
+  Littlewood–Paley kernels `δ_k = ⊗_i ψ_{k_i}`
+  describe the same space:
+  `‖(2^(s|k|_1) Ω^{e(k)}_L(f, 2^(-k))_p)_{k ∈ ℕ^d}‖_{ℓ_q} < ∞` iff
+  `‖(2^(s|k|_1) ‖k_k ⋆ f‖_p)_k‖_{ℓ_q} < ∞` iff `‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q} < ∞`
+  (`Rd.LocalMeansBump.mixedBesov_iff_mixedLocalMeans`, `Rd.mixedBesov_iff_mixedLP`). The
+  hyperbolic cross sums `S_N f = ∑_{|k|_1 ≤ N} δ_k ⋆ f` satisfy
+  `‖f - S_N f‖_p ≤ C 2^(-sN) (N + 1)^((d-1)(1-1/q)) ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}` with
+  the constant `C = ∑_l 2^(-sl) (l + 1)^((d-1)(1-1/q))`, finite for `s > 0`
+  (`Rd.hyperbolicCrossConst_ne_top`, `Rd.enorm_sub_hyperbolicSum_le_of_pos`).
 
-**Triebel–Lizorkin spaces** ([details](docs/TriebelLizorkin.md))
+**Triebel–Lizorkin spaces** ([Triebel–Lizorkin spaces](docs/TriebelLizorkin.md),
+[tools from analysis](docs/Analysis.md))
 
 * **The Fefferman–Stein inequality.** Let `V` be a finite-dimensional real inner product space,
   such as `ℝ^d`, and `M g(x) = sup_{r > 0} |B(x, r)|⁻¹ ∫_{B(x, r)} g` the Hardy–Littlewood
@@ -230,8 +234,20 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   and `0 < s < L`, `f ∈ F^s_{p,q}` iff `‖f‖_p + ‖ x ↦ ‖(2^(js) d_j f(x))_j‖_{ℓ_q} ‖_p < ∞`
   (`Rd.memTriebelLizorkin_iff_tlDiffNorm_lt_top`). The block document also describes
   `F^s_{p,q}` by atoms.
+* **The square function theorem.** Let `dim V ≥ 1` and `1 < p < ∞`. By definition,
+  `‖f‖_{F^0_{p,2}}` is the `L_p` norm of the square function `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}` of
+  the Littlewood–Paley blocks `ψ_j ⋆ f` (`Rd.triebelLizorkinNorm_zero_two_eq`). The theorem is
+  the two-sided bound: for every `f ∈ L_p(V)`,
+  `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p` and `‖f‖_p ≤ Q̃_{V,p} ‖f‖_{F^0_{p,2}}`
+  (`Rd.triebelLizorkinNorm_zero_two_le`, `Rd.enorm_le_triebelLizorkinNorm_zero_two`), with the
+  strong type constants of the Calderón–Zygmund families of the blocks and of the synthesis
+  kernels (`Rd.squareFunctionConst`, `Rd.squareSynthesisConst`), named formulas in Schwartz
+  seminorms of these fixed kernels, proved finite; hence `F^0_{p,2} = L_p(V)`
+  (`Rd.triebelLizorkinSpace_zero_two_eq_top`). The proof is the strong type `(p,p)` of
+  vector-valued singular integrals with Calderón–Zygmund kernel families
+  (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`, `Rd.IsCZFamily.eLpNorm_sum_conv_le`).
 
-**Sobolev spaces on `ℝ^d`** ([details](docs/SobolevRd.md))
+**Sobolev and Bessel potential spaces on `ℝ^d`** ([Sobolev spaces on `ℝ^d`](docs/SobolevRd.md))
 
 * **The Mathlib bridge: `H^s(ℝ^d) = B^s_{2,2}(ℝ^d)`.** Let `V` be a finite-dimensional real
   inner product space, such as `ℝ^d`, and `H^s(V)` Mathlib's Sobolev space of the tempered
@@ -246,70 +262,8 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `∫ φ g = (-1)^k ∫ (∂^v φ) f` for every smooth compactly supported real `φ` in `Ω`
   (`Rd.HasWeakLineDeriv`, `Rd.hasWeakLineDeriv_iff_integral`), and `f ∈ L_2(V)` lies in
   `W^1_2(V)` iff it lies in `H^1(V)` (`Rd.memSobolev_one_iff`).
-* **`H^1` on bounded Lipschitz domains.** On a bounded Lipschitz domain `Ω` with boundary `Γ`,
-  `H^1(Ω)` consists of the `f ∈ L_2(V)` that agree on `Ω` with a function of `H^1(V)`
-  (`Rd.BoundedLipschitzDomain.MemSobolevOn`); for every order `r ≥ 2`, `f ∈ H^1(Ω)` iff
-  `‖f‖_{L_2(Ω)} + ‖(2^k ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞`
-  (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_modulusOn`); every `f ∈ H^1(Ω)` has weak
-  derivatives in `L_2(Ω)` (`Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`, which holds
-  by the definition through extensions; the converse is the extension theorem below), and the
-  boundary traces of the functions of `H^1(Ω)` are the functions of `B^{1/2}_{2,2}(Γ)`, defined
-  chart by chart with first differences, which describe the Besov spaces of the boundary for
-  `0 < s < 1` (`Rd.BoundedLipschitzDomain.MemBoundaryBesov`,
-  `Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`).
 * **Rellich's theorem.** For every bounded set `Ω ⊆ V`, the restriction from `H^1(V)` to
   `L_2(Ω)` is a compact operator (`Rd.isCompactOperator_restr_toL2`).
-* **Sobolev spaces on open sets as Hilbert spaces.** For every open `Ω ⊆ V` and real `s`,
-  `H^s(Ω)` is the orthogonal complement in `H^s(V)` of the elements whose distribution vanishes
-  on every test function of `Ω` (`Rd.RestrictionSpace`), and by this definition as an orthogonal
-  complement it is isometric to the quotient of `H^s(V)` by them
-  (`Rd.quotientEquivRestrictionSpace`); `H^1(Ω) → L_2(Ω)` is injective and, for
-  bounded `Ω`, compact (`Rd.restrictL2_injective`, `Rd.isCompactOperator_restrictL2`); and
-  restriction is an isometry from `H̃^1(Ω)`, the closure of the test functions in `H^1(V)`, onto
-  `H^1_0(Ω)`, the closure of their restrictions in `H^1(Ω)` (`Rd.tildeEquivZeroBoundary`).
-* **Duality on open sets.** For every open `Ω ⊆ V` and real `s`, every bounded functional `ℓ` on
-  `H̃^s(Ω)` is `U ↦ ⟪J_{-s} W, J_s U⟫_{L_2}` for exactly one `W ∈ H^{-s}(Ω)`, with `‖W‖ = ‖ℓ‖`
-  (`Rd.dualEquiv`, `Rd.dualEquiv_apply`, `Rd.dualEquiv_eq_iff`), and likewise
-  `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` and `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` (`Rd.dualRestrictionEquiv`,
-  `Rd.dualZeroBoundaryEquiv`).
-* **The trace space `H^{1/2}(Γ)`.** On a bounded Lipschitz domain `Ω` with boundary `Γ`, the trace
-  space `H^{1/2}(Γ)` is defined as the orthogonal complement in `H^1(Ω)` of the `u` whose boundary
-  trace vanishes almost everywhere on `Γ` (`Rd.BoundedLipschitzDomain.TraceSpace`,
-  `Rd.BoundedLipschitzDomain.mem_traceKer_iff`). By this definition the trace is the orthogonal
-  projection onto it and the extension is the inclusion, both of norm at most `1`, and
-  `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)` isometrically (`Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`).
-  The boundary traces of its elements are the functions of `B^{1/2}_{2,2}(Γ)` modulo null sets of
-  `Γ` (`Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`); this link is qualitative,
-  a norm equivalence of `H^{1/2}(Γ)` with `B^{1/2}_{2,2}(Γ)` is not formalised.
-* **The area formula for Lipschitz graphs.** Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph
-  domain in `V`, `dim V = n`, with the graph map `γ(x') = x' + φ(x') e` over the hyperplane
-  `H = e^⊥` and the gradient `∇φ(x') ∈ H` of `φ` on `H`, which exists almost everywhere. For
-  every measurable `A ⊆ H`, `μHE[n-1] (γ(A)) = ∫_A √(1 + ‖∇φ(x')‖²) dx'` for Mathlib's
-  `(n-1)`-dimensional Euclidean Hausdorff measure `μHE[n-1]`, normalised to be the volume on
-  hyperplanes (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`).
-* **The surface measure and `L_2(Γ)`.** On a bounded Lipschitz domain `Ω` with boundary `Γ`,
-  charts `γ_j` over the hyperplanes `H_j` and boundary balls `B_j`, the surface measure `σ` is
-  `μHE[n-1]` restricted to `Γ` (`Rd.BoundedLipschitzDomain.surfaceMeasure`), and
-  `∫_Γ F dσ = ∫_{H_j} F(γ_j x') √(1 + ‖∇φ_j(x')‖²) dx'` for every `F : V → [0, ∞]` vanishing
-  outside `B_j` (`Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure_of_support`). It is finite,
-  `|Γ| = 0` (`Rd.BoundedLipschitzDomain.volume_frontier`), and the trace
-  `γ_{L_2} : H^1(Ω) → L_2(Γ) = L_2(σ)` is a bounded operator, given almost everywhere by the
-  boundary trace, with the trace kernel as its kernel (`Rd.BoundedLipschitzDomain.boundaryTraceL2`,
-  `Rd.BoundedLipschitzDomain.boundaryTraceL2_apply_ae`,
-  `Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`); on `H^{1/2}(Γ)` the trace into `L_2(Γ)` is
-  injective (`Rd.BoundedLipschitzDomain.traceL2_injective`).
-* **The square function theorem.** Let `dim V ≥ 1` and `1 < p < ∞`. By definition,
-  `‖f‖_{F^0_{p,2}}` is the `L_p` norm of the square function `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}` of
-  the Littlewood–Paley blocks `ψ_j ⋆ f` (`Rd.triebelLizorkinNorm_zero_two_eq`). The theorem is
-  the two-sided bound: for every `f ∈ L_p(V)`,
-  `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p` and `‖f‖_p ≤ Q̃_{V,p} ‖f‖_{F^0_{p,2}}`
-  (`Rd.triebelLizorkinNorm_zero_two_le`, `Rd.enorm_le_triebelLizorkinNorm_zero_two`), with the
-  strong type constants of the Calderón–Zygmund families of the blocks and of the synthesis
-  kernels (`Rd.squareFunctionConst`, `Rd.squareSynthesisConst`), named formulas in Schwartz
-  seminorms of these fixed kernels, proved finite; hence `F^0_{p,2} = L_p(V)`
-  (`Rd.triebelLizorkinSpace_zero_two_eq_top`). The proof is the strong type `(p,p)` of
-  vector-valued singular integrals with Calderón–Zygmund kernel families
-  (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`, `Rd.IsCZFamily.eLpNorm_sum_conv_le`).
 * **`W^m_p = F^m_{p,2}`.** Let `dim V ≥ 1`, `1 < p < ∞` and `m ∈ ℕ`. For `f ∈ L_p(V)`,
   `f ∈ W^m_p(V)` iff `f ∈ F^m_{p,2}(V)` (`Rd.memSobolev_iff_memTriebelLizorkin`), with named
   constants in both directions, formulas in Schwartz seminorms of fixed kernels, proved finite. If
@@ -362,6 +316,70 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `‖f‖_{F^m_{p,2}}` by `M_f`. The constants are named formulas in norms and Schwartz seminorms
   of fixed kernels, proved finite. The critical case `1/r = 1/p - m/n` with `r < ∞` (Sobolev's
   inequality) is not covered.
+
+**Domains, traces and manifolds** ([domains, traces and manifolds](docs/DomainsTraces.md))
+
+* **Besov spaces on bounded Lipschitz domains by intrinsic differences.** Let `Ω ⊆ V` be a bounded
+  Lipschitz domain: a bounded open set whose boundary is covered by finitely many open balls
+  `B_j`, centred on the boundary, with `B_j ∩ Ω = B_j ∩ Ω_j` for Lipschitz graph domains `Ω_j`
+  (`Rd.BoundedLipschitzDomain`, a structure that carries the balls and graph domains as data; a
+  constructor from the set-level definition and concrete instances are not formalised), and let
+  `ω_r(f, t, Ω)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_{L_p(Ω_{rh})}` with
+  `Ω_{rh} = {x : x, x + h, …, x + rh ∈ Ω}`. For `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`,
+  `f ∈ L_p(V)` agrees on `Ω` with some `F ∈ L_p(V)` with
+  `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
+  `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
+  (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`).
+* **`H^1` on bounded Lipschitz domains.** On a bounded Lipschitz domain `Ω` with boundary `Γ`,
+  `H^1(Ω)` consists of the `f ∈ L_2(V)` that agree on `Ω` with a function of `H^1(V)`
+  (`Rd.BoundedLipschitzDomain.MemSobolevOn`); for every order `r ≥ 2`, `f ∈ H^1(Ω)` iff
+  `‖f‖_{L_2(Ω)} + ‖(2^k ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞`
+  (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_modulusOn`); every `f ∈ H^1(Ω)` has weak
+  derivatives in `L_2(Ω)` (`Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`, which holds
+  by the definition through extensions; the converse is the extension theorem below), and the
+  boundary traces of the functions of `H^1(Ω)` are the functions of `B^{1/2}_{2,2}(Γ)`, defined
+  chart by chart with first differences, which describe the Besov spaces of the boundary for
+  `0 < s < 1` (`Rd.BoundedLipschitzDomain.MemBoundaryBesov`,
+  `Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_memSobolevOn`).
+* **Sobolev spaces on open sets as Hilbert spaces.** For every open `Ω ⊆ V` and real `s`,
+  `H^s(Ω)` is the orthogonal complement in `H^s(V)` of the elements whose distribution vanishes
+  on every test function of `Ω` (`Rd.RestrictionSpace`), and by this definition as an orthogonal
+  complement it is isometric to the quotient of `H^s(V)` by them
+  (`Rd.quotientEquivRestrictionSpace`); `H^1(Ω) → L_2(Ω)` is injective and, for
+  bounded `Ω`, compact (`Rd.restrictL2_injective`, `Rd.isCompactOperator_restrictL2`); and
+  restriction is an isometry from `H̃^1(Ω)`, the closure of the test functions in `H^1(V)`, onto
+  `H^1_0(Ω)`, the closure of their restrictions in `H^1(Ω)` (`Rd.tildeEquivZeroBoundary`).
+* **Duality on open sets.** For every open `Ω ⊆ V` and real `s`, every bounded functional `ℓ` on
+  `H̃^s(Ω)` is `U ↦ ⟪J_{-s} W, J_s U⟫_{L_2}` for exactly one `W ∈ H^{-s}(Ω)`, with `‖W‖ = ‖ℓ‖`
+  (`Rd.dualEquiv`, `Rd.dualEquiv_apply`, `Rd.dualEquiv_eq_iff`), and likewise
+  `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` and `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` (`Rd.dualRestrictionEquiv`,
+  `Rd.dualZeroBoundaryEquiv`).
+* **The trace space `H^{1/2}(Γ)`.** On a bounded Lipschitz domain `Ω` with boundary `Γ`, the trace
+  space `H^{1/2}(Γ)` is defined as the orthogonal complement in `H^1(Ω)` of the `u` whose boundary
+  trace vanishes almost everywhere on `Γ` (`Rd.BoundedLipschitzDomain.TraceSpace`,
+  `Rd.BoundedLipschitzDomain.mem_traceKer_iff`). By this definition the trace is the orthogonal
+  projection onto it and the extension is the inclusion, both of norm at most `1`, and
+  `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)` isometrically (`Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`).
+  The boundary traces of its elements are the functions of `B^{1/2}_{2,2}(Γ)` modulo null sets of
+  `Γ` (`Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`); this link is qualitative,
+  a norm equivalence of `H^{1/2}(Γ)` with `B^{1/2}_{2,2}(Γ)` is not formalised.
+* **The area formula for Lipschitz graphs.** Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph
+  domain in `V`, `dim V = n`, with the graph map `γ(x') = x' + φ(x') e` over the hyperplane
+  `H = e^⊥` and the gradient `∇φ(x') ∈ H` of `φ` on `H`, which exists almost everywhere. For
+  every measurable `A ⊆ H`, `μHE[n-1] (γ(A)) = ∫_A √(1 + ‖∇φ(x')‖²) dx'` for Mathlib's
+  `(n-1)`-dimensional Euclidean Hausdorff measure `μHE[n-1]`, normalised to be the volume on
+  hyperplanes (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`).
+* **The surface measure and `L_2(Γ)`.** On a bounded Lipschitz domain `Ω` with boundary `Γ`,
+  charts `γ_j` over the hyperplanes `H_j` and boundary balls `B_j`, the surface measure `σ` is
+  `μHE[n-1]` restricted to `Γ` (`Rd.BoundedLipschitzDomain.surfaceMeasure`), and
+  `∫_Γ F dσ = ∫_{H_j} F(γ_j x') √(1 + ‖∇φ_j(x')‖²) dx'` for every `F : V → [0, ∞]` vanishing
+  outside `B_j` (`Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure_of_support`). It is finite,
+  `|Γ| = 0` (`Rd.BoundedLipschitzDomain.volume_frontier`), and the trace
+  `γ_{L_2} : H^1(Ω) → L_2(Γ) = L_2(σ)` is a bounded operator, given almost everywhere by the
+  boundary trace, with the trace kernel as its kernel (`Rd.BoundedLipschitzDomain.boundaryTraceL2`,
+  `Rd.BoundedLipschitzDomain.boundaryTraceL2_apply_ae`,
+  `Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`); on `H^{1/2}(Γ)` the trace into `L_2(Γ)` is
+  injective (`Rd.BoundedLipschitzDomain.traceL2_injective`).
 * **The extension theorem for `W^1_p` on bounded Lipschitz domains.** Let `Ω` be a bounded
   Lipschitz domain in `V`, `dim V ≥ 1`, `(e_i)` the orthonormal basis `Rd.gridBasis V` and
   `1 < p < ∞`. There
@@ -411,20 +429,6 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `H^{1/2}(Γ)` by `[u] ↦ γ u` (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace`).
   An element of `H^1(V)` lies in the closure `H̃^1(Ω)` of the test functions of `Ω` iff it
   vanishes almost everywhere outside `Ω` (`Rd.BoundedLipschitzDomain.mem_tildeSpace_iff`).
-
-**Domains, manifolds and traces** ([details](docs/DomainsTraces.md))
-
-* **Besov spaces on bounded Lipschitz domains by intrinsic differences.** Let `Ω ⊆ V` be a bounded
-  Lipschitz domain: a bounded open set whose boundary is covered by finitely many open balls
-  `B_j`, centred on the boundary, with `B_j ∩ Ω = B_j ∩ Ω_j` for Lipschitz graph domains `Ω_j`
-  (`Rd.BoundedLipschitzDomain`, a structure that carries the balls and graph domains as data; a
-  constructor from the set-level definition and concrete instances are not formalised), and let
-  `ω_r(f, t, Ω)_p = sup_{|h| ≤ t} ‖Δ_h^r f‖_{L_p(Ω_{rh})}` with
-  `Ω_{rh} = {x : x, x + h, …, x + rh ∈ Ω}`. For `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`,
-  `f ∈ L_p(V)` agrees on `Ω` with some `F ∈ L_p(V)` with
-  `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
-  `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
-  (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`).
 * **Besov spaces on compact manifolds.** Let `M` be a compact smooth manifold, without boundary or
   with boundary modelled on the half-space, and `μ` a smooth measure; the range of the model is a
   Besov domain, a hypothesis class with the half-space and the whole space as instances
@@ -446,35 +450,21 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `Rd.BoundedLipschitzDomain` it has no constructor from the set-level definition and no
   concrete instance yet).
 
-**Dominating mixed smoothness** ([details](docs/MixedSmoothness.md))
-
-* **Mixed smoothness and hyperbolic crosses.** For `1 ≤ p < ∞`, `0 < s < L`, `1 ≤ q ≤ ∞` and
-  `f ∈ L_p(ℝ^d)`, the mixed moduli `Ω^{e(k)}_L` in the coordinates `e(k) = {i : k_i ≠ 0}`, the
-  tensor local means kernels `k_k` of a bump vanishing outside `[-1, 1]` and the tensor
-  Littlewood–Paley kernels `δ_k = ⊗_i ψ_{k_i}`
-  describe the same space:
-  `‖(2^(s|k|_1) Ω^{e(k)}_L(f, 2^(-k))_p)_{k ∈ ℕ^d}‖_{ℓ_q} < ∞` iff
-  `‖(2^(s|k|_1) ‖k_k ⋆ f‖_p)_k‖_{ℓ_q} < ∞` iff `‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q} < ∞`
-  (`Rd.LocalMeansBump.mixedBesov_iff_mixedLocalMeans`, `Rd.mixedBesov_iff_mixedLP`). The
-  hyperbolic cross sums `S_N f = ∑_{|k|_1 ≤ N} δ_k ⋆ f` satisfy
-  `‖f - S_N f‖_p ≤ C 2^(-sN) (N + 1)^((d-1)(1-1/q)) ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}` with
-  the constant `C = ∑_l 2^(-sl) (l + 1)^((d-1)(1-1/q))`, finite for `s > 0`
-  (`Rd.hyperbolicCrossConst_ne_top`, `Rd.enorm_sub_hyperbolicSum_le_of_pos`).
-
 ## What is formalised
 
 | Block | Lean | Checked |
 |---|---|---|
 | [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
-| [**Besov and Sobolev spaces on measure spaces**](docs/BesovSobolev.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, spectral schemes, continuous spectral bases | ✅ | ✗ |
+| [**Besov and Sobolev spaces on measure spaces**](docs/MeasureSpaces.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, spectral schemes, continuous spectral bases | ✅ | ✗ |
+| [**Tools from analysis**](docs/Analysis.md): `L_p` norms, the inclusion `L_r ↪ L_p`, Young's inequality, mixed norms, differences and the translation algebra, convolution, approximate identities, Littlewood–Paley kernels, test functions in the Schwartz space, dyadic cubes and cells, the Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, weak type and Marcinkiewicz interpolation, `L_p` norms by duality | ✅ | ✗ |
 | [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness and smooth Littlewood–Paley blocks for all `p`, `W^m_2` by Fourier multipliers, the trace on a face | ✅ | ✗ |
 | [**Intervals, the cube, splines and wavelets**](docs/IntervalCube.md): piecewise polynomials and splines on `[0, 1]`, the circle and `[0, 1]^d`, Whitney's inequality, coordinate and isotropic moduli, multiwavelets, the Haar system | ✅ | ✗ |
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
-| [**Function spaces on `ℝ^d`**](docs/Rd.md): convolution, Littlewood–Paley blocks, differences, local means, atoms, invariance under changes of variables | ✅ | ✗ |
-| [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): mixed norms, maximal functions, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, local means, ball means of differences, atoms, the torus | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, `H^1` on bounded Lipschitz domains with weak gradient and trace, Rellich's theorem, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators, the area formula for Lipschitz graphs with the outward unit normal, the surface measure of a bounded Lipschitz domain with `L_2(Γ)` and the trace into it, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, and `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)` | ✅ | ✗ |
-| [**Domains, manifolds and traces**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, traces, the half-space, compact manifolds with boundary, smooth domains | ✅ | ✗ |
+| [**Besov spaces on `ℝ^d`**](docs/Rd.md): band-limited approximation, Littlewood–Paley blocks, differences, local means, kernel majorants, atoms, invariance under changes of variables | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
+| [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞` | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}` | ✅ | ✗ |
+| [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 
 Lean: ✅ every file proved without `sorry` · 🟡 some statement still `sorry` · ⬜ planned.
 Checked (human-checked): ✅ mathematics and documentation both reviewed by the author ·
@@ -504,13 +494,21 @@ that library builds itself.
 
 ## What is left to do
 
-* **Reiteration** for approximation and interpolation spaces.
+* **Lipschitz domains as sets**: a constructor of `Rd.BoundedLipschitzDomain` from the set-level
+  definition, with the ball and bounded convex sets as instances.
+* **Interpolation**: the continuous K-method, so that the representation theorem reads
+  `A^s_q = (X, Y)_{s/r,q}`; the interpolation property of the K-method (an operator bounded on
+  both spaces of a couple is bounded on its interpolation spaces) and reiteration.
+* **Traces and extensions**: the norm equivalence `H^{1/2}(Γ) ≅ B^{1/2}_{2,2}(Γ)`, a bounded
+  linear extension operator for `W^1_p`, the exponents `p ∈ {1, ∞}` and higher order, and the
+  trace of a continuous function on the torus as its restriction.
+* **Manifolds with corners**, with Lipschitz domains as Besov domains.
 * **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,
   elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.
 * **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and their ball means and atoms on the
   torus.
-* **Sobolev spaces**: Sobolev spaces on the torus for all `p`, the critical Sobolev embedding,
-  Mihlin multipliers and `H^{s,p}` for `s < 0`.
+* **Sobolev spaces**: Sobolev spaces on the torus for all `p` through distributions, the critical
+  Sobolev embedding, Mihlin multipliers and `H^{s,p}` for `s < 0`.
 * **Higher smoothness**: splines on domains; for the Daubechies wavelets the sharp `L_p`
   exponents of the scaling functions, Hölder exponents beyond D4, and `ℝ^d`.
 * **The quasi-Banach range** `0 < p, q < 1`, the setting of nonlinear `n`-term approximation.

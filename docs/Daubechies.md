@@ -1,7 +1,7 @@
 # Daubechies wavelets
 
-Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *Daubechies
-wavelets*.
+Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Besov spaces*,
+chapter *Daubechies wavelets*.
 
 The compactly supported orthonormal wavelets of Daubechies on `ℝ`, built from the filter up, and
 the description of `B^s_{p,q}(ℝ)` by their coefficients. A mask of order `N` comes from the
@@ -13,7 +13,7 @@ transfer operator of Eirola and Villemoes gives the Sobolev regularity, the matr
 Daubechies and Lagarias the Hölder exponent of D4. The projections onto the spaces `V_j` form a
 projection scheme in the sense of [Approximation spaces](ApproximationSpaces.md); Jackson's and
 Bernstein's inequalities identify its approximation spaces with the Besov spaces of
-[Function spaces on `ℝ^d`](Rd.md), as for the Haar system and the multiwavelets of
+[Besov spaces on `ℝ^d`](Rd.md), as for the Haar system and the multiwavelets of
 [Intervals, the cube, splines and wavelets](IntervalCube.md).
 
 ## Main results

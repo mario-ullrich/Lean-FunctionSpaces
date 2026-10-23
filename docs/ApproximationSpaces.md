@@ -1,9 +1,10 @@
 # Approximation spaces
 
-Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *Approximation
-schemes*, *Sequence spaces*, *Approximation spaces*, *Lifting and the Nikolskii transfer theorem*,
-*Interpolation and the representation theorem*, *Block decompositions and projections*, *Traces and
-intrinsic norms*, *Moduli of smoothness and approximation*.
+Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Approximation
+spaces*, chapters *Approximation schemes*, *Sequence spaces*, *Approximation spaces*, *Lifting
+and the Nikolskii transfer theorem*, *Interpolation and the representation theorem*, *Block
+decompositions and projections*, *Traces and intrinsic norms* and *Moduli of smoothness and
+approximation*.
 
 The library `ApproximationSpaces` holds the abstract theory in a real normed space `X`:
 approximation schemes and the errors of best approximation, the approximation spaces `A^s_q` with

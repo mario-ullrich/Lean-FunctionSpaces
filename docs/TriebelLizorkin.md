@@ -1,38 +1,34 @@
 # Triebel–Lizorkin spaces
 
-Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters:
-*Triebel–Lizorkin spaces*.
+Part of [Characterizations of Function Spaces](../README.md). Blueprint: part
+*Triebel–Lizorkin spaces*, chapters *Triebel–Lizorkin spaces* and *Vector-valued singular
+integrals*.
 
 Besov quasi-norms take the `L_p` norm of every Littlewood–Paley block `ψ_j ⋆ f` and then the
 `ℓ_q` norm over the levels; the Triebel–Lizorkin quasi-norm
 `‖ (∑_j 2^(jsq) |ψ_j ⋆ f|^q)^(1/q) ‖_p`, with the supremum over `j` for `q = ∞`, takes the
 `ℓ_q` norm at every point first. This block develops the spaces `F^s_{p,q}` on `ℝ^d` and on the
-torus `𝕋^d` with the blocks of [Function spaces on `ℝ^d`](Rd.md). Its first part compares the two
-mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)` on every measure space.
+torus `𝕋^d` with the blocks of [Besov spaces on `ℝ^d`](Rd.md); the mixed norms `L_p(ℓ_q)` and
+`ℓ_q(L_p)`, the maximal functions and the Fefferman–Stein inequality are in
+[Tools from analysis](Analysis.md).
+The theory for `1 < p < ∞` starts with families of dilated Schwartz kernels with their Fourier
+overlap and Hörmander condition, the adjoint of a convolution, which moves kernels and their
+derivatives to the other side of an integral, the `L_2` bounds of the analysis and synthesis
+operators of every kernel family with bounded Fourier overlap, and the Calderón–Zygmund
+decomposition of functions with values in a normed space, and of families of them, into a bounded
+good part and bad pieces with mean zero on dyadic cubes. With these, the analysis and synthesis
+operators of every Calderón–Zygmund family are of weak type `(1,1)`. Marcinkiewicz interpolation
+between weak type `(1,1)` and strong type `(2,2)`, in the terms of the Carleson project, gives
+strong type `(p,p)` for `1 < p < 2`, and duality with the adjoint family extends it to `2 < p < ∞`,
+for the analysis and the synthesis operators. Applied to the Littlewood–Paley blocks and their
+synthesis kernels, this gives the square function theorem, the two-sided bound of `‖f‖_{F^0_{p,2}}`
+by `‖f‖_p`, for `1 < p < ∞`.
 
 ## Main results
 
-* **Mixed norms.** Let `(X, μ)` be a measure space and `g_i : X → [0, ∞]` measurable functions
-  indexed by a countable set, with the mixed norms
-  `‖g‖_{L_p(ℓ_q)} = ‖ x ↦ ‖(g_i(x))_i‖_{ℓ_q} ‖_p` and `‖g‖_{ℓ_q(L_p)} = ‖(‖g_i‖_p)_i‖_{ℓ_q}`.
-  For `0 < p < ∞`, `‖g‖_{L_p(ℓ_p)} = ‖g‖_{ℓ_p(L_p)}`
-  (`MeasureTheory.eLpNorm_lqNorm_eq_lqNorm_eLpNorm`); for `0 < p ≤ q ≤ ∞`,
-  `‖g‖_{ℓ_q(L_p)} ≤ ‖g‖_{L_p(ℓ_q)}` (`MeasureTheory.lqNorm_eLpNorm_le_eLpNorm_lqNorm`); for
-  `0 < q ≤ p < ∞`, `‖g‖_{L_p(ℓ_q)} ≤ ‖g‖_{ℓ_q(L_p)}`
-  (`MeasureTheory.eLpNorm_lqNorm_le_lqNorm_eLpNorm`). Hence for `1 ≤ p < ∞` and `1 ≤ q ≤ ∞`,
-  `‖g‖_{ℓ_{max(p,q)}(L_p)} ≤ ‖g‖_{L_p(ℓ_q)} ≤ ‖g‖_{ℓ_{min(p,q)}(L_p)}`
-  (`MeasureTheory.lqNorm_max_le_eLpNorm_lqNorm`, `MeasureTheory.eLpNorm_lqNorm_le_lqNorm_min`),
-  also for the weighted families `w_j ‖u_j‖` of functions `u_j` with values in a normed group
-  (`MeasureTheory.lqNorm_max_weighted_le`, `MeasureTheory.eLpNorm_lqNorm_weighted_le_min`), such
-  as `2^(js) ‖u_j‖` (`MeasureTheory.lqNorm_max_dyadicWeight_le`,
-  `MeasureTheory.eLpNorm_lqNorm_dyadicWeight_le_min`). The tools are Minkowski's inequality for
-  series in `L_p`, `‖∑_i g_i‖_p ≤ ∑_i ‖g_i‖_p` for `1 ≤ p ≤ ∞` (`MeasureTheory.eLpNorm_tsum_le`),
-  and Minkowski's integral inequality for `ℓ_u`-valued functions,
-  `‖(∫ g_i dμ)_i‖_{ℓ_u} ≤ ∫ ‖(g_i(x))_i‖_{ℓ_u} dμ(x)` for `1 ≤ u ≤ ∞`
-  (`MeasureTheory.lqNorm_lintegral_le`).
 * **Triebel–Lizorkin spaces and the Besov sandwich on `ℝ^d`.** Let `V` be a finite-dimensional
   real inner product space, such as `ℝ^d`, `1 ≤ p < ∞`, `s ∈ ℝ`, `1 ≤ q ≤ ∞`, and `ψ_j` the
-  Littlewood–Paley kernels of [Function spaces on `ℝ^d`](Rd.md). For `f ∈ L_p(V)` the
+  Littlewood–Paley kernels of [Besov spaces on `ℝ^d`](Rd.md). For `f ∈ L_p(V)` the
   Triebel–Lizorkin quasi-norm is `‖f‖_{F^s_{p,q}} = ‖ x ↦ ‖(2^(js) |ψ_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p`
   (`Rd.triebelLizorkinNorm`), and `F^s_{p,q}` consists of the `f` with `‖f‖_{F^s_{p,q}} < ∞`
   (`Rd.MemTriebelLizorkin`, a subspace of `L_p`: `Rd.triebelLizorkinSpace`; for `s < 0` this is
@@ -61,15 +57,8 @@ mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)` on every measure space.
   `Torus.triebelLizorkinNorm_le_approxNormDyadic`), where
   `B^s_{p,q}(𝕋^d)` is the approximation space of the trigonometric polynomials, described by the
   Littlewood–Paley blocks of [the torus](Torus.md).
-* **The Fefferman–Stein inequality.** Let `V` be a finite-dimensional real inner product space,
-  such as `ℝ^d`, and `M` the Hardy–Littlewood maximal operator. For `1 < p < ∞`, `1 < q ≤ ∞` and
-  almost everywhere measurable `g_j : V → [0, ∞]`, `j ∈ ℕ`,
-  `‖ x ↦ ‖(M g_j(x))_j‖_{ℓ_q} ‖_p ≤ C ‖ x ↦ ‖(g_j(x))_j‖_{ℓ_q} ‖_p` with the explicit constant
-  `C = Rd.feffermanSteinConst V p q` (`Rd.feffermanStein`). The case `p < q` rests on a
-  vector-valued weak type `(1,1)` (`Rd.volume_lqNorm_maximal_gt_le`), proved with the
-  Calderón–Zygmund decomposition on dyadic cubes.
 * **Local means.** Let `k_j` be the local means kernels of order `L` of a bump `g`
-  ([Function spaces on `ℝ^d`](Rd.md)) and
+  ([Besov spaces on `ℝ^d`](Rd.md)) and
   `‖f‖^{g,L}_{F^s_{p,q}} = ‖ x ↦ ‖(2^(js) |k_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p`
   (`Rd.LocalMeansBump.tlLocalMeansNorm`). For `1 < p < ∞`, `1 < q ≤ ∞` and `f ∈ L_p(V)`,
   `‖f‖^{g,L}_{F^s_{p,q}} ≤ D ‖f‖_{F^s_{p,q}}` and, for `L ≥ 1`,
@@ -117,6 +106,75 @@ mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)` on every measure space.
   Triebel's *Theory of Function Spaces II* states the characterisation with `(s,p)`-atoms
   normalised in `L_p`; the two forms correspond under `λ_{j,m} ↦ 2^(j(s - n/p)) λ_{j,m}`,
   `n = dim V`.
+* **Dilation families and the Hörmander condition.** Let `(G_j)_{j ∈ ℕ}` be Schwartz functions
+  on `V`, `dim V = n`, whose Schwartz seminorms `sup_x ‖x‖^k ‖D^l G_j(x)‖` are at most `A_{k,l}`
+  for every `j` (`Rd.IsUniformSchwartz`), and `θ_j(x) = 2^(jn) G_j(2^j x)`. For every `y ∈ V`,
+  `∫_{‖x‖ > 2‖y‖} ‖(θ_j(x - y) - θ_j(x))_j‖_{ℓ_2} dx ≤ 4 H_A` with an explicit constant `H_A`
+  built from the bounds `A` (`Rd.lintegral_lqNorm_sub_le`, `Rd.familyHormanderConst`); the proof
+  bounds each term by `H_A min(2^j ‖y‖, (2^j ‖y‖)⁻¹)`
+  (`Rd.setLIntegral_enorm_dilate_sub_le_min`) and uses
+  `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4` for every `a ∈ [0, ∞]` (`ENNReal.tsum_min_two_pow_le`). A
+  Calderón–Zygmund family with Fourier overlap `B` and Hörmander constant `H`
+  (`Rd.IsCZFamily`) consists of integrable, continuous, bounded kernels `θ_j` with integrable
+  Fourier transforms, `∑_j |𝓕θ_j(ξ)|² ≤ B` for every `ξ`, and the Hörmander integral at most `H`
+  for every `y`; uniform dilation families with overlap `B` are such families with
+  `H = 4 H_A` (`Rd.IsCZFamily.of_dilation`), and so are the adjoint kernels
+  `θ_j^*(x) = conj θ_j(-x)` with the same `B` and `H` (`Rd.IsCZFamily.adjoint`). The
+  Littlewood–Paley blocks `ψ_j` form such a family with overlap `2` (`Rd.isCZFamily_psi`), and so
+  do the synthesis kernels `ψ̃_0 = Φ_1`, `ψ̃_1 = Φ_2`, `ψ̃_j = Φ_{j+1} - Φ_{j-2}` with overlap `4`
+  (`Rd.psiDual`, `Rd.isCZFamily_psiDual`), which reproduce the blocks: `ψ̃_j ⋆ ψ_j = ψ_j`
+  (`Rd.conv_psiDual_psi`).
+* **The adjoint of a convolution.** For `K ∈ L_1(V)`, `f ∈ L_p(V)` and `g ∈ L_q(V)` with
+  `1/p + 1/q = 1`, `p < ∞`, and the reflection `K^∨(x) = K(-x)` (`Rd.reflect`),
+  `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` (`Rd.integral_conv_mul`). For Schwartz functions `η`, `u`,
+  `f ∈ L_p(V)`, `1 ≤ p < ∞`, and `w ∈ V^k`, `∫ ((∂^w η) ⋆ f) u = (-1)^k ∫ (η ⋆ f) ∂^w u`
+  (`Rd.integral_conv_iteratedLineDerivOp_mul`). Weak derivatives commute with convolution by a
+  Schwartz function `η`: if `g ∈ L_r(V)` is the weak derivative `∂^v f` of `f ∈ L_p(V)` on `V`,
+  `1 ≤ p, r ≤ ∞`, then `η ⋆ g = (∂^v η) ⋆ f` at every point
+  (`Rd.conv_eq_conv_iteratedLineDerivOp`), and `(∂^v η) ⋆ f` is the weak derivative
+  `∂^v (η ⋆ f)` for `f ∈ L_p(V)`, `1 ≤ p < ∞` (`Rd.hasWeakLineDeriv_conv`).
+* **Plancherel bounds.** For integrable kernels `θ_j` on `V` with `∑_j |𝓕θ_j(ξ)|² ≤ B` for
+  almost every `ξ`, the analysis operator satisfies `∑_j ‖θ_j ⋆ f‖_2² ≤ B ‖f‖_2²` for every
+  `f ∈ L_2(V)` (`Rd.tsum_enorm_convLp_sq_le`, `Rd.lintegral_lqNorm_conv_sq_le`), and the
+  synthesis operator satisfies `‖∑_{j ∈ s} θ_j ⋆ g_j‖_2² ≤ B ∑_{j ∈ s} ‖g_j‖_2²` for all
+  `g_j ∈ L_2(V)` and every finite set `s` (`Rd.enorm_sum_convLp_sq_le`,
+  `Rd.lintegral_enorm_sum_conv_sq_le`); in particular for every Calderón–Zygmund family with
+  overlap `B` (`Rd.IsCZFamily.lintegral_lqNorm_conv_sq_le`,
+  `Rd.IsCZFamily.lintegral_enorm_sum_conv_sq_le`).
+* **The weak type `(1,1)` of vector-valued singular integrals.** Let `n = dim V ≥ 1` and let
+  `(θ_j)_j` be a Calderón–Zygmund family with overlap `B` and Hörmander constant `H`, and put
+  `C = 4 · 2^n B + (2n)^n |B(0, 1)| + 4H` (`Rd.vectorWeakConst`). For every `0 < t < ∞` and
+  every integrable `f : V → ℂ`, `|{x : ‖((θ_j ⋆ f)(x))_j‖_{ℓ_2} > t}| ≤ C t⁻¹ ∫ |f|`
+  (`Rd.IsCZFamily.volume_lqNorm_conv_gt_le`), and for every finite set `s` and all almost
+  everywhere strongly measurable `g_j` with `∫ ‖(g_j(x))_j‖_{ℓ_2} dx < ∞`,
+  `|{x : |∑_{j ∈ s} (θ_j ⋆ g_j)(x)| > t}| ≤ C t⁻¹ ∫ ‖(g_j(x))_j‖_{ℓ_2} dx`
+  (`Rd.IsCZFamily.volume_enorm_sum_conv_gt_le`).
+* **The strong type of vector-valued singular integrals.** Let `n = dim V ≥ 1`, `1 < p < ∞`, and
+  let `(θ_j)_j` be a Calderón–Zygmund family with overlap `B` and Hörmander constant `H`. With the
+  explicit constant `S = S_{V,p}(B, H)` (`Rd.czConst`: `B^{1/2}` for `p = 2`, the Marcinkiewicz
+  constant `(p (2 C/(p - 1) + 4B/(2 - p)))^(1/p)` with the weak type constant `C` above for
+  `p < 2`, and that constant at the conjugate exponent `p/(p - 1)` for `p > 2`), every
+  `f ∈ L_p(V)` satisfies `‖ ‖((θ_j ⋆ f)(x))_j‖_{ℓ_2} ‖_p ≤ S ‖f‖_p`
+  (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`), and for every finite set `s` and all `g_j ∈ L_p(V)`,
+  `‖∑_{j ∈ s} θ_j ⋆ g_j‖_p ≤ S ‖ ‖(g_j(x))_j‖_{ℓ_2} ‖_p` (`Rd.IsCZFamily.eLpNorm_sum_conv_le`).
+  For `p > 2` the norms are bounded through their pairings with `L_{p/(p-1)}`
+  (`MeasureTheory.eLpNorm_lqNorm_le_of_forall_enorm_sum_integral_le`), tested on the norming
+  family `u_j ‖(u_i)_i‖_{ℓ_2}^{p-2}` (`MeasureTheory.normingFamily`).
+* **The square function theorem.** Let `n = dim V ≥ 1` and `1 < p < ∞`. By definition,
+  `‖f‖_{F^0_{p,2}}` is the `L_p` norm of the square function `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}` of
+  the Littlewood–Paley blocks (`Rd.triebelLizorkinNorm_zero_two_eq`). The theorem is the
+  two-sided bound: for every `f ∈ L_p(V)`,
+  `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p` (`Rd.triebelLizorkinNorm_zero_two_le`) and
+  `‖f‖_p ≤ Q̃_{V,p} ‖f‖_{F^0_{p,2}}` (`Rd.enorm_le_triebelLizorkinNorm_zero_two`) with the
+  named constants `Q_{V,p} = S_{V,p}(2, 4 H_{A^ψ})` and `Q̃_{V,p} = S_{V,p}(4, 4 H_Ã)` of the
+  Calderón–Zygmund families of the blocks and of the synthesis kernels
+  (`Rd.squareFunctionConst`, `Rd.squareSynthesisConst`), where `A^ψ` and `Ã` are the seminorm
+  bounds of the blocks and of the synthesis kernels (`Rd.psiBaseBound`, `Rd.psiDualBaseBound`),
+  formulas in Schwartz seminorms of fixed kernels, proved finite
+  (`Rd.squareFunctionConst_ne_top`, `Rd.squareSynthesisConst_ne_top`).
+  Hence `F^0_{p,2} = L_p(V)` (`Rd.triebelLizorkinSpace_zero_two_eq_top`). The lower bound uses
+  the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p(V)`
+  (`Rd.tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub`).
 
 ## What is formalised
 
@@ -124,13 +182,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`: Minkowski's inequalities for series and for `ℓ_u`-valued functions, comparison, limits of pointwise bounds, terms set to zero and tails, cancellation in Hölder's inequality and conjugate exponents | ✅ | ✗ | `Analysis/Lp/MixedNorms` |
 | Triebel–Lizorkin spaces on `ℝ^d`: definition, `F_{p,p} = B_{p,p}`, the Besov sandwich | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkin` |
-| Dyadic cubes of every level, Lebesgue differentiation along them | ✅ | ✗ | `Analysis/Maximal/DyadicCubes` |
-| Hardy–Littlewood maximal function: measurability, convolutions with kernels under radial majorants, weighted weak type `(1,1)` and weighted strong type, the maximal theorem | ✅ | ✗ | `Analysis/Maximal/HardyLittlewoodMaximal` |
-| The Calderón–Zygmund decomposition on dyadic cubes | ✅ | ✗ | `Analysis/Maximal/CalderonZygmund` |
-| The Fefferman–Stein inequality | ✅ | ✗ | `Analysis/Maximal/FeffermanStein` |
-| Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/LocalMeans/KernelMajorants` |
 | Local means characterisation of Triebel–Lizorkin spaces, and synthesis with the dual kernels in `F^s_{p,q}` | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinLocalMeans` |
 | Characterisation by ball means of differences | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinDifferences` |
 | `f^s_{p,q}`, atomic analysis, synthesis, characterisation | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinAtoms` |
@@ -138,6 +190,12 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The periodic lift: period boxes, lifted null sets, counting boxes | ✅ | ✗ | `Torus/PeriodicLift` |
 | The Fefferman–Stein inequality for periodic lifts | ✅ | ✗ | `Torus/FeffermanStein` |
 | Local means characterisation on the torus | ✅ | ✗ | `Torus/TriebelLizorkinLocalMeans` |
+| Dilation, reflection and conjugation of Schwartz functions, derivatives of dilations, uniform Schwartz families and finitely many exceptions in them, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families, also with finitely many exceptional members, and their adjoints, the Littlewood–Paley blocks and the synthesis kernels as such families | ✅ | ✗ | `Rd/SingularIntegrals/DilationFamilies` |
+| The adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for `f ∈ L_p`, `g ∈ L_q`, and its form `∫ (K ⋆ f) conj g = ∫ f conj(K^* ⋆ g)` with the adjoint kernel, derivatives of Schwartz kernels moved to the other Schwartz factor, translates and reflections of Schwartz functions, and weak derivatives commuting with convolution by Schwartz functions, on `ℝ^d`, in `L_p` and on open sets | ✅ | ✗ | `Rd/SingularIntegrals/ConvolutionAdjoint` |
+| The Cauchy–Schwarz inequality for finite sums, the `L_2` bounds of the analysis operator and of the synthesis operators on finite index sets for a kernel family with Fourier overlap `B`, and for every Calderón–Zygmund family | ✅ | ✗ | `Rd/SingularIntegrals/PlancherelBounds` |
+| Chebyshev's inequality for split functions, the Hörmander condition around a cube, convolutions of pieces with mean zero, and the weak type `(1,1)` of the analysis and synthesis operators of a Calderón–Zygmund family with an explicit constant | ✅ | ✗ | `Rd/SingularIntegrals/VectorValuedWeakType` |
+| The strong type `(p,p)`, `1 < p < ∞`, of the analysis and synthesis operators of a Calderón–Zygmund family with explicit constants: Plancherel for `p = 2`, Marcinkiewicz interpolation for `p < 2`, duality with the adjoint family for `p > 2` | ✅ | ✗ | `Rd/SingularIntegrals/VectorValuedSingularIntegrals` |
+| The square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, the two-sided bound with named constants, and the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p` | ✅ | ✗ | `Rd/TriebelLizorkin/SquareFunction` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

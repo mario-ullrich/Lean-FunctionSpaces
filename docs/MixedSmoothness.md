@@ -1,17 +1,16 @@
 # Dominating mixed smoothness
 
-Part of [Characterizations of Function Spaces](../README.md). Blueprint chapters: *Dominating mixed
-smoothness on `ℝ^d`*.
+Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Besov spaces*,
+chapter *Dominating mixed smoothness on `ℝ^d`*.
 
 On `ℝ^d = Fin d → ℝ` the spaces of dominating mixed smoothness measure differences in several
-coordinates at once, with the weight `2^(s|k|_1)` for `k ∈ ℕ^d`. Mixed differences are powers in
-the translation algebra of [Intervals, the cube, splines and wavelets](IntervalCube.md), the
-kernels are tensor products of the one-dimensional kernels of
-[Function spaces on `ℝ^d`](Rd.md), and the levels are summed by the Schur test and an almost
-diagonal lemma on `ℕ^d`, the counterpart of the almost diagonal sums of
-[Approximation spaces](ApproximationSpaces.md). Mixed differences, mixed local means and the
-tensor Littlewood–Paley blocks give the same space, and the hyperbolic cross sums approximate it
-at the rate `2^(-sN) (N + 1)^((d-1)(1-1/q))`.
+coordinates at once, with the weight `2^(s|k|_1)` for `k ∈ ℕ^d`. Mixed differences are powers in the
+translation algebra of [Tools from analysis](Analysis.md), the kernels are tensor products of the
+one-dimensional kernels of [Besov spaces on `ℝ^d`](Rd.md), and the levels are summed by the Schur
+test and an almost diagonal lemma on `ℕ^d`, the counterpart of the almost diagonal sums of
+[Approximation spaces](ApproximationSpaces.md). Mixed differences, mixed local means and the tensor
+Littlewood–Paley blocks give the same space, and the hyperbolic cross sums approximate it at the
+rate `2^(-sN) (N + 1)^((d-1)(1-1/q))`.
 
 ## Main results
 
