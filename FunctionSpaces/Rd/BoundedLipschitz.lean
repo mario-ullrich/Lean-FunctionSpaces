@@ -125,21 +125,6 @@ theorem modNorm_finsetSum_lt_top {ι : Type*} (t : Finset ι)
   rw [← Finset.sum_add_distrib]
   exact ENNReal.sum_lt_top.2 hG
 
-/-- **Restrictions have finite intrinsic moduli**: if `1_O F = 1_O f` for a measurable `O`, the
-intrinsic quasi-norm of `f` on `O` is at most the quasi-norm of `F` on `V`. -/
-theorem modNormOn_le_modNorm_of_indicatorLp {O : Set V} (hO : MeasurableSet O) (r : ℕ) (s : ℝ)
-    (q : ℝ≥0∞) {F f : Lp ℂ p (volume : Measure V)} (hFf : indicatorLp hO F = indicatorLp hO f) :
-    ‖indicatorLp hO f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p O r f k) ≤
-      ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) := by
-  have hae : O.indicator F =ᵐ[volume] O.indicator f := by
-    filter_upwards [indicatorLp_apply_ae hO F, indicatorLp_apply_ae hO f] with x h1 h2
-    rw [← h1, ← h2, hFf]
-  refine add_le_add ?_ (ENNReal.lqNorm_mono fun k => mul_le_mul' le_rfl ?_)
-  · rw [← hFf]
-    exact enorm_indicatorLp_le hO F
-  · rw [← lpModulusOn_congr hae r k]
-    exact lpModulusOn_le_lpModulus hO r F k
-
 /-- **Pasting local extensions**: let `(U_i)` be a finite cover of `Ō` by bounded open sets and
 `F_i` functions with finite Besov quasi-norms by differences that agree with `f` almost everywhere
 on `O ∩ U_i`. Then `f` agrees on `O` with a function with a finite Besov quasi-norm: `∑_i ψ_i F_i`

@@ -6,6 +6,8 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Rd.Differences
+public import FunctionSpaces.Lp.IndicatorOperator
+public import ApproximationSpaces.Sequences.Lq
 
 /-!
 # Moduli of smoothness on subsets of `V`
@@ -22,7 +24,9 @@ smoothness on `U`** is
 modulus uses only the values of `f` on `U` (`Rd.modulusOn_indicator`, `Rd.modulusOn_congr_ae`),
 increases in `t`, is subadditive, is bounded by `2^r ‖f‖_{L_p(U)}` (`Rd.modulusOn_le`) and by
 the modulus on `V` (`Rd.modulusOn_le_modulus`), and on `U = V` it is the modulus on `V`
-(`Rd.modulusOn_univ`). `Rd.lpModulusOn` samples it for `f ∈ L_p` at the dyadic scales `2^(-k)`.
+(`Rd.modulusOn_univ`). `Rd.lpModulusOn` samples it for `f ∈ L_p` at the dyadic scales `2^(-k)`;
+if `1_O F = 1_O f`, the intrinsic quasi-norm of `f` on `O` is at most that of `F` on `V`
+(`Rd.modNormOn_le_modNorm_of_indicatorLp`).
 -/
 
 @[expose] public section
@@ -266,5 +270,21 @@ theorem lpModulusOn_le [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet U) (r : 
     (k : ℕ) : lpModulusOn p U r f k ≤ 2 ^ r * ‖f‖ₑ :=
   (modulusOn_le (Lp.aestronglyMeasurable f) hU Fact.out r _).trans
     (mul_le_mul' le_rfl ((eLpNorm_indicator_le _ hU).trans_eq (Lp.enorm_def f).symm))
+
+/-- **Restrictions have finite intrinsic moduli**: if `1_O F = 1_O f` for a measurable `O`, the
+intrinsic quasi-norm of `f` on `O` is at most the quasi-norm of `F` on `V`. -/
+theorem modNormOn_le_modNorm_of_indicatorLp [Fact (1 ≤ p)] {O : Set V} (hO : MeasurableSet O)
+    (r : ℕ) (s : ℝ) (q : ℝ≥0∞) {F f : Lp ℂ p μ} (hFf : indicatorLp hO F = indicatorLp hO f) :
+    ‖indicatorLp hO f‖ₑ +
+        ENNReal.lqNorm q (fun k => ENNReal.dyadicWeight s k * lpModulusOn p O r f k) ≤
+      ‖F‖ₑ + ENNReal.lqNorm q (fun k => ENNReal.dyadicWeight s k * lpModulus p r F k) := by
+  have hae : O.indicator F =ᵐ[μ] O.indicator f := by
+    filter_upwards [indicatorLp_apply_ae hO F, indicatorLp_apply_ae hO f] with x h1 h2
+    rw [← h1, ← h2, hFf]
+  refine add_le_add ?_ (ENNReal.lqNorm_mono fun k => mul_le_mul' le_rfl ?_)
+  · rw [← hFf]
+    exact enorm_indicatorLp_le hO F
+  · rw [← lpModulusOn_congr hae r k]
+    exact lpModulusOn_le_lpModulus hO r F k
 
 end Rd

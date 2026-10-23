@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Rd.SobolevTwoLittlewoodPaley
-public import FunctionSpaces.Rd.LipschitzGraph
+public import FunctionSpaces.Lp.IndicatorOperator
 public import Mathlib.Analysis.Fourier.LpSpace
 public import Mathlib.Analysis.Normed.Operator.Compact.Basic
 public import Mathlib.MeasureTheory.Integral.Bochner.Set

@@ -6,6 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Rd.DiffeoInvariance
+public import FunctionSpaces.Rd.BoundedLipschitz
 public import Mathlib.Geometry.Manifold.Instances.Real
 
 /-!

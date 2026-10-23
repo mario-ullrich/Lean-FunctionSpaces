@@ -105,7 +105,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Jackson's inequality for band-limited approximation | ✅ | ✗ | `Rd/BandJackson` |
 | Differences of Schwartz functions in `L_1`, inverse inequality for band-limited functions | ✅ | ✗ | `Rd/BandInverse` |
 | Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ | ✗ | `Rd/BesovDifferences` |
-| Moduli of smoothness on subsets of `ℝ^d` | ✅ | ✗ | `Rd/DomainModuli` |
+| Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences | ✅ | ✗ | `Rd/DomainModuli` |
 | Moment kernels: averaged differences, approximation with the modulus, also on subsets, vanishing first moments of the moment kernels of order two | ✅ | ✗ | `Rd/MomentKernels` |
 | Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L` | ✅ | ✗ | `Rd/LocalMeans` |
 | Pointwise multipliers on `ℝ^d`: the multiplication operator on `L_p`, Leibniz's rule for differences, moduli of lower order | ✅ | ✗ | `Rd/Multipliers` |

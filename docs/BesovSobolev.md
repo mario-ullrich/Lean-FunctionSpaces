@@ -58,6 +58,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
 | `L_p` norms through integrals of powers | ✅ | ✗ | `Lp/LintegralForm` |
+| Multiplication by an indicator as an operator on `L_p`, integrals over a set as `L_2` pairings | ✅ | ✗ | `Lp/IndicatorOperator` |
 | Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces, elementary embeddings | ✅ | ✗ | `Lp/Inclusion`, `Lp/BoundedContinuous`, `Scheme`, `Besov/Basic`, `Besov/Trivial` |
 | Interpolation `L_p`–`L_∞`, Nikolskii property, Besov embeddings | ✅ | ✗ | `Lp/Interpolation`, `Besov/Nikolskii`, `Besov/Embeddings` |
 | Sobolev spaces as a hypothesis structure, Sobolev embeddings | ✅ | ✗ | `Sobolev/Embeddings` |

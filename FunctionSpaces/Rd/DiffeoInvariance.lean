@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Rd.AtomComposition
-public import FunctionSpaces.Rd.BoundedLipschitz
+public import FunctionSpaces.Rd.DomainModuli
 
 /-!
 # Invariance of Besov spaces under smooth changes of variables

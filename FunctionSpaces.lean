@@ -9,6 +9,7 @@ public import ApproximationSpaces
 public import FunctionSpaces.Lp.LintegralForm
 public import FunctionSpaces.Lp.Young
 public import FunctionSpaces.Lp.Inclusion
+public import FunctionSpaces.Lp.IndicatorOperator
 public import FunctionSpaces.Lp.BoundedContinuous
 public import FunctionSpaces.Lp.MixedNorms
 public import FunctionSpaces.Scheme
@@ -218,6 +219,8 @@ bounded continuous functions, and their embedding theorems.  The library builds 
 * `FunctionSpaces.Lp.LintegralForm`: `L_p` norms through integrals of powers.
 * `FunctionSpaces.Lp.Young`: the weighted Jensen inequality, Young's inequality on measurable
   groups, and weighted averages in `L_p`.
+* `FunctionSpaces.Lp.IndicatorOperator`: multiplication by the indicator of a measurable set
+  as an operator on `L_p` of norm at most `1`, and integrals over a set as `L_2` pairings.
 * `FunctionSpaces.Lp.Inclusion`: the bounded linear inclusion `L_r ↪ L_p` for `p ≤ r` and a
   finite measure, `MeasureTheory.Lp.inclusionOfExponentLe`.
 * `FunctionSpaces.Lp.BoundedContinuous`: bounded continuous functions in `L_p`; for a measure

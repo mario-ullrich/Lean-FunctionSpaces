@@ -118,7 +118,7 @@ declarations.
   functions, from Mathlib's manifold version, its form equal to `1` on a neighbourhood of a compact
   set (`Rd.exists_smooth_partition_nhds`), and bounded derivatives of compactly supported smooth
   functions (`Rd.exists_iteratedFDeriv_bound`, `FunctionSpaces/Rd/Multipliers.lean`).
-* **Multiplication by an indicator on `L_p`** (`FunctionSpaces/Rd/LipschitzGraph.lean`): for a
+* **Multiplication by an indicator on `L_p`** (`FunctionSpaces/Lp/IndicatorOperator.lean`): for a
   measurable set `s`, `g ↦ 1_s g` as a continuous linear operator of norm at most `1` on
   `Lp ℂ p μ` (`Rd.indicatorLp`). Mathlib has `indicatorConstLp` for constant functions.
 * **Differences of Schwartz functions in `L_1`** (`FunctionSpaces/Rd/BandInverse.lean`):
