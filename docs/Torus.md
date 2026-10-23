@@ -84,14 +84,14 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The torus: trigonometric polynomials, Nikolskii inequality | ✅ | ✗ | `Torus/Measure`, `Torus/Scheme`, `Torus/Nikolskii` |
 | The torus: `H^s(𝕋^d)`, Besov and Sobolev embeddings, `H^s(𝕋^d) ↪ C(𝕋^d)` | ✅ | ✗ | `Torus/Sobolev`, `Torus/Embeddings` |
 | Fourier-coefficient characterisations, `H^s(𝕋^d) = B^s_{2,2}(𝕋^d)` | ✅ | ✗ | `Torus/Coefficients` |
-| The Fourier basis as a continuous spectral basis with the local Weyl bound | ✅ | ✗ | `Torus/Eigenbasis` |
+| The Fourier basis as a continuous spectral basis with the local Weyl bound | ✅ | ✗ | `Torus/FourierSpectralBasis` |
 | Moduli of smoothness in `L_2(𝕋^d)`, Jackson's theorem, coincidence for `0 < s < 1` | ✅ | ✗ | `Torus/Translation`, `Torus/Modulus`, `Torus/BesovModuli` |
 | Convolution on the torus with kernels on `ℝ^d`: Young's inequality, Fourier multipliers, differences | ✅ | ✗ | `Torus/EuclideanConvolution` |
 | Jackson's and Bernstein's inequalities in `L_p(𝕋^d)`, moduli of every order | ✅ | ✗ | `Torus/LpJackson` |
 | Convolution identities, approximate identities | ✅ | ✗ | `Torus/EuclideanConvolutionIdentities` |
 | Littlewood–Paley blocks, Besov spaces by them for `1 ≤ p < ∞` | ✅ | ✗ | `Torus/LittlewoodPaley` |
 | Besov spaces on the torus by moduli of smoothness for all `1 ≤ p < ∞` | ✅ | ✗ | `Torus/LpBesovModuli` |
-| Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ | ✗ | `Traces/Examples/Torus` |
+| Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ | ✗ | `Torus/Trace` |
 | Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ | ✗ | `Torus/WeakDerivatives` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.

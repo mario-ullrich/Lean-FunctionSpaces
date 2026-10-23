@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Rd.Differences
+public import FunctionSpaces.Analysis.Differences.Differences
 public import Mathlib.RingTheory.Polynomial.Basic
 public import Mathlib.Analysis.Complex.Basic
 

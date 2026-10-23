@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Scheme
+public import FunctionSpaces.MeasureSpaces.Scheme
 public import FunctionSpaces.Torus.Measure
 public import Mathlib.Algebra.Algebra.Operations
 public import Mathlib.Data.Int.Interval

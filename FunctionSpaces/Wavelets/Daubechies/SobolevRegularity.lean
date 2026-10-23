@@ -5,8 +5,8 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Rd.Differences
-public import FunctionSpaces.Rd.LittlewoodPaleyKernels
+public import FunctionSpaces.Analysis.Differences.Differences
+public import FunctionSpaces.Analysis.Fourier.LittlewoodPaleyKernels
 public import FunctionSpaces.Wavelets.Daubechies.Cascade
 public import FunctionSpaces.Wavelets.Daubechies.TransferExamples
 

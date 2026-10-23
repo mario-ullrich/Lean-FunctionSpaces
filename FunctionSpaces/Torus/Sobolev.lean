@@ -6,8 +6,8 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Torus.Nikolskii
-public import FunctionSpaces.Spectral.Basic
-public import FunctionSpaces.Sobolev.Embeddings
+public import FunctionSpaces.MeasureSpaces.Spectral.Basic
+public import FunctionSpaces.MeasureSpaces.Sobolev.Embeddings
 
 /-!
 # `L_2` Sobolev spaces on the torus
@@ -23,13 +23,12 @@ The **Sobolev space** `H^s(𝕋^d)`, `s > 0`, consists of the `f ∈ L_2(𝕋^d)
 `∑_{k ∈ ℤ^d} (1 + max_i |k_i|)^(2s) |f̂(k)|² < ∞`,
 
 normed by the square root of this sum; it is the image of `ℓ²(ℤ^d)` under
-`c ↦ ∑_k (1 + deg k)^(-s) c_k e_k` (`Torus.sobolevSpace`, `Torus.mem_range_sobolev_iff`).  The
-weight `(1 + max_i |k_i|)^(2s)` is equivalent to the more common `(1 + |k|²)^s`, up to
-constants depending on `d` and `s`; it is used because the degree `max_i |k_i|` is the one that
-indexes the trigonometric polynomials.  By the spectral theory of `FunctionSpaces.Spectral`
-it satisfies Jackson's and Bernstein's inequalities with constant `1`, and so is a Sobolev
-space for the scheme of trigonometric polynomials in the sense of
-`FunctionScheme.SobolevSpace`.
+`c ↦ ∑_k (1 + deg k)^(-s) c_k e_k` (`Torus.sobolevSpace`, `Torus.mem_range_sobolev_iff`). The weight
+`(1 + max_i |k_i|)^(2s)` is equivalent to the more common `(1 + |k|²)^s`, up to constants depending
+on `d` and `s`; it is used because the degree `max_i |k_i|` is the one that indexes the
+trigonometric polynomials. By the spectral theory of `FunctionSpaces.MeasureSpaces.Spectral` it
+satisfies Jackson's and Bernstein's inequalities with constant `1`, and so is a Sobolev space for
+the scheme of trigonometric polynomials in the sense of `FunctionScheme.SobolevSpace`.
 -/
 
 @[expose] public section

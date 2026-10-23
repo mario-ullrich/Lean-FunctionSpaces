@@ -6,8 +6,8 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Torus.EuclideanConvolution
-public import FunctionSpaces.Rd.BandJackson
-public import FunctionSpaces.Rd.BandInverse
+public import FunctionSpaces.Rd.Approximation.BandJackson
+public import FunctionSpaces.Rd.Approximation.BandInverse
 
 /-!
 # Jackson's and Bernstein's inequalities in `L_p(𝕋^d)`

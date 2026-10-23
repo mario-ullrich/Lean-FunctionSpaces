@@ -481,29 +481,15 @@ resets its row there and the block here to ✗.
 ## Organisation
 
 Two libraries. `ApproximationSpaces` holds the abstract theory, which mentions neither functions
-nor measures; `FunctionSpaces` holds the Besov, Triebel–Lizorkin and Sobolev spaces built on
-it, in folders by setting.
-The blocks map onto the folders as follows: approximation spaces are all of
-`ApproximationSpaces/`; Besov and Sobolev spaces on measure spaces are
-`FunctionSpaces/{Lp,Scheme,Besov,Sobolev,Spectral}`; the torus is `FunctionSpaces/Torus/` with
-the torus traces in `FunctionSpaces/Traces/`; intervals, the cube, splines and wavelets are
-`FunctionSpaces/{Interval,Cube,Wavelets}` without `FunctionSpaces/Wavelets/Daubechies/`, which
-holds the Daubechies wavelets, and `FunctionSpaces/TranslationAlgebra.lean`; function
-spaces on `ℝ^d`, domains and traces, and mixed smoothness share `FunctionSpaces/Rd/`, with the
-manifolds in `FunctionSpaces/Manifold/`; the Triebel–Lizorkin block is the mixed norms in
-`FunctionSpaces/Lp/MixedNorms.lean`, the files
-`FunctionSpaces/Rd/{DyadicCubes,HardyLittlewoodMaximal,CalderonZygmund}`,
-`FunctionSpaces/Rd/{FeffermanStein,KernelMajorants}` and `FunctionSpaces/Rd/TriebelLizorkin*`, and
-`FunctionSpaces/Torus/{TriebelLizorkin,PeriodicLift,FeffermanStein,TriebelLizorkinLocalMeans}`;
-Sobolev spaces on `ℝ^d` are the files `SchwartzCutoff`, `WeakDerivatives`,
-`SobolevTwoLittlewoodPaley`, `LipschitzDomainH1`, `RellichCompactness`,
-`SobolevRestrictionSpaces`, `SobolevDuality`, `BoundaryTraceSpace`, `LipschitzGraphArea`,
-`SurfaceMeasure`, `DilationFamilies`, `ConvolutionAdjoint`, `PlancherelBounds`,
-`CalderonZygmundSigned`, `VectorValuedWeakType`, `VectorValuedSingularIntegrals`,
-`SquareFunction`, `DerivativeKernels`, `SobolevTriebelLizorkin`, `SobolevEmbedding`,
-`UniformSchwartzFamilies`, `BesselPotentialLifting`, `DivergenceKernels`, `SobolevExtension`,
-`LipschitzGraphGreen`, `LipschitzDomainGreen` and `TraceKernel` in `FunctionSpaces/Rd/`, with
-`WeakType`, `LayerCake`, `Marcinkiewicz` and `NormingFamily` in `FunctionSpaces/Lp/`.
+nor measures. `FunctionSpaces` holds the function spaces, in folders by setting with the
+characterisations inside: `Analysis/` collects the tools without function-space content
+(`L_p` norms, differences, convolution and the Fourier transform, maximal functions and
+interpolation of operators); `MeasureSpaces/` holds the Besov and Sobolev spaces of a scheme on a
+finite measure space; `Rd/` holds the spaces on `ℝ^d` with one folder per characterisation
+(approximation, Littlewood–Paley blocks, differences, local means, atoms, Triebel–Lizorkin
+spaces, vector-valued singular integrals, weak derivatives, Bessel potentials, mixed
+smoothness); `Domains/` holds Lipschitz domains, extensions, traces, Sobolev spaces on domains
+and compact manifolds; `Torus/`, `Interval/`, `Cube/` and `Wavelets/` hold the other settings.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 [docs/FEECInterface.md](docs/FEECInterface.md) describes the interface to a FEEC/BEEC library

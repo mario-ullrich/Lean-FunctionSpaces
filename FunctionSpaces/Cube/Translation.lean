@@ -6,19 +6,19 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Cube.Modulus
-public import FunctionSpaces.TranslationAlgebra
+public import FunctionSpaces.Analysis.Differences.TranslationAlgebra
 
 /-!
 # Isotropic differences and their expansion into coordinate differences
 
 The **isotropic difference** of order `r` with step `h ∈ ℝ^d`,
-`Δ_h^r f(x) = ∑_k (-1)^(r-k) C(r,k) f(x + kh)` (`Rd.higherDiff`, `Cube.higherDiff_apply`), moves
-all coordinates at once; with the step `t e_i` it is the difference in coordinate `i`
+`Δ_h^r f(x) = ∑_k (-1)^(r-k) C(r,k) f(x + kh)` (`Rd.higherDiff`, `Cube.higherDiff_apply`), moves all
+coordinates at once; with the step `t e_i` it is the difference in coordinate `i`
 (`Cube.higherDiff_single`). The translation algebra `ℂ[ℝ^d]` of
-`FunctionSpaces.TranslationAlgebra` expands it into differences in single coordinates: the
-element `(δ_{h_i e_i} - 1)^m` acts by the coordinate difference `Δ^m_{h_i e_i}`
-(`Cube.diffAct_coordElem_pow`), a product of such elements along a list of coordinates by the
-mixed coordinate difference `M_m f = Δ^{m_0}_{h_0 e_0} ⋯ Δ^{m_{d-1}}_{h_{d-1} e_{d-1}} f`
+`FunctionSpaces.Analysis.Differences.TranslationAlgebra` expands it into differences in single
+coordinates: the element `(δ_{h_i e_i} - 1)^m` acts by the coordinate difference `Δ^m_{h_i e_i}`
+(`Cube.diffAct_coordElem_pow`), a product of such elements along a list of coordinates by the mixed
+coordinate difference `M_m f = Δ^{m_0}_{h_0 e_0} ⋯ Δ^{m_{d-1}}_{h_{d-1} e_{d-1}} f`
 (`Cube.mixedDiff`, `Cube.diffAct_list_prod`), and the expansion
 `(δ_h - 1)^r = ∑_α δ_{s_α} ∏_i (δ_i - 1)^{m_i(α)}` (`TranslationAlgebra.single_sub_one_pow_eq_sum`)
 gives `Δ_h^r f(x) = ∑_α M_{m(α)} f(x + s_α)` (`Cube.higherDiff_eq_sum`): a sum of `d^r` mixed

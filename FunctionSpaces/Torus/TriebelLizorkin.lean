@@ -7,7 +7,7 @@ module
 
 public import FunctionSpaces.Torus.LittlewoodPaley
 public import FunctionSpaces.Torus.LpBesovModuli
-public import FunctionSpaces.Lp.MixedNorms
+public import FunctionSpaces.Analysis.Lp.MixedNorms
 
 /-!
 # Triebel–Lizorkin spaces on the torus
@@ -23,7 +23,7 @@ of the `f` with a finite quasi-norm (`Torus.MemTriebelLizorkin`); it is a subspa
 `1 ≤ q ≤ ∞` (`Torus.triebelLizorkinSpace`), increasing in `q` and decreasing in `s`. The
 comparisons with Besov spaces below need `p < ∞`.
 
-The mixed-norm comparisons of `FunctionSpaces.Lp.MixedNorms` give, for every `s ∈ ℝ`,
+The mixed-norm comparisons of `FunctionSpaces.Analysis.Lp.MixedNorms` give, for every `s ∈ ℝ`,
 `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{max(p,q)}} ≤ ‖f‖_{F^s_{p,q}} ≤ ‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{min(p,q)}}`,
 with equality for `q = p`. With the Littlewood–Paley characterisation of Besov spaces on the
 torus (`Torus.memBesov_iff_littlewoodPaleyNorm_lt_top`) this gives, for `s > 0`:

@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Interval.Differences
-public import FunctionSpaces.Rd.DomainModuli
+public import FunctionSpaces.Rd.Differences.DomainModuli
 public import Mathlib.MeasureTheory.Function.LpSeminorm.TriangleInequality
 public import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
 public import Mathlib.MeasureTheory.Group.Measure

@@ -7,7 +7,7 @@ module
 
 public import FunctionSpaces.Torus.Modulus
 public import FunctionSpaces.Torus.Nikolskii
-public import FunctionSpaces.Lp.Young
+public import FunctionSpaces.Analysis.Lp.Young
 public import Mathlib.Analysis.Fourier.FourierTransform
 
 /-!

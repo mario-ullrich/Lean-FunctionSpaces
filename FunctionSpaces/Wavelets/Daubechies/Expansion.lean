@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Rd.DyadicGrid
+public import FunctionSpaces.Analysis.Maximal.DyadicGrid
 public import FunctionSpaces.Wavelets.Daubechies.PolynomialReproduction
 
 /-!

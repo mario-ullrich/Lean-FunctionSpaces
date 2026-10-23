@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Lp.LintegralForm
+public import FunctionSpaces.Analysis.Lp.LintegralForm
 public import FunctionSpaces.Interval.Polynomials
 public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Basic
 public import ApproximationSpaces.Decompositions.Synthesis

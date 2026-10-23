@@ -43,13 +43,13 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| Tensor kernels on `ℝ^d`: integrals, convolutions, dilations, diagonal changes of variables | ✅ | ✗ | `Rd/TensorKernels` |
-| Sequences on `ℕ^d`: `ℓ_q` norms, Schur test, almost diagonal lemma | ✅ | ✗ | `Rd/MixedSequences` |
-| Mixed differences, mixed moduli, the mixed Besov quasi-norm | ✅ | ✗ | `Rd/MixedDifferences` |
-| Averaged mixed differences, bounded polynomials in translations | ✅ | ✗ | `Rd/MixedAveragedDifferences` |
-| Mixed local means and mixed differences | ✅ | ✗ | `Rd/MixedLocalMeans` |
-| Tensor Littlewood–Paley blocks, Vybíral's quasi-norm | ✅ | ✗ | `Rd/MixedLittlewoodPaley` |
-| Hyperbolic cross approximation | ✅ | ✗ | `Rd/HyperbolicCross` |
+| Tensor kernels on `ℝ^d`: integrals, convolutions, dilations, diagonal changes of variables | ✅ | ✗ | `Rd/MixedSmoothness/TensorKernels` |
+| Sequences on `ℕ^d`: `ℓ_q` norms, Schur test, almost diagonal lemma | ✅ | ✗ | `Rd/MixedSmoothness/MixedSequences` |
+| Mixed differences, mixed moduli, the mixed Besov quasi-norm | ✅ | ✗ | `Rd/MixedSmoothness/MixedDifferences` |
+| Averaged mixed differences, bounded polynomials in translations | ✅ | ✗ | `Rd/MixedSmoothness/MixedAveragedDifferences` |
+| Mixed local means and mixed differences | ✅ | ✗ | `Rd/MixedSmoothness/MixedLocalMeans` |
+| Tensor Littlewood–Paley blocks, Vybíral's quasi-norm | ✅ | ✗ | `Rd/MixedSmoothness/MixedLittlewoodPaley` |
+| Hyperbolic cross approximation | ✅ | ✗ | `Rd/MixedSmoothness/HyperbolicCross` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

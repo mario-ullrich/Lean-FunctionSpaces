@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Torus.LpJackson
-public import FunctionSpaces.Besov.Basic
+public import FunctionSpaces.MeasureSpaces.Besov.Basic
 public import ApproximationSpaces.Moduli
 
 /-!

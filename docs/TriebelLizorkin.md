@@ -124,16 +124,16 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`: Minkowski's inequalities for series and for `ℓ_u`-valued functions, comparison, limits of pointwise bounds, terms set to zero and tails, cancellation in Hölder's inequality and conjugate exponents | ✅ | ✗ | `Lp/MixedNorms` |
-| Triebel–Lizorkin spaces on `ℝ^d`: definition, `F_{p,p} = B_{p,p}`, the Besov sandwich | ✅ | ✗ | `Rd/TriebelLizorkin` |
-| Dyadic cubes of every level, Lebesgue differentiation along them | ✅ | ✗ | `Rd/DyadicCubes` |
-| Hardy–Littlewood maximal function: measurability, convolutions with kernels under radial majorants, weighted weak type `(1,1)` and weighted strong type, the maximal theorem | ✅ | ✗ | `Rd/HardyLittlewoodMaximal` |
-| The Calderón–Zygmund decomposition on dyadic cubes | ✅ | ✗ | `Rd/CalderonZygmund` |
-| The Fefferman–Stein inequality | ✅ | ✗ | `Rd/FeffermanStein` |
-| Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/KernelMajorants` |
-| Local means characterisation of Triebel–Lizorkin spaces, and synthesis with the dual kernels in `F^s_{p,q}` | ✅ | ✗ | `Rd/TriebelLizorkinLocalMeans` |
-| Characterisation by ball means of differences | ✅ | ✗ | `Rd/TriebelLizorkinDifferences` |
-| `f^s_{p,q}`, atomic analysis, synthesis, characterisation | ✅ | ✗ | `Rd/TriebelLizorkinAtoms` |
+| Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`: Minkowski's inequalities for series and for `ℓ_u`-valued functions, comparison, limits of pointwise bounds, terms set to zero and tails, cancellation in Hölder's inequality and conjugate exponents | ✅ | ✗ | `Analysis/Lp/MixedNorms` |
+| Triebel–Lizorkin spaces on `ℝ^d`: definition, `F_{p,p} = B_{p,p}`, the Besov sandwich | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkin` |
+| Dyadic cubes of every level, Lebesgue differentiation along them | ✅ | ✗ | `Analysis/Maximal/DyadicCubes` |
+| Hardy–Littlewood maximal function: measurability, convolutions with kernels under radial majorants, weighted weak type `(1,1)` and weighted strong type, the maximal theorem | ✅ | ✗ | `Analysis/Maximal/HardyLittlewoodMaximal` |
+| The Calderón–Zygmund decomposition on dyadic cubes | ✅ | ✗ | `Analysis/Maximal/CalderonZygmund` |
+| The Fefferman–Stein inequality | ✅ | ✗ | `Analysis/Maximal/FeffermanStein` |
+| Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/LocalMeans/KernelMajorants` |
+| Local means characterisation of Triebel–Lizorkin spaces, and synthesis with the dual kernels in `F^s_{p,q}` | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinLocalMeans` |
+| Characterisation by ball means of differences | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinDifferences` |
+| `f^s_{p,q}`, atomic analysis, synthesis, characterisation | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinAtoms` |
 | Triebel–Lizorkin spaces on the torus, the Besov sandwich | ✅ | ✗ | `Torus/TriebelLizorkin` |
 | The periodic lift: period boxes, lifted null sets, counting boxes | ✅ | ✗ | `Torus/PeriodicLift` |
 | The Fefferman–Stein inequality for periodic lifts | ✅ | ✗ | `Torus/FeffermanStein` |

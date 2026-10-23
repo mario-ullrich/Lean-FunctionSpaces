@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Lp.LintegralForm
+public import FunctionSpaces.Analysis.Lp.LintegralForm
 public import FunctionSpaces.Interval.Steklov
 public import Mathlib.MeasureTheory.Integral.Prod
 

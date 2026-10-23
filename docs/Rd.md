@@ -96,26 +96,26 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| Young's inequality on measurable groups, weighted Jensen inequality, weighted averages in `L_p` | ✅ | ✗ | `Lp/Young` |
-| Convolution with integrable kernels on `ℝ^d`: Young's inequality, pointwise bounds, associativity, operators on `L_p` | ✅ | ✗ | `Rd/Convolution` |
-| Dilations, their supports and their first moments, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ | ✗ | `Rd/ApproxIdentity` |
-| The Fourier transform of integrable functions (continuity, `L_1` bounds, convolutions, multiplication formula, conjugation, Lipschitz bound for band-limited inverse transforms); Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, the kernels on the frequency side with `|𝓕ψ_j| ≤ 1`, telescoping sums and at most two blocks at every frequency, kernel identities by Fourier inversion | ✅ | ✗ | `Rd/LittlewoodPaleyKernels` |
-| Band-limited classes on `ℝ^d`, Littlewood–Paley blocks, `A^s_q(band-limited)` characterised by Littlewood–Paley blocks for `s > 0` | ✅ | ✗ | `Rd/BandLimited`, `Rd/LittlewoodPaley` |
-| Differences `higherDiff` on any additive monoid, steps of either sign; the modulus of smoothness on `ℝ^d`, dilation of the scale, differences of convolutions and dilations | ✅ | ✗ | `Rd/Differences`, `Rd/DilatedDifferences` |
-| Jackson's inequality for band-limited approximation | ✅ | ✗ | `Rd/BandJackson` |
-| Differences of Schwartz functions in `L_1`, inverse inequality for band-limited functions | ✅ | ✗ | `Rd/BandInverse` |
-| Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ | ✗ | `Rd/BesovDifferences` |
-| Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences | ✅ | ✗ | `Rd/DomainModuli` |
-| Moment kernels: averaged differences, approximation with the modulus, also on subsets, vanishing first moments of the moment kernels of order two | ✅ | ✗ | `Rd/MomentKernels` |
-| Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L` | ✅ | ✗ | `Rd/LocalMeans` |
-| Pointwise multipliers on `ℝ^d`: the multiplication operator on `L_p`, Leibniz's rule for differences, moduli of lower order | ✅ | ✗ | `Rd/Multipliers` |
-| Dyadic cells of `ℝ^d`: partition, counting of their centres, bounded overlap | ✅ | ✗ | `Rd/DyadicGrid` |
-| Atomic synthesis: bounded overlap, regular atoms on sets, coefficient quasi-norm | ✅ | ✗ | `Rd/AtomSynthesis` |
-| Atomic decomposition by cell atoms, atomic characterisation of Besov spaces | ✅ | ✗ | `Rd/AtomAnalysis` |
-| Differences within convex sets through derivatives within the set | ✅ | ✗ | `Rd/ConvexDifferences` |
-| Smooth atoms on convex sets, smooth cell atoms of every order | ✅ | ✗ | `Rd/SmoothAtoms` |
-| Smooth atoms under smooth changes of variables with a cut-off | ✅ | ✗ | `Rd/AtomComposition` |
-| Invariance of Besov spaces under changes of variables, Besov domains | ✅ | ✗ | `Rd/DiffeoInvariance` |
+| Young's inequality on measurable groups, weighted Jensen inequality, weighted averages in `L_p` | ✅ | ✗ | `Analysis/Lp/Young` |
+| Convolution with integrable kernels on `ℝ^d`: Young's inequality, pointwise bounds, associativity, operators on `L_p` | ✅ | ✗ | `Analysis/Fourier/Convolution` |
+| Dilations, their supports and their first moments, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ | ✗ | `Analysis/Fourier/ApproxIdentity` |
+| The Fourier transform of integrable functions (continuity, `L_1` bounds, convolutions, multiplication formula, conjugation, Lipschitz bound for band-limited inverse transforms); Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, the kernels on the frequency side with `|𝓕ψ_j| ≤ 1`, telescoping sums and at most two blocks at every frequency, kernel identities by Fourier inversion | ✅ | ✗ | `Analysis/Fourier/LittlewoodPaleyKernels` |
+| Band-limited classes on `ℝ^d`, Littlewood–Paley blocks, `A^s_q(band-limited)` characterised by Littlewood–Paley blocks for `s > 0` | ✅ | ✗ | `Rd/Approximation/BandLimited`, `Rd/LittlewoodPaley/LittlewoodPaley` |
+| Differences `higherDiff` on any additive monoid, steps of either sign; the modulus of smoothness on `ℝ^d`, dilation of the scale, differences of convolutions and dilations | ✅ | ✗ | `Analysis/Differences/Differences`, `Rd/Differences/DilatedDifferences` |
+| Jackson's inequality for band-limited approximation | ✅ | ✗ | `Rd/Approximation/BandJackson` |
+| Differences of Schwartz functions in `L_1`, inverse inequality for band-limited functions | ✅ | ✗ | `Rd/Approximation/BandInverse` |
+| Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ | ✗ | `Rd/LittlewoodPaley/BesovDifferences` |
+| Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences | ✅ | ✗ | `Rd/Differences/DomainModuli` |
+| Moment kernels: averaged differences, approximation with the modulus, also on subsets, vanishing first moments of the moment kernels of order two | ✅ | ✗ | `Rd/Differences/MomentKernels` |
+| Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L` | ✅ | ✗ | `Rd/LocalMeans/LocalMeans` |
+| Pointwise multipliers on `ℝ^d`: the multiplication operator on `L_p`, Leibniz's rule for differences, moduli of lower order | ✅ | ✗ | `Rd/LocalMeans/Multipliers` |
+| Dyadic cells of `ℝ^d`: partition, counting of their centres, bounded overlap | ✅ | ✗ | `Analysis/Maximal/DyadicGrid` |
+| Atomic synthesis: bounded overlap, regular atoms on sets, coefficient quasi-norm | ✅ | ✗ | `Rd/Atoms/AtomSynthesis` |
+| Atomic decomposition by cell atoms, atomic characterisation of Besov spaces | ✅ | ✗ | `Rd/Atoms/AtomAnalysis` |
+| Differences within convex sets through derivatives within the set | ✅ | ✗ | `Rd/Atoms/ConvexDifferences` |
+| Smooth atoms on convex sets, smooth cell atoms of every order | ✅ | ✗ | `Rd/Atoms/SmoothAtoms` |
+| Smooth atoms under smooth changes of variables with a cut-off | ✅ | ✗ | `Rd/Atoms/AtomComposition` |
+| Invariance of Besov spaces under changes of variables, Besov domains | ✅ | ✗ | `Rd/Atoms/DiffeoInvariance` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

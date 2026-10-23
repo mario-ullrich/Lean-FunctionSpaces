@@ -57,14 +57,14 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| `L_p` norms through integrals of powers | ✅ | ✗ | `Lp/LintegralForm` |
-| Multiplication by an indicator as an operator on `L_p`, integrals over a set as `L_2` pairings | ✅ | ✗ | `Lp/IndicatorOperator` |
-| Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces, elementary embeddings | ✅ | ✗ | `Lp/Inclusion`, `Lp/BoundedContinuous`, `Scheme`, `Besov/Basic`, `Besov/Trivial` |
-| Interpolation `L_p`–`L_∞`, Nikolskii property, Besov embeddings | ✅ | ✗ | `Lp/Interpolation`, `Besov/Nikolskii`, `Besov/Embeddings` |
-| Sobolev spaces as a hypothesis structure, Sobolev embeddings | ✅ | ✗ | `Sobolev/Embeddings` |
-| Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ | ✗ | `Spectral/Basic` |
-| Coefficient characterisations of spectral schemes, `H^s = B^s_{2,2}` | ✅ | ✗ | `Spectral/Blocks` |
-| Continuous spectral bases (hypothesis), `B^s_{2,2} = H^s`, local Weyl bound, Nikolskii for `p ≤ 2`, continuity of `H^s` for `s > D/2` | ✅ | ✗ | `Spectral/Eigenbasis`, `Spectral/LocalWeyl` |
+| `L_p` norms through integrals of powers | ✅ | ✗ | `Analysis/Lp/LintegralForm` |
+| Multiplication by an indicator as an operator on `L_p`, integrals over a set as `L_2` pairings | ✅ | ✗ | `Analysis/Lp/IndicatorOperator` |
+| Inclusion `L_r ↪ L_p`, schemes of functions, Besov spaces, elementary embeddings | ✅ | ✗ | `Analysis/Lp/Inclusion`, `Analysis/Lp/BoundedContinuous`, `Scheme`, `MeasureSpaces/Besov/Basic`, `MeasureSpaces/Besov/Trivial` |
+| Interpolation `L_p`–`L_∞`, Nikolskii property, Besov embeddings | ✅ | ✗ | `Analysis/Lp/Interpolation`, `MeasureSpaces/Besov/Nikolskii`, `MeasureSpaces/Besov/Embeddings` |
+| Sobolev spaces as a hypothesis structure, Sobolev embeddings | ✅ | ✗ | `MeasureSpaces/Sobolev/Embeddings` |
+| Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ | ✗ | `MeasureSpaces/Spectral/Basic` |
+| Coefficient characterisations of spectral schemes, `H^s = B^s_{2,2}` | ✅ | ✗ | `MeasureSpaces/Spectral/Blocks` |
+| Continuous spectral bases (hypothesis), `B^s_{2,2} = H^s`, local Weyl bound, Nikolskii for `p ≤ 2`, continuity of `H^s` for `s > D/2` | ✅ | ✗ | `MeasureSpaces/Spectral/ContinuousSpectralBasis`, `MeasureSpaces/Spectral/LocalWeyl` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

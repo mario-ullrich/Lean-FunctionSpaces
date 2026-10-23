@@ -10,9 +10,10 @@ public import FunctionSpaces.Torus.Sobolev
 /-!
 # Embedding theorems on the torus
 
-The general embedding theorems of `FunctionSpaces.Besov.Embeddings` and
-`FunctionSpaces.Sobolev.Embeddings`, applied to the scheme of trigonometric polynomials on
-`𝕋^d`, which has the Nikolskii property of dimension `d` (`Torus.trigScheme_hasNikolskii`):
+The general embedding theorems of `FunctionSpaces.MeasureSpaces.Besov.Embeddings` and
+`FunctionSpaces.MeasureSpaces.Sobolev.Embeddings`, applied to the scheme of trigonometric
+polynomials on `𝕋^d`, which has the Nikolskii property of dimension `d`
+(`Torus.trigScheme_hasNikolskii`):
 
 * **Besov embedding** (`Torus.memBesov_exists_inclusion_eq`): for `1 ≤ p ≤ r ≤ ∞` and
   `s > d(1/p - 1/r)`, `B^s_{p,q}(𝕋^d) ⊆ B^{s - d(1/p - 1/r)}_{r,q}(𝕋^d)`;

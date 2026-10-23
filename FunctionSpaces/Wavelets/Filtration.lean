@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import ApproximationSpaces.Decompositions.Projection
-public import FunctionSpaces.Lp.Inclusion
+public import FunctionSpaces.Analysis.Lp.Inclusion
 public import Mathlib.MeasureTheory.Function.ConditionalExpectation.Real
 public import Mathlib.MeasureTheory.Function.ConditionalExpectation.AEMeasurable
 public import Mathlib.Probability.Process.Filtration

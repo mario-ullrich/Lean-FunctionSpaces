@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Cube.Translation
-public import FunctionSpaces.Rd.DomainModuli
+public import FunctionSpaces.Rd.Differences.DomainModuli
 
 /-!
 # The isotropic modulus of smoothness on the cube

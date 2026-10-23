@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Torus.PeriodicLift
-public import FunctionSpaces.Rd.FeffermanStein
+public import FunctionSpaces.Analysis.Maximal.FeffermanStein
 
 /-!
 # The Fefferman–Stein inequality for periodic lifts

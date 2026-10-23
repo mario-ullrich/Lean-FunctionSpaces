@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Torus.EuclideanConvolution
-public import FunctionSpaces.Rd.LittlewoodPaleyKernels
+public import FunctionSpaces.Analysis.Fourier.LittlewoodPaleyKernels
 
 /-!
 # Identities of convolution operators on the torus

@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Torus.Sobolev
-public import FunctionSpaces.Spectral.Blocks
+public import FunctionSpaces.MeasureSpaces.Spectral.Blocks
 
 /-!
 # Fourier-coefficient characterisations on the torus
@@ -20,8 +20,8 @@ For `f ∈ L_2(𝕋^d)` with Fourier coefficients `f̂(k)`, and `s > 0`:
   `(2^(ks) (∑_{2^k ≤ max_i |k_i| < 2^(k+1)} |f̂(k)|²)^(1/2))_k ∈ ℓ_q`, the block norms being
   `Torus.enorm_fourierBlock_sq`.
 
-Both are the spectral statements of `FunctionSpaces.Spectral.Blocks` for the Fourier basis,
-transported along `Torus.toLp_trigScheme_eq`.  The smooth Littlewood–Paley blocks
+Both are the spectral statements of `FunctionSpaces.MeasureSpaces.Spectral.Blocks` for the Fourier
+basis, transported along `Torus.toLp_trigScheme_eq`. The smooth Littlewood–Paley blocks
 `Torus.lpBlock` describe `B^s_{p,q}(𝕋^d)` for every `1 ≤ p < ∞`
 (`Torus.memBesov_iff_littlewoodPaleyNorm_lt_top`). The Littlewood–Paley identity
 `F^0_{p,2}(𝕋^d) = L_p(𝕋^d)`, `1 < p < ∞`, needs a Fourier multiplier theorem.

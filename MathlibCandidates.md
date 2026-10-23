@@ -17,18 +17,18 @@ declarations.
   first terms (`ENNReal.lqNorm_le_head_add_shift`, `ENNReal.lqNorm_le_sum_range_add_shift`).
 * **Monotone convergence and countable Minkowski for `eLpNorm`**: on any measure space,
   `‖sup_b F_b‖_p = sup_b ‖F_b‖_p` for directed countable families of a.e. measurable `F_b`
-  (`MeasureTheory.eLpNorm_iSup_of_directed`) and `‖∑_i g_i‖_p ≤ ∑_i ‖g_i‖_p` for
-  `1 ≤ p ≤ ∞` and countably many `g_i : α → [0, ∞]` (`MeasureTheory.eLpNorm_tsum_le`), both in
-  `FunctionSpaces/Lp/MixedNorms.lean`; the counting-measure versions `ENNReal.lqNorm_iSup` and
-  `ENNReal.lqNorm_tsum_le` are in `ApproximationSpaces/Sequences/Hardy.lean`. Mathlib has only
+  (`MeasureTheory.eLpNorm_iSup_of_directed`) and `‖∑_i g_i‖_p ≤ ∑_i ‖g_i‖_p` for `1 ≤ p ≤ ∞` and
+  countably many `g_i : α → [0, ∞]` (`MeasureTheory.eLpNorm_tsum_le`), both in
+  `FunctionSpaces/Analysis/Lp/MixedNorms.lean`; the counting-measure versions `ENNReal.lqNorm_iSup`
+  and `ENNReal.lqNorm_tsum_le` are in `ApproximationSpaces/Sequences/Hardy.lean`. Mathlib has only
   the finite version `eLpNorm_sum_le`.
-* **Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`** (`FunctionSpaces/Lp/MixedNorms.lean`): Minkowski's
-  integral inequality for `ℓ_u`-valued functions, `‖(∫ g_i)_i‖_{ℓ_u} ≤ ∫ ‖(g_i(x))_i‖_{ℓ_u}` for
-  `1 ≤ u ≤ ∞` (`MeasureTheory.lqNorm_lintegral_le`); `L_p(ℓ_p) = ℓ_p(L_p)` for `0 < p < ∞`
-  (`MeasureTheory.eLpNorm_lqNorm_eq_lqNorm_eLpNorm`) and the comparisons for `p ≤ q` and
-  `q ≤ p` (`MeasureTheory.lqNorm_eLpNorm_le_eLpNorm_lqNorm`,
-  `MeasureTheory.eLpNorm_lqNorm_le_lqNorm_eLpNorm`); and the passage of pointwise bounds to
-  limits, `u ≤ v + w_J` a.e. with `‖w_J‖_p → 0` gives `u ≤ v` a.e.
+* **Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`** (`FunctionSpaces/Analysis/Lp/MixedNorms.lean`):
+  Minkowski's integral inequality for `ℓ_u`-valued functions,
+  `‖(∫ g_i)_i‖_{ℓ_u} ≤ ∫ ‖(g_i(x))_i‖_{ℓ_u}` for `1 ≤ u ≤ ∞` (`MeasureTheory.lqNorm_lintegral_le`);
+  `L_p(ℓ_p) = ℓ_p(L_p)` for `0 < p < ∞` (`MeasureTheory.eLpNorm_lqNorm_eq_lqNorm_eLpNorm`) and the
+  comparisons for `p ≤ q` and `q ≤ p` (`MeasureTheory.lqNorm_eLpNorm_le_eLpNorm_lqNorm`,
+  `MeasureTheory.eLpNorm_lqNorm_le_lqNorm_eLpNorm`); and the passage of pointwise bounds to limits,
+  `u ≤ v + w_J` a.e. with `‖w_J‖_p → 0` gives `u ≤ v` a.e.
   (`MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm`).
 * **Weighted Cauchy condensation** (`ApproximationSpaces/Sequences/Dyadic.lean`): for a
   decreasing sequence and a power weight `(n + 1)^γ`, the comparison with the dyadic series
@@ -40,20 +40,21 @@ declarations.
   the sum behind every Hörmander condition for dyadic dilations; the same bound holds for
   `j ∈ ℤ`.
 * **Discrete Hardy inequalities** (`ApproximationSpaces/Sequences/Hardy.lean`):
-  `ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`, and the almost diagonal estimate that
-  combines both (`ENNReal.lqNorm_almostDiagonal_le`, in `FunctionSpaces/Rd/LocalMeans.lean`).
-* **The inclusion `L_r ↪ L_p`** (`FunctionSpaces/Lp/Inclusion.lean`): for a finite measure
+  `ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`, and the almost diagonal estimate that combines
+  both (`ENNReal.lqNorm_almostDiagonal_le`, in `FunctionSpaces/Rd/LocalMeans/LocalMeans.lean`).
+* **The inclusion `L_r ↪ L_p`** (`FunctionSpaces/Analysis/Lp/Inclusion.lean`): for a finite measure
   and `p ≤ r`, the bounded linear injection `MeasureTheory.Lp.inclusionOfExponentLe`, with
   its norm bound and compatibility with `BoundedContinuousFunction.toLp`. Mathlib has the
   subgroup inclusion `MeasureTheory.Lp.antitone` but no bundled map.
-* **Interpolation between `L_p` and `L_∞`** (`FunctionSpaces/Lp/Interpolation.lean`):
+* **Interpolation between `L_p` and `L_∞`** (`FunctionSpaces/Analysis/Lp/Interpolation.lean`):
   `eLpNorm f r μ ≤ M^(1-p/r) eLpNorm f p μ^(p/r)` for `‖f‖ ≤ M` a.e.
   (`MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow`), and its consequence that a bounded
   function in `L_p` lies in `L_r` for every `r ≥ p`
   (`MeasureTheory.MemLp.mono_exponent_of_enorm_le`).
-* **`L_∞` norm of bounded continuous functions** (`FunctionSpaces/Lp/BoundedContinuous.lean`):
-  for a measure charging open sets, `‖toLp ∞ μ a‖ = ‖a‖`, and the range is closed
-  (`BoundedContinuousFunction.norm_toLp_top`, `.isClosed_range_toLp_top`).
+* **`L_∞` norm of bounded continuous functions**
+  (`FunctionSpaces/Analysis/Lp/BoundedContinuous.lean`): for a measure charging open sets,
+  `‖toLp ∞ μ a‖ = ‖a‖`, and the range is closed (`BoundedContinuousFunction.norm_toLp_top`,
+  `.isClosed_range_toLp_top`).
 * **Conditional expectation on `L_p`** (`FunctionSpaces/Wavelets/Filtration.lean`): for a finite
   measure and `1 ≤ p ≤ ∞`, `E[· | m]` as a contraction `Lp E p μ →L Lp E p μ`
   (`MeasureTheory.Lp.condExpLp`); Mathlib bundles it only on `L_1` and `L_2`.
@@ -72,99 +73,104 @@ declarations.
   `|Δ_σ^m P(y)| ≤ σ^m sup_{[y, y+mσ]} |P^(m)|` (`Interval.norm_higherDiff_polyFun_le`), and the
   boundedness of every linear map of the polynomials of degree `< r` by the `L_p` norm on an
   interval (`Interval.exists_enorm_linearMap_le_eLpNorm`), a form of Markov's inequality.
-* **The translation algebra** (`FunctionSpaces/TranslationAlgebra.lean`): `ℂ[G]` acting on
-  functions on an additive commutative monoid `G` by translations (`TranslationAlgebra.diffAct`,
-  from `AddMonoidAlgebra.lift`), with `(fwdDiff h)^[r] = (δ_h - 1)^r`
+* **The translation algebra** (`FunctionSpaces/Analysis/Differences/TranslationAlgebra.lean`):
+  `ℂ[G]` acting on functions on an additive commutative monoid `G` by translations
+  (`TranslationAlgebra.diffAct`, from `AddMonoidAlgebra.lift`), with `(fwdDiff h)^[r] = (δ_h - 1)^r`
   (`TranslationAlgebra.higherDiff_eq_diffAct`), and the expansion of an isotropic difference on
   `ℝ^d` into mixed coordinate differences (`Cube.higherDiff_eq_sum`); Mathlib's `fwdDiff` has no
   such link to the group algebra.
-* **Young's inequality and convolution operators** (`FunctionSpaces/Rd/Convolution.lean`): for a
-  Haar measure on a finite-dimensional space, `1 ≤ p < ∞`, integrable `K` and `f ∈ L_p`,
-  `‖K ⋆ f‖_p ≤ ‖K‖_1 ‖f‖_p` (`Rd.eLpNorm_conv_le`), from the weighted Jensen inequality
-  `(∫ a g)^p ≤ (∫ a)^(p-1) ∫ a g^p` (`MeasureTheory.lintegral_mul_rpow_le`); associativity
-  `(K ⋆ L) ⋆ f = K ⋆ (L ⋆ f)` a.e. (`Rd.conv_conv_ae`), convolution as a bounded operator on
-  `L_p` (`Rd.convLp`), and Minkowski's integral inequality in the weighted form
+* **Young's inequality and convolution operators**
+  (`FunctionSpaces/Analysis/Fourier/Convolution.lean`): for a Haar measure on a finite-dimensional
+  space, `1 ≤ p < ∞`, integrable `K` and `f ∈ L_p`, `‖K ⋆ f‖_p ≤ ‖K‖_1 ‖f‖_p`
+  (`Rd.eLpNorm_conv_le`), from the weighted Jensen inequality `(∫ a g)^p ≤ (∫ a)^(p-1) ∫ a g^p`
+  (`MeasureTheory.lintegral_mul_rpow_le`); associativity `(K ⋆ L) ⋆ f = K ⋆ (L ⋆ f)` a.e.
+  (`Rd.conv_conv_ae`), convolution as a bounded operator on `L_p` (`Rd.convLp`), and Minkowski's
+  integral inequality in the weighted form
   `‖∫ Φ(z) G(·, z) dz‖_p^p ≤ ‖Φ‖_1^(p-1) ∫ |Φ(z)| ‖G(·, z)‖_p^p dz`
   (`MeasureTheory.eLpNorm_integral_kernel_le`). Mathlib has only pointwise bounds of convolutions.
-* **The adjoint of a convolution** (`FunctionSpaces/Rd/ConvolutionAdjoint.lean`): for integrable
-  `K`, `f ∈ L_p(V)` and `g ∈ L_q(V)` with `1/p + 1/q = 1`, `p < ∞`, and the reflection
-  `K^∨(x) = K(-x)`, `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` (`Rd.integral_conv_mul`), and with the adjoint
-  kernel `K^*(x) = conj K(-x)`, `∫ (K ⋆ f) conj g = ∫ f conj(K^* ⋆ g)`
-  (`Rd.integral_conv_mul_conj`). Mathlib has the associativity of convolutions but no such
-  transpose formula for `L_p` functions.
-* **Approximate identities in `L_p`** (`FunctionSpaces/Rd/ApproxIdentity.lean`): for integrable
-  `Φ` with `∫ Φ = 1`, `‖Φ_c ⋆ f - f‖_p → 0` as `c → ∞`, `Φ_c = c^n Φ(c ·)`
+* **The adjoint of a convolution** (`FunctionSpaces/Rd/SingularIntegrals/ConvolutionAdjoint.lean`):
+  for integrable `K`, `f ∈ L_p(V)` and `g ∈ L_q(V)` with `1/p + 1/q = 1`, `p < ∞`, and the
+  reflection `K^∨(x) = K(-x)`, `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` (`Rd.integral_conv_mul`), and with the
+  adjoint kernel `K^*(x) = conj K(-x)`, `∫ (K ⋆ f) conj g = ∫ f conj(K^* ⋆ g)`
+  (`Rd.integral_conv_mul_conj`). Mathlib has the associativity of convolutions but no such transpose
+  formula for `L_p` functions.
+* **Approximate identities in `L_p`** (`FunctionSpaces/Analysis/Fourier/ApproxIdentity.lean`): for
+  integrable `Φ` with `∫ Φ = 1`, `‖Φ_c ⋆ f - f‖_p → 0` as `c → ∞`, `Φ_c = c^n Φ(c ·)`
   (`Rd.tendsto_eLpNorm_conv_dilate_sub`, `Rd.tendsto_convLp_dilate`), and the continuity of
   `w ↦ ‖f(· - w) - f‖_p` (`Rd.continuous_eLpNorm_comp_sub_sub`). Mathlib has the pointwise
   convergence of mollifiers for continuous functions.
 * **The Fourier transform of dilations and kernel identities**
-  (`FunctionSpaces/Rd/LittlewoodPaleyKernels.lean`): `𝓕(c^n Φ(c ·))(ξ) = 𝓕Φ(c⁻¹ ξ)`
+  (`FunctionSpaces/Analysis/Fourier/LittlewoodPaleyKernels.lean`): `𝓕(c^n Φ(c ·))(ξ) = 𝓕Φ(c⁻¹ ξ)`
   (`Rd.fourier_dilate`), `𝓕(f - g) = 𝓕f - 𝓕g` for integrable functions (`Rd.fourier_sub_apply`),
   and `K ⋆ L = M` from `𝓕K · 𝓕L = 𝓕M` by Fourier inversion (`Rd.conv_eq_of_fourier`).
-* **Moduli of smoothness on finite-dimensional spaces** (`FunctionSpaces/Rd/Differences.lean`):
-  for Mathlib's `fwdDiff` and a Haar measure, `‖Δ_h^r f‖_p ≤ 2^r ‖f‖_p`, the dilation property
-  `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` (`Rd.modulus_mul_le`), and
-  `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost everywhere (`Rd.higherDiff_conv_ae`); the modulus on a
-  subset `U`, with the differences restricted to the points `x` with `x, …, x + rh ∈ U`
-  (`Rd.modulusOn`, `FunctionSpaces/Rd/DomainModuli.lean`).
-* **Leibniz's rule for iterated forward differences** (`FunctionSpaces/Rd/Multipliers.lean`):
+* **Moduli of smoothness on finite-dimensional spaces**
+  (`FunctionSpaces/Analysis/Differences/Differences.lean`): for Mathlib's `fwdDiff` and a Haar
+  measure, `‖Δ_h^r f‖_p ≤ 2^r ‖f‖_p`, the dilation property `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p`
+  (`Rd.modulus_mul_le`), and `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost everywhere
+  (`Rd.higherDiff_conv_ae`); the modulus on a subset `U`, with the differences restricted to the
+  points `x` with `x, …, x + rh ∈ U` (`Rd.modulusOn`,
+  `FunctionSpaces/Rd/Differences/DomainModuli.lean`).
+* **Leibniz's rule for iterated forward differences**
+  (`FunctionSpaces/Rd/LocalMeans/Multipliers.lean`):
   `Δ_h^r(u v)(x) = ∑_{l ≤ r} C(r, l) Δ_h^l u(x) Δ_h^(r-l) v(x + l h)` (`Rd.higherDiff_mul`); Mathlib
-  has only the one-step `fwdDiff_smul`. Also `‖Δ_h^l G(x)‖ ≤ C ‖h‖^l` for `G` of class `C^l`
-  with `‖D^l G‖ ≤ C` on the segment from `x` to `x + l h` (`Rd.norm_higherDiff_le_of_segment`),
-  and its global form `‖Δ_h^l G(x)‖ ≤ ‖h‖^l sup ‖D^l G‖`
-  (`Rd.norm_higherDiff_le_of_iteratedFDeriv`).
+  has only the one-step `fwdDiff_smul`. Also `‖Δ_h^l G(x)‖ ≤ C ‖h‖^l` for `G` of class `C^l` with
+  `‖D^l G‖ ≤ C` on the segment from `x` to `x + l h` (`Rd.norm_higherDiff_le_of_segment`), and its
+  global form `‖Δ_h^l G(x)‖ ≤ ‖h‖^l sup ‖D^l G‖` (`Rd.norm_higherDiff_le_of_iteratedFDeriv`).
 * **Smooth resolutions of unity in a finite-dimensional space**
-  (`FunctionSpaces/Rd/BoundedLipschitz.lean`): `Rd.exists_smooth_partition`, with `ContDiff`
-  functions, from Mathlib's manifold version, its form equal to `1` on a neighbourhood of a compact
-  set (`Rd.exists_smooth_partition_nhds`), and bounded derivatives of compactly supported smooth
-  functions (`Rd.exists_iteratedFDeriv_bound`, `FunctionSpaces/Rd/Multipliers.lean`).
-* **Multiplication by an indicator on `L_p`** (`FunctionSpaces/Lp/IndicatorOperator.lean`): for a
-  measurable set `s`, `g ↦ 1_s g` as a continuous linear operator of norm at most `1` on
+  (`FunctionSpaces/Domains/Lipschitz/BoundedLipschitz.lean`): `Rd.exists_smooth_partition`, with
+  `ContDiff` functions, from Mathlib's manifold version, its form equal to `1` on a neighbourhood of
+  a compact set (`Rd.exists_smooth_partition_nhds`), and bounded derivatives of compactly supported
+  smooth functions (`Rd.exists_iteratedFDeriv_bound`,
+  `FunctionSpaces/Rd/LocalMeans/Multipliers.lean`).
+* **Multiplication by an indicator on `L_p`** (`FunctionSpaces/Analysis/Lp/IndicatorOperator.lean`):
+  for a measurable set `s`, `g ↦ 1_s g` as a continuous linear operator of norm at most `1` on
   `Lp ℂ p μ` (`Rd.indicatorLp`). Mathlib has `indicatorConstLp` for constant functions.
-* **Differences of Schwartz functions in `L_1`** (`FunctionSpaces/Rd/BandInverse.lean`):
-  `‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1` (`Rd.lintegral_enorm_higherDiff_schwartz_le`), from
-  `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1` (`Rd.lintegral_enorm_fwdDiff_le`) and the commutation of differences
-  with line derivatives (`Rd.lineDerivOp_fwdDiffSchwartz`).
-* **Bounded overlap in `L_p`** (`FunctionSpaces/Rd/AtomSynthesis.lean`): if at every point at most
-  `N` of the functions `g_m` are nonzero, then `‖∑_m g_m‖_p^p ≤ N^(p-1) ∑_m ‖g_m‖_p^p`
+* **Differences of Schwartz functions in `L_1`**
+  (`FunctionSpaces/Rd/Approximation/BandInverse.lean`): `‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1`
+  (`Rd.lintegral_enorm_higherDiff_schwartz_le`), from `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1`
+  (`Rd.lintegral_enorm_fwdDiff_le`) and the commutation of differences with line derivatives
+  (`Rd.lineDerivOp_fwdDiffSchwartz`).
+* **Bounded overlap in `L_p`** (`FunctionSpaces/Rd/Atoms/AtomSynthesis.lean`): if at every point at
+  most `N` of the functions `g_m` are nonzero, then `‖∑_m g_m‖_p^p ≤ N^(p-1) ∑_m ‖g_m‖_p^p`
   (`Rd.eLpNorm_rpow_le_of_overlap`); a set all of whose finite subsets have at most `N` elements is
   finite with at most `N` elements (`Rd.exists_finset_of_card_le`).
-* **Dyadic cells of a finite-dimensional inner product space** (`FunctionSpaces/Rd/DyadicGrid.lean`):
-  the cells `⌊2^j ⟪b_i, x⟫⌋ = m_i`, their centres, and the count of at most `(2ρ + 2)^n` centres in
-  a ball of radius `ρ 2^(-j)` (`Rd.card_le_of_norm_cellCenter_sub_le`).
-* **Pointwise bounds of convolutions** (`FunctionSpaces/Rd/AtomAnalysis.lean`): Hölder's inequality
-  on a ball `∫_B |g| ≤ |B|^(1-1/p) ‖g‖_p` (`Rd.lintegral_closedBall_le`),
+* **Dyadic cells of a finite-dimensional inner product space**
+  (`FunctionSpaces/Analysis/Maximal/DyadicGrid.lean`): the cells `⌊2^j ⟪b_i, x⟫⌋ = m_i`, their
+  centres, and the count of at most `(2ρ + 2)^n` centres in a ball of radius `ρ 2^(-j)`
+  (`Rd.card_le_of_norm_cellCenter_sub_le`).
+* **Pointwise bounds of convolutions** (`FunctionSpaces/Rd/Atoms/AtomAnalysis.lean`): Hölder's
+  inequality on a ball `∫_B |g| ≤ |B|^(1-1/p) ‖g‖_p` (`Rd.lintegral_closedBall_le`),
   `|(K ⋆ g)(x)| ≤ sup |K| |B(0, ρ)|^(1-1/p) ‖g‖_p` for `K` vanishing outside `B(0, ρ)`
   (`Rd.enorm_conv_le_of_bound`), and `Δ_h^r (K ⋆ g) = (Δ_h^r K) ⋆ g` at every point
   (`Rd.higherDiff_conv_apply`).
-* **Continuity of convolutions with `L_p` functions** (`FunctionSpaces/Rd/SobolevEmbedding.lean`):
-  for `1 ≤ p < ∞`, an integrable bounded kernel `K` and `f ∈ L_p`, `K ⋆ f` is continuous
-  (`Rd.continuous_conv_of_enorm_le`). Mathlib's `HasCompactSupport.continuous_convolution_right`
-  needs a continuous function of compact support.
-* **Approximate identities at points of continuity** (`FunctionSpaces/Rd/GraphTrace.lean`): for
-  integrable `Φ` with `∫ Φ = 1` and bounded support, `(Φ_{2^J} ⋆ F_J)(z) → z₀` as `J → ∞` and
-  `z → y` whenever `F_J(z) → z₀` (`Rd.conv_dilate_near`). Mathlib's `convolution_tendsto_right`
-  needs nonnegative kernels.
-* **Convolution with Lipschitz functions** (`FunctionSpaces/Rd/MollifiedGraph.lean`): for an
-  integrable kernel `K` with bounded support and an `M`-Lipschitz `u`, `K ⋆ u` is Lipschitz with
-  constant `M ‖K‖_1` (`Rd.norm_conv_sub_conv_le`), `|K ⋆ u - u| ≤ M R ‖K‖_1` for `∫ K = 1`
+* **Continuity of convolutions with `L_p` functions**
+  (`FunctionSpaces/Rd/Sobolev/SobolevEmbedding.lean`): for `1 ≤ p < ∞`, an integrable bounded kernel
+  `K` and `f ∈ L_p`, `K ⋆ f` is continuous (`Rd.continuous_conv_of_enorm_le`). Mathlib's
+  `HasCompactSupport.continuous_convolution_right` needs a continuous function of compact support.
+* **Approximate identities at points of continuity**
+  (`FunctionSpaces/Domains/Traces/GraphTrace.lean`): for integrable `Φ` with `∫ Φ = 1` and bounded
+  support, `(Φ_{2^J} ⋆ F_J)(z) → z₀` as `J → ∞` and `z → y` whenever `F_J(z) → z₀`
+  (`Rd.conv_dilate_near`). Mathlib's `convolution_tendsto_right` needs nonnegative kernels.
+* **Convolution with Lipschitz functions** (`FunctionSpaces/Domains/Traces/MollifiedGraph.lean`):
+  for an integrable kernel `K` with bounded support and an `M`-Lipschitz `u`, `K ⋆ u` is Lipschitz
+  with constant `M ‖K‖_1` (`Rd.norm_conv_sub_conv_le`), `|K ⋆ u - u| ≤ M R ‖K‖_1` for `∫ K = 1`
   (`Rd.norm_conv_sub_self_le`), and `|Δ_h^2 (K ⋆ u)| ≤ M (R + 2‖h‖) ‖Δ_h^2 K‖_1`
   (`Rd.norm_higherDiff_two_conv_le`); `∫ Δ_h^r K = 0` for `r ≥ 1`
   (`Rd.integral_higherDiff_eq_zero`).
-* **Lipschitz images of null sets** (`FunctionSpaces/Rd/GraphTraceCharts.lean`): a Lipschitz map
-  between finite-dimensional inner product spaces of the same dimension maps null sets to null sets
-  (`Rd.volume_image_eq_zero_of_lipschitzWith`), through the Hausdorff measure, a Haar measure in
-  finite dimension.
-* **Tensor products of functions** (`FunctionSpaces/Rd/TensorKernels.lean`): for
+* **Lipschitz images of null sets** (`FunctionSpaces/Domains/Traces/GraphTraceCharts.lean`): a
+  Lipschitz map between finite-dimensional inner product spaces of the same dimension maps null sets
+  to null sets (`Rd.volume_image_eq_zero_of_lipschitzWith`), through the Hausdorff measure, a Haar
+  measure in finite dimension.
+* **Tensor products of functions** (`FunctionSpaces/Rd/MixedSmoothness/TensorKernels.lean`): for
   `(⊗K)(x) = ∏_i K_i(x_i)` on `ℝ^d`, `‖⊗K‖_1 = ∏_i ‖K_i‖_1` (`Rd.lintegral_enorm_tensorKernel`),
   `(⊗K) ⋆ (⊗K') = ⊗(K_i ⋆ K'_i)` (`Rd.conv_tensorKernel`), and diagonal changes of variables
   `∫ F((a_i z_i)_i) dz = (∏_i a_i)⁻¹ ∫ F` (`Rd.integral_comp_diagMap`).
-* **The Schur test on `ℓ_q`** (`FunctionSpaces/Rd/MixedSequences.lean`): row and column sums at most
-  `A` give `‖(∑_k w(m, k) b_k)_m‖_{ℓ_q} ≤ A ‖b‖_{ℓ_q}` for `1 ≤ q ≤ ∞` (`Rd.lqNorm_schur_le`),
-  for countable index sets; `∑_k ∏_i f_i(k_i) ≤ ∏_i ∑_j f_i(j)` on `ℕ^d`
+* **The Schur test on `ℓ_q`** (`FunctionSpaces/Rd/MixedSmoothness/MixedSequences.lean`): row and
+  column sums at most `A` give `‖(∑_k w(m, k) b_k)_m‖_{ℓ_q} ≤ A ‖b‖_{ℓ_q}` for `1 ≤ q ≤ ∞`
+  (`Rd.lqNorm_schur_le`), for countable index sets; `∑_k ∏_i f_i(k_i) ≤ ∏_i ∑_j f_i(j)` on `ℕ^d`
   (`Rd.tsum_prod_le_prod_tsum`).
 * **The layer cake formula for `[0, ∞]`-valued functions**
-  (`FunctionSpaces/Lp/LayerCake.lean`): `∫ F^p dν = p ∫_0^∞ ν{F > t} t^(p-1) dt` for
+  (`FunctionSpaces/Analysis/Lp/LayerCake.lean`): `∫ F^p dν = p ∫_0^∞ ν{F > t} t^(p-1) dt` for
   `p > 0`, every measure and every a.e. measurable `F : α → [0, ∞]`
   (`MeasureTheory.lintegral_rpow_eq_lintegral_meas_lt_mul_ennreal`); Mathlib's
   `lintegral_rpow_eq_lintegral_meas_lt_mul` is for real `f ≥ 0`. Mathlib PR #44813 (open,
@@ -172,67 +178,68 @@ declarations.
   the `lintegral` of powers over intervals, `∫_{(0,b)} t^r dt = b^(r+1)/(r+1)` for `r > -1` and
   `b ≥ 0` (`MeasureTheory.lintegral_Ioo_rpow`) and `∫_{(0,∞)} t^r dt = ∞`
   (`MeasureTheory.lintegral_Ioi_rpow_eq_top`).
-* **The Hardy–Littlewood maximal function** (`FunctionSpaces/Rd/HardyLittlewoodMaximal.lean`): the
-  centred maximal function on a finite-dimensional inner product space (`Rd.maximal`), its lower
-  semicontinuity and measurability for every `g` (`Rd.lowerSemicontinuous_maximal`,
-  `Rd.measurable_maximal`), the weighted weak type
+* **The Hardy–Littlewood maximal function**
+  (`FunctionSpaces/Analysis/Maximal/HardyLittlewoodMaximal.lean`): the centred maximal function on a
+  finite-dimensional inner product space (`Rd.maximal`), its lower semicontinuity and measurability
+  for every `g` (`Rd.lowerSemicontinuous_maximal`, `Rd.measurable_maximal`), the weighted weak type
   `∫_{Mg > t} w ≤ C t⁻¹ ∫ g Mw` (`Rd.setLIntegral_maximal_gt_le`), the weak type `(1,1)`
   (`Rd.volume_maximal_gt_le`), the weighted strong type `∫ (Mg)^p w ≤ C ∫ g^p Mw`
-  (`Rd.lintegral_maximal_rpow_mul_le`) and the maximal theorem `‖Mg‖_p ≤ C ‖g‖_p` for
-  `1 < p < ∞` (`Rd.eLpNorm_maximal_le`), with explicit constants. Mathlib has Vitali's covering
-  lemma and the differentiation theorem, but no maximal function.
-* **Dyadic cubes and Lebesgue differentiation along them** (`FunctionSpaces/Rd/DyadicCubes.lean`):
-  the dyadic cubes of every level `k ∈ ℤ` (`Rd.zcell`), their nesting
-  (`Rd.zcell_subset_or_disjoint`), and the convergence of the averages over the cubes containing
-  `x` to `F(x)` for almost every `x` and locally integrable `F` (`Rd.ae_tendsto_average_cubeAt`),
-  from Mathlib's `IsUnifLocDoublingMeasure.ae_tendsto_average_norm_sub`.
-* **The Calderón–Zygmund decomposition** (`FunctionSpaces/Rd/CalderonZygmund.lean`): for
-  `n ≥ 1`, `t > 0` and a.e. measurable `G` with `∫ G < ∞`, the maximal dyadic cubes with
-  average `> t` are disjoint, have averages at most `2^n t`, total measure at most `t⁻¹ ∫ G`
+  (`Rd.lintegral_maximal_rpow_mul_le`) and the maximal theorem `‖Mg‖_p ≤ C ‖g‖_p` for `1 < p < ∞`
+  (`Rd.eLpNorm_maximal_le`), with explicit constants. Mathlib has Vitali's covering lemma and the
+  differentiation theorem, but no maximal function.
+* **Dyadic cubes and Lebesgue differentiation along them**
+  (`FunctionSpaces/Analysis/Maximal/DyadicCubes.lean`): the dyadic cubes of every level `k ∈ ℤ`
+  (`Rd.zcell`), their nesting (`Rd.zcell_subset_or_disjoint`), and the convergence of the averages
+  over the cubes containing `x` to `F(x)` for almost every `x` and locally integrable `F`
+  (`Rd.ae_tendsto_average_cubeAt`), from Mathlib's
+  `IsUnifLocDoublingMeasure.ae_tendsto_average_norm_sub`.
+* **The Calderón–Zygmund decomposition** (`FunctionSpaces/Analysis/Maximal/CalderonZygmund.lean`):
+  for `n ≥ 1`, `t > 0` and a.e. measurable `G` with `∫ G < ∞`, the maximal dyadic cubes with average
+  `> t` are disjoint, have averages at most `2^n t`, total measure at most `t⁻¹ ∫ G`
   (`Rd.cz_volume_le`), and `G ≤ t` almost everywhere off their union (`Rd.cz_ae_le_of_notMem`).
-* **The Fefferman–Stein inequality** (`FunctionSpaces/Rd/FeffermanStein.lean`):
+* **The Fefferman–Stein inequality** (`FunctionSpaces/Analysis/Maximal/FeffermanStein.lean`):
   `‖ ‖(M g_j)_j‖_{ℓ_q} ‖_p ≤ C ‖ ‖(g_j)_j‖_{ℓ_q} ‖_p` for `1 < p < ∞`, `1 < q ≤ ∞`
   (`Rd.feffermanStein`), with the vector-valued weak type `(1,1)`
   (`Rd.volume_lqNorm_maximal_gt_le`) and the bound of the maximal function off enlarged sets,
   `M(1_{⋃ Q_i} g)(x) ≤ 3^n M g̃(x)` for countably many sets `Q_i ⊆ B̄(c_i, ρ_i)` of positive
   finite measure and `x` outside every `B̄(c_i, 2ρ_i)`, where `g̃ = ∑_i (⨍_{Q_i} g) 1_{Q_i}`
   (`Rd.maximal_indicator_iUnion_le`).
-* **Norms of means of vector-valued functions** (`FunctionSpaces/Rd/CalderonZygmundSigned.lean`):
-  `‖⨍ f‖ₑ ≤ ⨍⁻ ‖f‖ₑ` for `f` with values in a real normed space
-  (`MeasureTheory.enorm_average_le`), next to Mathlib's `enorm_integral_le_lintegral_enorm`; on
-  a set `s` of finite measure `μ s * ‖⨍_s f‖ₑ ≤ ∫⁻_s ‖f‖ₑ`
+* **Norms of means of vector-valued functions**
+  (`FunctionSpaces/Analysis/Maximal/CalderonZygmundSigned.lean`): `‖⨍ f‖ₑ ≤ ⨍⁻ ‖f‖ₑ` for `f` with
+  values in a real normed space (`MeasureTheory.enorm_average_le`), next to Mathlib's
+  `enorm_integral_le_lintegral_enorm`; on a set `s` of finite measure `μ s * ‖⨍_s f‖ₑ ≤ ∫⁻_s ‖f‖ₑ`
   (`MeasureTheory.measure_mul_enorm_setAverage_le`) and `∫⁻_s ‖f - ⨍_s f‖ₑ ≤ 2 ∫⁻_s ‖f‖ₑ`
-  (`MeasureTheory.setLIntegral_enorm_sub_setAverage_le`), the step behind the mass of the bad
-  pieces of a Calderón–Zygmund decomposition.
-* **Level sets of a split function** (`FunctionSpaces/Rd/VectorValuedWeakType.lean`): if
-  `u ≤ a + b` almost everywhere, `∫⁻ a² ≤ A t I`, `μ S ≤ D t⁻¹ I` and `∫⁻_{Sᶜ} b ≤ K I`, then
-  `μ {u > t} ≤ (4A + D + 2K) t⁻¹ I` (`MeasureTheory.measure_lt_le_of_ae_le_add`), from the two
-  forms of Chebyshev's inequality at half height
-  (`MeasureTheory.measure_half_lt_le_lintegral_sq`,
+  (`MeasureTheory.setLIntegral_enorm_sub_setAverage_le`), the step behind the mass of the bad pieces
+  of a Calderón–Zygmund decomposition.
+* **Level sets of a split function**
+  (`FunctionSpaces/Rd/SingularIntegrals/VectorValuedWeakType.lean`): if `u ≤ a + b` almost
+  everywhere, `∫⁻ a² ≤ A t I`, `μ S ≤ D t⁻¹ I` and `∫⁻_{Sᶜ} b ≤ K I`, then
+  `μ {u > t} ≤ (4A + D + 2K) t⁻¹ I` (`MeasureTheory.measure_lt_le_of_ae_le_add`), from the two forms
+  of Chebyshev's inequality at half height (`MeasureTheory.measure_half_lt_le_lintegral_sq`,
   `MeasureTheory.measure_half_lt_le_add_setLIntegral_compl`): the level-set bookkeeping of a
-  Calderón–Zygmund argument. The three lemmas assume `0 < t < ∞`; for Mathlib these hypotheses
-  would be removed, since at `t = ∞` the level sets are empty and at `t = 0` the bounds are
-  either `∞` or force the functions to vanish almost everywhere. Also `MemLp f 2 μ` from
-  `∫⁻ ‖f‖ₑ ^ 2 ∂μ ≠ ∞` (`MeasureTheory.memLp_two_of_lintegral_enorm_sq_ne_top`), with the
-  exponent `2 : ℕ`.
-* **The Hörmander condition for dilation families** (`FunctionSpaces/Rd/DilationFamilies.lean`):
-  for Schwartz functions `G_j` with seminorms bounded uniformly in `j` (`Rd.IsUniformSchwartz`) and
-  `θ_j = 2^(jn) G_j(2^j ·)`, `∫_{‖x‖ > 2‖y‖} ‖(θ_j(x - y) - θ_j(x))_j‖_{ℓ_2} dx ≤ 4 H_A` for every
-  `y`, with an explicit constant built from the seminorm bounds (`Rd.lintegral_lqNorm_sub_le`,
-  `Rd.familyHormanderConst`); such a family with bounded Fourier overlap is a Calderón–Zygmund
-  family (`Rd.IsCZFamily.of_dilation`), and so is its adjoint family (`Rd.IsCZFamily.adjoint`).
-* **Vector-valued singular integrals** (`FunctionSpaces/Rd/VectorValuedWeakType.lean`,
-  `FunctionSpaces/Rd/VectorValuedSingularIntegrals.lean`): for a Calderón–Zygmund family
-  `(θ_j)_j` with overlap `B` and Hörmander constant `H` on a space of dimension `n ≥ 1`, the
+  Calderón–Zygmund argument. The three lemmas assume `0 < t < ∞`; for Mathlib these hypotheses would
+  be removed, since at `t = ∞` the level sets are empty and at `t = 0` the bounds are either `∞` or
+  force the functions to vanish almost everywhere. Also `MemLp f 2 μ` from `∫⁻ ‖f‖ₑ ^ 2 ∂μ ≠ ∞`
+  (`MeasureTheory.memLp_two_of_lintegral_enorm_sq_ne_top`), with the exponent `2 : ℕ`.
+* **The Hörmander condition for dilation families**
+  (`FunctionSpaces/Rd/SingularIntegrals/DilationFamilies.lean`): for Schwartz functions `G_j` with
+  seminorms bounded uniformly in `j` (`Rd.IsUniformSchwartz`) and `θ_j = 2^(jn) G_j(2^j ·)`,
+  `∫_{‖x‖ > 2‖y‖} ‖(θ_j(x - y) - θ_j(x))_j‖_{ℓ_2} dx ≤ 4 H_A` for every `y`, with an explicit
+  constant built from the seminorm bounds (`Rd.lintegral_lqNorm_sub_le`, `Rd.familyHormanderConst`);
+  such a family with bounded Fourier overlap is a Calderón–Zygmund family
+  (`Rd.IsCZFamily.of_dilation`), and so is its adjoint family (`Rd.IsCZFamily.adjoint`).
+* **Vector-valued singular integrals**
+  (`FunctionSpaces/Rd/SingularIntegrals/VectorValuedWeakType.lean`,
+  `FunctionSpaces/Rd/SingularIntegrals/VectorValuedSingularIntegrals.lean`): for a Calderón–Zygmund
+  family `(θ_j)_j` with overlap `B` and Hörmander constant `H` on a space of dimension `n ≥ 1`, the
   analysis operator `f ↦ ‖(θ_j ⋆ f)_j‖_{ℓ_2}` and the synthesis operators
-  `(g_j)_j ↦ ∑_{j ∈ s} θ_j ⋆ g_j` have weak type `(1,1)`
-  (`Rd.IsCZFamily.volume_lqNorm_conv_gt_le`, `Rd.IsCZFamily.volume_enorm_sum_conv_gt_le`) and
-  strong type `(p,p)` for `1 < p < ∞` (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`,
-  `Rd.IsCZFamily.eLpNorm_sum_conv_le`), with explicit constants (`Rd.vectorWeakConst`,
-  `Rd.czConst`). Mathlib has no singular integrals; the Carleson project has the scalar
-  Calderón–Zygmund theory on doubling metric measure spaces.
+  `(g_j)_j ↦ ∑_{j ∈ s} θ_j ⋆ g_j` have weak type `(1,1)` (`Rd.IsCZFamily.volume_lqNorm_conv_gt_le`,
+  `Rd.IsCZFamily.volume_enorm_sum_conv_gt_le`) and strong type `(p,p)` for `1 < p < ∞`
+  (`Rd.IsCZFamily.eLpNorm_lqNorm_conv_le`, `Rd.IsCZFamily.eLpNorm_sum_conv_le`), with explicit
+  constants (`Rd.vectorWeakConst`, `Rd.czConst`). Mathlib has no singular integrals; the Carleson
+  project has the scalar Calderón–Zygmund theory on doubling metric measure spaces.
 * **Marcinkiewicz interpolation between weak type `(1,1)` and strong type `(2,2)`**
-  (`FunctionSpaces/Lp/Marcinkiewicz.lean`): the two Tonelli steps
+  (`FunctionSpaces/Analysis/Lp/Marcinkiewicz.lean`): the two Tonelli steps
   `∫_0^∞ τ^(p-2) ∫_{F > τ} F dμ dτ = (p - 1)⁻¹ ∫ F^p` and
   `∫_0^∞ τ^(p-1-r) ∫_{F ≤ τ} F^r dμ dτ ≤ (r - p)⁻¹ ∫ F^p` on s-finite measure spaces
   (`MeasureTheory.lintegral_Ioi_lintegral_indicator_lt_mul_rpow`,
@@ -240,12 +247,13 @@ declarations.
   `MeasureTheory.lintegral_rpow_le_of_forall_le_add`, and the case `(1,1)`, `(2,2)` of real
   interpolation with an explicit constant in the terms of the Carleson project
   (`MeasureTheory.hasStrongType_of_hasWeakType_one_of_hasStrongType_two`); the definitions in
-  `FunctionSpaces/Lp/WeakType.lean` are the Carleson project's own candidates. The file imports
-  the layer cake formula and the integrals of powers from `FunctionSpaces/Lp/LayerCake.lean`.
-  The Carleson project proves the general real interpolation theorem for `A ≥ 1` and positive
-  finite constants; new here are s-finite input measures, every `A ≥ 0`, constants in `[0, ∞]`
-  and the explicit constant `(p (2 A C₁/(p - 1) + 4 A² C₂²/(2 - p)))^(1/p)`.
-* **`L_p` norms by duality** (`FunctionSpaces/Lp/NormingFamily.lean`): for `1 < p < ∞` with
+  `FunctionSpaces/Analysis/Lp/WeakType.lean` are the Carleson project's own candidates. The file
+  imports the layer cake formula and the integrals of powers from
+  `FunctionSpaces/Analysis/Lp/LayerCake.lean`. The Carleson project proves the general real
+  interpolation theorem for `A ≥ 1` and positive finite constants; new here are s-finite input
+  measures, every `A ≥ 0`, constants in `[0, ∞]` and the explicit constant
+  `(p (2 A C₁/(p - 1) + 4 A² C₂²/(2 - p)))^(1/p)`.
+* **`L_p` norms by duality** (`FunctionSpaces/Analysis/Lp/NormingFamily.lean`): for `1 < p < ∞` with
   conjugate `q` and `v ∈ L_p(μ)`, if `|∫ v conj g| ≤ A ‖g‖_q` for every `g ∈ L_q(μ)`, then
   `‖v‖_p ≤ A` (`MeasureTheory.eLpNorm_le_of_forall_enorm_integral_mul_conj_le`), and the same
   for the `L_p(ℓ_2)` norm of a family in `L_p` vanishing outside a finite set
@@ -254,7 +262,7 @@ declarations.
   of `L_p` and `L_q` with its upper bound (`lpPairing`), and this is the converse. Also
   Hölder's inequality for `[0, ∞]`-valued functions written with `eLpNorm`
   (`MeasureTheory.lintegral_mul_le_eLpNorm_mul_eLpNorm`).
-* **Integrals under a change of scale** (`FunctionSpaces/Rd/KernelMajorants.lean`):
+* **Integrals under a change of scale** (`FunctionSpaces/Rd/LocalMeans/KernelMajorants.lean`):
   `∫ f(r x) dx = |r^(-n)| ∫ f` for `f : V → [0, ∞]` and `r ≠ 0` (`Rd.lintegral_comp_smul`),
   from Mathlib's `Measure.map_addHaar_smul`; Mathlib has the Bochner version
   `Measure.integral_comp_smul`.
@@ -295,7 +303,7 @@ declarations.
   (`FunctionSpaces/Wavelets/Daubechies/FilterIdentities.lean`):
   `(d/dt)^l ∑_i a_i e^(b_i t) = ∑_i a_i b_i^l e^(b_i t)` for `t ∈ ℝ`
   (`Daubechies.iteratedDeriv_sum_mul_cexp`); Mathlib has these derivatives for a complex variable.
-* **Distributions and Schwartz functions** (`FunctionSpaces/Rd/SchwartzCutoff.lean`):
+* **Distributions and Schwartz functions** (`FunctionSpaces/Analysis/Fourier/SchwartzCutoff.lean`):
   directional derivatives commute on Schwartz functions and on test functions
   (`SchwartzMap.lineDerivOp_comm`, `TestFunction.lineDerivOp_comm`), and a directional derivative
   commutes with every iterated one as soon as two of them commute
@@ -308,34 +316,33 @@ declarations.
   `χ(x/(n+1)) u(x)` of a Schwartz function converge to it in the Schwartz space
   (`Rd.tendsto_cutoffMul`), so tempered distributions are determined by test functions
   (`Rd.eq_zero_of_testSchwartz`).
-* **The convolution theorem on `L_2`** (`FunctionSpaces/Rd/SobolevTwoLittlewoodPaley.lean`): for
-  integrable `K` and `f ∈ L_2(V)`, `𝓕(K ⋆ f) = 𝓕K · 𝓕f` almost everywhere, with Plancherel's
+* **The convolution theorem on `L_2`** (`FunctionSpaces/Rd/Sobolev/SobolevTwoLittlewoodPaley.lean`):
+  for integrable `K` and `f ∈ L_2(V)`, `𝓕(K ⋆ f) = 𝓕K · 𝓕f` almost everywhere, with Plancherel's
   Fourier transform on `L_2` (`Rd.fourier_convLp`), from the multiplication formulas
-  `∫ 𝓕u · g = ∫ u · 𝓕g` and `∫ 𝓕⁻u · g = ∫ u · 𝓕⁻g` for Schwartz `u` and integrable `g`
-  (Mathlib's `VectorFourier.integral_fourierIntegral_smul_eq_flip`, in the `𝓕` form
-  `Rd.integral_fourier_smul_eq_of_integrable`, `Rd.integral_fourierInv_smul_eq_of_integrable`
-  of `FunctionSpaces/Rd/LittlewoodPaleyKernels.lean`;
-  Mathlib's `SchwartzMap.integral_fourier_smul_eq` and `SchwartzMap.integral_fourierInv_smul_eq`
-  are the forms for two Schwartz functions).
-  Mathlib has the convolution theorem for integrable functions
+  `∫ 𝓕u · g = ∫ u · 𝓕g` and `∫ 𝓕⁻u · g = ∫ u · 𝓕⁻g` for Schwartz `u` and integrable `g` (Mathlib's
+  `VectorFourier.integral_fourierIntegral_smul_eq_flip`, in the `𝓕` form
+  `Rd.integral_fourier_smul_eq_of_integrable`, `Rd.integral_fourierInv_smul_eq_of_integrable` of
+  `FunctionSpaces/Analysis/Fourier/LittlewoodPaleyKernels.lean`; Mathlib's
+  `SchwartzMap.integral_fourier_smul_eq` and `SchwartzMap.integral_fourierInv_smul_eq` are the forms
+  for two Schwartz functions). Mathlib has the convolution theorem for integrable functions
   (`Real.fourier_bilin_convolution_eq`) and for Schwartz functions.
-* **Temperate weights times `L_p` functions** (`FunctionSpaces/Rd/SobolevTwoLittlewoodPaley.lean`):
-  if `w` has temperate growth, `g ∈ L_p(V)` and `w g ∈ L_q(V)`, then the product of `w` with the
-  tempered distribution of `g` is the tempered distribution of `w g`
-  (`Rd.smulLeftCLM_toTemperedDistribution_eq`), and an identity `w G = H` of tempered
-  distributions with `G ∈ L_p(V)`, `H ∈ L_q(V)` holds almost everywhere
+* **Temperate weights times `L_p` functions**
+  (`FunctionSpaces/Rd/Sobolev/SobolevTwoLittlewoodPaley.lean`): if `w` has temperate growth,
+  `g ∈ L_p(V)` and `w g ∈ L_q(V)`, then the product of `w` with the tempered distribution of `g` is
+  the tempered distribution of `w g` (`Rd.smulLeftCLM_toTemperedDistribution_eq`), and an identity
+  `w G = H` of tempered distributions with `G ∈ L_p(V)`, `H ∈ L_q(V)` holds almost everywhere
   (`Rd.ae_eq_of_smulLeftCLM_eq`).
-* **`H^1` by derivatives in `L_2`** (`FunctionSpaces/Rd/SobolevTwoLittlewoodPaley.lean`): for
-  `f ∈ L_2(V)`, Mathlib's `TemperedDistribution.MemSobolev 1 2 f` holds iff every directional
-  derivative `∂_v f` of the tempered distribution `f` is an `L_2` function
-  (`Rd.memSobolev_one_iff` with `Rd.memSobolev_iff_tempered`); the derivatives along one
-  orthonormal basis `(e_i)` suffice (`Rd.memSobolev_one_two_of_lineDerivOp_eq`), and
-  `(2π)² ‖J_1 f‖_2² = (2π)² ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²`
-  (`Rd.lintegral_besselWeight_one_sq_eq`, `Rd.enorm_besselPotential_one_sq_eq`). Mathlib has
-  `∂_v : H^s → H^{s-1}` (`TemperedDistribution.MemSobolev.lineDerivOp`); the converse at `s = 1`
-  is new, and these results belong next to it in `Mathlib/Analysis/Distribution/Sobolev.lean`.
+* **`H^1` by derivatives in `L_2`** (`FunctionSpaces/Rd/Sobolev/SobolevTwoLittlewoodPaley.lean`):
+  for `f ∈ L_2(V)`, Mathlib's `TemperedDistribution.MemSobolev 1 2 f` holds iff every directional
+  derivative `∂_v f` of the tempered distribution `f` is an `L_2` function (`Rd.memSobolev_one_iff`
+  with `Rd.memSobolev_iff_tempered`); the derivatives along one orthonormal basis `(e_i)` suffice
+  (`Rd.memSobolev_one_two_of_lineDerivOp_eq`), and
+  `(2π)² ‖J_1 f‖_2² = (2π)² ‖f‖_2² + ∑_i ‖∂_{e_i} f‖_2²` (`Rd.lintegral_besselWeight_one_sq_eq`,
+  `Rd.enorm_besselPotential_one_sq_eq`). Mathlib has `∂_v : H^s → H^{s-1}`
+  (`TemperedDistribution.MemSobolev.lineDerivOp`); the converse at `s = 1` is new, and these results
+  belong next to it in `Mathlib/Analysis/Distribution/Sobolev.lean`.
 * **The inverse Fourier transform on `L_1 ∩ L_2` and Rellich's theorem**
-  (`FunctionSpaces/Rd/RellichCompactness.lean`): for an integrable `h ∈ L_2(V)`, Mathlib's
+  (`FunctionSpaces/Rd/Sobolev/RellichCompactness.lean`): for an integrable `h ∈ L_2(V)`, Mathlib's
   `L_2` inverse Fourier transform of `h` is the pointwise inverse Fourier integral almost
   everywhere (`Rd.fourierInv_Lp_ae_eq_of_integrable`). Mathlib has the `L_1` inverse transform
   (`Real.Lp.fourierTransformInv`) and the `L_2` inverse transform, and identifies the two on
@@ -344,7 +351,7 @@ declarations.
   from Mathlib's `H^{1,2}(V, ℂ)` to `L_2(Ω)` is a compact operator
   (`Rd.isCompactOperator_restr_toL2`).
 * **Evaluation on `H^s` and Sobolev spaces on open sets**
-  (`FunctionSpaces/Rd/SobolevRestrictionSpaces.lean`): for every Schwartz function `φ`,
+  (`FunctionSpaces/Domains/Sobolev/SobolevRestrictionSpaces.lean`): for every Schwartz function `φ`,
   `U ↦ U(φ)` is a continuous linear functional on Mathlib's `H^{s,2}(V, ℂ)` (`Rd.besselEvalCLM`,
   `Rd.continuous_toDistr_apply`), which belongs next to `BesselPotentialSpace` in
   `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`. Mathlib's Sobolev spaces live
@@ -357,94 +364,98 @@ declarations.
   everywhere outside a measurable set `S` and `b` almost everywhere on `S`, then
   `‖a‖_p ≤ ‖a + b‖_p` in every `Lp E p μ` (`Rd.norm_le_norm_add_of_ae_eq_zero`), which belongs
   next to `Lp.norm_le_norm_of_ae_le` in `Mathlib/MeasureTheory/Function/LpSpace/Basic.lean`.
-* **Duality of Bessel potential spaces** (`FunctionSpaces/Rd/SobolevDuality.lean`): the inner
-  product of Mathlib's `H^{s,2}(V, ℂ)` is that of the `L_2` functions `J_s U`
+* **Duality of Bessel potential spaces** (`FunctionSpaces/Domains/Sobolev/SobolevDuality.lean`): the
+  inner product of Mathlib's `H^{s,2}(V, ℂ)` is that of the `L_2` functions `J_s U`
   (`Rd.inner_toLp_toLp`); the isometry `J_{2s} : H^{s,2} → H^{-s,2}` (`Rd.besselShift`) and the
   pairing `⟪J_{-s} W, J_s U⟫_{L_2}` of `H^{-s,2}` and `H^{s,2}` (`Rd.pairing`), which extends the
   action of distributions on test functions (`Rd.pairing_ofTest_left`);
-  `⟪U, φ⟫ = conj ((J_{2s} U)(φ))` for real test functions `φ` (`Rd.inner_ofTest_eq`). These
-  belong in `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`. Also the reality of
-  the Bessel potential of real Schwartz functions (`Rd.conj_besselSchwartz_apply`), and the
-  conjugation identities `conj (𝓕 f) = 𝓕⁻(conj f)` and `conj (𝓕⁻ f) = 𝓕(conj f)` for
-  `f : V → ℂ` (`Rd.conj_fourier_apply`, `Rd.conj_fourierInv_apply` in
-  `FunctionSpaces/Rd/LittlewoodPaleyKernels.lean`), next to `Real.fourierInv_eq_fourier_neg` in
-  `Mathlib/Analysis/Fourier/FourierTransform.lean`.
+  `⟪U, φ⟫ = conj ((J_{2s} U)(φ))` for real test functions `φ` (`Rd.inner_ofTest_eq`). These belong
+  in `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`. Also the reality of the Bessel
+  potential of real Schwartz functions (`Rd.conj_besselSchwartz_apply`), and the conjugation
+  identities `conj (𝓕 f) = 𝓕⁻(conj f)` and `conj (𝓕⁻ f) = 𝓕(conj f)` for `f : V → ℂ`
+  (`Rd.conj_fourier_apply`, `Rd.conj_fourierInv_apply` in
+  `FunctionSpaces/Analysis/Fourier/LittlewoodPaleyKernels.lean`), next to
+  `Real.fourierInv_eq_fourier_neg` in `Mathlib/Analysis/Fourier/FourierTransform.lean`.
 * **`H^{s,p} = F^s_{p,2}` and `W^m_p = H^{m,p}`**
-  (`FunctionSpaces/Rd/BesselPotentialLifting.lean`): for `dim V ≥ 1` and `1 < p < ∞`, every
-  `f ∈ F^s_{p,2}(V)` lies in Mathlib's `H^{s,p}(V)` (`TemperedDistribution.MemSobolev s p`,
-  `BesselPotentialSpace`) for every real `s` (`Rd.exists_besselPotential_eq_of_memTriebelLizorkin`),
-  an `f ∈ L_p(V)` lies in `F^s_{p,2}(V)` iff it lies in `H^{s,p}(V)`, for every real `s`
-  (`Rd.memTriebelLizorkin_iff_memSobolev_bessel`), for `s ≥ 0` every element of `H^{s,p}(V)` is
-  an `L_p` function in `F^s_{p,2}(V)` (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`),
-  and `W^m_p(V) = H^{m,p}(V)`, Calderón's theorem (`Rd.memSobolev_iff_memSobolev_bessel`), with
-  existential constants. Mathlib has `H^{s,p}` with `∂_v : H^{s,p} → H^{s-1,p}`
-  (`TemperedDistribution.MemSobolev.lineDerivOp`); this project identifies it with `F^s_{2,2}`
-  for `p = 2` by Plancherel (`FunctionSpaces/Rd/SobolevTwoLittlewoodPaley.lean`), and for all
-  `1 < p < ∞` through its vector-valued singular integrals and Triebel–Lizorkin spaces, so the
-  identity would follow them into Mathlib. Three general facts on Mathlib's Fourier multipliers
-  are short and self-contained: an even multiplier acts on tempered distributions by the
-  transpose, `(m(D) T)(u) = T(m(D) u)` (`Rd.fourierMultiplierCLM_apply_apply_of_even`, in
-  `FunctionSpaces/Rd/SobolevTwoLittlewoodPaley.lean`, with the Bessel case
+  (`FunctionSpaces/Rd/BesselPotentials/BesselPotentialLifting.lean`): for `dim V ≥ 1` and
+  `1 < p < ∞`, every `f ∈ F^s_{p,2}(V)` lies in Mathlib's `H^{s,p}(V)`
+  (`TemperedDistribution.MemSobolev s p`, `BesselPotentialSpace`) for every real `s`
+  (`Rd.exists_besselPotential_eq_of_memTriebelLizorkin`), an `f ∈ L_p(V)` lies in `F^s_{p,2}(V)` iff
+  it lies in `H^{s,p}(V)`, for every real `s` (`Rd.memTriebelLizorkin_iff_memSobolev_bessel`), for
+  `s ≥ 0` every element of `H^{s,p}(V)` is an `L_p` function in `F^s_{p,2}(V)`
+  (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`), and `W^m_p(V) = H^{m,p}(V)`, Calderón's
+  theorem (`Rd.memSobolev_iff_memSobolev_bessel`), with existential constants. Mathlib has `H^{s,p}`
+  with `∂_v : H^{s,p} → H^{s-1,p}` (`TemperedDistribution.MemSobolev.lineDerivOp`); this project
+  identifies it with `F^s_{2,2}` for `p = 2` by Plancherel
+  (`FunctionSpaces/Rd/Sobolev/SobolevTwoLittlewoodPaley.lean`), and for all `1 < p < ∞` through its
+  vector-valued singular integrals and Triebel–Lizorkin spaces, so the identity would follow them
+  into Mathlib. Three general facts on Mathlib's Fourier multipliers are short and self-contained:
+  an even multiplier acts on tempered distributions by the transpose, `(m(D) T)(u) = T(m(D) u)`
+  (`Rd.fourierMultiplierCLM_apply_apply_of_even`, in
+  `FunctionSpaces/Rd/Sobolev/SobolevTwoLittlewoodPaley.lean`, with the Bessel case
   `Rd.besselPotential_apply_apply`), every multiplier commutes with translations of Schwartz
   functions and an even one with reflections (`Rd.fourierMultiplierCLM_compSubConstCLM`,
   `Rd.fourierMultiplierCLM_schwartzReflect`, with the Fourier transform of a translate
   `Rd.fourier_compSubConstCLM_apply`); they belong in
   `Mathlib/Analysis/Distribution/FourierMultiplier.lean` and next to `SchwartzMap.compSubConstCLM`.
-* **The area formula for Lipschitz graphs** (`FunctionSpaces/Rd/LipschitzGraphArea.lean`):
-  Mathlib has the area formula for linear maps, `μHE[dim U] (f '' s) = normDet f · vol(s)`
+* **The area formula for Lipschitz graphs**
+  (`FunctionSpaces/Domains/Lipschitz/LipschitzGraphArea.lean`): Mathlib has the area formula for
+  linear maps, `μHE[dim U] (f '' s) = normDet f · vol(s)`
   (`LinearMap.euclideanHausdorffMeasure_image`,
   `LinearMap.euclideanHausdorffMeasure_image_eq_normDet_mul_volume`, with `LinearMap.normDet` in
   `Mathlib/Analysis/InnerProductSpace/NormDet.lean`), and lacks the one for Lipschitz maps
   (2026-10-14). Two steps are general: a map that is `K`-Lipschitz on `s` satisfies
   `μHE[d] (f '' s) ≤ K^d μHE[d] s` (`LipschitzOnWith.euclideanHausdorffMeasure_image_le`, next to
-  `Isometry.euclideanHausdorffMeasure_image`), and images under two maps with nearby increments
-  have comparable measures (`Rd.euclideanHausdorffMeasure_image_le_of_near`). For the graph
+  `Isometry.euclideanHausdorffMeasure_image`), and images under two maps with nearby increments have
+  comparable measures (`Rd.euclideanHausdorffMeasure_image_le_of_near`). For the graph
   `γ(x') = x' + φ(x') e` of a Lipschitz function over the hyperplane `H = e^⊥`, the area formula
   `μHE[n-1] (γ '' A) = ∫_A √(1 + ‖∇φ‖²)` with its measure and integral forms
   (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`,
-  `Rd.LipschitzGraph.map_graphMap_withDensity`, `Rd.LipschitzGraph.lintegral_graphMap`). For
-  Mathlib the graph would be stated for a Lipschitz function on a Euclidean space without the
-  structure `Rd.LipschitzGraph`.
+  `Rd.LipschitzGraph.map_graphMap_withDensity`, `Rd.LipschitzGraph.lintegral_graphMap`). For Mathlib
+  the graph would be stated for a Lipschitz function on a Euclidean space without the structure
+  `Rd.LipschitzGraph`.
 * **The boundary of a bounded Lipschitz domain is a null set**
-  (`FunctionSpaces/Rd/SurfaceMeasure.lean`): `volume (frontier Ω) = 0`
+  (`FunctionSpaces/Domains/Lipschitz/SurfaceMeasure.lean`): `volume (frontier Ω) = 0`
   (`Rd.BoundedLipschitzDomain.volume_frontier`), since the boundary has finite `μHE[n-1]`-measure
   and hence `μHE[n]`-measure zero (`MeasureTheory.Measure.euclideanHausdorffMeasure_zero_or_top`).
   In Mathlib it would follow from the finiteness of `μHE[n-1]` on the graph of a Lipschitz
   function over a bounded subset of a hyperplane, a consequence of
   `LipschitzOnWith.euclideanHausdorffMeasure_image_le`.
-* **Smoothness of parametric integrals** (`FunctionSpaces/Rd/DivergenceKernels.lean`): if
-  `(x, t) ↦ F(x, t)` is smooth on `H × ℝ`, `H` finite dimensional, then `x ↦ ∫_a^b F(x, t) dt` is
-  smooth (`intervalIntegral.contDiff_parametric_intervalIntegral_of_contDiff`), with the
-  derivative under the integral sign for jointly `C^1` integrands
+* **Smoothness of parametric integrals**
+  (`FunctionSpaces/Domains/Extension/DivergenceKernels.lean`): if `(x, t) ↦ F(x, t)` is smooth on
+  `H × ℝ`, `H` finite dimensional, then `x ↦ ∫_a^b F(x, t) dt` is smooth
+  (`intervalIntegral.contDiff_parametric_intervalIntegral_of_contDiff`), with the derivative under
+  the integral sign for jointly `C^1` integrands
   (`intervalIntegral.hasFDerivAt_integral_of_contDiff`,
   `intervalIntegral.fderiv_integral_apply_of_contDiff`). Mathlib has the derivative at one point
   under a domination hypothesis (`intervalIntegral.hasFDerivAt_integral_of_dominated_of_fderiv_le`)
-  and the continuity (`intervalIntegral.continuous_parametric_intervalIntegral_of_continuous'`);
-  the smoothness follows by induction on the order, with all target spaces in one universe
-  (`intervalIntegral.contDiff_parametric_intervalIntegral_of_contDiff_aux`), reached through
-  `ULift` as in `contDiffOn_convolution_right_with_param`.
-* **Weak derivatives on open sets** (`FunctionSpaces/Rd/WeakDerivatives.lean`,
-  `FunctionSpaces/Rd/ConvolutionAdjoint.lean`): for Mathlib's distributions `𝓓'(Ω, ℂ)`, the
-  integration by parts against smooth compactly supported complex functions with support in
-  `Ω` (`Rd.HasWeakLineDeriv.integral_mul_eq`, through
+  and the continuity (`intervalIntegral.continuous_parametric_intervalIntegral_of_continuous'`); the
+  smoothness follows by induction on the order, with all target spaces in one universe
+  (`intervalIntegral.contDiff_parametric_intervalIntegral_of_contDiff_aux`), reached through `ULift`
+  as in `contDiffOn_convolution_right_with_param`.
+* **Weak derivatives on open sets** (`FunctionSpaces/Rd/Sobolev/WeakDerivatives.lean`,
+  `FunctionSpaces/Rd/SingularIntegrals/ConvolutionAdjoint.lean`): for Mathlib's distributions
+  `𝓓'(Ω, ℂ)`, the integration by parts against smooth compactly supported complex functions with
+  support in `Ω` (`Rd.HasWeakLineDeriv.integral_mul_eq`, through
   `Rd.exists_testSchwartz_eq_of_tsupport_subset`), the product rule with smooth real functions
   (`Rd.HasWeakLineDeriv.mul_contDiff`), and `(η ⋆ g)(x) = ((∂^v η) ⋆ f)(x)` for a compactly
   supported Schwartz `η` whose reflected translate lies in `Ω`
   (`Rd.conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv`); these belong next to the weak
   derivatives of the Sobolev library prepared for Mathlib.
-* **Gauss–Green on Lipschitz graph domains** (`FunctionSpaces/Rd/LipschitzGraphGreen.lean`): for
-  a Lipschitz graph domain `Ω = {φ < ⟪·, e⟫}`, Fubini in the product coordinates
-  `(x', t) ↦ x' + t e` and `(x', t) ↦ γ(x') + t e` of `H × ℝ`
-  (`Rd.LipschitzGraph.setIntegral_domain_eq`, `Rd.LipschitzGraph.setIntegral_domain_eq_graphMap`),
-  the vertical and horizontal directions (`Rd.LipschitzGraph.setIntegral_lineDeriv_e`, and
-  `Rd.LipschitzGraph.setIntegral_lineDeriv_hyperplane`, a Leibniz rule with a Lipschitz lower
-  limit in integrated form), and the divergence theorem `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dμHE[n-1]` for
-  compactly supported `C^1` functions (`Rd.LipschitzGraph.setIntegral_lineDeriv_eq`,
-  `Rd.LipschitzGraph.setIntegral_lineDeriv_eq_surface`). Mathlib's divergence theorem is the one
-  on boxes (`MeasureTheory.integral_divergence_of_hasFDerivAt_off_countable`, checked
-  2026-10-22); these results extend it to Lipschitz graph domains. Three general facts are short:
-  the line derivative of a compactly supported Lipschitz function is integrable and integrates to
-  zero (`Rd.integrable_lineDeriv`, `Rd.integral_lineDeriv_eq_zero`,
+* **Gauss–Green on Lipschitz graph domains**
+  (`FunctionSpaces/Domains/Sobolev/LipschitzGraphGreen.lean`): for a Lipschitz graph domain
+  `Ω = {φ < ⟪·, e⟫}`, Fubini in the product coordinates `(x', t) ↦ x' + t e` and
+  `(x', t) ↦ γ(x') + t e` of `H × ℝ` (`Rd.LipschitzGraph.setIntegral_domain_eq`,
+  `Rd.LipschitzGraph.setIntegral_domain_eq_graphMap`), the vertical and horizontal directions
+  (`Rd.LipschitzGraph.setIntegral_lineDeriv_e`, and
+  `Rd.LipschitzGraph.setIntegral_lineDeriv_hyperplane`, a Leibniz rule with a Lipschitz lower limit
+  in integrated form), and the divergence theorem `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dμHE[n-1]` for compactly
+  supported `C^1` functions (`Rd.LipschitzGraph.setIntegral_lineDeriv_eq`,
+  `Rd.LipschitzGraph.setIntegral_lineDeriv_eq_surface`). Mathlib's divergence theorem is the one on
+  boxes (`MeasureTheory.integral_divergence_of_hasFDerivAt_off_countable`, checked 2026-10-22);
+  these results extend it to Lipschitz graph domains. Three general facts are short: the line
+  derivative of a compactly supported Lipschitz function is integrable and integrates to zero
+  (`Rd.integrable_lineDeriv`, `Rd.integral_lineDeriv_eq_zero`,
   `Rd.integral_lineDeriv_eq_zero_complex`, next to `LipschitzWith.integral_lineDeriv_mul_eq` in
   `Mathlib/Analysis/Calculus/Rademacher.lean`), the product rule for line derivatives
   (`Rd.lineDeriv_mul`, next to `DifferentiableAt.lineDeriv_eq_fderiv`), and the ray integral
@@ -452,18 +463,19 @@ declarations.
   derivative and derivative `-g` along the ray (`Rd.hasFDerivAt_rayIntegral`,
   `Rd.fderiv_rayIntegral_self`, `Rd.exists_norm_fderiv_rayIntegral_le`). The density of the
   compactly supported Schwartz functions in Mathlib's `H^{s,2}(V, ℂ)` (`Rd.denseRange_ofSchwartz`,
-  `Rd.dense_ofSchwartz_hasCompactSupport`, `FunctionSpaces/Rd/SobolevRestrictionSpaces.lean`)
-  belongs in `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`.
-* **Integration by parts in `H^1`** (`FunctionSpaces/Rd/LipschitzDomainGreen.lean`): for
-  `U, W ∈ H^{1,2}(V, ℂ)` and every direction `v`, `∫ (∂_v U) W + U ∂_v W = 0`
+  `Rd.dense_ofSchwartz_hasCompactSupport`,
+  `FunctionSpaces/Domains/Sobolev/SobolevRestrictionSpaces.lean`) belongs in
+  `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`.
+* **Integration by parts in `H^1`** (`FunctionSpaces/Domains/Sobolev/LipschitzDomainGreen.lean`):
+  for `U, W ∈ H^{1,2}(V, ℂ)` and every direction `v`, `∫ (∂_v U) W + U ∂_v W = 0`
   (`Rd.integral_weakDeriv_mul_add_eq_zero`), and the weak derivatives of `H^1(V)` are local
   (`Rd.weakDerivL2_ae_eq_of_ae_eq`); both belong next to the density of the Schwartz functions in
   `Mathlib/Analysis/FunctionalSpaces/BesselPotentialSpace.lean`. Two general facts are short:
   integrals over two sets that agree inside a set `B` agree for functions vanishing outside `B`
   (`Rd.setIntegral_eq_of_inter_eq`), and line derivatives vanish outside the closed support
   (`Rd.lineDeriv_eq_zero_of_notMem_tsupport`).
-* **Mollification in `H^1`** (`FunctionSpaces/Rd/ConvolutionAdjoint.lean`,
-  `FunctionSpaces/Rd/TraceKernel.lean`): if `g = ∂^v f` weakly on `V` for `f ∈ L_p(V)`,
+* **Mollification in `H^1`** (`FunctionSpaces/Rd/SingularIntegrals/ConvolutionAdjoint.lean`,
+  `FunctionSpaces/Domains/Traces/TraceKernel.lean`): if `g = ∂^v f` weakly on `V` for `f ∈ L_p(V)`,
   `g ∈ L_r(V)`, `1 ≤ p, r < ∞`, then `η ⋆ g = ∂^v (η ⋆ f)` weakly for every Schwartz
   function `η` (`Rd.hasWeakLineDeriv_convLp`); hence the mollified `η_c ⋆ U` converge to `U` in
   `H^{1,2}(V, ℂ)` as `c → ∞` for `∫ η = 1` (`Rd.tendsto_of_toL2_eq_convLp`), and the elements of

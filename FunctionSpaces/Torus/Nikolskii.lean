@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Torus.Scheme
-public import FunctionSpaces.Besov.Nikolskii
+public import FunctionSpaces.MeasureSpaces.Besov.Nikolskii
 
 /-!
 # The Nikolskii inequality for trigonometric polynomials

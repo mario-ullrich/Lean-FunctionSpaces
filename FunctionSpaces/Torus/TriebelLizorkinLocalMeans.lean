@@ -7,7 +7,7 @@ module
 
 public import FunctionSpaces.Torus.TriebelLizorkin
 public import FunctionSpaces.Torus.FeffermanStein
-public import FunctionSpaces.Rd.TriebelLizorkinLocalMeans
+public import FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinLocalMeans
 
 /-!
 # Local means for Triebel–Lizorkin spaces on the torus
@@ -22,20 +22,20 @@ Triebel–Lizorkin quasi-norm of the torus, with explicit constants
 (`Torus.triebelLizorkinNorm_le_tlLocalMeansNorm`, `Torus.tlLocalMeansNorm_le_triebelLizorkinNorm`),
 so `F^s_{p,q}(𝕋^d)` is described by local means (`Torus.memTriebelLizorkin_iff_tlLocalMeans`).
 
-The proof transfers the one on `ℝ^d` (`FunctionSpaces.Rd.TriebelLizorkinLocalMeans`) by the
-periodic lift. The operator identities, the reproducing formula
-`f = ∑_i η_i ⋆ k_i ⋆ f` (`Torus.sum_econvLp_dual_kernel`, `Torus.tendsto_sum_econvLp_dual_kernel`)
-and `k_j ⋆ Δ_i f = (k_j ⋆ Θ_i) ⋆ Δ_i f`, hold on the torus as identities of Fourier multipliers.
-At a lifted point, `(K ⋆ h)(π x) = (K ⋆ (h ∘ π))(x)` is a convolution on `ℝ^d`, to which the
-pointwise bounds of the cross kernels apply for every function `h`; this gives, for almost every
-`x` in the period box `P_0 = (0, 1]^d`,
-`|ψ_j ⋆ f(π x)| ≤ C ∑_i c_{ji} M(|k_i ⋆ f| ∘ π)(x)` (`Torus.enorm_blockFun_proj_le_tsum_maximal`)
-and `|k_j ⋆ f(π x)| ≤ C ∑_i c_{ji} M(|ψ_i ⋆ f| ∘ π)(x)`
+The proof transfers the one on `ℝ^d` (`FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinLocalMeans`)
+by the periodic lift. The operator identities, the reproducing formula `f = ∑_i η_i ⋆ k_i ⋆ f`
+(`Torus.sum_econvLp_dual_kernel`, `Torus.tendsto_sum_econvLp_dual_kernel`) and
+`k_j ⋆ Δ_i f = (k_j ⋆ Θ_i) ⋆ Δ_i f`, hold on the torus as identities of Fourier multipliers. At a
+lifted point, `(K ⋆ h)(π x) = (K ⋆ (h ∘ π))(x)` is a convolution on `ℝ^d`, to which the pointwise
+bounds of the cross kernels apply for every function `h`; this gives, for almost every `x` in the
+period box `P_0 = (0, 1]^d`, `|ψ_j ⋆ f(π x)| ≤ C ∑_i c_{ji} M(|k_i ⋆ f| ∘ π)(x)`
+(`Torus.enorm_blockFun_proj_le_tsum_maximal`) and
+`|k_j ⋆ f(π x)| ≤ C ∑_i c_{ji} M(|ψ_i ⋆ f| ∘ π)(x)`
 (`Torus.enorm_econv_kernel_proj_le_tsum_maximal`), with `c_{ji} = 2^(-(j-i)L')` for `i ≤ j`,
-`c_{ji} = 1` for `i > j`, and explicit constants `C`. The bounds pass from the partial sums to
-their limits in `L_p(𝕋^d)` on `P_0` (`Torus.ae_enorm_comp_proj_le_of_tendsto_Lp`).
-The almost diagonal estimate and the Fefferman–Stein inequality for periodic lifts
-(`Torus.feffermanStein_periodic`) finish, since `L_p(𝕋^d)` norms are `L_p(P_0)` norms of lifts.
+`c_{ji} = 1` for `i > j`, and explicit constants `C`. The bounds pass from the partial sums to their
+limits in `L_p(𝕋^d)` on `P_0` (`Torus.ae_enorm_comp_proj_le_of_tendsto_Lp`). The almost diagonal
+estimate and the Fefferman–Stein inequality for periodic lifts (`Torus.feffermanStein_periodic`)
+finish, since `L_p(𝕋^d)` norms are `L_p(P_0)` norms of lifts.
 -/
 
 @[expose] public section

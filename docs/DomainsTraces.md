@@ -177,27 +177,27 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| Lipschitz graph domains: cone and closed cone, the closure of the domain plus the cone, cone bump, support principle | ✅ | ✗ | `Rd/LipschitzGraph` |
-| Rychkov's extension, restrictions to Lipschitz graph domains by intrinsic local means | ✅ | ✗ | `Rd/RychkovExtension` |
-| Restrictions to Lipschitz graph domains by intrinsic differences | ✅ | ✗ | `Rd/LipschitzGraphBesov` |
-| Local versions of Rychkov's extension: boundary and inner patches, short steps into the closed cone, absolute convergence from bounds of the weighted local means, agreement on the patch for every convergent local extension | ✅ | ✗ | `Rd/LocalExtension` |
-| Bounded Lipschitz domains: the patches covering the closure, pasting of local extensions | ✅ | ✗ | `Rd/BoundedLipschitz` |
-| The half-space and the models of manifolds as Besov domains | ✅ | ✗ | `Rd/HalfSpace` |
-| Traces of every order on the half-space: trace theorem, extension, trace space | ✅ | ✗ | `Rd/HalfSpaceTrace` |
-| Graph map of a Lipschitz graph domain, restrictions of atoms to the graph | ✅ | ✗ | `Rd/GraphParametrization` |
-| Traces on Lipschitz graph domains: boundedness, linearity, trace of continuous functions | ✅ | ✗ | `Rd/GraphTrace` |
-| Mollified graph and vertical cut-off with bounds of their differences | ✅ | ✗ | `Rd/MollifiedGraph` |
-| Extension from the boundary of a Lipschitz graph domain, its trace space | ✅ | ✗ | `Rd/GraphTraceExtension` |
-| Traces in charts: locality, approximation, change of chart, products, finite sums | ✅ | ✗ | `Rd/GraphTraceCharts` |
-| Traces on bounded Lipschitz domains: Besov spaces on the boundary, the trace space | ✅ | ✗ | `Rd/LipschitzBoundaryTrace` |
-| Smooth measures on manifolds, integrals in charts | ✅ | ✗ | `Manifold/SmoothMeasure` |
-| Besov atlases, chart pieces, changes of charts with cut-offs | ✅ | ✗ | `Manifold/BesovAtlas` |
-| Besov spaces on compact manifolds, independence of the atlas and of the order | ✅ | ✗ | `Manifold/Besov` |
-| Flattening of graph domains, preservation of the Lebesgue measure | ✅ | ✗ | `Rd/GraphStraightening` |
-| Smooth bounded domains as compact manifolds with boundary, Lebesgue measure as smooth measure | ✅ | ✗ | `Manifold/SmoothDomain` |
-| Besov spaces of smooth domains by charts equal the intrinsic Besov spaces | ✅ | ✗ | `Manifold/SmoothDomainBesov` |
-| Besov spaces on the boundary of a compact manifold, independence of the atlas | ✅ | ✗ | `Manifold/BoundaryBesov` |
-| Trace theorem on compact manifolds: commutation with charts, boundedness, trace space | ✅ | ✗ | `Manifold/BoundaryTrace` |
+| Lipschitz graph domains: cone and closed cone, the closure of the domain plus the cone, cone bump, support principle | ✅ | ✗ | `Domains/Lipschitz/LipschitzGraph` |
+| Rychkov's extension, restrictions to Lipschitz graph domains by intrinsic local means | ✅ | ✗ | `Domains/Extension/RychkovExtension` |
+| Restrictions to Lipschitz graph domains by intrinsic differences | ✅ | ✗ | `Domains/Extension/LipschitzGraphBesov` |
+| Local versions of Rychkov's extension: boundary and inner patches, short steps into the closed cone, absolute convergence from bounds of the weighted local means, agreement on the patch for every convergent local extension | ✅ | ✗ | `Domains/Extension/LocalExtension` |
+| Bounded Lipschitz domains: the patches covering the closure, pasting of local extensions | ✅ | ✗ | `Domains/Lipschitz/BoundedLipschitz` |
+| The half-space and the models of manifolds as Besov domains | ✅ | ✗ | `Domains/Lipschitz/HalfSpace` |
+| Traces of every order on the half-space: trace theorem, extension, trace space | ✅ | ✗ | `Domains/Traces/HalfSpaceTrace` |
+| Graph map of a Lipschitz graph domain, restrictions of atoms to the graph | ✅ | ✗ | `Domains/Lipschitz/GraphParametrization` |
+| Traces on Lipschitz graph domains: boundedness, linearity, trace of continuous functions | ✅ | ✗ | `Domains/Traces/GraphTrace` |
+| Mollified graph and vertical cut-off with bounds of their differences | ✅ | ✗ | `Domains/Traces/MollifiedGraph` |
+| Extension from the boundary of a Lipschitz graph domain, its trace space | ✅ | ✗ | `Domains/Traces/GraphTraceExtension` |
+| Traces in charts: locality, approximation, change of chart, products, finite sums | ✅ | ✗ | `Domains/Traces/GraphTraceCharts` |
+| Traces on bounded Lipschitz domains: Besov spaces on the boundary, the trace space | ✅ | ✗ | `Domains/Traces/LipschitzBoundaryTrace` |
+| Smooth measures on manifolds, integrals in charts | ✅ | ✗ | `Domains/Manifolds/SmoothMeasure` |
+| Besov atlases, chart pieces, changes of charts with cut-offs | ✅ | ✗ | `Domains/Manifolds/BesovAtlas` |
+| Besov spaces on compact manifolds, independence of the atlas and of the order | ✅ | ✗ | `Domains/Manifolds/Besov` |
+| Flattening of graph domains, preservation of the Lebesgue measure | ✅ | ✗ | `Domains/Lipschitz/GraphStraightening` |
+| Smooth bounded domains as compact manifolds with boundary, Lebesgue measure as smooth measure | ✅ | ✗ | `Domains/Manifolds/SmoothDomain` |
+| Besov spaces of smooth domains by charts equal the intrinsic Besov spaces | ✅ | ✗ | `Domains/Manifolds/SmoothDomainBesov` |
+| Besov spaces on the boundary of a compact manifold, independence of the atlas | ✅ | ✗ | `Domains/Manifolds/BoundaryBesov` |
+| Trace theorem on compact manifolds: commutation with charts, boundedness, trace space | ✅ | ✗ | `Domains/Manifolds/BoundaryTrace` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Lp.Interpolation
+public import FunctionSpaces.Analysis.Lp.Interpolation
 public import FunctionSpaces.Wavelets.Daubechies.SobolevRegularity
 
 /-!

@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Interval.Smoothing
-public import FunctionSpaces.Rd.Differences
+public import FunctionSpaces.Analysis.Differences.Differences
 
 /-!
 # Steklov smoothing on the whole line
