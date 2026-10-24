@@ -114,6 +114,7 @@ public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen
 public import FunctionSpaces.Domains.Traces.TraceKernel
 public import FunctionSpaces.Domains.Lipschitz.LocalLipschitzGraphs
+public import FunctionSpaces.Domains.Lipschitz.ConvexDomains
 public import FunctionSpaces.Torus.Measure
 public import FunctionSpaces.Torus.Scheme
 public import FunctionSpaces.Torus.Nikolskii
@@ -541,6 +542,8 @@ and the theorems that their characterisations agree. The library builds on
   bounded Lipschitz domains by local Lipschitz graphs, local graphs as Lipschitz graph domains,
   McShane's extension of local graphs, the bounded Lipschitz domain of a set satisfying the
   definition and the converse, and the ball as a bounded Lipschitz domain.
+* `FunctionSpaces.Domains.Lipschitz.ConvexDomains`: the ray length of a convex set, its cone
+  estimate, bounded open convex sets and the open unit cube as bounded Lipschitz domains.
 
 ### The torus
 

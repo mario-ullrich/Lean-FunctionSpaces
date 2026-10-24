@@ -29,7 +29,8 @@ they are described by intrinsic differences, by pasting local extensions
 (\Cref{thm:lipschitz-graph-area}) expresses the Euclidean Hausdorff measure of the boundary in a
 chart, and \Cref{sec:surface-measure} builds from it the surface measure, $L_2(\Gamma)$ and the
 traces into it. \Cref{sec:local-lipschitz-graphs} shows that the bounded Lipschitz domains are
-the sets of the usual definition by local Lipschitz graphs, with the open balls as examples.
+the sets of the usual definition by local Lipschitz graphs, with the open balls as examples, and
+\Cref{sec:convex-domains} adds the bounded open convex sets and the open unit cube.
 
 \section{Lipschitz graph domains}
 
@@ -486,8 +487,9 @@ Lipschitz graph domains $\Omega_j$ with $B_j \cap \Omega = B_j \cap \Omega_j$.
 This is the definition of Stein and Triebel, as in \cite[Remark 3.2]{SchneiderVybiral}; the
 direction $e_j$ of each graph domain replaces the rotations. In Lean the balls and the graph
 domains are data of the structure. In finite dimension the carriers of these structures are
-exactly the sets of the usual definition, and the open balls are among them
-(\Cref{thm:bounded-lipschitz-sets} and \Cref{thm:ball-lipschitz}).
+exactly the sets of the usual definition, and the open balls and the bounded open convex sets are
+among them (\Cref{thm:bounded-lipschitz-sets}, \Cref{thm:ball-lipschitz} and
+\Cref{thm:convex-lipschitz}).
 
 \begin{lemma}[Shrinking and the inner margin]
 \label{lem:bounded-lipschitz-geometry}
@@ -1556,12 +1558,16 @@ $\psi$ is constant along $e$.
 \begin{theorem}[Lipschitz near a point by graph domains]
 \label{thm:lipschitz-near-point}
 \lean{Rd.isLipschitzDomainAt_of_ball_inter_eq, Rd.IsLipschitzDomainAt.exists_ball_inter_eq,
-  Rd.isLipschitzDomainAt_iff, Rd.isLipschitzDomainAt_of_lipschitzOnWith}
+  Rd.isLipschitzDomainAt_iff, Rd.IsLipschitzDomainAt.congr_ball,
+  Rd.isLipschitzDomainAt_of_lipschitzOnWith}
 \leanok
 \uses{def:lipschitz-near-point, lem:local-graph-domain}
 For every $\Omega \subseteq V$ and every $z \in V$, $\Omega$ is Lipschitz near $z$ if and only if
 there are $r > 0$ and a Lipschitz graph domain $\Omega'$ with
-$B(z, r) \cap \Omega = B(z, r) \cap \Omega'$. For every $\Omega \subseteq V$, every $z \in V$,
+$B(z, r) \cap \Omega = B(z, r) \cap \Omega'$. For all $\Omega, \Omega' \subseteq V$, every
+$z \in V$ and every $\rho > 0$ with $B(z, \rho) \cap \Omega = B(z, \rho) \cap \Omega'$, if
+$\Omega'$ is Lipschitz near $z$, then so is $\Omega$. For every $\Omega \subseteq V$, every
+$z \in V$,
 every $r > 0$, every unit vector $\nu \in V$, every $L \geq 0$ and every
 $\varphi : \nu^\perp \to \R$ that is $L$-Lipschitz on $\{y \in \nu^\perp : \|y\| < r\}$ with
 $\Omega \cap B(z, r) = \{x : \varphi(P_\nu(x - z)) < \langle \nu, x - z \rangle\} \cap B(z, r)$, the
@@ -1571,9 +1577,11 @@ set $\Omega$ is Lipschitz near $z$.
 \begin{proof}
 \leanok
 Both directions of the equivalence are \Cref{lem:local-graph-domain}. For the second statement,
-McShane's extension (Mathlib's \texttt{LipschitzOnWith.\allowbreak extend\_\allowbreak real})
-gives an $L$-Lipschitz $\psi : \nu^\perp \to \R$ equal to $\varphi$ on the ball of radius $r$,
-and $\|P_\nu(x - z)\| \leq \|x - z\| < r$ for $x \in B(z, r)$.
+shrink the radius $r$ of a ball on which $\Omega'$ agrees with a Lipschitz graph domain to
+$\min(r, \rho)$. For the third statement, McShane's extension (Mathlib's
+\texttt{LipschitzOnWith.\allowbreak extend\_\allowbreak real}) gives an $L$-Lipschitz
+$\psi : \nu^\perp \to \R$ equal to $\varphi$ on the ball of radius $r$, and
+$\|P_\nu(x - z)\| \leq \|x - z\| < r$ for $x \in B(z, r)$.
 \end{proof}
 
 So the condition can be checked with a function that is Lipschitz only on the part of the
@@ -1676,6 +1684,169 @@ that $c - z = R\nu$, and $\varphi(y) = g_R(\|y\|)$, which is $1$-Lipschitz by
 \Cref{def:lipschitz-near-point}. For $R > 0$ the boundary of the ball lies in the sphere
 $\|z - c\| = R$; for $R \leq 0$ the ball is empty. The last statement is
 \Cref{thm:bounded-lipschitz-sets}.
+\end{proof}
+
+\section{Bounded convex open sets}
+\label{sec:convex-domains}
+
+Every bounded open convex set is a bounded Lipschitz set \cite{Grisvard}. Mathlib's gauge of a
+convex set describes it as a sublevel set; the graph form of \Cref{def:lipschitz-near-point}
+comes from the lengths of parallel rays instead. In this section $V$ is any real inner product
+space; for a unit vector $\nu \in V$, $P_\nu$ is the orthogonal projection onto $\nu^\perp$.
+
+\begin{definition}[The ray length]
+\label{def:ray-length}
+\lean{Rd.rayLength}
+\leanok
+For every $\Omega \subseteq V$ and all $a, \nu, y \in V$, the ray length is
+\[
+  \ell(y) = \ell_{\Omega, a, \nu}(y) = \sup\, \{s \in \R : a + y - s \nu \in \Omega\} ,
+\]
+with the convention of Lean's real numbers that the supremum of a set that is empty or unbounded
+above is $0$.
+\end{definition}
+
+For a bounded convex open set $\Omega$, a unit vector $\nu$ and $a + y \in \Omega$, the points of
+the ray from $a + y$ in the direction $-\nu$ that lie in $\Omega$ are exactly those with parameter
+$s < \ell(y)$ (\Cref{lem:ray-length}).
+
+\begin{lemma}[The ray in a convex open set]
+\label{lem:ray-length}
+\lean{Rd.nonempty_raySet, Rd.le_norm_add_of_sub_smul_mem, Rd.bddAbove_rayLength, Rd.le_rayLength,
+  Rd.rayLength_le, Rd.mem_iff_lt_rayLength}
+\leanok
+\uses{def:ray-length}
+For every $\Omega \subseteq V$ and all $a, \nu, y \in V$ with $a + y \in \Omega$, the set of
+\Cref{def:ray-length} contains $0$. Let $\Omega \subseteq V$ and $C \in \R$ with $\|x\| \leq C$ for
+every $x \in \Omega$. For every unit vector $\nu \in V$, all $a, y \in V$ and every $s \in \R$ with
+$a + y - s\nu \in \Omega$, $s \leq \|a + y\| + C$ and $s \leq \ell(y)$. For every unit vector
+$\nu \in V$ and all $a, y \in V$ with $a + y \in \Omega$, $\ell(y) \leq 2C$. If $\Omega$ is
+moreover convex and open, then for every unit vector $\nu \in V$, all $a, y \in V$ with
+$a + y \in \Omega$ and every $s \geq 0$, $a + y - s\nu \in \Omega$ if and only if $s < \ell(y)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The triangle inequality gives $|s| = \|s\nu\| \leq \|a + y\| + \|a + y - s\nu\|$, so the set of
+\Cref{def:ray-length} is bounded above and $\ell(y)$ is its least upper bound; for
+$a + y \in \Omega$ it contains $0$ and is bounded by $2C$. If $a + y - s\nu \in \Omega$, openness
+gives $\varepsilon > 0$ with $a + y - (s + \varepsilon/2)\nu \in \Omega$, so $s < \ell(y)$. If
+$s < \ell(y)$, there is $b > s$ with $a + y - b\nu \in \Omega$ (Mathlib's
+\texttt{exists\_\allowbreak lt\_\allowbreak of\_\allowbreak lt\_\allowbreak csSup}), and
+$a + y - s\nu = (1 - s/b)(a + y) + (s/b)(a + y - b\nu) \in \Omega$ by convexity.
+\end{proof}
+
+The convex hull of a point of $\Omega$ and the ball $B(a, \delta)$ is a cone around the segment
+between them. It contains the shortened rays from nearby starting points, which makes the ray
+length Lipschitz near $a$.
+
+\begin{lemma}[The cone estimate]
+\label{lem:ray-length-lipschitz}
+\lean{Rd.sub_smul_mem_of_norm_lt, Rd.rayLength_le_rayLength_add, Rd.cone_const_nonneg,
+  Rd.lipschitzOnWith_rayLength, Rd.lipschitzOnWith_sub_rayLength}
+\leanok
+\uses{lem:ray-length}
+Let $\Omega \subseteq V$ be convex and $C \in \R$ with $\|x\| \leq C$ for every $x \in \Omega$, and
+let $a \in V$ and $\delta > 0$ with $B(a, \delta) \subseteq \Omega$. Then $4C/\delta \geq 0$. For
+every $\nu \in V$, all $y_1, y_2 \in V$ with $\|y_1\|, \|y_2\| < \delta/4$ and every $s \in \R$
+with $a + y_1 - s\nu \in \Omega$, $a + y_2 - (1 - \mu) s \nu \in \Omega$, where
+$\mu = 2\|y_1 - y_2\|/\delta$. For every unit vector $\nu \in V$ and all $y_1, y_2 \in V$ with
+$\|y_1\|, \|y_2\| < \delta/4$,
+\[
+  \ell(y_1) \leq \ell(y_2) + \frac{4C}{\delta} \|y_1 - y_2\| .
+\]
+For every unit vector $\nu \in V$, the ray length is $4C/\delta$-Lipschitz on $B(0, \delta/4)$,
+and for every $d \in \R$ the function $y \mapsto d - \ell(y)$ is $4C/\delta$-Lipschitz on
+$\{y \in \nu^\perp : \|y\| < \delta/4\}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The constant is nonnegative since $C \geq \|a\| \geq 0$. For $y_1 = y_2$ the membership statement
+is the hypothesis. Otherwise $0 < \mu \leq 1$, since $\|y_1 - y_2\| < \delta/2$, and
+$b = y_1 + \mu^{-1}(y_2 - y_1)$ has $\|b\| \leq \|y_1\| + \delta/2 < \delta$, so
+$a + b \in \Omega$; then
+\[
+  a + y_2 - (1 - \mu) s \nu = (1 - \mu)(a + y_1 - s\nu) + \mu (a + b) \in \Omega .
+\]
+Hence $(1 - \mu) s \leq \ell(y_2)$ by \Cref{lem:ray-length}, and $s \leq 2C$ gives
+$s \leq \ell(y_2) + 2\mu C = \ell(y_2) + (4C/\delta)\|y_1 - y_2\|$; the supremum over $s$ is the
+bound for $\ell(y_1)$. The Lipschitz bounds follow, with the roles of $y_1$ and $y_2$ exchanged for
+$d - \ell$ (Mathlib's
+\texttt{LipschitzOnWith.\allowbreak of\_\allowbreak le\_\allowbreak add\_\allowbreak mul}).
+\end{proof}
+
+\begin{theorem}[Bounded convex open sets]
+\label{thm:convex-lipschitz}
+\lean{Rd.mem_iff_sub_rayLength_lt, Rd.isLipschitzDomainAt_of_convex,
+  Rd.isBoundedLipschitzDomain_of_convex, Rd.BoundedLipschitzDomain.ofConvex,
+  Rd.BoundedLipschitzDomain.carrier_ofConvex}
+\leanok
+\uses{lem:hyperplane-projection, lem:ray-length, lem:ray-length-lipschitz,
+  def:lipschitz-near-point, thm:lipschitz-near-point, thm:bounded-lipschitz-sets}
+Let $\Omega \subseteq V$ be convex, open and bounded.
+\begin{enumerate}
+  \item For every $C \in \R$ with $\|x\| \leq C$ for every $x \in \Omega$, all $a \in V$ and
+    $\delta > 0$ with $B(a, \delta) \subseteq \Omega$, every unit vector $\nu \in V$, all $z \in V$
+    and $d \geq \delta$ with $a - z = d\nu$, and every $x \in V$ with $\|x - z\| < \delta/4$,
+    $x \in \Omega$ if and only if $d - \ell(P_\nu(x - z)) < \langle \nu, x - z \rangle$.
+  \item For every $z \in \partial\Omega$, $\Omega$ is Lipschitz near $z$.
+  \item $\Omega$ is a bounded Lipschitz set; if $V$ is finite-dimensional, it is the carrier of a
+    bounded Lipschitz domain.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $t = \langle \nu, x - z \rangle$. By \Cref{lem:hyperplane-projection},
+$x = a + P_\nu(x - z) - (d - t)\nu$; moreover $\|P_\nu(x - z)\| \leq \|x - z\| < \delta/4$, so
+$a + P_\nu(x - z) \in \Omega$, and $t \leq \|x - z\| < \delta \leq d$. \Cref{lem:ray-length} with
+$s = d - t$ gives the first statement. For $z \in \partial\Omega$, the set $\Omega$ is nonempty
+since $z$ lies in its closure; choose $a \in \Omega$ and $\delta > 0$ with $B(a, \delta) \subseteq
+\Omega$. Since $\Omega$ is open, $z \notin \Omega$, so $d = \|a - z\| \geq \delta$. With
+$\nu = (a - z)/d$, the first statement and \Cref{lem:ray-length-lipschitz} give the hypotheses of
+the second statement of \Cref{thm:lipschitz-near-point} for $r = \delta/4$ and
+$\varphi(y) = d - \ell(y)$. The last statement follows by \Cref{thm:bounded-lipschitz-sets}.
+\end{proof}
+
+Near $z$ the graph function $y \mapsto \|a - z\| - \ell(y)$ is $4C/\delta$-Lipschitz: the
+Lipschitz constant of the boundary is at most four times the ratio of a bound $C$ for the norms on
+$\Omega$ to the radius $\delta$ of a ball inside $\Omega$. The local statement needs no
+boundedness: half-spaces and epigraphs of convex functions are examples.
+
+\begin{corollary}[Open convex sets near a frontier point]
+\label{cor:open-convex-lipschitz-near-point}
+\lean{Rd.isLipschitzDomainAt_of_convex_of_isOpen}
+\leanok
+\uses{thm:convex-lipschitz, thm:lipschitz-near-point}
+For every convex open set $\Omega \subseteq V$ and every $z \in \partial\Omega$, $\Omega$ is
+Lipschitz near $z$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+The set $\Omega' = \Omega \cap B(z, 1)$ is convex, open and bounded, and agrees with $\Omega$ on
+$B(z, 1)$. It does not contain $z$, and $z \in \overline{\Omega} \cap B(z, 1) \subseteq
+\overline{\Omega'}$ (Mathlib's \texttt{IsOpen.\allowbreak closure\_\allowbreak inter}), so
+$z \in \partial\Omega'$. By \Cref{thm:convex-lipschitz}, $\Omega'$ is Lipschitz near $z$, and by
+\Cref{thm:lipschitz-near-point} so is $\Omega$.
+\end{proof}
+
+\begin{corollary}[The open unit cube]
+\label{cor:unit-cube-lipschitz}
+\lean{Rd.isBoundedLipschitzDomain_unitCube, Rd.BoundedLipschitzDomain.unitCube,
+  Rd.BoundedLipschitzDomain.carrier_unitCube}
+\leanok
+\uses{thm:convex-lipschitz}
+For every $n \in \N$, the open unit cube $(0, 1)^n \subseteq \R^n$ is a bounded Lipschitz
+set and the carrier of a bounded Lipschitz domain.
+\end{corollary}
+
+\begin{proof}
+\leanok
+The cube is convex, open as the intersection of the $n$ open slabs $\{x : 0 < x_i < 1\}$, and
+bounded, since $\|x\| \leq \sqrt{n}$ on it (Mathlib's
+\texttt{EuclideanSpace.\allowbreak norm\_\allowbreak eq}); \Cref{thm:convex-lipschitz} applies.
 \end{proof}
 
 \chapter{Traces on Lipschitz domains}

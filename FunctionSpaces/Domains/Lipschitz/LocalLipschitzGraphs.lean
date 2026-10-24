@@ -21,7 +21,8 @@ and Lipschitz near each point of its frontier.
 * A local graph is a Lipschitz graph domain (`Rd.LipschitzGraph.ofLocal`,
   `Rd.LipschitzGraph.domain_ofLocal`), and every Lipschitz graph domain is a local graph around
   every point (`Rd.LipschitzGraph.domain_eq_localPhi`), so being Lipschitz near `z` means agreeing
-  with a Lipschitz graph domain on a ball around `z` (`Rd.isLipschitzDomainAt_iff`). A function
+  with a Lipschitz graph domain on a ball around `z` (`Rd.isLipschitzDomainAt_iff`); this depends
+  only on the set near `z` (`Rd.IsLipschitzDomainAt.congr_ball`). A function
   that is Lipschitz only on the ball of radius `r` of `ν^⊥` suffices, by McShane's extension
   (`Rd.isLipschitzDomainAt_of_lipschitzOnWith`).
 * In finite dimension, compactness of the frontier gives finitely many such balls, and these
@@ -180,6 +181,22 @@ theorem isLipschitzDomainAt_iff {Ω : Set V} {z : V} :
       ∃ r : ℝ, 0 < r ∧ ∃ G : LipschitzGraph V, ball z r ∩ Ω = ball z r ∩ G.domain :=
   ⟨IsLipschitzDomainAt.exists_ball_inter_eq, fun ⟨_, hr, G, h⟩ =>
     isLipschitzDomainAt_of_ball_inter_eq hr G h⟩
+
+/-- **Being Lipschitz near `z` depends only on the set near `z`**: if `Ω` and `Ω'` agree on a ball
+`B(z, ρ)` with `ρ > 0` and `Ω'` is Lipschitz near `z`, then so is `Ω`, with the radius shrunk to
+`min r ρ` (`Rd.isLipschitzDomainAt_iff`). -/
+theorem IsLipschitzDomainAt.congr_ball {Ω Ω' : Set V} {z : V} {ρ : ℝ} (hρ : 0 < ρ)
+    (h : ball z ρ ∩ Ω = ball z ρ ∩ Ω') (h' : IsLipschitzDomainAt Ω' z) :
+    IsLipschitzDomainAt Ω z := by
+  obtain ⟨r, hr, G, hG⟩ := h'.exists_ball_inter_eq
+  have h1 : ball z (min r ρ) ∩ ball z ρ = ball z (min r ρ) :=
+    inter_eq_left.2 (ball_subset_ball (min_le_right _ _))
+  have h2 : ball z (min r ρ) ∩ ball z r = ball z (min r ρ) :=
+    inter_eq_left.2 (ball_subset_ball (min_le_left _ _))
+  refine isLipschitzDomainAt_of_ball_inter_eq (lt_min hr hρ) G ?_
+  calc ball z (min r ρ) ∩ Ω = ball z (min r ρ) ∩ (ball z ρ ∩ Ω) := by rw [← inter_assoc, h1]
+    _ = ball z (min r ρ) ∩ (ball z r ∩ Ω') := by rw [h, ← inter_assoc, h1, ← inter_assoc, h2]
+    _ = ball z (min r ρ) ∩ G.domain := by rw [hG, ← inter_assoc, h2]
 
 /-- **A local graph that is Lipschitz only near the origin suffices**: if `φ` is `L`-Lipschitz on
 the ball of radius `r` of `ν^⊥` (the image of `B(z, r)` under `x ↦ P(x - z)`) and

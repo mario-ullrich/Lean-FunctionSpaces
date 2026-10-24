@@ -334,8 +334,9 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`).
   Every bounded open set that agrees near each boundary point with the region above a Lipschitz
   graph in some direction (the usual definition, `Rd.IsBoundedLipschitzDomain`) is the carrier of
-  such a structure, and conversely (`Rd.isBoundedLipschitzDomain_iff_exists`); every open ball is
-  such a carrier (`Rd.BoundedLipschitzDomain.ball`).
+  such a structure, and conversely (`Rd.isBoundedLipschitzDomain_iff_exists`); every open ball and
+  every bounded open convex set is such a carrier (`Rd.BoundedLipschitzDomain.ball`,
+  `Rd.BoundedLipschitzDomain.ofConvex`).
 * **`H^1` on bounded Lipschitz domains.** On a bounded Lipschitz domain `Ω` with boundary `Γ`,
   `H^1(Ω)` consists of the `f ∈ L_2(V)` that agree on `Ω` with a function of `H^1(V)`
   (`Rd.BoundedLipschitzDomain.MemSobolevOn`); for every order `r ≥ 2`, `f ∈ H^1(Ω)` iff
@@ -500,8 +501,8 @@ that library builds itself.
 
 ## What is left to do
 
-* **Lipschitz domains as sets**: bounded open convex sets as bounded Lipschitz domains; the ball,
-  and bounded open sets with smooth local graphs, as smooth domains (`Rd.SmoothDomain`).
+* **Smooth domains**: the ball, and bounded open sets with smooth local graphs, as smooth domains
+  (`Rd.SmoothDomain`).
 * **Interpolation**: the interpolation property of the K-method (an operator bounded on
   both spaces of a couple is bounded on its interpolation spaces) and reiteration.
 * **Traces and extensions**: the norm equivalence `H^{1/2}(Γ) ≅ B^{1/2}_{2,2}(Γ)`, a bounded

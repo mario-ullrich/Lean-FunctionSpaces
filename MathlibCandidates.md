@@ -442,8 +442,10 @@ declarations.
   `LipschitzOnWith.euclideanHausdorffMeasure_image_le`.
 * **Bounded Lipschitz domains from local graphs**
   (`FunctionSpaces/Domains/Lipschitz/LocalLipschitzGraphs.lean`): the set-level definition
-  (`Rd.IsLipschitzDomainAt`, `Rd.IsBoundedLipschitzDomain`) and the ball
-  (`Rd.isBoundedLipschitzDomain_ball`) are candidates only together with TauCeti's definitions of
+  (`Rd.IsLipschitzDomainAt`, `Rd.IsBoundedLipschitzDomain`), the ball
+  (`Rd.isBoundedLipschitzDomain_ball`) and every bounded open convex set
+  (`Rd.isBoundedLipschitzDomain_of_convex`, `FunctionSpaces/Domains/Lipschitz/ConvexDomains.lean`)
+  are candidates only together with TauCeti's definitions of
   Lipschitz domains (`Set.IsLipschitzDomain`, `Set.IsLipschitzChart`), whose shape they would take.
 * **Smoothness of parametric integrals**
   (`FunctionSpaces/Domains/Extension/DivergenceKernels.lean`): if `(x, t) ↦ F(x, t)` is smooth on
