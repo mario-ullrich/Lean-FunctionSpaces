@@ -34,7 +34,9 @@ inequality for the blocks and from it the embeddings of Besov spaces into $L_r(V
 bounded continuous functions, and the Sobolev embeddings $\Sob{m}{p}(V) \hookrightarrow L_r(V)$
 for $m > n(1/p - 1/r)$ and $\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, all with named
 constants. These named constants are formulas in norms and Schwartz seminorms of fixed kernels,
-proved finite. The Bessel potential spaces $H^{s,p}(V)$ for $1 < p < \infty$ follow in
+proved finite. \Cref{sec:sobolev-interpolation} identifies the real interpolation spaces of
+$L_p(V)$ and $\Sob{m}{p}(V)$, and of two Sobolev spaces, with Besov spaces. The Bessel
+potential spaces $H^{s,p}(V)$ for $1 < p < \infty$ follow in
 \Cref{ch:bessel-potential-spaces}, the Sobolev spaces on open sets and on bounded Lipschitz
 domains in \Cref{ch:sobolev-domains}.
 
@@ -2104,6 +2106,203 @@ For $r < \infty$ the condition $m > n(1/p - 1/r)$ says $1/r > 1/p - m/n$. The cr
 $1/r = 1/p - m/n$ with $m < n/p$, Sobolev's inequality
 $\|f\|_{r} \lesssim \|f\|_{\Sob{m}{p}}$, is not covered here.
 
+\section{Sobolev spaces and real interpolation}
+\label{sec:sobolev-interpolation}
+
+Let $n \geq 1$ and $1 < p < \infty$. This section gives $\Sob{m}{p}(V)$ a norm, the grid norm,
+and places it between the Besov quasi-norms of $\Besov{m}{p}{\min(p,2)}$ and
+$\Besov{m}{p}{\max(p,2)}$ with named constants (\Cref{thm:sobolev-grid-norm-sandwich}, from
+\Cref{cor:sobolev-besov-sandwich}). The sandwich principle
+(\Cref{cor:approximation-space-sandwich}) then identifies the real interpolation spaces of
+$L_p(V)$ and $\Sob{m}{p}(V)$, and of two Sobolev spaces, with Besov spaces; this is
+$(H^{s_0}_p, H^{s_1}_p)_{\theta,q} = \Besov{s}{p}{q}$ of~\cite[Theorem~6.4.5(1)]{BerghLofstrom}
+for integer orders, with $H^m_p = \Sob{m}{p}$ from~\cite[Theorem~6.2.3]{BerghLofstrom}. As in
+\Cref{sec:sobolev-triebel-lizorkin}, $e_\alpha$ is the tuple
+$(e_{\alpha_0}, \dots, e_{\alpha_{m-1}})$ of basis vectors of a multi-index $\alpha$ of length
+$m$ with entries below $n$, and $K_{V,p,\alpha}$ and $C_{V,p,w}$ are the constants of
+\Cref{def:sobolev-to-tl-const} and \Cref{def:tl-to-sobolev-const}.
+
+\paragraph{The grid norm.}
+
+\begin{definition}[The grid norm of $\Sob{m}{p}$]
+\label{def:sobolev-grid-norm}
+\lean{Rd.sobolevGridNorm, Rd.sobolevGridNorm_le, Rd.sobolevGridNorm_eq}
+\leanok
+\uses{def:weak-line-derivative, lem:weak-derivative-basic}
+For every $m \in \N$ and every $f \in L_p(V)$,
+\[
+  \|f\|^{\mathrm{gr}}_{m} = \|f\|_p + \inf \sum_\alpha \|g_\alpha\|_p ,
+\]
+the infimum over all families $(g_\alpha)_\alpha$ in $L_p(V)$, indexed by the multi-indices
+$\alpha$ of length $m$, such that $g_\alpha$ is the weak derivative $\partial^{e_\alpha} f$ on
+$V$ for every $\alpha$; the infimum of the empty set is $\infty$. In particular
+$\|f\|^{\mathrm{gr}}_{m} \leq \|f\|_p + \sum_\alpha \|g_\alpha\|_p$ for every such family.
+\end{definition}
+
+If the family exists, it is unique (\Cref{lem:weak-derivative-basic}) and the grid norm equals
+$\|f\|_p + \sum_\alpha \|\partial^{e_\alpha} f\|_p$.
+
+\begin{lemma}[The grid norm is finite exactly on $\Sob{m}{p}$]
+\label{lem:sobolev-grid-norm-finite}
+\lean{Rd.exists_hasWeakLineDeriv_of_sobolevGridNorm_lt_top,
+  Rd.sobolevGridNorm_lt_top_of_memSobolev, Rd.sobolevGridNorm_lt_top_iff}
+\leanok
+\uses{def:sobolev-grid-norm, lem:weak-derivative-basic, thm:sobolev-to-triebel-lizorkin,
+  cor:sobolev-triebel-lizorkin}
+Let $n \geq 1$ and $1 < p < \infty$. For every $m \in \N$ and every $f \in L_p(V)$,
+$\|f\|^{\mathrm{gr}}_{m} < \infty$ if and only if $f \in \Sob{m}{p}(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If the grid norm is finite, the infimum is taken over a nonempty set, so the weak derivatives
+$\partial^{e_\alpha} f \in L_p(V)$ exist for all $\alpha$, and
+\Cref{thm:sobolev-to-triebel-lizorkin}
+and \Cref{cor:sobolev-triebel-lizorkin} give $f \in \TL{m}{p}{2} = \Sob{m}{p}(V)$. Conversely,
+for $f \in \Sob{m}{p}(V)$ the weak derivatives along all $e_\alpha$ lie in $L_p(V)$
+(\Cref{lem:weak-derivative-basic}), and the finite sum of their norms bounds the infimum.
+\end{proof}
+
+\paragraph{The grid norm between two Besov quasi-norms.}
+
+\begin{lemma}[$\Phi$ has $L_1$ norm at least $1$]
+\label{lem:lp-kernel-norm-one}
+\lean{Rd.one_le_eLpNorm_lpKernel}
+\leanok
+\uses{def:lp-kernels, lem:lp-kernels-basic}
+$\|\Phi\|_1 \geq 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$1 = |\int \Phi| \leq \int |\Phi| = \|\Phi\|_1$ (\Cref{lem:lp-kernels-basic}).
+\end{proof}
+
+\begin{lemma}[Two inequalities in {$[0, \infty]$}]
+\label{lem:sum-of-products-le-product-of-sums}
+\lean{ENNReal.mul_add_mul_le_add_mul_add, ENNReal.sum_mul_le_sum_mul_sum}
+\leanok
+For all $a, b, x, y \in [0, \infty]$, $a x + b y \leq (a + b)(x + y)$. For every finite family
+$(a_i, b_i)_i$ in $[0, \infty]$, $\sum_i a_i b_i \leq \bigl(\sum_i a_i\bigr)\bigl(\sum_i b_i\bigr)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Expand $(a + b)(x + y) = a x + a y + b x + b y$. Each $a_i$ is at most $\sum_j a_j$.
+\end{proof}
+
+\begin{definition}[The constants of the grid norm]
+\label{def:sobolev-grid-consts}
+\lean{Rd.approxSobolevGridConst, Rd.approxSobolevGridConst_ne_top,
+  Rd.approxSobolevGridConst_ne_zero, Rd.sobolevGridApproxConst,
+  Rd.sobolevGridApproxConst_ne_top, Rd.sobolevGridApproxConst_ne_zero}
+\leanok
+\uses{def:sobolev-to-tl-const, def:tl-to-sobolev-const, lem:lp-kernel-norm-one}
+Let $1 < p < \infty$. For every $m \in \N$,
+\[
+  K'_{V,p,m} = 2 (1 - 2^{-m})^{-1} \Bigl( \|\Phi\|_1 + 2^m \sum_\alpha K_{V,p,\alpha} \Bigr)
+\]
+and
+\[
+  K''_{V,p,m} = 1 + \Bigl( \sum_\alpha C_{V,p,e_\alpha} \Bigr) \cdot 8 \cdot 8^m \, \|\Phi\|_1 ,
+\]
+the sums over the multi-indices $\alpha$ of length $m$. Both are nonzero, $K''_{V,p,m}$ is
+finite, and $K'_{V,p,m}$ is finite for $m \geq 1$.
+\end{definition}
+
+\begin{theorem}[The grid norm between two Besov quasi-norms]
+\label{thm:sobolev-grid-norm-sandwich}
+\lean{Rd.approxNormDyadic_le_of_hasWeakLineDeriv_sum, Rd.approxNormDyadic_le_sobolevGridNorm,
+  Rd.sobolevGridNorm_le_approxNormDyadic}
+\leanok
+\uses{def:sobolev-grid-norm, def:sobolev-grid-consts, cor:sobolev-besov-sandwich,
+  lem:sum-of-products-le-product-of-sums, def:band-space, def:dyadic-norm}
+Let $n \geq 1$ and $1 < p < \infty$. For every $m \geq 1$ and every $f \in L_p(V)$,
+\[
+  \|f\|^{\mathrm{dy}}_{A^m_{\max(p,2)}} \leq K'_{V,p,m} \, \|f\|^{\mathrm{gr}}_{m} ,
+\]
+and for every $m \in \N$ and every $f \in L_p(V)$,
+\[
+  \|f\|^{\mathrm{gr}}_{m} \leq K''_{V,p,m} \, \|f\|^{\mathrm{dy}}_{A^m_{\min(p,2)}} ,
+\]
+with the dyadic quasi-norms of the band-limited scheme.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For one family $(g_\alpha)$ of weak derivatives, \Cref{cor:sobolev-besov-sandwich} bounds
+$\|f\|^{\mathrm{dy}}_{A^m_{\max(p,2)}}$ by
+$2 (1 - 2^{-m})^{-1} (\|\Phi\|_1 \|f\|_p + 2^m \sum_\alpha K_{V,p,\alpha} \|g_\alpha\|_p)$, and
+\Cref{lem:sum-of-products-le-product-of-sums} bounds the bracket by
+$(\|\Phi\|_1 + 2^m \sum_\alpha K_{V,p,\alpha})(\|f\|_p + \sum_\alpha \|g_\alpha\|_p)$. The
+infimum over the families gives the first bound, since $K'_{V,p,m}$ is finite and nonzero. For
+the second, if $f \in \Besov{m}{p}{\min(p,2)}$, \Cref{cor:sobolev-besov-sandwich} gives weak
+derivatives $g_\alpha = \partial^{e_\alpha} f$ with
+$\|g_\alpha\|_p \leq C_{V,p,e_\alpha} \cdot 8 \cdot 8^m \|\Phi\|_1 \,
+\|f\|^{\mathrm{dy}}_{A^m_{\min(p,2)}}$,
+and $\|f\|_p \leq \|f\|^{\mathrm{dy}}_{A^m_{\min(p,2)}}$; otherwise the right side is $\infty$.
+\end{proof}
+
+\paragraph{Real interpolation.}
+
+\begin{definition}[Sobolev couples]
+\label{def:sobolev-couples}
+\lean{Rd.lpSobolevCouple, Rd.lpSobolevCouple_norm0, Rd.lpSobolevCouple_norm1,
+  Rd.sobolevCouple, Rd.sobolevCouple_norm0, Rd.sobolevCouple_norm1}
+\leanok
+\uses{def:couple, def:sobolev-grid-norm}
+For all $m, m_0, m_1 \in \N$, the couple $(L_p, \Sob{m}{p})$ on $L_p(V)$ is
+$(\|\cdot\|_p, \|\cdot\|^{\mathrm{gr}}_{m})$, and the couple $(\Sob{m_0}{p}, \Sob{m_1}{p})$ is
+$(\|\cdot\|^{\mathrm{gr}}_{m_0}, \|\cdot\|^{\mathrm{gr}}_{m_1})$.
+\end{definition}
+
+\begin{theorem}[Sobolev spaces interpolate to Besov spaces]
+\label{thm:sobolev-interpolate}
+\lean{Rd.memKMethod_lpSobolevCouple_iff, Rd.memKMethod_sobolevCouple_iff}
+\leanok
+\uses{def:sobolev-couples, thm:sobolev-grid-norm-sandwich, cor:approximation-space-sandwich,
+  def:couple-k-method}
+Let $n \geq 1$, $1 < p < \infty$, $1 \leq q \leq \infty$ and $f \in L_p(V)$.
+\begin{enumerate}
+  \item For every $m \geq 1$ and every $0 < \theta < 1$,
+    $f \in (L_p, \Sob{m}{p})_{\theta, q}$ if and only if $f \in \Besov{\theta m}{p}{q}$.
+  \item For all integers $1 \leq m_0 < m_1$ and every $0 < \eta < 1$,
+    $f \in (\Sob{m_0}{p}, \Sob{m_1}{p})_{\eta, q}$ if and only if
+    $f \in \Besov{(1 - \eta) m_0 + \eta m_1}{p}{q}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:sobolev-grid-norm-sandwich} the grid norm of order $m \geq 1$ lies between the
+dyadic quasi-norms of $A^m_{\min(p,2)}$ and $A^m_{\max(p,2)}$ with finite constants, and
+$1 \leq \min(p, 2) \leq \max(p, 2)$. Part (1) of \Cref{cor:approximation-space-sandwich} with
+$r = m$ gives (1), and part (2) with $s_i = m_i$ gives (2).
+\end{proof}
+
+\begin{corollary}[Operators bounded on $L_p$ and on $\Sob{m}{p}$]
+\label{cor:sobolev-interpolation-operators}
+\lean{Rd.kMethodNorm_map_le_of_bounded_lp_sobolev, Rd.memApprox_map_of_bounded_lp_sobolev}
+\leanok
+\uses{thm:sobolev-interpolate, thm:interpolation-property}
+Let $n \geq 1$, $1 < p < \infty$, $m \geq 1$, $0 < \theta < 1$ and $1 \leq q \leq \infty$, and
+let $T : L_p(V) \to L_p(V)$ be
+additive with $\|T f\|_p \leq M_0 \|f\|_p$ and
+$\|T f\|^{\mathrm{gr}}_{m} \leq M_1 \|f\|^{\mathrm{gr}}_{m}$ for every $f \in L_p(V)$, with
+$M_0, M_1 \in [0, \infty)$. For every $f \in \Besov{\theta m}{p}{q}$,
+$T f \in \Besov{\theta m}{p}{q}$. If $M_0, M_1 > 0$, then for every $f \in L_p(V)$, in the
+$K$-norm of $(L_p, \Sob{m}{p})$,
+\[
+  \|T f\|_{K, \theta, q} \leq M_0^{1 - \theta} M_1^{\theta} \, \|f\|_{K, \theta, q} .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:interpolation-property} for the couple $(L_p, \Sob{m}{p})$ and
+\Cref{thm:sobolev-interpolate}.
+\end{proof}
+
 \chapter{Bessel potential spaces}
 \label{ch:bessel-potential-spaces}
 
@@ -2116,7 +2315,8 @@ uniform Schwartz families whose dilates are Calder\'on--Zygmund families (\Cref{
 \Cref{sec:bessel-potential-lifting} proves $\TL{s}{p}{2} \subseteq H^{s,p}(V)$ for every real
 $s$, $H^{s,p}(V) = \TL{s}{p}{2}$ for $s \geq 0$, and Calder\'on's theorem
 $\Sob{m}{p}(V) = H^{m,p}(V)$ (\Cref{cor:sobolev-bessel}). The constants come from uniform
-Schwartz bounds and are existential.
+Schwartz bounds and are existential. The real interpolation spaces of Bessel potential spaces are
+Besov spaces (\Cref{sec:bessel-potential-interpolation}).
 
 \section{Uniform Schwartz families and the Bessel kernels}
 \label{sec:bessel-kernels}
@@ -2909,3 +3109,93 @@ Both are $\TL{m}{p}{2}$ (\Cref{cor:sobolev-triebel-lizorkin},
 
 For $p = 2$, \Cref{sec:sobolev-two-littlewood-paley} proves $H^s(V) = \TL{s}{2}{2}$ directly by
 Plancherel's theorem, with explicit constants (\Cref{thm:sobolev-two-triebel-lizorkin}).
+
+\section{Bessel potential spaces as interpolation spaces}
+\label{sec:bessel-potential-interpolation}
+
+The Bessel potential norm is equivalent to the quasi-norm of $\TL{s}{p}{2}$
+(\Cref{lem:bessel-potential-norm-tl}), so the interpolation theorem for Triebel--Lizorkin spaces
+(\Cref{thm:tl-interpolate}) identifies the real interpolation spaces of two Bessel potential
+spaces, and of $L_p$ and one of them, with Besov spaces, in the norms $\|J_s f\|_p$
+themselves; this is~\cite[Theorem~6.4.5(1)]{BerghLofstrom}. In this section $n \geq 1$,
+$1 < p < \infty$, $J_s$ is Mathlib's Bessel potential, and $\Besov{s}{p}{q}$ is the
+approximation space of the band-limited scheme in $L_p = L_p(V)$.
+
+\begin{definition}[The Bessel potential norm]
+\label{def:bessel-potential-norm}
+\lean{Rd.besselPotentialNorm, Rd.besselPotentialNorm_le, Rd.besselPotentialNorm_eq,
+  Rd.besselPotentialNorm_eq_enorm, Rd.besselPotentialNorm_eq_enorm_toBesselPotentialSpace,
+  Rd.besselPotentialNorm_lt_top_iff}
+\leanok
+\uses{lem:lp-distribution-determined, lem:bessel-space-enorm}
+For every $1 \leq p < \infty$, every $s \in \R$ and every $f \in L_p$, $\|f\|_{H^{s,p}}$ is the
+infimum of $\|h\|_p$ over all $h \in L_p$ with $J_s f = h$ as tempered distributions. If
+$J_s f = h \in L_p$, then $\|f\|_{H^{s,p}} = \|h\|_p$; if $f$ is the tempered distribution of an
+element $U$ of Mathlib's $H^{s,p}(V)$, then $\|f\|_{H^{s,p}} = \|U\|$; and
+$\|f\|_{H^{s,p}} < \infty$ if and only if $f \in H^{s,p}(V)$.
+\end{definition}
+
+The identity $\|f\|_{H^{s,p}} = \|h\|_p$ holds since an $L_p$ function is determined by its
+tempered distribution (\Cref{lem:lp-distribution-determined}). So for $f$ in Mathlib's
+$H^{s,p}(V)$ the Bessel potential norm is the norm of the bundled space
+(\Cref{lem:bessel-space-enorm}).
+
+\begin{lemma}[The Bessel potential norm and $\TL{s}{p}{2}$]
+\label{lem:bessel-potential-norm-tl}
+\lean{Rd.exists_triebelLizorkinNorm_le_besselPotentialNorm,
+  Rd.exists_besselPotentialNorm_le_triebelLizorkinNorm}
+\leanok
+\uses{def:bessel-potential-norm, thm:triebel-lizorkin-to-bessel,
+  thm:bessel-to-triebel-lizorkin-lp}
+Let $n \geq 1$ and $1 < p < \infty$. For every real $s$ there are $C, C' < \infty$ such that for
+every $f \in L_p$,
+\[
+  \|f\|_{F^s_{p,2}} \leq C \, \|f\|_{H^{s,p}}
+  \quad \text{and} \quad
+  \|f\|_{H^{s,p}} \leq C' \, \|f\|_{F^s_{p,2}} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For each inequality take the larger of $1$ and the constant of
+\Cref{thm:bessel-to-triebel-lizorkin-lp}, respectively of
+\Cref{thm:triebel-lizorkin-to-bessel}. The first inequality is
+\Cref{thm:bessel-to-triebel-lizorkin-lp} for every $h$ with $J_s f = h$, and it holds when there
+is none, since then $\|f\|_{H^{s,p}} = \infty$ and $C \geq 1$. The second is
+\Cref{thm:triebel-lizorkin-to-bessel} for $f \in \TL{s}{p}{2}$, and the right side is $\infty$
+otherwise.
+\end{proof}
+
+\begin{definition}[Bessel potential couples]
+\label{def:bessel-potential-couples}
+\lean{Rd.besselPotentialCouple, Rd.besselPotentialCouple_norm0, Rd.besselPotentialCouple_norm1,
+  Rd.lpBesselPotentialCouple, Rd.lpBesselPotentialCouple_norm0,
+  Rd.lpBesselPotentialCouple_norm1}
+\leanok
+\uses{def:couple, def:bessel-potential-norm}
+For all $s_0, s_1 \in \R$, the couple $(H^{s_0,p}, H^{s_1,p})$ on $L_p$ is
+$(\|\cdot\|_{H^{s_0,p}}, \|\cdot\|_{H^{s_1,p}})$, and the couple $(L_p, H^{s_1,p})$ is
+$(\|\cdot\|_p, \|\cdot\|_{H^{s_1,p}})$.
+\end{definition}
+
+\begin{theorem}[Bessel potential spaces interpolate to Besov spaces]
+\label{thm:bessel-potential-interpolate}
+\lean{Rd.memKMethod_besselPotentialCouple_iff, Rd.memKMethod_lpBesselPotentialCouple_iff}
+\leanok
+\uses{def:bessel-potential-couples, lem:bessel-potential-norm-tl, thm:tl-interpolate}
+Let $n \geq 1$, $1 < p < \infty$, $0 < \eta < 1$, $q \in [1, \infty]$ and $f \in L_p$.
+\begin{enumerate}
+  \item For every $0 < s_0 < s_1$, $f \in (H^{s_0,p}, H^{s_1,p})_{\eta, q}$ if and only if
+    $f \in \Besov{(1 - \eta) s_0 + \eta s_1}{p}{q}$.
+  \item For every $s_1 > 0$, $f \in (L_p, H^{s_1,p})_{\eta, q}$ if and only if
+    $f \in \Besov{\eta s_1}{p}{q}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+The Bessel potential norms are equivalent to the quasi-norms of $\TL{s_i}{p}{2}$
+(\Cref{lem:bessel-potential-norm-tl}); apply parts (3) and (4) of \Cref{thm:tl-interpolate} with
+$q_0 = q_1 = 2$.
+\end{proof}

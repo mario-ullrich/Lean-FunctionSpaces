@@ -22,7 +22,8 @@ between weak type `(1,1)` and strong type `(2,2)`, in the terms of the Carleson 
 strong type `(p,p)` for `1 < p < 2`, and duality with the adjoint family extends it to `2 < p < ∞`,
 for the analysis and the synthesis operators. Applied to the Littlewood–Paley blocks and their
 synthesis kernels, this gives the square function theorem, the two-sided bound of `‖f‖_{F^0_{p,2}}`
-by `‖f‖_p`, for `1 < p < ∞`.
+by `‖f‖_p`, for `1 < p < ∞`. The real interpolation spaces of two Triebel–Lizorkin spaces,
+and of `L_p` and one of them, are Besov spaces.
 
 ## Main results
 
@@ -106,6 +107,16 @@ by `‖f‖_p`, for `1 < p < ∞`.
   Triebel's *Theory of Function Spaces II* states the characterisation with `(s,p)`-atoms
   normalised in `L_p`; the two forms correspond under `λ_{j,m} ↦ 2^(j(s - n/p)) λ_{j,m}`,
   `n = dim V`.
+* **Real interpolation.** Let `1 ≤ p < ∞`, `0 < η < 1` and `1 ≤ q₀, q₁, q ≤ ∞`. By the
+  Besov sandwich and the sandwich principle of real interpolation,
+  `(F^{s₀}_{p,q₀}, F^{s₁}_{p,q₁})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` for `0 < s₀ < s₁` and
+  `(L_p, F^{s₁}_{p,q₁})_{η,q} = B^{ηs₁}_{p,q}` for `s₁ > 0`
+  (`Rd.memKMethod_triebelLizorkinCouple_iff`, `Rd.memKMethod_lpTriebelLizorkinCouple_iff`), and
+  the same for every couple of quasi-norms equivalent to these
+  (`Rd.memKMethod_iff_memApprox_of_triebelLizorkin_equiv`,
+  `Rd.memKMethod_iff_memApprox_of_triebelLizorkin_equiv_left`); on the torus the same two
+  identities hold (`Torus.memKMethod_triebelLizorkinCouple_iff`,
+  `Torus.memKMethod_lpTriebelLizorkinCouple_iff`).
 * **Dilation families and the Hörmander condition.** Let `(G_j)_{j ∈ ℕ}` be Schwartz functions
   on `V`, `dim V = n`, whose Schwartz seminorms `sup_x ‖x‖^k ‖D^l G_j(x)‖` are at most `A_{k,l}`
   for every `j` (`Rd.IsUniformSchwartz`), and `θ_j(x) = 2^(jn) G_j(2^j x)`. For every `y ∈ V`,
@@ -190,6 +201,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The periodic lift: period boxes, lifted null sets, counting boxes | ✅ | ✗ | `Torus/PeriodicLift` |
 | The Fefferman–Stein inequality for periodic lifts | ✅ | ✗ | `Torus/FeffermanStein` |
 | Local means characterisation on the torus | ✅ | ✗ | `Torus/TriebelLizorkinLocalMeans` |
+| Triebel–Lizorkin spaces on `ℝ^d` interpolate to Besov spaces: `(F^{s₀}_{p,q₀}, F^{s₁}_{p,q₁})_{η,q}` and `(L_p, F^{s₁}_{p,q₁})_{η,q}` | ✅ | ✗ | `Rd/Interpolation/TriebelLizorkinInterpolation` |
+| Triebel–Lizorkin spaces on the torus interpolate to Besov spaces | ✅ | ✗ | `Torus/TriebelLizorkinInterpolation` |
 | Dilation, reflection and conjugation of Schwartz functions, derivatives of dilations, uniform Schwartz families and finitely many exceptions in them, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families, also with finitely many exceptional members, and their adjoints, the Littlewood–Paley blocks and the synthesis kernels as such families | ✅ | ✗ | `Rd/SingularIntegrals/DilationFamilies` |
 | The adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for `f ∈ L_p`, `g ∈ L_q`, and its form `∫ (K ⋆ f) conj g = ∫ f conj(K^* ⋆ g)` with the adjoint kernel, derivatives of Schwartz kernels moved to the other Schwartz factor, translates and reflections of Schwartz functions, and weak derivatives commuting with convolution by Schwartz functions, on `ℝ^d`, in `L_p` and on open sets | ✅ | ✗ | `Rd/SingularIntegrals/ConvolutionAdjoint` |
 | The Cauchy–Schwarz inequality for finite sums, the `L_2` bounds of the analysis operator and of the synthesis operators on finite index sets for a kernel family with Fourier overlap `B`, and for every Calderón–Zygmund family | ✅ | ✗ | `Rd/SingularIntegrals/PlancherelBounds` |

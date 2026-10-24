@@ -24,7 +24,9 @@ multiples of the dilates of its Bessel kernels; when the Fourier transform of th
 an annulus, the Bessel kernels form a uniform Schwartz family and their dilates a Calderón–Zygmund
 family. Applied to the Littlewood–Paley blocks and their synthesis kernels, this gives, for
 `1 < p < ∞` and with existential constants, `H^{s,p} ∩ L_p = F^s_{p,2}` for every real `s`,
-`H^{s,p} = F^s_{p,2}` for `s ≥ 0`, and Calderón's theorem `W^m_p = H^{m,p}`.
+`H^{s,p} = F^s_{p,2}` for `s ≥ 0`, and Calderón's theorem `W^m_p = H^{m,p}`. The real
+interpolation spaces of `L_p` and `W^m_p`, of two Sobolev spaces, and of two Bessel potential
+spaces are Besov spaces.
 
 Sobolev spaces on open sets and on bounded Lipschitz domains, the trace space, the extension
 theorem, Green's formula and the kernel of the trace are in [Domains, traces and
@@ -206,6 +208,32 @@ project, with the decisions behind their form.
   The kernels are the Bessel potentials of the blocks and of the synthesis kernels, dilates of
   Bessel kernels up to `2^{±js}` (`Rd.besselBase`), which form Calderón–Zygmund families
   (`Rd.exists_isCZFamily_besselBase_psiBase`, `Rd.exists_isCZFamily_besselBase_psiDualBase`).
+* **Sobolev spaces and real interpolation.** Let `dim V ≥ 1` and `1 < p < ∞`. The grid norm
+  of `W^m_p(V)` is `‖f‖_p + inf ∑_α ‖g_α‖_p`, the infimum over the families of weak derivatives
+  `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f ∈ L_p(V)` along the basis of `Rd.gridBasis`
+  (`Rd.sobolevGridNorm`); weak derivatives are unique, so it is `‖f‖_p + ∑_α ‖g_α‖_p` for the
+  family when it exists (`Rd.sobolevGridNorm_eq`), and it is finite exactly on `W^m_p(V)`
+  (`Rd.sobolevGridNorm_lt_top_iff`).
+  It lies between the dyadic quasi-norms of `B^m_{p,max(p,2)}` (for `m ≥ 1`) and
+  `B^m_{p,min(p,2)}`, with the named constants `Rd.approxSobolevGridConst` and
+  `Rd.sobolevGridApproxConst` (`Rd.approxNormDyadic_le_sobolevGridNorm`,
+  `Rd.sobolevGridNorm_le_approxNormDyadic`). Hence, for `0 < θ, η < 1` and `1 ≤ q ≤ ∞`,
+  `(L_p, W^m_p)_{θ,q} = B^{θm}_{p,q}` for `m ≥ 1` (`Rd.memKMethod_lpSobolevCouple_iff`) and
+  `(W^{m₀}_p, W^{m₁}_p)_{η,q} = B^{(1-η)m₀+ηm₁}_{p,q}` for `1 ≤ m₀ < m₁`
+  (`Rd.memKMethod_sobolevCouple_iff`), for the K-method of the couples of these norms. An additive
+  map `T` with `‖T f‖_p ≤ M₀ ‖f‖_p` and `‖T f‖_{W^m_p} ≤ M₁ ‖f‖_{W^m_p}` maps `B^{θm}_{p,q}` into
+  itself (`Rd.memApprox_map_of_bounded_lp_sobolev`) and satisfies
+  `‖T f‖_{K,θ,q} ≤ M₀^(1-θ) M₁^θ ‖f‖_{K,θ,q}` (`Rd.kMethodNorm_map_le_of_bounded_lp_sobolev`).
+* **Bessel potential spaces and real interpolation.** Let `dim V ≥ 1` and `1 < p < ∞`. The
+  Bessel potential norm `‖J_s f‖_p` of `f ∈ L_p(V)` (`Rd.besselPotentialNorm`) is finite exactly
+  on Mathlib's `H^{s,p}(V)` (`Rd.besselPotentialNorm_lt_top_iff`), where it is the norm of the
+  bundled space (`Rd.besselPotentialNorm_eq_enorm`), and equivalent to the quasi-norm of
+  `F^s_{p,2}`, with existential constants (`Rd.exists_triebelLizorkinNorm_le_besselPotentialNorm`,
+  `Rd.exists_besselPotentialNorm_le_triebelLizorkinNorm`). Hence, for `0 < η < 1` and
+  `1 ≤ q ≤ ∞`, `(H^{s₀,p}, H^{s₁,p})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` for `0 < s₀ < s₁` and
+  `(L_p, H^{s₁,p})_{η,q} = B^{ηs₁}_{p,q}` for `s₁ > 0`, in the Bessel potential norms
+  (Bergh–Löfström, Theorem 6.4.5(1); `Rd.memKMethod_besselPotentialCouple_iff`,
+  `Rd.memKMethod_lpBesselPotentialCouple_iff`).
 
 ## What is formalised
 
@@ -220,6 +248,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | `W^m_p = F^m_{p,2}` for `1 < p < ∞` with named constants in both directions: the blocks as convolutions with the weak derivatives, the derivatives of the reproducing sums and their limit, the Besov sandwich `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}` and `W^m_2 = B^m_{2,2}` for `m ≥ 1` | ✅ | ✗ | `Rd/Sobolev/SobolevTriebelLizorkin` |
 | Continuity of convolutions of integrable bounded kernels with `L_p` functions, the Nikolskii inequality for the Littlewood–Paley blocks, almost everywhere convergence of the block series, the Besov embeddings into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions for `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with named constants | ✅ | ✗ | `Rd/Sobolev/SobolevEmbedding` |
 | Value–derivative jets of `W^1_p(O)` and `W^1_p(V)`, restriction | ✅ | ✗ | `Rd/Sobolev/SobolevJets` |
+| The grid norm of `W^m_p` between two Besov quasi-norms with named constants, `(L_p, W^m_p)_{θ,q} = B^{θm}_{p,q}`, `(W^{m₀}_p, W^{m₁}_p)_{η,q} = B^{(1-η)m₀+ηm₁}_{p,q}` for `1 < p < ∞`, and operators bounded on `L_p` and on `W^m_p` | ✅ | ✗ | `Rd/Interpolation/SobolevInterpolation` |
+| The Bessel potential norm `‖J_s f‖_p`, equivalent to the quasi-norm of `F^s_{p,2}`; `(H^{s₀,p}, H^{s₁,p})_{η,q}` and `(L_p, H^{s₁,p})_{η,q}` are Besov spaces | ✅ | ✗ | `Rd/Interpolation/BesselPotentialInterpolation` |
 | Uniform Schwartz families as bounded sets and under continuous linear maps, the shifted Bessel symbols `(ε + ‖ζ‖²)^{σ/2}` with derivative bounds on annuli uniform in `ε`, the Bessel symbol and kernel families as uniform Schwartz families, the Bessel potential of a dilate, the dilated Bessel kernels as a Calderón–Zygmund family with explicit overlap, and the annuli of the Littlewood–Paley kernels | ✅ | ✗ | `Rd/BesselPotentials/UniformSchwartzFamilies` |
 | Even Fourier multipliers, among them Mathlib's Bessel potential, commuting with translations and reflections of Schwartz functions and with convolutions, the Bessel kernels of the Littlewood–Paley kernels, convergent synthesis sums, `H^{s,p} ∩ L_p = F^s_{p,2}` for real `s`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0` and `W^m_p = H^{m,p}` for `1 < p < ∞`, with existential constants | ✅ | ✗ | `Rd/BesselPotentials/BesselPotentialLifting` |
 

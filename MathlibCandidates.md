@@ -79,6 +79,11 @@ declarations.
   in both directions (`ENNReal.tsum_pow_mul_le_dyadic`, `ENNReal.dyadic_le_tsum_pow_mul`),
   generalising `ENNReal.le_tsum_condensed` / `ENNReal.tsum_condensed_le`; and
   `ENNReal.rpow_le_rpow_of_nonpos`, which exists for `ℝ` and `ℝ≥0` but not for `ℝ≥0∞`.
+* **Products and sums in canonically ordered semirings**
+  (`FunctionSpaces/Rd/Interpolation/SobolevInterpolation.lean`): `a x + b y ≤ (a + b)(x + y)`
+  (`ENNReal.mul_add_mul_le_add_mul_add`) and `∑_i a_i b_i ≤ (∑_i a_i)(∑_i b_i)` for finite
+  families (`ENNReal.sum_mul_le_sum_mul_sum`). Stated here for `ℝ≥0∞`; both hold in every
+  `[CommSemiring R] [PartialOrder R] [CanonicallyOrderedAdd R]`.
 * **A dyadic sum** (`ApproximationSpaces/Sequences/Dyadic.lean`):
   `∑_{j ∈ ℕ} min(2^j a, (2^j a)⁻¹) ≤ 4` for every `a ∈ [0, ∞]` (`ENNReal.tsum_min_two_pow_le`),
   the sum behind every Hörmander condition for dyadic dilations; the same bound holds for

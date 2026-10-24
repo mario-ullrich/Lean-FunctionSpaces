@@ -26,7 +26,10 @@ those of Triebel~\cite{TriebelII}; the descriptions are proved here for $1 < p <
 $1 < q \leq \infty$. The atoms here are normalised in $L_\infty$ and the sequence space
 $f^s_{p,q}$ carries the weights $2^{js}$; Triebel states the atomic characterisation with
 $(s,p)$-atoms normalised in $L_p$, and the two forms correspond under
-$\lambda_{j,m} \mapsto 2^{j(s - n/p)} \lambda_{j,m}$.
+$\lambda_{j,m} \mapsto 2^{j(s - n/p)} \lambda_{j,m}$. The last two sections identify the real
+interpolation spaces of Triebel--Lizorkin and of Bessel potential spaces with Besov spaces
+(\Cref{sec:tl-interpolation}), and those of Triebel--Lizorkin spaces on the torus
+(\Cref{sec:torus-tl-interpolation}).
 
 \section{The spaces \texorpdfstring{$\TL{s}{p}{q}$}{F\^{}s\_\{p,q\}} and the Besov sandwich}
 
@@ -2028,6 +2031,156 @@ $A_{s,L} < \infty$.
 The Besov analogue is \Cref{thm:atomic-characterisation}. Here the atoms are indexed by the cells
 and centred at their centres, which takes the place of the bounded overlap condition there, and
 the atoms of the decomposition are smooth of every order.
+
+\section{Triebel--Lizorkin spaces as interpolation spaces}
+\label{sec:tl-interpolation}
+
+The Besov sandwich (\Cref{thm:tl-besov-sandwich}) places the quasi-norm of $\TL{s}{p}{q}$
+between two Besov quasi-norms of the same smoothness, so the sandwich principle
+(\Cref{cor:approximation-space-sandwich}) identifies the real interpolation spaces of two
+Triebel--Lizorkin spaces, and of $L_p$ and one Triebel--Lizorkin space, with Besov spaces; see
+Triebel~\cite[Section~2.4]{TriebelInterpolation}. \Cref{sec:bessel-potential-interpolation}
+draws the same conclusion for the Bessel potential spaces in their own norms. In this section
+$1 \leq p < \infty$, and $\Besov{s}{p}{q}$ is the approximation space of the band-limited scheme
+in $L_p = L_p(V)$.
+
+\begin{lemma}[The constants of the Besov sandwich are finite]
+\label{lem:tl-sandwich-constants}
+\lean{Rd.eight_mul_dyadicWeight_mul_eLpNorm_lpKernel_ne_top,
+  ENNReal.two_mul_one_sub_two_rpow_neg_inv_ne_top}
+\leanok
+\uses{thm:tl-besov-sandwich, lem:lp-kernels-basic}
+For every $s \in \R$, $8 \cdot 8^s \, \|\Phi\|_1 < \infty$, and for every $s > 0$,
+$2 (1 - 2^{-s})^{-1} < \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\Phi$ is integrable (\Cref{lem:lp-kernels-basic}), and $2^{-s} < 1$ for $s > 0$.
+\end{proof}
+
+\begin{definition}[Triebel--Lizorkin couples]
+\label{def:tl-couples}
+\lean{Rd.triebelLizorkinCouple, Rd.triebelLizorkinCouple_norm0, Rd.triebelLizorkinCouple_norm1,
+  Rd.lpTriebelLizorkinCouple, Rd.lpTriebelLizorkinCouple_norm0,
+  Rd.lpTriebelLizorkinCouple_norm1}
+\leanok
+\uses{def:couple, def:triebel-lizorkin}
+For all $s_0, s_1 \in \R$ and $q_0, q_1 \in [1, \infty]$, the couple
+$(\TL{s_0}{p}{q_0}, \TL{s_1}{p}{q_1})$ on $L_p$ is
+$(\|\cdot\|_{F^{s_0}_{p,q_0}}, \|\cdot\|_{F^{s_1}_{p,q_1}})$, and the couple
+$(L_p, \TL{s_1}{p}{q_1})$ is $(\|\cdot\|_p, \|\cdot\|_{F^{s_1}_{p,q_1}})$.
+\end{definition}
+
+\begin{theorem}[Triebel--Lizorkin spaces interpolate to Besov spaces]
+\label{thm:tl-interpolate}
+\lean{Rd.memKMethod_triebelLizorkinCouple_iff, Rd.memKMethod_lpTriebelLizorkinCouple_iff,
+  Rd.memKMethod_iff_memApprox_of_triebelLizorkin_equiv,
+  Rd.memKMethod_iff_memApprox_of_triebelLizorkin_equiv_left}
+\leanok
+\uses{def:tl-couples, thm:tl-besov-sandwich, lem:tl-sandwich-constants,
+  cor:approximation-space-sandwich, cor:comparable-couples, def:couple-k-method}
+Let $1 \leq p < \infty$, $0 < \eta < 1$, $q_0, q_1, q \in [1, \infty]$ and $f \in L_p$.
+\begin{enumerate}
+  \item For every $0 < s_0 < s_1$, $f \in (\TL{s_0}{p}{q_0}, \TL{s_1}{p}{q_1})_{\eta, q}$ if and
+    only if $f \in \Besov{(1 - \eta) s_0 + \eta s_1}{p}{q}$.
+  \item For every $s_1 > 0$, $f \in (L_p, \TL{s_1}{p}{q_1})_{\eta, q}$ if and only if
+    $f \in \Besov{\eta s_1}{p}{q}$.
+  \item For every $0 < s_0 < s_1$ and all $N_0, N_1 : L_p \to [0, \infty]$ and
+    $c_0, c_0', c_1, c_1' \in [0, \infty)$ with $N_i \leq c_i \|\cdot\|_{F^{s_i}_{p,q_i}}$ and
+    $\|\cdot\|_{F^{s_i}_{p,q_i}} \leq c_i' N_i$ for $i = 0, 1$, $f$ lies in the space of the
+    continuous $K$-method with $(\eta, q)$ of the couple $(N_0, N_1)$ if and only if
+    $f \in \Besov{(1 - \eta) s_0 + \eta s_1}{p}{q}$.
+  \item For every $s_1 > 0$ and all $N_1 : L_p \to [0, \infty]$ and $c_1, c_1' \in [0, \infty)$
+    with $N_1 \leq c_1 \|\cdot\|_{F^{s_1}_{p,q_1}}$ and
+    $\|\cdot\|_{F^{s_1}_{p,q_1}} \leq c_1' N_1$, $f$ lies in the space of the continuous
+    $K$-method with $(\eta, q)$ of the couple $(\|\cdot\|_p, N_1)$ if and only if
+    $f \in \Besov{\eta s_1}{p}{q}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:tl-besov-sandwich}, for $s > 0$ the quasi-norm of $\TL{s}{p}{q_i}$ is at most
+$8 \cdot 8^s \|\Phi\|_1$ times the dyadic quasi-norm of $A^s_{\min(p,q_i)}$ and at least
+$(2 (1 - 2^{-s})^{-1})^{-1}$ times that of $A^s_{\max(p,q_i)}$, with finite constants
+(\Cref{lem:tl-sandwich-constants}). Parts (1) and (2) are the two parts of
+\Cref{cor:approximation-space-sandwich}. Parts (3) and (4) follow, since equivalent couples have
+the same spaces (\Cref{cor:comparable-couples}).
+\end{proof}
+
+\section{Triebel--Lizorkin spaces on the torus as interpolation spaces}
+\label{sec:torus-tl-interpolation}
+
+The Besov sandwich on the torus (\Cref{thm:torus-tl-besov-sandwich}) places the quasi-norm of
+$\TL{s}{p}{q}(\T^d)$ between two Besov quasi-norms of the trigonometric polynomials, and the
+sandwich principle (\Cref{cor:approximation-space-sandwich}) gives the torus form of
+\Cref{thm:tl-interpolate}.
+
+\begin{definition}[The constants of the Besov sandwich on the torus]
+\label{def:torus-tl-sandwich-consts}
+\lean{Torus.triebelLizorkinBesovConst, Torus.besovTriebelLizorkinConst}
+\leanok
+\uses{thm:torus-tl-besov-sandwich}
+For every $s \in \R$,
+\[
+  K_{d,s} = 2 (\#d + 1) \, 2^{(\#d + 1) s} \, \|\Phi\|_1
+  \quad \text{and} \quad
+  K'_s = 2 \cdot 2^s (1 - 2^{-s})^{-1} ,
+\]
+the constants of the two bounds of \Cref{thm:torus-tl-besov-sandwich}.
+\end{definition}
+
+\begin{lemma}[The constants on the torus are finite]
+\label{lem:torus-tl-sandwich-consts-finite}
+\lean{Torus.triebelLizorkinBesovConst_ne_top, Torus.besovTriebelLizorkinConst_ne_top}
+\leanok
+\uses{def:torus-tl-sandwich-consts, lem:lp-kernels-basic}
+For every $s \in \R$, $K_{d,s} < \infty$, and for every $s > 0$, $K'_s < \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\Phi$ is integrable (\Cref{lem:lp-kernels-basic}), and $2^{-s} < 1$ for $s > 0$.
+\end{proof}
+
+\begin{definition}[Triebel--Lizorkin couples on the torus]
+\label{def:torus-tl-couples}
+\lean{Torus.triebelLizorkinCouple, Torus.triebelLizorkinCouple_norm0,
+  Torus.triebelLizorkinCouple_norm1, Torus.lpTriebelLizorkinCouple,
+  Torus.lpTriebelLizorkinCouple_norm0, Torus.lpTriebelLizorkinCouple_norm1}
+\leanok
+\uses{def:couple, def:torus-triebel-lizorkin}
+For every $1 \leq p < \infty$, all $s_0, s_1 \in \R$ and $q_0, q_1 \in [1, \infty]$, the couple
+$(\TL{s_0}{p}{q_0}(\T^d), \TL{s_1}{p}{q_1}(\T^d))$ on $L_p(\T^d)$ is
+$(\|\cdot\|_{F^{s_0}_{p,q_0}}, \|\cdot\|_{F^{s_1}_{p,q_1}})$, and the couple
+$(L_p(\T^d), \TL{s_1}{p}{q_1}(\T^d))$ is $(\|\cdot\|_p, \|\cdot\|_{F^{s_1}_{p,q_1}})$.
+\end{definition}
+
+\begin{theorem}[Triebel--Lizorkin spaces on the torus interpolate to Besov spaces]
+\label{thm:torus-tl-interpolate}
+\lean{Torus.memKMethod_triebelLizorkinCouple_iff, Torus.memKMethod_lpTriebelLizorkinCouple_iff}
+\leanok
+\uses{def:torus-tl-couples, def:couple, thm:torus-tl-besov-sandwich,
+  lem:torus-tl-sandwich-consts-finite, cor:approximation-space-sandwich, def:couple-k-method}
+Let $1 \leq p < \infty$, $0 < \eta < 1$, $q_0, q_1, q \in [1, \infty]$ and $f \in L_p(\T^d)$.
+\begin{enumerate}
+  \item For every $0 < s_0 < s_1$,
+    $f \in (\TL{s_0}{p}{q_0}(\T^d), \TL{s_1}{p}{q_1}(\T^d))_{\eta, q}$ if and only if
+    $f \in \Besov{(1 - \eta) s_0 + \eta s_1}{p}{q}(\T^d)$.
+  \item For every $s_1 > 0$, $f \in (L_p(\T^d), \TL{s_1}{p}{q_1}(\T^d))_{\eta, q}$ if and only
+    if $f \in \Besov{\eta s_1}{p}{q}(\T^d)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:torus-tl-besov-sandwich}, for $s > 0$ the quasi-norm of $\TL{s}{p}{q_i}(\T^d)$ is at
+most $K_{d,s}$ times the dyadic quasi-norm of $A^s_{\min(p,q_i)}$ and at least $(K'_s)^{-1}$
+times that of $A^s_{\max(p,q_i)}$, for the scheme $A$ of trigonometric polynomials, with finite
+constants (\Cref{lem:torus-tl-sandwich-consts-finite}). Apply
+\Cref{cor:approximation-space-sandwich}.
+\end{proof}
 
 \chapter{Vector-valued singular integrals}
 \label{ch:singular-integrals}

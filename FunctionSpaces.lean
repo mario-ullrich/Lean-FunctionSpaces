@@ -84,6 +84,9 @@ public import FunctionSpaces.Rd.Sobolev.SobolevJets
 public import FunctionSpaces.Rd.BesselPotentials.UniformSchwartzFamilies
 public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialLifting
 public import FunctionSpaces.Rd.Interpolation.BesovInterpolation
+public import FunctionSpaces.Rd.Interpolation.BesselPotentialInterpolation
+public import FunctionSpaces.Rd.Interpolation.SobolevInterpolation
+public import FunctionSpaces.Rd.Interpolation.TriebelLizorkinInterpolation
 public import FunctionSpaces.Domains.Lipschitz.LipschitzGraph
 public import FunctionSpaces.Domains.Extension.RychkovExtension
 public import FunctionSpaces.Domains.Extension.LipschitzGraphBesov
@@ -140,6 +143,7 @@ public import FunctionSpaces.Torus.WeakDerivatives
 public import FunctionSpaces.Torus.Trace
 public import FunctionSpaces.Torus.TraceContinuous
 public import FunctionSpaces.Torus.TriebelLizorkin
+public import FunctionSpaces.Torus.TriebelLizorkinInterpolation
 public import FunctionSpaces.Torus.PeriodicLift
 public import FunctionSpaces.Torus.FeffermanStein
 public import FunctionSpaces.Torus.TriebelLizorkinLocalMeans
@@ -449,6 +453,16 @@ and the theorems that their characterisations agree. The library builds on
   the Besov spaces by differences as real interpolation spaces,
   `(B^{s₀}_{p,q₀}, B^{s₁}_{p,q₁})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` and
   `(L_p, B^{s₁}_{p,q₁})_{η,q} = B^{ηs₁}_{p,q}`.
+* `FunctionSpaces.Rd.Interpolation.SobolevInterpolation`: the grid norm of `W^m_p` between two
+  Besov quasi-norms, `(L_p, W^m_p)_{θ,q} = B^{θm}_{p,q}`,
+  `(W^{m₀}_p, W^{m₁}_p)_{η,q} = B^{(1-η)m₀+ηm₁}_{p,q}` for `1 < p < ∞`, and operators bounded on
+  `L_p` and on `W^m_p`.
+* `FunctionSpaces.Rd.Interpolation.TriebelLizorkinInterpolation`:
+  `(F^{s₀}_{p,q₀}, F^{s₁}_{p,q₁})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` and
+  `(L_p, F^{s₁}_{p,q₁})_{η,q} = B^{ηs₁}_{p,q}`, and the same for equivalent couples.
+* `FunctionSpaces.Rd.Interpolation.BesselPotentialInterpolation`: the Bessel potential norm
+  `‖J_s f‖_p`, equivalent to the quasi-norm of `F^s_{p,2}`, and
+  `(H^{s₀,p}, H^{s₁,p})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}`, `(L_p, H^{s₁,p})_{η,q} = B^{ηs₁}_{p,q}`.
 
 ### Domains, traces and manifolds
 
@@ -611,6 +625,8 @@ and the theorems that their characterisations agree. The library builds on
   to the face; uniform density of trigonometric polynomials, de la Vallée Poussin operators.
 * `FunctionSpaces.Torus.TriebelLizorkin`: the Triebel–Lizorkin quasi-norm on the torus,
   `F^s_{p,p}(𝕋^d) = B^s_{p,p}(𝕋^d)` and the Besov sandwich on the torus.
+* `FunctionSpaces.Torus.TriebelLizorkinInterpolation`: the Triebel–Lizorkin spaces on the torus
+  interpolate to Besov spaces.
 * `FunctionSpaces.Torus.PeriodicLift`: period boxes, the quotient map `ℝ^d → 𝕋^d` as a measure
   preserving map on them, lifts of almost everywhere statements, convolutions and differences of
   lifts, counting boxes in a ball.

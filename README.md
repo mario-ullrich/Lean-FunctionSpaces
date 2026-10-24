@@ -258,6 +258,13 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   the torus `𝕋^d`, with the blocks `ψ_j ⋆ f(t) = ∫ ψ_j(y) f(t - π y) dy` and the approximation
   spaces of the trigonometric polynomials (`Torus.memTriebelLizorkin_iff_memBesov`,
   `Torus.memTriebelLizorkin_of_memBesov`, `Torus.memBesov_of_memTriebelLizorkin`).
+* **Triebel–Lizorkin spaces interpolate to Besov spaces.** For `1 ≤ p < ∞`, `0 < η < 1` and
+  `1 ≤ q₀, q₁, q ≤ ∞`, the continuous K-method gives
+  `(F^{s₀}_{p,q₀}, F^{s₁}_{p,q₁})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` for `0 < s₀ < s₁` and
+  `(L_p, F^{s₁}_{p,q₁})_{η,q} = B^{ηs₁}_{p,q}` for `s₁ > 0`
+  (`Rd.memKMethod_triebelLizorkinCouple_iff`, `Rd.memKMethod_lpTriebelLizorkinCouple_iff`), and
+  the same on the torus (`Torus.memKMethod_triebelLizorkinCouple_iff`,
+  `Torus.memKMethod_lpTriebelLizorkinCouple_iff`).
 * **The local means characterisation.** Let `g` be a smooth function on `V` with `∫ g = 1` that
   vanishes outside a ball, `g_c = c^n g(c ·)` its dilations (`n = dim V`), `L ≥ 1`,
   `m = ∑_{l=1}^L (-1)^(l+1) C(L, l) g_{1/l}`, and `k_0 = m`, `k_j = m_{2^j} - m_{2^(j-1)}` the
@@ -332,6 +339,23 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   Bessel potentials of the Littlewood–Paley blocks and of their synthesis kernels, which form
   Calderón–Zygmund families whose Schwartz bounds come from bounded derivatives on a compact
   annulus and the continuity of the inverse Fourier transform on the Schwartz space.
+* **Sobolev and Bessel potential spaces interpolate to Besov spaces.** Let `dim V ≥ 1` and
+  `1 < p < ∞`, and give `W^m_p(V)` the norm `‖f‖_p + inf ∑_α ‖g_α‖_p` over the weak derivatives
+  `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f ∈ L_p(V)` along the basis `e` of `Rd.gridBasis`
+  (`Rd.sobolevGridNorm`), finite exactly on `W^m_p(V)` (`Rd.sobolevGridNorm_lt_top_iff`). For
+  `0 < θ, η < 1` and `1 ≤ q ≤ ∞`,
+  `(L_p, W^m_p)_{θ,q} = B^{θm}_{p,q}` for `m ≥ 1` and
+  `(W^{m₀}_p, W^{m₁}_p)_{η,q} = B^{(1-η)m₀+ηm₁}_{p,q}` for `1 ≤ m₀ < m₁`
+  (`Rd.memKMethod_lpSobolevCouple_iff`, `Rd.memKMethod_sobolevCouple_iff`), since the norm lies
+  between the quasi-norms of `B^m_{p,min(p,2)}` and `B^m_{p,max(p,2)}` with named constants
+  (`Rd.approxNormDyadic_le_sobolevGridNorm`, `Rd.sobolevGridNorm_le_approxNormDyadic`). Hence an
+  additive map bounded on `L_p(V)` and on `W^m_p(V)` maps `B^{θm}_{p,q}` into itself, with the
+  bound `M₀^(1-θ) M₁^θ` in the K-norm (`Rd.memApprox_map_of_bounded_lp_sobolev`,
+  `Rd.kMethodNorm_map_le_of_bounded_lp_sobolev`). The same holds for the Bessel potential spaces
+  in the norms `‖J_s f‖_p`, the norms of Mathlib's `H^{s,p}(V)`:
+  `(H^{s₀,p}, H^{s₁,p})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` for `0 < s₀ < s₁` and
+  `(L_p, H^{s₁,p})_{η,q} = B^{ηs₁}_{p,q}` for `s₁ > 0` (Bergh–Löfström, Theorem 6.4.5(1);
+  `Rd.memKMethod_besselPotentialCouple_iff`, `Rd.memKMethod_lpBesselPotentialCouple_iff`).
 * **Sobolev and Besov embeddings on `ℝ^d`.** Let `n = dim V`, `1 ≤ p ≤ r ≤ ∞`, `p < ∞` and
   `1 ≤ q ≤ ∞`. For `s > n(1/p - 1/r)`, every `f ∈ B^s_{p,q}(V)` agrees almost everywhere with
   some `g ∈ L_r(V)` with `‖g‖_r ≤ K_{V,p,r,s} ‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q}`
@@ -506,8 +530,8 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
 | [**Besov spaces on `ℝ^d`**](docs/Rd.md): band-limited approximation, Littlewood–Paley blocks, differences, local means, kernel majorants, atoms, invariance under changes of variables, Besov spaces as interpolation spaces | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
-| [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞` | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}` | ✅ | ✗ |
+| [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, Triebel–Lizorkin spaces as interpolation spaces | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
 | [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary, smooth domains | ✅ | ✗ |
 
 Lean: ✅ every file proved without `sorry` · 🟡 some statement still `sorry` · ⬜ planned.
