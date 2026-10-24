@@ -44,6 +44,13 @@ declarations.
   (`InterpCouple.kMethodSpace`). They have the shape of `kNorm`, `kMethod` and `discreteKMethod`
   of the Bonn project *MultilinearInterpolation*; coordinate with
   lua-vr/MultilinearInterpolation.
+* **The interpolation property of the K-method**
+  (`ApproximationSpaces/Interpolation/Property.lean`): the invariance of `dt/t` under dilations
+  (`ApproximationScheme.measurePreserving_mul_left_kMethodMeasure`), the dilation formula
+  `Φ_{θ,q}(φ(c ·)) = c^θ Φ_{θ,q}(φ)` (`ApproximationScheme.phiFunctional_comp_mul`), the
+  K-functional under a map (`InterpCouple.kFunctional_map_le`) and exactness of exponent `θ`
+  (`InterpCouple.kMethodNorm_map_le`), the theorem that *MultilinearInterpolation* sketches as
+  `IsOfExponent`; coordinate with lua-vr/MultilinearInterpolation.
 * **Monotone convergence and countable Minkowski for `eLpNorm`**: on any measure space,
   `‖sup_b F_b‖_p = sup_b ‖F_b‖_p` for directed countable families of a.e. measurable `F_b`
   (`MeasureTheory.eLpNorm_iSup_of_directed`) and `‖∑_i g_i‖_p ≤ ∑_i ‖g_i‖_p` for `1 ≤ p ≤ ∞` and

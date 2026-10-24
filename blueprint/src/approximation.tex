@@ -1159,6 +1159,7 @@ by (4).
 \label{def:continuous-k-method}
 \lean{ApproximationScheme.kMethodMeasure, ApproximationScheme.phiFunctional,
   ApproximationScheme.phiIntegrand, ApproximationScheme.phiFunctional_eq,
+  ApproximationScheme.measurable_phiIntegrand_of_measurable,
   ApproximationScheme.measurable_phiIntegrand, ApproximationScheme.phiFunctional_congr,
   ApproximationScheme.kMethodNorm, ApproximationScheme.MemKMethod,
   ApproximationScheme.kMethodIntegrand, ApproximationScheme.kMethodNorm_eq,
@@ -1390,7 +1391,8 @@ monoid; its $K$-functional, its
 continuous $K$-method and its discrete $K$-method on the grid $2^n$, $n \in \Z$, are the
 $K$-functional, the continuous $K$-method and the discrete $K$-method with $\rho = 1$ of this
 chapter. The couple of a map $\iota$ gives back the spaces of
-\Cref{ch:interpolation}.
+\Cref{ch:interpolation}. \Cref{sec:interpolation-property} proves that the $K$-method is exact
+of exponent $\theta$.
 
 \section{Couples and their \texorpdfstring{$K$}{K}-method}
 \label{sec:couples}
@@ -1731,6 +1733,265 @@ integrates over $t > 0$.
 At $t = 0$ the $K$-functional of the couple vanishes (take $b = f$), while
 $\inf_y \|f - \iota y\|$ is the distance of $f$ to $\iota(Y)$; the two agree at $t = 0$ exactly
 for $f$ in the closure of $\iota(Y)$.
+
+\section{The interpolation property}
+\label{sec:interpolation-property}
+
+An additive map between two couples that is bounded at both levels is bounded between their
+real interpolation spaces, with the constant $M_0^{1-\theta} M_1^{\theta}$: the $K$-method is
+exact of exponent $\theta$~\cite[Theorems~3.1.2 and~3.11.2]{BerghLofstrom}. The proof combines
+the behaviour of the $K$-functional under a map with the invariance of $dt/t$ under dilations.
+
+\begin{lemma}[Dilations preserve $dt/t$]
+\label{lem:dilation-invariance}
+\lean{ApproximationScheme.kMethodMeasure_apply,
+  ApproximationScheme.indicator_preimage_mul_left_inv,
+  ApproximationScheme.measurePreserving_mul_left_kMethodMeasure,
+  ApproximationScheme.ae_pos_kMethodMeasure}
+\leanok
+\uses{def:continuous-k-method}
+For every $c > 0$, the map $t \mapsto ct$ preserves the measure $dt/t$ on $(0, \infty)$: for
+every measurable set $S \subseteq \R$,
+\[
+  \int_{\{t > 0 \,:\, ct \in S\}} \frac{dt}{t} = \int_{S \cap (0, \infty)} \frac{dt}{t} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $t > 0$, $\mathbf{1}_S(ct) \, t^{-1} = c \, \mathbf{1}_S(ct) \, (ct)^{-1}$, and
+$\int g(ct) \, dt = c^{-1} \int g(t) \, dt$ for every measurable $g \geq 0$.
+\end{proof}
+
+\begin{lemma}[The functional $\Phi_{\theta, q}$ under dilations]
+\label{lem:phi-functional-dilation}
+\lean{ApproximationScheme.phiFunctional_mono, ApproximationScheme.phiIntegrand_const_mul,
+  ApproximationScheme.phiFunctional_const_mul, ApproximationScheme.phiIntegrand_comp_mul,
+  ApproximationScheme.phiFunctional_comp_mul}
+\leanok
+\uses{def:continuous-k-method, lem:dilation-invariance, lem:lp-norm-nonnegative}
+Let $\theta \in \R$ and $q \in (0, \infty]$, and let $\varphi, \psi : [0, \infty] \to [0, \infty]$
+with $\varphi$ measurable.
+\begin{enumerate}
+  \item If $\varphi(t) \leq \psi(t)$ for every $t \in (0, \infty)$, then
+    $\Phi_{\theta, q}(\varphi) \leq \Phi_{\theta, q}(\psi)$.
+  \item For every $a \in [0, \infty]$,
+    $\Phi_{\theta, q}(a \varphi) = a \, \Phi_{\theta, q}(\varphi)$.
+  \item For every $c \in (0, \infty)$,
+    $\Phi_{\theta, q}\bigl(\varphi(c \, \cdot)\bigr) = c^{\theta} \, \Phi_{\theta, q}(\varphi)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) follows from the pointwise bound $t^{-\theta} \varphi(t) \leq t^{-\theta} \psi(t)$ of the
+integrands for $t > 0$, since $dt/t$ lives on $(0, \infty)$. The integrand of $a \varphi$ is
+$a$ times the integrand $t^{-\theta} \varphi(t)$ of $\varphi$, which is measurable, so (2) is the
+homogeneity of $L_q$ norms of measurable $[0, \infty]$-valued functions
+(\Cref{lem:lp-norm-nonnegative}). For (3),
+$t^{-\theta} \varphi(ct) = (ct)^{-\theta} c^{\theta} \varphi(ct)$, so the integrand of
+$\varphi(c \, \cdot)$ is the integrand of $c^{\theta} \varphi$ composed with $t \mapsto ct$,
+which preserves $dt/t$ (\Cref{lem:dilation-invariance}); then apply (2).
+\end{proof}
+
+Part (3) is the dilation formula in the proof of~\cite[Theorem~3.1.2]{BerghLofstrom}.
+
+\begin{lemma}[$K$-functional under a map]
+\label{lem:k-functional-map}
+\lean{InterpCouple.kFunctional_map_le_of_decomp, ENNReal.mul_add_div_mul_mul,
+  InterpCouple.kFunctional_map_le, InterpCouple.kFunctional_map_le_of_additiveOn}
+\leanok
+\uses{def:couple-k-functional}
+Let $A = (N_0, N_1)$ be a couple on $U$ with $K$-functional $K_A$, let $B = (N_0', N_1')$ be a
+couple on $V$ with $K$-functional $K_B$ and spaces $X_i' = \{v \in V : N_i'(v) < \infty\}$ for
+$i = 0, 1$, let $T : U \to V$ be a map, and let
+$M_0 \in (0, \infty)$ and $M_1 \in [0, \infty]$ with $N_0'(Ta) \leq M_0 N_0(a)$ and
+$N_1'(Ta) \leq M_1 N_1(a)$ for every $a \in U$. Let $u \in U$.
+\begin{enumerate}
+  \item If $T$ is additive, then $K_B(t, Tu) \leq M_0 \, K_A(M_1 t / M_0, u)$ for every
+    $t \in [0, \infty]$.
+  \item If $M_1 \neq 0$ and $Tu = T(u - b) + Tb$ for every $b \in U$ with $N_0(u - b) < \infty$
+    and $N_1(b) < \infty$, then $K_B(t, Tu) \leq M_0 \, K_A(M_1 t / M_0, u)$ for every
+    $t \in (0, \infty]$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+For every $b \in U$ with $Tu = T(u - b) + Tb$,
+\begin{align*}
+  K_B(t, Tu) &\leq N_0'\bigl(T(u - b)\bigr) + t N_1'(Tb) \leq M_0 N_0(u - b) + t M_1 N_1(b) \\
+  &= M_0 \Bigl(N_0(u - b) + \frac{M_1 t}{M_0} N_1(b)\Bigr) .
+\end{align*}
+Take the infimum over $b$. In (2), a decomposition with $N_0(u - b) = \infty$ or
+$N_1(b) = \infty$ gives the value $\infty$ on the right, since $M_0$, $M_1$ and $t$ are nonzero.
+\end{proof}
+
+Part (1) is the inequality in the proof of~\cite[Theorem~3.1.2]{BerghLofstrom}, and (2) is the
+Remark after that theorem: the map needs to be additive only on the decompositions of $u$ into
+two pieces of finite norm.
+
+\begin{theorem}[Interpolation property of the $K$-method]
+\label{thm:interpolation-property}
+\lean{ENNReal.mul_div_rpow_eq, ENNReal.rpow_mul_rpow_ne_top,
+  InterpCouple.kMethodNorm_le_of_kFunctional_le, InterpCouple.kMethodNorm_map_le,
+  InterpCouple.kMethodNorm_map_le_of_additiveOn, InterpCouple.MemKMethod.map}
+\leanok
+\uses{lem:k-functional-map, lem:phi-functional-dilation, lem:couple-k-functional,
+  def:couple-k-method}
+Let $A$, $B$, $T$, $M_0$, $M_1$ and $u$ be as in \Cref{lem:k-functional-map}, with
+$M_1 \in (0, \infty)$, and assume the hypothesis of (1) or of (2) there. For every
+$\theta \in \R$ and every $q \in (0, \infty]$,
+\[
+  \|Tu\|_{K, \theta, q} \leq M_0^{1-\theta} M_1^{\theta} \, \|u\|_{K, \theta, q} .
+\]
+In particular, for every additive $T : U \to V$ and all $M_0, M_1 \in [0, \infty)$ with
+$N_0'(Ta) \leq M_0 N_0(a)$ and $N_1'(Ta) \leq M_1 N_1(a)$ for every $a \in U$, every
+$\theta \in \R$ and every $q \in (0, \infty]$, the map $T$ sends $(X_0, X_1)_{\theta, q}$ into
+$(X_0', X_1')_{\theta, q}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+With $c = M_1 / M_0 \in (0, \infty)$, \Cref{lem:k-functional-map} and
+\Cref{lem:phi-functional-dilation} give
+\[
+  \|Tu\|_{K, \theta, q} = \Phi_{\theta, q}\bigl(K_B(\cdot, Tu)\bigr)
+  \leq M_0 \, \Phi_{\theta, q}\bigl(K_A(c \, \cdot, u)\bigr)
+  = M_0 \, c^{\theta} \, \|u\|_{K, \theta, q} ,
+\]
+and $M_0 (M_1 / M_0)^{\theta} = M_0^{1-\theta} M_1^{\theta}$. The functions $K_B(\cdot, Tu)$ and
+$K_A(c \, \cdot, u)$ increase, hence are measurable. For the last statement, the bounds hold with
+$\max(1, M_i) \in (0, \infty)$ in place of $M_i$.
+\end{proof}
+
+The proof shows more: for all $u \in U$, $v \in V$ and $M_0, M_1 \in (0, \infty)$ with
+$K_B(t, v) \leq M_0 K_A(M_1 t / M_0, u)$ for every $t \in (0, \infty)$,
+$\|v\|_{K, \theta, q} \leq M_0^{1-\theta} M_1^{\theta} \, \|u\|_{K, \theta, q}$.
+
+\begin{corollary}[Interpolation property for the discrete $K$-method]
+\label{cor:interpolation-property-discrete}
+\lean{InterpCouple.discreteKMethodNorm_le_of_kMethodNorm_le,
+  InterpCouple.discreteKMethodNorm_map_le}
+\leanok
+\uses{thm:interpolation-property, thm:couple-discrete-continuous}
+Let $A = (N_0, N_1)$ be a couple on $U$ and $B = (N_0', N_1')$ a couple on $V$, let
+$\theta \geq 0$, $\rho > 0$,
+$q \in (0, \infty]$ and $M \in [0, \infty]$. For all $u \in U$ and $v \in V$ with
+$\|v\|_{K, \theta, q} \leq M \|u\|_{K, \theta, q}$,
+\[
+  \|v\|^{\Z}_{\theta, \rho, q} \leq 2^{2\rho\theta} M \, \|u\|^{\Z}_{\theta, \rho, q} .
+\]
+In particular, for every additive $T : U \to V$ and all $M_0, M_1 \in (0, \infty)$ with
+$N_i'(Ta) \leq M_i N_i(a)$ for $i = 0, 1$ and every $a \in U$, and for every $u \in U$,
+$\|Tu\|^{\Z}_{\theta, \rho, q} \leq 2^{2\rho\theta} M_0^{1-\theta} M_1^{\theta} \,
+\|u\|^{\Z}_{\theta, \rho, q}$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+By \Cref{thm:couple-discrete-continuous},
+$(\rho \log 2)^{1/q} 2^{-\rho\theta} \|v\|^{\Z}_{\theta, \rho, q} \leq \|v\|_{K, \theta, q}$ and
+$\|u\|_{K, \theta, q} \leq (\rho \log 2)^{1/q} 2^{\rho\theta} \|u\|^{\Z}_{\theta, \rho, q}$, and
+$(\rho \log 2)^{1/q} 2^{-\rho\theta} \in (0, \infty)$.
+\end{proof}
+
+\begin{corollary}[Comparable couples]
+\label{cor:comparable-couples}
+\lean{InterpCouple.kMethodNorm_le_of_le, InterpCouple.MemKMethod.of_le,
+  InterpCouple.memKMethod_congr}
+\leanok
+\uses{thm:interpolation-property}
+Let $A = (N_0, N_1)$ and $B = (N_0', N_1')$ be couples on $U$, with $K$-norms
+$\|\cdot\|_{K, \theta, q}$ and $\|\cdot\|'_{K, \theta, q}$ and spaces $(X_0, X_1)_{\theta, q}$
+and $(X_0', X_1')_{\theta, q}$, and let $c_0, c_1 \in [0, \infty)$ with $N_0' \leq c_0 N_0$ and
+$N_1' \leq c_1 N_1$. For every $\theta \in \R$ and every $q \in (0, \infty]$:
+\begin{enumerate}
+  \item if $c_0, c_1 > 0$, then
+    $\|u\|'_{K, \theta, q} \leq c_0^{1-\theta} c_1^{\theta} \, \|u\|_{K, \theta, q}$ for every
+    $u \in U$;
+  \item $(X_0, X_1)_{\theta, q} \subseteq (X_0', X_1')_{\theta, q}$;
+  \item if moreover $N_0 \leq c_0' N_0'$ and $N_1 \leq c_1' N_1'$ for some
+    $c_0', c_1' \in [0, \infty)$, then $(X_0, X_1)_{\theta, q} = (X_0', X_1')_{\theta, q}$.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+\leanok
+Apply \Cref{thm:interpolation-property} to the identity map of $U$.
+\end{proof}
+
+\begin{theorem}[Interpolation of retracts]
+\label{thm:interpolation-retracts}
+\lean{InterpCouple.kMethodNorm_le_of_retract, InterpCouple.memKMethod_iff_of_retract,
+  InterpCouple.memKMethod_iff_exists_map_eq}
+\leanok
+\uses{thm:interpolation-property}
+Let $A = (N_0, N_1)$ be a couple on $U$ and $B = (N_0', N_1')$ a couple on $V$, let
+$R : U \to V$ be additive, let $E : V \to U$ be a map with $R(Ev) = v$ for every $v \in V$, and
+let $M_0, M_1 \in [0, \infty)$ with $N_i'(Ra) \leq M_i N_i(a)$ for $i = 0, 1$ and every
+$a \in U$. For every $\theta \in \R$ and every $q \in (0, \infty]$, with
+$(X_0, X_1)_{\theta, q}$ and $(X_0', X_1')_{\theta, q}$ the spaces of the $K$-method of $A$ and
+of $B$:
+\begin{enumerate}
+  \item if $M_0, M_1 > 0$, then
+    $\|v\|_{K, \theta, q} \leq M_0^{1-\theta} M_1^{\theta} \, \|Ev\|_{K, \theta, q}$ for every
+    $v \in V$;
+  \item if $E$ is additive and $N_i(Ev) \leq L_i N_i'(v)$ for $i = 0, 1$, every $v \in V$ and
+    some $L_0, L_1 \in [0, \infty)$, then for every $v \in V$, $v \in (X_0', X_1')_{\theta, q}$
+    if and only if $Ev \in (X_0, X_1)_{\theta, q}$, and if and only if $v = Ru$ for some
+    $u \in (X_0, X_1)_{\theta, q}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+Apply \Cref{thm:interpolation-property} to $R$ and, in (2), to $E$, and use $R(Ev) = v$. For
+the last equivalence in (2), take $u = Ev$.
+\end{proof}
+
+In the language of~\cite[Theorem~6.4.2]{BerghLofstrom}, $B$ is a retract of $A$, and by (2) the
+interpolation space of $B$ is the image under $R$ of the interpolation space of $A$.
+
+\paragraph{Couples of bounded linear maps.}
+For the couples of \Cref{def:map-couple}, a morphism is a pair of bounded linear maps that
+commutes with the two embeddings. This complements \Cref{lem:approx-functorial}, which asks
+the map to respect the approximation scheme.
+
+\begin{proposition}[Interpolation property for the couples of bounded linear maps]
+\label{prop:interpolation-property-map-couples}
+\lean{InterpCouple.norm0_ofMap_apply_le, InterpCouple.norm1_ofMap_apply_le,
+  ApproximationScheme.kMethodNorm_map_le_of_comp_eq,
+  ApproximationScheme.interpNorm_map_le_of_comp_eq, ApproximationScheme.MemKMethod.map,
+  ApproximationScheme.MemInterp.map}
+\leanok
+\uses{thm:interpolation-property, prop:map-couple-k-method, thm:discrete-continuous-k-method}
+Let $\iota : Y \to X$ and $\iota' : Y' \to X'$ be bounded linear maps between real normed
+spaces, and let $T : X \to X'$ and $S : Y \to Y'$ be bounded linear maps with
+$T \iota = \iota' S$. Let $\theta \in \R$, $q \in (0, \infty]$ and $f \in X$.
+\begin{enumerate}
+  \item For all $L_0, L_1 \in (0, \infty)$ with $\|T\| \leq L_0$ and $\|S\| \leq L_1$,
+    $\|Tf\|_{K, \theta, q} \leq L_0^{1-\theta} L_1^{\theta} \, \|f\|_{K, \theta, q}$; and, for
+    $\theta \geq 0$ and $\rho > 0$, the norms of \Cref{def:interpolation} on the grid
+    $t = 2^{-k\rho}$ satisfy
+    $\|Tf\|_{\theta, q} \leq c' \, L_0^{1-\theta} L_1^{\theta} \, c \, \|f\|_{\theta, q}$,
+    where $c$ is the constant $M_1$ of \Cref{thm:discrete-continuous-k-method} and $c'$ is its
+    constant $M_2$ for $\iota'$.
+  \item The map $T$ sends $(X, Y)^K_{\theta, q}$ into $(X', Y')^K_{\theta, q}$, and, for
+    $\theta > 0$ and $\rho > 0$, the space of the discrete $K$-method on the grid
+    $t = 2^{-k\rho}$ for $\iota$ into the space for $\iota'$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+\leanok
+$\|Ta\| \leq \|T\| \, \|a\|$, and $\iota y = a$ gives $\iota'(Sy) = Ta$, so that
+$N_1'(Ta) \leq \|S\| \, \|y\|$ for the quotient norms. Hence \Cref{thm:interpolation-property}
+applies to the couples of $\iota$ and $\iota'$, whose $K$-norms are those of
+\Cref{def:continuous-k-method} by \Cref{prop:map-couple-k-method}. The bound on the grid follows
+with \Cref{thm:discrete-continuous-k-method}, and (2) with $L_0 = \max(1, \|T\|)$ and
+$L_1 = \max(1, \|S\|)$.
+\end{proof}
 
 \chapter{Block decompositions and projections}
 \label{ch:decompositions}

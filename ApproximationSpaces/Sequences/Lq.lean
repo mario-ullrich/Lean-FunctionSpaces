@@ -26,7 +26,8 @@ on `ℕ`, so Minkowski's inequality (`MeasureTheory.eLpNorm_add_le`) and monoton
 free from Mathlib.  The alternative, Mathlib's normed space `lp`, would require summability
 proofs for every sequence that enters.
 
-The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥0∞` scalars,
+The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥0∞` scalars
+(also of `L_p` norms of `[0, ∞]`-valued functions, `MeasureTheory.eLpNorm_const_mul_ennreal`),
 **monotonicity in `q`** (`lqNorm r a ≤ lqNorm q a` for `1 ≤ q ≤ r`; Mathlib has only the
 inclusion `lp.monotone`, without the norm bound), the Cauchy–Schwarz inequality
 `∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for series and for finite sums
@@ -695,6 +696,35 @@ theorem lqNorm_ite_le_eq {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : 
   split_ifs <;> simp [ENNReal.zero_rpow_of_pos hpos]
 
 end ENNReal
+
+namespace MeasureTheory
+
+variable {α : Type*} [MeasurableSpace α] {μ : Measure α}
+
+/-! ### `L_p` norms of functions with values in `[0, ∞]` -/
+
+/-- **Homogeneity** for a scalar `c ∈ [0, ∞]`: `‖c h‖_p = c ‖h‖_p` for measurable
+`h : α → [0, ∞]` (Mathlib's `eLpNorm_const_smul` covers scalars in a normed division ring).
+Measurability matters for `p = 0`: a non-measurable `h > 0` has `‖h‖_0 = ∞`, while `∞ · h = ∞`
+is measurable with `‖∞ · h‖_0 = 0`. -/
+theorem eLpNorm_const_mul_ennreal (c : ℝ≥0∞) {h : α → ℝ≥0∞} (hh : AEMeasurable h μ)
+    (p : ℝ≥0∞) : eLpNorm (fun x => c * h x) p μ = c * eLpNorm h p μ := by
+  have hch : AEStronglyMeasurable (fun x => c * h x) μ := (hh.const_mul c).aestronglyMeasurable
+  rcases eq_or_ne p 0 with rfl | hp0
+  · rw [eLpNorm_exponent_zero hch, eLpNorm_exponent_zero hh.aestronglyMeasurable, mul_zero]
+  rcases eq_or_ne p ∞ with rfl | hp
+  · rw [eLpNorm_exponent_top hch, eLpNorm_exponent_top hh.aestronglyMeasurable]
+    simp only [eLpNormEssSup, enorm_eq_self]
+    exact ENNReal.essSup_const_mul
+  have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hch,
+    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hh.aestronglyMeasurable]
+  simp only [enorm_eq_self]
+  simp_rw [ENNReal.mul_rpow_of_nonneg _ _ hr.le]
+  rw [lintegral_const_mul'' _ (hh.pow_const _), ENNReal.mul_rpow_of_nonneg _ _ (by positivity),
+    ← ENNReal.rpow_mul, mul_one_div_cancel hr.ne', ENNReal.rpow_one]
+
+end MeasureTheory
 
 /-- `(1 + t)^N ≤ 2^N (1 + t^N)` for `t ≥ 0`, from Mathlib's `add_pow_le`. -/
 theorem one_add_pow_le_two_pow_mul {t : ℝ} (ht : 0 ≤ t) (N : ℕ) :

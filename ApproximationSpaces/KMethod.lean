@@ -251,9 +251,14 @@ variable {θ ρ : ℝ} {q : ℝ≥0∞} {φ : ℝ≥0∞ → ℝ≥0∞}
 theorem phiFunctional_eq (φ : ℝ≥0∞ → ℝ≥0∞) :
     phiFunctional θ q φ = eLpNorm (phiIntegrand θ φ) q kMethodMeasure := rfl
 
+/-- For a measurable `φ`, the integrand `t ↦ t^(-θ) φ(t)` is measurable. -/
+theorem measurable_phiIntegrand_of_measurable (hφ : Measurable φ) :
+    Measurable (phiIntegrand θ φ) :=
+  (ENNReal.measurable_ofReal.pow_const _).mul (hφ.comp ENNReal.measurable_ofReal)
+
 /-- For an increasing `φ`, the integrand `t ↦ t^(-θ) φ(t)` is measurable. -/
 theorem measurable_phiIntegrand (hφ : Monotone φ) : Measurable (phiIntegrand θ φ) :=
-  (ENNReal.measurable_ofReal.pow_const _).mul (hφ.measurable.comp ENNReal.measurable_ofReal)
+  measurable_phiIntegrand_of_measurable hφ.measurable
 
 /-- `Φ_{θ,q}(φ)` depends only on the values of `φ` on `(0, ∞)`: if `φ t = ψ t` for every
 `t ≠ 0, ∞`, then `Φ_{θ,q}(φ) = Φ_{θ,q}(ψ)`. -/

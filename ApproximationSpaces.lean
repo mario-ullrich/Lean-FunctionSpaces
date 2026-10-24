@@ -24,6 +24,7 @@ public import ApproximationSpaces.KFunctional
 public import ApproximationSpaces.Representation
 public import ApproximationSpaces.KMethod
 public import ApproximationSpaces.Interpolation.Couple
+public import ApproximationSpaces.Interpolation.Property
 public import ApproximationSpaces.Decompositions.Projection
 public import ApproximationSpaces.Decompositions.Blocks
 public import ApproximationSpaces.Decompositions.Synthesis
@@ -85,6 +86,9 @@ the counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the co
 * `ApproximationSpaces.Interpolation.Couple`: couples `InterpCouple` of two extended
   quasi-norms on an abelian group, their K-functional, the continuous and the discrete K-method
   and their equivalence, and the couple `InterpCouple.ofMap ι` of a bounded linear map.
+* `ApproximationSpaces.Interpolation.Property`: the invariance of `dt/t` under dilations, the
+  interpolation property of the K-method (exactness of exponent `θ`), comparable couples,
+  retracts, and the interpolation property for the couples of bounded linear maps.
 * `ApproximationSpaces.Decompositions.Projection`: schemes with uniformly bounded projections
   and the characterisation of `A^s_q` by dyadic blocks.
 * `ApproximationSpaces.Decompositions.Blocks`: the characterisation of `A^s_q` by block

@@ -99,6 +99,13 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   space (Bergh–Löfström, Lemma 3.1.3; `ApproximationScheme.memInterp_iff_memKMethod`), so
   `A^s_q = (X, Y)_{s/r, q}` for the continuous K-method
   (`ApproximationScheme.memApprox_iff_memKMethod`).
+* **Real interpolation of couples: the interpolation property.** Let `(N₀, N₁)` and
+  `(N₀', N₁')` be couples of extended quasi-norms on abelian groups `U` and `V`, and let
+  `T : U → V` be additive with `N_i'(T a) ≤ M_i N_i(a)` for `i = 0, 1`, every `a` and some
+  `0 < M_i < ∞`. Then for every `θ ∈ ℝ`, `q ∈ (0, ∞]` and `u ∈ U`, the K-norms
+  `‖u‖_{K,θ,q} = (∫_0^∞ (t^(-θ) K(t, u))^q dt/t)^(1/q)` satisfy
+  `‖T u‖_{K,θ,q} ≤ M₀^(1-θ) M₁^θ ‖u‖_{K,θ,q}` (Bergh–Löfström, Theorems 3.1.2 and 3.11.2;
+  `InterpCouple.kMethodNorm_map_le`).
 * **Moduli of smoothness and approximation.** Let `ω(f, 2^(-k))` be subadditive with
   `ω(f, t) ≤ C₀ ‖f‖`, and assume a Jackson inequality `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for
   `k ≥ k₀` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
@@ -465,7 +472,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 
 | Block | Lean | Checked |
 |---|---|---|
-| [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, couples and their K-method, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
+| [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, couples, their K-method and the interpolation property, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
 | [**Besov and Sobolev spaces on measure spaces**](docs/MeasureSpaces.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, spectral schemes, continuous spectral bases | ✅ | ✗ |
 | [**Tools from analysis**](docs/Analysis.md): `L_p` norms, the inclusion `L_r ↪ L_p`, Young's inequality, mixed norms, differences and the translation algebra, convolution, approximate identities, Littlewood–Paley kernels, test functions in the Schwartz space, dyadic cubes and cells, the Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, weak type and Marcinkiewicz interpolation, `L_p` norms by duality | ✅ | ✗ |
 | [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness and smooth Littlewood–Paley blocks for all `p`, `W^m_2` by Fourier multipliers, the trace on a face, the restriction for continuous functions | ✅ | ✗ |
@@ -507,8 +514,7 @@ that library builds itself.
 
 ## What is left to do
 
-* **Interpolation**: the interpolation property of the K-method (an operator bounded on
-  both spaces of a couple is bounded on its interpolation spaces) and reiteration.
+* **Interpolation**: the reiteration theorem of the K-method.
 * **Traces and extensions**: the norm equivalence `H^{1/2}(Γ) ≅ B^{1/2}_{2,2}(Γ)` and the
   extension of `W^1_p` for `p ∈ {1, ∞}` and of higher order.
 * **Manifolds with corners**, with Lipschitz domains as Besov domains.
