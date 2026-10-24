@@ -216,7 +216,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   On `ℝ^d`, let `1 ≤ p < ∞`, `r ≥ 1` an integer,
   `N_{s,q}(f) = ‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q}` and `0 < s₀ < s₁ < r`. Then
   `f ∈ L_p(V)` lies in the interpolation space `(N_{s₀,q₀}, N_{s₁,q₁})_{η,q}` iff
-  `N_{s,q}(f) < ∞` with `s = (1-η)s₀ + ηs₁` (Bergh–Löfström, Theorem 6.4.5(1);
+  `N_{s,q}(f) < ∞` with `s = (1-η)s₀ + ηs₁` (Bergh–Löfström, Theorem 6.4.5(2);
   `Rd.memKMethod_modCouple_iff`), and the same holds on the torus
   (`Torus.memKMethod_modCouple_iff`).
 * **Atomic decompositions on `ℝ^d`.** Let `1 ≤ p < ∞` and `n = dim V`. A regular atom of level

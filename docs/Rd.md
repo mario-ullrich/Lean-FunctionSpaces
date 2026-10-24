@@ -46,7 +46,7 @@ the approximate identities and the Littlewood–Paley kernels in [Tools from ana
   let `N_{s,q}(f) = ‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q}`, `0 < s₀ < s₁ < r`,
   `0 < η < 1`, `1 ≤ q₀, q₁, q ≤ ∞` and `s = (1-η)s₀ + ηs₁`. Then `f ∈ L_p(V)` lies in the real
   interpolation space `(N_{s₀,q₀}, N_{s₁,q₁})_{η,q}` of the continuous K-method iff
-  `N_{s,q}(f) < ∞` iff `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q} < ∞` (Bergh–Löfström, Theorem 6.4.5(1);
+  `N_{s,q}(f) < ∞` iff `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q} < ∞` (Bergh–Löfström, Theorem 6.4.5(2);
   `Rd.memKMethod_modCouple_iff`, `Rd.memKMethod_modCouple_iff_littlewoodPaley`), and
   `(‖·‖_p, N_{s₁,q₁})_{η,q}` consists of the `f` with `N_{ηs₁,q}(f) < ∞`
   (`Rd.memKMethod_leftModCouple_iff`). The same holds for the band-limited approximation spaces

@@ -23,7 +23,7 @@ and `s = (1-η)s₀ + ηs₁`,
 
 `f ∈ (B^{s₀}_{p,q₀}, B^{s₁}_{p,q₁})_{η,q} ⟺ ‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
 
-(Bergh–Löfström, Theorem 6.4.5(1); Triebel 1978, Section 2.4; `Rd.memKMethod_modCouple_iff`),
+(Bergh–Löfström, Theorem 6.4.5(2); Triebel 1978, Section 2.4; `Rd.memKMethod_modCouple_iff`),
 and equivalently `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q} < ∞`
 (`Rd.memKMethod_modCouple_iff_littlewoodPaley`).  The endpoint
 `(L_p, B^{s₁}_{p,q₁})_{η,q} = B^{ηs₁}_{p,q}` is `Rd.memKMethod_leftModCouple_iff`.
@@ -62,7 +62,7 @@ theorem memKMethod_bandLeftApproxCouple_iff (hp : p ≠ ∞) (hs₁ : 0 < s₁) 
       (bandScheme hp).MemApprox (η * s₁) q f :=
   ApproximationScheme.memKMethod_approxCouple_zero_iff hs₁ hη hη' hq₁ hq
 
-/-- **Besov spaces by differences interpolate** (Bergh–Löfström, Theorem 6.4.5(1); Triebel 1978,
+/-- **Besov spaces by differences interpolate** (Bergh–Löfström, Theorem 6.4.5(2); Triebel 1978,
 Section 2.4): for `1 ≤ p < ∞`, an order `r`, `0 < s₀ < s₁ < r`, `0 < η < 1` and
 `1 ≤ q₀, q₁, q ≤ ∞`, `f ∈ L_p(V)` lies in the real interpolation space of the couple of the
 quasi-norms `‖f‖_p + ‖(2^(ks_i) ω_r(f, 2^(-k))_p)_k‖_{ℓ_{q_i}}` iff
