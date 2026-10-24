@@ -1479,8 +1479,8 @@ The bounded Lipschitz domains of \Cref{def:bounded-lipschitz} carry their balls 
 as data. This section starts from the usual definition, a condition on a set, and shows that in
 finite dimension it describes exactly the carriers of these structures; the open balls are
 examples. In this section $V$ is any real inner product space; finite dimension enters only
-through the compactness of $\partial\Omega$. For a unit vector $\nu \in V$, $P_\nu$ is the
-orthogonal projection onto the hyperplane $\nu^\perp$.
+through the compactness of $\partial\Omega$. For $\nu \in V$, $P_\nu$ is the orthogonal
+projection onto $\nu^\perp$, a hyperplane for a unit vector $\nu$.
 
 \begin{definition}[Sets that are Lipschitz near a point]
 \label{def:lipschitz-near-point}
@@ -1526,22 +1526,27 @@ gives the identity.
 
 \begin{lemma}[Local graphs and Lipschitz graph domains]
 \label{lem:local-graph-domain}
-\lean{Rd.LipschitzGraph.ofLocal, Rd.LipschitzGraph.domain_ofLocal, Rd.LipschitzGraph.localPhi,
-  Rd.LipschitzGraph.lipschitzWith_localPhi, Rd.LipschitzGraph.domain_eq_localPhi}
+\lean{Rd.LipschitzGraph.ofLocal, Rd.LipschitzGraph.domain_ofLocal,
+  Rd.LipschitzGraph.contDiff_phi_ofLocal, Rd.LipschitzGraph.localPhi,
+  Rd.LipschitzGraph.lipschitzWith_localPhi, Rd.LipschitzGraph.contDiff_localPhi,
+  Rd.LipschitzGraph.domain_eq_localPhi}
 \leanok
 \uses{def:lipschitz-graph, def:graph-map, lem:hyperplane-projection}
 For every $z \in V$, every unit vector $\nu \in V$, every $L \geq 0$ and every $L$-Lipschitz
 $\varphi : \nu^\perp \to \R$, the function
 $x \mapsto \langle z, \nu \rangle + \varphi(P_\nu(x - z))$ is $L$-Lipschitz and constant along
 $\nu$, and its Lipschitz graph domain with direction $\nu$ is
-$\{x \in V : \varphi(P_\nu(x - z)) < \langle \nu, x - z \rangle\}$. For every Lipschitz graph
-domain $\Omega = \{x : \psi(x) < \langle x, e \rangle\}$ with graph function $\psi$ and constant
-$M$, and every $z \in V$, the function $\psi_z(y) = \psi(z + y) - \langle z, e \rangle$ on
-$H = e^\perp$ is $M$-Lipschitz and
+$\{x \in V : \varphi(P_\nu(x - z)) < \langle \nu, x - z \rangle\}$; for every
+$n \in \N \cup \{\infty, \omega\}$ (Mathlib's orders of smoothness, $\omega$ meaning analytic), if
+$\varphi$ is of class $C^n$, then so is this function. For every Lipschitz graph domain
+$\Omega = \{x : \psi(x) < \langle x, e \rangle\}$ with graph function $\psi$ and constant $M$, and
+every $z \in V$, the function $\psi_z(y) = \psi(z + y) - \langle z, e \rangle$ on $H = e^\perp$ is
+$M$-Lipschitz and
 \[
   \Omega = \{x \in V : \psi_z(P_e(x - z)) < \langle e, x - z \rangle\} ,
 \]
-with $P_e$ the orthogonal projection onto $H$.
+with $P_e$ the orthogonal projection onto $H$; for every $n \in \N \cup \{\infty, \omega\}$, if
+$\psi$ is of class $C^n$, then so is $\psi_z$.
 \end{lemma}
 
 \begin{proof}
@@ -1552,18 +1557,23 @@ constancy along $\nu$, and $\|P_\nu y\| \leq \|y\|$ the Lipschitz bound; the dom
 $\langle z, \nu \rangle + \varphi(P_\nu(x - z)) < \langle x, \nu \rangle$, which is the stated
 inequality. For the second statement,
 $z + P_e(x - z) = x - \langle x - z, e \rangle e$, so $\psi(z + P_e(x - z)) = \psi(x)$ since
-$\psi$ is constant along $e$.
+$\psi$ is constant along $e$. Both functions are compositions of $\varphi$ or $\psi$ with affine
+maps, so they keep the class $C^n$.
 \end{proof}
 
 \begin{theorem}[Lipschitz near a point by graph domains]
 \label{thm:lipschitz-near-point}
 \lean{Rd.isLipschitzDomainAt_of_ball_inter_eq, Rd.IsLipschitzDomainAt.exists_ball_inter_eq,
   Rd.isLipschitzDomainAt_iff, Rd.IsLipschitzDomainAt.congr_ball,
-  Rd.isLipschitzDomainAt_of_lipschitzOnWith}
+  Rd.localGraph_inter_ball_eq_of_eqOn, Rd.isLipschitzDomainAt_of_lipschitzOnWith}
 \leanok
 \uses{def:lipschitz-near-point, lem:local-graph-domain}
-For every $\Omega \subseteq V$ and every $z \in V$, $\Omega$ is Lipschitz near $z$ if and only if
-there are $r > 0$ and a Lipschitz graph domain $\Omega'$ with
+For every $z \in V$, every $\nu \in V$, every $\rho \in \R$ and all
+$\varphi, \psi : \nu^\perp \to \R$ that agree on $\{y \in \nu^\perp : \|y\| < \rho\}$, the sets
+$\{x : \varphi(P_\nu(x - z)) < \langle \nu, x - z \rangle\}$ and
+$\{x : \psi(P_\nu(x - z)) < \langle \nu, x - z \rangle\}$ have the same intersection with
+$B(z, \rho)$. For every $\Omega \subseteq V$ and every $z \in V$, $\Omega$ is Lipschitz near $z$
+if and only if there are $r > 0$ and a Lipschitz graph domain $\Omega'$ with
 $B(z, r) \cap \Omega = B(z, r) \cap \Omega'$. For all $\Omega, \Omega' \subseteq V$, every
 $z \in V$ and every $\rho > 0$ with $B(z, \rho) \cap \Omega = B(z, \rho) \cap \Omega'$, if
 $\Omega'$ is Lipschitz near $z$, then so is $\Omega$. For every $\Omega \subseteq V$, every
@@ -1576,12 +1586,13 @@ set $\Omega$ is Lipschitz near $z$.
 
 \begin{proof}
 \leanok
-Both directions of the equivalence are \Cref{lem:local-graph-domain}. For the second statement,
+The first statement holds since $\|P_\nu(x - z)\| \leq \|x - z\| < \rho$ for $x \in B(z, \rho)$.
+Both directions of the equivalence are \Cref{lem:local-graph-domain}. For the third statement,
 shrink the radius $r$ of a ball on which $\Omega'$ agrees with a Lipschitz graph domain to
-$\min(r, \rho)$. For the third statement, McShane's extension (Mathlib's
+$\min(r, \rho)$. For the last statement, McShane's extension (Mathlib's
 \texttt{LipschitzOnWith.\allowbreak extend\_\allowbreak real}) gives an $L$-Lipschitz
-$\psi : \nu^\perp \to \R$ equal to $\varphi$ on the ball of radius $r$, and
-$\|P_\nu(x - z)\| \leq \|x - z\| < r$ for $x \in B(z, r)$.
+$\psi : \nu^\perp \to \R$ equal to $\varphi$ on the ball of radius $r$, and the first statement
+applies.
 \end{proof}
 
 So the condition can be checked with a function that is Lipschitz only on the part of the
@@ -1589,32 +1600,39 @@ hyperplane that the ball sees.
 
 \begin{theorem}[Bounded Lipschitz sets and bounded Lipschitz domains]
 \label{thm:bounded-lipschitz-sets}
-\lean{Rd.IsBoundedLipschitzDomain.exists_chart, Rd.IsBoundedLipschitzDomain.chart,
+\lean{Rd.exists_finset_cover_frontier, Rd.frontierCenters, Rd.frontier_subset_frontierCenters,
+  Rd.frontierCenterAt, Rd.BoundedLipschitzDomain.ofCharts,
+  Rd.BoundedLipschitzDomain.carrier_ofCharts, Rd.BoundedLipschitzDomain.exists_graph_ofCharts_eq,
+  Rd.IsBoundedLipschitzDomain.exists_chart, Rd.IsBoundedLipschitzDomain.chart,
   Rd.IsBoundedLipschitzDomain.chart_fst_pos, Rd.IsBoundedLipschitzDomain.ball_inter_chart,
-  Rd.IsBoundedLipschitzDomain.exists_finset_cover, Rd.IsBoundedLipschitzDomain.centers,
-  Rd.IsBoundedLipschitzDomain.frontier_subset_centers, Rd.IsBoundedLipschitzDomain.centerAt,
   Rd.BoundedLipschitzDomain.ofIsBoundedLipschitzDomain,
   Rd.BoundedLipschitzDomain.carrier_ofIsBoundedLipschitzDomain,
+  Rd.BoundedLipschitzDomain.exists_ball_inter_eq_graph,
   Rd.BoundedLipschitzDomain.isLipschitzDomainAt,
   Rd.BoundedLipschitzDomain.isBoundedLipschitzDomain, Rd.isBoundedLipschitzDomain_iff_exists}
 \leanok
 \uses{def:bounded-lipschitz, thm:lipschitz-near-point}
-For every bounded Lipschitz domain $\Omega$ and every $z \in \partial\Omega$, $\Omega$ is
-Lipschitz near $z$; in particular $\Omega$ is a bounded Lipschitz set. If $V$ is
-finite-dimensional, then for every $\Omega \subseteq V$, $\Omega$ is a bounded Lipschitz set if and
-only if it is the carrier of a bounded Lipschitz domain.
+For every bounded Lipschitz domain $\Omega$ with balls $B_j$ and graph domains $\Omega_j$ and every
+$z \in \partial\Omega$, there are $j$ and $\rho > 0$ with
+$B(z, \rho) \cap \Omega = B(z, \rho) \cap \Omega_j$; in particular $\Omega$ is Lipschitz near $z$,
+and $\Omega$ is a bounded Lipschitz set. Let $V$ be finite-dimensional. For every bounded open
+$\Omega \subseteq V$, every family of radii $r_z > 0$ and every family of Lipschitz graph domains
+$\Omega'_z$, $z \in \partial\Omega$, with $B(z, r_z) \cap \Omega = B(z, r_z) \cap \Omega'_z$ for
+every $z \in \partial\Omega$, there is a bounded Lipschitz domain with carrier $\Omega$ whose
+graph domains are among the $\Omega'_z$. For every $\Omega \subseteq V$, $\Omega$ is a bounded
+Lipschitz set if and only if it is the carrier of a bounded Lipschitz domain.
 \end{theorem}
 
 \begin{proof}
 \leanok
 Let $\Omega$ be a bounded Lipschitz domain and $z \in \partial\Omega$. Then $z \in B(c_j, \rho_j)$
 for some $j$, the ball $B(z, \rho_j - \|z - c_j\|)$ lies in $B(c_j, \rho_j)$, and on it $\Omega$
-agrees with $\Omega_j$; \Cref{thm:lipschitz-near-point} applies. Conversely, let $\Omega$ be a
-bounded Lipschitz set. \Cref{thm:lipschitz-near-point} gives for each $z \in \partial\Omega$ a
-ball $B(z, r_z)$ and a Lipschitz graph domain that agrees with $\Omega$ on it. In finite dimension
-the boundary of the bounded set $\Omega$ is compact, so finitely many of these balls cover it
-(Mathlib's \texttt{IsCompact.\allowbreak elim\_\allowbreak finite\_\allowbreak subcover}); their
-centres, radii and graph domains form a bounded Lipschitz domain with carrier $\Omega$.
+agrees with $\Omega_j$; \Cref{thm:lipschitz-near-point} applies. For a family of charts, the
+boundary of the bounded set $\Omega$ is compact in finite dimension, so finitely many of the balls
+$B(z, r_z)$ cover it (Mathlib's \texttt{IsCompact.\allowbreak elim\_\allowbreak
+finite\_\allowbreak subcover}); their centres, radii and graph domains form a bounded Lipschitz
+domain with carrier $\Omega$. For a bounded Lipschitz set $\Omega$,
+\Cref{thm:lipschitz-near-point} gives such a family of charts.
 \end{proof}
 
 \begin{definition}[The sphere profile]
@@ -1655,6 +1673,7 @@ norm. The bound for the square roots is the argument of the Lean project
 \begin{theorem}[The ball]
 \label{thm:ball-lipschitz}
 \lean{Rd.mem_ball_iff_sphereProfile_lt, Rd.isLipschitzDomainAt_ball,
+  Rd.norm_inv_smul_sub_eq_one, Rd.inter_ball_eq_sphereProfile,
   Rd.isBoundedLipschitzDomain_ball, Rd.BoundedLipschitzDomain.ball,
   Rd.BoundedLipschitzDomain.carrier_ball}
 \leanok
@@ -1665,8 +1684,13 @@ Let $c \in V$.
   \item For every $R > 0$, every unit vector $\nu \in V$ and all $z, x \in V$ with $c - z = R \nu$
     and $\|x - z\| < R/2$, $x \in B(c, R)$ if and only if
     $g_R(\|P_\nu(x - z)\|) < \langle \nu, x - z \rangle$.
-  \item For every $R > 0$ and every $z \in V$ with $\|z - c\| = R$, the ball $B(c, R)$ is
-    Lipschitz near $z$.
+  \item For every $R > 0$ and every $z \in V$ with $\|z - c\| = R$, the vector
+    $\nu = (c - z)/R$ is a unit vector,
+    \[
+      B(c, R) \cap B(z, R/2)
+      = \{x : g_R(\|P_\nu(x - z)\|) < \langle \nu, x - z \rangle\} \cap B(z, R/2) ,
+    \]
+    and the ball $B(c, R)$ is Lipschitz near $z$.
   \item For every $R \in \R$, the ball $B(c, R)$ is a bounded Lipschitz set; if $V$ is
     finite-dimensional, it is the carrier of a bounded Lipschitz domain.
 \end{enumerate}
@@ -1679,10 +1703,10 @@ $\|x - z\|^2 = \|p\|^2 + t^2$ and $\|x - c\|^2 = \|x - z - R\nu\|^2 = \|p\|^2 + 
 $\|x - z\| < R/2$, $\|p\| < R/2$ and $t < R/2$, so $g_R(\|p\|) = R - \sqrt{R^2 - \|p\|^2}$ and
 $R - t > 0$; then $\|x - c\| < R$ if and only if $(R - t)^2 < R^2 - \|p\|^2$, that is
 $R - t < \sqrt{R^2 - \|p\|^2}$. For $z$ on the sphere take radius $R/2$, $\nu = (c - z)/R$, so
-that $c - z = R\nu$, and $\varphi(y) = g_R(\|y\|)$, which is $1$-Lipschitz by
-\Cref{lem:sphere-profile}; the first statement gives the condition of
-\Cref{def:lipschitz-near-point}. For $R > 0$ the boundary of the ball lies in the sphere
-$\|z - c\| = R$; for $R \leq 0$ the ball is empty. The last statement is
+that $c - z = R\nu$ and $\|\nu\| = \|z - c\|/R = 1$, and $\varphi(y) = g_R(\|y\|)$, which is
+$1$-Lipschitz by \Cref{lem:sphere-profile}; the first statement gives the set identity and the
+condition of \Cref{def:lipschitz-near-point}. For $R > 0$ the boundary of the ball lies in the
+sphere $\|z - c\| = R$; for $R \leq 0$ the ball is empty. The last statement is
 \Cref{thm:bounded-lipschitz-sets}.
 \end{proof}
 
@@ -6504,6 +6528,9 @@ closure of a graph domain is $\{x : \varphi(x) \leq \langle x, e \rangle\}$, and
 that agree on an open set $B$ agree on $B$.
 \end{definition}
 
+The carriers of smooth bounded domains are exactly the bounded sets with smooth local graphs
+(\Cref{sec:smooth-local-graphs}).
+
 \begin{definition}[Straighteners and their charts]
 \label{def:straightener}
 \lean{Rd.SmoothDomain.Straightener, Rd.SmoothDomain.Straightener.tau_mem_closure,
@@ -6849,3 +6876,159 @@ $f = \sum_k \theta_k \cdot (E G_k) \circ \kappa_k \in \Besov{s+1/p}{p}{q}(M)$
 The closure of a smooth bounded domain is a compact manifold with boundary
 (\Cref{thm:smooth-domain-manifold}), so this is the trace theorem on its boundary for every
 $s > 0$, in charts.
+
+\section{Smooth bounded domains from local graphs}
+\label{sec:smooth-local-graphs}
+
+The smooth bounded domains of \Cref{def:smooth-domain} carry their balls and graph functions as
+data. This section starts from the usual definition by smooth local graphs and shows that it
+describes exactly their carriers; the open balls are examples. In this section $V$ is a real
+inner product space, and for a unit vector $\nu \in V$, $P_\nu$ is the orthogonal projection onto
+the hyperplane $\nu^\perp$, as in \Cref{sec:local-lipschitz-graphs}.
+
+\begin{definition}[Sets that are smooth near a point]
+\label{def:smooth-near-point}
+\lean{Rd.IsSmoothDomainAt, Rd.IsBoundedSmoothDomain}
+\leanok
+\uses{def:lipschitz-near-point}
+Let $\Omega \subseteq V$ and $z \in V$. The set $\Omega$ is smooth near $z$ if there are $r > 0$,
+a unit vector $\nu \in V$ and a function $\varphi : \nu^\perp \to \R$ that is smooth on
+$\{y \in \nu^\perp : \|y\| < r\}$ with
+\[
+  \Omega \cap B(z, r)
+  = \{x \in V : \varphi(P_\nu(x - z)) < \langle \nu, x - z \rangle\} \cap B(z, r) .
+\]
+The set $\Omega$ is a bounded smooth set if it is open and bounded and smooth near every
+$z \in \partial\Omega$.
+\end{definition}
+
+This is the local condition of \cite[Definition 1.2.1.1]{Grisvard} with $\varphi$ of class
+$C^\infty$, written as in \Cref{def:lipschitz-near-point}. The function $\varphi$ is asked to be
+smooth only on the part of the hyperplane that the ball sees; a smooth cut-off turns it into a
+smooth Lipschitz function on the whole hyperplane.
+
+\begin{lemma}[The smooth cut-off]
+\label{lem:smooth-cutoff}
+\lean{Rd.contDiff_mul_of_tsupport_subset, Rd.exists_contDiff_lipschitzWith_eqOn_ball}
+\leanok
+Let $E$ be a real normed space. For every $n \in \N \cup \{\infty, \omega\}$, every
+$b : E \to \R$ of class $C^n$, every open $U \subseteq E$ with
+$\operatorname{tsupport} b \subseteq U$ and every $\varphi : E \to \R$ of class $C^n$ on $U$, the
+product $b \varphi$ is of class $C^n$ on $E$. If $E$ is a finite-dimensional real inner product
+space, then for every $r > 0$ and every $\varphi : E \to \R$ that is smooth on $B(0, r)$ there are
+$L \geq 0$ and a smooth $L$-Lipschitz $\psi : E \to \R$ with $\psi = \varphi$ on $B(0, r/4)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Near a point of $\operatorname{tsupport} b$ both factors are of class $C^n$; near any other point
+the product vanishes. This is the flat analogue of Mathlib's
+\texttt{ContMDiffOn.\allowbreak smul\_\allowbreak section\_\allowbreak of\_\allowbreak tsupport}.
+For the second statement take a smooth bump $b$ equal to $1$ on
+$\bar B(0, r/4)$ with $\operatorname{tsupport} b = \bar B(0, r/2) \subseteq B(0, r)$ (Mathlib's
+\texttt{ContDiffBump}) and $\psi = b \varphi$. It is smooth with compact support, hence Lipschitz
+(Mathlib's \texttt{ContDiff.\allowbreak lipschitzWith\_\allowbreak of\_\allowbreak
+hasCompactSupport}).
+\end{proof}
+
+\begin{theorem}[Smooth near a point by smooth graph domains]
+\label{thm:smooth-near-point}
+\lean{Rd.IsSmoothDomainAt.exists_ball_inter_eq, Rd.isSmoothDomainAt_of_ball_inter_eq,
+  Rd.isSmoothDomainAt_iff, Rd.IsSmoothDomainAt.isLipschitzDomainAt,
+  Rd.IsBoundedSmoothDomain.isBoundedLipschitzDomain}
+\leanok
+\uses{def:smooth-near-point, lem:smooth-cutoff, lem:local-graph-domain, thm:lipschitz-near-point}
+For every $\Omega \subseteq V$, every $z \in V$, every $r > 0$ and every Lipschitz graph domain
+$\Omega'$ with smooth graph function and $B(z, r) \cap \Omega = B(z, r) \cap \Omega'$, the set
+$\Omega$ is smooth near $z$. For every $\Omega \subseteq V$ and every $z \in V$, if $\Omega$ is
+smooth near $z$, then $\Omega$ is Lipschitz near $z$; every bounded smooth set is a bounded
+Lipschitz set. Let $V$ be finite-dimensional. For every $\Omega \subseteq V$ and every $z \in V$,
+$\Omega$ is smooth near $z$ if and only if there are $r > 0$ and a Lipschitz graph domain
+$\Omega'$ with smooth graph function and $B(z, r) \cap \Omega = B(z, r) \cap \Omega'$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For the first statement, the graph function seen from $z$ (\Cref{lem:local-graph-domain}) is
+smooth on the whole hyperplane. For the second, let $\varphi$ be smooth on the ball of radius $r$
+of $\nu^\perp$. It is of class $C^1$ at $0$, hence $K$-Lipschitz on a ball of some radius
+$\varepsilon > 0$ (Mathlib's \texttt{ContDiffAt.\allowbreak exists\_\allowbreak lipschitzOnWith}),
+and the last statement of \Cref{thm:lipschitz-near-point} applies with the radius
+$\min(\varepsilon, r)$; the statement on bounded sets follows pointwise. For the equivalence,
+\Cref{lem:smooth-cutoff} gives a smooth Lipschitz $\psi$ equal to $\varphi$ on the ball of radius
+$r/4$, so $\Omega$ agrees on $B(z, r/4)$ with the region above the graph of $\psi$
+(\Cref{thm:lipschitz-near-point}), the Lipschitz graph domain of the local graph $\psi$
+(\Cref{lem:local-graph-domain}), whose graph function is smooth by the same lemma.
+\end{proof}
+
+\begin{theorem}[Bounded smooth sets and smooth bounded domains]
+\label{thm:bounded-smooth-sets}
+\lean{Rd.IsBoundedSmoothDomain.exists_chart, Rd.IsBoundedSmoothDomain.chart,
+  Rd.IsBoundedSmoothDomain.chart_fst_pos, Rd.IsBoundedSmoothDomain.contDiff_chart_phi,
+  Rd.IsBoundedSmoothDomain.ball_inter_chart, Rd.SmoothDomain.ofIsBoundedSmoothDomain,
+  Rd.SmoothDomain.carrier_ofIsBoundedSmoothDomain, Rd.SmoothDomain.isBoundedSmoothDomain,
+  Rd.isBoundedSmoothDomain_iff_exists}
+\leanok
+\uses{def:smooth-domain, thm:smooth-near-point, thm:bounded-lipschitz-sets}
+For every $n \geq 1$ and every $\Omega \subseteq \R^n$, $\Omega$ is a bounded smooth set if and
+only if it is the carrier of a smooth bounded domain.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $\Omega$ be a bounded smooth set. \Cref{thm:smooth-near-point} gives for each
+$z \in \partial\Omega$ a ball $B(z, r_z)$ and a Lipschitz graph domain with smooth graph function
+that agrees with $\Omega$ on it. By \Cref{thm:bounded-lipschitz-sets} these charts give a bounded
+Lipschitz domain with carrier $\Omega$ whose graph domains are among them, so its graph functions
+are smooth. Conversely, near each boundary point a smooth bounded domain agrees with one of its
+graph domains (\Cref{thm:bounded-lipschitz-sets}), whose graph function is smooth;
+\Cref{thm:smooth-near-point} applies.
+\end{proof}
+
+\begin{theorem}[The ball as a smooth domain]
+\label{thm:smooth-ball}
+\lean{Rd.contDiffOn_sphereProfile_norm, Rd.isSmoothDomainAt_ball, Rd.isBoundedSmoothDomain_ball,
+  Rd.SmoothDomain.ball, Rd.SmoothDomain.carrier_ball}
+\leanok
+\uses{def:sphere-profile, thm:ball-lipschitz, def:smooth-near-point, thm:bounded-smooth-sets}
+For every real inner product space $E$ and every $R > 0$, the function $y \mapsto g_R(\|y\|)$ is
+smooth on $B(0, R/2) \subseteq E$. Let $c \in V$.
+\begin{enumerate}
+  \item For every $R > 0$ and every $z \in V$ with $\|z - c\| = R$, the ball $B(c, R)$ is smooth
+    near $z$.
+  \item For every $R \in \R$, the ball $B(c, R)$ is a bounded smooth set; if $V = \R^n$ with
+    $n \geq 1$, it is the carrier of a smooth bounded domain.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $\|y\| < R/2$, $g_R(\|y\|) = R - \sqrt{R^2 - \|y\|^2}$ with $R^2 - \|y\|^2 > 0$; the function
+$y \mapsto \|y\|^2$ is smooth (Mathlib's \texttt{contDiff\_\allowbreak norm\_\allowbreak sq}), and
+so is the square root away from $0$. For $z$ on the sphere take radius $R/2$ and
+$\nu = (c - z)/R$; \Cref{thm:ball-lipschitz} gives the set identity of
+\Cref{def:smooth-near-point} with $\varphi(y) = g_R(\|y\|)$. For $R > 0$ the boundary of the ball
+lies in the sphere $\|z - c\| = R$; for $R \leq 0$ the ball is empty. The last statement is
+\Cref{thm:bounded-smooth-sets}.
+\end{proof}
+
+So the closure of every open ball of $\R^n$ is a compact manifold with boundary
+(\Cref{thm:smooth-domain-manifold}), and the results of this chapter apply to it; for example its
+Besov spaces by charts are the intrinsic ones.
+
+\begin{corollary}[The Besov spaces of the closed ball]
+\label{cor:ball-besov}
+\lean{Rd.SmoothDomain.memBesov_ball_iff}
+\leanok
+\uses{thm:smooth-ball, thm:smooth-domain-besov}
+For every $n \geq 1$, every $c \in \R^n$, every $R \in \R$, every $1 \leq p < \infty$, all
+$0 < s < r$, every $1 \leq q \leq \infty$ and every $f \in L_p(M)$, where $M$ is the closure of
+$B(c, R)$, $f$ lies in the Besov space $\Besov{s}{p}{q}(M)$ of the compact manifold $M$ with the
+Lebesgue measure if and only if
+$\|f\|_{L_p(B(c, R))} + \|(2^{ks} \omega_r(f, 2^{-k}, B(c, R))_p)_k\|_{\ell_q} < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:smooth-domain-besov} for the smooth bounded domain of \Cref{thm:smooth-ball}.
+\end{proof}

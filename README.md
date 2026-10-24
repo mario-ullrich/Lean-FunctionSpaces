@@ -453,8 +453,11 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   everywhere with those of the trace `Tr_A f` of some `f ∈ B^{s+1/p}_{p,q}(M)`
   (`Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace`). For the closure of a smooth
   bounded domain this is the trace theorem on its boundary for every `s > 0` (`Rd.SmoothDomain`,
-  a bounded Lipschitz domain with smooth graph functions as data, with no constructor from the
-  set-level definition and no concrete instance yet).
+  a bounded Lipschitz domain with smooth graph functions as data). Every bounded open set that
+  agrees near each boundary point with the region above a smooth graph
+  (`Rd.IsBoundedSmoothDomain`) is the carrier of such a domain, and conversely
+  (`Rd.SmoothDomain.ofIsBoundedSmoothDomain`, `Rd.isBoundedSmoothDomain_iff_exists`); every open
+  ball is one (`Rd.SmoothDomain.ball`).
 
 ## What is formalised
 
@@ -501,8 +504,6 @@ that library builds itself.
 
 ## What is left to do
 
-* **Smooth domains**: the ball, and bounded open sets with smooth local graphs, as smooth domains
-  (`Rd.SmoothDomain`).
 * **Interpolation**: the interpolation property of the K-method (an operator bounded on
   both spaces of a couple is bounded on its interpolation spaces) and reiteration.
 * **Traces and extensions**: the norm equivalence `H^{1/2}(Γ) ≅ B^{1/2}_{2,2}(Γ)`, a bounded

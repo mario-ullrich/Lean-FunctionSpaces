@@ -22,12 +22,16 @@ and Lipschitz near each point of its frontier.
   `Rd.LipschitzGraph.domain_ofLocal`), and every Lipschitz graph domain is a local graph around
   every point (`Rd.LipschitzGraph.domain_eq_localPhi`), so being Lipschitz near `z` means agreeing
   with a Lipschitz graph domain on a ball around `z` (`Rd.isLipschitzDomainAt_iff`); this depends
-  only on the set near `z` (`Rd.IsLipschitzDomainAt.congr_ball`). A function
+  only on the set near `z` (`Rd.IsLipschitzDomainAt.congr_ball`). Both constructions keep the
+  graph functions `C^n` (`Rd.LipschitzGraph.contDiff_phi_ofLocal`,
+  `Rd.LipschitzGraph.contDiff_localPhi`). A function
   that is Lipschitz only on the ball of radius `r` of `ν^⊥` suffices, by McShane's extension
   (`Rd.isLipschitzDomainAt_of_lipschitzOnWith`).
-* In finite dimension, compactness of the frontier gives finitely many such balls, and these
-  charts form a `Rd.BoundedLipschitzDomain` with carrier `Ω`
-  (`Rd.BoundedLipschitzDomain.ofIsBoundedLipschitzDomain`); conversely the carrier of every
+* In finite dimension, compactness of the frontier gives finitely many balls out of any family
+  of charts at the frontier points, and these charts form a `Rd.BoundedLipschitzDomain` with
+  carrier `Ω` (`Rd.BoundedLipschitzDomain.ofCharts`, whose graph domains belong to the family);
+  for the chosen charts of a bounded Lipschitz set this is
+  `Rd.BoundedLipschitzDomain.ofIsBoundedLipschitzDomain`. Conversely the carrier of every
   `Rd.BoundedLipschitzDomain` is a bounded Lipschitz set
   (`Rd.BoundedLipschitzDomain.isBoundedLipschitzDomain`, `Rd.isBoundedLipschitzDomain_iff_exists`).
 * Every open ball `B(c, R)` is a bounded Lipschitz set (`Rd.isBoundedLipschitzDomain_ball`): near
@@ -128,6 +132,15 @@ theorem domain_ofLocal (z ν : V) (hν : ‖ν‖ = 1) {L : ℝ≥0} (φ : (ℝ 
   rw [Set.mem_ofPred_eq, inner_sub_right, real_inner_comm ν x, real_inner_comm ν z]
   constructor <;> intro h <;> linarith
 
+/-- **A smooth local graph has a smooth graph function**: if `φ` is `C^n` on `ν^⊥`, then so is
+the graph function `x ↦ ⟪z, ν⟫ + φ(P(x - z))` of `Rd.LipschitzGraph.ofLocal`, since the orthogonal
+projection `P` is continuous linear. -/
+theorem contDiff_phi_ofLocal (z ν : V) (hν : ‖ν‖ = 1) {L : ℝ≥0} {φ : (ℝ ∙ ν)ᗮ → ℝ}
+    (hφ : LipschitzWith L φ) {n : WithTop ℕ∞} (hφn : ContDiff ℝ n φ) :
+    ContDiff ℝ n (ofLocal z ν hν φ hφ).phi :=
+  contDiff_const.add (hφn.comp ((ℝ ∙ ν)ᗮ.orthogonalProjectionOnto.contDiff.comp
+    (contDiff_id.sub contDiff_const)))
+
 variable (G : LipschitzGraph V)
 
 /-- The graph function of a Lipschitz graph domain seen from the point `z`:
@@ -141,6 +154,12 @@ theorem lipschitzWith_localPhi (z : V) : LipschitzWith ⟨G.M, G.M_nonneg⟩ (G.
       dist_eq_norm]
     have h := G.lipschitz (z + y) (z + y')
     rwa [add_sub_add_left_eq_sub] at h
+
+/-- If the graph function `φ` is `C^n`, then so is the graph function seen from `z`,
+`y ↦ φ(z + y) - ⟪z, e⟫`. -/
+theorem contDiff_localPhi (z : V) {n : WithTop ℕ∞} (hG : ContDiff ℝ n G.phi) :
+    ContDiff ℝ n (G.localPhi z) :=
+  (hG.comp (contDiff_const.add G.hyperplane.subtypeL.contDiff)).sub contDiff_const
 
 /-- **Every Lipschitz graph domain is a local graph around every point**:
 `Ω = {x : φ_z(P(x - z)) < ⟪e, x - z⟫}`, since `φ(x) = φ(z + P(x - z))` by the constancy of `φ`
@@ -198,32 +217,117 @@ theorem IsLipschitzDomainAt.congr_ball {Ω Ω' : Set V} {z : V} {ρ : ℝ} (hρ 
     _ = ball z (min r ρ) ∩ (ball z r ∩ Ω') := by rw [h, ← inter_assoc, h1, ← inter_assoc, h2]
     _ = ball z (min r ρ) ∩ G.domain := by rw [hG, ← inter_assoc, h2]
 
+/-- **A local graph depends only on its function near the origin**: if `φ = ψ` on the ball of
+radius `ρ` of `ν^⊥`, then the regions above the graphs of `φ` and `ψ` agree on `B(z, ρ)`, since
+`‖P(x - z)‖ ≤ ‖x - z‖ < ρ` there (Mathlib's `Submodule.norm_orthogonalProjectionOnto_apply_le`). -/
+theorem localGraph_inter_ball_eq_of_eqOn {z ν : V} {ρ : ℝ} {φ ψ : (ℝ ∙ ν)ᗮ → ℝ}
+    (h : EqOn φ ψ (ball 0 ρ)) :
+    {x | φ ((ℝ ∙ ν)ᗮ.orthogonalProjectionOnto (x - z)) < inner ℝ ν (x - z)} ∩ ball z ρ =
+      {x | ψ ((ℝ ∙ ν)ᗮ.orthogonalProjectionOnto (x - z)) < inner ℝ ν (x - z)} ∩ ball z ρ := by
+  ext x
+  refine ⟨fun ⟨hx, hxb⟩ => ⟨?_, hxb⟩, fun ⟨hx, hxb⟩ => ⟨?_, hxb⟩⟩
+  all_goals
+    have hP : (ℝ ∙ ν)ᗮ.orthogonalProjectionOnto (x - z) ∈ ball (0 : (ℝ ∙ ν)ᗮ) ρ := by
+      rw [mem_ball_zero_iff]
+      exact (Submodule.norm_orthogonalProjectionOnto_apply_le _ _).trans_lt
+        (by rwa [← dist_eq_norm, ← mem_ball])
+  · show ψ _ < _
+    rw [← h hP]
+    exact hx
+  · show φ _ < _
+    rw [h hP]
+    exact hx
+
 /-- **A local graph that is Lipschitz only near the origin suffices**: if `φ` is `L`-Lipschitz on
 the ball of radius `r` of `ν^⊥` (the image of `B(z, r)` under `x ↦ P(x - z)`) and
 `Ω ∩ B(z, r) = {x : φ(P(x - z)) < ⟪ν, x - z⟫} ∩ B(z, r)`, then `Ω` is Lipschitz near `z`: McShane's
 extension (Mathlib's `LipschitzOnWith.extend_real`) gives an `L`-Lipschitz function on `ν^⊥` that
-agrees with `φ` on that ball. -/
+agrees with `φ` on that ball (`Rd.localGraph_inter_ball_eq_of_eqOn`). -/
 theorem isLipschitzDomainAt_of_lipschitzOnWith {Ω : Set V} {z ν : V} {r : ℝ} (hr : 0 < r)
     (hν : ‖ν‖ = 1) {L : ℝ≥0} {φ : (ℝ ∙ ν)ᗮ → ℝ} (hφ : LipschitzOnWith L φ (ball 0 r))
     (hΩ : Ω ∩ ball z r =
       {x | φ ((ℝ ∙ ν)ᗮ.orthogonalProjectionOnto (x - z)) < inner ℝ ν (x - z)} ∩ ball z r) :
     IsLipschitzDomainAt Ω z := by
   obtain ⟨ψ, hψ, heq⟩ := hφ.extend_real
-  refine ⟨r, hr, ν, hν, L, ψ, hψ, ?_⟩
-  rw [hΩ]
-  ext x
-  refine ⟨fun ⟨hx, hxb⟩ => ⟨?_, hxb⟩, fun ⟨hx, hxb⟩ => ⟨?_, hxb⟩⟩
-  all_goals
-    have hP : (ℝ ∙ ν)ᗮ.orthogonalProjectionOnto (x - z) ∈ ball (0 : (ℝ ∙ ν)ᗮ) r := by
-      rw [mem_ball_zero_iff]
-      exact (Submodule.norm_orthogonalProjectionOnto_apply_le _ _).trans_lt
-        (by rwa [← dist_eq_norm, ← mem_ball])
-  · show ψ _ < _
-    rw [← heq hP]
-    exact hx
-  · show φ _ < _
-    rw [heq hP]
-    exact hx
+  exact ⟨r, hr, ν, hν, L, ψ, hψ, by rw [hΩ, localGraph_inter_ball_eq_of_eqOn heq]⟩
+
+/-! ### The constructor from a family of charts -/
+
+section Charts
+
+variable [FiniteDimensional ℝ V] {Ω : Set V}
+
+/-- **Finitely many chart balls cover the frontier**: for a bounded set `Ω` and radii `r(z) > 0` at
+its frontier points, finitely many of the balls `B(z, r(z))` cover the frontier, which is compact
+in finite dimension (`Rd.isCompact_frontier_of_isBounded`, `IsCompact.elim_finite_subcover`). -/
+theorem exists_finset_cover_frontier (hb : Bornology.IsBounded Ω) (r : frontier Ω → ℝ)
+    (hr : ∀ z, 0 < r z) : ∃ t : Finset (frontier Ω), frontier Ω ⊆ ⋃ z ∈ t, ball (z : V) (r z) :=
+  (isCompact_frontier_of_isBounded hb).elim_finite_subcover
+    (fun z : frontier Ω => ball (z : V) (r z)) (fun _ => isOpen_ball)
+    fun x hx => mem_iUnion.2 ⟨⟨x, hx⟩, mem_ball_self (hr _)⟩
+
+/-- A chosen finite set of frontier points whose balls `B(z, r(z))` cover the frontier
+(`Rd.exists_finset_cover_frontier`). -/
+noncomputable def frontierCenters (hb : Bornology.IsBounded Ω) (r : frontier Ω → ℝ)
+    (hr : ∀ z, 0 < r z) : Finset (frontier Ω) :=
+  Classical.choose (exists_finset_cover_frontier hb r hr)
+
+/-- The balls `B(z, r(z))` of the chosen centres cover the frontier. -/
+theorem frontier_subset_frontierCenters (hb : Bornology.IsBounded Ω) (r : frontier Ω → ℝ)
+    (hr : ∀ z, 0 < r z) : frontier Ω ⊆ ⋃ z ∈ frontierCenters hb r hr, ball (z : V) (r z) :=
+  Classical.choose_spec (exists_finset_cover_frontier hb r hr)
+
+/-- The `j`-th chosen centre, for the numbering `Fin N` of the chosen centres
+(`Finset.equivFin`). -/
+noncomputable def frontierCenterAt (hb : Bornology.IsBounded Ω) (r : frontier Ω → ℝ)
+    (hr : ∀ z, 0 < r z) (j : Fin (frontierCenters hb r hr).card) : frontier Ω :=
+  ((frontierCenters hb r hr).equivFin.symm j : frontier Ω)
+
+/-- **The bounded Lipschitz domain of a family of charts**: let `Ω` be open and bounded, and let
+each frontier point `z` carry a radius `r(z) > 0` and a Lipschitz graph domain `G(z)` that agrees
+with `Ω` on `B(z, r(z))`. The charts at the finitely many chosen centres
+(`Rd.frontierCenters`) form a `Rd.BoundedLipschitzDomain` with carrier `Ω`, and each of its graph
+domains is one of the `G(z)` (`Rd.BoundedLipschitzDomain.exists_graph_ofCharts_eq`). -/
+noncomputable def BoundedLipschitzDomain.ofCharts (ho : IsOpen Ω) (hb : Bornology.IsBounded Ω)
+    (r : frontier Ω → ℝ) (hr : ∀ z, 0 < r z) (G : frontier Ω → LipschitzGraph V)
+    (hG : ∀ z : frontier Ω, ball (z : V) (r z) ∩ Ω = ball (z : V) (r z) ∩ (G z).domain) :
+    BoundedLipschitzDomain V where
+  carrier := Ω
+  isOpen := ho
+  isBounded := hb
+  N := (frontierCenters hb r hr).card
+  center j := (frontierCenterAt hb r hr j : V)
+  radius j := r (frontierCenterAt hb r hr j)
+  radius_pos j := hr _
+  center_mem j := (frontierCenterAt hb r hr j).2
+  graph j := G (frontierCenterAt hb r hr j)
+  frontier_subset x hx := by
+    obtain ⟨z, hz, hxz⟩ := mem_iUnion₂.1 (frontier_subset_frontierCenters hb r hr hx)
+    refine mem_iUnion.2 ⟨(frontierCenters hb r hr).equivFin ⟨z, hz⟩, ?_⟩
+    simp only [frontierCenterAt, Equiv.symm_apply_apply]
+    exact hxz
+  ball_inter j := hG _
+
+/-- The carrier of `Rd.BoundedLipschitzDomain.ofCharts` is `Ω`. -/
+@[simp]
+theorem BoundedLipschitzDomain.carrier_ofCharts (ho : IsOpen Ω) (hb : Bornology.IsBounded Ω)
+    (r : frontier Ω → ℝ) (hr : ∀ z, 0 < r z) (G : frontier Ω → LipschitzGraph V)
+    (hG : ∀ z : frontier Ω, ball (z : V) (r z) ∩ Ω = ball (z : V) (r z) ∩ (G z).domain) :
+    (BoundedLipschitzDomain.ofCharts ho hb r hr G hG).carrier = Ω :=
+  rfl
+
+/-- **The graph domains of `Rd.BoundedLipschitzDomain.ofCharts` come from the family**: each is
+`G(z)` for some frontier point `z`, so every property shared by all `G(z)`, such as smoothness
+of the graph functions, passes to the bounded Lipschitz domain. -/
+theorem BoundedLipschitzDomain.exists_graph_ofCharts_eq (ho : IsOpen Ω)
+    (hb : Bornology.IsBounded Ω) (r : frontier Ω → ℝ) (hr : ∀ z, 0 < r z)
+    (G : frontier Ω → LipschitzGraph V)
+    (hG : ∀ z : frontier Ω, ball (z : V) (r z) ∩ Ω = ball (z : V) (r z) ∩ (G z).domain)
+    (j : Fin (BoundedLipschitzDomain.ofCharts ho hb r hr G hG).N) :
+    ∃ z, (BoundedLipschitzDomain.ofCharts ho hb r hr G hG).graph j = G z :=
+  ⟨_, rfl⟩
+
+end Charts
 
 /-! ### The constructor from the set-level definition -/
 
@@ -251,57 +355,19 @@ theorem ball_inter_chart (h : IsBoundedLipschitzDomain Ω) (z : frontier Ω) :
     ball (z : V) (h.chart z).1 ∩ Ω = ball (z : V) (h.chart z).1 ∩ (h.chart z).2.domain :=
   (Classical.choose_spec (h.exists_chart z)).2
 
-variable [FiniteDimensional ℝ V]
-
-/-- **Finitely many charts cover the frontier**, since the frontier of a bounded set is compact in
-finite dimension (`Rd.isCompact_frontier_of_isBounded`, `IsCompact.elim_finite_subcover`). -/
-theorem exists_finset_cover (h : IsBoundedLipschitzDomain Ω) :
-    ∃ t : Finset (frontier Ω), frontier Ω ⊆ ⋃ z ∈ t, ball (z : V) (h.chart z).1 := by
-  refine (isCompact_frontier_of_isBounded h.2.1).elim_finite_subcover
-    (fun z : frontier Ω => ball (z : V) (h.chart z).1)
-    (fun _ => isOpen_ball) fun x hx => mem_iUnion.2 ⟨⟨x, hx⟩, mem_ball_self (h.chart_fst_pos _)⟩
-
-/-- The chosen finite set of frontier points whose chart balls cover the frontier. -/
-noncomputable def centers (h : IsBoundedLipschitzDomain Ω) : Finset (frontier Ω) :=
-  Classical.choose h.exists_finset_cover
-
-/-- The chart balls of the chosen centres cover the frontier. -/
-theorem frontier_subset_centers (h : IsBoundedLipschitzDomain Ω) :
-    frontier Ω ⊆ ⋃ z ∈ h.centers, ball (z : V) (h.chart z).1 :=
-  Classical.choose_spec h.exists_finset_cover
-
-/-- The `j`-th chosen centre, for the numbering `Fin N` of the chosen centres
-(`Finset.equivFin`). -/
-noncomputable def centerAt (h : IsBoundedLipschitzDomain Ω) (j : Fin h.centers.card) :
-    frontier Ω :=
-  (h.centers.equivFin.symm j : frontier Ω)
-
 end IsBoundedLipschitzDomain
 
 namespace BoundedLipschitzDomain
 
 variable [FiniteDimensional ℝ V] {Ω : Set V}
 
-/-- **The bounded Lipschitz domain of a bounded Lipschitz set**: the charts at the finitely many
-chosen frontier points (`Rd.IsBoundedLipschitzDomain.centers`) form a `Rd.BoundedLipschitzDomain`
-with carrier `Ω`. -/
+/-- **The bounded Lipschitz domain of a bounded Lipschitz set**: the chosen charts at the frontier
+points (`Rd.IsBoundedLipschitzDomain.chart`) form a family of charts, and
+`Rd.BoundedLipschitzDomain.ofCharts` gives a `Rd.BoundedLipschitzDomain` with carrier `Ω`. -/
 noncomputable def ofIsBoundedLipschitzDomain (h : IsBoundedLipschitzDomain Ω) :
-    BoundedLipschitzDomain V where
-  carrier := Ω
-  isOpen := h.1
-  isBounded := h.2.1
-  N := h.centers.card
-  center j := (h.centerAt j : V)
-  radius j := (h.chart (h.centerAt j)).1
-  radius_pos j := h.chart_fst_pos _
-  center_mem j := (h.centerAt j).2
-  graph j := (h.chart (h.centerAt j)).2
-  frontier_subset x hx := by
-    obtain ⟨z, hz, hxz⟩ := mem_iUnion₂.1 (h.frontier_subset_centers hx)
-    refine mem_iUnion.2 ⟨h.centers.equivFin ⟨z, hz⟩, ?_⟩
-    simp only [IsBoundedLipschitzDomain.centerAt, Equiv.symm_apply_apply]
-    exact hxz
-  ball_inter j := h.ball_inter_chart _
+    BoundedLipschitzDomain V :=
+  ofCharts h.1 h.2.1 (fun z => (h.chart z).1) h.chart_fst_pos (fun z => (h.chart z).2)
+    h.ball_inter_chart
 
 /-- The carrier of `Rd.BoundedLipschitzDomain.ofIsBoundedLipschitzDomain h` is `Ω`. -/
 @[simp]
@@ -310,17 +376,26 @@ theorem carrier_ofIsBoundedLipschitzDomain (h : IsBoundedLipschitzDomain Ω) :
   rfl
 
 omit [FiniteDimensional ℝ V] in
-/-- **A bounded Lipschitz domain is Lipschitz near each frontier point**: a frontier point `z` lies
-in some chart ball `B(c_j, ρ_j)`, the smaller ball `B(z, ρ_j - ‖z - c_j‖)` lies inside it, and
-there the domain is the graph domain `Ω_j`. -/
-theorem isLipschitzDomainAt (D : BoundedLipschitzDomain V) {z : V}
-    (hz : z ∈ frontier D.carrier) : IsLipschitzDomainAt D.carrier z := by
+/-- **A bounded Lipschitz domain is a graph domain near each frontier point**: a frontier point `z`
+lies in some chart ball `B(c_j, ρ_j)`, the smaller ball `B(z, ρ_j - ‖z - c_j‖)` lies inside it,
+and there the domain is the graph domain `Ω_j`. -/
+theorem exists_ball_inter_eq_graph (D : BoundedLipschitzDomain V) {z : V}
+    (hz : z ∈ frontier D.carrier) :
+    ∃ j : Fin D.N, ∃ ρ : ℝ, 0 < ρ ∧ ball z ρ ∩ D.carrier = ball z ρ ∩ (D.graph j).domain := by
   obtain ⟨j, hj⟩ := mem_iUnion.1 (D.frontier_subset hz)
   have hr : 0 < D.radius j - dist z (D.center j) := sub_pos.2 hj
   have hsub : ball z (D.radius j - dist z (D.center j)) ⊆ ball (D.center j) (D.radius j) :=
     ball_subset_ball' (by linarith)
-  refine isLipschitzDomainAt_of_ball_inter_eq hr (D.graph j) ?_
+  refine ⟨j, _, hr, ?_⟩
   rw [← inter_eq_left.2 hsub, inter_assoc, D.ball_inter j, ← inter_assoc]
+
+omit [FiniteDimensional ℝ V] in
+/-- **A bounded Lipschitz domain is Lipschitz near each frontier point**, by
+`Rd.BoundedLipschitzDomain.exists_ball_inter_eq_graph`. -/
+theorem isLipschitzDomainAt (D : BoundedLipschitzDomain V) {z : V}
+    (hz : z ∈ frontier D.carrier) : IsLipschitzDomainAt D.carrier z := by
+  obtain ⟨j, ρ, hρ, h⟩ := D.exists_ball_inter_eq_graph hz
+  exact isLipschitzDomainAt_of_ball_inter_eq hρ (D.graph j) h
 
 omit [FiniteDimensional ℝ V] in
 /-- **The carrier of a bounded Lipschitz domain is a bounded Lipschitz set.** -/
@@ -411,22 +486,36 @@ theorem mem_ball_iff_sphereProfile_lt {R : ℝ} (hR : 0 < R) {ν c z x : V} (hν
     Real.lt_sqrt hRt, ← sq_lt_sq₀ (norm_nonneg _) hR.le]
   constructor <;> intro h <;> nlinarith
 
-/-- **The ball is Lipschitz near each point of its sphere**: at `z` with `‖z - c‖ = R`, with the
-inward normal `ν = (c - z)/R`, radius `R/2` and the `1`-Lipschitz function
-`y ↦ g_R(‖y‖)` (`Rd.mem_ball_iff_sphereProfile_lt`). -/
-theorem isLipschitzDomainAt_ball (c : V) {R : ℝ} (hR : 0 < R) {z : V} (hz : dist z c = R) :
-    IsLipschitzDomainAt (ball c R) z := by
-  set ν : V := R⁻¹ • (c - z) with hν
-  have hνn : ‖ν‖ = 1 := by
-    rw [hν, norm_smul, norm_inv, Real.norm_eq_abs, abs_of_pos hR, ← dist_eq_norm, dist_comm, hz,
-      inv_mul_cancel₀ hR.ne']
-  have hc : c - z = R • ν := by rw [hν, smul_smul, mul_inv_cancel₀ hR.ne', one_smul]
-  refine ⟨R / 2, by positivity, ν, hνn, 1, fun y => sphereProfile R ‖(y : V)‖,
-    (lipschitzWith_sphereProfile_norm (E := (ℝ ∙ ν)ᗮ) hR), ?_⟩
+/-- **The inward unit normal of a sphere**: for `R > 0` and a point `z` with `‖z - c‖ = R`, the
+vector `(c - z)/R` has norm `1`. -/
+theorem norm_inv_smul_sub_eq_one {c z : V} {R : ℝ} (hR : 0 < R) (hz : dist z c = R) :
+    ‖R⁻¹ • (c - z)‖ = 1 := by
+  rw [norm_smul, norm_inv, Real.norm_eq_abs, abs_of_pos hR, ← dist_eq_norm, dist_comm, hz,
+    inv_mul_cancel₀ hR.ne']
+
+/-- **The ball near a point of its sphere, as a set**: for `R > 0` and `‖z - c‖ = R`, with the
+inward normal `ν = (c - z)/R`,
+`B(c, R) ∩ B(z, R/2) = {x : g_R(‖P(x - z)‖) < ⟪ν, x - z⟫} ∩ B(z, R/2)`
+(`Rd.mem_ball_iff_sphereProfile_lt`). -/
+theorem inter_ball_eq_sphereProfile (c : V) {R : ℝ} (hR : 0 < R) {z : V} (hz : dist z c = R) :
+    ball c R ∩ ball z (R / 2) =
+      {x | sphereProfile R ‖((ℝ ∙ R⁻¹ • (c - z))ᗮ.orthogonalProjectionOnto (x - z) : V)‖ <
+        inner ℝ (R⁻¹ • (c - z)) (x - z)} ∩ ball z (R / 2) := by
+  have hνn := norm_inv_smul_sub_eq_one hR hz
+  have hc : c - z = R • (R⁻¹ • (c - z)) := by rw [smul_smul, mul_inv_cancel₀ hR.ne', one_smul]
   ext x
   refine ⟨fun ⟨hx, hxb⟩ => ⟨?_, hxb⟩, fun ⟨hx, hxb⟩ => ⟨?_, hxb⟩⟩
   · exact (mem_ball_iff_sphereProfile_lt hR hνn hc (by rwa [← dist_eq_norm, ← mem_ball])).1 hx
   · exact (mem_ball_iff_sphereProfile_lt hR hνn hc (by rwa [← dist_eq_norm, ← mem_ball])).2 hx
+
+/-- **The ball is Lipschitz near each point of its sphere**: at `z` with `‖z - c‖ = R`, with the
+inward normal `ν = (c - z)/R`, radius `R/2` and the `1`-Lipschitz function
+`y ↦ g_R(‖y‖)` (`Rd.inter_ball_eq_sphereProfile`). -/
+theorem isLipschitzDomainAt_ball (c : V) {R : ℝ} (hR : 0 < R) {z : V} (hz : dist z c = R) :
+    IsLipschitzDomainAt (ball c R) z :=
+  ⟨R / 2, by positivity, R⁻¹ • (c - z), norm_inv_smul_sub_eq_one hR hz, 1,
+    fun y => sphereProfile R ‖(y : V)‖, lipschitzWith_sphereProfile_norm hR,
+    inter_ball_eq_sphereProfile c hR hz⟩
 
 /-- **Every open ball is a bounded Lipschitz set**: for `R > 0` by `Rd.isLipschitzDomainAt_ball`
 at the points of the sphere, which contains the frontier (Mathlib's

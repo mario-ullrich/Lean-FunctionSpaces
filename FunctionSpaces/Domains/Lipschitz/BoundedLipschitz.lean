@@ -193,7 +193,8 @@ replaces the rotations of the usual definition. The structure carries the balls 
 domains as data; in finite dimension every set satisfying the usual definition
 (`Rd.IsBoundedLipschitzDomain`) is the carrier of one
 (`Rd.BoundedLipschitzDomain.ofIsBoundedLipschitzDomain`, `Rd.isBoundedLipschitzDomain_iff_exists`),
-every open ball among them (`Rd.BoundedLipschitzDomain.ball`). -/
+every open ball and every bounded open convex set among them (`Rd.BoundedLipschitzDomain.ball`,
+`Rd.BoundedLipschitzDomain.ofConvex`, from `Rd.isBoundedLipschitzDomain_of_convex`). -/
 structure BoundedLipschitzDomain where
   /-- The domain. -/
   carrier : Set V

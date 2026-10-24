@@ -447,6 +447,12 @@ declarations.
   (`Rd.isBoundedLipschitzDomain_of_convex`, `FunctionSpaces/Domains/Lipschitz/ConvexDomains.lean`)
   are candidates only together with TauCeti's definitions of
   Lipschitz domains (`Set.IsLipschitzDomain`, `Set.IsLipschitzChart`), whose shape they would take.
+* **The smooth cut-off** (`FunctionSpaces/Domains/Manifolds/SmoothLocalGraphs.lean`): the product
+  of a `C^n` function `b` with a function `C^n` on an open set containing its closed support
+  (`tsupport b`) is `C^n` (`Rd.contDiff_mul_of_tsupport_subset`), the flat analogue of Mathlib's
+  `ContMDiffOn.smul_section_of_tsupport`, and a function smooth on the ball `B(0, r)` of a
+  finite-dimensional inner product space agrees on `B(0, r/4)` with a smooth Lipschitz function on
+  the whole space (`Rd.exists_contDiff_lipschitzWith_eqOn_ball`).
 * **Smoothness of parametric integrals**
   (`FunctionSpaces/Domains/Extension/DivergenceKernels.lean`): if `(x, t) ↦ F(x, t)` is smooth on
   `H × ℝ`, `H` finite dimensional, then `x ↦ ∫_a^b F(x, t) dt` is smooth
