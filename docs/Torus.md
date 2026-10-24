@@ -30,6 +30,12 @@ blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. The restricti
   transforms at the lattice points as multipliers (`Torus.econv_mFourier`); this transfers
   Jackson's inequality (`Torus.approxSeq_trigScheme_le`) and Bernstein's inequality
   (`Torus.lpModulus_le_of_mem_trigPolyLp`) from band-limited approximation on `ℝ^d`.
+* **Besov spaces on the torus as interpolation spaces.** With `p` and `ω_r` as above, let
+  `N_{s,q}(f) = ‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q}`, `0 < s₀ < s₁ < r`, `0 < η < 1` and
+  `1 ≤ q₀, q₁, q ≤ ∞`. The real interpolation space `(N_{s₀,q₀}, N_{s₁,q₁})_{η,q}` of the
+  continuous K-method consists of the `f ∈ L_p(𝕋^d)` with `N_{(1-η)s₀+ηs₁,q}(f) < ∞`, and
+  `(‖·‖_p, N_{s₁,q₁})_{η,q}` of the `f` with `N_{ηs₁,q}(f) < ∞`
+  (`Torus.memKMethod_modCouple_iff`, `Torus.memKMethod_leftModCouple_iff`).
 * **Besov spaces on the torus through Littlewood–Paley blocks.** Let `ψ_j` be the
   Littlewood–Paley kernels on `ℝ^d` of [Besov spaces on `ℝ^d`](Rd.md), acting on `𝕋^d` by
   convolution, and `Δ_j f = ψ_j ⋆ f` (`Torus.lpBlock`). For every `1 ≤ p < ∞`, `s > 0` and
@@ -97,6 +103,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Convolution identities, approximate identities | ✅ | ✗ | `Torus/EuclideanConvolutionIdentities` |
 | Littlewood–Paley blocks, Besov spaces by them for `1 ≤ p < ∞` | ✅ | ✗ | `Torus/LittlewoodPaley` |
 | Besov spaces on the torus by moduli of smoothness for all `1 ≤ p < ∞` | ✅ | ✗ | `Torus/LpBesovModuli` |
+| Besov spaces on the torus by moduli of smoothness as interpolation spaces | ✅ | ✗ | `Torus/BesovInterpolation` |
 | Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ | ✗ | `Torus/Trace` |
 | The trace of a continuous function is its restriction; de la Vallée Poussin operators | ✅ | ✗ | `Torus/TraceContinuous` |
 | Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ | ✗ | `Torus/WeakDerivatives` |

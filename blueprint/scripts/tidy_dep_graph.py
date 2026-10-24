@@ -94,7 +94,8 @@ BLOCKS: list[tuple[str, list]] = [
     ("Differences and local means", [
         (BESOV_RD, ["Differences and moduli of smoothness", "Moduli of smoothness on subsets",
                     "Moment kernels", "Jackson's inequality", "The inverse inequality",
-                    "Besov spaces by differences", "Local means"])]),
+                    "Besov spaces by differences", "Local means",
+                    "Besov spaces as interpolation spaces"])]),
     ("Multipliers and atoms", [
         (BESOV_RD, ["Pointwise multipliers", "Atoms", "Atomic decompositions"])]),
     ("Smooth atoms and changes of variables", [

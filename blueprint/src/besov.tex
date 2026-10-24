@@ -76,7 +76,10 @@ each quasi-norm by a constant times the other. The dimension of the underlying s
     dyadic blocks $P_{2^{k+1}} f - P_{2^k} f$, among them martingale differences.
   \item \emph{Interpolation} (\Cref{def:k-functional} and \Cref{def:interpolation}).
     The real interpolation space $(X, Y)_{s/r, q}$ between $X$ and a space $Y$ of smoothness $r$,
-    defined through the K-functional on the grid $t = 2^{-kr}$ (the discrete $K$-method).
+    defined through the K-functional on the grid $t = 2^{-kr}$ (the discrete $K$-method), or the
+    real interpolation space $(N_0, N_1)_{\eta, q}$ of the continuous $K$-method between two
+    approximation, Besov or classical spaces (\Cref{def:approximation-space-couples},
+    \Cref{def:besov-couples} and \Cref{def:modulus-couples}).
 \end{enumerate}
 
 On a domain $\Omega$ two further quasi-norms enter: the \emph{restriction} quasi-norm, the
@@ -106,6 +109,13 @@ Descriptions & Range & Result \\
   & $0 < s < r$ & \Cref{thm:representation}\newline \Cref{cor:equal-spaces} \\
 \raggedright Approximation and moduli, under Jackson's and the inverse inequality of order $\theta$
   & $0 \leq s < \theta$ & \Cref{thm:modulus-coincidence} \\
+\raggedright Approximation and real interpolation of two approximation spaces, also of two
+  Besov spaces of a scheme of functions
+  & $0 < s_0 < s_1$ & \Cref{thm:approximation-spaces-reiteration}\newline
+  \Cref{thm:besov-interpolate} \\
+\raggedright Moduli and real interpolation of two classical spaces, under Jackson's and the
+  inverse inequality of order $\theta$
+  & $0 < s_0 < s_1 < \theta$ & \Cref{cor:modulus-spaces-interpolate} \\
 \raggedright Approximation and blocks & $s > 0$ & \Cref{thm:block-decomposition} \\
 \raggedright Approximation and dyadic blocks of projections & $s > 0$ & \Cref{thm:blocks} \\
 \raggedright Approximation and martingale differences in $L_p$ & $s > 0$ & \Cref{thm:martingale} \\
@@ -132,6 +142,9 @@ Descriptions & Range & Result \\
   & $0 < s < r$ & \Cref{thm:torus-lp-moduli} \\
 \raggedright Trigonometric approximation and smooth Littlewood--Paley blocks, $1 \leq p < \infty$
   & $s > 0$ & \Cref{thm:torus-lp-besov} \\
+\raggedright Differences of order $r$ and real interpolation of two such spaces,
+  $1 \leq p < \infty$
+  & $0 < s_0 < s_1 < r$ & \Cref{thm:torus-besov-interpolate} \\
 \raggedright Weak derivatives, Fourier coefficients and approximation: $\Sob{m}{2} = H^m = \Besov{m}{2}{2}$
   & $m \geq 1$ & \Cref{thm:weak-sobolev} \\
 \hline
@@ -210,6 +223,8 @@ Descriptions & Range & Result \\
 \raggedright Local means and differences of order $L$ & $0 < s < L$ & \Cref{thm:local-means} \\
 \raggedright Atoms of order $L$ and differences of order $L$ & $0 < s < L$
   & \Cref{thm:atomic-characterisation} \\
+\raggedright Differences of order $r$ and real interpolation of two such spaces
+  & $0 < s_0 < s_1 < r$ & \Cref{thm:rd-besov-interpolate} \\
 \hline
 \end{tabular}
 \end{center}
@@ -815,7 +830,8 @@ The Besov and Sobolev spaces of \Cref{ch:besov}, \Cref{ch:sobolev} and \Cref{ch:
 defined through approximation. The classical definitions use moduli of smoothness and
 derivatives~\cite{Triebel, DeVoreLorentz}. This chapter shows that they coincide on
 $L_2(\T^d)$, and for moduli of smoothness and Littlewood--Paley blocks on every $L_p(\T^d)$,
-$1 \leq p < \infty$, with the notation of \Cref{ch:torus}.
+$1 \leq p < \infty$, with the notation of \Cref{ch:torus}; the spaces by moduli of smoothness
+are also real interpolation spaces between two of them (\Cref{thm:torus-besov-interpolate}).
 
 \section{Moduli of smoothness}
 
@@ -1253,6 +1269,38 @@ The modulus $\omega_r(f, 2^{-k})_p$ is compatible with the trigonometric polynom
 $L_p(\T^d)$ with inverse order $\theta = r$ (\Cref{def:modulus-data}): $C_0 = 2^r$, Jackson's
 inequality from $k_0 = 1$ on with the constant $2^r C_J$ (\Cref{thm:torus-lp-jackson}), and
 $C_B$ of \Cref{thm:torus-lp-bernstein}. \Cref{thm:modulus-coincidence} gives the equivalence.
+\end{proof}
+
+\section{Besov spaces on the torus as interpolation spaces}
+\label{sec:torus-besov-interpolation}
+
+The periodic Besov spaces interpolate as the Besov spaces of every scheme
+(\Cref{thm:besov-interpolate}). The moduli of smoothness of \Cref{thm:torus-lp-moduli} give the
+same for the quasi-norms by differences.
+
+\begin{theorem}[Besov spaces on the torus by differences interpolate]
+\label{thm:torus-besov-interpolate}
+\lean{Torus.memKMethod_modCouple_iff, Torus.memKMethod_leftModCouple_iff}
+\leanok
+\uses{thm:torus-lp-moduli, def:modulus-couples, cor:modulus-spaces-interpolate}
+Let $1 \leq p < \infty$, let $r \geq 1$ be an integer, let $0 < \eta < 1$,
+$q_0, q_1, q \in [1, \infty]$ and $f \in L_p(\T^d)$, and write
+$N_{s, q}(f) = \|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_q}$.
+\begin{enumerate}
+  \item For every $0 < s_0 < s_1 < r$, $f$ lies in the space of the continuous $K$-method with
+    $(\eta, q)$ of the couple $(N_{s_0, q_0}, N_{s_1, q_1})$ if and only if
+    $N_{(1-\eta)s_0 + \eta s_1, q}(f) < \infty$.
+  \item For every $0 < s_1 < r$, $f$ lies in the space of the continuous $K$-method with
+    $(\eta, q)$ of the couple $(\|\cdot\|_p, N_{s_1, q_1})$ if and only if
+    $N_{\eta s_1, q}(f) < \infty$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+$N_{s, q}$ is the classical quasi-norm of the modulus $\omega_r(f, 2^{-k})_p$, which is
+compatible with the trigonometric polynomials with inverse order $r$
+(\Cref{thm:torus-lp-moduli}). Apply \Cref{cor:modulus-spaces-interpolate}.
 \end{proof}
 
 \section{Littlewood--Paley blocks on the torus}
@@ -4186,12 +4234,13 @@ Besov space $\Besov{s}{p}{q}$ is the approximation space $A^s_q$ of the band-lim
 $L_p$. The chapter describes it by Littlewood--Paley blocks for $s > 0$ (\Cref{thm:lp-band}); by
 differences for $0 < s < r$, through Jackson's inequality and the inverse inequality
 (\Cref{thm:band-jackson}, \Cref{thm:band-inverse} and \Cref{thm:rd-besov}); by local means
-(\Cref{thm:local-means}); and by atomic decompositions with regular and with smooth atoms
-(\Cref{thm:atomic-characterisation} and \Cref{thm:smooth-atomic-decomposition}). Moduli of
-smoothness on subsets and pointwise multipliers prepare the domains of
-\Cref{ch:lipschitz-domains}, and smooth atoms give the invariance of the Besov spaces under
-smooth changes of variables (\Cref{thm:diffeo-invariance}), on which the manifolds of
-\Cref{ch:manifolds} rest.
+(\Cref{thm:local-means}); by atomic decompositions with regular and with smooth atoms
+(\Cref{thm:atomic-characterisation} and \Cref{thm:smooth-atomic-decomposition}); and as a
+real interpolation space between two Besov spaces by differences
+(\Cref{thm:rd-besov-interpolate}). Moduli of smoothness on subsets and pointwise multipliers
+prepare the domains of \Cref{ch:lipschitz-domains}, and smooth atoms give the invariance of
+the Besov spaces under smooth changes of variables (\Cref{thm:diffeo-invariance}), on which the
+manifolds of \Cref{ch:manifolds} rest.
 
 \section{Band-limited approximation}
 
@@ -4648,7 +4697,7 @@ $\|\Delta_h^r a\|_p \leq (2^j \|h\|)^r \|D^r \Theta\|_1 \|a\|_p$, and $2^j \|h\|
 
 \begin{theorem}[Approximation, Littlewood--Paley blocks and differences]
 \label{thm:rd-besov}
-\lean{Rd.bandModulusData, Rd.memApprox_bandScheme_iff_modulus,
+\lean{Rd.bandModulusData, Rd.modNorm_bandModulusData, Rd.memApprox_bandScheme_iff_modulus,
   Rd.littlewoodPaleyNorm_lt_top_iff_modulus, Rd.modNorm_le_modNorm_of_lt}
 \leanok
 \uses{thm:band-jackson, thm:band-inverse, lem:rd-modulus, def:modulus-data,
@@ -5777,6 +5826,64 @@ model with corners of the Euclidean half-space, and the range $V$ of a model wit
 The closed half-space differs from the Lipschitz graph domain $\{x : \langle x, e \rangle > 0\}$
 with graph function $0$ by the null set $e^\perp$ (\Cref{lem:null-set-domains}), and Rychkov's
 extension is bounded on the latter (\Cref{thm:graph-besov}).
+\end{proof}
+
+\section{Besov spaces as interpolation spaces}
+\label{sec:rd-besov-interpolation}
+
+The band-limited approximation spaces interpolate as the approximation spaces of every scheme
+(\Cref{thm:approximation-spaces-reiteration}), and the Besov spaces by differences as the
+classical spaces of every compatible modulus (\Cref{cor:modulus-spaces-interpolate}). This is
+the interpolation theorem for Besov spaces~\cite[Theorem~6.4.5]{BerghLofstrom}
+and~\cite[Section~2.4]{TriebelInterpolation}, here with the quasi-norms by differences, for
+$1 \leq p < \infty$ and $0 < s_0 < s_1 < r$.
+
+\begin{corollary}[Band-limited approximation spaces interpolate]
+\label{cor:band-approximation-interpolate}
+\lean{Rd.memKMethod_bandApproxCouple_iff, Rd.memKMethod_bandLeftApproxCouple_iff}
+\leanok
+\uses{def:band-space, def:approximation-space-couples, thm:approximation-spaces-reiteration}
+Let $1 \leq p < \infty$, $0 < \eta < 1$, $q_0, q_1, q \in [1, \infty]$ and $f \in L_p$, and let
+$A^s_q$ be the approximation spaces of the band-limited scheme.
+\begin{enumerate}
+  \item For every $0 < s_0 < s_1$, $f \in (A^{s_0}_{q_0}, A^{s_1}_{q_1})_{\eta, q}$ if and only
+    if $f \in A^{(1-\eta)s_0 + \eta s_1}_q$.
+  \item For every $s_1 > 0$, $f \in (L_p, A^{s_1}_{q_1})_{\eta, q}$ if and only if
+    $f \in A^{\eta s_1}_q$.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+\leanok
+This is \Cref{thm:approximation-spaces-reiteration} for the band-limited scheme.
+\end{proof}
+
+\begin{theorem}[Besov spaces by differences interpolate]
+\label{thm:rd-besov-interpolate}
+\lean{Rd.memKMethod_modCouple_iff, Rd.memKMethod_modCouple_iff_littlewoodPaley,
+  Rd.memKMethod_leftModCouple_iff}
+\leanok
+\uses{thm:rd-besov, def:modulus-couples, cor:modulus-spaces-interpolate, def:lp-blocks}
+Let $1 \leq p < \infty$, let $r \geq 1$ be an integer, let $0 < \eta < 1$,
+$q_0, q_1, q \in [1, \infty]$ and $f \in L_p$, and write
+$N_{s, q}(f) = \|f\|_p + \|(2^{ks} \omega_r(f, 2^{-k})_p)_k\|_{\ell_q}$.
+\begin{enumerate}
+  \item For every $0 < s_0 < s_1 < r$, with $s = (1 - \eta) s_0 + \eta s_1$, the following are
+    equivalent: $f$ lies in the space of the continuous $K$-method with $(\eta, q)$ of the
+    couple $(N_{s_0, q_0}, N_{s_1, q_1})$; $N_{s, q}(f) < \infty$;
+    $\|f\|^{\mathrm{LP}}_{s, q} < \infty$.
+  \item For every $0 < s_1 < r$, $f$ lies in the space of the continuous $K$-method with
+    $(\eta, q)$ of the couple $(\|\cdot\|_p, N_{s_1, q_1})$ if and only if
+    $N_{\eta s_1, q}(f) < \infty$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+$N_{s, q}$ is the classical quasi-norm of the modulus $\omega_r(f, 2^{-k})_p$, which is
+compatible with the band-limited scheme with inverse order $r$ (\Cref{thm:rd-besov}). Apply
+\Cref{cor:modulus-spaces-interpolate}; the Littlewood--Paley form is part (2) of
+\Cref{thm:rd-besov}.
 \end{proof}
 
 \input{daubechies}

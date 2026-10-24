@@ -148,6 +148,12 @@ norms and `dt/t` on `(0, ∞)` of the continuous K-method. The other blocks inst
   `k ≥ k₀` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
   for `0 ≤ s < θ` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff `‖f‖ + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q} < ∞`,
   with equivalent quasi-norms (`ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top`).
+  For `0 < s₀ < s₁ < θ`, `0 < η < 1` and `1 ≤ q₀, q₁, q ≤ ∞`, the `(η, q)` interpolation space
+  of the couple of the classical quasi-norms of smoothness and fine index `(s₀, q₀)` and
+  `(s₁, q₁)` consists of the `f` with `‖f‖ + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q} < ∞`,
+  `s = (1-η)s₀ + ηs₁`; for the couple of `‖·‖` and the classical quasi-norm of `(s₁, q₁)` the
+  same holds with `s = ηs₁` (`ApproximationScheme.ModulusData.memKMethod_modCouple_iff`,
+  `ApproximationScheme.ModulusData.memKMethod_leftModCouple_iff`).
 * **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
@@ -212,7 +218,7 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Dilations of `dt/t`, the interpolation property of the K-method, comparable couples, retracts, compatible maps between couples of bounded linear maps | ✅ | ✗ | `Interpolation/Property` |
 | Couples of K-spaces, Holmstedt's formula, the reiteration theorem and its endpoint cases | ✅ | ✗ | `Interpolation/Reiteration` |
 | Approximation spaces as interpolation spaces `A^s_q = (X, A^r_∞)_{s/r,q}`, reiteration of approximation spaces, the sandwich principle | ✅ | ✗ | `Interpolation/ApproxSpaces` |
-| Moduli compatible with a scheme, coincidence with the classical space | ✅ | ✗ | `Moduli` |
+| Moduli compatible with a scheme, coincidence with the classical space, interpolation of the classical spaces | ✅ | ✗ | `Moduli` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ | ✗ | `Decompositions/Blocks`, `Decompositions/Projection` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ | ✗ | `Decompositions/Synthesis`, `Decompositions/Atomic` |
 | Trace theorem: extension, transfer, surjectivity | ✅ | ✗ | `Trace` |

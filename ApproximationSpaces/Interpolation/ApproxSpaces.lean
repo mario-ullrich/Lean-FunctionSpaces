@@ -35,7 +35,9 @@ approximation spaces as interpolation spaces
 (`ApproximationScheme.memKMethod_iff_memApprox_of_sandwich`,
 `ApproximationScheme.memKMethod_iff_memApprox_of_two_sandwiches`).  For a smoothness space with
 Jackson's and Bernstein's inequalities this gives the representation theorem once more
-(`ApproximationScheme.memKMethod_ofMap_iff_memApprox`).
+(`ApproximationScheme.memKMethod_ofMap_iff_memApprox`).  The exponent `(1-η)s₀ + ηs₁` lies
+in `(0, θ)` whenever `0 < s₀ < s₁ < θ` (`ApproximationScheme.reiterationExponent_pos`,
+`ApproximationScheme.reiterationExponent_lt`).
 -/
 
 @[expose] public section
@@ -376,6 +378,20 @@ theorem isHomogeneous_approxCouple : (A.approxCouple s₀ q₀ s₁ q₁).IsHomo
   norm0_smul_le c a := (approxNormDyadic_smul c a).le
   norm1_smul_le c a := (approxNormDyadic_smul c a).le
 
+/-- **The reiteration exponent is positive**: for `0 < s₀ < s₁` and `0 < η < 1`,
+`0 < (1-η)s₀ + ηs₁`. -/
+theorem reiterationExponent_pos (hs₀ : 0 < s₀) (hs : s₀ < s₁) (hη : 0 < η) (hη' : η < 1) :
+    0 < (1 - η) * s₀ + η * s₁ :=
+  add_pos (mul_pos (sub_pos.2 hη') hs₀) (mul_pos hη (hs₀.trans hs))
+
+/-- **The reiteration exponent stays below every bound of `s₁`**: for `s₀ < s₁ < θ` and
+`η < 1`, `(1-η)s₀ + ηs₁ = s₁ - (1-η)(s₁ - s₀)` is at most `s₁`, hence `< θ`. -/
+theorem reiterationExponent_lt (hs : s₀ < s₁) (hs₁ : s₁ < θ) (hη' : η < 1) :
+    (1 - η) * s₀ + η * s₁ < θ :=
+  calc (1 - η) * s₀ + η * s₁ ≤ (1 - η) * s₁ + η * s₁ := by gcongr
+    _ = s₁ := by ring
+    _ < θ := hs₁
+
 /-- **The reiteration theorem for approximation spaces** (DeVore–Lorentz, Chapter 7; Pietsch
 1981; DeVore–Popov, LNM 1302 (1988)): for `0 < s₀ < s₁`, `0 < η < 1` and `1 ≤ q₀, q₁, q ≤ ∞`,
 `(A^{s₀}_{q₀}, A^{s₁}_{q₁})_{η,q} = A^{(1-η)s₀+ηs₁}_q`.  The proof represents both spaces in the
@@ -385,11 +401,10 @@ theorem memKMethod_approxCouple_iff (hs₀ : 0 < s₀) (hs : s₀ < s₁) (hη :
     (A.approxCouple s₀ q₀ s₁ q₁).MemKMethod η q f ↔ A.MemApprox ((1 - η) * s₀ + η * s₁) q f := by
   have hs₁ : 0 < s₁ := hs₀.trans hs
   have hr : 0 < s₁ + 1 := by linarith
-  have hθ : 0 < (1 - η) * s₀ + η * s₁ := add_pos (mul_pos (sub_pos.2 hη') hs₀) (mul_pos hη hs₁)
-  have hθr : (1 - η) * s₀ + η * s₁ < s₁ + 1 := by
-    nlinarith [mul_lt_mul_of_pos_left hs (sub_pos.2 hη')]
   have hsr₀ : s₀ < s₁ + 1 := by linarith
   have hsr₁ : s₁ < s₁ + 1 := by linarith
+  have hθ : 0 < (1 - η) * s₀ + η * s₁ := reiterationExponent_pos hs₀ hs hη hη'
+  have hθr : (1 - η) * s₀ + η * s₁ < s₁ + 1 := reiterationExponent_lt hs hsr₁ hη'
   rw [memApprox_iff_memKMethod_reprCouple hθ hθr hq,
     show ((1 - η) * s₀ + η * s₁) / (s₁ + 1) = (1 - η) * (s₀ / (s₁ + 1)) + η * (s₁ / (s₁ + 1)) by
       ring,
@@ -441,8 +456,7 @@ theorem kMethodSpace_approxCouple (hs₀ : 0 < s₀) (hs : s₀ < s₁) (hη : 0
     (hq₀ : 1 ≤ q₀) (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) :
     InterpCouple.kMethodSpace (isQuasiNormed_approxCouple (A := A) hs₀.le (hs₀.trans hs).le hq₀ hq₁)
       isHomogeneous_approxCouple η q =
-      A.approxSpace ((1 - η) * s₀ + η * s₁) q
-        (add_pos (mul_pos (sub_pos.2 hη') hs₀) (mul_pos hη (hs₀.trans hs))).le hq :=
+      A.approxSpace ((1 - η) * s₀ + η * s₁) q (reiterationExponent_pos hs₀ hs hη hη').le hq :=
   Submodule.ext fun _ => memKMethod_approxCouple_iff hs₀ hs hη hη' hq₀ hq₁ hq
 
 /-- **The reiteration theorem for approximation spaces at the left endpoint**, as an equality of

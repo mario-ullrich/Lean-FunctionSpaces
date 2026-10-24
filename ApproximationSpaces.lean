@@ -112,5 +112,6 @@ the counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the co
 * `ApproximationSpaces.Retract`: approximation-preserving extensions and the equivalence of
   intrinsic and restriction quasi-norms.
 * `ApproximationSpaces.Moduli`: moduli of smoothness compatible with a scheme (Jackson and
-  inverse inequalities) and the coincidence of `A^s_q` with the classical space for `0 < s < θ`.
+  inverse inequalities), the coincidence of `A^s_q` with the classical space for `0 < s < θ`, and
+  the interpolation of the classical spaces.
 -/

@@ -2735,6 +2735,24 @@ Combine \Cref{lem:approximation-space-couple-direct} and
 $C = 2 \cdot 2^r$ and $c = 1$, and with \Cref{thm:couple-discrete-continuous} for $\rho = 1$.
 \end{proof}
 
+The exponent $(1 - \eta) s_0 + \eta s_1$ of the reiteration lies strictly between $0$ and every
+bound of $s_1$.
+
+\begin{lemma}[The reiteration exponent]
+\label{lem:reiteration-exponent}
+\lean{ApproximationScheme.reiterationExponent_pos, ApproximationScheme.reiterationExponent_lt}
+\leanok
+For all real numbers $s_0 < s_1 < \theta$ and every $\eta < 1$,
+$(1 - \eta) s_0 + \eta s_1 < \theta$. For all $0 < s_0 < s_1$ and $0 < \eta < 1$,
+$(1 - \eta) s_0 + \eta s_1 > 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$(1 - \eta) s_0 + \eta s_1 = s_1 - (1 - \eta)(s_1 - s_0) \leq s_1 < \theta$, and for
+$0 < s_0 < s_1$ and $0 < \eta < 1$ both summands $(1 - \eta) s_0$ and $\eta s_1$ are positive.
+\end{proof}
+
 \begin{theorem}[Reiteration of approximation spaces]
 \label{thm:approximation-spaces-reiteration}
 \lean{ApproximationScheme.memKMethod_approxCouple_iff,
@@ -2744,7 +2762,7 @@ $C = 2 \cdot 2^r$ and $c = 1$, and with \Cref{thm:couple-discrete-continuous} fo
 \leanok
 \uses{lem:approximation-space-couple-norms, thm:approximation-spaces-interpolate,
   thm:reiteration, cor:comparable-couples, lem:approximation-space-couples,
-  def:k-space-couples, prop:couple-k-method-space}
+  def:k-space-couples, prop:couple-k-method-space, lem:reiteration-exponent}
 Let $q_0, q_1, q \in [1, \infty]$, $0 < \eta < 1$ and $f \in X$.
 \begin{enumerate}
   \item For $0 < s_0 < s_1$, $f \in (A^{s_0}_{q_0}, A^{s_1}_{q_1})_{\eta, q}$ if and only if
@@ -3357,6 +3375,59 @@ and the last sum is bounded in $\ell_q$ by Hardy's inequality (\Cref{lem:hardy})
 $\theta - s > 0$.
 \end{proof}
 
+\paragraph{Interpolation of the classical spaces.}
+
+With the sandwich principle (\Cref{cor:approximation-space-sandwich}) the coincidence theorem
+gives the interpolation of the classical spaces: below the inverse order, every classical
+quasi-norm lies between two finite multiples of the dyadic quasi-norm of the same smoothness.
+
+\begin{definition}[Couples of classical spaces]
+\label{def:modulus-couples}
+\lean{ApproximationScheme.ModulusData.modCouple, ApproximationScheme.ModulusData.modCouple_norm0,
+  ApproximationScheme.ModulusData.modCouple_norm1, ApproximationScheme.ModulusData.leftModCouple,
+  ApproximationScheme.ModulusData.leftModCouple_norm0,
+  ApproximationScheme.ModulusData.leftModCouple_norm1}
+\leanok
+\uses{def:modulus-data, def:couple}
+Let $\omega$ be a modulus compatible with $A$, let $s_0, s_1 \in \R$ and
+$q_0, q_1 \in [1, \infty]$. The \emph{couple of the classical spaces} of $\omega$ for
+$(s_0, q_0)$ and $(s_1, q_1)$ is
+$(\|\cdot\|^{\omega}_{s_0, q_0}, \|\cdot\|^{\omega}_{s_1, q_1})$ on $X$, and the \emph{couple of
+$X$ and the classical space} for $(s_1, q_1)$ is $(\|\cdot\|, \|\cdot\|^{\omega}_{s_1, q_1})$.
+\end{definition}
+
+\begin{corollary}[Classical spaces interpolate]
+\label{cor:modulus-spaces-interpolate}
+\lean{ApproximationScheme.ModulusData.memKMethod_modCouple_iff_memApprox,
+  ApproximationScheme.ModulusData.memKMethod_modCouple_iff,
+  ApproximationScheme.ModulusData.memKMethod_leftModCouple_iff_memApprox,
+  ApproximationScheme.ModulusData.memKMethod_leftModCouple_iff}
+\leanok
+\uses{def:modulus-couples, cor:approximation-space-sandwich, thm:modulus-coincidence,
+  lem:reiteration-exponent}
+Let $\omega$ be a modulus compatible with $A$ of inverse order $\theta$, and let
+$0 < \eta < 1$, $q_0, q_1, q \in [1, \infty]$ and $f \in X$.
+\begin{enumerate}
+  \item For every $0 < s_0 < s_1 < \theta$, with $s = (1 - \eta) s_0 + \eta s_1$, the following
+    are equivalent: $f$ lies in the space of the continuous $K$-method with $(\eta, q)$ of the
+    couple of the classical spaces for $(s_0, q_0)$ and $(s_1, q_1)$; $f \in A^s_q$;
+    $\|f\|^{\omega}_{s, q} < \infty$.
+  \item For every $0 < s_1 < \theta$ the following are equivalent: $f$ lies in the space of the
+    continuous $K$-method with $(\eta, q)$ of the couple of $X$ and the classical space for
+    $(s_1, q_1)$; $f \in A^{\eta s_1}_q$; $\|f\|^{\omega}_{\eta s_1, q} < \infty$.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+\leanok
+Since $0 \leq s_i < \theta$, \Cref{thm:modulus-coincidence} bounds
+$\|\cdot\|^{\omega}_{s_i, q_i}$ above and below by finite multiples of
+$\|\cdot\|^{\mathrm{dy}}_{A^{s_i}_{q_i}}$. Part (2) of \Cref{cor:approximation-space-sandwich},
+and part (1) with $r = s_1$ and the parameter $\eta$, give the equivalence with $f \in A^s_q$
+and with $f \in A^{\eta s_1}_q$. Since $0 < s < \theta$ and $0 < \eta s_1 < \theta$,
+\Cref{thm:modulus-coincidence} gives the equivalence with the classical quasi-norms.
+\end{proof}
+
 \chapter{Besov spaces and their embeddings}
 \label{ch:besov}
 
@@ -3577,6 +3648,60 @@ closed set of classes of bounded continuous functions (\Cref{lem:bc-linfty}).
 
 The limiting case $s = \alpha$ is out of reach of this method, since the Nikolskii transfer
 theorem needs $\alpha < s$.
+
+\section{Interpolation of Besov spaces}
+\label{sec:besov-interpolation}
+
+The Besov spaces of a scheme are approximation spaces, so the reiteration theorem for
+approximation spaces (\Cref{thm:approximation-spaces-reiteration}) gives their real interpolation
+spaces, for every scheme of functions and every $1 \leq p \leq \infty$. For the classical Besov
+spaces this is the theorem of DeVore and Popov~\cite{DeVorePopovTAMS}
+and~\cite[Theorem~6.4.5]{BerghLofstrom}.
+
+\begin{definition}[Couples of Besov spaces]
+\label{def:besov-couples}
+\lean{FunctionScheme.besovCouple, FunctionScheme.lpBesovCouple}
+\leanok
+\uses{def:besov, def:approximation-space-couples}
+Let $S$ be a scheme of functions, $1 \leq p \leq \infty$, $s_0, s_1 \in \R$ and
+$q_0, q_1 \in [1, \infty]$. The couple $(\Besov{s_0}{p}{q_0}, \Besov{s_1}{p}{q_1})$ on $L_p$ is
+the couple $(A^{s_0}_{q_0}, A^{s_1}_{q_1})$ of the scheme $S^{(p)}$, and the couple
+$(L_p, \Besov{s_1}{p}{q_1})$ is the couple $(X, A^{s_1}_{q_1})$ of $S^{(p)}$
+(\Cref{def:approximation-space-couples}), both with the dyadic quasi-norms.
+\end{definition}
+
+\begin{theorem}[Besov spaces interpolate]
+\label{thm:besov-interpolate}
+\lean{FunctionScheme.memKMethod_besovCouple_iff, FunctionScheme.memKMethod_lpBesovCouple_iff,
+  FunctionScheme.kMethodSpace_besovCouple, FunctionScheme.kMethodSpace_lpBesovCouple,
+  FunctionScheme.memKMethod_besovNormCouple_iff, FunctionScheme.memKMethod_lpBesovNormCouple_iff}
+\leanok
+\uses{def:besov-couples, thm:approximation-spaces-reiteration, thm:dyadic-norm,
+  cor:approximation-space-sandwich}
+Let $S$ be a scheme of functions, $1 \leq p \leq \infty$, $0 < \eta < 1$ and
+$q_0, q_1, q \in [1, \infty]$.
+\begin{enumerate}
+  \item For every $0 < s_0 < s_1$,
+    $(\Besov{s_0}{p}{q_0}, \Besov{s_1}{p}{q_1})_{\eta, q}
+    = \Besov{(1-\eta)s_0 + \eta s_1}{p}{q}$ as subspaces of $L_p$.
+  \item For every $s_1 > 0$, $(L_p, \Besov{s_1}{p}{q_1})_{\eta, q} = \Besov{\eta s_1}{p}{q}$ as
+    subspaces of $L_p$.
+  \item Both statements hold for the couples of Pietsch's quasi-norms
+    $(\|\cdot\|_{\Besov{s_0}{p}{q_0}}, \|\cdot\|_{\Besov{s_1}{p}{q_1}})$ and
+    $(\|\cdot\|_p, \|\cdot\|_{\Besov{s_1}{p}{q_1}})$ in place of the dyadic ones.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+Parts (1) and (2) are \Cref{thm:approximation-spaces-reiteration} for the scheme $S^{(p)}$ in
+$L_p$. For part (3), Pietsch's quasi-norm of smoothness $s$ is at most $2^s$ times the dyadic
+one, and the dyadic one at most $4 \cdot 2^s$ times Pietsch's (\Cref{thm:dyadic-norm}); the
+sandwich principle (\Cref{cor:approximation-space-sandwich}) applies.
+\end{proof}
+
+On the torus with the trigonometric polynomials these are the periodic Besov spaces;
+\Cref{thm:torus-besov-interpolate} describes their interpolation spaces by differences.
 
 \chapter{Sobolev spaces and their embeddings}
 \label{ch:sobolev}

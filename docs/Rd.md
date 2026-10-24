@@ -42,6 +42,15 @@ the approximate identities and the Littlewood–Paley kernels in [Tools from ana
   inequality `ω_r(a, 2^(-k))_p ≤ C 2^(-(k-j) r) ‖a‖_p` for `a ∈ E_j`
   (`Rd.lpModulus_le_of_mem_bandSpace`), which rests on `‖Δ_v^r G‖_1 ≤ |v|^r ‖D^r G‖_1` for
   Schwartz functions `G` (`Rd.lintegral_enorm_higherDiff_schwartz_le`).
+* **Besov spaces on `ℝ^d` as interpolation spaces.** With `V`, `p`, `ψ_j` and `ω_r` as above,
+  let `N_{s,q}(f) = ‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q}`, `0 < s₀ < s₁ < r`,
+  `0 < η < 1`, `1 ≤ q₀, q₁, q ≤ ∞` and `s = (1-η)s₀ + ηs₁`. Then `f ∈ L_p(V)` lies in the real
+  interpolation space `(N_{s₀,q₀}, N_{s₁,q₁})_{η,q}` of the continuous K-method iff
+  `N_{s,q}(f) < ∞` iff `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q} < ∞` (Bergh–Löfström, Theorem 6.4.5(1);
+  `Rd.memKMethod_modCouple_iff`, `Rd.memKMethod_modCouple_iff_littlewoodPaley`), and
+  `(‖·‖_p, N_{s₁,q₁})_{η,q}` consists of the `f` with `N_{ηs₁,q}(f) < ∞`
+  (`Rd.memKMethod_leftModCouple_iff`). The same holds for the band-limited approximation spaces
+  themselves (`Rd.memKMethod_bandApproxCouple_iff`, `Rd.memKMethod_bandLeftApproxCouple_iff`).
 * **Local means on `ℝ^d`.** With `V` and `p` as above, let `g` be a smooth function with
   `∫ g = 1` that vanishes outside a ball, `g_c = c^n g(c ·)` its dilations (`n = dim V`),
   `L ≥ 1`, `m = ∑_{l=1}^L (-1)^(l+1) C(L, l) g_{1/l}` the moment kernel, and `k_0 = m`,
@@ -103,6 +112,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Jackson's inequality for band-limited approximation | ✅ | ✗ | `Rd/Approximation/BandJackson` |
 | Differences of Schwartz functions in `L_1`, inverse inequality for band-limited functions | ✅ | ✗ | `Rd/Approximation/BandInverse` |
 | Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ | ✗ | `Rd/LittlewoodPaley/BesovDifferences` |
+| Besov spaces on `ℝ^d` as interpolation spaces, by approximation, differences and Littlewood–Paley blocks | ✅ | ✗ | `Rd/Interpolation/BesovInterpolation` |
 | Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences | ✅ | ✗ | `Rd/Differences/DomainModuli` |
 | Moment kernels: averaged differences, approximation with the modulus, also on subsets, vanishing first moments of the moment kernels of order two | ✅ | ✗ | `Rd/Differences/MomentKernels` |
 | Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L` | ✅ | ✗ | `Rd/LocalMeans/LocalMeans` |

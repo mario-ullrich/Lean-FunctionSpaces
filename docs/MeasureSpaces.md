@@ -26,6 +26,16 @@ Laplacian on a compact manifold, enter as a hypothesis. The torus is the first i
   `FunctionScheme.exists_inclusion_eq_of_nikolskii`). If `μ` charges every nonempty open set and
   `s > D/p`, every `f ∈ B^s_{p,q}` has a bounded continuous representative
   (`FunctionScheme.MemBesov.exists_boundedContinuous`).
+* **Besov spaces interpolate.** For every scheme of functions `S`, `1 ≤ p ≤ ∞`, `0 < η < 1` and
+  `1 ≤ q₀, q₁, q ≤ ∞`, the real interpolation spaces of the continuous K-method of the couples
+  of dyadic quasi-norms are `(B^{s₀}_{p,q₀}, B^{s₁}_{p,q₁})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` for
+  `0 < s₀ < s₁` and `(L_p, B^{s₁}_{p,q₁})_{η,q} = B^{ηs₁}_{p,q}` for `s₁ > 0`
+  (`FunctionScheme.memKMethod_besovCouple_iff`, `FunctionScheme.memKMethod_lpBesovCouple_iff`),
+  by the reiteration theorem for approximation spaces of
+  [Approximation spaces](ApproximationSpaces.md). The couples of Pietsch's quasi-norms
+  `FunctionScheme.besovNorm` have the same interpolation spaces
+  (`FunctionScheme.memKMethod_besovNormCouple_iff`,
+  `FunctionScheme.memKMethod_lpBesovNormCouple_iff`).
 * **Sobolev embeddings.** Call a Banach space `V` with an injective bounded map into `L_p(μ)` a
   Sobolev space of order `s` for `S` (the hypothesis structure `FunctionScheme.SobolevSpace`) if it
   satisfies Jackson's inequality `E_n(f)_p ≤ C n^(-s) ‖f‖_V` and Bernstein's inequality (every
@@ -59,6 +69,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 |---|---|---|---|
 | Schemes of functions, Besov spaces, elementary embeddings | ✅ | ✗ | `MeasureSpaces/Scheme`, `MeasureSpaces/Besov/Basic`, `MeasureSpaces/Besov/Trivial` |
 | Nikolskii property, Besov embeddings | ✅ | ✗ | `MeasureSpaces/Besov/Nikolskii`, `MeasureSpaces/Besov/Embeddings` |
+| Besov spaces as interpolation spaces | ✅ | ✗ | `MeasureSpaces/Besov/Interpolation` |
 | Sobolev spaces as a hypothesis structure, Sobolev embeddings | ✅ | ✗ | `MeasureSpaces/Sobolev/Embeddings` |
 | Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ | ✗ | `MeasureSpaces/Spectral/Basic` |
 | Coefficient characterisations of spectral schemes, `H^s = B^s_{2,2}` | ✅ | ✗ | `MeasureSpaces/Spectral/Blocks` |

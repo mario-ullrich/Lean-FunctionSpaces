@@ -7,6 +7,7 @@ module
 
 public import ApproximationSpaces.Lift
 public import ApproximationSpaces.Sequences.Hardy
+public import ApproximationSpaces.Interpolation.ApproxSpaces
 
 /-!
 # Moduli of smoothness and approximation: the coincidence theorem
@@ -30,6 +31,10 @@ quasi-norm `‖f‖ + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q}` (`ModulusData.modN
   applying the inverse inequality to each block and Hardy's inequality to the sum.
 
 So `A^s_q` is the classical space for `0 < s < θ` (`ModulusData.memApprox_iff_modNorm_lt_top`).
+With the sandwich principle of `ApproximationSpaces.Interpolation.ApproxSpaces`, the classical
+spaces of smoothness `0 < s₀ < s₁ < θ` interpolate to the classical space of smoothness
+`(1-η)s₀ + ηs₁`, and `X` with the classical space of smoothness `s₁` to that of smoothness `ηs₁`
+(`ModulusData.memKMethod_modCouple_iff`, `ModulusData.memKMethod_leftModCouple_iff`).
 The same theorem serves trigonometric polynomials (`θ = r` for `ω_r`), piecewise polynomials
 (`θ = 1/p`), splines and wavelets.
 -/
@@ -322,6 +327,87 @@ theorem memApprox_iff_modNorm_lt_top (hq : 1 ≤ q) (hs : 0 ≤ s) (hsθ : s < �
   · intro h
     exact (M.approxNormDyadic_le_modNorm hq f).trans_lt
       (ENNReal.mul_lt_top (M.directConst_ne_top s).lt_top h)
+
+/-! ### Interpolation of the classical spaces -/
+
+variable {s₀ s₁ η : ℝ} {q₀ q₁ : ℝ≥0∞}
+
+/-- The **couple of two classical spaces** of a modulus `ω` compatible with the scheme: the
+classical quasi-norms `‖f‖ + ‖(2^(ks_i) ω(f, 2^(-k)))_k‖_{ℓ_{q_i}}`, `i = 0, 1`. -/
+noncomputable def modCouple (s₀ : ℝ) (q₀ : ℝ≥0∞) (s₁ : ℝ) (q₁ : ℝ≥0∞) : InterpCouple X :=
+  ⟨M.modNorm s₀ q₀, M.modNorm s₁ q₁⟩
+
+/-- The first norm of the couple of two classical spaces is the classical quasi-norm of
+smoothness `s₀`. -/
+@[simp]
+theorem modCouple_norm0 (f : X) : (M.modCouple s₀ q₀ s₁ q₁).norm0 f = M.modNorm s₀ q₀ f := rfl
+
+/-- The second norm of the couple of two classical spaces is the classical quasi-norm of
+smoothness `s₁`. -/
+@[simp]
+theorem modCouple_norm1 (f : X) : (M.modCouple s₀ q₀ s₁ q₁).norm1 f = M.modNorm s₁ q₁ f := rfl
+
+/-- The **couple of `X` and a classical space** of a modulus `ω` compatible with the scheme: the
+norm `‖f‖` of `X` and the classical quasi-norm `‖f‖ + ‖(2^(ks₁) ω(f, 2^(-k)))_k‖_{ℓ_{q₁}}`. -/
+noncomputable def leftModCouple (s₁ : ℝ) (q₁ : ℝ≥0∞) : InterpCouple X :=
+  ⟨fun f => ‖f‖ₑ, M.modNorm s₁ q₁⟩
+
+/-- The first norm of the couple of `X` and a classical space is the norm of `X`. -/
+@[simp]
+theorem leftModCouple_norm0 (f : X) : (M.leftModCouple s₁ q₁).norm0 f = ‖f‖ₑ := rfl
+
+/-- The second norm of the couple of `X` and a classical space is the classical quasi-norm. -/
+@[simp]
+theorem leftModCouple_norm1 (f : X) : (M.leftModCouple s₁ q₁).norm1 f = M.modNorm s₁ q₁ f := rfl
+
+/-- **Classical spaces interpolate to approximation spaces**: for a modulus compatible with the
+scheme of inverse order `θ`, `0 < s₀ < s₁ < θ`, `0 < η < 1` and `1 ≤ q₀, q₁, q ≤ ∞`, the real
+interpolation space of the couple of the classical spaces of smoothness `s₀` and `s₁` is
+`A^{(1-η)s₀+ηs₁}_q`.  The classical quasi-norms are equivalent to the dyadic quasi-norms
+(`approxNormDyadic_le_modNorm`, `modNorm_le_approxNormDyadic`), so the sandwich principle
+applies (`memKMethod_iff_memApprox_of_two_sandwiches`). -/
+theorem memKMethod_modCouple_iff_memApprox (hs₀ : 0 < s₀) (hs : s₀ < s₁) (hs₁ : s₁ < θ)
+    (hη : 0 < η) (hη' : η < 1) (hq₀ : 1 ≤ q₀) (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) {f : X} :
+    (M.modCouple s₀ q₀ s₁ q₁).MemKMethod η q f ↔ A.MemApprox ((1 - η) * s₀ + η * s₁) q f :=
+  memKMethod_iff_memApprox_of_two_sandwiches (M.inverseConst_ne_top (hs.trans hs₁))
+    (M.directConst_ne_top s₀) (M.inverseConst_ne_top hs₁) (M.directConst_ne_top s₁) hq₀ hq₀ hq₁
+    hq₁ hs₀ hs hη hη' hq (M.modNorm_le_approxNormDyadic hq₀ hs₀.le (hs.trans hs₁))
+    (M.approxNormDyadic_le_modNorm hq₀)
+    (M.modNorm_le_approxNormDyadic hq₁ (hs₀.trans hs).le hs₁) (M.approxNormDyadic_le_modNorm hq₁)
+
+/-- **The interpolation spaces of two classical spaces**: for a modulus compatible with the
+scheme of inverse order `θ`, `0 < s₀ < s₁ < θ`, `0 < η < 1` and `1 ≤ q₀, q₁, q ≤ ∞`, `f` lies in
+the real interpolation space of the couple of the classical spaces of smoothness `s₀` and `s₁`
+iff `‖f‖ + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q} < ∞` with `s = (1-η)s₀ + ηs₁`. -/
+theorem memKMethod_modCouple_iff (hs₀ : 0 < s₀) (hs : s₀ < s₁) (hs₁ : s₁ < θ) (hη : 0 < η)
+    (hη' : η < 1) (hq₀ : 1 ≤ q₀) (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) {f : X} :
+    (M.modCouple s₀ q₀ s₁ q₁).MemKMethod η q f ↔
+      M.modNorm ((1 - η) * s₀ + η * s₁) q f < ∞ := by
+  rw [M.memKMethod_modCouple_iff_memApprox hs₀ hs hs₁ hη hη' hq₀ hq₁ hq]
+  exact M.memApprox_iff_modNorm_lt_top hq (reiterationExponent_pos hs₀ hs hη hη').le
+    (reiterationExponent_lt hs hs₁ hη') f
+
+/-- **`X` and a classical space interpolate to approximation spaces**: for a modulus compatible
+with the scheme of inverse order `θ`, `0 < s₁ < θ`, `0 < η < 1` and `1 ≤ q₁, q ≤ ∞`, the real
+interpolation space of the couple of `X` and the classical space of smoothness `s₁` is
+`A^{ηs₁}_q` (`memKMethod_iff_memApprox_of_sandwich`). -/
+theorem memKMethod_leftModCouple_iff_memApprox (hs₁ : 0 < s₁) (hs₁θ : s₁ < θ) (hη : 0 < η)
+    (hη' : η < 1) (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) {f : X} :
+    (M.leftModCouple s₁ q₁).MemKMethod η q f ↔ A.MemApprox (η * s₁) q f :=
+  memKMethod_iff_memApprox_of_sandwich (M.inverseConst_ne_top hs₁θ) (M.directConst_ne_top s₁)
+    hq₁ hq₁ hs₁ hη hη' hq (M.modNorm_le_approxNormDyadic hq₁ hs₁.le hs₁θ)
+    (M.approxNormDyadic_le_modNorm hq₁)
+
+/-- **The interpolation spaces of `X` and a classical space**: for a modulus compatible with the
+scheme of inverse order `θ`, `0 < s₁ < θ`, `0 < η < 1` and `1 ≤ q₁, q ≤ ∞`, `f` lies in the real
+interpolation space of the couple of `X` and the classical space of smoothness `s₁` iff
+`‖f‖ + ‖(2^(kηs₁) ω(f, 2^(-k)))_k‖_{ℓ_q} < ∞`. -/
+theorem memKMethod_leftModCouple_iff (hs₁ : 0 < s₁) (hs₁θ : s₁ < θ) (hη : 0 < η) (hη' : η < 1)
+    (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) {f : X} :
+    (M.leftModCouple s₁ q₁).MemKMethod η q f ↔ M.modNorm (η * s₁) q f < ∞ := by
+  have hlt : η * s₁ < θ := by nlinarith
+  rw [M.memKMethod_leftModCouple_iff_memApprox hs₁ hs₁θ hη hη' hq₁ hq]
+  exact M.memApprox_iff_modNorm_lt_top hq (mul_pos hη hs₁).le hlt f
 
 end ModulusData
 

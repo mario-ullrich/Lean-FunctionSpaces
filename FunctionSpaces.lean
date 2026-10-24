@@ -34,6 +34,7 @@ public import FunctionSpaces.MeasureSpaces.Besov.Basic
 public import FunctionSpaces.MeasureSpaces.Besov.Trivial
 public import FunctionSpaces.MeasureSpaces.Besov.Nikolskii
 public import FunctionSpaces.MeasureSpaces.Besov.Embeddings
+public import FunctionSpaces.MeasureSpaces.Besov.Interpolation
 public import FunctionSpaces.MeasureSpaces.Sobolev.Embeddings
 public import FunctionSpaces.MeasureSpaces.Spectral.Basic
 public import FunctionSpaces.MeasureSpaces.Spectral.Blocks
@@ -82,6 +83,7 @@ public import FunctionSpaces.Rd.Sobolev.SobolevEmbedding
 public import FunctionSpaces.Rd.Sobolev.SobolevJets
 public import FunctionSpaces.Rd.BesselPotentials.UniformSchwartzFamilies
 public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialLifting
+public import FunctionSpaces.Rd.Interpolation.BesovInterpolation
 public import FunctionSpaces.Domains.Lipschitz.LipschitzGraph
 public import FunctionSpaces.Domains.Extension.RychkovExtension
 public import FunctionSpaces.Domains.Extension.LipschitzGraphBesov
@@ -131,6 +133,7 @@ public import FunctionSpaces.Torus.BesovModuli
 public import FunctionSpaces.Torus.EuclideanConvolution
 public import FunctionSpaces.Torus.LpJackson
 public import FunctionSpaces.Torus.LpBesovModuli
+public import FunctionSpaces.Torus.BesovInterpolation
 public import FunctionSpaces.Torus.EuclideanConvolutionIdentities
 public import FunctionSpaces.Torus.LittlewoodPaley
 public import FunctionSpaces.Torus.WeakDerivatives
@@ -298,6 +301,9 @@ and the theorems that their characterisations agree. The library builds on
   Nikolskii inequality `‖a‖_r ≲ n^(D(1/p-1/r)) ‖a‖_p` it implies.
 * `FunctionSpaces.MeasureSpaces.Besov.Embeddings`: the Besov embeddings into `B^{s-α}_{r,q}`, `L_∞`
   and bounded continuous functions.
+* `FunctionSpaces.MeasureSpaces.Besov.Interpolation`: the Besov spaces as real interpolation
+  spaces, `(B^{s₀}_{p,q₀}, B^{s₁}_{p,q₁})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` and
+  `(L_p, B^{s₁}_{p,q₁})_{η,q} = B^{ηs₁}_{p,q}`.
 * `FunctionSpaces.MeasureSpaces.Sobolev.Embeddings`: Sobolev spaces for a scheme as a hypothesis
   structure (smoothness spaces), the Sobolev embedding `W^s_p ↪ W^t_r` and the embedding into
   bounded continuous functions.
@@ -439,6 +445,10 @@ and the theorems that their characterisations agree. The library builds on
   Calderón–Zygmund families of the Bessel kernels of the Littlewood–Paley kernels,
   `H^{s,p} ∩ L_p = F^s_{p,2}` for real `s` and `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, for `1 < p < ∞`
   with existential constants, and `W^m_p = H^{m,p}`.
+* `FunctionSpaces.Rd.Interpolation.BesovInterpolation`: the band-limited approximation spaces and
+  the Besov spaces by differences as real interpolation spaces,
+  `(B^{s₀}_{p,q₀}, B^{s₁}_{p,q₁})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` and
+  `(L_p, B^{s₁}_{p,q₁})_{η,q} = B^{ηs₁}_{p,q}`.
 
 ### Domains, traces and manifolds
 
@@ -587,6 +597,8 @@ and the theorems that their characterisations agree. The library builds on
   polynomials in `L_p(𝕋^d)`, `1 ≤ p < ∞`, with moduli of every order.
 * `FunctionSpaces.Torus.LpBesovModuli`: the Besov spaces `B^s_{p,q}(𝕋^d)` through moduli of
   smoothness for all `1 ≤ p < ∞`.
+* `FunctionSpaces.Torus.BesovInterpolation`: the Besov spaces on the torus by differences as real
+  interpolation spaces.
 * `FunctionSpaces.Torus.EuclideanConvolutionIdentities`: identities of the convolution
   operators on the torus through their Fourier multipliers, and approximate identities.
 * `FunctionSpaces.Torus.LittlewoodPaley`: Littlewood–Paley blocks on the torus and the

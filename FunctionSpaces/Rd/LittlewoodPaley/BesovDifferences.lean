@@ -17,8 +17,10 @@ For `1 ≤ p < ∞` and `r ≥ 1`, the modulus of smoothness `ω_r(f, t)_p` of `
 compatible with the band-limited scheme with inverse order `r` (`Rd.bandModulusData`):
 Jackson's inequality `E(f, E_k)_p ≤ C_J ω_r(f, 2^(-k))_p` (`Rd.approxSeq_bandScheme_le`) and the
 inverse inequality `ω_r(a, 2^(-k))_p ≤ C_B 2^(-(k-j) r) ‖a‖_p` for `a ∈ E_j`
-(`Rd.lpModulus_le_of_mem_bandSpace`). The coincidence theorem for moduli
-(`ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top`) gives, for `0 ≤ s < r`:
+(`Rd.lpModulus_le_of_mem_bandSpace`). Its classical quasi-norm is
+`‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q}` (`Rd.modNorm_bandModulusData`). The
+coincidence theorem for moduli (`ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top`)
+gives, for `0 ≤ s < r`:
 
 `f ∈ A^s_q(L_p, (E_k))  ⟺  ‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
 
@@ -60,6 +62,13 @@ noncomputable def bandModulusData (hp : p ≠ ∞) (r : ℕ) :
   CB := bandInverseConst V r
   CB_ne_top := bandInverseConst_ne_top r
   inverse _ _ _ ha := lpModulus_le_of_mem_bandSpace hp r (mem_bandScheme_two_pow.1 ha)
+
+/-- The classical quasi-norm of `Rd.bandModulusData hp r` is
+`‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q}`. -/
+theorem modNorm_bandModulusData (hp : p ≠ ∞) (r : ℕ) (s : ℝ) (q : ℝ≥0∞)
+    (f : Lp ℂ p (volume : Measure V)) :
+    (bandModulusData hp r).modNorm s q f =
+      ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) := rfl
 
 /-- **Band-limited approximation and moduli of smoothness**: for `1 ≤ p < ∞`, `0 ≤ s < r` and
 `1 ≤ q ≤ ∞`, `f ∈ A^s_q(L_p, (E_k))` iff `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`. -/
