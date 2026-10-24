@@ -168,6 +168,24 @@ iff\_\allowbreak indicator\_\allowbreak ae\_\allowbreak eq}), and the class $1_S
 \Cref{lem:indicator-lp} agrees almost everywhere with the function $1_S h$.
 \end{proof}
 
+\begin{lemma}[Extension by zero in $L_p$]
+\label{lem:zero-extension-lp}
+\lean{Rd.memLp_indicator_restrict, Rd.eLpNorm_indicator_restrict_le, Rd.indicatorExtendLp,
+  Rd.indicatorExtendLp_apply_ae, Rd.enorm_indicatorExtendLp_le}
+\leanok
+For every measure $\mu$ on $X$, every $O \subseteq X$, every measurable $T \subseteq O$ and every
+$1 \leq p \leq \infty$, the extension by zero $g \mapsto 1_T g$ is a bounded linear operator
+from $L_p(\mu|_O)$ to $L_p(\mu)$ of norm at most $1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\|1_T g\|_{L_p(\mu)} = \|g\|_{L_p(\mu|_T)} \leq \|g\|_{L_p(\mu|_O)}$ (Mathlib's
+\texttt{MeasureTheory.\allowbreak eLpNorm\_\allowbreak indicator\_\allowbreak eq\_\allowbreak
+eLpNorm\_\allowbreak restrict}), and $1_T (g + h) = 1_T g + 1_T h$, $1_T (c g) = c \, 1_T g$
+almost everywhere.
+\end{proof}
+
 \begin{lemma}[The support principle]
 \label{lem:support-principle}
 \lean{Rd.LipschitzGraph.conv_indicator_eq, Rd.LipschitzGraph.cutoff,
@@ -2951,8 +2969,9 @@ $s$, and \Cref{sec:sobolev-duality} proves the duality of $\tilde H^s(\Omega)$ a
 $H^{-s}(\Omega)$. \Cref{sec:boundary-trace-space} defines the trace space $H^{1/2}(\Gamma)$ of a
 bounded Lipschitz domain as the orthogonal complement of the trace kernel in $H^1(\Omega)$.
 \Cref{sec:divergence-kernels} and \Cref{sec:sobolev-extension} prove the extension theorem for
-$\Sob{1}{p}$ on bounded Lipschitz domains, $1 < p < \infty$, of first order and with an
-extension for each function. \Cref{sec:lipschitz-graph-green} and
+$\Sob{1}{p}$ on bounded Lipschitz domains, $1 < p < \infty$, of first order, with a bounded
+linear extension operator on the jets of \Cref{def:sobolev-jets}.
+\Cref{sec:lipschitz-graph-green} and
 \Cref{sec:lipschitz-domain-green} prove Gauss--Green on Lipschitz graph domains and Green's
 formula on bounded Lipschitz domains, and \Cref{sec:trace-kernel} proves that the kernel of the
 trace is $H^1_0(\Omega)$.
@@ -4604,7 +4623,8 @@ divergence kernels (\Cref{lem:bump-divergence-identity}), the derivatives move o
 strong type of the Calder\'on--Zygmund families of the divergence kernels
 (\Cref{thm:vector-valued-strong-type}) bounds the local means of Triebel--Lizorkin type of $f$ on
 a patch by $\|f\|_{\Sob{1}{p}(\Omega)}$. The local extensions lie in
-$\TL{1}{p}{2} = \Sob{1}{p}(V)$ and are pasted in $\Sob{1}{p}(V)$.
+$\TL{1}{p}{2} = \Sob{1}{p}(V)$ and are pasted in $\Sob{1}{p}(V)$. The extension is a bounded
+linear operator on the jets of \Cref{def:sobolev-jets} (\Cref{thm:sobolev-extension-operator}).
 
 \paragraph{Local means by the gradient.}
 
@@ -4799,7 +4819,9 @@ $\|h\|_{L_p(T)} \leq \|h\|_{L_p(O)}$.
 \begin{theorem}[The extension from one patch]
 \label{thm:one-patch-extension}
 \lean{Rd.LocalMeansBump.extensionConst, Rd.LocalMeansBump.extensionConst_ne_top,
-  Rd.LocalMeansBump.extendsSobolev}
+  Rd.LocalMeansBump.memTriebelLizorkin_localExtension_of_tlLocalNormOn,
+  Rd.LocalMeansBump.ae_localExtension_eq_of_ae_eq_indicator,
+  Rd.LocalMeansBump.enorm_localExtension_add_le_extensionConst, Rd.LocalMeansBump.extendsSobolev}
 \leanok
 \uses{thm:tl-local-means-gradient, lem:tl-local-extension, def:extends-sobolev,
   thm:triebel-lizorkin-to-sobolev, thm:local-extension, lem:support-principle-two}
@@ -4963,8 +4985,8 @@ $n = 0$ the open set $\Omega$ is empty, where $F = 0$ serves, or all of $V$, whe
 serves.
 \end{proof}
 
-The theorem is of first order and gives, for each $f$, an extension with this bound; a bounded
-linear extension operator and the exponents $p \in \{1, \infty\}$ are not formalised.
+The extension is a bounded linear operator (\Cref{thm:sobolev-extension-operator}). The theorem
+is of first order; the exponents $p \in \{1, \infty\}$ are not formalised.
 
 \begin{corollary}[$H^1(\Omega) = \Sob{1}{2}(\Omega)$]
 \label{cor:sobolev-extension-two}
@@ -5046,6 +5068,119 @@ norm of $u$ is at most $\|U\| \leq \|F\|_2 + \sum_i \|G_i\|_2$
 
 With \Cref{prop:sobolev-restriction-weak-gradient}, the quotient norm of $H^1(\Omega)$ and the
 norm of $\Sob{1}{2}(\Omega)$ are equivalent on bounded Lipschitz domains.
+
+\paragraph{The extension operator.}
+
+The construction of \Cref{thm:sobolev-extension} is linear in $f$: the patches, the bumps and the
+resolution of unity are fixed before $f$, and the local extension is a convergent series of
+bounded linear operators. Extension operators on the jets of \Cref{def:sobolev-jets} record this.
+
+\begin{definition}[Extension operators]
+\label{def:sobolev-extension-op}
+\lean{Rd.SobolevExtensionOp}
+\leanok
+\uses{def:extends-sobolev, def:sobolev-jets}
+Let $O \subseteq V$ be open, $U \subseteq O$, $1 \leq p \leq \infty$ and $C \in [0, \infty]$. An
+\emph{extension operator from $U$ with the constant $C$} is a linear map $E$ from the jets of
+$\Sob{1}{p}(O)$ to the jets of $\Sob{1}{p}(V)$ such that for every jet $u = (f, (g_i)_i)$ and
+$E u = (F, (G_i)_i)$, $F \in \Sob{1}{p}(V)$, $F = f$ almost everywhere on $U$, and
+\[
+  \|F\|_p + \sum_{i \in I} \|G_i\|_p \leq C \Bigl(\|f\|_{L_p(O)} + \sum_{i \in I}
+  \|g_i\|_{L_p(O)}\Bigr) .
+\]
+\end{definition}
+
+\begin{lemma}[Extension operators are bounded]
+\label{lem:sobolev-extension-op-bounded}
+\lean{Rd.SobolevExtensionOp.extendsSobolev, Rd.SobolevExtensionOp.norm_apply_le,
+  Rd.SobolevExtensionOp.toContinuousLinearMap, Rd.SobolevExtensionOp.norm_toContinuousLinearMap_le,
+  Rd.SobolevExtensionOp.restrictL_comp_toContinuousLinearMap}
+\leanok
+\uses{def:sobolev-extension-op, lem:sobolev-jets, def:extends-sobolev}
+For every open $O \subseteq V$, every $U \subseteq O$, every $1 \leq p \leq \infty$, every
+$C \in [0, \infty]$ and every extension operator $E$ from $U$ with the constant $C$: Sobolev
+functions on $O$ extend from $U$ with the constant $C$; if $C < \infty$, then $E$ is a bounded
+linear operator of norm at most $(n + 1) C$; if moreover $U = O$, then the restriction of $E u$
+to $O$ is $u$ for every jet $u$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For the first claim apply $E$ to the jet of the classes of $f$ and $g_i$. The bound
+$\|E u\| \leq (n + 1) C \|u\|$ follows from \Cref{lem:sobolev-jets} (1). The restriction of
+$E u$ to $O$ has the value $f$, so it is $u$ by \Cref{lem:sobolev-jets} (2).
+\end{proof}
+
+\begin{lemma}[The extension operator from one patch]
+\label{lem:sobolev-extension-op-patch}
+\lean{Rd.LocalMeansBump.localExtTerm_add, Rd.LocalMeansBump.localExtTerm_smul,
+  Rd.LocalMeansBump.tlLocalNormOn_indicatorExtendLp_le,
+  Rd.LocalMeansBump.tlLocalNormOn_indicatorExtendLp_lt_top,
+  Rd.LocalMeansBump.summable_localExtTerm_indicatorExtendLp, Rd.LocalMeansBump.localExtensionJet,
+  Rd.LocalMeansBump.memTriebelLizorkin_localExtensionJet,
+  Rd.LocalMeansBump.ae_localExtensionJet_eq, Rd.LocalMeansBump.enorm_localExtensionJet_add_le,
+  Rd.LocalMeansBump.sobolevExtensionOp}
+\leanok
+\uses{thm:one-patch-extension, thm:local-extension, def:sobolev-extension-op, lem:sobolev-jets,
+  lem:zero-extension-lp, thm:tl-local-means-gradient, lem:tl-local-extension}
+Let $n \geq 1$, $1 < p < \infty$, $g$ a bump with the dual kernels $\eta_j$ of order two and the
+divergence kernels $K_i$, let $U, W \subseteq V$ be measurable and $T \subseteq O \subseteq V$
+open with $U \subseteq T$, $x - y \in W$ for every $x \in U$, every $j$ and every $y$ with
+$\eta_j(y) \neq 0$, and $x - y \in T$ for every $x \in W$, every $j$, every $i$ and every $y$ in
+the support of $(K_i)_{2^j}$. Then the map
+$(f, (g_i)_i) \mapsto F = \sum_j \eta_j * \mathbf 1_W (k_j * \mathbf 1_T f)$, with the weak
+derivatives $\partial_{e_i} F$, is an extension operator from $U$ for the jets of
+$\Sob{1}{p}(O)$, with the constant of \Cref{thm:one-patch-extension}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For every jet the series converges absolutely (\Cref{thm:tl-local-means-gradient},
+\Cref{lem:tl-local-extension}, with $\|h\|_{L_p(T)} \leq \|h\|_{L_p(O)}$), and its terms are
+bounded linear operators applied to $\mathbf 1_T f$ (\Cref{lem:zero-extension-lp}), so $F$ is
+additive and homogeneous in the jet. The weak derivatives make it a linear map into the jets
+(\Cref{lem:sobolev-jets} (4)); the properties of \Cref{def:sobolev-extension-op} are those of the
+proof of \Cref{thm:one-patch-extension}.
+\end{proof}
+
+\begin{theorem}[The extension operator]
+\label{thm:sobolev-extension-operator}
+\lean{Rd.SobolevExtensionOp.pasteValue, Rd.SobolevExtensionOp.hasWeakLineDeriv_pasteValue,
+  Rd.SobolevExtensionOp.ae_pasteValue_eq, Rd.SobolevExtensionOp.paste,
+  Rd.sobolevExtensionOp_of_cover, Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_boundary,
+  Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_interior,
+  Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp, Rd.BoundedLipschitzDomain.sobolevExtensionL,
+  Rd.BoundedLipschitzDomain.memSobolev_sobolevExtensionL,
+  Rd.BoundedLipschitzDomain.sobolevExtensionL_fst_ae_eq,
+  Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet,
+  Rd.BoundedLipschitzDomain.exists_enorm_sobolevExtensionL_le,
+  Rd.BoundedLipschitzDomain.restrictL_comp_sobolevExtensionL,
+  Rd.BoundedLipschitzDomain.exists_extensionL, Rd.exists_extensionL_of_isBoundedLipschitzDomain}
+\leanok
+\uses{thm:pasting-sobolev, thm:sobolev-extension, def:sobolev-jets,
+  lem:sobolev-extension-op-patch, lem:sobolev-extension-op-bounded, lem:sobolev-patches,
+  def:lipschitz-near-point, thm:bounded-lipschitz-sets, lem:weak-derivative-basic}
+For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$ and every $1 < p < \infty$
+there is a bounded linear operator $E$ from the jets of $\Sob{1}{p}(\Omega)$ to the jets of
+$\Sob{1}{p}(V)$ such that for every jet $u = (f, (g_i)_i)$ and $E u = (F, (G_i)_i)$,
+$F \in \Sob{1}{p}(V)$, $F = f$ almost everywhere on $\Omega$, and the restriction of $E u$ to
+$\Omega$ is $u$; in particular $f \in \Sob{1}{p}(\Omega)$ for every jet $(f, (g_i)_i)$ of
+$\Sob{1}{p}(\Omega)$. The same holds for every bounded Lipschitz set $\Omega \subseteq V$
+(\Cref{def:lipschitz-near-point}) in dimension $n \geq 1$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The patches of \Cref{lem:sobolev-patches} carry extension operators by
+\Cref{lem:sobolev-extension-op-patch}. For a smooth resolution of unity $(\psi_k)$ as in
+\Cref{thm:pasting-sobolev}, $u \mapsto \sum_k \psi_k E_k u$ with the derivatives
+$\sum_k (\psi_k G_{k,i} + (\partial_{e_i} \psi_k) F_k)$ is linear and an extension operator from
+$\Omega$ with a finite constant, by the estimate of \Cref{thm:pasting-sobolev}.
+\Cref{lem:sobolev-extension-op-bounded} gives boundedness and the right inverse. The value $f$
+of a jet agrees on $\Omega$ with $F \in \Sob{1}{p}(V)$, so $f \in \Sob{1}{p}(\Omega)$
+(\Cref{lem:weak-derivative-basic}). The claim for bounded Lipschitz sets is the first for the
+bounded Lipschitz domain of \Cref{thm:bounded-lipschitz-sets}.
+\end{proof}
 
 \section{Gauss--Green on Lipschitz graph domains}
 \label{sec:lipschitz-graph-green}

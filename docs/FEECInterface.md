@@ -207,9 +207,21 @@ with `Ω.carrier` the open set and `Ω.toOpens : Opens V` the same set as an ele
   (hp : p ≠ ∞) : ∃ C, C ≠ ∞ ∧ Rd.ExtendsSobolev p Ω.toOpens Ω.carrier C`, that is, every
   `f ∈ L_p(Ω)` with weak derivatives `g_i = ∂_{e_i} f ∈ L_p(Ω)` agrees almost everywhere on `Ω`
   with some `F ∈ W^{1,p}(ℝ^d)` with weak derivatives `G_i = ∂_{e_i} F` and
-  `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`. The theorem is of first order
-  and gives an extension for each `f`; a bounded linear extension operator and `p ∈ {1, ∞}` are
-  not formalised. Membership form:
+  `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`. The extension is a bounded
+  linear operator on value–derivative jets (`FunctionSpaces/Rd/Sobolev/SobolevJets.lean`,
+  `FunctionSpaces/Domains/Extension/SobolevExtensionOperator.lean`):
+  `Rd.BoundedLipschitzDomain.exists_extensionL (hp1 : 1 < p) (hp : p ≠ ∞) : ∃ E :
+  Rd.weakSobolevJet p Ω.toOpens →L[ℂ] Rd.sobolevJet p, (Rd.sobolevJet.restrictL Ω.toOpens).comp E
+  = ContinuousLinearMap.id ℂ _ ∧ ∀ u, MemSobolev 1 (E u).1.1`, with `[Nontrivial V]` and
+  `[Fact (1 ≤ p)]`. Here `Rd.weakSobolevJet p O` is the submodule of `L_p(O) × L_p(O)^d` of the
+  pairs `(f, (g_i)_i)` with `g_i = ∂_{e_i} f` weakly on `O`, `Rd.sobolevJet p` the same on `V`,
+  and `Rd.sobolevJet.restrictL O` the restriction. The values of the jets of `W^{1,p}(Ω)` are
+  exactly the functions of `W^{1,p}(Ω)` (`Rd.exists_mem_weakSobolevJet_of_memWeakSobolev`,
+  `Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet`). A chosen operator is
+  `Rd.BoundedLipschitzDomain.sobolevExtensionL`, and
+  `Rd.exists_extensionL_of_isBoundedLipschitzDomain` is the same for the set-level definition
+  `Rd.IsBoundedLipschitzDomain`. The theorem is of first order, and `p ∈ {1, ∞}` are not
+  formalised. Membership form:
   `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev (hp1) (hp) (f : V → ℂ) :
   MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p volume, MemSobolev 1 F ∧
   (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f`, and the direction
@@ -1050,6 +1062,13 @@ with one folder per characterisation, `FunctionSpaces/Analysis/` for the tools,
 Sobolev spaces on domains and manifolds. The module paths of this document follow the new layout
 (for instance `FunctionSpaces.Domains.Traces.TraceKernel`); the package, the library names, the
 namespaces and every declaration name are unchanged.
+
+**The extension as a bounded linear operator** (24 October 2026). H.2 also holds in operator
+form: a bounded linear extension operator on value–derivative jets, a right inverse of the
+restriction, in the shape of
+TauCeti's `W1p.exists_extensionL_of_isLipschitzDomainWith`
+(`Rd.BoundedLipschitzDomain.exists_extensionL`, Section 4.3); the extension for each `f`
+(`Rd.BoundedLipschitzDomain.exists_extendsSobolev`) keeps its name and statement.
 
 ## References
 

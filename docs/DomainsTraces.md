@@ -30,7 +30,7 @@ chart, with the Gram density `√(1 + ‖∇φ‖²)`. On a bounded Lipschitz do
 this Hausdorff measure on the boundary `Γ`; it gives the space `L_2(Γ)`, into which `H^1(Ω)` and
 `H^{1/2}(Γ)` have bounded trace operators. The outward unit normal field is pasted from the chart
 normals. On a bounded Lipschitz domain, every function of `W^1_p(Ω)`, `1 < p < ∞`, is the
-restriction of a function of `W^1_p(ℝ^d)` with a bound, an extension for each `f` separately, by
+restriction of a function of `W^1_p(ℝ^d)` under a bounded linear extension operator, built from
 Rychkov's local extension with the local means of the gradient: the local means kernels of order two
 are divergences of dilated kernels with mean zero, which form Calderón–Zygmund families. For `p = 2`
 this identifies `H^1(Ω)` with `W^1_2(Ω)`. On a Lipschitz graph domain, the Gauss–Green theorem
@@ -380,9 +380,10 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   Triebel–Lizorkin type of `f` on the patch (`Rd.LocalMeansBump.tlLocalNormOn_le_patchConst`), the
   local extension lies in `F^1_{p,2} = W^1_p` (`Rd.LocalMeansBump.extendsSobolev`), and a smooth
   resolution of unity pastes the local extensions in `W^1_p(V)` (`Rd.extendsSobolev_of_cover`).
-  The constants are existential. The theorem is of first order and gives, for each `f`, an
-  extension with this bound; a bounded linear extension operator and the exponents `p ∈ {1, ∞}`
-  are not formalised.
+  The constants are existential. The extension is a bounded linear operator
+  `E : W^1_p(Ω) → W^1_p(V)` on value–derivative jets with `E u = u` on `Ω`
+  (`Rd.BoundedLipschitzDomain.sobolevExtensionL`, `Rd.BoundedLipschitzDomain.exists_extensionL`);
+  it is of first order, and the exponents `p ∈ {1, ∞}` are not formalised.
 * **Gauss–Green on Lipschitz graph domains.** Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph
   domain with the graph map `γ(x') = x' + φ(x') e` over the hyperplane `H = e^⊥`, the gradient
   `∇φ` of `φ|_H`, the outward unit normal `ν` and `n = dim V`, and let
@@ -489,6 +490,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The surface measure of a bounded Lipschitz domain as `μHE[n-1]` on the boundary, its chart form, finiteness and null sets, the boundary `Γ` as a Lebesgue null set, the boundary trace in `L_p(Γ)`, `L_2(Γ)` with the traces of `H^1(Ω)` and `H^{1/2}(Γ)`, and the outward unit normal field | ✅ | ✗ | `Domains/Lipschitz/SurfaceMeasure` |
 | Smoothness of parametric integrals, the dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, their supports and mean zero, and the Calderón–Zygmund families of the dilates of mean-zero Schwartz functions | ✅ | ✗ | `Domains/Extension/DivergenceKernels` |
 | The local means of order two by the gradient, local means of Triebel–Lizorkin type on a set, bounded extensions from one patch, pasting in `W^1_p(ℝ^d)`, the extension theorem (`W^1_p(Ω)` is the space of restrictions of `W^1_p(ℝ^d)`) for `1 < p < ∞` with a bound, and for `p = 2` `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the quotient norm of `H^1(Ω)` and the boundary traces of `W^1_2(Ω)` | ✅ | ✗ | `Domains/Extension/SobolevExtension` |
+| The extension operator for `W^1_p`, `1 < p < ∞`, on value–derivative jets, `E u = u` on `Ω` | ✅ | ✗ | `Domains/Extension/SobolevExtensionOperator` |
 | Gauss–Green on Lipschitz graph domains: product coordinates and Fubini, ray integrals, integrals of line derivatives of Lipschitz functions, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and surface form, the product rule for line derivatives, and Green's formula `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)` | ✅ | ✗ | `Domains/Sobolev/LipschitzGraphGreen` |
 | Green's formula on bounded Lipschitz domains: integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary, the chart form for every resolution of unity, the outward unit normal as the chart normal and a unit vector almost everywhere on the boundary, `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, the traces from both sides of a graph, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u` vanishes | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainGreen` |
 | The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, smoothing with compact support, bump mollifiers and cone mollifiers, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)` | ✅ | ✗ | `Domains/Traces/TraceKernel` |

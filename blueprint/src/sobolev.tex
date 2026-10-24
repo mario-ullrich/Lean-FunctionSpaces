@@ -147,6 +147,63 @@ the sum or the multiple of the representatives, and a weak derivative in $L_p(V)
 replaced by its class (4). For $m = 1$ the order $k = 0$ is (2).
 \end{proof}
 
+A function of $\Sob{1}{p}(\Omega)$ together with its weak derivatives along a basis is a single
+element of a product of $L_p$ spaces, a jet. Linear operators on $\Sob{1}{p}$, such as the
+extension operator of \Cref{thm:sobolev-extension-operator}, act on jets.
+
+\begin{definition}[Sobolev jets]
+\label{def:sobolev-jets}
+\lean{Rd.weakSobolevJet, Rd.mem_weakSobolevJet, Rd.sobolevJet, Rd.mem_sobolevJet}
+\leanok
+\uses{def:weak-line-derivative, lem:weak-derivative-basic}
+Let $(e_i)_{i \in I}$ be the orthonormal basis of the dyadic grid of $V$, $\Omega \subseteq V$
+open and $1 \leq p \leq \infty$. The \emph{jets} of $\Sob{1}{p}(\Omega)$ are the pairs
+$(f, (g_i)_{i \in I})$ of elements of $L_p(\Omega)$ such that $g_i = \partial_{e_i} f$ weakly on
+$\Omega$ for every $i \in I$; for $\Omega = V$ these are the jets of $\Sob{1}{p}(V)$. Both are
+complex linear subspaces of $L_p \times L_p^I$, with the norm
+$\max(\|f\|_p, \max_i \|g_i\|_p)$.
+\end{definition}
+
+\begin{lemma}[Properties of Sobolev jets]
+\label{lem:sobolev-jets}
+\lean{Rd.norm_le_norm_fst_add_sum, Rd.norm_fst_add_sum_le, Rd.toReal_enorm_add_sum,
+  Rd.weakSobolevJet.snd_eq_of_fst_eq, Rd.weakSobolevJet.ext_of_fst_eq,
+  Rd.exists_mem_weakSobolevJet_of_memWeakSobolev, Rd.sobolevJet.snd_eq_of_fst_eq,
+  Rd.sobolevJet.ext_of_fst_eq, Rd.sobolevJet.lift, Rd.sobolevJet.lift_apply_fst,
+  Rd.sobolevJet.lift_apply_snd, Rd.sobolevJet.restrictL, Rd.sobolevJet.restrictL_apply_fst,
+  Rd.sobolevJet.restrictL_apply_snd}
+\leanok
+\uses{def:sobolev-jets, lem:weak-derivative-basic}
+For every open $\Omega \subseteq V$ and every $1 \leq p \leq \infty$:
+\begin{enumerate}
+  \item for every jet $u = (f, (g_i)_i)$,
+    $\|u\| \leq \|f\|_p + \sum_i \|g_i\|_p \leq (n + 1) \|u\|$;
+  \item two jets of $\Sob{1}{p}(\Omega)$ with the same value $f$ are equal, and so are two jets of
+    $\Sob{1}{p}(V)$;
+  \item for every $f \in \Sob{1}{p}(\Omega)$ some jet of $\Sob{1}{p}(\Omega)$ has a value equal to
+    $f$ almost everywhere on $\Omega$;
+  \item for every complex vector space $M$ and every linear map $L \colon M \to L_p(V)$ such that
+    for every $x \in M$ and every $i$ some $G \in L_p(V)$ is the weak derivative
+    $\partial_{e_i} (L x)$ on $V$, the map $x \mapsto (L x, (\partial_{e_i} (L x))_i)$ is a
+    linear map into the jets of $\Sob{1}{p}(V)$;
+  \item the restriction $(F, (G_i)_i) \mapsto (F|_\Omega, (G_i|_\Omega)_i)$ is a bounded linear
+    operator from the jets of $\Sob{1}{p}(V)$ to the jets of $\Sob{1}{p}(\Omega)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Product and finite product norms are maxima. (2) Weak derivatives are unique almost
+everywhere on $\Omega$, and in $L_p(V)$ for $\Omega = V$ (\Cref{lem:weak-derivative-basic}).
+(3) Take the classes of $f$ and of its weak derivatives $\partial_{e_i} f \in L_p(\Omega)$.
+(4) By (2) the map is additive and homogeneous, since $L$ is. (5) Restriction is bounded on each
+component, and weak derivatives restrict to $\Omega$ (\Cref{lem:weak-derivative-basic}).
+\end{proof}
+
+On a bounded Lipschitz domain the converse of (3) holds: the value of every jet of
+$\Sob{1}{p}(\Omega)$, $1 < p < \infty$, lies in $\Sob{1}{p}(\Omega)$
+(\Cref{thm:sobolev-extension-operator}).
+
 \begin{lemma}[Complex test functions]
 \label{lem:weak-derivative-complex-test}
 \lean{Rd.exists_testSchwartz_eq_of_tsupport_subset, Rd.HasWeakLineDeriv.integral_mul_eq}

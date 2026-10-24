@@ -10,6 +10,7 @@ public import FunctionSpaces.Domains.Lipschitz.BoundedLipschitz
 public import FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinLocalMeans
 public import FunctionSpaces.Rd.Sobolev.SobolevTriebelLizorkin
 public import FunctionSpaces.Domains.Sobolev.SobolevRestrictionSpaces
+public import FunctionSpaces.Rd.Sobolev.SobolevJets
 
 /-!
 # The extension theorem for Sobolev spaces on bounded Lipschitz domains
@@ -479,14 +480,78 @@ theorem extensionConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) : 
     ENNReal.mul_ne_top (ENNReal.sum_ne_top.2 fun _ _ => tlToSobolevConst_ne_top hp1 hp _)
       (b.tlUpperConst_ne_top 2 hp1 hp ENNReal.one_lt_two one_pos)⟩) (b.patchConst_ne_top hp1 hp)
 
+/-- **The local extension lies in `F^1_{p,2}(V)`** if the local means quasi-norm of
+Triebel–Lizorkin type of `F` on `W` is finite
+(`Rd.LocalMeansBump.triebelLizorkinNorm_localExtension_le`). -/
+theorem memTriebelLizorkin_localExtension_of_tlLocalNormOn [Fact (1 ≤ p)] (hp1 : 1 < p)
+    (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) {F : Lp ℂ p (volume : Measure V)}
+    (hXf : b.tlLocalNormOn hp hW 2 1 2 F < ∞) :
+    MemTriebelLizorkin ((1 : ℕ) : ℝ) 2 (b.localExtension hp hW 2 F) := by
+  rw [Nat.cast_one]
+  exact (b.triebelLizorkinNorm_localExtension_le hp1 hp hW 2 one_pos ENNReal.one_lt_two
+    hXf).trans_lt (ENNReal.mul_lt_top
+      (b.tlUpperConst_ne_top 2 hp1 hp ENNReal.one_lt_two one_pos).lt_top hXf)
+
+/-- **The local extension agrees with `f` on `U`**: if `F = 1_T f` almost everywhere, `U ⊆ T`, the
+dual kernels at points of `U` only see `W` and the series of the local extension converges, then
+`∑_j η_j ⋆ 1_W (k_j ⋆ F) = f` almost everywhere on `U`
+(`Rd.LocalMeansBump.indicatorLp_localExtension_of_summable`). -/
+theorem ae_localExtension_eq_of_ae_eq_indicator [Fact (1 ≤ p)] (hp : p ≠ ∞) {U W T : Set V}
+    (hU : MeasurableSet U) (hW : MeasurableSet W) (hUT : U ⊆ T)
+    (hUW : ∀ x ∈ U, ∀ j y, b.dual 2 j y ≠ 0 → x - y ∈ W) {F : Lp ℂ p (volume : Measure V)}
+    {f : V → ℂ} (hF : (F : V → ℂ) =ᵐ[volume] T.indicator f)
+    (hsum : Summable fun j => b.localExtTerm hp hW 2 j F) :
+    ∀ᵐ x ∂volume, x ∈ U → b.localExtension hp hW 2 F x = f x := by
+  have heq := b.indicatorLp_localExtension_of_summable hp one_le_two hU hW hUW hsum
+  filter_upwards [Lp.ext_iff.1 heq, indicatorLp_apply_ae hU (b.localExtension hp hW 2 F),
+    indicatorLp_apply_ae hU F, hF] with x h1 h2 h3 h4 hxU
+  rw [h2, h3, Set.indicator_of_mem hxU, Set.indicator_of_mem hxU] at h1
+  rw [h1, h4, Set.indicator_of_mem (hUT hxU)]
+
+/-- **The bound of the local extension**: if the local means quasi-norm of Triebel–Lizorkin type
+of `F` on `W` is finite and at most `C_b Y`, `C_b = Rd.LocalMeansBump.patchConst b p`, then the
+local extension `E = ∑_j η_j ⋆ 1_W (k_j ⋆ F)` and every family of weak derivatives
+`G_i = ∂_{e_i} E ∈ L_p(V)` satisfy `‖E‖_p + ∑_i ‖G_i‖_p ≤ C Y` with
+`C = Rd.LocalMeansBump.extensionConst b p` (`Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin`). -/
+theorem enorm_localExtension_add_le_extensionConst [Fact (1 ≤ p)] [Nontrivial V] (hp1 : 1 < p)
+    (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) {F : Lp ℂ p (volume : Measure V)}
+    {Y : ℝ≥0∞} (hX : b.tlLocalNormOn hp hW 2 1 2 F ≤ b.patchConst p * Y)
+    (hXf : b.tlLocalNormOn hp hW 2 1 2 F < ∞)
+    {G : Fin (finrank ℝ V) → Lp ℂ p (volume : Measure V)}
+    (hG : ∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i)
+      (b.localExtension hp hW 2 F) (G i)) :
+    ‖b.localExtension hp hW 2 F‖ₑ + ∑ i, ‖G i‖ₑ ≤ b.extensionConst p * Y := by
+  have hTL := b.triebelLizorkinNorm_localExtension_le hp1 hp hW 2 one_pos ENNReal.one_lt_two hXf
+  have hmem := b.memTriebelLizorkin_localExtension_of_tlLocalNormOn hp1 hp hW hXf
+  have hFn := b.enorm_localExtension_le_of_tlLocalNormOn hp hW 2 one_pos two_ne_zero hXf
+  have hGs : ∑ i, ‖G i‖ₑ ≤ (∑ i, tlToSobolevConst p (fun _ : Fin 1 => gridBasis V i)) *
+      b.tlUpperConst 2 p 2 1 * b.tlLocalNormOn hp hW 2 1 2 F := by
+    rw [Finset.sum_mul, Finset.sum_mul]
+    refine Finset.sum_le_sum fun i _ => ?_
+    obtain ⟨G', hG', hG'n⟩ := exists_hasWeakLineDeriv_of_memTriebelLizorkin hp1 hp
+      (fun _ : Fin 1 => gridBasis V i) hmem
+    rw [(hG i).eq_of_top hG']
+    refine hG'n.trans ?_
+    rw [Nat.cast_one, mul_assoc]
+    exact mul_le_mul_right hTL _
+  calc _ ≤ _ := add_le_add hFn hGs
+    _ = (2 * eLpNorm (momentKernel b.toFun 2) 1 volume * (1 - (2 : ℝ≥0∞) ^ (-(1 : ℝ)))⁻¹ +
+        (∑ i, tlToSobolevConst p (fun _ : Fin 1 => gridBasis V i)) * b.tlUpperConst 2 p 2 1) *
+        b.tlLocalNormOn hp hW 2 1 2 F := by ring
+    _ ≤ (2 * eLpNorm (momentKernel b.toFun 2) 1 volume * (1 - (2 : ℝ≥0∞) ^ (-(1 : ℝ)))⁻¹ +
+        (∑ i, tlToSobolevConst p (fun _ : Fin 1 => gridBasis V i)) * b.tlUpperConst 2 p 2 1) *
+        (b.patchConst p * Y) := mul_le_mul_right hX _
+    _ = _ := by rw [extensionConst]; ring
+
 /-- **The extension from one patch** (Rychkov's local extension with the local means of the
 gradient): let `U ⊆ T` with `T` open, let the dual kernels at points of `U` only see `W`, and let
 `x - y ∈ T` for every `x ∈ W`, every level `j` and every `y` in the support of `(K_i)_{2^j}`. Then
 for `1 < p < ∞` the local extension `F = ∑_j η_j ⋆ 1_W (k_j ⋆ 1_T f)` of order two lies in
 `F^1_{p,2}(V) = W^1_p(V)` and agrees with `f` on `U`, with the constant
 `Rd.LocalMeansBump.extensionConst b p` (`Rd.LocalMeansBump.tlLocalNormOn_le_patchConst`,
-`Rd.LocalMeansBump.triebelLizorkinNorm_localExtension_le`,
-`Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin`). -/
+`Rd.LocalMeansBump.memTriebelLizorkin_localExtension_of_tlLocalNormOn`,
+`Rd.LocalMeansBump.ae_localExtension_eq_of_ae_eq_indicator`,
+`Rd.LocalMeansBump.enorm_localExtension_add_le_extensionConst`). -/
 theorem extendsSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {U W : Set V}
     (hU : MeasurableSet U) (hW : MeasurableSet W) {T : Opens V} (hUT : U ⊆ T)
     (hUW : ∀ x ∈ U, ∀ j y, b.dual 2 j y ≠ 0 → x - y ∈ W)
@@ -494,43 +559,18 @@ theorem extendsSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {U W : Set 
     ExtendsSobolev p T U (b.extensionConst p) := by
   have : Fact (1 ≤ p) := ⟨hp1.le⟩
   intro f g hf hg hfg
-  have hT := T.isOpen.measurableSet
-  have hf₀ := (memLp_indicator_iff_restrict hT).2 hf
-  set Y := eLpNorm f p (volume.restrict T) + ∑ i, eLpNorm (g i) p (volume.restrict T)
-  have hY : Y ≠ ∞ := ENNReal.add_ne_top.2 ⟨hf.eLpNorm_ne_top,
-    ENNReal.sum_ne_top.2 fun i _ => (hg i).eLpNorm_ne_top⟩
+  have hf₀ := (memLp_indicator_iff_restrict T.isOpen.measurableSet).2 hf
+  have hY : eLpNorm f p (volume.restrict T) + ∑ i, eLpNorm (g i) p (volume.restrict T) ≠ ∞ :=
+    ENNReal.add_ne_top.2 ⟨hf.eLpNorm_ne_top, ENNReal.sum_ne_top.2 fun i _ => (hg i).eLpNorm_ne_top⟩
   have hX := b.tlLocalNormOn_le_patchConst hp1 hp hW hf hg hfg hsupp hf₀.coeFn_toLp
-  have hXf : b.tlLocalNormOn hp hW 2 1 2 (hf₀.toLp _) < ∞ :=
-    hX.trans_lt (ENNReal.mul_lt_top (b.patchConst_ne_top hp1 hp).lt_top hY.lt_top)
-  have hTL := b.triebelLizorkinNorm_localExtension_le hp1 hp hW 2 one_pos ENNReal.one_lt_two hXf
-  have hmem : MemTriebelLizorkin ((1 : ℕ) : ℝ) 2 (b.localExtension hp hW 2 (hf₀.toLp _)) := by
-    rw [Nat.cast_one]
-    exact hTL.trans_lt (ENNReal.mul_lt_top
-      (b.tlUpperConst_ne_top 2 hp1 hp ENNReal.one_lt_two one_pos).lt_top hXf)
-  choose G hG hGn using fun i => exists_hasWeakLineDeriv_of_memTriebelLizorkin hp1 hp
-    (fun _ : Fin 1 => gridBasis V i) hmem
-  have heq := b.indicatorLp_localExtension_of_summable hp one_le_two hU hW hUW
-    (b.summable_localExtTerm_of_tlLocalNormOn hp hW 2 one_pos two_ne_zero hXf)
-  refine ⟨_, memSobolev_of_memTriebelLizorkin hp1 hp hmem, ?_, G, hG, ?_⟩
-  · filter_upwards [Lp.ext_iff.1 heq, indicatorLp_apply_ae hU (b.localExtension hp hW 2
-      (hf₀.toLp _)), indicatorLp_apply_ae hU (hf₀.toLp _), hf₀.coeFn_toLp] with x h1 h2 h3 h4 hxU
-    rw [h2, h3, Set.indicator_of_mem hxU, Set.indicator_of_mem hxU] at h1
-    rw [h1, h4, Set.indicator_of_mem (hUT hxU)]
-  · have hFn := b.enorm_localExtension_le_of_tlLocalNormOn hp hW 2 one_pos two_ne_zero hXf
-    have hGs : ∑ i, ‖G i‖ₑ ≤ (∑ i, tlToSobolevConst p (fun _ : Fin 1 => gridBasis V i)) *
-        b.tlUpperConst 2 p 2 1 * b.tlLocalNormOn hp hW 2 1 2 (hf₀.toLp _) := by
-      rw [Finset.sum_mul, Finset.sum_mul]
-      refine Finset.sum_le_sum fun i _ => (hGn i).trans ?_
-      rw [Nat.cast_one, mul_assoc]
-      exact mul_le_mul_right hTL _
-    calc _ ≤ _ := add_le_add hFn hGs
-      _ = (2 * eLpNorm (momentKernel b.toFun 2) 1 volume * (1 - (2 : ℝ≥0∞) ^ (-(1 : ℝ)))⁻¹ +
-          (∑ i, tlToSobolevConst p (fun _ : Fin 1 => gridBasis V i)) * b.tlUpperConst 2 p 2 1) *
-          b.tlLocalNormOn hp hW 2 1 2 (hf₀.toLp _) := by ring
-      _ ≤ (2 * eLpNorm (momentKernel b.toFun 2) 1 volume * (1 - (2 : ℝ≥0∞) ^ (-(1 : ℝ)))⁻¹ +
-          (∑ i, tlToSobolevConst p (fun _ : Fin 1 => gridBasis V i)) * b.tlUpperConst 2 p 2 1) *
-          (b.patchConst p * Y) := mul_le_mul_right hX _
-      _ = _ := by rw [extensionConst]; ring
+  have hXf := hX.trans_lt (ENNReal.mul_lt_top (b.patchConst_ne_top hp1 hp).lt_top hY.lt_top)
+  have hmem := b.memTriebelLizorkin_localExtension_of_tlLocalNormOn hp1 hp hW hXf
+  choose G hG using fun i => (exists_hasWeakLineDeriv_of_memTriebelLizorkin hp1 hp
+    (fun _ : Fin 1 => gridBasis V i) hmem).imp fun _ h => h.1
+  exact ⟨_, memSobolev_of_memTriebelLizorkin hp1 hp hmem,
+    b.ae_localExtension_eq_of_ae_eq_indicator hp hU hW hUT hUW hf₀.coeFn_toLp
+      (b.summable_localExtTerm_of_tlLocalNormOn hp hW 2 one_pos two_ne_zero hXf),
+    G, hG, b.enorm_localExtension_add_le_extensionConst hp1 hp hW hX hXf hG⟩
 
 end LocalMeansBump
 
@@ -749,11 +789,8 @@ omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 theorem sq_norm_add_sum_sq_le {E : Type*} [NormedAddCommGroup E] {ι : Type*} [Fintype ι] {x : E}
     {y : ι → E} {K : ℝ≥0∞} (hK : K ≠ ∞) (h : ‖x‖ₑ + ∑ i, ‖y i‖ₑ ≤ K) :
     ‖x‖ ^ 2 + ∑ i, ‖y i‖ ^ 2 ≤ K.toReal ^ 2 := by
-  have hr : ‖x‖ + ∑ i, ‖y i‖ ≤ K.toReal := by
-    have h1 := ENNReal.toReal_mono hK h
-    rw [ENNReal.toReal_add enorm_ne_top (ENNReal.sum_ne_top.2 fun _ _ => enorm_ne_top),
-      ENNReal.toReal_sum fun _ _ => enorm_ne_top] at h1
-    simpa only [toReal_enorm] using h1
+  have hr : ‖x‖ + ∑ i, ‖y i‖ ≤ K.toReal :=
+    toReal_enorm_add_sum x y ▸ ENNReal.toReal_mono hK h
   have hs := Finset.sum_sq_le_sq_sum_of_nonneg (s := Finset.univ) fun i _ => norm_nonneg (y i)
   have h0 : 0 ≤ ∑ i, ‖y i‖ := Finset.sum_nonneg fun i _ => norm_nonneg _
   nlinarith [norm_nonneg x]
@@ -948,10 +985,7 @@ theorem exists_norm_le_restrictL2 [Nontrivial V] :
   rw [hY] at hb
   have hFG : ‖F‖ + ∑ i, ‖G i‖ ≤ C.toReal * (‖restrictL2 Ω.toOpens u‖ + ∑ i, ‖g i‖) := by
     have h1 := ENNReal.toReal_mono (ENNReal.mul_ne_top hC ENNReal.ofReal_ne_top) hb
-    rw [ENNReal.toReal_add enorm_ne_top (ENNReal.sum_ne_top.2 fun _ _ => enorm_ne_top),
-      ENNReal.toReal_sum fun _ _ => enorm_ne_top, ENNReal.toReal_mul,
-      ENNReal.toReal_ofReal (by positivity)] at h1
-    simpa only [toReal_enorm] using h1
+    rwa [toReal_enorm_add_sum, ENNReal.toReal_mul, ENNReal.toReal_ofReal (by positivity)] at h1
   calc ‖u‖ = ‖restrictProj 1 Ω.toOpens hS.toBesselPotentialSpace‖ := by rw [hproj]
     _ ≤ ‖hS.toBesselPotentialSpace‖ := norm_restrictProj_apply_le _
     _ ≤ ‖toL2 hS.toBesselPotentialSpace‖ + ∑ i, ‖G i‖ :=

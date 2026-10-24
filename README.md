@@ -395,8 +395,10 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `‖F‖_p + ∑_i ‖∂_{e_i} F‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`
   (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`); so `f ∈ W^1_p(Ω)` iff `f` agrees on `Ω`
   with some `F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`).
-  The theorem is of first order and gives, for each `f`, an extension with this bound; a bounded
-  linear extension operator and the exponents `p ∈ {1, ∞}` are not formalised.
+  The extension is a bounded linear operator `E : W^1_p(Ω) → W^1_p(V)` on value–derivative jets
+  with `E u = u` on `Ω` (`Rd.BoundedLipschitzDomain.sobolevExtensionL`,
+  `Rd.BoundedLipschitzDomain.exists_extensionL`); it is of first order, and the exponents
+  `p ∈ {1, ∞}` are not formalised.
   For `p = 2`, `f ∈ L_2(V)` lies in `H^1(Ω)` iff it lies in `W^1_2(Ω)`
   (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`), every sequence bounded in
   `W^1_2(Ω)` has a subsequence converging in `L_2(Ω)`
@@ -506,8 +508,8 @@ that library builds itself.
 
 * **Interpolation**: the interpolation property of the K-method (an operator bounded on
   both spaces of a couple is bounded on its interpolation spaces) and reiteration.
-* **Traces and extensions**: the norm equivalence `H^{1/2}(Γ) ≅ B^{1/2}_{2,2}(Γ)`, a bounded
-  linear extension operator for `W^1_p`, and the exponents `p ∈ {1, ∞}` and higher order.
+* **Traces and extensions**: the norm equivalence `H^{1/2}(Γ) ≅ B^{1/2}_{2,2}(Γ)` and the
+  extension of `W^1_p` for `p ∈ {1, ∞}` and of higher order.
 * **Manifolds with corners**, with Lipschitz domains as Besov domains.
 * **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,
   elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.

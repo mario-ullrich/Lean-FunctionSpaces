@@ -144,6 +144,9 @@ declarations.
 * **Multiplication by an indicator on `L_p`** (`FunctionSpaces/Analysis/Lp/IndicatorOperator.lean`):
   for a measurable set `s`, `g ↦ 1_s g` as a continuous linear operator of norm at most `1` on
   `Lp ℂ p μ` (`Rd.indicatorLp`). Mathlib has `indicatorConstLp` for constant functions.
+* **Extension by zero on `L_p`** (`FunctionSpaces/Analysis/Lp/IndicatorOperator.lean`): for
+  measurable `T ⊆ O`, `g ↦ 1_T g` from `Lp ℂ p (μ.restrict O)` to `Lp ℂ p μ` as a continuous
+  linear operator of norm at most `1` (`Rd.indicatorExtendLp`; TauCeti has `extendByZeroLpₗᵢ`).
 * **Differences of Schwartz functions in `L_1`**
   (`FunctionSpaces/Rd/Approximation/BandInverse.lean`): `‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1`
   (`Rd.lintegral_enorm_higherDiff_schwartz_le`), from `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1`

@@ -79,6 +79,7 @@ public import FunctionSpaces.Rd.TriebelLizorkin.SquareFunction
 public import FunctionSpaces.Rd.Sobolev.DerivativeKernels
 public import FunctionSpaces.Rd.Sobolev.SobolevTriebelLizorkin
 public import FunctionSpaces.Rd.Sobolev.SobolevEmbedding
+public import FunctionSpaces.Rd.Sobolev.SobolevJets
 public import FunctionSpaces.Rd.BesselPotentials.UniformSchwartzFamilies
 public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialLifting
 public import FunctionSpaces.Domains.Lipschitz.LipschitzGraph
@@ -110,6 +111,7 @@ public import FunctionSpaces.Domains.Lipschitz.LipschitzGraphArea
 public import FunctionSpaces.Domains.Lipschitz.SurfaceMeasure
 public import FunctionSpaces.Domains.Extension.DivergenceKernels
 public import FunctionSpaces.Domains.Extension.SobolevExtension
+public import FunctionSpaces.Domains.Extension.SobolevExtensionOperator
 public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen
 public import FunctionSpaces.Domains.Traces.TraceKernel
@@ -228,7 +230,8 @@ and the theorems that their characterisations agree. The library builds on
 * `FunctionSpaces.Analysis.Lp.Young`: the weighted Jensen inequality, Young's inequality on
   measurable groups, and weighted averages in `L_p`.
 * `FunctionSpaces.Analysis.Lp.IndicatorOperator`: multiplication by the indicator of a measurable
-  set as an operator on `L_p` of norm at most `1`, and integrals over a set as `L_2` pairings.
+  set as an operator on `L_p` of norm at most `1`, integrals over a set as `L_2` pairings, and the
+  extension by zero from `L_p(μ|_O)` to `L_p(μ)`.
 * `FunctionSpaces.Analysis.Lp.Inclusion`: the bounded linear inclusion `L_r ↪ L_p` for `p ≤ r` and a
   finite measure, `MeasureTheory.Lp.inclusionOfExponentLe`.
 * `FunctionSpaces.Analysis.Lp.BoundedContinuous`: bounded continuous functions in `L_p`; for a
@@ -329,8 +332,9 @@ and the theorems that their characterisations agree. The library builds on
   approximation, by Littlewood–Paley blocks and by differences.
 * `FunctionSpaces.Rd.LocalMeans.LocalMeans`: local means with moment kernels, the reproducing
   formula, and the characterisation of Besov spaces by local means.
-* `FunctionSpaces.Rd.LocalMeans.Multipliers`: Leibniz's rule for differences and pointwise
-  multipliers of the Besov spaces by differences.
+* `FunctionSpaces.Rd.LocalMeans.Multipliers`: Leibniz's rule for differences, pointwise
+  multipliers of the Besov spaces by differences, and multiplication by bounded continuous
+  functions as an operator on `L_p`.
 * `FunctionSpaces.Rd.Atoms.AtomSynthesis`: bounded overlap, regular atoms on a set, the coefficient
   quasi-norm, and the atomic synthesis of Besov spaces by differences, on `V` and on a set.
 * `FunctionSpaces.Rd.Atoms.AtomAnalysis`: cell atoms of convolutions, the atomic decomposition by
@@ -422,6 +426,9 @@ and the theorems that their characterisations agree. The library builds on
   Besov embeddings into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions for
   `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with named
   constants.
+* `FunctionSpaces.Rd.Sobolev.SobolevJets`: the value–derivative jets of `W^1_p(O)` and `W^1_p(ℝ^d)`
+  as complex linear subspaces of `L_p × L_p^n`, the uniqueness of their derivatives, linear maps
+  into the jets, and the restriction of jets as a bounded linear operator.
 * `FunctionSpaces.Rd.BesselPotentials.UniformSchwartzFamilies`: uniform Schwartz families under
   continuous linear maps, the shifted Bessel symbols `(ε + ‖ζ‖²)^{σ/2}`, the Bessel kernels
   `K_j = 𝓕⁻¹[(2^{-2j} + ‖ζ‖²)^{σ/2} ω̂]` with `J_σ ω_{2^j} = 2^{jσ} (K_j)_{2^j}`, sums over the
@@ -524,6 +531,9 @@ and the theorems that their characterisations agree. The library builds on
   `W^1_p(Ω) = W^1_p(ℝ^d)|_Ω` for `1 < p < ∞` with a bound; for `p = 2`, `H^1(Ω) = W^1_2(Ω)`,
   Rellich's theorem in `W^1_2(Ω)`, the equivalence of the quotient norm of `H^1(Ω)` with the
   `W^1_2(Ω)` norm, and the boundary traces of `W^1_2(Ω)`.
+* `FunctionSpaces.Domains.Extension.SobolevExtensionOperator`: extension operators on jets, the
+  local extension of jets from one patch, pasting, and the extension operator
+  `W^1_p(Ω) → W^1_p(ℝ^d)` for `1 < p < ∞` as a bounded linear right inverse of the restriction.
 * `FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen`: Gauss–Green on a Lipschitz graph domain:
   product coordinates and Fubini, ray integrals and integrals of line derivatives of Lipschitz
   functions, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and

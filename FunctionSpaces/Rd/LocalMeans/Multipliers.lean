@@ -29,6 +29,9 @@ The ingredients:
   smoothness `s - l` and order `r - l` is bounded by the one with smoothness `s` and order `r`,
   through band-limited approximation, which does not depend on the order of the modulus
   (`Rd.bandModulusData`); for `l > s` the bound `ω_(r-l) ≤ 2^(r-l) ‖f‖_p` suffices.
+
+Multiplication by a bounded continuous function is a bounded linear operator on `L_p`
+(`Rd.mulLpL`).
 -/
 
 @[expose] public section
@@ -285,6 +288,17 @@ theorem mulLp_sub {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : ∀ x
   rw [h1, h5, Pi.sub_apply, h2, h3, h4, Pi.sub_apply, mul_sub]
 
 omit [Fact (1 ≤ p)] in
+/-- Multiplication by `ψ` is additive: `ψ (F + G) = ψ F + ψ G` in `L_p`. -/
+theorem mulLp_add {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : ∀ x, ‖ψ x‖ ≤ C)
+    (F G : Lp ℂ p (volume : Measure V)) :
+    mulLp hψ hψC (F + G) = mulLp hψ hψC F + mulLp hψ hψC G := by
+  refine Lp.ext ?_
+  filter_upwards [mulLp_apply_ae hψ hψC (F + G), mulLp_apply_ae hψ hψC F,
+    mulLp_apply_ae hψ hψC G, Lp.coeFn_add F G,
+    Lp.coeFn_add (mulLp hψ hψC F) (mulLp hψ hψC G)] with x h1 h2 h3 h4 h5
+  rw [h1, h5, Pi.add_apply, h2, h3, h4, Pi.add_apply, mul_add]
+
+omit [Fact (1 ≤ p)] in
 /-- Multiplication by `ψ` commutes with complex scalars: `ψ (c F) = c (ψ F)` in `L_p`. -/
 theorem mulLp_smul {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : ∀ x, ‖ψ x‖ ≤ C) (c : ℂ)
     (F : Lp ℂ p (volume : Measure V)) : mulLp hψ hψC (c • F) = c • mulLp hψ hψC F := by
@@ -303,6 +317,26 @@ theorem enorm_mulLp_le {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : 
     (Eventually.of_forall fun x => by
       rw [Pi.mul_apply, norm_mul]
       exact mul_le_mul_of_nonneg_right (hψC x) (norm_nonneg _)) p
+
+/-- **Multiplication by a bounded continuous function** `ψ`, `‖ψ‖ ≤ C`, as a bounded linear
+operator on `L_p` of norm at most `max C 0` (`Rd.mulLp`, `Rd.enorm_mulLp_le`). It is Mathlib's
+`ContinuousLinearMap.holderL` with `q = ∞` and `B = ContinuousLinearMap.mul ℂ ℂ`, applied to the
+`L_∞` class of `ψ`, packaged so that `Rd.mulLpL_apply` is `rfl` on the project's `Rd.mulLp`. -/
+noncomputable def mulLpL {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : ∀ x, ‖ψ x‖ ≤ C) :
+    Lp ℂ p (volume : Measure V) →L[ℂ] Lp ℂ p (volume : Measure V) :=
+  LinearMap.mkContinuous
+    { toFun := mulLp hψ hψC
+      map_add' := mulLp_add hψ hψC
+      map_smul' := mulLp_smul hψ hψC }
+    (ENNReal.ofReal C).toReal fun F => by
+      have h := ENNReal.toReal_mono (ENNReal.mul_ne_top ENNReal.ofReal_ne_top enorm_ne_top)
+        (enorm_mulLp_le hψ hψC F)
+      rwa [ENNReal.toReal_mul, toReal_enorm, toReal_enorm] at h
+
+/-- The operator `Rd.mulLpL` is `Rd.mulLp`. -/
+theorem mulLpL_apply {ψ : V → ℂ} (hψ : Continuous ψ) {C : ℝ} (hψC : ∀ x, ‖ψ x‖ ≤ C)
+    (F : Lp ℂ p (volume : Measure V)) : mulLpL hψ hψC F = mulLp hψ hψC F :=
+  rfl
 
 /-- **Moduli of lower order**: for `l ≤ s < r`, the quasi-norm with smoothness `s - l` and order
 `r - l` is at most a constant times the one with smoothness `s` and order `r`, since both equal

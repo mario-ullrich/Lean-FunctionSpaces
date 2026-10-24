@@ -36,8 +36,10 @@ Two kinds of patches satisfy the conditions:
 
 Short steps `-y ∈ K̄`, `‖y‖ ≤ ε`, take `Ω ∩ B(c, ρ - ε)` into `Ω ∩ B(c, ρ)`
 (`Rd.LipschitzGraph.sub_mem_patch_of_mem_closedCone`); this gives the support conditions of all
-cone-supported kernels of small support. A bound `2^(js) ‖1_W (k_j ⋆ f)‖_p ≤ X < ∞` makes the
-local extension converge absolutely (`Rd.LocalMeansBump.enorm_localExtTerm_le_of_forall_le`,
+cone-supported kernels of small support. The terms of the local extension are linear in `f`
+(`Rd.LocalMeansBump.localExtTerm_add`, `Rd.LocalMeansBump.localExtTerm_smul`). A bound
+`2^(js) ‖1_W (k_j ⋆ f)‖_p ≤ X < ∞` makes the local extension converge absolutely
+(`Rd.LocalMeansBump.enorm_localExtTerm_le_of_forall_le`,
 `Rd.LocalMeansBump.tsum_enorm_localExtTerm_le`,
 `Rd.LocalMeansBump.summable_localExtTerm_of_forall_le`).
 
@@ -288,6 +290,18 @@ noncomputable def localNormOn (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W
 noncomputable def localExtTerm (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L j : ℕ)
     (f : Lp ℂ p (volume : Measure V)) : Lp ℂ p (volume : Measure V) :=
   convLp hp (b.integrable_dual L j) (indicatorLp hW (b.localMean hp L j f))
+
+/-- The terms of the local extension are additive in `f`. -/
+theorem localExtTerm_add (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L j : ℕ)
+    (f g : Lp ℂ p (volume : Measure V)) :
+    b.localExtTerm hp hW L j (f + g) = b.localExtTerm hp hW L j f + b.localExtTerm hp hW L j g := by
+  simp only [localExtTerm, map_add]
+
+/-- The terms of the local extension commute with complex scalars. -/
+theorem localExtTerm_smul (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L j : ℕ) (c : ℂ)
+    (f : Lp ℂ p (volume : Measure V)) :
+    b.localExtTerm hp hW L j (c • f) = c • b.localExtTerm hp hW L j f := by
+  simp only [localExtTerm, map_smul]
 
 /-- The **local extension** `∑_j η_j ⋆ 1_W (k_j ⋆ f)`. -/
 noncomputable def localExtension (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L : ℕ)
