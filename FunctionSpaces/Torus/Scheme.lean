@@ -9,6 +9,8 @@ public import FunctionSpaces.MeasureSpaces.Scheme
 public import FunctionSpaces.Torus.Measure
 public import Mathlib.Algebra.Algebra.Operations
 public import Mathlib.Data.Int.Interval
+public import Mathlib.Analysis.Fourier.AddCircleMulti
+public import Mathlib.Topology.ContinuousMap.Compact
 
 /-!
 # Trigonometric polynomials on the torus
@@ -28,6 +30,10 @@ The frequencies of degree `< n` form the box `boxLt n ⊆ ℤ^d` with at most `(
 trigonometric polynomials are trigonometric polynomials, `trigPoly m · trigPoly n ⊆
 trigPoly (m + n)`, and `T ∈ trigPoly n` has `T^m ∈ trigPoly (m n)`
 (`pow_mem_trigPoly`).  This is what the proof of the Nikolskii inequality uses.
+
+The trigonometric polynomials are dense in the bounded continuous functions for the sup norm
+(`Torus.dense_iUnion_trigPoly`, from Mathlib's `span_mFourier_closure_eq_top`), so the errors of
+best uniform approximation tend to `0` (`Torus.tendsto_approxSeq_trigScheme`).
 -/
 
 @[expose] public section
@@ -172,5 +178,50 @@ noncomputable def trigScheme : FunctionScheme (UnitAddTorus d) :=
 @[simp]
 theorem mem_trigScheme {n : ℕ} {T : UnitAddTorus d →ᵇ ℂ} :
     T ∈ trigScheme d n ↔ T ∈ trigPoly d n := Iff.rfl
+
+section UniformDensity
+
+open Filter Topology
+
+/-! ### Uniform density of the trigonometric polynomials -/
+
+/-- Every element of the span of the characters `e_k` in `C(𝕋^d)`, viewed as a bounded continuous
+function, is a trigonometric polynomial of some degree: the image of the span lies in the
+supremum `⨆ n, 𝒯_n` of the spaces of trigonometric polynomials. -/
+theorem map_span_mFourier_le_iSup_trigPoly :
+    (Submodule.span ℂ (Set.range (mFourier (d := d)))).map
+        (ContinuousMap.linearIsometryBoundedOfCompact (UnitAddTorus d) ℂ ℂ).toLinearMap ≤
+      ⨆ n, trigPoly d n := by
+  rw [Submodule.map_span, Submodule.span_le]
+  rintro _ ⟨_, ⟨k, rfl⟩, rfl⟩
+  exact Submodule.mem_iSup_of_mem (deg k + 1) (trigMonomial_mem_trigPoly (Nat.lt_succ_self _))
+
+/-- **The trigonometric polynomials are uniformly dense** in the bounded continuous functions on
+`𝕋^d`: the image of Mathlib's dense span of the characters (`span_mFourier_closure_eq_top`) under
+the isometry `C(𝕋^d) ≅ (𝕋^d →ᵇ ℂ)`. -/
+theorem dense_iUnion_trigPoly : Dense (⋃ n, (trigPoly d n : Set (UnitAddTorus d →ᵇ ℂ))) := by
+  let L := ContinuousMap.linearIsometryBoundedOfCompact (UnitAddTorus d) ℂ ℂ
+  have hS : Dense (Submodule.span ℂ (Set.range (mFourier (d := d))) :
+      Set C(UnitAddTorus d, ℂ)) :=
+    Submodule.dense_iff_topologicalClosure_eq_top.2 span_mFourier_closure_eq_top
+  rw [← Submodule.coe_iSup_of_directed _ trigPoly_mono.directed_le]
+  exact (L.surjective.denseRange.dense_image L.continuous hS).mono
+    map_span_mFourier_le_iSup_trigPoly
+
+/-- The errors of best uniform approximation by trigonometric polynomials of degree `< n` tend
+to `0`. -/
+theorem tendsto_approxError_trigScheme (f : UnitAddTorus d →ᵇ ℂ) :
+    Tendsto ((trigScheme d).approxError · f) atTop (𝓝 0) :=
+  (ApproximationScheme.tendsto_approxError_zero_iff f).2 (dense_iUnion_trigPoly f)
+
+/-- The errors of best uniform approximation by trigonometric polynomials, in `ℝ≥0∞`, tend
+to `0`. -/
+theorem tendsto_approxSeq_trigScheme (f : UnitAddTorus d →ᵇ ℂ) :
+    Tendsto ((trigScheme d).approxSeq f) atTop (𝓝 0) := by
+  have h := ENNReal.tendsto_ofReal (tendsto_approxError_trigScheme f)
+  rw [ENNReal.ofReal_zero] at h
+  exact h
+
+end UniformDensity
 
 end Torus

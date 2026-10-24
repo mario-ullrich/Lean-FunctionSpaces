@@ -31,6 +31,9 @@ the convolution of `f` with the periodisation `∑_{m ∈ ℤ^d} Φ(· + m)` of 
   `deg m < n`, it reproduces them (`Torus.econvLp_eq_self_of_mem`).
 * **Differences**: `Δ^r_{π h} (Φ ⋆ f) = (Δ^r_h Φ) ⋆ f` almost everywhere
   (`Torus.higherDiff_econv_ae`), by the translation invariance of the Lebesgue measure.
+* **Bounded continuous functions**: `f ↦ Φ ⋆ f` is a bounded operator on the bounded continuous
+  functions, `‖Φ ⋆ f‖_∞ ≤ ‖Φ‖_1 ‖f‖_∞` (`Torus.econvBCF`), and the class of `Φ ⋆ f` in `L_p` is
+  `Torus.econvLp` of the class of `f` (`Torus.toLp_econvBCF`).
 -/
 
 @[expose] public section
@@ -417,5 +420,116 @@ theorem higherDiff_econv_ae {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrabl
   refine Finset.sum_congr rfl fun l _ => ?_
   rw [← integral_const_mul]
   exact integral_congr_ae (Eventually.of_forall fun y => by ring)
+
+section BoundedContinuous
+
+open scoped BoundedContinuousFunction
+
+/-! ### Convolution of bounded continuous functions -/
+
+/-- The integrand `y ↦ Φ(y) f(t - π y)` of the convolution of a bounded continuous `f` with an
+integrable kernel is integrable. -/
+theorem integrable_mul_comp_sub_proj {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ)
+    (f : UnitAddTorus d →ᵇ ℂ) (t : UnitAddTorus d) :
+    Integrable fun y => Φ y * f (t - proj y) :=
+  hΦ.mul_bdd (f.continuous.comp (continuous_const.sub continuous_proj)).aestronglyMeasurable
+    (Eventually.of_forall fun _ => f.norm_coe_le_norm _)
+
+/-- **The convolution of a continuous function is continuous**: for integrable `Φ` on `ℝ^d` and
+bounded continuous `f` on `𝕋^d`, `Φ ⋆ f` is continuous, by dominated convergence with the bound
+`|Φ(y)| ‖f‖_∞`. -/
+theorem continuous_econv {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ)
+    (f : UnitAddTorus d →ᵇ ℂ) : Continuous (econv Φ f) := by
+  show Continuous fun t => ∫ y, Φ y * f (t - proj y)
+  refine continuous_of_dominated (bound := fun y => ‖Φ y‖ * ‖f‖)
+    (fun t => (integrable_mul_comp_sub_proj hΦ f t).aestronglyMeasurable)
+    (fun t => Eventually.of_forall fun y => ?_) (hΦ.norm.mul_const _)
+    (Eventually.of_forall fun y => ?_)
+  · rw [norm_mul]
+    exact mul_le_mul_of_nonneg_left (f.norm_coe_le_norm _) (norm_nonneg _)
+  · exact continuous_const.mul (f.continuous.comp (continuous_id.sub continuous_const))
+
+/-- **The convolution is bounded pointwise**: `|(Φ ⋆ f)(t)| ≤ ‖Φ‖_1 ‖f‖_∞` for every `t`. -/
+theorem norm_econv_le {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ)
+    (f : UnitAddTorus d →ᵇ ℂ) (t : UnitAddTorus d) : ‖econv Φ f t‖ ≤ (∫ y, ‖Φ y‖) * ‖f‖ := by
+  rw [econv, ← integral_mul_const]
+  refine norm_integral_le_of_norm_le (hΦ.norm.mul_const _) (Eventually.of_forall fun y => ?_)
+  rw [norm_mul]
+  exact mul_le_mul_of_nonneg_left (f.norm_coe_le_norm _) (norm_nonneg _)
+
+/-- The **convolution of bounded continuous functions** with an integrable kernel `Φ` on `ℝ^d`,
+`(Φ ⋆ f)(t) = ∫ Φ(y) f(t - π y) dy`, as a bounded linear operator on the bounded continuous
+functions on `𝕋^d`, of norm at most `‖Φ‖_1`. -/
+noncomputable def econvBCF {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ) :
+    (UnitAddTorus d →ᵇ ℂ) →L[ℂ] (UnitAddTorus d →ᵇ ℂ) :=
+  LinearMap.mkContinuous
+    { toFun := fun f => BoundedContinuousFunction.mkOfCompact ⟨econv Φ f, continuous_econv hΦ f⟩
+      map_add' := fun f g => by
+        ext t
+        show econv Φ ⇑(f + g) t = econv Φ f t + econv Φ g t
+        simp only [econv, BoundedContinuousFunction.coe_add, Pi.add_apply, mul_add]
+        exact integral_add (integrable_mul_comp_sub_proj hΦ f t)
+          (integrable_mul_comp_sub_proj hΦ g t)
+      map_smul' := fun c f => by
+        ext t
+        show econv Φ ⇑(c • f) t = c * econv Φ f t
+        simp only [econv, BoundedContinuousFunction.coe_smul, smul_eq_mul]
+        rw [← integral_const_mul]
+        exact integral_congr_ae (Eventually.of_forall fun y => by ring) }
+    (∫ y, ‖Φ y‖) fun f => (BoundedContinuousFunction.norm_le
+      (mul_nonneg (integral_nonneg fun _ => norm_nonneg _) (norm_nonneg _))).2
+        fun t => norm_econv_le hΦ f t
+
+/-- The values of `econvBCF` are the convolution integrals. -/
+@[simp]
+theorem econvBCF_apply {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ)
+    (f : UnitAddTorus d →ᵇ ℂ) (t : UnitAddTorus d) : econvBCF hΦ f t = econv Φ f t := rfl
+
+/-- **Young's inequality in the sup norm**: `‖Φ ⋆ f‖_∞ ≤ ‖Φ‖_1 ‖f‖_∞`. -/
+theorem norm_econvBCF_le {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ)
+    (f : UnitAddTorus d →ᵇ ℂ) : ‖econvBCF hΦ f‖ ≤ (∫ y, ‖Φ y‖) * ‖f‖ :=
+  (BoundedContinuousFunction.norm_le
+    (mul_nonneg (integral_nonneg fun _ => norm_nonneg _) (norm_nonneg _))).2
+      fun t => norm_econv_le hΦ f t
+
+/-- **The two convolutions agree**: the `L_p` class of `Φ ⋆ f` for bounded continuous `f` is the
+operator `Torus.econvLp` applied to the class of `f`, `1 ≤ p < ∞`. -/
+theorem toLp_econvBCF {𝕜 : Type*} [NontriviallyNormedField 𝕜] [NormedSpace 𝕜 ℂ] (hp : p ≠ ∞)
+    {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ) (f : UnitAddTorus d →ᵇ ℂ) :
+    BoundedContinuousFunction.toLp (E := ℂ) p volume 𝕜 (econvBCF hΦ f) =
+      econvLp hp hΦ (BoundedContinuousFunction.toLp (E := ℂ) p volume 𝕜 f) := by
+  refine Lp.ext ?_
+  have hf := BoundedContinuousFunction.coeFn_toLp (E := ℂ) p
+    (volume : Measure (UnitAddTorus d)) 𝕜 f
+  filter_upwards [BoundedContinuousFunction.coeFn_toLp (E := ℂ) p volume 𝕜 (econvBCF hΦ f),
+    econvLp_apply_ae hp hΦ (BoundedContinuousFunction.toLp (E := ℂ) p volume 𝕜 f),
+    econv_congr_ae Φ (Lp.stronglyMeasurable _).measurable f.continuous.measurable hf]
+    with t h1 h2 h3
+  rw [h1, h2, h3, econvBCF_apply]
+
+/-- **Band-limited kernels map continuous functions into trigonometric polynomials**: if
+`𝓕Φ(m) = 0` for `deg m ≥ N`, then `Φ ⋆ f` has degree `< N` (through `L_2` and the injectivity of
+`f ↦ [f]` on continuous functions). -/
+theorem econvBCF_mem_trigPoly {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ) {N : ℕ}
+    (hF : ∀ m : d → ℤ, N ≤ deg m → 𝓕 Φ (latticeVec m) = 0) (f : UnitAddTorus d →ᵇ ℂ) :
+    econvBCF hΦ f ∈ trigPoly d N := by
+  obtain ⟨a, ha, hae⟩ := Submodule.mem_map.1 (econvLp_mem_trigPolyLp (p := (2 : ℝ≥0∞))
+    ENNReal.ofNat_ne_top hΦ hF (BoundedContinuousFunction.toLp (E := ℂ) 2 volume ℂ f))
+  have h : BoundedContinuousFunction.toLp (E := ℂ) 2 volume ℂ a =
+      BoundedContinuousFunction.toLp (E := ℂ) 2 volume ℂ (econvBCF hΦ f) := by
+    rw [toLp_econvBCF (p := (2 : ℝ≥0∞)) ENNReal.ofNat_ne_top]
+    exact hae
+  rwa [← BoundedContinuousFunction.toLp_injective (E := ℂ) (p := (2 : ℝ≥0∞)) (𝕜 := ℂ) volume h]
+
+/-- **Kernels with `𝓕Φ = 1` on the low frequencies reproduce continuous trigonometric
+polynomials**: if `𝓕Φ(m) = 1` for `deg m < N`, then `Φ ⋆ a = a` for `a` of degree `< N`. -/
+theorem econvBCF_eq_self_of_mem {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ) {N : ℕ}
+    (hF : ∀ m : d → ℤ, deg m < N → 𝓕 Φ (latticeVec m) = 1) {a : UnitAddTorus d →ᵇ ℂ}
+    (ha : a ∈ trigPoly d N) : econvBCF hΦ a = a := by
+  refine BoundedContinuousFunction.toLp_injective (E := ℂ) (p := (2 : ℝ≥0∞)) (𝕜 := ℂ) volume ?_
+  rw [toLp_econvBCF (p := (2 : ℝ≥0∞)) ENNReal.ofNat_ne_top]
+  exact econvLp_eq_self_of_mem _ hΦ hF (Submodule.mem_map_of_mem ha)
+
+end BoundedContinuous
 
 end Torus

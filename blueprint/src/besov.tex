@@ -730,52 +730,9 @@ every continuous function of $\Besov{1/p}{p}{1}(\T^{n+1})$ it is the restriction
 (\Cref{thm:trace-torus-continuous}). The proof uses approximants that are near-best both in
 $L_p$ and in the sup norm: smooth de la Vallée Poussin operators, built from the band-limiting
 kernel $\Theta_J$ of \Cref{def:lp-kernels} acting on $\T^d$ by the convolution of
-\Cref{def:torus-econv} in \Cref{ch:classical}. Their multiplier is $1$ on frequencies of degree
-$< 2^k$ and $0$ from degree $2^{k+\#d+2}$ on.
-
-\begin{lemma}[Uniform density of trigonometric polynomials]
-\label{lem:torus-uniform-density}
-\lean{Torus.map_span_mFourier_le_iSup_trigPoly, Torus.dense_iUnion_trigPoly,
-  Torus.tendsto_approxError_trigScheme, Torus.tendsto_approxSeq_trigScheme}
-\leanok
-\uses{def:trig-poly, lem:error-tendsto}
-The trigonometric polynomials are dense in the bounded continuous functions on $\T^d$ for the
-sup norm. For every bounded continuous $g$ on $\T^d$, the error $E_n(g)_\infty$ of best uniform
-approximation by $\mathcal{T}_n$ tends to $0$ as $n \to \infty$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The bounded continuous functions are the image of $C(\T^d)$ under an isometry, and the span of
-the characters is dense in $C(\T^d)$ (Mathlib's
-\texttt{span\_\allowbreak mFourier\_\allowbreak closure\_\allowbreak eq\_\allowbreak top}). Every
-character is a trigonometric polynomial, so the image of the span lies in
-$\bigcup_n \mathcal{T}_n$. \Cref{lem:error-tendsto} gives the convergence of the errors.
-\end{proof}
-
-\begin{lemma}[Convolution of continuous functions on the torus]
-\label{lem:torus-econv-continuous}
-\lean{Torus.integrable_mul_comp_sub_proj, Torus.continuous_econv, Torus.norm_econv_le,
-  Torus.econvBCF, Torus.econvBCF_apply, Torus.norm_econvBCF_le, Torus.toLp_econvBCF,
-  Torus.econvBCF_mem_trigPoly, Torus.econvBCF_eq_self_of_mem}
-\leanok
-\uses{def:torus-econv, lem:torus-econv-young, thm:torus-econv-fourier, def:trig-poly}
-For every $\Phi \in L_1(\R^d)$ the map $g \mapsto \Phi * g$ is a bounded linear operator on the
-bounded continuous functions on $\T^d$ with $\|\Phi * g\|_\infty \leq \|\Phi\|_1 \|g\|_\infty$.
-For all $1 \leq p < \infty$ and bounded continuous $g$, the class of $\Phi * g$ in $L_p(\T^d)$
-is $\Phi$ convolved with the class of $g$. For every $n \in \N$: if $\mathcal{F}\Phi(m) = 0$
-whenever $\deg m \geq n$, then $\Phi * g \in \mathcal{T}_n$ for every bounded continuous $g$;
-if $\mathcal{F}\Phi(m) = 1$ whenever $\deg m < n$, then $\Phi * a = a$ for every
-$a \in \mathcal{T}_n$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-Dominated convergence with the bound $|\Phi(y)| \|g\|_\infty$ shows that $\Phi * g$ is
-continuous, and the same bound gives the sup-norm estimate. Both convolutions are the same
-integral, so the classes agree. The last two claims hold for the classes in $L_2$ by
-\Cref{thm:torus-econv-fourier}, and continuous functions with the same class are equal.
-\end{proof}
+\Cref{def:torus-econv} in \Cref{ch:classical}, on bounded continuous functions as well
+(\Cref{lem:torus-uniform-density} and \Cref{lem:torus-econv-continuous}). Their multiplier is $1$
+on frequencies of degree $< 2^k$ and $0$ from degree $2^{k+\#d+2}$ on.
 
 \begin{lemma}[De la Vallée Poussin operators on the torus]
 \label{lem:torus-vallee-poussin}
@@ -1139,6 +1096,50 @@ $e_m(t - \pi y) = e_m(t) e_m(-\pi y)$ and \Cref{lem:torus-proj}. The trigonometr
 degree $< n$ form a finite-dimensional, hence closed, subspace of $L_p(\T^d)$, the operator maps
 every $e_m$ into it, and the $e_m$ span a dense subspace of $L_p(\T^d)$ (Mathlib's
 \texttt{span\_\allowbreak mFourierLp\_\allowbreak closure\_\allowbreak eq\_\allowbreak top}).
+\end{proof}
+
+\begin{lemma}[Uniform density of trigonometric polynomials]
+\label{lem:torus-uniform-density}
+\lean{Torus.map_span_mFourier_le_iSup_trigPoly, Torus.dense_iUnion_trigPoly,
+  Torus.tendsto_approxError_trigScheme, Torus.tendsto_approxSeq_trigScheme}
+\leanok
+\uses{def:trig-poly, lem:error-tendsto}
+The trigonometric polynomials are dense in the bounded continuous functions on $\T^d$ for the
+sup norm. For every bounded continuous $g$ on $\T^d$, the error $E_n(g)_\infty$ of best uniform
+approximation by $\mathcal{T}_n$ tends to $0$ as $n \to \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bounded continuous functions are the image of $C(\T^d)$ under an isometry, and the span of
+the characters is dense in $C(\T^d)$ (Mathlib's
+\texttt{span\_\allowbreak mFourier\_\allowbreak closure\_\allowbreak eq\_\allowbreak top}). Every
+character is a trigonometric polynomial, so the image of the span lies in
+$\bigcup_n \mathcal{T}_n$. \Cref{lem:error-tendsto} gives the convergence of the errors.
+\end{proof}
+
+\begin{lemma}[Convolution of continuous functions on the torus]
+\label{lem:torus-econv-continuous}
+\lean{Torus.integrable_mul_comp_sub_proj, Torus.continuous_econv, Torus.norm_econv_le,
+  Torus.econvBCF, Torus.econvBCF_apply, Torus.norm_econvBCF_le, Torus.toLp_econvBCF,
+  Torus.econvBCF_mem_trigPoly, Torus.econvBCF_eq_self_of_mem}
+\leanok
+\uses{def:torus-econv, lem:torus-econv-young, thm:torus-econv-fourier, def:trig-poly}
+For every $\Phi \in L_1(\R^d)$ the map $g \mapsto \Phi * g$ is a bounded linear operator on the
+bounded continuous functions on $\T^d$ with $\|\Phi * g\|_\infty \leq \|\Phi\|_1 \|g\|_\infty$.
+For all $1 \leq p < \infty$ and bounded continuous $g$, the class of $\Phi * g$ in $L_p(\T^d)$
+is $\Phi$ convolved with the class of $g$. For every $n \in \N$: if $\mathcal{F}\Phi(m) = 0$
+whenever $\deg m \geq n$, then $\Phi * g \in \mathcal{T}_n$ for every bounded continuous $g$;
+if $\mathcal{F}\Phi(m) = 1$ whenever $\deg m < n$, then $\Phi * a = a$ for every
+$a \in \mathcal{T}_n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Dominated convergence with the bound $|\Phi(y)| \|g\|_\infty$ shows that $\Phi * g$ is
+continuous, and the same bound gives the sup-norm estimate. Both convolutions are the same
+integral, so the classes agree. The last two claims hold for the classes in $L_2$ by
+\Cref{thm:torus-econv-fourier}, and continuous functions with the same class are equal.
 \end{proof}
 
 \begin{lemma}[Differences of the convolution]
