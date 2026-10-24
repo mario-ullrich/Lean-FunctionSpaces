@@ -34,12 +34,15 @@ lies between `2^(-ρθ)` times the `n`-th and `2^(ρθ)` times the `(n+1)`-th te
 pieces of equal measure is `MeasureTheory.eLpNorm_le_of_le_on_pieces` and
 `MeasureTheory.le_eLpNorm_of_le_on_pieces`.  For `φ = K(·, f)`, the terms with `n ≤ 0` are the
 sequence of `ApproximationScheme.interpNorm`, the term with `n = k + 1 > 0` is at most
-`2^(-kρθ) ‖f‖`, and `‖f‖ ≤ max(1, ‖ι‖) K(1, f)`.  Under a change of scale,
+`2^(-kρθ) ‖f‖`, and `‖f‖ ≤ max(1, ‖ι‖) K(1, f)`; the comparison of the two grids holds for every
+`φ`, with an upper bound `M` of `φ` in place of `‖f‖`
+(`ApproximationScheme.lqNorm_le_lqNorm_discretePhiSeq`,
+`ApproximationScheme.lqNorm_discretePhiSeq_le`).  Under a change of scale,
 `K(c t, f) ≤ max(1, c) K(t, f)` (`ApproximationScheme.kFunctional_mul_le`), and `‖f‖ ≤ K(t, f)`
 for `t ≥ ‖ι‖` (`ApproximationScheme.enorm_le_kFunctional`).
 
 The functional `ApproximationScheme.phiFunctional` is the formula of `EQuasinorm.phiFunctional`
-in the project *MultilinearInterpolation* (Bonn; van Doorn, Potergies, Rothgang, Viana Reis;
+in the project *MultilinearInterpolation* (Bonn; van Doorn, Portegies, Rothgang, Viana Reis;
 Apache 2.0).  That project states the equivalence `discreteKMethod_equiv_kmethod`
 (Bergh–Löfström, Lemma 3.1.3) for general couples of quasi-normed spaces on the grid `2^n`,
 `n ∈ ℤ`.  For `ρ = 1` and `θ ≥ 0`, the comparison of `phiFunctional` with its discrete version
@@ -252,10 +255,19 @@ theorem phiFunctional_eq (φ : ℝ≥0∞ → ℝ≥0∞) :
 theorem measurable_phiIntegrand (hφ : Monotone φ) : Measurable (phiIntegrand θ φ) :=
   (ENNReal.measurable_ofReal.pow_const _).mul (hφ.measurable.comp ENNReal.measurable_ofReal)
 
+/-- `Φ_{θ,q}(φ)` depends only on the values of `φ` on `(0, ∞)`: if `φ t = ψ t` for every
+`t ≠ 0, ∞`, then `Φ_{θ,q}(φ) = Φ_{θ,q}(ψ)`. -/
+theorem phiFunctional_congr {ψ : ℝ≥0∞ → ℝ≥0∞} (h : ∀ t, t ≠ 0 → t ≠ ∞ → φ t = ψ t) :
+    phiFunctional θ q φ = phiFunctional θ q ψ := by
+  rw [phiFunctional_eq, phiFunctional_eq, kMethodMeasure]
+  refine eLpNorm_congr_ae ((ae_restrict_iff' measurableSet_Ioi).2
+    (Filter.Eventually.of_forall fun t ht => ?_))
+  rw [phiIntegrand, phiIntegrand, h _ (ENNReal.ofReal_pos.2 ht).ne' ENNReal.ofReal_ne_top]
+
 variable (ι) in
 /-- The norm of the **continuous K-method**, `‖f‖_{K,θ,q} = Φ_{θ,q}(K(·, f))`, that is
-`(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)` for `q < ∞` and the essential supremum of
-`t^(-θ) K(t, f)` for `q = ∞` (Bergh–Löfström, Section 3.1). -/
+`(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)` for `0 < q < ∞`, the essential supremum of
+`t^(-θ) K(t, f)` for `q = ∞`, and `0` for `q = 0` (Bergh–Löfström, Section 3.1). -/
 noncomputable def kMethodNorm (θ : ℝ) (q : ℝ≥0∞) (f : X) : ℝ≥0∞ :=
   phiFunctional θ q fun t => kFunctional ι t f
 
@@ -474,27 +486,6 @@ theorem discreteKMethodNorm_le_kMethodNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (f : 
 
 /-! ### The grid on `ℤ` and the grid on `ℕ` -/
 
-/-- The terms with `n = -k ≤ 0` are the sequence of the interpolation norm:
-`2^(kρθ) K(2^(-kρ), f)`. -/
-theorem discreteKSeq_neg_natCast (f : X) (k : ℕ) :
-    discreteKSeq ι θ ρ f (-k) = interpSeq ι θ ρ f k := by
-  have h1 : -(((-(k : ℤ) : ℤ) : ℝ) * ρ * θ) = (k : ℝ) * (ρ * θ) := by push_cast; ring
-  have h2 : ((-(k : ℤ) : ℤ) : ℝ) * ρ = (k : ℝ) * -ρ := by push_cast; ring
-  rw [discreteKSeq, interpSeq, ENNReal.dyadicWeight, ENNReal.dyadicWeight, h1, h2]
-
-/-- The term with `n = 0` is `K(1, f)`. -/
-theorem discreteKSeq_zero (f : X) : discreteKSeq ι θ ρ f 0 = kFunctional ι 1 f := by
-  simp [discreteKSeq]
-
-/-- The terms with `n = k + 1 > 0` are at most `2^(-kρθ) ‖f‖`, for `ρθ ≥ 0`. -/
-theorem discreteKSeq_natCast_add_one_le (hρθ : 0 ≤ ρ * θ) (f : X) (k : ℕ) :
-    discreteKSeq ι θ ρ f ((k : ℤ) + 1) ≤ ‖f‖ₑ * dyadicWeight (-(ρ * θ)) k := by
-  rw [discreteKSeq, mul_comm ‖f‖ₑ, ENNReal.dyadicWeight]
-  refine mul_le_mul' (ENNReal.rpow_le_rpow_of_exponent_le one_le_two ?_)
-    (kFunctional_le_enorm f)
-  push_cast
-  nlinarith
-
 /-- The map `k ↦ -k` from `ℕ` to `ℤ` is injective. -/
 theorem injective_neg_natCast : Injective fun k : ℕ => -(k : ℤ) :=
   neg_injective.comp Nat.cast_injective
@@ -503,22 +494,109 @@ theorem injective_neg_natCast : Injective fun k : ℕ => -(k : ℤ) :=
 theorem injective_natCast_add_one : Injective fun k : ℕ => (k : ℤ) + 1 :=
   (add_left_injective 1).comp Nat.cast_injective
 
+/-- The terms of `(2^(-nρθ) φ(2^(nρ)))_{n ∈ ℤ}` with `n = -k ≤ 0` are `2^(kρθ) φ(2^(-kρ))`. -/
+theorem discretePhiSeq_neg_natCast (φ : ℝ≥0∞ → ℝ≥0∞) (k : ℕ) :
+    discretePhiSeq θ ρ φ (-k) = dyadicWeight (ρ * θ) k * φ (dyadicWeight (-ρ) k) := by
+  have h1 : -(((-(k : ℤ) : ℤ) : ℝ) * ρ * θ) = (k : ℝ) * (ρ * θ) := by push_cast; ring
+  have h2 : ((-(k : ℤ) : ℤ) : ℝ) * ρ = (k : ℝ) * -ρ := by push_cast; ring
+  rw [discretePhiSeq, ENNReal.dyadicWeight, ENNReal.dyadicWeight, h1, h2]
+
+/-- The term of `(2^(-nρθ) φ(2^(nρ)))_{n ∈ ℤ}` with `n = 0` is `φ(1)`. -/
+theorem discretePhiSeq_zero (φ : ℝ≥0∞ → ℝ≥0∞) : discretePhiSeq θ ρ φ 0 = φ 1 := by
+  simp [discretePhiSeq]
+
+/-- If `φ ≤ M`, the terms of `(2^(-nρθ) φ(2^(nρ)))_{n ∈ ℤ}` with `n = k + 1 > 0` are at most
+`2^(-kρθ) M`, for `ρθ ≥ 0`. -/
+theorem discretePhiSeq_natCast_add_one_le {M : ℝ≥0∞} (hρθ : 0 ≤ ρ * θ) (hM : ∀ t, φ t ≤ M)
+    (k : ℕ) : discretePhiSeq θ ρ φ ((k : ℤ) + 1) ≤ M * dyadicWeight (-(ρ * θ)) k := by
+  rw [discretePhiSeq, mul_comm M, ENNReal.dyadicWeight]
+  refine mul_le_mul' (ENNReal.rpow_le_rpow_of_exponent_le one_le_two ?_) (hM _)
+  push_cast
+  nlinarith
+
+/-- **Splitting the grid on `ℤ`**: if `φ ≤ M` and `ρθ ≥ 0`, the sequence
+`(2^(-nρθ) φ(2^(nρ)))_{n ∈ ℤ}` is at most the sequence `2^(kρθ) φ(2^(-kρ))` placed at
+`n = -k ≤ 0` plus the sequence `2^(-kρθ) M` placed at `n = k + 1 > 0`. -/
+theorem discretePhiSeq_le_extend {M : ℝ≥0∞} (hρθ : 0 ≤ ρ * θ) (hM : ∀ t, φ t ≤ M) (n : ℤ) :
+    discretePhiSeq θ ρ φ n ≤
+      extend (fun k : ℕ => -(k : ℤ)) (fun k => dyadicWeight (ρ * θ) k * φ (dyadicWeight (-ρ) k))
+          0 n +
+        extend (fun k : ℕ => (k : ℤ) + 1) (fun k => M * dyadicWeight (-(ρ * θ)) k) 0 n := by
+  obtain ⟨k, rfl | rfl⟩ := Int.eq_nat_or_neg n
+  · rcases k with _ | k
+    · have h0 : ((0 : ℕ) : ℤ) = -((0 : ℕ) : ℤ) := by simp
+      rw [h0, injective_neg_natCast.extend_apply, discretePhiSeq_neg_natCast]
+      exact le_self_add
+    · have h1 : ((k + 1 : ℕ) : ℤ) = (k : ℤ) + 1 := by push_cast; ring
+      rw [h1, injective_natCast_add_one.extend_apply]
+      exact (discretePhiSeq_natCast_add_one_le hρθ hM k).trans le_add_self
+  · rw [injective_neg_natCast.extend_apply, discretePhiSeq_neg_natCast]
+    exact le_self_add
+
+/-- **The grid on `ℤ` by the grid on `ℕ`**: if `φ ≤ M` and `ρθ ≥ 0`, then
+`‖(2^(-nρθ) φ(2^(nρ)))_{n ∈ ℤ}‖_{ℓ_q} ≤ C_q γ (M + ‖(2^(kρθ) φ(2^(-kρ)))_{k ∈ ℕ}‖_{ℓ_q})` with
+`γ = dyadicGeomConst (ρθ) q`, where `C_q` is Mathlib's constant `LpAddConst q` of the
+quasi-triangle inequality (`1` for `q ≥ 1`). -/
+theorem lqNorm_discretePhiSeq_le {M : ℝ≥0∞} (hρθ : 0 ≤ ρ * θ) (hM : ∀ t, φ t ≤ M) :
+    lqNorm q (discretePhiSeq θ ρ φ) ≤ LpAddConst q * dyadicGeomConst (ρ * θ) q *
+      (M + lqNorm q fun k : ℕ => dyadicWeight (ρ * θ) k * φ (dyadicWeight (-ρ) k)) := by
+  set a : ℕ → ℝ≥0∞ := fun k => dyadicWeight (ρ * θ) k * φ (dyadicWeight (-ρ) k)
+  calc lqNorm q (discretePhiSeq θ ρ φ)
+      ≤ lqNorm q (fun n => extend (fun k : ℕ => -(k : ℤ)) a 0 n +
+          extend (fun k : ℕ => (k : ℤ) + 1) (fun k => M * dyadicWeight (-(ρ * θ)) k) 0 n) :=
+        ENNReal.lqNorm_mono (discretePhiSeq_le_extend hρθ hM)
+    _ ≤ LpAddConst q * (lqNorm q (extend (fun k : ℕ => -(k : ℤ)) a 0) +
+          lqNorm q (extend (fun k : ℕ => (k : ℤ) + 1)
+            (fun k => M * dyadicWeight (-(ρ * θ)) k) 0)) :=
+        eLpNorm_add_le' q
+    _ ≤ LpAddConst q * (lqNorm q a + M * dyadicGeomConst (ρ * θ) q) := by
+        rw [ENNReal.lqNorm_extend_zero injective_neg_natCast,
+          ENNReal.lqNorm_extend_zero injective_natCast_add_one, ENNReal.lqNorm_const_mul]
+        gcongr
+        exact ENNReal.lqNorm_dyadicWeight_neg_le_dyadicGeomConst hρθ
+    _ ≤ LpAddConst q * dyadicGeomConst (ρ * θ) q * (M + lqNorm q a) := by
+        rw [mul_assoc]
+        gcongr
+        calc lqNorm q a + M * dyadicGeomConst (ρ * θ) q
+            ≤ dyadicGeomConst (ρ * θ) q * lqNorm q a + M * dyadicGeomConst (ρ * θ) q := by
+              gcongr
+              exact le_mul_of_one_le_left' (ENNReal.one_le_dyadicGeomConst _ _)
+          _ = dyadicGeomConst (ρ * θ) q * (M + lqNorm q a) := by ring
+
+/-- **The grid on `ℕ` is part of the grid on `ℤ`**:
+`‖(2^(kρθ) φ(2^(-kρ)))_{k ∈ ℕ}‖_{ℓ_q} ≤ ‖(2^(-nρθ) φ(2^(nρ)))_{n ∈ ℤ}‖_{ℓ_q}`. -/
+theorem lqNorm_le_lqNorm_discretePhiSeq :
+    lqNorm q (fun k : ℕ => dyadicWeight (ρ * θ) k * φ (dyadicWeight (-ρ) k)) ≤
+      lqNorm q (discretePhiSeq θ ρ φ) := by
+  have h : (fun k : ℕ => dyadicWeight (ρ * θ) k * φ (dyadicWeight (-ρ) k)) =
+      discretePhiSeq θ ρ φ ∘ fun k : ℕ => -(k : ℤ) :=
+    funext fun k => (discretePhiSeq_neg_natCast φ k).symm
+  rw [h]
+  exact ENNReal.lqNorm_comp_le_of_injective injective_neg_natCast _
+
+/-- The terms with `n = -k ≤ 0` are the sequence of the interpolation norm:
+`2^(kρθ) K(2^(-kρ), f)`. -/
+theorem discreteKSeq_neg_natCast (f : X) (k : ℕ) :
+    discreteKSeq ι θ ρ f (-k) = interpSeq ι θ ρ f k :=
+  discretePhiSeq_neg_natCast (fun t => kFunctional ι t f) k
+
+/-- The term with `n = 0` is `K(1, f)`. -/
+theorem discreteKSeq_zero (f : X) : discreteKSeq ι θ ρ f 0 = kFunctional ι 1 f :=
+  discretePhiSeq_zero (fun t => kFunctional ι t f)
+
+/-- The terms with `n = k + 1 > 0` are at most `2^(-kρθ) ‖f‖`, for `ρθ ≥ 0`. -/
+theorem discreteKSeq_natCast_add_one_le (hρθ : 0 ≤ ρ * θ) (f : X) (k : ℕ) :
+    discreteKSeq ι θ ρ f ((k : ℤ) + 1) ≤ ‖f‖ₑ * dyadicWeight (-(ρ * θ)) k :=
+  discretePhiSeq_natCast_add_one_le (φ := fun t => kFunctional ι t f) hρθ
+    (fun _ => kFunctional_le_enorm f) k
+
 /-- **Splitting the grid on `ℤ`**: the sequence on `ℤ` is at most the interpolation sequence
 placed at `n = -k ≤ 0` plus the sequence `2^(-kρθ) ‖f‖` placed at `n = k + 1 > 0`. -/
 theorem discreteKSeq_le_extend (hρθ : 0 ≤ ρ * θ) (f : X) (n : ℤ) :
     discreteKSeq ι θ ρ f n ≤
       extend (fun k : ℕ => -(k : ℤ)) (interpSeq ι θ ρ f) 0 n +
-        extend (fun k : ℕ => (k : ℤ) + 1) (fun k => ‖f‖ₑ * dyadicWeight (-(ρ * θ)) k) 0 n := by
-  obtain ⟨k, rfl | rfl⟩ := Int.eq_nat_or_neg n
-  · rcases k with _ | k
-    · have h0 : ((0 : ℕ) : ℤ) = -((0 : ℕ) : ℤ) := by simp
-      rw [h0, injective_neg_natCast.extend_apply, discreteKSeq_neg_natCast]
-      exact le_self_add
-    · have h1 : ((k + 1 : ℕ) : ℤ) = (k : ℤ) + 1 := by push_cast; ring
-      rw [h1, injective_natCast_add_one.extend_apply]
-      exact (discreteKSeq_natCast_add_one_le hρθ f k).trans le_add_self
-  · rw [injective_neg_natCast.extend_apply, discreteKSeq_neg_natCast]
-    exact le_self_add
+        extend (fun k : ℕ => (k : ℤ) + 1) (fun k => ‖f‖ₑ * dyadicWeight (-(ρ * θ)) k) 0 n :=
+  discretePhiSeq_le_extend (φ := fun t => kFunctional ι t f) hρθ (fun _ => kFunctional_le_enorm f) n
 
 /-- **The discrete K-norm on `ℤ` by the interpolation norm**: for `ρθ ≥ 0`,
 `‖(2^(-nρθ) K(2^(nρ), f))_{n ∈ ℤ}‖_{ℓ_q} ≤ C_q γ ‖f‖_{θ,q}` with
@@ -526,29 +604,8 @@ theorem discreteKSeq_le_extend (hρθ : 0 ≤ ρ * θ) (f : X) (n : ℤ) :
 quasi-triangle inequality (`1` for `q ≥ 1`). -/
 theorem discreteKMethodNorm_le_interpNorm (hρθ : 0 ≤ ρ * θ) (f : X) :
     discreteKMethodNorm ι θ ρ q f ≤
-      LpAddConst q * dyadicGeomConst (ρ * θ) q * interpNorm ι θ ρ q f := by
-  calc discreteKMethodNorm ι θ ρ q f
-      ≤ lqNorm q (fun n => extend (fun k : ℕ => -(k : ℤ)) (interpSeq ι θ ρ f) 0 n +
-          extend (fun k : ℕ => (k : ℤ) + 1) (fun k => ‖f‖ₑ * dyadicWeight (-(ρ * θ)) k) 0 n) :=
-        ENNReal.lqNorm_mono (discreteKSeq_le_extend hρθ f)
-    _ ≤ LpAddConst q * (lqNorm q (extend (fun k : ℕ => -(k : ℤ)) (interpSeq ι θ ρ f) 0) +
-          lqNorm q (extend (fun k : ℕ => (k : ℤ) + 1)
-            (fun k => ‖f‖ₑ * dyadicWeight (-(ρ * θ)) k) 0)) :=
-        eLpNorm_add_le' q
-    _ ≤ LpAddConst q * (lqNorm q (interpSeq ι θ ρ f) + ‖f‖ₑ * dyadicGeomConst (ρ * θ) q) := by
-        rw [ENNReal.lqNorm_extend_zero injective_neg_natCast,
-          ENNReal.lqNorm_extend_zero injective_natCast_add_one, ENNReal.lqNorm_const_mul]
-        gcongr
-        exact ENNReal.lqNorm_dyadicWeight_neg_le_dyadicGeomConst hρθ
-    _ ≤ LpAddConst q * dyadicGeomConst (ρ * θ) q * interpNorm ι θ ρ q f := by
-        rw [mul_assoc, interpNorm]
-        gcongr
-        calc lqNorm q (interpSeq ι θ ρ f) + ‖f‖ₑ * dyadicGeomConst (ρ * θ) q
-            ≤ dyadicGeomConst (ρ * θ) q * lqNorm q (interpSeq ι θ ρ f) +
-                ‖f‖ₑ * dyadicGeomConst (ρ * θ) q := by
-              gcongr
-              exact le_mul_of_one_le_left' (ENNReal.one_le_dyadicGeomConst _ _)
-          _ = dyadicGeomConst (ρ * θ) q * (‖f‖ₑ + lqNorm q (interpSeq ι θ ρ f)) := by ring
+      LpAddConst q * dyadicGeomConst (ρ * θ) q * interpNorm ι θ ρ q f :=
+  lqNorm_discretePhiSeq_le (φ := fun t => kFunctional ι t f) hρθ fun _ => kFunctional_le_enorm f
 
 /-- **The interpolation norm by the discrete K-norm on `ℤ`**: for `q ≠ 0`,
 `‖f‖_{θ,q} ≤ (1 + max(1, ‖ι‖)) ‖(2^(-nρθ) K(2^(nρ), f))_{n ∈ ℤ}‖_{ℓ_q}`; the term `‖f‖` is
@@ -560,11 +617,8 @@ theorem interpNorm_le_discreteKMethodNorm (hq : q ≠ 0) (f : X) :
     gcongr
     rw [← discreteKSeq_zero (θ := θ) (ρ := ρ)]
     exact ENNReal.le_lqNorm hq _ 0
-  have h2 : lqNorm q (interpSeq ι θ ρ f) ≤ discreteKMethodNorm ι θ ρ q f := by
-    have : interpSeq ι θ ρ f = discreteKSeq ι θ ρ f ∘ fun k : ℕ => -(k : ℤ) :=
-      funext fun k => (discreteKSeq_neg_natCast f k).symm
-    rw [this]
-    exact ENNReal.lqNorm_comp_le_of_injective injective_neg_natCast _
+  have h2 : lqNorm q (interpSeq ι θ ρ f) ≤ discreteKMethodNorm ι θ ρ q f :=
+    lqNorm_le_lqNorm_discretePhiSeq (φ := fun t => kFunctional ι t f)
   calc interpNorm ι θ ρ q f = ‖f‖ₑ + lqNorm q (interpSeq ι θ ρ f) := rfl
     _ ≤ max 1 ‖ι‖ₑ * discreteKMethodNorm ι θ ρ q f + discreteKMethodNorm ι θ ρ q f :=
         add_le_add h1 h2

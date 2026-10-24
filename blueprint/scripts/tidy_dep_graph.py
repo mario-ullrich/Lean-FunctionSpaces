@@ -63,6 +63,7 @@ BLOCKS: list[tuple[str, list]] = [
         "Approximation schemes", "Sequence spaces", "Approximation spaces",
         "Lifting and the Nikolskii transfer theorem",
         "Interpolation and the representation theorem"]),
+    ("Real interpolation of couples", ["Real interpolation of couples"]),
     ("Decompositions, traces and moduli", [
         "Block decompositions and projections", "Traces and intrinsic norms",
         "Moduli of smoothness and approximation"]),
@@ -137,6 +138,7 @@ COLUMNS: list[list[str]] = [
      "Sobolev spaces: the bridge for p = 2", "Interpolation of operators",
      "Vector-valued singular integrals", "Sobolev spaces W^m_p", "Bessel potential spaces"],
     ["Traces", "Sobolev spaces on domains and boundaries"],
+    ["Approximation spaces: general theory", "Real interpolation of couples"],
 ]
 GAP = 2
 

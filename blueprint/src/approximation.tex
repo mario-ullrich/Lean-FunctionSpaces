@@ -6,7 +6,8 @@
 This part develops the abstract theory: approximation schemes in a normed space, the
 approximation spaces $A^s_q$ and their embeddings, Jackson's and Bernstein's inequalities with
 the Nikolskii transfer theorem, the representation of $A^s_q$ as a real interpolation space of
-the discrete $K$-method, block decompositions and projections, traces and intrinsic norms, and
+the discrete $K$-method, real interpolation of couples of quasi-normed abelian groups, block
+decompositions and projections, traces and intrinsic norms, and
 moduli of smoothness. Its last three chapters apply the theory to schemes of functions on a
 finite measure space, whose approximation spaces are Besov spaces with embeddings from a
 Nikolskii inequality, and to spectral schemes in a Hilbert space. The characterisations proved
@@ -1092,7 +1093,8 @@ The discrete $K$-method of \Cref{def:interpolation} samples $K(t, f)$ on a dyadi
 continuous $K$-method integrates $K(t, f)$ over all $t > 0$ against the measure $dt/t$. This
 section shows that both give the same space for every $\theta > 0$ and every dyadic grid, with
 explicit constants~\cite[Lemma~3.1.3]{BerghLofstrom}. The definition has the form of the
-continuous $K$-method in the Lean project \emph{MultilinearInterpolation} (Bonn), where the
+continuous $K$-method in the Lean project
+\emph{MultilinearInterpolation}~\cite{MultilinearInterpolation} (Bonn), where the
 equivalence \texttt{discreteKMethod\_\allowbreak equiv\_\allowbreak kmethod} is stated for
 general couples of quasi-normed spaces on the grid $2^n$, $n \in \Z$. For $\rho = 1$ and
 $\theta \geq 0$, \Cref{lem:continuous-k-method-integer-grid} gives its two inequalities for every
@@ -1157,7 +1159,7 @@ by (4).
 \label{def:continuous-k-method}
 \lean{ApproximationScheme.kMethodMeasure, ApproximationScheme.phiFunctional,
   ApproximationScheme.phiIntegrand, ApproximationScheme.phiFunctional_eq,
-  ApproximationScheme.measurable_phiIntegrand,
+  ApproximationScheme.measurable_phiIntegrand, ApproximationScheme.phiFunctional_congr,
   ApproximationScheme.kMethodNorm, ApproximationScheme.MemKMethod,
   ApproximationScheme.kMethodIntegrand, ApproximationScheme.kMethodNorm_eq,
   ApproximationScheme.measurable_kMethodIntegrand}
@@ -1175,7 +1177,8 @@ with $\|f\|_{K, \theta, q} < \infty$.
 \end{definition}
 
 For an increasing $\varphi$ the integrand $t \mapsto t^{-\theta} \varphi(t)$ is measurable; this
-applies to $\varphi = K(\cdot, f)$. As in~\cite[Section~3.1]{BerghLofstrom}, the norm is
+applies to $\varphi = K(\cdot, f)$. The functional $\Phi_{\theta, q}(\varphi)$ depends only on
+the values of $\varphi$ on $(0, \infty)$. As in~\cite[Section~3.1]{BerghLofstrom}, the norm is
 $\Phi_{\theta, q}(K(\cdot, f))$ alone; the discrete norm of \Cref{def:interpolation}
 adds $\|f\|$.
 
@@ -1260,9 +1263,13 @@ $K$-functional is increasing in $t$ (\Cref{lem:k-functional}), which gives the s
 
 \begin{lemma}[The grid on the integers and the grid on the natural numbers]
 \label{lem:integer-grid-natural-grid}
-\lean{ApproximationScheme.discreteKSeq_neg_natCast, ApproximationScheme.discreteKSeq_zero,
-  ApproximationScheme.discreteKSeq_natCast_add_one_le, ApproximationScheme.injective_neg_natCast,
-  ApproximationScheme.injective_natCast_add_one, ApproximationScheme.discreteKSeq_le_extend,
+\lean{ApproximationScheme.injective_neg_natCast, ApproximationScheme.injective_natCast_add_one,
+  ApproximationScheme.discretePhiSeq_neg_natCast, ApproximationScheme.discretePhiSeq_zero,
+  ApproximationScheme.discretePhiSeq_natCast_add_one_le,
+  ApproximationScheme.discretePhiSeq_le_extend, ApproximationScheme.lqNorm_discretePhiSeq_le,
+  ApproximationScheme.lqNorm_le_lqNorm_discretePhiSeq,
+  ApproximationScheme.discreteKSeq_neg_natCast, ApproximationScheme.discreteKSeq_zero,
+  ApproximationScheme.discreteKSeq_natCast_add_one_le, ApproximationScheme.discreteKSeq_le_extend,
   ApproximationScheme.discreteKMethodNorm_le_interpNorm,
   ApproximationScheme.interpNorm_le_discreteKMethodNorm}
 \leanok
@@ -1278,14 +1285,29 @@ and, if $\rho\theta \geq 0$,
 \]
 where $C_q = 1$ for $q \geq 1$ and $C_q = 2^{1/q - 1}$ for $q < 1$ is the constant of the
 quasi-triangle inequality in $\ell_q$ and $\gamma_{\rho\theta, q}$ is the constant of
-\Cref{lem:lq-reindex}.
+\Cref{lem:lq-reindex}. For every $\varphi : [0, \infty] \to [0, \infty]$,
+\[
+  \bigl\| \bigl(2^{k\rho\theta} \varphi(2^{-k\rho})\bigr)_{k \in \N} \bigr\|_{\ell_q}
+  \leq \|\varphi^{\Z}_{\theta, \rho}\|_{\ell_q} ,
+\]
+and, if $\rho\theta \geq 0$ and $\varphi \leq M$ for some $M \in [0, \infty]$,
+\[
+  \|\varphi^{\Z}_{\theta, \rho}\|_{\ell_q} \leq C_q \, \gamma_{\rho\theta, q} \Bigl(M +
+  \bigl\| \bigl(2^{k\rho\theta} \varphi(2^{-k\rho})\bigr)_{k \in \N} \bigr\|_{\ell_q}\Bigr) .
+\]
 \end{lemma}
 
 \begin{proof}
 \leanok
-The terms with $n = -k \leq 0$ are the terms $2^{k\rho\theta} K(2^{-k\rho}, f)$ of
-$\|f\|_{\theta, q}$, the term $n = 0$ is $K(1, f)$, and the terms with $n = k + 1 > 0$ are at
-most $2^{-k\rho\theta} \|f\|$ since $K(t, f) \leq \|f\|$. Hence the sequence on $\Z$ is at most
+The terms of $\varphi^{\Z}_{\theta, \rho}$ with $n = -k \leq 0$ are
+$2^{k\rho\theta} \varphi(2^{-k\rho})$, the term $n = 0$ is $\varphi(1)$, and the terms with
+$n = k + 1 > 0$ are at most $2^{-k\rho\theta} M$. The argument below, written for
+$\varphi = K(\cdot, f)$ and $M = \|f\|$, uses only these three facts and so gives the two bounds
+for $\varphi$. For
+$\varphi = K(\cdot, f)$ and $M = \|f\|$: the terms with $n = -k \leq 0$ are the terms
+$2^{k\rho\theta} K(2^{-k\rho}, f)$ of $\|f\|_{\theta, q}$, the term $n = 0$ is $K(1, f)$, and
+the terms with $n = k + 1 > 0$ are at most $2^{-k\rho\theta} \|f\|$ since
+$K(t, f) \leq \|f\|$. Hence the sequence on $\Z$ is at most
 the sum of these two sequences placed on $n \leq 0$ and $n > 0$. By the quasi-triangle
 inequality in $\ell_q$ (constant $C_q$) and \Cref{lem:lq-reindex}, its norm is at most
 $C_q \bigl(\|(2^{k\rho\theta} K(2^{-k\rho}, f))_k\|_{\ell_q} + \gamma_{\rho\theta, q} \|f\|\bigr)$,
@@ -1355,6 +1377,360 @@ $A^s_q = (X, W)^K_{s/r, q}$.
 $t = 2^{-kr}$, and \Cref{thm:discrete-continuous-k-method} with $\theta = s/r > 0$ and
 $\rho = r > 0$ identifies this space with $(X, Y)^K_{s/r, q}$.
 \end{proof}
+
+\chapter{Real interpolation of couples}
+\label{ch:real-interpolation}
+
+The previous chapter interpolates between $X$ and the image of a bounded linear map
+$\iota : Y \to X$. This chapter sets up real interpolation for a general couple: two extended
+quasi-norms on one abelian group, as for quasi-normed abelian groups
+in~\cite[Sections~3.10 and~3.11]{BerghLofstrom}. The encoding is that of the couples of the Lean
+project \emph{MultilinearInterpolation}~\cite{MultilinearInterpolation} (Bonn), there on a
+monoid; its $K$-functional, its
+continuous $K$-method and its discrete $K$-method on the grid $2^n$, $n \in \Z$, are the
+$K$-functional, the continuous $K$-method and the discrete $K$-method with $\rho = 1$ of this
+chapter. The couple of a map $\iota$ gives back the spaces of
+\Cref{ch:interpolation}.
+
+\section{Couples and their \texorpdfstring{$K$}{K}-method}
+\label{sec:couples}
+
+\begin{definition}[Couple]
+\label{def:couple}
+\lean{InterpCouple, InterpCouple.swap, InterpCouple.swap_norm0, InterpCouple.swap_norm1,
+  InterpCouple.swap_swap, InterpCouple.IsQuasiNormed, InterpCouple.IsQuasiNormed.swap,
+  InterpCouple.IsHomogeneous, InterpCouple.IsHomogeneous.norm0_zero,
+  InterpCouple.IsHomogeneous.norm1_zero}
+\leanok
+Let $U$ be an abelian group. A \emph{couple} on $U$ is a pair $A = (N_0, N_1)$ of functions
+$N_0, N_1 : U \to [0, \infty]$; its \emph{swap} is $(N_1, N_0)$. For $C \in [0, \infty]$, the
+couple is \emph{quasi-normed with constant $C$} if $C < \infty$ and, for $i = 0, 1$ and all
+$a, b \in U$,
+\[
+  N_i(0) = 0 , \qquad N_i(-a) = N_i(a) , \qquad N_i(a + b) \leq C \bigl(N_i(a) + N_i(b)\bigr) .
+\]
+If $U$ is a real vector space, the couple is \emph{homogeneous} if $N_i(c a) \leq |c| N_i(a)$
+for $i = 0, 1$, every $c \in \R$ and every $a \in U$.
+\end{definition}
+
+The two spaces of the couple are $X_i = \{a \in U : N_i(a) < \infty\}$, both inside $U$, so the
+compatibility of the two spaces in~\cite[Section~2.3]{BerghLofstrom} is part of the encoding.
+The swap of a quasi-normed couple is quasi-normed with the same constant, and a homogeneous
+couple has $N_0(0) = N_1(0) = 0$.
+
+\begin{definition}[$K$-functional of a couple]
+\label{def:couple-k-functional}
+\lean{InterpCouple.kFunctional, InterpCouple.kFunctional_le}
+\leanok
+\uses{def:couple}
+For a couple $A = (N_0, N_1)$ on $U$, $t \in [0, \infty]$ and $u \in U$,
+\[
+  K(t, u) = \inf_{b \in U} \bigl(N_0(u - b) + t N_1(b)\bigr) .
+\]
+\end{definition}
+
+\begin{lemma}[Properties of the $K$-functional of a couple]
+\label{lem:couple-k-functional}
+\lean{InterpCouple.kFunctional_le_norm0, InterpCouple.kFunctional_le_mul_norm1,
+  InterpCouple.kFunctional_zero_right, InterpCouple.kFunctional_mono,
+  InterpCouple.monotone_kFunctional, InterpCouple.kFunctional_mul_le_of_ne_top,
+  InterpCouple.kFunctional_add_le_of_decomp, InterpCouple.kFunctional_add_le,
+  InterpCouple.kFunctional_neg, InterpCouple.kFunctional_smul_le}
+\leanok
+\uses{def:couple-k-functional}
+Let $A = (N_0, N_1)$ be a couple on $U$. For all $s \leq t$ in $[0, \infty]$, every
+$c \in [0, \infty)$ and all $u, v \in U$:
+\begin{enumerate}
+  \item if $N_1(0) = 0$, then $K(t, u) \leq N_0(u)$; if $N_0(0) = 0$, then
+    $K(t, u) \leq t N_1(u)$; if both hold, then $K(t, 0) = 0$;
+  \item $K(s, u) \leq K(t, u)$ and $K(ct, u) \leq \max(1, c) \, K(t, u)$;
+  \item if $A$ is quasi-normed with constant $C$, then
+    $K(t, u + v) \leq C \bigl(K(t, u) + K(t, v)\bigr)$; if $N_0$ and $N_1$ are even, then
+    $K(t, -u) = K(t, u)$;
+  \item if $U$ is a real vector space and $A$ is homogeneous, then
+    $K(t, r u) \leq |r| \, K(t, u)$ for every $r \in \R$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Take $b = 0$, respectively $b = u$. (2) For each $b$,
+$N_0(u - b) + ct N_1(b) \leq \max(1, c) \bigl(N_0(u - b) + t N_1(b)\bigr)$. (3) For all $b, b'$,
+the decomposition $u + v - (b + b') = (u - b) + (v - b')$ and the quasi-triangle inequalities
+give
+\[
+  K(t, u + v) \leq C \bigl(N_0(u - b) + t N_1(b) + N_0(v - b') + t N_1(b')\bigr) ;
+\]
+take the infimum over $b$ and over $b'$. The substitution $b \mapsto -b$ gives
+$K(t, -u) = K(t, u)$. (4) For $r \neq 0$ use the decomposition $r u = r(u - b) + r b$; for
+$r = 0$ use (1).
+\end{proof}
+
+These are~\cite[Lemmas~3.1.1 and~3.11.1]{BerghLofstrom}; for a quasi-normed couple with
+constant $C = 1$, (3) is a triangle inequality, as in \Cref{lem:k-functional}.
+
+\begin{lemma}[$K$-functional of the swapped couple]
+\label{lem:couple-k-functional-swap}
+\lean{InterpCouple.kFunctional_swap}
+\leanok
+\uses{def:couple-k-functional}
+For every couple $A$ on $U$, every $t \in (0, \infty)$ and every $u \in U$, the $K$-functional
+$K_{\mathrm{swap}}$ of the swapped couple satisfies
+$K_{\mathrm{swap}}(t, u) = t \, K(t^{-1}, u)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$t \bigl(N_0(u - b) + t^{-1} N_1(b)\bigr) = N_1(b) + t N_0(u - b)$, and $b \mapsto u - b$ is a
+bijection of $U$.
+\end{proof}
+
+\begin{lemma}[First norm of an ordered couple]
+\label{lem:ordered-couple}
+\lean{InterpCouple.norm0_le_mul_kFunctional_one}
+\leanok
+\uses{def:couple-k-functional}
+Let $A = (N_0, N_1)$ be a couple on $U$, quasi-normed with constant $C$, and let
+$c \in [0, \infty)$ with $N_0(a) \leq c \, N_1(a)$ for every $a \in U$. For every $u \in U$,
+$N_0(u) \leq C \max(1, c) \, K(1, u)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For every $b$,
+$N_0(u) \leq C \bigl(N_0(u - b) + N_0(b)\bigr) \leq C \max(1, c) \bigl(N_0(u - b) +
+N_1(b)\bigr)$.
+\end{proof}
+
+\paragraph{The $K$-method of a couple.}
+The continuous and the discrete $K$-method of \Cref{def:continuous-k-method} and
+\Cref{def:discrete-k-method-integers} need only the $K$-functional, so they carry over.
+
+\begin{definition}[$K$-method of a couple]
+\label{def:couple-k-method}
+\lean{InterpCouple.kMethodNorm, InterpCouple.MemKMethod, InterpCouple.discreteKSeq,
+  InterpCouple.discreteKMethodNorm, InterpCouple.discreteKMethodNorm_eq,
+  InterpCouple.discreteKSeq_zero}
+\leanok
+\uses{def:couple-k-functional, def:continuous-k-method, def:discrete-k-method-integers}
+Let $A$ be a couple on $U$, let $\theta, \rho \in \R$, $q \in (0, \infty]$ and $u \in U$. The
+\emph{continuous $K$-norm} of $u$ is $\|u\|_{K, \theta, q} = \Phi_{\theta, q}(K(\cdot, u))$,
+and the space $(X_0, X_1)_{\theta, q}$ consists of the $u \in U$ with
+$\|u\|_{K, \theta, q} < \infty$. The \emph{discrete $K$-norm} on the grid $t = 2^{n\rho}$ is
+\[
+  \|u\|^{\Z}_{\theta, \rho, q}
+  = \bigl\| \bigl(2^{-n\rho\theta} K(2^{n\rho}, u)\bigr)_{n \in \Z} \bigr\|_{\ell_q} ;
+\]
+its term with $n = 0$ is $K(1, u)$.
+\end{definition}
+
+\begin{theorem}[The discrete and the continuous $K$-method of a couple agree]
+\label{thm:couple-discrete-continuous}
+\lean{InterpCouple.kMethodNorm_le_discreteKMethodNorm,
+  InterpCouple.discreteKMethodNorm_le_kMethodNorm,
+  InterpCouple.memKMethod_iff_discreteKMethodNorm_lt_top}
+\leanok
+\uses{def:couple-k-method, lem:couple-k-functional, lem:continuous-k-method-integer-grid}
+For every couple $A$ on $U$, every $\theta \geq 0$, every $\rho > 0$, every $q \in (0, \infty]$
+and every $u \in U$,
+\[
+  (\rho \log 2)^{1/q} \, 2^{-\rho\theta} \, \|u\|^{\Z}_{\theta, \rho, q}
+  \leq \|u\|_{K, \theta, q}
+  \leq (\rho \log 2)^{1/q} \, 2^{\rho\theta} \, \|u\|^{\Z}_{\theta, \rho, q} .
+\]
+In particular, $u \in (X_0, X_1)_{\theta, q}$ if and only if
+$\|u\|^{\Z}_{\theta, \rho, q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The $K$-functional increases in $t$ (\Cref{lem:couple-k-functional}), so
+\Cref{lem:continuous-k-method-integer-grid} applies to $\varphi = K(\cdot, u)$. The constants
+are finite and nonzero.
+\end{proof}
+
+This is~\cite[Lemma~3.1.3]{BerghLofstrom}, for $\theta \geq 0$, every $q$ and every dyadic grid;
+in \emph{MultilinearInterpolation} it is the statement
+\texttt{discreteKMethod\_\allowbreak equiv\_\allowbreak kmethod}.
+
+\begin{lemma}[The discrete $K$-method of the swapped couple]
+\label{lem:couple-k-method-swap}
+\lean{InterpCouple.discreteKSeq_swap, InterpCouple.discreteKMethodNorm_swap}
+\leanok
+\uses{def:couple-k-method, lem:couple-k-functional-swap, lem:lq-reindex}
+For every couple $A$ on $U$, all $\theta, \rho \in \R$, every $q \in (0, \infty]$ and every
+$u \in U$, the discrete $K$-norm of the swapped couple with $\theta$ is the discrete $K$-norm of
+$A$ with $1 - \theta$ on the same grid $t = 2^{n\rho}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:couple-k-functional-swap}, the term $n$ for the swapped couple is
+\[
+  2^{-n\rho\theta} 2^{n\rho} K(2^{-n\rho}, u) = 2^{n\rho(1 - \theta)} K(2^{-n\rho}, u) ,
+\]
+the term $-n$ for $A$ and $1 - \theta$. The reflection $n \mapsto -n$ keeps the $\ell_q$ norm
+(\Cref{lem:lq-reindex}).
+\end{proof}
+
+\begin{lemma}[The $K$-functional by the discrete $K$-norm]
+\label{lem:couple-class-ck}
+\lean{InterpCouple.kFunctional_le_discreteKMethodNorm}
+\leanok
+\uses{def:couple-k-method, lem:lq-basic}
+For every couple $A$ on $U$, all $\theta, \rho \in \R$, every $q \in (0, \infty]$, every
+$n \in \Z$ and every $u \in U$,
+$K(2^{n\rho}, u) \leq 2^{n\rho\theta} \, \|u\|^{\Z}_{\theta, \rho, q}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Every term of a sequence is at most its $\ell_q$ norm.
+\end{proof}
+
+With \Cref{thm:couple-discrete-continuous} and the monotonicity of $K(\cdot, u)$ between grid
+points, this gives $K(t, u) \leq c \, t^{\theta} \|u\|_{K, \theta, q}$ for every $t > 0$, every
+$\theta \geq 0$ and every $q \in (0, \infty]$, with a constant $c$ depending on $\theta$, $\rho$ and
+$q$: the space $(X_0, X_1)_{\theta, q}$ is of class $\mathcal{C}_K(\theta)$
+of~\cite[Definition~3.5.1]{BerghLofstrom}, the property behind the easier inclusion of the
+reiteration theorem. The Lean statement is the bound on the grid.
+
+\begin{proposition}[The $K$-method of a quasi-normed couple]
+\label{prop:couple-k-method-space}
+\lean{InterpCouple.aestronglyMeasurable_phiIntegrand_kFunctional,
+  InterpCouple.kMethodNorm_add_le, InterpCouple.kMethodNorm_smul_le,
+  InterpCouple.kMethodNorm_zero, InterpCouple.kMethodSpace, InterpCouple.mem_kMethodSpace}
+\leanok
+\uses{def:couple-k-method, lem:couple-k-functional}
+Let $A$ be a couple on $U$, let $\theta \in \R$ and $q \in (0, \infty]$.
+\begin{enumerate}
+  \item If $A$ is quasi-normed with constant $C$, then $\|0\|_{K, \theta, q} = 0$ and, for all
+    $u, v \in U$,
+    \[
+      \|u + v\|_{K, \theta, q}
+      \leq C_q \, C \bigl(\|u\|_{K, \theta, q} + \|v\|_{K, \theta, q}\bigr) ,
+    \]
+    with the constant $C_q$ of \Cref{lem:integer-grid-natural-grid}.
+  \item If $U$ is a real vector space and $A$ is homogeneous, then
+    $\|r u\|_{K, \theta, q} \leq |r| \, \|u\|_{K, \theta, q}$ for every $r \in \R$ and every
+    $u \in U$; if $A$ is moreover quasi-normed, $(X_0, X_1)_{\theta, q}$ is a linear subspace
+    of $U$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+\leanok
+By \Cref{lem:couple-k-functional}, $t^{-\theta} K(t, u + v) \leq C \bigl(t^{-\theta} K(t, u) +
+t^{-\theta} K(t, v)\bigr)$ and $t^{-\theta} K(t, r u) \leq |r| \, t^{-\theta} K(t, u)$ for
+every $t$, and $K(t, 0) = 0$. The integrands are measurable, since $K(\cdot, u)$ increases, and
+the quasi-triangle inequality of $L_q(dt/t)$ has the constant $C_q$.
+\end{proof}
+
+\paragraph{The grid on the natural numbers.}
+The norm of \Cref{def:interpolation} adds the term $\|f\|$ to the sequence on the grid
+$t = 2^{-k\rho}$, $k \in \N$. For a couple the term is $N_0(u)$, and the comparison with the grid
+on $\Z$ needs a couple with $N_0 \leq c N_1$.
+
+\begin{proposition}[The grid on the natural numbers for a couple]
+\label{prop:couple-natural-grid}
+\lean{InterpCouple.interpNorm, InterpCouple.discreteKMethodNorm_le_interpNorm,
+  InterpCouple.interpNorm_le_discreteKMethodNorm, InterpCouple.memKMethod_iff_interpNorm_lt_top}
+\leanok
+\uses{def:couple-k-method, lem:couple-k-functional, lem:integer-grid-natural-grid,
+  lem:ordered-couple, lem:lq-basic, thm:couple-discrete-continuous}
+Let $A = (N_0, N_1)$ be a couple on $U$, let $\theta, \rho \in \R$ and $q \in (0, \infty]$, and
+for $u \in U$ let
+\[
+  \|u\|_{\theta, \rho, q}
+  = N_0(u) + \bigl\| \bigl(2^{k\rho\theta} K(2^{-k\rho}, u)\bigr)_{k \in \N} \bigr\|_{\ell_q} .
+\]
+\begin{enumerate}
+  \item If $N_1(0) = 0$ and $\rho\theta \geq 0$, then
+    $\|u\|^{\Z}_{\theta, \rho, q} \leq C_q \, \gamma_{\rho\theta, q} \, \|u\|_{\theta, \rho, q}$
+    for every $u \in U$, with the constants of \Cref{lem:integer-grid-natural-grid}.
+  \item If $A$ is quasi-normed with constant $C$ and $N_0(a) \leq c \, N_1(a)$ for every
+    $a \in U$ and some $c \in [0, \infty)$, then
+    $\|u\|_{\theta, \rho, q} \leq \bigl(1 + C \max(1, c)\bigr) \|u\|^{\Z}_{\theta, \rho, q}$
+    for every $u \in U$.
+  \item Under the hypotheses of (2), for $\theta > 0$ and $\rho > 0$, every $u \in U$ satisfies
+    $u \in (X_0, X_1)_{\theta, q}$ if and only if $\|u\|_{\theta, \rho, q} < \infty$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+\leanok
+(1) is \Cref{lem:integer-grid-natural-grid} for $\varphi = K(\cdot, u)$ and $M = N_0(u)$, since
+$K(t, u) \leq N_0(u)$ (\Cref{lem:couple-k-functional}). For (2), $N_0(u) \leq C \max(1, c) \,
+K(1, u)$ by \Cref{lem:ordered-couple}, $K(1, u)$ is the term $n = 0$ of the sequence on $\Z$, and
+the terms with $n \leq 0$ form the sequence on $\N$. (3) follows from (1), (2) and
+\Cref{thm:couple-discrete-continuous}; the constants are finite for $\rho\theta > 0$.
+\end{proof}
+
+\paragraph{The couple of a bounded linear map.}
+
+\begin{definition}[Couple of a bounded linear map]
+\label{def:map-couple}
+\lean{InterpCouple.ofMap, InterpCouple.ofMap_norm0, InterpCouple.ofMap_norm1,
+  InterpCouple.norm1_ofMap_le, InterpCouple.norm1_ofMap_neg_le}
+\leanok
+\uses{def:couple}
+For a bounded linear map $\iota : Y \to X$ between real normed spaces, the \emph{couple of
+$\iota$} on $X$ is $N_0(f) = \|f\|$ and $N_1(f) = \inf \{\|y\| : y \in Y, \ \iota y = f\}$,
+with $N_1(f) = \infty$ for $f \notin \iota(Y)$.
+\end{definition}
+
+The map $\iota$ need not be injective; $N_1$ is the quotient norm of $\iota(Y)$.
+
+\begin{lemma}[The couple of a bounded linear map is quasi-normed]
+\label{lem:map-couple}
+\lean{InterpCouple.isQuasiNormed_ofMap, InterpCouple.isHomogeneous_ofMap,
+  InterpCouple.norm0_ofMap_le}
+\leanok
+\uses{def:map-couple}
+For every bounded linear map $\iota : Y \to X$, the couple of $\iota$ is quasi-normed with
+constant $1$ and homogeneous, and $\|f\| \leq \max(1, \|\iota\|) \, N_1(f)$ for every $f \in X$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $\iota y = f$ and $\iota z = g$, then $\iota(y + z) = f + g$, $\iota(-y) = -f$ and
+$\iota(c y) = c f$, and $\|f\| \leq \|\iota\| \, \|y\|$. For $f \notin \iota(Y)$ the last
+bound reads $\|f\| \leq \infty$.
+\end{proof}
+
+For $\iota = 0$ and $f \neq 0$, $N_1(f) = \infty$ and $\|\iota\| \, N_1(f) = 0 \cdot \infty = 0$
+in $[0, \infty]$; the factor $\max(1, \|\iota\|) \geq 1$ keeps the bound true in this case.
+
+\begin{proposition}[The $K$-method of the couple of a map]
+\label{prop:map-couple-k-method}
+\lean{InterpCouple.kFunctional_ofMap, InterpCouple.kMethodNorm_ofMap,
+  InterpCouple.memKMethod_ofMap_iff, InterpCouple.discreteKMethodNorm_ofMap,
+  InterpCouple.interpNorm_ofMap}
+\leanok
+\uses{def:map-couple, def:couple-k-method, prop:couple-natural-grid, def:k-functional,
+  def:interpolation, def:continuous-k-method, def:discrete-k-method-integers}
+Let $\iota : Y \to X$ be a bounded linear map. For every $t \in (0, \infty)$ and every
+$f \in X$, the $K$-functional of the couple of $\iota$ at $(t, f)$ is the $K$-functional
+$\inf_{y \in Y} (\|f - \iota y\| + t \|y\|)$ of \Cref{def:k-functional}. Hence, for all
+$\theta, \rho \in \R$, every $q \in (0, \infty]$ and every $f \in X$, the continuous
+$K$-norm, the discrete $K$-norm on the grid $t = 2^{n\rho}$ and the norm
+$\|f\|_{\theta, \rho, q}$ of \Cref{prop:couple-natural-grid} of the couple of $\iota$ are the
+norms of \Cref{def:continuous-k-method}, \Cref{def:discrete-k-method-integers} and
+\Cref{def:interpolation}.
+\end{proposition}
+
+\begin{proof}
+\leanok
+For $y \in Y$ take $b = \iota y$, so that $N_1(b) \leq \|y\|$. Conversely, for $b \in X$ and
+$t \in (0, \infty)$,
+$\|f - b\| + t N_1(b) = \inf_{\iota y = b} (\|f - \iota y\| + t \|y\|)$. The norms sample $t$
+only in $(0, \infty)$: the grids are $t = 2^{n\rho}$ and $t = 2^{-k\rho}$, and $\Phi_{\theta, q}$
+integrates over $t > 0$.
+\end{proof}
+
+At $t = 0$ the $K$-functional of the couple vanishes (take $b = f$), while
+$\inf_y \|f - \iota y\|$ is the distance of $f$ to $\iota(Y)$; the two agree at $t = 0$ exactly
+for $f$ in the closure of $\iota(Y)$.
 
 \chapter{Block decompositions and projections}
 \label{ch:decompositions}

@@ -34,6 +34,16 @@ declarations.
   `ApproximationScheme.interpNorm_le_kMethodNorm`, `ApproximationScheme.memInterp_iff_memKMethod`).
   Upstreamed, these would take the shape of the definitions `kMethod` and `discreteKMethod` of
   that project.
+* **Couples and their K-method** (`ApproximationSpaces/Interpolation/Couple.lean`): couples
+  `InterpCouple` of two functions `U → [0, ∞]` on an abelian group with the axioms
+  `InterpCouple.IsQuasiNormed`, the quasi-triangle inequality of the K-functional
+  (`InterpCouple.kFunctional_add_le`), the K-functional of the swapped couple
+  (`InterpCouple.kFunctional_swap`), the equivalence of the continuous and the discrete K-method
+  (`InterpCouple.memKMethod_iff_discreteKMethodNorm_lt_top`), the reflection `θ ↦ 1 - θ`
+  (`InterpCouple.discreteKMethodNorm_swap`) and the interpolation space as a submodule
+  (`InterpCouple.kMethodSpace`). They have the shape of `kNorm`, `kMethod` and `discreteKMethod`
+  of the Bonn project *MultilinearInterpolation*; coordinate with
+  lua-vr/MultilinearInterpolation.
 * **Monotone convergence and countable Minkowski for `eLpNorm`**: on any measure space,
   `‖sup_b F_b‖_p = sup_b ‖F_b‖_p` for directed countable families of a.e. measurable `F_b`
   (`MeasureTheory.eLpNorm_iSup_of_directed`) and `‖∑_i g_i‖_p ≤ ∑_i ‖g_i‖_p` for `1 ≤ p ≤ ∞` and

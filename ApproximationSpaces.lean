@@ -23,6 +23,7 @@ public import ApproximationSpaces.Jackson
 public import ApproximationSpaces.KFunctional
 public import ApproximationSpaces.Representation
 public import ApproximationSpaces.KMethod
+public import ApproximationSpaces.Interpolation.Couple
 public import ApproximationSpaces.Decompositions.Projection
 public import ApproximationSpaces.Decompositions.Blocks
 public import ApproximationSpaces.Decompositions.Synthesis
@@ -37,7 +38,8 @@ public import ApproximationSpaces.Moduli
 The abstract theory of approximation spaces in the sense of Pietsch (J. Approx. Theory 32,
 1981) and of real interpolation by the K-method.  An approximation scheme is an increasing
 sequence of sets `A 0 ⊆ A 1 ⊆ ⋯` in a real normed space `X`, and `E_n(f) = dist(f, A n)` is the
-error of best approximation of `f`.  Everything happens in real normed spaces; the measures are
+error of best approximation of `f`.  The schemes live in real normed spaces, and the couples of
+`ApproximationSpaces.Interpolation` live on an additive commutative group; the measures are
 the counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the continuous K-method.
 
 ## Layout
@@ -80,6 +82,9 @@ the counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the co
   `(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)`, its equivalence with the discrete K-method on every
   dyadic grid (Bergh–Löfström, Lemma 3.1.3), and the representation theorem for the continuous
   K-method.
+* `ApproximationSpaces.Interpolation.Couple`: couples `InterpCouple` of two extended
+  quasi-norms on an abelian group, their K-functional, the continuous and the discrete K-method
+  and their equivalence, and the couple `InterpCouple.ofMap ι` of a bounded linear map.
 * `ApproximationSpaces.Decompositions.Projection`: schemes with uniformly bounded projections
   and the characterisation of `A^s_q` by dyadic blocks.
 * `ApproximationSpaces.Decompositions.Blocks`: the characterisation of `A^s_q` by block

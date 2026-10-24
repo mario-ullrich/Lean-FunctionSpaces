@@ -2,21 +2,23 @@
 
 Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Approximation
 spaces*, chapters *Approximation schemes*, *Sequence spaces*, *Approximation spaces*, *Lifting
-and the Nikolskii transfer theorem*, *Interpolation and the representation theorem*, *Block
-decompositions and projections*, *Traces and intrinsic norms* and *Moduli of smoothness and
-approximation*.
+and the Nikolskii transfer theorem*, *Interpolation and the representation theorem*, *Real
+interpolation of couples*, *Block decompositions and projections*, *Traces and intrinsic norms*
+and *Moduli of smoothness and approximation*.
 
-The library `ApproximationSpaces` holds the abstract theory in a real normed space `X`:
+The library `ApproximationSpaces` holds the abstract theory: in a real normed space `X`,
 approximation schemes and the errors of best approximation, the approximation spaces `A^s_q` with
 their dyadic quasi-norm, embeddings and functoriality, lifting under a Bernstein inequality and the
 Nikolskii transfer theorem, the K-functional, the discrete and the continuous K-method and the
-representation of `A^s_q` as a real interpolation space, block, projection and atomic
+representation of `A^s_q` as a real interpolation space, couples of two extended quasi-norms on
+an abelian group with their K-method (`InterpCouple`), block, projection and atomic
 decompositions, abstract trace and retract theorems, and the comparison with spaces defined by
 moduli of smoothness (`ModulusData`). A smoothness space of order `r` is a Banach space with an
 injective bounded map into `X` satisfying Jackson's and Bernstein's inequalities of order `r`
 (`ApproximationScheme.JacksonBound`, `ApproximationScheme.SmoothnessSpace`, a hypothesis structure
 whose fields are the embedding, the order and Jackson's and Bernstein's inequalities); Sobolev
-spaces are the motivating examples. Everything happens in real normed spaces; the measures are
+spaces are the motivating examples. The schemes live in real normed spaces, and the couples of
+`ApproximationSpaces.Interpolation` live on an additive commutative group; the measures are
 the counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the continuous K-method. The
 other blocks instantiate the theory.
 
@@ -76,6 +78,18 @@ other blocks instantiate the theory.
   (`ApproximationScheme.memInterp_iff_memInterp_of_pos`), and the representation theorem reads
   `A^s_q = (X, Y)_{s/r, q}` for the continuous K-method
   (`ApproximationScheme.memApprox_iff_memKMethod`).
+* **Couples and their K-method.** For a couple `(N₀, N₁)` of functions `U → [0, ∞]` on an
+  abelian group, with `K(t, u) = inf_b (N₀(u - b) + t N₁(b))`, every `θ ≥ 0`, `ρ > 0` and
+  `0 < q ≤ ∞`, the continuous K-norm `(∫_0^∞ (t^(-θ) K(t, u))^q dt/t)^(1/q)` is finite if and
+  only if `‖(2^(-nρθ) K(2^(nρ), u))_{n ∈ ℤ}‖_{ℓ_q}` is, with the constants
+  `(ρ log 2)^(1/q) 2^(±ρθ)` (Bergh–Löfström, Lemma 3.1.3;
+  `InterpCouple.memKMethod_iff_discreteKMethodNorm_lt_top`); swapping the couple replaces `θ` by
+  `1 - θ` (`InterpCouple.discreteKMethodNorm_swap`). For a couple quasi-normed with constant `C`,
+  `K(t, u + v) ≤ C (K(t, u) + K(t, v))` (`InterpCouple.kFunctional_add_le`); for a quasi-normed
+  homogeneous couple on a real vector space the K-method gives a linear subspace
+  (`InterpCouple.kMethodSpace`). The couple of a bounded
+  linear map `ι : Y → X` has the K-method of the previous item
+  (`InterpCouple.kMethodNorm_ofMap`).
 * **Moduli of smoothness and approximation.** Let `ω(f, 2^(-k))` be subadditive with
   `ω(f, t) ≤ C₀ ‖f‖`, and assume a Jackson inequality `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for
   `k ≥ k₀` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
@@ -141,6 +155,7 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ | ✗ | `Lift`, `Nikolskii` |
 | K-functional, real interpolation, representation theorem | ✅ | ✗ | `KFunctional`, `Representation` |
 | Continuous K-method and its equivalence with the discrete K-method | ✅ | ✗ | `KMethod` |
+| Couples of extended quasi-norms, their K-functional and K-method, the couple of a bounded linear map | ✅ | ✗ | `Interpolation/Couple` |
 | Moduli compatible with a scheme, coincidence with the classical space | ✅ | ✗ | `Moduli` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ | ✗ | `Decompositions/Blocks`, `Decompositions/Projection` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ | ✗ | `Decompositions/Synthesis`, `Decompositions/Atomic` |

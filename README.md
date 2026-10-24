@@ -465,7 +465,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 
 | Block | Lean | Checked |
 |---|---|---|
-| [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
+| [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, couples and their K-method, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
 | [**Besov and Sobolev spaces on measure spaces**](docs/MeasureSpaces.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, spectral schemes, continuous spectral bases | ✅ | ✗ |
 | [**Tools from analysis**](docs/Analysis.md): `L_p` norms, the inclusion `L_r ↪ L_p`, Young's inequality, mixed norms, differences and the translation algebra, convolution, approximate identities, Littlewood–Paley kernels, test functions in the Schwartz space, dyadic cubes and cells, the Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, weak type and Marcinkiewicz interpolation, `L_p` norms by duality | ✅ | ✗ |
 | [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness and smooth Littlewood–Paley blocks for all `p`, `W^m_2` by Fourier multipliers, the trace on a face, the restriction for continuous functions | ✅ | ✗ |
@@ -485,8 +485,9 @@ resets its row there and the block here to ✗.
 
 ## Organisation
 
-Two libraries. `ApproximationSpaces` holds the abstract theory of approximation and
-interpolation in normed spaces; the continuous K-method integrates over `t ∈ (0, ∞)`.
+Two libraries. `ApproximationSpaces` holds the abstract theory of approximation in normed spaces
+and of real interpolation of couples of extended quasi-norms on abelian groups; the continuous
+K-method integrates over `t ∈ (0, ∞)`.
 `FunctionSpaces` holds the function spaces, in folders by setting with the characterisations
 inside: `Analysis/` collects the tools without function-space content
 (`L_p` norms, differences, convolution and the Fourier transform, maximal functions and
