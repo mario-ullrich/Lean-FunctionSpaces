@@ -725,8 +725,131 @@ $C' = 1$. Apply \Cref{thm:trace-transfer} with $s + 1/p$ in place of $s$, and
 \Cref{thm:trace-surjective}.
 \end{proof}
 
-The map $\operatorname{Tr}$ is $f \mapsto f(0, \cdot)$ on trigonometric polynomials; its
-identification with the restriction of a continuous function is not formalised.
+The map $\operatorname{Tr}$ is $f \mapsto f(0, \cdot)$ on trigonometric polynomials, and on
+every continuous function of $\Besov{1/p}{p}{1}(\T^{n+1})$ it is the restriction as well
+(\Cref{thm:trace-torus-continuous}). The proof uses approximants that are near-best both in
+$L_p$ and in the sup norm: smooth de la Vallée Poussin operators, built from the band-limiting
+kernel $\Theta_J$ of \Cref{def:lp-kernels} acting on $\T^d$ by the convolution of
+\Cref{def:torus-econv} in \Cref{ch:classical}. Their multiplier is $1$ on frequencies of degree
+$< 2^k$ and $0$ from degree $2^{k+\#d+2}$ on.
+
+\begin{lemma}[Uniform density of trigonometric polynomials]
+\label{lem:torus-uniform-density}
+\lean{Torus.map_span_mFourier_le_iSup_trigPoly, Torus.dense_iUnion_trigPoly,
+  Torus.tendsto_approxError_trigScheme, Torus.tendsto_approxSeq_trigScheme}
+\leanok
+\uses{def:trig-poly, lem:error-tendsto}
+The trigonometric polynomials are dense in the bounded continuous functions on $\T^d$ for the
+sup norm. For every bounded continuous $g$ on $\T^d$, the error $E_n(g)_\infty$ of best uniform
+approximation by $\mathcal{T}_n$ tends to $0$ as $n \to \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bounded continuous functions are the image of $C(\T^d)$ under an isometry, and the span of
+the characters is dense in $C(\T^d)$ (Mathlib's
+\texttt{span\_\allowbreak mFourier\_\allowbreak closure\_\allowbreak eq\_\allowbreak top}). Every
+character is a trigonometric polynomial, so the image of the span lies in
+$\bigcup_n \mathcal{T}_n$. \Cref{lem:error-tendsto} gives the convergence of the errors.
+\end{proof}
+
+\begin{lemma}[Convolution of continuous functions on the torus]
+\label{lem:torus-econv-continuous}
+\lean{Torus.integrable_mul_comp_sub_proj, Torus.continuous_econv, Torus.norm_econv_le,
+  Torus.econvBCF, Torus.econvBCF_apply, Torus.norm_econvBCF_le, Torus.toLp_econvBCF,
+  Torus.econvBCF_mem_trigPoly, Torus.econvBCF_eq_self_of_mem}
+\leanok
+\uses{def:torus-econv, lem:torus-econv-young, thm:torus-econv-fourier, def:trig-poly}
+For every $\Phi \in L_1(\R^d)$ the map $g \mapsto \Phi * g$ is a bounded linear operator on the
+bounded continuous functions on $\T^d$ with $\|\Phi * g\|_\infty \leq \|\Phi\|_1 \|g\|_\infty$.
+For all $1 \leq p < \infty$ and bounded continuous $g$, the class of $\Phi * g$ in $L_p(\T^d)$
+is $\Phi$ convolved with the class of $g$. For every $n \in \N$: if $\mathcal{F}\Phi(m) = 0$
+whenever $\deg m \geq n$, then $\Phi * g \in \mathcal{T}_n$ for every bounded continuous $g$;
+if $\mathcal{F}\Phi(m) = 1$ whenever $\deg m < n$, then $\Phi * a = a$ for every
+$a \in \mathcal{T}_n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Dominated convergence with the bound $|\Phi(y)| \|g\|_\infty$ shows that $\Phi * g$ is
+continuous, and the same bound gives the sup-norm estimate. Both convolutions are the same
+integral, so the classes agree. The last two claims hold for the classes in $L_2$ by
+\Cref{thm:torus-econv-fourier}, and continuous functions with the same class are equal.
+\end{proof}
+
+\begin{lemma}[De la Vallée Poussin operators on the torus]
+\label{lem:torus-vallee-poussin}
+\lean{Torus.fourier_Theta_latticeVec_eq_zero, Torus.valleePoussin, Torus.valleePoussinBCF,
+  Torus.valleePoussin_mem_trigPolyLp, Torus.valleePoussinBCF_mem_trigPoly,
+  Torus.valleePoussin_eq_self, Torus.valleePoussinBCF_eq_self, Torus.toLp_valleePoussinBCF,
+  Torus.valleePoussinConst, Torus.valleePoussinConst_ne_top, Torus.toReal_valleePoussinConst,
+  Torus.enorm_sub_valleePoussin_le, Torus.norm_sub_valleePoussinBCF_le,
+  Torus.tendsto_valleePoussinBCF, Torus.tendsto_dyadicWeight_mul_enorm_sub_valleePoussin}
+\leanok
+\uses{lem:torus-uniform-density, lem:torus-econv-continuous, thm:torus-econv-fourier,
+  thm:torus-lp-bernstein, lem:lp-kernels-basic, lem:lp-kernels-frequency, lem:torus-proj,
+  lem:lebesgue-one-operator, lem:trace-ext}
+Let $C_V = 1 + \|\Theta\|_1$ and, for $k \in \N$, let $V_k f = \Theta_{k+\#d} * f$, both for
+$f \in L_p(\T^d)$, $1 \leq p < \infty$, and for bounded continuous $f$ on $\T^d$. For all
+$k \in \N$, $1 \leq p < \infty$, $f \in L_p(\T^d)$, bounded continuous $g$ on $\T^d$ and
+$a \in \mathcal{T}_{2^k}$:
+\begin{enumerate}
+  \item $V_k f \in \mathcal{T}_{2^{k+\#d+2}}$, $V_k g \in \mathcal{T}_{2^{k+\#d+2}}$, the class
+    of $V_k g$ in $L_p(\T^d)$ is $V_k$ applied to the class of $g$, and $V_k a = a$;
+  \item $\|f - V_k f\|_p \leq C_V \|f - a\|_p$ and
+    $\|g - V_k g\|_\infty \leq C_V \|g - a\|_\infty$.
+\end{enumerate}
+For every bounded continuous $g$ on $\T^d$, $\|g - V_k g\|_\infty \to 0$ as $k \to \infty$. For
+all $1 \leq p < \infty$, $\beta \geq 0$ and $f \in A^\beta_1$ of the trigonometric scheme in
+$L_p(\T^d)$, $2^{k\beta} \|f - V_k f\|_p \to 0$ as $k \to \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $J = k + \#d$, $\mathcal{F}\Theta_J(\xi) = 0$ for $|\xi| \geq 2^{J+2}$
+(\Cref{lem:lp-kernels-frequency}) and $\deg m \leq |m|$ (\Cref{lem:torus-proj}), so
+$\mathcal{F}\Theta_J(m) = 0$ if $\deg m \geq 2^{J+2}$, and $\Theta_J * a = a$ for
+$a \in \mathcal{T}_{2^k}$ (\Cref{thm:torus-lp-bernstein}). \Cref{thm:torus-econv-fourier} and
+\Cref{lem:torus-econv-continuous} give the first item. Since
+$\|\Theta_J\|_1 = \|\Theta\|_1$ (\Cref{lem:lp-kernels-basic}), $V_k$ has norm at most
+$\|\Theta\|_1$ in both norms, and \Cref{lem:lebesgue-one-operator} gives the second item. By the
+second item, $\|g - V_k g\|_\infty \leq C_V E_{2^k}(g)_\infty$, which tends to $0$ by
+\Cref{lem:torus-uniform-density}. For the last claim, the canonical near-best approximants
+$a_k \in \mathcal{T}_{2^k}$ of \Cref{lem:trace-ext} satisfy $2^{k\beta} \|f - a_k\|_p \to 0$, and
+$\|f - V_k f\|_p \leq C_V \|f - a_k\|_p$.
+\end{proof}
+
+\begin{theorem}[The trace of a continuous function]
+\label{thm:trace-torus-continuous}
+\lean{Torus.continuous_restrictFace, Torus.toLpR_valleePoussinBCF_mem,
+  Torus.traceBound_ext_eq_restrictFace, Torus.trace_besov_eq_restrictFace,
+  Torus.ae_trace_eq_restrictFace, Torus.exists_trace_eq_restrictFace}
+\leanok
+\uses{thm:trace-torus, lem:trace-ext, lem:torus-vallee-poussin, thm:torus-embeddings,
+  thm:approx-embedding}
+Let $1 \leq p < \infty$ and let $\operatorname{Tr}$ be the trace of \Cref{lem:trace-ext} for the
+restriction to the face, as in \Cref{thm:trace-torus}.
+\begin{enumerate}
+  \item For every bounded continuous $f$ on $\T^{n+1}$ with
+    $f \in \Besov{1/p}{p}{1}(\T^{n+1})$, $\operatorname{Tr} f = f(0, \cdot)$. In particular,
+    $\operatorname{Tr} f = f(0, \cdot)$ for all $s > 0$, $1 \leq q \leq \infty$ and bounded
+    continuous $f \in \Besov{s+1/p}{p}{q}(\T^{n+1})$.
+  \item For all $s > n/p$, $1 \leq q \leq \infty$ and $f \in \Besov{s+1/p}{p}{q}(\T^{n+1})$
+    there is a bounded continuous $g$ on $\T^{n+1}$ with $f = g$ almost everywhere and
+    $\operatorname{Tr} f = g(0, \cdot)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:torus-vallee-poussin}, $V_k f$ lies in $\mathcal{T}_{2^{k+n+3}}$ and
+$2^{k/p} \|f - V_k f\|_p \to 0$, so \Cref{lem:trace-ext} gives
+$(V_k f)(0, \cdot) \to \operatorname{Tr} f$ in $L_p(\T^n)$. Since $V_k f \to f$ uniformly,
+also $(V_k f)(0, \cdot) \to f(0, \cdot)$ uniformly, hence in $L_p(\T^n)$. For $s > 0$,
+$\Besov{s+1/p}{p}{q}(\T^{n+1}) \subseteq \Besov{1/p}{p}{1}(\T^{n+1})$ by
+\Cref{thm:approx-embedding}. For the second item, $s + 1/p > (n+1)/p$, and
+\Cref{thm:torus-embeddings} gives the continuous representative $g$.
+\end{proof}
 
 \chapter{Classical definitions on the torus}
 \label{ch:classical}

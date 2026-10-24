@@ -162,6 +162,27 @@ A best approximant, an $a \in A_n$ with $\|f - a\| = E_n(f)$, need not exist, si
 $A_n$ need not be closed. The proofs work with near-best approximants as in the proof of the
 fourth item.
 
+An operator of norm at most $C$ that fixes $a$ approximates every $f$ as well as $a$ does, up to
+the factor $1 + C$.
+
+\begin{lemma}[Lebesgue inequality for one operator]
+\label{lem:lebesgue-one-operator}
+\lean{ApproximationScheme.norm_sub_apply_le_of_apply_eq,
+  ApproximationScheme.enorm_sub_apply_le_of_apply_eq}
+\leanok
+For every normed group $X$, every additive map $P \colon X \to X$, every $C \in \R$ with
+$\|P x\| \leq C \|x\|$ for all $x \in X$, and all $a, f \in X$ with $P a = a$,
+\[
+  \|f - P f\| \leq (1 + C) \, \|f - a\| .
+\]
+The same holds for $C \in [0, \infty]$ with the norms in $[0, \infty]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$f - P f = (f - a) - P(f - a)$ and the triangle inequality.
+\end{proof}
+
 \begin{lemma}[Convergence of the errors]
 \label{lem:error-tendsto}
 \lean{ApproximationScheme.tendsto_approxError_zero_iff,
@@ -1405,7 +1426,7 @@ for some $M \geq 0$.
   ApproximationScheme.ProjectionScheme.enorm_sub_le_approxSeq,
   ApproximationScheme.ProjectionScheme.tendsto_of_dense}
 \leanok
-\uses{def:projection-scheme, def:error, lem:error-tendsto}
+\uses{def:projection-scheme, def:error, lem:error-tendsto, lem:lebesgue-one-operator}
 Let $(P_n)$ be a projection scheme for $A$ with bound $M$. For every $n \in \N$ and
 $f \in X$,
 \[
@@ -1416,8 +1437,8 @@ If $\bigcup_n A_n$ is dense in $X$, then $P_n f \to f$ for every $f \in X$.
 
 \begin{proof}
 \leanok
-For $a \in A_n$, $f - P_n f = (f - a) - P_n(f - a)$. The last statement follows from
-$E_n(f) \to 0$.
+For $a \in A_n$, $P_n a = a$, so \Cref{lem:lebesgue-one-operator} with $C = M$ gives
+$\|f - P_n f\| \leq (1 + M) \|f - a\|$. The last statement follows from $E_n(f) \to 0$.
 \end{proof}
 
 \begin{definition}[Dyadic blocks]

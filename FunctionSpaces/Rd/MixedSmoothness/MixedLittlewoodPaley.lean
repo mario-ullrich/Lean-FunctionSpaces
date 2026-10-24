@@ -224,7 +224,7 @@ theorem exists_eLpNorm_conv_kernel_Theta_le (L : ℕ) :
   set C₂ := 2 * (∫⁻ z, ‖b.toFun z‖ₑ) * ENNReal.ofReal (1 + b.radius) ^ L * (D * dyadicWeight L 1)
   have hC₀ : C₀ ≠ ∞ := ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num)
     (memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top)
-    (memLp_one_iff_integrable.2 integrable_bandKernel).eLpNorm_ne_top
+    eLpNorm_bandKernel_ne_top
   have hC₂ : C₂ ≠ ∞ := ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num)
     b.integrable.2.ne) (ENNReal.pow_ne_top ENNReal.ofReal_ne_top))
     (ENNReal.mul_ne_top (lintegral_enorm_iteratedFDeriv_ne_top L _)

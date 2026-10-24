@@ -22,7 +22,8 @@ in Lean `A.approxError n f`, defined as `Metric.infDist f (A n)`.  This file col
 calculus: `E_0(f) = ‖f‖`, `E_n(f) ≤ ‖f‖`, `E_n` decreases in `n`, `E_n(c f) = |c| E_n(f)`,
 `E_{m+n}(f + g) ≤ E_m(f) + E_n(g)`, `E_n` is `1`-Lipschitz in `f`, `E_n(f) → 0` exactly for
 `f` in the closure of `⋃ A n`, and a bounded linear map `T` with `T (A n) ⊆ B n` satisfies
-`E^B_n(T f) ≤ ‖T‖ E^A_n(f)`.
+`E^B_n(T f) ≤ ‖T‖ E^A_n(f)`.  The Lebesgue inequality `‖f - P f‖ ≤ (1 + C) ‖f - a‖` holds for
+every additive map `P` with `‖P x‖ ≤ C ‖x‖` that fixes `a`.
 
 A best approximant need not exist, since the sets `A n` need not be closed (sets of `n`-term
 approximants are not).  Proofs therefore pick approximants `a ∈ A n` with
@@ -205,5 +206,27 @@ theorem approxError_map_le (T : X →L[ℝ] Y) (B : ApproximationScheme Y)
   calc B.approxError n (T f) ≤ ‖T f - T a‖ := approxError_le_norm_sub (hT n a ha) _
     _ = ‖T (f - a)‖ := by rw [map_sub]
     _ ≤ ‖T‖ * ‖f - a‖ := T.le_opNorm _
+
+/-! ### The Lebesgue inequality -/
+
+/-- **The Lebesgue inequality**: if an additive map `P` with `‖P x‖ ≤ C ‖x‖` fixes `a`, then
+`‖f - P f‖ ≤ (1 + C) ‖f - a‖`, since `f - P f = (f - a) - P (f - a)`. -/
+theorem norm_sub_apply_le_of_apply_eq {E F : Type*} [SeminormedAddCommGroup E] [FunLike F E E]
+    [AddMonoidHomClass F E E] {P : F} {C : ℝ} (hP : ∀ x, ‖P x‖ ≤ C * ‖x‖) {a : E}
+    (ha : P a = a) (f : E) : ‖f - P f‖ ≤ (1 + C) * ‖f - a‖ := by
+  calc ‖f - P f‖ = ‖(f - a) - P (f - a)‖ := by rw [map_sub, ha]; abel_nf
+    _ ≤ ‖f - a‖ + ‖P (f - a)‖ := norm_sub_le _ _
+    _ ≤ ‖f - a‖ + C * ‖f - a‖ := by gcongr; exact hP _
+    _ = (1 + C) * ‖f - a‖ := by ring
+
+/-- **The Lebesgue inequality in extended norms**: if an additive map `P` with
+`‖P x‖ ≤ C ‖x‖`, `C ∈ [0, ∞]`, fixes `a`, then `‖f - P f‖ ≤ (1 + C) ‖f - a‖`. -/
+theorem enorm_sub_apply_le_of_apply_eq {E F : Type*} [SeminormedAddCommGroup E] [FunLike F E E]
+    [AddMonoidHomClass F E E] {P : F} {C : ENNReal} (hP : ∀ x, ‖P x‖ₑ ≤ C * ‖x‖ₑ) {a : E}
+    (ha : P a = a) (f : E) : ‖f - P f‖ₑ ≤ (1 + C) * ‖f - a‖ₑ := by
+  calc ‖f - P f‖ₑ = ‖(f - a) - P (f - a)‖ₑ := by rw [map_sub, ha]; abel_nf
+    _ ≤ ‖f - a‖ₑ + ‖P (f - a)‖ₑ := enorm_sub_le
+    _ ≤ ‖f - a‖ₑ + C * ‖f - a‖ₑ := by gcongr; exact hP _
+    _ = (1 + C) * ‖f - a‖ₑ := by rw [add_mul, one_mul]
 
 end ApproximationScheme

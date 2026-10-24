@@ -77,11 +77,8 @@ theorem enorm_sub_le_approxSeq (n : ℕ) (f : X) :
     ‖f - PS.P n f‖ₑ ≤ (1 + ENNReal.ofReal PS.bound) * A.approxSeq f n := by
   have hreal : ‖f - PS.P n f‖ ≤ (1 + PS.bound) * A.approxError n f := by
     refine le_mul_approxError_of_forall_mem (by linarith [PS.bound_nonneg]) fun a ha => ?_
-    calc ‖f - PS.P n f‖ = ‖(f - a) - PS.P n (f - a)‖ := by rw [map_sub, PS.proj n a ha]; abel_nf
-      _ ≤ ‖f - a‖ + ‖PS.P n (f - a)‖ := norm_sub_le _ _
-      _ ≤ ‖f - a‖ + PS.bound * ‖f - a‖ := by
-          gcongr; exact ((PS.P n).le_opNorm _).trans (by gcongr; exact PS.norm_le n)
-      _ = (1 + PS.bound) * ‖f - a‖ := by ring
+    exact norm_sub_apply_le_of_apply_eq
+      (fun x => ((PS.P n).le_opNorm x).trans (by gcongr; exact PS.norm_le n)) (PS.proj n a ha) f
   rw [← ofReal_norm, approxSeq, ← ENNReal.ofReal_one,
     ← ENNReal.ofReal_add zero_le_one PS.bound_nonneg,
     ← ENNReal.ofReal_mul (by linarith [PS.bound_nonneg])]

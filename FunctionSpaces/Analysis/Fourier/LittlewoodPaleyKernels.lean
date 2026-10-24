@@ -453,6 +453,16 @@ theorem eLpNorm_Theta_one (k : ℕ) :
     eLpNorm (Theta (V := V) k) 1 volume = eLpNorm (bandKernel (V := V)) 1 volume :=
   eLpNorm_dilate_one integrable_bandKernel (by positivity)
 
+/-- The norm `‖Θ‖_1` of the band-limiting kernel is finite. -/
+theorem eLpNorm_bandKernel_ne_top : eLpNorm (bandKernel (V := V)) 1 volume ≠ ⊤ :=
+  (memLp_one_iff_integrable.2 integrable_bandKernel).eLpNorm_ne_top
+
+/-- `∫ |Θ_k| = ‖Θ‖_1` for every dilation, as a lower Lebesgue integral. -/
+theorem lintegral_enorm_Theta (k : ℕ) :
+    ∫⁻ y, ‖Theta (V := V) k y‖ₑ = eLpNorm (bandKernel (V := V)) 1 volume := by
+  rw [← eLpNorm_one_eq_lintegral_enorm (integrable_Theta k).aestronglyMeasurable,
+    eLpNorm_Theta_one]
+
 /-- `‖ψ_j‖_1 ≤ 2 ‖Φ‖_1`. -/
 theorem eLpNorm_psi_one_le (j : ℕ) :
     eLpNorm (psi (V := V) j) 1 volume ≤ 2 * eLpNorm (lpKernel (V := V)) 1 volume := by

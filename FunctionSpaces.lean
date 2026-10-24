@@ -131,6 +131,7 @@ public import FunctionSpaces.Torus.EuclideanConvolutionIdentities
 public import FunctionSpaces.Torus.LittlewoodPaley
 public import FunctionSpaces.Torus.WeakDerivatives
 public import FunctionSpaces.Torus.Trace
+public import FunctionSpaces.Torus.TraceContinuous
 public import FunctionSpaces.Torus.TriebelLizorkin
 public import FunctionSpaces.Torus.PeriodicLift
 public import FunctionSpaces.Torus.FeffermanStein
@@ -576,6 +577,8 @@ and the theorems that their characterisations agree. The library builds on
   coefficients and `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)`.
 * `FunctionSpaces.Torus.Trace`: the trace on the face `{x_0 = 0}` of `𝕋^(n+1)`,
   `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)`, bounded and onto.
+* `FunctionSpaces.Torus.TraceContinuous`: the trace of a continuous function is its restriction
+  to the face; uniform density of trigonometric polynomials, de la Vallée Poussin operators.
 * `FunctionSpaces.Torus.TriebelLizorkin`: the Triebel–Lizorkin quasi-norm on the torus,
   `F^s_{p,p}(𝕋^d) = B^s_{p,p}(𝕋^d)` and the Besov sandwich on the torus.
 * `FunctionSpaces.Torus.PeriodicLift`: period boxes, the quotient map `ℝ^d → 𝕋^d` as a measure

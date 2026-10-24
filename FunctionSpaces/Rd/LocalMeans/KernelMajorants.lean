@@ -833,7 +833,7 @@ noncomputable def kernelThetaSupportConst (L N : ℕ) : ℝ≥0∞ :=
 /-- The constant of the support case of `k_j ⋆ Θ_i` is finite. -/
 theorem kernelThetaSupportConst_ne_top (L N : ℕ) : b.kernelThetaSupportConst L N ≠ ∞ :=
   ENNReal.mul_ne_top ENNReal.ofReal_ne_top (ENNReal.add_ne_top.2
-    ⟨ENNReal.mul_ne_top (memLp_one_iff_integrable.2 integrable_bandKernel).eLpNorm_ne_top
+    ⟨ENNReal.mul_ne_top eLpNorm_bandKernel_ne_top
       ENNReal.ofReal_ne_top,
       ENNReal.mul_ne_top (ENNReal.pow_ne_top ENNReal.ofNat_ne_top) (tailConst_ne_top _ _ _)⟩)
 

@@ -42,11 +42,16 @@ blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. The restricti
 * **Traces on the torus.** For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `s > 0`, the restriction
   `f ↦ f(0, ·)` to the face `{x_0 = 0}` of `𝕋^(n+1)` extends from trigonometric polynomials to
   a map from `B^{s+1/p}_{p,q}(𝕋^(n+1))` into `B^s_{p,q}(𝕋^n)`, and every element of
-  `B^s_{p,q}(𝕋^n)` is a trace (`Torus.trace_besov`). The trace equals `f(0, ·)` on
-  trigonometric polynomials; its identification with the restriction of a continuous function
-  is not formalised. The proof uses the trace inequality
+  `B^s_{p,q}(𝕋^n)` is a trace (`Torus.trace_besov`). The proof uses the trace inequality
   `‖a(0, ·)‖_p ≤ (2⌈p/2⌉ m)^(1/p) ‖a‖_p` for polynomials of degree `< m`
-  (`Torus.eLpNorm_restrictFace_le`) and an extension by the normalised Fejér kernel.
+  (`Torus.eLpNorm_restrictFace_le`) and an extension by the normalised Fejér kernel. For
+  continuous `f ∈ B^{1/p}_{p,1}(𝕋^(n+1))`, in particular for continuous
+  `f ∈ B^{s+1/p}_{p,q}(𝕋^(n+1))` with `s > 0`, the trace is `f(0, ·)`
+  (`Torus.traceBound_ext_eq_restrictFace`, `Torus.trace_besov_eq_restrictFace`); for `s > n/p`
+  every `f ∈ B^{s+1/p}_{p,q}(𝕋^(n+1))` has a continuous representative whose restriction is its
+  trace (`Torus.exists_trace_eq_restrictFace`). The approximants in this proof are the
+  de la Vallée Poussin means `V_k f = Θ_{k+n+1} ⋆ f`, near-best both in `L_p` and in the sup
+  norm.
 * **Sobolev spaces through weak derivatives.** Call `g ∈ L_2(𝕋^d)` the weak derivative
   `∂^α f` of `f ∈ L_2(𝕋^d)` if `ĝ(k) = (2πi k)^α f̂(k)` for all `k ∈ ℤ^d`, and let
   `W^m_2(𝕋^d)` consist of the `f` all of whose weak derivatives of order `|α| ≤ m` lie in
@@ -93,6 +98,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Littlewood–Paley blocks, Besov spaces by them for `1 ≤ p < ∞` | ✅ | ✗ | `Torus/LittlewoodPaley` |
 | Besov spaces on the torus by moduli of smoothness for all `1 ≤ p < ∞` | ✅ | ✗ | `Torus/LpBesovModuli` |
 | Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ | ✗ | `Torus/Trace` |
+| The trace of a continuous function is its restriction; de la Vallée Poussin operators on continuous functions, uniform density of trigonometric polynomials | ✅ | ✗ | `Torus/TraceContinuous` |
 | Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ | ✗ | `Torus/WeakDerivatives` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.

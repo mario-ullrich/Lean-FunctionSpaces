@@ -167,7 +167,7 @@ noncomputable def nikolskiiBlockConst (p : ℝ≥0∞) : ℝ≥0∞ :=
 /-- The Nikolskii constant `N_p` is finite for `p ≥ 1`. -/
 theorem nikolskiiBlockConst_ne_top : nikolskiiBlockConst V p ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (one_sub_one_div_toReal_nonneg Fact.out)
-      (memLp_one_iff_integrable.2 integrable_bandKernel).eLpNorm_ne_top)
+      eLpNorm_bandKernel_ne_top)
     (ENNReal.rpow_ne_top_of_nonneg (by positivity) iSup_enorm_bandKernel_lt_top.ne)
 
 /-- `|Θ_j(y)| ≤ 2^(jn) sup |Θ|` for every `y`, since `Θ_j(y) = 2^(jn) Θ(2^j y)`. -/
