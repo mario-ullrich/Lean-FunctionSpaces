@@ -349,6 +349,39 @@ fourth for a sequence with finitely many nonzero terms, and the last compares th
 $q$-th powers term by term.
 \end{proof}
 
+The next lemma holds for every $q \in (0, \infty]$, also below $1$, and for families on any
+countable index sets.
+
+\begin{lemma}[Reindexing and the geometric sequence]
+\label{lem:lq-reindex}
+\lean{ENNReal.lqNorm_comp_equiv, ENNReal.lqNorm_extend_zero, ENNReal.lqNorm_comp_le_of_injective,
+  ENNReal.dyadicGeomConst, ENNReal.lqNorm_dyadicWeight_neg_eq_dyadicGeomConst,
+  ENNReal.lqNorm_dyadicWeight_neg_le_dyadicGeomConst, ENNReal.one_le_dyadicGeomConst,
+  ENNReal.dyadicGeomConst_ne_top}
+\leanok
+\uses{def:lq-norm}
+Let $q \in (0, \infty]$ and let $I, J$ be countable sets. For every family $b$ in $[0, \infty]$
+on $J$ and every family $a$ in $[0, \infty]$ on $I$:
+\begin{enumerate}
+  \item for every bijection $e : I \to J$, $\|b \circ e\|_{\ell_q} = \|b\|_{\ell_q}$;
+  \item for every injective $g : I \to J$, $\|b \circ g\|_{\ell_q} \leq \|b\|_{\ell_q}$, and the
+    family on $J$ equal to $a_i$ at $g(i)$ and to $0$ outside $g(I)$ has $\ell_q$ norm
+    $\|a\|_{\ell_q}$;
+  \item for every $\alpha \geq 0$,
+    $\|(2^{-k\alpha})_{k \in \N}\|_{\ell_q} = \gamma_{\alpha, q}$, where
+    $\gamma_{\alpha, q} = (1 - 2^{-\alpha q})^{-1/q}$ for $q < \infty$ and
+    $\gamma_{\alpha, \infty} = 1$; moreover $\gamma_{\alpha, q} \geq 1$, and
+    $\gamma_{\alpha, q} < \infty$ for $\alpha > 0$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+In (1) and (2) the sums $\sum b_j^q$ and suprema $\sup b_j$ run over the same values, or over a
+part of them. In (3), $\sum_k 2^{-k\alpha q} = (1 - 2^{-\alpha q})^{-1} \geq 1$ is a geometric
+series, and $\sup_k 2^{-k\alpha} = 1$ is attained at $k = 0$.
+\end{proof}
+
 \begin{lemma}[The Cauchy--Schwarz inequality for sequences]
 \label{lem:lq-cauchy-schwarz-sequences}
 \lean{ENNReal.lqNorm_one_mul_le, ENNReal.sum_mul_le_lqNorm_two_mul}
@@ -910,8 +943,8 @@ For $t \in [0, \infty]$ and $f \in X$,
 \begin{lemma}[Properties of the $K$-functional]
 \label{lem:k-functional}
 \lean{ApproximationScheme.kFunctional_le_enorm, ApproximationScheme.kFunctional_mono,
-  ApproximationScheme.kFunctional_add_le, ApproximationScheme.kFunctional_smul_le,
-  ApproximationScheme.kFunctional_zero_right}
+  ApproximationScheme.monotone_kFunctional, ApproximationScheme.kFunctional_add_le,
+  ApproximationScheme.kFunctional_smul_le, ApproximationScheme.kFunctional_zero_right}
 \leanok
 \uses{def:k-functional}
 For all $t \leq u$ in $[0, \infty]$, $f, g \in X$ and $c \in \R$: $K(t, f) \leq \|f\|$,
@@ -932,22 +965,22 @@ Take $y = 0$ for the first bound; the others hold for each $y$ before the infimu
   ApproximationScheme.mem_interpSpace}
 \leanok
 \uses{def:k-functional, def:lq-norm, lem:k-functional}
-Let $\theta, \rho \in \R$ and $1 \leq q \leq \infty$. For $f \in X$,
+Let $\theta, \rho \in \R$ and $q \in (0, \infty]$. For $f \in X$,
 \[
   \|f\|_{\theta, q} = \|f\| + \bigl\| \bigl(2^{k\rho\theta} K(2^{-k\rho}, f)\bigr)_{k \in \N}
   \bigr\|_{\ell_q} .
 \]
 The \emph{real interpolation space} $(X, Y)_{\theta, q}$ consists of the $f \in X$ with
-$\|f\|_{\theta, q} < \infty$. It is a linear subspace of $X$, and $\|\cdot\|_{\theta, q}$
-satisfies the triangle inequality.
+$\|f\|_{\theta, q} < \infty$. For $1 \leq q \leq \infty$ it is a linear subspace of $X$, and
+$\|\cdot\|_{\theta, q}$ satisfies the triangle inequality.
 \end{definition}
 
 This is the discrete $K$-method. The textbook definition samples $K(t, f)$ on the grid
 $t = 2^{-k}$, which is $\rho = 1$; the representation theorem produces the grid $t = 2^{-kr}$.
-Grids for different $\rho > 0$ give equivalent norms, since $K(t, f)$ increases and $K(t, f)/t$
-decreases in $t$, and the continuous $K$-method
-$\bigl(\int_0^\infty (t^{-\theta} K(t, f))^q \, dt/t\bigr)^{1/q}$ gives an equivalent norm as
-well; these equivalences are not formalised. The term $\|f\|$ replaces the negative indices
+For $\theta > 0$, grids for different $\rho > 0$ give the same space, the space of the
+continuous $K$-method
+$\bigl(\int_0^\infty (t^{-\theta} K(t, f))^q \, dt/t\bigr)^{1/q}$, with equivalent norms
+(\Cref{thm:discrete-continuous-k-method}). The term $\|f\|$ replaces the negative indices
 $k < 0$ of the textbook definition.
 
 \begin{lemma}[Errors and the $K$-functional]
@@ -1009,7 +1042,8 @@ lifts enter each $z_k$, so $Y$ need not be complete.
 \end{proof}
 
 Here $(X, Y)_{s/r, q}$ is the discrete $K$-method on the grid $t = 2^{-kr}$
-(\Cref{def:interpolation}); its equivalence with the continuous $K$-method is not formalised.
+(\Cref{def:interpolation}); \Cref{cor:representation-continuous-k-method} states the theorem for
+the continuous $K$-method.
 
 \begin{corollary}[Schemes with the same Jackson and Bernstein inequalities]
 \label{cor:equal-spaces}
@@ -1029,6 +1063,277 @@ Both are $(X, Y)_{s/r, q}$ by \Cref{thm:representation}.
 
 This is how approximation by trigonometric polynomials, splines and wavelets are seen to
 define the same spaces.
+
+\section{The continuous \texorpdfstring{$K$}{K}-method}
+\label{sec:continuous-k-method}
+
+The discrete $K$-method of \Cref{def:interpolation} samples $K(t, f)$ on a dyadic grid. The
+continuous $K$-method integrates $K(t, f)$ over all $t > 0$ against the measure $dt/t$. This
+section shows that both give the same space for every $\theta > 0$ and every dyadic grid, with
+explicit constants~\cite[Lemma~3.1.3]{BerghLofstrom}. The definition has the form of the
+continuous $K$-method in the Lean project \emph{MultilinearInterpolation} (Bonn), where the
+equivalence \texttt{discreteKMethod\_\allowbreak equiv\_\allowbreak kmethod} is stated for
+general couples of quasi-normed spaces on the grid $2^n$, $n \in \Z$. For $\rho = 1$ and
+$\theta \geq 0$, \Cref{lem:continuous-k-method-integer-grid} gives its two inequalities for every
+couple whose $K$-functional increases in $t$; here it is applied to the couple given by $\iota$.
+
+\begin{lemma}[Functions bounded on pieces]
+\label{lem:bounded-on-pieces}
+\lean{MeasureTheory.lintegral_le_of_le_on_pieces, MeasureTheory.le_lintegral_of_le_on_pieces,
+  MeasureTheory.eLpNorm_le_of_le_on_pieces, MeasureTheory.le_eLpNorm_of_le_on_pieces}
+\leanok
+\uses{def:lq-norm}
+Let $\mu$ be a measure on a measurable space $\Omega$, let $(S_n)_{n \in I}$ be a countable family
+of pairwise disjoint measurable sets with $\mu(S_n) = c$ for every $n$, let
+$G : \Omega \to [0, \infty]$, let $a$ be a family in $[0, \infty]$ on $I$ and let
+$q \in (0, \infty]$, with $c^{1/\infty} = 1$.
+\begin{enumerate}
+  \item If almost every point lies in some $S_n$ and $G \leq a_n$ on $S_n$ for every $n$, then
+    $\int G \, d\mu \leq c \sum_n a_n$, and, for measurable $G$,
+    $\|G\|_{L_q(\mu)} \leq c^{1/q} \|a\|_{\ell_q}$.
+  \item If $a_n \leq G$ on $S_n$ for every $n$, then $c \sum_n a_n \leq \int G \, d\mu$, and, for
+    $c > 0$, $c^{1/q} \|a\|_{\ell_q} \leq \|G\|_{L_q(\mu)}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The integral over the disjoint union is the sum of the integrals over the pieces; apply this to
+$G^q$. For $q = \infty$: in (1), $G \leq \sup_n a_n$ almost everywhere; in (2), $G \geq a_n$ on
+$S_n$, a set of positive measure, so the essential supremum is at least $a_n$.
+\end{proof}
+
+\begin{lemma}[The $K$-functional across scales]
+\label{lem:k-functional-scales}
+\lean{ApproximationScheme.kFunctional_mul_le_of_ne_top, ApproximationScheme.kFunctional_mul_le,
+  ApproximationScheme.enorm_le_kFunctional, ApproximationScheme.enorm_le_max_mul_kFunctional_one,
+  ApproximationScheme.eq_zero_of_kFunctional_eq_zero}
+\leanok
+\uses{def:k-functional, lem:k-functional}
+For all $c, t \in [0, \infty]$ and every $f \in X$:
+\begin{enumerate}
+  \item $K(ct, f) \leq \max(1, c) \, K(t, f)$;
+  \item if $t \geq \|\iota\|$, then $\|f\| \leq K(t, f)$;
+  \item $\|f\| \leq \max(1, \|\iota\|) \, K(1, f)$;
+  \item if $t > 0$ and $K(t, f) = 0$, then $f = 0$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+For (1) with $c < \infty$, $\|f - \iota y\| + ct \|y\| \leq \max(1, c) (\|f - \iota y\| +
+t \|y\|)$ for every $y \in Y$. For (2),
+$\|f\| \leq \|f - \iota y\| + \|\iota\| \, \|y\| \leq \|f - \iota y\| + t \|y\|$, and (2) with
+(1) for $c = \|\iota\|$ and $t = 1$ gives (3). For (4) let $s = \min(t, 1)$; by (2), (1) and
+monotonicity,
+$\|f\| \leq K(\|\iota\|, f) \leq \max(1, \|\iota\|/s) \, K(s, f) \leq \max(1, \|\iota\|/s) \,
+K(t, f) = 0$. Finally (1) for $c = \infty$: the right side is $\infty$ unless $t = 0$ or
+$K(t, f) = 0$; in the first case $ct = 0$ and $\max(1, c) \geq 1$, in the second $f = 0$
+by (4).
+\end{proof}
+
+\begin{definition}[Continuous $K$-method]
+\label{def:continuous-k-method}
+\lean{ApproximationScheme.kMethodMeasure, ApproximationScheme.phiFunctional,
+  ApproximationScheme.phiIntegrand, ApproximationScheme.phiFunctional_eq,
+  ApproximationScheme.measurable_phiIntegrand,
+  ApproximationScheme.kMethodNorm, ApproximationScheme.MemKMethod,
+  ApproximationScheme.kMethodIntegrand, ApproximationScheme.kMethodNorm_eq,
+  ApproximationScheme.measurable_kMethodIntegrand}
+\leanok
+\uses{def:k-functional}
+Let $\theta \in \R$ and $q \in (0, \infty]$. For $\varphi : [0, \infty] \to [0, \infty]$,
+\[
+  \Phi_{\theta, q}(\varphi) = \Bigl(\int_0^\infty \bigl(t^{-\theta} \varphi(t)\bigr)^q
+  \, \frac{dt}{t}\Bigr)^{1/q} ,
+\]
+and $\Phi_{\theta, \infty}(\varphi)$ is the essential supremum of $t^{-\theta} \varphi(t)$ over
+$t > 0$ for the measure $dt/t$. For $f \in X$, $\|f\|_{K, \theta, q} = \Phi_{\theta, q}(K(\cdot,
+f))$, and the space $(X, Y)^K_{\theta, q}$ of the continuous $K$-method consists of the $f \in X$
+with $\|f\|_{K, \theta, q} < \infty$.
+\end{definition}
+
+For an increasing $\varphi$ the integrand $t \mapsto t^{-\theta} \varphi(t)$ is measurable; this
+applies to $\varphi = K(\cdot, f)$. As in~\cite[Section~3.1]{BerghLofstrom}, the norm is
+$\Phi_{\theta, q}(K(\cdot, f))$ alone; the discrete norm of \Cref{def:interpolation}
+adds $\|f\|$.
+
+\begin{lemma}[Dyadic pieces of $(0, \infty)$]
+\label{lem:dyadic-pieces}
+\lean{ApproximationScheme.dyadicPiece, ApproximationScheme.measurableSet_dyadicPiece,
+  ApproximationScheme.dyadicPiece_subset_Ioi, ENNReal.ofReal_two_rpow,
+  ApproximationScheme.ofReal_mem_Icc_of_mem_dyadicPiece,
+  ApproximationScheme.pairwise_disjoint_dyadicPiece,
+  ApproximationScheme.exists_mem_dyadicPiece, ApproximationScheme.ae_mem_iUnion_dyadicPiece,
+  ApproximationScheme.kMethodMeasure_dyadicPiece, ApproximationScheme.ofReal_mul_log_two_ne_zero}
+\leanok
+\uses{def:continuous-k-method}
+For every $\rho > 0$, the intervals $I_n = [2^{n\rho}, 2^{(n+1)\rho})$, $n \in \Z$, are pairwise
+disjoint, their union is $(0, \infty)$, and each has measure $\rho \log 2 > 0$ for $dt/t$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The function $n \mapsto 2^{n\rho}$ is increasing, with $2^{n\rho} \to 0$ for $n \to -\infty$ and
+$2^{n\rho} \to \infty$ for $n \to \infty$; and
+$\int_{I_n} dt/t = \log 2^{(n+1)\rho} - \log 2^{n\rho} = \rho \log 2$.
+\end{proof}
+
+\begin{definition}[Discrete $K$-method on the integers]
+\label{def:discrete-k-method-integers}
+\lean{ApproximationScheme.discretePhiSeq, ApproximationScheme.discreteKSeq,
+  ApproximationScheme.discreteKMethodNorm, ApproximationScheme.discreteKMethodNorm_eq}
+\leanok
+\uses{def:k-functional, def:lq-norm}
+Let $\theta, \rho \in \R$ and $q \in (0, \infty]$. For $\varphi : [0, \infty] \to [0, \infty]$,
+let $\varphi^{\Z}_{\theta, \rho} = \bigl(2^{-n\rho\theta} \varphi(2^{n\rho})\bigr)_{n \in \Z}$.
+For $f \in X$,
+\[
+  \|f\|^{\Z}_{\theta, \rho, q}
+  = \bigl\| \bigl(2^{-n\rho\theta} K(2^{n\rho}, f)\bigr)_{n \in \Z} \bigr\|_{\ell_q} ,
+\]
+the $\ell_q$ norm of $\varphi^{\Z}_{\theta, \rho}$ for $\varphi = K(\cdot, f)$.
+\end{definition}
+
+For $\rho = 1$ this is the textbook discrete $K$-method~\cite[Lemma~3.1.3]{BerghLofstrom}, and
+$\|\varphi^{\Z}_{\theta, 1}\|_{\ell_q}$ is the discrete functional of
+\emph{MultilinearInterpolation}.
+
+\begin{lemma}[The continuous $K$-method and the grid on the integers]
+\label{lem:continuous-k-method-integer-grid}
+\lean{ApproximationScheme.phiIntegrand_le_discretePhiSeq,
+  ApproximationScheme.discretePhiSeq_le_phiIntegrand,
+  ApproximationScheme.phiFunctional_le_lqNorm_discretePhiSeq,
+  ApproximationScheme.lqNorm_discretePhiSeq_le_phiFunctional,
+  ApproximationScheme.kMethodIntegrand_le_discreteKSeq,
+  ApproximationScheme.discreteKSeq_le_kMethodIntegrand,
+  ApproximationScheme.kMethodNorm_le_discreteKMethodNorm,
+  ApproximationScheme.discreteKMethodNorm_le_kMethodNorm}
+\leanok
+\uses{def:continuous-k-method, def:discrete-k-method-integers, lem:bounded-on-pieces,
+  lem:dyadic-pieces, lem:k-functional, lem:lq-reindex}
+For every $\theta \geq 0$, every $\rho > 0$, every $q \in (0, \infty]$ and every increasing
+$\varphi : [0, \infty] \to [0, \infty]$,
+\[
+  (\rho \log 2)^{1/q} \, 2^{-\rho\theta} \, \|\varphi^{\Z}_{\theta, \rho}\|_{\ell_q}
+  \leq \Phi_{\theta, q}(\varphi)
+  \leq (\rho \log 2)^{1/q} \, 2^{\rho\theta} \, \|\varphi^{\Z}_{\theta, \rho}\|_{\ell_q} .
+\]
+In particular, for every $f \in X$,
+\[
+  (\rho \log 2)^{1/q} \, 2^{-\rho\theta} \, \|f\|^{\Z}_{\theta, \rho, q}
+  \leq \|f\|_{K, \theta, q}
+  \leq (\rho \log 2)^{1/q} \, 2^{\rho\theta} \, \|f\|^{\Z}_{\theta, \rho, q} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $t \in I_n$, $t^{-\theta} \leq 2^{-n\rho\theta} = 2^{\rho\theta} 2^{-(n+1)\rho\theta}$ and
+$\varphi(t) \leq \varphi(2^{(n+1)\rho})$, so the integrand is at most $2^{\rho\theta}$ times the
+term $n + 1$ of $\varphi^{\Z}_{\theta, \rho}$; likewise it is at least $2^{-\rho\theta}$ times
+the term $n$. The shift $n \mapsto n + 1$ keeps the $\ell_q$ norm (\Cref{lem:lq-reindex}), and
+\Cref{lem:bounded-on-pieces} with the pieces of \Cref{lem:dyadic-pieces} gives both bounds. The
+$K$-functional is increasing in $t$ (\Cref{lem:k-functional}), which gives the second pair.
+\end{proof}
+
+\begin{lemma}[The grid on the integers and the grid on the natural numbers]
+\label{lem:integer-grid-natural-grid}
+\lean{ApproximationScheme.discreteKSeq_neg_natCast, ApproximationScheme.discreteKSeq_zero,
+  ApproximationScheme.discreteKSeq_natCast_add_one_le, ApproximationScheme.injective_neg_natCast,
+  ApproximationScheme.injective_natCast_add_one, ApproximationScheme.discreteKSeq_le_extend,
+  ApproximationScheme.discreteKMethodNorm_le_interpNorm,
+  ApproximationScheme.interpNorm_le_discreteKMethodNorm}
+\leanok
+\uses{def:interpolation, def:discrete-k-method-integers, lem:k-functional-scales, lem:lq-reindex}
+Let $\theta, \rho \in \R$ and $q \in (0, \infty]$, and let $\|f\|_{\theta, q}$ be the
+expression of \Cref{def:interpolation} on the grid $t = 2^{-k\rho}$. For every $f \in X$,
+\[
+  \|f\|_{\theta, q} \leq \bigl(1 + \max(1, \|\iota\|)\bigr) \, \|f\|^{\Z}_{\theta, \rho, q} ,
+\]
+and, if $\rho\theta \geq 0$,
+\[
+  \|f\|^{\Z}_{\theta, \rho, q} \leq C_q \, \gamma_{\rho\theta, q} \, \|f\|_{\theta, q} ,
+\]
+where $C_q = 1$ for $q \geq 1$ and $C_q = 2^{1/q - 1}$ for $q < 1$ is the constant of the
+quasi-triangle inequality in $\ell_q$ and $\gamma_{\rho\theta, q}$ is the constant of
+\Cref{lem:lq-reindex}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The terms with $n = -k \leq 0$ are the terms $2^{k\rho\theta} K(2^{-k\rho}, f)$ of
+$\|f\|_{\theta, q}$, the term $n = 0$ is $K(1, f)$, and the terms with $n = k + 1 > 0$ are at
+most $2^{-k\rho\theta} \|f\|$ since $K(t, f) \leq \|f\|$. Hence the sequence on $\Z$ is at most
+the sum of these two sequences placed on $n \leq 0$ and $n > 0$. By the quasi-triangle
+inequality in $\ell_q$ (constant $C_q$) and \Cref{lem:lq-reindex}, its norm is at most
+$C_q \bigl(\|(2^{k\rho\theta} K(2^{-k\rho}, f))_k\|_{\ell_q} + \gamma_{\rho\theta, q} \|f\|\bigr)$,
+and $\gamma_{\rho\theta, q} \geq 1$ gives the second bound. For the first,
+$\|f\| \leq \max(1, \|\iota\|) K(1, f)$ (\Cref{lem:k-functional-scales}), and the terms with
+$n \leq 0$ form a part of the sequence on $\Z$.
+\end{proof}
+
+\begin{theorem}[The discrete and the continuous $K$-method agree]
+\label{thm:discrete-continuous-k-method}
+\lean{ApproximationScheme.kMethodUpperConst, ApproximationScheme.kMethodUpperConst_ne_top,
+  ApproximationScheme.kMethodLowerConst, ApproximationScheme.ofReal_mul_log_two_rpow_ne_zero,
+  ApproximationScheme.kMethodLowerConst_ne_top, ApproximationScheme.kMethodNorm_le_interpNorm,
+  ApproximationScheme.interpNorm_le_kMethodNorm,
+  ApproximationScheme.memInterp_zero_and_memKMethod_zero,
+  ApproximationScheme.memInterp_iff_memKMethod, ApproximationScheme.memInterp_iff_memInterp_of_pos}
+\leanok
+\uses{lem:continuous-k-method-integer-grid, lem:integer-grid-natural-grid}
+Let $\theta \geq 0$, $\rho > 0$ and $q \in (0, \infty]$, and let $\|f\|_{\theta, q}$ be the
+expression of \Cref{def:interpolation} on the grid $t = 2^{-k\rho}$. For every $f \in X$,
+\[
+  \|f\|_{K, \theta, q} \leq M_1 \, \|f\|_{\theta, q}
+  \qquad \text{and} \qquad
+  \|f\|_{\theta, q} \leq M_2 \, \|f\|_{K, \theta, q} ,
+\]
+where $M_1 = (\rho \log 2)^{1/q} \, 2^{\rho\theta} \, C_q \, \gamma_{\rho\theta, q}$ and
+\[
+  M_2 = \bigl(1 + \max(1, \|\iota\|)\bigr) \, 2^{\rho\theta} (\rho \log 2)^{-1/q} ,
+\]
+with $C_q$ and $\gamma_{\rho\theta, q}$ as in \Cref{lem:integer-grid-natural-grid}. The
+constant $M_2$ is finite, and $M_1$ is finite for $\theta > 0$. In particular, for every
+$\theta > 0$, every $q \in (0, \infty]$, all $\rho, \rho' > 0$ and every $f \in X$, $f$ lies in
+the space of the discrete $K$-method on the grid $t = 2^{-k\rho}$ if and only if
+$f \in (X, Y)^K_{\theta, q}$, if and only if $f$ lies in the space of the discrete $K$-method on
+the grid $t = 2^{-k\rho'}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Combine \Cref{lem:continuous-k-method-integer-grid} with \Cref{lem:integer-grid-natural-grid};
+$\gamma_{\rho\theta, q} < \infty$ for $\rho\theta > 0$ by \Cref{lem:lq-reindex}.
+\end{proof}
+
+The theorem is \cite[Lemma~3.1.3]{BerghLofstrom}, there for the grid $\rho = 1$, the sequence on
+$\Z$ and $0 < \theta < 1$. The bound by $M_2$ holds for every $\theta \geq 0$, the bound by $M_1$
+has a finite constant for $\theta > 0$, and the spaces agree for every $\theta > 0$. For
+$\theta = 0$ and $q < \infty$ the constant $M_1$ is infinite, as it must be:
+$\|f\|_{K, 0, q} = \infty$ for every $f \neq 0$, since $K(t, f) \geq \|f\|$ for
+$t \geq \|\iota\|$. The Lean statements include the degenerate exponent $q = 0$, for which both
+spaces are all of $X$.
+
+\begin{corollary}[Representation theorem for the continuous $K$-method]
+\label{cor:representation-continuous-k-method}
+\lean{ApproximationScheme.memApprox_iff_memKMethod,
+  ApproximationScheme.SmoothnessSpace.memApprox_iff_memKMethod}
+\leanok
+\uses{thm:representation, thm:discrete-continuous-k-method, def:smoothness}
+Let $A$, $r$, $C_1, C_2 \geq 0$ and $\iota$ be as in \Cref{thm:representation}, and let
+$0 < s < r$ and $1 \leq q \leq \infty$. For every $f \in X$, $f \in A^s_q$ if and only if
+$\|f\|_{K, s/r, q} < \infty$. In particular, for every smoothness space $W$ of order $r$,
+$A^s_q = (X, W)^K_{s/r, q}$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:representation} identifies $A^s_q$ with the discrete $K$-method on the grid
+$t = 2^{-kr}$, and \Cref{thm:discrete-continuous-k-method} with $\theta = s/r > 0$ and
+$\rho = r > 0$ identifies this space with $(X, Y)^K_{s/r, q}$.
+\end{proof}
 
 \chapter{Block decompositions and projections}
 \label{ch:decompositions}

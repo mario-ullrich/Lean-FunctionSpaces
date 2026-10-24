@@ -94,8 +94,11 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `‖y‖ ≤ C n^r ‖a‖`) of order `r`. Then for `0 < s < r` and `1 ≤ q ≤ ∞`, `A^s_q` is the real
   interpolation space `(X, Y)_{s/r, q}` of the discrete K-method on the grid `t = 2^(-kr)`,
   the `f` with `‖f‖ + ‖(2^(ks) K(2^(-kr), f))_k‖_{ℓ_q} < ∞`, with equivalent norms
-  (`ApproximationScheme.memApprox_iff_memInterp`). The equivalence with the continuous K-method
-  `(∫_0^∞ (t^(-s/r) K(t, f))^q dt/t)^(1/q)` is not formalised.
+  (`ApproximationScheme.memApprox_iff_memInterp`). For `θ > 0` the discrete K-method on every
+  dyadic grid and the continuous K-method `(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)` give the same
+  space (Bergh–Löfström, Lemma 3.1.3; `ApproximationScheme.memInterp_iff_memKMethod`), so
+  `A^s_q = (X, Y)_{s/r, q}` for the continuous K-method
+  (`ApproximationScheme.memApprox_iff_memKMethod`).
 * **Moduli of smoothness and approximation.** Let `ω(f, 2^(-k))` be subadditive with
   `ω(f, t) ≤ C₀ ‖f‖`, and assume a Jackson inequality `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for
   `k ≥ k₀` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
@@ -476,9 +479,10 @@ resets its row there and the block here to ✗.
 
 ## Organisation
 
-Two libraries. `ApproximationSpaces` holds the abstract theory, which mentions neither functions
-nor measures. `FunctionSpaces` holds the function spaces, in folders by setting with the
-characterisations inside: `Analysis/` collects the tools without function-space content
+Two libraries. `ApproximationSpaces` holds the abstract theory of approximation and
+interpolation in normed spaces; the continuous K-method integrates over `t ∈ (0, ∞)`.
+`FunctionSpaces` holds the function spaces, in folders by setting with the characterisations
+inside: `Analysis/` collects the tools without function-space content
 (`L_p` norms, differences, convolution and the Fourier transform, maximal functions and
 interpolation of operators); `MeasureSpaces/` holds the Besov and Sobolev spaces of a scheme on a
 finite measure space; `Rd/` holds the spaces on `ℝ^d` with one folder per characterisation
@@ -498,8 +502,7 @@ that library builds itself.
 
 * **Lipschitz domains as sets**: bounded open convex sets as bounded Lipschitz domains; the ball,
   and bounded open sets with smooth local graphs, as smooth domains (`Rd.SmoothDomain`).
-* **Interpolation**: the continuous K-method, so that the representation theorem reads
-  `A^s_q = (X, Y)_{s/r,q}`; the interpolation property of the K-method (an operator bounded on
+* **Interpolation**: the interpolation property of the K-method (an operator bounded on
   both spaces of a couple is bounded on its interpolation spaces) and reiteration.
 * **Traces and extensions**: the norm equivalence `H^{1/2}(Γ) ≅ B^{1/2}_{2,2}(Γ)`, a bounded
   linear extension operator for `W^1_p`, the exponents `p ∈ {1, ∞}` and higher order, and the

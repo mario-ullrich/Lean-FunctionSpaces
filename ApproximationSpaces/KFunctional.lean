@@ -25,9 +25,10 @@ The **real interpolation space** `(X, Y)_{θ,q}`, `0 < θ < 1`, consists of the 
 The usual definition takes `ρ = 1` and all `k ∈ ℤ`; the terms with `k < 0` (that is `t > 1`)
 are controlled by `‖f‖` since `K(t, f) ≤ ‖f‖`, which is why `‖f‖` appears here.  A scale
 `ρ > 0` of the dyadic grid is allowed because the representation theorem produces the grid
-`t = 2^(-kr)`.  So `MemInterp` is the **discrete K-method** on the grid `t = 2^(-kρ)`; its
-equivalence with other scales and with the continuous K-method
-`(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)` is not formalised.
+`t = 2^(-kr)`.  So `MemInterp` is the **discrete K-method** on the grid `t = 2^(-kρ)`.  For
+`θ > 0` it gives the same space for every `ρ > 0`, the space of the continuous K-method
+`(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)` (`ApproximationScheme.memInterp_iff_memKMethod` in
+`ApproximationSpaces.KMethod`).
 -/
 
 @[expose] public section
@@ -63,6 +64,10 @@ theorem kFunctional_zero_right : kFunctional ι t 0 = 0 :=
 /-- The K-functional increases with `t`. -/
 theorem kFunctional_mono (h : t ≤ u) (f : X) : kFunctional ι t f ≤ kFunctional ι u f :=
   iInf_mono fun y => by gcongr
+
+/-- The K-functional `t ↦ K(t, f)` is monotone (the `Monotone` form of `kFunctional_mono`). -/
+theorem monotone_kFunctional (f : X) : Monotone fun t => kFunctional ι t f :=
+  fun _ _ h => kFunctional_mono h f
 
 /-- **Subadditivity**: `K(t, f + g) ≤ K(t, f) + K(t, g)`. -/
 theorem kFunctional_add_le (f g : X) :

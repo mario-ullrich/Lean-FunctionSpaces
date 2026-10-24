@@ -22,6 +22,7 @@ public import ApproximationSpaces.Nikolskii
 public import ApproximationSpaces.Jackson
 public import ApproximationSpaces.KFunctional
 public import ApproximationSpaces.Representation
+public import ApproximationSpaces.KMethod
 public import ApproximationSpaces.Decompositions.Projection
 public import ApproximationSpaces.Decompositions.Blocks
 public import ApproximationSpaces.Decompositions.Synthesis
@@ -34,9 +35,10 @@ public import ApproximationSpaces.Moduli
 # Approximation spaces
 
 The abstract theory of approximation spaces in the sense of Pietsch (J. Approx. Theory 32,
-1981).  An approximation scheme is an increasing sequence of sets `A 0 ⊆ A 1 ⊆ ⋯` in a real
-normed space `X`, and `E_n(f) = dist(f, A n)` is the error of best approximation of `f`.
-Nothing in this library mentions functions or measures.
+1981) and of real interpolation by the K-method.  An approximation scheme is an increasing
+sequence of sets `A 0 ⊆ A 1 ⊆ ⋯` in a real normed space `X`, and `E_n(f) = dist(f, A n)` is the
+error of best approximation of `f`.  Everything happens in real normed spaces; the measures are
+the counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the continuous K-method.
 
 ## Layout
 
@@ -74,6 +76,10 @@ Nothing in this library mentions functions or measures.
   spaces `(X, Y)_{θ,q}` of the discrete K-method on a dyadic grid.
 * `ApproximationSpaces.Representation`: the representation theorem `A^s_q = (X, Y)_{s/r,q}`
   under Jackson's and Bernstein's inequalities of order `r`.
+* `ApproximationSpaces.KMethod`: the continuous K-method
+  `(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)`, its equivalence with the discrete K-method on every
+  dyadic grid (Bergh–Löfström, Lemma 3.1.3), and the representation theorem for the continuous
+  K-method.
 * `ApproximationSpaces.Decompositions.Projection`: schemes with uniformly bounded projections
   and the characterisation of `A^s_q` by dyadic blocks.
 * `ApproximationSpaces.Decompositions.Blocks`: the characterisation of `A^s_q` by block

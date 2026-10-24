@@ -8,15 +8,17 @@ approximation*.
 
 The library `ApproximationSpaces` holds the abstract theory in a real normed space `X`:
 approximation schemes and the errors of best approximation, the approximation spaces `A^s_q` with
-their dyadic quasi-norm, embeddings and functoriality, lifting under a Bernstein inequality and
-the Nikolskii transfer theorem, the K-functional and the representation of `A^s_q` as a real
-interpolation space, block, projection and atomic decompositions, abstract trace and retract
-theorems, and the comparison with spaces defined by moduli of smoothness (`ModulusData`). A
-smoothness space of order `r` is a Banach space with an injective bounded map into `X` satisfying
-Jackson's and Bernstein's inequalities of order `r` (`ApproximationScheme.JacksonBound`,
-`ApproximationScheme.SmoothnessSpace`, a hypothesis structure whose fields are the embedding, the
-order and Jackson's and Bernstein's inequalities); Sobolev spaces are the motivating examples.
-Nothing in this block mentions functions or measures; the other blocks instantiate it.
+their dyadic quasi-norm, embeddings and functoriality, lifting under a Bernstein inequality and the
+Nikolskii transfer theorem, the K-functional, the discrete and the continuous K-method and the
+representation of `A^s_q` as a real interpolation space, block, projection and atomic
+decompositions, abstract trace and retract theorems, and the comparison with spaces defined by
+moduli of smoothness (`ModulusData`). A smoothness space of order `r` is a Banach space with an
+injective bounded map into `X` satisfying Jackson's and Bernstein's inequalities of order `r`
+(`ApproximationScheme.JacksonBound`, `ApproximationScheme.SmoothnessSpace`, a hypothesis structure
+whose fields are the embedding, the order and Jackson's and Bernstein's inequalities); Sobolev
+spaces are the motivating examples. Everything happens in real normed spaces; the measures are
+the counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the continuous K-method. The
+other blocks instantiate the theory.
 
 ## Main results
 
@@ -61,11 +63,19 @@ Nothing in this block mentions functions or measures; the other blocks instantia
   interpolation space `(X, Y)_{s/r, q}` of the discrete K-method on the grid `t = 2^(-kr)`, the `f`
   with `‖f‖ + ‖(2^(ks) K(2^(-kr), f))_k‖_{ℓ_q} < ∞` (`ApproximationScheme.MemInterp`), with
   equivalent norms (`ApproximationScheme.memApprox_iff_memInterp`,
-  `.approxNormDyadic_le_interpNorm_of_jackson`, `.interpNorm_le_approxNormDyadic_of_bernstein`). The
-  equivalence with the continuous K-method `(∫_0^∞ (t^(-s/r) K(t, f))^q dt/t)^(1/q)` is not
-  formalised. In particular two schemes with Jackson and Bernstein inequalities of the same order
+  `.approxNormDyadic_le_interpNorm_of_jackson`, `.interpNorm_le_approxNormDyadic_of_bernstein`). In
+  particular two schemes with Jackson and Bernstein inequalities of the same order
   for the same `ι` have the same approximation spaces
   (`ApproximationScheme.approxSpace_eq_of_jackson_bernstein`).
+* **The discrete and the continuous K-method.** For `θ > 0`, `0 < q ≤ ∞` and every grid
+  `t = 2^(-kρ)`, `ρ > 0`, the discrete K-norm `‖f‖ + ‖(2^(kρθ) K(2^(-kρ), f))_k‖_{ℓ_q}` and the
+  continuous K-norm `(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)` (the essential supremum of
+  `t^(-θ) K(t, f)` for `q = ∞`) are equivalent, with explicit
+  constants (Bergh–Löfström, Lemma 3.1.3; `ApproximationScheme.kMethodNorm_le_interpNorm`,
+  `.interpNorm_le_kMethodNorm`, `.memInterp_iff_memKMethod`). Hence the grid does not matter
+  (`ApproximationScheme.memInterp_iff_memInterp_of_pos`), and the representation theorem reads
+  `A^s_q = (X, Y)_{s/r, q}` for the continuous K-method
+  (`ApproximationScheme.memApprox_iff_memKMethod`).
 * **Moduli of smoothness and approximation.** Let `ω(f, 2^(-k))` be subadditive with
   `ω(f, t) ≤ C₀ ‖f‖`, and assume a Jackson inequality `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for
   `k ≥ k₀` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
@@ -123,13 +133,14 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Error of best approximation and its calculus | ✅ | ✗ | `Error` |
 | Linear approximation from a sequence | ✅ | ✗ | `Instances/Span` |
 | `n`-term approximation from a dictionary | ✅ | ✗ | `Instances/NTerm` |
-| `ℓ_q` norms in `ℝ≥0∞`, Minkowski, Cauchy–Schwarz, monotonicity in `q`, tails, sequences with finitely many nonzero terms | ✅ | ✗ | `Sequences/Lq` |
+| `ℓ_q` norms in `ℝ≥0∞`, Minkowski, Cauchy–Schwarz, monotonicity in `q`, tails, sequences with finitely many nonzero terms, reindexing, geometric sequences | ✅ | ✗ | `Sequences/Lq` |
 | Cauchy condensation with power weights, the dyadic sum `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4`, finitely many changed terms, sums over the dyadic scales of an annulus | ✅ | ✗ | `Sequences/Dyadic` |
 | Countable Minkowski inequality, monotone convergence and truncations in `ℓ_q`, discrete Hardy inequalities, almost diagonal sums | ✅ | ✗ | `Sequences/Hardy` |
 | `A^s_q`, its dyadic quasi-norm and linear structure | ✅ | ✗ | `Norm`, `Dyadic`, `Space` |
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ | ✗ | `Embedding`, `Transfer` |
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ | ✗ | `Lift`, `Nikolskii` |
 | K-functional, real interpolation, representation theorem | ✅ | ✗ | `KFunctional`, `Representation` |
+| Continuous K-method and its equivalence with the discrete K-method | ✅ | ✗ | `KMethod` |
 | Moduli compatible with a scheme, coincidence with the classical space | ✅ | ✗ | `Moduli` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ | ✗ | `Decompositions/Blocks`, `Decompositions/Projection` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ | ✗ | `Decompositions/Synthesis`, `Decompositions/Atomic` |

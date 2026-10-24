@@ -32,7 +32,9 @@ inclusion `lp.monotone`, without the norm bound), the Cauchy–Schwarz inequalit
 `∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for series and for finite sums
 (`ENNReal.lqNorm_one_mul_le`, `ENNReal.sum_mul_le_lqNorm_two_mul`), the splitting off of the
 first term, tails of sequences (`ENNReal.lqNorm_ite_le_eq`), sequences with one nonzero term
-(`Rd.lqNorm_ite_eq`), the geometric sequence, and the **dyadic weights**
+(`Rd.lqNorm_ite_eq`), reindexing along bijections and injections
+(`ENNReal.lqNorm_comp_equiv`, `ENNReal.lqNorm_extend_zero`), the `ℓ_q` norm of the geometric
+sequence for every `q` (`ENNReal.dyadicGeomConst`), and the **dyadic weights**
 `dyadicWeight s k = 2 ^ (k s)` that every approximation space uses.
 -/
 
@@ -117,8 +119,8 @@ omit [Countable ι] [MeasurableSingletonClass ι] in
 @[simp]
 theorem lqNorm_zero_right (q : ℝ≥0∞) : lqNorm q (fun _ : ι => (0 : ℝ≥0∞)) = 0 := eLpNorm_fun_zero
 
-/-- The exponent `0` is degenerate: `eLpNorm` assigns it the value `0`.  All statements below
-assume `1 ≤ q`. -/
+/-- The exponent `0` is degenerate: `eLpNorm` assigns it the value `0`.  The statements below
+with a hypothesis `1 ≤ q` need it; the others hold for every `q`. -/
 @[simp]
 theorem lqNorm_zero_left (a : ι → ℝ≥0∞) : lqNorm 0 a = 0 :=
   eLpNorm_exponent_zero (aestronglyMeasurable_count a)
@@ -236,6 +238,57 @@ theorem lqNorm_prod_rpow {M N : Type*} [Fintype M] [Fintype N] [MeasurableSpace 
   rw [lqNorm_rpow hq0 hq, tsum_fintype, Fintype.sum_prod_type]
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [lqNorm_rpow hq0 hq, tsum_fintype]
+
+/-! ### Reindexing -/
+
+variable {ι' : Type*} [MeasurableSpace ι'] [Countable ι'] [MeasurableSingletonClass ι']
+
+/-- **Reindexing by a bijection** does not change the `ℓ_q` norm: `‖a ∘ e‖_q = ‖a‖_q`. -/
+theorem lqNorm_comp_equiv (e : ι ≃ ι') (a : ι' → ℝ≥0∞) : lqNorm q (a ∘ e) = lqNorm q a := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · simp [lqNorm_zero_left]
+  rcases eq_or_ne q ∞ with rfl | hq
+  · rw [lqNorm_top, lqNorm_top]
+    exact e.iSup_comp
+  rw [lqNorm_eq_tsum hq0 hq, lqNorm_eq_tsum hq0 hq]
+  congr 1
+  exact e.tsum_eq fun n => a n ^ q.toReal
+
+/-- **Extension by zero along an injective map** does not change the `ℓ_q` norm: if
+`g : ι → ι'` is injective, the family on `ι'` equal to `a i` at `g i` and to `0` off the range
+of `g` has the norm of `a`. -/
+theorem lqNorm_extend_zero {g : ι → ι'} (hg : Function.Injective g) (a : ι → ℝ≥0∞) :
+    lqNorm q (Function.extend g a 0) = lqNorm q a := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · simp [lqNorm_zero_left]
+  rcases eq_or_ne q ∞ with rfl | hq
+  · rw [lqNorm_top, lqNorm_top]
+    exact iSup_extend_bot hg a
+  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
+  rw [lqNorm_eq_tsum hq0 hq, lqNorm_eq_tsum hq0 hq]
+  congr 1
+  have hext : ∀ n, Function.extend g a 0 n ^ q.toReal =
+      Function.extend g (fun i => a i ^ q.toReal) 0 n :=
+    fun n => by
+      rw [Function.apply_extend (· ^ q.toReal) g 0 n]
+      congr 1
+      funext m
+      simp [ENNReal.zero_rpow_of_pos hp]
+  simp_rw [hext]
+  exact tsum_extend_zero hg _
+
+/-- **Restriction to the range of an injective map** does not increase the `ℓ_q` norm:
+`‖a ∘ g‖_q ≤ ‖a‖_q`. -/
+theorem lqNorm_comp_le_of_injective {g : ι → ι'} (hg : Function.Injective g) (a : ι' → ℝ≥0∞) :
+    lqNorm q (a ∘ g) ≤ lqNorm q a := by
+  rw [← lqNorm_extend_zero hg]
+  refine lqNorm_mono fun n => ?_
+  by_cases hn : ∃ i, g i = n
+  · obtain ⟨i, rfl⟩ := hn
+    rw [hg.extend_apply]
+    rfl
+  · rw [Function.extend_apply' _ _ _ hn]
+    exact zero_le
 
 end Generic
 
@@ -443,6 +496,46 @@ theorem tsum_dyadicWeight_neg (α : ℝ) :
   simp_rw [dyadicWeight_eq_pow]
   exact ENNReal.tsum_geometric _
 
+/-- The constant `(1 - 2^(-α q))^(-1/q)` of the dyadic geometric sequence `(2^(-kα))_k`, with
+the value `1` for `q = ∞` (where `q.toReal = 0`).  For `α ≥ 0` and `q ≠ 0` it is the `ℓ_q` norm
+of that sequence (`ENNReal.lqNorm_dyadicWeight_neg_eq_dyadicGeomConst`). -/
+noncomputable def dyadicGeomConst (α : ℝ) (q : ℝ≥0∞) : ℝ≥0∞ :=
+  ((1 - (2 : ℝ≥0∞) ^ (-(α * q.toReal)))⁻¹) ^ (1 / q.toReal)
+
+/-- **The geometric sequence in `ℓ_q`** for every `q ≠ 0`:
+`‖(2^(-kα))_k‖_{ℓ_q} = dyadicGeomConst α q` for `α ≥ 0`. -/
+theorem lqNorm_dyadicWeight_neg_eq_dyadicGeomConst {α : ℝ} (hα : 0 ≤ α) (hq0 : q ≠ 0) :
+    lqNorm q (dyadicWeight (-α)) = dyadicGeomConst α q := by
+  rcases eq_or_ne q ∞ with rfl | hq
+  · rw [lqNorm_top, dyadicGeomConst, toReal_top, _root_.div_zero, rpow_zero]
+    refine le_antisymm (iSup_le fun k => ?_) (le_iSup_of_le 0 (dyadicWeight_zero_right _).ge)
+    exact (dyadicWeight_anti (neg_nonpos.2 hα) (Nat.zero_le k)).trans_eq
+      (dyadicWeight_zero_right _)
+  rw [lqNorm_eq_tsum hq0 hq, dyadicGeomConst]
+  simp_rw [dyadicWeight_rpow, neg_mul]
+  rw [tsum_dyadicWeight_neg]
+
+/-- The geometric sequence for every `q`: `‖(2^(-kα))_k‖_{ℓ_q} ≤ dyadicGeomConst α q` for
+`α ≥ 0`; for `q = 0` the left side is `0`. -/
+theorem lqNorm_dyadicWeight_neg_le_dyadicGeomConst {α : ℝ} (hα : 0 ≤ α) :
+    lqNorm q (dyadicWeight (-α)) ≤ dyadicGeomConst α q := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · simp [lqNorm_zero_left]
+  exact (lqNorm_dyadicWeight_neg_eq_dyadicGeomConst hα hq0).le
+
+/-- The constant `dyadicGeomConst α q` is at least `1`, for every `α` and `q`. -/
+theorem one_le_dyadicGeomConst (α : ℝ) (q : ℝ≥0∞) : 1 ≤ dyadicGeomConst α q :=
+  (one_rpow _).symm.trans_le
+    (rpow_le_rpow (one_le_one_sub_two_rpow_neg_inv _) (by positivity))
+
+/-- The constant `dyadicGeomConst α q` is finite for `α > 0`. -/
+theorem dyadicGeomConst_ne_top {α : ℝ} (hα : 0 < α) (q : ℝ≥0∞) : dyadicGeomConst α q ≠ ∞ := by
+  rcases (ENNReal.toReal_nonneg (a := q)).eq_or_lt with h | h
+  · rw [dyadicGeomConst, ← h, _root_.div_zero, rpow_zero]
+    exact one_ne_top
+  exact rpow_ne_top_of_nonneg (by positivity)
+    (one_sub_two_rpow_neg_inv_ne_top (_root_.mul_pos hα h))
+
 /-- `∑ₖ 2^(-k) = 2`. -/
 theorem tsum_dyadicWeight_neg_one : ∑' k, dyadicWeight (-1) k = 2 := by
   simp_rw [dyadicWeight_eq_pow, ENNReal.rpow_neg_one]
@@ -454,6 +547,10 @@ theorem lqNorm_dyadicWeight_neg_one_le (hq : 1 ≤ q) : lqNorm q (dyadicWeight (
     _ = 2 := tsum_dyadicWeight_neg_one
 
 /-! ### Powers of two as dyadic weights -/
+
+/-- `ofReal (2^x) = 2^x`: the real power of two as an element of `[0, ∞]`. -/
+theorem ofReal_two_rpow (x : ℝ) : ENNReal.ofReal ((2 : ℝ) ^ x) = (2 : ℝ≥0∞) ^ x := by
+  rw [← ENNReal.ofReal_rpow_of_pos two_pos, ENNReal.ofReal_ofNat]
 
 /-- `2^k` as a dyadic weight. -/
 theorem ofReal_two_pow_eq (k : ℕ) : ENNReal.ofReal (2 ^ k) = dyadicWeight 1 k := by
