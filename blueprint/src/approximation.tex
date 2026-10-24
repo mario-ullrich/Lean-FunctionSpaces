@@ -675,7 +675,8 @@ $\|f\|_{A^s_q} < \infty$.
   ApproximationScheme.lqNorm_le_approxNormDyadic, ApproximationScheme.approxSeqDyadic_rpow,
   ApproximationScheme.approxSeqDyadic_zero, ApproximationScheme.approxNormDyadic_zero,
   ApproximationScheme.approxSeqDyadic_smul, ApproximationScheme.approxNormDyadic_smul,
-  ApproximationScheme.one_le_two_rpow, ApproximationScheme.two_rpow_ne_top}
+  ApproximationScheme.approxNormDyadic_neg, ApproximationScheme.one_le_two_rpow,
+  ApproximationScheme.one_le_two_mul_two_rpow, ApproximationScheme.two_rpow_ne_top}
 \leanok
 \uses{def:error, def:lq-norm}
 Let $s \in \R$ and $1 \leq q \leq \infty$. For $f \in X$,
@@ -684,6 +685,10 @@ Let $s \in \R$ and $1 \leq q \leq \infty$. For $f \in X$,
   \bigr\|_{\ell_q} .
 \]
 \end{definition}
+
+For every $c \in \R$ and $f \in X$, $\|c f\|^{\mathrm{dy}}_{A^s_q} = |c| \,
+\|f\|^{\mathrm{dy}}_{A^s_q}$; in particular the dyadic quasi-norm is even. For $s \geq 0$,
+$1 \leq 2^s \leq 2 \cdot 2^s$.
 
 The term $\|f\| = E_0(f)$ is needed because the dyadic sequence starts at $E_1$. The dyadic
 form is the working norm: every later theorem is stated for it, and the next theorem
@@ -1088,7 +1093,8 @@ DeVore and Lorentz~\cite[Chapter~7]{DeVoreLorentz}.
 \begin{theorem}[Representation theorem]
 \label{thm:representation}
 \lean{ApproximationScheme.approxNormDyadic_le_interpNorm_of_jackson,
-  ApproximationScheme.interpSeq_le_of_lift,
+  ApproximationScheme.interpSeq_le_of_lift, ApproximationScheme.lqNorm_le_of_le_partialSums,
+  ApproximationScheme.enorm_add_le_mul_approxNormDyadic,
   ApproximationScheme.interpNorm_le_approxNormDyadic_of_bernstein, ApproximationScheme.reprConst,
   ApproximationScheme.memApprox_iff_memInterp, ApproximationScheme.approxSpace_eq_interpSpace,
   ApproximationScheme.SmoothnessSpace.memApprox_iff_memInterp, ApproximationScheme.reprConst_ne_top}
@@ -1452,8 +1458,9 @@ continuous $K$-method and its discrete $K$-method on the grid $2^n$, $n \in \Z$,
 $K$-functional, the continuous $K$-method and the discrete $K$-method with $\rho = 1$ of this
 chapter. The couple of a map $\iota$ gives back the spaces of
 \Cref{ch:interpolation}. \Cref{sec:interpolation-property} proves that the $K$-method is exact
-of exponent $\theta$, and \Cref{sec:reiteration} proves the reiteration theorem through
-Holmstedt's formula.
+of exponent $\theta$, \Cref{sec:reiteration} proves the reiteration theorem through
+Holmstedt's formula, and \Cref{sec:approximation-spaces-interpolate} identifies the
+approximation spaces of every scheme with interpolation spaces and interpolates between them.
 
 \section{Couples and their \texorpdfstring{$K$}{K}-method}
 \label{sec:couples}
@@ -1598,6 +1605,7 @@ $2^{-n\theta} K(2^n, u)$.
   InterpCouple.discreteKMethodNorm_le_kMethodNorm,
   InterpCouple.kMethodNorm_le_mul_discreteKMethodNorm,
   InterpCouple.discreteKMethodNorm_le_mul_kMethodNorm,
+  InterpCouple.discreteKMethodNorm_le_inv_mul_kMethodNorm,
   InterpCouple.memKMethod_iff_discreteKMethodNorm_lt_top}
 \leanok
 \uses{def:couple-k-method, lem:couple-k-functional, lem:continuous-k-method-integer-grid}
@@ -1727,17 +1735,21 @@ on $\Z$ needs a couple with $N_0 \leq c N_1$.
 
 \begin{proposition}[The grid on the natural numbers for a couple]
 \label{prop:couple-natural-grid}
-\lean{InterpCouple.interpNorm, InterpCouple.discreteKMethodNorm_le_interpNorm,
-  InterpCouple.interpNorm_le_discreteKMethodNorm, InterpCouple.memKMethod_iff_interpNorm_lt_top}
+\lean{InterpCouple.interpNorm, InterpCouple.interpNorm_zero,
+  InterpCouple.discreteKMethodNorm_le_interpNorm,
+  InterpCouple.interpNorm_le_discreteKMethodNorm, InterpCouple.memKMethod_iff_interpNorm_lt_top,
+  InterpCouple.kMethodNorm_le_interpNorm, InterpCouple.interpNorm_le_kMethodNorm}
 \leanok
 \uses{def:couple-k-method, lem:couple-k-functional, lem:integer-grid-natural-grid,
-  lem:ordered-couple, lem:lq-basic, thm:couple-discrete-continuous}
+  lem:ordered-couple, lem:lq-basic, thm:couple-discrete-continuous,
+  thm:discrete-continuous-k-method}
 Let $A = (N_0, N_1)$ be a couple on $U$, let $\theta, \rho \in \R$ and $q \in (0, \infty]$, and
 for $u \in U$ let
 \[
   \|u\|_{\theta, \rho, q}
   = N_0(u) + \bigl\| \bigl(2^{k\rho\theta} K(2^{-k\rho}, u)\bigr)_{k \in \N} \bigr\|_{\ell_q} .
 \]
+If $N_0(0) = N_1(0) = 0$, then $\|0\|_{\theta, \rho, q} = 0$.
 \begin{enumerate}
   \item If $N_1(0) = 0$ and $\rho\theta \geq 0$, then
     $\|u\|^{\Z}_{\theta, \rho, q} \leq C_q \, \gamma_{\rho\theta, q} \, \|u\|_{\theta, \rho, q}$
@@ -1748,6 +1760,12 @@ for $u \in U$ let
     for every $u \in U$.
   \item Under the hypotheses of (2), for $\theta > 0$ and $\rho > 0$, every $u \in U$ satisfies
     $u \in (X_0, X_1)_{\theta, q}$ if and only if $\|u\|_{\theta, \rho, q} < \infty$.
+  \item If $N_1(0) = 0$, $\theta \geq 0$ and $\rho > 0$, then
+    $\|u\|_{K, \theta, q} \leq M_1 \, \|u\|_{\theta, \rho, q}$ for every $u \in U$, with the
+    constant $M_1$ of \Cref{thm:discrete-continuous-k-method}. Under the hypotheses of (2), for
+    $\theta \geq 0$ and $\rho > 0$,
+    $\|u\|_{\theta, \rho, q} \leq \bigl(1 + C \max(1, c)\bigr) \, 2^{\rho\theta}
+    (\rho \log 2)^{-1/q} \, \|u\|_{K, \theta, q}$ for every $u \in U$.
 \end{enumerate}
 \end{proposition}
 
@@ -1757,7 +1775,9 @@ for $u \in U$ let
 $K(t, u) \leq N_0(u)$ (\Cref{lem:couple-k-functional}). For (2), $N_0(u) \leq C \max(1, c) \,
 K(1, u)$ by \Cref{lem:ordered-couple}, $K(1, u)$ is the term $n = 0$ of the sequence on $\Z$, and
 the terms with $n \leq 0$ form the sequence on $\N$. (3) follows from (1), (2) and
-\Cref{thm:couple-discrete-continuous}; the constants are finite for $\rho\theta > 0$.
+\Cref{thm:couple-discrete-continuous}; the constants are finite for $\rho\theta > 0$. (4)
+combines (1) and (2) with the two bounds of \Cref{thm:couple-discrete-continuous}, the lower
+one solved for the discrete $K$-norm.
 \end{proof}
 
 \paragraph{The couple of a bounded linear map.}
@@ -2497,6 +2517,337 @@ The couple of $\iota$ is quasi-normed with constant $1$ (\Cref{lem:map-couple}),
 continuous $K$-norms are those of \Cref{def:continuous-k-method}
 (\Cref{prop:map-couple-k-method}). Apply \Cref{thm:reiteration} (1).
 \end{proof}
+
+\section{Approximation spaces as interpolation spaces}
+\label{sec:approximation-spaces-interpolate}
+
+Throughout, $A$ is an approximation scheme in $X$. The representation theorem
+(\Cref{thm:representation}) interpolates between $X$ and a smoothness space $Y$ with Jackson's
+and Bernstein's inequalities. Every scheme carries a quasi-normed space of this kind: the
+approximation space $A^r_\infty$, which satisfies Jackson's inequality by definition and for
+which the near-best approximants are their own lifts. Hence
+$A^s_q = (X, A^r_\infty)_{s/r, q}$ for every scheme~\cite{Pietsch, DeVorePopovLNM}, and
+the reiteration theorem (\Cref{thm:reiteration}) gives the interpolation spaces between two
+approximation spaces~\cite[Chapter~7]{DeVoreLorentz}.
+
+\begin{definition}[Couples of approximation spaces]
+\label{def:approximation-space-couples}
+\lean{ApproximationScheme.leftApproxCouple, ApproximationScheme.leftApproxCouple_norm0,
+  ApproximationScheme.leftApproxCouple_norm1, ApproximationScheme.reprCouple,
+  ApproximationScheme.reprCouple_norm0, ApproximationScheme.reprCouple_norm1,
+  ApproximationScheme.approxCouple}
+\leanok
+\uses{def:couple, def:dyadic-norm}
+Let $s \in \R$ and $q \in [1, \infty]$. The couple $(X, A^s_q)$ on $X$ is $N_0(f) = \|f\|$ and
+$N_1(f) = \|f\|^{\mathrm{dy}}_{A^s_q}$; for $r \in \R$, the couple $(X, A^r_\infty)$ is the case
+$s = r$, $q = \infty$. For $s_0, s_1 \in \R$ and
+$q_0, q_1 \in [1, \infty]$, the couple $(A^{s_0}_{q_0}, A^{s_1}_{q_1})$ on $X$ is
+$(\|\cdot\|^{\mathrm{dy}}_{A^{s_0}_{q_0}}, \|\cdot\|^{\mathrm{dy}}_{A^{s_1}_{q_1}})$.
+\end{definition}
+
+\begin{lemma}[Couples of approximation spaces are quasi-normed]
+\label{lem:approximation-space-couples}
+\lean{ApproximationScheme.isQuasiNormed_leftApproxCouple,
+  ApproximationScheme.isHomogeneous_leftApproxCouple, ApproximationScheme.isQuasiNormed_reprCouple,
+  ApproximationScheme.isHomogeneous_reprCouple, ApproximationScheme.norm0_reprCouple_le,
+  ApproximationScheme.isQuasiNormed_approxCouple, ApproximationScheme.isHomogeneous_approxCouple}
+\leanok
+\uses{def:approximation-space-couples, prop:approx-linear, def:dyadic-norm}
+For every $s \geq 0$ and $q \in [1, \infty]$, the couple $(X, A^s_q)$ is quasi-normed with
+constant $2 \cdot 2^s$ and homogeneous; in particular so is $(X, A^r_\infty)$ for $r \geq 0$, and
+$\|f\| \leq \|f\|^{\mathrm{dy}}_{A^r_\infty}$ for every $r \in \R$ and every $f \in X$. For all
+$s_0, s_1 \geq 0$ and $q_0, q_1 \in [1, \infty]$, the couple $(A^{s_0}_{q_0}, A^{s_1}_{q_1})$
+is quasi-normed with constant $2 \cdot 2^{\max(s_0, s_1)}$ and homogeneous.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The dyadic quasi-norm satisfies the quasi-triangle inequality with constant $2 \cdot 2^s$
+(\Cref{prop:approx-linear}), it is homogeneous and even, and $1 \leq 2 \cdot 2^s$ covers the
+norm of $X$ (\Cref{def:dyadic-norm}).
+\end{proof}
+
+\paragraph{The two halves.}
+
+\begin{lemma}[Jackson's half]
+\label{lem:approximation-space-couple-direct}
+\lean{ApproximationScheme.approxSeq_pow_le_dyadicWeight_mul,
+  ApproximationScheme.approxSeq_le_kFunctional_reprCouple,
+  ApproximationScheme.approxNormDyadic_le_interpNorm_reprCouple}
+\leanok
+\uses{def:approximation-space-couples, def:couple-k-functional, prop:couple-natural-grid,
+  lem:error-basic, lem:lq-basic}
+Let $r \in \R$, and let $K$ be the $K$-functional of $(X, A^r_\infty)$. For every $f \in X$ and
+every $k \in \N$, $E_{2^{k+1}}(f) \leq K(2^{-kr}, f)$. If moreover $r \neq 0$, then for every
+$s \geq 0$, every $q \in [1, \infty]$ and every $f \in X$,
+\[
+  \|f\|^{\mathrm{dy}}_{A^s_q} \leq 2 \cdot 2^s \, \|f\|_{s/r, r, q} ,
+\]
+with the norm $\|\cdot\|_{s/r, r, q}$ of \Cref{prop:couple-natural-grid} of $(X, A^r_\infty)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For every $b \in X$, $2^{kr} E_{2^k}(b) \leq \|b\|^{\mathrm{dy}}_{A^r_\infty}$, hence
+\[
+  E_{2^{k+1}}(f) \leq E_{2^k}(f - b) + E_{2^k}(b)
+  \leq \|f - b\| + 2^{-kr} \|b\|^{\mathrm{dy}}_{A^r_\infty}
+\]
+(\Cref{lem:error-basic}); take the infimum over $b$. Then
+$2^{(k+1)s} E_{2^{k+1}}(f) \leq 2^s \, 2^{kr \cdot s/r} K(2^{-kr}, f)$, and splitting off the
+first term $E_1(f) \leq \|f\|$ of the $\ell_q$ norm (\Cref{lem:lq-basic}) gives
+$\|f\|^{\mathrm{dy}}_{A^s_q} \leq 2 \|f\| + 2^s \bigl\| \bigl(2^{ks} K(2^{-kr}, f)\bigr)_k
+\bigr\|_{\ell_q} \leq 2 \cdot 2^s \, \|f\|_{s/r, r, q}$.
+\end{proof}
+
+\begin{lemma}[Near-best approximants in $A^r_\infty$]
+\label{lem:approximants-top-norm}
+\lean{ApproximationScheme.approxNormDyadic_top_le_of_mem,
+  ApproximationScheme.DyadicApprox.enorm_le, ApproximationScheme.DyadicApprox.approxSeq_le,
+  ApproximationScheme.DyadicApprox.approxNormDyadic_top_le}
+\leanok
+\uses{def:dyadic-norm, lem:near-best, lem:error-basic, lem:scheme-basic}
+Let $r \in \R$ and $k \in \N$.
+\begin{enumerate}
+  \item For every $a \in A_{2^k}$,
+    $\|a\|^{\mathrm{dy}}_{A^r_\infty} \leq \|a\| + \sum_{j<k} 2^{jr} E_{2^j}(a)$.
+  \item Let $f \in X$, let $(t_k)_k$ be a sequence in $[0, \infty]$ and let $a_k \in A_{2^k}$
+    with $\|f - a_k\| \leq E_{2^k}(f) + t_k$ for every $k$. Then
+    $\|a_k\| \leq 2 \|f\| + t_k$. If $(t_k)_k$ decreases, then
+    $E_{2^j}(a_k) \leq 2 \bigl(E_{2^j}(f) + t_j\bigr)$ for every $j \leq k$; if moreover
+    $t_0 \leq \|f\|$, then
+    \[
+      \|a_k\|^{\mathrm{dy}}_{A^r_\infty}
+      \leq 3 \|f\| + 2 \sum_{j \leq k} 2^{jr} \bigl(E_{2^j}(f) + t_j\bigr) .
+    \]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) For $j \geq k$, $a \in A_{2^j}$ and so $E_{2^j}(a) = 0$. (2) $\|a_k\| \leq \|f\| +
+\|f - a_k\|$ and $E_{2^k}(f) \leq \|f\|$. For $j \leq k$,
+$E_{2^j}(a_k) \leq E_{2^j}(f) + \|f - a_k\|$ and
+$\|f - a_k\| \leq E_{2^k}(f) + t_k \leq E_{2^j}(f) + t_j$ (\Cref{lem:error-basic}). The last
+bound combines these with (1).
+\end{proof}
+
+\begin{theorem}[Bernstein's half]
+\label{thm:approximation-space-couple-inverse}
+\lean{ApproximationScheme.dyadicWeight_mul_kFunctional_reprCouple_le,
+  ApproximationScheme.lqNorm_kFunctional_reprCouple_le, ApproximationScheme.devorePopovConst,
+  ApproximationScheme.devorePopovConst_ne_top,
+  ApproximationScheme.interpNorm_reprCouple_le_approxNormDyadic}
+\leanok
+\uses{lem:approximants-top-norm, lem:near-best, thm:lift, lem:hardy, lem:lq-basic,
+  prop:couple-natural-grid, def:approximation-space-couples, lem:approximation-space-couples,
+  lem:couple-k-functional, def:lq-norm, thm:representation}
+Let $0 \leq s < r$ and $q \in [1, \infty]$. For every $f \in X$,
+\[
+  \|f\|_{s/r, r, q} \leq \bigl(3 + 7 (1 - 2^{-(r-s)})^{-1}\bigr) \,
+  \|f\|^{\mathrm{dy}}_{A^s_q} ,
+\]
+with the norm $\|\cdot\|_{s/r, r, q}$ of \Cref{prop:couple-natural-grid} of $(X, A^r_\infty)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $f = 0$ both sides vanish. Otherwise choose near-best approximants $a_k$ with the
+tolerances $t_k = \|f\| 2^{-k(s+1)}$ (\Cref{lem:near-best}, \Cref{thm:lift}). With
+$b_j = 2^{jr} (E_{2^j}(f) + t_j)$, \Cref{lem:approximants-top-norm} and
+$K(2^{-kr}, f) \leq \|f - a_k\| + 2^{-kr} \|a_k\|^{\mathrm{dy}}_{A^r_\infty}$ give
+\[
+  2^{ks} K(2^{-kr}, f) \leq 2^{ks} \bigl(E_{2^k}(f) + t_k\bigr) + 3 \|f\| 2^{-k(r-s)}
+  + 2 \cdot 2^{-k(r-s)} \sum_{j \leq k} b_j .
+\]
+Let $D = \|(2^{ks} E_{2^k}(f))_k\|_{\ell_q}$ and $c = (1 - 2^{-(r-s)})^{-1}$. The $\ell_q$ norms
+of the three terms are at most $D + 2 \|f\|$, $3 c \|f\|$ and, by the second Hardy inequality
+(\Cref{lem:hardy}) with exponent $r - s > 0$ and $2^{-k(r-s)} b_k = 2^{ks}(E_{2^k}(f) + t_k)$,
+$2 c (D + 2 \|f\|)$. Adding $\|f\|$ and using $\|f\|, D \leq \|f\|^{\mathrm{dy}}_{A^s_q}$ gives
+the constant $3 + 7c$. These two steps are shared with the proof of \Cref{thm:representation}.
+\end{proof}
+
+The approximants $a_k$ lie in $A^r_\infty$ and serve as their own lifts; the proof is that of
+\Cref{thm:representation} with $Y = A^r_\infty$ and $z_k = a_k$.
+
+\begin{theorem}[Approximation spaces are interpolation spaces]
+\label{thm:approximation-spaces-interpolate}
+\lean{ApproximationScheme.memApprox_iff_memKMethod_reprCouple,
+  ApproximationScheme.kMethodSpace_reprCouple}
+\leanok
+\uses{lem:approximation-space-couple-direct, thm:approximation-space-couple-inverse,
+  lem:approximation-space-couples, prop:couple-natural-grid, thm:dyadic-norm,
+  prop:couple-k-method-space}
+Let $0 < s < r$ and $q \in [1, \infty]$. For every $f \in X$, $f \in A^s_q$ if and only if
+$f \in (X, A^r_\infty)_{s/r, q}$, the space of the continuous $K$-method of the couple
+$(X, A^r_\infty)$. In particular $A^s_q = (X, A^r_\infty)_{s/r, q}$ as subspaces of $X$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:dyadic-norm}, $f \in A^s_q$ if and only if $\|f\|^{\mathrm{dy}}_{A^s_q} < \infty$,
+and by \Cref{prop:couple-natural-grid} (3) with $\theta = s/r > 0$, $\rho = r > 0$ and $c = 1$
+(\Cref{lem:approximation-space-couples}), $f \in (X, A^r_\infty)_{s/r, q}$ if and only if
+$\|f\|_{s/r, r, q} < \infty$. \Cref{lem:approximation-space-couple-direct} and
+\Cref{thm:approximation-space-couple-inverse} compare the two norms with finite constants.
+\end{proof}
+
+\paragraph{Reiteration.}
+
+\begin{lemma}[The norms of the couple $(X, A^r_\infty)$]
+\label{lem:approximation-space-couple-norms}
+\lean{ApproximationScheme.reprLowerConst, ApproximationScheme.reprLowerConst_ne_top,
+  ApproximationScheme.approxNormDyadic_le_kMethodNorm_reprCouple,
+  ApproximationScheme.reprUpperConst, ApproximationScheme.reprUpperConst_ne_top,
+  ApproximationScheme.kMethodNorm_reprCouple_le_approxNormDyadic,
+  ApproximationScheme.approxNormDyadic_le_discreteKMethodNorm_reprCouple,
+  ApproximationScheme.discreteKMethodNorm_reprCouple_le_approxNormDyadic,
+  ApproximationScheme.inv_log_two_rpow_mul_two_rpow_ne_top,
+  ApproximationScheme.log_two_rpow_mul_two_rpow_ne_top}
+\leanok
+\uses{lem:approximation-space-couple-direct, thm:approximation-space-couple-inverse,
+  prop:couple-natural-grid, thm:couple-discrete-continuous, thm:discrete-continuous-k-method,
+  lem:approximation-space-couples}
+Let $r > 0$ and $q \in [1, \infty]$, and write $\|\cdot\|_{K, \theta, q}$ and
+$\|\cdot\|^{\Z}_{\theta, 1, q}$ for the continuous $K$-norm and the discrete $K$-norm on the grid
+$t = 2^n$ of the couple $(X, A^r_\infty)$. For every $f \in X$:
+\begin{enumerate}
+  \item if $s \geq 0$, then
+    \[
+      \|f\|^{\mathrm{dy}}_{A^s_q} \leq L \, \|f\|_{K, s/r, q}
+      \qquad \text{and} \qquad
+      \|f\|^{\mathrm{dy}}_{A^s_q} \leq L (\log 2)^{1/q} 2^{s/r} \, \|f\|^{\Z}_{s/r, 1, q} ,
+    \]
+    with $L = 2 \cdot 2^s (1 + 2 \cdot 2^r) \, 2^s (r \log 2)^{-1/q}$;
+  \item if $0 < s < r$, then $\|f\|_{K, s/r, q} \leq M \, \|f\|^{\mathrm{dy}}_{A^s_q}$ and
+    $\|f\|^{\Z}_{s/r, 1, q} \leq \bigl((\log 2)^{1/q} 2^{-s/r}\bigr)^{-1} M \,
+    \|f\|^{\mathrm{dy}}_{A^s_q}$, with $M = M_1 \bigl(3 + 7 (1 - 2^{-(r-s)})^{-1}\bigr)$ and
+    the constant $M_1$ of \Cref{thm:discrete-continuous-k-method} for $\theta = s/r$ and
+    $\rho = r$.
+\end{enumerate}
+All these constants are finite.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Combine \Cref{lem:approximation-space-couple-direct} and
+\Cref{thm:approximation-space-couple-inverse} with \Cref{prop:couple-natural-grid} (4), for
+$C = 2 \cdot 2^r$ and $c = 1$, and with \Cref{thm:couple-discrete-continuous} for $\rho = 1$.
+\end{proof}
+
+\begin{theorem}[Reiteration of approximation spaces]
+\label{thm:approximation-spaces-reiteration}
+\lean{ApproximationScheme.memKMethod_approxCouple_iff,
+  ApproximationScheme.memKMethod_approxCouple_zero_iff,
+  ApproximationScheme.kMethodSpace_approxCouple,
+  ApproximationScheme.kMethodSpace_approxCouple_zero}
+\leanok
+\uses{lem:approximation-space-couple-norms, thm:approximation-spaces-interpolate,
+  thm:reiteration, cor:comparable-couples, lem:approximation-space-couples,
+  def:k-space-couples, prop:couple-k-method-space}
+Let $q_0, q_1, q \in [1, \infty]$, $0 < \eta < 1$ and $f \in X$.
+\begin{enumerate}
+  \item For $0 < s_0 < s_1$, $f \in (A^{s_0}_{q_0}, A^{s_1}_{q_1})_{\eta, q}$ if and only if
+    $f \in A^{(1-\eta)s_0 + \eta s_1}_q$. In particular
+    $(A^{s_0}_{q_0}, A^{s_1}_{q_1})_{\eta, q} = A^{(1-\eta)s_0 + \eta s_1}_q$ as subspaces of
+    $X$.
+  \item For $s_1 > 0$, $f \in (X, A^{s_1}_{q_1})_{\eta, q}$, for the couple
+    $(X, A^{s_1}_{q_1})$ of \Cref{def:approximation-space-couples}, if and only if
+    $f \in A^{\eta s_1}_q$. In particular $(X, A^{s_1}_{q_1})_{\eta, q} = A^{\eta s_1}_q$ as
+    subspaces of $X$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+Put $r = s_1 + 1$ and let $B$ be the couple $(X, A^r_\infty)$. By
+\Cref{lem:approximation-space-couple-norms}, $\|\cdot\|^{\mathrm{dy}}_{A^{s_i}_{q_i}}$ and the
+discrete $K$-norm $\|\cdot\|^{\Z}_{s_i/r, 1, q_i}$ of $B$ are comparable with finite constants.
+By \Cref{cor:comparable-couples}, the couple of (1) has the same spaces as the couple of
+$K$-spaces of $B$ for $(s_0/r, q_0)$ and $(s_1/r, q_1)$, and the couple of (2) has the same
+spaces as the left endpoint couple of $B$ for $(s_1/r, q_1)$
+(\Cref{def:k-space-couples}). Since $B$ is quasi-normed
+(\Cref{lem:approximation-space-couples}) and $0 < s_0/r < s_1/r < 1$, \Cref{thm:reiteration}
+(1) and (2) identify these spaces with the spaces of $B$ for $(1 - \eta) s_0/r + \eta s_1/r$ and
+for $\eta s_1/r$. Since
+$0 < (1 - \eta) s_0 + \eta s_1 < r$ and $0 < \eta s_1 < r$,
+\Cref{thm:approximation-spaces-interpolate} identifies them with
+$A^{(1-\eta)s_0 + \eta s_1}_q$ and $A^{\eta s_1}_q$.
+\end{proof}
+
+This is the reiteration theorem for approximation
+spaces~\cite[Chapter~7]{DeVoreLorentz}~\cite{Pietsch, DeVorePopovLNM}, here for every scheme
+and all fine indices in
+$[1, \infty]$.
+
+\paragraph{Sandwiches.}
+
+\begin{corollary}[The sandwich principle]
+\label{cor:approximation-space-sandwich}
+\lean{ApproximationScheme.memKMethod_iff_memApprox_of_sandwich,
+  ApproximationScheme.memKMethod_iff_memApprox_of_two_sandwiches}
+\leanok
+\uses{thm:approximation-spaces-reiteration, cor:comparable-couples}
+Let $q \in [1, \infty]$ and $N_0, N_1 : X \to [0, \infty]$.
+\begin{enumerate}
+  \item Let $r > 0$, $0 < \theta < 1$, $q', q'' \in [1, \infty]$ and $c, c' \in [0, \infty)$
+    with $N_1(f) \leq c \, \|f\|^{\mathrm{dy}}_{A^r_{q'}}$ and
+    $\|f\|^{\mathrm{dy}}_{A^r_{q''}} \leq c' \, N_1(f)$ for every $f \in X$. For every
+    $f \in X$, $f$ lies in the space of the continuous $K$-method with $(\theta, q)$ of the
+    couple $(\|\cdot\|, N_1)$ if and only if $f \in A^{\theta r}_q$.
+  \item Let $0 < s_0 < s_1$, $0 < \eta < 1$, $q_i', q_i'' \in [1, \infty]$ and
+    $c_i, c_i' \in [0, \infty)$ with $N_i(f) \leq c_i \, \|f\|^{\mathrm{dy}}_{A^{s_i}_{q_i'}}$
+    and $\|f\|^{\mathrm{dy}}_{A^{s_i}_{q_i''}} \leq c_i' \, N_i(f)$ for $i = 0, 1$ and every
+    $f \in X$. For every $f \in X$, $f$ lies in the space of the continuous $K$-method with
+    $(\eta, q)$ of the couple $(N_0, N_1)$ if and only if
+    $f \in A^{(1-\eta)s_0 + \eta s_1}_q$.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+\leanok
+Smaller norms give larger spaces (\Cref{cor:comparable-couples}), so the space of the couple
+lies between the spaces of the couples of \Cref{thm:approximation-spaces-reiteration} with the
+fine indices $q''$ and $q'$, and both are the approximation space of the statement.
+\end{proof}
+
+The corollary applies to every space that lies between two approximation spaces of the same
+smoothness, with norms; a smoothness space is an example.
+
+\begin{corollary}[The representation theorem through the sandwich principle]
+\label{cor:representation-sandwich}
+\lean{ApproximationScheme.approxNormDyadic_top_le_norm1_ofMap,
+  ApproximationScheme.norm1_ofMap_le_approxNormDyadic_one,
+  ApproximationScheme.memKMethod_ofMap_iff_memApprox}
+\leanok
+\uses{cor:approximation-space-sandwich, lem:jackson-top, thm:lift, def:map-couple,
+  def:jackson, def:lift-bound}
+Let $Y$ be a Banach space, let $r > 0$ and $C_1, C_2 \geq 0$, let $\iota : Y \to X$ satisfy
+Jackson's inequality of order $r$ and constant $C_1$ and the lifting bound of exponent $r$ and
+constant $C_2$, and let $N_1(f) = \inf \{\|y\| : \iota y = f\}$ be the second norm of the
+couple of $\iota$. For every $f \in X$,
+\[
+  \|f\|^{\mathrm{dy}}_{A^r_\infty} \leq (1 + \|\iota\| + C_1) \, N_1(f)
+  \qquad \text{and} \qquad
+  N_1(f) \leq (1 + 3 C_2 + 6 C_2 \cdot 4^r) \, \|f\|^{\mathrm{dy}}_{A^r_1} .
+\]
+Hence, for every $0 < \theta < 1$, every $q \in [1, \infty]$ and every $f \in X$,
+$f \in (X, \iota(Y))_{\theta, q}$, the space of the continuous $K$-method of the couple of
+$\iota$, if and only if $f \in A^{\theta r}_q$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{lem:jackson-top} gives $\|\iota y\|^{\mathrm{dy}}_{A^r_\infty} \leq (\|\iota\| + C_1)
+\|y\|$; take the infimum over the $y$ with $\iota y = f$. If
+$\|f\|^{\mathrm{dy}}_{A^r_1} < \infty$, \Cref{thm:lift} gives such a $y$ with
+$\|y\| \leq (3 C_2 + 6 C_2 \cdot 4^r) \|f\|^{\mathrm{dy}}_{A^r_1}$; otherwise the second bound
+is trivial. Apply \Cref{cor:approximation-space-sandwich} (1) with $q' = 1$ and
+$q'' = \infty$.
+\end{proof}
+
+For complete $Y$ this is \Cref{cor:representation-continuous-k-method} with $\theta = s/r$
+once more; that corollary holds for every normed space $Y$.
 
 \chapter{Block decompositions and projections}
 \label{ch:decompositions}

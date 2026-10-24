@@ -30,7 +30,9 @@ approximants `a_k`, and the tails bound how well `y` is approximated in `Y`.
 
 This single construction yields three theorems: Bernstein implies `A^β_1 ↪ Y`
 (`exists_preimage_of_liftBound`, this file), the Nikolskii transfer theorem
-(`ApproximationSpaces.Nikolskii`), and one half of the representation theorem.
+(`ApproximationSpaces.Nikolskii`), and one half of the representation theorem.  The
+approximants themselves are controlled in `X` and in `A^r_∞` (`DyadicApprox.enorm_le`,
+`DyadicApprox.approxNormDyadic_top_le`).
 
 **Tolerances.** Best approximants need not exist, so `a_k` is only near-best:
 `‖f - a_k‖ ≤ E_{2^k}(f) + t_k`.  The tolerances `t_k = ‖f‖ 2^(-k(σ+1))` are chosen so small
@@ -120,13 +122,51 @@ theorem enorm_sub_succ_le (ht : Antitone t) (k : ℕ) :
         · exact ht (Nat.le_succ k)
     _ = 2 * (A.approxSeq f (2 ^ k) + t k) := by ring
 
+/-- A near-best approximant of complexity `2^k` has norm at most `2 ‖f‖ + t_k`. -/
+theorem enorm_le (k : ℕ) : ‖D.a k‖ₑ ≤ 2 * ‖f‖ₑ + t k :=
+  calc ‖D.a k‖ₑ = ‖f - (f - D.a k)‖ₑ := by rw [sub_sub_cancel]
+    _ ≤ ‖f‖ₑ + ‖f - D.a k‖ₑ := _root_.enorm_sub_le
+    _ ≤ ‖f‖ₑ + (‖f‖ₑ + t k) := by
+        gcongr
+        exact (D.enorm_sub_le k).trans (by gcongr; exact approxSeq_le_enorm f _)
+    _ = 2 * ‖f‖ₑ + t k := by ring
+
 /-- The first approximant is bounded: `‖a_0‖ ≤ 2 ‖f‖ + t_0`. -/
-theorem enorm_zero_le : ‖D.a 0‖ₑ ≤ 2 * ‖f‖ₑ + t 0 := by
-  calc ‖D.a 0‖ₑ = ‖f - (f - D.a 0)‖ₑ := by rw [sub_sub_cancel]
-    _ ≤ ‖f‖ₑ + ‖f - D.a 0‖ₑ := _root_.enorm_sub_le
-    _ ≤ ‖f‖ₑ + (A.approxSeq f (2 ^ 0) + t 0) := by gcongr; exact D.enorm_sub_le 0
-    _ ≤ ‖f‖ₑ + (‖f‖ₑ + t 0) := by gcongr; exact approxSeq_le_enorm f _
-    _ = 2 * ‖f‖ₑ + t 0 := by ring
+theorem enorm_zero_le : ‖D.a 0‖ₑ ≤ 2 * ‖f‖ₑ + t 0 := D.enorm_le 0
+
+/-- **The errors of a near-best approximant**: for decreasing tolerances and `j ≤ k`,
+`E_{2^j}(a_k) ≤ E_{2^j}(f) + ‖f - a_k‖ ≤ 2 (E_{2^j}(f) + t_j)`. -/
+theorem approxSeq_le (ht : Antitone t) {j k : ℕ} (hjk : j ≤ k) :
+    A.approxSeq (D.a k) (2 ^ j) ≤ 2 * (A.approxSeq f (2 ^ j) + t j) :=
+  calc A.approxSeq (D.a k) (2 ^ j) ≤ A.approxSeq f (2 ^ j) + ‖D.a k - f‖ₑ :=
+        approxSeq_le_approxSeq_add_enorm _ _ _
+    _ ≤ A.approxSeq f (2 ^ j) + (A.approxSeq f (2 ^ j) + t j) := by
+        rw [enorm_sub_rev]
+        gcongr
+        exact (D.enorm_sub_le k).trans
+          (add_le_add (approxSeq_anti f (Nat.pow_le_pow_right two_pos hjk)) (ht hjk))
+    _ ≤ 2 * (A.approxSeq f (2 ^ j) + t j) := by
+        rw [two_mul]
+        gcongr
+        exact le_self_add
+
+/-- **The quasi-norm of `A^r_∞` of a near-best approximant**: for decreasing tolerances with
+`t_0 ≤ ‖f‖`, `‖a_k‖_{A^r_∞} ≤ 3 ‖f‖ + 2 ∑_{j ≤ k} 2^(jr) (E_{2^j}(f) + t_j)`. -/
+theorem approxNormDyadic_top_le {r : ℝ} (ht : Antitone t) (ht0 : t 0 ≤ ‖f‖ₑ) (k : ℕ) :
+    A.approxNormDyadic r ∞ (D.a k) ≤ 3 * ‖f‖ₑ +
+      2 * ∑ j ∈ range (k + 1), dyadicWeight r j * (A.approxSeq f (2 ^ j) + t j) := by
+  refine (approxNormDyadic_top_le_of_mem (D.mem k)).trans (add_le_add ?_ ?_)
+  · calc ‖D.a k‖ₑ ≤ 2 * ‖f‖ₑ + t k := D.enorm_le k
+      _ ≤ 2 * ‖f‖ₑ + ‖f‖ₑ := by gcongr; exact (ht (Nat.zero_le k)).trans ht0
+      _ = 3 * ‖f‖ₑ := by ring
+  · rw [Finset.mul_sum]
+    calc ∑ j ∈ range k, A.approxSeqDyadic r (D.a k) j
+        ≤ ∑ j ∈ range k, 2 * (dyadicWeight r j * (A.approxSeq f (2 ^ j) + t j)) :=
+          sum_le_sum fun j hj => by
+            rw [approxSeqDyadic, mul_left_comm]
+            gcongr
+            exact D.approxSeq_le ht (mem_range.1 hj).le
+      _ ≤ _ := sum_le_sum_of_subset (range_mono (Nat.le_succ k))
 
 /-- The approximants converge to `f` when the dyadic errors and the tolerances tend to `0`. -/
 theorem tendsto (he : Tendsto (fun k => A.approxSeq f (2 ^ k)) atTop (𝓝 0))

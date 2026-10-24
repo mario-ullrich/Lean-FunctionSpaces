@@ -115,7 +115,12 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   K-norms `‖(2^(-nθ_i) K(2^n, u))_{n ∈ ℤ}‖_{ℓ_{q_i}}` or their continuous K-norms
   `‖·‖_{K,θ_i,q_i}`. The proof uses the upper bound of Holmstedt's formula with `ℓ_1` sums
   (Holmstedt 1970; Bergh–Löfström, Theorem 3.6.1 has `ℓ_{q_i}` norms of the two pieces), which
-  suffices for reiteration (`InterpCouple.kFunctional_kCouple_le`).
+  suffices for reiteration (`InterpCouple.kFunctional_kCouple_le`). For every approximation
+  scheme, `0 < s < r` and `1 ≤ q ≤ ∞`, `A^s_q = (X, A^r_∞)_{s/r,q}` for the couple of the norm
+  of `X` and the dyadic quasi-norm of `A^r_∞`, and for `0 < s₀ < s₁`, `0 < η < 1` and
+  `1 ≤ q₀, q₁, q ≤ ∞`, `(A^{s₀}_{q₀}, A^{s₁}_{q₁})_{η,q} = A^{(1-η)s₀+ηs₁}_q` (Pietsch 1981;
+  DeVore–Popov, LNM 1302 (1988); `ApproximationScheme.memApprox_iff_memKMethod_reprCouple`,
+  `ApproximationScheme.memKMethod_approxCouple_iff`).
 * **Moduli of smoothness and approximation.** Let `ω(f, 2^(-k))` be subadditive with
   `ω(f, t) ≤ C₀ ‖f‖`, and assume a Jackson inequality `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for
   `k ≥ k₀` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
@@ -482,7 +487,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 
 | Block | Lean | Checked |
 |---|---|---|
-| [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, couples, their K-method, the interpolation property and the reiteration theorem, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
+| [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, couples, their K-method, the interpolation property and the reiteration theorem, approximation spaces as interpolation spaces, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
 | [**Besov and Sobolev spaces on measure spaces**](docs/MeasureSpaces.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, spectral schemes, continuous spectral bases | ✅ | ✗ |
 | [**Tools from analysis**](docs/Analysis.md): `L_p` norms, the inclusion `L_r ↪ L_p`, Young's inequality, mixed norms, differences and the translation algebra, convolution, approximate identities, Littlewood–Paley kernels, test functions in the Schwartz space, dyadic cubes and cells, the Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, weak type and Marcinkiewicz interpolation, `L_p` norms by duality | ✅ | ✗ |
 | [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness and smooth Littlewood–Paley blocks for all `p`, `W^m_2` by Fourier multipliers, the trace on a face, the restriction for continuous functions | ✅ | ✗ |
@@ -620,6 +625,9 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * R. A. DeVore, G. G. Lorentz, *Constructive Approximation*, Grundlehren der
   mathematischen Wissenschaften **303**, Springer-Verlag, 1993. Chapter 7: approximation
   spaces, Jackson and Bernstein inequalities, and their relation to interpolation.
+* R. A. DeVore, V. A. Popov, *Interpolation spaces and non-linear approximation*, in: Function
+  Spaces and Applications (Lund, 1986), Lecture Notes in Math. **1302**, Springer-Verlag, 1988,
+  191–205. Approximation spaces as interpolation spaces between `X` and `A^r_∞`.
 * R. A. DeVore, R. C. Sharpley, *Besov spaces on domains in ℝ^d*, Trans. Amer. Math. Soc.
   **335** (1993), no. 2, 843–864. The modulus of smoothness on a domain.
 * T. Eirola, *Sobolev characterization of solutions of dilation equations*, SIAM J. Math.

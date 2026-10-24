@@ -12,8 +12,9 @@ their dyadic quasi-norm, embeddings and functoriality, lifting under a Bernstein
 Nikolskii transfer theorem, the K-functional, the discrete and the continuous K-method and the
 representation of `A^s_q` as a real interpolation space, couples of two extended quasi-norms on
 an abelian group with their K-method, its interpolation property and the reiteration theorem
-(`InterpCouple`), block, projection and atomic decompositions, abstract trace and retract
-theorems, and the comparison with spaces defined by moduli of smoothness (`ModulusData`). A
+(`InterpCouple`), approximation spaces as interpolation spaces of the couple `(X, A^r_∞)`,
+block, projection and atomic decompositions, abstract trace and retract theorems, and the
+comparison with spaces defined by moduli of smoothness (`ModulusData`). A
 smoothness space of order `r` is a Banach space with an injective bounded map into `X` satisfying
 Jackson's and Bernstein's inequalities of order `r` (`ApproximationScheme.JacksonBound`,
 `ApproximationScheme.SmoothnessSpace`, a hypothesis structure whose fields are the embedding, the
@@ -127,6 +128,21 @@ norms and `dt/t` on `(0, ∞)` of the continuous K-method. The other blocks inst
   `InterpCouple.kFunctional_leftKCouple_le` and `InterpCouple.kFunctional_rightKCouple_le`), which
   suffices for reiteration, and the geometric convolutions on `ℤ`
   (`ENNReal.lqNorm_tsum_geom_sub_le`, `ENNReal.lqNorm_tsum_geom_add_le`).
+* **Approximation spaces as interpolation spaces.** For every scheme, `0 < s < r` and
+  `1 ≤ q ≤ ∞`, `A^s_q = (X, A^r_∞)_{s/r,q}` for the couple of the norm of `X` and the dyadic
+  quasi-norm of `A^r_∞` (Pietsch 1981; DeVore–Popov, LNM 1302 (1988);
+  `ApproximationScheme.memApprox_iff_memKMethod_reprCouple`), with the explicit constants `2 · 2^s`
+  and `ApproximationScheme.devorePopovConst r s = 3 + 7 (1 - 2^(-(r-s)))⁻¹` for the norm on the
+  grid `t = 2^(-kr)` (`ApproximationScheme.approxNormDyadic_le_interpNorm_reprCouple`,
+  `ApproximationScheme.interpNorm_reprCouple_le_approxNormDyadic`); the proof uses the scheme
+  alone, with the near-best approximants in place of lifts. For `0 < s₀ < s₁`, `0 < η < 1`
+  and `1 ≤ q₀, q₁, q ≤ ∞`,
+  `(A^{s₀}_{q₀}, A^{s₁}_{q₁})_{η,q} = A^{(1-η)s₀+ηs₁}_q` and `(X, A^{s₁}_{q₁})_{η,q} = A^{ηs₁}_q`
+  (`ApproximationScheme.memKMethod_approxCouple_iff`,
+  `ApproximationScheme.memKMethod_approxCouple_zero_iff`), and every couple whose norms lie
+  between two dyadic quasi-norms of the same smoothness has these spaces as interpolation spaces
+  (`ApproximationScheme.memKMethod_iff_memApprox_of_sandwich`,
+  `ApproximationScheme.memKMethod_iff_memApprox_of_two_sandwiches`).
 * **Moduli of smoothness and approximation.** Let `ω(f, 2^(-k))` be subadditive with
   `ω(f, t) ≤ C₀ ‖f‖`, and assume a Jackson inequality `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for
   `k ≥ k₀` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
@@ -195,6 +211,7 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Couples of extended quasi-norms, their K-functional and K-method, quasi-triangle inequalities of the K-norms, the couple of a bounded linear map | ✅ | ✗ | `Interpolation/Couple` |
 | Dilations of `dt/t`, the interpolation property of the K-method, comparable couples, retracts, compatible maps between couples of bounded linear maps | ✅ | ✗ | `Interpolation/Property` |
 | Couples of K-spaces, Holmstedt's formula, the reiteration theorem and its endpoint cases | ✅ | ✗ | `Interpolation/Reiteration` |
+| Approximation spaces as interpolation spaces `A^s_q = (X, A^r_∞)_{s/r,q}`, reiteration of approximation spaces, the sandwich principle | ✅ | ✗ | `Interpolation/ApproxSpaces` |
 | Moduli compatible with a scheme, coincidence with the classical space | ✅ | ✗ | `Moduli` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ | ✗ | `Decompositions/Blocks`, `Decompositions/Projection` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ | ✗ | `Decompositions/Synthesis`, `Decompositions/Atomic` |

@@ -26,6 +26,7 @@ public import ApproximationSpaces.KMethod
 public import ApproximationSpaces.Interpolation.Couple
 public import ApproximationSpaces.Interpolation.Property
 public import ApproximationSpaces.Interpolation.Reiteration
+public import ApproximationSpaces.Interpolation.ApproxSpaces
 public import ApproximationSpaces.Decompositions.Projection
 public import ApproximationSpaces.Decompositions.Blocks
 public import ApproximationSpaces.Decompositions.Synthesis
@@ -95,6 +96,9 @@ the counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the co
 * `ApproximationSpaces.Interpolation.Reiteration`: couples of K-spaces, Holmstedt's formula in
   discrete form, and the reiteration theorem
   `((X₀, X₁)_{θ₀,q₀}, (X₀, X₁)_{θ₁,q₁})_{η,q} = (X₀, X₁)_{(1-η)θ₀+ηθ₁,q}` with its endpoint cases.
+* `ApproximationSpaces.Interpolation.ApproxSpaces`: approximation spaces as interpolation spaces,
+  `A^s_q = (X, A^r_∞)_{s/r,q}` for every scheme, the reiteration
+  `(A^{s₀}_{q₀}, A^{s₁}_{q₁})_{η,q} = A^{(1-η)s₀+ηs₁}_q`, and the sandwich principle.
 * `ApproximationSpaces.Decompositions.Projection`: schemes with uniformly bounded projections
   and the characterisation of `A^s_q` by dyadic blocks.
 * `ApproximationSpaces.Decompositions.Blocks`: the characterisation of `A^s_q` by block

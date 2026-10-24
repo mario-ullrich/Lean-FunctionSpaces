@@ -117,6 +117,70 @@ theorem interpSeq_le_of_lift (hr : r ≠ 0) {f : X} {t : ℕ → ℝ≥0∞} (D 
         simp only [approxSeqDyadic, mul_add, ← mul_assoc, hw]
         ring
 
+/-- **The `ℓ_q` norm of a sequence bounded through partial sums**: for `q ≥ 1`, with the
+tolerances `t_k = tolerance f s k`, if
+`u_k ≤ (2^(ks) E_{2^k}(f) + 2^(ks) t_k) + (B 2^(-k(r-s)) + K 2^(-k(r-s)) ∑_{j ≤ k} 2^(jr)
+(E_{2^j}(f) + t_j))` for every `k`, then `‖u‖_{ℓ_q} ≤ (D + 2 ‖f‖) + (B c + K c (D + 2 ‖f‖))`,
+where `D = ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}` and `c = (1 - 2^(-(r-s)))⁻¹`, by Hardy's inequality
+for partial sums (`ENNReal.hardy_sum_le`).  Both Bernstein halves, through lifts and through
+the near-best approximants in `A^r_∞`, end with this bound. -/
+theorem lqNorm_le_of_le_partialSums (hq : 1 ≤ q) {f : X} {u : ℕ → ℝ≥0∞} {B K : ℝ≥0∞}
+    (hu : ∀ k, u k ≤ (A.approxSeqDyadic s f k + dyadicWeight s k * tolerance f s k) +
+      (B * dyadicWeight (-(r - s)) k + K * (dyadicWeight (-(r - s)) k *
+        ∑ j ∈ range (k + 1), dyadicWeight r j * (A.approxSeq f (2 ^ j) + tolerance f s j)))) :
+    lqNorm q u ≤ (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ) +
+      (B * (1 - (2 : ℝ≥0∞) ^ (-(r - s)))⁻¹ +
+        K * ((1 - (2 : ℝ≥0∞) ^ (-(r - s)))⁻¹ * (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ))) := by
+  have hsplit : ∀ k, dyadicWeight (-(r - s)) k *
+      (dyadicWeight r k * (A.approxSeq f (2 ^ k) + tolerance f s k)) =
+        A.approxSeqDyadic s f k + dyadicWeight s k * tolerance f s k := fun k => by
+    simp only [approxSeqDyadic, ← mul_assoc, ← ENNReal.dyadicWeight_add, mul_add]
+    congr 2 <;> congr 1 <;> ring
+  have hL12 : lqNorm q (fun k => A.approxSeqDyadic s f k + dyadicWeight s k * tolerance f s k) ≤
+      lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ :=
+    (ENNReal.lqNorm_add_le hq _ _).trans
+      (add_le_add le_rfl (lqNorm_dyadicWeight_mul_tolerance_le hq f le_rfl))
+  have hL3 : lqNorm q (fun k => B * dyadicWeight (-(r - s)) k) ≤
+      B * (1 - (2 : ℝ≥0∞) ^ (-(r - s)))⁻¹ := by
+    rw [ENNReal.lqNorm_const_mul]
+    gcongr
+    exact ENNReal.lqNorm_dyadicWeight_neg_le hq _
+  have hL4 : lqNorm q (fun k => K * (dyadicWeight (-(r - s)) k * ∑ j ∈ range (k + 1),
+      dyadicWeight r j * (A.approxSeq f (2 ^ j) + tolerance f s j))) ≤
+        K * ((1 - (2 : ℝ≥0∞) ^ (-(r - s)))⁻¹ * (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ)) := by
+    rw [ENNReal.lqNorm_const_mul]
+    gcongr
+    refine (ENNReal.hardy_sum_le hq (r - s) _).trans ?_
+    simp_rw [hsplit]
+    gcongr
+  exact (ENNReal.lqNorm_mono hu).trans ((ENNReal.lqNorm_add_le hq _ _).trans (add_le_add hL12
+    ((ENNReal.lqNorm_add_le hq _ _).trans (add_le_add hL3 hL4))))
+
+/-- **Adding the norm**: if `L ≤ (D + 2 ‖f‖) + (B ‖f‖ c + K c (D + 2 ‖f‖))` with
+`D = ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}`, then `‖f‖ + L ≤ (3 + (B + 2 K) c) ‖f‖_{A^s_q}`, since
+`‖f‖` and `D` are at most the dyadic quasi-norm `‖f‖_{A^s_q} = ‖f‖ + D`. -/
+theorem enorm_add_le_mul_approxNormDyadic {f : X} {L B K c : ℝ≥0∞}
+    (h : L ≤ (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ) +
+      (B * ‖f‖ₑ * c + K * (c * (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ)))) :
+    ‖f‖ₑ + L ≤ (3 + (B + 2 * K) * c) * A.approxNormDyadic s q f := by
+  set N := A.approxNormDyadic s q f
+  set Ds := lqNorm q (A.approxSeqDyadic s f)
+  have hN : N = ‖f‖ₑ + Ds := rfl
+  have hfN : ‖f‖ₑ ≤ N := enorm_le_approxNormDyadic f
+  have h2 : Ds + 2 * ‖f‖ₑ ≤ 2 * N :=
+    calc Ds + 2 * ‖f‖ₑ = N + ‖f‖ₑ := by rw [hN]; ring
+      _ ≤ N + N := by gcongr
+      _ = 2 * N := by ring
+  have h1 : ‖f‖ₑ + (Ds + 2 * ‖f‖ₑ) ≤ 3 * N :=
+    calc ‖f‖ₑ + (Ds + 2 * ‖f‖ₑ) = N + 2 * ‖f‖ₑ := by rw [hN]; ring
+      _ ≤ N + 2 * N := by gcongr
+      _ = 3 * N := by ring
+  calc ‖f‖ₑ + L ≤ ‖f‖ₑ + ((Ds + 2 * ‖f‖ₑ) + (B * ‖f‖ₑ * c + K * (c * (Ds + 2 * ‖f‖ₑ)))) := by
+        gcongr
+    _ = (‖f‖ₑ + (Ds + 2 * ‖f‖ₑ)) + B * ‖f‖ₑ * c + K * (c * (Ds + 2 * ‖f‖ₑ)) := by ring
+    _ ≤ 3 * N + B * N * c + K * (c * (2 * N)) := by gcongr
+    _ = (3 + (B + 2 * K) * c) * N := by ring
+
 /-- **Bernstein's half of the representation theorem**: for `0 < s < r`,
 `‖f‖_{(X,Y)_{s/r,q}} ≤ reprConst C r s · ‖f‖_{A^s_q}` (dyadic quasi-norm). -/
 theorem interpNorm_le_approxNormDyadic_of_bernstein (hB : LiftBound ι A r C) (hC : 0 ≤ C)
@@ -125,74 +189,18 @@ theorem interpNorm_le_approxNormDyadic_of_bernstein (hB : LiftBound ι A r C) (h
   rcases eq_or_ne f 0 with rfl | hf0
   · have : interpSeq ι (s / r) r (0 : X) = fun _ => 0 := by funext k; simp [interpSeq]
     simp [interpNorm, this]
-  have hr : r ≠ 0 := (hs.trans hsr).ne'
-  set t := tolerance f s
   obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s) (tolerance_ne_top f s)
   obtain ⟨y0, d, hpart, hy0, hd⟩ := D.exists_lift_partial (tolerance_anti f hs.le) hB hC
-  set K := liftConst C r
-  set Cr := (1 - (2 : ℝ≥0∞) ^ (-(r - s)))⁻¹
-  set N := A.approxNormDyadic s q f
-  set Ds := lqNorm q (A.approxSeqDyadic s f)
-  set b : ℕ → ℝ≥0∞ := fun j => dyadicWeight r j * (A.approxSeq f (2 ^ j) + t j)
   have hy0' : ‖y0‖ₑ ≤ 3 * ENNReal.ofReal C * ‖f‖ₑ := by
     rw [tolerance_zero] at hy0
     calc ‖y0‖ₑ ≤ ENNReal.ofReal C * (2 * ‖f‖ₑ + ‖f‖ₑ) := hy0
       _ = 3 * ENNReal.ofReal C * ‖f‖ₑ := by ring
   -- the K-functional at `2^(-kr)`, through the lifted partial sums
-  have hK : ∀ k, interpSeq ι (s / r) r f k ≤
-      (A.approxSeqDyadic s f k + dyadicWeight s k * t k) +
-        (3 * ENNReal.ofReal C * ‖f‖ₑ * dyadicWeight (-(r - s)) k +
-          K * (dyadicWeight (-(r - s)) k * ∑ j ∈ range (k + 1), b j)) :=
-    interpSeq_le_of_lift hr D hpart hy0' hd
-  -- the four sequences
-  have hsplit : ∀ k, dyadicWeight (-(r - s)) k * b k =
-      A.approxSeqDyadic s f k + dyadicWeight s k * t k := fun k => by
-    simp only [b, approxSeqDyadic, ← mul_assoc, ← ENNReal.dyadicWeight_add, mul_add]
-    congr 2 <;> congr 1 <;> ring
-  have hL12 : lqNorm q (fun k => A.approxSeqDyadic s f k + dyadicWeight s k * t k) ≤
-      Ds + 2 * ‖f‖ₑ :=
-    (ENNReal.lqNorm_add_le hq _ _).trans
-      (add_le_add le_rfl (lqNorm_dyadicWeight_mul_tolerance_le hq f le_rfl))
-  have hL3 : lqNorm q (fun k => 3 * ENNReal.ofReal C * ‖f‖ₑ * dyadicWeight (-(r - s)) k) ≤
-      3 * ENNReal.ofReal C * ‖f‖ₑ * Cr := by
-    rw [ENNReal.lqNorm_const_mul]
-    gcongr
-    exact ENNReal.lqNorm_dyadicWeight_neg_le hq _
-  have hL4 : lqNorm q (fun k => K * (dyadicWeight (-(r - s)) k * ∑ j ∈ range (k + 1), b j)) ≤
-      K * (Cr * (Ds + 2 * ‖f‖ₑ)) := by
-    rw [ENNReal.lqNorm_const_mul]
-    gcongr
-    calc lqNorm q (fun k => dyadicWeight (-(r - s)) k * ∑ j ∈ range (k + 1), b j)
-        ≤ Cr * lqNorm q (fun k => dyadicWeight (-(r - s)) k * b k) :=
-          ENNReal.hardy_sum_le hq (r - s) b
-      _ ≤ Cr * (Ds + 2 * ‖f‖ₑ) := by simp_rw [hsplit]; gcongr
-  have hfN : ‖f‖ₑ ≤ N := enorm_le_approxNormDyadic f
-  have hDN : Ds ≤ N := lqNorm_le_approxNormDyadic f
+  have hK := interpSeq_le_of_lift (s := s) (hs.trans hsr).ne' D hpart hy0' hd
   calc interpNorm ι (s / r) r q f = ‖f‖ₑ + lqNorm q (interpSeq ι (s / r) r f) := rfl
-    _ ≤ ‖f‖ₑ + ((Ds + 2 * ‖f‖ₑ) + (3 * ENNReal.ofReal C * ‖f‖ₑ * Cr +
-          K * (Cr * (Ds + 2 * ‖f‖ₑ)))) := by
-        gcongr
-        calc lqNorm q (interpSeq ι (s / r) r f)
-            ≤ lqNorm q (fun k => (A.approxSeqDyadic s f k + dyadicWeight s k * t k) +
-                (3 * ENNReal.ofReal C * ‖f‖ₑ * dyadicWeight (-(r - s)) k +
-                  K * (dyadicWeight (-(r - s)) k * ∑ j ∈ range (k + 1), b j))) :=
-              ENNReal.lqNorm_mono hK
-          _ ≤ _ := (ENNReal.lqNorm_add_le hq _ _).trans (add_le_add hL12
-              ((ENNReal.lqNorm_add_le hq _ _).trans (add_le_add hL3 hL4)))
-    _ = (‖f‖ₑ + (Ds + 2 * ‖f‖ₑ)) + 3 * ENNReal.ofReal C * ‖f‖ₑ * Cr +
-          K * (Cr * (Ds + 2 * ‖f‖ₑ)) := by ring
-    _ ≤ 3 * N + 3 * ENNReal.ofReal C * N * Cr + K * (Cr * (2 * N)) := by
-        have hN : N = ‖f‖ₑ + Ds := rfl
-        have h1 : ‖f‖ₑ + (Ds + 2 * ‖f‖ₑ) ≤ 3 * N :=
-          calc ‖f‖ₑ + (Ds + 2 * ‖f‖ₑ) = N + 2 * ‖f‖ₑ := by rw [hN]; ring
-            _ ≤ N + 2 * N := by gcongr
-            _ = 3 * N := by ring
-        have h2 : Ds + 2 * ‖f‖ₑ ≤ 2 * N :=
-          calc Ds + 2 * ‖f‖ₑ = N + ‖f‖ₑ := by rw [hN]; ring
-            _ ≤ N + N := by gcongr
-            _ = 2 * N := by ring
-        gcongr
-    _ = reprConst C r s * N := by simp only [reprConst, K, Cr]; ring
+    _ ≤ reprConst C r s * A.approxNormDyadic s q f := by
+        rw [reprConst]
+        exact enorm_add_le_mul_approxNormDyadic (lqNorm_le_of_le_partialSums hq hK)
 
 /-- **The representation theorem**: under Jackson's and Bernstein's inequalities of order `r`
 and for `0 < s < r`, `f ∈ A^s_q` if and only if `f ∈ (X, Y)_{s/r,q}`, the real interpolation

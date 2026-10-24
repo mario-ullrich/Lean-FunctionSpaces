@@ -676,6 +676,21 @@ theorem ofReal_mul_log_two_rpow_ne_zero (hρ : 0 < ρ) (q : ℝ≥0∞) :
   (ENNReal.rpow_pos (pos_iff_ne_zero.2 (ofReal_mul_log_two_ne_zero hρ))
     ENNReal.ofReal_ne_top).ne'
 
+/-- The factor `((log 2)^(1/q) 2^(-θ))⁻¹` of `InterpCouple.discreteKMethodNorm_le_mul_kMethodNorm`
+is finite. -/
+theorem inv_log_two_rpow_mul_two_rpow_ne_top (θ : ℝ) (q : ℝ≥0∞) :
+    (ENNReal.ofReal (Real.log 2) ^ (1 / q.toReal) * 2 ^ (-θ))⁻¹ ≠ ∞ := by
+  have h := ofReal_mul_log_two_rpow_ne_zero (ρ := 1) one_pos q
+  rw [one_mul] at h
+  exact ENNReal.inv_ne_top.2 (mul_ne_zero h (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne')
+
+/-- The factor `(log 2)^(1/q) 2^θ` of `InterpCouple.kMethodNorm_le_mul_discreteKMethodNorm` is
+finite. -/
+theorem log_two_rpow_mul_two_rpow_ne_top (θ : ℝ) (q : ℝ≥0∞) :
+    ENNReal.ofReal (Real.log 2) ^ (1 / q.toReal) * 2 ^ θ ≠ ∞ :=
+  ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top)
+    (two_rpow_ne_top θ)
+
 /-- The constant `kMethodLowerConst ι θ ρ q` is finite for `ρ > 0`. -/
 theorem kMethodLowerConst_ne_top (hρ : 0 < ρ) (q : ℝ≥0∞) : kMethodLowerConst ι θ ρ q ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,

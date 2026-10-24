@@ -30,7 +30,8 @@ a real subspace (`InterpCouple.kMethodSpace`).  For an ordered quasi-normed coup
 (`N₀ ≤ c N₁`, `InterpCouple.norm0_le_mul_kFunctional_one`), the norm
 `N₀(u) + ‖(2^(kρθ) K(2^(-kρ), u))_{k ∈ ℕ}‖_{ℓ_q}` on the grid `t = 2^(-kρ)`
 (`InterpCouple.interpNorm`) gives the same space for `θ > 0`, `ρ > 0` and `q ≠ 0`
-(`InterpCouple.memKMethod_iff_interpNorm_lt_top`).
+(`InterpCouple.memKMethod_iff_interpNorm_lt_top`), with explicit constants in both directions
+(`InterpCouple.kMethodNorm_le_interpNorm`, `InterpCouple.interpNorm_le_kMethodNorm`).
 
 A bounded linear map `ι : Y → X` gives the couple `(X, ι(Y))` (`InterpCouple.ofMap`), whose
 K-functional is `ApproximationScheme.kFunctional ι` for `0 < t < ∞`.  Hence its continuous
@@ -335,6 +336,23 @@ theorem discreteKMethodNorm_le_kMethodNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (u : 
   exact ApproximationScheme.lqNorm_discretePhiSeq_le_phiFunctional
     (monotone_kFunctional (A := A) u) hθ hρ
 
+/-- **The discrete K-norm by the continuous one, solved for the discrete norm**: for `θ ≥ 0` and
+`ρ > 0`, `‖(2^(-nρθ) K(2^(nρ), u))_{n ∈ ℤ}‖_{ℓ_q} ≤ ((ρ log 2)^(1/q) 2^(-ρθ))⁻¹ ‖u‖_{K,θ,q}`
+(`discreteKMethodNorm_le_kMethodNorm`). -/
+theorem discreteKMethodNorm_le_inv_mul_kMethodNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (u : U) :
+    A.discreteKMethodNorm θ ρ q u ≤
+      (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) * 2 ^ (-(ρ * θ)))⁻¹ *
+        A.kMethodNorm θ q u := by
+  have h0 : ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) * 2 ^ (-(ρ * θ)) ≠ 0 :=
+    mul_ne_zero (ApproximationScheme.ofReal_mul_log_two_rpow_ne_zero hρ q)
+      (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne'
+  have ht : ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) * 2 ^ (-(ρ * θ)) ≠ ∞ :=
+    ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top)
+      (ApproximationScheme.two_rpow_ne_top _)
+  refine (ENNReal.mul_le_iff_le_inv h0 ht).1 ?_
+  rw [mul_assoc]
+  exact discreteKMethodNorm_le_kMethodNorm hθ hρ u
+
 /-- The continuous K-norm by the discrete K-norm on the grid `t = 2^n`: for `θ ≥ 0`,
 `‖u‖_{K,θ,q} ≤ (log 2)^(1/q) 2^θ ‖u‖_{θ,1,q}` (`kMethodNorm_le_discreteKMethodNorm` with
 `ρ = 1`). -/
@@ -345,21 +363,13 @@ theorem kMethodNorm_le_mul_discreteKMethodNorm (hθ : 0 ≤ θ) (u : U) :
   simpa only [one_mul, mul_assoc] using h
 
 /-- The discrete K-norm on the grid `t = 2^n` by the continuous K-norm: for `θ ≥ 0`,
-`‖u‖_{θ,1,q} ≤ ((log 2)^(1/q) 2^(-θ))⁻¹ ‖u‖_{K,θ,q}` (`discreteKMethodNorm_le_kMethodNorm` with
-`ρ = 1`). -/
+`‖u‖_{θ,1,q} ≤ ((log 2)^(1/q) 2^(-θ))⁻¹ ‖u‖_{K,θ,q}` (`discreteKMethodNorm_le_inv_mul_kMethodNorm`
+with `ρ = 1`). -/
 theorem discreteKMethodNorm_le_mul_kMethodNorm (hθ : 0 ≤ θ) (u : U) :
     A.discreteKMethodNorm θ 1 q u ≤
       (ENNReal.ofReal (Real.log 2) ^ (1 / q.toReal) * 2 ^ (-θ))⁻¹ * A.kMethodNorm θ q u := by
-  have h0 : ENNReal.ofReal (Real.log 2) ^ (1 / q.toReal) * 2 ^ (-θ) ≠ 0 :=
-    mul_ne_zero (by simpa only [one_mul] using
-      ApproximationScheme.ofReal_mul_log_two_rpow_ne_zero (ρ := 1) one_pos q)
-      (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne'
-  have ht : ENNReal.ofReal (Real.log 2) ^ (1 / q.toReal) * 2 ^ (-θ) ≠ ∞ :=
-    ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top)
-      (ApproximationScheme.two_rpow_ne_top _)
-  refine (ENNReal.mul_le_iff_le_inv h0 ht).1 ?_
-  have h := discreteKMethodNorm_le_kMethodNorm (A := A) (q := q) hθ one_pos u
-  simpa only [one_mul, mul_assoc] using h
+  simpa only [one_mul] using discreteKMethodNorm_le_inv_mul_kMethodNorm (A := A) (q := q) hθ
+    one_pos u
 
 /-- **The discrete and the continuous K-method agree** (Bergh–Löfström, Lemma 3.1.3; Bonn's
 `discreteKMethod_equiv_kmethod`): for `θ ≥ 0`, `ρ > 0` and every `q`, `‖u‖_{K,θ,q} < ∞` if and
@@ -534,6 +544,10 @@ grid `t = 2^(-kρ)`, `k ∈ ℕ`, as in `ApproximationScheme.interpNorm`. -/
 noncomputable def interpNorm (A : InterpCouple U) (θ ρ : ℝ) (q : ℝ≥0∞) (u : U) : ℝ≥0∞ :=
   A.norm0 u + lqNorm q fun k : ℕ => dyadicWeight (ρ * θ) k * A.kFunctional (dyadicWeight (-ρ) k) u
 
+/-- The norm on the grid `ℕ` vanishes at `0` if both norms do. -/
+theorem interpNorm_zero (h0 : A.norm0 0 = 0) (h1 : A.norm1 0 = 0) : A.interpNorm θ ρ q 0 = 0 := by
+  simp [interpNorm, h0, kFunctional_zero_right h0 h1, ENNReal.lqNorm_zero_right]
+
 /-- **The discrete K-norm on `ℤ` by the norm on the grid `ℕ`**: if `N₁(0) = 0` and `ρθ ≥ 0`,
 `‖(2^(-nρθ) K(2^(nρ), u))_{n ∈ ℤ}‖_{ℓ_q} ≤ C_q γ (N₀(u) + ‖(2^(kρθ) K(2^(-kρ), u))_k‖_{ℓ_q})`
 with `γ = dyadicGeomConst (ρθ) q` and Mathlib's constant `C_q = LpAddConst q`. -/
@@ -577,6 +591,45 @@ theorem memKMethod_iff_interpNorm_lt_top (hA : A.IsQuasiNormed C) (hc : c ≠ �
       (ENNReal.mul_lt_top hM h),
     fun h => (discreteKMethodNorm_le_interpNorm hA.norm1_zero (mul_pos hρ hθ).le u).trans_lt
       (ENNReal.mul_lt_top hL h)⟩
+
+/-- **The continuous K-norm by the norm on the grid `ℕ`**: if `N₁(0) = 0`, `θ ≥ 0` and `ρ > 0`,
+then `‖u‖_{K,θ,q} ≤ c (N₀(u) + ‖(2^(kρθ) K(2^(-kρ), u))_k‖_{ℓ_q})` with the constant
+`c = ApproximationScheme.kMethodUpperConst θ ρ q` of the couples of bounded linear maps. -/
+theorem kMethodNorm_le_interpNorm (h1 : A.norm1 0 = 0) (hθ : 0 ≤ θ) (hρ : 0 < ρ) (u : U) :
+    A.kMethodNorm θ q u ≤ ApproximationScheme.kMethodUpperConst θ ρ q * A.interpNorm θ ρ q u :=
+  calc A.kMethodNorm θ q u
+      ≤ ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) *
+          (2 ^ (ρ * θ) * A.discreteKMethodNorm θ ρ q u) :=
+        kMethodNorm_le_discreteKMethodNorm hθ hρ u
+    _ ≤ ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) * (2 ^ (ρ * θ) *
+          (LpAddConst q * dyadicGeomConst (ρ * θ) q * A.interpNorm θ ρ q u)) := by
+        gcongr
+        exact discreteKMethodNorm_le_interpNorm h1 (mul_nonneg hρ.le hθ) u
+    _ = ApproximationScheme.kMethodUpperConst θ ρ q * A.interpNorm θ ρ q u := by
+        rw [ApproximationScheme.kMethodUpperConst]
+        ring
+
+/-- **The norm on the grid `ℕ` by the continuous K-norm**, for an ordered couple: if the couple
+is quasi-normed with constant `C`, `N₀ ≤ c N₁` with `c < ∞`, `θ ≥ 0`, `ρ > 0` and `q ≠ 0`, then
+`N₀(u) + ‖(2^(kρθ) K(2^(-kρ), u))_k‖_{ℓ_q} ≤ (1 + C max(1, c)) 2^(ρθ) (ρ log 2)^(-1/q)
+‖u‖_{K,θ,q}`. -/
+theorem interpNorm_le_kMethodNorm (hA : A.IsQuasiNormed C) (hc : c ≠ ∞)
+    (hord : ∀ a, A.norm0 a ≤ c * A.norm1 a) (hθ : 0 ≤ θ) (hρ : 0 < ρ) (hq : q ≠ 0) (u : U) :
+    A.interpNorm θ ρ q u ≤ (1 + C * max 1 c) *
+      (2 ^ (ρ * θ) * (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal))⁻¹) *
+        A.kMethodNorm θ q u :=
+  have hinv : (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) * 2 ^ (-(ρ * θ)))⁻¹ =
+      2 ^ (ρ * θ) * (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal))⁻¹ := by
+    rw [ENNReal.mul_inv (Or.inl (ApproximationScheme.ofReal_mul_log_two_rpow_ne_zero hρ q))
+      (Or.inl (ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top)),
+      ENNReal.rpow_neg, inv_inv, mul_comm]
+  calc A.interpNorm θ ρ q u ≤ (1 + C * max 1 c) * A.discreteKMethodNorm θ ρ q u :=
+        interpNorm_le_discreteKMethodNorm hA hc hord hq u
+    _ ≤ (1 + C * max 1 c) * ((ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) *
+          2 ^ (-(ρ * θ)))⁻¹ * A.kMethodNorm θ q u) := by
+        gcongr
+        exact discreteKMethodNorm_le_inv_mul_kMethodNorm hθ hρ u
+    _ = _ := by rw [hinv]; ring
 
 /-! ### The couple of a bounded linear map -/
 

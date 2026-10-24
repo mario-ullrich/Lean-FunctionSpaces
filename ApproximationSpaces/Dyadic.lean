@@ -28,8 +28,9 @@ comparing different `q` is monotonicity of `ℓ_q` norms, and a shift `k ↦ k +
 weights by the constant `2^s`.  Every later theorem is proved for `approxNormDyadic` and
 transported through this equivalence; no later proof unfolds Pietsch's weights `n^(s - 1/q)`.
 
-The file ends with the consequence that the errors of an element of `A^s_q`, `s > 0`, tend to
-zero, so that `A^s_q` lies in the closure of `⋃ A n`.
+For an approximant `a ∈ A_{2^k}` the quasi-norm of `A^s_∞` is at most a finite sum
+(`approxNormDyadic_top_le_of_mem`).  The file ends with the consequence that the errors of an
+element of `A^s_q`, `s > 0`, tend to zero, so that `A^s_q` lies in the closure of `⋃ A n`.
 -/
 
 @[expose] public section
@@ -94,9 +95,21 @@ theorem approxNormDyadic_smul (c : ℝ) (f : X) :
   rw [approxNormDyadic, approxNormDyadic, approxSeqDyadic_smul, ENNReal.lqNorm_const_mul,
     enorm_smul, mul_add]
 
+/-- The dyadic quasi-norm is even: `‖-f‖_{A^s_q} = ‖f‖_{A^s_q}`. -/
+theorem approxNormDyadic_neg (f : X) : A.approxNormDyadic s q (-f) = A.approxNormDyadic s q f := by
+  have h : A.approxSeqDyadic s (-f) = A.approxSeqDyadic s f := by
+    funext k
+    rw [approxSeqDyadic, approxSeqDyadic, approxSeq_neg]
+  rw [approxNormDyadic, approxNormDyadic, h, enorm_neg]
+
 /-- `1 ≤ 2^s` for `s ≥ 0`. -/
 theorem one_le_two_rpow (hs : 0 ≤ s) : 1 ≤ (2 : ℝ≥0∞) ^ s := by
   simpa using ENNReal.rpow_le_rpow_of_exponent_le one_le_two hs
+
+/-- `1 ≤ 2 · 2^s` for `s ≥ 0`: the quasi-triangle constants `2 · 2^s` of the dyadic quasi-norms
+dominate the constant `1` of the norm. -/
+theorem one_le_two_mul_two_rpow (hs : 0 ≤ s) : 1 ≤ (2 : ℝ≥0∞) * 2 ^ s :=
+  one_le_two.trans (le_mul_of_one_le_right' (one_le_two_rpow hs))
 
 /-- `2^s` is finite in `ℝ≥0∞`. -/
 theorem two_rpow_ne_top (s : ℝ) : (2 : ℝ≥0∞) ^ s ≠ ∞ :=
@@ -228,6 +241,20 @@ theorem approxSeq_pow_le (hq : 1 ≤ q) (f : X) (k : ℕ) :
   calc A.approxSeq f (2 ^ k) = dyadicWeight (-s) k * A.approxSeqDyadic s f k := by
         rw [approxSeqDyadic, ← mul_assoc, ENNReal.dyadicWeight_neg_mul_self, one_mul]
     _ ≤ _ := by gcongr; exact approxSeqDyadic_le_lqNorm hq f k
+
+/-- **The quasi-norm of `A^s_∞` of an approximant**: for `a ∈ A_{2^k}`, `E_{2^j}(a) = 0` for
+`j ≥ k`, hence `‖a‖_{A^s_∞} ≤ ‖a‖ + ∑_{j<k} 2^(js) E_{2^j}(a)`. -/
+theorem approxNormDyadic_top_le_of_mem {k : ℕ} {a : X} (ha : a ∈ A (2 ^ k)) :
+    A.approxNormDyadic s ∞ a ≤ ‖a‖ₑ + ∑ j ∈ Finset.range k, A.approxSeqDyadic s a j := by
+  rw [approxNormDyadic, ENNReal.lqNorm_top]
+  gcongr
+  refine iSup_le fun j => ?_
+  rcases lt_or_ge j k with hj | hj
+  · exact Finset.single_le_sum (f := A.approxSeqDyadic s a) (fun _ _ => zero_le)
+      (Finset.mem_range.2 hj)
+  · rw [approxSeqDyadic,
+      approxSeq_eq_zero_of_mem (mem_of_le (Nat.pow_le_pow_right two_pos hj) ha), mul_zero]
+    exact zero_le
 
 /-- For `f ∈ A^s_q` with `s > 0`, the dyadic errors `E_{2^k}(f)` tend to zero. -/
 theorem tendsto_approxError_pow_zero_of_memApprox (hq : 1 ≤ q) (hs : 0 < s) {f : X}

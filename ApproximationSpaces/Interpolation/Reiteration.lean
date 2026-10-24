@@ -736,16 +736,11 @@ theorem memKMethod_kMethodCouple_iff (hA : A.IsQuasiNormed C) (hθ₀ : 0 < θ�
     {u : U} :
     (A.kMethodCouple θ₀ q₀ θ₁ q₁).MemKMethod η q u ↔
       A.MemKMethod ((1 - η) * θ₀ + η * θ₁) q u := by
-  have hL : ∀ r : ℝ≥0∞, ENNReal.ofReal (Real.log 2) ^ (1 / r.toReal) ≠ ∞ := fun r =>
-    ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top
-  have hI : ∀ (r : ℝ≥0∞) (s : ℝ), (ENNReal.ofReal (Real.log 2) ^ (1 / r.toReal) * 2 ^ s)⁻¹ ≠ ∞ :=
-    fun r s => ENNReal.inv_ne_top.2 (mul_ne_zero (by simpa only [one_mul] using
-      ApproximationScheme.ofReal_mul_log_two_rpow_ne_zero (ρ := 1) one_pos r)
-      (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne')
   rw [← memKMethod_kCouple_iff hA hθ₀ hθ hθ₁ hη hη' hq₀ hq₁ hq]
-  exact memKMethod_congr (hI q₀ (-θ₀)) (hI q₁ (-θ₁))
-    (ENNReal.mul_ne_top (hL q₀) (ApproximationScheme.two_rpow_ne_top θ₀))
-    (ENNReal.mul_ne_top (hL q₁) (ApproximationScheme.two_rpow_ne_top θ₁))
+  exact memKMethod_congr (ApproximationScheme.inv_log_two_rpow_mul_two_rpow_ne_top θ₀ q₀)
+    (ApproximationScheme.inv_log_two_rpow_mul_two_rpow_ne_top θ₁ q₁)
+    (ApproximationScheme.log_two_rpow_mul_two_rpow_ne_top θ₀ q₀)
+    (ApproximationScheme.log_two_rpow_mul_two_rpow_ne_top θ₁ q₁)
     (discreteKMethodNorm_le_mul_kMethodNorm hθ₀.le)
     (discreteKMethodNorm_le_mul_kMethodNorm (hθ₀.trans hθ).le)
     (kMethodNorm_le_mul_discreteKMethodNorm hθ₀.le)
