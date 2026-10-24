@@ -9,7 +9,7 @@ public import ApproximationSpaces.Sequences.Lq
 public import Mathlib.MeasureTheory.Integral.Lebesgue.Add
 
 /-!
-# Discrete Hardy inequalities
+# Discrete Hardy inequalities and geometric convolutions
 
 For `α > 0`, `1 ≤ q ≤ ∞` and a sequence `b : ℕ → ℝ≥0∞`, with `C_α = (1 - 2^(-α))⁻¹`:
 
@@ -30,6 +30,13 @@ norms of its truncations, which increase (`lqNorm_eq_iSup_lqNorm_ite`, `monotone
 Together they bound an **almost diagonal sum**: with `c_{ij} = 2^(-(i-j)L)` for `j ≤ i` and
 `c_{ij} = 1` for `j > i`, `‖(2^(is) ∑_j c_{ij} a_j)_i‖_q ≤ C ‖(2^(js) a_j)_j‖_q` for `0 < s < L`
 (`lqNorm_almostDiagonal_le`).
+
+The Minkowski inequalities and monotone convergence hold for families on every countable index
+set.  On `ℤ`, the norm is invariant under shifts (`lqNorm_comp_add_int`), which gives Young's
+inequality for a series of shifts (`lqNorm_tsum_shift_le`) and the two **geometric
+convolutions** `‖(∑_{j ≥ 0} 2^(-(j+1)α) c_{m-(j+1)})_m‖_q ≤ (1 - 2^(-α))⁻¹ ‖c‖_q` and the same
+bound for `(∑_{j ≥ 0} 2^(-jα) c_{m+j})_m` (`lqNorm_tsum_geom_sub_le`, `lqNorm_tsum_geom_add_le`),
+the convolutions behind the reiteration theorem.
 -/
 
 @[expose] public section
@@ -41,9 +48,13 @@ namespace ENNReal
 
 variable {q : ℝ≥0∞}
 
-/-- **Monotone convergence** for the `ℓ_q` norm: for an increasing sequence of sequences,
-the norm of the pointwise supremum is the supremum of the norms. -/
-theorem lqNorm_iSup {F : ℕ → ℕ → ℝ≥0∞} (hF : Monotone F) :
+section Countable
+
+variable {κ : Type*} [MeasurableSpace κ] [Countable κ] [MeasurableSingletonClass κ]
+
+/-- **Monotone convergence** for the `ℓ_q` norm: for an increasing sequence of families indexed
+by a countable set, the norm of the pointwise supremum is the supremum of the norms. -/
+theorem lqNorm_iSup {F : ℕ → κ → ℝ≥0∞} (hF : Monotone F) :
     lqNorm q (fun k => ⨆ N, F N k) = ⨆ N, lqNorm q (F N) := by
   rcases eq_or_ne q 0 with rfl | hq0
   · simp
@@ -56,10 +67,30 @@ theorem lqNorm_iSup {F : ℕ → ℕ → ℝ≥0∞} (hF : Monotone F) :
   have hmono : Monotone fun N k => F N k ^ q.toReal := fun N M h k =>
     ENNReal.rpow_le_rpow (hF h k) hp.le
   have h2 : ∑' k, ⨆ N, F N k ^ q.toReal = ⨆ N, ∑' k, F N k ^ q.toReal := by
-    rw [← lintegral_count, lintegral_iSup (fun _ => measurable_from_nat) hmono]
+    rw [← lintegral_count, lintegral_iSup (fun _ => measurable_of_countable _) hmono]
     simp_rw [lintegral_count]
   simp_rw [h1, h2]
   exact (ENNReal.orderIsoRpow (1 / q.toReal) (by positivity)).map_iSup _
+
+omit [Countable κ] [MeasurableSingletonClass κ] in
+/-- **Minkowski's inequality for finite sums** of families. -/
+theorem lqNorm_sum_le (hq : 1 ≤ q) {ι : Type*} (s : Finset ι) (f : ι → κ → ℝ≥0∞) :
+    lqNorm q (fun k => ∑ i ∈ s, f i k) ≤ ∑ i ∈ s, lqNorm q (f i) := by
+  have : (fun k => ∑ i ∈ s, f i k) = ∑ i ∈ s, f i := by funext k; simp
+  rw [this]
+  exact eLpNorm_sum_le hq
+
+/-- **Minkowski's inequality for series** of families indexed by a countable set: the norm of a
+pointwise sum is at most the sum of the norms. -/
+theorem lqNorm_tsum_le (hq : 1 ≤ q) (f : ℕ → κ → ℝ≥0∞) :
+    lqNorm q (fun k => ∑' i, f i k) ≤ ∑' i, lqNorm q (f i) := by
+  simp_rw [ENNReal.tsum_eq_iSup_nat]
+  have hmono : Monotone fun N k => ∑ i ∈ range N, f i k := fun N M h k =>
+    Finset.sum_le_sum_of_subset (Finset.range_mono h)
+  rw [lqNorm_iSup hmono]
+  exact iSup_mono fun N => lqNorm_sum_le hq _ f
+
+end Countable
 
 /-- **The truncations of a sequence increase**: `J ↦ (a_j 1_{j < J})_j` is monotone. -/
 theorem monotone_ite_lt (a : ℕ → ℝ≥0∞) :
@@ -84,23 +115,6 @@ theorem lqNorm_eq_iSup_lqNorm_ite (a : ℕ → ℝ≥0∞) :
   split_ifs
   · exact le_rfl
   · exact zero_le
-
-/-- **Minkowski's inequality for finite sums** of sequences. -/
-theorem lqNorm_sum_le (hq : 1 ≤ q) {ι : Type*} (s : Finset ι) (f : ι → ℕ → ℝ≥0∞) :
-    lqNorm q (fun k => ∑ i ∈ s, f i k) ≤ ∑ i ∈ s, lqNorm q (f i) := by
-  have : (fun k => ∑ i ∈ s, f i k) = ∑ i ∈ s, f i := by funext k; simp
-  rw [this]
-  exact eLpNorm_sum_le hq
-
-/-- **Minkowski's inequality for series** of sequences: the norm of a pointwise sum is at most
-the sum of the norms. -/
-theorem lqNorm_tsum_le (hq : 1 ≤ q) (f : ℕ → ℕ → ℝ≥0∞) :
-    lqNorm q (fun k => ∑' i, f i k) ≤ ∑' i, lqNorm q (f i) := by
-  simp_rw [ENNReal.tsum_eq_iSup_nat]
-  have hmono : Monotone fun N k => ∑ i ∈ range N, f i k := fun N M h k =>
-    Finset.sum_le_sum_of_subset (Finset.range_mono h)
-  rw [lqNorm_iSup hmono]
-  exact iSup_mono fun N => lqNorm_sum_le hq _ f
 
 /-- Dropping the first `i` terms does not increase the norm. -/
 theorem lqNorm_shift_le' (i : ℕ) (a : ℕ → ℝ≥0∞) : lqNorm q (fun n => a (n + i)) ≤ lqNorm q a := by
@@ -264,5 +278,62 @@ theorem lqNorm_almostDiagonal_le (hq : 1 ≤ q) (s L : ℝ) (a : ℕ → ℝ≥0
         ENNReal.lqNorm_add_le hq _ _
     _ ≤ (1 - (2 : ℝ≥0∞) ^ (-(L - s)))⁻¹ * X + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := add_le_add hP hT
     _ = _ := by ring
+
+/-! ### Sequences on `ℤ` -/
+
+/-- The geometric series without its first term is at most the full series:
+`∑_{j ≥ 0} 2^(-(j+1)α) ≤ (1 - 2^(-α))⁻¹` for every real `α`. -/
+theorem tsum_dyadicWeight_neg_succ_le (α : ℝ) :
+    ∑' j : ℕ, dyadicWeight (-α) (j + 1) ≤ (1 - (2 : ℝ≥0∞) ^ (-α))⁻¹ :=
+  (ENNReal.tsum_comp_le_tsum_of_injective (add_left_injective 1) (dyadicWeight (-α))).trans_eq
+    (tsum_dyadicWeight_neg α)
+
+/-- **A series over `ℤ` split at `m`**:
+`∑_{n ∈ ℤ} f n = ∑_{j ≥ 0} f(m + j) + ∑_{j ≥ 0} f(m - (j+1))`, the terms with `n ≥ m` and those
+with `n < m` (Mathlib's `tsum_of_nat_of_neg_add_one` after the shift `n ↦ m + n`). -/
+theorem tsum_int_eq_tsum_add_tsum_sub (m : ℤ) (f : ℤ → ℝ≥0∞) :
+    ∑' n, f n = ∑' j : ℕ, f (m + j) + ∑' j : ℕ, f (m - (j + 1)) := by
+  rw [← (Equiv.addLeft m).tsum_eq f,
+    tsum_of_nat_of_neg_add_one ENNReal.summable ENNReal.summable]
+  simp only [Equiv.coe_addLeft, ← sub_eq_add_neg]
+
+/-- **The `ℓ_q` norm on `ℤ` is shift invariant**: `‖(a(k + i))_k‖_{ℓ_q} = ‖a‖_{ℓ_q}` for every
+`a : ℤ → [0, ∞]`, every `i ∈ ℤ` and every exponent `q`, since `k ↦ k + i` is a bijection of `ℤ`
+(`lqNorm_comp_equiv` for Mathlib's `Equiv.addRight`). -/
+theorem lqNorm_comp_add_int (q : ℝ≥0∞) (a : ℤ → ℝ≥0∞) (i : ℤ) :
+    lqNorm q (fun k : ℤ => a (k + i)) = lqNorm q a :=
+  lqNorm_comp_equiv (Equiv.addRight i) a
+
+/-- **Young's inequality for a series of shifts on `ℤ`**: for weights `w_j ≥ 0`, shifts
+`s_j ∈ ℤ` and `1 ≤ q ≤ ∞`, `‖(∑_j w_j c_{m + s_j})_{m ∈ ℤ}‖_{ℓ_q} ≤ (∑_j w_j) ‖c‖_{ℓ_q}`, by the
+countable Minkowski inequality and the invariance of the norm under shifts. -/
+theorem lqNorm_tsum_shift_le (hq : 1 ≤ q) (w : ℕ → ℝ≥0∞) (s : ℕ → ℤ) (c : ℤ → ℝ≥0∞) :
+    lqNorm q (fun m => ∑' j, w j * c (m + s j)) ≤ (∑' j, w j) * lqNorm q c :=
+  calc lqNorm q (fun m => ∑' j, w j * c (m + s j))
+      ≤ ∑' j, lqNorm q (fun m => w j * c (m + s j)) :=
+        lqNorm_tsum_le hq fun j m => w j * c (m + s j)
+    _ = ∑' j, w j * lqNorm q c := by
+        congr 1
+        funext j
+        rw [lqNorm_const_mul, lqNorm_comp_add_int]
+    _ = (∑' j, w j) * lqNorm q c := ENNReal.tsum_mul_right
+
+/-- **The geometric convolution from below on `ℤ`**: for `1 ≤ q ≤ ∞` and every real `α`,
+`‖(∑_{j ≥ 0} 2^(-(j+1)α) c_{m-(j+1)})_{m ∈ ℤ}‖_{ℓ_q} ≤ (1 - 2^(-α))⁻¹ ‖c‖_{ℓ_q}`. -/
+theorem lqNorm_tsum_geom_sub_le (hq : 1 ≤ q) (α : ℝ) (c : ℤ → ℝ≥0∞) :
+    lqNorm q (fun m => ∑' j : ℕ, dyadicWeight (-α) (j + 1) * c (m - (j + 1))) ≤
+      (1 - (2 : ℝ≥0∞) ^ (-α))⁻¹ * lqNorm q c := by
+  have h := lqNorm_tsum_shift_le hq (fun j => dyadicWeight (-α) (j + 1))
+    (fun j => -((j : ℤ) + 1)) c
+  simp only [← sub_eq_add_neg] at h
+  exact h.trans (by gcongr; exact tsum_dyadicWeight_neg_succ_le α)
+
+/-- **The geometric convolution from above on `ℤ`**: for `1 ≤ q ≤ ∞` and every real `α`,
+`‖(∑_{j ≥ 0} 2^(-jα) c_{m+j})_{m ∈ ℤ}‖_{ℓ_q} ≤ (1 - 2^(-α))⁻¹ ‖c‖_{ℓ_q}`. -/
+theorem lqNorm_tsum_geom_add_le (hq : 1 ≤ q) (α : ℝ) (c : ℤ → ℝ≥0∞) :
+    lqNorm q (fun m => ∑' j : ℕ, dyadicWeight (-α) j * c (m + j)) ≤
+      (1 - (2 : ℝ≥0∞) ^ (-α))⁻¹ * lqNorm q c :=
+  (lqNorm_tsum_shift_le hq (dyadicWeight (-α)) (fun j => (j : ℤ)) c).trans_eq
+    (by rw [tsum_dyadicWeight_neg])
 
 end ENNReal

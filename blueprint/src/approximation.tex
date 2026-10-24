@@ -315,6 +315,7 @@ With these, a constant $(1 - 2^{-\alpha})^{-1}$ is finite exactly for $\alpha > 
   ENNReal.dyadicWeight_rpow, ENNReal.dyadicWeight_eq_pow, ENNReal.dyadicWeight_mono,
   ENNReal.dyadicWeight_le_of_le, ENNReal.dyadicWeight_anti, ENNReal.one_le_dyadicWeight,
   ENNReal.natCast_two_pow_rpow, ENNReal.two_pow_rpow_eq_dyadicWeight,
+  ENNReal.two_rpow_mul_two_rpow,
   ENNReal.two_rpow_neg_lt_one, ENNReal.one_sub_two_rpow_neg_inv_ne_top,
   ENNReal.one_le_one_sub_two_rpow_neg_inv, ENNReal.lqNorm_dyadicWeight_neg_le,
   ENNReal.lqNorm_lt_top_iff_of_le_mul}
@@ -329,8 +330,8 @@ For $s \in \R$ and $k \in \N$, the \emph{dyadic weight} is $2^{ks}$.
 \end{definition}
 
 In Lean, $\|a\|_{\ell_q}$ is the $L_q$ norm of $a$ for the counting measure on $I$. The index set
-is $\N$ for sequences, $\N^d$ for dominating mixed smoothness, and a finite set for the
-coefficients of one level of atoms and wavelets.
+is $\N$ for sequences, $\Z$ for the discrete $K$-method, $\N^d$ for dominating mixed
+smoothness, and a finite set for the coefficients of one level of atoms and wavelets.
 
 \begin{lemma}[Properties of the $\ell_q$ norm]
 \label{lem:lq-basic}
@@ -431,11 +432,15 @@ term is nonnegative.
   ENNReal.monotone_ite_lt, ENNReal.lqNorm_eq_iSup_lqNorm_ite}
 \leanok
 \uses{lem:lq-basic}
-For every $1 \leq q \leq \infty$ and every family $(f_{i,k})_{i, k \in \N}$ in $[0, \infty]$,
+For every $1 \leq q \leq \infty$, every countable set $I$ and every family
+$(f_{i,k})_{i \in \N, k \in I}$ in $[0, \infty]$,
 \[
-  \Bigl\| \Bigl(\sum_{i=0}^\infty f_{i,k}\Bigr)_k \Bigr\|_{\ell_q}
-  \leq \sum_{i=0}^\infty \|(f_{i,k})_k\|_{\ell_q} .
+  \Bigl\| \Bigl(\sum_{i=0}^\infty f_{i,k}\Bigr)_{k \in I} \Bigr\|_{\ell_q}
+  \leq \sum_{i=0}^\infty \|(f_{i,k})_{k \in I}\|_{\ell_q} .
 \]
+For every $q \in (0, \infty]$, every countable set $I$ and every increasing sequence
+$(F_N)_{N \in \N}$ of families on $I$ in $[0, \infty]$,
+$\|(\sup_N F_{N,k})_{k \in I}\|_{\ell_q} = \sup_N \|F_N\|_{\ell_q}$.
 For every $q \in (0, \infty]$ and every sequence $a$ in $[0, \infty]$, the truncations
 $(a_k \mathbf 1_{\{k < J\}})_k$ increase with $J$ and
 $\|a\|_{\ell_q} = \sup_{J \in \N} \|(a_k \mathbf 1_{\{k < J\}})_k\|_{\ell_q}$.
@@ -444,9 +449,9 @@ $\|a\|_{\ell_q} = \sup_{J \in \N} \|(a_k \mathbf 1_{\{k < J\}})_k\|_{\ell_q}$.
 \begin{proof}
 \leanok
 For finite sums this follows from \Cref{lem:lq-basic} by induction. The partial sums increase
-to the series, and the $\ell_q$ norm of an increasing family of sequences is the supremum of
-their norms, by monotone convergence. The truncations of $a$ increase to $a$, so the same
-argument gives the last identity.
+to the series, and the $\ell_q$ norm of an increasing sequence of families on $I$ is the
+supremum of their norms, by monotone convergence. The truncations of $a$ increase to $a$, so
+the same argument gives the last identity.
 \end{proof}
 
 The following two inequalities are the discrete Hardy inequalities: a tail sum and a partial
@@ -482,6 +487,61 @@ norm, and $\sum_i 2^{-i\alpha} = (1 - 2^{-\alpha})^{-1}$. The second inequality 
 argument with $2^{-k\alpha} \sum_{j \leq k} b_j = \sum_{i \leq k} 2^{-i\alpha} \,
 2^{-(k-i)\alpha} b_{k-i}$ and the shift to the right. The term $k = 0$ of the first inequality
 gives the last one.
+\end{proof}
+
+On $\Z$ the $\ell_q$ norm is invariant under every shift, so the same argument bounds
+convolutions with a geometric kernel on both sides; the reiteration theorem
+(\Cref{sec:reiteration}) uses them.
+
+\begin{lemma}[Shift invariance of the $\ell_q$ norm on the integers]
+\label{lem:lq-shift-integers}
+\lean{ENNReal.lqNorm_comp_add_int}
+\leanok
+\uses{def:lq-norm, lem:lq-reindex}
+For every $q \in (0, \infty]$, every family $(a_k)_{k \in \Z}$ in $[0, \infty]$ and every
+$i \in \Z$, $\|(a_{k+i})_{k \in \Z}\|_{\ell_q} = \|a\|_{\ell_q}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The shift $k \mapsto k + i$ is a bijection of $\Z$ (\Cref{lem:lq-reindex}).
+\end{proof}
+
+\begin{lemma}[Geometric convolutions on the integers]
+\label{lem:geometric-convolutions-integers}
+\lean{ENNReal.tsum_dyadicWeight_neg_succ_le, ENNReal.tsum_int_eq_tsum_add_tsum_sub,
+  ENNReal.lqNorm_tsum_shift_le, ENNReal.lqNorm_tsum_geom_sub_le,
+  ENNReal.lqNorm_tsum_geom_add_le}
+\leanok
+\uses{lem:countable-minkowski, lem:lq-shift-integers, lem:hardy}
+For every family $(f_n)_{n \in \Z}$ in $[0, \infty]$ and every $k \in \Z$,
+\[
+  \sum_{n \in \Z} f_n = \sum_{j=0}^\infty f_{k+j} + \sum_{j=0}^\infty f_{k-(j+1)} .
+\]
+Let $1 \leq q \leq \infty$ and let $(c_n)_{n \in \Z}$ be a family in $[0, \infty]$. For all
+weights $w_j \in [0, \infty]$ and shifts $s_j \in \Z$, $j \in \N$,
+\[
+  \Bigl\| \Bigl(\sum_{j=0}^\infty w_j c_{m + s_j}\Bigr)_{m \in \Z} \Bigr\|_{\ell_q}
+  \leq \Bigl(\sum_{j=0}^\infty w_j\Bigr) \|c\|_{\ell_q} .
+\]
+For every $\alpha \in \R$, $\sum_{j=0}^\infty 2^{-(j+1)\alpha} \leq (1 - 2^{-\alpha})^{-1}$ and
+\begin{align*}
+  \Bigl\| \Bigl(\sum_{j=0}^\infty 2^{-(j+1)\alpha} c_{m-(j+1)}\Bigr)_{m \in \Z} \Bigr\|_{\ell_q}
+  &\leq (1 - 2^{-\alpha})^{-1} \|c\|_{\ell_q} , \\
+  \Bigl\| \Bigl(\sum_{j=0}^\infty 2^{-j\alpha} c_{m+j}\Bigr)_{m \in \Z} \Bigr\|_{\ell_q}
+  &\leq (1 - 2^{-\alpha})^{-1} \|c\|_{\ell_q} .
+\end{align*}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The splitting at $k$ is the splitting of $\Z$ into $\{n \geq k\}$ and $\{n < k\}$ after the
+shift $n \mapsto k + n$. For the convolution, \Cref{lem:countable-minkowski} on the countable
+set $\Z$ bounds the left side by
+$\sum_j w_j \|(c_{m + s_j})_{m \in \Z}\|_{\ell_q}$, and the shift by $s_j$ keeps the norm
+(\Cref{lem:lq-shift-integers}). The series $\sum_j 2^{-(j+1)\alpha}$ is the geometric series
+without its first term, and $\sum_j 2^{-j\alpha} = (1 - 2^{-\alpha})^{-1}$
+(\Cref{lem:hardy}).
 \end{proof}
 
 The comparison of Pietsch's quasi-norm with its dyadic form rests on Cauchy's condensation
@@ -1392,7 +1452,8 @@ continuous $K$-method and its discrete $K$-method on the grid $2^n$, $n \in \Z$,
 $K$-functional, the continuous $K$-method and the discrete $K$-method with $\rho = 1$ of this
 chapter. The couple of a map $\iota$ gives back the spaces of
 \Cref{ch:interpolation}. \Cref{sec:interpolation-property} proves that the $K$-method is exact
-of exponent $\theta$.
+of exponent $\theta$, and \Cref{sec:reiteration} proves the reiteration theorem through
+Holmstedt's formula.
 
 \section{Couples and their \texorpdfstring{$K$}{K}-method}
 \label{sec:couples}
@@ -1437,7 +1498,8 @@ For a couple $A = (N_0, N_1)$ on $U$, $t \in [0, \infty]$ and $u \in U$,
   InterpCouple.kFunctional_zero_right, InterpCouple.kFunctional_mono,
   InterpCouple.monotone_kFunctional, InterpCouple.kFunctional_mul_le_of_ne_top,
   InterpCouple.kFunctional_add_le_of_decomp, InterpCouple.kFunctional_add_le,
-  InterpCouple.kFunctional_neg, InterpCouple.kFunctional_smul_le}
+  InterpCouple.kFunctional_neg, InterpCouple.kFunctional_smul_le,
+  InterpCouple.le_add_mul_kFunctional}
 \leanok
 \uses{def:couple-k-functional}
 Let $A = (N_0, N_1)$ be a couple on $U$. For all $s \leq t$ in $[0, \infty]$, every
@@ -1450,7 +1512,9 @@ $c \in [0, \infty)$ and all $u, v \in U$:
     $K(t, u + v) \leq C \bigl(K(t, u) + K(t, v)\bigr)$; if $N_0$ and $N_1$ are even, then
     $K(t, -u) = K(t, u)$;
   \item if $U$ is a real vector space and $A$ is homogeneous, then
-    $K(t, r u) \leq |r| \, K(t, u)$ for every $r \in \R$.
+    $K(t, r u) \leq |r| \, K(t, u)$ for every $r \in \R$;
+  \item for all $F, X \in [0, \infty]$, if $F \leq X + c \bigl(N_0(u - b) + t N_1(b)\bigr)$ for
+    every $b \in U$, then $F \leq X + c \, K(t, u)$.
 \end{enumerate}
 \end{lemma}
 
@@ -1465,7 +1529,8 @@ give
 \]
 take the infimum over $b$ and over $b'$. The substitution $b \mapsto -b$ gives
 $K(t, -u) = K(t, u)$. (4) For $r \neq 0$ use the decomposition $r u = r(u - b) + r b$; for
-$r = 0$ use (1).
+$r = 0$ use (1). (5) Since $c < \infty$, the infimum over $b$ of the right side is
+$X + c \, K(t, u)$.
 \end{proof}
 
 These are~\cite[Lemmas~3.1.1 and~3.11.1]{BerghLofstrom}; for a quasi-normed couple with
@@ -1512,7 +1577,7 @@ The continuous and the discrete $K$-method of \Cref{def:continuous-k-method} and
 \label{def:couple-k-method}
 \lean{InterpCouple.kMethodNorm, InterpCouple.MemKMethod, InterpCouple.discreteKSeq,
   InterpCouple.discreteKMethodNorm, InterpCouple.discreteKMethodNorm_eq,
-  InterpCouple.discreteKSeq_zero}
+  InterpCouple.discreteKSeq_zero, InterpCouple.discreteKSeq_one}
 \leanok
 \uses{def:couple-k-functional, def:continuous-k-method, def:discrete-k-method-integers}
 Let $A$ be a couple on $U$, let $\theta, \rho \in \R$, $q \in (0, \infty]$ and $u \in U$. The
@@ -1523,13 +1588,16 @@ $\|u\|_{K, \theta, q} < \infty$. The \emph{discrete $K$-norm} on the grid $t = 2
   \|u\|^{\Z}_{\theta, \rho, q}
   = \bigl\| \bigl(2^{-n\rho\theta} K(2^{n\rho}, u)\bigr)_{n \in \Z} \bigr\|_{\ell_q} ;
 \]
-its term with $n = 0$ is $K(1, u)$.
+its term with $n = 0$ is $K(1, u)$, and on the grid $t = 2^n$ ($\rho = 1$) its term $n$ is
+$2^{-n\theta} K(2^n, u)$.
 \end{definition}
 
 \begin{theorem}[The discrete and the continuous $K$-method of a couple agree]
 \label{thm:couple-discrete-continuous}
 \lean{InterpCouple.kMethodNorm_le_discreteKMethodNorm,
   InterpCouple.discreteKMethodNorm_le_kMethodNorm,
+  InterpCouple.kMethodNorm_le_mul_discreteKMethodNorm,
+  InterpCouple.discreteKMethodNorm_le_mul_kMethodNorm,
   InterpCouple.memKMethod_iff_discreteKMethodNorm_lt_top}
 \leanok
 \uses{def:couple-k-method, lem:couple-k-functional, lem:continuous-k-method-integer-grid}
@@ -1577,7 +1645,8 @@ the term $-n$ for $A$ and $1 - \theta$. The reflection $n \mapsto -n$ keeps the 
 
 \begin{lemma}[The $K$-functional by the discrete $K$-norm]
 \label{lem:couple-class-ck}
-\lean{InterpCouple.kFunctional_le_discreteKMethodNorm}
+\lean{InterpCouple.kFunctional_le_discreteKMethodNorm,
+  InterpCouple.kFunctional_two_rpow_le_discreteKMethodNorm}
 \leanok
 \uses{def:couple-k-method, lem:lq-basic}
 For every couple $A$ on $U$, all $\theta, \rho \in \R$, every $q \in (0, \infty]$, every
@@ -1595,7 +1664,7 @@ points, this gives $K(t, u) \leq c \, t^{\theta} \|u\|_{K, \theta, q}$ for every
 $\theta \geq 0$ and every $q \in (0, \infty]$, with a constant $c$ depending on $\theta$, $\rho$ and
 $q$: the space $(X_0, X_1)_{\theta, q}$ is of class $\mathcal{C}_K(\theta)$
 of~\cite[Definition~3.5.1]{BerghLofstrom}, the property behind the easier inclusion of the
-reiteration theorem. The Lean statement is the bound on the grid.
+reiteration theorem (\Cref{cor:reiteration-easy}). The Lean statement is the bound on the grid.
 
 \begin{proposition}[The $K$-method of a quasi-normed couple]
 \label{prop:couple-k-method-space}
@@ -1626,6 +1695,29 @@ By \Cref{lem:couple-k-functional}, $t^{-\theta} K(t, u + v) \leq C \bigl(t^{-\th
 t^{-\theta} K(t, v)\bigr)$ and $t^{-\theta} K(t, r u) \leq |r| \, t^{-\theta} K(t, u)$ for
 every $t$, and $K(t, 0) = 0$. The integrands are measurable, since $K(\cdot, u)$ increases, and
 the quasi-triangle inequality of $L_q(dt/t)$ has the constant $C_q$.
+\end{proof}
+
+\begin{lemma}[The discrete $K$-norm is a quasi-norm]
+\label{lem:discrete-k-norm-quasi-norm}
+\lean{InterpCouple.discreteKMethodNorm_zero, InterpCouple.discreteKMethodNorm_neg,
+  InterpCouple.discreteKMethodNorm_add_le}
+\leanok
+\uses{def:couple-k-method, lem:couple-k-functional, lem:lq-basic}
+Let $A = (N_0, N_1)$ be a couple on $U$, let $\theta, \rho \in \R$ and $q \in (0, \infty]$.
+\begin{enumerate}
+  \item If $N_0(0) = N_1(0) = 0$, then $\|0\|^{\Z}_{\theta, \rho, q} = 0$.
+  \item If $N_0$ and $N_1$ are even, then $\|{-u}\|^{\Z}_{\theta, \rho, q} =
+    \|u\|^{\Z}_{\theta, \rho, q}$ for every $u \in U$.
+  \item If $A$ is quasi-normed with constant $C$ and $q \geq 1$, then
+    $\|u + v\|^{\Z}_{\theta, \rho, q} \leq C \bigl(\|u\|^{\Z}_{\theta, \rho, q} +
+    \|v\|^{\Z}_{\theta, \rho, q}\bigr)$ for all $u, v \in U$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+Termwise by \Cref{lem:couple-k-functional}; for (3) also Minkowski's inequality
+(\Cref{lem:lq-basic}).
 \end{proof}
 
 \paragraph{The grid on the natural numbers.}
@@ -1991,6 +2083,419 @@ applies to the couples of $\iota$ and $\iota'$, whose $K$-norms are those of
 \Cref{def:continuous-k-method} by \Cref{prop:map-couple-k-method}. The bound on the grid follows
 with \Cref{thm:discrete-continuous-k-method}, and (2) with $L_0 = \max(1, \|T\|)$ and
 $L_1 = \max(1, \|S\|)$.
+\end{proof}
+
+\section{The reiteration theorem}
+\label{sec:reiteration}
+
+Interpolating between two real interpolation spaces of a couple gives a real interpolation
+space of the same couple~\cite[Theorems~3.5.3 and~3.11.5]{BerghLofstrom}. The easier inclusion
+uses only that $K(t, a) \lesssim t^{\theta} \|a\|_{\theta, q}$; the other one rests on
+Holmstedt's formula~\cite{Holmstedt}~\cite[Theorem~3.6.1]{BerghLofstrom} for the $K$-functional
+of a couple of $K$-spaces, so the proof uses the $K$-method only. Throughout,
+\[
+  \|u\|_{\theta, q} = \|u\|^{\Z}_{\theta, 1, q}
+  = \bigl\| \bigl(2^{-n\theta} K(2^n, u)\bigr)_{n \in \Z} \bigr\|_{\ell_q}
+\]
+is the discrete $K$-norm on the grid $t = 2^n$ (\Cref{def:couple-k-method}).
+
+\begin{definition}[Couples of $K$-spaces]
+\label{def:k-space-couples}
+\lean{InterpCouple.kCouple, InterpCouple.leftKCouple, InterpCouple.rightKCouple,
+  InterpCouple.kMethodCouple}
+\leanok
+\uses{def:couple-k-method}
+Let $A = (N_0, N_1)$ be a couple on $U$, let $\theta_0, \theta_1 \in \R$ and
+$q_0, q_1 \in (0, \infty]$. The \emph{couple of $K$-spaces} is
+$(\|\cdot\|_{\theta_0, q_0}, \|\cdot\|_{\theta_1, q_1})$, the \emph{left endpoint couple} is
+$(N_0, \|\cdot\|_{\theta_1, q_1})$, the \emph{right endpoint couple} is
+$(\|\cdot\|_{\theta_0, q_0}, N_1)$, and the \emph{couple of continuous $K$-norms} is
+$(\|\cdot\|_{K, \theta_0, q_0}, \|\cdot\|_{K, \theta_1, q_1})$.
+\end{definition}
+
+For $\theta_0, \theta_1 \geq 0$ (\Cref{thm:couple-discrete-continuous}), their spaces are
+$(X_0, X_1)_{\theta_0, q_0}$ and $(X_0, X_1)_{\theta_1, q_1}$, respectively
+$X_0$ and $(X_0, X_1)_{\theta_1, q_1}$, and $(X_0, X_1)_{\theta_0, q_0}$ and $X_1$.
+
+\begin{lemma}[Couples of $K$-spaces are quasi-normed]
+\label{lem:k-space-couples}
+\lean{InterpCouple.isQuasiNormed_kCouple, InterpCouple.isQuasiNormed_leftKCouple,
+  InterpCouple.isQuasiNormed_rightKCouple, InterpCouple.rightKCouple_eq_swap}
+\leanok
+\uses{def:k-space-couples, lem:discrete-k-norm-quasi-norm, lem:couple-k-method-swap}
+Let $A$ be a couple on $U$ quasi-normed with constant $C$. For all $\theta_0, \theta_1 \in \R$
+and $q_0, q_1 \in [1, \infty]$, the couple of $K$-spaces and the two endpoint couples are
+quasi-normed with constant $C$. For every couple $A$ on $U$, every $\theta_0 \in \R$ and every
+$q_0 \in (0, \infty]$, the right endpoint couple of $A$ for $(\theta_0, q_0)$ is the swap of the
+left endpoint couple of the swapped couple of $A$ for $(1 - \theta_0, q_0)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first statement is \Cref{lem:discrete-k-norm-quasi-norm}. For the second, the discrete
+$K$-norm of the swapped couple with $1 - \theta_0$ is the discrete $K$-norm of $A$ with
+$\theta_0$ (\Cref{lem:couple-k-method-swap}).
+\end{proof}
+
+\paragraph{The easier inclusion.}
+
+\begin{lemma}[Couples of class $\mathcal{C}_K$]
+\label{lem:reiteration-class-ck}
+\lean{InterpCouple.discreteKSeq_le_of_kFunctional_le,
+  InterpCouple.discreteKMethodNorm_le_of_kFunctional_le}
+\leanok
+\uses{def:couple-k-method, lem:couple-k-functional}
+Let $A$ be a couple on $U$ quasi-normed with constant $C$, with $K$-functional $K_A$, let
+$B = (M_0, M_1)$ be a couple on $U$, and let $\theta_0, \theta_1 \in \R$ with
+$K_A(2^n, a) \leq 2^{n\theta_i} M_i(a)$ for $i = 0, 1$, every $n \in \Z$ and every $a \in U$. For
+every $\eta \in \R$, every $q \in (0, \infty]$ and every $u \in U$, with
+$\theta = (1 - \eta)\theta_0 + \eta\theta_1$,
+\[
+  \|u\|_{\theta, q} \leq C \, \|u\|^{\Z, B}_{\eta, \theta_1 - \theta_0, q} ,
+\]
+where the right side is the discrete $K$-norm of $B$ on the grid $t = 2^{n(\theta_1 - \theta_0)}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For every $n \in \Z$ and every $b \in U$,
+\begin{align*}
+  2^{-n\theta} K_A(2^n, u) &\leq 2^{-n\theta} C \bigl(K_A(2^n, u - b) + K_A(2^n, b)\bigr) \\
+  &\leq C \, 2^{-n\theta} \bigl(2^{n\theta_0} M_0(u - b) + 2^{n\theta_1} M_1(b)\bigr) \\
+  &= C \, 2^{-n(\theta_1 - \theta_0)\eta} \bigl(M_0(u - b) + 2^{n(\theta_1 - \theta_0)}
+  M_1(b)\bigr) ,
+\end{align*}
+since $\theta - \theta_0 = \eta(\theta_1 - \theta_0)$ and
+$\theta_1 - \theta = (1 - \eta)(\theta_1 - \theta_0)$. Take the infimum over $b$ and the $\ell_q$
+norm over $n$.
+\end{proof}
+
+The hypothesis says that the spaces of $B$ are of class $\mathcal{C}_K(\theta_0)$ and
+$\mathcal{C}_K(\theta_1)$~\cite[Definition~3.5.1]{BerghLofstrom} on the grid; the lemma is the
+first half of the proof of~\cite[Theorem~3.5.3]{BerghLofstrom}.
+
+\begin{corollary}[The easier inclusion of the reiteration theorem]
+\label{cor:reiteration-easy}
+\lean{InterpCouple.discreteKMethodNorm_le_kCouple,
+  InterpCouple.discreteKMethodNorm_le_leftKCouple, InterpCouple.discreteKMethodNorm_le_rightKCouple}
+\leanok
+\uses{lem:reiteration-class-ck, def:k-space-couples, lem:couple-class-ck,
+  lem:couple-k-functional}
+Let $A = (N_0, N_1)$ be a couple on $U$ quasi-normed with constant $C$, let
+$\theta_0, \theta_1, \eta \in \R$, $q_0, q_1, q \in (0, \infty]$ and $u \in U$. Then
+\begin{enumerate}
+  \item $\|u\|_{(1-\eta)\theta_0 + \eta\theta_1, q} \leq C \, \|u\|^{\Z}_{\eta, \theta_1 -
+    \theta_0, q}$ for the discrete $K$-norm of the couple of $K$-spaces;
+  \item $\|u\|_{\eta\theta_1, q} \leq C \, \|u\|^{\Z}_{\eta, \theta_1, q}$ for the discrete
+    $K$-norm of the left endpoint couple;
+  \item $\|u\|_{(1-\eta)\theta_0 + \eta, q} \leq C \, \|u\|^{\Z}_{\eta, 1 - \theta_0, q}$ for the
+    discrete $K$-norm of the right endpoint couple.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+\leanok
+Apply \Cref{lem:reiteration-class-ck} with $K(2^n, a) \leq 2^{n\theta} \|a\|_{\theta, q}$
+(\Cref{lem:couple-class-ck}), $K(2^n, a) \leq N_0(a) = 2^{n \cdot 0} N_0(a)$ and
+$K(2^n, a) \leq 2^{n \cdot 1} N_1(a)$ (\Cref{lem:couple-k-functional}).
+\end{proof}
+
+\paragraph{Holmstedt's formula.}
+
+\begin{definition}[The two sums of Holmstedt's formula]
+\label{def:holmstedt-sums}
+\lean{InterpCouple.kSumBelow, InterpCouple.kSumAbove}
+\leanok
+\uses{def:couple-k-method}
+For every couple $A$ on $U$, every $\theta \in \R$, every $m \in \Z$ and every $u \in U$ let
+\begin{align*}
+  S^{\theta}_{<m}(u) &= \sum_{n < m} 2^{-n\theta} K(2^n, u)
+  = \sum_{j=0}^\infty 2^{-(m-(j+1))\theta} K(2^{m-(j+1)}, u) , \\
+  S^{\theta}_{\geq m}(u) &= \sum_{n \geq m} 2^{-n\theta} K(2^n, u)
+  = \sum_{j=0}^\infty 2^{-(m+j)\theta} K(2^{m+j}, u) .
+\end{align*}
+\end{definition}
+
+\begin{lemma}[The two sums under pointwise bounds]
+\label{lem:holmstedt-sums}
+\lean{InterpCouple.discreteKMethodNorm_le_kSumAbove_add_kSumBelow, InterpCouple.kSumAbove_le,
+  InterpCouple.kSumBelow_le}
+\leanok
+\uses{def:holmstedt-sums, lem:geometric-convolutions-integers, lem:lq-basic}
+Let $A$ be a couple on $U$, let $\theta \in \R$, $m \in \Z$, $u, v \in U$ and
+$a, X \in [0, \infty]$.
+\begin{enumerate}
+  \item For every $q \in [1, \infty]$,
+    $\|v\|_{\theta, q} \leq S^{\theta}_{\geq m}(v) + S^{\theta}_{<m}(v)$.
+  \item If $K(2^n, v) \leq a K(2^n, u) + X$ for every $n \geq m$, then
+    $S^{\theta}_{\geq m}(v) \leq a \, S^{\theta}_{\geq m}(u) + 2^{-m\theta} (1 - 2^{-\theta})^{-1}
+    X$.
+  \item If $K(2^n, v) \leq a K(2^n, u) + 2^{n-m} X$ for every $n < m$, then
+    $S^{\theta}_{<m}(v) \leq a \, S^{\theta}_{<m}(u) + 2^{-m\theta}
+    (1 - 2^{-(1-\theta)})^{-1} X$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The $\ell_q$ norm is at most the $\ell_1$ norm (\Cref{lem:lq-basic}), and the series over
+$\Z$ splits at $m$ (\Cref{lem:geometric-convolutions-integers}). (2) For $n = m + j$,
+$2^{-n\theta} = 2^{-m\theta} 2^{-j\theta}$, and $\sum_j 2^{-j\theta} = (1 - 2^{-\theta})^{-1}$.
+(3) For $n = m - (j + 1)$, $2^{-n\theta} 2^{n-m} = 2^{-m\theta} 2^{-(j+1)(1-\theta)}$, and
+$\sum_j 2^{-(j+1)(1-\theta)} \leq (1 - 2^{-(1-\theta)})^{-1}$
+(\Cref{lem:geometric-convolutions-integers}).
+\end{proof}
+
+\begin{lemma}[The two halves of a decomposition]
+\label{lem:holmstedt-halves}
+\lean{InterpCouple.kFunctional_le_two_rpow_sub_mul, InterpCouple.holmstedtSideConst,
+  InterpCouple.holmstedtSideConst_ne_top, InterpCouple.discreteKMethodNorm_sub_le_kSumBelow,
+  InterpCouple.discreteKMethodNorm_le_kSumAbove}
+\leanok
+\uses{lem:holmstedt-sums, lem:couple-k-functional}
+Let $A = (N_0, N_1)$ be a couple on $U$ quasi-normed with constant $C$, and for $\alpha \in \R$
+let $c_C(\alpha) = (1 - 2^{-\alpha})^{-1} + C (1 - 2^{-(1-\alpha)})^{-1}$. Let $\theta \in \R$,
+$q \in [1, \infty]$, $m \in \Z$ and $u, b \in U$, and put $J = N_0(u - b) + 2^m N_1(b)$. Then
+$K(2^n, b) \leq 2^{n-m} J$ for every $n \in \Z$, and
+\begin{align*}
+  \|u - b\|_{\theta, q} &\leq C \, S^{\theta}_{<m}(u) + 2^{-m\theta} c_C(\theta) \, J , \\
+  \|b\|_{\theta, q} &\leq C \, S^{\theta}_{\geq m}(u) + 2^{-m\theta} c_C(1 - \theta) \, J .
+\end{align*}
+The constant $c_C(\alpha)$ is finite for $C < \infty$ and $0 < \alpha < 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$K(2^n, b) \leq 2^n N_1(b) = 2^{n-m} \, 2^m N_1(b) \leq 2^{n-m} J$ and
+$K(2^n, u - b) \leq N_0(u - b) \leq J$ for every $n$ (\Cref{lem:couple-k-functional}). Hence
+$K(2^n, u - b) \leq C \bigl(K(2^n, u) + K(2^n, b)\bigr) \leq C K(2^n, u) + 2^{n-m} C J$ and
+$K(2^n, b) \leq C \bigl(K(2^n, u) + K(2^n, u - b)\bigr) \leq C K(2^n, u) + C J$. By
+\Cref{lem:holmstedt-sums},
+\begin{align*}
+  \|u - b\|_{\theta, q} &\leq S^{\theta}_{\geq m}(u - b) + S^{\theta}_{<m}(u - b) \\
+  &\leq 2^{-m\theta} (1 - 2^{-\theta})^{-1} J + C \, S^{\theta}_{<m}(u)
+    + 2^{-m\theta} (1 - 2^{-(1-\theta)})^{-1} C J , \\
+  \|b\|_{\theta, q} &\leq S^{\theta}_{\geq m}(b) + S^{\theta}_{<m}(b) \\
+  &\leq C \, S^{\theta}_{\geq m}(u) + 2^{-m\theta} (1 - 2^{-\theta})^{-1} C J
+    + 2^{-m\theta} (1 - 2^{-(1-\theta)})^{-1} J .
+\end{align*}
+The constant is finite since $\alpha > 0$ and $1 - \alpha > 0$.
+\end{proof}
+
+\begin{theorem}[Holmstedt's formula, the upper bound in $\ell_1$ form]
+\label{thm:holmstedt}
+\lean{InterpCouple.holmstedtConst, InterpCouple.holmstedtConst_ne_top,
+  InterpCouple.two_rpow_mul_kFunctional_le_kSumAbove, InterpCouple.kFunctional_kCouple_le,
+  InterpCouple.endpointHolmstedtConst, InterpCouple.endpointHolmstedtConst_ne_top,
+  InterpCouple.kFunctional_leftKCouple_le, InterpCouple.kSumAbove_swap,
+  InterpCouple.kFunctional_rightKCouple_le}
+\leanok
+\uses{lem:holmstedt-halves, def:k-space-couples, def:couple-k-functional,
+  lem:couple-k-functional, lem:k-space-couples, lem:couple-k-functional-swap,
+  lem:couple-k-method-swap}
+Let $A$ be a couple on $U$ quasi-normed with constant $C$, let $q_0, q_1 \in [1, \infty]$ and
+$\theta_0, \theta_1 \in (0, 1)$, and let $c_C$ be as in \Cref{lem:holmstedt-halves}. For every
+$m \in \Z$ and every $u \in U$:
+\begin{enumerate}
+  \item with $s = 2^{m(\theta_1 - \theta_0)}$ and $\bar K$ the $K$-functional of the couple of
+    $K$-spaces,
+    \[
+      \bar K(s, u) \leq \bigl(C + c_C(\theta_0) + c_C(1 - \theta_1)\bigr)
+      \bigl(S^{\theta_0}_{<m}(u) + s \, S^{\theta_1}_{\geq m}(u)\bigr) ;
+    \]
+  \item with $s = 2^{m\theta_1}$ and $\bar K$ the $K$-functional of the left endpoint couple,
+    $\bar K(s, u) \leq \bigl(C + 1 + c_C(1 - \theta_1)\bigr) \, s \, S^{\theta_1}_{\geq m}(u)$;
+  \item with $\bar K$ the $K$-functional of the right endpoint couple,
+    \[
+      \bar K\bigl(2^{m(1-\theta_0)}, u\bigr) \leq \bigl(C + 1 + c_C(\theta_0)\bigr)
+      \sum_{n \leq m} 2^{-n\theta_0} K(2^n, u) ,
+    \]
+    and the sum is $S^{\theta_0}_{<m+1}(u)$.
+\end{enumerate}
+The constants are finite.
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) Let $b \in U$ and $J = N_0(u - b) + 2^m N_1(b)$. Since $s \, 2^{-m\theta_1} =
+2^{-m\theta_0}$, \Cref{lem:holmstedt-halves} gives
+\begin{align*}
+  \bar K(s, u) &\leq \|u - b\|_{\theta_0, q_0} + s \|b\|_{\theta_1, q_1} \\
+  &\leq C \, S^{\theta_0}_{<m}(u) + s \, C \, S^{\theta_1}_{\geq m}(u)
+    + 2^{-m\theta_0} \bigl(c_C(\theta_0) + c_C(1 - \theta_1)\bigr) J .
+\end{align*}
+The coefficient of $J$ is finite, so the infimum over $b$ replaces $J$ by $K(2^m, u)$
+(\Cref{lem:couple-k-functional}). Finally
+$2^{-m\theta_0} K(2^m, u) = s \, 2^{-m\theta_1} K(2^m, u) \leq s \, S^{\theta_1}_{\geq m}(u)$,
+the first term of the sum. (2) The same argument with $N_0(u - b) \leq J$ in place of the
+bound for $\|u - b\|_{\theta_0, q_0}$, and $s \, 2^{-m\theta_1} = 1$. (3) By
+\Cref{lem:k-space-couples}, the right endpoint couple is the swap of the left endpoint couple
+$\bar A$ of the swapped couple for $1 - \theta_0$. With $t = 2^{m(1-\theta_0)}$,
+\Cref{lem:couple-k-functional-swap} gives $\bar K(t, u) = t \, K_{\bar A}(t^{-1}, u)$, and (2)
+for the swapped couple, which is quasi-normed with constant $C$, at $-m$ bounds this by
+$\bigl(C + 1 + c_C(\theta_0)\bigr)$ times the sum of the terms $n \geq -m$ of the discrete
+$K$-norm of the swapped couple with $1 - \theta_0$. By \Cref{lem:couple-k-method-swap} these are
+the terms $n \leq m$ of the discrete $K$-norm of $A$ with $\theta_0$.
+\end{proof}
+
+Holmstedt's formula~\cite[Theorem~3.6.1]{BerghLofstrom} is the two-sided estimate of
+$\bar K(t^{\theta_1 - \theta_0}, u)$ by the $\ell_{q_0}$ norm of the terms below $t$ and the
+$\ell_{q_1}$ norm of the terms above $t$; the sums $S$ are their $\ell_1$ forms, which suffice for
+the reiteration theorem.
+
+\paragraph{The reiteration theorem.}
+
+\begin{lemma}[Holmstedt's sums as geometric convolutions]
+\label{lem:holmstedt-convolutions}
+\lean{InterpCouple.two_rpow_mul_kSumBelow, InterpCouple.two_rpow_mul_kSumAbove}
+\leanok
+\uses{def:holmstedt-sums}
+Let $A$ be a couple on $U$, let $\theta, \theta_0, \theta_1, \eta, \rho \in \R$, $m \in \Z$ and
+$u \in U$, and put $c_n = 2^{-n\theta} K(2^n, u)$ for $n \in \Z$. If
+$\theta = \theta_0 + \eta\rho$, then
+$2^{-m\rho\eta} S^{\theta_0}_{<m}(u) = \sum_{j=0}^\infty 2^{-(j+1)\eta\rho} c_{m-(j+1)}$. If
+$\theta_1 = \theta + (1 - \eta)\rho$, then
+$2^{-m\rho\eta} \, 2^{m\rho} \, S^{\theta_1}_{\geq m}(u) = \sum_{j=0}^\infty
+2^{-j(1-\eta)\rho} c_{m+j}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Termwise: for $n = m - (j + 1)$, $-m\rho\eta - n\theta_0 = -(j+1)\eta\rho - n\theta$, and for
+$n = m + j$, $-m\rho\eta + m\rho - n\theta_1 = -j(1-\eta)\rho - n\theta$.
+\end{proof}
+
+\begin{proposition}[The reiteration bound]
+\label{prop:reiteration-bound}
+\lean{InterpCouple.reiterationConst, InterpCouple.reiterationConst_ne_top,
+  InterpCouple.kCouple_discreteKMethodNorm_le, InterpCouple.endpointReiterationConst,
+  InterpCouple.endpointReiterationConst_ne_top,
+  InterpCouple.leftKCouple_discreteKMethodNorm_le,
+  InterpCouple.rightKCouple_discreteKMethodNorm_le}
+\leanok
+\uses{thm:holmstedt, lem:holmstedt-convolutions, lem:geometric-convolutions-integers,
+  lem:k-space-couples, lem:couple-k-method-swap}
+Let $A$ be a couple on $U$ quasi-normed with constant $C$, let $q_0, q_1, q \in [1, \infty]$,
+$\eta \in \R$ and $u \in U$, let $c_C$ be as in \Cref{lem:holmstedt-halves}, and let
+$e_C(\theta_1, \eta) = \bigl(C + 1 + c_C(1 - \theta_1)\bigr) (1 - 2^{-(1-\eta)\theta_1})^{-1}$.
+\begin{enumerate}
+  \item For $\theta_0, \theta_1 \in (0, 1)$, with $\theta = (1 - \eta)\theta_0 + \eta\theta_1$ and
+    $d = \theta_1 - \theta_0$, the discrete $K$-norm of the couple of $K$-spaces on the grid
+    $t = 2^{nd}$ satisfies
+    \begin{align*}
+      \|u\|^{\Z}_{\eta, d, q} \leq{} &\bigl(C + c_C(\theta_0) + c_C(1 - \theta_1)\bigr) \\
+      &\cdot \bigl((1 - 2^{-\eta d})^{-1} + (1 - 2^{-(1-\eta) d})^{-1}\bigr)
+      \|u\|_{\theta, q} .
+    \end{align*}
+  \item For $\theta_1 \in (0, 1)$, the discrete $K$-norm of the left endpoint couple on the grid
+    $t = 2^{n\theta_1}$ satisfies $\|u\|^{\Z}_{\eta, \theta_1, q} \leq e_C(\theta_1, \eta) \,
+    \|u\|_{\eta\theta_1, q}$.
+  \item For $\theta_0 \in (0, 1)$, the discrete $K$-norm of the right endpoint couple on the
+    grid $t = 2^{n(1-\theta_0)}$ satisfies $\|u\|^{\Z}_{\eta, 1 - \theta_0, q} \leq
+    e_C(1 - \theta_0, 1 - \eta) \, \|u\|_{(1-\eta)\theta_0 + \eta, q}$.
+\end{enumerate}
+The constant of (1) is finite for $0 < \theta_0 < \theta_1 < 1$ and $0 < \eta < 1$, and
+$e_C(\theta_1, \eta)$ is finite for $0 < \theta_1 < 1$ and $\eta < 1$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+(1) Multiply \Cref{thm:holmstedt} (1) by $2^{-m\eta d}$. By
+\Cref{lem:holmstedt-convolutions} with $\rho = d$, the two terms become
+$\sum_j 2^{-(j+1)\eta d} c_{m-(j+1)}$ and $\sum_j 2^{-j(1-\eta)d} c_{m+j}$ with
+$c_n = 2^{-n\theta} K(2^n, u)$, since $\theta = \theta_0 + \eta d$ and
+$\theta_1 = \theta + (1 - \eta) d$. Minkowski's inequality and
+\Cref{lem:geometric-convolutions-integers} bound their $\ell_q$ norms over $m$ by
+$(1 - 2^{-\eta d})^{-1} \|c\|_{\ell_q}$ and $(1 - 2^{-(1-\eta)d})^{-1} \|c\|_{\ell_q}$, and
+$\|c\|_{\ell_q} = \|u\|_{\theta, q}$. (2) The same argument with \Cref{thm:holmstedt} (2), the
+second sum only, $\rho = \theta_1$ and $\theta = \eta\theta_1$. (3) By \Cref{lem:k-space-couples},
+the right endpoint couple is the swap of the left endpoint couple of the swapped couple for
+$1 - \theta_0$, and by \Cref{lem:couple-k-method-swap} swapping replaces $\eta$ by $1 - \eta$ and
+$\|\cdot\|_{\theta, q}$ of the swapped couple by $\|\cdot\|_{1-\theta, q}$ of $A$. Apply (2) to the
+swapped couple, which is quasi-normed with constant $C$, and use
+$1 - (1 - \eta)(1 - \theta_0) = (1 - \eta)\theta_0 + \eta$.
+\end{proof}
+
+\begin{lemma}[Equal spaces from comparable discrete $K$-norms]
+\label{lem:comparable-discrete-k-norms}
+\lean{InterpCouple.memKMethod_iff_of_discreteKMethodNorm_le}
+\leanok
+\uses{thm:couple-discrete-continuous}
+Let $A$ and $B$ be couples on $U$, let $\eta, \theta \geq 0$, $\rho > 0$, $q \in (0, \infty]$,
+$c, c' \in [0, \infty)$ and $u \in U$. If
+$\|u\|^{\Z, B}_{\eta, \rho, q} \leq c \, \|u\|_{\theta, q}$ and
+$\|u\|_{\theta, q} \leq c' \, \|u\|^{\Z, B}_{\eta, \rho, q}$, then $u$ belongs to the space of
+the continuous $K$-method of $B$ with $(\eta, q)$ if and only if $u \in (X_0, X_1)_{\theta, q}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{thm:couple-discrete-continuous}, both memberships are the finiteness of the two
+discrete $K$-norms, and the two bounds with finite constants transfer finiteness.
+\end{proof}
+
+\begin{theorem}[The reiteration theorem]
+\label{thm:reiteration}
+\lean{InterpCouple.memKMethod_kCouple_iff, InterpCouple.memKMethod_leftKCouple_iff,
+  InterpCouple.memKMethod_rightKCouple_iff, InterpCouple.memKMethod_kMethodCouple_iff}
+\leanok
+\uses{prop:reiteration-bound, cor:reiteration-easy, thm:couple-discrete-continuous,
+  cor:comparable-couples, def:k-space-couples, lem:comparable-discrete-k-norms}
+Let $A$ be a couple on $U$ quasi-normed with constant $C$, let $q_0, q_1, q \in [1, \infty]$ and
+$u \in U$. For each couple of \Cref{def:k-space-couples}, the outer space is the space of its
+continuous $K$-method (\Cref{def:couple-k-method}).
+\begin{enumerate}
+  \item For $0 < \theta_0 < \theta_1 < 1$ and $0 < \eta < 1$, with
+    $\theta = (1 - \eta)\theta_0 + \eta\theta_1$,
+    $u \in \bigl((X_0, X_1)_{\theta_0, q_0}, (X_0, X_1)_{\theta_1, q_1}\bigr)_{\eta, q}$ if and
+    only if $u \in (X_0, X_1)_{\theta, q}$, both for the couple of $K$-spaces and for the couple of
+    continuous $K$-norms.
+  \item For $0 < \theta_1 < 1$ and $0 \leq \eta < 1$,
+    $u \in \bigl(X_0, (X_0, X_1)_{\theta_1, q_1}\bigr)_{\eta, q}$ if and only if
+    $u \in (X_0, X_1)_{\eta\theta_1, q}$.
+  \item For $0 < \theta_0 < 1$ and $\eta > 0$,
+    $u \in \bigl((X_0, X_1)_{\theta_0, q_0}, X_1\bigr)_{\eta, q}$ if and only if
+    $u \in (X_0, X_1)_{(1-\eta)\theta_0 + \eta, q}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:couple-discrete-continuous}, membership in each space is finiteness of a discrete
+$K$-norm: on the grid $t = 2^n$ for $A$, and on the grids $t = 2^{n(\theta_1 - \theta_0)}$,
+$t = 2^{n\theta_1}$ and $t = 2^{n(1-\theta_0)}$ for the three couples of
+\Cref{def:k-space-couples}. These discrete $K$-norms are comparable with finite constants by
+\Cref{cor:reiteration-easy} and \Cref{prop:reiteration-bound}, so the spaces agree
+(\Cref{lem:comparable-discrete-k-norms}). For the couple of continuous
+$K$-norms, \Cref{thm:couple-discrete-continuous} with $\rho = 1$ gives
+$\|a\|_{K, \theta_i, q_i} \leq (\log 2)^{1/q_i} 2^{\theta_i} \|a\|_{\theta_i, q_i}$ and
+$\|a\|_{\theta_i, q_i} \leq \bigl((\log 2)^{1/q_i} 2^{-\theta_i}\bigr)^{-1} \|a\|_{K, \theta_i,
+q_i}$ for every $a \in U$, so the two couples have the same spaces
+(\Cref{cor:comparable-couples}).
+\end{proof}
+
+This is~\cite[Theorems~3.5.3 and~3.11.5]{BerghLofstrom} for the $K$-spaces themselves, with
+$\theta_0 < \theta_1$; for $\theta_0 > \theta_1$ swap the couple
+(\Cref{lem:couple-k-method-swap}).
+
+\begin{corollary}[Reiteration for the couple of a bounded linear map]
+\label{cor:reiteration-map-couples}
+\lean{ApproximationScheme.memKMethod_reiteration}
+\leanok
+\uses{thm:reiteration, prop:map-couple-k-method, lem:map-couple}
+Let $\iota : Y \to X$ be a bounded linear map between real normed spaces, let
+$0 < \theta_0 < \theta_1 < 1$, $0 < \eta < 1$ and $q_0, q_1, q \in [1, \infty]$, and put
+$\theta = (1 - \eta)\theta_0 + \eta\theta_1$. For every $f \in X$,
+$f \in \bigl((X, Y)^K_{\theta_0, q_0}, (X, Y)^K_{\theta_1, q_1}\bigr)_{\eta, q}$, for the couple
+of the continuous $K$-norms of \Cref{def:continuous-k-method}, if and only if
+$f \in (X, Y)^K_{\theta, q}$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+The couple of $\iota$ is quasi-normed with constant $1$ (\Cref{lem:map-couple}), and its
+continuous $K$-norms are those of \Cref{def:continuous-k-method}
+(\Cref{prop:map-couple-k-method}). Apply \Cref{thm:reiteration} (1).
 \end{proof}
 
 \chapter{Block decompositions and projections}

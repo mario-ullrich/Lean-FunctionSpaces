@@ -51,6 +51,14 @@ declarations.
   K-functional under a map (`InterpCouple.kFunctional_map_le`) and exactness of exponent `θ`
   (`InterpCouple.kMethodNorm_map_le`), the theorem that *MultilinearInterpolation* sketches as
   `IsOfExponent`; coordinate with lua-vr/MultilinearInterpolation.
+* **The reiteration theorem** (`ApproximationSpaces/Interpolation/Reiteration.lean`): the
+  inclusion for couples of class `C_K` (`InterpCouple.discreteKMethodNorm_le_of_kFunctional_le`),
+  the upper bound of Holmstedt's formula in discrete form with `ℓ₁` sums
+  (`InterpCouple.kFunctional_kCouple_le`) and the reiteration theorem for quasi-normed couples
+  (`InterpCouple.memKMethod_kCouple_iff`, `InterpCouple.memKMethod_kMethodCouple_iff`), with the
+  geometric convolutions on `ℤ` (`ENNReal.lqNorm_tsum_geom_sub_le`,
+  `ENNReal.lqNorm_tsum_geom_add_le`); this complements *MultilinearInterpolation*, whose
+  interpolation theory ends with the K-method; coordinate with lua-vr/MultilinearInterpolation.
 * **Monotone convergence and countable Minkowski for `eLpNorm`**: on any measure space,
   `‖sup_b F_b‖_p = sup_b ‖F_b‖_p` for directed countable families of a.e. measurable `F_b`
   (`MeasureTheory.eLpNorm_iSup_of_directed`) and `‖∑_i g_i‖_p ≤ ∑_i ‖g_i‖_p` for `1 ≤ p ≤ ∞` and
@@ -334,7 +342,7 @@ declarations.
   the periodisation `∑_n f(x + n)` of a continuous `f` vanishing outside a bounded interval, with
   `𝓕 f(n) = 0` for `n ≠ 0`, is the constant `∫ f` (`Real.tsum_comp_add_int_eq_integral`).
 * **Sums over overlapping sets and shifts in `ℓ_q(ℤ)`**
-  (`FunctionSpaces/Wavelets/Daubechies/Expansion.lean`):
+  (`FunctionSpaces/Wavelets/Daubechies/Expansion.lean`, `ApproximationSpaces/Sequences/Hardy.lean`):
   if every point lies in at most `M` of the sets `I_i`, then `∑_i ∫_{I_i} F ≤ M ∫ F`
   (`MeasureTheory.tsum_setLIntegral_le_mul_lintegral`); `ℓ_q(ℤ)` norms are invariant under
   shifts (`ENNReal.lqNorm_comp_add_int`).

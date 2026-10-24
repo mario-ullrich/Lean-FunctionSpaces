@@ -3692,21 +3692,6 @@ At every point $\sum_i 1_{I_i} F \leq M F$. Integrate, and exchange the sum with
 monotone convergence.
 \end{proof}
 
-\begin{lemma}[Shift invariance of the $\ell_q$ norm]
-\label{lem:daub-lq-shift}
-\lean{ENNReal.lqNorm_comp_add_int}
-\leanok
-\uses{def:lq-norm}
-For every exponent $q$, every $\alpha : \Z \to [0, \infty]$ and every $i \in \Z$,
-$\|(\alpha_{k+i})_{k \in \Z}\|_{\ell_q} = \|\alpha\|_{\ell_q}$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The shift $k \mapsto k + i$ is a bijection of $\Z$ that preserves the counting measure, and the
-$\ell_q$ norm is the $L_q$ norm for the counting measure.
-\end{proof}
-
 \begin{lemma}[Norms of the generators]
 \label{lem:daub-generator-norms}
 \lean{Daubechies.aestronglyMeasurable_comp_sub_map,

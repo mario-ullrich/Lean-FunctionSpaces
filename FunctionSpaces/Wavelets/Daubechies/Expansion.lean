@@ -52,9 +52,6 @@ The file is generic in `g`, so that it serves the scaling function `φ` (support
   (`Daubechies.eLpNorm_expand_coeffFun_le`). Expansions are linear in the coefficients and the
   coefficients are linear in `f` (`Daubechies.expand_add`, `Daubechies.expand_const_mul`,
   `Daubechies.coeffFun_add`, `Daubechies.coeffFun_const_mul`).
-
-The file also proves the shift invariance `‖(a(k + i))_k‖_{ℓ_q} = ‖a‖_{ℓ_q}` of the `ℓ_q` norm on
-`ℤ` (`ENNReal.lqNorm_comp_add_int`).
 -/
 
 @[expose] public section
@@ -92,19 +89,6 @@ theorem tsum_setLIntegral_le_mul_lintegral {α ι : Type*} [MeasurableSpace α] 
     _ = M * ∫⁻ x, F x ∂μ := lintegral_const_mul' _ _ (ENNReal.natCast_ne_top M)
 
 end MeasureTheory
-
-namespace ENNReal
-
-/-- **The `ℓ_q` norm on `ℤ` is shift invariant**: `‖(a(k + i))_k‖_{ℓ_q} = ‖a‖_{ℓ_q}` for every
-`a : ℤ → [0, ∞]`, every `i ∈ ℤ` and every exponent `q`. The shift `k ↦ k + i` preserves the
-counting measure (Mathlib's `MeasureTheory.measurePreserving_add_right`), and the `ℓ_q` norm is
-the `L_q` norm for the counting measure. -/
-theorem lqNorm_comp_add_int (q : ℝ≥0∞) (a : ℤ → ℝ≥0∞) (i : ℤ) :
-    lqNorm q (fun k : ℤ => a (k + i)) = lqNorm q a :=
-  eLpNorm_comp_measurePreserving (aestronglyMeasurable_count a)
-    (measurePreserving_add_right Measure.count i)
-
-end ENNReal
 
 namespace Daubechies
 

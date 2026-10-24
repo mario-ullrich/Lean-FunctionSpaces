@@ -25,6 +25,7 @@ public import ApproximationSpaces.Representation
 public import ApproximationSpaces.KMethod
 public import ApproximationSpaces.Interpolation.Couple
 public import ApproximationSpaces.Interpolation.Property
+public import ApproximationSpaces.Interpolation.Reiteration
 public import ApproximationSpaces.Decompositions.Projection
 public import ApproximationSpaces.Decompositions.Blocks
 public import ApproximationSpaces.Decompositions.Synthesis
@@ -58,8 +59,9 @@ the counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the co
 * `ApproximationSpaces.Sequences.Dyadic`: Cauchy condensation with power weights, which
   compares `∑ (n+1)^γ b n` with `∑ 2^(k(γ+1)) b (2^k)` for decreasing `b`, and the dyadic sums
   `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4` and `∑_j u_j ≤ (N + 1) M` for `N + 1` dyadic scales.
-* `ApproximationSpaces.Sequences.Hardy`: the countable Minkowski inequality and the two
-  discrete Hardy inequalities.
+* `ApproximationSpaces.Sequences.Hardy`: the countable Minkowski inequality, the two
+  discrete Hardy inequalities, the shift invariance of `ℓ_q(ℤ)` and the geometric convolutions
+  on `ℤ`.
 * `ApproximationSpaces.Norm`: Pietsch's quasi-norm `ApproximationScheme.approxNorm` of
   `A^s_q` and membership `ApproximationScheme.MemApprox`.
 * `ApproximationSpaces.Dyadic`: the equivalent dyadic quasi-norm
@@ -84,11 +86,15 @@ the counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the co
   dyadic grid (Bergh–Löfström, Lemma 3.1.3), and the representation theorem for the continuous
   K-method.
 * `ApproximationSpaces.Interpolation.Couple`: couples `InterpCouple` of two extended
-  quasi-norms on an abelian group, their K-functional, the continuous and the discrete K-method
-  and their equivalence, and the couple `InterpCouple.ofMap ι` of a bounded linear map.
+  quasi-norms on an abelian group, their K-functional, the continuous and the discrete K-method,
+  their equivalence and quasi-triangle inequalities, and the couple `InterpCouple.ofMap ι` of a
+  bounded linear map.
 * `ApproximationSpaces.Interpolation.Property`: the invariance of `dt/t` under dilations, the
   interpolation property of the K-method (exactness of exponent `θ`), comparable couples,
   retracts, and the interpolation property for the couples of bounded linear maps.
+* `ApproximationSpaces.Interpolation.Reiteration`: couples of K-spaces, Holmstedt's formula in
+  discrete form, and the reiteration theorem
+  `((X₀, X₁)_{θ₀,q₀}, (X₀, X₁)_{θ₁,q₁})_{η,q} = (X₀, X₁)_{(1-η)θ₀+ηθ₁,q}` with its endpoint cases.
 * `ApproximationSpaces.Decompositions.Projection`: schemes with uniformly bounded projections
   and the characterisation of `A^s_q` by dyadic blocks.
 * `ApproximationSpaces.Decompositions.Blocks`: the characterisation of `A^s_q` by block

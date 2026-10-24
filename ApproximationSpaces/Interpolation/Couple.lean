@@ -23,8 +23,10 @@ the **discrete K-method** on the grid `t = 2^(nρ)`, `n ∈ ℤ`, is
 `‖(2^(-nρθ) K(2^(nρ), u))_n‖_{ℓ_q}` (`InterpCouple.discreteKMethodNorm`).  For `θ ≥ 0` and
 `ρ > 0` both give the same space (`InterpCouple.memKMethod_iff_discreteKMethodNorm_lt_top`,
 Bergh–Löfström, Lemma 3.1.3); swapping the couple replaces `θ` by `1 - θ`
-(`InterpCouple.discreteKMethodNorm_swap`); for a quasi-normed homogeneous couple the space is a
-real subspace (`InterpCouple.kMethodSpace`).  For an ordered quasi-normed couple
+(`InterpCouple.discreteKMethodNorm_swap`); for a quasi-normed couple both K-norms satisfy a
+quasi-triangle inequality (`InterpCouple.kMethodNorm_add_le`,
+`InterpCouple.discreteKMethodNorm_add_le`), and for a quasi-normed homogeneous couple the space is
+a real subspace (`InterpCouple.kMethodSpace`).  For an ordered quasi-normed couple
 (`N₀ ≤ c N₁`, `InterpCouple.norm0_le_mul_kFunctional_one`), the norm
 `N₀(u) + ‖(2^(kρθ) K(2^(-kρ), u))_{k ∈ ℕ}‖_{ℓ_q}` on the grid `t = 2^(-kρ)`
 (`InterpCouple.interpNorm`) gives the same space for `θ > 0`, `ρ > 0` and `q ≠ 0`
@@ -140,6 +142,14 @@ variable {A : InterpCouple U} {t s c C : ℝ≥0∞}
 `kNorm_le_of_decomp`). -/
 theorem kFunctional_le (b u : U) : A.kFunctional t u ≤ A.norm0 (u - b) + t * A.norm1 b :=
   iInf_le (fun b => A.norm0 (u - b) + t * A.norm1 b) b
+
+/-- **An upper bound by decompositions passes to the K-functional**: if
+`F ≤ X + c (N₀(u - b) + t N₁(b))` for every `b` and `c < ∞`, then `F ≤ X + c K(t, u)`, since
+`b ↦ X + c (N₀(u - b) + t N₁(b))` has the infimum `X + c K(t, u)`. -/
+theorem le_add_mul_kFunctional {F X : ℝ≥0∞} (hc : c ≠ ∞) {u : U}
+    (h : ∀ b, F ≤ X + c * (A.norm0 (u - b) + t * A.norm1 b)) : F ≤ X + c * A.kFunctional t u := by
+  rw [kFunctional, ENNReal.mul_iInf fun h' => absurd h' hc, ENNReal.add_iInf]
+  exact le_iInf h
 
 /-- `K(t, u) ≤ N₀(u)` if `N₁(0) = 0`, from `b = 0`. -/
 theorem kFunctional_le_norm0 (h : A.norm1 0 = 0) (u : U) : A.kFunctional t u ≤ A.norm0 u :=
@@ -301,6 +311,12 @@ theorem discreteKMethodNorm_eq (u : U) : A.discreteKMethodNorm θ ρ q u =
 theorem discreteKSeq_zero (u : U) : A.discreteKSeq θ ρ u 0 = A.kFunctional 1 u :=
   ApproximationScheme.discretePhiSeq_zero fun t => A.kFunctional t u
 
+/-- The term `n` of the discrete K-method on the grid `t = 2^n`:
+`2^(-nθ) K(2^n, u)`. -/
+theorem discreteKSeq_one (u : U) (n : ℤ) :
+    A.discreteKSeq θ 1 u n = 2 ^ (-((n : ℝ) * θ)) * A.kFunctional (2 ^ (n : ℝ)) u := by
+  simp only [discreteKSeq, mul_one]
+
 /-- **The continuous K-norm by the discrete one**: for `θ ≥ 0` and `ρ > 0`,
 `‖u‖_{K,θ,q} ≤ (ρ log 2)^(1/q) 2^(ρθ) ‖(2^(-nρθ) K(2^(nρ), u))_{n ∈ ℤ}‖_{ℓ_q}`. -/
 theorem kMethodNorm_le_discreteKMethodNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (u : U) :
@@ -318,6 +334,32 @@ theorem discreteKMethodNorm_le_kMethodNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (u : 
   rw [discreteKMethodNorm_eq]
   exact ApproximationScheme.lqNorm_discretePhiSeq_le_phiFunctional
     (monotone_kFunctional (A := A) u) hθ hρ
+
+/-- The continuous K-norm by the discrete K-norm on the grid `t = 2^n`: for `θ ≥ 0`,
+`‖u‖_{K,θ,q} ≤ (log 2)^(1/q) 2^θ ‖u‖_{θ,1,q}` (`kMethodNorm_le_discreteKMethodNorm` with
+`ρ = 1`). -/
+theorem kMethodNorm_le_mul_discreteKMethodNorm (hθ : 0 ≤ θ) (u : U) :
+    A.kMethodNorm θ q u ≤
+      ENNReal.ofReal (Real.log 2) ^ (1 / q.toReal) * 2 ^ θ * A.discreteKMethodNorm θ 1 q u := by
+  have h := kMethodNorm_le_discreteKMethodNorm (A := A) (q := q) hθ one_pos u
+  simpa only [one_mul, mul_assoc] using h
+
+/-- The discrete K-norm on the grid `t = 2^n` by the continuous K-norm: for `θ ≥ 0`,
+`‖u‖_{θ,1,q} ≤ ((log 2)^(1/q) 2^(-θ))⁻¹ ‖u‖_{K,θ,q}` (`discreteKMethodNorm_le_kMethodNorm` with
+`ρ = 1`). -/
+theorem discreteKMethodNorm_le_mul_kMethodNorm (hθ : 0 ≤ θ) (u : U) :
+    A.discreteKMethodNorm θ 1 q u ≤
+      (ENNReal.ofReal (Real.log 2) ^ (1 / q.toReal) * 2 ^ (-θ))⁻¹ * A.kMethodNorm θ q u := by
+  have h0 : ENNReal.ofReal (Real.log 2) ^ (1 / q.toReal) * 2 ^ (-θ) ≠ 0 :=
+    mul_ne_zero (by simpa only [one_mul] using
+      ApproximationScheme.ofReal_mul_log_two_rpow_ne_zero (ρ := 1) one_pos q)
+      (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne'
+  have ht : ENNReal.ofReal (Real.log 2) ^ (1 / q.toReal) * 2 ^ (-θ) ≠ ∞ :=
+    ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top)
+      (ApproximationScheme.two_rpow_ne_top _)
+  refine (ENNReal.mul_le_iff_le_inv h0 ht).1 ?_
+  have h := discreteKMethodNorm_le_kMethodNorm (A := A) (q := q) hθ one_pos u
+  simpa only [one_mul, mul_assoc] using h
 
 /-- **The discrete and the continuous K-method agree** (Bergh–Löfström, Lemma 3.1.3; Bonn's
 `discreteKMethod_equiv_kmethod`): for `θ ≥ 0`, `ρ > 0` and every `q`, `‖u‖_{K,θ,q} < ∞` if and
@@ -370,6 +412,12 @@ theorem kFunctional_le_discreteKMethodNorm (hq : q ≠ 0) (n : ℤ) (u : U) :
     _ ≤ _ := by
         gcongr
         exact ENNReal.le_lqNorm hq _ n
+
+/-- The class `C_K` on the grid `t = 2^n`: `K(2^n, u) ≤ 2^(nθ) ‖u‖_{θ,1,q}` for every `n ∈ ℤ`
+and `q ≠ 0` (`kFunctional_le_discreteKMethodNorm` with `ρ = 1`). -/
+theorem kFunctional_two_rpow_le_discreteKMethodNorm (hq : q ≠ 0) (n : ℤ) (u : U) :
+    A.kFunctional (2 ^ (n : ℝ)) u ≤ 2 ^ ((n : ℝ) * θ) * A.discreteKMethodNorm θ 1 q u := by
+  simpa only [mul_one] using kFunctional_le_discreteKMethodNorm (A := A) (ρ := 1) (θ := θ) hq n u
 
 /-- The integrand of the continuous K-norm of `u` as a function of `t : ℝ`; it is measurable,
 since `K(·, u)` is monotone. -/
@@ -428,6 +476,37 @@ theorem kMethodNorm_smul_le [Module ℝ U] (hH : A.IsHomogeneous) (c : ℝ) (u :
 theorem kMethodNorm_zero (h0 : A.norm0 0 = 0) (h1 : A.norm1 0 = 0) :
     A.kMethodNorm θ q 0 = 0 := by
   simp [kMethodNorm, kFunctional_zero_right h0 h1, ApproximationScheme.phiFunctional]
+
+/-- The discrete K-norm vanishes at `0` if both norms do. -/
+theorem discreteKMethodNorm_zero (h0 : A.norm0 0 = 0) (h1 : A.norm1 0 = 0) :
+    A.discreteKMethodNorm θ ρ q 0 = 0 := by
+  have h : A.discreteKSeq θ ρ 0 = fun _ => 0 :=
+    funext fun n => by rw [discreteKSeq, kFunctional_zero_right h0 h1, mul_zero]
+  rw [discreteKMethodNorm, h, ENNReal.lqNorm_zero_right]
+
+/-- The discrete K-norm of a couple of even functions is even. -/
+theorem discreteKMethodNorm_neg (h0 : ∀ a, A.norm0 (-a) = A.norm0 a)
+    (h1 : ∀ a, A.norm1 (-a) = A.norm1 a) (u : U) :
+    A.discreteKMethodNorm θ ρ q (-u) = A.discreteKMethodNorm θ ρ q u := by
+  have h : A.discreteKSeq θ ρ (-u) = A.discreteKSeq θ ρ u :=
+    funext fun n => by rw [discreteKSeq, discreteKSeq, kFunctional_neg h0 h1]
+  rw [discreteKMethodNorm, discreteKMethodNorm, h]
+
+/-- **The quasi-triangle inequality of the discrete K-norm**: for a couple quasi-normed with
+constant `C` and `1 ≤ q ≤ ∞`, `‖u + v‖_{θ,ρ,q} ≤ C (‖u‖_{θ,ρ,q} + ‖v‖_{θ,ρ,q})`, from the
+quasi-triangle inequality of the K-functional and Minkowski's inequality. -/
+theorem discreteKMethodNorm_add_le (hA : A.IsQuasiNormed C) (hq : 1 ≤ q) (u v : U) :
+    A.discreteKMethodNorm θ ρ q (u + v) ≤
+      C * (A.discreteKMethodNorm θ ρ q u + A.discreteKMethodNorm θ ρ q v) :=
+  calc A.discreteKMethodNorm θ ρ q (u + v)
+      ≤ lqNorm q (fun n => C * (A.discreteKSeq θ ρ u n + A.discreteKSeq θ ρ v n)) :=
+        ENNReal.lqNorm_mono fun n => (mul_le_mul_right (kFunctional_add_le hA u v) _).trans_eq
+          (by simp only [discreteKSeq]; ring)
+    _ = C * lqNorm q (fun n => A.discreteKSeq θ ρ u n + A.discreteKSeq θ ρ v n) :=
+        ENNReal.lqNorm_const_mul _ _
+    _ ≤ _ := by
+        gcongr
+        exact ENNReal.lqNorm_add_le hq _ _
 
 /-- The **real interpolation space** `(X₀, X₁)_{θ,q}` of a quasi-normed homogeneous couple, as a
 real subspace of `U` (Bergh–Löfström, Sections 3.1 and 3.11). -/

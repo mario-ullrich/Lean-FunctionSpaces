@@ -99,13 +99,23 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   space (Bergh–Löfström, Lemma 3.1.3; `ApproximationScheme.memInterp_iff_memKMethod`), so
   `A^s_q = (X, Y)_{s/r, q}` for the continuous K-method
   (`ApproximationScheme.memApprox_iff_memKMethod`).
-* **Real interpolation of couples: the interpolation property.** Let `(N₀, N₁)` and
-  `(N₀', N₁')` be couples of extended quasi-norms on abelian groups `U` and `V`, and let
+* **Real interpolation of couples: interpolation property and reiteration.** Let `(N₀, N₁)`
+  and `(N₀', N₁')` be couples of extended quasi-norms on abelian groups `U` and `V`, and let
   `T : U → V` be additive with `N_i'(T a) ≤ M_i N_i(a)` for `i = 0, 1`, every `a` and some
   `0 < M_i < ∞`. Then for every `θ ∈ ℝ`, `q ∈ (0, ∞]` and `u ∈ U`, the K-norms
   `‖u‖_{K,θ,q} = (∫_0^∞ (t^(-θ) K(t, u))^q dt/t)^(1/q)` satisfy
   `‖T u‖_{K,θ,q} ≤ M₀^(1-θ) M₁^θ ‖u‖_{K,θ,q}` (Bergh–Löfström, Theorems 3.1.2 and 3.11.2;
-  `InterpCouple.kMethodNorm_map_le`).
+  `InterpCouple.kMethodNorm_map_le`). If `(N₀, N₁)` satisfies `N_i(0) = 0`, `N_i(-a) = N_i(a)`
+  and `N_i(a + b) ≤ C (N_i(a) + N_i(b))` with `C < ∞`, then for `0 < θ₀ < θ₁ < 1`,
+  `0 < η < 1` and `1 ≤ q₀, q₁, q ≤ ∞`,
+  `((X₀, X₁)_{θ₀,q₀}, (X₀, X₁)_{θ₁,q₁})_{η,q} = (X₀, X₁)_{(1-η)θ₀+ηθ₁,q}` (Bergh–Löfström,
+  Theorems 3.5.3 and 3.11.5; `InterpCouple.memKMethod_kCouple_iff`,
+  `InterpCouple.memKMethod_kMethodCouple_iff`). Here `X_i = {N_i < ∞}`,
+  `(X₀, X₁)_{θ,q} = {u : ‖u‖_{K,θ,q} < ∞}`, and the two inner K-spaces carry their discrete
+  K-norms `‖(2^(-nθ_i) K(2^n, u))_{n ∈ ℤ}‖_{ℓ_{q_i}}` or their continuous K-norms
+  `‖·‖_{K,θ_i,q_i}`. The proof uses the upper bound of Holmstedt's formula with `ℓ_1` sums
+  (Holmstedt 1970; Bergh–Löfström, Theorem 3.6.1 has `ℓ_{q_i}` norms of the two pieces), which
+  suffices for reiteration (`InterpCouple.kFunctional_kCouple_le`).
 * **Moduli of smoothness and approximation.** Let `ω(f, 2^(-k))` be subadditive with
   `ω(f, t) ≤ C₀ ‖f‖`, and assume a Jackson inequality `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for
   `k ≥ k₀` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
@@ -472,7 +482,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 
 | Block | Lean | Checked |
 |---|---|---|
-| [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, couples, their K-method and the interpolation property, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
+| [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, couples, their K-method, the interpolation property and the reiteration theorem, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
 | [**Besov and Sobolev spaces on measure spaces**](docs/MeasureSpaces.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, spectral schemes, continuous spectral bases | ✅ | ✗ |
 | [**Tools from analysis**](docs/Analysis.md): `L_p` norms, the inclusion `L_r ↪ L_p`, Young's inequality, mixed norms, differences and the translation algebra, convolution, approximate identities, Littlewood–Paley kernels, test functions in the Schwartz space, dyadic cubes and cells, the Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, weak type and Marcinkiewicz interpolation, `L_p` norms by duality | ✅ | ✗ |
 | [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness and smooth Littlewood–Paley blocks for all `p`, `W^m_2` by Fourier multipliers, the trace on a face, the restriction for continuous functions | ✅ | ✗ |
@@ -514,7 +524,9 @@ that library builds itself.
 
 ## What is left to do
 
-* **Interpolation**: the reiteration theorem of the K-method.
+* **Interpolation**: the J-method and the equivalence theorem, the complex method,
+  `(L_{p₀}, L_{p₁})_{θ,q} = L_{p,q}` with Lorentz spaces, and the off-diagonal Marcinkiewicz
+  theorem.
 * **Traces and extensions**: the norm equivalence `H^{1/2}(Γ) ≅ B^{1/2}_{2,2}(Γ)` and the
   extension of `W^1_p` for `p ∈ {1, ∞}` and of higher order.
 * **Manifolds with corners**, with Lipschitz domains as Besov domains.
@@ -631,6 +643,8 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   Press, 1996. Multiresolution analyses.
 * R. Hiptmair, D. Pauly, E. Schulz, *Traces for Hilbert complexes*, J. Funct. Anal. **284**
   (2023), Paper No. 109905. Assumption F, the compactness of the restriction to bounded domains.
+* T. Holmstedt, *Interpolation of quasi-normed spaces*, Math. Scand. **26** (1970), 177–199.
+  Holmstedt's formula for the K-functional of a couple of K-spaces.
 * L. Hörmander, *Estimates for translation invariant operators in L^p spaces*, Acta Math.
   **104** (1960), no. 1–2, 93–140. The Hörmander condition.
 * J. Marcinkiewicz, *Sur l'interpolation d'opérations*, C. R. Acad. Sci. Paris **208** (1939),

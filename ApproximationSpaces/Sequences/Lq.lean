@@ -471,6 +471,11 @@ theorem two_pow_rpow_eq_dyadicWeight (j n : ℕ) (t : ℝ) :
   push_cast
   ring
 
+/-- The product rule for powers of `2` in `[0, ∞]`: `2^x 2^y = 2^(x+y)` for all real `x, y`
+(Mathlib's `ENNReal.rpow_add` with the side conditions `2 ≠ 0` and `2 ≠ ∞` discharged). -/
+theorem two_rpow_mul_two_rpow (x y : ℝ) : (2 : ℝ≥0∞) ^ x * 2 ^ y = 2 ^ (x + y) :=
+  (ENNReal.rpow_add x y two_ne_zero ENNReal.ofNat_ne_top).symm
+
 /-- For `α > 0` the ratio `2 ^ (-α)` of the decaying weights is `< 1`. -/
 theorem two_rpow_neg_lt_one {α : ℝ} (hα : 0 < α) : (2 : ℝ≥0∞) ^ (-α) < 1 :=
   ENNReal.rpow_lt_one_of_one_lt_of_neg one_lt_two (neg_neg_iff_pos.2 hα)

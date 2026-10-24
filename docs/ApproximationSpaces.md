@@ -11,11 +11,11 @@ approximation schemes and the errors of best approximation, the approximation sp
 their dyadic quasi-norm, embeddings and functoriality, lifting under a Bernstein inequality and the
 Nikolskii transfer theorem, the K-functional, the discrete and the continuous K-method and the
 representation of `A^s_q` as a real interpolation space, couples of two extended quasi-norms on
-an abelian group with their K-method and its interpolation property (`InterpCouple`), block,
-projection and atomic decompositions, abstract trace and retract theorems, and the comparison with
-spaces defined by moduli of smoothness (`ModulusData`). A smoothness space of order `r` is a
-Banach space with an injective bounded map into `X` satisfying Jackson's and Bernstein's
-inequalities of order `r` (`ApproximationScheme.JacksonBound`,
+an abelian group with their K-method, its interpolation property and the reiteration theorem
+(`InterpCouple`), block, projection and atomic decompositions, abstract trace and retract
+theorems, and the comparison with spaces defined by moduli of smoothness (`ModulusData`). A
+smoothness space of order `r` is a Banach space with an injective bounded map into `X` satisfying
+Jackson's and Bernstein's inequalities of order `r` (`ApproximationScheme.JacksonBound`,
 `ApproximationScheme.SmoothnessSpace`, a hypothesis structure whose fields are the embedding, the
 order and Jackson's and Bernstein's inequalities); Sobolev spaces are the motivating examples.
 The schemes live in real normed spaces, and the couples of `ApproximationSpaces.Interpolation`
@@ -103,6 +103,30 @@ norms and `dt/t` on `(0, ∞)` of the continuous K-method. The other blocks inst
   bounded linear maps `T : X → X'`, `S : Y → Y'` with `T ι = ι' S` map `(X, Y)_{θ,q}` into
   `(X', Y')_{θ,q}` (`ApproximationScheme.kMethodNorm_map_le_of_comp_eq`,
   `ApproximationScheme.MemInterp.map`).
+* **The reiteration theorem.** For a couple quasi-normed with constant `C` (`N_i(0) = 0`,
+  `N_i(-a) = N_i(a)`, `N_i(a + b) ≤ C (N_i(a) + N_i(b))`, `C < ∞`), `0 < θ₀ < θ₁ < 1`,
+  `0 < η < 1` and `1 ≤ q₀, q₁, q ≤ ∞`,
+  `((X₀, X₁)_{θ₀,q₀}, (X₀, X₁)_{θ₁,q₁})_{η,q} = (X₀, X₁)_{(1-η)θ₀+ηθ₁,q}` (Bergh–Löfström,
+  Theorems 3.5.3 and 3.11.5), where `X_i = {N_i < ∞}` and
+  `(X₀, X₁)_{θ,q} = {u : ‖u‖_{K,θ,q} < ∞}`, for the discrete K-norms
+  `‖(2^(-nθ_i) K(2^n, u))_{n ∈ ℤ}‖_{ℓ_{q_i}}` and for the continuous K-norms `‖·‖_{K,θ_i,q_i}` of
+  the two inner K-spaces (`InterpCouple.memKMethod_kCouple_iff`,
+  `InterpCouple.memKMethod_kMethodCouple_iff`), with the explicit constants
+  `InterpCouple.reiterationConst` (`InterpCouple.kCouple_discreteKMethodNorm_le`); the endpoint
+  cases are
+  `(X₀, (X₀, X₁)_{θ₁,q₁})_{η,q} = (X₀, X₁)_{ηθ₁,q}` and
+  `((X₀, X₁)_{θ₀,q₀}, X₁)_{η,q} = (X₀, X₁)_{(1-η)θ₀+η,q}`
+  (`InterpCouple.memKMethod_leftKCouple_iff`, `InterpCouple.memKMethod_rightKCouple_iff`), and
+  for a bounded linear map `ι : Y → X`, `((X, Y)_{θ₀,q₀}, (X, Y)_{θ₁,q₁})_{η,q} = (X, Y)_{θ,q}`
+  (`ApproximationScheme.memKMethod_reiteration`). The proof uses the upper bound of Holmstedt's
+  formula in discrete form with `ℓ_1` sums,
+  `K̄(2^(m(θ₁-θ₀)), u) ≤ c (∑_{n<m} 2^(-nθ₀) K(2^n, u) + 2^(m(θ₁-θ₀)) ∑_{n≥m} 2^(-nθ₁)
+  K(2^n, u))`
+  (Holmstedt 1970; Bergh–Löfström, Theorem 3.6.1 has `ℓ_{q_i}` norms of the two pieces;
+  `InterpCouple.kFunctional_kCouple_le`, with the endpoint versions
+  `InterpCouple.kFunctional_leftKCouple_le` and `InterpCouple.kFunctional_rightKCouple_le`), which
+  suffices for reiteration, and the geometric convolutions on `ℤ`
+  (`ENNReal.lqNorm_tsum_geom_sub_le`, `ENNReal.lqNorm_tsum_geom_add_le`).
 * **Moduli of smoothness and approximation.** Let `ω(f, 2^(-k))` be subadditive with
   `ω(f, t) ≤ C₀ ‖f‖`, and assume a Jackson inequality `E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for
   `k ≥ k₀` and an inverse inequality `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖` for `a ∈ A_{2^j}`. Then
@@ -162,14 +186,15 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | `n`-term approximation from a dictionary | ✅ | ✗ | `Instances/NTerm` |
 | `ℓ_q` norms in `ℝ≥0∞`, Minkowski, Cauchy–Schwarz, monotonicity in `q`, tails, sequences with finitely many nonzero terms, reindexing, geometric sequences | ✅ | ✗ | `Sequences/Lq` |
 | Cauchy condensation with power weights, the dyadic sum `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4`, finitely many changed terms, sums over the dyadic scales of an annulus | ✅ | ✗ | `Sequences/Dyadic` |
-| Countable Minkowski inequality, monotone convergence and truncations in `ℓ_q`, discrete Hardy inequalities, almost diagonal sums | ✅ | ✗ | `Sequences/Hardy` |
+| Countable Minkowski inequality, monotone convergence and truncations in `ℓ_q`, discrete Hardy inequalities, almost diagonal sums, shift invariance and geometric convolutions on `ℤ` | ✅ | ✗ | `Sequences/Hardy` |
 | `A^s_q`, its dyadic quasi-norm and linear structure | ✅ | ✗ | `Norm`, `Dyadic`, `Space` |
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ | ✗ | `Embedding`, `Transfer` |
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ | ✗ | `Lift`, `Nikolskii` |
 | K-functional, real interpolation, representation theorem | ✅ | ✗ | `KFunctional`, `Representation` |
 | Continuous K-method and its equivalence with the discrete K-method | ✅ | ✗ | `KMethod` |
-| Couples of extended quasi-norms, their K-functional and K-method, the couple of a bounded linear map | ✅ | ✗ | `Interpolation/Couple` |
+| Couples of extended quasi-norms, their K-functional and K-method, quasi-triangle inequalities of the K-norms, the couple of a bounded linear map | ✅ | ✗ | `Interpolation/Couple` |
 | Dilations of `dt/t`, the interpolation property of the K-method, comparable couples, retracts, compatible maps between couples of bounded linear maps | ✅ | ✗ | `Interpolation/Property` |
+| Couples of K-spaces, Holmstedt's formula, the reiteration theorem and its endpoint cases | ✅ | ✗ | `Interpolation/Reiteration` |
 | Moduli compatible with a scheme, coincidence with the classical space | ✅ | ✗ | `Moduli` |
 | Block decompositions, projection schemes and dyadic blocks | ✅ | ✗ | `Decompositions/Blocks`, `Decompositions/Projection` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ | ✗ | `Decompositions/Synthesis`, `Decompositions/Atomic` |
