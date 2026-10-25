@@ -31,7 +31,7 @@ weighted sequence is not decreasing and Mathlib's version does not apply to it d
 These estimates are what makes Pietsch's quasi-norm `‖(n^(s - 1/q) E_{n-1})ₙ‖_q` equivalent to
 the dyadic one `‖(2^(ks) E_{2^k})ₖ‖_q`.
 
-Three sums over dyadic scales close the file:
+Three sums over dyadic scales follow:
 
 * **the dyadic sum** `∑_{j ∈ ℕ} min(2^j a, (2^j a)⁻¹) ≤ 4` for `a ∈ [0, ∞]`
   (`tsum_min_two_pow_le`), the sum behind the Hörmander condition for dyadic dilations, with
@@ -40,6 +40,13 @@ Three sums over dyadic scales close the file:
   `j ≥ N` (`tsum_le_tsum_add_sum_of_forall_ge_eq`);
 * **dyadic scales of an annulus**: a sequence bounded by `M` whose nonzero terms have `t / 2^j`
   in `[a, 2^N a]`, `a > 0`, sums to at most `(N + 1) M` (`tsum_le_of_dyadic_annulus`).
+
+The last section proves the **interpolation inequality for dyadic suprema** (Brezis–Mironescu;
+Johnsen–Sickel, Lemma 2): for `σ₁ < σ₀` and `0 < θ < 1`,
+`∑_j 2^(j(θσ₀ + (1-θ)σ₁)) a_j ≤ c (sup_j 2^(jσ₀) a_j)^θ (sup_j 2^(jσ₁) a_j)^(1-θ)`
+(`tsum_dyadicWeight_mul_le_iSup`, constant `dyadicInterpConst`). The series is split at the
+index where the two bounds `2^(jθδ) sup_j 2^(jσ₁) a_j` and `2^(-j(1-θ)δ) sup_j 2^(jσ₀) a_j` of
+its terms cross, `δ = σ₀ - σ₁`, and each part is a geometric series.
 -/
 
 @[expose] public section
@@ -324,5 +331,219 @@ theorem tsum_le_of_dyadic_annulus {u : ℕ → ℝ≥0∞} {M : ℝ≥0∞} {a t
         (hu _ (Nat.find_spec hex)).2⟩
   · push Not at hex
     simp [hex]
+
+/-! ### Interpolation of dyadic suprema -/
+
+/-- **Geometric partial sums**: `∑_{j < J} r^j ≤ r^J (r - 1)⁻¹` for `1 ≤ r < ∞`, from the
+geometric sum `(∑_{j < J} r^j)(r - 1) + 1 = r^J` (Mathlib's `geom_sum_mul_add` with
+`x = r - 1`). -/
+theorem sum_range_pow_le_pow_mul_inv {r : ℝ≥0∞} (hr1 : 1 ≤ r) (hr : r ≠ ∞) (J : ℕ) :
+    ∑ j ∈ range J, r ^ j ≤ r ^ J * (r - 1)⁻¹ := by
+  have h := geom_sum_mul_add (r - 1) J
+  rw [tsub_add_cancel_of_le hr1] at h
+  rw [← div_eq_mul_inv,
+    ENNReal.le_div_iff_mul_le (Or.inr (pow_ne_zero _ (one_pos.trans_le hr1).ne'))
+      (Or.inl (tsub_le_self.trans_lt hr.lt_top).ne)]
+  rw [← h]
+  exact le_self_add
+
+/-- The **constant of the dyadic interpolation inequality**,
+`c(δ, θ) = 2^(θδ) (2^(θδ) - 1)⁻¹ + (1 - 2^(-(1-θ)δ))⁻¹`
+(`ENNReal.tsum_dyadicWeight_mul_le_iSup`): the first summand bounds the geometric sum of the
+low indices, the second that of the high indices. -/
+noncomputable def dyadicInterpConst (δ θ : ℝ) : ℝ≥0∞ :=
+  2 ^ (θ * δ) * (2 ^ (θ * δ) - 1)⁻¹ + (1 - (2 : ℝ≥0∞) ^ (-((1 - θ) * δ)))⁻¹
+
+/-- The constant `c(δ, θ)` is finite for `δ > 0` and `0 < θ < 1`. -/
+theorem dyadicInterpConst_ne_top {δ θ : ℝ} (hδ : 0 < δ) (hθ0 : 0 < θ) (hθ1 : θ < 1) :
+    dyadicInterpConst δ θ ≠ ∞ := by
+  refine ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top
+    (ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofNat_ne_top) ?_,
+    one_sub_two_rpow_neg_inv_ne_top (_root_.mul_pos (sub_pos.2 hθ1) hδ)⟩
+  rw [ENNReal.inv_ne_top]
+  exact (tsub_pos_of_lt (ENNReal.one_lt_rpow one_lt_two (_root_.mul_pos hθ0 hδ))).ne'
+
+/-- The constant `c(δ, θ)` is at least `1`. -/
+theorem one_le_dyadicInterpConst (δ θ : ℝ) : 1 ≤ dyadicInterpConst δ θ :=
+  (one_le_one_sub_two_rpow_neg_inv _).trans le_add_self
+
+/-- `Y = Y^θ Y^(1-θ)` in `[0, ∞]` for `0 ≤ θ ≤ 1` (Mathlib's `ENNReal.rpow_add_of_nonneg`). -/
+theorem rpow_mul_rpow_one_sub {θ : ℝ} (hθ0 : 0 ≤ θ) (hθ1 : θ ≤ 1) (Y : ℝ≥0∞) :
+    Y ^ θ * Y ^ (1 - θ) = Y := by
+  rw [← ENNReal.rpow_add_of_nonneg _ _ hθ0 (sub_nonneg.2 hθ1), add_sub_cancel, ENNReal.rpow_one]
+
+variable {δ θ : ℝ} {X Y : ℝ≥0∞}
+
+/-- **The low-index bound**: if `Y ≤ 2^(-Kδ) X`, then `2^(Kθδ) Y ≤ X^θ Y^(1-θ)` for
+`0 ≤ θ ≤ 1`, since `Y^θ ≤ 2^(-Kθδ) X^θ`. -/
+theorem dyadicWeight_mul_le_rpow_mul_rpow (hθ0 : 0 ≤ θ) (hθ1 : θ ≤ 1) {K : ℕ}
+    (hK : Y ≤ dyadicWeight (-δ) K * X) :
+    dyadicWeight (θ * δ) K * Y ≤ X ^ θ * Y ^ (1 - θ) := by
+  have h1 : Y ^ θ ≤ dyadicWeight (-(θ * δ)) K * X ^ θ := by
+    calc Y ^ θ ≤ (dyadicWeight (-δ) K * X) ^ θ := ENNReal.rpow_le_rpow hK hθ0
+      _ = dyadicWeight (-(θ * δ)) K * X ^ θ := by
+          rw [ENNReal.mul_rpow_of_nonneg _ _ hθ0, dyadicWeight_rpow]
+          congr 2
+          ring
+  calc dyadicWeight (θ * δ) K * Y = dyadicWeight (θ * δ) K * Y ^ θ * Y ^ (1 - θ) := by
+        rw [mul_assoc, rpow_mul_rpow_one_sub hθ0 hθ1]
+    _ ≤ dyadicWeight (θ * δ) K * (dyadicWeight (-(θ * δ)) K * X ^ θ) * Y ^ (1 - θ) := by
+        gcongr
+    _ = X ^ θ * Y ^ (1 - θ) := by
+        rw [← mul_assoc, dyadicWeight_mul_neg_self, one_mul]
+
+/-- **The high-index bound**: if `2^(-Jδ) X ≤ Y`, then `2^(-J(1-θ)δ) X ≤ X^θ Y^(1-θ)` for
+`0 ≤ θ ≤ 1`, since `2^(-J(1-θ)δ) X^(1-θ) = (2^(-Jδ) X)^(1-θ) ≤ Y^(1-θ)`. -/
+theorem dyadicWeight_neg_mul_le_rpow_mul_rpow (hθ0 : 0 ≤ θ) (hθ1 : θ ≤ 1) {J : ℕ}
+    (hJ : dyadicWeight (-δ) J * X ≤ Y) :
+    dyadicWeight (-((1 - θ) * δ)) J * X ≤ X ^ θ * Y ^ (1 - θ) := by
+  have h1 : dyadicWeight (-((1 - θ) * δ)) J * X ^ (1 - θ) ≤ Y ^ (1 - θ) := by
+    calc dyadicWeight (-((1 - θ) * δ)) J * X ^ (1 - θ)
+        = (dyadicWeight (-δ) J * X) ^ (1 - θ) := by
+          rw [ENNReal.mul_rpow_of_nonneg _ _ (sub_nonneg.2 hθ1), dyadicWeight_rpow]
+          congr 2
+          ring
+      _ ≤ Y ^ (1 - θ) := ENNReal.rpow_le_rpow hJ (sub_nonneg.2 hθ1)
+  calc dyadicWeight (-((1 - θ) * δ)) J * X
+      = X ^ θ * (dyadicWeight (-((1 - θ) * δ)) J * X ^ (1 - θ)) := by
+        conv_lhs => rw [← rpow_mul_rpow_one_sub hθ0 hθ1 X]
+        ring
+    _ ≤ X ^ θ * Y ^ (1 - θ) := by gcongr
+
+/-- **The low indices**: if `b_j ≤ 2^(jθδ) Y` for every `j` and `Y ≤ 2^(-Kδ) X`, then
+`∑_{j ≤ K} b_j ≤ 2^(θδ) (2^(θδ) - 1)⁻¹ X^θ Y^(1-θ)` for `θ ∈ [0, 1]` and `δ ≥ 0`. The geometric
+sum is at most `2^((K+1)θδ) (2^(θδ) - 1)⁻¹` (`ENNReal.sum_range_pow_le_pow_mul_inv`), and
+`2^(Kθδ) Y ≤ X^θ Y^(1-θ)` (`ENNReal.dyadicWeight_mul_le_rpow_mul_rpow`). -/
+theorem sum_range_succ_le_of_le_dyadicWeight (hδ : 0 ≤ δ) (hθ0 : 0 ≤ θ) (hθ1 : θ ≤ 1)
+    (hlow : ∀ j, b j ≤ dyadicWeight (θ * δ) j * Y) {K : ℕ}
+    (hK : Y ≤ dyadicWeight (-δ) K * X) :
+    ∑ j ∈ range (K + 1), b j ≤
+      2 ^ (θ * δ) * (2 ^ (θ * δ) - 1)⁻¹ * (X ^ θ * Y ^ (1 - θ)) := by
+  have hr1 : 1 ≤ (2 : ℝ≥0∞) ^ (θ * δ) := (ENNReal.rpow_zero (x := 2)).symm.le.trans
+    (ENNReal.rpow_le_rpow_of_exponent_le one_le_two (mul_nonneg hθ0 hδ))
+  have hr : (2 : ℝ≥0∞) ^ (θ * δ) ≠ ∞ :=
+    ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofNat_ne_top
+  calc ∑ j ∈ range (K + 1), b j
+      ≤ ∑ j ∈ range (K + 1), ((2 : ℝ≥0∞) ^ (θ * δ)) ^ j * Y :=
+        Finset.sum_le_sum fun j _ => (hlow j).trans_eq (by rw [dyadicWeight_eq_pow])
+    _ = (∑ j ∈ range (K + 1), ((2 : ℝ≥0∞) ^ (θ * δ)) ^ j) * Y := (Finset.sum_mul _ _ _).symm
+    _ ≤ ((2 : ℝ≥0∞) ^ (θ * δ)) ^ (K + 1) * (2 ^ (θ * δ) - 1)⁻¹ * Y := by
+        gcongr
+        exact sum_range_pow_le_pow_mul_inv hr1 hr _
+    _ = 2 ^ (θ * δ) * (2 ^ (θ * δ) - 1)⁻¹ * (dyadicWeight (θ * δ) K * Y) := by
+        rw [dyadicWeight_eq_pow, pow_succ]
+        ring
+    _ ≤ _ := mul_le_mul' le_rfl (dyadicWeight_mul_le_rpow_mul_rpow hθ0 hθ1 hK)
+
+/-- **The high indices**: if `b_j ≤ 2^(-j(1-θ)δ) X` for every `j` and `2^(-Jδ) X ≤ Y`, then
+`∑_{i} b_{i+J} ≤ (1 - 2^(-(1-θ)δ))⁻¹ X^θ Y^(1-θ)` for `θ ∈ [0, 1]`: the geometric series
+`∑_i 2^(-i(1-θ)δ)` (`ENNReal.tsum_dyadicWeight_neg`) times
+`2^(-J(1-θ)δ) X ≤ X^θ Y^(1-θ)` (`ENNReal.dyadicWeight_neg_mul_le_rpow_mul_rpow`). -/
+theorem tsum_add_le_of_le_dyadicWeight_neg (hθ0 : 0 ≤ θ) (hθ1 : θ ≤ 1)
+    (hhigh : ∀ j, b j ≤ dyadicWeight (-((1 - θ) * δ)) j * X) {J : ℕ}
+    (hJ : dyadicWeight (-δ) J * X ≤ Y) :
+    ∑' i, b (i + J) ≤ (1 - (2 : ℝ≥0∞) ^ (-((1 - θ) * δ)))⁻¹ * (X ^ θ * Y ^ (1 - θ)) := by
+  calc ∑' i, b (i + J)
+      ≤ ∑' i, dyadicWeight (-((1 - θ) * δ)) i * (dyadicWeight (-((1 - θ) * δ)) J * X) :=
+        ENNReal.tsum_le_tsum fun i => (hhigh (i + J)).trans_eq (by
+          rw [dyadicWeight_add_nat, mul_assoc])
+    _ = (1 - (2 : ℝ≥0∞) ^ (-((1 - θ) * δ)))⁻¹ * (dyadicWeight (-((1 - θ) * δ)) J * X) := by
+        rw [ENNReal.tsum_mul_right, tsum_dyadicWeight_neg]
+    _ ≤ _ := mul_le_mul' le_rfl (dyadicWeight_neg_mul_le_rpow_mul_rpow hθ0 hθ1 hJ)
+
+/-- For `δ > 0`, `X < ∞` and `Y > 0` there is `J` with `2^(-Jδ) X ≤ Y`, since
+`2^(-Jδ) X → 0` (Mathlib's `ENNReal.tendsto_pow_atTop_nhds_zero_of_lt_one`). -/
+theorem exists_dyadicWeight_neg_mul_le (hδ : 0 < δ) (hX : X ≠ ∞) (hY : Y ≠ 0) :
+    ∃ J : ℕ, dyadicWeight (-δ) J * X ≤ Y := by
+  have h : Tendsto (fun J : ℕ => dyadicWeight (-δ) J * X) atTop (nhds 0) := by
+    simp_rw [dyadicWeight_eq_pow]
+    simpa using ENNReal.Tendsto.mul_const
+      (ENNReal.tendsto_pow_atTop_nhds_zero_of_lt_one (two_rpow_neg_lt_one hδ)) (Or.inr hX)
+  obtain ⟨J, hJ⟩ := ((tendsto_order.1 h).2 Y (pos_iff_ne_zero.2 hY)).exists
+  exact ⟨J, hJ.le⟩
+
+/-- **Splitting a series into low and high indices**: with `δ > 0`, `0 < θ < 1`, `X < ∞` and
+`Y > 0`, if `b_j ≤ 2^(jθδ) Y` and `b_j ≤ 2^(-j(1-θ)δ) X` for every `j`, then
+`∑_j b_j ≤ c(δ, θ) X^θ Y^(1-θ)`. The series is split at the least `J` with `2^(-Jδ) X ≤ Y`
+(`ENNReal.exists_dyadicWeight_neg_mul_le`): the indices `j < J` are bounded by
+`ENNReal.sum_range_succ_le_of_le_dyadicWeight`, the indices `j ≥ J` by
+`ENNReal.tsum_add_le_of_le_dyadicWeight_neg`. -/
+theorem tsum_le_dyadicInterpConst_of_ne (hδ : 0 < δ) (hθ0 : 0 < θ) (hθ1 : θ < 1)
+    (hX : X ≠ ∞) (hY : Y ≠ 0) (hlow : ∀ j, b j ≤ dyadicWeight (θ * δ) j * Y)
+    (hhigh : ∀ j, b j ≤ dyadicWeight (-((1 - θ) * δ)) j * X) :
+    ∑' j, b j ≤ dyadicInterpConst δ θ * (X ^ θ * Y ^ (1 - θ)) := by
+  classical
+  have hex := exists_dyadicWeight_neg_mul_le hδ hX hY
+  rw [← ENNReal.summable.sum_add_tsum_nat_add' (k := Nat.find hex), dyadicInterpConst, add_mul]
+  refine add_le_add ?_
+    (tsum_add_le_of_le_dyadicWeight_neg hθ0.le hθ1.le hhigh (Nat.find_spec hex))
+  rcases Nat.eq_zero_or_pos (Nat.find hex) with h0 | hpos
+  · rw [h0, Finset.sum_range_zero]
+    exact zero_le
+  obtain ⟨K, hK⟩ := Nat.exists_eq_add_of_lt hpos
+  rw [hK, zero_add]
+  refine sum_range_succ_le_of_le_dyadicWeight hδ.le hθ0.le hθ1.le hlow ?_
+  have := Nat.find_min hex (show K < Nat.find hex by omega)
+  rw [not_le] at this
+  exact this.le
+
+/-- **Splitting a series into low and high indices**, for all `X, Y ∈ [0, ∞]`: with `δ > 0` and
+`0 < θ < 1`, if `b_j ≤ 2^(jθδ) Y` and `b_j ≤ 2^(-j(1-θ)δ) X` for every `j`, then
+`∑_j b_j ≤ c(δ, θ) X^θ Y^(1-θ)`. For `Y = 0` every `b_j` is `0`; for `X = ∞` and `Y > 0` the
+right side is `∞`; otherwise this is `ENNReal.tsum_le_dyadicInterpConst_of_ne`. -/
+theorem tsum_le_dyadicInterpConst (hδ : 0 < δ) (hθ0 : 0 < θ) (hθ1 : θ < 1)
+    (hlow : ∀ j, b j ≤ dyadicWeight (θ * δ) j * Y)
+    (hhigh : ∀ j, b j ≤ dyadicWeight (-((1 - θ) * δ)) j * X) :
+    ∑' j, b j ≤ dyadicInterpConst δ θ * (X ^ θ * Y ^ (1 - θ)) := by
+  rcases eq_or_ne Y 0 with rfl | hY
+  · have hb : ∀ j, b j = 0 := fun j => le_antisymm ((hlow j).trans_eq (mul_zero _)) zero_le
+    simp [hb]
+  rcases eq_or_ne X ∞ with rfl | hX
+  · have h1 : Y ^ (1 - θ) ≠ 0 := (ENNReal.rpow_pos_of_nonneg (pos_iff_ne_zero.2 hY)
+      (sub_nonneg.2 hθ1.le)).ne'
+    rw [ENNReal.top_rpow_of_pos hθ0, ENNReal.top_mul h1,
+      ENNReal.mul_top (one_pos.trans_le (one_le_dyadicInterpConst δ θ)).ne']
+    exact le_top
+  exact tsum_le_dyadicInterpConst_of_ne hδ hθ0 hθ1 hX hY hlow hhigh
+
+/-- **The interpolation inequality for dyadic suprema** (Brezis–Mironescu 2001; Johnsen–Sickel
+2007, Lemma 2 for `q = 1`): for `σ₁ < σ₀`, `0 < θ < 1` and every sequence `a` in `[0, ∞]`,
+
+`∑_j 2^(j(θσ₀ + (1-θ)σ₁)) a_j ≤ c(σ₀ - σ₁, θ) (sup_j 2^(jσ₀) a_j)^θ (sup_j 2^(jσ₁) a_j)^(1-θ)`
+
+with `c = ENNReal.dyadicInterpConst`. With `δ = σ₀ - σ₁`, every term is at most
+`2^(jθδ) sup_j 2^(jσ₁) a_j` and at most `2^(-j(1-θ)δ) sup_j 2^(jσ₀) a_j`
+(`ENNReal.tsum_le_dyadicInterpConst`). -/
+theorem tsum_dyadicWeight_mul_le_iSup {σ₀ σ₁ : ℝ} (hσ : σ₁ < σ₀) (hθ0 : 0 < θ) (hθ1 : θ < 1)
+    (a : ℕ → ℝ≥0∞) :
+    ∑' j, dyadicWeight (θ * σ₀ + (1 - θ) * σ₁) j * a j ≤
+      dyadicInterpConst (σ₀ - σ₁) θ * (⨆ j, dyadicWeight σ₀ j * a j) ^ θ *
+        (⨆ j, dyadicWeight σ₁ j * a j) ^ (1 - θ) := by
+  rw [mul_assoc]
+  refine tsum_le_dyadicInterpConst (sub_pos.2 hσ) hθ0 hθ1 (fun j => ?_) (fun j => ?_)
+  · calc dyadicWeight (θ * σ₀ + (1 - θ) * σ₁) j * a j
+        = dyadicWeight (θ * (σ₀ - σ₁)) j * (dyadicWeight σ₁ j * a j) := by
+          rw [← mul_assoc, ← dyadicWeight_add]
+          congr 2
+          ring
+      _ ≤ _ := mul_le_mul' le_rfl (le_iSup (fun j => dyadicWeight σ₁ j * a j) j)
+  · calc dyadicWeight (θ * σ₀ + (1 - θ) * σ₁) j * a j
+        = dyadicWeight (-((1 - θ) * (σ₀ - σ₁))) j * (dyadicWeight σ₀ j * a j) := by
+          rw [← mul_assoc, ← dyadicWeight_add]
+          congr 2
+          ring
+      _ ≤ _ := mul_le_mul' le_rfl (le_iSup (fun j => dyadicWeight σ₀ j * a j) j)
+
+/-- **The interpolation inequality for dyadic suprema in `ℓ_q`** (Brezis–Mironescu 2001;
+Johnsen–Sickel 2007, Lemma 2): for `1 ≤ q ≤ ∞`, `σ₁ < σ₀` and `0 < θ < 1`,
+`‖(2^(j(θσ₀ + (1-θ)σ₁)) a_j)_j‖_{ℓ_q} ≤
+  c(σ₀ - σ₁, θ) (sup_j 2^(jσ₀) a_j)^θ (sup_j 2^(jσ₁) a_j)^(1-θ)`, since the `ℓ_q` norm is at
+most the sum (`ENNReal.lqNorm_le_lqNorm_one`). -/
+theorem lqNorm_dyadicWeight_mul_le_iSup {q : ℝ≥0∞} (hq : 1 ≤ q) {σ₀ σ₁ : ℝ} (hσ : σ₁ < σ₀)
+    (hθ0 : 0 < θ) (hθ1 : θ < 1) (a : ℕ → ℝ≥0∞) :
+    lqNorm q (fun j => dyadicWeight (θ * σ₀ + (1 - θ) * σ₁) j * a j) ≤
+      dyadicInterpConst (σ₀ - σ₁) θ * (⨆ j, dyadicWeight σ₀ j * a j) ^ θ *
+        (⨆ j, dyadicWeight σ₁ j * a j) ^ (1 - θ) :=
+  (lqNorm_le_lqNorm_one hq _).trans (tsum_dyadicWeight_mul_le_iSup hσ hθ0 hθ1 a)
 
 end ENNReal

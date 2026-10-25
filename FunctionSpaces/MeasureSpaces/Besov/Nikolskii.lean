@@ -25,7 +25,11 @@ library.  The property is stated against the sup norm only; the general
 `‖a‖_r ≤ C' n^(D (1/p - 1/r)) ‖a‖_p`,   `p ≤ r`
 
 follows by interpolation, `‖a‖_r ≤ ‖a‖_∞^(1 - p/r) ‖a‖_p^(p/r)`
-(`HasNikolskii.eLpNorm_le`).  The exponent `D (1/p - 1/r)` is `nikolskiiExponent D p r`.
+(`HasNikolskii.eLpNorm_le`).  The exponent `D (1/p - 1/r)` is `nikolskiiExponent D p r`; for
+`D > 0`, `1 ≤ p < ∞` and `r > 0` it is positive iff `p < r` and nonnegative iff `p ≤ r`
+(`nikolskiiExponent_pos`, `lt_of_nikolskiiExponent_pos`, `le_of_nikolskiiExponent_nonneg`).
+With `θ = p₀/p₁` and `s₀ - s₁ = D(1/p₀ - 1/p₁)`, `θ s₀ + (1 - θ)(s₀ - D/p₀) = s₁`
+(`nikolskiiExponent_interp_eq`).
 
 In the language of `ApproximationSpaces.Lift` this is a lifting bound for the inclusion
 `L_r ↪ L_p` and the scheme in `L_p` (`HasNikolskii.liftBound`): the approximant `a` in `L_p` is
@@ -61,6 +65,53 @@ theorem nikolskiiExponent_nonneg {D : ℝ} (hD : 0 ≤ D) {p r : ℝ≥0∞} (hp
 theorem one_le_of_nikolskiiExponent_lt {D : ℝ} (hD : 0 ≤ D) {p r : ℝ≥0∞} (hp : 1 ≤ p)
     (hpr : p ≤ r) {m : ℕ} (hm : nikolskiiExponent D p r < m) : 1 ≤ m :=
   Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 ((nikolskiiExponent_nonneg hD hp hpr).trans_lt hm)).ne'
+
+/-- **The Nikolskii exponent is positive** for `D > 0` and `1 ≤ p < r ≤ ∞`, since then
+`1/r < 1/p`. -/
+theorem nikolskiiExponent_pos {D : ℝ} (hD : 0 < D) {p r : ℝ≥0∞} (hp : 1 ≤ p) (hpr : p < r) :
+    0 < nikolskiiExponent D p r := by
+  unfold nikolskiiExponent
+  refine mul_pos hD (sub_pos.2 ?_)
+  have hp0 : 0 < p.toReal :=
+    ENNReal.toReal_pos (zero_lt_one.trans_le hp).ne' (hpr.trans_le le_top).ne
+  rcases eq_or_ne r ∞ with rfl | hr
+  · simpa using hp0
+  exact inv_strictAnti₀ hp0 (ENNReal.toReal_strict_mono hr hpr)
+
+/-- **A positive Nikolskii exponent forces `p < r`**: for `D ≥ 0`, `p < ∞` and `r > 0`, if
+`D(1/p - 1/r) > 0`, then `p < r`; for `r ≤ p` the exponent is `≤ 0`. -/
+theorem lt_of_nikolskiiExponent_pos {D : ℝ} (hD : 0 ≤ D) {p r : ℝ≥0∞} (hp : p ≠ ∞) (hr : 0 < r)
+    (h : 0 < nikolskiiExponent D p r) : p < r := by
+  by_contra hrp
+  rw [not_lt] at hrp
+  have hr' : r ≠ ∞ := ne_top_of_le_ne_top hp hrp
+  have hle : p.toReal⁻¹ ≤ r.toReal⁻¹ :=
+    inv_anti₀ (ENNReal.toReal_pos hr.ne' hr') (ENNReal.toReal_mono hp hrp)
+  unfold nikolskiiExponent at h
+  nlinarith
+
+/-- **A nonnegative Nikolskii exponent forces `p ≤ r`**: for `D > 0`, `p < ∞` and `r > 0`, if
+`D(1/p - 1/r) ≥ 0`, then `p ≤ r`; for `r < p` the exponent is `< 0`. -/
+theorem le_of_nikolskiiExponent_nonneg {D : ℝ} (hD : 0 < D) {p r : ℝ≥0∞} (hp : p ≠ ∞)
+    (hr : 0 < r) (h : 0 ≤ nikolskiiExponent D p r) : p ≤ r := by
+  by_contra hrp
+  rw [not_le] at hrp
+  have hr' : r ≠ ∞ := ne_top_of_lt hrp
+  have hlt : p.toReal⁻¹ < r.toReal⁻¹ :=
+    inv_strictAnti₀ (ENNReal.toReal_pos hr.ne' hr') (ENNReal.toReal_strict_mono hp hrp)
+  unfold nikolskiiExponent at h
+  nlinarith
+
+/-- **The interpolation identity of the Nikolskii exponent**: for `0 < p₀ < ∞`, `θ = p₀/p₁` and
+`s₀ - s₁ = D(1/p₀ - 1/p₁)`, `θ s₀ + (1 - θ)(s₀ - D/p₀) = s₁`, since `θ/p₀ = 1/p₁`. -/
+theorem nikolskiiExponent_interp_eq {D s₀ s₁ : ℝ} {p₀ p₁ : ℝ≥0∞} (hp₀0 : p₀ ≠ 0) (hp₀ : p₀ ≠ ∞)
+    (hs : s₀ - s₁ = nikolskiiExponent D p₀ p₁) :
+    p₀.toReal / p₁.toReal * s₀ + (1 - p₀.toReal / p₁.toReal) * (s₀ - D / p₀.toReal) = s₁ := by
+  have h0 : p₀.toReal ≠ 0 := (ENNReal.toReal_pos hp₀0 hp₀).ne'
+  unfold nikolskiiExponent at hs
+  rw [show s₁ = s₀ - D * (p₀.toReal⁻¹ - p₁.toReal⁻¹) by linarith]
+  field_simp
+  ring
 
 /-- `α(D, p, ∞) = D/p`. -/
 @[simp]

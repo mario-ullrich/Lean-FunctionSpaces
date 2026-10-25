@@ -80,9 +80,11 @@ public import FunctionSpaces.Rd.TriebelLizorkin.SquareFunction
 public import FunctionSpaces.Rd.Sobolev.DerivativeKernels
 public import FunctionSpaces.Rd.Sobolev.SobolevTriebelLizorkin
 public import FunctionSpaces.Rd.Sobolev.SobolevEmbedding
+public import FunctionSpaces.Rd.Sobolev.CriticalSobolevEmbedding
 public import FunctionSpaces.Rd.Sobolev.SobolevJets
 public import FunctionSpaces.Rd.BesselPotentials.UniformSchwartzFamilies
 public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialLifting
+public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialEmbedding
 public import FunctionSpaces.Rd.Interpolation.BesovInterpolation
 public import FunctionSpaces.Rd.Interpolation.BesselPotentialInterpolation
 public import FunctionSpaces.Rd.Interpolation.SobolevInterpolation
@@ -437,6 +439,10 @@ and the theorems that their characterisations agree. The library builds on
   Besov embeddings into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions for
   `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with named
   constants.
+* `FunctionSpaces.Rd.Sobolev.CriticalSobolevEmbedding`: the critical embedding
+  `F^α_{p₀,∞} ↪ L_{p₁}` for `α = n(1/p₀ - 1/p₁)`, Jawerth's embedding
+  `F^{s₀}_{p₀,∞} ↪ F^{s₁}_{p₁,q}`, and the critical Sobolev embedding `W^m_p ↪ L_r` for
+  `1/r = 1/p - m/n`, `1 < p < ∞`, with named constants (Johnsen–Sickel).
 * `FunctionSpaces.Rd.Sobolev.SobolevJets`: the value–derivative jets of `W^1_p(O)` and `W^1_p(ℝ^d)`
   as complex linear subspaces of `L_p × L_p^n`, the uniqueness of their derivatives, linear maps
   into the jets, and the restriction of jets as a bounded linear operator.
@@ -450,6 +456,8 @@ and the theorems that their characterisations agree. The library builds on
   Calderón–Zygmund families of the Bessel kernels of the Littlewood–Paley kernels,
   `H^{s,p} ∩ L_p = F^s_{p,2}` for real `s` and `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, for `1 < p < ∞`
   with existential constants, and `W^m_p = H^{m,p}`.
+* `FunctionSpaces.Rd.BesselPotentials.BesselPotentialEmbedding`: the Sobolev embedding
+  `H^{s,p} ↪ L_r` for `1 < p ≤ r < ∞` and `s ≥ n(1/p - 1/r)`, also in Mathlib's bundled space.
 * `FunctionSpaces.Rd.Interpolation.BesovInterpolation`: the band-limited approximation spaces and
   the Besov spaces by differences as real interpolation spaces,
   `(B^{s₀}_{p,q₀}, B^{s₁}_{p,q₁})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` and

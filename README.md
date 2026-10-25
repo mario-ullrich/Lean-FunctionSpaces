@@ -368,8 +368,19 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `‖ψ_j ⋆ f‖_r ≤ N_p^(1-p/r) 2^(jn(1/p - 1/r)) ‖ψ_j ⋆ f‖_p` for the Littlewood–Paley blocks
   (`Rd.eLpNorm_blockFun_le_nikolskii`, `Rd.nikolskiiBlockConst`) and the bound of
   `‖f‖_{F^m_{p,2}}` by `M_f`. The constants are named formulas in norms and Schwartz seminorms
-  of fixed kernels, proved finite. The critical case `1/r = 1/p - m/n` with `r < ∞` (Sobolev's
-  inequality) is not covered.
+  of fixed kernels, proved finite. The critical case follows Johnsen–Sickel: for `n ≥ 1` and
+  `1 ≤ p₀ < p₁ < ∞` every `f ∈ F^{n(1/p₀ - 1/p₁)}_{p₀,∞}(V)` agrees almost everywhere with some
+  `g ∈ L_{p₁}(V)` with `‖g‖_{p₁} ≤ K_{V,p₀,p₁} ‖f‖_{F^{n(1/p₀ - 1/p₁)}_{p₀,∞}}`
+  (`Rd.exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top`, `Rd.criticalEmbeddingConst`), and
+  Jawerth's embedding `F^{s₀}_{p₀,∞} ↪ F^{s₁}_{p₁,q}` holds for `s₁ ≥ 0`,
+  `s₀ - s₁ = n(1/p₀ - 1/p₁)` and every `q`
+  (`Rd.exists_triebelLizorkinNorm_le_of_nikolskiiExponent`).
+  Hence Sobolev's inequality: for `1 < p < ∞`, `m ≥ 1`, `r < ∞` and `1/r = 1/p - m/n`, `f`
+  agrees almost everywhere with some `u ∈ L_r(V)` with `‖u‖_r ≤ K_{V,p,r} M_f`
+  (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_of_eq`, `Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`).
+  For `n ≥ 1`, `1 < p ≤ r < ∞` and real `s ≥ n(1/p - 1/r)`, every element of Mathlib's Bessel
+  potential space `H^{s,p}(V)` is a function in `L_r(V)`
+  (`Rd.exists_memLp_eq_of_memSobolev_bessel`, `Rd.exists_enorm_le_of_besselPotentialSpace`).
 
 **Domains, traces and manifolds** ([domains, traces and manifolds](docs/DomainsTraces.md))
 
@@ -532,7 +543,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Besov spaces on `ℝ^d`**](docs/Rd.md): band-limited approximation, Littlewood–Paley blocks, differences, local means, kernel majorants, atoms, invariance under changes of variables, Besov spaces as interpolation spaces | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, Triebel–Lizorkin spaces as interpolation spaces | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings including the critical case, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
 | [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph and bounded Lipschitz domains, closures of convex ones, closed balls, the closed cube and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary or with corners, smooth domains | ✅ | ✗ |
 
 Lean: ✅ every file proved without `sorry` · 🟡 some statement still `sorry` · ⬜ planned.
@@ -576,8 +587,9 @@ that library builds itself.
   elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.
 * **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and their ball means and atoms on the
   torus.
-* **Sobolev spaces**: Sobolev spaces on the torus for all `p` through distributions, the critical
-  Sobolev embedding, Mihlin multipliers and `H^{s,p}` for `s < 0`.
+* **Sobolev spaces**: Sobolev spaces on the torus for all `p` through distributions, Mihlin
+  multipliers and `H^{s,p}` for `s < 0`; the Jawerth–Franke embeddings with Besov targets,
+  Hardy–Littlewood–Sobolev for Riesz potentials, `p = n`.
 * **Higher smoothness**: splines on domains; for the Daubechies wavelets the sharp `L_p`
   exponents of the scaling functions, Hölder exponents beyond D4, and `ℝ^d`.
 * **The quasi-Banach range** `0 < p, q < 1`, the setting of nonlinear `n`-term approximation.
@@ -645,6 +657,9 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * J. Bergh, J. Löfström, *Interpolation Spaces. An Introduction*, Grundlehren der
   mathematischen Wissenschaften **223**, Springer-Verlag, 1976. Real interpolation and the
   K-functional.
+* H. Brezis, P. Mironescu, *Gagliardo–Nirenberg, composition and products in fractional
+  Sobolev spaces*, J. Evol. Equ. **1** (2001), no. 4, 387–404. The interpolation inequality
+  for dyadic suprema.
 * A. P. Calderón, *Lebesgue spaces of differentiable functions and distributions*, in: Partial
   Differential Equations, Proc. Sympos. Pure Math. **4**, American Mathematical Society, 1961,
   33–49. Sobolev spaces as Bessel potential spaces, `W^m_p = H^{m,p}`.
@@ -677,6 +692,9 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   Springer-Verlag, 1969. The area formula.
 * C. Fefferman, E. M. Stein, *Some maximal inequalities*, Amer. J. Math. **93** (1971), no. 1,
   107–115. The vector-valued maximal inequality.
+* J. Franke, *On the spaces F^s_{pq} of Triebel–Lizorkin type: pointwise multipliers and
+  spaces on domains*, Math. Nachr. **125** (1986), no. 1, 29–68. The embedding
+  `B^{s₀}_{p₀,p₁} ↪ F^{s₁}_{p₁,q}`, among the goals in *What is left to do*.
 * L. Grafakos, *Classical Fourier Analysis*, 3rd ed., Graduate Texts in Mathematics **249**,
   Springer, 2014. Littlewood–Paley theory, vector-valued singular integrals and Marcinkiewicz
   interpolation.
@@ -686,6 +704,8 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   regularity of wavelets and subdivisions*, SIAM J. Matrix Anal. Appl. **37** (2016), no. 1,
   18–52, [arXiv:1502.01192](https://arxiv.org/abs/1502.01192). Hölder exponents of the
   Daubechies wavelets of higher order.
+* L. I. Hedberg, *On certain convolution inequalities*, Proc. Amer. Math. Soc. **36** (1972),
+  no. 2, 505–510. Sobolev's inequality through Riesz potentials and the maximal function.
 * E. Hernández, G. Weiss, *A First Course on Wavelets*, Studies in Advanced Mathematics, CRC
   Press, 1996. Multiresolution analyses.
 * R. Hiptmair, D. Pauly, E. Schulz, *Traces for Hilbert complexes*, J. Funct. Anal. **284**
@@ -695,6 +715,11 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   Holmstedt's formula for the K-functional of a couple of K-spaces.
 * L. Hörmander, *Estimates for translation invariant operators in L^p spaces*, Acta Math.
   **104** (1960), no. 1–2, 93–140. The Hörmander condition.
+* B. Jawerth, *Some observations on Besov and Lizorkin–Triebel spaces*, Math. Scand. **40**
+  (1977), 94–104. The embedding `F^{s₀}_{p₀,∞} ↪ F^{s₁}_{p₁,q}`.
+* J. Johnsen, W. Sickel, *A direct proof of Sobolev embeddings for quasi-homogeneous
+  Lizorkin–Triebel spaces with mixed norms*, J. Funct. Spaces Appl. **5** (2007), no. 2,
+  183–198. The direct proof of the critical embedding from the Littlewood–Paley blocks.
 * J. Marcinkiewicz, *Sur l'interpolation d'opérations*, C. R. Acad. Sci. Paris **208** (1939),
   1272–1273. The interpolation theorem.
 * W. McLean, *Strongly Elliptic Systems and Boundary Integral Equations*, Cambridge University
@@ -741,3 +766,6 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   operator and the Sobolev exponent.
 * J. Vybíral, *Function spaces with dominating mixed smoothness*, Dissertationes Math. **436**
   (2006), 1–73. Tensor Littlewood–Paley decompositions of spaces of dominating mixed smoothness.
+* J. Vybíral, *A new proof of the Jawerth–Franke embedding*, Rev. Mat. Complut. **21** (2008),
+  no. 1, 75–82. The Jawerth–Franke embeddings with a Besov space on one side, among the goals
+  in *What is left to do*.

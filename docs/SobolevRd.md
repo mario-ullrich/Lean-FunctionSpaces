@@ -18,6 +18,9 @@ Littlewood–Paley blocks are continuous and satisfy the Nikolskii inequality, w
 embeddings of `B^s_{p,q}` into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions
 for `s > n/p`, and with `W^m_p ⊆ F^m_{p,2}` the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b`,
 all with named constants: formulas in norms and Schwartz seminorms of fixed kernels, proved finite.
+An interpolation inequality for dyadic suprema (Brezis–Mironescu) adds the critical case: Jawerth's
+embedding `F^{s₀}_{p₀,∞} ↪ F^{s₁}_{p₁,q}`, `F^{n(1/p₀ - 1/p₁)}_{p₀,∞} ↪ L_{p₁}` and Sobolev's
+inequality `W^m_p ↪ L_r` for `1/r = 1/p - m/n`, `1 < p < ∞`, following Johnsen–Sickel.
 For the Bessel potential spaces, uniform Schwartz families stay uniform under continuous linear maps
 of the Schwartz space, and the Bessel potential maps the dilates of every Schwartz function to
 multiples of the dilates of its Bessel kernels; when the Fourier transform of the function lives in
@@ -165,8 +168,26 @@ project, with the decisions behind their form.
   particular every `f ∈ W^m_p(V)` has these representatives
   (`Rd.exists_memLp_ae_eq_of_memSobolev`, `Rd.exists_boundedContinuous_ae_eq_of_memSobolev`).
   The constants are named formulas in norms and Schwartz seminorms of fixed kernels, proved
-  finite (`Rd.besovEmbeddingConst_ne_top`, `Rd.sobolevToTLConst_ne_top`). The critical case
-  `1/r = 1/p - m/n` with `r < ∞` (Sobolev's inequality) is not covered.
+  finite (`Rd.besovEmbeddingConst_ne_top`, `Rd.sobolevToTLConst_ne_top`).
+* **The critical Sobolev embedding.** Let `dim V = n ≥ 1`, `1 ≤ p₀ < p₁ < ∞`, `θ = p₀/p₁` and
+  `α = n(1/p₀ - 1/p₁)`. At every point, `∑_j 2^(js₁) |(ψ_j ⋆ f)(x)|` with `s₀ - s₁ = α` is at most
+  `c G(x)^θ (N_{p₀} ‖(2^(js₀) ‖ψ_j ⋆ f‖_{p₀})_j‖_{ℓ_∞})^(1-θ)` with
+  `G(x) = sup_j 2^(js₀) |(ψ_j ⋆ f)(x)|`
+  (`Rd.tsum_dyadicWeight_enorm_blockFun_le`), by the interpolation inequality for dyadic suprema
+  (`ENNReal.tsum_dyadicWeight_mul_le_iSup`) and the Nikolskii inequality; integrated, its `L_{p₁}`
+  norm is at most `K_{V,p₀,p₁} ‖f‖_{F^{s₀}_{p₀,∞}}`
+  (`Rd.eLpNorm_tsum_dyadicWeight_enorm_blockFun_le`,
+  `Rd.criticalEmbeddingConst`). Hence every `f ∈ F^α_{p₀,q}`, `1 ≤ q ≤ ∞`, has a representative
+  `g ∈ L_{p₁}(V)` with `‖g‖_{p₁} ≤ K_{V,p₀,p₁} ‖f‖_{F^α_{p₀,∞}}`
+  (`Rd.exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top`,
+  `Rd.exists_memLp_ae_eq_of_memTriebelLizorkin`),
+  for `p₀ = 1` as well, and Jawerth's embedding `F^{s₀}_{p₀,∞} ↪ F^{s₁}_{p₁,q}` holds for `s₁ ≥ 0`
+  and every `q` (`Rd.exists_triebelLizorkinNorm_le_of_nikolskiiExponent`). For `1 < p < ∞`, `r < ∞`
+  and `m = n(1/p - 1/r) ≥ 1`, `f` with weak derivatives `g_α ∈ L_p(V)` of order `m` has a
+  representative `u ∈ L_r(V)` with `‖u‖_r ≤ K_{V,p,r} M_f`
+  (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_of_eq`), and `W^m_p(V) ↪ L_r(V)` for every
+  `p ≤ r < ∞` with `n(1/p - 1/r) ≤ m` (`Rd.exists_memLp_ae_eq_of_memSobolev_of_le`,
+  `Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`).
 * **Bessel kernels.** A family `(G_j)` of Schwartz functions is uniformly Schwartz for some
   bounds iff `{G_j}` is a bounded set of the Schwartz space
   (`Rd.exists_isUniformSchwartz_iff_isVonNBounded`). If `(G_j)` is a uniform Schwartz family and
@@ -208,6 +229,9 @@ project, with the decisions behind their form.
   The kernels are the Bessel potentials of the blocks and of the synthesis kernels, dilates of
   Bessel kernels up to `2^{±js}` (`Rd.besselBase`), which form Calderón–Zygmund families
   (`Rd.exists_isCZFamily_besselBase_psiBase`, `Rd.exists_isCZFamily_besselBase_psiDualBase`).
+  For `p ≤ r < ∞` and real `s ≥ n(1/p - 1/r)`, every element of `H^{s,p}(V)` is a function in
+  `L_r(V)` (`Rd.exists_memLp_eq_of_memSobolev_bessel`), with `‖g‖_r ≤ C ‖F‖_{H^{s,p}}` in Mathlib's
+  bundled space (`Rd.exists_enorm_le_of_besselPotentialSpace`).
 * **Sobolev spaces and real interpolation.** Let `dim V ≥ 1` and `1 < p < ∞`. The grid norm
   of `W^m_p(V)` is `‖f‖_p + inf ∑_α ‖g_α‖_p`, the infimum over the families of weak derivatives
   `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f ∈ L_p(V)` along the basis of `Rd.gridBasis`
@@ -247,11 +271,13 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Fourier transforms of iterated derivatives, the derivative symbols and kernels, the block `ψ_1` as a sum of derivatives of order `m`, and the Calderón–Zygmund families of the dilated derivative kernels and of the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels | ✅ | ✗ | `Rd/Sobolev/DerivativeKernels` |
 | `W^m_p = F^m_{p,2}` for `1 < p < ∞` with named constants in both directions: the blocks as convolutions with the weak derivatives, the derivatives of the reproducing sums and their limit, the Besov sandwich `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}` and `W^m_2 = B^m_{2,2}` for `m ≥ 1` | ✅ | ✗ | `Rd/Sobolev/SobolevTriebelLizorkin` |
 | Continuity of convolutions of integrable bounded kernels with `L_p` functions, the Nikolskii inequality for the Littlewood–Paley blocks, almost everywhere convergence of the block series, the Besov embeddings into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions for `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with named constants | ✅ | ✗ | `Rd/Sobolev/SobolevEmbedding` |
+| The Nikolskii inequality in supremum form, the pointwise and the integrated bound of the weighted blocks, `F^{n(1/p₀ - 1/p₁)}_{p₀,q} ↪ L_{p₁}`, Jawerth's embedding `F^{s₀}_{p₀,∞} ↪ F^{s₁}_{p₁,q}` and the critical Sobolev embedding `W^m_p ↪ L_r` for `1/r = 1/p - m/n` with named constants | ✅ | ✗ | `Rd/Sobolev/CriticalSobolevEmbedding` |
 | Value–derivative jets of `W^1_p(O)` and `W^1_p(V)`, restriction | ✅ | ✗ | `Rd/Sobolev/SobolevJets` |
 | The grid norm of `W^m_p` between two Besov quasi-norms with named constants, `(L_p, W^m_p)_{θ,q} = B^{θm}_{p,q}`, `(W^{m₀}_p, W^{m₁}_p)_{η,q} = B^{(1-η)m₀+ηm₁}_{p,q}` for `1 < p < ∞`, and operators bounded on `L_p` and on `W^m_p` | ✅ | ✗ | `Rd/Interpolation/SobolevInterpolation` |
 | The Bessel potential norm `‖J_s f‖_p`, equivalent to the quasi-norm of `F^s_{p,2}`; `(H^{s₀,p}, H^{s₁,p})_{η,q}` and `(L_p, H^{s₁,p})_{η,q}` are Besov spaces | ✅ | ✗ | `Rd/Interpolation/BesselPotentialInterpolation` |
 | Uniform Schwartz families as bounded sets and under continuous linear maps, the shifted Bessel symbols `(ε + ‖ζ‖²)^{σ/2}` with derivative bounds on annuli uniform in `ε`, the Bessel symbol and kernel families as uniform Schwartz families, the Bessel potential of a dilate, the dilated Bessel kernels as a Calderón–Zygmund family with explicit overlap, and the annuli of the Littlewood–Paley kernels | ✅ | ✗ | `Rd/BesselPotentials/UniformSchwartzFamilies` |
 | Even Fourier multipliers, among them Mathlib's Bessel potential, commuting with translations and reflections of Schwartz functions and with convolutions, the Bessel kernels of the Littlewood–Paley kernels, convergent synthesis sums, `H^{s,p} ∩ L_p = F^s_{p,2}` for real `s`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0` and `W^m_p = H^{m,p}` for `1 < p < ∞`, with existential constants | ✅ | ✗ | `Rd/BesselPotentials/BesselPotentialLifting` |
+| `H^{s,p} ↪ L_r` for `1 < p ≤ r < ∞` and `s ≥ n(1/p - 1/r)`, also in Mathlib's bundled space | ✅ | ✗ | `Rd/BesselPotentials/BesselPotentialEmbedding` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

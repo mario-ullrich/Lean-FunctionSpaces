@@ -20,7 +20,9 @@ form.  It reduces every Nikolskii inequality `‖a‖_r ≲ n^(D(1/p-1/r)) ‖a�
 `r = ∞`.  The real-valued form `toReal_eLpNorm_le_rpow_mul` is the one used in estimates.
 A consequence is `MemLp.mono_exponent_of_enorm_le`: a bounded function in `L_p` lies in `L_r` for
 every `r ≥ p`.  The exponent `1 - p/r` is nonnegative for `p ≤ r ≤ ∞`
-(`ENNReal.one_sub_toReal_div_nonneg`).
+(`ENNReal.one_sub_toReal_div_nonneg`); for `1 ≤ p₀ < p₁ < ∞` the ratio `θ = p₀/p₁` lies in
+`(0, 1)` and `p₁ θ = p₀` (`ENNReal.toReal_div_toReal_mem_Ioo`,
+`ENNReal.mul_ofReal_toReal_div_toReal`).
 -/
 
 @[expose] public section
@@ -34,6 +36,25 @@ theorem ENNReal.one_sub_toReal_div_nonneg {p r : ℝ≥0∞} (hpr : p ≤ r) :
   rcases eq_or_ne r ∞ with rfl | hr
   · simp
   · exact sub_nonneg.2 (div_le_one_of_le₀ (ENNReal.toReal_mono hr hpr) ENNReal.toReal_nonneg)
+
+/-- For `1 ≤ p₀ < p₁ < ∞` the ratio `θ = p₀/p₁` of the exponents lies in `(0, 1)`. -/
+theorem ENNReal.toReal_div_toReal_mem_Ioo {p₀ p₁ : ℝ≥0∞} (hp₀ : 1 ≤ p₀) (hp₀₁ : p₀ < p₁)
+    (hp₁ : p₁ ≠ ∞) : p₀.toReal / p₁.toReal ∈ Set.Ioo 0 1 := by
+  have h0 : 0 < p₀.toReal :=
+    ENNReal.toReal_pos (zero_lt_one.trans_le hp₀).ne' (hp₀₁.trans_le le_top).ne
+  have h01 : p₀.toReal < p₁.toReal := ENNReal.toReal_strict_mono hp₁ hp₀₁
+  exact ⟨div_pos h0 (h0.trans h01), (div_lt_one (h0.trans h01)).2 h01⟩
+
+/-- `p₁ · (p₀/p₁) = p₀` for finite `p₀` and `0 < p₁ < ∞`: the exponent `p₁ θ` with
+`θ = p₀/p₁` is `p₀`. -/
+theorem ENNReal.mul_ofReal_toReal_div_toReal {p₀ p₁ : ℝ≥0∞} (hp₀ : p₀ ≠ ∞) (hp₁0 : p₁ ≠ 0)
+    (hp₁ : p₁ ≠ ∞) : p₁ * ENNReal.ofReal (p₀.toReal / p₁.toReal) = p₀ := by
+  have h1 : 0 < p₁.toReal := ENNReal.toReal_pos hp₁0 hp₁
+  calc p₁ * ENNReal.ofReal (p₀.toReal / p₁.toReal)
+      = ENNReal.ofReal p₁.toReal * ENNReal.ofReal (p₀.toReal / p₁.toReal) := by
+        rw [ENNReal.ofReal_toReal hp₁]
+    _ = p₀ := by
+        rw [← ENNReal.ofReal_mul h1.le, mul_div_cancel₀ _ h1.ne', ENNReal.ofReal_toReal hp₀]
 
 namespace MeasureTheory
 

@@ -34,7 +34,10 @@ inequality for the blocks and from it the embeddings of Besov spaces into $L_r(V
 bounded continuous functions, and the Sobolev embeddings $\Sob{m}{p}(V) \hookrightarrow L_r(V)$
 for $m > n(1/p - 1/r)$ and $\Sob{m}{p}(V) \hookrightarrow C_b(V)$ for $m > n/p$, all with named
 constants. These named constants are formulas in norms and Schwartz seminorms of fixed kernels,
-proved finite. \Cref{sec:sobolev-interpolation} identifies the real interpolation spaces of
+proved finite. \Cref{sec:critical-sobolev-embedding} proves the critical case
+$1/r = 1/p - m/n$, $1 < p < \infty$, and Jawerth's embedding
+$\TL{s_0}{p_0}{\infty} \hookrightarrow \TL{s_1}{p_1}{q}$, following Johnsen and Sickel.
+\Cref{sec:sobolev-interpolation} identifies the real interpolation spaces of
 $L_p(V)$ and $\Sob{m}{p}(V)$, and of two Sobolev spaces, with Besov spaces. The Bessel
 potential spaces $H^{s,p}(V)$ for $1 < p < \infty$ follow in
 \Cref{ch:bessel-potential-spaces}, the Sobolev spaces on open sets and on bounded Lipschitz
@@ -423,6 +426,20 @@ equal.
 \leanok
 Mathlib's \texttt{Lp.\allowbreak ker\_\allowbreak toTemperedDistributionCLM\_\allowbreak
 eq\_\allowbreak bot}.
+\end{proof}
+
+\begin{lemma}[Almost everywhere equal classes are the same distribution]
+\label{lem:ae-equal-classes-distribution}
+\lean{Rd.toTemperedDistribution_eq_of_ae_eq}
+\leanok
+For all $1 \leq p, r \leq \infty$, every $f \in L_p(V)$ and every $g \in L_r(V)$ with $g = f$
+almost everywhere, $g = f$ as tempered distributions.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For every Schwartz function $u$, $\int_V u g = \int_V u f$, since the integrands agree almost
+everywhere.
 \end{proof}
 
 \begin{lemma}[The norm of Mathlib's $H^{s,p}$]
@@ -2104,7 +2121,209 @@ $f \in \Besov{m}{p}{\max(p,2)}$ by \Cref{cor:sobolev-besov-sandwich}.
 
 For $r < \infty$ the condition $m > n(1/p - 1/r)$ says $1/r > 1/p - m/n$. The critical case
 $1/r = 1/p - m/n$ with $m < n/p$, Sobolev's inequality
-$\|f\|_{r} \lesssim \|f\|_{\Sob{m}{p}}$, is not covered here.
+$\|f\|_{r} \lesssim \|f\|_{\Sob{m}{p}}$, is \Cref{thm:critical-sobolev-embedding}.
+
+\section{The critical Sobolev embedding}
+\label{sec:critical-sobolev-embedding}
+
+Let $n \geq 1$, $1 \leq p_0 < p_1 < \infty$, $\theta = p_0/p_1$ and
+$\alpha = \alpha(n, p_0, p_1) = n(1/p_0 - 1/p_1)$. The embeddings of
+\Cref{sec:sobolev-embedding} need $s > \alpha$; this section proves the critical case
+$\TL{\alpha}{p_0}{\infty} \hookrightarrow L_{p_1}(V)$ and with it Sobolev's inequality
+$\Sob{m}{p}(V) \hookrightarrow L_r(V)$ for $1 < p < \infty$ and $1/r = 1/p - m/n > 0$. The proof is
+the direct one of Johnsen and Sickel~\cite[Proposition~1]{JohnsenSickel2007}. At a point $x$ the
+Nikolskii inequality for blocks bounds $\sup_j 2^{j(s_0 - n/p_0)} |(\psi_j * f)(x)|$ by the
+Littlewood--Paley quasi-norm of $\Besov{s_0}{p_0}{\infty}$, an interpolation inequality for
+weighted suprema of sequences, due to Brezis and Mironescu~\cite{BrezisMironescu2001}
+(\Cref{lem:dyadic-interpolation}), combines this bound with
+$G(x) = \sup_j 2^{j s_0} |(\psi_j * f)(x)|$, and integration turns $G^\theta$ into
+$\|G\|_{p_0}^\theta = \|f\|_{F^{s_0}_{p_0,\infty}}^\theta$. The same argument gives Jawerth's
+embedding $\TL{s_0}{p_0}{\infty} \hookrightarrow \TL{s_1}{p_1}{q}$ for
+$s_0 - s_1 = \alpha$ and every $q$ (Jawerth~\cite{Jawerth1977}, Triebel~\cite[\S 2.7.1]{Triebel},
+Vyb\'{\i}ral~\cite[Theorem~0.1~(ii)]{VybiralJF2008}). The classical proofs of Sobolev's inequality
+go through Riesz potentials and the Hardy--Littlewood--Sobolev inequality, for instance by
+Hedberg's inequality~\cite{Hedberg1972}.
+
+\paragraph{The pointwise bound and its integral.}
+
+\begin{lemma}[The Nikolskii inequality in supremum form]
+\label{lem:nikolskii-sup}
+\lean{Rd.iSup_dyadicWeight_enorm_blockFun_le}
+\leanok
+\uses{thm:nikolskii-blocks, def:nikolskii-block-const, def:lp-blocks, def:triebel-lizorkin}
+For every $1 \leq p < \infty$, every $s \in \R$, every $f \in L_p(V)$ and every $x \in V$,
+\[
+  \sup_{j \in \N} 2^{j(s - n/p)} |(\psi_j * f)(x)| \leq N_p \, \|f\|^{\mathrm{LP}}_{s,\infty} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{thm:nikolskii-blocks},
+$2^{j(s - n/p)} |(\psi_j * f)(x)| \leq N_p \, 2^{js} \|\psi_j * f\|_p
+\leq N_p \|f\|^{\mathrm{LP}}_{s,\infty}$ for every $j$.
+\end{proof}
+
+\begin{lemma}[The pointwise bound]
+\label{lem:critical-pointwise-bound}
+\lean{ENNReal.toReal_div_toReal_mem_Ioo, nikolskiiExponent_interp_eq,
+  Rd.tsum_dyadicWeight_enorm_blockFun_le}
+\leanok
+\uses{lem:dyadic-interpolation, lem:nikolskii-sup, def:nikolskii-property}
+Let $n \geq 1$, $1 \leq p_0 < p_1 < \infty$, $\theta = p_0/p_1$ and $s_0, s_1 \in \R$ with
+$s_0 - s_1 = n(1/p_0 - 1/p_1)$. Then $0 < \theta < 1$, and for every $f \in L_{p_0}(V)$ and every
+$x \in V$,
+\[
+  \sum_{j \in \N} 2^{j s_1} |(\psi_j * f)(x)|
+  \leq c(n/p_0, \theta) \, G(x)^\theta \,
+    \bigl(N_{p_0} \|f\|^{\mathrm{LP}}_{s_0,\infty}\bigr)^{1-\theta} ,
+\]
+where $G(x) = \sup_{j \in \N} 2^{j s_0} |(\psi_j * f)(x)|$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Apply \Cref{lem:dyadic-interpolation} with $\sigma_0 = s_0$, $\sigma_1 = s_0 - n/p_0$ and
+$a_j = |(\psi_j * f)(x)|$: $\sigma_0 - \sigma_1 = n/p_0 > 0$, and
+$\theta s_0 + (1 - \theta)(s_0 - n/p_0) = s_0 - n/p_0 + n/p_1 = s_1$, since $\theta/p_0 = 1/p_1$.
+\Cref{lem:nikolskii-sup} bounds $\sup_j 2^{j\sigma_1} a_j$.
+\end{proof}
+
+\begin{definition}[The constant of the critical embedding]
+\label{def:critical-embedding-const}
+\lean{Rd.criticalEmbeddingConst, Rd.criticalEmbeddingConst_ne_top}
+\leanok
+\uses{lem:dyadic-interpolation, def:nikolskii-block-const}
+For $1 \leq p_0 \leq p_1 \leq \infty$ and $\theta = p_0/p_1$,
+\[
+  K_{V,p_0,p_1} = c(n/p_0, \theta) \, N_{p_0}^{1-\theta} ,
+\]
+which is finite for $n \geq 1$ and $p_0 < p_1 < \infty$.
+\end{definition}
+
+\begin{lemma}[The integrated bound]
+\label{lem:critical-integrated-bound}
+\lean{ENNReal.mul_ofReal_toReal_div_toReal, Rd.eLpNorm_rpow_lqNorm_blockFun_eq,
+  Rd.eLpNorm_tsum_dyadicWeight_enorm_blockFun_le}
+\leanok
+\uses{lem:critical-pointwise-bound, def:critical-embedding-const, lem:lp-norm-nonnegative,
+  thm:tl-besov-sandwich, def:triebel-lizorkin}
+Let $n \geq 1$, $1 \leq p_0 < p_1 < \infty$ and $s_0, s_1 \in \R$ with
+$s_0 - s_1 = n(1/p_0 - 1/p_1)$. For every $f \in L_{p_0}(V)$,
+\[
+  \Bigl\| x \mapsto \sum_{j \in \N} 2^{j s_1} |(\psi_j * f)(x)| \Bigr\|_{p_1}
+  \leq K_{V,p_0,p_1} \, \|f\|_{F^{s_0}_{p_0,\infty}} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+With $A = \|f\|^{\mathrm{LP}}_{s_0,\infty}$ and $T = \|f\|_{F^{s_0}_{p_0,\infty}} = \|G\|_{p_0}$,
+\Cref{lem:critical-pointwise-bound} and \Cref{lem:lp-norm-nonnegative} bound the left side by
+$c(n/p_0, \theta) (N_{p_0} A)^{1-\theta} \|G^\theta\|_{p_1}$, and
+$\|G^\theta\|_{p_1} = \|G\|_{p_1 \theta}^\theta = T^\theta$ since $p_1\theta = p_0$. Finally
+$A \leq T$ (\Cref{thm:tl-besov-sandwich} with $q = \infty$), so
+$A^{1-\theta} T^\theta \leq T$.
+\end{proof}
+
+\paragraph{The embeddings.}
+
+\begin{theorem}[$\TL{\alpha}{p_0}{q} \hookrightarrow L_{p_1}$]
+\label{thm:triebel-lizorkin-into-lp}
+\lean{Rd.exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top,
+  Rd.exists_memLp_ae_eq_of_memTriebelLizorkin}
+\leanok
+\uses{lem:critical-integrated-bound, lem:blocks-ae-convergence, thm:tl-besov-sandwich,
+  prop:tl-elementary, def:nikolskii-property}
+Let $n \geq 1$, $1 \leq p_0 < p_1 < \infty$ and $\alpha = n(1/p_0 - 1/p_1)$. For every
+$1 \leq q \leq \infty$ and every $f \in \TL{\alpha}{p_0}{q}$ there is $g \in L_{p_1}(V)$ with
+$g = f$ almost everywhere and
+\[
+  \|g\|_{p_1} \leq K_{V,p_0,p_1} \, \|f\|_{F^{\alpha}_{p_0,\infty}}
+  \leq K_{V,p_0,p_1} \, \|f\|_{F^{\alpha}_{p_0,q}} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The second inequality is \Cref{prop:tl-elementary}. Since $\alpha > 0$ and
+$\|f\|^{\mathrm{LP}}_{\alpha,\infty} \leq \|f\|_{F^\alpha_{p_0,\infty}} < \infty$
+(\Cref{thm:tl-besov-sandwich}), $\sum_j (\psi_j * f)(x) = f(x)$ for almost every $x$
+(\Cref{lem:blocks-ae-convergence}), so $|f| \leq \sum_j |\psi_j * f|$ almost everywhere.
+\Cref{lem:critical-integrated-bound} with $s_0 = \alpha$ and $s_1 = 0$ bounds the $L_{p_1}$ norm
+of the right side, so $f \in L_{p_1}(V)$ with the stated bound.
+\end{proof}
+
+For $p_0 = 1$ this is the embedding $\TL{n(1 - 1/p_1)}{1}{\infty} \hookrightarrow L_{p_1}(V)$.
+
+\begin{theorem}[Jawerth's embedding]
+\label{thm:jawerth-embedding}
+\lean{Rd.exists_triebelLizorkinNorm_le_of_nikolskiiExponent}
+\leanok
+\uses{thm:triebel-lizorkin-into-lp, lem:critical-integrated-bound, prop:tl-elementary,
+  lem:tl-pointwise-blocks, lem:lq-basic}
+Let $n \geq 1$, $1 \leq p_0 < p_1 < \infty$, $s_1 \geq 0$ and $s_0 - s_1 = n(1/p_0 - 1/p_1)$.
+For every $f \in \TL{s_0}{p_0}{\infty}$ there is $g \in L_{p_1}(V)$ with $g = f$ almost
+everywhere such that for every $1 \leq q \leq \infty$,
+\[
+  \|g\|_{F^{s_1}_{p_1,q}} \leq K_{V,p_0,p_1} \, \|f\|_{F^{s_0}_{p_0,\infty}} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Since $s_0 - s_1 \leq s_0$, $f \in \TL{s_0 - s_1}{p_0}{\infty}$ (\Cref{prop:tl-elementary}), and
+\Cref{thm:triebel-lizorkin-into-lp} gives $g$. The blocks of $g$ are those of $f$
+(\Cref{lem:tl-pointwise-blocks}), and
+$\|\cdot\|_{\ell_q} \leq \|\cdot\|_{\ell_1}$ (\Cref{lem:lq-basic}) bounds
+$\|g\|_{F^{s_1}_{p_1,q}}$ by the left side of \Cref{lem:critical-integrated-bound}.
+\end{proof}
+
+The companion embeddings with Besov spaces on one side,
+$\TL{s_0}{p_0}{q} \hookrightarrow \Besov{s_1}{p_1}{p_0}$ (Jawerth~\cite{Jawerth1977}) and
+$\Besov{s_0}{p_0}{p_1} \hookrightarrow \TL{s_1}{p_1}{q}$ (Franke~\cite{Franke1986}), rest on
+decreasing rearrangements; Vyb\'{\i}ral~\cite{VybiralJF2008} gives a short proof of both.
+
+\begin{theorem}[The critical Sobolev embedding]
+\label{thm:critical-sobolev-embedding}
+\lean{Rd.exists_lp_zero_ae_eq, Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_of_eq,
+  Rd.exists_memLp_ae_eq_of_memSobolev_of_le, Rd.exists_memLp_ae_eq_of_memSobolev_of_eq}
+\leanok
+\uses{thm:triebel-lizorkin-into-lp, thm:sobolev-to-triebel-lizorkin, def:sobolev-to-tl-const,
+  def:critical-embedding-const, prop:tl-elementary, def:nikolskii-property}
+Let $n \geq 1$ and $1 < p < \infty$.
+\begin{enumerate}
+  \item For every $m \in \N$ with $m \geq 1$, every $r < \infty$ with $m = n(1/p - 1/r)$, that is
+    $1/r = 1/p - m/n$, and every $f \in L_p(V)$ with weak derivatives
+    $g_\alpha = \partial^{e_\alpha} f \in L_p(V)$ for every multi-index $\alpha$ of order $m$, as
+    in \Cref{thm:sobolev-to-triebel-lizorkin}, there is $u \in L_r(V)$ with $u = f$ almost
+    everywhere and
+    \[
+      \|u\|_r \leq K_{V,p,r} \Bigl( \|\Phi\|_1 \, \|f\|_p
+        + 2^m \sum_\alpha K_{V,p,\alpha} \, \|g_\alpha\|_p \Bigr) .
+    \]
+  \item For every $m \in \N$, every $p \leq r < \infty$ with $n(1/p - 1/r) \leq m$ and every
+    $f \in \Sob{m}{p}(V)$ there is $g \in L_r(V)$ with $g = f$ almost everywhere. In particular,
+    this holds for every $r < \infty$ with $n(1/p - 1/r) = m$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) Since $n(1/p - 1/r) = m > 0$, $p < r$. By \Cref{prop:tl-elementary} and
+\Cref{thm:sobolev-to-triebel-lizorkin}, $\|f\|_{F^m_{p,\infty}} \leq \|f\|_{F^m_{p,2}}$ is at
+most the bracket, and \Cref{thm:triebel-lizorkin-into-lp} with $p_0 = p$, $p_1 = r$ gives $u$.
+
+(2) For $r = p$ take $g = f$. For $p < r$,
+$f \in \TL{m}{p}{2} \subseteq \TL{\alpha(n, p, r)}{p}{\infty}$
+(\Cref{thm:sobolev-to-triebel-lizorkin}, \Cref{prop:tl-elementary}), and
+\Cref{thm:triebel-lizorkin-into-lp} applies. If $n(1/p - 1/r) = m \geq 0$, then $p \leq r$
+(\Cref{def:nikolskii-property}).
+\end{proof}
+
+In Lean, $1/0 = 0$, so the exponent $r = 0$ satisfies $n(1/p - 1/r) = n/p$; there every
+$f \in L_p(V)$ is a class of $L_0(V)$ of norm $0$. For $p = 1$ the space $\Sob{m}{1}(V)$ is larger
+than $\TL{m}{1}{2}$, and the argument above starts from $\TL{m}{p}{2}$.
 
 \section{Sobolev spaces and real interpolation}
 \label{sec:sobolev-interpolation}
@@ -2316,7 +2535,9 @@ uniform Schwartz families whose dilates are Calder\'on--Zygmund families (\Cref{
 $s$, $H^{s,p}(V) = \TL{s}{p}{2}$ for $s \geq 0$, and Calder\'on's theorem
 $\Sob{m}{p}(V) = H^{m,p}(V)$ (\Cref{cor:sobolev-bessel}). The constants come from uniform
 Schwartz bounds and are existential. The real interpolation spaces of Bessel potential spaces are
-Besov spaces (\Cref{sec:bessel-potential-interpolation}).
+Besov spaces (\Cref{sec:bessel-potential-interpolation}), and
+\Cref{sec:bessel-potential-embedding} proves $H^{s,p}(V) \hookrightarrow L_r(V)$ for
+$p \leq r < \infty$ and $s \geq n(1/p - 1/r)$.
 
 \section{Uniform Schwartz families and the Bessel kernels}
 \label{sec:bessel-kernels}
@@ -3199,4 +3420,42 @@ Let $n \geq 1$, $1 < p < \infty$, $0 < \eta < 1$, $q \in [1, \infty]$ and $f \in
 The Bessel potential norms are equivalent to the quasi-norms of $\TL{s_i}{p}{2}$
 (\Cref{lem:bessel-potential-norm-tl}); apply parts (3) and (4) of \Cref{thm:tl-interpolate} with
 $q_0 = q_1 = 2$.
+\end{proof}
+
+\section{Embeddings of Bessel potential spaces}
+\label{sec:bessel-potential-embedding}
+
+For $s \geq 0$ every element of $H^{s,p}(V)$ is an $L_p$ function in $\TL{s}{p}{2}$
+(\Cref{thm:bessel-to-triebel-lizorkin}), so the critical embedding of
+\Cref{thm:triebel-lizorkin-into-lp} applies to it. This gives the Sobolev embedding
+$H^{s,p}(V) \hookrightarrow L_r(V)$ for $s \geq n(1/p - 1/r)$ and real $s$. Since
+$\Sob{m}{p}(V) = H^{m,p}(V)$ (\Cref{cor:sobolev-bessel}), its case $s = m$ contains the Sobolev
+embedding of \Cref{thm:critical-sobolev-embedding}. Stein proves it with the Bessel kernel and
+fractional integration~\cite[Chapter~V]{SteinSingular}.
+
+\begin{theorem}[$H^{s,p} \hookrightarrow L_r$]
+\label{thm:bessel-potential-embedding}
+\lean{Rd.exists_memLp_eq_of_memSobolev_bessel, Rd.exists_enorm_le_of_besselPotentialSpace}
+\leanok
+\uses{thm:bessel-to-triebel-lizorkin, cor:bessel-bundled, thm:triebel-lizorkin-into-lp,
+  def:critical-embedding-const, lem:ae-equal-classes-distribution, thm:square-function-lower,
+  prop:tl-elementary, def:nikolskii-property}
+Let $n \geq 1$, $1 < p < \infty$, $p \leq r < \infty$ and $s \geq n(1/p - 1/r)$ real. Every
+tempered distribution $f \in H^{s,p}(V)$ is a function $g \in L_r(V)$. There is $C < \infty$ such
+that every $F$ in Mathlib's $H^{s,p}(V)$ is a function $g \in L_r(V)$ with
+$\|g\|_r \leq C \|F\|_{H^{s,p}}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Since $s \geq n(1/p - 1/r) \geq 0$, \Cref{thm:bessel-to-triebel-lizorkin} and
+\Cref{cor:bessel-bundled} give an $L_p$ function $g_0 \in \TL{s}{p}{2}$ with $g_0 = f$ as
+tempered distributions and $\|g_0\|_{F^s_{p,2}} \leq C_0 \|F\|_{H^{s,p}}$. For $r = p$ take
+$g = g_0$, with $\|g_0\|_p \leq \tilde Q_{V,p} \|g_0\|_{F^0_{p,2}}
+\leq \tilde Q_{V,p} \|g_0\|_{F^s_{p,2}}$ (\Cref{thm:square-function-lower},
+\Cref{prop:tl-elementary}). For $p < r$ and $\alpha = n(1/p - 1/r)$,
+$\|g_0\|_{F^\alpha_{p,\infty}} \leq \|g_0\|_{F^s_{p,2}}$ (\Cref{prop:tl-elementary}), and
+\Cref{thm:triebel-lizorkin-into-lp} gives $g \in L_r(V)$ with $g = g_0$ almost everywhere and
+$\|g\|_r \leq K_{V,p,r} \|g_0\|_{F^\alpha_{p,\infty}}$; by
+\Cref{lem:ae-equal-classes-distribution} $g = g_0 = f$ as tempered distributions.
 \end{proof}

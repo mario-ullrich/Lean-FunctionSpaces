@@ -92,10 +92,11 @@ $\|f\|^{\mathrm{LP}}_{s,q}$ an $\ell_q(L_p)$ norm of the same family.
 \begin{lemma}[The pointwise blocks]
 \label{lem:tl-pointwise-blocks}
 \lean{Rd.iSup_enorm_psi_lt_top, Rd.eLpNorm_psi_mul_iSup_psi_ne_top, Rd.enorm_blockFun_le,
-  Rd.blockFun_add_ae, Rd.blockFun_smul, Rd.memLp_blockFun, Rd.eLpNorm_blockFun_zero_le}
+  Rd.blockFun_add_ae, Rd.blockFun_smul, Rd.blockFun_eq_of_ae_eq, Rd.memLp_blockFun,
+  Rd.eLpNorm_blockFun_zero_le}
 \leanok
 \uses{def:triebel-lizorkin, lem:conv-pointwise-bound, lem:lp-kernels-basic, lem:conv-assoc,
-  thm:young}
+  thm:young, def:conv}
 For every $1 \leq p < \infty$, all $f, g \in L_p$, every $c \in \C$, every $j \in \N$ and every
 $x \in V$, $\psi_j * f \in L_p$, $\|\psi_0 * f\|_p \leq \|\Phi\|_1 \, \|f\|_p$,
 \[
@@ -103,7 +104,9 @@ $x \in V$, $\psi_j * f \in L_p$, $\|\psi_0 * f\|_p \leq \|\Phi\|_1 \, \|f\|_p$,
 \]
 with $\|\psi_j\|_1^{1 - 1/p} ( \sup |\psi_j| )^{1/p} < \infty$, and
 $(\psi_j * (c f))(x) = c \, (\psi_j * f)(x)$. For almost every $x \in V$,
-$(\psi_j * (f + g))(x) = (\psi_j * f)(x) + (\psi_j * g)(x)$ for all $j \in \N$.
+$(\psi_j * (f + g))(x) = (\psi_j * f)(x) + (\psi_j * g)(x)$ for all $j \in \N$. For every
+$1 \leq r \leq \infty$ and every $h \in L_r$ with $h = f$ almost everywhere,
+$\psi_j * h = \psi_j * f$.
 \end{lemma}
 
 \begin{proof}
@@ -113,7 +116,8 @@ $\|\psi_0\|_1 = \|\Phi_0\|_1 = \|\Phi\|_1$ (\Cref{lem:lp-kernels-basic}) the bou
 $\psi_0 * f$. The pointwise bound is \Cref{lem:conv-pointwise-bound}; its constant is finite
 since $\psi_j$ is integrable and bounded (\Cref{lem:lp-kernels-basic}). Homogeneity holds for
 the integrals, and additivity holds almost everywhere for each $j$ by \Cref{lem:conv-assoc},
-hence for all $j$ at once outside a countable union of null sets.
+hence for all $j$ at once outside a countable union of null sets. Convolutions depend only on
+the class of a function (\Cref{def:conv}).
 \end{proof}
 
 \begin{proposition}[Elementary properties]

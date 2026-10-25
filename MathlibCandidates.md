@@ -89,6 +89,12 @@ declarations.
   `∑_{j ∈ ℕ} min(2^j a, (2^j a)⁻¹) ≤ 4` for every `a ∈ [0, ∞]` (`ENNReal.tsum_min_two_pow_le`),
   the sum behind every Hörmander condition for dyadic dilations; the same bound holds for
   `j ∈ ℤ`.
+* **Interpolation of dyadic suprema** (`ApproximationSpaces/Sequences/Dyadic.lean`): the
+  Brezis–Mironescu inequality
+  `∑_j 2^(j(θσ₀ + (1-θ)σ₁)) a_j ≤ c (sup_j 2^(jσ₀) a_j)^θ (sup_j 2^(jσ₁) a_j)^(1-θ)` for
+  `σ₁ < σ₀`, `0 < θ < 1` (`ENNReal.tsum_dyadicWeight_mul_le_iSup`, `ENNReal.dyadicInterpConst`),
+  with its `ℓ_q` form; a candidate only together with `ENNReal.lqNorm` and
+  `ENNReal.dyadicWeight`.
 * **Discrete Hardy inequalities** (`ApproximationSpaces/Sequences/Hardy.lean`):
   `ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`, and the almost diagonal estimate that combines
   both (`ENNReal.lqNorm_almostDiagonal_le`, in `FunctionSpaces/Rd/LocalMeans/LocalMeans.lean`).

@@ -194,6 +194,14 @@ theorem blockFun_smul (j : ℕ) (c : ℂ) (f : Lp ℂ p (volume : Measure V)) (x
   rw [h, conv_smul]
   rfl
 
+omit [Fact (1 ≤ p)] in
+/-- The blocks of two `L_p` classes with almost everywhere equal representatives agree at every
+point, for possibly different exponents (`Rd.conv_congr_ae`). -/
+theorem blockFun_eq_of_ae_eq {r : ℝ≥0∞} {f : Lp ℂ p (volume : Measure V)}
+    {g : Lp ℂ r (volume : Measure V)} (h : (g : V → ℂ) =ᵐ[volume] f) (j : ℕ) :
+    blockFun j g = blockFun j f :=
+  conv_congr_ae h
+
 /-! ### The Triebel–Lizorkin quasi-norm -/
 
 /-- The **Triebel–Lizorkin quasi-norm** `‖ x ↦ ‖(2^(js) |ψ_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p` of

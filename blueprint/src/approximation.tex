@@ -645,6 +645,63 @@ nonzero. In the second, let $i_0$ be the least $j$ with $u_j \neq 0$; by the fir
 $j$ with $u_j \neq 0$ satisfies $i_0 \leq j \leq i_0 + N$.
 \end{proof}
 
+The critical Sobolev embedding (\Cref{sec:critical-sobolev-embedding}) rests on an
+interpolation inequality for weighted suprema of sequences, due to Brezis and
+Mironescu~\cite{BrezisMironescu2001}.
+
+\begin{lemma}[Interpolation of dyadic suprema]
+\label{lem:dyadic-interpolation}
+\lean{ENNReal.sum_range_pow_le_pow_mul_inv, ENNReal.dyadicInterpConst,
+  ENNReal.dyadicInterpConst_ne_top, ENNReal.one_le_dyadicInterpConst,
+  ENNReal.rpow_mul_rpow_one_sub, ENNReal.dyadicWeight_mul_le_rpow_mul_rpow,
+  ENNReal.dyadicWeight_neg_mul_le_rpow_mul_rpow, ENNReal.sum_range_succ_le_of_le_dyadicWeight,
+  ENNReal.tsum_add_le_of_le_dyadicWeight_neg, ENNReal.exists_dyadicWeight_neg_mul_le,
+  ENNReal.tsum_le_dyadicInterpConst_of_ne, ENNReal.tsum_le_dyadicInterpConst,
+  ENNReal.tsum_dyadicWeight_mul_le_iSup, ENNReal.lqNorm_dyadicWeight_mul_le_iSup}
+\leanok
+\uses{def:lq-norm, lem:hardy, lem:lq-basic}
+For every $\delta > 0$ and every $0 < \theta < 1$ put
+\[
+  c(\delta, \theta) = 2^{\theta\delta} \bigl(2^{\theta\delta} - 1\bigr)^{-1}
+    + \bigl(1 - 2^{-(1-\theta)\delta}\bigr)^{-1} < \infty .
+\]
+For all $\sigma_1 < \sigma_0$ in $\R$, every $0 < \theta < 1$, every $1 \leq q \leq \infty$ and
+every sequence $(a_j)_{j \in \N}$ in $[0, \infty]$,
+\begin{align*}
+  \bigl\| \bigl(2^{j(\theta\sigma_0 + (1-\theta)\sigma_1)} a_j\bigr)_j \bigr\|_{\ell_q}
+  &\leq \sum_{j \in \N} 2^{j(\theta\sigma_0 + (1-\theta)\sigma_1)} a_j \\
+  &\leq c(\sigma_0 - \sigma_1, \theta)
+    \Bigl(\sup_{j} 2^{j\sigma_0} a_j\Bigr)^{\theta}
+    \Bigl(\sup_{j} 2^{j\sigma_1} a_j\Bigr)^{1-\theta} .
+\end{align*}
+\end{lemma}
+
+\begin{proof}
+\leanok
+Let $\delta = \sigma_0 - \sigma_1$, $X = \sup_j 2^{j\sigma_0} a_j$, $Y = \sup_j 2^{j\sigma_1} a_j$
+and $b_j = 2^{j(\theta\sigma_0 + (1-\theta)\sigma_1)} a_j$. Then $b_j \leq 2^{j\theta\delta} Y$
+and $b_j \leq 2^{-j(1-\theta)\delta} X$. If $Y = 0$, every $b_j$ is $0$; if $X = \infty$ and
+$Y > 0$, the right side is $\infty$. Otherwise $2^{-J\delta} X \to 0$, so there is a least
+$J \in \N$ with $2^{-J\delta} X \leq Y$. The indices $j \geq J$ contribute
+\[
+  \sum_{i \in \N} b_{i+J} \leq \bigl(1 - 2^{-(1-\theta)\delta}\bigr)^{-1} 2^{-J(1-\theta)\delta} X ,
+\]
+and $2^{-J(1-\theta)\delta} X = X^\theta (2^{-J\delta} X)^{1-\theta} \leq X^\theta Y^{1-\theta}$.
+If $J = K + 1$, then $Y < 2^{-K\delta} X$ by minimality, the geometric sum
+$\sum_{j \leq K} r^j \leq r^{K+1} (r - 1)^{-1}$ with $r = 2^{\theta\delta}$ (from
+$(\sum_{j \leq K} r^j)(r - 1) + 1 = r^{K+1}$) gives
+\[
+  \sum_{j \leq K} b_j
+  \leq 2^{\theta\delta} \bigl(2^{\theta\delta} - 1\bigr)^{-1} 2^{K\theta\delta} Y ,
+\]
+and $2^{K\theta\delta} Y = 2^{K\theta\delta} Y^\theta Y^{1-\theta}
+\leq X^\theta Y^{1-\theta}$. The $\ell_q$ norm is at most the sum for $q \geq 1$
+(\Cref{lem:lq-basic}).
+\end{proof}
+
+This is~\cite[Lemma~2]{JohnsenSickel2007}; the embeddings of
+\Cref{sec:critical-sobolev-embedding} use $q = 1$.
+
 \chapter{Approximation spaces}
 \label{ch:approximation-spaces}
 
@@ -3580,7 +3637,8 @@ $C_b(\Omega) \to L_p$, of norm at most $\mu(\Omega)^{1/p}$.
 \begin{definition}[Nikolskii property]
 \label{def:nikolskii-property}
 \lean{FunctionScheme.HasNikolskii, nikolskiiExponent, nikolskiiExponent_nonneg,
-  one_le_of_nikolskiiExponent_lt, nikolskiiExponent_top, nikolskiiExponent_self,
+  one_le_of_nikolskiiExponent_lt, nikolskiiExponent_pos, lt_of_nikolskiiExponent_pos,
+  le_of_nikolskiiExponent_nonneg, nikolskiiExponent_top, nikolskiiExponent_self,
   FunctionScheme.toReal_eLpNorm_top_le_norm}
 \leanok
 \uses{def:function-scheme}
@@ -3592,6 +3650,11 @@ of dimension $D$ if for every $1 \leq p \leq \infty$ there is $C \geq 0$ with
 \]
 For $1 \leq p \leq r \leq \infty$ put $\alpha(D, p, r) = D(1/p - 1/r)$.
 \end{definition}
+
+With $1/\infty = 0$ the exponent $\alpha(D, p, r)$ is defined for all $p, r \in (0, \infty]$. For
+$D > 0$, $1 \leq p < \infty$ and $0 < r \leq \infty$, $\alpha(D, p, r) > 0$ if and only if $p < r$,
+and $\alpha(D, p, r) \geq 0$ if and only if $p \leq r$, since $1/r < 1/p$ if and only if
+$p < r$.
 
 The Nikolskii property enters the theorems below as a hypothesis on the scheme; the
 trigonometric polynomials on the torus have it (\Cref{thm:torus-nikolskii}).

@@ -111,7 +111,8 @@ BLOCKS: list[tuple[str, list]] = [
                "Rellich compactness"])]),
     ("Sobolev spaces W^m_p", [
         (SOB, ["Derivative kernels", "Sobolev spaces as Triebel--Lizorkin spaces",
-               "Sobolev embeddings", "Sobolev spaces and real interpolation"])]),
+               "Sobolev embeddings", "The critical Sobolev embedding",
+               "Sobolev spaces and real interpolation"])]),
     ("Bessel potential spaces", ["Bessel potential spaces"]),
     ("Lipschitz domains", ["Lipschitz domains"]),
     ("Traces", ["Traces on Lipschitz domains"]),

@@ -55,8 +55,9 @@ with the distribution of an `L_p` function `g` is the distribution of `w g` when
 `L_q` (`Rd.smulLeftCLM_toTemperedDistribution_eq`), and an identity `w g = h` of distributions,
 with `g` and `h` in `L_p` spaces, holds almost everywhere (`Rd.ae_eq_of_smulLeftCLM_eq`). An
 `L_p` function is determined by its tempered distribution (`Rd.eq_of_toTemperedDistribution_eq`),
-and the norm of Mathlib's `H^{s,p}` is the `L_p` norm of `J_s U`, also in `ℝ≥0∞`
-(`BesselPotentialSpace.enorm_toLp_eq`).
+almost everywhere equal `L_p` and `L_r` classes have the same tempered distribution
+(`Rd.toTemperedDistribution_eq_of_ae_eq`), and the norm of Mathlib's `H^{s,p}` is the `L_p` norm
+of `J_s U`, also in `ℝ≥0∞` (`BesselPotentialSpace.enorm_toLp_eq`).
 -/
 
 @[expose] public section
@@ -98,6 +99,19 @@ theorem eq_of_toTemperedDistribution_eq {p : ℝ≥0∞} [Fact (1 ≤ p)]
     {f g : Lp ℂ p (volume : Measure V)} (h : (f : 𝓢'(V, ℂ)) = g) : f = g :=
   LinearMap.ker_eq_bot.1 (Lp.ker_toTemperedDistributionCLM_eq_bot (F := ℂ)
     (μ := (volume : Measure V)) (p := p)) h
+
+/-- **Almost everywhere equal classes are the same tempered distribution**: if `f ∈ L_p(V)` and
+`g ∈ L_r(V)`, `1 ≤ p, r ≤ ∞`, have almost everywhere equal representatives, then
+`∫ u g = ∫ u f` for every Schwartz function `u` (Mathlib's
+`MeasureTheory.Lp.toTemperedDistribution_apply`, `MeasureTheory.integral_congr_ae`). -/
+theorem toTemperedDistribution_eq_of_ae_eq {p r : ℝ≥0∞} [Fact (1 ≤ p)] [Fact (1 ≤ r)]
+    {f : Lp ℂ p (volume : Measure V)} {g : Lp ℂ r (volume : Measure V)}
+    (h : (g : V → ℂ) =ᵐ[volume] f) : (g : 𝓢'(V, ℂ)) = (f : 𝓢'(V, ℂ)) := by
+  ext u
+  simp only [Lp.toTemperedDistribution_apply]
+  refine integral_congr_ae ?_
+  filter_upwards [h] with x hx
+  rw [hx]
 
 /-- **`𝓕(K ⋆ φ) = 𝓕K · 𝓕φ` for Schwartz functions `φ`**, as an identity in `L_2(V)`: the `L_2`
 Fourier transform of `K ⋆ φ` is the product of the bounded function `𝓕K` with the `L_2` Fourier

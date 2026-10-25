@@ -59,7 +59,8 @@ the counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the co
   `ℝ≥0∞`, its monotonicity in `q`, and the dyadic weights `ENNReal.dyadicWeight`.
 * `ApproximationSpaces.Sequences.Dyadic`: Cauchy condensation with power weights, which
   compares `∑ (n+1)^γ b n` with `∑ 2^(k(γ+1)) b (2^k)` for decreasing `b`, and the dyadic sums
-  `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4` and `∑_j u_j ≤ (N + 1) M` for `N + 1` dyadic scales.
+  `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4` and `∑_j u_j ≤ (N + 1) M` for `N + 1` dyadic scales, and the
+  interpolation inequality for dyadic suprema `ENNReal.tsum_dyadicWeight_mul_le_iSup`.
 * `ApproximationSpaces.Sequences.Hardy`: the countable Minkowski inequality, the two
   discrete Hardy inequalities, the shift invariance of `ℓ_q(ℤ)` and the geometric convolutions
   on `ℤ`.
