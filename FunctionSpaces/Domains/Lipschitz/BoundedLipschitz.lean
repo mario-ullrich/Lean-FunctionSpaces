@@ -45,7 +45,9 @@ The proof follows Schneider–Vybíral §3: a covering `Ω̄ ⊆ K_0 ∪ ⋃_j K
 * A smooth resolution of unity subordinate to these patches (Mathlib's
   `SmoothPartitionOfUnity.exists_isSubordinate`, `Rd.exists_smooth_partition`) pastes the local
   extensions (`Rd.exists_pasting_le`, `Rd.indicatorLp_sum_eq_of_partition`), by the pointwise
-  multipliers of `Rd.modNorm_mulLp_le` and the triangle inequality `Rd.modNorm_finsetSum_le`.
+  multipliers of `Rd.modNorm_mulLp_le` and the triangle inequality `Rd.modNorm_finsetSum_le`. The
+  quasi-norm by differences is subadditive and homogeneous (`Rd.modNorm_add_le`,
+  `Rd.modNorm_const_smul`).
 
 For a compact set, the smooth resolutions of unity can be chosen equal to `1` on a neighbourhood
 of it (`Rd.exists_smooth_partition_nhds`).
@@ -132,6 +134,34 @@ theorem modNorm_finsetSum_le {ι : Type*} (t : Finset ι)
       (Finset.mul_sum _ _ _)).trans (ENNReal.lqNorm_sum_le hq _ _)
   rw [Finset.sum_add_distrib]
   exact add_le_add h1 h2
+
+/-- **The Besov quasi-norm by differences is subadditive**:
+`‖G + H‖_p + ‖(2^(ks) ω_r(G + H, 2^(-k))_p)_k‖_{ℓ_q} ≤
+(‖G‖_p + ‖(2^(ks) ω_r(G, 2^(-k))_p)_k‖_{ℓ_q}) + (‖H‖_p + ‖(2^(ks) ω_r(H, 2^(-k))_p)_k‖_{ℓ_q})`
+for `q ≥ 1` (`Rd.lpModulus_add_le`, `ENNReal.lqNorm_add_le`). -/
+theorem modNorm_add_le (G H : Lp ℂ p (volume : Measure V)) (r : ℕ) (s : ℝ) {q : ℝ≥0∞}
+    (hq : 1 ≤ q) :
+    ‖G + H‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r (G + H) k) ≤
+      (‖G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r G k)) +
+        (‖H‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r H k)) := by
+  have h2 : lqNorm q (fun k => dyadicWeight s k * lpModulus p r (G + H) k) ≤
+      lqNorm q (fun k => dyadicWeight s k * lpModulus p r G k) +
+        lqNorm q (fun k => dyadicWeight s k * lpModulus p r H k) :=
+    (ENNReal.lqNorm_mono fun k => (mul_le_mul' le_rfl (lpModulus_add_le r G H k)).trans_eq
+      (mul_add _ _ _)).trans (ENNReal.lqNorm_add_le hq _ _)
+  rw [add_add_add_comm]
+  exact add_le_add (enorm_add_le G H) h2
+
+/-- **The Besov quasi-norm by differences is homogeneous**:
+`‖c G‖_p + ‖(2^(ks) ω_r(c G, 2^(-k))_p)_k‖_{ℓ_q} =
+|c| (‖G‖_p + ‖(2^(ks) ω_r(G, 2^(-k))_p)_k‖_{ℓ_q})`
+(`Rd.lpModulus_const_smul`, `ENNReal.lqNorm_const_mul`). -/
+theorem modNorm_const_smul (c : ℂ) (G : Lp ℂ p (volume : Measure V)) (r : ℕ) (s : ℝ)
+    (q : ℝ≥0∞) :
+    ‖c • G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r (c • G) k) =
+      ‖c‖ₑ * (‖G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r G k)) := by
+  simp_rw [lpModulus_const_smul, mul_left_comm (dyadicWeight s _) ‖c‖ₑ]
+  rw [ENNReal.lqNorm_const_mul, enorm_smul, mul_add]
 
 /-- **Finite sums keep the Besov spaces by differences** (`Rd.modNorm_finsetSum_le`). -/
 theorem modNorm_finsetSum_lt_top {ι : Type*} (t : Finset ι)

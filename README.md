@@ -445,8 +445,16 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   projection onto it and the extension is the inclusion, both of norm at most `1`, and
   `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)` isometrically (`Rd.BoundedLipschitzDomain.quotientEquivTraceSpace`).
   The boundary traces of its elements are the functions of `B^{1/2}_{2,2}(Γ)` modulo null sets of
-  `Γ` (`Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`); this link is qualitative,
-  a norm equivalence of `H^{1/2}(Γ)` with `B^{1/2}_{2,2}(Γ)` is not formalised.
+  `Γ`, with equivalent norms: for every resolution of unity `ψ` there is `C < ∞` with
+  `‖t‖ ≤ C ‖τ t‖_{B^{1/2}_{2,2}(Γ)}` and `‖τ t‖_{B^{1/2}_{2,2}(Γ)} ≤ C ‖t‖` for all
+  `t ∈ H^{1/2}(Γ)`, with the trace `τ : H^{1/2}(Γ) → L_2(Γ)`, where the norm of
+  `B^{1/2}_{2,2}(Γ)` is the sum over the charts of
+  `‖G_j‖_{L_2(H_j)} + ‖(2^{k/2} ω_1(G_j, 2^{-k})_2)_k‖_{ℓ_2}` for the pieces `G_j = (ψ_j g) ∘ γ_j`
+  (`Rd.BoundedLipschitzDomain.boundaryBesovNorm`,
+  `Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv`). The range of `τ` is
+  `B^{1/2}_{2,2}(Γ)` (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff`), and the norm of
+  `H^{1/2}(Γ)` is the least `H^1(ℝ^d)` norm of a function with the given boundary trace
+  (`Rd.BoundedLipschitzDomain.enorm_eq_iInf`).
 * **The area formula for Lipschitz graphs.** Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph
   domain in `V`, `dim V = n`, with the graph map `γ(x') = x' + φ(x') e` over the hyperplane
   `H = e^⊥` and the gradient `∇φ(x') ∈ H` of `φ` on `H`, which exists almost everywhere. For
@@ -553,7 +561,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, Triebel–Lizorkin spaces as interpolation spaces | ✅ | ✗ |
 | [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings including the critical case and the Gagliardo–Nirenberg–Sobolev inequality, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
-| [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph and bounded Lipschitz domains, closures of convex ones, closed balls, the closed cube and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary or with corners, smooth domains | ✅ | ✗ |
+| [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph and bounded Lipschitz domains, closures of convex ones, closed balls, the closed cube and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators and its norm equivalent to that of `B^{1/2}_{2,2}(Γ)`, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary or with corners, smooth domains | ✅ | ✗ |
 
 Lean: ✅ every file proved without `sorry` · 🟡 some statement still `sorry` · ⬜ planned.
 Checked (human-checked): ✅ mathematics and documentation both reviewed by the author ·
@@ -588,8 +596,8 @@ that library builds itself.
 * **Interpolation**: the J-method and the equivalence theorem, the complex method,
   `(L_{p₀}, L_{p₁})_{θ,q} = L_{p,q}` with Lorentz spaces, and the off-diagonal Marcinkiewicz
   theorem.
-* **Traces and extensions**: the norm equivalence `H^{1/2}(Γ) ≅ B^{1/2}_{2,2}(Γ)` and the
-  extension of `W^1_p` for `p ∈ {1, ∞}` and of higher order.
+* **Traces and extensions**: the Sobolev–Slobodeckij norm on `Γ` and the extension of `W^1_p`
+  for `p ∈ {1, ∞}` and of higher order.
 * **Manifolds with corners**: a compact example (the cube with charts at its vertices), traces on
   the faces and products of models.
 * **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,

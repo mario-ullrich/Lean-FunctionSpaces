@@ -24,9 +24,9 @@ the name.  Expanded, `Δ_h^r f(x) = ∑_{l ≤ r} (-1)^(r-l) C(r, l) f(x + l h)`
 (`Rd.measurable_enorm_higherDiff_uncurry`). A negative step reflects the difference:
 `Δ_{-h}^r f(x) = (-1)^r Δ_h^r f(x - r h)` (`Rd.higherDiff_neg`). For a Haar
 measure `μ` the **modulus of smoothness** in `L_p(μ)` is
-`ω_r(f, t)_p = sup_{‖h‖ ≤ t} ‖Δ_h^r f‖_p` (`Rd.modulus`). It increases in `t`, is subadditive in
-`f`, is bounded by `2^r ‖f‖_p` (`Rd.modulus_le`), and depends only on the class of `f` modulo
-null sets (`Rd.modulus_congr_ae`).
+`ω_r(f, t)_p = sup_{‖h‖ ≤ t} ‖Δ_h^r f‖_p` (`Rd.modulus`). It increases in `t`, is subadditive and
+homogeneous in `f` (`Rd.modulus_const_smul`), is bounded by `2^r ‖f‖_p` (`Rd.modulus_le`), and
+depends only on the class of `f` modulo null sets (`Rd.modulus_congr_ae`).
 
 **Dilating the step** (`Rd.modulus_mul_le`): `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` for
 `c, t ≥ 0`. For an integer `m ≥ 1`, `Δ_{mh} = ∑_{i<m} τ_{ih} Δ_h` with the translations
@@ -313,6 +313,13 @@ theorem modulus_congr_ae {f g : V → ℂ} (hfg : f =ᵐ[μ] g) (r : ℕ) (p : �
   funext _
   exact eLpNorm_congr_ae (higherDiff_congr_ae hfg r h)
 
+omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] [μ.IsAddHaarMeasure] in
+/-- **The modulus is homogeneous**: `ω_r(c f, t)_p = |c| ω_r(f, t)_p`, since
+`Δ_h^r (c f) = c Δ_h^r f` (Mathlib's `fwdDiff_iter_const_smul`, `eLpNorm_const_smul`). -/
+theorem modulus_const_smul (r : ℕ) (p : ℝ≥0∞) (c : ℂ) (f : V → ℂ) (t : ℝ) :
+    modulus μ r p (c • f) t = ‖c‖ₑ * modulus μ r p f t := by
+  simp only [modulus, fwdDiff_iter_const_smul, eLpNorm_const_smul, ENNReal.mul_iSup]
+
 omit [FiniteDimensional ℝ V] in
 /-- **Integer multiples of the scale**: `ω_r(f, m t)_p ≤ m^r ω_r(f, t)_p` for `m ≥ 1`. -/
 theorem modulus_nat_mul_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞} (hp : 1 ≤ p)
@@ -386,5 +393,13 @@ omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 /-- The modulus of `0` vanishes. -/
 theorem lpModulus_zero (r k : ℕ) : lpModulus p r (0 : Lp ℂ p μ) k = 0 :=
   le_antisymm ((lpModulus_le r 0 k).trans (by simp)) bot_le
+
+omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [Fact (1 ≤ p)] in
+/-- The dyadic moduli are homogeneous: `ω_r(c f, 2^(-k))_p = |c| ω_r(f, 2^(-k))_p`
+(`Rd.modulus_const_smul`). -/
+theorem lpModulus_const_smul (r : ℕ) (c : ℂ) (f : Lp ℂ p μ) (k : ℕ) :
+    lpModulus p r (c • f) k = ‖c‖ₑ * lpModulus p r f k := by
+  rw [lpModulus, modulus_congr_ae (Lp.coeFn_smul c f), modulus_const_smul]
+  rfl
 
 end Rd

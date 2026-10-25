@@ -103,6 +103,7 @@ public import FunctionSpaces.Domains.Traces.MollifiedGraph
 public import FunctionSpaces.Domains.Traces.GraphTraceExtension
 public import FunctionSpaces.Domains.Traces.GraphTraceCharts
 public import FunctionSpaces.Domains.Traces.LipschitzBoundaryTrace
+public import FunctionSpaces.Domains.Traces.BoundaryBesovNorm
 public import FunctionSpaces.Domains.Manifolds.SmoothMeasure
 public import FunctionSpaces.Domains.Manifolds.BesovAtlas
 public import FunctionSpaces.Domains.Manifolds.Besov
@@ -117,6 +118,7 @@ public import FunctionSpaces.Domains.Sobolev.SobolevDuality
 public import FunctionSpaces.Domains.Traces.BoundaryTraceSpace
 public import FunctionSpaces.Domains.Lipschitz.LipschitzGraphArea
 public import FunctionSpaces.Domains.Lipschitz.SurfaceMeasure
+public import FunctionSpaces.Domains.Traces.TraceSpaceNorm
 public import FunctionSpaces.Domains.Extension.DivergenceKernels
 public import FunctionSpaces.Domains.Extension.SobolevExtension
 public import FunctionSpaces.Domains.Extension.SobolevExtensionOperator
@@ -264,7 +266,8 @@ and the theorems that their characterisations agree. The library builds on
   smooth frequency cut-offs, the kernels `Φ_k`, `Θ_k`, `ψ_j` of the Littlewood–Paley decomposition,
   and their identities by Fourier inversion.
 * `FunctionSpaces.Analysis.Differences.Differences`: differences on any additive group, and the
-  modulus of smoothness on a finite-dimensional space with the dilation of the scale.
+  modulus of smoothness on a finite-dimensional space, its homogeneity, and the dilation of the
+  scale.
 * `FunctionSpaces.Analysis.Maximal.DyadicGrid`: the dyadic cells of a finite-dimensional inner
   product space, their centres, and the counting of centres in balls.
 * `FunctionSpaces.Analysis.Maximal.DyadicCubes`: dyadic cubes of every integer level, their nesting,
@@ -491,8 +494,9 @@ and the theorems that their characterisations agree. The library builds on
 * `FunctionSpaces.Domains.Extension.LocalExtension`: local versions of Rychkov's extension, for
   boundary patches of Lipschitz graph domains and for inner patches, with a bound.
 * `FunctionSpaces.Domains.Lipschitz.BoundedLipschitz`: bounded Lipschitz domains, smooth resolutions
-  of unity, pasting with a bound, and the restrictions of Besov spaces described by intrinsic
-  differences, with an extension bounded by a constant times the intrinsic quasi-norm.
+  of unity, pasting with a bound, subadditivity and homogeneity of the Besov quasi-norms by
+  differences, and the restrictions of Besov spaces described by intrinsic differences, with an
+  extension bounded by a constant times the intrinsic quasi-norm.
 * `FunctionSpaces.Domains.Lipschitz.HalfSpace`: null sets and moduli on sets, the closed half-space
   and the models of manifolds as Besov domains.
 * `FunctionSpaces.Domains.Traces.HalfSpaceTrace`: restrictions and extensions of smooth atoms on the
@@ -509,10 +513,13 @@ and the theorems that their characterisations agree. The library builds on
   atoms and the trace space of a Lipschitz graph domain.
 * `FunctionSpaces.Domains.Traces.GraphTraceCharts`: locality of the trace, its bound by the
   intrinsic norm, approximation by the partial sums of the reproducing formula, change of chart,
-  traces of products with smooth functions and of finite sums.
+  traces of products with smooth functions and their bound, and traces of finite sums.
 * `FunctionSpaces.Domains.Traces.LipschitzBoundaryTrace`: almost everywhere on the boundary of a
   bounded Lipschitz domain, Besov spaces on the boundary, the boundary trace, its existence and
   uniqueness for functions with a finite intrinsic Besov norm, and its trace space.
+* `FunctionSpaces.Domains.Traces.BoundaryBesovNorm`: the Besov quasi-norm on the boundary of a
+  bounded Lipschitz domain by chart pieces, the bounded trace, a bounded extension from the
+  boundary, and the independence of the resolution of unity up to equivalence.
 * `FunctionSpaces.Domains.Manifolds.SmoothMeasure`: smooth measures on manifolds, integrals in
   charts and their comparison with integrals on the manifold.
 * `FunctionSpaces.Domains.Manifolds.BesovAtlas`: Besov atlases, chart pieces in `L_p`, the changes
@@ -547,11 +554,11 @@ and the theorems that their characterisations agree. The library builds on
   as a real function, the isometry `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}(ℝ^d)`
   and `H^s(ℝ^d)`, and the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` and
   `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on open sets for real `s`.
-* `FunctionSpaces.Domains.Traces.BoundaryTraceSpace`: `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` with explicit
-  constants, the trace of `H^1(ℝ^d)` on a Lipschitz graph and the chart traces of `H^1(Ω)` on a
-  bounded Lipschitz domain as bounded operators, the trace kernel, the trace space `H^{1/2}(Γ)`
-  of the boundary `Γ`, defined as its orthogonal complement, with the trace and extension
-  operators, and its dual `H^{-1/2}(Γ)`.
+* `FunctionSpaces.Domains.Traces.BoundaryTraceSpace`: `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` and
+  `B^1_{2,2}(ℝ^d) ⊆ H^1(ℝ^d)` with explicit constants, the trace of `H^1(ℝ^d)` on a Lipschitz graph
+  and the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the trace
+  kernel, the trace space `H^{1/2}(Γ)` of the boundary `Γ`, defined as its orthogonal complement,
+  with the trace and extension operators, and its dual `H^{-1/2}(Γ)`.
 * `FunctionSpaces.Domains.Lipschitz.LipschitzGraphArea`: the area formula for Lipschitz graphs: the
   image of a measurable set `A` of the hyperplane under the graph map has `(n-1)`-dimensional
   Euclidean Hausdorff measure `∫_A √(1 + ‖∇φ‖²)`, where `n = dim V`; the outward unit normal of a
@@ -560,6 +567,10 @@ and the theorems that their characterisations agree. The library builds on
   bounded Lipschitz domain as the `(n-1)`-dimensional Euclidean Hausdorff measure on `Γ`, its chart
   form, `|Γ| = 0`, the space `L_2(Γ)`, the traces `H^1(Ω) → L_2(Γ)` and `H^{1/2}(Γ) → L_2(Γ)`, and
   the outward unit normal field.
+* `FunctionSpaces.Domains.Traces.TraceSpaceNorm`: the norm of `H^{1/2}(Γ)` as the least extension
+  norm, its equivalence with the norm of `B^{1/2}_{2,2}(Γ)`, bounded preimages under the trace,
+  the range of `H^{1/2}(Γ) → L_2(Γ)`, the Banach space `B^{1/2}_{2,2}(Γ)` isomorphic to
+  `H^{1/2}(Γ)`, and the bounded linear right inverse of the trace.
 * `FunctionSpaces.Domains.Extension.DivergenceKernels`: smoothness of parametric integrals, the
   dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, the
   divergence kernels as Schwartz functions with mean zero when `m` has vanishing first moments, and

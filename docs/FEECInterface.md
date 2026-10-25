@@ -241,9 +241,10 @@ with `Ω.carrier` the open set and `Ω.toOpens : Opens V` the same set as an ele
   weak derivatives `g_i ∈ L_2(Ω)` on `Ω`) and `Rd.sq_norm_restrictL2_add_sum_le` (Section 4.5).
 * Norms on `Ω`: the restriction direction has constant `1`: the intrinsic quantity of `f` is at
   most `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2}` for every `F` with `F = f` on `Ω`
-  (`Rd.BoundedLipschitzDomain.modNormOn_le_modNorm_of_ae_eq`). The extension direction is
-  qualitative for the intrinsic moduli; for the `W^{1,p}(Ω)` norm of the weak gradient it has an
-  existential constant (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`, Section 5).
+  (`Rd.BoundedLipschitzDomain.modNormOn_le_modNorm_of_ae_eq`). The extension direction has an
+  existential constant for the intrinsic moduli
+  (`Rd.BoundedLipschitzDomain.exists_besov_extension_le`) and for the `W^{1,p}(Ω)` norm of the
+  weak gradient (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`, Section 5).
 
 ### 4.4 The trace (H.7 at `k = 0` in qualitative form, X.3)
 
@@ -401,8 +402,24 @@ boundary traces at `L = 2`, `p = q = 2`, `s = 1/2` (`Ω.boundaryTrace ψ two_ne_
   everywhere on `Γ`), `memBoundaryBesov_extend` (the boundary trace of `E t` lies in
   `B^{1/2}_{2,2}(Γ)`), `exists_traceSpace_of_memBoundaryBesov` (every `g ∈ B^{1/2}_{2,2}(Γ)` is
   the boundary trace of some `E t`), `boundaryTrace_extend_eventuallyEq_iff` (`t` is determined
-  by the boundary trace of `E t`). This link to `B^{1/2}_{2,2}(Γ)` is qualitative: a norm
-  equivalence of `H^{1/2}(Γ)` with `B^{1/2}_{2,2}(Γ)` is not formalised.
+  by the boundary trace of `E t`).
+* The norms (file `FunctionSpaces/Domains/Traces/TraceSpaceNorm.lean`, with the quasi-norm
+  `Rd.BoundedLipschitzDomain.boundaryBesovNorm Ω 2 ψ (1 / 2) 2` of `B^{1/2}_{2,2}(Γ)` by chart
+  pieces from `FunctionSpaces/Domains/Traces/BoundaryBesovNorm.lean`), for every resolution of
+  unity `ψ`: `Rd.BoundedLipschitzDomain.enorm_eq_iInf` (`‖t‖ₑ` is the infimum of `‖U‖ₑ` over the
+  `U : H^{1, 2}(V, ℂ)` with the boundary trace of `E t`, the quotient norm, equivalent to
+  McLean's norm by his Theorem 3.37),
+  `Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv` (`∃ C, C ≠ ∞ ∧ ∀ t, ‖t‖ₑ ≤ C *
+  boundaryBesovNorm (traceL2 t) ∧ boundaryBesovNorm (traceL2 t) ≤ C * ‖t‖ₑ`),
+  `exists_traceSpace_of_memBoundaryBesov_le` (bounded preimages under the trace),
+  `mem_range_traceL2_iff` (the range of `traceL2` is `B^{1/2}_{2,2}(Γ)`), and
+  `traceSpaceEquivBoundaryBesovHalf Ω : TraceSpace Ω ≃L[ℂ] BoundaryBesovHalf Ω`, the isomorphism
+  with the Banach space of the `g ∈ L_2(Γ)` in `B^{1/2}_{2,2}(Γ)` for `Ω.boundaryPartition`, and
+  `traceRightInverse Ω : BoundaryBesovHalf Ω →L[ℂ] SobolevOne Ω`, the bounded linear right inverse
+  of McLean's Theorem 3.37 (`boundaryTraceL2_traceRightInverse`:
+  `boundaryTraceL2 (traceRightInverse b) = b.toL2`; `norm_traceRightInverse_le`). The constants
+  are existential. On `V`, `Rd.enorm_le_modNorm_two` is the converse of
+  `Rd.modNorm_two_le_norm`, with the explicit `Rd.sobolevOneInvConst V`.
 * `H^{-1/2}(Γ)`: `Rd.BoundedLipschitzDomain.DualTraceSpace Ω := StrongDual ℂ (TraceSpace Ω)`,
   `Rd.BoundedLipschitzDomain.dualTraceEquiv Ω : DualTraceSpace Ω ≃ₗᵢ⋆[ℂ] TraceSpace Ω` (Riesz,
   `dualTraceEquiv_apply`, uniqueness `eq_dualTraceEquiv_of_forall`), and
@@ -704,16 +721,16 @@ File `FunctionSpaces/Domains/Traces/TraceKernel.lean`, namespace `Rd.BoundedLips
 
 ## 5. Decisions and reasons
 
-* **Statements on `Ω` are qualitative.** The extension theorem for bounded Lipschitz domains
+* **Constants on `Ω` are existential.** The extension theorem for bounded Lipschitz domains
   (Rychkov's extension, assembled with a resolution of unity) and the trace theorem carry
-  existential constants, so the statements on `Ω` are equivalences of membership, and the
-  extension bound for `W^{1,p}` (Section 4.3) is `∃ C, C ≠ ∞ ∧ …`. The norm statements on `Ω`
-  have constant `1`: the restriction bound, and on the trace space the trace, the extension and
-  the quotient isometry `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)` (Section 4.6), which hold by the definition
-  of `H^{1/2}(Γ)` as the orthogonal complement of the trace kernel; its link with
-  `B^{1/2}_{2,2}(Γ)` is qualitative, without a norm comparison. The trace into `L_2(Γ)` has an
+  existential constants, so the bounds on `Ω` are statements `∃ C, C ≠ ∞ ∧ …`: the extension
+  bound for `W^{1,p}` (Section 4.3) and the norm equivalence of `H^{1/2}(Γ)` with
+  `B^{1/2}_{2,2}(Γ)` by chart pieces (Section 4.6). The norm statements on `Ω` with constant `1`
+  are the restriction bound, and on the trace space the trace, the extension and the quotient
+  isometry `H^1(Ω)/ker γ ≅ H^{1/2}(Γ)` (Section 4.6), which hold by the definition of
+  `H^{1/2}(Γ)` as the orthogonal complement of the trace kernel. The trace into `L_2(Γ)` has an
   existential constant (Section 4.8). Norm equivalences with explicit constants hold on `V`
-  (Sections 4.1 and 4.2).
+  (Sections 4.1, 4.2 and 4.6).
 * **`H^s(Ω)` is the restriction space**, the definition of Chandler-Wilde, Hewett and Moiola (the
   proposal cites their §3.1.4). Rellich's theorem then holds on every bounded set. Every function
   of `H^1(Ω)` lies in the weak-derivative space `W^1_2(Ω)`, on every open set
@@ -803,8 +820,10 @@ the FEEC/BEEC library builds the layers above on them.
 ## 8. Versioning
 
 The Lean declarations cited here are those of the commit of `main` that adds the bounded linear
-extension operator (`Rd.BoundedLipschitzDomain.exists_extensionL`); later commits keep them unless
-this document says otherwise, and the commit that changes an interface name updates this document.
+extension operator (`Rd.BoundedLipschitzDomain.exists_extensionL`), and the norms of Section 4.6
+those of the commit that adds `Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv`; later commits
+keep them unless this document says otherwise, and the commit that changes an interface name
+updates this document.
 The module paths are those of the folder layout by setting (Section 9): declaration names do not
 depend on folders, so a downstream file changes only its `import` lines. Pin `rev` to that commit
 or a later one. Missing lemmas and wishes for other statement shapes go to the issue tracker of

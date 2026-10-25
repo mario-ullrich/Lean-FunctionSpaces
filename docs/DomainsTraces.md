@@ -25,7 +25,8 @@ open set the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)`, for real `s`
 Mathlib's `H^s(ℝ^d)`, with the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`. On a bounded Lipschitz domain the
 trace space `H^{1/2}(Γ)` is defined as the orthogonal complement of the trace kernel in `H^1(Ω)`, a
 Hilbert space whose trace and extension operators have norm at most `1` by this definition, and
-`H^{-1/2}(Γ)` is its dual; the link to `B^{1/2}_{2,2}(Γ)` is qualitative. On a Lipschitz graph
+`H^{-1/2}(Γ)` is its dual; its norm is the least `H^1` norm of an extension and is equivalent to
+the norm of `B^{1/2}_{2,2}(Γ)` by chart pieces. On a Lipschitz graph
 domain the area formula expresses Mathlib's Euclidean Hausdorff measure of the boundary in the
 chart, with the Gram density `√(1 + ‖∇φ‖²)`. On a bounded Lipschitz domain the surface measure is
 this Hausdorff measure on the boundary `Γ`; it gives the space `L_2(Γ)`, into which `H^1(Ω)` and
@@ -241,6 +242,24 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   `Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_of_boundaryPartition`). The proof rests on the
   change of chart for the traces of graph domains (`Rd.LipschitzGraph.trace_ae_eq_trace_comp`),
   whose Lipschitz chart maps keep null sets (`Rd.volume_image_eq_zero_of_lipschitzWith`).
+* **Besov quasi-norms on the boundary.** With `Ω`, `Γ` and `ψ` as above, the quasi-norm
+  `‖g‖_{B^s_{p,q}(Γ)}` is the sum over the charts of
+  `‖G_j‖_{L_p(H_j)} + ‖(2^(ks) ω_1(G_j, 2^(-k))_p)_k‖_{ℓ_q}` for the chart pieces
+  `G_j = (ψ_j g) ∘ γ_j` (`Rd.BoundedLipschitzDomain.boundaryBesovNorm`,
+  `Rd.BoundedLipschitzDomain.boundaryBesovNorm_eq_sum`; Schneider–Vybíral, Definition 3.3). It is
+  finite exactly on `B^s_{p,q}(Γ)`
+  (`Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_boundaryBesovNorm_lt_top`), sees `g` only almost
+  everywhere on `Γ`, and is subadditive and homogeneous
+  (`Rd.BoundedLipschitzDomain.boundaryBesovNorm_add_le`,
+  `Rd.BoundedLipschitzDomain.boundaryBesovNorm_const_smul`). For `1 ≤ p < ∞`, `0 < s < 1` and
+  `1 ≤ q ≤ ∞` there are `C < ∞` with
+  `‖Tr_Γ F‖_{B^s_{p,q}(Γ)} ≤ C (‖F‖_p + ‖(2^(k(s+1/p)) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q})` for
+  `s + 1/p < L` (`Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_boundaryTrace_le`); for
+  `L ≥ 2` every `g ∈ B^s_{p,q}(Γ)` is `Tr_Γ F` almost everywhere on `Γ` for some `F` with
+  `‖F‖_p + ‖(2^(k(s+1/p)) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C ‖g‖_{B^s_{p,q}(Γ)}`
+  (`Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq_le`). Two resolutions of
+  unity give equivalent quasi-norms
+  (`Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_le_of_partition`).
 * **`H^1` on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`.
   `f ∈ L_2(V)` lies in `H^1(Ω)` if `f = F` almost everywhere on `Ω` for some `F ∈ W^1_2(V)`
   (`Rd.BoundedLipschitzDomain.MemSobolevOn`, a definition by extension); `H^1(Ω)` contains `0`, is
@@ -259,8 +278,11 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   (`Rd.BoundedLipschitzDomain.isBoundaryTrace_iff_forall_memSobolev`), and `f` has the boundary
   trace `g` with a finite intrinsic norm iff `f ∈ H^1(Ω)` and `g` is its boundary trace
   (`Rd.BoundedLipschitzDomain.hasBoundaryTrace_iff_memSobolevOn`). The extension and trace theorems
-  for bounded Lipschitz domains are qualitative, and so are these statements; the restriction
-  direction has constant `1` (`Rd.BoundedLipschitzDomain.modNormOn_le_modNorm_of_ae_eq`).
+  for bounded Lipschitz domains hold with bounds
+  (`Rd.BoundedLipschitzDomain.exists_besov_extension_le`,
+  `Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_boundaryTrace_le`,
+  `Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq_le`), and the restriction direction has
+  constant `1` (`Rd.BoundedLipschitzDomain.modNormOn_le_modNorm_of_ae_eq`).
 * **Sobolev spaces on open sets as Hilbert spaces.** Let `Ω ⊆ V` be open and `s` real. The
   elements of Mathlib's `H^s(V)` whose distribution vanishes on every test function of `Ω` form
   a closed subspace (`Rd.vanishOn`); for `s = 1` they are the elements vanishing almost
@@ -303,7 +325,9 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   (`Rd.conj_fourier_apply`).
 * **The trace space of a bounded Lipschitz domain.** For every `U ∈ H^1(V)` with `L_2` function
   `ι U` (`Rd.toL2`), `‖ι U‖_2 + ‖(2^k ω_2(ι U, 2^(-k))_2)_k‖_{ℓ_2} ≤ C ‖U‖` with an explicit
-  constant (`Rd.modNorm_two_le_norm`, `Rd.sobolevOneBesovConst`), and the `B^{1/2}_{2,1}` quantity
+  constant (`Rd.modNorm_two_le_norm`, `Rd.sobolevOneBesovConst`). Conversely
+  `‖U‖ ≤ C' (‖ι U‖_2 + ‖(2^k ω_2(ι U, 2^(-k))_2)_k‖_{ℓ_2})` with an explicit constant
+  (`Rd.enorm_le_modNorm_two`, `Rd.sobolevOneInvConst`). The `B^{1/2}_{2,1}` quantity
   is at most `√2` times this `B^1_{2,2}` quantity (`Rd.modNorm_half_one_le`), so
   `‖ι U‖_2 + ∑_k 2^(k/2) ω_2(ι U, 2^(-k))_2 ≤ √2 C ‖U‖` (`Rd.modNorm_half_one_le_norm`). Let `Ω` be
   a bounded Lipschitz domain with boundary `Γ` and `H^1(Ω)` the Hilbert space of the restriction
@@ -322,8 +346,8 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   (`Rd.BoundedLipschitzDomain.trace_eq_iff`), and `t ↦ Tr_Γ(E t)` maps `H^{1/2}(Γ)` onto
   `B^{1/2}_{2,2}(Γ)` modulo null sets of `Γ` (`Rd.BoundedLipschitzDomain.memBoundaryBesov_extend`,
   `Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`,
-  `Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`); this link is qualitative, a
-  norm equivalence of `H^{1/2}(Γ)` with `B^{1/2}_{2,2}(Γ)` is not formalised. `H^{-1/2}(Γ)` is the
+  `Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`), with equivalent norms (*The
+  norm of the trace space* below). `H^{-1/2}(Γ)` is the
   dual of the trace space (`Rd.BoundedLipschitzDomain.DualTraceSpace`), conjugate-linearly isometric
   to it by Riesz (`Rd.BoundedLipschitzDomain.dualTraceEquiv`), and the adjoint of the trace is the
   extension (`Rd.BoundedLipschitzDomain.adjoint_trace`).
@@ -370,6 +394,23 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   `ν(y) = ∑_j ψ_j(y) ν_j(P_j y)`, with the chart normals `ν_j` and the canonical resolution of
   unity `ψ` (`Rd.BoundedLipschitzDomain.boundaryPartition`, nonnegative), is measurable with
   `‖ν‖ ≤ 1` (`Rd.BoundedLipschitzDomain.normal`, `Rd.BoundedLipschitzDomain.norm_normal_le`).
+* **The norm of the trace space.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`,
+  `H^{1/2}(Γ)` its trace space and `τ : H^{1/2}(Γ) → L_2(Γ)` the trace. For every resolution of
+  unity `ψ` and `t ∈ H^{1/2}(Γ)`, `‖t‖` is the least norm `‖U‖` of a `U ∈ H^1(V)` with the
+  boundary trace of `t` (`Rd.BoundedLipschitzDomain.enorm_eq_iInf`), the quotient norm of
+  `γ(H^1(Ω))`, which McLean, Theorem 3.37, shows to be equivalent to his chart norm, and
+  there is `C < ∞` with `‖t‖ ≤ C ‖τ t‖_{B^{1/2}_{2,2}(Γ)}` and `‖τ t‖_{B^{1/2}_{2,2}(Γ)} ≤ C ‖t‖`
+  (`Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv`). Every `g ∈ B^{1/2}_{2,2}(Γ)` is the
+  boundary trace of some `E t` with `‖t‖ ≤ C ‖g‖_{B^{1/2}_{2,2}(Γ)}`
+  (`Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov_le`), and the range of `τ` is
+  `B^{1/2}_{2,2}(Γ)` (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff`). With the canonical
+  resolution of unity, the functions of `L_2(Γ)` in `B^{1/2}_{2,2}(Γ)` form a Banach space with
+  the norm by chart pieces (`Rd.BoundedLipschitzDomain.BoundaryBesovHalf`), and `τ` is an
+  isomorphism of `H^{1/2}(Γ)` onto it
+  (`Rd.BoundedLipschitzDomain.traceSpaceEquivBoundaryBesovHalf`). The trace has the bounded linear
+  right inverse `E τ⁻¹ : B^{1/2}_{2,2}(Γ) → H^1(Ω)`, as in McLean, Theorem 3.37
+  (`Rd.BoundedLipschitzDomain.traceRightInverse`,
+  `Rd.BoundedLipschitzDomain.boundaryTraceL2_traceRightInverse`).
 * **Divergence kernels.** Let `(e_i)` be an orthonormal basis of `V`, `n = dim V`, and
   `m_c(x) = c^n m(c x)`. For every smooth `m`, `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence
   kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt` (`Rd.divergenceKernel`,
@@ -496,15 +537,16 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Rychkov's extension, restrictions to Lipschitz graph domains by intrinsic local means | ✅ | ✗ | `Domains/Extension/RychkovExtension` |
 | Restrictions to Lipschitz graph domains by intrinsic differences | ✅ | ✗ | `Domains/Extension/LipschitzGraphBesov` |
 | Local versions of Rychkov's extension: boundary and inner patches, short steps into the closed cone, absolute convergence from bounds of the weighted local means, agreement on the patch for every convergent local extension, the local extension with a bound | ✅ | ✗ | `Domains/Extension/LocalExtension` |
-| Bounded Lipschitz domains: the patches covering the closure, pasting of local extensions, the extension with a bound | ✅ | ✗ | `Domains/Lipschitz/BoundedLipschitz` |
+| Bounded Lipschitz domains: the patches covering the closure, pasting of local extensions, subadditivity and homogeneity of the quasi-norms by differences, the extension with a bound | ✅ | ✗ | `Domains/Lipschitz/BoundedLipschitz` |
 | Null hyperplanes, the half-space and the models of manifolds as Besov domains | ✅ | ✗ | `Domains/Lipschitz/HalfSpace` |
 | Traces of every order on the half-space: trace theorem, extension, trace space | ✅ | ✗ | `Domains/Traces/HalfSpaceTrace` |
 | Graph map of a Lipschitz graph domain, restrictions of atoms to the graph | ✅ | ✗ | `Domains/Lipschitz/GraphParametrization` |
 | Traces on Lipschitz graph domains: boundedness, linearity, trace of continuous functions | ✅ | ✗ | `Domains/Traces/GraphTrace` |
 | Mollified graph and vertical cut-off with bounds of their differences | ✅ | ✗ | `Domains/Traces/MollifiedGraph` |
 | Extension from the boundary of a Lipschitz graph domain, its trace space | ✅ | ✗ | `Domains/Traces/GraphTraceExtension` |
-| Traces in charts: locality, approximation, change of chart, products, finite sums | ✅ | ✗ | `Domains/Traces/GraphTraceCharts` |
+| Traces in charts: locality, approximation, change of chart, products and their bound, finite sums | ✅ | ✗ | `Domains/Traces/GraphTraceCharts` |
 | Traces on bounded Lipschitz domains: Besov spaces on the boundary, the trace space | ✅ | ✗ | `Domains/Traces/LipschitzBoundaryTrace` |
+| Besov quasi-norms on the boundary: chart pieces, bounded trace and extension for `1 ≤ p < ∞`, independence of the resolution of unity | ✅ | ✗ | `Domains/Traces/BoundaryBesovNorm` |
 | Smooth measures on manifolds, integrals in charts | ✅ | ✗ | `Domains/Manifolds/SmoothMeasure` |
 | Besov atlases, chart pieces, changes of charts with cut-offs | ✅ | ✗ | `Domains/Manifolds/BesovAtlas` |
 | Besov spaces on compact manifolds, independence of the atlas and of the order | ✅ | ✗ | `Domains/Manifolds/Besov` |
@@ -516,9 +558,10 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | `H^1` on bounded Lipschitz domains defined as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the weak gradient, and the boundary traces, which form `B^{1/2}_{2,2}(Γ)` | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainH1` |
 | The Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets inside Mathlib's `H^s(ℝ^d)`, `H^s(Ω)` as a quotient, Rellich's theorem for `H^1(Ω)`, the identification with the restriction space of a bounded Lipschitz domain, the restriction of an element agreeing with `u ∈ H^1(Ω)` on `Ω`, the bound of the `H^1` norm by the `W^1_2` norm, the weak derivatives as bounded operators on `H^1(ℝ^d)`, the density of compactly supported Schwartz functions in `H^s(ℝ^d)`, Schwartz functions with compact support in `Ω` in the span of the test functions, `H̃^s(ℝ^d) = H^s(ℝ^d)`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)` | ✅ | ✗ | `Domains/Sobolev/SobolevRestrictionSpaces` |
 | The Bessel potential of real Schwartz functions as a real function, the isometry `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}` and `H^s`, and the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)`, `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on open sets | ✅ | ✗ | `Domains/Sobolev/SobolevDuality` |
-| `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` with explicit constants, the trace of `H^1(ℝ^d)` on a Lipschitz graph and the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the trace kernel, the trace space `H^{1/2}(Γ)` defined as its orthogonal complement, with trace and extension operators, `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` | ✅ | ✗ | `Domains/Traces/BoundaryTraceSpace` |
+| `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` and its converse `B^1_{2,2}(ℝ^d) ⊆ H^1(ℝ^d)` with explicit constants, the trace of `H^1(ℝ^d)` on a Lipschitz graph and the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the trace kernel, the trace space `H^{1/2}(Γ)` defined as its orthogonal complement, with trace and extension operators, `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` | ✅ | ✗ | `Domains/Traces/BoundaryTraceSpace` |
 | The area formula for Lipschitz graphs: Lipschitz maps and Mathlib's Euclidean Hausdorff measure, the linear case by Mathlib's norm determinant, stretches and tilts, the gradient and the Gram density, good pieces, `μHE[n-1](γ(A)) = ∫_A √(1 + ‖∇φ‖²)` with `n = dim V` in set, measure and integral form; the outward unit normal | ✅ | ✗ | `Domains/Lipschitz/LipschitzGraphArea` |
 | The surface measure of a bounded Lipschitz domain as `μHE[n-1]` on the boundary, its chart form, finiteness and null sets, the boundary `Γ` as a Lebesgue null set, the boundary trace in `L_p(Γ)`, `L_2(Γ)` with the traces of `H^1(Ω)` and `H^{1/2}(Γ)`, and the outward unit normal field | ✅ | ✗ | `Domains/Lipschitz/SurfaceMeasure` |
+| The norm of the trace space: least extension norm, equivalence with the norm of `B^{1/2}_{2,2}(Γ)`, bounded preimages, the range of `H^{1/2}(Γ) → L_2(Γ)`, the Banach space `B^{1/2}_{2,2}(Γ)` isomorphic to `H^{1/2}(Γ)`, and the bounded linear right inverse of the trace | ✅ | ✗ | `Domains/Traces/TraceSpaceNorm` |
 | Smoothness of parametric integrals, the dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, their supports and mean zero, and the Calderón–Zygmund families of the dilates of mean-zero Schwartz functions | ✅ | ✗ | `Domains/Extension/DivergenceKernels` |
 | The local means of order two by the gradient, local means of Triebel–Lizorkin type on a set, bounded extensions from one patch, pasting in `W^1_p(ℝ^d)`, the extension theorem (`W^1_p(Ω)` is the space of restrictions of `W^1_p(ℝ^d)`) for `1 < p < ∞` with a bound, and for `p = 2` `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the quotient norm of `H^1(Ω)` and the boundary traces of `W^1_2(Ω)` | ✅ | ✗ | `Domains/Extension/SobolevExtension` |
 | The extension operator for `W^1_p`, `1 < p < ∞`, on value–derivative jets, `E u = u` on `Ω` | ✅ | ✗ | `Domains/Extension/SobolevExtensionOperator` |

@@ -15,8 +15,9 @@ Let `Ω` be a bounded Lipschitz domain with boundary `Γ` in a finite-dimensiona
 product space `V`, such as `ℝ^d`, with Lebesgue measure, and `H^1(Ω)` the Hilbert space
 `Rd.RestrictionSpace 1 Ω` (`Rd.BoundedLipschitzDomain.SobolevOne`). The trace space
 `H^{1/2}(Γ)` is defined as the orthogonal complement of the trace kernel in `H^1(Ω)`, a Hilbert
-space; the trace, the extension and the quotient isometry below hold by this definition. Its link
-to `B^{1/2}_{2,2}(Γ)` is qualitative; a norm equivalence is not formalised.
+space; the trace, the extension and the quotient isometry below hold by this definition. Its
+norm is equivalent to the norm of `B^{1/2}_{2,2}(Γ)`
+(`Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv`).
 
 * **`H^1(V)` in Besov spaces, with constants**: for `U ∈ H^1(V)` with `L_2` function `ι U`
   (`Rd.toL2`), `‖ι U‖_2 + ‖(2^k ω_2(ι U, 2^(-k))_2)_k‖_{ℓ_2} ≤ C ‖U‖` with an explicit `C`
@@ -24,7 +25,9 @@ to `B^{1/2}_{2,2}(Γ)` is qualitative; a norm equivalence is not formalised.
   `B^1_{2,2}` quantity (`Rd.modNorm_half_one_le`, by the Cauchy–Schwarz inequality
   `ENNReal.lqNorm_one_mul_le` and `‖(2^(-k/2))_k‖_{ℓ_2} = √2`,
   `ENNReal.lqNorm_two_dyadicWeight_neg_half`); together `H^1(V) ⊆ B^{1/2}_{2,1}(V)` with
-  constant `√2 C` (`Rd.modNorm_half_one_le_norm`), so the trace of `H^1(V)` on one Lipschitz
+  constant `√2 C` (`Rd.modNorm_half_one_le_norm`). Conversely
+  `‖U‖ ≤ C' (‖ι U‖_2 + ‖(2^k ω_2(ι U, 2^(-k))_2)_k‖_{ℓ_2})` with an explicit `C'`
+  (`Rd.enorm_le_modNorm_two`). The trace of `H^1(V)` on one Lipschitz
   graph is bounded (`Rd.LipschitzGraph.exists_enorm_trace_toL2_le`): a bounded operator
   `H^1(V) → L_2(H)` (`Rd.LipschitzGraph.traceH1`), equal to `w ∘ γ` for Schwartz functions `w`
   (`Rd.LipschitzGraph.traceH1_ofSchwartz_ae`).
@@ -146,6 +149,61 @@ theorem modNorm_two_le_norm (U : H^{1}(V)) :
         gcongr
     _ = sobolevOneBesovConst V * ‖U‖ₑ := by
         rw [sobolevOneBesovConst]
+        ring
+
+variable (V) in
+/-- **The constant of the bound of `H^1(V)` by `B^1_{2,2}(V)`**:
+`(2 · 5)^{1/2} · 8 · 8 ‖Φ‖_1 · D`, the product of the constants of the three inclusions behind
+`Rd.enorm_le_modNorm_two`: `F^1_{2,2} ⊆ H^1` (`Rd.enorm_besselPotential_le_triebelLizorkinNorm`),
+`A^1_2 ⊆ F^1_{2,2}` for the band-limited approximation spaces, with the Littlewood–Paley kernel
+`Φ = Rd.lpKernel` (`Rd.triebelLizorkinNorm_le_approxNormDyadic`), and Jackson's direction for the
+moduli of order `2` (`ApproximationScheme.ModulusData.directConst` of `Rd.bandModulusData`). -/
+noncomputable def sobolevOneInvConst : ℝ≥0∞ :=
+  (2 * 5 ^ (1 : ℝ)) ^ (1 / 2 : ℝ) *
+    (8 * dyadicWeight 1 3 * eLpNorm (lpKernel (V := V)) 1 volume) *
+      (bandModulusData (V := V) two_ne_top 2).directConst 1
+
+/-- The constant of the bound of `H^1(V)` by `B^1_{2,2}(V)` is finite. -/
+theorem sobolevOneInvConst_ne_top : sobolevOneInvConst V ≠ ∞ :=
+  ENNReal.mul_ne_top (ENNReal.mul_ne_top
+    (ENNReal.rpow_ne_top_of_nonneg (by norm_num)
+      (ENNReal.mul_ne_top (by norm_num) (ENNReal.rpow_ne_top_of_nonneg zero_le_one (by norm_num))))
+    (ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num) (ENNReal.dyadicWeight_ne_top 1 3))
+      (memLp_one_iff_integrable.2 integrable_lpKernel).eLpNorm_lt_top.ne))
+    ((bandModulusData two_ne_top 2).directConst_ne_top 1)
+
+/-- **The norm of `H^1(V)` by the `B^1_{2,2}(V)` quantity, with an explicit constant**, the
+converse of `Rd.modNorm_two_le_norm`: for every `U ∈ H^1(V)` with `L_2` function `ι U`,
+`‖U‖ ≤ C (‖ι U‖_2 + ‖(2^k ω_2(ι U, 2^(-k))_2)_k‖_{ℓ_2})` with `C = Rd.sobolevOneInvConst V`:
+`‖U‖ = ‖J_1 ι U‖_2` (`BesselPotentialSpace.enorm_toLp_eq`) is at most `(2 · 5)^{1/2}` times the
+norm of `F^1_{2,2}` (`Rd.enorm_besselPotential_le_triebelLizorkinNorm`), which is bounded by the
+band-limited approximation norm (`Rd.triebelLizorkinNorm_le_approxNormDyadic`), which is bounded by
+the moduli (`ApproximationScheme.ModulusData.approxNormDyadic_le_modNorm`). -/
+theorem enorm_le_modNorm_two (U : H^{1}(V)) :
+    ‖U‖ₑ ≤ sobolevOneInvConst V *
+      (‖toL2 U‖ₑ + lqNorm 2 (fun k => dyadicWeight 1 k * lpModulus 2 2 (toL2 U) k)) := by
+  have hfh : besselPotential V ℂ 1 ((toL2 U : Lp ℂ 2 (volume : Measure V)) : 𝓢'(V, ℂ)) =
+      (U.toLp : 𝓢'(V, ℂ)) := by
+    rw [toTemperedDistribution_toL2]
+    exact U.bessel_toDistr_eq_toLp
+  have h1 := enorm_besselPotential_le_triebelLizorkinNorm zero_le_one hfh
+  rw [U.enorm_toLp_eq] at h1
+  have h2 := triebelLizorkinNorm_le_approxNormDyadic two_ne_top zero_le_one one_le_two (toL2 U)
+  rw [min_self] at h2
+  have h3 := (bandModulusData (V := V) two_ne_top 2).approxNormDyadic_le_modNorm (s := 1)
+    one_le_two (toL2 U)
+  calc ‖U‖ₑ ≤ (2 * 5 ^ (1 : ℝ)) ^ (1 / 2 : ℝ) * triebelLizorkinNorm 1 2 (toL2 U) := h1
+    _ ≤ (2 * 5 ^ (1 : ℝ)) ^ (1 / 2 : ℝ) *
+        (8 * dyadicWeight 1 3 * eLpNorm (lpKernel (V := V)) 1 volume *
+          (bandScheme two_ne_top).approxNormDyadic 1 2 (toL2 U)) := by gcongr
+    _ ≤ (2 * 5 ^ (1 : ℝ)) ^ (1 / 2 : ℝ) *
+        (8 * dyadicWeight 1 3 * eLpNorm (lpKernel (V := V)) 1 volume *
+          ((bandModulusData (V := V) two_ne_top 2).directConst 1 *
+            (‖toL2 U‖ₑ + lqNorm 2 (fun k => dyadicWeight 1 k * lpModulus 2 2 (toL2 U) k)))) := by
+        gcongr
+        exact h3
+    _ = _ := by
+        rw [sobolevOneInvConst]
         ring
 
 /-- **`H^1(V) ⊆ B^{1/2}_{2,1}(V)` with an explicit constant**: for every `U ∈ H^1(V)` with `L_2`
@@ -484,10 +542,10 @@ theorem boundaryTrace_toL2_sub (ψ : Ω.BoundaryPartition) (U W : H^{1}(V)) :
 /-- **The trace space `H^{1/2}(Γ)`** of a bounded Lipschitz domain, as a Hilbert space, defined
 as the orthogonal complement of the trace kernel in `H^1(Ω)`. By the trace theorem of `H^1(Ω)`,
 the boundary traces of its elements are the functions of `B^{1/2}_{2,2}(Γ)`, up to null sets of
-`Γ`, without a norm equivalence
-(`Rd.BoundedLipschitzDomain.memBoundaryBesov_extend`,
+`Γ` (`Rd.BoundedLipschitzDomain.memBoundaryBesov_extend`,
 `Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov`,
-`Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`). -/
+`Rd.BoundedLipschitzDomain.boundaryTrace_extend_eventuallyEq_iff`), with equivalent norms
+(`Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv`). -/
 abbrev TraceSpace := ↥(Ω.traceKer)ᗮ
 
 /-- **The trace** `γ : H^1(Ω) → H^{1/2}(Γ)`, the orthogonal projection onto the trace space. Two

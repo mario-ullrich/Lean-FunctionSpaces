@@ -23,8 +23,10 @@ with the vertical cut-off `v_j` of the mollified graph (`Rd.LipschitzGraph.vertC
 order and exponent `2` on `V` (`Rd.LipschitzGraph.isRegularAtom_extendAtom`). The levels of the
 extension are `F_j(x) = g_j(Px) v_j(x)` (`Rd.LipschitzGraph.extLevel`), and `E g = ∑_j F_j`
 (`Rd.LipschitzGraph.graphExtension`) has a finite `B^{s+1/p}_{p,q}`-norm on `V`
-(`Rd.LipschitzGraph.modNorm_graphExtension_le`), since the coefficient quasi-norm with smoothness
-`s + 1/p` on `V` is the one with smoothness `s` on `H`: `(s + 1/p) - n/p = s - (n-1)/p`.
+(`Rd.LipschitzGraph.modNorm_graphExtension_le`), also with differences of every order `L ≥ 2`
+(`Rd.LipschitzGraph.modNorm_graphExtension_lt_top`), since the coefficient quasi-norm with
+smoothness `s + 1/p` on `V` is the one with smoothness `s` on `H`:
+`(s + 1/p) - n/p = s - (n-1)/p`.
 
 **The trace of the extension is `g`** (`Rd.LipschitzGraph.trace_graphExtension`): the partial sums
 `∑_{j ≤ J} F_j` are continuous with traces `∑_{j ≤ J} g_j → g`
@@ -483,6 +485,19 @@ theorem intrinsicNorm_lt_top_of_modNorm (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L
     ((Ω.modNormOn_le_modNorm L σ q rfl).trans (modNorm_order_le hL σ q G)).trans_lt
       (ENNReal.mul_lt_top (by simp) hG)
   exact ⟨h1, Ω.intrinsicNorm_lt_top hp L σ hq h1⟩
+
+/-- **The extension has a finite norm of every order `L ≥ 2`**: for `1 ≤ p < ∞`, `0 < s < 1`,
+`1 ≤ q ≤ ∞` and `g ∈ B^s_{p,q}(H)`,
+`‖E g‖_p + ‖(2^(k(s+1/p)) ω_L(E g, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
+(`Rd.LipschitzGraph.modNorm_graphExtension_le`, `Rd.modNorm_order_le`). -/
+theorem modNorm_graphExtension_lt_top (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s)
+    (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q) {g : Lp ℂ p (volume : Measure Ω.hyperplane)}
+    (hg : ‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 g k) < ∞) :
+    ‖Ω.graphExtension hp g‖ₑ + lqNorm q (fun k =>
+      dyadicWeight (s + 1 / p.toReal) k * lpModulus p L (Ω.graphExtension hp g) k) < ∞ := by
+  obtain ⟨K, hK, hle⟩ := Ω.modNorm_graphExtension_le hp hs hs1 hq
+  exact (modNorm_order_le hL _ q _).trans_lt (ENNReal.mul_lt_top (by simp)
+    ((hle g hg).trans_lt (ENNReal.mul_lt_top hK.lt_top hg)))
 
 /-- **One level of the extension**: there are `C < ∞` and `N` such that for `0 < σ < 2`,
 `1 ≤ q ≤ ∞`, `g ∈ L_p(H)` and every level `j`,

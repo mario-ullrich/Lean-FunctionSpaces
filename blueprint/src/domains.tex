@@ -573,12 +573,14 @@ $S \subseteq \operatorname{int} L \subseteq L \subseteq \bigcup_i U_i$ (Mathlib'
 
 \begin{lemma}[Pasting local extensions]
 \label{lem:pasting}
-\lean{Rd.lpModulus_finsetSum_le, Rd.modNorm_finsetSum_le, Rd.modNorm_finsetSum_lt_top,
+\lean{Rd.lpModulus_finsetSum_le, Rd.modNorm_add_le, Rd.modNorm_const_smul,
+  Rd.modNorm_finsetSum_le, Rd.modNorm_finsetSum_lt_top,
   Rd.indicatorLp_sum_eq_of_partition, Rd.exists_pasting_le, Rd.exists_pasting}
 \leanok
-\uses{lem:resolution-of-unity, thm:multipliers}
+\uses{lem:resolution-of-unity, thm:multipliers, lem:rd-modulus}
 Let $1 \leq p < \infty$, $s < r$ and $1 \leq q \leq \infty$, and write
-$N(F) = \|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q}$. For every finite family
+$N(F) = \|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q}$. For all $G, H \in L_p$ and
+every $c \in \C$, $N(G + H) \leq N(G) + N(H)$ and $N(c G) = |c| \, N(G)$; for every finite family
 $(G_i)$ in $L_p$, $N(\sum_i G_i) \leq \sum_i N(G_i)$. Let $O \subseteq V$ be measurable and $(U_i)$
 a finite cover of $\overline O$ by bounded open sets. There is $C < \infty$ such that for every
 $f \in L_p$ and all $F_i \in L_p$ with $F_i = f$ almost everywhere on $O \cap U_i$, $f$ agrees on
@@ -588,7 +590,8 @@ $N(F_i) < \infty$ for every $i$.
 
 \begin{proof}
 \leanok
-The modulus $\omega_r(\cdot, t)_p$ and the norm of $\ell_q$ are subadditive. Fix a resolution of
+The modulus $\omega_r(\cdot, t)_p$ and the norm of $\ell_q$ are subadditive and homogeneous
+(\Cref{lem:rd-modulus}). Fix a resolution of
 unity $(\psi_i)$ subordinate to $(U_i)$ and bounds of its derivatives up to order $r$
 (\Cref{lem:resolution-of-unity}) before $f$, and take $F = \sum_i \psi_i F_i$: then
 $N(\psi_i F_i) \leq C_i N(F_i)$ with the constant $C_i$ of \Cref{thm:multipliers}, so
@@ -2641,10 +2644,10 @@ and $\min(1, t^l) \min(1, t^{2-l}) \leq \min(1, t^2)$. \Cref{lem:pointwise-atoms
   Rd.LipschitzGraph.eLpNorm_extLevel_le, Rd.LipschitzGraph.memLp_extLevel,
   Rd.LipschitzGraph.traceExtTerm, Rd.LipschitzGraph.traceExtTerm_ae,
   Rd.LipschitzGraph.graphExtension, Rd.LipschitzGraph.summable_traceExtTerm,
-  Rd.LipschitzGraph.modNorm_graphExtension_le}
+  Rd.LipschitzGraph.modNorm_graphExtension_le, Rd.LipschitzGraph.modNorm_graphExtension_lt_top}
 \leanok
 \uses{lem:extended-atoms, thm:atomic-decomposition, lem:cell-atoms-dual, thm:rd-atomic-synthesis,
-  thm:local-means}
+  thm:local-means, lem:moduli-orders}
 Let $1 \leq p < \infty$, $0 < s < 1$ and $1 \leq q \leq \infty$. For $g \in L_p(H)$ let
 $g_j = \eta_j * (k_j * g)$ be the terms of the reproducing formula on $H$, with moment order $1$,
 and $F_j(x) = g_j(Px) v_j(x)$. There is $K < \infty$ such that $E g = \sum_j F_j$ satisfies
@@ -2652,6 +2655,8 @@ and $F_j(x) = g_j(Px) v_j(x)$. There is $K < \infty$ such that $E g = \sum_j F_j
   \|E g\|_p + \|(2^{k(s + 1/p)} \omega_2(E g, 2^{-k})_p)_k\|_{\ell_q}
   \\ \leq K \bigl( \|g\|_{L_p(H)} + \|(2^{ks} \omega_1(g, 2^{-k})_p)_k\|_{\ell_q} \bigr).
 \end{multline*}
+For every $L \geq 2$ and every $g$ with a finite right side,
+$\|E g\|_p + \|(2^{k(s + 1/p)} \omega_L(E g, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
 \end{theorem}
 
 \begin{proof}
@@ -3022,6 +3027,31 @@ $\operatorname{Tr}(\psi G_J) = (\psi G_J) \circ \gamma$ and $\operatorname{Tr} G
 everywhere.
 \end{proof}
 
+\begin{lemma}[The trace of a product is bounded]
+\label{lem:trace-products-bound}
+\lean{Rd.LipschitzGraph.exists_modNorm_trace_mulLp_le}
+\leanok
+\uses{thm:trace-graph, thm:graph-besov, thm:multipliers, lem:trace-partial-sums}
+For all $1 \leq p < \infty$, $0 < s < 1$, $1 \leq q \leq \infty$ and $L \in \N$ with
+$s + 1/p < L$ and every smooth $\psi$ with bounded derivatives up to order $L$, there is
+$K < \infty$ such that for every $F \in L_p(V)$ with
+$\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$,
+\begin{multline*}
+  \|\operatorname{Tr}(\psi F)\|_{L_p(H)}
+    + \|(2^{ks} \omega_1(\operatorname{Tr}(\psi F), 2^{-k})_p)_k\|_{\ell_q}
+  \\ \leq K \bigl(\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q}\bigr).
+\end{multline*}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The function $\psi F$ has a finite intrinsic norm on $\Omega$ (\Cref{thm:multipliers},
+\Cref{lem:trace-partial-sums}). The trace is bounded by this intrinsic norm
+(\Cref{thm:trace-graph}), which is at most the norm of $\psi F$ on $V$ (\Cref{thm:graph-besov}),
+which is at most $M$ times the norm of $F$, with the multiplier constant $M$ of $\psi$
+(\Cref{thm:multipliers}).
+\end{proof}
+
 \begin{lemma}[Traces of finite sums]
 \label{lem:trace-sums}
 \lean{Rd.LipschitzGraph.trace_zero, Rd.LipschitzGraph.trace_finsetSum,
@@ -3112,7 +3142,9 @@ $x' \in H_k$ with $\gamma_k(x') \in B_k$ holds almost everywhere on $\Gamma \cap
 
 \begin{definition}[Besov spaces on the boundary]
 \label{def:boundary-besov}
-\lean{Rd.BoundedLipschitzDomain.MemBoundaryBesov, Rd.BoundedLipschitzDomain.MemBoundaryBesov.congr}
+\lean{Rd.BoundedLipschitzDomain.MemBoundaryBesov,
+  Rd.BoundedLipschitzDomain.chart_ae_eq_of_eventuallyEq,
+  Rd.BoundedLipschitzDomain.MemBoundaryBesov.congr}
 \leanok
 \uses{def:boundary-partition, def:ae-boundary}
 A function $g$ belongs to $B^s_{p,q}(\Gamma)$ if for every $j$ the chart piece
@@ -3195,14 +3227,21 @@ $(\psi_j \circ \gamma_j) \operatorname{Tr}_j F = \operatorname{Tr}_j (\psi_j F)$
 
 \begin{theorem}[The extension from the boundary]
 \label{thm:boundary-trace-extension}
-\lean{Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq}
+\lean{Rd.BoundedLipschitzDomain.modNorm_extensionSum_lt_top,
+  Rd.BoundedLipschitzDomain.boundaryTrace_extensionSum_eventuallyEq,
+  Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq}
 \leanok
 \uses{def:boundary-besov, lem:boundary-cutoffs, thm:graph-trace-extension, thm:trace-extension,
   lem:moduli-orders, lem:trace-products, thm:change-of-chart, lem:trace-sums,
-  thm:boundary-trace-charts}
+  thm:boundary-trace-charts, thm:multipliers, lem:pasting}
 Let $1 \leq p < \infty$, $0 < s < 1$, $1 \leq q \leq \infty$ and $L \geq 2$. Every
 $g \in B^s_{p,q}(\Gamma)$ is $\operatorname{Tr}_\Gamma F$ almost everywhere on $\Gamma$ for some $F$
-with $\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+with $\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$. More precisely,
+for all smooth $\zeta_j$ with bounded derivatives up to order $L$, $\zeta_j \neq 0$ only in $B_j$
+and $\zeta_j = 1$ where $\psi_j \neq 0$, and all $G_j \in L_p(H_j)$ with
+$G_j = (\psi_j g) \circ \gamma_j$ almost everywhere on $H_j$ and
+$\|G_j\|_p + \|(2^{ks} \omega_1(G_j, 2^{-k})_p)_k\|_{\ell_q} < \infty$, the function
+$F = \sum_j \zeta_j E_j G_j$ has these properties.
 \end{theorem}
 
 \begin{proof}
@@ -3300,6 +3339,174 @@ The first statement is the corresponding one of \Cref{thm:boundary-trace-space},
 of a finite intrinsic norm is part of \Cref{def:boundary-trace-finite-norm}. For the second, by
 \Cref{thm:bounded-lipschitz-besov} with $r = L$ some admissible $F$ exists, and
 $g = \operatorname{Tr}_\Gamma F = g'$ almost everywhere on $\Gamma$.
+\end{proof}
+
+\section{Besov quasi-norms on the boundary}
+\label{sec:boundary-besov-norm}
+
+In this section $\Omega$ is a bounded Lipschitz domain with boundary $\Gamma$, boundary balls
+$B_j$ and graph domains $\Omega_j$ over the hyperplanes $H_j$, with graph maps $\gamma_j$ and traces
+$\operatorname{Tr}_j$, and $\psi$ is a resolution of unity on $\Gamma$
+(\Cref{def:boundary-partition}). The space $B^s_{p,q}(\Gamma)$ of \Cref{def:boundary-besov} comes
+with a quasi-norm, the sum of the quasi-norms of the chart pieces, as in Schneider and Vyb\'{\i}ral
+\cite[Definition 3.3]{SchneiderVybiral} and Triebel \cite{Triebel2002}. The trace and the
+extension of \Cref{thm:boundary-trace-space} are bounded for it, following
+\cite[Theorem 4.11]{SchneiderVybiral} for $p \geq 1$; the constants depend on $\Omega$, $\psi$, $p$,
+$s$, $q$ and $L$, and are fixed before the functions.
+
+\begin{lemma}[The extension in one chart]
+\label{lem:chart-extension-bound}
+\lean{Rd.LipschitzGraph.exists_modNorm_mulLp_graphExtension_le}
+\leanok
+\uses{thm:multipliers, thm:graph-trace-extension, lem:moduli-orders}
+Let $\Omega_0$ be a Lipschitz graph domain with hyperplane $H$ and extension $E$
+(\Cref{thm:graph-trace-extension}). For all $1 \leq p < \infty$, $0 < s < 1$,
+$1 \leq q \leq \infty$ and $L \geq 2$ and every smooth $\psi$ with bounded derivatives up to
+order $L$, there is $K < \infty$ such that for every $g \in L_p(H)$ with
+$\|g\|_p + \|(2^{ks} \omega_1(g, 2^{-k})_p)_k\|_{\ell_q} < \infty$,
+\begin{multline*}
+  \|\psi E g\|_p + \|(2^{k(s + 1/p)} \omega_L(\psi E g, 2^{-k})_p)_k\|_{\ell_q}
+  \\ \leq K \bigl(\|g\|_{L_p(H)} + \|(2^{ks} \omega_1(g, 2^{-k})_p)_k\|_{\ell_q}\bigr).
+\end{multline*}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The multiplier bound (\Cref{thm:multipliers}), $\omega_L \leq 2^{L-2} \omega_2$
+(\Cref{lem:moduli-orders}) and the bound of the extension (\Cref{thm:graph-trace-extension}) give
+$K = M \, 2^{L-2} K_E$, with the multiplier constant $M$ of $\psi$.
+\end{proof}
+
+\begin{definition}[The Besov quasi-norm on the boundary]
+\label{def:boundary-besov-norm}
+\lean{Rd.BoundedLipschitzDomain.boundaryBesovNorm,
+  Rd.BoundedLipschitzDomain.boundaryBesovNorm_le_sum,
+  Rd.BoundedLipschitzDomain.boundaryBesovNorm_eq_sum}
+\leanok
+\uses{def:boundary-besov}
+For $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and a function $g$ on $V$,
+\[
+  \|g\|_{B^s_{p,q}(\Gamma)} = \sum_j \inf_{G_j}
+    \bigl(\|G_j\|_{L_p(H_j)} + \|(2^{ks} \omega_1(G_j, 2^{-k})_p)_k\|_{\ell_q}\bigr),
+\]
+where $G_j$ runs over the elements of $L_p(H_j)$ with $G_j = (\psi_j g) \circ \gamma_j$ almost
+everywhere on $H_j$. If such $G_j$ exist for every $j$, then
+$\|g\|_{B^s_{p,q}(\Gamma)}$ is the sum of the quasi-norms of the $G_j$.
+\end{definition}
+
+Each infimum runs over at most one element of $L_p(H_j)$, the class of the chart piece, and it
+is $\infty$ if the chart piece does not lie in $L_p(H_j)$.
+
+\begin{lemma}[Properties of the quasi-norm on the boundary]
+\label{lem:boundary-besov-norm-properties}
+\lean{Rd.BoundedLipschitzDomain.boundaryBesovNorm_zero,
+  Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_boundaryBesovNorm_lt_top,
+  Rd.BoundedLipschitzDomain.boundaryBesovNorm_eq_top_of_not_mem,
+  Rd.BoundedLipschitzDomain.boundaryBesovNorm_congr,
+  Rd.BoundedLipschitzDomain.boundaryBesovNorm_add_le_of_mem,
+  Rd.BoundedLipschitzDomain.boundaryBesovNorm_add_le,
+  Rd.BoundedLipschitzDomain.MemBoundaryBesov.add,
+  Rd.BoundedLipschitzDomain.boundaryBesovNorm_const_smul_of_mem,
+  Rd.BoundedLipschitzDomain.MemBoundaryBesov.const_smul,
+  Rd.BoundedLipschitzDomain.boundaryBesovNorm_const_smul,
+  Rd.BoundedLipschitzDomain.chart_ae_eq_zero_of_boundaryBesovNorm_eq_zero}
+\leanok
+\uses{def:boundary-besov-norm, def:boundary-besov, lem:pasting}
+Let $1 \leq p < \infty$, $s \in \R$ and $1 \leq q \leq \infty$.
+\begin{enumerate}
+  \item For every function $g$ on $V$, $g \in B^s_{p,q}(\Gamma)$ if and only if
+    $\|g\|_{B^s_{p,q}(\Gamma)} < \infty$.
+  \item For all functions $g, h$ on $V$ with $g = h$ almost everywhere on $\Gamma$,
+    $\|g\|_{B^s_{p,q}(\Gamma)} = \|h\|_{B^s_{p,q}(\Gamma)}$; and $\|0\|_{B^s_{p,q}(\Gamma)} = 0$.
+  \item For all functions $g, h$ on $V$ and every $c \in \C$,
+    $\|g + h\|_{B^s_{p,q}(\Gamma)} \leq \|g\|_{B^s_{p,q}(\Gamma)} + \|h\|_{B^s_{p,q}(\Gamma)}$
+    and $\|c g\|_{B^s_{p,q}(\Gamma)} = |c| \, \|g\|_{B^s_{p,q}(\Gamma)}$; in particular
+    $g + h, c g \in B^s_{p,q}(\Gamma)$ for $g, h \in B^s_{p,q}(\Gamma)$.
+  \item For every function $g$ on $V$ with $\|g\|_{B^s_{p,q}(\Gamma)} = 0$ and every $j$,
+    $(\psi_j g) \circ \gamma_j = 0$ almost everywhere on $H_j$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The quasi-norm is the sum of the quasi-norms of the chart pieces when they exist, and an
+infimum is finite only if some $G_j$ exists. (2) The chart pieces of $g$ and $h$ agree almost
+everywhere on $H_j$ (\Cref{def:boundary-besov}). (3) The chart
+pieces of $g + h$ and $c g$ are $G_j + H_j$ and $c G_j$, and the quasi-norms by differences are
+subadditive and homogeneous (\Cref{lem:pasting}). If $g$ or $h$ lies outside $B^s_{p,q}(\Gamma)$,
+the right side of the triangle inequality is $\infty$ by (1). For $c = 0$ both sides of the
+homogeneity vanish; for $c \neq 0$, $g = c^{-1}(c g)$, so $c g \in B^s_{p,q}(\Gamma)$ if and only
+if $g \in B^s_{p,q}(\Gamma)$, and outside the space both sides are $\infty$. (4) $\|G_j\|_p = 0$
+gives $G_j = 0$.
+\end{proof}
+
+\begin{theorem}[The boundary trace is bounded]
+\label{thm:boundary-besov-norm-trace}
+\lean{Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_boundaryTrace_le}
+\leanok
+\uses{def:boundary-besov-norm, lem:trace-products-bound, thm:boundary-trace-bounded}
+For all $1 \leq p < \infty$, $0 < s < 1$, $1 \leq q \leq \infty$ and $L \in \N$ with
+$s + 1/p < L$ there is $C < \infty$ such that for every $F \in L_p(V)$ with
+$\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$,
+\[
+  \|\operatorname{Tr}_\Gamma F\|_{B^s_{p,q}(\Gamma)}
+    \leq C \bigl(\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q}\bigr).
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The chart pieces of $\operatorname{Tr}_\Gamma F$ are $\operatorname{Tr}_j(\psi_j F)$
+(\Cref{thm:boundary-trace-bounded}), bounded by \Cref{lem:trace-products-bound} with
+constants $K_j$ chosen before $F$; $C = \sum_j K_j$.
+\end{proof}
+
+\begin{theorem}[A bounded extension from the boundary]
+\label{thm:boundary-besov-norm-extension}
+\lean{Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq_le}
+\leanok
+\uses{def:boundary-besov-norm, lem:chart-extension-bound, thm:boundary-trace-extension,
+  lem:boundary-cutoffs, lem:pasting}
+For all $1 \leq p < \infty$, $0 < s < 1$, $1 \leq q \leq \infty$ and $L \geq 2$ there is
+$C < \infty$ such that every $g \in B^s_{p,q}(\Gamma)$ is $\operatorname{Tr}_\Gamma F$ almost
+everywhere on $\Gamma$ for some $F \in L_p(V)$ with
+\[
+  \|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} \leq C \|g\|_{B^s_{p,q}(\Gamma)} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Choose the cut-offs $\zeta_j$ (\Cref{lem:boundary-cutoffs}), bounds of their derivatives up to
+order $L$ and the constants $K_j$ of \Cref{lem:chart-extension-bound} before $g$. For the
+chart pieces $G_j$ of $g$, $F = \sum_j \zeta_j E_j G_j$ has
+$\operatorname{Tr}_\Gamma F = g$ almost everywhere on $\Gamma$, as in the proof of
+\Cref{thm:boundary-trace-extension}, and by the triangle inequality (\Cref{lem:pasting}) its norm
+is at most $\sum_j K_j N(G_j) \leq C \|g\|_{B^s_{p,q}(\Gamma)}$ with $C = \sum_j K_j$.
+\end{proof}
+
+\begin{theorem}[Independence of the resolution of unity]
+\label{thm:boundary-besov-norm-partition}
+\lean{Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_le_of_partition}
+\leanok
+\uses{thm:boundary-besov-norm-trace, thm:boundary-besov-norm-extension, thm:boundary-trace-charts,
+  lem:boundary-besov-norm-properties}
+For all $1 \leq p < \infty$, $0 < s < 1$ and $1 \leq q \leq \infty$ and all resolutions of unity
+$\psi$, $\psi'$ on $\Gamma$ there is $C < \infty$ such that for every function $g$ on $V$,
+$\|g\|_{B^s_{p,q}(\Gamma), \psi'} \leq C \|g\|_{B^s_{p,q}(\Gamma), \psi}$, with the quasi-norms of
+$\psi'$ and $\psi$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $g \in B^s_{p,q}(\Gamma)$, \Cref{thm:boundary-besov-norm-extension} for $\psi$ and $L = 2$
+gives $F$ with $\operatorname{Tr}_\Gamma F = g$, the boundary traces of $\psi$ and $\psi'$ agree
+(\Cref{thm:boundary-trace-charts}), and \Cref{thm:boundary-besov-norm-trace} for $\psi'$ bounds
+$\|g\|_{B^s_{p,q}(\Gamma), \psi'}$. With the constant $C'$ of
+\Cref{thm:boundary-besov-norm-extension} for $\psi$ and $C''$ of
+\Cref{thm:boundary-besov-norm-trace} for $\psi'$, $C = C'' C' + 1$; the summand $1$ makes
+$C > 0$, so that $C \cdot \infty = \infty$ when $g \notin B^s_{p,q}(\Gamma)$, where the right side
+is $\infty$ (\Cref{lem:boundary-besov-norm-properties}).
 \end{proof}
 
 \chapter{Sobolev spaces on domains}
@@ -3423,9 +3630,11 @@ $1_\Omega F = 1_\Omega f$ (\Cref{lem:indicator-lp-eq-iff}). (2) and (3) agree by
 inequality is \Cref{lem:restriction-moduli}.
 \end{proof}
 
-The extension theorem for bounded Lipschitz domains (\Cref{thm:bounded-lipschitz-besov}) and the
-trace theorem below are qualitative, so the statements on $H^1(\Omega)$ are too; the inequality
-gives the restriction with constant $1$.
+The extension theorem for bounded Lipschitz domains (\Cref{thm:bounded-lipschitz-besov}), the
+boundary trace (\Cref{thm:boundary-besov-norm-trace}) and the extension from the boundary
+(\Cref{thm:boundary-besov-norm-extension}) hold with constants fixed before the functions; the
+statements on $H^1(\Omega)$ below are stated as memberships, and the inequality gives the
+restriction with constant $1$.
 
 \begin{theorem}[The weak gradient]
 \label{thm:sobolev-lipschitz-domain-weak}
@@ -4337,8 +4546,7 @@ trace space $H^{1/2}(\Gamma)$ is defined as the orthogonal complement in $H^1(\O
 of the trace, so that by this definition it is a Hilbert space with a trace and an extension of
 norm at most $1$; by the trace theorem of $H^1(\Omega)$ (\Cref{thm:sobolev-lipschitz-domain-trace})
 its elements correspond to the functions of $B^{1/2}_{2,2}(\Gamma)$ modulo null sets of $\Gamma$.
-This correspondence is qualitative: a norm equivalence of $H^{1/2}(\Gamma)$ with
-$B^{1/2}_{2,2}(\Gamma)$ is not formalised.
+The norms are compared in \Cref{sec:trace-space-norm}.
 
 The chart traces are bounded by the norm of $B^{1/2}_{2,1}(V)$ (\Cref{lem:trace-linear}). The
 following three results bound this norm on $H^1(V)$, with explicit constants.
@@ -4418,6 +4626,36 @@ The second bound follows with \Cref{lem:besov-half-one}.
 
 The finiteness in \Cref{thm:sobolev-one-besov-constant} is the hypothesis of the boundary trace
 theorems with $s = 1/2$ and $p = q = 2$.
+
+\begin{theorem}[The norm of $H^1(V)$ by the $B^1_{2,2}(V)$ quantity, with an explicit constant]
+\label{thm:besov-sobolev-one-constant}
+\lean{Rd.sobolevOneInvConst, Rd.sobolevOneInvConst_ne_top, Rd.enorm_le_modNorm_two}
+\leanok
+\uses{thm:modulus-coincidence, thm:rd-besov, thm:tl-besov-sandwich,
+  thm:sobolev-two-triebel-lizorkin, lem:sobolev-one-to-l2, lem:bessel-space-enorm}
+Let $D$ be the constant of the direct direction of \Cref{thm:modulus-coincidence} for the
+band-limited scheme with the moduli of order $2$ (\Cref{thm:rd-besov}) at smoothness $1$, $\Phi$
+the kernel of \Cref{thm:tl-besov-sandwich}, and
+$C_2 = (2 \cdot 5)^{1/2} \cdot 8 \cdot 8 \, \|\Phi\|_1 D$.
+Then $C_2 < \infty$, and for every $U \in H^1(V)$,
+\[
+  \|U\| \leq C_2 \bigl(\|\iota U\|_2 + \|(2^k \omega_2(\iota U, 2^{-k})_2)_k\|_{\ell_2}\bigr).
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\|U\| = \|J_1 \iota U\|_2$ (\Cref{lem:sobolev-one-to-l2}, \Cref{lem:bessel-space-enorm}), which is
+at most $(2 \cdot 5)^{1/2} \|\iota U\|_{F^1_{2,2}}$ (\Cref{thm:sobolev-two-triebel-lizorkin}),
+which is at most $8 \cdot 8 \, \|\Phi\|_1$ times the approximation norm of $\iota U$ in $A^1_2$
+(\Cref{thm:tl-besov-sandwich}), which is at most $D$ times the right side without $C_2$
+(\Cref{thm:modulus-coincidence}).
+\end{proof}
+
+\Cref{thm:sobolev-one-besov-constant} and \Cref{thm:besov-sobolev-one-constant} together give
+$\|U\| \simeq \|\iota U\|_2 + \|(2^k \omega_2(\iota U, 2^{-k})_2)_k\|_{\ell_2}$ on $H^1(V)$; the
+norm of the trace space is compared with that of $B^{1/2}_{2,2}(\Gamma)$ through them in
+\Cref{sec:trace-space-norm}.
 
 \begin{lemma}[The trace of $H^1(V)$ on a Lipschitz graph is bounded]
 \label{lem:graph-trace-sobolev-one}
@@ -4675,7 +4913,8 @@ $\operatorname{Tr}_\Gamma \iota u = g$ almost everywhere on $\Gamma$
 \end{proof}
 
 So $t \mapsto \operatorname{Tr}_\Gamma \iota E t$ is a bijection of $H^{1/2}(\Gamma)$ onto
-$B^{1/2}_{2,2}(\Gamma)$ modulo null sets of $\Gamma$, without a comparison of the norms.
+$B^{1/2}_{2,2}(\Gamma)$ modulo null sets of $\Gamma$; \Cref{sec:trace-space-norm} compares the
+norms.
 
 \begin{definition}[The space $H^{-1/2}(\Gamma)$]
 \label{def:dual-trace-space}
@@ -4705,6 +4944,265 @@ uniqueness, since an element is determined by its inner products (Mathlib's
 Mathlib's \texttt{Submodule.\allowbreak adjoint\_\allowbreak orthogonalProjectionOnto}, the adjoint
 of the orthogonal projection onto a closed subspace is the inclusion.
 \end{proof}
+
+\section{The norm of the trace space}
+\label{sec:trace-space-norm}
+
+In this section $\Omega$ is a bounded Lipschitz domain with boundary $\Gamma$, $H^{1/2}(\Gamma)$
+is the trace space of \Cref{def:trace-space} with the trace $\gamma$ and the extension $E$, and
+$\tau : H^{1/2}(\Gamma) \to L_2(\Gamma)$ is the trace into $L_2(\Gamma)$ for the surface
+measure (\Cref{def:trace-l2}). The norm of $B^{1/2}_{2,2}(\Gamma)$ is the quasi-norm by chart
+pieces of \Cref{def:boundary-besov-norm} with $p = q = 2$ and $s = 1/2$, and boundary traces are
+taken with $L = 2$. McLean \cite[Theorem 3.37]{McLean} proves that the trace from $H^1(\Omega)$
+onto his $H^{1/2}(\Gamma)$, defined by charts, is bounded and surjective with a bounded right
+inverse; hence his $H^{1/2}(\Gamma)$ is $\gamma(H^1(\Omega))$ with the quotient norm up to
+equivalence. With the definition by orthogonality the quotient norm is the norm of
+$H^{1/2}(\Gamma)$ (\Cref{thm:trace-space-least-extension}), and the norm equivalence with
+$B^{1/2}_{2,2}(\Gamma)$ is \Cref{thm:trace-space-norm-equiv}, following
+\cite[Theorem 4.11]{SchneiderVybiral} for $p = q = 2$.
+
+\begin{lemma}[The restriction to $\Omega$ keeps the boundary trace]
+\label{lem:boundary-trace-restriction}
+\lean{Rd.BoundedLipschitzDomain.boundaryTrace_restrictProj,
+  Rd.BoundedLipschitzDomain.enorm_trace_restrictProj_le,
+  Rd.BoundedLipschitzDomain.trace_restrictProj_eq,
+  Rd.BoundedLipschitzDomain.enorm_le_of_boundaryTrace_eventuallyEq}
+\leanok
+\uses{lem:sobolev-restriction-basic, prop:sobolev-vanishing-one, lem:boundary-trace-locality,
+  thm:sobolev-one-besov-constant, thm:trace-space-operators, thm:trace-space-functions}
+For every resolution of unity $\psi$ on $\Gamma$ and every $U \in H^1(V)$,
+$\operatorname{Tr}_\Gamma \iota(r_\Omega U) = \operatorname{Tr}_\Gamma \iota U$ almost everywhere on
+$\Gamma$ and $\|\gamma(r_\Omega U)\| \leq \|U\|$. For every $t \in H^{1/2}(\Gamma)$ with
+$\operatorname{Tr}_\Gamma \iota U = \operatorname{Tr}_\Gamma \iota E t$ almost everywhere on
+$\Gamma$, $\gamma(r_\Omega U) = t$ and $\|t\| \leq \|U\|$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$U - r_\Omega U$ vanishes on $\Omega$ (\Cref{lem:sobolev-restriction-basic}), so
+$\iota(U - r_\Omega U) = 0$ almost everywhere on $\Omega$ (\Cref{prop:sobolev-vanishing-one}), and
+the boundary trace depends only on the function on $\Omega$ (\Cref{lem:boundary-trace-locality}).
+The restriction and $\gamma$ have norm at most $1$ (\Cref{lem:sobolev-restriction-basic},
+\Cref{thm:trace-space-operators}), and equal boundary traces give equal traces
+(\Cref{thm:trace-space-functions}), with $\gamma E t = t$.
+\end{proof}
+
+\begin{theorem}[The norm of $H^{1/2}(\Gamma)$ is the least extension norm]
+\label{thm:trace-space-least-extension}
+\lean{Rd.BoundedLipschitzDomain.enorm_eq_iInf}
+\leanok
+\uses{lem:boundary-trace-restriction, thm:trace-space-operators}
+For every resolution of unity $\psi$ on $\Gamma$ and every $t \in H^{1/2}(\Gamma)$,
+\[
+  \|t\| = \inf \bigl\{\|U\| : U \in H^1(V),\ \operatorname{Tr}_\Gamma \iota U =
+    \operatorname{Tr}_\Gamma \iota E t \text{ almost everywhere on } \Gamma\bigr\}.
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Every such $U$ has $\|t\| \leq \|U\|$ (\Cref{lem:boundary-trace-restriction}), and $U = E t$ has
+$\|E t\| = \|t\|$ (\Cref{thm:trace-space-operators}).
+\end{proof}
+
+\begin{lemma}[Bounds of the trace of $H^1(V)$ and of an extension into $H^1(V)$]
+\label{lem:trace-space-norm-bounds}
+\lean{Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_toL2_le,
+  Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_extend_le,
+  Rd.BoundedLipschitzDomain.exists_toL2_boundaryTrace_eq_le}
+\leanok
+\uses{thm:boundary-besov-norm-trace, thm:boundary-besov-norm-extension,
+  thm:sobolev-one-besov-constant, thm:besov-sobolev-one-constant, thm:sobolev-one-two-besov,
+  lem:sobolev-one-weak-gradient-norm, lem:boundary-besov-norm-properties,
+  thm:trace-space-operators}
+For every resolution of unity $\psi$ on $\Gamma$:
+\begin{enumerate}
+  \item there is $C < \infty$ with
+    $\|\operatorname{Tr}_\Gamma \iota U\|_{B^{1/2}_{2,2}(\Gamma)} \leq C \|U\|$ for every
+    $U \in H^1(V)$, and hence
+    $\|\operatorname{Tr}_\Gamma \iota E t\|_{B^{1/2}_{2,2}(\Gamma)} \leq C \|t\|$ for every
+    $t \in H^{1/2}(\Gamma)$;
+  \item there is $C < \infty$ such that every $g \in B^{1/2}_{2,2}(\Gamma)$ is
+    $\operatorname{Tr}_\Gamma \iota U$ almost everywhere on $\Gamma$ for some $U \in H^1(V)$ with
+    $\|U\| \leq C \|g\|_{B^{1/2}_{2,2}(\Gamma)}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) \Cref{thm:boundary-besov-norm-trace} with $p = q = L = 2$ and $s = 1/2$, where
+$s + 1/p = 1$, and \Cref{thm:sobolev-one-besov-constant}; $\|E t\| = \|t\|$. (2)
+\Cref{thm:boundary-besov-norm-extension} gives $F$ with
+$\|F\|_2 + \|(2^k \omega_2(F, 2^{-k})_2)_k\|_{\ell_2}
+\leq C' \|g\|_{B^{1/2}_{2,2}(\Gamma)} < \infty$
+(\Cref{lem:boundary-besov-norm-properties}), so $F \in \Sob{1}{2}(V)$
+(\Cref{thm:sobolev-one-two-besov}) is $\iota U$ for some $U \in H^1(V)$
+(\Cref{lem:sobolev-one-weak-gradient-norm}), and \Cref{thm:besov-sobolev-one-constant} gives
+$\|U\| \leq C_2 C' \|g\|_{B^{1/2}_{2,2}(\Gamma)}$.
+\end{proof}
+
+\begin{theorem}[Bounded preimages under the trace]
+\label{thm:trace-space-right-inverse}
+\lean{Rd.BoundedLipschitzDomain.exists_traceSpace_of_memBoundaryBesov_le}
+\leanok
+\uses{lem:trace-space-norm-bounds, lem:boundary-trace-restriction, thm:trace-space-functions}
+For every resolution of unity $\psi$ on $\Gamma$ there is $C < \infty$ such that every
+$g \in B^{1/2}_{2,2}(\Gamma)$ is $\operatorname{Tr}_\Gamma \iota E t$ almost everywhere on $\Gamma$
+for some $t \in H^{1/2}(\Gamma)$ with $\|t\| \leq C \|g\|_{B^{1/2}_{2,2}(\Gamma)}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Take $U$ from \Cref{lem:trace-space-norm-bounds} (2) and $t = \gamma(r_\Omega U)$:
+$\operatorname{Tr}_\Gamma \iota E \gamma(r_\Omega U) = \operatorname{Tr}_\Gamma \iota(r_\Omega U)
+= \operatorname{Tr}_\Gamma \iota U = g$ (\Cref{thm:trace-space-functions},
+\Cref{lem:boundary-trace-restriction}), and $\|t\| \leq \|U\|$.
+\end{proof}
+
+By \Cref{thm:trace-space-functions}, $t$ is determined by $g$; \Cref{thm:trace-right-inverse}
+makes $g \mapsto E t$ a bounded linear operator.
+
+\begin{theorem}[$H^{1/2}(\Gamma)$ and $B^{1/2}_{2,2}(\Gamma)$ have equivalent norms]
+\label{thm:trace-space-norm-equiv}
+\lean{Rd.BoundedLipschitzDomain.exists_enorm_le_boundaryBesovNorm_extend,
+  Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv}
+\leanok
+\uses{thm:trace-space-right-inverse, lem:trace-space-norm-bounds, thm:trace-space-functions,
+  thm:trace-l2, thm:surface-measure-null-sets, lem:boundary-besov-norm-properties}
+For every resolution of unity $\psi$ on $\Gamma$ there is $C < \infty$ such that for every
+$t \in H^{1/2}(\Gamma)$,
+\[
+  \|t\| \leq C \|\tau t\|_{B^{1/2}_{2,2}(\Gamma)} \quad\text{and}\quad
+  \|\tau t\|_{B^{1/2}_{2,2}(\Gamma)} \leq C \|t\| .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\tau t = \operatorname{Tr}_\Gamma \iota E t$ almost everywhere on $\Gamma$
+(\Cref{thm:trace-l2}, \Cref{thm:surface-measure-null-sets}), and the quasi-norm sees only this
+class (\Cref{lem:boundary-besov-norm-properties}). The upper bound is
+\Cref{lem:trace-space-norm-bounds} (1). For the lower bound, \Cref{thm:trace-space-right-inverse}
+applied to $g = \operatorname{Tr}_\Gamma \iota E t$ returns some $t'$ with the boundary trace of
+$t$, and $t' = t$ (\Cref{thm:trace-space-functions}).
+\end{proof}
+
+\begin{theorem}[The range of $H^{1/2}(\Gamma) \to L_2(\Gamma)$]
+\label{thm:trace-l2-range}
+\lean{Rd.BoundedLipschitzDomain.mem_range_traceL2_iff}
+\leanok
+\uses{thm:trace-l2, thm:trace-space-functions, thm:surface-measure-null-sets}
+For every resolution of unity $\psi$ on $\Gamma$ and every $g \in L_2(\Gamma)$, $g = \tau t$
+for some $t \in H^{1/2}(\Gamma)$ if and only if $g \in B^{1/2}_{2,2}(\Gamma)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:trace-space-functions} and \Cref{thm:trace-l2}: the boundary traces of the elements of
+$H^{1/2}(\Gamma)$ lie in $B^{1/2}_{2,2}(\Gamma)$, and every $g \in B^{1/2}_{2,2}(\Gamma)$ is
+$\tau t$ almost everywhere on $\Gamma$ for some $t$.
+\end{proof}
+
+\paragraph{The Banach space $B^{1/2}_{2,2}(\Gamma)$.}
+With the canonical resolution of unity $\psi^0$ (\Cref{def:trace-space-setting}), the functions of
+$L_2(\Gamma)$ in $B^{1/2}_{2,2}(\Gamma)$ form a normed space with the quasi-norm by chart pieces,
+and $\tau$ identifies it with $H^{1/2}(\Gamma)$.
+
+\begin{definition}[The space $B^{1/2}_{2,2}(\Gamma)$ as a normed space]
+\label{def:boundary-besov-half}
+\lean{Rd.BoundedLipschitzDomain.memBoundaryBesov_coe_zero,
+  Rd.BoundedLipschitzDomain.MemBoundaryBesov.coe_add,
+  Rd.BoundedLipschitzDomain.MemBoundaryBesov.coe_smul,
+  Rd.BoundedLipschitzDomain.MemBoundaryBesov.coe_neg,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.toL2_injective,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instZero,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instAdd,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instNeg,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instSub,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instSMul,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instSMulNat,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instSMulInt,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instAddCommGroup,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.toL2AddMonoidHom,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instModule,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instNorm,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.norm_def,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.boundaryBesovNorm_lt_top,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.norm_smul,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.norm_add_le,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.norm_eq_zero_iff,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.normedSpaceCore,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instNormedAddCommGroup,
+  Rd.BoundedLipschitzDomain.BoundaryBesovHalf.instNormedSpace}
+\leanok
+\uses{def:boundary-l2, def:boundary-besov, def:boundary-besov-norm,
+  lem:boundary-besov-norm-properties, lem:boundary-vanishing-charts, thm:surface-measure-null-sets,
+  def:trace-space-setting}
+The normed space $B^{1/2}_{2,2}(\Gamma)$ consists of the $g \in L_2(\Gamma)$ that lie in the
+space of \Cref{def:boundary-besov} for $p = q = 2$, $s = 1/2$ and $\psi^0$, with the norm
+$\|g\|_{B^{1/2}_{2,2}(\Gamma)}$ of \Cref{def:boundary-besov-norm} for $\psi^0$. It is a complex
+normed space.
+\end{definition}
+
+The space is closed under the operations of $L_2(\Gamma)$, and the quasi-norm is homogeneous and
+subadditive (\Cref{lem:boundary-besov-norm-properties}). It is definite: a vanishing norm makes all
+chart pieces vanish, so $g = 0$ almost everywhere on $\Gamma$
+(\Cref{lem:boundary-vanishing-charts}), that is, $\sigma$-almost everywhere
+(\Cref{thm:surface-measure-null-sets}). In Lean it is a structure around $L_2(\Gamma)$ that
+carries the norm by chart pieces.
+
+\begin{theorem}[$H^{1/2}(\Gamma) \cong B^{1/2}_{2,2}(\Gamma)$]
+\label{thm:trace-space-iso}
+\lean{Rd.BoundedLipschitzDomain.traceSpaceToBoundaryBesovHalf,
+  Rd.BoundedLipschitzDomain.traceSpaceToBoundaryBesovHalf_bijective,
+  Rd.BoundedLipschitzDomain.traceSpaceLinearEquiv,
+  Rd.BoundedLipschitzDomain.toL2_traceSpaceLinearEquiv,
+  Rd.BoundedLipschitzDomain.traceNormConst, Rd.BoundedLipschitzDomain.traceNormConst_ne_top,
+  Rd.BoundedLipschitzDomain.traceNormConst_spec,
+  Rd.BoundedLipschitzDomain.norm_traceSpaceLinearEquiv_le,
+  Rd.BoundedLipschitzDomain.norm_traceSpaceLinearEquiv_symm_le,
+  Rd.BoundedLipschitzDomain.traceSpaceEquivBoundaryBesovHalf,
+  Rd.BoundedLipschitzDomain.toL2_traceSpaceEquivBoundaryBesovHalf,
+  Rd.BoundedLipschitzDomain.completeSpace_boundaryBesovHalf}
+\leanok
+\uses{def:boundary-besov-half, thm:trace-space-norm-equiv, thm:trace-l2-range, thm:trace-l2}
+The map $t \mapsto \tau t$ is an isomorphism of normed spaces of $H^{1/2}(\Gamma)$ onto
+$B^{1/2}_{2,2}(\Gamma)$. In particular $B^{1/2}_{2,2}(\Gamma)$ is a Banach space.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The map is linear, injective (\Cref{thm:trace-l2}) and surjective (\Cref{thm:trace-l2-range}),
+and bounded in both directions by \Cref{thm:trace-space-norm-equiv} for $\psi^0$ (Mathlib's
+\texttt{LinearEquiv.\allowbreak toContinuousLinearEquivOfBounds}). A normed space isomorphic to a
+complete one is complete (Mathlib's \texttt{completeSpace\_\allowbreak congr}).
+\end{proof}
+
+\begin{theorem}[The bounded linear right inverse of the trace]
+\label{thm:trace-right-inverse}
+\lean{Rd.BoundedLipschitzDomain.traceRightInverse,
+  Rd.BoundedLipschitzDomain.trace_traceRightInverse,
+  Rd.BoundedLipschitzDomain.boundaryTraceL2_traceRightInverse,
+  Rd.BoundedLipschitzDomain.norm_traceRightInverse_le}
+\leanok
+\uses{thm:trace-space-iso, thm:trace-space-operators, def:trace-l2}
+Let $C$ be the constant of \Cref{thm:trace-space-norm-equiv} for $\psi^0$ chosen in
+\Cref{thm:trace-space-iso}. The operator $R = E \circ \tau^{-1} : B^{1/2}_{2,2}(\Gamma) \to
+H^1(\Omega)$ is bounded and linear, and for every $g \in B^{1/2}_{2,2}(\Gamma)$,
+$\gamma R g = \tau^{-1} g$, $\gamma_{L_2} R g = g$ in $L_2(\Gamma)$ and
+$\|R g\| \leq C \|g\|_{B^{1/2}_{2,2}(\Gamma)}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\gamma E = \mathrm{id}$ and $\|E t\| = \|t\|$ (\Cref{thm:trace-space-operators}),
+$\gamma_{L_2} = \tau \circ \gamma$ (\Cref{def:trace-l2}), and $\|\tau^{-1} g\| \leq C \|g\|$
+(\Cref{thm:trace-space-iso}).
+\end{proof}
+
+This is the right inverse of McLean's trace theorem \cite[Theorem 3.37]{McLean} for
+$H^{1/2}(\Gamma)$ defined by orthogonality.
 
 \section{Divergence kernels}
 \label{sec:divergence-kernels}

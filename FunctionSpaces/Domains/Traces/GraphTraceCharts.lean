@@ -30,7 +30,9 @@ independent of the graph that describes it:
   sets (`Rd.volume_image_eq_zero_of_lipschitzWith`, through Mathlib's Hausdorff measures, which are
   Haar measures in finite dimension); hence almost everywhere statements pass from one chart to the
   other (`Rd.LipschitzGraph.ae_proj_graphMap`).
-* **Products with smooth functions** (`Rd.LipschitzGraph.trace_mulLp_ae`): `Tr(ψ F) = (ψ ∘ γ) Tr F`.
+* **Products with smooth functions** (`Rd.LipschitzGraph.trace_mulLp_ae`): `Tr(ψ F) = (ψ ∘ γ) Tr F`,
+  and the trace of `ψ F` is bounded in `B^s_{p,q}(H)` by the norm of `F`
+  (`Rd.LipschitzGraph.exists_modNorm_trace_mulLp_le`).
 * **Finite sums** (`Rd.LipschitzGraph.trace_finsetSum`): the trace of a finite sum is the sum of the
   traces.
 
@@ -544,6 +546,34 @@ theorem trace_mulLp_ae (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs :
   simp only [Function.comp_apply]
   rw [hx3, hx4]
   rfl
+
+/-- **The trace of a localised function is bounded**: for `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞`,
+`s + 1/p < L` and a smooth `ψ` with derivatives bounded by `M` up to order `L`, there is `K < ∞`
+with `‖Tr(ψ F)‖_p + ‖(2^(ks) ω_1(Tr(ψ F), 2^(-k))_p)_k‖_{ℓ_q} ≤
+K (‖F‖_p + ‖(2^(k(s+1/p)) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q})` for every `F ∈ L_p(V)` with a finite right
+side: the trace bound by the intrinsic norm (`Rd.LipschitzGraph.modNorm_trace_le`), the intrinsic
+norm by the norm on `V` (`Rd.LipschitzGraph.modNormOn_le_modNorm`) and the multiplier bound
+(`Rd.modNorm_mulLp_le`). -/
+theorem exists_modNorm_trace_mulLp_le (hp : p ≠ ∞) {L : ℕ} {s : ℝ} (hs : 0 < s) (hs1 : s < 1)
+    (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {ψ : V → ℂ}
+    (hψ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) ψ) {M : ℝ}
+    (hM : ∀ l ≤ L, ∀ x, ‖iteratedFDeriv ℝ l ψ x‖ ≤ M) :
+    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ F : Lp ℂ p (volume : Measure V), ‖F‖ₑ + lqNorm q (fun k =>
+        dyadicWeight (s + 1 / p.toReal) k * lpModulus p L F k) < ∞ →
+      ‖Ω.trace hp L (mulLp hψ.continuous (norm_le_of_iteratedFDeriv_le hM) F)‖ₑ +
+          lqNorm q (fun k => dyadicWeight s k *
+            lpModulus p 1 (Ω.trace hp L (mulLp hψ.continuous (norm_le_of_iteratedFDeriv_le hM) F))
+              k) ≤
+        K * (‖F‖ₑ + lqNorm q (fun k =>
+          dyadicWeight (s + 1 / p.toReal) k * lpModulus p L F k)) := by
+  obtain ⟨K, hK, hle⟩ := Ω.modNorm_trace_le hp L hs hs1 hq
+  refine ⟨K * multiplierTotal (V := V) hp L (s + 1 / p.toReal) M,
+    ENNReal.mul_ne_top hK (multiplierTotal_ne_top hp hsL M), fun F hF => ?_⟩
+  have hX := (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq
+    (modNorm_mulLp_lt_top hp hψ hM hsL hq hF)).1
+  rw [mul_assoc]
+  exact (hle _ hX).trans (mul_le_mul' le_rfl ((Ω.modNormOn_le_modNorm L _ q rfl).trans
+    (modNorm_mulLp_le hp hψ hM hsL hq F)))
 
 /-! ### Finite sums -/
 

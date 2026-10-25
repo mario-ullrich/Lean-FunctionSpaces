@@ -34,7 +34,7 @@ Let `Ω` be a bounded Lipschitz domain with boundary `Γ`: finitely many balls `
   (`Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq_iff`). The chart pieces of `Tr_Γ F` are the
   traces of `ψ_j F` on the graph domains; conversely `F = ∑_j ζ_j E_j G_j` with the extensions `E_j`
   of the graph domains and cut-offs `ζ_j` with `ζ_j ≠ 0` only in `B_j` and `ζ_j = 1` where
-  `ψ_j ≠ 0`.
+  `ψ_j ≠ 0` (`Rd.BoundedLipschitzDomain.boundaryTrace_extensionSum_eventuallyEq`).
 * The boundary trace depends only on `F` on `Ω` (`Rd.BoundedLipschitzDomain.boundaryTrace_congr`),
   and the functions with a finite intrinsic norm on `Ω` are the restrictions of such `F`
   (`Rd.BoundedLipschitzDomain.exists_besov_extension_of_modulusOn`): `B^s_{p,q}(Γ)` is the trace
@@ -322,18 +322,25 @@ def MemBoundaryBesov (ψ : Ω.BoundaryPartition) (s : ℝ) (q : ℝ≥0∞) (g :
     ‖G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 G k) < ∞
 
 variable {Ω} in
-/-- `B^s_{p,q}(Γ)` only sees `g` almost everywhere on `Γ`. -/
-theorem MemBoundaryBesov.congr {ψ : Ω.BoundaryPartition} {s : ℝ} {q : ℝ≥0∞} {g h : V → ℂ}
-    (hg : Ω.MemBoundaryBesov p ψ s q g) (hgh : g =ᶠ[Ω.aeBoundary] h) :
-    Ω.MemBoundaryBesov p ψ s q h := by
-  intro j
-  obtain ⟨G, hG, hGfin⟩ := hg j
-  refine ⟨G, ?_, hGfin⟩
-  filter_upwards [hG, (Ω.eventually_aeBoundary_iff.1 hgh) j] with x' h1 h2
-  rw [h1]
+/-- **Chart pieces see `g` only almost everywhere on `Γ`**: if `g = h` almost everywhere on `Γ`,
+then `(ψ_j g) ∘ γ_j = (ψ_j h) ∘ γ_j` almost everywhere on `H_j`, since `ψ_j ≠ 0` only in `B_j`. -/
+theorem chart_ae_eq_of_eventuallyEq (ψ : Ω.BoundaryPartition) {g h : V → ℂ}
+    (hgh : g =ᶠ[Ω.aeBoundary] h) (j : Fin Ω.N) :
+    (fun x' => ψ.toComplex j ((Ω.graph j).graphMap x') * g ((Ω.graph j).graphMap x')) =ᵐ[volume]
+      fun x' => ψ.toComplex j ((Ω.graph j).graphMap x') * h ((Ω.graph j).graphMap x') := by
+  filter_upwards [(Ω.eventually_aeBoundary_iff.1 hgh) j] with x' hx
   by_cases hψ : ψ.toFun j ((Ω.graph j).graphMap x') = 0
   · rw [ψ.toComplex_of_eq_zero hψ, zero_mul, zero_mul]
-  · rw [h2 (ψ.mem_ball_of_ne_zero hψ)]
+  · rw [hx (ψ.mem_ball_of_ne_zero hψ)]
+
+variable {Ω} in
+/-- `B^s_{p,q}(Γ)` only sees `g` almost everywhere on `Γ`
+(`Rd.BoundedLipschitzDomain.chart_ae_eq_of_eventuallyEq`). -/
+theorem MemBoundaryBesov.congr {ψ : Ω.BoundaryPartition} {s : ℝ} {q : ℝ≥0∞} {g h : V → ℂ}
+    (hg : Ω.MemBoundaryBesov p ψ s q g) (hgh : g =ᶠ[Ω.aeBoundary] h) :
+    Ω.MemBoundaryBesov p ψ s q h := fun j =>
+  let ⟨G, hG, hGfin⟩ := hg j
+  ⟨G, hG.trans (chart_ae_eq_of_eventuallyEq ψ hgh j), hGfin⟩
 
 /-! ### The boundary trace -/
 
@@ -461,42 +468,52 @@ theorem memBoundaryBesov_boundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ �
   exact ⟨_, Ω.trace_mulLp_ae_boundaryTrace ψ hp hL hs hsL hq hF j hC,
     (hle _ hX).trans_lt (ENNReal.mul_lt_top hK.lt_top hX)⟩
 
-/-- **Every function of `B^s_{p,q}(Γ)` is a boundary trace** (Schneider–Vybíral, Theorem 4.11, for
-`p ≥ 1`, the extension): for `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞` and `L ≥ 2`, every
-`g ∈ B^s_{p,q}(Γ)` is `Tr_Γ F` almost everywhere on `Γ` for some `F` with
-`‖F‖_p + ‖(2^(k(s+1/p)) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞`. With the chart pieces `G_j` of `g`,
-`F = ∑_j ζ_j E_j G_j` with the extensions `E_j` of the graph domains
-(`Rd.LipschitzGraph.graphExtension`) and the cut-offs `ζ_j`
-(`Rd.BoundedLipschitzDomain.BoundaryPartition.exists_cutoff`): in the chart of `Ω_k`,
-`Tr_k(ζ_j E_j G_j) = ζ_j ψ_j g = ψ_j g` by the change of chart, and `∑_j ψ_j = 1` on `Γ`. -/
-theorem exists_boundaryTrace_eq (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L)
-    {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q) {g : V → ℂ}
-    (hg : Ω.MemBoundaryBesov p ψ s q g) :
-    ∃ F : Lp ℂ p (volume : Measure V), ‖F‖ₑ + lqNorm q (fun k =>
-        dyadicWeight (s + 1 / p.toReal) k * lpModulus p L F k) < ∞ ∧
-      Ω.boundaryTrace ψ hp L F =ᶠ[Ω.aeBoundary] g := by
+/-- **The localised extensions have a finite norm**: for `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞`,
+`L ≥ 2`, smooth `ζ_j` with derivatives bounded up to order `L` and `G_j ∈ B^s_{p,q}(H_j)`, the sum
+`F = ∑_j ζ_j E_j G_j` of the localised extensions has
+`‖F‖_p + ‖(2^(k(s+1/p)) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
+(`Rd.LipschitzGraph.modNorm_graphExtension_lt_top`, `Rd.modNorm_mulLp_lt_top`,
+`Rd.modNorm_finsetSum_lt_top`). -/
+theorem modNorm_extensionSum_lt_top (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s)
+    (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q) {ζ : Fin Ω.N → V → ℂ}
+    (hζs : ∀ j, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (ζ j)) {C : Fin Ω.N → ℝ}
+    (hC : ∀ j, ∀ l ≤ L, ∀ x, ‖iteratedFDeriv ℝ l (ζ j) x‖ ≤ C j)
+    (G : ∀ j, Lp ℂ p (volume : Measure (Ω.graph j).hyperplane))
+    (hGfin : ∀ j, ‖G j‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 (G j) k) < ∞) :
+    ‖∑ j, mulLp (hζs j).continuous (norm_le_of_iteratedFDeriv_le (hC j))
+        ((Ω.graph j).graphExtension hp (G j))‖ₑ + lqNorm q (fun k =>
+      dyadicWeight (s + 1 / p.toReal) k * lpModulus p L (∑ j, mulLp (hζs j).continuous
+        (norm_le_of_iteratedFDeriv_le (hC j)) ((Ω.graph j).graphExtension hp (G j))) k) < ∞ :=
+  modNorm_finsetSum_lt_top Finset.univ _ hq fun j _ =>
+    modNorm_mulLp_lt_top hp (hζs j) (hC j) (add_one_div_toReal_lt hp hs1 hL) hq
+      ((Ω.graph j).modNorm_graphExtension_lt_top hp hL hs hs1 hq (hGfin j))
+
+/-- **The boundary trace of the sum of the localised extensions**: for `1 ≤ p < ∞`, `0 < s < 1`,
+`1 ≤ q ≤ ∞`, `L ≥ 2`, smooth `ζ_j` with derivatives bounded up to order `L`, `ζ_j ≠ 0` only in
+`B_j` and `ζ_j = 1` where `ψ_j ≠ 0`, and chart pieces `G_j ∈ B^s_{p,q}(H_j)` of `g`,
+`G_j = (ψ_j g) ∘ γ_j` almost everywhere on `H_j`, the function `F = ∑_j ζ_j E_j G_j` has
+`Tr_Γ F = g` almost everywhere on `Γ`. In the chart of `Ω_k`,
+`Tr_k(ζ_j E_j G_j) = ζ_j ψ_j g = ψ_j g` by the change of chart
+(`Rd.LipschitzGraph.trace_mulLp_ae`, `Rd.LipschitzGraph.trace_ae_eq_trace_comp`,
+`Rd.LipschitzGraph.trace_graphExtension`), and `∑_j ψ_j = 1` on `Γ`. -/
+theorem boundaryTrace_extensionSum_eventuallyEq (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ}
+    (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q)
+    {ζ : Fin Ω.N → V → ℂ} (hζs : ∀ j, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (ζ j))
+    (hζB : ∀ j y, ζ j y ≠ 0 → y ∈ ball (Ω.center j) (Ω.radius j))
+    (hζ1 : ∀ j y, ψ.toFun j y ≠ 0 → ζ j y = 1) {C : Fin Ω.N → ℝ}
+    (hC : ∀ j, ∀ l ≤ L, ∀ x, ‖iteratedFDeriv ℝ l (ζ j) x‖ ≤ C j) {g : V → ℂ}
+    (G : ∀ j, Lp ℂ p (volume : Measure (Ω.graph j).hyperplane))
+    (hG : ∀ j, (G j : (Ω.graph j).hyperplane → ℂ) =ᵐ[volume]
+      fun x' => ψ.toComplex j ((Ω.graph j).graphMap x') * g ((Ω.graph j).graphMap x'))
+    (hGfin : ∀ j, ‖G j‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 (G j) k) < ∞) :
+    Ω.boundaryTrace ψ hp L (∑ j, mulLp (hζs j).continuous (norm_le_of_iteratedFDeriv_le (hC j))
+      ((Ω.graph j).graphExtension hp (G j))) =ᶠ[Ω.aeBoundary] g := by
   have hL1 : 1 ≤ L := le_trans one_le_two hL
   have hsL := add_one_div_toReal_lt hp hs1 hL
-  choose G hG hGfin using hg
-  choose ζ hζs hζc hζB hζ1 using ψ.exists_cutoff
-  choose C hC using fun j => exists_iteratedFDeriv_bound (hζs j) (hζc j) L
-  -- the extensions of the chart pieces
-  have hEfin : ∀ j, ‖(Ω.graph j).graphExtension hp (G j)‖ₑ + lqNorm q (fun k =>
-      dyadicWeight (s + 1 / p.toReal) k *
-        lpModulus p L ((Ω.graph j).graphExtension hp (G j)) k) < ∞ := fun j => by
-    obtain ⟨K, hK, hle⟩ := (Ω.graph j).modNorm_graphExtension_le hp hs hs1 hq
-    exact (modNorm_order_le hL _ q _).trans_lt (ENNReal.mul_lt_top (by simp)
-      ((hle (G j) (hGfin j)).trans_lt (ENNReal.mul_lt_top hK.lt_top (hGfin j))))
-  -- the localized extensions
-  have hFfin : ∀ j, ‖mulLp (hζs j).continuous (norm_le_of_iteratedFDeriv_le (hC j))
-      ((Ω.graph j).graphExtension hp (G j))‖ₑ + lqNorm q (fun k =>
-        dyadicWeight (s + 1 / p.toReal) k * lpModulus p L (mulLp (hζs j).continuous
-          (norm_le_of_iteratedFDeriv_le (hC j)) ((Ω.graph j).graphExtension hp (G j))) k) < ∞ :=
-    fun j => modNorm_mulLp_lt_top hp (hζs j) (hC j) hsL hq (hEfin j)
-  have hsum := modNorm_finsetSum_lt_top Finset.univ (fun j => mulLp (hζs j).continuous
-    (norm_le_of_iteratedFDeriv_le (hC j)) ((Ω.graph j).graphExtension hp (G j))) hq
-      fun j _ => hFfin j
-  refine ⟨_, hsum, Ω.eventually_aeBoundary_iff.2 fun k => ?_⟩
+  have hEfin := fun j => (Ω.graph j).modNorm_graphExtension_lt_top hp hL hs hs1 hq (hGfin j)
+  have hFfin := fun j => modNorm_mulLp_lt_top hp (hζs j) (hC j) hsL hq (hEfin j)
+  have hsum := Ω.modNorm_extensionSum_lt_top hp hL hs hs1 hq hζs hC G hGfin
+  refine Ω.eventually_aeBoundary_iff.2 fun k => ?_
   -- the trace in the chart of `Ω_k`
   have htr := (Ω.graph k).trace_finsetSum hp L hs hq Finset.univ
     (F := fun j => mulLp (hζs j).continuous (norm_le_of_iteratedFDeriv_le (hC j))
@@ -529,6 +546,26 @@ theorem exists_boundaryTrace_eq (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L 
       · rw [hζ1 j _ hψ, one_mul]
   rw [h1 hk, htr, h2, Finset.sum_congr rfl fun j _ => hterm j, ← Finset.sum_mul,
     ψ.sum_toComplex_eq_one hΓ, one_mul]
+
+/-- **Every function of `B^s_{p,q}(Γ)` is a boundary trace** (Schneider–Vybíral, Theorem 4.11, for
+`p ≥ 1`, the extension): for `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞` and `L ≥ 2`, every
+`g ∈ B^s_{p,q}(Γ)` is `Tr_Γ F` almost everywhere on `Γ` for some `F` with
+`‖F‖_p + ‖(2^(k(s+1/p)) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞`. With the chart pieces `G_j` of `g`,
+`F = ∑_j ζ_j E_j G_j` with the extensions `E_j` of the graph domains
+(`Rd.LipschitzGraph.graphExtension`) and the cut-offs `ζ_j`
+(`Rd.BoundedLipschitzDomain.BoundaryPartition.exists_cutoff`,
+`Rd.BoundedLipschitzDomain.boundaryTrace_extensionSum_eventuallyEq`). -/
+theorem exists_boundaryTrace_eq (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L)
+    {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q) {g : V → ℂ}
+    (hg : Ω.MemBoundaryBesov p ψ s q g) :
+    ∃ F : Lp ℂ p (volume : Measure V), ‖F‖ₑ + lqNorm q (fun k =>
+        dyadicWeight (s + 1 / p.toReal) k * lpModulus p L F k) < ∞ ∧
+      Ω.boundaryTrace ψ hp L F =ᶠ[Ω.aeBoundary] g := by
+  choose G hG hGfin using hg
+  choose ζ hζs hζc hζB hζ1 using ψ.exists_cutoff
+  choose C hC using fun j => exists_iteratedFDeriv_bound (hζs j) (hζc j) L
+  exact ⟨_, Ω.modNorm_extensionSum_lt_top hp hL hs hs1 hq hζs hC G hGfin,
+    Ω.boundaryTrace_extensionSum_eventuallyEq ψ hp hL hs hs1 hq hζs hζB hζ1 hC G hG hGfin⟩
 
 /-- **The trace space of a bounded Lipschitz domain** (Schneider–Vybíral, Theorem 4.11, for
 `p ≥ 1`): for `1 ≤ p < ∞`, `0 < s < 1`, `1 ≤ q ≤ ∞` and `L ≥ 2`, `g ∈ B^s_{p,q}(Γ)` iff
