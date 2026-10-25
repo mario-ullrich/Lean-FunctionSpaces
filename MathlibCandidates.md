@@ -561,3 +561,16 @@ declarations.
   `H^{1,2}(V, ℂ)` vanishing outside a compact subset of an open set `Ω` lie in the closure of the
   test functions of `Ω` (`Rd.mem_tildeSpace_of_isCompact`). Mathlib's convolution files cover the
   smoothness of `η ⋆ f`; these statements add its weak derivatives.
+* **The Gagliardo–Nirenberg–Sobolev inequality for weak derivatives**
+  (`FunctionSpaces/Rd/Sobolev/GagliardoNirenbergSobolev.lean`): for a smooth compactly supported
+  kernel `K` and `g = ∂_v h` weakly on `V`, `D(K ⋆ h)(x) v = (K ⋆ g)(x)`
+  (`Rd.fderiv_conv_apply_eq_conv`), a candidate on its own next to Mathlib's distributions `𝓓'`
+  and their line derivatives; and Mathlib's inequality `‖f‖_{p'} ≤ C ∑_k ‖∂_{e_k} f‖_p` for every
+  `f ∈ L_p(V)` with weak derivatives along the orthonormal basis `Rd.gridBasis`, by
+  mollification, cut-off and Fatou's lemma (`Rd.eLpNorm_le_of_hasWeakLineDeriv`), a candidate
+  together with TauCeti's `W1p0.sobolevEmbeddingL`. Fatou's lemma with convergent bounds
+  `B_i → b` (`MeasureTheory.eLpNorm_le_of_ae_tendsto_of_tendsto`) generalises Mathlib's
+  `MeasureTheory.Lp.eLpNorm_le_of_ae_tendsto`, the case of a constant bound, and belongs next to
+  it; the bound `‖L‖ ≤ ∑_i ‖L b_i‖` of a continuous linear map through an orthonormal basis
+  (`ContinuousLinearMap.opNorm_le_sum_norm_apply_orthonormalBasis`) belongs next to
+  `OrthonormalBasis.sum_repr'`.

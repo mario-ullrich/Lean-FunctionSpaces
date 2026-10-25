@@ -5545,7 +5545,8 @@ $2^{jn}$ against the coefficient as in \Cref{lem:cell-atoms-regular}.
 
 \begin{theorem}[Atomic decomposition into smooth atoms]
 \label{thm:smooth-atomic-decomposition}
-\lean{Rd.LocalMeansBump.atomic_decomposition_smooth, Rd.stdBumpBase, Rd.LocalMeansBump.std}
+\lean{Rd.LocalMeansBump.atomic_decomposition_smooth, Rd.stdBumpBase, Rd.LocalMeansBump.std,
+  Rd.LocalMeansBump.eLpNorm_std_one}
 \leanok
 \uses{thm:atomic-decomposition, lem:cell-atoms-smooth}
 Let $g$ be a bump of radius $R$, $1 \leq p < \infty$ and $L, K \in \N$. There is $A$ such that for
@@ -5553,13 +5554,14 @@ every $F \in L_p$ the terms of the reproducing formula are
 $\eta_j * (k_j * F) = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, with cell atoms that are
 smooth atoms on $V$ of order $K$, radius factor $2LR + n$ and constant $A$, and
 $\|\lambda\|_{b^s_{p,q}} = \|(2^{js} \|k_j * F\|_p)_j\|_{\ell_q}$. The normalised smooth bump of
-radius $1$ around $0$ is a bump.
+radius $1$ around $0$ is a bump of $L_1$ norm $1$.
 \end{theorem}
 
 \begin{proof}
 \leanok
 \Cref{thm:atomic-decomposition} for the decomposition and the coefficients, and
-\Cref{lem:cell-atoms-smooth} for the atoms.
+\Cref{lem:cell-atoms-smooth} for the atoms. The normalised bump is nonnegative with integral
+$1$, so its $L_1$ norm is $1$.
 \end{proof}
 
 \begin{definition}[Smooth changes of variables with a cut-off]

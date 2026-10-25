@@ -21,6 +21,9 @@ all with named constants: formulas in norms and Schwartz seminorms of fixed kern
 An interpolation inequality for dyadic suprema (Brezis–Mironescu) adds the critical case: Jawerth's
 embedding `F^{s₀}_{p₀,∞} ↪ F^{s₁}_{p₁,q}`, `F^{n(1/p₀ - 1/p₁)}_{p₀,∞} ↪ L_{p₁}` and Sobolev's
 inequality `W^m_p ↪ L_r` for `1/r = 1/p - m/n`, `1 < p < ∞`, following Johnsen–Sickel.
+Mathlib's Gagliardo–Nirenberg–Sobolev inequality, carried to weakly differentiable functions by
+mollification, cut-off and Fatou's lemma, adds `p = 1`: `W^1_p ↪ L_r` for `1/r = 1/p - 1/n` and
+every `1 ≤ p`, and `W^m_1 ↪ L_r` for `1/r = 1 - m/n`.
 For the Bessel potential spaces, uniform Schwartz families stay uniform under continuous linear maps
 of the Schwartz space, and the Bessel potential maps the dilates of every Schwartz function to
 multiples of the dilates of its Bessel kernels; when the Fourier transform of the function lives in
@@ -188,6 +191,21 @@ project, with the decisions behind their form.
   (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_of_eq`), and `W^m_p(V) ↪ L_r(V)` for every
   `p ≤ r < ∞` with `n(1/p - 1/r) ≤ m` (`Rd.exists_memLp_ae_eq_of_memSobolev_of_le`,
   `Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`).
+* **The Gagliardo–Nirenberg–Sobolev inequality.** Let `dim V = n ≥ 1`, `1 ≤ p < ∞` and
+  `1/p' = 1/p - 1/n`. Every `f ∈ L_p(V)` with weak derivatives `g_k` along the orthonormal basis
+  of `Rd.gridBasis` satisfies `‖f‖_{p'} ≤ C_{V,p} ∑_k ‖g_k‖_p` with Mathlib's constant
+  `C_{V,p}` (`Rd.eLpNorm_le_of_hasWeakLineDeriv`,
+  `MeasureTheory.eLpNormLESNormFDerivOfEqInnerConst`). The proof mollifies with a normalised
+  bump, applies Mathlib's inequality for compactly supported `C^1` functions
+  (`MeasureTheory.eLpNorm_le_eLpNorm_fderiv_of_eq_inner`), passes to the limit along the
+  convergence in measure of the mollifications, and removes the compact support by cut-offs and
+  Fatou's lemma. Hence, for `r < ∞`, `1/r = 1/p - 1/n` and `g_k ∈ L_p(V)`, `f` has a
+  representative `u ∈ L_r(V)` with `‖u‖_r ≤ C_{V,p} ∑_k ‖g_k‖_p`, `p = 1` included
+  (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_one`, `Rd.exists_memLp_ae_eq_of_memSobolev_one`,
+  and with the exponents `1/r + 1/n = 1/p`:
+  `Rd.exists_memLp_ae_eq_of_memSobolev_one_of_inv_add_inv`), and every `f ∈ W^m_1(V)`,
+  `m ≥ 1`, has a representative in `L_r(V)` for `r < ∞` and `1/r = 1 - m/n`
+  (`Rd.exists_memLp_ae_eq_of_memSobolev_one_of_eq`).
 * **Bessel kernels.** A family `(G_j)` of Schwartz functions is uniformly Schwartz for some
   bounds iff `{G_j}` is a bounded set of the Schwartz space
   (`Rd.exists_isUniformSchwartz_iff_isVonNBounded`). If `(G_j)` is a uniform Schwartz family and
@@ -272,6 +290,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | `W^m_p = F^m_{p,2}` for `1 < p < ∞` with named constants in both directions: the blocks as convolutions with the weak derivatives, the derivatives of the reproducing sums and their limit, the Besov sandwich `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}` and `W^m_2 = B^m_{2,2}` for `m ≥ 1` | ✅ | ✗ | `Rd/Sobolev/SobolevTriebelLizorkin` |
 | Continuity of convolutions of integrable bounded kernels with `L_p` functions, the Nikolskii inequality for the Littlewood–Paley blocks, almost everywhere convergence of the block series, the Besov embeddings into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions for `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with named constants | ✅ | ✗ | `Rd/Sobolev/SobolevEmbedding` |
 | The Nikolskii inequality in supremum form, the pointwise and the integrated bound of the weighted blocks, `F^{n(1/p₀ - 1/p₁)}_{p₀,q} ↪ L_{p₁}`, Jawerth's embedding `F^{s₀}_{p₀,∞} ↪ F^{s₁}_{p₁,q}` and the critical Sobolev embedding `W^m_p ↪ L_r` for `1/r = 1/p - m/n` with named constants | ✅ | ✗ | `Rd/Sobolev/CriticalSobolevEmbedding` |
+| Mathlib's Gagliardo–Nirenberg–Sobolev inequality for weakly differentiable functions, by mollification, cut-off and Fatou's lemma; `W^1_p ↪ L_r` for `1/r = 1/p - 1/n` and every `1 ≤ p`, and `W^m_1 ↪ L_r` for `1/r = 1 - m/n` | ✅ | ✗ | `Rd/Sobolev/GagliardoNirenbergSobolev` |
 | Value–derivative jets of `W^1_p(O)` and `W^1_p(V)`, restriction | ✅ | ✗ | `Rd/Sobolev/SobolevJets` |
 | The grid norm of `W^m_p` between two Besov quasi-norms with named constants, `(L_p, W^m_p)_{θ,q} = B^{θm}_{p,q}`, `(W^{m₀}_p, W^{m₁}_p)_{η,q} = B^{(1-η)m₀+ηm₁}_{p,q}` for `1 < p < ∞`, and operators bounded on `L_p` and on `W^m_p` | ✅ | ✗ | `Rd/Interpolation/SobolevInterpolation` |
 | The Bessel potential norm `‖J_s f‖_p`, equivalent to the quasi-norm of `F^s_{p,2}`; `(H^{s₀,p}, H^{s₁,p})_{η,q}` and `(L_p, H^{s₁,p})_{η,q}` are Besov spaces | ✅ | ✗ | `Rd/Interpolation/BesselPotentialInterpolation` |

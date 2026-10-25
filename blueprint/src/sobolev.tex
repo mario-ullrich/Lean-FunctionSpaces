@@ -37,6 +37,10 @@ constants. These named constants are formulas in norms and Schwartz seminorms of
 proved finite. \Cref{sec:critical-sobolev-embedding} proves the critical case
 $1/r = 1/p - m/n$, $1 < p < \infty$, and Jawerth's embedding
 $\TL{s_0}{p_0}{\infty} \hookrightarrow \TL{s_1}{p_1}{q}$, following Johnsen and Sickel.
+\Cref{sec:gagliardo-nirenberg-sobolev} carries Mathlib's Gagliardo--Nirenberg--Sobolev
+inequality to weakly differentiable functions, which gives the case $p = 1$:
+$\Sob{1}{p}(V) \hookrightarrow L_r(V)$ for $1/r = 1/p - 1/n$ and every $1 \leq p$, and
+$\Sob{m}{1}(V) \hookrightarrow L_r(V)$ for $1/r = 1 - m/n$.
 \Cref{sec:sobolev-interpolation} identifies the real interpolation spaces of
 $L_p(V)$ and $\Sob{m}{p}(V)$, and of two Sobolev spaces, with Besov spaces. The Bessel
 potential spaces $H^{s,p}(V)$ for $1 < p < \infty$ follow in
@@ -97,7 +101,9 @@ $\partial^v f(\varphi) = (-1)^k f(\partial^v \varphi)$ by \Cref{lem:distribution
   Rd.MemWeakSobolev.mono_set, Rd.zero_memWeakSobolev, Rd.MemWeakSobolev.add,
   Rd.MemWeakSobolev.smul, Rd.MemWeakSobolev.congr_ae, Rd.zero_memSobolev, Rd.MemSobolev.add,
   Rd.MemSobolev.smul, Rd.HasWeakLineDeriv.sum, Rd.memSobolev_iff_exists_hasWeakLineDeriv,
-  Rd.MemSobolev.sum, Rd.HasWeakLineDeriv.eq_of_top, Rd.memSobolev_one_of_forall_hasWeakLineDeriv}
+  Rd.MemSobolev.sum, Rd.HasWeakLineDeriv.eq_of_top, Rd.memSobolev_one_of_forall_hasWeakLineDeriv,
+  Rd.HasWeakLineDeriv.locallyIntegrable, Rd.HasWeakLineDeriv.locallyIntegrable_deriv,
+  Rd.HasWeakLineDeriv.of_cons}
 \leanok
 \uses{def:weak-line-derivative, lem:weak-derivative-integral, lem:directional-derivatives-commute}
 For every $v \in V^k$, all functions $f, f', g, g'$ and every $c \in \C$:
@@ -117,7 +123,10 @@ For every $v \in V^k$, all functions $f, f', g, g'$ and every $c \in \C$:
     $\Omega' \subseteq \Omega$;
   \item $0 = \partial^v 0$ weakly on $\Omega$;
   \item if $g = \partial^v f$ weakly on $\Omega$, $O \subseteq \Omega$ is open and $f = 0$
-    almost everywhere on $O$, then $g = 0$ almost everywhere on $O$.
+    almost everywhere on $O$, then $g = 0$ almost everywhere on $O$;
+  \item if $g = \partial^v f$ weakly on $V$, then $f$ and $g$ are locally integrable on $V$;
+  \item for every $w \in V$ and all $G$, $H$ with $G = \partial^v f$ and
+    $H = \partial^{(w, v)} f$ weakly on $\Omega$, $H = \partial_w G$ weakly on $\Omega$.
 \end{enumerate}
 For every $1 \leq p \leq \infty$, every $f \in L_p(\Omega)$ is locally integrable on $\Omega$
 and $\Sob{0}{p}(\Omega) = L_p(\Omega)$. For all $m, l \in \N$ with
@@ -144,7 +153,10 @@ function depends on it only almost everywhere on $\Omega$.
 (\Cref{lem:directional-derivatives-commute}), so the identity of
 \Cref{lem:weak-derivative-integral} on $\Omega$ gives it on $\Omega'$. (6) The distribution of
 $0$ is $0$, and so are its derivatives. (7) By (5) and (4), $g = \partial^v 0$ weakly on $O$,
-so $g = 0$ almost everywhere on $O$ by (6) and (1). A function in $L_p(\Omega)$, $p \geq 1$, is
+so $g = 0$ almost everywhere on $O$ by (6) and (1). (8) is the definition for $\Omega = V$.
+(9) For distributions $\partial^{(w, v)} = \partial_w \partial^v$, so
+$\partial_w G = \partial_w \partial^v f = \partial^{(w,v)} f = H$ as distributions on $\Omega$.
+A function in $L_p(\Omega)$, $p \geq 1$, is
 integrable on every compact subset of $\Omega$, which has finite measure. The statements on
 $\Sob{m}{p}$ follow, with $L_p(\Omega') \supseteq L_p(\Omega)|_{\Omega'}$ and (4); in $L_p(V)$,
 the zero class, and the class of a sum or a multiple, agree almost everywhere with $0$ and with
@@ -2323,7 +2335,317 @@ $f \in \TL{m}{p}{2} \subseteq \TL{\alpha(n, p, r)}{p}{\infty}$
 
 In Lean, $1/0 = 0$, so the exponent $r = 0$ satisfies $n(1/p - 1/r) = n/p$; there every
 $f \in L_p(V)$ is a class of $L_0(V)$ of norm $0$. For $p = 1$ the space $\Sob{m}{1}(V)$ is larger
-than $\TL{m}{1}{2}$, and the argument above starts from $\TL{m}{p}{2}$.
+than $\TL{m}{1}{2}$, and the argument above starts from $\TL{m}{p}{2}$;
+\Cref{sec:gagliardo-nirenberg-sobolev} treats $p = 1$.
+
+\section{The Gagliardo--Nirenberg--Sobolev inequality}
+\label{sec:gagliardo-nirenberg-sobolev}
+
+Let $n \geq 1$, let $e_0, \dots, e_{n-1}$ be the orthonormal basis of \Cref{def:dyadic-cells},
+$1 \leq p < \infty$ and $1/p' = 1/p - 1/n$. The case $p = 1$ of the Gagliardo--Nirenberg--Sobolev
+inequality $\|f\|_{p'} \leq C \sum_k \|\partial_{e_k} f\|_p$ is due to
+Gagliardo~\cite{Gagliardo1958} and, independently, Nirenberg~\cite{Nirenberg1959}; applied to
+$|u|^\gamma$ it gives $1 < p < n$. Mathlib proves the inequality for compactly supported $C^1$
+functions: for every $1 \leq p < \infty$ there is a constant $C_{V,p} < \infty$
+(\texttt{MeasureTheory.\allowbreak eLpNormLESNormFDerivOfEqInnerConst}) such that
+$\|u\|_{p'} \leq C_{V,p} \|Du\|_p$ for every $p' \geq 0$ with $1/p' = 1/p - 1/n$, every real
+inner product space $H$ and every $C^1$ function $u \colon V \to H$ with compact support
+(\texttt{MeasureTheory.\allowbreak eLpNorm\_\allowbreak le\_\allowbreak eLpNorm\_\allowbreak
+fderiv\_\allowbreak of\_\allowbreak eq\_\allowbreak inner}), by the grid-lines argument of
+Gagliardo and Nirenberg for $p = 1$ and by applying it to $|u|^\gamma$ for $p > 1$. This section
+carries the inequality to every $f \in L_p(V)$ with weak derivatives $\partial_{e_k} f$ by lower
+semicontinuity: for $h$ with compact support the mollifications $\eta_c * h$ satisfy the
+inequality and converge to $h$ in measure, which passes the bound to $h$; the cut-offs
+$\chi_R f$ have compact support and converge to $f$ pointwise, and Fatou's lemma passes their
+bounds to $f$. The result is the Sobolev embedding $\Sob{1}{p}(V) \hookrightarrow L_r(V)$ for
+$1/r = 1/p - 1/n$ and every $1 \leq p$, $p = 1$ included, where
+\Cref{sec:critical-sobolev-embedding} needs $1 < p$, and with it
+$\Sob{m}{1}(V) \hookrightarrow L_r(V)$ for $1/r = 1 - m/n$. In Lean $1/0 = 0$, so the exponent
+$p' = 0$ satisfies $1/p' = 1/p - 1/n$ for $p = n$; there the left side is the norm of exponent
+$0$, which is $0$.
+
+\paragraph{Fatou's lemma, mollification and bases.}
+
+\begin{lemma}[Fatou's lemma with bounds]
+\label{lem:fatou-bounded-norms}
+\lean{MeasureTheory.eLpNorm_le_of_ae_tendsto_of_tendsto}
+\leanok
+For every measure space, every $0 \leq p \leq \infty$, all almost everywhere strongly measurable
+$u_i$ ($i \in \N$), every $f$ with $u_i \to f$ almost everywhere, and all
+$B_i, b \in [0, \infty]$ with $\|u_i\|_p \leq B_i$ for every $i$ and $B_i \to b$,
+$\|f\|_p \leq b$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+As an almost everywhere limit, $f$ is almost everywhere strongly measurable (Mathlib's
+\texttt{aestronglyMeasurable\_\allowbreak of\_\allowbreak tendsto\_\allowbreak ae}). By Fatou's
+lemma (Mathlib's \texttt{MeasureTheory.\allowbreak Lp.\allowbreak
+eLpNorm\_\allowbreak lim\_\allowbreak le\_\allowbreak liminf\_\allowbreak eLpNorm}),
+$\|f\|_p \leq \liminf_i \|u_i\|_p \leq \liminf_i B_i = b$.
+\end{proof}
+
+Mathlib's \texttt{MeasureTheory.\allowbreak Lp.\allowbreak eLpNorm\_\allowbreak le\_\allowbreak
+of\_\allowbreak ae\_\allowbreak tendsto} is the case of a constant bound $B_i = b$.
+
+\begin{lemma}[The derivative of a mollification]
+\label{lem:mollification-weak-derivative}
+\lean{Rd.coe_lineDerivOp_toSchwartzMap, Rd.fderiv_conv_apply_eq_conv}
+\leanok
+\uses{lem:conv-derivatives, lem:weak-derivative-convolution-local, lem:weak-derivative-basic}
+For every smooth $K \colon V \to \C$ with compact support and every $v \in V$, $K$ is a Schwartz
+function with $\partial_v K = DK(\cdot) \, v$, and for all $h$, $g$ with $g = \partial_v h$
+weakly on $V$ and every $x \in V$,
+\[
+  D(K * h)(x) \, v = (K * g)(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+A smooth function with compact support is a Schwartz function, and its directional derivative
+as a Schwartz function is $DK(\cdot) v$. The function $h$ is locally integrable
+(\Cref{lem:weak-derivative-basic}). By \Cref{lem:conv-derivatives},
+$D(K * h)(x) v = ((\partial_v K) * h)(x)$, which is $(K * g)(x)$ by
+\Cref{lem:weak-derivative-convolution-local} with $\Omega = V$.
+\end{proof}
+
+\begin{lemma}[Derivatives through a basis]
+\label{lem:derivative-basis-bound}
+\lean{ContinuousLinearMap.opNorm_le_sum_norm_apply_orthonormalBasis,
+  Rd.norm_le_sum_norm_apply_gridBasis, Rd.eLpNorm_fderiv_le_sum}
+\leanok
+\uses{def:dyadic-cells}
+For every real inner product space $E$ with an orthonormal basis $(b_i)_{i \in I}$, $I$ finite,
+every real normed space $F$ and every continuous linear $L \colon E \to F$,
+$\|L\| \leq \sum_i \|L b_i\|$; in particular $\|L\| \leq \sum_k \|L e_k\|$ for every continuous
+linear $L \colon V \to F$. For every $C^1$ function $u \colon V \to \C$ and every
+$1 \leq p \leq \infty$, $\|Du\|_p \leq \sum_k \|D_{e_k} u\|_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$x = \sum_i \langle b_i, x \rangle b_i$ and $|\langle b_i, x \rangle| \leq \|x\|$ give
+$\|L x\| \leq \|x\| \sum_i \|L b_i\|$. Apply this to $L = Du(x)$ and use the triangle
+inequality in $L_p$.
+\end{proof}
+
+\paragraph{The inequality.}
+
+\begin{lemma}[The inequality for a mollification]
+\label{lem:gns-mollification}
+\lean{Rd.eLpNorm_conv_le_of_hasWeakLineDeriv}
+\leanok
+\uses{lem:mollification-weak-derivative, lem:derivative-basis-bound, lem:conv-derivatives,
+  thm:young, lem:weak-derivative-basic}
+Let $n \geq 1$. For every $1 \leq p < \infty$, every $p' \geq 0$ with $1/p' = 1/p - 1/n$, every
+smooth $K \colon V \to \C$ with compact support, and all $h$ with compact support and $g_k$ with
+$g_k = \partial_{e_k} h$ weakly on $V$ for every $k$,
+\[
+  \|K * h\|_{p'} \leq C_{V,p} \, \|K\|_1 \sum_k \|g_k\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The function $h$ is locally integrable (\Cref{lem:weak-derivative-basic}), so $K * h$ is smooth
+with compact support (\Cref{lem:conv-derivatives}). By Mathlib's inequality,
+\Cref{lem:derivative-basis-bound} and \Cref{lem:mollification-weak-derivative},
+$\|K * h\|_{p'} \leq C_{V,p} \sum_k \|K * g_k\|_p$, and Young's inequality (\Cref{thm:young})
+gives $\|K * g_k\|_p \leq \|K\|_1 \|g_k\|_p$.
+\end{proof}
+
+\begin{lemma}[The inequality with compact support]
+\label{lem:gns-compact-support}
+\lean{Rd.eLpNorm_le_of_hasCompactSupport_of_hasWeakLineDeriv}
+\leanok
+\uses{lem:gns-mollification, thm:smooth-atomic-decomposition, lem:dilate, thm:approx-identity,
+  lem:weak-derivative-basic, lem:conv-derivatives, lem:dual-kernel-derivatives}
+Let $n \geq 1$. For every $1 \leq p < \infty$, every $p' \geq 0$ with $1/p' = 1/p - 1/n$, and
+all $h$ with compact support and $g_k$ with $g_k = \partial_{e_k} h$ weakly on $V$ for every $k$,
+\[
+  \|h\|_{p'} \leq C_{V,p} \sum_k \|g_k\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The function $h$ is locally integrable (\Cref{lem:weak-derivative-basic}) with compact support,
+hence integrable. Let $\eta$ be the standard bump of \Cref{thm:smooth-atomic-decomposition},
+with $\|\eta\|_1 = 1$, and $c_i = i + 1$. By \Cref{lem:gns-mollification} and
+\Cref{lem:dilate}, $\|\eta_{c_i} * h\|_{p'} \leq C_{V,p} \sum_k \|g_k\|_p$ for every $i$. The
+functions $\eta_{c_i} * h$ are smooth (\Cref{lem:dual-kernel-derivatives} and
+\Cref{lem:conv-derivatives}) and converge to $h$ in $L_1(V)$ (\Cref{thm:approx-identity}), hence
+in measure. A bound of the $L_{p'}$ norms along a sequence that converges in measure holds for
+its limit (Mathlib's \texttt{MeasureTheory.\allowbreak eLpNorm\_\allowbreak le\_\allowbreak
+of\_\allowbreak tendstoInMeasure}).
+\end{proof}
+
+\begin{definition}[The cut-off]
+\label{def:real-cutoff}
+\lean{Rd.cutoffBump, Rd.realCutoff, Rd.ofReal_realCutoff}
+\leanok
+\uses{def:lp-kernels}
+Let $b = \chi_{1,2} \colon V \to [0, 1]$ be the smooth bump of \Cref{def:lp-kernels}, equal to
+$1$ on $\bar B(0, 1)$ and to $0$ outside $B(0, 2)$. For every $R > 0$, $\chi_R(x) = b(x / R)$.
+\end{definition}
+
+In Lean $\chi_R(x) = b(R^{-1} x)$ for every real $R$, with $0^{-1} = 0$.
+
+\begin{lemma}[Properties of the cut-off]
+\label{lem:real-cutoff}
+\lean{Rd.contDiff_realCutoff, Rd.hasCompactSupport_realCutoff, Rd.realCutoff_eq_one,
+  Rd.abs_realCutoff_le_one, Rd.abs_fderiv_cutoffBump_le, Rd.abs_fderiv_realCutoff_le,
+  Rd.eLpNorm_realCutoff_mul_deriv_le}
+\leanok
+\uses{def:real-cutoff, def:lp-kernels, def:dyadic-cells}
+Let $M = p_{0,1}(\chi_{1,2}) = \sup_y \|D\chi_{1,2}(y)\|$ be the Schwartz seminorm of
+\Cref{def:lp-kernels}. For every $R > 0$, $\chi_R$ is smooth with compact support and
+$|\chi_R| \leq 1$, and $\chi_R = 1$ on $\bar B(0, R)$. For all $y, w \in V$,
+$|Db(y) w| \leq M \|w\|$, and for every $R > 0$ and all $x, v \in V$,
+\[
+  |D\chi_R(x) v| \leq M R^{-1} \|v\| .
+\]
+For every $R > 0$, every $M' \in \R$ with $|D\chi_R(x) v| \leq M' R^{-1} \|v\|$ for all
+$x, v \in V$, every $1 \leq p \leq \infty$, all almost everywhere strongly measurable $f$, $g$
+and every $k$, $\|\chi_R g + (\partial_{e_k} \chi_R) f\|_p \leq \|g\|_p + M' R^{-1} \|f\|_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$|Db(y) w| = |D\chi_{1,2}(y) w| \leq \|D\chi_{1,2}(y)\| \|w\| \leq M \|w\|$, and
+$D\chi_R(x) v = Db(x/R)(v/R)$. The last bound follows from $|\chi_R| \leq 1$, $\|e_k\| = 1$ and
+the triangle inequality in $L_p$.
+\end{proof}
+
+\begin{theorem}[The Gagliardo--Nirenberg--Sobolev inequality on $\Sob{1}{p}$]
+\label{thm:gns-weak}
+\lean{Rd.eLpNorm_le_of_hasWeakLineDeriv}
+\leanok
+\uses{lem:gns-compact-support, lem:real-cutoff, lem:weak-derivative-product,
+  lem:fatou-bounded-norms, lem:weak-derivative-basic, def:schwartz-cutoff}
+Let $n \geq 1$. For every $1 \leq p < \infty$, every $p' \geq 0$ with $1/p' = 1/p - 1/n$, every
+$f \in L_p(V)$ and all $g_k$ with $g_k = \partial_{e_k} f$ weakly on $V$ for every $k$,
+\[
+  \|f\|_{p'} \leq C_{V,p} \sum_k \|g_k\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $R_i = i + 1$ and $M$ as in \Cref{lem:real-cutoff}. The function $\chi_{R_i} f$ has compact
+support (\Cref{def:schwartz-cutoff}) and weak derivatives
+$\chi_{R_i} g_k + (\partial_{e_k} \chi_{R_i}) f$ (\Cref{lem:weak-derivative-product}), of $L_p$
+norm at most $\|g_k\|_p + M R_i^{-1} \|f\|_p$ (\Cref{lem:real-cutoff}), since $g_k$ is locally
+integrable (\Cref{lem:weak-derivative-basic}). By \Cref{lem:gns-compact-support},
+$\|\chi_{R_i} f\|_{p'} \leq C_{V,p} \sum_k (\|g_k\|_p + M R_i^{-1} \|f\|_p)$, which tends to
+$C_{V,p} \sum_k \|g_k\|_p$ since $\|f\|_p < \infty$. At every $x$, $\chi_{R_i}(x) f(x) = f(x)$
+as soon as $R_i \geq \|x\|$, and \Cref{lem:fatou-bounded-norms} gives the bound.
+\end{proof}
+
+\paragraph{Sobolev embeddings.}
+
+Inside the exponent $n(1/p - 1/r)$ of \Cref{def:nikolskii-property}, Lean reads
+$1/0 = 1/\infty = 0$, and the statements below follow this convention.
+
+\begin{lemma}[Exponents]
+\label{lem:gns-exponents}
+\lean{toReal_inv_eq_of_nikolskiiExponent_eq_one, nikolskiiExponent_eq_one_of_inv_add_inv,
+  one_lt_of_nikolskiiExponent_one_eq, nikolskiiExponent_conjExponent_of_eq}
+\leanok
+\uses{def:nikolskii-property}
+For every $D \geq 0$, every $n \in \N$ and all $p, r \in [0, \infty]$, with $1/0 = 1/\infty = 0$
+in $D(1/p - 1/r)$ as in Lean:
+\begin{enumerate}
+  \item if $D(1/p - 1/r) = 1$, then $D > 0$, $p < \infty$ and $1/r = 1/p - 1/D$;
+  \item if $1 \leq p$ and $1/r + 1/n = 1/p$ in $[0, \infty]$, where $1/0 = \infty$, then
+    $p < \infty$ and $n(1/p - 1/r) = 1$;
+  \item for every $m \geq 2$ with $n(1 - 1/r) = m$, $n > 1$, and the conjugate exponent
+    $q = n/(n - 1)$ of $n$ satisfies $1 < q < \infty$, $n(1 - 1/q) = 1$ and
+    $n(1/q - 1/r) = m - 1$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) For $D = 0$ the left side is $0$, and for $p = \infty$ it is $-D/r \leq 0$. (2) Since
+$1/p \leq 1$, both $1/r$ and $1/n$ are finite, so $n \geq 1$ and $r > 0$, and $p = \infty$ would
+force $1/n = 0$. (3) $n - n/r = m \geq 2$ and $1/r \geq 0$ give $n > 1$, so $1 < q < \infty$.
+Hölder conjugacy (Mathlib's \texttt{ENNReal.\allowbreak conjExponent}) gives $1/q + 1/n = 1$,
+hence $n(1 - 1/q) = 1$ by (2) with $p = 1$, and $n(1/q - 1/r) = n(1 - 1/r) - 1 = m - 1$.
+\end{proof}
+
+\begin{theorem}[$\Sob{1}{p} \hookrightarrow L_r$ for $1/r = 1/p - 1/n$]
+\label{thm:sobolev-one-embedding}
+\lean{Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_one, Rd.exists_memLp_ae_eq_of_memSobolev_one,
+  Rd.exists_memLp_ae_eq_of_memSobolev_one_of_inv_add_inv}
+\leanok
+\uses{thm:gns-weak, lem:gns-exponents, def:weak-line-derivative, lem:weak-derivative-basic}
+\begin{enumerate}
+  \item For every $1 \leq p \leq \infty$, every $r < \infty$ with $n(1/p - 1/r) = 1$, every
+    $f \in L_p(V)$ and all $g_k \in L_p(V)$ with $g_k = \partial_{e_k} f$ weakly on $V$ for
+    every $k$, there is $u \in L_r(V)$ with $u = f$ almost everywhere and
+    $\|u\|_r \leq C_{V,p} \sum_k \|g_k\|_p$.
+  \item For every $1 \leq p \leq \infty$, every $r < \infty$ with $n(1/p - 1/r) = 1$ and every
+    $f \in \Sob{1}{p}(V)$ there are $g_k \in L_p(V)$ with $g_k = \partial_{e_k} f$ weakly on $V$
+    for every $k$ and $u \in L_r(V)$ with $u = f$ almost everywhere and
+    $\|u\|_r \leq C_{V,p} \sum_k \|g_k\|_p$.
+  \item For every $1 \leq p \leq \infty$, every $r < \infty$ with $1/r + 1/n = 1/p$ in
+    $[0, \infty]$, where $1/0 = \infty$, and every $f \in \Sob{1}{p}(V)$ the conclusion of (2)
+    holds.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) By \Cref{lem:gns-exponents}, $n \geq 1$, $p < \infty$ and $1/r = 1/p - 1/n$, so
+\Cref{thm:gns-weak} with $p' = r$ bounds $\|f\|_r$, and $f \in L_r(V)$. (2) The weak derivatives
+$\partial_{e_k} f \in L_p(V)$ exist by \Cref{def:weak-line-derivative} and
+\Cref{lem:weak-derivative-basic}, and (1) applies. (3) By \Cref{lem:gns-exponents},
+$n(1/p - 1/r) = 1$, and (2) applies.
+\end{proof}
+
+The condition $n(1/p - 1/r) = 1$ forces $p < \infty$ and $1/r = 1/p - 1/n$
+(\Cref{lem:gns-exponents}). For $p = 1$ the space $\Sob{1}{1}(V)$ is larger than $\TL{1}{1}{2}$,
+so this case lies outside \Cref{thm:critical-sobolev-embedding}.
+
+\begin{lemma}[The derivatives of $\Sob{m}{1}$ of lower order]
+\label{lem:sobolev-l1-derivatives}
+\lean{Rd.exists_hasWeakLineDeriv_memLp_of_memSobolev_of_lt}
+\leanok
+\uses{thm:sobolev-one-embedding, lem:weak-derivative-basic}
+For every $m \in \N$, every $f \in \Sob{m}{1}(V)$, every $q < \infty$ with $n(1 - 1/q) = 1$,
+every $k < m$ and every $v \in V^k$, there is $u \in L_q(V)$ with $u = \partial^v f$ weakly on
+$V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Let $G = \partial^v f \in L_1(V)$ and $H_j = \partial^{(e_j, v)} f \in L_1(V)$, which exist since
+$k + 1 \leq m$. By \Cref{lem:weak-derivative-basic}, $H_j = \partial_{e_j} G$ weakly, and
+\Cref{thm:sobolev-one-embedding} with $p = 1$ gives $u \in L_q(V)$ with $u = G$ almost
+everywhere.
+\end{proof}
+
+\begin{theorem}[$\Sob{m}{1} \hookrightarrow L_r$ for $1/r = 1 - m/n$]
+\label{thm:sobolev-l1-embedding}
+\lean{Rd.exists_memLp_ae_eq_of_memSobolev_one_of_eq}
+\leanok
+\uses{thm:sobolev-one-embedding, lem:sobolev-l1-derivatives, lem:gns-exponents,
+  thm:critical-sobolev-embedding, lem:weak-derivative-basic}
+For every $m \geq 1$, every $r < \infty$ with $n(1 - 1/r) = m$, that is $1/r = 1 - m/n$, and
+every $f \in \Sob{m}{1}(V)$ there is $g \in L_r(V)$ with $g = f$ almost everywhere.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $m = 1$ this is \Cref{thm:sobolev-one-embedding}. For $m \geq 2$ let $q = n/(n - 1)$
+(\Cref{lem:gns-exponents}). By \Cref{lem:sobolev-l1-derivatives} with $k = 0$, $f$ agrees
+almost everywhere with some $f' \in L_q(V)$, and every weak derivative of $f$ of order at most
+$m - 1$ lies in $L_q(V)$, so $f' \in \Sob{m-1}{q}(V)$. Since $1 < q < \infty$ and
+$n(1/q - 1/r) = m - 1$, \Cref{thm:critical-sobolev-embedding} gives $g \in L_r(V)$ with $g = f'$
+almost everywhere.
+\end{proof}
 
 \section{Sobolev spaces and real interpolation}
 \label{sec:sobolev-interpolation}

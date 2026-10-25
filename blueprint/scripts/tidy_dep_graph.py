@@ -112,6 +112,7 @@ BLOCKS: list[tuple[str, list]] = [
     ("Sobolev spaces W^m_p", [
         (SOB, ["Derivative kernels", "Sobolev spaces as Triebel--Lizorkin spaces",
                "Sobolev embeddings", "The critical Sobolev embedding",
+               "The Gagliardo--Nirenberg--Sobolev inequality",
                "Sobolev spaces and real interpolation"])]),
     ("Bessel potential spaces", ["Bessel potential spaces"]),
     ("Lipschitz domains", ["Lipschitz domains"]),

@@ -27,7 +27,8 @@ The dual kernels are dilations, `‖D^l η_j‖ ≤ A 2^(j(n+l))` (`Rd.norm_iter
 with the explicit constant `A = 2 ∑_{l ≤ K} sup ‖D^l m‖` of the moment kernel `m`
 (`Rd.LocalMeansBump.dualDerivConst`, `Rd.LocalMeansBump.norm_iteratedFDeriv_dual_le`), and the
 cell coefficients cancel the factor `2^(jn)` as for the atoms themselves
-(`Rd.enorm_inv_cellCoef_mul_conv_le`).
+(`Rd.enorm_inv_cellCoef_mul_conv_le`). The standard bump `Rd.LocalMeansBump.std`, the normalised
+smooth bump of radius `1`, has `L_1` norm `1` (`Rd.LocalMeansBump.eLpNorm_std_one`).
 -/
 
 @[expose] public section
@@ -490,5 +491,17 @@ noncomputable def LocalMeansBump.std : LocalMeansBump V where
     rw [Function.notMem_support.1 hz', Complex.ofReal_zero]
   integral_eq_one := by
     rw [integral_complex_ofReal, ContDiffBump.integral_normed, Complex.ofReal_one]
+
+/-- The standard bump `Rd.LocalMeansBump.std`, a nonnegative function of integral `1`, has `L_1`
+norm `1`. -/
+theorem LocalMeansBump.eLpNorm_std_one :
+    eLpNorm (LocalMeansBump.std (V := V)).toFun 1 volume = 1 := by
+  rw [eLpNorm_one_eq_lintegral_enorm (LocalMeansBump.std (V := V)).integrable.aestronglyMeasurable,
+    ← ofReal_integral_norm_eq_lintegral_enorm (LocalMeansBump.std (V := V)).integrable]
+  have hn : ∀ z, ‖(LocalMeansBump.std (V := V)).toFun z‖ =
+      (stdBumpBase (V := V)).normed volume z := fun z => by
+    change ‖(((stdBumpBase (V := V)).normed volume z : ℝ) : ℂ)‖ = _
+    rw [Complex.norm_real, Real.norm_of_nonneg ((stdBumpBase (V := V)).nonneg_normed z)]
+  simp_rw [hn, ContDiffBump.integral_normed, ENNReal.ofReal_one]
 
 end Rd

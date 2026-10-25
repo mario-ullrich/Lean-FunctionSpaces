@@ -29,7 +29,11 @@ follows by interpolation, `‖a‖_r ≤ ‖a‖_∞^(1 - p/r) ‖a‖_p^(p/r)`
 `D > 0`, `1 ≤ p < ∞` and `r > 0` it is positive iff `p < r` and nonnegative iff `p ≤ r`
 (`nikolskiiExponent_pos`, `lt_of_nikolskiiExponent_pos`, `le_of_nikolskiiExponent_nonneg`).
 With `θ = p₀/p₁` and `s₀ - s₁ = D(1/p₀ - 1/p₁)`, `θ s₀ + (1 - θ)(s₀ - D/p₀) = s₁`
-(`nikolskiiExponent_interp_eq`).
+(`nikolskiiExponent_interp_eq`). For the Gagliardo–Nirenberg–Sobolev inequality,
+`D(1/p - 1/r) = 1` with `D ≥ 0` means `p < ∞` and `1/r = 1/p - 1/D`
+(`toReal_inv_eq_of_nikolskiiExponent_eq_one`), which follows from `1/r + 1/n = 1/p` for `D = n`
+(`nikolskiiExponent_eq_one_of_inv_add_inv`), and `n(1 - 1/r) = m ≥ 2` passes through the
+conjugate exponent `n/(n - 1)` (`nikolskiiExponent_conjExponent_of_eq`).
 
 In the language of `ApproximationSpaces.Lift` this is a lifting bound for the inclusion
 `L_r ↪ L_p` and the scheme in `L_p` (`HasNikolskii.liftBound`): the approximant `a` in `L_p` is
@@ -122,6 +126,80 @@ theorem nikolskiiExponent_top (D : ℝ) (p : ℝ≥0∞) : nikolskiiExponent D p
 @[simp]
 theorem nikolskiiExponent_self (D : ℝ) (p : ℝ≥0∞) : nikolskiiExponent D p p = 0 := by
   simp [nikolskiiExponent]
+
+/-- **The Nikolskii exponent `1`**: for `D ≥ 0`, `D(1/p - 1/r) = 1` forces `D > 0`, `p < ∞` and
+`1/r = 1/p - 1/D`; for `p = ∞` the exponent is `-D/r ≤ 0`. -/
+theorem toReal_inv_eq_of_nikolskiiExponent_eq_one {D : ℝ} (hD : 0 ≤ D) {p r : ℝ≥0∞}
+    (hs : nikolskiiExponent D p r = 1) : 0 < D ∧ p ≠ ∞ ∧ r.toReal⁻¹ = p.toReal⁻¹ - D⁻¹ := by
+  unfold nikolskiiExponent at hs
+  have hD0 : D ≠ 0 := by
+    rintro rfl
+    rw [zero_mul] at hs
+    exact zero_ne_one hs
+  refine ⟨lt_of_le_of_ne hD (Ne.symm hD0), fun hp => ?_, ?_⟩
+  · rw [hp, ENNReal.toReal_top, inv_zero, zero_sub] at hs
+    have : 0 ≤ r.toReal⁻¹ := inv_nonneg.2 ENNReal.toReal_nonneg
+    nlinarith
+  · have h : p.toReal⁻¹ - r.toReal⁻¹ = D⁻¹ := eq_inv_of_mul_eq_one_right hs
+    linarith
+
+/-- **The exponents in the form `1/r + 1/n = 1/p`**: for `n ∈ ℕ`, `1 ≤ p` and
+`r⁻¹ + n⁻¹ = p⁻¹` in `[0, ∞]` (where `1/0 = ∞`), `p < ∞` and `n(1/p - 1/r) = 1`. -/
+theorem nikolskiiExponent_eq_one_of_inv_add_inv {n : ℕ} {p r : ℝ≥0∞} (hp : 1 ≤ p)
+    (hexp : r⁻¹ + (n : ℝ≥0∞)⁻¹ = p⁻¹) : p ≠ ∞ ∧ nikolskiiExponent n p r = 1 := by
+  have hp1 : p⁻¹ ≤ 1 := ENNReal.inv_le_one.2 hp
+  have hr0 : r⁻¹ ≠ ∞ := (le_self_add.trans (hexp.le.trans hp1)).trans_lt ENNReal.one_lt_top |>.ne
+  have hn0 : (n : ℝ≥0∞)⁻¹ ≠ ∞ :=
+    (le_add_self.trans (hexp.le.trans hp1)).trans_lt ENNReal.one_lt_top |>.ne
+  have hn : n ≠ 0 := by
+    rintro rfl
+    simp at hn0
+  refine ⟨fun hpt => ?_, ?_⟩
+  · rw [hpt, ENNReal.inv_top, add_eq_zero] at hexp
+    exact ENNReal.inv_ne_zero.2 (ENNReal.natCast_ne_top n) hexp.2
+  have h := congrArg ENNReal.toReal hexp
+  rw [ENNReal.toReal_add hr0 hn0, ENNReal.toReal_inv, ENNReal.toReal_inv, ENNReal.toReal_inv,
+    ENNReal.toReal_natCast] at h
+  unfold nikolskiiExponent
+  rw [← h, add_sub_cancel_left, mul_inv_cancel₀ (Nat.cast_ne_zero.2 hn)]
+
+/-- For `m ≥ 2`, `n(1 - 1/r) = m` forces `n > 1`, since `1/r ≥ 0`. -/
+theorem one_lt_of_nikolskiiExponent_one_eq {n m : ℕ} (hm : 2 ≤ m) {r : ℝ≥0∞}
+    (hs : nikolskiiExponent n 1 r = m) : 1 < n := by
+  unfold nikolskiiExponent at hs
+  rw [ENNReal.toReal_one, inv_one] at hs
+  have ha : 0 ≤ r.toReal⁻¹ := inv_nonneg.2 ENNReal.toReal_nonneg
+  have hm2 : (2 : ℝ) ≤ m := by exact_mod_cast hm
+  have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
+  have h : (1 : ℝ) < n := by nlinarith
+  exact_mod_cast h
+
+/-- **The intermediate exponent `q = n/(n - 1)`**: for `m ≥ 2`, every `r ∈ [0, ∞]` with
+`n(1 - 1/r) = m` and the conjugate exponent `q = n/(n - 1)` of `n` (Mathlib's
+`ENNReal.conjExponent`), `1 < q < ∞`, `n(1 - 1/q) = 1` and `n(1/q - 1/r) = m - 1`: Hölder
+conjugacy gives `1/q + 1/n = 1` (`nikolskiiExponent_eq_one_of_inv_add_inv`), and
+`n > 1` (`one_lt_of_nikolskiiExponent_one_eq`). -/
+theorem nikolskiiExponent_conjExponent_of_eq {n m : ℕ} (hm : 2 ≤ m) {r : ℝ≥0∞}
+    (hs : nikolskiiExponent n 1 r = m) :
+    1 < ENNReal.conjExponent n ∧ ENNReal.conjExponent n ≠ ∞ ∧
+      nikolskiiExponent n 1 (ENNReal.conjExponent n) = 1 ∧
+      nikolskiiExponent n (ENNReal.conjExponent n) r = ((m - 1 : ℕ) : ℝ) := by
+  have hn : (1 : ℝ≥0∞) < n := by exact_mod_cast one_lt_of_nikolskiiExponent_one_eq hm hs
+  have : (n : ℝ≥0∞).HolderConjugate (ENNReal.conjExponent n) := .conjExponent hn.le
+  have h1 : nikolskiiExponent n 1 (ENNReal.conjExponent n) = 1 :=
+    (nikolskiiExponent_eq_one_of_inv_add_inv le_rfl (by
+      rw [inv_one, add_comm]
+      exact ENNReal.HolderConjugate.inv_add_inv_eq_one _ _)).2
+  refine ⟨(ENNReal.HolderConjugate.lt_top_iff_one_lt _ _).1 (ENNReal.natCast_lt_top n),
+    ((ENNReal.HolderConjugate.lt_top_iff_one_lt _ _).2 hn).ne, h1, ?_⟩
+  obtain ⟨-, -, hq⟩ := toReal_inv_eq_of_nikolskiiExponent_eq_one (Nat.cast_nonneg n) h1
+  have hn0 : (n : ℝ) ≠ 0 :=
+    Nat.cast_ne_zero.2 (one_lt_of_nikolskiiExponent_one_eq hm hs).ne_bot
+  unfold nikolskiiExponent at hs ⊢
+  rw [ENNReal.toReal_one, inv_one] at hs hq
+  rw [hq, Nat.cast_sub (by omega), Nat.cast_one, ← hs]
+  field_simp
+  ring
 
 namespace FunctionScheme
 

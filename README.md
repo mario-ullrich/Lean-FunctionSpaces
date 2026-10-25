@@ -378,6 +378,15 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   Hence Sobolev's inequality: for `1 < p < ∞`, `m ≥ 1`, `r < ∞` and `1/r = 1/p - m/n`, `f`
   agrees almost everywhere with some `u ∈ L_r(V)` with `‖u‖_r ≤ K_{V,p,r} M_f`
   (`Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_of_eq`, `Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`).
+  Mathlib's Gagliardo–Nirenberg–Sobolev inequality, carried to weakly differentiable functions
+  by mollification, cut-off and Fatou's lemma, adds `p = 1`: for `n ≥ 1`, `1 ≤ p < ∞`, `r < ∞`
+  and `1/r = 1/p - 1/n`, every `f ∈ L_p(V)` with weak derivatives `g_k ∈ L_p(V)` along the
+  orthonormal basis `Rd.gridBasis` agrees almost everywhere with some `u ∈ L_r(V)` with
+  `‖u‖_r ≤ C_{V,p} ∑_k ‖g_k‖_p`, where `C_{V,p}` is Mathlib's constant
+  `MeasureTheory.eLpNormLESNormFDerivOfEqInnerConst` (`Rd.eLpNorm_le_of_hasWeakLineDeriv`,
+  `Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_one`, `Rd.exists_memLp_ae_eq_of_memSobolev_one`),
+  and for `m ≥ 1`, `r < ∞` and `1/r = 1 - m/n` every `f ∈ W^m_1(V)` agrees almost everywhere
+  with some `g ∈ L_r(V)` (`Rd.exists_memLp_ae_eq_of_memSobolev_one_of_eq`).
   For `n ≥ 1`, `1 < p ≤ r < ∞` and real `s ≥ n(1/p - 1/r)`, every element of Mathlib's Bessel
   potential space `H^{s,p}(V)` is a function in `L_r(V)`
   (`Rd.exists_memLp_eq_of_memSobolev_bessel`, `Rd.exists_enorm_le_of_besselPotentialSpace`).
@@ -543,7 +552,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Besov spaces on `ℝ^d`**](docs/Rd.md): band-limited approximation, Littlewood–Paley blocks, differences, local means, kernel majorants, atoms, invariance under changes of variables, Besov spaces as interpolation spaces | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, Triebel–Lizorkin spaces as interpolation spaces | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings including the critical case, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings including the critical case and the Gagliardo–Nirenberg–Sobolev inequality, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
 | [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph and bounded Lipschitz domains, closures of convex ones, closed balls, the closed cube and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary or with corners, smooth domains | ✅ | ✗ |
 
 Lean: ✅ every file proved without `sorry` · 🟡 some statement still `sorry` · ⬜ planned.
@@ -695,6 +704,8 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * J. Franke, *On the spaces F^s_{pq} of Triebel–Lizorkin type: pointwise multipliers and
   spaces on domains*, Math. Nachr. **125** (1986), no. 1, 29–68. The embedding
   `B^{s₀}_{p₀,p₁} ↪ F^{s₁}_{p₁,q}`, among the goals in *What is left to do*.
+* E. Gagliardo, *Proprietà di alcune classi di funzioni in più variabili*, Ricerche Mat. **7**
+  (1958), 102–137. The Sobolev inequality for `p = 1`.
 * L. Grafakos, *Classical Fourier Analysis*, 3rd ed., Graduate Texts in Mathematics **249**,
   Springer, 2014. Littlewood–Paley theory, vector-valued singular integrals and Marcinkiewicz
   interpolation.
@@ -727,6 +738,10 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * S. M. Nikol'skii, *Approximation of Functions of Several Variables and Imbedding
   Theorems*, Grundlehren der mathematischen Wissenschaften **205**, Springer-Verlag, 1975.
   The Nikolskii inequality and the embedding theorems it yields.
+* L. Nirenberg, *On elliptic partial differential equations*, Ann. Scuola Norm. Sup. Pisa (3)
+  **13** (1959), no. 2, 115–162,
+  [Numdam](https://www.numdam.org/item/ASNSP_1959_3_13_2_115_0). The Gagliardo–Nirenberg–Sobolev
+  inequality.
 * H. Ojanen, *Orthonormal compactly supported wavelets with optimal Sobolev regularity:
   numerical results*, Appl. Comput. Harmon. Anal. **10** (2001), no. 1, 93–98,
   [arXiv:math/9807089](https://arxiv.org/abs/math/9807089). The Sobolev exponents of the

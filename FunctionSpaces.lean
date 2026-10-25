@@ -81,6 +81,7 @@ public import FunctionSpaces.Rd.Sobolev.DerivativeKernels
 public import FunctionSpaces.Rd.Sobolev.SobolevTriebelLizorkin
 public import FunctionSpaces.Rd.Sobolev.SobolevEmbedding
 public import FunctionSpaces.Rd.Sobolev.CriticalSobolevEmbedding
+public import FunctionSpaces.Rd.Sobolev.GagliardoNirenbergSobolev
 public import FunctionSpaces.Rd.Sobolev.SobolevJets
 public import FunctionSpaces.Rd.BesselPotentials.UniformSchwartzFamilies
 public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialLifting
@@ -443,6 +444,10 @@ and the theorems that their characterisations agree. The library builds on
   `F^α_{p₀,∞} ↪ L_{p₁}` for `α = n(1/p₀ - 1/p₁)`, Jawerth's embedding
   `F^{s₀}_{p₀,∞} ↪ F^{s₁}_{p₁,q}`, and the critical Sobolev embedding `W^m_p ↪ L_r` for
   `1/r = 1/p - m/n`, `1 < p < ∞`, with named constants (Johnsen–Sickel).
+* `FunctionSpaces.Rd.Sobolev.GagliardoNirenbergSobolev`: Mathlib's Gagliardo–Nirenberg–Sobolev
+  inequality carried to weakly differentiable functions, `‖f‖_{p'} ≤ C ∑_k ‖∂_k f‖_p` for
+  `1 ≤ p` and `1/p' = 1/p - 1/n`, by mollification, cut-off and Fatou's lemma; hence
+  `W^1_p ↪ L_r` for `1/r = 1/p - 1/n` and `W^m_1 ↪ L_r` for `1/r = 1 - m/n`.
 * `FunctionSpaces.Rd.Sobolev.SobolevJets`: the value–derivative jets of `W^1_p(O)` and `W^1_p(ℝ^d)`
   as complex linear subspaces of `L_p × L_p^n`, the uniqueness of their derivatives, linear maps
   into the jets, and the restriction of jets as a bounded linear operator.

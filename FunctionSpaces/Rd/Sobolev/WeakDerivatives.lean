@@ -22,7 +22,10 @@ the distribution `φ ↦ ∫ φ f` on `Ω` (Mathlib's `Distribution.ofFun`, test
   (`Rd.hasWeakLineDeriv_iff_integral`, by the transpose formula
   `Distribution.iteratedLineDerivOp_apply_apply`). They are unique almost everywhere on `Ω`
   and, on `V`, unique as elements of `L_r(V)` (`Rd.HasWeakLineDeriv.eq_of_top`), linear, local
-  (`Rd.HasWeakLineDeriv.mono`), vanish where `f` vanishes
+  (`Rd.HasWeakLineDeriv.mono`), on `V` locally integrable, as is `f`
+  (`Rd.HasWeakLineDeriv.locallyIntegrable_deriv`, `Rd.HasWeakLineDeriv.locallyIntegrable`),
+  iterate (`Rd.HasWeakLineDeriv.of_cons`: if `G = ∂^v f` and `H = ∂^{(w, v)} f`, then
+  `H = ∂_w G`), vanish where `f` vanishes
   (`Rd.HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero`), additive over finite sums
   (`Rd.HasWeakLineDeriv.sum`), tested also by smooth compactly supported complex functions
   (`Rd.HasWeakLineDeriv.integral_mul_eq`), satisfy the product rule with smooth real functions
@@ -194,6 +197,28 @@ theorem HasWeakLineDeriv.mono (h : HasWeakLineDeriv Ω v f g) (hΩ : Ω' ≤ Ω)
     simp [hΩ]
   have h' := h.integral_eq (TestFunction.monoCLM ℝ φ)
   rwa [coe_iteratedLineDerivOp_eq hφ, hφ] at h'
+
+/-- A function with a weak derivative on the whole space `V` is locally integrable on `V`. -/
+theorem HasWeakLineDeriv.locallyIntegrable (h : HasWeakLineDeriv ⊤ v f g) :
+    LocallyIntegrable f volume := by
+  have h' := h.locallyIntegrableOn
+  rwa [Opens.coe_top, locallyIntegrableOn_univ] at h'
+
+/-- A weak derivative on the whole space `V` is locally integrable on `V`. -/
+theorem HasWeakLineDeriv.locallyIntegrable_deriv (h : HasWeakLineDeriv ⊤ v f g) :
+    LocallyIntegrable g volume := by
+  have h' := h.locallyIntegrableOn_deriv
+  rwa [Opens.coe_top, locallyIntegrableOn_univ] at h'
+
+/-- **Weak derivatives of weak derivatives**: if `G = ∂^v f` and `H = ∂^{(w, v)} f` weakly on `Ω`,
+then `H = ∂_w G` weakly on `Ω`, since `∂^{(w, v)} = ∂_w ∂^v` for distributions (Mathlib's
+`LineDeriv.iteratedLineDerivOp_succ_left`). -/
+theorem HasWeakLineDeriv.of_cons {w : V} {G H : V → ℂ} (h : HasWeakLineDeriv Ω v f G)
+    (h' : HasWeakLineDeriv Ω (Fin.cons w v) f H) :
+    HasWeakLineDeriv Ω (fun _ : Fin 1 => w) G H := by
+  refine ⟨h.locallyIntegrableOn_deriv, h'.locallyIntegrableOn_deriv, ?_⟩
+  rw [LineDeriv.iteratedLineDerivOp_one, ← h'.eq,
+    LineDeriv.iteratedLineDerivOp_succ_left (Fin.cons w v), Fin.cons_zero, Fin.tail_cons, h.eq]
 
 /-- **Weak derivatives vanish where the function vanishes**: if `g` is a weak derivative `∂^v f`
 on `Ω`, `O ⊆ Ω` is open and `f = 0` almost everywhere on `O`, then `g = 0` almost everywhere on

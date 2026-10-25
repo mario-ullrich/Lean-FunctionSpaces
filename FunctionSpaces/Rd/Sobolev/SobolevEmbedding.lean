@@ -42,7 +42,9 @@ Let `V` have dimension `n`, `1 ≤ p < ∞` and `α(n, p, r) = n (1/p - 1/r)` fo
   `m > n/p`, with named constants, formulas in norms and Schwartz seminorms of fixed kernels
   that are proved finite. The critical case `1/r = 1/p - m/n` with `r < ∞` (Sobolev's
   inequality) is in `FunctionSpaces.Rd.Sobolev.CriticalSobolevEmbedding`
-  (`Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`).
+  (`Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`), and for `p = 1` in
+  `FunctionSpaces.Rd.Sobolev.GagliardoNirenbergSobolev`
+  (`Rd.exists_memLp_ae_eq_of_memSobolev_one_of_eq`).
 -/
 
 @[expose] public section
@@ -417,7 +419,8 @@ The bound of `‖f‖_{F^m_{p,2}}` (`Rd.triebelLizorkinNorm_le_of_hasWeakLineDer
 Littlewood–Paley quasi-norm of `B^m_{p,max(p,2)}`
 (`Rd.littlewoodPaleyNorm_max_le_triebelLizorkinNorm`), and the Besov embedding
 (`Rd.exists_memLp_ae_eq_of_memApprox`) applies. The critical case `1/r = 1/p - m/n` with `r < ∞`
-(Sobolev's inequality) is `Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_of_eq`. -/
+(Sobolev's inequality) is `Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_of_eq`; for `m = 1` and
+every `1 ≤ p`, `p = 1` included, it is `Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv_one`. -/
 theorem exists_memLp_ae_eq_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     {r : ℝ≥0∞} (hpr : p ≤ r) {m : ℕ} (hs : nikolskiiExponent (finrank ℝ V) p r < m)
     {f : Lp ℂ p (volume : Measure V)}
@@ -468,7 +471,8 @@ theorem exists_boundedContinuous_ae_eq_of_hasWeakLineDeriv [Nontrivial V] (hp1 :
 (`Rd.memApprox_of_memSobolev`) and the Besov embedding (`Rd.exists_memLp_ae_eq_of_memApprox`);
 `Rd.exists_memLp_ae_eq_of_hasWeakLineDeriv` adds the norm bound. The critical case
 `1/r = 1/p - m/n` with `r < ∞` (Sobolev's inequality) is
-`Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`. -/
+`Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`, and for `p = 1`
+`Rd.exists_memLp_ae_eq_of_memSobolev_one_of_eq`. -/
 theorem exists_memLp_ae_eq_of_memSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     {r : ℝ≥0∞} (hpr : p ≤ r) {m : ℕ}
     (hs : nikolskiiExponent (finrank ℝ V) p r < m) {f : Lp ℂ p (volume : Measure V)}
