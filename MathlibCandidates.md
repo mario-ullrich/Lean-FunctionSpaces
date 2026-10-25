@@ -166,6 +166,18 @@ declarations.
   (`Rd.higherDiff_conv_ae`); the modulus on a subset `U`, with the differences restricted to the
   points `x` with `x, …, x + rh ∈ U` (`Rd.modulusOn`,
   `FunctionSpaces/Rd/Differences/DomainModuli.lean`).
+* **Sobolev–Slobodeckij norms** (`FunctionSpaces/Rd/Differences/SobolevSlobodeckij.lean`):
+  Mathlib has no fractional Sobolev spaces. The Gagliardo form
+  `∫∫ |f(y) - f(x)|^p / |y - x|^(n+sp) dy dx` on a finite-dimensional inner product space
+  (`Rd.slobodeckijForm`), its form `∫ ‖Δ_h f‖_p^p / |h|^(n+sp) dh` by Tonelli's theorem
+  (`Rd.slobodeckijForm_eq_lintegral_eLpNorm`), its two-sided bounds by the first-difference
+  Besov norm (`Rd.lqNorm_modulus_rpow_le_slobodeckijForm`, `Rd.slobodeckijForm_le`) and
+  `W^{s,p} = B^s_{p,p}` for `0 < s < 1` (`Rd.slobodeckijForm_lt_top_iff_memApprox`); the radial
+  integrals `∫_{|z| ≥ R} |z|^(-a)` for `a > n` and `∫_{|z| < R} |z|^(-a)` for `a < n` with
+  explicit constants (`Rd.lintegral_compl_ball_norm_rpow_neg_le`,
+  `Rd.lintegral_ball_norm_rpow_neg_le`) belong next to Mathlib's
+  `integrableOn_ball_of_norm_le_rpow`. The Lean project *quadratic-forms-sobolev-lean* has the
+  form for `p = 2` (`formHs`); *grunweg/SobolevSlobodeckij* has integer orders only.
 * **Leibniz's rule for iterated forward differences**
   (`FunctionSpaces/Rd/LocalMeans/Multipliers.lean`):
   `Δ_h^r(u v)(x) = ∑_{l ≤ r} C(r, l) Δ_h^l u(x) Δ_h^(r-l) v(x + l h)` (`Rd.higherDiff_mul`); Mathlib

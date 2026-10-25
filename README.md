@@ -206,6 +206,14 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   equivalent for `f ∈ L_p(V)`: `f ∈ A^s_q(L_p(V), (E_k))`;
   `‖(2^(js) ‖ψ_j ⋆ f‖_p)_j‖_{ℓ_q} < ∞`; and `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
   (`Rd.memApprox_bandScheme_iff_modulus`, `Rd.littlewoodPaleyNorm_lt_top_iff_modulus`).
+* **`W^{s,p} = B^s_{p,p}` by the Gagliardo seminorm.** Let `V` be a finite-dimensional real inner
+  product space of dimension `n`, `1 ≤ p < ∞` and `0 < s < 1`. Then `f ∈ L_p(V)` has finite
+  Gagliardo form `∫∫ |f(y) - f(x)|^p / |y - x|^(n+sp) dy dx` (Gagliardo 1957) iff
+  `f ∈ A^s_p(L_p(V), (E_k))`, equivalently `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k))_p)_k‖_{ℓ_p} < ∞`, so
+  the Sobolev–Slobodeckij space `W^{s,p}(V)` is `B^s_{p,p}(V)`
+  (`Rd.slobodeckijForm_lt_top_iff_memApprox`, `Rd.memApprox_bandScheme_iff_modulus`). Both
+  directions hold with explicit constants for every `s > 0`
+  (`Rd.lqNorm_modulus_rpow_le_slobodeckijForm`, `Rd.slobodeckijForm_le`).
 * **Besov spaces as interpolation spaces.** For every scheme of bounded continuous functions on a
   finite measure space, `1 ≤ p ≤ ∞`, `0 < η < 1` and `1 ≤ q₀, q₁, q ≤ ∞`, the continuous K-method
   gives `(B^{s₀}_{p,q₀}, B^{s₁}_{p,q₁})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` for `0 < s₀ < s₁` and
@@ -557,7 +565,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness and smooth Littlewood–Paley blocks for all `p`, interpolation of Besov spaces by differences, `W^m_2` by Fourier multipliers, the trace on a face, the restriction for continuous functions | ✅ | ✗ |
 | [**Intervals, the cube, splines and wavelets**](docs/IntervalCube.md): piecewise polynomials and splines on `[0, 1]`, the circle and `[0, 1]^d`, Whitney's inequality, coordinate and isotropic moduli, multiwavelets, the Haar system | ✅ | ✗ |
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
-| [**Besov spaces on `ℝ^d`**](docs/Rd.md): band-limited approximation, Littlewood–Paley blocks, differences, local means, kernel majorants, atoms, invariance under changes of variables, Besov spaces as interpolation spaces | ✅ | ✗ |
+| [**Besov spaces on `ℝ^d`**](docs/Rd.md): band-limited approximation, Littlewood–Paley blocks, differences, Sobolev–Slobodeckij norms, local means, kernel majorants, atoms, invariance under changes of variables, Besov spaces as interpolation spaces | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, Triebel–Lizorkin spaces as interpolation spaces | ✅ | ✗ |
 | [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings including the critical case and the Gagliardo–Nirenberg–Sobolev inequality, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
@@ -712,6 +720,9 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * J. Franke, *On the spaces F^s_{pq} of Triebel–Lizorkin type: pointwise multipliers and
   spaces on domains*, Math. Nachr. **125** (1986), no. 1, 29–68. The embedding
   `B^{s₀}_{p₀,p₁} ↪ F^{s₁}_{p₁,q}`, among the goals in *What is left to do*.
+* E. Gagliardo, *Caratterizzazioni delle tracce sulla frontiera relative ad alcune classi di
+  funzioni in n variabili*, Rend. Sem. Mat. Univ. Padova **27** (1957), 284–305,
+  [Numdam](https://www.numdam.org/item/RSMUP_1957__27__284_0). The Sobolev–Slobodeckij seminorm.
 * E. Gagliardo, *Proprietà di alcune classi di funzioni in più variabili*, Ricerche Mat. **7**
   (1958), 102–137. The Sobolev inequality for `p = 1`.
 * L. Grafakos, *Classical Fourier Analysis*, 3rd ed., Graduate Texts in Mathematics **249**,

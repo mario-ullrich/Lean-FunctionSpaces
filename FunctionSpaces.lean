@@ -48,6 +48,7 @@ public import FunctionSpaces.Rd.Differences.MomentKernels
 public import FunctionSpaces.Rd.Approximation.BandJackson
 public import FunctionSpaces.Rd.Approximation.BandInverse
 public import FunctionSpaces.Rd.LittlewoodPaley.BesovDifferences
+public import FunctionSpaces.Rd.Differences.SobolevSlobodeckij
 public import FunctionSpaces.Rd.LocalMeans.LocalMeans
 public import FunctionSpaces.Rd.LocalMeans.Multipliers
 public import FunctionSpaces.Rd.Atoms.AtomSynthesis
@@ -347,6 +348,9 @@ and the theorems that their characterisations agree. The library builds on
 * `FunctionSpaces.Rd.LittlewoodPaley.BesovDifferences`: the modulus of smoothness as a modulus
   compatible with the band-limited scheme, and the agreement of the Besov conditions by
   approximation, by Littlewood–Paley blocks and by differences.
+* `FunctionSpaces.Rd.Differences.SobolevSlobodeckij`: the Gagliardo form of the Sobolev–Slobodeckij
+  spaces, its two-sided bounds by the first-difference Besov norm with explicit constants, radial
+  integrals of powers, and `W^{s,p} = B^s_{p,p}` for `0 < s < 1`.
 * `FunctionSpaces.Rd.LocalMeans.LocalMeans`: local means with moment kernels, the reproducing
   formula, and the characterisation of Besov spaces by local means.
 * `FunctionSpaces.Rd.LocalMeans.Multipliers`: Leibniz's rule for differences, pointwise

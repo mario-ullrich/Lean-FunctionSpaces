@@ -45,7 +45,10 @@ each quasi-norm by a constant times the other. The dimension of the underlying s
     order $r$ on a group such as $\R^n$ or $\T^n$, or on a set $\Omega$, where only the
     differences with all their points in $\Omega$ count. The moduli on the torus and on an interval
     and the isotropic modulus on the cube are of this form; the moduli along the coordinates of the
-    cube take differences in one coordinate at a time.
+    cube take differences in one coordinate at a time. For $r = 1$, $q = p$ and $0 < s < 1$ the
+    Gagliardo form $\int\!\int |f(y) - f(x)|^p / |y - x|^{n + sp} \, dy \, dx$ of the
+    Sobolev--Slobodeckij space $W^{s,p}(\R^n)$, added to $\|f\|_p^p$, is equivalent to the
+    $p$-th power of this norm (\Cref{thm:sobolev-slobodeckij-besov}).
   \item \emph{Littlewood--Paley blocks} (\Cref{def:lp-blocks}).
     $\|(2^{js} \|\psi_j * f\|_p)_j\|_{\ell_q}$, where the Fourier transforms of the kernels
     $\psi_j$ form a smooth dyadic decomposition of unity. For $p = 2$ on the torus the sharp
@@ -225,6 +228,8 @@ Descriptions & Range & Result \\
   & \Cref{thm:atomic-characterisation} \\
 \raggedright Differences of order $r$ and real interpolation of two such spaces
   & $0 < s_0 < s_1 < r$ & \Cref{thm:rd-besov-interpolate} \\
+\raggedright Band-limited approximation and the Gagliardo form, $q = p$ & $0 < s < 1$
+  & \Cref{thm:sobolev-slobodeckij-besov} \\
 \hline
 \end{tabular}
 \end{center}
@@ -4233,14 +4238,16 @@ approximate identities and the Littlewood--Paley kernels are those of \Cref{ch:f
 Besov space $\Besov{s}{p}{q}$ is the approximation space $A^s_q$ of the band-limited scheme in
 $L_p$. The chapter describes it by Littlewood--Paley blocks for $s > 0$ (\Cref{thm:lp-band}); by
 differences for $0 < s < r$, through Jackson's inequality and the inverse inequality
-(\Cref{thm:band-jackson}, \Cref{thm:band-inverse} and \Cref{thm:rd-besov}); by local means
-(\Cref{thm:local-means}); by atomic decompositions with regular and with smooth atoms
-(\Cref{thm:atomic-characterisation} and \Cref{thm:smooth-atomic-decomposition}); and as a
-real interpolation space between two Besov spaces by differences
-(\Cref{thm:rd-besov-interpolate}). Moduli of smoothness on subsets and pointwise multipliers
-prepare the domains of \Cref{ch:lipschitz-domains}, and smooth atoms give the invariance of
-the Besov spaces under smooth changes of variables (\Cref{thm:diffeo-invariance}), on which the
-manifolds of \Cref{ch:manifolds} rest.
+(\Cref{thm:band-jackson}, \Cref{thm:band-inverse} and \Cref{thm:rd-besov}); for $q = p$ and
+$0 < s < 1$ by the Gagliardo form of the Sobolev--Slobodeckij space $W^{s,p}(V)$
+(\Cref{thm:sobolev-slobodeckij-besov}); by local means (\Cref{thm:local-means}); by atomic
+decompositions with regular and with smooth atoms (\Cref{thm:atomic-characterisation} and
+\Cref{thm:smooth-atomic-decomposition}); and as a real interpolation space between two Besov
+spaces by differences (\Cref{thm:rd-besov-interpolate}).
+Moduli of smoothness on subsets and pointwise multipliers prepare the domains of
+\Cref{ch:lipschitz-domains}, and smooth atoms give the invariance of the Besov spaces under
+smooth changes of variables (\Cref{thm:diffeo-invariance}), on which the manifolds of
+\Cref{ch:manifolds} rest.
 
 \section{Band-limited approximation}
 
@@ -4726,6 +4733,251 @@ combines (1) with \Cref{thm:lp-band}. Part (3) combines the inverse direction of
 
 For $0 < s < r$ the Besov space $\Besov{s}{p}{q}(V)$ thus has three equivalent descriptions: by
 approximation with band-limited functions, by Littlewood--Paley blocks, and by differences.
+
+\section{Sobolev--Slobodeckij norms}
+\label{sec:sobolev-slobodeckij}
+
+For $0 < s < 1$ and $1 \leq p < \infty$ the Sobolev--Slobodeckij space $W^{s,p}(V)$ consists of
+the $f \in L_p$ with finite Gagliardo seminorm
+$(\int\!\int |f(y) - f(x)|^p / |y - x|^{n + sp} \, dy \, dx)^{1/p}$, which Gagliardo introduced
+to describe the boundary values of $\Sob{1}{p}$, with $s = 1 - 1/p$ on the
+boundary~\cite{Gagliardo1957}. This section compares the $p$-th power of the seminorm with the
+first-difference Besov norm of \Cref{thm:rd-besov}, with explicit constants in both directions,
+and so identifies $W^{s,p}(V)$ with $\Besov{s}{p}{p}(V)$. Both directions sort the steps $h$
+into dyadic annuli: from the form to the modulus, $\|\Delta_h f\|_p^p$ is an average of
+$\|\Delta_z f\|_p^p$ over a ball, and Hardy's inequality sums the annuli; from the modulus to
+the form, each annulus inside the unit ball contributes one term of the $\ell_p$ norm, and the
+steps outside it give a radial integral.
+
+\paragraph{The form.}
+
+\begin{definition}[The Gagliardo form]
+\label{def:slobodeckij-form}
+\lean{Rd.slobodeckijForm}
+\leanok
+For every $0 < p < \infty$, every $s \in \R$ and every $f \colon V \to \C$, the Gagliardo
+form is
+\[
+  \mathcal{E}_{s,p}(f) = \int_V \int_V \frac{|f(y) - f(x)|^p}{|y - x|^{n + sp}} \, dy \, dx
+  \in [0, \infty] .
+\]
+\end{definition}
+
+The Lean definition takes the exponent $p$ as a real number, which is $0$ for $p = \infty$; the
+results below use the form for $1 \leq p < \infty$.
+
+\begin{lemma}[The Gagliardo form by the step]
+\label{lem:slobodeckij-form-step}
+\lean{Rd.slobodeckijForm_congr_ae, Rd.slobodeckijForm_of_subsingleton, Rd.fwdDiff_congr_ae,
+  Rd.eLpNorm_fwdDiff_rpow_eq, Rd.eLpNorm_fwdDiff_zero_rpow, Rd.measurable_eLpNorm_fwdDiff_rpow,
+  Rd.slobodeckijForm_eq_lintegral_of_measurable, Rd.slobodeckijForm_eq_lintegral_eLpNorm}
+\leanok
+\uses{def:slobodeckij-form, def:rd-modulus, lem:rd-differences}
+Let $0 < p < \infty$ and $s \in \R$. For all $f, g \colon V \to \C$ with $f = g$ almost
+everywhere, $\Delta_h f = \Delta_h g$ almost everywhere for every $h \in V$ and
+$\mathcal{E}_{s,p}(f) = \mathcal{E}_{s,p}(g)$; if $V = \{0\}$, then
+$\mathcal{E}_{s,p}(f) = 0$ for every $f$. For every almost everywhere strongly measurable
+$f \colon V \to \C$, the function $h \mapsto \|\Delta_h f\|_p^p$ is measurable,
+$\|\Delta_0 f\|_p = 0$, and
+\[
+  \mathcal{E}_{s,p}(f) = \int_V \frac{\|\Delta_h f\|_p^p}{|h|^{n + sp}} \, dh .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Replace $f$ by a measurable representative. The substitution $y = x + h$ in the inner integral
+and Tonelli's theorem for the measurable function
+$(x, h) \mapsto |f(x + h) - f(x)|^p / |h|^{n + sp}$ exchange the order of integration, and
+$\int |f(x + h) - f(x)|^p \, dx = \|\Delta_h f\|_p^p$. The same Tonelli argument gives the
+measurability of $h \mapsto \|\Delta_h f\|_p^p$.
+\end{proof}
+
+\paragraph{Dyadic annuli and radial integrals.}
+
+\begin{lemma}[Dyadic annuli]
+\label{lem:dyadic-annuli}
+\lean{Rd.dyadicAnnulus, Rd.measurableSet_dyadicAnnulus, Rd.pairwise_disjoint_dyadicAnnulus,
+  Rd.closedBall_subset_union_iUnion_dyadicAnnulus,
+  Rd.setLIntegral_closedBall_le_tsum_dyadicAnnulus,
+  Rd.setLIntegral_closedBall_le_tsum_dyadicAnnulus_of_zero,
+  Rd.tsum_setLIntegral_dyadicAnnulus_le, ENNReal.ofReal_div_two_pow_rpow,
+  Rd.volume_dyadicAnnulus_le}
+\leanok
+For every $\rho > 0$ and $j \in \N$ let
+$A_{\rho, j} = \{ z \in V : \rho 2^{-(j+1)} < |z| \leq \rho 2^{-j} \}$. These sets are
+measurable and pairwise disjoint, and $|A_{\rho, j}| \leq \rho^n 2^{-jn} |B(0, 1)|$. For every
+$k \in \N$ the closed ball $\bar B(0, \rho 2^{-k})$ is contained in
+$\{0\} \cup \bigcup_{i \in \N} A_{\rho, k + i}$, and for every $G \colon V \to [0, \infty]$
+\[
+  \int_{\bar B(0, \rho 2^{-k})} G \leq G(0) \, |\{0\}| + \sum_{i \in \N} \int_{A_{\rho, k+i}} G ,
+  \qquad
+  \sum_{j \in \N} \int_{A_{\rho, j}} G \leq \int_V G .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $z \neq 0$ in the ball choose $i$ with $2^i \leq \rho 2^{-k} / |z| < 2^{i+1}$; then
+$z \in A_{\rho, k+i}$. For $i < j$, the points of $A_{\rho, j}$ satisfy
+$|z| \leq \rho 2^{-j} \leq \rho 2^{-(i+1)}$, so they lie outside $A_{\rho, i}$. The integral
+bounds follow from the countable subadditivity of the integral over sets and from its
+additivity over disjoint measurable sets, and $A_{\rho, j}$ lies in the closed ball of radius
+$\rho 2^{-j}$, whose volume is $\rho^n 2^{-jn} |B(0, 1)|$.
+\end{proof}
+
+\begin{lemma}[Radial integrals of powers]
+\label{lem:radial-power-integrals}
+\lean{ENNReal.ofReal_two_pow_mul_rpow, ENNReal.rpow_le_rpow_add_rpow_of_le_of_le,
+  Rd.complBallRpowConst,
+  Rd.complBallRpowConst_ne_top, Rd.setLIntegral_compl_ball_inter_dyadicShell_le,
+  Rd.lintegral_compl_ball_norm_rpow_neg_le, Rd.ballRpowConst, Rd.ballRpowConst_ne_top,
+  Rd.setLIntegral_dyadicAnnulus_norm_rpow_neg_le, Rd.lintegral_ball_norm_rpow_neg_le}
+\leanok
+\uses{lem:dyadic-annuli, lem:maximal-function-kernels}
+For every $R > 0$ and every real $a$:
+\begin{enumerate}
+  \item if $a > n$, then
+    $\int_{|z| \geq R} |z|^{-a} \, dz \leq 2^n |B(0, 1)| \bigl(1 - 2^{-(a - n)}\bigr)^{-1}
+    R^{n - a}$;
+  \item if $a < n$, then
+    $\int_{|z| < R} |z|^{-a} \, dz \leq (1 + 2^a) |B(0, 1)| \bigl(1 - 2^{-(n - a)}\bigr)^{-1}
+    R^{n - a}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) On the part of the shell $2^i R \leq |z| < 2^{i+1} R$ of \Cref{lem:maximal-function-kernels}
+outside $B(0, R)$, $|z|^{-a} \leq 2^{-ia} R^{-a}$, and the shell lies in a ball of volume
+$2^{(i+1)n} R^n |B(0, 1)|$; sum the geometric series in $2^{-(a-n)}$. (2) On the annulus
+$A_{R, i}$ of \Cref{lem:dyadic-annuli},
+$|z|^{-a} \leq (R 2^{-(i+1)})^{-a} + (R 2^{-i})^{-a} = (1 + 2^a) R^{-a} 2^{ia}$ for either sign
+of $a$, and $|A_{R, i}| \leq R^n 2^{-in} |B(0, 1)|$; sum the geometric series in
+$2^{-(n-a)}$. For $n \geq 1$ the point $0$ is a null set; for $n = 0$ the integrand vanishes,
+since then $-a > 0$.
+\end{proof}
+
+Part (2) holds for exponents $a$ of either sign.
+
+\paragraph{Averages over balls.}
+
+\begin{lemma}[A difference as an average of differences]
+\label{lem:difference-average}
+\lean{Rd.eLpNorm_fwdDiff_le_add, Rd.eLpNorm_fwdDiff_rpow_le, Rd.setLIntegral_ball_comp_sub_le,
+  Rd.eLpNorm_fwdDiff_rpow_le_average}
+\leanok
+\uses{lem:rd-differences, lem:slobodeckij-form-step}
+Let $1 \leq p < \infty$ and let $f \colon V \to \C$ be almost everywhere strongly measurable.
+For all $h, z \in V$,
+$\|\Delta_h f\|_p \leq \|\Delta_{h - z} f\|_p + \|\Delta_z f\|_p$. For every
+$G \colon V \to [0, \infty]$, all $t \in \R$ and $h \in V$ with $|h| \leq t$,
+$\int_{|z| < t} G(h - z) \, dz \leq \int_{|z| < 2t} G(z) \, dz$. For all $t > 0$ and $h \in V$
+with $|h| \leq t$,
+\[
+  \|\Delta_h f\|_p^p \leq 2^p \, |B(0, t)|^{-1} \int_{|z| < 2t} \|\Delta_z f\|_p^p \, dz .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\Delta_h f = (\Delta_{h - z} f)(\cdot + z) + \Delta_z f$, and translations keep $L_p$ norms.
+Hence $\|\Delta_h f\|_p^p \leq 2^{p-1} (\|\Delta_{h-z} f\|_p^p + \|\Delta_z f\|_p^p)$ by the
+convexity of $x \mapsto x^p$. Integrate over $|z| < t$. The reflection $z \mapsto h - z$
+preserves Lebesgue measure and maps $B(0, t)$ into $B(0, 2t)$, since
+$|h - z| \leq |h| + |z| < 2t$, so both integrals are at most
+$\int_{|z| < 2t} \|\Delta_z f\|_p^p \, dz$, and dividing by $|B(0, t)|$ gives the claim.
+\end{proof}
+
+\paragraph{The two bounds.}
+
+\begin{theorem}[The modulus by the Gagliardo form]
+\label{thm:modulus-by-slobodeckij-form}
+\lean{Rd.lpModulus_rpow_le_average, Rd.inv_volume_ball_one_div_two_pow,
+  Rd.dyadicWeight_mul_lpModulus_rpow_le, Rd.dyadicWeight_mul_setLIntegral_dyadicAnnulus_le,
+  Rd.tsum_dyadicWeight_mul_setLIntegral_closedBall_le, Rd.slobodeckijConstUpper,
+  Rd.slobodeckijConstUpper_ne_top, Rd.lqNorm_modulus_rpow_le_slobodeckijForm}
+\leanok
+\uses{lem:difference-average, lem:dyadic-annuli, lem:slobodeckij-form-step, lem:hardy,
+  lem:rd-modulus, def:lq-norm}
+Let $1 \leq p < \infty$, $s > 0$ and $b = n + sp$, and let
+$C_1 = 2^p |B(0, 1)|^{-1} (1 - 2^{-b})^{-1} 2^b$. Then $C_1 < \infty$, and for every
+$f \in L_p$
+\[
+  \bigl\| \bigl(2^{ks} \omega_1(f, 2^{-k})_p\bigr)_k \bigr\|_{\ell_p}^p
+  \leq C_1 \, \mathcal{E}_{s,p}(f) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:difference-average} with $t = 2^{-k}$ for every step of the supremum, and
+$|B(0, 2^{-k})|^{-1} = 2^{kn} |B(0, 1)|^{-1}$,
+\[
+  \bigl(2^{ks} \omega_1(f, 2^{-k})_p\bigr)^p \leq 2^p |B(0, 1)|^{-1} \, 2^{kb}
+  \int_{|z| \leq 2^{1-k}} \|\Delta_z f\|_p^p \, dz .
+\]
+Write $G(z) = \|\Delta_z f\|_p^p$, so that $G(0) = 0$, and $I_j = \int_{A_{2, j}} G$. By
+\Cref{lem:dyadic-annuli} the ball of radius $2^{1-k}$ contributes at most $\sum_{i} I_{k+i}$,
+and Hardy's inequality (\Cref{lem:hardy}, $q = 1$) gives
+$\sum_k 2^{kb} \sum_i I_{k+i} \leq (1 - 2^{-b})^{-1} \sum_j 2^{jb} I_j$. On $A_{2, j}$,
+$|z| \leq 2^{1-j}$, so $2^{jb} \leq 2^b |z|^{-b}$ and
+$2^{jb} I_j \leq 2^b \int_{A_{2, j}} G(z) |z|^{-b} \, dz$. The annuli are disjoint, so the sum
+is at most $2^b \int_V G(z) |z|^{-b} \, dz = 2^b \mathcal{E}_{s,p}(f)$ by
+\Cref{lem:slobodeckij-form-step}.
+\end{proof}
+
+\begin{theorem}[The Gagliardo form by the modulus]
+\label{thm:slobodeckij-form-by-modulus}
+\lean{Rd.setLIntegral_dyadicAnnulus_le_lpModulus, Rd.setLIntegral_compl_ball_le_enorm,
+  Rd.slobodeckijConstLower, Rd.slobodeckijConstLower_ne_top, Rd.slobodeckijForm_le}
+\leanok
+\uses{lem:dyadic-annuli, lem:radial-power-integrals, lem:slobodeckij-form-step,
+  lem:rd-modulus, def:lq-norm}
+Let $1 \leq p < \infty$, $s > 0$ and $b = n + sp$, and let
+$C_2 = 2^b |B(0, 1)| + 2^p \cdot 2^n |B(0, 1)| (1 - 2^{-sp})^{-1}$. Then $C_2 < \infty$, and for
+every $f \in L_p$
+\[
+  \mathcal{E}_{s,p}(f) \leq C_2 \Bigl( \|f\|_p^p
+  + \bigl\| \bigl(2^{ks} \omega_1(f, 2^{-k})_p\bigr)_k \bigr\|_{\ell_p}^p \Bigr) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Split the integral of \Cref{lem:slobodeckij-form-step} into $|z| \leq 1$ and $|z| \geq 1$. Since
+the integrand vanishes at $z = 0$, \Cref{lem:dyadic-annuli} with $\rho = 1$ bounds the first
+part by the sum over the annuli $2^{-(i+1)} < |z| \leq 2^{-i}$. There
+$\|\Delta_z f\|_p \leq \omega_1(f, 2^{-i})_p$ and $|z|^{-b} \leq 2^{(i+1) b}$, and the annulus
+has volume at most $2^{-in} |B(0, 1)|$, so it contributes at most
+$2^b |B(0, 1)| \, 2^{isp} \omega_1(f, 2^{-i})_p^p$. For $|z| \geq 1$,
+$\|\Delta_z f\|_p \leq 2 \|f\|_p$, and part (1) of \Cref{lem:radial-power-integrals} with
+$a = b > n$ and $R = 1$ bounds the second part by
+$2^p \|f\|_p^p \cdot 2^n |B(0, 1)| (1 - 2^{-sp})^{-1}$.
+\end{proof}
+
+\begin{theorem}[Sobolev--Slobodeckij spaces are Besov spaces]
+\label{thm:sobolev-slobodeckij-besov}
+\lean{Rd.slobodeckijForm_lt_top_iff_memApprox}
+\leanok
+\uses{thm:modulus-by-slobodeckij-form, thm:slobodeckij-form-by-modulus, thm:rd-besov}
+For every $1 \leq p < \infty$, every $0 < s < 1$ and every $f \in L_p$,
+$\mathcal{E}_{s,p}(f) < \infty$ if and only if $f$ lies in the approximation space $A^s_p$ of
+the band-limited scheme.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:rd-besov} with $r = 1$ and $q = p$, $f \in A^s_p$ if and only if
+$\|f\|_p + \|(2^{ks} \omega_1(f, 2^{-k})_p)_k\|_{\ell_p} < \infty$. The two directions are
+\Cref{thm:modulus-by-slobodeckij-form} and \Cref{thm:slobodeckij-form-by-modulus}, whose
+constants are finite.
+\end{proof}
+
+Thus $W^{s,p}(V) = \Besov{s}{p}{p}(V)$ for $0 < s < 1$ and $1 \leq p < \infty$, with
+$\|f\|_p^p + \mathcal{E}_{s,p}(f)$ and
+$\|f\|_p^p + \|(2^{ks} \omega_1(f, 2^{-k})_p)_k\|_{\ell_p}^p$ equivalent: each is at most
+$\max(1, C_1)$, respectively $1 + C_2$, times the other.
 
 \section{Local means}
 

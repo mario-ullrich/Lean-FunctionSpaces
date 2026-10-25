@@ -51,6 +51,19 @@ the approximate identities and the Littlewood–Paley kernels in [Tools from ana
   `(‖·‖_p, N_{s₁,q₁})_{η,q}` consists of the `f` with `N_{ηs₁,q}(f) < ∞`
   (`Rd.memKMethod_leftModCouple_iff`). The same holds for the band-limited approximation spaces
   themselves (`Rd.memKMethod_bandApproxCouple_iff`, `Rd.memKMethod_bandLeftApproxCouple_iff`).
+* **Sobolev–Slobodeckij spaces on `ℝ^d`.** With `V` and `p` as above, `n = dim V` and `s > 0`,
+  let `E_{s,p}(f) = ∫∫ |f(y) - f(x)|^p / |y - x|^(n+sp) dy dx` be the Gagliardo form
+  (`Rd.slobodeckijForm`; Gagliardo 1957). For every `f ∈ L_p(V)`,
+  `‖(2^(ks) ω_1(f, 2^(-k))_p)_k‖_{ℓ_p}^p ≤ C_1 E_{s,p}(f)` and
+  `E_{s,p}(f) ≤ C_2 (‖f‖_p^p + ‖(2^(ks) ω_1(f, 2^(-k))_p)_k‖_{ℓ_p}^p)` with explicit constants
+  (`Rd.lqNorm_modulus_rpow_le_slobodeckijForm`, `Rd.slobodeckijForm_le`). Hence for `0 < s < 1`,
+  `E_{s,p}(f) < ∞` iff `f ∈ A^s_p(L_p(V), (E_k))`, that is, `W^{s,p}(V) = B^s_{p,p}(V)`
+  (`Rd.slobodeckijForm_lt_top_iff_memApprox`). The proof sorts the steps into dyadic annuli:
+  `‖Δ_h f‖_p^p ≤ 2^p |B(0,t)|⁻¹ ∫_{|z| < 2t} ‖Δ_z f‖_p^p dz` for `|h| ≤ t`
+  (`Rd.eLpNorm_fwdDiff_rpow_le_average`), Hardy's inequality sums the annuli, and the radial
+  integrals `∫_{|z| ≥ R} |z|^(-a) dz` for `a > n` and `∫_{|z| < R} |z|^(-a) dz` for `a < n` are
+  bounded by explicit multiples of `R^(n-a)` (`Rd.lintegral_compl_ball_norm_rpow_neg_le`,
+  `Rd.lintegral_ball_norm_rpow_neg_le`).
 * **Local means on `ℝ^d`.** With `V` and `p` as above, let `g` be a smooth function with
   `∫ g = 1` that vanishes outside a ball, `g_c = c^n g(c ·)` its dilations (`n = dim V`),
   `L ≥ 1`, `m = ∑_{l=1}^L (-1)^(l+1) C(L, l) g_{1/l}` the moment kernel, and `k_0 = m`,
@@ -115,6 +128,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Jackson's inequality for band-limited approximation | ✅ | ✗ | `Rd/Approximation/BandJackson` |
 | Differences of Schwartz functions in `L_1`, inverse inequality for band-limited functions | ✅ | ✗ | `Rd/Approximation/BandInverse` |
 | Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ | ✗ | `Rd/LittlewoodPaley/BesovDifferences` |
+| Sobolev–Slobodeckij norms: the Gagliardo form, its two-sided bounds by first differences with explicit constants, radial integrals of powers, `W^{s,p} = B^s_{p,p}` for `0 < s < 1` | ✅ | ✗ | `Rd/Differences/SobolevSlobodeckij` |
 | Besov spaces on `ℝ^d` as interpolation spaces, by approximation, differences and Littlewood–Paley blocks | ✅ | ✗ | `Rd/Interpolation/BesovInterpolation` |
 | Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences | ✅ | ✗ | `Rd/Differences/DomainModuli` |
 | Moment kernels: averaged differences, approximation with the modulus, also on subsets, vanishing first moments of the moment kernels of order two | ✅ | ✗ | `Rd/Differences/MomentKernels` |
