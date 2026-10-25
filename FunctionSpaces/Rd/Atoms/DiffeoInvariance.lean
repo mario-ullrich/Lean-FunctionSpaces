@@ -36,7 +36,9 @@ a cut-off on `Ω` (`Rd.CutoffDiffeo`), acting by `T f = 1_{Ω ∩ U} (χ f) ∘ 
   function of finite intrinsic Besov quasi-norm extends to `V` with a bound. On a Besov domain the
   intrinsic quasi-norm is invariant (`Rd.CutoffDiffeo.modNormOn_applyLp_le_modNormOn`), and the
   order of the differences does not matter (`Rd.BesovDomain.modNormOn_order_le`); `V` itself is a
-  Besov domain.
+  Besov domain, and so are the closed half-space, the quadrant, closed balls of positive radius,
+  the closed unit cube and the closures of nonempty bounded open convex sets
+  (`FunctionSpaces.Domains.Lipschitz.HalfSpace`, `FunctionSpaces.Domains.Lipschitz.BesovDomains`).
 -/
 
 @[expose] public section
@@ -507,11 +509,15 @@ extension is a field of the class, so the class is a hypothesis; its instances a
 closed half-space, the models of manifolds with and without boundary and the quadrant model of
 manifolds with corners (`Rd.BesovDomain.univ`, `Rd.BesovDomain.closedHalfSpace`,
 `Rd.BesovDomain.range_euclideanHalfSpace`, `Rd.BesovDomain.range_of_boundaryless`,
-`Rd.BesovDomain.range_euclideanQuadrant`), and the closure of a Lipschitz graph domain with convex
-graph function is a Besov domain (`Rd.BesovDomain.closure_lipschitzGraph`). The class consists of
-closed convex sets; every Lipschitz graph domain, convex or not, has the extension property
-(`Rd.HasBesovExtension`, `Rd.LipschitzGraph.hasBesovExtension`). Closed balls and cubes are not yet
-proved instances. -/
+`Rd.BesovDomain.range_euclideanQuadrant`) and the closed unit cube
+(`Rd.BesovDomain.closedUnitCube`). The closure of a Lipschitz graph domain with convex graph
+function, of a nonempty convex bounded Lipschitz domain and of a nonempty bounded open convex set
+is a Besov domain (`Rd.BesovDomain.closure_lipschitzGraph`,
+`Rd.BesovDomain.closure_boundedLipschitzDomain`, `Rd.BesovDomain.closure_of_convex`), and so is
+every closed ball of positive radius (`Rd.BesovDomain.closedBall`).
+The class consists of closed convex sets; every Lipschitz graph domain and every bounded Lipschitz
+domain, convex or not, has the extension property (`Rd.HasBesovExtension`,
+`Rd.LipschitzGraph.hasBesovExtension`, `Rd.BoundedLipschitzDomain.hasBesovExtension`). -/
 class BesovDomain (Ω : Set V) : Prop where
   convex : Convex ℝ Ω
   isClosed : IsClosed Ω
@@ -525,19 +531,6 @@ class BesovDomain (Ω : Set V) : Prop where
         ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) ≤
           C * (‖indicatorLp isClosed.measurableSet f‖ₑ +
             lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r f k))
-
-/-- On `Ω = V` the intrinsic quasi-norm is the quasi-norm of `V`. -/
-theorem modNormOn_univ {p : ℝ≥0∞} [Fact (1 ≤ p)] (r : ℕ) (s : ℝ) (q : ℝ≥0∞)
-    (f : Lp ℂ p (volume : Measure V)) :
-    ‖indicatorLp MeasurableSet.univ f‖ₑ +
-        lqNorm q (fun k => dyadicWeight s k * lpModulusOn p (Set.univ : Set V) r f k) =
-      ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) := by
-  have h1 : ‖indicatorLp MeasurableSet.univ f‖ₑ = ‖f‖ₑ := by
-    rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae _ f),
-      Set.indicator_univ]
-  have h2 : ∀ k, lpModulusOn p (Set.univ : Set V) r f k = lpModulus p r f k := fun k => by
-    rw [lpModulusOn, modulusOn_univ, lpModulus]
-  simp_rw [h1, h2]
 
 /-- **`V` is a Besov domain**, with the extension `F = f`. -/
 instance BesovDomain.univ : BesovDomain (Set.univ : Set V) where

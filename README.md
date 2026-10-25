@@ -382,12 +382,18 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `f ∈ L_p(V)` agrees on `Ω` with some `F ∈ L_p(V)` with
   `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
-  (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`).
+  (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`), and then `F` can be chosen
+  with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q}` at most `C` times the intrinsic quasi-norm,
+  with one `C < ∞` for all `f` (`Rd.BoundedLipschitzDomain.exists_besov_extension_le`).
   Every bounded open set that agrees near each boundary point with the region above a Lipschitz
   graph in some direction (the usual definition, `Rd.IsBoundedLipschitzDomain`) is the carrier of
   such a structure, and conversely (`Rd.isBoundedLipschitzDomain_iff_exists`); every open ball and
   every bounded open convex set is such a carrier (`Rd.BoundedLipschitzDomain.ball`,
-  `Rd.BoundedLipschitzDomain.ofConvex`).
+  `Rd.BoundedLipschitzDomain.ofConvex`). Hence the closure of every nonempty bounded open convex
+  set is a Besov domain, a closed convex set with nonempty interior whose functions of finite
+  intrinsic quasi-norm extend to `V` with a bound (`Rd.BesovDomain`,
+  `Rd.BesovDomain.closure_of_convex`); examples are every closed ball of positive radius and the
+  closed unit cube (`Rd.BesovDomain.closedBall`, `Rd.BesovDomain.closedUnitCube`).
 * **`H^1` on bounded Lipschitz domains.** On a bounded Lipschitz domain `Ω` with boundary `Γ`,
   `H^1(Ω)` consists of the `f ∈ L_2(V)` that agree on `Ω` with a function of `H^1(V)`
   (`Rd.BoundedLipschitzDomain.MemSobolevOn`); for every order `r ≥ 2`, `f ∈ H^1(Ω)` iff
@@ -527,7 +533,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, Triebel–Lizorkin spaces as interpolation spaces | ✅ | ✗ |
 | [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
-| [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph domains, closures of convex ones and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary or with corners, smooth domains | ✅ | ✗ |
+| [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph and bounded Lipschitz domains, closures of convex ones, closed balls, the closed cube and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary or with corners, smooth domains | ✅ | ✗ |
 
 Lean: ✅ every file proved without `sorry` · 🟡 some statement still `sorry` · ⬜ planned.
 Checked (human-checked): ✅ mathematics and documentation both reviewed by the author ·

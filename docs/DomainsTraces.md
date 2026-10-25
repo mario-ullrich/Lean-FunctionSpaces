@@ -86,10 +86,15 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, and the same condition describes the
   restrictions of the band-limited approximation spaces
   (`Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn`,
-  `Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff`). The proof pastes local versions of
-  Rychkov's extension (`Rd.LocalMeansBump.exists_local_extension`) with a smooth resolution of
-  unity; smooth functions with bounded derivatives are pointwise multipliers of the Besov spaces
-  by differences (`Rd.modNorm_mulLp_le`).
+  `Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff`). The extension comes with a bound:
+  there is `C < ∞` such that `F` can be chosen with
+  `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤`
+  `C (‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})` for every `f`
+  (`Rd.BoundedLipschitzDomain.exists_besov_extension_le`). The proof pastes local
+  versions of Rychkov's extension with a bound (`Rd.LocalMeansBump.exists_local_extension_le`)
+  with a smooth resolution of unity fixed before `f` (`Rd.exists_pasting_le`); smooth functions
+  with bounded derivatives are pointwise multipliers of the Besov spaces by differences
+  (`Rd.modNorm_mulLp_le`).
 * **Traces on Lipschitz graph domains.** Let `Ω` be a Lipschitz graph domain as above, with
   Lipschitz constant `M`, and `H = e^⊥`. The boundary of `Ω` is the image of the graph map
   `γ(x') = x' + φ(x') e`, `x' ∈ H` (`Rd.LipschitzGraph.graphMap`). For `f ∈ L_p(V)` the trace
@@ -127,16 +132,17 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   this extension. The closed half-space is a Besov domain (`Rd.BesovDomain.closedHalfSpace`), and
   so are `V` and the models of manifolds with and without boundary (`Rd.BesovDomain.univ`,
   `Rd.BesovDomain.range_euclideanHalfSpace`, `Rd.BesovDomain.range_of_boundaryless`). The class
-  consists of closed convex sets; closed balls and cubes are not yet proved instances.
-* **The extension property of Lipschitz graph domains, and the quadrant as a Besov domain.** A
-  measurable set `Ω` has the extension property (`Rd.HasBesovExtension`) if for `1 ≤ p < ∞`,
-  `0 < s < r` and `1 ≤ q ≤ ∞` there is `C < ∞` such that every `f` with
-  `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` agrees on `Ω` with some
-  `F` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C N_Ω(f)`; a closed convex set with
-  nonempty interior has it iff it is a Besov domain. The property passes to sets that agree up to a
-  null set (`Rd.HasBesovExtension.congr_set`), and with it every order `r > s` gives the same
-  space (`Rd.HasBesovExtension.modNormOn_order_le`). Every Lipschitz graph domain
-  `{x : φ(x) < ⟪x, e⟫}` has it (`Rd.LipschitzGraph.hasBesovExtension`), its graph and its
+  consists of closed convex sets; the quadrant, closed balls of positive radius and the closed
+  unit cube are Besov domains as well (next item).
+* **The extension property of Lipschitz graph domains and bounded Lipschitz domains; the quadrant
+  and closures of convex sets as Besov domains.** A measurable set `Ω` has the extension property
+  (`Rd.HasBesovExtension`) if for `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞` there is `C < ∞`
+  such that every `f` with `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
+  agrees on `Ω` with some `F` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C N_Ω(f)`; a
+  closed convex set with nonempty interior has it iff it is a Besov domain. The property passes to
+  sets that agree up to a null set (`Rd.HasBesovExtension.congr_set`), and with it every order
+  `r > s` gives the same space (`Rd.HasBesovExtension.modNormOn_order_le`). Every Lipschitz graph
+  domain `{x : φ(x) < ⟪x, e⟫}` has it (`Rd.LipschitzGraph.hasBesovExtension`), its graph and its
   frontier are null sets (`Rd.LipschitzGraph.volume_graph`,
   `Rd.LipschitzGraph.volume_frontier_domain`), and for convex `φ` its closure is a Besov domain
   (`Rd.BesovDomain.closure_lipschitzGraph`). The open quadrant `{y ∈ ℝ^n : y_i > 0 for all i}` is
@@ -144,7 +150,14 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   `e = (1, …, 1)/√n` (`Rd.LipschitzGraph.quadrant`, `Rd.LipschitzGraph.quadrant_domain`), so the
   range `{y : y_i ≥ 0 for all i}` of Mathlib's model of manifolds with corners
   `modelWithCornersEuclideanQuadrant n` is a Besov domain
-  (`Rd.BesovDomain.range_euclideanQuadrant`).
+  (`Rd.BesovDomain.range_euclideanQuadrant`). Every bounded Lipschitz domain has the extension
+  property (`Rd.BoundedLipschitzDomain.hasBesovExtension`), so the order `r > s` does not matter on
+  it, convex or not (`Rd.BoundedLipschitzDomain.modNormOn_order_le`); its closure agrees with it up
+  to the null frontier (`Rd.BoundedLipschitzDomain.closure_ae_eq`), and for nonempty convex
+  domains the closure is a Besov domain (`Rd.BesovDomain.closure_boundedLipschitzDomain`). Hence
+  the closure of every nonempty bounded open convex set is a Besov domain
+  (`Rd.BesovDomain.closure_of_convex`), for example every closed ball `B̄(c, R)` with `R > 0` and
+  the closed unit cube `[0, 1]^n` (`Rd.BesovDomain.closedBall`, `Rd.BesovDomain.closedUnitCube`).
 * **Besov spaces on compact manifolds.** Let `M` be a compact smooth manifold modelled on `E` with
   corners `I` whose range is a Besov domain (the half-space, the quadrant of manifolds with
   corners, or `E`), `μ` a smooth measure (in every chart a continuous positive density with
@@ -482,8 +495,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Lipschitz graph domains: cone and closed cone, the closure of the domain plus the cone, cone bump, support principle | ✅ | ✗ | `Domains/Lipschitz/LipschitzGraph` |
 | Rychkov's extension, restrictions to Lipschitz graph domains by intrinsic local means | ✅ | ✗ | `Domains/Extension/RychkovExtension` |
 | Restrictions to Lipschitz graph domains by intrinsic differences | ✅ | ✗ | `Domains/Extension/LipschitzGraphBesov` |
-| Local versions of Rychkov's extension: boundary and inner patches, short steps into the closed cone, absolute convergence from bounds of the weighted local means, agreement on the patch for every convergent local extension | ✅ | ✗ | `Domains/Extension/LocalExtension` |
-| Bounded Lipschitz domains: the patches covering the closure, pasting of local extensions | ✅ | ✗ | `Domains/Lipschitz/BoundedLipschitz` |
+| Local versions of Rychkov's extension: boundary and inner patches, short steps into the closed cone, absolute convergence from bounds of the weighted local means, agreement on the patch for every convergent local extension, the local extension with a bound | ✅ | ✗ | `Domains/Extension/LocalExtension` |
+| Bounded Lipschitz domains: the patches covering the closure, pasting of local extensions, the extension with a bound | ✅ | ✗ | `Domains/Lipschitz/BoundedLipschitz` |
 | Null hyperplanes, the half-space and the models of manifolds as Besov domains | ✅ | ✗ | `Domains/Lipschitz/HalfSpace` |
 | Traces of every order on the half-space: trace theorem, extension, trace space | ✅ | ✗ | `Domains/Traces/HalfSpaceTrace` |
 | Graph map of a Lipschitz graph domain, restrictions of atoms to the graph | ✅ | ✗ | `Domains/Lipschitz/GraphParametrization` |
@@ -513,8 +526,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Green's formula on bounded Lipschitz domains: integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary, the chart form for every resolution of unity, the outward unit normal as the chart normal and a unit vector almost everywhere on the boundary, `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, the traces from both sides of a graph, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u` vanishes | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainGreen` |
 | The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, smoothing with compact support, bump mollifiers and cone mollifiers, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)` | ✅ | ✗ | `Domains/Traces/TraceKernel` |
 | Bounded Lipschitz domains from the set-level definition: sets Lipschitz near a point, local graphs as Lipschitz graph domains, McShane's extension of local graphs, the structure from a family of charts and the converse, the ball | ✅ | ✗ | `Domains/Lipschitz/LocalLipschitzGraphs` |
-| Bounded open convex sets as bounded Lipschitz domains: the ray length, its cone estimate, open convex sets, bounded or not, near a frontier point as regions above a Lipschitz graph, and the open unit cube | ✅ | ✗ | `Domains/Lipschitz/ConvexDomains` |
-| The extension property and null sets, Lipschitz graph domains with null graphs and boundaries, closures of convex Lipschitz graph domains as Besov domains, the quadrant as a Lipschitz graph domain and the quadrant model of manifolds with corners as a Besov domain | ✅ | ✗ | `Domains/Lipschitz/BesovDomains` |
+| Bounded open convex sets as bounded Lipschitz domains: the ray length, its cone estimate, open convex sets, bounded or not, near a frontier point as regions above a Lipschitz graph, and the open unit cube with its closure | ✅ | ✗ | `Domains/Lipschitz/ConvexDomains` |
+| The extension property and null sets, Lipschitz graph domains with null graphs and boundaries, closures of convex Lipschitz graph domains as Besov domains, the quadrant as a Lipschitz graph domain and the quadrant model of manifolds with corners as a Besov domain, bounded Lipschitz domains with the extension property, closures of nonempty convex bounded Lipschitz domains and of nonempty bounded open convex sets, closed balls of positive radius and the closed unit cube as Besov domains | ✅ | ✗ | `Domains/Lipschitz/BesovDomains` |
 | Smooth bounded domains from the set-level definition: sets smooth near a point, the smooth cut-off of a local graph, the smooth domain from smooth charts and the converse, the ball as a smooth domain and the Besov spaces of its closure | ✅ | ✗ | `Domains/Manifolds/SmoothLocalGraphs` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.

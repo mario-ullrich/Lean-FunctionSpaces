@@ -24,16 +24,19 @@ near each boundary point with a Lipschitz graph domain. On Lipschitz graph domai
 restrictions of the Besov spaces of $V$ are described by intrinsic local means and by intrinsic
 differences, with Rychkov's universal extension (\Cref{thm:graph-extension},
 \Cref{thm:restriction-local-means} and \Cref{thm:graph-besov}); on bounded Lipschitz domains
-they are described by intrinsic differences, by pasting local extensions
-(\Cref{thm:local-extension} and \Cref{thm:bounded-lipschitz-besov}). The area formula for Lipschitz graphs
+they are described by intrinsic differences, with an extension bounded by a constant times the
+intrinsic quasi-norm that pastes local extensions (\Cref{thm:local-extension} and
+\Cref{thm:bounded-lipschitz-besov}). The area formula for Lipschitz graphs
 (\Cref{thm:lipschitz-graph-area}) expresses the Euclidean Hausdorff measure of the boundary in a
 chart, and \Cref{sec:surface-measure} builds from it the surface measure, $L_2(\Gamma)$ and the
 traces into it. \Cref{sec:local-lipschitz-graphs} shows that the bounded Lipschitz domains are
 the sets of the usual definition by local Lipschitz graphs, with the open balls as examples, and
 \Cref{sec:convex-domains} adds the bounded open convex sets and the open unit cube.
-\Cref{sec:graph-besov-domains} shows that every Lipschitz graph domain has the extension property
-of Besov domains, and that the closures of convex Lipschitz graph domains and the quadrant, the
-model of manifolds with corners, are Besov domains.
+\Cref{sec:graph-besov-domains} shows that every Lipschitz graph domain and every bounded Lipschitz
+domain has the extension property of Besov domains, and that the closures of convex Lipschitz
+graph domains, the quadrant (the model of manifolds with corners) and the closures of nonempty
+bounded open convex sets, among them closed balls of positive radius and the closed unit cube,
+are Besov domains.
 
 \section{Lipschitz graph domains}
 
@@ -462,6 +465,9 @@ As in \Cref{lem:intrinsic-upper}, with \Cref{thm:moment-approx} for the two sets
 \lean{Rd.LocalMeansBump.localExtTerm, Rd.LocalMeansBump.localExtension,
   Rd.LocalMeansBump.summable_localExtTerm, Rd.LocalMeansBump.tendsto_sum_localExtTerm,
   Rd.LocalMeansBump.modNorm_localExtension_le, Rd.LocalMeansBump.indicatorLp_localExtension,
+  Rd.LocalMeansBump.momentConst_ne_top, Rd.LocalMeansBump.localExtConst,
+  Rd.LocalMeansBump.localExtConst_ne_top,
+  Rd.LocalMeansBump.exists_local_extension_le,
   Rd.LocalMeansBump.exists_local_extension, Rd.LocalMeansBump.tendsto_sum_localExtTerm_of_summable,
   Rd.LocalMeansBump.indicatorLp_localExtension_of_summable,
   Rd.LocalMeansBump.enorm_localExtTerm_le_of_forall_le,
@@ -475,8 +481,14 @@ $1 \leq q \leq \infty$. Let $U \subseteq W$ and $U \subseteq T$ be measurable wi
 for $x \in U$ and $\eta_j(y) \neq 0$, and with $W \subseteq T_{Lh}$ for the steps
 $h = -c^{-1} z$, $c \geq 1$, $g(z) \neq 0$. If
 $\|f\|_{L_p(T)} + \|(2^{ks} \omega_L(f, 2^{-k}, T)_p)_k\|_{\ell_q} < \infty$, then there is
-$F \in L_p$ with $\|F\|_p + \|(2^{ks} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$ and $F = f$
-almost everywhere on $U$. For every measurable $W$, every $s > 0$ and every $f \in L_p$ with
+$F \in L_p$ with $F = f$ almost everywhere on $U$ and
+\begin{multline*}
+  \|F\|_p + \|(2^{ks} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} \\
+  \leq C (\|m\|_1 + 2 \|g\|_1) \bigl( \|f\|_{L_p(T)}
+    + \|(2^{ks} \omega_L(f, 2^{-k}, T)_p)_k\|_{\ell_q} \bigr) < \infty ,
+\end{multline*}
+with the constant $C$ of \Cref{lem:local-means-synthesis}. For every measurable $W$, every
+$s > 0$ and every $f \in L_p$ with
 $2^{js} \|\mathbf 1_W (k_j * f)\|_p \leq X < \infty$ for every $j$,
 $\sum_j \|\eta_j * \mathbf 1_W (k_j * f)\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} X$.
 \end{theorem}
@@ -484,7 +496,9 @@ $\sum_j \|\eta_j * \mathbf 1_W (k_j * f)\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} X$
 \begin{proof}
 \leanok
 Take $F = \sum_j \eta_j * 1_W (k_j * 1_T f)$, which converges by \Cref{lem:local-means-on-sets}
-and has the bound of \Cref{lem:local-means-synthesis}. On $U$, \Cref{lem:support-principle-two}
+and has the bound of \Cref{lem:local-means-synthesis}; \Cref{lem:local-means-on-sets} for $1_T f$
+bounds the local means on $W$ by the intrinsic quasi-norm on $T$. On $U$,
+\Cref{lem:support-principle-two}
 removes the cut-off $1_W$, and the reproducing formula (\Cref{lem:reproducing-formula}) gives
 $1_T f = f$. The agreement on $U$ uses only the convergence of the series.
 \end{proof}
@@ -559,20 +573,26 @@ $S \subseteq \operatorname{int} L \subseteq L \subseteq \bigcup_i U_i$ (Mathlib'
 
 \begin{lemma}[Pasting local extensions]
 \label{lem:pasting}
-\lean{Rd.lpModulus_finsetSum_le, Rd.modNorm_finsetSum_lt_top, Rd.exists_pasting}
+\lean{Rd.lpModulus_finsetSum_le, Rd.modNorm_finsetSum_le, Rd.modNorm_finsetSum_lt_top,
+  Rd.indicatorLp_sum_eq_of_partition, Rd.exists_pasting_le, Rd.exists_pasting}
 \leanok
 \uses{lem:resolution-of-unity, thm:multipliers}
-Let $O \subseteq V$ be measurable, $(U_i)$ a finite cover of $\overline O$ by bounded open sets, and
-$F_i \in L_p$ with $\|F_i\|_p + \|(2^{ks} \omega_r(F_i, 2^{-k})_p)_k\|_{\ell_q} < \infty$ and
-$F_i = f$ almost everywhere on $O \cap U_i$, where $s < r$. Then $f$ agrees on $O$ with some $F$ with
-$\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+Let $1 \leq p < \infty$, $s < r$ and $1 \leq q \leq \infty$, and write
+$N(F) = \|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q}$. For every finite family
+$(G_i)$ in $L_p$, $N(\sum_i G_i) \leq \sum_i N(G_i)$. Let $O \subseteq V$ be measurable and $(U_i)$
+a finite cover of $\overline O$ by bounded open sets. There is $C < \infty$ such that for every
+$f \in L_p$ and all $F_i \in L_p$ with $F_i = f$ almost everywhere on $O \cap U_i$, $f$ agrees on
+$O$ with some $F \in L_p$ with $N(F) \leq C \sum_i N(F_i)$; in particular $N(F) < \infty$ if
+$N(F_i) < \infty$ for every $i$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-$F = \sum_i \psi_i F_i$ for a resolution of unity subordinate to $(U_i)$
-(\Cref{lem:resolution-of-unity}): each $\psi_i F_i$ has a finite norm by \Cref{thm:multipliers},
-and $\psi_i F_i = \psi_i f$ on $O$.
+The modulus $\omega_r(\cdot, t)_p$ and the norm of $\ell_q$ are subadditive. Fix a resolution of
+unity $(\psi_i)$ subordinate to $(U_i)$ and bounds of its derivatives up to order $r$
+(\Cref{lem:resolution-of-unity}) before $f$, and take $F = \sum_i \psi_i F_i$: then
+$N(\psi_i F_i) \leq C_i N(F_i)$ with the constant $C_i$ of \Cref{thm:multipliers}, so
+$C = \sum_i C_i$ works, and $\psi_i F_i = \psi_i f$ almost everywhere on $O$, so $F = f$ there.
 \end{proof}
 
 \begin{lemma}[Restrictions and smaller sets]
@@ -593,15 +613,18 @@ replaced by a measurable subset.
 
 \begin{lemma}[The patches of a bounded Lipschitz domain]
 \label{lem:bounded-patches}
-\lean{Rd.BoundedLipschitzDomain.exists_local_extension_boundary,
+\lean{Rd.BoundedLipschitzDomain.exists_local_extension_boundary_le,
+  Rd.BoundedLipschitzDomain.exists_local_extension_interior_le,
+  Rd.BoundedLipschitzDomain.exists_local_extension_boundary,
   Rd.BoundedLipschitzDomain.exists_local_extension_interior}
 \leanok
 \uses{thm:local-extension, lem:patches, lem:bumps-every-radius, lem:restriction-moduli}
-Let $1 \leq p < \infty$, $0 < s < r$, $1 \leq q \leq \infty$, $\varepsilon, \delta > 0$, and
-$f \in L_p$ with $\|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q} < \infty$.
-For every $j$, $f$ agrees on $\Omega \cap B(c_j, \rho_j - 2\varepsilon)$, and on
-$\{\operatorname{dist}(\cdot, \Omega^c) > 2\delta\}$, with functions with finite Besov quasi-norms
-on $V$.
+Let $1 \leq p < \infty$, $0 < s < r$, $1 \leq q \leq \infty$ and $\varepsilon, \delta > 0$, and
+write $N_\Omega(f) = \|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q}$.
+For every $j$ there is $C < \infty$ such that every $f \in L_p$ with $N_\Omega(f) < \infty$ agrees
+on $\Omega \cap B(c_j, \rho_j - 2\varepsilon)$ with some $F \in L_p$ with
+$\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq C N_\Omega(f)$; the same holds on
+$\{\operatorname{dist}(\cdot, \Omega^c) > 2\delta\}$.
 \end{lemma}
 
 \begin{proof}
@@ -609,12 +632,15 @@ on $V$.
 \Cref{thm:local-extension} with the patches of \Cref{lem:patches}: for the boundary balls the cone
 bump of $\Omega_j$ rescaled to radius $\leq \varepsilon / r$, inside a centred bump of radius
 $\leq \delta / r$; the moduli on the smaller sets are bounded by those on $\Omega$
-(\Cref{lem:restriction-moduli}).
+(\Cref{lem:restriction-moduli}). The bumps depend only on $\varepsilon$, $\delta$, $r$ and $j$, so
+$C$ is the constant of \Cref{thm:local-extension} for that bump.
 \end{proof}
 
 \begin{theorem}[Besov spaces on bounded Lipschitz domains by intrinsic differences]
 \label{thm:bounded-lipschitz-besov}
-\lean{Rd.BoundedLipschitzDomain.exists_besov_extension_of_modulusOn,
+\lean{Rd.BoundedLipschitzDomain.modNorm_eq_modNormOn_of_carrier_eq_univ,
+  Rd.BoundedLipschitzDomain.exists_besov_extension_le,
+  Rd.BoundedLipschitzDomain.exists_besov_extension_of_modulusOn,
   Rd.BoundedLipschitzDomain.exists_besov_extension_iff_modulusOn,
   Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff}
 \leanok
@@ -629,16 +655,28 @@ $1 \leq q \leq \infty$ and $f \in L_p$. The following are equivalent:
   \item there is $F$ in the approximation space $A^s_q$ of the band-limited scheme with $F = f$
     almost everywhere on $\Omega$.
 \end{enumerate}
+Moreover, there is $C < \infty$ such that for every $f \in L_p$ with (1) there is $F$ as in (2)
+with $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq
+C (\|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q})$.
 \end{theorem}
 
 \begin{proof}
 \leanok
-(2) gives (1) by \Cref{lem:restriction-moduli}. For the converse, if $\Omega = V$ take $F = f$.
-Otherwise \Cref{lem:bounded-lipschitz-geometry} gives $\varepsilon$ and $\delta$, the balls
+(2) gives (1) by \Cref{lem:restriction-moduli}. For the converse, if $\Omega = V$ (possible
+only for $V = \{0\}$, since $\Omega$ is bounded) take $F = f$ and $C = 1$. Otherwise
+\Cref{lem:bounded-lipschitz-geometry} gives $\varepsilon$ and $\delta$, the balls
 $B(c_j, \rho_j - 2\varepsilon)$ and the set $\{\operatorname{dist}(\cdot, \Omega^c) > 2\delta\}$
 cover $\overline\Omega$, \Cref{lem:bounded-patches} gives the local extensions, and
-\Cref{lem:pasting} pastes them. (2) and (3) agree by \Cref{thm:rd-besov}.
+\Cref{lem:pasting} pastes them. The patches, the bumps and the resolution of unity depend only on
+$\Omega$ and $r$, so $C$ is the pasting constant times the sum of the local constants. (2) and
+(3) agree by \Cref{thm:rd-besov}.
 \end{proof}
+
+Every step of the construction is linear in $f$, so for fixed $r$ the construction is a bounded
+linear operator, as in Rychkov's construction \cite{Rychkov}; \Cref{thm:bounded-lipschitz-besov}
+records its bound for each $f$. For Sobolev spaces the bounded
+extension operator on Lipschitz domains is Stein's
+\cite[Chapter VI, \S 3, Theorem 5]{SteinSingular}.
 
 \section{The area formula for Lipschitz graphs}
 \label{sec:lipschitz-graph-area}
@@ -1734,7 +1772,8 @@ sphere $\|z - c\| = R$; for $R \leq 0$ the ball is empty. The last statement is
 \section{Bounded convex open sets}
 \label{sec:convex-domains}
 
-Every bounded open convex set is a bounded Lipschitz set \cite{Grisvard}. Mathlib's gauge of a
+Every bounded open convex set is a bounded Lipschitz set \cite[Corollary 1.2.2.3]{Grisvard}.
+Mathlib's gauge of a
 convex set describes it as a sublevel set; the graph form of \Cref{def:lipschitz-near-point}
 comes from the lengths of parallel rays instead. In this section $V$ is any real inner product
 space; for a unit vector $\nu \in V$, $P_\nu$ is the orthogonal projection onto $\nu^\perp$.
@@ -1877,19 +1916,41 @@ $z \in \partial\Omega'$. By \Cref{thm:convex-lipschitz}, $\Omega'$ is Lipschitz 
 \Cref{thm:lipschitz-near-point} so is $\Omega$.
 \end{proof}
 
+\begin{lemma}[The open and the closed unit cube]
+\label{lem:unit-cube}
+\lean{Rd.convex_unitCube, Rd.nonempty_unitCube, Rd.unitCube_eq_preimage,
+  Rd.closedUnitCube_eq_preimage, Rd.isClosed_closedUnitCube, Rd.closure_unitCube}
+\leanok
+For every $n \in \N$, the open unit cube $(0, 1)^n \subseteq \R^n$ is convex and nonempty, the
+closed unit cube $[0, 1]^n$ is closed, and $\overline{(0, 1)^n} = [0, 1]^n$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The open cube is convex coordinatewise (Mathlib's \texttt{convex\_\allowbreak Ioo}), and
+$(1/2, \dots, 1/2) \in (0, 1)^n$. The identification of $\R^n$ with the product space
+$\prod_{i} \R$ is a homeomorphism (Mathlib's \texttt{PiLp.\allowbreak homeomorph}) that maps
+$(0, 1)^n$ and $[0, 1]^n$ onto the products $\prod_i (0, 1)$ and $\prod_i [0, 1]$. A product of
+closed sets is closed (Mathlib's \texttt{isClosed\_\allowbreak set\_\allowbreak pi}), the closure
+of a product is the product of the closures (Mathlib's
+\texttt{closure\_\allowbreak pi\_\allowbreak set}), and $\overline{(0, 1)} = [0, 1]$ (Mathlib's
+\texttt{closure\_\allowbreak Ioo}).
+\end{proof}
+
 \begin{corollary}[The open unit cube]
 \label{cor:unit-cube-lipschitz}
 \lean{Rd.isBoundedLipschitzDomain_unitCube, Rd.BoundedLipschitzDomain.unitCube,
   Rd.BoundedLipschitzDomain.carrier_unitCube}
 \leanok
-\uses{thm:convex-lipschitz}
+\uses{thm:convex-lipschitz, lem:unit-cube}
 For every $n \in \N$, the open unit cube $(0, 1)^n \subseteq \R^n$ is a bounded Lipschitz
 set and the carrier of a bounded Lipschitz domain.
 \end{corollary}
 
 \begin{proof}
 \leanok
-The cube is convex, open as the intersection of the $n$ open slabs $\{x : 0 < x_i < 1\}$, and
+The cube is convex (\Cref{lem:unit-cube}), open as the intersection of the $n$ open slabs
+$\{x : 0 < x_i < 1\}$, and
 bounded, since $\|x\| \leq \sqrt{n}$ on it (Mathlib's
 \texttt{EuclideanSpace.\allowbreak norm\_\allowbreak eq}); \Cref{thm:convex-lipschitz} applies.
 \end{proof}
@@ -1901,8 +1962,11 @@ A Besov domain (\Cref{def:besov-domain}) is a closed convex set with nonempty in
 functions of finite intrinsic quasi-norm extend to $V$ with a bound. The extension alone makes
 sense on every measurable set. Rychkov's extension \cite{Rychkov} gives it on every Lipschitz
 graph domain, and it passes to sets that agree with such a domain up to a null set. Hence the
-closures of convex Lipschitz graph domains and the quadrant, the model of manifolds with corners,
-are Besov domains. In this section $V$ is a finite-dimensional real inner product space, and
+closures of convex Lipschitz graph domains and the quadrant (the model of manifolds with corners)
+are Besov domains. The extension with a bound on bounded Lipschitz domains
+(\Cref{thm:bounded-lipschitz-besov}) gives the property there as well, and with it the closures of
+nonempty bounded open convex sets, such as closed balls of positive radius and the closed unit
+cube, are Besov domains. In this section $V$ is a finite-dimensional real inner product space, and
 \[
   N_\Omega(f; r) = \|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q}
 \]
@@ -1973,6 +2037,8 @@ $N_\Omega(f; r') \leq \|F\|_p + \|(2^{ks} \omega_{r'}(F, 2^{-k})_p)_k\|_{\ell_q}
 (\Cref{lem:restriction-moduli}).
 \end{proof}
 
+\paragraph{Lipschitz graph domains.}
+
 \begin{lemma}[The graph is a null set]
 \label{lem:lipschitz-graph-null}
 \lean{Rd.LipschitzGraph.volume_graph, Rd.LipschitzGraph.volume_frontier_domain,
@@ -2030,6 +2096,7 @@ For non-convex $\varphi$ neither $\Omega$ nor $\overline{\Omega}$ is convex. $\O
 extension property, but $\overline{\Omega}$ is not a Besov domain: the class asks for convexity,
 which the changes of variables of \Cref{thm:besov-domain-invariance} use.
 
+\paragraph{The quadrant.}
 The open quadrant $\{y \in \R^n : y_i > 0 \text{ for every } i\}$ is a single Lipschitz graph
 domain, near the corner as well, in the diagonal direction.
 
@@ -2104,6 +2171,74 @@ domain hold for compact manifolds with corners modelled on the quadrant: Besov a
 Besov space neither depends on the atlas nor on the order of the differences
 (\Cref{def:manifold-besov}). The boundary spaces and the trace theorem of that chapter use the
 half-space model.
+
+\paragraph{Bounded Lipschitz domains.}
+A bounded Lipschitz domain (\Cref{def:bounded-lipschitz}) has the extension property by
+\Cref{thm:bounded-lipschitz-besov}, convex or not; its closure is a Besov domain when it is
+convex and nonempty.
+
+\begin{theorem}[Bounded Lipschitz domains and Besov domains]
+\label{thm:bounded-lipschitz-besov-domain}
+\lean{Rd.BoundedLipschitzDomain.hasBesovExtension, Rd.BoundedLipschitzDomain.closure_ae_eq,
+  Rd.BesovDomain.closure_boundedLipschitzDomain}
+\leanok
+\uses{def:besov-extension-property, thm:bounded-lipschitz-besov, cor:boundary-null,
+  lem:besov-extension-null-sets}
+Every bounded Lipschitz domain $\Omega \subseteq V$ has the extension property, and its closure
+$\overline{\Omega}$ agrees with $\Omega$ up to a null set. If $\Omega$ is convex and nonempty, then
+$\overline{\Omega}$ is a Besov domain.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The extension of \Cref{thm:bounded-lipschitz-besov} agrees with $f$ on $\Omega$ and is bounded by
+$C N_\Omega(f)$. The frontier of $\Omega$ is a null set (\Cref{cor:boundary-null}), so
+$\overline{\Omega}$ agrees with $\Omega$ up to a null set (Mathlib's \texttt{closure\_\allowbreak
+ae\_\allowbreak eq\_\allowbreak of\_\allowbreak null\_\allowbreak frontier}). For convex $\Omega$,
+$\overline{\Omega}$ is closed and convex (Mathlib's \texttt{Convex.\allowbreak closure}), the
+nonempty open set $\Omega$ lies in its interior, and \Cref{lem:besov-extension-null-sets} gives the
+Besov domain.
+\end{proof}
+
+\begin{corollary}[The order of the differences on bounded Lipschitz domains]
+\label{cor:bounded-lipschitz-order}
+\lean{Rd.BoundedLipschitzDomain.modNormOn_order_le}
+\leanok
+\uses{thm:bounded-lipschitz-besov-domain, cor:besov-extension-order}
+For every bounded Lipschitz domain $\Omega \subseteq V$, every $1 \leq p < \infty$, all
+$r, r' \in \N$ and $s \in \R$ with $0 < s < r$ and $s < r'$, and every $1 \leq q \leq \infty$,
+there is $C < \infty$ with $N_\Omega(f; r') \leq C N_\Omega(f; r)$ for every $f \in L_p(V)$ with
+$N_\Omega(f; r) < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{cor:besov-extension-order} with \Cref{thm:bounded-lipschitz-besov-domain}.
+\end{proof}
+
+So on every bounded Lipschitz domain the intrinsic quasi-norms of all orders $r > s$ are
+equivalent, as on the domains of DeVore and Sharpley \cite{DeVoreSharpley}.
+
+\begin{corollary}[Closures of bounded open convex sets]
+\label{cor:convex-besov-domain}
+\lean{Rd.BesovDomain.closure_of_convex, Rd.BesovDomain.closedBall, Rd.BesovDomain.closedUnitCube}
+\leanok
+\uses{thm:bounded-lipschitz-besov-domain, thm:convex-lipschitz, cor:unit-cube-lipschitz,
+  lem:unit-cube}
+For every nonempty bounded open convex set $U \subseteq V$, the closure $\overline{U}$ is a Besov
+domain. For every $c \in V$ and every $R > 0$, the closed ball $\overline{B}(c, R)$ is a Besov
+domain, and for every $n \in \N$, the closed unit cube $[0, 1]^n \subseteq \R^n$ is a Besov
+domain.
+\end{corollary}
+
+\begin{proof}
+\leanok
+$U$ is a bounded Lipschitz domain (\Cref{thm:convex-lipschitz}), so
+\Cref{thm:bounded-lipschitz-besov-domain} applies. The closed ball is the closure of the open ball
+$B(c, R)$ (Mathlib's \texttt{closure\_\allowbreak ball}), and the closed unit cube is the closure of
+the open unit cube (\Cref{lem:unit-cube}), a bounded Lipschitz domain
+(\Cref{cor:unit-cube-lipschitz}).
+\end{proof}
 
 \chapter{Traces on Lipschitz domains}
 \label{ch:traces-lipschitz}

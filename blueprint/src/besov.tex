@@ -5007,7 +5007,8 @@ $\sum_k 2^{k(s-l)q} < \infty$.
 
 \begin{theorem}[Pointwise multipliers]
 \label{thm:multipliers}
-\lean{Rd.modNorm_mulLp_le, Rd.multiplierTotal_ne_top, Rd.modNorm_mulLp_lt_top}
+\lean{Rd.multiplierTotal, Rd.modNorm_mulLp_le, Rd.multiplierTotal_ne_top,
+  Rd.modNorm_mulLp_lt_top}
 \leanok
 \uses{lem:product-modulus, lem:lower-order-moduli}
 Let $1 \leq p < \infty$, $s < r$, $1 \leq q \leq \infty$ and $\psi : V \to \C$ smooth with bounded
@@ -5770,11 +5771,14 @@ Besov domain, with $F = f$.
 The extension is part of the definition, so a Besov domain is a hypothesis. Its instances are
 $V$, the closed half-space and the models of manifolds with and without boundary
 (\Cref{thm:half-space-besov-domain}), the closures of Lipschitz graph domains with convex graph
-function (\Cref{thm:graph-besov-domain}) and the quadrant, the model of manifolds with corners
-(\Cref{thm:quadrant-besov-domain}). The class consists of closed convex sets; every Lipschitz
-graph domain, convex or not, satisfies the extension condition of
-\Cref{def:besov-extension-property} (\Cref{thm:graph-besov-domain}). Closed balls and cubes are
-not yet proved instances.
+function (\Cref{thm:graph-besov-domain}), the quadrant (the model of manifolds with corners,
+\Cref{thm:quadrant-besov-domain}), and the closures of nonempty convex bounded Lipschitz domains
+(\Cref{thm:bounded-lipschitz-besov-domain}) and of nonempty bounded open convex sets, among them
+the closed balls of positive radius and the closed unit cube (\Cref{cor:convex-besov-domain}).
+The class consists of closed convex sets; every Lipschitz graph domain and every bounded
+Lipschitz domain, convex or not, satisfies the extension condition of
+\Cref{def:besov-extension-property} (\Cref{thm:graph-besov-domain} and
+\Cref{thm:bounded-lipschitz-besov-domain}).
 
 \begin{theorem}[Invariance on Besov domains]
 \label{thm:besov-domain-invariance}

@@ -27,10 +27,12 @@ of the ray from `a + y` in the direction `-ν` inside `Ω`.
   (`Rd.isLipschitzDomainAt_of_convex_of_isOpen`).
 
 Hence every bounded open convex set is a bounded Lipschitz set
-(`Rd.isBoundedLipschitzDomain_of_convex`, a classical result, see Grisvard) and, in finite
+(`Rd.isBoundedLipschitzDomain_of_convex`; Grisvard, Corollary 1.2.2.3) and, in finite
 dimension, the carrier of a `Rd.BoundedLipschitzDomain` (`Rd.BoundedLipschitzDomain.ofConvex`);
 the open unit cube `(0, 1)^n` is an example (`Rd.isBoundedLipschitzDomain_unitCube`,
-`Rd.BoundedLipschitzDomain.unitCube`).
+`Rd.BoundedLipschitzDomain.unitCube`). It is convex and nonempty (`Rd.convex_unitCube`,
+`Rd.nonempty_unitCube`), and its closure is the closed unit cube `[0, 1]^n`
+(`Rd.closure_unitCube`).
 -/
 
 @[expose] public section
@@ -285,15 +287,59 @@ theorem BoundedLipschitzDomain.carrier_ofConvex [FiniteDimensional ℝ V] (hΩ :
 
 /-! ### The open unit cube -/
 
-/-- **The open unit cube is a bounded Lipschitz set**: `(0, 1)^n ⊆ ℝ^n` is convex, open (an
-intersection of finitely many open slabs) and bounded (`‖x‖ ≤ √n` on it,
-`EuclideanSpace.norm_eq`), so `Rd.isBoundedLipschitzDomain_of_convex` applies. -/
+/-- **The open unit cube is convex**: `(0, 1)^n ⊆ ℝ^n` is convex coordinatewise
+(Mathlib's `convex_Ioo`). -/
+theorem convex_unitCube (n : ℕ) :
+    Convex ℝ {x : EuclideanSpace ℝ (Fin n) | ∀ i, x i ∈ Ioo (0 : ℝ) 1} := by
+  intro x hx y hy s t hs ht hst i
+  simp only [PiLp.add_apply, PiLp.smul_apply]
+  exact convex_Ioo (0 : ℝ) 1 (hx i) (hy i) hs ht hst
+
+/-- **The open unit cube is nonempty**: it contains the centre `(1/2, …, 1/2)`. -/
+theorem nonempty_unitCube (n : ℕ) :
+    {x : EuclideanSpace ℝ (Fin n) | ∀ i, x i ∈ Ioo (0 : ℝ) 1}.Nonempty :=
+  ⟨WithLp.toLp 2 fun _ => 1 / 2, fun _ => show (1 / 2 : ℝ) ∈ Ioo 0 1 by norm_num⟩
+
+/-- The closed unit cube `[0, 1]^n ⊆ ℝ^n` is the preimage of the product `∏_i [0, 1]` under
+Mathlib's homeomorphism `PiLp.homeomorph` between `ℝ^n` and the product space. -/
+theorem closedUnitCube_eq_preimage (n : ℕ) :
+    {x : EuclideanSpace ℝ (Fin n) | ∀ i, x i ∈ Icc (0 : ℝ) 1} =
+      PiLp.homeomorph 2 _ ⁻¹' univ.pi (fun _ => Icc (0 : ℝ) 1) := by
+  ext
+  simp [PiLp.homeomorph, -pi_univ_Icc]
+
+/-- The open unit cube `(0, 1)^n ⊆ ℝ^n` is the preimage of the product `∏_i (0, 1)` under
+Mathlib's homeomorphism `PiLp.homeomorph` between `ℝ^n` and the product space. -/
+theorem unitCube_eq_preimage (n : ℕ) :
+    {x : EuclideanSpace ℝ (Fin n) | ∀ i, x i ∈ Ioo (0 : ℝ) 1} =
+      PiLp.homeomorph 2 _ ⁻¹' univ.pi (fun _ => Ioo (0 : ℝ) 1) := by
+  ext
+  simp [PiLp.homeomorph]
+
+/-- **The closed unit cube is closed**: `[0, 1]^n ⊆ ℝ^n` is the preimage of a product of closed
+intervals under a homeomorphism (`Rd.closedUnitCube_eq_preimage`, Mathlib's `isClosed_set_pi`). -/
+theorem isClosed_closedUnitCube (n : ℕ) :
+    IsClosed {x : EuclideanSpace ℝ (Fin n) | ∀ i, x i ∈ Icc (0 : ℝ) 1} := by
+  rw [closedUnitCube_eq_preimage]
+  exact (isClosed_set_pi fun _ _ => isClosed_Icc).preimage (PiLp.homeomorph 2 _).continuous
+
+/-- **The closure of the open unit cube is the closed unit cube**: closures commute with
+homeomorphisms and with products (`Rd.unitCube_eq_preimage`, Mathlib's
+`Homeomorph.preimage_closure`, `closure_pi_set`), and the closure of `(0, 1)` is `[0, 1]`
+(Mathlib's `closure_Ioo`). -/
+theorem closure_unitCube (n : ℕ) :
+    closure {x : EuclideanSpace ℝ (Fin n) | ∀ i, x i ∈ Ioo (0 : ℝ) 1} =
+      {x | ∀ i, x i ∈ Icc (0 : ℝ) 1} := by
+  rw [unitCube_eq_preimage, ← Homeomorph.preimage_closure, closure_pi_set,
+    closure_Ioo zero_ne_one, closedUnitCube_eq_preimage]
+
+/-- **The open unit cube is a bounded Lipschitz set**: `(0, 1)^n ⊆ ℝ^n` is convex
+(`Rd.convex_unitCube`), open (an intersection of finitely many open slabs) and bounded
+(`‖x‖ ≤ √n` on it, `EuclideanSpace.norm_eq`), so `Rd.isBoundedLipschitzDomain_of_convex`
+applies. -/
 theorem isBoundedLipschitzDomain_unitCube (n : ℕ) :
     IsBoundedLipschitzDomain {x : EuclideanSpace ℝ (Fin n) | ∀ i, x i ∈ Ioo (0 : ℝ) 1} := by
-  refine isBoundedLipschitzDomain_of_convex ?_ ?_ ?_
-  · intro x hx y hy s t hs ht hst i
-    simp only [PiLp.add_apply, PiLp.smul_apply]
-    exact convex_Ioo (0 : ℝ) 1 (hx i) (hy i) hs ht hst
+  refine isBoundedLipschitzDomain_of_convex (convex_unitCube n) ?_ ?_
   · have h : {x : EuclideanSpace ℝ (Fin n) | ∀ i, x i ∈ Ioo (0 : ℝ) 1} =
         ⋂ i, (fun x : EuclideanSpace ℝ (Fin n) => x i) ⁻¹' Ioo 0 1 := by
       ext x

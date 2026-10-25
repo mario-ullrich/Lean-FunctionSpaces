@@ -20,7 +20,9 @@ kernels `η_j` and radius `R ≤ 1/2`, and let `U ⊆ W` and `U ⊆ T` be measur
 
 Then for `f ∈ L_p(V)` with `‖f‖_{L_p(T)} + ‖(2^(ks) ω_L(f, 2^(-k), T)_p)_k‖_{ℓ_q} < ∞` and
 `0 < s < L`, the series `F = ∑_j η_j ⋆ 1_W (k_j ⋆ 1_T f)` has a finite Besov quasi-norm on `V`
-and `F = f` almost everywhere on `U` (`Rd.LocalMeansBump.exists_local_extension`). The proof is
+and `F = f` almost everywhere on `U` (`Rd.LocalMeansBump.exists_local_extension`); its Besov
+quasi-norm is at most a constant of the bump (`Rd.LocalMeansBump.localExtConst`) times that of `f`
+on `T` (`Rd.LocalMeansBump.exists_local_extension_le`). The proof is
 that of Rychkov's extension (`Rd.LipschitzGraph.extension`), with the support principle for two
 sets (`Rd.indicatorLp_convLp_indicatorLp`) and the moment kernel bound for two sets
 (`Rd.eLpNorm_indicator_sub_convLp_momentKernel_le`).
@@ -467,11 +469,83 @@ theorem localNormOn_le (hp : p ≠ ∞) {W T : Set V} (hW : MeasurableSet W) (L 
         · exact le_add_self
     _ = (M + 2 * A) * (‖f‖ₑ + Λ) := by ring
 
+/-- The constant `‖m‖_1 + 2 ‖g‖_1` of `Rd.LocalMeansBump.localNormOn_le` is finite, for the
+moment kernel `m` of the bump `g`. -/
+theorem momentConst_ne_top (L : ℕ) :
+    eLpNorm (momentKernel b.toFun L) 1 volume + 2 * ∫⁻ z, ‖b.toFun z‖ₑ ≠ ∞ :=
+  ENNReal.add_ne_top.2
+    ⟨(memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top,
+      ENNReal.mul_ne_top (by norm_num) b.integrable.2.ne⟩
+
+/-- The **constant of the local extension** `C_b(L, s) (‖m‖_1 + 2 ‖g‖_1)`, for the moment kernel
+`m` of the bump `g`: the constant of the synthesis estimate (`Rd.LocalMeansBump.synthConst`) times
+that of `Rd.LocalMeansBump.localNormOn_le`. -/
+noncomputable def localExtConst (L : ℕ) (s : ℝ) : ℝ≥0∞ :=
+  b.synthConst L s * (eLpNorm (momentKernel b.toFun L) 1 volume + 2 * ∫⁻ z, ‖b.toFun z‖ₑ)
+
+/-- The constant of the local extension is finite for `0 < s < L`. -/
+theorem localExtConst_ne_top {L : ℕ} {s : ℝ} (hs : 0 < s) (hsL : s < L) :
+    b.localExtConst L s ≠ ∞ :=
+  ENNReal.mul_ne_top (b.synthConst_ne_top hs hsL) (b.momentConst_ne_top L)
+
+/-- **The local extension theorem with a bound**: let `U ⊆ W`, `U ⊆ T` be measurable sets such
+that the dual kernels at points of `U` only see `W` and the steps take `W` into `T`, and let the
+bump have radius `R ≤ 1/2`. For `1 ≤ p < ∞`, `0 < s`, `1 ≤ q ≤ ∞` and `f` with
+`N_T(f) = ‖f‖_{L_p(T)} + ‖(2^(ks) ω_L(f, 2^(-k), T)_p)_k‖_{ℓ_q} < ∞` there is `F` with
+`F = f` almost everywhere on `U` and
+`‖F‖_p + ‖(2^(ks) ω_L(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C_b(L, s) (‖m‖_1 + 2 ‖g‖_1) N_T(f)`
+(`Rd.LocalMeansBump.localExtConst`): the local extension of `1_T f`
+(`Rd.LocalMeansBump.modNorm_localExtension_le`, `Rd.LocalMeansBump.localNormOn_le`). The constant
+is finite for `s < L` (`Rd.LocalMeansBump.localExtConst_ne_top`); for `s ≥ L` the factor
+`(1 - 2^(-(L - s)))⁻¹` of `Rd.LocalMeansBump.synthConst` is `∞`. -/
+theorem exists_local_extension_le (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
+    {q : ℝ≥0∞} (hq : 1 ≤ q) {U W T : Set V} (hU : MeasurableSet U)
+    (hW : MeasurableSet W) (hT : MeasurableSet T) (hUT : U ⊆ T)
+    (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W)
+    (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
+    (hR : b.radius ≤ 1 / 2) (f : Lp ℂ p (volume : Measure V))
+    (hf : ‖indicatorLp hT f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p T L f k) <
+      ∞) :
+    ∃ F : Lp ℂ p (volume : Measure V),
+      ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p L F k) ≤
+          b.localExtConst L s * (‖indicatorLp hT f‖ₑ +
+            lqNorm q (fun k => dyadicWeight s k * lpModulusOn p T L f k)) ∧
+        indicatorLp hU F = indicatorLp hU f := by
+  set f' := indicatorLp hT f
+  have hae : T.indicator f' =ᵐ[volume] T.indicator f := by
+    filter_upwards [indicatorLp_apply_ae hT f] with x hx
+    by_cases hxT : x ∈ T
+    · rw [Set.indicator_of_mem hxT, Set.indicator_of_mem hxT, hx, Set.indicator_of_mem hxT]
+    · rw [Set.indicator_of_notMem hxT, Set.indicator_of_notMem hxT]
+  have hmod : ∀ k, lpModulusOn p T L f' k = lpModulusOn p T L f k := fun k =>
+    lpModulusOn_congr hae L k
+  have hle : b.localNormOn hp hW L s q f' ≤
+      (eLpNorm (momentKernel b.toFun L) 1 volume + 2 * ∫⁻ z, ‖b.toFun z‖ₑ) *
+        (‖f'‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p T L f k)) := by
+    have h := b.localNormOn_le hp hW L s hq hstep hR f'
+    simp_rw [hmod] at h
+    exact h
+  have hfin : b.localNormOn hp hW L s q f' < ∞ :=
+    hle.trans_lt (ENNReal.mul_lt_top (b.momentConst_ne_top L).lt_top hf)
+  refine ⟨b.localExtension hp hW L f', (b.modNorm_localExtension_le hp hW L hs hq hfin).trans ?_,
+    ?_⟩
+  · rw [localExtConst, mul_assoc]
+    exact mul_le_mul' le_rfl hle
+  rw [b.indicatorLp_localExtension hp hL hU hW hUW hs hq hfin]
+  refine Lp.ext ?_
+  filter_upwards [indicatorLp_apply_ae hU f', indicatorLp_apply_ae hU f,
+    indicatorLp_apply_ae hT f] with x h1 h2 h3
+  rw [h1, h2]
+  by_cases hxU : x ∈ U
+  · rw [Set.indicator_of_mem hxU, Set.indicator_of_mem hxU, h3, Set.indicator_of_mem (hUT hxU)]
+  · rw [Set.indicator_of_notMem hxU, Set.indicator_of_notMem hxU]
+
 /-- **The local extension theorem**: let `U ⊆ W`, `U ⊆ T` be measurable sets such that the dual
 kernels at points of `U` only see `W` and the steps take `W` into `T`, and let the bump have
 radius `R ≤ 1/2`. For `1 ≤ p < ∞`, `0 < s < L`, `1 ≤ q ≤ ∞` and `f` with
 `‖f‖_{L_p(T)} + ‖(2^(ks) ω_L(f, 2^(-k), T)_p)_k‖_{ℓ_q} < ∞` there is `F` with a finite Besov
-quasi-norm by differences on `V` and `F = f` almost everywhere on `U`. -/
+quasi-norm by differences on `V` and `F = f` almost everywhere on `U`
+(`Rd.LocalMeansBump.exists_local_extension_le`). -/
 theorem exists_local_extension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
     (hsL : s < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {U W T : Set V} (hU : MeasurableSet U)
     (hW : MeasurableSet W) (hT : MeasurableSet T) (hUT : U ⊆ T)
@@ -483,31 +557,8 @@ theorem exists_local_extension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : �
     ∃ F : Lp ℂ p (volume : Measure V),
       ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p L F k) < ∞ ∧
         indicatorLp hU F = indicatorLp hU f := by
-  set f' := indicatorLp hT f
-  have hae : T.indicator f' =ᵐ[volume] T.indicator f := by
-    filter_upwards [indicatorLp_apply_ae hT f] with x hx
-    by_cases hxT : x ∈ T
-    · rw [Set.indicator_of_mem hxT, Set.indicator_of_mem hxT, hx, Set.indicator_of_mem hxT]
-    · rw [Set.indicator_of_notMem hxT, Set.indicator_of_notMem hxT]
-  have hmod : ∀ k, lpModulusOn p T L f' k = lpModulusOn p T L f k := fun k =>
-    lpModulusOn_congr hae L k
-  have hfin : b.localNormOn hp hW L s q f' < ∞ := by
-    refine (b.localNormOn_le hp hW L s hq hstep hR f').trans_lt (ENNReal.mul_lt_top ?_ ?_)
-    · exact (ENNReal.add_ne_top.2
-        ⟨(memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top,
-          ENNReal.mul_ne_top (by norm_num) b.integrable.2.ne⟩).lt_top
-    · simp_rw [hmod]
-      exact hf
-  refine ⟨b.localExtension hp hW L f', (b.modNorm_localExtension_le hp hW L hs hq hfin).trans_lt
-    (ENNReal.mul_lt_top (b.synthConst_ne_top hs hsL).lt_top hfin), ?_⟩
-  rw [b.indicatorLp_localExtension hp hL hU hW hUW hs hq hfin]
-  refine Lp.ext ?_
-  filter_upwards [indicatorLp_apply_ae hU f', indicatorLp_apply_ae hU f,
-    indicatorLp_apply_ae hT f] with x h1 h2 h3
-  rw [h1, h2]
-  by_cases hxU : x ∈ U
-  · rw [Set.indicator_of_mem hxU, Set.indicator_of_mem hxU, h3, Set.indicator_of_mem (hUT hxU)]
-  · rw [Set.indicator_of_notMem hxU, Set.indicator_of_notMem hxU]
+  obtain ⟨F, hF, hFf⟩ := b.exists_local_extension_le hp hL hs hq hU hW hT hUT hUW hstep hR f hf
+  exact ⟨F, hF.trans_lt (ENNReal.mul_lt_top (b.localExtConst_ne_top hs hsL).lt_top hf), hFf⟩
 
 end LocalMeansBump
 

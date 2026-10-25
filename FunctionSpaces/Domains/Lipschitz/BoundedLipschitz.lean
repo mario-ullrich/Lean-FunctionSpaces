@@ -22,7 +22,10 @@ direction of each graph domain replaces the rotations of the usual definition.
 `0 < s < r` and `1 ≤ q ≤ ∞`, `f` agrees on `Ω` with some `F ∈ L_p(V)` with
 `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
 `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`; likewise with the band-limited
-approximation spaces (`Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff`).
+approximation spaces (`Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff`). The extension
+comes with a bound: its quasi-norm on `V` is at most `C` times the intrinsic one, with `C`
+depending only on `Ω`, `p`, `r`, `s` and `q`
+(`Rd.BoundedLipschitzDomain.exists_besov_extension_le`).
 
 The proof follows Schneider–Vybíral §3: a covering `Ω̄ ⊆ K_0 ∪ ⋃_j K_j` with an inner domain
 `K_0`, a smooth resolution of unity, and pointwise multipliers.
@@ -34,12 +37,15 @@ The proof follows Schneider–Vybíral §3: a covering `Ω̄ ⊆ K_0 ∪ ⋃_j K
   (`Rd.BoundedLipschitzDomain.nonempty_compl`). The shrunk balls and the inner patch are bounded
   open sets that cover `Ω̄` (`Rd.BoundedLipschitzDomain.patch`,
   `Rd.BoundedLipschitzDomain.closure_subset_iUnion_patch`).
-* Local extensions (`Rd.LocalMeansBump.exists_local_extension`) on the boundary patches
-  `Ω ∩ B(c_j, ρ_j - 2ε)`, with the cone bump of `Ω_j` rescaled to radius `≤ ε / r`, and on the
-  inner patch `{infDist(·, Ωᶜ) > 2δ}`, with a centred bump of radius `≤ δ / r`.
+* Local extensions with a bound (`Rd.LocalMeansBump.exists_local_extension_le`) on the boundary
+  patches `Ω ∩ B(c_j, ρ_j - 2ε)`, with the cone bump of `Ω_j` rescaled to radius `≤ ε / r`, and on
+  the inner patch `{infDist(·, Ωᶜ) > 2δ}`, with a centred bump of radius `≤ δ / r`
+  (`Rd.BoundedLipschitzDomain.exists_local_extension_boundary_le`,
+  `Rd.BoundedLipschitzDomain.exists_local_extension_interior_le`).
 * A smooth resolution of unity subordinate to these patches (Mathlib's
   `SmoothPartitionOfUnity.exists_isSubordinate`, `Rd.exists_smooth_partition`) pastes the local
-  extensions (`Rd.exists_pasting`), by the pointwise multipliers of `Rd.modNorm_mulLp_lt_top`.
+  extensions (`Rd.exists_pasting_le`, `Rd.indicatorLp_sum_eq_of_partition`), by the pointwise
+  multipliers of `Rd.modNorm_mulLp_le` and the triangle inequality `Rd.modNorm_finsetSum_le`.
 
 For a compact set, the smooth resolutions of unity can be chosen equal to `1` on a neighbourhood
 of it (`Rd.exists_smooth_partition_nhds`).
@@ -110,34 +116,77 @@ theorem lpModulus_finsetSum_le {ι : Type*} (t : Finset ι)
     rw [Finset.sum_insert hi, Finset.sum_insert hi]
     exact (lpModulus_add_le r _ _ k).trans (add_le_add le_rfl ih)
 
-/-- **Finite sums keep the Besov spaces by differences.** -/
-theorem modNorm_finsetSum_lt_top {ι : Type*} (t : Finset ι)
-    (G : ι → Lp ℂ p (volume : Measure V)) {r : ℕ} {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
-    (hG : ∀ i ∈ t, ‖G i‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r (G i) k) < ∞) :
+/-- **The Besov quasi-norm by differences of a finite sum** is at most the sum of the quasi-norms:
+`‖∑_i G_i‖_p + ‖(2^(ks) ω_r(∑_i G_i, 2^(-k))_p)_k‖_{ℓ_q} ≤
+∑_i (‖G_i‖_p + ‖(2^(ks) ω_r(G_i, 2^(-k))_p)_k‖_{ℓ_q})` for `q ≥ 1`
+(`Rd.lpModulus_finsetSum_le`, `ENNReal.lqNorm_sum_le`). -/
+theorem modNorm_finsetSum_le {ι : Type*} (t : Finset ι)
+    (G : ι → Lp ℂ p (volume : Measure V)) (r : ℕ) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q) :
     ‖∑ i ∈ t, G i‖ₑ +
-        lqNorm q (fun k => dyadicWeight s k * lpModulus p r (∑ i ∈ t, G i) k) < ∞ := by
+        lqNorm q (fun k => dyadicWeight s k * lpModulus p r (∑ i ∈ t, G i) k) ≤
+      ∑ i ∈ t, (‖G i‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r (G i) k)) := by
   have h1 : ‖∑ i ∈ t, G i‖ₑ ≤ ∑ i ∈ t, ‖G i‖ₑ := enorm_sum_le _ _
   have h2 : lqNorm q (fun k => dyadicWeight s k * lpModulus p r (∑ i ∈ t, G i) k) ≤
       ∑ i ∈ t, lqNorm q (fun k => dyadicWeight s k * lpModulus p r (G i) k) :=
     (ENNReal.lqNorm_mono fun k => (mul_le_mul' le_rfl (lpModulus_finsetSum_le t G r k)).trans_eq
       (Finset.mul_sum _ _ _)).trans (ENNReal.lqNorm_sum_le hq _ _)
-  refine (add_le_add h1 h2).trans_lt ?_
-  rw [← Finset.sum_add_distrib]
-  exact ENNReal.sum_lt_top.2 hG
+  rw [Finset.sum_add_distrib]
+  exact add_le_add h1 h2
 
-/-- **Pasting local extensions**: let `(U_i)` be a finite cover of `Ō` by bounded open sets and
-`F_i` functions with finite Besov quasi-norms by differences that agree with `f` almost everywhere
-on `O ∩ U_i`. Then `f` agrees on `O` with a function with a finite Besov quasi-norm: `∑_i ψ_i F_i`
-for a smooth resolution of unity `(ψ_i)` subordinate to `(U_i)`. -/
-theorem exists_pasting {ι : Type*} [Fintype ι] (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hsr : s < r)
+/-- **Finite sums keep the Besov spaces by differences** (`Rd.modNorm_finsetSum_le`). -/
+theorem modNorm_finsetSum_lt_top {ι : Type*} (t : Finset ι)
+    (G : ι → Lp ℂ p (volume : Measure V)) {r : ℕ} {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
+    (hG : ∀ i ∈ t, ‖G i‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r (G i) k) < ∞) :
+    ‖∑ i ∈ t, G i‖ₑ +
+        lqNorm q (fun k => dyadicWeight s k * lpModulus p r (∑ i ∈ t, G i) k) < ∞ :=
+  (modNorm_finsetSum_le t G r s hq).trans_lt (ENNReal.sum_lt_top.2 hG)
+
+/-- **Pasting with a resolution of unity agrees with `f` on `O`**: if `∑_i ψ_i = 1` on `O`,
+`ψ_i` vanishes outside `U_i`, `G_i = ψ_i F_i` almost everywhere and `F_i = f` almost everywhere
+on `O ∩ U_i`, then `∑_i G_i = f` almost everywhere on `O`. -/
+theorem indicatorLp_sum_eq_of_partition {ι : Type*} [Fintype ι] {O : Set V}
+    (hO : MeasurableSet O) (U : ι → Set V) (ψ : ι → V → ℝ) (hψU : ∀ i, Function.support (ψ i) ⊆ U i)
+    (hψ1 : ∀ x ∈ O, ∑ i, ψ i x = 1) (f : Lp ℂ p (volume : Measure V))
+    (F G : ι → Lp ℂ p (volume : Measure V))
+    (hG : ∀ i, G i =ᵐ[volume] fun x => ((ψ i x : ℝ) : ℂ) * F i x)
+    (hFf : ∀ i, ∀ᵐ x ∂(volume : Measure V), x ∈ O → x ∈ U i → F i x = f x) :
+    indicatorLp hO (∑ i, G i) = indicatorLp hO f := by
+  refine Lp.ext ?_
+  have hall : ∀ᵐ x ∂(volume : Measure V), ∀ i, (x ∈ O → x ∈ U i → F i x = f x) ∧
+      G i x = ((ψ i x : ℝ) : ℂ) * F i x :=
+    ae_all_iff.2 fun i => (hFf i).and (hG i)
+  filter_upwards [indicatorLp_apply_ae hO (∑ i, G i), indicatorLp_apply_ae hO f,
+    Lp.coeFn_fun_finsetSum Finset.univ G, hall] with x h1 h2 h3 h4
+  rw [h1, h2]
+  by_cases hx : x ∈ O
+  · rw [Set.indicator_of_mem hx, Set.indicator_of_mem hx, h3]
+    have hterm : ∀ i, G i x = ((ψ i x : ℝ) : ℂ) * f x := fun i => by
+      rw [(h4 i).2]
+      by_cases hψx : ψ i x = 0
+      · simp [hψx]
+      · rw [(h4 i).1 hx (hψU i hψx)]
+    simp_rw [hterm]
+    rw [← Finset.sum_mul, ← Complex.ofReal_sum, hψ1 x hx, Complex.ofReal_one, one_mul]
+  · rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem hx]
+
+/-- **Pasting local extensions with a bound**: let `(U_i)` be a finite cover of `Ō` by bounded
+open sets. There is `C < ∞` such that for all `f` and all `F_i` that agree with `f` almost
+everywhere on `O ∩ U_i`, `f` agrees on `O` with some `G` with
+`‖G‖_p + ‖(2^(ks) ω_r(G, 2^(-k))_p)_k‖_{ℓ_q} ≤`
+`C ∑_i (‖F_i‖_p + ‖(2^(ks) ω_r(F_i, 2^(-k))_p)_k‖_{ℓ_q})`.
+The resolution of unity `(ψ_i)` subordinate to `(U_i)` (`Rd.exists_smooth_partition`) and the
+bounds on its derivatives (`Rd.exists_iteratedFDeriv_bound`) are fixed before `f`; `G = ∑_i ψ_i F_i`
+and `C` is the sum of the multiplier constants of `Rd.modNorm_mulLp_le` (`Rd.multiplierTotal`). -/
+theorem exists_pasting_le {ι : Type*} [Fintype ι] (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hsr : s < r)
     {q : ℝ≥0∞} (hq : 1 ≤ q) {O : Set V} (hO : MeasurableSet O) (U : ι → Set V)
     (hUo : ∀ i, IsOpen (U i)) (hUb : ∀ i, Bornology.IsBounded (U i))
-    (hcov : closure O ⊆ ⋃ i, U i) (f : Lp ℂ p (volume : Measure V))
-    (F : ι → Lp ℂ p (volume : Measure V))
-    (hF : ∀ i, ‖F i‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r (F i) k) < ∞)
-    (hFf : ∀ i, ∀ᵐ x ∂(volume : Measure V), x ∈ O → x ∈ U i → F i x = f x) :
-    ∃ G : Lp ℂ p (volume : Measure V), indicatorLp hO G = indicatorLp hO f ∧
-      ‖G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r G k) < ∞ := by
+    (hcov : closure O ⊆ ⋃ i, U i) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ (f : Lp ℂ p (volume : Measure V))
+      (F : ι → Lp ℂ p (volume : Measure V)),
+      (∀ i, ∀ᵐ x ∂(volume : Measure V), x ∈ O → x ∈ U i → F i x = f x) →
+      ∃ G : Lp ℂ p (volume : Measure V), indicatorLp hO G = indicatorLp hO f ∧
+        ‖G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r G k) ≤
+          C * ∑ i, (‖F i‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r (F i) k)) := by
   obtain ⟨ψ, hψ, hψU, hψ1, -⟩ := exists_smooth_partition isClosed_closure U hUo hcov
   set ψC : ι → V → ℂ := fun i x => ((ψ i x : ℝ) : ℂ)
   have hψC : ∀ i, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (ψC i) := fun i =>
@@ -147,31 +196,35 @@ theorem exists_pasting {ι : Type*} [Fintype ι] (hp : p ≠ ∞) {r : ℕ} {s :
       ((hUb i).subset (hψU i))).of_isClosed_subset (isClosed_tsupport _)
         (tsupport_comp_subset Complex.ofReal_zero _)
   choose C hC using fun i => exists_iteratedFDeriv_bound (hψC i) (hcs i) r
+  refine ⟨∑ i, multiplierTotal (V := V) hp r s (C i),
+    ENNReal.sum_ne_top.2 fun i _ => multiplierTotal_ne_top hp hsr (C i), fun f F hFf => ?_⟩
   set G : ι → Lp ℂ p (volume : Measure V) := fun i =>
     mulLp (hψC i).continuous (norm_le_of_iteratedFDeriv_le (hC i)) (F i)
-  refine ⟨∑ i, G i, ?_, modNorm_finsetSum_lt_top _ G hq fun i _ =>
-    modNorm_mulLp_lt_top hp (hψC i) (hC i) hsr hq (hF i)⟩
-  refine Lp.ext ?_
-  have hall : ∀ᵐ x ∂(volume : Measure V), ∀ i, (x ∈ O → x ∈ U i → F i x = f x) ∧
-      G i x = ψC i x * F i x :=
-    ae_all_iff.2 fun i => (hFf i).and (mulLp_apply_ae _ _ (F i))
-  filter_upwards [indicatorLp_apply_ae hO (∑ i, G i), indicatorLp_apply_ae hO f,
-    Lp.coeFn_fun_finsetSum Finset.univ G, hall] with x h1 h2 h3 h4
-  rw [h1, h2]
-  by_cases hx : x ∈ O
-  · rw [Set.indicator_of_mem hx, Set.indicator_of_mem hx, h3]
-    have hterm : ∀ i, G i x = ψC i x * f x := fun i => by
-      rw [(h4 i).2]
-      by_cases hψx : ψ i x = 0
-      · simp [ψC, hψx]
-      · rw [(h4 i).1 hx (hψU i (subset_tsupport _ hψx))]
-    simp_rw [hterm]
-    rw [← Finset.sum_mul]
-    have hsum : ∑ i, ψC i x = 1 := by
-      simp only [ψC]
-      rw [← Complex.ofReal_sum, hψ1 x (subset_closure hx), Complex.ofReal_one]
-    rw [hsum, one_mul]
-  · rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem hx]
+  refine ⟨∑ i, G i, indicatorLp_sum_eq_of_partition hO U ψ
+    (fun i => (subset_tsupport _).trans (hψU i)) (fun x hx => hψ1 x (subset_closure hx)) f F G
+    (fun i => mulLp_apply_ae _ _ (F i)) hFf,
+    (modNorm_finsetSum_le _ G r s hq).trans ?_⟩
+  rw [Finset.mul_sum]
+  exact Finset.sum_le_sum fun i _ => (modNorm_mulLp_le hp (hψC i) (hC i) hsr hq (F i)).trans
+    (mul_le_mul' (Finset.single_le_sum (f := fun i => multiplierTotal (V := V) hp r s (C i))
+      (fun _ _ => zero_le) (Finset.mem_univ i)) le_rfl)
+
+/-- **Pasting local extensions**: let `(U_i)` be a finite cover of `Ō` by bounded open sets and
+`F_i` functions with finite Besov quasi-norms by differences that agree with `f` almost everywhere
+on `O ∩ U_i`. Then `f` agrees on `O` with a function with a finite Besov quasi-norm: `∑_i ψ_i F_i`
+for a smooth resolution of unity `(ψ_i)` subordinate to `(U_i)` (`Rd.exists_pasting_le`). -/
+theorem exists_pasting {ι : Type*} [Fintype ι] (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hsr : s < r)
+    {q : ℝ≥0∞} (hq : 1 ≤ q) {O : Set V} (hO : MeasurableSet O) (U : ι → Set V)
+    (hUo : ∀ i, IsOpen (U i)) (hUb : ∀ i, Bornology.IsBounded (U i))
+    (hcov : closure O ⊆ ⋃ i, U i) (f : Lp ℂ p (volume : Measure V))
+    (F : ι → Lp ℂ p (volume : Measure V))
+    (hF : ∀ i, ‖F i‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r (F i) k) < ∞)
+    (hFf : ∀ i, ∀ᵐ x ∂(volume : Measure V), x ∈ O → x ∈ U i → F i x = f x) :
+    ∃ G : Lp ℂ p (volume : Measure V), indicatorLp hO G = indicatorLp hO f ∧
+      ‖G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r G k) < ∞ := by
+  obtain ⟨C, hC, h⟩ := exists_pasting_le hp hsr hq hO U hUo hUb hcov
+  obtain ⟨G, hG, hle⟩ := h f F hFf
+  exact ⟨G, hG, hle.trans_lt (ENNReal.mul_lt_top hC.lt_top (ENNReal.sum_lt_top.2 fun i _ => hF i))⟩
 
 end Pasting
 
@@ -360,18 +413,23 @@ theorem modNormOn_mono_set {T : Set V} (hT : MeasurableSet T) (hTΩ : T ⊆ Ω.c
   exact eLpNorm_mono ((Lp.aestronglyMeasurable f).indicator hT)
     fun x => norm_indicator_le_of_subset hTΩ _ x
 
-/-- **The boundary patches**: on `Ω ∩ B(c_j, ρ_j - 2ε)`, `f` agrees with a function with a finite
-Besov quasi-norm on `V`, by the local extension with the cone bump of `Ω_j` rescaled to radius
-`≤ ε / r`. -/
-theorem exists_local_extension_boundary (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
-    (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {ε : ℝ} (hε : 0 < ε) (j : Fin Ω.N)
-    (f : Lp ℂ p (volume : Measure V))
-    (hf : ‖indicatorLp Ω.measurableSet f‖ₑ +
-      lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞) :
-    ∃ F : Lp ℂ p (volume : Measure V),
-      ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) < ∞ ∧
-        ∀ᵐ x ∂(volume : Measure V), x ∈ Ω.carrier →
-          x ∈ ball (Ω.center j) (Ω.radius j - 2 * ε) → F x = f x := by
+/-- **The boundary patches with a bound**: there is `C < ∞` such that on `Ω ∩ B(c_j, ρ_j - 2ε)`
+every `f` with `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` agrees with a
+function `F` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C N_Ω(f)`, by the local extension
+with the cone bump of `Ω_j` rescaled to radius `≤ ε / r`
+(`Rd.LocalMeansBump.exists_local_extension_le`); the bump and `C` depend only on `ε`, `r`, `s`
+and `j`. -/
+theorem exists_local_extension_boundary_le (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ}
+    (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {ε : ℝ} (hε : 0 < ε) (j : Fin Ω.N) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
+      ‖indicatorLp Ω.measurableSet f‖ₑ +
+          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞ →
+      ∃ F : Lp ℂ p (volume : Measure V),
+        ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) ≤
+            C * (‖indicatorLp Ω.measurableSet f‖ₑ +
+              lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k)) ∧
+          ∀ᵐ x ∂(volume : Measure V), x ∈ Ω.carrier →
+            x ∈ ball (Ω.center j) (Ω.radius j - 2 * ε) → F x = f x := by
   set G := Ω.graph j
   set c := Ω.center j
   set ρ := Ω.radius j
@@ -399,10 +457,11 @@ theorem exists_local_extension_boundary (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r
   have hTΩ : G.domain ∩ ball c ρ ⊆ Ω.carrier := by
     rw [← Ω.inter_ball_eq j le_rfl]
     exact Set.inter_subset_left
-  obtain ⟨F, hF, hFf⟩ := b.exists_local_extension hp hr hs hsr hq hU hW hT
+  refine ⟨b.localExtConst r s, b.localExtConst_ne_top hs hsr, fun f hf => ?_⟩
+  obtain ⟨F, hF, hFf⟩ := b.exists_local_extension_le hp hr hs hq hU hW hT
     (Set.inter_subset_inter_right _ (ball_subset_ball (by linarith))) (G.patch_support hb hLR)
     (G.patch_step hb hLR) hR f ((Ω.modNormOn_mono_set hT hTΩ r s q f).trans_lt hf)
-  refine ⟨F, hF, ?_⟩
+  refine ⟨F, hF.trans (mul_le_mul' le_rfl (Ω.modNormOn_mono_set hT hTΩ r s q f)), ?_⟩
   filter_upwards [Lp.ext_iff.1 hFf, indicatorLp_apply_ae hU F, indicatorLp_apply_ae hU f]
     with x h1 h2 h3 hxΩ hxb
   have hxU : x ∈ G.domain ∩ ball c (ρ - 2 * ε) := by
@@ -411,16 +470,38 @@ theorem exists_local_extension_boundary (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r
   rw [h2, h3, Set.indicator_of_mem hxU, Set.indicator_of_mem hxU] at h1
   exact h1
 
-/-- **The inner patch**: on `{infDist(·, Ωᶜ) > 2δ}`, `f` agrees with a function with a finite
-Besov quasi-norm on `V`, by the local extension with a centred bump of radius `≤ δ / r`. -/
-theorem exists_local_extension_interior (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
-    (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {δ : ℝ} (hδ : 0 < δ) (f : Lp ℂ p (volume : Measure V))
+/-- **The boundary patches**: on `Ω ∩ B(c_j, ρ_j - 2ε)`, `f` agrees with a function with a finite
+Besov quasi-norm on `V`, by the local extension with the cone bump of `Ω_j` rescaled to radius
+`≤ ε / r` (`Rd.BoundedLipschitzDomain.exists_local_extension_boundary_le`). -/
+theorem exists_local_extension_boundary (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
+    (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {ε : ℝ} (hε : 0 < ε) (j : Fin Ω.N)
+    (f : Lp ℂ p (volume : Measure V))
     (hf : ‖indicatorLp Ω.measurableSet f‖ₑ +
       lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞) :
     ∃ F : Lp ℂ p (volume : Measure V),
       ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) < ∞ ∧
         ∀ᵐ x ∂(volume : Measure V), x ∈ Ω.carrier →
-          x ∈ {x : V | 2 * δ < infDist x Ω.carrierᶜ} → F x = f x := by
+          x ∈ ball (Ω.center j) (Ω.radius j - 2 * ε) → F x = f x := by
+  obtain ⟨C, hC, h⟩ := Ω.exists_local_extension_boundary_le hp hr hs hsr hq hε j
+  obtain ⟨F, hF, hFf⟩ := h f hf
+  exact ⟨F, hF.trans_lt (ENNReal.mul_lt_top hC.lt_top hf), hFf⟩
+
+/-- **The inner patch with a bound**: there is `C < ∞` such that on `{infDist(·, Ωᶜ) > 2δ}` every
+`f` with `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` agrees with a
+function `F` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C N_Ω(f)`, by the local extension
+with a centred bump of radius `≤ δ / r` (`Rd.LocalMeansBump.exists_local_extension_le`); the bump
+and `C` depend only on `δ`, `r` and `s`. -/
+theorem exists_local_extension_interior_le (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ}
+    (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {δ : ℝ} (hδ : 0 < δ) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
+      ‖indicatorLp Ω.measurableSet f‖ₑ +
+          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞ →
+      ∃ F : Lp ℂ p (volume : Measure V),
+        ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) ≤
+            C * (‖indicatorLp Ω.measurableSet f‖ₑ +
+              lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k)) ∧
+          ∀ᵐ x ∂(volume : Measure V), x ∈ Ω.carrier →
+            x ∈ {x : V | 2 * δ < infDist x Ω.carrierᶜ} → F x = f x := by
   have hR0 : 0 < min (1 / 2 : ℝ) (δ / ((r : ℝ) + 1)) := lt_min (by norm_num) (by positivity)
   set b := LocalMeansBump.centered (V := V) hR0
   have hR : b.radius ≤ 1 / 2 := min_le_left _ _
@@ -432,7 +513,8 @@ theorem exists_local_extension_interior (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r
           nlinarith
   have hU := measurableSet_infDist_gt Ω.carrier (2 * δ)
   have hW := measurableSet_infDist_gt Ω.carrier δ
-  obtain ⟨F, hF, hFf⟩ := b.exists_local_extension hp hr hs hsr hq hU hW Ω.measurableSet
+  refine ⟨b.localExtConst r s, b.localExtConst_ne_top hs hsr, fun f hf => ?_⟩
+  obtain ⟨F, hF, hFf⟩ := b.exists_local_extension_le hp hr hs hq hU hW Ω.measurableSet
     (setOf_lt_infDist_compl_subset _ (by positivity))
     (fun x hx j y hy => interior_patch_support Ω.carrier
       (fun y hy => (not_lt.1 fun h => hy (b.dual_eq_zero r j h)).trans hLR) x hx y hy)
@@ -453,9 +535,95 @@ theorem exists_local_extension_interior (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r
   rw [h2, h3, Set.indicator_of_mem hxU', Set.indicator_of_mem hxU'] at h1
   exact h1
 
+/-- **The inner patch**: on `{infDist(·, Ωᶜ) > 2δ}`, `f` agrees with a function with a finite
+Besov quasi-norm on `V`, by the local extension with a centred bump of radius `≤ δ / r`
+(`Rd.BoundedLipschitzDomain.exists_local_extension_interior_le`). -/
+theorem exists_local_extension_interior (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
+    (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {δ : ℝ} (hδ : 0 < δ) (f : Lp ℂ p (volume : Measure V))
+    (hf : ‖indicatorLp Ω.measurableSet f‖ₑ +
+      lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞) :
+    ∃ F : Lp ℂ p (volume : Measure V),
+      ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) < ∞ ∧
+        ∀ᵐ x ∂(volume : Measure V), x ∈ Ω.carrier →
+          x ∈ {x : V | 2 * δ < infDist x Ω.carrierᶜ} → F x = f x := by
+  obtain ⟨C, hC, h⟩ := Ω.exists_local_extension_interior_le hp hr hs hsr hq hδ
+  obtain ⟨F, hF, hFf⟩ := h f hf
+  exact ⟨F, hF.trans_lt (ENNReal.mul_lt_top hC.lt_top hf), hFf⟩
+
+/-- **On the whole space the intrinsic quasi-norm is the quasi-norm on `V`**: if `Ω = V`
+(possible only for `V = {0}`, since `Ω` is bounded), then
+`‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q}`
+`= ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}` (`Rd.modNormOn_univ`). -/
+theorem modNorm_eq_modNormOn_of_carrier_eq_univ (hu : Ω.carrier = Set.univ) (r : ℕ) (s : ℝ)
+    (q : ℝ≥0∞) (f : Lp ℂ p (volume : Measure V)) :
+    ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) =
+      ‖indicatorLp Ω.measurableSet f‖ₑ +
+        lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) := by
+  have key : ∀ {U : Set V} (hU : MeasurableSet U), U = Set.univ →
+      ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) =
+        ‖indicatorLp hU f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p U r f k) := by
+    rintro U hU rfl
+    exact (modNormOn_univ r s q f).symm
+  exact key Ω.measurableSet hu
+
+/-- **The extension for bounded Lipschitz domains with a bound** (Rychkov): for `1 ≤ p < ∞`,
+`0 < s < r` and `1 ≤ q ≤ ∞` there is `C < ∞` such that every `f` with
+`N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` agrees on
+`Ω` with some `F` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C N_Ω(f)`. The patches, the
+bumps of the local extensions and the resolution of unity depend only on `Ω` and `r`, so `C`
+is fixed before `f`: it is the pasting constant times the sum of the local constants
+(`Rd.exists_pasting_le`, `Rd.BoundedLipschitzDomain.exists_local_extension_boundary_le`,
+`Rd.BoundedLipschitzDomain.exists_local_extension_interior_le`; for `V = {0}`, where `Ω = V`,
+`C = 1`). Every step is linear in `f`, so for fixed `r` the construction is a bounded linear
+operator, as in Rychkov; this theorem records its bound for each `f`. -/
+theorem exists_besov_extension_le (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s < r)
+    {q : ℝ≥0∞} (hq : 1 ≤ q) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
+      ‖indicatorLp Ω.measurableSet f‖ₑ +
+          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞ →
+      ∃ F : Lp ℂ p (volume : Measure V), indicatorLp Ω.measurableSet F =
+          indicatorLp Ω.measurableSet f ∧
+        ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) ≤
+          C * (‖indicatorLp Ω.measurableSet f‖ₑ +
+            lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k)) := by
+  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 fun h => by
+    rw [h, Nat.cast_zero] at hsr
+    exact lt_irrefl _ (hs.trans hsr)
+  rcases (Ω.carrierᶜ).eq_empty_or_nonempty with hc | hc
+  · -- `Ω = V`
+    refine ⟨1, ENNReal.one_ne_top, fun f _ => ⟨f, rfl, ?_⟩⟩
+    rw [one_mul, Ω.modNorm_eq_modNormOn_of_carrier_eq_univ (Set.compl_empty_iff.1 hc)]
+  obtain ⟨ε, hε0, hε⟩ := Ω.exists_shrink
+  obtain ⟨δ, hδ0, hδ⟩ := Ω.exists_interior_margin hc hε
+  choose Cb hCb hextb using fun j => Ω.exists_local_extension_boundary_le hp hr hs hsr hq hε0 j
+  obtain ⟨C0, hC0, hext0⟩ := Ω.exists_local_extension_interior_le hp hr hs hsr hq hδ0
+  obtain ⟨Cp, hCp, hpaste⟩ := exists_pasting_le (ι := Option (Fin Ω.N)) hp hsr hq
+    Ω.measurableSet (Ω.patch ε δ) (Ω.isOpen_patch ε δ) (Ω.isBounded_patch ε hδ0.le)
+    (Ω.closure_subset_iUnion_patch hε hδ)
+  set Cl : Option (Fin Ω.N) → ℝ≥0∞ := fun i => i.elim C0 Cb
+  have hCl : ∀ i, Cl i ≠ ∞ := fun i => by
+    cases i with
+    | none => exact hC0
+    | some j => exact hCb j
+  refine ⟨Cp * ∑ i, Cl i, ENNReal.mul_ne_top hCp (ENNReal.sum_ne_top.2 fun i _ => hCl i),
+    fun f hf => ?_⟩
+  choose Fb hFb hFbf using fun j => hextb j f hf
+  obtain ⟨F0, hF0, hF0f⟩ := hext0 f hf
+  obtain ⟨G, hG, hGle⟩ := hpaste f (fun i => i.elim F0 Fb) fun i => by
+    cases i with
+    | none => exact hF0f
+    | some j => exact hFbf j
+  refine ⟨G, hG, hGle.trans ?_⟩
+  rw [mul_assoc, Finset.sum_mul]
+  refine mul_le_mul' le_rfl (Finset.sum_le_sum fun i _ => ?_)
+  cases i with
+  | none => exact hF0
+  | some j => exact hFb j
+
 /-- **The extension for bounded Lipschitz domains**: for `1 ≤ p < ∞`, `0 < s < r` and
 `1 ≤ q ≤ ∞`, if `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`, then `f` agrees on
-`Ω` with a function with a finite Besov quasi-norm by differences on `V`. -/
+`Ω` with a function with a finite Besov quasi-norm by differences on `V`
+(`Rd.BoundedLipschitzDomain.exists_besov_extension_le`). -/
 theorem exists_besov_extension_of_modulusOn (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s)
     (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
     (hf : ‖indicatorLp Ω.measurableSet f‖ₑ +
@@ -463,33 +631,9 @@ theorem exists_besov_extension_of_modulusOn (hp : p ≠ ∞) {r : ℕ} {s : ℝ}
     ∃ F : Lp ℂ p (volume : Measure V), indicatorLp Ω.measurableSet F =
         indicatorLp Ω.measurableSet f ∧
       ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) < ∞ := by
-  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 fun h => by
-    rw [h, Nat.cast_zero] at hsr
-    exact lt_irrefl _ (hs.trans hsr)
-  rcases (Ω.carrierᶜ).eq_empty_or_nonempty with hc | hc
-  · -- `Ω = V`
-    have hu : Ω.carrier = Set.univ := Set.compl_empty_iff.1 hc
-    refine ⟨f, rfl, ?_⟩
-    have h1 : ‖indicatorLp Ω.measurableSet f‖ₑ = ‖f‖ₑ := by
-      rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae _ f), hu,
-        Set.indicator_univ]
-    have h2 : ∀ k, lpModulusOn p Ω.carrier r f k = lpModulus p r f k := fun k => by
-      rw [hu, lpModulusOn, modulusOn_univ, lpModulus]
-    simp_rw [h1, h2] at hf
-    exact hf
-  obtain ⟨ε, hε0, hε⟩ := Ω.exists_shrink
-  obtain ⟨δ, hδ0, hδ⟩ := Ω.exists_interior_margin hc hε
-  choose Fb hFb hFbf using fun j => Ω.exists_local_extension_boundary hp hr hs hsr hq hε0 j f hf
-  obtain ⟨F0, hF0, hF0f⟩ := Ω.exists_local_extension_interior hp hr hs hsr hq hδ0 f hf
-  refine exists_pasting (ι := Option (Fin Ω.N)) hp hsr hq Ω.measurableSet (Ω.patch ε δ)
-    (Ω.isOpen_patch ε δ) (Ω.isBounded_patch ε hδ0.le) (Ω.closure_subset_iUnion_patch hε hδ) f
-    (fun i => i.elim F0 Fb) (fun i => ?_) (fun i => ?_)
-  · cases i with
-    | none => exact hF0
-    | some j => exact hFb j
-  · cases i with
-    | none => exact hF0f
-    | some j => exact hFbf j
+  obtain ⟨C, hC, h⟩ := Ω.exists_besov_extension_le hp hs hsr hq
+  obtain ⟨F, hFf, hF⟩ := h f hf
+  exact ⟨F, hFf, hF.trans_lt (ENNReal.mul_lt_top hC.lt_top hf)⟩
 
 /-- **Restrictions of Besov spaces to bounded Lipschitz domains, by intrinsic differences**: for
 `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`, `f` agrees on `Ω` with some `F ∈ L_p(V)` with

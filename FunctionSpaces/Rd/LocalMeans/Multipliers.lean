@@ -421,18 +421,23 @@ theorem lqNorm_lpModulus_le_multiplierConst (hp : p ≠ ∞) {r l : ℕ} (hlr : 
           rw [mul_right_comm]
           exact mul_le_mul' le_rfl le_self_add
 
+/-- The **constant of the multiplier bound** `K = C + ∑_{l ≤ r} C(r, l) C K_l` for a bound `C` of
+the derivatives up to order `r`, with the constants `K_l` of `Rd.multiplierConst`. -/
+noncomputable def multiplierTotal (hp : p ≠ ∞) (r : ℕ) (s : ℝ) (C : ℝ) : ℝ≥0∞ :=
+  ENNReal.ofReal C + ∑ l ∈ Finset.range (r + 1),
+    (r.choose l : ℝ≥0∞) * ENNReal.ofReal C * multiplierConst (V := V) hp r s l
+
 /-- **Pointwise multipliers**: for a smooth `ψ` with `‖D^l ψ‖ ≤ C` for `l ≤ r`, `1 ≤ p < ∞`,
 `s < r` and `1 ≤ q ≤ ∞`,
 `‖ψ F‖_p + ‖(2^(ks) ω_r(ψ F, 2^(-k))_p)_k‖_{ℓ_q} ≤ K (‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q})`
-with `K = C + ∑_{l ≤ r} C(r, l) C K_l` (`Rd.multiplierConst`). -/
+with `K = C + ∑_{l ≤ r} C(r, l) C K_l` (`Rd.multiplierTotal`, `Rd.multiplierConst`). -/
 theorem modNorm_mulLp_le (hp : p ≠ ∞) {ψ : V → ℂ} (hψ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) ψ)
     {r : ℕ} {C : ℝ} (hC : ∀ l ≤ r, ∀ x, ‖iteratedFDeriv ℝ l ψ x‖ ≤ C) {s : ℝ} (hsr : s < r)
     {q : ℝ≥0∞} (hq : 1 ≤ q) (F : Lp ℂ p (volume : Measure V)) :
     ‖mulLp hψ.continuous (norm_le_of_iteratedFDeriv_le hC) F‖ₑ +
         lqNorm q (fun k => dyadicWeight s k *
           lpModulus p r (mulLp hψ.continuous (norm_le_of_iteratedFDeriv_le hC) F) k) ≤
-      (ENNReal.ofReal C + ∑ l ∈ Finset.range (r + 1),
-        (r.choose l : ℝ≥0∞) * ENNReal.ofReal C * multiplierConst (V := V) hp r s l) *
+      multiplierTotal (V := V) hp r s C *
         (‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k)) := by
   set G := mulLp hψ.continuous (norm_le_of_iteratedFDeriv_le hC) F
   set N := ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k)
@@ -471,16 +476,14 @@ theorem modNorm_mulLp_le (hp : p ≠ ∞) {ψ : V → ℂ} (hψ : ContDiff ℝ (
       ≤ ENNReal.ofReal C * N + ∑ l ∈ Finset.range (r + 1), (r.choose l : ℝ≥0∞) *
           ENNReal.ofReal C * (multiplierConst (V := V) hp r s l * N) :=
         add_le_add ((enorm_mulLp_le _ _ F).trans (mul_le_mul' le_rfl le_self_add)) hseq
-    _ = (ENNReal.ofReal C + ∑ l ∈ Finset.range (r + 1),
-          (r.choose l : ℝ≥0∞) * ENNReal.ofReal C * multiplierConst (V := V) hp r s l) * N := by
-        rw [add_mul, Finset.sum_mul]
+    _ = multiplierTotal (V := V) hp r s C * N := by
+        rw [multiplierTotal, add_mul, Finset.sum_mul]
         congr 1
         exact Finset.sum_congr rfl fun l _ => by ring
 
-/-- The constant of `Rd.modNorm_mulLp_le` is finite. -/
+/-- The constant of `Rd.modNorm_mulLp_le` is finite for `s < r`. -/
 theorem multiplierTotal_ne_top (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hsr : s < r) (C : ℝ) :
-    ENNReal.ofReal C + ∑ l ∈ Finset.range (r + 1),
-      (r.choose l : ℝ≥0∞) * ENNReal.ofReal C * multiplierConst (V := V) hp r s l ≠ ∞ :=
+    multiplierTotal (V := V) hp r s C ≠ ∞ :=
   ENNReal.add_ne_top.2 ⟨ENNReal.ofReal_ne_top, ENNReal.sum_ne_top.2 fun l _ =>
     ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.natCast_ne_top _) ENNReal.ofReal_ne_top)
       (multiplierConst_ne_top hp hsr l)⟩

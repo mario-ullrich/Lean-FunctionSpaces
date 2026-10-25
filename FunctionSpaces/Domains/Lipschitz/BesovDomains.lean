@@ -8,10 +8,12 @@ module
 public import FunctionSpaces.Domains.Lipschitz.HalfSpace
 public import FunctionSpaces.Domains.Lipschitz.GraphStraightening
 public import FunctionSpaces.Domains.Traces.GraphTraceCharts
+public import FunctionSpaces.Domains.Lipschitz.SurfaceMeasure
+public import FunctionSpaces.Domains.Lipschitz.ConvexDomains
 public import Mathlib.Analysis.Convex.Measure
 
 /-!
-# The extension property of Lipschitz graph domains and the quadrant as a Besov domain
+# The extension property and Besov domains: graph domains, the quadrant, bounded domains
 
 **The extension property** (`Rd.HasBesovExtension`): a measurable set `Ω` has it if every function
 of finite intrinsic Besov quasi-norm on `Ω` agrees on `Ω` with a function on `V` whose Besov
@@ -38,6 +40,17 @@ the open one by its frontier, a null set (Mathlib's `Convex.addHaar_frontier`), 
 Mathlib's model with corners `modelWithCornersEuclideanQuadrant n` is a Besov domain
 (`Rd.BesovDomain.range_euclideanQuadrant`). The results on Besov spaces on compact manifolds
 therefore hold for manifolds with corners.
+
+**Bounded Lipschitz domains** have the property (`Rd.BoundedLipschitzDomain.hasBesovExtension`),
+by the extension with a bound (`Rd.BoundedLipschitzDomain.exists_besov_extension_le`), so the order
+of the differences does not matter on them (`Rd.BoundedLipschitzDomain.modNormOn_order_le`). Their
+frontier is a null set, so their closure agrees with them up to a null set
+(`Rd.BoundedLipschitzDomain.closure_ae_eq`), and the closure of a nonempty convex one is a Besov
+domain (`Rd.BesovDomain.closure_boundedLipschitzDomain`). Bounded open convex sets are bounded
+Lipschitz domains, so the closure of every nonempty bounded open convex set is a Besov domain
+(`Rd.BesovDomain.closure_of_convex`): closed balls of positive radius
+(`Rd.BesovDomain.closedBall`) and the closed unit cube `[0, 1]^n`
+(`Rd.BesovDomain.closedUnitCube`) are examples.
 -/
 
 @[expose] public section
@@ -372,5 +385,73 @@ instance BesovDomain.range_euclideanQuadrant :
     exact quadrant_ae_eq n
 
 end Quadrant
+
+/-! ### Bounded Lipschitz domains -/
+
+namespace BoundedLipschitzDomain
+
+variable (Ω : BoundedLipschitzDomain V)
+
+/-- **Bounded Lipschitz domains have the extension property**
+(`Rd.BoundedLipschitzDomain.exists_besov_extension_le`). -/
+theorem hasBesovExtension : HasBesovExtension Ω.measurableSet := by
+  intro p _ hp r s hs hsr q hq
+  exact Ω.exists_besov_extension_le hp hs hsr hq
+
+/-- **The closure of a bounded Lipschitz domain is the domain up to a null set**, since the
+frontier is a null set (`Rd.BoundedLipschitzDomain.volume_frontier`, Mathlib's
+`closure_ae_eq_of_null_frontier`). -/
+theorem closure_ae_eq : closure Ω.carrier =ᵐ[volume] Ω.carrier :=
+  closure_ae_eq_of_null_frontier Ω.volume_frontier
+
+/-- **The order of the differences does not matter on a bounded Lipschitz domain**
+(DeVore–Sharpley): for `1 ≤ p < ∞`, `0 < s < r`, `s < r'` and `1 ≤ q ≤ ∞` there is `C < ∞` with
+`N_Ω(f; r') ≤ C N_Ω(f; r)` whenever `N_Ω(f; r) < ∞`, where
+`N_Ω(f; r) = ‖1_Ω f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}`. This holds for every bounded
+Lipschitz domain, convex or not (`Rd.HasBesovExtension.modNormOn_order_le`). -/
+theorem modNormOn_order_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {r r' : ℕ} {s : ℝ}
+    (hs : 0 < s) (hsr : s < r) (hsr' : s < r') {q : ℝ≥0∞} (hq : 1 ≤ q) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
+      ‖indicatorLp Ω.measurableSet f‖ₑ +
+          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞ →
+      ‖indicatorLp Ω.measurableSet f‖ₑ +
+          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r' f k) ≤
+        C * (‖indicatorLp Ω.measurableSet f‖ₑ +
+          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k)) :=
+  Ω.hasBesovExtension.modNormOn_order_le hp hs hsr hsr' hq
+
+end BoundedLipschitzDomain
+
+/-- **The closure of a nonempty convex bounded Lipschitz domain is a Besov domain**: it is closed
+and convex, contains the nonempty open domain in its interior, and agrees with the domain up to the
+null frontier (`Rd.BoundedLipschitzDomain.closure_ae_eq`). -/
+theorem BesovDomain.closure_boundedLipschitzDomain (Ω : BoundedLipschitzDomain V)
+    (hc : Convex ℝ Ω.carrier) (hne : Ω.carrier.Nonempty) : BesovDomain (closure Ω.carrier) :=
+  of_ae_eq hc.closure isClosed_closure (hne.mono Ω.isOpen.subset_interior_closure)
+    Ω.hasBesovExtension Ω.closure_ae_eq
+
+/-- **The closure of a nonempty bounded open convex set is a Besov domain**: for every nonempty
+bounded open convex set `U`, the closure `Ū` is a Besov domain, since `U` is a bounded Lipschitz
+domain (`Rd.BoundedLipschitzDomain.ofConvex`; Grisvard, Corollary 1.2.2.3). -/
+theorem BesovDomain.closure_of_convex {U : Set V} (hc : Convex ℝ U) (ho : IsOpen U)
+    (hb : Bornology.IsBounded U) (hne : U.Nonempty) : BesovDomain (closure U) :=
+  closure_boundedLipschitzDomain (BoundedLipschitzDomain.ofConvex hc ho hb) hc hne
+
+/-- **Closed balls are Besov domains**: for every `c` and `R > 0` the closed ball `B̄(c, R)` is
+the closure of the open ball (Mathlib's `closure_ball`), a nonempty bounded open convex set
+(`Rd.BesovDomain.closure_of_convex`). -/
+theorem BesovDomain.closedBall (c : V) {R : ℝ} (hR : 0 < R) :
+    BesovDomain (Metric.closedBall c R) := by
+  rw [← closure_ball c hR.ne']
+  exact closure_of_convex (convex_ball c R) isOpen_ball isBounded_ball (nonempty_ball.2 hR)
+
+/-- **The closed unit cube is a Besov domain**: `[0, 1]^n ⊆ ℝ^n` is the closure of the open unit
+cube (`Rd.closure_unitCube`), a nonempty bounded open convex set
+(`Rd.BoundedLipschitzDomain.unitCube`, `Rd.BesovDomain.closure_boundedLipschitzDomain`). -/
+instance BesovDomain.closedUnitCube (n : ℕ) :
+    BesovDomain {x : EuclideanSpace ℝ (Fin n) | ∀ i, x i ∈ Icc (0 : ℝ) 1} := by
+  rw [← closure_unitCube n]
+  exact closure_boundedLipschitzDomain (BoundedLipschitzDomain.unitCube n) (convex_unitCube n)
+    (nonempty_unitCube n)
 
 end Rd

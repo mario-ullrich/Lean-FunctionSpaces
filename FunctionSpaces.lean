@@ -476,9 +476,10 @@ and the theorems that their characterisations agree. The library builds on
 * `FunctionSpaces.Domains.Extension.LipschitzGraphBesov`: the restrictions of Besov spaces to
   Lipschitz graph domains described by intrinsic differences.
 * `FunctionSpaces.Domains.Extension.LocalExtension`: local versions of Rychkov's extension, for
-  boundary patches of Lipschitz graph domains and for inner patches.
+  boundary patches of Lipschitz graph domains and for inner patches, with a bound.
 * `FunctionSpaces.Domains.Lipschitz.BoundedLipschitz`: bounded Lipschitz domains, smooth resolutions
-  of unity, and the restrictions of Besov spaces described by intrinsic differences.
+  of unity, pasting with a bound, and the restrictions of Besov spaces described by intrinsic
+  differences, with an extension bounded by a constant times the intrinsic quasi-norm.
 * `FunctionSpaces.Domains.Lipschitz.HalfSpace`: null sets and moduli on sets, the closed half-space
   and the models of manifolds as Besov domains.
 * `FunctionSpaces.Domains.Traces.HalfSpaceTrace`: restrictions and extensions of smooth atoms on the
@@ -579,11 +580,14 @@ and the theorems that their characterisations agree. The library builds on
   McShane's extension of local graphs, the bounded Lipschitz domain of a family of charts and of
   a set satisfying the definition, the converse, and the ball as a bounded Lipschitz domain.
 * `FunctionSpaces.Domains.Lipschitz.ConvexDomains`: the ray length of a convex set, its cone
-  estimate, bounded open convex sets and the open unit cube as bounded Lipschitz domains.
+  estimate, bounded open convex sets and the open unit cube as bounded Lipschitz domains, and the
+  closed unit cube as the closure of the open one.
 * `FunctionSpaces.Domains.Lipschitz.BesovDomains`: the extension property of a set, its invariance
   under null sets, Lipschitz graph domains with it, their null graphs, closures of convex Lipschitz
-  graph domains as Besov domains, the quadrant as a Lipschitz graph domain, and the quadrant model
-  of manifolds with corners as a Besov domain.
+  graph domains as Besov domains, the quadrant as a Lipschitz graph domain, the quadrant model
+  of manifolds with corners as a Besov domain, bounded Lipschitz domains with the extension
+  property, and the closures of nonempty convex bounded Lipschitz domains and of nonempty bounded
+  open convex sets, closed balls of positive radius and the closed unit cube as Besov domains.
 * `FunctionSpaces.Domains.Manifolds.SmoothLocalGraphs`: the usual set-level definition of
   bounded domains with smooth boundary by smooth local graphs, the smooth cut-off of a local graph,
   the smooth domain of a set satisfying the definition and the converse, and the ball as a smooth

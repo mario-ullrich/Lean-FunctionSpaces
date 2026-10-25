@@ -26,7 +26,8 @@ increases in `t`, is subadditive, is bounded by `2^r ‖f‖_{L_p(U)}` (`Rd.modu
 the modulus on `V` (`Rd.modulusOn_le_modulus`), and on `U = V` it is the modulus on `V`
 (`Rd.modulusOn_univ`). `Rd.lpModulusOn` samples it for `f ∈ L_p` at the dyadic scales `2^(-k)`;
 if `1_O F = 1_O f`, the intrinsic quasi-norm of `f` on `O` is at most that of `F` on `V`
-(`Rd.modNormOn_le_modNorm_of_indicatorLp`).
+(`Rd.modNormOn_le_modNorm_of_indicatorLp`), and on `O = V` the two agree
+(`Rd.modNormOn_univ`).
 -/
 
 @[expose] public section
@@ -286,5 +287,21 @@ theorem modNormOn_le_modNorm_of_indicatorLp [Fact (1 ≤ p)] {O : Set V} (hO : M
     exact enorm_indicatorLp_le hO F
   · rw [← lpModulusOn_congr hae r k]
     exact lpModulusOn_le_lpModulus hO r F k
+
+omit [BorelSpace V] [μ.IsAddHaarMeasure] in
+/-- On `U = V` the intrinsic quasi-norm is the quasi-norm of `V`:
+`‖1_V f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), V)_p)_k‖_{ℓ_q} = ‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q}`
+(`Rd.modulusOn_univ`). -/
+theorem modNormOn_univ [Fact (1 ≤ p)] (r : ℕ) (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p μ) :
+    ‖indicatorLp MeasurableSet.univ f‖ₑ +
+        ENNReal.lqNorm q (fun k => ENNReal.dyadicWeight s k *
+          lpModulusOn p (Set.univ : Set V) r f k) =
+      ‖f‖ₑ + ENNReal.lqNorm q (fun k => ENNReal.dyadicWeight s k * lpModulus p r f k) := by
+  have h1 : ‖indicatorLp MeasurableSet.univ f‖ₑ = ‖f‖ₑ := by
+    rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae _ f),
+      Set.indicator_univ]
+  have h2 : ∀ k, lpModulusOn p (Set.univ : Set V) r f k = lpModulus p r f k := fun k => by
+    rw [lpModulusOn, modulusOn_univ, lpModulus]
+  simp_rw [h1, h2]
 
 end Rd
