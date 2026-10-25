@@ -524,9 +524,9 @@ with boundary `Γ`, boundary balls `B_j = ball (Ω.center j) (Ω.radius j)` and 
 
 ### 4.10 Sobolev and Bessel potential spaces for `1 < p < ∞`
 
-The current part of Lean-FunctionSpaces proves, for all `1 < p < ∞`, `W^m_p = F^m_{p,2}` and,
-for Mathlib's Bessel potential space, `H^{s,p} ∩ L_p = F^s_{p,2}` for every real `s` and
-`H^{s,p} = F^s_{p,2}` for `s ≥ 0`, and the Sobolev embeddings on `ℝ^d`
+Lean-FunctionSpaces proves, for all `1 < p < ∞`, `W^m_p = F^m_{p,2}` and, for Mathlib's Bessel
+potential space, `H^{s,p} ∩ L_p = F^s_{p,2}` for every real `s` and `H^{s,p} = F^s_{p,2}` for
+`s ≥ 0`, and the Sobolev embeddings on `ℝ^d`
 (`Rd.exists_memLp_ae_eq_of_memSobolev`, `Rd.exists_boundedContinuous_ae_eq_of_memSobolev`). Its
 tools are formalised: Plancherel bounds for families of convolution kernels
 (`Rd.tsum_enorm_convLp_sq_le`, `Rd.enorm_sum_convLp_sq_le`), the weak type `(1,1)` of the
@@ -557,7 +557,7 @@ real `s` and on all tempered distributions for `s ≥ 0`
 `Rd.exists_memTriebelLizorkin_of_besselPotential_eq`,
 `Rd.memTriebelLizorkin_iff_memSobolev_bessel`), and with it `W^m_p = H^{m,p}`
 (`Rd.memSobolev_iff_memSobolev_bessel`). These results generalise Sections 4.1 and 4.2 from
-`p = 2`; the `p = 2` statements above stay, with their explicit constants.
+`p = 2`, whose statements carry explicit constants.
 
 ### 4.11 Green's formula on Lipschitz graph domains
 
@@ -796,20 +796,19 @@ the FEEC/BEEC library builds the layers above on them.
    `Γ` with `L_2(Γ)` and the trace into it (Section 4.8), and `H^1_0(Ω) = ker γ` with the quotient
    `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)` (Section 4.13).
 7. **Split and versions.** The split Lean-SNumbers / Lean-FunctionSpaces / FEEC/BEEC library is
-   right. Lean-FunctionSpaces pins Lean and Mathlib `v4.35.0-rc2`, Lean-SNumbers moves to the
-   same pin, and the FEEC/BEEC library takes it as well; the three move to the stable release
-   together.
+   right. Lean-FunctionSpaces pins Lean and Mathlib `v4.35.0-rc2`, and the FEEC/BEEC library
+   takes the same pin. Lean-SNumbers is on the stable release `v4.35.0`; Lean-FunctionSpaces moves
+   to it later, and the FEEC/BEEC library follows.
 
 ## 8. Versioning
 
-The Lean declarations cited here are those of the commit of `main` that adds the trace kernel
-(`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`); later commits keep them unless this
-document says otherwise, and the commit that changes an interface name updates this document. The
-module paths are those of the folder layout by setting (Section 9): declaration names do not depend
-on folders, so a downstream file changes only its `import` lines. Pin `rev` to a commit at or after
-the one that moves the files into this layout. Missing lemmas and wishes for other statement shapes
-go to the issue tracker of the GitHub repository, with the item number of the proposal and the
-intended Lean statement.
+The Lean declarations cited here are those of the commit of `main` that adds the bounded linear
+extension operator (`Rd.BoundedLipschitzDomain.exists_extensionL`); later commits keep them unless
+this document says otherwise, and the commit that changes an interface name updates this document.
+The module paths are those of the folder layout by setting (Section 9): declaration names do not
+depend on folders, so a downstream file changes only its `import` lines. Pin `rev` to that commit
+or a later one. Missing lemmas and wishes for other statement shapes go to the issue tracker of
+the GitHub repository, with the item number of the proposal and the intended Lean statement.
 
 ## 9. Changes to the original plan (14 October 2026)
 

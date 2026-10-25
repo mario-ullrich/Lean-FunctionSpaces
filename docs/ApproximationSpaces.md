@@ -19,9 +19,9 @@ smoothness space of order `r` is a Banach space with an injective bounded map in
 Jackson's and Bernstein's inequalities of order `r` (`ApproximationScheme.JacksonBound`,
 `ApproximationScheme.SmoothnessSpace`, a hypothesis structure whose fields are the embedding, the
 order and Jackson's and Bernstein's inequalities); Sobolev spaces are the motivating examples.
-The schemes live in real normed spaces, and the couples of `ApproximationSpaces.Interpolation`
-live on an additive commutative group; the measures are the counting measure behind the `ℓ_q`
-norms and `dt/t` on `(0, ∞)` of the continuous K-method. The other blocks instantiate the theory.
+The schemes live in real normed spaces and the couples on abelian groups; the measures are the
+counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the continuous K-method. The
+other blocks instantiate the theory.
 
 ## Main results
 

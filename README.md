@@ -154,9 +154,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 * **Besov spaces on the torus through moduli of smoothness.** For `1 ≤ p < ∞`, `0 < s < r` and
   `1 ≤ q ≤ ∞`, `f ∈ B^s_{p,q}(𝕋^d)` iff `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` for
   the modulus `ω_r(f, t)_p = sup_{‖h‖ ≤ t} ‖Δ_h^r f‖_p` of order `r`
-  (`Torus.memBesov_iff_modNorm_lt_top_lp`). The kernels of `ℝ^d` act on `𝕋^d` by
-  `(Φ ⋆ f)(t) = ∫ Φ(y) f(t - π y) dy` (`Torus.econvLp`), which transfers Jackson's and
-  Bernstein's inequalities from band-limited approximation on `ℝ^d`.
+  (`Torus.memBesov_iff_modNorm_lt_top_lp`).
 * **Besov spaces on the torus through Littlewood–Paley blocks.** Let `ψ_j` be the
   Littlewood–Paley kernels on `ℝ^d` (below), acting on `𝕋^d` by
   `ψ_j ⋆ f(t) = ∫ ψ_j(y) f(t - π y) dy` with the quotient map `π : ℝ^d → 𝕋^d`. For every
@@ -322,8 +320,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `W^m_p(V) ⊆ B^m_{p,max(p,2)}` (`Rd.memSobolev_of_memApprox`, `Rd.memApprox_of_memSobolev`, with
   norm bounds `Rd.exists_hasWeakLineDeriv_of_memApprox`,
   `Rd.approxNormDyadic_le_of_hasWeakLineDeriv`), and `W^m_2 = B^m_{2,2}` for `m ≥ 1`
-  (`Rd.memSobolev_two_iff_memApprox`). The proof writes the blocks through the weak derivatives and
-  back, with the strong type of the Calderón–Zygmund families of the derivative kernels.
+  (`Rd.memSobolev_two_iff_memApprox`).
 * **`H^{s,p} = F^s_{p,2}` and `W^m_p = H^{m,p}`.** Let `dim V ≥ 1` and `1 < p < ∞`, and let
   `J_s` be Mathlib's Bessel potential, the Fourier multiplier with `(1 + ‖ξ‖²)^{s/2}`; a tempered
   distribution `f` lies in Mathlib's Bessel potential space `H^{s,p}(V)` iff `J_s f ∈ L_p(V)`.
@@ -335,10 +332,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`). For every real `s`, `f ∈ L_p(V)` lies
   in `F^s_{p,2}(V)` iff it lies in `H^{s,p}(V)` (`Rd.memTriebelLizorkin_iff_memSobolev_bessel`),
   and for every `m ∈ ℕ`, `f ∈ W^m_p(V)` iff `f ∈ H^{m,p}(V)`, Calderón's theorem
-  (`Rd.memSobolev_iff_memSobolev_bessel`). The constants are existential: the kernels are the
-  Bessel potentials of the Littlewood–Paley blocks and of their synthesis kernels, which form
-  Calderón–Zygmund families whose Schwartz bounds come from bounded derivatives on a compact
-  annulus and the continuity of the inverse Fourier transform on the Schwartz space.
+  (`Rd.memSobolev_iff_memSobolev_bessel`).
 * **Sobolev and Bessel potential spaces interpolate to Besov spaces.** Let `dim V ≥ 1` and
   `1 < p < ∞`, and give `W^m_p(V)` the norm `‖f‖_p + inf ∑_α ‖g_α‖_p` over the weak derivatives
   `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f ∈ L_p(V)` along the basis `e` of `Rd.gridBasis`

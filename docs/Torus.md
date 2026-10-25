@@ -65,8 +65,8 @@ blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. The restricti
   (`Torus.memSobolev_iff`), and for `m ≥ 1`, `W^m_2(𝕋^d) = B^m_{2,2}(𝕋^d)`
   (`Torus.memSobolev_iff_memBesov`). This Fourier-multiplier definition covers `p = 2`;
   classical derivatives and `W^m_p` for other `p` are not formalised on the torus.
-* **The torus.** For a trigonometric polynomial `T` of degree `< n` on `𝕋^d`, `n ≥ 1`, and
-  `1 ≤ p < ∞`, `‖T‖_∞ ≤ (2⌈p/2⌉)^(d/p) n^(d/p) ‖T‖_p`
+* **The Nikolskii inequality and the Besov embeddings.** For a trigonometric polynomial `T` of
+  degree `< n` on `𝕋^d`, `n ≥ 1`, and `1 ≤ p < ∞`, `‖T‖_∞ ≤ (2⌈p/2⌉)^(d/p) n^(d/p) ‖T‖_p`
   (`Torus.norm_le_rpow_mul_eLpNorm`). Hence the trigonometric polynomials have the
   Nikolskii property of dimension `d` (`Torus.trigScheme_hasNikolskii`), and all the Besov
   embeddings of [Besov and Sobolev spaces on measure spaces](MeasureSpaces.md) hold on
