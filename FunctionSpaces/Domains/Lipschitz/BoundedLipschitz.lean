@@ -12,7 +12,7 @@ public import Mathlib.Geometry.Manifold.PartitionOfUnity
 /-!
 # Bounded Lipschitz domains
 
-A **bounded Lipschitz domain** (Stein; Triebel; Schneider–Vybíral, Remark 3.2) is a bounded open
+A **bounded Lipschitz domain** (Stein; Schneider–Vybíral, Remark 3.2) is a bounded open
 set `Ω ⊆ V` whose boundary `Γ` is covered by finitely many open balls `B_j`, centred on `Γ`, with
 `B_j ∩ Ω = B_j ∩ Ω_j` for Lipschitz graph domains `Ω_j` (`Rd.BoundedLipschitzDomain`); the free
 direction of each graph domain replaces the rotations of the usual definition.
@@ -186,7 +186,7 @@ theorem isCompact_frontier_of_isBounded [FiniteDimensional ℝ V] {s : Set V}
   hs.isCompact_closure.of_isClosed_subset isClosed_frontier frontier_subset_closure
 
 variable (V) in
-/-- A **bounded Lipschitz domain** (Stein; Triebel; Schneider–Vybíral, Remark 3.2): a bounded open
+/-- A **bounded Lipschitz domain** (Stein; Schneider–Vybíral, Remark 3.2): a bounded open
 set whose boundary is covered by finitely many open balls `B_j`, centred on the boundary, with
 `B_j ∩ Ω = B_j ∩ Ω_j` for Lipschitz graph domains `Ω_j`; the free direction of each graph domain
 replaces the rotations of the usual definition. The structure carries the balls and the graph

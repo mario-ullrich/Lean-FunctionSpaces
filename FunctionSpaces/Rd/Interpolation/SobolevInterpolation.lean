@@ -280,7 +280,7 @@ theorem sobolevCouple_norm1 {m₀ m₁ : ℕ} (f : Lp ℂ p (volume : Measure V)
 
 variable {θ η : ℝ} {q : ℝ≥0∞}
 
-/-- **`(L_p, W^m_p)_{θ,q} = B^{θm}_{p,q}`** (Bergh–Löfström, Theorem 6.4.5(1) with
+/-- **`(L_p, W^m_p)_{θ,q} = B^{θm}_{p,q}`** (Bergh–Löfström, Theorem 6.4.5(4) with
 `H^m_p = W^m_p` from Theorem 6.2.3): in dimension
 `n ≥ 1`, for `1 < p < ∞`, `m ≥ 1`, `0 < θ < 1` and `1 ≤ q ≤ ∞`, `f ∈ L_p(V)` lies in the real
 interpolation space of the couple `(L_p, W^m_p)` iff `f` lies in the approximation space
@@ -296,7 +296,7 @@ theorem memKMethod_lpSobolevCouple_iff [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ 
     (sobolevGridNorm_le_approxNormDyadic hp1 hp m) (approxNormDyadic_le_sobolevGridNorm hp1 hp hm)
 
 /-- **`(W^{m₀}_p, W^{m₁}_p)_{η,q} = B^{(1-η)m₀+ηm₁}_{p,q}`** (Bergh–Löfström,
-Theorem 6.4.5(1) with `H^m_p = W^m_p` from Theorem 6.2.3): in dimension `n ≥ 1`, for
+Theorem 6.4.5(4) with `H^m_p = W^m_p` from Theorem 6.2.3): in dimension `n ≥ 1`, for
 `1 < p < ∞`, orders `1 ≤ m₀ < m₁`, `0 < η < 1` and `1 ≤ q ≤ ∞`, `f ∈ L_p(V)` lies in the real
 interpolation space of the couple `(W^{m₀}_p, W^{m₁}_p)` iff `f` lies in the Besov space
 `B^{(1-η)m₀+ηm₁}_{p,q}(V)`, the approximation space of the band-limited scheme

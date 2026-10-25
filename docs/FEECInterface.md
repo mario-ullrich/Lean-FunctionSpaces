@@ -613,7 +613,7 @@ File `FunctionSpaces/Domains/Sobolev/LipschitzDomainGreen.lean`, namespace
 `Rd.BoundedLipschitzDomain`, for `Ω : Rd.BoundedLipschitzDomain V` with the notation of Sections
 4.6–4.8 and 4.11:
 
-* Green's formula with the surface measure and the outward unit normal (McLean, Theorem 3.34),
+* Green's formula with the surface measure and the outward unit normal (Grisvard, Theorem 1.5.3.1),
   for elements of `H^{1, 2}(V, ℂ)` with the trace `ambientTraceL2` and for `H^1(Ω)` with
   `boundaryTraceL2`:
 

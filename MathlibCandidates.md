@@ -49,16 +49,17 @@ declarations.
   (`ApproximationScheme.measurePreserving_mul_left_kMethodMeasure`), the dilation formula
   `Φ_{θ,q}(φ(c ·)) = c^θ Φ_{θ,q}(φ)` (`ApproximationScheme.phiFunctional_comp_mul`), the
   K-functional under a map (`InterpCouple.kFunctional_map_le`) and exactness of exponent `θ`
-  (`InterpCouple.kMethodNorm_map_le`), the theorem that *MultilinearInterpolation* sketches as
-  `IsOfExponent`; coordinate with lua-vr/MultilinearInterpolation.
+  (`InterpCouple.kMethodNorm_map_le`), the theorem behind the commented-out definition
+  `IsOfExponent` of *MultilinearInterpolation*; coordinate with lua-vr/MultilinearInterpolation.
 * **The reiteration theorem** (`ApproximationSpaces/Interpolation/Reiteration.lean`): the
   inclusion for couples of class `C_K` (`InterpCouple.discreteKMethodNorm_le_of_kFunctional_le`),
   the upper bound of Holmstedt's formula in discrete form with `ℓ₁` sums
   (`InterpCouple.kFunctional_kCouple_le`) and the reiteration theorem for quasi-normed couples
   (`InterpCouple.memKMethod_kCouple_iff`, `InterpCouple.memKMethod_kMethodCouple_iff`), with the
   geometric convolutions on `ℤ` (`ENNReal.lqNorm_tsum_geom_sub_le`,
-  `ENNReal.lqNorm_tsum_geom_add_le`); this complements *MultilinearInterpolation*, whose
-  interpolation theory ends with the K-method; coordinate with lua-vr/MultilinearInterpolation.
+  `ENNReal.lqNorm_tsum_geom_add_le`); this complements *MultilinearInterpolation*, which has
+  the K-method, parts of the J-method and Janson's lemma, and no reiteration theorem; coordinate
+  with lua-vr/MultilinearInterpolation.
 * **Monotone convergence and countable Minkowski for `eLpNorm`**: on any measure space,
   `‖sup_b F_b‖_p = sup_b ‖F_b‖_p` for directed countable families of a.e. measurable `F_b`
   (`MeasureTheory.eLpNorm_iSup_of_directed`) and `‖∑_i g_i‖_p ≤ ∑_i ‖g_i‖_p` for `1 ≤ p ≤ ∞` and

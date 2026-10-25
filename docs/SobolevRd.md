@@ -232,7 +232,7 @@ project, with the decisions behind their form.
   `Rd.exists_besselPotentialNorm_le_triebelLizorkinNorm`). Hence, for `0 < η < 1` and
   `1 ≤ q ≤ ∞`, `(H^{s₀,p}, H^{s₁,p})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` for `0 < s₀ < s₁` and
   `(L_p, H^{s₁,p})_{η,q} = B^{ηs₁}_{p,q}` for `s₁ > 0`, in the Bessel potential norms
-  (Bergh–Löfström, Theorem 6.4.5(1); `Rd.memKMethod_besselPotentialCouple_iff`,
+  (Bergh–Löfström, Theorem 6.4.5(4); `Rd.memKMethod_besselPotentialCouple_iff`,
   `Rd.memKMethod_lpBesselPotentialCouple_iff`).
 
 ## What is formalised

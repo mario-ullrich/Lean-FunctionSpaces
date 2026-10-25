@@ -505,7 +505,7 @@ $B_j = B(c_j, \rho_j)$ with $c_j \in \partial\Omega$, $\partial \Omega \subseteq
 Lipschitz graph domains $\Omega_j$ with $B_j \cap \Omega = B_j \cap \Omega_j$.
 \end{definition}
 
-This is the definition of Stein and Triebel, as in \cite[Remark 3.2]{SchneiderVybiral}; the
+This is the definition of Stein, as in \cite[Remark 3.2]{SchneiderVybiral}; the
 direction $e_j$ of each graph domain replaces the rotations. In Lean the balls and the graph
 domains are data of the structure. In finite dimension the carriers of these structures are
 exactly the sets of the usual definition, and the open balls and the bounded open convex sets are
@@ -5822,7 +5822,8 @@ $T_\Gamma \colon H^1(V) \to L_2(\Gamma)$ and $\gamma_{L_2} \colon H^1(\Omega) \t
 the traces of \Cref{sec:surface-measure}, $\nu$ is the unit normal field
 (\Cref{def:boundary-normal}) and $N_\Gamma$ the trace kernel (\Cref{def:trace-kernel}). For
 $U \in H^1(V)$, $\partial_v U \in L_2(V)$ is the weak derivative of $\iota U$. Green's formula on
-$\Omega$ (McLean \cite[Theorem 3.34]{McLean}) is pasted from Green's formula on the graph domains
+$\Omega$ (Grisvard \cite[Theorem 1.5.3.1]{Grisvard}) is pasted from Green's formula on the graph
+domains
 (\Cref{thm:graph-green}) with a resolution of unity that equals one near $\Gamma$; the interior
 piece integrates to zero by integration by parts on $V$. The chart normals agree almost
 everywhere on the overlaps of the balls, by Gauss--Green in two charts, so the boundary term is

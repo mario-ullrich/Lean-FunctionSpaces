@@ -123,7 +123,7 @@ other blocks instantiate the theory.
   formula in discrete form with `ℓ_1` sums,
   `K̄(2^(m(θ₁-θ₀)), u) ≤ c (∑_{n<m} 2^(-nθ₀) K(2^n, u) + 2^(m(θ₁-θ₀)) ∑_{n≥m} 2^(-nθ₁)
   K(2^n, u))`
-  (Holmstedt 1970; Bergh–Löfström, Theorem 3.6.1 has `ℓ_{q_i}` norms of the two pieces;
+  (Holmstedt 1970; Bergh–Löfström, Theorem 3.6.1 has `L_{q_i}(dt/t)` norms of the two pieces;
   `InterpCouple.kFunctional_kCouple_le`, with the endpoint versions
   `InterpCouple.kFunctional_leftKCouple_le` and `InterpCouple.kFunctional_rightKCouple_le`), which
   suffices for reiteration, and the geometric convolutions on `ℤ`

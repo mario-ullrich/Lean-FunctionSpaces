@@ -114,7 +114,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `(X₀, X₁)_{θ,q} = {u : ‖u‖_{K,θ,q} < ∞}`, and the two inner K-spaces carry their discrete
   K-norms `‖(2^(-nθ_i) K(2^n, u))_{n ∈ ℤ}‖_{ℓ_{q_i}}` or their continuous K-norms
   `‖·‖_{K,θ_i,q_i}`. The proof uses the upper bound of Holmstedt's formula with `ℓ_1` sums
-  (Holmstedt 1970; Bergh–Löfström, Theorem 3.6.1 has `ℓ_{q_i}` norms of the two pieces), which
+  (Holmstedt 1970; Bergh–Löfström, Theorem 3.6.1 has `L_{q_i}(dt/t)` norms of the two pieces), which
   suffices for reiteration (`InterpCouple.kFunctional_kCouple_le`). For every approximation
   scheme, `0 < s < r` and `1 ≤ q ≤ ∞`, `A^s_q = (X, A^r_∞)_{s/r,q}` for the couple of the norm
   of `X` and the dyadic quasi-norm of `A^r_∞`, and for `0 < s₀ < s₁`, `0 < η < 1` and
@@ -214,7 +214,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   On `ℝ^d`, let `1 ≤ p < ∞`, `r ≥ 1` an integer,
   `N_{s,q}(f) = ‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q}` and `0 < s₀ < s₁ < r`. Then
   `f ∈ L_p(V)` lies in the interpolation space `(N_{s₀,q₀}, N_{s₁,q₁})_{η,q}` iff
-  `N_{s,q}(f) < ∞` with `s = (1-η)s₀ + ηs₁` (Bergh–Löfström, Theorem 6.4.5(2);
+  `N_{s,q}(f) < ∞` with `s = (1-η)s₀ + ηs₁` (Bergh–Löfström, Theorem 6.4.5(1);
   `Rd.memKMethod_modCouple_iff`), and the same holds on the torus
   (`Torus.memKMethod_modCouple_iff`).
 * **Atomic decompositions on `ℝ^d`.** Let `1 ≤ p < ∞` and `n = dim V`. A regular atom of level
@@ -348,7 +348,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `Rd.kMethodNorm_map_le_of_bounded_lp_sobolev`). The same holds for the Bessel potential spaces
   in the norms `‖J_s f‖_p`, the norms of Mathlib's `H^{s,p}(V)`:
   `(H^{s₀,p}, H^{s₁,p})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` for `0 < s₀ < s₁` and
-  `(L_p, H^{s₁,p})_{η,q} = B^{ηs₁}_{p,q}` for `s₁ > 0` (Bergh–Löfström, Theorem 6.4.5(1);
+  `(L_p, H^{s₁,p})_{η,q} = B^{ηs₁}_{p,q}` for `s₁ > 0` (Bergh–Löfström, Theorem 6.4.5(4);
   `Rd.memKMethod_besselPotentialCouple_iff`, `Rd.memKMethod_lpBesselPotentialCouple_iff`).
 * **Sobolev and Besov embeddings on `ℝ^d`.** Let `n = dim V`, `1 ≤ p ≤ r ≤ ∞`, `p < ∞` and
   `1 ≤ q ≤ ∞`. For `s > n(1/p - 1/r)`, every `f ∈ B^s_{p,q}(V)` agrees almost everywhere with
@@ -676,14 +676,15 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   interpolation.
 * P. Grisvard, *Elliptic Problems in Nonsmooth Domains*, Monographs and Studies in Mathematics
   **24**, Pitman, 1985. The usual definition of Lipschitz domains by local graphs.
-* N. Guglielmi, V. Yu. Protasov, *Invariant polytopes of linear operators with applications to
-  regularity of wavelets and of subdivisions*, SIAM J. Matrix Anal. Appl. **37** (2016), no. 1,
+* N. Guglielmi, V. Yu. Protasov, *Invariant polytopes of sets of matrices with application to
+  regularity of wavelets and subdivisions*, SIAM J. Matrix Anal. Appl. **37** (2016), no. 1,
   18–52, [arXiv:1502.01192](https://arxiv.org/abs/1502.01192). Hölder exponents of the
   Daubechies wavelets of higher order.
 * E. Hernández, G. Weiss, *A First Course on Wavelets*, Studies in Advanced Mathematics, CRC
   Press, 1996. Multiresolution analyses.
 * R. Hiptmair, D. Pauly, E. Schulz, *Traces for Hilbert complexes*, J. Funct. Anal. **284**
-  (2023), Paper No. 109905. Assumption F, the compactness of the restriction to bounded domains.
+  (2023), no. 10, Paper No. 109905. Assumption F: compact inclusions of the regular decomposition
+  spaces; for the de Rham complex, Rellich's theorem `H^1(Ω) ↪ L_2(Ω)`.
 * T. Holmstedt, *Interpolation of quasi-normed spaces*, Math. Scand. **26** (1970), 177–199.
   Holmstedt's formula for the K-functional of a couple of K-spaces.
 * L. Hörmander, *Estimates for translation invariant operators in L^p spaces*, Acta Math.

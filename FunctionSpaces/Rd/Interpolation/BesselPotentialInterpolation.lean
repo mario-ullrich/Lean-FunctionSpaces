@@ -22,7 +22,7 @@ Triebel–Lizorkin spaces gives, for `0 < η < 1`, `1 ≤ q ≤ ∞`, `0 < s₀ 
 
 `(H^{s₀,p}, H^{s₁,p})_{η,q} = B^s_{p,q}` and `(L_p, H^{s₁,p})_{η,q} = B^{ηs₁}_{p,q}`
 
-in the Bessel potential norms (Bergh–Löfström, Theorem 6.4.5(1);
+in the Bessel potential norms (Bergh–Löfström, Theorem 6.4.5(4);
 `Rd.memKMethod_besselPotentialCouple_iff`, `Rd.memKMethod_lpBesselPotentialCouple_iff`).
 -/
 
@@ -149,7 +149,7 @@ theorem lpBesselPotentialCouple_norm0 (f : Lp ℂ p (volume : Measure V)) :
 theorem lpBesselPotentialCouple_norm1 (f : Lp ℂ p (volume : Measure V)) :
     (lpBesselPotentialCouple s₁).norm1 f = besselPotentialNorm s₁ f := rfl
 
-/-- **Bessel potential spaces interpolate to Besov spaces** (Bergh–Löfström, Theorem 6.4.5(1)): in
+/-- **Bessel potential spaces interpolate to Besov spaces** (Bergh–Löfström, Theorem 6.4.5(4)): in
 dimension `n ≥ 1`, for `1 < p < ∞`, `0 < s₀ < s₁`, `0 < η < 1` and `1 ≤ q ≤ ∞`, `f ∈ L_p(V)`
 lies in the real interpolation space `(H^{s₀,p}, H^{s₁,p})_{η,q}` of the Bessel potential norms
 iff `f` lies in the Besov space `B^{(1-η)s₀+ηs₁}_{p,q}(V)`.  The Bessel potential norms are

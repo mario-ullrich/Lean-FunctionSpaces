@@ -724,7 +724,7 @@ theorem integral_ambientTraceL2_mul_inner_normal_eq (ψ : Ω.BoundaryPartition) 
     rw [h1 hj, h2 hj, h3 hj, ← (Ω.graph j).inner_normalAt_mul_gram, Complex.ofReal_mul]
     ring
 
-/-- **Green's formula on a bounded Lipschitz domain** (McLean, Theorem 3.34): for all
+/-- **Green's formula on a bounded Lipschitz domain** (Grisvard, Theorem 1.5.3.1): for all
 `U, W ∈ H^1(V)` and every direction `v`,
 `∫_Ω (∂_v U) W + U ∂_v W = ∫_Γ γ U · γ W ⟪v, ν⟫ dσ` with the traces `γ U, γ W ∈ L_2(Γ)`
 (`Rd.BoundedLipschitzDomain.ambientTraceL2`), the outward unit normal `ν` and the surface measure
