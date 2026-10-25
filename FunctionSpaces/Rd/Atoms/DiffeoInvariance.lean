@@ -504,11 +504,14 @@ end ModNormOn
 finite intrinsic Besov quasi-norm agrees with a function on `V` whose Besov quasi-norm is bounded
 by a constant times the intrinsic one, for `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`. The
 extension is a field of the class, so the class is a hypothesis; its instances are `univ`, the
-closed half-space and the models of manifolds (`Rd.BesovDomain.univ`,
-`Rd.BesovDomain.closedHalfSpace`, `Rd.BesovDomain.range_euclideanHalfSpace`,
-`Rd.BesovDomain.range_of_boundaryless`). The class consists of closed convex sets, so non-convex
-domains lie outside it; among the convex ones, closed balls, cubes and quadrants are not yet proved
-instances. -/
+closed half-space, the models of manifolds with and without boundary and the quadrant model of
+manifolds with corners (`Rd.BesovDomain.univ`, `Rd.BesovDomain.closedHalfSpace`,
+`Rd.BesovDomain.range_euclideanHalfSpace`, `Rd.BesovDomain.range_of_boundaryless`,
+`Rd.BesovDomain.range_euclideanQuadrant`), and the closure of a Lipschitz graph domain with convex
+graph function is a Besov domain (`Rd.BesovDomain.closure_lipschitzGraph`). The class consists of
+closed convex sets; every Lipschitz graph domain, convex or not, has the extension property
+(`Rd.HasBesovExtension`, `Rd.LipschitzGraph.hasBesovExtension`). Closed balls and cubes are not yet
+proved instances. -/
 class BesovDomain (Ω : Set V) : Prop where
   convex : Convex ℝ Ω
   isClosed : IsClosed Ω

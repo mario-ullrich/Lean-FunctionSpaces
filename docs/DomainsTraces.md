@@ -9,13 +9,14 @@ With `V` and the kernels of [Besov spaces on `ℝ^d`](Rd.md), the Besov spaces o
 Lipschitz graph domains (Rychkov's extension) and for bounded Lipschitz domains (pasting with a
 resolution of unity and pointwise multipliers). Traces on Lipschitz boundaries are built from the
 atoms and hold for `0 < s < 1`; on the half-space, where smooth atoms restrict to smooth atoms,
-the trace theorem holds for every `s > 0`. Compact manifolds with boundary carry Besov spaces in
-the charts of a Besov atlas; the invariance under changes of variables makes them independent of
-the atlas, and the trace theorem of the half-space carries over to the boundary for every
-`s > 0`. Smooth bounded domains are such manifolds, and their chart spaces are the intrinsic
-Besov spaces. In finite dimension the bounded Lipschitz domains are the sets of the usual
-definition by local Lipschitz graphs, the open balls and the bounded open convex sets among them;
-the smooth bounded domains are the sets of the usual definition by smooth local graphs, the open
+the trace theorem holds for every `s > 0`. Compact manifolds with boundary or with corners carry
+Besov spaces in the charts of a Besov atlas, since the half-space and the quadrant are Besov
+domains; the invariance under changes of variables makes them independent of the atlas, and for
+manifolds with boundary the trace theorem of the half-space carries over to the boundary for every
+`s > 0`. Smooth bounded domains are such manifolds, and their chart spaces are the intrinsic Besov
+spaces. In finite dimension the bounded Lipschitz domains are the sets of the usual definition by
+local Lipschitz graphs, the open balls and the bounded open convex sets among them; the smooth
+bounded domains are the sets of the usual definition by smooth local graphs, the open
 balls among them.
 
 On a bounded Lipschitz domain, `H^1` is the space of restrictions of `H^1(ℝ^d)`, with weak
@@ -126,15 +127,32 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   this extension. The closed half-space is a Besov domain (`Rd.BesovDomain.closedHalfSpace`), and
   so are `V` and the models of manifolds with and without boundary (`Rd.BesovDomain.univ`,
   `Rd.BesovDomain.range_euclideanHalfSpace`, `Rd.BesovDomain.range_of_boundaryless`). The class
-  consists of closed convex sets, so non-convex domains lie outside it; among the convex ones,
-  closed balls, cubes and quadrants are not yet proved instances.
+  consists of closed convex sets; closed balls and cubes are not yet proved instances.
+* **The extension property of Lipschitz graph domains, and the quadrant as a Besov domain.** A
+  measurable set `Ω` has the extension property (`Rd.HasBesovExtension`) if for `1 ≤ p < ∞`,
+  `0 < s < r` and `1 ≤ q ≤ ∞` there is `C < ∞` such that every `f` with
+  `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` agrees on `Ω` with some
+  `F` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C N_Ω(f)`; a closed convex set with
+  nonempty interior has it iff it is a Besov domain. The property passes to sets that agree up to a
+  null set (`Rd.HasBesovExtension.congr_set`), and with it every order `r > s` gives the same
+  space (`Rd.HasBesovExtension.modNormOn_order_le`). Every Lipschitz graph domain
+  `{x : φ(x) < ⟪x, e⟫}` has it (`Rd.LipschitzGraph.hasBesovExtension`), its graph and its
+  frontier are null sets (`Rd.LipschitzGraph.volume_graph`,
+  `Rd.LipschitzGraph.volume_frontier_domain`), and for convex `φ` its closure is a Besov domain
+  (`Rd.BesovDomain.closure_lipschitzGraph`). The open quadrant `{y ∈ ℝ^n : y_i > 0 for all i}` is
+  the Lipschitz graph domain of `φ(y) = ⟪y, e⟫ - √n min_i y_i` with the diagonal
+  `e = (1, …, 1)/√n` (`Rd.LipschitzGraph.quadrant`, `Rd.LipschitzGraph.quadrant_domain`), so the
+  range `{y : y_i ≥ 0 for all i}` of Mathlib's model of manifolds with corners
+  `modelWithCornersEuclideanQuadrant n` is a Besov domain
+  (`Rd.BesovDomain.range_euclideanQuadrant`).
 * **Besov spaces on compact manifolds.** Let `M` be a compact smooth manifold modelled on `E` with
-  corners `I` whose range is a Besov domain (the half-space or `E`; manifolds with corners are not
-  covered), `μ` a smooth measure (in every chart a continuous positive density with respect to
-  the Lebesgue measure, `Manifold.IsSmoothMeasure`) and `1 ≤ p < ∞`. A Besov atlas consists of
-  finitely many charts `κ_i`, a smooth partition of unity `ψ_i` subordinate to them and cut-offs
-  (`Manifold.BesovAtlas`); every compact manifold has one (`Manifold.BesovAtlas.nonempty`). Its
-  Besov quasi-norm is `‖f‖_{A,r,s,q} = ∑_i N_Ω((ψ_i f) ∘ κ_i⁻¹)` with
+  corners `I` whose range is a Besov domain (the half-space, the quadrant of manifolds with
+  corners, or `E`), `μ` a smooth measure (in every chart a continuous positive density with
+  respect to the Lebesgue measure, `Manifold.IsSmoothMeasure`) and `1 ≤ p < ∞`. A Besov atlas
+  consists of finitely many charts `κ_i`, a smooth partition of unity `ψ_i` subordinate to them and
+  cut-offs (`Manifold.BesovAtlas`); every compact manifold has one
+  (`Manifold.BesovAtlas.nonempty`). Its Besov quasi-norm is
+  `‖f‖_{A,r,s,q} = ∑_i N_Ω((ψ_i f) ∘ κ_i⁻¹)` with
   `N_Ω(G) = ‖G‖_{L_p(Ω)} + ‖(2^(ks) ω_r(G, 2^(-k), Ω)_p)_k‖_{ℓ_q}`, `Ω = range I`
   (`Manifold.BesovAtlas.besovNorm`). For two Besov atlases, `0 < s < r` and `1 ≤ q ≤ ∞` there is
   `C < ∞` with `‖f‖_{A,r,s,q} ≤ C ‖f‖_{A',r,s,q}` for all `f ∈ L_p(μ)`
@@ -466,7 +484,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Restrictions to Lipschitz graph domains by intrinsic differences | ✅ | ✗ | `Domains/Extension/LipschitzGraphBesov` |
 | Local versions of Rychkov's extension: boundary and inner patches, short steps into the closed cone, absolute convergence from bounds of the weighted local means, agreement on the patch for every convergent local extension | ✅ | ✗ | `Domains/Extension/LocalExtension` |
 | Bounded Lipschitz domains: the patches covering the closure, pasting of local extensions | ✅ | ✗ | `Domains/Lipschitz/BoundedLipschitz` |
-| The half-space and the models of manifolds as Besov domains | ✅ | ✗ | `Domains/Lipschitz/HalfSpace` |
+| Null hyperplanes, the half-space and the models of manifolds as Besov domains | ✅ | ✗ | `Domains/Lipschitz/HalfSpace` |
 | Traces of every order on the half-space: trace theorem, extension, trace space | ✅ | ✗ | `Domains/Traces/HalfSpaceTrace` |
 | Graph map of a Lipschitz graph domain, restrictions of atoms to the graph | ✅ | ✗ | `Domains/Lipschitz/GraphParametrization` |
 | Traces on Lipschitz graph domains: boundedness, linearity, trace of continuous functions | ✅ | ✗ | `Domains/Traces/GraphTrace` |
@@ -477,7 +495,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Smooth measures on manifolds, integrals in charts | ✅ | ✗ | `Domains/Manifolds/SmoothMeasure` |
 | Besov atlases, chart pieces, changes of charts with cut-offs | ✅ | ✗ | `Domains/Manifolds/BesovAtlas` |
 | Besov spaces on compact manifolds, independence of the atlas and of the order | ✅ | ✗ | `Domains/Manifolds/Besov` |
-| Flattening of graph domains, preservation of the Lebesgue measure | ✅ | ✗ | `Domains/Lipschitz/GraphStraightening` |
+| Flattening of graph domains, the Lipschitz inverse and the graph in the image of the hyperplane, preservation of the Lebesgue measure | ✅ | ✗ | `Domains/Lipschitz/GraphStraightening` |
 | Smooth bounded domains as compact manifolds with boundary, Lebesgue measure as smooth measure | ✅ | ✗ | `Domains/Manifolds/SmoothDomain` |
 | Besov spaces of smooth domains by charts equal the intrinsic Besov spaces | ✅ | ✗ | `Domains/Manifolds/SmoothDomainBesov` |
 | Besov spaces on the boundary of a compact manifold, independence of the atlas | ✅ | ✗ | `Domains/Manifolds/BoundaryBesov` |
@@ -496,6 +514,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, smoothing with compact support, bump mollifiers and cone mollifiers, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)` | ✅ | ✗ | `Domains/Traces/TraceKernel` |
 | Bounded Lipschitz domains from the set-level definition: sets Lipschitz near a point, local graphs as Lipschitz graph domains, McShane's extension of local graphs, the structure from a family of charts and the converse, the ball | ✅ | ✗ | `Domains/Lipschitz/LocalLipschitzGraphs` |
 | Bounded open convex sets as bounded Lipschitz domains: the ray length, its cone estimate, open convex sets, bounded or not, near a frontier point as regions above a Lipschitz graph, and the open unit cube | ✅ | ✗ | `Domains/Lipschitz/ConvexDomains` |
+| The extension property and null sets, Lipschitz graph domains with null graphs and boundaries, closures of convex Lipschitz graph domains as Besov domains, the quadrant as a Lipschitz graph domain and the quadrant model of manifolds with corners as a Besov domain | ✅ | ✗ | `Domains/Lipschitz/BesovDomains` |
 | Smooth bounded domains from the set-level definition: sets smooth near a point, the smooth cut-off of a local graph, the smooth domain from smooth charts and the converse, the ball as a smooth domain and the Besov spaces of its closure | ✅ | ✗ | `Domains/Manifolds/SmoothLocalGraphs` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.

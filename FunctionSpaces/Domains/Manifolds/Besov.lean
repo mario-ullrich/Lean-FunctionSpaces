@@ -11,9 +11,10 @@ public import FunctionSpaces.Domains.Manifolds.BesovAtlas
 # Besov spaces on compact manifolds
 
 Let `M` be a compact manifold with model `I` whose range `Ω = range I` is a Besov domain (the
-half-space for manifolds with boundary, `E` for manifolds without boundary), `μ` a smooth measure
-and `1 ≤ p < ∞`. For a Besov atlas `A` with charts `κ_i` and partition of unity `ψ_i`, the
-**Besov quasi-norm** of `f ∈ L_p(μ)` is the sum of the intrinsic quasi-norms of the chart pieces
+half-space for manifolds with boundary, the quadrant `{y : ∀ i, 0 ≤ y_i}` for manifolds with
+corners, `E` for manifolds without boundary), `μ` a smooth measure and `1 ≤ p < ∞`. For a
+Besov atlas `A` with charts `κ_i` and partition of unity `ψ_i`, the **Besov quasi-norm** of
+`f ∈ L_p(μ)` is the sum of the intrinsic quasi-norms of the chart pieces
 (`Manifold.BesovAtlas.besovNorm`):
 
 `‖f‖_{A, r, s, q} = ∑_i N_Ω((ψ_i f) ∘ κ_i⁻¹)`,
@@ -32,6 +33,11 @@ finite sums of the pieces of `A'` transported by the changes of charts with cut-
 **Lifts from a chart**: for `F ∈ B^s_{p,q}(E)` the function `θ_k · F ∘ κ_k` lies in
 `B^s_{p,q}(M)` (`Manifold.BesovAtlas.memBesov_chartLiftLp`), since its pieces are the images
 `T_{ik} F` under the changes of charts (`Manifold.BesovAtlas.pieceLp_chartLiftLp`).
+
+**Manifolds with corners**: the range of Mathlib's model `modelWithCornersEuclideanQuadrant n` is a
+Besov domain (`Rd.BesovDomain.range_euclideanQuadrant` in
+`FunctionSpaces.Domains.Lipschitz.BesovDomains`), so all of this holds for compact manifolds with
+corners modelled on the quadrant.
 -/
 
 @[expose] public section

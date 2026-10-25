@@ -5768,9 +5768,13 @@ Besov domain, with $F = f$.
 \end{definition}
 
 The extension is part of the definition, so a Besov domain is a hypothesis. Its instances are
-$V$, the closed half-space and the models of manifolds (\Cref{thm:half-space-besov-domain}).
-The class consists of closed convex sets, so non-convex domains lie outside it; among the convex
-ones, closed balls, cubes and quadrants are not yet proved instances.
+$V$, the closed half-space and the models of manifolds with and without boundary
+(\Cref{thm:half-space-besov-domain}), the closures of Lipschitz graph domains with convex graph
+function (\Cref{thm:graph-besov-domain}) and the quadrant, the model of manifolds with corners
+(\Cref{thm:quadrant-besov-domain}). The class consists of closed convex sets; every Lipschitz
+graph domain, convex or not, satisfies the extension condition of
+\Cref{def:besov-extension-property} (\Cref{thm:graph-besov-domain}). Closed balls and cubes are
+not yet proved instances.
 
 \begin{theorem}[Invariance on Besov domains]
 \label{thm:besov-domain-invariance}
@@ -5810,21 +5814,26 @@ The step sets are intersections of translates, and translations preserve the Leb
 
 \begin{theorem}[The half-space is a Besov domain]
 \label{thm:half-space-besov-domain}
-\lean{Rd.closedHalfSpace, Rd.isClosed_closedHalfSpace, Rd.convex_closedHalfSpace,
+\lean{Rd.orthogonal_singleton_ne_top, Rd.volume_orthogonal_singleton_eq_zero,
+  Rd.closedHalfSpace, Rd.isClosed_closedHalfSpace, Rd.convex_closedHalfSpace,
   Rd.mem_interior_closedHalfSpace, Rd.LipschitzGraph.flat, Rd.LipschitzGraph.flat_domain,
   Rd.closedHalfSpace_ae_eq, Rd.BesovDomain.closedHalfSpace,
   Rd.BesovDomain.range_euclideanHalfSpace, Rd.BesovDomain.range_of_boundaryless}
 \leanok
 \uses{def:besov-domain, lem:null-set-domains, thm:graph-besov}
-For a unit vector $e$ the closed half-space $\{x : \langle x, e \rangle \geq 0\}$ is a Besov
-domain. Hence the models of manifolds are Besov domains: the range $\{y : y_0 \geq 0\}$ of the
-model with corners of the Euclidean half-space, and the range $V$ of a model without boundary.
+For every nonzero $e \in V$, the hyperplane $e^\perp$ is a null set. For a unit vector $e$ the
+closed half-space $\{x : \langle x, e \rangle \geq 0\}$ is a Besov domain. Hence the models of
+manifolds are Besov domains: the range $\{y : y_0 \geq 0\}$ of the model with corners of the
+Euclidean half-space, and the range $V$ of a model without boundary.
 \end{theorem}
 
 \begin{proof}
 \leanok
-The closed half-space differs from the Lipschitz graph domain $\{x : \langle x, e \rangle > 0\}$
-with graph function $0$ by the null set $e^\perp$ (\Cref{lem:null-set-domains}), and Rychkov's
+The hyperplane $e^\perp$ is a proper subspace (Mathlib's \texttt{Submodule.\allowbreak
+orthogonal\_\allowbreak eq\_\allowbreak top\_\allowbreak iff}), hence a null set (Mathlib's
+\texttt{MeasureTheory.\allowbreak Measure.\allowbreak addHaar\_\allowbreak submodule}). The closed
+half-space differs from the Lipschitz graph domain $\{x : \langle x, e \rangle > 0\}$ with graph
+function $0$ by the null set $e^\perp$ (\Cref{lem:null-set-domains}), and Rychkov's
 extension is bounded on the latter (\Cref{thm:graph-besov}).
 \end{proof}
 

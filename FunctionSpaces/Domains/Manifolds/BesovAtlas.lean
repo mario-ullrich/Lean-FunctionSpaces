@@ -24,6 +24,11 @@ A smooth function on `M` read in an extended chart is smooth within the target o
 a chart** `θ · F ∘ κ` on `M` (`Manifold.chartLift`), which lies in `L_p(μ)` for `F ∈ L_p(E)`
 (`Manifold.memLp_chartLift`) and whose pieces are the images of `F` under the changes of charts
 (`Manifold.BesovAtlas.piece_chartLift`).
+
+The pieces of one atlas are sums of the pieces of another transported by the changes of charts
+(`Manifold.BesovAtlas.pieceLp_eq_sum`) for every real model `I` whose range is a Besov domain: the
+half-space, `E`, and the quadrant of manifolds with corners
+(`Rd.BesovDomain.range_euclideanQuadrant` in `FunctionSpaces.Domains.Lipschitz.BesovDomains`).
 -/
 
 @[expose] public section

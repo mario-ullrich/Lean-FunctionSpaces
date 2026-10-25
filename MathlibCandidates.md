@@ -213,6 +213,13 @@ declarations.
   Lipschitz map between finite-dimensional inner product spaces of the same dimension maps null sets
   to null sets (`Rd.volume_image_eq_zero_of_lipschitzWith`), through the Hausdorff measure, a Haar
   measure in finite dimension.
+* **Null graphs of Lipschitz functions** (`FunctionSpaces/Domains/Lipschitz/BesovDomains.lean`):
+  for a unit vector `e` and a Lipschitz `φ` constant along `e`, the graph `{x : φ(x) = ⟪x, e⟫}` is
+  a null set (`Rd.LipschitzGraph.volume_graph`), as the image of the null hyperplane `e^⊥`
+  (`Rd.volume_orthogonal_singleton_eq_zero`) under the Lipschitz map `y ↦ y + φ(y) e`; Mathlib
+  has no null-graph lemma (checked 2026-10-25). The quadrant lemmas of the same file
+  (`Rd.quadrant_ae_eq`) overlap Mathlib PR #44352 (`closure_quadrant`, `frontier_quadrant`,
+  `range_modelWithCornersEuclideanQuadrant`), which is newer than the Mathlib tag of the project.
 * **Tensor products of functions** (`FunctionSpaces/Rd/MixedSmoothness/TensorKernels.lean`): for
   `(⊗K)(x) = ∏_i K_i(x_i)` on `ℝ^d`, `‖⊗K‖_1 = ∏_i ‖K_i‖_1` (`Rd.lintegral_enorm_tensorKernel`),
   `(⊗K) ⋆ (⊗K') = ⊗(K_i ⋆ K'_i)` (`Rd.conv_tensorKernel`), and diagonal changes of variables

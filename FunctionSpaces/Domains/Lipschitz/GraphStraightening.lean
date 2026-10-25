@@ -15,8 +15,10 @@ public import Mathlib.MeasureTheory.Function.Jacobian
 For a Lipschitz graph domain `Ω = {x : φ(x) < ⟪x, e⟫}` the **flattening**
 `F(x) = x - φ(x) e` (`Rd.LipschitzGraph.flatten`) maps `Ω` onto the half-space `{⟪y, e⟫ > 0}`
 (`Rd.LipschitzGraph.inner_flatten`): it is a bijection of `V` with inverse `y ↦ y + φ(y) e`
-(`Rd.LipschitzGraph.unflatten`), because `φ` is constant along `e`. For smooth `φ` both maps are
-smooth, and the flattening preserves the Lebesgue measure
+(`Rd.LipschitzGraph.unflatten`), because `φ` is constant along `e`. The inverse is
+`(1 + M)`-Lipschitz (`Rd.LipschitzGraph.lipschitzWith_unflatten`), and the image of the hyperplane
+`e^⊥` under it contains the graph (`Rd.LipschitzGraph.graph_subset_image_unflatten`). For smooth
+`φ` both maps are smooth, and the flattening preserves the Lebesgue measure
 (`Rd.LipschitzGraph.measurePreserving_flatten`): its derivative `id - e ⊗ Dφ(x)` is a
 transvection, since `Dφ(x) e = 0`, so its determinant is `1` (Mathlib's
 `LinearMap.transvection.det`), and the change of variables formula
@@ -71,6 +73,33 @@ theorem continuous_flatten : Continuous Ω.flatten :=
 /-- The inverse of the flattening is continuous. -/
 theorem continuous_unflatten : Continuous Ω.unflatten :=
   continuous_id.add (Ω.continuous_phi.smul continuous_const)
+
+/-- **The inverse flattening is Lipschitz**: `y ↦ y + φ(y) e` is `(1 + M)`-Lipschitz, since `φ`
+is `M`-Lipschitz and `‖e‖ = 1`. On the hyperplane `e^⊥` this is
+`Rd.LipschitzGraph.norm_graphMap_sub_le`. -/
+theorem lipschitzWith_unflatten :
+    LipschitzWith ⟨1 + Ω.M, add_nonneg zero_le_one Ω.M_nonneg⟩ Ω.unflatten := by
+  refine LipschitzWith.of_dist_le_mul fun x y => ?_
+  rw [dist_eq_norm, dist_eq_norm]
+  show _ ≤ (1 + Ω.M) * _
+  calc ‖Ω.unflatten x - Ω.unflatten y‖ = ‖(x - y) + (Ω.phi x - Ω.phi y) • Ω.e‖ := by
+        rw [unflatten, unflatten, sub_smul]
+        congr 1
+        abel
+    _ ≤ ‖x - y‖ + |Ω.phi x - Ω.phi y| := by
+        refine (norm_add_le _ _).trans_eq ?_
+        rw [norm_smul, Ω.norm_e, mul_one, Real.norm_eq_abs]
+    _ ≤ (1 + Ω.M) * ‖x - y‖ := by linarith [Ω.lipschitz x y]
+
+/-- **The graph lies in the image of the hyperplane** `e^⊥` under `y ↦ y + φ(y) e`: a point `x`
+of the graph is the image of its flattening `x - φ(x) e`, which lies in `e^⊥`
+(`Rd.LipschitzGraph.inner_flatten`). -/
+theorem graph_subset_image_unflatten :
+    {x | Ω.phi x = inner ℝ x Ω.e} ⊆ Ω.unflatten '' ((ℝ ∙ Ω.e)ᗮ : Set V) := by
+  intro x (hx : Ω.phi x = inner ℝ x Ω.e)
+  refine ⟨Ω.flatten x, ?_, Ω.unflatten_flatten x⟩
+  rw [SetLike.mem_coe, Submodule.mem_orthogonal_singleton_iff_inner_right, real_inner_comm,
+    Ω.inner_flatten, hx, sub_self]
 
 /-- For smooth `φ`, the flattening is smooth. -/
 theorem contDiff_flatten {n : WithTop ℕ∞} (hφ : ContDiff ℝ n Ω.phi) : ContDiff ℝ n Ω.flatten :=

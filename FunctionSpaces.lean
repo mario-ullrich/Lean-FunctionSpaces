@@ -122,6 +122,7 @@ public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen
 public import FunctionSpaces.Domains.Traces.TraceKernel
 public import FunctionSpaces.Domains.Lipschitz.LocalLipschitzGraphs
 public import FunctionSpaces.Domains.Lipschitz.ConvexDomains
+public import FunctionSpaces.Domains.Lipschitz.BesovDomains
 public import FunctionSpaces.Domains.Manifolds.SmoothLocalGraphs
 public import FunctionSpaces.Torus.Measure
 public import FunctionSpaces.Torus.Scheme
@@ -579,6 +580,10 @@ and the theorems that their characterisations agree. The library builds on
   a set satisfying the definition, the converse, and the ball as a bounded Lipschitz domain.
 * `FunctionSpaces.Domains.Lipschitz.ConvexDomains`: the ray length of a convex set, its cone
   estimate, bounded open convex sets and the open unit cube as bounded Lipschitz domains.
+* `FunctionSpaces.Domains.Lipschitz.BesovDomains`: the extension property of a set, its invariance
+  under null sets, Lipschitz graph domains with it, their null graphs, closures of convex Lipschitz
+  graph domains as Besov domains, the quadrant as a Lipschitz graph domain, and the quadrant model
+  of manifolds with corners as a Besov domain.
 * `FunctionSpaces.Domains.Manifolds.SmoothLocalGraphs`: the usual set-level definition of
   bounded domains with smooth boundary by smooth local graphs, the smooth cut-off of a local graph,
   the smooth domain of a set satisfying the definition and the converse, and the ball as a smooth

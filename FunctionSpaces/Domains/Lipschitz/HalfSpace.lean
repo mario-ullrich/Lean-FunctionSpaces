@@ -14,8 +14,9 @@ public import Mathlib.Geometry.Manifold.Instances.Real
 
 The closed half-space `{x : 0 ≤ ⟪x, e⟫}` for a unit vector `e` (`Rd.closedHalfSpace`) is a Besov
 domain (`Rd.BesovDomain.closedHalfSpace`): it differs from the flat Lipschitz graph domain
-`{x : 0 < ⟪x, e⟫}` (`Rd.LipschitzGraph.flat`) by the null set `e^⊥`, and on the latter Rychkov's
-extension is bounded (`Rd.LipschitzGraph.modNorm_extension_le_modNormOn`).
+`{x : 0 < ⟪x, e⟫}` (`Rd.LipschitzGraph.flat`) by the null set `e^⊥`
+(`Rd.volume_orthogonal_singleton_eq_zero`), and on the latter Rychkov's extension is bounded
+(`Rd.LipschitzGraph.modNorm_extension_le_modNormOn`).
 
 Changing a set by a null set changes neither the step sets up to null sets (`Rd.stepSet_ae_eq`)
 nor the moduli on the set (`Rd.modulusOn_congr_set`) nor the cut-off (`Rd.indicatorLp_congr_set`).
@@ -75,6 +76,19 @@ theorem indicatorLp_congr_set {p : ℝ≥0∞} [Fact (1 ≤ p)] {U U' : Set V} (
     indicator_ae_eq_of_ae_eq_set (f := (f : V → ℂ)) hUU'] with x h1 h2 h3
   rw [h1, h2, h3]
 
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- For `e ≠ 0` the orthogonal complement `e^⊥` is a proper subspace: `Kᗮ = ⊤` only for `K = ⊥`
+(Mathlib's `Submodule.orthogonal_eq_top_iff`), and `ℝ e = ⊥` only for `e = 0` (Mathlib's
+`Submodule.span_singleton_eq_bot`). -/
+theorem orthogonal_singleton_ne_top {e : V} (he : e ≠ 0) : (ℝ ∙ e)ᗮ ≠ ⊤ := by
+  simpa using he
+
+/-- **A hyperplane is a null set**: `e^⊥` has Lebesgue measure zero for `e ≠ 0` (Mathlib's
+`MeasureTheory.Measure.addHaar_submodule`). -/
+theorem volume_orthogonal_singleton_eq_zero {e : V} (he : e ≠ 0) :
+    volume ((ℝ ∙ e)ᗮ : Set V) = 0 :=
+  Measure.addHaar_submodule volume _ (orthogonal_singleton_ne_top he)
+
 /-! ### The half-space -/
 
 /-- The **closed half-space** `{x : 0 ≤ ⟪x, e⟫}`. -/
@@ -124,11 +138,7 @@ theorem LipschitzGraph.flat_domain (e : V) (he : ‖e‖ = 1) :
 theorem closedHalfSpace_ae_eq {e : V} (he : ‖e‖ = 1) :
     closedHalfSpace e =ᵐ[volume] (LipschitzGraph.flat e he).domain := by
   have he0 : e ≠ 0 := fun h => by simp [h] at he
-  have hnull : volume ((ℝ ∙ e)ᗮ : Set V) = 0 := by
-    refine Measure.addHaar_submodule volume _ fun htop => ?_
-    have hmem : e ∈ (ℝ ∙ e)ᗮ := by rw [htop]; exact Submodule.mem_top
-    rw [Submodule.mem_orthogonal_singleton_iff_inner_right, real_inner_self_eq_norm_sq, he] at hmem
-    norm_num at hmem
+  have hnull := volume_orthogonal_singleton_eq_zero he0
   refine ae_eq_set.2 ⟨measure_mono_null (fun x hx => ?_) hnull, ?_⟩
   · have h1 : 0 ≤ inner ℝ x e := hx.1
     have h2 : ¬ 0 < inner ℝ x e := hx.2

@@ -496,14 +496,15 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   An element of `H^1(V)` lies in the closure `H̃^1(Ω)` of the test functions of `Ω` iff it
   vanishes almost everywhere outside `Ω` (`Rd.BoundedLipschitzDomain.mem_tildeSpace_iff`).
 * **Besov spaces on compact manifolds.** Let `M` be a compact smooth manifold, without boundary or
-  with boundary modelled on the half-space, and `μ` a smooth measure; the range of the model is a
-  Besov domain, a hypothesis class with the half-space and the whole space as instances
-  (`Rd.BesovDomain`), so manifolds with corners are not covered. A Besov atlas consists of finitely
-  many charts `κ_i`, a smooth partition of unity `ψ_i` subordinate to them and cut-offs
-  (`Manifold.BesovAtlas`), and `f ∈ B^s_{p,q}(M)` if every piece `(ψ_i f) ∘ κ_i⁻¹` has finite
-  intrinsic Besov quasi-norm on the model space. For `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞` this
-  depends neither on the atlas nor on the order of the differences (`Manifold.memBesov_iff`,
-  `Manifold.BesovAtlas.memBesov_iff_besovNorm_lt_top`).
+  with boundary modelled on the half-space, or with corners modelled on the quadrant, and `μ` a
+  smooth measure; the range of the model is a Besov domain, a hypothesis class
+  (`Rd.BesovDomain`): the half-space, the quadrant `{y : y_i ≥ 0 for all i}` of Mathlib's manifolds
+  with corners (`Rd.BesovDomain.range_euclideanQuadrant`) and the whole space are instances. A
+  Besov atlas consists of finitely many charts `κ_i`, a smooth partition of unity `ψ_i`
+  subordinate to them and cut-offs (`Manifold.BesovAtlas`), and `f ∈ B^s_{p,q}(M)` if every
+  piece `(ψ_i f) ∘ κ_i⁻¹` has finite intrinsic Besov quasi-norm on the model space. For
+  `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞` this depends neither on the atlas nor on the order of the
+  differences (`Manifold.memBesov_iff`, `Manifold.BesovAtlas.memBesov_iff_besovNorm_lt_top`).
 * **The trace theorem on compact manifolds with boundary.** Let `M` be as above with boundary,
   modelled on the half-space `{y ∈ ℝ^n : y_0 ≥ 0}`, and let `B^s_{p,q}(∂M)` consist of the `g`
   whose chart pieces restricted to the boundary hyperplane lie in its Besov space. For
@@ -532,7 +533,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, Triebel–Lizorkin spaces as interpolation spaces | ✅ | ✗ |
 | [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
-| [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary, smooth domains | ✅ | ✗ |
+| [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph domains, closures of convex ones and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary or with corners, smooth domains | ✅ | ✗ |
 
 Lean: ✅ every file proved without `sorry` · 🟡 some statement still `sorry` · ⬜ planned.
 Checked (human-checked): ✅ mathematics and documentation both reviewed by the author ·
@@ -569,7 +570,8 @@ that library builds itself.
   theorem.
 * **Traces and extensions**: the norm equivalence `H^{1/2}(Γ) ≅ B^{1/2}_{2,2}(Γ)` and the
   extension of `W^1_p` for `p ∈ {1, ∞}` and of higher order.
-* **Manifolds with corners**, with Lipschitz domains as Besov domains.
+* **Manifolds with corners**: a compact example (the cube with charts at its vertices), traces on
+  the faces and products of models.
 * **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,
   elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.
 * **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and their ball means and atoms on the

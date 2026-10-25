@@ -96,8 +96,9 @@ the approximate identities and the Littlewood–Paley kernels in [Tools from ana
   C (‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q})` (`Rd.CutoffDiffeo.modNormOn_applyLp_le`). On a
   Besov domain, a closed convex set with nonempty interior whose functions of finite intrinsic
   quasi-norm `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}` extend to `V` with
-  a bound (`Rd.BesovDomain`, a hypothesis class whose instances are `V`, the closed half-space
-  and the models of manifolds), `N_Ω(T f) ≤ C N_Ω(f)`
+  a bound (`Rd.BesovDomain`, a hypothesis class whose instances are `V`, the closed half-space,
+  the closures of convex Lipschitz graph domains and the models of manifolds with boundary, with
+  corners and without boundary), `N_Ω(T f) ≤ C N_Ω(f)`
   (`Rd.CutoffDiffeo.modNormOn_applyLp_le_modNormOn`), and the order `r > s` of the differences
   does not matter (`Rd.BesovDomain.modNormOn_order_le`).
 

@@ -31,6 +31,9 @@ chart, and \Cref{sec:surface-measure} builds from it the surface measure, $L_2(\
 traces into it. \Cref{sec:local-lipschitz-graphs} shows that the bounded Lipschitz domains are
 the sets of the usual definition by local Lipschitz graphs, with the open balls as examples, and
 \Cref{sec:convex-domains} adds the bounded open convex sets and the open unit cube.
+\Cref{sec:graph-besov-domains} shows that every Lipschitz graph domain has the extension property
+of Besov domains, and that the closures of convex Lipschitz graph domains and the quadrant, the
+model of manifolds with corners, are Besov domains.
 
 \section{Lipschitz graph domains}
 
@@ -1890,6 +1893,217 @@ The cube is convex, open as the intersection of the $n$ open slabs $\{x : 0 < x_
 bounded, since $\|x\| \leq \sqrt{n}$ on it (Mathlib's
 \texttt{EuclideanSpace.\allowbreak norm\_\allowbreak eq}); \Cref{thm:convex-lipschitz} applies.
 \end{proof}
+
+\section{Lipschitz domains and quadrants as Besov domains}
+\label{sec:graph-besov-domains}
+
+A Besov domain (\Cref{def:besov-domain}) is a closed convex set with nonempty interior whose
+functions of finite intrinsic quasi-norm extend to $V$ with a bound. The extension alone makes
+sense on every measurable set. Rychkov's extension \cite{Rychkov} gives it on every Lipschitz
+graph domain, and it passes to sets that agree with such a domain up to a null set. Hence the
+closures of convex Lipschitz graph domains and the quadrant, the model of manifolds with corners,
+are Besov domains. In this section $V$ is a finite-dimensional real inner product space, and
+\[
+  N_\Omega(f; r) = \|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q}
+\]
+is the intrinsic quasi-norm on a measurable set $\Omega \subseteq V$, with $N_\Omega(f) =
+N_\Omega(f; r)$ when the order $r$ is fixed.
+
+\begin{definition}[The extension property]
+\label{def:besov-extension-property}
+\lean{Rd.HasBesovExtension, Rd.BesovDomain.hasBesovExtension, Rd.BesovDomain.of_hasBesovExtension}
+\leanok
+\uses{def:besov-domain}
+A measurable set $\Omega \subseteq V$ has the extension property if for every $1 \leq p < \infty$,
+all $r \in \N$ and $s \in \R$ with $0 < s < r$, and every $1 \leq q \leq \infty$ there is
+$C < \infty$ such that every $f \in L_p(V)$ with $N_\Omega(f) < \infty$ agrees on $\Omega$ with
+some $F \in L_p(V)$ with $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq
+C N_\Omega(f)$. For every closed convex set $\Omega \subseteq V$ with nonempty interior, $\Omega$ is
+a Besov domain if and only if $\Omega$ has the extension property.
+\end{definition}
+
+The extension property is the extension condition of \Cref{def:besov-domain} without convexity.
+It is the same for sets that agree up to a null set, and it makes the order of the differences a
+free parameter, as on a Besov domain (\Cref{thm:besov-domain-invariance}). DeVore and Sharpley
+define Besov spaces on domains by the same moduli $\omega_r(f, t, \Omega)_p$ and construct
+extension operators to $\R^d$ on Lipschitz graph domains \cite[Section~4]{DeVoreSharpley} and on
+$(\varepsilon, \delta)$-domains \cite[Section~5]{DeVoreSharpley}.
+
+\begin{lemma}[The extension property up to null sets]
+\label{lem:besov-extension-null-sets}
+\lean{Rd.HasBesovExtension.congr_set, Rd.BesovDomain.of_ae_eq, Rd.BesovDomain.range_of_ae_eq}
+\leanok
+\uses{def:besov-extension-property, lem:null-set-domains}
+For all measurable sets $U, U' \subseteq V$ that agree up to a null set, if $U$ has the extension
+property, then so does $U'$. For every closed convex set $\Omega \subseteq V$ with nonempty
+interior and every measurable set $U \subseteq V$ with the extension property that agrees with
+$\Omega$ up to a null set, $\Omega$ is a Besov domain. For
+every real model with corners $I$ with model vector space $V$ and every measurable set
+$U \subseteq V$ with the extension property that agrees with $\operatorname{range} I$ up to a null
+set, $\operatorname{range} I$ is a Besov domain.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The cut-offs $1_U f$, $1_{U'} f$ and the moduli on $U$ and $U'$ agree (\Cref{lem:null-set-domains}),
+so $N_U = N_{U'}$, and $F$ agrees with $f$ on $U$ if and only if it does on $U'$; the proof keeps
+the constant $C$. The range of a real model with corners is closed, convex and has nonempty
+interior (Mathlib's
+\texttt{ModelWithCorners.\allowbreak isClosed\_\allowbreak range},
+\texttt{ModelWithCorners.\allowbreak convex\_\allowbreak range} and
+\texttt{ModelWithCorners.\allowbreak nonempty\_\allowbreak interior}).
+\end{proof}
+
+\begin{corollary}[The order of the differences]
+\label{cor:besov-extension-order}
+\lean{Rd.HasBesovExtension.modNormOn_order_le}
+\leanok
+\uses{def:besov-extension-property, thm:rd-besov, lem:restriction-moduli}
+For every measurable set $\Omega \subseteq V$ with the extension property, every
+$1 \leq p < \infty$, all $r, r' \in \N$ and $s \in \R$ with $0 < s < r$ and $s < r'$, and every
+$1 \leq q \leq \infty$, there is $C < \infty$ with $N_\Omega(f; r') \leq C N_\Omega(f; r)$ for every
+$f \in L_p(V)$ with $N_\Omega(f; r) < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+Extend $f$ to $F$ with $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq
+C_1 N_\Omega(f; r)$, change the order on $V$ (\Cref{thm:rd-besov}) and restrict,
+$N_\Omega(f; r') \leq \|F\|_p + \|(2^{ks} \omega_{r'}(F, 2^{-k})_p)_k\|_{\ell_q}$
+(\Cref{lem:restriction-moduli}).
+\end{proof}
+
+\begin{lemma}[The graph is a null set]
+\label{lem:lipschitz-graph-null}
+\lean{Rd.LipschitzGraph.volume_graph, Rd.LipschitzGraph.volume_frontier_domain,
+  Rd.LipschitzGraph.closure_domain_ae_eq}
+\leanok
+\uses{def:lipschitz-graph, lem:flattening, lem:lipschitz-null, thm:half-space-besov-domain}
+For every Lipschitz graph domain $\Omega = \{x : \varphi(x) < \langle x, e \rangle\}$, the graph
+$\{x : \varphi(x) = \langle x, e \rangle\}$ and the frontier of $\Omega$ are null sets, and
+$\overline{\Omega}$ agrees with $\Omega$ up to a null set.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The image of the hyperplane $e^\perp$ under the Lipschitz map $y \mapsto y + \varphi(y) e$ contains
+the graph (\Cref{lem:flattening}). The hyperplane is a null set
+(\Cref{thm:half-space-besov-domain}), and Lipschitz images of null sets are null sets
+(\Cref{lem:lipschitz-null}). The frontier of $\Omega$ lies in the graph (Mathlib's
+\texttt{frontier\_\allowbreak lt\_\allowbreak subset\_\allowbreak eq}), and a set with null
+frontier agrees with its closure up to a null set (Mathlib's \texttt{closure\_\allowbreak
+ae\_\allowbreak eq\_\allowbreak of\_\allowbreak null\_\allowbreak frontier}).
+\end{proof}
+
+The argument uses only the Lipschitz bound of $\varphi$; the preservation of the Lebesgue measure
+by the flattening (\Cref{lem:flattening}) uses $\varphi \in C^1$.
+
+\begin{theorem}[Lipschitz graph domains and Besov domains]
+\label{thm:graph-besov-domain}
+\lean{Rd.LipschitzGraph.hasBesovExtension, Rd.LipschitzGraph.convex_domain,
+  Rd.LipschitzGraph.domain_nonempty, Rd.BesovDomain.closure_lipschitzGraph}
+\leanok
+\uses{def:besov-extension-property, thm:graph-besov, lem:besov-extension-null-sets,
+  lem:lipschitz-graph-null}
+Every Lipschitz graph domain $\Omega = \{x : \varphi(x) < \langle x, e \rangle\}$ is nonempty and
+has the extension property. If $\varphi$ is convex, then $\Omega$ is convex and its closure
+$\overline{\Omega}$ is a Besov domain.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The domain contains $(\varphi(0) + 1) e$, since $\varphi$ is constant along $e$. Rychkov's extension
+agrees with $f$ on $\Omega$ and is bounded by $C N_\Omega(f)$; take $C$ as the constant of
+\Cref{thm:graph-besov}. For convex $\varphi$, $\Omega$ is a strict sublevel set of the convex
+function $\varphi - \langle e, \cdot \rangle$ (Mathlib's \texttt{ConvexOn.\allowbreak
+convex\_\allowbreak lt}), so $\Omega$ and $\overline{\Omega}$ are convex; $\Omega$ is open, so it
+lies in the interior of $\overline{\Omega}$, and \Cref{lem:lipschitz-graph-null} and
+\Cref{lem:besov-extension-null-sets} give the Besov domain.
+\end{proof}
+
+Examples with convex $\varphi$ are the half-spaces, the epigraphs of convex Lipschitz functions,
+the quadrant (\Cref{lem:quadrant-graph}) and the circular cones
+\[
+  \{x \in V : M \|x - \langle x, e \rangle e\| < \langle x, e \rangle\} .
+\]
+For non-convex $\varphi$ neither $\Omega$ nor $\overline{\Omega}$ is convex. $\Omega$ still has the
+extension property, but $\overline{\Omega}$ is not a Besov domain: the class asks for convexity,
+which the changes of variables of \Cref{thm:besov-domain-invariance} use.
+
+The open quadrant $\{y \in \R^n : y_i > 0 \text{ for every } i\}$ is a single Lipschitz graph
+domain, near the corner as well, in the diagonal direction.
+
+\begin{definition}[The diagonal and the smallest coordinate]
+\label{def:quadrant-graph}
+\lean{Rd.quadrantDir, Rd.quadrantDir_apply, Rd.quadrantMin}
+\leanok
+For every $n \in \N$, the diagonal direction of $\R^n$ is $e = (1, \dots, 1)/\sqrt{n}$. For every
+$n \geq 1$ and every $y \in \R^n$, the smallest coordinate of $y$ is $m(y) = \min_i y_i$.
+\end{definition}
+
+\begin{lemma}[The quadrant as a Lipschitz graph domain]
+\label{lem:quadrant-graph}
+\lean{Rd.inner_quadrantDir, Rd.norm_quadrantDir, Rd.quadrantMin_le, Rd.le_quadrantMin_iff,
+  Rd.lt_quadrantMin_iff, Rd.quadrantMin_add_smul, Rd.quadrantMin_le_add_norm,
+  Rd.abs_quadrantMin_sub_le, Rd.concaveOn_quadrantMin, Rd.LipschitzGraph.quadrant,
+  Rd.LipschitzGraph.quadrant_domain, Rd.LipschitzGraph.convexOn_quadrant_phi}
+\leanok
+\uses{def:quadrant-graph, def:lipschitz-graph}
+For every $n \in \N$ and every $y \in \R^n$, $\langle y, e \rangle = (y_1 + \dots + y_n)/\sqrt{n}$.
+Let $n \geq 1$. Then $\|e\| = 1$; for all $y, z \in \R^n$ and $t \in \R$,
+\begin{gather*}
+  m(y + t e) = m(y) + t/\sqrt{n} , \\
+  m(y) \leq m(z) + \|y - z\| , \qquad |m(y) - m(z)| \leq \|y - z\| ;
+\end{gather*}
+and $m$ is concave. The function $\varphi(y) = \langle y, e \rangle - \sqrt{n}\, m(y)$ is convex,
+$(1 + \sqrt{n})$-Lipschitz and constant along $e$, and its Lipschitz graph domain is
+\[
+  \{y \in \R^n : \varphi(y) < \langle y, e \rangle\} = \{y \in \R^n : y_i > 0 \text{ for every }
+  i\} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Every coordinate of $e$ is $1/\sqrt{n}$, and $\|e\|^2 = n \cdot (1/n) = 1$. Every coordinate of
+$y + te$ is $y_i + t/\sqrt{n}$, which gives the first identity. Since $y_i \leq z_i + |y_i - z_i|$
+and $|y_i - z_i| \leq \|y - z\|$ (Mathlib's \texttt{PiLp.\allowbreak norm\_\allowbreak
+apply\_\allowbreak le}), $m(y) - \|y - z\| \leq z_i$ for every $i$, so $m(y) - \|y - z\| \leq
+m(z)$; exchanging $y$ and $z$ gives the absolute value. As a minimum of linear functions, $m$ is
+concave, so $\varphi$ is convex. Then
+$|\varphi(y) - \varphi(z)| \leq |\langle y - z, e \rangle| + \sqrt{n}\, |m(y) - m(z)| \leq
+(1 + \sqrt{n}) \|y - z\|$, and $\varphi(y + te) = \langle y, e \rangle + t - \sqrt{n}\,(m(y) +
+t/\sqrt{n}) = \varphi(y)$. Finally $\varphi(y) < \langle y, e \rangle$ if and only if $m(y) > 0$.
+\end{proof}
+
+\begin{theorem}[The quadrant is a Besov domain]
+\label{thm:quadrant-besov-domain}
+\lean{Rd.quadrant_ae_eq, Rd.BesovDomain.range_euclideanQuadrant}
+\leanok
+\uses{lem:quadrant-graph, thm:graph-besov-domain, lem:besov-extension-null-sets,
+  def:besov-domain}
+For every $n \in \N$, the closed quadrant $\{y \in \R^n : y_i \geq 0 \text{ for every } i\}$
+agrees with the open quadrant $\{y \in \R^n : y_i > 0 \text{ for every } i\}$ up to a null set,
+and the closed quadrant, the range of Mathlib's model with corners
+\texttt{modelWithCornersEuclideanQuadrant}~$n$, is a Besov domain.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The open quadrant is the interior of the closed one (Mathlib's
+\texttt{interior\_\allowbreak euclideanQuadrant}), and the frontier of a convex set is a null set
+(Mathlib's \texttt{Convex.\allowbreak addHaar\_\allowbreak frontier}). For $n = 0$ the range is the
+whole space $\R^0$, a Besov domain by \Cref{def:besov-domain}. For $n \geq 1$ the open quadrant is a
+Lipschitz graph domain (\Cref{lem:quadrant-graph}) with the extension property
+(\Cref{thm:graph-besov-domain}), and \Cref{lem:besov-extension-null-sets} applies to the model.
+\end{proof}
+
+Hence the results of \Cref{ch:manifolds} that assume only that the range of the model is a Besov
+domain hold for compact manifolds with corners modelled on the quadrant: Besov atlases exist
+(\Cref{def:besov-atlas}), their quasi-norms are equivalent (\Cref{thm:atlas-independence}), and the
+Besov space neither depends on the atlas nor on the order of the differences
+(\Cref{def:manifold-besov}). The boundary spaces and the trace theorem of that chapter use the
+half-space model.
 
 \chapter{Traces on Lipschitz domains}
 \label{ch:traces-lipschitz}
@@ -6405,10 +6619,10 @@ This chapter works on a compact manifold $M$ modelled on a finite-dimensional re
 space $E$ with corners $I$, in the sense of Mathlib: charts $e$ map open sets of $M$ to open sets
 of a model space $H$, and the extended charts $\kappa = e.\mathrm{extend}\, I$ take values in the
 closed set $\Omega = \operatorname{range} I \subseteq E$, the half-space for manifolds with
-boundary and $E$ itself for manifolds without boundary. The results assume that $\Omega$ is a
-Besov domain (\Cref{def:besov-domain}), which holds for these two models
-(\Cref{thm:half-space-besov-domain}), so manifolds with corners are not covered; the boundary
-trace is built for the half-space model.
+boundary, the quadrant for manifolds with corners and $E$ itself for manifolds without boundary.
+The results assume that $\Omega$ is a Besov domain (\Cref{def:besov-domain}), which holds for these
+three models (\Cref{thm:half-space-besov-domain} and \Cref{thm:quadrant-besov-domain}); the
+boundary trace is built for the half-space model.
 
 \section{Smooth measures}
 
@@ -6632,20 +6846,25 @@ F(\Phi_{ik} y)$. The changes of charts are bounded into the intrinsic space on $
   Rd.LipschitzGraph.unflatten_flatten, Rd.LipschitzGraph.flatten_unflatten,
   Rd.LipschitzGraph.inner_flatten, Rd.LipschitzGraph.flattenEquiv,
   Rd.LipschitzGraph.continuous_flatten, Rd.LipschitzGraph.continuous_unflatten,
+  Rd.LipschitzGraph.lipschitzWith_unflatten, Rd.LipschitzGraph.graph_subset_image_unflatten,
   Rd.LipschitzGraph.contDiff_flatten, Rd.LipschitzGraph.contDiff_unflatten,
   Rd.LipschitzGraph.fderiv_phi_e, Rd.LipschitzGraph.hasFDerivAt_flatten,
   Rd.LipschitzGraph.det_fderiv_flatten, Rd.LipschitzGraph.measurePreserving_flatten}
 \leanok
 \uses{def:lipschitz-graph}
-For a Lipschitz graph domain $\{x : \varphi(x) < \langle x, e \rangle\}$ the flattening
-$F(x) = x - \varphi(x) e$ is a bijection of $V$ with inverse $y \mapsto y + \varphi(y) e$ and
-$\langle F(x), e \rangle = \langle x, e \rangle - \varphi(x)$. For smooth $\varphi$ both maps are
-smooth and $F$ preserves the Lebesgue measure.
+For a Lipschitz graph domain $\{x : \varphi(x) < \langle x, e \rangle\}$ with $M$-Lipschitz
+$\varphi$ the flattening $F(x) = x - \varphi(x) e$ is a bijection of $V$ with inverse
+$y \mapsto y + \varphi(y) e$ and $\langle F(x), e \rangle = \langle x, e \rangle - \varphi(x)$.
+The inverse is $(1 + M)$-Lipschitz, and the graph $\{x : \varphi(x) = \langle x, e \rangle\}$ lies
+in the image of $e^\perp$ under it. For smooth $\varphi$ both maps are smooth and $F$ preserves the
+Lebesgue measure.
 \end{lemma}
 
 \begin{proof}
 \leanok
 $\varphi$ is constant along $e$, so $\varphi(x - \varphi(x) e) = \varphi(x)$ and $D\varphi(x) e = 0$.
+The bound $\|(y + \varphi(y) e) - (z + \varphi(z) e)\| \leq \|y - z\| + |\varphi(y) - \varphi(z)|$
+gives the Lipschitz constant, and a point $x$ of the graph is the image of $F(x) \in e^\perp$.
 The derivative $\mathrm{id} - e \otimes D\varphi(x)$ is a transvection with determinant
 $1 - D\varphi(x) e = 1$ (Mathlib's \texttt{LinearMap.transvection.det}), and the change of variables
 formula gives $F_* \mathrm{vol} = \mathrm{vol}$.
