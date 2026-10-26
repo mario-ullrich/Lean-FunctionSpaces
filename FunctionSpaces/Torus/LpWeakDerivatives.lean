@@ -29,7 +29,8 @@ dense in the smooth functions.
   the derivatives `∂^α` of `Torus.HasWeakDeriv` (`Torus.hasWeakDeriv_iff_hasWeakLineDeriv`).
 * **Convolution**: for `1 ≤ p < ∞` and a Schwartz kernel `η` on `ℝ^d`, `(∂^v η) ⋆ f = η ⋆ ∂^v f`
   (`Torus.econvLp_iteratedLineDerivOp`) and `∂^v (η ⋆ f) = (∂^v η) ⋆ f`
-  (`Torus.hasWeakLineDeriv_econvLp`).
+  (`Torus.hasWeakLineDeriv_econvLp`); for every integrable kernel `Φ`, `Φ ⋆ ∂^v f = ∂^v (Φ ⋆ f)`
+  (`Torus.HasWeakLineDeriv.econvLp`).
 * **Sobolev spaces**: `f ∈ W^m_p(𝕋^d)` iff `∂^v f ∈ L_p` for all directions of order `≤ m`
   (`Torus.memSobolev_iff_forall_hasWeakLineDeriv`); `W^0_p = L_p`, `W^m_p` is a linear subspace,
   decreasing in `m`, and `W^m_r ⊆ W^m_p` for `p ≤ r`.
@@ -148,7 +149,8 @@ theorem lineSymbol_eq_sum [DecidableEq d] {k : ℕ} (v : Fin k → EuclideanSpac
 `v ∈ (ℝ^d)^k`: `ĝ(m) = σ_v(m) f̂(m)` for every `m ∈ ℤ^d`. This is the integral identity
 `∫ g φ = (-1)^k ∫ f ∂^v φ` tested with the trigonometric polynomials `φ`. The definition is meant
 for `1 ≤ p ≤ ∞`, where every element of `L_p(𝕋^d)` is integrable and its coefficients are
-integrals. -/
+integrals. It is the distributional derivative of the periodic lifts on `ℝ^d`
+(`Torus.hasWeakLineDeriv_iff_comp_proj`). -/
 def HasWeakLineDeriv {p : ℝ≥0∞} {k : ℕ} (v : Fin k → EuclideanSpace ℝ d)
     (f g : Lp ℂ p (volume : Measure (UnitAddTorus d))) : Prop :=
   ∀ m : d → ℤ, mFourierCoeff g m = lineSymbol v m * mFourierCoeff f m
@@ -277,6 +279,14 @@ theorem hasWeakLineDeriv_econvLp (hp : p ≠ ∞) (v : Fin k → EuclideanSpace 
       SchwartzMap.fourier_iteratedLineDerivOp_apply, ← SchwartzMap.fourier_coe, smul_eq_mul,
       lineSymbol]
     ring
+
+/-- **Convolution keeps weak derivatives**: if `g = ∂^v f` in `L_p(𝕋^d)`, `1 ≤ p < ∞`, then
+`Φ ⋆ g = ∂^v (Φ ⋆ f)` for every integrable kernel `Φ` on `ℝ^d`; both sides have the coefficients
+`𝓕Φ(m) σ_v(m) f̂(m)` (`Torus.mFourierCoeff_econvLp`). -/
+theorem HasWeakLineDeriv.econvLp (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ)
+    {f g : Lp ℂ p (volume : Measure (UnitAddTorus d))} (h : HasWeakLineDeriv v f g) :
+    HasWeakLineDeriv v (Torus.econvLp hp hΦ f) (Torus.econvLp hp hΦ g) := fun m => by
+  rw [mFourierCoeff_econvLp, mFourierCoeff_econvLp, h m, mul_left_comm]
 
 /-! ### Sobolev spaces -/
 

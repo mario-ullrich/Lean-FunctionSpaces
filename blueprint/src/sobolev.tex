@@ -3516,6 +3516,8 @@ coefficients of convolutions with kernels on $\R^d$ (\Cref{def:torus-econv}).
 \Cref{sec:torus-lp-weak-derivatives} defines the derivatives $\partial^v$ along directions
 $v \in (\R^d)^k$, proves their calculus, moves them through convolutions with Schwartz kernels,
 and describes $\Sob{m}{p}(\T^d)$ by directional derivatives.
+\Cref{sec:torus-periodic-distributions} identifies these weak derivatives with the distributional
+derivatives of the periodic lifts on $\R^d$, and classical derivatives with weak derivatives.
 \Cref{sec:torus-sobolev-triebel-lizorkin} proves $\Sob{m}{p}(\T^d) = \TL{m}{p}{2}(\T^d)$ for
 $1 < p < \infty$, and \Cref{sec:torus-sobolev-embedding} derives the Sobolev embeddings on the
 torus.
@@ -3756,7 +3758,8 @@ limits in $\C$ are unique. (6) $\hat e_n(m) = 1$ for $m = n$ and $0$ otherwise
 
 \begin{lemma}[Weak derivatives and convolution on the torus]
 \label{lem:torus-weak-derivative-convolution}
-\lean{Torus.econvLp_iteratedLineDerivOp, Torus.hasWeakLineDeriv_econvLp}
+\lean{Torus.econvLp_iteratedLineDerivOp, Torus.hasWeakLineDeriv_econvLp,
+  Torus.HasWeakLineDeriv.econvLp}
 \leanok
 \uses{def:torus-weak-line-derivative, thm:torus-coefficients-convolution,
   thm:torus-coefficients-uniqueness, lem:fourier-iterated-derivative}
@@ -3764,8 +3767,10 @@ Let $1 \leq p < \infty$, $k \in \N$, $v \in (\R^d)^k$ and let $\eta$ be a comple
 function on $\R^d$. For every $f \in L_p(\T^d)$, $(\partial^v \eta) * f$ is the weak derivative
 $\partial^v (\eta * f)$. For all $f, g \in L_p(\T^d)$ with $g = \partial^v f$,
 \[
-  (\partial^v \eta) * f = \eta * g .
+  (\partial^v \eta) * f = \eta * g ,
 \]
+and for every integrable kernel $\Phi$ on $\R^d$, $\Phi * g$ is the weak derivative
+$\partial^v (\Phi * f)$.
 \end{lemma}
 
 \begin{proof}
@@ -3775,7 +3780,9 @@ coefficient of $(\partial^v \eta) * f$ at $m$ is
 $\mathcal{F}(\partial^v \eta)(m) \, \hat f(m) = \sigma_v(m) \, \mathcal{F}\eta(m) \, \hat f(m)$.
 This is $\sigma_v(m)$ times the coefficient of $\eta * f$, and for $g = \partial^v f$ it is
 $\mathcal{F}\eta(m) \, \hat g(m)$, the coefficient of $\eta * g$. Apply
-\Cref{thm:torus-coefficients-uniqueness}.
+\Cref{thm:torus-coefficients-uniqueness}. The coefficient of $\Phi * g$ at $m$ is
+$\mathcal{F}\Phi(m) \, \sigma_v(m) \hat f(m)$, which is $\sigma_v(m)$ times the coefficient of
+$\Phi * f$.
 \end{proof}
 
 \begin{theorem}[Sobolev spaces on the torus by directional derivatives]
@@ -3811,6 +3818,265 @@ coefficients (\Cref{lem:torus-lp-coefficients}). Conversely, $\partial^\alpha f$
 $\partial^{v^\alpha} f$ (\Cref{lem:torus-weak-line-derivative-basic}). The only multi-index of
 order $0$ is $\alpha = 0$, with $\partial^0 f = f$; the other claims follow from (4) and (7) of
 \Cref{lem:torus-weak-line-derivative-basic}.
+\end{proof}
+
+\section{Periodic distributions}
+\label{sec:torus-periodic-distributions}
+
+A function $h$ on $\T^d$ lifts to the periodic function $h \circ \pi$ on $\R^d$, where
+$\pi \colon \R^d \to \T^d$ is the quotient map (\Cref{lem:torus-proj}). Periodic distributions,
+the distributions on $\R^d$ invariant under the translations by $\Z^d$, are the setting of the
+function spaces on the torus in Schmeisser and Triebel~\cite{SchmeisserTriebel}; the lifts of
+integrable functions on $\T^d$ are periodic distributions. Mathlib has distributions on open
+subsets of $\R^d$; this section shows that the weak derivatives of
+\Cref{def:torus-weak-line-derivative} are the weak derivatives of the lifts in the sense of
+\Cref{def:weak-line-derivative}, for every $1 \leq p \leq \infty$, and that classical derivatives
+of continuously differentiable lifts are weak derivatives. In this section a test function is a
+real smooth function with compact support on $\R^d$.
+
+\begin{lemma}[Classical derivatives are weak derivatives]
+\label{lem:weak-derivative-classical}
+\lean{Rd.fderiv_testSchwartz_apply, Rd.hasWeakLineDeriv_of_contDiff}
+\leanok
+\uses{def:weak-line-derivative, lem:weak-derivative-integral, def:test-schwartz,
+  lem:directional-derivatives-commute}
+Let $V$ be a finite-dimensional real inner product space and $\Omega \subseteq V$ open. For every
+continuously differentiable $F \colon V \to \C$ and every $w \in V$, the function
+$x \mapsto DF(x) w$ is the weak derivative $\partial_w F$ on $\Omega$. For every real test
+function $\varphi$ on $\Omega$ and all $x, w \in V$, the derivative of $\varphi$, regarded as a
+complex function, at $x$ in the direction $w$ is $(\partial_w \varphi)(x)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The second claim is \Cref{lem:directional-derivatives-commute} for the complex Schwartz function
+$\varphi$ of \Cref{def:test-schwartz}. Let $\varphi$ be a test function on $\Omega$. Since
+$\varphi$ has compact support and $F$ and $DF(\cdot) w$ are continuous, the products
+$\varphi \, DF(\cdot) w$, $(\partial_w \varphi) F$ and $\varphi F$ are integrable, and integration
+by parts (Mathlib's \texttt{integral\_\allowbreak mul\_\allowbreak fderiv\_\allowbreak
+eq\_\allowbreak neg\_\allowbreak fderiv\_\allowbreak mul\_\allowbreak of\_\allowbreak integrable})
+gives $\int \varphi \, DF(\cdot) w = -\int (\partial_w \varphi) F$. This is the identity of
+\Cref{lem:weak-derivative-integral} for $k = 1$.
+\end{proof}
+
+\begin{definition}[The periodic pairing]
+\label{def:torus-periodic-pairing}
+\lean{Torus.periodicPairing}
+\leanok
+\uses{lem:torus-proj}
+For every $1 \leq p \leq \infty$ and every test function $\varphi$ on $\R^d$, the periodic pairing
+of $\varphi$ is the map $L_p(\T^d) \to \C$,
+\[
+  h \mapsto \langle \varphi, h \rangle = \int_{\R^d} \varphi(x) \, h(\pi x) \, dx .
+\]
+\end{definition}
+
+The pairing evaluates the lift $h \circ \pi$, as a distribution on $\R^d$, at $\varphi$.
+
+\begin{lemma}[The periodic pairing]
+\label{lem:torus-periodic-pairing}
+\lean{Torus.locallyIntegrable_comp_proj_Lp, Torus.integrable_mul_comp_proj,
+  Torus.enorm_integral_mul_comp_proj_le, Torus.exists_norm_integral_mul_comp_proj_le,
+  Torus.integral_mul_comp_proj_add, Torus.integral_mul_comp_proj_smul,
+  Torus.periodicPairing_apply, Torus.periodicPairing_mFourierLp,
+  Torus.periodicPairing_iteratedLineDerivOp_mFourierLp}
+\leanok
+\uses{def:torus-periodic-pairing, lem:period-box-counting, lem:period-box-measure,
+  lem:torus-proj, lem:translation-fourier, lem:torus-line-symbol,
+  lem:fourier-iterated-derivative, lem:directional-derivatives-commute, def:test-schwartz}
+Let $1 \leq p \leq \infty$ and let $\varphi$ be a test function on $\R^d$.
+\begin{enumerate}
+  \item For every $h \in L_p(\T^d)$, the lift $h \circ \pi$ is locally integrable on $\R^d$, and
+    $x \mapsto \varphi(x) \, h(\pi x)$ is integrable. For all $M, R \in \R$ with
+    $|\varphi| \leq M$ and $\operatorname{supp} \varphi \subseteq B(0, R)$, the open ball, and
+    every $h \in L_p(\T^d)$,
+    \[
+      |\langle \varphi, h \rangle| \leq M \, (2R + 2)^d \, \|h\|_1
+        \leq M \, (2R + 2)^d \, \|h\|_p .
+    \]
+    The periodic pairing of $\varphi$ is a bounded linear functional on $L_p(\T^d)$.
+  \item For every $m \in \Z^d$, $\langle \varphi, e_m \rangle = \mathcal{F}\varphi(-m)$.
+  \item For all $k \in \N$, $v \in (\R^d)^k$ and $m \in \Z^d$,
+    \[
+      \langle \partial^v \varphi, e_m \rangle = (-1)^k \sigma_v(m) \, \langle \varphi, e_m \rangle .
+    \]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Local integrability is \Cref{lem:period-box-counting}, since $h$ is integrable on the
+probability space $\T^d$; a test function times a locally integrable function is integrable. The
+integrand vanishes outside $B(0, R)$, and
+$\int_{B(0,R)} |h(\pi x)| \, dx \leq (2R + 2)^d \|h\|_1$ (\Cref{lem:period-box-counting}), and
+$\|h\|_1 \leq \|h\|_p$ on the probability space $\T^d$. Linearity holds because the lifts of
+almost-everywhere identities on $\T^d$ hold almost everywhere on $\R^d$
+(\Cref{lem:period-box-measure}). (2) Since $e_m(t) = e_{-m}(-t)$ for every $t \in \T^d$
+(\Cref{lem:translation-fourier}), $\langle \varphi, e_m \rangle$ is the integral
+$\int \varphi(y) \, e_{-m}(-\pi y) \, dy$ of \Cref{lem:torus-proj} at $-m$. (3) By (2),
+\Cref{lem:directional-derivatives-commute} and \Cref{lem:fourier-iterated-derivative},
+$\langle \partial^v \varphi, e_m \rangle = \mathcal{F}(\partial^v \varphi)(-m)
+= \sigma_v(-m) \, \mathcal{F}\varphi(-m)$, and $\sigma_v(-m) = (-1)^k \sigma_v(m)$
+(\Cref{lem:torus-line-symbol}).
+\end{proof}
+
+\begin{lemma}[From the torus to the lifts]
+\label{lem:torus-weak-derivative-to-lift}
+\lean{Torus.periodicPairing_eq_of_mem_trigPolyLp, Torus.periodicPairing_lpBlock,
+  Torus.HasWeakLineDeriv.periodicPairing_eq, Torus.HasWeakLineDeriv.comp_proj}
+\leanok
+\uses{lem:torus-periodic-pairing, def:torus-weak-line-derivative, def:weak-line-derivative,
+  lem:weak-derivative-integral, thm:torus-coefficients-uniqueness, lem:torus-lp-blocks,
+  lem:torus-lp-blocks-trig, lem:torus-weak-derivative-convolution,
+  lem:torus-weak-line-derivative-basic, lem:period-box-measure}
+Let $1 \leq p \leq \infty$, $k \in \N$, $v \in (\R^d)^k$ and let $\varphi$ be a test function on
+$\R^d$.
+\begin{enumerate}
+  \item For every $n \in \N$ and all trigonometric polynomials $a, b \in L_p(\T^d)$ of degree
+    $< n$ with $b = \partial^v a$,
+    $\langle \varphi, b \rangle = (-1)^k \langle \partial^v \varphi, a \rangle$.
+  \item Let $p < \infty$. For all $f, g \in L_p(\T^d)$ with $g = \partial^v f$ and every
+    $j \in \N$, $\langle \varphi, \Delta_j g \rangle = (-1)^k \langle \partial^v \varphi,
+    \Delta_j f \rangle$ and $\langle \varphi, g \rangle = (-1)^k \langle \partial^v \varphi, f
+    \rangle$.
+  \item For all $f, g \in L_p(\T^d)$ with $g = \partial^v f$, the lift $g \circ \pi$ is the weak
+    derivative $\partial^v (f \circ \pi)$ on $\R^d$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Write $a = \sum_m \hat a(m) e_m$ and $b = \sum_m \hat b(m) e_m$, sums over the degrees
+$< n$ (\Cref{thm:torus-coefficients-uniqueness}). By (3) of \Cref{lem:torus-periodic-pairing},
+\[
+  \hat b(m) \langle \varphi, e_m \rangle = \sigma_v(m) \hat a(m) \langle \varphi, e_m \rangle
+  = (-1)^k \hat a(m) \langle \partial^v \varphi, e_m \rangle ,
+\]
+since $((-1)^k)^2 = 1$; sum over $m$. (2) The block $\Delta_j g = \psi_j * g$ is the weak
+derivative $\partial^v \Delta_j f$ (\Cref{lem:torus-weak-derivative-convolution}), and both blocks
+are trigonometric polynomials of degree $< 2^{j+1}$ (\Cref{lem:torus-lp-blocks-trig}), so (1)
+applies. The partial sums $\sum_{j < J} \Delta_j$ converge to $f$ and $g$ in $L_p(\T^d)$
+(\Cref{lem:torus-lp-blocks}), and both pairings are continuous
+(\Cref{lem:torus-periodic-pairing}). (3) The classes of $f$ and $g$ in $L_1(\T^d)$ satisfy
+$g = \partial^v f$ (\Cref{lem:torus-weak-line-derivative-basic}), and their lifts agree with
+those of $f$ and $g$ almost everywhere (\Cref{lem:period-box-measure}). So (2) for $p = 1$ gives
+$\int \varphi \, (g \circ \pi) = (-1)^k \int (\partial^v \varphi) (f \circ \pi)$ for every test
+function $\varphi$; both lifts are locally integrable (\Cref{lem:torus-periodic-pairing}), and
+\Cref{lem:weak-derivative-integral} applies.
+\end{proof}
+
+\begin{definition}[Modulated bumps]
+\label{def:torus-modulated-bump}
+\lean{Torus.modulatedBump}
+\leanok
+\uses{lem:torus-proj, thm:smooth-atomic-decomposition}
+Let $\chi$ be the normalised smooth bump of radius $1$ around $0$ of
+\Cref{thm:smooth-atomic-decomposition}: a smooth function on $\R^d$ with values in $[0, \infty)$,
+support in the ball $B(0, 1)$ and $\int \chi = 1$. For every $m \in \Z^d$, regarded as a point
+of $\R^d$, the modulated bump is
+\[
+  \eta_m(x) = \chi(x) \, e^{2\pi i \langle x, m \rangle} \qquad (x \in \R^d) .
+\]
+\end{definition}
+
+\begin{lemma}[From the lifts to the torus]
+\label{lem:torus-weak-derivative-from-lift}
+\lean{Torus.econv_eq_of_comp_proj, Torus.modulatedBump_apply,
+  Torus.hasCompactSupport_modulatedBump, Torus.fourier_modulatedBump,
+  Torus.HasWeakLineDeriv.of_comp_proj}
+\leanok
+\uses{def:torus-modulated-bump, def:weak-line-derivative, lem:weak-derivative-convolution-local,
+  lem:torus-lift-conv, lem:torus-proj, def:torus-econv, thm:torus-coefficients-convolution,
+  lem:fourier-iterated-derivative, def:torus-weak-line-derivative}
+Let $k \in \N$ and $v \in (\R^d)^k$.
+\begin{enumerate}
+  \item For all functions $f, g$ on $\T^d$ such that $g \circ \pi$ is the weak derivative
+    $\partial^v (f \circ \pi)$ on $\R^d$, and every complex Schwartz function $\eta$ on $\R^d$
+    with compact support, $\eta * g = (\partial^v \eta) * f$ at every point of $\T^d$.
+  \item For every $m \in \Z^d$, $\eta_m$ is a complex Schwartz function with compact support and
+    $\mathcal{F}\eta_m(m) = 1$.
+  \item Let $1 \leq p \leq \infty$. For all $f, g \in L_p(\T^d)$ such that $g \circ \pi$ is the
+    weak derivative $\partial^v (f \circ \pi)$ on $\R^d$, $g = \partial^v f$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Every point of $\T^d$ is $\pi x$ for some $x \in \R^d$ (\Cref{lem:torus-proj}), and at $\pi x$
+both sides are convolutions on $\R^d$ with the lifts (\Cref{lem:torus-lift-conv}). These agree by
+\Cref{lem:weak-derivative-convolution-local}, with $\Omega = \R^d$. (2) $\eta_m$ is smooth with
+the compact support of $\chi$, and
+$\mathcal{F}\eta_m(m) = \int e^{-2\pi i \langle x, m \rangle} \chi(x)
+e^{2\pi i \langle x, m \rangle} \, dx = \int \chi = 1$. (3) Let $m \in \Z^d$. By (1) with
+$\eta = \eta_m$, the coefficients at $m$ of $\eta_m * g$ and $(\partial^v \eta_m) * f$ agree. By
+\Cref{thm:torus-coefficients-convolution}, \Cref{lem:fourier-iterated-derivative} and (2) they are
+$\mathcal{F}\eta_m(m) \, \hat g(m) = \hat g(m)$ and
+$\mathcal{F}(\partial^v \eta_m)(m) \, \hat f(m) = \sigma_v(m) \hat f(m)$.
+\end{proof}
+
+\begin{theorem}[Weak derivatives on the torus as distributions of the lifts]
+\label{thm:torus-weak-derivative-lift}
+\lean{Torus.hasWeakLineDeriv_iff_comp_proj, Torus.hasWeakDeriv_iff_comp_proj,
+  Torus.memSobolev_iff_comp_proj}
+\leanok
+\uses{lem:torus-weak-derivative-to-lift, lem:torus-weak-derivative-from-lift,
+  def:torus-weak-line-derivative, def:weak-derivative, def:weak-line-derivative,
+  thm:torus-sobolev-directions, lem:torus-weak-line-derivative-basic}
+Let $1 \leq p \leq \infty$, $k \in \N$ and $v \in (\R^d)^k$. For all $f, g \in L_p(\T^d)$,
+$g = \partial^v f$ if and only if $g \circ \pi$ is the weak derivative $\partial^v (f \circ \pi)$
+on $\R^d$, that is,
+\[
+  \int_{\R^d} \varphi(x) \, g(\pi x) \, dx
+    = (-1)^k \int_{\R^d} (\partial^v \varphi)(x) \, f(\pi x) \, dx
+\]
+for every test function $\varphi$ on $\R^d$. For every $\alpha \in \N^d$ and all
+$f, g \in L_p(\T^d)$, $g = \partial^\alpha f$ if and only if $g \circ \pi$ is the weak derivative
+$\partial^{v^\alpha} (f \circ \pi)$ on $\R^d$. For every $m \in \N$ and every $f \in L_p(\T^d)$,
+$f \in \Sob{m}{p}(\T^d)$ if and only if for every $k \leq m$ and every $v \in (\R^d)^k$ some
+$g \in L_p(\T^d)$ has the lift $g \circ \pi = \partial^v (f \circ \pi)$, weakly on $\R^d$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first claim is (3) of \Cref{lem:torus-weak-derivative-to-lift} and (3) of
+\Cref{lem:torus-weak-derivative-from-lift}; the integral form is
+\Cref{lem:weak-derivative-integral}. The second follows with $\partial^\alpha =
+\partial^{v^\alpha}$ (\Cref{lem:torus-weak-line-derivative-basic}), and the third with
+\Cref{thm:torus-sobolev-directions}.
+\end{proof}
+
+So $\Sob{m}{p}(\T^d)$ consists of the $f \in L_p(\T^d)$ whose periodic lifts have all
+distributional derivatives of order at most $m$ in the lifts of $L_p(\T^d)$.
+
+\begin{theorem}[Classical derivatives on the torus]
+\label{thm:torus-classical-derivative}
+\lean{Torus.hasWeakLineDeriv_of_contDiff, Torus.hasWeakLineDeriv_of_contDiff_chain,
+  Fin.eq_prod_mul_of_succ_eq}
+\leanok
+\uses{lem:weak-derivative-classical, lem:torus-weak-derivative-from-lift,
+  def:torus-weak-line-derivative, def:torus-line-symbol, lem:weak-derivative-basic}
+Let $1 \leq p \leq \infty$.
+\begin{enumerate}
+  \item For every continuously differentiable $F \colon \R^d \to \C$, every $w \in \R^d$ and all
+    $f, g \in L_p(\T^d)$ with $f \circ \pi = F$ and $g \circ \pi = DF(\cdot) w$ almost
+    everywhere, $g = \partial_w f$.
+  \item For every $k \in \N$, every $v \in (\R^d)^k$, all functions
+    $F_0, \dots, F_k \colon \R^d \to \C$ such that $F_l$ is continuously differentiable and
+    $F_{l+1} = DF_l(\cdot) v_l$ for every $l < k$, and all $f_0, \dots, f_k \in L_p(\T^d)$ with
+    $f_l \circ \pi = F_l$ almost everywhere for every $l \leq k$, $f_k = \partial^v f_0$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) $DF(\cdot) w$ is the weak derivative $\partial_w F$ on $\R^d$
+(\Cref{lem:weak-derivative-classical}), so also of the lifts, which agree with $F$ and
+$DF(\cdot) w$ almost everywhere (\Cref{lem:weak-derivative-basic}). Apply (3) of
+\Cref{lem:torus-weak-derivative-from-lift}. (2) By (1),
+$\hat f_{l+1}(m) = 2\pi i \langle m, v_l \rangle \hat f_l(m)$ for every $l < k$ and $m \in \Z^d$.
+In every commutative monoid, $a_{l+1} = c_l a_l$ for every $l < k$ gives
+$a_k = (\prod_{l < k} c_l) \, a_0$ by induction on $k$; so
+$\hat f_k(m) = \sigma_v(m) \hat f_0(m)$.
 \end{proof}
 
 \section{Sobolev spaces as Triebel--Lizorkin spaces on the torus}

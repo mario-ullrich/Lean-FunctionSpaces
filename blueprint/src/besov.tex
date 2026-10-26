@@ -1489,7 +1489,8 @@ For a multi-index $\alpha \in \N^d$ the derivative $\partial^\alpha$ multiplies 
 coefficients by $(2\pi i k)^\alpha$. Defining weak derivatives through this rule is the
 distributional definition $\int g \, \varphi = (-1)^{|\alpha|} \int f \, \partial^\alpha
 \varphi$, tested against the monomials $\varphi = \overline{e_k}$, whose span is dense in
-the smooth functions. Mathlib has no distributions on the torus.
+the smooth functions. For $1 \leq p \leq \infty$ the weak derivatives are the distributional
+derivatives of the periodic lifts on $\R^d$ (\Cref{thm:torus-weak-derivative-lift}).
 
 \begin{definition}[Weak derivatives and $W^m_p(\T^d)$]
 \label{def:weak-derivative}
@@ -1569,8 +1570,8 @@ $((2\pi i k)^\alpha \hat f(k))_k$ is square-summable for $|\alpha| \leq m$, and
 \Cref{thm:torus-coefficients} and \Cref{def:torus-sobolev}.
 \end{proof}
 
-That the weak derivative of a smooth function is its classical derivative is integration
-by parts on the torus; it is not formalised.
+Classical derivatives of functions with continuously differentiable periodic lifts are weak
+derivatives (\Cref{thm:torus-classical-derivative}).
 
 \chapter{Filtrations and martingale differences}
 \label{ch:filtrations}

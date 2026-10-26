@@ -12,10 +12,11 @@ multipliers. For every `1 ≤ p < ∞` the Besov spaces are described by moduli 
 order: the kernels of `ℝ^d` act on `𝕋^d` by convolution with their periodisations, using Young's
 inequality on measurable groups of [Tools from analysis](Analysis.md) and the band-limited
 approximation of [Besov spaces on `ℝ^d`](Rd.md); the same kernels give smooth Littlewood–Paley
-blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. For `1 < p < ∞`, weak derivatives
-in `L_p` tested against trigonometric polynomials give `W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)`, with the
-Besov sandwich and the Sobolev embeddings. The restriction to a face of
-`𝕋^(n+1)` is the model case of the trace theorem.
+blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. Weak derivatives in `L_p`,
+`1 ≤ p ≤ ∞`, defined by Fourier coefficients, are the distributional derivatives of the periodic
+lifts on `ℝ^d`; for `1 < p < ∞` they give `W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)`, with the Besov
+sandwich and the Sobolev embeddings. The restriction to a face of `𝕋^(n+1)` is the model case of
+the trace theorem.
 
 ## Main results
 
@@ -69,8 +70,14 @@ Besov sandwich and the Sobolev embeddings. The restriction to a face of
   (`Torus.memSobolev_iff_memBesov`). In every `L_p(𝕋^d)`, `1 ≤ p ≤ ∞`, the same rule
   `ĝ(m) = σ_v(m) f̂(m)` with `σ_v(m) = ∏_l 2πi ⟪m, v_l⟫` defines weak derivatives `∂^v` along
   directions `v ∈ (ℝ^d)^k`, tested against trigonometric polynomials
-  (`Torus.HasWeakLineDeriv`). An element of `L_p(𝕋^d)` is determined by its Fourier
-  coefficients (`Torus.eq_of_mFourierCoeff_eq`), so the weak derivative is unique; it is linear
+  (`Torus.HasWeakLineDeriv`). These are the distributional derivatives of the periodic lifts:
+  `g = ∂^v f` iff `g ∘ π = ∂^v (f ∘ π)` in Mathlib's `𝓓'(ℝ^d)` for the quotient map
+  `π : ℝ^d → 𝕋^d` (`Torus.hasWeakLineDeriv_iff_comp_proj`, `Torus.hasWeakDeriv_iff_comp_proj`,
+  `Torus.memSobolev_iff_comp_proj`), through the pairing `h ↦ ∫ φ(x) h(π x) dx` with test
+  functions (`Torus.periodicPairing`); classical derivatives of `C^1` lifts are weak derivatives
+  (`Torus.hasWeakLineDeriv_of_contDiff`, `Torus.hasWeakLineDeriv_of_contDiff_chain`). An
+  element of `L_p(𝕋^d)` is determined by its Fourier coefficients
+  (`Torus.eq_of_mFourierCoeff_eq`), so the weak derivative is unique; it is linear
   and passes to limits, for `p < ∞` it commutes with convolution by Schwartz kernels
   (`Torus.econvLp_iteratedLineDerivOp`), and `f ∈ W^m_p(𝕋^d)` iff `∂^v f ∈ L_p` for all
   directions of order `≤ m` (`Torus.memSobolev_iff_forall_hasWeakLineDeriv`). For `d ≥ 1` and
@@ -132,6 +139,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Weak derivatives along directions in `L_p(𝕋^d)`, `W^m_p(𝕋^d)` by them | ✅ | ✗ | `Torus/LpWeakDerivatives` |
 | `W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)` for `1 < p < ∞`, the Besov sandwich, local means | ✅ | ✗ | `Torus/SobolevTriebelLizorkin` |
 | Embeddings of `W^m_p(𝕋^d)` into `L_r`, `C(𝕋^d)`, `W^k_r(𝕋^d)` | ✅ | ✗ | `Torus/SobolevEmbedding` |
+| Weak and classical derivatives of periodic lifts | ✅ | ✗ | `Torus/PeriodicDistributions` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

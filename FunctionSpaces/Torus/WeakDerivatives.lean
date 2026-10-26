@@ -17,12 +17,13 @@ derivative** `∂^α f` of `f ∈ L_p` (`Torus.HasWeakDeriv`) if
 `ĝ(k) = (2πi k)^α f̂(k)`   for all `k ∈ ℤ^d`.
 
 This is the distributional definition `∫ g φ = (-1)^|α| ∫ f ∂^α φ`, tested against the
-trigonometric monomials `φ = e_{-k}`; Mathlib has no distributions on the torus, and the
-monomials suffice because their span is dense.  The **Sobolev space** `W^m_p(𝕋^d)`,
-`m ∈ ℕ`, consists of the `f ∈ L_p` all of whose weak derivatives of order `|α| ≤ m` lie in
-`L_p` (`Torus.MemSobolev`).  The definitions are for every exponent `p`; the theorems below,
-apart from `Torus.hasWeakDeriv_zero`, are for `p = 2`.  `FunctionSpaces.Torus.LpWeakDerivatives`
-develops the calculus for `1 ≤ p ≤ ∞`.
+trigonometric monomials `φ = e_{-k}`, whose span is dense.  For `1 ≤ p ≤ ∞` the weak derivative
+`∂^α f` is the distributional derivative of the periodic lift `f ∘ π` on `ℝ^d`
+(`Torus.hasWeakDeriv_iff_comp_proj`).  The **Sobolev space**
+`W^m_p(𝕋^d)`, `m ∈ ℕ`, consists of the `f ∈ L_p` all of whose weak derivatives of order
+`|α| ≤ m` lie in `L_p` (`Torus.MemSobolev`).  The definitions are for every exponent `p`; the
+theorems below, apart from `Torus.hasWeakDeriv_zero`, are for `p = 2`.
+`FunctionSpaces.Torus.LpWeakDerivatives` develops the calculus for `1 ≤ p ≤ ∞`.
 
 **Coincidence** (`Torus.memSobolev_iff`, `Torus.memSobolev_iff_memBesov`):
 
@@ -31,8 +32,8 @@ develops the calculus for `1 ≤ p ≤ ∞`.
 because the symbols of order `≤ m` and the weight `(1 + max_i |k_i|)^m` dominate each other:
 `|(2πi k)^α| ≤ (2π)^m (1 + max_i |k_i|)^m` for `|α| ≤ m` (`Torus.norm_derivSymbol_le`), and
 `(1 + max_i |k_i|)^m ≤ 2^m (1 + ∑_j |k_j|^m)`, where `|k_j|^m` is at most the symbol of
-`∂_j^m` (`Torus.one_add_deg_pow_le`).  The identification of the weak derivative of a smooth
-function with its classical derivative (integration by parts on the torus) is not formalised.
+`∂_j^m` (`Torus.one_add_deg_pow_le`).  For functions with `C^1` lifts the classical derivatives
+are the weak derivatives (`Torus.hasWeakLineDeriv_of_contDiff`).
 -/
 
 @[expose] public section

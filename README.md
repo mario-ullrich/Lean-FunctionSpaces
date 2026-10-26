@@ -403,9 +403,13 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   derivative `∂^α f` of `f ∈ L_p(𝕋^d)` if `ĝ(k) = (2πi k)^α f̂(k)` for all `k ∈ ℤ^d`, the
   integral identity tested against trigonometric polynomials (`Torus.HasWeakDeriv`), and let
   `W^m_p(𝕋^d)` consist of the `f` all of whose weak derivatives of order `|α| ≤ m` lie in
-  `L_p(𝕋^d)` (`Torus.MemSobolev`). Then `f ∈ W^m_p(𝕋^d)` iff `f ∈ F^m_{p,2}(𝕋^d)`
-  (`Torus.memSobolev_iff_memTriebelLizorkin`), with named constants in both directions
-  (`Torus.triebelLizorkinNorm_le_of_hasWeakLineDeriv`, `Torus.sobolevToTLConst`,
+  `L_p(𝕋^d)` (`Torus.MemSobolev`). These weak derivatives are the distributional derivatives of
+  the periodic lifts: for `1 ≤ p ≤ ∞`, `g = ∂^α f` iff `g ∘ π = ∂^α (f ∘ π)` in Mathlib's
+  `𝓓'(ℝ^d)`, where `π : ℝ^d → 𝕋^d` is the quotient map (`Torus.hasWeakDeriv_iff_comp_proj`,
+  `Torus.hasWeakLineDeriv_iff_comp_proj`), and the classical derivatives of `C^1` lifts are weak
+  derivatives (`Torus.hasWeakLineDeriv_of_contDiff`). Then `f ∈ W^m_p(𝕋^d)` iff
+  `f ∈ F^m_{p,2}(𝕋^d)` (`Torus.memSobolev_iff_memTriebelLizorkin`), with named constants in
+  both directions (`Torus.triebelLizorkinNorm_le_of_hasWeakLineDeriv`, `Torus.sobolevToTLConst`,
   `Torus.exists_hasWeakLineDeriv_of_memTriebelLizorkin`, `Torus.tlToSobolevConst`); the proof
   transfers the vector-valued singular integrals of `ℝ^d` to the torus by localising the
   periodic lift (`Torus.eLpNorm_lqNorm_econv_le`, `Torus.eLpNorm_sum_econv_le`). Hence
@@ -595,7 +599,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, couples, their K-method, the interpolation property and the reiteration theorem, approximation spaces as interpolation spaces, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
 | [**Besov and Sobolev spaces on measure spaces**](docs/MeasureSpaces.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, Besov spaces as interpolation spaces, spectral schemes, continuous spectral bases | ✅ | ✗ |
 | [**Tools from analysis**](docs/Analysis.md): `L_p` norms, the inclusion `L_r ↪ L_p`, Young's inequality, mixed norms, differences and the translation algebra, convolution, approximate identities, Littlewood–Paley kernels, test functions in the Schwartz space, dyadic cubes and cells, the Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, weak type and Marcinkiewicz interpolation, `L_p` norms by duality | ✅ | ✗ |
-| [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness and smooth Littlewood–Paley blocks for all `p`, interpolation of Besov spaces by differences, `W^m_2` by Fourier multipliers, weak derivatives in `L_p` tested against trigonometric polynomials, `W^m_p = F^m_{p,2}` for `1 < p < ∞` with the Besov sandwich and the Sobolev embeddings, the trace on a face, the restriction for continuous functions | ✅ | ✗ |
+| [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness and smooth Littlewood–Paley blocks for all `p`, interpolation of Besov spaces by differences, `W^m_2` by Fourier multipliers, weak derivatives in `L_p` as distributional derivatives of the periodic lifts, `W^m_p = F^m_{p,2}` for `1 < p < ∞` with the Besov sandwich and the Sobolev embeddings, the trace on a face, the restriction for continuous functions | ✅ | ✗ |
 | [**Intervals, the cube, splines and wavelets**](docs/IntervalCube.md): piecewise polynomials and splines on `[0, 1]`, the circle and `[0, 1]^d`, Whitney's inequality, coordinate and isotropic moduli, multiwavelets, the Haar system | ✅ | ✗ |
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
 | [**Besov spaces on `ℝ^d`**](docs/Rd.md): band-limited approximation, Littlewood–Paley blocks, differences, Sobolev–Slobodeckij norms, local means, kernel majorants, atoms, invariance under changes of variables, Besov spaces as interpolation spaces | ✅ | ✗ |
@@ -645,9 +649,8 @@ that library builds itself.
   elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.
 * **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and their ball means and atoms on the
   torus.
-* **Sobolev spaces**: Sobolev spaces on the torus for all `p` through distributions, Mihlin
-  multipliers and `H^{s,p}` for `s < 0`; the Jawerth–Franke embeddings with Besov targets,
-  Hardy–Littlewood–Sobolev for Riesz potentials, `p = n`.
+* **Sobolev spaces**: Mihlin multipliers and `H^{s,p}` for `s < 0`; the Jawerth–Franke
+  embeddings with Besov targets, Hardy–Littlewood–Sobolev for Riesz potentials, `p = n`.
 * **Higher smoothness**: splines on domains; for the Daubechies wavelets the sharp `L_p`
   exponents of the scaling functions, Hölder exponents beyond D4, and `ℝ^d`.
 * **The quasi-Banach range** `0 < p, q < 1`, the setting of nonlinear `n`-term approximation.

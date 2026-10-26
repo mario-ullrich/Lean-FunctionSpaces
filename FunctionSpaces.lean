@@ -168,6 +168,7 @@ public import FunctionSpaces.Torus.LpFourierCoefficients
 public import FunctionSpaces.Torus.LpWeakDerivatives
 public import FunctionSpaces.Torus.SobolevTriebelLizorkin
 public import FunctionSpaces.Torus.SobolevEmbedding
+public import FunctionSpaces.Torus.PeriodicDistributions
 public import FunctionSpaces.Interval.Differences
 public import FunctionSpaces.Interval.Modulus
 public import FunctionSpaces.Interval.Polynomials
@@ -737,6 +738,8 @@ and the theorems that their characterisations agree. The library builds on
   local means.
 * `FunctionSpaces.Torus.SobolevEmbedding`: the embeddings of `W^m_p(𝕋^d)` into `L_r`, into
   continuous functions and into `W^k_r(𝕋^d)`.
+* `FunctionSpaces.Torus.PeriodicDistributions`: weak derivatives on the torus as distributional
+  derivatives of the periodic lifts on `ℝ^d`, and classical derivatives of `C^1` lifts.
 
 ### Intervals
 
