@@ -33,8 +33,9 @@ measure-preserving map between measure spaces.
 * **Cutoffs** (`Rd.HasWeakLineDeriv.mul_of_tsupport_subset`,
   `Rd.eLpNorm_mul_add_fderiv_mul_le`, `Rd.eLpNorm_mul_le_of_tsupport_subset`): if `g = ∂_w f` on
   `O ∩ B` and the smooth `χ` has closed support in `B`, then `χ g + (∂_w χ) f = ∂_w (χ f)` on `O`,
-  with the `L_p` bounds; smooth cutoffs equal to `1` near a compact set exist
-  (`Rd.exists_contDiff_eventuallyEq_one`), with bounded derivatives
+  with the `L_p` bounds, on `V` in the norm `‖f‖_p + ∑_i ‖g_i‖_p`
+  (`Rd.eLpNorm_mul_add_sum_le_of_tsupport_subset`); smooth cutoffs equal to `1` near a compact
+  set exist (`Rd.exists_contDiff_eventuallyEq_one`), with bounded derivatives
   (`Rd.exists_norm_fderiv_gridBasis_le`).
 * **Mollification on open sets** (`Rd.fderiv_conv_apply_eq_conv`,
   `Rd.exists_tendsto_contDiff_of_hasWeakLineDeriv`): mollification commutes with weak
@@ -520,6 +521,38 @@ theorem norm_le_one_of_forall_mem_Icc {α : Type*} {χ : α → ℝ} (h : ∀ x,
     (x : α) : ‖χ x‖ ≤ 1 := by
   rw [Real.norm_eq_abs, abs_of_nonneg (h x).1]
   exact (h x).2
+
+/-- **The bound of a cutoff on `V`**: for `1 ≤ p`, an open `O`, a smooth `χ` with values in
+`[0, 1]`, closed support in `O` and `|∂_{e_i} χ| ≤ d_i`, and all `f`, `g_i`,
+`‖χ f‖_p + ∑_i ‖χ g_i + (∂_{e_i} χ) f‖_p ≤ (1 + ∑_i d_i) (‖f‖_{L_p(O)} + ∑_i ‖g_i‖_{L_p(O)})`
+(`Rd.eLpNorm_mul_le_of_tsupport_subset` and `Rd.eLpNorm_mul_add_fderiv_mul_le` on `V`). -/
+theorem eLpNorm_mul_add_sum_le_of_tsupport_subset {p : ℝ≥0∞} (hp : 1 ≤ p) {χ : V → ℝ}
+    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (hχO : tsupport χ ⊆ O)
+    (hχ01 : ∀ x, χ x ∈ Icc (0 : ℝ) 1) {d : Fin (finrank ℝ V) → ℝ≥0}
+    (hd : ∀ i x, ‖fderiv ℝ χ x (gridBasis V i)‖ ≤ d i) (f : V → ℂ)
+    (g : Fin (finrank ℝ V) → V → ℂ) :
+    eLpNorm (fun x => (χ x : ℂ) * f x) p volume + ∑ i, eLpNorm
+        (fun x => (χ x : ℂ) * g i x + (fderiv ℝ χ x (gridBasis V i) : ℂ) * f x) p volume ≤
+      (1 + ∑ i, (d i : ℝ≥0∞)) *
+        (eLpNorm f p (volume.restrict O) + ∑ i, eLpNorm (g i) p (volume.restrict O)) := by
+  have h1 : ∀ x, ‖χ x‖ ≤ ((1 : ℝ≥0) : ℝ) := fun x =>
+    (norm_le_one_of_forall_mem_Icc hχ01 x).trans_eq NNReal.coe_one.symm
+  have hF := eLpNorm_mul_le_of_tsupport_subset (O := ⊤) (B := O) (f := f) (p := p)
+    hχ.continuous hχO h1
+  have hG := fun i => eLpNorm_mul_add_fderiv_mul_le (O := ⊤) (B := O) (f := f) (g := g i)
+    hp hχ hχO h1 (hd i)
+  simp only [volume_restrict_top, top_inf_eq, ENNReal.coe_one, one_mul] at hF hG
+  calc _ ≤ eLpNorm f p (volume.restrict O) + ∑ i, (eLpNorm (g i) p
+        (volume.restrict O) + d i * eLpNorm f p (volume.restrict O)) :=
+        add_le_add hF (Finset.sum_le_sum fun i _ => hG i)
+    _ ≤ _ := by
+        rw [Finset.sum_add_distrib, ← Finset.sum_mul]
+        calc _ ≤ eLpNorm f p (volume.restrict O) +
+              (∑ i, eLpNorm (g i) p (volume.restrict O) +
+                (∑ i, (d i : ℝ≥0∞)) * eLpNorm f p (volume.restrict O)) +
+              (∑ i, (d i : ℝ≥0∞)) * ∑ i, eLpNorm (g i) p (volume.restrict O) :=
+              le_self_add
+          _ = _ := by ring
 
 end Cutoff
 

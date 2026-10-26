@@ -31,7 +31,8 @@ dimension `n ≥ 1`, and `1 < p < ∞`. There is a bounded linear operator `E` f
 * **Bounded Lipschitz domains**: the boundary and inner patches carry extension operators
   (`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_boundary`,
   `Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_interior`), pasted to one from `Ω`
-  (`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp`). The value of every jet of `W^1_p(Ω)`
+  (`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_of_patches`, for every `1 ≤ p ≤ ∞`;
+  `Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp`). The value of every jet of `W^1_p(Ω)`
   lies in `W^1_p(Ω)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet`).
 -/
 
@@ -433,15 +434,22 @@ theorem exists_sobolevExtensionOp_interior [Nontrivial V] (hp1 : 1 < p) (hp : p 
   show x - y ∈ Ω.carrier
   simpa using notMem_of_dist_lt_infDist hx'
 
-/-- **The extension operator with a finite constant**: for a bounded Lipschitz domain `Ω` in
-dimension `n ≥ 1` and `1 < p < ∞` there is an extension operator from `Ω` with a finite constant
-(the patches of `Rd.BoundedLipschitzDomain.patch`, pasted by `Rd.sobolevExtensionOp_of_cover`). -/
-theorem exists_sobolevExtensionOp [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) :
+/-- **Pasting the patch operators**: for a bounded Lipschitz domain `Ω` in dimension `n ≥ 1` and
+`1 ≤ p ≤ ∞`, if for every `ε > 0` and every `j` there is an extension operator from the boundary
+patch `Ω ∩ B(c_j, ρ_j - 2ε)` with a finite constant, and for every `δ > 0` one from the inner patch
+`{x ∈ Ω : infDist(x, Ωᶜ) > 2δ}`, then there is an extension operator from `Ω` with a finite
+constant (the patches of `Rd.BoundedLipschitzDomain.patch`, pasted by
+`Rd.sobolevExtensionOp_of_cover`). -/
+theorem exists_sobolevExtensionOp_of_patches [Nontrivial V]
+    (hbd : ∀ ε : ℝ, 0 < ε → ∀ j : Fin Ω.N, ∃ C : ℝ≥0∞, C ≠ ∞ ∧ Nonempty (SobolevExtensionOp p
+      Ω.toOpens (Ω.carrier ∩ ball (Ω.center j) (Ω.radius j - 2 * ε)) C))
+    (hin : ∀ δ : ℝ, 0 < δ → ∃ C : ℝ≥0∞, C ≠ ∞ ∧ Nonempty (SobolevExtensionOp p Ω.toOpens
+      (Ω.carrier ∩ {x : V | 2 * δ < infDist x Ω.carrierᶜ}) C)) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ Nonempty (SobolevExtensionOp p Ω.toOpens Ω.carrier C) := by
   obtain ⟨ε, hε0, hε⟩ := Ω.exists_shrink
   obtain ⟨δ, hδ0, hδ⟩ := Ω.exists_interior_margin Ω.nonempty_compl hε
-  choose Cb hCb hb using fun j => Ω.exists_sobolevExtensionOp_boundary hp1 hp hε0 j
-  obtain ⟨C0, hC0, h0⟩ := Ω.exists_sobolevExtensionOp_interior hp1 hp hδ0
+  choose Cb hCb hb using hbd ε hε0
+  obtain ⟨C0, hC0, h0⟩ := hin δ hδ0
   refine sobolevExtensionOp_of_cover (O := Ω.toOpens) (Ω.patch ε δ) (Ω.isOpen_patch ε δ)
     (Ω.isBounded_patch ε hδ0.le) (Ω.closure_subset_iUnion_patch hε hδ)
     (C := fun i => i.elim C0 Cb) (fun i => ?_) (fun i => ?_)
@@ -451,6 +459,17 @@ theorem exists_sobolevExtensionOp [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) 
   · cases i with
     | none => exact h0.some
     | some j => exact (hb j).some
+
+/-- **The extension operator with a finite constant**: for a bounded Lipschitz domain `Ω` in
+dimension `n ≥ 1` and `1 < p < ∞` there is an extension operator from `Ω` with a finite constant
+(`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_of_patches` with the patch operators
+`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_boundary` and
+`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_interior`). -/
+theorem exists_sobolevExtensionOp [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ Nonempty (SobolevExtensionOp p Ω.toOpens Ω.carrier C) :=
+  Ω.exists_sobolevExtensionOp_of_patches
+    (fun _ hε j => Ω.exists_sobolevExtensionOp_boundary hp1 hp hε j)
+    (fun _ hδ => Ω.exists_sobolevExtensionOp_interior hp1 hp hδ)
 
 /-- **The extension operator for `W^1_p`** (Calderón and Stein, here by Rychkov's extension): for a
 bounded Lipschitz domain `Ω` in dimension `n ≥ 1` and `1 < p < ∞`, a bounded linear operator `E`

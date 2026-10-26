@@ -128,6 +128,7 @@ public import FunctionSpaces.Domains.Extension.SobolevExtension
 public import FunctionSpaces.Domains.Extension.SobolevExtensionOperator
 public import FunctionSpaces.Domains.Extension.HalfSpaceReflection
 public import FunctionSpaces.Domains.Extension.ReflectionExtension
+public import FunctionSpaces.Domains.Extension.ReflectionExtensionOperator
 public import FunctionSpaces.Domains.Extension.HigherDivergenceKernels
 public import FunctionSpaces.Domains.Extension.HigherSobolevExtension
 public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
@@ -612,12 +613,16 @@ and the theorems that their characterisations agree. The library builds on
   `W^1_p(Ω) → W^1_p(ℝ^d)` for `1 < p < ∞` as a bounded linear right inverse of the restriction.
 * `FunctionSpaces.Domains.Extension.HalfSpaceReflection`: the open half-space, the reflection
   across a hyperplane, cutoffs near the hyperplane, integration by parts on the half-space, and
-  the weak derivatives and `L_p` bounds of the even reflection.
+  the linearity, weak derivatives and `L_p` bounds of the even reflection.
 * `FunctionSpaces.Domains.Extension.ReflectionExtension`: the flattening of a Lipschitz graph
-  domain as a measure-preserving map, the extension by reflection across the graph with its weak
-  derivatives and `L_p` bounds, cutoffs from a bounded Lipschitz domain to its graph domains, and
-  the extension theorem `W^1_p(Ω) = W^1_p(ℝ^d)|_Ω` for `1 ≤ p ≤ ∞` with a bound on a bounded
-  Lipschitz domain.
+  domain as a measure-preserving map, the extension by reflection across the graph with its
+  linearity, weak derivatives and `L_p` bounds, cutoffs from a bounded Lipschitz domain to its
+  graph domains, and the extension theorem `W^1_p(Ω) = W^1_p(ℝ^d)|_Ω` for `1 ≤ p ≤ ∞` with a
+  bound on a bounded Lipschitz domain.
+* `FunctionSpaces.Domains.Extension.ReflectionExtensionOperator`: linear extensions of functions
+  as extension operators on jets, the patches by reflection as linear extensions, and an extension
+  operator `W^1_p(Ω) → W^1_p(ℝ^d)` built by reflection for `1 ≤ p ≤ ∞` as a bounded linear right
+  inverse of the restriction.
 * `FunctionSpaces.Domains.Extension.HigherDivergenceKernels`: weighted dilation averages, their
   writing as sums of derivatives of order `m` of the higher divergence kernels when the weight has
   vanishing moments, the smoothed bump with smooth moment and kernel weights, and the local means

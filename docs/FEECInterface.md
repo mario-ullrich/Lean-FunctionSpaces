@@ -186,8 +186,9 @@ other; Lean-FunctionSpaces follows its statement shapes where that costs nothing
 ### 4.3 `H^1` on bounded Lipschitz domains and the extension theorem H.2 (step 2 of the proposal)
 
 Files `FunctionSpaces/Domains/Sobolev/LipschitzDomainH1.lean`,
-`FunctionSpaces/Domains/Extension/SobolevExtension.lean` and
-`FunctionSpaces/Domains/Extension/ReflectionExtension.lean`;
+`FunctionSpaces/Domains/Extension/SobolevExtension.lean`,
+`FunctionSpaces/Domains/Extension/ReflectionExtension.lean` and
+`FunctionSpaces/Domains/Extension/ReflectionExtensionOperator.lean`;
 `Ω : Rd.BoundedLipschitzDomain V` (X.1), with `Ω.carrier` the open set and
 `Ω.toOpens : Opens V` the same set as an element of `Opens V`.
 
@@ -226,8 +227,15 @@ Files `FunctionSpaces/Domains/Sobolev/LipschitzDomainH1.lean`,
   `Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet`). A chosen operator is
   `Rd.BoundedLipschitzDomain.sobolevExtensionL`, and
   `Rd.exists_extensionL_of_isBoundedLipschitzDomain` is the same for the set-level definition
-  `Rd.IsBoundedLipschitzDomain`. The theorem is of first order. Membership form, for every
-  `1 ≤ p ≤ ∞`:
+  `Rd.IsBoundedLipschitzDomain`. For every `1 ≤ p ≤ ∞` there is such an operator, built by
+  reflection: `Rd.BoundedLipschitzDomain.exists_extensionL_of_one_le : ∃ E :
+  Rd.weakSobolevJet p Ω.toOpens →L[ℂ] Rd.sobolevJet p, (Rd.sobolevJet.restrictL Ω.toOpens).comp E
+  = ContinuousLinearMap.id ℂ _ ∧ ∀ u, MemSobolev 1 (E u).1.1`, with `[Nontrivial V]` and
+  `[Fact (1 ≤ p)]`; a chosen operator is `Rd.BoundedLipschitzDomain.sobolevExtensionL_of_one_le p`,
+  the values of the jets are the functions of `W^{1,p}(Ω)`
+  (`Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet_of_one_le`), and
+  `Rd.exists_extensionL_of_isBoundedLipschitzDomain_of_one_le` is the set-level form. The theorem
+  is of first order. Membership form, for every `1 ≤ p ≤ ∞`:
   `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le (hp : 1 ≤ p)
   (f : V → ℂ) : MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p volume, MemSobolev 1 F ∧
   (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f`, and the direction
@@ -1098,9 +1106,10 @@ namespaces and every declaration name are unchanged.
 
 **The extension as a bounded linear operator** (24 October 2026). H.2 also holds in operator
 form: a bounded linear extension operator on value–derivative jets, a right inverse of the
-restriction, in the shape of
-TauCeti's `W1p.exists_extensionL_of_isLipschitzDomainWith`
-(`Rd.BoundedLipschitzDomain.exists_extensionL`, Section 4.3); the extension for each `f`
+restriction, in the shape of TauCeti's `W1p.exists_extensionL_of_isLipschitzDomainWith`, for
+`1 < p < ∞` by Rychkov's extension (`Rd.BoundedLipschitzDomain.exists_extensionL`) and for every
+`1 ≤ p ≤ ∞` by reflection (`Rd.BoundedLipschitzDomain.exists_extensionL_of_one_le`,
+`Rd.BoundedLipschitzDomain.sobolevExtensionL_of_one_le`), Section 4.3; the extension for each `f`
 (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`) keeps its name and statement.
 
 ## References

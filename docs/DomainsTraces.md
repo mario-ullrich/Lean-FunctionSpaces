@@ -36,11 +36,11 @@ restriction of a function of `W^1_p(ℝ^d)` under a bounded linear extension ope
 Rychkov's local extension with the local means of the gradient: the local means kernels of order two
 are divergences of dilated kernels with mean zero, which form Calderón–Zygmund families. For `p = 2`
 this identifies `H^1(Ω)` with `W^1_2(Ω)`. For every `1 ≤ p ≤ ∞` every function of `W^1_p(Ω)` is
-the restriction of a function of `W^1_p(ℝ^d)` with a bound, by reflection across the boundary in
-the flattened coordinates of the graph domains. For `1 < p < ∞` and every order `m` every function
-of `W^m_p(Ω)` is the restriction of a function of `W^m_p(ℝ^d)` with a bound, by Rychkov's local
-extension with the local means of the derivatives of order `m`, pasted with the Leibniz rule. On a
-Lipschitz graph domain, the Gauss–Green theorem
+the restriction of a function of `W^1_p(ℝ^d)` under a bounded linear extension operator, by
+reflection across the boundary in the flattened coordinates of the graph domains. For
+`1 < p < ∞` and every order `m` every function of `W^m_p(Ω)` is the restriction of a function of
+`W^m_p(ℝ^d)` with a bound, by Rychkov's local extension with the local means of the derivatives
+of order `m`, pasted with the Leibniz rule. On a Lipschitz graph domain, the Gauss–Green theorem
 `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` holds for compactly supported `C^1` functions, and Green's formula
 `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)`, by the density of the
 compactly supported Schwartz functions in every `H^s(ℝ^d)`. On a bounded Lipschitz domain, Green's
@@ -495,7 +495,11 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   `Rd.LipschitzGraph.eLpNorm_reflectionDeriv_le`). On the half-space the even reflection is
   weakly differentiable by integration by parts with cutoffs near the hyperplane
   (`Rd.hasWeakLineDeriv_evenReflection`). The boundary patches of `Ω` extend by a cutoff and the
-  reflection, the inner patch by a cutoff, and `Rd.extendsSobolev_of_cover` pastes them.
+  reflection, the inner patch by a cutoff, and `Rd.extendsSobolev_of_cover` pastes them. The
+  extension is a bounded linear operator `E : W^1_p(Ω) → W^1_p(V)` on value–derivative jets with
+  `E u = u` on `Ω` (`Rd.BoundedLipschitzDomain.sobolevExtensionL_of_one_le`,
+  `Rd.BoundedLipschitzDomain.exists_extensionL_of_one_le`), since every patch extension is linear
+  and sees only the values on `Ω` (`Rd.IsSobolevExtensionMap`).
 * **The extension theorem of higher order.** For a bounded Lipschitz domain `Ω` in `V` of
   dimension `n ≥ 1`, `1 < p < ∞` and `m ∈ ℕ` there is a finite `C` such that every `f` with weak
   derivatives `g_{k,w} = ∂^{e_w} f ∈ L_p(Ω)` on `Ω` along all words `w` of length `k ≤ m` agrees
@@ -625,8 +629,9 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Smoothness of parametric integrals, the dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, their supports and those of dyadic dilates, mean zero, and the Calderón–Zygmund families of the dilates of mean-zero Schwartz functions | ✅ | ✗ | `Domains/Extension/DivergenceKernels` |
 | The local means of order two by the gradient, local means of Triebel–Lizorkin type on a set, bounded extensions from one patch, pasting in `W^1_p(ℝ^d)`, the extension theorem (`W^1_p(Ω)` is the space of restrictions of `W^1_p(ℝ^d)`) for `1 < p < ∞` with a bound, and for `p = 2` `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the quotient norm of `H^1(Ω)` and the boundary traces of `W^1_2(Ω)` | ✅ | ✗ | `Domains/Extension/SobolevExtension` |
 | The extension operator for `W^1_p`, `1 < p < ∞`, on value–derivative jets, `E u = u` on `Ω` | ✅ | ✗ | `Domains/Extension/SobolevExtensionOperator` |
-| The half-space and the reflection across a hyperplane, cutoffs near the hyperplane, integration by parts on the half-space, the weak derivatives and `L_p` bounds of the even reflection | ✅ | ✗ | `Domains/Extension/HalfSpaceReflection` |
-| The flattening of a Lipschitz graph domain as a measure-preserving map, the extension by reflection across the graph with its weak derivatives and `L_p` bounds, cutoffs from a bounded Lipschitz domain to its graph domains, and the extension theorem for `W^1_p` on bounded Lipschitz domains for `1 ≤ p ≤ ∞` with a bound | ✅ | ✗ | `Domains/Extension/ReflectionExtension` |
+| The half-space and the reflection across a hyperplane, cutoffs near the hyperplane, integration by parts on the half-space, the linearity, weak derivatives and `L_p` bounds of the even reflection | ✅ | ✗ | `Domains/Extension/HalfSpaceReflection` |
+| The flattening of a Lipschitz graph domain as a measure-preserving map, the extension by reflection across the graph with its linearity, weak derivatives and `L_p` bounds, cutoffs from a bounded Lipschitz domain to its graph domains, and the extension theorem for `W^1_p` on bounded Lipschitz domains for `1 ≤ p ≤ ∞` with a bound | ✅ | ✗ | `Domains/Extension/ReflectionExtension` |
+| Linear extensions of functions as extension operators on jets, the patches by reflection as linear extensions, and an extension operator for `W^1_p`, `1 ≤ p ≤ ∞`, built by reflection on value–derivative jets, `E u = u` on `Ω` | ✅ | ✗ | `Domains/Extension/ReflectionExtensionOperator` |
 | Weighted dilation averages `∫_a^b w(s) G_{e^s} ds`, their writing as sums of derivatives of order `m` of the higher divergence kernels when the weight has vanishing moments, the smoothed bump with its moment and kernel weights, and the local means kernels of order `L` as sums of derivatives of order `m ≤ L` of the higher divergence kernels, which have mean zero for `m < L` and lie in the reflected cone for bumps supported in `-K` | ✅ | ✗ | `Domains/Extension/HigherDivergenceKernels` |
 | The local means of order `m + 1` of the smoothed bump by the derivatives of order `m`, local means of Triebel–Lizorkin type with smoothness `m` on a set, bounded extensions of order `m` from one patch and by a cutoff, pasting in `W^m_p(ℝ^d)` by the Leibniz rule, and the extension theorem (`W^m_p(Ω)` is the space of restrictions of `W^m_p(ℝ^d)`) on bounded Lipschitz domains for `1 < p < ∞` and every `m`, with a bound | ✅ | ✗ | `Domains/Extension/HigherSobolevExtension` |
 | Gauss–Green on Lipschitz graph domains: product coordinates and Fubini, ray integrals, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and surface form, the product rule for line derivatives, and Green's formula `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)` | ✅ | ✗ | `Domains/Sobolev/LipschitzGraphGreen` |

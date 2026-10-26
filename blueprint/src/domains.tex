@@ -6553,11 +6553,40 @@ additive and homogeneous in the jet. The weak derivatives make it a linear map i
 proof of \Cref{thm:one-patch-extension}.
 \end{proof}
 
-\begin{theorem}[The extension operator]
-\label{thm:sobolev-extension-operator}
+\begin{lemma}[Pasting extension operators]
+\label{lem:sobolev-extension-op-pasting}
 \lean{Rd.SobolevExtensionOp.pasteValue, Rd.SobolevExtensionOp.hasWeakLineDeriv_pasteValue,
   Rd.SobolevExtensionOp.ae_pasteValue_eq, Rd.SobolevExtensionOp.paste,
-  Rd.sobolevExtensionOp_of_cover, Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_boundary,
+  Rd.sobolevExtensionOp_of_cover, Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_of_patches}
+\leanok
+\uses{thm:pasting-sobolev, def:sobolev-extension-op, lem:sobolev-jets, lem:resolution-of-unity,
+  lem:bounded-lipschitz-geometry}
+Let $1 \leq p \leq \infty$.
+\begin{enumerate}
+  \item For every open $O \subseteq V$, every finite cover $(U_k)_k$ of $\overline O$ by bounded
+    open sets and all extension operators $E_k$ from $O \cap U_k$ with finite constants, there is
+    an extension operator from $O$ with a finite constant.
+  \item For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$ with boundary balls
+    $B(c_j, \rho_j)$: if for every $\varepsilon > 0$ and every $j$ there is an extension operator
+    with a finite constant from $\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$, and for every
+    $\delta > 0$ one from $\{x \in \Omega : \dist(x, V \setminus \Omega) > 2 \delta\}$, then there
+    is an extension operator from $\Omega$ with a finite constant.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) For a smooth resolution of unity $(\psi_k)$ subordinate to $(U_k)$
+(\Cref{lem:resolution-of-unity}), $u \mapsto \sum_k \psi_k E_k u$ with the derivatives
+$\sum_k (\psi_k G_{k,i} + (\partial_{e_i} \psi_k) F_k)$ is a linear map into the jets
+(\Cref{lem:sobolev-jets} (4)) and an extension operator from $O$ with a finite constant, by the
+estimate of \Cref{thm:pasting-sobolev}. (2) The patches of \Cref{lem:bounded-lipschitz-geometry}
+are bounded open sets that cover $\overline\Omega$; apply (1).
+\end{proof}
+
+\begin{theorem}[The extension operator]
+\label{thm:sobolev-extension-operator}
+\lean{Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_boundary,
   Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_interior,
   Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp, Rd.BoundedLipschitzDomain.sobolevExtensionL,
   Rd.BoundedLipschitzDomain.memSobolev_sobolevExtensionL,
@@ -6567,7 +6596,7 @@ proof of \Cref{thm:one-patch-extension}.
   Rd.BoundedLipschitzDomain.restrictL_comp_sobolevExtensionL,
   Rd.BoundedLipschitzDomain.exists_extensionL, Rd.exists_extensionL_of_isBoundedLipschitzDomain}
 \leanok
-\uses{thm:pasting-sobolev, thm:sobolev-extension, def:sobolev-jets,
+\uses{lem:sobolev-extension-op-pasting, thm:sobolev-extension, def:sobolev-jets,
   lem:sobolev-extension-op-patch, lem:sobolev-extension-op-bounded, lem:sobolev-patches,
   def:lipschitz-near-point, thm:bounded-lipschitz-sets, lem:weak-derivative-basic}
 For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$ and every $1 < p < \infty$
@@ -6582,10 +6611,8 @@ $\Sob{1}{p}(\Omega)$. The same holds for every bounded Lipschitz set $\Omega \su
 \begin{proof}
 \leanok
 The patches of \Cref{lem:sobolev-patches} carry extension operators by
-\Cref{lem:sobolev-extension-op-patch}. For a smooth resolution of unity $(\psi_k)$ as in
-\Cref{thm:pasting-sobolev}, $u \mapsto \sum_k \psi_k E_k u$ with the derivatives
-$\sum_k (\psi_k G_{k,i} + (\partial_{e_i} \psi_k) F_k)$ is linear and an extension operator from
-$\Omega$ with a finite constant, by the estimate of \Cref{thm:pasting-sobolev}.
+\Cref{lem:sobolev-extension-op-patch}, and \Cref{lem:sobolev-extension-op-pasting} (2) pastes
+them to an extension operator from $\Omega$ with a finite constant.
 \Cref{lem:sobolev-extension-op-bounded} gives boundedness and the right inverse. The value $f$
 of a jet agrees on $\Omega$ with $F \in \Sob{1}{p}(V)$, so $f \in \Sob{1}{p}(\Omega)$
 (\Cref{lem:weak-derivative-basic}). The claim for bounded Lipschitz sets is the first for the
@@ -6605,7 +6632,8 @@ $x \mapsto x - \varphi(x) e$ of a Lipschitz graph domain is a Lipschitz map onto
 that preserves Lebesgue measure, and the chain rule of \Cref{thm:weak-derivative-chain-rule}
 carries the reflection to the graph. The boundary patches of $\Omega$ extend by a cutoff and this
 reflection, the inner patch by a cutoff, and \Cref{thm:pasting-sobolev} pastes them. The
-construction is the same for every $p$.
+construction is the same for every $p$, and for every $p$ it is linear in $f$, so it gives a
+bounded linear extension operator (\Cref{thm:reflection-extension-operator}).
 
 \paragraph{The half-space.}
 
@@ -6629,12 +6657,13 @@ So $E u = u$ on $H_+$, $E u = u \circ \sigma$ on $\sigma(H_+)$ and $E u = 0$ on 
 \lean{Rd.halfSpaceReflection_apply, Rd.inner_halfSpaceReflection,
   Rd.halfSpaceReflection_halfSpaceReflection, Rd.halfSpaceReflection_of_inner_eq_zero,
   Rd.halfSpaceReflection_self, Rd.halfSpaceReflection_notMem, Rd.norm_sub_halfSpaceReflection,
-  Rd.evenReflection_of_mem, Rd.evenReflection_of_reflection_mem,
-  Rd.measurePreserving_halfSpaceReflection}
+  Rd.evenReflection_of_mem, Rd.evenReflection_of_reflection_mem, Rd.evenReflection_add,
+  Rd.evenReflection_smul, Rd.measurePreserving_halfSpaceReflection}
 \leanok
 \uses{def:half-space-reflection}
 For every $e \in V$ the reflection $\sigma$ is a linear isometry with $\sigma(\sigma y) = y$ for
-every $y \in V$, and it preserves Lebesgue measure. For every unit vector $e$, every $y \in V$,
+every $y \in V$, it preserves Lebesgue measure, and the even reflection is linear. For every
+unit vector $e$, every $y \in V$,
 every $w \perp e$ and every $u \colon V \to \C$:
 $\sigma y = y - 2 \langle y, e \rangle e$, $\langle \sigma y, e \rangle = -\langle y, e \rangle$,
 $\sigma w = w$, $\sigma e = -e$ and $\|y - \sigma y\| = 2 |\langle y, e \rangle|$; if $y \in H_+$,
@@ -6647,8 +6676,9 @@ $E u(y) = u(\sigma y)$.
 The reflection across $(\R e)^\perp$ is $y \mapsto y - 2 \langle y, e \rangle e / \|e\|^2$
 (Mathlib's \texttt{Submodule.\allowbreak reflection\_\allowbreak orthogonal\_\allowbreak apply}),
 an involutive linear isometry; linear isometries preserve Lebesgue measure (Mathlib's
-\texttt{LinearIsometryEquiv.\allowbreak measurePreserving}). The remaining identities follow from
-the formula and $\|e\| = 1$.
+\texttt{LinearIsometryEquiv.\allowbreak measurePreserving}). The even reflection is a sum of
+indicators of $u$ and of $u \circ \sigma$, hence linear in $u$. The remaining identities follow
+from the formula and $\|e\| = 1$.
 \end{proof}
 
 Let $s$ be Mathlib's smooth step function (\texttt{Real.\allowbreak smoothTransition}), with
@@ -6918,6 +6948,28 @@ $F^{-1}(\sigma(F x)) = R(x)$. The rest follows from \Cref{lem:half-space-reflect
 $\langle x, e \rangle < \varphi(x)$.
 \end{proof}
 
+\begin{lemma}[The extension by reflection is linear]
+\label{lem:reflection-extension-linear}
+\lean{Rd.LipschitzGraph.reflectionExtension_add, Rd.LipschitzGraph.reflectionExtension_smul,
+  Rd.LipschitzGraph.reflectionExtensionLinearMap,
+  Rd.LipschitzGraph.reflectionExtensionLinearMap_apply,
+  Rd.LipschitzGraph.reflectionExtension_congr_ae}
+\leanok
+\uses{def:graph-reflection-extension, lem:half-space-reflection, lem:lipschitz-flattening}
+For every Lipschitz graph domain $G$ the extension by reflection $E_G$ is linear, and for all
+$u, u' \colon V \to \C$ with $u = u'$ almost everywhere on $G$, $E_G u = E_G u'$ almost
+everywhere on $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The even reflection is linear (\Cref{lem:half-space-reflection}), and so is the composition with
+$F^{-1}$ and $F$. The inverse flattening maps $H_+$ into $G$, so
+$u \circ F^{-1} = u' \circ F^{-1}$ almost everywhere on $H_+$; the flattening, its inverse and
+$\sigma$ preserve Lebesgue measure (\Cref{lem:half-space-reflection},
+\Cref{lem:lipschitz-flattening}), so they carry null sets to null sets.
+\end{proof}
+
 For $g_i \colon V \to \C$ ($i \in I$) and $w, y \in V$ let
 \[
   D_w(y) = \sum_{i \in I} \bigl\langle DF^{-1}(y) \, w, e_i \bigr\rangle \, g_i(F^{-1} y) ,
@@ -7027,7 +7079,8 @@ Minkowski's inequality and \Cref{lem:composition-measure-preserving}. The bound 
 
 \begin{lemma}[Bounded extensions from estimates]
 \label{lem:extends-sobolev-of-bounds}
-\lean{Rd.extendsSobolev_of_eLpNorm_le, Rd.add_sum_le_of_le_two_mul}
+\lean{Rd.memLp_of_eLpNorm_add_sum_le, Rd.extendsSobolev_of_eLpNorm_le,
+  Rd.add_sum_le_of_le_two_mul}
 \leanok
 \uses{def:extends-sobolev, lem:weak-derivative-direction-linear, lem:weak-derivative-basic}
 \begin{enumerate}
@@ -7043,15 +7096,18 @@ Minkowski's inequality and \Cref{lem:composition-measure-preserving}. The bound 
   \item For all $a, X, Y, K, d \in [0, \infty]$ and all $b_k \in [0, \infty]$, $k$ in a finite
     set with $N$ elements, with $a \leq 2 X$ and $b_k \leq K (Y + d X)$ for every $k$,
     $a + \sum_k b_k \leq (2 + N K (1 + d)) (X + Y)$.
+  \item For every $1 \leq p \leq \infty$, all $C, X < \infty$, every $F \colon V \to \C$ and all
+    $G_k \colon V \to \C$, $k$ in a finite set, with
+    $\|F\|_p + \sum_k \|G_k\|_p \leq C X$, $F$ and every $G_k$ lie in $L_p(V)$.
 \end{enumerate}
 \end{lemma}
 
 \begin{proof}
 \leanok
-(1) The bound puts $F$ and every $G_i$ into $L_p(V)$; weak derivatives see only the classes
-(\Cref{lem:weak-derivative-basic}), and \Cref{lem:weak-derivative-direction-linear} (4) gives
-$F \in \Sob{1}{p}(V)$. (2) The right side is the bound $2 X + N K (Y + d X)$ of the left side
-plus $2 Y + N K (X + d Y)$.
+(1) The bound puts $F$ and every $G_i$ into $L_p(V)$ by (3); weak derivatives see only the
+classes (\Cref{lem:weak-derivative-basic}), and \Cref{lem:weak-derivative-direction-linear} (4)
+gives $F \in \Sob{1}{p}(V)$. (2) The right side is the bound $2 X + N K (Y + d X)$ of the left
+side plus $2 Y + N K (X + d Y)$. (3) Every term of the left side is at most $C X < \infty$.
 \end{proof}
 
 Let $\Omega$ be a bounded Lipschitz domain with boundary balls $B(c_j, \rho_j)$, and let
@@ -7090,41 +7146,88 @@ $O$ and $B(c_j, \rho_j)$ for $B$ carries it to $\Omega_j$. (2) and (3)
 $\Omega_j \cap B(c_j, \rho_j)$ is at most the $L_p$ norm on $\Omega$.
 \end{proof}
 
+\begin{definition}[The constant of the reflection patches]
+\label{def:reflection-const}
+\lean{Rd.reflectionConst}
+\leanok
+\uses{def:bounded-lipschitz}
+For a bounded Lipschitz domain $\Omega$ with boundary balls $B(c_j, \rho_j)$ let $M_j$ be the
+Lipschitz constant of the graph function of $\Omega_j$, and for every $j$ and every
+$d \in [0, \infty]$ let
+\[
+  C_j(d) = 2 + 2 n (1 + M_j)^2 (1 + d) .
+\]
+\end{definition}
+
 \begin{lemma}[The patches by reflection]
 \label{lem:reflection-patches}
-\lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary_reflection,
+\lean{Rd.reflectionConst_ne_top,
+  Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_reflectionExtension_mul,
+  Rd.BoundedLipschitzDomain.reflectionExtension_mul_eq_of_mem,
+  Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_mul_interior,
+  Rd.BoundedLipschitzDomain.exists_cutoff_boundary,
+  Rd.BoundedLipschitzDomain.exists_cutoff_interior,
+  Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary_reflection,
   Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior_cutoff}
 \leanok
-\uses{thm:graph-reflection-extension, lem:graph-reflection, lem:extends-sobolev-of-bounds,
-  lem:smooth-cutoff-compact, lem:weak-derivative-cutoff, lem:mollification-open-set,
-  def:bounded-lipschitz, lem:cutoff-graph-domain, lem:weak-derivative-basic}
-Let $\Omega$ be a bounded Lipschitz domain with boundary balls $B(c_j, \rho_j)$. For every
-$1 \leq p \leq \infty$, every $\varepsilon > 0$, every $\delta > 0$ and every $j$, Sobolev
-functions on $\Omega$ extend with finite constants from
-$\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$ and from
-$\{x \in \Omega : \dist(x, V \setminus \Omega) > 2 \delta\}$.
+\uses{def:reflection-const, thm:graph-reflection-extension, lem:graph-reflection,
+  lem:extends-sobolev-of-bounds, lem:smooth-cutoff-compact, lem:cutoff-bound-whole-space,
+  lem:mollification-open-set, def:bounded-lipschitz, lem:cutoff-graph-domain,
+  lem:weak-derivative-basic}
+Let $\Omega$ be a bounded Lipschitz domain with boundary balls $B(c_j, \rho_j)$ and
+$1 \leq p \leq \infty$.
+\begin{enumerate}
+  \item For every $j$ and every $d < \infty$, $C_j(d) < \infty$. For every $j$, every
+    $\varepsilon \geq 0$, all $d_i \geq 0$, every smooth real $\chi$ with values in $[0, 1]$,
+    closed support in $B(c_j, \rho_j)$, $|\partial_{e_i} \chi| \leq d_i$ and $\chi = 1$ near
+    $\bar B(c_j, \rho_j - 2 \varepsilon)$, and every $f \in L_p(\Omega)$ with weak derivatives
+    $g_i = \partial_{e_i} f \in L_p(\Omega)$ on $\Omega$, the extension by reflection
+    $F = E_{\Omega_j}(\chi f)$ equals $f$ on $\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$ and has
+    weak derivatives $G_k = \partial_{e_k} F$ on $V$ with
+    \[
+      \|F\|_p + \sum_{k \in I} \|G_k\|_p \leq C_j\Bigl(\sum_{i \in I} d_i\Bigr)
+      \Bigl(\|f\|_{L_p(\Omega)} + \sum_{i \in I} \|g_i\|_{L_p(\Omega)}\Bigr) .
+    \]
+  \item For every real $\delta$, all $d_i \geq 0$, every smooth real $\chi$ with values in
+    $[0, 1]$, compact closed support in $\Omega$, $|\partial_{e_i} \chi| \leq d_i$ and $\chi = 1$
+    near $\{x : \dist(x, V \setminus \Omega) \geq 2 \delta\}$, and every $f$ with weak derivatives
+    $g_i = \partial_{e_i} f$ on $\Omega$, the function $\chi f$ equals $f$ on
+    $\{x \in \Omega : \dist(x, V \setminus \Omega) > 2 \delta\}$ and has weak derivatives
+    $G_i = \partial_{e_i} (\chi f)$ on $V$ with
+    \[
+      \|\chi f\|_p + \sum_{i \in I} \|G_i\|_p \leq \Bigl(1 + \sum_{i \in I} d_i\Bigr)
+      \Bigl(\|f\|_{L_p(\Omega)} + \sum_{i \in I} \|g_i\|_{L_p(\Omega)}\Bigr) .
+    \]
+  \item For every $j$ and every $\varepsilon > 0$ there is a smooth real $\chi$ with values in
+    $[0, 1]$, compact closed support in $B(c_j, \rho_j)$ and $\chi = 1$ near
+    $\bar B(c_j, \rho_j - 2 \varepsilon)$. For every $\delta > 0$ there is a smooth real $\chi$
+    with values in $[0, 1]$, compact closed support in $\Omega$ and $\chi = 1$ near
+    $\{x : \dist(x, V \setminus \Omega) \geq 2 \delta\}$.
+  \item For every $\varepsilon > 0$, every $\delta > 0$ and every $j$, Sobolev functions on
+    $\Omega$ extend with finite constants from $\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$ and
+    from $\{x \in \Omega : \dist(x, V \setminus \Omega) > 2 \delta\}$.
+\end{enumerate}
 \end{lemma}
 
 \begin{proof}
 \leanok
-For the boundary patch let $M_j$ be the Lipschitz constant of the graph function of $\Omega_j$,
-and $\chi$ smooth with values in $[0, 1]$, $\chi = 1$ on
-$\bar B(c_j, \rho_j - 2 \varepsilon)$ and closed support in $B(c_j, \rho_j)$
-(\Cref{lem:smooth-cutoff-compact}), with $|\partial_{e_i} \chi| \leq d_i$. By
-\Cref{lem:cutoff-graph-domain}, $\chi f$ has the weak derivatives
-$\chi g_i + (\partial_{e_i} \chi) f$ on $\Omega_j$, with
+(1) $C_j(d)$ is a sum and product of finite numbers. By \Cref{lem:cutoff-graph-domain}, $\chi f$
+has the weak derivatives $\chi g_i + (\partial_{e_i} \chi) f$ on $\Omega_j$, with
 $\|\chi f\|_{L_p(\Omega_j)} \leq \|f\|_{L_p(\Omega)}$ and
 $\|\chi g_i + (\partial_{e_i} \chi) f\|_{L_p(\Omega_j)} \leq \|g_i\|_{L_p(\Omega)} + d_i
-\|f\|_{L_p(\Omega)}$. The extension by reflection of $\chi f$
-(\Cref{thm:graph-reflection-extension})
-equals $\chi f = f$ on $\Omega \cap B(c_j, \rho_j - 2 \varepsilon) \subseteq \Omega_j$
-(\Cref{lem:graph-reflection}), and \Cref{lem:extends-sobolev-of-bounds} (2) and (1) give the
-constant $2 + 2 n (1 + M_j)^2 (1 + \sum_i d_i)$. For the inner patch, the set
+\|f\|_{L_p(\Omega)}$. \Cref{thm:graph-reflection-extension} and
+\Cref{lem:extends-sobolev-of-bounds} (2) give the weak derivatives and the bound. The set
+$\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$ lies in $\Omega_j$, where
+$E_{\Omega_j}(\chi f) = \chi f = f$ (\Cref{lem:graph-reflection}). (2) The function $\chi f$ has
+the weak derivatives $\chi g_i + (\partial_{e_i} \chi) f$ on $V$
+(\Cref{lem:mollification-open-set} (2)), \Cref{lem:cutoff-bound-whole-space} with $\Omega$ for
+$O$ bounds them, and $\chi f = f$ where $\chi = 1$. (3) The closed ball
+$\bar B(c_j, \rho_j - 2 \varepsilon)$ is a compact subset of $B(c_j, \rho_j)$, and
 $\{x : \dist(x, V \setminus \Omega) \geq 2 \delta\}$ is a compact subset of $\Omega$; take $\chi$
-of \Cref{lem:smooth-cutoff-compact} equal to $1$ near it with compact closed support in
-$\Omega$. Then $\chi f$ has the weak derivatives $\chi g_i + (\partial_{e_i} \chi) f$ on $V$
-(\Cref{lem:mollification-open-set} (2)), \Cref{lem:weak-derivative-cutoff} (4) and (5) bound
-them, and the constant is $1 + \sum_i d_i$.
+of \Cref{lem:smooth-cutoff-compact}. (4) Take the cutoffs of (3) with the bounds $d_i$ of their
+derivatives of \Cref{lem:smooth-cutoff-compact}; (1), (2) and
+\Cref{lem:extends-sobolev-of-bounds} (1) give the extensions, with the constants
+$C_j(\sum_i d_i)$ and $1 + \sum_i d_i$.
 \end{proof}
 
 \begin{theorem}[The extension theorem by reflection]
@@ -7155,6 +7258,147 @@ As for \Cref{thm:sobolev-extension}, with the patches of \Cref{lem:reflection-pa
 cover the closure of $\Omega$ (\Cref{lem:bounded-lipschitz-geometry}), and
 \Cref{thm:pasting-sobolev} pastes them for every $1 \leq p \leq \infty$. For $n = 0$ the argument
 of \Cref{thm:sobolev-extension} holds for every $p$.
+\end{proof}
+
+\paragraph{The extension operator by reflection.}
+
+Each patch extension of \Cref{lem:reflection-patches} is a linear map on functions that sees
+only the values on $\Omega$. Hence the extension operators of \Cref{def:sobolev-extension-op}
+exist for every $1 \leq p \leq \infty$.
+
+\begin{definition}[Linear extensions of functions]
+\label{def:sobolev-extension-map}
+\lean{Rd.IsSobolevExtensionMap}
+\leanok
+\uses{def:weak-line-derivative}
+Let $O \subseteq V$ be open, $U \subseteq V$, $1 \leq p \leq \infty$ and $C \in [0, \infty]$. A
+complex linear map $E$ on the functions $V \to \C$ is a \emph{linear extension of Sobolev
+functions from $U$ with the constant $C$} if $E f = E f'$ almost everywhere on $V$ for all $f$,
+$f'$ with $f = f'$ almost everywhere on $O$, and if for every $f \in L_p(O)$ with weak derivatives
+$g_i = \partial_{e_i} f \in L_p(O)$ on $O$ the function $E f$ has weak derivatives
+$G_i = \partial_{e_i} (E f)$ on $V$ with $E f = f$ almost everywhere on $U$ and
+\[
+  \|E f\|_p + \sum_{i \in I} \|G_i\|_p \leq C \Bigl(\|f\|_{L_p(O)} + \sum_{i \in I}
+  \|g_i\|_{L_p(O)}\Bigr) .
+\]
+\end{definition}
+
+\begin{lemma}[Linear extensions of functions are extension operators]
+\label{lem:sobolev-extension-map-op}
+\lean{Rd.IsSobolevExtensionMap.exists_hasWeakLineDeriv_jet,
+  Rd.IsSobolevExtensionMap.memLp_apply, Rd.IsSobolevExtensionMap.valueMap,
+  Rd.IsSobolevExtensionMap.valueMap_apply,
+  Rd.IsSobolevExtensionMap.exists_hasWeakLineDeriv_valueMap,
+  Rd.IsSobolevExtensionMap.ae_valueMap_eq, Rd.IsSobolevExtensionMap.enorm_valueMap_add_le,
+  Rd.IsSobolevExtensionMap.toSobolevExtensionOp}
+\leanok
+\uses{def:sobolev-extension-map, def:sobolev-extension-op, lem:sobolev-jets,
+  lem:extends-sobolev-of-bounds, lem:weak-derivative-direction-linear, lem:weak-derivative-basic}
+For every open $O \subseteq V$, every $U \subseteq O$, every $1 \leq p \leq \infty$, every
+$C < \infty$ and every linear extension $E$ of Sobolev functions from $U$ with the constant $C$,
+the map $(f, (g_i)_i) \mapsto (E f, (\partial_{e_i} E f)_i)$ is an extension operator from $U$
+for the jets of $\Sob{1}{p}(O)$ with the constant $C$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For a jet $(f, (g_i)_i)$ the bound puts $E f$ and its weak derivatives into $L_p(V)$
+(\Cref{lem:extends-sobolev-of-bounds} (3)). The class of $E f$ depends only on the class of $f$
+on $O$, so $(f, (g_i)_i) \mapsto E f$ is linear from the jets into $L_p(V)$, and the weak
+derivatives make it a linear map into the jets (\Cref{lem:sobolev-jets} (4)). Its values lie in
+$\Sob{1}{p}(V)$ (\Cref{lem:weak-derivative-direction-linear} (4)), and the derivatives of the jet
+are those of the definition, since weak derivatives are unique (\Cref{lem:weak-derivative-basic}).
+\end{proof}
+
+\begin{lemma}[Cutoffs see only the values on a set]
+\label{lem:cutoff-ae-eq}
+\lean{Rd.mul_ae_eq_of_tsupport_subset}
+\leanok
+For all measurable $s, t \subseteq V$, every $B \subseteq V$ with $s \cap B \subseteq t$, every
+real $\chi$ with closed support in $B$ and all $f, f' \colon V \to \C$ with $f = f'$ almost
+everywhere on $t$, $\chi f = \chi f'$ almost everywhere on $s$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $s \cap B \subseteq t$ the functions $f$ and $f'$ agree almost everywhere, and outside $B$
+both products vanish, since $\chi = 0$ there.
+\end{proof}
+
+\begin{lemma}[The patches by reflection are linear]
+\label{lem:reflection-patches-linear}
+\lean{Rd.BoundedLipschitzDomain.isSobolevExtensionMap_boundary_reflection,
+  Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_boundary_reflection,
+  Rd.BoundedLipschitzDomain.isSobolevExtensionMap_interior_cutoff,
+  Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_interior_cutoff}
+\leanok
+\uses{def:reflection-const, lem:reflection-patches, lem:reflection-extension-linear,
+  lem:cutoff-ae-eq, def:sobolev-extension-map, lem:sobolev-extension-map-op,
+  lem:cutoff-graph-domain, lem:smooth-cutoff-compact}
+Let $\Omega$ be a bounded Lipschitz domain with boundary balls $B(c_j, \rho_j)$ and
+$1 \leq p \leq \infty$.
+\begin{enumerate}
+  \item For every $j$, every $\varepsilon \geq 0$, all $d_i \geq 0$ and every smooth real $\chi$
+    with values in $[0, 1]$, closed support in $B(c_j, \rho_j)$, $|\partial_{e_i} \chi| \leq d_i$
+    and $\chi = 1$ near $\bar B(c_j, \rho_j - 2 \varepsilon)$, the map
+    $f \mapsto E_{\Omega_j}(\chi f)$ is a linear extension of Sobolev functions on $\Omega$ from
+    $\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$ with the constant $C_j(\sum_i d_i)$.
+  \item For every real $\delta$, all $d_i \geq 0$ and every smooth real $\chi$ with values in
+    $[0, 1]$, compact closed support in $\Omega$, $|\partial_{e_i} \chi| \leq d_i$ and $\chi = 1$
+    near $\{x : \dist(x, V \setminus \Omega) \geq 2 \delta\}$, the map $f \mapsto \chi f$ is a
+    linear extension of Sobolev functions on $\Omega$ from
+    $\{x \in \Omega : \dist(x, V \setminus \Omega) > 2 \delta\}$ with the constant
+    $1 + \sum_i d_i$.
+  \item For every $\varepsilon > 0$, every $\delta > 0$ and every $j$, there are extension operators
+    with finite constants from $\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$ and from
+    $\{x \in \Omega : \dist(x, V \setminus \Omega) > 2 \delta\}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) and (2): the maps are linear and see only the values on $\Omega$
+(\Cref{lem:reflection-extension-linear} and \Cref{lem:cutoff-ae-eq}, with
+$\Omega_j \cap B(c_j, \rho_j) \subseteq \Omega$ by \Cref{lem:cutoff-graph-domain}), and
+\Cref{lem:reflection-patches} (1) and (2) give the extensions with their bounds. (3) Take the
+cutoffs of \Cref{lem:reflection-patches} (3) with the bounds $d_i$ of their derivatives of
+\Cref{lem:smooth-cutoff-compact}; (1), (2) and \Cref{lem:sobolev-extension-map-op} give the
+extension operators.
+\end{proof}
+
+\begin{theorem}[The extension operator by reflection]
+\label{thm:reflection-extension-operator}
+\lean{Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_of_one_le,
+  Rd.BoundedLipschitzDomain.sobolevExtensionL_of_one_le,
+  Rd.BoundedLipschitzDomain.memSobolev_sobolevExtensionL_of_one_le,
+  Rd.BoundedLipschitzDomain.sobolevExtensionL_fst_ae_eq_of_one_le,
+  Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet_of_one_le,
+  Rd.BoundedLipschitzDomain.exists_enorm_sobolevExtensionL_le_of_one_le,
+  Rd.BoundedLipschitzDomain.restrictL_comp_sobolevExtensionL_of_one_le,
+  Rd.BoundedLipschitzDomain.exists_extensionL_of_one_le,
+  Rd.exists_extensionL_of_isBoundedLipschitzDomain_of_one_le}
+\leanok
+\uses{lem:reflection-patches-linear, lem:sobolev-extension-op-pasting,
+  lem:sobolev-extension-op-bounded, def:lipschitz-near-point, thm:bounded-lipschitz-sets,
+  lem:weak-derivative-basic}
+For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$ and every
+$1 \leq p \leq \infty$ there is a bounded linear operator $E$ from the jets of
+$\Sob{1}{p}(\Omega)$ to the jets of $\Sob{1}{p}(V)$ such that for every jet
+$u = (f, (g_i)_i)$ and $E u = (F, (G_i)_i)$, $F \in \Sob{1}{p}(V)$, $F = f$ almost everywhere on
+$\Omega$, and the restriction of $E u$ to $\Omega$ is $u$; in particular
+$f \in \Sob{1}{p}(\Omega)$ for every jet $(f, (g_i)_i)$ of $\Sob{1}{p}(\Omega)$. The same holds
+for every bounded Lipschitz set $\Omega \subseteq V$ (\Cref{def:lipschitz-near-point}) in
+dimension $n \geq 1$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The patches carry extension operators by \Cref{lem:reflection-patches-linear} (3), and
+\Cref{lem:sobolev-extension-op-pasting} (2) pastes them to an extension operator from $\Omega$
+with a finite constant. \Cref{lem:sobolev-extension-op-bounded} gives boundedness and the right
+inverse. The value $f$ of a jet agrees on $\Omega$ with $F \in \Sob{1}{p}(V)$, so
+$f \in \Sob{1}{p}(\Omega)$ (\Cref{lem:weak-derivative-basic}). The claim for bounded Lipschitz
+sets is the first for the bounded Lipschitz domain of \Cref{thm:bounded-lipschitz-sets}.
 \end{proof}
 
 \section{Higher divergence kernels}

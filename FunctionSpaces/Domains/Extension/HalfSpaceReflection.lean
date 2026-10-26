@@ -22,8 +22,8 @@ isometry that preserves Lebesgue measure.
   smooth step is bounded and vanishes outside `[0, 1]`, and a function integrable on every ball
   around a point is locally integrable.
 * **The even reflection** (`Rd.evenReflection`): `E u = 1_{H₊} u + (1_{H₊} u) ∘ σ`, that is `u` on
-  `H₊` and `u ∘ σ` on `σ(H₊)`, with `‖E u‖_{L_p(V)} ≤ 2 ‖u‖_{L_p(H₊)}` for `1 ≤ p`
-  (`Rd.eLpNorm_evenReflection_le`).
+  `H₊` and `u ∘ σ` on `σ(H₊)`, linear in `u` (`Rd.evenReflection_add`, `Rd.evenReflection_smul`),
+  with `‖E u‖_{L_p(V)} ≤ 2 ‖u‖_{L_p(H₊)}` for `1 ≤ p` (`Rd.eLpNorm_evenReflection_le`).
 * **Cutoffs near the hyperplane** (`Rd.halfSpaceCutoff`): `η_n(y) = s((n + 1)⟪y, e⟫ - 1)` with
   Mathlib's smooth step `s = Real.smoothTransition`; their derivatives have size `n + 1` on a
   strip of width `1/(n + 1)`.
@@ -188,6 +188,24 @@ theorem evenReflection_of_reflection_mem (he : ‖e‖ = 1) (u : V → ℂ) {y :
   have hy' : y ∉ openHalfSpace e := by
     simpa using halfSpaceReflection_notMem he hy
   rw [evenReflection, indicator_of_notMem hy', indicator_of_mem hy, zero_add]
+
+variable (e) in
+/-- The even reflection is additive: `E(u + u') = E u + E u'`. -/
+theorem evenReflection_add (u u' : V → ℂ) :
+    evenReflection e (u + u') = evenReflection e u + evenReflection e u' := by
+  funext y
+  simp only [evenReflection, indicator_add', Pi.add_apply]
+  ring
+
+variable (e) in
+/-- The even reflection is homogeneous: `E(c u) = c E u`. -/
+theorem evenReflection_smul (c : ℂ) (u : V → ℂ) :
+    evenReflection e (c • u) = c • evenReflection e u := by
+  funext y
+  simp only [evenReflection, Pi.smul_apply, smul_eq_mul]
+  rw [show c • u = fun z => c • u z from rfl, indicator_const_smul]
+  simp only [smul_eq_mul]
+  ring
 
 variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
 

@@ -493,9 +493,11 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   in flattened coordinates; for `1 < p < ∞` also `Rd.BoundedLipschitzDomain.exists_extendsSobolev`,
   by Rychkov's local extension); so `f ∈ W^1_p(Ω)` iff `f` agrees on `Ω` with some
   `F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`).
-  For `1 < p < ∞` the extension is a bounded linear operator `E : W^1_p(Ω) → W^1_p(V)` on
-  value–derivative jets with `E u = u` on `Ω` (`Rd.BoundedLipschitzDomain.sobolevExtensionL`,
-  `Rd.BoundedLipschitzDomain.exists_extensionL`).
+  For `1 ≤ p ≤ ∞` the extension is a bounded linear operator `E : W^1_p(Ω) → W^1_p(V)` on
+  value–derivative jets with `E u = u` on `Ω`
+  (`Rd.BoundedLipschitzDomain.sobolevExtensionL_of_one_le`,
+  `Rd.BoundedLipschitzDomain.exists_extensionL_of_one_le`, by reflection; for `1 < p < ∞` also
+  `Rd.BoundedLipschitzDomain.sobolevExtensionL`, by Rychkov's local extension).
   For `1 < p < ∞` and every order `m`, with the derivatives
   `∂^{e_w} = ∂_{e_{w_0}} ⋯ ∂_{e_{w_{k-1}}}` along the words `w` of length `k ≤ m`, there is a
   finite `C` such that every `f` whose weak
@@ -619,8 +621,7 @@ that library builds itself.
   `(L_{p₀}, L_{p₁})_{θ,q} = L_{p,q}` with Lorentz spaces, and the off-diagonal Marcinkiewicz
   theorem.
 * **Traces and extensions**: the extension of higher order for `p ∈ {1, ∞}` (Stein's extension
-  operator), and bounded linear extension operators for `W^1_p` with `p ∈ {1, ∞}` and for higher
-  order.
+  operator), and bounded linear extension operators for higher order.
 * **Manifolds with corners**: a compact example (the cube with charts at its vertices), traces on
   the faces and products of models.
 * **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,

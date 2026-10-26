@@ -24,17 +24,19 @@ flattening `F(x) = x - φ(x) e` and its inverse `F⁻¹(y) = y + φ(y) e`.
 * **The extension by reflection** (`Rd.LipschitzGraph.reflectionExtension`): the even reflection
   (`Rd.evenReflection`) of `f ∘ F⁻¹` across `e^⊥`, composed with `F`. It is `f` on `Ω` and
   `f ∘ R` below the graph, for the graph reflection `R = F⁻¹ ∘ σ ∘ F`
-  (`Rd.LipschitzGraph.reflect_eq`). If `f` and its weak derivatives on `Ω` are integrable on the
-  bounded parts of `Ω`, it is weakly differentiable on `V`
-  (`Rd.LipschitzGraph.hasWeakLineDeriv_reflectionExtension_of_integrableOn`, by the chain rule
-  `Rd.HasWeakLineDeriv.comp_lipschitzWith` for `F⁻¹` and for `F`); for `1 ≤ p ≤ ∞` and
-  `f ∈ W^1_p(Ω)`, with
-  `‖E f‖_{L_p(V)} ≤ 2 ‖f‖_{L_p(Ω)}` and
+  (`Rd.LipschitzGraph.reflect_eq`). It is linear (`Rd.LipschitzGraph.reflectionExtensionLinearMap`)
+  and sees only the values on `Ω` (`Rd.LipschitzGraph.reflectionExtension_congr_ae`). If `f` and
+  its weak derivatives on `Ω` are integrable on the bounded parts of `Ω`, it is weakly
+  differentiable on `V` (`Rd.LipschitzGraph.hasWeakLineDeriv_reflectionExtension_of_integrableOn`,
+  by the chain rule `Rd.HasWeakLineDeriv.comp_lipschitzWith` for `F⁻¹` and for `F`); for
+  `1 ≤ p ≤ ∞` and `f ∈ W^1_p(Ω)`, with `‖E f‖_{L_p(V)} ≤ 2 ‖f‖_{L_p(Ω)}` and
   `‖∂_v E f‖_{L_p(V)} ≤ 2 (1 + M)² ‖v‖ ∑_i ‖∂_{e_i} f‖_{L_p(Ω)}`.
 * **Bounded Lipschitz domains** (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le`,
   `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`): a boundary patch
   extends by a cutoff (`Rd.BoundedLipschitzDomain.hasWeakLineDeriv_mul_graph`) and the
-  reflection in its graph domain, the inner patch by a cutoff, and
+  reflection in its graph domain with the constant `Rd.reflectionConst`
+  (`Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_reflectionExtension_mul`), the inner patch
+  by a cutoff (`Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_mul_interior`), and
   `Rd.extendsSobolev_of_cover` pastes them. So for every `1 ≤ p ≤ ∞` the space `W^1_p(Ω)` is the
   space of restrictions of `W^1_p(V)`, with a bounded extension (Evans–Gariepy, Section 4.4).
 -/
@@ -177,6 +179,32 @@ theorem reflectionExtension_of_lt (u : V → ℂ) {x : V} (hx : inner ℝ x Ω.e
     reflect_eq]
   rfl
 
+/-- The extension by reflection is additive (`Rd.evenReflection_add`). -/
+theorem reflectionExtension_add (u u' : V → ℂ) :
+    Ω.reflectionExtension (u + u') = Ω.reflectionExtension u + Ω.reflectionExtension u' := by
+  simp only [reflectionExtension]
+  rw [show (u + u') ∘ Ω.unflatten = u ∘ Ω.unflatten + u' ∘ Ω.unflatten from rfl,
+    evenReflection_add]
+  rfl
+
+/-- The extension by reflection is homogeneous (`Rd.evenReflection_smul`). -/
+theorem reflectionExtension_smul (c : ℂ) (u : V → ℂ) :
+    Ω.reflectionExtension (c • u) = c • Ω.reflectionExtension u := by
+  simp only [reflectionExtension]
+  rw [show (c • u) ∘ Ω.unflatten = c • (u ∘ Ω.unflatten) from rfl, evenReflection_smul]
+  rfl
+
+/-- **The extension by reflection as a linear map** on functions `V → ℂ`. -/
+noncomputable def reflectionExtensionLinearMap : (V → ℂ) →ₗ[ℂ] V → ℂ where
+  toFun := Ω.reflectionExtension
+  map_add' := Ω.reflectionExtension_add
+  map_smul' := Ω.reflectionExtension_smul
+
+/-- The linear map of the extension by reflection is the extension by reflection. -/
+theorem reflectionExtensionLinearMap_apply (u : V → ℂ) :
+    Ω.reflectionExtensionLinearMap u = Ω.reflectionExtension u :=
+  rfl
+
 variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
 
 /-- The graph reflection preserves the Lebesgue measure (`Rd.LipschitzGraph.reflect_eq`). -/
@@ -184,6 +212,25 @@ theorem measurePreserving_reflect : MeasurePreserving Ω.reflect volume volume :
   rw [reflect_eq]
   exact Ω.measurePreserving_unflatten.comp
     ((measurePreserving_halfSpaceReflection Ω.e).comp Ω.measurePreserving_flatten_of_lipschitz)
+
+/-- **The extension by reflection sees only the values on the graph domain**: if `u = u'` almost
+everywhere on the graph domain, then their extensions by reflection agree almost everywhere on
+`V`, since the inverse flattening maps `H₊` into the graph domain and the flattening, its inverse
+and `σ` preserve Lebesgue measure (Mathlib's
+`MeasureTheory.Measure.QuasiMeasurePreserving.ae_eq_comp`). -/
+theorem reflectionExtension_congr_ae {u u' : V → ℂ} (h : u =ᵐ[volume.restrict Ω.domain] u') :
+    Ω.reflectionExtension u =ᵐ[volume] Ω.reflectionExtension u' := by
+  have hH := (openHalfSpace Ω.e).isOpen.measurableSet
+  have h1 : u ∘ Ω.unflatten =ᵐ[volume.restrict (openHalfSpace Ω.e)] u' ∘ Ω.unflatten := by
+    refine (ae_restrict_iff' hH).2 ?_
+    filter_upwards [Ω.measurePreserving_unflatten.quasiMeasurePreserving.ae
+      ((ae_restrict_iff' Ω.measurableSet_domain).1 h)] with y hy hyH
+    exact hy (Ω.mapsTo_unflatten hyH)
+  have h2 := (ae_eq_restrict_iff_indicator_ae_eq hH).1 h1
+  have h3 : evenReflection Ω.e (u ∘ Ω.unflatten) =ᵐ[volume]
+      evenReflection Ω.e (u' ∘ Ω.unflatten) :=
+    h2.add ((measurePreserving_halfSpaceReflection Ω.e).quasiMeasurePreserving.ae_eq_comp h2)
+  exact Ω.measurePreserving_flatten_of_lipschitz.quasiMeasurePreserving.ae_eq_comp h3
 
 end Reflection
 
@@ -488,11 +535,23 @@ section BoundedDomains
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V] {p : ℝ≥0∞}
 
+/-- **Finiteness from a bound**: if `‖F‖_p + ∑_i ‖G_i‖_p ≤ C X` with finite `C` and `X`, then `F`
+and every `G_i` lie in `L_p(V)`. -/
+theorem memLp_of_eLpNorm_add_sum_le {ι : Type*} [Fintype ι] {F : V → ℂ} {G : ι → V → ℂ}
+    {C X : ℝ≥0∞} (hC : C ≠ ∞) (hX : X ≠ ∞)
+    (hb : eLpNorm F p volume + ∑ i, eLpNorm (G i) p volume ≤ C * X) :
+    MemLp F p volume ∧ ∀ i, MemLp (G i) p volume := by
+  have hfin : C * X < ∞ := ENNReal.mul_lt_top hC.lt_top hX.lt_top
+  refine ⟨memLp_iff.2 ((le_self_add.trans hb).trans_lt hfin), fun i => memLp_iff.2 ?_⟩
+  exact (((Finset.single_le_sum (f := fun j => eLpNorm (G j) p volume) (fun j _ => zero_le)
+    (Finset.mem_univ i)).trans le_add_self).trans hb).trans_lt hfin
+
 /-- **Extensions from `L_p` bounds**: Sobolev functions on `O` extend from `U` with constant `C`
 (`Rd.ExtendsSobolev`) as soon as every `f ∈ L_p(O)` with weak derivatives `g_i = ∂_{e_i} f` in
 `L_p(O)` agrees almost everywhere on `U` with a function `F` on `V` with weak derivatives
 `G_i = ∂_{e_i} F` on `V` and `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(O)} + ∑_i ‖g_i‖_{L_p(O)})`;
-the bound puts `F` and the `G_i` into `L_p(V)` (Mathlib's `MemLp.toLp`). -/
+the bound puts `F` and the `G_i` into `L_p(V)` (`Rd.memLp_of_eLpNorm_add_sum_le`, Mathlib's
+`MemLp.toLp`). -/
 theorem extendsSobolev_of_eLpNorm_le [Fact (1 ≤ p)] {O : Opens V} {U : Set V} {C : ℝ≥0∞}
     (hC : C ≠ ∞)
     (h : ∀ (f : V → ℂ) (g : Fin (finrank ℝ V) → V → ℂ), MemLp f p (volume.restrict O) →
@@ -506,13 +565,9 @@ theorem extendsSobolev_of_eLpNorm_le [Fact (1 ≤ p)] {O : Opens V} {U : Set V} 
     ExtendsSobolev p O U C := by
   intro f g hf hg hfg
   obtain ⟨F, G, hG, hFf, hb⟩ := h f g hf hg hfg
-  have hfin : C * (eLpNorm f p (volume.restrict O) +
-      ∑ i, eLpNorm (g i) p (volume.restrict O)) < ∞ :=
-    ENNReal.mul_lt_top hC.lt_top (ENNReal.add_lt_top.2 ⟨hf, ENNReal.sum_lt_top.2 fun i _ => hg i⟩)
-  have hFm : MemLp F p volume := memLp_iff.2 ((le_self_add.trans hb).trans_lt hfin)
-  have hGm : ∀ i, MemLp (G i) p volume := fun i => memLp_iff.2
-    ((((Finset.single_le_sum (f := fun j => eLpNorm (G j) p volume) (fun j _ => zero_le)
-      (Finset.mem_univ i)).trans le_add_self).trans hb).trans_lt hfin)
+  obtain ⟨hFm, hGm⟩ := memLp_of_eLpNorm_add_sum_le hC
+    (ENNReal.add_ne_top.2 ⟨hf.eLpNorm_ne_top, ENNReal.sum_ne_top.2 fun i _ =>
+      (hg i).eLpNorm_ne_top⟩) hb
   have hW : ∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) (hFm.toLp F)
       ((hGm i).toLp (G i)) := fun i =>
     (hG i).congr_ae (by rw [volume_restrict_top]; exact hFm.coeFn_toLp.symm)
@@ -534,6 +589,18 @@ theorem add_sum_le_of_le_two_mul {ι : Type*} [Fintype ι] {a X Y K d : ℝ≥0�
     _ ≤ (2 * X + Fintype.card ι * (K * (Y + d * X))) +
           (2 * Y + Fintype.card ι * K * (X + d * Y)) := le_self_add
     _ = _ := by ring
+
+/-- The **constant of the boundary patches by reflection**: `2 + 2 n (1 + M)² (1 + d)` for the
+dimension `n`, the Lipschitz constant `M` of the graph and the sum `d` of the bounds of the
+derivatives of the cutoff
+(`Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_reflectionExtension_mul`). -/
+noncomputable def reflectionConst (n : ℕ) (M : ℝ) (d : ℝ≥0∞) : ℝ≥0∞ :=
+  2 + n * (2 * ENNReal.ofReal ((1 + M) ^ 2)) * (1 + d)
+
+/-- The constant of the boundary patches by reflection is finite for finite `d`. -/
+theorem reflectionConst_ne_top (n : ℕ) (M : ℝ) {d : ℝ≥0∞} (hd : d ≠ ∞) :
+    reflectionConst n M d ≠ ∞ := by
+  simp [reflectionConst, ENNReal.mul_eq_top, hd]
 
 namespace BoundedLipschitzDomain
 
@@ -589,29 +656,33 @@ theorem eLpNorm_mul_add_fderiv_mul_graph_le (j : Fin Ω.N) (hp : 1 ≤ p) {w : V
     (B := ⟨ball (Ω.center j) (Ω.radius j), isOpen_ball⟩) hp hχ hχB hC hC').trans (by
       gcongr <;> exact Ω.graph_toOpens_inf_ball_le j)
 
-/-- **The boundary patches by reflection**: for `1 ≤ p ≤ ∞`, Sobolev functions on `Ω` extend from
-`Ω ∩ B(c_j, ρ_j - 2ε)` with a finite constant. A smooth cutoff `χ = 1` on
-`B̄(c_j, ρ_j - 2ε)` with closed support in `B(c_j, ρ_j)` (`Rd.exists_contDiff_eventuallyEq_one`)
-turns `f` into a Sobolev function `χ f` on the graph domain `Ω_j`
-(`Rd.BoundedLipschitzDomain.hasWeakLineDeriv_mul_graph`), and its extension by reflection
-(`Rd.LipschitzGraph.hasWeakLineDeriv_reflectionExtension`) agrees with `f` there. -/
-theorem exists_extendsSobolev_boundary_reflection [Fact (1 ≤ p)] {ε : ℝ} (hε : 0 < ε)
-    (j : Fin Ω.N) :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens
-      (Ω.carrier ∩ ball (Ω.center j) (Ω.radius j - 2 * ε)) C := by
-  have hp : 1 ≤ p := Fact.out
-  obtain ⟨χ, hχ, hχc, hχB, hχ01, hχ1⟩ := exists_contDiff_eventuallyEq_one
-    (isCompact_closedBall (Ω.center j) (Ω.radius j - 2 * ε)) isOpen_ball
-    (closedBall_subset_ball (by linarith) :
-      closedBall (Ω.center j) (Ω.radius j - 2 * ε) ⊆ ball (Ω.center j) (Ω.radius j))
-  obtain ⟨d, hd'⟩ := exists_norm_fderiv_gridBasis_le hχ hχc
+/-- **The extension by reflection of a cutoff on a boundary patch, with its bound**: for `1 ≤ p`, a
+smooth `χ` with values in `[0, 1]`, closed support in the boundary ball `B(c_j, ρ_j)` and
+`|∂_{e_i} χ| ≤ d_i`, and `f ∈ L_p(Ω)` with weak derivatives `g_i = ∂_{e_i} f ∈ L_p(Ω)` on `Ω`, the
+extension by reflection `F` of `χ f` in the graph domain `Ω_j` has weak derivatives
+`G_k = ∂_{e_k} F` on `V` with
+`‖F‖_p + ∑_k ‖G_k‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`,
+`C = 2 + 2 n (1 + M_j)² (1 + ∑_i d_i)` (`Rd.reflectionConst`) with the Lipschitz constant `M_j` of
+the graph of `Ω_j`
+(`Rd.BoundedLipschitzDomain.hasWeakLineDeriv_mul_graph`,
+`Rd.LipschitzGraph.hasWeakLineDeriv_reflectionExtension`, `Rd.add_sum_le_of_le_two_mul`). -/
+theorem exists_hasWeakLineDeriv_reflectionExtension_mul (j : Fin Ω.N) (hp : 1 ≤ p) {χ : V → ℝ}
+    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ)
+    (hχB : tsupport χ ⊆ ball (Ω.center j) (Ω.radius j)) (hχ01 : ∀ x, χ x ∈ Icc (0 : ℝ) 1)
+    {d : Fin (finrank ℝ V) → ℝ≥0} (hd : ∀ i x, ‖fderiv ℝ χ x (gridBasis V i)‖ ≤ d i)
+    {f : V → ℂ} {g : Fin (finrank ℝ V) → V → ℂ} (hf : MemLp f p (volume.restrict Ω.carrier))
+    (hg : ∀ i, MemLp (g i) p (volume.restrict Ω.carrier))
+    (hfg : ∀ i, HasWeakLineDeriv Ω.toOpens (fun _ : Fin 1 => gridBasis V i) f (g i)) :
+    ∃ G : Fin (finrank ℝ V) → V → ℂ,
+      (∀ k, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V k)
+        ((Ω.graph j).reflectionExtension fun x => (χ x : ℂ) * f x) (G k)) ∧
+      eLpNorm ((Ω.graph j).reflectionExtension fun x => (χ x : ℂ) * f x) p volume +
+          ∑ k, eLpNorm (G k) p volume ≤
+        reflectionConst (finrank ℝ V) (Ω.graph j).M (∑ i, (d i : ℝ≥0∞)) *
+          (eLpNorm f p (volume.restrict Ω.carrier) +
+            ∑ i, eLpNorm (g i) p (volume.restrict Ω.carrier)) := by
   have h1 : ∀ x, ‖χ x‖ ≤ ((1 : ℝ≥0) : ℝ) := fun x =>
     (norm_le_one_of_forall_mem_Icc hχ01 x).trans_eq NNReal.coe_one.symm
-  set d₀ : ℝ≥0∞ := ∑ i, (d i : ℝ≥0∞)
-  set K : ℝ≥0∞ := 2 * ENNReal.ofReal ((1 + (Ω.graph j).M) ^ 2)
-  have hC : 2 + Fintype.card (Fin (finrank ℝ V)) * K * (1 + d₀) ≠ ∞ := by
-    simp [K, d₀, ENNReal.mul_eq_top, ENNReal.sum_eq_top]
-  refine ⟨_, hC, extendsSobolev_of_eLpNorm_le hC fun f g hf hg hfg => ?_⟩
   have hloc := fun i => Ω.hasWeakLineDeriv_mul_graph j hχ hχB (hfg i)
   have hF0 : eLpNorm (fun x => (χ x : ℂ) * f x) p (volume.restrict (Ω.graph j).domain) ≤
       eLpNorm f p (volume.restrict Ω.carrier) :=
@@ -619,7 +690,7 @@ theorem exists_extendsSobolev_boundary_reflection [Fact (1 ≤ p)] {ε : ℝ} (h
   have hG0 : ∀ i, eLpNorm (fun x => (χ x : ℂ) * g i x + (fderiv ℝ χ x (gridBasis V i) : ℂ) * f x)
       p (volume.restrict (Ω.graph j).domain) ≤ eLpNorm (g i) p (volume.restrict Ω.carrier) +
         d i * eLpNorm f p (volume.restrict Ω.carrier) := fun i =>
-    (Ω.eLpNorm_mul_add_fderiv_mul_graph_le j hp hχ hχB h1 (hd' i)).trans_eq
+    (Ω.eLpNorm_mul_add_fderiv_mul_graph_le j hp hχ hχB h1 (hd i)).trans_eq
       (by rw [ENNReal.coe_one, one_mul])
   have hmf : MemLp (fun x => (χ x : ℂ) * f x) p (volume.restrict (Ω.graph j).domain) :=
     memLp_iff.2 (hF0.trans_lt hf)
@@ -627,67 +698,127 @@ theorem exists_extendsSobolev_boundary_reflection [Fact (1 ≤ p)] {ε : ℝ} (h
       p (volume.restrict (Ω.graph j).domain) := fun i =>
     memLp_iff.2 ((hG0 i).trans_lt (ENNReal.add_lt_top.2 ⟨hg i, ENNReal.mul_lt_top
       ENNReal.coe_lt_top hf⟩))
-  refine ⟨_, _, fun k => (Ω.graph j).hasWeakLineDeriv_reflectionExtension hp hmf hmg hloc
-    (gridBasis V k), ae_of_all _ fun x hx => ?_, add_sum_le_of_le_two_mul
-      ((LipschitzGraph.eLpNorm_reflectionExtension_le _ hp _).trans (by gcongr; exact hF0))
-        fun k => ?_⟩
-  · have hxG : x ∈ (Ω.graph j).domain := by
-      have hx' := hx
-      rw [Ω.inter_ball_eq j (by linarith)] at hx'
-      exact hx'.1
-    rw [LipschitzGraph.reflectionExtension_of_mem _ _ hxG,
-      hχ1.self_of_nhdsSet x (ball_subset_closedBall hx.2), Complex.ofReal_one, one_mul]
-  · refine ((Ω.graph j).eLpNorm_reflectionDeriv_le hp hmf hmg hloc _).trans ?_
-    rw [← ofReal_norm, (gridBasis V).orthonormal.1 k, ENNReal.ofReal_one, mul_one]
-    gcongr
-    calc _ ≤ ∑ i, (eLpNorm (g i) p (volume.restrict Ω.carrier) +
-          d i * eLpNorm f p (volume.restrict Ω.carrier)) :=
-          Finset.sum_le_sum fun i _ => hG0 i
-      _ = _ := by rw [Finset.sum_add_distrib, Finset.sum_mul]; rfl
+  refine ⟨_, fun k => (Ω.graph j).hasWeakLineDeriv_reflectionExtension hp hmf hmg hloc
+    (gridBasis V k), ?_⟩
+  calc _ ≤ (2 + Fintype.card (Fin (finrank ℝ V)) * (2 * ENNReal.ofReal ((1 + (Ω.graph j).M) ^ 2)) *
+        (1 + ∑ i, (d i : ℝ≥0∞))) * (eLpNorm f p (volume.restrict Ω.carrier) +
+          ∑ i, eLpNorm (g i) p (volume.restrict Ω.carrier)) := by
+        refine add_sum_le_of_le_two_mul
+          ((LipschitzGraph.eLpNorm_reflectionExtension_le _ hp _).trans (by gcongr)) fun k => ?_
+        refine ((Ω.graph j).eLpNorm_reflectionDeriv_le hp hmf hmg hloc _).trans ?_
+        rw [← ofReal_norm, (gridBasis V).orthonormal.1 k, ENNReal.ofReal_one, mul_one]
+        gcongr
+        calc _ ≤ ∑ i, (eLpNorm (g i) p (volume.restrict Ω.carrier) +
+              d i * eLpNorm f p (volume.restrict Ω.carrier)) :=
+              Finset.sum_le_sum fun i _ => hG0 i
+          _ = _ := by rw [Finset.sum_add_distrib, Finset.sum_mul]
+    _ = _ := by rw [Fintype.card_fin]; rfl
 
-/-- **The inner patch by a cutoff**: for `1 ≤ p ≤ ∞` and `δ > 0`, Sobolev functions on `Ω` extend
-from `{x ∈ Ω : infDist(x, Ωᶜ) > 2δ}` with a finite constant. A smooth cutoff `χ = 1` on the
-compact set `{infDist(·, Ωᶜ) ≥ 2δ} ⊆ Ω` with compact closed support in `Ω`
-(`Rd.exists_contDiff_eventuallyEq_one`) gives `χ f` with the weak derivatives
-`χ g_i + (∂_{e_i} χ) f` on `V` (`Rd.HasWeakLineDeriv.cutoff_top`). -/
-theorem exists_extendsSobolev_interior_cutoff [Fact (1 ≤ p)] {δ : ℝ} (hδ : 0 < δ) :
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **The extension by reflection of a cutoff agrees with the function near the patch**: if
+`χ = 1` near `B̄(c_j, ρ_j - 2ε)` with `ε ≥ 0`, then the extension by reflection of `χ f` in the
+graph domain `Ω_j` is `f` on `Ω ∩ B(c_j, ρ_j - 2ε)`, a subset of `Ω_j`
+(`Rd.BoundedLipschitzDomain.inter_ball_eq`, `Rd.LipschitzGraph.reflectionExtension_of_mem`). -/
+theorem reflectionExtension_mul_eq_of_mem (j : Fin Ω.N) {ε : ℝ} (hε : 0 ≤ ε) {χ : V → ℝ}
+    (hχ1 : ∀ᶠ x in 𝓝ˢ (closedBall (Ω.center j) (Ω.radius j - 2 * ε)), χ x = 1) (f : V → ℂ)
+    {x : V} (hx : x ∈ Ω.carrier ∩ ball (Ω.center j) (Ω.radius j - 2 * ε)) :
+    (Ω.graph j).reflectionExtension (fun x => (χ x : ℂ) * f x) x = f x := by
+  have hxG : x ∈ (Ω.graph j).domain := by
+    have hx' := hx
+    rw [Ω.inter_ball_eq j (by linarith)] at hx'
+    exact hx'.1
+  rw [LipschitzGraph.reflectionExtension_of_mem _ _ hxG,
+    hχ1.self_of_nhdsSet x (ball_subset_closedBall hx.2), Complex.ofReal_one, one_mul]
+
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- **The cutoff of a boundary patch**: for `ε > 0` and every `j` there is a smooth `χ` with values
+in `[0, 1]`, compact closed support in the boundary ball `B(c_j, ρ_j)` and `χ = 1` near
+`B̄(c_j, ρ_j - 2ε)` (`Rd.exists_contDiff_eventuallyEq_one`). -/
+theorem exists_cutoff_boundary {ε : ℝ} (hε : 0 < ε) (j : Fin Ω.N) :
+    ∃ χ : V → ℝ, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ ∧ HasCompactSupport χ ∧
+      tsupport χ ⊆ ball (Ω.center j) (Ω.radius j) ∧ (∀ x, χ x ∈ Icc (0 : ℝ) 1) ∧
+      ∀ᶠ x in 𝓝ˢ (closedBall (Ω.center j) (Ω.radius j - 2 * ε)), χ x = 1 :=
+  exists_contDiff_eventuallyEq_one (isCompact_closedBall _ _) isOpen_ball
+    (closedBall_subset_ball (by linarith))
+
+/-- **The boundary patches by reflection**: for `1 ≤ p ≤ ∞`, Sobolev functions on `Ω` extend from
+`Ω ∩ B(c_j, ρ_j - 2ε)` with a finite constant. The cutoff
+`Rd.BoundedLipschitzDomain.exists_cutoff_boundary` turns `f` into a Sobolev function `χ f` on the
+graph domain `Ω_j`, and its extension by reflection
+(`Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_reflectionExtension_mul`) agrees with `f`
+there (`Rd.BoundedLipschitzDomain.reflectionExtension_mul_eq_of_mem`). -/
+theorem exists_extendsSobolev_boundary_reflection [Fact (1 ≤ p)] {ε : ℝ} (hε : 0 < ε)
+    (j : Fin Ω.N) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens
-      (Ω.carrier ∩ {x : V | 2 * δ < infDist x Ω.carrierᶜ}) C := by
-  have hp : 1 ≤ p := Fact.out
+      (Ω.carrier ∩ ball (Ω.center j) (Ω.radius j - 2 * ε)) C := by
+  obtain ⟨χ, hχ, hχc, hχB, hχ01, hχ1⟩ := Ω.exists_cutoff_boundary hε j
+  obtain ⟨d, hd⟩ := exists_norm_fderiv_gridBasis_le hχ hχc
+  have hC := reflectionConst_ne_top (finrank ℝ V) (Ω.graph j).M
+    (ENNReal.sum_ne_top.2 fun i _ => ENNReal.coe_ne_top : ∑ i, (d i : ℝ≥0∞) ≠ ∞)
+  refine ⟨_, hC, extendsSobolev_of_eLpNorm_le hC fun f g hf hg hfg => ?_⟩
+  obtain ⟨G, hG, hb⟩ := Ω.exists_hasWeakLineDeriv_reflectionExtension_mul j Fact.out hχ hχB hχ01
+    hd hf hg hfg
+  exact ⟨_, G, hG, ae_of_all _ fun x hx => Ω.reflectionExtension_mul_eq_of_mem j hε.le hχ1 f hx,
+    hb⟩
+
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- **The cutoff of the inner patch**: for `δ > 0` there is a smooth `χ` with values in `[0, 1]`,
+compact closed support in `Ω` and `χ = 1` near the compact set `{infDist(·, Ωᶜ) ≥ 2δ} ⊆ Ω`
+(`Rd.exists_contDiff_eventuallyEq_one`). -/
+theorem exists_cutoff_interior {δ : ℝ} (hδ : 0 < δ) :
+    ∃ χ : V → ℝ, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ ∧ HasCompactSupport χ ∧
+      tsupport χ ⊆ Ω.carrier ∧ (∀ x, χ x ∈ Icc (0 : ℝ) 1) ∧
+      ∀ᶠ x in 𝓝ˢ {x : V | 2 * δ ≤ infDist x Ω.carrierᶜ}, χ x = 1 := by
   have hKΩ : {x : V | 2 * δ ≤ infDist x Ω.carrierᶜ} ⊆ Ω.carrier := fun x hx => by
     by_contra h
     have h0 : infDist x Ω.carrierᶜ = 0 := infDist_zero_of_mem h
     have hx' : 2 * δ ≤ infDist x Ω.carrierᶜ := hx
     linarith
-  obtain ⟨χ, hχ, hχc, hχΩ, hχ01, hχ1⟩ := exists_contDiff_eventuallyEq_one
+  exact exists_contDiff_eventuallyEq_one
     (isCompact_of_isClosed_isBounded (isClosed_le continuous_const (continuous_infDist_pt _))
       (Ω.isBounded.subset hKΩ)) Ω.isOpen hKΩ
+
+/-- **The cutoff of a function on the inner patch, with its bound**: for `1 ≤ p`, a smooth `χ` with
+values in `[0, 1]`, compact closed support in `Ω`, `|∂_{e_i} χ| ≤ d_i` and `χ = 1` near
+`{infDist(·, Ωᶜ) ≥ 2δ}`, and `f` with weak derivatives `g_i = ∂_{e_i} f` on `Ω`, the function
+`χ f` has weak derivatives `G_i = ∂_{e_i} (χ f)` on `V`, equals `f` on
+`{x ∈ Ω : infDist(x, Ωᶜ) > 2δ}`, and
+`‖χ f‖_p + ∑_i ‖G_i‖_p ≤ (1 + ∑_i d_i) (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`
+(`Rd.HasWeakLineDeriv.cutoff_top`, `Rd.eLpNorm_mul_add_sum_le_of_tsupport_subset`). -/
+theorem exists_hasWeakLineDeriv_mul_interior (hp : 1 ≤ p) {δ : ℝ} {χ : V → ℝ}
+    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (hχc : HasCompactSupport χ)
+    (hχΩ : tsupport χ ⊆ Ω.carrier) (hχ01 : ∀ x, χ x ∈ Icc (0 : ℝ) 1)
+    {d : Fin (finrank ℝ V) → ℝ≥0} (hd : ∀ i x, ‖fderiv ℝ χ x (gridBasis V i)‖ ≤ d i)
+    (hχ1 : ∀ᶠ x in 𝓝ˢ {x : V | 2 * δ ≤ infDist x Ω.carrierᶜ}, χ x = 1) {f : V → ℂ}
+    {g : Fin (finrank ℝ V) → V → ℂ}
+    (hfg : ∀ i, HasWeakLineDeriv Ω.toOpens (fun _ : Fin 1 => gridBasis V i) f (g i)) :
+    ∃ G : Fin (finrank ℝ V) → V → ℂ,
+      (∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) (fun x => (χ x : ℂ) * f x)
+        (G i)) ∧
+      (∀ x ∈ Ω.carrier ∩ {x : V | 2 * δ < infDist x Ω.carrierᶜ}, (χ x : ℂ) * f x = f x) ∧
+      eLpNorm (fun x => (χ x : ℂ) * f x) p volume + ∑ i, eLpNorm (G i) p volume ≤
+        (1 + ∑ i, (d i : ℝ≥0∞)) * (eLpNorm f p (volume.restrict Ω.carrier) +
+          ∑ i, eLpNorm (g i) p (volume.restrict Ω.carrier)) := by
+  refine ⟨fun i x => (χ x : ℂ) * g i x + (fderiv ℝ χ x (gridBasis V i) : ℂ) * f x,
+    fun i => ((hfg i).cutoff_top hχ hχc hχΩ).1, fun x hx => ?_,
+    eLpNorm_mul_add_sum_le_of_tsupport_subset (O := Ω.toOpens) hp hχ hχΩ hχ01 hd f g⟩
+  rw [hχ1.self_of_nhdsSet x (le_of_lt hx.2 : 2 * δ ≤ infDist x Ω.carrierᶜ), Complex.ofReal_one,
+    one_mul]
+
+/-- **The inner patch by a cutoff**: for `1 ≤ p ≤ ∞` and `δ > 0`, Sobolev functions on `Ω` extend
+from `{x ∈ Ω : infDist(x, Ωᶜ) > 2δ}` with a finite constant, by the cutoff
+`Rd.BoundedLipschitzDomain.exists_cutoff_interior` and
+`Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_mul_interior`. -/
+theorem exists_extendsSobolev_interior_cutoff [Fact (1 ≤ p)] {δ : ℝ} (hδ : 0 < δ) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens
+      (Ω.carrier ∩ {x : V | 2 * δ < infDist x Ω.carrierᶜ}) C := by
+  obtain ⟨χ, hχ, hχc, hχΩ, hχ01, hχ1⟩ := Ω.exists_cutoff_interior hδ
   obtain ⟨d, hd⟩ := exists_norm_fderiv_gridBasis_le hχ hχc
-  have h1 : ∀ x, ‖χ x‖ ≤ ((1 : ℝ≥0) : ℝ) := fun x =>
-    (norm_le_one_of_forall_mem_Icc hχ01 x).trans_eq NNReal.coe_one.symm
   have hC : 1 + ∑ i, (d i : ℝ≥0∞) ≠ ∞ := by simp [ENNReal.sum_eq_top]
-  refine ⟨_, hC, extendsSobolev_of_eLpNorm_le hC fun f g hf hg hfg => ?_⟩
-  refine ⟨fun x => (χ x : ℂ) * f x,
-    fun i x => (χ x : ℂ) * g i x + (fderiv ℝ χ x (gridBasis V i) : ℂ) * f x,
-    fun i => ((hfg i).cutoff_top hχ hχc hχΩ).1, ae_of_all _ fun x hx => ?_, ?_⟩
-  · show (χ x : ℂ) * f x = f x
-    rw [hχ1.self_of_nhdsSet x (le_of_lt hx.2), Complex.ofReal_one, one_mul]
-  have hF := eLpNorm_mul_le_of_tsupport_subset (O := ⊤) (B := Ω.toOpens) (f := f) (p := p)
-    hχ.continuous hχΩ h1
-  have hG := fun i => eLpNorm_mul_add_fderiv_mul_le (O := ⊤) (B := Ω.toOpens) (f := f) (g := g i)
-    hp hχ hχΩ h1 (hd i)
-  simp only [volume_restrict_top, top_inf_eq, ENNReal.coe_one, one_mul] at hF hG
-  calc _ ≤ eLpNorm f p (volume.restrict Ω.toOpens) + ∑ i, (eLpNorm (g i) p
-        (volume.restrict Ω.toOpens) + d i * eLpNorm f p (volume.restrict Ω.toOpens)) :=
-        add_le_add hF (Finset.sum_le_sum fun i _ => hG i)
-    _ ≤ _ := by
-        rw [Finset.sum_add_distrib, ← Finset.sum_mul]
-        calc _ ≤ eLpNorm f p (volume.restrict Ω.toOpens) +
-              (∑ i, eLpNorm (g i) p (volume.restrict Ω.toOpens) +
-                (∑ i, (d i : ℝ≥0∞)) * eLpNorm f p (volume.restrict Ω.toOpens)) +
-              (∑ i, (d i : ℝ≥0∞)) * ∑ i, eLpNorm (g i) p (volume.restrict Ω.toOpens) :=
-              le_self_add
-          _ = _ := by ring
+  refine ⟨_, hC, extendsSobolev_of_eLpNorm_le hC fun f g _ _ hfg => ?_⟩
+  obtain ⟨G, hG, hU, hb⟩ :=
+    Ω.exists_hasWeakLineDeriv_mul_interior (p := p) Fact.out hχ hχc hχΩ hχ01 hd hχ1 hfg
+  exact ⟨_, G, hG, ae_of_all _ hU, hb⟩
 
 /-- **The extension theorem for `1 ≤ p ≤ ∞` with a bound**: for a bounded Lipschitz domain `Ω` in
 dimension `n ≥ 1` and `1 ≤ p ≤ ∞` there is a finite constant `C` such that every `f ∈ L_p(Ω)` with

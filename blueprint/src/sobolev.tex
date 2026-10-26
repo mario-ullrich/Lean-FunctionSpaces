@@ -594,6 +594,29 @@ eq\_\allowbreak one\_\allowbreak iff} gives a smooth $\chi$ with values in $[0, 
 and $\chi = 1$ on $L$. For the bounds, $\partial_{e_i} \chi$ is continuous with compact support.
 \end{proof}
 
+\begin{lemma}[The cutoff bound on the whole space]
+\label{lem:cutoff-bound-whole-space}
+\lean{Rd.eLpNorm_mul_add_sum_le_of_tsupport_subset}
+\leanok
+\uses{lem:weak-derivative-cutoff, lem:smooth-cutoff-compact}
+For every $1 \leq p \leq \infty$, every open $O \subseteq V$, all $d_i \geq 0$, every smooth real
+$\chi$ with values in $[0, 1]$, closed support in $O$ and $|\partial_{e_i} \chi| \leq d_i$ for
+every $i \in I$, and all $f$, $g_i \colon V \to \C$,
+\begin{multline*}
+  \|\chi f\|_{L_p(V)} + \sum_{i \in I} \|\chi g_i + (\partial_{e_i} \chi) f\|_{L_p(V)} \\
+  \leq \Bigl(1 + \sum_{i \in I} d_i\Bigr) \Bigl(\|f\|_{L_p(O)} + \sum_{i \in I}
+  \|g_i\|_{L_p(O)}\Bigr) .
+\end{multline*}
+\end{lemma}
+
+\begin{proof}
+\leanok
+Here $|\chi| \leq 1$ (\Cref{lem:smooth-cutoff-compact}), so \Cref{lem:weak-derivative-cutoff} (5)
+and (4) with $V$ for $O$ and $O$ for $B$ give $\|\chi f\|_{L_p(V)} \leq \|f\|_{L_p(O)}$ and
+$\|\chi g_i + (\partial_{e_i} \chi) f\|_{L_p(V)} \leq \|g_i\|_{L_p(O)} + d_i \|f\|_{L_p(O)}$.
+The sum of these bounds is at most the right side.
+\end{proof}
+
 \paragraph{Mollification on open sets.}
 
 \begin{lemma}[The derivative of a mollification]
