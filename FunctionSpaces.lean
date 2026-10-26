@@ -166,6 +166,8 @@ public import FunctionSpaces.Torus.SingularIntegrals
 public import FunctionSpaces.Torus.SquareFunction
 public import FunctionSpaces.Torus.LpFourierCoefficients
 public import FunctionSpaces.Torus.LpWeakDerivatives
+public import FunctionSpaces.Torus.SobolevTriebelLizorkin
+public import FunctionSpaces.Torus.SobolevEmbedding
 public import FunctionSpaces.Interval.Differences
 public import FunctionSpaces.Interval.Modulus
 public import FunctionSpaces.Interval.Polynomials
@@ -730,6 +732,11 @@ and the theorems that their characterisations agree. The library builds on
 * `FunctionSpaces.Torus.LpWeakDerivatives`: weak derivatives along directions in `L_p(𝕋^d)`,
   their symbols and calculus, convolution with Schwartz kernels, and `W^m_p(𝕋^d)` through
   directional derivatives.
+* `FunctionSpaces.Torus.SobolevTriebelLizorkin`: `W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)` for
+  `1 < p < ∞` with named constants, the Besov sandwich of `W^m_p(𝕋^d)` and its description by
+  local means.
+* `FunctionSpaces.Torus.SobolevEmbedding`: the embeddings of `W^m_p(𝕋^d)` into `L_r`, into
+  continuous functions and into `W^k_r(𝕋^d)`.
 
 ### Intervals
 

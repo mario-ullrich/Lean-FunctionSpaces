@@ -22,7 +22,9 @@ multipliers:
   `Torus.econvLp_comp_econvLp_of_eq` for a given `M = K ⋆ L`), from `𝓕(K ⋆ L) = 𝓕K · 𝓕L`
   (`Rd.fourier_conv`); in particular the operators commute (`Torus.econvLp_comm`);
 * the operator is additive in the kernel (`Torus.econvLp_add_kernel`,
-  `Torus.econvLp_sub_kernel`);
+  `Torus.econvLp_sub_kernel`), constants move from the kernel to the function
+  (`Torus.econv_smul_kernel`), and equal kernels give the same operator
+  (`Torus.econvLp_congr_kernel`);
 * if `𝓕Φ(m) = 0` for `deg m < n`, the operator annihilates the trigonometric polynomials of
   degree `< n` (`Torus.econvLp_eq_zero_of_mem`).
 
@@ -109,6 +111,22 @@ theorem econvLp_sub_kernel (hp : p ≠ ∞) {K L : EuclideanSpace ℝ d → ℂ}
       rw [sub_apply, econvLp_mFourierLp, econvLp_mFourierLp,
         econvLp_mFourierLp, Rd.fourier_sub_apply hK hL, sub_smul]
   exact DFunLike.congr_fun h f
+
+/-- **Constants move from the kernel to the function**: `(c K) ⋆ g = K ⋆ (c g)` at every point
+of the torus, for every `c ∈ ℂ`, every function `K` on `ℝ^d` and every function `g` on `𝕋^d`. -/
+theorem econv_smul_kernel (c : ℂ) (K : EuclideanSpace ℝ d → ℂ) (g : UnitAddTorus d → ℂ) :
+    econv (c • K) g = econv K (c • g) := funext fun t => by
+  simp only [econv, Pi.smul_apply, smul_eq_mul]
+  congr 1
+  funext y
+  ring
+
+/-- Equal integrable kernels `K = L` on `ℝ^d` give the same convolution operator on
+`L_p(𝕋^d)`. -/
+theorem econvLp_congr_kernel (hp : p ≠ ∞) {K L : EuclideanSpace ℝ d → ℂ} (hK : Integrable K)
+    (hL : Integrable L) (h : K = L) : econvLp hp hK = econvLp hp hL := by
+  subst h
+  rfl
 
 /-- **Kernels with `𝓕Φ = 0` on the low frequencies annihilate trigonometric polynomials**: if
 `𝓕Φ(m) = 0` for `deg m < n`, then `Φ ⋆ a = 0` for every trigonometric polynomial `a` of degree

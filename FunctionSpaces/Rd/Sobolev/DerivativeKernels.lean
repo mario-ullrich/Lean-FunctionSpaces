@@ -25,7 +25,7 @@ Fourier transform `𝓕η_i(ξ) = ∏_k ⟪ξ, e_{i_k}⟫ / ((2πi)^m ‖ξ‖^{
 * **The dilated identity**: with the chain rule `∂^w (G_c) = c^k (∂^w G)_c`
   (`Rd.iteratedLineDerivOp_schwartzDilate`),
   `2^{jm} ψ_{j+1} = ∑_i ∂_{e_{i_0}} ⋯ ∂_{e_{i_{m-1}}} ((η_i)_{2^j})`
-  (`Rd.two_pow_smul_psi_succ_eq_sum`).
+  (`Rd.two_pow_smul_psi_succ_eq_sum`), with the factor `‖2^n‖ = 2^n` (`Rd.enorm_two_pow_complex`).
 * **The derivative families** `((η_i)_{2^j})_j` are Calderón–Zygmund families with overlap `2`
   (`Rd.isCZFamily_derivFamily`).
 * **The dual derivative families**: for every `w ∈ V^k` the synthesis kernels satisfy
@@ -264,6 +264,11 @@ theorem two_pow_smul_psi_succ_eq_sum (m j : ℕ) :
   have hx := congrArg (fun S : 𝓢(V, ℂ) => S x) h
   simp only [sum_apply, smul_apply] at hx
   rw [Finset.sum_apply, hx, Pi.smul_apply, coe_schwartzDilate, coe_psiOneS, dilate_psi_one]
+
+/-- The complex number `2^n` has absolute value `2^n`, by Mathlib's `enorm_pow` and
+`Complex.norm_two`; this is the size of the factor `2^{jm}` of the dilated identity. -/
+theorem enorm_two_pow_complex (n : ℕ) : ‖(2 : ℂ) ^ n‖ₑ = 2 ^ n := by
+  rw [enorm_pow, ← ofReal_norm, Complex.norm_two, ENNReal.ofReal_ofNat]
 
 /-! ### The derivative families -/
 

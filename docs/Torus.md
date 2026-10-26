@@ -12,7 +12,9 @@ multipliers. For every `1 ≤ p < ∞` the Besov spaces are described by moduli 
 order: the kernels of `ℝ^d` act on `𝕋^d` by convolution with their periodisations, using Young's
 inequality on measurable groups of [Tools from analysis](Analysis.md) and the band-limited
 approximation of [Besov spaces on `ℝ^d`](Rd.md); the same kernels give smooth Littlewood–Paley
-blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. The restriction to a face of
+blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. For `1 < p < ∞`, weak derivatives
+in `L_p` tested against trigonometric polynomials give `W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)`, with the
+Besov sandwich and the Sobolev embeddings. The restriction to a face of
 `𝕋^(n+1)` is the model case of the trace theorem.
 
 ## Main results
@@ -71,7 +73,19 @@ blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. The restricti
   coefficients (`Torus.eq_of_mFourierCoeff_eq`), so the weak derivative is unique; it is linear
   and passes to limits, for `p < ∞` it commutes with convolution by Schwartz kernels
   (`Torus.econvLp_iteratedLineDerivOp`), and `f ∈ W^m_p(𝕋^d)` iff `∂^v f ∈ L_p` for all
-  directions of order `≤ m` (`Torus.memSobolev_iff_forall_hasWeakLineDeriv`).
+  directions of order `≤ m` (`Torus.memSobolev_iff_forall_hasWeakLineDeriv`). For `d ≥ 1` and
+  `1 < p < ∞`, `W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)` for every `m ∈ ℕ`
+  (`Torus.memSobolev_iff_memTriebelLizorkin`), with named constants in both directions
+  (`Torus.triebelLizorkinNorm_le_of_hasWeakLineDeriv`,
+  `Torus.exists_hasWeakLineDeriv_of_memTriebelLizorkin`): the vector-valued singular integrals on
+  the torus act on the derivative kernels of `ℝ^d`. Hence
+  `B^m_{p,min(p,2)}(𝕋^d) ⊆ W^m_p(𝕋^d) ⊆ B^m_{p,max(p,2)}(𝕋^d)` for `m ≥ 1`
+  (`Torus.memSobolev_of_memBesov`, `Torus.memBesov_of_memSobolev`), `W^m_p(𝕋^d)` is described by
+  local means (`Torus.memSobolev_iff_tlLocalMeans`), and with `α = d (1/p - 1/r)` every
+  `f ∈ W^m_p(𝕋^d)` lies in `L_r(𝕋^d)` for `p ≤ r ≤ ∞` and `m > α`, has a continuous
+  representative for `m > d/p`, and lies in `W^k_r(𝕋^d)` for `p ≤ r < ∞` and `k < m - α`
+  (`Torus.memSobolev_exists_inclusion_eq`, `Torus.memSobolev_exists_continuous`,
+  `Torus.memSobolev_of_memSobolev_of_lt`).
 * **The Nikolskii inequality and the Besov embeddings.** For a trigonometric polynomial `T` of
   degree `< n` on `𝕋^d`, `n ≥ 1`, and `1 ≤ p < ∞`, `‖T‖_∞ ≤ (2⌈p/2⌉)^(d/p) n^(d/p) ‖T‖_p`
   (`Torus.norm_le_rpow_mul_eLpNorm`). Hence the trigonometric polynomials have the
@@ -116,6 +130,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ | ✗ | `Torus/WeakDerivatives` |
 | Fourier coefficients in `L_p(𝕋^d)`: convolutions, uniqueness | ✅ | ✗ | `Torus/LpFourierCoefficients` |
 | Weak derivatives along directions in `L_p(𝕋^d)`, `W^m_p(𝕋^d)` by them | ✅ | ✗ | `Torus/LpWeakDerivatives` |
+| `W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)` for `1 < p < ∞`, the Besov sandwich, local means | ✅ | ✗ | `Torus/SobolevTriebelLizorkin` |
+| Embeddings of `W^m_p(𝕋^d)` into `L_r`, `C(𝕋^d)`, `W^k_r(𝕋^d)` | ✅ | ✗ | `Torus/SobolevEmbedding` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

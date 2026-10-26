@@ -1324,17 +1324,19 @@ $L_p(\T^d)$.
 \label{lem:torus-econv-identities}
 \lean{Torus.ext_mFourierLp, Torus.econvLp_comp_econvLp, Torus.econvLp_comp_econvLp_of_eq,
   Torus.econvLp_comm, Torus.econvLp_add_kernel, Torus.econvLp_sub_kernel,
-  Torus.econvLp_eq_zero_of_mem}
+  Torus.econv_smul_kernel, Torus.econvLp_congr_kernel, Torus.econvLp_eq_zero_of_mem}
 \leanok
-\uses{thm:torus-econv-fourier, lem:torus-econv-young, lem:fourier-conv}
+\uses{def:torus-econv, thm:torus-econv-fourier, lem:torus-econv-young, lem:fourier-conv}
 For every normed space $F$, two bounded linear maps $L_p(\T^d) \to F$ that agree on every $e_m$,
 $m \in \Z^d$, are equal. For all
 $K, L \in L_1(\R^d)$ and every $f \in L_p(\T^d)$,
 \[
   K * (L * f) = (K * L) * f = L * (K * f), \qquad (K \pm L) * f = K * f \pm L * f .
 \]
-For every $n \in \N$ and every $\Phi \in L_1(\R^d)$ with $\mathcal{F}\Phi(m) = 0$ whenever
-$\deg m < n$, $\Phi * a = 0$ for every $a \in \mathcal{T}_n$.
+For every $c \in \C$, every function $K$ on $\R^d$ and every function $g$ on $\T^d$,
+$(c K) * g = K * (c g)$ at every point of $\T^d$. For every $n \in \N$ and every
+$\Phi \in L_1(\R^d)$ with $\mathcal{F}\Phi(m) = 0$ whenever $\deg m < n$, $\Phi * a = 0$ for
+every $a \in \mathcal{T}_n$.
 \end{lemma}
 
 \begin{proof}
@@ -1343,9 +1345,14 @@ The characters span a dense subspace of $L_p(\T^d)$, so a bounded linear map is 
 its values on them. All operators in the identities are bounded (\Cref{lem:torus-econv-young}) and
 multiply $e_m$ by $\mathcal{F}K(m) \, \mathcal{F}L(m) = \mathcal{F}(K * L)(m)$, respectively by
 $\mathcal{F}K(m) \pm \mathcal{F}L(m) = \mathcal{F}(K \pm L)(m)$ (\Cref{thm:torus-econv-fourier},
-\Cref{lem:fourier-conv}). The last claim holds on the characters $e_m$ with
+\Cref{lem:fourier-conv}). The identity $(c K) * g = K * (c g)$ is
+$(c K(y)) \, g(t - \pi y) = K(y) \, (c g(t - \pi y))$ under the integral of
+\Cref{def:torus-econv}. The last claim holds on the characters $e_m$ with
 $\deg m < n$, which span $\mathcal{T}_n$.
 \end{proof}
+
+The operator $f \mapsto K * f$ is determined by the kernel $K$: equal integrable kernels $K = L$
+on $\R^d$ give the same operator on $L_p(\T^d)$.
 
 \begin{theorem}[Approximate identities on the torus]
 \label{thm:torus-approx-identity}

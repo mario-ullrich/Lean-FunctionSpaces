@@ -240,7 +240,8 @@ and $\TL{s}{p}{q}(\T^d)$ consists of the $f \in L_p(\T^d)$ with $\|f\|_{F^s_{p,q
 
 \begin{proposition}[Elementary properties on the torus]
 \label{prop:torus-tl-elementary}
-\lean{Torus.blockFun_add_ae, Torus.blockFun_smul_ae, Torus.triebelLizorkinNorm_add_le,
+\lean{Torus.blockFun_add_ae, Torus.blockFun_smul_ae, Torus.eLpNorm_blockFun_zero_le,
+  Torus.triebelLizorkinNorm_add_le,
   Torus.triebelLizorkinNorm_smul, Torus.triebelLizorkinNorm_zero,
   Torus.triebelLizorkinNorm_zero_left, Torus.triebelLizorkinNorm_mono_exponent,
   Torus.triebelLizorkinNorm_mono_smoothness,
@@ -248,14 +249,15 @@ and $\TL{s}{p}{q}(\T^d)$ consists of the $f \in L_p(\T^d)$ with $\|f\|_{F^s_{p,q
   Torus.MemTriebelLizorkin.add, Torus.MemTriebelLizorkin.smul, Torus.triebelLizorkinSpace,
   Torus.mem_triebelLizorkinSpace}
 \leanok
-\uses{def:torus-triebel-lizorkin, lem:torus-econv-young, lem:lq-basic, lem:lp-norm-nonnegative}
+\uses{def:torus-triebel-lizorkin, lem:torus-econv-young, lem:lp-kernels-basic, lem:lq-basic,
+  lem:lp-norm-nonnegative}
 For every $1 \leq p < \infty$, all $s \leq t$ in $\R$, all $1 \leq q \leq r \leq \infty$, all
 $f, g \in L_p(\T^d)$ and every $c \in \C$, for almost every $x \in \T^d$ and all $j \in \N$,
 \[
   (\psi_j * (f + g))(x) = (\psi_j * f)(x) + (\psi_j * g)(x), \qquad
   (\psi_j * (c f))(x) = c \, (\psi_j * f)(x),
 \]
-and
+$\|\psi_0 * f\|_p \leq \|\Phi\|_1 \, \|f\|_p$, and
 \[
   \|f + g\|_{F^s_{p,q}} \leq \|f\|_{F^s_{p,q}} + \|g\|_{F^s_{p,q}}, \qquad
   \|c f\|_{F^s_{p,q}} = |c| \, \|f\|_{F^s_{p,q}},
@@ -275,7 +277,9 @@ $\|f\|_{F^0_{p,q}} = \bigl\| t \mapsto \|((\psi_j * f)(t))_j\|_{\ell_q} \bigr\|_
 The pointwise block depends on $f$ only through its class, and the convolution integral is
 linear in $f$. Since $L_p(\T^d) \subseteq L_1(\T^d)$, the integrals converge absolutely at almost
 every point (\Cref{lem:torus-econv-young}), which gives the identities for the pointwise blocks,
-for all $j$ at once. The rest is the proof of \Cref{prop:tl-elementary}; for $s = 0$ the weights
+for all $j$ at once. Young's inequality on the torus (\Cref{lem:torus-econv-young}) and
+$\|\psi_0\|_1 = \|\Phi\|_1$ (\Cref{lem:lp-kernels-basic}) give the bound of $\psi_0 * f$. The rest
+is the proof of \Cref{prop:tl-elementary}; for $s = 0$ the weights
 $2^{j \cdot 0}$ are $1$.
 \end{proof}
 

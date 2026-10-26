@@ -3516,6 +3516,9 @@ coefficients of convolutions with kernels on $\R^d$ (\Cref{def:torus-econv}).
 \Cref{sec:torus-lp-weak-derivatives} defines the derivatives $\partial^v$ along directions
 $v \in (\R^d)^k$, proves their calculus, moves them through convolutions with Schwartz kernels,
 and describes $\Sob{m}{p}(\T^d)$ by directional derivatives.
+\Cref{sec:torus-sobolev-triebel-lizorkin} proves $\Sob{m}{p}(\T^d) = \TL{m}{p}{2}(\T^d)$ for
+$1 < p < \infty$, and \Cref{sec:torus-sobolev-embedding} derives the Sobolev embeddings on the
+torus.
 
 \section{Fourier coefficients in \texorpdfstring{$L_p$}{L\_p} on the torus}
 \label{sec:torus-lp-fourier-coefficients}
@@ -3808,6 +3811,375 @@ coefficients (\Cref{lem:torus-lp-coefficients}). Conversely, $\partial^\alpha f$
 $\partial^{v^\alpha} f$ (\Cref{lem:torus-weak-line-derivative-basic}). The only multi-index of
 order $0$ is $\alpha = 0$, with $\partial^0 f = f$; the other claims follow from (4) and (7) of
 \Cref{lem:torus-weak-line-derivative-basic}.
+\end{proof}
+
+\section{Sobolev spaces as Triebel--Lizorkin spaces on the torus}
+\label{sec:torus-sobolev-triebel-lizorkin}
+
+Let $\#d \geq 1$ and $1 < p < \infty$. This section proves
+$\Sob{m}{p}(\T^d) = \TL{m}{p}{2}(\T^d)$ for every $m \in \N$, with named constants in both
+directions, by the argument of \Cref{sec:sobolev-triebel-lizorkin}: the strong type on $\R^d$ is
+replaced by the strong type of vector-valued singular integrals on the torus
+(\Cref{thm:torus-vector-valued-strong-type}), and the weak derivatives on $V$ by those of
+\Cref{def:torus-weak-line-derivative}. The identity $\Sob{m}{p}(\T^d) = \TL{m}{p}{2}(\T^d)$ is
+classical; see Triebel~\cite{Triebel}. In this section $V = \R^d$, and $e_\alpha$, $\eta_\alpha$,
+$\theta^\alpha_j$, $A^\alpha$, $\tilde\theta^w_j$, $\tilde A^w$ and $B_w$ are those of
+\Cref{sec:derivative-kernels}; the basis $e$ is the orthonormal basis of $\R^d$ of
+\Cref{def:dyadic-cells}, and directional derivatives (\Cref{thm:torus-sobolev-directions}) relate
+it to the coordinate basis.
+
+\paragraph{From weak derivatives to the blocks.}
+
+\begin{lemma}[The blocks on the torus as convolutions with the derivatives]
+\label{lem:torus-blocks-as-derivative-convolutions}
+\lean{Torus.fourier_two_pow_smul_psi_succ, Torus.two_pow_smul_lpBlock_succ,
+  Torus.two_pow_mul_blockFun_succ_ae, Torus.lqNorm_blockFun_succ_le_sum_ae}
+\leanok
+\uses{cor:psi-derivatives-dilated, lem:fourier-iterated-derivative,
+  thm:torus-coefficients-convolution, thm:torus-coefficients-uniqueness,
+  lem:torus-lp-coefficients, def:torus-weak-line-derivative, def:torus-lp-blocks,
+  def:torus-triebel-lizorkin, lem:blocks-as-derivative-convolutions, lem:dyadic-weights-integer,
+  lem:lq-basic, lem:countable-minkowski}
+For all $m, j \in \N$ and every $\xi \in \R^d$,
+\[
+  2^{jm} \, \mathcal{F}\psi_{j+1}(\xi)
+  = \sum_\alpha \Bigl( \prod_{l < m} 2\pi i \langle \xi, e_{\alpha_l} \rangle \Bigr)
+    \mathcal{F}\theta^\alpha_j(\xi) .
+\]
+Let $1 \leq p < \infty$, $m \in \N$ and $f \in L_p(\T^d)$, and for every multi-index $\alpha$
+let $g_\alpha \in L_p(\T^d)$ be the weak derivative $\partial^{e_\alpha} f$. For every $j \in \N$,
+\[
+  2^{jm} \Delta_{j+1} f = \sum_\alpha \theta^\alpha_j * g_\alpha
+\]
+in $L_p(\T^d)$; for almost every $t \in \T^d$ and every $j \in \N$,
+$2^{jm} (\psi_{j+1} * f)(t) = \sum_\alpha (\theta^\alpha_j * g_\alpha)(t)$; and for almost every
+$t \in \T^d$,
+\[
+  \bigl\| (2^{(j+1)m} |(\psi_{j+1} * f)(t)|)_j \bigr\|_{\ell_2}
+  \leq 2^m \sum_\alpha \bigl\| ((\theta^\alpha_j * g_\alpha)(t))_j \bigr\|_{\ell_2} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Fourier identity is the Fourier transform of \Cref{cor:psi-derivatives-dilated}: the
+transform is linear, and $\mathcal{F}(\partial^{e_\alpha} G)(\xi)
+= \prod_l 2\pi i \langle \xi, e_{\alpha_l} \rangle \, \mathcal{F}G(\xi)$ for Schwartz functions
+$G$ (\Cref{lem:fourier-iterated-derivative}). At $\xi = m' \in \Z^d$ the product is the symbol
+$\sigma_{e_\alpha}(m')$, so both sides of the identity in $L_p(\T^d)$ have the Fourier
+coefficients $2^{jm} \mathcal{F}\psi_{j+1}(m') \hat f(m')$
+(\Cref{thm:torus-coefficients-convolution}, \Cref{def:torus-weak-line-derivative}), and
+\Cref{thm:torus-coefficients-uniqueness} applies. The pointwise identity follows since the
+convolution integrals represent the operators (\Cref{def:torus-lp-blocks},
+\Cref{def:torus-triebel-lizorkin}), and the bound follows from it as in
+\Cref{lem:blocks-as-derivative-convolutions}.
+\end{proof}
+
+\begin{definition}[The constants of the embedding into $\TL{m}{p}{2}(\T^d)$]
+\label{def:torus-sobolev-to-tl-const}
+\lean{Torus.sobolevToTLConst, Torus.sobolevToTLConst_ne_top}
+\leanok
+\uses{def:periodic-cz-const, def:hormander-const, def:derivative-family,
+  lem:torus-far-mass-derivative-families}
+For $1 < p < \infty$, every $m \in \N$ and every multi-index $\alpha$,
+\[
+  K^{\T}_{p,\alpha} = S^{\T}_{p}\bigl(2, 4 H_{A^\alpha}, 2 T_{A^\alpha,0,1}\bigr) ,
+\]
+which is finite.
+\end{definition}
+
+\begin{theorem}[$\Sob{m}{p}(\T^d) \subseteq \TL{m}{p}{2}(\T^d)$]
+\label{thm:torus-sobolev-to-triebel-lizorkin}
+\lean{Torus.eLpNorm_lqNorm_blockFun_succ_le,
+  Torus.triebelLizorkinNorm_le_of_hasWeakLineDeriv, Torus.memTriebelLizorkin_of_hasWeakLineDeriv,
+  Torus.memTriebelLizorkin_of_memSobolev}
+\leanok
+\uses{lem:torus-blocks-as-derivative-convolutions, def:torus-sobolev-to-tl-const,
+  thm:cz-family-derivative, lem:torus-far-mass-derivative-families,
+  thm:torus-vector-valued-strong-type, prop:torus-tl-elementary, lem:lq-basic,
+  lem:lp-norm-nonnegative, thm:torus-sobolev-directions}
+Let $\#d \geq 1$, $1 < p < \infty$, $m \in \N$ and
+$f \in L_p(\T^d)$, and for every multi-index $\alpha$ let $g_\alpha \in L_p(\T^d)$ be the weak
+derivative $\partial^{e_\alpha} f$. Then
+\[
+  \bigl\| \|(2^{(j+1)m} |(\psi_{j+1} * f)(t)|)_j\|_{\ell_2} \bigr\|_p
+  \leq 2^m \sum_\alpha K^{\T}_{p,\alpha} \|g_\alpha\|_p
+\]
+and
+\[
+  \|f\|_{\TL{m}{p}{2}(\T^d)} \leq \|\Phi\|_1 \, \|f\|_p + 2^m \sum_\alpha K^{\T}_{p,\alpha} \,
+  \|g_\alpha\|_p .
+\]
+In particular, $f \in \TL{m}{p}{2}(\T^d)$, and every $f \in \Sob{m}{p}(\T^d)$ lies in
+$\TL{m}{p}{2}(\T^d)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For the first bound, take the $L_p$ norm in
+\Cref{lem:torus-blocks-as-derivative-convolutions}, use the homogeneity of the $L_p$ norm
+(\Cref{lem:lp-norm-nonnegative}) and Minkowski's inequality in $L_p$, and bound each term by the
+strong type of the analysis operator on the torus (\Cref{thm:torus-vector-valued-strong-type}) of
+the Calder\'on--Zygmund family $(\theta^\alpha_j)_j$ with overlap $2$ and H\"ormander constant
+$4 H_{A^\alpha}$ (\Cref{thm:cz-family-derivative}) and far mass at most $2 T_{A^\alpha,0,1}$
+(\Cref{lem:torus-far-mass-derivative-families}). Splitting off the block $j = 0$ from the $\ell_2$
+norm (\Cref{lem:lq-basic}), the triangle inequality in $L_p$ and
+$\|\psi_0 * f\|_p \leq \|\Phi\|_1 \, \|f\|_p$ (\Cref{prop:torus-tl-elementary}) give the second
+bound. For $f \in \Sob{m}{p}(\T^d)$ the weak derivatives $\partial^{e_\alpha} f$ exist in
+$L_p(\T^d)$ (\Cref{thm:torus-sobolev-directions}), and the right side is finite.
+\end{proof}
+
+\paragraph{From the blocks to weak derivatives.}
+
+\begin{definition}[The constants of the embedding into $\Sob{m}{p}(\T^d)$]
+\label{def:torus-tl-to-sobolev-const}
+\lean{Torus.tlToSobolevConst, Torus.tlToSobolevConst_ne_top}
+\leanok
+\uses{def:periodic-cz-const, def:hormander-const, def:dual-derivative-family,
+  lem:torus-far-mass-derivative-families}
+For $1 < p < \infty$, every $k \in \N$ and all $w \in (\R^d)^k$,
+\[
+  C^{\T}_{p,w} = S^{\T}_{p}\bigl(B_w, 4 H_{\tilde A^w}, 2 T_{\tilde A^w,0,1}\bigr) ,
+\]
+which is finite.
+\end{definition}
+
+\begin{lemma}[The weighted blocks on the torus and their tails]
+\label{lem:torus-weighted-block-tails}
+\lean{Torus.eLpNorm_lqNorm_ite_blockFun_le, Torus.tendsto_eLpNorm_lqNorm_blockFun_tail}
+\leanok
+\uses{def:torus-triebel-lizorkin, lem:mixed-norm-tails}
+Let $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p(\T^d)$. For every set
+$P \subseteq \N$,
+\[
+  \bigl\| \|(\mathbf 1_P(j) \, 2^{js} |(\psi_j * f)(t)|)_j\|_{\ell_q} \bigr\|_p
+  \leq \|f\|_{\TL{s}{p}{q}(\T^d)} .
+\]
+If $q < \infty$ and $f \in \TL{s}{p}{q}(\T^d)$, then
+\[
+  \bigl\| \|(2^{js} |(\psi_j * f)(t)|)_{j \geq N}\|_{\ell_q} \bigr\|_p \to 0 \qquad
+  (N \to \infty) ,
+\]
+where the $\ell_q$ norm is taken of the sequence with the terms $j < N$ replaced by $0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both claims are \Cref{lem:mixed-norm-tails} for the functions
+$g_j = 2^{js} |\psi_j * f|$ on $\T^d$, whose mixed norm is $\|f\|_{\TL{s}{p}{q}(\T^d)}$
+(\Cref{def:torus-triebel-lizorkin}).
+\end{proof}
+
+\begin{lemma}[The synthesis bound for derivatives of the synthesis kernels on the torus]
+\label{lem:torus-derivative-synthesis-bound}
+\lean{Torus.enorm_sum_econvLp_derivDual_le, Torus.derivSynthesisSum,
+  Torus.enorm_derivSynthesisSum_sub_le}
+\leanok
+\uses{def:torus-tl-to-sobolev-const, lem:torus-econv-identities, lem:psi-dual-derivatives,
+  thm:cz-family-dual-derivative, lem:torus-far-mass-derivative-families,
+  thm:torus-vector-valued-strong-type, def:torus-lp-blocks, def:torus-triebel-lizorkin,
+  lem:blocks-as-derivative-convolutions, lem:dyadic-weights-integer, lem:mixed-norm-tails}
+Let $\#d \geq 1$, $1 < p < \infty$, $k \in \N$, $w \in (\R^d)^k$ and $f \in L_p(\T^d)$. For
+every finite set $s \subseteq \N$,
+\begin{multline*}
+  \Bigl\| \sum_{j \in s} (\partial^w \tilde\psi_j) * \Delta_j f \Bigr\|_p \\
+  \leq C^{\T}_{p,w} \, \bigl\| \|(\mathbf 1_s(j) \, 2^{jk} |(\psi_j * f)(t)|)_j\|_{\ell_2}
+  \bigr\|_p .
+\end{multline*}
+Let $D_J = \sum_{j < J} (\partial^w \tilde\psi_j) * \Delta_j f \in L_p(\T^d)$. For all
+$N \leq N'$,
+\[
+  \|D_{N'} - D_N\|_p \leq C^{\T}_{p,w} \,
+  \bigl\| \|(2^{jk} |(\psi_j * f)(t)|)_{j \geq N}\|_{\ell_2} \bigr\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Since $\partial^w \tilde\psi_j = 2^{jk} \tilde\theta^w_j$ (\Cref{lem:psi-dual-derivatives})
+and constants move from the kernel to the function (\Cref{lem:torus-econv-identities}), the sum
+is almost everywhere $\sum_{j \in s} \tilde\theta^w_j * h_j$ with
+$h_j = \mathbf 1_s(j) 2^{jk} \Delta_j f$ (\Cref{def:torus-lp-blocks}), and
+$|h_j| = \mathbf 1_s(j) 2^{jk} |\psi_j * f|$ almost everywhere (\Cref{def:torus-triebel-lizorkin},
+\Cref{lem:blocks-as-derivative-convolutions}, \Cref{lem:dyadic-weights-integer}). The strong
+type of the synthesis operators on the torus (\Cref{thm:torus-vector-valued-strong-type}) of the
+Calder\'on--Zygmund family $(\tilde\theta^w_j)_j$ (\Cref{thm:cz-family-dual-derivative}) with far
+mass at most $2 T_{\tilde A^w,0,1}$ (\Cref{lem:torus-far-mass-derivative-families}) gives the
+first bound.
+$D_{N'} - D_N$ is the sum over $s = \{N, \dots, N' - 1\}$, whose sequence is at most the tail
+from $N$; the measurability is \Cref{lem:mixed-norm-tails}.
+\end{proof}
+
+\begin{lemma}[The partial sums of the derivative on the torus]
+\label{lem:torus-derivative-partial-sums}
+\lean{Torus.hasWeakLineDeriv_sum_lpBlock, Torus.cauchySeq_derivSynthesisSum}
+\leanok
+\uses{lem:torus-derivative-synthesis-bound, lem:torus-weighted-block-tails,
+  lem:torus-weak-derivative-convolution, lem:torus-weak-line-derivative-basic,
+  lem:torus-square-function-reproducing, lem:psi-dual-derivatives, lem:torus-econv-identities}
+Let $1 \leq p < \infty$, $k \in \N$, $w \in (\R^d)^k$ and $f \in L_p(\T^d)$. For every $J \in \N$,
+$D_J$ is the weak derivative $\partial^w$ of $\sum_{j < J} \Delta_j f$. If $\#d \geq 1$,
+$1 < p < \infty$ and $f \in \TL{k}{p}{2}(\T^d)$, then $(D_J)_J$ is a Cauchy sequence in $L_p(\T^d)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Each term $(\partial^w \tilde\psi_j) * \Delta_j f$ is the weak derivative of
+$\tilde\psi_j * \Delta_j f$ (\Cref{lem:torus-weak-derivative-convolution}, with the Schwartz
+function $\tilde\psi_j$ of \Cref{lem:psi-dual-derivatives}; equal kernels give the same
+operator, see after \Cref{lem:torus-econv-identities}), which is $\Delta_j f$
+(\Cref{lem:torus-square-function-reproducing}), and weak derivatives add up
+(\Cref{lem:torus-weak-line-derivative-basic}). By \Cref{lem:torus-derivative-synthesis-bound},
+$\|D_{N'} - D_N\|_p$ is at most $C^{\T}_{p,w}$ times the tail from $N$, which is finite and tends
+to zero (\Cref{lem:torus-weighted-block-tails}).
+\end{proof}
+
+\begin{theorem}[$\TL{m}{p}{2}(\T^d) \subseteq \Sob{m}{p}(\T^d)$]
+\label{thm:torus-triebel-lizorkin-to-sobolev}
+\lean{Torus.exists_hasWeakLineDeriv_of_memTriebelLizorkin,
+  Torus.exists_hasWeakLineDeriv_of_memTriebelLizorkin_of_le,
+  Torus.memSobolev_of_memTriebelLizorkin}
+\leanok
+\uses{lem:torus-derivative-partial-sums, lem:torus-derivative-synthesis-bound,
+  lem:torus-weighted-block-tails, lem:torus-lp-blocks, lem:torus-weak-line-derivative-basic,
+  def:torus-tl-to-sobolev-const, prop:torus-tl-elementary, thm:torus-sobolev-directions}
+Let $\#d \geq 1$, $1 < p < \infty$, $k \in \N$ and $w \in (\R^d)^k$. For every
+$f \in \TL{k}{p}{2}(\T^d)$ the weak derivative $\partial^w f$ exists as some $g \in L_p(\T^d)$
+with
+\[
+  \|g\|_p \leq C^{\T}_{p,w} \, \|f\|_{\TL{k}{p}{2}(\T^d)} .
+\]
+For every $m \geq k$ and every $f \in \TL{m}{p}{2}(\T^d)$, the weak derivative $g = \partial^w f$
+satisfies $\|g\|_p \leq C^{\T}_{p,w} \, \|f\|_{\TL{m}{p}{2}(\T^d)}$. In particular,
+$\TL{m}{p}{2}(\T^d) \subseteq \Sob{m}{p}(\T^d)$ for every $m \in \N$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $g$ be the limit of the Cauchy sequence $(D_J)_J$ in $L_p(\T^d)$
+(\Cref{lem:torus-derivative-partial-sums}). The partial sums $\sum_{j < J} \Delta_j f$ tend to
+$f$ in $L_p(\T^d)$ (\Cref{lem:torus-lp-blocks}), and $D_J$ is their weak derivative
+$\partial^w$, so $g = \partial^w f$ (\Cref{lem:torus-weak-line-derivative-basic}). By
+\Cref{lem:torus-derivative-synthesis-bound} with $s = \{0, \dots, J - 1\}$ and
+\Cref{lem:torus-weighted-block-tails},
+$\|D_J\|_p \leq C^{\T}_{p,w} \|f\|_{\TL{k}{p}{2}(\T^d)}$ for every $J$, and the bound passes to
+the limit. For $m \geq k$,
+$\|f\|_{\TL{k}{p}{2}(\T^d)} \leq \|f\|_{\TL{m}{p}{2}(\T^d)}$ (\Cref{prop:torus-tl-elementary}).
+The last claim is \Cref{thm:torus-sobolev-directions}.
+\end{proof}
+
+\paragraph{Consequences.}
+
+\begin{corollary}[$\Sob{m}{p}(\T^d) = \TL{m}{p}{2}(\T^d)$]
+\label{cor:torus-sobolev-triebel-lizorkin}
+\lean{Torus.memSobolev_iff_memTriebelLizorkin}
+\leanok
+\uses{thm:torus-sobolev-to-triebel-lizorkin, thm:torus-triebel-lizorkin-to-sobolev}
+For every $\#d \geq 1$, every $1 < p < \infty$, every $m \in \N$ and every $f \in L_p(\T^d)$,
+$f \in \Sob{m}{p}(\T^d)$ if and only if $f \in \TL{m}{p}{2}(\T^d)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:torus-sobolev-to-triebel-lizorkin} and \Cref{thm:torus-triebel-lizorkin-to-sobolev}.
+\end{proof}
+
+For $p = 2$ and $m \geq 1$, together with $\TL{m}{2}{2}(\T^d) = \Besov{m}{2}{2}(\T^d)$
+(\Cref{thm:torus-tl-besov-sandwich}), this gives $\Sob{m}{2}(\T^d) = \Besov{m}{2}{2}(\T^d)$ once
+more, which \Cref{thm:weak-sobolev} proves through the Fourier coefficients.
+
+\begin{corollary}[The Besov sandwich for $\Sob{m}{p}(\T^d)$]
+\label{cor:torus-sobolev-besov-sandwich}
+\lean{Torus.memBesov_of_memSobolev, Torus.memSobolev_of_memBesov,
+  Torus.approxNormDyadic_le_of_hasWeakLineDeriv, Torus.exists_hasWeakLineDeriv_of_memBesov}
+\leanok
+\uses{cor:torus-sobolev-triebel-lizorkin, thm:torus-sobolev-to-triebel-lizorkin,
+  thm:torus-triebel-lizorkin-to-sobolev, thm:torus-tl-besov-sandwich,
+  cor:torus-square-function-theorem}
+Let $\#d \geq 1$, $1 < p < \infty$ and let $A$ be the scheme of trigonometric polynomials in
+$L_p(\T^d)$. For every $m \in \N$,
+\[
+  \Besov{m}{p}{\min(p,2)}(\T^d) \subseteq \Sob{m}{p}(\T^d) ,
+\]
+and for every $m \geq 1$,
+\[
+  \Sob{m}{p}(\T^d) \subseteq \Besov{m}{p}{\max(p,2)}(\T^d) .
+\]
+For every $m \geq 1$ and every $f \in L_p(\T^d)$ with weak derivatives
+$g_\alpha = \partial^{e_\alpha} f \in L_p(\T^d)$ for every multi-index $\alpha$ of length $m$,
+\[
+  \|f\|^{\mathrm{dy}}_{A^m_{\max(p,2)}} \leq 2 \cdot 2^m (1 - 2^{-m})^{-1}
+  \Bigl( \|\Phi\|_1 \, \|f\|_p + 2^m \sum_\alpha K^{\T}_{p,\alpha} \, \|g_\alpha\|_p \Bigr) .
+\]
+For every $m \in \N$, every $f \in \Besov{m}{p}{\min(p,2)}(\T^d)$, every $k \leq m$ and all
+$w \in (\R^d)^k$, the weak derivative $\partial^w f$ is some $g \in L_p(\T^d)$ with
+\[
+  \|g\|_p \leq C^{\T}_{p,w} \cdot 2 (\#d + 1) \, 2^{(\#d + 1) m} \, \|\Phi\|_1 \,
+  \|f\|^{\mathrm{dy}}_{A^m_{\min(p,2)}} .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+$\Besov{m}{p}{\min(p,2)}(\T^d) \subseteq \TL{m}{p}{2}(\T^d)$ for every $m \geq 0$
+(\Cref{cor:torus-square-function-theorem}), and \Cref{cor:torus-sobolev-triebel-lizorkin} gives
+the first inclusion. The Besov sandwich for $s = m > 0$ (\Cref{thm:torus-tl-besov-sandwich})
+gives the second. The bounds combine \Cref{thm:torus-sobolev-to-triebel-lizorkin} and
+\Cref{thm:torus-triebel-lizorkin-to-sobolev} with the bounds of
+\Cref{thm:torus-tl-besov-sandwich}.
+\end{proof}
+
+\begin{corollary}[$\Sob{m}{p}(\T^d)$ by local means]
+\label{cor:torus-sobolev-local-means}
+\lean{Torus.memSobolev_iff_tlLocalMeans}
+\leanok
+\uses{cor:torus-sobolev-triebel-lizorkin, thm:torus-tl-local-means, def:torus-tl-local-means}
+Let $\#d \geq 1$, $1 < p < \infty$, let $g$ be a bump on $\R^d$ and let $m, L \in \N$ with
+$1 \leq m < L$. For every $f \in L_p(\T^d)$, $f \in \Sob{m}{p}(\T^d)$ if and only if
+$\|f\|^{g,L}_{F^m_{p,2}(\T^d)} < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{cor:torus-sobolev-triebel-lizorkin} and \Cref{thm:torus-tl-local-means} with $q = 2$ and
+$s = m$.
+\end{proof}
+
+\section{Sobolev embeddings on the torus}
+\label{sec:torus-sobolev-embedding}
+
+Through $\Sob{m}{p}(\T^d) \subseteq \Besov{m}{p}{\max(p,2)}(\T^d)$
+(\Cref{cor:torus-sobolev-besov-sandwich}), the Besov embeddings of the torus
+(\Cref{thm:torus-embeddings}) give the Sobolev embeddings on the torus. Here $\iota_{r,p}$ is the
+inclusion $L_r(\T^d) \hookrightarrow L_p(\T^d)$ for $p \leq r$.
+
+\begin{theorem}[Sobolev embeddings on the torus]
+\label{thm:torus-sobolev-embedding}
+\lean{Torus.memSobolev_exists_inclusion_eq, Torus.memSobolev_exists_continuous,
+  Torus.memSobolev_of_memSobolev_of_lt}
+\leanok
+\uses{cor:torus-sobolev-besov-sandwich, thm:torus-embeddings, def:nikolskii-property,
+  thm:approx-embedding}
+Let $\#d \geq 1$, $1 < p < \infty$ and $m \in \N$.
+\begin{enumerate}
+  \item For every $r$ with $p \leq r \leq \infty$ and $m > \#d (1/p - 1/r)$, every
+    $f \in \Sob{m}{p}(\T^d)$ is $\iota_{r,p} g$ for some
+    $g \in \Besov{m - \#d(1/p - 1/r)}{r}{\max(p,2)}(\T^d)$.
+  \item If $m > \#d/p$, then every $f \in \Sob{m}{p}(\T^d)$ has a continuous representative.
+  \item For every $r$ with $p \leq r < \infty$ and every $k \in \N$ with
+    $k < m - \#d (1/p - 1/r)$, every $f \in \Sob{m}{p}(\T^d)$ is $\iota_{r,p} g$ for some
+    $g \in \Sob{k}{r}(\T^d)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+In (1), $m \geq 1$ since $\#d (1/p - 1/r) \geq 0$ (\Cref{def:nikolskii-property}); in (2),
+$m \geq 1$ since $\#d/p \geq 0$. So $f \in \Besov{m}{p}{\max(p,2)}(\T^d)$
+(\Cref{cor:torus-sobolev-besov-sandwich}), and the first two items of \Cref{thm:torus-embeddings}
+apply. In (3), $m > \#d (1/p - 1/r)$, so (1) gives $g$, and $g \in \Besov{k}{r}{\min(r,2)}(\T^d)$
+since $0 \leq k < m - \#d(1/p - 1/r)$ (\Cref{thm:approx-embedding}); hence $g \in \Sob{k}{r}(\T^d)$
+(\Cref{cor:torus-sobolev-besov-sandwich}, with $1 < p \leq r$).
 \end{proof}
 
 \chapter{Bessel potential spaces}

@@ -18,11 +18,13 @@ For `1 ≤ p ≤ ∞`, `s ∈ ℝ`, `1 ≤ q ≤ ∞` and `f ∈ L_p(𝕋^d)`, t
 
 (`Torus.triebelLizorkinNorm`) takes the `ℓ_q` norm of the Littlewood–Paley blocks at every point
 before the `L_p` norm. The blocks are the pointwise convolutions `ψ_j ⋆ f` with the kernels of
-`ℝ^d` (`Torus.blockFun`), representatives of `Torus.lpBlock`. The space `F^s_{p,q}(𝕋^d)` consists
-of the `f` with a finite quasi-norm (`Torus.MemTriebelLizorkin`); it is a subspace of `L_p` for
-`1 ≤ q ≤ ∞` (`Torus.triebelLizorkinSpace`), increasing in `q` and decreasing in `s`. For `s = 0`
-the weights are `1`, so `‖f‖_{F^0_{p,q}}` is the `L_p` norm of `t ↦ ‖((ψ_j ⋆ f)(t))_j‖_{ℓ_q}`
-(`Torus.triebelLizorkinNorm_zero_left`). The comparisons with Besov spaces below need `p < ∞`.
+`ℝ^d` (`Torus.blockFun`), representatives of `Torus.lpBlock`, with
+`‖ψ_0 ⋆ f‖_p ≤ ‖Φ‖_1 ‖f‖_p` by Young's inequality (`Torus.eLpNorm_blockFun_zero_le`). The
+space `F^s_{p,q}(𝕋^d)` consists of the `f` with a finite quasi-norm (`Torus.MemTriebelLizorkin`);
+it is a subspace of `L_p` for `1 ≤ q ≤ ∞` (`Torus.triebelLizorkinSpace`), increasing in `q` and
+decreasing in `s`. For `s = 0` the weights are `1`, so `‖f‖_{F^0_{p,q}}` is the `L_p` norm of
+`t ↦ ‖((ψ_j ⋆ f)(t))_j‖_{ℓ_q}` (`Torus.triebelLizorkinNorm_zero_left`). The comparisons with
+Besov spaces below need `p < ∞`.
 
 The mixed-norm comparisons of `FunctionSpaces.Analysis.Lp.MixedNorms` give, for every `s ∈ ℝ`,
 `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{max(p,q)}} ≤ ‖f‖_{F^s_{p,q}} ≤ ‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{min(p,q)}}`,
@@ -76,6 +78,14 @@ theorem enorm_lpBlock_eq_eLpNorm_blockFun (hp : p ≠ ∞) (j : ℕ)
     ‖lpBlock hp j f‖ₑ = eLpNorm (blockFun j f) p volume := by
   rw [Lp.enorm_def]
   exact eLpNorm_congr_ae (lpBlock_ae_eq_blockFun hp j f)
+
+/-- **The block `j = 0` by Young's inequality**: for `1 ≤ p < ∞` and `f ∈ L_p(𝕋^d)`,
+`‖ψ_0 ⋆ f‖_p ≤ ‖Φ‖_1 ‖f‖_p`. -/
+theorem eLpNorm_blockFun_zero_le (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
+    eLpNorm (blockFun 0 f) p volume ≤
+      eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume * ‖f‖ₑ := by
+  rw [Lp.enorm_def, ← Rd.eLpNorm_Phi_one 0, eLpNorm_one_eq_lintegral_enorm (Rd.integrable_Phi 0).1]
+  exact eLpNorm_econv_le Fact.out hp (Rd.integrable_psi 0) (Lp.stronglyMeasurable f).measurable
 
 /-- The block of a sum is the sum of the blocks, almost everywhere and for all levels at once.
 On the torus `L_p ⊆ L_1`, so the convolution integrals converge absolutely almost everywhere

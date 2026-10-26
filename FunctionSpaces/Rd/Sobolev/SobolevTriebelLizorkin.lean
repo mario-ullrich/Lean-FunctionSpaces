@@ -53,10 +53,6 @@ namespace Rd
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
 
-/-- The complex number `2^n` has absolute value `2^n`. -/
-theorem enorm_two_pow_complex (n : ℕ) : ‖(2 : ℂ) ^ n‖ₑ = 2 ^ n := by
-  rw [enorm_pow, ← ofReal_norm, Complex.norm_two, ENNReal.ofReal_ofNat]
-
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-! ### `W^m_p ⊆ F^m_{p,2}` -/
