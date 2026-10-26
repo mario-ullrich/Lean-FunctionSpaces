@@ -107,7 +107,7 @@ BLOCKS: list[tuple[str, list]] = [
     ("Triebel–Lizorkin spaces", ["Triebel--Lizorkin spaces"]),
     ("Vector-valued singular integrals", ["Vector-valued singular integrals"]),
     ("Sobolev spaces: the bridge for p = 2", [
-        (SOB, ["Weak derivatives on open sets",
+        (SOB, ["Weak derivatives on open sets", "Changes of variables and cutoffs",
                r"Mathlib's Sobolev spaces \texorpdfstring{$H^s$}{H\^{}s} by Littlewood--Paley blocks",
                "Rellich compactness"])]),
     ("Sobolev spaces W^m_p", [

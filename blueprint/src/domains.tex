@@ -6634,30 +6634,6 @@ $(0, \infty)$ gives $-g(y)$. Each line meets the support of $g$ in an interval o
 $2R$, so $\|D\Psi(y)\| \leq 2 R C$, and the mean value inequality gives the Lipschitz bound.
 \end{proof}
 
-\begin{lemma}[Line derivatives of Lipschitz functions integrate to zero]
-\label{lem:integral-line-derivative-zero}
-\lean{Rd.integral_lineDeriv_eq_zero, Rd.integrable_lineDeriv,
-  Rd.integral_lineDeriv_eq_zero_complex}
-\leanok
-For every finite-dimensional real normed space $F$ with a Haar measure, every Lipschitz function
-$f \colon F \to \R$ with compact support and every $v \in F$, $\int \partial_v f = 0$. For every
-real Banach space $G$, every Lipschitz function $f \colon F \to G$ with compact support and every
-$v \in F$, $\partial_v f$ is integrable. For every Lipschitz function $f \colon F \to \C$ with
-compact support and every $v \in F$, $\int \partial_v f = 0$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-Integration by parts for Lipschitz functions with the constant function $1$, whose line
-derivatives vanish (Mathlib's \texttt{LipschitzWith.\allowbreak integral\_\allowbreak
-lineDeriv\_\allowbreak mul\_\allowbreak eq}). $\partial_v f$ is measurable (Mathlib's
-\texttt{aestronglyMeasurable\_\allowbreak lineDeriv}), bounded by $C \|v\|$ for the Lipschitz
-constant $C$, and zero outside the closed support of $f$. For complex $f$, $f$ is
-differentiable almost everywhere by Rademacher's theorem, so the real and imaginary parts of
-$\partial_v f$ are almost everywhere the line derivatives of the Lipschitz functions
-$\operatorname{Re} f$ and $\operatorname{Im} f$.
-\end{proof}
-
 \paragraph{The normal weight and the ray integral from the graph.}
 
 \begin{definition}[The normal weight]

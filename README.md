@@ -684,6 +684,8 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * J. Bergh, J. Löfström, *Interpolation Spaces. An Introduction*, Grundlehren der
   mathematischen Wissenschaften **223**, Springer-Verlag, 1976. Real interpolation and the
   K-functional.
+* H. Brezis, *Functional Analysis, Sobolev Spaces and Partial Differential Equations*,
+  Universitext, Springer, 2011. Weak derivatives on open sets and the extension by reflection.
 * H. Brezis, P. Mironescu, *Gagliardo–Nirenberg, composition and products in fractional
   Sobolev spaces*, J. Evol. Equ. **1** (2001), no. 4, 387–404. The interpolation inequality
   for dyadic suprema.

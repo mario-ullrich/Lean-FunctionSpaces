@@ -544,11 +544,8 @@ declarations.
   supported `C^1` functions (`Rd.LipschitzGraph.setIntegral_lineDeriv_eq`,
   `Rd.LipschitzGraph.setIntegral_lineDeriv_eq_surface`). Mathlib's divergence theorem is the one on
   boxes (`MeasureTheory.integral_divergence_of_hasFDerivAt_off_countable`, checked 2026-10-22);
-  these results extend it to Lipschitz graph domains. Three general facts are short: the line
-  derivative of a compactly supported Lipschitz function is integrable and integrates to zero
-  (`Rd.integrable_lineDeriv`, `Rd.integral_lineDeriv_eq_zero`,
-  `Rd.integral_lineDeriv_eq_zero_complex`, next to `LipschitzWith.integral_lineDeriv_mul_eq` in
-  `Mathlib/Analysis/Calculus/Rademacher.lean`), the product rule for line derivatives
+  these results extend it to Lipschitz graph domains. Two general facts are short: the product
+  rule for line derivatives
   (`Rd.lineDeriv_mul`, next to `DifferentiableAt.lineDeriv_eq_fderiv`), and the ray integral
   `∫_0^∞ g(y + t w) dt` of a compactly supported `C^1` function is differentiable with bounded
   derivative and derivative `-g` along the ray (`Rd.hasFDerivAt_rayIntegral`,
@@ -574,15 +571,36 @@ declarations.
   test functions of `Ω` (`Rd.mem_tildeSpace_of_isCompact`). Mathlib's convolution files cover the
   smoothness of `η ⋆ f`; these statements add its weak derivatives.
 * **The Gagliardo–Nirenberg–Sobolev inequality for weak derivatives**
-  (`FunctionSpaces/Rd/Sobolev/GagliardoNirenbergSobolev.lean`): for a smooth compactly supported
-  kernel `K` and `g = ∂_v h` weakly on `V`, `D(K ⋆ h)(x) v = (K ⋆ g)(x)`
-  (`Rd.fderiv_conv_apply_eq_conv`), a candidate on its own next to Mathlib's distributions `𝓓'`
-  and their line derivatives; and Mathlib's inequality `‖f‖_{p'} ≤ C ∑_k ‖∂_{e_k} f‖_p` for every
-  `f ∈ L_p(V)` with weak derivatives along the orthonormal basis `Rd.gridBasis`, by
-  mollification, cut-off and Fatou's lemma (`Rd.eLpNorm_le_of_hasWeakLineDeriv`), a candidate
-  together with TauCeti's `W1p0.sobolevEmbeddingL`. Fatou's lemma with convergent bounds
+  (`FunctionSpaces/Rd/Sobolev/GagliardoNirenbergSobolev.lean`): Mathlib's inequality
+  `‖f‖_{p'} ≤ C ∑_k ‖∂_{e_k} f‖_p` for every `f ∈ L_p(V)` with weak derivatives along the
+  orthonormal basis `Rd.gridBasis`, by mollification, cut-off and Fatou's lemma
+  (`Rd.eLpNorm_le_of_hasWeakLineDeriv`), a candidate together with TauCeti's
+  `W1p0.sobolevEmbeddingL`. Fatou's lemma with convergent bounds
   `B_i → b` (`MeasureTheory.eLpNorm_le_of_ae_tendsto_of_tendsto`) generalises Mathlib's
-  `MeasureTheory.Lp.eLpNorm_le_of_ae_tendsto`, the case of a constant bound, and belongs next to
-  it; the bound `‖L‖ ≤ ∑_i ‖L b_i‖` of a continuous linear map through an orthonormal basis
+  `MeasureTheory.Lp.eLpNorm_le_of_ae_tendsto`, the case of a constant bound, and belongs next to it;
+  the bound `‖L‖ ≤ ∑_i ‖L b_i‖` of a continuous linear map through an orthonormal basis
   (`ContinuousLinearMap.opNorm_le_sum_norm_apply_orthonormalBasis`) belongs next to
   `OrthonormalBasis.sum_repr'`.
+* **Weak derivatives under Lipschitz changes of variables**
+  (`FunctionSpaces/Rd/Sobolev/WeakDerivativeChangeOfVariables.lean`): the line derivative of a
+  compactly supported Lipschitz function is integrable and integrates to zero
+  (`Rd.integrable_lineDeriv`, `Rd.integral_lineDeriv_eq_zero`,
+  `Rd.integral_lineDeriv_eq_zero_complex`, next to `LipschitzWith.integral_lineDeriv_mul_eq` in
+  `Mathlib/Analysis/Calculus/Rademacher.lean`), and
+  `D(K ⋆ h)(x) v = (K ⋆ g)(x)` for a smooth compactly supported `K` and `g = ∂_v h` weakly
+  (`Rd.fderiv_conv_apply_eq_conv`); Lipschitz functions are weakly differentiable
+  (`Rd.hasWeakLineDeriv_of_lipschitzWith`), weak derivatives are linear in the direction
+  (`Rd.HasWeakLineDeriv.sum_smul_dir`), satisfy the product rule with cutoffs
+  (`Rd.HasWeakLineDeriv.mul_of_tsupport_subset`), are approximated by mollification on open sets
+  (`Rd.exists_tendsto_contDiff_of_hasWeakLineDeriv`) and satisfy the chain rule for Lipschitz
+  measure-preserving maps (`Rd.HasWeakLineDeriv.comp_lipschitzWith`), candidates together with
+  TauCeti's `LocallyLipschitzOn.hasWeakLineDerivOn` and `HasWeakFDerivOn.comp_measurePreserving`.
+  Four measure-theoretic facts of the file are short: `‖h ∘ Φ‖_{L_p(U)} ≤ ‖h‖_{L_p(O)}` for a
+  measure-preserving `Φ` with `Φ(U) ⊆ O` (`Rd.eLpNorm_comp_le_of_mapsTo`, next to
+  `eLpNorm_comp_measurePreserving`), locally integrable functions with compact support are
+  integrable (`MeasureTheory.LocallyIntegrable.integrable_of_hasCompactSupport`, next to
+  `Continuous.integrable_of_hasCompactSupport`), finite sums of locally integrable functions on a
+  set are locally integrable on it (`Rd.locallyIntegrableOn_sum_smul`, next to
+  `locallyIntegrable_finsetSum'`), and `‖c u‖_{L_p} ≤ C ‖u‖_{L_p}` for a measurable `|c| ≤ C`
+  and every `u` (`MeasureTheory.eLpNorm_mul_le_of_forall_norm_le`, next to
+  `eLpNorm_le_mul_eLpNorm_of_ae_le_mul'`).

@@ -6,7 +6,9 @@ potential spaces*, chapters *Sobolev spaces on `ℝ^d`* and *Bessel potential sp
 This block develops the Sobolev spaces `W^m_p` defined by weak derivatives. A weak derivative is an
 identity between distributions on an open set, in Mathlib's distributions `𝓓'(Ω, ℂ)`; on the whole
 space and for `L_p` functions it is an identity between tempered distributions `𝓢'(V, ℂ)`, where
-Mathlib's Fourier transform and Bessel potential spaces live. For `p = 2` it identifies Mathlib's
+Mathlib's Fourier transform and Bessel potential spaces live. Lipschitz functions are weakly
+differentiable, and weak derivatives satisfy the product rule with cutoffs and the chain rule
+under Lipschitz maps that preserve Lebesgue measure. For `p = 2` it identifies Mathlib's
 Bessel potential spaces `H^s`, `s ≥ 0`, with the Triebel–Lizorkin spaces `F^s_{2,2}` (and, for
 `s > 0`, with the Besov spaces `B^s_{2,2}`) and shows `W^1_2 = H^1 = B^1_{2,2}`. On every bounded
 set the restriction from `H^1(ℝ^d)` to `L_2` is compact (Rellich's theorem). For `W^m_p`, the block
@@ -53,6 +55,20 @@ project, with the decisions behind their form.
   (`Rd.HasWeakLineDeriv.unique`), linear, local (`Rd.HasWeakLineDeriv.mono`), the classical
   derivative on Schwartz functions (`Rd.hasWeakLineDeriv_schwartz`), and stable under limits in
   `L_p(Ω) × L_r(Ω)` for `1 ≤ p, r ≤ ∞` (`Rd.HasWeakLineDeriv.of_tendsto`).
+* **Changes of variables and cutoffs.** For a Lipschitz `f : V → ℂ` the almost everywhere line
+  derivative `D_v f` (Mathlib's `lineDeriv`) is the weak derivative on every open set
+  (`Rd.hasWeakLineDeriv_of_lipschitzWith`). Weak derivatives are linear in the direction
+  (`Rd.HasWeakLineDeriv.sum_smul_dir`), so the derivatives `g_i = ∂_{e_i} f` along an orthonormal
+  basis give `∂_v f = ∑_i ⟪v, e_i⟫ g_i` (`Rd.hasWeakLineDeriv_of_forall_gridBasis`). If
+  `g = ∂_w f` on `O ∩ B` and the smooth `χ` has closed support in `B`, then
+  `χ g + (∂_w χ) f = ∂_w (χ f)` on `O` (`Rd.HasWeakLineDeriv.mul_of_tsupport_subset`). On every
+  compact `L ⊆ O`, smooth compactly supported functions approximate a locally integrable `f` and
+  its weak derivatives in `L_1(L)` (`Rd.exists_tendsto_contDiff_of_hasWeakLineDeriv`). For a
+  `K`-Lipschitz map `Φ` that preserves Lebesgue measure and maps `U` into `O`,
+  `∂_v (f ∘ Φ)(x) = ∑_i ⟪DΦ(x) v, e_i⟫ g_i(Φ x)` weakly on `U`
+  (`Rd.HasWeakLineDeriv.comp_lipschitzWith`), with
+  `‖∑_i ⟪DΦ v, e_i⟫ h_i ∘ Φ‖_{L_p(U)} ≤ K ‖v‖ ∑_i ‖h_i‖_{L_p(O)}` for `1 ≤ p ≤ ∞`
+  (`Rd.eLpNorm_sum_inner_fderiv_mul_comp_le`).
 * **Sobolev spaces.** For `m ∈ ℕ` and `1 ≤ p ≤ ∞`, `W^m_p(Ω)` consists of the `f ∈ L_p(Ω)` whose
   weak derivatives `∂^v f` of every order `k ≤ m` in all directions exist on `Ω` and lie in
   `L_p(Ω)` (`Rd.MemWeakSobolev`); `W^0_p(Ω) = L_p(Ω)` (`Rd.memWeakSobolev_zero_iff`), the spaces
@@ -284,6 +300,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
 | Weak derivatives and Sobolev spaces on open sets, integration by parts, also against complex test functions, uniqueness, locality, finite sums, the product rule with smooth functions, limits; the bridge to tempered distributions | ✅ | ✗ | `Rd/Sobolev/WeakDerivatives` |
+| Lipschitz functions as weakly differentiable functions, weak derivatives linear in the direction, `W^1_p(ℝ^d)` from the basis directions, the product rule with a cutoff `χ` supported in `B`, which carries a weak derivative on `O ∩ B` to one on `O`, with its `L_p` bound, bounded multipliers on `L_p`, smooth cutoffs, the derivative of a mollification, mollification on open sets in `L_1`, `L_p` norms of compositions with measure-preserving maps, and the chain rule for Lipschitz measure-preserving maps | ✅ | ✗ | `Rd/Sobolev/WeakDerivativeChangeOfVariables` |
 | The convolution theorem and Plancherel for a convolution on `L_2`, the Bessel potential on Schwartz functions, even Fourier multipliers acting by the transpose, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/Sobolev/SobolevTwoLittlewoodPaley` |
 | The inverse Fourier transform of integrable `L_2` functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, the injectivity of `H^1(ℝ^d) → L_2(ℝ^d)`, and Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω` | ✅ | ✗ | `Rd/Sobolev/RellichCompactness` |
 | Fourier transforms of iterated derivatives, the derivative symbols and kernels, the block `ψ_1` as a sum of derivatives of order `m`, and the Calderón–Zygmund families of the dilated derivative kernels and of the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels | ✅ | ✗ | `Rd/Sobolev/DerivativeKernels` |

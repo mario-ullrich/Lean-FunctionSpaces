@@ -74,6 +74,7 @@ public import FunctionSpaces.Rd.Sobolev.SobolevTwoLittlewoodPaley
 public import FunctionSpaces.Rd.Sobolev.RellichCompactness
 public import FunctionSpaces.Rd.SingularIntegrals.DilationFamilies
 public import FunctionSpaces.Rd.SingularIntegrals.ConvolutionAdjoint
+public import FunctionSpaces.Rd.Sobolev.WeakDerivativeChangeOfVariables
 public import FunctionSpaces.Rd.SingularIntegrals.PlancherelBounds
 public import FunctionSpaces.Rd.SingularIntegrals.VectorValuedWeakType
 public import FunctionSpaces.Rd.SingularIntegrals.VectorValuedSingularIntegrals
@@ -422,6 +423,12 @@ and the theorems that their characterisations agree. The library builds on
   `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for `f ∈ L_p`, `g ∈ L_q` and the reflection `K^∨(x) = K(-x)`,
   derivatives of Schwartz kernels moved to the other Schwartz factor, and weak derivatives commuting
   with convolution by Schwartz functions, also for the convolution operators on `L_p`.
+* `FunctionSpaces.Rd.Sobolev.WeakDerivativeChangeOfVariables`: integrals of line derivatives of
+  compactly supported Lipschitz functions, line derivatives of Lipschitz functions as weak
+  derivatives, weak derivatives linear in the direction, the product rule with a cutoff `χ`
+  supported in `B`, which carries a weak derivative on `O ∩ B` to one on `O`, mollification on
+  open sets in `L_1`, and the chain rule `∂_v (f ∘ Φ) = ∑_i ⟪DΦ v, e_i⟫ (∂_{e_i} f) ∘ Φ` for
+  Lipschitz measure-preserving `Φ`.
 * `FunctionSpaces.Rd.SingularIntegrals.PlancherelBounds`: the `L_2` bounds of the analysis operator
   `f ↦ (θ_j ⋆ f)_j` and of the synthesis operators `(g_j)_j ↦ ∑_{j ∈ s} θ_j ⋆ g_j` for finite
   sets `s` by the Fourier overlap `B`, for integrable kernels and for Calderón–Zygmund
@@ -594,10 +601,10 @@ and the theorems that their characterisations agree. The library builds on
   local extension of jets from one patch, pasting, and the extension operator
   `W^1_p(Ω) → W^1_p(ℝ^d)` for `1 < p < ∞` as a bounded linear right inverse of the restriction.
 * `FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen`: Gauss–Green on a Lipschitz graph domain:
-  product coordinates and Fubini, ray integrals and integrals of line derivatives of Lipschitz
-  functions, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and
-  surface form, the product rule for line derivatives, and Green's formula
-  `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)`.
+  product coordinates and Fubini, ray integrals, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ`
+  for compactly supported `C^1` functions in chart and surface form, the product rule for line
+  derivatives, and Green's formula `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for
+  `f, g ∈ W^1_2(ℝ^d)`.
 * `FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen`: Green's formula on a bounded Lipschitz
   domain: integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary,
   the chart form `∑_j ∫_{H_j} ψ_j Tr_j f · Tr_j g · n^j_v`, the unit normal as the chart normal

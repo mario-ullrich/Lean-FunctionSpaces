@@ -6,6 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Rd.Sobolev.CriticalSobolevEmbedding
+public import FunctionSpaces.Rd.Sobolev.WeakDerivativeChangeOfVariables
 public import Mathlib.Analysis.FunctionalSpaces.SobolevInequality
 
 /-!
@@ -18,13 +19,11 @@ Gagliardo–Nirenberg–Sobolev inequality `‖u‖_{p'} ≤ C_{V,p} ‖Du‖_p`
 differentiable functions by mollification, cut-off and Fatou's lemma
 (`MeasureTheory.eLpNorm_le_of_ae_tendsto_of_tendsto`):
 
-* **mollification** (`Rd.fderiv_conv_apply_eq_conv`): for a smooth kernel `K` with compact support
-  and `g = ∂_v h` weakly, `D(K ⋆ h)(x) v = (K ⋆ g)(x)`, by testing the weak derivative with
-  `y ↦ K(x - y)` (`Rd.conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv`);
 * **compact support** (`Rd.eLpNorm_le_of_hasCompactSupport_of_hasWeakLineDeriv`): for `h` with
   compact support and weak derivatives `g_k` along the orthonormal basis `e` of `Rd.gridBasis`,
   `‖h‖_{p'} ≤ C_{V,p} ∑_k ‖g_k‖_p`; the mollified `η_c ⋆ h`, `η = Rd.LocalMeansBump.std`,
-  satisfy the bound by Young's inequality and converge to `h` in `L_1`, hence in measure;
+  satisfy the bound by Young's inequality, with `D_{e_k}(η_c ⋆ h) = η_c ⋆ g_k`
+  (`Rd.fderiv_conv_apply_eq_conv`), and converge to `h` in `L_1`, hence in measure;
 * **the homogeneous inequality** (`Rd.eLpNorm_le_of_hasWeakLineDeriv`): the same bound for every
   `f ∈ L_p(V)` with weak derivatives along `e`, through the cut-offs `χ_R f`
   (`Rd.realCutoff`), whose weak derivatives differ from `χ_R g_k` by `O(1/R) |f|`;
@@ -76,34 +75,6 @@ namespace Rd
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
-
-/-! ### The derivative of a mollification -/
-
-omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
-/-- The directional derivative of a smooth compactly supported `K`, as a Schwartz function
-(Mathlib's `HasCompactSupport.toSchwartzMap`), is `y ↦ DK(y) v`. -/
-theorem coe_lineDerivOp_toSchwartzMap {K : V → ℂ} (hK : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) K)
-    (hKs : HasCompactSupport K) (v : V) :
-    ((∂^{fun _ : Fin 1 => v} (hKs.toSchwartzMap hK) : 𝓢(V, ℂ)) : V → ℂ) =
-      fun y => fderiv ℝ K y v := by
-  funext y
-  rw [LineDeriv.iteratedLineDerivOp_one, SchwartzMap.lineDerivOp_apply_eq_fderiv]
-  rfl
-
-/-- **The derivative of a mollification is the mollified weak derivative**: for a smooth `K`
-with compact support and `g = ∂_v h` weakly on `V`, `D(K ⋆ h)(x) v = (K ⋆ g)(x)` for every `x`.
-The derivative falls on the kernel (`Rd.fderiv_conv_apply`), and the weak derivative tested with
-the reflected translate `y ↦ K(x - y)` moves it back to `h`
-(`Rd.conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv`). -/
-theorem fderiv_conv_apply_eq_conv {K : V → ℂ} (hK : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) K)
-    (hKs : HasCompactSupport K) {v : V} {h g : V → ℂ}
-    (hhg : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => v) h g) (x : V) :
-    fderiv ℝ (conv K h volume) x v = conv K g volume x := by
-  have hc := conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv hhg
-    (η := hKs.toSchwartzMap hK) hKs (x := x) fun _ _ => by simp
-  rw [fderiv_conv_apply (hK.of_le (by exact_mod_cast le_top)) hKs hhg.locallyIntegrable,
-    ← coe_lineDerivOp_toSchwartzMap hK hKs v]
-  exact hc.symm
 
 /-! ### Derivatives through a basis -/
 
@@ -178,9 +149,7 @@ theorem eLpNorm_le_of_hasCompactSupport_of_hasWeakLineDeriv {p p' : ℝ≥0} (hp
     eLpNorm h p' volume ≤
       eLpNormLESNormFDerivOfEqInnerConst (volume : Measure V) p * ∑ k, eLpNorm (g k) p volume := by
   have hloc := (hhg ⟨0, hn⟩).locallyIntegrable
-  have hint : Integrable h volume :=
-    (integrableOn_iff_integrable_of_support_subset (subset_tsupport h)).1
-      (hloc.integrableOn_isCompact hc.isCompact)
+  have hint : Integrable h volume := hloc.integrable_of_hasCompactSupport hc
   have hlim : Tendsto (fun i : ℕ => eLpNorm (conv (dilate ((i : ℝ) + 1)
       (LocalMeansBump.std (V := V)).toFun) h volume - h) 1 volume) atTop (𝓝 0) :=
     (tendsto_eLpNorm_conv_dilate_sub ENNReal.one_ne_top LocalMeansBump.std.integrable

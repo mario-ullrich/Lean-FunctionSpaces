@@ -20,7 +20,10 @@ derivative is an identity between distributions on an open set $\Omega \subseteq
 space $\mathcal D'(\Omega)$ of distributions tested against real smooth compactly supported
 functions (\Cref{sec:schwartz-cutoff}). On the whole space $V$ and for $L_p$ functions it is the
 same as an identity between tempered distributions, the setting of Mathlib's Fourier transform
-and Bessel potential spaces (\Cref{sec:weak-derivatives}). For $p = 2$,
+and Bessel potential spaces (\Cref{sec:weak-derivatives}).
+\Cref{sec:weak-derivative-change-of-variables} shows that Lipschitz functions are weakly
+differentiable and proves the product rule with cutoffs and the chain rule under Lipschitz maps
+that preserve Lebesgue measure. For $p = 2$,
 \Cref{sec:sobolev-two-littlewood-paley} identifies Mathlib's Bessel potential spaces $H^s(V)$,
 $s \geq 0$, with the Triebel--Lizorkin spaces $\TL{s}{2}{2}$ (and, for $s > 0$, with the Besov
 spaces $\Besov{s}{2}{2}$) and proves $\Sob{1}{2}(V) = H^1(V) = \Besov{1}{2}{2}$.
@@ -390,6 +393,400 @@ As tempered distributions $\partial^v \eta$ is the Schwartz function $\partial^v
 the weak derivative on $V$, and \Cref{lem:weak-derivative-basic} (5) on $\Omega$. The Sobolev
 statement is \Cref{cor:sobolev-tempered} with $g = \partial^v \eta$.
 \end{proof}
+
+\section{Changes of variables and cutoffs}
+\label{sec:weak-derivative-change-of-variables}
+
+Throughout this section $(e_i)_{i \in I}$ is the orthonormal basis of the dyadic grid of $V$
+(\Cref{def:dyadic-cells}). For a function $f$ on $V$, $D_v f(x)$ is the line derivative
+$\lim_{t \to 0} (f(x + t v) - f(x))/t$ where it exists and $0$ elsewhere (Mathlib's
+\texttt{lineDeriv}), and $\partial_v f$ is a weak derivative; for a map $\Phi \colon V \to V$,
+$D\Phi(x)$ is the derivative where it exists and $0$ elsewhere (Mathlib's \texttt{fderiv}). For
+Lipschitz $f$ and $\Phi$ both exist almost everywhere by Rademacher's theorem. The section
+proves that Lipschitz functions are weakly differentiable, that weak derivatives are linear in
+the direction, the product rule with a cutoff $\chi$ supported in $B$, which carries a weak
+derivative on $O \cap B$ to one on $O$, an
+approximation by mollification on open sets in $L_1$, and the chain rule for Lipschitz maps that
+preserve Lebesgue measure. These are the tools of the extension by reflection across Lipschitz
+graphs \cite[Section~4.4]{EvansGariepy}, \cite[Chapter~9]{Brezis2011}.
+
+\paragraph{Lipschitz functions.}
+
+\begin{lemma}[Line derivatives of Lipschitz functions integrate to zero]
+\label{lem:integral-line-derivative-zero}
+\lean{Rd.integral_lineDeriv_eq_zero, Rd.integrable_lineDeriv, Rd.ae_re_lineDeriv_eq,
+  Rd.ae_im_lineDeriv_eq, Rd.integral_lineDeriv_eq_zero_complex}
+\leanok
+For every finite-dimensional real normed space $F$ with a Haar measure, every Lipschitz function
+$f \colon F \to \R$ with compact support and every $v \in F$, $\int D_v f = 0$. For every
+real Banach space $G$, every Lipschitz function $f \colon F \to G$ with compact support and every
+$v \in F$, $D_v f$ is integrable. For every Lipschitz function $f \colon F \to \C$ and every
+$v \in F$, $\operatorname{Re} D_v f = D_v \operatorname{Re} f$ and
+$\operatorname{Im} D_v f = D_v \operatorname{Im} f$ almost everywhere; if $f$ has
+compact support, then $\int D_v f = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Integration by parts for Lipschitz functions with the constant function $1$, whose line
+derivatives vanish (Mathlib's \texttt{LipschitzWith.\allowbreak integral\_\allowbreak
+lineDeriv\_\allowbreak mul\_\allowbreak eq}). The line derivative $D_v f$ is measurable (Mathlib's
+\texttt{aestronglyMeasurable\_\allowbreak lineDeriv}), bounded by $C \|v\|$ for the Lipschitz
+constant $C$, and zero outside the closed support of $f$. For complex $f$, $f$ is
+differentiable almost everywhere by Rademacher's theorem, so the real and imaginary parts of
+$D_v f$ are almost everywhere the line derivatives of the Lipschitz functions
+$\operatorname{Re} f$ and $\operatorname{Im} f$.
+\end{proof}
+
+\begin{lemma}[Lipschitz functions are weakly differentiable]
+\label{lem:lipschitz-weak-derivative}
+\lean{Rd.integral_testFunction_mul_lineDeriv, Rd.hasWeakLineDeriv_of_lipschitzWith}
+\leanok
+\uses{lem:integral-line-derivative-zero, lem:weak-derivative-integral,
+  lem:directional-derivatives-commute}
+For every open $\Omega \subseteq V$, every $\varphi \in \mathcal D(\Omega)$, every Lipschitz
+$u \colon V \to \R$ and every $v \in V$,
+\[
+  \int_V \varphi \, D_v u = -\int_V (\partial_v \varphi) \, u .
+\]
+For every Lipschitz $f \colon V \to \C$, every open $\Omega \subseteq V$ and every $v \in V$,
+$D_v f$ is the weak derivative of $f$ on $\Omega$ in the direction $v$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The test function $\varphi$ is smooth with compact support, hence Lipschitz (Mathlib's
+\texttt{ContDiff.\allowbreak lipschitzWith\_\allowbreak of\_\allowbreak hasCompactSupport}), and
+Mathlib's integration by parts for Lipschitz functions gives
+$\int (D_v u) \varphi = \int (D_{-v} \varphi) u$, with
+$D_{-v} \varphi = -\partial_v \varphi$ (\Cref{lem:directional-derivatives-commute}). For
+complex $f$, $f$ is continuous and $D_v f$ is measurable and bounded, so both are locally
+integrable. The real and imaginary parts of $\int \varphi \, D_v f$ are
+$\int \varphi \, D_v \operatorname{Re} f$ and
+$\int \varphi \, D_v \operatorname{Im} f$ (\Cref{lem:integral-line-derivative-zero}), and
+the first part for the Lipschitz functions $\operatorname{Re} f$ and $\operatorname{Im} f$ gives
+the identity of \Cref{lem:weak-derivative-integral}.
+\end{proof}
+
+\paragraph{Directions.}
+
+\begin{lemma}[Weak derivatives are linear in the direction]
+\label{lem:weak-derivative-direction-linear}
+\lean{Rd.locallyIntegrableOn_sum_smul, Rd.HasWeakLineDeriv.sum_smul_dir,
+  Rd.locallyIntegrableOn_of_forall_gridBasis, Rd.hasWeakLineDeriv_of_forall_gridBasis,
+  Rd.memSobolev_one_of_forall_gridBasis}
+\leanok
+\uses{lem:weak-derivative-integral, lem:weak-derivative-basic,
+  lem:directional-derivatives-commute, def:dyadic-cells}
+For every open $\Omega \subseteq V$:
+\begin{enumerate}
+  \item for every finite set $s$, all locally integrable $g_i$ on $\Omega$ and all $c_i \in \C$
+    ($i \in s$), $\sum_{i \in s} c_i g_i$ is locally integrable on $\Omega$;
+  \item for every finite set $s$, all $v_i \in V$ and $c_i \in \R$ ($i \in s$), every locally
+    integrable $f$ on $\Omega$ and all $g_i$ with $g_i = \partial_{v_i} f$ weakly on $\Omega$ for
+    every $i \in s$, $\sum_{i \in s} c_i g_i = \partial_v f$ weakly on $\Omega$ for
+    $v = \sum_{i \in s} c_i v_i$;
+  \item for every $f$ and all $g_i$ with $g_i = \partial_{e_i} f$ weakly on $\Omega$ for every
+    $i \in I$, $f$ is locally integrable on $\Omega$, and for every $v \in V$,
+    $\sum_{i \in I} \langle v, e_i \rangle g_i = \partial_v f$ weakly on $\Omega$;
+  \item for every $1 \leq p \leq \infty$, every $f \in L_p(V)$ and all $g_i \in L_p(V)$ with
+    $g_i = \partial_{e_i} f$ weakly on $V$ for every $i \in I$, $f \in \Sob{1}{p}(V)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Induction on $s$. (2) For every $\varphi \in \mathcal D(\Omega)$,
+$\partial_v \varphi = \sum_i c_i \, \partial_{v_i} \varphi$, since
+$\partial_w \varphi = D\varphi(\cdot) \, w$ is linear in $w$
+(\Cref{lem:directional-derivatives-commute}); integrate against $f$ and apply
+\Cref{lem:weak-derivative-integral} for every $i$. (3) For $n \geq 1$, $f$ is locally integrable
+as a function with a weak derivative; for $n = 0$, $V$ is a point and every function on it is
+continuous. Then (2) with $v = \sum_i \langle v, e_i \rangle e_i$. (4) By (3) the class of
+$\sum_i \langle v, e_i \rangle g_i$ in $L_p(V)$ is the weak derivative $\partial_v f$ for every
+$v$, and \Cref{lem:weak-derivative-basic} for $m = 1$ applies.
+\end{proof}
+
+\paragraph{Cutoffs.}
+
+\begin{lemma}[Bounded multipliers on $L_p$]
+\label{lem:bounded-multiplier-lp}
+\lean{MeasureTheory.eLpNorm_mul_le_of_forall_norm_le}
+\leanok
+For every measure space $(X, \mu)$, every $0 \leq p \leq \infty$, every $C \geq 0$, every almost
+everywhere strongly measurable $c \colon X \to \C$ with $|c| \leq C$ and every $u \colon X \to \C$,
+$\|c u\|_{L_p(\mu)} \leq C \, \|u\|_{L_p(\mu)}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For almost everywhere strongly measurable $u$ this is the pointwise bound $|c u| \leq C |u|$.
+For the other $u$, $\|u\|_{L_p(\mu)} = \infty$ in Mathlib, and for $C = 0$ the product $c u$ is
+$0$.
+\end{proof}
+
+\begin{lemma}[The product rule with a cutoff]
+\label{lem:weak-derivative-cutoff}
+\lean{Rd.testFunctionMulOn, Rd.testFunctionMulOn_apply, Rd.lineDerivOp_testFunctionMulOn_apply,
+  Rd.locallyIntegrableOn_mul_of_tsupport_subset, Rd.HasWeakLineDeriv.mul_of_tsupport_subset,
+  Rd.eLpNorm_mul_add_fderiv_mul_le}
+\leanok
+\uses{lem:weak-derivative-integral, lem:weak-derivative-product,
+  lem:directional-derivatives-commute, lem:bounded-multiplier-lp}
+For all open $O, B \subseteq V$ and every smooth real function $\chi$ on $V$ with closed support
+in $B$:
+\begin{enumerate}
+  \item for every $\varphi \in \mathcal D(O)$, $\varphi \chi \in \mathcal D(O \cap B)$ and
+    $\partial_w (\varphi \chi) = (\partial_w \varphi) \chi + \varphi \, \partial_w \chi$ for every
+    $w \in V$;
+  \item for every continuous $c \colon V \to \C$ with closed support in $B$ and every locally
+    integrable $u$ on $O \cap B$, $c u$ is locally integrable on $O$;
+  \item for every $w \in V$ and all $f$, $g$ with $g = \partial_w f$ weakly on $O \cap B$,
+    $\chi g + (\partial_w \chi) f = \partial_w (\chi f)$ weakly on $O$;
+  \item for every $1 \leq p \leq \infty$, every $w \in V$, all $C, C' \geq 0$ with
+    $|\chi| \leq C$ and $|\partial_w \chi| \leq C'$ and all $f$, $g$,
+    \[
+      \|\chi g + (\partial_w \chi) f\|_{L_p(O)} \leq C \, \|g\|_{L_p(O \cap B)}
+        + C' \, \|f\|_{L_p(O \cap B)} .
+    \]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The closed support of $\varphi \chi$ lies in those of $\varphi$ and of $\chi$, hence in
+$O \cap B$, and the product rule gives the derivative. (2) Near a point of $B$, $c u$ is the
+product of a continuous function with a locally integrable function on the open set $O \cap B$;
+near a point of $O$ outside $B$, which lies outside the closed support of $c$, $c u$ vanishes.
+(3) As in \Cref{lem:weak-derivative-product}, with the test function
+$\varphi \chi \in \mathcal D(O \cap B)$ of (1) for $\varphi \in \mathcal D(O)$. (4) The function
+vanishes outside $B$, so its norm in $L_p(O)$ is its norm in $L_p(O \cap B)$; Minkowski's
+inequality and \Cref{lem:bounded-multiplier-lp} give the estimate.
+\end{proof}
+
+\begin{lemma}[Smooth cutoffs]
+\label{lem:smooth-cutoff-compact}
+\lean{Rd.exists_contDiff_eventuallyEq_one}
+\leanok
+For every compact $K \subseteq V$ and every open $U \supseteq K$ there is a smooth
+$\chi \colon V \to [0, 1]$ with compact closed support in $U$ that equals $1$ on a neighbourhood
+of $K$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Choose a compact $L$ with $K \subseteq \operatorname{int} L$ and $L \subseteq U$, and an open
+$W \supseteq L$ with compact closure in $U$ (Mathlib's \texttt{exists\_\allowbreak
+compact\_\allowbreak between} and \texttt{exists\_\allowbreak open\_\allowbreak between\_\allowbreak
+and\_\allowbreak isCompact\_\allowbreak closure}). Mathlib's
+\texttt{exists\_\allowbreak contDiff\_\allowbreak support\_\allowbreak eq\_\allowbreak
+eq\_\allowbreak one\_\allowbreak iff} gives a smooth $\chi$ with values in $[0, 1]$, support $W$
+and $\chi = 1$ on $L$.
+\end{proof}
+
+\paragraph{Mollification on open sets.}
+
+\begin{lemma}[The derivative of a mollification]
+\label{lem:mollification-weak-derivative}
+\lean{Rd.coe_lineDerivOp_toSchwartzMap, Rd.fderiv_conv_apply_eq_conv}
+\leanok
+\uses{lem:conv-derivatives, lem:weak-derivative-convolution-local, lem:weak-derivative-basic}
+For every smooth $K \colon V \to \C$ with compact support and every $v \in V$, $K$ is a Schwartz
+function with $\partial_v K = DK(\cdot) \, v$, and for all $h$, $g$ with $g = \partial_v h$
+weakly on $V$ and every $x \in V$,
+\[
+  D(K * h)(x) \, v = (K * g)(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+A smooth function with compact support is a Schwartz function, and its directional derivative
+as a Schwartz function is $DK(\cdot) v$. The function $h$ is locally integrable
+(\Cref{lem:weak-derivative-basic}). By \Cref{lem:conv-derivatives},
+$D(K * h)(x) v = ((\partial_v K) * h)(x)$, which is $(K * g)(x)$ by
+\Cref{lem:weak-derivative-convolution-local} with $\Omega = V$.
+\end{proof}
+
+Let $\eta$ be the standard bump of \Cref{thm:smooth-atomic-decomposition}, a smooth nonnegative
+function with integral $1$ supported in the unit ball, and $\eta_c(x) = c^n \eta(c x)$.
+
+\begin{lemma}[Mollification on open sets]
+\label{lem:mollification-open-set}
+\lean{MeasureTheory.LocallyIntegrable.integrable_of_hasCompactSupport,
+  Rd.tendsto_eLpNorm_mollify_sub_restrict, Rd.HasWeakLineDeriv.cutoff_top,
+  Rd.exists_tendsto_contDiff_of_hasWeakLineDeriv}
+\leanok
+\uses{lem:weak-derivative-cutoff, lem:smooth-cutoff-compact, lem:mollification-weak-derivative,
+  thm:approx-identity, lem:dilate, lem:conv-derivatives, thm:smooth-atomic-decomposition,
+  lem:weak-derivative-basic}
+\begin{enumerate}
+  \item For every topological space $X$ with a measure and every locally integrable $u$ on $X$
+    with compact support, $u$ is integrable. For every
+    integrable $h$, every $K \subseteq V$ and every $h'$ with $h = h'$ almost everywhere on $K$,
+    $\|\eta_{k+1} * h - h'\|_{L_1(K)} \to 0$ as $k \to \infty$.
+  \item For every open $O \subseteq V$, every $w \in V$, all $f$, $g$ with $g = \partial_w f$
+    weakly on $O$ and every smooth real $\chi$ with compact closed support in $O$, the functions
+    $\chi f$ and $\chi g + (\partial_w \chi) f$ are integrable on $V$, and
+    $\chi g + (\partial_w \chi) f = \partial_w (\chi f)$ weakly on $V$.
+  \item For every open $O \subseteq V$, every compact $K \subseteq O$, every family
+    $(w_i)_{i \in J}$ in $V$, every locally integrable $f$ on $O$ and all $g_i$ with
+    $g_i = \partial_{w_i} f$ weakly on $O$ for every $i \in J$, there are smooth $u_k$ with
+    compact support ($k \in \N$) such that $\|u_k - f\|_{L_1(K)} \to 0$ and
+    $\|D u_k(\cdot) \, w_i - g_i\|_{L_1(K)} \to 0$ for every $i \in J$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Such a function is integrable on its compact closed support and zero outside it. The
+mollifications converge to $h$ in $L_1(V)$ (\Cref{thm:approx-identity}), and on $K$, $h = h'$
+almost everywhere. (2) \Cref{lem:weak-derivative-cutoff} with $V$ for $O$ and $O$ for $B$; both
+functions are locally integrable on $V$ (\Cref{lem:weak-derivative-basic}) with compact support,
+so (1) applies. (3) Take $\chi$ of \Cref{lem:smooth-cutoff-compact} for $K \subseteq O$ and
+$u_k = \eta_{k+1} * (\chi f)$, which is smooth with compact support (\Cref{lem:conv-derivatives},
+\Cref{lem:dilate}). By \Cref{lem:mollification-weak-derivative} and (2),
+$D u_k(\cdot) \, w_i = \eta_{k+1} * (\chi g_i + (\partial_{w_i} \chi) f)$. On $K$, $\chi = 1$ and
+$D\chi = 0$, so $\chi f = f$ and $\chi g_i + (\partial_{w_i} \chi) f = g_i$ there, and (1) gives
+both limits.
+\end{proof}
+
+\paragraph{The chain rule.}
+
+\begin{lemma}[Compositions with measure-preserving maps]
+\label{lem:composition-measure-preserving}
+\lean{Rd.aestronglyMeasurable_comp_of_mapsTo, Rd.eLpNorm_comp_le_of_mapsTo}
+\leanok
+For all measure spaces $(X, \mu)$ and $(Y, \nu)$, every measurable $\Phi \colon X \to Y$ with
+$\Phi_* \mu = \nu$, every $U \subseteq X$ and every measurable $O \subseteq Y$ with
+$\Phi(U) \subseteq O$, every normed group $E$ and every $h \colon Y \to E$: if $h$ is almost
+everywhere strongly measurable on $O$, then $h \circ \Phi$ is almost everywhere strongly
+measurable on $U$; and for every $0 \leq p \leq \infty$,
+$\|h \circ \Phi\|_{L_p(U)} \leq \|h\|_{L_p(O)}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The map $\Phi$ carries $\mu$ restricted to $\Phi^{-1}(O)$ to $\nu$ restricted to $O$
+(Mathlib's \texttt{MeasurePreserving.\allowbreak restrict\_\allowbreak preimage}), and
+$U \subseteq \Phi^{-1}(O)$. Hence $h \circ \Phi$ is almost everywhere strongly measurable on
+$\Phi^{-1}(O)$, so on $U$, and
+$\|h \circ \Phi\|_{L_p(U)} \leq \|h \circ \Phi\|_{L_p(\Phi^{-1}(O))} = \|h\|_{L_p(O)}$. In
+Mathlib the $L_p$ norm of a function that is not almost everywhere strongly measurable is
+$\infty$, so the bound holds for every $h$.
+\end{proof}
+
+\begin{lemma}[The chain rule for smooth functions]
+\label{lem:chain-rule-smooth}
+\lean{Rd.lineDeriv_comp_eq_sum, Rd.hasWeakLineDeriv_comp_of_contDiff,
+  Rd.eLpNorm_sum_inner_fderiv_mul_comp_le}
+\leanok
+\uses{lem:lipschitz-weak-derivative, lem:composition-measure-preserving, def:dyadic-cells,
+  lem:weak-derivative-basic, lem:bounded-multiplier-lp}
+\begin{enumerate}
+  \item For all $u \colon V \to \C$, $\Phi \colon V \to V$ and $x \in V$ such that $u$ is
+    differentiable at $\Phi(x)$ and $\Phi$ at $x$, and for every $v \in V$,
+    $D_v (u \circ \Phi)(x) = \sum_{i \in I} \langle D\Phi(x) v, e_i \rangle \,
+    Du(\Phi(x)) \, e_i$.
+  \item For every smooth $u \colon V \to \C$ with compact support, every Lipschitz
+    $\Phi \colon V \to V$, every open $\Omega \subseteq V$ and every $v \in V$, the function
+    $x \mapsto \sum_{i \in I} \langle D\Phi(x) v, e_i \rangle \, Du(\Phi(x)) \, e_i$ is the weak
+    derivative of $u \circ \Phi$ on $\Omega$ in the direction $v$.
+  \item For every $1 \leq p \leq \infty$, every $K \geq 0$, every $K$-Lipschitz
+    $\Phi \colon V \to V$ that preserves Lebesgue measure, every $U \subseteq V$ and every
+    measurable $O \subseteq V$ with $\Phi(U) \subseteq O$, every $v \in V$ and all $h_i$
+    ($i \in I$),
+    \[
+      \Bigl\| \sum_{i \in I} \langle D\Phi(\cdot) v, e_i \rangle \, h_i \circ \Phi
+      \Bigr\|_{L_p(U)} \leq K \|v\| \sum_{i \in I} \|h_i\|_{L_p(O)} .
+    \]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The chain rule and $D\Phi(x) v = \sum_i \langle e_i, D\Phi(x) v \rangle e_i$. (2) The smooth
+$u$ with compact support is Lipschitz, hence so is $u \circ \Phi$, and
+\Cref{lem:lipschitz-weak-derivative} shows that $D_v (u \circ \Phi)$ is its weak derivative. By
+Rademacher's theorem (Mathlib's \texttt{LipschitzWith.\allowbreak ae\_\allowbreak
+differentiableAt}) $\Phi$ is differentiable almost everywhere, where (1) applies, and weak
+derivatives only see functions almost everywhere (\Cref{lem:weak-derivative-basic}).
+(3) $\|D\Phi(x)\| \leq K$ for every $x$ (Mathlib's \texttt{norm\_\allowbreak fderiv\_\allowbreak
+le\_\allowbreak of\_\allowbreak lipschitz}), so
+$|\langle D\Phi(x) v, e_i \rangle| \leq K \|v\|$, and the coefficients are measurable (Mathlib's
+\texttt{measurable\_\allowbreak fderiv\_\allowbreak apply\_\allowbreak const}). Minkowski's
+inequality, \Cref{lem:bounded-multiplier-lp} and \Cref{lem:composition-measure-preserving} give
+the bound.
+\end{proof}
+
+\begin{lemma}[Weak derivatives from compact pieces]
+\label{lem:weak-derivative-local-to-global}
+\lean{Rd.hasWeakLineDeriv_of_forall_isCompact}
+\leanok
+\uses{lem:weak-derivative-integral, lem:directional-derivatives-commute}
+For every open $U \subseteq V$, every $v \in V^k$ and all $F$, $G$ such that every compact
+$K \subseteq U$ lies in an open $U'$ with $G = \partial^v F$ weakly on $U'$,
+$G = \partial^v F$ weakly on $U$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $x \in U$ the compact set $\{x\}$ lies in such a $U'$, a neighbourhood of $x$, so $F$ and $G$
+are locally integrable on $U$. Every $\varphi \in \mathcal D(U)$ is a test function on an open
+$U'$ containing its closed support, with the same derivatives
+(\Cref{lem:directional-derivatives-commute}), and \Cref{lem:weak-derivative-integral} on $U'$
+gives the identity on $U$.
+\end{proof}
+
+\begin{theorem}[The chain rule for Lipschitz maps]
+\label{thm:weak-derivative-chain-rule}
+\lean{Rd.HasWeakLineDeriv.comp_lipschitzWith_of_mapsTo_isCompact,
+  Rd.HasWeakLineDeriv.comp_lipschitzWith}
+\leanok
+\uses{lem:mollification-open-set, lem:chain-rule-smooth, lem:composition-measure-preserving,
+  lem:weak-derivative-local-to-global, lem:weak-derivative-direction-linear,
+  thm:weak-derivative-limits}
+\begin{enumerate}
+  \item For all open $O, U \subseteq V$, every compact $L \subseteq O$, every locally integrable
+    $f$ on $O$, all $g_i$ with $g_i = \partial_{e_i} f$ weakly on $O$ for every $i \in I$, every
+    $K \geq 0$, every $K$-Lipschitz $\Phi \colon V \to V$ that preserves Lebesgue measure with
+    $\Phi(U) \subseteq L$, and every $v \in V$,
+    $\partial_v (f \circ \Phi) = \sum_{i \in I} \langle D\Phi(\cdot) v, e_i \rangle \,
+    g_i \circ \Phi$ weakly on $U$.
+  \item For all open $O, U \subseteq V$, every $f$ and all $g_i$ with $g_i = \partial_{e_i} f$
+    weakly on $O$ for every $i \in I$, every $K \geq 0$, every $K$-Lipschitz
+    $\Phi \colon V \to V$ that preserves Lebesgue measure and maps $U$ into $O$, and every
+    $v \in V$,
+    \[
+      \partial_v (f \circ \Phi)(x) = \sum_{i \in I} \langle D\Phi(x) v, e_i \rangle \,
+      g_i(\Phi(x))
+    \]
+    weakly on $U$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) Let $u_k$ be the smooth functions of \Cref{lem:mollification-open-set} for $L$ and the
+directions $e_i$, and $G$ the right side. By \Cref{lem:chain-rule-smooth} (2),
+$G_k(x) = \sum_i \langle D\Phi(x) v, e_i \rangle \, D u_k(\Phi(x)) \, e_i$ is the weak derivative
+$\partial_v (u_k \circ \Phi)$ on $U$. By \Cref{lem:composition-measure-preserving},
+$\|u_k \circ \Phi - f \circ \Phi\|_{L_1(U)} \leq \|u_k - f\|_{L_1(L)} \to 0$, and by
+\Cref{lem:chain-rule-smooth} (3),
+$\|G_k - G\|_{L_1(U)} \leq K \|v\| \sum_i \|D u_k(\cdot) \, e_i - g_i\|_{L_1(L)} \to 0$. The
+same bounds give $f \circ \Phi, G \in L_1(U)$, since $f$ and the $g_i$ are integrable on the
+compact $L \subseteq O$. \Cref{thm:weak-derivative-limits} with $p = r = 1$ gives
+$G = \partial_v (f \circ \Phi)$ weakly on $U$.
+
+(2) The function $f$ is locally integrable on $O$ (\Cref{lem:weak-derivative-direction-linear}).
+By \Cref{lem:weak-derivative-local-to-global} it suffices to treat a compact $K' \subseteq U$. Its
+image $\Phi(K')$ is a compact subset of $O$; choose a compact $L \subseteq O$ with
+$\Phi(K') \subseteq \operatorname{int} L$. The open set $U' = \Phi^{-1}(\operatorname{int} L)$
+contains $K'$, and $\Phi(U') \subseteq L$, so (1) applies on $U'$.
+\end{proof}
+
+Measure preservation alone carries the convergence in $L_1(L)$ to the convergence in $L_1(U)$,
+so every Lipschitz map that preserves Lebesgue measure qualifies.
 
 \section{Mathlib's Sobolev spaces \texorpdfstring{$H^s$}{H\^{}s} by Littlewood--Paley blocks}
 \label{sec:sobolev-two-littlewood-paley}
@@ -2364,7 +2761,7 @@ $\Sob{m}{1}(V) \hookrightarrow L_r(V)$ for $1/r = 1 - m/n$. In Lean $1/0 = 0$, s
 $p' = 0$ satisfies $1/p' = 1/p - 1/n$ for $p = n$; there the left side is the norm of exponent
 $0$, which is $0$.
 
-\paragraph{Fatou's lemma, mollification and bases.}
+\paragraph{Fatou's lemma and bases.}
 
 \begin{lemma}[Fatou's lemma with bounds]
 \label{lem:fatou-bounded-norms}
@@ -2387,28 +2784,6 @@ $\|f\|_p \leq \liminf_i \|u_i\|_p \leq \liminf_i B_i = b$.
 
 Mathlib's \texttt{MeasureTheory.\allowbreak Lp.\allowbreak eLpNorm\_\allowbreak le\_\allowbreak
 of\_\allowbreak ae\_\allowbreak tendsto} is the case of a constant bound $B_i = b$.
-
-\begin{lemma}[The derivative of a mollification]
-\label{lem:mollification-weak-derivative}
-\lean{Rd.coe_lineDerivOp_toSchwartzMap, Rd.fderiv_conv_apply_eq_conv}
-\leanok
-\uses{lem:conv-derivatives, lem:weak-derivative-convolution-local, lem:weak-derivative-basic}
-For every smooth $K \colon V \to \C$ with compact support and every $v \in V$, $K$ is a Schwartz
-function with $\partial_v K = DK(\cdot) \, v$, and for all $h$, $g$ with $g = \partial_v h$
-weakly on $V$ and every $x \in V$,
-\[
-  D(K * h)(x) \, v = (K * g)(x) .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-A smooth function with compact support is a Schwartz function, and its directional derivative
-as a Schwartz function is $DK(\cdot) v$. The function $h$ is locally integrable
-(\Cref{lem:weak-derivative-basic}). By \Cref{lem:conv-derivatives},
-$D(K * h)(x) v = ((\partial_v K) * h)(x)$, which is $(K * g)(x)$ by
-\Cref{lem:weak-derivative-convolution-local} with $\Omega = V$.
-\end{proof}
 
 \begin{lemma}[Derivatives through a basis]
 \label{lem:derivative-basis-bound}

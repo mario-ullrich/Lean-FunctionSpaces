@@ -6,6 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Domains.Lipschitz.SurfaceMeasure
+public import FunctionSpaces.Rd.Sobolev.WeakDerivativeChangeOfVariables
 public import Mathlib.MeasureTheory.Integral.IntegralEqImproper
 public import Mathlib.MeasureTheory.Function.Holder
 public import Mathlib.Analysis.Calculus.ParametricIntegral
@@ -69,70 +70,6 @@ theorem integrable_of_norm_le_of_forall_norm_gt_eq_zero {F E : Type*} [NormedAdd
   rw [mem_closedBall_zero_iff]
   by_contra h
   exact hx (hR x (lt_of_not_ge h))
-
-/-! ### Integrals of line derivatives of Lipschitz functions -/
-
-section LineDerivIntegral
-
-variable {F : Type*} [NormedAddCommGroup F] [NormedSpace ℝ F] [FiniteDimensional ℝ F]
-  [MeasurableSpace F] [BorelSpace F] {μ : Measure F} [μ.IsAddHaarMeasure] {C : ℝ≥0}
-
-/-- **The line derivative of a compactly supported Lipschitz function integrates to zero**: for a
-Lipschitz `f : F → ℝ` with compact support on a finite-dimensional space with a Haar measure,
-`∫ ∂_v f = 0` for every direction `v`. This is Mathlib's integration by parts for Lipschitz
-functions (`LipschitzWith.integral_lineDeriv_mul_eq`) against the constant `1`. -/
-theorem integral_lineDeriv_eq_zero {f : F → ℝ} (hf : LipschitzWith C f)
-    (hfc : HasCompactSupport f) (v : F) : ∫ x, lineDeriv ℝ f x v ∂μ = 0 := by
-  have h := (LipschitzWith.const (1 : ℝ)).integral_lineDeriv_mul_eq (μ := μ) hf hfc (-v)
-  simp only [neg_neg, mul_one] at h
-  rw [← h]
-  simp [lineDeriv]
-
-/-- **The line derivative of a compactly supported Lipschitz function is integrable**: it is
-measurable (Mathlib's `aestronglyMeasurable_lineDeriv`), bounded by `C ‖v‖`
-(`norm_lineDeriv_le_of_lipschitz`) and zero outside the closed support of `f`. -/
-theorem integrable_lineDeriv {G : Type*} [NormedAddCommGroup G] [NormedSpace ℝ G]
-    [CompleteSpace G] {f : F → G}
-    (hf : LipschitzWith C f) (hfc : HasCompactSupport f) (v : F) :
-    Integrable (fun x => lineDeriv ℝ f x v) μ := by
-  refine IntegrableOn.integrable_of_forall_notMem_eq_zero (s := tsupport f)
-    (Measure.integrableOn_of_bounded hfc.measure_lt_top.ne
-      (aestronglyMeasurable_lineDeriv hf.continuous _)
-      (ae_of_all _ fun _ => norm_lineDeriv_le_of_lipschitz ℝ hf)) fun x hx => ?_
-  rw [((notMem_tsupport_iff_eventuallyEq).1 hx).lineDeriv_eq]
-  simp [lineDeriv]
-
-/-- **The complex form**: for a compactly supported Lipschitz `f : F → ℂ`, `∫ ∂_v f = 0`. Almost
-everywhere `f` is differentiable (Rademacher's theorem, `LipschitzWith.ae_differentiableAt`), so
-the real and imaginary parts of `∂_v f` are the line derivatives of the real and imaginary parts
-of `f` (`Rd.integral_lineDeriv_eq_zero`), and `∂_v f` is integrable
-(`Rd.integrable_lineDeriv`). -/
-theorem integral_lineDeriv_eq_zero_complex {f : F → ℂ} (hf : LipschitzWith C f)
-    (hfc : HasCompactSupport f) (v : F) : ∫ x, lineDeriv ℝ f x v ∂μ = 0 := by
-  have hre : ∀ᵐ x ∂μ, (lineDeriv ℝ f x v).re = lineDeriv ℝ (fun y => (f y).re) x v := by
-    filter_upwards [hf.ae_differentiableAt] with x hx
-    have h2 : HasFDerivAt (fun y => (f y).re) (Complex.reCLM.comp (fderiv ℝ f x)) x :=
-      Complex.reCLM.hasFDerivAt.comp x hx.hasFDerivAt
-    rw [hx.lineDeriv_eq_fderiv, h2.differentiableAt.lineDeriv_eq_fderiv, h2.fderiv]
-    rfl
-  have him : ∀ᵐ x ∂μ, (lineDeriv ℝ f x v).im = lineDeriv ℝ (fun y => (f y).im) x v := by
-    filter_upwards [hf.ae_differentiableAt] with x hx
-    have h2 : HasFDerivAt (fun y => (f y).im) (Complex.imCLM.comp (fderiv ℝ f x)) x :=
-      Complex.imCLM.hasFDerivAt.comp x hx.hasFDerivAt
-    rw [hx.lineDeriv_eq_fderiv, h2.differentiableAt.lineDeriv_eq_fderiv, h2.fderiv]
-    rfl
-  have h := integral_re_add_im (integrable_lineDeriv (μ := μ) hf hfc v)
-  simp only [RCLike.re_to_complex, RCLike.im_to_complex, RCLike.I_to_complex] at h
-  have h0re : ∫ x, lineDeriv ℝ (fun y => (f y).re) x v ∂μ = 0 :=
-    integral_lineDeriv_eq_zero (Complex.reCLM.lipschitzWith.comp hf)
-      (hfc.comp_left Complex.zero_re) v
-  have h0im : ∫ x, lineDeriv ℝ (fun y => (f y).im) x v ∂μ = 0 :=
-    integral_lineDeriv_eq_zero (Complex.imCLM.lipschitzWith.comp hf)
-      (hfc.comp_left Complex.zero_im) v
-  rw [← h, integral_congr_ae hre, integral_congr_ae him, h0re, h0im]
-  simp
-
-end LineDerivIntegral
 
 /-! ### Ray integrals -/
 
