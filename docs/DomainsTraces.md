@@ -411,6 +411,21 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   right inverse `E τ⁻¹ : B^{1/2}_{2,2}(Γ) → H^1(Ω)`, as in McLean, Theorem 3.37
   (`Rd.BoundedLipschitzDomain.traceRightInverse`,
   `Rd.BoundedLipschitzDomain.boundaryTraceL2_traceRightInverse`).
+* **The Sobolev–Slobodeckij norm on the boundary.** Let `Ω` be a bounded Lipschitz domain in `V`,
+  `dim V = n`, with boundary `Γ` and surface measure `σ`, let `ψ` be a resolution of unity,
+  `1 ≤ p < ∞` and `0 < s < 1`. For `g ∈ L_p(Γ)`, `g ∈ B^s_{p,p}(Γ)` iff Gagliardo's form
+  `E(g) = ∫_Γ ∫_Γ |g(y) - g(x)|^p / |y - x|^(n-1+sp) dσ(y) dσ(x)` is finite
+  (`Rd.BoundedLipschitzDomain.boundarySlobodeckijForm`,
+  `Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_boundarySlobodeckijForm_lt_top`); there is
+  `C < ∞` with `E(g) ≤ C ‖g‖_{B^s_{p,p}(Γ)}^p` for all `g` (for every `s > 0`) and
+  `‖g‖_{B^s_{p,p}(Γ)}^p ≤ C (‖g‖_{L_p(Γ)}^p + E(g))` for all `g` measurable on `Γ`
+  (`Rd.BoundedLipschitzDomain.exists_boundarySlobodeckijForm_le`,
+  `Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_rpow_le`). For `p = 2`, `s = 1/2` there is
+  `C < ∞` with `‖t‖² ≤ C (‖τ t‖²_{L_2(Γ)} + ∫_Γ ∫_Γ |τ t(y) - τ t(x)|² / |y - x|^n dσ dσ)` and the
+  reverse bound for all `t ∈ H^{1/2}(Γ)`
+  (`Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij`), and `g ∈ L_2(Γ)` lies in
+  the range of `τ` iff its form is finite
+  (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`).
 * **Divergence kernels.** Let `(e_i)` be an orthonormal basis of `V`, `n = dim V`, and
   `m_c(x) = c^n m(c x)`. For every smooth `m`, `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence
   kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt` (`Rd.divergenceKernel`,
@@ -562,6 +577,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The area formula for Lipschitz graphs: Lipschitz maps and Mathlib's Euclidean Hausdorff measure, the linear case by Mathlib's norm determinant, stretches and tilts, the gradient and the Gram density, good pieces, `μHE[n-1](γ(A)) = ∫_A √(1 + ‖∇φ‖²)` with `n = dim V` in set, measure and integral form; the outward unit normal | ✅ | ✗ | `Domains/Lipschitz/LipschitzGraphArea` |
 | The surface measure of a bounded Lipschitz domain as `μHE[n-1]` on the boundary, its chart form, finiteness and null sets, the boundary `Γ` as a Lebesgue null set, the boundary trace in `L_p(Γ)`, `L_2(Γ)` with the traces of `H^1(Ω)` and `H^{1/2}(Γ)`, and the outward unit normal field | ✅ | ✗ | `Domains/Lipschitz/SurfaceMeasure` |
 | The norm of the trace space: least extension norm, equivalence with the norm of `B^{1/2}_{2,2}(Γ)`, bounded preimages, the range of `H^{1/2}(Γ) → L_2(Γ)`, the Banach space `B^{1/2}_{2,2}(Γ)` isomorphic to `H^{1/2}(Γ)`, and the bounded linear right inverse of the trace | ✅ | ✗ | `Domains/Traces/TraceSpaceNorm` |
+| The Sobolev–Slobodeckij norm on the boundary: Gagliardo's double integral for the surface measure, double integrals in the charts, the bounds by the chart-wise norm of `B^s_{p,p}(Γ)` in both directions, `W^{s,p}(Γ) = B^s_{p,p}(Γ)` for `0 < s < 1`, and the norm of `H^{1/2}(Γ)` as the Sobolev–Slobodeckij norm of `W^{1/2,2}(Γ)` | ✅ | ✗ | `Domains/Traces/BoundaryGagliardo` |
 | Smoothness of parametric integrals, the dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, their supports and mean zero, and the Calderón–Zygmund families of the dilates of mean-zero Schwartz functions | ✅ | ✗ | `Domains/Extension/DivergenceKernels` |
 | The local means of order two by the gradient, local means of Triebel–Lizorkin type on a set, bounded extensions from one patch, pasting in `W^1_p(ℝ^d)`, the extension theorem (`W^1_p(Ω)` is the space of restrictions of `W^1_p(ℝ^d)`) for `1 < p < ∞` with a bound, and for `p = 2` `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the quotient norm of `H^1(Ω)` and the boundary traces of `W^1_2(Ω)` | ✅ | ✗ | `Domains/Extension/SobolevExtension` |
 | The extension operator for `W^1_p`, `1 < p < ∞`, on value–derivative jets, `E u = u` on `Ω` | ✅ | ✗ | `Domains/Extension/SobolevExtensionOperator` |

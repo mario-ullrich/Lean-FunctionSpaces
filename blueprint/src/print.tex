@@ -35,18 +35,29 @@
 % Two subtleties in the printing:
 %   * `\detokenize` is required: declaration names contain underscores, which
 %     TeX would otherwise read as math subscripts;
-%   * the list is split at the commas, so that a long list wraps while each
-%     individual name stays on one line (detokenized spaces are not
-%     breakpoints, so a single detokenized string would run into the margin).
+%   * the list is split at the commas, so that a long list wraps between the
+%     names (detokenized spaces are not breakpoints, so a single detokenized
+%     string would run into the margin); a breakable space follows "Lean:", so
+%     a long first name can start the next line, and a name wider than the
+%     line breaks after one of its dots (`\bp@leanparts`), with a penalty that
+%     keeps such breaks to the names that need them.
 \makeatletter
 \newcommand{\bp@leanlist}{}
 \renewcommand{\lean}[1]{\gdef\bp@leanlist{#1}}
-\newcommand{\bp@leanname}[1]{\mbox{\detokenize{#1}}}
+\newcommand{\bp@leanname}[1]{\bp@leanparts#1.\@nil}
+\def\bp@leanparts#1.#2\@nil{%
+  \mbox{\detokenize{#1}}%
+  \ifx\relax#2\relax
+    \expandafter\@gobble
+  \else
+    \expandafter\@firstofone
+  \fi
+  {.\penalty1000 \bp@leanparts#2\@nil}}
 \newcommand{\bp@leanflush}{%
   \ifx\bp@leanlist\@empty\else
     \par\nobreak\smallskip
     {\normalfont\footnotesize\raggedright
-     [\textsf{Lean:}\nobreakspace\ttfamily
+     [\textsf{Lean:}\ \allowbreak\ttfamily
      \expandafter\@for\expandafter\bp@leanitem\expandafter:%
        \expandafter=\bp@leanlist\do{%
          \expandafter\bp@leanname\expandafter{\bp@leanitem}\allowbreak}%

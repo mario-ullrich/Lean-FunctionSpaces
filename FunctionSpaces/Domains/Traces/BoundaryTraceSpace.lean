@@ -339,6 +339,27 @@ theorem derivBound_spec (j : Fin Ω.N) :
   (exists_iteratedFDeriv_bound (ψ.contDiff_toComplex j) (ψ.hasCompactSupport_toComplex j)
     2).choose_spec
 
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- `|ψ_j| ≤ D_j` for the derivative bound `D_j = ψ.derivBound j`. -/
+theorem enorm_toComplex_le (j : Fin Ω.N) (y : V) :
+    ‖ψ.toComplex j y‖ₑ ≤ ENNReal.ofReal (ψ.derivBound j) := by
+  rw [← ofReal_norm]
+  exact ENNReal.ofReal_le_ofReal (norm_le_of_iteratedFDeriv_le (ψ.derivBound_spec j) y)
+
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- `ψ_j` is Lipschitz: `|ψ_j(x) - ψ_j(y)| ≤ D_j |x - y|` for the derivative bound
+`D_j = ψ.derivBound j` (`Rd.norm_higherDiff_le_of_iteratedFDeriv` with differences of order
+`1`). -/
+theorem enorm_toComplex_sub_le (j : Fin Ω.N) (x y : V) :
+    ‖ψ.toComplex j x - ψ.toComplex j y‖ₑ ≤ ENNReal.ofReal (ψ.derivBound j) * ‖x - y‖ₑ := by
+  have h := norm_higherDiff_le_of_iteratedFDeriv (ψ.contDiff_toComplex j) (l := 1)
+    (fun z => ψ.derivBound_spec j 1 (by norm_num) z) (x - y) y
+  simp only [Function.iterate_one, fwdDiff, add_sub_cancel, pow_one] at h
+  have hD : 0 ≤ ψ.derivBound j :=
+    (norm_nonneg _).trans (norm_le_of_iteratedFDeriv_le (ψ.derivBound_spec j) y)
+  rw [← ofReal_norm, ← ofReal_norm, ← ENNReal.ofReal_mul hD]
+  exact ENNReal.ofReal_le_ofReal h
+
 /-- **Localisation to the chart `j`**: `F ↦ ψ_j F` on `L_2(V)` (`Rd.mulLp`). -/
 noncomputable def localize (j : Fin Ω.N) (F : Lp ℂ 2 (volume : Measure V)) :
     Lp ℂ 2 (volume : Measure V) :=

@@ -5204,6 +5204,475 @@ $\gamma_{L_2} = \tau \circ \gamma$ (\Cref{def:trace-l2}), and $\|\tau^{-1} g\| \
 This is the right inverse of McLean's trace theorem \cite[Theorem 3.37]{McLean} for
 $H^{1/2}(\Gamma)$ defined by orthogonality.
 
+\section{The Sobolev--Slobodeckij norm on the boundary}
+\label{sec:boundary-slobodeckij}
+
+In this section $\Omega$ is a bounded Lipschitz domain in $V$, $\dim V = n$, with boundary
+$\Gamma$, surface measure $\sigma$ (\Cref{def:surface-measure}), boundary balls
+$B_j = B(c_j, \rho_j)$, graph maps $\gamma_j : H_j \to V$ with Lipschitz constants $M_j$, and
+$\psi$ is a resolution of unity on $\Gamma$ (\Cref{def:boundary-partition}) with a bound $D_j$ of
+$\psi_j$ and its derivatives of order at most $2$ (\Cref{def:trace-space-setting}). Gagliardo
+described the boundary values of $\Sob{1}{p}$ by a double integral over the boundary
+\cite{Gagliardo1957}; McLean defines $H^s(\Gamma)$ by charts \cite[Chapter~3, p.~96]{McLean}, as
+\Cref{def:boundary-besov-norm} does. This section shows that for $1 \leq p < \infty$ and
+$0 < s < 1$ the chart-wise space $\Besov{s}{p}{p}(\Gamma)$ is the Sobolev--Slobodeckij space of
+$\Gamma$ defined by $\sigma$ alone: the Gagliardo form is bounded by the $p$-th power of the
+chart-wise norm, and that by the form plus $\|g\|_{L_p(\Gamma)}^p$. This gives the norm of
+$H^{1/2}(\Gamma)$ of \Cref{sec:trace-space-norm} in Gagliardo's form. In the charts, the
+Gagliardo form of $\Gamma$ is compared with the Gagliardo form of the hyperplanes
+(\Cref{sec:sobolev-slobodeckij}). The results hold in every dimension $n \geq 1$; for $n = 1$
+the hyperplanes are points and $\Gamma$ is finite.
+
+\paragraph{The form and double integrals in the charts.}
+
+\begin{definition}[The Gagliardo form on the boundary]
+\label{def:boundary-slobodeckij-form}
+\lean{Rd.BoundedLipschitzDomain.boundarySlobodeckijForm,
+  Rd.BoundedLipschitzDomain.boundarySlobodeckijForm_congr_ae}
+\leanok
+\uses{def:surface-measure}
+For every $0 < p < \infty$, every $s \in \R$ and every $g \colon V \to \C$,
+\[
+  \mathcal{E}^\Gamma_{s,p}(g) = \int_\Gamma \int_\Gamma
+    \frac{|g(y) - g(x)|^p}{|y - x|^{n - 1 + sp}} \, d\sigma(y) \, d\sigma(x) \in [0, \infty] .
+\]
+It depends only on the class of $g$ modulo $\sigma$-null sets.
+\end{definition}
+
+For $p = 2$ and $s = 1/2$ the exponent is $n$. The form is the $p$-th power of the Gagliardo
+seminorm of the Sobolev--Slobodeckij space $W^{s,p}(\Gamma)$ of the $(n-1)$-dimensional surface
+$\Gamma$.
+
+\begin{lemma}[Splitting double integrals]
+\label{lem:double-integral-splitting}
+\lean{Rd.lintegral_lintegral_add_right, Rd.lintegral_lintegral_const_mul',
+  Rd.lintegral_lintegral_le_add_two_mul}
+\leanok
+For every s-finite measure $\mu$ on a measurable space $X$ and all
+$F, G \colon X \times X \to [0, \infty]$ with $G$ measurable,
+$\int\!\int (F + G) \, d\mu \, d\mu
+= \int\!\int F \, d\mu \, d\mu + \int\!\int G \, d\mu \, d\mu$. For every $c < \infty$ and
+every $F$,
+$\int\!\int c F = c \int\!\int F$. For all $F, T \colon X \times X \to [0, \infty]$ and every
+measurable $a \colon X \to [0, \infty]$ with $F(x, y) \leq T(x, y) + a(x) + a(y)$ for all
+$x, y$,
+\[
+  \int\!\int F \, d\mu \, d\mu \leq \int\!\int T \, d\mu \, d\mu + 2 \mu(X) \int a \, d\mu .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The integral of a sum is the sum of the integrals when one summand is measurable, for the inner
+and, by Tonelli's theorem, for the outer integral; constants $c < \infty$ leave every integral.
+For the last bound, $\int\!\int a(x) \, d\mu(y) \, d\mu(x) = \mu(X) \int a$, and the same for
+$a(y)$.
+\end{proof}
+
+\begin{lemma}[Double integrals in a chart]
+\label{lem:boundary-double-integral-charts}
+\lean{Rd.LipschitzGraph.one_le_ofReal_gram,
+  Rd.BoundedLipschitzDomain.lintegral_chart_le,
+  Rd.BoundedLipschitzDomain.lintegral_le_chart,
+  Rd.BoundedLipschitzDomain.lintegral_lintegral_surfaceMeasure_of_support,
+  Rd.BoundedLipschitzDomain.lintegral_lintegral_chart_le}
+\leanok
+\uses{thm:surface-measure-charts, lem:graph-gradient}
+For every $j$ the density $w_j = \sqrt{1 + \|\nabla \varphi_j\|^2}$ on $H_j$ is at least $1$,
+and for every $F \colon V \times V \to [0, \infty]$ with $F(x, y) = 0$ unless $x, y \in B_j$,
+\begin{align*}
+  \int_\Gamma \int_\Gamma F(x, y) \, d\sigma(y) \, d\sigma(x)
+  &= \int_{H_j} \int_{H_j} F(\gamma_j x', \gamma_j y') \, w_j(y') \, w_j(x') \, dy' \, dx' \\
+  &\geq \int_{H_j} \int_{H_j} F(\gamma_j x', \gamma_j y') \, dy' \, dx' .
+\end{align*}
+For every $j$ and every $F \colon V \to [0, \infty]$ with $F = 0$ outside $B_j$,
+$\int_{H_j} F(\gamma_j x') \, dx' \leq \int_\Gamma F \, d\sigma
+\leq \sqrt{1 + M_j^2} \int_{H_j} F(\gamma_j x') \, dx'$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{thm:surface-measure-charts} twice: for fixed $x$, $y \mapsto F(x, y)$ vanishes outside
+$B_j$, and so does $x \mapsto \int_\Gamma F(x, y) \, d\sigma(y)$. The chart formula holds for
+every $F$, measurable or not, and $1 \leq w_j \leq \sqrt{1 + M_j^2}$
+(\Cref{lem:graph-gradient}).
+\end{proof}
+
+\begin{lemma}[Functions of $\Besov{s}{p}{q}(\Gamma)$ are measurable on $\Gamma$]
+\label{lem:boundary-besov-measurable}
+\lean{Rd.BoundedLipschitzDomain.ae_eq_sum_mul,
+  Rd.BoundedLipschitzDomain.aestronglyMeasurable_of_memBoundaryBesov}
+\leanok
+\uses{def:boundary-besov, def:boundary-partition, thm:surface-measure-null-sets,
+  def:surface-measure}
+For every $g \colon V \to \C$, $g = \sum_j \psi_j g$ $\sigma$-almost everywhere. For all
+$1 \leq p \leq \infty$, every $s \in \R$, every $q \in [0, \infty]$ and every
+$g \in \Besov{s}{p}{q}(\Gamma)$, $g$ is almost everywhere strongly measurable for $\sigma$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\sum_j \psi_j = 1$ on $\Gamma$, which carries $\sigma$. On $B_j$, $\psi_j g = G_j \circ P_j$
+$\sigma$-almost everywhere for the chart piece $G_j \in L_p(H_j)$ and the projection $P_j$ onto
+$H_j$, since the $\sigma$-null sets in $B_j$ are those of the chart
+(\Cref{thm:surface-measure-null-sets}); outside $B_j$, $\psi_j g = 0$. So $g$ agrees
+$\sigma$-almost everywhere with the measurable function $\sum_j \mathbf 1_{B_j} (G_j \circ P_j)$.
+\end{proof}
+
+\paragraph{The upper bound.}
+
+\begin{lemma}[The Gagliardo form of a finite sum]
+\label{lem:boundary-slobodeckij-sum}
+\lean{Rd.measurable_slobodeckijIntegrand,
+  Rd.BoundedLipschitzDomain.boundarySlobodeckijForm_finsetSum_le}
+\leanok
+\uses{def:boundary-slobodeckij-form, lem:double-integral-splitting}
+For every measurable $f \colon V \to \C$ and all real $p, b$, the function
+$(x, y) \mapsto |f(y) - f(x)|^p / |y - x|^b$ is measurable. For every $1 \leq p < \infty$, every
+$s \in \R$, every finite set $T$ and all measurable $f_i \colon V \to \C$, $i \in T$,
+\[
+  \mathcal{E}^\Gamma_{s,p}\Bigl(\sum_{i \in T} f_i\Bigr) \leq (\# T)^{p-1}
+    \sum_{i \in T} \mathcal{E}^\Gamma_{s,p}(f_i) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$|\sum_i (f_i(y) - f_i(x))|^p \leq (\# T)^{p-1} \sum_i |f_i(y) - f_i(x)|^p$ by the triangle
+inequality and Hölder's inequality for finite sums (Mathlib's
+\texttt{ENNReal.\allowbreak rpow\_sum\_le\_const\_mul\_sum\_rpow}); the integrands are measurable,
+so the double integral of the sum is the sum of the double integrals.
+\end{proof}
+
+\begin{lemma}[The Gagliardo integrand of a function supported in a ball]
+\label{lem:slobodeckij-integrand-support}
+\lean{Rd.sub_le_norm_sub_of_mem_ball, Rd.slobodeckijIntegrand_le_of_support}
+\leanok
+For all $c, x, y \in V$ and $r, R \in \R$ with $y \in B(c, r)$ and $x \notin B(c, R)$,
+$R - r \leq |y - x|$. For all $r \leq R$, every $f \colon V \to \C$ with $f = 0$ outside
+$B(c, r)$, all $P > 0$, $a \geq 0$ and $x, y \in V$,
+\[
+  \frac{|f(y) - f(x)|^P}{|y - x|^a} \leq \mathbf 1_{B(c, R)^2}(x, y)
+    \frac{|f(y) - f(x)|^P}{|y - x|^a} + \frac{|f(x)|^P}{(R - r)^a}
+    + \frac{|f(y)|^P}{(R - r)^a} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The triangle inequality $|x - c| \leq |x - y| + |y - c|$. If $x \notin B(c, R)$, then $f(x) = 0$,
+and $f(y) \neq 0$ puts $y$ in $B(c, r)$, at distance at least $R - r$ from $x$; the case
+$y \notin B(c, R)$ is symmetric.
+\end{proof}
+
+\begin{lemma}[The graph maps are bi-Lipschitz]
+\label{lem:graph-map-bilipschitz}
+\lean{Rd.LipschitzGraph.enorm_sub_le_enorm_graphMap_sub, Rd.LipschitzGraph.enorm_graphMap_sub_le}
+\leanok
+\uses{def:graph-map, lem:graph-map-area}
+For every Lipschitz graph with constant $M$ and graph map $\gamma$ and all $x', y'$ in its
+hyperplane, $|x' - y'| \leq |\gamma x' - \gamma y'| \leq (1 + M) |x' - y'|$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\gamma$ is antilipschitz with constant $1$ and Lipschitz with constant $1 + M$
+(\Cref{lem:graph-map-area}, \Cref{def:graph-map}).
+\end{proof}
+
+\begin{lemma}[The Gagliardo form of a function supported in a boundary ball]
+\label{lem:boundary-slobodeckij-localized}
+\lean{Rd.BoundedLipschitzDomain.boundarySlobodeckijForm_le_of_support,
+  Rd.BoundedLipschitzDomain.lintegral_lintegral_indicator_le_slobodeckijForm}
+\leanok
+\uses{lem:boundary-double-integral-charts, lem:graph-map-bilipschitz,
+  lem:slobodeckij-integrand-support, lem:double-integral-splitting, def:slobodeckij-form,
+  def:boundary-slobodeckij-form, def:graph-map}
+Let $0 < p < \infty$, $s \geq 0$ and $b = n - 1 + sp$. For every $j$ and every
+$f \colon V \to \C$,
+\[
+  \int_\Gamma \int_\Gamma \mathbf 1_{B_j^2}(x, y) \frac{|f(y) - f(x)|^p}{|y - x|^b}
+    \, d\sigma(y) \, d\sigma(x) \leq (1 + M_j^2) \, \mathcal{E}_{s,p}(f \circ \gamma_j),
+\]
+with the Gagliardo form of $H_j$ (\Cref{def:slobodeckij-form}). For every $r < \rho_j$ and every
+measurable $f \colon V \to \C$ with $f = 0$ outside $B(c_j, r)$,
+\[
+  \mathcal{E}^\Gamma_{s,p}(f) \leq (1 + M_j^2) \, \mathcal{E}_{s,p}(f \circ \gamma_j)
+    + \frac{2 \sigma(\Gamma)}{(\rho_j - r)^b} \int_\Gamma |f|^p \, d\sigma .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+In the chart (\Cref{lem:boundary-double-integral-charts}) the densities are at most
+$\sqrt{1 + M_j^2}$ and $|y' - x'| \leq |\gamma_j y' - \gamma_j x'|$
+(\Cref{lem:graph-map-bilipschitz}); $\dim H_j = n - 1$ (\Cref{def:graph-map}). The second bound
+follows from \Cref{lem:slobodeckij-integrand-support} with $R = \rho_j$ and
+\Cref{lem:double-integral-splitting}.
+\end{proof}
+
+\begin{theorem}[The Gagliardo form by the chart-wise norm]
+\label{thm:boundary-slobodeckij-upper}
+\lean{Rd.BoundedLipschitzDomain.exists_boundarySlobodeckijForm_mul_le,
+  Rd.BoundedLipschitzDomain.exists_boundarySlobodeckijForm_le}
+\leanok
+\uses{lem:boundary-slobodeckij-localized, lem:boundary-slobodeckij-sum,
+  lem:boundary-besov-measurable, thm:slobodeckij-form-by-modulus, def:boundary-besov-norm,
+  lem:boundary-besov-norm-properties, lem:boundary-double-integral-charts}
+For every $1 \leq p < \infty$, every $s > 0$ and every resolution of unity $\psi$ on $\Gamma$:
+\begin{enumerate}
+  \item for every $j$ there is $C < \infty$ such that for every measurable $g \colon V \to \C$
+    and every $G \in L_p(H_j)$ with $G = (\psi_j g) \circ \gamma_j$ almost everywhere,
+    $\mathcal{E}^\Gamma_{s,p}(\psi_j g) \leq C \bigl(\|G\|_p
+    + \|(2^{ks} \omega_1(G, 2^{-k})_p)_k\|_{\ell_p}\bigr)^p$;
+  \item there is $C < \infty$ such that for every $g \colon V \to \C$,
+    \[
+      \mathcal{E}^\Gamma_{s,p}(g) \leq C \, \|g\|_{\Besov{s}{p}{p}(\Gamma)}^p .
+    \]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) The support of $\psi_j$ lies in some $B(c_j, r)$ with $r < \rho_j$, so
+\Cref{lem:boundary-slobodeckij-localized} applies to $\psi_j g$;
+\Cref{thm:slobodeckij-form-by-modulus} on $H_j$ bounds $\mathcal{E}_{s,p}(G)$ by
+$C_2 (\|G\|_p^p + \|(2^{ks} \omega_1(G, 2^{-k})_p)_k\|_{\ell_p}^p)$, and
+$\int_\Gamma |\psi_j g|^p \, d\sigma \leq \sqrt{1 + M_j^2} \, \|G\|_p^p$
+(\Cref{lem:boundary-double-integral-charts}). (2) For $g \notin \Besov{s}{p}{p}(\Gamma)$ the right
+side is $\infty$ (\Cref{lem:boundary-besov-norm-properties}). Otherwise replace $g$ by a measurable
+function equal to it $\sigma$-almost everywhere (\Cref{lem:boundary-besov-measurable}); both sides
+are unchanged. Write $g = \sum_j \psi_j g$ on $\Gamma$, apply \Cref{lem:boundary-slobodeckij-sum}
+and (1) to each $\psi_j g$ with its chart piece $G_j$; each term
+$\|G_j\|_p + \|(2^{ks} \omega_1(G_j, 2^{-k})_p)_k\|_{\ell_p}$ is at most
+$\|g\|_{\Besov{s}{p}{p}(\Gamma)}$ (\Cref{def:boundary-besov-norm}).
+\end{proof}
+
+\paragraph{The lower bound.}
+
+\begin{lemma}[A radial integral of Lipschitz differences, and a tail integral]
+\label{lem:radial-lipschitz-integral}
+\lean{Rd.lintegral_rpow_div_norm_rpow_le, Rd.lintegral_lintegral_mul_indicator_le}
+\leanok
+\uses{lem:radial-power-integrals}
+Let $E$ be a finite-dimensional real inner product space of dimension $m$. For all
+$L, S \in [0, \infty]$, every $u \colon E \to [0, \infty]$ with $u(z) \leq L |z|$ and
+$u(z) \leq S$ for every $z$, and all $p > 0$ and $a$ with $a - p < m < a$,
+\[
+  \int_E \frac{u(z)^p}{|z|^a} \, dz \leq L^p c_1 + S^p c_2 ,
+\]
+where $c_1$ is the constant of part (2) of \Cref{lem:radial-power-integrals} for the exponent
+$a - p$ and $c_2$ the constant of its part (1) for $a$. For every $u \colon E \to [0, \infty]$
+and all $\eta > 0$ and $a > m$,
+\[
+  \int_E \int_E u(x) \, \mathbf 1_{|y - x| \geq \eta} |y - x|^{-a} \, dy \, dx
+  \leq c_2 \, \eta^{m - a} \int_E u .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+On the unit ball $u(z)^p / |z|^a \leq L^p |z|^{-(a - p)}$, also at $z = 0$, where $u(0) = 0$;
+outside it $u(z)^p / |z|^a \leq S^p |z|^{-a}$. \Cref{lem:radial-power-integrals} with $R = 1$
+bounds both parts. For the tail, the inner integral is
+$\int_{|z| \geq \eta} |z|^{-a} \, dz \leq c_2 \eta^{m - a}$ by translation.
+\end{proof}
+
+\begin{lemma}[The resolution of unity is bounded and Lipschitz]
+\label{lem:boundary-partition-lipschitz}
+\lean{Rd.BoundedLipschitzDomain.BoundaryPartition.enorm_toComplex_le,
+  Rd.BoundedLipschitzDomain.BoundaryPartition.enorm_toComplex_sub_le}
+\leanok
+\uses{def:trace-space-setting, lem:smooth-differences}
+For every $j$ and all $x, y \in V$, $|\psi_j(y)| \leq D_j$ and
+$|\psi_j(x) - \psi_j(y)| \leq D_j |x - y|$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$D_j$ bounds $\psi_j$ and its first derivative (\Cref{def:trace-space-setting}), and a first
+difference is bounded by the first derivative (\Cref{lem:smooth-differences}).
+\end{proof}
+
+\begin{lemma}[The integrand of a chart piece]
+\label{lem:chart-piece-integrand}
+\lean{Rd.enorm_mul_sub_mul_le, ENNReal.div_rpow_le_rpow_mul_div_rpow,
+  ENNReal.mul_add_mul_add_mul_le,
+  Rd.BoundedLipschitzDomain.chartPiece_integrand_le,
+  Rd.BoundedLipschitzDomain.chartPiece_integrand_le_of_notMem,
+  Rd.BoundedLipschitzDomain.chartPiece_integrand_le_add}
+\leanok
+\uses{lem:boundary-partition-lipschitz, lem:graph-map-bilipschitz,
+  lem:slobodeckij-integrand-support}
+For all $a, b, c, d \in \C$, $|ab - cd| \leq |a| |b - d| + |a - c| |d|$. For all
+$u, v, w, c \in [0, \infty]$ with $0 < c < \infty$ and $w \leq c v$ and every $a \geq 0$,
+$u / v^a \leq c^a u / w^a$. For all $a, b, c, X, Y \in [0, \infty]$,
+$aY + bX + cX \leq (a + b + c)(X + Y)$. Let $r \leq \rho_j$ with $\psi_j = 0$ outside
+$B(c_j, r)$, let $P \geq 1$, $a \geq 0$, $\eta = (\rho_j - r) / (1 + M_j)$ and
+$k(z) = \mathbf 1_{|z| \geq \eta} |z|^{-a}$. For every $g \colon V \to \C$, the chart piece
+$G = (\psi_j g) \circ \gamma_j$ and all $x', y' \in H_j$,
+\begin{align*}
+  \frac{|G(y') - G(x')|^P}{|y' - x'|^a}
+  &\leq 2^{P-1} \Bigl( D_j^P (1 + M_j)^a \, \mathbf 1_{B_j^2}(\gamma_j x', \gamma_j y')
+      \frac{|g(\gamma_j y') - g(\gamma_j x')|^P}{|\gamma_j y' - \gamma_j x'|^a} \\
+  &\qquad\qquad + \mathbf 1_{B_j}(\gamma_j x') |g(\gamma_j x')|^P
+      \frac{|\psi_j(\gamma_j y') - \psi_j(\gamma_j x')|^P}{|y' - x'|^a} \Bigr) \\
+  &\qquad + |G(x')|^P k(y' - x') + |G(y')|^P k(x' - y') .
+\end{align*}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first three inequalities are elementary; the third follows from $X, Y \leq X + Y$. If
+$\gamma_j x', \gamma_j y' \in B_j$, write
+$G(y') - G(x') = \psi_j(\gamma_j y') (g(\gamma_j y') - g(\gamma_j x'))
++ (\psi_j(\gamma_j y') - \psi_j(\gamma_j x')) g(\gamma_j x')$, use the convexity of $t \mapsto t^P$,
+$|\psi_j| \leq D_j$ (\Cref{lem:boundary-partition-lipschitz}) and
+$|\gamma_j y' - \gamma_j x'| \leq (1 + M_j) |y' - x'|$ (\Cref{lem:graph-map-bilipschitz}). If
+$\gamma_j x' \notin B_j$, then $G(x') = 0$, and $G(y') \neq 0$ puts $\gamma_j y'$ in
+$B(c_j, r)$, so $\rho_j - r \leq |\gamma_j y' - \gamma_j x'| \leq (1 + M_j) |y' - x'|$
+(\Cref{lem:slobodeckij-integrand-support}) and the quotient is $|G(y')|^P k(x' - y')$; the case
+$\gamma_j y' \notin B_j$ is symmetric.
+\end{proof}
+
+\begin{lemma}[The parts of a chart piece]
+\label{lem:chart-piece-parts}
+\lean{Rd.BoundedLipschitzDomain.lintegral_chartPiece_le,
+  Rd.BoundedLipschitzDomain.lintegral_lintegral_inside_le,
+  Rd.BoundedLipschitzDomain.chartLipschitzConst,
+  Rd.BoundedLipschitzDomain.chartLipschitzConst_ne_top,
+  Rd.BoundedLipschitzDomain.lintegral_lintegral_lipschitz_le,
+  Rd.BoundedLipschitzDomain.slobodeckijForm_chartPiece_le}
+\leanok
+\uses{lem:chart-piece-integrand, lem:boundary-double-integral-charts,
+  lem:radial-lipschitz-integral, lem:boundary-partition-lipschitz, lem:graph-map-bilipschitz,
+  lem:double-integral-splitting, def:slobodeckij-form, def:boundary-slobodeckij-form,
+  def:graph-map}
+Let $1 \leq p < \infty$, $0 < s < 1$, $b = n - 1 + sp$, and keep the notation of
+\Cref{lem:chart-piece-integrand} with $P = p$ and $a = b$. For every $g \colon V \to \C$:
+\begin{enumerate}
+  \item $\int_{H_j} |G|^p \leq D_j^p \int_\Gamma |g|^p \, d\sigma$;
+  \item $\int_{H_j} \int_{H_j} \mathbf 1_{B_j^2}(\gamma_j x', \gamma_j y')
+    |g(\gamma_j y') - g(\gamma_j x')|^p / |\gamma_j y' - \gamma_j x'|^b \, dy' \, dx'
+    \leq \mathcal{E}^\Gamma_{s,p}(g)$;
+  \item with $K_j = (D_j (1 + M_j))^p c_1 + (2 D_j)^p c_2$ for the constants $c_1$, $c_2$ of
+    \Cref{lem:radial-lipschitz-integral} on $H_j$ with $a = b$, $K_j < \infty$ and
+    $\int_{H_j} \int_{H_j} \mathbf 1_{B_j}(\gamma_j x') |g(\gamma_j x')|^p
+    |\psi_j(\gamma_j y') - \psi_j(\gamma_j x')|^p / |y' - x'|^b \, dy' \, dx'
+    \leq K_j \int_\Gamma |g|^p \, d\sigma$;
+  \item if $g$ is measurable, then $\mathcal{E}_{s,p}(G)$ is at most $2^{p-1}$ times the sum of
+    the double integrals of the two parts in parentheses in \Cref{lem:chart-piece-integrand},
+    plus $2 \int_{H_j} \int_{H_j} |G(x')|^p k(y' - x') \, dy' \, dx'$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) and (2) are \Cref{lem:boundary-double-integral-charts}, with $|\psi_j| \leq D_j$. (3) After
+the substitution $y' = x' + z$ the inner integral is at most $K_j$ by
+\Cref{lem:radial-lipschitz-integral} with
+$|\psi_j(\gamma_j(x' + z)) - \psi_j(\gamma_j x')| \leq \min(D_j (1 + M_j) |z|, 2 D_j)$
+(\Cref{lem:boundary-partition-lipschitz}, \Cref{lem:graph-map-bilipschitz}); here
+$\dim H_j = n - 1$ and $b - p < n - 1 < b$ since $0 < s < 1$; then (1) without $\psi_j$.
+(4) Integrate \Cref{lem:chart-piece-integrand}. The parts other than the first are measurable,
+so the double integral of the sum is the sum of the double integrals
+(\Cref{lem:double-integral-splitting}), and Tonelli's theorem turns the last part into the one
+before it.
+\end{proof}
+
+\begin{theorem}[The chart-wise norm by the Gagliardo form]
+\label{thm:boundary-slobodeckij-lower}
+\lean{Rd.BoundedLipschitzDomain.exists_slobodeckijForm_chartPiece_le,
+  Rd.BoundedLipschitzDomain.exists_boundaryBesovNorm_rpow_le}
+\leanok
+\uses{lem:chart-piece-parts, lem:radial-lipschitz-integral, thm:modulus-by-slobodeckij-form,
+  def:boundary-besov-norm, thm:surface-measure-null-sets, def:boundary-slobodeckij-form}
+For every $1 \leq p < \infty$, every $0 < s < 1$ and every resolution of unity $\psi$ on
+$\Gamma$:
+\begin{enumerate}
+  \item for every $j$ there is $K < \infty$ such that for every measurable $g \colon V \to \C$,
+    $\mathcal{E}_{s,p}((\psi_j g) \circ \gamma_j) \leq K \bigl(\int_\Gamma |g|^p \, d\sigma
+    + \mathcal{E}^\Gamma_{s,p}(g)\bigr)$;
+  \item there is $C < \infty$ such that for every $g \colon V \to \C$ that is almost everywhere
+    strongly measurable for $\sigma$,
+    \[
+      \|g\|_{\Besov{s}{p}{p}(\Gamma)}^p \leq C \bigl( \|g\|_{L_p(\Gamma)}^p
+        + \mathcal{E}^\Gamma_{s,p}(g) \bigr) .
+    \]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) The support of $\psi_j$ lies in some $B(c_j, r)$ with $r < \rho_j$; bound the parts of
+\Cref{lem:chart-piece-parts} (4) by (2), (3) and, for the last part,
+\Cref{lem:radial-lipschitz-integral} with $\eta = (\rho_j - r)/(1 + M_j)$ and (1). (2) Replace
+$g$ by a measurable function equal to it $\sigma$-almost everywhere; both sides are unchanged
+(\Cref{thm:surface-measure-null-sets}). If $\int_\Gamma |g|^p \, d\sigma = \infty$ there is
+nothing to prove. Otherwise each chart piece $G_j = (\psi_j g) \circ \gamma_j$ lies in $L_p(H_j)$
+by \Cref{lem:chart-piece-parts} (1), the quasi-norm is
+$\sum_j (\|G_j\|_p + \|(2^{ks} \omega_1(G_j, 2^{-k})_p)_k\|_{\ell_p})$
+(\Cref{def:boundary-besov-norm}), its $p$-th power is at most
+$N^{p-1} 2^{p-1} \sum_j (\|G_j\|_p^p + \|(2^{ks} \omega_1(G_j, 2^{-k})_p)_k\|_{\ell_p}^p)$ for the
+number $N$ of charts, and \Cref{thm:modulus-by-slobodeckij-form} on $H_j$ and (1) bound the second
+term.
+\end{proof}
+
+\paragraph{Gagliardo's description of the boundary spaces.}
+
+\begin{theorem}[$\Besov{s}{p}{p}(\Gamma)$ is the Sobolev--Slobodeckij space of $\Gamma$]
+\label{thm:boundary-slobodeckij-besov}
+\lean{Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_boundarySlobodeckijForm_lt_top}
+\leanok
+\uses{thm:boundary-slobodeckij-upper, thm:boundary-slobodeckij-lower,
+  lem:boundary-besov-norm-properties}
+For every $1 \leq p < \infty$, every $0 < s < 1$, every resolution of unity $\psi$ on $\Gamma$ and
+every $g \in L_p(\Gamma)$, $g \in \Besov{s}{p}{p}(\Gamma)$ if and only if
+$\mathcal{E}^\Gamma_{s,p}(g) < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$g \in \Besov{s}{p}{p}(\Gamma)$ if and only if $\|g\|_{\Besov{s}{p}{p}(\Gamma)} < \infty$
+(\Cref{lem:boundary-besov-norm-properties}); apply \Cref{thm:boundary-slobodeckij-upper} and
+\Cref{thm:boundary-slobodeckij-lower}.
+\end{proof}
+
+Thus $W^{s,p}(\Gamma) = \Besov{s}{p}{p}(\Gamma)$ inside $L_p(\Gamma)$ for $0 < s < 1$. For
+$p = 2$ and $s = 1/2$ this describes the trace space with equivalent norms.
+
+\begin{theorem}[The norm of $H^{1/2}(\Gamma)$ by the Sobolev--Slobodeckij norm]
+\label{thm:trace-space-slobodeckij}
+\lean{Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij,
+  Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij}
+\leanok
+\uses{thm:trace-space-norm-equiv, thm:boundary-slobodeckij-upper,
+  thm:boundary-slobodeckij-lower, thm:trace-l2-range, thm:boundary-slobodeckij-besov,
+  def:trace-l2, def:boundary-l2}
+There is $C < \infty$ such that for every $t \in H^{1/2}(\Gamma)$,
+\[
+  \|t\|^2 \leq C \bigl( \|\tau t\|_{L_2(\Gamma)}^2 + \mathcal{E}^\Gamma_{1/2,2}(\tau t) \bigr)
+  \quad\text{and}\quad
+  \|\tau t\|_{L_2(\Gamma)}^2 + \mathcal{E}^\Gamma_{1/2,2}(\tau t) \leq C \|t\|^2 .
+\]
+For every $g \in L_2(\Gamma)$, $g = \tau t$ for some $t \in H^{1/2}(\Gamma)$ if and only if
+$\mathcal{E}^\Gamma_{1/2,2}(g) < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+With the canonical resolution of unity $\psi^0$, $\|t\| \leq C_1 \|\tau t\|_{B^{1/2}_{2,2}(\Gamma)}$
+and $\|\tau t\|_{B^{1/2}_{2,2}(\Gamma)} \leq C_1 \|t\|$ (\Cref{thm:trace-space-norm-equiv}).
+\Cref{thm:boundary-slobodeckij-lower} bounds $\|\tau t\|_{B^{1/2}_{2,2}(\Gamma)}^2$,
+\Cref{thm:boundary-slobodeckij-upper} bounds $\mathcal{E}^\Gamma_{1/2,2}(\tau t)$, and $\tau$ is
+bounded. The range is \Cref{thm:trace-l2-range} with \Cref{thm:boundary-slobodeckij-besov}.
+\end{proof}
+
+So $H^{1/2}(\Gamma)$, defined by orthogonality in $H^1(\Omega)$, is Gagliardo's space
+$W^{1/2,2}(\Gamma)$ with the norm
+$(\|g\|_{L_2(\Gamma)}^2 + \int_\Gamma \int_\Gamma |g(y) - g(x)|^2 / |y - x|^n \, d\sigma(y) \,
+d\sigma(x))^{1/2}$ up to equivalence.
+
 \section{Divergence kernels}
 \label{sec:divergence-kernels}
 

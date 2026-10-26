@@ -379,6 +379,21 @@ theorem antilipschitzWith_graphMap : AntilipschitzWith 1 Ω.graphMap :=
     rw [dist_eq_norm, dist_eq_norm, NNReal.coe_one, one_mul]
     exact Ω.norm_sub_le_norm_graphOver_sub Ω.phiH x' y'
 
+/-- The graph map does not shrink distances: `|x' - y'| ≤ |γ x' - γ y'|`
+(`Rd.LipschitzGraph.antilipschitzWith_graphMap`). -/
+theorem enorm_sub_le_enorm_graphMap_sub (x' y' : Ω.hyperplane) :
+    ‖x' - y'‖ₑ ≤ ‖Ω.graphMap x' - Ω.graphMap y'‖ₑ := by
+  simpa [edist_eq_enorm_sub] using Ω.antilipschitzWith_graphMap x' y'
+
+/-- The graph map is Lipschitz: `|γ x' - γ y'| ≤ (1 + M) |x' - y'|`
+(`Rd.LipschitzGraph.lipschitzWith_graphMap`). -/
+theorem enorm_graphMap_sub_le (x' y' : Ω.hyperplane) :
+    ‖Ω.graphMap x' - Ω.graphMap y'‖ₑ ≤ ENNReal.ofReal (1 + Ω.M) * ‖x' - y'‖ₑ := by
+  have h := Ω.lipschitzWith_graphMap.edist_le_mul x' y'
+  rw [edist_eq_enorm_sub, edist_eq_enorm_sub] at h
+  rw [ENNReal.ofReal_eq_coe_nnreal (by linarith [Ω.M_nonneg])]
+  exact h
+
 /-- **The range of the graph map is the boundary** of the graph domain. -/
 theorem range_graphMap : Set.range Ω.graphMap = frontier Ω.domain := by
   ext y
@@ -450,6 +465,10 @@ theorem one_le_gram (x' : Ω.hyperplane) : 1 ≤ Ω.gram x' :=
 
 /-- The Gram density is positive. -/
 theorem gram_pos (x' : Ω.hyperplane) : 0 < Ω.gram x' := one_pos.trans_le (Ω.one_le_gram x')
+
+/-- The Gram density `√(1 + ‖∇φ(x')‖²)` is at least `1`, as an element of `[0, ∞]`. -/
+theorem one_le_ofReal_gram (x' : Ω.hyperplane) : 1 ≤ ENNReal.ofReal (Ω.gram x') :=
+  ENNReal.one_le_ofReal.2 (Ω.one_le_gram x')
 
 /-- The Gram density is at most `√(1 + M²)`. -/
 theorem gram_le (x' : Ω.hyperplane) : Ω.gram x' ≤ √(1 + Ω.M ^ 2) := by

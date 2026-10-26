@@ -20,9 +20,12 @@ graphs `γ_j(x') = x' + φ_j(x') e_j` over the hyperplanes `H_j`.
   charts. By the area formula for Lipschitz graphs, in each chart it is the measure with density
   `√(1 + ‖∇φ_j‖²)` on `H_j` (`Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure_of_support`,
   `Rd.BoundedLipschitzDomain.integral_surfaceMeasure_of_support`), so two charts give the same
-  integrals (`Rd.BoundedLipschitzDomain.lintegral_chart_eq`), and a resolution of unity splits
-  every integral over `Γ` into chart integrals
-  (`Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure`,
+  integrals (`Rd.BoundedLipschitzDomain.lintegral_chart_eq`), the density between `1` and
+  `√(1 + M_j²)` compares the integrals in a chart with those over `Γ`
+  (`Rd.BoundedLipschitzDomain.lintegral_chart_le`, `Rd.BoundedLipschitzDomain.lintegral_le_chart`),
+  and a resolution of unity splits every integral over `Γ` into chart integrals, since
+  `g = ∑_j ψ_j g` on `Γ` (`Rd.BoundedLipschitzDomain.ae_eq_sum_mul`,
+  `Rd.BoundedLipschitzDomain.lintegral_surfaceMeasure`,
   `Rd.BoundedLipschitzDomain.integral_surfaceMeasure`). It is finite, its null sets are those of
   the charts (`Rd.BoundedLipschitzDomain.ae_surfaceMeasure_iff_aeBoundary`), and `Γ` is a null
   set of the volume (`Rd.BoundedLipschitzDomain.volume_frontier`).
@@ -107,6 +110,27 @@ theorem lintegral_surfaceMeasure_of_support (j : Fin Ω.N) (F : V → ℝ≥0∞
   rw [← setLIntegral_eq_of_support_subset hs, surfaceMeasure_restrict_ball,
     setLIntegral_eq_of_support_subset hs, LipschitzGraph.lintegral_graphMap]
 
+/-- **Integrals in the chart are at most those over `Γ`**: for every `F : V → [0, ∞]` vanishing
+outside `B_j`, `∫_{H_j} F(γ_j x') dx' ≤ ∫_Γ F dσ`, since the density `√(1 + ‖∇φ_j‖²)` is at least
+`1` (`Rd.LipschitzGraph.one_le_ofReal_gram`). -/
+theorem lintegral_chart_le (j : Fin Ω.N) (F : V → ℝ≥0∞)
+    (hF : ∀ y, F y ≠ 0 → y ∈ ball (Ω.center j) (Ω.radius j)) :
+    ∫⁻ x', F ((Ω.graph j).graphMap x') ≤ ∫⁻ y, F y ∂Ω.surfaceMeasure := by
+  rw [Ω.lintegral_surfaceMeasure_of_support j F hF]
+  exact lintegral_mono fun x' => le_mul_of_one_le_right' ((Ω.graph j).one_le_ofReal_gram x')
+
+/-- **Integrals over `Γ` by the chart**: for every `F : V → [0, ∞]` vanishing outside `B_j`,
+`∫_Γ F dσ ≤ √(1 + M_j²) ∫_{H_j} F(γ_j x') dx'` (`Rd.LipschitzGraph.gram_le`). -/
+theorem lintegral_le_chart (j : Fin Ω.N) (F : V → ℝ≥0∞)
+    (hF : ∀ y, F y ≠ 0 → y ∈ ball (Ω.center j) (Ω.radius j)) :
+    ∫⁻ y, F y ∂Ω.surfaceMeasure ≤
+      ENNReal.ofReal √(1 + (Ω.graph j).M ^ 2) * ∫⁻ x', F ((Ω.graph j).graphMap x') := by
+  rw [Ω.lintegral_surfaceMeasure_of_support j F hF,
+    ← lintegral_const_mul' _ _ ENNReal.ofReal_ne_top]
+  refine lintegral_mono fun x' => ?_
+  rw [mul_comm]
+  exact mul_le_mul' (ENNReal.ofReal_le_ofReal ((Ω.graph j).gram_le x')) le_rfl
+
 /-- **Complex integrals over a boundary ball in the chart**: for every `F : V → ℂ` vanishing outside
 `B_j`, `∫_Γ F dσ = ∫_{H_j} F(γ_j x') √(1 + ‖∇φ_j(x')‖²) dx'`, by the area formula for the graph of
 `φ_j` (`Rd.LipschitzGraph.integral_graphMap`). -/
@@ -163,6 +187,15 @@ theorem lintegral_surfaceMeasure (ψ : Ω.BoundaryPartition)
   refine Ω.lintegral_surfaceMeasure_of_support j _ fun y hy => ψ.mem_ball_of_ne_zero fun h => hy ?_
   rw [Pi.mul_apply, h, ENNReal.ofReal_zero, zero_mul]
 
+omit [FiniteDimensional ℝ V] in
+/-- On `Γ`, `g = ∑_j ψ_j g` almost everywhere for the surface measure, since `∑_j ψ_j = 1` on `Γ`
+and `σ` is carried by `Γ`. -/
+theorem ae_eq_sum_mul (ψ : Ω.BoundaryPartition) (g : V → ℂ) :
+    g =ᵐ[Ω.surfaceMeasure] fun y => ∑ j, ψ.toComplex j y * g y :=
+  Ω.ae_mem_frontier.mono fun y hy => by
+    dsimp only
+    rw [← Finset.sum_mul, ψ.sum_toComplex_eq_one hy, one_mul]
+
 /-- **The surface measure in the charts, for complex integrals**: for every resolution of unity `ψ`
 on the boundary, of any sign, and every `σ`-integrable `f : V → ℂ`,
 `∫_Γ f dσ = ∑_j ∫_{H_j} ψ_j(γ_j x') f(γ_j x') √(1 + ‖∇φ_j(x')‖²) dx'`. On `Γ`, `f = ∑_j ψ_j f`;
@@ -173,10 +206,8 @@ theorem integral_surfaceMeasure (ψ : Ω.BoundaryPartition) {f : V → ℂ}
     ∫ y, f y ∂Ω.surfaceMeasure = ∑ j, ∫ x', ψ.toComplex j ((Ω.graph j).graphMap x') *
       f ((Ω.graph j).graphMap x') * ((Ω.graph j).gram x' : ℂ) := by
   have hsum : ∫ y, f y ∂Ω.surfaceMeasure =
-      ∫ y, ∑ j, ψ.toComplex j y * f y ∂Ω.surfaceMeasure := by
-    refine integral_congr_ae (Ω.ae_mem_frontier.mono fun y hy => ?_)
-    dsimp only
-    rw [← Finset.sum_mul, ψ.sum_toComplex_eq_one hy, one_mul]
+      ∫ y, ∑ j, ψ.toComplex j y * f y ∂Ω.surfaceMeasure :=
+    integral_congr_ae (Ω.ae_eq_sum_mul ψ f)
   rw [hsum, integral_finsetSum _ fun j _ => hf.bdd_mul
     (ψ.contDiff_toComplex j).continuous.aestronglyMeasurable
     (ae_of_all _ (norm_le_of_iteratedFDeriv_le (ψ.derivBound_spec j)))]

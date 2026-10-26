@@ -462,7 +462,10 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv`). The range of `τ` is
   `B^{1/2}_{2,2}(Γ)` (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff`), and the norm of
   `H^{1/2}(Γ)` is the least `H^1(ℝ^d)` norm of a function with the given boundary trace
-  (`Rd.BoundedLipschitzDomain.enorm_eq_iInf`).
+  (`Rd.BoundedLipschitzDomain.enorm_eq_iInf`), and it is equivalent to the Sobolev–Slobodeckij
+  norm `(‖g‖²_{L_2(Γ)} + ∫_Γ∫_Γ |g(x) − g(y)|²/|x − y|^n dσ(x) dσ(y))^{1/2}` of `g = τ t`, with
+  `n = dim V` and the surface measure `σ`
+  (`Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij`).
 * **The area formula for Lipschitz graphs.** Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph
   domain in `V`, `dim V = n`, with the graph map `γ(x') = x' + φ(x') e` over the hyperplane
   `H = e^⊥` and the gradient `∇φ(x') ∈ H` of `φ` on `H`, which exists almost everywhere. For
@@ -604,8 +607,7 @@ that library builds itself.
 * **Interpolation**: the J-method and the equivalence theorem, the complex method,
   `(L_{p₀}, L_{p₁})_{θ,q} = L_{p,q}` with Lorentz spaces, and the off-diagonal Marcinkiewicz
   theorem.
-* **Traces and extensions**: the Sobolev–Slobodeckij norm on `Γ` and the extension of `W^1_p`
-  for `p ∈ {1, ∞}` and of higher order.
+* **Traces and extensions**: the extension of `W^1_p` for `p ∈ {1, ∞}` and of higher order.
 * **Manifolds with corners**: a compact example (the cube with charts at its vertices), traces on
   the faces and products of models.
 * **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,

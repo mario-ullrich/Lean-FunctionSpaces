@@ -31,7 +31,10 @@ The constants are explicit (`Rd.slobodeckijConstUpper`, `Rd.slobodeckijConstLowe
 `0 < s < 1` the form is finite exactly on the Besov space `B^s_{p,p}(V)`, so
 `W^{s,p}(V) = B^s_{p,p}(V)` (`Rd.slobodeckijForm_lt_top_iff_memApprox`). The radial integral
 over balls, `∫_{|z| < R} |z|^(-a) dz ≤ c R^(n-a)` for `a < n`, is
-`Rd.lintegral_ball_norm_rpow_neg_le`.
+`Rd.lintegral_ball_norm_rpow_neg_le`. Together they bound `∫ u(z)^p / |z|^a dz` for
+`u(z) ≤ min(L |z|, S)` (`Rd.lintegral_rpow_div_norm_rpow_le`), and the integral outside a ball
+bounds, after translation, the tail `∫∫ u(x) 1_{|y - x| ≥ η} |y - x|^(-a) dy dx`
+(`Rd.lintegral_lintegral_mul_indicator_le`).
 -/
 
 @[expose] public section
@@ -420,6 +423,78 @@ theorem lintegral_ball_norm_rpow_neg_le {a : ℝ} (ha : a < finrank ℝ V) {R : 
     _ = _ := by
         rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg, ballRpowConst]
         ring
+
+/-- **A radial integral of Lipschitz differences**: if `u(z) ≤ L |z|` and `u(z) ≤ S` for all
+`z ∈ V`, `dim V = n`, then `∫ u(z)^p / |z|^a dz ≤ L^p c_1 + S^p c_2` for `p > 0` and
+`a - p < n < a`, with the constants `c_1 = Rd.ballRpowConst V (a - p)` of the unit ball, where
+`u^p / |z|^a ≤ L^p |z|^(-(a-p))`, and `c_2 = Rd.complBallRpowConst V a` of its complement, where
+`u^p / |z|^a ≤ S^p |z|^(-a)`. -/
+theorem lintegral_rpow_div_norm_rpow_le {u : V → ℝ≥0∞} {L S : ℝ≥0∞}
+    (huL : ∀ z, u z ≤ L * ‖z‖ₑ) (huS : ∀ z, u z ≤ S) {p a : ℝ} (hp : 0 < p)
+    (ha : (finrank ℝ V : ℝ) < a) (hap : a - p < finrank ℝ V) :
+    ∫⁻ z, u z ^ p / ‖z‖ₑ ^ a ≤
+      L ^ p * ballRpowConst V (a - p) + S ^ p * complBallRpowConst V a := by
+  have hin : ∀ z, u z ^ p / ‖z‖ₑ ^ a ≤ L ^ p * ‖z‖ₑ ^ (-(a - p)) := fun z => by
+    rcases eq_or_ne z 0 with rfl | hz
+    · have h0 : u 0 = 0 := le_antisymm ((huL 0).trans (by rw [enorm_zero, mul_zero])) zero_le
+      rw [h0, ENNReal.zero_rpow_of_pos hp, ENNReal.zero_div]
+      exact zero_le
+    · calc u z ^ p / ‖z‖ₑ ^ a ≤ (L * ‖z‖ₑ) ^ p / ‖z‖ₑ ^ a :=
+            ENNReal.div_le_div_right (ENNReal.rpow_le_rpow (huL z) hp.le) _
+        _ = L ^ p * ‖z‖ₑ ^ (-(a - p)) := by
+            rw [ENNReal.mul_rpow_of_nonneg _ _ hp.le, mul_div_assoc, neg_sub,
+              ENNReal.rpow_sub _ _ (enorm_ne_zero.2 hz) enorm_ne_top]
+  have hout : ∀ z, u z ^ p / ‖z‖ₑ ^ a ≤ S ^ p * ‖z‖ₑ ^ (-a) := fun z => by
+    rw [ENNReal.rpow_neg, ← div_eq_mul_inv]
+    exact ENNReal.div_le_div_right (ENNReal.rpow_le_rpow (huS z) hp.le) _
+  calc ∫⁻ z, u z ^ p / ‖z‖ₑ ^ a
+      = ∫⁻ z in ball (0 : V) 1 ∪ (ball (0 : V) 1)ᶜ, u z ^ p / ‖z‖ₑ ^ a := by
+        rw [union_compl_self, Measure.restrict_univ]
+    _ ≤ (∫⁻ z in ball (0 : V) 1, u z ^ p / ‖z‖ₑ ^ a) +
+          ∫⁻ z in (ball (0 : V) 1)ᶜ, u z ^ p / ‖z‖ₑ ^ a := lintegral_union_le _ _ _
+    _ ≤ (∫⁻ z in ball (0 : V) 1, L ^ p * ‖z‖ₑ ^ (-(a - p))) +
+          ∫⁻ z in (ball (0 : V) 1)ᶜ, S ^ p * ‖z‖ₑ ^ (-a) :=
+        add_le_add (lintegral_mono hin) (lintegral_mono hout)
+    _ = L ^ p * (∫⁻ z in ball (0 : V) 1, ‖z‖ₑ ^ (-(a - p))) +
+          S ^ p * ∫⁻ z in (ball (0 : V) 1)ᶜ, ‖z‖ₑ ^ (-a) := by
+        rw [lintegral_const_mul _ (measurable_enorm.pow_const _),
+          lintegral_const_mul _ (measurable_enorm.pow_const _)]
+    _ ≤ L ^ p * ballRpowConst V (a - p) + S ^ p * complBallRpowConst V a := by
+        gcongr
+        · simpa using lintegral_ball_norm_rpow_neg_le hap one_pos
+        · simpa using lintegral_compl_ball_norm_rpow_neg_le ha one_pos
+
+/-- **The tail part of a Gagliardo form**: for `η > 0`, `a > n = dim V` and every
+`u : V → [0, ∞]`, `∫∫ u(x) 1_{|y - x| ≥ η} |y - x|^(-a) dy dx ≤ c η^(n - a) ∫ u` with
+`c = Rd.complBallRpowConst V a`: the inner integral is `∫_{|z| ≥ η} |z|^(-a) dz` by translation
+(`Rd.lintegral_compl_ball_norm_rpow_neg_le`). -/
+theorem lintegral_lintegral_mul_indicator_le (u : V → ℝ≥0∞) {η a : ℝ} (hη : 0 < η)
+    (ha : (finrank ℝ V : ℝ) < a) :
+    ∫⁻ x, ∫⁻ y, u x * (ball (0 : V) η)ᶜ.indicator (fun z => ‖z‖ₑ ^ (-a)) (y - x) ≤
+      complBallRpowConst V a * ENNReal.ofReal η ^ ((finrank ℝ V : ℝ) - a) * ∫⁻ x, u x := by
+  have hh : Measurable ((ball (0 : V) η)ᶜ.indicator fun z => ‖z‖ₑ ^ (-a)) :=
+    (measurable_enorm.pow_const _).indicator measurableSet_ball.compl
+  have hI : complBallRpowConst V a * ENNReal.ofReal η ^ ((finrank ℝ V : ℝ) - a) ≠ ∞ :=
+    ENNReal.mul_ne_top (complBallRpowConst_ne_top ha)
+      (ENNReal.rpow_ne_top_of_ne_zero (ENNReal.ofReal_pos.2 hη).ne' ENNReal.ofReal_ne_top)
+  have hin : ∀ x, ∫⁻ y, u x * (ball (0 : V) η)ᶜ.indicator (fun z => ‖z‖ₑ ^ (-a)) (y - x) ≤
+      u x * (complBallRpowConst V a * ENNReal.ofReal η ^ ((finrank ℝ V : ℝ) - a)) := fun x => by
+    have hm : Measurable fun y : V => (ball (0 : V) η)ᶜ.indicator (fun z => ‖z‖ₑ ^ (-a)) (y - x) :=
+      hh.comp (measurable_id.sub measurable_const)
+    rw [lintegral_const_mul _ hm,
+      lintegral_sub_right_eq_self (fun z => (ball (0 : V) η)ᶜ.indicator
+        (fun z => ‖z‖ₑ ^ (-a)) z) x, lintegral_indicator measurableSet_ball.compl]
+    exact mul_le_mul' le_rfl (lintegral_compl_ball_norm_rpow_neg_le ha hη)
+  calc _ ≤ ∫⁻ x, u x * (complBallRpowConst V a * ENNReal.ofReal η ^ ((finrank ℝ V : ℝ) - a)) :=
+        lintegral_mono hin
+    _ = _ := by rw [lintegral_mul_const' _ _ hI, mul_comm]
+
+/-- The integrand `(x, y) ↦ |f(y) - f(x)|^p / |y - x|^b` of a Gagliardo form is measurable for
+measurable `f`. -/
+theorem measurable_slobodeckijIntegrand {f : V → ℂ} (hf : Measurable f) (p b : ℝ) :
+    Measurable (Function.uncurry fun x y : V => ‖f y - f x‖ₑ ^ p / ‖y - x‖ₑ ^ b) :=
+  (((hf.comp measurable_snd).sub (hf.comp measurable_fst)).enorm.pow_const _).div
+    ((measurable_snd.sub measurable_fst).enorm.pow_const _)
 
 /-! ### Averaging the differences over a ball -/
 

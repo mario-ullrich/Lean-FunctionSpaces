@@ -120,6 +120,7 @@ public import FunctionSpaces.Domains.Traces.BoundaryTraceSpace
 public import FunctionSpaces.Domains.Lipschitz.LipschitzGraphArea
 public import FunctionSpaces.Domains.Lipschitz.SurfaceMeasure
 public import FunctionSpaces.Domains.Traces.TraceSpaceNorm
+public import FunctionSpaces.Domains.Traces.BoundaryGagliardo
 public import FunctionSpaces.Domains.Extension.DivergenceKernels
 public import FunctionSpaces.Domains.Extension.SobolevExtension
 public import FunctionSpaces.Domains.Extension.SobolevExtensionOperator
@@ -575,6 +576,10 @@ and the theorems that their characterisations agree. The library builds on
   norm, its equivalence with the norm of `B^{1/2}_{2,2}(Γ)`, bounded preimages under the trace,
   the range of `H^{1/2}(Γ) → L_2(Γ)`, the Banach space `B^{1/2}_{2,2}(Γ)` isomorphic to
   `H^{1/2}(Γ)`, and the bounded linear right inverse of the trace.
+* `FunctionSpaces.Domains.Traces.BoundaryGagliardo`: the Gagliardo form on the boundary `Γ` of a
+  bounded Lipschitz domain with the surface measure, its two-sided bounds by the chart-wise norm of
+  `B^s_{p,p}(Γ)`, `W^{s,p}(Γ) = B^s_{p,p}(Γ)` for `0 < s < 1`, and the equivalence of the norm of
+  `H^{1/2}(Γ)` with the Sobolev–Slobodeckij norm of `W^{1/2,2}(Γ)`.
 * `FunctionSpaces.Domains.Extension.DivergenceKernels`: smoothness of parametric integrals, the
   dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, the
   divergence kernels as Schwartz functions with mean zero when `m` has vanishing first moments, and

@@ -420,6 +420,13 @@ boundary traces at `L = 2`, `p = q = 2`, `s = 1/2` (`Ω.boundaryTrace ψ two_ne_
   `boundaryTraceL2 (traceRightInverse b) = b.toL2`; `norm_traceRightInverse_le`). The constants
   are existential. On `V`, `Rd.enorm_le_modNorm_two` is the converse of
   `Rd.modNorm_two_le_norm`, with the explicit `Rd.sobolevOneInvConst V`.
+  `Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij` (file
+  `FunctionSpaces/Domains/Traces/BoundaryGagliardo.lean`) gives the chart-free form:
+  `‖t‖ₑ ^ 2` and `‖traceL2 t‖ₑ ^ 2 + boundarySlobodeckijForm 2 (1 / 2) (traceL2 t)`, with
+  Gagliardo's double integral `∫_Γ ∫_Γ |g(y) - g(x)|² / |y - x|^n dσ dσ`, `n = dim V`, for the
+  surface measure `σ`, are equivalent up to an existential constant, and
+  `mem_range_traceL2_iff_slobodeckij` describes the range of `traceL2` by the finiteness of that
+  integral.
 * `H^{-1/2}(Γ)`: `Rd.BoundedLipschitzDomain.DualTraceSpace Ω := StrongDual ℂ (TraceSpace Ω)`,
   `Rd.BoundedLipschitzDomain.dualTraceEquiv Ω : DualTraceSpace Ω ≃ₗᵢ⋆[ℂ] TraceSpace Ω` (Riesz,
   `dualTraceEquiv_apply`, uniqueness `eq_dualTraceEquiv_of_forall`), and
