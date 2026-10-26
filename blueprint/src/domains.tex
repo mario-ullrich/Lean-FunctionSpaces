@@ -572,6 +572,22 @@ $S \subseteq \operatorname{int} L \subseteq L \subseteq \bigcup_i U_i$ (Mathlib'
 \texttt{exists\_\allowbreak compact\_\allowbreak between}).
 \end{proof}
 
+\begin{lemma}[Pasted functions agree with $f$]
+\label{lem:pasting-agrees}
+\lean{Rd.ae_sum_mul_eq}
+\leanok
+For every finite set $\kappa$, all $O, U_l \subseteq V$ and $\psi_l \colon V \to \R$
+($l \in \kappa$) with the closed support of $\psi_l$ in $U_l$ and $\sum_l \psi_l = 1$ on $O$, and
+all $F_l$, $f \colon V \to \C$ with $F_l = f$ almost everywhere on $O \cap U_l$,
+$\sum_l \psi_l F_l = f$ almost everywhere on $O$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Where $\psi_l(x) \neq 0$, $x \in U_l$, so $\psi_l F_l = \psi_l f$ almost everywhere on $O$, and
+$\sum_l \psi_l f = f$ on $O$.
+\end{proof}
+
 \begin{lemma}[Pasting local extensions]
 \label{lem:pasting}
 \lean{Rd.lpModulus_finsetSum_le, Rd.modNorm_add_le, Rd.modNorm_const_smul,
@@ -3526,8 +3542,11 @@ $s$, and \Cref{sec:sobolev-duality} proves the duality of $\tilde H^s(\Omega)$ a
 $H^{-s}(\Omega)$. \Cref{sec:boundary-trace-space} defines the trace space $H^{1/2}(\Gamma)$ of a
 bounded Lipschitz domain as the orthogonal complement of the trace kernel in $H^1(\Omega)$.
 \Cref{sec:divergence-kernels} and \Cref{sec:sobolev-extension} prove the extension theorem for
-$\Sob{1}{p}$ on bounded Lipschitz domains, $1 < p < \infty$, of first order, with a bounded
-linear extension operator on the jets of \Cref{def:sobolev-jets}.
+$\Sob{1}{p}$ on bounded Lipschitz domains, $1 < p < \infty$, with a bounded linear extension
+operator on the jets of \Cref{def:sobolev-jets}; \Cref{sec:reflection-extension} extends
+$\Sob{1}{p}$ for every $1 \leq p \leq \infty$ by reflection, and
+\Cref{sec:higher-divergence-kernels} and \Cref{sec:higher-sobolev-extension} extend
+$\Sob{m}{p}$ for every $m$ and $1 < p < \infty$.
 \Cref{sec:lipschitz-graph-green} and
 \Cref{sec:lipschitz-domain-green} prove Gauss--Green on Lipschitz graph domains and Green's
 formula on bounded Lipschitz domains, and \Cref{sec:trace-kernel} proves that the kernel of the
@@ -6091,6 +6110,40 @@ terms and the convergence follow as in \Cref{thm:local-extension}, and
 \Cref{thm:tl-synthesis-dual} with $h_j = \mathbf 1_W (k_j * f)$ bounds $\|F\|_{F^s_{p,q}}$.
 \end{proof}
 
+\begin{lemma}[The local means of Triebel--Lizorkin type from a pointwise bound]
+\label{lem:tl-local-means-pointwise}
+\lean{Rd.LocalMeansBump.ae_lqNorm_le_of_pointwise, Rd.LocalMeansBump.tlLocalNormOn_le_of_pointwise}
+\leanok
+\uses{def:tl-local-norm-on, lem:local-means-on-sets, lem:lq-basic, lem:countable-minkowski}
+Let $1 \leq p < \infty$, $g$ a bump with the moment kernel $\mu$ of order $L \in \N$, $s \in \R$,
+$W \subseteq V$ measurable, $\varphi \colon V \to \C$, $F \in L_p(V)$ with $F = \varphi$ almost
+everywhere, $c \in [0, \infty]$, $(K_i)_{i \in \kappa}$ a finite family of Schwartz functions and
+$(h_i)_{i \in \kappa}$ functions on $V$, and assume
+\[
+  2^{(j+1)s} \bigl|(k_{j+1} * \varphi)(x)\bigr| \leq c \sum_{i \in \kappa}
+  \bigl|\bigl((K_i)_{2^j} * h_i\bigr)(x)\bigr|
+\]
+for every $x \in W$ and every $j \in \N$. Then almost everywhere
+\[
+  \bigl\|(2^{js} |\mathbf 1_W (k_j * F)(x)|)_j\bigr\|_{\ell_2} \leq |\mathbf 1_W (k_0 * F)(x)|
+  + c \sum_{i \in \kappa} \bigl\|\bigl(((K_i)_{2^j} * h_i)(x)\bigr)_j\bigr\|_{\ell_2} ,
+\]
+and if every $h_i$ is measurable, then
+\[
+  \|F\|^{W,L}_{s,2} \leq \|\mu\|_1 \|F\|_p + c \sum_{i \in \kappa} \Bigl\| x \mapsto
+  \bigl\|\bigl(((K_i)_{2^j} * h_i)(x)\bigr)_j\bigr\|_{\ell_2} \Bigr\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Almost everywhere $\mathbf 1_W (k_j * F) = \mathbf 1_W (k_j * \varphi)$ for every $j$. Split off
+the term $j = 0$ (\Cref{lem:lq-basic}), bound the other terms by the assumption, and apply
+Minkowski's inequality in $\ell_2$ (\Cref{lem:countable-minkowski}). The first term has $L_p$ norm
+at most $\|\mu\|_1 \|F\|_p$ (\Cref{lem:local-means-on-sets}), and the triangle inequality in $L_p$
+gives the second bound.
+\end{proof}
+
 \begin{theorem}[The local means of Triebel--Lizorkin type by the gradient]
 \label{thm:tl-local-means-gradient}
 \lean{Rd.LocalMeansBump.gradientConst, Rd.LocalMeansBump.gradientConst_ne_top,
@@ -6101,8 +6154,7 @@ terms and the convergence follow as in \Cref{thm:local-extension}, and
   Rd.LocalMeansBump.tlLocalNormOn_le_patchConst}
 \leanok
 \uses{lem:local-means-gradient-point, def:tl-local-norm-on, lem:bump-divergence-identity,
-  thm:vector-valued-strong-type, def:cz-const, lem:local-means-on-sets, lem:lq-basic,
-  lem:countable-minkowski}
+  thm:vector-valued-strong-type, def:cz-const, lem:tl-local-means-pointwise}
 Let $n \geq 1$, $1 < p < \infty$, $g$ a bump with the moment kernel $m$ of order two and the
 divergence kernels $K_i$, $W \subseteq V$ measurable, $T \subseteq V$ open, $f \in L_p(T)$ with
 weak derivatives $g_i = \partial_{e_i} f \in L_p(T)$ on $T$, and assume $x - y \in T$ for every
@@ -6122,17 +6174,17 @@ type constant of \Cref{def:cz-const}.
 
 \begin{proof}
 \leanok
-Almost everywhere $\mathbf 1_W (k_j * F) = \mathbf 1_W (k_j * \mathbf 1_T f)$. Split off the term
-$j = 0$ (\Cref{lem:lq-basic}); for $x \in W$, \Cref{lem:local-means-gradient-point} bounds the
-other terms, and Minkowski's inequality in $\ell_2$ (\Cref{lem:countable-minkowski}) gives
+By \Cref{lem:local-means-gradient-point}, the assumption of
+\Cref{lem:tl-local-means-pointwise} holds with $\varphi = \mathbf 1_T f$,
+$h_i = \mathbf 1_T g_i$, $s = 1$ and $c = 2$, so almost everywhere
 \[
   \bigl\|(2^j |\mathbf 1_W (k_j * F)(x)|)_j\bigr\|_{\ell_2} \leq |\mathbf 1_W (k_0 * F)(x)|
   + 2 \sum_i \bigl\|\bigl(((K_i)_{2^j} * \mathbf 1_T g_i)(x)\bigr)_j\bigr\|_{\ell_2}
 \]
-almost everywhere. The first term has $L_p$ norm at most $\|m\|_1 \|F\|_p$
-(\Cref{lem:local-means-on-sets}), and the analysis operators of the Calder\'on--Zygmund
-families $((K_i)_{2^j})_j$ are bounded by $S_{V,p}(B_i, H_i)$
-(\Cref{thm:vector-valued-strong-type}). Finally
+and $\|F\|^{W,2}_{1,2} \leq \|m\|_1 \|F\|_p + 2 \sum_i \|x \mapsto \|\Lambda_i(x)\|_{\ell_2}\|_p$
+with $\Lambda_i(x) = (((K_i)_{2^j} * \mathbf 1_T g_i)(x))_j$. Here $\|F\|_p = \|f\|_{L_p(T)}$, and
+the analysis operators of the Calder\'on--Zygmund families $((K_i)_{2^j})_j$ are bounded by
+$S_{V,p}(B_i, H_i)$ (\Cref{thm:vector-valued-strong-type}). Finally
 $\sum_i a_i b_i \leq (\sum_i a_i)(\sum_i b_i)$ for $a_i, b_i \in [0, \infty]$.
 \end{proof}
 
@@ -6341,9 +6393,10 @@ $n = 0$ the open set $\Omega$ is empty, where $F = 0$ serves, or all of $V$, whe
 serves.
 \end{proof}
 
-The extension is a bounded linear operator (\Cref{thm:sobolev-extension-operator}). The theorem
-is of first order; for every $1 \leq p \leq \infty$ it holds by reflection
-(\Cref{thm:reflection-extension}).
+The extension is a bounded linear operator (\Cref{thm:sobolev-extension-operator}). For every
+$1 \leq p \leq \infty$ the theorem holds by reflection (\Cref{thm:reflection-extension}), and for
+every order $m$ and $1 < p < \infty$ by the local means of the derivatives of order $m$
+(\Cref{thm:higher-sobolev-extension}).
 
 \begin{corollary}[$H^1(\Omega) = \Sob{1}{2}(\Omega)$]
 \label{cor:sobolev-extension-two}
@@ -7587,7 +7640,7 @@ $\Psi$ (\Cref{lem:derivative-dilate}).
 \begin{theorem}[Calder\'on--Zygmund families and supports of the higher divergence kernels]
 \label{thm:bump-higher-kernels-cz}
 \lean{Rd.LocalMeansBump.integral_higherKernel, Rd.LocalMeansBump.isCZFamily_higherKernel,
-  Rd.LocalMeansBump.higherKernel_eq_zero_of_lt,
+  Rd.LocalMeansBump.higherKernel_eq_zero_of_lt, Rd.LocalMeansBump.hasCompactSupport_higherKernel,
   Rd.LocalMeansBump.tsupport_dilate_higherKernel_subset_closedBall,
   Rd.LipschitzGraph.tsupport_dilate_higherKernel_subset}
 \leanok
@@ -7598,8 +7651,8 @@ For every bump $g$ of radius $R$, every $L \geq 1$, every $m \in \N$ and every $
 \begin{enumerate}
   \item if $m < L$, then $\int_V K^L_i = 0$ and $((K^L_i)_{2^j})_{j \in \N}$ is a
     Calder\'on--Zygmund family with the constants of \Cref{thm:mean-zero-cz-family};
-  \item $K^L_i$ vanishes outside $\bar B(0, L R)$, and every dilate $(K^L_i)_{2^j}$ is supported
-    in $\bar B(0, L R)$;
+  \item $K^L_i$ vanishes outside $\bar B(0, L R)$, in particular $K^L_i$ has compact support, and
+    every dilate $(K^L_i)_{2^j}$ is supported in $\bar B(0, L R)$;
   \item if $g$ is supported in $-K$ for the cone $K$ of a Lipschitz graph domain, then every
     dilate $(K^L_i)_{2^j}$ is supported in $\{y : -y \in \bar K, \ \|y\| \leq L R\}$.
 \end{enumerate}
@@ -7614,6 +7667,342 @@ so \Cref{lem:higher-divergence-mean-zero} and \Cref{thm:mean-zero-cz-family} app
 \Cref{lem:dyadic-dilate-support} and (2); the closed cone is invariant under multiplication by
 nonnegative numbers.
 \end{proof}
+
+\section{The extension theorem for Sobolev spaces of higher order}
+\label{sec:higher-sobolev-extension}
+
+Let $\Omega$ be a bounded Lipschitz domain (\Cref{def:bounded-lipschitz}) in $V$ of dimension
+$n \geq 1$, $1 < p < \infty$ and $m \in \N$. With the words $w \in I^k$ of
+\Cref{sec:leibniz-rule}, the norm of $\Sob{m}{p}(O)$ on an open set $O$ is
+$\sum_{k \leq m} \sum_{w \in I^k} \|\partial^{e_w} f\|_{L_p(O)}$; the empty word gives $f$. The
+extension theorem of Calder\'on and Stein \cite[Chapter VI]{SteinSingular} says that every
+$f \in \Sob{m}{p}(\Omega)$ is the restriction of some $F \in \Sob{m}{p}(V)$ with
+$\|F\|_{\Sob{m}{p}(V)} \leq C \|f\|_{\Sob{m}{p}(\Omega)}$ (\Cref{thm:higher-sobolev-extension}).
+The proof follows \Cref{sec:sobolev-extension}, with Rychkov's local extension \cite{Rychkov} of
+order $m + 1$ for the smoothed bump: its local means kernels are sums of derivatives of order $m$
+of the higher divergence kernels (\Cref{thm:bump-higher-identity}), the derivatives move onto
+$f$, and the strong type of the Calder\'on--Zygmund families of these kernels
+(\Cref{thm:bump-higher-kernels-cz}) bounds the local means of Triebel--Lizorkin type with
+smoothness $m$ by $\|f\|_{\Sob{m}{p}}$ on a patch. The local extensions lie in
+$\TL{m}{p}{2} \subseteq \Sob{m}{p}(V)$ and are pasted by the Leibniz rule
+(\Cref{thm:leibniz-rule}); the inner patch extends by a cutoff.
+
+\paragraph{Local means by the derivatives of order $m$.}
+
+\begin{lemma}[Local means by the derivatives of order $m$ at a point]
+\label{lem:local-means-higher-point}
+\lean{Rd.LocalMeansBump.conv_kernel_succ_eq_sum_higherKernel,
+  Rd.LocalMeansBump.dyadicWeight_mul_enorm_conv_kernel_succ_le}
+\leanok
+\uses{def:bump-higher-kernels, thm:bump-higher-identity, thm:bump-higher-kernels-cz,
+  lem:weak-derivative-convolution-local, lem:weak-derivative-basic, lem:dilate}
+Let $g$ be a bump with the smoothed bump $g'$, let $L \geq 1$ and $m \leq L$, and let $K^L_i$,
+$i \in I^m$, be the higher divergence kernels of $g$ (\Cref{def:bump-higher-kernels}). Let
+$T \subseteq V$ be open, $1 \leq p \leq \infty$,
+$f \in L_p(T)$ with weak derivatives $g_i = \partial^{e_i} f$ on $T$ for every $i \in I^m$,
+$j \in \N$ and $x \in V$ with $x - y \in T$ for every $i \in I^m$ and every $y$ in the support
+of $(K^L_i)_{2^j}$. Then the local means kernels $k'_j$ of order $L$ of $g'$ satisfy
+\[
+  \bigl(k'_{j+1} * \mathbf 1_T f\bigr)(x) = 2^{-jm} \sum_{i \in I^m}
+  \bigl((K^L_i)_{2^j} * \mathbf 1_T g_i\bigr)(x) ,
+\]
+and therefore
+\[
+  2^{(j+1)m} \bigl|\bigl(k'_{j+1} * \mathbf 1_T f\bigr)(x)\bigr| \leq 2^m \sum_{i \in I^m}
+  \bigl|\bigl((K^L_i)_{2^j} * \mathbf 1_T g_i\bigr)(x)\bigr| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$K^L_i$ has compact support (\Cref{thm:bump-higher-kernels-cz} (2)). By
+\Cref{thm:bump-higher-identity},
+$(k'_{j+1} * \mathbf 1_T f)(x) = 2^{-jm} \sum_i ((\partial^{e_i} (K^L_i)_{2^j}) * \mathbf 1_T
+f)(x)$, and $\mathbf 1_T g_i = \partial^{e_i} (\mathbf 1_T f)$ weakly on $T$
+(\Cref{lem:weak-derivative-basic}), so \Cref{lem:weak-derivative-convolution-local} moves each
+derivative to $\mathbf 1_T f$. The bound follows from $2^{(j+1)m} 2^{-jm} = 2^m$.
+\end{proof}
+
+\begin{theorem}[The local means of Triebel--Lizorkin type by the derivatives of order $m$]
+\label{thm:tl-local-means-higher}
+\lean{Rd.LocalMeansBump.ae_lqNorm_le_of_hasWeakLineDeriv_words,
+  Rd.LocalMeansBump.eLpNorm_lqNorm_conv_higherKernel_le, Rd.LocalMeansBump.higherGradientConst,
+  Rd.LocalMeansBump.higherGradientConst_ne_top,
+  Rd.LocalMeansBump.tlLocalNormOn_le_of_hasWeakLineDeriv_words,
+  Rd.LocalMeansBump.higherPatchConst, Rd.LocalMeansBump.higherPatchConst_ne_top,
+  Rd.LocalMeansBump.tlLocalNormOn_le_higherPatchConst}
+\leanok
+\uses{lem:local-means-higher-point, def:tl-local-norm-on, thm:bump-higher-kernels-cz,
+  thm:vector-valued-strong-type, def:cz-const, lem:tl-local-means-pointwise,
+  thm:tl-local-means-gradient}
+Let $n \geq 1$, $1 < p < \infty$, $g$ a bump with the smoothed bump $g'$, $m < L$, $\mu'$ the
+moment kernel of order $L$ of $g'$, $K^L_i$ the higher divergence kernels of $g$ with the
+constants $B_i$, $H_i$ of \Cref{thm:bump-higher-kernels-cz}, $W \subseteq V$ measurable,
+$T \subseteq V$ open, $f \in L_p(T)$ with weak derivatives $g_i = \partial^{e_i} f \in L_p(T)$ on
+$T$ for every $i \in I^m$, and assume $x - y \in T$ for every $x \in W$, every $j \in \N$, every
+$i \in I^m$ and every $y$ in the support of $(K^L_i)_{2^j}$. Then $F = \mathbf 1_T f \in L_p(V)$
+satisfies, with the quasi-norm $\|\cdot\|'^{W,L}_{m,2}$ of \Cref{def:tl-local-norm-on} for $g'$,
+\[
+  \|F\|'^{W,L}_{m,2} \leq \|\mu'\|_1 \|f\|_{L_p(T)} + 2^m \sum_{i \in I^m} S_{V,p}(B_i, H_i)
+  \|g_i\|_{L_p(T)} ,
+\]
+hence
+\[
+  \|F\|'^{W,L}_{m,2} \leq C'_g \Bigl(\|f\|_{L_p(T)} + \sum_{i \in I^m} \|g_i\|_{L_p(T)}\Bigr) ,
+\]
+with the constant $C'_g = \|\mu'\|_1 + 2^m \sum_i S_{V,p}(B_i, H_i) < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+As for \Cref{thm:tl-local-means-gradient}, with \Cref{lem:local-means-higher-point} in place of
+\Cref{lem:local-means-gradient-point}: the assumption of \Cref{lem:tl-local-means-pointwise}
+holds for $g'$ with $\varphi = \mathbf 1_T f$, $h_i = \mathbf 1_T g_i$, $s = m$ and $c = 2^m$,
+so with $\Lambda_i(x) = (((K^L_i)_{2^j} * \mathbf 1_T g_i)(x))_j$, almost everywhere
+\[
+  \bigl\|(2^{jm} |\mathbf 1_W (k'_j * F)(x)|)_j\bigr\|_{\ell_2}
+  \leq |\mathbf 1_W (k'_0 * F)(x)| + 2^m \sum_{i \in I^m} \|\Lambda_i(x)\|_{\ell_2} ,
+\]
+the first term has $L_p$ norm at most $\|\mu'\|_1 \|F\|_p$, and for $m < L$ the families
+$((K^L_i)_{2^j})_j$ are Calder\'on--Zygmund families (\Cref{thm:bump-higher-kernels-cz}), whose
+analysis operators are bounded by $S_{V,p}(B_i, H_i)$ (\Cref{thm:vector-valued-strong-type}).
+\end{proof}
+
+\paragraph{Bounded extensions of order $m$.}
+
+\begin{definition}[Bounded extensions of order $m$]
+\label{def:extends-sobolev-order}
+\lean{Rd.ExtendsSobolevOrder}
+\leanok
+\uses{def:weak-line-derivative}
+Let $O \subseteq V$ be open, $U \subseteq V$, $1 \leq p \leq \infty$, $m \in \N$ and
+$C \in [0, \infty]$. \emph{Sobolev functions of order $m$ on $O$ extend from $U$ with the
+constant $C$} if for every $f$ and all $g_{k,w} \in L_p(O)$ ($k \leq m$, $w \in I^k$) with
+$g_{k,w} = \partial^{e_w} f$ weakly on $O$ there are $F \in \Sob{m}{p}(V)$ with $F = f$ almost
+everywhere on $U$ and weak derivatives $G_{k,w} = \partial^{e_w} F \in L_p(V)$ on $V$
+($k \leq m$, $w \in I^k$) with
+\[
+  \sum_{k \leq m} \sum_{w \in I^k} \|G_{k,w}\|_p \leq C \sum_{k \leq m} \sum_{w \in I^k}
+  \|g_{k,w}\|_{L_p(O)} .
+\]
+\end{definition}
+
+The empty word gives $g_{0,()} = f$ almost everywhere on $O$ and $G_{0,()} = F$, so both sides
+are norms of $\Sob{m}{p}$; for $m = 1$ they are the norms of \Cref{def:extends-sobolev}.
+
+\begin{lemma}[Properties of bounded extensions of order $m$]
+\label{lem:extends-sobolev-order}
+\lean{Rd.ExtendsSobolevOrder.of_le, Rd.extendsSobolevOrder_of_eLpNorm_le,
+  Rd.extendsSobolevOrder_zero, Rd.eLpNorm_add_sum_le_sum_words}
+\leanok
+\uses{def:extends-sobolev-order, lem:sums-over-words, lem:weak-derivative-basic,
+  lem:weak-derivative-words}
+For every $1 \leq p \leq \infty$ and every $m \in \N$:
+\begin{enumerate}
+  \item for all open $T \subseteq O \subseteq V$, every $U \subseteq V$ and every
+    $C \in [0, \infty]$: if Sobolev functions of order $m$ on $T$ extend from $U$ with the
+    constant $C$, then Sobolev functions of order $m$ on $O$ extend from $U$ with the
+    constant $C$;
+  \item for every open $O \subseteq V$, every $U \subseteq V$ and every $C < \infty$: if for
+    every $f$ and all $g_{k,w} = \partial^{e_w} f \in L_p(O)$ as in
+    \Cref{def:extends-sobolev-order} there are $F$ with $F = f$ almost everywhere on $U$ and
+    $G_{k,w}$ with $G_{k,w} = \partial^{e_w} F$ weakly on $V$ for every $k \leq m$ and every
+    $w \in I^k$ and
+    $\sum_{k \leq m} \sum_w \|G_{k,w}\|_p \leq C \sum_{k \leq m} \sum_w \|g_{k,w}\|_{L_p(O)}$,
+    then Sobolev functions of order $m$ on $O$ extend from $U$ with the constant $C$;
+  \item for every open $O \subseteq V$, Sobolev functions of order $0$ on $O$ extend from $O$
+    with the constant $1$;
+  \item if $m \geq 1$, then for every open $O \subseteq V$, every $f$ and all $g_{k,w}$
+    ($k \in \N$, $w \in I^k$) with $g_{0,()} = f$ weakly on $O$,
+    \[
+      \|f\|_{L_p(O)} + \sum_{i \in I^m} \|g_{m,i}\|_{L_p(O)} \leq \sum_{k \leq m}
+      \sum_{w \in I^k} \|g_{k,w}\|_{L_p(O)} .
+    \]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Weak derivatives on $O$ restrict to $T$ (\Cref{lem:weak-derivative-basic}), and
+$\|h\|_{L_p(T)} \leq \|h\|_{L_p(O)}$. (2) Each $\|G_{k,w}\|_p$ is at most the finite right side
+(\Cref{lem:sums-over-words} (1)), so $G_{k,w} \in L_p(V)$; $F = G_{0,()}$ almost everywhere, so
+$F \in L_p(V)$, and $F \in \Sob{m}{p}(V)$ by \Cref{lem:weak-derivative-words} (4). (3) $F$ is
+the extension of $f$ by zero, and $f = g_{0,()}$ almost everywhere on $O$. (4) $f = g_{0,()}$
+almost everywhere on $O$, and for $m \geq 1$ the two terms on the left are the summands $k = 0$
+and $k = m$ on the right.
+\end{proof}
+
+\paragraph{One patch.}
+
+\begin{theorem}[The extension of order $m$ from one patch]
+\label{thm:one-patch-extension-higher}
+\lean{Rd.LocalMeansBump.higherExtensionConst, Rd.LocalMeansBump.higherExtensionConst_ne_top,
+  Rd.LocalMeansBump.extendsSobolevOrder}
+\leanok
+\uses{thm:tl-local-means-higher, lem:tl-local-extension, def:extends-sobolev-order,
+  lem:extends-sobolev-order, thm:triebel-lizorkin-to-sobolev, thm:local-extension,
+  lem:support-principle-two, thm:one-patch-extension}
+Let $n \geq 1$, $1 < p < \infty$, $m \geq 1$, $g$ a bump with the smoothed bump $g'$, the dual
+kernels $\eta'_j$ of order $m + 1$ of $g'$ and the higher divergence kernels $K^{m+1}_i$ of $g$,
+let $U, W \subseteq V$ be measurable and $T \subseteq V$ open with $U \subseteq T$, $x - y \in W$
+for every $x \in U$, every $j$ and every $y$ with $\eta'_j(y) \neq 0$, and $x - y \in T$ for
+every $x \in W$, every $j$, every $i \in I^m$ and every $y$ in the support of
+$(K^{m+1}_i)_{2^j}$. Then Sobolev functions of order $m$ on $T$ extend from $U$ with the constant
+$\bigl(\sum_{k \leq m} \sum_{w \in I^k} D_{p, e_w}\bigr) A C'_g$, where $A$ is the
+constant $C$ of \Cref{thm:tl-local-means} for $g'$, $L = m + 1$, $q = 2$, $s = m$, $D_{p,e_w}$ the
+constants of \Cref{thm:triebel-lizorkin-to-sobolev}, and $C'_g$ that of
+\Cref{thm:tl-local-means-higher} for $L = m + 1$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $Y = \sum_{k \leq m} \sum_w \|g_{k,w}\|_{L_p(T)}$, $F_0 = \mathbf 1_T f \in L_p(V)$ (since
+$f = g_{0,()}$ almost everywhere on $T$) and $F = \sum_j \eta'_j * \mathbf 1_W (k'_j * F_0)$.
+By \Cref{thm:tl-local-means-higher} and \Cref{lem:extends-sobolev-order} (4),
+$\|F_0\|'^{W,m+1}_{m,2} \leq C'_g Y$; by \Cref{lem:tl-local-extension} with $s = m > 0$, $F$
+converges and $\|F\|_{\TL{m}{p}{2}} \leq A C'_g Y$. By
+\Cref{thm:triebel-lizorkin-to-sobolev}, $F \in \Sob{m}{p}(V)$, and for every $k \leq m$ and every
+$w \in I^k$ the weak derivative $\partial^{e_w} F$ has $L_p$ norm at most
+$D_{p,e_w} \|F\|_{\TL{m}{p}{2}}$. On $U$, $F = F_0 = f$ almost everywhere, as in
+\Cref{thm:one-patch-extension} (\Cref{lem:support-principle-two}, \Cref{thm:local-extension}).
+\end{proof}
+
+\paragraph{Pasting in $\Sob{m}{p}(V)$.}
+
+\begin{lemma}[The Leibniz rule for pasting]
+\label{lem:leibniz-pasting}
+\lean{Rd.exists_hasWeakLineDeriv_top_mul_le}
+\leanok
+\uses{thm:leibniz-rule, lem:sums-over-words, lem:weak-derivative-basic}
+For every open $B \subseteq V$, every $1 \leq p \leq \infty$, every $m \in \N$, every $F$, all
+$G_{k,w}$ ($k \leq m$, $w \in I^k$) with $G_{k,w} = \partial^{e_w} F$ weakly on $B$, every smooth
+$\chi \colon V \to \R$ with compact closed support in $B$, every $k \leq m$ and every
+$w \in I^k$, there is $H$ with $H = \partial^{e_w} (\chi F)$ weakly on $V$ and
+\[
+  \|H\|_p \leq C_k(\chi) \sum_{k' \leq m} \sum_{w' \in I^{k'}} \|G_{k',w'}\|_{L_p(B)} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{thm:leibniz-rule} with $V$ for $O$, and \Cref{lem:sums-over-words} (2).
+\end{proof}
+
+\begin{theorem}[Pasting bounded extensions of order $m$]
+\label{thm:pasting-sobolev-higher}
+\lean{Rd.extendsSobolevOrder_of_cover}
+\leanok
+\uses{def:extends-sobolev-order, lem:extends-sobolev-order, lem:leibniz-pasting,
+  lem:pasting-agrees, lem:sums-over-words, lem:resolution-of-unity, lem:leibniz-constant,
+  lem:weak-derivative-basic}
+Let $O \subseteq V$ be open, $1 \leq p \leq \infty$, $m \in \N$, and $(U_l)_{l \in \kappa}$ a
+finite family of bounded open sets covering the closure of $O$. If for every $l$ Sobolev
+functions of order $m$ on $O$ extend from $O \cap U_l$ with a finite constant $C_l$, then
+Sobolev functions of order $m$ on $O$ extend from $O$ with a finite constant.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $(\psi_l)$ be a smooth resolution of unity on the closure of $O$ subordinate to $(U_l)$
+(\Cref{lem:resolution-of-unity}); each $\psi_l$ has compact support, so $C_k(\psi_l) < \infty$
+(\Cref{lem:leibniz-constant} (1)). For $f$ with the extensions $F_l$ and their weak derivatives
+$G_{l,k,w}$, the function $F = \sum_l \psi_l F_l$ equals $f$ almost everywhere on $O$
+(\Cref{lem:pasting-agrees}), and \Cref{lem:leibniz-pasting} gives weak derivatives
+$H_{l,k,w} = \partial^{e_w} (\psi_l F_l)$ on $V$ with
+$\|H_{l,k,w}\|_p \leq C_k(\psi_l) C_l Y$, $Y = \sum_{k \leq m} \sum_w \|g_{k,w}\|_{L_p(O)}$.
+Then $\sum_l H_{l,k,w} = \partial^{e_w} F$ on $V$ and
+\[
+  \sum_{k \leq m} \sum_{w \in I^k} \Bigl\|\sum_l H_{l,k,w}\Bigr\|_p \leq \sum_l \Bigl(\sum_{k
+  \leq m} \sum_{w \in I^k} C_k(\psi_l)\Bigr) C_l Y
+\]
+by \Cref{lem:sums-over-words} (3), and \Cref{lem:extends-sobolev-order} (2) applies.
+\end{proof}
+
+\paragraph{The extension theorem.}
+
+\begin{lemma}[The patches of order $m$]
+\label{lem:higher-patches}
+\lean{Rd.natCast_succ_mul_half_div_le, Rd.LipschitzGraph.patch_support_higherKernel,
+  Rd.BoundedLipschitzDomain.exists_extendsSobolevOrder_boundary,
+  Rd.BoundedLipschitzDomain.exists_extendsSobolevOrder_interior}
+\leanok
+\uses{thm:one-patch-extension-higher, thm:bump-higher-kernels-cz, lem:smoothed-bump,
+  lem:patches, lem:bumps-every-radius, lem:cone-bump, def:bounded-lipschitz, lem:graph-cone,
+  lem:extends-sobolev-order, lem:leibniz-pasting, lem:smooth-cutoff-compact,
+  lem:leibniz-constant, lem:sobolev-patches}
+\begin{enumerate}
+  \item For every $m \in \N$ and every $\varepsilon > 0$,
+    $(m + 1) \cdot \frac{1/2}{(m + 1)(1 + 1/\varepsilon)} \leq \varepsilon$.
+  \item For every Lipschitz graph domain $\Omega'$ with closed cone $\bar K$, every bump $g$ of
+    radius $R$ supported in $-K$, every $L \geq 1$, every $m \in \N$, every
+    $\varepsilon \geq L R$, every $\rho$ and every $c \in V$: $x - y \in \Omega' \cap B(c, \rho)$
+    for every $x \in \Omega' \cap B(c, \rho - \varepsilon)$, every $j$, every $i \in I^m$ and
+    every $y$ in the support of $(K^L_i)_{2^j}$.
+  \item Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$ with boundary balls
+    $B(c_j, \rho_j)$. For every $1 < p < \infty$, every $m \geq 1$, every $\varepsilon > 0$ and
+    every $j$, Sobolev functions of order $m$ on $\Omega$ extend from
+    $\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$ with a finite constant.
+  \item For every bounded Lipschitz domain $\Omega$, every $1 \leq p \leq \infty$, every
+    $m \in \N$ and every $\delta > 0$, Sobolev functions of order $m$ on $\Omega$ extend from
+    $\{x \in \Omega : \dist(x, V \setminus \Omega) > 2 \delta\}$ with a finite constant.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The left side is $\varepsilon / (2 (\varepsilon + 1))$. (2) By
+\Cref{thm:bump-higher-kernels-cz} (3), $-y \in \bar K$ and $\|y\| \leq L R \leq \varepsilon$;
+then $\Omega' + \bar K \subseteq \Omega'$ (\Cref{lem:graph-cone}) and
+$\|x - y - c\| < \rho$. (3) Take the cone bump of the graph domain $\Omega_j$ rescaled to the
+radius $R = \frac{1/2}{(m + 1)(1 + 1/\varepsilon)}$ (\Cref{lem:cone-bump},
+\Cref{lem:bumps-every-radius}), so $(m + 1) R \leq \varepsilon$ by (1). Its smoothed bump has the
+same radius and is supported in $-K$ (\Cref{lem:smoothed-bump}), so its dual kernels of order
+$m + 1$ satisfy the support condition of \Cref{lem:patches}, and the higher divergence kernels
+satisfy that of (2). With $U$, $W$ and $T$ as in \Cref{lem:sobolev-patches},
+\Cref{thm:one-patch-extension-higher} applies, and \Cref{lem:extends-sobolev-order} (1) passes
+from $T$ to $\Omega$. (4) The set $\{x : \dist(x, V \setminus \Omega) \geq 2 \delta\}$ is a
+compact subset of $\Omega$; take $\chi$ of \Cref{lem:smooth-cutoff-compact} equal to $1$ near it
+with compact closed support in $\Omega$. Then $\chi f = f$ on the patch, and
+\Cref{lem:leibniz-pasting} with $B = \Omega$ and \Cref{lem:extends-sobolev-order} (2) give
+the constant $\sum_{k \leq m} \sum_{w \in I^k} C_k(\chi)$, finite by
+\Cref{lem:leibniz-constant} (1).
+\end{proof}
+
+\begin{theorem}[The extension theorem of higher order]
+\label{thm:higher-sobolev-extension}
+\lean{Rd.BoundedLipschitzDomain.exists_extendsSobolevOrder,
+  Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev_order,
+  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_order}
+\leanok
+\uses{lem:higher-patches, thm:pasting-sobolev-higher, lem:extends-sobolev-order,
+  lem:bounded-lipschitz-geometry, def:extends-sobolev-order, lem:weak-derivative-basic,
+  thm:sobolev-extension}
+For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$, every $1 < p < \infty$ and
+every $m \in \N$ there is $C < \infty$ such that for every $f$ and all
+$g_{k,w} \in L_p(\Omega)$ ($k \leq m$, $w \in I^k$) with $g_{k,w} = \partial^{e_w} f$ weakly on
+$\Omega$ there are $F \in \Sob{m}{p}(V)$ with $F = f$ almost everywhere on $\Omega$ and weak
+derivatives $G_{k,w} = \partial^{e_w} F \in L_p(V)$ on $V$ with
+\[
+  \sum_{k \leq m} \sum_{w \in I^k} \|G_{k,w}\|_p \leq C \sum_{k \leq m} \sum_{w \in I^k}
+  \|g_{k,w}\|_{L_p(\Omega)} .
+\]
+For every bounded Lipschitz domain $\Omega$ in $V$ of any dimension, every $1 < p < \infty$,
+every $m \in \N$ and every $f \colon V \to \C$, $f \in \Sob{m}{p}(\Omega)$ if and only if
+$f = F$ almost everywhere on $\Omega$ for some $F \in \Sob{m}{p}(V)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $m = 0$ this is \Cref{lem:extends-sobolev-order} (3). For $m \geq 1$, the patches
+$\Omega \cap B(c_j, \rho_j - 2\varepsilon)$ and
+$\{x \in \Omega : \dist(x, V \setminus \Omega) > 2\delta\}$ cover the closure of $\Omega$
+(\Cref{lem:bounded-lipschitz-geometry}); \Cref{lem:higher-patches} and
+\Cref{thm:pasting-sobolev-higher} give the first claim. The second follows from the first as in
+\Cref{thm:sobolev-extension}; for $n = 0$ the argument there holds for every $m$.
+\end{proof}
+
+Stein's extension operator gives the theorem for every $1 \leq p \leq \infty$ with one operator
+for all orders \cite[Chapter VI, \S 3, Theorem 5]{SteinSingular}.
 
 \section{Gauss--Green on Lipschitz graph domains}
 \label{sec:lipschitz-graph-green}

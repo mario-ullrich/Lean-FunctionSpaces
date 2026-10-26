@@ -28,6 +28,10 @@ orthonormal basis `e_0, …, e_{n-1}` of `Rd.gridBasis`. A **word** of length `k
   `‖G_w‖_{L_p(O)} ≤ C_k(χ) ∑_{k' ≤ k} ∑_{w'} ‖g_{k',w'}‖_{L_p(O ∩ B)}`. The constant is
   `C_k(χ) = 2^k sup_x ∑_{j ≤ k} ‖D^j χ(x)‖` (`Rd.leibnizConst`, finite by
   `Rd.leibnizConst_ne_top`); the proof is the induction `∂_i (χ f) = χ ∂_i f + (∂_i χ) f`.
+* **Sums over words** (`Rd.le_sum_range_sum_words`, `Rd.sum_range_sum_words_mono`,
+  `Rd.sum_range_sum_words_sum_mul`): elementary bounds for `∑_{k ≤ m} ∑_w a_{k,w}`, and one
+  family of choices along all words of length at most `m`
+  (`Rd.exists_forall_words_of_forall_le`).
 * **Smooth compactly supported multipliers on `W^m_p(V)`**
   (`Rd.MemSobolev.mulLp_of_hasCompactSupport`): `χ F ∈ W^m_p(V)` for `F ∈ W^m_p(V)`, since
   derivatives in `L_p(V)` along all words of length `k ≤ m` give `W^m_p(V)`
@@ -244,6 +248,53 @@ theorem sum_range_sum_snoc_le {ι : Type*} [Fintype ι] (a : (k : ℕ) → (Fin 
   rw [Finset.sum_range_succ' _ (k + 1)]
   exact le_add_right (Finset.sum_le_sum fun k' _ => sum_snoc_le (a (k' + 1)) j)
 
+omit [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V]
+  [BorelSpace V] in
+/-- **One term of a sum over words**: for nonnegative `a` and a word `w` of length `k ≤ m`,
+`a_{k,w} ≤ ∑_{k' ≤ m} ∑_{w'} a_{k',w'}`, the sum over all words of length at most `m`. -/
+theorem le_sum_range_sum_words {ι : Type*} [Fintype ι] (a : (k : ℕ) → (Fin k → ι) → ℝ≥0∞)
+    {k m : ℕ} (hk : k ≤ m) (w : Fin k → ι) :
+    a k w ≤ ∑ k' ∈ Finset.range (m + 1), ∑ w' : Fin k' → ι, a k' w' :=
+  (Finset.single_le_sum (f := fun w' => a k w') (fun _ _ => zero_le) (Finset.mem_univ w)).trans
+    (Finset.single_le_sum (f := fun k' => ∑ w' : Fin k' → ι, a k' w') (fun _ _ => zero_le)
+      (Finset.mem_range.2 (Nat.lt_succ_of_le hk)))
+
+omit [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V]
+  [BorelSpace V] in
+/-- **Sums over words of increasing length**: for nonnegative `a` and `k ≤ m`, the sum over the
+words of length at most `k` is at most the sum over the words of length at most `m`. -/
+theorem sum_range_sum_words_mono {ι : Type*} [Fintype ι] (a : (k : ℕ) → (Fin k → ι) → ℝ≥0∞)
+    {k m : ℕ} (hk : k ≤ m) :
+    ∑ k' ∈ Finset.range (k + 1), ∑ w' : Fin k' → ι, a k' w' ≤
+      ∑ k' ∈ Finset.range (m + 1), ∑ w' : Fin k' → ι, a k' w' :=
+  Finset.sum_le_sum_of_subset (Finset.range_mono (by omega))
+
+omit [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V]
+  [BorelSpace V] in
+/-- **Exchanging the sums over words and over an index set**: for nonnegative `λ_{i,k}` and
+`c_i`, `∑_{k ≤ m} ∑_w ∑_i λ_{i,k} c_i = ∑_i (∑_{k ≤ m} ∑_w λ_{i,k}) c_i`. -/
+theorem sum_range_sum_words_sum_mul {ι κ : Type*} [Fintype ι] [Fintype κ] (m : ℕ)
+    (lam : ι → ℕ → ℝ≥0∞) (c : ι → ℝ≥0∞) :
+    ∑ k ∈ Finset.range (m + 1), ∑ _w : Fin k → κ, ∑ i, lam i k * c i =
+      ∑ i, (∑ k ∈ Finset.range (m + 1), ∑ _w : Fin k → κ, lam i k) * c i := by
+  rw [Finset.sum_congr rfl fun k _ => Finset.sum_comm, Finset.sum_comm]
+  refine Finset.sum_congr rfl fun i _ => ?_
+  simp_rw [Finset.sum_mul]
+
+omit [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V]
+  [BorelSpace V] in
+/-- **A choice along the words of length at most `m`**: if for every word `w` of length `k ≤ m`
+some `a` satisfies `P k w a`, then one family `(a_{k,w})`, indexed by all words, satisfies
+`P k w a_{k,w}` for every word `w` of length `k ≤ m`. -/
+theorem exists_forall_words_of_forall_le {ι α : Type*} [Nonempty α] {m : ℕ}
+    {P : (k : ℕ) → (Fin k → ι) → α → Prop} (h : ∀ k ≤ m, ∀ w, ∃ a, P k w a) :
+    ∃ G : (k : ℕ) → (Fin k → ι) → α, ∀ k ≤ m, ∀ w, P k w (G k w) := by
+  classical
+  refine ⟨fun k w => if hk : k ≤ m then (h k hk w).choose else Classical.arbitrary α,
+    fun k hk w => ?_⟩
+  simp only [hk, ↓reduceDIte]
+  exact (h k hk w).choose_spec
+
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- The basis directions of a word `(u, j)` are those of `u` followed by `e_j` (Mathlib's
 `Fin.comp_snoc`). -/
@@ -375,20 +426,17 @@ theorem MemSobolev.exists_hasWeakLineDeriv_mul {m : ℕ} {F : Lp ℂ p (volume :
     ∃ G : V → ℂ, MemLp G p volume ∧
       HasWeakLineDeriv ⊤ (fun l => gridBasis V (w l)) (fun x => (χ x : ℂ) * F x) G := by
   have htop : (⊤ ⊓ ⊤ : Opens V) = ⊤ := inf_idem _
-  have hex : ∀ (k : ℕ) (w : Fin k → Fin (finrank ℝ V)), ∃ g : V → ℂ, k ≤ m →
-      MemLp g p volume ∧ HasWeakLineDeriv ⊤ (fun l => gridBasis V (w l)) F g := fun k w => by
-    by_cases hk : k ≤ m
-    · obtain ⟨g, hg, hFg⟩ := hF.2 k hk fun l => gridBasis V (w l)
-      exact ⟨g, fun _ => ⟨volume_restrict_top (V := V) ▸ hg, hFg⟩⟩
-    · exact ⟨0, fun h => absurd h hk⟩
-  choose g hg using hex
+  obtain ⟨g, hg⟩ := exists_forall_words_of_forall_le (m := m)
+    (P := fun k w g => MemLp g p volume ∧ HasWeakLineDeriv ⊤ (fun l => gridBasis V (w l)) F g)
+    fun k hk w => (hF.2 k hk fun l => gridBasis V (w l)).imp fun g hg =>
+      ⟨volume_restrict_top (V := V) ▸ hg.1, hg.2⟩
   obtain ⟨G, hG, hGb⟩ := exists_hasWeakLineDeriv_mul_of_tsupport_subset (p := p) (O := ⊤) (B := ⊤)
-    g (fun k hk w => htop ▸ (hg k w hk).2) hχ hcs (subset_univ _) hk w
+    g (fun k hk w => htop ▸ (hg k hk w).2) hχ hcs (subset_univ _) hk w
   have hfin : eLpNorm G p (volume.restrict (⊤ : Opens V)) < ∞ := by
     refine hGb.trans_lt (ENNReal.mul_lt_top (leibnizConst_ne_top hχ hcs k).lt_top ?_)
     refine ENNReal.sum_lt_top.2 fun k' hk' => ENNReal.sum_lt_top.2 fun w' _ => ?_
     rw [htop, volume_restrict_top]
-    exact (hg k' w' (by have := Finset.mem_range.1 hk'; omega)).1.eLpNorm_lt_top
+    exact (hg k' (by have := Finset.mem_range.1 hk'; omega) w').1.eLpNorm_lt_top
   rw [volume_restrict_top] at hfin
   exact ⟨G, memLp_iff.2 hfin, hG⟩
 

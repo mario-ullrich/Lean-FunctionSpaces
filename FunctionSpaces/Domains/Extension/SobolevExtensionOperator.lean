@@ -209,7 +209,7 @@ theorem ae_localExtensionJet_eq [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {U
     (hsupp : ∀ x ∈ W, ∀ j i, ∀ y ∈ tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)), x - y ∈ T)
     (u : weakSobolevJet p O) :
     ∀ᵐ x ∂volume, x ∈ U → b.localExtensionJet hp1 hp hW hTO hsupp u x = u.1.1 x :=
-  b.ae_localExtension_eq_of_ae_eq_indicator hp hU hW hUT hUW
+  b.ae_localExtension_eq_of_ae_eq_indicator hp one_le_two hU hW hUT hUW
     (indicatorExtendLp_apply_ae T.isOpen.measurableSet hTO u.1.1)
     (b.summable_localExtTerm_indicatorExtendLp hp1 hp hW hTO hsupp u)
 

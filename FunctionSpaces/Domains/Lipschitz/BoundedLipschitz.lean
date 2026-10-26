@@ -44,10 +44,10 @@ The proof follows Schneider–Vybíral §3: a covering `Ω̄ ⊆ K_0 ∪ ⋃_j K
   `Rd.BoundedLipschitzDomain.exists_local_extension_interior_le`).
 * A smooth resolution of unity subordinate to these patches (Mathlib's
   `SmoothPartitionOfUnity.exists_isSubordinate`, `Rd.exists_smooth_partition`) pastes the local
-  extensions (`Rd.exists_pasting_le`, `Rd.indicatorLp_sum_eq_of_partition`), by the pointwise
-  multipliers of `Rd.modNorm_mulLp_le` and the triangle inequality `Rd.modNorm_finsetSum_le`. The
-  quasi-norm by differences is subadditive and homogeneous (`Rd.modNorm_add_le`,
-  `Rd.modNorm_const_smul`).
+  extensions (`Rd.exists_pasting_le`, `Rd.indicatorLp_sum_eq_of_partition`, `Rd.ae_sum_mul_eq`),
+  by the pointwise multipliers of `Rd.modNorm_mulLp_le` and the triangle inequality
+  `Rd.modNorm_finsetSum_le`. The quasi-norm by differences is subadditive and homogeneous
+  (`Rd.modNorm_add_le`, `Rd.modNorm_const_smul`).
 
 For a compact set, the smooth resolutions of unity can be chosen equal to `1` on a neighbourhood
 of it (`Rd.exists_smooth_partition_nhds`).
@@ -170,6 +170,20 @@ theorem modNorm_finsetSum_lt_top {ι : Type*} (t : Finset ι)
     ‖∑ i ∈ t, G i‖ₑ +
         lqNorm q (fun k => dyadicWeight s k * lpModulus p r (∑ i ∈ t, G i) k) < ∞ :=
   (modNorm_finsetSum_le t G r s hq).trans_lt (ENNReal.sum_lt_top.2 hG)
+
+/-- **The pasted functions agree with `f`**: if `∑_i ψ_i = 1` on `O`, `tsupport ψ_i ⊆ U_i` and
+`F_i = f` almost everywhere on `O ∩ U_i`, then `∑_i ψ_i F_i = f` almost everywhere on `O`. -/
+theorem ae_sum_mul_eq {ι : Type*} [Fintype ι] {O : Set V} {U : ι → Set V} {ψ : ι → V → ℝ}
+    (hψU : ∀ i, tsupport (ψ i) ⊆ U i) (hψ1 : ∀ x ∈ O, ∑ i, ψ i x = 1) {F : ι → V → ℂ}
+    {f : V → ℂ} (hFf : ∀ i, ∀ᵐ x ∂volume, x ∈ O ∩ U i → F i x = f x) :
+    ∀ᵐ x ∂volume, x ∈ O → ∑ i, (ψ i x : ℂ) * F i x = f x := by
+  filter_upwards [ae_all_iff.2 hFf] with x h2 hxO
+  have hterm : ∀ i, (ψ i x : ℂ) * F i x = (ψ i x : ℂ) * f x := fun i => by
+    by_cases hψx : ψ i x = 0
+    · simp [hψx]
+    · rw [h2 i ⟨hxO, hψU i (subset_tsupport _ hψx)⟩]
+  simp_rw [hterm]
+  rw [← Finset.sum_mul, ← Complex.ofReal_sum, hψ1 x hxO, Complex.ofReal_one, one_mul]
 
 /-- **Pasting with a resolution of unity agrees with `f` on `O`**: if `∑_i ψ_i = 1` on `O`,
 `ψ_i` vanishes outside `U_i`, `G_i = ψ_i F_i` almost everywhere and `F_i = f` almost everywhere

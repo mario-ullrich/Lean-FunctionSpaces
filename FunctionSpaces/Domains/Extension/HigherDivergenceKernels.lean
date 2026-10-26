@@ -44,8 +44,9 @@ the orthonormal basis `(e_i)` of `Rd.gridBasis` and the dilations `G_c(x) = c^n 
 * **The bump statement**: for `m ≤ L`, `k_{j+1} = 2^{-jm} ∑_i ∂^{e_i} (K_i)_{2^j}` with the higher
   divergence kernels of the bump (`Rd.LocalMeansBump.higherKernel`,
   `Rd.LocalMeansBump.kernel_succ_eq_sum_higherKernel`). For `m < L` their dyadic dilates form
-  Calderón–Zygmund families (`Rd.LocalMeansBump.isCZFamily_higherKernel`); for `L ≥ 1` they are
-  supported in `B̄(0, L R)`, and in the reflected closed cone for bumps supported in `-K`
+  Calderón–Zygmund families (`Rd.LocalMeansBump.isCZFamily_higherKernel`); they have compact
+  support (`Rd.LocalMeansBump.hasCompactSupport_higherKernel`), for `L ≥ 1` in `B̄(0, L R)`, and
+  in the reflected closed cone for bumps supported in `-K`
   (`Rd.LipschitzGraph.tsupport_dilate_higherKernel_subset`).
 -/
 
@@ -973,6 +974,13 @@ theorem higherKernel_eq_zero_of_lt {L m : ℕ} (hL : 1 ≤ L) (i : Fin m → Fin
   weightedDilation_eq_zero_of_lt (neg_log_le_two_mul_log_two L) _
     (mul_eq_zero_of_lt_norm b.eq_zero _)
     (by rwa [neg_neg, Real.exp_log (by exact_mod_cast hL), mul_comm])
+
+/-- The higher divergence kernels of a bump have compact support
+(`Rd.hasCompactSupport_weightedDilation`). -/
+theorem hasCompactSupport_higherKernel (L m : ℕ) (i : Fin m → Fin (finrank ℝ V)) :
+    HasCompactSupport (b.higherKernel L m i : V → ℂ) :=
+  hasCompactSupport_weightedDilation (neg_log_le_two_mul_log_two L) _
+    (mul_eq_zero_of_lt_norm b.eq_zero _)
 
 /-- The higher divergence kernels of a bump of radius `R` and their dilates `(K_i)_{2^j}` are
 supported in the closed ball of radius `L R`, for `L ≥ 1`. -/

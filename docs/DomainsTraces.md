@@ -37,7 +37,10 @@ Rychkov's local extension with the local means of the gradient: the local means 
 are divergences of dilated kernels with mean zero, which form Calderón–Zygmund families. For `p = 2`
 this identifies `H^1(Ω)` with `W^1_2(Ω)`. For every `1 ≤ p ≤ ∞` every function of `W^1_p(Ω)` is
 the restriction of a function of `W^1_p(ℝ^d)` with a bound, by reflection across the boundary in
-the flattened coordinates of the graph domains. On a Lipschitz graph domain, the Gauss–Green theorem
+the flattened coordinates of the graph domains. For `1 < p < ∞` and every order `m` every function
+of `W^m_p(Ω)` is the restriction of a function of `W^m_p(ℝ^d)` with a bound, by Rychkov's local
+extension with the local means of the derivatives of order `m`, pasted with the Leibniz rule. On a
+Lipschitz graph domain, the Gauss–Green theorem
 `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` holds for compactly supported `C^1` functions, and Green's formula
 `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)`, by the density of the
 compactly supported Schwartz functions in every `H^s(ℝ^d)`. On a bounded Lipschitz domain, Green's
@@ -493,6 +496,25 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   weakly differentiable by integration by parts with cutoffs near the hyperplane
   (`Rd.hasWeakLineDeriv_evenReflection`). The boundary patches of `Ω` extend by a cutoff and the
   reflection, the inner patch by a cutoff, and `Rd.extendsSobolev_of_cover` pastes them.
+* **The extension theorem of higher order.** For a bounded Lipschitz domain `Ω` in `V` of
+  dimension `n ≥ 1`, `1 < p < ∞` and `m ∈ ℕ` there is a finite `C` such that every `f` with weak
+  derivatives `g_{k,w} = ∂^{e_w} f ∈ L_p(Ω)` on `Ω` along all words `w` of length `k ≤ m` agrees
+  almost everywhere on `Ω` with some `F ∈ W^m_p(V)` whose weak derivatives `G_{k,w} = ∂^{e_w} F`
+  satisfy `∑_{k ≤ m} ∑_w ‖G_{k,w}‖_p ≤ C ∑_{k ≤ m} ∑_w ‖g_{k,w}‖_{L_p(Ω)}`
+  (`Rd.BoundedLipschitzDomain.exists_extendsSobolevOrder`); hence `f ∈ W^m_p(Ω)` iff `f` agrees
+  on `Ω` with some `F ∈ W^m_p(V)`, in every dimension
+  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_order`). For the smoothed bump
+  `b'` of a bump `b` and `m ≤ L`, the local means kernels of order `L` are
+  `k_{j+1} = 2^{-jm} ∑_i ∂^{e_i} (K_i)_{2^j}` with the higher divergence kernels `K_i` of `b`, so
+  on a patch `k_{j+1} ⋆ 1_T f = 2^{-jm} ∑_i (K_i)_{2^j} ⋆ 1_T ∂^{e_i} f`
+  (`Rd.LocalMeansBump.conv_kernel_succ_eq_sum_higherKernel`); for `L = m + 1` the strong type of
+  the Calderón–Zygmund families `((K_i)_{2^j})_j` bounds the local means of Triebel–Lizorkin type
+  with smoothness `m` (`Rd.LocalMeansBump.tlLocalNormOn_le_higherPatchConst`), the local extension
+  lies in `F^m_{p,2} ⊆ W^m_p` (`Rd.LocalMeansBump.extendsSobolevOrder`), and a smooth resolution of
+  unity pastes the local extensions by the Leibniz rule (`Rd.extendsSobolevOrder_of_cover`). The
+  inner patch extends by a cutoff for every `1 ≤ p ≤ ∞`
+  (`Rd.BoundedLipschitzDomain.exists_extendsSobolevOrder_interior`). The constants are
+  existential.
 * **Gauss–Green on Lipschitz graph domains.** Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph
   domain with the graph map `γ(x') = x' + φ(x') e` over the hyperplane `H = e^⊥`, the gradient
   `∇φ` of `φ|_H`, the outward unit normal `ν` and `n = dim V`, and let
@@ -606,6 +628,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The half-space and the reflection across a hyperplane, cutoffs near the hyperplane, integration by parts on the half-space, the weak derivatives and `L_p` bounds of the even reflection | ✅ | ✗ | `Domains/Extension/HalfSpaceReflection` |
 | The flattening of a Lipschitz graph domain as a measure-preserving map, the extension by reflection across the graph with its weak derivatives and `L_p` bounds, cutoffs from a bounded Lipschitz domain to its graph domains, and the extension theorem for `W^1_p` on bounded Lipschitz domains for `1 ≤ p ≤ ∞` with a bound | ✅ | ✗ | `Domains/Extension/ReflectionExtension` |
 | Weighted dilation averages `∫_a^b w(s) G_{e^s} ds`, their writing as sums of derivatives of order `m` of the higher divergence kernels when the weight has vanishing moments, the smoothed bump with its moment and kernel weights, and the local means kernels of order `L` as sums of derivatives of order `m ≤ L` of the higher divergence kernels, which have mean zero for `m < L` and lie in the reflected cone for bumps supported in `-K` | ✅ | ✗ | `Domains/Extension/HigherDivergenceKernels` |
+| The local means of order `m + 1` of the smoothed bump by the derivatives of order `m`, local means of Triebel–Lizorkin type with smoothness `m` on a set, bounded extensions of order `m` from one patch and by a cutoff, pasting in `W^m_p(ℝ^d)` by the Leibniz rule, and the extension theorem (`W^m_p(Ω)` is the space of restrictions of `W^m_p(ℝ^d)`) on bounded Lipschitz domains for `1 < p < ∞` and every `m`, with a bound | ✅ | ✗ | `Domains/Extension/HigherSobolevExtension` |
 | Gauss–Green on Lipschitz graph domains: product coordinates and Fubini, ray integrals, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and surface form, the product rule for line derivatives, and Green's formula `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)` | ✅ | ✗ | `Domains/Sobolev/LipschitzGraphGreen` |
 | Green's formula on bounded Lipschitz domains: integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary, the chart form for every resolution of unity, the outward unit normal as the chart normal and a unit vector almost everywhere on the boundary, `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, the traces from both sides of a graph, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u` vanishes | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainGreen` |
 | The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, smoothing with compact support, bump mollifiers and cone mollifiers, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)` | ✅ | ✗ | `Domains/Traces/TraceKernel` |

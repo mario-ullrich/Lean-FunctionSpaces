@@ -129,6 +129,7 @@ public import FunctionSpaces.Domains.Extension.SobolevExtensionOperator
 public import FunctionSpaces.Domains.Extension.HalfSpaceReflection
 public import FunctionSpaces.Domains.Extension.ReflectionExtension
 public import FunctionSpaces.Domains.Extension.HigherDivergenceKernels
+public import FunctionSpaces.Domains.Extension.HigherSobolevExtension
 public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen
 public import FunctionSpaces.Domains.Traces.TraceKernel
@@ -434,9 +435,9 @@ and the theorems that their characterisations agree. The library builds on
   open sets in `L_1`, and the chain rule `∂_v (f ∘ Φ) = ∑_i ⟪DΦ v, e_i⟫ (∂_{e_i} f) ∘ Φ` for
   Lipschitz measure-preserving `Φ`.
 * `FunctionSpaces.Rd.Sobolev.WeakDerivativeLeibniz`: composition of weak derivatives, derivatives
-  along all directions from those along words in the basis, the Leibniz rule for `χ f` with a
-  smooth compactly supported `χ` and the bound by the Leibniz constant, and smooth compactly
-  supported multipliers on `W^m_p(ℝ^d)`.
+  along all directions from those along words in the basis, sums and choices over words, the
+  Leibniz rule for `χ f` with a smooth compactly supported `χ` and the bound by the Leibniz
+  constant, and smooth compactly supported multipliers on `W^m_p(ℝ^d)`.
 * `FunctionSpaces.Rd.SingularIntegrals.PlancherelBounds`: the `L_2` bounds of the analysis operator
   `f ↦ (θ_j ⋆ f)_j` and of the synthesis operators `(g_j)_j ↦ ∑_{j ∈ s} θ_j ⋆ g_j` for finite
   sets `s` by the Fourier overlap `B`, for integrable kernels and for Calderón–Zygmund
@@ -622,6 +623,11 @@ and the theorems that their characterisations agree. The library builds on
   vanishing moments, the smoothed bump with smooth moment and kernel weights, and the local means
   kernels of order `L` as sums of derivatives of order `m ≤ L` of the higher divergence kernels,
   which have mean zero for `m < L` and lie in the reflected cone for bumps supported in `-K`.
+* `FunctionSpaces.Domains.Extension.HigherSobolevExtension`: the local means of order `m + 1` of
+  the smoothed bump by the derivatives of order `m`, bounded extensions of order `m` from one patch
+  and by a cutoff, pasting with the Leibniz rule, and the extension theorem
+  `W^m_p(Ω) = W^m_p(ℝ^d)|_Ω` on bounded Lipschitz domains for `1 < p < ∞` and every `m`, with a
+  bound.
 * `FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen`: Gauss–Green on a Lipschitz graph domain:
   product coordinates and Fubini, ray integrals, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ`
   for compactly supported `C^1` functions in chart and surface form, the product rule for line

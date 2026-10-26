@@ -483,7 +483,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `Rd.BoundedLipschitzDomain.boundaryTraceL2_apply_ae`,
   `Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`); on `H^{1/2}(Γ)` the trace into `L_2(Γ)` is
   injective (`Rd.BoundedLipschitzDomain.traceL2_injective`).
-* **The extension theorem for `W^1_p` on bounded Lipschitz domains.** Let `Ω` be a bounded
+* **The extension theorem for Sobolev spaces on bounded Lipschitz domains.** Let `Ω` be a bounded
   Lipschitz domain in `V`, `dim V ≥ 1`, `(e_i)` the orthonormal basis `Rd.gridBasis V` and
   `1 ≤ p ≤ ∞`. There
   is a finite `C` such that every `f ∈ L_p(Ω)` whose weak derivatives `g_i = ∂_{e_i} f` on `Ω` lie
@@ -495,7 +495,17 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`).
   For `1 < p < ∞` the extension is a bounded linear operator `E : W^1_p(Ω) → W^1_p(V)` on
   value–derivative jets with `E u = u` on `Ω` (`Rd.BoundedLipschitzDomain.sobolevExtensionL`,
-  `Rd.BoundedLipschitzDomain.exists_extensionL`). The theorem is of first order.
+  `Rd.BoundedLipschitzDomain.exists_extensionL`).
+  For `1 < p < ∞` and every order `m`, with the derivatives
+  `∂^{e_w} = ∂_{e_{w_0}} ⋯ ∂_{e_{w_{k-1}}}` along the words `w` of length `k ≤ m`, there is a
+  finite `C` such that every `f` whose weak
+  derivatives `g_{k,w} = ∂^{e_w} f` on `Ω` lie in `L_p(Ω)` agrees almost everywhere on `Ω` with
+  some `F ∈ W^m_p(V)` with
+  `∑_{k ≤ m} ∑_w ‖∂^{e_w} F‖_p ≤ C ∑_{k ≤ m} ∑_w ‖g_{k,w}‖_{L_p(Ω)}`
+  (`Rd.BoundedLipschitzDomain.exists_extendsSobolevOrder`, by Rychkov's local extension with the
+  local means of the derivatives of order `m` and pasting with the Leibniz rule); so
+  `f ∈ W^m_p(Ω)` iff `f` agrees on `Ω` with some `F ∈ W^m_p(V)`
+  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_order`).
   For `p = 2`, `f ∈ L_2(V)` lies in `H^1(Ω)` iff it lies in `W^1_2(Ω)`
   (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`), every sequence bounded in
   `W^1_2(Ω)` has a subsequence converging in `L_2(Ω)`
@@ -573,7 +583,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, Triebel–Lizorkin spaces as interpolation spaces | ✅ | ✗ |
 | [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings including the critical case and the Gagliardo–Nirenberg–Sobolev inequality, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
-| [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph and bounded Lipschitz domains, closures of convex ones, closed balls, the closed cube and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators and its norm equivalent to that of `B^{1/2}_{2,2}(Γ)`, the extension theorem for `W^1_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary or with corners, smooth domains | ✅ | ✗ |
+| [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph and bounded Lipschitz domains, closures of convex ones, closed balls, the closed cube and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators and its norm equivalent to that of `B^{1/2}_{2,2}(Γ)`, the extension theorems for `W^1_p` and `W^m_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary or with corners, smooth domains | ✅ | ✗ |
 
 Lean: ✅ every file proved without `sorry` · 🟡 some statement still `sorry` · ⬜ planned.
 Checked (human-checked): ✅ mathematics and documentation both reviewed by the author ·
@@ -608,8 +618,9 @@ that library builds itself.
 * **Interpolation**: the J-method and the equivalence theorem, the complex method,
   `(L_{p₀}, L_{p₁})_{θ,q} = L_{p,q}` with Lorentz spaces, and the off-diagonal Marcinkiewicz
   theorem.
-* **Traces and extensions**: the extension of `W^1_p` as a bounded linear operator for
-  `p ∈ {1, ∞}`, and the extension of higher order.
+* **Traces and extensions**: the extension of higher order for `p ∈ {1, ∞}` (Stein's extension
+  operator), and bounded linear extension operators for `W^1_p` with `p ∈ {1, ∞}` and for higher
+  order.
 * **Manifolds with corners**: a compact example (the cube with charts at its vertices), traces on
   the faces and products of models.
 * **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,

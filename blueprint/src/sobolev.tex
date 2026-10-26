@@ -1772,6 +1772,36 @@ For every finite set $J$, every $j \in J$ and every $k \in \N$:
 right is nonnegative. (3) By definition.
 \end{proof}
 
+\begin{lemma}[Sums and choices over words]
+\label{lem:sums-over-words}
+\lean{Rd.le_sum_range_sum_words, Rd.sum_range_sum_words_mono, Rd.sum_range_sum_words_sum_mul,
+  Rd.exists_forall_words_of_forall_le}
+\leanok
+For every finite set $J$ and every $m \in \N$:
+\begin{enumerate}
+  \item for all $a_{k,w} \in [0, \infty]$ ($k \in \N$, $w \in J^k$),
+    $a_{k,w} \leq \sum_{k' \leq m} \sum_{w' \in J^{k'}} a_{k',w'}$ for every $k \leq m$ and
+    every $w \in J^k$;
+  \item for all $a_{k,w} \in [0, \infty]$ ($k \in \N$, $w \in J^k$),
+    $\sum_{k' \leq k} \sum_{w' \in J^{k'}} a_{k',w'} \leq \sum_{k' \leq m}
+    \sum_{w' \in J^{k'}} a_{k',w'}$ for every $k \leq m$;
+  \item for every finite set $\kappa$ and all $\lambda_{l,k}, c_l \in [0, \infty]$
+    ($l \in \kappa$, $k \in \N$),
+    $\sum_{k \leq m} \sum_{w \in J^k} \sum_{l \in \kappa} \lambda_{l,k} c_l
+      = \sum_{l \in \kappa} \bigl(\sum_{k \leq m} \sum_{w \in J^k} \lambda_{l,k}\bigr) c_l$;
+  \item for every nonempty set $A$ and every property $P(k, w, a)$ of $k \in \N$, $w \in J^k$
+    and $a \in A$: if for every $k \leq m$ and every $w \in J^k$ some $a \in A$ satisfies
+    $P(k, w, a)$, then there is a family $(a_{k,w})_{k \in \N, w \in J^k}$ in $A$ with
+    $P(k, w, a_{k,w})$ for every $k \leq m$ and every $w \in J^k$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) and (2) The terms are nonnegative. (3) Exchange the sums. (4) Choose $a_{k,w}$ for $k \leq m$
+and any element of $A$ for $k > m$.
+\end{proof}
+
 \begin{theorem}[The Leibniz rule with a bound]
 \label{thm:leibniz-rule}
 \lean{Rd.exists_hasWeakLineDeriv_mul_zero, Rd.HasWeakLineDeriv.mul_snoc,

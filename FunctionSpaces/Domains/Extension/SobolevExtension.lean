@@ -31,7 +31,9 @@ the gradient. For `n = 0`, `F = f` or `F = 0` serves
   (`Rd.LocalMeansBump.conv_kernel_two_succ_eq`), and the strong type of the Calderón–Zygmund
   families `((K_i)_{2^j})_j` bounds the local means quasi-norm of Triebel–Lizorkin type on a set
   (`Rd.LocalMeansBump.tlLocalNormOn`) by `‖f‖_{L_p(T)} + ∑_i ‖g_i‖_{L_p(T)}`
-  (`Rd.LocalMeansBump.tlLocalNormOn_le_patchConst`).
+  (`Rd.LocalMeansBump.tlLocalNormOn_le_patchConst`). The step from a pointwise bound of the
+  local means by convolutions with Schwartz kernels to the quasi-norm holds for every kernel family
+  (`Rd.LocalMeansBump.tlLocalNormOn_le_of_pointwise`).
 * **One patch** (`Rd.LocalMeansBump.extendsSobolev`): the local extension
   `∑_j η_j ⋆ 1_W (k_j ⋆ 1_T f)` lies in `F^1_{p,2}(V) = W^1_p(V)`
   (`Rd.LocalMeansBump.triebelLizorkinNorm_localExtension_le`) and agrees with `f` on the patch;
@@ -261,6 +263,91 @@ theorem triebelLizorkinNorm_localExtension_le (hp1 : 1 < p) (hp : p ≠ ∞) {W 
     (b.tendsto_sum_localExtTerm_of_summable hp hW L
       (b.summable_localExtTerm_of_tlLocalNormOn hp hW L hs (zero_lt_one.trans hq1).ne' hf))
 
+/-! ### The Triebel–Lizorkin local means from a pointwise bound -/
+
+/-- **The local means from a pointwise bound, almost everywhere**: let `F = φ` almost
+everywhere, and let `2^{(j+1)s} |(k_{j+1} ⋆ φ)(x)| ≤ c ∑_i |((K_i)_{2^j} ⋆ h_i)(x)|` for the local
+means kernels `k_j` of order `L`, every `x ∈ W` and every level `j`, with Schwartz kernels `K_i`
+and functions `h_i`. Then almost everywhere
+`‖(2^{js} |1_W (k_j ⋆ F)(x)|)_j‖_{ℓ_2} ≤ |1_W (k_0 ⋆ F)(x)| +
+c ∑_i ‖(((K_i)_{2^j} ⋆ h_i)(x))_j‖_{ℓ_2}`. -/
+theorem ae_lqNorm_le_of_pointwise (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {W : Set V}
+    (hW : MeasurableSet W) {φ : V → ℂ} {ι : Type*} [Fintype ι] (K : ι → 𝓢(V, ℂ))
+    (h : ι → V → ℂ) (c : ℝ≥0∞)
+    (hpt : ∀ x ∈ W, ∀ j, dyadicWeight s (j + 1) * ‖conv (b.kernel L (j + 1)) φ volume x‖ₑ ≤
+      c * ∑ i, ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)
+    {F : Lp ℂ p (volume : Measure V)} (hF : (F : V → ℂ) =ᵐ[volume] φ) :
+    ∀ᵐ x ∂volume, lqNorm 2 (fun j => dyadicWeight s j *
+        ‖(indicatorLp hW (b.localMean hp L j F) : V → ℂ) x‖ₑ) ≤
+      ‖(indicatorLp hW (b.localMean hp L 0 F) : V → ℂ) x‖ₑ + c * ∑ i, lqNorm 2 (fun j =>
+        ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ) := by
+  have hae : ∀ᵐ x ∂volume, ∀ j, (indicatorLp hW (b.localMean hp L j F) : V → ℂ) x =
+      W.indicator (conv (b.kernel L j) φ volume) x := ae_all_iff.2 fun j => by
+    filter_upwards [indicatorLp_apply_ae hW (b.localMean hp L j F), b.localMean_ae_eq hp L j F]
+      with x h1 h2
+    rw [h1, ← conv_congr_ae hF]
+    by_cases hxW : x ∈ W
+    · rw [Set.indicator_of_mem hxW, Set.indicator_of_mem hxW, h2]
+    · rw [Set.indicator_of_notMem hxW, Set.indicator_of_notMem hxW]
+  filter_upwards [hae] with x hx
+  refine (ENNReal.lqNorm_le_head_add_shift one_le_two _).trans ?_
+  rw [ENNReal.dyadicWeight_zero_right, one_mul]
+  gcongr
+  calc lqNorm 2 (fun j => dyadicWeight s (j + 1) *
+        ‖(indicatorLp hW (b.localMean hp L (j + 1) F) : V → ℂ) x‖ₑ)
+      ≤ lqNorm 2 (fun j => c * ∑ i, ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ) :=
+        ENNReal.lqNorm_mono fun j => by
+          rw [hx (j + 1)]
+          by_cases hxW : x ∈ W
+          · rw [Set.indicator_of_mem hxW]
+            exact hpt x hxW j
+          · simp [Set.indicator_of_notMem hxW]
+    _ = c * lqNorm 2 (fun j => ∑ i, ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ) :=
+        ENNReal.lqNorm_const_mul _ _
+    _ ≤ _ := by
+        gcongr
+        exact ENNReal.lqNorm_sum_le one_le_two _ fun i j =>
+          ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ
+
+/-- **The local means of Triebel–Lizorkin type from a pointwise bound**: under the hypotheses of
+`Rd.LocalMeansBump.ae_lqNorm_le_of_pointwise`, with almost everywhere strongly measurable `h_i`,
+`‖ x ↦ ‖(2^{js} |1_W (k_j ⋆ F)(x)|)_j‖_{ℓ_2} ‖_p ≤ ‖m_L‖_1 ‖F‖_p +
+c ∑_i ‖ x ↦ ‖(((K_i)_{2^j} ⋆ h_i)(x))_j‖_{ℓ_2} ‖_p`, with the moment kernel `m_L` of order `L`. -/
+theorem tlLocalNormOn_le_of_pointwise (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {W : Set V}
+    (hW : MeasurableSet W) {φ : V → ℂ} {ι : Type*} [Fintype ι] (K : ι → 𝓢(V, ℂ))
+    (h : ι → V → ℂ) (hh : ∀ i, AEStronglyMeasurable (h i) volume) (c : ℝ≥0∞)
+    (hpt : ∀ x ∈ W, ∀ j, dyadicWeight s (j + 1) * ‖conv (b.kernel L (j + 1)) φ volume x‖ₑ ≤
+      c * ∑ i, ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)
+    {F : Lp ℂ p (volume : Measure V)} (hF : (F : V → ℂ) =ᵐ[volume] φ) :
+    b.tlLocalNormOn hp hW L s 2 F ≤ eLpNorm (momentKernel b.toFun L) 1 volume * ‖F‖ₑ +
+      c * ∑ i, eLpNorm (fun x => lqNorm 2 (fun j =>
+        ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)) p volume := by
+  have hΛ : ∀ i, AEMeasurable (fun x => lqNorm 2 (fun j =>
+      ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)) volume := fun i =>
+    aemeasurable_lqNorm_comp (fun j => (aestronglyMeasurable_conv
+      (continuous_dilate (K i).continuous _).aestronglyMeasurable (hh i)).enorm) 2
+  have h1 : b.tlLocalNormOn hp hW L s 2 F ≤
+      eLpNorm (fun x => ‖(indicatorLp hW (b.localMean hp L 0 F) : V → ℂ) x‖ₑ) p volume +
+        eLpNorm (fun x => c * ∑ i, lqNorm 2 (fun j =>
+          ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)) p volume := by
+    refine (eLpNorm_mono_enorm_ae
+      (aemeasurable_lqNorm_comp (fun j => ((Lp.aestronglyMeasurable _).enorm.const_mul _))
+        2).aestronglyMeasurable ?_).trans (eLpNorm_add_le Fact.out)
+    filter_upwards [b.ae_lqNorm_le_of_pointwise hp L s hW K h c hpt hF] with x hx
+    simpa only [enorm_eq_self, Pi.add_apply] using hx
+  have h2 : eLpNorm (fun x => c * ∑ i, lqNorm 2 (fun j =>
+      ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)) p volume ≤
+      c * ∑ i, eLpNorm (fun x => lqNorm 2 (fun j =>
+        ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)) p volume := by
+    rw [eLpNorm_const_mul_ennreal _ (Finset.aemeasurable_fun_sum _ fun i _ => hΛ i)]
+    gcongr
+    simpa only [Finset.sum_fn] using eLpNorm_sum_le (p := p) (μ := volume) Fact.out
+  have h3 : eLpNorm (fun x => ‖(indicatorLp hW (b.localMean hp L 0 F) : V → ℂ) x‖ₑ) p volume ≤
+      eLpNorm (momentKernel b.toFun L) 1 volume * ‖F‖ₑ := by
+    rw [eLpNorm_enorm _ (Lp.aestronglyMeasurable _), ← Lp.enorm_def]
+    exact b.enorm_indicatorLp_localMean_zero_le hp hW L F
+  exact h1.trans (add_le_add h3 h2)
+
 /-! ### The Triebel–Lizorkin local means of order two by the gradient -/
 
 /-- **One local mean by the gradient**: under the hypotheses of
@@ -286,7 +373,7 @@ theorem dyadicWeight_mul_enorm_conv_kernel_le {T : Opens V} {f : V → ℂ}
 /-- **The local means of order two by the gradient, pointwise**: if `x - y ∈ T` for `x ∈ W`, every
 level `j` and every `y` in the support of `(K_i)_{2^j}`, and `F = 1_T f` in `L_p`, then almost
 everywhere `‖(2^j |1_W (k_j ⋆ F)(x)|)_j‖_{ℓ_2} ≤ |1_W (k_0 ⋆ F)(x)| +
-2 ∑_i ‖(((K_i)_{2^j} ⋆ 1_T g_i)(x))_j‖_{ℓ_2}`. -/
+2 ∑_i ‖(((K_i)_{2^j} ⋆ 1_T g_i)(x))_j‖_{ℓ_2}` (`Rd.LocalMeansBump.ae_lqNorm_le_of_pointwise`). -/
 theorem ae_lqNorm_le_of_hasWeakLineDeriv (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W)
     {T : Opens V} {f : V → ℂ} {g : Fin (finrank ℝ V) → V → ℂ}
     (hf : MemLp f p (volume.restrict T))
@@ -297,35 +384,9 @@ theorem ae_lqNorm_le_of_hasWeakLineDeriv (hp : p ≠ ∞) {W : Set V} (hW : Meas
         ‖(indicatorLp hW (b.localMean hp 2 j F) : V → ℂ) x‖ₑ) ≤
       ‖(indicatorLp hW (b.localMean hp 2 0 F) : V → ℂ) x‖ₑ + 2 * ∑ i, lqNorm 2 (fun j =>
         ‖conv (dilate (2 ^ j) (b.divKernel i : V → ℂ)) ((T : Set V).indicator (g i)) volume
-          x‖ₑ) := by
-  have hae : ∀ᵐ x ∂volume, ∀ j, (indicatorLp hW (b.localMean hp 2 j F) : V → ℂ) x =
-      W.indicator (conv (b.kernel 2 j) ((T : Set V).indicator f) volume) x :=
-      ae_all_iff.2 fun j => by
-    filter_upwards [indicatorLp_apply_ae hW (b.localMean hp 2 j F), b.localMean_ae_eq hp 2 j F]
-      with x h1 h2
-    rw [h1, ← conv_congr_ae hF]
-    by_cases hxW : x ∈ W
-    · rw [Set.indicator_of_mem hxW, Set.indicator_of_mem hxW, h2]
-    · rw [Set.indicator_of_notMem hxW, Set.indicator_of_notMem hxW]
-  filter_upwards [hae] with x hx
-  refine (ENNReal.lqNorm_le_head_add_shift one_le_two _).trans ?_
-  rw [ENNReal.dyadicWeight_zero_right, one_mul]
-  gcongr
-  calc lqNorm 2 (fun j => dyadicWeight 1 (j + 1) *
-        ‖(indicatorLp hW (b.localMean hp 2 (j + 1) F) : V → ℂ) x‖ₑ)
-      ≤ lqNorm 2 (fun j => 2 * ∑ i, ‖conv (dilate (2 ^ j) (b.divKernel i : V → ℂ))
-          ((T : Set V).indicator (g i)) volume x‖ₑ) := ENNReal.lqNorm_mono fun j => by
-        rw [hx (j + 1)]
-        by_cases hxW : x ∈ W
-        · rw [Set.indicator_of_mem hxW]
-          exact b.dyadicWeight_mul_enorm_conv_kernel_le hf hfg j (hsupp x hxW j)
-        · simp [Set.indicator_of_notMem hxW]
-    _ = 2 * lqNorm 2 (fun j => ∑ i, ‖conv (dilate (2 ^ j) (b.divKernel i : V → ℂ))
-          ((T : Set V).indicator (g i)) volume x‖ₑ) := ENNReal.lqNorm_const_mul _ _
-    _ ≤ _ := by
-        gcongr
-        exact ENNReal.lqNorm_sum_le one_le_two _ fun i j =>
-          ‖conv (dilate (2 ^ j) (b.divKernel i : V → ℂ)) ((T : Set V).indicator (g i)) volume x‖ₑ
+          x‖ₑ) :=
+  b.ae_lqNorm_le_of_pointwise hp 2 1 hW b.divKernel (fun i => (T : Set V).indicator (g i)) 2
+    (fun x hx j => b.dyadicWeight_mul_enorm_conv_kernel_le hf hfg j (hsupp x hx j)) hF
 
 omit [Fact (1 ≤ p)] in
 /-- The square functions of the divergence kernels: for `1 < p < ∞`,
@@ -346,7 +407,7 @@ theorem eLpNorm_lqNorm_conv_divKernel_le [Nontrivial V] (hp1 : 1 < p) (hp : p �
 an open set `T` with `f, g_i ∈ L_p(T)`, `1 < p < ∞`, let `x - y ∈ T` for every `x ∈ W`, every level
 `j` and every `y` in the support of `(K_i)_{2^j}`, and let `F = 1_T f` in `L_p`. Then
 `‖ x ↦ ‖(2^j |1_W (k_j ⋆ F)(x)|)_j‖_{ℓ_2} ‖_p ≤ ‖m‖_1 ‖f‖_{L_p(T)} +
-2 ∑_i C_p(K_i) ‖g_i‖_{L_p(T)}`. -/
+2 ∑_i C_p(K_i) ‖g_i‖_{L_p(T)}` (`Rd.LocalMeansBump.tlLocalNormOn_le_of_pointwise`). -/
 theorem tlLocalNormOn_le_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     {W : Set V} (hW : MeasurableSet W) {T : Opens V} {f : V → ℂ}
     {g : Fin (finrank ℝ V) → V → ℂ} (hf : MemLp f p (volume.restrict T))
@@ -359,34 +420,13 @@ theorem tlLocalNormOn_le_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) (hp : 
         (4 * familyHormanderConst V fun k l => SchwartzMap.seminorm ℝ k l (b.divKernel i)) *
         eLpNorm (g i) p (volume.restrict T) := by
   have hT := T.isOpen.measurableSet
-  have hΛ : ∀ i, AEMeasurable (fun x => lqNorm 2 (fun j =>
-      ‖conv (dilate (2 ^ j) (b.divKernel i : V → ℂ)) ((T : Set V).indicator (g i)) volume x‖ₑ))
-      volume := fun i => aemeasurable_lqNorm_comp (fun j =>
-    (aestronglyMeasurable_conv (continuous_dilate (b.divKernel i).continuous _).aestronglyMeasurable
-      ((memLp_indicator_iff_restrict hT).2 (hg i)).aestronglyMeasurable).enorm) 2
   have hFn : ‖F‖ₑ = eLpNorm f p (volume.restrict T) := by
     rw [Lp.enorm_def, eLpNorm_congr_ae hF, eLpNorm_indicator_eq_eLpNorm_restrict hT]
-  have h1 : b.tlLocalNormOn hp hW 2 1 2 F ≤
-      eLpNorm (fun x => ‖(indicatorLp hW (b.localMean hp 2 0 F) : V → ℂ) x‖ₑ) p volume +
-        eLpNorm (fun x => 2 * ∑ i, lqNorm 2 (fun j => ‖conv (dilate (2 ^ j)
-          (b.divKernel i : V → ℂ)) ((T : Set V).indicator (g i)) volume x‖ₑ)) p volume := by
-    refine (eLpNorm_mono_enorm_ae
-      (aemeasurable_lqNorm_comp (fun j => ((Lp.aestronglyMeasurable _).enorm.const_mul _))
-        2).aestronglyMeasurable ?_).trans (eLpNorm_add_le Fact.out)
-    filter_upwards [b.ae_lqNorm_le_of_hasWeakLineDeriv hp hW hf hfg hsupp hF] with x hx
-    simpa only [enorm_eq_self, Pi.add_apply] using hx
-  have h2 : eLpNorm (fun x => 2 * ∑ i, lqNorm 2 (fun j => ‖conv (dilate (2 ^ j)
-      (b.divKernel i : V → ℂ)) ((T : Set V).indicator (g i)) volume x‖ₑ)) p volume ≤
-      2 * ∑ i, eLpNorm (fun x => lqNorm 2 (fun j => ‖conv (dilate (2 ^ j)
-        (b.divKernel i : V → ℂ)) ((T : Set V).indicator (g i)) volume x‖ₑ)) p volume := by
-    rw [eLpNorm_const_mul_ennreal _ (Finset.aemeasurable_fun_sum _ fun i _ => hΛ i)]
-    gcongr
-    simpa only [Finset.sum_fn] using eLpNorm_sum_le (p := p) (μ := volume) Fact.out
-  have h3 : eLpNorm (fun x => ‖(indicatorLp hW (b.localMean hp 2 0 F) : V → ℂ) x‖ₑ) p volume ≤
-      eLpNorm (momentKernel b.toFun 2) 1 volume * eLpNorm f p (volume.restrict T) := by
-    rw [eLpNorm_enorm _ (Lp.aestronglyMeasurable _), ← Lp.enorm_def, ← hFn]
-    exact b.enorm_indicatorLp_localMean_zero_le hp hW 2 F
-  refine h1.trans (add_le_add h3 (h2.trans ?_))
+  refine (b.tlLocalNormOn_le_of_pointwise hp 2 1 hW b.divKernel
+    (fun i => (T : Set V).indicator (g i))
+    (fun i => ((memLp_indicator_iff_restrict hT).2 (hg i)).aestronglyMeasurable) 2
+    (fun x hx j => b.dyadicWeight_mul_enorm_conv_kernel_le hf hfg j (hsupp x hx j)) hF).trans ?_
+  rw [hFn]
   gcongr with i
   exact b.eLpNorm_lqNorm_conv_divKernel_le hp1 hp (hg i) i
 
@@ -493,17 +533,17 @@ theorem memTriebelLizorkin_localExtension_of_tlLocalNormOn [Fact (1 ≤ p)] (hp1
       (b.tlUpperConst_ne_top 2 hp1 hp ENNReal.one_lt_two one_pos).lt_top hXf)
 
 /-- **The local extension agrees with `f` on `U`**: if `F = 1_T f` almost everywhere, `U ⊆ T`, the
-dual kernels at points of `U` only see `W` and the series of the local extension converges, then
-`∑_j η_j ⋆ 1_W (k_j ⋆ F) = f` almost everywhere on `U`
+dual kernels of order `L ≥ 1` at points of `U` only see `W` and the series of the local extension
+converges, then `∑_j η_j ⋆ 1_W (k_j ⋆ F) = f` almost everywhere on `U`
 (`Rd.LocalMeansBump.indicatorLp_localExtension_of_summable`). -/
-theorem ae_localExtension_eq_of_ae_eq_indicator [Fact (1 ≤ p)] (hp : p ≠ ∞) {U W T : Set V}
-    (hU : MeasurableSet U) (hW : MeasurableSet W) (hUT : U ⊆ T)
-    (hUW : ∀ x ∈ U, ∀ j y, b.dual 2 j y ≠ 0 → x - y ∈ W) {F : Lp ℂ p (volume : Measure V)}
+theorem ae_localExtension_eq_of_ae_eq_indicator [Fact (1 ≤ p)] (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L)
+    {U W T : Set V} (hU : MeasurableSet U) (hW : MeasurableSet W) (hUT : U ⊆ T)
+    (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W) {F : Lp ℂ p (volume : Measure V)}
     {f : V → ℂ} (hF : (F : V → ℂ) =ᵐ[volume] T.indicator f)
-    (hsum : Summable fun j => b.localExtTerm hp hW 2 j F) :
-    ∀ᵐ x ∂volume, x ∈ U → b.localExtension hp hW 2 F x = f x := by
-  have heq := b.indicatorLp_localExtension_of_summable hp one_le_two hU hW hUW hsum
-  filter_upwards [Lp.ext_iff.1 heq, indicatorLp_apply_ae hU (b.localExtension hp hW 2 F),
+    (hsum : Summable fun j => b.localExtTerm hp hW L j F) :
+    ∀ᵐ x ∂volume, x ∈ U → b.localExtension hp hW L F x = f x := by
+  have heq := b.indicatorLp_localExtension_of_summable hp hL hU hW hUW hsum
+  filter_upwards [Lp.ext_iff.1 heq, indicatorLp_apply_ae hU (b.localExtension hp hW L F),
     indicatorLp_apply_ae hU F, hF] with x h1 h2 h3 h4 hxU
   rw [h2, h3, Set.indicator_of_mem hxU, Set.indicator_of_mem hxU] at h1
   rw [h1, h4, Set.indicator_of_mem (hUT hxU)]
@@ -568,7 +608,7 @@ theorem extendsSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {U W : Set 
   choose G hG using fun i => (exists_hasWeakLineDeriv_of_memTriebelLizorkin hp1 hp
     (fun _ : Fin 1 => gridBasis V i) hmem).imp fun _ h => h.1
   exact ⟨_, memSobolev_of_memTriebelLizorkin hp1 hp hmem,
-    b.ae_localExtension_eq_of_ae_eq_indicator hp hU hW hUT hUW hf₀.coeFn_toLp
+    b.ae_localExtension_eq_of_ae_eq_indicator hp one_le_two hU hW hUT hUW hf₀.coeFn_toLp
       (b.summable_localExtTerm_of_tlLocalNormOn hp hW 2 one_pos two_ne_zero hXf),
     G, hG, b.enorm_localExtension_add_le_extensionConst hp1 hp hW hX hXf hG⟩
 
@@ -764,12 +804,13 @@ end LipschitzGraph
 
 /-! ### Dimension zero -/
 
-/-- **Extension in dimension `0`**: if `V` is a single point, every `f ∈ W^1_p(O)` on an open set
-`O` agrees almost everywhere on `O` with some `F ∈ W^1_p(V)`. Here `O` is empty, and `F = 0`
-serves, or `O = V`, and `F = f` serves (Mathlib's `Subsingleton.eq_univ_of_nonempty`). -/
+/-- **Extension in dimension `0`**: if `V` is a single point, every `f ∈ W^m_p(O)` on an open set
+`O`, of every order `m`, agrees almost everywhere on `O` with some `F ∈ W^m_p(V)`. Here `O` is
+empty, and `F = 0` serves, or `O = V`, and `F = f` serves (Mathlib's
+`Subsingleton.eq_univ_of_nonempty`). -/
 theorem exists_memSobolev_of_memWeakSobolev_of_subsingleton [Subsingleton V] {O : Opens V}
-    {f : V → ℂ} (hf : MemWeakSobolev O 1 p f) :
-    ∃ F : Lp ℂ p (volume : Measure V), MemSobolev 1 F ∧ (F : V → ℂ) =ᵐ[volume.restrict O] f := by
+    {m : ℕ} {f : V → ℂ} (hf : MemWeakSobolev O m p f) :
+    ∃ F : Lp ℂ p (volume : Measure V), MemSobolev m F ∧ (F : V → ℂ) =ᵐ[volume.restrict O] f := by
   rcases (O : Set V).eq_empty_or_nonempty with h | h
   · refine ⟨0, zero_memSobolev, ?_⟩
     rw [h, Measure.restrict_empty, ae_zero]

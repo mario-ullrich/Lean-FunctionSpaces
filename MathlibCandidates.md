@@ -609,3 +609,17 @@ declarations.
   (`Real.smoothTransition.deriv_eq_zero_of_one_lt`, `Real.smoothTransition.deriv_eq_zero_of_neg`,
   `Real.smoothTransition.exists_abs_deriv_le`), and a function integrable on every ball around a
   point is locally integrable (`MeasureTheory.locallyIntegrable_of_forall_integrableOn_ball`).
+* **The Leibniz rule for weak derivatives**
+  (`FunctionSpaces/Rd/Sobolev/WeakDerivativeLeibniz.lean`): derivatives of every order of `χ f`
+  for a smooth compactly supported `χ`, with the bound `C_k(χ) = 2^k sup_x ∑_{j ≤ k} ‖D^j χ(x)‖`
+  (`Rd.exists_hasWeakLineDeriv_mul_of_tsupport_subset`), a candidate together with TauCeti's
+  `Wkp.exists_value_ae_eq_mul_of_contDiffOn`.
+* **Weighted dilation averages** (`FunctionSpaces/Domains/Extension/HigherDivergenceKernels.lean`):
+  `∫_a^b w(s) G_{e^s} ds` is smooth with integral `(∫_a^b w) ∫ G` (`Rd.weightedDilation`,
+  `Rd.contDiff_weightedDilation`, `Rd.integral_weightedDilation`).
+* **Weighted dilation averages as divergences** (same file): `A_w G = ∑_i ∂_{e_i} A_W(⟪e_i, ·⟫ G)`
+  for `∫_a^b w = 0` with the anti-weight `W` (`Rd.weightedDilation_eq_sum_fderiv`,
+  `Rd.antiWeight`).
+* **Weighted dilation averages as derivatives of order `m`** (same file): `A_w G = ∑_i ∂^{e_i} K_i`
+  for weights with `m` vanishing moments (`Rd.weightedDilation_eq_sum_iteratedLineDeriv`,
+  `Rd.higherDivKernel`), the kernels of Calderón's and Rychkov's extension.
