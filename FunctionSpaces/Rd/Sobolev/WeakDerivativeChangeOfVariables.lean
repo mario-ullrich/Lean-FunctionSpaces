@@ -31,13 +31,16 @@ measure-preserving map between measure spaces.
   `∂_v f = ∑_i ⟪v, e_i⟫ g_i` for every `v`, and `W^1_p(V)` needs only the basis directions
   (`Rd.memSobolev_one_of_forall_gridBasis`).
 * **Cutoffs** (`Rd.HasWeakLineDeriv.mul_of_tsupport_subset`,
-  `Rd.eLpNorm_mul_add_fderiv_mul_le`): if `g = ∂_w f` on `O ∩ B` and the smooth `χ` has closed
-  support in `B`, then `χ g + (∂_w χ) f = ∂_w (χ f)` on `O`, with the `L_p` bound.
+  `Rd.eLpNorm_mul_add_fderiv_mul_le`, `Rd.eLpNorm_mul_le_of_tsupport_subset`): if `g = ∂_w f` on
+  `O ∩ B` and the smooth `χ` has closed support in `B`, then `χ g + (∂_w χ) f = ∂_w (χ f)` on `O`,
+  with the `L_p` bounds; smooth cutoffs equal to `1` near a compact set exist
+  (`Rd.exists_contDiff_eventuallyEq_one`), with bounded derivatives
+  (`Rd.exists_norm_fderiv_gridBasis_le`).
 * **Mollification on open sets** (`Rd.fderiv_conv_apply_eq_conv`,
   `Rd.exists_tendsto_contDiff_of_hasWeakLineDeriv`): mollification commutes with weak
   derivatives, and for every compact `K ⊆ O` smooth compactly supported `u_k` converge to `f`
   in `L_1(K)` with `∂_{w_i} u_k → ∂_{w_i} f` in `L_1(K)`, through a smooth cutoff equal to `1`
-  near `K` (`Rd.exists_contDiff_eventuallyEq_one`).
+  near `K`.
 * **The chain rule** (`Rd.HasWeakLineDeriv.comp_lipschitzWith`; local to global:
   `Rd.hasWeakLineDeriv_of_forall_isCompact`): for a Lipschitz map `Φ` that preserves Lebesgue
   measure and maps `U` into `O`, the derivatives `g_i = ∂_{e_i} f` on `O` give
@@ -424,6 +427,16 @@ theorem HasWeakLineDeriv.mul_of_tsupport_subset {w : V} {f g : V → ℂ}
   simp only [pow_one, neg_one_smul]
   abel
 
+/-- **Restriction to the support**: if `h` vanishes outside the open set `B`, then its `L_p` norm
+on `O` is its `L_p` norm on `O ∩ B`, for every `0 ≤ p ≤ ∞` (Mathlib's
+`eLpNorm_indicator_eq_eLpNorm_restrict`). -/
+theorem eLpNorm_restrict_eq_inf_of_support_subset {E : Type*} [NormedAddCommGroup E] {h : V → E}
+    (hB : Function.support h ⊆ B) (p : ℝ≥0∞) :
+    eLpNorm h p (volume.restrict O) = eLpNorm h p (volume.restrict (O ⊓ B : Opens V)) := by
+  conv_lhs => rw [← indicator_eq_self.2 hB]
+  rw [eLpNorm_indicator_eq_eLpNorm_restrict B.isOpen.measurableSet,
+    Measure.restrict_restrict B.isOpen.measurableSet, Opens.coe_inf, inter_comm]
+
 /-- **The `L_p` bound for a cutoff derivative**: if `χ` has closed support in `B`, `|χ| ≤ C` and
 `|∂_w χ| ≤ C'`, then `‖χ g + (∂_w χ) f‖_{L_p(O)} ≤ C ‖g‖_{L_p(O ∩ B)} + C' ‖f‖_{L_p(O ∩ B)}` for
 all `f`, `g` and `1 ≤ p`: the function vanishes outside `B`, and each term is bounded by
@@ -444,18 +457,28 @@ theorem eLpNorm_mul_add_fderiv_mul_le {p : ℝ≥0∞} (hp : 1 ≤ p) {w : V} {f
     by_contra hxB
     have h0 : χ =ᶠ[𝓝 x] 0 := notMem_tsupport_iff_eventuallyEq.1 fun h => hxB (hχB h)
     exact hx (by simp [h0.eq_of_nhds, h0.fderiv_eq])
-  have hres : eLpNorm (fun x => (χ x : ℂ) * g x + (fderiv ℝ χ x w : ℂ) * f x) p
-      (volume.restrict O) = eLpNorm (fun x => (χ x : ℂ) * g x + (fderiv ℝ χ x w : ℂ) * f x) p
-        (volume.restrict (O ⊓ B : Opens V)) := by
-    conv_lhs => rw [← indicator_eq_self.2 hsupp]
-    rw [eLpNorm_indicator_eq_eLpNorm_restrict B.isOpen.measurableSet,
-      Measure.restrict_restrict B.isOpen.measurableSet, Opens.coe_inf, inter_comm]
-  rw [hres]
+  rw [eLpNorm_restrict_eq_inf_of_support_subset hsupp]
   exact (eLpNorm_add_le hp).trans (add_le_add
     (eLpNorm_mul_le_of_forall_norm_le hc.aestronglyMeasurable
       (fun x => by rw [Complex.norm_real]; exact hC x) p)
     (eLpNorm_mul_le_of_forall_norm_le hc'.aestronglyMeasurable
       (fun x => by rw [Complex.norm_real]; exact hC' x) p))
+
+/-- **Cutoffs in `L_p`**: if `χ` is continuous with closed support in `B` and `|χ| ≤ C`, then
+`‖χ f‖_{L_p(O)} ≤ C ‖f‖_{L_p(O ∩ B)}` for every `f` and every `0 ≤ p ≤ ∞`: the product vanishes
+outside `B` (`Rd.eLpNorm_restrict_eq_inf_of_support_subset`), and
+`MeasureTheory.eLpNorm_mul_le_of_forall_norm_le` bounds it. -/
+theorem eLpNorm_mul_le_of_tsupport_subset {p : ℝ≥0∞} {f : V → ℂ} {χ : V → ℝ}
+    (hχ : Continuous χ) (hχB : tsupport χ ⊆ B) {C : ℝ≥0} (hC : ∀ x, ‖χ x‖ ≤ C) :
+    eLpNorm (fun x => (χ x : ℂ) * f x) p (volume.restrict O) ≤
+      C * eLpNorm f p (volume.restrict (O ⊓ B : Opens V)) := by
+  have hsupp : (Function.support fun x => (χ x : ℂ) * f x) ⊆ B := fun x hx =>
+    hχB (subset_tsupport _ (Function.mem_support.2
+      (Complex.ofReal_ne_zero.1 (left_ne_zero_of_mul (Function.mem_support.1 hx)))))
+  rw [eLpNorm_restrict_eq_inf_of_support_subset hsupp]
+  have hc : Continuous fun x => (χ x : ℂ) := Complex.continuous_ofReal.comp hχ
+  exact eLpNorm_mul_le_of_forall_norm_le hc.aestronglyMeasurable
+    (fun x => by rw [Complex.norm_real]; exact hC x) p
 
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- **Smooth cutoffs**: for a compact `K` inside an open set `U` there is a smooth
@@ -477,6 +500,24 @@ theorem exists_contDiff_eventuallyEq_one {K U : Set V} (hK : IsCompact K) (hU : 
     exact hWU
   · exact eventually_of_mem (isOpen_interior.mem_nhdsSet.2 hKL) fun x hx =>
       (h1 x).1 (interior_subset hx)
+
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- **Bounded derivatives of a cutoff**: a smooth `χ` with compact support has
+`|∂_{e_i} χ| ≤ d_i` for constants `d_i ≥ 0` (Mathlib's
+`Continuous.bounded_above_of_compact_support`). -/
+theorem exists_norm_fderiv_gridBasis_le {χ : V → ℝ} (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ)
+    (hχc : HasCompactSupport χ) :
+    ∃ d : Fin (finrank ℝ V) → ℝ≥0, ∀ i x, ‖fderiv ℝ χ x (gridBasis V i)‖ ≤ d i := by
+  choose d hd using fun i => ((hχ.continuous_fderiv (by simp)).clm_apply
+    continuous_const).bounded_above_of_compact_support (hχc.fderiv_apply (𝕜 := ℝ) (gridBasis V i))
+  exact ⟨fun i => (d i).toNNReal, fun i x => (hd i x).trans (Real.le_coe_toNNReal _)⟩
+
+/-- A real function with values in `[0, 1]`, such as the cutoffs of
+`Rd.exists_contDiff_eventuallyEq_one`, has norm at most `1`. -/
+theorem norm_le_one_of_forall_mem_Icc {α : Type*} {χ : α → ℝ} (h : ∀ x, χ x ∈ Icc (0 : ℝ) 1)
+    (x : α) : ‖χ x‖ ≤ 1 := by
+  rw [Real.norm_eq_abs, abs_of_nonneg (h x).1]
+  exact (h x).2
 
 end Cutoff
 

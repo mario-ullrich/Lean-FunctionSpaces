@@ -604,3 +604,8 @@ declarations.
   `locallyIntegrable_finsetSum'`), and `‖c u‖_{L_p} ≤ C ‖u‖_{L_p}` for a measurable `|c| ≤ C`
   and every `u` (`MeasureTheory.eLpNorm_mul_le_of_forall_norm_le`, next to
   `eLpNorm_le_mul_eLpNorm_of_ae_le_mul'`).
+* **The smooth step and balls** (`FunctionSpaces/Domains/Extension/HalfSpaceReflection.lean`): the
+  derivative of `Real.smoothTransition` vanishes outside `[0, 1]` and is bounded
+  (`Real.smoothTransition.deriv_eq_zero_of_one_lt`, `Real.smoothTransition.deriv_eq_zero_of_neg`,
+  `Real.smoothTransition.exists_abs_deriv_le`), and a function integrable on every ball around a
+  point is locally integrable (`MeasureTheory.locallyIntegrable_of_forall_integrableOn_ball`).

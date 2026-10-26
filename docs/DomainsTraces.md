@@ -35,7 +35,9 @@ normals. On a bounded Lipschitz domain, every function of `W^1_p(Ω)`, `1 < p < 
 restriction of a function of `W^1_p(ℝ^d)` under a bounded linear extension operator, built from
 Rychkov's local extension with the local means of the gradient: the local means kernels of order two
 are divergences of dilated kernels with mean zero, which form Calderón–Zygmund families. For `p = 2`
-this identifies `H^1(Ω)` with `W^1_2(Ω)`. On a Lipschitz graph domain, the Gauss–Green theorem
+this identifies `H^1(Ω)` with `W^1_2(Ω)`. For every `1 ≤ p ≤ ∞` every function of `W^1_p(Ω)` is
+the restriction of a function of `W^1_p(ℝ^d)` with a bound, by reflection across the boundary in
+the flattened coordinates of the graph domains. On a Lipschitz graph domain, the Gauss–Green theorem
 `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` holds for compactly supported `C^1` functions, and Green's formula
 `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)`, by the density of the
 compactly supported Schwartz functions in every `H^s(ℝ^d)`. On a bounded Lipschitz domain, Green's
@@ -470,7 +472,27 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   The constants are existential. The extension is a bounded linear operator
   `E : W^1_p(Ω) → W^1_p(V)` on value–derivative jets with `E u = u` on `Ω`
   (`Rd.BoundedLipschitzDomain.sobolevExtensionL`, `Rd.BoundedLipschitzDomain.exists_extensionL`);
-  it is of first order, and the exponents `p ∈ {1, ∞}` are not formalised.
+  it is of first order.
+* **The extension theorem for `1 ≤ p ≤ ∞` by reflection.** For a bounded Lipschitz domain `Ω` in
+  `V` of dimension `n ≥ 1` and every `1 ≤ p ≤ ∞` there is a finite `C` such that every
+  `f ∈ L_p(Ω)` with weak derivatives `g_i = ∂_{e_i} f ∈ L_p(Ω)` on `Ω` agrees almost everywhere on
+  `Ω` with some `F ∈ W^1_p(V)` whose weak derivatives `G_i = ∂_{e_i} F` satisfy
+  `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`
+  (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le`); hence `f ∈ W^1_p(Ω)` iff `f`
+  agrees on `Ω` with some `F ∈ W^1_p(V)`, in every dimension
+  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`). On a Lipschitz
+  graph domain `Ω = {x : φ(x) < ⟪x, e⟫}` with `M`-Lipschitz `φ`, the flattening
+  `F(x) = x - φ(x) e` and its inverse are `(1 + M)`-Lipschitz and preserve Lebesgue measure
+  (`Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz`,
+  `Rd.LipschitzGraph.measurePreserving_unflatten`), and the even reflection of `f ∘ F⁻¹` across
+  `e^⊥`, composed with `F` (`Rd.LipschitzGraph.reflectionExtension`), is `f` on `Ω`, is weakly
+  differentiable on `V` (`Rd.LipschitzGraph.hasWeakLineDeriv_reflectionExtension`) and satisfies
+  `‖E f‖_p ≤ 2 ‖f‖_{L_p(Ω)}` and `‖∂_v E f‖_p ≤ 2 (1 + M)² ‖v‖ ∑_i ‖g_i‖_{L_p(Ω)}`
+  (`Rd.LipschitzGraph.eLpNorm_reflectionExtension_le`,
+  `Rd.LipschitzGraph.eLpNorm_reflectionDeriv_le`). On the half-space the even reflection is
+  weakly differentiable by integration by parts with cutoffs near the hyperplane
+  (`Rd.hasWeakLineDeriv_evenReflection`). The boundary patches of `Ω` extend by a cutoff and the
+  reflection, the inner patch by a cutoff, and `Rd.extendsSobolev_of_cover` pastes them.
 * **Gauss–Green on Lipschitz graph domains.** Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph
   domain with the graph map `γ(x') = x' + φ(x') e` over the hyperplane `H = e^⊥`, the gradient
   `∇φ` of `φ|_H`, the outward unit normal `ν` and `n = dim V`, and let
@@ -565,7 +587,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Smooth measures on manifolds, integrals in charts | ✅ | ✗ | `Domains/Manifolds/SmoothMeasure` |
 | Besov atlases, chart pieces, changes of charts with cut-offs | ✅ | ✗ | `Domains/Manifolds/BesovAtlas` |
 | Besov spaces on compact manifolds, independence of the atlas and of the order | ✅ | ✗ | `Domains/Manifolds/Besov` |
-| Flattening of graph domains, the Lipschitz inverse and the graph in the image of the hyperplane, preservation of the Lebesgue measure | ✅ | ✗ | `Domains/Lipschitz/GraphStraightening` |
+| Flattening of graph domains, the Lipschitz bounds of the flattening and its inverse, the graph in the image of the hyperplane, preservation of the Lebesgue measure | ✅ | ✗ | `Domains/Lipschitz/GraphStraightening` |
 | Smooth bounded domains as compact manifolds with boundary, Lebesgue measure as smooth measure | ✅ | ✗ | `Domains/Manifolds/SmoothDomain` |
 | Besov spaces of smooth domains by charts equal the intrinsic Besov spaces | ✅ | ✗ | `Domains/Manifolds/SmoothDomainBesov` |
 | Besov spaces on the boundary of a compact manifold, independence of the atlas | ✅ | ✗ | `Domains/Manifolds/BoundaryBesov` |
@@ -581,6 +603,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Smoothness of parametric integrals, the dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, their supports and mean zero, and the Calderón–Zygmund families of the dilates of mean-zero Schwartz functions | ✅ | ✗ | `Domains/Extension/DivergenceKernels` |
 | The local means of order two by the gradient, local means of Triebel–Lizorkin type on a set, bounded extensions from one patch, pasting in `W^1_p(ℝ^d)`, the extension theorem (`W^1_p(Ω)` is the space of restrictions of `W^1_p(ℝ^d)`) for `1 < p < ∞` with a bound, and for `p = 2` `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the quotient norm of `H^1(Ω)` and the boundary traces of `W^1_2(Ω)` | ✅ | ✗ | `Domains/Extension/SobolevExtension` |
 | The extension operator for `W^1_p`, `1 < p < ∞`, on value–derivative jets, `E u = u` on `Ω` | ✅ | ✗ | `Domains/Extension/SobolevExtensionOperator` |
+| The half-space and the reflection across a hyperplane, cutoffs near the hyperplane, integration by parts on the half-space, the weak derivatives and `L_p` bounds of the even reflection | ✅ | ✗ | `Domains/Extension/HalfSpaceReflection` |
+| The flattening of a Lipschitz graph domain as a measure-preserving map, the extension by reflection across the graph with its weak derivatives and `L_p` bounds, cutoffs from a bounded Lipschitz domain to its graph domains, and the extension theorem for `W^1_p` on bounded Lipschitz domains for `1 ≤ p ≤ ∞` with a bound | ✅ | ✗ | `Domains/Extension/ReflectionExtension` |
 | Gauss–Green on Lipschitz graph domains: product coordinates and Fubini, ray integrals, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and surface form, the product rule for line derivatives, and Green's formula `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)` | ✅ | ✗ | `Domains/Sobolev/LipschitzGraphGreen` |
 | Green's formula on bounded Lipschitz domains: integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary, the chart form for every resolution of unity, the outward unit normal as the chart normal and a unit vector almost everywhere on the boundary, `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, the traces from both sides of a graph, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u` vanishes | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainGreen` |
 | The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, smoothing with compact support, bump mollifiers and cone mollifiers, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)` | ✅ | ✗ | `Domains/Traces/TraceKernel` |

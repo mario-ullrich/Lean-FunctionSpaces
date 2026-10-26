@@ -529,7 +529,8 @@ $0$.
 \label{lem:weak-derivative-cutoff}
 \lean{Rd.testFunctionMulOn, Rd.testFunctionMulOn_apply, Rd.lineDerivOp_testFunctionMulOn_apply,
   Rd.locallyIntegrableOn_mul_of_tsupport_subset, Rd.HasWeakLineDeriv.mul_of_tsupport_subset,
-  Rd.eLpNorm_mul_add_fderiv_mul_le}
+  Rd.eLpNorm_restrict_eq_inf_of_support_subset, Rd.eLpNorm_mul_add_fderiv_mul_le,
+  Rd.eLpNorm_mul_le_of_tsupport_subset}
 \leanok
 \uses{lem:weak-derivative-integral, lem:weak-derivative-product,
   lem:directional-derivatives-commute, lem:bounded-multiplier-lp}
@@ -547,8 +548,12 @@ in $B$:
     $|\chi| \leq C$ and $|\partial_w \chi| \leq C'$ and all $f$, $g$,
     \[
       \|\chi g + (\partial_w \chi) f\|_{L_p(O)} \leq C \, \|g\|_{L_p(O \cap B)}
-        + C' \, \|f\|_{L_p(O \cap B)} .
+        + C' \, \|f\|_{L_p(O \cap B)} ;
     \]
+  \item for every $0 \leq p \leq \infty$, every $h$ that vanishes outside $B$ has
+    $\|h\|_{L_p(O)} = \|h\|_{L_p(O \cap B)}$, and for every continuous real $\chi$ with closed
+    support in $B$ and $|\chi| \leq C$ and every $f$,
+    $\|\chi f\|_{L_p(O)} \leq C \, \|f\|_{L_p(O \cap B)}$.
 \end{enumerate}
 \end{lemma}
 
@@ -560,17 +565,22 @@ product of a continuous function with a locally integrable function on the open 
 near a point of $O$ outside $B$, which lies outside the closed support of $c$, $c u$ vanishes.
 (3) As in \Cref{lem:weak-derivative-product}, with the test function
 $\varphi \chi \in \mathcal D(O \cap B)$ of (1) for $\varphi \in \mathcal D(O)$. (4) The function
-vanishes outside $B$, so its norm in $L_p(O)$ is its norm in $L_p(O \cap B)$; Minkowski's
-inequality and \Cref{lem:bounded-multiplier-lp} give the estimate.
+vanishes outside $B$, so its norm in $L_p(O)$ is its norm in $L_p(O \cap B)$ by (5); Minkowski's
+inequality and \Cref{lem:bounded-multiplier-lp} give the estimate. (5) $h = \mathbf 1_B h$, and
+the $L_p(O)$ norm of $\mathbf 1_B h$ is the $L_p(O \cap B)$ norm of $h$; $\chi f$ vanishes outside
+$B$, and \Cref{lem:bounded-multiplier-lp} bounds it.
 \end{proof}
 
 \begin{lemma}[Smooth cutoffs]
 \label{lem:smooth-cutoff-compact}
-\lean{Rd.exists_contDiff_eventuallyEq_one}
+\lean{Rd.exists_contDiff_eventuallyEq_one, Rd.exists_norm_fderiv_gridBasis_le,
+  Rd.norm_le_one_of_forall_mem_Icc}
 \leanok
 For every compact $K \subseteq V$ and every open $U \supseteq K$ there is a smooth
 $\chi \colon V \to [0, 1]$ with compact closed support in $U$ that equals $1$ on a neighbourhood
-of $K$.
+of $K$. For every smooth real $\chi$ with compact support there are $d_i \geq 0$ with
+$|\partial_{e_i} \chi| \leq d_i$ for every $i \in I$, and every real function with values in
+$[0, 1]$ has absolute value at most $1$.
 \end{lemma}
 
 \begin{proof}
@@ -581,7 +591,7 @@ compact\_\allowbreak between} and \texttt{exists\_\allowbreak open\_\allowbreak 
 and\_\allowbreak isCompact\_\allowbreak closure}). Mathlib's
 \texttt{exists\_\allowbreak contDiff\_\allowbreak support\_\allowbreak eq\_\allowbreak
 eq\_\allowbreak one\_\allowbreak iff} gives a smooth $\chi$ with values in $[0, 1]$, support $W$
-and $\chi = 1$ on $L$.
+and $\chi = 1$ on $L$. For the bounds, $\partial_{e_i} \chi$ is continuous with compact support.
 \end{proof}
 
 \paragraph{Mollification on open sets.}

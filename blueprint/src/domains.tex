@@ -43,7 +43,8 @@ are Besov domains.
 \begin{definition}[Lipschitz graph domains]
 \label{def:lipschitz-graph}
 \lean{Rd.LipschitzGraph, Rd.LipschitzGraph.domain, Rd.LipschitzGraph.cone,
-  Rd.LipschitzGraph.continuous_phi, Rd.LipschitzGraph.isOpen_domain,
+  Rd.LipschitzGraph.lipschitzWith_phi, Rd.LipschitzGraph.continuous_phi,
+  Rd.LipschitzGraph.isOpen_domain, Rd.LipschitzGraph.toOpens, Rd.LipschitzGraph.coe_toOpens,
   Rd.LipschitzGraph.measurableSet_domain}
 \leanok
 Let $e \in V$ be a unit vector, $M \geq 0$, and $\varphi : V \to \R$ with
@@ -6302,7 +6303,8 @@ serves.
 \end{proof}
 
 The extension is a bounded linear operator (\Cref{thm:sobolev-extension-operator}). The theorem
-is of first order; the exponents $p \in \{1, \infty\}$ are not formalised.
+is of first order; for every $1 \leq p \leq \infty$ it holds by reflection
+(\Cref{thm:reflection-extension}).
 
 \begin{corollary}[$H^1(\Omega) = \Sob{1}{2}(\Omega)$]
 \label{cor:sobolev-extension-two}
@@ -6496,6 +6498,571 @@ $\Omega$ with a finite constant, by the estimate of \Cref{thm:pasting-sobolev}.
 of a jet agrees on $\Omega$ with $F \in \Sob{1}{p}(V)$, so $f \in \Sob{1}{p}(\Omega)$
 (\Cref{lem:weak-derivative-basic}). The claim for bounded Lipschitz sets is the first for the
 bounded Lipschitz domain of \Cref{thm:bounded-lipschitz-sets}.
+\end{proof}
+
+\section{Extension by reflection}
+\label{sec:reflection-extension}
+
+Let $\Omega$ be a bounded Lipschitz domain in $V$ of dimension $n \geq 1$, let
+$(e_i)_{i \in I}$ be the orthonormal basis of the dyadic grid of $V$ and $1 \leq p \leq \infty$.
+This section proves the extension theorem of \Cref{thm:sobolev-extension} for every
+$1 \leq p \leq \infty$, by reflection across the boundary \cite[Section~4.4]{EvansGariepy},
+\cite[Chapter~9]{Brezis2011}. On a half-space the even reflection of a Sobolev function is a
+Sobolev function, by integration by parts with cutoffs near the hyperplane. The flattening
+$x \mapsto x - \varphi(x) e$ of a Lipschitz graph domain is a Lipschitz map onto the half-space
+that preserves Lebesgue measure, and the chain rule of \Cref{thm:weak-derivative-chain-rule}
+carries the reflection to the graph. The boundary patches of $\Omega$ extend by a cutoff and this
+reflection, the inner patch by a cutoff, and \Cref{thm:pasting-sobolev} pastes them. The
+construction is the same for every $p$.
+
+\paragraph{The half-space.}
+
+\begin{definition}[The reflection across a hyperplane]
+\label{def:half-space-reflection}
+\lean{Rd.openHalfSpace, Rd.mem_openHalfSpace, Rd.coe_openHalfSpace, Rd.halfSpaceReflection,
+  Rd.evenReflection}
+\leanok
+For a vector $e \in V$ the \emph{open half-space} is $H_+ = \{y \in V : \langle y, e \rangle > 0\}$,
+the \emph{reflection} $\sigma$ is the reflection of $V$ across the hyperplane $e^\perp$, and the
+\emph{even reflection} of $u \colon V \to \C$ is
+\[
+  E u(y) = \mathbf 1_{H_+}(y) \, u(y) + \mathbf 1_{H_+}(\sigma y) \, u(\sigma y) .
+\]
+\end{definition}
+
+So $E u = u$ on $H_+$, $E u = u \circ \sigma$ on $\sigma(H_+)$ and $E u = 0$ on the hyperplane.
+
+\begin{lemma}[The reflection]
+\label{lem:half-space-reflection}
+\lean{Rd.halfSpaceReflection_apply, Rd.inner_halfSpaceReflection,
+  Rd.halfSpaceReflection_halfSpaceReflection, Rd.halfSpaceReflection_of_inner_eq_zero,
+  Rd.halfSpaceReflection_self, Rd.halfSpaceReflection_notMem, Rd.norm_sub_halfSpaceReflection,
+  Rd.evenReflection_of_mem, Rd.evenReflection_of_reflection_mem,
+  Rd.measurePreserving_halfSpaceReflection}
+\leanok
+\uses{def:half-space-reflection}
+For every $e \in V$ the reflection $\sigma$ is a linear isometry with $\sigma(\sigma y) = y$ for
+every $y \in V$, and it preserves Lebesgue measure. For every unit vector $e$, every $y \in V$,
+every $w \perp e$ and every $u \colon V \to \C$:
+$\sigma y = y - 2 \langle y, e \rangle e$, $\langle \sigma y, e \rangle = -\langle y, e \rangle$,
+$\sigma w = w$, $\sigma e = -e$ and $\|y - \sigma y\| = 2 |\langle y, e \rangle|$; if $y \in H_+$,
+then $\sigma y \notin H_+$ and $E u(y) = u(y)$; if $\sigma y \in H_+$, then
+$E u(y) = u(\sigma y)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The reflection across $(\R e)^\perp$ is $y \mapsto y - 2 \langle y, e \rangle e / \|e\|^2$
+(Mathlib's \texttt{Submodule.\allowbreak reflection\_\allowbreak orthogonal\_\allowbreak apply}),
+an involutive linear isometry; linear isometries preserve Lebesgue measure (Mathlib's
+\texttt{LinearIsometryEquiv.\allowbreak measurePreserving}). The remaining identities follow from
+the formula and $\|e\| = 1$.
+\end{proof}
+
+Let $s$ be Mathlib's smooth step function (\texttt{Real.\allowbreak smoothTransition}), with
+$0 \leq s \leq 1$, $s = 0$ on $(-\infty, 0]$ and $s = 1$ on $[1, \infty)$, and for $k \in \N$ let
+$\eta_k(y) = s((k + 1) \langle y, e \rangle - 1)$.
+
+\begin{lemma}[Cutoffs near the hyperplane]
+\label{lem:half-space-cutoffs}
+\lean{Real.smoothTransition.deriv_eq_zero_of_one_lt,
+  Real.smoothTransition.deriv_eq_zero_of_neg, Real.smoothTransition.exists_abs_deriv_le,
+  Rd.halfSpaceCutoff, Rd.contDiff_halfSpaceCutoff,
+  Rd.abs_halfSpaceCutoff_le, Rd.halfSpaceCutoff_eq_zero, Rd.halfSpaceCutoff_eq_zero_of_notMem,
+  Rd.tsupport_halfSpaceCutoff_subset, Rd.tendsto_halfSpaceCutoff,
+  Rd.fderiv_halfSpaceCutoff_apply, Rd.abs_deriv_smoothTransition_mul_le}
+\leanok
+\uses{def:half-space-reflection}
+The derivative $s'$ vanishes outside $[0, 1]$, and $|s'| \leq D$ for some $D \geq 0$. For every
+$e \in V$ and every $k \in \N$, $\eta_k$ is smooth with values in $[0, 1]$, $\eta_k(y) = 0$ for
+$\langle y, e \rangle \leq 1/(k + 1)$, the closed support of $\eta_k$ lies in $H_+$,
+$\eta_k(y) \to 1$ as $k \to \infty$ for every $y \in H_+$, and for all $y, w \in V$
+\[
+  D\eta_k(y) \, w = s'\bigl((k + 1) \langle y, e \rangle - 1\bigr) \, (k + 1) \langle w, e \rangle .
+\]
+For every $e \in V$, every $k \in \N$, every $D$ with $|s'| \leq D$, every $C \in \R$, every
+$y \in H_+$ and every $c \in \R$ with $|c| \leq C \langle y, e \rangle$,
+$|s'((k + 1) \langle y, e \rangle - 1) \, (k + 1) c| \leq 2 D C$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$s$ is constant on $(-\infty, 0)$ and on $(1, \infty)$, and $s'$ is continuous with compact
+support, hence bounded. The properties of $\eta_k$ follow from those of $s$ and the chain rule.
+For the last bound, $s'((k + 1) \langle y, e \rangle - 1) = 0$ unless
+$(k + 1) \langle y, e \rangle \leq 2$, and then $(k + 1) |c| \leq (k + 1) C \langle y, e \rangle
+\leq 2 C$.
+\end{proof}
+
+\begin{lemma}[Limits with the cutoffs]
+\label{lem:half-space-cutoff-limits}
+\lean{Rd.integrableOn_smul_of_hasCompactSupport, Rd.integrable_smul_of_forall_notMem,
+  Rd.tendsto_integral_halfSpaceCutoff_smul, Rd.deriv_smoothTransition_mul_eq_zero,
+  Rd.tendsto_integral_deriv_halfSpaceCutoff_smul}
+\leanok
+\uses{lem:half-space-cutoffs}
+For every measurable $S \subseteq V$, every $b \colon V \to \C$ integrable on $S \cap B(0, R)$ for
+every $R$ and every continuous $c \colon V \to \R$ with compact support, $c b$ is integrable on
+$S$, and integrable on $V$ if $c = 0$ outside $S$. Let $e \in V$. For every $F$ integrable on
+$H_+$, $\int_V \eta_k F \to \int_{H_+} F$ as $k \to \infty$. For every $b \colon V \to \C$
+integrable on $H_+ \cap B(0, R)$ for every $R$, every continuous $c \colon V \to \R$ with compact
+support and every $C$ with $|c(y)| \leq C \langle y, e \rangle$ for every $y \in H_+$,
+\[
+  \int_V s'\bigl((k + 1) \langle y, e \rangle - 1\bigr) \, (k + 1) \, c(y) \, b(y) \, dy \to 0
+  \qquad (k \to \infty) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$c$ is bounded and vanishes outside some ball $B(0, R)$. The second claim is dominated
+convergence with $|\eta_k| \leq 1$, $\eta_k \to 1$ on $H_+$ and $\eta_k = 0$ outside $H_+$
+(\Cref{lem:half-space-cutoffs}). In the third, the integrand vanishes outside
+$H_+ \cap B(0, R)$, since $s' = 0$ on $(-\infty, 0)$; on $H_+ \cap B(0, R)$ it is bounded by
+$2 D C |b|$ (\Cref{lem:half-space-cutoffs}) and tends to $0$, since $s' = 0$ on $(1, \infty)$.
+Dominated convergence gives the limit.
+\end{proof}
+
+\begin{theorem}[Integration by parts on the half-space]
+\label{thm:half-space-integration-by-parts}
+\lean{Rd.integral_halfSpaceCutoff_smul_eq, Rd.setIntegral_openHalfSpace_smul_add_eq}
+\leanok
+\uses{lem:half-space-cutoff-limits, lem:half-space-cutoffs, lem:weak-derivative-cutoff,
+  lem:weak-derivative-integral, lem:directional-derivatives-commute, lem:weak-derivative-basic}
+Let $e \in V$.
+\begin{enumerate}
+  \item For every $w \in V$, all $u$, $g$ with $g = \partial_w u$ weakly on $H_+$, every smooth
+    real $\chi$ with compact support and every $k \in \N$,
+    \[
+      \int_V \eta_k \chi g = -\int_V \eta_k (\partial_w \chi) u
+        - \int_V (\partial_w \eta_k) \chi u .
+    \]
+  \item For all $w_1, w_2 \in V$, all $u$, $g_1$, $g_2$ integrable on $H_+ \cap B(0, R)$ for every
+    $R$ with $g_l = \partial_{w_l} u$ weakly on $H_+$ ($l = 1, 2$), all smooth real $\chi_1$,
+    $\chi_2$ with compact support and every $C$ with
+    $|\langle w_1, e \rangle \chi_1(y) + \langle w_2, e \rangle \chi_2(y)|
+    \leq C \langle y, e \rangle$
+    for every $y \in H_+$,
+    \[
+      \int_{H_+} (\chi_1 g_1 + \chi_2 g_2) = -\int_{H_+} \bigl((\partial_{w_1} \chi_1) u
+        + (\partial_{w_2} \chi_2) u\bigr) .
+    \]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) The closed support of $\eta_k$ lies in $H_+$, so $\eta_k u$ has the weak derivative
+$\eta_k g + (\partial_w \eta_k) u$ on $V$ (\Cref{lem:weak-derivative-cutoff} with $V$ for $O$ and
+$H_+$ for $B$, and \Cref{lem:weak-derivative-basic} for the open set $V \cap H_+ = H_+$); test it
+against $\chi$ (\Cref{lem:weak-derivative-integral}), whose derivative $\partial_w \chi$ is
+$D\chi(\cdot) \, w$ (\Cref{lem:directional-derivatives-commute}). (2) Add (1) for
+$l = 1, 2$. By the formula for $D\eta_k$ in \Cref{lem:half-space-cutoffs}, the two terms with
+$\partial_{w_l} \eta_k$ combine to
+$\int s'((k + 1) \langle y, e \rangle - 1) (k + 1) (\langle w_1, e \rangle \chi_1 +
+\langle w_2, e \rangle \chi_2) u$, which tends to $0$ (\Cref{lem:half-space-cutoff-limits}); the
+other terms converge to the integrals over $H_+$.
+\end{proof}
+
+The boundary term vanishes because the test functions cancel to first order on the hyperplane.
+This is what the even reflection produces.
+
+\begin{lemma}[Integrals of reflected functions]
+\label{lem:reflected-integrals}
+\lean{Rd.integrableOn_inter_ball_of_memLp,
+  MeasureTheory.locallyIntegrable_of_forall_integrableOn_ball,
+  Rd.locallyIntegrable_indicator_add_indicator_comp_halfSpaceReflection,
+  Rd.integral_smul_indicator, Rd.integral_smul_indicator_comp_halfSpaceReflection,
+  Rd.integrable_smul_indicator, Rd.integrable_smul_indicator_comp_halfSpaceReflection,
+  Rd.abs_inner_mul_add_inner_halfSpaceReflection_mul_le}
+\leanok
+\uses{lem:half-space-reflection, lem:half-space-cutoff-limits}
+\begin{enumerate}
+  \item For every $1 \leq p \leq \infty$, every $S \subseteq V$ and every $R$, every
+    $u \in L_p(S)$ is integrable on $S \cap B(0, R)$. For every metric space $X$ with a measure,
+    every $x_0 \in X$ and every $f$ integrable on $B(x_0, R)$ for every $R$, $f$ is locally
+    integrable on $X$.
+  \item For every $e \in V$, every measurable $S \subseteq V$ and all $a$, $b$ integrable on
+    $S \cap B(0, R)$ for every $R$, the function
+    $y \mapsto \mathbf 1_S(y) a(y) + \mathbf 1_S(\sigma y) b(\sigma y)$ is locally integrable on
+    $V$, and for every continuous $c \colon V \to \R$ with compact support, $c \mathbf 1_S b$ and
+    $y \mapsto c(y) \mathbf 1_S(\sigma y) b(\sigma y)$ are integrable on $V$.
+  \item For every $e \in V$, every measurable $S \subseteq V$ and all $c \colon V \to \R$ and
+    $b \colon V \to \C$, $\int_V c \mathbf 1_S b = \int_S c b$ and
+    $\int_V c(y) \mathbf 1_S(\sigma y) b(\sigma y) \, dy = \int_S c(\sigma y) b(y) \, dy$.
+  \item For every unit vector $e$, every $L$-Lipschitz $\varphi \colon V \to \R$, every $v \in V$
+    and every $y \in H_+$,
+    $|\langle v, e \rangle \varphi(y) + \langle \sigma v, e \rangle \varphi(\sigma y)| \leq
+    2 L |\langle v, e \rangle| \langle y, e \rangle$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) $S \cap B(0, R)$ has finite measure, and $x$ lies in the open ball
+$B(x_0, d(x, x_0) + 1)$.
+(2) and (3) The reflection preserves Lebesgue measure and the balls $B(0, R)$, and is an
+involution (\Cref{lem:half-space-reflection}); the multipliers are integrable by
+\Cref{lem:half-space-cutoff-limits}. (4) $\langle \sigma v, e \rangle = -\langle v, e \rangle$
+and $|\varphi(y) - \varphi(\sigma y)| \leq L \|y - \sigma y\| = 2 L \langle y, e \rangle$.
+\end{proof}
+
+\begin{theorem}[The even reflection]
+\label{thm:even-reflection}
+\lean{Rd.hasWeakLineDeriv_evenReflection_of_forall, Rd.hasWeakLineDeriv_evenReflection,
+  Rd.eLpNorm_indicator_add_indicator_comp_halfSpaceReflection_le, Rd.eLpNorm_evenReflection_le}
+\leanok
+\uses{thm:half-space-integration-by-parts, lem:reflected-integrals, lem:half-space-reflection,
+  lem:weak-derivative-integral, lem:weak-derivative-direction-linear,
+  lem:composition-measure-preserving, lem:directional-derivatives-commute}
+Let $e$ be a unit vector.
+\begin{enumerate}
+  \item For every $u$ and all $g_w$ ($w \in V$) with $g_w = \partial_w u$ weakly on $H_+$ such
+    that $u$ and every $g_w$ are integrable on $H_+ \cap B(0, R)$ for every $R$, and for every
+    $v \in V$,
+    $\partial_v E u = \mathbf 1_{H_+} g_v + (\mathbf 1_{H_+} g_{\sigma v}) \circ \sigma$ weakly on
+    $V$.
+  \item For every $u$ and all $h_i$ ($i \in I$) with $h_i = \partial_{e_i} u$ weakly on $H_+$ such
+    that $u$ and every $h_i$ are integrable on $H_+ \cap B(0, R)$ for every $R$, and for every
+    $v \in V$,
+    \[
+      \partial_v E u(y) = \mathbf 1_{H_+}(y) \sum_{i \in I} \langle v, e_i \rangle h_i(y)
+        + \mathbf 1_{H_+}(\sigma y) \sum_{i \in I} \langle \sigma v, e_i \rangle h_i(\sigma y)
+    \]
+    weakly on $V$.
+  \item For every $1 \leq p \leq \infty$, every measurable $S \subseteq V$, every normed group $X$
+    and all $a, b \colon V \to X$,
+    \[
+      \bigl\| \mathbf 1_S a + (\mathbf 1_S b) \circ \sigma \bigr\|_{L_p(V)} \leq
+      \|a\|_{L_p(S)} + \|b\|_{L_p(S)} ,
+    \]
+    and for every $u \colon V \to \C$, $\|E u\|_{L_p(V)} \leq 2 \|u\|_{L_p(H_+)}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) Both functions are locally integrable on $V$ (\Cref{lem:reflected-integrals}). For a test
+function $\varphi$ on $V$, the change of variables $y \mapsto \sigma y$ of
+\Cref{lem:reflected-integrals} turns $\int \varphi \, \partial_v E u$ into
+$\int_{H_+} (\varphi g_v + (\varphi \circ \sigma) g_{\sigma v})$ and
+$\int (\partial_v \varphi) E u$ into
+$\int_{H_+} ((\partial_v \varphi) u + ((\partial_v \varphi) \circ \sigma) u)$, and
+$\partial_{\sigma v} (\varphi \circ \sigma) = (\partial_v \varphi) \circ \sigma$, since
+$\partial_a \varphi(x) = D\varphi(x) a$ (\Cref{lem:directional-derivatives-commute}).
+\Cref{thm:half-space-integration-by-parts} (2) with $\chi_1 = \varphi$,
+$\chi_2 = \varphi \circ \sigma$,
+$w_1 = v$ and $w_2 = \sigma v$ applies: $\varphi$ is Lipschitz, and
+\Cref{lem:reflected-integrals} (4) is its hypothesis. \Cref{lem:weak-derivative-integral} gives
+the claim. (2) is (1) with $g_w = \sum_i \langle w, e_i \rangle h_i$
+(\Cref{lem:weak-derivative-direction-linear}). (3) Minkowski's inequality and
+\Cref{lem:composition-measure-preserving} for the measure-preserving $\sigma$.
+\end{proof}
+
+\paragraph{Lipschitz graph domains.}
+
+In this paragraph $G = \{x : \varphi(x) < \langle x, e \rangle\}$ is a Lipschitz graph domain
+(\Cref{def:lipschitz-graph}) with $M$-Lipschitz $\varphi$, $F(x) = x - \varphi(x) e$ is the
+flattening and $F^{-1}(y) = y + \varphi(y) e$ its inverse (\Cref{lem:flattening}).
+
+\begin{lemma}[Flattening a Lipschitz graph domain]
+\label{lem:lipschitz-flattening}
+\lean{Rd.LipschitzGraph.mapsTo_flatten, Rd.LipschitzGraph.mapsTo_unflatten,
+  Rd.LipschitzGraph.mapsTo_unflatten_inter_ball, Rd.LipschitzGraph.unflatten_eq,
+  Rd.LipschitzGraph.flatten_eq, Rd.LipschitzGraph.measurePreserving_unflatten,
+  Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz}
+\leanok
+\uses{lem:flattening, lem:graph-product-coordinates, def:half-space-reflection}
+For every Lipschitz graph domain $G$ with $M$-Lipschitz $\varphi$, $F(G) \subseteq H_+$,
+$F^{-1}(H_+) \subseteq G$ and
+$F^{-1}(H_+ \cap B(0, R)) \subseteq G \cap B(0, \|F^{-1}(0)\| + (1 + M) R)$ for every $R \in \R$,
+and $F^{-1}(x' + t e) = \gamma(x') + t e$ for every $x' \in e^\perp$ and every $t \in \R$, with the
+graph map $\gamma$. Both $F$ and $F^{-1}$ preserve Lebesgue measure.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\langle F(x), e \rangle = \langle x, e \rangle - \varphi(x)$, and $F^{-1}$ is
+$(1 + M)$-Lipschitz (\Cref{lem:flattening}). Since
+$\varphi$ is constant along $e$, $F^{-1}(x' + t e) = x' + \varphi(x') e + t e$, so $F^{-1}$ is the
+graph coordinates after the inverse of the product coordinates, and $F$ the product
+coordinates after the inverse of the graph coordinates; all of them preserve Lebesgue measure
+(\Cref{lem:graph-product-coordinates}).
+\end{proof}
+
+The flattening of \Cref{lem:flattening} preserves Lebesgue measure for $C^1$ graphs by the change
+of variables formula; the product coordinates give it for every Lipschitz graph.
+
+\begin{definition}[The extension by reflection]
+\label{def:graph-reflection-extension}
+\lean{Rd.LipschitzGraph.reflect, Rd.LipschitzGraph.reflectionExtension}
+\leanok
+\uses{def:half-space-reflection, lem:flattening}
+For a Lipschitz graph domain $G$ the \emph{graph reflection} is
+$R(x) = x + 2 (\varphi(x) - \langle x, e \rangle) e$, and the \emph{extension by reflection} of
+$u \colon V \to \C$ is $E_G u = E(u \circ F^{-1}) \circ F$, with the even reflection $E$ across
+$e^\perp$ (\Cref{def:half-space-reflection}).
+\end{definition}
+
+\begin{lemma}[The graph reflection]
+\label{lem:graph-reflection}
+\lean{Rd.LipschitzGraph.reflect_eq, Rd.LipschitzGraph.reflect_reflect,
+  Rd.LipschitzGraph.reflectionExtension_of_mem, Rd.LipschitzGraph.reflectionExtension_of_lt,
+  Rd.LipschitzGraph.measurePreserving_reflect}
+\leanok
+\uses{def:graph-reflection-extension, lem:half-space-reflection, lem:lipschitz-flattening}
+For every Lipschitz graph domain $G$, $R = F^{-1} \circ \sigma \circ F$, $R(R(x)) = x$ for every
+$x \in V$, and $R$ preserves Lebesgue measure. For every $u \colon V \to \C$, $E_G u(x) = u(x)$
+for every $x \in G$, and $E_G u(x) = u(R(x))$ for every $x$ with
+$\langle x, e \rangle < \varphi(x)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\sigma(F x) = F x - 2 (\langle x, e \rangle - \varphi(x)) e$ (\Cref{lem:half-space-reflection},
+\Cref{lem:lipschitz-flattening}), and $\varphi$ is constant along $e$, so
+$F^{-1}(\sigma(F x)) = R(x)$. The rest follows from \Cref{lem:half-space-reflection} and
+\Cref{lem:lipschitz-flattening}: $F(G) \subseteq H_+$, and $\sigma(F x) \in H_+$ if
+$\langle x, e \rangle < \varphi(x)$.
+\end{proof}
+
+For $g_i \colon V \to \C$ ($i \in I$) and $w, y \in V$ let
+\[
+  D_w(y) = \sum_{i \in I} \bigl\langle DF^{-1}(y) \, w, e_i \bigr\rangle \, g_i(F^{-1} y) ,
+\]
+with the derivative $DF^{-1}(y)$ where it exists and $0$ elsewhere.
+
+\begin{lemma}[Derivatives in flat coordinates]
+\label{lem:flat-derivative}
+\lean{Rd.LipschitzGraph.flatDeriv, Rd.LipschitzGraph.flatDeriv_sum_smul,
+  Rd.LipschitzGraph.sum_inner_mul_flatDeriv, Rd.LipschitzGraph.norm_flatDeriv_le,
+  Rd.LipschitzGraph.hasWeakLineDeriv_comp_unflatten, Rd.LipschitzGraph.eLpNorm_flatDeriv_le,
+  Rd.LipschitzGraph.memLp_comp_unflatten, Rd.LipschitzGraph.memLp_flatDeriv,
+  Rd.LipschitzGraph.integrableOn_comp_unflatten_inter_ball,
+  Rd.LipschitzGraph.integrableOn_flatDeriv_inter_ball}
+\leanok
+\uses{lem:lipschitz-flattening, thm:weak-derivative-chain-rule, lem:chain-rule-smooth,
+  lem:composition-measure-preserving}
+Let $G$ be a Lipschitz graph domain with $M$-Lipschitz $\varphi$ and $g_i \colon V \to \C$
+($i \in I$).
+\begin{enumerate}
+  \item For every $y \in V$, every finite family $(w_k, c_k)$ in $V \times \R$, every $a \in V$
+    and every linear $T \colon V \to V$,
+    $D_{\sum_k c_k w_k}(y) = \sum_k c_k D_{w_k}(y)$ and
+    $\sum_{k \in I} \langle a, e_k \rangle D_{T e_k}(y) = D_{T a}(y)$, and for every $w \in V$,
+    $|D_w(y)| \leq (1 + M) \|w\| \sum_{i \in I} |g_i(F^{-1} y)|$.
+  \item For every $f$ with $g_i = \partial_{e_i} f$ weakly on $G$ for every $i \in I$ and every
+    $w \in V$, $D_w = \partial_w (f \circ F^{-1})$ weakly on $H_+$.
+  \item For every $1 \leq p \leq \infty$ and every $w \in V$,
+    $\|D_w\|_{L_p(H_+)} \leq (1 + M) \|w\| \sum_{i \in I} \|g_i\|_{L_p(G)}$, so $D_w \in L_p(H_+)$
+    if every $g_i \in L_p(G)$; for every $0 \leq p \leq \infty$ and every $f \in L_p(G)$,
+    $f \circ F^{-1} \in L_p(H_+)$.
+  \item For every $f$ integrable on $G \cap B(0, R)$ for every $R$, $f \circ F^{-1}$ is integrable
+    on $H_+ \cap B(0, R)$ for every $R$; if every $g_i$ is integrable on $G \cap B(0, R)$ for
+    every $R$, then so is every $D_w$ on $H_+ \cap B(0, R)$ for every $R$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) $DF^{-1}(y)$ is linear, $a = \sum_k \langle a, e_k \rangle e_k$, and
+$\|DF^{-1}(y)\| \leq 1 + M$ for the $(1 + M)$-Lipschitz $F^{-1}$ (Mathlib's
+\texttt{norm\_\allowbreak fderiv\_\allowbreak le\_\allowbreak of\_\allowbreak lipschitz}).
+(2) \Cref{thm:weak-derivative-chain-rule} for $F^{-1}$, which preserves Lebesgue measure and maps
+$H_+$ into $G$ (\Cref{lem:lipschitz-flattening}). (3) \Cref{lem:chain-rule-smooth} (3) and
+\Cref{lem:composition-measure-preserving}. (4) The same lemmas for $p = 1$ with the sets
+$H_+ \cap B(0, R)$ and $G \cap B(0, \|F^{-1}(0)\| + (1 + M) R)$, the second containing the
+image of the first (\Cref{lem:lipschitz-flattening}).
+\end{proof}
+
+\begin{theorem}[The extension by reflection]
+\label{thm:graph-reflection-extension}
+\lean{Rd.LipschitzGraph.reflectionDeriv, Rd.LipschitzGraph.sum_inner_mul_indicator_flatDeriv,
+  Rd.LipschitzGraph.norm_reflectionDeriv_le,
+  Rd.LipschitzGraph.hasWeakLineDeriv_reflectionExtension_of_integrableOn,
+  Rd.LipschitzGraph.hasWeakLineDeriv_reflectionExtension,
+  Rd.LipschitzGraph.eLpNorm_reflectionExtension_le,
+  Rd.LipschitzGraph.eLpNorm_sum_norm_comp_unflatten_le,
+  Rd.LipschitzGraph.eLpNorm_reflectionDeriv_le}
+\leanok
+\uses{thm:even-reflection, lem:flat-derivative, lem:lipschitz-flattening, lem:reflected-integrals,
+  def:graph-reflection-extension, thm:weak-derivative-chain-rule,
+  lem:composition-measure-preserving, lem:weak-derivative-basic, lem:flattening}
+Let $G$ be a Lipschitz graph domain with $M$-Lipschitz $\varphi$. For $g_i \colon V \to \C$
+($i \in I$) and $v \in V$ let
+\[
+  h_v(x) = \mathbf 1_{H_+}(F x) \, D_a(F x)
+    + \mathbf 1_{H_+}(\sigma F x) \, D_{\sigma a}(\sigma F x) ,
+  \qquad a = DF(x) \, v .
+\]
+\begin{enumerate}
+  \item For every $f$ with weak derivatives $g_i = \partial_{e_i} f$ on $G$ such that $f$ and
+    every $g_i$ are integrable on $G \cap B(0, R)$ for every $R$, and for every $v \in V$, $h_v$ is
+    the weak derivative $\partial_v E_G f$ on $V$.
+  \item For every $1 \leq p \leq \infty$, every $f \in L_p(G)$ with weak derivatives
+    $g_i = \partial_{e_i} f \in L_p(G)$ on $G$ and every $v \in V$, $h_v$ is the weak derivative
+    $\partial_v E_G f$ on $V$, and
+    \[
+      \|E_G f\|_{L_p(V)} \leq 2 \|f\|_{L_p(G)} , \quad
+      \|h_v\|_{L_p(V)} \leq 2 (1 + M)^2 \|v\| \sum_{i \in I} \|g_i\|_{L_p(G)} .
+    \]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) By \Cref{lem:flat-derivative}, $D_w = \partial_w (f \circ F^{-1})$ weakly on $H_+$, and
+$f \circ F^{-1}$ and every $D_w$ are integrable on the bounded parts of $H_+$.
+\Cref{thm:even-reflection} (1) gives the weak derivatives
+$H_w = \mathbf 1_{H_+} D_w + (\mathbf 1_{H_+} D_{\sigma w}) \circ \sigma$ of $E(f \circ F^{-1})$ on
+$V$, and the chain rule (\Cref{thm:weak-derivative-chain-rule}) for the measure-preserving
+$(1 + M)$-Lipschitz $F$ (\Cref{lem:flattening}) gives
+$\partial_v E_G f(x) = \sum_k \langle DF(x) v, e_k \rangle H_{e_k}(F x)$, which is $h_v(x)$ by
+\Cref{lem:flat-derivative} (1) for the identity and for $\sigma$
+(\Cref{lem:weak-derivative-basic}). (2) Functions in $L_p(G)$ are integrable on the bounded parts
+of $G$ (\Cref{lem:reflected-integrals} (1)), so (1) applies, and $h_v$ is locally integrable,
+hence measurable (\Cref{lem:weak-derivative-basic}). Since
+$\|DF(x) v\| \leq (1 + M) \|v\|$ and $\sigma$ preserves norms,
+$|h_v(x)| \leq (1 + M)^2 \|v\| \bigl(\mathbf 1_{H_+}(F x) S(F x) + \mathbf 1_{H_+}(\sigma F x)
+S(\sigma F x)\bigr)$ with $S(y) = \sum_i |g_i(F^{-1} y)|$. The flattening preserves Lebesgue
+measure, \Cref{thm:even-reflection} (3) bounds the right side by
+$2 (1 + M)^2 \|v\| \|S\|_{L_p(H_+)}$, and $\|S\|_{L_p(H_+)} \leq \sum_i \|g_i\|_{L_p(G)}$ by
+Minkowski's inequality and \Cref{lem:composition-measure-preserving}. The bound for $E_G f$ is
+\Cref{thm:even-reflection} (3) with the same changes of variables.
+\end{proof}
+
+\paragraph{Bounded Lipschitz domains.}
+
+\begin{lemma}[Bounded extensions from estimates]
+\label{lem:extends-sobolev-of-bounds}
+\lean{Rd.extendsSobolev_of_eLpNorm_le, Rd.add_sum_le_of_le_two_mul}
+\leanok
+\uses{def:extends-sobolev, lem:weak-derivative-direction-linear, lem:weak-derivative-basic}
+\begin{enumerate}
+  \item For every open $O \subseteq V$, every $U \subseteq V$, every $1 \leq p \leq \infty$ and
+    every $C < \infty$: if every $f \in L_p(O)$ with weak derivatives
+    $g_i = \partial_{e_i} f \in L_p(O)$ on $O$ agrees almost everywhere on $U$ with a function $F$
+    with weak derivatives $G_i = \partial_{e_i} F$ on $V$ and
+    \[
+      \|F\|_p + \sum_{i \in I} \|G_i\|_p \leq C \Bigl(\|f\|_{L_p(O)} + \sum_{i \in I}
+      \|g_i\|_{L_p(O)}\Bigr) ,
+    \]
+    then Sobolev functions on $O$ extend from $U$ with the constant $C$.
+  \item For all $a, X, Y, K, d \in [0, \infty]$ and all $b_k \in [0, \infty]$, $k$ in a finite
+    set with $N$ elements, with $a \leq 2 X$ and $b_k \leq K (Y + d X)$ for every $k$,
+    $a + \sum_k b_k \leq (2 + N K (1 + d)) (X + Y)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The bound puts $F$ and every $G_i$ into $L_p(V)$; weak derivatives see only the classes
+(\Cref{lem:weak-derivative-basic}), and \Cref{lem:weak-derivative-direction-linear} (4) gives
+$F \in \Sob{1}{p}(V)$. (2) The right side is the bound $2 X + N K (Y + d X)$ of the left side
+plus $2 Y + N K (X + d Y)$.
+\end{proof}
+
+Let $\Omega$ be a bounded Lipschitz domain with boundary balls $B(c_j, \rho_j)$, and let
+$\Omega_j$ be the graph domain of the ball $B(c_j, \rho_j)$, so that
+$\Omega_j \cap B(c_j, \rho_j) = \Omega \cap B(c_j, \rho_j)$ (\Cref{def:bounded-lipschitz}).
+
+\begin{lemma}[Cutoffs to a graph domain]
+\label{lem:cutoff-graph-domain}
+\lean{Rd.BoundedLipschitzDomain.graph_toOpens_inf_ball_le,
+  Rd.BoundedLipschitzDomain.hasWeakLineDeriv_mul_graph,
+  Rd.BoundedLipschitzDomain.eLpNorm_mul_graph_le,
+  Rd.BoundedLipschitzDomain.eLpNorm_mul_add_fderiv_mul_graph_le}
+\leanok
+\uses{lem:weak-derivative-cutoff, lem:weak-derivative-basic, def:bounded-lipschitz}
+For every bounded Lipschitz domain $\Omega$ and every $j$, $\Omega_j \cap B(c_j, \rho_j)
+\subseteq \Omega$. For every smooth real $\chi$ with closed support in $B(c_j, \rho_j)$:
+\begin{enumerate}
+  \item for every $w \in V$ and all $f$, $g$ with $g = \partial_w f$ weakly on $\Omega$,
+    $\chi g + (\partial_w \chi) f = \partial_w (\chi f)$ weakly on $\Omega_j$;
+  \item for every $C \geq 0$ with $|\chi| \leq C$, every $f$ and every $0 \leq p \leq \infty$,
+    $\|\chi f\|_{L_p(\Omega_j)} \leq C \|f\|_{L_p(\Omega)}$;
+  \item for every $1 \leq p \leq \infty$, every $w \in V$, all $C, C' \geq 0$ with
+    $|\chi| \leq C$ and $|\partial_w \chi| \leq C'$ and all $f$, $g$,
+    $\|\chi g + (\partial_w \chi) f\|_{L_p(\Omega_j)} \leq C \|g\|_{L_p(\Omega)}
+    + C' \|f\|_{L_p(\Omega)}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The inclusion is $\Omega_j \cap B(c_j, \rho_j) = \Omega \cap B(c_j, \rho_j)$. (1) The weak
+derivative restricts to the open set $\Omega_j \cap B(c_j, \rho_j)$
+(\Cref{lem:weak-derivative-basic}), and \Cref{lem:weak-derivative-cutoff} (3) with $\Omega_j$ for
+$O$ and $B(c_j, \rho_j)$ for $B$ carries it to $\Omega_j$. (2) and (3)
+\Cref{lem:weak-derivative-cutoff} (5) and (4), and the $L_p$ norm on
+$\Omega_j \cap B(c_j, \rho_j)$ is at most the $L_p$ norm on $\Omega$.
+\end{proof}
+
+\begin{lemma}[The patches by reflection]
+\label{lem:reflection-patches}
+\lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary_reflection,
+  Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior_cutoff}
+\leanok
+\uses{thm:graph-reflection-extension, lem:graph-reflection, lem:extends-sobolev-of-bounds,
+  lem:smooth-cutoff-compact, lem:weak-derivative-cutoff, lem:mollification-open-set,
+  def:bounded-lipschitz, lem:cutoff-graph-domain, lem:weak-derivative-basic}
+Let $\Omega$ be a bounded Lipschitz domain with boundary balls $B(c_j, \rho_j)$. For every
+$1 \leq p \leq \infty$, every $\varepsilon > 0$, every $\delta > 0$ and every $j$, Sobolev
+functions on $\Omega$ extend with finite constants from
+$\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$ and from
+$\{x \in \Omega : \dist(x, V \setminus \Omega) > 2 \delta\}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For the boundary patch let $M_j$ be the Lipschitz constant of the graph function of $\Omega_j$,
+and $\chi$ smooth with values in $[0, 1]$, $\chi = 1$ on
+$\bar B(c_j, \rho_j - 2 \varepsilon)$ and closed support in $B(c_j, \rho_j)$
+(\Cref{lem:smooth-cutoff-compact}), with $|\partial_{e_i} \chi| \leq d_i$. By
+\Cref{lem:cutoff-graph-domain}, $\chi f$ has the weak derivatives
+$\chi g_i + (\partial_{e_i} \chi) f$ on $\Omega_j$, with
+$\|\chi f\|_{L_p(\Omega_j)} \leq \|f\|_{L_p(\Omega)}$ and
+$\|\chi g_i + (\partial_{e_i} \chi) f\|_{L_p(\Omega_j)} \leq \|g_i\|_{L_p(\Omega)} + d_i
+\|f\|_{L_p(\Omega)}$. The extension by reflection of $\chi f$
+(\Cref{thm:graph-reflection-extension})
+equals $\chi f = f$ on $\Omega \cap B(c_j, \rho_j - 2 \varepsilon) \subseteq \Omega_j$
+(\Cref{lem:graph-reflection}), and \Cref{lem:extends-sobolev-of-bounds} (2) and (1) give the
+constant $2 + 2 n (1 + M_j)^2 (1 + \sum_i d_i)$. For the inner patch, the set
+$\{x : \dist(x, V \setminus \Omega) \geq 2 \delta\}$ is a compact subset of $\Omega$; take $\chi$
+of \Cref{lem:smooth-cutoff-compact} equal to $1$ near it with compact closed support in
+$\Omega$. Then $\chi f$ has the weak derivatives $\chi g_i + (\partial_{e_i} \chi) f$ on $V$
+(\Cref{lem:mollification-open-set} (2)), \Cref{lem:weak-derivative-cutoff} (4) and (5) bound
+them, and the constant is $1 + \sum_i d_i$.
+\end{proof}
+
+\begin{theorem}[The extension theorem by reflection]
+\label{thm:reflection-extension}
+\lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le,
+  Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev_of_one_le,
+  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le}
+\leanok
+\uses{lem:reflection-patches, thm:pasting-sobolev, lem:bounded-lipschitz-geometry,
+  def:extends-sobolev, lem:weak-derivative-basic, thm:sobolev-extension}
+For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$ and every
+$1 \leq p \leq \infty$ there is $C < \infty$ such that for every $f \in L_p(\Omega)$ with weak
+derivatives $g_i = \partial_{e_i} f \in L_p(\Omega)$ on $\Omega$ there are $F \in \Sob{1}{p}(V)$
+with $F = f$ almost everywhere on $\Omega$ and weak derivatives
+$G_i = \partial_{e_i} F \in L_p(V)$ on $V$ with
+\[
+  \|F\|_p + \sum_{i \in I} \|G_i\|_p \leq C \Bigl(\|f\|_{L_p(\Omega)} + \sum_{i \in I}
+  \|g_i\|_{L_p(\Omega)}\Bigr) .
+\]
+For every bounded Lipschitz domain $\Omega$ in $V$ of any dimension, every $1 \leq p \leq \infty$
+and every $f \colon V \to \C$, $f \in \Sob{1}{p}(\Omega)$ if and only if $f = F$ almost everywhere
+on $\Omega$ for some $F \in \Sob{1}{p}(V)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+As for \Cref{thm:sobolev-extension}, with the patches of \Cref{lem:reflection-patches}: they
+cover the closure of $\Omega$ (\Cref{lem:bounded-lipschitz-geometry}), and
+\Cref{thm:pasting-sobolev} pastes them for every $1 \leq p \leq \infty$. For $n = 0$ the argument
+of \Cref{thm:sobolev-extension} holds for every $p$.
 \end{proof}
 
 \section{Gauss--Green on Lipschitz graph domains}
@@ -7925,7 +8492,8 @@ F(\Phi_{ik} y)$. The changes of charts are bounded into the intrinsic space on $
   Rd.LipschitzGraph.unflatten_flatten, Rd.LipschitzGraph.flatten_unflatten,
   Rd.LipschitzGraph.inner_flatten, Rd.LipschitzGraph.flattenEquiv,
   Rd.LipschitzGraph.continuous_flatten, Rd.LipschitzGraph.continuous_unflatten,
-  Rd.LipschitzGraph.lipschitzWith_unflatten, Rd.LipschitzGraph.graph_subset_image_unflatten,
+  Rd.LipschitzGraph.lipschitzWith_unflatten, Rd.LipschitzGraph.lipschitzWith_flatten,
+  Rd.LipschitzGraph.graph_subset_image_unflatten,
   Rd.LipschitzGraph.contDiff_flatten, Rd.LipschitzGraph.contDiff_unflatten,
   Rd.LipschitzGraph.fderiv_phi_e, Rd.LipschitzGraph.hasFDerivAt_flatten,
   Rd.LipschitzGraph.det_fderiv_flatten, Rd.LipschitzGraph.measurePreserving_flatten}
@@ -7934,16 +8502,17 @@ F(\Phi_{ik} y)$. The changes of charts are bounded into the intrinsic space on $
 For a Lipschitz graph domain $\{x : \varphi(x) < \langle x, e \rangle\}$ with $M$-Lipschitz
 $\varphi$ the flattening $F(x) = x - \varphi(x) e$ is a bijection of $V$ with inverse
 $y \mapsto y + \varphi(y) e$ and $\langle F(x), e \rangle = \langle x, e \rangle - \varphi(x)$.
-The inverse is $(1 + M)$-Lipschitz, and the graph $\{x : \varphi(x) = \langle x, e \rangle\}$ lies
-in the image of $e^\perp$ under it. For smooth $\varphi$ both maps are smooth and $F$ preserves the
-Lebesgue measure.
+Both maps are $(1 + M)$-Lipschitz, and the graph $\{x : \varphi(x) = \langle x, e \rangle\}$ lies
+in the image of $e^\perp$ under the inverse. For smooth $\varphi$ both maps are smooth and $F$
+preserves the Lebesgue measure.
 \end{lemma}
 
 \begin{proof}
 \leanok
 $\varphi$ is constant along $e$, so $\varphi(x - \varphi(x) e) = \varphi(x)$ and $D\varphi(x) e = 0$.
-The bound $\|(y + \varphi(y) e) - (z + \varphi(z) e)\| \leq \|y - z\| + |\varphi(y) - \varphi(z)|$
-gives the Lipschitz constant, and a point $x$ of the graph is the image of $F(x) \in e^\perp$.
+The bounds $\|(y \pm \varphi(y) e) - (z \pm \varphi(z) e)\| \leq \|y - z\| +
+|\varphi(y) - \varphi(z)|$ give the Lipschitz constants, and a point $x$ of the graph is the image
+of $F(x) \in e^\perp$.
 The derivative $\mathrm{id} - e \otimes D\varphi(x)$ is a transvection with determinant
 $1 - D\varphi(x) e = 1$ (Mathlib's \texttt{LinearMap.transvection.det}), and the change of variables
 formula gives $F_* \mathrm{vol} = \mathrm{vol}$.

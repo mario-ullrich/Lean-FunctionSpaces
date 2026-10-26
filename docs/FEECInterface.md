@@ -24,7 +24,7 @@ trace kernel in `H^1(Ω)`, with its trace and extension operators and its dual `
 area formula for Lipschitz graphs, the surface measure of `Γ` with
 `L_2(Γ)` and the trace into it, Rellich's compactness theorem for the restriction space
 (items I.6 and H.1 in that form, Section 4.5), and the extension theorem H.2 for `W^{1,p}`,
-`1 < p < ∞`, with `H^1(Ω) = W^{1,2}(Ω)` and Rellich's theorem in the weak-derivative form
+`1 ≤ p ≤ ∞`, with `H^1(Ω) = W^{1,2}(Ω)` and Rellich's theorem in the weak-derivative form
 (Section 4.3), Gauss–Green and Green's formula on Lipschitz graph domains (Section 4.11),
 Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing
 trace (Section 4.12), and `ker γ = H^1_0(Ω)` with the quotient `H^1(Ω)/H^1_0(Ω) ≅ H^{1/2}(Γ)` of
@@ -185,9 +185,11 @@ other; Lean-FunctionSpaces follows its statement shapes where that costs nothing
 
 ### 4.3 `H^1` on bounded Lipschitz domains and the extension theorem H.2 (step 2 of the proposal)
 
-Files `FunctionSpaces/Domains/Sobolev/LipschitzDomainH1.lean` and
-`FunctionSpaces/Domains/Extension/SobolevExtension.lean`; `Ω : Rd.BoundedLipschitzDomain V` (X.1),
-with `Ω.carrier` the open set and `Ω.toOpens : Opens V` the same set as an element of `Opens V`.
+Files `FunctionSpaces/Domains/Sobolev/LipschitzDomainH1.lean`,
+`FunctionSpaces/Domains/Extension/SobolevExtension.lean` and
+`FunctionSpaces/Domains/Extension/ReflectionExtension.lean`;
+`Ω : Rd.BoundedLipschitzDomain V` (X.1), with `Ω.carrier` the open set and
+`Ω.toOpens : Opens V` the same set as an element of `Opens V`.
 
 * `Rd.BoundedLipschitzDomain.MemSobolevOn Ω f`: `H^1(Ω)` as the restriction space,
   `∃ F, Rd.MemSobolev 1 F ∧ F =ᵐ[volume.restrict Ω.carrier] f`; only the values of `f` on `Ω`
@@ -207,7 +209,11 @@ with `Ω.carrier` the open set and `Ω.toOpens : Opens V` the same set as an ele
   (hp : p ≠ ∞) : ∃ C, C ≠ ∞ ∧ Rd.ExtendsSobolev p Ω.toOpens Ω.carrier C`, that is, every
   `f ∈ L_p(Ω)` with weak derivatives `g_i = ∂_{e_i} f ∈ L_p(Ω)` agrees almost everywhere on `Ω`
   with some `F ∈ W^{1,p}(ℝ^d)` with weak derivatives `G_i = ∂_{e_i} F` and
-  `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`. The extension is a bounded
+  `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`. The same holds for every
+  `1 ≤ p ≤ ∞`, by reflection across the boundary in flattened coordinates (Evans–Gariepy,
+  Section 4.4): `Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le (hp : 1 ≤ p) :
+  ∃ C, C ≠ ∞ ∧ Rd.ExtendsSobolev p Ω.toOpens Ω.carrier C`, with `[Nontrivial V]`. For
+  `1 < p < ∞` the extension is a bounded
   linear operator on value–derivative jets (`FunctionSpaces/Rd/Sobolev/SobolevJets.lean`,
   `FunctionSpaces/Domains/Extension/SobolevExtensionOperator.lean`):
   `Rd.BoundedLipschitzDomain.exists_extensionL (hp1 : 1 < p) (hp : p ≠ ∞) : ∃ E :
@@ -220,13 +226,15 @@ with `Ω.carrier` the open set and `Ω.toOpens : Opens V` the same set as an ele
   `Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet`). A chosen operator is
   `Rd.BoundedLipschitzDomain.sobolevExtensionL`, and
   `Rd.exists_extensionL_of_isBoundedLipschitzDomain` is the same for the set-level definition
-  `Rd.IsBoundedLipschitzDomain`. The theorem is of first order, and `p ∈ {1, ∞}` are not
-  formalised. Membership form:
-  `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev (hp1) (hp) (f : V → ℂ) :
-  MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p volume, MemSobolev 1 F ∧
+  `Rd.IsBoundedLipschitzDomain`. The theorem is of first order. Membership form, for every
+  `1 ≤ p ≤ ∞`:
+  `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le (hp : 1 ≤ p)
+  (f : V → ℂ) : MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p volume, MemSobolev 1 F ∧
   (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f`, and the direction
-  `Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev`, in every dimension (for
-  `d = 0`, `Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`).
+  `Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev_of_one_le`, in every dimension
+  (for `d = 0`, `Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`); for `1 < p < ∞` also
+  `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev (hp1) (hp)` and
+  `Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev`.
 * `H^1(Ω) = W^{1,2}(Ω)`: `Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev
   (f : Lp ℂ 2 volume) : Ω.MemSobolevOn f ↔ MemWeakSobolev Ω.toOpens 1 2 f`, and with the
   Hilbert space of Section 4.5,
@@ -743,7 +751,7 @@ File `FunctionSpaces/Domains/Traces/TraceKernel.lean`, namespace `Rd.BoundedLips
   of `H^1(Ω)` lies in the weak-derivative space `W^1_2(Ω)`, on every open set
   (`Rd.memWeakSobolev_toL2`). On bounded Lipschitz
   domains the two spaces agree by the extension theorem for `W^{1,2}` of Calderón and Stein
-  (Stein 1970, Chapter VI, §3), formalised here for every `W^{1,p}`, `1 < p < ∞`
+  (Stein 1970, Chapter VI, §3), formalised here for every `W^{1,p}`, `1 ≤ p ≤ ∞`
   (Section 4.3); on some
   bounded open sets they differ (a slit disc), and the embedding `W^1_2(Ω) ↪ L_2(Ω)` can fail to
   be compact (the rooms-and-passages domains, Adams and Fournier, Chapter 6). This splits H.1
@@ -1104,6 +1112,8 @@ TauCeti's `W1p.exists_extensionL_of_isLipschitzDomainWith`
 * S. N. Chandler-Wilde, D. P. Hewett, A. Moiola, *Sobolev spaces on non-Lipschitz subsets of `ℝ^n`
   with application to boundary integral equations on fractal screens*, Integral Equations
   Operator Theory **87** (2017), no. 2, 179–224.
+* L. C. Evans, R. F. Gariepy, *Measure Theory and Fine Properties of Functions*, revised ed.,
+  Textbooks in Mathematics, CRC Press, 2015.
 * *FEEC and BEEC in Lean: a proposed proof structure*, version 4, 10 October 2026.
 * R. Hiptmair, D. Pauly, E. Schulz, *Traces for Hilbert complexes*, J. Funct. Anal. **284**
   (2023), Paper No. 109905.

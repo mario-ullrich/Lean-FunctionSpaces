@@ -125,6 +125,8 @@ public import FunctionSpaces.Domains.Traces.BoundaryGagliardo
 public import FunctionSpaces.Domains.Extension.DivergenceKernels
 public import FunctionSpaces.Domains.Extension.SobolevExtension
 public import FunctionSpaces.Domains.Extension.SobolevExtensionOperator
+public import FunctionSpaces.Domains.Extension.HalfSpaceReflection
+public import FunctionSpaces.Domains.Extension.ReflectionExtension
 public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen
 public import FunctionSpaces.Domains.Traces.TraceKernel
@@ -540,7 +542,7 @@ and the theorems that their characterisations agree. The library builds on
   the atlas and of the order, the Besov spaces of a compact manifold, and lifts from a chart in
   them.
 * `FunctionSpaces.Domains.Lipschitz.GraphStraightening`: the flattening of a graph domain, its
-  inverse, and its preservation of the Lebesgue measure.
+  inverse, their Lipschitz bounds, and the preservation of the Lebesgue measure.
 * `FunctionSpaces.Domains.Manifolds.SmoothDomain`: smooth bounded domains, straighteners and their
   charts, the closure as a compact manifold with boundary, and the Lebesgue measure as a smooth
   measure.
@@ -600,6 +602,14 @@ and the theorems that their characterisations agree. The library builds on
 * `FunctionSpaces.Domains.Extension.SobolevExtensionOperator`: extension operators on jets, the
   local extension of jets from one patch, pasting, and the extension operator
   `W^1_p(Ω) → W^1_p(ℝ^d)` for `1 < p < ∞` as a bounded linear right inverse of the restriction.
+* `FunctionSpaces.Domains.Extension.HalfSpaceReflection`: the open half-space, the reflection
+  across a hyperplane, cutoffs near the hyperplane, integration by parts on the half-space, and
+  the weak derivatives and `L_p` bounds of the even reflection.
+* `FunctionSpaces.Domains.Extension.ReflectionExtension`: the flattening of a Lipschitz graph
+  domain as a measure-preserving map, the extension by reflection across the graph with its weak
+  derivatives and `L_p` bounds, cutoffs from a bounded Lipschitz domain to its graph domains, and
+  the extension theorem `W^1_p(Ω) = W^1_p(ℝ^d)|_Ω` for `1 ≤ p ≤ ∞` with a bound on a bounded
+  Lipschitz domain.
 * `FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen`: Gauss–Green on a Lipschitz graph domain:
   product coordinates and Fubini, ray integrals, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ`
   for compactly supported `C^1` functions in chart and surface form, the product rule for line

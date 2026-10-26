@@ -15,8 +15,9 @@ public import Mathlib.MeasureTheory.Function.Jacobian
 For a Lipschitz graph domain `Ω = {x : φ(x) < ⟪x, e⟫}` the **flattening**
 `F(x) = x - φ(x) e` (`Rd.LipschitzGraph.flatten`) maps `Ω` onto the half-space `{⟪y, e⟫ > 0}`
 (`Rd.LipschitzGraph.inner_flatten`): it is a bijection of `V` with inverse `y ↦ y + φ(y) e`
-(`Rd.LipschitzGraph.unflatten`), because `φ` is constant along `e`. The inverse is
-`(1 + M)`-Lipschitz (`Rd.LipschitzGraph.lipschitzWith_unflatten`), and the image of the hyperplane
+(`Rd.LipschitzGraph.unflatten`), because `φ` is constant along `e`. Both maps are
+`(1 + M)`-Lipschitz (`Rd.LipschitzGraph.lipschitzWith_flatten`,
+`Rd.LipschitzGraph.lipschitzWith_unflatten`), and the image of the hyperplane
 `e^⊥` under it contains the graph (`Rd.LipschitzGraph.graph_subset_image_unflatten`). For smooth
 `φ` both maps are smooth, and the flattening preserves the Lebesgue measure
 (`Rd.LipschitzGraph.measurePreserving_flatten`): its derivative `id - e ⊗ Dφ(x)` is a
@@ -88,6 +89,22 @@ theorem lipschitzWith_unflatten :
         abel
     _ ≤ ‖x - y‖ + |Ω.phi x - Ω.phi y| := by
         refine (norm_add_le _ _).trans_eq ?_
+        rw [norm_smul, Ω.norm_e, mul_one, Real.norm_eq_abs]
+    _ ≤ (1 + Ω.M) * ‖x - y‖ := by linarith [Ω.lipschitz x y]
+
+/-- **The flattening is Lipschitz**: `x ↦ x - φ(x) e` is `(1 + M)`-Lipschitz, since `φ` is
+`M`-Lipschitz and `‖e‖ = 1`. -/
+theorem lipschitzWith_flatten :
+    LipschitzWith ⟨1 + Ω.M, add_nonneg zero_le_one Ω.M_nonneg⟩ Ω.flatten := by
+  refine LipschitzWith.of_dist_le_mul fun x y => ?_
+  rw [dist_eq_norm, dist_eq_norm]
+  show _ ≤ (1 + Ω.M) * _
+  calc ‖Ω.flatten x - Ω.flatten y‖ = ‖(x - y) - (Ω.phi x - Ω.phi y) • Ω.e‖ := by
+        rw [flatten, flatten, sub_smul]
+        congr 1
+        abel
+    _ ≤ ‖x - y‖ + |Ω.phi x - Ω.phi y| := by
+        refine (norm_sub_le _ _).trans_eq ?_
         rw [norm_smul, Ω.norm_e, mul_one, Real.norm_eq_abs]
     _ ≤ (1 + Ω.M) * ‖x - y‖ := by linarith [Ω.lipschitz x y]
 

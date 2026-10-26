@@ -485,16 +485,17 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   injective (`Rd.BoundedLipschitzDomain.traceL2_injective`).
 * **The extension theorem for `W^1_p` on bounded Lipschitz domains.** Let `Ω` be a bounded
   Lipschitz domain in `V`, `dim V ≥ 1`, `(e_i)` the orthonormal basis `Rd.gridBasis V` and
-  `1 < p < ∞`. There
+  `1 ≤ p ≤ ∞`. There
   is a finite `C` such that every `f ∈ L_p(Ω)` whose weak derivatives `g_i = ∂_{e_i} f` on `Ω` lie
   in `L_p(Ω)` agrees almost everywhere on `Ω` with some `F ∈ W^1_p(V)` with
   `‖F‖_p + ∑_i ‖∂_{e_i} F‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`
-  (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`); so `f ∈ W^1_p(Ω)` iff `f` agrees on `Ω`
-  with some `F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`).
-  The extension is a bounded linear operator `E : W^1_p(Ω) → W^1_p(V)` on value–derivative jets
-  with `E u = u` on `Ω` (`Rd.BoundedLipschitzDomain.sobolevExtensionL`,
-  `Rd.BoundedLipschitzDomain.exists_extensionL`); it is of first order, and the exponents
-  `p ∈ {1, ∞}` are not formalised.
+  (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le`, by reflection across the boundary
+  in flattened coordinates; for `1 < p < ∞` also `Rd.BoundedLipschitzDomain.exists_extendsSobolev`,
+  by Rychkov's local extension); so `f ∈ W^1_p(Ω)` iff `f` agrees on `Ω` with some
+  `F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`).
+  For `1 < p < ∞` the extension is a bounded linear operator `E : W^1_p(Ω) → W^1_p(V)` on
+  value–derivative jets with `E u = u` on `Ω` (`Rd.BoundedLipschitzDomain.sobolevExtensionL`,
+  `Rd.BoundedLipschitzDomain.exists_extensionL`). The theorem is of first order.
   For `p = 2`, `f ∈ L_2(V)` lies in `H^1(Ω)` iff it lies in `W^1_2(Ω)`
   (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`), every sequence bounded in
   `W^1_2(Ω)` has a subsequence converging in `L_2(Ω)`
@@ -607,7 +608,8 @@ that library builds itself.
 * **Interpolation**: the J-method and the equivalence theorem, the complex method,
   `(L_{p₀}, L_{p₁})_{θ,q} = L_{p,q}` with Lorentz spaces, and the off-diagonal Marcinkiewicz
   theorem.
-* **Traces and extensions**: the extension of `W^1_p` for `p ∈ {1, ∞}` and of higher order.
+* **Traces and extensions**: the extension of `W^1_p` as a bounded linear operator for
+  `p ∈ {1, ∞}`, and the extension of higher order.
 * **Manifolds with corners**: a compact example (the cube with charts at its vertices), traces on
   the faces and products of models.
 * **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,
@@ -716,7 +718,7 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * T. Eirola, *Sobolev characterization of solutions of dilation equations*, SIAM J. Math.
   Anal. **23** (1992), no. 4, 1015–1030. The transfer operator and the Sobolev exponent.
 * L. C. Evans, R. F. Gariepy, *Measure Theory and Fine Properties of Functions*, revised ed.,
-  Textbooks in Mathematics, CRC Press, 2015. The area formula.
+  Textbooks in Mathematics, CRC Press, 2015. The area formula and the extension by reflection.
 * H. Federer, *Geometric Measure Theory*, Grundlehren der mathematischen Wissenschaften **153**,
   Springer-Verlag, 1969. The area formula.
 * C. Fefferman, E. M. Stein, *Some maximal inequalities*, Amer. J. Math. **93** (1971), no. 1,

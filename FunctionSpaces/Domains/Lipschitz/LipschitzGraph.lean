@@ -14,9 +14,11 @@ public import Mathlib.Analysis.Calculus.BumpFunction.Normed
 
 A **Lipschitz graph domain** in `V` is `Ω = {x : φ(x) < ⟪x, e⟫}` for a unit vector `e` and an
 `M`-Lipschitz function `φ` that is constant along `e` (`Rd.LipschitzGraph`); for `V = ℝ^d` and
-`e = e_d` this is `{x_d > φ(x_1, …, x_(d-1))}`. With the cone `K = {y : M ‖y - ⟪y, e⟫ e‖ < ⟪y, e⟫}`
-(`Rd.LipschitzGraph.cone`), `Ω + K ⊆ Ω` (`Rd.LipschitzGraph.add_mem`): a step into the cone raises
-`⟪·, e⟫` faster than `φ`. The cone is closed under positive scaling and contains a ball around `e/4`
+`e = e_d` this is `{x_d > φ(x_1, …, x_(d-1))}`. The function `φ` is Lipschitz in Mathlib's sense
+(`Rd.LipschitzGraph.lipschitzWith_phi`), and `Ω` is open (`Rd.LipschitzGraph.toOpens`). With the
+cone `K = {y : M ‖y - ⟪y, e⟫ e‖ < ⟪y, e⟫}` (`Rd.LipschitzGraph.cone`), `Ω + K ⊆ Ω`
+(`Rd.LipschitzGraph.add_mem`): a step into the cone raises `⟪·, e⟫` faster than `φ`. The cone is
+closed under positive scaling and contains a ball around `e/4`
 (`Rd.LipschitzGraph.ball_subset_cone`). The closed cone `K̄ = {y : M ‖y - ⟪y, e⟫ e‖ ≤ ⟪y, e⟫}`
 (`Rd.LipschitzGraph.closedCone`) is closed under nonnegative scaling, and still `Ω + K̄ ⊆ Ω`
 (`Rd.LipschitzGraph.add_mem_of_mem_closedCone`); for the closure, `Ω̄ + K ⊆ Ω`
@@ -137,11 +139,15 @@ theorem smul_mem_closedCone {c : ℝ} (hc : 0 ≤ c) {y : V} (hy : y ∈ Ω.clos
   rw [real_inner_smul_left, ← smul_smul, ← smul_sub, norm_smul, Real.norm_of_nonneg hc]
   nlinarith
 
+/-- The graph function `φ` is `M`-Lipschitz, in the form of Mathlib's `LipschitzWith`. -/
+theorem lipschitzWith_phi : LipschitzWith ⟨Ω.M, Ω.M_nonneg⟩ Ω.phi :=
+  LipschitzWith.of_dist_le_mul fun x y => by
+    rw [Real.dist_eq, dist_eq_norm]
+    exact Ω.lipschitz x y
+
 /-- The graph function is continuous. -/
 theorem continuous_phi : Continuous Ω.phi :=
-  (LipschitzWith.of_dist_le_mul (K := ⟨Ω.M, Ω.M_nonneg⟩) fun x y => by
-    rw [Real.dist_eq, dist_eq_norm]
-    exact Ω.lipschitz x y).continuous
+  Ω.lipschitzWith_phi.continuous
 
 /-- **Steps into the open cone from the closure stay in the domain**: `Ω̄ + K ⊆ Ω`, since
 `φ(x) ≤ ⟪x, e⟫` on the closure of `Ω` and the cone is defined by a strict inequality
@@ -158,6 +164,15 @@ theorem add_mem_of_mem_closure {x y : V} (hx : x ∈ closure Ω.domain) (hy : y 
 /-- The domain is open. -/
 theorem isOpen_domain : IsOpen Ω.domain :=
   isOpen_lt Ω.continuous_phi (continuous_id.inner continuous_const)
+
+/-- The graph domain `Ω = {x : φ(x) < ⟪x, e⟫}` as an element of Mathlib's `Opens V`, the form in
+which open sets carry weak derivatives. -/
+def toOpens : TopologicalSpace.Opens V := ⟨Ω.domain, Ω.isOpen_domain⟩
+
+/-- The points of `Ω.toOpens` are the points of the graph domain. -/
+@[simp]
+theorem coe_toOpens : (Ω.toOpens : Set V) = Ω.domain :=
+  rfl
 
 /-- The radius `1/(8(M + 1))` of a ball around `e/4` inside the cone. -/
 noncomputable def coneRadius : ℝ := 1 / (8 * (Ω.M + 1))
