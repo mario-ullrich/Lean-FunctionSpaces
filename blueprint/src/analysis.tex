@@ -41,6 +41,7 @@ is integrable for integrable $K$ and $L$.
 \begin{lemma}[Weighted Jensen inequality]
 \label{lem:weighted-jensen}
 \lean{MeasureTheory.lintegral_mul_rpow_le, Rd.enorm_conv_le_lintegral,
+  MeasureTheory.lintegral_rpow_lintegral_kernel_le,
   MeasureTheory.lintegral_rpow_lintegral_mul_le, MeasureTheory.aemeasurable_kernel_rpow,
   MeasureTheory.aemeasurable_lintegral_kernel, MeasureTheory.lintegral_rpow_lintegral_le,
   MeasureTheory.eLpNorm_integral_kernel_le, MeasureTheory.eLpNorm_integral_kernel_le_of_bound}
@@ -48,6 +49,12 @@ is integrable for integrable $K$ and $L$.
 Let $1 \leq p < \infty$. For every measure $\mu$ and all measurable $a, g \geq 0$,
 \[
   \Bigl( \int a g \, d\mu \Bigr)^p \leq \Bigl( \int a \, d\mu \Bigr)^{p-1} \int a g^p \, d\mu .
+\]
+For $s$-finite measure spaces $X$, $Y$, every measurable $a : Y \to [0, \infty]$, every
+measurable $K : X \times Y \to [0, \infty]$ and every $C \in [0, \infty]$ with
+$\int_X K(x, y)^p \, dx \leq C$ for every $y \in Y$,
+\[
+  \int_X \Bigl( \int_Y a(y) \, K(x, y) \, dy \Bigr)^p dx \leq \Bigl( \int_Y a \Bigr)^p C .
 \]
 For all measurable $a, b \geq 0$ on a measurable group $G$ with a right-invariant $s$-finite
 measure, such as $V$ and the torus,
@@ -69,9 +76,10 @@ $\Phi(z) \neq 0$, then $\| \int_Z \Phi(z) \, G(\cdot, z) \, dz \|_p \leq \|\Phi\
 \leanok
 The first inequality is Hölder's inequality with the conjugate exponent $p'$ for
 $a g = a^{1/p'} \cdot a^{1/p} g$. For the second apply the first for fixed $x$, integrate over
-$x$, exchange the integrals by Tonelli's theorem, and use $\int_V b(x - y)^p \, dx = \int_V b^p$.
-The third follows in the same way from the first with $a = |\Phi|$ and $g = |G(x, \cdot)|$,
-and it gives the last one.
+$x$, exchange the integrals by Tonelli's theorem, and bound $\int_X K(x, y)^p \, dx$ by $C$. The
+third is the second for $K(x, y) = b(x - y)$ and $C = \int_G b^p$, since
+$\int_G b(x - y)^p \, dx = \int_G b^p$. The fourth follows in the same way from the first with
+$a = |\Phi|$ and $g = |G(x, \cdot)|$, and it gives the last one.
 \end{proof}
 
 \begin{theorem}[Young's inequality]

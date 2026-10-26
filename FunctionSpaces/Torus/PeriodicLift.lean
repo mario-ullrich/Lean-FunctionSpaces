@@ -18,7 +18,9 @@ quotient map `π` (`Torus.proj`). This file compares integrals of lifts with int
   `UnitAddTorus.lintegral_preimage`), so `π` maps the Lebesgue measure on `P_a` to the Haar
   measure (`Torus.measurePreserving_proj_periodBox`), `|P_a| = 1` and
   `‖F ∘ π‖_{L_p(P_a)} = ‖F‖_{L_p(𝕋^d)}` (`Torus.volume_periodBox`,
-  `Torus.eLpNorm_comp_proj_periodBox`). The boxes `P_m`, `m ∈ ℤ^d`, partition `ℝ^d`, hence `π`
+  `Torus.eLpNorm_comp_proj_periodBox`). Hence a bound `F(π x) ≤ A(x) + G(π x)` for almost every
+  `x ∈ P_0` gives `‖F‖_{L_p(𝕋^d)} ≤ ‖A‖_{L_p(ℝ^d)} + ‖G‖_{L_p(𝕋^d)}`
+  (`Torus.eLpNorm_le_of_comp_proj_le`). The boxes `P_m`, `m ∈ ℤ^d`, partition `ℝ^d`, hence `π`
   maps null sets back to null sets (`Torus.quasiMeasurePreserving_proj`) and almost everywhere
   statements on the torus lift (`Torus.ae_comp_proj`).
 * Convolutions and differences on the torus are those of the lift:
@@ -28,7 +30,8 @@ quotient map `π` (`Torus.proj`). This file compares integrals of lifts with int
   `∫_{B(x,r)} g(π y) dy ≤ (2r + 2)^d ∫_{𝕋^d} g` (`Torus.setLIntegral_ball_comp_proj_le`), lifts
   of integrable functions are locally integrable (`Torus.locallyIntegrable_comp_proj`), balls of
   radius `r ≤ 1` around points of `P_0` lie in the box `(-1, 2]^d` of side `3`
-  (`Torus.ball_subset_tripleBox`), and `∫_{(-1,2]^d} g(π y) dy = 3^d ∫_{𝕋^d} g`
+  (`Torus.ball_subset_tripleBox`), `‖y‖ ≥ 1` whenever `x ∈ P_0` and `x - y ∉ (-1, 2]^d`
+  (`Torus.one_le_norm_of_sub_notMem_tripleBox`), and `∫_{(-1,2]^d} g(π y) dy = 3^d ∫_{𝕋^d} g`
   (`Torus.setLIntegral_tripleBox`).
 -/
 
@@ -127,6 +130,26 @@ theorem eLpNorm_comp_proj_periodBox {ε : Type*} [TopologicalSpace ε] [Continuo
     (a : d → ℝ) {F : UnitAddTorus d → ε} (hF : AEStronglyMeasurable F volume) (p : ℝ≥0∞) :
     eLpNorm (F ∘ proj) p (volume.restrict (periodBox a)) = eLpNorm F p volume :=
   eLpNorm_comp_measurePreserving hF (measurePreserving_proj_periodBox a)
+
+/-- **From the period box to the torus**: for `1 ≤ p`, almost everywhere measurable
+`F, G : 𝕋^d → [0, ∞]` and `A : ℝ^d → [0, ∞]` with `F(π x) ≤ A(x) + G(π x)` for almost every
+`x ∈ P_0`, `‖F‖_{L_p(𝕋^d)} ≤ ‖A‖_{L_p(ℝ^d)} + ‖G‖_{L_p(𝕋^d)}`, since `L_p` norms on the torus are
+`L_p` norms of lifts on `P_0` (`Torus.eLpNorm_comp_proj_periodBox`). -/
+theorem eLpNorm_le_of_comp_proj_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {F G : UnitAddTorus d → ℝ≥0∞}
+    (hF : AEMeasurable F volume) (hG : AEMeasurable G volume) {A : EuclideanSpace ℝ d → ℝ≥0∞}
+    (h : ∀ᵐ x ∂volume.restrict (periodBox 0), F (proj x) ≤ A x + G (proj x)) :
+    eLpNorm F p volume ≤ eLpNorm A p volume + eLpNorm G p volume :=
+  calc eLpNorm F p volume = eLpNorm (F ∘ proj) p (volume.restrict (periodBox 0)) :=
+        (eLpNorm_comp_proj_periodBox 0 hF.aestronglyMeasurable p).symm
+    _ ≤ eLpNorm (A + G ∘ proj) p (volume.restrict (periodBox 0)) :=
+        eLpNorm_mono_enorm_ae (hF.aestronglyMeasurable.comp_measurePreserving
+          (measurePreserving_proj_periodBox 0)) (h.mono fun x hx => by
+            simpa only [enorm_eq_self, Pi.add_apply, Function.comp_apply] using hx)
+    _ ≤ eLpNorm A p (volume.restrict (periodBox 0)) +
+          eLpNorm (G ∘ proj) p (volume.restrict (periodBox 0)) := eLpNorm_add_le hp1
+    _ ≤ eLpNorm A p volume + eLpNorm G p volume :=
+        add_le_add (eLpNorm_mono_measure _ Measure.restrict_le_self)
+          (eLpNorm_comp_proj_periodBox 0 hG.aestronglyMeasurable p).le
 
 /-! ### Null sets and almost everywhere statements -/
 
@@ -263,6 +286,23 @@ theorem ball_subset_tripleBox {x : EuclideanSpace ℝ d} (hx : x ∈ periodBox 0
   obtain ⟨h1, h2⟩ := hx i
   simp only [Pi.zero_apply, zero_add] at h1 h2
   exact ⟨by linarith, by linarith⟩
+
+/-- **Points outside the box are far**: if `x ∈ P_0 = (0, 1]^d` and `x - y ∉ (-1, 2]^d`, then
+`‖y‖ ≥ 1`, since some coordinate has `y_i ≥ x_i + 1 > 1` or `y_i < x_i - 2 ≤ -1`. -/
+theorem one_le_norm_of_sub_notMem_tripleBox {x y : EuclideanSpace ℝ d} (hx : x ∈ periodBox 0)
+    (h : x - y ∉ tripleBox) : 1 ≤ ‖y‖ := by
+  simp only [tripleBox, mem_ofPred_eq, not_forall] at h
+  obtain ⟨i, hi⟩ := h
+  obtain ⟨h1, h2⟩ := hx i
+  simp only [Pi.zero_apply, zero_add] at h1 h2
+  rw [PiLp.sub_apply, mem_Ioc, not_and_or, not_lt, not_le] at hi
+  have hyi : 1 ≤ |y i| := by
+    rcases hi with hi | hi
+    · rw [abs_of_pos (by linarith)]
+      linarith
+    · rw [abs_of_neg (by linarith)]
+      linarith
+  exact hyi.trans (by rw [← Real.norm_eq_abs]; exact PiLp.norm_apply_le y i)
 
 /-- **The box of side `3`**: `∫_{(-1,2]^d} g(π y) dy = 3^d ∫_{𝕋^d} g`, since `(-1, 2]^d` is the
 disjoint union of `3^d` period boxes. -/

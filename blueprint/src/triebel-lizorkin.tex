@@ -9,7 +9,8 @@ characterisation by local means on both, and the characterisations by ball means
 and by atoms on $\R^d$ (\Cref{ch:triebel-lizorkin}). \Cref{ch:singular-integrals} proves the
 strong type of vector-valued singular integrals with Calder\'on--Zygmund kernel families and,
 from it, the square function theorem $\TL{0}{p}{2} = L_p$ for $n \geq 1$ and $1 < p < \infty$
-(\Cref{cor:square-function-theorem}).
+(\Cref{cor:square-function-theorem}), on $\R^d$ and on the torus
+(\Cref{cor:torus-square-function-theorem}).
 
 \chapter{Triebel--Lizorkin spaces}
 \label{ch:triebel-lizorkin}
@@ -241,7 +242,8 @@ and $\TL{s}{p}{q}(\T^d)$ consists of the $f \in L_p(\T^d)$ with $\|f\|_{F^s_{p,q
 \label{prop:torus-tl-elementary}
 \lean{Torus.blockFun_add_ae, Torus.blockFun_smul_ae, Torus.triebelLizorkinNorm_add_le,
   Torus.triebelLizorkinNorm_smul, Torus.triebelLizorkinNorm_zero,
-  Torus.triebelLizorkinNorm_mono_exponent, Torus.triebelLizorkinNorm_mono_smoothness,
+  Torus.triebelLizorkinNorm_zero_left, Torus.triebelLizorkinNorm_mono_exponent,
+  Torus.triebelLizorkinNorm_mono_smoothness,
   Torus.MemTriebelLizorkin.mono_exponent, Torus.MemTriebelLizorkin.mono_smoothness,
   Torus.MemTriebelLizorkin.add, Torus.MemTriebelLizorkin.smul, Torus.triebelLizorkinSpace,
   Torus.mem_triebelLizorkinSpace}
@@ -263,7 +265,9 @@ and
 \]
 In particular $\TL{s}{p}{q}(\T^d)$ is a linear subspace of $L_p(\T^d)$,
 $\TL{s}{p}{q}(\T^d) \subseteq \TL{s}{p}{r}(\T^d)$ and
-$\TL{t}{p}{q}(\T^d) \subseteq \TL{s}{p}{q}(\T^d)$.
+$\TL{t}{p}{q}(\T^d) \subseteq \TL{s}{p}{q}(\T^d)$. For every $q \in [0, \infty]$ and every
+$f \in L_p(\T^d)$,
+$\|f\|_{F^0_{p,q}} = \bigl\| t \mapsto \|((\psi_j * f)(t))_j\|_{\ell_q} \bigr\|_{L_p(\T^d)}$.
 \end{proposition}
 
 \begin{proof}
@@ -271,7 +275,8 @@ $\TL{t}{p}{q}(\T^d) \subseteq \TL{s}{p}{q}(\T^d)$.
 The pointwise block depends on $f$ only through its class, and the convolution integral is
 linear in $f$. Since $L_p(\T^d) \subseteq L_1(\T^d)$, the integrals converge absolutely at almost
 every point (\Cref{lem:torus-econv-young}), which gives the identities for the pointwise blocks,
-for all $j$ at once. The rest is the proof of \Cref{prop:tl-elementary}.
+for all $j$ at once. The rest is the proof of \Cref{prop:tl-elementary}; for $s = 0$ the weights
+$2^{j \cdot 0}$ are $1$.
 \end{proof}
 
 \begin{theorem}[$\TL{s}{p}{p}(\T^d) = \Besov{s}{p}{p}(\T^d)$ and the Besov sandwich on the torus]
@@ -2202,7 +2207,10 @@ of an integral; \Cref{sec:plancherel-bounds} gives the bounds on $L_2(V)$;
 Calder\'on--Zygmund decomposition of \Cref{sec:calderon-zygmund-signed}; and
 \Cref{sec:vector-valued-strong-type} interpolates with the theorems of
 \Cref{ch:operator-interpolation}. \Cref{sec:square-function} applies the strong type to the
-Littlewood--Paley blocks and proves the square function theorem $\TL{0}{p}{2} = L_p(V)$. The same
+Littlewood--Paley blocks and proves the square function theorem $\TL{0}{p}{2} = L_p(V)$.
+\Cref{sec:torus-singular-integrals} transfers the strong type to the torus by localising the
+periodic lift, and \Cref{sec:torus-square-function} proves
+$\TL{0}{p}{2}(\T^d) = L_p(\T^d)$. The same
 families give $\Sob{m}{p}(V) = \TL{m}{p}{2}$ (\Cref{ch:sobolev-rd}),
 $H^{s,p}(V) = \TL{s}{p}{2}$ (\Cref{ch:bessel-potential-spaces}) and the extension theorem for
 $\Sob{1}{p}$ (\Cref{ch:sobolev-domains}).
@@ -3747,4 +3755,353 @@ $f \in L_p(V)$,
 \begin{proof}
 \leanok
 \Cref{thm:square-function-upper} and \Cref{thm:square-function-lower}.
+\end{proof}
+
+\section{Vector-valued singular integrals on the torus}
+\label{sec:torus-singular-integrals}
+
+This section transfers the strong type of vector-valued singular integrals
+(\Cref{thm:vector-valued-strong-type}) to the torus $\T^d$, on which kernels $\theta_j$ on
+$\R^d$ act by $(\theta_j * f)(t) = \int_{\R^d} \theta_j(y) f(t - \pi y) \, dy$
+(\Cref{def:torus-econv}). The transfer localises the periodic lift, as for the Fefferman--Stein
+inequality (\Cref{thm:fefferman-stein-periodic}). At a point $x$ of the period box $P_0$,
+$(\theta_j * f)(\pi x) = (\theta_j * (f \circ \pi))(x)$ (\Cref{lem:torus-lift-conv}). The part
+$\mathbf 1_T (f \circ \pi)$ of the lift on the box $T = (-1, 2]^d$ is a function on $\R^d$ with
+$L_p$ norm $3^{\#d/p} \|f\|_p$, to which the bounds on $\R^d$ apply; the rest is seen by
+$\theta_j$ only at points $\|y\| \geq 1$, and the mass of the kernels there bounds it by Young's
+inequality. Throughout, $\#d$ is the dimension of the torus, and $\mathbf 1_T$ is the indicator
+function of $T$.
+
+\begin{definition}[The far mass and the far convolution]
+\label{def:torus-far-mass}
+\lean{Torus.farMass, Torus.farConv, Torus.aemeasurable_tsum_enorm, Torus.aemeasurable_farConv}
+\leanok
+\uses{def:torus-econv, lem:torus-proj}
+For every family $\theta = (\theta_j)_{j \in \N}$ of functions $\R^d \to \C$, the far mass is
+\[
+  M_\theta = \int_{\{\|y\| \geq 1\}} \sum_j |\theta_j(y)| \, dy \in [0, \infty],
+\]
+and for every $G : \T^d \to [0, \infty]$ the far convolution is
+\[
+  F_\theta G(t) = \int_{\{\|y\| \geq 1\}} \Bigl( \sum_j |\theta_j(y)| \Bigr) G(t - \pi y) \, dy .
+\]
+If every $\theta_j$ is almost everywhere measurable, then $y \mapsto \sum_j |\theta_j(y)|$ is
+almost everywhere measurable, and $F_\theta G$ is almost everywhere measurable for every
+measurable $G$.
+\end{definition}
+
+\begin{lemma}[The far mass of dilation families]
+\label{lem:torus-far-mass-dilate}
+\lean{Rd.inv_one_add_ofReal_two_pow_le, Torus.farMass_dilate_le, Torus.farMass_psi_le,
+  Torus.farMass_psiDual_le}
+\leanok
+\uses{def:torus-far-mass, def:uniform-schwartz, lem:schwartz-tails,
+  lem:uniform-schwartz-constants, def:psi-base, lem:psi-base, def:psi-dual, lem:psi-dual-basic}
+For every uniform Schwartz family $(G_j)_j$ on $\R^d$ with bounds $A$, the dilates
+$\theta_j = (G_j)_{2^j}$ satisfy
+\[
+  M_\theta \leq 2 \, T_{A,0,1} .
+\]
+In particular $M_\psi \leq 2 T_{A^\psi,0,1}$ for the blocks and
+$M_{\tilde\psi} \leq 2 T_{\tilde A,0,1}$ for the synthesis kernels.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By monotone convergence $M_\theta$ is the sum over $j$ of the tails
+$\int_{\{\|y\| \geq 1\}} |(G_j)_{2^j}(y)| \, dy$. \Cref{lem:schwartz-tails} with $a = 1$ and
+$N = 1$ and \Cref{lem:uniform-schwartz-constants} bound the $j$-th tail by
+$T_{A,0,1} (1 + 2^j)^{-1} \leq T_{A,0,1} 2^{-j}$, and $\sum_j 2^{-j} = 2$. The blocks and the
+synthesis kernels are such dilates by \Cref{lem:psi-base} and \Cref{lem:psi-dual-basic}.
+\end{proof}
+
+\begin{lemma}[Young's inequality for the far convolution]
+\label{lem:torus-far-conv-young}
+\lean{Torus.lintegral_rpow_lintegral_mul_comp_sub_proj_le, Torus.eLpNorm_farConv_le,
+  Torus.tsum_setLIntegral_eq_farConv}
+\leanok
+\uses{def:torus-far-mass, lem:weighted-jensen, lem:lp-norm-nonnegative}
+For every $q \geq 1$, every s-finite measure $\nu$ on $\R^d$, every almost everywhere measurable
+$a : \R^d \to [0, \infty]$ and every measurable $G : \T^d \to [0, \infty]$,
+\[
+  \int_{\T^d} \Bigl( \int a(y) G(t - \pi y) \, d\nu(y) \Bigr)^q dt
+  \leq \Bigl( \int a \, d\nu \Bigr)^q \int_{\T^d} G^q .
+\]
+For every $1 \leq p < \infty$, every family $\theta$ of almost everywhere measurable functions and
+every measurable $G : \T^d \to [0, \infty]$, $\|F_\theta G\|_p \leq M_\theta \|G\|_p$ and, for
+every $t \in \T^d$,
+\[
+  \sum_j \int_{\{\|y\| \geq 1\}} |\theta_j(y)| \, G(t - \pi y) \, dy = F_\theta G(t) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+This is the kernel form of Young's inequality (\Cref{lem:weighted-jensen}) for
+$K(t, y) = G(t - \pi y)$, since $\int_{\T^d} G(t - \pi y)^q \, dt = \int_{\T^d} G^q$ for every
+$y$ by the translation invariance of the Haar measure of $\T^d$. The
+bound of $F_\theta G$ is the case $q = p$, $\nu$ the Lebesgue measure on $\{\|y\| \geq 1\}$ and
+$a = \sum_j |\theta_j|$, with $\|G\|_p^p = \int G^p$ (\Cref{lem:lp-norm-nonnegative}); the sum
+over $j$ is monotone convergence.
+\end{proof}
+
+\begin{lemma}[The box of side $3$ and the far points]
+\label{lem:torus-triple-box}
+\lean{Torus.one_le_norm_of_sub_notMem_tripleBox, Torus.eLpNorm_indicator_tripleBox_comp_proj,
+  Torus.memLp_indicator_tripleBox_comp_proj}
+\leanok
+\uses{def:period-box, lem:period-box-counting, thm:fefferman-stein-periodic}
+For every $x \in P_0$ and every $y \in \R^d$ with $x - y \notin T$, $\|y\| \geq 1$. For every
+$0 < p < \infty$ and every almost everywhere strongly measurable $f : \T^d \to \C$,
+\[
+  \|\mathbf 1_T (f \circ \pi)\|_{L_p(\R^d)} = 3^{\#d/p} \|f\|_{L_p(\T^d)} ,
+\]
+so $\mathbf 1_T (f \circ \pi) \in L_p(\R^d)$ for every $f \in L_p(\T^d)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Some coordinate has $(x - y)_i \leq -1$ or $(x - y)_i > 2$; with $0 < x_i \leq 1$ this gives
+$y_i \geq 1$ or $y_i < -1$, and $|y_i| \leq \|y\|$. The norm identity is the identity
+$\int_T u(\pi y) \, dy = 3^{\#d} \int_{\T^d} u$ of \Cref{lem:period-box-counting} for
+$u = |f|^p$.
+\end{proof}
+
+\begin{lemma}[Localisation of convolutions]
+\label{lem:torus-conv-localisation}
+\lean{Torus.enorm_econv_proj_sub_conv_le, Torus.ae_integrable_econv_proj,
+  Torus.lqNorm_econv_proj_le, Torus.enorm_sum_econv_proj_le}
+\leanok
+\uses{lem:torus-triple-box, lem:torus-lift-conv, def:conv, lem:torus-econv-young,
+  lem:period-box-measure, lem:lq-basic, lem:torus-far-conv-young, def:torus-far-mass}
+For every $\theta : \R^d \to \C$, every $f : \T^d \to \C$ and every $x \in P_0$ such that
+$y \mapsto \theta(y) f(\pi x - \pi y)$ is integrable,
+\[
+  \bigl| (\theta * f)(\pi x) - \bigl(\theta * (\mathbf 1_T (f \circ \pi))\bigr)(x) \bigr|
+  \leq \int_{\{\|y\| \geq 1\}} |\theta(y)| \, |f(\pi x - \pi y)| \, dy ,
+\]
+with the convolution on $\R^d$ in the second term. For every family of integrable
+$\theta_j : \R^d \to \C$ and every family of measurable $g_j \in L_1(\T^d)$, the functions
+$y \mapsto \theta_j(y) g_j(\pi x - \pi y)$ are integrable for almost every $x \in \R^d$ and all
+$j$ at once. For every family of almost everywhere measurable $\theta_j$, every measurable
+$f : \T^d \to \C$ and every $x \in P_0$ at which all these functions are integrable,
+\[
+  \|((\theta_j * f)(\pi x))_j\|_{\ell_2}
+  \leq \bigl\| \bigl(\bigl(\theta_j * (\mathbf 1_T (f \circ \pi))\bigr)(x)\bigr)_j \bigr\|_{\ell_2}
+  + F_\theta |f| (\pi x) ,
+\]
+and for every family of measurable $g_j : \T^d \to \C$, every finite set $s \subseteq \N$ and
+every $x \in P_0$ at which all the integrals for $g_j$ converge absolutely, with
+$G(t) = \|(g_j(t))_j\|_{\ell_2}$,
+\[
+  \Bigl| \sum_{j \in s} (\theta_j * g_j)(\pi x) \Bigr|
+  \leq \Bigl| \sum_{j \in s} \bigl(\theta_j * (\mathbf 1_T (g_j \circ \pi))\bigr)(x) \Bigr|
+  + F_\theta G (\pi x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:torus-lift-conv}, $(\theta * f)(\pi x) = \int \theta(y) f(\pi x - \pi y) \, dy$, and
+the convolution with $\mathbf 1_T (f \circ \pi)$ is the integral of the same function over the
+$y$ with $x - y \in T$. The difference is the integral over the other $y$, which have
+$\|y\| \geq 1$ (\Cref{lem:torus-triple-box}). The integrability holds for almost every $t$ at
+$t = \pi x$ (\Cref{lem:torus-econv-young}), and lifts to almost every $x$
+(\Cref{lem:period-box-measure}). For the $\ell_2$ bound, the triangle inequality in $\ell_2$
+separates the two parts, $\|\cdot\|_{\ell_2} \leq \|\cdot\|_{\ell_1}$ (\Cref{lem:lq-basic}) bounds
+the far parts by their sum, and that sum is $F_\theta |f| (\pi x)$
+(\Cref{lem:torus-far-conv-young}). For the sums, $|g_j| \leq G$ at every point, and the far parts
+over $j \in s$ are at most their sum over all $j$.
+\end{proof}
+
+\begin{lemma}[From the period box to the torus]
+\label{lem:torus-period-box-split}
+\lean{Torus.eLpNorm_le_of_comp_proj_le}
+\leanok
+\uses{lem:period-box-measure}
+For every $1 \leq p \leq \infty$, all almost everywhere measurable $F, G : \T^d \to [0, \infty]$
+and every $A : \R^d \to [0, \infty]$ with $F(\pi x) \leq A(x) + G(\pi x)$ for almost every
+$x \in P_0$,
+\[
+  \|F\|_{L_p(\T^d)} \leq \|A\|_{L_p(\R^d)} + \|G\|_{L_p(\T^d)} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\|F\|_{L_p(\T^d)} = \|F \circ \pi\|_{L_p(P_0)}$ and
+$\|G \circ \pi\|_{L_p(P_0)} = \|G\|_{L_p(\T^d)}$ (\Cref{lem:period-box-measure}); monotonicity
+and the triangle inequality in $L_p(P_0)$, and $\|A\|_{L_p(P_0)} \leq \|A\|_{L_p(\R^d)}$ finish.
+\end{proof}
+
+\begin{definition}[The strong type constant on the torus]
+\label{def:periodic-cz-const}
+\lean{Torus.periodicCZConst, Torus.periodicCZConst_ne_top}
+\leanok
+\uses{def:cz-const}
+For $1 < p < \infty$ and $B, H, D \in [0, \infty]$,
+\[
+  S^{\T}_{p}(B, H, D) = 3^{\#d/p} \, S_{\R^d,p}(B, H) + D ,
+\]
+with the constant $S_{\R^d,p}(B, H)$ of \Cref{def:cz-const}. It is finite if $B$, $H$ and $D$
+are.
+\end{definition}
+
+\begin{theorem}[The strong type of vector-valued singular integrals on the torus]
+\label{thm:torus-vector-valued-strong-type}
+\lean{Torus.eLpNorm_lqNorm_econv_le, Torus.eLpNorm_sum_econv_le}
+\leanok
+\uses{thm:vector-valued-strong-type, def:periodic-cz-const, lem:torus-conv-localisation,
+  lem:torus-period-box-split, lem:torus-triple-box, lem:torus-far-conv-young, def:cz-family,
+  lem:torus-econv-young}
+Let $\#d \geq 1$ and $1 < p < \infty$. For all $B, H, D \in [0, \infty]$, every
+Calder\'on--Zygmund family $\theta = (\theta_j)_j$ on $\R^d$ with overlap $B$ and H\"ormander
+constant $H$ and with $M_\theta \leq D$, every $f \in L_p(\T^d)$,
+\[
+  \bigl\| t \mapsto \|((\theta_j * f)(t))_j\|_{\ell_2} \bigr\|_{L_p(\T^d)}
+  \leq S^{\T}_{p}(B, H, D) \, \|f\|_p ,
+\]
+and for every finite set $s \subseteq \N$ and all measurable $g_j \in L_p(\T^d)$,
+\[
+  \Bigl\| \sum_{j \in s} \theta_j * g_j \Bigr\|_{L_p(\T^d)}
+  \leq S^{\T}_{p}(B, H, D) \, \bigl\| t \mapsto \|(g_j(t))_j\|_{\ell_2} \bigr\|_{L_p(\T^d)} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+On the torus $L_p \subseteq L_1$, so \Cref{lem:torus-conv-localisation} applies at almost every
+point of $P_0$, and \Cref{lem:torus-period-box-split} bounds the left side by the sum of two
+terms. The first is the $L_p(\R^d)$ norm of the analysis operator, or of a synthesis operator,
+of the family on $\R^d$ applied to $\mathbf 1_T (f \circ \pi)$, or to the
+$\mathbf 1_T (g_j \circ \pi)$, which lie in $L_p(\R^d)$ (\Cref{lem:torus-triple-box}).
+\Cref{thm:vector-valued-strong-type} bounds it by $S_{\R^d,p}(B, H)$ times
+$\|\mathbf 1_T (f \circ \pi)\|_p = 3^{\#d/p} \|f\|_p$, respectively times
+$\|\mathbf 1_T (G \circ \pi)\|_p = 3^{\#d/p} \|G\|_p$ with $G(t) = \|(g_j(t))_j\|_{\ell_2}$, since
+$\|(\mathbf 1_T (g_j \circ \pi)(x))_j\|_{\ell_2} = \mathbf 1_T (G \circ \pi)(x)$. The second is
+the norm of a far convolution, at most $M_\theta \|f\|_p$, respectively $M_\theta \|G\|_p$
+(\Cref{lem:torus-far-conv-young}).
+\end{proof}
+
+\section{The square function theorem on the torus}
+\label{sec:torus-square-function}
+
+The square function theorem of \Cref{sec:square-function} holds on the torus with the same
+proof: the blocks $\psi_j$ and the synthesis kernels $\tilde\psi_j$ are Calder\'on--Zygmund
+families of dilates on $\R^d$ (\Cref{thm:cz-family-psi}, \Cref{thm:cz-family-psi-dual}), their
+far masses are finite (\Cref{lem:torus-far-mass-dilate}), and the strong type on the torus
+(\Cref{thm:torus-vector-valued-strong-type}) replaces the strong type on $\R^d$. For
+$1 < p < \infty$ this gives $\TL{0}{p}{2}(\T^d) = L_p(\T^d)$ with equivalent norms.
+
+\begin{definition}[The square function constants on the torus]
+\label{def:torus-square-function-consts}
+\lean{Torus.squareFunctionConst, Torus.squareFunctionConst_ne_top, Torus.squareSynthesisConst,
+  Torus.squareSynthesisConst_ne_top}
+\leanok
+\uses{def:periodic-cz-const, def:hormander-const, def:uniform-schwartz, def:psi-base,
+  def:psi-dual}
+For $1 < p < \infty$,
+\[
+  Q^{\T}_{p} = S^{\T}_{p}\bigl(2, 4 H_{A^\psi}, 2 T_{A^\psi,0,1}\bigr) , \qquad
+  \tilde Q^{\T}_{p} = S^{\T}_{p}\bigl(4, 4 H_{\tilde A}, 2 T_{\tilde A,0,1}\bigr) .
+\]
+Both are finite.
+\end{definition}
+
+\begin{theorem}[The upper square function bound on the torus]
+\label{thm:torus-square-function-upper}
+\lean{Torus.triebelLizorkinNorm_zero_two_le, Torus.memTriebelLizorkin_zero_two}
+\leanok
+\uses{def:torus-triebel-lizorkin, prop:torus-tl-elementary, thm:cz-family-psi,
+  lem:torus-far-mass-dilate, thm:torus-vector-valued-strong-type,
+  def:torus-square-function-consts}
+Let $\#d \geq 1$ and $1 < p < \infty$. For every $f \in L_p(\T^d)$,
+\[
+  \|f\|_{\TL{0}{p}{2}(\T^d)} \leq Q^{\T}_{p} \, \|f\|_p ,
+\]
+and in particular $f \in \TL{0}{p}{2}(\T^d)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{prop:torus-tl-elementary} the norm $\|f\|_{\TL{0}{p}{2}(\T^d)}$ is the $L_p$ norm of the
+square function $t \mapsto \|((\psi_j * f)(t))_j\|_{\ell_2}$. The blocks form a
+Calder\'on--Zygmund family with overlap $2$ and H\"ormander constant $4 H_{A^\psi}$
+(\Cref{thm:cz-family-psi}) and far mass at most
+$2 T_{A^\psi,0,1}$ (\Cref{lem:torus-far-mass-dilate}), and
+\Cref{thm:torus-vector-valued-strong-type} bounds its analysis operator.
+\end{proof}
+
+\begin{lemma}[The reproducing formula on the torus]
+\label{lem:torus-square-function-reproducing}
+\lean{Torus.econvLp_psiDual_lpBlock, Torus.sum_econv_psiDual_lpBlock_ae}
+\leanok
+\uses{lem:torus-econv-identities, lem:psi-dual-reproduces, def:torus-lp-blocks,
+  lem:torus-econv-young, lem:psi-dual-basic}
+Let $1 \leq p < \infty$ and $f \in L_p(\T^d)$. For every $j \in \N$,
+$\tilde\psi_j * \Delta_j f = \Delta_j f$, and for every finite set $s \subseteq \N$,
+\[
+  \sum_{j \in s} \tilde\psi_j * \Delta_j f = \sum_{j \in s} \Delta_j f
+\]
+almost everywhere, with the convolution integrals of representatives of the $\Delta_j f$ on the
+left.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\tilde\psi_j * (\psi_j * f) = (\tilde\psi_j * \psi_j) * f$ (\Cref{lem:torus-econv-identities})
+and $\tilde\psi_j * \psi_j = \psi_j$ (\Cref{lem:psi-dual-reproduces}). The convolution integral
+represents the operator of \Cref{lem:torus-econv-young}.
+\end{proof}
+
+\begin{theorem}[The lower square function bound on the torus]
+\label{thm:torus-square-function-lower}
+\lean{Torus.enorm_le_triebelLizorkinNorm_zero_two}
+\leanok
+\uses{lem:torus-square-function-reproducing, thm:cz-family-psi-dual, lem:torus-far-mass-dilate,
+  thm:torus-vector-valued-strong-type, prop:torus-tl-elementary,
+  def:torus-square-function-consts, lem:torus-lp-blocks, def:torus-triebel-lizorkin}
+Let $\#d \geq 1$ and $1 < p < \infty$. For every $f \in L_p(\T^d)$,
+\[
+  \|f\|_p \leq \tilde Q^{\T}_{p} \, \|f\|_{\TL{0}{p}{2}(\T^d)} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+For every $J \in \N$, \Cref{lem:torus-square-function-reproducing} and
+\Cref{thm:torus-vector-valued-strong-type} for the Calder\'on--Zygmund family
+$(\tilde\psi_j)_j$ with overlap $4$, H\"ormander constant $4 H_{\tilde A}$
+(\Cref{thm:cz-family-psi-dual}) and far mass at most $2 T_{\tilde A,0,1}$
+(\Cref{lem:torus-far-mass-dilate}), applied to $g_j = \Delta_j f$, give
+\[
+  \Bigl\| \sum_{j < J} \Delta_j f \Bigr\|_p
+  \leq \tilde Q^{\T}_{p} \, \bigl\| t \mapsto \|(\Delta_j f(t))_j\|_{\ell_2} \bigr\|_p
+  = \tilde Q^{\T}_{p} \, \|f\|_{\TL{0}{p}{2}(\T^d)} ,
+\]
+since $\Delta_j f = \psi_j * f$ almost everywhere for all $j$ at once
+(\Cref{def:torus-triebel-lizorkin}, \Cref{prop:torus-tl-elementary}). The left side tends
+to $\|f\|_p$ as $J \to \infty$ (\Cref{lem:torus-lp-blocks}).
+\end{proof}
+
+\begin{corollary}[The square function theorem on the torus]
+\label{cor:torus-square-function-theorem}
+\lean{Torus.triebelLizorkinSpace_zero_two_eq_top, Torus.memTriebelLizorkin_two_of_memBesov}
+\leanok
+\uses{thm:torus-square-function-upper, thm:torus-square-function-lower,
+  prop:torus-tl-elementary, thm:torus-tl-besov-sandwich}
+Let $\#d \geq 1$ and $1 < p < \infty$. Then $\TL{0}{p}{2}(\T^d) = L_p(\T^d)$, and for every
+$f \in L_p(\T^d)$,
+\[
+  \|f\|_p \leq \tilde Q^{\T}_{p} \, \|f\|_{\TL{0}{p}{2}(\T^d)} , \qquad
+  \|f\|_{\TL{0}{p}{2}(\T^d)} \leq Q^{\T}_{p} \, \|f\|_p .
+\]
+For every $s \geq 0$, $\Besov{s}{p}{\min(p,2)}(\T^d) \subseteq \TL{s}{p}{2}(\T^d)$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:torus-square-function-upper} and \Cref{thm:torus-square-function-lower}. For $s > 0$
+the inclusion is the Besov sandwich (\Cref{thm:torus-tl-besov-sandwich}); for $s = 0$ every
+$f \in L_p(\T^d)$ lies in $\TL{0}{p}{2}(\T^d)$.
 \end{proof}

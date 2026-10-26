@@ -162,6 +162,8 @@ public import FunctionSpaces.Torus.TriebelLizorkinInterpolation
 public import FunctionSpaces.Torus.PeriodicLift
 public import FunctionSpaces.Torus.FeffermanStein
 public import FunctionSpaces.Torus.TriebelLizorkinLocalMeans
+public import FunctionSpaces.Torus.SingularIntegrals
+public import FunctionSpaces.Torus.SquareFunction
 public import FunctionSpaces.Interval.Differences
 public import FunctionSpaces.Interval.Modulus
 public import FunctionSpaces.Interval.Polynomials
@@ -716,6 +718,11 @@ and the theorems that their characterisations agree. The library builds on
   of periodic lifts on the period box, by localisation.
 * `FunctionSpaces.Torus.TriebelLizorkinLocalMeans`: the local means characterisation of
   `F^s_{p,q}(𝕋^d)` for `1 < p < ∞`, `1 < q ≤ ∞`, `0 < s < L`, through the periodic lift.
+* `FunctionSpaces.Torus.SingularIntegrals`: the strong type of the analysis and synthesis
+  operators of Calderón–Zygmund families on the torus for `1 < p < ∞`, by localising the periodic
+  lift.
+* `FunctionSpaces.Torus.SquareFunction`: the square function theorem
+  `L_p(𝕋^d) = F^0_{p,2}(𝕋^d)` for `1 < p < ∞`, with named constants.
 
 ### Intervals
 

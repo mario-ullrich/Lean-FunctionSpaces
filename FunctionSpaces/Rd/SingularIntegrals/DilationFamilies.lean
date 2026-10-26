@@ -340,6 +340,13 @@ theorem inv_one_add_ofReal_two_pow_mul_le (j : ℕ) (y : V) :
     ENNReal.ofReal_ofNat, ofReal_norm]
   exact ENNReal.inv_le_inv.2 le_add_self
 
+/-- `(1 + 2^j)^(-1) ≤ 2^(-j)` in `[0, ∞]`, written in the form `((1 + ofReal (2^j · 1))^1)^(-1)`
+of the tail bound `Rd.setLIntegral_enorm_dilate_schwartz_le` at radius `1` and order `1`. -/
+theorem inv_one_add_ofReal_two_pow_le (j : ℕ) :
+    ((1 + ENNReal.ofReal (2 ^ j * 1)) ^ 1)⁻¹ ≤ (2⁻¹ : ℝ≥0∞) ^ j := by
+  rw [mul_one, pow_one, ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat, ← ENNReal.inv_pow]
+  exact ENNReal.inv_le_inv.2 le_add_self
+
 /-- **Long steps**: `∫_{‖x‖ > 2‖y‖} |G_{2^j}(x - y) - G_{2^j}(x)| dx ≤ 2 T_G (2^j ‖y‖)^(-1)` with
 `T_G = Rd.tailConst G 0 1`: both `x` and `x - y` lie outside the ball of radius `‖y‖`, where the
 mass of `G_{2^j}` is at most `T_G (1 + 2^j ‖y‖)^(-1)`

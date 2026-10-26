@@ -18,8 +18,10 @@ on the torus), the convolution `(K ⋆ f)(x) = ∫ K(y) f(x - y) dμ(y)` with th
 
 `(∫ a g)^p ≤ (∫ a)^(p-1) ∫ a g^p`
 
-(`MeasureTheory.lintegral_mul_rpow_le`, Hölder's inequality for the measure `a dμ`), applied to
-`g(y) = f(x - y)` and integrated over `x` by Tonelli's theorem and the invariance of `μ`
+(`MeasureTheory.lintegral_mul_rpow_le`, Hölder's inequality for the measure `a dμ`). Integrated
+over `x` by Tonelli's theorem, it gives `∫ (∫ a(y) K(x, y) dy)^q dx ≤ (∫ a)^q C` for every kernel
+with `∫ K(x, y)^q dx ≤ C` for all `y` (`MeasureTheory.lintegral_rpow_lintegral_kernel_le`). For
+`K(x, y) = |f(x - y)|` the invariance of `μ` gives Young's inequality
 (`MeasureTheory.lintegral_rpow_lintegral_le`). The same bound shows that the convolution integral
 converges absolutely almost everywhere (`MeasureTheory.ae_convolutionExistsAt`). Mathlib has the
 pointwise bounds of convolutions, not Young's inequality.
@@ -79,6 +81,43 @@ theorem lintegral_mul_rpow_le {α : Type*} [MeasurableSpace α] {μ : Measure α
         rw [ENNReal.mul_rpow_of_nonneg _ _ hp0.le, ← ENNReal.rpow_mul, ← ENNReal.rpow_mul,
           one_div_mul_cancel hp0.ne', ENNReal.rpow_one, hexp]
 
+/-- **Young's inequality for kernels**, for nonnegative functions: for `1 ≤ q`, s-finite measures
+`μ` on `X` and `ν` on `Y`, an almost everywhere measurable `a : Y → [0, ∞]` and a jointly almost
+everywhere measurable `K : X × Y → [0, ∞]` with `∫ K(x, y)^q dμ(x) ≤ C` for every `y`,
+`∫ (∫ a(y) K(x, y) dν(y))^q dμ(x) ≤ (∫ a dν)^q C`. By the weighted Jensen inequality the inner
+power is at most `(∫ a)^(q-1) ∫ a(y) K(x, y)^q dν(y)`, and Tonelli's theorem gives
+`(∫ a)^(q-1) ∫ a(y) C dν(y)`. -/
+theorem lintegral_rpow_lintegral_kernel_le {X Y : Type*} [MeasurableSpace X] [MeasurableSpace Y]
+    {μ : Measure X} {ν : Measure Y} [SFinite μ] [SFinite ν] {q : ℝ} (hq1 : 1 ≤ q)
+    {a : Y → ℝ≥0∞} (ha : AEMeasurable a ν) {K : X → Y → ℝ≥0∞}
+    (hK : AEMeasurable (Function.uncurry K) (μ.prod ν)) {C : ℝ≥0∞}
+    (hC : ∀ y, ∫⁻ x, K x y ^ q ∂μ ≤ C) :
+    ∫⁻ x, (∫⁻ y, a y * K x y ∂ν) ^ q ∂μ ≤ (∫⁻ y, a y ∂ν) ^ q * C := by
+  have hprod : AEMeasurable (Function.uncurry fun x y => a y * K x y ^ q) (μ.prod ν) :=
+    ha.comp_snd.mul (hK.pow_const q)
+  have hx : ∀ᵐ x ∂μ, AEMeasurable (K x) ν :=
+    hK.aestronglyMeasurable.prodMk_left.mono fun x hx => hx.aemeasurable
+  have hy : ∀ᵐ y ∂ν, AEMeasurable (fun x => K x y ^ q) μ :=
+    hK.prod_swap.aestronglyMeasurable.prodMk_left.mono fun y hy => hy.aemeasurable.pow_const q
+  calc ∫⁻ x, (∫⁻ y, a y * K x y ∂ν) ^ q ∂μ
+      ≤ ∫⁻ x, (∫⁻ y, a y ∂ν) ^ (q - 1) * ∫⁻ y, a y * K x y ^ q ∂ν ∂μ :=
+        lintegral_mono_ae (hx.mono fun x hx => lintegral_mul_rpow_le hq1 ha hx)
+    _ = (∫⁻ y, a y ∂ν) ^ (q - 1) * ∫⁻ x, ∫⁻ y, a y * K x y ^ q ∂ν ∂μ :=
+        lintegral_const_mul'' _ hprod.lintegral_prod_right'
+    _ = (∫⁻ y, a y ∂ν) ^ (q - 1) * ∫⁻ y, ∫⁻ x, a y * K x y ^ q ∂μ ∂ν := by
+        rw [lintegral_lintegral_swap hprod]
+    _ ≤ (∫⁻ y, a y ∂ν) ^ (q - 1) * ∫⁻ y, a y * C ∂ν := by
+        gcongr 1
+        refine lintegral_mono_ae (hy.mono fun y hy => ?_)
+        rw [lintegral_const_mul'' _ hy]
+        gcongr
+        exact hC y
+    _ = (∫⁻ y, a y ∂ν) ^ q * C := by
+        rw [lintegral_mul_const'' _ ha, ← mul_assoc]
+        congr 1
+        conv_rhs => rw [show q = (q - 1) + 1 by ring]
+        rw [ENNReal.rpow_add_of_nonneg _ _ (by linarith) zero_le_one, ENNReal.rpow_one]
+
 /-! ### Young's inequality -/
 
 section Young
@@ -87,38 +126,15 @@ variable {G : Type*} [AddGroup G] [MeasurableSpace G] [MeasurableAdd₂ G] [Meas
   {μ : Measure G} [SFinite μ] [μ.IsAddRightInvariant]
 
 /-- **The integral form of Young's inequality** for nonnegative functions: for `1 ≤ q`,
-`∫ (∫ a(y) b(x - y) dy)^q dx ≤ (∫ a)^q ∫ b^q`. By the weighted Jensen inequality the inner power is
-at most `(∫ a)^(q-1) ∫ a(y) b(x - y)^q dy`; Tonelli's theorem and the invariance of `μ` give
-`(∫ a)^(q-1) (∫ a) ∫ b^q`. -/
+`∫ (∫ a(y) b(x - y) dy)^q dx ≤ (∫ a)^q ∫ b^q`. This is the kernel form
+`MeasureTheory.lintegral_rpow_lintegral_kernel_le` for `K(x, y) = b(x - y)`, since
+`∫ b(x - y)^q dx = ∫ b^q` by the invariance of `μ`. -/
 theorem lintegral_rpow_lintegral_mul_le {q : ℝ} (hq1 : 1 ≤ q) {a b : G → ℝ≥0∞}
     (ha : AEMeasurable a μ) (hb : AEMeasurable b μ) :
-    ∫⁻ x, (∫⁻ y, a y * b (x - y) ∂μ) ^ q ∂μ ≤ (∫⁻ y, a y ∂μ) ^ q * ∫⁻ x, b x ^ q ∂μ := by
-  have hbx : ∀ x, AEMeasurable (fun y => b (x - y)) μ := fun x =>
-    hb.comp_quasiMeasurePreserving (quasiMeasurePreserving_sub_left_of_right_invariant μ x)
-  have hby : ∀ y, AEMeasurable (fun x => b (x - y) ^ q) μ := fun y =>
-    (hb.pow_const q).comp_quasiMeasurePreserving
-      (measurePreserving_sub_right μ y).quasiMeasurePreserving
-  have hprod : AEMeasurable (Function.uncurry fun x y => a y * b (x - y) ^ q) (μ.prod μ) :=
-    ha.comp_snd.mul ((hb.pow_const q).comp_quasiMeasurePreserving
-      (quasiMeasurePreserving_sub_of_right_invariant μ μ))
-  calc ∫⁻ x, (∫⁻ y, a y * b (x - y) ∂μ) ^ q ∂μ
-      ≤ ∫⁻ x, (∫⁻ y, a y ∂μ) ^ (q - 1) * ∫⁻ y, a y * b (x - y) ^ q ∂μ ∂μ :=
-        lintegral_mono fun x => lintegral_mul_rpow_le hq1 ha (hbx x)
-    _ = (∫⁻ y, a y ∂μ) ^ (q - 1) * ∫⁻ x, ∫⁻ y, a y * b (x - y) ^ q ∂μ ∂μ :=
-        lintegral_const_mul'' _ hprod.lintegral_prod_right'
-    _ = (∫⁻ y, a y ∂μ) ^ (q - 1) * ∫⁻ y, ∫⁻ x, a y * b (x - y) ^ q ∂μ ∂μ := by
-        rw [lintegral_lintegral_swap hprod]
-    _ = (∫⁻ y, a y ∂μ) ^ (q - 1) * ∫⁻ y, a y * ∫⁻ x, b x ^ q ∂μ ∂μ := by
-        congr 1
-        refine lintegral_congr fun y => ?_
-        rw [lintegral_const_mul'' _ (hby y), lintegral_sub_right_eq_self (fun x => b x ^ q) y]
-    _ = (∫⁻ y, a y ∂μ) ^ (q - 1) * ((∫⁻ y, a y ∂μ) * ∫⁻ x, b x ^ q ∂μ) := by
-        rw [lintegral_mul_const'' _ ha]
-    _ = (∫⁻ y, a y ∂μ) ^ q * ∫⁻ x, b x ^ q ∂μ := by
-        rw [← mul_assoc]
-        congr 1
-        conv_rhs => rw [show q = (q - 1) + 1 by ring]
-        rw [ENNReal.rpow_add_of_nonneg _ _ (by linarith) zero_le_one, ENNReal.rpow_one]
+    ∫⁻ x, (∫⁻ y, a y * b (x - y) ∂μ) ^ q ∂μ ≤ (∫⁻ y, a y ∂μ) ^ q * ∫⁻ x, b x ^ q ∂μ :=
+  lintegral_rpow_lintegral_kernel_le hq1 ha (K := fun x y => b (x - y))
+    (hb.comp_quasiMeasurePreserving (quasiMeasurePreserving_sub_of_right_invariant μ μ))
+    fun y => (lintegral_sub_right_eq_self (fun x => b x ^ q) y).le
 
 /-- The integrand of `x ↦ ∫ |K(y)| |f(x - y)|^q dy` is measurable on the product. -/
 theorem aemeasurable_kernel_rpow {K f : G → ℂ} (hK : AEStronglyMeasurable K μ)

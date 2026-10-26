@@ -2213,6 +2213,28 @@ $\sum_j |\widehat{\tilde\theta^w_j}(\xi)|^2 \leq ((8\pi)^k \prod_l \|w_l\|)^2
 \Cref{lem:psi-dual-derivatives} give the rest.
 \end{proof}
 
+On the torus the derivative families act through the periodic lift, and the strong type there
+needs their far mass $M_\theta$ of \Cref{def:torus-far-mass}.
+
+\begin{lemma}[The far mass of the derivative families]
+\label{lem:torus-far-mass-derivative-families}
+\lean{Torus.farMass_derivFamily_le, Torus.farMass_derivDualFamily_le}
+\leanok
+\uses{lem:torus-far-mass-dilate, def:derivative-family, def:dual-derivative-family,
+  thm:cz-family-derivative, lem:psi-dual-derivatives}
+Let $V = \R^d$. For every $m \in \N$ and every multi-index $\alpha$,
+$M_{\theta^\alpha} \leq 2 T_{A^\alpha,0,1}$, and for every $k \in \N$ and all $w \in V^k$,
+$M_{\tilde\theta^w} \leq 2 T_{\tilde A^w,0,1}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The families $\theta^\alpha_j = (\eta_\alpha)_{2^j}$ and $\tilde\theta^w_j = (\tilde G^w_j)_{2^j}$
+are dilates of uniform Schwartz families with bounds $A^\alpha$ and $\tilde A^w$
+(\Cref{thm:cz-family-derivative}, \Cref{lem:psi-dual-derivatives}), and
+\Cref{lem:torus-far-mass-dilate} applies.
+\end{proof}
+
 \section{Sobolev spaces as Triebel--Lizorkin spaces}
 \label{sec:sobolev-triebel-lizorkin}
 

@@ -20,8 +20,9 @@ For `1 ≤ p ≤ ∞`, `s ∈ ℝ`, `1 ≤ q ≤ ∞` and `f ∈ L_p(𝕋^d)`, t
 before the `L_p` norm. The blocks are the pointwise convolutions `ψ_j ⋆ f` with the kernels of
 `ℝ^d` (`Torus.blockFun`), representatives of `Torus.lpBlock`. The space `F^s_{p,q}(𝕋^d)` consists
 of the `f` with a finite quasi-norm (`Torus.MemTriebelLizorkin`); it is a subspace of `L_p` for
-`1 ≤ q ≤ ∞` (`Torus.triebelLizorkinSpace`), increasing in `q` and decreasing in `s`. The
-comparisons with Besov spaces below need `p < ∞`.
+`1 ≤ q ≤ ∞` (`Torus.triebelLizorkinSpace`), increasing in `q` and decreasing in `s`. For `s = 0`
+the weights are `1`, so `‖f‖_{F^0_{p,q}}` is the `L_p` norm of `t ↦ ‖((ψ_j ⋆ f)(t))_j‖_{ℓ_q}`
+(`Torus.triebelLizorkinNorm_zero_left`). The comparisons with Besov spaces below need `p < ∞`.
 
 The mixed-norm comparisons of `FunctionSpaces.Analysis.Lp.MixedNorms` give, for every `s ∈ ℝ`,
 `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{max(p,q)}} ≤ ‖f‖_{F^s_{p,q}} ≤ ‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{min(p,q)}}`,
@@ -168,6 +169,15 @@ theorem triebelLizorkinNorm_zero (s : ℝ) (q : ℝ≥0∞) :
     triebelLizorkinNorm s q (0 : Lp ℂ p (volume : Measure (UnitAddTorus d))) = 0 := by
   simpa using
     triebelLizorkinNorm_smul s q (0 : ℂ) (0 : Lp ℂ p (volume : Measure (UnitAddTorus d)))
+
+omit [Fact (1 ≤ p)] in
+/-- **Smoothness `0`**: `‖f‖_{F^0_{p,q}(𝕋^d)} = ‖ t ↦ ‖((ψ_j ⋆ f)(t))_j‖_{ℓ_q} ‖_p` for every `q`,
+since the weights `2^(j·0)` are `1`. -/
+theorem triebelLizorkinNorm_zero_left (q : ℝ≥0∞)
+    (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
+    triebelLizorkinNorm 0 q f =
+      eLpNorm (fun t => lqNorm q fun j => ‖blockFun j f t‖ₑ) p volume := by
+  simp only [triebelLizorkinNorm, ENNReal.dyadicWeight_zero_left, one_mul]
 
 omit [Fact (1 ≤ p)] in
 /-- **The quasi-norm decreases in `q`**: `‖f‖_{F^s_{p,r}} ≤ ‖f‖_{F^s_{p,q}}` for

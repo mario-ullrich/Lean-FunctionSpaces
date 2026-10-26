@@ -22,7 +22,8 @@ between weak type `(1,1)` and strong type `(2,2)`, in the terms of the Carleson 
 strong type `(p,p)` for `1 < p < 2`, and duality with the adjoint family extends it to `2 < p < ∞`,
 for the analysis and the synthesis operators. Applied to the Littlewood–Paley blocks and their
 synthesis kernels, this gives the square function theorem, the two-sided bound of `‖f‖_{F^0_{p,2}}`
-by `‖f‖_p`, for `1 < p < ∞`. The real interpolation spaces of two Triebel–Lizorkin spaces,
+by `‖f‖_p`, for `1 < p < ∞`. Localising the periodic lift transfers the strong type, and with it the
+square function theorem, to the torus. The real interpolation spaces of two Triebel–Lizorkin spaces,
 and of `L_p` and one of them, are Besov spaces.
 
 ## Main results
@@ -186,6 +187,21 @@ and of `L_p` and one of them, are Besov spaces.
   Hence `F^0_{p,2} = L_p(V)` (`Rd.triebelLizorkinSpace_zero_two_eq_top`). The lower bound uses
   the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p(V)`
   (`Rd.tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub`).
+* **The square function theorem on the torus.** Let `d ≥ 1` and `1 < p < ∞`. A
+  Calderón–Zygmund family `(θ_j)_j` on `ℝ^d` with overlap `B` and Hörmander constant `H` acts on
+  the torus by `(θ_j ⋆ f)(t) = ∫ θ_j(y) f(t - π y) dy`. If its far mass
+  `∫_{‖y‖ ≥ 1} ∑_j |θ_j(y)| dy` is at most `D` (`Torus.farMass`), its analysis and synthesis
+  operators satisfy the bounds of the strong type on `L_p(𝕋^d)` with the constant
+  `3^{d/p} S_{ℝ^d,p}(B, H) + D` (`Torus.periodicCZConst`, `Torus.eLpNorm_lqNorm_econv_le`,
+  `Torus.eLpNorm_sum_econv_le`). The proof localises the periodic lift: the part of the lift on
+  the box `(-1, 2]^d` is a function on `ℝ^d`, and the rest is bounded by Young's inequality
+  with the far mass (`Torus.eLpNorm_farConv_le`). Dilation families of uniform Schwartz families
+  with bounds `A` have far mass at most `2 T_A` (`Torus.farMass_dilate_le`). Hence
+  `‖f‖_{F^0_{p,2}(𝕋^d)} ≤ Q^𝕋_p ‖f‖_p` and `‖f‖_p ≤ Q̃^𝕋_p ‖f‖_{F^0_{p,2}(𝕋^d)}` for every
+  `f ∈ L_p(𝕋^d)` (`Torus.triebelLizorkinNorm_zero_two_le`,
+  `Torus.enorm_le_triebelLizorkinNorm_zero_two`), with named constants proved finite
+  (`Torus.squareFunctionConst`, `Torus.squareSynthesisConst`), and
+  `F^0_{p,2}(𝕋^d) = L_p(𝕋^d)` (`Torus.triebelLizorkinSpace_zero_two_eq_top`).
 
 ## What is formalised
 
@@ -209,6 +225,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Chebyshev's inequality for split functions, the Hörmander condition around a cube, convolutions of pieces with mean zero, and the weak type `(1,1)` of the analysis and synthesis operators of a Calderón–Zygmund family with an explicit constant | ✅ | ✗ | `Rd/SingularIntegrals/VectorValuedWeakType` |
 | The strong type `(p,p)`, `1 < p < ∞`, of the analysis and synthesis operators of a Calderón–Zygmund family with explicit constants: Plancherel for `p = 2`, Marcinkiewicz interpolation for `p < 2`, duality with the adjoint family for `p > 2` | ✅ | ✗ | `Rd/SingularIntegrals/VectorValuedSingularIntegrals` |
 | The square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, the two-sided bound with named constants, and the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p` | ✅ | ✗ | `Rd/TriebelLizorkin/SquareFunction` |
+| Strong type of vector-valued singular integrals on the torus | ✅ | ✗ | `Torus/SingularIntegrals` |
+| The square function theorem `L_p(𝕋^d) = F^0_{p,2}(𝕋^d)` | ✅ | ✗ | `Torus/SquareFunction` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics
