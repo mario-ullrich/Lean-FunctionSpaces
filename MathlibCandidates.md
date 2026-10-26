@@ -350,6 +350,14 @@ declarations.
   `π : ℝ^d → 𝕋^d` on every period box of `EuclideanSpace ℝ d`
   (`Torus.measurePreserving_proj_periodBox`) and the fact that `π` pulls null sets back to null
   sets (`Torus.quasiMeasurePreserving_proj`).
+* **Fourier coefficients in `L_p(𝕋^d)`** (`FunctionSpaces/Torus/LpFourierCoefficients.lean`),
+  for `Mathlib/Analysis/Fourier/AddCircleMulti.lean`: the coefficient `f ↦ f̂(m)` as a bounded
+  linear functional of norm at most `1` on `L_p(𝕋^d)`, `1 ≤ p ≤ ∞` (`Torus.coeffCLM`,
+  `Torus.norm_coeffCLM_le`), the coefficients of the characters
+  (`Torus.mFourierCoeff_mFourierLp`), of convolutions with integrable kernels on `ℝ^d`
+  (`Torus.mFourierCoeff_econvLp`), and uniqueness for `1 ≤ p ≤ ∞`
+  (`Torus.eq_of_mFourierCoeff_eq`). Mathlib has uniqueness in `L_2`, through `mFourierBasis`;
+  the open PR #43803 (Fejér's theorem on `AddCircle`) overlaps with uniqueness for `d = 1`.
 * **The Fejér–Riesz theorem** (`FunctionSpaces/Wavelets/Daubechies/FejerRiesz.lean`): a real
   polynomial `Q` with `Q > 0` on `[-1, 1]` satisfies `Q(cos θ) = |L(e^(iθ))|²` for a real
   polynomial `L` of degree `≤ deg Q` with `L(1) > 0` and without zeros in the closed unit disk

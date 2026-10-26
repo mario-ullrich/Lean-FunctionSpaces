@@ -8,8 +8,10 @@ Bessel potential spaces $H^{s,p}$ on $\R^d$. \Cref{ch:sobolev-rd} identifies Mat
 $s \geq 0$, with $\TL{s}{2}{2}$ (and, for $s > 0$, with $\Besov{s}{2}{2}$), proves Rellich's
 theorem, and, from the vector-valued singular integrals of \Cref{ch:singular-integrals}, proves
 $\Sob{m}{p} = \TL{m}{p}{2}$ for $1 < p < \infty$ and the Sobolev embeddings;
-\Cref{ch:bessel-potential-spaces} proves, also from them, $H^{s,p} = \TL{s}{p}{2}$ for
-$s \geq 0$ and Calder\'on's theorem $\Sob{m}{p} = H^{m,p}$.
+\Cref{ch:sobolev-torus} defines weak derivatives in $L_p(\T^d)$ through Fourier coefficients and
+describes $\Sob{m}{p}(\T^d)$ by directional derivatives; \Cref{ch:bessel-potential-spaces}
+proves, also from the singular integrals, $H^{s,p} = \TL{s}{p}{2}$ for $s \geq 0$ and
+Calder\'on's theorem $\Sob{m}{p} = H^{m,p}$.
 
 \chapter{Sobolev spaces on \texorpdfstring{$\R^d$}{R\^{}d}}
 \label{ch:sobolev-rd}
@@ -3498,6 +3500,314 @@ $K$-norm of $(L_p, \Sob{m}{p})$,
 \leanok
 \Cref{thm:interpolation-property} for the couple $(L_p, \Sob{m}{p})$ and
 \Cref{thm:sobolev-interpolate}.
+\end{proof}
+
+\chapter{Sobolev spaces on the torus}
+\label{ch:sobolev-torus}
+
+This chapter defines weak derivatives in $L_p(\T^d)$ through Fourier coefficients, as
+\Cref{def:weak-derivative} does for multi-indices. The rule
+$\hat g(m) = \sigma_v(m) \hat f(m)$ for $g = \partial^v f$ is the distributional identity
+$\int g \, \varphi = (-1)^k \int f \, \partial^v \varphi$ tested with the characters
+$\varphi = e_{-m}$, whose span is dense in the smooth functions on $\T^d$.
+\Cref{sec:torus-lp-fourier-coefficients} shows that an element of
+$L_p(\T^d)$, $1 \leq p \leq \infty$, is determined by its Fourier coefficients, and computes the
+coefficients of convolutions with kernels on $\R^d$ (\Cref{def:torus-econv}).
+\Cref{sec:torus-lp-weak-derivatives} defines the derivatives $\partial^v$ along directions
+$v \in (\R^d)^k$, proves their calculus, moves them through convolutions with Schwartz kernels,
+and describes $\Sob{m}{p}(\T^d)$ by directional derivatives.
+
+\section{Fourier coefficients in \texorpdfstring{$L_p$}{L\_p} on the torus}
+\label{sec:torus-lp-fourier-coefficients}
+
+On the probability space $\T^d$, $|\hat f(m)| \leq \|f\|_1 \leq \|f\|_p$ for every
+$1 \leq p \leq \infty$, so every Fourier coefficient is a bounded linear functional on
+$L_p(\T^d)$. Since the characters span a dense subspace of $L_p(\T^d)$ for $p < \infty$, identities
+between such functionals are checked on the characters.
+
+\begin{lemma}[Fourier coefficients in $L_p$]
+\label{lem:torus-lp-coefficients}
+\lean{Torus.mFourierCoeff_congr_ae, Torus.norm_mFourier_apply_le,
+  Torus.enorm_mFourierCoeff_le_eLpNorm_one, Torus.integrable_mFourier_smul,
+  Torus.mFourierCoeff_add, Torus.mFourierCoeff_smul, Torus.enorm_mFourierCoeff_le,
+  Torus.norm_mFourierCoeff_le, Torus.mFourierCoeff_sub, Torus.mFourierCoeff_neg,
+  Torus.mFourierCoeff_zero, Torus.mFourierCoeff_sum, Torus.mFourierCoeff_mFourier,
+  Torus.mFourierCoeff_mFourierLp, Torus.mFourierCoeff_inclusionOfExponentLe}
+\leanok
+\uses{def:trig-poly, lem:inclusion}
+Let $1 \leq p \leq \infty$. For all $f, g \in L_p(\T^d)$, every $c \in \C$ and all
+$k, m \in \Z^d$:
+\begin{enumerate}
+  \item for all functions $f_1, f_2$ on $\T^d$ with $f_1 = f_2$ almost everywhere,
+    $\hat f_1(m) = \hat f_2(m)$; for every function $f_1$ on $\T^d$,
+    $|\hat f_1(m)| \leq \|f_1\|_1$; and $|e_k(t)| \leq 1$ for every $t \in \T^d$;
+  \item $|\hat f(m)| \leq \|f\|_1 \leq \|f\|_p$;
+  \item $\widehat{f + g}(m) = \hat f(m) + \hat g(m)$, $\widehat{c f}(m) = c \hat f(m)$,
+    $\widehat{f - g}(m) = \hat f(m) - \hat g(m)$, $\widehat{-f}(m) = -\hat f(m)$,
+    $\hat 0(m) = 0$, and the coefficients of a finite sum are the sums of the coefficients;
+  \item $\hat e_k(m) = 1$ if $k = m$, and $\hat e_k(m) = 0$ otherwise.
+\end{enumerate}
+For every $r$ with $p \leq r \leq \infty$ and every $f \in L_r(\T^d)$, the class of $f$ in
+$L_p(\T^d)$ has the Fourier coefficients of $f$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The coefficient is an integral, and $|e_k| = 1$. (2) $|e_{-m} f| \leq |f|$, and
+$\|f\|_1 \leq \|f\|_p$ on a probability space (Mathlib's
+\texttt{eLpNorm\_\allowbreak le\_\allowbreak eLpNorm\_\allowbreak of\_\allowbreak
+exponent\_\allowbreak le}).
+(3) The integrands $e_{-m} f$ and $e_{-m} g$ are integrable by (2); the remaining identities
+follow from linearity. (4) The characters are
+orthonormal in $L_2(\T^d)$ (Mathlib's \texttt{mFourierBasis}). The inclusion
+$L_r \hookrightarrow L_p$ keeps the function almost everywhere (\Cref{lem:inclusion}).
+\end{proof}
+
+\begin{definition}[The coefficient functional]
+\label{def:torus-coefficient-functional}
+\lean{Torus.coeffCLM, Torus.coeffCLM_apply, Torus.norm_coeffCLM_le}
+\leanok
+\uses{lem:torus-lp-coefficients}
+For $1 \leq p \leq \infty$ and $m \in \Z^d$, the coefficient functional is the bounded linear
+map $L_p(\T^d) \to \C$, $f \mapsto \hat f(m)$, of norm at most $1$.
+\end{definition}
+
+\begin{theorem}[Fourier coefficients of convolutions]
+\label{thm:torus-coefficients-convolution}
+\lean{Torus.mFourierCoeff_econvLp, Torus.mFourierCoeff_econv}
+\leanok
+\uses{def:torus-coefficient-functional, lem:torus-econv-young, thm:torus-econv-fourier,
+  lem:torus-econv-identities}
+For every $1 \leq p < \infty$, every $\Phi \in L_1(\R^d)$, every $f \in L_p(\T^d)$ and every
+$m \in \Z^d$,
+\[
+  \widehat{\Phi * f}(m) = \mathcal{F}\Phi(m) \, \hat f(m) .
+\]
+The same holds for every measurable integrable function $f$ on $\T^d$ and the convolution
+integral $\Phi * f$ of \Cref{def:torus-econv}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Both sides are bounded linear functionals of $f$ (\Cref{lem:torus-econv-young},
+\Cref{def:torus-coefficient-functional}). On a character $e_k$,
+$\Phi * e_k = \mathcal{F}\Phi(k) \, e_k$ (\Cref{thm:torus-econv-fourier}), so both sides are
+$\mathcal{F}\Phi(m)$ for $k = m$ and $0$ otherwise. Bounded linear maps that agree on the
+characters are equal (\Cref{lem:torus-econv-identities}). For an integrable $f$ take $p = 1$:
+the convolution integral represents the operator (\Cref{lem:torus-econv-young}).
+\end{proof}
+
+\begin{theorem}[Uniqueness of Fourier coefficients]
+\label{thm:torus-coefficients-uniqueness}
+\lean{Torus.eq_sum_mFourierCoeff_of_mem_trigPolyLp, Torus.eq_zero_of_mem_trigPolyLp,
+  Torus.eq_zero_of_mFourierCoeff_eq_zero_one, Torus.eq_zero_of_mFourierCoeff_eq_zero,
+  Torus.eq_of_mFourierCoeff_eq}
+\leanok
+\uses{lem:torus-lp-coefficients, thm:torus-econv-fourier, thm:torus-coefficients-convolution,
+  lem:torus-lp-blocks-trig, lem:torus-lp-blocks, lem:inclusion}
+Let $1 \leq p \leq \infty$. For every $n \in \N$, every trigonometric polynomial
+$a \in \mathcal{T}_n$ in $L_p(\T^d)$ satisfies
+\[
+  a = \sum_{\deg m < n} \hat a(m) \, e_m .
+\]
+For all $f, g \in L_p(\T^d)$ with $\hat f(m) = \hat g(m)$ for every $m \in \Z^d$, $f = g$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Both sides of the identity are linear in $a$ and agree on the characters $e_k$ with $\deg k < n$
+(\Cref{lem:torus-lp-coefficients}), which span $\mathcal{T}_n$ (\Cref{thm:torus-econv-fourier}).
+For the second claim, $h = f - g$ has vanishing coefficients. Let first $p = 1$. Every block
+$\Delta_j h$ is a trigonometric polynomial (\Cref{lem:torus-lp-blocks-trig}) with the
+coefficients $\mathcal{F}\psi_j(m) \, \hat h(m) = 0$ (\Cref{thm:torus-coefficients-convolution}),
+hence $\Delta_j h = 0$ by the identity, and $h = \lim_J \sum_{j \leq J} \Delta_j h = 0$
+(\Cref{lem:torus-lp-blocks}). For general $p$, the class of $h$ in $L_1(\T^d)$ has the same
+coefficients (\Cref{lem:torus-lp-coefficients}), so it is $0$, and the inclusion
+$L_p \hookrightarrow L_1$ is injective (\Cref{lem:inclusion}).
+\end{proof}
+
+\section{Weak derivatives in \texorpdfstring{$L_p$}{L\_p} on the torus}
+\label{sec:torus-lp-weak-derivatives}
+
+For directions $v = (v_0, \dots, v_{k-1}) \in (\R^d)^k$ the derivative
+$\partial^v = \partial_{v_0} \cdots \partial_{v_{k-1}}$ of
+$x \mapsto e^{2\pi i \langle m, x \rangle}$ is
+$\prod_{l < k} 2\pi i \langle m, v_l \rangle \, e^{2\pi i \langle m, x \rangle}$. Directions
+make the derivatives independent of a basis of $\R^d$; the coordinate directions give back the
+multi-indices of \Cref{def:weak-derivative}.
+
+\begin{definition}[Symbols of directional derivatives]
+\label{def:torus-line-symbol}
+\lean{Torus.lineSymbol, Torus.coordIndexEquiv, Torus.coordDirs, Torus.coordCount}
+\leanok
+\uses{def:weak-derivative, lem:torus-proj}
+For $k \in \N$, $v \in (\R^d)^k$ and $m \in \Z^d$, regarded as a point of $\R^d$, the symbol of
+$\partial^v$ is
+\[
+  \sigma_v(m) = \prod_{l < k} 2\pi i \langle m, v_l \rangle .
+\]
+For $\alpha \in \N^d$, the coordinate directions $v^\alpha \in (\R^d)^{|\alpha|}$ list $\alpha_i$
+copies of the unit vector $e_i$ for every $i \in d$, in a fixed order. For every map
+$c \colon \{0, \dots, k-1\} \to d$, the multiplicities $\alpha^c \in \N^d$ are
+$\alpha^c_i = \#\{l : c_l = i\}$.
+\end{definition}
+
+\begin{lemma}[Symbols]
+\label{lem:torus-line-symbol}
+\lean{Torus.lineSymbol_fin_zero, Torus.lineSymbol_neg, Torus.norm_lineSymbol_le,
+  Torus.lineSymbol_append, Torus.lineSymbol_coordDirs, Torus.sum_coordCount,
+  Torus.prod_eq_derivSymbol_coordCount, Torus.lineSymbol_eq_sum}
+\leanok
+\uses{def:torus-line-symbol, lem:torus-proj, lem:dual-derivative-frequency}
+For all $k, j \in \N$, $v \in (\R^d)^k$, $w \in (\R^d)^j$ and $m \in \Z^d$:
+\begin{enumerate}
+  \item $\sigma_v(m) = 1$ for $k = 0$, and $\sigma_v(-m) = (-1)^k \sigma_v(m)$;
+  \item $|\sigma_v(m)| \leq \prod_{l < k} 2\pi \, |m| \, |v_l|$;
+  \item $\sigma_{(v, w)}(m) = \sigma_v(m) \, \sigma_w(m)$ for the concatenation
+    $(v, w) \in (\R^d)^{k + j}$;
+  \item $\sigma_{v^\alpha}(m) = (2\pi i m)^\alpha$ for every $\alpha \in \N^d$;
+  \item for every $c \colon \{0, \dots, k-1\} \to d$, $|\alpha^c| = k$ and
+    $\prod_{l < k} 2\pi i m_{c_l} = (2\pi i m)^{\alpha^c}$, and
+    \[
+      \sigma_v(m) = \sum_{c} \Bigl( \prod_{l < k} (v_l)_{c_l} \Bigr) (2\pi i m)^{\alpha^c} ,
+    \]
+    the sum over all maps $c \colon \{0, \dots, k-1\} \to d$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) $\langle -m, v_l \rangle = -\langle m, v_l \rangle$ (\Cref{lem:torus-proj}). (2) The
+Cauchy--Schwarz inequality, as in \Cref{lem:dual-derivative-frequency}. (3) The product over $k + j$
+factors splits. (4) $\langle m, e_i \rangle = m_i$ (\Cref{lem:torus-proj}), and the product over
+the slots of $v^\alpha$ groups by coordinates. (5) Group the factors by the value of $c_l$
+(Mathlib's \texttt{Finset.\allowbreak prod\_\allowbreak fiberwise'}), and expand
+$\prod_l \sum_i 2\pi i \, m_i (v_l)_i$ into a sum over the maps $c$ (Mathlib's
+\texttt{Finset.\allowbreak prod\_\allowbreak univ\_\allowbreak sum}).
+\end{proof}
+
+\begin{definition}[Weak derivatives along directions on the torus]
+\label{def:torus-weak-line-derivative}
+\lean{Torus.HasWeakLineDeriv}
+\leanok
+\uses{def:torus-line-symbol}
+For every $1 \leq p \leq \infty$, $k \in \N$ and $v \in (\R^d)^k$, an element $g \in L_p(\T^d)$
+is the weak derivative $\partial^v f$ of $f \in L_p(\T^d)$ if $\hat g(m) = \sigma_v(m) \hat f(m)$
+for every $m \in \Z^d$.
+\end{definition}
+
+Since $\partial^v e_{-m} = \sigma_v(-m) e_{-m} = (-1)^k \sigma_v(m) e_{-m}$
+(\Cref{lem:torus-line-symbol}), the definition is the identity
+$\int g \, e_{-m} = (-1)^k \int f \, \partial^v e_{-m}$ for every $m \in \Z^d$.
+
+\begin{lemma}[Properties of weak derivatives on the torus]
+\label{lem:torus-weak-line-derivative-basic}
+\lean{Torus.hasWeakLineDeriv_fin_zero, Torus.hasWeakDeriv_iff_hasWeakLineDeriv,
+  Torus.HasWeakLineDeriv.comp, Torus.HasWeakLineDeriv.unique, Torus.HasWeakDeriv.eq,
+  Torus.HasWeakLineDeriv.add, Torus.HasWeakLineDeriv.smul, Torus.HasWeakLineDeriv.neg,
+  Torus.HasWeakLineDeriv.sub, Torus.HasWeakLineDeriv.sum, Torus.HasWeakDeriv.add,
+  Torus.HasWeakDeriv.smul, Torus.HasWeakLineDeriv.of_tendsto,
+  Torus.hasWeakLineDeriv_mFourierLp, Torus.HasWeakLineDeriv.of_inclusion,
+  Torus.HasWeakDeriv.of_inclusion}
+\leanok
+\uses{def:torus-weak-line-derivative, def:weak-derivative, lem:torus-line-symbol,
+  lem:torus-lp-coefficients, def:torus-coefficient-functional,
+  thm:torus-coefficients-uniqueness}
+Let $1 \leq p \leq \infty$, $k \in \N$, $v \in (\R^d)^k$, $f, f', g, g' \in L_p(\T^d)$ and
+$c \in \C$.
+\begin{enumerate}
+  \item For $k = 0$, $f = \partial^v f$. For every $\alpha \in \N^d$, $g = \partial^\alpha f$ if
+    and only if $g = \partial^{v^\alpha} f$.
+  \item For every $j \in \N$, $w \in (\R^d)^j$ and $h \in L_p(\T^d)$ with $g = \partial^v f$ and
+    $h = \partial^w g$, $h = \partial^{(w, v)} f$.
+  \item If $g$ and $g'$ are weak derivatives $\partial^v f$, then $g = g'$; the
+    same holds for $\partial^\alpha$, $\alpha \in \N^d$.
+  \item If $g = \partial^v f$ and $g' = \partial^v f'$, then $g + g' = \partial^v (f + f')$,
+    $-g = \partial^v (-f)$, $g - g' = \partial^v (f - f')$ and $c g = \partial^v (c f)$; for a
+    finite set $s$ and $F_i, G_i \in L_p(\T^d)$ with $G_i = \partial^v F_i$ for every $i \in s$,
+    $\sum_{i \in s} G_i = \partial^v \sum_{i \in s} F_i$. Sums and complex multiples of weak
+    derivatives $\partial^\alpha$, $\alpha \in \N^d$, are weak derivatives $\partial^\alpha$ in
+    the same way.
+  \item For every filter $\ell \neq \bot$ on a set $I$ and all $f_i, g_i \in L_p(\T^d)$,
+    $i \in I$, with $f_i \to f$ and $g_i \to g$ in $L_p(\T^d)$ along $\ell$ and
+    $g_i = \partial^v f_i$ for all $i$ in a set of $\ell$, $g = \partial^v f$.
+  \item For every $n \in \Z^d$, $\sigma_v(n) \, e_n = \partial^v e_n$.
+  \item For every $r$ with $p \leq r \leq \infty$ and all $f, g \in L_r(\T^d)$ with
+    $g = \partial^v f$, the classes of $f$ and $g$ in $L_p(\T^d)$ satisfy $g = \partial^v f$;
+    the same holds for $\partial^\alpha$, $\alpha \in \N^d$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+Every claim is an identity between Fourier coefficients. (1) and (2) are (1), (4) and (3) of
+\Cref{lem:torus-line-symbol}. (3) Both derivatives have the coefficients $\sigma_v(m) \hat f(m)$,
+and \Cref{thm:torus-coefficients-uniqueness} applies. (4) The coefficients are linear
+(\Cref{lem:torus-lp-coefficients}, \Cref{def:torus-coefficient-functional}). (5) Every
+coefficient is a continuous functional (\Cref{def:torus-coefficient-functional}), so
+$\hat g(m) = \lim_i \hat g_i(m) = \lim_i \sigma_v(m) \hat f_i(m) = \sigma_v(m) \hat f(m)$, and
+limits in $\C$ are unique. (6) $\hat e_n(m) = 1$ for $m = n$ and $0$ otherwise
+(\Cref{lem:torus-lp-coefficients}). (7) The inclusion keeps the coefficients
+(\Cref{lem:torus-lp-coefficients}).
+\end{proof}
+
+\begin{lemma}[Weak derivatives and convolution on the torus]
+\label{lem:torus-weak-derivative-convolution}
+\lean{Torus.econvLp_iteratedLineDerivOp, Torus.hasWeakLineDeriv_econvLp}
+\leanok
+\uses{def:torus-weak-line-derivative, thm:torus-coefficients-convolution,
+  thm:torus-coefficients-uniqueness, lem:fourier-iterated-derivative}
+Let $1 \leq p < \infty$, $k \in \N$, $v \in (\R^d)^k$ and let $\eta$ be a complex Schwartz
+function on $\R^d$. For every $f \in L_p(\T^d)$, $(\partial^v \eta) * f$ is the weak derivative
+$\partial^v (\eta * f)$. For all $f, g \in L_p(\T^d)$ with $g = \partial^v f$,
+\[
+  (\partial^v \eta) * f = \eta * g .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{thm:torus-coefficients-convolution} and \Cref{lem:fourier-iterated-derivative}, the
+coefficient of $(\partial^v \eta) * f$ at $m$ is
+$\mathcal{F}(\partial^v \eta)(m) \, \hat f(m) = \sigma_v(m) \, \mathcal{F}\eta(m) \, \hat f(m)$.
+This is $\sigma_v(m)$ times the coefficient of $\eta * f$, and for $g = \partial^v f$ it is
+$\mathcal{F}\eta(m) \, \hat g(m)$, the coefficient of $\eta * g$. Apply
+\Cref{thm:torus-coefficients-uniqueness}.
+\end{proof}
+
+\begin{theorem}[Sobolev spaces on the torus by directional derivatives]
+\label{thm:torus-sobolev-directions}
+\lean{Torus.hasWeakLineDeriv_sum_coordCount, Torus.memSobolev_iff_forall_hasWeakLineDeriv,
+  Torus.memSobolev_zero, Torus.MemSobolev.add, Torus.MemSobolev.smul,
+  Torus.MemSobolev.mono_order, Torus.MemSobolev.of_inclusion}
+\leanok
+\uses{def:weak-derivative, def:torus-weak-line-derivative, lem:torus-line-symbol,
+  lem:torus-weak-line-derivative-basic, lem:torus-lp-coefficients}
+Let $1 \leq p \leq \infty$ and $m \in \N$. For every $f \in L_p(\T^d)$, $f \in \Sob{m}{p}(\T^d)$
+if and only if for every $k \leq m$ and every $v \in (\R^d)^k$ some $g \in L_p(\T^d)$ is the
+weak derivative $\partial^v f$. For all $k \in \N$, $v \in (\R^d)^k$ and
+$g_c \in L_p(\T^d)$ with $g_c = \partial^{\alpha^c} f$ for every
+$c \colon \{0, \dots, k-1\} \to d$,
+\[
+  \sum_c \Bigl( \prod_{l < k} (v_l)_{c_l} \Bigr) g_c = \partial^v f .
+\]
+Moreover $\Sob{0}{p}(\T^d) = L_p(\T^d)$, sums and complex
+multiples of elements of $\Sob{m}{p}(\T^d)$ lie in $\Sob{m}{p}(\T^d)$,
+$\Sob{m}{p}(\T^d) \subseteq \Sob{l}{p}(\T^d)$ for every $l \leq m$, and for every $r$ with
+$p \leq r \leq \infty$ the class in $L_p(\T^d)$ of every $f \in \Sob{m}{r}(\T^d)$ lies in
+$\Sob{m}{p}(\T^d)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $f \in \Sob{m}{p}(\T^d)$, $k \leq m$ and $v \in (\R^d)^k$. For every map
+$c \colon \{0, \dots, k-1\} \to d$ the multiplicities $\alpha^c$ have order $k$, so
+$g_c = \partial^{\alpha^c} f$ exists, and $\sum_c (\prod_{l < k} (v_l)_{c_l}) \, g_c$ is
+$\partial^v f$ by the expansion (5) of \Cref{lem:torus-line-symbol} and the linearity of the
+coefficients (\Cref{lem:torus-lp-coefficients}). Conversely, $\partial^\alpha f$ is
+$\partial^{v^\alpha} f$ (\Cref{lem:torus-weak-line-derivative-basic}). The only multi-index of
+order $0$ is $\alpha = 0$, with $\partial^0 f = f$; the other claims follow from (4) and (7) of
+\Cref{lem:torus-weak-line-derivative-basic}.
 \end{proof}
 
 \chapter{Bessel potential spaces}

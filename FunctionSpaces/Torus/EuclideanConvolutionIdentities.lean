@@ -14,7 +14,7 @@ public import FunctionSpaces.Analysis.Fourier.LittlewoodPaleyKernels
 The kernels `Φ` of `ℝ^d` act on `L_p(𝕋^d)`, `1 ≤ p < ∞`, by the bounded operators
 `f ↦ Φ ⋆ f` (`Torus.econvLp`), and the characters are their eigenfunctions,
 `Φ ⋆ e_m = 𝓕Φ(m) e_m` (`Torus.econvLp_mFourierLp`). Since the characters span a dense subspace
-of `L_p(𝕋^d)`, a bounded operator is determined by its values on them
+of `L_p(𝕋^d)`, a bounded linear map on `L_p(𝕋^d)` is determined by its values on them
 (`Torus.ext_mFourierLp`), and every identity between these operators is an identity of Fourier
 multipliers:
 
@@ -46,12 +46,11 @@ variable {d : Type*} [Fintype d] {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-! ### Operators are determined by the characters -/
 
-/-- **Bounded operators on `L_p(𝕋^d)` are determined by the characters**: for `1 ≤ p < ∞`, two
-bounded operators that agree on every `e_m` are equal, since the characters span a dense
-subspace (Mathlib's `span_mFourierLp_closure_eq_top`). -/
-theorem ext_mFourierLp (hp : p ≠ ∞)
-    {T S : Lp ℂ p (volume : Measure (UnitAddTorus d)) →L[ℂ]
-      Lp ℂ p (volume : Measure (UnitAddTorus d))}
+/-- **Bounded linear maps on `L_p(𝕋^d)` are determined by the characters**: for `1 ≤ p < ∞`,
+two bounded linear maps from `L_p(𝕋^d)` into a normed space that agree on every `e_m` are equal,
+since the characters span a dense subspace (Mathlib's `span_mFourierLp_closure_eq_top`). -/
+theorem ext_mFourierLp (hp : p ≠ ∞) {F : Type*} [NormedAddCommGroup F] [NormedSpace ℂ F]
+    {T S : Lp ℂ p (volume : Measure (UnitAddTorus d)) →L[ℂ] F}
     (h : ∀ m : d → ℤ, T (mFourierLp p m) = S (mFourierLp p m)) : T = S :=
   ContinuousLinearMap.ext_on
     (Submodule.dense_iff_topologicalClosure_eq_top.2 (span_mFourierLp_closure_eq_top hp))

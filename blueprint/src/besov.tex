@@ -1049,13 +1049,16 @@ $m \in \Z^d$ as a point of $\R^d$.
 \label{lem:torus-proj}
 \lean{Torus.proj, Torus.proj_apply, Torus.continuous_proj, Torus.measurable_proj,
   Torus.norm_proj_le, Torus.norm_le_card_mul, Torus.exists_proj_eq, Torus.latticeVec,
-  Torus.latticeVec_apply, Torus.deg_le_norm_latticeVec, Torus.norm_latticeVec_le,
+  Torus.latticeVec_apply, Torus.latticeVec_neg, Torus.inner_latticeVec,
+  Torus.inner_latticeVec_single, Torus.deg_le_norm_latticeVec, Torus.norm_latticeVec_le,
   Torus.mFourier_neg_proj, Torus.integral_mul_mFourier_neg_proj}
 \leanok
 \uses{def:trig-poly}
 The quotient map is an additive homomorphism with $\|\pi x\| \leq |x|$, and every $h \in \T^d$ is
-$\pi x$ with $|x| \leq \#d \, \|h\|$. For $m \in \Z^d$, $\deg m \leq |m| \leq \#d \deg m$ and
-$e_m(-\pi y) = e^{-2\pi i \langle y, m \rangle}$, so
+$\pi x$ with $|x| \leq \#d \, \|h\|$. For $m \in \Z^d$ and $v \in \R^d$, the point $-m$ of
+$\R^d$ is the negative of $m$, $\langle m, v \rangle = \sum_i m_i v_i$, and
+$\langle m, e_i \rangle = m_i$ for every unit vector $e_i$. Moreover
+$\deg m \leq |m| \leq \#d \deg m$ and $e_m(-\pi y) = e^{-2\pi i \langle y, m \rangle}$, so
 $\int_{\R^d} \Phi(y) e_m(-\pi y) \, dy = \mathcal{F}\Phi(m)$.
 \end{lemma}
 
@@ -1324,7 +1327,8 @@ $L_p(\T^d)$.
   Torus.econvLp_eq_zero_of_mem}
 \leanok
 \uses{thm:torus-econv-fourier, lem:torus-econv-young, lem:fourier-conv}
-Two bounded operators on $L_p(\T^d)$ that agree on every $e_m$, $m \in \Z^d$, are equal. For all
+For every normed space $F$, two bounded linear maps $L_p(\T^d) \to F$ that agree on every $e_m$,
+$m \in \Z^d$, are equal. For all
 $K, L \in L_1(\R^d)$ and every $f \in L_p(\T^d)$,
 \[
   K * (L * f) = (K * L) * f = L * (K * f), \qquad (K \pm L) * f = K * f \pm L * f .
@@ -1335,8 +1339,8 @@ $\deg m < n$, $\Phi * a = 0$ for every $a \in \mathcal{T}_n$.
 
 \begin{proof}
 \leanok
-The characters span a dense subspace of $L_p(\T^d)$, so a bounded operator is determined by its
-values on them. All operators in the identities are bounded (\Cref{lem:torus-econv-young}) and
+The characters span a dense subspace of $L_p(\T^d)$, so a bounded linear map is determined by
+its values on them. All operators in the identities are bounded (\Cref{lem:torus-econv-young}) and
 multiply $e_m$ by $\mathcal{F}K(m) \, \mathcal{F}L(m) = \mathcal{F}(K * L)(m)$, respectively by
 $\mathcal{F}K(m) \pm \mathcal{F}L(m) = \mathcal{F}(K \pm L)(m)$ (\Cref{thm:torus-econv-fourier},
 \Cref{lem:fourier-conv}). The last claim holds on the characters $e_m$ with
@@ -1480,20 +1484,20 @@ distributional definition $\int g \, \varphi = (-1)^{|\alpha|} \int f \, \partia
 \varphi$, tested against the monomials $\varphi = \overline{e_k}$, whose span is dense in
 the smooth functions. Mathlib has no distributions on the torus.
 
-\begin{definition}[Weak derivatives and $W^m_2(\T^d)$]
+\begin{definition}[Weak derivatives and $W^m_p(\T^d)$]
 \label{def:weak-derivative}
 \lean{Torus.derivSymbol, Torus.HasWeakDeriv, Torus.MemSobolev, Torus.norm_two_pi_I_mul_intCast}
 \leanok
 For $\alpha \in \N^d$ put $|\alpha| = \sum_j \alpha_j$ and $(2\pi i k)^\alpha = \prod_j
-(2\pi i k_j)^{\alpha_j}$ for $k \in \Z^d$. An element $g \in L_2(\T^d)$ is the \emph{weak
-derivative} $\partial^\alpha f$ of $f \in L_2(\T^d)$ if $\hat g(k) = (2\pi i k)^\alpha \hat
-f(k)$ for every $k \in \Z^d$. For $m \in \N$, the Sobolev space $\Sob{m}{2}(\T^d)$ consists
-of the $f \in L_2(\T^d)$ that have a weak derivative $\partial^\alpha f \in L_2(\T^d)$ for
-every $\alpha$ with $|\alpha| \leq m$.
+(2\pi i k_j)^{\alpha_j}$ for $k \in \Z^d$. Let $1 \leq p \leq \infty$. An element
+$g \in L_p(\T^d)$ is the \emph{weak derivative} $\partial^\alpha f$ of $f \in L_p(\T^d)$ if
+$\hat g(k) = (2\pi i k)^\alpha \hat f(k)$ for every $k \in \Z^d$. For $m \in \N$, the Sobolev
+space $\Sob{m}{p}(\T^d)$ consists of the $f \in L_p(\T^d)$ that have a weak derivative
+$\partial^\alpha f \in L_p(\T^d)$ for every $\alpha$ with $|\alpha| \leq m$.
 \end{definition}
 
-The definition is for $p = 2$; Sobolev spaces $\Sob{m}{p}(\T^d)$ for other $p$ are not
-formalised on the torus.
+The remaining results of this section are for $p = 2$; \Cref{ch:sobolev-torus} treats weak
+derivatives along directions in $L_p(\T^d)$ for every $1 \leq p \leq \infty$.
 
 \begin{lemma}[Existence and uniqueness of weak derivatives]
 \label{lem:weak-derivative}
@@ -1501,8 +1505,9 @@ formalised on the torus.
   Torus.HasWeakDeriv.mem_l2}
 \leanok
 \uses{def:weak-derivative}
-Let $f \in L_2(\T^d)$ and $\alpha \in \N^d$. The weak derivative $\partial^\alpha f$ is unique
-when it exists, $\partial^0 f = f$, and $\partial^\alpha f$ exists if and only if
+For every $1 \leq p \leq \infty$ and every $f \in L_p(\T^d)$, $\partial^0 f = f$. Let
+$f \in L_2(\T^d)$ and $\alpha \in \N^d$. The weak derivative $\partial^\alpha f$ in $L_2(\T^d)$
+is unique when it exists, and it exists if and only if
 $\sum_k |(2\pi i k)^\alpha \hat f(k)|^2 < \infty$.
 \end{lemma}
 

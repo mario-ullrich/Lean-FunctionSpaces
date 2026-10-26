@@ -8,19 +8,21 @@ module
 public import FunctionSpaces.Torus.Coefficients
 
 /-!
-# Sobolev spaces `W^m_2(𝕋^d)` through weak derivatives
+# Weak derivatives on the torus and `W^m_2(𝕋^d)`
 
 For a multi-index `α ∈ ℕ^d`, the derivative `∂^α` multiplies the Fourier coefficients by the
-**symbol** `(2πi k)^α = ∏ᵢ (2πi kᵢ)^(αᵢ)` (`Torus.derivSymbol`).  So `g ∈ L_2` is the **weak
-derivative** `∂^α f` of `f ∈ L_2` (`Torus.HasWeakDeriv`) if
+**symbol** `(2πi k)^α = ∏ᵢ (2πi kᵢ)^(αᵢ)` (`Torus.derivSymbol`).  So `g ∈ L_p` is the **weak
+derivative** `∂^α f` of `f ∈ L_p` (`Torus.HasWeakDeriv`) if
 
 `ĝ(k) = (2πi k)^α f̂(k)`   for all `k ∈ ℤ^d`.
 
 This is the distributional definition `∫ g φ = (-1)^|α| ∫ f ∂^α φ`, tested against the
 trigonometric monomials `φ = e_{-k}`; Mathlib has no distributions on the torus, and the
-monomials suffice because their span is dense.  The **Sobolev space** `W^m_2(𝕋^d)`,
-`m ∈ ℕ`, consists of the `f ∈ L_2` all of whose weak derivatives of order `|α| ≤ m` lie in
-`L_2` (`Torus.MemSobolev`).
+monomials suffice because their span is dense.  The **Sobolev space** `W^m_p(𝕋^d)`,
+`m ∈ ℕ`, consists of the `f ∈ L_p` all of whose weak derivatives of order `|α| ≤ m` lie in
+`L_p` (`Torus.MemSobolev`).  The definitions are for every exponent `p`; the theorems below,
+apart from `Torus.hasWeakDeriv_zero`, are for `p = 2`.  `FunctionSpaces.Torus.LpWeakDerivatives`
+develops the calculus for `1 ≤ p ≤ ∞`.
 
 **Coincidence** (`Torus.memSobolev_iff`, `Torus.memSobolev_iff_memBesov`):
 
@@ -117,24 +119,29 @@ theorem one_add_deg_pow_le [DecidableEq d] (m : ℕ) (k : d → ℤ) :
       (Finset.single_le_sum (f := fun j => ‖derivSymbol (Pi.single j m) k‖)
         (fun _ _ => norm_nonneg _) (Finset.mem_univ j))
 
-/-- `g` is the **weak derivative** `∂^α f`: `ĝ(k) = (2πi k)^α f̂(k)` for all `k ∈ ℤ^d`. -/
-def HasWeakDeriv (α : d → ℕ) (f g : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) : Prop :=
+/-- `g ∈ L_p(𝕋^d)` is the **weak derivative** `∂^α f` of `f ∈ L_p(𝕋^d)`:
+`ĝ(k) = (2πi k)^α f̂(k)` for all `k ∈ ℤ^d`. The definition is meant for `1 ≤ p ≤ ∞`, where every
+element of `L_p(𝕋^d)` is integrable and its coefficients are integrals. -/
+def HasWeakDeriv {p : ℝ≥0∞} (α : d → ℕ) (f g : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
+    Prop :=
   ∀ k : d → ℤ, mFourierCoeff g k = derivSymbol α k * mFourierCoeff f k
 
-/-- `f ∈ W^m_2(𝕋^d)`: every weak derivative `∂^α f` of order `|α| ≤ m` lies in `L_2`. -/
-def MemSobolev (m : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) : Prop :=
+/-- `f ∈ W^m_p(𝕋^d)`: every weak derivative `∂^α f` of order `|α| ≤ m` lies in `L_p`. The
+definition is meant for `1 ≤ p ≤ ∞`, where every element of `L_p(𝕋^d)` is integrable and its
+coefficients are integrals. -/
+def MemSobolev {p : ℝ≥0∞} (m : ℕ) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) : Prop :=
   ∀ α : d → ℕ, ∑ i, α i ≤ m → ∃ g, HasWeakDeriv α f g
 
-/-- **The weak derivative is unique**, since a function in `L_2` is determined by its Fourier
-coefficients. -/
+/-- **The weak derivative in `L_2` is unique**, since a function in `L_2` is determined by its
+Fourier coefficients. -/
 theorem HasWeakDeriv.unique {α : d → ℕ} {f g g' : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
     (hg : HasWeakDeriv α f g) (hg' : HasWeakDeriv α f g') : g = g' := by
   refine mFourierBasis.repr.injective (lp.ext (funext fun k => ?_))
   change mFourierBasis.repr g k = mFourierBasis.repr g' k
   rw [mFourierBasis_repr, mFourierBasis_repr, hg k, hg' k]
 
-/-- `f` is its own derivative of order `0`. -/
-theorem hasWeakDeriv_zero (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
+/-- `f ∈ L_p(𝕋^d)` is its own derivative of order `0`. -/
+theorem hasWeakDeriv_zero {p : ℝ≥0∞} (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     HasWeakDeriv 0 f f := fun k => by rw [derivSymbol_zero, one_mul]
 
 /-- A weak derivative exists as soon as the multiplied coefficients are square-summable: it is

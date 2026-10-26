@@ -1,7 +1,8 @@
 # The torus
 
 Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Besov spaces*,
-chapters *The torus* and *Classical definitions on the torus*.
+chapters *The torus* and *Classical definitions on the torus*; part *Sobolev and Bessel
+potential spaces*, chapter *Sobolev spaces on the torus*.
 
 On `𝕋^d` with its normalised Haar measure, the scheme consists of the trigonometric polynomials of
 degree `< n`. They satisfy the Nikolskii inequality, so all the embeddings of [Besov and Sobolev
@@ -63,8 +64,14 @@ blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. The restricti
   `W^m_2(𝕋^d)` consist of the `f` all of whose weak derivatives of order `|α| ≤ m` lie in
   `L_2`. Then `f ∈ W^m_2(𝕋^d)` iff `∑_k (1 + max_i |k_i|)^(2m) |f̂(k)|² < ∞`
   (`Torus.memSobolev_iff`), and for `m ≥ 1`, `W^m_2(𝕋^d) = B^m_{2,2}(𝕋^d)`
-  (`Torus.memSobolev_iff_memBesov`). This Fourier-multiplier definition covers `p = 2`;
-  classical derivatives and `W^m_p` for other `p` are not formalised on the torus.
+  (`Torus.memSobolev_iff_memBesov`). In every `L_p(𝕋^d)`, `1 ≤ p ≤ ∞`, the same rule
+  `ĝ(m) = σ_v(m) f̂(m)` with `σ_v(m) = ∏_l 2πi ⟪m, v_l⟫` defines weak derivatives `∂^v` along
+  directions `v ∈ (ℝ^d)^k`, tested against trigonometric polynomials
+  (`Torus.HasWeakLineDeriv`). An element of `L_p(𝕋^d)` is determined by its Fourier
+  coefficients (`Torus.eq_of_mFourierCoeff_eq`), so the weak derivative is unique; it is linear
+  and passes to limits, for `p < ∞` it commutes with convolution by Schwartz kernels
+  (`Torus.econvLp_iteratedLineDerivOp`), and `f ∈ W^m_p(𝕋^d)` iff `∂^v f ∈ L_p` for all
+  directions of order `≤ m` (`Torus.memSobolev_iff_forall_hasWeakLineDeriv`).
 * **The Nikolskii inequality and the Besov embeddings.** For a trigonometric polynomial `T` of
   degree `< n` on `𝕋^d`, `n ≥ 1`, and `1 ≤ p < ∞`, `‖T‖_∞ ≤ (2⌈p/2⌉)^(d/p) n^(d/p) ‖T‖_p`
   (`Torus.norm_le_rpow_mul_eLpNorm`). Hence the trigonometric polynomials have the
@@ -107,6 +114,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Traces on the torus: trace inequality, Fejér extension, `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)` onto | ✅ | ✗ | `Torus/Trace` |
 | The trace of a continuous function is its restriction; de la Vallée Poussin operators | ✅ | ✗ | `Torus/TraceContinuous` |
 | Weak derivatives on the torus, `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)` | ✅ | ✗ | `Torus/WeakDerivatives` |
+| Fourier coefficients in `L_p(𝕋^d)`: convolutions, uniqueness | ✅ | ✗ | `Torus/LpFourierCoefficients` |
+| Weak derivatives along directions in `L_p(𝕋^d)`, `W^m_p(𝕋^d)` by them | ✅ | ✗ | `Torus/LpWeakDerivatives` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

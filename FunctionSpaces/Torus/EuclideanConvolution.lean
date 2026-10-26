@@ -103,6 +103,24 @@ omit [Fintype d] in
 /-- `(latticeVec m)_i = m_i`. -/
 theorem latticeVec_apply (m : d → ℤ) (i : d) : latticeVec m i = (m i : ℝ) := rfl
 
+omit [Fintype d] in
+/-- The lattice vector of `-m` is `-m`. -/
+theorem latticeVec_neg (m : d → ℤ) : latticeVec (-m) = -latticeVec m := by
+  ext i
+  simp [latticeVec_apply]
+
+/-- `⟪m, v⟫ = ∑_i m_i v_i` in coordinates. -/
+theorem inner_latticeVec (m : d → ℤ) (v : EuclideanSpace ℝ d) :
+    inner ℝ (latticeVec m) v = ∑ i, (m i : ℝ) * v i := by
+  simp only [PiLp.inner_apply, latticeVec_apply, RCLike.inner_apply, conj_trivial]
+  exact Finset.sum_congr rfl fun i _ => mul_comm _ _
+
+/-- `⟪m, e_i⟫ = m_i` for the unit vector `e_i`. -/
+theorem inner_latticeVec_single [DecidableEq d] (m : d → ℤ) (i : d) :
+    inner ℝ (latticeVec m) (EuclideanSpace.single i (1 : ℝ)) = (m i : ℝ) := by
+  rw [EuclideanSpace.inner_single_right, latticeVec_apply, one_mul]
+  rfl
+
 /-- **The degree is at most the norm**: `max_i |m_i| ≤ ‖m‖`. -/
 theorem deg_le_norm_latticeVec (m : d → ℤ) : (deg m : ℝ) ≤ ‖latticeVec m‖ := by
   have hi : ∀ i, ((m i).natAbs : ℝ) ≤ ‖latticeVec m‖ := fun i => by

@@ -164,6 +164,8 @@ public import FunctionSpaces.Torus.FeffermanStein
 public import FunctionSpaces.Torus.TriebelLizorkinLocalMeans
 public import FunctionSpaces.Torus.SingularIntegrals
 public import FunctionSpaces.Torus.SquareFunction
+public import FunctionSpaces.Torus.LpFourierCoefficients
+public import FunctionSpaces.Torus.LpWeakDerivatives
 public import FunctionSpaces.Interval.Differences
 public import FunctionSpaces.Interval.Modulus
 public import FunctionSpaces.Interval.Polynomials
@@ -701,7 +703,7 @@ and the theorems that their characterisations agree. The library builds on
   operators on the torus through their Fourier multipliers, and approximate identities.
 * `FunctionSpaces.Torus.LittlewoodPaley`: Littlewood–Paley blocks on the torus and the
   characterisation of `B^s_{p,q}(𝕋^d)` by them for all `1 ≤ p < ∞`.
-* `FunctionSpaces.Torus.WeakDerivatives`: weak derivatives on the torus through Fourier
+* `FunctionSpaces.Torus.WeakDerivatives`: weak derivatives `∂^α` in `L_p(𝕋^d)` through Fourier
   coefficients and `W^m_2(𝕋^d) = H^m(𝕋^d) = B^m_{2,2}(𝕋^d)`.
 * `FunctionSpaces.Torus.Trace`: the trace on the face `{x_0 = 0}` of `𝕋^(n+1)`,
   `B^{s+1/p}_{p,q}(𝕋^(n+1)) → B^s_{p,q}(𝕋^n)`, bounded and onto.
@@ -723,6 +725,11 @@ and the theorems that their characterisations agree. The library builds on
   lift.
 * `FunctionSpaces.Torus.SquareFunction`: the square function theorem
   `L_p(𝕋^d) = F^0_{p,2}(𝕋^d)` for `1 < p < ∞`, with named constants.
+* `FunctionSpaces.Torus.LpFourierCoefficients`: the Fourier coefficients as bounded functionals
+  on `L_p(𝕋^d)`, the coefficients of convolutions, and uniqueness for `1 ≤ p ≤ ∞`.
+* `FunctionSpaces.Torus.LpWeakDerivatives`: weak derivatives along directions in `L_p(𝕋^d)`,
+  their symbols and calculus, convolution with Schwartz kernels, and `W^m_p(𝕋^d)` through
+  directional derivatives.
 
 ### Intervals
 

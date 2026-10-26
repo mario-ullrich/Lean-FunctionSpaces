@@ -116,6 +116,7 @@ BLOCKS: list[tuple[str, list]] = [
                "Sobolev embeddings", "The critical Sobolev embedding",
                "The Gagliardo--Nirenberg--Sobolev inequality",
                "Sobolev spaces and real interpolation"])]),
+    ("Sobolev spaces on the torus", ["Sobolev spaces on the torus"]),
     ("Bessel potential spaces", ["Bessel potential spaces"]),
     ("Lipschitz domains", ["Lipschitz domains"]),
     ("Traces", ["Traces on Lipschitz domains"]),
@@ -141,7 +142,8 @@ COLUMNS: list[list[str]] = [
     ["Convolution and the Fourier transform",
      "Maximal functions and the Fefferman–Stein inequality", "Triebel–Lizorkin spaces",
      "Sobolev spaces: the bridge for p = 2", "Interpolation of operators",
-     "Vector-valued singular integrals", "Sobolev spaces W^m_p", "Bessel potential spaces"],
+     "Vector-valued singular integrals", "Sobolev spaces W^m_p", "Sobolev spaces on the torus",
+     "Bessel potential spaces"],
     ["Traces", "Sobolev spaces on domains and boundaries"],
     ["Approximation spaces: general theory", "Real interpolation of couples"],
 ]
