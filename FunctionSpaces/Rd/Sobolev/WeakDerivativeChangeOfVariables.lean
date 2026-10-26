@@ -230,9 +230,11 @@ section Directions
 
 variable {Ω : Opens V} {f : V → ℂ}
 
-/-- Finite sums of locally integrable functions on `Ω` with complex coefficients are locally
-integrable on `Ω`, by induction over the sum as in Mathlib's `locallyIntegrable_finsetSum'`. -/
-theorem locallyIntegrableOn_sum_smul {ι : Type*} (s : Finset ι) (c : ι → ℂ) {g : ι → V → ℂ}
+/-- Finite sums of locally integrable functions on `Ω` with coefficients in a normed field `𝕜`
+acting on `ℂ`, such as `ℝ` or `ℂ`, are locally integrable on `Ω`, by induction over the sum as in
+Mathlib's `locallyIntegrable_finsetSum'`. -/
+theorem locallyIntegrableOn_sum_smul {𝕜 : Type*} [NormedField 𝕜] [NormedSpace 𝕜 ℂ] {ι : Type*}
+    (s : Finset ι) (c : ι → 𝕜) {g : ι → V → ℂ}
     (hg : ∀ i ∈ s, LocallyIntegrableOn (g i) Ω volume) :
     LocallyIntegrableOn (∑ i ∈ s, c i • g i) Ω volume :=
   Finset.sum_induction (fun i => c i • g i)
@@ -248,7 +250,7 @@ theorem HasWeakLineDeriv.sum_smul_dir {ι : Type*} (s : Finset ι) {v : ι → V
     (h : ∀ i ∈ s, HasWeakLineDeriv Ω (fun _ : Fin 1 => v i) f (g i)) :
     HasWeakLineDeriv Ω (fun _ : Fin 1 => ∑ i ∈ s, c i • v i) f (∑ i ∈ s, (c i : ℂ) • g i) := by
   refine (hasWeakLineDeriv_iff_integral hf
-    (locallyIntegrableOn_sum_smul s _ fun i hi => (h i hi).2)).2 fun φ => ?_
+    (locallyIntegrableOn_sum_smul s (fun i => (c i : ℂ)) fun i hi => (h i hi).2)).2 fun φ => ?_
   have hL : ∀ x, (∂^{fun _ : Fin 1 => ∑ i ∈ s, c i • v i} φ) x =
       ∑ i ∈ s, c i * (∂^{fun _ : Fin 1 => v i} φ) x := fun x => by
     simp only [LineDeriv.iteratedLineDerivOp_one, lineDerivOp_testFunction_apply, map_sum,

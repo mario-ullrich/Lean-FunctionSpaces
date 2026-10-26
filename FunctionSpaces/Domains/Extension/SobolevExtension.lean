@@ -703,12 +703,11 @@ theorem exists_momentKernel_ne_zero_of_divKernel_ne_zero (i : Fin (finrank ℝ V
 
 /-- **The supports of the dilated divergence kernels**: if the divergence kernel `K_i` vanishes
 outside a closed set `S` with `c y ∈ S ⇒ y ∈ S` for `c ≥ 1`, then every dilate `(K_i)_{2^j}` is
-supported in `S`. -/
+supported in `S` (`Rd.tsupport_dilate_two_pow_subset`). -/
 theorem tsupport_dilate_divKernel_subset (i : Fin (finrank ℝ V)) {S : Set V} (hS : IsClosed S)
     (hK : ∀ y, b.divKernel i y ≠ 0 → y ∈ S) (hscale : ∀ c : ℝ, 1 ≤ c → ∀ y, c • y ∈ S → y ∈ S)
     (j : ℕ) : tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)) ⊆ S :=
-  closure_minimal (fun y hy => hscale (2 ^ j) (one_le_pow₀ one_le_two) y
-    (hK _ fun h => hy (by simp [dilate, h]))) hS
+  tsupport_dilate_two_pow_subset hS hK hscale j
 
 /-- The divergence kernels of a bump of radius `R` and their dilates `(K_i)_{2^j}` are supported
 in the closed ball of radius `2R`. -/

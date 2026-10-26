@@ -26,11 +26,14 @@ dilations (`Rd.dilate`).
   `A_m(x) = ∫_0^{log 2} m_{e^s}(x) ds = ∫_1^2 t⁻¹ m_t(x) dt` (`Rd.dilationAverage`,
   `Rd.dilationAverage_eq_integral_inv_mul`) and the
   divergence kernels `K_i(x) = ⟪e_i, x⟫ A_m(x)` (`Rd.divergenceKernel`),
-  `m_2 - m = ∑_i ∂_{e_i} K_i`, at every scale for the dilates
+  `m_2 - m = ∑_i ∂_{e_i} K_i`, since `∑_i ∂_{e_i} (⟪e_i, ·⟫ A)(x) = n A(x) + DA(x) x`
+  (`Rd.sum_fderiv_inner_mul`); at every scale for the dilates
   (`Rd.sum_lineDerivOp_schwartzDilate_divergenceSchwartz`).
 * **Support and mean**: `K_i(x) ≠ 0` only if `m(t x) ≠ 0` for some `t ∈ [1, 2]`
   (`Rd.divergenceKernel_eq_zero`), so the `K_i` of a smooth compactly supported `m` are Schwartz
-  functions (`Rd.divergenceSchwartz`), and `∫ K_i = 0` if the first moments of `m` vanish
+  functions (`Rd.divergenceSchwartz`). A kernel that vanishes outside a closed set `S` with
+  `c y ∈ S ⇒ y ∈ S` for `c ≥ 1` has its dyadic dilates supported in `S`
+  (`Rd.tsupport_dilate_two_pow_subset`), and `∫ K_i = 0` if the first moments of `m` vanish
   (`Rd.integral_divergenceKernel`, with the first moments of dilates
   `Rd.integral_inner_mul_dilate`),
   as they do for the moment kernels of order two (`Rd.integral_inner_mul_momentKernel_two`).
@@ -181,6 +184,12 @@ theorem fderiv_dilate_apply {m : V → ℂ} (hm : Differentiable ℝ m) (c : ℝ
   simp
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- The dilates of a differentiable function are differentiable. -/
+theorem differentiableAt_dilate {G : V → ℂ} (hG : Differentiable ℝ G) (c : ℝ) (x : V) :
+    DifferentiableAt ℝ (dilate c G) x :=
+  (differentiableAt_const _).mul ((hG _).comp x (differentiableAt_id.const_smul c))
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Euler's identity for dilations**: `d/ds m_{e^s}(x) = n m_{e^s}(x) + D(m_{e^s})(x) x`, the
 derivative of the dilation parameter is the radial derivative. -/
 theorem hasDerivAt_dilate_exp {m : V → ℂ} (hm : Differentiable ℝ m) (x : V) (s : ℝ) :
@@ -285,6 +294,16 @@ theorem hasCompactSupport_divergenceKernel [ProperSpace V] {m : V → ℂ} {R : 
   HasCompactSupport.intro (isCompact_closedBall 0 R) fun x hx =>
     divergenceKernel_eq_zero_of_lt hR w (by simpa [mem_closedBall, dist_zero_right] using hx)
 
+omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **Supports of dyadic dilates**: if `K` vanishes outside a closed set `S` with
+`c y ∈ S ⇒ y ∈ S` for `c ≥ 1`, then every dilate `K_{2^j}` is supported in `S`. -/
+theorem tsupport_dilate_two_pow_subset [NormedSpace ℝ V] {K : V → ℂ} {S : Set V}
+    (hS : IsClosed S) (hK : ∀ y, K y ≠ 0 → y ∈ S)
+    (hscale : ∀ c : ℝ, 1 ≤ c → ∀ y, c • y ∈ S → y ∈ S) (j : ℕ) :
+    tsupport (dilate (2 ^ j) K) ⊆ S :=
+  closure_minimal (fun y hy => hscale (2 ^ j) (one_le_pow₀ one_le_two) y
+    (hK _ fun h => hy (by simp [dilate, h]))) hS
+
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- The dilation average of a `C^1` function is differentiable
 (`intervalIntegral.hasFDerivAt_integral_of_contDiff`). -/
@@ -336,32 +355,38 @@ theorem dilate_two_sub_eq {m : V → ℂ} (hm : ContDiff ℝ 1 m) (x : V) :
   rw [dilationAverage, fderiv_dilationAverage_apply hm, hftc]
   simp [dilate]
 
-omit [MeasurableSpace V] [BorelSpace V] in
-/-- **The divergence identity**: for an orthonormal basis `(b_i)` of `V` and `m ∈ C^1`,
-`∑_i ∂_{b_i} K_{b_i}(x) = m_2(x) - m(x)` with the divergence kernels
-`K_{b_i}(x) = ⟪b_i, x⟫ A_m(x)`: the left side is `n A_m(x) + D A_m(x) x` since
-`∑_i ⟪b_i, x⟫ b_i = x` (Mathlib's `OrthonormalBasis.sum_repr'`), and `Rd.dilate_two_sub_eq`. -/
-theorem sum_fderiv_divergenceKernel {ι : Type*} [Fintype ι] (b : OrthonormalBasis ι ℝ V)
-    {m : V → ℂ} (hm : ContDiff ℝ 1 m) (x : V) :
-    ∑ i, fderiv ℝ (divergenceKernel m (b i)) x (b i) = dilate 2 m x - m x := by
-  have hA := differentiable_dilationAverage hm
-  have hK : ∀ w v : V, fderiv ℝ (divergenceKernel m w) x v =
-      (inner ℝ w v : ℂ) * dilationAverage m x +
-        (inner ℝ w x : ℂ) * fderiv ℝ (dilationAverage m) x v := fun w v => by
-    have h := ((Complex.ofRealCLM.comp (innerSL ℝ w)).hasFDerivAt (x := x)).mul
-      (hA x).hasFDerivAt
-    rw [show divergenceKernel m w = ⇑(Complex.ofRealCLM.comp (innerSL ℝ w)) *
-      dilationAverage m from funext fun y => by simp [divergenceKernel], h.fderiv]
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **The divergence of `x A(x)`**: for an orthonormal basis `(b_i)` of `V` and `A`
+differentiable at `x`, `∑_i ∂_{b_i} (⟪b_i, ·⟫ A)(x) = n A(x) + DA(x) x`, since
+`∑_i ⟪b_i, x⟫ b_i = x` (Mathlib's `OrthonormalBasis.sum_repr'`). -/
+theorem sum_fderiv_inner_mul {ι : Type*} [Fintype ι] (b : OrthonormalBasis ι ℝ V) {A : V → ℂ}
+    {x : V} (hA : DifferentiableAt ℝ A x) :
+    ∑ i, fderiv ℝ (fun y => (inner ℝ (b i) y : ℂ) * A y) x (b i) =
+      (finrank ℝ V : ℂ) * A x + fderiv ℝ A x x := by
+  have hK : ∀ w v : V, fderiv ℝ (fun y => (inner ℝ w y : ℂ) * A y) x v =
+      (inner ℝ w v : ℂ) * A x + (inner ℝ w x : ℂ) * fderiv ℝ A x v := fun w v => by
+    have h := ((Complex.ofRealCLM.comp (innerSL ℝ w)).hasFDerivAt (x := x)).mul hA.hasFDerivAt
+    rw [show (fun y => (inner ℝ w y : ℂ) * A y) = ⇑(Complex.ofRealCLM.comp (innerSL ℝ w)) * A from
+      funext fun y => by simp, h.fderiv]
     simp [add_comm, mul_comm]
   have hb : ∀ i, inner ℝ (b i) (b i) = (1 : ℝ) := fun i => by
     rw [real_inner_self_eq_norm_sq, b.orthonormal.1 i, one_pow]
-  have hsum : fderiv ℝ (dilationAverage m) x x =
-      ∑ i, (inner ℝ (b i) x : ℂ) * fderiv ℝ (dilationAverage m) x (b i) := by
-    rw [← congrArg (fun v => fderiv ℝ (dilationAverage m) x v) (b.sum_repr' x)]
+  have hsum : fderiv ℝ A x x = ∑ i, (inner ℝ (b i) x : ℂ) * fderiv ℝ A x (b i) := by
+    rw [← congrArg (fun v => fderiv ℝ A x v) (b.sum_repr' x)]
     simp [map_sum, Complex.real_smul]
   simp_rw [hK, hb, Complex.ofReal_one, one_mul]
-  rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, dilate_two_sub_eq hm, hsum,
+  rw [Finset.sum_add_distrib, Finset.sum_const, Finset.card_univ, hsum,
     ← Module.finrank_eq_card_basis b.toBasis, nsmul_eq_mul]
+
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- **The divergence identity**: for an orthonormal basis `(b_i)` of `V` and `m ∈ C^1`,
+`∑_i ∂_{b_i} K_{b_i}(x) = m_2(x) - m(x)` with the divergence kernels
+`K_{b_i}(x) = ⟪b_i, x⟫ A_m(x)`: the left side is `n A_m(x) + D A_m(x) x`
+(`Rd.sum_fderiv_inner_mul`), and `Rd.dilate_two_sub_eq`. -/
+theorem sum_fderiv_divergenceKernel {ι : Type*} [Fintype ι] (b : OrthonormalBasis ι ℝ V)
+    {m : V → ℂ} (hm : ContDiff ℝ 1 m) (x : V) :
+    ∑ i, fderiv ℝ (divergenceKernel m (b i)) x (b i) = dilate 2 m x - m x :=
+  (sum_fderiv_inner_mul b (differentiable_dilationAverage hm x)).trans (dilate_two_sub_eq hm x).symm
 
 /-- The integrand `(x, s) ↦ ⟪w, x⟫ m_{e^s}(x)` of the dilation average is integrable on
 `V × (0, c]` if `m` is continuous and vanishes outside a ball: it is continuous and vanishes

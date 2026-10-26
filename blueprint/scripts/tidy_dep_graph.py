@@ -111,7 +111,8 @@ BLOCKS: list[tuple[str, list]] = [
                r"Mathlib's Sobolev spaces \texorpdfstring{$H^s$}{H\^{}s} by Littlewood--Paley blocks",
                "Rellich compactness"])]),
     ("Sobolev spaces W^m_p", [
-        (SOB, ["Derivative kernels", "Sobolev spaces as Triebel--Lizorkin spaces",
+        (SOB, ["The Leibniz rule", "Derivative kernels",
+               "Sobolev spaces as Triebel--Lizorkin spaces",
                "Sobolev embeddings", "The critical Sobolev embedding",
                "The Gagliardo--Nirenberg--Sobolev inequality",
                "Sobolev spaces and real interpolation"])]),

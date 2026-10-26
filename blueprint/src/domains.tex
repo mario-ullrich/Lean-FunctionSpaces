@@ -5723,12 +5723,12 @@ Mathlib has the derivative under the integral sign and the continuity of paramet
 \begin{lemma}[Exponential dilations]
 \label{lem:exponential-dilation}
 \lean{Rd.contDiff_dilate_exp, Rd.continuous_dilate_exp, Rd.fderiv_dilate_apply,
-  Rd.hasDerivAt_dilate_exp}
+  Rd.differentiableAt_dilate, Rd.hasDerivAt_dilate_exp}
 \leanok
 \uses{lem:dilate}
 For every continuous $m \colon V \to \C$ the function $(x, s) \mapsto m_{e^s}(x)$ on
 $V \times \R$ is continuous, and it is $k$ times continuously differentiable if $m$ is. For every
-differentiable $m$, every $c \in \R$ and all $x, v \in V$,
+differentiable $m$ and every $c \in \R$, $m_c$ is differentiable, for all $x, v \in V$,
 $D(m_c)(x) \, v = c^n \, Dm(c x)(c v)$, and for every $x \in V$ and every $s \in \R$,
 \[
   \frac{d}{ds} \, m_{e^s}(x) = n \, m_{e^s}(x) + D(m_{e^s})(x) \, x .
@@ -5804,6 +5804,22 @@ For $s \in [0, \log 2]$, $e^s \in [1, 2]$, so the integrand of $A_m(x)$ vanishes
 $\|x\| > R$ and $t \geq 1$, $\|t x\| \geq \|x\| > R$.
 \end{proof}
 
+\begin{lemma}[Supports of dyadic dilates]
+\label{lem:dyadic-dilate-support}
+\lean{Rd.tsupport_dilate_two_pow_subset}
+\leanok
+\uses{lem:dilate}
+For every closed $S \subseteq V$ with $y \in S$ whenever $c y \in S$ for some $c \geq 1$, every
+$\Psi \colon V \to \C$ that vanishes outside $S$ and every $j \in \N$, the dilate $\Psi_{2^j}$ is
+supported in $S$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\Psi_{2^j}(y) \neq 0$ gives $\Psi(2^j y) \neq 0$, so $2^j y \in S$ and $y \in S$; the support is
+the closure of this set, and $S$ is closed.
+\end{proof}
+
 \begin{definition}[Divergence kernels as Schwartz functions]
 \label{def:divergence-schwartz}
 \lean{Rd.divergenceSchwartz, Rd.coe_divergenceSchwartz}
@@ -5813,6 +5829,28 @@ For every smooth $m \colon V \to \C$ that vanishes outside a ball and every $w \
 divergence kernel $K^m_w$, smooth with compact support, is a Schwartz function.
 \end{definition}
 
+\begin{lemma}[The divergence of $x A(x)$]
+\label{lem:radial-divergence}
+\lean{Rd.sum_fderiv_inner_mul}
+\leanok
+For every orthonormal basis $(b_j)_{j \in J}$ of $V$, every $x \in V$ and every
+$A \colon V \to \C$ differentiable at $x$,
+\[
+  \sum_{j \in J} \partial_{b_j} \bigl(\langle b_j, \cdot \rangle A\bigr)(x)
+    = n \, A(x) + DA(x) \, x .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By the product rule,
+\[
+  \partial_{b_j} \bigl(\langle b_j, \cdot \rangle A\bigr)(x)
+    = \langle b_j, b_j \rangle A(x) + \langle b_j, x \rangle \, DA(x) \, b_j ,
+\]
+and $\sum_j \langle b_j, x \rangle b_j = x$.
+\end{proof}
+
 \begin{theorem}[The dilation identity]
 \label{thm:dilation-divergence}
 \lean{Rd.fderiv_dilationAverage_apply, Rd.continuous_fderiv_dilate_exp_apply,
@@ -5820,7 +5858,8 @@ divergence kernel $K^m_w$, smooth with compact support, is a Schwartz function.
   Rd.sum_lineDerivOp_schwartzDilate_divergenceSchwartz}
 \leanok
 \uses{def:divergence-kernel, lem:exponential-dilation, lem:parametric-integral-smooth,
-  lem:divergence-kernel-smooth, def:divergence-schwartz, lem:derivative-dilate}
+  lem:divergence-kernel-smooth, def:divergence-schwartz, lem:derivative-dilate,
+  lem:radial-divergence}
 For every continuously differentiable $m \colon V \to \C$ and every $x \in V$,
 \[
   m_2(x) - m(x) = n \, A_m(x) + D A_m(x) \, x = \sum_{i \in I} \partial_{e_i} K^m_{e_i}(x) .
@@ -5837,10 +5876,8 @@ By \Cref{lem:parametric-integral-smooth},
 $D A_m(x) \, x = \int_0^{\log 2} D(m_{e^s})(x) \, x \, ds$,
 so by \Cref{lem:exponential-dilation} $n A_m(x) + D A_m(x) \, x$ is the integral of the
 derivative of $s \mapsto m_{e^s}(x)$ over $[0, \log 2]$, which is
-$m_2(x) - m_1(x) = m_2(x) - m(x)$ by the fundamental theorem of calculus. The product rule gives
-$\partial_{e_i} K^m_{e_i}(x) = \langle e_i, e_i \rangle A_m(x) +
-\langle e_i, x \rangle \, D A_m(x) \, e_i$, and the sum over $i$ is
-$n A_m(x) + D A_m(x) \bigl(\sum_i \langle e_i, x \rangle e_i\bigr) = n A_m(x) + D A_m(x) \, x$.
+$m_2(x) - m_1(x) = m_2(x) - m(x)$ by the fundamental theorem of calculus, and
+$\sum_i \partial_{e_i} K^m_{e_i}(x) = n A_m(x) + D A_m(x) \, x$ by \Cref{lem:radial-divergence}.
 The second identity follows with $\partial_w (G_c) = c \, (\partial_w G)_c$
 (\Cref{lem:derivative-dilate}).
 \end{proof}
@@ -6221,7 +6258,8 @@ $Y = \|f\|_{L_p(O)} + \sum_i \|g_i\|_{L_p(O)}$.
   Rd.LocalMeansBump.tsupport_dilate_divKernel_subset_closedBall,
   Rd.LipschitzGraph.tsupport_dilate_divKernel_subset, Rd.LipschitzGraph.patch_support_divKernel}
 \leanok
-\uses{def:bump-divergence-kernels, lem:graph-cone, def:cone-supported, lem:patches}
+\uses{def:bump-divergence-kernels, lem:graph-cone, def:cone-supported, lem:patches,
+  lem:dyadic-dilate-support}
 Let $g$ be a bump of radius $R$ with the divergence kernels $K_i$. For every $i$ and every
 $j \in \N$ the support of $(K_i)_{2^j}$ lies in $\bar B(0, 2R)$. If $g$ is supported in $-K$ for a
 Lipschitz graph domain $\Omega$ with the closed cone $\bar K$ (\Cref{lem:graph-cone}), the support
@@ -6236,7 +6274,8 @@ $x \in \Omega \cap B(c, \rho - \varepsilon)$ and every $y$ in the support of $(K
 $K_i(y) \neq 0$ only if $m(t y) \neq 0$ for some $t \in [1, 2]$, so $\|y\| \leq \|t y\| \leq 2R$,
 and $-t y \in K$ if $g$ is supported in $-K$, so $-y \in \bar K$. These sets are closed and
 contain $y$ whenever they contain $c y$ for some $c \geq 1$, so they contain the supports of the
-dilates. Finally $\Omega + \bar K \subseteq \Omega$ (\Cref{lem:graph-cone}) and
+dilates (\Cref{lem:dyadic-dilate-support}). Finally $\Omega + \bar K \subseteq \Omega$
+(\Cref{lem:graph-cone}) and
 $\|x - y - c\| < \rho - \varepsilon + 2R \leq \rho$.
 \end{proof}
 
@@ -7063,6 +7102,517 @@ As for \Cref{thm:sobolev-extension}, with the patches of \Cref{lem:reflection-pa
 cover the closure of $\Omega$ (\Cref{lem:bounded-lipschitz-geometry}), and
 \Cref{thm:pasting-sobolev} pastes them for every $1 \leq p \leq \infty$. For $n = 0$ the argument
 of \Cref{thm:sobolev-extension} holds for every $p$.
+\end{proof}
+
+\section{Higher divergence kernels}
+\label{sec:higher-divergence-kernels}
+
+\Cref{lem:bump-divergence-identity} writes the local means kernels of order two as divergences
+of mean-zero kernels (\Cref{sec:divergence-kernels}), which bounds the local means of $f$ by its
+gradient. This section does the same
+for the derivatives of order $m$: for $m \leq L$ the local means kernels of order $L$ are sums of
+derivatives of order $m$ of kernels, which have mean zero for $m < L$ and are supported in the
+reflected cone for bumps supported in $-K$. They are the tool for bounding the local means in
+Rychkov's local extension \cite{Rychkov} by the derivatives of order $m$. The kernels are averages
+of
+dilates with smooth weights; the weights for derivatives of order $m$ come from $m$ integrations
+by parts along the dilations, which need $m$ vanishing moments of the weight. Throughout,
+$(e_i)_{i \in I}$ is the orthonormal basis of \Cref{def:dyadic-cells},
+$\Phi_c(x) = c^n \Phi(c x)$ (\Cref{lem:dilate}), and for a word $i = (i_0, \dots, i_{m-1}) \in I^m$,
+$\partial^{e_i} = \partial_{e_{i_0}} \cdots \partial_{e_{i_{m-1}}}$ and
+$x^i = \prod_{l < m} \langle e_{i_l}, x \rangle$.
+
+\paragraph{Weighted dilation averages.}
+
+\begin{definition}[Weighted dilation averages]
+\label{def:weighted-dilation}
+\lean{Rd.weightedDilation}
+\leanok
+\uses{lem:dilate}
+For $a, b \in \R$, $w \colon \R \to \C$ and $G \colon V \to \C$, the \emph{weighted dilation
+average} is
+\[
+  A^{a,b}_w G(x) = \int_a^b w(s) \, G_{e^s}(x) \, ds .
+\]
+\end{definition}
+
+For $w = 1$ on $[0, \log 2]$ this is the dilation average of \Cref{def:divergence-kernel}.
+
+\begin{lemma}[Properties of weighted dilation averages]
+\label{lem:weighted-dilation}
+\lean{Rd.contDiff_weight_mul_dilate_exp, Rd.contDiff_weightedDilation,
+  Rd.weightedDilation_eq_zero, Rd.lt_norm_exp_smul, Rd.weightedDilation_eq_zero_of_lt,
+  Rd.hasCompactSupport_weightedDilation, Rd.integrable_weight_mul_dilate_exp,
+  Rd.integral_weightedDilation}
+\leanok
+\uses{def:weighted-dilation, lem:parametric-integral-smooth, lem:exponential-dilation,
+  lem:dilate}
+For all $a, b \in \R$, $w \colon \R \to \C$ and $G \colon V \to \C$:
+\begin{enumerate}
+  \item if $w$ and $G$ are smooth, then $(x, s) \mapsto w(s) \, G_{e^s}(x)$ and $A^{a,b}_w G$ are
+    smooth;
+  \item for every $x \in V$ with $G(e^s x) = 0$ for every $s$ between $a$ and $b$,
+    $A^{a,b}_w G(x) = 0$;
+  \item if $a \leq b$ and $G$ vanishes outside $\bar B(0, R)$, then $A^{a,b}_w G$ vanishes
+    outside $\bar B(0, R e^{-a})$ and has compact support;
+  \item if $a \leq b$, $w$ and $G$ are continuous and $G$ vanishes outside a ball, then
+    $(x, s) \mapsto w(s) \, G_{e^s}(x)$ is integrable on $V \times (a, b]$ and
+    \[
+      \int_V A^{a,b}_w G = \Bigl(\int_a^b w\Bigr) \int_V G .
+    \]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) \Cref{lem:exponential-dilation} and \Cref{lem:parametric-integral-smooth}. (2) The integrand
+vanishes. (3) For $s \geq a$ and $\|x\| > R e^{-a}$, $\|e^s x\| > R$. (4) The integrand is
+continuous and vanishes outside the compact set $\bar B(0, R e^{-a}) \times [a, b]$; by Fubini,
+$\int_V w(s) G_{e^s} = w(s) \int_V G$ for every $s$ (\Cref{lem:dilate}).
+\end{proof}
+
+\begin{lemma}[Intervals, linearity and dilations]
+\label{lem:weighted-dilation-algebra}
+\lean{Rd.intervalIntegral_eq_of_support_subset, Rd.weightedDilation_eq_of_support,
+  Rd.weightedDilation_sum, Rd.weightedDilation_sub, Rd.dilate_exp_neg_weightedDilation}
+\leanok
+\uses{def:weighted-dilation, lem:dilate}
+\begin{enumerate}
+  \item For every $f \colon \R \to \C$ and all $a, b, a', b' \in \R$ such that $f$ vanishes
+    outside $(a, b]$ and $(a, b] \subseteq (a', b']$,
+    \[
+      \int_a^b f = \int_{a'}^{b'} f ;
+    \]
+    in particular $A^{a,b}_w G = A^{a',b'}_w G$ for every $G$ and every $w$ that vanishes
+    outside $(a, b]$.
+  \item For all $a, b \in \R$, every finite set $J$, all $c_l \in \C$ and continuous $w_l$
+    ($l \in J$), all continuous $w$, $v$ and every continuous $G$,
+    $A^{a,b}_{\sum_l c_l w_l} G = \sum_l c_l A^{a,b}_{w_l} G$ and
+    $A^{a,b}_{w - v} G = A^{a,b}_w G - A^{a,b}_v G$.
+  \item For all $a, b, t \in \R$, $w$ and $G$,
+    $(A^{a,b}_w G)_{e^{-t}} = A^{a-t, b-t}_{w(\cdot + t)} G$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Both integrals are $\int_\R f$. (2) Linearity of the integral. (3)
+$(G_{e^s})_{e^{-t}} = G_{e^{s-t}}$ and the substitution $s \mapsto s + t$.
+\end{proof}
+
+\paragraph{One step.}
+
+\begin{definition}[Anti-weights]
+\label{def:anti-weight}
+\lean{Rd.antiWeight, Rd.iterWeight}
+\leanok
+For $a \in \R$ and $w \colon \R \to \C$, the \emph{anti-weight} of $w$ is
+\[
+  W_a(w)(s) = -e^{-s} \int_a^s w ,
+\]
+and the iterated anti-weights are $w_0 = w$ and $w_{k+1} = W_a(w_k)$.
+\end{definition}
+
+\begin{lemma}[Regularity of the anti-weights]
+\label{lem:anti-weight}
+\lean{Rd.contDiff_primitive, Rd.contDiff_antiWeight, Rd.continuous_antiWeight,
+  Rd.iterWeight_succ, Rd.contDiff_iterWeight, Rd.continuous_iterWeight}
+\leanok
+\uses{def:anti-weight}
+For every $a \in \R$ and every $w \colon \R \to \C$:
+\begin{enumerate}
+  \item if $w$ is continuous, then the anti-weight $W_a(w)$ and every iterated anti-weight $w_k$
+    are continuous;
+  \item if $w$ is smooth, then the primitive $s \mapsto \int_a^s w$, the anti-weight $W_a(w)$ and
+    every iterated anti-weight $w_k$ are smooth;
+  \item for every $k \in \N$, $w_{k+1}$ is the $k$-th iterated anti-weight of $W_a(w)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The primitive of a continuous function is continuous (Mathlib's
+\texttt{intervalIntegral.\allowbreak continuous\_\allowbreak primitive}); induction on $k$.
+(2) The primitive has the derivative $w$ (Mathlib's
+\texttt{Continuous.\allowbreak integral\_\allowbreak hasStrictDerivAt}); induction on $k$.
+(3) By definition.
+\end{proof}
+
+\begin{lemma}[Derivatives and coordinate factors]
+\label{lem:weighted-dilation-derivative}
+\lean{Rd.fderiv_weightedDilation_apply, Rd.weightedDilation_antiWeight_inner_mul}
+\leanok
+\uses{def:weighted-dilation, def:anti-weight, lem:parametric-integral-smooth,
+  lem:exponential-dilation, lem:first-moments-dilate}
+\begin{enumerate}
+  \item For all $a, b \in \R$, all continuously differentiable $w \colon \R \to \C$ and
+    $G \colon V \to \C$ and all $x, v \in V$,
+    $D(A^{a,b}_w G)(x) \, v = \int_a^b w(s) \, D(G_{e^s})(x) \, v \, ds$.
+  \item For all $a, b \in \R$, $w$, $G$ and $e, x \in V$,
+    $A^{a,b}_{W_a(w)} (\langle e, \cdot \rangle G)(x)
+      = \langle e, x \rangle \, A^{a,b}_{\tilde w} G(x)$ with $\tilde w(s) = -\int_a^s w$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Every dilate $G_{e^s}$ is differentiable (\Cref{lem:exponential-dilation}), and
+\Cref{lem:parametric-integral-smooth} applies. (2) $(\langle e, \cdot \rangle G)_c(x)
+= c \, \langle e, x \rangle \, G_c(x)$ (\Cref{lem:first-moments-dilate}) and
+$e^{-s} e^s = 1$.
+\end{proof}
+
+\begin{theorem}[A weighted dilation average as a divergence]
+\label{thm:weighted-dilation-divergence}
+\lean{Rd.finrank_mul_add_fderiv_weightedDilation_primitive, Rd.weightedDilation_eq_sum_fderiv}
+\leanok
+\uses{lem:weighted-dilation-derivative, lem:radial-divergence, lem:anti-weight,
+  lem:exponential-dilation, lem:weighted-dilation}
+For all $a, b \in \R$, every smooth $w \colon \R \to \C$ with $\int_a^b w = 0$, every smooth
+$G \colon V \to \C$ and every $x \in V$, with $\tilde w(s) = -\int_a^s w$,
+\[
+  n \, A^{a,b}_{\tilde w} G(x) + D(A^{a,b}_{\tilde w} G)(x) \, x = A^{a,b}_w G(x)
+\]
+and
+\[
+  A^{a,b}_w G(x) = \sum_{i \in I} \partial_{e_i} \bigl(A^{a,b}_{W_a(w)}
+    (\langle e_i, \cdot \rangle G)\bigr)(x) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:weighted-dilation-derivative} (1) and Euler's identity
+(\Cref{lem:exponential-dilation}), the left side of the first identity is
+$-\int_a^b (\int_a^s w) \frac{d}{ds} G_{e^s}(x) \, ds$. Integration by parts in $s$ has no
+boundary terms, since $\int_a^a w = \int_a^b w = 0$, and gives
+$\int_a^b w(s) \, G_{e^s}(x) \, ds$. The second identity follows from the first by
+\Cref{lem:weighted-dilation-derivative} (2) and \Cref{lem:radial-divergence}.
+\end{proof}
+
+\begin{lemma}[Moments of the anti-weights]
+\label{lem:anti-weight-moments}
+\lean{Rd.hasDerivAt_neg_inv_mul_exp, Rd.integral_antiWeight_mul_exp, Rd.integral_mul_exp_zero,
+  Rd.integral_iterWeight_mul_exp_eq_zero}
+\leanok
+\uses{def:anti-weight, lem:anti-weight}
+For all $a, b \in \R$ and every continuous $w \colon \R \to \C$:
+\begin{enumerate}
+  \item if $\int_a^b w = 0$, then for every $r \in \N$,
+    \[
+      \int_a^b W_a(w)(s) \, e^{-rs} \, ds = -\frac{1}{r + 1} \int_a^b w(s) \, e^{-(r+1)s} \, ds ;
+    \]
+  \item for all $k, r \in \N$ with $\int_a^b w(s) \, e^{-r's} \, ds = 0$ for every $r' \leq r + k$,
+    $\int_a^b w_k(s) \, e^{-rs} \, ds = 0$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) $W_a(w)(s) \, e^{-rs} = -e^{-(r+1)s} \int_a^s w$; integrate by parts against
+$-(r+1)^{-1} e^{-(r+1)s}$, whose derivative is $e^{-(r+1)s}$, without boundary terms.
+(2) Induction on $k$ with (1); the moment of order $0$ is $\int_a^b w$.
+\end{proof}
+
+\paragraph{Iteration.}
+
+\begin{lemma}[Monomials times a kernel]
+\label{lem:monomial-kernels}
+\lean{Rd.contDiff_prod_inner_mul, Rd.contDiff_inner_mul, Rd.mul_eq_zero_of_lt_norm}
+\leanok
+For every smooth $G \colon V \to \C$, every $m \in \N$, every $i \in I^m$ and every $j \in I$, the
+functions $x^i G$ and $\langle e_j, \cdot \rangle G$ are smooth. For every $G$ that vanishes
+outside $\bar B(0, R)$ and every $c \colon V \to \C$, $c G$ vanishes outside $\bar B(0, R)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Products of smooth functions are smooth.
+\end{proof}
+
+\begin{definition}[Higher divergence kernels]
+\label{def:higher-divergence-kernel}
+\lean{Rd.higherDivKernel, Rd.higherDivSchwartz, Rd.higherDivSchwartz_apply}
+\leanok
+\uses{def:weighted-dilation, def:anti-weight, lem:monomial-kernels}
+For $a, b \in \R$, $w \colon \R \to \C$, $G \colon V \to \C$, $m \in \N$ and a word $i \in I^m$,
+the \emph{higher divergence kernel} is
+\[
+  K^{a,b}_{w,G,i} = A^{a,b}_{w_m} (x^i G) ,
+\]
+with the iterated anti-weight $w_m$. For $a \leq b$, smooth $w$ and smooth $G$ that vanishes
+outside a ball, it is a Schwartz function.
+\end{definition}
+
+\begin{theorem}[Weighted dilation averages as derivatives of order $m$]
+\label{thm:weighted-dilation-higher}
+\lean{Rd.higherDivSchwartz_antiWeight, Rd.weightedDilation_eq_sum_iteratedLineDeriv}
+\leanok
+\uses{def:higher-divergence-kernel, thm:weighted-dilation-divergence, lem:anti-weight-moments,
+  lem:anti-weight}
+For all $a \leq b$, every smooth $w \colon \R \to \C$, every smooth $G \colon V \to \C$ that
+vanishes outside a ball and every $m \in \N$ with $\int_a^b w(s) \, e^{-rs} \, ds = 0$ for every
+$r < m$,
+\[
+  A^{a,b}_w G = \sum_{i \in I^m} \partial^{e_i} K^{a,b}_{w,G,i} .
+\]
+For every $j \in I$ and every $i \in I^m$, the kernel of the word $i$ for $W_a(w)$ and
+$\langle e_j, \cdot \rangle G$ is the kernel of the word $(j, i)$ for $w$ and $G$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Induction on $m$. For $m + 1$, \Cref{thm:weighted-dilation-divergence} gives
+$A^{a,b}_w G = \sum_j \partial_{e_j} A^{a,b}_{W_a(w)} (\langle e_j, \cdot \rangle G)$; the
+moments of $W_a(w)$ of the orders $r < m$ vanish by \Cref{lem:anti-weight-moments} (1), and the
+induction hypothesis for $W_a(w)$ and $\langle e_j, \cdot \rangle G$ writes each term as a sum
+over the words $(j, i)$, $i \in I^m$.
+\end{proof}
+
+\begin{lemma}[The higher divergence kernels have mean zero]
+\label{lem:higher-divergence-mean-zero}
+\lean{Rd.integral_higherDivKernel_eq_zero}
+\leanok
+\uses{def:higher-divergence-kernel, lem:weighted-dilation, lem:anti-weight-moments}
+For all $a \leq b$, every continuous $w \colon \R \to \C$, every continuous $G \colon V \to \C$
+that vanishes outside a ball, every $m \in \N$ with $\int_a^b w(s) \, e^{-rs} \, ds = 0$ for
+every $r \leq m$ and every $i \in I^m$, $\int_V A^{a,b}_{w_m}(x^i G) = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\int_V A^{a,b}_{w_m}(x^i G) = (\int_a^b w_m) \int_V x^i G$ (\Cref{lem:weighted-dilation} (4)),
+and $\int_a^b w_m = 0$ by \Cref{lem:anti-weight-moments} (2) with $r = 0$.
+\end{proof}
+
+\begin{lemma}[Weighted dilation averages in the cone]
+\label{lem:higher-divergence-cone}
+\lean{Rd.LipschitzGraph.ConeSupported.mul_left, Rd.LipschitzGraph.coneSupported_weightedDilation,
+  Rd.LipschitzGraph.coneSupported_higherDivKernel}
+\leanok
+\uses{def:cone-supported, lem:graph-cone, def:weighted-dilation, def:higher-divergence-kernel}
+For every Lipschitz graph domain with cone $K$ and every $G$ supported in $-K$: $c G$ is
+supported in $-K$ for every $c \colon V \to \C$, and $A^{a,b}_w G$ and every
+$K^{a,b}_{w,G,i}$ are supported in $-K$, for all $a, b \in \R$ and $w \colon \R \to \C$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $A^{a,b}_w G(y) \neq 0$, then $G(e^s y) \neq 0$ for some $s$, so $-e^s y \in K$ and
+$-y = e^{-s}(-e^s y) \in K$ (\Cref{lem:graph-cone}).
+\end{proof}
+
+\paragraph{The smoothed bump.}
+
+The moment kernel of a bump $g$ is a combination of the point dilates $g_{1/(l+1)}$. Averaging
+$g$ first over the dilates $g_t$, $1 \leq t \leq 2$, with a smooth weight turns every moment kernel
+and every local means kernel into a weighted dilation average of $g$ with a smooth weight.
+
+\begin{definition}[The smoothed bump]
+\label{def:smoothed-bump}
+\lean{Rd.logBumpBase, Rd.dilationWeight, Rd.LocalMeansBump.dilationSmoothed}
+\leanok
+\uses{def:local-means, def:weighted-dilation}
+The \emph{smoothing weight} $\rho \colon \R \to \C$ is the normalised smooth bump function on
+$\R$ centred at $\frac{\log 2}{2}$ with inner radius $\frac{\log 2}{4}$ and outer radius
+$\frac{\log 2}{2}$. For a bump $g$ of radius
+$R$ (\Cref{def:local-means}), the \emph{smoothed bump} is $g' = A^{0, \log 2}_\rho g$, a bump of
+radius $R$.
+\end{definition}
+
+\begin{lemma}[Properties of the smoothed bump]
+\label{lem:smoothed-bump}
+\lean{Rd.contDiff_dilationWeight, Rd.mem_Ioo_of_dilationWeight_ne_zero,
+  Rd.integral_dilationWeight, Rd.LocalMeansBump.dilationSmoothed_radius,
+  Rd.LipschitzGraph.coneSupported_dilationSmoothed}
+\leanok
+\uses{def:smoothed-bump, lem:weighted-dilation, lem:higher-divergence-cone}
+The smoothing weight $\rho$ is smooth, vanishes outside $(0, \log 2)$ and has
+$\int_0^{\log 2} \rho = 1$. For every bump $g$ of radius $R$, the smoothed bump is smooth,
+vanishes outside $\bar B(0, R)$ and has integral $1$; for every Lipschitz graph domain with cone
+$K$ and every bump supported in $-K$, the smoothed bump is supported in $-K$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's normalised bump functions, \Cref{lem:weighted-dilation} and
+\Cref{lem:higher-divergence-cone}.
+\end{proof}
+
+\begin{definition}[Moment and kernel weights]
+\label{def:moment-weight}
+\lean{Rd.momentWeight, Rd.kernelWeight}
+\leanok
+\uses{def:smoothed-bump, lem:moment-coefficients}
+For $L \geq 1$, with the coefficients $a_l = (-1)^l \binom{L}{l+1}$ of the moment kernel of order
+$L$ (\Cref{lem:moment-coefficients}), the \emph{moment weight} and the \emph{kernel weight} are
+\[
+  u_L(s) = \sum_{l < L} a_l \, \rho(s + \log(l + 1)) , \qquad
+  v_L(s) = u_L(s - \log 2) - u_L(s) .
+\]
+\end{definition}
+
+The statements on these weights and on the kernels built from them below take $L \geq 1$. Lean
+states most of them for every $L \in \N$, with Mathlib's convention $\log 0 = 0$; for $L = 0$ the
+weights vanish.
+
+\begin{lemma}[Supports of the weights]
+\label{lem:moment-weight-support}
+\lean{Rd.contDiff_momentWeight, Rd.contDiff_kernelWeight, Rd.log_succ_mem_Icc,
+  Rd.mem_Ioc_of_dilationWeight_add_ne_zero, Rd.mem_Ioc_of_momentWeight_ne_zero,
+  Rd.mem_Ioc_of_kernelWeight_ne_zero, Rd.neg_log_le_two_mul_log_two}
+\leanok
+\uses{def:moment-weight, lem:smoothed-bump}
+For every $L \geq 1$, $u_L$ and $v_L$ are smooth, $0 \leq \log(l + 1) \leq \log L$ for every
+$l < L$, $\rho(\cdot + \log(l + 1))$ and $u_L$ vanish outside $(-\log L, \log 2]$, $v_L$ vanishes
+outside $(-\log L, 2 \log 2]$, and $-\log L \leq 2 \log 2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\rho$ vanishes outside $(0, \log 2)$ (\Cref{lem:smoothed-bump}), and $\log$ is monotone.
+\end{proof}
+
+\begin{theorem}[The kernels of the smoothed bump]
+\label{thm:smoothed-bump-kernels}
+\lean{Rd.LocalMeansBump.momentKernel_dilationSmoothed,
+  Rd.LocalMeansBump.kernel_succ_dilationSmoothed}
+\leanok
+\uses{def:smoothed-bump, def:moment-weight, lem:moment-weight-support,
+  lem:weighted-dilation-algebra, def:moment-kernel, def:local-means}
+For every bump $g$ with the smoothed bump $g'$, every $L \geq 1$ and every $j \in \N$, the moment
+kernel $m'$ of
+order $L$ of $g'$ and its local means kernels $k'_j$ of order $L$ satisfy
+\[
+  m' = A^{-\log L, \log 2}_{u_L} g , \qquad
+  k'_{j+1} = \bigl(A^{-\log L, 2 \log 2}_{v_L} g\bigr)_{2^j} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:weighted-dilation-algebra} (3),
+\[
+  g'_{1/(l+1)} = (A^{0, \log 2}_\rho g)_{e^{-\log(l+1)}}
+  = A^{-\log(l+1), \log 2 - \log(l+1)}_{\rho(\cdot + \log(l+1))} g ;
+\]
+enlarge the interval to $(-\log L, \log 2]$
+(\Cref{lem:weighted-dilation-algebra} (1)) and sum (\Cref{lem:weighted-dilation-algebra} (2)).
+Then $k'_{j+1} = (m'_2 - m')_{2^j}$, and $m'_2 = (m')_{e^{\log 2}}$ is the average with the
+weight $u_L(\cdot - \log 2)$ on $(-\log L + \log 2, 2 \log 2]$.
+\end{proof}
+
+\begin{lemma}[Moments of the coefficients of the moment kernels]
+\label{lem:jackson-moments}
+\lean{Rd.sum_jacksonCoeff_mul_pow}
+\leanok
+\uses{lem:moment-coefficients}
+For all $r, j \in \N$ with $1 \leq j < r$,
+$\sum_{l < r} (-1)^l \binom{r}{l+1} (l + 1)^j = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:moment-coefficients} the sum is $0^j - (-1)^r \Delta^r_1 (x^j)(0)$, and differences
+of order $r$ annihilate polynomials of degree $j < r$ (Mathlib's
+\texttt{fwdDiff\_\allowbreak iter\_\allowbreak pow\_\allowbreak eq\_\allowbreak zero\_\allowbreak
+of\_\allowbreak lt}).
+\end{proof}
+
+\begin{theorem}[Vanishing moments of the kernel weights]
+\label{thm:kernel-weight-moments}
+\lean{Rd.integral_dilationWeight_add_mul_exp, Rd.integral_momentWeight_mul_exp,
+  Rd.integral_kernelWeight_mul_exp}
+\leanok
+\uses{def:moment-weight, lem:moment-weight-support, lem:weighted-dilation-algebra,
+  lem:jackson-moments}
+For every $L \geq 1$ and all $l, r \in \N$ with $l < L$,
+\[
+  \int_{-\log L}^{\log 2} \rho(s + \log(l + 1)) \, e^{-rs} \, ds
+    = (l + 1)^r \int_0^{\log 2} \rho(s) \, e^{-rs} \, ds ,
+\]
+for every $L \geq 1$ and every $r \in \N$,
+\[
+  \int_{-\log L}^{\log 2} u_L(s) \, e^{-rs} \, ds
+    = \Bigl(\sum_{l < L} a_l (l + 1)^r\Bigr) \int_0^{\log 2} \rho(s) \, e^{-rs} \, ds ,
+\]
+and for every $L \geq 1$ and every $r \in \N$ with $r < L$,
+$\int_{-\log L}^{2 \log 2} v_L(s) \, e^{-rs} \, ds = 0$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The substitution $s \mapsto s + \log(l + 1)$ and \Cref{lem:weighted-dilation-algebra} (1) give
+the first identity, and summing gives the second. The substitution $s \mapsto s - \log 2$ writes
+the moment of $v_L$ as $(2^{-r} - 1) \int_{-\log L}^{\log 2} u_L(s) \, e^{-rs} \, ds$. The factor
+vanishes for $r = 0$, the sum $\sum_{l < L} a_l (l + 1)^r$ for $1 \leq r < L$
+(\Cref{lem:jackson-moments}).
+\end{proof}
+
+\paragraph{The higher divergence kernels of a bump.}
+
+\begin{definition}[The higher divergence kernels of a bump]
+\label{def:bump-higher-kernels}
+\lean{Rd.LocalMeansBump.higherKernel, Rd.LocalMeansBump.higherKernel_apply}
+\leanok
+\uses{def:higher-divergence-kernel, def:moment-weight, lem:moment-weight-support}
+For a bump $g$, $L \geq 1$, $m \in \N$ and a word $i \in I^m$, the \emph{higher divergence kernel}
+of $g$
+is the Schwartz function $K^L_i = K^{-\log L, 2 \log 2}_{v_L, g, i}$.
+\end{definition}
+
+\begin{theorem}[The local means kernels as derivatives of order $m$]
+\label{thm:bump-higher-identity}
+\lean{Rd.LocalMeansBump.kernel_succ_eq_sum_higherKernel}
+\leanok
+\uses{def:bump-higher-kernels, thm:weighted-dilation-higher, thm:smoothed-bump-kernels,
+  thm:kernel-weight-moments, lem:derivative-dilate, def:schwartz-dilate}
+For every bump $g$ with the smoothed bump $g'$, every $L \geq 1$, every $m \in \N$ with $m \leq L$,
+every
+$j \in \N$ and every $y \in V$, the local means kernels $k'_j$ of order $L$ of $g'$ satisfy
+\[
+  k'_{j+1}(y) = 2^{-jm} \sum_{i \in I^m} \partial^{e_i} \bigl(K^L_i\bigr)_{2^j}(y) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+$k'_{j+1} = (A^{-\log L, 2 \log 2}_{v_L} g)_{2^j}$ (\Cref{thm:smoothed-bump-kernels}); the moments
+of $v_L$ of the orders $r < m \leq L$ vanish (\Cref{thm:kernel-weight-moments}), so
+\Cref{thm:weighted-dilation-higher} writes the average as $\sum_i \partial^{e_i} K^L_i$, and
+$\partial^{e_i} (\Psi_{2^j}) = 2^{jm} (\partial^{e_i} \Psi)_{2^j}$ for every Schwartz function
+$\Psi$ (\Cref{lem:derivative-dilate}).
+\end{proof}
+
+\begin{theorem}[Calder\'on--Zygmund families and supports of the higher divergence kernels]
+\label{thm:bump-higher-kernels-cz}
+\lean{Rd.LocalMeansBump.integral_higherKernel, Rd.LocalMeansBump.isCZFamily_higherKernel,
+  Rd.LocalMeansBump.higherKernel_eq_zero_of_lt,
+  Rd.LocalMeansBump.tsupport_dilate_higherKernel_subset_closedBall,
+  Rd.LipschitzGraph.tsupport_dilate_higherKernel_subset}
+\leanok
+\uses{def:bump-higher-kernels, lem:higher-divergence-mean-zero, thm:kernel-weight-moments,
+  thm:mean-zero-cz-family, lem:weighted-dilation, lem:higher-divergence-cone, lem:graph-cone,
+  lem:dyadic-dilate-support}
+For every bump $g$ of radius $R$, every $L \geq 1$, every $m \in \N$ and every $i \in I^m$:
+\begin{enumerate}
+  \item if $m < L$, then $\int_V K^L_i = 0$ and $((K^L_i)_{2^j})_{j \in \N}$ is a
+    Calder\'on--Zygmund family with the constants of \Cref{thm:mean-zero-cz-family};
+  \item $K^L_i$ vanishes outside $\bar B(0, L R)$, and every dilate $(K^L_i)_{2^j}$ is supported
+    in $\bar B(0, L R)$;
+  \item if $g$ is supported in $-K$ for the cone $K$ of a Lipschitz graph domain, then every
+    dilate $(K^L_i)_{2^j}$ is supported in $\{y : -y \in \bar K, \ \|y\| \leq L R\}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) The moments of $v_L$ of the orders $r \leq m < L$ vanish (\Cref{thm:kernel-weight-moments}),
+so \Cref{lem:higher-divergence-mean-zero} and \Cref{thm:mean-zero-cz-family} apply.
+(2) \Cref{lem:weighted-dilation} (3) with $R e^{\log L} = L R$, and
+\Cref{lem:dyadic-dilate-support}. (3) \Cref{lem:higher-divergence-cone},
+\Cref{lem:dyadic-dilate-support} and (2); the closed cone is invariant under multiplication by
+nonnegative numbers.
 \end{proof}
 
 \section{Gauss--Green on Lipschitz graph domains}

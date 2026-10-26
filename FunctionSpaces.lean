@@ -75,6 +75,7 @@ public import FunctionSpaces.Rd.Sobolev.RellichCompactness
 public import FunctionSpaces.Rd.SingularIntegrals.DilationFamilies
 public import FunctionSpaces.Rd.SingularIntegrals.ConvolutionAdjoint
 public import FunctionSpaces.Rd.Sobolev.WeakDerivativeChangeOfVariables
+public import FunctionSpaces.Rd.Sobolev.WeakDerivativeLeibniz
 public import FunctionSpaces.Rd.SingularIntegrals.PlancherelBounds
 public import FunctionSpaces.Rd.SingularIntegrals.VectorValuedWeakType
 public import FunctionSpaces.Rd.SingularIntegrals.VectorValuedSingularIntegrals
@@ -127,6 +128,7 @@ public import FunctionSpaces.Domains.Extension.SobolevExtension
 public import FunctionSpaces.Domains.Extension.SobolevExtensionOperator
 public import FunctionSpaces.Domains.Extension.HalfSpaceReflection
 public import FunctionSpaces.Domains.Extension.ReflectionExtension
+public import FunctionSpaces.Domains.Extension.HigherDivergenceKernels
 public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen
 public import FunctionSpaces.Domains.Traces.TraceKernel
@@ -431,6 +433,10 @@ and the theorems that their characterisations agree. The library builds on
   supported in `B`, which carries a weak derivative on `O ∩ B` to one on `O`, mollification on
   open sets in `L_1`, and the chain rule `∂_v (f ∘ Φ) = ∑_i ⟪DΦ v, e_i⟫ (∂_{e_i} f) ∘ Φ` for
   Lipschitz measure-preserving `Φ`.
+* `FunctionSpaces.Rd.Sobolev.WeakDerivativeLeibniz`: composition of weak derivatives, derivatives
+  along all directions from those along words in the basis, the Leibniz rule for `χ f` with a
+  smooth compactly supported `χ` and the bound by the Leibniz constant, and smooth compactly
+  supported multipliers on `W^m_p(ℝ^d)`.
 * `FunctionSpaces.Rd.SingularIntegrals.PlancherelBounds`: the `L_2` bounds of the analysis operator
   `f ↦ (θ_j ⋆ f)_j` and of the synthesis operators `(g_j)_j ↦ ∑_{j ∈ s} θ_j ⋆ g_j` for finite
   sets `s` by the Fourier overlap `B`, for integrable kernels and for Calderón–Zygmund
@@ -591,8 +597,9 @@ and the theorems that their characterisations agree. The library builds on
   `H^{1/2}(Γ)` with the Sobolev–Slobodeckij norm of `W^{1/2,2}(Γ)`.
 * `FunctionSpaces.Domains.Extension.DivergenceKernels`: smoothness of parametric integrals, the
   dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, the
-  divergence kernels as Schwartz functions with mean zero when `m` has vanishing first moments, and
-  the Calderón–Zygmund families of the dilates of mean-zero Schwartz functions.
+  divergence kernels as Schwartz functions with mean zero when `m` has vanishing first moments, the
+  supports of dyadic dilates, and the Calderón–Zygmund families of the dilates of mean-zero
+  Schwartz functions.
 * `FunctionSpaces.Domains.Extension.SobolevExtension`: the local means of order two by the gradient,
   the local means of Triebel–Lizorkin type on a set, bounded extensions from the patches of a
   bounded Lipschitz domain pasted in `W^1_p(ℝ^d)`, and the extension theorem
@@ -610,6 +617,11 @@ and the theorems that their characterisations agree. The library builds on
   derivatives and `L_p` bounds, cutoffs from a bounded Lipschitz domain to its graph domains, and
   the extension theorem `W^1_p(Ω) = W^1_p(ℝ^d)|_Ω` for `1 ≤ p ≤ ∞` with a bound on a bounded
   Lipschitz domain.
+* `FunctionSpaces.Domains.Extension.HigherDivergenceKernels`: weighted dilation averages, their
+  writing as sums of derivatives of order `m` of the higher divergence kernels when the weight has
+  vanishing moments, the smoothed bump with smooth moment and kernel weights, and the local means
+  kernels of order `L` as sums of derivatives of order `m ≤ L` of the higher divergence kernels,
+  which have mean zero for `m < L` and lie in the reflected cone for bumps supported in `-K`.
 * `FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen`: Gauss–Green on a Lipschitz graph domain:
   product coordinates and Fubini, ray integrals, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ`
   for compactly supported `C^1` functions in chart and surface form, the product rule for line

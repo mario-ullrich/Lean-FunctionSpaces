@@ -480,8 +480,8 @@ the identity of \Cref{lem:weak-derivative-integral}.
   lem:directional-derivatives-commute, def:dyadic-cells}
 For every open $\Omega \subseteq V$:
 \begin{enumerate}
-  \item for every finite set $s$, all locally integrable $g_i$ on $\Omega$ and all $c_i \in \C$
-    ($i \in s$), $\sum_{i \in s} c_i g_i$ is locally integrable on $\Omega$;
+  \item for every finite set $s$, all locally integrable $g_i$ on $\Omega$ and all $c_i$ in $\R$
+    or $\C$ ($i \in s$), $\sum_{i \in s} c_i g_i$ is locally integrable on $\Omega$;
   \item for every finite set $s$, all $v_i \in V$ and $c_i \in \R$ ($i \in s$), every locally
     integrable $f$ on $\Omega$ and all $g_i$ with $g_i = \partial_{v_i} f$ weakly on $\Omega$ for
     every $i \in s$, $\sum_{i \in s} c_i g_i = \partial_v f$ weakly on $\Omega$ for
@@ -1633,6 +1633,202 @@ Weak derivatives on $V$ are derivatives of tempered distributions
 (\Cref{lem:sobolev-one-to-l2}) with $\|F_n\|_{H^1}^2 \leq M^2$
 (\Cref{cor:weak-gradient-sobolev-norm}). Apply \Cref{thm:rellich-compactness} with the bound
 $|M|$.
+\end{proof}
+
+\section{The Leibniz rule}
+\label{sec:leibniz-rule}
+
+Let $(e_i)_{i \in I}$ be the orthonormal basis of \Cref{def:dyadic-cells}. A \emph{word} of
+length $k$ is a tuple $w = (w_0, \dots, w_{k-1}) \in I^k$; it stands for the derivative
+$\partial^{e_w} = \partial_{e_{w_0}} \cdots \partial_{e_{w_{k-1}}}$. For directions
+$u = (u_0, \dots, u_{k-1}) \in V^k$ and $v \in V$, $(u, v) \in V^{k+1}$ is the tuple $u$ followed
+by $v$, so that $\partial^{(u, v)} = \partial^u \partial_v$. This section proves the Leibniz rule
+for $\chi f$ with a smooth compactly supported $\chi$, with an explicit constant, by induction on
+the order: $\partial_{e_j} (\chi f) = \chi \, \partial_{e_j} f + (\partial_{e_j} \chi) f$
+(\Cref{lem:weak-derivative-cutoff}). The Leibniz rule is the tool for pasting local extensions in
+$\Sob{m}{p}(V)$, as \Cref{lem:product-rule-lp} is for $m = 1$.
+
+\paragraph{Words and directions.}
+
+\begin{lemma}[Composition of weak derivatives]
+\label{lem:weak-derivative-snoc}
+\lean{Rd.HasWeakLineDeriv.snoc, Rd.HasWeakLineDeriv.of_snoc}
+\leanok
+\uses{def:weak-line-derivative}
+For every open $\Omega \subseteq V$, every $k \in \N$, all $u \in V^k$ and $v \in V$ and all
+$f$, $h$, $g$ with $h = \partial_v f$ weakly on $\Omega$: $g = \partial^u h$ weakly on $\Omega$ if
+and only if $g = \partial^{(u, v)} f$ weakly on $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For distributions, $\partial^{(u, v)} T = \partial^u (\partial_v T)$ (Mathlib's
+\texttt{LineDeriv.\allowbreak iteratedLineDerivOp\_\allowbreak succ\_\allowbreak right}), and
+$\partial_v f = h$ as distributions on $\Omega$.
+\end{proof}
+
+\begin{lemma}[Derivatives along all directions from the words]
+\label{lem:weak-derivative-words}
+\lean{Rd.iteratedLineDerivOp_eq_sum_prod_smul, Rd.ofFun_sum_smul,
+  Rd.hasWeakLineDeriv_of_gridBasis_words, Rd.memSobolev_of_forall_gridBasis_words}
+\leanok
+\uses{def:weak-line-derivative, def:dyadic-cells, lem:weak-derivative-basic,
+  lem:weak-derivative-direction-linear}
+\begin{enumerate}
+  \item For every real vector space $E$ with derivatives $\partial_v \colon E \to E$ ($v \in V$)
+    that are additive and real homogeneous both in $v$ and in their argument, every finite set
+    $J$, all $b_j \in V$ ($j \in J$), every $k \in \N$, all $c_{l,j} \in \R$ ($l < k$, $j \in J$)
+    and every $T \in E$,
+    \[
+      \partial^v T = \sum_{i \in J^k} \Bigl(\prod_{l < k} c_{l, i_l}\Bigr)
+        \partial_{b_{i_0}} \cdots \partial_{b_{i_{k-1}}} T
+      \qquad \text{for } v_l = \sum_{j \in J} c_{l,j} b_j .
+    \]
+  \item For every open $\Omega \subseteq V$, every finite set $J$, all $c_j \in \R$ and all
+    locally integrable $g_j$ on $\Omega$ ($j \in J$), the distribution of $\sum_j c_j g_j$ on
+    $\Omega$ is $\sum_j c_j$ times the distribution of $g_j$.
+  \item For every open $\Omega \subseteq V$, every $k \in \N$, every locally integrable $f$ on
+    $\Omega$, all $g_w$ with $g_w = \partial^{e_w} f$ weakly on $\Omega$ for every word
+    $w \in I^k$ and every $v \in V^k$,
+    \[
+      \sum_{w \in I^k} \Bigl(\prod_{l < k} \langle v_l, e_{w_l} \rangle\Bigr) g_w = \partial^v f
+      \quad \text{weakly on } \Omega .
+    \]
+  \item For every $1 \leq p \leq \infty$, every $m \in \N$ and every $F \in L_p(V)$ with a weak
+    derivative $\partial^{e_w} F \in L_p(V)$ on $V$ for every $k \leq m$ and every word
+    $w \in I^k$, $F \in \Sob{m}{p}(V)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Induction on $k$: $\partial^v T = \partial_{v_0} \partial^{(v_1, \dots, v_{k-1})} T$, the
+induction hypothesis for the tail, linearity of $\partial_{v_0}$ in $v_0$ and in its argument,
+and the splitting of the words $i \in J^{k+1}$ into their first letter and the rest.
+(2) Induction on $J$. (3) (1) for distributions on $\Omega$ with
+$v_l = \sum_{j \in I} \langle v_l, e_j \rangle e_j$, and (2). (4) By (3) the derivative along
+$v \in V^k$ is a finite combination of the $\partial^{e_w} F$, hence lies in $L_p(V)$.
+\end{proof}
+
+\paragraph{The Leibniz constant.}
+
+\begin{definition}[The Leibniz constant]
+\label{def:leibniz-constant}
+\lean{Rd.leibnizConst}
+\leanok
+For every smooth $\chi \colon V \to \R$ and every $k \in \N$,
+\[
+  C_k(\chi) = 2^k \sup_{x \in V} \sum_{j \leq k} \|D^j \chi(x)\| \in [0, \infty] .
+\]
+\end{definition}
+
+\begin{lemma}[Properties of the Leibniz constant]
+\label{lem:leibniz-constant}
+\lean{Rd.leibnizConst_ne_top, Rd.enorm_le_leibnizConst_zero,
+  Rd.enorm_iteratedFDeriv_fderiv_apply_le, Rd.leibnizConst_add_le}
+\leanok
+\uses{def:leibniz-constant}
+For every smooth $\chi \colon V \to \R$:
+\begin{enumerate}
+  \item if $\chi$ has compact support, then $C_k(\chi) < \infty$ for every $k \in \N$;
+  \item $|\chi(x)| \leq C_0(\chi)$ for every $x \in V$;
+  \item for every $v \in V$ with $\|v\| \leq 1$, every $j \in \N$ and every $x \in V$,
+    $\|D^j (\partial_v \chi)(x)\| \leq \|D^{j+1} \chi(x)\|$, and
+    $C_k(\chi) + C_k(\partial_v \chi) \leq C_{k+1}(\chi)$ for every $k \in \N$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) Each $D^j \chi$ is continuous with compact support, hence bounded. (2) $D^0 \chi = \chi$.
+(3) $D^j (\partial_v \chi)(x)$ is $D^{j+1} \chi(x)$ with $v$ inserted as one argument (Mathlib's
+\texttt{norm\_\allowbreak iteratedFDeriv\_\allowbreak clm\_\allowbreak apply\_\allowbreak const}
+and \texttt{norm\_\allowbreak iteratedFDeriv\_\allowbreak fderiv}). Hence both
+$\sum_{j \leq k} \|D^j \chi(x)\|$ and $\sum_{j \leq k} \|D^j (\partial_v \chi)(x)\|$ are at most
+$\sum_{j \leq k+1} \|D^j \chi(x)\|$, and $2^k + 2^k = 2^{k+1}$.
+\end{proof}
+
+\paragraph{The Leibniz rule.}
+
+\begin{lemma}[Words with a fixed last letter]
+\label{lem:words-snoc}
+\lean{Rd.sum_snoc_le, Rd.sum_range_sum_snoc_le, Rd.gridBasis_snoc}
+\leanok
+For every finite set $J$, every $j \in J$ and every $k \in \N$:
+\begin{enumerate}
+  \item for every $a \colon J^{k+1} \to [0, \infty]$,
+    $\sum_{w \in J^k} a(w, j) \leq \sum_{w \in J^{k+1}} a(w)$;
+  \item for all $a_{k'} \colon J^{k'} \to [0, \infty]$ ($k' \in \N$),
+    $\sum_{k' \leq k} \sum_{w \in J^{k'}} a_{k'+1}(w, j)
+      \leq \sum_{k' \leq k+1} \sum_{w \in J^{k'}} a_{k'}(w)$;
+  \item for $J = I$ and every $u \in I^k$, the directions of the word $(u, j)$ are
+    $(e_{u_0}, \dots, e_{u_{k-1}}, e_j)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The map $w \mapsto (w, j)$ is injective. (2) (1) for every $k'$, and the term $k' = 0$ on the
+right is nonnegative. (3) By definition.
+\end{proof}
+
+\begin{theorem}[The Leibniz rule with a bound]
+\label{thm:leibniz-rule}
+\lean{Rd.exists_hasWeakLineDeriv_mul_zero, Rd.HasWeakLineDeriv.mul_snoc,
+  Rd.exists_hasWeakLineDeriv_mul_of_tsupport_subset}
+\leanok
+\uses{lem:weak-derivative-snoc, lem:weak-derivative-cutoff, lem:leibniz-constant,
+  lem:words-snoc, lem:weak-derivative-basic, def:leibniz-constant}
+For all open $O, B \subseteq V$, every $1 \leq p \leq \infty$, every $m \in \N$, every $f$, all
+$g_{k,w}$ ($k \leq m$, $w \in I^k$) with $g_{k,w} = \partial^{e_w} f$ weakly on $O \cap B$, every
+smooth $\chi \colon V \to \R$ with compact closed support in $B$, every $k \leq m$ and every
+$w \in I^k$, there is $G$ with $G = \partial^{e_w} (\chi f)$ weakly on $O$ and
+\[
+  \|G\|_{L_p(O)} \leq C_k(\chi) \sum_{k' \leq k} \sum_{w' \in I^{k'}}
+    \|g_{k',w'}\|_{L_p(O \cap B)} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Induction on $k$, for all $m$, $f$, $g$ and $\chi$ at once. For $k = 0$, $G = \chi f$, and
+$\|\chi f\|_{L_p(O)} \leq C_0(\chi) \|f\|_{L_p(O \cap B)}$
+(\Cref{lem:weak-derivative-cutoff} (5), \Cref{lem:leibniz-constant} (2)) with $f = g_{0,()}$
+almost everywhere on $O \cap B$. For a word $(u, j)$ of length $k + 1$, let
+$f' = g_{1,(j)} = \partial_{e_j} f$. Then $g_{k'+1,(w', j)} = \partial^{e_{w'}} f'$ on $O \cap B$
+(\Cref{lem:weak-derivative-snoc}), and the induction hypothesis for $\chi f'$ and for
+$(\partial_{e_j} \chi) f$ along $u$ gives $G_1$ and $G_2$. Since
+$\partial_{e_j} (\chi f) = \chi f' + (\partial_{e_j} \chi) f$ on $O$
+(\Cref{lem:weak-derivative-cutoff} (3)), $G = G_1 + G_2$ is the derivative along $(u, j)$
+(\Cref{lem:weak-derivative-snoc}). Both bounds are at most the sum over the words of length at most
+$k + 1$ (\Cref{lem:words-snoc}), and
+$C_k(\chi) + C_k(\partial_{e_j} \chi) \leq C_{k+1}(\chi)$ (\Cref{lem:leibniz-constant} (3)).
+\end{proof}
+
+In the next corollary, $\chi F$ is the product in $L_p(V)$ of \Cref{lem:product-modulus}, formed
+with the continuity of $\chi$ and a bound $|\chi| \leq C$; both follow from smoothness and compact
+support.
+
+\begin{corollary}[Smooth compactly supported multipliers on $\Sob{m}{p}(V)$]
+\label{cor:sobolev-multiplier}
+\lean{Rd.MemSobolev.exists_hasWeakLineDeriv_mul, Rd.MemSobolev.mulLp_of_hasCompactSupport}
+\leanok
+\uses{thm:leibniz-rule, lem:weak-derivative-words, lem:leibniz-constant, lem:product-modulus,
+  def:weak-line-derivative}
+For every $1 \leq p \leq \infty$, every $m \in \N$, every $F \in \Sob{m}{p}(V)$ and every smooth
+$\chi \colon V \to \R$ with compact support:
+\begin{enumerate}
+  \item for every $k \leq m$ and every $w \in I^k$, $\chi F$ has a weak derivative
+    $\partial^{e_w} (\chi F) \in L_p(V)$ on $V$;
+  \item $\chi F \in \Sob{m}{p}(V)$.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+\leanok
+(1) \Cref{thm:leibniz-rule} with $O = B = V$; the bound is finite since $C_k(\chi) < \infty$
+(\Cref{lem:leibniz-constant} (1)) and the derivatives of $F$ lie in $L_p(V)$. (2) (1) and
+\Cref{lem:weak-derivative-words} (4).
 \end{proof}
 
 \section{Derivative kernels}
