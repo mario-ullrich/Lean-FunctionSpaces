@@ -164,9 +164,7 @@ theorem eLpNorm_farConv_le {θ : ℕ → EuclideanSpace ℝ d → ℂ}
     {G : UnitAddTorus d → ℝ≥0∞} (hG : Measurable G) :
     eLpNorm (farConv θ G) p volume ≤ farMass θ * eLpNorm G p volume := by
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
-  have hq1 : 1 ≤ p.toReal := by
-    have h := ENNReal.toReal_mono hp hp1
-    rwa [ENNReal.toReal_one] at h
+  have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp1 hp
   refine eLpNorm_le_of_lintegral_le (aemeasurable_farConv hθ hG).aestronglyMeasurable hp0 hp ?_
   rw [ENNReal.mul_rpow_of_nonneg _ _ (by linarith), eLpNorm_rpow_eq_lintegral hp0 hp
     hG.aemeasurable]

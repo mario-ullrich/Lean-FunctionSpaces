@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import Mathlib.Analysis.Distribution.SchwartzSpace.Fourier
+public import FunctionSpaces.Analysis.Fourier.LittlewoodPaleyKernels
 public import Mathlib.Analysis.Distribution.AEEqOfIntegralContDiff
 
 /-!
@@ -14,7 +14,9 @@ public import Mathlib.Analysis.Distribution.AEEqOfIntegralContDiff
 Mathlib's Fourier transform of `f : ℝ → ℂ` is `𝓕 f(ξ) = ∫ e^(-2πixξ) f(x) dx`, its inverse is
 `𝓕⁻ f(x) = ∫ e^(2πixξ) f(ξ) dξ` (`Real.fourier_real_eq`, `Real.fourierInv_eq`). This file proves
 the facts about the transform that the Daubechies scaling function `φ = 𝓕⁻ Φ` needs. The
-analytic hypotheses are integrability and continuity conditions.
+analytic hypotheses are integrability and continuity conditions. Continuity, the uniform bound,
+the value at `0`, conjugation and the multiplication formula are the cases `V = ℝ` of the
+lemmas of `FunctionSpaces.Analysis.Fourier.LittlewoodPaleyKernels`.
 
 * **Continuity and the uniform bound.** For integrable `f`, `𝓕 f` and `𝓕⁻ f` are continuous
   (`Real.continuous_fourier_of_integrable`), and `‖𝓕 f(ξ)‖ ≤ ∫ ‖f‖`
@@ -28,8 +30,7 @@ analytic hypotheses are integrability and continuity conditions.
   `𝓕[f(a ·)](ξ) = a⁻¹ 𝓕 f(ξ / a)` for `a > 0` (`Real.fourier_comp_mul_left_apply`) and
   `conj (𝓕 f(ξ)) = 𝓕⁻[conj ∘ f](ξ)` (`Real.conj_fourier`), each with its `𝓕⁻` version.
 * **The multiplication formula** `∫ 𝓕 f · g = ∫ f · 𝓕 g` for integrable `f, g`
-  (`Real.integral_fourier_mul`): Fubini, in the form of Mathlib's
-  `VectorFourier.integral_bilin_fourierIntegral_eq_flip` with the product as bilinear form.
+  (`Real.integral_fourier_mul`), by Fubini (`Rd.integral_fourier_mul`).
 * **Parseval's identity** `∫ f · conj g = ∫ 𝓕 f · conj (𝓕 g)` for integrable `f` and continuous
   integrable `g` with integrable `𝓕 g` (`Real.integral_mul_conj_eq_integral_fourier`): the
   sesquilinear multiplication formula for `f` and `𝓕 g`
@@ -58,34 +59,32 @@ variable {f g : ℝ → ℂ}
 /-! ### Continuity and the uniform bound -/
 
 /-- The Fourier transform `𝓕 f(ξ) = ∫ e^(-2πixξ) f(x) dx` of an integrable function is
-continuous (Mathlib's `VectorFourier.fourierIntegral_continuous`, dominated convergence). -/
+continuous (`Rd.continuous_fourier_of_integrable` on `ℝ`). -/
 theorem continuous_fourier_of_integrable (hf : Integrable f) : Continuous (𝓕 f) :=
-  VectorFourier.fourierIntegral_continuous (L := innerₗ ℝ) continuous_fourierChar
-    continuous_inner hf
+  Rd.continuous_fourier_of_integrable hf
 
 /-- The inverse Fourier transform `𝓕⁻ f(x) = ∫ e^(2πixξ) f(ξ) dξ` of an integrable function is
-continuous, since `𝓕⁻ f(x) = 𝓕 f(-x)`. -/
-theorem continuous_fourierInv_of_integrable (hf : Integrable f) : Continuous (𝓕⁻ f) := by
-  rw [show 𝓕⁻ f = fun x => 𝓕 f (-x) from funext (fourierInv_eq_fourier_neg f)]
-  exact (continuous_fourier_of_integrable hf).comp continuous_neg
+continuous (`Rd.continuous_fourierInv_of_integrable` on `ℝ`). -/
+theorem continuous_fourierInv_of_integrable (hf : Integrable f) : Continuous (𝓕⁻ f) :=
+  Rd.continuous_fourierInv_of_integrable hf
 
-/-- The uniform bound `‖𝓕 f(ξ)‖ ≤ ∫ ‖f‖` (Mathlib's
-`VectorFourier.norm_fourierIntegral_le_integral_norm`). It holds for every `f`: if `f` is not
-integrable, then `𝓕 f(ξ) = 0`, since Lean's integral of a non-integrable function is `0`. -/
+/-- The uniform bound `‖𝓕 f(ξ)‖ ≤ ∫ ‖f‖` (`Rd.norm_fourier_le_integral_norm` on `ℝ`). It holds
+for every `f`: if `f` is not integrable, then `𝓕 f(ξ) = 0`, since Lean's integral of a
+non-integrable function is `0`. -/
 theorem norm_fourier_le_integral_norm (f : ℝ → ℂ) (ξ : ℝ) : ‖𝓕 f ξ‖ ≤ ∫ x, ‖f x‖ :=
-  VectorFourier.norm_fourierIntegral_le_integral_norm 𝐞 volume (innerₗ ℝ) f ξ
+  Rd.norm_fourier_le_integral_norm f ξ
 
-/-- The uniform bound `‖𝓕⁻ f(x)‖ ≤ ∫ ‖f‖` for the inverse transform. -/
-theorem norm_fourierInv_le_integral_norm (f : ℝ → ℂ) (x : ℝ) : ‖𝓕⁻ f x‖ ≤ ∫ ξ, ‖f ξ‖ := by
-  rw [fourierInv_eq_fourier_neg]
-  exact norm_fourier_le_integral_norm f (-x)
+/-- The uniform bound `‖𝓕⁻ f(x)‖ ≤ ∫ ‖f‖` for the inverse transform
+(`Rd.norm_fourierInv_le_integral_norm` on `ℝ`). -/
+theorem norm_fourierInv_le_integral_norm (f : ℝ → ℂ) (x : ℝ) : ‖𝓕⁻ f x‖ ≤ ∫ ξ, ‖f ξ‖ :=
+  Rd.norm_fourierInv_le_integral_norm f x
 
 /-! ### The Fourier transform at `0` -/
 
 /-- **The Fourier transform at `0` is the integral**: `𝓕 f(0) = ∫ f(x) dx` for every
-`f : ℝ → ℂ`, since `e^(-2πix·0) = 1`. -/
-theorem fourier_apply_zero (f : ℝ → ℂ) : 𝓕 f 0 = ∫ x, f x := by
-  simp [fourier_real_eq]
+`f : ℝ → ℂ` (`Rd.fourier_apply_zero` on `ℝ`). -/
+theorem fourier_apply_zero (f : ℝ → ℂ) : 𝓕 f 0 = ∫ x, f x :=
+  Rd.fourier_apply_zero f
 
 /-! ### Linearity -/
 
@@ -200,41 +199,29 @@ theorem fourier_comp_mul_sub_apply (f : ℝ → ℂ) {a : ℝ} (ha : 0 < a) (b �
 
 /-! ### Conjugation -/
 
-/-- **Conjugation**: `conj (𝓕 f(ξ)) = 𝓕⁻[conj ∘ f](ξ)`, since `conj e^(-2πixξ) = e^(2πixξ)`. -/
-theorem conj_fourier (f : ℝ → ℂ) (ξ : ℝ) : conj (𝓕 f ξ) = 𝓕⁻ (fun x => conj (f x)) ξ := by
-  rw [fourier_eq, fourierInv_eq, ← integral_conj]
-  congr 1 with x
-  rw [Circle.smul_def, Circle.smul_def, smul_eq_mul, smul_eq_mul, map_mul,
-    Circle.starRingEnd_addChar, neg_neg]
+/-- **Conjugation**: `conj (𝓕 f(ξ)) = 𝓕⁻[conj ∘ f](ξ)`, since `conj e^(-2πixξ) = e^(2πixξ)`
+(`Rd.conj_fourier_apply` on `ℝ`). -/
+theorem conj_fourier (f : ℝ → ℂ) (ξ : ℝ) : conj (𝓕 f ξ) = 𝓕⁻ (fun x => conj (f x)) ξ :=
+  Rd.conj_fourier_apply f ξ
 
-/-- Conjugation for the inverse transform: `conj (𝓕⁻ f(x)) = 𝓕[conj ∘ f](x)`. -/
-theorem conj_fourierInv (f : ℝ → ℂ) (x : ℝ) : conj (𝓕⁻ f x) = 𝓕 (fun ξ => conj (f ξ)) x := by
-  rw [fourierInv_eq, fourier_eq, ← integral_conj]
-  congr 1 with ξ
-  rw [Circle.smul_def, Circle.smul_def, smul_eq_mul, smul_eq_mul, map_mul,
-    Circle.starRingEnd_addChar]
+/-- Conjugation for the inverse transform: `conj (𝓕⁻ f(x)) = 𝓕[conj ∘ f](x)`
+(`Rd.conj_fourierInv_apply` on `ℝ`). -/
+theorem conj_fourierInv (f : ℝ → ℂ) (x : ℝ) : conj (𝓕⁻ f x) = 𝓕 (fun ξ => conj (f ξ)) x :=
+  Rd.conj_fourierInv_apply f x
 
 /-! ### The multiplication formula and Parseval's identity -/
 
-/-- **The multiplication formula** `∫ 𝓕 f · g = ∫ f · 𝓕 g` for integrable `f, g`: both sides are
-the double integral `∫∫ e^(-2πixξ) f(x) g(ξ) dx dξ` (Fubini, Mathlib's
-`VectorFourier.integral_bilin_fourierIntegral_eq_flip` with the product as bilinear form). -/
+/-- **The multiplication formula** `∫ 𝓕 f · g = ∫ f · 𝓕 g` for integrable `f, g`
+(`Rd.integral_fourier_mul` on `ℝ`). -/
 theorem integral_fourier_mul (hf : Integrable f) (hg : Integrable g) :
-    ∫ ξ, 𝓕 f ξ * g ξ = ∫ x, f x * 𝓕 g x := by
-  simpa using! VectorFourier.integral_bilin_fourierIntegral_eq_flip (ContinuousLinearMap.mul ℂ ℂ)
-    (L := innerₗ ℝ) continuous_fourierChar continuous_inner hf hg
+    ∫ ξ, 𝓕 f ξ * g ξ = ∫ x, f x * 𝓕 g x :=
+  Rd.integral_fourier_mul hf hg
 
 /-- The multiplication formula for the inverse transform: `∫ 𝓕⁻ f · g = ∫ f · 𝓕⁻ g` for
-integrable `f, g`. -/
+integrable `f, g` (`Rd.integral_fourierInv_mul` on `ℝ`). -/
 theorem integral_fourierInv_mul (hf : Integrable f) (hg : Integrable g) :
-    ∫ ξ, 𝓕⁻ f ξ * g ξ = ∫ x, f x * 𝓕⁻ g x := by
-  have hL : (-innerₗ ℝ : ℝ →ₗ[ℝ] ℝ →ₗ[ℝ] ℝ).flip = -innerₗ ℝ := by
-    ext
-    simp
-  have h := VectorFourier.integral_bilin_fourierIntegral_eq_flip (ContinuousLinearMap.mul ℂ ℂ)
-    (L := -innerₗ ℝ) continuous_fourierChar continuous_inner.neg hf hg
-  rw [hL] at h
-  simpa using! h
+    ∫ ξ, 𝓕⁻ f ξ * g ξ = ∫ x, f x * 𝓕⁻ g x :=
+  Rd.integral_fourierInv_mul hf hg
 
 /-- **Parseval's identity** `∫ f · conj g = ∫ 𝓕 f · conj (𝓕 g)` for integrable `f` and a
 continuous integrable `g` with integrable transform. The sesquilinear multiplication formula

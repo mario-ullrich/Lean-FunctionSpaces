@@ -103,14 +103,9 @@ theorem MemApprox.sub (hq : 1 ≤ q) (hs : 0 ≤ s) {f g : X} (hf : A.MemApprox 
 
 /-- For `s ≥ 0` and `q ≥ 1`, `A^s_q` is closed under finite sums. -/
 theorem MemApprox.sum (hq : 1 ≤ q) (hs : 0 ≤ s) {ι : Type*} (t : Finset ι) {f : ι → X}
-    (hf : ∀ i ∈ t, A.MemApprox s q (f i)) : A.MemApprox s q (∑ i ∈ t, f i) := by
-  classical
-  induction t using Finset.induction_on with
-  | empty => simpa using memApprox_zero (A := A) s q
-  | insert i t hi ih =>
-    rw [Finset.sum_insert hi]
-    exact (hf i (Finset.mem_insert_self i t)).add hq hs
-      (ih fun j hj => hf j (Finset.mem_insert_of_mem hj))
+    (hf : ∀ i ∈ t, A.MemApprox s q (f i)) : A.MemApprox s q (∑ i ∈ t, f i) :=
+  Finset.sum_induction f (A.MemApprox s q) (fun _ _ ha hb => ha.add hq hs hb)
+    (memApprox_zero s q) hf
 
 /-- **Approximants lie in every approximation space**: an element of `A m` has only finitely
 many nonzero dyadic errors. -/

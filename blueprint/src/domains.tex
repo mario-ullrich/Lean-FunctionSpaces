@@ -6149,7 +6149,7 @@ gives the second bound.
 \lean{Rd.LocalMeansBump.gradientConst, Rd.LocalMeansBump.gradientConst_ne_top,
   Rd.LocalMeansBump.ae_lqNorm_le_of_hasWeakLineDeriv,
   Rd.LocalMeansBump.eLpNorm_lqNorm_conv_divKernel_le,
-  Rd.LocalMeansBump.tlLocalNormOn_le_of_hasWeakLineDeriv, Rd.sum_mul_le_sum_mul_sum,
+  Rd.LocalMeansBump.tlLocalNormOn_le_of_hasWeakLineDeriv,
   Rd.LocalMeansBump.patchConst, Rd.LocalMeansBump.patchConst_ne_top,
   Rd.LocalMeansBump.tlLocalNormOn_le_patchConst}
 \leanok
@@ -6174,6 +6174,7 @@ type constant of \Cref{def:cz-const}.
 
 \begin{proof}
 \leanok
+\uses{lem:sum-of-products-le-product-of-sums}
 By \Cref{lem:local-means-gradient-point}, the assumption of
 \Cref{lem:tl-local-means-pointwise} holds with $\varphi = \mathbf 1_T f$,
 $h_i = \mathbf 1_T g_i$, $s = 1$ and $c = 2$, so almost everywhere
@@ -6185,7 +6186,8 @@ and $\|F\|^{W,2}_{1,2} \leq \|m\|_1 \|F\|_p + 2 \sum_i \|x \mapsto \|\Lambda_i(x
 with $\Lambda_i(x) = (((K_i)_{2^j} * \mathbf 1_T g_i)(x))_j$. Here $\|F\|_p = \|f\|_{L_p(T)}$, and
 the analysis operators of the Calder\'on--Zygmund families $((K_i)_{2^j})_j$ are bounded by
 $S_{V,p}(B_i, H_i)$ (\Cref{thm:vector-valued-strong-type}). Finally
-$\sum_i a_i b_i \leq (\sum_i a_i)(\sum_i b_i)$ for $a_i, b_i \in [0, \infty]$.
+$\sum_i a_i b_i \leq (\sum_i a_i)(\sum_i b_i)$ for $a_i, b_i \in [0, \infty]$
+(\Cref{lem:sum-of-products-le-product-of-sums}).
 \end{proof}
 
 \paragraph{Extensions from patches.}

@@ -24,9 +24,10 @@ transforms `𝓕K` and `𝓕⁻K` are continuous and bounded by `‖K‖_1`
 (`Rd.fourier_add_apply`, `Rd.fourier_sub_apply`) and conjugation as `conj (𝓕 f) = 𝓕⁻(conj f)`,
 `conj (𝓕⁻ f) = 𝓕(conj f)` for every `f : V → ℂ` (`Rd.conj_fourier_apply`,
 `Rd.conj_fourierInv_apply`), `𝓕(K ⋆ L) = 𝓕K · 𝓕L` (`Rd.fourier_conv`),
-`𝓕K(0) = ∫ K` (`Rd.fourier_apply_zero`), and
-`∫ 𝓕u · K = ∫ u · 𝓕K`, `∫ 𝓕⁻u · K = ∫ u · 𝓕⁻K` for Schwartz functions `u`
-(`Rd.integral_fourier_smul_eq_of_integrable`, `Rd.integral_fourierInv_smul_eq_of_integrable`).
+`𝓕K(0) = ∫ K` (`Rd.fourier_apply_zero`), and the multiplication formula
+`∫ 𝓕u · K = ∫ u · 𝓕K`, `∫ 𝓕⁻u · K = ∫ u · 𝓕⁻K` holds for integrable `u` and `K`
+(`Rd.integral_fourier_mul`, `Rd.integral_fourierInv_mul`), in particular for Schwartz functions
+`u` (`Rd.integral_fourier_smul_eq_of_integrable`, `Rd.integral_fourierInv_smul_eq_of_integrable`).
 The character `t ↦ e^(2πit)` is `2π`-Lipschitz (`Rd.norm_fourierChar_sub_le`), so the inverse
 transform of an integrable `g` vanishing outside the ball of radius `K` is Lipschitz with
 constant `2πK ‖g‖_1` (`Rd.norm_fourierInv_sub_le`).
@@ -35,7 +36,9 @@ The kernels of the Littlewood–Paley decomposition are inverse transforms of sm
 * `Rd.cutoff a b`: a smooth function equal to `1` on the closed ball of radius `a` and to `0`
   outside the ball of radius `b` (Mathlib's `ContDiffBump`), a Schwartz function
   (`Rd.cutoffSchwartz`);
-* `Rd.lpKernel = 𝓕⁻¹ χ_{1,2}` with `∫ lpKernel = 1` (`Rd.integral_lpKernel`), and
+* `Rd.lpKernel = 𝓕⁻¹ χ_{1,2}` with `∫ lpKernel = 1` (`Rd.integral_lpKernel`), hence
+  `1 ≤ ‖lpKernel‖_1 < ∞` (`Rd.one_le_eLpNorm_lpKernel`, `Rd.eLpNorm_lpKernel_ne_top`,
+  `Rd.eLpNorm_lpKernel_lt_top`), and
   `Rd.bandKernel = 𝓕⁻¹ χ_{2,4}`;
 * their dilations `Φ_k = Rd.Phi k` and `Θ_k = Rd.Theta k` by `2^k`, whose transforms are the
   cut-offs at scale `2^k` (`Rd.fourier_dilate`: `𝓕(Φ_c)(ξ) = 𝓕Φ(c^(-1) ξ)`), and the blocks
@@ -166,13 +169,32 @@ theorem continuous_fourier_of_integrable {K : V → ℂ} (hK : Integrable K) : C
   VectorFourier.fourierIntegral_continuous Real.continuous_fourierChar
     (innerSL ℝ).continuous₂ hK
 
+/-- **The multiplication formula** `∫ 𝓕f · g = ∫ f · 𝓕g` for integrable `f, g : V → ℂ`: both
+sides are the double integral `∫∫ e^(-2πi⟪x, ξ⟫) f(x) g(ξ) dx dξ` (Fubini, Mathlib's
+`VectorFourier.integral_bilin_fourierIntegral_eq_flip` with the product as bilinear form). -/
+theorem integral_fourier_mul {f g : V → ℂ} (hf : Integrable f) (hg : Integrable g) :
+    ∫ ξ, 𝓕 f ξ * g ξ = ∫ x, f x * 𝓕 g x := by
+  simpa using! VectorFourier.integral_bilin_fourierIntegral_eq_flip (ContinuousLinearMap.mul ℂ ℂ)
+    (L := innerₗ V) Real.continuous_fourierChar continuous_inner hf hg
+
+/-- **The multiplication formula for the inverse transform** `∫ 𝓕⁻f · g = ∫ f · 𝓕⁻g` for
+integrable `f, g : V → ℂ` (the pairing `-⟪ξ, x⟫` in Mathlib's
+`VectorFourier.integral_bilin_fourierIntegral_eq_flip`). -/
+theorem integral_fourierInv_mul {f g : V → ℂ} (hf : Integrable f) (hg : Integrable g) :
+    ∫ ξ, 𝓕⁻ f ξ * g ξ = ∫ x, f x * 𝓕⁻ g x := by
+  have hL : (-innerₗ V).flip = -innerₗ V := by
+    ext x y
+    simp [real_inner_comm]
+  have h := VectorFourier.integral_bilin_fourierIntegral_eq_flip (ContinuousLinearMap.mul ℂ ℂ)
+    (L := -innerₗ V) Real.continuous_fourierChar continuous_inner.neg hf hg
+  rw [hL] at h
+  simpa using! h
+
 /-- **Duality for the Fourier transform** (the multiplication formula), `∫ 𝓕u · g = ∫ u · 𝓕g`,
-for a Schwartz function `u` and an integrable function `g` (Mathlib's
-`VectorFourier.integral_fourierIntegral_smul_eq_flip` for the Fourier transform of `V`). -/
+for a Schwartz function `u` and an integrable function `g` (`Rd.integral_fourier_mul`). -/
 theorem integral_fourier_smul_eq_of_integrable (u : 𝓢(V, ℂ)) {g : V → ℂ} (hg : Integrable g) :
     ∫ ξ, 𝓕 u ξ • g ξ = ∫ x, u x • 𝓕 g x := by
-  simpa using! VectorFourier.integral_fourierIntegral_smul_eq_flip (L := innerₗ V)
-    Real.continuous_fourierChar continuous_inner u.integrable hg
+  simpa [SchwartzMap.fourier_coe] using integral_fourier_mul u.integrable hg
 
 /-- The Fourier transform of a function is bounded by its `L_1` norm:
 `|𝓕K(ξ)| ≤ ∫ |K|` for every `ξ` (Mathlib's `VectorFourier.norm_fourierIntegral_le_integral_norm`).
@@ -207,20 +229,11 @@ theorem norm_fourierInv_le_integral_norm (g : V → ℂ) (x : V) : ‖𝓕⁻ g 
   exact norm_fourier_le_integral_norm g (-x)
 
 /-- **Duality for the inverse Fourier transform** (the multiplication formula),
-`∫ 𝓕⁻u · g = ∫ u · 𝓕⁻g`, for a Schwartz function `u` and an integrable function `g` (Mathlib's
-`VectorFourier.integral_fourierIntegral_smul_eq_flip` for the pairing `-⟪ξ, x⟫`). -/
+`∫ 𝓕⁻u · g = ∫ u · 𝓕⁻g`, for a Schwartz function `u` and an integrable function `g`
+(`Rd.integral_fourierInv_mul`). -/
 theorem integral_fourierInv_smul_eq_of_integrable (u : 𝓢(V, ℂ)) {g : V → ℂ}
     (hg : Integrable g) : ∫ ξ, 𝓕⁻ u ξ • g ξ = ∫ x, u x • 𝓕⁻ g x := by
-  have hL : (-innerₗ V).flip = -innerₗ V := by
-    ext x y
-    simp [real_inner_comm]
-  have h := VectorFourier.integral_fourierIntegral_smul_eq_flip (L := -innerₗ V)
-    Real.continuous_fourierChar
-    (show Continuous fun p : V × V => -(inner ℝ p.1 p.2) from continuous_inner.neg)
-    (u.integrable (μ := volume)) hg
-  rw [hL] at h
-  rw [SchwartzMap.fourierInv_coe]
-  exact h
+  simpa [SchwartzMap.fourierInv_coe] using integral_fourierInv_mul u.integrable hg
 
 /-- The character `t ↦ e^(2πit)` is `2π`-Lipschitz: `|e^(2πia) - e^(2πib)| ≤ 2π |a - b|`
 (Mathlib's `Real.norm_exp_I_mul_ofReal_sub_one_le`). -/
@@ -456,6 +469,23 @@ theorem eLpNorm_Theta_one (k : ℕ) :
 /-- The norm `‖Θ‖_1` of the band-limiting kernel is finite. -/
 theorem eLpNorm_bandKernel_ne_top : eLpNorm (bandKernel (V := V)) 1 volume ≠ ⊤ :=
   (memLp_one_iff_integrable.2 integrable_bandKernel).eLpNorm_ne_top
+
+/-- The norm `‖Φ‖_1` of the low-pass kernel is finite. -/
+theorem eLpNorm_lpKernel_ne_top : eLpNorm (lpKernel (V := V)) 1 volume ≠ ⊤ :=
+  (memLp_one_iff_integrable.2 integrable_lpKernel).eLpNorm_ne_top
+
+/-- The norm `‖Φ‖_1` of the low-pass kernel is finite, as a strict inequality
+(`Rd.eLpNorm_lpKernel_ne_top`). -/
+theorem eLpNorm_lpKernel_lt_top : eLpNorm (lpKernel (V := V)) 1 volume < ⊤ :=
+  eLpNorm_lpKernel_ne_top.lt_top
+
+/-- **The kernel `Φ` has `L_1` norm at least `1`**: `‖Φ‖_1 ≥ |∫ Φ| = 1`
+(`Rd.integral_lpKernel` and Mathlib's `enorm_integral_le_lintegral_enorm`). -/
+theorem one_le_eLpNorm_lpKernel : 1 ≤ eLpNorm (lpKernel (V := V)) 1 volume :=
+  calc (1 : ℝ≥0∞) = ‖∫ x, lpKernel (V := V) x‖ₑ := by rw [integral_lpKernel, enorm_one]
+    _ ≤ ∫⁻ x, ‖lpKernel (V := V) x‖ₑ := enorm_integral_le_lintegral_enorm _
+    _ = eLpNorm (lpKernel (V := V)) 1 volume :=
+        (eLpNorm_one_eq_lintegral_enorm integrable_lpKernel.aestronglyMeasurable).symm
 
 /-- `∫ |Θ_k| = ‖Θ‖_1` for every dilation, as a lower Lebesgue integral. -/
 theorem lintegral_enorm_Theta (k : ℕ) :

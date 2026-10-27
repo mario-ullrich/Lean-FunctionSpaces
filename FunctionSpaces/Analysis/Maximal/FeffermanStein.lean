@@ -446,38 +446,29 @@ theorem volume_lt_mul_lqNorm_maximal_czGood_le [Nontrivial V] {q : ℝ≥0∞} (
   have hc : (1 + 3 ^ finrank ℝ V : ℝ≥0∞) ^ q.toReal ≠ ∞ :=
     ENNReal.rpow_ne_top_of_nonneg (by linarith)
       (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.pow_ne_top ENNReal.ofNat_ne_top⟩)
-  have hL : Measurable fun x => (1 + 3 ^ finrank ℝ V) * lqNorm q (fun j =>
+  have hL : Measurable fun x => lqNorm q (fun j =>
       maximal (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x) :=
-    (measurable_lqNorm_comp (fun _ => measurable_maximal _) q).const_mul _
-  have htr0 : t ^ (q.toReal - 1) ≠ 0 := (ENNReal.rpow_pos ht0 ht).ne'
-  have htrt : t ^ (q.toReal - 1) ≠ ∞ := ENNReal.rpow_ne_top_of_nonneg (by linarith) ht
-  have hcheb := mul_meas_ge_le_lintegral₀ (μ := volume) (hL.pow_const q.toReal).aemeasurable
-    (t ^ q.toReal)
+    measurable_lqNorm_comp (fun _ => measurable_maximal _) q
   have hint := (lintegral_lqNorm_maximal_rpow_le hq1 hq
     (fun j => aemeasurable_czGood (G := fun y => lqNorm q (fun j => g j y)) (t := t) (hg j))).trans
     (mul_le_mul_right (lintegral_lqNorm_czGood_rpow_le hq1 hq hg hGi ht0) _)
-  simp_rw [ENNReal.mul_rpow_of_nonneg _ _ (zero_le_one.trans hr.le)] at hcheb
-  rw [lintegral_const_mul' _ _ hc] at hcheb
+  have htt : (t ^ q.toReal)⁻¹ * t ^ (q.toReal - 1) = t⁻¹ := by
+    rw [ENNReal.rpow_sub _ _ ht0.ne' ht, ENNReal.rpow_one, div_eq_mul_inv, ← mul_assoc,
+      ENNReal.inv_mul_cancel (ENNReal.rpow_pos ht0 ht).ne'
+        (ENNReal.rpow_ne_top_of_nonneg (by linarith) ht), one_mul]
   calc volume {x | t < (1 + 3 ^ finrank ℝ V) * lqNorm q (fun j =>
         maximal (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x)}
-      ≤ volume {x | t ^ q.toReal ≤ (1 + 3 ^ finrank ℝ V) ^ q.toReal * lqNorm q (fun j =>
-          maximal (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x) ^ q.toReal} :=
-        measure_mono fun x hx => by
-          rw [Set.mem_ofPred_eq, ← ENNReal.mul_rpow_of_nonneg _ _ (zero_le_one.trans hr.le)]
-          exact ENNReal.rpow_le_rpow (le_of_lt hx) (zero_le_one.trans hr.le)
-    _ ≤ t⁻¹ * ((1 + 3 ^ finrank ℝ V) ^ q.toReal * 2 ^ ((finrank ℝ V : ℝ) * (q.toReal - 1)) *
-          maximalConst (finrank ℝ V) q.toReal * ∫⁻ x, lqNorm q (fun j => g j x)) := by
-        rw [← ENNReal.mul_le_iff_le_inv ht0.ne' ht]
-        refine (ENNReal.mul_le_mul_iff_right htr0 htrt).1 ?_
-        calc t ^ (q.toReal - 1) * (t * volume _)
-            = t ^ q.toReal * volume _ := by
-              rw [ENNReal.rpow_eq_mul_rpow_sub_one t hr.le]; ring
-          _ ≤ _ := hcheb
-          _ ≤ (1 + 3 ^ finrank ℝ V) ^ q.toReal * (maximalConst (finrank ℝ V) q.toReal *
-                (2 ^ ((finrank ℝ V : ℝ) * (q.toReal - 1)) * t ^ (q.toReal - 1) *
-                  ∫⁻ x, lqNorm q (fun j => g j x))) := mul_le_mul_right hint _
-          _ = _ := by ring
-    _ = _ := by ring
+      ≤ (t ^ q.toReal)⁻¹ * ∫⁻ x, ((1 + 3 ^ finrank ℝ V) * lqNorm q (fun j =>
+          maximal (czGood (fun y => lqNorm q (fun j => g j y)) t (g j)) x)) ^ q.toReal :=
+        measure_lt_le_inv_rpow_mul_lintegral (hL.const_mul _).aemeasurable (by linarith)
+          ht0.ne' ht
+    _ ≤ (t ^ q.toReal)⁻¹ * ((1 + 3 ^ finrank ℝ V) ^ q.toReal * (maximalConst (finrank ℝ V)
+          q.toReal * (2 ^ ((finrank ℝ V : ℝ) * (q.toReal - 1)) * t ^ (q.toReal - 1) *
+            ∫⁻ x, lqNorm q (fun j => g j x)))) := by
+        simp_rw [ENNReal.mul_rpow_of_nonneg _ _ (zero_le_one.trans hr.le)]
+        rw [lintegral_const_mul' _ _ hc]
+        gcongr
+    _ = _ := by rw [← htt]; ring
 
 /-- **The vector-valued weak type `(1,1)`** of the maximal function (Fefferman–Stein): in
 dimension `n ≥ 1`, for `1 < q < ∞`, almost everywhere measurable `g_j : V → [0, ∞]` with
@@ -561,23 +552,14 @@ theorem volume_lqNorm_maximal_gt_le_split [Nontrivial V] {q : ℝ≥0∞} (hq1 :
   simp only [ENNReal.lqNorm_indicator] at h1
   have hL : Measurable fun x => lqNorm q (fun j => maximal (Sᶜ.indicator (g j)) x) :=
     measurable_lqNorm_comp (fun _ => measurable_maximal _) q
-  have hpow0 : (s / 2) ^ q.toReal ≠ 0 := (ENNReal.rpow_pos hs2 hs2t).ne'
-  have hpowt : (s / 2) ^ q.toReal ≠ ∞ := ENNReal.rpow_ne_top_of_nonneg (by linarith) hs2t
   have h2 : volume {x | s / 2 < lqNorm q (fun j => maximal (Sᶜ.indicator (g j)) x)} ≤
       ((s / 2) ^ q.toReal)⁻¹ * (maximalConst (finrank ℝ V) q.toReal *
         ∫⁻ x, Sᶜ.indicator (fun y => lqNorm q (fun j => g j y)) x ^ q.toReal) := by
-    rw [← ENNReal.mul_le_iff_le_inv hpow0 hpowt]
-    calc (s / 2) ^ q.toReal *
-          volume {x | s / 2 < lqNorm q (fun j => maximal (Sᶜ.indicator (g j)) x)}
-        ≤ (s / 2) ^ q.toReal * volume {x | (s / 2) ^ q.toReal ≤
-            lqNorm q (fun j => maximal (Sᶜ.indicator (g j)) x) ^ q.toReal} :=
-          mul_le_mul_right (measure_mono fun x hx =>
-            ENNReal.rpow_le_rpow (le_of_lt hx) (by linarith)) _
-      _ ≤ ∫⁻ x, lqNorm q (fun j => maximal (Sᶜ.indicator (g j)) x) ^ q.toReal :=
-          mul_meas_ge_le_lintegral₀ (hL.pow_const _).aemeasurable _
-      _ ≤ _ := by
-          have := lintegral_lqNorm_maximal_rpow_le hq1 hq fun j => (hg j).indicator hS.compl
-          simpa only [ENNReal.lqNorm_indicator] using this
+    refine (measure_lt_le_inv_rpow_mul_lintegral hL.aemeasurable (by linarith) hs2.ne'
+      hs2t).trans ?_
+    gcongr
+    have := lintegral_lqNorm_maximal_rpow_le hq1 hq fun j => (hg j).indicator hS.compl
+    simpa only [ENNReal.lqNorm_indicator] using this
   calc volume {x | s < lqNorm q (fun j => maximal (g j) x)}
       ≤ volume {x | s / 2 < lqNorm q (fun j => maximal (S.indicator (g j)) x)} +
           volume {x | s / 2 < lqNorm q (fun j => maximal (Sᶜ.indicator (g j)) x)} :=

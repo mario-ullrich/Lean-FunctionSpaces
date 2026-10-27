@@ -3148,8 +3148,9 @@ $\mu\{u > t\} \leq (4A + D + 2K) \, t^{-1} I$.
 
 \begin{proof}
 \leanok
-The first bound is Chebyshev's inequality for $a^2$ at height $t^2/4$, the second Chebyshev's
-inequality for $\mathbf 1_{X \setminus S} \, b$ at height $t/2$. By
+\uses{lem:chebyshev-power}
+The first bound is \Cref{lem:chebyshev-power} with $r = 2$ at height $t/2$, the second
+Chebyshev's inequality for $\mathbf 1_{X \setminus S} \, b$ at height $t/2$. By
 \Cref{lem:weak-type-elementary}, almost every point of $\{u > t\}$ lies in
 $\{a > t/2\} \cup \{b > t/2\}$, and the two bounds give
 $\mu\{u > t\} \leq 4 t^{-2} A t I + D t^{-1} I + 2 t^{-1} K I$.

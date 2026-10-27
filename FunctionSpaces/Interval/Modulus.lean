@@ -82,8 +82,7 @@ theorem eLpNorm_Icc_split {G : ℝ → ℂ} (hG : Measurable G) {p : ℝ≥0∞}
     eLpNorm G p (volume.restrict (Icc a c)) ≤
       eLpNorm G p (volume.restrict (Icc a b)) + eLpNorm G p (volume.restrict (Icc b c)) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp).ne'
-  have hq1 : 1 ≤ p.toReal := by
-    have := ENNReal.toReal_mono hp' hp; rwa [ENNReal.toReal_one] at this
+  have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp hp'
   rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' hG.aestronglyMeasurable,
     eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' hG.aestronglyMeasurable,
     eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp' hG.aestronglyMeasurable,

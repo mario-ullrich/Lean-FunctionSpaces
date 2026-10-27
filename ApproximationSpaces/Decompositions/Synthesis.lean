@@ -81,31 +81,20 @@ theorem approxSeq_add_le_of_isLinear (hA : A.IsLinear) (n : ℕ) (f g : X) :
     (approxError_nonneg _ _)]
   exact ENNReal.ofReal_le_ofReal (approxError_add_le_of_isLinear hA n f g)
 
-/-- `E_n(∑ g_j) ≤ ∑ E_n(g_j)` for a linear scheme. -/
+/-- `E_n(∑ g_j) ≤ ∑ E_n(g_j)` for a linear scheme (Mathlib's `Finset.le_sum_of_subadditive`). -/
 theorem approxSeq_sum_le_of_isLinear (hA : A.IsLinear) (n : ℕ) {ι : Type*} (t : Finset ι)
-    (g : ι → X) : A.approxSeq (∑ j ∈ t, g j) n ≤ ∑ j ∈ t, A.approxSeq (g j) n := by
-  classical
-  induction t using Finset.induction_on with
-  | empty => simp [approxSeq_zero_right]
-  | insert i t hi ih =>
-    rw [Finset.sum_insert hi, Finset.sum_insert hi]
-    exact (approxSeq_add_le_of_isLinear hA n _ _).trans (add_le_add le_rfl ih)
+    (g : ι → X) : A.approxSeq (∑ j ∈ t, g j) n ≤ ∑ j ∈ t, A.approxSeq (g j) n :=
+  Finset.le_sum_of_subadditive (A.approxSeq · n) (approxSeq_zero_right n).le
+    (approxSeq_add_le_of_isLinear hA n) t g
 
-/-- The algebra of the weights: `2^(ks) 2^(-(k-j)σ) = 2^(-k(σ-s)) 2^(jσ)` for `j ≤ k`. -/
+/-- The algebra of the weights: `2^(ks) 2^(-(k-j)σ) = 2^(-k(σ-s)) 2^(jσ)` for `j ≤ k`
+(`ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub`). -/
 theorem dyadicWeight_mul_dyadicWeight_sub {σ : ℝ} {j k : ℕ} (hjk : j ≤ k) (c e : ℝ≥0∞) :
     dyadicWeight s k * (c * dyadicWeight (-σ) (k - j) * e) =
-      c * (dyadicWeight (-(σ - s)) k * (dyadicWeight σ j * e)) := by
-  obtain ⟨d, rfl⟩ := Nat.exists_eq_add_of_le' hjk
-  rw [Nat.add_sub_cancel, ENNReal.dyadicWeight_add_nat, ENNReal.dyadicWeight_add_nat]
-  have h1 : dyadicWeight s d * dyadicWeight (-σ) d = dyadicWeight (-(σ - s)) d := by
-    rw [← ENNReal.dyadicWeight_add]; congr 1; ring
-  have h2 : dyadicWeight (-(σ - s)) j * dyadicWeight σ j = dyadicWeight s j := by
-    rw [← ENNReal.dyadicWeight_add]; congr 1; ring
-  calc dyadicWeight s d * dyadicWeight s j * (c * dyadicWeight (-σ) d * e)
-      = c * (dyadicWeight s d * dyadicWeight (-σ) d) * dyadicWeight s j * e := by ring
-    _ = c * (dyadicWeight (-(σ - s)) d * (dyadicWeight (-(σ - s)) j * dyadicWeight σ j)) * e := by
-        rw [h1, h2]; ring
-    _ = _ := by ring
+      c * (dyadicWeight (-(σ - s)) k * (dyadicWeight σ j * e)) :=
+  calc dyadicWeight s k * (c * dyadicWeight (-σ) (k - j) * e)
+      = c * (dyadicWeight s k * dyadicWeight (-σ) (k - j)) * e := by ring
+    _ = _ := by rw [ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub s σ hjk]; ring
 
 /-- **Synthesis with decay**: for a linear scheme, `f = ∑ g_j` with `‖g_j‖ ≤ ε_j` and
 `E_{2^k}(g_j) ≤ C 2^(-(k-j)σ) ε_j` for `k ≥ j` satisfies

@@ -225,9 +225,7 @@ theorem eLpNorm_conv_dilate_sub_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ 
           (1 / p.toReal) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  have hq1 : 1 ≤ p.toReal := by
-    have h := ENNReal.toReal_mono hp hp1
-    rwa [ENNReal.toReal_one] at h
+  have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp1 hp
   set q := p.toReal
   have hgmeas : Measurable g := hgm.measurable
   have hconvm : AEStronglyMeasurable (conv (dilate c Φ) g μ - g) μ :=
@@ -283,9 +281,7 @@ theorem tendsto_eLpNorm_conv_dilate_sub {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : 
   have hp1 : 1 ≤ p := Fact.out
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  have hq1 : 1 ≤ p.toReal := by
-    have h := ENNReal.toReal_mono hp hp1
-    rwa [ENNReal.toReal_one] at h
+  have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp1 hp
   set q := p.toReal
   set T : V → ℝ≥0∞ := fun w => eLpNorm (fun x => g (x - w) - g x) p μ
   have hT : Continuous T := continuous_eLpNorm_comp_sub_sub hp hg

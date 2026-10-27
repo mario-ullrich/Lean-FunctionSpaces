@@ -46,8 +46,7 @@ variable (d) in
 theorem triebelLizorkinBesovConst_ne_top (s : ℝ) : triebelLizorkinBesovConst d s ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top ENNReal.ofNat_ne_top
     (ENNReal.add_ne_top.2 ⟨ENNReal.natCast_ne_top _, ENNReal.one_ne_top⟩))
-    (ENNReal.dyadicWeight_ne_top _ _))
-    (memLp_one_iff_integrable.2 Rd.integrable_lpKernel).eLpNorm_ne_top
+    (ENNReal.dyadicWeight_ne_top _ _)) Rd.eLpNorm_lpKernel_ne_top
 
 /-- The constant `2 · 2^s (1 - 2^(-s))⁻¹` of the bound of the Besov quasi-norm on `𝕋^d` by the
 Triebel–Lizorkin quasi-norm (`Torus.approxNormDyadic_le_triebelLizorkinNorm`). -/

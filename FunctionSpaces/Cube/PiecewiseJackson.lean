@@ -72,8 +72,7 @@ theorem eLpNorm_le_of_slice_le {F G₁ D₁ G₂ D₂ : (Fin d → ℝ) → ℂ}
         (eLpNorm G₂ p (regionVol d i a₂ b₂) + M * eLpNorm D₂ p (regionVol d i a₂ b₂))) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp'
-  have hq1 : 1 ≤ p.toReal := by
-    have := ENNReal.toReal_mono hp' hp; rwa [ENNReal.toReal_one] at this
+  have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp hp'
   have hm₁ := measurable_eLpNorm_slice hG₁ hp0 hp' i (volume.restrict (Icc a₁ b₁))
   have hm₂ := (measurable_eLpNorm_slice hD₁ hp0 hp' i (volume.restrict (Icc a₁ b₁))).const_mul M
   have hm₃ := measurable_eLpNorm_slice hG₂ hp0 hp' i (volume.restrict (Icc a₂ b₂))

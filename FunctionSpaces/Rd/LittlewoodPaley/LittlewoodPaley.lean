@@ -105,8 +105,7 @@ theorem enorm_lpBlock_le_approxSeq (hp : p ≠ ∞) {i j : ℕ} (hij : i + 3 ≤
     ‖lpBlock hp j f‖ₑ ≤
       2 * eLpNorm (lpKernel (V := V)) 1 volume * (bandScheme hp).approxSeq f (2 ^ i) := by
   have hC : 2 * eLpNorm (lpKernel (V := V)) 1 volume ≠ ∞ :=
-    ENNReal.mul_ne_top (by norm_num)
-      (memLp_one_iff_integrable.2 integrable_lpKernel).eLpNorm_ne_top
+    ENNReal.mul_ne_top (by norm_num) eLpNorm_lpKernel_ne_top
   have hreal : ‖lpBlock hp j f‖ ≤ (2 * eLpNorm (lpKernel (V := V)) 1 volume).toReal *
       (bandScheme hp).approxError (2 ^ i) f := by
     refine ApproximationScheme.le_mul_approxError_of_forall_mem ENNReal.toReal_nonneg
@@ -223,8 +222,7 @@ theorem memApprox_bandScheme_iff (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : �
   · intro h
     refine (littlewoodPaleyNorm_le_approxNormDyadic hp hs.le hq f).trans_lt
       (ENNReal.mul_lt_top (ENNReal.mul_lt_top (ENNReal.mul_lt_top (by norm_num)
-        (ENNReal.dyadicWeight_lt_top s 3)) ?_) h)
-    exact (memLp_one_iff_integrable.2 integrable_lpKernel).eLpNorm_lt_top
+        (ENNReal.dyadicWeight_lt_top s 3)) eLpNorm_lpKernel_lt_top) h)
   · intro h
     exact (approxNormDyadic_bandScheme_le hp hs hq f).trans_lt (ENNReal.mul_lt_top
       (ENNReal.mul_lt_top (by norm_num) (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs).lt_top) h)

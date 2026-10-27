@@ -3381,13 +3381,14 @@ $1 = |\int \Phi| \leq \int |\Phi| = \|\Phi\|_1$ (\Cref{lem:lp-kernels-basic}).
 \label{lem:sum-of-products-le-product-of-sums}
 \lean{ENNReal.mul_add_mul_le_add_mul_add, ENNReal.sum_mul_le_sum_mul_sum}
 \leanok
-For all $a, b, x, y \in [0, \infty]$, $a x + b y \leq (a + b)(x + y)$. For every finite family
-$(a_i, b_i)_i$ in $[0, \infty]$, $\sum_i a_i b_i \leq \bigl(\sum_i a_i\bigr)\bigl(\sum_i b_i\bigr)$.
+For all $a, b, x, y \in [0, \infty]$, $a x + b y \leq (a + b)(x + y)$. For every finite set $s$
+and all families $(a_i)_{i \in s}$, $(b_i)_{i \in s}$ in $[0, \infty]$,
+$\sum_{i \in s} a_i b_i \leq \bigl(\sum_{i \in s} a_i\bigr)\bigl(\sum_{i \in s} b_i\bigr)$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-Expand $(a + b)(x + y) = a x + a y + b x + b y$. Each $a_i$ is at most $\sum_j a_j$.
+Expand $(a + b)(x + y) = a x + a y + b x + b y$. Each $b_i$ is at most $\sum_{j \in s} b_j$.
 \end{proof}
 
 \begin{definition}[The constants of the grid norm]

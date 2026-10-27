@@ -30,9 +30,9 @@ Triebel–Lizorkin spaces use the first, Besov spaces the second. This file comp
   Littlewood–Paley blocks (`MeasureTheory.lqNorm_max_dyadicWeight_le`,
   `MeasureTheory.eLpNorm_lqNorm_dyadicWeight_le_min`).
 
-The tools are power identities and homogeneity of `eLpNorm` in `[0, ∞]`, monotone convergence for
-`L_p` norms (`MeasureTheory.eLpNorm_iSup_of_directed`), Minkowski's inequality for series in `L_p`
-(`MeasureTheory.eLpNorm_tsum_le`) and Minkowski's integral inequality for `ℓ_u`-valued functions,
+The tools are the `L_p` norms of `[0, ∞]`-valued functions of `ApproximationSpaces.Sequences.Lq`
+(powers, homogeneity, monotone convergence and Minkowski's inequality for series) and
+Minkowski's integral inequality for `ℓ_u`-valued functions,
 `‖(∫ g_i)_i‖_{ℓ_u} ≤ ∫ ‖(g_i)_i‖_{ℓ_u}` (`MeasureTheory.lqNorm_lintegral_le`), proved by
 Hölder's inequality on finite sets, also for means (`MeasureTheory.lqNorm_laverage_le`) and, on
 a probability space, with the `L_p` norm on the right (`MeasureTheory.lqNorm_lintegral_le_eLpNorm`).
@@ -140,10 +140,8 @@ variable {ι : Type*} [Countable ι] [MeasurableSpace ι] [MeasurableSingletonCl
 
 /-- **Powers inside an `ℓ_u` norm**: `‖(a_i^r)_i‖_{ℓ_u} = ‖a‖_{ℓ_{u r}}^r` for `r > 0`. -/
 theorem lqNorm_fun_rpow (u : ℝ≥0∞) {r : ℝ} (hr : 0 < r) (a : ι → ℝ≥0∞) :
-    lqNorm u (fun i => a i ^ r) = lqNorm (u * ENNReal.ofReal r) a ^ r := by
-  simpa only [lqNorm, enorm_eq_self] using
-    MeasureTheory.eLpNorm_enorm_rpow (p := u) (μ := MeasureTheory.Measure.count) a
-      (aestronglyMeasurable_count a) hr
+    lqNorm u (fun i => a i ^ r) = lqNorm (u * ENNReal.ofReal r) a ^ r :=
+  MeasureTheory.eLpNorm_fun_rpow (measurable_of_countable a).aemeasurable hr u
 
 end Countable
 
@@ -179,74 +177,6 @@ theorem enorm_le_dyadicWeight_neg_mul_eLpNorm_lqNorm {E : Type*} [NormedAddCommG
   calc ‖h j‖ₑ = dyadicWeight (-s) j * (dyadicWeight s j * ‖h j‖ₑ) := by
         rw [← mul_assoc, ENNReal.dyadicWeight_neg_mul_self, one_mul]
     _ ≤ _ := by gcongr; exact dyadicWeight_mul_enorm_le_eLpNorm_lqNorm hq s h j
-
-/-- **Powers inside an `L_p` norm**: `‖g^r‖_p = ‖g‖_{p r}^r` for `r > 0` and `g : α → [0, ∞]`
-measurable (Mathlib's `eLpNorm_enorm_rpow`). -/
-theorem eLpNorm_fun_rpow {g : α → ℝ≥0∞} (hg : AEMeasurable g μ) {r : ℝ} (hr : 0 < r)
-    (p : ℝ≥0∞) : eLpNorm (fun x => g x ^ r) p μ = eLpNorm g (p * ENNReal.ofReal r) μ ^ r := by
-  simpa only [enorm_eq_self] using eLpNorm_enorm_rpow (p := p) (μ := μ) g hg.aestronglyMeasurable hr
-
-/-- **Monotone convergence for `L_p` norms**: for a directed countable family of measurable
-functions `F_b : α → [0, ∞]`, `‖sup_b F_b‖_p = sup_b ‖F_b‖_p`. For `p < ∞` this is the monotone
-convergence theorem for `∫ F_b^p`; for `p = ∞` it holds for every countable family. -/
-theorem eLpNorm_iSup_of_directed {β : Type*} [Countable β] {F : β → α → ℝ≥0∞}
-    (hF : ∀ b, AEMeasurable (F b) μ) (hd : Directed (· ≤ ·) F) (p : ℝ≥0∞) :
-    eLpNorm (fun x => ⨆ b, F b x) p μ = ⨆ b, eLpNorm (F b) p μ := by
-  have hm : AEMeasurable (fun x => ⨆ b, F b x) μ := AEMeasurable.iSup hF
-  rcases eq_or_ne p 0 with rfl | hp0
-  · simp [eLpNorm_exponent_zero hm.aestronglyMeasurable,
-      eLpNorm_exponent_zero (hF _).aestronglyMeasurable]
-  rcases eq_or_ne p ∞ with rfl | hp
-  · simp only [eLpNorm_exponent_top hm.aestronglyMeasurable,
-      eLpNorm_exponent_top (hF _).aestronglyMeasurable, eLpNormEssSup, enorm_eq_self]
-    refine le_antisymm (essSup_le_of_ae_le _ ?_) (iSup_le fun b => essSup_mono_ae ?_)
-    · have h : ∀ᵐ x ∂μ, ∀ b, F b x ≤ essSup (F b) μ :=
-        ae_all_iff.2 fun b => ENNReal.ae_le_essSup (F b)
-      filter_upwards [h] with x hx
-      exact iSup_le fun b => (hx b).trans (le_iSup (fun b => essSup (F b) μ) b)
-    · exact Eventually.of_forall fun x => le_iSup (fun b => F b x) b
-  have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hm.aestronglyMeasurable]
-  simp_rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (hF _).aestronglyMeasurable]
-  simp only [enorm_eq_self]
-  have h1 : ∀ x, (⨆ b, F b x) ^ p.toReal = ⨆ b, F b x ^ p.toReal := fun x =>
-    (ENNReal.orderIsoRpow p.toReal hr).map_iSup (fun b => F b x)
-  simp_rw [h1]
-  rw [lintegral_iSup_directed (fun b => (hF b).pow_const _) ?_]
-  · exact (ENNReal.orderIsoRpow (1 / p.toReal) (by positivity)).map_iSup _
-  · intro b₁ b₂
-    obtain ⟨c, h₁, h₂⟩ := hd b₁ b₂
-    exact ⟨c, fun x => ENNReal.rpow_le_rpow (h₁ x) hr.le,
-      fun x => ENNReal.rpow_le_rpow (h₂ x) hr.le⟩
-
-/-- **Minkowski's inequality for series** in `L_p`, `1 ≤ p ≤ ∞`, on any measure space: for
-`g_i : α → [0, ∞]` indexed by a countable set, `‖∑_i g_i‖_p ≤ ∑_i ‖g_i‖_p`. If some `g_i` is not
-measurable, then `‖g_i‖_p = ∞` and so is the right side. Otherwise the series is the supremum of
-its finite partial sums, and this follows from Mathlib's finite version `eLpNorm_sum_le` by
-monotone convergence (`MeasureTheory.eLpNorm_iSup_of_directed`). -/
-theorem eLpNorm_tsum_le {ι : Type*} [Countable ι] {g : ι → α → ℝ≥0∞} (hp1 : 1 ≤ p) :
-    eLpNorm (fun x => ∑' i, g i x) p μ ≤ ∑' i, eLpNorm (g i) p μ := by
-  by_cases hg : ∀ i, AEMeasurable (g i) μ
-  swap
-  · obtain ⟨i, hi⟩ := not_forall.1 hg
-    have h : eLpNorm (g i) p μ = ∞ :=
-      eLpNorm_of_not_aestronglyMeasurable fun h => hi h.aemeasurable
-    rw [ENNReal.tsum_eq_top_of_eq_top ⟨i, h⟩]
-    exact le_top
-  have h : (fun x => ∑' i, g i x) = fun x => ⨆ s : Finset ι, ∑ i ∈ s, g i x := by
-    funext x
-    exact ENNReal.tsum_eq_iSup_sum
-  have hmono : Monotone fun (s : Finset ι) (x : α) => ∑ i ∈ s, g i x := fun s t hst x =>
-    Finset.sum_le_sum_of_subset hst
-  rw [h, eLpNorm_iSup_of_directed (fun s => Finset.aemeasurable_fun_sum s fun i _ => hg i)
-    hmono.directed_le p]
-  refine iSup_le fun s => ?_
-  calc eLpNorm (fun x => ∑ i ∈ s, g i x) p μ = eLpNorm (∑ i ∈ s, g i) p μ := by
-        congr 1
-        funext x
-        simp [Finset.sum_apply]
-    _ ≤ ∑ i ∈ s, eLpNorm (g i) p μ := eLpNorm_sum_le hp1
-    _ ≤ ∑' i, eLpNorm (g i) p μ := ENNReal.sum_le_tsum s
 
 /-! ### Minkowski's integral inequality for `ℓ_u`-valued functions -/
 

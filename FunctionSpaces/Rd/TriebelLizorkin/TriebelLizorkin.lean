@@ -35,9 +35,11 @@ For `s > 0` this gives:
 
 * `F^s_{p,p} = B^s_{p,p}` (`Rd.memTriebelLizorkin_iff_memApprox`), also described by moduli of
   smoothness (`Rd.memTriebelLizorkin_iff_modulus`);
-* the **Besov sandwich** `B^s_{p,min(p,q)} ⊆ F^s_{p,q} ⊆ B^s_{p,max(p,q)}`, with explicit constants
-  (`Rd.approxNormDyadic_le_triebelLizorkinNorm`, `Rd.triebelLizorkinNorm_le_approxNormDyadic`,
-  `Rd.memApprox_of_memTriebelLizorkin`, `Rd.memTriebelLizorkin_of_memApprox`). For `q = 2`,
+* the **Besov sandwich** `B^s_{p,min(p,q)} ⊆ F^s_{p,q} ⊆ B^s_{p,max(p,q)}`, with explicit finite
+  constants (`Rd.approxNormDyadic_le_triebelLizorkinNorm`,
+  `Rd.triebelLizorkinNorm_le_approxNormDyadic`,
+  `Rd.eight_mul_dyadicWeight_mul_eLpNorm_lpKernel_ne_top`, `Rd.memApprox_of_memTriebelLizorkin`,
+  `Rd.memTriebelLizorkin_of_memApprox`). For `q = 2`,
   `F^s_{p,2}` lies between `B^s_{p,min(p,2)}` and `B^s_{p,max(p,2)}`.
 
 Besov spaces on `V` are the approximation spaces of the band-limited scheme (`Rd.bandScheme`).
@@ -404,6 +406,12 @@ theorem triebelLizorkinNorm_le_approxNormDyadic (hp : p ≠ ∞) {s : ℝ} (hs :
         (bandScheme hp).approxNormDyadic s (min p q) f :=
   (triebelLizorkinNorm_le_littlewoodPaleyNorm_min hp hq f).trans
     (littlewoodPaleyNorm_le_approxNormDyadic hp hs (le_min Fact.out hq) f)
+
+/-- The constant `8 · 2^{3s} ‖Φ‖_1` of `Rd.triebelLizorkinNorm_le_approxNormDyadic` is finite. -/
+theorem eight_mul_dyadicWeight_mul_eLpNorm_lpKernel_ne_top (s : ℝ) :
+    8 * dyadicWeight s 3 * eLpNorm (lpKernel (V := V)) 1 volume ≠ ∞ :=
+  ENNReal.mul_ne_top (ENNReal.mul_ne_top ENNReal.ofNat_ne_top (ENNReal.dyadicWeight_ne_top _ _))
+    eLpNorm_lpKernel_ne_top
 
 /-- **`F^s_{p,q} ⊆ B^s_{p,max(p,q)}`**: for `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, every
 `f ∈ F^s_{p,q}` lies in the approximation space `A^s_{max(p,q)}` of the band-limited scheme. For

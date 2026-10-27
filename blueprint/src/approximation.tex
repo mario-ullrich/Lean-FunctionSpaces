@@ -312,6 +312,7 @@ With these, a constant $(1 - 2^{-\alpha})^{-1}$ is finite exactly for $\alpha > 
   ENNReal.dyadicWeight_lt_top, ENNReal.dyadicWeight_pos, ENNReal.dyadicWeight_ne_zero,
   ENNReal.dyadicWeight_add, ENNReal.dyadicWeight_add_nat, ENNReal.dyadicWeight_succ,
   ENNReal.dyadicWeight_neg, ENNReal.dyadicWeight_neg_mul_self, ENNReal.dyadicWeight_mul_neg_self,
+  ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub,
   ENNReal.dyadicWeight_rpow, ENNReal.dyadicWeight_eq_pow, ENNReal.dyadicWeight_mono,
   ENNReal.dyadicWeight_le_of_le, ENNReal.dyadicWeight_anti, ENNReal.one_le_dyadicWeight,
   ENNReal.natCast_two_pow_rpow, ENNReal.two_pow_rpow_eq_dyadicWeight,
@@ -359,6 +360,12 @@ $c, \rho \in [0, \infty]$ and all $n \in \N$:
   \item if $q < \infty$, the tail $(0, \dots, 0, a_n, a_{n+1}, \dots)$ has the $\ell_q$ norm
     $\|(a_{n+k})_k\|_{\ell_q}$.
 \end{enumerate}
+For every $p \in (0, \infty]$, every finite set $I$, every $B \in [0, \infty]$ and every family
+$(a_i)_{i \in I}$ in $[0, \infty]$ with $a_i \leq B$ for every $i$,
+$\|a\|_{\ell_p} \leq (\# I)^{1/p} B$, with $1/p = 0$ for $p = \infty$. For every
+$p \in (0, \infty)$ and all finite sets $I$, $M$, $N$, every family $a$ on $I$ has
+$\|a\|_{\ell_p} = (\sum_{i \in I} a_i^p)^{1/p}$, and every family $b$ on $M \times N$ has
+$\|b\|_{\ell_p}^p = \sum_{m \in M} \|(b_{m,n})_{n \in N}\|_{\ell_p}^p$.
 \end{lemma}
 
 \begin{proof}
@@ -369,7 +376,10 @@ then $a_k^r = a_k^{r-q} a_k^q \leq M^{r-q} a_k^q$, and summation gives
 $\|a\|_{\ell_r}^r \leq M^r$. The fifth is the third applied to $a_0 \delta_0$ and the rest,
 and induction on $m$. The sixth is the fourth and the geometric series, the seventh is the
 fourth for a sequence with finitely many nonzero terms, and the last compares the series of the
-$q$-th powers term by term.
+$q$-th powers term by term. For a finite set $I$ the counting measure of $I$ is $\# I$, so the
+bound by $B$ is Mathlib's \texttt{eLpNorm\_\allowbreak le\_\allowbreak of\_\allowbreak
+ae\_\allowbreak enorm\_\allowbreak bound}; the two identities are the series of $p$-th powers
+written as finite sums.
 \end{proof}
 
 The next lemma holds for every $q \in (0, \infty]$, also below $1$, and for families on any
@@ -448,10 +458,10 @@ $\|a\|_{\ell_q} = \sup_{J \in \N} \|(a_k \mathbf 1_{\{k < J\}})_k\|_{\ell_q}$.
 
 \begin{proof}
 \leanok
-For finite sums this follows from \Cref{lem:lq-basic} by induction. The partial sums increase
-to the series, and the $\ell_q$ norm of an increasing sequence of families on $I$ is the
-supremum of their norms, by monotone convergence. The truncations of $a$ increase to $a$, so
-the same argument gives the last identity.
+\uses{lem:lp-series-minkowski}
+The first two claims are \Cref{lem:lp-series-minkowski} for the counting measure on $I$; for
+finite sums Minkowski's inequality is Mathlib's \texttt{eLpNorm\_sum\_le}. The truncations of
+$a$ increase to $a$, so the second claim gives the last identity.
 \end{proof}
 
 The following two inequalities are the discrete Hardy inequalities: a tail sum and a partial
@@ -600,12 +610,15 @@ and $\min(x, x^{-1})^2 \leq \min(x, x^{-1})$ for every $x \in [0, \infty]$.
 
 \begin{proof}
 \leanok
+\uses{lem:dyadic-interpolation}
 The second claim holds since $\min(x, x^{-1}) \leq 1$. For $a = 0$ every term is $0$.
 Otherwise some $j$ has $2^j a > 1$ (Mathlib's
 \texttt{ENNReal.\allowbreak exists\_\allowbreak nat\_\allowbreak mul\_\allowbreak gt} and
 $m < 2^m$); let $j_0$ be the least such $j$. For
 $j < j_0$ the terms are at most $2^j a$, and
-$\sum_{j < j_0} 2^j a \leq 2^{j_0} a = 2 \cdot 2^{j_0 - 1} a \leq 2$ when $j_0 \geq 1$. For
+$\sum_{j < j_0} 2^j a \leq 2^{j_0} a = 2 \cdot 2^{j_0 - 1} a \leq 2$ when $j_0 \geq 1$, by
+the geometric bound $\sum_{j < N} r^j \leq r^N (r - 1)^{-1}$ of \Cref{lem:dyadic-interpolation}
+for $r = 2$. For
 $i \in \N$ the term of $j = i + j_0$ is at most
 $(2^{i + j_0} a)^{-1} = 2^{-i} (2^{j_0} a)^{-1} \leq 2^{-i}$, and $\sum_i 2^{-i} = 2$.
 \end{proof}

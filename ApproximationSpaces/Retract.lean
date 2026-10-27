@@ -99,9 +99,8 @@ theorem approxNormDyadic_extension_le {R : X →L[ℝ] Y} (Ex : ApproxExtension 
         _ ≤ u (j + γ) + v (j + γ) := by
             simp only [v, hk, ↓reduceIte, Nat.add_sub_cancel]; exact le_add_self
   have hu : lqNorm q u ≤ γ * (w * (C * ‖g‖ₑ)) := by
-    refine (ENNReal.lqNorm_le_lqNorm_one hq u).trans_eq ?_
-    rw [tsum_eq_sum (s := range γ) fun k hk => by
-      simp only [u, Finset.mem_range.not.1 hk, ↓reduceIte]]
+    refine (ENNReal.lqNorm_le_sum_of_eq_zero hq (range γ) fun k hk => by
+      simp only [u, Finset.mem_range.not.1 hk, ↓reduceIte]).trans_eq ?_
     calc ∑ k ∈ range γ, u k = ∑ _k ∈ range γ, w * (C * ‖g‖ₑ) :=
           Finset.sum_congr rfl fun k hk => by simp only [u, Finset.mem_range.1 hk, ↓reduceIte]
       _ = γ * (w * (C * ‖g‖ₑ)) := by rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul]

@@ -84,16 +84,11 @@ theorem approxNormDyadic_le_of_hasSum (hq : 1 ≤ q) {f : X} {g : ℕ → X}
             rw [approxSeqDyadic]; gcongr
             exact (approxSeq_le_of_mem (sum_range_mem hg k) f).trans (htail k)
       _ ≤ Cs * L := ENNReal.hardy_tail_le hq s (fun m => ‖g m‖ₑ)
-  have hf' : ‖f‖ₑ ≤ Cs * L := by
-    have hsup : ∀ i, dyadicWeight s i * ‖g i‖ₑ ≤ L := fun i =>
-      ENNReal.le_lqNorm (zero_lt_one.trans_le hq).ne' (fun k => dyadicWeight s k * ‖g k‖ₑ) i
+  have hf' : ‖f‖ₑ ≤ Cs * L :=
     calc ‖f‖ₑ = ‖f - ∑ j ∈ range 0, g j‖ₑ := by simp
       _ ≤ ∑' i, ‖g (0 + i)‖ₑ := htail 0
-      _ = ∑' i, dyadicWeight (-s) i * (dyadicWeight s i * ‖g i‖ₑ) := by
-          congr 1; funext i
-          rw [zero_add, ← mul_assoc, ENNReal.dyadicWeight_neg_mul_self, one_mul]
-      _ ≤ ∑' i, dyadicWeight (-s) i * L := ENNReal.tsum_le_tsum fun i => by gcongr; exact hsup i
-      _ = Cs * L := by rw [ENNReal.tsum_mul_right, ENNReal.tsum_dyadicWeight_neg]
+      _ ≤ Cs * L := by
+          simpa only [zero_add] using ENNReal.tsum_le_lqNorm_dyadicWeight hq s (‖g ·‖ₑ)
   calc A.approxNormDyadic s q f = ‖f‖ₑ + lqNorm q (A.approxSeqDyadic s f) := rfl
     _ ≤ Cs * L + Cs * L := add_le_add hf' hD
     _ = 2 * Cs * L := by ring

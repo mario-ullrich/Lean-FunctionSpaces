@@ -243,7 +243,7 @@ theorem tlLocalNormOn_le_higherPatchConst [Nontrivial V] (hp1 : 1 < p) (hp : p â
   refine (b.tlLocalNormOn_le_of_hasWeakLineDeriv_words hp1 hp hmL hW hf hg hfg hsupp hF).trans ?_
   rw [higherPatchConst, add_mul, mul_assoc (2 ^ m), higherGradientConst]
   refine add_le_add (mul_le_mul_right le_self_add _) (mul_le_mul_right ?_ _)
-  exact (sum_mul_le_sum_mul_sum _ _ _).trans (mul_le_mul_right le_add_self _)
+  exact (ENNReal.sum_mul_le_sum_mul_sum _ _ _).trans (mul_le_mul_right le_add_self _)
 
 end LocalMeansBump
 

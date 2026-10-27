@@ -119,9 +119,7 @@ theorem ae_integrable_conv_conv {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞
       (μ.prod μ) := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  have hq1 : 1 ≤ p.toReal := by
-    have h := ENNReal.toReal_mono hp hp1
-    rwa [ENNReal.toReal_one] at h
+  have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp1 hp
   have hfm := hf.aestronglyMeasurable
   set F : V → ℝ≥0∞ := fun z => ∫⁻ w, ‖L w‖ₑ * ‖f (z - w)‖ₑ ∂μ with hFdef
   have hF : AEMeasurable F μ := aemeasurable_lintegral_kernel hL.aestronglyMeasurable hfm
@@ -391,9 +389,7 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 theorem one_sub_one_div_toReal_nonneg {p : ℝ≥0∞} (hp1 : 1 ≤ p) : 0 ≤ 1 - 1 / p.toReal := by
   rcases eq_or_ne p ∞ with hpt | hpt
   · simp [hpt]
-  · have : 1 ≤ p.toReal := by
-      rw [← ENNReal.toReal_one]
-      exact ENNReal.toReal_mono hpt hp1
+  · have : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp1 hpt
     rw [sub_nonneg, div_le_one (by linarith)]
     exact this
 

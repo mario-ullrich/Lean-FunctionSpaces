@@ -158,8 +158,7 @@ theorem exists_eLpNorm_conv_psi_dual_le (L : ℕ) :
   set Φ₁ := 2 * eLpNorm (lpKernel (V := ℝ)) 1 volume
   set C₀ := Φ₁ * (2 * eLpNorm (momentKernel b.toFun L) 1 volume)
   set C₁ := Φ₁ * (jacksonConst ℝ L 1 * b.dualConst L)
-  have hΦ₁ : Φ₁ ≠ ∞ := ENNReal.mul_ne_top (by norm_num)
-    (memLp_one_iff_integrable.2 integrable_lpKernel).eLpNorm_ne_top
+  have hΦ₁ : Φ₁ ≠ ∞ := ENNReal.mul_ne_top (by norm_num) eLpNorm_lpKernel_ne_top
   have hC₀ : C₀ ≠ ∞ := ENNReal.mul_ne_top hΦ₁ (ENNReal.mul_ne_top (by norm_num)
     (memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top)
   have hC₁ : C₁ ≠ ∞ := ENNReal.mul_ne_top hΦ₁ (ENNReal.mul_ne_top

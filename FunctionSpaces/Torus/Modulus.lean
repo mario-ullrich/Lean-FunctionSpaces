@@ -121,47 +121,25 @@ theorem exists_coe_eq_abs_eq_norm (u : UnitAddCircle) :
 
 /-- **Scaling the modulus of order `r`**: `ω_r(f, m t)_p ≤ m^r ω_r(f, t)_p` on the torus for
 `m ≥ 1` and `1 ≤ p`, since every `h` with `‖h‖ ≤ m t` is `m h'` with `‖h'‖ ≤ t`
-(`Torus.exists_coe_eq_abs_eq_norm`) and `‖Δ^r_{m h'} f‖_p ≤ m^r ‖Δ^r_{h'} f‖_p`
-(`Rd.eLpNorm_higherDiff_nsmul_higherDiff_le`). -/
+(`Torus.exists_coe_eq_abs_eq_norm`, `Rd.modulus_nat_mul_le_of_forall_exists_nsmul`). -/
 theorem modulus_nat_mul_le {f : UnitAddTorus d → ℂ} (hf : AEStronglyMeasurable f volume)
     {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) {m : ℕ} (hm : 1 ≤ m) {t : ℝ} (ht : 0 ≤ t) :
     Rd.modulus volume r p f (m * t) ≤ (m : ℝ≥0∞) ^ r * Rd.modulus volume r p f t := by
-  refine iSup₂_le fun h hh => ?_
+  refine Rd.modulus_nat_mul_le_of_forall_exists_nsmul hf hp r fun h hh => ?_
   have hm' : (0 : ℝ) < m := by exact_mod_cast hm
   choose x hx1 hx2 using fun i => exists_coe_eq_abs_eq_norm (h i)
-  set h' : UnitAddTorus d := fun i => ((x i / m : ℝ) : UnitAddCircle)
-  have hh' : ‖h'‖ ≤ t := (pi_norm_le_iff_of_nonneg ht).2 fun i => (norm_coe_le_abs _).trans (by
-    rw [abs_div, Nat.abs_cast, div_le_iff₀ hm', hx2, mul_comm]
-    exact (norm_le_pi_norm h i).trans hh)
-  have hmh : m • h' = h := funext fun i => by
-    rw [Pi.smul_apply, ← hx1 i, ← AddCircle.coe_nsmul, nsmul_eq_mul, mul_div_cancel₀ _ hm'.ne']
-  rw [← hmh]
-  have h1 := Rd.eLpNorm_higherDiff_nsmul_higherDiff_le hf hp m h' r 0
-  simp only [Function.iterate_zero, id_eq, add_zero] at h1
-  exact h1.trans (mul_le_mul' le_rfl (Rd.eLpNorm_higherDiff_le_modulus hh'))
+  refine ⟨fun i => ((x i / m : ℝ) : UnitAddCircle), (pi_norm_le_iff_of_nonneg ht).2 fun i =>
+    (norm_coe_le_abs _).trans ?_, funext fun i => ?_⟩
+  · rw [abs_div, Nat.abs_cast, div_le_iff₀ hm', hx2, mul_comm]
+    exact (norm_le_pi_norm h i).trans hh
+  · rw [Pi.smul_apply, ← hx1 i, ← AddCircle.coe_nsmul, nsmul_eq_mul, mul_div_cancel₀ _ hm'.ne']
 
 /-- **The modulus of order `r` grows polynomially**: `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` on the
-torus for `c, t ≥ 0`, from `Torus.modulus_nat_mul_le` with `m = max 1 ⌈c⌉`. -/
+torus for `c, t ≥ 0` (`Torus.modulus_nat_mul_le`, `Rd.modulus_mul_le_of_nat_mul_le`). -/
 theorem modulus_mul_le {f : UnitAddTorus d → ℂ} (hf : AEStronglyMeasurable f volume)
     {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) {c t : ℝ} (hc : 0 ≤ c) (ht : 0 ≤ t) :
-    Rd.modulus volume r p f (c * t) ≤ ENNReal.ofReal (1 + c) ^ r * Rd.modulus volume r p f t := by
-  set m := max 1 ⌈c⌉₊
-  have hm : 1 ≤ m := le_max_left _ _
-  have hcm : c ≤ m := (Nat.le_ceil c).trans (by exact_mod_cast le_max_right 1 ⌈c⌉₊)
-  have hm1 : (m : ℝ) ≤ 1 + c := by
-    rcases le_total 1 ⌈c⌉₊ with h | h
-    · rw [show m = ⌈c⌉₊ from max_eq_right h]
-      linarith [Nat.ceil_lt_add_one hc]
-    · rw [show m = 1 from max_eq_left h]
-      push_cast
-      linarith
-  calc Rd.modulus volume r p f (c * t) ≤ Rd.modulus volume r p f (m * t) :=
-        Rd.modulus_mono r p f (mul_le_mul_of_nonneg_right hcm ht)
-    _ ≤ (m : ℝ≥0∞) ^ r * Rd.modulus volume r p f t := modulus_nat_mul_le hf hp r hm ht
-    _ ≤ ENNReal.ofReal (1 + c) ^ r * Rd.modulus volume r p f t := by
-        gcongr
-        rw [← ENNReal.ofReal_natCast]
-        exact ENNReal.ofReal_le_ofReal hm1
+    Rd.modulus volume r p f (c * t) ≤ ENNReal.ofReal (1 + c) ^ r * Rd.modulus volume r p f t :=
+  Rd.modulus_mul_le_of_nat_mul_le hc ht fun _ hm => modulus_nat_mul_le hf hp r hm ht
 
 /-- `|e^(ix) - 1|² = 2 - 2 cos x`. -/
 theorem norm_exp_I_mul_sub_one_sq (x : ℝ) :

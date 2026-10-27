@@ -26,8 +26,7 @@ on `ℕ`, so Minkowski's inequality (`MeasureTheory.eLpNorm_add_le`) and monoton
 free from Mathlib.  The alternative, Mathlib's normed space `lp`, would require summability
 proofs for every sequence that enters.
 
-The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥0∞` scalars
-(also of `L_p` norms of `[0, ∞]`-valued functions, `MeasureTheory.eLpNorm_const_mul_ennreal`),
+The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥0∞` scalars,
 **monotonicity in `q`** (`lqNorm r a ≤ lqNorm q a` for `1 ≤ q ≤ r`; Mathlib has only the
 inclusion `lp.monotone`, without the norm bound), the Cauchy–Schwarz inequality
 `∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for series and for finite sums
@@ -36,7 +35,18 @@ first term, tails of sequences (`ENNReal.lqNorm_ite_le_eq`), sequences with one 
 (`Rd.lqNorm_ite_eq`), reindexing along bijections and injections
 (`ENNReal.lqNorm_comp_equiv`, `ENNReal.lqNorm_extend_zero`), the `ℓ_q` norm of the geometric
 sequence for every `q` (`ENNReal.dyadicGeomConst`), and the **dyadic weights**
-`dyadicWeight s k = 2 ^ (k s)` that every approximation space uses.
+`dyadicWeight s k = 2 ^ (k s)` that every approximation space uses, with the identity
+`2^(ks) 2^(-(k-j)σ) = 2^(-k(σ-s)) 2^(jσ)` of almost diagonal estimates
+(`ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub`).  Two inequalities in `[0, ∞]`,
+`a x + b y ≤ (a + b)(x + y)` and `∑_i a_i b_i ≤ (∑_i a_i)(∑_i b_i)`
+(`ENNReal.mul_add_mul_le_add_mul_add`, `ENNReal.sum_mul_le_sum_mul_sum`), bound sums of
+products by products of sums.
+
+For `L_p` norms of functions with values in `[0, ∞]` the file proves homogeneity
+(`MeasureTheory.eLpNorm_const_mul_ennreal`), powers inside the norm
+(`MeasureTheory.eLpNorm_fun_rpow`), monotone convergence
+(`MeasureTheory.eLpNorm_iSup_of_directed`) and Minkowski's inequality for series
+(`MeasureTheory.eLpNorm_tsum_le`); the `ℓ_q` versions are their cases for the counting measure.
 -/
 
 @[expose] public section
@@ -211,24 +221,14 @@ theorem lqNorm_eq_sum [Fintype ι] (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ι → 
     lqNorm q a = (∑ i, a i ^ q.toReal) ^ (1 / q.toReal) := by
   rw [lqNorm_eq_tsum hq0 hq, tsum_fintype]
 
-/-- For a finite index set, a family bounded by `B` has `‖a‖_{ℓ_q} ≤ (#ι)^(1/q) B`, `q ≠ 0`. -/
-theorem lqNorm_le_card_rpow_mul [Fintype ι] (hq0 : q ≠ 0) {B : ℝ≥0∞} (h : ∀ i, a i ≤ B) :
+/-- For a finite index set, a family bounded by `B` has `‖a‖_{ℓ_q} ≤ (#ι)^(1/q) B` (Mathlib's
+`eLpNorm_le_of_ae_enorm_bound`, with `#ι` the counting measure of `ι`). -/
+theorem lqNorm_le_card_rpow_mul [Fintype ι] {B : ℝ≥0∞} (h : ∀ i, a i ≤ B) :
     lqNorm q a ≤ (Fintype.card ι : ℝ≥0∞) ^ (1 / q.toReal) * B := by
-  rcases eq_or_ne q ∞ with rfl | hq
-  · have h0 : (1 : ℝ) / (∞ : ℝ≥0∞).toReal = 0 := by simp
-    rw [lqNorm_top, h0, ENNReal.rpow_zero, one_mul]
-    exact iSup_le h
-  have hq' : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
-  rw [lqNorm_eq_sum hq0 hq]
-  calc (∑ i, a i ^ q.toReal) ^ (1 / q.toReal)
-      ≤ (∑ _i : ι, B ^ q.toReal) ^ (1 / q.toReal) := by
-        gcongr with i
-        exact h i
-    _ = ((Fintype.card ι : ℝ≥0∞) * B ^ q.toReal) ^ (1 / q.toReal) := by
-        rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]
-    _ = (Fintype.card ι : ℝ≥0∞) ^ (1 / q.toReal) * B := by
-        rw [ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_mul,
-          mul_one_div_cancel hq'.ne', ENNReal.rpow_one]
+  refine (eLpNorm_le_of_ae_enorm_bound (aestronglyMeasurable_count a)
+    (Eventually.of_forall h)).trans_eq ?_
+  rw [Measure.count_univ, ENat.card_eq_coe_fintype_card, ENat.toENNReal_coe, smul_eq_mul,
+    mul_comm, one_div]
 
 /-- **The `ℓ_q` norm on a finite product**: `‖a‖_{ℓ_q(M × N)}^q = ∑_m ‖a_{m,·}‖_{ℓ_q(N)}^q` for
 `0 < q < ∞`. -/
@@ -296,50 +296,29 @@ end Generic
 variable {q r : ℝ≥0∞} {a b : ℕ → ℝ≥0∞}
 
 /-- Dropping the first term does not increase the norm. -/
-theorem lqNorm_shift_le (a : ℕ → ℝ≥0∞) : lqNorm q (fun n => a (n + 1)) ≤ lqNorm q a := by
-  rcases eq_or_ne q 0 with rfl | hq0
-  · simp
-  rcases eq_or_ne q ∞ with rfl | hq
-  · rw [lqNorm_top, lqNorm_top]; exact iSup_le fun n => le_iSup a (n + 1)
-  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
-  rw [lqNorm_eq_tsum hq0 hq, lqNorm_eq_tsum hq0 hq]
-  exact ENNReal.rpow_le_rpow
-    (ENNReal.tsum_comp_le_tsum_of_injective (add_left_injective 1) (fun n => a n ^ q.toReal))
-    (by positivity)
+theorem lqNorm_shift_le (a : ℕ → ℝ≥0∞) : lqNorm q (fun n => a (n + 1)) ≤ lqNorm q a :=
+  lqNorm_comp_le_of_injective (add_left_injective 1) a
 
-/-- **Splitting off the first term**: `‖a‖_q ≤ a 0 + ‖(a (n + 1))ₙ‖_q`. -/
+/-- **Splitting off the first term**: `‖a‖_q ≤ a 0 + ‖(a (n + 1))ₙ‖_q`, by Minkowski's
+inequality for `a = (a 0, 0, 0, …) + (0, a 1, a 2, …)`, the second summand being the extension by
+zero of `(a (n + 1))ₙ` along `n ↦ n + 1` (`ENNReal.lqNorm_extend_zero`). -/
 theorem lqNorm_le_head_add_shift (hq : 1 ≤ q) (a : ℕ → ℝ≥0∞) :
     lqNorm q a ≤ a 0 + lqNorm q (fun n => a (n + 1)) := by
-  have hq0 : q ≠ 0 := (zero_lt_one.trans_le hq).ne'
-  set e : ℕ → ℝ≥0∞ := fun n => if n = 0 then a 0 else 0
-  set b : ℕ → ℝ≥0∞ := fun n => if n = 0 then 0 else a n
-  have hab : a = fun n => e n + b n := by
-    funext n; rcases n with _ | n <;> simp [e, b]
-  have he : lqNorm q e ≤ a 0 := by
-    rcases eq_or_ne q ∞ with rfl | hq'
-    · rw [lqNorm_top]; exact iSup_le fun n => by simp only [e]; split_ifs <;> simp
-    have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq'
-    rw [lqNorm_eq_tsum hq0 hq']
-    have : ∑' n, e n ^ q.toReal = a 0 ^ q.toReal := by
-      rw [tsum_eq_single 0 fun n hn => by simp [e, hn, ENNReal.zero_rpow_of_pos hp]]
-      simp [e]
-    rw [this, one_div, ENNReal.rpow_rpow_inv hp.ne']
-  have hb : lqNorm q b = lqNorm q (fun n => a (n + 1)) := by
-    rcases eq_or_ne q ∞ with rfl | hq'
-    · rw [lqNorm_top, lqNorm_top]
-      apply le_antisymm
-      · exact iSup_le fun n => by
-          rcases n with _ | n
-          · simp [b]
-          · simpa [b] using le_iSup (fun n => a (n + 1)) n
-      · exact iSup_le fun n => by simpa [b] using le_iSup b (n + 1)
-    have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq'
-    rw [lqNorm_eq_tsum hq0 hq', lqNorm_eq_tsum hq0 hq',
-      tsum_eq_zero_add' ENNReal.summable]
-    simp [b, ENNReal.zero_rpow_of_pos hp]
-  calc lqNorm q a = lqNorm q (fun n => e n + b n) := by rw [← hab]
-    _ ≤ lqNorm q e + lqNorm q b := lqNorm_add_le hq e b
-    _ ≤ a 0 + lqNorm q (fun n => a (n + 1)) := by rw [hb]; gcongr
+  have hab : a = fun n => (if n = 0 then a 0 else 0) +
+      Function.extend (· + 1) (fun n => a (n + 1)) 0 n := by
+    funext n
+    rcases n with _ | n
+    · simp
+    · simp [(add_left_injective 1).extend_apply (fun n => a (n + 1)) 0 n]
+  calc lqNorm q a ≤ lqNorm q (fun n => if n = 0 then a 0 else 0) +
+        lqNorm q (Function.extend (· + 1) (fun n => a (n + 1)) 0) := by
+        conv_lhs => rw [hab]
+        exact lqNorm_add_le hq _ _
+    _ ≤ a 0 + lqNorm q (fun n => a (n + 1)) := by
+        rw [lqNorm_extend_zero (add_left_injective 1)]
+        gcongr
+        refine (lqNorm_le_sum_of_eq_zero hq {0} fun n hn => ?_).trans_eq (by simp)
+        simp [Finset.mem_singleton.not.1 hn]
 
 /-- **Splitting off the first `m` terms**: `‖a‖_q ≤ a 0 + ⋯ + a (m - 1) + ‖(a (n + m))ₙ‖_q`. -/
 theorem lqNorm_le_sum_range_add_shift (hq : 1 ≤ q) (a : ℕ → ℝ≥0∞) (m : ℕ) :
@@ -424,6 +403,17 @@ theorem dyadicWeight_neg_mul_self (s : ℝ) (k : ℕ) : dyadicWeight (-s) k * dy
 theorem dyadicWeight_mul_neg_self (s : ℝ) (k : ℕ) : dyadicWeight s k * dyadicWeight (-s) k = 1 := by
   rw [mul_comm, dyadicWeight_neg_mul_self]
 
+/-- **Trading growth for decay**: `2^(ks) 2^(-(k-j)σ) = 2^(-k(σ-s)) 2^(jσ)` for `j ≤ k`, the
+identity behind every almost diagonal estimate. -/
+theorem dyadicWeight_mul_dyadicWeight_neg_sub (s σ : ℝ) {j k : ℕ} (hjk : j ≤ k) :
+    dyadicWeight s k * dyadicWeight (-σ) (k - j) =
+      dyadicWeight (-(σ - s)) k * dyadicWeight σ j := by
+  simp only [dyadicWeight]
+  rw [← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top,
+    ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top, Nat.cast_sub hjk]
+  congr 1
+  ring
+
 /-- `(2^(ks))^p = 2^(k s p)`. -/
 theorem dyadicWeight_rpow (s p : ℝ) (k : ℕ) : dyadicWeight s k ^ p = dyadicWeight (s * p) k := by
   rw [dyadicWeight, dyadicWeight, ← ENNReal.rpow_mul, mul_assoc]
@@ -484,6 +474,12 @@ theorem two_rpow_neg_lt_one {α : ℝ} (hα : 0 < α) : (2 : ℝ≥0∞) ^ (-α)
 theorem one_sub_two_rpow_neg_inv_ne_top {α : ℝ} (hα : 0 < α) : (1 - (2 : ℝ≥0∞) ^ (-α))⁻¹ ≠ ∞ := by
   rw [ENNReal.inv_ne_top]
   exact (tsub_pos_of_lt (two_rpow_neg_lt_one hα)).ne'
+
+/-- The constant `2 (1 - 2^(-s))⁻¹` is finite for `s > 0`
+(`ENNReal.one_sub_two_rpow_neg_inv_ne_top`). -/
+theorem two_mul_one_sub_two_rpow_neg_inv_ne_top {s : ℝ} (hs : 0 < s) :
+    2 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ ≠ ∞ :=
+  ENNReal.mul_ne_top ENNReal.ofNat_ne_top (one_sub_two_rpow_neg_inv_ne_top hs)
 
 /-- The constant `(1 - 2 ^ (-α))⁻¹` is at least `1`. -/
 theorem one_le_one_sub_two_rpow_neg_inv (α : ℝ) : 1 ≤ (1 - (2 : ℝ≥0∞) ^ (-α))⁻¹ :=
@@ -606,13 +602,8 @@ theorem le_tsum_of_tendsto_finsetSum {E ι : Type*} [NormedAddCommGroup E] {Q : 
     {S : ℕ → Finset ι} {u : ι → E} {F : E}
     (hu : Tendsto (fun J => ∑ k ∈ S J, u k) atTop (nhds F)) :
     Q F ≤ ∑' k, Q (u k) := by
-  have hsum : ∀ s : Finset ι, Q (∑ k ∈ s, u k) ≤ ∑ k ∈ s, Q (u k) := fun s => by
-    classical
-    induction s using Finset.induction_on with
-    | empty => simpa using hle 0
-    | insert i s hi ih =>
-      rw [Finset.sum_insert hi, Finset.sum_insert hi]
-      exact (hadd _ _).trans (add_le_add le_rfl ih)
+  have hsum : ∀ s : Finset ι, Q (∑ k ∈ s, u k) ≤ ∑ k ∈ s, Q (u k) := fun s =>
+    Finset.le_sum_of_subadditive Q (by simpa using hle 0) hadd s u
   have hJ : ∀ J, Q F ≤ ∑' k, Q (u k) + C * ‖F - ∑ k ∈ S J, u k‖ₑ := fun J => by
     calc Q F = Q (∑ k ∈ S J, u k + (F - ∑ k ∈ S J, u k)) := by rw [add_sub_cancel]
       _ ≤ Q (∑ k ∈ S J, u k) + Q (F - ∑ k ∈ S J, u k) := hadd _ _
@@ -700,6 +691,23 @@ theorem lqNorm_ite_le_eq {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : 
   refine tsum_congr fun j => ?_
   split_ifs <;> simp [ENNReal.zero_rpow_of_pos hpos]
 
+/-! ### Products of sums -/
+
+/-- `a x + b y ≤ (a + b)(x + y)` in `[0, ∞]`. -/
+theorem mul_add_mul_le_add_mul_add (a b x y : ℝ≥0∞) :
+    a * x + b * y ≤ (a + b) * (x + y) := by
+  rw [add_mul, mul_add, mul_add]
+  exact add_le_add le_self_add le_add_self
+
+/-- `∑_{i ∈ s} a_i b_i ≤ (∑_{i ∈ s} a_i)(∑_{i ∈ s} b_i)` for every finite set `s` and all families
+`a, b` in `[0, ∞]`: each `b_i` is at most `∑_{j ∈ s} b_j` (Mathlib's `Finset.single_le_sum`,
+`Finset.sum_mul`). -/
+theorem sum_mul_le_sum_mul_sum {ι : Type*} (s : Finset ι) (a b : ι → ℝ≥0∞) :
+    ∑ i ∈ s, a i * b i ≤ (∑ i ∈ s, a i) * ∑ i ∈ s, b i := by
+  rw [Finset.sum_mul]
+  exact Finset.sum_le_sum fun i hi => mul_le_mul_right (Finset.single_le_sum
+    (fun j _ => zero_le) hi) _
+
 end ENNReal
 
 namespace MeasureTheory
@@ -729,6 +737,74 @@ theorem eLpNorm_const_mul_ennreal (c : ℝ≥0∞) {h : α → ℝ≥0∞} (hh :
   rw [lintegral_const_mul'' _ (hh.pow_const _), ENNReal.mul_rpow_of_nonneg _ _ (by positivity),
     ← ENNReal.rpow_mul, mul_one_div_cancel hr.ne', ENNReal.rpow_one]
 
+/-- **Powers inside an `L_p` norm**: `‖g^r‖_p = ‖g‖_{p r}^r` for `r > 0` and `g : α → [0, ∞]`
+measurable (Mathlib's `eLpNorm_enorm_rpow`). -/
+theorem eLpNorm_fun_rpow {g : α → ℝ≥0∞} (hg : AEMeasurable g μ) {r : ℝ} (hr : 0 < r)
+    (p : ℝ≥0∞) : eLpNorm (fun x => g x ^ r) p μ = eLpNorm g (p * ENNReal.ofReal r) μ ^ r := by
+  simpa only [enorm_eq_self] using eLpNorm_enorm_rpow (p := p) (μ := μ) g hg.aestronglyMeasurable hr
+
+/-- **Monotone convergence for `L_p` norms**: for a directed countable family of measurable
+functions `F_b : α → [0, ∞]`, `‖sup_b F_b‖_p = sup_b ‖F_b‖_p`. For `p < ∞` this is the monotone
+convergence theorem for `∫ F_b^p`; for `p = ∞` it holds for every countable family. -/
+theorem eLpNorm_iSup_of_directed {β : Type*} [Countable β] {F : β → α → ℝ≥0∞}
+    (hF : ∀ b, AEMeasurable (F b) μ) (hd : Directed (· ≤ ·) F) (p : ℝ≥0∞) :
+    eLpNorm (fun x => ⨆ b, F b x) p μ = ⨆ b, eLpNorm (F b) p μ := by
+  have hm : AEMeasurable (fun x => ⨆ b, F b x) μ := AEMeasurable.iSup hF
+  rcases eq_or_ne p 0 with rfl | hp0
+  · simp [eLpNorm_exponent_zero hm.aestronglyMeasurable,
+      eLpNorm_exponent_zero (hF _).aestronglyMeasurable]
+  rcases eq_or_ne p ∞ with rfl | hp
+  · simp only [eLpNorm_exponent_top hm.aestronglyMeasurable,
+      eLpNorm_exponent_top (hF _).aestronglyMeasurable, eLpNormEssSup, enorm_eq_self]
+    refine le_antisymm (essSup_le_of_ae_le _ ?_) (iSup_le fun b => essSup_mono_ae ?_)
+    · have h : ∀ᵐ x ∂μ, ∀ b, F b x ≤ essSup (F b) μ :=
+        ae_all_iff.2 fun b => ENNReal.ae_le_essSup (F b)
+      filter_upwards [h] with x hx
+      exact iSup_le fun b => (hx b).trans (le_iSup (fun b => essSup (F b) μ) b)
+    · exact Eventually.of_forall fun x => le_iSup (fun b => F b x) b
+  have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hm.aestronglyMeasurable]
+  simp_rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (hF _).aestronglyMeasurable]
+  simp only [enorm_eq_self]
+  have h1 : ∀ x, (⨆ b, F b x) ^ p.toReal = ⨆ b, F b x ^ p.toReal := fun x =>
+    (ENNReal.orderIsoRpow p.toReal hr).map_iSup (fun b => F b x)
+  simp_rw [h1]
+  rw [lintegral_iSup_directed (fun b => (hF b).pow_const _) ?_]
+  · exact (ENNReal.orderIsoRpow (1 / p.toReal) (by positivity)).map_iSup _
+  · intro b₁ b₂
+    obtain ⟨c, h₁, h₂⟩ := hd b₁ b₂
+    exact ⟨c, fun x => ENNReal.rpow_le_rpow (h₁ x) hr.le,
+      fun x => ENNReal.rpow_le_rpow (h₂ x) hr.le⟩
+
+/-- **Minkowski's inequality for series** in `L_p`, `1 ≤ p ≤ ∞`, on any measure space: for
+`g_i : α → [0, ∞]` indexed by a countable set, `‖∑_i g_i‖_p ≤ ∑_i ‖g_i‖_p`. If some `g_i` is not
+measurable, then `‖g_i‖_p = ∞` and so is the right side. Otherwise the series is the supremum of
+its finite partial sums, and this follows from Mathlib's finite version `eLpNorm_sum_le` by
+monotone convergence (`MeasureTheory.eLpNorm_iSup_of_directed`). -/
+theorem eLpNorm_tsum_le {ι : Type*} [Countable ι] {g : ι → α → ℝ≥0∞} {p : ℝ≥0∞} (hp1 : 1 ≤ p) :
+    eLpNorm (fun x => ∑' i, g i x) p μ ≤ ∑' i, eLpNorm (g i) p μ := by
+  by_cases hg : ∀ i, AEMeasurable (g i) μ
+  swap
+  · obtain ⟨i, hi⟩ := not_forall.1 hg
+    have h : eLpNorm (g i) p μ = ∞ :=
+      eLpNorm_of_not_aestronglyMeasurable fun h => hi h.aemeasurable
+    rw [ENNReal.tsum_eq_top_of_eq_top ⟨i, h⟩]
+    exact le_top
+  have h : (fun x => ∑' i, g i x) = fun x => ⨆ s : Finset ι, ∑ i ∈ s, g i x := by
+    funext x
+    exact ENNReal.tsum_eq_iSup_sum
+  have hmono : Monotone fun (s : Finset ι) (x : α) => ∑ i ∈ s, g i x := fun s t hst x =>
+    Finset.sum_le_sum_of_subset hst
+  rw [h, eLpNorm_iSup_of_directed (fun s => Finset.aemeasurable_fun_sum s fun i _ => hg i)
+    hmono.directed_le p]
+  refine iSup_le fun s => ?_
+  calc eLpNorm (fun x => ∑ i ∈ s, g i x) p μ = eLpNorm (∑ i ∈ s, g i) p μ := by
+        congr 1
+        funext x
+        simp [Finset.sum_apply]
+    _ ≤ ∑ i ∈ s, eLpNorm (g i) p μ := eLpNorm_sum_le hp1
+    _ ≤ ∑' i, eLpNorm (g i) p μ := ENNReal.sum_le_tsum s
+
 end MeasureTheory
 
 /-- `(1 + t)^N ≤ 2^N (1 + t^N)` for `t ≥ 0`, from Mathlib's `add_pow_le`. -/
@@ -748,16 +824,13 @@ open ENNReal (lqNorm)
 /-- `‖(…, 0, x, 0, …)‖_{ℓ_q} = x` for a sequence with one nonzero term. -/
 theorem lqNorm_ite_eq {q : ℝ≥0∞} (hq : 1 ≤ q) (j : ℕ) (x : ℝ≥0∞) :
     lqNorm q (fun i => if i = j then x else 0) = x := by
-  rcases eq_or_ne q ∞ with rfl | hqt
-  · rw [ENNReal.lqNorm_top]
-    refine le_antisymm (iSup_le fun i => ?_) (le_iSup_of_le j (by simp))
-    split_ifs <;> simp
-  · have hq0 : q ≠ 0 := (zero_lt_one.trans_le hq).ne'
-    have hpos : 0 < q.toReal := ENNReal.toReal_pos hq0 hqt
-    rw [ENNReal.lqNorm_eq_tsum hq0 hqt]
-    have h : (fun i => (if i = j then x else 0) ^ q.toReal) =
-        fun i => if i = j then x ^ q.toReal else 0 := funext fun i => by
-      split_ifs <;> simp [ENNReal.zero_rpow_of_pos hpos]
-    rw [h, tsum_ite_eq, one_div, ENNReal.rpow_rpow_inv hpos.ne']
+  have h : (fun i => if i = j then x else 0) = ({j} : Set ℕ).indicator fun _ => x := by
+    funext i
+    by_cases hi : i = j
+    · rw [Set.indicator_of_mem (Set.mem_singleton_iff.2 hi)]; simp [hi]
+    · rw [Set.indicator_of_notMem (mt Set.mem_singleton_iff.1 hi)]; simp [hi]
+  rw [lqNorm, h, eLpNorm_indicator_const' (measurableSet_singleton j).nullMeasurableSet
+    (by simp) (zero_lt_one.trans_le hq).ne', Measure.count_singleton, ENNReal.one_rpow, mul_one]
+  rfl
 
 end Rd

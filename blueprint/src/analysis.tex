@@ -288,13 +288,13 @@ e^{2\pi i \langle x, \xi \rangle}$.
 
 \begin{lemma}[The Fourier transform of integrable functions]
 \label{lem:fourier-integrable}
-\lean{Rd.integral_fourier_smul_eq_of_integrable, Rd.norm_fourier_le_integral_norm,
+\lean{Rd.integral_fourier_mul, Rd.integral_fourierInv_mul,
+  Rd.integral_fourier_smul_eq_of_integrable, Rd.norm_fourier_le_integral_norm,
   Rd.enorm_fourier_le_lintegral, Rd.memLp_top_fourier, Rd.continuous_fourierInv_of_integrable,
   Rd.norm_fourierInv_le_integral_norm, Rd.integral_fourierInv_smul_eq_of_integrable}
 \leanok
 \uses{lem:fourier-conv}
-For every Schwartz function $u$ and every integrable $g$ on $V$,
-$\int \widehat u \, g = \int u \, \widehat g$ and
+For all integrable $u, g$ on $V$, $\int \widehat u \, g = \int u \, \widehat g$ and
 $\int (\mathcal F^{-1} u) \, g = \int u \, \mathcal F^{-1} g$. For every integrable $K$ on $V$,
 $|\widehat K(\xi)| \leq \|K\|_1$ for every $\xi \in V$, $\widehat K \in L_\infty$, and the inverse
 Fourier transform
@@ -304,16 +304,23 @@ with $|\mathcal F^{-1} K(x)| \leq \|K\|_1$ for every $x \in V$.
 
 \begin{proof}
 \leanok
-Mathlib's \texttt{VectorFourier.\allowbreak integral\_\allowbreak fourierIntegral\_\allowbreak
-smul\_\allowbreak eq\_\allowbreak flip} and \texttt{VectorFourier.\allowbreak norm\_\allowbreak
-fourierIntegral\_\allowbreak le\_\allowbreak integral\_\allowbreak norm}; $\widehat K$ is
+By Fubini's theorem both sides of the first identity are the double integral
+$\int \int e^{-2\pi i \langle x, \xi \rangle} u(x) g(\xi) \, dx \, d\xi$ (Mathlib's
+\texttt{VectorFourier.\allowbreak integral\_\allowbreak bilin\_\allowbreak
+fourierIntegral\_\allowbreak eq\_\allowbreak flip} with the product as bilinear form). The
+bound $|\widehat K(\xi)| \leq \|K\|_1$ is Mathlib's
+\texttt{VectorFourier.\allowbreak norm\_\allowbreak fourierIntegral\_\allowbreak
+le\_\allowbreak integral\_\allowbreak norm}; $\widehat K$ is
 continuous by \Cref{lem:fourier-conv}, hence measurable. For the inverse transform,
 $\mathcal F^{-1} K(x) = \widehat K(-x)$ (Mathlib's \texttt{Real.\allowbreak
 fourierInv\_\allowbreak eq\_\allowbreak fourier\_\allowbreak neg}), and the identity is
-\texttt{VectorFourier.\allowbreak integral\_\allowbreak fourierIntegral\_\allowbreak
-smul\_\allowbreak eq\_\allowbreak flip} for the pairing $(\xi, x) \mapsto -\langle \xi, x \rangle$,
-which is symmetric.
+the same double integral for the pairing $(\xi, x) \mapsto -\langle \xi, x \rangle$, which is
+symmetric.
 \end{proof}
+
+Schwartz functions are integrable, so both identities hold for every Schwartz function $u$ and
+every integrable $g$ (\texttt{Rd.\allowbreak integral\_\allowbreak fourier\_\allowbreak
+smul\_\allowbreak eq\_\allowbreak of\_\allowbreak integrable} and its inverse form).
 
 \begin{definition}[Cut-offs and kernels]
 \label{def:lp-kernels}
@@ -339,6 +346,7 @@ $\psi_j = \Phi_j - \Phi_{j-1}$ for $j \geq 1$.
   Rd.sum_psi, Rd.integrable_Phi, Rd.integrable_Theta, Rd.integrable_psi, Rd.continuous_Phi,
   Rd.continuous_Theta, Rd.continuous_psi, Rd.bddAbove_Phi, Rd.bddAbove_Theta, Rd.bddAbove_psi,
   Rd.eLpNorm_Phi_one, Rd.eLpNorm_Theta_one, Rd.eLpNorm_bandKernel_ne_top,
+  Rd.eLpNorm_lpKernel_ne_top, Rd.eLpNorm_lpKernel_lt_top,
   Rd.lintegral_enorm_Theta, Rd.eLpNorm_psi_one_le, Rd.integral_Phi}
 \leanok
 \uses{def:lp-kernels, lem:dilate}
@@ -1585,10 +1593,12 @@ $0 < t < \infty$,
 
 \begin{proof}
 \leanok
+\uses{lem:chebyshev-power}
 Decompose $G$ at height $t$. Off $\Omega^*$, \Cref{lem:calderon-zygmund-good-parts} gives
 $\overline M g \leq (1 + 3^n) \|(M(\mathcal G g_j))_j\|_{\ell_q}$, so the level set lies in the
-union of $\Omega^*$ and the set $E$ where the right side exceeds $t$. By Chebyshev's inequality,
-\Cref{lem:fefferman-stein-diagonal} and \Cref{lem:calderon-zygmund-good-parts},
+union of $\Omega^*$ and the set $E$ where the right side exceeds $t$. By
+\Cref{lem:chebyshev-power} with $r = q$, \Cref{lem:fefferman-stein-diagonal} and
+\Cref{lem:calderon-zygmund-good-parts},
 \[
   t^q |E| \leq (1 + 3^n)^q \, C_{n,q} \int \|(\mathcal G g_j(x))_j\|_{\ell_q}^q \, dx
   \leq (1 + 3^n)^q \, C_{n,q} \, (2^n t)^{q-1} \int G,
@@ -1622,13 +1632,14 @@ $g_j : V \to [0, \infty]$, $j \in \N$, with $\int G^p < \infty$ and every $\tau 
 
 \begin{proof}
 \leanok
+\uses{lem:chebyshev-power}
 The pointwise $\ell_q$ norm of $(\mathbf 1_S g_j)_j$ is $\mathbf 1_S G$. Since
 $g_j = \mathbf 1_S g_j + \mathbf 1_{V \setminus S} g_j$, the subadditivity of $M$ and
 Minkowski's inequality in $\ell_q$ give
 $\overline M g \leq \overline M(\mathbf 1_S g) + \overline M(\mathbf 1_{V \setminus S} g)$, so
 $\{\overline M g > s\}$ lies in
 $\{\overline M(\mathbf 1_S g) > s/2\} \cup \{\overline M(\mathbf 1_{V \setminus S} g) > s/2\}$.
-\Cref{thm:vector-weak-type} bounds the first set, Chebyshev's inequality and
+\Cref{thm:vector-weak-type} bounds the first set, \Cref{lem:chebyshev-power} with $r = q$ and
 \Cref{lem:fefferman-stein-diagonal} the second. The last bound is the first for
 $S = \{G > \tau\}$, on which $G$ is integrable by \Cref{lem:parts-above-below-level}, with
 $(\tau/2)^{-1} \tau^{p-1} = 2 \tau^{p-2}$ and $(\tau/2)^{-q} \tau^{p-1} = 2^q \tau^{p-1-q}$
@@ -2145,6 +2156,22 @@ is the first integral for $a = \infty$ and the second for $a = 0$. For $a = \inf
 integral vanishes.
 \end{proof}
 
+\begin{lemma}[Chebyshev's inequality with a power]
+\label{lem:chebyshev-power}
+\lean{MeasureTheory.measure_lt_le_inv_rpow_mul_lintegral}
+\leanok
+For every measure space $(X, \mu)$, every almost everywhere measurable $F : X \to [0, \infty]$,
+every $r > 0$ and every $t \in (0, \infty)$,
+\[
+  \mu\{F > t\} \leq t^{-r} \int F^r \, d\mu .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $\{F > t\}$, $t^r \leq F^r$, and Markov's inequality for $F^r$ at height $t^r$ applies.
+\end{proof}
+
 \begin{lemma}[The parts above and below a level]
 \label{lem:parts-above-below-level}
 \lean{MeasureTheory.lintegral_indicator_lt_le, MeasureTheory.lintegral_indicator_compl_rpow_le,
@@ -2246,10 +2273,12 @@ $\nu\{F > \tau\} \, \tau^{p-1} \leq 2 C_1 \tau^{p-2} I_1 + 4 C_2 \tau^{p-3} I_2$
 
 \begin{proof}
 \leanok
+\uses{lem:chebyshev-power}
 The identities are computations with real powers. Almost every point of $\{F > \tau\}$ lies in
 $\{F_1 > \tau/2\} \cup \{F_2 > \tau/2\}$ (the distribution of a sum in
-\Cref{lem:distribution-weak-norm-basic}, with $c = 1$), and Chebyshev's inequality gives
-$\nu\{F_2 > \tau/2\} \leq (\tau/2)^{-2} C_2 I_2$. The identities with $r = 2$ finish the proof.
+\Cref{lem:distribution-weak-norm-basic}, with $c = 1$), and \Cref{lem:chebyshev-power} with
+$r = 2$ gives $\nu\{F_2 > \tau/2\} \leq (\tau/2)^{-2} C_2 I_2$. The identities with $r = 2$
+finish the proof.
 \end{proof}
 
 \begin{definition}[The Marcinkiewicz constants]

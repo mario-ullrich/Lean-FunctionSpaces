@@ -20,7 +20,9 @@ For `f : V → ℂ`, a step `h ∈ V` and `r ∈ ℕ`, the **difference** of ord
 `(fwdDiff h)^[r] f` itself, for which Mathlib has its lemmas; the files on intervals and cubes use
 the name.  Expanded, `Δ_h^r f(x) = ∑_{l ≤ r} (-1)^(r-l) C(r, l) f(x + l h)`
 (`Rd.higherDiff_apply`); hence `|Δ_h^r f(x)| ≤ ∑_{l ≤ r} C(r, l) |f(x + l h)|`
-(`Rd.enorm_higherDiff_le_sum`), and `(x, h) ↦ |Δ_h^r f(x)|` is measurable for measurable `f`
+(`Rd.enorm_higherDiff_le_sum`), so `|Δ_h^r f(x)| ≤ 2^r B` if `|f| ≤ B` at the points `x + l h`
+(`Rd.enorm_higherDiff_le_of_bound_steps`), and `(x, h) ↦ |Δ_h^r f(x)|` is measurable for
+measurable `f`
 (`Rd.measurable_enorm_higherDiff_uncurry`). A negative step reflects the difference:
 `Δ_{-h}^r f(x) = (-1)^r Δ_h^r f(x - r h)` (`Rd.higherDiff_neg`). For a Haar
 measure `μ` the **modulus of smoothness** in `L_p(μ)` is
@@ -32,7 +34,10 @@ depends only on the class of `f` modulo null sets (`Rd.modulus_congr_ae`).
 `c, t ≥ 0`. For an integer `m ≥ 1`, `Δ_{mh} = ∑_{i<m} τ_{ih} Δ_h` with the translations
 `τ_a g = g(· + a)` (`Rd.fwdDiff_nsmul`), translations commute with differences
 (`Rd.higherDiff_comp_add`), and translations keep `L_p` norms, so
-`‖Δ_{mh}^r f‖_p ≤ m^r ‖Δ_h^r f‖_p` (`Rd.eLpNorm_higherDiff_nsmul_higherDiff_le`).
+`‖Δ_{mh}^r f‖_p ≤ m^r ‖Δ_h^r f‖_p` (`Rd.eLpNorm_higherDiff_nsmul_higherDiff_le`). The two steps,
+from steps `m h'` to the scale `m t` and from integers to real dilations
+(`Rd.modulus_nat_mul_le_of_forall_exists_nsmul`, `Rd.modulus_mul_le_of_nat_mul_le`), hold on
+every normed group, the torus included.
 
 `Rd.lpModulus` samples the modulus of `f ∈ L_p` at the dyadic scales `2^(-k)`.  The file needs
 only Mathlib; differences of convolutions and dilations are in
@@ -144,15 +149,22 @@ theorem enorm_higherDiff_le_sum (r : ℕ) (h : V) (f : V → ℂ) (x : V) :
     ← ofReal_norm, Complex.norm_natCast, ENNReal.ofReal_natCast]
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
-/-- `|Δ_h^r f| ≤ 2^r B` for `|f| ≤ B`: the binomial weights of `Rd.enorm_higherDiff_le_sum` sum
-to `2^r` (Mathlib's `Nat.sum_range_choose`). -/
-theorem enorm_higherDiff_le_of_bound {f : V → ℂ} {B : ℝ≥0∞}
-    (hf : ∀ y, ‖f y‖ₑ ≤ B) (r : ℕ) (h x : V) : ‖(fwdDiff h)^[r] f x‖ₑ ≤ 2 ^ r * B := by
-  refine (enorm_higherDiff_le_sum r h f x).trans
-    ((Finset.sum_le_sum fun l _ => mul_le_mul' le_rfl (hf _)).trans_eq ?_)
+/-- `|Δ_h^r f(x)| ≤ 2^r B` if `|f(x + l h)| ≤ B` at the points `l = 0, …, r` of the difference:
+the binomial weights of `Rd.enorm_higherDiff_le_sum` sum to `2^r` (Mathlib's
+`Nat.sum_range_choose`). -/
+theorem enorm_higherDiff_le_of_bound_steps {f : V → ℂ} {B : ℝ≥0∞} {r : ℕ} {h x : V}
+    (hf : ∀ l ≤ r, ‖f (x + (l : ℝ) • h)‖ₑ ≤ B) : ‖(fwdDiff h)^[r] f x‖ₑ ≤ 2 ^ r * B := by
+  refine (enorm_higherDiff_le_sum r h f x).trans ((Finset.sum_le_sum fun l hl =>
+    mul_le_mul' le_rfl (hf l (Nat.lt_succ_iff.1 (Finset.mem_range.1 hl)))).trans_eq ?_)
   rw [← Finset.sum_mul]
   congr 1
   exact_mod_cast Nat.sum_range_choose r
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- `|Δ_h^r f| ≤ 2^r B` for `|f| ≤ B` (`Rd.enorm_higherDiff_le_of_bound_steps`). -/
+theorem enorm_higherDiff_le_of_bound {f : V → ℂ} {B : ℝ≥0∞}
+    (hf : ∀ y, ‖f y‖ₑ ≤ B) (r : ℕ) (h x : V) : ‖(fwdDiff h)^[r] f x‖ₑ ≤ 2 ^ r * B :=
+  enorm_higherDiff_le_of_bound_steps fun _ _ => hf _
 
 /-- For measurable `f` the differences `(x, h) ↦ |Δ_h^r f(x)|` are jointly measurable, by the
 expansion `Δ_h^r f(x) = ∑_{l ≤ r} (-1)^(r-l) C(r, l) f(x + l h)`. -/
@@ -320,27 +332,39 @@ theorem modulus_const_smul (r : ℕ) (p : ℝ≥0∞) (c : ℂ) (f : V → ℂ) 
     modulus μ r p (c • f) t = ‖c‖ₑ * modulus μ r p f t := by
   simp only [modulus, fwdDiff_iter_const_smul, eLpNorm_const_smul, ENNReal.mul_iSup]
 
-omit [FiniteDimensional ℝ V] in
-/-- **Integer multiples of the scale**: `ω_r(f, m t)_p ≤ m^r ω_r(f, t)_p` for `m ≥ 1`. -/
-theorem modulus_nat_mul_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞} (hp : 1 ≤ p)
-    (r : ℕ) {m : ℕ} (hm : 1 ≤ m) (t : ℝ) :
+omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
+/-- **Integer multiples of the scale, for divisible steps**: if every step `h` with
+`‖h‖ ≤ m t` is `m h'` for a step `h'` with `‖h'‖ ≤ t`, then `ω_r(f, m t)_p ≤ m^r ω_r(f, t)_p`,
+since `‖Δ^r_{m h'} f‖_p ≤ m^r ‖Δ^r_{h'} f‖_p` (`Rd.eLpNorm_higherDiff_nsmul_higherDiff_le`). The
+hypothesis holds on every normed space and on the torus. -/
+theorem modulus_nat_mul_le_of_forall_exists_nsmul {f : V → ℂ} (hf : AEStronglyMeasurable f μ)
+    {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) {m : ℕ} {t : ℝ}
+    (hdiv : ∀ h : V, ‖h‖ ≤ m * t → ∃ h' : V, ‖h'‖ ≤ t ∧ h = m • h') :
     modulus μ r p f (m * t) ≤ (m : ℝ≥0∞) ^ r * modulus μ r p f t := by
   refine iSup₂_le fun h hh => ?_
-  have hm0 : (0 : ℝ) < m := by exact_mod_cast hm
-  obtain ⟨h', hh', rfl⟩ : ∃ h' : V, ‖h'‖ ≤ t ∧ h = m • h' := by
-    refine ⟨(m : ℝ)⁻¹ • h, ?_, ?_⟩
-    · rw [norm_smul, Real.norm_of_nonneg (inv_nonneg.2 hm0.le), inv_mul_le_iff₀ hm0]
-      exact hh
-    · rw [← Nat.cast_smul_eq_nsmul ℝ, smul_inv_smul₀ hm0.ne']
+  obtain ⟨h', hh', rfl⟩ := hdiv h hh
   have h1 := eLpNorm_higherDiff_nsmul_higherDiff_le hf hp m h' r 0
   simp only [Function.iterate_zero, id_eq, add_zero] at h1
   exact h1.trans (by gcongr; exact eLpNorm_higherDiff_le_modulus hh')
 
 omit [FiniteDimensional ℝ V] in
-/-- **Dilating the scale**: `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` for `c, t ≥ 0`, with the
-integer `m = ⌊c⌋ + 1 ≤ 1 + c`. -/
-theorem modulus_mul_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞} (hp : 1 ≤ p)
-    (r : ℕ) {c t : ℝ} (hc : 0 ≤ c) (ht : 0 ≤ t) :
+/-- **Integer multiples of the scale**: `ω_r(f, m t)_p ≤ m^r ω_r(f, t)_p` for `m ≥ 1`. -/
+theorem modulus_nat_mul_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞} (hp : 1 ≤ p)
+    (r : ℕ) {m : ℕ} (hm : 1 ≤ m) (t : ℝ) :
+    modulus μ r p f (m * t) ≤ (m : ℝ≥0∞) ^ r * modulus μ r p f t := by
+  have hm0 : (0 : ℝ) < m := by exact_mod_cast hm
+  refine modulus_nat_mul_le_of_forall_exists_nsmul hf hp r fun h hh => ⟨(m : ℝ)⁻¹ • h, ?_, ?_⟩
+  · rw [norm_smul, Real.norm_of_nonneg (inv_nonneg.2 hm0.le), inv_mul_le_iff₀ hm0]
+    exact hh
+  · rw [← Nat.cast_smul_eq_nsmul ℝ, smul_inv_smul₀ hm0.ne']
+
+omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] [μ.IsAddHaarMeasure] in
+/-- **From integer to real dilations of the scale**: if `ω_r(f, m t)_p ≤ m^r ω_r(f, t)_p` for
+every integer `m ≥ 1`, then `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` for every `c ≥ 0`, with the
+integer `m = ⌊c⌋ + 1 ≤ 1 + c` and the monotonicity of the modulus. -/
+theorem modulus_mul_le_of_nat_mul_le {r : ℕ} {p : ℝ≥0∞} {f : V → ℂ} {c t : ℝ} (hc : 0 ≤ c)
+    (ht : 0 ≤ t)
+    (hnat : ∀ m : ℕ, 1 ≤ m → modulus μ r p f (m * t) ≤ (m : ℝ≥0∞) ^ r * modulus μ r p f t) :
     modulus μ r p f (c * t) ≤ ENNReal.ofReal (1 + c) ^ r * modulus μ r p f t := by
   have hm : 1 ≤ ⌊c⌋₊ + 1 := Nat.le_add_left 1 _
   have hcm : c ≤ ((⌊c⌋₊ + 1 : ℕ) : ℝ) := by
@@ -353,8 +377,16 @@ theorem modulus_mul_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ
     linarith [Nat.floor_le hc]
   calc modulus μ r p f (c * t) ≤ modulus μ r p f ((⌊c⌋₊ + 1 : ℕ) * t) :=
         modulus_mono r p f (mul_le_mul_of_nonneg_right hcm ht)
-    _ ≤ ((⌊c⌋₊ + 1 : ℕ) : ℝ≥0∞) ^ r * modulus μ r p f t := modulus_nat_mul_le hf hp r hm t
+    _ ≤ ((⌊c⌋₊ + 1 : ℕ) : ℝ≥0∞) ^ r * modulus μ r p f t := hnat _ hm
     _ ≤ ENNReal.ofReal (1 + c) ^ r * modulus μ r p f t := by gcongr
+
+omit [FiniteDimensional ℝ V] in
+/-- **Dilating the scale**: `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` for `c, t ≥ 0`
+(`Rd.modulus_nat_mul_le`, `Rd.modulus_mul_le_of_nat_mul_le`). -/
+theorem modulus_mul_le {f : V → ℂ} (hf : AEStronglyMeasurable f μ) {p : ℝ≥0∞} (hp : 1 ≤ p)
+    (r : ℕ) {c t : ℝ} (hc : 0 ≤ c) (ht : 0 ≤ t) :
+    modulus μ r p f (c * t) ≤ ENNReal.ofReal (1 + c) ^ r * modulus μ r p f t :=
+  modulus_mul_le_of_nat_mul_le hc ht fun _ hm => modulus_nat_mul_le hf hp r hm t
 
 /-! ### The modulus on `L_p` at dyadic scales -/
 

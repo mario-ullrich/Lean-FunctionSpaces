@@ -160,8 +160,7 @@ theorem le_sum_splineExponent {r : ℕ} (hr : 1 ≤ r) (m : Fin d → ℕ) (hm :
     have h1p : 1 / p.toReal ≤ 1 := by
       rcases eq_or_ne p ∞ with hpinf | hpinf
       · simp [hpinf]
-      · have h := ENNReal.toReal_mono hpinf (Fact.out : 1 ≤ p)
-        rw [ENNReal.toReal_one] at h
+      · have h := ENNReal.one_le_toReal_of_one_le Fact.out hpinf
         exact (div_le_one (by linarith)).2 h
     rw [hsum, Nat.cast_sub hr, Nat.cast_one]
     linarith

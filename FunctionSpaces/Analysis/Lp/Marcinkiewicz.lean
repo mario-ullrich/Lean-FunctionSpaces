@@ -19,6 +19,16 @@ strong type `(2,2)` has strong type `(p,p)`. The constant for the integrals of `
 weak type constant and `C₂` the constant of `∫ (Tf)² ≤ C₂ ∫ f²`. The measure on the input space
 is s-finite.
 
+* **Chebyshev's inequality and level sets**: `μ{F > t} ≤ t^(-r) ∫ F^r`
+  (`MeasureTheory.measure_lt_le_inv_rpow_mul_lintegral`, the lintegral form of the
+  distribution bound `MeasureTheory.distribution_le_inv_rpow_mul_eLpNorm_rpow` of
+  `FunctionSpaces.Analysis.Lp.WeakType`), its forms at half height
+  (`MeasureTheory.measure_half_lt_le_lintegral_sq`,
+  `MeasureTheory.measure_half_lt_le_add_setLIntegral_compl`) and the level sets of a function
+  split into a part controlled in `L_2` and a part controlled in `L_1` off an exceptional set
+  (`MeasureTheory.measure_lt_le_of_ae_le_add`), the bookkeeping of Calderón–Zygmund arguments,
+  with `t < a + b ⇒ t/2 < a ∨ t/2 < b` (`ENNReal.half_lt_or_half_lt_of_lt_add`) and `L_2`
+  membership from `∫ ‖f‖² < ∞` (`MeasureTheory.memLp_two_of_lintegral_enorm_sq_ne_top`).
 * **The parts above and below a level** (`MeasureTheory.lintegral_indicator_lt_le`,
   `MeasureTheory.lintegral_indicator_compl_rpow_le`): `∫_{F > s} F ≤ s^(1-p) ∫ F^p` and
   `∫_{F ≤ s} F^r ≤ s^(r-p) ∫ F^p`.
@@ -91,12 +101,106 @@ theorem inv_half_rpow_mul_ofReal_rpow {τ : ℝ} (hτ : 0 < τ) (p r : ℝ) :
     ← ENNReal.ofReal_mul (by positivity), hreal, ENNReal.ofReal_mul (by positivity),
     ← ENNReal.ofReal_rpow_of_pos two_pos, ENNReal.ofReal_ofNat]
 
+/-- If `t < a + b` in `[0, ∞]`, then `t/2 < a` or `t/2 < b`: Mathlib's `lt_or_lt_of_add_lt_add`
+applied to `t/2 + t/2 = t`. -/
+theorem half_lt_or_half_lt_of_lt_add {t a b : ℝ≥0∞} (h : t < a + b) : t / 2 < a ∨ t / 2 < b :=
+  lt_or_lt_of_add_lt_add (by rwa [ENNReal.add_halves])
+
 end ENNReal
 
 namespace MeasureTheory
 
 variable {α α' : Type*} [MeasurableSpace α] [MeasurableSpace α'] {μ : Measure α}
   {ν : Measure α'}
+
+/-! ### Chebyshev's inequality and level sets -/
+
+section Chebyshev
+
+variable {t : ℝ≥0∞}
+
+/-- **Chebyshev's inequality with a power**: for an almost everywhere measurable
+`F : α → [0, ∞]`, `r > 0` and `0 < t < ∞`, `μ {F > t} ≤ t^(-r) ∫ F^r`, from Mathlib's
+`mul_meas_ge_le_lintegral₀` for `F^r`. This is the lintegral form of
+`MeasureTheory.distribution_le_inv_rpow_mul_eLpNorm_rpow`. The bound holds for `t ∈ {0, ∞}` as
+well (at `t = ∞` the level set is empty, at `t = 0` the right side is `∞` unless `F = 0` almost
+everywhere); the callers use `0 < t < ∞`. -/
+theorem measure_lt_le_inv_rpow_mul_lintegral {F : α → ℝ≥0∞} (hF : AEMeasurable F μ) {r : ℝ}
+    (hr : 0 < r) (ht0 : t ≠ 0) (ht : t ≠ ∞) :
+    μ {x | t < F x} ≤ (t ^ r)⁻¹ * ∫⁻ x, F x ^ r ∂μ := by
+  rw [← ENNReal.mul_le_iff_le_inv (ENNReal.rpow_pos (pos_iff_ne_zero.2 ht0) ht).ne'
+    (ENNReal.rpow_ne_top_of_nonneg hr.le ht)]
+  calc t ^ r * μ {x | t < F x} ≤ t ^ r * μ {x | t ^ r ≤ F x ^ r} :=
+        mul_le_mul_right (measure_mono fun x hx => ENNReal.rpow_le_rpow (le_of_lt hx) hr.le) _
+    _ ≤ ∫⁻ x, F x ^ r ∂μ := mul_meas_ge_le_lintegral₀ (hF.pow_const r) _
+
+/-- **Chebyshev's inequality with squares at half height**: for an almost everywhere measurable
+`a : α → [0, ∞]` and `0 < t < ∞`, `μ {a > t/2} ≤ 4 t⁻² ∫ a²`
+(`MeasureTheory.measure_lt_le_inv_rpow_mul_lintegral` with `r = 2`). -/
+theorem measure_half_lt_le_lintegral_sq {a : α → ℝ≥0∞} (ha : AEMeasurable a μ) (ht0 : 0 < t)
+    (ht : t ≠ ∞) : μ {x | t / 2 < a x} ≤ 4 * (t ^ 2)⁻¹ * ∫⁻ x, a x ^ 2 ∂μ := by
+  have h4 : (t / 2) ^ 2 = 4⁻¹ * t ^ 2 := by
+    rw [ENNReal.div_eq_inv_mul, mul_pow, ← ENNReal.inv_pow]
+    norm_num
+  have h := measure_lt_le_inv_rpow_mul_lintegral ha two_pos (ENNReal.half_pos ht0.ne').ne'
+    (ENNReal.div_ne_top ht two_ne_zero)
+  simp_rw [ENNReal.rpow_two] at h
+  rwa [h4, ENNReal.mul_inv (Or.inl (by norm_num)) (Or.inl (by norm_num)), inv_inv] at h
+
+/-- **Chebyshev's inequality off a set, at half height**: for an almost everywhere measurable
+`b : α → [0, ∞]`, a measurable set `S` and `0 < t < ∞`,
+`μ {b > t/2} ≤ μ(S) + 2 t⁻¹ ∫_{Sᶜ} b`. -/
+theorem measure_half_lt_le_add_setLIntegral_compl {b : α → ℝ≥0∞} (hb : AEMeasurable b μ)
+    {S : Set α} (hS : MeasurableSet S) (ht0 : 0 < t) (ht : t ≠ ∞) :
+    μ {x | t / 2 < b x} ≤ μ S + 2 * t⁻¹ * ∫⁻ x in Sᶜ, b x ∂μ := by
+  have hc : t / 2 ≠ 0 := (ENNReal.div_pos ht0.ne' (by norm_num)).ne'
+  have hc' : t / 2 ≠ ∞ := ENNReal.div_ne_top ht two_ne_zero
+  calc μ {x | t / 2 < b x} ≤ μ S + μ {x | t / 2 ≤ Sᶜ.indicator b x} := by
+        refine (measure_mono fun x hx => ?_).trans (measure_union_le _ _)
+        by_cases hxS : x ∈ S
+        · exact Or.inl hxS
+        · exact Or.inr (show t / 2 ≤ Sᶜ.indicator b x by
+            rw [Set.indicator_of_mem (show x ∈ Sᶜ from hxS)]; exact le_of_lt hx)
+    _ ≤ μ S + (∫⁻ x, Sᶜ.indicator b x ∂μ) / (t / 2) :=
+        add_le_add le_rfl (meas_ge_le_lintegral_div (hb.indicator hS.compl) hc hc')
+    _ = μ S + 2 * t⁻¹ * ∫⁻ x in Sᶜ, b x ∂μ := by
+        rw [lintegral_indicator hS.compl, ENNReal.div_eq_inv_mul, ENNReal.div_eq_inv_mul,
+          ENNReal.mul_inv (Or.inr ht) (Or.inl (by norm_num)), inv_inv]
+
+/-- A function with `∫ ‖f‖² < ∞` that is almost everywhere strongly measurable lies in `L_2`
+(Mathlib's `eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top`). -/
+theorem memLp_two_of_lintegral_enorm_sq_ne_top {E : Type*} [NormedAddCommGroup E] {f : α → E}
+    (hf : AEStronglyMeasurable f μ) (h : ∫⁻ x, ‖f x‖ₑ ^ 2 ∂μ ≠ ∞) : MemLp f 2 μ :=
+  memLp_iff.2 ((eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top two_ne_zero ENNReal.ofNat_ne_top
+    hf).2 (by simpa [ENNReal.rpow_two] using h.lt_top))
+
+/-- **The level sets of a split function**: let `u ≤ a + b` almost everywhere, with almost
+everywhere measurable `a, b : α → [0, ∞]`, let `S` be measurable and `0 < t < ∞`. If
+`∫ a² ≤ A t I`, `μ(S) ≤ D t⁻¹ I` and `∫_{Sᶜ} b ≤ K I`, then `μ {u > t} ≤ (4A + D + 2K) t⁻¹ I`.
+This is the bookkeeping of the Calderón–Zygmund argument: `a` is the good part, controlled in
+`L_2`, and `b` the bad part, controlled in `L_1` off the exceptional set `S`. -/
+theorem measure_lt_le_of_ae_le_add {u a b : α → ℝ≥0∞} (ha : AEMeasurable a μ)
+    (hb : AEMeasurable b μ) (hu : ∀ᵐ x ∂μ, u x ≤ a x + b x) {S : Set α} (hS : MeasurableSet S)
+    (ht0 : 0 < t) (ht : t ≠ ∞) {A D K I : ℝ≥0∞} (haI : ∫⁻ x, a x ^ 2 ∂μ ≤ A * t * I)
+    (hSI : μ S ≤ D * (t⁻¹ * I)) (hbI : ∫⁻ x in Sᶜ, b x ∂μ ≤ K * I) :
+    μ {x | t < u x} ≤ (4 * A + D + 2 * K) * t⁻¹ * I := by
+  have htt : (t ^ 2)⁻¹ * t = t⁻¹ := by
+    rw [pow_two, ENNReal.mul_inv (Or.inr ht) (Or.inl ht), mul_assoc,
+      ENNReal.inv_mul_cancel ht0.ne' ht, mul_one]
+  calc μ {x | t < u x} ≤ μ ({x | t / 2 < a x} ∪ {x | t / 2 < b x}) :=
+        measure_mono_ae (hu.mono fun x hx hxt =>
+          ENNReal.half_lt_or_half_lt_of_lt_add (lt_of_lt_of_le hxt hx))
+    _ ≤ μ {x | t / 2 < a x} + μ {x | t / 2 < b x} := measure_union_le _ _
+    _ ≤ 4 * (t ^ 2)⁻¹ * (A * t * I) + (μ S + 2 * t⁻¹ * (K * I)) := by
+        gcongr
+        · exact (measure_half_lt_le_lintegral_sq ha ht0 ht).trans (by gcongr)
+        · exact (measure_half_lt_le_add_setLIntegral_compl hb hS ht0 ht).trans (by gcongr)
+    _ ≤ 4 * (t ^ 2)⁻¹ * (A * t * I) + (D * (t⁻¹ * I) + 2 * t⁻¹ * (K * I)) := by gcongr
+    _ = (4 * A + D + 2 * K) * t⁻¹ * I := by
+        rw [show 4 * (t ^ 2)⁻¹ * (A * t * I) = 4 * A * ((t ^ 2)⁻¹ * t) * I by ring, htt]
+        ring
+
+end Chebyshev
 
 /-! ### The parts above and below a level -/
 
@@ -311,15 +415,9 @@ theorem measure_lt_mul_rpow_le_of_le_add {F F₁ F₂ : α' → ℝ≥0∞} (hF�
   have ht0 : ENNReal.ofReal τ / 2 ≠ 0 := (ENNReal.half_pos (ENNReal.ofReal_pos.2 hτ).ne').ne'
   have htt : ENNReal.ofReal τ / 2 ≠ ∞ := ENNReal.div_ne_top ENNReal.ofReal_ne_top two_ne_zero
   have h2 : ν {x | ENNReal.ofReal τ / 2 < F₂ x} ≤
-      ((ENNReal.ofReal τ / 2) ^ (2 : ℝ))⁻¹ * (C₂ * I₂) := by
-    calc ν {x | ENNReal.ofReal τ / 2 < F₂ x}
-        ≤ ν {x | (ENNReal.ofReal τ / 2) ^ 2 ≤ F₂ x ^ 2} :=
-          measure_mono fun x hx => pow_le_pow_left₀ zero_le (le_of_lt hx) 2
-      _ ≤ (∫⁻ x, F₂ x ^ 2 ∂ν) / (ENNReal.ofReal τ / 2) ^ 2 :=
-          meas_ge_le_lintegral_div (hF₂.pow_const 2) (pow_ne_zero 2 ht0) (ENNReal.pow_ne_top htt)
-      _ ≤ _ := by
-          rw [ENNReal.rpow_two, ENNReal.div_eq_inv_mul]
-          gcongr
+      ((ENNReal.ofReal τ / 2) ^ (2 : ℝ))⁻¹ * (C₂ * I₂) :=
+    (measure_lt_le_inv_rpow_mul_lintegral hF₂ two_pos ht0 htt).trans
+      (by gcongr; simpa only [ENNReal.rpow_two] using hstrong)
   have hunion : ν {x | ENNReal.ofReal τ < F x} ≤
       ν {x | ENNReal.ofReal τ / 2 < F₁ x} + ν {x | ENNReal.ofReal τ / 2 < F₂ x} := by
     have h := distribution_add_le_of_enorm (μ := ν) (c := 1) (t := ENNReal.ofReal τ / 2)

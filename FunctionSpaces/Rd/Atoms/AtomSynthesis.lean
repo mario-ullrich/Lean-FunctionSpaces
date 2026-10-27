@@ -662,25 +662,13 @@ theorem enorm_higherDiff_le_of_iteratedFDeriv {a : V → ℂ}
       ENNReal.ofReal (2 ^ r * A) * min 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (r : ℝ)) := by
   have h1 : ‖(fwdDiff h)^[r] a x‖ ≤ A * 2 ^ (j * r) * ‖h‖ ^ r :=
     norm_higherDiff_le_of_iteratedFDeriv ha (hD r le_rfl) h x
-  have h2 : ‖(fwdDiff h)^[r] a x‖ ≤ 2 ^ r * A := by
-    rw [higherDiff_apply]
-    calc ‖∑ l ∈ Finset.range (r + 1), ((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) *
-          a (x + (l : ℝ) • h)‖
-        ≤ ∑ l ∈ Finset.range (r + 1), ‖((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) *
-            a (x + (l : ℝ) • h)‖ := norm_sum_le _ _
-      _ ≤ ∑ l ∈ Finset.range (r + 1), (r.choose l : ℝ) * A := by
-          refine Finset.sum_le_sum fun l _ => ?_
-          rw [norm_mul, norm_mul, norm_pow, norm_neg, norm_one, one_pow, one_mul,
-            Complex.norm_natCast]
-          refine mul_le_mul_of_nonneg_left ?_ (Nat.cast_nonneg _)
-          simpa using hD 0 (Nat.zero_le r) (x + (l : ℝ) • h)
-      _ = 2 ^ r * A := by
-          rw [← Finset.sum_mul]
-          congr 1
-          exact_mod_cast Nat.sum_range_choose r
+  have h2 : ‖(fwdDiff h)^[r] a x‖ₑ ≤ ENNReal.ofReal (2 ^ r * A) := by
+    rw [ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat]
+    refine enorm_higherDiff_le_of_bound (fun y => ?_) r h x
+    rw [← ofReal_norm]
+    exact ENNReal.ofReal_le_ofReal (by simpa using hD 0 (Nat.zero_le r) y)
   rcases le_total 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (r : ℝ)) with hmin | hmin
-  · rw [min_eq_left hmin, mul_one, ← ofReal_norm]
-    exact ENNReal.ofReal_le_ofReal h2
+  · rwa [min_eq_left hmin, mul_one]
   · rw [min_eq_right hmin, ← ofReal_norm,
       ENNReal.ofReal_rpow_of_nonneg (by positivity) (Nat.cast_nonneg r),
       Real.rpow_natCast, ← ENNReal.ofReal_mul (by positivity)]

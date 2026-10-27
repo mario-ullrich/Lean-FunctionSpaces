@@ -206,13 +206,24 @@ theorem dyadic_le_iSup_pow_mul {s : ℝ} (hs : 0 ≤ s) :
 
 /-! ### The dyadic sum -/
 
-/-- `∑_{j < N} 2^j ≤ 2^N` in `[0, ∞]`, from the geometric sum `∑_{j < N} 2^j + 1 = 2^N`
-(Mathlib's `geom_sum_mul_add` with `x = 1`). -/
-theorem sum_range_two_pow_le (N : ℕ) : ∑ j ∈ Finset.range N, (2 : ℝ≥0∞) ^ j ≤ 2 ^ N := by
-  have h := geom_sum_mul_add (1 : ℝ≥0∞) N
-  rw [one_add_one_eq_two, mul_one] at h
+/-- **Geometric partial sums**: `∑_{j < J} r^j ≤ r^J (r - 1)⁻¹` for `1 ≤ r < ∞`, from the
+geometric sum `(∑_{j < J} r^j)(r - 1) + 1 = r^J` (Mathlib's `geom_sum_mul_add` with
+`x = r - 1`). -/
+theorem sum_range_pow_le_pow_mul_inv {r : ℝ≥0∞} (hr1 : 1 ≤ r) (hr : r ≠ ∞) (J : ℕ) :
+    ∑ j ∈ range J, r ^ j ≤ r ^ J * (r - 1)⁻¹ := by
+  have h := geom_sum_mul_add (r - 1) J
+  rw [tsub_add_cancel_of_le hr1] at h
+  rw [← div_eq_mul_inv,
+    ENNReal.le_div_iff_mul_le (Or.inr (pow_ne_zero _ (one_pos.trans_le hr1).ne'))
+      (Or.inl (tsub_le_self.trans_lt hr.lt_top).ne)]
   rw [← h]
   exact le_self_add
+
+/-- `∑_{j < N} 2^j ≤ 2^N` in `[0, ∞]`, the case `r = 2` of
+`ENNReal.sum_range_pow_le_pow_mul_inv`. -/
+theorem sum_range_two_pow_le (N : ℕ) : ∑ j ∈ Finset.range N, (2 : ℝ≥0∞) ^ j ≤ 2 ^ N := by
+  have h := sum_range_pow_le_pow_mul_inv one_le_two ofNat_ne_top N
+  rwa [ENNReal.sub_eq_of_eq_add one_ne_top one_add_one_eq_two.symm, inv_one, mul_one] at h
 
 /-- For `a ≠ 0` in `[0, ∞]` there is `j ∈ ℕ` with `2^j a > 1`: Mathlib's
 `ENNReal.exists_nat_mul_gt` gives `n a > 1`, and `n < 2^n`. -/
@@ -333,19 +344,6 @@ theorem tsum_le_of_dyadic_annulus {u : ℕ → ℝ≥0∞} {M : ℝ≥0∞} {a t
     simp [hex]
 
 /-! ### Interpolation of dyadic suprema -/
-
-/-- **Geometric partial sums**: `∑_{j < J} r^j ≤ r^J (r - 1)⁻¹` for `1 ≤ r < ∞`, from the
-geometric sum `(∑_{j < J} r^j)(r - 1) + 1 = r^J` (Mathlib's `geom_sum_mul_add` with
-`x = r - 1`). -/
-theorem sum_range_pow_le_pow_mul_inv {r : ℝ≥0∞} (hr1 : 1 ≤ r) (hr : r ≠ ∞) (J : ℕ) :
-    ∑ j ∈ range J, r ^ j ≤ r ^ J * (r - 1)⁻¹ := by
-  have h := geom_sum_mul_add (r - 1) J
-  rw [tsub_add_cancel_of_le hr1] at h
-  rw [← div_eq_mul_inv,
-    ENNReal.le_div_iff_mul_le (Or.inr (pow_ne_zero _ (one_pos.trans_le hr1).ne'))
-      (Or.inl (tsub_le_self.trans_lt hr.lt_top).ne)]
-  rw [← h]
-  exact le_self_add
 
 /-- The **constant of the dyadic interpolation inequality**,
 `c(δ, θ) = 2^(θδ) (2^(θδ) - 1)⁻¹ + (1 - 2^(-(1-θ)δ))⁻¹`

@@ -166,13 +166,8 @@ theorem approxNormDyadic_le_blockNorm (hq : 1 ≤ q) {f : X}
             rw [approxSeqDyadic]; gcongr
             exact (PS.approxSeq_le_enorm_sub _ f).trans (PS.enorm_sub_le_tsum_block hf k)
       _ ≤ Cs * L := ENNReal.hardy_tail_le hq s (fun m => ‖PS.block m f‖ₑ)
-  have hsum : ∑' i, ‖PS.block i f‖ₑ ≤ Cs * L := by
-    have hsup : ∀ i, dyadicWeight s i * ‖PS.block i f‖ₑ ≤ L := fun i =>
-      ENNReal.le_lqNorm (zero_lt_one.trans_le hq).ne' (fun k => dyadicWeight s k * ‖PS.block k f‖ₑ) i
-    calc ∑' i, ‖PS.block i f‖ₑ = ∑' i, dyadicWeight (-s) i * (dyadicWeight s i * ‖PS.block i f‖ₑ) := by
-          congr 1; funext i; rw [← mul_assoc, ENNReal.dyadicWeight_neg_mul_self, one_mul]
-      _ ≤ ∑' i, dyadicWeight (-s) i * L := ENNReal.tsum_le_tsum fun i => by gcongr; exact hsup i
-      _ = Cs * L := by rw [ENNReal.tsum_mul_right, ENNReal.tsum_dyadicWeight_neg]
+  have hsum : ∑' i, ‖PS.block i f‖ₑ ≤ Cs * L :=
+    ENNReal.tsum_le_lqNorm_dyadicWeight hq s (‖PS.block · f‖ₑ)
   have h0 := PS.enorm_sub_le_tsum_block hf 0
   simp only [pow_zero, zero_add] at h0
   have hf' : ‖f‖ₑ ≤ ‖PS.P 1 f‖ₑ + Cs * L := by

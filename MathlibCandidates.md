@@ -64,7 +64,7 @@ declarations.
   `‖sup_b F_b‖_p = sup_b ‖F_b‖_p` for directed countable families of a.e. measurable `F_b`
   (`MeasureTheory.eLpNorm_iSup_of_directed`) and `‖∑_i g_i‖_p ≤ ∑_i ‖g_i‖_p` for `1 ≤ p ≤ ∞` and
   countably many `g_i : α → [0, ∞]` (`MeasureTheory.eLpNorm_tsum_le`), both in
-  `FunctionSpaces/Analysis/Lp/MixedNorms.lean`; the counting-measure versions `ENNReal.lqNorm_iSup`
+  `ApproximationSpaces/Sequences/Lq.lean`; the counting-measure versions `ENNReal.lqNorm_iSup`
   and `ENNReal.lqNorm_tsum_le` are in `ApproximationSpaces/Sequences/Hardy.lean`. Mathlib has only
   the finite version `eLpNorm_sum_le`.
 * **Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`** (`FunctionSpaces/Analysis/Lp/MixedNorms.lean`):
@@ -81,10 +81,10 @@ declarations.
   generalising `ENNReal.le_tsum_condensed` / `ENNReal.tsum_condensed_le`; and
   `ENNReal.rpow_le_rpow_of_nonpos`, which exists for `ℝ` and `ℝ≥0` but not for `ℝ≥0∞`.
 * **Products and sums in canonically ordered semirings**
-  (`FunctionSpaces/Rd/Interpolation/SobolevInterpolation.lean`): `a x + b y ≤ (a + b)(x + y)`
-  (`ENNReal.mul_add_mul_le_add_mul_add`) and `∑_i a_i b_i ≤ (∑_i a_i)(∑_i b_i)` for finite
-  families (`ENNReal.sum_mul_le_sum_mul_sum`). Stated here for `ℝ≥0∞`; both hold in every
-  `[CommSemiring R] [PartialOrder R] [CanonicallyOrderedAdd R]`.
+  (`ApproximationSpaces/Sequences/Lq.lean`): `a x + b y ≤ (a + b)(x + y)`
+  (`ENNReal.mul_add_mul_le_add_mul_add`) and `∑_{i ∈ s} a_i b_i ≤ (∑_{i ∈ s} a_i)(∑_{i ∈ s} b_i)`
+  for every finite set `s` (`ENNReal.sum_mul_le_sum_mul_sum`). Stated here for `ℝ≥0∞`; both hold
+  in every `[CommSemiring R] [PartialOrder R] [CanonicallyOrderedAdd R]`.
 * **A dyadic sum** (`ApproximationSpaces/Sequences/Dyadic.lean`):
   `∑_{j ∈ ℕ} min(2^j a, (2^j a)⁻¹) ≤ 4` for every `a ∈ [0, ∞]` (`ENNReal.tsum_min_two_pow_le`),
   the sum behind every Hörmander condition for dyadic dilations; the same bound holds for
@@ -290,14 +290,17 @@ declarations.
   (`MeasureTheory.setLIntegral_enorm_sub_setAverage_le`), the step behind the mass of the bad pieces
   of a Calderón–Zygmund decomposition.
 * **Level sets of a split function**
-  (`FunctionSpaces/Rd/SingularIntegrals/VectorValuedWeakType.lean`): if `u ≤ a + b` almost
+  (`FunctionSpaces/Analysis/Lp/Marcinkiewicz.lean`): if `u ≤ a + b` almost
   everywhere, `∫⁻ a² ≤ A t I`, `μ S ≤ D t⁻¹ I` and `∫⁻_{Sᶜ} b ≤ K I`, then
   `μ {u > t} ≤ (4A + D + 2K) t⁻¹ I` (`MeasureTheory.measure_lt_le_of_ae_le_add`), from the two forms
   of Chebyshev's inequality at half height (`MeasureTheory.measure_half_lt_le_lintegral_sq`,
   `MeasureTheory.measure_half_lt_le_add_setLIntegral_compl`): the level-set bookkeeping of a
-  Calderón–Zygmund argument. The three lemmas assume `0 < t < ∞`; for Mathlib these hypotheses would
-  be removed, since at `t = ∞` the level sets are empty and at `t = 0` the bounds are either `∞` or
-  force the functions to vanish almost everywhere. Also `MemLp f 2 μ` from `∫⁻ ‖f‖ₑ ^ 2 ∂μ ≠ ∞`
+  Calderón–Zygmund argument; the first form is Chebyshev's inequality with a power in lintegral
+  form, `μ {F > t} ≤ t^(-r) ∫⁻ F^r` (`MeasureTheory.measure_lt_le_inv_rpow_mul_lintegral`; Mathlib
+  has the `eLpNorm` form `meas_ge_le_mul_pow_eLpNorm_enorm`). The three lemmas assume
+  `0 < t < ∞`; for Mathlib these hypotheses would be removed, since at `t = ∞` the level sets are
+  empty and at `t = 0` the bounds are either `∞` or force the functions to vanish almost
+  everywhere. Also `MemLp f 2 μ` from `∫⁻ ‖f‖ₑ ^ 2 ∂μ ≠ ∞`
   (`MeasureTheory.memLp_two_of_lintegral_enorm_sq_ne_top`), with the exponent `2 : ℕ`.
 * **The Hörmander condition for dilation families**
   (`FunctionSpaces/Rd/SingularIntegrals/DilationFamilies.lean`): for Schwartz functions `G_j` with

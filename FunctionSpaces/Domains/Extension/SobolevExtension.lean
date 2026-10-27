@@ -464,13 +464,6 @@ theorem ExtendsSobolev.of_le {T O : Opens V} {U : Set V} {C : ℝ≥0∞}
   refine ⟨F, hF, hFf, G, hG, hb.trans ?_⟩
   gcongr
 
-/-- `∑_i a_i b_i ≤ (∑_i a_i)(∑_i b_i)` in `ℝ≥0∞`. -/
-theorem sum_mul_le_sum_mul_sum {ι : Type*} (s : Finset ι) (a b : ι → ℝ≥0∞) :
-    ∑ i ∈ s, a i * b i ≤ (∑ i ∈ s, a i) * ∑ i ∈ s, b i := by
-  rw [Finset.sum_mul]
-  exact Finset.sum_le_sum fun i hi => mul_le_mul_right (Finset.single_le_sum
-    (fun j _ => zero_le) hi) _
-
 namespace LocalMeansBump
 
 variable (b : LocalMeansBump V)
@@ -501,7 +494,7 @@ theorem tlLocalNormOn_le_patchConst [Fact (1 ≤ p)] [Nontrivial V] (hp1 : 1 < p
   refine (b.tlLocalNormOn_le_of_hasWeakLineDeriv hp1 hp hW hf hg hfg hsupp hF).trans ?_
   rw [patchConst, add_mul, mul_assoc 2]
   refine add_le_add (mul_le_mul_right le_self_add _) (mul_le_mul_right ?_ 2)
-  exact (sum_mul_le_sum_mul_sum _ _ _).trans (mul_le_mul_right le_add_self _)
+  exact (ENNReal.sum_mul_le_sum_mul_sum _ _ _).trans (mul_le_mul_right le_add_self _)
 
 /-- The constant `(2 ‖m‖_1 (1 - 2^(-1))⁻¹ + (∑_i C_i) A) C_b` of the extension from one patch, with
 the constants `C_i = Rd.tlToSobolevConst p e_i` of the weak derivatives of `F^1_{p,2}` functions,

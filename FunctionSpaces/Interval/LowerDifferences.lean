@@ -293,9 +293,7 @@ theorem exists_eLpNorm_higherDiff_ppFun_le {r m : ℕ} (hm : 1 ≤ m) (hmr : m �
   obtain ⟨Km, hKm, hKmb⟩ := exists_diffBound (p := p) r m hp
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  have hq1 : 1 ≤ p.toReal := by
-    have h := ENNReal.toReal_mono hp (Fact.out : 1 ≤ p)
-    rwa [ENNReal.toReal_one] at h
+  have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le Fact.out hp
   set C₀ : ℝ≥0∞ := (2 ^ m * K) ^ p.toReal * ((r : ℝ≥0∞) * (r + 1)) + Km ^ p.toReal
   have hC₀ : C₀ ≠ ∞ := by
     refine ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg hq.le

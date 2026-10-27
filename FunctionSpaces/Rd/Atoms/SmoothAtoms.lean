@@ -273,27 +273,15 @@ theorem IsSmoothAtom.enorm_higherDiff_le {Ω : Set V} (hΩ : Convex ℝ Ω)
     rw [mul_pow, pow_mul]
     ring
   -- the bound through the values
-  have h2 : ‖(fwdDiff h)^[r] a x‖ ≤ 2 ^ r * A := by
-    rw [higherDiff_apply]
-    calc ‖∑ l ∈ Finset.range (r + 1), ((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) *
-          a (x + (l : ℝ) • h)‖
-        ≤ ∑ l ∈ Finset.range (r + 1), ‖((-1 : ℂ) ^ (r - l) * (r.choose l : ℂ)) *
-            a (x + (l : ℝ) • h)‖ := norm_sum_le _ _
-      _ ≤ ∑ l ∈ Finset.range (r + 1), (r.choose l : ℝ) * A := by
-          refine Finset.sum_le_sum fun l hl => ?_
-          rw [norm_mul, norm_mul, norm_pow, norm_neg, norm_one, one_pow, one_mul,
-            Complex.norm_natCast]
-          refine mul_le_mul_of_nonneg_left ?_ (Nat.cast_nonneg _)
-          have hmem := hx l (Nat.lt_succ_iff.1 (Finset.mem_range.1 hl))
-          simpa [norm_iteratedFDerivWithin_zero] using
-            ha.norm_iteratedFDerivWithin_le 0 (Nat.zero_le K) _ hmem
-      _ = 2 ^ r * A := by
-          rw [← Finset.sum_mul]
-          congr 1
-          exact_mod_cast Nat.sum_range_choose r
+  have h2 : ‖(fwdDiff h)^[r] a x‖ₑ ≤ ENNReal.ofReal (2 ^ r * A) := by
+    rw [ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat]
+    refine enorm_higherDiff_le_of_bound_steps fun l hl => ?_
+    have hy := ha.norm_iteratedFDerivWithin_le 0 (Nat.zero_le K) _ (hx l hl)
+    rw [← ofReal_norm]
+    exact ENNReal.ofReal_le_ofReal (by simpa [norm_iteratedFDerivWithin_zero] using hy)
   rcases le_total 1 (ENNReal.ofReal (2 ^ j * ‖h‖) ^ (r : ℝ)) with hmin | hmin
-  · rw [min_eq_left hmin, mul_one, ← ofReal_norm]
-    refine ENNReal.ofReal_le_ofReal (h2.trans ?_)
+  · rw [min_eq_left hmin, mul_one]
+    refine h2.trans (ENNReal.ofReal_le_ofReal ?_)
     calc 2 ^ r * A = 1 * (2 ^ r * A) := (one_mul _).symm
       _ ≤ (r : ℝ) ^ (r + 1) * (2 ^ r * A) :=
           mul_le_mul_of_nonneg_right (one_le_pow₀ (by exact_mod_cast hr)) (by positivity)

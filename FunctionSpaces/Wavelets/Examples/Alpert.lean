@@ -686,7 +686,7 @@ theorem exists_stable : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ β
             rw [ENNReal.ofReal_mul (NNReal.coe_nonneg _), ENNReal.ofReal_coe_nnreal]
     calc ENNReal.lqNorm p (fun i => ‖β i‖ₑ)
         ≤ (Fintype.card (Fin r) : ℝ≥0∞) ^ (1 / p.toReal) * ‖β‖ₑ :=
-          ENNReal.lqNorm_le_card_rpow_mul hp0 fun i => by
+          ENNReal.lqNorm_le_card_rpow_mul fun i => by
             rw [← ofReal_norm, ← ofReal_norm]
             exact ENNReal.ofReal_le_ofReal (norm_le_pi_norm β i)
       _ ≤ (Fintype.card (Fin r) : ℝ≥0∞) ^ (1 / p.toReal) * (K * ‖sumPsi r p β‖ₑ) := by gcongr

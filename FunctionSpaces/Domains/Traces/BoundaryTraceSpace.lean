@@ -169,7 +169,7 @@ theorem sobolevOneInvConst_ne_top : sobolevOneInvConst V ≠ ∞ :=
     (ENNReal.rpow_ne_top_of_nonneg (by norm_num)
       (ENNReal.mul_ne_top (by norm_num) (ENNReal.rpow_ne_top_of_nonneg zero_le_one (by norm_num))))
     (ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num) (ENNReal.dyadicWeight_ne_top 1 3))
-      (memLp_one_iff_integrable.2 integrable_lpKernel).eLpNorm_lt_top.ne))
+      eLpNorm_lpKernel_ne_top))
     ((bandModulusData two_ne_top 2).directConst_ne_top 1)
 
 /-- **The norm of `H^1(V)` by the `B^1_{2,2}(V)` quantity, with an explicit constant**, the

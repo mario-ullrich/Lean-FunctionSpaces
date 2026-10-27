@@ -25,7 +25,9 @@ For a function `f : α → ε` into a type with an extended norm `‖·‖ₑ`, 
 
 * the distribution function `MeasureTheory.distribution f t μ = μ {x | t < ‖f x‖ₑ}`, with its
   monotonicity, the distribution of a sum (`MeasureTheory.distribution_add_le_of_enorm`) and
-  Chebyshev's inequality (`MeasureTheory.distribution_le_inv_rpow_mul_eLpNorm_rpow`);
+  Chebyshev's inequality (`MeasureTheory.distribution_le_inv_rpow_mul_eLpNorm_rpow`; its
+  lintegral form `MeasureTheory.measure_lt_le_inv_rpow_mul_lintegral` is in
+  `FunctionSpaces.Analysis.Lp.Marcinkiewicz`, next to the level-set lemmas that use it);
 * the weak `L_p` norm `MeasureTheory.wnorm f p μ = sup_t t μ{‖f‖ > t}^{1/p}` (the essential
   supremum for `p = ∞`), bounded by the `L_p` norm (`MeasureTheory.wnorm_le_eLpNorm`), and
   weak `L_p` (`MeasureTheory.MemWLp`);

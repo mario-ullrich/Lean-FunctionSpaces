@@ -905,9 +905,10 @@ in particular $\omega(f, n t)_2 \leq n \, \omega(f, t)_2$ for $n \geq 1$.
 \leanok
 $\tau_{n h} f - f = \sum_{i < n} \tau_{i h} (\tau_h f - f)$, where translations are isometries.
 Every $h$ with $\|h\| \leq m t$ is $m h'$ with $\|h'\| \leq t$: divide representatives $x_j$ of
-$h_j$ with $|x_j| = \|h_j\|$ by $m$. Then $\|\Delta^r_{m h'} f\|_p \leq m^r
-\|\Delta^r_{h'} f\|_p$ (\Cref{lem:rd-modulus}); for real $c$ take
-$m = \max(1, \lceil c \rceil) \leq 1 + c$.
+$h_j$ with $|x_j| = \|h_j\|$ by $m$. So the divisibility hypothesis of \Cref{lem:rd-modulus}
+holds on $\T^d$, and \Cref{lem:rd-modulus} gives
+$\omega_r(f, m t)_p \leq m^r \omega_r(f, t)_p$ and, for real $c$ with
+$m = \lfloor c \rfloor + 1 \leq 1 + c$, the second bound.
 \end{proof}
 
 The classical Jackson theorem bounds the error of trigonometric approximation by the modulus
@@ -4426,8 +4427,10 @@ sum is a finite sum of measurable functions of $(x, v)$.
 \begin{lemma}[Properties of the modulus]
 \label{lem:rd-modulus}
 \lean{Rd.eLpNorm_higherDiff_nsmul_higherDiff_le, Rd.eLpNorm_higherDiff_le_modulus, Rd.modulus_mono,
-  Rd.modulus_add_le, Rd.modulus_le, Rd.modulus_congr_ae, Rd.modulus_nat_mul_le,
-  Rd.modulus_mul_le, Rd.lpModulus_add_le, Rd.lpModulus_le, Rd.lpModulus_zero,
+  Rd.modulus_add_le, Rd.modulus_le, Rd.modulus_congr_ae,
+  Rd.modulus_nat_mul_le_of_forall_exists_nsmul, Rd.modulus_nat_mul_le,
+  Rd.modulus_mul_le_of_nat_mul_le, Rd.modulus_mul_le, Rd.lpModulus_add_le, Rd.lpModulus_le,
+  Rd.lpModulus_zero,
   Rd.modulus_const_smul, Rd.lpModulus_const_smul}
 \leanok
 \uses{def:rd-modulus, lem:rd-differences}
@@ -4435,10 +4438,16 @@ Let $1 \leq p < \infty$, $r \in \N$ and $f, g \in L_p$. The modulus $\omega_r(f,
 in $t$, depends only on the class of $f$ modulo null sets, and satisfies
 $\omega_r(f + g, t)_p \leq \omega_r(f, t)_p + \omega_r(g, t)_p$,
 $\omega_r(a f, t)_p = |a| \, \omega_r(f, t)_p$ for every $a \in \C$ and
-$\omega_r(f, t)_p \leq 2^r \|f\|_p$. For all $c, t \geq 0$,
+$\omega_r(f, t)_p \leq 2^r \|f\|_p$. For every integer $m \geq 1$ and every $t \geq 0$,
+$\omega_r(f, m t)_p \leq m^r \, \omega_r(f, t)_p$, and for all $c, t \geq 0$,
 \[
   \omega_r(f, c t)_p \leq (1 + c)^r \, \omega_r(f, t)_p .
 \]
+More generally, let $\mu$ be an additive Haar measure on a normed group $V$, let $f$ be almost
+everywhere strongly measurable and let $t \geq 0$. For every integer $m \geq 1$: if every $h$
+with $\|h\| \leq m t$ is $m h'$ for some $h'$ with $\|h'\| \leq t$, then
+$\omega_r(f, m t)_p \leq m^r \omega_r(f, t)_p$. If this bound holds for every integer
+$m \geq 1$, then $\omega_r(f, c t)_p \leq (1 + c)^r \omega_r(f, t)_p$ for every $c \geq 0$.
 \end{lemma}
 
 \begin{proof}
@@ -5462,10 +5471,12 @@ $|\Delta_h^r a| \leq 2^r A \min(1, (2^j \|h\|)^r)$.
 
 \begin{proof}
 \leanok
+\uses{lem:conv-pointwise}
 A function with $|g| \leq B$ that vanishes outside $S$ has $\|g\|_p \leq B |S|^{1/p}$. The
 difference $\Delta_h^r a$ vanishes outside $r + 1$ translates of the ball, and
 $|\overline{B}(c, d 2^{-j})| = d^n |B_1| 2^{-jn}$. For smooth $a$, \Cref{lem:smooth-differences}
-gives $|\Delta_h^r a| \leq A (2^j \|h\|)^r$, and $|\Delta_h^r a| \leq 2^r \sup |a|$.
+gives $|\Delta_h^r a| \leq A (2^j \|h\|)^r$, and $|\Delta_h^r a| \leq 2^r \sup |a|$
+(\Cref{lem:conv-pointwise}).
 \end{proof}
 
 \section{Atomic decompositions}
@@ -5490,7 +5501,8 @@ Countable additivity of the integral, and \Cref{lem:dyadic-cells}.
 \label{lem:conv-pointwise}
 \lean{Rd.lintegral_closedBall_le, Rd.lintegral_kernel_mul_le, Rd.enorm_conv_le_of_bound,
   Rd.integrable_translate_mul_of_locallyIntegrable, Rd.conv_add_apply, Rd.higherDiff_conv_apply,
-  Rd.enorm_higherDiff_le_sum, Rd.enorm_higherDiff_le_of_bound}
+  Rd.enorm_higherDiff_le_sum, Rd.enorm_higherDiff_le_of_bound_steps,
+  Rd.enorm_higherDiff_le_of_bound}
 \leanok
 \uses{def:conv}
 Let $1 \leq p < \infty$, $g \in L_p$, and $|K| \leq A$ with $K = 0$ outside $\overline{B}(0, \rho)$.
@@ -5501,7 +5513,8 @@ Then $\int_{\overline{B}(x, \rho)} |g| \leq |\overline{B}(x, \rho)|^{1 - 1/p} \|
 For a continuous $K$ with compact support the integrals $\int K(y + v) g(x - y) \, dy$ converge
 absolutely, they equal $(K * g)(x + v)$, and $\Delta_h^r (K * g) = (\Delta_h^r K) * g$ at every point.
 For every $f : V \to \C$ and all $h, x \in V$,
-$|\Delta_h^r f(x)| \leq \sum_{l \leq r} \binom{r}{l} |f(x + l h)|$, and if $|f| \leq B$, then
+$|\Delta_h^r f(x)| \leq \sum_{l \leq r} \binom{r}{l} |f(x + l h)|$; if $|f(x + l h)| \leq B$
+for $l = 0, \dots, r$, then $|\Delta_h^r f(x)| \leq 2^r B$, and if $|f| \leq B$, then
 $|\Delta_h^r f| \leq 2^r B$.
 \end{lemma}
 
@@ -5740,8 +5753,10 @@ $2^r r^{r+1} A ((r + 1) d^n |B_1|)^{1/p}$.
 
 \begin{proof}
 \leanok
+\uses{lem:conv-pointwise}
 \Cref{lem:convex-differences} with $C = A 2^{jr}$ gives the bound $(2^j \|h\|)^r$, and
-$|\Delta_h^r a| \leq 2^r A$ on $\Omega_{rh}$ since all its points lie in $\Omega$.
+$|\Delta_h^r a| \leq 2^r A$ on $\Omega_{rh}$ since all its points lie in $\Omega$
+(\Cref{lem:conv-pointwise}).
 \Cref{lem:pointwise-atoms} on $\Omega$ concludes.
 \end{proof}
 

@@ -6,7 +6,6 @@ Authors: Mario Ullrich
 module
 
 public import ApproximationSpaces.Sequences.Lq
-public import Mathlib.MeasureTheory.Integral.Lebesgue.Add
 
 /-!
 # Discrete Hardy inequalities and geometric convolutions
@@ -22,10 +21,10 @@ These are the two estimates behind every telescoping argument in approximation t
 first controls partial sums of dyadic blocks (Bernstein side), the second controls tails
 (Jackson and Nikolskii side).  Both are Young's inequality `‖w * c‖_q ≤ ‖w‖_1 ‖c‖_q` for the
 geometric kernel `w i = 2^(-iα)`.  The proof writes the convolution as a series of shifted
-copies of `c` and uses the **countable Minkowski inequality** `lqNorm_tsum_le`, which follows
-from Mathlib's finite version (`MeasureTheory.eLpNorm_sum_le`) by monotone convergence
-(`lqNorm_iSup`); monotone convergence also gives the norm of a sequence as the supremum of the
-norms of its truncations, which increase (`lqNorm_eq_iSup_lqNorm_ite`, `monotone_ite_lt`).
+copies of `c` and uses the **countable Minkowski inequality** `lqNorm_tsum_le`, the case of
+`MeasureTheory.eLpNorm_tsum_le` for the counting measure; monotone convergence (`lqNorm_iSup`, the
+case of `MeasureTheory.eLpNorm_iSup_of_directed`) gives the norm of a sequence as the supremum of
+the norms of its truncations, which increase (`lqNorm_eq_iSup_lqNorm_ite`, `monotone_ite_lt`).
 
 Together they bound an **almost diagonal sum**: with `c_{ij} = 2^(-(i-j)L)` for `j ≤ i` and
 `c_{ij} = 1` for `j > i`, `‖(2^(is) ∑_j c_{ij} a_j)_i‖_q ≤ C ‖(2^(js) a_j)_j‖_q` for `0 < s < L`
@@ -53,24 +52,11 @@ section Countable
 variable {κ : Type*} [MeasurableSpace κ] [Countable κ] [MeasurableSingletonClass κ]
 
 /-- **Monotone convergence** for the `ℓ_q` norm: for an increasing sequence of families indexed
-by a countable set, the norm of the pointwise supremum is the supremum of the norms. -/
+by a countable set, the norm of the pointwise supremum is the supremum of the norms
+(`MeasureTheory.eLpNorm_iSup_of_directed` for the counting measure). -/
 theorem lqNorm_iSup {F : ℕ → κ → ℝ≥0∞} (hF : Monotone F) :
-    lqNorm q (fun k => ⨆ N, F N k) = ⨆ N, lqNorm q (F N) := by
-  rcases eq_or_ne q 0 with rfl | hq0
-  · simp
-  rcases eq_or_ne q ∞ with rfl | hq
-  · simp_rw [lqNorm_top]; exact iSup_comm
-  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
-  simp_rw [lqNorm_eq_tsum hq0 hq]
-  have h1 : ∀ k, (⨆ N, F N k) ^ q.toReal = ⨆ N, F N k ^ q.toReal := fun k =>
-    (ENNReal.orderIsoRpow q.toReal hp).map_iSup (fun N => F N k)
-  have hmono : Monotone fun N k => F N k ^ q.toReal := fun N M h k =>
-    ENNReal.rpow_le_rpow (hF h k) hp.le
-  have h2 : ∑' k, ⨆ N, F N k ^ q.toReal = ⨆ N, ∑' k, F N k ^ q.toReal := by
-    rw [← lintegral_count, lintegral_iSup (fun _ => measurable_of_countable _) hmono]
-    simp_rw [lintegral_count]
-  simp_rw [h1, h2]
-  exact (ENNReal.orderIsoRpow (1 / q.toReal) (by positivity)).map_iSup _
+    lqNorm q (fun k => ⨆ N, F N k) = ⨆ N, lqNorm q (F N) :=
+  eLpNorm_iSup_of_directed (fun _ => (measurable_of_countable _).aemeasurable) hF.directed_le q
 
 omit [Countable κ] [MeasurableSingletonClass κ] in
 /-- **Minkowski's inequality for finite sums** of families. -/
@@ -80,15 +66,12 @@ theorem lqNorm_sum_le (hq : 1 ≤ q) {ι : Type*} (s : Finset ι) (f : ι → κ
   rw [this]
   exact eLpNorm_sum_le hq
 
-/-- **Minkowski's inequality for series** of families indexed by a countable set: the norm of a
-pointwise sum is at most the sum of the norms. -/
+omit [Countable κ] [MeasurableSingletonClass κ] in
+/-- **Minkowski's inequality for series** of families: the norm of a pointwise sum is at most the
+sum of the norms (`MeasureTheory.eLpNorm_tsum_le` for the counting measure). -/
 theorem lqNorm_tsum_le (hq : 1 ≤ q) (f : ℕ → κ → ℝ≥0∞) :
-    lqNorm q (fun k => ∑' i, f i k) ≤ ∑' i, lqNorm q (f i) := by
-  simp_rw [ENNReal.tsum_eq_iSup_nat]
-  have hmono : Monotone fun N k => ∑ i ∈ range N, f i k := fun N M h k =>
-    Finset.sum_le_sum_of_subset (Finset.range_mono h)
-  rw [lqNorm_iSup hmono]
-  exact iSup_mono fun N => lqNorm_sum_le hq _ f
+    lqNorm q (fun k => ∑' i, f i k) ≤ ∑' i, lqNorm q (f i) :=
+  eLpNorm_tsum_le hq
 
 end Countable
 
@@ -116,35 +99,25 @@ theorem lqNorm_eq_iSup_lqNorm_ite (a : ℕ → ℝ≥0∞) :
   · exact le_rfl
   · exact zero_le
 
-/-- Dropping the first `i` terms does not increase the norm. -/
-theorem lqNorm_shift_le' (i : ℕ) (a : ℕ → ℝ≥0∞) : lqNorm q (fun n => a (n + i)) ≤ lqNorm q a := by
-  induction i with
-  | zero => simp
-  | succ i ih =>
-    calc lqNorm q (fun n => a (n + (i + 1))) = lqNorm q (fun n => (fun m => a (m + i)) (n + 1)) := by
-          simp only [add_assoc, add_comm 1 i]
-      _ ≤ lqNorm q (fun m => a (m + i)) := lqNorm_shift_le (q := q) (fun m => a (m + i))
-      _ ≤ lqNorm q a := ih
+/-- Dropping the first `i` terms does not increase the norm
+(`ENNReal.lqNorm_comp_le_of_injective` for `n ↦ n + i`). -/
+theorem lqNorm_shift_le' (i : ℕ) (a : ℕ → ℝ≥0∞) : lqNorm q (fun n => a (n + i)) ≤ lqNorm q a :=
+  lqNorm_comp_le_of_injective (add_left_injective i) a
 
 /-- Shifting a sequence to the right by `i` places, filling with zeros, does not increase the
-norm. -/
+norm: the shifted sequence is the extension by zero of `a` along `k ↦ k + i`
+(`ENNReal.lqNorm_extend_zero`). -/
 theorem lqNorm_shiftRight_le (i : ℕ) (a : ℕ → ℝ≥0∞) :
     lqNorm q (fun k => if i ≤ k then a (k - i) else 0) ≤ lqNorm q a := by
-  rcases eq_or_ne q 0 with rfl | hq0
-  · simp
-  rcases eq_or_ne q ∞ with rfl | hq
-  · rw [lqNorm_top, lqNorm_top]
-    exact iSup_le fun k => by split_ifs <;> simp [le_iSup a (k - i)]
-  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
-  rw [lqNorm_eq_tsum hq0 hq, lqNorm_eq_tsum hq0 hq]
-  refine ENNReal.rpow_le_rpow (le_of_eq ?_) (by positivity)
-  set F : ℕ → ℝ≥0∞ := fun k => (if i ≤ k then a (k - i) else 0) ^ q.toReal
-  have hsplit := Summable.sum_add_tsum_nat_add' (f := F) (k := i) ENNReal.summable
-  have h0 : ∑ k ∈ range i, F k = 0 :=
-    Finset.sum_eq_zero fun k hk => by
-      simp [F, not_le.2 (Finset.mem_range.1 hk), ENNReal.zero_rpow_of_pos hp]
-  rw [← hsplit, h0, zero_add]
-  simp [F]
+  have h : (fun k => if i ≤ k then a (k - i) else 0) = Function.extend (· + i) a 0 := by
+    funext k
+    split_ifs with hk
+    · obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le' hk
+      rw [Nat.add_sub_cancel]
+      exact ((add_left_injective i).extend_apply a 0 m).symm
+    · rw [Function.extend_apply' _ _ _ fun ⟨m, hm⟩ => hk (hm ▸ Nat.le_add_left i m)]
+      rfl
+  rw [h, lqNorm_extend_zero (add_left_injective i)]
 
 /-- **Hardy's inequality for tails**: for `α > 0` and `1 ≤ q ≤ ∞`,
 `‖(2^(kα) ∑_{i ≥ 0} b (k + i))ₖ‖_q ≤ (1 - 2^(-α))⁻¹ ‖(2^(kα) b k)ₖ‖_q`. -/
@@ -222,15 +195,6 @@ theorem lqNorm_almostDiagonal_le (hq : 1 ≤ q) (s L : ℝ) (a : ℕ → ℝ≥0
       · refine tsum_congr fun t => ?_
         have hti : ¬(t + (i + 1) ≤ i) := by omega
         simp only [hti, ↓reduceIte, one_mul]
-  have hw : ∀ i j, j ≤ i → dyadicWeight s i * dyadicWeight (-L) (i - j) =
-      dyadicWeight (-(L - s)) i * (dyadicWeight (L - s) j * dyadicWeight s j) := by
-    intro i j hji
-    simp only [dyadicWeight]
-    rw [← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top,
-      ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top,
-      ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top, Nat.cast_sub hji]
-    congr 1
-    ring
   have hP : lqNorm q (fun i => dyadicWeight s i *
       ∑ j ∈ Finset.range (i + 1), dyadicWeight (-L) (i - j) * a j) ≤
       (1 - (2 : ℝ≥0∞) ^ (-(L - s)))⁻¹ * X := by
@@ -243,7 +207,10 @@ theorem lqNorm_almostDiagonal_le (hq : 1 ≤ q) (s L : ℝ) (a : ℕ → ℝ≥0
       funext i
       rw [Finset.mul_sum, Finset.mul_sum]
       refine Finset.sum_congr rfl fun j hj => ?_
-      rw [← mul_assoc, hw i j (Nat.lt_succ_iff.1 (Finset.mem_range.1 hj))]
+      have hL : dyadicWeight L j = dyadicWeight (L - s) j * dyadicWeight s j := by
+        rw [← dyadicWeight_add, sub_add_cancel]
+      rw [← mul_assoc, dyadicWeight_mul_dyadicWeight_neg_sub s L
+        (Nat.lt_succ_iff.1 (Finset.mem_range.1 hj)), hL]
       ring
     have h2 : (fun k => dyadicWeight (-(L - s)) k *
         (dyadicWeight (L - s) k * (dyadicWeight s k * a k))) = fun k => dyadicWeight s k * a k := by

@@ -22,27 +22,12 @@ so the sandwich principle gives, for `0 < s₀ < s₁` and `s = (1-η)s₀ + ηs
 same for every couple of quasi-norms equivalent to these
 (`Rd.memKMethod_iff_memApprox_of_triebelLizorkin_equiv`,
 `Rd.memKMethod_iff_memApprox_of_triebelLizorkin_equiv_left`).
-
-The sandwich constants are finite by `Rd.eight_mul_dyadicWeight_mul_eLpNorm_lpKernel_ne_top` and
-`ENNReal.two_mul_one_sub_two_rpow_neg_inv_ne_top`.
 -/
 
 @[expose] public section
 
 open MeasureTheory
 open scoped ENNReal
-open ENNReal (dyadicWeight)
-
-namespace ENNReal
-
-/-- The constant `2 (1 - 2^{-s})⁻¹` of the bound of the Besov quasi-norm by the
-Triebel–Lizorkin quasi-norm (`Rd.approxNormDyadic_le_triebelLizorkinNorm`) is finite for
-`s > 0` (`ENNReal.one_sub_two_rpow_neg_inv_ne_top`). -/
-theorem two_mul_one_sub_two_rpow_neg_inv_ne_top {s : ℝ} (hs : 0 < s) :
-    2 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ ≠ ∞ :=
-  ENNReal.mul_ne_top ENNReal.ofNat_ne_top (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)
-
-end ENNReal
 
 namespace Rd
 
@@ -51,13 +36,6 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
   {q₀ q₁ q : ℝ≥0∞}
 
 /-! ### Triebel–Lizorkin spaces -/
-
-/-- The constant `8 · 2^{3s} ‖Φ‖_1` of the bound of the Triebel–Lizorkin quasi-norm by the Besov
-quasi-norm (`Rd.triebelLizorkinNorm_le_approxNormDyadic`) is finite. -/
-theorem eight_mul_dyadicWeight_mul_eLpNorm_lpKernel_ne_top (s : ℝ) :
-    8 * dyadicWeight s 3 * eLpNorm (lpKernel (V := V)) 1 volume ≠ ∞ :=
-  ENNReal.mul_ne_top (ENNReal.mul_ne_top ENNReal.ofNat_ne_top (ENNReal.dyadicWeight_ne_top _ _))
-    (memLp_one_iff_integrable.2 integrable_lpKernel).eLpNorm_ne_top
 
 /-- The **couple `(F^{s₀}_{p,q₀}, F^{s₁}_{p,q₁})`** on `L_p(V)`: the two Triebel–Lizorkin
 quasi-norms. -/

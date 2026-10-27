@@ -1575,6 +1575,8 @@ continuous. For every $f : \R \to \C$ and all $\xi, x \in \R$,
 
 \begin{proof}
 \leanok
+\uses{lem:fourier-conv, lem:fourier-integrable}
+The case $V = \R$ of \Cref{lem:fourier-conv} and \Cref{lem:fourier-integrable}:
 $|e^{-2\pi i x \xi}| = 1$, and dominated convergence with the dominating function $|f|$; the
 inverse transform is $\mathcal F^{-1} f(x) = \widehat f(-x)$.
 \end{proof}
@@ -1588,7 +1590,8 @@ For every $f : \R \to \C$, $\widehat f(0) = \int_\R f$.
 
 \begin{proof}
 \leanok
-$e^{-2\pi i x \cdot 0} = 1$ for every $x \in \R$.
+\uses{lem:fourier-conv}
+$e^{-2\pi i x \cdot 0} = 1$ for every $x \in \R$ (the case $V = \R$ of \Cref{lem:fourier-conv}).
 \end{proof}
 
 \begin{lemma}[Linearity]
@@ -1670,7 +1673,9 @@ For every $f : \R \to \C$ and all $\xi, x \in \R$, with $\bar f(x) = \overline{f
 
 \begin{proof}
 \leanok
-$\overline{e^{-2\pi i x \xi}} = e^{2\pi i x \xi}$, and conjugation commutes with the integral.
+\uses{lem:fourier-conjugation}
+The case $V = \R$ of \Cref{lem:fourier-conjugation}: $\overline{e^{-2\pi i x \xi}} =
+e^{2\pi i x \xi}$, and conjugation commutes with the integral.
 \end{proof}
 
 \paragraph{The multiplication formula and Parseval's identity.}
@@ -1693,9 +1698,11 @@ and the same holds with $\mathcal F^{-1}$ in place of $\mathcal F$:
 
 \begin{proof}
 \leanok
-By Fubini's theorem both sides of the first identity equal the absolutely convergent double
-integral $\int_\R \int_\R e^{-2\pi i x \xi} f(x) g(\xi) \, dx \, d\xi$. The second identity is
-the same with $e^{2\pi i x \xi}$.
+\uses{lem:fourier-integrable}
+The case $V = \R$ of \Cref{lem:fourier-integrable}: by Fubini's theorem both sides of the first
+identity equal the absolutely convergent double integral
+$\int_\R \int_\R e^{-2\pi i x \xi} f(x) g(\xi) \, dx \, d\xi$. The second identity is the same
+with $e^{2\pi i x \xi}$.
 \end{proof}
 
 \begin{proposition}[Parseval's identity]

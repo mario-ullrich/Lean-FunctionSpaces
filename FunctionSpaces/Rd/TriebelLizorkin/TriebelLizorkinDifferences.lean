@@ -167,8 +167,7 @@ theorem eLpNorm_ballMeanDiff_le_of_measurable {p : ℝ≥0∞} (hp1 : 1 ≤ p) (
   set B := ball (0 : V) (1 / 2 ^ j)
   set X := 2 ^ L * eLpNorm f p volume
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
-  have hP1 : 1 ≤ p.toReal := by
-    simpa using ENNReal.toReal_mono hp hp1
+  have hP1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp1 hp
   have hP : 0 < p.toReal := zero_lt_one.trans_le hP1
   have hB0 : volume B ≠ 0 := volume_ball_ne_zero (one_div_two_pow_pos j)
   have hc : (volume B)⁻¹ ≠ ∞ := ENNReal.inv_ne_top.2 hB0

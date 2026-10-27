@@ -281,8 +281,7 @@ theorem exists_window_poly {F g D : ℝ → ℂ} (hFm : Measurable F) (hgm : Mea
   have hp1 : 1 ≤ p := Fact.out
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  have hq1 : 1 ≤ p.toReal := by
-    have := ENNReal.toReal_mono hp hp1; rwa [ENNReal.toReal_one] at this
+  have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp1 hp
   obtain ⟨T, hTm, hTb⟩ := hT
   refine ⟨T, hTm, ?_⟩
   have htri : eLpNorm (fun x => F x - polyFun T x) p (volume.restrict (Icc a b)) ≤
@@ -361,8 +360,7 @@ theorem exists_sum_eLpNorm_sub_qiPieces_le_of_taylor {r : ℕ} (hr : 1 ≤ r) (h
   have hp1 : 1 ≤ p := Fact.out
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  have hq1 : 1 ≤ p.toReal := by
-    have := ENNReal.toReal_mono hp hp1; rwa [ENNReal.toReal_one] at this
+  have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp1 hp
   have h2top : (2 : ℝ≥0∞) ^ (p.toReal - 1) ≠ ∞ :=
     ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top
   set Cq := 1 + r * (MN * (Cb * ppProjConst r))
@@ -481,8 +479,7 @@ theorem exists_eLpNorm_sub_qi_le_of_taylor {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ 
   obtain ⟨A, hA, hAb⟩ := exists_sum_eLpNorm_sub_qiPieces_le_of_taylor (p := p) hr hp
   have hp1 : 1 ≤ p := Fact.out
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
-  have hq1 : 1 ≤ p.toReal := by
-    have := ENNReal.toReal_mono hp hp1; rwa [ENNReal.toReal_one] at this
+  have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp1 hp
   refine ⟨A, hA, fun {k} hk {u g₁ D₁ g₂ D₂} hum hui hg₁ hD₁ hg₂ hD₂ hT₁ hT₂ => ?_⟩
   have hpos : (0 : ℝ) < 2 ^ k := by positivity
   -- the cells whose windows lie in `[0, 3/4]`, and the others, whose windows lie in `[1/4, 1]`

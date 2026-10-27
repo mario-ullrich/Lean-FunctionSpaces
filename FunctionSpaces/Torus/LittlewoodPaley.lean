@@ -121,8 +121,7 @@ theorem enorm_lpBlock_le_approxSeq (hp : p ≠ ∞) {i j : ℕ} (hij : i + Finty
     ‖lpBlock hp j f‖ₑ ≤ 2 * eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume *
       ((trigScheme d).toLp volume p).approxSeq f (2 ^ i) := by
   set C := 2 * eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume
-  have hC : C ≠ ∞ := ENNReal.mul_ne_top (by norm_num)
-    (memLp_one_iff_integrable.2 Rd.integrable_lpKernel).eLpNorm_ne_top
+  have hC : C ≠ ∞ := ENNReal.mul_ne_top (by norm_num) Rd.eLpNorm_lpKernel_ne_top
   have hreal : ‖lpBlock hp j f‖ ≤
       C.toReal * ((trigScheme d).toLp volume p).approxError (2 ^ i) f := by
     refine ApproximationScheme.le_mul_approxError_of_forall_mem ENNReal.toReal_nonneg
@@ -292,7 +291,7 @@ theorem memBesov_iff_littlewoodPaleyNorm_lt_top (hp : p ≠ ∞) {s : ℝ} (hs :
     (trigScheme d).MemBesov volume p s q f ↔ littlewoodPaleyNorm hp s q f < ∞ := by
   rw [FunctionScheme.MemBesov, ApproximationScheme.memApprox_iff_approxNormDyadic_lt_top hq hs.le]
   have hK : eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume < ∞ :=
-    (memLp_one_iff_integrable.2 Rd.integrable_lpKernel).eLpNorm_lt_top
+    Rd.eLpNorm_lpKernel_lt_top
   constructor
   · intro h
     refine (littlewoodPaleyNorm_le_approxNormDyadic_trigScheme hp hs.le hq f).trans_lt

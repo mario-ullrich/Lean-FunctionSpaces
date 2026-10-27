@@ -141,9 +141,7 @@ omit [Fact (1 ≤ p)] in
 theorem jacksonConst_ne_top (hp1 : 1 ≤ p) (hp : p ≠ ∞) (r : ℕ) : jacksonConst V r p ≠ ∞ := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  have hq1 : 1 ≤ p.toReal := by
-    have h := ENNReal.toReal_mono hp hp1
-    rwa [ENNReal.toReal_one] at h
+  have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp1 hp
   have h1 : ∫⁻ z, ‖lpKernel (V := V) z‖ₑ ≠ ∞ := integrable_lpKernel.2.ne
   set N := ⌈(r : ℝ) * p.toReal⌉₊
   have hint : Integrable (fun z : V => 2 ^ N * (‖lpKernel z‖ + ‖z‖ ^ N * ‖lpKernel z‖)) :=

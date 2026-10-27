@@ -29,9 +29,6 @@ sandwich principle gives, for `0 < θ, η < 1` and `1 ≤ q ≤ ∞`,
 By the interpolation property, an additive map bounded on `L_p` and on `W^m_p` is bounded on
 `B^{θm}_{p,q}` (`Rd.kMethodNorm_map_le_of_bounded_lp_sobolev`,
 `Rd.memApprox_map_of_bounded_lp_sobolev`).
-
-The constants use two inequalities in `[0, ∞]` (`ENNReal.mul_add_mul_le_add_mul_add`,
-`ENNReal.sum_mul_le_sum_mul_sum`) and `‖Φ‖_1 ≥ 1` (`Rd.one_le_eLpNorm_lpKernel`).
 -/
 
 @[expose] public section
@@ -40,36 +37,10 @@ open MeasureTheory Module
 open scoped ENNReal
 open ENNReal (dyadicWeight)
 
-namespace ENNReal
-
-/-- `a x + b y ≤ (a + b)(x + y)` in `[0, ∞]`. -/
-theorem mul_add_mul_le_add_mul_add (a b x y : ℝ≥0∞) :
-    a * x + b * y ≤ (a + b) * (x + y) := by
-  rw [add_mul, mul_add, mul_add]
-  exact add_le_add le_self_add le_add_self
-
-/-- `∑_i a_i b_i ≤ (∑_i a_i)(∑_i b_i)` for finite families in `[0, ∞]`: each `a_i` is at most
-`∑_j a_j` (Mathlib's `Finset.single_le_sum`, `Finset.sum_mul`). -/
-theorem sum_mul_le_sum_mul_sum {ι : Type*} [Fintype ι] (a b : ι → ℝ≥0∞) :
-    ∑ i, a i * b i ≤ (∑ i, a i) * ∑ i, b i := by
-  rw [Finset.mul_sum]
-  exact Finset.sum_le_sum fun i hi =>
-    mul_le_mul_left (Finset.single_le_sum (fun j _ => zero_le) hi) _
-
-end ENNReal
-
 namespace Rd
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
-
-/-- **The kernel `Φ` has `L_1` norm at least `1`**: `‖Φ‖_1 ≥ |∫ Φ| = 1`
-(`Rd.integral_lpKernel` and Mathlib's `enorm_integral_le_lintegral_enorm`). -/
-theorem one_le_eLpNorm_lpKernel : 1 ≤ eLpNorm (lpKernel (V := V)) 1 volume :=
-  calc (1 : ℝ≥0∞) = ‖∫ x, lpKernel (V := V) x‖ₑ := by rw [integral_lpKernel, enorm_one]
-    _ ≤ ∫⁻ x, ‖lpKernel (V := V) x‖ₑ := enorm_integral_le_lintegral_enorm _
-    _ = eLpNorm (lpKernel (V := V)) 1 volume :=
-        (eLpNorm_one_eq_lintegral_enorm integrable_lpKernel.aestronglyMeasurable).symm
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
@@ -149,11 +120,10 @@ omit [Fact (1 ≤ p)] in
 /-- The constant `Rd.approxSobolevGridConst V p m` is finite for `1 < p < ∞` and `m ≥ 1`. -/
 theorem approxSobolevGridConst_ne_top (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ} (hm : 1 ≤ m) :
     approxSobolevGridConst V p m ≠ ∞ :=
-  ENNReal.mul_ne_top (ENNReal.mul_ne_top ENNReal.ofNat_ne_top
-    (ENNReal.one_sub_two_rpow_neg_inv_ne_top (Nat.cast_pos.2 hm)))
-    (ENNReal.add_ne_top.2 ⟨(memLp_one_iff_integrable.2 integrable_lpKernel).eLpNorm_ne_top,
-      ENNReal.mul_ne_top (ENNReal.pow_ne_top ENNReal.ofNat_ne_top)
-        (ENNReal.sum_ne_top.2 fun i _ => sobolevToTLConst_ne_top hp1 hp i)⟩)
+  ENNReal.mul_ne_top (ENNReal.two_mul_one_sub_two_rpow_neg_inv_ne_top (Nat.cast_pos.2 hm))
+    (ENNReal.add_ne_top.2 ⟨eLpNorm_lpKernel_ne_top, ENNReal.mul_ne_top
+      (ENNReal.pow_ne_top ENNReal.ofNat_ne_top)
+      (ENNReal.sum_ne_top.2 fun i _ => sobolevToTLConst_ne_top hp1 hp i)⟩)
 
 omit [Fact (1 ≤ p)] in
 /-- The constant `Rd.approxSobolevGridConst V p m` is nonzero, since `‖Φ‖_1 ≥ 1`
@@ -180,7 +150,7 @@ theorem approxNormDyadic_le_of_hasWeakLineDeriv_sum [Nontrivial V] (hp1 : 1 < p)
         (‖f‖ₑ + ∑ i, ‖g i‖ₑ) := by
     refine le_trans ?_ (ENNReal.mul_add_mul_le_add_mul_add _ _ _ _)
     rw [mul_assoc]
-    exact add_le_add_right (mul_le_mul_right (ENNReal.sum_mul_le_sum_mul_sum _ _) _) _
+    exact add_le_add_right (mul_le_mul_right (ENNReal.sum_mul_le_sum_mul_sum _ _ _) _) _
   refine (approxNormDyadic_le_of_hasWeakLineDeriv hp1 hp hm hg).trans ?_
   rw [approxSobolevGridConst, mul_assoc _ (_ + _)]
   exact mul_le_mul_right h _
@@ -213,9 +183,7 @@ theorem sobolevGridApproxConst_ne_top (hp1 : 1 < p) (hp : p ≠ ∞) (m : ℕ) :
     sobolevGridApproxConst V p m ≠ ∞ :=
   ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.mul_ne_top
     (ENNReal.sum_ne_top.2 fun _ _ => tlToSobolevConst_ne_top hp1 hp _)
-    (ENNReal.mul_ne_top (ENNReal.mul_ne_top ENNReal.ofNat_ne_top
-      (ENNReal.dyadicWeight_ne_top _ _))
-      (memLp_one_iff_integrable.2 integrable_lpKernel).eLpNorm_ne_top)⟩
+    (eight_mul_dyadicWeight_mul_eLpNorm_lpKernel_ne_top _)⟩
 
 omit [Fact (1 ≤ p)] in
 /-- The constant `Rd.sobolevGridApproxConst V p m` is nonzero: it is at least `1`. -/

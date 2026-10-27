@@ -248,7 +248,7 @@ theorem memTriebelLizorkin_of_hasWeakLineDeriv [Nonempty d] (hp1 : 1 < p) (hp : 
     MemTriebelLizorkin (m : ℝ) 2 f :=
   (triebelLizorkinNorm_le_of_hasWeakLineDeriv hp1 hp hg).trans_lt
     (ENNReal.add_lt_top.2 ⟨ENNReal.mul_lt_top
-      (memLp_one_iff_integrable.2 Rd.integrable_lpKernel).eLpNorm_lt_top enorm_lt_top,
+      Rd.eLpNorm_lpKernel_lt_top enorm_lt_top,
       ENNReal.mul_lt_top (ENNReal.pow_lt_top ENNReal.ofNat_lt_top) (ENNReal.sum_lt_top.2 fun i _ =>
         ENNReal.mul_lt_top (sobolevToTLConst_ne_top hp1 hp i).lt_top enorm_lt_top)⟩)
 

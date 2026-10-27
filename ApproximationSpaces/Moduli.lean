@@ -86,15 +86,11 @@ noncomputable def modNorm (s : ℝ) (q : ℝ≥0∞) (f : X) : ℝ≥0∞ :=
 theorem modulus_zero (k : ℕ) : M.modulus 0 k = 0 :=
   le_antisymm ((M.le_enorm 0 k).trans (by simp)) bot_le
 
-/-- The modulus is subadditive on finite sums. -/
+/-- The modulus is subadditive on finite sums (Mathlib's `Finset.le_sum_of_subadditive`). -/
 theorem modulus_sum_le {ι : Type*} (t : Finset ι) (g : ι → X) (k : ℕ) :
-    M.modulus (∑ i ∈ t, g i) k ≤ ∑ i ∈ t, M.modulus (g i) k := by
-  classical
-  induction t using Finset.induction_on with
-  | empty => simp [M.modulus_zero]
-  | insert i t hi ih =>
-    rw [Finset.sum_insert hi, Finset.sum_insert hi]
-    exact (M.add_le _ _ k).trans (add_le_add le_rfl ih)
+    M.modulus (∑ i ∈ t, g i) k ≤ ∑ i ∈ t, M.modulus (g i) k :=
+  Finset.le_sum_of_subadditive (M.modulus · k) (M.modulus_zero k).le (fun f g => M.add_le f g k)
+    t g
 
 /-- The constant of Jackson's direction, `1 + ∑_{k<k₀} 2^(ks) + C_J`. -/
 noncomputable def directConst (s : ℝ) : ℝ≥0∞ :=
@@ -122,9 +118,9 @@ theorem approxNormDyadic_le_modNorm (hq : 1 ≤ q) (f : X) :
       exact M.jackson f k (not_lt.1 hk)
   have hlow : lqNorm q (fun k => if k < M.jacksonStart then dyadicWeight s k * ‖f‖ₑ else 0) ≤
       W * ‖f‖ₑ := by
-    refine (ENNReal.lqNorm_le_lqNorm_of_le le_rfl hq _).trans_eq ?_
-    rw [ENNReal.lqNorm_one, tsum_eq_sum (s := range M.jacksonStart) fun k hk => by
-      rw [mem_range] at hk; simp only [hk, ↓reduceIte], Finset.sum_mul]
+    refine (ENNReal.lqNorm_le_sum_of_eq_zero hq (range M.jacksonStart) fun k hk => by
+      rw [mem_range] at hk; simp only [hk, ↓reduceIte]).trans_eq ?_
+    rw [Finset.sum_mul]
     exact Finset.sum_congr rfl fun k hk => by rw [mem_range] at hk; simp only [hk, ↓reduceIte]
   calc A.approxNormDyadic s q f = ‖f‖ₑ + lqNorm q (A.approxSeqDyadic s f) := rfl
     _ ≤ ‖f‖ₑ + (W * ‖f‖ₑ + M.CJ * L) := by
@@ -224,13 +220,8 @@ theorem dyadicWeight_mul_modulus_le_of_dyadicApprox (hθ : 0 ≤ θ) {f : X} {t 
             (dyadicWeight s j * (A.approxSeq f (2 ^ j) + t j))) := by
   have hw : ∀ j ∈ range k, dyadicWeight s k * dyadicWeight (-θ) (k - j) =
       dyadicWeight (-(θ - s)) k * dyadicWeight (θ - s) j * dyadicWeight s j := fun j hj => by
-    have hjk : j ≤ k := (Finset.mem_range.1 hj).le
-    simp only [ENNReal.dyadicWeight]
-    rw [← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top,
-      ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top,
-      ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top, Nat.cast_sub hjk]
-    congr 1
-    ring
+    rw [ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub s θ (Finset.mem_range.1 hj).le, mul_assoc,
+      ← ENNReal.dyadicWeight_add, sub_add_cancel]
   have hw0 : dyadicWeight s k * dyadicWeight (-θ) k = dyadicWeight (-(θ - s)) k := by
     rw [← ENNReal.dyadicWeight_add]; congr 1; ring
   calc dyadicWeight s k * M.modulus f k

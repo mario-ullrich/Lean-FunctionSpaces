@@ -163,9 +163,10 @@ section Partition
 variable [MeasurableSpace V] [BorelSpace V]
 
 omit [MeasurableSpace V] [BorelSpace V] in
-/-- Cells of the same level with different indices are disjoint. -/
+/-- Cells of the same level with different indices are disjoint: they are the fibres of
+`Rd.cellIndex j` (Mathlib's `pairwise_disjoint_fiber`). -/
 theorem cell_disjoint (j : ℕ) : Pairwise (Function.onFun Disjoint (cell (V := V) j)) :=
-  fun _ _ hmm' => Set.disjoint_left.2 fun _ hx hx' => hmm' (hx.symm.trans hx')
+  pairwise_disjoint_fiber (cellIndex j)
 
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- The cells of one level cover the space. -/
@@ -243,9 +244,7 @@ theorem eLpNorm_rpow_le_of_overlap {α : Type*} [MeasurableSpace α] {μ : Measu
     eLpNorm F p μ ^ p.toReal ≤
       (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, eLpNorm (g m) p μ ^ p.toReal := by
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
-  have hpr : 1 ≤ p.toReal := by
-    rw [← ENNReal.toReal_one]
-    exact ENNReal.toReal_mono hp hp1
+  have hpr : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp1 hp
   rw [eLpNorm_rpow_eq hF hp0 hp]
   calc ∫⁻ x, ‖F x‖ₑ ^ p.toReal ∂μ
       ≤ ∫⁻ x, (N : ℝ≥0∞) ^ (p.toReal - 1) * ∑' m, ‖g m x‖ₑ ^ p.toReal ∂μ := by
