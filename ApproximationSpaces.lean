@@ -38,81 +38,141 @@ public import ApproximationSpaces.Moduli
 /-!
 # Approximation spaces
 
-The abstract theory of approximation spaces in the sense of Pietsch (J. Approx. Theory 32,
-1981) and of real interpolation by the K-method.  An approximation scheme is an increasing
-sequence of sets `A 0 ⊆ A 1 ⊆ ⋯` in a real normed space `X`, and `E_n(f) = dist(f, A n)` is the
-error of best approximation of `f`.  The schemes live in real normed spaces, and the couples of
-`ApproximationSpaces.Interpolation` live on an additive commutative group; the measures are
-the counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the continuous K-method.
+This library is the abstract theory of approximation spaces in the sense of Pietsch
+(J. Approx. Theory 32, 1981), together with real interpolation by the K-method.
+
+**Approximation schemes.** An approximation scheme is an increasing sequence of sets
+`A 0 ⊆ A 1 ⊆ A 2 ⊆ ⋯` in a real normed space `X`, with `A 0 = {0}`, `c • A n ⊆ A n` and
+`A m + A n ⊆ A (m + n)`. The elements of `A n` are the approximants of complexity `n`:
+polynomials of degree `< n`, combinations of the first `n` elements of a basis, or combinations
+of at most `n` elements of a dictionary. The error of best approximation of `f ∈ X` from `A n` is
+
+`E_n(f) = inf { ‖f - a‖ : a ∈ A n }`.
+
+**Approximation spaces.** For a smoothness `s > 0` and a fine index `1 ≤ q ≤ ∞`, the space
+`A^s_q` consists of the `f` whose errors decay at the rate `n^(-s)`, measured in `ℓ_q`:
+
+`‖f‖_{A^s_q} = ‖(n^(s - 1/q) E_{n-1}(f))_{n ≥ 1}‖_{ℓ_q} < ∞`.
+
+So smoothness becomes a rate of approximation. Two inequalities link the spaces `A^s_q` to
+classical spaces such as Besov spaces. Jackson's inequality says that smooth elements are well
+approximated. Bernstein's inequality says that approximants are smooth, with controlled norm.
+
+**Real interpolation.** For a smaller space `Y` inside `X`, the K-functional
+`K(t, f) = inf_y (‖f - y‖_X + t ‖y‖_Y)` measures how well `f` is approximated by elements of `Y`
+of controlled size. The K-method builds from it the interpolation spaces `(X, Y)_{θ,q}`. Under
+Jackson's and Bernstein's inequalities of order `r`, the representation theorem gives
+
+`A^s_q = (X, Y)_{s/r,q}`   for `0 < s < r`.
+
+Hence theorems about interpolation spaces, such as the reiteration theorem, apply to
+approximation spaces.
+
+**Setting.** Everything here is abstract. The schemes live in real normed spaces, and the
+couples of the interpolation part live on additive commutative groups. No function spaces
+occur, and the only measures are the counting measure behind the `ℓ_q` norms and `dt/t` on
+`(0, ∞)` in the continuous K-method. The library `FunctionSpaces` applies the theory to
+concrete schemes.
 
 ## Layout
 
-* `ApproximationSpaces.Scheme`: the structure `ApproximationScheme`, its elementary
-  consequences, the preimage and image of a scheme under a linear map, and the dyadic scheme of
-  an increasing sequence of subspaces.
-* `ApproximationSpaces.Error`: the error `ApproximationScheme.approxError` and its calculus.
-* `ApproximationSpaces.Instances.Span`: linear approximation from the first `n` elements of
-  a sequence, `ApproximationScheme.ofSpan`.
-* `ApproximationSpaces.Instances.NTerm`: nonlinear `n`-term approximation from a
-  dictionary, `ApproximationScheme.nTerm`.
-* `ApproximationSpaces.Sequences.Lq`: the `ℓ_q` norm `ENNReal.lqNorm` of a sequence in
-  `ℝ≥0∞`, its monotonicity in `q`, and the dyadic weights `ENNReal.dyadicWeight`.
-* `ApproximationSpaces.Sequences.Dyadic`: Cauchy condensation with power weights, which
-  compares `∑ (n+1)^γ b n` with `∑ 2^(k(γ+1)) b (2^k)` for decreasing `b`, and the dyadic sums
-  `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4` and `∑_j u_j ≤ (N + 1) M` for `N + 1` dyadic scales, and the
-  interpolation inequality for dyadic suprema `ENNReal.tsum_dyadicWeight_mul_le_iSup`.
-* `ApproximationSpaces.Sequences.Hardy`: the countable Minkowski inequality, the two
-  discrete Hardy inequalities, the shift invariance of `ℓ_q(ℤ)` and the geometric convolutions
-  on `ℤ`.
-* `ApproximationSpaces.Norm`: Pietsch's quasi-norm `ApproximationScheme.approxNorm` of
-  `A^s_q` and membership `ApproximationScheme.MemApprox`.
+Names below are relative to the namespace `ApproximationScheme`, except those that start with
+`ENNReal` or `InterpCouple`.
+
+### The scheme and the error
+
+* `ApproximationSpaces.Scheme`: the structure `ApproximationScheme` and its elementary
+  consequences, the preimage `comap` and the image `map` of a scheme under a linear map, the
+  scheme `ofSubmodules` of an increasing sequence of subspaces, and the dyadic scheme
+  `ofMonotoneSubmodules`, with the `k`-th subspace at complexity `2^k`.
+* `ApproximationSpaces.Error`: the error `E_n(f)`, `approxError`, and its calculus:
+  `E_0(f) = ‖f‖`, monotonicity in `n`, homogeneity, subadditivity, near-best approximants, the
+  limit `E_n(f) → 0` exactly on the closure of `⋃ A n` (`tendsto_approxError_zero_iff`), the
+  bound for linear maps (`approxError_map_le`) and the Lebesgue inequality.
+* `ApproximationSpaces.Instances.Span`: linear approximation from the first `n` elements of a
+  sequence, `ofSpan`. Its errors tend to zero exactly on the closed span.
+* `ApproximationSpaces.Instances.NTerm`: nonlinear `n`-term approximation from a dictionary,
+  `nTerm`. Its errors are at most those of `ofSpan` (`approxError_nTerm_le_ofSpan`).
+
+### The spaces `A^s_q` and their dyadic norm
+
+* `ApproximationSpaces.Norm`: the errors as a sequence in `ℝ≥0∞` (`approxSeq`), Pietsch's
+  quasi-norm `approxNorm` of `A^s_q`, membership `MemApprox`, homogeneity, and the embedding
+  `‖f‖ ≤ ‖f‖_{A^s_q}` (`enorm_le_approxNorm`).
 * `ApproximationSpaces.Dyadic`: the equivalent dyadic quasi-norm
-  `ApproximationScheme.approxNormDyadic`, the working norm of all later files.
-* `ApproximationSpaces.Space`: the quasi-triangle inequality and `A^s_q` as a submodule,
-  `ApproximationScheme.approxSpace`.
-* `ApproximationSpaces.Embedding`: the embeddings `A^s_q ↪ A^t_r`.
-* `ApproximationSpaces.Transfer`: functoriality under bounded linear maps.
-* `ApproximationSpaces.Lift`: lifting bounds (Bernstein and Nikolskii inequalities), dyadic
-  near-best approximants and the telescoping construction; a lifting bound of exponent `β`
-  gives `A^β_1 ↪ Y`.
-* `ApproximationSpaces.Nikolskii`: the Nikolskii transfer theorem
-  `A^s_q(X) ↪ B^{s-α}_q(Y)`.
-* `ApproximationSpaces.Jackson`: Jackson's inequality, `ι(Y) ⊆ A^r_∞`, and smoothness spaces
-  `ApproximationScheme.SmoothnessSpace` with `A^r_1 ⊆ Y ⊆ A^r_∞`.
-* `ApproximationSpaces.KFunctional`: the Peetre K-functional and the real interpolation
-  spaces `(X, Y)_{θ,q}` of the discrete K-method on a dyadic grid.
+  `‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}`, `approxNormDyadic`, the working norm of all later files.
+* `ApproximationSpaces.Space`: the quasi-triangle inequality and `A^s_q` as a submodule of `X`,
+  `approxSpace`.
+
+### Sequence spaces (`Sequences/`)
+
+* `ApproximationSpaces.Sequences.Lq`: the `ℓ_q` norm `ENNReal.lqNorm` of a sequence in `ℝ≥0∞`,
+  defined as the `L_q` norm for the counting measure, with its monotonicity in `q`, the
+  Cauchy–Schwarz inequality and the dyadic weights `ENNReal.dyadicWeight`.
+* `ApproximationSpaces.Sequences.Dyadic`: Cauchy condensation with power weights
+  (`ENNReal.tsum_pow_mul_le_dyadic`), three sums over dyadic scales, and the interpolation
+  inequality for dyadic suprema (`ENNReal.tsum_dyadicWeight_mul_le_iSup`).
+* `ApproximationSpaces.Sequences.Hardy`: the countable Minkowski inequality, the two discrete
+  Hardy inequalities (`ENNReal.hardy_sum_le`, `ENNReal.hardy_tail_le`), almost diagonal sums,
+  shifts on `ℓ_q(ℤ)` and geometric convolutions.
+
+### Embeddings, transfer and lifting
+
+* `ApproximationSpaces.Embedding`: the embeddings `A^s_q ↪ A^s_r` for `q ≤ r` and
+  `A^s_q ↪ A^t_r` for `t < s` (`MemApprox.mono`).
+* `ApproximationSpaces.Transfer`: a bounded linear map `T` with `T (A n) ⊆ B n` maps `A^s_q(X)`
+  into `B^s_q(Y)` with norm at most `‖T‖` (`approxNorm_map_le`).
+* `ApproximationSpaces.Lift`: lifting bounds `LiftBound` (Bernstein's and Nikolskii's
+  inequalities), dyadic near-best approximants `DyadicApprox`, and the telescoping construction.
+  A lifting bound of exponent `β` gives `A^β_1 ↪ Y` (`exists_preimage_of_liftBound`).
+* `ApproximationSpaces.Nikolskii`: the Nikolskii transfer theorem `A^s_q(X) ↪ B^{s-α}_q(Y)` for
+  `0 ≤ α < s` (`exists_preimage_of_nikolskii`).
+
+### Jackson inequalities and smoothness spaces
+
+* `ApproximationSpaces.Jackson`: Jackson's inequality `JacksonBound`, which gives
+  `ι(Y) ⊆ A^r_∞`, and smoothness spaces `SmoothnessSpace`, with `A^r_1 ⊆ ι(Y) ⊆ A^r_∞`.
+
+### Real interpolation
+
+* `ApproximationSpaces.KFunctional`: the K-functional `kFunctional` of a bounded linear map
+  `ι : Y → X` and the spaces `(X, Y)_{θ,q}` of the discrete K-method (`interpNorm`, `MemInterp`).
 * `ApproximationSpaces.Representation`: the representation theorem `A^s_q = (X, Y)_{s/r,q}`
-  under Jackson's and Bernstein's inequalities of order `r`.
-* `ApproximationSpaces.KMethod`: the continuous K-method
-  `(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)`, its equivalence with the discrete K-method on every
-  dyadic grid (Bergh–Löfström, Lemma 3.1.3), and the representation theorem for the continuous
-  K-method.
-* `ApproximationSpaces.Interpolation.Couple`: couples `InterpCouple` of two extended
-  quasi-norms on an abelian group, their K-functional, the continuous and the discrete K-method,
-  their equivalence and quasi-triangle inequalities, and the couple `InterpCouple.ofMap ι` of a
-  bounded linear map.
-* `ApproximationSpaces.Interpolation.Property`: the invariance of `dt/t` under dilations, the
-  interpolation property of the K-method (exactness of exponent `θ`), comparable couples,
-  retracts, and the interpolation property for the couples of bounded linear maps.
-* `ApproximationSpaces.Interpolation.Reiteration`: couples of K-spaces, Holmstedt's formula in
-  discrete form, and the reiteration theorem
-  `((X₀, X₁)_{θ₀,q₀}, (X₀, X₁)_{θ₁,q₁})_{η,q} = (X₀, X₁)_{(1-η)θ₀+ηθ₁,q}` with its endpoint cases.
-* `ApproximationSpaces.Interpolation.ApproxSpaces`: approximation spaces as interpolation spaces,
-  `A^s_q = (X, A^r_∞)_{s/r,q}` for every scheme, the reiteration
-  `(A^{s₀}_{q₀}, A^{s₁}_{q₁})_{η,q} = A^{(1-η)s₀+ηs₁}_q`, and the sandwich principle.
+  under Jackson's and Bernstein's inequalities of order `r` (`approxSpace_eq_interpSpace`).
+* `ApproximationSpaces.KMethod`: the continuous K-method `kMethodNorm` and its equivalence with
+  the discrete K-method on every dyadic grid (Bergh–Löfström, Lemma 3.1.3;
+  `memInterp_iff_memKMethod`).
+* `ApproximationSpaces.Interpolation.Couple`: couples `InterpCouple` of two extended quasi-norms
+  on an abelian group, their K-functional and K-methods, and the couple `InterpCouple.ofMap ι`
+  of a bounded linear map.
+* `ApproximationSpaces.Interpolation.Property`: the interpolation property of the K-method,
+  exact of exponent `θ` (`InterpCouple.kMethodNorm_map_le`), comparable couples and retracts.
+* `ApproximationSpaces.Interpolation.Reiteration`: Holmstedt's formula in discrete form and the
+  reiteration theorem `((X₀, X₁)_{θ₀,q₀}, (X₀, X₁)_{θ₁,q₁})_{η,q} = (X₀, X₁)_{(1-η)θ₀+ηθ₁,q}`
+  (`InterpCouple.memKMethod_kCouple_iff`).
+* `ApproximationSpaces.Interpolation.ApproxSpaces`: approximation spaces as interpolation
+  spaces, `A^s_q = (X, A^r_∞)_{s/r,q}` for every scheme (`memApprox_iff_memKMethod_reprCouple`),
+  their reiteration (`memKMethod_approxCouple_iff`) and the sandwich principle.
+
+### Decompositions
+
 * `ApproximationSpaces.Decompositions.Projection`: schemes with uniformly bounded projections
-  and the characterisation of `A^s_q` by dyadic blocks.
+  `ProjectionScheme` and the characterisation of `A^s_q` by dyadic blocks.
 * `ApproximationSpaces.Decompositions.Blocks`: the characterisation of `A^s_q` by block
-  decompositions `f = ∑ g_k`, `g_k ∈ A (2^k)`.
-* `ApproximationSpaces.Decompositions.Synthesis`: linear schemes and synthesis from blocks that
-  are approximable at rate `σ`.
-* `ApproximationSpaces.Decompositions.Atomic`: atomic systems, the sequence spaces `b^s_{p,q}`
-  and the atomic characterisation of `A^s_q`.
-* `ApproximationSpaces.Trace`: maps defined on approximants (traces), their extension to
-  `A^β_1`, the transfer `A^s_q → B^{s-β}_q` and its surjectivity.
-* `ApproximationSpaces.Retract`: approximation-preserving extensions and the equivalence of
-  intrinsic and restriction quasi-norms.
-* `ApproximationSpaces.Moduli`: moduli of smoothness compatible with a scheme (Jackson and
-  inverse inequalities), the coincidence of `A^s_q` with the classical space for `0 < s < θ`, and
-  the interpolation of the classical spaces.
+  decompositions `f = ∑ g_k` with `g_k ∈ A (2^k)` (`memApprox_iff_blockDecompNorm_lt_top`).
+* `ApproximationSpaces.Decompositions.Synthesis`: linear schemes `IsLinear` and synthesis from
+  blocks that are approximable at rate `σ` (`approxNormDyadic_le_of_hasSum_decay`).
+* `ApproximationSpaces.Decompositions.Atomic`: atomic systems `AtomicSystem`, the sequence
+  spaces `b^s_{p,q}` and the atomic characterisation of `A^s_q`
+  (`AtomicSystem.memApprox_iff_exists_atomic`).
+
+### Traces, retracts and moduli of smoothness
+
+* `ApproximationSpaces.Trace`: maps controlled only on the approximants (`TraceBound`), their
+  extension to `A^β_1`, the transfer `A^s_q(X) → B^{s-β}_q(Y)` and its surjectivity.
+* `ApproximationSpaces.Retract`: approximation-preserving extensions `ApproxExtension` and the
+  equivalence of intrinsic and restriction quasi-norms (`memApprox_iff_exists_restrict`).
+* `ApproximationSpaces.Moduli`: moduli of smoothness compatible with a scheme (`ModulusData`),
+  the coincidence of `A^s_q` with the classical space for `0 < s < θ`, and the interpolation of
+  the classical spaces.
 -/
