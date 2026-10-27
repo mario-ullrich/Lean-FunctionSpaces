@@ -71,7 +71,7 @@ theorem iUnion_ofSpan : (⋃ n, ofSpan e n) = (Submodule.span ℝ (Set.range e) 
 
 /-- For `ofSpan e`, the errors tend to zero exactly on the closed span of `e`. -/
 theorem tendsto_approxError_ofSpan_iff (f : X) :
-    Filter.Tendsto ((ofSpan e).approxError · f) Filter.atTop (nhds 0) ↔
+    Filter.Tendsto ((ofSpan e).approxError f) Filter.atTop (nhds 0) ↔
       f ∈ closure (Submodule.span ℝ (Set.range e) : Set X) := by
   rw [tendsto_approxError_zero_iff, iUnion_ofSpan]
 

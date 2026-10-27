@@ -35,12 +35,6 @@ variable {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 
 variable {A : ApproximationScheme X} {B : ApproximationScheme Y} {s : ℝ} {q : ℝ≥0∞}
 
-/-- `E^B_n(T f) ≤ ‖T‖ E^A_n(f)` when `T(A_n) ⊆ B_n`. -/
-theorem approxSeq_map_le (T : X →L[ℝ] Y) (hT : ∀ n, ∀ a ∈ A n, T a ∈ B n) (f : X) (n : ℕ) :
-    B.approxSeq (T f) n ≤ ‖T‖ₑ * A.approxSeq f n := by
-  rw [approxSeq, approxSeq, ← ofReal_norm, ← ENNReal.ofReal_mul (norm_nonneg T)]
-  exact ENNReal.ofReal_le_ofReal (approxError_map_le T B hT n f)
-
 /-- **Functoriality**, Pietsch's quasi-norm: `‖T f‖_{B^s_q} ≤ ‖T‖ ‖f‖_{A^s_q}`. -/
 theorem approxNorm_map_le (T : X →L[ℝ] Y) (hT : ∀ n, ∀ a ∈ A n, T a ∈ B n) (f : X) :
     B.approxNorm s q (T f) ≤ ‖T‖ₑ * A.approxNorm s q f := by
@@ -48,7 +42,7 @@ theorem approxNorm_map_le (T : X →L[ℝ] Y) (hT : ∀ n, ∀ a ∈ A n, T a �
   refine ENNReal.lqNorm_mono fun n => ?_
   rw [mul_left_comm]
   gcongr
-  exact approxSeq_map_le T hT f n
+  exact approxError_map_le T hT f n
 
 /-- **Functoriality**, dyadic quasi-norm: `‖T f‖^dyadic ≤ ‖T‖ ‖f‖^dyadic`. -/
 theorem approxNormDyadic_map_le (T : X →L[ℝ] Y) (hT : ∀ n, ∀ a ∈ A n, T a ∈ B n) (f : X) :
@@ -57,7 +51,7 @@ theorem approxNormDyadic_map_le (T : X →L[ℝ] Y) (hT : ∀ n, ∀ a ∈ A n, 
   refine add_le_add (T.le_opENorm f) (ENNReal.lqNorm_mono fun k => ?_)
   rw [approxSeqDyadic, approxSeqDyadic, mul_left_comm]
   gcongr
-  exact approxSeq_map_le T hT f _
+  exact approxError_map_le T hT f _
 
 /-- A bounded linear map with `T(A_n) ⊆ B_n` maps `A^s_q` into `B^s_q`. -/
 theorem MemApprox.map (T : X →L[ℝ] Y) (hT : ∀ n, ∀ a ∈ A n, T a ∈ B n) {f : X}

@@ -76,7 +76,7 @@ structure AtomicSystem (A : ApproximationScheme X) (M : ℕ → Type*) [∀ j, F
   size : ∀ j (a : M j → X), (∀ m, a m ∈ adm j m) → ∀ c : M j → ℝ,
     ‖∑ m, c m • a m‖ₑ ≤ C * (dyadicWeight (-δ) j * lqNorm p (fun m => ‖c m‖ₑ))
   decay : ∀ j (a : M j → X), (∀ m, a m ∈ adm j m) → ∀ c : M j → ℝ, ∀ k, j ≤ k →
-    A.approxSeq (∑ m, c m • a m) (2 ^ k) ≤
+    A.approxError (∑ m, c m • a m) (2 ^ k) ≤
       dyadicWeight (-σ) (k - j) * (C * (dyadicWeight (-δ) j * lqNorm p (fun m => ‖c m‖ₑ)))
 
 namespace AtomicSystem

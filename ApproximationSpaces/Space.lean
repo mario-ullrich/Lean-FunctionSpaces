@@ -45,7 +45,7 @@ theorem approxSeqDyadic_add_le_succ (f g : X) (k : ℕ) :
   rw [approxSeqDyadic, ENNReal.dyadicWeight_succ, mul_assoc, approxSeqDyadic, approxSeqDyadic,
     ← mul_add]
   gcongr
-  exact approxSeq_add_le_pow_succ k f g
+  exact approxError_add_le_pow_succ k f g
 
 /-- **Quasi-triangle inequality** for the dyadic quasi-norm, with constant `2 · 2^s`. -/
 theorem approxNormDyadic_add_le (hq : 1 ≤ q) (hs : 0 ≤ s) (f g : X) :
@@ -56,7 +56,7 @@ theorem approxNormDyadic_add_le (hq : 1 ≤ q) (hs : 0 ≤ s) (f g : X) :
   have hD : lqNorm q (A.approxSeqDyadic s (f + g)) ≤ (‖f‖ₑ + ‖g‖ₑ) +
       2 ^ s * (lqNorm q (A.approxSeqDyadic s f) + lqNorm q (A.approxSeqDyadic s g)) := by
     refine (ENNReal.lqNorm_le_head_add_shift hq _).trans (add_le_add ?_ ?_)
-    · rw [approxSeqDyadic_zero]; exact (approxSeq_le_enorm _ 1).trans hfg
+    · rw [approxSeqDyadic_zero]; exact (approxError_le_enorm _ 1).trans hfg
     · calc lqNorm q (fun k => A.approxSeqDyadic s (f + g) (k + 1))
           ≤ lqNorm q (fun k => 2 ^ s * (A.approxSeqDyadic s f k + A.approxSeqDyadic s g k)) :=
             ENNReal.lqNorm_mono fun k => approxSeqDyadic_add_le_succ f g k
@@ -115,12 +115,12 @@ theorem memApprox_of_mem (hq : 1 ≤ q) (hs : 0 ≤ s) {m : ℕ} {a : X} (ha : a
   have hzero : ∀ k ∉ Finset.range m, A.approxSeqDyadic s a k = 0 := fun k hk => by
     have hmk : m ≤ 2 ^ k :=
       (not_lt.1 (Finset.mem_range.not.1 hk)).trans (Nat.lt_two_pow_self).le
-    rw [approxSeqDyadic, approxSeq_eq_zero_of_mem (A.mono hmk ha), mul_zero]
+    rw [approxSeqDyadic, approxError_eq_zero_of_mem (A.mono hmk ha), mul_zero]
   calc lqNorm q (A.approxSeqDyadic s a) ≤ ∑' k, A.approxSeqDyadic s a k :=
         ENNReal.lqNorm_le_lqNorm_one hq _
     _ = ∑ k ∈ Finset.range m, A.approxSeqDyadic s a k := tsum_eq_sum hzero
     _ < ∞ := ENNReal.sum_lt_top.2 fun k _ =>
-        ENNReal.mul_lt_top (ENNReal.dyadicWeight_lt_top s k) (approxSeq_ne_top a _).lt_top
+        ENNReal.mul_lt_top (ENNReal.dyadicWeight_lt_top s k) (approxError_ne_top a _).lt_top
 
 variable (A)
 

@@ -327,10 +327,10 @@ noncomputable def cubePPIsoModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞)
   C0_ne_top := by simp
   le_enorm := lpIsoModulus_le r
   jacksonStart := 0
-  CJ := (exists_approxSeq_cubePPScheme_le (d := d) (p := p) hr hp).choose * d
-  CJ_ne_top := ENNReal.mul_ne_top (exists_approxSeq_cubePPScheme_le hr hp).choose_spec.1
+  CJ := (exists_approxError_cubePPScheme_le (d := d) (p := p) hr hp).choose * d
+  CJ_ne_top := ENNReal.mul_ne_top (exists_approxError_cubePPScheme_le hr hp).choose_spec.1
     (ENNReal.natCast_ne_top d)
-  jackson f k _ := ((exists_approxSeq_cubePPScheme_le hr hp).choose_spec.2 f k).trans (by
+  jackson f k _ := ((exists_approxError_cubePPScheme_le hr hp).choose_spec.2 f k).trans (by
     rw [mul_assoc]
     exact mul_le_mul' le_rfl (lpCubeModulus_le_lpIsoModulus r f k))
   CB := (exists_inverse_cubePPScheme_iso (d := d) hr hp).choose
@@ -358,10 +358,10 @@ noncomputable def cubeSplineIsoModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ 
   C0_ne_top := by simp
   le_enorm := lpIsoModulus_le r
   jacksonStart := 0
-  CJ := (exists_approxSeq_cubeSplineScheme_le (d := d) (p := p) hr hp).choose * d
-  CJ_ne_top := ENNReal.mul_ne_top (exists_approxSeq_cubeSplineScheme_le hr hp).choose_spec.1
+  CJ := (exists_approxError_cubeSplineScheme_le (d := d) (p := p) hr hp).choose * d
+  CJ_ne_top := ENNReal.mul_ne_top (exists_approxError_cubeSplineScheme_le hr hp).choose_spec.1
     (ENNReal.natCast_ne_top d)
-  jackson f k _ := ((exists_approxSeq_cubeSplineScheme_le hr hp).choose_spec.2 f k).trans (by
+  jackson f k _ := ((exists_approxError_cubeSplineScheme_le hr hp).choose_spec.2 f k).trans (by
     rw [mul_assoc]
     exact mul_le_mul' le_rfl (lpCubeModulus_le_lpIsoModulus r f k))
   CB := (exists_inverse_cubeSplineScheme_iso (d := d) hr hp).choose

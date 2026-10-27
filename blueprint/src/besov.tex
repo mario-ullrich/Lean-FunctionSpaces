@@ -917,9 +917,9 @@ translations along the coordinate axes.
 
 \begin{theorem}[Jackson's theorem on the torus]
 \label{thm:torus-jackson}
-\lean{Torus.approxSeq_sq_le_card_mul_modulus_sq, Torus.approxSeq_sq_le_tsum,
+\lean{Torus.approxError_sq_le_card_mul_modulus_sq, Torus.approxError_sq_le_tsum,
   Torus.integral_norm_fourier_sub_one_sq, Torus.le_integral_norm_fourier_sub_one_sq,
-  Torus.approxSeq_le_modulus, Torus.ofReal_le_lintegral_enorm_fourier_sub_one_sq,
+  Torus.approxError_le_modulus, Torus.ofReal_le_lintegral_enorm_fourier_sub_one_sq,
   Torus.mFourier_single}
 \leanok
 \uses{def:modulus, lem:translation-fourier, def:torus-sobolev}
@@ -1126,7 +1126,7 @@ every $e_m$ into it, and the $e_m$ span a dense subspace of $L_p(\T^d)$ (Mathlib
 \begin{lemma}[Uniform density of trigonometric polynomials]
 \label{lem:torus-uniform-density}
 \lean{Torus.map_span_mFourier_le_iSup_trigPoly, Torus.dense_iUnion_trigPoly,
-  Torus.tendsto_approxError_trigScheme, Torus.tendsto_approxSeq_trigScheme}
+  Torus.tendsto_approxError_trigScheme}
 \leanok
 \uses{def:trig-poly, lem:error-tendsto}
 The trigonometric polynomials are dense in the bounded continuous functions on $\T^d$ for the
@@ -1214,7 +1214,7 @@ $(l+1) \, \pi(-c^{-1} z) = -\pi((c/(l+1))^{-1} z)$.
 
 \begin{theorem}[Jackson's inequality in $L_p(\T^d)$]
 \label{thm:torus-lp-jackson}
-\lean{Torus.enorm_sub_jacksonApprox_le, Torus.approxSeq_trigScheme_le,
+\lean{Torus.enorm_sub_jacksonApprox_le, Torus.approxError_trigScheme_le,
   Torus.lpModulus_le_two_pow_mul_succ}
 \leanok
 \uses{lem:torus-lp-jackson-approx, lem:modulus-linear, lem:weighted-jensen, thm:band-jackson}
@@ -1422,7 +1422,7 @@ $\|\Delta_j f\|_p \leq 2^{-js} \|f\|^{\mathrm{LP}}_{s,q}$ is summable.
 \begin{lemma}[Blocks and trigonometric polynomials]
 \label{lem:torus-lp-blocks-trig}
 \lean{Torus.lpBlock_mem_trigPolyLp, Torus.lpBlock_eq_zero_of_mem,
-  Torus.enorm_lpBlock_le_approxSeq}
+  Torus.enorm_lpBlock_le_approxError}
 \leanok
 \uses{lem:torus-lp-blocks, thm:torus-econv-fourier, lem:torus-econv-identities,
   lem:lp-kernels-frequency, lem:torus-proj, lem:error-basic}
@@ -2187,8 +2187,8 @@ slices of functions on a cube as well (\Cref{thm:cube-jackson}).
 \lean{Interval.jacksonConst, Interval.jacksonConst_ne_top,
   Interval.add_ofReal_pow_mul_le_jacksonConst, Interval.exists_ppFun_approx, Interval.lpModulus,
   Interval.lpModulus_add_le, Interval.lpModulus_le, Interval.lpModulus_anti,
-  Interval.approxSeq_le_of_continuous, Interval.approxSeq_ppScheme_le,
-  Interval.exists_approxSeq_ppScheme_one_le, Interval.exists_approxSeq_ppScheme_le}
+  Interval.approxError_le_of_continuous, Interval.approxError_ppScheme_le,
+  Interval.exists_approxError_ppScheme_one_le, Interval.exists_approxError_ppScheme_le}
 \leanok
 \uses{def:pp-scheme, lem:pp-taylor, lem:two-sided-smoothing, thm:whitney, lem:error-dense}
 Let $1 \leq p < \infty$ and $r \geq 1$. For every $f \in L_p[0,1]$ and $k \geq 1$,
@@ -2360,7 +2360,7 @@ $\|\Delta_h^r \tilde f\|_{L_p[0, n]}^p \leq n \|\Delta_h^r \tilde f\|_{L_p[0, 1]
   Interval.perExt_ppFun_eq, Interval.isPiecewisePoly_perExt_ppFun, Interval.sum_localMass_perExt_le,
   Interval.sum_sum_localMass_perExt_le, Interval.lpPerModulus, Interval.lpPerModulus_add_le,
   Interval.lpPerModulus_le, Interval.lpModulus_le_lpPerModulus,
-  Interval.exists_approxSeq_ppScheme_le_per, Interval.exists_inverse_ppScheme_per,
+  Interval.exists_approxError_ppScheme_le_per, Interval.exists_inverse_ppScheme_per,
   Interval.ppPerModulusData, Interval.memApprox_ppScheme_iff_per}
 \leanok
 \uses{thm:pp-jackson, thm:pp-inverse, lem:pp-local, lem:per-modulus, def:modulus-data,
@@ -3089,8 +3089,8 @@ second. For the third take $g = D = 0$ on $[0, 1]$.
 
 \begin{theorem}[Jackson's inequality for splines]
 \label{thm:spline-jackson}
-\lean{Interval.exists_eLpNorm_sub_qi_le, Interval.approxSeq_splineScheme_one,
-  Interval.exists_approxSeq_splineScheme_le}
+\lean{Interval.exists_eLpNorm_sub_qi_le, Interval.approxError_splineScheme_one,
+  Interval.exists_approxError_splineScheme_le}
 \leanok
 \uses{lem:two-sided-smoothing, lem:qi-taylor, def:spline-space, thm:whitney,
   thm:pp-jackson}
@@ -3225,7 +3225,7 @@ so the join is that of $Q_k g$ at the knot $1$.
   Interval.eLpNorm_sub_perQiPieces_eq, Interval.exists_eLpNorm_sub_perQi_le, Interval.cutoff,
   Interval.continuous_cutoff, Interval.cutoff_zero, Interval.cutoff_one, Interval.cutoff_nonneg,
   Interval.cutoff_le_one, Interval.cutoff_eq_one, Interval.dense_periodic,
-  Interval.exists_approxSeq_perSplineScheme_le}
+  Interval.exists_approxError_perSplineScheme_le}
 \leanok
 \uses{lem:per-qi, lem:qi-taylor, lem:two-sided-smoothing, lem:per-modulus, lem:error-dense}
 Let $1 \leq p < \infty$ and $r \geq 1$. There is $C_J$ with
@@ -3791,10 +3791,10 @@ second statement is \Cref{lem:kernel-telescoping}.
 \begin{theorem}[Jackson's inequality on the cube]
 \label{thm:cube-jackson}
 \lean{Cube.eLpNorm_sub_slicewise_ppKernel_le, Cube.cubeJacksonConst, Cube.cubeJacksonConst_ne_top,
-  Cube.eLpNorm_sub_cubeProj_le, Cube.approxSeq_le_of_continuous, Cube.approxSeq_cubePPScheme_le,
+  Cube.eLpNorm_sub_cubeProj_le, Cube.approxError_le_of_continuous, Cube.approxError_cubePPScheme_le,
   Cube.exists_eLpNorm_sub_ppKernel_zero_apply_le,
-  Cube.exists_eLpNorm_sub_slicewise_ppKernel_zero_le, Cube.exists_approxSeq_cubePPScheme_one_le,
-  Cube.exists_approxSeq_cubePPScheme_le}
+  Cube.exists_eLpNorm_sub_slicewise_ppKernel_zero_le, Cube.exists_approxError_cubePPScheme_one_le,
+  Cube.exists_approxError_cubePPScheme_le}
 \leanok
 \uses{def:cube-pp, lem:pp-kernel, lem:pp-taylor, lem:poly-glue, lem:cube-two-sided-smoothing,
   lem:slices-to-cube, lem:cube-modulus, lem:error-dense}
@@ -3907,7 +3907,7 @@ bound is \Cref{lem:qi-taylor} when $u \in L_p[0,1]$, and trivial otherwise.
   Cube.isCubeSpline_of_isForm, Cube.cubeQI, Cube.isCubeSpline_cubeQI, Cube.cubeSplineSpace,
   Cube.cubeSplineSpace_mono,
   Cube.cubeSplineScheme, Cube.mem_cubeSplineScheme_two_pow, Cube.cubeSplineScheme_isLinear,
-  Cube.approxSeq_cubeSplineScheme_one_le}
+  Cube.approxError_cubeSplineScheme_one_le}
 \leanok
 \uses{def:spline-space, lem:qi-kernel, lem:kernel-forms, def:cube-pp}
 Let $r \geq 1$ and $k \in \N$. A function on $\R^d$ is a spline of order $r$ and level $k$ in
@@ -3951,7 +3951,7 @@ product of these combinations expands into a combination of products of B-spline
 
 \begin{theorem}[Jackson's inequality for tensor splines]
 \label{thm:cube-spline-jackson}
-\lean{Cube.exists_eLpNorm_sub_slicewise_qiKernel_le, Cube.exists_approxSeq_cubeSplineScheme_le}
+\lean{Cube.exists_eLpNorm_sub_slicewise_qiKernel_le, Cube.exists_approxError_cubeSplineScheme_le}
 \leanok
 \uses{def:cube-spline, lem:qi-taylor, lem:qi-kernel, lem:cube-two-sided-smoothing,
   lem:slices-to-cube, thm:cube-jackson, lem:error-dense}
@@ -4333,7 +4333,7 @@ claim, $\|\Delta_j f\|_p \leq 2^{-js} \|f\|^{\mathrm{LP}}_{s,q}$ is summable.
 
 \begin{lemma}[Blocks and band-limited functions]
 \label{lem:lp-blocks-band}
-\lean{Rd.lpBlock_mem_bandSpace, Rd.lpBlock_eq_zero_of_mem, Rd.enorm_lpBlock_le_approxSeq}
+\lean{Rd.lpBlock_mem_bandSpace, Rd.lpBlock_eq_zero_of_mem, Rd.enorm_lpBlock_le_approxError}
 \leanok
 \uses{lem:lp-blocks, lem:band-space, thm:kernel-identities}
 Let $1 \leq p < \infty$, $f \in L_p$ and $i, j \in \N$. Then $\Delta_j f \in E_j$. If
@@ -4655,7 +4655,7 @@ $g = \Phi$, $L = r$ and $c = 2^k$, since $\int_V \Phi = \widehat{\Phi}(0) = 1$.
 \begin{theorem}[Jackson's inequality]
 \label{thm:band-jackson}
 \lean{one_add_pow_le_two_pow_mul, Rd.jacksonConst, Rd.jacksonConst_ne_top,
-  Rd.enorm_sub_jacksonApprox_le, Rd.approxSeq_bandScheme_le}
+  Rd.enorm_sub_jacksonApprox_le, Rd.approxError_bandScheme_le}
 \leanok
 \uses{lem:jackson-approx, lem:rd-modulus, lem:weighted-jensen, lem:lp-kernels-basic}
 Let $1 \leq p < \infty$ and $r \in \N$. There is $C < \infty$ with

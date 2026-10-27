@@ -26,7 +26,7 @@ These local estimates hold for every piecewise polynomial on `[0, ∞)`
 (`Interval.IsPiecewisePoly`, `Interval.eLpNorm_higherDiff_le_of_isPiecewisePoly`), so they serve
 the periodic extensions of `FunctionSpaces.Interval.PiecewisePeriodic` as well.
 
-With Jackson's inequality at every level (`Interval.exists_approxSeq_ppScheme_le`) this is a
+With Jackson's inequality at every level (`Interval.exists_approxError_ppScheme_le`) this is a
 modulus compatible with the scheme, of inverse order `θ = 1/p` (`Interval.ppModulusData`), and the
 abstract coincidence theorem gives, for
 `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `r ≥ 1` and `0 ≤ s < 1/p`,
@@ -420,9 +420,9 @@ noncomputable def ppModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
   C0_ne_top := by simp
   le_enorm := lpModulus_le r
   jacksonStart := 0
-  CJ := (exists_approxSeq_ppScheme_le (p := p) hr hp).choose
-  CJ_ne_top := (exists_approxSeq_ppScheme_le hr hp).choose_spec.1
-  jackson f k _ := (exists_approxSeq_ppScheme_le hr hp).choose_spec.2 f k
+  CJ := (exists_approxError_ppScheme_le (p := p) hr hp).choose
+  CJ_ne_top := (exists_approxError_ppScheme_le hr hp).choose_spec.1
+  jackson f k _ := (exists_approxError_ppScheme_le hr hp).choose_spec.2 f k
   CB := (exists_inverse_ppScheme (r := r) hp).choose
   CB_ne_top := (exists_inverse_ppScheme hp).choose_spec.1
   inverse := (exists_inverse_ppScheme hp).choose_spec.2

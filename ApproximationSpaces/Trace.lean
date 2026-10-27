@@ -106,8 +106,7 @@ theorem traceSurjConst_ne_top {C' : ℝ≥0∞} (hC' : C' ≠ ∞) {β s : ℝ} 
 trace. -/
 noncomputable def canonicalApprox (A : ApproximationScheme X) (β : ℝ) (f : X) :
     A.DyadicApprox f (dyadicWeight (-(β + 1))) :=
-  (exists_dyadicApprox A f (fun k => ENNReal.dyadicWeight_ne_zero _ k)
-    (fun k => ENNReal.dyadicWeight_ne_top _ k)).some
+  (exists_dyadicApprox A f (fun k => ENNReal.dyadicWeight_ne_zero _ k)).some
 
 /-- An approximant lies in the subspace spanned by all approximants. -/
 theorem mem_iUnionSubmodule {A : ApproximationScheme X} {n : ℕ} {a : X} (ha : a ∈ A n) :
@@ -119,7 +118,7 @@ theorem mem_iUnionSubmodule {A : ApproximationScheme X} {n : ℕ} {a : X} (ha : 
 `2^(kβ) ‖f - a_k‖` tend to `0`. -/
 theorem DyadicApprox.tendsto_dyadicWeight_mul_enorm_sub {A : ApproximationScheme X} {f : X}
     {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) {β : ℝ}
-    (hsum : ∑' k, dyadicWeight β k * (A.approxSeq f (2 ^ k) + t k) ≠ ∞) :
+    (hsum : ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) ≠ ∞) :
     Tendsto (fun k => dyadicWeight β k * ‖f - D.a k‖ₑ) atTop (𝓝 0) :=
   tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds
     (ENNReal.tendsto_atTop_zero_of_tsum_ne_top hsum) (fun _ => bot_le)
@@ -129,7 +128,7 @@ theorem DyadicApprox.tendsto_dyadicWeight_mul_enorm_sub {A : ApproximationScheme
 approximants is finite. -/
 theorem tsum_canonical_ne_top {A : ApproximationScheme X} {β : ℝ} (hβ : 0 ≤ β) {f : X}
     (hf : A.MemApprox β 1 f) :
-    ∑' k, dyadicWeight β k * (A.approxSeq f (2 ^ k) + dyadicWeight (-(β + 1)) k) ≠ ∞ := by
+    ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + dyadicWeight (-(β + 1)) k) ≠ ∞ := by
   have hL := (memApprox_iff_lqNorm_dyadic_lt_top le_rfl hβ).1 hf
   have h2 : ∀ k, dyadicWeight β k * dyadicWeight (-(β + 1)) k = dyadicWeight (-1) k :=
     fun k => by rw [← ENNReal.dyadicWeight_add]; congr 1; ring
@@ -234,11 +233,11 @@ theorem enorm_apply_le {k : ℕ} {a : X} (ha : a ∈ A (2 ^ k)) :
 theorem enorm_apply_sub_succ_le {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t)
     (ht : Antitone t) (k : ℕ) :
     ‖TB.T (D.a (k + 1)) - TB.T (D.a k)‖ₑ ≤
-      traceConst TB.C β * (dyadicWeight β k * (A.approxSeq f (2 ^ k) + t k)) := by
+      traceConst TB.C β * (dyadicWeight β k * (A.approxError f (2 ^ k) + t k)) := by
   rw [← map_sub]
   calc ‖TB.T (D.a (k + 1) - D.a k)‖ₑ ≤ TB.C * dyadicWeight β (k + 2) * ‖D.a (k + 1) - D.a k‖ₑ :=
         TB.enorm_apply_le (D.sub_mem k)
-    _ ≤ TB.C * dyadicWeight β (k + 2) * (2 * (A.approxSeq f (2 ^ k) + t k)) := by
+    _ ≤ TB.C * dyadicWeight β (k + 2) * (2 * (A.approxError f (2 ^ k) + t k)) := by
         gcongr; exact D.enorm_sub_succ_le ht k
     _ = _ := by simp only [traceConst, ENNReal.dyadicWeight_add_nat]; ring
 
@@ -247,14 +246,14 @@ theorem enorm_apply_sub_succ_le {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicAp
 theorem edist_apply_succ_le {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (ht : Antitone t)
     (k : ℕ) :
     edist (TB.T (D.a k)) (TB.T (D.a (k + 1))) ≤
-      traceConst TB.C β * (dyadicWeight β k * (A.approxSeq f (2 ^ k) + t k)) := by
+      traceConst TB.C β * (dyadicWeight β k * (A.approxError f (2 ^ k) + t k)) := by
   rw [edist_comm, edist_eq_enorm_sub]
   exact TB.enorm_apply_sub_succ_le D ht k
 
 /-- The traces of near-best approximants form a Cauchy sequence when
 `∑_k 2^(kβ) (E_{2^k}(f) + t_k) < ∞`. -/
 theorem cauchySeq_apply {f : X} {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (ht : Antitone t)
-    (hsum : ∑' k, dyadicWeight β k * (A.approxSeq f (2 ^ k) + t k) ≠ ∞) :
+    (hsum : ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) ≠ ∞) :
     CauchySeq fun k => TB.T (D.a k) :=
   cauchySeq_of_edist_le_of_tsum_ne_top _ (TB.edist_apply_succ_le D ht) (by
     rw [ENNReal.tsum_mul_left]
@@ -386,9 +385,9 @@ decreasing tolerances and `∑_k 2^(kβ) (E_{2^k}(f) + t_k) < ∞`,
 `edist (T a_k) (ext f) ≤ 2 C 4^β ∑_{i ≥ 0} 2^((k+i)β) (E_{2^(k+i)}(f) + t_{k+i})`. -/
 theorem edist_apply_ext_le [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} {t : ℕ → ℝ≥0∞}
     (D : A.DyadicApprox f t) (ht : Antitone t)
-    (hsum : ∑' k, dyadicWeight β k * (A.approxSeq f (2 ^ k) + t k) ≠ ∞) (k : ℕ) :
+    (hsum : ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) ≠ ∞) (k : ℕ) :
     edist (TB.T (D.a k)) (TB.ext f) ≤ traceConst TB.C β *
-      ∑' i, dyadicWeight β (k + i) * (A.approxSeq f (2 ^ (k + i)) + t (k + i)) := by
+      ∑' i, dyadicWeight β (k + i) * (A.approxError f (2 ^ (k + i)) + t (k + i)) := by
   have hf : A.MemApprox β 1 f := by
     refine (memApprox_iff_lqNorm_dyadic_lt_top le_rfl hβ).2 (lt_of_le_of_lt ?_ hsum.lt_top)
     rw [ENNReal.lqNorm_one]
@@ -396,7 +395,7 @@ theorem edist_apply_ext_le [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} {t : ℕ �
   have hlim := TB.tendsto_ext hβ hf (γ := 0) (fun k => by simpa using D.mem k)
     (D.tendsto_dyadicWeight_mul_enorm_sub hsum)
   calc edist (TB.T (D.a k)) (TB.ext f) ≤ ∑' m, traceConst TB.C β *
-        (dyadicWeight β (k + m) * (A.approxSeq f (2 ^ (k + m)) + t (k + m))) :=
+        (dyadicWeight β (k + m) * (A.approxError f (2 ^ (k + m)) + t (k + m))) :=
         edist_le_tsum_of_edist_le_of_tendsto _ (TB.edist_apply_succ_le D ht) hlim k
     _ = _ := ENNReal.tsum_mul_left
 
@@ -404,9 +403,9 @@ theorem edist_apply_ext_le [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} {t : ℕ �
 `‖ext f‖ ≤ C (2 ‖f‖ + t_0) + 2 C 4^β ∑_k 2^(kβ) (E_{2^k}(f) + t_k)`. -/
 theorem enorm_ext_le_of_dyadicApprox [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} {t : ℕ → ℝ≥0∞}
     (D : A.DyadicApprox f t) (ht : Antitone t)
-    (hsum : ∑' k, dyadicWeight β k * (A.approxSeq f (2 ^ k) + t k) ≠ ∞) :
+    (hsum : ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) ≠ ∞) :
     ‖TB.ext f‖ₑ ≤ TB.C * (2 * ‖f‖ₑ + t 0) +
-      traceConst TB.C β * ∑' k, dyadicWeight β k * (A.approxSeq f (2 ^ k) + t k) := by
+      traceConst TB.C β * ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) := by
   have h0 := TB.edist_apply_ext_le hβ D ht hsum 0
   simp only [zero_add] at h0
   have hT0 : ‖TB.T (D.a 0)‖ₑ ≤ TB.C * (2 * ‖f‖ₑ + t 0) := by
@@ -427,20 +426,20 @@ theorem enorm_ext_le [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemAppro
   rcases eq_or_ne f 0 with rfl | hf0
   · rw [TB.ext_zero hβ, enorm_zero]; exact bot_le
   set t := tolerance f β
-  obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 β) (tolerance_ne_top f β)
+  obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 β)
   set L := lqNorm 1 (A.approxSeqDyadic β f)
   have hL : L < ∞ := (memApprox_iff_lqNorm_dyadic_lt_top le_rfl hβ).1 hf
-  have hsplit : ∑' k, dyadicWeight β k * (A.approxSeq f (2 ^ k) + t k) ≤ L + 2 * ‖f‖ₑ := by
+  have hsplit : ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) ≤ L + 2 * ‖f‖ₑ := by
     simp_rw [mul_add]
     rw [ENNReal.tsum_add, ← ENNReal.lqNorm_one]
     exact add_le_add le_rfl (tsum_dyadicWeight_mul_tolerance_le f le_rfl)
-  have hsum : ∑' k, dyadicWeight β k * (A.approxSeq f (2 ^ k) + t k) ≠ ∞ :=
+  have hsum : ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) ≠ ∞ :=
     ne_top_of_le_ne_top (ENNReal.add_ne_top.2 ⟨hL.ne, ENNReal.mul_ne_top (by norm_num)
       enorm_ne_top⟩) hsplit
   refine (TB.enorm_ext_le_of_dyadicApprox hβ D (tolerance_anti f hβ) hsum).trans ?_
   rw [tolerance_zero]
   calc TB.C * (2 * ‖f‖ₑ + ‖f‖ₑ) +
-        traceConst TB.C β * ∑' k, dyadicWeight β k * (A.approxSeq f (2 ^ k) + t k)
+        traceConst TB.C β * ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k)
       ≤ TB.C * (3 * (‖f‖ₑ + L)) + traceConst TB.C β * (3 * (‖f‖ₑ + L)) := by
         gcongr
         · calc 2 * ‖f‖ₑ + ‖f‖ₑ = 3 * ‖f‖ₑ := by ring
@@ -466,11 +465,11 @@ theorem approxNormDyadic_ext_le [CompleteSpace Y] (hβ : 0 ≤ β) {s : ℝ} (h�
   · rw [TB.ext_zero hβ, approxNormDyadic_zero]; exact bot_le
   have hs : 0 ≤ s := hβ.trans hβs.le
   set t := tolerance f s
-  obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s) (tolerance_ne_top f s)
+  obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s)
   set N := A.approxNormDyadic s q f
   set Cs := (1 - (2 : ℝ≥0∞) ^ (-(s - β)))⁻¹
   set K := traceConst TB.C β
-  set g : ℕ → ℝ≥0∞ := fun m => dyadicWeight β m * (A.approxSeq f (2 ^ m) + t m)
+  set g : ℕ → ℝ≥0∞ := fun m => dyadicWeight β m * (A.approxError f (2 ^ m) + t m)
   have hfN : ‖f‖ₑ ≤ N := enorm_le_approxNormDyadic f
   have hL : lqNorm 1 (A.approxSeqDyadic β f) ≤ Cs * N :=
     (lqNorm_le_approxNormDyadic f).trans (approxNormDyadic_le_of_lt hq le_rfl f)
@@ -485,9 +484,9 @@ theorem approxNormDyadic_ext_le [CompleteSpace Y] (hβ : 0 ≤ β) {s : ℝ} (h�
   have herr : ∀ k, B.approxSeqDyadic (s - β) (TB.ext f) k ≤
       K * (dyadicWeight (s - β) k * ∑' i, g (k + i)) := fun k => by
     calc B.approxSeqDyadic (s - β) (TB.ext f) k
-        = dyadicWeight (s - β) k * B.approxSeq (TB.ext f) (2 ^ k) := rfl
+        = dyadicWeight (s - β) k * B.approxError (TB.ext f) (2 ^ k) := rfl
       _ ≤ dyadicWeight (s - β) k * ‖TB.ext f - TB.T (D.a k)‖ₑ := by
-          gcongr; exact approxSeq_le_of_mem (TB.mapsTo _ _ (D.mem k)) _
+          gcongr; exact approxError_le_of_mem (TB.mapsTo _ _ (D.mem k)) _
       _ ≤ dyadicWeight (s - β) k * (K * ∑' i, g (k + i)) := by
           gcongr
           rw [← edist_eq_enorm_sub, edist_comm]

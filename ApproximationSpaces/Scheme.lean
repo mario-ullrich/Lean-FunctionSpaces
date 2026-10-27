@@ -78,8 +78,8 @@ theorem ext {A B : ApproximationScheme X} (h : ∀ n, A n = B n) : A = B := by
 theorem zero_mem (n : ℕ) : (0 : X) ∈ A n :=
   A.mono (Nat.zero_le n) (by rw [A.coe_zero]; rfl)
 
-/-- The sets of a scheme are nonempty.  This is the hypothesis that the lemmas on
-`Metric.infDist` need. -/
+/-- The sets of a scheme are nonempty.  This is the hypothesis under which
+`Metric.infEDist` is finite, so the error of approximation is finite. -/
 theorem nonempty (n : ℕ) : (A n).Nonempty := ⟨0, A.zero_mem n⟩
 
 variable {A}

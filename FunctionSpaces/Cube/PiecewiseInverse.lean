@@ -19,7 +19,7 @@ point, bounds the differences in each coordinate:
 `0 ≤ h ≤ 2^(-j)` (`Cube.eLpNorm_cubeDiff_le_of_isCubePP`). Summed over the coordinates this is the
 **inverse inequality of order `1/p`** (`Cube.exists_inverse_cubePPScheme`).
 
-With Jackson's inequality at every level (`Cube.exists_approxSeq_cubePPScheme_le`, Whitney's
+With Jackson's inequality at every level (`Cube.exists_approxError_cubePPScheme_le`, Whitney's
 inequality at level `0`) the modulus on the cube is compatible with the scheme
 (`Cube.cubePPModulusData`), and the coincidence theorem of
 `ApproximationSpaces.Moduli` gives `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 ≤ s < 1/p`
@@ -108,9 +108,9 @@ noncomputable def cubePPModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
   C0_ne_top := ENNReal.mul_ne_top (ENNReal.natCast_ne_top d) (by simp)
   le_enorm := lpCubeModulus_le hp r
   jacksonStart := 0
-  CJ := (exists_approxSeq_cubePPScheme_le (d := d) (p := p) hr hp).choose
-  CJ_ne_top := (exists_approxSeq_cubePPScheme_le hr hp).choose_spec.1
-  jackson f k _ := (exists_approxSeq_cubePPScheme_le hr hp).choose_spec.2 f k
+  CJ := (exists_approxError_cubePPScheme_le (d := d) (p := p) hr hp).choose
+  CJ_ne_top := (exists_approxError_cubePPScheme_le hr hp).choose_spec.1
+  jackson f k _ := (exists_approxError_cubePPScheme_le hr hp).choose_spec.2 f k
   CB := (exists_inverse_cubePPScheme (d := d) (r := r) hp).choose
   CB_ne_top := (exists_inverse_cubePPScheme hp).choose_spec.1
   inverse := (exists_inverse_cubePPScheme hp).choose_spec.2

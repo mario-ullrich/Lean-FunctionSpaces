@@ -29,7 +29,7 @@ and the two quasi-norms are equivalent (`Rd.approxNormDyadic_bandScheme_le`,
   `ApproximationScheme.blockDecompNorm`;
 * high blocks of band-limited functions vanish, `Δ_j g = 0` for `g ∈ E_i` and `j ≥ i + 3`, since
   `ψ_j ⋆ Θ_i = 0` (`Rd.lpBlock_eq_zero_of_mem`); hence `Δ_j f = Δ_j (f - g)` and
-  `‖Δ_j f‖_p ≤ 2 ‖Φ‖_1 E(f, E_i)_p` (`Rd.enorm_lpBlock_le_approxSeq`).
+  `‖Δ_j f‖_p ≤ 2 ‖Φ‖_1 E(f, E_i)_p` (`Rd.enorm_lpBlock_le_approxError`).
 -/
 
 @[expose] public section
@@ -100,30 +100,15 @@ theorem lpBlock_eq_zero_of_mem (hp : p ≠ ∞) {i j : ℕ} (hij : i + 3 ≤ j)
 
 /-- **Blocks see only the error of band-limited approximation**: for `j ≥ i + 3`,
 `‖Δ_j f‖_p ≤ 2 ‖Φ‖_1 E(f, E_i)_p`. -/
-theorem enorm_lpBlock_le_approxSeq (hp : p ≠ ∞) {i j : ℕ} (hij : i + 3 ≤ j)
+theorem enorm_lpBlock_le_approxError (hp : p ≠ ∞) {i j : ℕ} (hij : i + 3 ≤ j)
     (f : Lp ℂ p (volume : Measure V)) :
     ‖lpBlock hp j f‖ₑ ≤
-      2 * eLpNorm (lpKernel (V := V)) 1 volume * (bandScheme hp).approxSeq f (2 ^ i) := by
-  have hC : 2 * eLpNorm (lpKernel (V := V)) 1 volume ≠ ∞ :=
-    ENNReal.mul_ne_top (by norm_num) eLpNorm_lpKernel_ne_top
-  have hreal : ‖lpBlock hp j f‖ ≤ (2 * eLpNorm (lpKernel (V := V)) 1 volume).toReal *
-      (bandScheme hp).approxError (2 ^ i) f := by
-    refine ApproximationScheme.le_mul_approxError_of_forall_mem ENNReal.toReal_nonneg
-      fun a ha => ?_
-    have h0 : lpBlock hp j a = 0 := lpBlock_eq_zero_of_mem hp hij (mem_bandScheme_two_pow.1 ha)
-    have h1 : lpBlock hp j f = lpBlock hp j (f - a) := by rw [map_sub, h0, sub_zero]
-    calc ‖lpBlock hp j f‖ = ‖lpBlock hp j (f - a)‖ₑ.toReal := by rw [h1, toReal_enorm]
-      _ ≤ (2 * eLpNorm (lpKernel (V := V)) 1 volume * ‖f - a‖ₑ).toReal :=
-          ENNReal.toReal_mono (ENNReal.mul_ne_top hC enorm_ne_top)
-            (enorm_lpBlock_le hp j (f - a))
-      _ = (2 * eLpNorm (lpKernel (V := V)) 1 volume).toReal * ‖f - a‖ := by
-          rw [ENNReal.toReal_mul, toReal_enorm]
-  calc ‖lpBlock hp j f‖ₑ = ENNReal.ofReal ‖lpBlock hp j f‖ := (ofReal_norm _).symm
-    _ ≤ ENNReal.ofReal ((2 * eLpNorm (lpKernel (V := V)) 1 volume).toReal *
-          (bandScheme hp).approxError (2 ^ i) f) := ENNReal.ofReal_le_ofReal hreal
-    _ = 2 * eLpNorm (lpKernel (V := V)) 1 volume * (bandScheme hp).approxSeq f (2 ^ i) := by
-        rw [ENNReal.ofReal_mul ENNReal.toReal_nonneg, ENNReal.ofReal_toReal hC]
-        rfl
+      2 * eLpNorm (lpKernel (V := V)) 1 volume * (bandScheme hp).approxError f (2 ^ i) := by
+  refine ApproximationScheme.le_mul_approxError_of_forall_mem
+    (ENNReal.mul_ne_top (by norm_num) eLpNorm_lpKernel_ne_top) fun a ha => ?_
+  have h0 : lpBlock hp j a = 0 := lpBlock_eq_zero_of_mem hp hij (mem_bandScheme_two_pow.1 ha)
+  rw [show lpBlock hp j f = lpBlock hp j (f - a) by rw [map_sub, h0, sub_zero]]
+  exact enorm_lpBlock_le hp j (f - a)
 
 /-! ### The Littlewood–Paley quasi-norm -/
 
@@ -190,10 +175,10 @@ theorem littlewoodPaleyNorm_le_approxNormDyadic (hp : p ≠ ∞) {s : ℝ} (hs :
     simp only [a, ApproximationScheme.approxSeqDyadic]
     rw [add_comm n 3, ENNReal.dyadicWeight_add_nat]
     calc w * dyadicWeight s n * ‖lpBlock hp (3 + n) f‖ₑ
-        ≤ w * dyadicWeight s n * (C * (bandScheme hp).approxSeq f (2 ^ n)) := by
+        ≤ w * dyadicWeight s n * (C * (bandScheme hp).approxError f (2 ^ n)) := by
           gcongr
-          exact enorm_lpBlock_le_approxSeq hp (by omega) f
-      _ = w * C * (dyadicWeight s n * (bandScheme hp).approxSeq f (2 ^ n)) := by ring
+          exact enorm_lpBlock_le_approxError hp (by omega) f
+      _ = w * C * (dyadicWeight s n * (bandScheme hp).approxError f (2 ^ n)) := by ring
   calc littlewoodPaleyNorm hp s q f = lqNorm q a := rfl
     _ ≤ ∑ j ∈ Finset.range 3, a j + lqNorm q (fun n => a (n + 3)) :=
         ENNReal.lqNorm_le_sum_range_add_shift hq a 3

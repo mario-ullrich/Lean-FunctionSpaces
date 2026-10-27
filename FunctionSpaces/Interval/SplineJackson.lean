@@ -14,7 +14,7 @@ public import FunctionSpaces.Interval.PiecewiseJackson
 
 For `1 ≤ p < ∞`, `r ≥ 1` and every level `k`, the error of best approximation in `L_p[0, 1]` by
 splines of order `r` and level `k` is bounded by the modulus of smoothness,
-`E_{2^k}(f)_p ≤ C ω_r(f, 2^(-k), [0, 1])_p` (`Interval.exists_approxSeq_splineScheme_le`).
+`E_{2^k}(f)_p ≤ C ω_r(f, 2^(-k), [0, 1])_p` (`Interval.exists_approxError_splineScheme_le`).
 
 The approximant is the quasi-interpolant `Q_k f` of `FunctionSpaces.Interval.QuasiInterp`. On
 `I_{k,i}` it reproduces every polynomial `T_i` of degree `< r` and is bounded by the `L_p` norm on
@@ -24,11 +24,11 @@ polynomial of the Steklov smoothing of `f`, forward on `[0, 3/4]` and backward o
 (`Interval.exists_left_smoothing`, `Interval.exists_right_smoothing` with `L = 2^(-k)`); every
 window lies in one of the two parts, and the windows overlap at most `r` times
 (`Interval.sum_lintegral_window_le`). This works for `k ≥ r + 2`; general `f ∈ L_p` follow by
-density (`Interval.approxSeq_le_of_continuous`). The coarse levels `k ≤ r + 1` need Whitney's
+density (`Interval.approxError_le_of_continuous`). The coarse levels `k ≤ r + 1` need Whitney's
 inequality:
 `E_{2^k}(f) ≤ E_1(f)`, and the splines of level `0` are the polynomials of degree `< r`
-(`Interval.approxSeq_splineScheme_one`), so `E_1(f) ≤ W ω_r(f, 2^(-(r+1)))_p ≤ W ω_r(f, 2^(-k))_p`
-(`Interval.exists_approxSeq_ppScheme_one_le`).
+(`Interval.approxError_splineScheme_one`), so `E_1(f) ≤ W ω_r(f, 2^(-(r+1)))_p ≤ W ω_r(f, 2^(-k))_p`
+(`Interval.exists_approxError_ppScheme_one_le`).
 
 With the inverse inequality of order `r - 1 + 1/p` (`Interval.exists_inverse_splineScheme`) this
 is a modulus compatible with the spline scheme (`Interval.splineModulusData`), and for
@@ -583,35 +583,34 @@ theorem exists_eLpNorm_qi_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
 
 /-- At complexity `1` the spline scheme and the piecewise polynomial scheme have the same error:
 both approximate by the polynomials of degree `< r` (`Interval.splineSpace_zero`). -/
-theorem approxSeq_splineScheme_one (r : ℕ) (f : Lp ℂ p unitVol) :
-    (splineScheme p r).approxSeq f 1 = (ppScheme p r).approxSeq f 1 := by
+theorem approxError_splineScheme_one (r : ℕ) (f : Lp ℂ p unitVol) :
+    (splineScheme p r).approxError f 1 = (ppScheme p r).approxError f 1 := by
   have h : (splineScheme p r) 1 = (ppScheme p r) 1 := by
     ext g
     rw [mem_splineScheme one_ne_zero, mem_ppScheme one_ne_zero, Nat.log_one_right,
       splineSpace_zero]
-  rw [ApproximationScheme.approxSeq, ApproximationScheme.approxSeq,
-    ApproximationScheme.approxError, ApproximationScheme.approxError, h]
+  rw [ApproximationScheme.approxError, ApproximationScheme.approxError, h]
 
 /-- **Jackson's inequality for dyadic splines**: for `1 ≤ p < ∞` and `r ≥ 1` there is `C_J` with
 `E_{2^k}(f)_p ≤ C_J ω_r(f, 2^(-k), [0, 1])_p` for all `f ∈ L_p[0, 1]` and all `k ≥ 0`: the
 quasi-interpolant for `k ≥ r + 2`, Whitney's inequality for `k ≤ r + 1`. -/
-theorem exists_approxSeq_splineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
+theorem exists_approxError_splineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ∃ CJ : ℝ≥0∞, CJ ≠ ∞ ∧ ∀ (f : Lp ℂ p unitVol) (k : ℕ),
-      (splineScheme p r).approxSeq f (2 ^ k) ≤ CJ * lpModulus p r f k := by
+      (splineScheme p r).approxError f (2 ^ k) ≤ CJ * lpModulus p r f k := by
   obtain ⟨C, hC, hCb⟩ := exists_eLpNorm_sub_qi_le hr hp
-  obtain ⟨W, hW, hWb⟩ := exists_approxSeq_ppScheme_one_le (p := p) hr hp (m := r + 1) (by omega)
+  obtain ⟨W, hW, hWb⟩ := exists_approxError_ppScheme_one_le (p := p) hr hp (m := r + 1) (by omega)
   refine ⟨W + C, ENNReal.add_ne_top.2 ⟨hW, hC⟩, fun f k => ?_⟩
   rcases lt_or_ge k (r + 2) with hk | hk
   · -- the coarse levels: Whitney's inequality
-    calc (splineScheme p r).approxSeq f (2 ^ k)
-        ≤ (splineScheme p r).approxSeq f 1 :=
-          ApproximationScheme.approxSeq_anti f Nat.one_le_two_pow
-      _ = (ppScheme p r).approxSeq f 1 := approxSeq_splineScheme_one r f
+    calc (splineScheme p r).approxError f (2 ^ k)
+        ≤ (splineScheme p r).approxError f 1 :=
+          ApproximationScheme.approxError_anti f Nat.one_le_two_pow
+      _ = (ppScheme p r).approxError f 1 := approxError_splineScheme_one r f
       _ ≤ W * lpModulus p r f (r + 1) := hWb f
       _ ≤ (W + C) * lpModulus p r f k :=
           mul_le_mul' le_self_add (lpModulus_anti r f (by omega))
   · -- the fine levels: the quasi-interpolant
-    refine (approxSeq_le_of_continuous hp hC (fun g => ?_) f).trans
+    refine (approxError_le_of_continuous hp hC (fun g => ?_) f).trans
       (mul_le_mul' le_add_self le_rfl)
     exact ⟨ppFun k (qiPieces hr k (2 ^ k) g), ⟨(memLp_ppFun k (qiPieces hr k (2 ^ k) g) p).toLp _,
       mem_splineScheme_two_pow.2 ⟨qiPieces hr k (2 ^ k) g, qiPieces_mem hr k (2 ^ k) g,
@@ -628,9 +627,9 @@ noncomputable def splineModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
   C0_ne_top := by simp
   le_enorm := lpModulus_le r
   jacksonStart := 0
-  CJ := (exists_approxSeq_splineScheme_le hr hp).choose
-  CJ_ne_top := (exists_approxSeq_splineScheme_le hr hp).choose_spec.1
-  jackson f k _ := (exists_approxSeq_splineScheme_le hr hp).choose_spec.2 f k
+  CJ := (exists_approxError_splineScheme_le hr hp).choose
+  CJ_ne_top := (exists_approxError_splineScheme_le hr hp).choose_spec.1
+  jackson f k _ := (exists_approxError_splineScheme_le hr hp).choose_spec.2 f k
   CB := (exists_inverse_splineScheme (r := r) hp).choose
   CB_ne_top := (exists_inverse_splineScheme hp).choose_spec.1
   inverse := (exists_inverse_splineScheme hp).choose_spec.2

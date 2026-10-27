@@ -13,7 +13,7 @@ public import FunctionSpaces.Interval.SplineJackson
 
 For `1 ≤ p < ∞` and `r ≥ 1`, the error of best approximation in `L_p(𝕋) = L_p[0, 1]` by periodic
 splines of order `r` and level `k ≥ r` is bounded by the periodic modulus of smoothness,
-`E_{2^k}(f)_p ≤ C ω_r^per(f, 2^(-k))_p` (`Interval.exists_approxSeq_perSplineScheme_le`).
+`E_{2^k}(f)_p ≤ C ω_r^per(f, 2^(-k))_p` (`Interval.exists_approxError_perSplineScheme_le`).
 
 * **The periodic quasi-interpolant.** For a `1`-periodic `G`, the quasi-interpolant of
   `FunctionSpaces.Interval.QuasiInterp` on `[0, 2)` repeats itself away from `0`: its
@@ -433,21 +433,21 @@ theorem dense_periodic (hp : p ≠ ∞) :
 with `E_{2^k}(f)_p ≤ C_J ω_r^per(f, 2^(-k))_p` for all `f ∈ L_p(𝕋)` and all `k ≥ r`; the levels
 `k ≥ r` have `r ≤ 2^k`, so that the periodic quasi-interpolant is a periodic spline. General `f`
 follow by density of the continuous periodic functions
-(`ApproximationScheme.approxSeq_le_of_dense`). -/
-theorem exists_approxSeq_perSplineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
+(`ApproximationScheme.approxError_le_of_dense`). -/
+theorem exists_approxError_perSplineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ∃ CJ : ℝ≥0∞, CJ ≠ ∞ ∧ ∀ (f : Lp ℂ p unitVol) (k : ℕ), r ≤ k →
-      (perSplineScheme p r).approxSeq f (2 ^ k) ≤ CJ * lpPerModulus p r f k := by
+      (perSplineScheme p r).approxError f (2 ^ k) ≤ CJ * lpPerModulus p r f k := by
   obtain ⟨C, hC, hCb⟩ := exists_eLpNorm_sub_perQi_le hr hp
   refine ⟨C, hC, fun f k hk => ?_⟩
   have hrk : r ≤ 2 ^ k := hk.trans Nat.lt_two_pow_self.le
-  refine ApproximationScheme.approxSeq_le_of_dense (dense_periodic hp)
+  refine ApproximationScheme.approxError_le_of_dense (dense_periodic hp)
     (fun f g => lpPerModulus_add_le r f g k) (C0 := 2 ^ r) (by simp)
     (fun f => lpPerModulus_le hp r f k) hC ?_ f
   rintro g ⟨G, hGc, hGp, hgG⟩
   have ha : (memLp_ppFun k (perQiPieces hr k G) p).toLp _ ∈ perSplineScheme p r (2 ^ k) :=
     mem_perSplineScheme_two_pow.2 ⟨perQiPieces hr k G, perQiPieces_mem hr k G,
       splineJoins_perQiPieces hr k G, perJoin_perQiPieces hr hGp hrk, MemLp.coeFn_toLp _⟩
-  refine (ApproximationScheme.approxSeq_le_of_mem ha g).trans ?_
+  refine (ApproximationScheme.approxError_le_of_mem ha g).trans ?_
   rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hgG.sub (MemLp.coeFn_toLp _))),
     lpPerModulus, perModulus_congr_ae hgG]
   exact hCb G hGc hGp k
@@ -463,9 +463,9 @@ noncomputable def perSplineModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞)
   C0_ne_top := by simp
   le_enorm := lpPerModulus_le hp r
   jacksonStart := r
-  CJ := (exists_approxSeq_perSplineScheme_le hr hp).choose
-  CJ_ne_top := (exists_approxSeq_perSplineScheme_le hr hp).choose_spec.1
-  jackson := (exists_approxSeq_perSplineScheme_le hr hp).choose_spec.2
+  CJ := (exists_approxError_perSplineScheme_le hr hp).choose
+  CJ_ne_top := (exists_approxError_perSplineScheme_le hr hp).choose_spec.1
+  jackson := (exists_approxError_perSplineScheme_le hr hp).choose_spec.2
   CB := (exists_inverse_perSplineScheme (r := r) hp).choose
   CB_ne_top := (exists_inverse_perSplineScheme hp).choose_spec.1
   inverse := (exists_inverse_perSplineScheme hp).choose_spec.2

@@ -144,16 +144,19 @@ theorem norm_sub_valleePoussinBCF_le {k : ℕ} {a : UnitAddTorus d →ᵇ ℂ}
 every bounded continuous `f`, since `‖f - V_k f‖_∞ ≤ (1 + ‖Θ‖_1) E_{2^k}(f)_∞ → 0`. -/
 theorem tendsto_valleePoussinBCF (f : UnitAddTorus d →ᵇ ℂ) :
     Tendsto (fun k => valleePoussinBCF k f) atTop (𝓝 f) := by
-  have hE : Tendsto (fun k => (valleePoussinConst d).toReal *
-      (trigScheme d).approxError (2 ^ k) f) atTop (𝓝 0) := by
-    simpa [Function.comp_def] using ((tendsto_approxError_trigScheme f).comp
-      (tendsto_pow_atTop_atTop_of_one_lt (α := ℕ) one_lt_two)).const_mul
-        (valleePoussinConst d).toReal
-  rw [tendsto_iff_norm_sub_tendsto_zero]
-  refine squeeze_zero (fun _ => norm_nonneg _) (fun k => ?_) hE
-  rw [norm_sub_rev]
-  exact ApproximationScheme.le_mul_approxError_of_forall_mem ENNReal.toReal_nonneg
-    fun a ha => norm_sub_valleePoussinBCF_le ha f
+  have hE : Tendsto (fun k => valleePoussinConst d * (trigScheme d).approxError f (2 ^ k)) atTop
+      (𝓝 0) := by
+    simpa using ENNReal.Tendsto.const_mul ((tendsto_approxError_trigScheme f).comp
+      (tendsto_pow_atTop_atTop_of_one_lt (α := ℕ) one_lt_two)) (Or.inr valleePoussinConst_ne_top)
+  rw [tendsto_iff_edist_tendsto_0]
+  refine tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hE (fun _ => bot_le)
+    fun k => ?_
+  rw [edist_comm, edist_eq_enorm_sub]
+  refine ApproximationScheme.le_mul_approxError_of_forall_mem valleePoussinConst_ne_top
+    fun a ha => ?_
+  rw [← ofReal_norm, ← ofReal_norm, ← ENNReal.ofReal_toReal (valleePoussinConst_ne_top (d := d)),
+    ← ENNReal.ofReal_mul ENNReal.toReal_nonneg]
+  exact ENNReal.ofReal_le_ofReal (norm_sub_valleePoussinBCF_le ha f)
 
 /-- **The weighted rate of the de la Vallée Poussin operators**: for `F ∈ A^β_1` of the
 trigonometric scheme in `L_p(𝕋^d)`, `β ≥ 0`, `2^(kβ) ‖F - V_k F‖_p → 0`. The canonical near-best

@@ -56,7 +56,7 @@ structure ApproxExtension (R : X →L[ℝ] Y) (A : ApproximationScheme X)
   /-- The loss `γ` in complexity: `2^k` becomes `2^(k+γ)`. -/
   loss : ℕ
   enorm_le : ∀ g, ‖E g‖ₑ ≤ C * ‖g‖ₑ
-  approxSeq_le : ∀ g k, A.approxSeq (E g) (2 ^ (k + loss)) ≤ C * B.approxSeq g (2 ^ k)
+  approxError_le : ∀ g k, A.approxError (E g) (2 ^ (k + loss)) ≤ C * B.approxError g (2 ^ k)
 
 /-- The constant `C (1 + (γ + 1) 2^(γs))` of the extension bound. -/
 noncomputable def extensionConst (C : ℝ≥0∞) (γ : ℕ) (s : ℝ) : ℝ≥0∞ :=
@@ -83,17 +83,17 @@ theorem approxNormDyadic_extension_le {R : X →L[ℝ] Y} (Ex : ApproxExtension 
   have hpt : ∀ k, A.approxSeqDyadic s (Ex.E g) k ≤ u k + v k := fun k => by
     rcases lt_or_ge k γ with hk | hk
     · calc A.approxSeqDyadic s (Ex.E g) k
-          = dyadicWeight s k * A.approxSeq (Ex.E g) (2 ^ k) := rfl
+          = dyadicWeight s k * A.approxError (Ex.E g) (2 ^ k) := rfl
         _ ≤ w * (C * ‖g‖ₑ) := by
             gcongr
             · exact ENNReal.dyadicWeight_mono hs hk.le
-            · exact (approxSeq_le_enorm _ _).trans (Ex.enorm_le g)
+            · exact (approxError_le_enorm _ _).trans (Ex.enorm_le g)
         _ ≤ u k + v k := by simp only [u, hk, ↓reduceIte]; exact le_self_add
     · obtain ⟨j, rfl⟩ := Nat.exists_eq_add_of_le' hk
       calc A.approxSeqDyadic s (Ex.E g) (j + γ)
-          = dyadicWeight s (j + γ) * A.approxSeq (Ex.E g) (2 ^ (j + γ)) := rfl
-        _ ≤ dyadicWeight s (j + γ) * (C * B.approxSeq g (2 ^ j)) := by
-            gcongr; exact Ex.approxSeq_le g j
+          = dyadicWeight s (j + γ) * A.approxError (Ex.E g) (2 ^ (j + γ)) := rfl
+        _ ≤ dyadicWeight s (j + γ) * (C * B.approxError g (2 ^ j)) := by
+            gcongr; exact Ex.approxError_le g j
         _ = w * C * B.approxSeqDyadic s g j := by
             rw [ENNReal.dyadicWeight_add_nat, approxSeqDyadic]; ring
         _ ≤ u (j + γ) + v (j + γ) := by

@@ -95,21 +95,19 @@ theorem kFunctional_smul_le (c : ℝ) (f : X) :
 
 /-- **Jackson's inequality controls the errors by the K-functional**:
 `E_n(f) ≤ max(1, C) K(n^(-r), f)` for `n ≥ 1`. -/
-theorem approxSeq_le_kFunctional_of_jackson {A : ApproximationScheme X} {r C : ℝ}
+theorem approxError_le_kFunctional_of_jackson {A : ApproximationScheme X} {r C : ℝ}
     (hJ : JacksonBound ι A r C) (hC : 0 ≤ C) {n : ℕ} (hn : 1 ≤ n) (f : X) :
-    A.approxSeq f n ≤ max 1 (ENNReal.ofReal C) * kFunctional ι ((n : ℝ≥0∞) ^ (-r)) f := by
+    A.approxError f n ≤ max 1 (ENNReal.ofReal C) * kFunctional ι ((n : ℝ≥0∞) ^ (-r)) f := by
   have hM0 : max 1 (ENNReal.ofReal C) ≠ 0 := (zero_lt_one.trans_le (le_max_left _ _)).ne'
   have hMt : max 1 (ENNReal.ofReal C) ≠ ∞ := max_ne_top ENNReal.one_ne_top ENNReal.ofReal_ne_top
   rw [show max 1 (ENNReal.ofReal C) * kFunctional ι ((n : ℝ≥0∞) ^ (-r)) f =
       ⨅ y, max 1 (ENNReal.ofReal C) * (‖f - ι y‖ₑ + (n : ℝ≥0∞) ^ (-r) * ‖y‖ₑ) from
     ENNReal.mul_iInf_of_ne hM0 hMt]
   refine le_iInf fun y => ?_
-  have h1 : A.approxSeq f n ≤ ‖f - ι y‖ₑ + A.approxSeq (ι y) n := by
-    rw [approxSeq, approxSeq, ← ofReal_norm, ← ENNReal.ofReal_add (norm_nonneg _)
-      (approxError_nonneg _ _), add_comm]
-    exact ENNReal.ofReal_le_ofReal (approxError_le_approxError_add_norm n f (ι y))
-  calc A.approxSeq f n ≤ ‖f - ι y‖ₑ + ENNReal.ofReal C * (n : ℝ≥0∞) ^ (-r) * ‖y‖ₑ :=
-        h1.trans (by gcongr; exact hJ.approxSeq_le hC hn y)
+  have h1 : A.approxError f n ≤ ‖f - ι y‖ₑ + A.approxError (ι y) n := by
+    rw [add_comm]; exact approxError_le_approxError_add_enorm n f (ι y)
+  calc A.approxError f n ≤ ‖f - ι y‖ₑ + ENNReal.ofReal C * (n : ℝ≥0∞) ^ (-r) * ‖y‖ₑ :=
+        h1.trans (by gcongr; exact hJ.approxError_le hC hn y)
     _ ≤ max 1 (ENNReal.ofReal C) * ‖f - ι y‖ₑ +
           max 1 (ENNReal.ofReal C) * ((n : ℝ≥0∞) ^ (-r) * ‖y‖ₑ) := by
         rw [mul_assoc]

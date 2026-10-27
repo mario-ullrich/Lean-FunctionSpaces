@@ -98,70 +98,68 @@ Injectivity of $\iota$ is what gives $\iota^{-1}(\{0\}) = \{0\}$.
 
 \begin{definition}[Error of best approximation]
 \label{def:error}
-\lean{ApproximationScheme.approxError, ApproximationScheme.approxError_nonneg,
-  ApproximationScheme.approxError_le_norm_sub}
+\lean{ApproximationScheme.approxError, ApproximationScheme.approxError_ne_top,
+  ApproximationScheme.approxError_le_of_mem}
 \leanok
 \uses{def:scheme}
 Let $A$ be an approximation scheme in $X$. For $n \in \N$ and $f \in X$,
 \[
-  E_n(f) = \dist(f, A_n) = \inf_{a \in A_n} \|f - a\|.
+  E_n(f) = \dist(f, A_n) = \inf_{a \in A_n} \|f - a\| \in [0, \infty).
 \]
 \end{definition}
 
+In Lean the error takes values in $[0, \infty]$, like the quasi-norms built from it; it is
+finite because $0 \in A_n$.
+
 \begin{lemma}[Calculus of the error]
 \label{lem:error-basic}
-\lean{ApproximationScheme.approxError_zero_left, ApproximationScheme.approxError_le_norm,
+\lean{ApproximationScheme.approxError_zero_right, ApproximationScheme.approxError_le_enorm,
   ApproximationScheme.approxError_anti, ApproximationScheme.approxError_smul,
-  ApproximationScheme.approxError_add_le, ApproximationScheme.abs_approxError_sub_le,
-  ApproximationScheme.approxSeq_le_approxSeq_add_enorm, ApproximationScheme.approxError_zero_right,
+  ApproximationScheme.approxError_add_le, ApproximationScheme.approxError_add_le_of_add_mem,
+  ApproximationScheme.approxError_le_approxError_add_enorm,
+  ApproximationScheme.approxError_zero_left,
   ApproximationScheme.approxError_eq_zero_of_mem,
   ApproximationScheme.approxError_eq_zero_of_mem_closure,
   ApproximationScheme.approxError_anti_scheme, ApproximationScheme.le_approxError_iff,
-  ApproximationScheme.exists_mem_norm_sub_lt, ApproximationScheme.exists_mem_norm_sub_le_add,
+  ApproximationScheme.exists_mem_enorm_sub_lt, ApproximationScheme.exists_mem_enorm_sub_le_add,
   ApproximationScheme.le_mul_approxError_of_forall_mem,
   ApproximationScheme.approxError_add_le_pow_succ, ApproximationScheme.approxError_neg,
-  ApproximationScheme.approxError_le_approxError_add_norm,
-  ApproximationScheme.continuous_approxError, ApproximationScheme.approxSeq_anti,
-  ApproximationScheme.approxSeq_zero_left, ApproximationScheme.approxSeq_zero_right,
-  ApproximationScheme.approxSeq_le_enorm, ApproximationScheme.approxSeq_ne_top,
-  ApproximationScheme.approxSeq_le_of_mem, ApproximationScheme.approxSeq_eq_zero_of_mem,
-  ApproximationScheme.approxSeq_add_le, ApproximationScheme.approxSeq_add_le_pow_succ,
-  ApproximationScheme.approxSeq_smul, ApproximationScheme.approxSeq_neg,
-  ApproximationScheme.approxSeq_anti_scheme}
+  ApproximationScheme.continuous_approxError}
 \leanok
 \uses{def:error, lem:scheme-basic}
 Let $A$ be an approximation scheme in $X$. For all $f, g \in X$, $c \in \R$ and
-$m, n \in \N$:
+$m, n, k \in \N$:
 \begin{enumerate}
   \item $E_0(f) = \|f\|$ and $E_n(f) \leq \|f\|$;
   \item $E_n(f) \leq E_m(f)$ whenever $m \leq n$;
   \item $E_n(c f) = |c| \, E_n(f)$;
-  \item $E_{m+n}(f + g) \leq E_m(f) + E_n(g)$;
-  \item $|E_n(f) - E_n(g)| \leq \|f - g\|$, so $E_n$ is continuous;
+  \item $E_k(f + g) \leq E_m(f) + E_n(g)$ whenever $A_m + A_n \subseteq A_k$, in particular
+    $E_{m+n}(f + g) \leq E_m(f) + E_n(g)$;
+  \item $E_n(f) \leq E_n(g) + \|f - g\|$, so $E_n$ is continuous;
   \item $E_n(f) = 0$ for $f$ in the closure of $A_n$, in particular $E_n(0) = 0$;
   \item a scheme with larger sets has smaller errors;
   \item for every $\varepsilon > 0$ there is $a \in A_n$ with
-    $\|f - a\| \leq E_n(f) + \varepsilon$.
+    $\|f - a\| \leq E_n(f) + \varepsilon$;
+  \item for all $e \in [0, \infty]$ and $C \in [0, \infty)$ with $e \leq C \|f - a\|$ for
+    every $a \in A_n$, $e \leq C \, E_n(f)$.
 \end{enumerate}
-The same statements hold for the errors as elements of $[0, \infty]$, the form used by the
-approximation spaces.
 \end{lemma}
 
 \begin{proof}
 \leanok
 The first item holds because $A_0 = \{0\}$ and $0 \in A_n$, the second because the sets
-increase, the third because $c A_n = A_n$ for $c \neq 0$. For the fourth, given
-$\varepsilon > 0$ choose $a \in A_m$ and $b \in A_n$ with $\|f - a\| \leq E_m(f) +
-\varepsilon$ and $\|g - b\| \leq E_n(g) + \varepsilon$; then $a + b \in A_{m+n}$ and the
-triangle inequality gives the bound up to $2\varepsilon$. The fifth item is the
+increase, the third because $c A_n = A_n$ for $c \neq 0$. For the fourth,
+$E_k(f + g) \leq \|(f - a) + (g - b)\| \leq \|f - a\| + \|g - b\|$ for all $a \in A_m$ and
+$b \in A_n$, and the infimum over $a$ and $b$ gives the bound. The fifth item is the
 $1$-Lipschitz property of the distance to a set, the sixth holds because the distance to a set
 equals the distance to its closure, the seventh because the infimum over a larger set is
-smaller, and the last is the definition of the infimum.
+smaller, and the eighth is the definition of the infimum. For the last, divide by $C$ when
+$C > 0$ and take the infimum over $a$; for $C = 0$ take $a = 0$.
 \end{proof}
 
 A best approximant, an $a \in A_n$ with $\|f - a\| = E_n(f)$, need not exist, since the sets
-$A_n$ need not be closed. The proofs work with near-best approximants as in the proof of the
-fourth item.
+$A_n$ need not be closed. The proofs work with near-best approximants as in the eighth item, or
+bound $E_n(f)$ through every approximant as in the last item.
 
 An operator of norm at most $C$ that fixes $a$ approximates every $f$ as well as $a$ does, up to
 the factor $1 + C$.
@@ -204,7 +202,7 @@ The errors decrease, so convergence along $2^k$ gives convergence.
 
 \begin{lemma}[Bounds by a modulus extend from a dense set]
 \label{lem:error-dense}
-\lean{ApproximationScheme.approxSeq_le_of_dense}
+\lean{ApproximationScheme.approxError_le_of_dense}
 \leanok
 \uses{lem:error-basic}
 Let $A$ be an approximation scheme in $X$, $n \in \N$, $D \subseteq X$ dense,
@@ -224,7 +222,7 @@ so $E_n(f) \leq C \omega(f) + (C C_0 + 1) \|f - g\|$, and $\|f - g\|$ is arbitra
 \label{lem:error-map}
 \lean{ApproximationScheme.approxError_map_le}
 \leanok
-\uses{def:error}
+\uses{lem:error-basic}
 Let $A$ and $B$ be approximation schemes in $X$ and $Y$, and let $T : X \to Y$ be a bounded
 linear map with $T(A_n) \subseteq B_n$ for all $n$. Then for all $n \in \N$ and $f \in X$,
 \[
@@ -724,7 +722,7 @@ from $0$.
 
 \begin{definition}[Approximation space]
 \label{def:approx-space}
-\lean{ApproximationScheme.approxSeq, ApproximationScheme.approxNorm, ApproximationScheme.MemApprox,
+\lean{ApproximationScheme.approxNorm, ApproximationScheme.MemApprox,
   ApproximationScheme.approxNorm_top, ApproximationScheme.approxNorm_rpow,
   ApproximationScheme.memApprox_iff, ApproximationScheme.MemApprox.approxNorm_ne_top}
 \leanok
@@ -838,7 +836,7 @@ function into $[0, \infty]$, in the way Mathlib treats $L_p$ through \texttt{eLp
 
 \begin{lemma}[Approximation spaces lie in the closure]
 \label{lem:approx-closure}
-\lean{ApproximationScheme.approxSeq_pow_le,
+\lean{ApproximationScheme.approxError_pow_le,
   ApproximationScheme.tendsto_approxError_pow_zero_of_memApprox,
   ApproximationScheme.mem_closure_iUnion_of_memApprox,
   ApproximationScheme.approxSpace_subset_closure}
@@ -890,7 +888,7 @@ two and the two comparisons of \Cref{thm:dyadic-norm}.
 
 \begin{lemma}[Functoriality]
 \label{lem:approx-functorial}
-\lean{ApproximationScheme.approxSeq_map_le, ApproximationScheme.approxNorm_map_le,
+\lean{ApproximationScheme.approxNorm_map_le,
   ApproximationScheme.approxNormDyadic_map_le, ApproximationScheme.MemApprox.map,
   ApproximationScheme.approxSpace_map_le, ApproximationScheme.mem_map_of_mem'}
 \leanok
@@ -935,7 +933,7 @@ $\iota y = a$ and $\|y\| \leq C \, n^\beta \, \|a\|$.
   ApproximationScheme.DyadicApprox.tendsto, ApproximationScheme.DyadicApprox.enorm_zero_le}
 \leanok
 \uses{lem:error-basic, lem:scheme-basic}
-Let $f \in X$ and let $(t_k)_k$ be a sequence in $(0, \infty)$. There are $a_k \in A_{2^k}$
+Let $f \in X$ and let $(t_k)_k$ be a sequence in $(0, \infty]$. There are $a_k \in A_{2^k}$
 with $\|f - a_k\| \leq E_{2^k}(f) + t_k$ for every $k$. Every such sequence satisfies
 $a_{k+1} - a_k \in A_{2^{k+2}}$; if $(t_k)$ decreases, then
 $\|a_{k+1} - a_k\| \leq 2 (E_{2^k}(f) + t_k)$; and if $E_{2^k}(f) \to 0$ and $t_k \to 0$, then
@@ -1025,7 +1023,7 @@ and $\|(2^{ks} t_k)_k\|_{\ell_q} \leq 2\|f\|$.
 
 \begin{definition}[Jackson inequality]
 \label{def:jackson}
-\lean{ApproximationScheme.JacksonBound, ApproximationScheme.JacksonBound.approxSeq_le}
+\lean{ApproximationScheme.JacksonBound, ApproximationScheme.JacksonBound.approxError_le}
 \leanok
 \uses{def:error}
 Let $r, C \in \R$. The map $\iota$ satisfies \emph{Jackson's inequality} of order $r$ and
@@ -1142,7 +1140,7 @@ $k < 0$ of the textbook definition.
 
 \begin{lemma}[Errors and the $K$-functional]
 \label{lem:error-k-functional}
-\lean{ApproximationScheme.approxSeq_le_kFunctional_of_jackson}
+\lean{ApproximationScheme.approxError_le_kFunctional_of_jackson}
 \leanok
 \uses{def:k-functional, def:jackson}
 Let $A$ be an approximation scheme in $X$, and let $\iota$ satisfy Jackson's inequality of
@@ -2641,8 +2639,8 @@ norm of $X$ (\Cref{def:dyadic-norm}).
 
 \begin{lemma}[Jackson's half]
 \label{lem:approximation-space-couple-direct}
-\lean{ApproximationScheme.approxSeq_pow_le_dyadicWeight_mul,
-  ApproximationScheme.approxSeq_le_kFunctional_reprCouple,
+\lean{ApproximationScheme.approxError_pow_le_dyadicWeight_mul,
+  ApproximationScheme.approxError_le_kFunctional_reprCouple,
   ApproximationScheme.approxNormDyadic_le_interpNorm_reprCouple}
 \leanok
 \uses{def:approximation-space-couples, def:couple-k-functional, prop:couple-natural-grid,
@@ -2673,7 +2671,7 @@ $\|f\|^{\mathrm{dy}}_{A^s_q} \leq 2 \|f\| + 2^s \bigl\| \bigl(2^{ks} K(2^{-kr}, 
 \begin{lemma}[Near-best approximants in $A^r_\infty$]
 \label{lem:approximants-top-norm}
 \lean{ApproximationScheme.approxNormDyadic_top_le_of_mem,
-  ApproximationScheme.DyadicApprox.enorm_le, ApproximationScheme.DyadicApprox.approxSeq_le,
+  ApproximationScheme.DyadicApprox.enorm_le, ApproximationScheme.DyadicApprox.approxError_le,
   ApproximationScheme.DyadicApprox.approxNormDyadic_top_le}
 \leanok
 \uses{def:dyadic-norm, lem:near-best, lem:error-basic, lem:scheme-basic}
@@ -3004,8 +3002,8 @@ for some $M \geq 0$.
 
 \begin{lemma}[Lebesgue inequality]
 \label{lem:lebesgue}
-\lean{ApproximationScheme.ProjectionScheme.approxSeq_le_enorm_sub,
-  ApproximationScheme.ProjectionScheme.enorm_sub_le_approxSeq,
+\lean{ApproximationScheme.ProjectionScheme.approxError_le_enorm_sub,
+  ApproximationScheme.ProjectionScheme.enorm_sub_le_approxError,
   ApproximationScheme.ProjectionScheme.tendsto_of_dense}
 \leanok
 \uses{def:projection-scheme, def:error, lem:error-tendsto, lem:lebesgue-one-operator}
@@ -3079,9 +3077,8 @@ condition: they are small and approximable at a rate $\sigma$ from their own lev
 \label{def:linear-scheme}
 \lean{ApproximationScheme.IsLinear, ApproximationScheme.isLinear_ofSubmodules,
   ApproximationScheme.isLinear_ofMonotoneSubmodules,
-  ApproximationScheme.approxSeq_add_le_of_isLinear,
-  ApproximationScheme.approxSeq_sum_le_of_isLinear, ApproximationScheme.IsLinear.map,
-  ApproximationScheme.approxError_add_le_of_isLinear}
+  ApproximationScheme.approxError_add_le_of_isLinear,
+  ApproximationScheme.approxError_sum_le_of_isLinear, ApproximationScheme.IsLinear.map}
 \leanok
 \uses{def:scheme, def:error}
 An approximation scheme is \emph{linear} if $a + b \in A_n$ for all $n \in \N$ and

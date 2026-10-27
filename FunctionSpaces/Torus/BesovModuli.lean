@@ -17,7 +17,7 @@ modulus is compatible with the trigonometric scheme, with inverse order `θ = 1`
 (`Torus.trigModulusData`, a `ModulusData`):
 
 * it is subadditive and at most `2 ‖f‖_2` (`Rd.lpModulus_add_le`, `Rd.lpModulus_le`);
-* **Jackson's inequality** `E_n(f)_2 ≤ (d + 1) ω(f, 1/n)_2` (`Torus.approxSeq_le_modulus`);
+* **Jackson's inequality** `E_n(f)_2 ≤ (d + 1) ω(f, 1/n)_2` (`Torus.approxError_le_modulus`);
 * **the inverse inequality** `ω(a, 2^(-k))_2 ≤ max(2, 2πd) 2^(-(k-j)) ‖a‖_2` for trigonometric
   polynomials `a` of degree `< 2^j` (`Torus.modulus_le_of_mem`), from Bernstein's inequality
   `‖τ_h a - a‖_2 ≤ 2πd 2^j ‖h‖ ‖a‖_2` (`Torus.enorm_translate_sub_le_of_mem`).
@@ -47,15 +47,16 @@ variable {d : Type*} [Fintype d] {s : ℝ} {q : ℝ≥0∞}
 /-! ### Jackson's inequality -/
 
 /-- Jackson's theorem in the form `E_n(f) ≤ (d + 1) ω(f, 1/n)`. -/
-theorem approxSeq_le_modulus {n : ℕ} (hn : 1 ≤ n) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    ((trigScheme d).toLp volume 2).approxSeq f n ≤
+theorem approxError_le_modulus {n : ℕ} (hn : 1 ≤ n)
+    (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
+    ((trigScheme d).toLp volume 2).approxError f n ≤
       ((Fintype.card d : ℝ≥0∞) + 1) * modulus f (1 / n) := by
-  have h := approxSeq_sq_le_card_mul_modulus_sq hn f
+  have h := approxError_sq_le_card_mul_modulus_sq hn f
   have hd : (Fintype.card d : ℝ≥0∞) ≤ ((Fintype.card d : ℝ≥0∞) + 1) ^ 2 := by
     calc (Fintype.card d : ℝ≥0∞) ≤ (Fintype.card d : ℝ≥0∞) + 1 := le_self_add
       _ ≤ ((Fintype.card d : ℝ≥0∞) + 1) ^ 2 := by
           rw [sq]; exact le_mul_of_one_le_left' le_add_self
-  have h2 : ((trigScheme d).toLp volume 2).approxSeq f n ^ 2 ≤
+  have h2 : ((trigScheme d).toLp volume 2).approxError f n ^ 2 ≤
       (((Fintype.card d : ℝ≥0∞) + 1) * modulus f (1 / n)) ^ 2 := by
     rw [mul_pow]; exact h.trans (by gcongr)
   rw [← ENNReal.rpow_two, ← ENNReal.rpow_two] at h2
@@ -131,7 +132,7 @@ noncomputable def trigModulusData (d : Type*) [Fintype d] :
   jacksonStart := 0
   CJ := Fintype.card d + 1
   CJ_ne_top := ENNReal.add_ne_top.2 ⟨ENNReal.natCast_ne_top _, ENNReal.one_ne_top⟩
-  jackson f k _ := by simpa using approxSeq_le_modulus (Nat.one_le_two_pow (n := k)) f
+  jackson f k _ := by simpa using approxError_le_modulus (Nat.one_le_two_pow (n := k)) f
   CB := ENNReal.ofReal (max 2 (2 * π * Fintype.card d))
   CB_ne_top := ENNReal.ofReal_ne_top
   inverse _ k _ ha := modulus_le_of_mem ha k

@@ -18,7 +18,7 @@ point, bounds the differences in each coordinate (`Cube.eLpNorm_cubeDiff_le_of_i
 Summed over the coordinates this is the **inverse inequality of order `r - 1 + 1/p`**
 (`Cube.exists_inverse_cubeSplineScheme`).
 
-With Jackson's inequality at every level (`Cube.exists_approxSeq_cubeSplineScheme_le`) the modulus
+With Jackson's inequality at every level (`Cube.exists_approxError_cubeSplineScheme_le`) the modulus
 on the cube is compatible with the scheme of tensor splines (`Cube.cubeSplineModulusData`), and
 `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 ≤ s < r - 1 + 1/p` (`Cube.memApprox_cubeSplineScheme_iff`),
 beyond smoothness `1` for `r ≥ 2`.
@@ -121,9 +121,9 @@ noncomputable def cubeSplineModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞
   C0_ne_top := ENNReal.mul_ne_top (ENNReal.natCast_ne_top d) (by simp)
   le_enorm := lpCubeModulus_le hp r
   jacksonStart := 0
-  CJ := (exists_approxSeq_cubeSplineScheme_le (d := d) (p := p) hr hp).choose
-  CJ_ne_top := (exists_approxSeq_cubeSplineScheme_le hr hp).choose_spec.1
-  jackson f k _ := (exists_approxSeq_cubeSplineScheme_le hr hp).choose_spec.2 f k
+  CJ := (exists_approxError_cubeSplineScheme_le (d := d) (p := p) hr hp).choose
+  CJ_ne_top := (exists_approxError_cubeSplineScheme_le hr hp).choose_spec.1
+  jackson f k _ := (exists_approxError_cubeSplineScheme_le hr hp).choose_spec.2 f k
   CB := (exists_inverse_cubeSplineScheme (d := d) (r := r) hp).choose
   CB_ne_top := (exists_inverse_cubeSplineScheme hp).choose_spec.1
   inverse := (exists_inverse_cubeSplineScheme hp).choose_spec.2

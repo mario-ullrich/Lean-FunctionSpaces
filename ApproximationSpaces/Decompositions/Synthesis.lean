@@ -64,28 +64,14 @@ theorem IsLinear.map {Y : Type*} [NormedAddCommGroup Y] [NormedSpace ℝ Y] (hA 
 /-- For a linear scheme the error is subadditive at a fixed complexity:
 `E_n(f + g) ≤ E_n(f) + E_n(g)`. -/
 theorem approxError_add_le_of_isLinear (hA : A.IsLinear) (n : ℕ) (f g : X) :
-    A.approxError n (f + g) ≤ A.approxError n f + A.approxError n g := by
-  refine le_of_forall_pos_le_add fun ε hε => ?_
-  obtain ⟨a, ha, hfa⟩ := exists_mem_norm_sub_le_add (A := A) n f (half_pos hε)
-  obtain ⟨b, hb, hgb⟩ := exists_mem_norm_sub_le_add (A := A) n g (half_pos hε)
-  calc A.approxError n (f + g) ≤ ‖(f + g) - (a + b)‖ := approxError_le_norm_sub (hA n a ha b hb) _
-    _ = ‖(f - a) + (g - b)‖ := by congr 1; abel
-    _ ≤ ‖f - a‖ + ‖g - b‖ := norm_add_le _ _
-    _ ≤ (A.approxError n f + ε / 2) + (A.approxError n g + ε / 2) := add_le_add hfa hgb
-    _ = A.approxError n f + A.approxError n g + ε := by ring
-
-/-- `E_n(f + g) ≤ E_n(f) + E_n(g)` for a linear scheme, in `ℝ≥0∞`. -/
-theorem approxSeq_add_le_of_isLinear (hA : A.IsLinear) (n : ℕ) (f g : X) :
-    A.approxSeq (f + g) n ≤ A.approxSeq f n + A.approxSeq g n := by
-  rw [approxSeq, approxSeq, approxSeq, ← ENNReal.ofReal_add (approxError_nonneg _ _)
-    (approxError_nonneg _ _)]
-  exact ENNReal.ofReal_le_ofReal (approxError_add_le_of_isLinear hA n f g)
+    A.approxError (f + g) n ≤ A.approxError f n + A.approxError g n :=
+  approxError_add_le_of_add_mem (hA n) f g
 
 /-- `E_n(∑ g_j) ≤ ∑ E_n(g_j)` for a linear scheme (Mathlib's `Finset.le_sum_of_subadditive`). -/
-theorem approxSeq_sum_le_of_isLinear (hA : A.IsLinear) (n : ℕ) {ι : Type*} (t : Finset ι)
-    (g : ι → X) : A.approxSeq (∑ j ∈ t, g j) n ≤ ∑ j ∈ t, A.approxSeq (g j) n :=
-  Finset.le_sum_of_subadditive (A.approxSeq · n) (approxSeq_zero_right n).le
-    (approxSeq_add_le_of_isLinear hA n) t g
+theorem approxError_sum_le_of_isLinear (hA : A.IsLinear) (n : ℕ) {ι : Type*} (t : Finset ι)
+    (g : ι → X) : A.approxError (∑ j ∈ t, g j) n ≤ ∑ j ∈ t, A.approxError (g j) n :=
+  Finset.le_sum_of_subadditive (A.approxError · n) (approxError_zero_left n).le
+    (approxError_add_le_of_isLinear hA n) t g
 
 /-- The algebra of the weights: `2^(ks) 2^(-(k-j)σ) = 2^(-k(σ-s)) 2^(jσ)` for `j ≤ k`
 (`ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub`). -/
@@ -103,7 +89,7 @@ quasi-norm).  The constant is finite for `0 < s < σ`. -/
 theorem approxNormDyadic_le_of_hasSum_decay (hA : A.IsLinear) (hq : 1 ≤ q) {σ : ℝ}
     {C : ℝ≥0∞} {f : X} {g : ℕ → X} (hf : HasSum g f) {ε : ℕ → ℝ≥0∞}
     (hsize : ∀ j, ‖g j‖ₑ ≤ ε j)
-    (hdecay : ∀ j k, j ≤ k → A.approxSeq (g j) (2 ^ k) ≤ C * dyadicWeight (-σ) (k - j) * ε j) :
+    (hdecay : ∀ j k, j ≤ k → A.approxError (g j) (2 ^ k) ≤ C * dyadicWeight (-σ) (k - j) * ε j) :
     A.approxNormDyadic s q f ≤ (2 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ +
       C * (1 - (2 : ℝ≥0∞) ^ (-(σ - s)))⁻¹) * lqNorm q (fun j => dyadicWeight s j * ε j) := by
   set Cs := (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹
@@ -123,15 +109,15 @@ theorem approxNormDyadic_le_of_hasSum_decay (hA : A.IsLinear) (hq : 1 ≤ q) {σ
   have herr : ∀ k, A.approxSeqDyadic s f k ≤
       C * (dyadicWeight (-(σ - s)) k * ∑ j ∈ range (k + 1), dyadicWeight σ j * ε j) +
         dyadicWeight s k * ∑' i, ε (k + i) := fun k => by
-    have h1 : A.approxSeq (∑ j ∈ range (k + 1), g j) (2 ^ k) ≤
+    have h1 : A.approxError (∑ j ∈ range (k + 1), g j) (2 ^ k) ≤
         ∑ j ∈ range (k + 1), C * dyadicWeight (-σ) (k - j) * ε j :=
-      (approxSeq_sum_le_of_isLinear hA _ _ _).trans (Finset.sum_le_sum fun j hj =>
+      (approxError_sum_le_of_isLinear hA _ _ _).trans (Finset.sum_le_sum fun j hj =>
         hdecay j k (Nat.lt_succ_iff.1 (Finset.mem_range.1 hj)))
-    calc A.approxSeqDyadic s f k = dyadicWeight s k * A.approxSeq f (2 ^ k) := rfl
+    calc A.approxSeqDyadic s f k = dyadicWeight s k * A.approxError f (2 ^ k) := rfl
       _ ≤ dyadicWeight s k * (∑ j ∈ range (k + 1), C * dyadicWeight (-σ) (k - j) * ε j +
             ∑' i, ε (k + i)) := by
           gcongr
-          exact (approxSeq_le_approxSeq_add_enorm _ f _).trans (add_le_add h1 (htail k))
+          exact (approxError_le_approxError_add_enorm _ f _).trans (add_le_add h1 (htail k))
       _ = ∑ j ∈ range (k + 1), dyadicWeight s k * (C * dyadicWeight (-σ) (k - j) * ε j) +
             dyadicWeight s k * ∑' i, ε (k + i) := by rw [mul_add, Finset.mul_sum]
       _ = C * (dyadicWeight (-(σ - s)) k * ∑ j ∈ range (k + 1), dyadicWeight σ j * ε j) +

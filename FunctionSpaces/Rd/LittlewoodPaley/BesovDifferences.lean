@@ -15,7 +15,7 @@ public import ApproximationSpaces.Moduli
 
 For `1 ≤ p < ∞` and `r ≥ 1`, the modulus of smoothness `ω_r(f, t)_p` of `f ∈ L_p(V)` is
 compatible with the band-limited scheme with inverse order `r` (`Rd.bandModulusData`):
-Jackson's inequality `E(f, E_k)_p ≤ C_J ω_r(f, 2^(-k))_p` (`Rd.approxSeq_bandScheme_le`) and the
+Jackson's inequality `E(f, E_k)_p ≤ C_J ω_r(f, 2^(-k))_p` (`Rd.approxError_bandScheme_le`) and the
 inverse inequality `ω_r(a, 2^(-k))_p ≤ C_B 2^(-(k-j) r) ‖a‖_p` for `a ∈ E_j`
 (`Rd.lpModulus_le_of_mem_bandSpace`). Its classical quasi-norm is
 `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q}` (`Rd.modNorm_bandModulusData`). The
@@ -58,7 +58,7 @@ noncomputable def bandModulusData (hp : p ≠ ∞) (r : ℕ) :
   jacksonStart := 0
   CJ := jacksonConst V r p
   CJ_ne_top := jacksonConst_ne_top Fact.out hp r
-  jackson f k _ := approxSeq_bandScheme_le hp r k f
+  jackson f k _ := approxError_bandScheme_le hp r k f
   CB := bandInverseConst V r
   CB_ne_top := bandInverseConst_ne_top r
   inverse _ _ _ ha := lpModulus_le_of_mem_bandSpace hp r (mem_bandScheme_two_pow.1 ha)

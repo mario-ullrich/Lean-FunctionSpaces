@@ -307,15 +307,13 @@ theorem cubeSplineScheme_isLinear (r : ℕ) : (cubeSplineScheme p d r).IsLinear 
 
 /-- At complexity `1` the tensor splines contain the polynomials of degree `< r` in each
 variable, so their error is at most that of the piecewise polynomials. -/
-theorem approxSeq_cubeSplineScheme_one_le (r : ℕ) (f : Lp ℂ p (cubeVol d)) :
-    (cubeSplineScheme p d r).approxSeq f 1 ≤ (cubePPScheme p d r).approxSeq f 1 := by
+theorem approxError_cubeSplineScheme_one_le (r : ℕ) (f : Lp ℂ p (cubeVol d)) :
+    (cubeSplineScheme p d r).approxError f 1 ≤ (cubePPScheme p d r).approxError f 1 := by
   have hsub : (cubePPScheme p d r 1 : Set (Lp ℂ p (cubeVol d))) ⊆ cubeSplineScheme p d r 1 := by
     intro g hg
     obtain ⟨g', hg', hgg'⟩ := (mem_cubePPScheme_two_pow (k := 0)).1 hg
     exact (mem_cubeSplineScheme_two_pow (k := 0)).2 ⟨g', hg'.isCubeSpline_zero, hgg'⟩
-  rw [ApproximationScheme.approxSeq, ApproximationScheme.approxSeq,
-    ApproximationScheme.approxError, ApproximationScheme.approxError]
-  exact ENNReal.ofReal_le_ofReal
-    (Metric.infDist_le_infDist_of_subset hsub ((cubePPScheme p d r).nonempty 1))
+  rw [ApproximationScheme.approxError, ApproximationScheme.approxError]
+  exact Metric.infEDist_anti hsub
 
 end Cube

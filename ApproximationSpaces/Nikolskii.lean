@@ -77,11 +77,11 @@ theorem exists_preimage_of_nikolskii [CompleteSpace Y] (hι : Function.Injective
   have hs : 0 ≤ s := hα.trans hαs.le
   set B := A.comap ι.toLinearMap hι
   set t := tolerance f s
-  obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s) (tolerance_ne_top f s)
+  obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s)
   set N := A.approxNormDyadic s q f
   set Cs := (1 - (2 : ℝ≥0∞) ^ (-(s - α)))⁻¹
   set K := liftConst C α
-  set g : ℕ → ℝ≥0∞ := fun m => dyadicWeight α m * (A.approxSeq f (2 ^ m) + t m)
+  set g : ℕ → ℝ≥0∞ := fun m => dyadicWeight α m * (A.approxError f (2 ^ m) + t m)
   have hfN : ‖f‖ₑ ≤ N := enorm_le_approxNormDyadic f
   have hL : lqNorm 1 (A.approxSeqDyadic α f) ≤ Cs * N :=
     (lqNorm_le_approxNormDyadic f).trans (approxNormDyadic_le_of_lt hq le_rfl f)
@@ -98,9 +98,9 @@ theorem exists_preimage_of_nikolskii [CompleteSpace Y] (hι : Function.Injective
   have herr : ∀ k, B.approxSeqDyadic (s - α) y k ≤
       K * (dyadicWeight (s - α) k * ∑' i, g (k + i)) := fun k => by
     obtain ⟨z, hz, hzle⟩ := htail k
-    calc B.approxSeqDyadic (s - α) y k = dyadicWeight (s - α) k * B.approxSeq y (2 ^ k) := rfl
+    calc B.approxSeqDyadic (s - α) y k = dyadicWeight (s - α) k * B.approxError y (2 ^ k) := rfl
       _ ≤ dyadicWeight (s - α) k * ‖y - z‖ₑ := by
-          gcongr; exact approxSeq_le_of_mem (A.mem_comap.2 hz) y
+          gcongr; exact approxError_le_of_mem (A.mem_comap.2 hz) y
       _ ≤ dyadicWeight (s - α) k * (K * ∑' i, g (k + i)) := by gcongr
       _ = K * (dyadicWeight (s - α) k * ∑' i, g (k + i)) := by ring
   have hg : ∀ k, dyadicWeight (s - α) k * g k =

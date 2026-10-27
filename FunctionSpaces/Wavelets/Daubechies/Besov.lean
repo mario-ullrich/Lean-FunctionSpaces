@@ -29,7 +29,7 @@ Bernstein bound `ω_N(φ, t)_p ≤ K t^θ` for `0 < t ≤ 1` (`Daubechies.Bernst
 `‖f‖_p + ‖(2^(ks) ω_N(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞  ⟺  ‖f‖_coef < ∞`.
 
 * **Approximation and moduli.** Jackson's inequality `E_{2^k}(f)_p ≤ C_J ω_N(f, 2^(-k))_p`
-  (`Daubechies.approxSeq_scheme_le`) and the inverse inequality
+  (`Daubechies.approxError_scheme_le`) and the inverse inequality
   `ω_N(a, 2^(-k))_p ≤ C_B 2^(-(k-j)θ) ‖a‖_p` for `a ∈ V_j` (`Daubechies.inverse_scheme`) make
   the modulus of smoothness compatible with the Daubechies scheme (`Daubechies.modulusData`), so
   the coincidence theorem `ApproximationScheme.ModulusData.memApprox_iff_modNorm_lt_top` gives
@@ -130,7 +130,7 @@ variable (p) in
 `ω_N(f, 2^(-k))_p` (`Rd.lpModulus p N`) is compatible with the Daubechies scheme with inverse
 order `θ` (`ApproximationScheme.ModulusData`). Jackson's inequality
 `E_{2^k}(f)_p ≤ C_J ω_N(f, 2^(-k))_p` holds from level `0` on
-(`Daubechies.approxSeq_scheme_le_jacksonConst_mul`), and the inverse inequality
+(`Daubechies.approxError_scheme_le_jacksonConst_mul`), and the inverse inequality
 `ω_N(a, 2^(-k))_p ≤ C_B 2^(-(k-j)θ) ‖a‖_p` for the approximants `a` of complexity `2^j` is
 `Daubechies.inverse_scheme`. -/
 noncomputable def modulusData (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} (hB : BernsteinBound m p θ N) :
@@ -143,7 +143,7 @@ noncomputable def modulusData (hN : 2 ≤ N) (hp : p ≠ ∞) {θ : ℝ} (hB : B
   jacksonStart := 0
   CJ := jacksonConst m p
   CJ_ne_top := jacksonConst_ne_top m hN p
-  jackson f k _ := approxSeq_scheme_le_jacksonConst_mul m hN hp f k
+  jackson f k _ := approxError_scheme_le_jacksonConst_mul m hN hp f k
   CB := (inverse_scheme m hN hp hB).choose
   CB_ne_top := (inverse_scheme m hN hp hB).choose_spec.1
   inverse := (inverse_scheme m hN hp hB).choose_spec.2

@@ -22,7 +22,7 @@ norm `‖h‖ = max_i ‖h_i‖` on `𝕋^d`.  For every order `r` and `1 ≤ p`
 (`Torus.modulus_mul_le`).  This file proves
 **Jackson's theorem**
 
-`E_n(f)_2² ≤ d · ω(f, 1/n)_2²`   (`Torus.approxSeq_sq_le_card_mul_modulus_sq`),
+`E_n(f)_2² ≤ d · ω(f, 1/n)_2²`   (`Torus.approxError_sq_le_card_mul_modulus_sq`),
 
 the error of best approximation by trigonometric polynomials of degree `< n` controlled by the
 modulus.  The proof averages over translations in the coordinate directions: by Parseval,
@@ -215,11 +215,11 @@ theorem mFourier_single [DecidableEq d] (k : d → ℤ) (i : d) (u : UnitAddCirc
 
 /-- The error of best approximation is at most the tail of the Fourier series:
 `E_n(f)_2² ≤ ∑_{deg k ≥ n} |f̂(k)|²`. -/
-theorem approxSeq_sq_le_tsum (n : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    ((trigScheme d).toLp volume 2).approxSeq f n ^ 2 ≤
+theorem approxError_sq_le_tsum (n : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
+    ((trigScheme d).toLp volume 2).approxError f n ^ 2 ≤
       ∑' k, if n ≤ deg k then ‖mFourierCoeff f k‖ₑ ^ 2 else 0 := by
   rw [toLp_trigScheme_eq]
-  have h1 := (fourierScheme d).projectionScheme.approxSeq_le_enorm_sub n f
+  have h1 := (fourierScheme d).projectionScheme.approxError_le_enorm_sub n f
   refine (pow_le_pow_left₀ bot_le h1 2).trans (le_of_eq ?_)
   rw [SpectralScheme.projectionScheme_P, ← mFourierBasis.repr.enorm_map,
     SpectralScheme.enorm_sq_eq_tsum]
@@ -235,9 +235,9 @@ theorem approxSeq_sq_le_tsum (n : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAddT
   · omega
 
 /-- **Jackson's theorem in `L_2(𝕋^d)`**: `E_n(f)_2² ≤ d · ω(f, 1/n)_2²` for `n ≥ 1`. -/
-theorem approxSeq_sq_le_card_mul_modulus_sq {n : ℕ} (hn : 1 ≤ n)
+theorem approxError_sq_le_card_mul_modulus_sq {n : ℕ} (hn : 1 ≤ n)
     (f : Lp ℂ 2 (volume : Measure (UnitAddTorus d))) :
-    ((trigScheme d).toLp volume 2).approxSeq f n ^ 2 ≤
+    ((trigScheme d).toLp volume 2).approxError f n ^ 2 ≤
       (Fintype.card d : ℝ≥0∞) * modulus f (1 / n) ^ 2 := by
   classical
   set t : ℝ := 1 / n
@@ -309,6 +309,6 @@ theorem approxSeq_sq_le_card_mul_modulus_sq {n : ℕ} (hn : 1 ≤ n)
           rw [Finset.sum_const, Finset.card_univ, nsmul_eq_mul]; ring
   have hcancel := (ENNReal.mul_le_mul_iff_right (ENNReal.ofReal_pos.2 ht).ne'
     ENNReal.ofReal_ne_top).1 hsum
-  exact (approxSeq_sq_le_tsum n f).trans hcancel
+  exact (approxError_sq_le_tsum n f).trans hcancel
 
 end Torus

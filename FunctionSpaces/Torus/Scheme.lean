@@ -33,7 +33,7 @@ trigPoly (m + n)`, and `T ∈ trigPoly n` has `T^m ∈ trigPoly (m n)`
 
 The trigonometric polynomials are dense in the bounded continuous functions for the sup norm
 (`Torus.dense_iUnion_trigPoly`, from Mathlib's `span_mFourier_closure_eq_top`), so the errors of
-best uniform approximation tend to `0` (`Torus.tendsto_approxSeq_trigScheme`).
+best uniform approximation tend to `0` (`Torus.tendsto_approxError_trigScheme`).
 -/
 
 @[expose] public section
@@ -211,16 +211,8 @@ theorem dense_iUnion_trigPoly : Dense (⋃ n, (trigPoly d n : Set (UnitAddTorus 
 /-- The errors of best uniform approximation by trigonometric polynomials of degree `< n` tend
 to `0`. -/
 theorem tendsto_approxError_trigScheme (f : UnitAddTorus d →ᵇ ℂ) :
-    Tendsto ((trigScheme d).approxError · f) atTop (𝓝 0) :=
+    Tendsto ((trigScheme d).approxError f) atTop (𝓝 0) :=
   (ApproximationScheme.tendsto_approxError_zero_iff f).2 (dense_iUnion_trigPoly f)
-
-/-- The errors of best uniform approximation by trigonometric polynomials, in `ℝ≥0∞`, tend
-to `0`. -/
-theorem tendsto_approxSeq_trigScheme (f : UnitAddTorus d →ᵇ ℂ) :
-    Tendsto ((trigScheme d).approxSeq f) atTop (𝓝 0) := by
-  have h := ENNReal.tendsto_ofReal (tendsto_approxError_trigScheme f)
-  rw [ENNReal.ofReal_zero] at h
-  exact h
 
 end UniformDensity
 

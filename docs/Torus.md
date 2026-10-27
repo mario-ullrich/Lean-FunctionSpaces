@@ -22,7 +22,7 @@ the trace theorem.
 
 * **Besov spaces through moduli of smoothness.** For `f ∈ L_2(𝕋^d)` let
   `ω(f, t)_2 = sup_{‖h‖ ≤ t} ‖f(· + h) - f‖_2`. Jackson's theorem
-  `E_n(f)_2² ≤ d ω(f, 1/n)_2²` holds (`Torus.approxSeq_sq_le_card_mul_modulus_sq`), and for
+  `E_n(f)_2² ≤ d ω(f, 1/n)_2²` holds (`Torus.approxError_sq_le_card_mul_modulus_sq`), and for
   `0 < s < 1` and `1 ≤ q ≤ ∞`, `f ∈ B^s_{2,q}(𝕋^d)` iff
   `‖f‖_2 + ‖(2^(js) ω(f, 2^(-j))_2)_j‖_{ℓ_q} < ∞`, with equivalent norms
   (`Torus.memBesov_iff_modulusNorm_lt_top`, `Torus.approxNormDyadic_le_modulusNorm`,
@@ -32,7 +32,7 @@ the trace theorem.
   for the modulus `ω_r` of order `r` (`Torus.memBesov_iff_modNorm_lt_top_lp`). The kernels of
   `ℝ^d` act on `𝕋^d` by `(Φ ⋆ f)(t) = ∫ Φ(y) f(t - π y) dy` (`Torus.econvLp`), with their Fourier
   transforms at the lattice points as multipliers (`Torus.econv_mFourier`); this transfers
-  Jackson's inequality (`Torus.approxSeq_trigScheme_le`) and Bernstein's inequality
+  Jackson's inequality (`Torus.approxError_trigScheme_le`) and Bernstein's inequality
   (`Torus.lpModulus_le_of_mem_trigPolyLp`) from band-limited approximation on `ℝ^d`.
 * **Besov spaces on the torus as interpolation spaces.** With `p` and `ω_r` as above, let
   `N_{s,q}(f) = ‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q}`, `0 < s₀ < s₁ < r`, `0 < η < 1` and

@@ -26,8 +26,8 @@ quasi-normed (the triangle inequality holds up to a constant), and Mathlib has n
 quasi-normed spaces, so no new normed type is introduced.  The linear structure is recorded
 separately as a `Submodule` (`ApproximationScheme.approxSpace`).
 
-The errors enter through `approxSeq f n = E_n(f)` as an element of `ℝ≥0∞`.  This file holds
-the definition and the facts that follow directly from the calculus of `E_n`: homogeneity,
+This file holds the definition and the facts that follow directly from the calculus of the
+error `E_n(f) = A.approxError f n` of `ApproximationSpaces.Error`: homogeneity,
 `‖f‖ ≤ ‖f‖_{A^s_q}` (because `E_0(f) = ‖f‖`), definiteness, and comparison of schemes.
 Everything else is proved for the equivalent dyadic quasi-norm of
 `ApproximationSpaces.Dyadic`.
@@ -43,112 +43,9 @@ variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 
 variable (A : ApproximationScheme X)
 
-/-- The errors `E_n(f)` as a sequence in `ℝ≥0∞`. -/
-noncomputable def approxSeq (f : X) (n : ℕ) : ℝ≥0∞ := ENNReal.ofReal (A.approxError n f)
-
-variable {A}
-
-/-- The errors decrease: `E_n(f) ≤ E_m(f)` for `m ≤ n`. -/
-theorem approxSeq_anti (f : X) : Antitone (A.approxSeq f) := fun _ _ h =>
-  ENNReal.ofReal_le_ofReal (approxError_anti f h)
-
-/-- `E_0(f) = ‖f‖`. -/
-@[simp]
-theorem approxSeq_zero_left (f : X) : A.approxSeq f 0 = ‖f‖ₑ := by
-  simp [approxSeq]
-
-/-- `E_n(0) = 0`. -/
-@[simp]
-theorem approxSeq_zero_right (n : ℕ) : A.approxSeq 0 n = 0 := by simp [approxSeq]
-
-/-- `E_n(f) ≤ ‖f‖`. -/
-theorem approxSeq_le_enorm (f : X) (n : ℕ) : A.approxSeq f n ≤ ‖f‖ₑ := by
-  rw [← ofReal_norm]; exact ENNReal.ofReal_le_ofReal (approxError_le_norm n f)
-
-/-- The errors are finite. -/
-theorem approxSeq_ne_top (f : X) (n : ℕ) : A.approxSeq f n ≠ ∞ := ENNReal.ofReal_ne_top
-
-/-- `E_n(f) ≤ ‖f - a‖` for `a ∈ A_n`. -/
-theorem approxSeq_le_of_mem {n : ℕ} {a : X} (ha : a ∈ A n) (f : X) :
-    A.approxSeq f n ≤ ‖f - a‖ₑ := by
-  rw [← ofReal_norm]; exact ENNReal.ofReal_le_ofReal (approxError_le_norm_sub ha f)
-
-/-- `E_n(f) ≤ E_n(h) + ‖f - h‖`, in `ℝ≥0∞`. -/
-theorem approxSeq_le_approxSeq_add_enorm (n : ℕ) (f h : X) :
-    A.approxSeq f n ≤ A.approxSeq h n + ‖f - h‖ₑ := by
-  rw [approxSeq, approxSeq, ← ofReal_norm, ← ENNReal.ofReal_add (approxError_nonneg _ _)
-    (norm_nonneg _)]
-  exact ENNReal.ofReal_le_ofReal (approxError_le_approxError_add_norm n f h)
-
-/-- `E_n(f) = 0` for `f ∈ A_n`. -/
-theorem approxSeq_eq_zero_of_mem {n : ℕ} {f : X} (hf : f ∈ A n) : A.approxSeq f n = 0 := by
-  simp [approxSeq, approxError_eq_zero_of_mem hf]
-
-/-- `E_{m+n}(f + g) ≤ E_m(f) + E_n(g)`. -/
-theorem approxSeq_add_le (m n : ℕ) (f g : X) :
-    A.approxSeq (f + g) (m + n) ≤ A.approxSeq f m + A.approxSeq g n := by
-  rw [approxSeq, approxSeq, approxSeq, ← ENNReal.ofReal_add (approxError_nonneg _ _)
-    (approxError_nonneg _ _)]
-  exact ENNReal.ofReal_le_ofReal (approxError_add_le m n f g)
-
-/-- `E_{2^(k+1)}(f + g) ≤ E_{2^k}(f) + E_{2^k}(g)`. -/
-theorem approxSeq_add_le_pow_succ (k : ℕ) (f g : X) :
-    A.approxSeq (f + g) (2 ^ (k + 1)) ≤ A.approxSeq f (2 ^ k) + A.approxSeq g (2 ^ k) := by
-  have := approxSeq_add_le (A := A) (2 ^ k) (2 ^ k) f g
-  rwa [← two_mul, ← pow_succ'] at this
-
-/-- `E_n(c f) = |c| E_n(f)`. -/
-theorem approxSeq_smul (c : ℝ) (f : X) (n : ℕ) :
-    A.approxSeq (c • f) n = ‖c‖ₑ * A.approxSeq f n := by
-  rw [approxSeq, approxSeq, approxError_smul, ENNReal.ofReal_mul (abs_nonneg c),
-    Real.enorm_eq_ofReal_abs]
-
-/-- `E_n(-f) = E_n(f)`. -/
-@[simp]
-theorem approxSeq_neg (f : X) (n : ℕ) : A.approxSeq (-f) n = A.approxSeq f n := by
-  simp [approxSeq]
-
-/-- Larger approximating sets give smaller errors. -/
-theorem approxSeq_anti_scheme {A' : ApproximationScheme X} (h : ∀ n, A n ⊆ A' n) (f : X)
-    (n : ℕ) : A'.approxSeq f n ≤ A.approxSeq f n :=
-  ENNReal.ofReal_le_ofReal (approxError_anti_scheme h n f)
-
-/-- **Bounds by a modulus pass from a dense set to all of `X`**: if `ω` is subadditive with
-`ω(f) ≤ C₀ ‖f‖` and `E_n(g) ≤ C ω(g)` for all `g` in a dense set, then `E_n(f) ≤ C ω(f)` for every
-`f`, since both sides move by at most a multiple of `‖f - g‖`
-(`ApproximationScheme.approxSeq_le_approxSeq_add_enorm`). -/
-theorem approxSeq_le_of_dense {D : Set X} (hD : Dense D)
-    {ω : X → ℝ≥0∞} (hadd : ∀ f g, ω (f + g) ≤ ω f + ω g) {C0 : ℝ≥0∞} (hC0 : C0 ≠ ∞)
-    (hle : ∀ f, ω f ≤ C0 * ‖f‖ₑ) {n : ℕ} {C : ℝ≥0∞} (hC : C ≠ ∞)
-    (h : ∀ g ∈ D, A.approxSeq g n ≤ C * ω g) (f : X) : A.approxSeq f n ≤ C * ω f := by
-  refine ENNReal.le_of_forall_pos_le_add fun ε hε _ => ?_
-  set K : ℝ≥0∞ := C * C0 + 1
-  have hK : K ≠ ∞ := ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top hC hC0, ENNReal.one_ne_top⟩
-  have hK0 : K ≠ 0 := by simp [K]
-  have hη : 0 < (ε / K).toReal := ENNReal.toReal_pos (by
-    simpa using ⟨ne_of_gt (by exact_mod_cast hε), hK⟩) (ENNReal.div_ne_top ENNReal.coe_ne_top hK0)
-  obtain ⟨g, hgf, hgD⟩ := Metric.dense_iff.1 hD f _ hη
-  have hdist : ‖f - g‖ₑ ≤ ε / K := by
-    rw [← edist_eq_enorm_sub, edist_comm, edist_dist, ← ENNReal.ofReal_toReal
-      (ENNReal.div_ne_top ENNReal.coe_ne_top hK0)]
-    exact ENNReal.ofReal_le_ofReal (Metric.mem_ball.1 hgf).le
-  have hmod : ω g ≤ ω f + C0 * ‖f - g‖ₑ := by
-    have h1 := hadd f (g - f)
-    rw [add_sub_cancel] at h1
-    refine h1.trans (add_le_add le_rfl ((hle _).trans ?_))
-    rw [← enorm_neg, neg_sub]
-  calc A.approxSeq f n
-      ≤ A.approxSeq g n + ‖f - g‖ₑ := approxSeq_le_approxSeq_add_enorm n f g
-    _ ≤ C * (ω f + C0 * ‖f - g‖ₑ) + ‖f - g‖ₑ := add_le_add ((h g hgD).trans (by gcongr)) le_rfl
-    _ = C * ω f + K * ‖f - g‖ₑ := by simp only [K]; ring
-    _ ≤ C * ω f + K * (ε / K) := by gcongr
-    _ = C * ω f + ε := by rw [ENNReal.mul_div_cancel hK0 hK]
-
-variable (A)
-
 /-- **Pietsch's quasi-norm** of `A^s_q`: the `ℓ_q` norm of `((n + 1)^(s - 1/q) E_n(f))_n`. -/
 noncomputable def approxNorm (s : ℝ) (q : ℝ≥0∞) (f : X) : ℝ≥0∞ :=
-  ENNReal.lqNorm q (fun n => ((n + 1 : ℕ) : ℝ≥0∞) ^ (s - 1 / q.toReal) * A.approxSeq f n)
+  ENNReal.lqNorm q (fun n => ((n + 1 : ℕ) : ℝ≥0∞) ^ (s - 1 / q.toReal) * A.approxError f n)
 
 /-- `f` belongs to the **approximation space** `A^s_q`: its quasi-norm is finite. -/
 def MemApprox (s : ℝ) (q : ℝ≥0∞) (f : X) : Prop := A.approxNorm s q f < ∞
@@ -164,13 +61,13 @@ theorem MemApprox.approxNorm_ne_top {f : X} (hf : A.MemApprox s q f) : A.approxN
 
 /-- For `q = ∞` the quasi-norm is `sup_n (n + 1)^s E_n(f)`. -/
 theorem approxNorm_top (s : ℝ) (f : X) :
-    A.approxNorm s ∞ f = ⨆ n, ((n + 1 : ℕ) : ℝ≥0∞) ^ s * A.approxSeq f n := by
+    A.approxNorm s ∞ f = ⨆ n, ((n + 1 : ℕ) : ℝ≥0∞) ^ s * A.approxError f n := by
   simp [approxNorm, ENNReal.lqNorm_top]
 
 /-- For `q < ∞` the `q`-th power of the quasi-norm is `∑ₙ (n + 1)^(sq - 1) E_n(f)^q`. -/
 theorem approxNorm_rpow (hq0 : q ≠ 0) (hq : q ≠ ∞) (s : ℝ) (f : X) :
     A.approxNorm s q f ^ q.toReal =
-      ∑' n, ((n + 1 : ℕ) : ℝ≥0∞) ^ (s * q.toReal - 1) * A.approxSeq f n ^ q.toReal := by
+      ∑' n, ((n + 1 : ℕ) : ℝ≥0∞) ^ (s * q.toReal - 1) * A.approxError f n ^ q.toReal := by
   have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
   rw [approxNorm, ENNReal.lqNorm_rpow hq0 hq]
   congr 1; funext n
@@ -190,7 +87,7 @@ theorem memApprox_zero (s : ℝ) (q : ℝ≥0∞) : A.MemApprox s q 0 := by
 /-- **Homogeneity**: `‖c f‖_{A^s_q} = |c| ‖f‖_{A^s_q}`. -/
 theorem approxNorm_smul (c : ℝ) (f : X) :
     A.approxNorm s q (c • f) = ‖c‖ₑ * A.approxNorm s q f := by
-  simp_rw [approxNorm, approxSeq_smul, mul_left_comm _ ‖c‖ₑ]
+  simp_rw [approxNorm, approxError_smul, mul_left_comm _ ‖c‖ₑ]
   exact ENNReal.lqNorm_const_mul _ _
 
 /-- `A^s_q` is closed under real multiples. -/
@@ -205,8 +102,8 @@ theorem MemApprox.neg {f : X} (hf : A.MemApprox s q f) : A.MemApprox s q (-f) :=
 /-- **The embedding `A^s_q ↪ X`**: `‖f‖ ≤ ‖f‖_{A^s_q}`, from the term `E_0(f) = ‖f‖`. -/
 theorem enorm_le_approxNorm (hq : 1 ≤ q) (f : X) : ‖f‖ₑ ≤ A.approxNorm s q f := by
   have := ENNReal.le_lqNorm (a := fun n => ((n + 1 : ℕ) : ℝ≥0∞) ^ (s - 1 / q.toReal) *
-    A.approxSeq f n) (zero_lt_one.trans_le hq).ne' 0
-  simp only [zero_add, Nat.cast_one, ENNReal.one_rpow, one_mul, approxSeq_zero_left] at this
+    A.approxError f n) (zero_lt_one.trans_le hq).ne' 0
+  simp only [zero_add, Nat.cast_one, ENNReal.one_rpow, one_mul, approxError_zero_right] at this
   exact this
 
 /-- For `q ≥ 1`, `‖f‖_{A^s_q} = 0` only for `f = 0`. -/
@@ -219,7 +116,7 @@ theorem approxNorm_eq_zero_iff (hq : 1 ≤ q) {f : X} : A.approxNorm s q f = 0 �
 /-- A scheme with larger sets has smaller quasi-norms, hence larger approximation spaces. -/
 theorem approxNorm_anti_scheme {A' : ApproximationScheme X} (h : ∀ n, A n ⊆ A' n) (f : X) :
     A'.approxNorm s q f ≤ A.approxNorm s q f :=
-  ENNReal.lqNorm_mono fun n => by gcongr; exact approxSeq_anti_scheme h f n
+  ENNReal.lqNorm_mono fun n => by gcongr; exact approxError_anti_scheme h f n
 
 /-- A scheme with larger sets has larger approximation spaces. -/
 theorem MemApprox.of_subset_scheme {A' : ApproximationScheme X} (h : ∀ n, A n ⊆ A' n) {f : X}

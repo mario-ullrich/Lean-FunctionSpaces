@@ -68,7 +68,7 @@ structure ModulusData (A : ApproximationScheme X) (θ : ℝ) where
   /-- The Jackson constant. -/
   CJ : ℝ≥0∞
   CJ_ne_top : CJ ≠ ∞
-  jackson : ∀ f k, jacksonStart ≤ k → A.approxSeq f (2 ^ k) ≤ CJ * modulus f k
+  jackson : ∀ f k, jacksonStart ≤ k → A.approxError f (2 ^ k) ≤ CJ * modulus f k
   /-- The constant of the inverse inequality. -/
   CB : ℝ≥0∞
   CB_ne_top : CB ≠ ∞
@@ -112,7 +112,7 @@ theorem approxNormDyadic_le_modNorm (hq : 1 ≤ q) (f : X) :
         M.CJ * (dyadicWeight s k * M.modulus f k) := fun k => by
     rw [approxSeqDyadic]
     split_ifs with hk
-    · exact le_add_right (by gcongr; exact approxSeq_le_enorm f _)
+    · exact le_add_right (by gcongr; exact approxError_le_enorm f _)
     · rw [zero_add, mul_left_comm]
       gcongr
       exact M.jackson f k (not_lt.1 hk)
@@ -170,13 +170,13 @@ theorem inverseConst_ne_top (hsθ : s < θ) : M.inverseConst s ≠ ∞ := by
   + ∑_{j<k} 2 C_B 4^θ 2^(-(k-j)θ) (E_{2^j}(f) + t_j)`. -/
 theorem modulus_le_of_dyadicApprox (hθ : 0 ≤ θ) {f : X} {t : ℕ → ℝ≥0∞}
     (D : A.DyadicApprox f t) (ht : Antitone t) (ht0 : t 0 = ‖f‖ₑ) (k : ℕ) :
-    M.modulus f k ≤ M.C0 * (A.approxSeq f (2 ^ k) + t k) +
+    M.modulus f k ≤ M.C0 * (A.approxError f (2 ^ k) + t k) +
       M.CB * dyadicWeight (-θ) k * (3 * ‖f‖ₑ) + ∑ j ∈ range k,
         M.CB * (2 * dyadicWeight θ 2) * (dyadicWeight (-θ) (k - j) *
-          (A.approxSeq f (2 ^ j) + t j)) := by
+          (A.approxError f (2 ^ j) + t j)) := by
   have htel : f = (f - D.a k) + (D.a 0 + ∑ j ∈ range k, (D.a (j + 1) - D.a j)) := by
     rw [sum_range_sub (fun j => D.a j) k]; abel
-  have h1 : M.modulus (f - D.a k) k ≤ M.C0 * (A.approxSeq f (2 ^ k) + t k) :=
+  have h1 : M.modulus (f - D.a k) k ≤ M.C0 * (A.approxError f (2 ^ k) + t k) :=
     (M.le_enorm _ k).trans (by gcongr; exact D.enorm_sub_le k)
   have h2 : M.modulus (D.a 0) k ≤ M.CB * dyadicWeight (-θ) k * (3 * ‖f‖ₑ) := by
     refine (M.inverse 0 k _ (by simpa using D.mem 0)).trans ?_
@@ -186,11 +186,11 @@ theorem modulus_le_of_dyadicApprox (hθ : 0 ≤ θ) {f : X} {t : ℕ → ℝ≥0
       _ = 3 * ‖f‖ₑ := by rw [ht0]; ring
   have h3 : ∀ j ∈ range k, M.modulus (D.a (j + 1) - D.a j) k ≤
       M.CB * (2 * dyadicWeight θ 2) * (dyadicWeight (-θ) (k - j) *
-        (A.approxSeq f (2 ^ j) + t j)) := fun j _ => by
+        (A.approxError f (2 ^ j) + t j)) := fun j _ => by
     refine (M.inverse (j + 2) k _ (D.sub_mem j)).trans ?_
     calc M.CB * dyadicWeight (-θ) (k - (j + 2)) * ‖D.a (j + 1) - D.a j‖ₑ
         ≤ M.CB * (dyadicWeight θ 2 * dyadicWeight (-θ) (k - j)) *
-            (2 * (A.approxSeq f (2 ^ j) + t j)) := by
+            (2 * (A.approxError f (2 ^ j) + t j)) := by
           gcongr
           · rw [show k - (j + 2) = k - j - 2 by omega]
             exact dyadicWeight_neg_sub_two_le hθ (k - j)
@@ -213,11 +213,11 @@ theorem modulus_le_of_dyadicApprox (hθ : 0 ≤ θ) {f : X} {t : ℕ → ℝ≥0
 theorem dyadicWeight_mul_modulus_le_of_dyadicApprox (hθ : 0 ≤ θ) {f : X} {t : ℕ → ℝ≥0∞}
     (D : A.DyadicApprox f t) (ht : Antitone t) (ht0 : t 0 = ‖f‖ₑ) (k : ℕ) :
     dyadicWeight s k * M.modulus f k ≤
-      M.C0 * (dyadicWeight s k * (A.approxSeq f (2 ^ k) + t k)) +
+      M.C0 * (dyadicWeight s k * (A.approxError f (2 ^ k) + t k)) +
         M.CB * 3 * ‖f‖ₑ * dyadicWeight (-(θ - s)) k +
         M.CB * (2 * dyadicWeight θ 2) * (dyadicWeight (-(θ - s)) k *
           ∑ j ∈ range (k + 1), dyadicWeight (θ - s) j *
-            (dyadicWeight s j * (A.approxSeq f (2 ^ j) + t j))) := by
+            (dyadicWeight s j * (A.approxError f (2 ^ j) + t j))) := by
   have hw : ∀ j ∈ range k, dyadicWeight s k * dyadicWeight (-θ) (k - j) =
       dyadicWeight (-(θ - s)) k * dyadicWeight (θ - s) j * dyadicWeight s j := fun j hj => by
     rw [ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub s θ (Finset.mem_range.1 hj).le, mul_assoc,
@@ -225,24 +225,24 @@ theorem dyadicWeight_mul_modulus_le_of_dyadicApprox (hθ : 0 ≤ θ) {f : X} {t 
   have hw0 : dyadicWeight s k * dyadicWeight (-θ) k = dyadicWeight (-(θ - s)) k := by
     rw [← ENNReal.dyadicWeight_add]; congr 1; ring
   calc dyadicWeight s k * M.modulus f k
-      ≤ dyadicWeight s k * (M.C0 * (A.approxSeq f (2 ^ k) + t k) +
+      ≤ dyadicWeight s k * (M.C0 * (A.approxError f (2 ^ k) + t k) +
           M.CB * dyadicWeight (-θ) k * (3 * ‖f‖ₑ) + ∑ j ∈ range k,
             M.CB * (2 * dyadicWeight θ 2) * (dyadicWeight (-θ) (k - j) *
-              (A.approxSeq f (2 ^ j) + t j))) := by
+              (A.approxError f (2 ^ j) + t j))) := by
         gcongr
         exact M.modulus_le_of_dyadicApprox hθ D ht ht0 k
-    _ = M.C0 * (dyadicWeight s k * (A.approxSeq f (2 ^ k) + t k)) +
+    _ = M.C0 * (dyadicWeight s k * (A.approxError f (2 ^ k) + t k)) +
           M.CB * 3 * ‖f‖ₑ * (dyadicWeight s k * dyadicWeight (-θ) k) +
           M.CB * (2 * dyadicWeight θ 2) * ∑ j ∈ range k,
             (dyadicWeight s k * dyadicWeight (-θ) (k - j)) *
-              (A.approxSeq f (2 ^ j) + t j) := by
+              (A.approxError f (2 ^ j) + t j) := by
         simp only [mul_add, Finset.mul_sum]; ring_nf
     _ ≤ _ := by
         rw [hw0, Finset.sum_congr rfl fun j hj => by rw [hw j hj]]
         have hsum : ∑ j ∈ range k, dyadicWeight (-(θ - s)) k * dyadicWeight (θ - s) j *
-            dyadicWeight s j * (A.approxSeq f (2 ^ j) + t j) =
+            dyadicWeight s j * (A.approxError f (2 ^ j) + t j) =
               dyadicWeight (-(θ - s)) k * ∑ j ∈ range k, dyadicWeight (θ - s) j *
-                (dyadicWeight s j * (A.approxSeq f (2 ^ j) + t j)) := by
+                (dyadicWeight s j * (A.approxError f (2 ^ j) + t j)) := by
           rw [Finset.mul_sum]
           refine Finset.sum_congr rfl fun j _ => ?_
           ring
@@ -259,10 +259,9 @@ theorem modNorm_le_approxNormDyadic (hq : 1 ≤ q) (hs : 0 ≤ s) (hsθ : s < θ
   · simp [modNorm, M.modulus_zero]
   set t := tolerance f s
   obtain ⟨D⟩ := A.exists_dyadicApprox f (fun k => tolerance_ne_zero hf0 s k)
-    (tolerance_ne_top f s)
   have ht : Antitone t := tolerance_anti f hs
   set N := A.approxNormDyadic s q f
-  set E : ℕ → ℝ≥0∞ := fun k => dyadicWeight s k * (A.approxSeq f (2 ^ k) + t k)
+  set E : ℕ → ℝ≥0∞ := fun k => dyadicWeight s k * (A.approxError f (2 ^ k) + t k)
   have hE : lqNorm q E ≤ N + 2 * ‖f‖ₑ := by
     calc lqNorm q E = lqNorm q (fun k => A.approxSeqDyadic s f k + dyadicWeight s k * t k) := by
           congr 1; funext k; simp only [E, approxSeqDyadic]; ring

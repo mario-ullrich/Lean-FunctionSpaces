@@ -13,7 +13,7 @@ public import FunctionSpaces.Cube.PiecewiseJackson
 
 For `1 ≤ p < ∞` and `r ≥ 1` there is `C_J < ∞` with `E_{2^k}(f)_p ≤ C_J ω_r(f, 2^(-k))_p` for every
 `f ∈ L_p(Q)`, `Q = [0, 1]^d`, and every level `k`, where `E` is the error of best approximation
-by splines of order `r` in each variable (`Cube.exists_approxSeq_cubeSplineScheme_le`).
+by splines of order `r` in each variable (`Cube.exists_approxError_cubeSplineScheme_le`).
 
 For `k ≥ r + 2` the approximant of a bounded continuous `f` is the tensor quasi-interpolant. In
 coordinate `i`, every slice of `f - Q_k^{(i)} f` is the error of the quasi-interpolant in one
@@ -90,28 +90,28 @@ theorem exists_eLpNorm_sub_slicewise_qiKernel_le {r : ℕ} (hr : 1 ≤ r) (hp : 
 /-- **Jackson's inequality for tensor splines on the cube**: for `1 ≤ p < ∞` and `r ≥ 1` there is
 `C_J < ∞` with `E_{2^k}(f)_p ≤ C_J ω_r(f, 2^(-k))_p` for every `f ∈ L_p(Q)` and every `k ≥ 0`:
 the tensor quasi-interpolant for `k ≥ r + 2`, Whitney's inequality for `k ≤ r + 1`. -/
-theorem exists_approxSeq_cubeSplineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
+theorem exists_approxError_cubeSplineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ∃ CJ : ℝ≥0∞, CJ ≠ ∞ ∧ ∀ (f : Lp ℂ p (cubeVol d)) (k : ℕ),
-      (cubeSplineScheme p d r).approxSeq f (2 ^ k) ≤ CJ * lpCubeModulus p r f k := by
+      (cubeSplineScheme p d r).approxError f (2 ^ k) ≤ CJ * lpCubeModulus p r f k := by
   have hp1 : 1 ≤ p := Fact.out
   obtain ⟨B, hB, hBb⟩ := exists_eLpNorm_sub_slicewise_qiKernel_le (d := d) (p := p) hr hp
   obtain ⟨Cq, hCq, hCqb⟩ := exists_eLpNorm_qiKernel_apply_le (p := p) hr hp
   obtain ⟨W, hW, hWb⟩ :=
-    exists_approxSeq_cubePPScheme_one_le (d := d) (p := p) hr hp (m := r + 1) (by omega)
+    exists_approxError_cubePPScheme_one_le (d := d) (p := p) hr hp (m := r + 1) (by omega)
   have hF : (1 + Cq) ^ d * B ≠ ∞ := ENNReal.mul_ne_top
     (ENNReal.pow_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, hCq⟩)) hB
   refine ⟨W + (1 + Cq) ^ d * B, ENNReal.add_ne_top.2 ⟨hW, hF⟩, fun f k => ?_⟩
   rcases lt_or_ge k (r + 2) with hk | hk
   · -- the coarse levels: Whitney's inequality
-    calc (cubeSplineScheme p d r).approxSeq f (2 ^ k)
-        ≤ (cubeSplineScheme p d r).approxSeq f 1 :=
-          ApproximationScheme.approxSeq_anti f Nat.one_le_two_pow
-      _ ≤ (cubePPScheme p d r).approxSeq f 1 := approxSeq_cubeSplineScheme_one_le r f
+    calc (cubeSplineScheme p d r).approxError f (2 ^ k)
+        ≤ (cubeSplineScheme p d r).approxError f 1 :=
+          ApproximationScheme.approxError_anti f Nat.one_le_two_pow
+      _ ≤ (cubePPScheme p d r).approxError f 1 := approxError_cubeSplineScheme_one_le r f
       _ ≤ W * lpCubeModulus p r f (r + 1) := hWb f
       _ ≤ (W + (1 + Cq) ^ d * B) * lpCubeModulus p r f k :=
           mul_le_mul' le_self_add (lpCubeModulus_anti r f (by omega))
   · -- the fine levels: the tensor quasi-interpolant
-    refine (approxSeq_le_of_continuous hp hF (fun g => ?_) f).trans
+    refine (approxError_le_of_continuous hp hF (fun g => ?_) f).trans
       (mul_le_mul' le_add_self le_rfl)
     have hgb : BddMeas (g : (Fin d → ℝ) → ℂ) :=
       ⟨g.continuous.measurable, ‖g‖, g.norm_coe_le_norm⟩

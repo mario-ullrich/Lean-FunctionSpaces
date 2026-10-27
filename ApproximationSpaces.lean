@@ -85,10 +85,12 @@ Names below are relative to the namespace `ApproximationScheme`, except those th
   consequences, the preimage `comap` and the image `map` of a scheme under a linear map, the
   scheme `ofSubmodules` of an increasing sequence of subspaces, and the dyadic scheme
   `ofMonotoneSubmodules`, with the `k`-th subspace at complexity `2^k`.
-* `ApproximationSpaces.Error`: the error `E_n(f)`, `approxError`, and its calculus:
-  `E_0(f) = ‖f‖`, monotonicity in `n`, homogeneity, subadditivity, near-best approximants, the
-  limit `E_n(f) → 0` exactly on the closure of `⋃ A n` (`tendsto_approxError_zero_iff`), the
-  bound for linear maps (`approxError_map_le`) and the Lebesgue inequality.
+* `ApproximationSpaces.Error`: the error `E_n(f)`, `approxError`, with values in `ℝ≥0∞`, and
+  its calculus: `E_0(f) = ‖f‖`, monotonicity in `n`, homogeneity, subadditivity, near-best
+  approximants, the limit `E_n(f) → 0` exactly on the closure of `⋃ A n`
+  (`tendsto_approxError_zero_iff`), the bound for linear maps (`approxError_map_le`), the
+  extension of modulus bounds from a dense set (`approxError_le_of_dense`) and the Lebesgue
+  inequality.
 * `ApproximationSpaces.Instances.Span`: linear approximation from the first `n` elements of a
   sequence, `ofSpan`. Its errors tend to zero exactly on the closed span.
 * `ApproximationSpaces.Instances.NTerm`: nonlinear `n`-term approximation from a dictionary,
@@ -96,9 +98,8 @@ Names below are relative to the namespace `ApproximationScheme`, except those th
 
 ### The spaces `A^s_q` and their dyadic norm
 
-* `ApproximationSpaces.Norm`: the errors as a sequence in `ℝ≥0∞` (`approxSeq`), Pietsch's
-  quasi-norm `approxNorm` of `A^s_q`, membership `MemApprox`, homogeneity, and the embedding
-  `‖f‖ ≤ ‖f‖_{A^s_q}` (`enorm_le_approxNorm`).
+* `ApproximationSpaces.Norm`: Pietsch's quasi-norm `approxNorm` of `A^s_q`, membership
+  `MemApprox`, homogeneity, and the embedding `‖f‖ ≤ ‖f‖_{A^s_q}` (`enorm_le_approxNorm`).
 * `ApproximationSpaces.Dyadic`: the equivalent dyadic quasi-norm
   `‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}`, `approxNormDyadic`, the working norm of all later files.
 * `ApproximationSpaces.Space`: the quasi-triangle inequality and `A^s_q` as a submodule of `X`,

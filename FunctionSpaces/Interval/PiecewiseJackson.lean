@@ -15,10 +15,10 @@ public import Mathlib.MeasureTheory.Function.ContinuousMapDense
 For `1 ≤ p < ∞`, `r ≥ 1` and `k ≥ 1`, the error of best approximation in `L_p[0, 1]` by
 piecewise polynomials of level `k` and degree `< r` is bounded by the modulus of smoothness,
 `E_{2^k}(f)_p ≤ 2 (1 + 2^r r^(2r)) ω_r(f, 2^(-k), [0, 1])_p`
-(`Interval.approxSeq_ppScheme_le`). At level `0` the approximants are the polynomials of degree
+(`Interval.approxError_ppScheme_le`). At level `0` the approximants are the polynomials of degree
 `< r`, and Whitney's inequality of `FunctionSpaces.Interval.Whitney` gives the bound there
-(`Interval.exists_approxSeq_ppScheme_one_le`), so Jackson's inequality holds at every level
-(`Interval.exists_approxSeq_ppScheme_le`).
+(`Interval.exists_approxError_ppScheme_one_le`), so Jackson's inequality holds at every level
+(`Interval.exists_approxError_ppScheme_le`).
 
 For `k ≥ 1` the proof needs no Whitney theorem. For continuous `f`, the Steklov smoothing of
 `Interval.exists_left_smoothing` is close to `f`, its `r`-th derivative is bounded by `2^(kr)`
@@ -29,7 +29,7 @@ polynomials of both halves form one piecewise polynomial
 (`Interval.exists_ppFun_approx_of_taylor`, stated for any function and any two smoothings, so
 that the slices of functions on the cube use it too). The point `1/2` is a knot of every level
 `k ≥ 1`, which is why `k ≥ 1` in this part of the argument. General `f ∈ L_p` follow by density
-of bounded continuous functions (`Interval.approxSeq_le_of_continuous`, which serves every scheme
+of bounded continuous functions (`Interval.approxError_le_of_continuous`, which serves every scheme
 in `L_p[0, 1]`).
 -/
 
@@ -244,21 +244,21 @@ theorem lpModulus_anti (r : ℕ) (f : Lp ℂ p unitVol) : Antitone (lpModulus p 
 /-- **From continuous functions to `L_p` by density**: a bound `E_n(g) ≤ C ω_r(g, 2^(-k))_p`
 for every bounded continuous `g`, given by an approximant `u ∈ A_n` of `g`, holds for every
 `f ∈ L_p[0, 1]`, `p < ∞`. The bounded continuous functions are dense in `L_p` (Mathlib's
-`BoundedContinuousFunction.toLp_denseRange`), so `ApproximationScheme.approxSeq_le_of_dense`
+`BoundedContinuousFunction.toLp_denseRange`), so `ApproximationScheme.approxError_le_of_dense`
 applies. -/
-theorem approxSeq_le_of_continuous {A : ApproximationScheme (Lp ℂ p unitVol)} (hp : p ≠ ∞)
+theorem approxError_le_of_continuous {A : ApproximationScheme (Lp ℂ p unitVol)} (hp : p ≠ ∞)
     {r n k : ℕ} {C : ℝ≥0∞} (hC : C ≠ ∞)
     (h : ∀ g : ℝ →ᵇ ℂ, ∃ u : ℝ → ℂ, (∃ a ∈ A n, (a : ℝ → ℂ) =ᵐ[unitVol] u) ∧
       eLpNorm (fun x => g x - u x) p unitVol ≤ C * modulus r p 0 1 g (1 / 2 ^ k))
-    (f : Lp ℂ p unitVol) : A.approxSeq f n ≤ C * lpModulus p r f k := by
-  refine ApproximationScheme.approxSeq_le_of_dense
+    (f : Lp ℂ p unitVol) : A.approxError f n ≤ C * lpModulus p r f k := by
+  refine ApproximationScheme.approxError_le_of_dense
     (BoundedContinuousFunction.toLp_denseRange ℂ unitVol ℝ hp)
     (fun f g => lpModulus_add_le r f g k) (C0 := 2 ^ r) (by simp) (fun f => lpModulus_le r f k) hC
     ?_ f
   rintro _ ⟨g, rfl⟩
   obtain ⟨u, ⟨a, ha, hau⟩, hbound⟩ := h g
   have hg := BoundedContinuousFunction.coeFn_toLp (E := ℂ) p unitVol ℝ g
-  refine (A.approxSeq_le_of_mem ha _).trans ?_
+  refine (A.approxError_le_of_mem ha _).trans ?_
   rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hg.sub hau)), lpModulus,
     modulus_congr_ae hg]
   exact hbound
@@ -266,12 +266,12 @@ theorem approxSeq_le_of_continuous {A : ApproximationScheme (Lp ℂ p unitVol)} 
 /-- **Jackson's inequality for dyadic piecewise polynomials**: for `1 ≤ p < ∞`, `r ≥ 1` and
 `k ≥ 1`, `E_{2^k}(f)_p ≤ 2 (1 + 2^r r^(2r)) ω_r(f, 2^(-k), [0, 1])_p`; first for continuous
 functions (`Interval.exists_ppFun_approx`), then by density
-(`Interval.approxSeq_le_of_continuous`). -/
-theorem approxSeq_ppScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) (f : Lp ℂ p unitVol) {k : ℕ}
+(`Interval.approxError_le_of_continuous`). -/
+theorem approxError_ppScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) (f : Lp ℂ p unitVol) {k : ℕ}
     (hk : 1 ≤ k) :
-    (ppScheme p r).approxSeq f (2 ^ k) ≤ 2 * jacksonConst r * lpModulus p r f k := by
+    (ppScheme p r).approxError f (2 ^ k) ≤ 2 * jacksonConst r * lpModulus p r f k := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le' hk
-  refine approxSeq_le_of_continuous hp (ENNReal.mul_ne_top (by norm_num) (jacksonConst_ne_top r))
+  refine approxError_le_of_continuous hp (ENNReal.mul_ne_top (by norm_num) (jacksonConst_ne_top r))
     (fun g => ?_) f
   obtain ⟨Q, hQ, hbound⟩ := exists_ppFun_approx g.continuous hr Fact.out hp k
   exact ⟨ppFun (k + 1) Q, ⟨(memLp_ppFun (k + 1) Q p).toLp _,
@@ -281,16 +281,16 @@ theorem approxSeq_ppScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) (f : Lp 
 `W < ∞` with `E_1(f)_p ≤ W ω_r(f, 2^(-m), [0, 1])_p` for every `f ∈ L_p[0, 1]`, where `E_1` is the
 error of best approximation by the polynomials of degree `< r` (the approximants of
 complexity `1`). -/
-theorem exists_approxSeq_ppScheme_one_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) {m : ℕ} (hm : 2 ≤ m) :
+theorem exists_approxError_ppScheme_one_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) {m : ℕ} (hm : 2 ≤ m) :
     ∃ W : ℝ≥0∞, W ≠ ∞ ∧ ∀ f : Lp ℂ p unitVol,
-      (ppScheme p r).approxSeq f 1 ≤ W * lpModulus p r f m := by
+      (ppScheme p r).approxError f 1 ≤ W * lpModulus p r f m := by
   have ht : (0 : ℝ) < 1 / 2 ^ m := by positivity
   have ht3 : (1 : ℝ) / 2 ^ m ≤ 1 / 3 := by
     rw [div_le_div_iff₀ (by positivity) (by norm_num), one_mul, one_mul]
     calc (3 : ℝ) ≤ 2 ^ 2 := by norm_num
       _ ≤ 2 ^ m := pow_le_pow_right₀ (by norm_num) hm
   obtain ⟨W, hW, hWb⟩ := exists_eLpNorm_sub_polyFun_le_modulus hr hp ht ht3
-  refine ⟨W, hW, fun f => approxSeq_le_of_continuous hp hW (fun g => ?_) f⟩
+  refine ⟨W, hW, fun f => approxError_le_of_continuous hp hW (fun g => ?_) f⟩
   obtain ⟨P, hP, hbound⟩ := hWb g g.continuous
   have hae : (fun x => g x - ppFun 0 (fun _ => P) x) =ᵐ[unitVol] fun x => g x - polyFun P x := by
     filter_upwards [ae_mem_Ico_unitVol] with x hx
@@ -304,15 +304,15 @@ theorem exists_approxSeq_ppScheme_one_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ �
 /-- **Jackson's inequality for dyadic piecewise polynomials at every level**: for `1 ≤ p < ∞` and
 `r ≥ 1` there is `C_J < ∞` with `E_{2^k}(f)_p ≤ C_J ω_r(f, 2^(-k), [0, 1])_p` for every
 `f ∈ L_p[0, 1]` and every `k ≥ 0`; level `0` is Whitney's inequality. -/
-theorem exists_approxSeq_ppScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
+theorem exists_approxError_ppScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ∃ CJ : ℝ≥0∞, CJ ≠ ∞ ∧ ∀ (f : Lp ℂ p unitVol) (k : ℕ),
-      (ppScheme p r).approxSeq f (2 ^ k) ≤ CJ * lpModulus p r f k := by
-  obtain ⟨W, hW, hWb⟩ := exists_approxSeq_ppScheme_one_le (p := p) hr hp (le_refl 2)
+      (ppScheme p r).approxError f (2 ^ k) ≤ CJ * lpModulus p r f k := by
+  obtain ⟨W, hW, hWb⟩ := exists_approxError_ppScheme_one_le (p := p) hr hp (le_refl 2)
   refine ⟨W + 2 * jacksonConst r, ENNReal.add_ne_top.2 ⟨hW, ENNReal.mul_ne_top (by norm_num)
     (jacksonConst_ne_top r)⟩, fun f k => ?_⟩
   rcases Nat.eq_zero_or_pos k with rfl | hk
   · rw [pow_zero]
     exact (hWb f).trans (mul_le_mul' le_self_add (lpModulus_anti r f (Nat.zero_le 2)))
-  · exact (approxSeq_ppScheme_le hr hp f hk).trans (mul_le_mul' le_add_self le_rfl)
+  · exact (approxError_ppScheme_le hr hp f hk).trans (mul_le_mul' le_add_self le_rfl)
 
 end Interval

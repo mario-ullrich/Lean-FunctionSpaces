@@ -16,7 +16,7 @@ For `1 ≤ p < ∞` and an order `r ≥ 1`, the modulus of smoothness `ω_r(f, 2
 `f ∈ L_p(𝕋^d)` is compatible with the trigonometric polynomials (`Torus.lpModulusData`):
 
 * Jackson's inequality `E_{2^k}(f)_p ≤ 2^r C ω_r(f, 2^(-k))_p` for `k ≥ 1`
-  (`Torus.approxSeq_trigScheme_le` and the halving of the step,
+  (`Torus.approxError_trigScheme_le` and the halving of the step,
   `Torus.lpModulus_le_two_pow_mul_succ`);
 * the inverse inequality `ω_r(a, 2^(-k))_p ≤ C 2^(-(k-j) r) ‖a‖_p` for trigonometric polynomials
   of degree `< 2^j` (`Torus.lpModulus_le_of_mem_trigPolyLp`).
@@ -56,7 +56,7 @@ noncomputable def lpModulusData (hp : p ≠ ∞) (r : ℕ) :
   CJ_ne_top := ENNReal.mul_ne_top (Rd.jacksonConst_ne_top Fact.out hp r) (by simp)
   jackson f k hk := by
     obtain ⟨k', rfl⟩ : ∃ k', k = k' + 1 := ⟨k - 1, by omega⟩
-    refine (approxSeq_trigScheme_le hp r k' f).trans ?_
+    refine (approxError_trigScheme_le hp r k' f).trans ?_
     rw [mul_assoc]
     exact mul_le_mul' le_rfl (lpModulus_le_two_pow_mul_succ r k' f)
   CB := bernsteinConst d r

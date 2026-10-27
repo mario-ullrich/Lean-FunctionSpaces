@@ -44,17 +44,18 @@ variable {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
   [NormedAddCommGroup Y] [NormedSpace ℝ Y]
 
 /-- **Jackson's inequality** of order `r` with constant `C`: `E_n(ι y) ≤ C n^(-r) ‖y‖` for all
-`y ∈ Y` and `n ≥ 1`. -/
+`y ∈ Y` and `n ≥ 1`, stated for the real number `E_n(ι y)` (the error is finite). -/
 def JacksonBound (ι : Y →L[ℝ] X) (A : ApproximationScheme X) (r C : ℝ) : Prop :=
-  ∀ n : ℕ, 1 ≤ n → ∀ y : Y, A.approxError n (ι y) ≤ C * (n : ℝ) ^ (-r) * ‖y‖
+  ∀ n : ℕ, 1 ≤ n → ∀ y : Y, (A.approxError (ι y) n).toReal ≤ C * (n : ℝ) ^ (-r) * ‖y‖
 
 variable {ι : Y →L[ℝ] X} {A : ApproximationScheme X} {r C : ℝ}
 
 /-- Jackson's inequality in `ℝ≥0∞`. -/
-theorem JacksonBound.approxSeq_le (hJ : JacksonBound ι A r C) (hC : 0 ≤ C) {n : ℕ} (hn : 1 ≤ n)
-    (y : Y) : A.approxSeq (ι y) n ≤ ENNReal.ofReal C * (n : ℝ≥0∞) ^ (-r) * ‖y‖ₑ := by
+theorem JacksonBound.approxError_le (hJ : JacksonBound ι A r C) (hC : 0 ≤ C) {n : ℕ} (hn : 1 ≤ n)
+    (y : Y) : A.approxError (ι y) n ≤ ENNReal.ofReal C * (n : ℝ≥0∞) ^ (-r) * ‖y‖ₑ := by
   have hn0 : (0 : ℝ) < n := by exact_mod_cast hn
-  rw [approxSeq, ← ofReal_norm, ← ENNReal.ofReal_natCast, ENNReal.ofReal_rpow_of_pos hn0,
+  rw [← ENNReal.ofReal_toReal (approxError_ne_top (ι y) n), ← ofReal_norm,
+    ← ENNReal.ofReal_natCast, ENNReal.ofReal_rpow_of_pos hn0,
     ← ENNReal.ofReal_mul hC, ← ENNReal.ofReal_mul (by positivity)]
   exact ENNReal.ofReal_le_ofReal (hJ n hn y)
 
@@ -66,7 +67,7 @@ theorem approxNormDyadic_top_le_of_jackson (hJ : JacksonBound ι A r C) (hC : 0 
   refine add_le_add (ι.le_opENorm y) (iSup_le fun k => ?_)
   calc A.approxSeqDyadic r (ι y) k
       ≤ dyadicWeight r k * (ENNReal.ofReal C * ((2 ^ k : ℕ) : ℝ≥0∞) ^ (-r) * ‖y‖ₑ) := by
-        rw [approxSeqDyadic]; gcongr; exact hJ.approxSeq_le hC Nat.one_le_two_pow y
+        rw [approxSeqDyadic]; gcongr; exact hJ.approxError_le hC Nat.one_le_two_pow y
     _ = ENNReal.ofReal C * ‖y‖ₑ := by
         rw [ENNReal.natCast_two_pow_rpow, mul_comm (ENNReal.ofReal C), mul_assoc, ← mul_assoc,
           ENNReal.dyadicWeight_mul_neg_self, one_mul]

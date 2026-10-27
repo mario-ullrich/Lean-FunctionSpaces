@@ -22,14 +22,14 @@ degree.
   `‖F - P‖_{L_p[0, 1]} ≤ W ω_r(F, t, [0, 1])_p` (`Interval.exists_eLpNorm_sub_polyFun_le_modulus`),
   with the modulus `ω_r` of the next item. In `L_p[0, 1]` the error of best approximation by the
   polynomials of degree `< r` satisfies `E_1(f)_p ≤ W ω_r(f, 2^(-m), [0, 1])_p` for `m ≥ 2`
-  (`Interval.exists_approxSeq_ppScheme_one_le`).
+  (`Interval.exists_approxError_ppScheme_one_le`).
 * **Piecewise polynomials on an interval.** Let `V_k ⊆ L_p[0, 1]` consist of the functions that
   agree on each dyadic interval `[n 2^(-k), (n+1) 2^(-k))` with a polynomial of degree `< r`,
   and let `ω_r(f, t, [0, 1])_p = sup_{0 ≤ h ≤ t} ‖Δ_h^r f‖_{L_p[0, 1-rh]}`. For `1 ≤ p < ∞`
   and `r ≥ 1`, `E_{2^k}(f)_p ≤ 2 (1 + 2^r r^(2r)) ω_r(f, 2^(-k), [0, 1])_p` for `k ≥ 1`
-  (`Interval.approxSeq_ppScheme_le`), with Whitney's inequality a bound
+  (`Interval.approxError_ppScheme_le`), with Whitney's inequality a bound
   `E_{2^k}(f)_p ≤ C_J ω_r(f, 2^(-k), [0, 1])_p` for all `k ≥ 0`
-  (`Interval.exists_approxSeq_ppScheme_le`), and there is `C` with
+  (`Interval.exists_approxError_ppScheme_le`), and there is `C` with
   `ω_r(a, 2^(-k), [0, 1])_p ≤ C 2^(-(k-j)/p) ‖a‖_p` for all `a ∈ V_j` and `k ≥ j`
   (`Interval.exists_inverse_ppScheme`). Hence for `1 ≤ q ≤ ∞` and `0 ≤ s < 1/p`, `f ∈ A^s_q`
   iff `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`
@@ -46,7 +46,7 @@ degree.
   `r ≥ 1` on the dyadic grid of level `k`: piecewise polynomials of degree `< r` that are `r - 2`
   times continuously differentiable. For `1 ≤ p < ∞` there is `C` with
   `E_{2^k}(f)_p ≤ C ω_r(f, 2^(-k), [0, 1])_p` for all `k ≥ 0`
-  (`Interval.exists_approxSeq_splineScheme_le`) and with
+  (`Interval.exists_approxError_splineScheme_le`) and with
   `ω_r(a, 2^(-k), [0, 1])_p ≤ C 2^(-(k-j)(r-1+1/p)) ‖a‖_p` for `a ∈ S_j`, `k ≥ j`
   (`Interval.exists_inverse_splineScheme`). Hence for `1 ≤ q ≤ ∞` and `0 ≤ s < r - 1 + 1/p`,
   `f ∈ A^s_q` iff `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`
@@ -59,7 +59,7 @@ degree.
   `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `0 ≤ s < r - 1 + 1/p`, `f ∈ A^s_q` of the periodic splines iff
   `‖f‖_p + ‖(2^(ks) ω_r^per(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
   (`Interval.memApprox_perSplineScheme_iff`), with Jackson's inequality from level `r` on
-  (`Interval.exists_approxSeq_perSplineScheme_le`) and the inverse inequality of order
+  (`Interval.exists_approxError_perSplineScheme_le`) and the inverse inequality of order
   `r - 1 + 1/p` (`Interval.exists_inverse_perSplineScheme`).
 * **Local projections and multiscale details.** Let `P_k` be the projection of `L_p[0, 1]`
   onto the piecewise polynomials of degree `< r` on the dyadic intervals of level `k` that is
@@ -89,8 +89,8 @@ degree.
   polynomials of degree `< r` in each variable separately. For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`,
   `r ≥ 1` and `0 ≤ s < 1/p`, `f ∈ A^s_q` of these spaces iff
   `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Cube.memApprox_cubePPScheme_iff`), with
-  Jackson's inequality at every level (`Cube.exists_approxSeq_cubePPScheme_le`; level `0` is
-  Whitney's inequality on the cube, `Cube.exists_approxSeq_cubePPScheme_one_le`) and the inverse
+  Jackson's inequality at every level (`Cube.exists_approxError_cubePPScheme_le`; level `0` is
+  Whitney's inequality on the cube, `Cube.exists_approxError_cubePPScheme_one_le`) and the inverse
   inequality of order `1/p` (`Cube.exists_inverse_cubePPScheme`). The approximants are tensor
   products of the projections in one variable, applied to the slices one coordinate at a time.
 * **Tensor splines on the cube.** Let `S_k^d ⊆ L_p(Q)` consist of the bounded measurable functions
@@ -100,7 +100,7 @@ degree.
   `r ≥ 1` and `0 ≤ s < r - 1 + 1/p`, `f ∈ A^s_q` of these spaces iff
   `‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
   (`Cube.memApprox_cubeSplineScheme_iff`), with Jackson's inequality at every level through the
-  tensor quasi-interpolant (`Cube.exists_approxSeq_cubeSplineScheme_le`) and the inverse
+  tensor quasi-interpolant (`Cube.exists_approxError_cubeSplineScheme_le`) and the inverse
   inequality of order `r - 1 + 1/p` (`Cube.exists_inverse_cubeSplineScheme`).
 * **The isotropic modulus on the cube.** Let
   `ω_r^iso(f, t)_p = sup_{‖h‖_∞ ≤ t} ‖Δ_h^r f‖_{L_p({x ∈ Q : x + rh ∈ Q})}` with

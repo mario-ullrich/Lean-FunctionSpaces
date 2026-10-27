@@ -20,7 +20,7 @@ For every approximation scheme `A` in `X`, every `s ≥ 0` and `1 ≤ q ≤ ∞`
 (Pietsch 1981; DeVore–Popov, LNM 1302 (1988);
 `ApproximationScheme.memApprox_iff_memKMethod_reprCouple`).  The proof uses the scheme alone:
 Jackson's half is `E_{2^(k+1)}(f) ≤ K(2^(-kr), f)`
-(`ApproximationScheme.approxSeq_le_kFunctional_reprCouple`), and Bernstein's half takes
+(`ApproximationScheme.approxError_le_kFunctional_reprCouple`), and Bernstein's half takes
 near-best approximants `a_k ∈ A_{2^k}`, whose norm in `A^r_∞` is at most a finite sum, since
 `E_{2^j}(a_k) = 0` for `j ≥ k` (`ApproximationScheme.interpNorm_reprCouple_le_approxNormDyadic`,
 with the constant `ApproximationScheme.devorePopovConst`).
@@ -118,21 +118,21 @@ theorem norm0_reprCouple_le (f : X) : (A.reprCouple r).norm0 f ≤ 1 * (A.reprCo
 /-! ### Jackson's half -/
 
 /-- One term of the dyadic quasi-norm of `A^r_∞`: `E_{2^k}(b) ≤ 2^(-kr) ‖b‖_{A^r_∞}`. -/
-theorem approxSeq_pow_le_dyadicWeight_mul (b : X) (k : ℕ) :
-    A.approxSeq b (2 ^ k) ≤ dyadicWeight (-r) k * A.approxNormDyadic r ∞ b :=
-  (approxSeq_pow_le (s := r) le_top b k).trans (by gcongr; exact lqNorm_le_approxNormDyadic b)
+theorem approxError_pow_le_dyadicWeight_mul (b : X) (k : ℕ) :
+    A.approxError b (2 ^ k) ≤ dyadicWeight (-r) k * A.approxNormDyadic r ∞ b :=
+  (approxError_pow_le (s := r) le_top b k).trans (by gcongr; exact lqNorm_le_approxNormDyadic b)
 
 /-- **Jackson's inequality for the couple `(X, A^r_∞)`**: `E_{2^(k+1)}(f) ≤ K(2^(-kr), f)`, since
 `E_{2^(k+1)}(f) ≤ E_{2^k}(f - b) + E_{2^k}(b) ≤ ‖f - b‖ + 2^(-kr) ‖b‖_{A^r_∞}` for every `b`. -/
-theorem approxSeq_le_kFunctional_reprCouple (f : X) (k : ℕ) :
-    A.approxSeq f (2 ^ (k + 1)) ≤ (A.reprCouple r).kFunctional (dyadicWeight (-r) k) f := by
+theorem approxError_le_kFunctional_reprCouple (f : X) (k : ℕ) :
+    A.approxError f (2 ^ (k + 1)) ≤ (A.reprCouple r).kFunctional (dyadicWeight (-r) k) f := by
   unfold InterpCouple.kFunctional
   refine le_iInf fun b => ?_
-  calc A.approxSeq f (2 ^ (k + 1)) = A.approxSeq ((f - b) + b) (2 ^ (k + 1)) := by
+  calc A.approxError f (2 ^ (k + 1)) = A.approxError ((f - b) + b) (2 ^ (k + 1)) := by
         rw [sub_add_cancel]
-    _ ≤ A.approxSeq (f - b) (2 ^ k) + A.approxSeq b (2 ^ k) := approxSeq_add_le_pow_succ k _ _
+    _ ≤ A.approxError (f - b) (2 ^ k) + A.approxError b (2 ^ k) := approxError_add_le_pow_succ k _ _
     _ ≤ ‖f - b‖ₑ + dyadicWeight (-r) k * A.approxNormDyadic r ∞ b :=
-        add_le_add (approxSeq_le_enorm _ _) (approxSeq_pow_le_dyadicWeight_mul b k)
+        add_le_add (approxError_le_enorm _ _) (approxError_pow_le_dyadicWeight_mul b k)
 
 /-- **Jackson's half of `A^s_q = (X, A^r_∞)_{s/r,q}`**: for `s ≥ 0`, `r ≠ 0` and `q ≥ 1`,
 `‖f‖_{A^s_q} ≤ 2 · 2^s (‖f‖ + ‖(2^(ks) K(2^(-kr), f))_k‖_{ℓ_q})`, the dyadic quasi-norm against
@@ -147,14 +147,14 @@ theorem approxNormDyadic_le_interpNorm_reprCouple (hs : 0 ≤ s) (hr : r ≠ 0) 
     refine ENNReal.lqNorm_mono fun k => ?_
     rw [approxSeqDyadic, ENNReal.dyadicWeight_succ, mul_div_cancel₀ s hr, mul_assoc]
     gcongr
-    exact approxSeq_le_kFunctional_reprCouple f k
+    exact approxError_le_kFunctional_reprCouple f k
   calc A.approxNormDyadic s q f = ‖f‖ₑ + lqNorm q (A.approxSeqDyadic s f) := rfl
     _ ≤ ‖f‖ₑ + (‖f‖ₑ + 2 ^ s * lqNorm q (fun k : ℕ => dyadicWeight (r * (s / r)) k *
           (A.reprCouple r).kFunctional (dyadicWeight (-r) k) f)) := by
         gcongr
         refine (ENNReal.lqNorm_le_head_add_shift hq _).trans (add_le_add ?_ hshift)
         rw [approxSeqDyadic_zero]
-        exact approxSeq_le_enorm f 1
+        exact approxError_le_enorm f 1
     _ ≤ 2 * 2 ^ s * ‖f‖ₑ + 2 * 2 ^ s * lqNorm q (fun k : ℕ => dyadicWeight (r * (s / r)) k *
           (A.reprCouple r).kFunctional (dyadicWeight (-r) k) f) := by
         rw [← add_assoc, ← two_mul]
@@ -177,10 +177,11 @@ theorem dyadicWeight_mul_kFunctional_reprCouple_le (hs : 0 ≤ s) (hr : r ≠ 0)
     dyadicWeight (r * (s / r)) k * (A.reprCouple r).kFunctional (dyadicWeight (-r) k) f ≤
       (A.approxSeqDyadic s f k + dyadicWeight s k * tolerance f s k) +
         (3 * ‖f‖ₑ * dyadicWeight (-(r - s)) k + 2 * (dyadicWeight (-(r - s)) k *
-          ∑ j ∈ range (k + 1), dyadicWeight r j * (A.approxSeq f (2 ^ j) + tolerance f s j))) := by
+          ∑ j ∈ range (k + 1),
+            dyadicWeight r j * (A.approxError f (2 ^ j) + tolerance f s j))) := by
   have hK : (A.reprCouple r).kFunctional (dyadicWeight (-r) k) f ≤
-      (A.approxSeq f (2 ^ k) + tolerance f s k) + dyadicWeight (-r) k * (3 * ‖f‖ₑ + 2 *
-        ∑ j ∈ range (k + 1), dyadicWeight r j * (A.approxSeq f (2 ^ j) + tolerance f s j)) := by
+      (A.approxError f (2 ^ k) + tolerance f s k) + dyadicWeight (-r) k * (3 * ‖f‖ₑ + 2 *
+        ∑ j ∈ range (k + 1), dyadicWeight r j * (A.approxError f (2 ^ j) + tolerance f s j)) := by
     refine (InterpCouple.kFunctional_le (D.a k) f).trans ?_
     gcongr
     · exact D.enorm_sub_le k
@@ -191,9 +192,9 @@ theorem dyadicWeight_mul_kFunctional_reprCouple_le (hs : 0 ≤ s) (hr : r ≠ 0)
     ring
   rw [mul_div_cancel₀ s hr]
   calc dyadicWeight s k * (A.reprCouple r).kFunctional (dyadicWeight (-r) k) f
-      ≤ dyadicWeight s k * ((A.approxSeq f (2 ^ k) + tolerance f s k) +
+      ≤ dyadicWeight s k * ((A.approxError f (2 ^ k) + tolerance f s k) +
           dyadicWeight (-r) k * (3 * ‖f‖ₑ + 2 * ∑ j ∈ range (k + 1),
-            dyadicWeight r j * (A.approxSeq f (2 ^ j) + tolerance f s j))) := by gcongr
+            dyadicWeight r j * (A.approxError f (2 ^ j) + tolerance f s j))) := by gcongr
     _ = _ := by
         simp only [approxSeqDyadic, mul_add, ← mul_assoc, hw]
         ring
@@ -235,7 +236,7 @@ theorem interpNorm_reprCouple_le_approxNormDyadic (hs : 0 ≤ s) (hsr : s < r) (
   rcases eq_or_ne f 0 with rfl | hf0
   · rw [InterpCouple.interpNorm_zero enorm_zero (approxNormDyadic_zero r ∞)]
     exact zero_le
-  obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s) (tolerance_ne_top f s)
+  obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s)
   calc (A.reprCouple r).interpNorm (s / r) r q f
       = ‖f‖ₑ + lqNorm q (fun k : ℕ => dyadicWeight (r * (s / r)) k *
           (A.reprCouple r).kFunctional (dyadicWeight (-r) k) f) := rfl

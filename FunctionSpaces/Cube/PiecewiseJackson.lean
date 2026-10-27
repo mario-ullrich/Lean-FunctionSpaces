@@ -16,7 +16,7 @@ For `1 ≤ p < ∞`, `r ≥ 1` and `k ≥ 1`, the error of best approximation in
 `Q = [0, 1]^d`, by piecewise polynomials of level `k` and degree `< r` in each variable is bounded
 by the modulus on the cube,
 `E_{2^k}(f)_p ≤ (1 + C_r)^(d+1) 2 (1 + 2^r r^(2r)) ω_r(f, 2^(-k))_p`
-(`Cube.approxSeq_cubePPScheme_le`), with the bound `C_r` of the local projections.
+(`Cube.approxError_cubePPScheme_le`), with the bound `C_r` of the local projections.
 
 The approximant of a bounded continuous `f` is the tensor projection
 `P_k^d f = P_k^{(0)} ⋯ P_k^{(d-1)} f`. Its error telescopes into the errors of the projections in
@@ -30,15 +30,15 @@ smoothings in coordinate `i` on the halves `{x_i ≤ 1/2}` and `{x_i ≥ 1/2}`
 Minkowski's inequality in the point turns the bounds of the slices into bounds on two regions of
 the cube (`Cube.eLpNorm_le_of_slice_le`, used in `Cube.eLpNorm_sub_slicewise_ppKernel_le`).
 General `f ∈ L_p(Q)` follow by density of the bounded continuous functions
-(`Cube.approxSeq_le_of_continuous`).
+(`Cube.approxError_le_of_continuous`).
 
 At level `0` the approximants are the polynomials of degree `< r` in each variable, and
 **Whitney's inequality on the cube** `E_1(f)_p ≤ W ω_r(f, 2^(-m))_p`, `m ≥ 2`
-(`Cube.exists_approxSeq_cubePPScheme_one_le`), follows in the same way: on every slice, the Taylor
+(`Cube.exists_approxError_cubePPScheme_one_le`), follows in the same way: on every slice, the Taylor
 polynomials of the smoothings on `{x_i ≤ 1 - t}` and `{x_i ≥ t}`, `t = 2^(-m)`, are glued as in
 one variable (`Interval.exists_eLpNorm_sub_polyFun_le_glue`,
 `Cube.exists_eLpNorm_sub_ppKernel_zero_apply_le`). So Jackson's inequality holds at every level
-(`Cube.exists_approxSeq_cubePPScheme_le`).
+(`Cube.exists_approxError_cubePPScheme_le`).
 -/
 
 @[expose] public section
@@ -200,15 +200,15 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 /-- **From continuous functions to `L_p(Q)` by density**: a bound
 `E_n(g) ≤ C ω_r(g, 2^(-k))_p` for every bounded continuous `g`, given by an approximant
 `u ∈ A_n` of `g`, holds for every `f ∈ L_p(Q)`, `p < ∞`, as in one variable
-(`Interval.approxSeq_le_of_continuous`). -/
-theorem approxSeq_le_of_continuous {A : ApproximationScheme (Lp ℂ p (cubeVol d))} (hp : p ≠ ∞)
+(`Interval.approxError_le_of_continuous`). -/
+theorem approxError_le_of_continuous {A : ApproximationScheme (Lp ℂ p (cubeVol d))} (hp : p ≠ ∞)
     {r n k : ℕ} {C : ℝ≥0∞} (hC : C ≠ ∞)
     (h : ∀ g : (Fin d → ℝ) →ᵇ ℂ, ∃ u : (Fin d → ℝ) → ℂ,
       (∃ a ∈ A n, (a : (Fin d → ℝ) → ℂ) =ᵐ[cubeVol d] u) ∧
         eLpNorm (fun x => g x - u x) p (cubeVol d) ≤ C * cubeModulus r p g (1 / 2 ^ k))
-    (f : Lp ℂ p (cubeVol d)) : A.approxSeq f n ≤ C * lpCubeModulus p r f k := by
+    (f : Lp ℂ p (cubeVol d)) : A.approxError f n ≤ C * lpCubeModulus p r f k := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
-  refine ApproximationScheme.approxSeq_le_of_dense
+  refine ApproximationScheme.approxError_le_of_dense
     (BoundedContinuousFunction.toLp_denseRange ℂ (cubeVol d) ℝ hp)
     (fun f g => lpCubeModulus_add_le hp r f g k) (C0 := d * 2 ^ r)
     (ENNReal.mul_ne_top (ENNReal.natCast_ne_top d) (ENNReal.pow_ne_top ENNReal.ofNat_ne_top))
@@ -216,7 +216,7 @@ theorem approxSeq_le_of_continuous {A : ApproximationScheme (Lp ℂ p (cubeVol d
   rintro _ ⟨g, rfl⟩
   obtain ⟨u, ⟨a, ha, hau⟩, hbound⟩ := h g
   have hg := BoundedContinuousFunction.coeFn_toLp (E := ℂ) p (cubeVol d) ℝ g
-  refine (A.approxSeq_le_of_mem ha _).trans ?_
+  refine (A.approxError_le_of_mem ha _).trans ?_
   rw [Lp.enorm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans (hg.sub hau)), lpCubeModulus,
     cubeModulus_congr_ae (Lp.stronglyMeasurable _).measurable g.continuous.measurable hg hp0 hp]
   exact hbound
@@ -225,11 +225,11 @@ theorem approxSeq_le_of_continuous {A : ApproximationScheme (Lp ℂ p (cubeVol d
 `k ≥ 1`, `E_{2^k}(f)_p ≤ (1 + C_r)^(d+1) 2 (1 + 2^r r^(2r)) ω_r(f, 2^(-k))_p` for every
 `f ∈ L_p(Q)`; first for bounded continuous functions with the tensor projection
 (`Cube.eLpNorm_sub_cubeProj_le`), then by density. -/
-theorem approxSeq_cubePPScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) (f : Lp ℂ p (cubeVol d))
+theorem approxError_cubePPScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) (f : Lp ℂ p (cubeVol d))
     {k : ℕ} (hk : 1 ≤ k) :
-    (cubePPScheme p d r).approxSeq f (2 ^ k) ≤ cubeJacksonConst d r * lpCubeModulus p r f k := by
+    (cubePPScheme p d r).approxError f (2 ^ k) ≤ cubeJacksonConst d r * lpCubeModulus p r f k := by
   obtain ⟨k, rfl⟩ := Nat.exists_eq_add_of_le' hk
-  refine approxSeq_le_of_continuous hp (cubeJacksonConst_ne_top d r) (fun g => ?_) f
+  refine approxError_le_of_continuous hp (cubeJacksonConst_ne_top d r) (fun g => ?_) f
   have hgb : BddMeas (g : (Fin d → ℝ) → ℂ) := ⟨g.continuous.measurable, ‖g‖, g.norm_coe_le_norm⟩
   have hP := isCubePP_cubeProj r (k + 1) hgb
   exact ⟨cubeProj r (k + 1) g, ⟨(hP.1.memLp p (cubeVol d)).toLp _,
@@ -331,10 +331,10 @@ theorem exists_eLpNorm_sub_slicewise_ppKernel_zero_le {r : ℕ} (hr : 1 ≤ r) (
 /-- **Whitney's inequality on the cube**: for `m ≥ 2` there is `W < ∞` with
 `E_1(f)_p ≤ W ω_r(f, 2^(-m))_p` for every `f ∈ L_p(Q)`; the approximants of complexity `1` are the
 polynomials of degree `< r` in each variable. -/
-theorem exists_approxSeq_cubePPScheme_one_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) {m : ℕ}
+theorem exists_approxError_cubePPScheme_one_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) {m : ℕ}
     (hm : 2 ≤ m) :
     ∃ W : ℝ≥0∞, W ≠ ∞ ∧ ∀ f : Lp ℂ p (cubeVol d),
-      (cubePPScheme p d r).approxSeq f 1 ≤ W * lpCubeModulus p r f m := by
+      (cubePPScheme p d r).approxError f 1 ≤ W * lpCubeModulus p r f m := by
   have ht : (0 : ℝ) < 1 / 2 ^ m := by positivity
   have ht3 : (1 : ℝ) / 2 ^ m ≤ 1 / 3 := by
     rw [div_le_div_iff₀ (by positivity) (by norm_num), one_mul, one_mul]
@@ -345,7 +345,7 @@ theorem exists_approxSeq_cubePPScheme_one_le {r : ℕ} (hr : 1 ≤ r) (hp : p �
   have hW' : (1 + ppProjConst r) ^ d * W ≠ ∞ := ENNReal.mul_ne_top
     (ENNReal.pow_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ppProjConst_ne_top r⟩)) hW
   refine ⟨(1 + ppProjConst r) ^ d * W, hW',
-    fun f => approxSeq_le_of_continuous hp hW' (fun g => ?_) f⟩
+    fun f => approxError_le_of_continuous hp hW' (fun g => ?_) f⟩
   have hgb : BddMeas (g : (Fin d → ℝ) → ℂ) := ⟨g.continuous.measurable, ‖g‖, g.norm_coe_le_norm⟩
   have hP := isCubePP_cubeProj r 0 hgb
   refine ⟨cubeProj r 0 g, ⟨(hP.1.memLp p (cubeVol d)).toLp _, ?_, MemLp.coeFn_toLp _⟩, ?_⟩
@@ -356,15 +356,15 @@ theorem exists_approxSeq_cubePPScheme_one_le {r : ℕ} (hr : 1 ≤ r) (hp : p �
 /-- **Jackson's inequality for piecewise polynomials on the cube at every level**: for
 `1 ≤ p < ∞` and `r ≥ 1` there is `C_J < ∞` with `E_{2^k}(f)_p ≤ C_J ω_r(f, 2^(-k))_p` for every
 `f ∈ L_p(Q)` and every `k ≥ 0`; level `0` is Whitney's inequality. -/
-theorem exists_approxSeq_cubePPScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
+theorem exists_approxError_cubePPScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
     ∃ CJ : ℝ≥0∞, CJ ≠ ∞ ∧ ∀ (f : Lp ℂ p (cubeVol d)) (k : ℕ),
-      (cubePPScheme p d r).approxSeq f (2 ^ k) ≤ CJ * lpCubeModulus p r f k := by
-  obtain ⟨W, hW, hWb⟩ := exists_approxSeq_cubePPScheme_one_le (d := d) (p := p) hr hp le_rfl
+      (cubePPScheme p d r).approxError f (2 ^ k) ≤ CJ * lpCubeModulus p r f k := by
+  obtain ⟨W, hW, hWb⟩ := exists_approxError_cubePPScheme_one_le (d := d) (p := p) hr hp le_rfl
   refine ⟨W + cubeJacksonConst d r,
     ENNReal.add_ne_top.2 ⟨hW, cubeJacksonConst_ne_top d r⟩, fun f k => ?_⟩
   rcases Nat.eq_zero_or_pos k with rfl | hk
   · rw [pow_zero]
     exact (hWb f).trans (mul_le_mul' le_self_add (lpCubeModulus_anti r f (Nat.zero_le 2)))
-  · exact (approxSeq_cubePPScheme_le hr hp f hk).trans (mul_le_mul' le_add_self le_rfl)
+  · exact (approxError_cubePPScheme_le hr hp f hk).trans (mul_le_mul' le_add_self le_rfl)
 
 end Cube

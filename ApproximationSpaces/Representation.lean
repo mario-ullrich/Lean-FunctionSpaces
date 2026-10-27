@@ -23,7 +23,7 @@ the continuous K-method `(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)`
 halves:
 
 * **Jackson** (`approxNormDyadic_le_interpNorm_of_jackson`):
-  `E_n(f) ≤ max(1, C) K(n^(-r), f)` (`approxSeq_le_kFunctional_of_jackson`), so at the
+  `E_n(f) ≤ max(1, C) K(n^(-r), f)` (`approxError_le_kFunctional_of_jackson`), so at the
   dyadic points `2^(ks) E_{2^k}(f) ≤ max(1, C) 2^(kr·s/r) K(2^(-kr), f)`;
 * **Bernstein** (`interpNorm_le_approxNormDyadic_of_bernstein`): with near-best approximants
   `a_k = ι z_k` lifted by Bernstein's inequality (`DyadicApprox.exists_lift_partial`),
@@ -59,7 +59,7 @@ theorem approxNormDyadic_le_interpNorm_of_jackson (hJ : JacksonBound ι A r C) (
   have hseq : ∀ k, A.approxSeqDyadic s f k ≤ M * interpSeq ι (s / r) r f k := fun k => by
     rw [approxSeqDyadic, interpSeq, mul_div_cancel₀ s hr, mul_left_comm]
     gcongr
-    have := approxSeq_le_kFunctional_of_jackson hJ hC (Nat.one_le_two_pow (n := k)) f
+    have := approxError_le_kFunctional_of_jackson hJ hC (Nat.one_le_two_pow (n := k)) f
     rwa [ENNReal.natCast_two_pow_rpow] at this
   calc A.approxNormDyadic s q f = ‖f‖ₑ + lqNorm q (A.approxSeqDyadic s f) := rfl
     _ ≤ M * ‖f‖ₑ + M * lqNorm q (interpSeq ι (s / r) r f) := by
@@ -101,7 +101,7 @@ theorem interpSeq_le_of_lift (hr : r ≠ 0) {f : X} {t : ℕ → ℝ≥0∞} (D 
           gcongr; exact Nat.le_succ k
       _ = _ := by rw [Finset.mul_sum]
   have hkf : kFunctional ι (dyadicWeight (-r) k) f ≤
-      (A.approxSeq f (2 ^ k) + t k) + dyadicWeight (-r) k *
+      (A.approxError f (2 ^ k) + t k) + dyadicWeight (-r) k *
         (B + K * ∑ j ∈ range (k + 1), b j) := by
     refine (kFunctional_le (y0 + ∑ j ∈ range k, d j) f).trans ?_
     rw [hpart k]
@@ -109,7 +109,7 @@ theorem interpSeq_le_of_lift (hr : r ≠ 0) {f : X} {t : ℕ → ℝ≥0∞} (D 
     exact D.enorm_sub_le k
   rw [interpSeq, mul_div_cancel₀ s hr]
   calc dyadicWeight s k * kFunctional ι (dyadicWeight (-r) k) f
-      ≤ dyadicWeight s k * ((A.approxSeq f (2 ^ k) + t k) + dyadicWeight (-r) k *
+      ≤ dyadicWeight s k * ((A.approxError f (2 ^ k) + t k) + dyadicWeight (-r) k *
         (B + K * ∑ j ∈ range (k + 1), b j)) := by gcongr
     _ = _ := by
         have hw : dyadicWeight s k * dyadicWeight (-r) k = dyadicWeight (-(r - s)) k := by
@@ -127,12 +127,12 @@ the near-best approximants in `A^r_∞`, end with this bound. -/
 theorem lqNorm_le_of_le_partialSums (hq : 1 ≤ q) {f : X} {u : ℕ → ℝ≥0∞} {B K : ℝ≥0∞}
     (hu : ∀ k, u k ≤ (A.approxSeqDyadic s f k + dyadicWeight s k * tolerance f s k) +
       (B * dyadicWeight (-(r - s)) k + K * (dyadicWeight (-(r - s)) k *
-        ∑ j ∈ range (k + 1), dyadicWeight r j * (A.approxSeq f (2 ^ j) + tolerance f s j)))) :
+        ∑ j ∈ range (k + 1), dyadicWeight r j * (A.approxError f (2 ^ j) + tolerance f s j)))) :
     lqNorm q u ≤ (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ) +
       (B * (1 - (2 : ℝ≥0∞) ^ (-(r - s)))⁻¹ +
         K * ((1 - (2 : ℝ≥0∞) ^ (-(r - s)))⁻¹ * (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ))) := by
   have hsplit : ∀ k, dyadicWeight (-(r - s)) k *
-      (dyadicWeight r k * (A.approxSeq f (2 ^ k) + tolerance f s k)) =
+      (dyadicWeight r k * (A.approxError f (2 ^ k) + tolerance f s k)) =
         A.approxSeqDyadic s f k + dyadicWeight s k * tolerance f s k := fun k => by
     simp only [approxSeqDyadic, ← mul_assoc, ← ENNReal.dyadicWeight_add, mul_add]
     congr 2 <;> congr 1 <;> ring
@@ -146,7 +146,7 @@ theorem lqNorm_le_of_le_partialSums (hq : 1 ≤ q) {f : X} {u : ℕ → ℝ≥0�
     gcongr
     exact ENNReal.lqNorm_dyadicWeight_neg_le hq _
   have hL4 : lqNorm q (fun k => K * (dyadicWeight (-(r - s)) k * ∑ j ∈ range (k + 1),
-      dyadicWeight r j * (A.approxSeq f (2 ^ j) + tolerance f s j))) ≤
+      dyadicWeight r j * (A.approxError f (2 ^ j) + tolerance f s j))) ≤
         K * ((1 - (2 : ℝ≥0∞) ^ (-(r - s)))⁻¹ * (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ)) := by
     rw [ENNReal.lqNorm_const_mul]
     gcongr
@@ -189,7 +189,7 @@ theorem interpNorm_le_approxNormDyadic_of_bernstein (hB : LiftBound ι A r C) (h
   rcases eq_or_ne f 0 with rfl | hf0
   · have : interpSeq ι (s / r) r (0 : X) = fun _ => 0 := by funext k; simp [interpSeq]
     simp [interpNorm, this]
-  obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s) (tolerance_ne_top f s)
+  obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s)
   obtain ⟨y0, d, hpart, hy0, hd⟩ := D.exists_lift_partial (tolerance_anti f hs.le) hB hC
   have hy0' : ‖y0‖ₑ ≤ 3 * ENNReal.ofReal C * ‖f‖ₑ := by
     rw [tolerance_zero] at hy0

@@ -27,7 +27,7 @@ give
 for almost every `x` (`Rd.ae_sub_jacksonApprox_eq`). The weighted Jensen inequality
 (`MeasureTheory.eLpNorm_integral_kernel_le`) and
 `ω_r(f, 2^(-k) |z|)_p ≤ (1 + |z|)^r ω_r(f, 2^(-k))_p` give
-**Jackson's inequality** (`Rd.enorm_sub_jacksonApprox_le`, `Rd.approxSeq_bandScheme_le`)
+**Jackson's inequality** (`Rd.enorm_sub_jacksonApprox_le`, `Rd.approxError_bandScheme_le`)
 
 `E(f, E_k)_p ≤ ‖f - J_k f‖_p ≤ C ω_r(f, 2^(-k))_p`,
 `C^p = ‖Φ‖_1^(p-1) ∫ |Φ(z)| (1 + |z|)^(rp) dz`,
@@ -229,9 +229,9 @@ theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (v
 
 /-- **Jackson's inequality for the band-limited scheme**:
 `E(f, E_k)_p ≤ C ω_r(f, 2^(-k))_p`. -/
-theorem approxSeq_bandScheme_le (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (volume : Measure V)) :
-    (bandScheme hp).approxSeq f (2 ^ k) ≤ jacksonConst V r p * lpModulus p r f k :=
-  (ApproximationScheme.approxSeq_le_of_mem
+theorem approxError_bandScheme_le (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (volume : Measure V)) :
+    (bandScheme hp).approxError f (2 ^ k) ≤ jacksonConst V r p * lpModulus p r f k :=
+  (ApproximationScheme.approxError_le_of_mem
     (mem_bandScheme_two_pow.2 (jacksonApprox_mem_bandSpace hp r k f)) f).trans
     (enorm_sub_jacksonApprox_le hp r k f)
 

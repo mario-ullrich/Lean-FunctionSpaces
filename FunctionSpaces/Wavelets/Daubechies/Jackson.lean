@@ -21,8 +21,8 @@ every level `j ∈ ℕ`, the error of best approximation from `V_j` obeys
 
 with the modulus of smoothness `ω_N(f, t)_p = sup_{|h| ≤ t} ‖Δ_h^N f‖_{L_p(ℝ)}` (`Rd.modulus`) and
 a constant `C_J` that depends only on the mask and on `p` (`Daubechies.jacksonConst`,
-`Daubechies.approxSeq_scheme_le_jacksonConst_mul`). This is the Jackson inequality of the
-Daubechies scheme (`Daubechies.approxSeq_scheme_le`). With the uniform bound `C` of the
+`Daubechies.approxError_scheme_le_jacksonConst_mul`). This is the Jackson inequality of the
+Daubechies scheme (`Daubechies.approxError_scheme_le`). With the uniform bound `C` of the
 projections it gives `‖f - P_j f‖_p ≤ (1 + C) C_J ω_N(f, 2^(-j))_p`
 (`Daubechies.enorm_sub_proj_le`), and for continuous `f` directly
 `‖f - P_j f‖_p ≤ C_J ω_N(f, 2^(-j))_p` (`Daubechies.eLpNorm_sub_projFun_le_modulus`).
@@ -56,7 +56,7 @@ The proof has three steps.
   (Mathlib's `MeasureTheory.Lp.boundedContinuousFunction_dense`), and the error of best
   approximation and the modulus are both controlled by `‖f‖_p`, so the inequality for
   `E_{2^j}(f)_p ≤ ‖f - P_j f‖_p` extends by density
-  (`ApproximationScheme.approxSeq_le_of_dense`). The Lebesgue inequality
+  (`ApproximationScheme.approxError_le_of_dense`). The Lebesgue inequality
   `‖f - P_j f‖_p ≤ (1 + C) E_{2^j}(f)_p` returns to the projections.
 -/
 
@@ -428,11 +428,11 @@ bounded continuous representative, `P_j f ∈ V_j` gives `E_{2^j}(f)_p ≤ ‖f 
 (`Daubechies.enorm_sub_proj_le_of_continuous`); these `f` are dense in `L_p` (Mathlib's
 `MeasureTheory.Lp.boundedContinuousFunction_dense`), and both sides are controlled by `‖f‖_p`
 (`Rd.lpModulus_add_le`, `Rd.lpModulus_le`), so the bound extends to all of `L_p`
-(`ApproximationScheme.approxSeq_le_of_dense`). -/
-theorem approxSeq_scheme_le_jacksonConst_mul (hN : 2 ≤ N) (hp : p ≠ ∞)
+(`ApproximationScheme.approxError_le_of_dense`). -/
+theorem approxError_scheme_le_jacksonConst_mul (hN : 2 ≤ N) (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure ℝ)) (j : ℕ) :
-    (scheme m p hN hp).approxSeq f (2 ^ j) ≤ jacksonConst m p * Rd.lpModulus p N f j := by
-  refine ApproximationScheme.approxSeq_le_of_dense
+    (scheme m p hN hp).approxError f (2 ^ j) ≤ jacksonConst m p * Rd.lpModulus p N f j := by
+  refine ApproximationScheme.approxError_le_of_dense
     (Lp.boundedContinuousFunction_dense ℂ volume hp) (fun f g => Rd.lpModulus_add_le N f g j)
     (C0 := 2 ^ N) (ENNReal.pow_ne_top ENNReal.ofNat_ne_top) (fun f => Rd.lpModulus_le N f j)
     (jacksonConst_ne_top m hN p) (fun g hg => ?_) f
@@ -441,7 +441,7 @@ theorem approxSeq_scheme_le_jacksonConst_mul (hN : 2 ≤ N) (hp : p ≠ ∞)
     have h := g₀.toContinuousMap.coeFn_toAEEqFun volume
     rw [hg₀] at h
     exact h
-  exact ((scheme m p hN hp).approxSeq_le_of_mem
+  exact ((scheme m p hN hp).approxError_le_of_mem
     ((mem_scheme_two_pow m).2 (proj_mem_scalingSpace m hN hp j g)) g).trans
     (enorm_sub_proj_le_of_continuous m hN hp g₀.continuous hae j)
 
@@ -449,28 +449,28 @@ theorem approxSeq_scheme_le_jacksonConst_mul (hN : 2 ≤ N) (hp : p ≠ ∞)
 constant `C_J < ∞` such that for every `f ∈ L_p(ℝ)` and every level `j` the error of best
 approximation from the scaling space `V_j` satisfies `E_{2^j}(f)_p ≤ C_J ω_N(f, 2^(-j))_p`, the
 Jackson inequality of an approximation scheme with modulus `ω_N` at the dyadic scales. The
-constant `C_J = jacksonConst m p` serves (`Daubechies.approxSeq_scheme_le_jacksonConst_mul`). -/
-theorem approxSeq_scheme_le (hN : 2 ≤ N) (hp : p ≠ ∞) :
+constant `C_J = jacksonConst m p` serves (`Daubechies.approxError_scheme_le_jacksonConst_mul`). -/
+theorem approxError_scheme_le (hN : 2 ≤ N) (hp : p ≠ ∞) :
     ∃ C_J : ℝ≥0∞, C_J ≠ ∞ ∧ ∀ (f : Lp ℂ p (volume : Measure ℝ)) (j : ℕ),
-      (scheme m p hN hp).approxSeq f (2 ^ j) ≤ C_J * Rd.lpModulus p N f j :=
-  ⟨jacksonConst m p, jacksonConst_ne_top m hN p, approxSeq_scheme_le_jacksonConst_mul m hN hp⟩
+      (scheme m p hN hp).approxError f (2 ^ j) ≤ C_J * Rd.lpModulus p N f j :=
+  ⟨jacksonConst m p, jacksonConst_ne_top m hN p, approxError_scheme_le_jacksonConst_mul m hN hp⟩
 
 /-- **Jackson's inequality for the projections**: for `N ≥ 2`, `1 ≤ p < ∞`, every `f ∈ L_p(ℝ)` and
 every level `j`, `‖f - P_j f‖_p ≤ (1 + C) C_J ω_N(f, 2^(-j))_p` with the uniform bound
 `C = projConst m p` of the projections and `C_J = jacksonConst m p`. This is the Lebesgue
 inequality `‖f - P_j f‖_p ≤ (1 + C) E_{2^j}(f)_p`
-(`ApproximationScheme.ProjectionScheme.enorm_sub_le_approxSeq` for the projection scheme
+(`ApproximationScheme.ProjectionScheme.enorm_sub_le_approxError` for the projection scheme
 `Daubechies.projectionScheme`, whose projection of complexity `2^j` is `P_j`,
 `Daubechies.projectionScheme_two_pow`) combined with
-`Daubechies.approxSeq_scheme_le_jacksonConst_mul`. -/
+`Daubechies.approxError_scheme_le_jacksonConst_mul`. -/
 theorem enorm_sub_proj_le (hN : 2 ≤ N) (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure ℝ)) (j : ℕ) :
     ‖f - proj m p hN hp j f‖ₑ ≤
       (1 + ENNReal.ofReal (projConst m p)) * jacksonConst m p * Rd.lpModulus p N f j := by
-  have h := (projectionScheme m p hN hp).enorm_sub_le_approxSeq (2 ^ j) f
+  have h := (projectionScheme m p hN hp).enorm_sub_le_approxError (2 ^ j) f
   rw [projectionScheme_two_pow] at h
   refine h.trans ?_
   rw [mul_assoc]
-  exact mul_le_mul_right (approxSeq_scheme_le_jacksonConst_mul m hN hp f j) _
+  exact mul_le_mul_right (approxError_scheme_le_jacksonConst_mul m hN hp f j) _
 
 end Lp
 

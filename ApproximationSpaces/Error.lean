@@ -7,7 +7,7 @@ module
 
 public import ApproximationSpaces.Scheme
 public import Mathlib.Analysis.Normed.Module.Ball.Pointwise
-public import Mathlib.Analysis.Normed.Operator.Basic
+public import Mathlib.Analysis.Normed.Operator.NNNorm
 public import Mathlib.Topology.MetricSpace.HausdorffDistance
 
 /-!
@@ -16,23 +16,27 @@ public import Mathlib.Topology.MetricSpace.HausdorffDistance
 For an approximation scheme `A` in a normed space `X`, the **error of best approximation** of
 `f ∈ X` from `A n` is
 
-`E_n(f) = dist(f, A n) = inf { ‖f - a‖ : a ∈ A n }`,
+`E_n(f) = inf { ‖f - a‖ : a ∈ A n }`,
 
-in Lean `A.approxError n f`, defined as `Metric.infDist f (A n)`.  This file collects its
-calculus: `E_0(f) = ‖f‖`, `E_n(f) ≤ ‖f‖`, `E_n` decreases in `n`, `E_n(c f) = |c| E_n(f)`,
-`E_{m+n}(f + g) ≤ E_m(f) + E_n(g)`, `E_n` is `1`-Lipschitz in `f`, `E_n(f) → 0` exactly for
-`f` in the closure of `⋃ A n`, and a bounded linear map `T` with `T (A n) ⊆ B n` satisfies
-`E^B_n(T f) ≤ ‖T‖ E^A_n(f)`.  The Lebesgue inequality `‖f - P f‖ ≤ (1 + C) ‖f - a‖` holds for
-every additive map `P` with `‖P x‖ ≤ C ‖x‖` that fixes `a`.
+in Lean `A.approxError f n`, defined as the extended distance `Metric.infEDist f (A n)` with
+values in `ℝ≥0∞`; it is finite (`approxError_ne_top`).  This file collects its calculus:
+`E_0(f) = ‖f‖`, `E_n(f) ≤ ‖f‖`, `E_n` decreases in `n`, `E_n(c f) = |c| E_n(f)`,
+`E_{m+n}(f + g) ≤ E_m(f) + E_n(g)`, `E_n(f) ≤ E_n(g) + ‖f - g‖`, `E_n(f) → 0` exactly for `f`
+in the closure of `⋃ A n`, a bounded linear map `T` with `T (A n) ⊆ B n` satisfies
+`E^B_n(T f) ≤ ‖T‖ E^A_n(f)`, and bounds by a subadditive modulus pass from a dense set to all
+of `X`.  The Lebesgue inequality `‖f - P f‖ ≤ (1 + C) ‖f - a‖` holds for every additive map `P`
+with `‖P x‖ ≤ C ‖x‖` that fixes `a`.
 
 A best approximant need not exist, since the sets `A n` need not be closed (sets of `n`-term
-approximants are not).  Proofs therefore pick approximants `a ∈ A n` with
-`‖f - a‖ ≤ E_n(f) + ε` (`ApproximationScheme.exists_mem_norm_sub_le_add`) and let `ε → 0`.
+approximants are in general not closed).  Proofs pick approximants `a ∈ A n` with
+`‖f - a‖ ≤ E_n(f) + ε` (`ApproximationScheme.exists_mem_enorm_sub_le_add`), or bound `E_n(f)`
+through every approximant at once (`ApproximationScheme.le_mul_approxError_of_forall_mem`).
 -/
 
 @[expose] public section
 
 open Filter Topology
+open scoped ENNReal
 
 namespace ApproximationScheme
 
@@ -41,171 +45,176 @@ variable {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 
 variable (A : ApproximationScheme X)
 
-/-- The **error of best approximation** `E_n(f) = dist(f, A n)` of `f` from the approximants
-of complexity `n`. -/
-noncomputable def approxError (n : ℕ) (f : X) : ℝ := Metric.infDist f (A n)
+/-- The **error of best approximation** `E_n(f) = inf_{a ∈ A n} ‖f - a‖ ∈ [0, ∞]` of `f` from
+the approximants of complexity `n`, the extended distance from `f` to `A n`. -/
+noncomputable def approxError (f : X) (n : ℕ) : ℝ≥0∞ := Metric.infEDist f (A n)
 
 variable {A}
 
-/-- `E_n(f) ≥ 0`. -/
-theorem approxError_nonneg (n : ℕ) (f : X) : 0 ≤ A.approxError n f := Metric.infDist_nonneg
+/-- The errors are finite, since `A n` is nonempty. -/
+theorem approxError_ne_top (f : X) (n : ℕ) : A.approxError f n ≠ ∞ :=
+  Metric.infEDist_ne_top (A.nonempty n)
 
-/-- Every approximant gives an upper bound for the error. -/
-theorem approxError_le_norm_sub {n : ℕ} {a : X} (ha : a ∈ A n) (f : X) :
-    A.approxError n f ≤ ‖f - a‖ := by
-  rw [← dist_eq_norm]; exact Metric.infDist_le_dist_of_mem ha
+/-- Every approximant gives an upper bound: `E_n(f) ≤ ‖f - a‖` for `a ∈ A_n`. -/
+theorem approxError_le_of_mem {n : ℕ} {a : X} (ha : a ∈ A n) (f : X) :
+    A.approxError f n ≤ ‖f - a‖ₑ := by
+  rw [← edist_eq_enorm_sub]; exact Metric.infEDist_le_edist_of_mem ha
 
 /-- The error never exceeds the norm, since `0` is an approximant. -/
-theorem approxError_le_norm (n : ℕ) (f : X) : A.approxError n f ≤ ‖f‖ := by
-  simpa using approxError_le_norm_sub (A.zero_mem n) f
+theorem approxError_le_enorm (f : X) (n : ℕ) : A.approxError f n ≤ ‖f‖ₑ := by
+  simpa using approxError_le_of_mem (A.zero_mem n) f
 
 /-- `E_n(0) = 0`. -/
 @[simp]
-theorem approxError_zero_right (n : ℕ) : A.approxError n 0 = 0 :=
-  Metric.infDist_zero_of_mem (A.zero_mem n)
+theorem approxError_zero_left (n : ℕ) : A.approxError 0 n = 0 :=
+  Metric.infEDist_zero_of_mem (A.zero_mem n)
 
 /-- `E_0(f) = ‖f‖`, because `A 0 = {0}`. -/
 @[simp]
-theorem approxError_zero_left (f : X) : A.approxError 0 f = ‖f‖ := by
-  simp [approxError, A.coe_zero, Metric.infDist_singleton]
+theorem approxError_zero_right (f : X) : A.approxError f 0 = ‖f‖ₑ := by
+  simp [approxError, A.coe_zero, Metric.infEDist_singleton]
 
 /-- `E_n(f) = 0` for `f ∈ A_n`. -/
-theorem approxError_eq_zero_of_mem {n : ℕ} {f : X} (hf : f ∈ A n) : A.approxError n f = 0 :=
-  Metric.infDist_zero_of_mem hf
+theorem approxError_eq_zero_of_mem {n : ℕ} {f : X} (hf : f ∈ A n) : A.approxError f n = 0 :=
+  Metric.infEDist_zero_of_mem hf
 
 /-- `E_n(f) = 0` for `f` in the closure of `A_n`. -/
 theorem approxError_eq_zero_of_mem_closure {n : ℕ} {f : X} (hf : f ∈ closure (A n)) :
-    A.approxError n f = 0 :=
-  Metric.infDist_zero_of_mem_closure hf
+    A.approxError f n = 0 :=
+  Metric.mem_closure_iff_infEDist_zero.1 hf
 
 /-- The error decreases as the complexity grows. -/
-theorem approxError_anti (f : X) : Antitone (A.approxError · f) := fun _ _ h =>
-  Metric.infDist_le_infDist_of_subset (A.mono h) (A.nonempty _)
+theorem approxError_anti (f : X) : Antitone (A.approxError f) := fun _ _ h =>
+  Metric.infEDist_anti (A.mono h)
 
 /-- A scheme with larger sets has smaller errors. -/
-theorem approxError_anti_scheme {A' : ApproximationScheme X} (h : ∀ n, A n ⊆ A' n) (n : ℕ)
-    (f : X) : A'.approxError n f ≤ A.approxError n f :=
-  Metric.infDist_le_infDist_of_subset (h n) (A.nonempty n)
+theorem approxError_anti_scheme {A' : ApproximationScheme X} (h : ∀ n, A n ⊆ A' n) (f : X)
+    (n : ℕ) : A'.approxError f n ≤ A.approxError f n :=
+  Metric.infEDist_anti (h n)
 
 /-- `r ≤ E_n(f)` iff `r ≤ ‖f - a‖` for every `a ∈ A_n`. -/
-theorem le_approxError_iff {n : ℕ} {f : X} {r : ℝ} :
-    r ≤ A.approxError n f ↔ ∀ a ∈ A n, r ≤ ‖f - a‖ := by
-  simp only [approxError, Metric.le_infDist (A.nonempty n), dist_eq_norm]
+theorem le_approxError_iff {n : ℕ} {f : X} {r : ℝ≥0∞} :
+    r ≤ A.approxError f n ↔ ∀ a ∈ A n, r ≤ ‖f - a‖ₑ := by
+  simp only [approxError, Metric.le_infEDist, edist_eq_enorm_sub]
 
 /-- If the error is below `r`, some approximant is closer than `r`. -/
-theorem exists_mem_norm_sub_lt {n : ℕ} {f : X} {r : ℝ} (h : A.approxError n f < r) :
-    ∃ a ∈ A n, ‖f - a‖ < r := by
-  simpa [dist_eq_norm] using (Metric.infDist_lt_iff (A.nonempty n)).1 h
+theorem exists_mem_enorm_sub_lt {n : ℕ} {f : X} {r : ℝ≥0∞} (h : A.approxError f n < r) :
+    ∃ a ∈ A n, ‖f - a‖ₑ < r := by
+  simpa [edist_eq_enorm_sub] using Metric.infEDist_lt_iff.1 h
 
 /-- **Near-best approximants.** For every `ε > 0` there is `a ∈ A n` with
 `‖f - a‖ ≤ E_n(f) + ε`.  A best approximant (`ε = 0`) need not exist. -/
-theorem exists_mem_norm_sub_le_add (n : ℕ) (f : X) {ε : ℝ} (hε : 0 < ε) :
-    ∃ a ∈ A n, ‖f - a‖ ≤ A.approxError n f + ε := by
-  obtain ⟨a, ha, h⟩ := exists_mem_norm_sub_lt (lt_add_of_pos_right (A.approxError n f) hε)
+theorem exists_mem_enorm_sub_le_add (n : ℕ) (f : X) {ε : ℝ≥0∞} (hε : ε ≠ 0) :
+    ∃ a ∈ A n, ‖f - a‖ₑ ≤ A.approxError f n + ε := by
+  obtain ⟨a, ha, h⟩ := exists_mem_enorm_sub_lt (ENNReal.lt_add_right (approxError_ne_top f n) hε)
   exact ⟨a, ha, h.le⟩
 
-/-- To bound a quantity by `C · E_n(f)` it suffices to bound it by `C ‖f - a‖` for every
-approximant `a`. -/
-theorem le_mul_approxError_of_forall_mem {n : ℕ} {f : X} {e C : ℝ} (hC : 0 ≤ C)
-    (h : ∀ a ∈ A n, e ≤ C * ‖f - a‖) : e ≤ C * A.approxError n f := by
-  refine le_of_forall_pos_le_add fun ε hε => ?_
-  have hC1 : 0 < C + 1 := by linarith
-  obtain ⟨a, ha, hfa⟩ := exists_mem_norm_sub_le_add n f (div_pos hε hC1)
-  calc e ≤ C * ‖f - a‖ := h a ha
-    _ ≤ C * (A.approxError n f + ε / (C + 1)) := by gcongr
-    _ = C * A.approxError n f + C * ε / (C + 1) := by ring
-    _ ≤ C * A.approxError n f + ε := by
-      gcongr
-      rw [div_le_iff₀ hC1]; nlinarith
+/-- To bound a quantity by `C · E_n(f)` with `C < ∞` it suffices to bound it by `C ‖f - a‖`
+for every approximant `a`.  The finiteness of `C` is needed: for `C = ∞` and `f` in the
+closure of `A n` outside `A n`, every `C ‖f - a‖` is `∞`, so the hypothesis holds for every
+`e`, while `C · E_n(f) = ∞ · 0 = 0`. -/
+theorem le_mul_approxError_of_forall_mem {n : ℕ} {f : X} {e C : ℝ≥0∞} (hC : C ≠ ∞)
+    (h : ∀ a ∈ A n, e ≤ C * ‖f - a‖ₑ) : e ≤ C * A.approxError f n := by
+  rcases eq_or_ne C 0 with rfl | hC0
+  · simpa using h 0 (A.zero_mem n)
+  rw [mul_comm, ← ENNReal.div_le_iff hC0 hC, le_approxError_iff]
+  exact fun a ha => (ENNReal.div_le_iff hC0 hC).2 (by rw [mul_comm]; exact h a ha)
+
+/-- **Subadditivity** for any three complexities with `A m + A n ⊆ A k`:
+`E_k(f + g) ≤ E_m(f) + E_n(g)`. -/
+theorem approxError_add_le_of_add_mem {m n k : ℕ} (h : ∀ a ∈ A m, ∀ b ∈ A n, a + b ∈ A k)
+    (f g : X) : A.approxError (f + g) k ≤ A.approxError f m + A.approxError g n := by
+  refine ENNReal.le_iInf₂_add_iInf₂ fun a ha b hb => ?_
+  calc A.approxError (f + g) k ≤ edist (f + g) (a + b) :=
+        Metric.infEDist_le_edist_of_mem (h a ha b hb)
+    _ ≤ edist f a + edist g b := edist_add_add_le f g a b
 
 /-- **Subadditivity**: `E_{m+n}(f + g) ≤ E_m(f) + E_n(g)`, because `A m + A n ⊆ A (m + n)`. -/
 theorem approxError_add_le (m n : ℕ) (f g : X) :
-    A.approxError (m + n) (f + g) ≤ A.approxError m f + A.approxError n g := by
-  refine le_of_forall_pos_le_add fun ε hε => ?_
-  obtain ⟨a, ha, hfa⟩ := exists_mem_norm_sub_le_add m f (half_pos hε)
-  obtain ⟨b, hb, hgb⟩ := exists_mem_norm_sub_le_add n g (half_pos hε)
-  calc A.approxError (m + n) (f + g) ≤ ‖f + g - (a + b)‖ :=
-        approxError_le_norm_sub (add_mem ha hb) _
-    _ = ‖(f - a) + (g - b)‖ := by rw [add_sub_add_comm]
-    _ ≤ ‖f - a‖ + ‖g - b‖ := norm_add_le _ _
-    _ ≤ A.approxError m f + A.approxError n g + ε := by linarith
+    A.approxError (f + g) (m + n) ≤ A.approxError f m + A.approxError g n :=
+  approxError_add_le_of_add_mem (fun _ ha _ hb => add_mem ha hb) f g
 
 /-- The dyadic form of subadditivity: `E_{2^(k+1)}(f + g) ≤ E_{2^k}(f) + E_{2^k}(g)`. -/
 theorem approxError_add_le_pow_succ (k : ℕ) (f g : X) :
-    A.approxError (2 ^ (k + 1)) (f + g) ≤ A.approxError (2 ^ k) f + A.approxError (2 ^ k) g := by
-  have := approxError_add_le (A := A) (2 ^ k) (2 ^ k) f g
-  rwa [← two_mul, ← pow_succ'] at this
+    A.approxError (f + g) (2 ^ (k + 1)) ≤ A.approxError f (2 ^ k) + A.approxError g (2 ^ k) :=
+  approxError_add_le_of_add_mem (fun _ ha _ hb => A.add_mem_pow_succ ha hb) f g
 
 /-- **Homogeneity**: `E_n(c f) = |c| E_n(f)`, because `c • A n = A n` for `c ≠ 0`. -/
-theorem approxError_smul (n : ℕ) (c : ℝ) (f : X) :
-    A.approxError n (c • f) = |c| * A.approxError n f := by
+theorem approxError_smul (c : ℝ) (f : X) (n : ℕ) :
+    A.approxError (c • f) n = ‖c‖ₑ * A.approxError f n := by
   rcases eq_or_ne c 0 with rfl | hc
   · simp
-  · have := infDist_smul₀ hc (A n) f
-    rw [A.smul_set_eq hc n, Real.norm_eq_abs] at this
+  · have := infEDist_smul₀ hc (A n) f
+    rw [A.smul_set_eq hc n, ENNReal.smul_def, smul_eq_mul] at this
     exact this
 
 /-- `E_n(-f) = E_n(f)`. -/
 @[simp]
-theorem approxError_neg (n : ℕ) (f : X) : A.approxError n (-f) = A.approxError n f := by
-  simpa using approxError_smul (A := A) n (-1) f
+theorem approxError_neg (f : X) (n : ℕ) : A.approxError (-f) n = A.approxError f n := by
+  simpa using approxError_smul (A := A) (-1) f n
 
-/-- `E_n(f) ≤ E_n(g) + ‖f - g‖`. -/
-theorem approxError_le_approxError_add_norm (n : ℕ) (f g : X) :
-    A.approxError n f ≤ A.approxError n g + ‖f - g‖ := by
-  rw [← dist_eq_norm]; exact Metric.infDist_le_infDist_add_dist
+/-- `E_n(f) ≤ E_n(g) + ‖f - g‖`: the error is `1`-Lipschitz in `f`. -/
+theorem approxError_le_approxError_add_enorm (n : ℕ) (f g : X) :
+    A.approxError f n ≤ A.approxError g n + ‖f - g‖ₑ := by
+  rw [← edist_eq_enorm_sub]; exact Metric.infEDist_le_infEDist_add_edist
 
-/-- The error is `1`-Lipschitz in `f`. -/
-theorem abs_approxError_sub_le (n : ℕ) (f g : X) :
-    |A.approxError n f - A.approxError n g| ≤ ‖f - g‖ := by
-  simpa [approxError, Real.dist_eq, dist_eq_norm] using
-    (Metric.lipschitz_infDist_pt (A n)).dist_le_mul f g
+/-- `E_n` is continuous in `f`, being `1`-Lipschitz. -/
+theorem continuous_approxError (n : ℕ) : Continuous (A.approxError · n) :=
+  Metric.continuous_infEDist
 
-/-- `E_n` is continuous, being `1`-Lipschitz. -/
-theorem continuous_approxError (n : ℕ) : Continuous (A.approxError n) :=
-  Metric.continuous_infDist_pt _
-
-/-- The errors tend to zero exactly for the elements of the closure of `⋃ n, A n`. -/
+/-- The errors tend to zero exactly for the elements of the closure of `⋃ n, A n`: the
+decreasing errors tend to their infimum, the distance from `f` to `⋃ n, A n`. -/
 theorem tendsto_approxError_zero_iff (f : X) :
-    Tendsto (A.approxError · f) atTop (𝓝 0) ↔ f ∈ closure (⋃ n, A n) := by
-  rw [Metric.mem_closure_iff]
-  constructor
-  · intro h ε hε
-    obtain ⟨n, hn⟩ := (Metric.tendsto_atTop.1 h) ε hε
-    have hn' := hn n le_rfl
-    rw [Real.dist_eq, sub_zero, abs_of_nonneg (approxError_nonneg n f)] at hn'
-    obtain ⟨a, ha, hfa⟩ := exists_mem_norm_sub_lt hn'
-    exact ⟨a, Set.mem_iUnion.2 ⟨n, ha⟩, by rwa [dist_eq_norm]⟩
-  · intro h
-    refine Metric.tendsto_atTop.2 fun ε hε => ?_
-    obtain ⟨a, ha, hfa⟩ := h ε hε
-    obtain ⟨m, ha⟩ := Set.mem_iUnion.1 ha
-    refine ⟨m, fun n hn => ?_⟩
-    rw [Real.dist_eq, sub_zero, abs_of_nonneg (approxError_nonneg n f)]
-    calc A.approxError n f ≤ A.approxError m f := approxError_anti f hn
-      _ ≤ ‖f - a‖ := approxError_le_norm_sub ha f
-      _ < ε := by rwa [← dist_eq_norm]
+    Tendsto (A.approxError f) atTop (𝓝 0) ↔ f ∈ closure (⋃ n, A n) := by
+  have h := tendsto_atTop_iInf (approxError_anti (A := A) f)
+  rw [Metric.mem_closure_iff_infEDist_zero, Metric.infEDist_iUnion]
+  exact ⟨fun h0 => tendsto_nhds_unique h h0, fun h0 => h0 ▸ h⟩
 
 /-- Since the errors decrease, they tend to zero as soon as the dyadic errors `E_{2^k}` do. -/
 theorem tendsto_approxError_zero_of_pow {f : X}
-    (h : Tendsto (fun k => A.approxError (2 ^ k) f) atTop (𝓝 0)) :
-    Tendsto (A.approxError · f) atTop (𝓝 0) := by
-  refine Metric.tendsto_atTop.2 fun ε hε => ?_
-  obtain ⟨K, hK⟩ := (Metric.tendsto_atTop.1 h) ε hε
-  refine ⟨2 ^ K, fun n hn => ?_⟩
-  have hK' := hK K le_rfl
-  rw [Real.dist_eq, sub_zero, abs_of_nonneg (approxError_nonneg _ f)] at hK' ⊢
-  exact (approxError_anti f hn).trans_lt hK'
+    (h : Tendsto (fun k => A.approxError f (2 ^ k)) atTop (𝓝 0)) :
+    Tendsto (A.approxError f) atTop (𝓝 0) := by
+  rw [ENNReal.tendsto_atTop_zero_iff_le_of_antitone (approxError_anti f)]
+  intro ε hε
+  obtain ⟨N, hN⟩ := ENNReal.tendsto_atTop_zero.1 h ε hε
+  exact ⟨2 ^ N, hN N le_rfl⟩
 
 /-- **Functoriality of the error**: a bounded linear map that sends approximants to
 approximants satisfies `E^B_n(T f) ≤ ‖T‖ E^A_n(f)`. -/
-theorem approxError_map_le (T : X →L[ℝ] Y) (B : ApproximationScheme Y)
-    (hT : ∀ n, ∀ a ∈ A n, T a ∈ B n) (n : ℕ) (f : X) :
-    B.approxError n (T f) ≤ ‖T‖ * A.approxError n f := by
-  refine le_mul_approxError_of_forall_mem (norm_nonneg T) fun a ha => ?_
-  calc B.approxError n (T f) ≤ ‖T f - T a‖ := approxError_le_norm_sub (hT n a ha) _
-    _ = ‖T (f - a)‖ := by rw [map_sub]
-    _ ≤ ‖T‖ * ‖f - a‖ := T.le_opNorm _
+theorem approxError_map_le {B : ApproximationScheme Y} (T : X →L[ℝ] Y)
+    (hT : ∀ n, ∀ a ∈ A n, T a ∈ B n) (f : X) (n : ℕ) :
+    B.approxError (T f) n ≤ ‖T‖ₑ * A.approxError f n := by
+  refine le_mul_approxError_of_forall_mem enorm_ne_top fun a ha => ?_
+  calc B.approxError (T f) n ≤ ‖T f - T a‖ₑ := approxError_le_of_mem (hT n a ha) _
+    _ = ‖T (f - a)‖ₑ := by rw [map_sub]
+    _ ≤ ‖T‖ₑ * ‖f - a‖ₑ := T.le_opENorm _
+
+/-- **Bounds by a modulus pass from a dense set to all of `X`**: if `ω` is subadditive with
+`ω(f) ≤ C₀ ‖f‖` and `E_n(g) ≤ C ω(g)` for all `g` in a dense set, then `E_n(f) ≤ C ω(f)` for every
+`f`, since both sides move by at most a multiple of `‖f - g‖`
+(`ApproximationScheme.approxError_le_approxError_add_enorm`). -/
+theorem approxError_le_of_dense {D : Set X} (hD : Dense D)
+    {ω : X → ℝ≥0∞} (hadd : ∀ f g, ω (f + g) ≤ ω f + ω g) {C0 : ℝ≥0∞} (hC0 : C0 ≠ ∞)
+    (hle : ∀ f, ω f ≤ C0 * ‖f‖ₑ) {n : ℕ} {C : ℝ≥0∞} (hC : C ≠ ∞)
+    (h : ∀ g ∈ D, A.approxError g n ≤ C * ω g) (f : X) : A.approxError f n ≤ C * ω f := by
+  refine ENNReal.le_of_forall_pos_le_add fun ε hε _ => ?_
+  set K : ℝ≥0∞ := C * C0 + 1
+  have hK : K ≠ ∞ := ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top hC hC0, ENNReal.one_ne_top⟩
+  have hK0 : K ≠ 0 := by simp [K]
+  obtain ⟨g, hgD, hfg⟩ := EMetric.mem_closure_iff.1 (hD f) (ε / K)
+    (ENNReal.div_pos (by exact_mod_cast hε.ne') hK)
+  have hdist : ‖f - g‖ₑ ≤ ε / K := by rw [← edist_eq_enorm_sub]; exact hfg.le
+  have hmod : ω g ≤ ω f + C0 * ‖f - g‖ₑ := by
+    have h1 := hadd f (g - f)
+    rw [add_sub_cancel] at h1
+    refine h1.trans (add_le_add le_rfl ((hle _).trans ?_))
+    rw [← enorm_neg, neg_sub]
+  calc A.approxError f n
+      ≤ A.approxError g n + ‖f - g‖ₑ := approxError_le_approxError_add_enorm n f g
+    _ ≤ C * (ω f + C0 * ‖f - g‖ₑ) + ‖f - g‖ₑ := add_le_add ((h g hgD).trans (by gcongr)) le_rfl
+    _ = C * ω f + K * ‖f - g‖ₑ := by simp only [K]; ring
+    _ ≤ C * ω f + K * (ε / K) := by gcongr
+    _ = C * ω f + ε := by rw [ENNReal.mul_div_cancel hK0 hK]
 
 /-! ### The Lebesgue inequality -/
 

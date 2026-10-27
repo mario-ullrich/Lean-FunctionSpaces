@@ -48,7 +48,7 @@ variable (A : ApproximationScheme X)
 
 /-- The **dyadic sequence** `(2^(ks) E_{2^k}(f))_k`. -/
 noncomputable def approxSeqDyadic (s : ℝ) (f : X) (k : ℕ) : ℝ≥0∞ :=
-  dyadicWeight s k * A.approxSeq f (2 ^ k)
+  dyadicWeight s k * A.approxError f (2 ^ k)
 
 /-- The **dyadic quasi-norm** `‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}`, equivalent to Pietsch's
 quasi-norm for `s ≥ 0`. -/
@@ -71,11 +71,11 @@ theorem lqNorm_le_approxNormDyadic (f : X) :
 
 /-- Powers of the dyadic terms: `(2^(ks) E_{2^k}(f))^p = 2^(ksp) E_{2^k}(f)^p` for `p ≥ 0`. -/
 theorem approxSeqDyadic_rpow {p : ℝ} (hp : 0 ≤ p) (f : X) (k : ℕ) :
-    A.approxSeqDyadic s f k ^ p = dyadicWeight (s * p) k * A.approxSeq f (2 ^ k) ^ p := by
+    A.approxSeqDyadic s f k ^ p = dyadicWeight (s * p) k * A.approxError f (2 ^ k) ^ p := by
   rw [approxSeqDyadic, ENNReal.mul_rpow_of_nonneg _ _ hp, ENNReal.dyadicWeight_rpow]
 
 /-- The first dyadic term is `E_1(f)`. -/
-theorem approxSeqDyadic_zero (f : X) : A.approxSeqDyadic s f 0 = A.approxSeq f 1 := by
+theorem approxSeqDyadic_zero (f : X) : A.approxSeqDyadic s f 0 = A.approxError f 1 := by
   simp [approxSeqDyadic]
 
 /-- The dyadic quasi-norm of `0` is `0`. -/
@@ -87,7 +87,7 @@ theorem approxNormDyadic_zero (s : ℝ) (q : ℝ≥0∞) : A.approxNormDyadic s 
 /-- The dyadic terms are homogeneous: `2^(ks) E_{2^k}(c f) = |c| 2^(ks) E_{2^k}(f)`. -/
 theorem approxSeqDyadic_smul (c : ℝ) (f : X) :
     A.approxSeqDyadic s (c • f) = fun k => ‖c‖ₑ * A.approxSeqDyadic s f k := by
-  funext k; rw [approxSeqDyadic, approxSeqDyadic, approxSeq_smul, mul_left_comm]
+  funext k; rw [approxSeqDyadic, approxSeqDyadic, approxError_smul, mul_left_comm]
 
 /-- The dyadic quasi-norm is homogeneous: `‖c f‖^dyadic = |c| ‖f‖^dyadic`. -/
 theorem approxNormDyadic_smul (c : ℝ) (f : X) :
@@ -99,7 +99,7 @@ theorem approxNormDyadic_smul (c : ℝ) (f : X) :
 theorem approxNormDyadic_neg (f : X) : A.approxNormDyadic s q (-f) = A.approxNormDyadic s q f := by
   have h : A.approxSeqDyadic s (-f) = A.approxSeqDyadic s f := by
     funext k
-    rw [approxSeqDyadic, approxSeqDyadic, approxSeq_neg]
+    rw [approxSeqDyadic, approxSeqDyadic, approxError_neg]
   rw [approxNormDyadic, approxNormDyadic, h, enorm_neg]
 
 /-- `1 ≤ 2^s` for `s ≥ 0`. -/
@@ -122,31 +122,31 @@ theorem approxNorm_le_approxNormDyadic (hq : 1 ≤ q) (hs : 0 ≤ s) (f : X) :
   have h2s := one_le_two_rpow hs
   rcases eq_or_ne q ∞ with rfl | hq'
   · rw [approxNorm_top, approxNormDyadic, ENNReal.lqNorm_top]
-    calc ⨆ n, ((n + 1 : ℕ) : ℝ≥0∞) ^ s * A.approxSeq f n
-        ≤ A.approxSeq f 0 + 2 ^ s * ⨆ k, dyadicWeight s k * A.approxSeq f (2 ^ k) :=
-          ENNReal.iSup_pow_mul_le_dyadic (approxSeq_anti f) hs
+    calc ⨆ n, ((n + 1 : ℕ) : ℝ≥0∞) ^ s * A.approxError f n
+        ≤ A.approxError f 0 + 2 ^ s * ⨆ k, dyadicWeight s k * A.approxError f (2 ^ k) :=
+          ENNReal.iSup_pow_mul_le_dyadic (approxError_anti f) hs
       _ ≤ 2 ^ s * ‖f‖ₑ + 2 ^ s * ⨆ k, A.approxSeqDyadic s f k := by
-          rw [approxSeq_zero_left]
+          rw [approxError_zero_right]
           exact add_le_add (le_mul_of_one_le_left' h2s) le_rfl
       _ = 2 ^ s * (‖f‖ₑ + ⨆ k, A.approxSeqDyadic s f k) := by rw [mul_add]
   have hq0 : q ≠ 0 := (zero_lt_one.trans_le hq).ne'
   have hp1 : 1 ≤ q.toReal := ENNReal.one_le_toReal_of_one_le hq hq'
   have hp : 0 < q.toReal := zero_lt_one.trans_le hp1
   have hD : lqNorm q (A.approxSeqDyadic s f) ^ q.toReal =
-      ∑' k, dyadicWeight (s * q.toReal) k * A.approxSeq f (2 ^ k) ^ q.toReal := by
+      ∑' k, dyadicWeight (s * q.toReal) k * A.approxError f (2 ^ k) ^ q.toReal := by
     rw [ENNReal.lqNorm_rpow hq0 hq']
     simp_rw [approxSeqDyadic_rpow hp.le]
   set p := q.toReal
-  have hb : Antitone fun n => A.approxSeq f n ^ p := fun m n h =>
-    ENNReal.rpow_le_rpow (approxSeq_anti f h) hp.le
+  have hb : Antitone fun n => A.approxError f n ^ p := fun m n h =>
+    ENNReal.rpow_le_rpow (approxError_anti f h) hp.le
   set D := lqNorm q (A.approxSeqDyadic s f)
   rw [← ENNReal.rpow_le_rpow_iff hp, approxNorm_rpow hq0 hq']
-  calc ∑' n, ((n + 1 : ℕ) : ℝ≥0∞) ^ (s * p - 1) * A.approxSeq f n ^ p
-      ≤ A.approxSeq f 0 ^ p + 2 ^ max (s * p - 1) 0 *
-          ∑' k, dyadicWeight (s * p - 1 + 1) k * A.approxSeq f (2 ^ k) ^ p :=
+  calc ∑' n, ((n + 1 : ℕ) : ℝ≥0∞) ^ (s * p - 1) * A.approxError f n ^ p
+      ≤ A.approxError f 0 ^ p + 2 ^ max (s * p - 1) 0 *
+          ∑' k, dyadicWeight (s * p - 1 + 1) k * A.approxError f (2 ^ k) ^ p :=
         ENNReal.tsum_pow_mul_le_dyadic hb (s * p - 1)
     _ = ‖f‖ₑ ^ p + 2 ^ max (s * p - 1) 0 * D ^ p := by
-        rw [sub_add_cancel, hD, approxSeq_zero_left]
+        rw [sub_add_cancel, hD, approxError_zero_right]
     _ ≤ (2 ^ s) ^ p * ‖f‖ₑ ^ p + (2 ^ s) ^ p * D ^ p := by
         gcongr
         · exact le_mul_of_one_le_left' (ENNReal.one_le_rpow h2s hp |>.trans_eq' rfl)
@@ -161,30 +161,30 @@ theorem approxNorm_le_approxNormDyadic (hq : 1 ≤ q) (hs : 0 ≤ s) (f : X) :
 /-- The shifted dyadic sequence `(2^(ks) E_{2^(k+1)}(f))_k` is dominated by twice Pietsch's
 quasi-norm. -/
 theorem lqNorm_dyadic_succ_le (hq : 1 ≤ q) (hs : 0 ≤ s) (f : X) :
-    lqNorm q (fun k => dyadicWeight s k * A.approxSeq f (2 ^ (k + 1))) ≤
+    lqNorm q (fun k => dyadicWeight s k * A.approxError f (2 ^ (k + 1))) ≤
       2 * A.approxNorm s q f := by
   rcases eq_or_ne q ∞ with rfl | hq'
   · rw [ENNReal.lqNorm_top]
-    calc ⨆ k, dyadicWeight s k * A.approxSeq f (2 ^ (k + 1))
-        ≤ ⨆ k, dyadicWeight s k * A.approxSeq f (2 ^ k) := iSup_mono fun k => by
+    calc ⨆ k, dyadicWeight s k * A.approxError f (2 ^ (k + 1))
+        ≤ ⨆ k, dyadicWeight s k * A.approxError f (2 ^ k) := iSup_mono fun k => by
           gcongr
-          exact approxSeq_anti f (Nat.pow_le_pow_right two_pos (Nat.le_succ k))
-      _ ≤ ⨆ n, ((n + 1 : ℕ) : ℝ≥0∞) ^ s * A.approxSeq f n := ENNReal.dyadic_le_iSup_pow_mul hs
+          exact approxError_anti f (Nat.pow_le_pow_right two_pos (Nat.le_succ k))
+      _ ≤ ⨆ n, ((n + 1 : ℕ) : ℝ≥0∞) ^ s * A.approxError f n := ENNReal.dyadic_le_iSup_pow_mul hs
       _ = A.approxNorm s ∞ f := (approxNorm_top s f).symm
       _ ≤ 2 * A.approxNorm s ∞ f := le_mul_of_one_le_left' one_le_two
   have hq0 : q ≠ 0 := (zero_lt_one.trans_le hq).ne'
   have hp1 : 1 ≤ q.toReal := ENNReal.one_le_toReal_of_one_le hq hq'
   have hp : 0 < q.toReal := zero_lt_one.trans_le hp1
   set p := q.toReal
-  have hb : Antitone fun n => A.approxSeq f n ^ p := fun m n h =>
-    ENNReal.rpow_le_rpow (approxSeq_anti f h) hp.le
+  have hb : Antitone fun n => A.approxError f n ^ p := fun m n h =>
+    ENNReal.rpow_le_rpow (approxError_anti f h) hp.le
   rw [← ENNReal.rpow_le_rpow_iff hp, ENNReal.lqNorm_rpow hq0 hq']
-  calc ∑' k, (dyadicWeight s k * A.approxSeq f (2 ^ (k + 1))) ^ p
-      = ∑' k, dyadicWeight (s * p - 1 + 1) k * A.approxSeq f (2 ^ (k + 1)) ^ p := by
+  calc ∑' k, (dyadicWeight s k * A.approxError f (2 ^ (k + 1))) ^ p
+      = ∑' k, dyadicWeight (s * p - 1 + 1) k * A.approxError f (2 ^ (k + 1)) ^ p := by
         congr 1; funext k
         rw [ENNReal.mul_rpow_of_nonneg _ _ hp.le, ENNReal.dyadicWeight_rpow, sub_add_cancel]
     _ ≤ 2 ^ max (-(s * p - 1)) 0 * ∑' n, ((n + 1 : ℕ) : ℝ≥0∞) ^ (s * p - 1) *
-          A.approxSeq f n ^ p := ENNReal.dyadic_le_tsum_pow_mul hb _
+          A.approxError f n ^ p := ENNReal.dyadic_le_tsum_pow_mul hb _
     _ = 2 ^ max (-(s * p - 1)) 0 * A.approxNorm s q f ^ p := by rw [approxNorm_rpow hq0 hq']
     _ ≤ 2 ^ p * A.approxNorm s q f ^ p := by
         have hsp : 0 ≤ s * p := mul_nonneg hs hp.le
@@ -201,10 +201,10 @@ theorem approxNormDyadic_le_approxNorm (hq : 1 ≤ q) (hs : 0 ≤ s) (f : X) :
   have h2s := one_le_two_rpow hs
   have hfP : ‖f‖ₑ ≤ P := enorm_le_approxNorm hq f
   have hhead : A.approxSeqDyadic s f 0 ≤ P := by
-    rw [approxSeqDyadic_zero]; exact (approxSeq_le_enorm f 1).trans hfP
+    rw [approxSeqDyadic_zero]; exact (approxError_le_enorm f 1).trans hfP
   have hshift : lqNorm q (fun k => A.approxSeqDyadic s f (k + 1)) ≤ 2 ^ s * (2 * P) := by
     have : (fun k => A.approxSeqDyadic s f (k + 1)) =
-        fun k => 2 ^ s * (dyadicWeight s k * A.approxSeq f (2 ^ (k + 1))) := by
+        fun k => 2 ^ s * (dyadicWeight s k * A.approxError f (2 ^ (k + 1))) := by
       funext k; rw [approxSeqDyadic, ENNReal.dyadicWeight_succ, mul_assoc]
     rw [this, ENNReal.lqNorm_const_mul]
     gcongr
@@ -236,9 +236,9 @@ theorem memApprox_iff_lqNorm_dyadic_lt_top (hq : 1 ≤ q) (hs : 0 ≤ s) {f : X}
   exact and_iff_right enorm_lt_top
 
 /-- A bound on the dyadic quasi-norm gives the decay `E_{2^k}(f) ≤ 2^(-ks) ‖f‖^dyadic`. -/
-theorem approxSeq_pow_le (hq : 1 ≤ q) (f : X) (k : ℕ) :
-    A.approxSeq f (2 ^ k) ≤ dyadicWeight (-s) k * lqNorm q (A.approxSeqDyadic s f) := by
-  calc A.approxSeq f (2 ^ k) = dyadicWeight (-s) k * A.approxSeqDyadic s f k := by
+theorem approxError_pow_le (hq : 1 ≤ q) (f : X) (k : ℕ) :
+    A.approxError f (2 ^ k) ≤ dyadicWeight (-s) k * lqNorm q (A.approxSeqDyadic s f) := by
+  calc A.approxError f (2 ^ k) = dyadicWeight (-s) k * A.approxSeqDyadic s f k := by
         rw [approxSeqDyadic, ← mul_assoc, ENNReal.dyadicWeight_neg_mul_self, one_mul]
     _ ≤ _ := by gcongr; exact approxSeqDyadic_le_lqNorm hq f k
 
@@ -253,24 +253,21 @@ theorem approxNormDyadic_top_le_of_mem {k : ℕ} {a : X} (ha : a ∈ A (2 ^ k)) 
   · exact Finset.single_le_sum (f := A.approxSeqDyadic s a) (fun _ _ => zero_le)
       (Finset.mem_range.2 hj)
   · rw [approxSeqDyadic,
-      approxSeq_eq_zero_of_mem (mem_of_le (Nat.pow_le_pow_right two_pos hj) ha), mul_zero]
+      approxError_eq_zero_of_mem (mem_of_le (Nat.pow_le_pow_right two_pos hj) ha), mul_zero]
     exact zero_le
 
 /-- For `f ∈ A^s_q` with `s > 0`, the dyadic errors `E_{2^k}(f)` tend to zero. -/
 theorem tendsto_approxError_pow_zero_of_memApprox (hq : 1 ≤ q) (hs : 0 < s) {f : X}
-    (hf : A.MemApprox s q f) : Tendsto (fun k => A.approxError (2 ^ k) f) atTop (𝓝 0) := by
+    (hf : A.MemApprox s q f) : Tendsto (fun k => A.approxError f (2 ^ k)) atTop (𝓝 0) := by
   have hD := (memApprox_iff_lqNorm_dyadic_lt_top hq hs.le).1 hf
   set D := lqNorm q (A.approxSeqDyadic s f)
   have hgeom : Tendsto (fun k => D * ((2 : ℝ≥0∞) ^ (-s)) ^ k) atTop (𝓝 0) := by
     simpa using ENNReal.Tendsto.const_mul
       (ENNReal.tendsto_pow_atTop_nhds_zero_of_lt_one (ENNReal.two_rpow_neg_lt_one hs))
       (Or.inr hD.ne)
-  have hseq : Tendsto (fun k => A.approxSeq f (2 ^ k)) atTop (𝓝 0) :=
-    tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hgeom (fun _ => bot_le)
-      fun k => by
-        rw [mul_comm, ← ENNReal.dyadicWeight_eq_pow]; exact approxSeq_pow_le hq f k
-  have := (ENNReal.tendsto_toReal ENNReal.zero_ne_top).comp hseq
-  simpa [Function.comp_def, approxSeq, ENNReal.toReal_ofReal (approxError_nonneg _ _)] using this
+  exact tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hgeom (fun _ => bot_le)
+    fun k => by
+      rw [mul_comm, ← ENNReal.dyadicWeight_eq_pow]; exact approxError_pow_le hq f k
 
 /-- **`A^s_q` lies in the closure of `⋃ A n`** for `s > 0`. -/
 theorem mem_closure_iUnion_of_memApprox (hq : 1 ≤ q) (hs : 0 < s) {f : X}

@@ -78,8 +78,8 @@ theorem ofSpan_subset_nTerm (e : ℕ → X) (n : ℕ) : ofSpan e n ⊆ nTerm (Se
 
 /-- `n`-term approximation from `range e` is at least as good as linear approximation from
 the first `n` elements of `e`. -/
-theorem approxError_nTerm_le_ofSpan (e : ℕ → X) (n : ℕ) (f : X) :
-    (nTerm (Set.range e)).approxError n f ≤ (ofSpan e).approxError n f :=
-  approxError_anti_scheme (ofSpan_subset_nTerm e) n f
+theorem approxError_nTerm_le_ofSpan (e : ℕ → X) (f : X) (n : ℕ) :
+    (nTerm (Set.range e)).approxError f n ≤ (ofSpan e).approxError f n :=
+  approxError_anti_scheme (ofSpan_subset_nTerm e) f n
 
 end ApproximationScheme

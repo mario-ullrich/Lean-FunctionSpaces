@@ -18,7 +18,7 @@ partial sums of an unconditional or orthonormal basis (Fourier series in `L_2`, 
 `L_p`), conditional expectations onto dyadic σ-algebras (Haar).  For them:
 
 * `P n` is a near-best approximation: `E_n(f) ≤ ‖f - P n f‖ ≤ (1 + M) E_n(f)`
-  (`enorm_sub_le_approxSeq`), a **Lebesgue inequality**;
+  (`enorm_sub_le_approxError`), a **Lebesgue inequality**;
 * `A^s_q` is characterised by the **dyadic blocks** `Δ_k f = P (2^(k+1)) f - P (2^k) f`:
   for `s > 0`, and if `P n f → f` for every `f`,
 
@@ -69,36 +69,31 @@ theorem enorm_apply_le (n : ℕ) (f : X) : ‖PS.P n f‖ₑ ≤ ENNReal.ofReal 
   rw [← ofReal_norm]; exact ENNReal.ofReal_le_ofReal (PS.norm_le n)
 
 /-- `P n f` is an approximant, so `E_n(f) ≤ ‖f - P n f‖`. -/
-theorem approxSeq_le_enorm_sub (n : ℕ) (f : X) : A.approxSeq f n ≤ ‖f - PS.P n f‖ₑ :=
-  approxSeq_le_of_mem (PS.mem n f) f
+theorem approxError_le_enorm_sub (n : ℕ) (f : X) : A.approxError f n ≤ ‖f - PS.P n f‖ₑ :=
+  approxError_le_of_mem (PS.mem n f) f
 
 /-- **The Lebesgue inequality**: `‖f - P n f‖ ≤ (1 + M) E_n(f)`. -/
-theorem enorm_sub_le_approxSeq (n : ℕ) (f : X) :
-    ‖f - PS.P n f‖ₑ ≤ (1 + ENNReal.ofReal PS.bound) * A.approxSeq f n := by
-  have hreal : ‖f - PS.P n f‖ ≤ (1 + PS.bound) * A.approxError n f := by
-    refine le_mul_approxError_of_forall_mem (by linarith [PS.bound_nonneg]) fun a ha => ?_
-    exact norm_sub_apply_le_of_apply_eq
-      (fun x => ((PS.P n).le_opNorm x).trans (by gcongr; exact PS.norm_le n)) (PS.proj n a ha) f
-  rw [← ofReal_norm, approxSeq, ← ENNReal.ofReal_one,
-    ← ENNReal.ofReal_add zero_le_one PS.bound_nonneg,
-    ← ENNReal.ofReal_mul (by linarith [PS.bound_nonneg])]
-  exact ENNReal.ofReal_le_ofReal hreal
+theorem enorm_sub_le_approxError (n : ℕ) (f : X) :
+    ‖f - PS.P n f‖ₑ ≤ (1 + ENNReal.ofReal PS.bound) * A.approxError f n :=
+  le_mul_approxError_of_forall_mem
+    (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.ofReal_ne_top⟩)
+    fun a ha => enorm_sub_apply_le_of_apply_eq (PS.enorm_apply_le n) (PS.proj n a ha) f
 
 /-- The **dyadic block** `Δ_k f = P (2^(k+1)) f - P (2^k) f`. -/
 noncomputable def block (k : ℕ) (f : X) : X := PS.P (2 ^ (k + 1)) f - PS.P (2 ^ k) f
 
 /-- A block is controlled by the error: `‖Δ_k f‖ ≤ 2 (1 + M) E_{2^k}(f)`. -/
 theorem enorm_block_le (k : ℕ) (f : X) :
-    ‖PS.block k f‖ₑ ≤ 2 * (1 + ENNReal.ofReal PS.bound) * A.approxSeq f (2 ^ k) := by
+    ‖PS.block k f‖ₑ ≤ 2 * (1 + ENNReal.ofReal PS.bound) * A.approxError f (2 ^ k) := by
   calc ‖PS.block k f‖ₑ = ‖(f - PS.P (2 ^ k) f) - (f - PS.P (2 ^ (k + 1)) f)‖ₑ := by
         rw [block]; congr 1; abel
     _ ≤ ‖f - PS.P (2 ^ k) f‖ₑ + ‖f - PS.P (2 ^ (k + 1)) f‖ₑ := enorm_sub_le
-    _ ≤ (1 + ENNReal.ofReal PS.bound) * A.approxSeq f (2 ^ k) +
-          (1 + ENNReal.ofReal PS.bound) * A.approxSeq f (2 ^ k) := by
+    _ ≤ (1 + ENNReal.ofReal PS.bound) * A.approxError f (2 ^ k) +
+          (1 + ENNReal.ofReal PS.bound) * A.approxError f (2 ^ k) := by
         gcongr
-        · exact PS.enorm_sub_le_approxSeq _ f
-        · exact (PS.enorm_sub_le_approxSeq _ f).trans (by
-            gcongr; exact approxSeq_anti f (Nat.pow_le_pow_right two_pos (Nat.le_succ k)))
+        · exact PS.enorm_sub_le_approxError _ f
+        · exact (PS.enorm_sub_le_approxError _ f).trans (by
+            gcongr; exact approxError_anti f (Nat.pow_le_pow_right two_pos (Nat.le_succ k)))
     _ = _ := by ring
 
 /-- The **block quasi-norm** `‖P 1 f‖ + ‖(2^(ks) ‖Δ_k f‖)_k‖_{ℓ_q}`. -/
@@ -164,7 +159,7 @@ theorem approxNormDyadic_le_blockNorm (hq : 1 ≤ q) {f : X}
         ≤ lqNorm q (fun k => dyadicWeight s k * ∑' i, ‖PS.block (k + i) f‖ₑ) :=
           ENNReal.lqNorm_mono fun k => by
             rw [approxSeqDyadic]; gcongr
-            exact (PS.approxSeq_le_enorm_sub _ f).trans (PS.enorm_sub_le_tsum_block hf k)
+            exact (PS.approxError_le_enorm_sub _ f).trans (PS.enorm_sub_le_tsum_block hf k)
       _ ≤ Cs * L := ENNReal.hardy_tail_le hq s (fun m => ‖PS.block m f‖ₑ)
   have hsum : ∑' i, ‖PS.block i f‖ₑ ≤ Cs * L :=
     ENNReal.tsum_le_lqNorm_dyadicWeight hq s (‖PS.block · f‖ₑ)
@@ -187,15 +182,14 @@ theorem approxNormDyadic_le_blockNorm (hq : 1 ≤ q) {f : X}
 /-- If `⋃ A n` is dense, the projections converge: `P n f → f` for every `f`. -/
 theorem tendsto_of_dense (hd : closure (⋃ n, A n) = Set.univ) (f : X) :
     Tendsto (fun n => PS.P n f) atTop (𝓝 f) := by
-  have hE := (tendsto_approxError_zero_iff (A := A) f).2 (by rw [hd]; trivial)
-  have hE' : Tendsto (fun n => A.approxSeq f n) atTop (𝓝 0) := by
-    simpa [approxSeq] using (ENNReal.tendsto_ofReal hE)
-  have hbound : Tendsto (fun n => (1 + ENNReal.ofReal PS.bound) * A.approxSeq f n) atTop (𝓝 0) := by
+  have hE' := (tendsto_approxError_zero_iff (A := A) f).2 (by rw [hd]; trivial)
+  have hbound :
+      Tendsto (fun n => (1 + ENNReal.ofReal PS.bound) * A.approxError f n) atTop (𝓝 0) := by
     simpa using ENNReal.Tendsto.const_mul hE' (Or.inr (ENNReal.add_ne_top.2
       ⟨ENNReal.one_ne_top, ENNReal.ofReal_ne_top⟩))
   have h0 : Tendsto (fun n => ‖f - PS.P n f‖ₑ) atTop (𝓝 0) :=
     tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds hbound (fun _ => bot_le)
-      (PS.enorm_sub_le_approxSeq · f)
+      (PS.enorm_sub_le_approxError · f)
   rw [tendsto_iff_norm_sub_tendsto_zero]
   have := (ENNReal.tendsto_toReal ENNReal.zero_ne_top).comp h0
   simpa [Function.comp_def, norm_sub_rev] using this

@@ -27,10 +27,10 @@ other blocks instantiate the theory.
 
 * **The error of best approximation.** For every approximation scheme, `E₀(f) = ‖f‖`,
   `E_n(f)` decreases in `n`, `E_n(c f) = |c| E_n(f)`, `E_{m+n}(f + g) ≤ E_m(f) + E_n(g)`,
-  and `|E_n(f) - E_n(g)| ≤ ‖f - g‖`
-  (`ApproximationScheme.approxError_zero_left`, `.approxError_anti`, `.approxError_smul`,
-  `.approxError_add_le`, `.abs_approxError_sub_le`). The errors tend to zero exactly on the
-  closure of `⋃ A_n` (`ApproximationScheme.tendsto_approxError_zero_iff`).
+  and `E_n(f) ≤ E_n(g) + ‖f - g‖`
+  (`ApproximationScheme.approxError_zero_right`, `.approxError_anti`, `.approxError_smul`,
+  `.approxError_add_le`, `.approxError_le_approxError_add_enorm`). The errors tend to zero
+  exactly on the closure of `⋃ A_n` (`ApproximationScheme.tendsto_approxError_zero_iff`).
 * **The dyadic quasi-norm.** For `s ≥ 0` and `1 ≤ q ≤ ∞`,
   `‖f‖_{A^s_q} ≤ 2^s (‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}) ≤ 4 · 4^s ‖f‖_{A^s_q}`
   (`ApproximationScheme.approxNorm_le_approxNormDyadic`,

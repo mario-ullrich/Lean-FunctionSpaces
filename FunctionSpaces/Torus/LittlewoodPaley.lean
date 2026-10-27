@@ -30,7 +30,7 @@ multipliers at the lattice points:
   `|m| ≥ 2^(j+1)` (`Torus.lpBlock_mem_trigPolyLp`);
 * high blocks of trigonometric polynomials vanish, `Δ_j a = 0` for `a ∈ 𝒯_{2^i}` and
   `j ≥ i + #d + 1`, since `|m| ≤ #d deg m < 2^(i + #d)` (`Torus.lpBlock_eq_zero_of_mem`); hence
-  `‖Δ_j f‖_p ≤ 2 ‖Φ‖_1 E_{2^i}(f)_p` (`Torus.enorm_lpBlock_le_approxSeq`).
+  `‖Δ_j f‖_p ≤ 2 ‖Φ‖_1 E_{2^i}(f)_p` (`Torus.enorm_lpBlock_le_approxError`).
 -/
 
 @[expose] public section
@@ -116,28 +116,15 @@ theorem lpBlock_eq_zero_of_mem (hp : p ≠ ∞) {i j : ℕ} (hij : i + Fintype.c
 
 /-- **Blocks see only the error of trigonometric approximation**: for `j ≥ i + #d + 1`,
 `‖Δ_j f‖_p ≤ 2 ‖Φ‖_1 E_{2^i}(f)_p`. -/
-theorem enorm_lpBlock_le_approxSeq (hp : p ≠ ∞) {i j : ℕ} (hij : i + Fintype.card d + 1 ≤ j)
+theorem enorm_lpBlock_le_approxError (hp : p ≠ ∞) {i j : ℕ} (hij : i + Fintype.card d + 1 ≤ j)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ‖lpBlock hp j f‖ₑ ≤ 2 * eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume *
-      ((trigScheme d).toLp volume p).approxSeq f (2 ^ i) := by
-  set C := 2 * eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume
-  have hC : C ≠ ∞ := ENNReal.mul_ne_top (by norm_num) Rd.eLpNorm_lpKernel_ne_top
-  have hreal : ‖lpBlock hp j f‖ ≤
-      C.toReal * ((trigScheme d).toLp volume p).approxError (2 ^ i) f := by
-    refine ApproximationScheme.le_mul_approxError_of_forall_mem ENNReal.toReal_nonneg
-      fun a ha => ?_
-    have h0 : lpBlock hp j a = 0 := lpBlock_eq_zero_of_mem hp hij (mem_toLp_trigScheme_iff.1 ha)
-    have h1 : lpBlock hp j f = lpBlock hp j (f - a) := by rw [map_sub, h0, sub_zero]
-    calc ‖lpBlock hp j f‖ = ‖lpBlock hp j (f - a)‖ₑ.toReal := by rw [h1, toReal_enorm]
-      _ ≤ (C * ‖f - a‖ₑ).toReal := ENNReal.toReal_mono (ENNReal.mul_ne_top hC enorm_ne_top)
-            (enorm_lpBlock_le hp j (f - a))
-      _ = C.toReal * ‖f - a‖ := by rw [ENNReal.toReal_mul, toReal_enorm]
-  calc ‖lpBlock hp j f‖ₑ = ENNReal.ofReal ‖lpBlock hp j f‖ := (ofReal_norm _).symm
-    _ ≤ ENNReal.ofReal (C.toReal * ((trigScheme d).toLp volume p).approxError (2 ^ i) f) :=
-        ENNReal.ofReal_le_ofReal hreal
-    _ = C * ((trigScheme d).toLp volume p).approxSeq f (2 ^ i) := by
-        rw [ENNReal.ofReal_mul ENNReal.toReal_nonneg, ENNReal.ofReal_toReal hC]
-        rfl
+      ((trigScheme d).toLp volume p).approxError f (2 ^ i) := by
+  refine ApproximationScheme.le_mul_approxError_of_forall_mem
+    (ENNReal.mul_ne_top (by norm_num) Rd.eLpNorm_lpKernel_ne_top) fun a ha => ?_
+  have h0 : lpBlock hp j a = 0 := lpBlock_eq_zero_of_mem hp hij (mem_toLp_trigScheme_iff.1 ha)
+  rw [show lpBlock hp j f = lpBlock hp j (f - a) by rw [map_sub, h0, sub_zero]]
+  exact enorm_lpBlock_le hp j (f - a)
 
 /-! ### The Littlewood–Paley quasi-norm -/
 
@@ -261,10 +248,10 @@ theorem littlewoodPaleyNorm_le_approxNormDyadic_trigScheme (hp : p ≠ ∞) {s :
     simp only [a, ApproximationScheme.approxSeqDyadic]
     rw [add_comm n M, ENNReal.dyadicWeight_add_nat]
     calc w * dyadicWeight s n * ‖lpBlock hp (M + n) f‖ₑ
-        ≤ w * dyadicWeight s n * (C * A.approxSeq f (2 ^ n)) := by
+        ≤ w * dyadicWeight s n * (C * A.approxError f (2 ^ n)) := by
           gcongr
-          exact enorm_lpBlock_le_approxSeq hp (by omega) f
-      _ = w * C * (dyadicWeight s n * A.approxSeq f (2 ^ n)) := by ring
+          exact enorm_lpBlock_le_approxError hp (by omega) f
+      _ = w * C * (dyadicWeight s n * A.approxError f (2 ^ n)) := by ring
   calc littlewoodPaleyNorm hp s q f = lqNorm q a := rfl
     _ ≤ ∑ j ∈ Finset.range M, a j + lqNorm q (fun n => a (n + M)) :=
         ENNReal.lqNorm_le_sum_range_add_shift hq a M
