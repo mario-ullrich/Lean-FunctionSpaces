@@ -676,6 +676,22 @@ theorem ofReal_mul_log_two_rpow_ne_zero (hρ : 0 < ρ) (q : ℝ≥0∞) :
   (ENNReal.rpow_pos (pos_iff_ne_zero.2 (ofReal_mul_log_two_ne_zero hρ))
     ENNReal.ofReal_ne_top).ne'
 
+/-- **The discrete version of `Φ_{θ,q}` by the functional, solved for the sequence**: for an
+increasing `φ`, `θ ≥ 0` and `ρ > 0`,
+`‖(2^(-nρθ) φ(2^(nρ)))_{n ∈ ℤ}‖_{ℓ_q} ≤ ((ρ log 2)^(1/q) 2^(-ρθ))⁻¹ Φ_{θ,q}(φ)`
+(`lqNorm_discretePhiSeq_le_phiFunctional`). -/
+theorem lqNorm_discretePhiSeq_le_inv_mul_phiFunctional {φ : ℝ≥0∞ → ℝ≥0∞} (hφ : Monotone φ)
+    (hθ : 0 ≤ θ) (hρ : 0 < ρ) :
+    lqNorm q (discretePhiSeq θ ρ φ) ≤
+      (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) * 2 ^ (-(ρ * θ)))⁻¹ *
+        phiFunctional θ q φ := by
+  refine (ENNReal.mul_le_iff_le_inv (mul_ne_zero (ofReal_mul_log_two_rpow_ne_zero hρ q)
+      (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne')
+    (ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top)
+      (two_rpow_ne_top _))).1 ?_
+  rw [mul_assoc]
+  exact lqNorm_discretePhiSeq_le_phiFunctional hφ hθ hρ
+
 /-- The factor `((log 2)^(1/q) 2^(-θ))⁻¹` of `InterpCouple.discreteKMethodNorm_le_mul_kMethodNorm`
 is finite. -/
 theorem inv_log_two_rpow_mul_two_rpow_ne_top (θ : ℝ) (q : ℝ≥0∞) :
@@ -708,18 +724,11 @@ theorem interpNorm_le_kMethodNorm (hθ : 0 ≤ θ) (hρ : 0 < ρ) (hq : q ≠ 0)
     ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top
   have hD : discreteKMethodNorm ι θ ρ q f ≤ 2 ^ (ρ * θ) *
       (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal))⁻¹ * kMethodNorm ι θ q f := by
-    calc discreteKMethodNorm ι θ ρ q f
-        = 2 ^ (ρ * θ) * (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal))⁻¹ *
-            (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) *
-              (2 ^ (-(ρ * θ)) * discreteKMethodNorm ι θ ρ q f)) := by
-          rw [show ∀ a b c d : ℝ≥0∞, a * b⁻¹ * (b * (c * d)) = (b⁻¹ * b) * ((a * c) * d) by
-              intros; ring, ENNReal.inv_mul_cancel hc0 hct,
-            ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top, add_neg_cancel,
-            ENNReal.rpow_zero, one_mul, one_mul]
-      _ ≤ 2 ^ (ρ * θ) * (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal))⁻¹ *
-            kMethodNorm ι θ q f := by
-          gcongr
-          exact discreteKMethodNorm_le_kMethodNorm hθ hρ f
+    rw [discreteKMethodNorm_eq, kMethodNorm]
+    refine (lqNorm_discretePhiSeq_le_inv_mul_phiFunctional (monotone_kFunctional f) hθ
+      hρ).trans_eq ?_
+    rw [ENNReal.mul_inv (Or.inl hc0) (Or.inl hct), ENNReal.rpow_neg, inv_inv,
+      mul_comm _ (2 ^ (ρ * θ))]
   calc interpNorm ι θ ρ q f ≤ (1 + max 1 ‖ι‖ₑ) * discreteKMethodNorm ι θ ρ q f :=
         interpNorm_le_discreteKMethodNorm hq f
     _ ≤ (1 + max 1 ‖ι‖ₑ) * (2 ^ (ρ * θ) *

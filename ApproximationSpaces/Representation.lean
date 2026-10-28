@@ -136,10 +136,6 @@ theorem lqNorm_le_of_le_partialSums (hq : 1 ≤ q) {f : X} {u : ℕ → ℝ≥0�
         A.approxSeqDyadic s f k + dyadicWeight s k * tolerance f s k := fun k => by
     simp only [approxSeqDyadic, ← mul_assoc, ← ENNReal.dyadicWeight_add, mul_add]
     congr 2 <;> congr 1 <;> ring
-  have hL12 : lqNorm q (fun k => A.approxSeqDyadic s f k + dyadicWeight s k * tolerance f s k) ≤
-      lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ :=
-    (ENNReal.lqNorm_add_le hq _ _).trans
-      (add_le_add le_rfl (lqNorm_dyadicWeight_mul_tolerance_le hq f le_rfl))
   have hL3 : lqNorm q (fun k => B * dyadicWeight (-(r - s)) k) ≤
       B * (1 - (2 : ℝ≥0∞) ^ (-(r - s)))⁻¹ := by
     rw [ENNReal.lqNorm_const_mul]
@@ -153,8 +149,10 @@ theorem lqNorm_le_of_le_partialSums (hq : 1 ≤ q) {f : X} {u : ℕ → ℝ≥0�
     refine (ENNReal.hardy_sum_le hq (r - s) _).trans ?_
     simp_rw [hsplit]
     gcongr
-  exact (ENNReal.lqNorm_mono hu).trans ((ENNReal.lqNorm_add_le hq _ _).trans (add_le_add hL12
-    ((ENNReal.lqNorm_add_le hq _ _).trans (add_le_add hL3 hL4))))
+    exact lqNorm_approxSeqDyadic_add_tolerance_le hq f s
+  exact (ENNReal.lqNorm_mono hu).trans ((ENNReal.lqNorm_add_le hq _ _).trans
+    (add_le_add (lqNorm_approxSeqDyadic_add_tolerance_le hq f s)
+      ((ENNReal.lqNorm_add_le hq _ _).trans (add_le_add hL3 hL4))))
 
 /-- **Adding the norm**: if `L ≤ (D + 2 ‖f‖) + (B ‖f‖ c + K c (D + 2 ‖f‖))` with
 `D = ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}`, then `‖f‖ + L ≤ (3 + (B + 2 K) c) ‖f‖_{A^s_q}`, since

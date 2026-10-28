@@ -2311,7 +2311,7 @@ the homogeneity of the $\ell_2$ norm and Minkowski's inequality for finite sums
 \leanok
 \uses{lem:blocks-as-derivative-convolutions, def:sobolev-to-tl-const, thm:cz-family-derivative,
   thm:vector-valued-strong-type, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-nonnegative,
-  def:weak-line-derivative, lem:weak-derivative-basic}
+  lem:lp-norm-homogeneity, def:weak-line-derivative, lem:weak-derivative-basic}
 Let $n \geq 1$, $1 < p < \infty$, $m \in \N$ and $f \in L_p(V)$, and for every multi-index
 $\alpha$ let $g_\alpha \in L_p(V)$ be the weak derivative $\partial^{e_\alpha} f$ on $V$. Then
 \[
@@ -2329,7 +2329,7 @@ In particular, $f \in \TL{m}{p}{2}$, and every $f \in \Sob{m}{p}(V)$ lies in $\T
 \begin{proof}
 \leanok
 For the first bound, take the $L_p$ norm in \Cref{lem:blocks-as-derivative-convolutions}, use
-the homogeneity of the $L_p$ norm (\Cref{lem:lp-norm-nonnegative}) and Minkowski's inequality in
+the homogeneity of the $L_p$ norm (\Cref{lem:lp-norm-homogeneity}) and Minkowski's inequality in
 $L_p$, and bound each term by the strong type of the analysis operator
 (\Cref{thm:vector-valued-strong-type}) of the Calder\'on--Zygmund family $(\theta^\alpha_j)_j$
 with overlap $2$ and H\"ormander constant $4 H_{A^\alpha}$ (\Cref{thm:cz-family-derivative}).
@@ -2898,7 +2898,7 @@ which is finite for $n \geq 1$ and $p_0 < p_1 < \infty$.
 \lean{ENNReal.mul_ofReal_toReal_div_toReal, Rd.eLpNorm_rpow_lqNorm_blockFun_eq,
   Rd.eLpNorm_tsum_dyadicWeight_enorm_blockFun_le}
 \leanok
-\uses{lem:critical-pointwise-bound, def:critical-embedding-const, lem:lp-norm-nonnegative,
+\uses{lem:critical-pointwise-bound, def:critical-embedding-const, lem:lp-norm-homogeneity,
   thm:tl-besov-sandwich, def:triebel-lizorkin}
 Let $n \geq 1$, $1 \leq p_0 < p_1 < \infty$ and $s_0, s_1 \in \R$ with
 $s_0 - s_1 = n(1/p_0 - 1/p_1)$. For every $f \in L_{p_0}(V)$,
@@ -2911,7 +2911,7 @@ $s_0 - s_1 = n(1/p_0 - 1/p_1)$. For every $f \in L_{p_0}(V)$,
 \begin{proof}
 \leanok
 With $A = \|f\|^{\mathrm{LP}}_{s_0,\infty}$ and $T = \|f\|_{F^{s_0}_{p_0,\infty}} = \|G\|_{p_0}$,
-\Cref{lem:critical-pointwise-bound} and \Cref{lem:lp-norm-nonnegative} bound the left side by
+\Cref{lem:critical-pointwise-bound} and \Cref{lem:lp-norm-homogeneity} bound the left side by
 $c(n/p_0, \theta) (N_{p_0} A)^{1-\theta} \|G^\theta\|_{p_1}$, and
 $\|G^\theta\|_{p_1} = \|G\|_{p_1 \theta}^\theta = T^\theta$ since $p_1\theta = p_0$. Finally
 $A \leq T$ (\Cref{thm:tl-besov-sandwich} with $q = \infty$), so
@@ -3364,40 +3364,13 @@ for $f \in \Sob{m}{p}(V)$ the weak derivatives along all $e_\alpha$ lie in $L_p(
 
 \paragraph{The grid norm between two Besov quasi-norms.}
 
-\begin{lemma}[$\Phi$ has $L_1$ norm at least $1$]
-\label{lem:lp-kernel-norm-one}
-\lean{Rd.one_le_eLpNorm_lpKernel}
-\leanok
-\uses{def:lp-kernels, lem:lp-kernels-basic}
-$\|\Phi\|_1 \geq 1$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-$1 = |\int \Phi| \leq \int |\Phi| = \|\Phi\|_1$ (\Cref{lem:lp-kernels-basic}).
-\end{proof}
-
-\begin{lemma}[Two inequalities in {$[0, \infty]$}]
-\label{lem:sum-of-products-le-product-of-sums}
-\lean{ENNReal.mul_add_mul_le_add_mul_add, ENNReal.sum_mul_le_sum_mul_sum}
-\leanok
-For all $a, b, x, y \in [0, \infty]$, $a x + b y \leq (a + b)(x + y)$. For every finite set $s$
-and all families $(a_i)_{i \in s}$, $(b_i)_{i \in s}$ in $[0, \infty]$,
-$\sum_{i \in s} a_i b_i \leq \bigl(\sum_{i \in s} a_i\bigr)\bigl(\sum_{i \in s} b_i\bigr)$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-Expand $(a + b)(x + y) = a x + a y + b x + b y$. Each $b_i$ is at most $\sum_{j \in s} b_j$.
-\end{proof}
-
 \begin{definition}[The constants of the grid norm]
 \label{def:sobolev-grid-consts}
 \lean{Rd.approxSobolevGridConst, Rd.approxSobolevGridConst_ne_top,
   Rd.approxSobolevGridConst_ne_zero, Rd.sobolevGridApproxConst,
   Rd.sobolevGridApproxConst_ne_top, Rd.sobolevGridApproxConst_ne_zero}
 \leanok
-\uses{def:sobolev-to-tl-const, def:tl-to-sobolev-const, lem:lp-kernel-norm-one}
+\uses{def:sobolev-to-tl-const, def:tl-to-sobolev-const, lem:lp-kernels-basic}
 Let $1 < p < \infty$. For every $m \in \N$,
 \[
   K'_{V,p,m} = 2 (1 - 2^{-m})^{-1} \Bigl( \|\Phi\|_1 + 2^m \sum_\alpha K_{V,p,\alpha} \Bigr)
@@ -4164,7 +4137,7 @@ which is finite.
 \uses{lem:torus-blocks-as-derivative-convolutions, def:torus-sobolev-to-tl-const,
   thm:cz-family-derivative, lem:torus-far-mass-derivative-families,
   thm:torus-vector-valued-strong-type, prop:torus-tl-elementary, lem:lq-basic,
-  lem:lp-norm-nonnegative, thm:torus-sobolev-directions}
+  lem:lp-norm-nonnegative, lem:lp-norm-homogeneity, thm:torus-sobolev-directions}
 Let $\#d \geq 1$, $1 < p < \infty$, $m \in \N$ and
 $f \in L_p(\T^d)$, and for every multi-index $\alpha$ let $g_\alpha \in L_p(\T^d)$ be the weak
 derivative $\partial^{e_\alpha} f$. Then
@@ -4185,7 +4158,7 @@ $\TL{m}{p}{2}(\T^d)$.
 \leanok
 For the first bound, take the $L_p$ norm in
 \Cref{lem:torus-blocks-as-derivative-convolutions}, use the homogeneity of the $L_p$ norm
-(\Cref{lem:lp-norm-nonnegative}) and Minkowski's inequality in $L_p$, and bound each term by the
+(\Cref{lem:lp-norm-homogeneity}) and Minkowski's inequality in $L_p$, and bound each term by the
 strong type of the analysis operator on the torus (\Cref{thm:torus-vector-valued-strong-type}) of
 the Calder\'on--Zygmund family $(\theta^\alpha_j)_j$ with overlap $2$ and H\"ormander constant
 $4 H_{A^\alpha}$ (\Cref{thm:cz-family-derivative}) and far mass at most $2 T_{A^\alpha,0,1}$

@@ -542,27 +542,14 @@ theorem ppProj_of_mem (hp : p ≠ ∞) {r j : ℕ} {a : Lp ℂ p unitVol} (ha : 
 /-- **The projection scheme of dyadic piecewise polynomials** in `L_p[0, 1]`, `1 ≤ p < ∞`: the
 projection of complexity `n ≥ 1` is the one onto the piecewise polynomials of level
 `⌊log₂ n⌋`, and all are bounded by `r M²`. -/
-noncomputable def ppProjectionScheme (hp : p ≠ ∞) (r : ℕ) : (ppScheme p r).ProjectionScheme where
-  P n := if n = 0 then 0 else ppProj p hp r (Nat.log 2 n)
-  mem n f := by
-    split_ifs with hn
-    · rw [hn, zero_apply, mem_ppScheme_zero]
-    · exact (mem_ppScheme hn).2 (ppProj_mem hp r _ f)
-  proj n a ha := by
-    split_ifs with hn
-    · subst hn
-      rw [mem_ppScheme_zero.1 ha, zero_apply]
-    · exact ppProj_of_mem hp ((mem_ppScheme hn).1 ha)
-  bound := (ppProjConst r).toReal
-  norm_le n := by
-    split_ifs
-    · simp
-    · exact norm_ppProj_le hp r _
+noncomputable def ppProjectionScheme (hp : p ≠ ∞) (r : ℕ) : (ppScheme p r).ProjectionScheme :=
+  ApproximationScheme.ProjectionScheme.ofMonotone (ppSpace p r) (ppSpace_mono r) (ppProj p hp r)
+    (ppProj_mem hp r) (fun _ _ ha => ppProj_of_mem hp ha) (ppProjConst r).toReal
+    (norm_ppProj_le hp r)
 
 /-- The projection of complexity `2^k` is the one onto the piecewise polynomials of level `k`. -/
 theorem ppProjectionScheme_two_pow (hp : p ≠ ∞) (r k : ℕ) :
-    (ppProjectionScheme hp r).P (2 ^ k) = ppProj p hp r k := by
-  simp only [ppProjectionScheme, pow_ne_zero k two_ne_zero, ↓reduceIte,
-    Nat.log_pow Nat.one_lt_two]
+    (ppProjectionScheme hp r).P (2 ^ k) = ppProj p hp r k :=
+  ApproximationScheme.ProjectionScheme.ofMonotone_two_pow k
 
 end Interval

@@ -129,7 +129,7 @@ the class of a function (\Cref{def:conv}).
   Rd.MemTriebelLizorkin.mono_smoothness, Rd.MemTriebelLizorkin.add, Rd.MemTriebelLizorkin.smul,
   Rd.triebelLizorkinSpace, Rd.mem_triebelLizorkinSpace, Rd.triebelLizorkinNorm_zero_two_eq}
 \leanok
-\uses{def:triebel-lizorkin, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-nonnegative}
+\uses{def:triebel-lizorkin, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-homogeneity}
 For every $1 \leq p < \infty$, all $s \leq t$ in $\R$, all $1 \leq q \leq r \leq \infty$, all
 $f, g \in L_p$ and every $c \in \C$,
 \[
@@ -150,7 +150,7 @@ At almost every point the blocks of $f + g$ are the sums of the blocks of $f$ an
 (\Cref{lem:tl-pointwise-blocks}), so the triangle inequality in $\ell_q$
 (\Cref{lem:lq-basic}) and then in $L_p$ gives the first claim. The blocks of $c f$ are $c$ times
 those of $f$, and $|c|$ leaves the $\ell_q$ and the $L_p$ norm
-(\Cref{lem:lp-norm-nonnegative}). The monotonicity follows from
+(\Cref{lem:lp-norm-homogeneity}). The monotonicity follows from
 $\|\cdot\|_{\ell_r} \leq \|\cdot\|_{\ell_q}$ and $2^{js} \leq 2^{jt}$ at every point. For
 $s = 0$ the weights $2^{j \cdot 0}$ are $1$, for every $q$ and in particular for $q = 2$.
 \end{proof}
@@ -250,7 +250,7 @@ and $\TL{s}{p}{q}(\T^d)$ consists of the $f \in L_p(\T^d)$ with $\|f\|_{F^s_{p,q
   Torus.mem_triebelLizorkinSpace}
 \leanok
 \uses{def:torus-triebel-lizorkin, lem:torus-econv-young, lem:lp-kernels-basic, lem:lq-basic,
-  lem:lp-norm-nonnegative}
+  lem:lp-norm-homogeneity}
 For every $1 \leq p < \infty$, all $s \leq t$ in $\R$, all $1 \leq q \leq r \leq \infty$, all
 $f, g \in L_p(\T^d)$ and every $c \in \C$, for almost every $x \in \T^d$ and all $j \in \N$,
 \[
@@ -833,7 +833,8 @@ holds for all $s, L \in \R$, to $(m_i)_i$. The second claim is part (3) of
 \label{lem:maximal-bounds-mixed-norm}
 \lean{Rd.eLpNorm_le_of_le_lqNorm_maximal}
 \leanok
-\uses{thm:fefferman-stein, lem:lp-norm-nonnegative, lem:maximal-function-measurable}
+\uses{thm:fefferman-stein, lem:lp-norm-nonnegative, lem:lp-norm-homogeneity,
+  lem:maximal-function-measurable}
 Let $1 < p < \infty$, $1 < q \leq \infty$ and $C \in [0, \infty]$. For every almost everywhere
 measurable $F : V \to [0, \infty]$ and every family of almost everywhere measurable
 $h_i : V \to [0, \infty]$, $i \in \N$, with $F(x) \leq C \|(M h_i(x))_i\|_{\ell_q}$ for almost
@@ -1206,7 +1207,7 @@ gives $\|(\int u_j)_j\|_{\ell_q} \leq \|G\|_{L_p(\T^d)}$.
 \label{lem:torus-maximal-bounds-mixed-norm}
 \lean{Torus.eLpNorm_le_of_le_lqNorm_maximal_proj}
 \leanok
-\uses{thm:fefferman-stein-periodic, lem:period-box-measure, lem:lp-norm-nonnegative,
+\uses{thm:fefferman-stein-periodic, lem:period-box-measure, lem:lp-norm-homogeneity,
   lem:maximal-function-measurable}
 Let $1 < p < \infty$, $1 < q \leq \infty$ and $C \in [0, \infty]$. For every almost everywhere
 measurable $F : \T^d \to [0, \infty]$ and every family of almost everywhere measurable
@@ -1636,7 +1637,7 @@ everywhere.
   lem:almost-diagonal-pointwise, lem:maximal-bounds-mixed-norm, lem:reproducing-formula,
   lem:dual-kernel-moduli, lem:conv-op, cor:mixed-norm-sandwich, lem:lq-basic,
   thm:rd-atomic-synthesis, def:tl-local-means, def:ball-means-differences,
-  lem:lp-norm-nonnegative}
+  lem:lp-norm-homogeneity}
 Let $s \in \R$, $L \in \N$, $1 \leq p < \infty$ and $1 \leq q \leq \infty$, and let
 \[
   D^\Delta_{L,s} = 2 \|m\|_1 \sum_{j \leq r} 2^{js} + 2^{(r+1)s} C^\Delta .
@@ -2057,20 +2058,21 @@ draws the same conclusion for the Bessel potential spaces in their own norms. In
 $1 \leq p < \infty$, and $\Besov{s}{p}{q}$ is the approximation space of the band-limited scheme
 in $L_p = L_p(V)$.
 
-\begin{lemma}[The constants of the Besov sandwich are finite]
+\begin{lemma}[The upper constant of the Besov sandwich is finite]
 \label{lem:tl-sandwich-constants}
-\lean{Rd.eight_mul_dyadicWeight_mul_eLpNorm_lpKernel_ne_top,
-  ENNReal.two_mul_one_sub_two_rpow_neg_inv_ne_top}
+\lean{Rd.eight_mul_dyadicWeight_mul_eLpNorm_lpKernel_ne_top}
 \leanok
 \uses{thm:tl-besov-sandwich, lem:lp-kernels-basic}
-For every $s \in \R$, $8 \cdot 8^s \, \|\Phi\|_1 < \infty$, and for every $s > 0$,
-$2 (1 - 2^{-s})^{-1} < \infty$.
+For every $s \in \R$, $8 \cdot 8^s \, \|\Phi\|_1 < \infty$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-$\Phi$ is integrable (\Cref{lem:lp-kernels-basic}), and $2^{-s} < 1$ for $s > 0$.
+$\Phi$ is integrable (\Cref{lem:lp-kernels-basic}).
 \end{proof}
+
+The lower constant $2 (1 - 2^{-s})^{-1}$ is finite for every $s > 0$, since $2^{-s} < 1$
+(\Cref{def:lq-norm}).
 
 \begin{definition}[Triebel--Lizorkin couples]
 \label{def:tl-couples}
@@ -2091,7 +2093,7 @@ $(L_p, \TL{s_1}{p}{q_1})$ is $(\|\cdot\|_p, \|\cdot\|_{F^{s_1}_{p,q_1}})$.
   Rd.memKMethod_iff_memApprox_of_triebelLizorkin_equiv,
   Rd.memKMethod_iff_memApprox_of_triebelLizorkin_equiv_left}
 \leanok
-\uses{def:tl-couples, thm:tl-besov-sandwich, lem:tl-sandwich-constants,
+\uses{def:tl-couples, thm:tl-besov-sandwich, lem:tl-sandwich-constants, def:lq-norm,
   cor:approximation-space-sandwich, cor:comparable-couples, def:couple-k-method}
 Let $1 \leq p < \infty$, $0 < \eta < 1$, $q_0, q_1, q \in [1, \infty]$ and $f \in L_p$.
 \begin{enumerate}
@@ -2117,7 +2119,7 @@ Let $1 \leq p < \infty$, $0 < \eta < 1$, $q_0, q_1, q \in [1, \infty]$ and $f \i
 By \Cref{thm:tl-besov-sandwich}, for $s > 0$ the quasi-norm of $\TL{s}{p}{q_i}$ is at most
 $8 \cdot 8^s \|\Phi\|_1$ times the dyadic quasi-norm of $A^s_{\min(p,q_i)}$ and at least
 $(2 (1 - 2^{-s})^{-1})^{-1}$ times that of $A^s_{\max(p,q_i)}$, with finite constants
-(\Cref{lem:tl-sandwich-constants}). Parts (1) and (2) are the two parts of
+(\Cref{lem:tl-sandwich-constants} and \Cref{def:lq-norm}). Parts (1) and (2) are the two parts of
 \Cref{cor:approximation-space-sandwich}. Parts (3) and (4) follow, since equivalent couples have
 the same spaces (\Cref{cor:comparable-couples}).
 \end{proof}
@@ -3106,55 +3108,6 @@ enlarged exceptional set $\Omega^*$ is the union of the balls $\bar B(c_Q, 2 \rh
 H\"ormander condition act. This is the classical argument for singular integrals with values in a
 Hilbert space~\cite{BenedekCalderonPanzone}; see also Stein~\cite{SteinSingular} and
 Grafakos~\cite{Grafakos}.
-
-\begin{lemma}[Elementary facts]
-\label{lem:weak-type-elementary}
-\lean{ENNReal.half_lt_or_half_lt_of_lt_add,
-  MeasureTheory.memLp_two_of_lintegral_enorm_sq_ne_top}
-\leanok
-For all $t, a, b \in [0, \infty]$ with $t < a + b$, $t/2 < a$ or $t/2 < b$. For every measure
-space $(X, \mu)$, every normed group $E$ and every almost everywhere strongly measurable
-$f : X \to E$ with $\int \|f\|^2 \, d\mu < \infty$, $f \in L_2(\mu)$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-If $a \leq t/2$ and $b \leq t/2$, then $a + b \leq t$ (Mathlib's
-\texttt{lt\_\allowbreak or\_\allowbreak lt\_\allowbreak of\_\allowbreak add\_\allowbreak
-lt\_\allowbreak add}). The second statement is the definition of the $L_2$ norm.
-\end{proof}
-
-\begin{lemma}[Level sets of a split function]
-\label{lem:level-sets-split-function}
-\lean{MeasureTheory.measure_half_lt_le_lintegral_sq,
-  MeasureTheory.measure_half_lt_le_add_setLIntegral_compl,
-  MeasureTheory.measure_lt_le_of_ae_le_add}
-\leanok
-\uses{lem:weak-type-elementary}
-For every measure space $(X, \mu)$, every $t \in (0, \infty)$, all almost everywhere measurable
-$a, b : X \to [0, \infty]$ and every measurable set $S \subseteq X$,
-\[
-  \mu\{a > t/2\} \leq 4 t^{-2} \int a^2 \, d\mu , \qquad
-  \mu\{b > t/2\} \leq \mu(S) + 2 t^{-1} \int_{X \setminus S} b \, d\mu .
-\]
-For every $u : X \to [0, \infty]$ with $u \leq a + b$ almost everywhere and all
-$A, D, K, I \in [0, \infty]$ with
-\[
-  \int a^2 \, d\mu \leq A t I , \qquad \mu(S) \leq D t^{-1} I , \qquad
-  \int_{X \setminus S} b \, d\mu \leq K I ,
-\]
-$\mu\{u > t\} \leq (4A + D + 2K) \, t^{-1} I$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:chebyshev-power}
-The first bound is \Cref{lem:chebyshev-power} with $r = 2$ at height $t/2$, the second
-Chebyshev's inequality for $\mathbf 1_{X \setminus S} \, b$ at height $t/2$. By
-\Cref{lem:weak-type-elementary}, almost every point of $\{u > t\}$ lies in
-$\{a > t/2\} \cup \{b > t/2\}$, and the two bounds give
-$\mu\{u > t\} \leq 4 t^{-2} A t I + D t^{-1} I + 2 t^{-1} K I$.
-\end{proof}
 
 \begin{lemma}[The H\"ormander condition around a cube]
 \label{lem:hormander-around-cube}

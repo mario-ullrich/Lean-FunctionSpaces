@@ -6,6 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import ApproximationSpaces.Decompositions.Blocks
+public import ApproximationSpaces.Nikolskii
 public import Mathlib.LinearAlgebra.Basis.VectorSpace
 
 /-!
@@ -29,8 +30,9 @@ is linear (`TraceBound.extLinear`) and is bounded by the dyadic norm of `A^β_1`
 (`TraceBound.enorm_ext_le`).
 
 * **Transfer** (`TraceBound.approxNormDyadic_ext_le`): for `0 ≤ β < s` and `1 ≤ q ≤ ∞` the
-  trace maps `A^s_q(X)` into `B^{s-β}_q(Y)`.  The proof is that of the Nikolskii transfer
-  theorem (`ApproximationSpaces.Nikolskii`), which is the case `T = ι⁻¹` on the approximants.
+  trace maps `A^s_q(X)` into `B^{s-β}_q(Y)`.  The proof ends with the transfer estimate
+  (`approxNormDyadic_le_of_tail`) of the Nikolskii transfer theorem, which is the case
+  `T = ι⁻¹` on the approximants.
 * **Surjectivity** (`TraceBound.exists_ext_eq`): if every `b ∈ B (2^k)` is `T a` for some
   `a ∈ A (2^(k+γ))` with `‖a‖ ≤ C' 2^(-kβ) ‖b‖`, then every `g ∈ B^s_q(Y)`, `s > 0`, is the
   trace of some `f ∈ A^{s+β}_q(X)` with `‖f‖ ≲ ‖g‖`.  The proof lifts the blocks of the block
@@ -425,34 +427,12 @@ theorem enorm_ext_le [CompleteSpace Y] (hβ : 0 ≤ β) {f : X} (hf : A.MemAppro
     ‖TB.ext f‖ₑ ≤ (3 * TB.C + 3 * traceConst TB.C β) * A.approxNormDyadic β 1 f := by
   rcases eq_or_ne f 0 with rfl | hf0
   · rw [TB.ext_zero hβ, enorm_zero]; exact bot_le
-  set t := tolerance f β
   obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 β)
-  set L := lqNorm 1 (A.approxSeqDyadic β f)
-  have hL : L < ∞ := (memApprox_iff_lqNorm_dyadic_lt_top le_rfl hβ).1 hf
-  have hsplit : ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) ≤ L + 2 * ‖f‖ₑ := by
-    simp_rw [mul_add]
-    rw [ENNReal.tsum_add, ← ENNReal.lqNorm_one]
-    exact add_le_add le_rfl (tsum_dyadicWeight_mul_tolerance_le f le_rfl)
-  have hsum : ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) ≠ ∞ :=
-    ne_top_of_le_ne_top (ENNReal.add_ne_top.2 ⟨hL.ne, ENNReal.mul_ne_top (by norm_num)
-      enorm_ne_top⟩) hsplit
-  refine (TB.enorm_ext_le_of_dyadicApprox hβ D (tolerance_anti f hβ) hsum).trans ?_
-  rw [tolerance_zero]
-  calc TB.C * (2 * ‖f‖ₑ + ‖f‖ₑ) +
-        traceConst TB.C β * ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k)
-      ≤ TB.C * (3 * (‖f‖ₑ + L)) + traceConst TB.C β * (3 * (‖f‖ₑ + L)) := by
-        gcongr
-        · calc 2 * ‖f‖ₑ + ‖f‖ₑ = 3 * ‖f‖ₑ := by ring
-            _ ≤ 3 * (‖f‖ₑ + L) := by gcongr; exact le_self_add
-        · calc _ ≤ L + 2 * ‖f‖ₑ := hsplit
-            _ ≤ 3 * (‖f‖ₑ + L) := by
-                calc L + 2 * ‖f‖ₑ ≤ (‖f‖ₑ + L) + 2 * (‖f‖ₑ + L) := by
-                      gcongr
-                      · exact le_add_self
-                      · exact le_self_add
-                  _ = 3 * (‖f‖ₑ + L) := by ring
-    _ = (3 * TB.C + 3 * traceConst TB.C β) * A.approxNormDyadic β 1 f := by
-        rw [approxNormDyadic]; ring
+  have h := TB.enorm_ext_le_of_dyadicApprox hβ D (tolerance_anti f hβ)
+    (tsum_dyadicWeight_mul_add_tolerance_ne_top le_rfl
+      ((memApprox_iff_lqNorm_dyadic_lt_top le_rfl hβ).1 hf).ne)
+  rw [tolerance_zero] at h
+  exact h.trans (mul_add_mul_tsum_tolerance_le _ _ f β)
 
 /-- **The trace transfer theorem**: for `0 ≤ β < s` and `1 ≤ q ≤ ∞` the trace maps `A^s_q(X)`
 into `B^{s-β}_q(Y)`, with `‖ext f‖_{B^{s-β}_q} ≤ K ‖f‖_{A^s_q}` in the dyadic quasi-norms,
@@ -463,75 +443,15 @@ theorem approxNormDyadic_ext_le [CompleteSpace Y] (hβ : 0 ≤ β) {s : ℝ} (h�
       traceTransferConst TB.C β s * A.approxNormDyadic s q f := by
   rcases eq_or_ne f 0 with rfl | hf0
   · rw [TB.ext_zero hβ, approxNormDyadic_zero]; exact bot_le
-  have hs : 0 ≤ s := hβ.trans hβs.le
-  set t := tolerance f s
   obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s)
-  set N := A.approxNormDyadic s q f
-  set Cs := (1 - (2 : ℝ≥0∞) ^ (-(s - β)))⁻¹
-  set K := traceConst TB.C β
-  set g : ℕ → ℝ≥0∞ := fun m => dyadicWeight β m * (A.approxError f (2 ^ m) + t m)
-  have hfN : ‖f‖ₑ ≤ N := enorm_le_approxNormDyadic f
-  have hL : lqNorm 1 (A.approxSeqDyadic β f) ≤ Cs * N :=
-    (lqNorm_le_approxNormDyadic f).trans (approxNormDyadic_le_of_lt hq le_rfl f)
-  have hsplit : ∑' k, g k ≤ lqNorm 1 (A.approxSeqDyadic β f) + 2 * ‖f‖ₑ := by
-    simp_rw [g, mul_add]
-    rw [ENNReal.tsum_add, ← ENNReal.lqNorm_one]
-    exact add_le_add le_rfl (tsum_dyadicWeight_mul_tolerance_le f hβs.le)
-  have hsum : ∑' k, g k ≠ ∞ :=
-    ne_top_of_le_ne_top (ENNReal.add_ne_top.2 ⟨(hf.lqNorm_one_lt_top hq hβ hβs).ne,
-      ENNReal.mul_ne_top (by norm_num) enorm_ne_top⟩) hsplit
-  have ht := tolerance_anti f hs
-  have herr : ∀ k, B.approxSeqDyadic (s - β) (TB.ext f) k ≤
-      K * (dyadicWeight (s - β) k * ∑' i, g (k + i)) := fun k => by
-    calc B.approxSeqDyadic (s - β) (TB.ext f) k
-        = dyadicWeight (s - β) k * B.approxError (TB.ext f) (2 ^ k) := rfl
-      _ ≤ dyadicWeight (s - β) k * ‖TB.ext f - TB.T (D.a k)‖ₑ := by
-          gcongr; exact approxError_le_of_mem (TB.mapsTo _ _ (D.mem k)) _
-      _ ≤ dyadicWeight (s - β) k * (K * ∑' i, g (k + i)) := by
-          gcongr
-          rw [← edist_eq_enorm_sub, edist_comm]
-          exact TB.edist_apply_ext_le hβ D ht hsum k
-      _ = K * (dyadicWeight (s - β) k * ∑' i, g (k + i)) := by ring
-  have hg : ∀ k, dyadicWeight (s - β) k * g k =
-      A.approxSeqDyadic s f k + dyadicWeight s k * t k := fun k => by
-    simp only [g, approxSeqDyadic, ← mul_assoc, ← ENNReal.dyadicWeight_add, sub_add_cancel,
-      mul_add]
-  have hlq : lqNorm q (B.approxSeqDyadic (s - β) (TB.ext f)) ≤ K * (Cs * (2 * N)) := by
-    calc lqNorm q (B.approxSeqDyadic (s - β) (TB.ext f))
-        ≤ lqNorm q (fun k => K * (dyadicWeight (s - β) k * ∑' i, g (k + i))) :=
-          ENNReal.lqNorm_mono herr
-      _ = K * lqNorm q (fun k => dyadicWeight (s - β) k * ∑' i, g (k + i)) :=
-          ENNReal.lqNorm_const_mul _ _
-      _ ≤ K * (Cs * lqNorm q (fun k => dyadicWeight (s - β) k * g k)) := by
-          gcongr; exact ENNReal.hardy_tail_le hq (s - β) g
-      _ ≤ K * (Cs * (2 * N)) := by
-          gcongr
-          simp_rw [hg]
-          calc lqNorm q (fun k => A.approxSeqDyadic s f k + dyadicWeight s k * t k)
-              ≤ lqNorm q (A.approxSeqDyadic s f) + lqNorm q (fun k => dyadicWeight s k * t k) :=
-                ENNReal.lqNorm_add_le hq _ _
-            _ ≤ lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ := by
-                gcongr; exact lqNorm_dyadicWeight_mul_tolerance_le hq f le_rfl
-            _ ≤ 2 * N := by
-                calc lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ
-                    ≤ 2 * lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ := by
-                      gcongr; exact le_mul_of_one_le_left' one_le_two
-                  _ = 2 * N := by
-                      rw [show N = ‖f‖ₑ + lqNorm q (A.approxSeqDyadic s f) from rfl]; ring
-  have hnorm : ‖TB.ext f‖ₑ ≤ (3 * TB.C + K * Cs + 2 * K) * N := by
-    calc ‖TB.ext f‖ₑ ≤ TB.C * (2 * ‖f‖ₑ + t 0) + K * ∑' k, g k :=
-          TB.enorm_ext_le_of_dyadicApprox hβ D ht hsum
-      _ ≤ TB.C * (3 * N) + K * (Cs * N + 2 * N) := by
-          rw [show t 0 = ‖f‖ₑ from tolerance_zero f s]
-          gcongr
-          · calc 2 * ‖f‖ₑ + ‖f‖ₑ = 3 * ‖f‖ₑ := by ring
-              _ ≤ 3 * N := by gcongr
-          · exact hsplit.trans (add_le_add hL (by gcongr))
-      _ = (3 * TB.C + K * Cs + 2 * K) * N := by ring
-  calc B.approxNormDyadic (s - β) q (TB.ext f)
-      = ‖TB.ext f‖ₑ + lqNorm q (B.approxSeqDyadic (s - β) (TB.ext f)) := rfl
-    _ ≤ (3 * TB.C + K * Cs + 2 * K) * N + K * (Cs * (2 * N)) := add_le_add hnorm hlq
-    _ = traceTransferConst TB.C β s * N := by simp only [traceTransferConst, K, Cs]; ring
+  have ht := tolerance_anti f (hβ.trans hβs.le)
+  have hsum := tsum_dyadicWeight_mul_add_tolerance_ne_top hβs.le (hf.lqNorm_one_lt_top hq hβ hβs).ne
+  have hy := TB.enorm_ext_le_of_dyadicApprox hβ D ht hsum
+  rw [tolerance_zero] at hy
+  refine approxNormDyadic_le_of_tail hβs.le hq f hy fun k => ?_
+  refine (approxError_le_of_mem (TB.mapsTo _ _ (D.mem k)) _).trans ?_
+  rw [← edist_eq_enorm_sub, edist_comm]
+  exact TB.edist_apply_ext_le hβ D ht hsum k
 
 /-- **The trace transfer theorem**, membership form: `f ∈ A^s_q(X)` gives
 `ext f ∈ B^{s-β}_q(Y)` for `0 ≤ β < s`. -/
@@ -562,12 +482,8 @@ theorem ext_eq_of_hasSum_lift [CompleteSpace Y] (hβ : 0 ≤ β) {γ : ℕ} {C' 
     (ENNReal.dyadicWeight_le_of_le (by linarith) j).trans_eq (ENNReal.dyadicWeight_zero_left j)
   have hG : HasSum (shiftSeq γ a) f := hasSum_shiftSeq hfa
   have htailG : ∀ K, ‖f - ∑ i ∈ range (K + γ), shiftSeq γ a i‖ₑ ≤ ∑' m, ‖a (m + K)‖ₑ :=
-    fun K => by
-      rw [← hG.tsum_eq, ← ((summable_nat_add_iff (K + γ)).2 hG.summable).sum_add_tsum_nat_add',
-        add_sub_cancel_left]
-      calc ‖∑' m, shiftSeq γ a (m + (K + γ))‖ₑ ≤ ∑' m, ‖shiftSeq γ a (m + (K + γ))‖ₑ :=
-            enorm_tsum_le_tsum_enorm
-        _ = ∑' m, ‖a (m + K)‖ₑ := by congr 1; funext m; rw [← add_assoc, shiftSeq_add]
+    fun K => (hG.enorm_sub_sum_range_le (K + γ)).trans_eq (by
+      congr 1; funext m; rw [← add_assoc, shiftSeq_add])
   have hdecay : ∀ K, dyadicWeight β K * ‖f - ∑ i ∈ range (K + γ), shiftSeq γ a i‖ₑ ≤
       C' * ∑' m, ‖b (m + K)‖ₑ := fun K => by
     calc dyadicWeight β K * ‖f - ∑ i ∈ range (K + γ), shiftSeq γ a i‖ₑ
@@ -631,7 +547,7 @@ theorem exists_ext_eq [CompleteSpace X] [CompleteSpace Y] (hβ : 0 ≤ β) {γ :
       _ = C' * ‖b j‖ₑ := by rw [mul_one]
   have ha_fin : ∑' j, ‖a j‖ₑ ≠ ∞ := ne_top_of_le_ne_top (ENNReal.mul_ne_top hC' hb_fin)
     ((ENNReal.tsum_le_tsum hale').trans_eq ENNReal.tsum_mul_left)
-  have ha_summ : Summable a := Summable.of_norm (by simpa using ENNReal.summable_toReal ha_fin)
+  have ha_summ : Summable a := Summable.of_enorm ha_fin
   set f := ∑' j, a j
   have hfa : HasSum a f := ha_summ.hasSum
   -- the norm of `f`, through the lifted blocks placed at the levels `j + γ`

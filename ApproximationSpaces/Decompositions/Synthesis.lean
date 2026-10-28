@@ -98,9 +98,7 @@ theorem approxNormDyadic_le_of_hasSum_decay (hA : A.IsLinear) (hq : 1 ≤ q) {σ
   have hq0 : q ≠ 0 := (zero_lt_one.trans_le hq).ne'
   -- the tail of the series
   have htail : ∀ k, ‖f - ∑ j ∈ range (k + 1), g j‖ₑ ≤ ∑' i, ε (k + i) := fun k => by
-    rw [← hf.tsum_eq, ← ((summable_nat_add_iff (k + 1)).2 hf.summable).sum_add_tsum_nat_add',
-      add_sub_cancel_left]
-    calc ‖∑' i, g (i + (k + 1))‖ₑ ≤ ∑' i, ‖g (i + (k + 1))‖ₑ := enorm_tsum_le_tsum_enorm
+    calc _ ≤ ∑' i, ‖g (i + (k + 1))‖ₑ := hf.enorm_sub_sum_range_le (k + 1)
       _ ≤ ∑' i, ε (i + (k + 1)) := ENNReal.tsum_le_tsum fun i => hsize _
       _ = ∑' i, ε (k + (i + 1)) := by congr 1; funext i; congr 1; omega
       _ ≤ ∑' i, ε (k + i) :=

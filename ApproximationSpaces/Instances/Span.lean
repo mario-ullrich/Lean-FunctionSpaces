@@ -30,19 +30,9 @@ variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 
 /-- The scheme of **linear approximation from the first `n` elements** of a sequence `e`:
 `A n = span {e i : i < n}`. -/
-def ofSpan (e : ℕ → X) : ApproximationScheme X where
-  sets n := (Submodule.span ℝ (e '' Set.Iio n) : Set X)
-  sets_zero := by simp
-  mono _ _ h := SetLike.coe_subset_coe.2
-    (Submodule.span_mono (Set.image_mono (Set.Iio_subset_Iio h)))
-  smul_mem c _ _ ha := Submodule.smul_mem _ c ha
-  add_subset m n := by
-    rintro _ ⟨a, ha, b, hb, rfl⟩
-    have hm : Submodule.span ℝ (e '' Set.Iio m) ≤ Submodule.span ℝ (e '' Set.Iio (m + n)) :=
-      Submodule.span_mono (Set.image_mono (Set.Iio_subset_Iio (Nat.le_add_right m n)))
-    have hn : Submodule.span ℝ (e '' Set.Iio n) ≤ Submodule.span ℝ (e '' Set.Iio (m + n)) :=
-      Submodule.span_mono (Set.image_mono (Set.Iio_subset_Iio (Nat.le_add_left n m)))
-    exact Submodule.add_mem _ (hm ha) (hn hb)
+def ofSpan (e : ℕ → X) : ApproximationScheme X :=
+  ofSubmodules (fun n => Submodule.span ℝ (e '' Set.Iio n)) (by simp)
+    fun _ _ h => Submodule.span_mono (Set.image_mono (Set.Iio_subset_Iio h))
 
 variable (e : ℕ → X)
 

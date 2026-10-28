@@ -26,12 +26,27 @@ block into localised atoms with coefficients; wavelet decompositions expand it i
   Hardy's inequality for tails gives the bound on `‖f‖_{A^s_q}`.
 * Conversely, the differences of near-best approximants form a decomposition
   (`g_{k+2} = a_{k+1} - a_k ∈ A (2^(k+2))`), whose norms are controlled by the errors.
+* For concrete blocks such as Littlewood–Paley blocks, a finite weighted `ℓ_q` norm makes the
+  series converge absolutely (`HasSum.of_tendsto_of_lqNorm_dyadicWeight_lt_top`), and blocks
+  bounded by the errors have weighted `ℓ_q` norm at most a multiple of `‖f‖_{A^s_q}`
+  (`lqNorm_dyadicWeight_mul_enorm_le_approxNormDyadic`).
 -/
 
 @[expose] public section
 
 open Filter Topology Finset
 open scoped ENNReal
+
+/-- **A weighted `ℓ_q` bound gives the sum**: for `s > 0` and `1 ≤ q ≤ ∞`, a sequence `b_j` in a
+complete normed group with `‖(2^(js) ‖b_j‖)_j‖_{ℓ_q} < ∞` is absolutely summable
+(`ENNReal.tsum_le_lqNorm_dyadicWeight`), so its sum is the limit `f` of its partial sums. -/
+theorem HasSum.of_tendsto_of_lqNorm_dyadicWeight_lt_top {E : Type*} [NormedAddCommGroup E]
+    [CompleteSpace E] {s : ℝ} {q : ℝ≥0∞} (hs : 0 < s) (hq : 1 ≤ q) {b : ℕ → E} {f : E}
+    (hb : Tendsto (fun n => ∑ j ∈ range n, b j) atTop (𝓝 f))
+    (hL : ENNReal.lqNorm q (fun j => ENNReal.dyadicWeight s j * ‖b j‖ₑ) < ∞) : HasSum b f :=
+  (Summable.of_enorm (ne_top_of_le_ne_top
+    (ENNReal.mul_ne_top (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs) hL.ne)
+    (ENNReal.tsum_le_lqNorm_dyadicWeight hq s _))).hasSum_iff_tendsto_nat.2 hb
 
 namespace ApproximationScheme
 
@@ -72,11 +87,8 @@ theorem approxNormDyadic_le_of_hasSum (hq : 1 ≤ q) {f : X} {g : ℕ → X}
       2 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * lqNorm q (fun k => dyadicWeight s k * ‖g k‖ₑ) := by
   set Cs := (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹
   set L := lqNorm q (fun k => dyadicWeight s k * ‖g k‖ₑ)
-  have htail : ∀ k, ‖f - ∑ j ∈ range k, g j‖ₑ ≤ ∑' i, ‖g (k + i)‖ₑ := fun k => by
-    rw [← hf.tsum_eq, ← ((summable_nat_add_iff k).2 hf.summable).sum_add_tsum_nat_add',
-      add_sub_cancel_left]
-    calc ‖∑' i, g (i + k)‖ₑ ≤ ∑' i, ‖g (i + k)‖ₑ := enorm_tsum_le_tsum_enorm
-      _ = ∑' i, ‖g (k + i)‖ₑ := by simp_rw [add_comm]
+  have htail : ∀ k, ‖f - ∑ j ∈ range k, g j‖ₑ ≤ ∑' i, ‖g (k + i)‖ₑ := fun k =>
+    (hf.enorm_sub_sum_range_le k).trans_eq (by simp_rw [add_comm])
   have hD : lqNorm q (A.approxSeqDyadic s f) ≤ Cs * L := by
     calc lqNorm q (A.approxSeqDyadic s f)
         ≤ lqNorm q (fun k => dyadicWeight s k * ∑' i, ‖g (k + i)‖ₑ) :=
@@ -161,8 +173,7 @@ theorem DyadicApprox.hasSum_blocks [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ q)
     (hf : A.MemApprox s q f) {t : ℕ → ℝ≥0∞} (D : A.DyadicApprox f t) (ht : Antitone t)
     (htend : Tendsto t atTop (𝓝 0)) (htsum : ∑' k, t k ≤ 2 * ‖f‖ₑ) :
     HasSum D.blocks f := by
-  have hsum : Summable D.blocks := Summable.of_norm (by
-    simpa using ENNReal.summable_toReal (D.tsum_enorm_blocks_ne_top hs hq hf ht htsum))
+  have hsum : Summable D.blocks := Summable.of_enorm (D.tsum_enorm_blocks_ne_top hs hq hf ht htsum)
   have he := tendsto_approxError_pow_zero_of_memApprox hq hs hf
   have h2 : Tendsto (fun K => ∑ j ∈ range (K + 2), D.blocks j) atTop (𝓝 (∑' k, D.blocks k)) :=
     hsum.hasSum.tendsto_sum_nat.comp (tendsto_add_atTop_nat 2)
@@ -223,33 +234,6 @@ theorem DyadicApprox.blockDecompNorm_le [CompleteSpace X] (hs : 0 < s) (hq : 1 �
   (ApproximationScheme.blockDecompNorm_le D.blocks_mem
     (D.hasSum_blocks hs hq hf ht htend htsum)).trans (D.lqNorm_blocks_le hq ht ht0 htq)
 
-/-- **The approximation norm controls the block decomposition quasi-norm**: in a Banach space
-and for `s > 0`, `inf ‖(2^(ks) ‖g_k‖)_k‖_q ≤ (3·2^s + 4·4^s) ‖f‖^dyadic`. -/
-theorem blockDecompNorm_le_approxNormDyadic [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ q) (f : X) :
-    A.blockDecompNorm s q f ≤ (3 * 2 ^ s + 4 * dyadicWeight s 2) * A.approxNormDyadic s q f := by
-  by_cases hf : A.MemApprox s q f
-  swap
-  · rw [memApprox_iff_approxNormDyadic_lt_top hq hs.le, not_lt, top_le_iff] at hf
-    rw [hf, ENNReal.mul_top (by positivity)]; exact le_top
-  rcases eq_or_ne f 0 with rfl | hf0
-  · refine (blockDecompNorm_le (g := fun _ => 0) (fun k => A.zero_mem _) hasSum_zero).trans ?_
-    simp
-  obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 s)
-  have h := D.blockDecompNorm_le hs hq hf (tolerance_anti f hs.le) (tolerance_zero f s).le
-    (tendsto_tolerance f (by linarith)) (tsum_tolerance_le f hs.le)
-    (lqNorm_dyadicWeight_mul_tolerance_le hq f le_rfl)
-  refine h.trans ?_
-  have hfN : ‖f‖ₑ ≤ A.approxNormDyadic s q f := enorm_le_approxNormDyadic f
-  have hDN : lqNorm q (A.approxSeqDyadic s f) + ‖f‖ₑ = A.approxNormDyadic s q f := by
-    rw [approxNormDyadic, add_comm]
-  calc 2 ^ s * (3 * ‖f‖ₑ) + 2 * dyadicWeight s 2 * (lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ)
-      = 2 ^ s * (3 * ‖f‖ₑ) + 2 * dyadicWeight s 2 *
-          ((lqNorm q (A.approxSeqDyadic s f) + ‖f‖ₑ) + ‖f‖ₑ) := by ring
-    _ ≤ 2 ^ s * (3 * A.approxNormDyadic s q f) + 2 * dyadicWeight s 2 *
-          (A.approxNormDyadic s q f + A.approxNormDyadic s q f) := by
-        rw [hDN]; gcongr
-    _ = (3 * 2 ^ s + 4 * dyadicWeight s 2) * A.approxNormDyadic s q f := by ring
-
 /-- **Existence of a block decomposition with bounds**: in a Banach space, for `s > 0` and
 `f ∈ A^s_q`, there are blocks `g_k ∈ A (2^k)` with `f = ∑ g_k`, `∑_k ‖g_k‖ < ∞` and
 `‖(2^(ks) ‖g_k‖)_k‖_q ≤ (3·2^s + 4·4^s) ‖f‖^dyadic`. -/
@@ -277,6 +261,50 @@ theorem exists_blocks [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ q) {f : X}
           (A.approxNormDyadic s q f + A.approxNormDyadic s q f) := by
         rw [hDN]; gcongr
     _ = (3 * 2 ^ s + 4 * dyadicWeight s 2) * A.approxNormDyadic s q f := by ring
+
+/-- **The approximation norm controls the block decomposition quasi-norm**: in a Banach space
+and for `s > 0`, `inf ‖(2^(ks) ‖g_k‖)_k‖_q ≤ (3·2^s + 4·4^s) ‖f‖^dyadic`. -/
+theorem blockDecompNorm_le_approxNormDyadic [CompleteSpace X] (hs : 0 < s) (hq : 1 ≤ q) (f : X) :
+    A.blockDecompNorm s q f ≤ (3 * 2 ^ s + 4 * dyadicWeight s 2) * A.approxNormDyadic s q f := by
+  by_cases hf : A.MemApprox s q f
+  · obtain ⟨g, hg, hgf, -, hle⟩ := exists_blocks hs hq hf
+    exact (blockDecompNorm_le hg hgf).trans hle
+  · rw [memApprox_iff_approxNormDyadic_lt_top hq hs.le, not_lt, top_le_iff] at hf
+    rw [hf, ENNReal.mul_top (by positivity)]; exact le_top
+
+/-! ### Weighted sequences of blocks -/
+
+/-- **Blocks controlled by the errors**: for `s ≥ 0`, `1 ≤ q ≤ ∞`, `M ≥ 1` and a sequence `b_j`
+in a normed group with `‖b_j‖ ≤ C ‖f‖` for `j < M` and `‖b_{n+M}‖ ≤ C E_{2^n}(f)` for every `n`,
+`‖(2^(js) ‖b_j‖)_j‖_{ℓ_q} ≤ M 2^(Ms) C ‖f‖^dyadic`.  For Littlewood–Paley blocks `b_j = Δ_j f`
+this is the bound of the Littlewood–Paley quasi-norm by the approximation norm. -/
+theorem lqNorm_dyadicWeight_mul_enorm_le_approxNormDyadic {E : Type*} [NormedAddCommGroup E]
+    (hs : 0 ≤ s) (hq : 1 ≤ q) {M : ℕ} (hM : 1 ≤ M) {C : ℝ≥0∞} {f : X} {b : ℕ → E}
+    (hhead : ∀ j < M, ‖b j‖ₑ ≤ C * ‖f‖ₑ)
+    (htail : ∀ n, ‖b (n + M)‖ₑ ≤ C * A.approxError f (2 ^ n)) :
+    lqNorm q (fun j => dyadicWeight s j * ‖b j‖ₑ) ≤
+      M * dyadicWeight s M * C * A.approxNormDyadic s q f := by
+  set w := dyadicWeight s M
+  set a : ℕ → ℝ≥0∞ := fun j => dyadicWeight s j * ‖b j‖ₑ
+  have hhead' : ∀ j < M, a j ≤ w * C * ‖f‖ₑ := fun j hj => by
+    rw [mul_assoc]
+    exact mul_le_mul' (ENNReal.dyadicWeight_mono hs hj.le) (hhead j hj)
+  have htail' : ∀ n, a (n + M) ≤ w * C * A.approxSeqDyadic s f n := fun n => by
+    calc a (n + M) = w * dyadicWeight s n * ‖b (n + M)‖ₑ := by
+          simp only [a]; rw [add_comm n M, ENNReal.dyadicWeight_add_nat, add_comm M n]
+      _ ≤ w * dyadicWeight s n * (C * A.approxError f (2 ^ n)) := by gcongr; exact htail n
+      _ = w * C * A.approxSeqDyadic s f n := by rw [approxSeqDyadic]; ring
+  calc lqNorm q a ≤ ∑ j ∈ range M, a j + lqNorm q (fun n => a (n + M)) :=
+        ENNReal.lqNorm_le_sum_range_add_shift hq a M
+    _ ≤ ∑ _j ∈ range M, w * C * ‖f‖ₑ + lqNorm q (fun n => w * C * A.approxSeqDyadic s f n) := by
+        gcongr with j hj
+        · exact hhead' j (mem_range.1 hj)
+        · exact ENNReal.lqNorm_mono htail'
+    _ = (M : ℝ≥0∞) * (w * C * ‖f‖ₑ) + w * C * lqNorm q (A.approxSeqDyadic s f) := by
+        rw [sum_const, card_range, nsmul_eq_mul, ENNReal.lqNorm_const_mul]
+    _ ≤ (M : ℝ≥0∞) * (w * C * ‖f‖ₑ) + (M : ℝ≥0∞) * (w * C * lqNorm q (A.approxSeqDyadic s f)) :=
+        add_le_add le_rfl (le_mul_of_one_le_left zero_le (by exact_mod_cast hM))
+    _ = M * w * C * A.approxNormDyadic s q f := by rw [approxNormDyadic]; ring
 
 /-- **The characterisation of `A^s_q` by block decompositions**: in a Banach space, for
 `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff `f = ∑ g_k` with `g_k ∈ A (2^k)` and

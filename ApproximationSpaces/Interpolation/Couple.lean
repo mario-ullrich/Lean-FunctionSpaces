@@ -343,15 +343,9 @@ theorem discreteKMethodNorm_le_inv_mul_kMethodNorm (hθ : 0 ≤ θ) (hρ : 0 < �
     A.discreteKMethodNorm θ ρ q u ≤
       (ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) * 2 ^ (-(ρ * θ)))⁻¹ *
         A.kMethodNorm θ q u := by
-  have h0 : ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) * 2 ^ (-(ρ * θ)) ≠ 0 :=
-    mul_ne_zero (ApproximationScheme.ofReal_mul_log_two_rpow_ne_zero hρ q)
-      (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne'
-  have ht : ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) * 2 ^ (-(ρ * θ)) ≠ ∞ :=
-    ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top)
-      (ApproximationScheme.two_rpow_ne_top _)
-  refine (ENNReal.mul_le_iff_le_inv h0 ht).1 ?_
-  rw [mul_assoc]
-  exact discreteKMethodNorm_le_kMethodNorm hθ hρ u
+  rw [discreteKMethodNorm_eq]
+  exact ApproximationScheme.lqNorm_discretePhiSeq_le_inv_mul_phiFunctional
+    (monotone_kFunctional (A := A) u) hθ hρ
 
 /-- The continuous K-norm by the discrete K-norm on the grid `t = 2^n`: for `θ ≥ 0`,
 `‖u‖_{K,θ,q} ≤ (log 2)^(1/q) 2^θ ‖u‖_{θ,1,q}` (`kMethodNorm_le_discreteKMethodNorm` with

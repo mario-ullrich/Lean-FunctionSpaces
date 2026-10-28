@@ -37,13 +37,25 @@ approximants themselves are controlled in `X` and in `A^r_∞` (`DyadicApprox.en
 **Tolerances.** Best approximants need not exist, so `a_k` is only near-best:
 `‖f - a_k‖ ≤ E_{2^k}(f) + t_k`.  The tolerances `t_k = ‖f‖ 2^(-k(σ+1))` are chosen so small
 that every weighted sum of them that occurs is at most `2 ‖f‖`, which is absorbed into the
-final constant; this avoids a limit `ε → 0`.
+final constant; this avoids a limit `ε → 0`.  The resulting bounds of the tolerances against
+the errors (`tsum_dyadicWeight_mul_add_tolerance_le`, `mul_add_mul_tsum_tolerance_le`,
+`lqNorm_approxSeqDyadic_add_tolerance_le`) serve every theorem built on the construction.
+The tails of the lifted series are bounded by the tail of a convergent series,
+`‖f - ∑_{i<n} a_i‖ ≤ ∑_{i ≥ 0} ‖a_{i+n}‖` (`HasSum.enorm_sub_sum_range_le`).
 -/
 
 @[expose] public section
 
 open Filter Topology Finset
 open scoped ENNReal
+
+/-- **The tail of a convergent series**: if `∑_i a_i = f`, then
+`‖f - ∑_{i<n} a_i‖ ≤ ∑_{i ≥ 0} ‖a_{i+n}‖`. -/
+theorem HasSum.enorm_sub_sum_range_le {E : Type*} [NormedAddCommGroup E] {a : ℕ → E} {f : E}
+    (h : HasSum a f) (n : ℕ) : ‖f - ∑ i ∈ range n, a i‖ₑ ≤ ∑' i, ‖a (i + n)‖ₑ := by
+  rw [← h.tsum_eq, ← ((summable_nat_add_iff n).2 h.summable).sum_add_tsum_nat_add',
+    add_sub_cancel_left]
+  exact enorm_tsum_le_tsum_enorm
 
 namespace ApproximationScheme
 
@@ -228,25 +240,12 @@ theorem exists_preimage [CompleteSpace Y] (ht : Antitone t) (hB : LiftBound ι A
       ∀ k, ∃ z : Y, ι z ∈ A (2 ^ k) ∧
         ‖y - z‖ₑ ≤ liftConst C β *
           ∑' i, dyadicWeight β (k + i) * (A.approxError f (2 ^ (k + i)) + t (k + i)) := by
-  obtain ⟨y0, d, hy0, hd, hy0le, hdle⟩ := D.exists_lift hB hC
+  obtain ⟨y0, d, hpart, hy0le, hdk⟩ := D.exists_lift_partial ht hB hC
   set g : ℕ → ℝ≥0∞ := fun k => dyadicWeight β k * (A.approxError f (2 ^ k) + t k)
-  have hdk : ∀ k, ‖d k‖ₑ ≤ liftConst C β * g k := fun k => by
-    calc ‖d k‖ₑ ≤ ENNReal.ofReal C * dyadicWeight β (k + 2) * ‖D.a (k + 1) - D.a k‖ₑ := hdle k
-      _ ≤ ENNReal.ofReal C * dyadicWeight β (k + 2) * (2 * (A.approxError f (2 ^ k) + t k)) := by
-          gcongr; exact D.enorm_sub_succ_le ht k
-      _ = liftConst C β * g k := by
-          simp only [g, liftConst, ENNReal.dyadicWeight_add_nat]; ring
-  have hsumd : ∑' k, ‖d k‖ₑ ≠ ∞ := by
-    refine ne_top_of_le_ne_top (ENNReal.mul_ne_top (liftConst_ne_top C β) hsum) ?_
-    calc ∑' k, ‖d k‖ₑ ≤ ∑' k, liftConst C β * g k := ENNReal.tsum_le_tsum hdk
-      _ = liftConst C β * ∑' k, g k := ENNReal.tsum_mul_left
-  have hsd : Summable d := Summable.of_norm (by simpa using ENNReal.summable_toReal hsumd)
-  -- the partial sums lift the approximants
-  have hpart : ∀ n, ι (y0 + ∑ j ∈ range n, d j) = D.a n := fun n => by
-    rw [map_add, map_sum, hy0]
-    simp_rw [hd]
-    rw [Finset.sum_range_sub (fun k => D.a k) n]
-    abel
+  have hsumd : ∑' k, ‖d k‖ₑ ≠ ∞ :=
+    ne_top_of_le_ne_top (ENNReal.mul_ne_top (liftConst_ne_top C β) hsum)
+      ((ENNReal.tsum_le_tsum hdk).trans_eq ENNReal.tsum_mul_left)
+  have hsd : Summable d := Summable.of_enorm hsumd
   -- the errors and the tolerances tend to zero
   have hg : Tendsto g atTop (𝓝 0) := ENNReal.tendsto_atTop_zero_of_tsum_ne_top hsum
   have hle1 : ∀ k, A.approxError f (2 ^ k) + t k ≤ g k := fun k =>
@@ -264,19 +263,13 @@ theorem exists_preimage [CompleteSpace Y] (ht : Antitone t) (hB : LiftBound ι A
   have hy : ι y = f := tendsto_nhds_unique hlim (D.tendsto he ht0)
   refine ⟨y, hy, ?_, fun k => ⟨y0 + ∑ j ∈ range k, d j, by rw [hpart]; exact D.mem k, ?_⟩⟩
   · calc ‖y‖ₑ ≤ ‖y0‖ₑ + ‖∑' k, d k‖ₑ := enorm_add_le _ _
-      _ ≤ ENNReal.ofReal C * (2 * ‖f‖ₑ + t 0) + ∑' k, ‖d k‖ₑ := by
-          gcongr
-          · exact hy0le.trans (by gcongr; exact D.enorm_zero_le)
-          · exact enorm_tsum_le_tsum_enorm
       _ ≤ ENNReal.ofReal C * (2 * ‖f‖ₑ + t 0) + ∑' k, liftConst C β * g k := by
-          gcongr with k; exact hdk k
+          gcongr
+          exact enorm_tsum_le_tsum_enorm.trans (ENNReal.tsum_le_tsum hdk)
       _ = _ := by rw [ENNReal.tsum_mul_left]
-  · have htail : y - (y0 + ∑ j ∈ range k, d j) = ∑' i, d (i + k) := by
-      rw [show y = y0 + ∑' k, d k from rfl,
-        ← ((summable_nat_add_iff k).2 hsd).sum_add_tsum_nat_add']
-      abel
-    rw [htail]
-    calc ‖∑' i, d (i + k)‖ₑ ≤ ∑' i, ‖d (i + k)‖ₑ := enorm_tsum_le_tsum_enorm
+  · rw [show y = y0 + ∑' k, d k from rfl, add_sub_add_left_eq_sub]
+    calc ‖∑' j, d j - ∑ j ∈ range k, d j‖ₑ ≤ ∑' i, ‖d (i + k)‖ₑ :=
+          hsd.hasSum.enorm_sub_sum_range_le k
       _ ≤ ∑' i, liftConst C β * g (k + i) := ENNReal.tsum_le_tsum fun i => by
           rw [add_comm k i]; exact hdk (i + k)
       _ = _ := ENNReal.tsum_mul_left
@@ -351,6 +344,53 @@ theorem lqNorm_dyadicWeight_mul_tolerance_le {q : ℝ≥0∞} (hq : 1 ≤ q) (f 
 
 end Tolerance
 
+/-! ### The tolerances against the errors -/
+
+/-- **Splitting off the tolerances**: for `τ ≤ σ`,
+`∑_k 2^(kτ) (E_{2^k}(f) + t_k) ≤ ‖(2^(kτ) E_{2^k}(f))_k‖_{ℓ_1} + 2 ‖f‖`, with the tolerances
+`t_k = tolerance f σ k`. -/
+theorem tsum_dyadicWeight_mul_add_tolerance_le (f : X) {σ τ : ℝ} (h : τ ≤ σ) :
+    ∑' k, dyadicWeight τ k * (A.approxError f (2 ^ k) + tolerance f σ k) ≤
+      lqNorm 1 (A.approxSeqDyadic τ f) + 2 * ‖f‖ₑ := by
+  simp_rw [mul_add]
+  rw [ENNReal.tsum_add, ← ENNReal.lqNorm_one]
+  exact add_le_add le_rfl (tsum_dyadicWeight_mul_tolerance_le f h)
+
+/-- For `τ ≤ σ` and `‖(2^(kτ) E_{2^k}(f))_k‖_{ℓ_1} < ∞`, the series
+`∑_k 2^(kτ) (E_{2^k}(f) + t_k)` with the tolerances `t_k = tolerance f σ k` is finite. -/
+theorem tsum_dyadicWeight_mul_add_tolerance_ne_top {f : X} {σ τ : ℝ} (h : τ ≤ σ)
+    (hf : lqNorm 1 (A.approxSeqDyadic τ f) ≠ ∞) :
+    ∑' k, dyadicWeight τ k * (A.approxError f (2 ^ k) + tolerance f σ k) ≠ ∞ :=
+  ne_top_of_le_ne_top (ENNReal.add_ne_top.2 ⟨hf, ENNReal.mul_ne_top (by norm_num) enorm_ne_top⟩)
+    (tsum_dyadicWeight_mul_add_tolerance_le f h)
+
+/-- **The bound of a telescoping lift by the norm of `A^σ_1`**:
+`c (2 ‖f‖ + ‖f‖) + K ∑_k 2^(kσ) (E_{2^k}(f) + t_k) ≤ (3 c + 3 K) ‖f‖_{A^σ_1}` with the
+tolerances `t_k = tolerance f σ k`, for all `c, K ∈ [0, ∞]`. -/
+theorem mul_add_mul_tsum_tolerance_le (c K : ℝ≥0∞) (f : X) (σ : ℝ) :
+    c * (2 * ‖f‖ₑ + ‖f‖ₑ) +
+        K * ∑' k, dyadicWeight σ k * (A.approxError f (2 ^ k) + tolerance f σ k) ≤
+      (3 * c + 3 * K) * A.approxNormDyadic σ 1 f := by
+  set L := lqNorm 1 (A.approxSeqDyadic σ f)
+  have hN : A.approxNormDyadic σ 1 f = ‖f‖ₑ + L := rfl
+  calc _ ≤ c * (3 * (‖f‖ₑ + L)) + K * (3 * (‖f‖ₑ + L)) := by
+        gcongr
+        · calc 2 * ‖f‖ₑ + ‖f‖ₑ = 3 * ‖f‖ₑ := by ring
+            _ ≤ 3 * (‖f‖ₑ + L) := by gcongr; exact le_self_add
+        · calc _ ≤ L + 2 * ‖f‖ₑ := tsum_dyadicWeight_mul_add_tolerance_le f le_rfl
+            _ ≤ (‖f‖ₑ + L) + 2 * (‖f‖ₑ + L) := by gcongr; exacts [le_add_self, le_self_add]
+            _ = 3 * (‖f‖ₑ + L) := by ring
+    _ = _ := by rw [hN]; ring
+
+/-- **The `ℓ_q` norm of the errors plus the tolerances**: for `q ≥ 1`,
+`‖(2^(ks) E_{2^k}(f) + 2^(ks) t_k)_k‖_{ℓ_q} ≤ ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q} + 2 ‖f‖`, with the
+tolerances `t_k = tolerance f s k`. -/
+theorem lqNorm_approxSeqDyadic_add_tolerance_le {q : ℝ≥0∞} (hq : 1 ≤ q) (f : X) (s : ℝ) :
+    lqNorm q (fun k => A.approxSeqDyadic s f k + dyadicWeight s k * tolerance f s k) ≤
+      lqNorm q (A.approxSeqDyadic s f) + 2 * ‖f‖ₑ :=
+  (ENNReal.lqNorm_add_le hq _ _).trans
+    (add_le_add le_rfl (lqNorm_dyadicWeight_mul_tolerance_le hq f le_rfl))
+
 /-- **A lifting bound of exponent `β` gives `A^β_1 ↪ Y`**: if
 `∑_k 2^(kβ) E_{2^k}(f) < ∞`, then `f = ι y` with
 `‖y‖ ≤ (3 C + 3 K) (‖f‖ + ∑_k 2^(kβ) E_{2^k}(f))`, `K = liftConst C β`.  For a Bernstein
@@ -361,33 +401,10 @@ theorem exists_preimage_of_liftBound [CompleteSpace Y] (hB : LiftBound ι A β C
       ‖y‖ₑ ≤ (3 * ENNReal.ofReal C + 3 * liftConst C β) * A.approxNormDyadic β 1 f := by
   rcases eq_or_ne f 0 with rfl | hf0
   · exact ⟨0, map_zero ι, by simp⟩
-  set t := tolerance f β
   obtain ⟨D⟩ := exists_dyadicApprox A f (tolerance_ne_zero hf0 β)
-  set L := lqNorm 1 (A.approxSeqDyadic β f)
-  have hsplit : ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) ≤ L + 2 * ‖f‖ₑ := by
-    simp_rw [mul_add]
-    rw [ENNReal.tsum_add, ← ENNReal.lqNorm_one]
-    exact add_le_add le_rfl (tsum_dyadicWeight_mul_tolerance_le f le_rfl)
-  have hsum : ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k) ≠ ∞ :=
-    ne_top_of_le_ne_top (ENNReal.add_ne_top.2 ⟨hf.ne, ENNReal.mul_ne_top (by norm_num)
-      enorm_ne_top⟩) hsplit
-  obtain ⟨y, hy, hyle, -⟩ := D.exists_preimage (tolerance_anti f hβ) hB hC hβ hsum
-  refine ⟨y, hy, hyle.trans ?_⟩
-  rw [tolerance_zero]
-  calc ENNReal.ofReal C * (2 * ‖f‖ₑ + ‖f‖ₑ) +
-        liftConst C β * ∑' k, dyadicWeight β k * (A.approxError f (2 ^ k) + t k)
-      ≤ ENNReal.ofReal C * (3 * (‖f‖ₑ + L)) + liftConst C β * (3 * (‖f‖ₑ + L)) := by
-        gcongr
-        · calc 2 * ‖f‖ₑ + ‖f‖ₑ = 3 * ‖f‖ₑ := by ring
-            _ ≤ 3 * (‖f‖ₑ + L) := by gcongr; exact le_self_add
-        · calc _ ≤ L + 2 * ‖f‖ₑ := hsplit
-            _ ≤ 3 * (‖f‖ₑ + L) := by
-                calc L + 2 * ‖f‖ₑ ≤ (‖f‖ₑ + L) + 2 * (‖f‖ₑ + L) := by
-                      gcongr
-                      · exact le_add_self
-                      · exact le_self_add
-                  _ = 3 * (‖f‖ₑ + L) := by ring
-    _ = (3 * ENNReal.ofReal C + 3 * liftConst C β) * A.approxNormDyadic β 1 f := by
-        rw [approxNormDyadic]; ring
+  obtain ⟨y, hy, hyle, -⟩ := D.exists_preimage (tolerance_anti f hβ) hB hC hβ
+    (tsum_dyadicWeight_mul_add_tolerance_ne_top le_rfl hf.ne)
+  rw [tolerance_zero] at hyle
+  exact ⟨y, hy, hyle.trans (mul_add_mul_tsum_tolerance_le _ _ f β)⟩
 
 end ApproximationScheme

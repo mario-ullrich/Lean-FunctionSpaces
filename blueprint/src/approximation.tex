@@ -316,6 +316,7 @@ With these, a constant $(1 - 2^{-\alpha})^{-1}$ is finite exactly for $\alpha > 
   ENNReal.natCast_two_pow_rpow, ENNReal.two_pow_rpow_eq_dyadicWeight,
   ENNReal.two_rpow_mul_two_rpow,
   ENNReal.two_rpow_neg_lt_one, ENNReal.one_sub_two_rpow_neg_inv_ne_top,
+  ENNReal.two_mul_one_sub_two_rpow_neg_inv_ne_top,
   ENNReal.one_le_one_sub_two_rpow_neg_inv, ENNReal.lqNorm_dyadicWeight_neg_le,
   ENNReal.lqNorm_lt_top_iff_of_le_mul}
 \leanok
@@ -432,6 +433,65 @@ The second inequality is Hölder's inequality for the counting measure on $I$ (M
 \texttt{ENNReal.\allowbreak lintegral\_\allowbreak mul\_\allowbreak le\_\allowbreak
 Lp\_\allowbreak mul\_\allowbreak Lq}) with exponents $2$ and $2$; the first holds since every
 term is nonnegative.
+\end{proof}
+
+\begin{lemma}[Two inequalities in {$[0, \infty]$}]
+\label{lem:sum-of-products-le-product-of-sums}
+\lean{ENNReal.mul_add_mul_le_add_mul_add, ENNReal.sum_mul_le_sum_mul_sum}
+\leanok
+For all $a, b, x, y \in [0, \infty]$, $a x + b y \leq (a + b)(x + y)$. For every finite set $s$
+and all families $(a_i)_{i \in s}$, $(b_i)_{i \in s}$ in $[0, \infty]$,
+$\sum_{i \in s} a_i b_i \leq \bigl(\sum_{i \in s} a_i\bigr)\bigl(\sum_{i \in s} b_i\bigr)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Expand $(a + b)(x + y) = a x + a y + b x + b y$. Each $b_i$ is at most $\sum_{j \in s} b_j$.
+\end{proof}
+
+The next two lemmas concern $L_p$ norms of functions with values in $[0, \infty]$ on a
+measure space $(X, \mu)$; for the counting measure they give the corresponding statements on
+$\ell_q$ norms.
+
+\begin{lemma}[{Homogeneity and powers of $L_p$ norms in $[0, \infty]$}]
+\label{lem:lp-norm-homogeneity}
+\lean{MeasureTheory.eLpNorm_const_mul_ennreal, MeasureTheory.eLpNorm_fun_rpow}
+\leanok
+For every measure space $(X, \mu)$, every measurable $h : X \to [0, \infty]$, every
+$c \in [0, \infty]$, every $p \in [0, \infty]$ and every $r > 0$,
+\[
+  \|c h\|_p = c \, \|h\|_p, \qquad \|h^r\|_p = \|h\|_{pr}^r .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $0 < p < \infty$ the norm is $(\int h^p)^{1/p}$, and constants leave the integral; for
+$p = \infty$ the essential supremum is homogeneous. The power rule is Mathlib's
+\texttt{eLpNorm\_enorm\_rpow}.
+\end{proof}
+
+\begin{lemma}[Monotone convergence and Minkowski's inequality for series in $L_p$]
+\label{lem:lp-series-minkowski}
+\lean{MeasureTheory.eLpNorm_iSup_of_directed, MeasureTheory.eLpNorm_tsum_le}
+\leanok
+For every measure space $(X, \mu)$, every countable directed family $(F_b)_b$ of measurable
+functions $F_b : X \to [0, \infty]$ and every $p \in [0, \infty]$,
+$\|\sup_b F_b\|_p = \sup_b \|F_b\|_p$. For every countable set $I$, every family
+$(g_i)_{i \in I}$ of functions $g_i : X \to [0, \infty]$ and every $1 \leq p \leq \infty$,
+\[
+  \Bigl\| \sum_{i \in I} g_i \Bigr\|_p \leq \sum_{i \in I} \|g_i\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $0 < p < \infty$, $\|\sup_b F_b\|_p^p = \int \sup_b F_b^p = \sup_b \int F_b^p$ by the
+monotone convergence theorem for directed families; for $p = \infty$, almost everywhere
+$F_b \leq \|F_b\|_\infty$ for all $b$ at once, since there are countably many. If some $g_i$ is
+not almost everywhere measurable, then $\|g_i\|_p = \infty$. Otherwise the series is the
+supremum of its finite partial sums, a directed family, and Minkowski's inequality bounds the
+norm of each partial sum by $\sum_{i \in I} \|g_i\|_p$.
 \end{proof}
 
 \begin{lemma}[Countable Minkowski inequality and monotone convergence in $\ell_q$]
@@ -948,7 +1008,25 @@ The approximants exist by the definition of the infimum. The rest is
 
 The tolerances $t_k$ replace best approximants, which need not exist. The proofs below take
 $t_k = \|f\| \, 2^{-k(\sigma+1)}$ for a suitable $\sigma$, so that
-$\sum_k 2^{k\sigma} t_k \leq 2 \|f\|$.
+$\sum_k 2^{k\sigma} t_k \leq 2 \|f\|$. The tails of the series that occur are bounded by the
+next lemma.
+
+\begin{lemma}[Tail of a convergent series]
+\label{lem:series-tail}
+\lean{HasSum.enorm_sub_sum_range_le}
+\leanok
+For every normed group $E$, every sequence $(a_i)_i$ in $E$ with $\sum_i a_i = f$ and every
+$n \in \N$,
+\[
+  \Bigl\|f - \sum_{i<n} a_i\Bigr\| \leq \sum_{i=0}^\infty \|a_{i+n}\| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The difference is the sum $\sum_{i \geq 0} a_{i+n}$ of the tail, whose norm is at most the sum
+of the norms.
+\end{proof}
 
 \begin{theorem}[Lifting theorem]
 \label{thm:lift}
@@ -959,7 +1037,11 @@ $\sum_k 2^{k\sigma} t_k \leq 2 \|f\|$.
   ApproximationScheme.tolerance_ne_top, ApproximationScheme.tolerance_anti,
   ApproximationScheme.tolerance_zero, ApproximationScheme.dyadicWeight_mul_tolerance_le,
   ApproximationScheme.tsum_dyadicWeight_mul_tolerance_le, ApproximationScheme.tendsto_tolerance,
-  ApproximationScheme.tsum_tolerance_le, ApproximationScheme.lqNorm_dyadicWeight_mul_tolerance_le}
+  ApproximationScheme.tsum_tolerance_le, ApproximationScheme.lqNorm_dyadicWeight_mul_tolerance_le,
+  ApproximationScheme.tsum_dyadicWeight_mul_add_tolerance_le,
+  ApproximationScheme.tsum_dyadicWeight_mul_add_tolerance_ne_top,
+  ApproximationScheme.mul_add_mul_tsum_tolerance_le,
+  ApproximationScheme.lqNorm_approxSeqDyadic_add_tolerance_le}
 \leanok
 \uses{def:lift-bound, lem:near-best, def:dyadic-norm}
 Let $Y$ be a Banach space, let $\beta \geq 0$ and $C \geq 0$, and let $\iota$ satisfy the
@@ -973,6 +1055,7 @@ $\sum_k 2^{k\beta} E_{2^k}(f) < \infty$ there is $y \in Y$ with $\iota y = f$ an
 
 \begin{proof}
 \leanok
+\uses{lem:series-tail}
 For $f = 0$ take $y = 0$. Otherwise choose near-best approximants $a_k$ with tolerances
 $t_k = \|f\| 2^{-k(\beta+1)}$ by \Cref{lem:near-best}. Lift $a_0 \in A_1$ to $y_0$ and
 $a_{k+1} - a_k \in A_{2^{k+2}}$ to $d_k$, so that $\|y_0\| \leq C \|a_0\| \leq 3C\|f\|$
@@ -983,8 +1066,37 @@ $\iota(y_0 + \sum_{j<k} d_j) = a_k$, which is $f$ since $E_{2^k}(f) \to 0$. Addi
 gives the constant.
 \end{proof}
 
-The same construction gives the next theorem, the transfer of approximation spaces along an
-injective map with a Nikolskii inequality.
+The same construction gives \Cref{thm:nikolskii-transfer}, the transfer of approximation spaces
+along an injective map with a Nikolskii inequality. It and the trace transfer theorem
+(\Cref{thm:trace-transfer}) end with the following estimate.
+
+\begin{lemma}[Transfer estimate]
+\label{lem:transfer-estimate}
+\lean{ApproximationScheme.approxNormDyadic_le_of_tail}
+\leanok
+\uses{def:dyadic-norm, def:error}
+Let $B$ be an approximation scheme in a normed space $Y$, let $1 \leq q \leq \infty$,
+$\alpha \leq s$ and $c, K \in [0, \infty]$. For every $f \in X$ put
+$t_k = \|f\| \, 2^{-k(s+1)}$ and $g_k = 2^{k\alpha} (E_{2^k}(f) + t_k)$. For every $y \in Y$
+with $\|y\| \leq 3c\|f\| + K \sum_k g_k$ and $E^B_{2^k}(y) \leq K \sum_{i \geq 0} g_{k+i}$ for
+every $k \in \N$,
+\[
+  \|y\|^{\mathrm{dy}}_{B^{s-\alpha}_q} \leq
+  \bigl(3c + 3K (1 - 2^{-(s-\alpha)})^{-1} + 2K\bigr) \|f\|^{\mathrm{dy}}_{A^s_q} .
+\]
+\end{lemma}
+
+The constant is finite for $\alpha < s$, the case of both transfer theorems.
+
+\begin{proof}
+\leanok
+\uses{lem:hardy, thm:approx-embedding}
+Multiply the bound of $E^B_{2^k}(y)$ by $2^{k(s-\alpha)}$ and apply the first Hardy inequality
+(\Cref{lem:hardy}) with exponent $s - \alpha$: the weights combine to
+$2^{k(s-\alpha)} 2^{k\alpha} = 2^{ks}$, and $\|(2^{ks} t_k)_k\|_{\ell_q} \leq 2\|f\|$. For the
+norm of $y$, $\sum_k g_k \leq \sum_k 2^{k\alpha} E_{2^k}(f) + 2\|f\|$, and the sum is at most
+$(1 - 2^{-(s-\alpha)})^{-1} \|f\|^{\mathrm{dy}}_{A^s_q}$ by \Cref{thm:approx-embedding}.
+\end{proof}
 
 \begin{theorem}[Nikolskii transfer theorem]
 \label{thm:nikolskii-transfer}
@@ -1006,6 +1118,7 @@ $f \in A^s_q$ there is $y \in Y$ with $\iota y = f$ and
 
 \begin{proof}
 \leanok
+\uses{lem:transfer-estimate, lem:series-tail}
 By \Cref{thm:approx-embedding}, $\sum_k 2^{k\alpha} E_{2^k}(f) < \infty$, so the
 construction of \Cref{thm:lift} applies, now with tolerances $t_k = \|f\| 2^{-k(s+1)}$. The
 partial lifts $z_k = y_0 + \sum_{j<k} d_j$ satisfy $\iota z_k = a_k \in A_{2^k}$, so
@@ -1014,9 +1127,7 @@ $z_k \in B_{2^k}$ and
   E^B_{2^k}(y) \leq \|y - z_k\| \leq \sum_{i=0}^\infty \|d_{k+i}\|
   \leq 2C \, 4^\alpha \sum_{i=0}^\infty 2^{(k+i)\alpha} \bigl(E_{2^{k+i}}(f) + t_{k+i}\bigr).
 \]
-Multiply by $2^{k(s-\alpha)}$ and apply the first Hardy inequality (\Cref{lem:hardy}) with
-exponent $s - \alpha > 0$: the weights combine to $2^{k(s-\alpha)} 2^{k\alpha} = 2^{ks}$,
-and $\|(2^{ks} t_k)_k\|_{\ell_q} \leq 2\|f\|$.
+With $c = C$ and $K = 2C \cdot 4^\alpha$, \Cref{lem:transfer-estimate} gives the bound.
 \end{proof}
 
 \section{Jackson and Bernstein inequalities}
@@ -1364,6 +1475,7 @@ $\|\varphi^{\Z}_{\theta, 1}\|_{\ell_q}$ is the discrete functional of
   ApproximationScheme.discretePhiSeq_le_phiIntegrand,
   ApproximationScheme.phiFunctional_le_lqNorm_discretePhiSeq,
   ApproximationScheme.lqNorm_discretePhiSeq_le_phiFunctional,
+  ApproximationScheme.lqNorm_discretePhiSeq_le_inv_mul_phiFunctional,
   ApproximationScheme.kMethodIntegrand_le_discreteKSeq,
   ApproximationScheme.discreteKSeq_le_kMethodIntegrand,
   ApproximationScheme.kMethodNorm_le_discreteKMethodNorm,
@@ -1949,7 +2061,7 @@ $\int g(ct) \, dt = c^{-1} \int g(t) \, dt$ for every measurable $g \geq 0$.
   ApproximationScheme.phiFunctional_const_mul, ApproximationScheme.phiIntegrand_comp_mul,
   ApproximationScheme.phiFunctional_comp_mul}
 \leanok
-\uses{def:continuous-k-method, lem:dilation-invariance, lem:lp-norm-nonnegative}
+\uses{def:continuous-k-method, lem:dilation-invariance, lem:lp-norm-homogeneity}
 Let $\theta \in \R$ and $q \in (0, \infty]$, and let $\varphi, \psi : [0, \infty] \to [0, \infty]$
 with $\varphi$ measurable.
 \begin{enumerate}
@@ -1968,7 +2080,7 @@ with $\varphi$ measurable.
 integrands for $t > 0$, since $dt/t$ lives on $(0, \infty)$. The integrand of $a \varphi$ is
 $a$ times the integrand $t^{-\theta} \varphi(t)$ of $\varphi$, which is measurable, so (2) is the
 homogeneity of $L_q$ norms of measurable $[0, \infty]$-valued functions
-(\Cref{lem:lp-norm-nonnegative}). For (3),
+(\Cref{lem:lp-norm-homogeneity}). For (3),
 $t^{-\theta} \varphi(ct) = (ct)^{-\theta} c^{\theta} \varphi(ct)$, so the integrand of
 $\varphi(c \, \cdot)$ is the integrand of $c^{\theta} \varphi$ composed with $t \mapsto ct$,
 which preserves $dt/t$ (\Cref{lem:dilation-invariance}); then apply (2).
@@ -2977,7 +3089,7 @@ and $f \in A^s_q$ if and only if $\|f\|^{\mathrm{dec}}_{s,q} < \infty$.
 
 \begin{proof}
 \leanok
-\uses{lem:scheme-basic}
+\uses{lem:scheme-basic, lem:series-tail}
 Let $f = \sum_k g_k$ with $g_k \in A_{2^k}$. Since $\sum_{j<k} 2^j < 2^k$, the partial sum
 $\sum_{j<k} g_j$ lies in $A_{2^k}$, so $E_{2^k}(f) \leq T_k = \sum_{i \geq 0} \|g_{k+i}\|$,
 and also $\|f\| \leq T_0$. The first Hardy inequality bounds $\|(2^{ks} T_k)_k\|_{\ell_q}$,
@@ -2987,18 +3099,83 @@ a_{k+1} - a_k \in A_{2^{k+2}}$. Their partial sums are the $a_k$, which converge
 \Cref{lem:approx-closure}, and $\|g_{k+2}\| \leq 2(E_{2^k}(f) + t_k)$ gives the bound.
 \end{proof}
 
+The next lemma packages two steps that recur for concrete blocks, such as the
+Littlewood--Paley blocks on $\R^d$ and on the torus.
+
+\begin{lemma}[Weighted sequences of blocks]
+\label{lem:weighted-blocks}
+\lean{HasSum.of_tendsto_of_lqNorm_dyadicWeight_lt_top,
+  ApproximationScheme.lqNorm_dyadicWeight_mul_enorm_le_approxNormDyadic}
+\leanok
+\uses{def:dyadic-norm, def:error}
+Let $1 \leq q \leq \infty$ and let $(b_j)_j$ be a sequence in a normed group $E$.
+\begin{enumerate}
+\item If $E$ is complete, then for every $s > 0$ and $f \in E$ with
+  $\|(2^{js} \|b_j\|)_j\|_{\ell_q} < \infty$ and $\sum_{j<n} b_j \to f$, we have
+  $\sum_j b_j = f$, the series converging in $E$.
+\item For every $s \geq 0$, $M \geq 1$, $C \in [0, \infty]$ and $f \in X$ with
+  $\|b_j\| \leq C \|f\|$ for every $j < M$ and $\|b_{n+M}\| \leq C \, E_{2^n}(f)$ for every
+  $n$,
+  \[
+    \|(2^{js} \|b_j\|)_j\|_{\ell_q} \leq M \, 2^{Ms} \, C \, \|f\|^{\mathrm{dy}}_{A^s_q} .
+  \]
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:hardy, lem:lq-basic}
+For (1), $\sum_j \|b_j\| \leq (1 - 2^{-s})^{-1} \|(2^{js} \|b_j\|)_j\|_{\ell_q}$
+(\Cref{lem:hardy}), so the series converges absolutely, and its sum is the limit $f$ of its
+partial sums. For (2), split off the first $M$ terms (\Cref{lem:lq-basic}):
+$2^{js} \|b_j\| \leq 2^{Ms} C \|f\|$ for $j < M$, and
+$2^{(n+M)s} \|b_{n+M}\| \leq 2^{Ms} C \, 2^{ns} E_{2^n}(f)$ for every $n$.
+\end{proof}
+
+Blocks that lie $\gamma$ levels too high are moved up by $\gamma$ levels.
+
+\begin{lemma}[Shifted blocks]
+\label{lem:shifted-blocks}
+\lean{ApproximationScheme.shiftSeq, ApproximationScheme.shiftSeq_add,
+  ApproximationScheme.shiftSeq_of_lt, ApproximationScheme.hasSum_shiftSeq,
+  ApproximationScheme.shiftSeq_mem, ApproximationScheme.lqNorm_shiftSeq_le}
+\leanok
+\uses{def:scheme, def:lq-norm}
+Let $\gamma \in \N$, let $(a_j)_j$ be a sequence in $X$, and let $g_i = 0$ for $i < \gamma$ and
+$g_{j+\gamma} = a_j$ for $j \in \N$.
+\begin{enumerate}
+\item If $a_j \in A_{2^{j+\gamma}}$ for every $j$, then $g_i \in A_{2^i}$ for every $i$.
+\item For every $f \in X$ with $\sum_j a_j = f$, $\sum_i g_i = f$.
+\item For every $\sigma \in \R$ and $1 \leq q \leq \infty$,
+  $\|(2^{i\sigma} \|g_i\|)_i\|_{\ell_q} \leq \|(2^{(j+\gamma)\sigma} \|a_j\|)_j\|_{\ell_q}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:hardy, lem:scheme-basic}
+The levels below $\gamma$ are $0 \in A_{2^i}$ and add nothing to the sum, and the level
+$j + \gamma$ is $a_j$. The third claim is the shift bound of \Cref{lem:hardy}.
+\end{proof}
+
 \section{Projection schemes}
 
 \begin{definition}[Projection scheme]
 \label{def:projection-scheme}
 \lean{ApproximationScheme.ProjectionScheme, ApproximationScheme.ProjectionScheme.bound_nonneg,
-  ApproximationScheme.ProjectionScheme.enorm_apply_le}
+  ApproximationScheme.ProjectionScheme.enorm_apply_le,
+  ApproximationScheme.ProjectionScheme.ofMonotone,
+  ApproximationScheme.ProjectionScheme.ofMonotone_two_pow}
 \leanok
 \uses{def:scheme}
 A \emph{projection scheme} for $A$ is a sequence of bounded linear maps $P_n : X \to X$ with
 $P_n(X) \subseteq A_n$, $P_n a = a$ for every $a \in A_n$, and $\|P_n\| \leq M$ for all $n$,
 for some $M \geq 0$.
 \end{definition}
+
+Bounded linear projections $Q_k$ onto increasing subspaces $V_k$ with $\|Q_k\| \leq B$ give a
+projection scheme for the dyadic scheme of the $V_k$: $P_0 = 0$ and
+$P_n = Q_{\lfloor \log_2 n \rfloor}$, so $P_{2^k} = Q_k$.
 
 \begin{lemma}[Lebesgue inequality]
 \label{lem:lebesgue}
@@ -3104,6 +3281,7 @@ a finite constant for $0 < s < \sigma$.
 
 \begin{proof}
 \leanok
+\uses{lem:series-tail}
 Split $f$ at level $k$: $E_{2^k}(f) \leq \sum_{j \leq k} E_{2^k}(g_j) + \|\sum_{j > k} g_j\|$
 by linearity. The first sum is at most $C \, 2^{-k\sigma} \sum_{j \leq k} 2^{j\sigma}
 \varepsilon_j$, and after multiplication by $2^{ks}$ the second Hardy inequality with exponent
@@ -3289,21 +3467,21 @@ let $0 \leq \beta < s$ and $1 \leq q \leq \infty$. For every $f \in A^s_q$,
 
 \begin{proof}
 \leanok
+\uses{lem:transfer-estimate}
 Since $T a_k \in B_{2^k}$, $E^B_{2^k}(\operatorname{Tr} f) \leq \sum_{i \geq 0}
-\|T a_{k+i+1} - T a_{k+i}\|$. The proof of \Cref{thm:nikolskii-transfer} then applies word for
-word; that theorem is the case $T = \iota^{-1}$ on the approximants.
+\|T a_{k+i+1} - T a_{k+i}\|$. With $c = C$ and $K = 2C \cdot 4^\beta$,
+\Cref{lem:transfer-estimate} gives the bound, as in the proof of
+\Cref{thm:nikolskii-transfer}, which is the case $T = \iota^{-1}$ on the approximants.
 \end{proof}
 
 \begin{theorem}[Surjectivity of the trace]
 \label{thm:trace-surjective}
-\lean{ApproximationScheme.TraceBound.RightInverseBound, ApproximationScheme.shiftSeq,
-  ApproximationScheme.shiftSeq_add, ApproximationScheme.shiftSeq_of_lt,
-  ApproximationScheme.hasSum_shiftSeq, ApproximationScheme.shiftSeq_mem,
-  ApproximationScheme.lqNorm_shiftSeq_le, ApproximationScheme.TraceBound.ext_eq_of_hasSum_lift,
+\lean{ApproximationScheme.TraceBound.RightInverseBound,
+  ApproximationScheme.TraceBound.ext_eq_of_hasSum_lift,
   ApproximationScheme.TraceBound.exists_ext_eq, ApproximationScheme.traceSurjConst,
   ApproximationScheme.traceSurjConst_ne_top}
 \leanok
-\uses{thm:trace-transfer, lem:exists-blocks, thm:block-decomposition}
+\uses{thm:trace-transfer, lem:exists-blocks, thm:block-decomposition, lem:shifted-blocks}
 Let $X$ and $Y$ be Banach spaces, $T$ a trace bound of exponent $\beta \geq 0$, and let
 $\gamma \in \N$ and $C' < \infty$ be such that every $b \in B_{2^k}$ is $T a$ for some
 $a \in A_{2^{k+\gamma}}$ with $\|a\| \leq C' \, 2^{-k\beta} \|b\|$. Let $s > 0$ and
@@ -3317,10 +3495,12 @@ $\operatorname{Tr} f = g$ and
 
 \begin{proof}
 \leanok
+\uses{lem:series-tail}
 Lift the blocks $b_j \in B_{2^j}$ of \Cref{lem:exists-blocks} for $g$ to $a_j \in
 A_{2^{j+\gamma}}$ and put $f = \sum_j a_j$. The blocks $a_j$, placed at level $j + \gamma$,
-form a block decomposition of $f$, and $2^{(j+\gamma)(s+\beta)} \|a_j\| \leq
-2^{\gamma(s+\beta)} C' \, 2^{js} \|b_j\|$, so \Cref{thm:block-decomposition} gives the bound.
+form a block decomposition of $f$ (\Cref{lem:shifted-blocks}), and
+$2^{(j+\gamma)(s+\beta)} \|a_j\| \leq 2^{\gamma(s+\beta)} C' \, 2^{js} \|b_j\|$, so
+\Cref{thm:block-decomposition} gives the bound.
 The partial sums $c_K = \sum_{j < K} a_j$ satisfy $2^{K\beta} \|f - c_K\| \leq C' \sum_{m \geq 0}
 \|b_{m+K}\| \to 0$, so $T c_K \to \operatorname{Tr} f$ by \Cref{lem:trace-ext}, while
 $T c_K = \sum_{j < K} b_j \to g$.
@@ -3386,7 +3566,8 @@ piecewise polynomials, splines and wavelets.
 \begin{definition}[Modulus compatible with a scheme]
 \label{def:modulus-data}
 \lean{ApproximationScheme.ModulusData, ApproximationScheme.ModulusData.modNorm,
-  ApproximationScheme.ModulusData.modulus_zero, ApproximationScheme.ModulusData.modulus_sum_le}
+  ApproximationScheme.ModulusData.modulus_zero, ApproximationScheme.ModulusData.modulus_sum_le,
+  ApproximationScheme.ModulusData.ofExists}
 \leanok
 \uses{def:scheme, def:error}
 Let $\theta \in \R$. A \emph{modulus compatible with $A$ of inverse order $\theta$} is a family
@@ -3403,6 +3584,9 @@ all $f, g \in X$ and $j, k \in \N$
 The \emph{classical quasi-norm} is
 $\|f\|^{\omega}_{s,q} = \|f\| + \|(2^{ks} \omega(f, k))_k\|_{\ell_q}$.
 \end{definition}
+
+A modulus compatible with $A$ is determined by the modulus, $C_0$ and $k_0$ once finite
+constants $C_J$, $C_B$ are known to exist.
 
 \begin{theorem}[Coincidence of approximation and moduli]
 \label{thm:modulus-coincidence}

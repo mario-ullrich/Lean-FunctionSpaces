@@ -121,24 +121,8 @@ noncomputable def littlewoodPaleyNorm (hp : p ≠ ∞) (s : ℝ) (q : ℝ≥0∞
 `s > 0`, `‖Δ_j f‖_p ≤ 2^(-js) ‖f‖_{LP}`, so `f = ∑_j Δ_j f` converges absolutely in `L_p`. -/
 theorem hasSum_lpBlock (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {f : Lp ℂ p (volume : Measure V)} (hf : littlewoodPaleyNorm hp s q f < ∞) :
-    HasSum (fun j => lpBlock hp j f) f := by
-  set L := littlewoodPaleyNorm hp s q f
-  have hle : ∀ j, ‖lpBlock hp j f‖ₑ ≤ dyadicWeight (-s) j * L := fun j => by
-    calc ‖lpBlock hp j f‖ₑ = dyadicWeight (-s) j * (dyadicWeight s j * ‖lpBlock hp j f‖ₑ) := by
-          rw [← mul_assoc, ENNReal.dyadicWeight_neg_mul_self, one_mul]
-      _ ≤ dyadicWeight (-s) j * L := by
-          gcongr
-          exact ENNReal.le_lqNorm (zero_lt_one.trans_le hq).ne'
-            (fun j => dyadicWeight s j * ‖lpBlock hp j f‖ₑ) j
-  have htsum : ∑' j, ‖lpBlock hp j f‖ₑ ≠ ∞ := by
-    refine ne_top_of_le_ne_top ?_ (ENNReal.tsum_le_tsum hle)
-    rw [ENNReal.tsum_mul_right, ENNReal.tsum_dyadicWeight_neg]
-    exact ENNReal.mul_ne_top (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs) hf.ne
-  have hsum : Summable fun j => lpBlock hp j f :=
-    Summable.of_norm (by simpa using ENNReal.summable_toReal htsum)
-  have hfeq : f = ∑' j, lpBlock hp j f :=
-    tendsto_nhds_unique (tendsto_sum_lpBlock hp f) hsum.hasSum.tendsto_sum_nat
-  exact (congrArg (HasSum fun j => lpBlock hp j f) hfeq).mpr hsum.hasSum
+    HasSum (fun j => lpBlock hp j f) f :=
+  HasSum.of_tendsto_of_lqNorm_dyadicWeight_lt_top hs hq (tendsto_sum_lpBlock hp f) hf
 
 /-! ### Band-limited approximation and Littlewood–Paley blocks -/
 
@@ -165,37 +149,16 @@ theorem littlewoodPaleyNorm_le_approxNormDyadic (hp : p ≠ ∞) {s : ℝ} (hs :
     littlewoodPaleyNorm hp s q f ≤
       8 * dyadicWeight s 3 * eLpNorm (lpKernel (V := V)) 1 volume *
         (bandScheme hp).approxNormDyadic s q f := by
-  set C := 2 * eLpNorm (lpKernel (V := V)) 1 volume with hC
-  set w := dyadicWeight s 3
-  set a : ℕ → ℝ≥0∞ := fun j => dyadicWeight s j * ‖lpBlock hp j f‖ₑ
-  have hhead : ∀ j < 3, a j ≤ w * C * ‖f‖ₑ := fun j hj => by
-    rw [mul_assoc]
-    exact mul_le_mul' (ENNReal.dyadicWeight_mono hs hj.le) (enorm_lpBlock_le hp j f)
-  have htail : ∀ n, a (n + 3) ≤ w * C * (bandScheme hp).approxSeqDyadic s f n := fun n => by
-    simp only [a, ApproximationScheme.approxSeqDyadic]
-    rw [add_comm n 3, ENNReal.dyadicWeight_add_nat]
-    calc w * dyadicWeight s n * ‖lpBlock hp (3 + n) f‖ₑ
-        ≤ w * dyadicWeight s n * (C * (bandScheme hp).approxError f (2 ^ n)) := by
-          gcongr
-          exact enorm_lpBlock_le_approxError hp (by omega) f
-      _ = w * C * (dyadicWeight s n * (bandScheme hp).approxError f (2 ^ n)) := by ring
-  calc littlewoodPaleyNorm hp s q f = lqNorm q a := rfl
-    _ ≤ ∑ j ∈ Finset.range 3, a j + lqNorm q (fun n => a (n + 3)) :=
-        ENNReal.lqNorm_le_sum_range_add_shift hq a 3
-    _ ≤ ∑ _j ∈ Finset.range 3, w * C * ‖f‖ₑ +
-          lqNorm q (fun n => w * C * (bandScheme hp).approxSeqDyadic s f n) := by
-        gcongr with j hj
-        · exact hhead j (Finset.mem_range.1 hj)
-        · exact ENNReal.lqNorm_mono htail
-    _ = 3 * (w * C * ‖f‖ₑ) + w * C * lqNorm q ((bandScheme hp).approxSeqDyadic s f) := by
-        rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul, ENNReal.lqNorm_const_mul]
-        norm_num
-    _ ≤ 4 * (w * C * ‖f‖ₑ) + 4 * (w * C * lqNorm q ((bandScheme hp).approxSeqDyadic s f)) :=
-        add_le_add (mul_le_mul' (by norm_num) le_rfl)
-          (le_mul_of_one_le_left (by positivity) (by norm_num))
-    _ = 8 * w * eLpNorm (lpKernel (V := V)) 1 volume * (bandScheme hp).approxNormDyadic s q f := by
-        rw [ApproximationScheme.approxNormDyadic, hC]
-        ring
+  calc littlewoodPaleyNorm hp s q f
+      ≤ ((3 : ℕ) : ℝ≥0∞) * dyadicWeight s 3 * (2 * eLpNorm (lpKernel (V := V)) 1 volume) *
+          (bandScheme hp).approxNormDyadic s q f :=
+        ApproximationScheme.lqNorm_dyadicWeight_mul_enorm_le_approxNormDyadic hs hq (by norm_num)
+          (fun j _ => enorm_lpBlock_le hp j f) fun n => enorm_lpBlock_le_approxError hp le_rfl f
+    _ = 6 * (dyadicWeight s 3 * eLpNorm (lpKernel (V := V)) 1 volume *
+          (bandScheme hp).approxNormDyadic s q f) := by push_cast; ring
+    _ ≤ 8 * (dyadicWeight s 3 * eLpNorm (lpKernel (V := V)) 1 volume *
+          (bandScheme hp).approxNormDyadic s q f) := by gcongr; norm_num
+    _ = _ := by ring
 
 /-- **Band-limited approximation and Littlewood–Paley blocks**: for `s > 0` and `1 ≤ q ≤ ∞`,
 `f ∈ A^s_q(L_p, (E_k))` iff `(2^(js) ‖Δ_j f‖_p)_j ∈ ℓ_q`. -/

@@ -92,6 +92,9 @@ declarations.
 * **Discrete Hardy inequalities** (`ApproximationSpaces/Sequences/Hardy.lean`):
   `ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`, and the almost diagonal estimate that combines
   both (`ENNReal.lqNorm_almostDiagonal_le`, in `FunctionSpaces/Rd/LocalMeans/LocalMeans.lean`).
+* **The tail of a convergent series** (`ApproximationSpaces/Lift.lean`): in every normed group,
+  `∑_i a_i = f` gives `‖f - ∑_{i<n} a_i‖ ≤ ∑_{i ≥ 0} ‖a_{i+n}‖` for every `n`
+  (`HasSum.enorm_sub_sum_range_le`).
 * **The inclusion `L_r ↪ L_p`** (`FunctionSpaces/Analysis/Lp/Inclusion.lean`): for a finite measure
   and `p ≤ r`, the bounded linear injection `MeasureTheory.Lp.inclusionOfExponentLe`, with
   its norm bound and compatibility with `BoundedContinuousFunction.toLp`. Mathlib has the

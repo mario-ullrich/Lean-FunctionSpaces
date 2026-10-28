@@ -20,7 +20,8 @@ spaces by the errors `E_{2^k}(f)`.  They coincide when the scheme and the modulu
   (with `k - j` truncated at `0`, so for `k < j` this is a bound by `‖a‖`).
 
 A `ModulusData A θ` bundles the modulus (sampled at dyadic scales, `modulus f k = ω(f, 2^(-k))`), its
-subadditivity and bound `ω(f) ≤ C₀ ‖f‖`, and the two inequalities.  With the classical
+subadditivity and bound `ω(f) ≤ C₀ ‖f‖`, and the two inequalities; `ModulusData.ofExists`
+builds one from existence statements for the constants `C_J`, `C_B`.  With the classical
 quasi-norm `‖f‖ + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q}` (`ModulusData.modNorm`):
 
 * `‖f‖_{A^s_q} ≤ (1 + ∑_{k<k₀} 2^(ks) + C_J) ‖f‖^ω_{s,q}` for all `s ≥ 0`
@@ -76,7 +77,35 @@ structure ModulusData (A : ApproximationScheme X) (θ : ℝ) where
 
 namespace ModulusData
 
-variable {θ : ℝ} (M : ModulusData A θ)
+variable {θ : ℝ}
+
+/-- A modulus compatible with the scheme from **existence statements** for the two constants:
+the modulus with its subadditivity and the bound `ω(f) ≤ C₀ ‖f‖`, a Jackson inequality
+`E_{2^k}(f) ≤ C_J ω(f, 2^(-k))` for `k ≥ k₀` with some finite `C_J`, and an inverse inequality
+`ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) ‖a‖`, `a ∈ A_{2^j}`, with some finite `C_B`.  The constants
+`C_J`, `C_B` are chosen with `Exists.choose`. -/
+noncomputable def ofExists (modulus : X → ℕ → ℝ≥0∞)
+    (add_le : ∀ f g k, modulus (f + g) k ≤ modulus f k + modulus g k) (C0 : ℝ≥0∞)
+    (C0_ne_top : C0 ≠ ∞) (le_enorm : ∀ f k, modulus f k ≤ C0 * ‖f‖ₑ) (jacksonStart : ℕ)
+    (hJ : ∃ CJ : ℝ≥0∞, CJ ≠ ∞ ∧
+      ∀ f k, jacksonStart ≤ k → A.approxError f (2 ^ k) ≤ CJ * modulus f k)
+    (hB : ∃ CB : ℝ≥0∞, CB ≠ ∞ ∧
+      ∀ j k, ∀ a ∈ A (2 ^ j), modulus a k ≤ CB * dyadicWeight (-θ) (k - j) * ‖a‖ₑ) :
+    ModulusData A θ where
+  modulus := modulus
+  add_le := add_le
+  C0 := C0
+  C0_ne_top := C0_ne_top
+  le_enorm := le_enorm
+  jacksonStart := jacksonStart
+  CJ := hJ.choose
+  CJ_ne_top := hJ.choose_spec.1
+  jackson := hJ.choose_spec.2
+  CB := hB.choose
+  CB_ne_top := hB.choose_spec.1
+  inverse := hB.choose_spec.2
+
+variable (M : ModulusData A θ)
 
 /-- The **classical quasi-norm** `‖f‖ + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q}`. -/
 noncomputable def modNorm (s : ℝ) (q : ℝ≥0∞) (f : X) : ℝ≥0∞ :=
@@ -265,10 +294,8 @@ theorem modNorm_le_approxNormDyadic (hq : 1 ≤ q) (hs : 0 ≤ s) (hsθ : s < θ
   have hE : lqNorm q E ≤ N + 2 * ‖f‖ₑ := by
     calc lqNorm q E = lqNorm q (fun k => A.approxSeqDyadic s f k + dyadicWeight s k * t k) := by
           congr 1; funext k; simp only [E, approxSeqDyadic]; ring
-      _ ≤ lqNorm q (A.approxSeqDyadic s f) + lqNorm q (fun k => dyadicWeight s k * t k) :=
-          ENNReal.lqNorm_add_le hq _ _
-      _ ≤ N + 2 * ‖f‖ₑ := add_le_add le_add_self
-          (lqNorm_dyadicWeight_mul_tolerance_le hq f le_rfl)
+      _ ≤ N + 2 * ‖f‖ₑ :=
+          (lqNorm_approxSeqDyadic_add_tolerance_le hq f s).trans (add_le_add le_add_self le_rfl)
   -- pointwise bound for one scale
   set α := θ - s
   have hpt : ∀ k, dyadicWeight s k * M.modulus f k ≤

@@ -6,8 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Torus.EuclideanConvolutionIdentities
-public import ApproximationSpaces.Decompositions.Blocks
-public import ApproximationSpaces.Sequences.Hardy
+public import ApproximationSpaces.Trace
 
 /-!
 # Littlewood–Paley blocks on the torus
@@ -138,74 +137,16 @@ noncomputable def littlewoodPaleyNorm (hp : p ≠ ∞) (s : ℝ) (q : ℝ≥0∞
 `L_p(𝕋^d)`. -/
 theorem hasSum_lpBlock (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} (hf : littlewoodPaleyNorm hp s q f < ∞) :
-    HasSum (fun j => lpBlock hp j f) f := by
-  set L := littlewoodPaleyNorm hp s q f
-  have hle : ∀ j, ‖lpBlock hp j f‖ₑ ≤ dyadicWeight (-s) j * L := fun j => by
-    calc ‖lpBlock hp j f‖ₑ = dyadicWeight (-s) j * (dyadicWeight s j * ‖lpBlock hp j f‖ₑ) := by
-          rw [← mul_assoc, ENNReal.dyadicWeight_neg_mul_self, one_mul]
-      _ ≤ dyadicWeight (-s) j * L := by
-          gcongr
-          exact ENNReal.le_lqNorm (zero_lt_one.trans_le hq).ne'
-            (fun j => dyadicWeight s j * ‖lpBlock hp j f‖ₑ) j
-  have htsum : ∑' j, ‖lpBlock hp j f‖ₑ ≠ ∞ := by
-    refine ne_top_of_le_ne_top ?_ (ENNReal.tsum_le_tsum hle)
-    rw [ENNReal.tsum_mul_right, ENNReal.tsum_dyadicWeight_neg]
-    exact ENNReal.mul_ne_top (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs) hf.ne
-  have hsum : Summable fun j => lpBlock hp j f :=
-    Summable.of_norm (by simpa using ENNReal.summable_toReal htsum)
-  have hfeq : f = ∑' j, lpBlock hp j f :=
-    tendsto_nhds_unique (tendsto_sum_lpBlock hp f) hsum.hasSum.tendsto_sum_nat
-  exact (congrArg (HasSum fun j => lpBlock hp j f) hfeq).mpr hsum.hasSum
+    HasSum (fun j => lpBlock hp j f) f :=
+  HasSum.of_tendsto_of_lqNorm_dyadicWeight_lt_top hs hq (tendsto_sum_lpBlock hp f) hf
 
 /-! ### Trigonometric approximation and Littlewood–Paley blocks -/
 
-/-- The blocks shifted by one level, `0, Δ_0 f, Δ_1 f, …`: the `k`-th term lies in
-`𝒯_{2^k}`. -/
-noncomputable def shiftedBlock (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure (UnitAddTorus d)))
-    (k : ℕ) : Lp ℂ p (volume : Measure (UnitAddTorus d)) :=
-  if 1 ≤ k then lpBlock hp (k - 1) f else 0
-
-/-- The shifted blocks are approximants: `Δ_{k-1} f ∈ 𝒯_{2^k}` (`Torus.lpBlock_mem_trigPolyLp`). -/
-theorem shiftedBlock_mem (hp : p ≠ ∞) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) (k : ℕ) :
-    shiftedBlock hp f k ∈ ((trigScheme d).toLp volume p) (2 ^ k) := by
-  unfold shiftedBlock
-  split_ifs with hk
-  · obtain ⟨j, rfl⟩ : ∃ j, k = j + 1 := ⟨k - 1, by omega⟩
-    exact mem_toLp_trigScheme_iff.2 (by simpa using lpBlock_mem_trigPolyLp hp j f)
-  · exact ApproximationScheme.zero_mem _ _
-
-/-- For `s > 0` and `1 ≤ q ≤ ∞`, the shifted blocks of an `f` with finite Littlewood–Paley
-quasi-norm add up to `f`. -/
-theorem hasSum_shiftedBlock (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
-    {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} (hf : littlewoodPaleyNorm hp s q f < ∞) :
-    HasSum (shiftedBlock hp f) f := by
-  refine (hasSum_nat_add_iff' 1).1 ?_
-  simpa [shiftedBlock] using hasSum_lpBlock hp hs hq hf
-
-/-- The weighted norms of the shifted blocks `g_k` (`Torus.shiftedBlock`: `g_0 = 0`,
-`g_{k+1} = Δ_k f`): `‖(2^(ks) ‖g_k‖_p)_k‖_{ℓ_q} ≤ 2^s ‖f‖_{LP}`. -/
-theorem lqNorm_shiftedBlock_le (hp : p ≠ ∞) (s : ℝ) (q : ℝ≥0∞)
-    (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    lqNorm q (fun k => dyadicWeight s k * ‖shiftedBlock hp f k‖ₑ) ≤
-      dyadicWeight s 1 * littlewoodPaleyNorm hp s q f := by
-  set a : ℕ → ℝ≥0∞ := fun j => dyadicWeight s j * ‖lpBlock hp j f‖ₑ
-  have heq : (fun k => dyadicWeight s k * ‖shiftedBlock hp f k‖ₑ) =
-      fun k => dyadicWeight s 1 * (if 1 ≤ k then a (k - 1) else 0) := by
-    funext k
-    unfold shiftedBlock
-    split_ifs with hk
-    · obtain ⟨j, rfl⟩ : ∃ j, k = j + 1 := ⟨k - 1, by omega⟩
-      simp only [a, Nat.add_sub_cancel, ENNReal.dyadicWeight_add_nat]
-      ring
-    · simp
-  rw [heq, ENNReal.lqNorm_const_mul]
-  gcongr
-  exact ENNReal.lqNorm_shiftRight_le 1 a
-
 /-- **The approximation norm is controlled by the Littlewood–Paley quasi-norm**: for `s > 0`,
 `‖f‖^dyadic ≤ 2 · 2^s (1 - 2^(-s))⁻¹ ‖(2^(js) ‖Δ_j f‖_p)_j‖_q` for every `f ∈ L_p(𝕋^d)`, with
-the scheme of trigonometric polynomials. The shifted blocks form a block decomposition
-(`ApproximationScheme.approxNormDyadic_le_of_hasSum`). -/
+the scheme of trigonometric polynomials. The blocks moved up by one level,
+`0, Δ_0 f, Δ_1 f, …` (`ApproximationScheme.shiftSeq 1`), lie in `𝒯_{2^k}` and form a block
+decomposition (`ApproximationScheme.approxNormDyadic_le_of_hasSum`). -/
 theorem approxNormDyadic_trigScheme_le (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ((trigScheme d).toLp volume p).approxNormDyadic s q f ≤
@@ -215,16 +156,20 @@ theorem approxNormDyadic_trigScheme_le (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {
       (ENNReal.dyadicWeight_pos s 1).ne')
       (zero_lt_one.trans_le (ENNReal.one_le_one_sub_two_rpow_neg_inv s)).ne')]
     exact le_top
-  · calc ((trigScheme d).toLp volume p).approxNormDyadic s q f
-        ≤ 2 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ *
-            lqNorm q (fun k => dyadicWeight s k * ‖shiftedBlock hp f k‖ₑ) :=
-          ApproximationScheme.approxNormDyadic_le_of_hasSum hq (shiftedBlock_mem hp f)
-            (hasSum_shiftedBlock hp hs hq h.lt_top)
-      _ ≤ 2 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * (dyadicWeight s 1 * littlewoodPaleyNorm hp s q f) := by
-          gcongr
-          exact lqNorm_shiftedBlock_le hp s q f
-      _ = 2 * dyadicWeight s 1 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * littlewoodPaleyNorm hp s q f := by
-          ring
+  set g := ApproximationScheme.shiftSeq 1 fun j => lpBlock hp j f
+  calc ((trigScheme d).toLp volume p).approxNormDyadic s q f
+      ≤ 2 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * lqNorm q (fun k => dyadicWeight s k * ‖g k‖ₑ) :=
+        ApproximationScheme.approxNormDyadic_le_of_hasSum hq
+          (ApproximationScheme.shiftSeq_mem fun j =>
+            mem_toLp_trigScheme_iff.2 (lpBlock_mem_trigPolyLp hp j f))
+          (ApproximationScheme.hasSum_shiftSeq (hasSum_lpBlock hp hs hq h.lt_top))
+    _ ≤ 2 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ *
+          lqNorm q (fun j => dyadicWeight s 1 * (dyadicWeight s j * ‖lpBlock hp j f‖ₑ)) := by
+        gcongr
+        refine (ApproximationScheme.lqNorm_shiftSeq_le 1 _ s q).trans_eq ?_
+        congr 1; funext j; rw [ENNReal.dyadicWeight_add_nat]; ring
+    _ = 2 * dyadicWeight s 1 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * littlewoodPaleyNorm hp s q f := by
+        rw [ENNReal.lqNorm_const_mul, littlewoodPaleyNorm]; ring
 
 /-- **The Littlewood–Paley quasi-norm is controlled by the approximation norm**: for `s ≥ 0`,
 `‖(2^(js) ‖Δ_j f‖_p)_j‖_q ≤ 2 (#d + 1) 2^((#d + 1) s) ‖Φ‖_1 ‖f‖^dyadic` for every
@@ -236,39 +181,11 @@ theorem littlewoodPaleyNorm_le_approxNormDyadic_trigScheme (hp : p ≠ ∞) {s :
       2 * ((Fintype.card d : ℝ≥0∞) + 1) * dyadicWeight s (Fintype.card d + 1) *
         eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume *
           ((trigScheme d).toLp volume p).approxNormDyadic s q f := by
-  set M := Fintype.card d + 1
-  set C := 2 * eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume with hC
-  set w := dyadicWeight s M
-  set A := (trigScheme d).toLp volume p
-  set a : ℕ → ℝ≥0∞ := fun j => dyadicWeight s j * ‖lpBlock hp j f‖ₑ
-  have hhead : ∀ j < M, a j ≤ w * C * ‖f‖ₑ := fun j hj => by
-    rw [mul_assoc]
-    exact mul_le_mul' (ENNReal.dyadicWeight_mono hs hj.le) (enorm_lpBlock_le hp j f)
-  have htail : ∀ n, a (n + M) ≤ w * C * A.approxSeqDyadic s f n := fun n => by
-    simp only [a, ApproximationScheme.approxSeqDyadic]
-    rw [add_comm n M, ENNReal.dyadicWeight_add_nat]
-    calc w * dyadicWeight s n * ‖lpBlock hp (M + n) f‖ₑ
-        ≤ w * dyadicWeight s n * (C * A.approxError f (2 ^ n)) := by
-          gcongr
-          exact enorm_lpBlock_le_approxError hp (by omega) f
-      _ = w * C * (dyadicWeight s n * A.approxError f (2 ^ n)) := by ring
-  calc littlewoodPaleyNorm hp s q f = lqNorm q a := rfl
-    _ ≤ ∑ j ∈ Finset.range M, a j + lqNorm q (fun n => a (n + M)) :=
-        ENNReal.lqNorm_le_sum_range_add_shift hq a M
-    _ ≤ ∑ _j ∈ Finset.range M, w * C * ‖f‖ₑ +
-          lqNorm q (fun n => w * C * A.approxSeqDyadic s f n) := by
-        gcongr with j hj
-        · exact hhead j (Finset.mem_range.1 hj)
-        · exact ENNReal.lqNorm_mono htail
-    _ = (M : ℝ≥0∞) * (w * C * ‖f‖ₑ) + w * C * lqNorm q (A.approxSeqDyadic s f) := by
-        rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul, ENNReal.lqNorm_const_mul]
-    _ ≤ (M : ℝ≥0∞) * (w * C * ‖f‖ₑ) + (M : ℝ≥0∞) * (w * C * lqNorm q (A.approxSeqDyadic s f)) :=
-        add_le_add le_rfl (le_mul_of_one_le_left zero_le (by exact_mod_cast Nat.succ_pos _))
-    _ = 2 * ((Fintype.card d : ℝ≥0∞) + 1) * w *
-          eLpNorm (Rd.lpKernel (V := EuclideanSpace ℝ d)) 1 volume * A.approxNormDyadic s q f := by
-        rw [ApproximationScheme.approxNormDyadic, hC]
-        push_cast [M]
-        ring
+  refine (ApproximationScheme.lqNorm_dyadicWeight_mul_enorm_le_approxNormDyadic
+    (M := Fintype.card d + 1) hs hq (by omega) (fun j _ => enorm_lpBlock_le hp j f)
+    fun n => enorm_lpBlock_le_approxError hp le_rfl f).trans_eq ?_
+  push_cast
+  ring
 
 /-- **Besov spaces on the torus by Littlewood–Paley blocks**: for every `1 ≤ p < ∞`, `s > 0` and
 `1 ≤ q ≤ ∞`, `f ∈ B^s_{p,q}(𝕋^d)` (the approximation space of the trigonometric polynomials in

@@ -15,7 +15,9 @@ public import Mathlib.Analysis.Normed.Operator.NNNorm
 Many schemes come with **uniformly bounded projections**: bounded linear maps `P n : X → X`
 onto `A n` (fixing `A n`) with `‖P n‖ ≤ M` (`ApproximationScheme.ProjectionScheme`).  Examples:
 partial sums of an unconditional or orthonormal basis (Fourier series in `L_2`, wavelets in
-`L_p`), conditional expectations onto dyadic σ-algebras (Haar).  For them:
+`L_p`), conditional expectations onto dyadic σ-algebras (Haar).  Bounded projections onto an
+increasing sequence of subspaces `V_k` give a projection scheme for the dyadic scheme of the
+`V_k` (`ProjectionScheme.ofMonotone`).  For projection schemes:
 
 * `P n` is a near-best approximation: `E_n(f) ≤ ‖f - P n f‖ ≤ (1 + M) E_n(f)`
   (`enorm_sub_le_approxError`), a **Lebesgue inequality**;
@@ -56,6 +58,35 @@ structure ProjectionScheme (A : ApproximationScheme X) where
   norm_le : ∀ n, ‖P n‖ ≤ bound
 
 namespace ProjectionScheme
+
+/-- **The projection scheme of an increasing sequence of subspaces**: bounded linear projections
+`Q_k` onto `V_k`, with `Q_k a = a` for `a ∈ V_k` and `‖Q_k‖ ≤ B`, give a projection scheme for the
+dyadic scheme `ofMonotoneSubmodules V`, with `P_0 = 0` and `P_n = Q_⌊log₂ n⌋` for `n ≥ 1`. -/
+noncomputable def ofMonotone (V : ℕ → Submodule ℝ X) (hV : Monotone V) (Q : ℕ → X →L[ℝ] X)
+    (hmem : ∀ k f, Q k f ∈ V k) (hproj : ∀ k, ∀ a ∈ V k, Q k a = a) (B : ℝ)
+    (hB : ∀ k, ‖Q k‖ ≤ B) : (ofMonotoneSubmodules V hV).ProjectionScheme where
+  P n := if n = 0 then 0 else Q (Nat.log 2 n)
+  mem n f := by
+    split_ifs with hn
+    · rw [hn, zero_apply, mem_ofMonotoneSubmodules_zero]
+    · exact (mem_ofMonotoneSubmodules hn).2 (hmem _ f)
+  proj n a ha := by
+    split_ifs with hn
+    · subst hn
+      rw [mem_ofMonotoneSubmodules_zero.1 ha, zero_apply]
+    · exact hproj _ a ((mem_ofMonotoneSubmodules hn).1 ha)
+  bound := B
+  norm_le n := by
+    split_ifs
+    · simpa using (norm_nonneg (Q 0)).trans (hB 0)
+    · exact hB _
+
+/-- The projection of complexity `2^k` of `ProjectionScheme.ofMonotone` is `Q_k`. -/
+theorem ofMonotone_two_pow {V : ℕ → Submodule ℝ X} {hV : Monotone V} {Q : ℕ → X →L[ℝ] X}
+    {hmem : ∀ k f, Q k f ∈ V k} {hproj : ∀ k, ∀ a ∈ V k, Q k a = a} {B : ℝ}
+    {hB : ∀ k, ‖Q k‖ ≤ B} (k : ℕ) :
+    (ofMonotone V hV Q hmem hproj B hB).P (2 ^ k) = Q k := by
+  simp only [ofMonotone, pow_ne_zero k two_ne_zero, ↓reduceIte, Nat.log_pow Nat.one_lt_two]
 
 variable {A : ApproximationScheme X} (PS : ProjectionScheme A)
 

@@ -1403,11 +1403,11 @@ $\|f\|^{\mathrm{LP}}_{s,q} = \|(2^{js} \|\Delta_j f\|_p)_j\|_{\ell_q}$.
   Torus.hasSum_lpBlock}
 \leanok
 \uses{def:torus-lp-blocks, lem:torus-econv-young, lem:torus-econv-identities,
-  thm:torus-approx-identity, lem:lp-kernels-basic}
+  thm:torus-approx-identity, lem:lp-kernels-basic, lem:weighted-blocks}
 Let $f \in L_p(\T^d)$. For all $j, J \in \N$, $\|\Delta_j f\|_p \leq 2 \|\Phi\|_1 \|f\|_p$ and
 $\sum_{j=0}^J \Delta_j f = \Phi_J * f$, and $\sum_{j=0}^J \Delta_j f \to f$ in $L_p(\T^d)$ as
 $J \to \infty$. If $s > 0$, $1 \leq q \leq \infty$ and $\|f\|^{\mathrm{LP}}_{s,q} < \infty$,
-then $\sum_j \Delta_j f$ converges absolutely to $f$ in $L_p(\T^d)$.
+then $\sum_j \Delta_j f = f$, the series converging in $L_p(\T^d)$.
 \end{lemma}
 
 \begin{proof}
@@ -1415,8 +1415,8 @@ then $\sum_j \Delta_j f$ converges absolutely to $f$ in $L_p(\T^d)$.
 The bound is \Cref{lem:torus-econv-young} with $\|\psi_j\|_1 \leq 2 \|\Phi\|_1$
 (\Cref{lem:lp-kernels-basic}). The sum telescopes, since
 $\psi_{j+1} * f = \Phi_{j+1} * f - \Phi_j * f$ (\Cref{lem:torus-econv-identities}), and
-$\Phi_J * f \to f$ by \Cref{thm:torus-approx-identity}. For the last claim,
-$\|\Delta_j f\|_p \leq 2^{-js} \|f\|^{\mathrm{LP}}_{s,q}$ is summable.
+$\Phi_J * f \to f$ by \Cref{thm:torus-approx-identity}. For the last claim apply
+\Cref{lem:weighted-blocks}(1).
 \end{proof}
 
 \begin{lemma}[Blocks and trigonometric polynomials]
@@ -1446,13 +1446,12 @@ bounds it by $2 \|\Phi\|_1 \|f - a\|_p$.
 
 \begin{theorem}[Besov spaces on the torus by Littlewood--Paley blocks]
 \label{thm:torus-lp-besov}
-\lean{Torus.shiftedBlock, Torus.shiftedBlock_mem, Torus.hasSum_shiftedBlock,
-  Torus.lqNorm_shiftedBlock_le, Torus.approxNormDyadic_trigScheme_le,
+\lean{Torus.approxNormDyadic_trigScheme_le,
   Torus.littlewoodPaleyNorm_le_approxNormDyadic_trigScheme,
   Torus.memBesov_iff_littlewoodPaleyNorm_lt_top}
 \leanok
 \uses{lem:torus-lp-blocks, lem:torus-lp-blocks-trig, thm:block-decomposition, def:dyadic-norm,
-  thm:dyadic-norm, def:besov, lem:lq-basic, lem:hardy}
+  thm:dyadic-norm, def:besov, lem:shifted-blocks, lem:weighted-blocks}
 Let $1 \leq q \leq \infty$, let $A$ be the scheme of trigonometric polynomials in $L_p(\T^d)$,
 and let $f \in L_p(\T^d)$. For every $s > 0$,
 \[
@@ -1469,16 +1468,13 @@ $\|f\|^{\mathrm{LP}}_{s,q} < \infty$.
 
 \begin{proof}
 \leanok
-Put $g_0 = 0$ and $g_{k+1} = \Delta_k f$. Then $g_k \in \mathcal{T}_{2^k}$ by
-\Cref{lem:torus-lp-blocks-trig}, a finite Littlewood--Paley quasi-norm makes $f = \sum_k g_k$ a
-block decomposition (\Cref{lem:torus-lp-blocks}), and
-$\|(2^{ks} \|g_k\|_p)_k\|_{\ell_q} \leq 2^s \|f\|^{\mathrm{LP}}_{s,q}$, since shifting a sequence
-keeps its $\ell_q$ norm or lowers it (\Cref{lem:hardy}); \Cref{thm:block-decomposition} gives the
-first
-inequality. For the second, split off the first $M = \#d + 1$ terms (\Cref{lem:lq-basic}):
-$2^{js} \|\Delta_j f\|_p \leq 2^{Ms} \cdot 2 \|\Phi\|_1 \|f\|_p$ for $j < M$, and
-$2^{(j+M)s} \|\Delta_{j+M} f\|_p \leq 2^{Ms} \cdot 2 \|\Phi\|_1 \, 2^{js} E_{2^j}(f)_p$ by
-\Cref{lem:torus-lp-blocks-trig}.
+Put $g_0 = 0$ and $g_{k+1} = \Delta_k f$, the blocks moved up by one level. Then
+$g_k \in \mathcal{T}_{2^k}$ by \Cref{lem:torus-lp-blocks-trig}, a finite Littlewood--Paley
+quasi-norm makes $f = \sum_k g_k$ a block decomposition (\Cref{lem:torus-lp-blocks}), and
+$\|(2^{ks} \|g_k\|_p)_k\|_{\ell_q} \leq 2^s \|f\|^{\mathrm{LP}}_{s,q}$ by
+\Cref{lem:shifted-blocks}; \Cref{thm:block-decomposition} gives the first inequality. For the
+second, apply \Cref{lem:weighted-blocks}(2) with $M = \#d + 1$ and $C = 2\|\Phi\|_1$
+(\Cref{lem:torus-lp-blocks}, \Cref{lem:torus-lp-blocks-trig}).
 \end{proof}
 
 For $p = 2$ the sharp dyadic blocks of the Fourier coefficients describe the same spaces
@@ -1602,9 +1598,9 @@ which Mathlib provides; linearity holds almost everywhere.
 
 \begin{definition}[Filtration scheme]
 \label{def:filtration-scheme}
-\lean{MeasureTheory.Filtration.approximants, MeasureTheory.Filtration.scheme,
+\lean{MeasureTheory.Filtration.scheme, MeasureTheory.Filtration.mem_scheme,
   MeasureTheory.Filtration.proj, MeasureTheory.Filtration.projectionScheme,
-  MeasureTheory.Filtration.proj_two_pow, MeasureTheory.Filtration.approximants_mono}
+  MeasureTheory.Filtration.proj_two_pow}
 \leanok
 \uses{lem:condexp-lp, def:projection-scheme, def:comap}
 Let $\mathcal{F}_0 \subseteq \mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}$ be a
@@ -2526,7 +2522,7 @@ $\langle d_i, b_l \rangle = \delta_{il}$, and $Q$ is a combination of the $b_l(2
   Interval.coeFn_ppProj, Interval.norm_ppProj_le, Interval.ppProj_mem, Interval.ppProj_of_mem,
   Interval.ppProjectionScheme, Interval.ppProjectionScheme_two_pow, Interval.ppFun_locProj_ppFun}
 \leanok
-\uses{lem:loc-proj, lem:pp-bookkeeping}
+\uses{lem:loc-proj, lem:pp-bookkeeping, def:projection-scheme}
 Let $1 \leq p < \infty$ and $r \in \N$. For $j \in \N$ let $P_j f = \Pi_{j,m} f$ on every
 $I_{j,m}$, $m < 2^j$. Then $P_j$ is a bounded projection of $L_p[0,1]$ onto $V_j$, and
 $\|P_j\| \leq r M^2$ for all $j$. As functions, $P_j a = a$ for every piecewise polynomial $a$ of
@@ -4316,11 +4312,11 @@ $\|f\|^{\mathrm{LP}}_{s,q} = \|(2^{js} \|\Delta_j f\|_p)_j\|_{\ell_q}$.
 \lean{Rd.enorm_lpBlock_le, Rd.lpBlock_succ, Rd.sum_lpBlock, Rd.tendsto_sum_lpBlock,
   Rd.hasSum_lpBlock}
 \leanok
-\uses{def:lp-blocks, lem:lp-kernels-basic, thm:approx-identity}
+\uses{def:lp-blocks, lem:lp-kernels-basic, thm:approx-identity, lem:weighted-blocks}
 Let $1 \leq p < \infty$ and $f \in L_p$. For all $j, J \in \N$,
 $\|\Delta_j f\|_p \leq 2 \|\Phi\|_1 \|f\|_p$ and $\sum_{j=0}^J \Delta_j f = \Phi_J * f$, and
 $\sum_{j=0}^J \Delta_j f \to f$ in $L_p$ as $J \to \infty$. If $s > 0$, $1 \leq q \leq \infty$
-and $\|f\|^{\mathrm{LP}}_{s,q} < \infty$, then $\sum_j \Delta_j f$ converges absolutely to $f$
+and $\|f\|^{\mathrm{LP}}_{s,q} < \infty$, then $\sum_j \Delta_j f = f$, the series converging
 in $L_p$.
 \end{lemma}
 
@@ -4328,7 +4324,7 @@ in $L_p$.
 \leanok
 The bound is \Cref{lem:conv-op} with $\|\psi_j\|_1 \leq 2 \|\Phi\|_1$, the sum telescopes by
 \Cref{lem:lp-kernels-basic}, and $\Phi_J * f \to f$ by \Cref{thm:approx-identity}. For the last
-claim, $\|\Delta_j f\|_p \leq 2^{-js} \|f\|^{\mathrm{LP}}_{s,q}$ is summable.
+claim apply \Cref{lem:weighted-blocks}(1).
 \end{proof}
 
 \begin{lemma}[Blocks and band-limited functions]
@@ -4354,7 +4350,8 @@ $\psi_j * g = \psi_j * (\Theta_i * g) = (\psi_j * \Theta_i) * g = 0$ by
 \lean{Rd.approxNormDyadic_bandScheme_le, Rd.littlewoodPaleyNorm_le_approxNormDyadic,
   Rd.memApprox_bandScheme_iff}
 \leanok
-\uses{lem:lp-blocks, lem:lp-blocks-band, thm:block-decomposition, def:dyadic-norm, lem:lq-basic}
+\uses{lem:lp-blocks, lem:lp-blocks-band, thm:block-decomposition, def:dyadic-norm,
+  lem:weighted-blocks}
 Let $1 \leq p < \infty$, $s > 0$ and $1 \leq q \leq \infty$, and let $A$ be the band-limited
 scheme. For every $f \in L_p$,
 \[
@@ -4369,10 +4366,9 @@ and $f \in A^s_q$ if and only if $\|f\|^{\mathrm{LP}}_{s,q} < \infty$.
 \leanok
 By \Cref{lem:lp-blocks-band}, $\Delta_j f \in E_j = A_{2^j}$, and by \Cref{lem:lp-blocks} a
 finite Littlewood--Paley quasi-norm makes $f = \sum_j \Delta_j f$ a block decomposition, so
-\Cref{thm:block-decomposition} gives the first inequality. For the second, split off the first
-three terms (\Cref{lem:lq-basic}): $2^{js} \|\Delta_j f\|_p \leq 8^s \cdot 2 \|\Phi\|_1 \|f\|_p$
-for $j < 3$, and $2^{(j+3)s} \|\Delta_{j+3} f\|_p \leq 8^s \cdot 2 \|\Phi\|_1 \, 2^{js}
-E_{2^j}(f)$ by \Cref{lem:lp-blocks-band}.
+\Cref{thm:block-decomposition} gives the first inequality. For the second, apply
+\Cref{lem:weighted-blocks}(2) with $M = 3$ and $C = 2\|\Phi\|_1$ (\Cref{lem:lp-blocks},
+\Cref{lem:lp-blocks-band}), and $3 \cdot 2 \leq 8$.
 \end{proof}
 
 With the Besov space $\Besov{s}{p}{q}(V)$ defined through Littlewood--Paley blocks,

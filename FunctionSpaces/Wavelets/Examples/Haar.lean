@@ -421,10 +421,8 @@ theorem toLp_mem_closure (g : ℝ →ᵇ ℂ) :
   have hmem : MemLp (stepFun g j) p vol :=
     MemLp.of_bound hmeas ‖g‖ (ae_of_all _ fun x => g.norm_coe_le_norm _)
   refine ⟨hmem.toLp _, mem_iUnion.2 ⟨2 ^ j, ?_⟩, ?_⟩
-  · show hmem.toLp _ ∈ dyadicFiltration.approximants p vol (2 ^ j)
-    simp only [Filtration.approximants, pow_ne_zero j two_ne_zero, ↓reduceIte,
-      Nat.log_pow Nat.one_lt_two]
-    rw [mem_lpMeas_iff_aestronglyMeasurable]
+  · rw [dyadicFiltration.mem_scheme (pow_ne_zero j two_ne_zero), Nat.log_pow Nat.one_lt_two,
+      mem_lpMeas_iff_aestronglyMeasurable]
     exact hsm.aestronglyMeasurable.congr (MemLp.coeFn_toLp hmem).symm
   · rw [dist_eq_norm, Lp.norm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans
       ((BoundedContinuousFunction.coeFn_toLp p vol ℝ g).sub (MemLp.coeFn_toLp hmem)))]

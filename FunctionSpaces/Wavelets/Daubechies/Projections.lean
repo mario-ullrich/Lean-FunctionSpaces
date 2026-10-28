@@ -837,28 +837,15 @@ variable (p) in
 `1 ≤ p < ∞`: the projection of complexity `n ≥ 1` is `P_{⌊log₂ n⌋}`, the one of complexity `0`
 is `0` (the approximants of complexity `0` are `{0}`), and all are bounded by `projConst m p`. -/
 noncomputable def projectionScheme (hN : 2 ≤ N) (hp : p ≠ ∞) :
-    (scheme m p hN hp).ProjectionScheme where
-  P n := if n = 0 then 0 else proj m p hN hp (Nat.log 2 n)
-  mem n f := by
-    split_ifs with hn
-    · rw [hn, zero_apply, mem_scheme_zero]
-    · exact (mem_scheme m hn).2 (proj_mem_scalingSpace m hN hp _ f)
-  proj n a ha := by
-    split_ifs with hn
-    · subst hn
-      rw [(mem_scheme_zero m).1 ha, zero_apply]
-    · exact proj_eq_self_of_mem m hN hp ((mem_scheme m hn).1 ha)
-  bound := projConst m p
-  norm_le n := by
-    split_ifs
-    · simpa using projConst_nonneg m p
-    · exact norm_proj_le m hN hp _
+    (scheme m p hN hp).ProjectionScheme :=
+  ApproximationScheme.ProjectionScheme.ofMonotone (scalingSpace m p hN hp)
+    (scalingSpace_mono m hN hp) (proj m p hN hp) (proj_mem_scalingSpace m hN hp)
+    (fun _ _ ha => proj_eq_self_of_mem m hN hp ha) (projConst m p) (norm_proj_le m hN hp)
 
 /-- The projection of complexity `2^k` is `P_k`. -/
 theorem projectionScheme_two_pow (hN : 2 ≤ N) (hp : p ≠ ∞) (k : ℕ) :
-    (projectionScheme m p hN hp).P (2 ^ k) = proj m p hN hp k := by
-  simp only [projectionScheme, pow_ne_zero k two_ne_zero, ↓reduceIte,
-    Nat.log_pow Nat.one_lt_two]
+    (projectionScheme m p hN hp).P (2 ^ k) = proj m p hN hp k :=
+  ApproximationScheme.ProjectionScheme.ofMonotone_two_pow k
 
 /-! ### Density of the scaling spaces -/
 
