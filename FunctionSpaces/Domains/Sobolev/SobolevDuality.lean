@@ -94,11 +94,10 @@ theorem inner_toLp_besselSchwartz (t : ℝ) {u : 𝓢(V, ℂ)} (hu : ∀ x, conj
 /-! ### The inner product of `H^t(V)` and Schwartz functions -/
 
 /-- **The inner product of `H^t(V)` is that of the `L_2` functions**:
-`⟪U, W⟫_{H^t} = ⟪J_t U, J_t W⟫_{L_2}`, since `U ↦ J_t U` is a linear isometry onto `L_2(V)`
-(Mathlib's `BesselPotentialSpace.toLpₗᵢ`, `LinearIsometryEquiv.inner_map_map`). -/
-theorem inner_toLp_toLp {t : ℝ} (U W : H^{t}(V)) : ⟪U.toLp, W.toLp⟫_ℂ = ⟪U, W⟫_ℂ := by
-  rw [← BesselPotentialSpace.toLpₗᵢ_apply, ← BesselPotentialSpace.toLpₗᵢ_apply,
-    LinearIsometryEquiv.inner_map_map]
+`⟪U, W⟫_{H^t} = ⟪J_t U, J_t W⟫_{L_2}`, which is how Mathlib defines the inner product of
+`BesselPotentialSpace`. -/
+theorem inner_toLp_toLp {t : ℝ} (U W : H^{t}(V)) : ⟪U.toLp, W.toLp⟫_ℂ = ⟪U, W⟫_ℂ :=
+  rfl
 
 /-- **The `L_2` function of a Schwartz function in `H^t(V)`**: for a Schwartz function `u`, the
 element `u ∈ H^t(V)` (Mathlib's `SchwartzMap.memSobolev`) has `J_t u` as its `L_2` function, since
@@ -150,8 +149,7 @@ variable {s : ℝ} {Ω : Opens V}
 `BesselPotentialSpace.toLpₗᵢ` has `f` as its `L_2` function. -/
 theorem toLp_toLpLinearIsometry_symm_apply (t : ℝ) (f : Lp ℂ 2 (volume : Measure V)) :
     ((BesselPotentialSpace.toLpₗᵢ V ℂ t 2).symm f).toLp = f := by
-  have h := (BesselPotentialSpace.toLpₗᵢ V ℂ t 2).apply_symm_apply f
-  rwa [BesselPotentialSpace.toLpₗᵢ_apply] at h
+  rw [← BesselPotentialSpace.toLpₗᵢ_apply, LinearIsometryEquiv.apply_symm_apply]
 
 /-- `besselShift s U` has the same `L_2` function as `U`. -/
 @[simp]

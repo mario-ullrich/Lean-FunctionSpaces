@@ -19,7 +19,10 @@ The **graph map** `γ(x') = x' + φ(x') e` (`Rd.LipschitzGraph.graphMap`) satisf
 for the orthogonal projection `Px = x - ⟪x, e⟫ e` onto `H` (`Rd.LipschitzGraph.proj`, from the
 formula for the projection onto the hyperplane of any unit vector,
 `Rd.coe_orthogonalProjectionOnto_orthogonalComplement_singleton`), and it is Lipschitz with
-constant `1 + M` (`Rd.LipschitzGraph.norm_graphMap_sub_le`).
+constant `1 + M` (`Rd.LipschitzGraph.norm_graphMap_sub_le`). The boundary of `Ω` is the graph:
+`y ∈ ∂Ω` iff `γ(Py) = y` iff `⟪y, e⟫ = φ(y)` (`Rd.LipschitzGraph.mem_frontier_domain_iff`,
+`Rd.LipschitzGraph.graphMap_proj_eq_iff`), so `∂Ω` is the range of `γ`
+(`Rd.LipschitzGraph.range_graphMap`).
 
 **Traces of atoms** (`Rd.LipschitzGraph.isRegularAtom_comp_graphMap`): a continuous `a` on `V`
 that vanishes outside `B̄(c, d 2^(-j))`, with `|a| ≤ A` and `|a(x + h) - a(x)| ≤ A min(1, 2^j ‖h‖)`,
@@ -164,29 +167,58 @@ theorem continuous_graphMap : Continuous Ω.graphMap :=
   continuous_subtype_val.add ((Ω.continuous_phi.comp continuous_subtype_val).smul continuous_const)
 
 /-- **Steps into the cone from the boundary stay in the domain**: `γ x' + K ⊆ Ω`, since
-`φ(γ x') = ⟪γ x', e⟫` and a step `y` into the cone raises `⟪·, e⟫` faster than `φ`. -/
+`φ(γ x') = ⟪γ x', e⟫` and a step `y` into the cone raises `⟪·, e⟫` faster than `φ`
+(`Rd.LipschitzGraph.phi_add_le`). -/
 theorem graphMap_add_mem (x' : Ω.hyperplane) {y : V} (hy : y ∈ Ω.cone) :
     Ω.graphMap x' + y ∈ Ω.domain := by
-  set d := y - inner ℝ y Ω.e • Ω.e
-  have h1 : Ω.phi (Ω.graphMap x' + y) = Ω.phi (Ω.graphMap x' + d) := by
-    rw [← Ω.const (Ω.graphMap x' + d) (inner ℝ y Ω.e)]
-    congr 1
-    simp only [d]
-    abel
-  have h2 : Ω.phi (Ω.graphMap x' + d) ≤ Ω.phi (Ω.graphMap x') + Ω.M * ‖d‖ := by
-    have h := Ω.lipschitz (Ω.graphMap x' + d) (Ω.graphMap x')
-    rw [add_sub_cancel_left] at h
-    linarith [le_abs_self (Ω.phi (Ω.graphMap x' + d) - Ω.phi (Ω.graphMap x'))]
-  have hy' : Ω.M * ‖d‖ < inner ℝ y Ω.e := hy
-  rw [Ω.phi_graphMap] at h2
+  have h := Ω.phi_add_le (Ω.graphMap x') y
+  have hy' : Ω.M * ‖y - inner ℝ y Ω.e • Ω.e‖ < inner ℝ y Ω.e := hy
+  rw [Ω.phi_graphMap] at h
   show Ω.phi (Ω.graphMap x' + y) < inner ℝ (Ω.graphMap x' + y) Ω.e
-  rw [inner_add_left, h1, Ω.inner_graphMap]
+  rw [inner_add_left, Ω.inner_graphMap]
   linarith
 
 /-- `‖x' - Pc‖ ≤ ‖γ x' - c‖`: the projection is a contraction. -/
 theorem norm_sub_proj_le (x' : Ω.hyperplane) (c : V) : ‖x' - Ω.proj c‖ ≤ ‖Ω.graphMap x' - c‖ := by
   calc ‖x' - Ω.proj c‖ = ‖Ω.proj (Ω.graphMap x' - c)‖ := by rw [map_sub, Ω.proj_graphMap]
     _ ≤ ‖Ω.graphMap x' - c‖ := Ω.norm_proj_le _
+
+/-! ### The boundary of a graph domain -/
+
+/-- `φ(Py) = φ(y)`: `φ` is constant in the direction `e`. -/
+theorem phi_proj (y : V) : Ω.phi (Ω.proj y) = Ω.phi y := by
+  have h := Ω.const (Ω.proj y) (inner ℝ y Ω.e)
+  rw [coe_proj, sub_add_cancel] at h
+  rw [coe_proj]
+  exact h.symm
+
+/-- **The graph** `γ(Py) = y` consists of the points with `⟪y, e⟫ = φ(y)`. -/
+theorem graphMap_proj_eq_iff (y : V) :
+    Ω.graphMap (Ω.proj y) = y ↔ inner ℝ y Ω.e = Ω.phi y := by
+  constructor
+  · intro h
+    have h1 := Ω.inner_graphMap (Ω.proj y)
+    rw [h, phi_proj] at h1
+    exact h1
+  · intro h
+    rw [graphMap, phi_proj, coe_proj, ← h, sub_add_cancel]
+
+/-- **The boundary of a graph domain is the graph**: `y ∈ ∂Ω` iff `γ(Py) = y`, since the
+closure of `Ω` is `{φ ≤ ⟪·, e⟫}` (`Rd.LipschitzGraph.closure_domain`) and `Ω` is open. -/
+theorem mem_frontier_domain_iff (y : V) :
+    y ∈ frontier Ω.domain ↔ Ω.graphMap (Ω.proj y) = y := by
+  rw [graphMap_proj_eq_iff, frontier, Ω.isOpen_domain.interior_eq, Ω.closure_domain]
+  exact ⟨fun h => (le_antisymm h.1 (not_lt.1 h.2)).symm, fun h => ⟨h.ge, h.not_gt⟩⟩
+
+/-- **The range of the graph map is the boundary** of the graph domain. -/
+theorem range_graphMap : Set.range Ω.graphMap = frontier Ω.domain := by
+  ext y
+  rw [Ω.mem_frontier_domain_iff]
+  constructor
+  · rintro ⟨x', rfl⟩
+    rw [Ω.proj_graphMap]
+  · intro h
+    exact ⟨_, h⟩
 
 /-! ### Traces of atoms -/
 

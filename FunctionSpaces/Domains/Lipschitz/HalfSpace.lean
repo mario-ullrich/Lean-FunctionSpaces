@@ -21,9 +21,12 @@ domain (`Rd.BesovDomain.closedHalfSpace`): it differs from the flat Lipschitz gr
 Changing a set by a null set changes neither the step sets up to null sets (`Rd.stepSet_ae_eq`)
 nor the moduli on the set (`Rd.modulusOn_congr_set`) nor the cut-off (`Rd.indicatorLp_congr_set`).
 
-The models of manifolds are Besov domains: the range `{y : 0 ≤ y 0}` of the model with corners
-of the Euclidean half-space (`Rd.BesovDomain.range_euclideanHalfSpace`), and the range `V` of a
-model without boundary (`Rd.BesovDomain.range_of_boundaryless`).
+The models of manifolds are Besov domains: the range of the model with corners of the Euclidean
+half-space is the closed half-space `{y : 0 ≤ ⟪y, e₀⟫}` for the unit vector `e₀ = (1, 0, …, 0)`
+(`Rd.e0`, `Rd.norm_e0`, `Manifold.range_eq_closedHalfSpace`,
+`Rd.BesovDomain.range_euclideanHalfSpace`), and the range `V` of a model without boundary is the
+whole space (`Rd.BesovDomain.range_of_boundaryless`). The first coordinate is `⟪y, e₀⟫`
+(`Rd.coord_zero_eq_inner`).
 -/
 
 @[expose] public section
@@ -157,9 +160,7 @@ theorem BesovDomain.closedHalfSpace {e : V} (he : ‖e‖ = 1) : BesovDomain (cl
   interior_nonempty := ⟨e, mem_interior_closedHalfSpace fun h => by simp [h] at he⟩
   exists_extension p _ hp r s hs hsr q hq := by
     set Ω := LipschitzGraph.flat e he
-    have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 fun h => by
-      rw [h, Nat.cast_zero] at hsr
-      exact lt_irrefl _ (hs.trans hsr)
+    have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
     have hae := closedHalfSpace_ae_eq he
     have hC := (isClosed_closedHalfSpace e).measurableSet
     have hcut : ∀ g : Lp ℂ p (volume : Measure V), indicatorLp hC g = Ω.cutoff g := fun g =>
@@ -175,17 +176,37 @@ theorem BesovDomain.closedHalfSpace {e : V} (he : ‖e‖ = 1) : BesovDomain (cl
 
 /-! ### The models of manifolds -/
 
+section FirstAxis
+
+variable {n : ℕ} [NeZero n]
+
+/-- The unit vector `e₀ = (1, 0, …, 0)` of `ℝ^n`. -/
+noncomputable def e0 : EuclideanSpace ℝ (Fin n) := EuclideanSpace.single 0 1
+
+/-- `‖e₀‖ = 1`. -/
+theorem norm_e0 : ‖(e0 : EuclideanSpace ℝ (Fin n))‖ = 1 := by
+  simp [e0]
+
+/-- The first coordinate is the inner product with `e₀`. -/
+theorem coord_zero_eq_inner (y : EuclideanSpace ℝ (Fin n)) : y 0 = inner ℝ y e0 := by
+  simp [e0, EuclideanSpace.inner_single_right]
+
+open scoped Manifold in
+/-- The range of the half-space model is the closed half-space `{y : 0 ≤ ⟪y, e₀⟫}`. -/
+theorem _root_.Manifold.range_eq_closedHalfSpace :
+    range (𝓡∂ n) = Rd.closedHalfSpace (Rd.e0 : EuclideanSpace ℝ (Fin n)) := by
+  rw [range_modelWithCornersEuclideanHalfSpace]
+  ext y
+  simp [Rd.closedHalfSpace, Rd.e0, EuclideanSpace.inner_single_right]
+
+end FirstAxis
+
 /-- **The Euclidean half-space model is a Besov domain**: the range of the model with corners
-`𝓡∂ n` is the closed half-space `{y : 0 ≤ y 0}`. -/
+`𝓡∂ n` is the closed half-space `{y : 0 ≤ ⟪y, e₀⟫}` (`Manifold.range_eq_closedHalfSpace`). -/
 instance BesovDomain.range_euclideanHalfSpace (n : ℕ) [NeZero n] :
     BesovDomain (Set.range (modelWithCornersEuclideanHalfSpace n)) := by
-  rw [range_modelWithCornersEuclideanHalfSpace]
-  have h : {y : EuclideanSpace ℝ (Fin n) | 0 ≤ y 0} =
-      Rd.closedHalfSpace (EuclideanSpace.single 0 1) := by
-    ext y
-    simp [Rd.closedHalfSpace, EuclideanSpace.inner_single_right]
-  rw [h]
-  exact BesovDomain.closedHalfSpace (by simp)
+  rw [Manifold.range_eq_closedHalfSpace]
+  exact BesovDomain.closedHalfSpace norm_e0
 
 /-- **A model without boundary is a Besov domain**: its range is the whole space. -/
 instance BesovDomain.range_of_boundaryless {H : Type*} [TopologicalSpace H]

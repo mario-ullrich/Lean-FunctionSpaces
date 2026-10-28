@@ -630,9 +630,7 @@ theorem exists_besov_extension_le (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 <
         ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) ≤
           C * (‖indicatorLp Ω.measurableSet f‖ₑ +
             lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k)) := by
-  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 fun h => by
-    rw [h, Nat.cast_zero] at hsr
-    exact lt_irrefl _ (hs.trans hsr)
+  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
   rcases (Ω.carrierᶜ).eq_empty_or_nonempty with hc | hc
   · -- `Ω = V`
     refine ⟨1, ENNReal.one_ne_top, fun f _ => ⟨f, rfl, ?_⟩⟩

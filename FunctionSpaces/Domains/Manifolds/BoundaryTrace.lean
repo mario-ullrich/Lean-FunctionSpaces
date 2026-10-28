@@ -52,13 +52,6 @@ variable {n : ℕ} [NeZero n]
 
 /-! ### The closed and the open half-space -/
 
-/-- The range of the half-space model is the closed half-space `{y : 0 ≤ ⟪y, e₀⟫}`. -/
-theorem range_eq_closedHalfSpace :
-    range (𝓡∂ n) = Rd.closedHalfSpace (Rd.e0 : EuclideanSpace ℝ (Fin n)) := by
-  rw [range_modelWithCornersEuclideanHalfSpace]
-  ext y
-  simp [Rd.closedHalfSpace, Rd.e0, EuclideanSpace.inner_single_right]
-
 /-- The range of the half-space model is the flat domain up to the null set `H₀`. -/
 theorem range_ae_eq_domain : range (𝓡∂ n) =ᵐ[volume] (flatDomain n).domain := by
   rw [range_eq_closedHalfSpace]

@@ -17,7 +17,8 @@ A **Besov atlas** of a manifold `M` (`Manifold.BesovAtlas`) consists of finitely
 smooth cut-offs `θ_i` with `θ_i = 1` on `tsupport ψ_i` and `tsupport θ_i ⊆ e_i.source`. Every
 compact manifold has one (`Manifold.BesovAtlas.nonempty`): finitely many chart sources cover `M`,
 Mathlib's smooth partitions of unity are subordinate to them
-(`SmoothPartitionOfUnity.exists_isSubordinate`), and smooth Urysohn functions give the cut-offs.
+(`SmoothPartitionOfUnity.exists_isSubordinate`), and smooth cut-offs exist for every compact set
+inside an open set (`Manifold.exists_contMDiff_eq_one_tsupport_subset`).
 
 A smooth function on `M` read in an extended chart is smooth within the target of the chart
 (`Manifold.contDiffOn_comp_extend_symm`). Conversely, a function `F` on `E` gives the **lift from
@@ -63,9 +64,25 @@ structure BesovAtlas where
   theta_eq_one : ∀ i, ∀ x ∈ tsupport (psi i), theta i x = 1
   tsupport_theta_subset : ∀ i, tsupport (theta i) ⊆ (chart i).source
 
+variable {M} in
+/-- **Smooth cut-offs**: for a compact set `K` inside an open set `U` of a σ-compact Hausdorff
+manifold there is a smooth `θ : M → ℝ` with `θ = 1` on `K` and `tsupport θ ⊆ U`: Mathlib's
+smooth function with support an open `V` and equal to `1` exactly on `K`
+(`exists_contMDiff_support_eq_eq_one_iff`), for `K ⊆ V` and `closure V ⊆ U`
+(`exists_open_between_and_isCompact_closure`). -/
+theorem exists_contMDiff_eq_one_tsupport_subset [T2Space M] [SigmaCompactSpace M]
+    [IsManifold I ∞ M] {K U : Set M} (hK : IsCompact K) (hU : IsOpen U) (hKU : K ⊆ U) :
+    ∃ θ : M → ℝ, ContMDiff I 𝓘(ℝ, ℝ) ∞ θ ∧ (∀ x ∈ K, θ x = 1) ∧ tsupport θ ⊆ U := by
+  have := Manifold.locallyCompact_of_finiteDimensional (M := M) I
+  obtain ⟨V, hVo, hKV, hVU, -⟩ := exists_open_between_and_isCompact_closure hK hU hKU
+  obtain ⟨θ, hθ, -, hsupp, h1⟩ :=
+    exists_contMDiff_support_eq_eq_one_iff I (n := ⊤) hVo hK.isClosed hKV
+  exact ⟨θ, hθ, fun x hx => (h1 x).1 hx, by rw [tsupport, hsupp]; exact hVU⟩
+
 /-- **Every compact manifold has a Besov atlas**: finitely many chart sources cover `M`, a smooth
-partition of unity is subordinate to them, and a smooth Urysohn function between `tsupport ψ_i`
-and the complement of an open set `V_i` with `closure V_i ⊆ e_i.source` is the cut-off. -/
+partition of unity is subordinate to them, and the cut-off `θ_i` is a smooth function equal to
+`1` on `tsupport ψ_i` with `tsupport θ_i ⊆ e_i.source`
+(`Manifold.exists_contMDiff_eq_one_tsupport_subset`). -/
 theorem BesovAtlas.nonempty [CompactSpace M] [T2Space M] [IsManifold I ∞ M] :
     Nonempty (BesovAtlas I M) := by
   obtain ⟨t, ht⟩ := isCompact_univ.elim_finite_subcover (fun x : M => (chartAt H x).source)
@@ -78,15 +95,9 @@ theorem BesovAtlas.nonempty [CompactSpace M] [T2Space M] [IsManifold I ∞ M] :
   obtain ⟨f, hf⟩ := SmoothPartitionOfUnity.exists_isSubordinate I isClosed_univ
     (fun i => (chartAt H (pt i)).source) (fun i => (chartAt H (pt i)).open_source) hcover
   have hθ : ∀ i, ∃ θ : M → ℝ, ContMDiff I 𝓘(ℝ, ℝ) ∞ θ ∧ (∀ x ∈ tsupport (f i), θ x = 1) ∧
-      tsupport θ ⊆ (chartAt H (pt i)).source := fun i => by
-    have hK : IsCompact (tsupport (f i)) := (isClosed_tsupport _).isCompact
-    obtain ⟨V, hVo, hKV, hVU, -⟩ :=
-      exists_open_between_and_isCompact_closure hK (chartAt H (pt i)).open_source (hf i)
-    obtain ⟨g, hg0, hg1, -⟩ := exists_contMDiffMap_zero_one_of_isClosed (n := ⊤) I
-      hVo.isClosed_compl (isClosed_tsupport _) (disjoint_compl_left_iff_subset.2 hKV)
-    refine ⟨g, g.contMDiff, fun x hx => hg1 hx, (closure_mono fun x hx => ?_).trans hVU⟩
-    by_contra hxV
-    exact hx (hg0 hxV)
+      tsupport θ ⊆ (chartAt H (pt i)).source := fun i =>
+    exists_contMDiff_eq_one_tsupport_subset I (isClosed_tsupport _).isCompact
+      (chartAt H (pt i)).open_source (hf i)
   choose θ hθs hθ1 hθsub using hθ
   exact ⟨{ n := t.card
            chart := fun i => chartAt H (pt i)

@@ -346,8 +346,9 @@ The Hilbert spaces on an open set `Ω : Opens V`, built inside Mathlib's `H^{s}(
 * The bridge to the predicate of Section 4.3: for a bounded Lipschitz domain `Ω` and
   `f ∈ L_2(V)`, `Ω.MemSobolevOn f` iff `f|_Ω = restrictL2 Ω.toOpens u` for some
   `u : RestrictionSpace 1 Ω.toOpens`
-  (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`). So the compactness above is
-  H.1 for the restriction space.
+  (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`, in
+  `FunctionSpaces/Domains/Sobolev/LipschitzDomainH1.lean`). So the compactness above is H.1 for
+  the restriction space.
 * H.4 at `s = 1`: `Rd.tildeSpace s Ω` is `H̃^s(Ω)`, the closure of the test functions of `Ω` in
   `H^{s}(V)`, and `Rd.zeroBoundarySpace s Ω` is `H^s_0(Ω)`, the closure of their restrictions in
   `RestrictionSpace s Ω`. Restriction is an isometry of `H̃^1(Ω)` onto `H^1_0(Ω)` for every open
@@ -460,7 +461,8 @@ the hyperplane `H = Ω.hyperplane = e^⊥` and Mathlib's Euclidean Hausdorff mea
   where `φ|_H` is not differentiable, which happens only on a null set:
   `ae_differentiableAt_phiH`), and `Rd.LipschitzGraph.gram Ω x' = √(1 + ‖gradPhi x'‖²)`, with
   `1 ≤ gram x' ≤ √(1 + M²)` (`one_le_gram`, `gram_le`) and `measurable_gram`.
-* `Rd.LipschitzGraph.range_graphMap : Set.range Ω.graphMap = frontier Ω.domain`, and
+* `Rd.LipschitzGraph.range_graphMap : Set.range Ω.graphMap = frontier Ω.domain` (in
+  `FunctionSpaces/Domains/Lipschitz/GraphParametrization.lean`), and
   `measurableEmbedding_graphMap`, `graphMap_injective`, `lipschitzWith_graphMap` (constant
   `1 + M`), `antilipschitzWith_graphMap` (constant `1`).
 * The area formula `Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`, its measure form
@@ -870,9 +872,10 @@ Section 4.12, and `ker γ = H^1_0(Ω)`, with its Lean names in Section 4.13.
   the test functions of `Ω` in `H^s(ℝ^d)` (`Rd.tildeSpace`), `H^s_0(Ω)` as their closure in
   `H^s(Ω)` (`Rd.zeroBoundarySpace`); the restriction to `L_2(Ω)` as a bounded injective
   operator (`Rd.restrictL2`), compact for bounded `Ω` (Rellich in operator form, HPS
-  Assumption F, `Rd.isCompactOperator_restrictL2`); the bridge to the predicate on bounded
-  Lipschitz domains (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`). File
-  `FunctionSpaces/Domains/Sobolev/SobolevRestrictionSpaces.lean`.
+  Assumption F, `Rd.isCompactOperator_restrictL2`). File
+  `FunctionSpaces/Domains/Sobolev/SobolevRestrictionSpaces.lean`. The bridge to the predicate on
+  bounded Lipschitz domains (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`) is in
+  `FunctionSpaces/Domains/Sobolev/LipschitzDomainH1.lean`.
 * **H.4 and duality (formalised, Section 4.5).** `H̃^1(Ω) ≅ H^1_0(Ω)` isometrically for every
   open `Ω` (`Rd.tildeEquivZeroBoundary`); for every real `s` the duality
   `(H̃^s(Ω))^* ≅ H^{-s}(Ω)` and `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` with the pairing of `H^{-s}(ℝ^d)` and

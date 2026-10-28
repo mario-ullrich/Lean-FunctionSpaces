@@ -347,9 +347,9 @@ theorem summable_localExtTerm_of_forall_le (hp : p ≠ ∞) {W : Set V} (hW : Me
     Summable fun j => b.localExtTerm hp hW L j f := by
   have htsum : ∑' j, ‖b.localExtTerm hp hW L j f‖ₑ ≠ ∞ :=
     ne_top_of_le_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num)
-      (memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top)
+      (eLpNorm_momentKernel_ne_top b.integrable L))
       (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)) hXf) (b.tsum_enorm_localExtTerm_le hp hW L hX)
-  exact Summable.of_norm (by simpa using ENNReal.summable_toReal htsum)
+  exact Summable.of_enorm htsum
 
 /-- **The local extension converges absolutely** for `s > 0` and a finite local means
 quasi-norm on `W`: `‖η_j ⋆ 1_W (k_j ⋆ f)‖_p ≤ 2 ‖m‖_1 2^(-js) ‖f‖_W`
@@ -468,14 +468,6 @@ theorem localNormOn_le (hp : p ≠ ∞) {W T : Set V} (hW : MeasurableSet W) (L 
         · exact le_self_add
         · exact le_add_self
     _ = (M + 2 * A) * (‖f‖ₑ + Λ) := by ring
-
-/-- The constant `‖m‖_1 + 2 ‖g‖_1` of `Rd.LocalMeansBump.localNormOn_le` is finite, for the
-moment kernel `m` of the bump `g`. -/
-theorem momentConst_ne_top (L : ℕ) :
-    eLpNorm (momentKernel b.toFun L) 1 volume + 2 * ∫⁻ z, ‖b.toFun z‖ₑ ≠ ∞ :=
-  ENNReal.add_ne_top.2
-    ⟨(memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top,
-      ENNReal.mul_ne_top (by norm_num) b.integrable.2.ne⟩
 
 /-- The **constant of the local extension** `C_b(L, s) (‖m‖_1 + 2 ‖g‖_1)`, for the moment kernel
 `m` of the bump `g`: the constant of the synthesis estimate (`Rd.LocalMeansBump.synthConst`) times

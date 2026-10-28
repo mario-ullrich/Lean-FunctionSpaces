@@ -7,6 +7,7 @@ module
 
 public import FunctionSpaces.Rd.Sobolev.SobolevTwoLittlewoodPaley
 public import FunctionSpaces.Domains.Traces.LipschitzBoundaryTrace
+public import FunctionSpaces.Domains.Sobolev.SobolevRestrictionSpaces
 
 /-!
 # `H^1` on bounded Lipschitz domains
@@ -22,6 +23,9 @@ only on the values of `f` on `Ω` (`Rd.BoundedLipschitzDomain.MemSobolevOn.congr
   `r ≥ 2`, by `W^1_2(V) = B^1_{2,2}(V)` and the extension theorem for bounded Lipschitz domains.
   This quantity is at most `‖F‖_2 + ‖(2^k ω_r(F, 2^(-k))_2)_k‖_{ℓ_2}` for every `F` with `F = f`
   on `Ω` (`Rd.BoundedLipschitzDomain.modNormOn_le_modNorm_of_ae_eq`).
+* **The Hilbert space** (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`):
+  `f ∈ H^1(Ω)` iff its restriction to `Ω` is `u|_Ω` for some `u` in the Hilbert space `H^1(Ω)`
+  of restrictions of Mathlib's `H^1(V)` (`Rd.RestrictionSpace`).
 * **The weak gradient** (`Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`): every
   `f ∈ H^1(Ω)` lies in `W^1_2(Ω)`, so its weak derivatives on `Ω` exist and lie in `L_2(Ω)`.
   This direction holds by the definition through extensions; the converse is the extension
@@ -253,6 +257,27 @@ theorem MemSobolevOn.isBoundaryTrace_unique (ψ : Ω.BoundaryPartition)
     (hg : Ω.IsBoundaryTrace ψ two_ne_top 2 1 2 f g)
     (hg' : Ω.IsBoundaryTrace ψ two_ne_top 2 1 2 f g') : g =ᶠ[Ω.aeBoundary] g' :=
   hg.unique one_pos (by norm_num) one_le_two ((Ω.memSobolevOn_iff_modulusOn le_rfl f).1 hf) hg'
+
+open scoped BesselPotentialSpace in
+/-- **The predicate and the type agree**: for a bounded Lipschitz domain `Ω`, `f ∈ L_2(V)` lies
+in `H^1(Ω)` in the sense of `Rd.BoundedLipschitzDomain.MemSobolevOn` iff its restriction to `Ω`
+is `u|_Ω` for some `u` in the Hilbert space `H^1(Ω)`. -/
+theorem memSobolevOn_iff_exists_restrictL2 (Ω : BoundedLipschitzDomain V)
+    (f : Lp ℂ 2 (volume : Measure V)) :
+    Ω.MemSobolevOn f ↔ ∃ u : RestrictionSpace 1 Ω.toOpens,
+      restrictL2 Ω.toOpens u = LpToLpRestrictCLM V ℂ ℂ volume 2 Ω.carrier f := by
+  constructor
+  · rintro ⟨F, hF, hFf⟩
+    have hS := (memSobolev_one_iff F).1 hF
+    have hU : toL2 hS.toBesselPotentialSpace = F :=
+      toL2_eq_of_toDistr_eq _ hS.toBesselPotentialSpace_toDistr.symm
+    refine ⟨restrictProj 1 Ω.toOpens hS.toBesselPotentialSpace, ?_⟩
+    rw [restrictL2_restrictProj, hU]
+    exact Lp.ext ((LpToLpRestrictCLM_coeFn ℂ _ _).trans
+      (hFf.trans (LpToLpRestrictCLM_coeFn ℂ _ _).symm))
+  · rintro ⟨u, hu⟩
+    refine ⟨toL2 (u : H^{1}(V)), memSobolev_toL2 _, ?_⟩
+    exact (restrictL2_eq_iff_ae_eq u f).1 hu
 
 end BoundedLipschitzDomain
 

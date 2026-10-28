@@ -100,9 +100,9 @@ theorem summable_extTerm (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : 
     refine ne_top_of_le_ne_top ?_ (ENNReal.tsum_le_tsum hle)
     rw [ENNReal.tsum_mul_left, ENNReal.tsum_mul_right, ENNReal.tsum_dyadicWeight_neg]
     exact ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num)
-      (memLp_one_iff_integrable.2 (integrable_momentKernel Ω.coneBump.integrable L)).eLpNorm_ne_top)
+      (eLpNorm_momentKernel_ne_top Ω.coneBump.integrable L))
       (ENNReal.mul_ne_top (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs) hf.ne)
-  exact Summable.of_norm (by simpa using ENNReal.summable_toReal htsum)
+  exact Summable.of_enorm htsum
 
 /-- **Rychkov's extension** `Ext f = ∑_j η_j ⋆ (1_Ω (k_j ⋆ f))`. -/
 noncomputable def extension (hp : p ≠ ∞) (L : ℕ) (f : Lp ℂ p (volume : Measure V)) :

@@ -596,14 +596,14 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| Lipschitz graph domains: cone and closed cone, the closure of the domain plus the cone, cone bump, support principle | ✅ | ✗ | `Domains/Lipschitz/LipschitzGraph` |
+| Lipschitz graph domains: cone and closed cone, the closure of the domain, the closure plus the cone, cone bump, support principle | ✅ | ✗ | `Domains/Lipschitz/LipschitzGraph` |
 | Rychkov's extension, restrictions to Lipschitz graph domains by intrinsic local means | ✅ | ✗ | `Domains/Extension/RychkovExtension` |
 | Restrictions to Lipschitz graph domains by intrinsic differences | ✅ | ✗ | `Domains/Extension/LipschitzGraphBesov` |
 | Local versions of Rychkov's extension: boundary and inner patches, short steps into the closed cone, absolute convergence from bounds of the weighted local means, agreement on the patch for every convergent local extension, the local extension with a bound | ✅ | ✗ | `Domains/Extension/LocalExtension` |
 | Bounded Lipschitz domains: the patches covering the closure, pasting of local extensions, subadditivity and homogeneity of the quasi-norms by differences, the extension with a bound | ✅ | ✗ | `Domains/Lipschitz/BoundedLipschitz` |
-| Null hyperplanes, the half-space and the models of manifolds as Besov domains | ✅ | ✗ | `Domains/Lipschitz/HalfSpace` |
+| Null hyperplanes, the half-space, the first axis `e₀` of `ℝ^n`, and the models of manifolds as Besov domains | ✅ | ✗ | `Domains/Lipschitz/HalfSpace` |
 | Traces of every order on the half-space: trace theorem, extension, trace space | ✅ | ✗ | `Domains/Traces/HalfSpaceTrace` |
-| Graph map of a Lipschitz graph domain, restrictions of atoms to the graph | ✅ | ✗ | `Domains/Lipschitz/GraphParametrization` |
+| Graph map of a Lipschitz graph domain, the boundary as the graph, restrictions of atoms to the graph | ✅ | ✗ | `Domains/Lipschitz/GraphParametrization` |
 | Traces on Lipschitz graph domains: boundedness, linearity, trace of continuous functions | ✅ | ✗ | `Domains/Traces/GraphTrace` |
 | Mollified graph and vertical cut-off with bounds of their differences | ✅ | ✗ | `Domains/Traces/MollifiedGraph` |
 | Extension from the boundary of a Lipschitz graph domain, its trace space | ✅ | ✗ | `Domains/Traces/GraphTraceExtension` |
@@ -618,8 +618,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Besov spaces of smooth domains by charts equal the intrinsic Besov spaces | ✅ | ✗ | `Domains/Manifolds/SmoothDomainBesov` |
 | Besov spaces on the boundary of a compact manifold, independence of the atlas | ✅ | ✗ | `Domains/Manifolds/BoundaryBesov` |
 | Trace theorem on compact manifolds: commutation with charts, boundedness, trace space | ✅ | ✗ | `Domains/Manifolds/BoundaryTrace` |
-| `H^1` on bounded Lipschitz domains defined as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the weak gradient, and the boundary traces, which form `B^{1/2}_{2,2}(Γ)` | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainH1` |
-| The Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets inside Mathlib's `H^s(ℝ^d)`, `H^s(Ω)` as a quotient, Rellich's theorem for `H^1(Ω)`, the identification with the restriction space of a bounded Lipschitz domain, the restriction of an element agreeing with `u ∈ H^1(Ω)` on `Ω`, the bound of the `H^1` norm by the `W^1_2` norm, the weak derivatives as bounded operators on `H^1(ℝ^d)`, the density of compactly supported Schwartz functions in `H^s(ℝ^d)`, Schwartz functions with compact support in `Ω` in the span of the test functions, `H̃^s(ℝ^d) = H^s(ℝ^d)`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)` | ✅ | ✗ | `Domains/Sobolev/SobolevRestrictionSpaces` |
+| `H^1` on bounded Lipschitz domains defined as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the identification with the restriction space, the weak gradient, and the boundary traces, which form `B^{1/2}_{2,2}(Γ)` | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainH1` |
+| The Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets inside Mathlib's `H^s(ℝ^d)`, `H^s(Ω)` as a quotient, Rellich's theorem for `H^1(Ω)`, the restriction of an element agreeing with `u ∈ H^1(Ω)` on `Ω`, the bound of the `H^1` norm by the `W^1_2` norm, the weak derivatives as bounded operators on `H^1(ℝ^d)`, the density of compactly supported Schwartz functions in `H^s(ℝ^d)`, Schwartz functions with compact support in `Ω` in the span of the test functions, `H̃^s(ℝ^d) = H^s(ℝ^d)`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)` | ✅ | ✗ | `Domains/Sobolev/SobolevRestrictionSpaces` |
 | The Bessel potential of real Schwartz functions as a real function, the isometry `J_{2s} : H^s(ℝ^d) → H^{-s}(ℝ^d)`, the pairing of `H^{-s}` and `H^s`, and the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)`, `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on open sets | ✅ | ✗ | `Domains/Sobolev/SobolevDuality` |
 | `H^1(ℝ^d) ⊆ B^{1/2}_{2,1}(ℝ^d)` and its converse `B^1_{2,2}(ℝ^d) ⊆ H^1(ℝ^d)` with explicit constants, the trace of `H^1(ℝ^d)` on a Lipschitz graph and the chart traces of `H^1(Ω)` on a bounded Lipschitz domain as bounded operators, the trace kernel, the trace space `H^{1/2}(Γ)` defined as its orthogonal complement, with trace and extension operators, `H^1(Ω) ⧸ ker γ ≅ H^{1/2}(Γ)`, and `H^{-1/2}(Γ)` | ✅ | ✗ | `Domains/Traces/BoundaryTraceSpace` |
 | The area formula for Lipschitz graphs: Lipschitz maps and Mathlib's Euclidean Hausdorff measure, the linear case by Mathlib's norm determinant, stretches and tilts, the gradient and the Gram density, good pieces, `μHE[n-1](γ(A)) = ∫_A √(1 + ‖∇φ‖²)` with `n = dim V` in set, measure and integral form; the outward unit normal | ✅ | ✗ | `Domains/Lipschitz/LipschitzGraphArea` |

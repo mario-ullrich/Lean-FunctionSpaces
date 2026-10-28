@@ -6143,13 +6143,15 @@ The step sets are intersections of translates, and translations preserve the Leb
   Rd.closedHalfSpace, Rd.isClosed_closedHalfSpace, Rd.convex_closedHalfSpace,
   Rd.mem_interior_closedHalfSpace, Rd.LipschitzGraph.flat, Rd.LipschitzGraph.flat_domain,
   Rd.closedHalfSpace_ae_eq, Rd.BesovDomain.closedHalfSpace,
+  Rd.e0, Rd.norm_e0, Rd.coord_zero_eq_inner, Manifold.range_eq_closedHalfSpace,
   Rd.BesovDomain.range_euclideanHalfSpace, Rd.BesovDomain.range_of_boundaryless}
 \leanok
 \uses{def:besov-domain, lem:null-set-domains, thm:graph-besov}
 For every nonzero $e \in V$, the hyperplane $e^\perp$ is a null set. For a unit vector $e$ the
 closed half-space $\{x : \langle x, e \rangle \geq 0\}$ is a Besov domain. Hence the models of
-manifolds are Besov domains: the range $\{y : y_0 \geq 0\}$ of the model with corners of the
-Euclidean half-space, and the range $V$ of a model without boundary.
+manifolds are Besov domains: the range $\{y : y_0 \geq 0\} = \{y : \langle y, e_0 \rangle \geq 0\}$
+of the model with corners of the Euclidean half-space, for the unit vector
+$e_0 = (1, 0, \dots, 0)$, and the range $V$ of a model without boundary.
 \end{theorem}
 
 \begin{proof}

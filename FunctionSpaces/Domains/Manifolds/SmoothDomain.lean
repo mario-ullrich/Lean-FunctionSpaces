@@ -40,17 +40,6 @@ variable {n : ℕ} [NeZero n]
 
 /-! ### Aligning a unit vector with the first axis -/
 
-/-- The unit vector `e₀ = (1, 0, …, 0)` of `ℝ^n`. -/
-noncomputable def e0 : EuclideanSpace ℝ (Fin n) := EuclideanSpace.single 0 1
-
-/-- `‖e₀‖ = 1`. -/
-theorem norm_e0 : ‖(e0 : EuclideanSpace ℝ (Fin n))‖ = 1 := by
-  simp [e0]
-
-/-- The first coordinate is the inner product with `e₀`. -/
-theorem coord_zero_eq_inner (y : EuclideanSpace ℝ (Fin n)) : y 0 = inner ℝ y e0 := by
-  simp [e0, EuclideanSpace.inner_single_right]
-
 /-- The **alignment** of a vector `e` with `e₀`: the reflection in `(e - e₀)^⊥`. -/
 noncomputable def alignTo (e : EuclideanSpace ℝ (Fin n)) :
     EuclideanSpace ℝ (Fin n) ≃ₗᵢ[ℝ] EuclideanSpace ℝ (Fin n) :=
@@ -60,44 +49,18 @@ noncomputable def alignTo (e : EuclideanSpace ℝ (Fin n)) :
 theorem alignTo_apply_self {e : EuclideanSpace ℝ (Fin n)} (he : ‖e‖ = 1) : alignTo e e = e0 :=
   Submodule.reflection_sub (by rw [he, norm_e0])
 
-/-! ### Closures of graph domains -/
-
-omit [NeZero n] in
-/-- **The closure of a graph domain** is `{x : φ(x) ≤ ⟪x, e⟫}`: the points with `φ(x) = ⟪x, e⟫`
-are limits of `x + t e`, `t ↓ 0`. -/
-theorem LipschitzGraph.closure_domain {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
-    (G : LipschitzGraph V) : closure G.domain = {x | G.phi x ≤ inner ℝ x G.e} := by
-  apply Subset.antisymm
-  · exact closure_minimal (fun x (hx : G.phi x < inner ℝ x G.e) => le_of_lt hx)
-      (isClosed_le G.continuous_phi (continuous_id.inner continuous_const))
-  · intro x hx
-    have hlim : Tendsto (fun t : ℝ => x + t • G.e) (𝓝[>] 0) (𝓝 x) := by
-      have hc : Continuous fun t : ℝ => x + t • G.e :=
-        continuous_const.add (continuous_id.smul continuous_const)
-      have h := hc.tendsto 0
-      simp only [zero_smul, add_zero] at h
-      exact h.mono_left nhdsWithin_le_nhds
-    refine mem_closure_of_tendsto hlim (eventually_nhdsWithin_of_forall fun t (ht : 0 < t) => ?_)
-    show G.phi (x + t • G.e) < inner ℝ (x + t • G.e) G.e
-    rw [G.const, inner_add_left, real_inner_smul_left, real_inner_self_eq_norm_sq, G.norm_e]
-    have hx' : G.phi x ≤ inner ℝ x G.e := hx
-    linarith
+/-! ### Closures -/
 
 omit [NeZero n] in
 /-- **Closures agree on open sets where the sets agree**: if `B ∩ S = B ∩ T` for an open `B`, then
-`closure S` and `closure T` have the same points in `B`. -/
+`closure S` and `closure T` have the same points in `B`, since near `x ∈ B` the neighbourhoods
+within `S` and within `T` are those within `B ∩ S = B ∩ T` (Mathlib's
+`mem_closure_iff_nhdsWithin_neBot`, `nhdsWithin_restrict`). -/
 theorem mem_closure_iff_of_inter_eq {V : Type*} [TopologicalSpace V] {S T B : Set V}
     (hB : IsOpen B) (h : B ∩ S = B ∩ T) {x : V} (hx : x ∈ B) :
     x ∈ closure S ↔ x ∈ closure T := by
-  constructor
-  · intro hxS
-    have h1 := hB.inter_closure ⟨hx, hxS⟩
-    rw [h] at h1
-    exact closure_mono inter_subset_right h1
-  · intro hxT
-    have h1 := hB.inter_closure ⟨hx, hxT⟩
-    rw [← h] at h1
-    exact closure_mono inter_subset_right h1
+  rw [mem_closure_iff_nhdsWithin_neBot, mem_closure_iff_nhdsWithin_neBot,
+    nhdsWithin_restrict S hx hB, nhdsWithin_restrict T hx hB, inter_comm S, inter_comm T, h]
 
 /-! ### Smooth domains and their straighteners -/
 

@@ -34,7 +34,9 @@ over balls, `∫_{|z| < R} |z|^(-a) dz ≤ c R^(n-a)` for `a < n`, is
 `Rd.lintegral_ball_norm_rpow_neg_le`. Together they bound `∫ u(z)^p / |z|^a dz` for
 `u(z) ≤ min(L |z|, S)` (`Rd.lintegral_rpow_div_norm_rpow_le`), and the integral outside a ball
 bounds, after translation, the tail `∫∫ u(x) 1_{|y - x| ≥ η} |y - x|^(-a) dy dx`
-(`Rd.lintegral_lintegral_mul_indicator_le`).
+(`Rd.lintegral_lintegral_mul_indicator_le`). Double integrals split over sums and take out finite
+constants (`Rd.lintegral_lintegral_add_right`, `Rd.lintegral_lintegral_le_add_two_mul`,
+`Rd.lintegral_lintegral_const_mul'`).
 -/
 
 @[expose] public section
@@ -94,12 +96,9 @@ noncomputable def slobodeckijForm (p : ℝ≥0∞) (s : ℝ) (f : V → ℂ) : �
 
 /-- The Gagliardo form depends only on the class of `f` modulo null sets. -/
 theorem slobodeckijForm_congr_ae {f g : V → ℂ} (hfg : f =ᵐ[volume] g) (p : ℝ≥0∞) (s : ℝ) :
-    slobodeckijForm p s f = slobodeckijForm p s g := by
-  refine lintegral_congr_ae ?_
-  filter_upwards [hfg] with x hx
-  refine lintegral_congr_ae ?_
-  filter_upwards [hfg] with y hy
-  rw [hx, hy]
+    slobodeckijForm p s f = slobodeckijForm p s g :=
+  lintegral_congr_ae (hfg.mono fun x hx => lintegral_congr_ae (hfg.mono fun y hy => by
+    simp only [hx, hy]))
 
 /-- On a space with one point the Gagliardo form vanishes for `0 < p < ∞`: every difference
 `f(y) - f(x)` is `0`. -/
@@ -495,6 +494,41 @@ theorem measurable_slobodeckijIntegrand {f : V → ℂ} (hf : Measurable f) (p b
     Measurable (Function.uncurry fun x y : V => ‖f y - f x‖ₑ ^ p / ‖y - x‖ₑ ^ b) :=
   (((hf.comp measurable_snd).sub (hf.comp measurable_fst)).enorm.pow_const _).div
     ((measurable_snd.sub measurable_fst).enorm.pow_const _)
+
+/-- **Splitting a double integral**: `∫∫ (F + G) = ∫∫ F + ∫∫ G` for an s-finite measure and `G`
+jointly measurable, whatever `F` (Mathlib's `lintegral_add_right'` for the inner and the outer
+integral, with `Measurable.lintegral_prod_right'`). -/
+theorem lintegral_lintegral_add_right {α : Type*} [MeasurableSpace α] {μ : Measure α} [SFinite μ]
+    (F : α → α → ℝ≥0∞) {G : α → α → ℝ≥0∞} (hG : Measurable (Function.uncurry G)) :
+    ∫⁻ x, ∫⁻ y, (F x y + G x y) ∂μ ∂μ = ∫⁻ x, ∫⁻ y, F x y ∂μ ∂μ + ∫⁻ x, ∫⁻ y, G x y ∂μ ∂μ := by
+  have hin : ∀ x, ∫⁻ y, (F x y + G x y) ∂μ = ∫⁻ y, F x y ∂μ + ∫⁻ y, G x y ∂μ := fun x =>
+    lintegral_add_right' _ (hG.comp measurable_prodMk_left).aemeasurable
+  simp_rw [hin]
+  exact lintegral_add_right' _ hG.lintegral_prod_right'.aemeasurable
+
+/-- **A double integral by a pointwise bound with one-variable parts**: if
+`F(x, y) ≤ T(x, y) + a(x) + a(y)` for measurable `a`, then
+`∫∫ F ≤ ∫∫ T + 2 μ(univ) ∫ a` (`Rd.lintegral_lintegral_add_right`). -/
+theorem lintegral_lintegral_le_add_two_mul {α : Type*} [MeasurableSpace α] {μ : Measure α}
+    [SFinite μ] {F T : α → α → ℝ≥0∞} {a : α → ℝ≥0∞} (ha : Measurable a)
+    (hF : ∀ x y, F x y ≤ T x y + a x + a y) :
+    ∫⁻ x, ∫⁻ y, F x y ∂μ ∂μ ≤ ∫⁻ x, ∫⁻ y, T x y ∂μ ∂μ + 2 * μ univ * ∫⁻ x, a x ∂μ := by
+  calc ∫⁻ x, ∫⁻ y, F x y ∂μ ∂μ ≤ ∫⁻ x, ∫⁻ y, (T x y + a x + a y) ∂μ ∂μ :=
+        lintegral_mono fun x => lintegral_mono fun y => hF x y
+    _ = (∫⁻ x, ∫⁻ y, T x y ∂μ ∂μ) + (∫⁻ x, ∫⁻ _, a x ∂μ ∂μ) + ∫⁻ _, ∫⁻ y, a y ∂μ ∂μ := by
+        rw [lintegral_lintegral_add_right (fun x y => T x y + a x) (G := fun _ y => a y)
+            (ha.comp measurable_snd),
+          lintegral_lintegral_add_right T (G := fun x _ => a x) (ha.comp measurable_fst)]
+    _ = _ := by
+        simp only [lintegral_const, lintegral_mul_const _ ha]
+        ring
+
+/-- `∫∫ c F = c ∫∫ F` for a finite constant `c`, measurable `F` or not (Mathlib's
+`lintegral_const_mul'` twice). -/
+theorem lintegral_lintegral_const_mul' {α : Type*} [MeasurableSpace α] {μ : Measure α}
+    {c : ℝ≥0∞} (hc : c ≠ ∞) (F : α → α → ℝ≥0∞) :
+    ∫⁻ x, ∫⁻ y, c * F x y ∂μ ∂μ = c * ∫⁻ x, ∫⁻ y, F x y ∂μ ∂μ := by
+  rw [lintegral_congr fun x => lintegral_const_mul' c (F x) hc, lintegral_const_mul' _ _ hc]
 
 /-! ### Averaging the differences over a ball -/
 

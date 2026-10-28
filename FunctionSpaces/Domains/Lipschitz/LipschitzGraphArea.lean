@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Domains.Traces.LipschitzBoundaryTrace
+public import FunctionSpaces.Domains.Lipschitz.GraphParametrization
 public import Mathlib.Geometry.Euclidean.Volume.Measure
 public import Mathlib.Analysis.Calculus.Rademacher
 public import Mathlib.Analysis.Calculus.Gradient.Basic
@@ -19,7 +19,7 @@ public import Mathlib.Analysis.InnerProductSpace.NormDet
 
 Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph domain in `V`, `dim V = n`, with the graph map
 `γ(x') = x' + φ(x') e` over the hyperplane `H = e^⊥` (`Rd.LipschitzGraph.graphMap`), whose range is
-the boundary of `Ω` (`Rd.LipschitzGraph.range_graphMap`). By Rademacher's theorem `φ|_H` has a
+the boundary of `Ω`. By Rademacher's theorem `φ|_H` has a
 gradient `∇φ(x') ∈ H` almost everywhere (`Rd.LipschitzGraph.gradPhi`). The **area formula**
 (`Rd.LipschitzGraph.euclideanHausdorffMeasure_graphMap_image`) states, for every measurable
 `A ⊆ H`, `μHE[n-1] (γ(A)) = ∫_A √(1 + ‖∇φ(x')‖²) dx'` for Mathlib's Euclidean Hausdorff measure
@@ -393,16 +393,6 @@ theorem enorm_graphMap_sub_le (x' y' : Ω.hyperplane) :
   rw [edist_eq_enorm_sub, edist_eq_enorm_sub] at h
   rw [ENNReal.ofReal_eq_coe_nnreal (by linarith [Ω.M_nonneg])]
   exact h
-
-/-- **The range of the graph map is the boundary** of the graph domain. -/
-theorem range_graphMap : Set.range Ω.graphMap = frontier Ω.domain := by
-  ext y
-  rw [Ω.mem_frontier_domain_iff]
-  constructor
-  · rintro ⟨x', rfl⟩
-    rw [Ω.proj_graphMap]
-  · intro h
-    exact ⟨_, h⟩
 
 variable [FiniteDimensional ℝ V]
 

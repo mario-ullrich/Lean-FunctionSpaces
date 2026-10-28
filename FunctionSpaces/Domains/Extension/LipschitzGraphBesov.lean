@@ -107,6 +107,14 @@ theorem enorm_indicatorLp_localMean_succ_le (hp : p ≠ ∞) {W T : Set V} (hW :
             (mul_le_mul' le_rfl (hmono (j + 1) (Nat.le_succ j))))
     _ = 2 * A * lpModulusOn p T L f (j + 1) := by ring
 
+/-- The constant `‖m‖_1 + 2 ‖g‖_1` of the bounds of the local means by the moduli on a set
+(`Rd.LipschitzGraph.intrinsicConst` for the cone bump, `Rd.LocalMeansBump.localNormOn_le`) is
+finite, for the moment kernel `m` of the bump `g` (`Rd.eLpNorm_momentKernel_ne_top`). -/
+theorem momentConst_ne_top (L : ℕ) :
+    eLpNorm (momentKernel b.toFun L) 1 volume + 2 * ∫⁻ z, ‖b.toFun z‖ₑ ≠ ∞ :=
+  ENNReal.add_ne_top.2
+    ⟨eLpNorm_momentKernel_ne_top b.integrable L, ENNReal.mul_ne_top (by norm_num) b.integrable.2.ne⟩
+
 end LocalMeansBump
 
 namespace LipschitzGraph
@@ -171,11 +179,10 @@ theorem enorm_cutoff_localMean_succ_le (hp : p ≠ ∞) (L j : ℕ)
 noncomputable def intrinsicConst (L : ℕ) : ℝ≥0∞ :=
   eLpNorm (momentKernel Ω.coneBump.toFun L) 1 volume + 2 * ∫⁻ z, ‖Ω.coneBump.toFun z‖ₑ
 
-/-- The constant of the intrinsic upper bound is finite. -/
+/-- The constant of the intrinsic upper bound is finite
+(`Rd.LocalMeansBump.momentConst_ne_top` for the cone bump). -/
 theorem intrinsicConst_ne_top (L : ℕ) : Ω.intrinsicConst L ≠ ∞ :=
-  ENNReal.add_ne_top.2
-    ⟨(memLp_one_iff_integrable.2 (integrable_momentKernel Ω.coneBump.integrable L)).eLpNorm_ne_top,
-      ENNReal.mul_ne_top (by norm_num) Ω.coneBump.integrable.2.ne⟩
+  Ω.coneBump.momentConst_ne_top L
 
 /-- **The intrinsic local means are bounded by the moduli on `Ω`**:
 `‖(2^(js) ‖1_Ω (k_j ⋆ f)‖_p)_j‖_{ℓ_q} ≤
@@ -226,16 +233,13 @@ theorem intrinsicNorm_lt_top (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0�
 
 /-- **The moduli on `Ω` are at most those of every function that agrees with `f` on `Ω`**: if
 `1_Ω F = 1_Ω f`, then `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} ≤
-‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q}`. -/
+‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q}`; the case `O = Ω` of
+`Rd.modNormOn_le_modNorm_of_indicatorLp`, since the cut-off is `indicatorLp`. -/
 theorem modNormOn_le_modNorm (r : ℕ) (s : ℝ) (q : ℝ≥0∞) {F f : Lp ℂ p (volume : Measure V)}
     (hFf : Ω.cutoff F = Ω.cutoff f) :
     ‖Ω.cutoff f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.domain r f k) ≤
-      ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) := by
-  refine add_le_add ?_ (ENNReal.lqNorm_mono fun k => mul_le_mul' le_rfl ?_)
-  · rw [← hFf]
-    exact Ω.enorm_cutoff_le F
-  · rw [← lpModulusOn_congr (Ω.indicator_ae_eq_of_cutoff_eq hFf) r k]
-    exact lpModulusOn_le_lpModulus Ω.measurableSet_domain r F k
+      ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) :=
+  modNormOn_le_modNorm_of_indicatorLp Ω.measurableSet_domain r s q hFf
 
 /-- **Rychkov's extension agrees with `f` on `Ω`** when the intrinsic moduli are finite. -/
 theorem cutoff_extension_of_modNormOn (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
@@ -268,9 +272,7 @@ theorem exists_besov_extension_iff_modulusOn (hp : p ≠ ∞) {r : ℕ} {s : ℝ
     (∃ F : Lp ℂ p (volume : Measure V), Ω.cutoff F = Ω.cutoff f ∧
         ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) < ∞) ↔
       ‖Ω.cutoff f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.domain r f k) < ∞ := by
-  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 fun h => by
-    rw [h, Nat.cast_zero] at hsr
-    exact lt_irrefl _ (hs.trans hsr)
+  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
   constructor
   · rintro ⟨F, hFf, hF⟩
     exact (Ω.modNormOn_le_modNorm r s q hFf).trans_lt hF

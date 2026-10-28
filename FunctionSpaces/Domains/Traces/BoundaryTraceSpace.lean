@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Domains.Sobolev.SobolevRestrictionSpaces
+public import FunctionSpaces.Domains.Sobolev.LipschitzDomainH1
 public import Mathlib.Analysis.InnerProductSpace.Adjoint
 
 /-!

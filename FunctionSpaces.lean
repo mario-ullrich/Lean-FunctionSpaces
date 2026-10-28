@@ -365,7 +365,7 @@ and the theorems that their characterisations agree. The library builds on
   approximation, by Littlewood–Paley blocks and by differences.
 * `FunctionSpaces.Rd.Differences.SobolevSlobodeckij`: the Gagliardo form of the Sobolev–Slobodeckij
   spaces, its two-sided bounds by the first-difference Besov norm with explicit constants, radial
-  integrals of powers, and `W^{s,p} = B^s_{p,p}` for `0 < s < 1`.
+  integrals of powers, double integrals of sums, and `W^{s,p} = B^s_{p,p}` for `0 < s < 1`.
 * `FunctionSpaces.Rd.LocalMeans.LocalMeans`: local means with moment kernels, the reproducing
   formula, and the characterisation of Besov spaces by local means.
 * `FunctionSpaces.Rd.LocalMeans.Multipliers`: Leibniz's rule for differences, pointwise
@@ -526,13 +526,13 @@ and the theorems that their characterisations agree. The library builds on
   of unity, pasting with a bound, subadditivity and homogeneity of the Besov quasi-norms by
   differences, and the restrictions of Besov spaces described by intrinsic differences, with an
   extension bounded by a constant times the intrinsic quasi-norm.
-* `FunctionSpaces.Domains.Lipschitz.HalfSpace`: null sets and moduli on sets, the closed half-space
-  and the models of manifolds as Besov domains.
+* `FunctionSpaces.Domains.Lipschitz.HalfSpace`: null sets and moduli on sets, the closed half-space,
+  the first axis `e₀` of `ℝ^n`, and the models of manifolds as Besov domains.
 * `FunctionSpaces.Domains.Traces.HalfSpaceTrace`: restrictions and extensions of smooth atoms on the
   flat graph, the trace theorem and the trace space of the half-space for every smoothness, and the
   traces of functions continuous on the closed half-space.
 * `FunctionSpaces.Domains.Lipschitz.GraphParametrization`: the hyperplane and the graph map of a
-  Lipschitz graph domain, and the restrictions of atoms to the graph.
+  Lipschitz graph domain, the boundary as the graph, and the restrictions of atoms to the graph.
 * `FunctionSpaces.Domains.Traces.GraphTrace`: the trace on the boundary of a Lipschitz graph domain,
   its boundedness from the intrinsic Besov spaces, its linearity, and the trace of continuous
   functions.
@@ -540,9 +540,9 @@ and the theorems that their characterisations agree. The library builds on
   cut-off, with bounds of their differences.
 * `FunctionSpaces.Domains.Traces.GraphTraceExtension`: the extension from the boundary by extended
   atoms and the trace space of a Lipschitz graph domain.
-* `FunctionSpaces.Domains.Traces.GraphTraceCharts`: locality of the trace, its bound by the
-  intrinsic norm, approximation by the partial sums of the reproducing formula, change of chart,
-  traces of products with smooth functions and their bound, and traces of finite sums.
+* `FunctionSpaces.Domains.Traces.GraphTraceCharts`: locality of the trace, approximation by the
+  partial sums of the reproducing formula, change of chart, traces of products with smooth functions
+  and their bound, and traces of finite sums.
 * `FunctionSpaces.Domains.Traces.LipschitzBoundaryTrace`: almost everywhere on the boundary of a
   bounded Lipschitz domain, Besov spaces on the boundary, the boundary trace, its existence and
   uniqueness for functions with a finite intrinsic Besov norm, and its trace space.
@@ -570,8 +570,9 @@ and the theorems that their characterisations agree. The library builds on
   the trace on the boundary of a compact manifold, its independence of the atlas, and the trace
   theorem.
 * `FunctionSpaces.Domains.Sobolev.LipschitzDomainH1`: `H^1(Ω)` on a bounded Lipschitz domain `Ω` as
-  the space of restrictions of `H^1(ℝ^d)`, its description by intrinsic differences, the weak
-  gradient on `Ω`, and the boundary traces in `B^{1/2}_{2,2}(∂Ω)`, which form the trace space.
+  the space of restrictions of `H^1(ℝ^d)`, its description by intrinsic differences, its
+  identification with the restriction space, the weak gradient on `Ω`, and the boundary traces in
+  `B^{1/2}_{2,2}(∂Ω)`, which form the trace space.
 * `FunctionSpaces.Domains.Sobolev.SobolevRestrictionSpaces`: the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`
   and `H^s_0(Ω)` on open sets `Ω ⊆ ℝ^d` for real `s`, built inside Mathlib's `H^s(ℝ^d)`: restriction
   as an orthogonal projection, `H^s(Ω)` as a quotient, elements of `H^1(Ω)` determined by their

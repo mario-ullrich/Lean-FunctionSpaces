@@ -65,7 +65,8 @@ structure GlobalAtlas where
 
 /-- **Every smooth domain has a global atlas**: finitely many sets of straighteners cover the
 compact closure, Mathlib's smooth partitions of unity on `ℝ^n` are subordinate to them, and smooth
-Urysohn functions give the cut-offs. -/
+cut-offs exist for every compact set inside an open set
+(`Manifold.exists_contMDiff_eq_one_tsupport_subset`). -/
 theorem GlobalAtlas.nonempty : Nonempty Ω.GlobalAtlas := by
   obtain ⟨t, ht⟩ := Ω.isCompact_closure.elim_finite_subcover
     (fun x : closure Ω.carrier => (Ω.straightenerAt x).B) (fun x => (Ω.straightenerAt x).isOpen_B)
@@ -80,17 +81,11 @@ theorem GlobalAtlas.nonempty : Nonempty Ω.GlobalAtlas := by
     (fun i => (Ω.straightenerAt (pt i)).isOpen_B) hcover
   have hθ : ∀ i, ∃ θ : EuclideanSpace ℝ (Fin n) → ℝ, ContDiff ℝ ∞ θ ∧
       (∀ x ∈ tsupport (f i), θ x = 1) ∧ tsupport θ ⊆ (Ω.straightenerAt (pt i)).B := fun i => by
-    have hK : IsCompact (tsupport (f i)) := Metric.isCompact_of_isClosed_isBounded
-      (isClosed_tsupport _) ((Ω.straightenerAt (pt i)).isBounded_B.subset (hf i))
-    obtain ⟨V, hVo, hKV, hVU, -⟩ :=
-      exists_open_between_and_isCompact_closure hK (Ω.straightenerAt (pt i)).isOpen_B (hf i)
-    obtain ⟨g, hg0, hg1, -⟩ := exists_contMDiffMap_zero_one_of_isClosed (n := ⊤)
-      𝓘(ℝ, EuclideanSpace ℝ (Fin n)) hVo.isClosed_compl (isClosed_tsupport _)
-      (disjoint_compl_left_iff_subset.2 hKV)
-    refine ⟨g, contMDiff_iff_contDiff.1 g.contMDiff, fun x hx => hg1 hx,
-      (closure_mono fun x hx => ?_).trans hVU⟩
-    by_contra hxV
-    exact hx (hg0 hxV)
+    obtain ⟨θ, hθs, hθ1, hθsub⟩ := Manifold.exists_contMDiff_eq_one_tsupport_subset
+      𝓘(ℝ, EuclideanSpace ℝ (Fin n)) (Metric.isCompact_of_isClosed_isBounded
+        (isClosed_tsupport _) ((Ω.straightenerAt (pt i)).isBounded_B.subset (hf i)))
+      (Ω.straightenerAt (pt i)).isOpen_B (hf i)
+    exact ⟨θ, contMDiff_iff_contDiff.1 hθs, hθ1, hθsub⟩
   choose θ hθs hθ1 hθsub using hθ
   exact ⟨{ N := t.card
            S := fun i => Ω.straightenerAt (pt i)
@@ -178,7 +173,8 @@ theorem eLpNorm_extend {g : closure Ω.carrier → ℂ} (hg : StronglyMeasurable
 /-! ### The pieces of the global atlas -/
 
 omit [NeZero n] in
-/-- `{y : y_0 = 0}` is a null set. -/
+/-- `{y : y_0 = 0}` is a null set: it is the hyperplane `e₀^⊥`
+(`Rd.volume_orthogonal_singleton_eq_zero`). -/
 theorem volume_coord_zero_eq_zero [NeZero n] :
     volume {y : EuclideanSpace ℝ (Fin n) | y 0 = 0} = 0 := by
   have h : {y : EuclideanSpace ℝ (Fin n) | y 0 = 0} =
@@ -188,13 +184,7 @@ theorem volume_coord_zero_eq_zero [NeZero n] :
       ← coord_zero_eq_inner]
     rfl
   rw [h]
-  refine Measure.addHaar_submodule volume _ fun htop => ?_
-  have hmem : (e0 : EuclideanSpace ℝ (Fin n)) ∈ (ℝ ∙ (e0 : EuclideanSpace ℝ (Fin n)))ᗮ := by
-    rw [htop]
-    exact Submodule.mem_top
-  rw [Submodule.mem_orthogonal_singleton_iff_inner_right, real_inner_self_eq_norm_sq,
-    norm_e0] at hmem
-  norm_num at hmem
+  exact volume_orthogonal_singleton_eq_zero (norm_ne_zero_iff.1 (by simp [norm_e0]))
 
 namespace Straightener
 
@@ -373,11 +363,7 @@ theorem GlobalAtlas.modNormOn_pieceLp_lt_top (G : Ω.GlobalAtlas) {r : ℕ} {s :
     (hf : modNormOn Ω.measurableSet r s q (Ω.extLp hp f) < ⊤) (i : Fin G.N) :
     modNormOn (BesovDomain.measurableSet (range (𝓡∂ n))) r s q
       (G.toBesovAtlas.pieceLp Ω.volumeOn hp i f) < ⊤ := by
-  have hr : 1 ≤ r := by
-    by_contra h
-    have h0 : r = 0 := by omega
-    rw [h0, Nat.cast_zero] at hsr
-    linarith
+  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
   set hΩh := BesovDomain.measurableSet (range (𝓡∂ n))
   obtain ⟨F, hFf, hF⟩ :=
     (Ω.exists_besov_extension_iff_modulusOn hp hs hsr hq (Ω.extLp hp f)).2 hf
@@ -386,12 +372,10 @@ theorem GlobalAtlas.modNormOn_pieceLp_lt_top (G : Ω.GlobalAtlas) {r : ℕ} {s :
     MeasurableSet.univ hp hr hs hsr hq
   -- `f = F` on `Ω`
   have hΩf : ∀ᵐ x ∂volume, x ∈ Ω.carrier → Ω.extend f x = F x := by
-    filter_upwards [indicatorLp_apply_ae Ω.measurableSet F,
-      indicatorLp_apply_ae Ω.measurableSet (Ω.extLp hp f), Ω.extLp_ae hp f] with x h1 h2 h3 hx
-    rw [hFf] at h1
-    have h := h1.symm.trans h2
-    rw [indicator_of_mem hx, indicator_of_mem hx, h3] at h
-    exact h.symm
+    filter_upwards [(ae_restrict_iff' Ω.measurableSet).1
+      ((indicatorLp_eq_iff_ae_eq_restrict Ω.measurableSet).1 hFf), Ω.extLp_ae hp f]
+      with x h1 h3 hx
+    rw [h1 hx, h3]
   -- the piece agrees with `(ψ_i F) ∘ τ_i` on the half-space
   have hgood : ∀ᵐ y ∂volume, y ∈ range (𝓡∂ n) →
       (G.psi i ((G.S i).tau y) : ℂ) * Ω.extend f ((G.S i).tau y) =
@@ -443,11 +427,7 @@ theorem GlobalAtlas.modNormOn_extLp_lt_top (G : Ω.GlobalAtlas) {r : ℕ} {s : �
     (hf : ∀ i, modNormOn (BesovDomain.measurableSet (range (𝓡∂ n))) r s q
       (G.toBesovAtlas.pieceLp Ω.volumeOn hp i f) < ⊤) :
     modNormOn Ω.measurableSet r s q (Ω.extLp hp f) < ⊤ := by
-  have hr : 1 ≤ r := by
-    by_contra h
-    have h0 : r = 0 := by omega
-    rw [h0, Nat.cast_zero] at hsr
-    linarith
+  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
   set hΩh := BesovDomain.measurableSet (range (𝓡∂ n))
   obtain ⟨Cext, hCext, hext⟩ :=
     BesovDomain.exists_extension (Ω := range (𝓡∂ n)) p hp r s hs hsr q hq
@@ -467,13 +447,10 @@ theorem GlobalAtlas.modNormOn_extLp_lt_top (G : Ω.GlobalAtlas) {r : ℕ} {s : �
   have hpiece : ∀ i, ∀ᵐ x ∂volume, x ∈ Ω.carrier →
       (G.theta i x : ℂ) * Gi i ((G.S i).sigma x) = (G.psi i x : ℂ) * Ω.extend f x := fun i => by
     have h1 : ∀ᵐ y ∂volume, y ∈ range (𝓡∂ n) → Gi i y = G.toBesovAtlas.piece i f y := by
-      filter_upwards [indicatorLp_apply_ae hΩh (Gi i),
-        indicatorLp_apply_ae hΩh (G.toBesovAtlas.pieceLp Ω.volumeOn hp i f),
-        G.toBesovAtlas.pieceLp_ae Ω.volumeOn hp i f] with y a1 a2 a3 hy
-      rw [hGif i] at a1
-      have h := a1.symm.trans a2
-      rw [indicator_of_mem hy, indicator_of_mem hy, a3] at h
-      exact h
+      filter_upwards [(ae_restrict_iff' hΩh).1
+        ((indicatorLp_eq_iff_ae_eq_restrict hΩh).1 (hGif i)),
+        G.toBesovAtlas.pieceLp_ae Ω.volumeOn hp i f] with y a1 a3 hy
+      rw [a1 hy, a3]
     filter_upwards [(G.S i).measurePreserving_sigma.quasiMeasurePreserving.ae h1] with x hx hxΩ
     by_cases hB : x ∈ (G.S i).B
     · have hσ0 : 0 < (G.S i).sigma x 0 := ((G.S i).mem_iff x hB).1 hxΩ

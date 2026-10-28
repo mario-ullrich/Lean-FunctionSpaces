@@ -6,7 +6,6 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Rd.Sobolev.RellichCompactness
-public import FunctionSpaces.Domains.Sobolev.LipschitzDomainH1
 public import Mathlib.Analysis.InnerProductSpace.ProdL2
 public import Mathlib.Analysis.InnerProductSpace.Projection.Submodule
 public import Mathlib.Topology.Algebra.Module.Basic
@@ -29,10 +28,7 @@ and McLean (Chapter 3), and are Hilbert spaces as well.
   minimum of the norms of the extensions.
 * **`H^1(Ω)` in `L_2(Ω)`**: `Rd.restrictL2` is injective, has norm at most `1`, and is compact
   for bounded `Ω` (Rellich's theorem, `Rd.isCompactOperator_restrictL2`); `U|_Ω = u` whenever
-  `U ∈ H^1(V)` agrees with `u ∈ H^1(Ω)` on `Ω` (`Rd.restrictProj_eq_of_ae_eq`). On a bounded
-  Lipschitz domain the elements of `H^1(Ω)` are the functions of
-  `Rd.BoundedLipschitzDomain.MemSobolevOn`
-  (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`).
+  `U ∈ H^1(V)` agrees with `u ∈ H^1(Ω)` on `Ω` (`Rd.restrictProj_eq_of_ae_eq`).
 * **Weak derivatives**: the `L_2` function of `U ∈ H^1(V)` lies in `W^1_2(V)` and in `W^1_2(Ω)`
   for every open `Ω` (`Rd.memSobolev_toL2`, `Rd.memWeakSobolev_toL2`), every function of
   `W^1_2(V)` is one (`Rd.exists_toL2_eq_of_memSobolev`), with
@@ -838,31 +834,5 @@ theorem coe_tildeEquivZeroBoundary_symm_apply (u : zeroBoundarySpace 1 Ω) :
   simp only [coe_tildeEquivZeroBoundary_apply] at h
   rw [← h]
   exact (congrArg Subtype.val h').symm
-
-/-! ### `H^1(Ω)` of a bounded Lipschitz domain -/
-
-namespace BoundedLipschitzDomain
-
-/-- **The predicate and the type agree**: for a bounded Lipschitz domain `Ω`, `f ∈ L_2(V)` lies
-in `H^1(Ω)` in the sense of `Rd.BoundedLipschitzDomain.MemSobolevOn` iff its restriction to `Ω`
-is `u|_Ω` for some `u` in the Hilbert space `H^1(Ω)`. -/
-theorem memSobolevOn_iff_exists_restrictL2 (Ω : BoundedLipschitzDomain V)
-    (f : Lp ℂ 2 (volume : Measure V)) :
-    Ω.MemSobolevOn f ↔ ∃ u : RestrictionSpace 1 Ω.toOpens,
-      restrictL2 Ω.toOpens u = LpToLpRestrictCLM V ℂ ℂ volume 2 Ω.carrier f := by
-  constructor
-  · rintro ⟨F, hF, hFf⟩
-    have hS := (memSobolev_one_iff F).1 hF
-    have hU : toL2 hS.toBesselPotentialSpace = F :=
-      toL2_eq_of_toDistr_eq _ hS.toBesselPotentialSpace_toDistr.symm
-    refine ⟨restrictProj 1 Ω.toOpens hS.toBesselPotentialSpace, ?_⟩
-    rw [restrictL2_restrictProj, hU]
-    exact Lp.ext ((LpToLpRestrictCLM_coeFn ℂ _ _).trans
-      (hFf.trans (LpToLpRestrictCLM_coeFn ℂ _ _).symm))
-  · rintro ⟨u, hu⟩
-    refine ⟨toL2 (u : H^{1}(V)), memSobolev_toL2 _, ?_⟩
-    exact (restrictL2_eq_iff_ae_eq u f).1 hu
-
-end BoundedLipschitzDomain
 
 end Rd

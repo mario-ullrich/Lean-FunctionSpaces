@@ -107,7 +107,8 @@ theorem isSmoothAtom_comp_graphMap_flat {K : ℕ} {d A : ℝ} {j : ℕ} {c : V}
 /-- **The trace atoms of every order** on the flat graph: for every order `r ≥ 1` there are a
 radius factor `d`, a constant `C < ∞` and an overlap bound `N` such that the restrictions
 `a_{j,m} ∘ γ` of the cell atoms of `η_j ⋆ h` are regular atoms on `H` of order and exponent `r`
-centred at `P c_{j,m}`, and the centres of the cells meeting `H` have overlap at most `N`. -/
+centred at `P c_{j,m}`, and the centres of the cells meeting `H` have overlap at most `N`
+(`Rd.LipschitzGraph.norm_graphMap_sub_cellCenter_le` with `t = r`). -/
 theorem exists_trace_atoms_flat (b : LocalMeansBump V) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L : ℕ) {r : ℕ}
     (hr : 1 ≤ r) :
     ∃ (d : ℝ) (C : ℝ≥0∞) (N : ℕ), 0 ≤ d ∧ C ≠ ∞ ∧ ∀ (j : ℕ) {h : V → ℂ}, MemLp h p volume →
@@ -128,41 +129,27 @@ theorem exists_trace_atoms_flat (b : LocalMeansBump V) {p : ℝ≥0∞} (hp1 : 1
   refine ⟨d, ENNReal.ofReal (2 ^ r * (r : ℝ) ^ (r + 1) * A) *
       (((r + 1 : ℕ) : ℝ≥0∞) * (ENNReal.ofReal (d ^ finrank ℝ Ω.hyperplane) *
         volume (ball (0 : Ω.hyperplane) 1))) ^ (1 / p.toReal),
-    ⌈(2 * (3 * d + r) + 2) ^ finrank ℝ V⌉₊, hd, ?_, fun j h hh => ⟨fun m => ?_, fun x' S hS => ?_⟩⟩
+    ⌈(2 * (d + (1 + Ω.M) * (2 * d + r)) + 2) ^ finrank ℝ V⌉₊, hd, ?_,
+    fun j h hh => ⟨fun m => ?_, fun x' S hS => ?_⟩⟩
   · exact ENNReal.mul_ne_top ENNReal.ofReal_ne_top (ENNReal.rpow_ne_top_of_nonneg (by positivity)
       (ENNReal.mul_ne_top (ENNReal.natCast_ne_top _)
         (ENNReal.mul_ne_top ENNReal.ofReal_ne_top measure_ball_lt_top.ne)))
   · exact isRegularAtomOn_of_isSmoothAtom convex_univ MeasurableSet.univ hint hr le_rfl hd hA
       (isSmoothAtom_comp_graphMap_flat e he (hsm j hh m))
-  · refine card_le_of_norm_sub_cellCenter_le j (by positivity) (x' : V) S fun m hm => ?_
+  · refine card_le_of_norm_sub_cellCenter_le j
+      (add_nonneg hd (mul_nonneg (by linarith [Ω.M_nonneg]) (by positivity))) (Ω.graphMap x') S
+      fun m hm => ?_
     obtain ⟨hcoef, hdist⟩ := hS m hm
-    obtain ⟨y', hy'⟩ : ∃ y', cellAtom p (b.dual L j) j h m (Ω.graphMap y') ≠ 0 := by
+    have hex : ∃ y', cellAtom p (b.dual L j) j h m (Ω.graphMap y') ≠ 0 := by
       by_contra hcon
       exact hcoef (by simp [traceCoef, hcon])
-    have h1 : ‖Ω.graphMap y' - cellCenter j m‖ ≤ d / 2 ^ j :=
-      not_lt.1 fun hlt => hy' ((hsm j hh m).eq_zero _ hlt)
-    rw [flat_graphMap] at h1
-    have h2 : ‖(y' : V) - (Ω.proj (cellCenter j m) : V)‖ ≤ d / 2 ^ j := by
-      have h3 := Ω.norm_proj_le ((y' : V) - cellCenter j m)
-      rw [map_sub, Ω.proj_coe] at h3
-      rw [← Submodule.coe_sub, Submodule.norm_coe]
-      exact h3.trans h1
-    have h4 : ‖(x' : V) - (Ω.proj (cellCenter j m) : V)‖ ≤ (d + r) / 2 ^ j := by
-      rw [← Submodule.coe_sub, Submodule.norm_coe]
-      exact hdist
-    calc ‖(x' : V) - cellCenter j m‖ = ‖((x' : V) - Ω.proj (cellCenter j m)) -
-          ((y' : V) - Ω.proj (cellCenter j m)) + ((y' : V) - cellCenter j m)‖ := by
-          congr 1
-          abel
-      _ ≤ ‖(x' : V) - Ω.proj (cellCenter j m)‖ + ‖(y' : V) - Ω.proj (cellCenter j m)‖ +
-          ‖(y' : V) - cellCenter j m‖ :=
-          (norm_add_le _ _).trans (add_le_add_left (norm_sub_le _ _) _)
-      _ ≤ (d + r) / 2 ^ j + d / 2 ^ j + d / 2 ^ j := add_le_add (add_le_add h4 h2) h1
-      _ = (3 * d + r) / 2 ^ j := by ring
+    exact Ω.norm_graphMap_sub_cellCenter_le (fun y hy => b.dual_eq_zero_of_lt L j hy) hex hdist
 
 /-- **The trace of a series, of every order**: on the flat graph, for `0 < s < r` there is
 `K < ∞` with `‖Tr‖_{L_p(H)} + ‖(2^(ks) ω_r(Tr, 2^(-k))_p)_k‖_{ℓ_q} ≤
-K ‖(2^(j(s+1/p)) ‖h_j‖_p)_j‖_{ℓ_q}` for the trace `Tr = ∑_j (η_j ⋆ h_j) ∘ γ`. -/
+K ‖(2^(j(s+1/p)) ‖h_j‖_p)_j‖_{ℓ_q}` for the trace `Tr = ∑_j (η_j ⋆ h_j) ∘ γ`, from the trace
+atoms of order `r` (`Rd.LipschitzGraph.exists_trace_atoms_flat`,
+`Rd.LipschitzGraph.modNorm_traceSeries_le_of_atoms`). -/
 theorem modNorm_traceSeries_le_flat (b : LocalMeansBump V) {p : ℝ≥0∞} [Fact (1 ≤ p)]
     (hp : p ≠ ∞) (L : ℕ) {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞}
     (hq : 1 ≤ q) :
@@ -171,31 +158,8 @@ theorem modNorm_traceSeries_le_flat (b : LocalMeansBump V) {p : ℝ≥0∞} [Fac
       ‖(flat e he).traceSeries b hp L h‖ₑ + lqNorm q (fun k =>
           dyadicWeight s k * lpModulus p r ((flat e he).traceSeries b hp L h) k) ≤
         K * lqNorm q (fun j => dyadicWeight (s + 1 / p.toReal) j * ‖h j‖ₑ) := by
-  set Ω := flat e he
-  have hp1 : 1 ≤ p := Fact.out
-  have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
-  obtain ⟨d, C, N, hd, hC, hatoms⟩ := exists_trace_atoms_flat e he b hp1 L hr
-  refine ⟨atomSynthConst p N C r s r, atomSynthConst_ne_top hp1 N hC r hs hsr, fun h hX => ?_⟩
-  have hsyn := modNorm_le_coeffNorm hp (fun j m => Ω.proj (cellCenter j m))
-    (fun j m => cellAtom p (b.dual L j) j (h j) m ∘ Ω.graphMap)
-    (fun j => Ω.traceCoef b p L j (h j))
-    (fun j x' S hS => (hatoms j (Lp.memLp (h j))).2 x' S hS)
-    (fun j m => (hatoms j (Lp.memLp (h j))).1 m)
-    (fun j => (Ω.traceTerm_ae b hp L j (h j)).mono fun x' hx' =>
-      hx'.trans (Ω.traceFun_eq_tsum b hp1 L j (Lp.memLp (h j)) x'))
-    (Ω.tendsto_sum_traceTerm b hp L hs hq hX) hs hsr hq
-  refine hsyn.trans (mul_le_mul' le_rfl ?_)
-  rw [coeffNorm]
-  refine ENNReal.lqNorm_mono fun j => ?_
-  calc dyadicWeight (s - finrank ℝ Ω.hyperplane / p.toReal) j *
-        levelNorm p (Ω.traceCoef b p L j (h j))
-      ≤ dyadicWeight (s - finrank ℝ Ω.hyperplane / p.toReal) j *
-          (dyadicWeight (finrank ℝ V / p.toReal) j * eLpNorm (h j) p volume) :=
-        mul_le_mul' le_rfl (Ω.levelNorm_traceCoef_le b hp0 hp L j (Lp.memLp (h j)))
-    _ = dyadicWeight (s + 1 / p.toReal) j * ‖h j‖ₑ := by
-        rw [← mul_assoc, ← ENNReal.dyadicWeight_add, Lp.enorm_def, Ω.finrank_hyperplane_eq]
-        congr 2
-        ring
+  obtain ⟨d, C, N, -, hC, hatoms⟩ := exists_trace_atoms_flat e he b (Fact.out : 1 ≤ p) L hr
+  exact (flat e he).modNorm_traceSeries_le_of_atoms b hp L hs hsr hq hC hatoms
 
 /-- **The trace theorem of every order on the half-space**: for `1 ≤ p < ∞`, `0 < s < r` and
 `1 ≤ q ≤ ∞` there is `K < ∞` with
@@ -490,13 +454,10 @@ theorem summable_flatTerm (hp : p ≠ ∞) (Lh : ℕ) {s : ℝ} (hs : 0 < s) {q 
       _ ≤ K * (dyadicWeight (-s) j * X) :=
           mul_le_mul' le_rfl (hw.trans (mul_le_mul' le_rfl hXj))
       _ = K * X * dyadicWeight (-s) j := by ring
-  refine Summable.of_norm ?_
-  have hfin : ∑' j, ‖flatTerm e he hp Lh j g‖ₑ ≠ ∞ := by
-    refine ne_top_of_le_ne_top ?_ (ENNReal.tsum_le_tsum hterm)
-    rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg]
-    exact ENNReal.mul_ne_top (ENNReal.mul_ne_top hK hX.ne)
-      (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)
-  simpa only [toReal_enorm] using ENNReal.summable_toReal hfin
+  refine Summable.of_enorm (ne_top_of_le_ne_top ?_ (ENNReal.tsum_le_tsum hterm))
+  rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg]
+  exact ENNReal.mul_ne_top (ENNReal.mul_ne_top hK hX.ne)
+    (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)
 
 /-- The coefficient quasi-norm of the cell coefficients on `H` with smoothness `s + 1/p` in
 dimension `n` is the local means quasi-norm of `g` with smoothness `s`, since
@@ -528,11 +489,7 @@ theorem modNorm_flatExtension_le_localMeansNorm (hp : p ≠ ∞) (Lh : ℕ) {r :
   set Ω := flat e he
   have hp1 : 1 ≤ p := Fact.out
   have hσ0 : 0 < s + 1 / p.toReal := by positivity
-  have hr : 1 ≤ r := by
-    by_contra h
-    have h0 : r = 0 := by omega
-    rw [h0, Nat.cast_zero] at hsr
-    linarith
+  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hσ0.trans hsr)).ne'
   obtain ⟨d, C, N, hC, hatoms⟩ := exists_flat_extension_atoms e he (p := p) Lh hr
   refine ⟨atomSynthConst p N C r (s + 1 / p.toReal) r,
     atomSynthConst_ne_top hp1 N hC r hσ0 hsr, fun g hX => ?_⟩
@@ -719,11 +676,7 @@ theorem exists_trace_eq_iff_flat (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {r : 
         dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p (flat e he).domain L f k) < ∞ ∧
         (flat e he).trace hp L f = g) ↔
       ‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r g k) < ∞ := by
-  have hr : 1 ≤ r := by
-    by_contra h
-    have h0 : r = 0 := by omega
-    rw [h0, Nat.cast_zero] at hsr
-    linarith
+  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
   constructor
   · rintro ⟨f, hf, rfl⟩
     obtain ⟨K, hK, hle⟩ := modNorm_trace_le_flat e he hp L hr hs hsr hq

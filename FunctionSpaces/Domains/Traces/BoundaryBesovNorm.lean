@@ -289,11 +289,8 @@ theorem exists_boundaryBesovNorm_boundaryTrace_le (ψ : Ω.BoundaryPartition) (h
         dyadicWeight (s + 1 / p.toReal) k * lpModulus p L F k) < ∞ →
       Ω.boundaryBesovNorm p ψ s q (Ω.boundaryTrace ψ hp L F) ≤
         C * (‖F‖ₑ + lqNorm q (fun k => dyadicWeight (s + 1 / p.toReal) k * lpModulus p L F k)) := by
-  have hL : 1 ≤ L := by
-    have h0 : (0 : ℝ) < L := by
-      have : 0 ≤ 1 / p.toReal := by positivity
-      linarith
-    exact Nat.succ_le_of_lt (by exact_mod_cast h0)
+  have hL : 1 ≤ L := Nat.one_le_iff_ne_zero.2
+    (Nat.cast_pos.1 ((show (0 : ℝ) < s + 1 / p.toReal by positivity).trans hsL)).ne'
   choose M hM using fun j => exists_iteratedFDeriv_bound (ψ.contDiff_toComplex j)
     (ψ.hasCompactSupport_toComplex j) L
   choose K hK hle using fun j =>

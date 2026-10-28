@@ -68,13 +68,11 @@ section Auxiliary
 
 variable {α : Type*} [MeasurableSpace α] {μ : Measure α} {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
-/-- Elements of `L_p` with equal restrictions to `O` agree almost everywhere on `O`. -/
+/-- Elements of `L_p` with equal restrictions to `O` agree almost everywhere on `O`
+(`Rd.indicatorLp_eq_iff_ae_eq_restrict` and Mathlib's `ae_restrict_iff'`). -/
 theorem ae_eq_of_indicatorLp_eq {O : Set α} (hO : MeasurableSet O) {F f : Lp ℂ p μ}
-    (h : indicatorLp hO F = indicatorLp hO f) : ∀ᵐ x ∂μ, x ∈ O → F x = f x := by
-  filter_upwards [Lp.ext_iff.1 h, indicatorLp_apply_ae hO F, indicatorLp_apply_ae hO f]
-    with x h1 h2 h3 hx
-  rw [h2, h3, Set.indicator_of_mem hx, Set.indicator_of_mem hx] at h1
-  exact h1
+    (h : indicatorLp hO F = indicatorLp hO f) : ∀ᵐ x ∂μ, x ∈ O → F x = f x :=
+  (ae_restrict_iff' hO).1 ((indicatorLp_eq_iff_ae_eq_restrict hO).1 h)
 
 omit [MeasurableSpace α] in
 /-- `s + 1/p < L` for `s < 1`, `1 ≤ p < ∞` and `L ≥ 2`. -/
@@ -88,57 +86,6 @@ theorem add_one_div_toReal_lt (hp : p ≠ ∞) {s : ℝ} (hs1 : s < 1) {L : ℕ}
   linarith
 
 end Auxiliary
-
-/-! ### The boundary of a graph domain -/
-
-namespace LipschitzGraph
-
-variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] (Ω : LipschitzGraph V)
-
-/-- `φ(Py) = φ(y)`: `φ` is constant in the direction `e`. -/
-theorem phi_proj (y : V) : Ω.phi (Ω.proj y) = Ω.phi y := by
-  have h := Ω.const (Ω.proj y) (inner ℝ y Ω.e)
-  rw [coe_proj, sub_add_cancel] at h
-  rw [coe_proj]
-  exact h.symm
-
-/-- **The graph** `γ(Py) = y` consists of the points with `⟪y, e⟫ = φ(y)`. -/
-theorem graphMap_proj_eq_iff (y : V) :
-    Ω.graphMap (Ω.proj y) = y ↔ inner ℝ y Ω.e = Ω.phi y := by
-  constructor
-  · intro h
-    have h1 := Ω.inner_graphMap (Ω.proj y)
-    rw [h, phi_proj] at h1
-    exact h1
-  · intro h
-    rw [graphMap, phi_proj, coe_proj, ← h, sub_add_cancel]
-
-/-- **The boundary of a graph domain is the graph**: `y ∈ ∂Ω` iff `γ(Py) = y`. A point of the
-graph is the limit of the points `y + t e ∈ Ω`, `t > 0`. -/
-theorem mem_frontier_domain_iff (y : V) :
-    y ∈ frontier Ω.domain ↔ Ω.graphMap (Ω.proj y) = y := by
-  rw [graphMap_proj_eq_iff]
-  constructor
-  · intro hy
-    have h : Ω.phi y = inner ℝ y Ω.e :=
-      frontier_lt_subset_eq Ω.continuous_phi (continuous_id.inner continuous_const) hy
-    exact h.symm
-  · intro hy
-    rw [frontier, Ω.isOpen_domain.interior_eq]
-    refine ⟨?_, fun h => ?_⟩
-    · have hlim : Tendsto (fun t : ℝ => y + t • Ω.e) (𝓝[>] 0) (𝓝 y) :=
-        ((continuous_const.add (continuous_id.smul continuous_const)).tendsto' (0 : ℝ) y
-          (by simp)).mono_left nhdsWithin_le_nhds
-      refine mem_closure_of_tendsto hlim ?_
-      filter_upwards [self_mem_nhdsWithin] with t ht
-      show Ω.phi (y + t • Ω.e) < inner ℝ (y + t • Ω.e) Ω.e
-      rw [Ω.const, inner_add_left, real_inner_smul_left, Ω.inner_e_self, mul_one, ← hy]
-      exact lt_add_of_pos_right _ ht
-    · have h' : Ω.phi y < inner ℝ y Ω.e := h
-      rw [hy] at h'
-      exact lt_irrefl _ h'
-
-end LipschitzGraph
 
 namespace BoundedLipschitzDomain
 

@@ -311,7 +311,8 @@ $-2^{-j} z = 2^{-j} (-z)$ lies in $K$ and has length at most $2^{-(j+1)}$; apply
 \label{lem:intrinsic-upper}
 \lean{Rd.LipschitzGraph.enorm_cutoff_localMean_zero_le,
   Rd.LipschitzGraph.enorm_cutoff_localMean_succ_le, Rd.LipschitzGraph.intrinsicConst,
-  Rd.LipschitzGraph.intrinsicConst_ne_top, Rd.LipschitzGraph.intrinsicNorm_le,
+  Rd.LipschitzGraph.intrinsicConst_ne_top, Rd.LocalMeansBump.momentConst_ne_top,
+  Rd.LipschitzGraph.intrinsicNorm_le,
   Rd.LipschitzGraph.intrinsicNorm_lt_top}
 \leanok
 \uses{lem:cone-steps, lem:support-principle, lem:rd-modulus-on, def:intrinsic-local-means}
@@ -445,7 +446,7 @@ balls.
   Rd.LocalMeansBump.enorm_indicatorLp_localMean_zero_le,
   Rd.LocalMeansBump.enorm_indicatorLp_localMean_succ_le, Rd.LocalMeansBump.localNormOn_le}
 \leanok
-\uses{thm:moment-approx, def:local-means, lem:rd-modulus-on}
+\uses{thm:moment-approx, def:local-means, lem:rd-modulus-on, lem:intrinsic-upper}
 Let $g$ be a bump of radius $R \leq 1/2$, $1 \leq p < \infty$, and let $W, T \subseteq V$ with $W$
 measurable and $W \subseteq T_{Lh}$ for the steps $h = -c^{-1} z$, $c \geq 1$, $g(z) \neq 0$. For
 $f \in L_p$, $s \in \R$ and $1 \leq q \leq \infty$,
@@ -466,7 +467,7 @@ As in \Cref{lem:intrinsic-upper}, with \Cref{thm:moment-approx} for the two sets
 \lean{Rd.LocalMeansBump.localExtTerm, Rd.LocalMeansBump.localExtension,
   Rd.LocalMeansBump.summable_localExtTerm, Rd.LocalMeansBump.tendsto_sum_localExtTerm,
   Rd.LocalMeansBump.modNorm_localExtension_le, Rd.LocalMeansBump.indicatorLp_localExtension,
-  Rd.LocalMeansBump.momentConst_ne_top, Rd.LocalMeansBump.localExtConst,
+  Rd.LocalMeansBump.localExtConst,
   Rd.LocalMeansBump.localExtConst_ne_top,
   Rd.LocalMeansBump.exists_local_extension_le,
   Rd.LocalMeansBump.exists_local_extension, Rd.LocalMeansBump.tendsto_sum_localExtTerm_of_summable,
@@ -944,23 +945,22 @@ $D x' + c a w = x' + (c - 1) a u + a (u + b e) - c a u = x' + a b e$.
 \lean{Rd.LipschitzGraph.phiH, Rd.LipschitzGraph.graphMap_eq_graphOver,
   Rd.LipschitzGraph.graphMap_injective, Rd.LipschitzGraph.lipschitzWith_phiH,
   Rd.LipschitzGraph.continuous_phiH, Rd.LipschitzGraph.lipschitzWith_graphMap,
-  Rd.LipschitzGraph.antilipschitzWith_graphMap, Rd.LipschitzGraph.range_graphMap,
-  Rd.LipschitzGraph.measurableEmbedding_graphMap}
+  Rd.LipschitzGraph.antilipschitzWith_graphMap, Rd.LipschitzGraph.measurableEmbedding_graphMap}
 \leanok
-\uses{def:graph-over, lem:graph-over, lem:boundary-charts}
+\uses{def:graph-over, lem:graph-over}
 The graph map is the graph $\gamma = \gamma_{\varphi|_H}$ of the $M$-Lipschitz function
 $\varphi|_H$ over $H$. It is injective, $(1 + M)$-Lipschitz, satisfies
-$\|x' - y'\| \leq \|\gamma(x') - \gamma(y')\|$ for all $x', y' \in H$, is a measurable embedding
-(measurable, injective, and it maps measurable sets to measurable sets), and its range is the
-boundary of $\Omega$.
+$\|x' - y'\| \leq \|\gamma(x') - \gamma(y')\|$ for all $x', y' \in H$, and is a measurable
+embedding (measurable, injective, and it maps measurable sets to measurable sets).
 \end{lemma}
 
 \begin{proof}
 \leanok
 \Cref{lem:graph-over} and \Cref{def:graph-map}; an antilipschitz and uniformly continuous map of
-the complete space $H$ is a closed embedding, hence a measurable embedding. The boundary of
-$\Omega$ is $\{y : \gamma(Py) = y\}$ (\Cref{lem:boundary-charts}).
+the complete space $H$ is a closed embedding, hence a measurable embedding.
 \end{proof}
+
+The range of the graph map is the boundary of $\Omega$ (\Cref{lem:boundary-charts}).
 
 \begin{lemma}[The graph map keeps null sets]
 \label{lem:graph-map-null}
@@ -2339,12 +2339,33 @@ $(\eta_j * h)(\gamma(x')) = \sum_m \lambda'_{j,m} a_{j,m}(\gamma(x'))$ and
 $\|\lambda'_{j,\cdot}\|_{\ell_p} \leq 2^{jn/p} \|h\|_p$.
 \end{definition}
 
+\begin{lemma}[The centres of the trace atoms]
+\label{lem:trace-atom-centres}
+\lean{Rd.LipschitzGraph.norm_graphMap_sub_cellCenter_le}
+\leanok
+\uses{def:graph-map, def:cell-atoms, lem:cell-atoms-regular}
+Let $\rho \in \R$, $j \in \N$, $d = \rho + n$, and let $K$ vanish outside
+$\overline{B}(0, \rho 2^{-j})$. For every real $t$, every $g$, every $m \in \Z^n$ such that the cell
+atom $a_{j,m}$ of $K * g$ does not vanish everywhere on the graph, and every $x' \in H$ with
+$\|x' - P c_{j,m}\| \leq (d + t) 2^{-j}$,
+\[
+  \|\gamma(x') - c_{j,m}\| \leq (d + (1 + M)(2d + t)) 2^{-j}.
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The atom is nonzero at some $\gamma(y')$, so $\|\gamma(y') - c_{j,m}\| \leq d 2^{-j}$
+(\Cref{lem:cell-atoms-regular}) and $\|y' - P c_{j,m}\| \leq d 2^{-j}$ (\Cref{def:graph-map}).
+Hence $\|x' - y'\| \leq (2d + t) 2^{-j}$, and $\gamma$ is $(1 + M)$-Lipschitz.
+\end{proof}
+
 \begin{lemma}[The trace atoms]
 \label{lem:trace-atoms}
-\lean{Rd.LipschitzGraph.norm_graphMap_sub_cellCenter_le, Rd.LipschitzGraph.exists_trace_atoms}
+\lean{Rd.LipschitzGraph.exists_trace_atoms}
 \leanok
 \uses{def:trace-terms, lem:cell-atoms-regular, lem:dual-kernel-bounds, lem:atom-traces,
-  lem:cells-partition}
+  lem:trace-atom-centres, lem:cells-partition}
 There are $d \geq 0$, $C < \infty$ and $N$ such that for every level $j$ and $h \in L_p$ the
 restrictions $a_{j,m} \circ \gamma$ of the cell atoms of $\eta_j * h$ are regular atoms on $H$ of
 order and exponent $1$ with centres $P c_{j,m}$, and the centres $P c_{j,m}$ with
@@ -2355,10 +2376,9 @@ $\lambda'_{j,m} \neq 0$ have overlap at most $N$ on balls of radius $(d + 1) 2^{
 \leanok
 The cell atoms satisfy the pointwise bounds of \Cref{lem:atom-traces} by
 \Cref{lem:cell-atoms-regular} and \Cref{lem:dual-kernel-bounds}. If $\lambda'_{j,m} \neq 0$, the
-atom meets the graph at some $\gamma(y')$ with $\|\gamma(y') - c_{j,m}\| \leq d 2^{-j}$; if moreover
-$\|x' - P c_{j,m}\| \leq (d + 1) 2^{-j}$, then
-$\|\gamma(x') - c_{j,m}\| \leq (d + (1 + M)(2d + 1)) 2^{-j}$, and \Cref{lem:cells-partition} counts
-these centres.
+atom meets the graph, and the centres $c_{j,m}$ with $\|x' - P c_{j,m}\| \leq (d + 1) 2^{-j}$ lie
+within $(d + (1 + M)(2d + 1)) 2^{-j}$ of $\gamma(x')$ (\Cref{lem:trace-atom-centres} with $t = 1$);
+\Cref{lem:cells-partition} counts them.
 \end{proof}
 
 \begin{lemma}[The traces of the terms in $L_p(H)$]
@@ -2377,12 +2397,42 @@ $j$ and $h \in L_p$.
 $2^{-j(n-1)/p} \|\lambda'_{j,\cdot}\|_{\ell_p} \leq 2^{-j(n-1)/p} 2^{jn/p} \|h\|_p$.
 \end{proof}
 
+\begin{lemma}[The trace of a series of atoms]
+\label{lem:trace-series-atoms}
+\lean{Rd.LipschitzGraph.traceSeries, Rd.LipschitzGraph.summable_traceTerm,
+  Rd.LipschitzGraph.tendsto_sum_traceTerm, Rd.LipschitzGraph.modNorm_traceSeries_le_of_atoms}
+\leanok
+\uses{def:trace-terms, lem:trace-terms-lp, thm:rd-atomic-synthesis}
+Let $1 \leq p < \infty$, $s > 0$ and $1 \leq q \leq \infty$. For all $h_j \in L_p$ with
+$X = \|(2^{j(s + 1/p)} \|h_j\|_p)_j\|_{\ell_q} < \infty$ the series
+$\operatorname{Tr} = \sum_j (\eta_j * h_j) \circ \gamma$ converges absolutely in $L_p(H)$.
+Let moreover $r \in \N$ with $s < r$, $d \in \R$, $C < \infty$ and $N \in \N$ be such that for every
+level $j$ and every $h \in L_p$ the restrictions $a_{j,m} \circ \gamma$ of the cell atoms of
+$\eta_j * h$ are regular atoms on $H$ of order and exponent $r$ with radius factor $d$, constant
+$C$ and centres $P c_{j,m}$, and for every $x' \in H$ at most $N$ of the centres $P c_{j,m}$ with
+$\lambda'_{j,m} \neq 0$ lie within $(d + r) 2^{-j}$ of $x'$. Then there is $K < \infty$ such that
+for all $h_j \in L_p$ with $X < \infty$
+\[
+  \|\operatorname{Tr}\|_{L_p(H)} + \|(2^{ks} \omega_r(\operatorname{Tr}, 2^{-k})_p)_k\|_{\ell_q}
+  \leq K X.
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The terms have $\|(\eta_j * h_j) \circ \gamma\|_{L_p(H)} \leq K 2^{j/p} \|h_j\|_p \leq K X 2^{-js}$
+(\Cref{lem:trace-terms-lp}). \Cref{thm:rd-atomic-synthesis} on $H$ with these atoms and
+$\sigma = r > s$ bounds the left side by the coefficient quasi-norm on $H$, and since
+$s - (n - 1)/p = (s + 1/p) - n/p$,
+$2^{j(s - (n-1)/p)} \|\lambda'_{j,\cdot}\|_{\ell_p} \leq 2^{j(s + 1/p)} \|h_j\|_p$
+(\Cref{def:trace-terms}).
+\end{proof}
+
 \begin{theorem}[The trace of a series]
 \label{thm:trace-series}
-\lean{Rd.LipschitzGraph.traceSeries, Rd.LipschitzGraph.summable_traceTerm,
-  Rd.LipschitzGraph.tendsto_sum_traceTerm, Rd.LipschitzGraph.modNorm_traceSeries_le}
+\lean{Rd.LipschitzGraph.modNorm_traceSeries_le}
 \leanok
-\uses{lem:trace-terms-lp, lem:trace-atoms, thm:rd-atomic-synthesis}
+\uses{lem:trace-series-atoms, lem:trace-atoms}
 Let $1 \leq p < \infty$, $0 < s < 1$ and $1 \leq q \leq \infty$. There is $K < \infty$ such that for
 $h_j \in L_p$ with $X = \|(2^{j(s + 1/p)} \|h_j\|_p)_j\|_{\ell_q} < \infty$ the series
 $\operatorname{Tr} = \sum_j (\eta_j * h_j) \circ \gamma$ converges absolutely in $L_p(H)$ and
@@ -2394,11 +2444,7 @@ $\operatorname{Tr} = \sum_j (\eta_j * h_j) \circ \gamma$ converges absolutely in
 
 \begin{proof}
 \leanok
-The terms have $\|(\eta_j * h_j) \circ \gamma\|_{L_p(H)} \leq K 2^{j/p} \|h_j\|_p \leq K X 2^{-js}$
-(\Cref{lem:trace-terms-lp}). \Cref{thm:rd-atomic-synthesis} on $H$ with the atoms of
-\Cref{lem:trace-atoms} and $\sigma = r = 1 > s$ bounds the left side by the coefficient
-quasi-norm on $H$, and since $s - (n - 1)/p = (s + 1/p) - n/p$,
-$2^{j(s - (n-1)/p)} \|\lambda'_{j,\cdot}\|_{\ell_p} \leq 2^{j(s + 1/p)} \|h_j\|_p$.
+\Cref{lem:trace-series-atoms} with $r = 1$ and the atoms of \Cref{lem:trace-atoms}.
 \end{proof}
 
 \begin{theorem}[The trace theorem on Lipschitz graph domains]
@@ -2431,7 +2477,7 @@ $h_j = 1_\Omega (k_j * f)$, and \Cref{lem:intrinsic-upper} with smoothness $s + 
   Rd.LipschitzGraph.enorm_trace_le, Rd.LipschitzGraph.tendsto_trace_of_modNorm_sub_le,
   Rd.LipschitzGraph.enorm_trace_le_modNormOn}
 \leanok
-\uses{thm:trace-graph, lem:trace-terms-lp, lem:local-means-upper, lem:intrinsic-upper, def:conv}
+\uses{thm:trace-graph, lem:trace-terms-lp, lem:intrinsic-upper, thm:graph-besov, def:conv}
 For every $c \in \C$ and every $f \in L_p(V)$, $\operatorname{Tr}(c f) = c \operatorname{Tr} f$.
 The trace is additive on the functions with a finite intrinsic norm of smoothness $s + 1/p$,
 $s > 0$, and there is $K < \infty$ with
@@ -2448,11 +2494,10 @@ $\operatorname{Tr} f_J \to \operatorname{Tr} f$ in $L_p(H)$.
 The terms are linear in $h_j$, since convolution is (\Cref{def:conv}), and the series converge;
 a series commutes with complex scalars (Mathlib's \texttt{tsum\_\allowbreak const\_\allowbreak
 smul''}). The bound:
-$\|\operatorname{Tr} f\|_{L_p(H)} \leq \sum_j K 2^{j/p} \|k_j * f\|_p$
-(\Cref{lem:trace-terms-lp}), and the local means are bounded by the moduli
-(\Cref{lem:local-means-upper}); with the cut-offs $1_\Omega (k_j * f)$ kept, by the moduli on
-$\Omega$ (\Cref{lem:intrinsic-upper}). The convergence follows from the linearity and the bound for
-$f - f_J$.
+$\|\operatorname{Tr} f\|_{L_p(H)} \leq \sum_j K 2^{j/p} \|1_\Omega (k_j * f)\|_p$
+(\Cref{lem:trace-terms-lp}), which \Cref{lem:intrinsic-upper} bounds by the moduli on $\Omega$;
+these are at most the moduli on $V$ (\Cref{thm:graph-besov}). The convergence follows from the
+linearity and the bound for $f - f_J$.
 \end{proof}
 
 \begin{lemma}[Approximate identities at points of continuity]
@@ -2773,7 +2818,7 @@ inclusion has norm at most $1$. For $x' \in H$, $\|x' - Pc\| \leq \|x' - c\|$.
   Rd.LipschitzGraph.modNorm_trace_le_flat}
 \leanok
 \uses{lem:smooth-atoms-hyperplane, lem:cell-atoms-smooth, lem:smooth-atoms-regular,
-  thm:trace-graph, thm:rd-atomic-synthesis}
+  lem:trace-atom-centres, lem:cells-partition, lem:trace-series-atoms, thm:trace-graph}
 Let $1 \leq p < \infty$, $0 < s < r$, $1 \leq q \leq \infty$ and $L \in \N$. There is
 $K < \infty$ such that
 \begin{multline*}
@@ -2789,7 +2834,9 @@ for all $f \in L_p(V)$ for which the right side is finite.
 As \Cref{thm:trace-graph}: the restrictions of the cell atoms are smooth atoms of order $r$ on $H$
 (\Cref{lem:cell-atoms-smooth}, \Cref{lem:smooth-atoms-hyperplane}), hence regular atoms of order
 and exponent $r$ (\Cref{lem:smooth-atoms-regular}). The centres of the cells meeting $H$ lie within
-$3d 2^{-j} + r 2^{-j}$ of the point, and the synthesis on $H$ with exponent $r > s$ concludes.
+$(3d + r) 2^{-j}$ of the point (\Cref{lem:trace-atom-centres} with $M = 0$ and $t = r$), and
+\Cref{lem:cells-partition} counts them. The synthesis on $H$ with exponent $r > s$ concludes
+(\Cref{lem:trace-series-atoms}).
 \end{proof}
 
 \begin{lemma}[Extended atoms of every order]
@@ -3096,22 +3143,24 @@ maps $\gamma_j$, projections $P_j$ and traces $\operatorname{Tr}_j$.
 
 \begin{lemma}[The boundary in the charts]
 \label{lem:boundary-charts}
-\lean{Rd.LipschitzGraph.phi_proj, Rd.LipschitzGraph.graphMap_proj_eq_iff,
-  Rd.LipschitzGraph.mem_frontier_domain_iff, Rd.BoundedLipschitzDomain.mem_frontier_iff,
+\lean{Rd.LipschitzGraph.closure_domain, Rd.LipschitzGraph.phi_proj,
+  Rd.LipschitzGraph.graphMap_proj_eq_iff, Rd.LipschitzGraph.mem_frontier_domain_iff,
+  Rd.LipschitzGraph.range_graphMap, Rd.BoundedLipschitzDomain.mem_frontier_iff,
   Rd.BoundedLipschitzDomain.graphMap_mem_frontier, Rd.BoundedLipschitzDomain.graphMap_proj_graphMap}
 \leanok
 \uses{def:bounded-lipschitz, def:graph-map}
-The boundary of a Lipschitz graph domain is its graph
-$\{y : \langle y, e \rangle = \phi(y)\} = \{y : \gamma(Py) = y\}$. For $y \in B_j$,
-$y \in \Gamma$ if and only if $\gamma_j(P_j y) = y$. Hence a boundary point $\gamma_j(x')$ in
-$B_j \cap B_k$ satisfies $\gamma_k(P_k \gamma_j(x')) = \gamma_j(x')$.
+For every Lipschitz graph domain, the closure is $\{x : \phi(x) \leq \langle x, e \rangle\}$, and
+the boundary is the graph
+$\{y : \langle y, e \rangle = \phi(y)\} = \{y : \gamma(Py) = y\}$, which is the range of $\gamma$.
+For $y \in B_j$, $y \in \Gamma$ if and only if $\gamma_j(P_j y) = y$. Hence a boundary point
+$\gamma_j(x')$ in $B_j \cap B_k$ satisfies $\gamma_k(P_k \gamma_j(x')) = \gamma_j(x')$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-A point of the graph is the limit of the points $y + te \in \Omega$, $t > 0$, since
-$\phi(y + te) = \phi(y)$, and it is not in the open set $\Omega$. The boundary is local in open sets,
-and $\Omega \cap B_j = \Omega_j \cap B_j$.
+The closure is $\{x : \phi(x) \leq \langle x, e \rangle\}$, since a point of the graph is the limit
+of $y + te \in \Omega$, $t > 0$; the boundary is the closure minus the open set $\Omega$. The
+boundary is local in open sets, and $\Omega \cap B_j = \Omega_j \cap B_j$.
 \end{proof}
 
 \begin{definition}[Resolutions of unity on the boundary]
@@ -9503,22 +9552,27 @@ From now on $M$ is compact, smooth, and the range $\Omega$ of $I$ is a Besov dom
 
 \begin{definition}[Besov atlases]
 \label{def:besov-atlas}
-\lean{Manifold.BesovAtlas, Manifold.BesovAtlas.nonempty, Manifold.contDiffOn_comp_extend_symm,
+\lean{Manifold.BesovAtlas, Manifold.BesovAtlas.nonempty,
+  Manifold.exists_contMDiff_eq_one_tsupport_subset, Manifold.contDiffOn_comp_extend_symm,
   Manifold.BesovAtlas.ext, Manifold.BesovAtlas.psi_le_one, Manifold.BesovAtlas.theta_mul_psi}
 \leanok
 A Besov atlas consists of finitely many charts $e_i$ of the atlas with extended charts
 $\kappa_i$, a smooth partition of unity $(\psi_i)$ with $\operatorname{tsupport} \psi_i \subseteq
 e_i.\mathrm{source}$, and smooth cut-offs $\theta_i$ with $\theta_i = 1$ on
 $\operatorname{tsupport} \psi_i$ and $\operatorname{tsupport} \theta_i \subseteq
-e_i.\mathrm{source}$. Every compact smooth manifold has a Besov atlas. A smooth function $g$ on $M$
-gives a function $g \circ \kappa^{-1}$ that is smooth within the target of $\kappa$.
+e_i.\mathrm{source}$. Every compact smooth manifold has a Besov atlas. For every compact $K$
+inside an open $U$ of a $\sigma$-compact Hausdorff smooth manifold there is a smooth
+$\theta \colon M \to \R$ with $\theta = 1$ on $K$ and $\operatorname{tsupport} \theta \subseteq U$.
+A smooth function $g$ on $M$ gives a function $g \circ \kappa^{-1}$ that is smooth within the
+target of $\kappa$.
 \end{definition}
 
 \begin{proof}
 \leanok
 Finitely many chart sources cover $M$; Mathlib's smooth partitions of unity are subordinate to
-them, and a smooth Urysohn function between $\operatorname{tsupport} \psi_i$ and the complement of
-an open $V_i$ with $\overline{V_i} \subseteq e_i.\mathrm{source}$ is the cut-off.
+them. For the cut-off, take an open $V$ with $K \subseteq V$ and $\overline{V} \subseteq U$, and
+Mathlib's smooth function with support $V$ that equals $1$ exactly on $K$; for $\theta_i$, take
+$K = \operatorname{tsupport} \psi_i$ and $U = e_i.\mathrm{source}$.
 \end{proof}
 
 \begin{definition}[Chart pieces]
@@ -9709,14 +9763,12 @@ formula gives $F_* \mathrm{vol} = \mathrm{vol}$.
 
 \begin{definition}[Smooth bounded domains]
 \label{def:smooth-domain}
-\lean{Rd.SmoothDomain, Rd.e0, Rd.norm_e0, Rd.coord_zero_eq_inner, Rd.alignTo,
-  Rd.alignTo_apply_self, Rd.LipschitzGraph.closure_domain, Rd.mem_closure_iff_of_inter_eq}
+\lean{Rd.SmoothDomain, Rd.alignTo, Rd.alignTo_apply_self, Rd.mem_closure_iff_of_inter_eq}
 \leanok
-\uses{def:bounded-lipschitz}
+\uses{def:bounded-lipschitz, lem:boundary-charts, thm:half-space-besov-domain}
 A smooth bounded domain in $\R^n$ is a bounded Lipschitz domain whose graph functions are smooth.
-The reflection $A_e$ in $(e - e_0)^\perp$ maps a unit vector $e$ to $e_0 = (1, 0, \dots, 0)$. The
-closure of a graph domain is $\{x : \varphi(x) \leq \langle x, e \rangle\}$, and closures of sets
-that agree on an open set $B$ agree on $B$.
+The reflection $A_e$ in $(e - e_0)^\perp$ maps a unit vector $e$ to $e_0 = (1, 0, \dots, 0)$, and
+closures of sets that agree on an open set $B$ agree on $B$.
 \end{definition}
 
 The carriers of smooth bounded domains are exactly the bounded sets with smooth local graphs
@@ -9960,10 +10012,9 @@ half-space $\Omega_0 = \{y : y_0 > 0\}$ (\Cref{thm:trace-every-order}).
 
 \begin{lemma}[The closed and the open half-space]
 \label{lem:closed-open-half-space}
-\lean{Manifold.range_eq_closedHalfSpace, Manifold.range_ae_eq_domain,
-  Manifold.cutoff_eq_indicatorLp, Manifold.modNormOn_range_eq}
+\lean{Manifold.range_ae_eq_domain, Manifold.cutoff_eq_indicatorLp, Manifold.modNormOn_range_eq}
 \leanok
-\uses{lem:null-set-domains}
+\uses{lem:null-set-domains, thm:half-space-besov-domain}
 The range of the model is the closed half-space $\{y : y_0 \geq 0\}$, which differs from
 $\Omega_0$ by the null set $H_0$. So the cut-offs and the intrinsic quasi-norms on the two sets
 agree.

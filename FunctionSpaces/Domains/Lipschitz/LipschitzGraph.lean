@@ -15,7 +15,8 @@ public import Mathlib.Analysis.Calculus.BumpFunction.Normed
 A **Lipschitz graph domain** in `V` is `Ω = {x : φ(x) < ⟪x, e⟫}` for a unit vector `e` and an
 `M`-Lipschitz function `φ` that is constant along `e` (`Rd.LipschitzGraph`); for `V = ℝ^d` and
 `e = e_d` this is `{x_d > φ(x_1, …, x_(d-1))}`. The function `φ` is Lipschitz in Mathlib's sense
-(`Rd.LipschitzGraph.lipschitzWith_phi`), and `Ω` is open (`Rd.LipschitzGraph.toOpens`). With the
+(`Rd.LipschitzGraph.lipschitzWith_phi`), `Ω` is open (`Rd.LipschitzGraph.toOpens`), and its
+closure is `{x : φ(x) ≤ ⟪x, e⟫}` (`Rd.LipschitzGraph.closure_domain`). With the
 cone `K = {y : M ‖y - ⟪y, e⟫ e‖ < ⟪y, e⟫}` (`Rd.LipschitzGraph.cone`), `Ω + K ⊆ Ω`
 (`Rd.LipschitzGraph.add_mem`): a step into the cone raises `⟪·, e⟫` faster than `φ`. The cone is
 closed under positive scaling and contains a ball around `e/4`
@@ -164,6 +165,20 @@ theorem add_mem_of_mem_closure {x y : V} (hx : x ∈ closure Ω.domain) (hy : y 
 /-- The domain is open. -/
 theorem isOpen_domain : IsOpen Ω.domain :=
   isOpen_lt Ω.continuous_phi (continuous_id.inner continuous_const)
+
+/-- **The closure of a graph domain** is `{x : φ(x) ≤ ⟪x, e⟫}`: the points with `φ(x) = ⟪x, e⟫`
+are limits of `x + t e`, `t ↓ 0`. -/
+theorem closure_domain : closure Ω.domain = {x | Ω.phi x ≤ inner ℝ x Ω.e} := by
+  refine Set.Subset.antisymm
+    (closure_lt_subset_le Ω.continuous_phi (continuous_id.inner continuous_const)) fun x hx => ?_
+  have hlim : Tendsto (fun t : ℝ => x + t • Ω.e) (𝓝[>] 0) (𝓝 x) :=
+    ((continuous_const.add (continuous_id.smul continuous_const)).tendsto' (0 : ℝ) x
+      (by simp)).mono_left nhdsWithin_le_nhds
+  refine mem_closure_of_tendsto hlim (eventually_nhdsWithin_of_forall fun t (ht : 0 < t) => ?_)
+  show Ω.phi (x + t • Ω.e) < inner ℝ (x + t • Ω.e) Ω.e
+  rw [Ω.const, inner_add_left, real_inner_smul_left, real_inner_self_eq_norm_sq, Ω.norm_e]
+  have hx' : Ω.phi x ≤ inner ℝ x Ω.e := hx
+  linarith
 
 /-- The graph domain `Ω = {x : φ(x) < ⟪x, e⟫}` as an element of Mathlib's `Opens V`, the form in
 which open sets carry weak derivatives. -/

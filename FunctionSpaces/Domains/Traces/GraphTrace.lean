@@ -35,12 +35,14 @@ centred at the projections of the cell centres. Only the cells whose atoms meet 
 overlap on `H` (`Rd.LipschitzGraph.exists_trace_atoms`). With `‖λ_{j,·}‖_{ℓ_p} ≤ 2^(jn/p) ‖h_j‖_p`
 the coefficient quasi-norm on `H` is at most `‖(2^(j(s+1/p)) ‖h_j‖_p)_j‖_{ℓ_q}`, since
 `s - (n-1)/p = (s + 1/p) - n/p`, and the atomic synthesis on `H` (`Rd.modNorm_le_coeffNorm`)
-concludes (`Rd.LipschitzGraph.modNorm_traceSeries_le`).
+concludes (`Rd.LipschitzGraph.modNorm_traceSeries_le`). This last step holds for trace atoms of
+every order `r > s` (`Rd.LipschitzGraph.modNorm_traceSeries_le_of_atoms`), which gives the traces
+of every order on the half-space.
 
 The trace is linear (`Rd.LipschitzGraph.trace_sub`, `Rd.LipschitzGraph.trace_smul`) and bounded
-by the norm of `B^{1/p}_{p,1}`
-(`Rd.LipschitzGraph.enorm_trace_le`), hence continuous along sequences that converge in this norm
-(`Rd.LipschitzGraph.tendsto_trace_of_modNorm_sub_le`).
+by the intrinsic norm of `B^{1/p}_{p,1}` on `Ω` (`Rd.LipschitzGraph.enorm_trace_le_modNormOn`), so
+by the norm of `B^{1/p}_{p,1}` on `V` (`Rd.LipschitzGraph.enorm_trace_le`), hence continuous
+along sequences that converge in this norm (`Rd.LipschitzGraph.tendsto_trace_of_modNorm_sub_le`).
 -/
 
 @[expose] public section
@@ -116,35 +118,35 @@ theorem levelNorm_traceCoef_le {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
 
 /-- **The centres of the trace atoms lie near the graph**: if the cell atom `a_{j,m}` of `K ⋆ g`,
 `K = 0` outside `B(0, ρ 2^(-j))`, does not vanish on the graph and the projection of its centre lies
-within `(d + 1) 2^(-j)` of `x'`, `d = ρ + n`, then the centre lies within
-`(d + (1 + M)(2d + 1)) 2^(-j)` of `γ x'`. -/
-theorem norm_graphMap_sub_cellCenter_le {p : ℝ≥0∞} {K g : V → ℂ} {ρ : ℝ} {j : ℕ}
+within `(d + t) 2^(-j)` of `x'`, `d = ρ + n`, then the centre lies within
+`(d + (1 + M)(2d + t)) 2^(-j)` of `γ x'`. -/
+theorem norm_graphMap_sub_cellCenter_le {p : ℝ≥0∞} {K g : V → ℂ} {ρ t : ℝ} {j : ℕ}
     (hK : ∀ y, ρ / 2 ^ j < ‖y‖ → K y = 0) {m : Fin (finrank ℝ V) → ℤ}
     (hne : ∃ y', cellAtom p K j g m (Ω.graphMap y') ≠ 0) {x' : Ω.hyperplane}
-    (hdist : ‖x' - Ω.proj (cellCenter j m)‖ ≤ (ρ + finrank ℝ V + 1) / 2 ^ j) :
+    (hdist : ‖x' - Ω.proj (cellCenter j m)‖ ≤ (ρ + finrank ℝ V + t) / 2 ^ j) :
     ‖Ω.graphMap x' - cellCenter j m‖ ≤
-      (ρ + finrank ℝ V + (1 + Ω.M) * (2 * (ρ + finrank ℝ V) + 1)) / 2 ^ j := by
+      (ρ + finrank ℝ V + (1 + Ω.M) * (2 * (ρ + finrank ℝ V) + t)) / 2 ^ j := by
   set d := ρ + finrank ℝ V
   obtain ⟨y', hy'⟩ := hne
   have h1 : ‖Ω.graphMap y' - cellCenter j m‖ ≤ d / 2 ^ j :=
     not_lt.1 fun hlt => hy' (cellAtom_eq_zero hK m hlt)
   have h2 : ‖y' - Ω.proj (cellCenter j m)‖ ≤ d / 2 ^ j := (Ω.norm_sub_proj_le y' _).trans h1
-  have h3 : ‖x' - y'‖ ≤ (2 * d + 1) / 2 ^ j := by
+  have h3 : ‖x' - y'‖ ≤ (2 * d + t) / 2 ^ j := by
     calc ‖x' - y'‖ = ‖(x' - Ω.proj (cellCenter j m)) - (y' - Ω.proj (cellCenter j m))‖ := by
           congr 1
           abel
       _ ≤ ‖x' - Ω.proj (cellCenter j m)‖ + ‖y' - Ω.proj (cellCenter j m)‖ := norm_sub_le _ _
-      _ ≤ (d + 1) / 2 ^ j + d / 2 ^ j := add_le_add hdist h2
-      _ = (2 * d + 1) / 2 ^ j := by ring
+      _ ≤ (d + t) / 2 ^ j + d / 2 ^ j := add_le_add hdist h2
+      _ = (2 * d + t) / 2 ^ j := by ring
   calc ‖Ω.graphMap x' - cellCenter j m‖
       = ‖(Ω.graphMap x' - Ω.graphMap y') + (Ω.graphMap y' - cellCenter j m)‖ := by
         congr 1
         abel
     _ ≤ ‖Ω.graphMap x' - Ω.graphMap y'‖ + ‖Ω.graphMap y' - cellCenter j m‖ := norm_add_le _ _
-    _ ≤ (1 + Ω.M) * ((2 * d + 1) / 2 ^ j) + d / 2 ^ j :=
+    _ ≤ (1 + Ω.M) * ((2 * d + t) / 2 ^ j) + d / 2 ^ j :=
         add_le_add ((Ω.norm_graphMap_sub_le x' y').trans
           (mul_le_mul_of_nonneg_left h3 (by linarith [Ω.M_nonneg]))) h1
-    _ = (d + (1 + Ω.M) * (2 * d + 1)) / 2 ^ j := by ring
+    _ = (d + (1 + Ω.M) * (2 * d + t)) / 2 ^ j := by ring
 
 /-- **The trace atoms**: there are a radius factor `d`, a constant `C < ∞` and an overlap bound
 `N` such that for every level `j` and `h ∈ L_p` the restrictions `a_{j,m} ∘ γ` of the cell atoms
@@ -311,13 +313,10 @@ theorem summable_traceTerm (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q 
     calc K * (dyadicWeight (s + 1 / p.toReal) j * dyadicWeight (-s) j) * ‖h j‖ₑ
         = K * (dyadicWeight (s + 1 / p.toReal) j * ‖h j‖ₑ) * dyadicWeight (-s) j := by ring
       _ ≤ K * X * dyadicWeight (-s) j := by gcongr
-  refine Summable.of_norm ?_
-  have hfin : ∑' j, ‖Ω.traceTerm b hp L j (h j)‖ₑ ≠ ∞ := by
-    refine ne_top_of_le_ne_top ?_ (ENNReal.tsum_le_tsum hterm)
-    rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg]
-    exact ENNReal.mul_ne_top (ENNReal.mul_ne_top hK hX.ne)
-      (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)
-  simpa only [toReal_enorm] using ENNReal.summable_toReal hfin
+  refine Summable.of_enorm (ne_top_of_le_ne_top ?_ (ENNReal.tsum_le_tsum hterm))
+  rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg]
+  exact ENNReal.mul_ne_top (ENNReal.mul_ne_top hK hX.ne)
+    (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)
 
 /-- The partial sums of the trace series converge to it. -/
 theorem tendsto_sum_traceTerm (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
@@ -327,30 +326,39 @@ theorem tendsto_sum_traceTerm (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) 
       (𝓝 (Ω.traceSeries b hp L h)) :=
   ((Ω.summable_traceTerm b hp L hs hq hX).hasSum.tendsto_sum_nat).comp (tendsto_add_atTop_nat 1)
 
-/-- **The trace of a series** (Schneider–Vybíral, Theorem 4.2): for `0 < s < 1`
+/-- **The trace of a series from trace atoms of order `r`**: let `0 < s < r`, and let the
+restrictions `a_{j,m} ∘ γ` of the cell atoms of `η_j ⋆ h`, for every level `j` and `h ∈ L_p`, be
+regular atoms on `H` of order and exponent `r` with radius factor `d` and constant `C < ∞`,
+centred at `P c_{j,m}`, and for every `x' ∈ H` let at most `N` of the centres `P c_{j,m}` with
+nonzero coefficient `λ'_{j,m}` lie within `(d + r) 2^(-j)` of `x'`. Then
 there is `K < ∞` such that the trace `Tr = ∑_j (η_j ⋆ h_j) ∘ γ` has
-`‖Tr‖_{L_p(H)} + ‖(2^(ks) ω_1(Tr, 2^(-k))_p)_k‖_{ℓ_q} ≤ K ‖(2^(j(s+1/p)) ‖h_j‖_p)_j‖_{ℓ_q}`,
-by the atomic synthesis on `H` with the trace atoms. -/
-theorem modNorm_traceSeries_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) (hs1 : s < 1)
-    {q : ℝ≥0∞} (hq : 1 ≤ q) :
+`‖Tr‖_{L_p(H)} + ‖(2^(ks) ω_r(Tr, 2^(-k))_p)_k‖_{ℓ_q} ≤ K ‖(2^(j(s+1/p)) ‖h_j‖_p)_j‖_{ℓ_q}`,
+by the atomic synthesis on `H` (`Rd.modNorm_le_coeffNorm`) and
+`2^(j(s-(n-1)/p)) ‖λ'_{j,·}‖_{ℓ_p} ≤ 2^(j(s+1/p)) ‖h_j‖_p`. -/
+theorem modNorm_traceSeries_le_of_atoms (hp : p ≠ ∞) (L : ℕ) {r : ℕ} {s : ℝ} (hs : 0 < s)
+    (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {d : ℝ} {C : ℝ≥0∞} {N : ℕ} (hC : C ≠ ∞)
+    (hatoms : ∀ (j : ℕ) {h : V → ℂ}, MemLp h p volume →
+      (∀ m, IsRegularAtom p r r d C j (Ω.proj (cellCenter j m))
+        (cellAtom p (b.dual L j) j h m ∘ Ω.graphMap)) ∧
+      ∀ x' (S : Finset (Fin (finrank ℝ V) → ℤ)),
+        (∀ m ∈ S, Ω.traceCoef b p L j h m ≠ 0 ∧ ‖x' - Ω.proj (cellCenter j m)‖ ≤ (d + r) / 2 ^ j) →
+          S.card ≤ N) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ h : ℕ → Lp ℂ p (volume : Measure V),
       lqNorm q (fun j => dyadicWeight (s + 1 / p.toReal) j * ‖h j‖ₑ) < ∞ →
       ‖Ω.traceSeries b hp L h‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 (Ω.traceSeries b hp L h) k) ≤
+          lqNorm q (fun k => dyadicWeight s k * lpModulus p r (Ω.traceSeries b hp L h) k) ≤
         K * lqNorm q (fun j => dyadicWeight (s + 1 / p.toReal) j * ‖h j‖ₑ) := by
   have hp1 : 1 ≤ p := Fact.out
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
-  obtain ⟨d, C, N, hd, hC, hatoms⟩ := Ω.exists_trace_atoms b hp1 L
-  refine ⟨atomSynthConst p N C 1 s 1, atomSynthConst_ne_top hp1 N hC 1 hs hs1, fun h hX => ?_⟩
+  refine ⟨atomSynthConst p N C r s r, atomSynthConst_ne_top hp1 N hC r hs hsr, fun h hX => ?_⟩
   have hsyn := modNorm_le_coeffNorm hp (fun j m => Ω.proj (cellCenter j m))
     (fun j m => cellAtom p (b.dual L j) j (h j) m ∘ Ω.graphMap)
     (fun j => Ω.traceCoef b p L j (h j))
-    (fun j x' S hS => (hatoms j (Lp.memLp (h j))).2 x' S fun m hm =>
-      ⟨(hS m hm).1, by simpa only [Nat.cast_one] using (hS m hm).2⟩)
+    (fun j x' S hS => (hatoms j (Lp.memLp (h j))).2 x' S hS)
     (fun j m => (hatoms j (Lp.memLp (h j))).1 m)
     (fun j => (Ω.traceTerm_ae b hp L j (h j)).mono fun x' hx' =>
       hx'.trans (Ω.traceFun_eq_tsum b hp1 L j (Lp.memLp (h j)) x'))
-    (Ω.tendsto_sum_traceTerm b hp L hs hq hX) hs hs1 hq
+    (Ω.tendsto_sum_traceTerm b hp L hs hq hX) hs hsr hq
   refine hsyn.trans (mul_le_mul' le_rfl ?_)
   rw [coeffNorm]
   refine ENNReal.lqNorm_mono fun j => ?_
@@ -363,6 +371,24 @@ theorem modNorm_traceSeries_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s)
         rw [← mul_assoc, ← ENNReal.dyadicWeight_add, Lp.enorm_def, Ω.finrank_hyperplane_eq]
         congr 2
         ring
+
+/-- **The trace of a series** (Schneider–Vybíral, Theorem 4.2): for `0 < s < 1`
+there is `K < ∞` such that the trace `Tr = ∑_j (η_j ⋆ h_j) ∘ γ` has
+`‖Tr‖_{L_p(H)} + ‖(2^(ks) ω_1(Tr, 2^(-k))_p)_k‖_{ℓ_q} ≤ K ‖(2^(j(s+1/p)) ‖h_j‖_p)_j‖_{ℓ_q}`,
+by the atomic synthesis on `H` with the trace atoms of order `1`
+(`Rd.LipschitzGraph.exists_trace_atoms`, `Rd.LipschitzGraph.modNorm_traceSeries_le_of_atoms`). -/
+theorem modNorm_traceSeries_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) (hs1 : s < 1)
+    {q : ℝ≥0∞} (hq : 1 ≤ q) :
+    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ h : ℕ → Lp ℂ p (volume : Measure V),
+      lqNorm q (fun j => dyadicWeight (s + 1 / p.toReal) j * ‖h j‖ₑ) < ∞ →
+      ‖Ω.traceSeries b hp L h‖ₑ +
+          lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 (Ω.traceSeries b hp L h) k) ≤
+        K * lqNorm q (fun j => dyadicWeight (s + 1 / p.toReal) j * ‖h j‖ₑ) := by
+  obtain ⟨d, C, N, -, hC, hatoms⟩ := Ω.exists_trace_atoms b (Fact.out : 1 ≤ p) L
+  exact Ω.modNorm_traceSeries_le_of_atoms b hp L (r := 1) hs (by exact_mod_cast hs1) hq hC
+    fun j h hh => ⟨fun m => by simpa only [Nat.cast_one] using (hatoms j hh).1 m,
+      fun x' S hS => (hatoms j hh).2 x' S fun m hm =>
+        ⟨(hS m hm).1, by simpa only [Nat.cast_one] using (hS m hm).2⟩⟩
 
 end Series
 
@@ -574,30 +600,42 @@ theorem trace_smul (hp : p ≠ ∞) (L : ℕ) (c : ℂ) (f : Lp ℂ p (volume : 
   simp_rw [Ω.traceTerm_smul]
   exact tsum_const_smul'' c
 
-/-- **The trace in `L_p(H)` is bounded by the `B^{1/p}_{p,1}`-norm**:
-`‖Tr f‖_{L_p(H)} ≤ K (‖f‖_p + ∑_k 2^(k/p) ω_L(f, 2^(-k))_p)`, by the bounds of the terms
-(`Rd.LipschitzGraph.eLpNorm_traceFun_le`) and of the local means by the moduli. -/
-theorem enorm_trace_le (hp : p ≠ ∞) (L : ℕ) :
+/-- **The trace is bounded by the intrinsic norm of `B^{1/p}_{p,1}`**:
+`‖Tr f‖_{L_p(H)} ≤ K (‖f‖_{L_p(Ω)} + ∑_k 2^(k/p) ω_L(f, 2^(-k), Ω)_p)`, by the bounds of the terms
+(`Rd.LipschitzGraph.eLpNorm_traceFun_le`) and the comparison of the intrinsic local means with the
+moduli on `Ω`. -/
+theorem enorm_trace_le_modNormOn (hp : p ≠ ∞) (L : ℕ) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖Ω.trace hp L f‖ₑ ≤
-        K * (‖f‖ₑ + lqNorm 1 (fun k => dyadicWeight (1 / p.toReal) k * lpModulus p L f k)) := by
+      ‖Ω.trace hp L f‖ₑ ≤ K * (‖Ω.cutoff f‖ₑ + lqNorm 1 (fun k =>
+        dyadicWeight (1 / p.toReal) k * lpModulusOn p Ω.domain L f k)) := by
   obtain ⟨K, hK, hle⟩ := Ω.eLpNorm_traceFun_le Ω.coneBump Fact.out hp L
-  refine ⟨K * Ω.coneBump.upperConst L (1 / p.toReal),
-    ENNReal.mul_ne_top hK (Ω.coneBump.upperConst_ne_top L _), fun f => ?_⟩
+  refine ⟨K * Ω.intrinsicConst L, ENNReal.mul_ne_top hK (Ω.intrinsicConst_ne_top L),
+    fun f => ?_⟩
   calc ‖Ω.trace hp L f‖ₑ ≤ ∑' j, ‖Ω.traceTerm Ω.coneBump hp L j
         (Ω.cutoff (Ω.coneBump.localMean hp L j f))‖ₑ := enorm_tsum_le_tsum_enorm
-    _ ≤ ∑' j, K * (dyadicWeight (1 / p.toReal) j * ‖Ω.coneBump.localMean hp L j f‖ₑ) :=
+    _ ≤ ∑' j, K * (dyadicWeight (1 / p.toReal) j *
+          ‖Ω.cutoff (Ω.coneBump.localMean hp L j f)‖ₑ) :=
         ENNReal.tsum_le_tsum fun j => by
           rw [Lp.enorm_def, eLpNorm_congr_ae (Ω.traceTerm_ae Ω.coneBump hp L j _)]
           refine (hle j (Lp.memLp _)).trans ?_
           rw [← Lp.enorm_def, mul_assoc]
-          exact mul_le_mul' le_rfl (mul_le_mul' le_rfl (Ω.enorm_cutoff_le _))
-    _ = K * Ω.coneBump.localMeansNorm hp L (1 / p.toReal) 1 f := by
-        rw [ENNReal.tsum_mul_left, LocalMeansBump.localMeansNorm, ENNReal.lqNorm_one]
-    _ ≤ K * (Ω.coneBump.upperConst L (1 / p.toReal) * (‖f‖ₑ +
-          lqNorm 1 (fun k => dyadicWeight (1 / p.toReal) k * lpModulus p L f k))) :=
-        mul_le_mul' le_rfl (Ω.coneBump.localMeansNorm_le hp L _ le_rfl f)
+    _ = K * Ω.intrinsicNorm hp L (1 / p.toReal) 1 f := by
+        rw [ENNReal.tsum_mul_left, intrinsicNorm, ENNReal.lqNorm_one]
+    _ ≤ K * (Ω.intrinsicConst L * (‖Ω.cutoff f‖ₑ + lqNorm 1 (fun k =>
+          dyadicWeight (1 / p.toReal) k * lpModulusOn p Ω.domain L f k))) :=
+        mul_le_mul' le_rfl (Ω.intrinsicNorm_le hp L _ le_rfl f)
     _ = _ := by ring
+
+/-- **The trace in `L_p(H)` is bounded by the `B^{1/p}_{p,1}`-norm**:
+`‖Tr f‖_{L_p(H)} ≤ K (‖f‖_p + ∑_k 2^(k/p) ω_L(f, 2^(-k))_p)`, since the intrinsic quantity of
+`Rd.LipschitzGraph.enorm_trace_le_modNormOn` is at most this one
+(`Rd.LipschitzGraph.modNormOn_le_modNorm`). -/
+theorem enorm_trace_le (hp : p ≠ ∞) (L : ℕ) :
+    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
+      ‖Ω.trace hp L f‖ₑ ≤
+        K * (‖f‖ₑ + lqNorm 1 (fun k => dyadicWeight (1 / p.toReal) k * lpModulus p L f k)) := by
+  obtain ⟨K, hK, hle⟩ := Ω.enorm_trace_le_modNormOn hp L
+  exact ⟨K, hK, fun f => (hle f).trans (mul_le_mul' le_rfl (Ω.modNormOn_le_modNorm L _ 1 rfl))⟩
 
 /-- **The trace along a convergent sequence**: if `F` and the `F_J` have finite intrinsic norms of
 smoothness `s + 1/p`, `s > 0`, and `‖F - F_J‖_p + ‖(2^(k/p) ω_L(F - F_J, 2^(-k))_p)_k‖_{ℓ_1} ≤ b_J`

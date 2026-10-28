@@ -410,13 +410,10 @@ theorem summable_traceExtTerm (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ�
       _ ≤ K * (dyadicWeight (-s) j * X) :=
           mul_le_mul' le_rfl (hw.trans (mul_le_mul' le_rfl hXj))
       _ = K * X * dyadicWeight (-s) j := by ring
-  refine Summable.of_norm ?_
-  have hfin : ∑' j, ‖Ω.traceExtTerm hp j g‖ₑ ≠ ∞ := by
-    refine ne_top_of_le_ne_top ?_ (ENNReal.tsum_le_tsum hterm)
-    rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg]
-    exact ENNReal.mul_ne_top (ENNReal.mul_ne_top hK hX.ne)
-      (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)
-  simpa only [toReal_enorm] using ENNReal.summable_toReal hfin
+  refine Summable.of_enorm (ne_top_of_le_ne_top ?_ (ENNReal.tsum_le_tsum hterm))
+  rw [ENNReal.tsum_mul_left, ENNReal.tsum_dyadicWeight_neg]
+  exact ENNReal.mul_ne_top (ENNReal.mul_ne_top hK hX.ne)
+    (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)
 
 /-- **The extension is bounded** (Schneider–Vybíral, Theorem 4.10, for `p ≥ 1`): for `0 < s < 1`
 there is `K < ∞` with
