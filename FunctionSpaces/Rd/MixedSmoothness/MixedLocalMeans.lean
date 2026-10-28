@@ -491,7 +491,8 @@ theorem lpMixedModulus_convLp_mixedDual_le (hp : p ≠ ∞) (L : ℕ) (m k : Fin
 /-- **Synthesis with the mixed dual kernels**: if `F = ∑_k η_k ⋆ h_k` as the limit of the partial
 sums over the boxes `{k : k_i ≤ J}`, then for `0 ≤ s`,
 `‖(2^(s|m|_1) Ω^{e(m)}_L(F, 2^(-m))_p)_m‖_{ℓ_q} ≤ (C_η C)^d ‖(2^(s|k|_1) ‖h_k‖_p)_k‖_{ℓ_q}` with the
-constant `C` of the almost diagonal lemma, finite for `0 < s < L`. -/
+constant `C` of the almost diagonal lemma, finite for `0 < s < L`
+(`Rd.lqNorm_le_of_le_almostDiagonal_pi`). -/
 theorem mixedModNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 ≤ s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {F : Lp ℂ p (volume : Measure (Fin d → ℝ))}
     {h : (Fin d → ℕ) → Lp ℂ p (volume : Measure (Fin d → ℝ))}
@@ -510,21 +511,7 @@ theorem mixedModNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 
     refine ENNReal.tsum_le_tsum fun k => ?_
     rw [← mul_assoc]
     exact b.lpMixedModulus_convLp_mixedDual_le hp L m k (h k)
-  calc mixedModNorm p L s q F
-      ≤ lqNorm q (fun m => b.dualConst L ^ d * (mixedWeight s m *
-          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ)) :=
-        ENNReal.lqNorm_mono fun m => by
-          calc mixedWeight s m * lpMixedModulus p L F m
-              ≤ mixedWeight s m * (b.dualConst L ^ d *
-                  ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) :=
-                mul_le_mul' le_rfl (hmod m)
-            _ = _ := by ring
-    _ = b.dualConst L ^ d * lqNorm q (fun m => mixedWeight s m *
-          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) := ENNReal.lqNorm_const_mul _ _
-    _ ≤ b.dualConst L ^ d * (almostDiagConst s L ^ d *
-          lqNorm q (fun k => mixedWeight s k * ‖h k‖ₑ)) :=
-        mul_le_mul' le_rfl (lqNorm_almostDiagonal_pi_le hq hs _)
-    _ = _ := by rw [mul_pow, mul_assoc]
+  exact lqNorm_le_of_le_almostDiagonal_pi hq hs hmod
 
 /-- **The mixed modulus is bounded by the mixed local means**: for `0 ≤ s`,
 `‖(2^(s|m|_1) Ω^{e(m)}_L(f, 2^(-m))_p)_m‖_{ℓ_q} ≤ (C_η C)^d ‖(2^(s|k|_1) ‖k_k ⋆ f‖_p)_k‖_{ℓ_q}`, by

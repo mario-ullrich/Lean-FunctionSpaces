@@ -24,8 +24,8 @@ functions (\Cref{sec:schwartz-cutoff}). On the whole space $V$ and for $L_p$ fun
 same as an identity between tempered distributions, the setting of Mathlib's Fourier transform
 and Bessel potential spaces (\Cref{sec:weak-derivatives}).
 \Cref{sec:weak-derivative-change-of-variables} shows that Lipschitz functions are weakly
-differentiable and proves the product rule with cutoffs and the chain rule under Lipschitz maps
-that preserve Lebesgue measure. For $p = 2$,
+differentiable, bounds products with cutoffs in $L_p$ and proves the chain rule under Lipschitz
+maps that preserve Lebesgue measure. For $p = 2$,
 \Cref{sec:sobolev-two-littlewood-paley} identifies Mathlib's Bessel potential spaces $H^s(V)$,
 $s \geq 0$, with the Triebel--Lizorkin spaces $\TL{s}{2}{2}$ (and, for $s > 0$, with the Besov
 spaces $\Besov{s}{2}{2}$) and proves $\Sob{1}{2}(V) = H^1(V) = \Besov{1}{2}{2}$.
@@ -247,28 +247,75 @@ Then $\partial^v w = \partial^v a + i \, \partial^v b$
 $b$ gives the identity.
 \end{proof}
 
-\begin{lemma}[The product rule for weak derivatives]
-\label{lem:weak-derivative-product}
-\lean{Rd.testFunctionMul, Rd.testFunctionMul_apply, Rd.lineDerivOp_testFunctionMul_apply,
-  Rd.HasWeakLineDeriv.mul_contDiff}
+\begin{lemma}[The product rule for test functions]
+\label{lem:test-function-product}
+\lean{Rd.testFunctionMul, Rd.testFunctionMul_apply, Rd.lineDerivOp_testFunctionMul_apply}
 \leanok
-\uses{lem:weak-derivative-integral}
+\uses{lem:directional-derivatives-commute}
 For every test function $\varphi \in \mathcal D(\Omega)$ and every smooth real function $\chi$
-on $V$, $\varphi \chi \in \mathcal D(\Omega)$ with
-$\partial_w (\varphi \chi) = (\partial_w \varphi) \chi + \varphi \, \partial_w \chi$. For every
-$w \in V$, all $f$, $g$ with $g = \partial_w f$ weakly on $\Omega$ and every smooth real $\chi$,
-$\chi g + (\partial_w \chi) f = \partial_w (\chi f)$ weakly on $\Omega$.
+on $V$, $\varphi \chi \in \mathcal D(\Omega)$ and
+$\partial_w (\varphi \chi) = (\partial_w \varphi) \chi + \varphi \, \partial_w \chi$ for every
+$w \in V$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-The products of $\chi$ and $\partial_w \chi$ with locally integrable functions on $\Omega$ are
-locally integrable on $\Omega$. For $\varphi \in \mathcal D(\Omega)$,
+The closed support of $\varphi \chi$ lies in that of $\varphi$, and the product rule for
+derivatives gives $\partial_w (\varphi \chi)$, since $\partial_w \psi = D\psi(\cdot) \, w$ for
+test functions $\psi$ (\Cref{lem:directional-derivatives-commute}).
+\end{proof}
+
+\begin{lemma}[The product rule with a cutoff]
+\label{lem:weak-derivative-product-cutoff}
+\lean{Rd.testFunctionMulOn, Rd.testFunctionMulOn_apply, Rd.lineDerivOp_testFunctionMulOn_apply,
+  Rd.locallyIntegrableOn_mul_of_tsupport_subset, Rd.HasWeakLineDeriv.mul_of_tsupport_subset}
+\leanok
+\uses{lem:weak-derivative-integral, lem:test-function-product,
+  lem:directional-derivatives-commute}
+For all open $O, B \subseteq V$ and every smooth real function $\chi$ on $V$ with closed support
+in $B$:
+\begin{enumerate}
+  \item for every $\varphi \in \mathcal D(O)$, $\varphi \chi \in \mathcal D(O \cap B)$ and
+    $\partial_w (\varphi \chi) = (\partial_w \varphi) \chi + \varphi \, \partial_w \chi$ for every
+    $w \in V$;
+  \item for every continuous $c \colon V \to \C$ with closed support in $B$ and every locally
+    integrable $u$ on $O \cap B$, $c u$ is locally integrable on $O$;
+  \item for every $w \in V$ and all $f$, $g$ with $g = \partial_w f$ weakly on $O \cap B$,
+    $\chi g + (\partial_w \chi) f = \partial_w (\chi f)$ weakly on $O$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The closed support of $\varphi \chi$ lies in those of $\varphi$ and of $\chi$, hence in
+$O \cap B$, and as a function $\varphi \chi$ is the test function of
+\Cref{lem:test-function-product} on $O$, with the same derivative. (2) Near a point of $B$, $c u$
+is the product of a continuous function with a locally integrable function on the open set
+$O \cap B$; near a point of $O$ outside $B$, which lies outside the closed support of $c$, $c u$
+vanishes. (3) The closed support of $\partial_w \chi$ lies in $B$ as well, so by (2) the functions
+$\chi f$, $\chi g$ and $(\partial_w \chi) f$ are locally integrable on $O$. For
+$\varphi \in \mathcal D(O)$,
 \[
   \int \varphi \bigl(\chi g + (\partial_w \chi) f\bigr) = -\int \partial_w(\varphi \chi) \, f
   + \int \varphi \, (\partial_w \chi) f = -\int (\partial_w \varphi) \, \chi f
 \]
-by \Cref{lem:weak-derivative-integral} for the test function $\varphi \chi$.
+by \Cref{lem:weak-derivative-integral} on $O \cap B$ for the test function
+$\varphi \chi \in \mathcal D(O \cap B)$ of (1), and by the formula for its derivative in (1).
+\end{proof}
+
+\begin{lemma}[The product rule for weak derivatives]
+\label{lem:weak-derivative-product}
+\lean{Rd.HasWeakLineDeriv.mul_contDiff}
+\leanok
+\uses{lem:weak-derivative-product-cutoff}
+For every $w \in V$, all $f$, $g$ with $g = \partial_w f$ weakly on $\Omega$ and every smooth
+real $\chi$, $\chi g + (\partial_w \chi) f = \partial_w (\chi f)$ weakly on $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:weak-derivative-product-cutoff} (3) with $\Omega$ for $O$ and $V$ for $B$, since
+$\Omega \cap V = \Omega$.
 \end{proof}
 
 \begin{lemma}[Pairing with a test function]
@@ -406,8 +453,7 @@ $\lim_{t \to 0} (f(x + t v) - f(x))/t$ where it exists and $0$ elsewhere (Mathli
 $D\Phi(x)$ is the derivative where it exists and $0$ elsewhere (Mathlib's \texttt{fderiv}). For
 Lipschitz $f$ and $\Phi$ both exist almost everywhere by Rademacher's theorem. The section
 proves that Lipschitz functions are weakly differentiable, that weak derivatives are linear in
-the direction, the product rule with a cutoff $\chi$ supported in $B$, which carries a weak
-derivative on $O \cap B$ to one on $O$, an
+the direction, $L_p$ bounds for the products with a cutoff $\chi$ supported in $B$, an
 approximation by mollification on open sets in $L_1$, and the chain rule for Lipschitz maps that
 preserve Lebesgue measure. These are the tools of the extension by reflection across Lipschitz
 graphs \cite[Section~4.4]{EvansGariepy}, \cite[Chapter~9]{Brezis2011}.
@@ -527,27 +573,20 @@ For the other $u$, $\|u\|_{L_p(\mu)} = \infty$ in Mathlib, and for $C = 0$ the p
 $0$.
 \end{proof}
 
-\begin{lemma}[The product rule with a cutoff]
+The product rule with a cutoff (\Cref{lem:weak-derivative-product-cutoff}) carries a weak
+derivative from $O \cap B$ to $O$; the next lemma bounds the $L_p$ norms of the products.
+
+\begin{lemma}[Cutoffs in $L_p$]
 \label{lem:weak-derivative-cutoff}
-\lean{Rd.testFunctionMulOn, Rd.testFunctionMulOn_apply, Rd.lineDerivOp_testFunctionMulOn_apply,
-  Rd.locallyIntegrableOn_mul_of_tsupport_subset, Rd.HasWeakLineDeriv.mul_of_tsupport_subset,
-  Rd.eLpNorm_restrict_eq_inf_of_support_subset, Rd.eLpNorm_mul_add_fderiv_mul_le,
+\lean{Rd.eLpNorm_restrict_eq_inf_of_support_subset, Rd.eLpNorm_mul_add_fderiv_mul_le,
   Rd.eLpNorm_mul_le_of_tsupport_subset}
 \leanok
-\uses{lem:weak-derivative-integral, lem:weak-derivative-product,
-  lem:directional-derivatives-commute, lem:bounded-multiplier-lp}
-For all open $O, B \subseteq V$ and every smooth real function $\chi$ on $V$ with closed support
-in $B$:
+\uses{lem:bounded-multiplier-lp}
+For all open $O, B \subseteq V$:
 \begin{enumerate}
-  \item for every $\varphi \in \mathcal D(O)$, $\varphi \chi \in \mathcal D(O \cap B)$ and
-    $\partial_w (\varphi \chi) = (\partial_w \varphi) \chi + \varphi \, \partial_w \chi$ for every
-    $w \in V$;
-  \item for every continuous $c \colon V \to \C$ with closed support in $B$ and every locally
-    integrable $u$ on $O \cap B$, $c u$ is locally integrable on $O$;
-  \item for every $w \in V$ and all $f$, $g$ with $g = \partial_w f$ weakly on $O \cap B$,
-    $\chi g + (\partial_w \chi) f = \partial_w (\chi f)$ weakly on $O$;
-  \item for every $1 \leq p \leq \infty$, every $w \in V$, all $C, C' \geq 0$ with
-    $|\chi| \leq C$ and $|\partial_w \chi| \leq C'$ and all $f$, $g$,
+  \item for every $1 \leq p \leq \infty$, every $w \in V$, every smooth real function $\chi$ on
+    $V$ with closed support in $B$, all $C, C' \geq 0$ with $|\chi| \leq C$ and
+    $|\partial_w \chi| \leq C'$ and all $f$, $g$,
     \[
       \|\chi g + (\partial_w \chi) f\|_{L_p(O)} \leq C \, \|g\|_{L_p(O \cap B)}
         + C' \, \|f\|_{L_p(O \cap B)} ;
@@ -561,16 +600,10 @@ in $B$:
 
 \begin{proof}
 \leanok
-(1) The closed support of $\varphi \chi$ lies in those of $\varphi$ and of $\chi$, hence in
-$O \cap B$, and the product rule gives the derivative. (2) Near a point of $B$, $c u$ is the
-product of a continuous function with a locally integrable function on the open set $O \cap B$;
-near a point of $O$ outside $B$, which lies outside the closed support of $c$, $c u$ vanishes.
-(3) As in \Cref{lem:weak-derivative-product}, with the test function
-$\varphi \chi \in \mathcal D(O \cap B)$ of (1) for $\varphi \in \mathcal D(O)$. (4) The function
-vanishes outside $B$, so its norm in $L_p(O)$ is its norm in $L_p(O \cap B)$ by (5); Minkowski's
-inequality and \Cref{lem:bounded-multiplier-lp} give the estimate. (5) $h = \mathbf 1_B h$, and
-the $L_p(O)$ norm of $\mathbf 1_B h$ is the $L_p(O \cap B)$ norm of $h$; $\chi f$ vanishes outside
-$B$, and \Cref{lem:bounded-multiplier-lp} bounds it.
+(1) The function vanishes outside $B$, so its norm in $L_p(O)$ is its norm in $L_p(O \cap B)$ by
+(2); Minkowski's inequality and \Cref{lem:bounded-multiplier-lp} give the estimate. (2)
+$h = \mathbf 1_B h$, and the $L_p(O)$ norm of $\mathbf 1_B h$ is the $L_p(O \cap B)$ norm of $h$;
+$\chi f$ vanishes outside $B$, and \Cref{lem:bounded-multiplier-lp} bounds it.
 \end{proof}
 
 \begin{lemma}[Smooth cutoffs]
@@ -613,8 +646,8 @@ every $i \in I$, and all $f$, $g_i \colon V \to \C$,
 
 \begin{proof}
 \leanok
-Here $|\chi| \leq 1$ (\Cref{lem:smooth-cutoff-compact}), so \Cref{lem:weak-derivative-cutoff} (5)
-and (4) with $V$ for $O$ and $O$ for $B$ give $\|\chi f\|_{L_p(V)} \leq \|f\|_{L_p(O)}$ and
+Here $|\chi| \leq 1$ (\Cref{lem:smooth-cutoff-compact}), so \Cref{lem:weak-derivative-cutoff} (2)
+and (1) with $V$ for $O$ and $O$ for $B$ give $\|\chi f\|_{L_p(V)} \leq \|f\|_{L_p(O)}$ and
 $\|\chi g_i + (\partial_{e_i} \chi) f\|_{L_p(V)} \leq \|g_i\|_{L_p(O)} + d_i \|f\|_{L_p(O)}$.
 The sum of these bounds is at most the right side.
 \end{proof}
@@ -652,8 +685,9 @@ function with integral $1$ supported in the unit ball, and $\eta_c(x) = c^n \eta
   Rd.tendsto_eLpNorm_mollify_sub_restrict, Rd.HasWeakLineDeriv.cutoff_top,
   Rd.exists_tendsto_contDiff_of_hasWeakLineDeriv}
 \leanok
-\uses{lem:weak-derivative-cutoff, lem:smooth-cutoff-compact, lem:mollification-weak-derivative,
-  thm:approx-identity, lem:dilate, lem:conv-derivatives, thm:smooth-atomic-decomposition,
+\uses{lem:weak-derivative-product-cutoff, lem:smooth-cutoff-compact,
+  lem:mollification-weak-derivative, thm:approx-identity, lem:dilate, lem:conv-derivatives,
+  thm:smooth-atomic-decomposition,
   lem:weak-derivative-basic}
 \begin{enumerate}
   \item For every topological space $X$ with a measure and every locally integrable $u$ on $X$
@@ -676,7 +710,8 @@ function with integral $1$ supported in the unit ball, and $\eta_c(x) = c^n \eta
 \leanok
 (1) Such a function is integrable on its compact closed support and zero outside it. The
 mollifications converge to $h$ in $L_1(V)$ (\Cref{thm:approx-identity}), and on $K$, $h = h'$
-almost everywhere. (2) \Cref{lem:weak-derivative-cutoff} with $V$ for $O$ and $O$ for $B$; both
+almost everywhere. (2) \Cref{lem:weak-derivative-product-cutoff} (3) with $V$ for $O$ and $O$
+for $B$; both
 functions are locally integrable on $V$ (\Cref{lem:weak-derivative-basic}) with compact support,
 so (1) applies. (3) Take $\chi$ of \Cref{lem:smooth-cutoff-compact} for $K \subseteq O$ and
 $u_k = \eta_{k+1} * (\chi f)$, which is smooth with compact support (\Cref{lem:conv-derivatives},
@@ -1670,8 +1705,8 @@ $u = (u_0, \dots, u_{k-1}) \in V^k$ and $v \in V$, $(u, v) \in V^{k+1}$ is the t
 by $v$, so that $\partial^{(u, v)} = \partial^u \partial_v$. This section proves the Leibniz rule
 for $\chi f$ with a smooth compactly supported $\chi$, with an explicit constant, by induction on
 the order: $\partial_{e_j} (\chi f) = \chi \, \partial_{e_j} f + (\partial_{e_j} \chi) f$
-(\Cref{lem:weak-derivative-cutoff}). The Leibniz rule is the tool for pasting local extensions in
-$\Sob{m}{p}(V)$, as \Cref{lem:product-rule-lp} is for $m = 1$.
+(\Cref{lem:weak-derivative-product-cutoff}). The Leibniz rule is the tool for pasting local
+extensions in $\Sob{m}{p}(V)$, as \Cref{lem:product-rule-lp} is for $m = 1$.
 
 \paragraph{Words and directions.}
 
@@ -1832,8 +1867,8 @@ and any element of $A$ for $k > m$.
 \lean{Rd.exists_hasWeakLineDeriv_mul_zero, Rd.HasWeakLineDeriv.mul_snoc,
   Rd.exists_hasWeakLineDeriv_mul_of_tsupport_subset}
 \leanok
-\uses{lem:weak-derivative-snoc, lem:weak-derivative-cutoff, lem:leibniz-constant,
-  lem:words-snoc, lem:weak-derivative-basic, def:leibniz-constant}
+\uses{lem:weak-derivative-snoc, lem:weak-derivative-product-cutoff, lem:weak-derivative-cutoff,
+  lem:leibniz-constant, lem:words-snoc, lem:weak-derivative-basic, def:leibniz-constant}
 For all open $O, B \subseteq V$, every $1 \leq p \leq \infty$, every $m \in \N$, every $f$, all
 $g_{k,w}$ ($k \leq m$, $w \in I^k$) with $g_{k,w} = \partial^{e_w} f$ weakly on $O \cap B$, every
 smooth $\chi \colon V \to \R$ with compact closed support in $B$, every $k \leq m$ and every
@@ -1848,13 +1883,13 @@ $w \in I^k$, there is $G$ with $G = \partial^{e_w} (\chi f)$ weakly on $O$ and
 \leanok
 Induction on $k$, for all $m$, $f$, $g$ and $\chi$ at once. For $k = 0$, $G = \chi f$, and
 $\|\chi f\|_{L_p(O)} \leq C_0(\chi) \|f\|_{L_p(O \cap B)}$
-(\Cref{lem:weak-derivative-cutoff} (5), \Cref{lem:leibniz-constant} (2)) with $f = g_{0,()}$
+(\Cref{lem:weak-derivative-cutoff} (2), \Cref{lem:leibniz-constant} (2)) with $f = g_{0,()}$
 almost everywhere on $O \cap B$. For a word $(u, j)$ of length $k + 1$, let
 $f' = g_{1,(j)} = \partial_{e_j} f$. Then $g_{k'+1,(w', j)} = \partial^{e_{w'}} f'$ on $O \cap B$
 (\Cref{lem:weak-derivative-snoc}), and the induction hypothesis for $\chi f'$ and for
 $(\partial_{e_j} \chi) f$ along $u$ gives $G_1$ and $G_2$. Since
 $\partial_{e_j} (\chi f) = \chi f' + (\partial_{e_j} \chi) f$ on $O$
-(\Cref{lem:weak-derivative-cutoff} (3)), $G = G_1 + G_2$ is the derivative along $(u, j)$
+(\Cref{lem:weak-derivative-product-cutoff} (3)), $G = G_1 + G_2$ is the derivative along $(u, j)$
 (\Cref{lem:weak-derivative-snoc}). Both bounds are at most the sum over the words of length at most
 $k + 1$ (\Cref{lem:words-snoc}), and
 $C_k(\chi) + C_k(\partial_{e_j} \chi) \leq C_{k+1}(\chi)$ (\Cref{lem:leibniz-constant} (3)).
@@ -2275,8 +2310,7 @@ which is finite.
   Rd.lqNorm_blockFun_succ_le_sum_ae}
 \leanok
 \uses{cor:psi-derivatives-dilated, thm:weak-derivative-convolution, lem:averaged-differences,
-  def:derivative-family, def:triebel-lizorkin, lem:dyadic-weights-integer, lem:lq-basic,
-  lem:countable-minkowski}
+  def:derivative-family, def:triebel-lizorkin, lem:mixed-norm-tools}
 For every $l \in \N$, the complex number $2^l$ has absolute value $|2^l| = 2^l$.
 Let $1 \leq p < \infty$, $m \in \N$ and $f \in L_p(V)$, and for every multi-index $\alpha$ let
 $g_\alpha \in L_p(V)$ be the weak derivative $\partial^{e_\alpha} f$ on $V$. For almost every
@@ -2297,11 +2331,10 @@ By \Cref{cor:psi-derivatives-dilated}, $2^{jm} \psi_{j+1} * f$ is the convolutio
 $\sum_\alpha \partial^{e_\alpha} \theta^\alpha_j$, which is
 $\sum_\alpha (\partial^{e_\alpha} \theta^\alpha_j) * f$ almost everywhere
 (\Cref{lem:averaged-differences}); each term is $\theta^\alpha_j * g_\alpha$ at every point
-(\Cref{thm:weak-derivative-convolution}). For the bound,
-$2^{(j+1)m} = 2^m 2^{jm}$ (\Cref{lem:dyadic-weights-integer}) and $|2^{jm}| = 2^{jm}$ in $\C$;
-the triangle inequality in $\C$,
-the homogeneity of the $\ell_2$ norm and Minkowski's inequality for finite sums
-(\Cref{lem:lq-basic}, \Cref{lem:countable-minkowski}) give the claim.
+(\Cref{thm:weak-derivative-convolution}). For the bound, $|2^{jm}| = 2^{jm}$ in $\C$, so the
+triangle inequality in $\C$ gives
+$2^{jm} |(\psi_{j+1} * f)(x)| \leq \sum_\alpha |(\theta^\alpha_j * g_\alpha)(x)|$, and
+\Cref{lem:mixed-norm-tools} (5) gives the claim.
 \end{proof}
 
 \begin{theorem}[$\Sob{m}{p} \subseteq \TL{m}{p}{2}$]
@@ -2310,8 +2343,8 @@ the homogeneity of the $\ell_2$ norm and Minkowski's inequality for finite sums
   Rd.memTriebelLizorkin_of_hasWeakLineDeriv, Rd.memTriebelLizorkin_of_memSobolev}
 \leanok
 \uses{lem:blocks-as-derivative-convolutions, def:sobolev-to-tl-const, thm:cz-family-derivative,
-  thm:vector-valued-strong-type, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-nonnegative,
-  lem:lp-norm-homogeneity, def:weak-line-derivative, lem:weak-derivative-basic}
+  thm:vector-valued-strong-type, lem:tl-pointwise-blocks, lem:mixed-norm-tools,
+  def:weak-line-derivative, lem:weak-derivative-basic}
 Let $n \geq 1$, $1 < p < \infty$, $m \in \N$ and $f \in L_p(V)$, and for every multi-index
 $\alpha$ let $g_\alpha \in L_p(V)$ be the weak derivative $\partial^{e_\alpha} f$ on $V$. Then
 \[
@@ -2328,13 +2361,12 @@ In particular, $f \in \TL{m}{p}{2}$, and every $f \in \Sob{m}{p}(V)$ lies in $\T
 
 \begin{proof}
 \leanok
-For the first bound, take the $L_p$ norm in \Cref{lem:blocks-as-derivative-convolutions}, use
-the homogeneity of the $L_p$ norm (\Cref{lem:lp-norm-homogeneity}) and Minkowski's inequality in
-$L_p$, and bound each term by the strong type of the analysis operator
-(\Cref{thm:vector-valued-strong-type}) of the Calder\'on--Zygmund family $(\theta^\alpha_j)_j$
-with overlap $2$ and H\"ormander constant $4 H_{A^\alpha}$ (\Cref{thm:cz-family-derivative}).
-Splitting off the block $j = 0$ from the $\ell_2$ norm (\Cref{lem:lq-basic}), the triangle
-inequality in $L_p$ and $\|\psi_0 * f\|_p \leq \|\Phi\|_1 \, \|f\|_p$
+For the first bound, take the $L_p$ norm in \Cref{lem:blocks-as-derivative-convolutions} with
+Minkowski's inequality in $L_p$ (\Cref{lem:mixed-norm-tools} (3)), and bound each term by the
+strong type of the analysis operator (\Cref{thm:vector-valued-strong-type}) of the
+Calder\'on--Zygmund family $(\theta^\alpha_j)_j$ with overlap $2$ and H\"ormander constant
+$4 H_{A^\alpha}$ (\Cref{thm:cz-family-derivative}). Splitting off the block $j = 0$
+(\Cref{lem:mixed-norm-tools} (4)) and $\|\psi_0 * f\|_p \leq \|\Phi\|_1 \, \|f\|_p$
 (\Cref{lem:tl-pointwise-blocks}) give the second bound.
 For $f \in \Sob{m}{p}(V)$ the weak derivatives $\partial^{e_\alpha} f$ exist in $L_p(V)$
 (\Cref{lem:weak-derivative-basic}), and the right side is finite.
@@ -2380,14 +2412,77 @@ $g_j = 2^{js} |\psi_j * f|$, whose mixed norm is $\|f\|_{\TL{s}{p}{q}}$
 (\Cref{def:triebel-lizorkin}).
 \end{proof}
 
+\begin{lemma}[The synthesis bound with scaled blocks]
+\label{lem:scaled-synthesis-bound}
+\lean{Rd.IsCZFamily.eLpNorm_sum_conv_smul_blockFun_le}
+\leanok
+\uses{thm:vector-valued-strong-type, def:cz-const, def:triebel-lizorkin, lem:tl-pointwise-blocks}
+Let $n \geq 1$, $1 < p < \infty$, $(\theta_j)_j$ a Calder\'on--Zygmund family with overlap $B$ and
+H\"ormander constant $H$, $\sigma \in \R$ and $c_j \in \C$ with $|c_j| = 2^{j\sigma}$. For every
+finite set $t \subseteq \N$ and every $f \in L_p(V)$,
+\[
+  \Bigl\| \sum_{j \in t} \theta_j * (c_j \, \psi_j * f) \Bigr\|_p
+  \leq S_{V,p}(B, H) \, \Bigl\| x \mapsto \bigl\| \bigl(\mathbf 1_t(j) \, 2^{j\sigma}
+  |(\psi_j * f)(x)|\bigr)_j \bigr\|_{\ell_2} \Bigr\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The functions $g_j = \mathbf 1_t(j) \, c_j \, \psi_j * f$ lie in $L_p(V)$
+(\Cref{lem:tl-pointwise-blocks}) and $|g_j| = \mathbf 1_t(j) \, 2^{j\sigma} |\psi_j * f|$; the
+synthesis bound of \Cref{thm:vector-valued-strong-type} applies.
+\end{proof}
+
+\begin{lemma}[Convergent synthesis sums]
+\label{lem:synthesis-sums-convergent}
+\lean{Rd.memLp_sum_conv_blockFun, Rd.eLpNorm_sum_conv_blockFun_sub_le,
+  Rd.cauchySeq_toLp_sum_conv_blockFun, Rd.exists_tendsto_sum_conv_blockFun}
+\leanok
+\uses{def:triebel-lizorkin, thm:young, lem:weighted-block-tails, lem:tl-pointwise-blocks,
+  lem:mixed-norm-tools}
+Let $\sigma$ be real, $f \in L_p(V)$, $C \in [0, \infty]$ and $K_j$ Schwartz functions with
+\[
+  \Bigl\| \sum_{j \in t} K_j * (\psi_j * f) \Bigr\|_p \leq C \, \Bigl\| x \mapsto
+  \bigl\| \bigl(\mathbf 1_t(j) \, 2^{j\sigma} |(\psi_j * f)(x)|\bigr)_j \bigr\|_{\ell_2}
+  \Bigr\|_p
+\]
+for every finite set $t \subseteq \N$.
+\begin{enumerate}
+  \item For all $N \leq N'$,
+    \[
+      \Bigl\| \sum_{N \leq j < N'} K_j * (\psi_j * f) \Bigr\|_p \leq C \, \Bigl\| x \mapsto
+      \bigl\| \bigl(2^{j\sigma} |(\psi_j * f)(x)|\bigr)_{j \geq N} \bigr\|_{\ell_2} \Bigr\|_p ,
+    \]
+    where the $\ell_2$ norm is taken of the sequence with the terms $j < N$ replaced by $0$.
+  \item For $1 \leq p < \infty$, the sums $\sum_{j \in t} K_j * (\psi_j * f)$ lie in $L_p(V)$ for
+    every finite set $t \subseteq \N$.
+  \item For $1 \leq p < \infty$, $C < \infty$ and $f \in \TL{\sigma}{p}{2}$, the partial sums
+    $\sum_{j < J} K_j * (\psi_j * f)$ form a Cauchy sequence in $L_p(V)$, and they converge to
+    some $g \in L_p(V)$ with $\|g\|_p \leq C \|f\|_{F^\sigma_{p,2}}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The sum is the sum over $t = \{N, \dots, N' - 1\}$, and setting the terms $j < N$ instead of
+the terms $j \notin t$ to zero enlarges the mixed norm (\Cref{lem:mixed-norm-tools} (1)).
+(2) The blocks $\psi_j * f$ lie in $L_p(V)$ (\Cref{lem:tl-pointwise-blocks}), and Young's
+inequality (\Cref{thm:young}) applies. (3) By (1) and \Cref{lem:mixed-norm-tools} (2) for the
+functions $2^{j\sigma} |\psi_j * f|$, whose mixed norm $\|f\|_{F^\sigma_{p,2}}$ is finite
+(\Cref{def:triebel-lizorkin}), the partial sums form a Cauchy sequence. The limit $g$ exists
+since $L_p(V)$ is complete, and each partial sum has norm at most $C \|f\|_{F^\sigma_{p,2}}$
+(\Cref{lem:weighted-block-tails}).
+\end{proof}
+
 \begin{lemma}[The synthesis bound for derivatives of the synthesis kernels]
 \label{lem:derivative-synthesis-bound}
 \lean{Rd.eLpNorm_sum_conv_derivDual_le, Rd.derivSynthesisSum, Rd.memLp_derivSynthesisSum,
   Rd.eLpNorm_derivSynthesisSum_sub_le}
 \leanok
 \uses{def:tl-to-sobolev-const, lem:psi-dual-derivatives, thm:cz-family-dual-derivative,
-  thm:vector-valued-strong-type, lem:tl-pointwise-blocks, thm:young,
-  lem:blocks-as-derivative-convolutions, lem:dyadic-weights-integer, lem:mixed-norm-tails}
+  lem:blocks-as-derivative-convolutions, lem:dyadic-weights-integer, lem:scaled-synthesis-bound,
+  lem:synthesis-sums-convergent}
 Let $n \geq 1$, $1 < p < \infty$, $k \in \N$, $w \in V^k$ and $f \in L_p(V)$. For every finite
 set $s \subseteq \N$,
 \begin{multline*}
@@ -2406,24 +2501,20 @@ and for all $N \leq N'$,
 \begin{proof}
 \leanok
 $\partial^w \tilde\psi_j = 2^{jk} \tilde\theta^w_j$ (\Cref{lem:psi-dual-derivatives}), so the
-sum is $\sum_{j \in s} \tilde\theta^w_j * h_j$ with $h_j = \mathbf 1_s(j) 2^{jk} \psi_j * f$,
-which lie in $L_p(V)$ (\Cref{lem:tl-pointwise-blocks}). Since $|2^{jk}| = 2^{jk}$ in $\C$
-(\Cref{lem:blocks-as-derivative-convolutions}),
-$|h_j| = \mathbf 1_s(j) 2^{jk} |\psi_j * f|$, with the weight $2^{jk}$ of smoothness $k$
-(\Cref{lem:dyadic-weights-integer}). The strong type of the synthesis
-operators (\Cref{thm:vector-valued-strong-type}) of the Calder\'on--Zygmund family
-$(\tilde\theta^w_j)_j$ (\Cref{thm:cz-family-dual-derivative}) gives the first bound. The partial
-sums lie in $L_p(V)$ by Young's inequality (\Cref{thm:young}), and $D_{N'} - D_N$ is the sum over
-$s = \{N, \dots, N' - 1\}$, whose sequence is at most the tail from $N$; the measurability is
-\Cref{lem:mixed-norm-tails}.
+sum is $\sum_{j \in s} \tilde\theta^w_j * (c_j \, \psi_j * f)$ with $c_j = 2^{jk}$, and
+$|c_j| = 2^{jk}$ in $\C$ (\Cref{lem:blocks-as-derivative-convolutions}), the weight of
+smoothness $k$ (\Cref{lem:dyadic-weights-integer}). The synthesis bound with scaled blocks
+(\Cref{lem:scaled-synthesis-bound}) for the Calder\'on--Zygmund family $(\tilde\theta^w_j)_j$
+(\Cref{thm:cz-family-dual-derivative}) gives the first bound. The partial sums lie in $L_p(V)$,
+and the first bound gives the second (\Cref{lem:synthesis-sums-convergent} (2) and (1)).
 \end{proof}
 
 \begin{lemma}[The partial sums of the derivative]
 \label{lem:derivative-partial-sums}
 \lean{Rd.cauchySeq_toLp_derivSynthesisSum, Rd.hasWeakLineDeriv_sum_conv_psiDual}
 \leanok
-\uses{lem:derivative-synthesis-bound, lem:weighted-block-tails, thm:weak-derivative-convolution,
-  lem:weak-derivative-basic, lem:psi-dual-derivatives}
+\uses{lem:derivative-synthesis-bound, lem:synthesis-sums-convergent,
+  thm:weak-derivative-convolution, lem:weak-derivative-basic, lem:psi-dual-derivatives}
 Let $n \geq 1$, $1 < p < \infty$, $k \in \N$, $w \in V^k$ and $f \in L_p(V)$. For every
 $J \in \N$, $D_J$ is the weak derivative $\partial^w$ of $\sum_{j < J} \tilde\psi_j * (\psi_j * f)$
 on $V$. If $f \in \TL{k}{p}{2}$, then $(D_J)_J$ is a Cauchy sequence in $L_p(V)$.
@@ -2433,9 +2524,9 @@ on $V$. If $f \in \TL{k}{p}{2}$, then $(D_J)_J$ is a Cauchy sequence in $L_p(V)$
 \leanok
 Each term $(\partial^w \tilde\psi_j) * (\psi_j * f)$ is the weak derivative of
 $\tilde\psi_j * (\psi_j * f)$ (\Cref{thm:weak-derivative-convolution}), and weak derivatives
-add up (\Cref{lem:weak-derivative-basic}). By \Cref{lem:derivative-synthesis-bound},
-$\|D_{N'} - D_N\|_p$ is at most $C_{V,p,w}$ times the tail from $N$, which is finite and tends
-to zero (\Cref{lem:weighted-block-tails}).
+add up (\Cref{lem:weak-derivative-basic}). The first bound of
+\Cref{lem:derivative-synthesis-bound} and \Cref{lem:synthesis-sums-convergent} (3) give the
+Cauchy property.
 \end{proof}
 
 \begin{theorem}[$\TL{m}{p}{2} \subseteq \Sob{m}{p}$]
@@ -2443,7 +2534,7 @@ to zero (\Cref{lem:weighted-block-tails}).
 \lean{Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin,
   Rd.exists_hasWeakLineDeriv_of_memTriebelLizorkin_of_le, Rd.memSobolev_of_memTriebelLizorkin}
 \leanok
-\uses{lem:derivative-partial-sums, lem:derivative-synthesis-bound, lem:weighted-block-tails,
+\uses{lem:derivative-partial-sums, lem:derivative-synthesis-bound, lem:synthesis-sums-convergent,
   lem:square-function-reproducing, thm:weak-derivative-limits, lem:weak-derivative-basic,
   def:tl-to-sobolev-const, prop:tl-elementary}
 Let $n \geq 1$, $1 < p < \infty$, $k \in \N$ and $w \in V^k$. For every $f \in \TL{k}{p}{2}$ the
@@ -2458,13 +2549,12 @@ $\TL{m}{p}{2} \subseteq \Sob{m}{p}(V)$ for every $m \in \N$.
 
 \begin{proof}
 \leanok
-Let $g$ be the limit of the Cauchy sequence $(D_J)_J$ in $L_p(V)$
-(\Cref{lem:derivative-partial-sums}). The reproducing sums tend to $f$ in $L_p(V)$
-(\Cref{lem:square-function-reproducing}), and $D_J$ is their weak derivative $\partial^w$, so
-$g = \partial^w f$ weakly on $V$ (\Cref{thm:weak-derivative-limits}). By
-\Cref{lem:derivative-synthesis-bound} with $s = \{0, \dots, J - 1\}$ and
-\Cref{lem:weighted-block-tails}, $\|D_J\|_p \leq C_{V,p,w} \|f\|_{\TL{k}{p}{2}}$ for every $J$,
-and the bound passes to the limit. For $m \geq k$, $\TL{m}{p}{2} \subseteq \TL{k}{p}{2}$ with
+By the first bound of \Cref{lem:derivative-synthesis-bound} and
+\Cref{lem:synthesis-sums-convergent} (3), $D_J$ converges in $L_p(V)$ to some $g$ with
+$\|g\|_p \leq C_{V,p,w} \|f\|_{\TL{k}{p}{2}}$. The reproducing sums tend to $f$ in $L_p(V)$
+(\Cref{lem:square-function-reproducing}), and $D_J$ is their weak derivative $\partial^w$
+(\Cref{lem:derivative-partial-sums}), so $g = \partial^w f$ weakly on $V$
+(\Cref{thm:weak-derivative-limits}). For $m \geq k$, $\TL{m}{p}{2} \subseteq \TL{k}{p}{2}$ with
 $\|f\|_{\TL{k}{p}{2}} \leq \|f\|_{\TL{m}{p}{2}}$ (\Cref{prop:tl-elementary}). The last claim is
 \Cref{lem:weak-derivative-basic}.
 \end{proof}
@@ -2948,6 +3038,23 @@ of the right side, so $f \in L_{p_1}(V)$ with the stated bound.
 
 For $p_0 = 1$ this is the embedding $\TL{n(1 - 1/p_1)}{1}{\infty} \hookrightarrow L_{p_1}(V)$.
 
+\begin{corollary}[$\TL{s}{p_0}{q} \hookrightarrow L_{p_1}$ for $p_0 \leq p_1$]
+\label{cor:triebel-lizorkin-into-lp-le}
+\lean{Rd.exists_memLp_ae_eq_of_memTriebelLizorkin_of_le}
+\leanok
+\uses{thm:triebel-lizorkin-into-lp, prop:tl-elementary}
+Let $n \geq 1$, $1 \leq p_0 \leq p_1 < \infty$, $1 \leq q \leq \infty$ and
+$n(1/p_0 - 1/p_1) \leq s$. Every $f \in \TL{s}{p_0}{q}$ has a representative $g \in L_{p_1}(V)$,
+$g = f$ almost everywhere.
+\end{corollary}
+
+\begin{proof}
+\leanok
+For $p_1 = p_0$ take $g = f$. For $p_0 < p_1$, $f \in \TL{\alpha}{p_0}{\infty}$ with
+$\alpha = n(1/p_0 - 1/p_1)$ (\Cref{prop:tl-elementary}), and \Cref{thm:triebel-lizorkin-into-lp}
+applies.
+\end{proof}
+
 \begin{theorem}[Jawerth's embedding]
 \label{thm:jawerth-embedding}
 \lean{Rd.exists_triebelLizorkinNorm_le_of_nikolskiiExponent}
@@ -2982,7 +3089,8 @@ decreasing rearrangements; Vyb\'{\i}ral~\cite{VybiralJF2008} gives a short proof
   Rd.exists_memLp_ae_eq_of_memSobolev_of_le, Rd.exists_memLp_ae_eq_of_memSobolev_of_eq}
 \leanok
 \uses{thm:triebel-lizorkin-into-lp, thm:sobolev-to-triebel-lizorkin, def:sobolev-to-tl-const,
-  def:critical-embedding-const, prop:tl-elementary, def:nikolskii-property}
+  def:critical-embedding-const, prop:tl-elementary, def:nikolskii-property,
+  cor:triebel-lizorkin-into-lp-le}
 Let $n \geq 1$ and $1 < p < \infty$.
 \begin{enumerate}
   \item For every $m \in \N$ with $m \geq 1$, every $r < \infty$ with $m = n(1/p - 1/r)$, that is
@@ -5028,7 +5136,7 @@ $(\omega_j)$ of Schwartz functions, every $F \colon V \to \C$ and every $x \in V
 \lean{Rd.eLpNorm_sum_conv_besselSchwartz_le}
 \leanok
 \uses{lem:bessel-dilate-convolution, thm:vector-valued-strong-type, def:cz-const,
-  def:triebel-lizorkin, lem:tl-pointwise-blocks}
+  def:triebel-lizorkin, lem:tl-pointwise-blocks, lem:scaled-synthesis-bound}
 Let $n \geq 1$, $1 < p < \infty$, $\sigma$ real, and let $(\omega_j)$ be Schwartz functions such
 that $((K^\sigma_j[\omega])_{2^j})_j$ is a Calder\'on--Zygmund family with overlap $B$ and
 H\"ormander constant $H$. Then for every finite set $t \subseteq \N$ and every $f \in L_p(V)$,
@@ -5046,36 +5154,6 @@ $\sum_{j \in t} (K^\sigma_j[\omega])_{2^j} * g_j$ with $g_j = 2^{j\sigma} \psi_j
 for $j \in t$ (\Cref{lem:tl-pointwise-blocks}) and $g_j = 0$ otherwise, and
 $|g_j| = \mathbf 1_t(j) \, 2^{j\sigma} |\psi_j * f|$. The synthesis bound of
 \Cref{thm:vector-valued-strong-type} applies.
-\end{proof}
-
-\paragraph{Convergent synthesis sums.}
-
-\begin{lemma}[Convergent synthesis sums]
-\label{lem:synthesis-sums-convergent}
-\lean{Rd.memLp_sum_conv_blockFun, Rd.cauchySeq_toLp_sum_conv_blockFun,
-  Rd.exists_tendsto_sum_conv_blockFun}
-\leanok
-\uses{def:triebel-lizorkin, thm:young, lem:weighted-block-tails, lem:tl-pointwise-blocks}
-Let $1 \leq p < \infty$, $\sigma$ real, $f \in \TL{\sigma}{p}{2}$, $C < \infty$ and $K_j$ Schwartz
-functions with
-\[
-  \Bigl\| \sum_{j \in t} K_j * (\psi_j * f) \Bigr\|_p \leq C \, \Bigl\| x \mapsto
-  \bigl\| \bigl(\mathbf 1_t(j) \, 2^{j\sigma} |(\psi_j * f)(x)|\bigr)_j \bigr\|_{\ell_2}
-  \Bigr\|_p
-\]
-for every finite set $t \subseteq \N$. Then the sums $\sum_{j \in t} K_j * (\psi_j * f)$ lie in
-$L_p(V)$, the partial sums $\sum_{j < J} K_j * (\psi_j * f)$ form a Cauchy sequence in $L_p(V)$,
-and they converge to some $g \in L_p(V)$ with $\|g\|_p \leq C \|f\|_{F^\sigma_{p,2}}$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The blocks $\psi_j * f$ lie in $L_p(V)$ (\Cref{lem:tl-pointwise-blocks}), so the sums lie in
-$L_p(V)$ by Young's inequality (\Cref{thm:young}). For $N \leq N'$ the difference of the partial
-sums at $N'$ and $N$ is the sum over $t = \{N, \dots, N' - 1\}$, whose norm is at most $C$ times
-the norm of the weighted blocks with $j \geq N$; these tails tend to zero
-(\Cref{lem:weighted-block-tails}). The limit $g$ exists since $L_p(V)$ is complete, and each
-partial sum has norm at most $C \|f\|_{F^\sigma_{p,2}}$ (\Cref{lem:weighted-block-tails}).
 \end{proof}
 
 \paragraph{Triebel--Lizorkin spaces in Bessel potential spaces.}
@@ -5098,7 +5176,7 @@ $f \in \TL{s}{p}{2}$.
 Let $B, H$ be the constants of \Cref{thm:cz-family-bessel-base} for $\omega = \tilde G$ and
 $\sigma = s$, and $C = S_{V,p}(B, H)$. Since $(\tilde G_j)_{2^j} = \tilde\psi_j$
 (\Cref{lem:psi-dual-derivatives}), \Cref{thm:bessel-synthesis-bound} gives the hypothesis of
-\Cref{lem:synthesis-sums-convergent} for $K_j = J_s \tilde\psi_j$, so
+\Cref{lem:synthesis-sums-convergent} for $K_j = J_s \tilde\psi_j$, so by its item (3)
 $\sum_{j < J} (J_s \tilde\psi_j) * (\psi_j * f)$ converges to some $h \in L_p(V)$ with
 $\|h\|_p \leq C \|f\|_{F^s_{p,2}}$. The sums $\sum_{j < J} \tilde\psi_j * (\psi_j * f)$ tend to
 $f$ (\Cref{lem:square-function-reproducing}), and \Cref{lem:bessel-potential-limits} gives
@@ -5338,7 +5416,8 @@ fractional integration~\cite[Chapter~V]{SteinSingular}.
 \lean{Rd.exists_memLp_eq_of_memSobolev_bessel, Rd.exists_enorm_le_of_besselPotentialSpace}
 \leanok
 \uses{thm:bessel-to-triebel-lizorkin, cor:bessel-bundled, thm:triebel-lizorkin-into-lp,
-  def:critical-embedding-const, lem:ae-equal-classes-distribution, thm:square-function-lower,
+  cor:triebel-lizorkin-into-lp-le, def:critical-embedding-const, lem:ae-equal-classes-distribution,
+  thm:square-function-lower,
   prop:tl-elementary, def:nikolskii-property}
 Let $n \geq 1$, $1 < p < \infty$, $p \leq r < \infty$ and $s \geq n(1/p - 1/r)$ real. Every
 tempered distribution $f \in H^{s,p}(V)$ is a function $g \in L_r(V)$. There is $C < \infty$ such
@@ -5350,7 +5429,10 @@ $\|g\|_r \leq C \|F\|_{H^{s,p}}$.
 \leanok
 Since $s \geq n(1/p - 1/r) \geq 0$, \Cref{thm:bessel-to-triebel-lizorkin} and
 \Cref{cor:bessel-bundled} give an $L_p$ function $g_0 \in \TL{s}{p}{2}$ with $g_0 = f$ as
-tempered distributions and $\|g_0\|_{F^s_{p,2}} \leq C_0 \|F\|_{H^{s,p}}$. For $r = p$ take
+tempered distributions and $\|g_0\|_{F^s_{p,2}} \leq C_0 \|F\|_{H^{s,p}}$. For the first
+claim, \Cref{cor:triebel-lizorkin-into-lp-le} gives $g \in L_r(V)$ with $g = g_0$ almost
+everywhere, so $g = f$ as tempered distributions (\Cref{lem:ae-equal-classes-distribution}).
+For the bound and $r = p$ take
 $g = g_0$, with $\|g_0\|_p \leq \tilde Q_{V,p} \|g_0\|_{F^0_{p,2}}
 \leq \tilde Q_{V,p} \|g_0\|_{F^s_{p,2}}$ (\Cref{thm:square-function-lower},
 \Cref{prop:tl-elementary}). For $p < r$ and $\alpha = n(1/p - 1/r)$,

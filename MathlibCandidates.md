@@ -599,7 +599,8 @@ declarations.
   (`Rd.fderiv_conv_apply_eq_conv`); Lipschitz functions are weakly differentiable
   (`Rd.hasWeakLineDeriv_of_lipschitzWith`), weak derivatives are linear in the direction
   (`Rd.HasWeakLineDeriv.sum_smul_dir`), satisfy the product rule with cutoffs
-  (`Rd.HasWeakLineDeriv.mul_of_tsupport_subset`), are approximated by mollification on open sets
+  (`Rd.HasWeakLineDeriv.mul_of_tsupport_subset`, in
+  `FunctionSpaces/Rd/Sobolev/WeakDerivatives.lean`), are approximated by mollification on open sets
   (`Rd.exists_tendsto_contDiff_of_hasWeakLineDeriv`) and satisfy the chain rule for Lipschitz
   measure-preserving maps (`Rd.HasWeakLineDeriv.comp_lipschitzWith`), candidates together with
   TauCeti's `LocallyLipschitzOn.hasWeakLineDerivOn` and `HasWeakFDerivOn.comp_measurePreserving`.

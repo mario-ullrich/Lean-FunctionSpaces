@@ -6751,8 +6751,9 @@ Dominated convergence gives the limit.
 \label{thm:half-space-integration-by-parts}
 \lean{Rd.integral_halfSpaceCutoff_smul_eq, Rd.setIntegral_openHalfSpace_smul_add_eq}
 \leanok
-\uses{lem:half-space-cutoff-limits, lem:half-space-cutoffs, lem:weak-derivative-cutoff,
-  lem:weak-derivative-integral, lem:directional-derivatives-commute, lem:weak-derivative-basic}
+\uses{lem:half-space-cutoff-limits, lem:half-space-cutoffs,
+  lem:weak-derivative-product-cutoff, lem:weak-derivative-integral,
+  lem:directional-derivatives-commute, lem:weak-derivative-basic}
 Let $e \in V$.
 \begin{enumerate}
   \item For every $w \in V$, all $u$, $g$ with $g = \partial_w u$ weakly on $H_+$, every smooth
@@ -6777,7 +6778,8 @@ Let $e \in V$.
 \begin{proof}
 \leanok
 (1) The closed support of $\eta_k$ lies in $H_+$, so $\eta_k u$ has the weak derivative
-$\eta_k g + (\partial_w \eta_k) u$ on $V$ (\Cref{lem:weak-derivative-cutoff} with $V$ for $O$ and
+$\eta_k g + (\partial_w \eta_k) u$ on $V$ (\Cref{lem:weak-derivative-product-cutoff} (3) with $V$
+for $O$ and
 $H_+$ for $B$, and \Cref{lem:weak-derivative-basic} for the open set $V \cap H_+ = H_+$); test it
 against $\chi$ (\Cref{lem:weak-derivative-integral}), whose derivative $\partial_w \chi$ is
 $D\chi(\cdot) \, w$ (\Cref{lem:directional-derivatives-commute}). (2) Add (1) for
@@ -7123,7 +7125,8 @@ $\Omega_j \cap B(c_j, \rho_j) = \Omega \cap B(c_j, \rho_j)$ (\Cref{def:bounded-l
   Rd.BoundedLipschitzDomain.eLpNorm_mul_graph_le,
   Rd.BoundedLipschitzDomain.eLpNorm_mul_add_fderiv_mul_graph_le}
 \leanok
-\uses{lem:weak-derivative-cutoff, lem:weak-derivative-basic, def:bounded-lipschitz}
+\uses{lem:weak-derivative-product-cutoff, lem:weak-derivative-cutoff, lem:weak-derivative-basic,
+  def:bounded-lipschitz}
 For every bounded Lipschitz domain $\Omega$ and every $j$, $\Omega_j \cap B(c_j, \rho_j)
 \subseteq \Omega$. For every smooth real $\chi$ with closed support in $B(c_j, \rho_j)$:
 \begin{enumerate}
@@ -7142,9 +7145,10 @@ For every bounded Lipschitz domain $\Omega$ and every $j$, $\Omega_j \cap B(c_j,
 \leanok
 The inclusion is $\Omega_j \cap B(c_j, \rho_j) = \Omega \cap B(c_j, \rho_j)$. (1) The weak
 derivative restricts to the open set $\Omega_j \cap B(c_j, \rho_j)$
-(\Cref{lem:weak-derivative-basic}), and \Cref{lem:weak-derivative-cutoff} (3) with $\Omega_j$ for
+(\Cref{lem:weak-derivative-basic}), and \Cref{lem:weak-derivative-product-cutoff} (3) with
+$\Omega_j$ for
 $O$ and $B(c_j, \rho_j)$ for $B$ carries it to $\Omega_j$. (2) and (3)
-\Cref{lem:weak-derivative-cutoff} (5) and (4), and the $L_p$ norm on
+\Cref{lem:weak-derivative-cutoff} (2) and (1), and the $L_p$ norm on
 $\Omega_j \cap B(c_j, \rho_j)$ is at most the $L_p$ norm on $\Omega$.
 \end{proof}
 

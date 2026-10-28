@@ -285,7 +285,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `F^s_{p,q}` by atoms.
 * **The square function theorem.** Let `dim V ≥ 1` and `1 < p < ∞`. By definition,
   `‖f‖_{F^0_{p,2}}` is the `L_p` norm of the square function `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}` of
-  the Littlewood–Paley blocks `ψ_j ⋆ f` (`Rd.triebelLizorkinNorm_zero_two_eq`). The theorem is
+  the Littlewood–Paley blocks `ψ_j ⋆ f` (`Rd.triebelLizorkinNorm_zero_left`). The theorem is
   the two-sided bound: for every `f ∈ L_p(V)`,
   `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p` and `‖f‖_p ≤ Q̃_{V,p} ‖f‖_{F^0_{p,2}}`
   (`Rd.triebelLizorkinNorm_zero_two_le`, `Rd.enorm_le_triebelLizorkinNorm_zero_two`), with the

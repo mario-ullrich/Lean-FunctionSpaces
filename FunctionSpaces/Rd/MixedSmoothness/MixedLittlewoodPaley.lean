@@ -160,7 +160,7 @@ theorem exists_eLpNorm_conv_psi_dual_le (L : ℕ) :
   set C₁ := Φ₁ * (jacksonConst ℝ L 1 * b.dualConst L)
   have hΦ₁ : Φ₁ ≠ ∞ := ENNReal.mul_ne_top (by norm_num) eLpNorm_lpKernel_ne_top
   have hC₀ : C₀ ≠ ∞ := ENNReal.mul_ne_top hΦ₁ (ENNReal.mul_ne_top (by norm_num)
-    (memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top)
+    (eLpNorm_momentKernel_ne_top b.integrable L))
   have hC₁ : C₁ ≠ ∞ := ENNReal.mul_ne_top hΦ₁ (ENNReal.mul_ne_top
     (jacksonConst_ne_top le_rfl h1 L) (b.dualConst_ne_top L))
   refine ⟨(C₀ + C₁) * dyadicWeight L 3, ENNReal.mul_ne_top (ENNReal.add_ne_top.2 ⟨hC₀, hC₁⟩)
@@ -222,7 +222,7 @@ theorem exists_eLpNorm_conv_kernel_Theta_le (L : ℕ) :
   set D := ∫⁻ x, ‖iteratedFDeriv ℝ L (bandKernelS (V := ℝ) : ℝ → ℂ) x‖ₑ
   set C₂ := 2 * (∫⁻ z, ‖b.toFun z‖ₑ) * ENNReal.ofReal (1 + b.radius) ^ L * (D * dyadicWeight L 1)
   have hC₀ : C₀ ≠ ∞ := ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num)
-    (memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top)
+    (eLpNorm_momentKernel_ne_top b.integrable L))
     eLpNorm_bandKernel_ne_top
   have hC₂ : C₂ ≠ ∞ := ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num)
     b.integrable.2.ne) (ENNReal.pow_ne_top ENNReal.ofReal_ne_top))
@@ -307,7 +307,7 @@ theorem enorm_mixedLocalMean_mixedBlock_le (hp : p ≠ ∞) (L : ℕ) {C : ℝ�
 
 /-- **Littlewood–Paley blocks are bounded by the mixed local means**: there is `C < ∞` with
 `‖(2^(s|m|_1) ‖δ_m ⋆ f‖_p)_m‖_{ℓ_q} ≤ (C C_s)^d ‖(2^(s|k|_1) ‖k_k ⋆ f‖_p)_k‖_{ℓ_q}` for `0 ≤ s`,
-`C_s` the constant of the almost diagonal lemma. -/
+`C_s` the constant of the almost diagonal lemma (`Rd.lqNorm_le_of_le_almostDiagonal_pi`). -/
 theorem exists_mixedLPNorm_le (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ {s : ℝ}, 0 ≤ s → ∀ {q : ℝ≥0∞}, 1 ≤ q →
       ∀ f : Lp ℂ p (volume : Measure (Fin d → ℝ)),
@@ -328,25 +328,11 @@ theorem exists_mixedLPNorm_le (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) :
     refine ENNReal.tsum_le_tsum fun k => ?_
     rw [← mul_assoc]
     exact b.enorm_mixedBlock_convLp_mixedDual_le hp L hE m k (h k)
-  calc mixedLPNorm hp s q f
-      ≤ lqNorm q (fun m => C ^ d * (mixedWeight s m *
-          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ)) :=
-        ENNReal.lqNorm_mono fun m => by
-          calc mixedWeight s m * ‖mixedBlock hp m f‖ₑ
-              ≤ mixedWeight s m * (C ^ d *
-                  ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) :=
-                mul_le_mul' le_rfl (hblock m)
-            _ = _ := by ring
-    _ = C ^ d * lqNorm q (fun m => mixedWeight s m *
-          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) := ENNReal.lqNorm_const_mul _ _
-    _ ≤ C ^ d * (almostDiagConst s L ^ d * lqNorm q (fun k => mixedWeight s k * ‖h k‖ₑ)) :=
-        mul_le_mul' le_rfl (lqNorm_almostDiagonal_pi_le hq hs _)
-    _ = (C * almostDiagConst s L) ^ d * b.mixedLocalMeansNorm hp L s q f := by
-        rw [mul_pow, mul_assoc]
-        rfl
+  exact lqNorm_le_of_le_almostDiagonal_pi hq hs hblock
 
 /-- **The mixed local means are bounded by the Littlewood–Paley blocks**: there is `C < ∞` with
-`‖(2^(s|m|_1) ‖k_m ⋆ f‖_p)_m‖_{ℓ_q} ≤ (C C_s)^d ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}` for `0 ≤ s`. -/
+`‖(2^(s|m|_1) ‖k_m ⋆ f‖_p)_m‖_{ℓ_q} ≤ (C C_s)^d ‖(2^(s|k|_1) ‖δ_k ⋆ f‖_p)_k‖_{ℓ_q}` for `0 ≤ s`
+(`Rd.lqNorm_le_of_le_almostDiagonal_pi`). -/
 theorem exists_mixedLocalMeansNorm_le (hp : p ≠ ∞) (L : ℕ) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ {s : ℝ}, 0 ≤ s → ∀ {q : ℝ≥0∞}, 1 ≤ q →
       ∀ f : Lp ℂ p (volume : Measure (Fin d → ℝ)),
@@ -367,22 +353,7 @@ theorem exists_mixedLocalMeansNorm_le (hp : p ≠ ∞) (L : ℕ) :
     refine ENNReal.tsum_le_tsum fun k => ?_
     rw [← mul_assoc]
     exact b.enorm_mixedLocalMean_mixedBlock_le hp L hE m k f
-  calc b.mixedLocalMeansNorm hp L s q f
-      ≤ lqNorm q (fun m => C ^ d * (mixedWeight s m *
-          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ)) :=
-        ENNReal.lqNorm_mono fun m => by
-          calc mixedWeight s m * ‖b.mixedLocalMean hp L m f‖ₑ
-              ≤ mixedWeight s m * (C ^ d *
-                  ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) :=
-                mul_le_mul' le_rfl (hmean m)
-            _ = _ := by ring
-    _ = C ^ d * lqNorm q (fun m => mixedWeight s m *
-          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ) := ENNReal.lqNorm_const_mul _ _
-    _ ≤ C ^ d * (almostDiagConst s L ^ d * lqNorm q (fun k => mixedWeight s k * ‖h k‖ₑ)) :=
-        mul_le_mul' le_rfl (lqNorm_almostDiagonal_pi_le hq hs _)
-    _ = (C * almostDiagConst s L) ^ d * mixedLPNorm hp s q f := by
-        rw [mul_pow, mul_assoc]
-        rfl
+  exact lqNorm_le_of_le_almostDiagonal_pi hq hs hmean
 
 end LocalMeansBump
 

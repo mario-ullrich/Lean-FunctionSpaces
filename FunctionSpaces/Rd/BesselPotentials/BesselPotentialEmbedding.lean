@@ -35,9 +35,8 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 /-- **`H^{s,p} ↪ L_r`**: let `n ≥ 1`, `1 < p < ∞`, `p ≤ r < ∞` and `s ≥ n(1/p - 1/r)`. Every
 tempered distribution `f` in Mathlib's Bessel potential space `H^{s,p}(V)` is a function
 `g ∈ L_r(V)`. Since `s ≥ 0`, `f` is an `L_p` function `g₀ ∈ F^s_{p,2}`
-(`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`); for `r = p` this is `g`, and for `p < r`,
-`F^s_{p,2} ⊆ F^α_{p,∞} ↪ L_r` with `α = n(1/p - 1/r)`
-(`Rd.exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top`). The potential route through the
+(`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`), and `F^s_{p,2} ↪ L_r`
+(`Rd.exists_memLp_ae_eq_of_memTriebelLizorkin_of_le`). The potential route through the
 Hardy–Littlewood–Sobolev inequality is Stein's (1970, Chapter V). -/
 theorem exists_memLp_eq_of_memSobolev_bessel [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     (hpr : p ≤ r) (hr : r ≠ ∞) {s : ℝ} (hs : nikolskiiExponent (finrank ℝ V) p r ≤ s)
@@ -47,11 +46,7 @@ theorem exists_memLp_eq_of_memSobolev_bessel [Nontrivial V] (hp1 : 1 < p) (hp : 
   obtain ⟨h, hh⟩ := hf
   obtain ⟨C, -, hC⟩ := exists_memTriebelLizorkin_of_besselPotential_eq (V := V) hp1 hp hs0
   obtain ⟨g₀, hg₀, hmem, -⟩ := hC f h hh
-  rcases hpr.eq_or_lt with rfl | hlt
-  · exact ⟨g₀, hg₀⟩
-  have hTL : triebelLizorkinNorm (nikolskiiExponent (finrank ℝ V) p r) ∞ g₀ < ∞ :=
-    (triebelLizorkinNorm_mono_exponent one_le_two le_top g₀).trans_lt (hmem.mono_smoothness hs)
-  obtain ⟨g, hg, -⟩ := exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top hlt hr rfl hTL
+  obtain ⟨g, hg⟩ := exists_memLp_ae_eq_of_memTriebelLizorkin_of_le hpr hr hs one_le_two hmem
   exact ⟨g, (toTemperedDistribution_eq_of_ae_eq hg).trans hg₀⟩
 
 /-- **`H^{s,p} ↪ L_r` in Mathlib's bundled space**: let `n ≥ 1`, `1 < p < ∞`, `p ≤ r < ∞` and

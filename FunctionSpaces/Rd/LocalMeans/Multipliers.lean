@@ -18,6 +18,9 @@ differences into themselves (`Rd.exists_modNorm_mulLp_le`): for `1 ≤ p < ∞`,
 
 The ingredients:
 
+* **bounded derivatives**: on a compact set, the derivatives of a smooth function up to order
+  `r` are bounded (`ContDiffOn.exists_norm_iteratedFDerivWithin_le` for derivatives within a
+  set, `Rd.exists_iteratedFDeriv_bound` with compact support);
 * **differences of smooth functions**: for `G` of class `C^l`, `‖Δ_h^l G(x)‖ ≤ C ‖h‖^l` if
   `‖D^l G‖ ≤ C` on the segment from `x` to `x + l h` (`Rd.norm_higherDiff_le_of_segment`), by the
   mean value inequality, in particular if `‖D^l G‖ ≤ C` everywhere
@@ -130,6 +133,24 @@ theorem exists_iteratedFDeriv_bound {G : V → E} (hG : ContDiff ℝ ((⊤ : ℕ
     ?_)⟩
   exact Finset.single_le_sum (f := fun l => |C l|) (fun _ _ => abs_nonneg _)
     (Finset.mem_range.2 (Nat.lt_succ_of_le hl))
+
+/-- **Bounded derivatives on a compact set**: if `f` is smooth on a set `s` of unique
+differentiability and `K ⊆ s` is compact, then the derivatives of `f` within `s` of the orders
+`i ≤ r` are bounded on `K` by one constant (their norms are continuous on `K`). -/
+theorem _root_.ContDiffOn.exists_norm_iteratedFDerivWithin_le {E F : Type*}
+    [NormedAddCommGroup E] [NormedSpace ℝ E] [NormedAddCommGroup F] [NormedSpace ℝ F]
+    {f : E → F} {s K : Set E} (hf : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) f s)
+    (hs : UniqueDiffOn ℝ s) (hK : IsCompact K) (hKs : K ⊆ s) (r : ℕ) :
+    ∃ C : ℝ, ∀ i ≤ r, ∀ x ∈ K, ‖iteratedFDerivWithin ℝ i f s x‖ ≤ C := by
+  have hcont : ContinuousOn
+      (fun x => ∑ i ∈ Finset.range (r + 1), ‖iteratedFDerivWithin ℝ i f s x‖) K :=
+    continuousOn_finsetSum _ fun i _ =>
+      ((hf.continuousOn_iteratedFDerivWithin (WithTop.coe_le_coe.2 le_top) hs).mono hKs).norm
+  obtain ⟨C, hC⟩ := hK.exists_bound_of_continuousOn hcont
+  refine ⟨C, fun i hi x hx => ?_⟩
+  refine le_trans ?_ ((Real.le_norm_self _).trans (hC x hx))
+  exact Finset.single_le_sum (f := fun i => ‖iteratedFDerivWithin ℝ i f s x‖)
+    (fun _ _ => norm_nonneg _) (Finset.mem_range.2 (Nat.lt_succ_of_le hi))
 
 end Smooth
 

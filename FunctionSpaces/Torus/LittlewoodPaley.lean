@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Torus.EuclideanConvolutionIdentities
-public import ApproximationSpaces.Trace
+public import ApproximationSpaces.Decompositions.Blocks
 
 /-!
 # Littlewood–Paley blocks on the torus

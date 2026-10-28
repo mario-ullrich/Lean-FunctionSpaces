@@ -131,10 +131,10 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Sobolev–Slobodeckij norms: the Gagliardo form, its two-sided bounds by first differences with explicit constants, radial integrals of powers, `W^{s,p} = B^s_{p,p}` for `0 < s < 1` | ✅ | ✗ | `Rd/Differences/SobolevSlobodeckij` |
 | Besov spaces on `ℝ^d` as interpolation spaces, by approximation, differences and Littlewood–Paley blocks | ✅ | ✗ | `Rd/Interpolation/BesovInterpolation` |
 | Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences | ✅ | ✗ | `Rd/Differences/DomainModuli` |
-| Moment kernels: averaged differences, approximation with the modulus, also on subsets, vanishing first moments of the moment kernels of order two | ✅ | ✗ | `Rd/Differences/MomentKernels` |
+| Moment kernels: finite `L_1` norm, the vanishing moments of their coefficients, averaged differences, approximation with the modulus, also on subsets, vanishing first moments of the moment kernels of order two | ✅ | ✗ | `Rd/Differences/MomentKernels` |
 | Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L` | ✅ | ✗ | `Rd/LocalMeans/LocalMeans` |
 | Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/LocalMeans/KernelMajorants` |
-| Pointwise multipliers on `ℝ^d`: the multiplication operator on `L_p`, Leibniz's rule for differences, moduli of lower order | ✅ | ✗ | `Rd/LocalMeans/Multipliers` |
+| Pointwise multipliers on `ℝ^d`: bounded derivatives on compact sets, the multiplication operator on `L_p`, Leibniz's rule for differences, moduli of lower order | ✅ | ✗ | `Rd/LocalMeans/Multipliers` |
 | Atomic synthesis: bounded overlap, regular atoms on sets, coefficient quasi-norm | ✅ | ✗ | `Rd/Atoms/AtomSynthesis` |
 | Atomic decomposition by cell atoms, atomic characterisation of Besov spaces | ✅ | ✗ | `Rd/Atoms/AtomAnalysis` |
 | Differences within convex sets through derivatives within the set | ✅ | ✗ | `Rd/Atoms/ConvexDifferences` |

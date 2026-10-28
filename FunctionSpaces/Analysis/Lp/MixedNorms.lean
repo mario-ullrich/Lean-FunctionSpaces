@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import ApproximationSpaces.Sequences.Lq
+public import ApproximationSpaces.Sequences.Hardy
 public import FunctionSpaces.Analysis.Lp.LintegralForm
 public import Mathlib.Analysis.MeanInequalities
 public import Mathlib.MeasureTheory.Function.ConvergenceInMeasure
@@ -39,14 +39,23 @@ a probability space, with the `L_p` norm on the right (`MeasureTheory.lqNorm_lin
 Finally, a pointwise bound `u ≤ v + w_J` with `‖w_J‖_p → 0` gives `u ≤ v` almost everywhere
 (`MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm`), and a bound `|G_J| ≤ v` almost everywhere
 passes to the limit of `G_J` in `L_p` (`MeasureTheory.ae_enorm_le_of_tendsto_Lp`). Setting
-terms of a family to zero decreases its mixed norm (`MeasureTheory.eLpNorm_lqNorm_ite_le`), and
-one member is bounded by the mixed norm,
+terms of a family to zero decreases its mixed norm (`MeasureTheory.eLpNorm_lqNorm_ite_le`,
+`MeasureTheory.eLpNorm_lqNorm_ite_mono`), and one member is bounded by the mixed norm,
 `2^(js) ‖h_j‖_p ≤ ‖ x ↦ ‖(2^(is) |h_i(x)|)_i‖_{ℓ_q} ‖_p`
 (`MeasureTheory.dyadicWeight_mul_enorm_le_eLpNorm_lqNorm`,
 `MeasureTheory.enorm_le_dyadicWeight_neg_mul_eLpNorm_lqNorm`). For
 a family with a finite mixed norm, the tails `x ↦ ‖(g_j(x))_{j ≥ N}‖_{ℓ_q}` tend to zero in `L_p`
 by dominated convergence (`MeasureTheory.tendsto_eLpNorm_lqNorm_ite_le`), since the tails of a
-single sequence in `ℓ_q` do (`ENNReal.tendsto_lqNorm_ite_le`).
+single sequence in `ℓ_q` do (`ENNReal.tendsto_lqNorm_ite_le`); a sequence whose differences are
+bounded by these tails is a Cauchy sequence (`MeasureTheory.cauchySeq_of_edist_le_lqNorm_ite`).
+
+Three steps of the embeddings of Sobolev spaces into Triebel–Lizorkin spaces hold for all
+families: the first term splits off,
+`‖x ↦ ‖(2^(js) b_j(x))_j‖_{ℓ_q}‖_p ≤ ‖b_0‖_p + ‖x ↦ ‖(2^((n+1)s) b_{n+1}(x))_n‖_{ℓ_q}‖_p`
+(`MeasureTheory.eLpNorm_lqNorm_dyadicWeight_le_zero_add_succ`), a pointwise bound by a finite
+sum passes to `L_p` by Minkowski's inequality
+(`MeasureTheory.eLpNorm_le_const_mul_sum_of_ae_le`), and `2^(nm) b_n ≤ ∑_i c_{i,n}` gives
+`‖(2^((n+1)m) b_n)_n‖_{ℓ_q} ≤ 2^m ∑_i ‖c_i‖_{ℓ_q}` (`ENNReal.lqNorm_dyadicWeight_succ_le_sum`).
 
 Two facts on conjugate exponents serve the duality arguments: a power cancels in Hölder's
 inequality, `X ≤ K A^{1/u} X^{1/u'}` with `X < ∞` gives `X ≤ K^u A`
@@ -133,6 +142,30 @@ theorem le_rpow_mul_of_le_mul_rpow {X K A : ℝ≥0∞} {u u' : ℝ} (h : u.Hold
     _ ≤ (K * A ^ (1 / u)) ^ u := ENNReal.rpow_le_rpow h1 hu.le
     _ = K ^ u * A := by
         rw [ENNReal.mul_rpow_of_nonneg _ _ hu.le, one_div, ENNReal.rpow_inv_rpow hu.ne']
+
+/-! ### Shifted dyadic weights -/
+
+/-- **Shifted dyadic weights against a finite sum**: for `m ∈ ℕ`, `1 ≤ q ≤ ∞`, a sequence
+`b : ℕ → [0, ∞]` and finitely many sequences `c_i : ℕ → [0, ∞]` with
+`2^(nm) b_n ≤ ∑_i c_{i,n}` for every `n`,
+`‖(2^((n+1)m) b_n)_n‖_{ℓ_q} ≤ 2^m ∑_i ‖c_i‖_{ℓ_q}`, since `2^((n+1)m) = 2^m 2^(nm)`, by the
+homogeneity of the `ℓ_q` norm and Minkowski's inequality (`ENNReal.lqNorm_sum_le`). -/
+theorem lqNorm_dyadicWeight_succ_le_sum {q : ℝ≥0∞} (hq : 1 ≤ q) {m : ℕ} {ι : Type*}
+    (s : Finset ι) {b : ℕ → ℝ≥0∞} {c : ι → ℕ → ℝ≥0∞}
+    (h : ∀ n, 2 ^ (n * m) * b n ≤ ∑ i ∈ s, c i n) :
+    lqNorm q (fun n => dyadicWeight (m : ℝ) (n + 1) * b n) ≤
+      2 ^ m * ∑ i ∈ s, lqNorm q (c i) := by
+  calc lqNorm q (fun n => dyadicWeight (m : ℝ) (n + 1) * b n)
+      ≤ lqNorm q (fun n => 2 ^ m * ∑ i ∈ s, c i n) := by
+        refine lqNorm_mono fun n => ?_
+        rw [dyadicWeight_eq_pow, ENNReal.rpow_natCast, ← pow_mul,
+          show m * (n + 1) = m + n * m by ring, pow_add, mul_assoc]
+        gcongr
+        exact h n
+    _ = 2 ^ m * lqNorm q (fun n => ∑ i ∈ s, c i n) := lqNorm_const_mul _ _
+    _ ≤ 2 ^ m * ∑ i ∈ s, lqNorm q (c i) := by
+        gcongr
+        exact lqNorm_sum_le hq _ _
 
 section Countable
 
@@ -590,6 +623,22 @@ theorem eLpNorm_lqNorm_ite_le {P : ℕ → Prop} [DecidablePred P] {g : ℕ → 
     simp only [enorm_eq_self]
     exact ENNReal.lqNorm_mono fun j => by split_ifs <;> simp
 
+/-- **Setting more terms to zero decreases the mixed norm**: for measurable `g_j : α → [0, ∞]` and
+predicates `P`, `Q` on `ℕ` with `P j → Q j` for every `j`,
+`‖x ↦ ‖(1_P(j) g_j(x))_j‖_{ℓ_q}‖_p ≤ ‖x ↦ ‖(1_Q(j) g_j(x))_j‖_{ℓ_q}‖_p`;
+`MeasureTheory.eLpNorm_lqNorm_ite_le` is the case where `Q` always holds. -/
+theorem eLpNorm_lqNorm_ite_mono {P Q : ℕ → Prop} [DecidablePred P] [DecidablePred Q]
+    {g : ℕ → α → ℝ≥0∞} (hg : ∀ j, AEMeasurable (g j) μ) (hPQ : ∀ j, P j → Q j) :
+    eLpNorm (fun x => lqNorm q fun j => if P j then g j x else 0) p μ ≤
+      eLpNorm (fun x => lqNorm q fun j => if Q j then g j x else 0) p μ :=
+  eLpNorm_mono_enorm (aemeasurable_lqNorm_ite hg q).aestronglyMeasurable fun x => by
+    simp only [enorm_eq_self]
+    refine ENNReal.lqNorm_mono fun j => ?_
+    by_cases hP : P j
+    · simp only [hP, hPQ j hP, ↓reduceIte, le_refl]
+    · simp only [hP, ↓reduceIte]
+      exact zero_le
+
 /-! ### Tails in `L_p(ℓ_q)` -/
 
 /-- **Dominated convergence for tails in `L_p(ℓ_q)`**: for `0 < p, q < ∞` and measurable
@@ -643,5 +692,64 @@ theorem tendsto_eLpNorm_lqNorm_ite_le (hp0 : p ≠ 0) (hp : p ≠ ∞) (hq0 : q 
   refine h.congr fun N => ?_
   rw [Function.comp_apply, ← eLpNorm_rpow_eq_lintegral hp0 hp (aemeasurable_lqNorm_ite hg q),
     ← ENNReal.rpow_mul, mul_one_div_cancel hr.ne', ENNReal.rpow_one]
+
+/-- **Cauchy sequences from tails in `L_p(ℓ_q)`**: let `0 < p, q < ∞`, let `g_j : α → [0, ∞]` be
+measurable with `‖x ↦ ‖(g_j(x))_j‖_{ℓ_q}‖_p < ∞`, and let `C < ∞`. A sequence `S` in a
+pseudo-extended metric space with `edist(S_{N'}, S_N) ≤ C ‖x ↦ ‖(g_j(x))_{j ≥ N}‖_{ℓ_q}‖_p` for
+all `N ≤ N'` (the terms `j < N` set to `0`) is a Cauchy sequence: two members beyond `N` are
+within `2 C` times the `N`-th tail, and the tails tend to zero
+(`MeasureTheory.tendsto_eLpNorm_lqNorm_ite_le`; Mathlib's `EMetric.cauchySeq_iff_le_tendsto_0`). -/
+theorem cauchySeq_of_edist_le_lqNorm_ite {E : Type*} [PseudoEMetricSpace E] {S : ℕ → E}
+    {C : ℝ≥0∞} (hC : C ≠ ∞) (hp0 : p ≠ 0) (hp : p ≠ ∞) (hq0 : q ≠ 0) (hq : q ≠ ∞)
+    {g : ℕ → α → ℝ≥0∞} (hg : ∀ j, AEMeasurable (g j) μ)
+    (hG : eLpNorm (fun x => lqNorm q fun j => g j x) p μ ≠ ∞)
+    (hS : ∀ N N', N ≤ N' → edist (S N') (S N) ≤
+      C * eLpNorm (fun x => lqNorm q fun j => if N ≤ j then g j x else 0) p μ) :
+    CauchySeq S := by
+  have h := ENNReal.Tendsto.const_mul (tendsto_eLpNorm_lqNorm_ite_le hp0 hp hq0 hq hg hG)
+    (Or.inr hC)
+  rw [mul_zero] at h
+  refine EMetric.cauchySeq_iff_le_tendsto_0.2 ⟨fun N => C * eLpNorm (fun x => lqNorm q fun j =>
+    if N ≤ j then g j x else 0) p μ + C * eLpNorm (fun x => lqNorm q fun j =>
+    if N ≤ j then g j x else 0) p μ, fun n m N hn hm => ?_, by simpa using h.add h⟩
+  exact (edist_triangle_right _ _ (S N)).trans (add_le_add (hS N n hn) (hS N m hm))
+
+/-! ### Splitting off the first term -/
+
+/-- **Minkowski's inequality for a pointwise bound**: for `1 ≤ p`, a measurable `B : α → [0, ∞]`
+and measurable `F_i : α → [0, ∞]`, `i ∈ s` finite, the bound `B ≤ c ∑_i F_i` almost everywhere
+gives `‖B‖_p ≤ c ∑_i ‖F_i‖_p` (`MeasureTheory.eLpNorm_const_mul_ennreal`, Mathlib's
+`eLpNorm_sum_le`). -/
+theorem eLpNorm_le_const_mul_sum_of_ae_le (hp1 : 1 ≤ p) {ι : Type*} (s : Finset ι)
+    {B : α → ℝ≥0∞} {F : ι → α → ℝ≥0∞} (hB : AEMeasurable B μ)
+    (hF : ∀ i ∈ s, AEMeasurable (F i) μ) (c : ℝ≥0∞) (h : ∀ᵐ x ∂μ, B x ≤ c * ∑ i ∈ s, F i x) :
+    eLpNorm B p μ ≤ c * ∑ i ∈ s, eLpNorm (F i) p μ := by
+  calc eLpNorm B p μ ≤ eLpNorm (fun x => c * ∑ i ∈ s, F i x) p μ := by
+        refine eLpNorm_mono_enorm_ae hB.aestronglyMeasurable ?_
+        filter_upwards [h] with x hx
+        simpa only [enorm_eq_self] using hx
+    _ = c * eLpNorm (∑ i ∈ s, F i) p μ := by
+        rw [eLpNorm_const_mul_ennreal _ (Finset.aemeasurable_fun_sum _ hF), Finset.sum_fn]
+    _ ≤ c * ∑ i ∈ s, eLpNorm (F i) p μ := by
+        gcongr
+        exact eLpNorm_sum_le hp1
+
+/-- **The first term of a weighted family splits off**: for `1 ≤ p`, `1 ≤ q ≤ ∞`, `s ∈ ℝ` and
+measurable `b_j : α → [0, ∞]`,
+`‖x ↦ ‖(2^(js) b_j(x))_j‖_{ℓ_q}‖_p ≤ ‖b_0‖_p + ‖x ↦ ‖(2^((n+1)s) b_{n+1}(x))_n‖_{ℓ_q}‖_p`,
+by the bound of the `ℓ_q` norm by its first term and its shifted tail
+(`ENNReal.lqNorm_le_sum_range_add_shift`) and the triangle inequality in `L_p`. -/
+theorem eLpNorm_lqNorm_dyadicWeight_le_zero_add_succ (hp1 : 1 ≤ p) (hq : 1 ≤ q) (s : ℝ)
+    {b : ℕ → α → ℝ≥0∞} (hb : ∀ j, AEMeasurable (b j) μ) :
+    eLpNorm (fun x => lqNorm q fun j => dyadicWeight s j * b j x) p μ ≤
+      eLpNorm (b 0) p μ +
+        eLpNorm (fun x => lqNorm q fun n => dyadicWeight s (n + 1) * b (n + 1) x) p μ := by
+  refine (eLpNorm_mono_enorm (f := fun x => lqNorm q fun j => dyadicWeight s j * b j x)
+    (g := b 0 + fun x => lqNorm q fun n => dyadicWeight s (n + 1) * b (n + 1) x)
+    (aemeasurable_lqNorm_comp (fun j => (hb j).const_mul _) q).aestronglyMeasurable
+    fun x => ?_).trans (eLpNorm_add_le hp1)
+  simp only [enorm_eq_self, Pi.add_apply]
+  refine (ENNReal.lqNorm_le_sum_range_add_shift hq _ 1).trans_eq ?_
+  simp [ENNReal.dyadicWeight_zero_right]
 
 end MeasureTheory

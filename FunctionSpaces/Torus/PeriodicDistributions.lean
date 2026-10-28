@@ -7,8 +7,7 @@ module
 
 public import FunctionSpaces.Torus.LpWeakDerivatives
 public import FunctionSpaces.Torus.PeriodicLift
-public import FunctionSpaces.Rd.SingularIntegrals.ConvolutionAdjoint
-public import Mathlib.Analysis.Calculus.LineDeriv.IntegrationByParts
+public import FunctionSpaces.Rd.Sobolev.WeakDerivativeChangeOfVariables
 public import Mathlib.Analysis.Calculus.BumpFunction.Normed
 
 /-!
@@ -33,8 +32,9 @@ through the lifts (`Torus.memSobolev_iff_comp_proj`).
   compactly supported Schwartz kernel `η` moves the derivative onto `η`, so
   `η ⋆ g = (∂^v η) ⋆ f` on the torus; the modulated bump `η_m` with `𝓕η_m(m) = 1`
   (`Torus.modulatedBump`) reads off the coefficient at `m`.
-* **Classical derivatives**: the classical derivative of a `C^1` function on `ℝ^d` is its weak
-  derivative (`Rd.hasWeakLineDeriv_of_contDiff`, integration by parts); so for `C^1` lifts the
+* **Classical derivatives**: since the classical derivative of a `C^1` function on `ℝ^d` is its
+  weak derivative (`FunctionSpaces.Rd.Sobolev.WeakDerivativeChangeOfVariables`), for `C^1` lifts
+  the
   classes of the classical derivatives are the weak derivatives on the torus
   (`Torus.hasWeakLineDeriv_of_contDiff`, and `Torus.hasWeakLineDeriv_of_contDiff_chain` for a
   chain of derivatives of order `k`, whose coefficients multiply along the chain by
@@ -61,45 +61,6 @@ theorem Fin.eq_prod_mul_of_succ_eq {M : Type*} [CommMonoid M] {k : ℕ} (a : Fin
     rw [← Fin.succ_last, h (Fin.last k), ih', Fin.prod_univ_castSucc, Fin.castSucc_zero,
       mul_comm (∏ l : Fin k, c l.castSucc) (c (Fin.last k)), mul_assoc]
 
-/-! ### Classical derivatives on `ℝ^d` -/
-
-namespace Rd
-
-variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
-  [MeasurableSpace V] [BorelSpace V]
-
-omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
-/-- The derivative of a real test function as a complex function:
-`D(φ : ℂ)(x) w = (∂_w φ)(x)`. -/
-theorem fderiv_testSchwartz_apply {Ω : Opens V} (φ : 𝓓(Ω, ℝ)) (x w : V) :
-    fderiv ℝ (testSchwartz φ) x w = (((∂_{w} φ) x : ℝ) : ℂ) := by
-  rw [← SchwartzMap.lineDerivOp_apply_eq_fderiv, lineDerivOp_testSchwartz, testSchwartz_apply]
-
-/-- **Classical derivatives are weak derivatives**: for a `C^1` function `F` on `V`, the
-classical directional derivative `x ↦ DF(x) w` is the weak derivative `∂_w F` on every open set
-`Ω`. This is integration by parts against compactly supported test functions (Mathlib's
-`integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable`). -/
-theorem hasWeakLineDeriv_of_contDiff {F : V → ℂ} (hF : ContDiff ℝ 1 F) (Ω : Opens V) (w : V) :
-    HasWeakLineDeriv Ω (fun _ : Fin 1 => w) F (fun x => fderiv ℝ F x w) := by
-  have hc : Continuous F := hF.continuous
-  have hd : Continuous fun x => fderiv ℝ F x w :=
-    (hF.continuous_fderiv one_ne_zero).clm_apply continuous_const
-  refine (hasWeakLineDeriv_iff_integral (hc.locallyIntegrable.locallyIntegrableOn _)
-    (hd.locallyIntegrable.locallyIntegrableOn _)).2 fun φ => ?_
-  have hi : ∀ (ψ : 𝓓(Ω, ℝ)) {u : V → ℂ}, Continuous u →
-      Integrable (fun x => (testSchwartz ψ) x * u x) volume := fun ψ u hu => by
-    simpa only [testSchwartz_apply, Complex.real_smul] using
-      ψ.integrable_smul (hu.locallyIntegrable.locallyIntegrableOn _)
-  have h := integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable (f := testSchwartz φ) (g := F)
-    (v := w) (by simpa only [fderiv_testSchwartz_apply, testSchwartz_apply] using hi (∂_{w} φ) hc)
-    (hi φ hd) (hi φ hc) (fun x _ => (testSchwartz φ).differentiableAt)
-    (fun x _ => (hF.differentiable one_ne_zero).differentiableAt)
-  simp only [fderiv_testSchwartz_apply, testSchwartz_apply] at h
-  rw [LineDeriv.iteratedLineDerivOp_one, pow_one, neg_one_smul]
-  simpa only [Complex.real_smul] using h
-
-end Rd
-
 namespace Torus
 
 variable {d : Type*} [Fintype d]
@@ -107,11 +68,6 @@ variable {d : Type*} [Fintype d]
 /-! ### The pairing of periodic lifts with test functions -/
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
-
-/-- The lift `h ∘ π` of `h ∈ L_p(𝕋^d)`, `1 ≤ p`, is locally integrable on `ℝ^d`. -/
-theorem locallyIntegrable_comp_proj_Lp (h : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    LocallyIntegrable (⇑h ∘ proj) volume :=
-  locallyIntegrable_comp_proj ((Lp.memLp h).integrable Fact.out)
 
 /-- For a test function `φ` on `ℝ^d` and `h ∈ L_p(𝕋^d)`, `x ↦ φ(x) h(π x)` is integrable. -/
 theorem integrable_mul_comp_proj (φ : 𝓓((⊤ : Opens (EuclideanSpace ℝ d)), ℝ))

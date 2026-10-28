@@ -1217,9 +1217,9 @@ $(l+1) \, \pi(-c^{-1} z) = -\pi((c/(l+1))^{-1} z)$.
 \lean{Torus.enorm_sub_jacksonApprox_le, Torus.approxError_trigScheme_le,
   Torus.lpModulus_le_two_pow_mul_succ}
 \leanok
-\uses{lem:torus-lp-jackson-approx, lem:modulus-linear, lem:weighted-jensen, thm:band-jackson}
-For $f \in L_p(\T^d)$ and $k \in \N$, with the constant $C_J$ of \Cref{thm:band-jackson} on
-$\R^d$,
+\uses{lem:torus-lp-jackson-approx, lem:modulus-linear, lem:jackson-weighted-average}
+For $f \in L_p(\T^d)$ and $k \in \N$, with the constant $C_J$ of
+\Cref{lem:jackson-weighted-average} on $\R^d$,
 \[
   E_{2^{k+1}}(f)_p \leq \|f - J_k f\|_p \leq C_J \, \omega_r(f, 2^{-k})_p
   \leq 2^r C_J \, \omega_r(f, 2^{-(k+1)})_p .
@@ -1229,8 +1229,9 @@ $\R^d$,
 \begin{proof}
 \leanok
 $\|\Delta^r_{\pi(-2^{-k} z)} f\|_p \leq \omega_r(f, 2^{-k} |z|)_p \leq
-(1 + |z|)^r \omega_r(f, 2^{-k})_p$ (\Cref{lem:modulus-linear}), and \Cref{lem:weighted-jensen}
-averages with the weight $|\Phi|$, as in \Cref{thm:band-jackson}.
+(1 + |z|)^r \omega_r(f, 2^{-k})_p$ (\Cref{lem:modulus-linear}), and
+\Cref{lem:jackson-weighted-average} with $M = \omega_r(f, 2^{-k})_p$ averages with the weight
+$|\Phi|$.
 \end{proof}
 
 \begin{theorem}[Bernstein's inequality in $L_p(\T^d)$]
@@ -1599,8 +1600,7 @@ which Mathlib provides; linearity holds almost everywhere.
 \begin{definition}[Filtration scheme]
 \label{def:filtration-scheme}
 \lean{MeasureTheory.Filtration.scheme, MeasureTheory.Filtration.mem_scheme,
-  MeasureTheory.Filtration.proj, MeasureTheory.Filtration.projectionScheme,
-  MeasureTheory.Filtration.proj_two_pow}
+  MeasureTheory.Filtration.projectionScheme}
 \leanok
 \uses{lem:condexp-lp, def:projection-scheme, def:comap}
 Let $\mathcal{F}_0 \subseteq \mathcal{F}_1 \subseteq \cdots \subseteq \mathcal{F}$ be a
@@ -4549,6 +4549,7 @@ for $L \geq 1$.
 \begin{definition}[Moment kernels]
 \label{def:moment-kernel}
 \lean{Rd.momentKernel, Rd.dilate_dilate, Rd.dilate_momentKernel, Rd.integrable_momentKernel,
+  Rd.eLpNorm_momentKernel_ne_top, Rd.eLpNorm_momentKernel_lt_top,
   Rd.integral_momentKernel, Rd.lintegral_enorm_ne_zero_of_integral_eq_one}
 \leanok
 \uses{lem:moment-coefficients, lem:dilate}
@@ -4556,8 +4557,8 @@ Let $g \in L_1$ with $\int_V g = 1$ and $L \in \N$. The moment kernel of order $
 \[
   m = \sum_{l=1}^L (-1)^{l+1} \binom{L}{l} \, g_{1/l} .
 \]
-Its dilations are $m_c = \sum_{l=1}^L (-1)^{l+1} \binom{L}{l} \, g_{c/l}$ for $c > 0$, and
-$\int_V m = 1$ for $L \geq 1$.
+Its dilations are $m_c = \sum_{l=1}^L (-1)^{l+1} \binom{L}{l} \, g_{c/l}$ for $c > 0$,
+$\|m\|_1 < \infty$, and $\int_V m = 1$ for $L \geq 1$.
 \end{definition}
 
 \begin{lemma}[First moments of the moment kernels of order two]
@@ -4648,12 +4649,42 @@ $c \leq 2^k$ by \Cref{lem:conv-of-fourier}. The identity is \Cref{lem:averaged-d
 $g = \Phi$, $L = r$ and $c = 2^k$, since $\int_V \Phi = \widehat{\Phi}(0) = 1$.
 \end{proof}
 
+Jackson's inequality averages differences with the weight $|\Phi|$. The weighted average is a
+lemma of its own, since it serves the torus as well (\Cref{thm:torus-lp-jackson}).
+
+\begin{lemma}[Weighted averages with the Jackson weight]
+\label{lem:jackson-weighted-average}
+\lean{one_add_pow_le_two_pow_mul, Rd.jacksonConst, Rd.jacksonConst_ne_top,
+  Rd.eLpNorm_integral_lpKernel_mul_le}
+\leanok
+\uses{lem:weighted-jensen, lem:lp-kernels-basic}
+Let $1 \leq p < \infty$ and $r \in \N$, and let $C \geq 0$ with
+$C^p = \|\Phi\|_1^{p-1} \int_V |\Phi(z)| (1 + |z|)^{rp} \, dz$. Then $C < \infty$. For every
+s-finite measure space $(X, \mu)$, every $M < \infty$ and every measurable
+$G \colon X \times V \to \C$ with $\|G(\cdot, z)\|_{L_p(\mu)} \leq (1 + |z|)^r M$ for every
+$z \in V$,
+\[
+  \Bigl\|\int_V \Phi(z) \, G(\cdot, z) \, dz\Bigr\|_{L_p(\mu)} \leq C M .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The constant is finite, since $\Phi$ is a Schwartz function,
+$(1 + t)^N \leq 2^N (1 + t^N)$ for $t \geq 0$, and $|\Phi(z)| (1 + |z|)^N$ is integrable for every
+$N$. By \Cref{lem:weighted-jensen},
+\begin{align*}
+  \Bigl\|\int_V \Phi(z) \, G(\cdot, z) \, dz\Bigr\|_{L_p(\mu)}^p
+    &\leq \|\Phi\|_1^{p-1} \int_V |\Phi(z)| \, \|G(\cdot, z)\|_{L_p(\mu)}^p \, dz \\
+    &\leq \|\Phi\|_1^{p-1} \int_V |\Phi(z)| (1 + |z|)^{rp} \, dz \; M^p = C^p M^p .
+\end{align*}
+\end{proof}
+
 \begin{theorem}[Jackson's inequality]
 \label{thm:band-jackson}
-\lean{one_add_pow_le_two_pow_mul, Rd.jacksonConst, Rd.jacksonConst_ne_top,
-  Rd.enorm_sub_jacksonApprox_le, Rd.approxError_bandScheme_le}
+\lean{Rd.enorm_sub_jacksonApprox_le, Rd.approxError_bandScheme_le}
 \leanok
-\uses{lem:jackson-approx, lem:rd-modulus, lem:weighted-jensen, lem:lp-kernels-basic}
+\uses{lem:jackson-approx, lem:rd-modulus, lem:jackson-weighted-average}
 Let $1 \leq p < \infty$ and $r \in \N$. There is $C < \infty$ with
 \[
   \inf_{g \in E_k} \|f - g\|_p \leq \|f - J_k f\|_p \leq C \, \omega_r(f, 2^{-k})_p
@@ -4664,13 +4695,11 @@ $C^p = \|\Phi\|_1^{p-1} \int_V |\Phi(z)| (1 + |z|)^{rp} \, dz$.
 
 \begin{proof}
 \leanok
-By \Cref{lem:jackson-approx} and \Cref{lem:weighted-jensen},
-\[
-  \|f - J_k f\|_p^p \leq \|\Phi\|_1^{p-1} \int_V |\Phi(z)| \, \|\Delta^r_{-2^{-k} z} f\|_p^p \, dz ,
-\]
-and $\|\Delta^r_{-2^{-k} z} f\|_p \leq \omega_r(f, 2^{-k} |z|)_p \leq (1 + |z|)^r
-\omega_r(f, 2^{-k})_p$ by \Cref{lem:rd-modulus}. The constant is finite, since $\Phi$ is a Schwartz
-function and $|\Phi(z)| (1 + |z|)^N$ is integrable for every $N$.
+By \Cref{lem:jackson-approx},
+$f - J_k f = (-1)^r \int_V \Phi(z) \, \Delta^r_{-2^{-k} z} f \, dz$ almost everywhere, and
+$\|\Delta^r_{-2^{-k} z} f\|_p \leq \omega_r(f, 2^{-k} |z|)_p \leq (1 + |z|)^r
+\omega_r(f, 2^{-k})_p$ by \Cref{lem:rd-modulus}. \Cref{lem:jackson-weighted-average} with
+$M = \omega_r(f, 2^{-k})_p$ gives the bound.
 \end{proof}
 
 \section{The inverse inequality}
@@ -5125,11 +5154,17 @@ weights $2^{is}$, and \Cref{lem:hardy} bounds both.
 
 \begin{lemma}[The synthesis estimate]
 \label{lem:local-means-synthesis}
-\lean{ENNReal.le_tsum_of_tendsto_sum, Rd.LocalMeansBump.synthConst,
-  Rd.LocalMeansBump.synthConst_ne_top, Rd.LocalMeansBump.modNorm_le_of_tendsto,
-  Rd.LocalMeansBump.modNorm_le_localMeansNorm}
+\lean{ENNReal.le_tsum_of_tendsto_sum, ENNReal.enorm_le_of_tendsto_sum,
+  Rd.LocalMeansBump.synthConst, Rd.LocalMeansBump.synthConst_ne_top,
+  Rd.LocalMeansBump.modNorm_le_of_tendsto, Rd.LocalMeansBump.modNorm_le_localMeansNorm}
 \leanok
 \uses{lem:dual-kernel-moduli, lem:almost-diagonal, lem:reproducing-formula, lem:rd-modulus}
+Let $E$ be a normed group and let the partial sums of $\sum_j u_j$ converge to $F$ in $E$. For
+every $C < \infty$ and every subadditive $Q \colon E \to [0, \infty]$ with $Q \leq C \|\cdot\|$,
+$Q(F) \leq \sum_j Q(u_j)$. For every real $s$, every $1 \leq q \leq \infty$, every
+$K \in [0, \infty]$ and all $b_j \in [0, \infty]$ with $\|u_j\| \leq K b_j$ for every $j$,
+$\|F\| \leq K (1 - 2^{-s})^{-1} \|(2^{js} b_j)_j\|_{\ell_q}$.
+
 With the notation of \Cref{def:local-means}, let $0 < s < L$ and $1 \leq q \leq \infty$. There is
 $C < \infty$ such that for all $h_j \in L_p$ and $F \in L_p$ with
 $\sum_{j=0}^J \eta_j * h_j \to F$ in $L_p$,
@@ -5143,6 +5178,11 @@ In particular $\|f\|_p + \|(2^{is} \omega_L(f, 2^{-i})_p)_i\|_{\ell_q}
 
 \begin{proof}
 \leanok
+The functional $Q$ passes to the limit of the partial sums, which it bounds by
+$\sum_{j \leq J} Q(u_j) + C \|F - \sum_{j \leq J} u_j\|$. For the second claim take $Q = \|\cdot\|$
+and $u_j \leq 2^{-js} \|(2^{js} b_j)_j\|_{\ell_q}$ termwise, with
+$\sum_j 2^{-js} = (1 - 2^{-s})^{-1}$.
+
 The norm and the modulus $\omega_L(\cdot, 2^{-i})_p$ are subadditive and bounded by multiples of
 $\|\cdot\|_p$, so they pass to the series:
 $\omega_L(F, 2^{-i})_p \leq \sum_j \omega_L(\eta_j * h_j, 2^{-i})_p \leq C \sum_j c_{ij}
@@ -5404,11 +5444,10 @@ $j > k$, $\omega_r(f, t)_p \leq 2^r \|f\|_p$.
 
 \begin{theorem}[Atomic synthesis]
 \label{thm:rd-atomic-synthesis}
-\lean{Rd.atomSynthConst, Rd.atomSynthConst_ne_top, ENNReal.enorm_le_of_tendsto_sum,
-  Rd.modNorm_le_coeffNorm, Rd.eLpNorm_indicator_le_tsum, Rd.lpModulusOn_le_tsum,
-  Rd.modNormOn_le_coeffNorm}
+\lean{Rd.atomSynthConst, Rd.atomSynthConst_ne_top, Rd.modNorm_le_coeffNorm,
+  Rd.eLpNorm_indicator_le_tsum, Rd.lpModulusOn_le_tsum, Rd.modNormOn_le_coeffNorm}
 \leanok
-\uses{lem:level-sums, lem:almost-diagonal, lem:rd-modulus-on}
+\uses{lem:level-sums, lem:almost-diagonal, lem:rd-modulus-on, lem:local-means-synthesis}
 Let $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $0 < s < \sigma$. Let $a_{j,m}$ be regular atoms
 of level $j$ such that the centres of the atoms with $\lambda_{j,m} \neq 0$ satisfy the overlap
 condition of \Cref{lem:level-sums} at every level, and let $F = \sum_j f_j$ in $L_p$ with
@@ -5428,9 +5467,10 @@ with $K = N^{1-1/p} C \bigl((1 - 2^{-s})^{-1} + 2^r ((1 - 2^{-(\sigma - s)})^{-1
 \leanok
 This is \cite[Theorem 2.6 and Corollary 2.8, direction $\Leftarrow$]{SchneiderVybiral} for
 $p \geq 1$. The norm and the moduli are subadditive and bounded on $L_p$, so they are bounded by the
-sums over the levels. With \Cref{lem:level-sums} and $b_j = 2^{-jn/p} \|\lambda_{j,\cdot}\|_{\ell_p}$,
-the almost diagonal lemma (\Cref{lem:almost-diagonal}) with exponent $\sigma$ sums the levels,
-since $2^{js} b_j = 2^{j(s - n/p)} \|\lambda_{j,\cdot}\|_{\ell_p}$.
+sums over the levels (\Cref{lem:local-means-synthesis}). With \Cref{lem:level-sums} and $b_j =
+2^{-jn/p} \|\lambda_{j,\cdot}\|_{\ell_p}$, the almost diagonal lemma (\Cref{lem:almost-diagonal})
+with exponent $\sigma$ sums the levels, since $2^{js} b_j = 2^{j(s - n/p)}
+\|\lambda_{j,\cdot}\|_{\ell_p}$.
 \end{proof}
 
 \begin{lemma}[Synthesis of one level]
@@ -5874,7 +5914,7 @@ $\Omega = V$ and $\Phi = \mathrm{id}$, $T$ is a pointwise multiplier.
   Rd.CutoffDiffeo.exists_lipschitzOnWith_Phi, Rd.CutoffDiffeo.exists_iteratedFDerivWithin_chi_bound,
   Rd.CutoffDiffeo.exists_iteratedFDerivWithin_Phi_bound}
 \leanok
-\uses{def:cutoff-diffeo}
+\uses{def:cutoff-diffeo, lem:bounded-derivatives-compact}
 A map of class $C^1$ within a relatively open part $\Omega \cap U$ of a convex set is Lipschitz on
 the compact subsets of $\Omega \cap U$. Hence $\Psi$ is Lipschitz on $K_0$ and $\Phi$ on
 $\Psi(K_0)$. For every $K$ the derivatives of $\chi$ of order at most $K$ are bounded on
@@ -5885,7 +5925,8 @@ $\Omega \cap U'$, and those of $\Phi$ on $\Psi(K_0)$.
 \leanok
 The mean value inequality on the convex sets $\Omega \cap B$ for small balls $B$ gives local
 Lipschitz bounds within $\Omega$; on a compact set finitely many of them suffice. The derivatives
-are continuous within the sets, hence bounded on the compact sets $K_0$ and $\Psi(K_0)$; the
+are continuous within the sets, hence bounded on the compact sets $K_0$ and $\Psi(K_0)$
+(\Cref{lem:bounded-derivatives-compact}); the
 derivatives of $\chi$ vanish on $\Omega \cap U' \setminus K_0$, where $\chi$ vanishes near
 every point.
 \end{proof}
@@ -6277,7 +6318,7 @@ gives at most $A^q \sum_k b_k^q$. The product bound holds on the finite boxes.
 \label{lem:mixed-almost-diagonal}
 \lean{Rd.almostDiagCoeff, Rd.almostDiagProfile, Rd.dyadicWeight_mul_almostDiagCoeff_mul,
   Rd.tsum_almostDiagProfile_le, Rd.almostDiagConst, Rd.almostDiagConst_ne_top,
-  Rd.lqNorm_almostDiagonal_pi_le}
+  Rd.lqNorm_almostDiagonal_pi_le, Rd.lqNorm_le_of_le_almostDiagonal_pi}
 \leanok
 \uses{lem:schur-test, lem:almost-diagonal}
 Let $c(i, j) = 2^{-(i - j)L}$ for $j \leq i$ and $c(i, j) = 1$ for $j > i$, let $s \geq 0$ and
@@ -6287,6 +6328,9 @@ $1 \leq q \leq \infty$. Then for every $a \geq 0$
   \leq C^d \, \|(2^{s|k|_1} a_k)_k\|_{\ell_q}
 \]
 with $C = (1 - 2^{-(L-s)})^{-1} + (1 - 2^{-s})^{-1}$, and $C < \infty$ for $0 < s < L$.
+Consequently, for every $C_0 \in [0, \infty]$ and every $a' \geq 0$ on $\N^d$ with
+$a'_m \leq C_0^d \sum_k \prod_i c(m_i, k_i) \, a_k$ for every $m$,
+$\|(2^{s|m|_1} a'_m)_m\|_{\ell_q} \leq (C_0 C)^d \, \|(2^{s|k|_1} a_k)_k\|_{\ell_q}$.
 \end{lemma}
 
 \begin{proof}

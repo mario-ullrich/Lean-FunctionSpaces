@@ -25,7 +25,7 @@ give
 `f(x) - J_k f(x) = ∫ Φ(z) (-1)^r Δ^r_{-2^(-k) z} f(x) dz`
 
 for almost every `x` (`Rd.ae_sub_jacksonApprox_eq`). The weighted Jensen inequality
-(`MeasureTheory.eLpNorm_integral_kernel_le`) and
+(`MeasureTheory.eLpNorm_integral_kernel_le`, `Rd.eLpNorm_integral_lpKernel_mul_le`) and
 `ω_r(f, 2^(-k) |z|)_p ≤ (1 + |z|)^r ω_r(f, 2^(-k))_p` give
 **Jackson's inequality** (`Rd.enorm_sub_jacksonApprox_le`, `Rd.approxError_bandScheme_le`)
 
@@ -104,21 +104,12 @@ theorem ae_sub_jacksonApprox_eq (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (volu
   have hJ : ⇑(jacksonApprox hp r k f) =ᵐ[volume] fun x => ∑ l ∈ Finset.range r,
       jacksonCoeff r l * conv (dilate (jacksonScale k l) lpKernel) (f : V → ℂ) volume x := by
     unfold jacksonApprox
-    have h' : ∀ᵐ x ∂volume, ∀ l ∈ Finset.range r,
-        ⇑(jacksonCoeff r l • convLp hp (integrable_dilate integrable_lpKernel
-          (jacksonScale_pos k l).ne') f) x =
-        jacksonCoeff r l * conv (dilate (jacksonScale k l) lpKernel) (f : V → ℂ) volume x :=
-      (Filter.eventually_all_finset _).2 fun l _ => by
-        filter_upwards [Lp.coeFn_smul (jacksonCoeff r l) (convLp hp (integrable_dilate
-          integrable_lpKernel (jacksonScale_pos k l).ne') f),
-          convLp_apply_ae hp (integrable_dilate integrable_lpKernel (jacksonScale_pos k l).ne') f]
-          with x h1 h2
-        rw [h1, Pi.smul_apply, h2, smul_eq_mul]
-    filter_upwards [Lp.coeFn_fun_finsetSum (Finset.range r) fun l => jacksonCoeff r l •
-      convLp hp (integrable_dilate integrable_lpKernel (jacksonScale_pos k l).ne') f, h']
-      with x hx hx'
-    rw [hx]
-    exact Finset.sum_congr rfl hx'
+    refine (Lp.coeFn_finsetSum _ _).trans ((eventuallyEq_sum fun l _ =>
+      (Lp.coeFn_smul _ _).trans ((convLp_apply_ae hp (integrable_dilate integrable_lpKernel
+        (jacksonScale_pos k l).ne') f).const_smul (jacksonCoeff r l))).trans (.of_eq ?_))
+    funext x
+    rw [Finset.sum_apply]
+    exact Finset.sum_congr rfl fun l _ => by rw [Pi.smul_apply, smul_eq_mul]
   filter_upwards [Lp.coeFn_sub f (jacksonApprox hp r k f), hJ,
     ae_sub_sum_conv_dilate_eq Fact.out hp integrable_lpKernel integral_lpKernel (Lp.memLp f) r
       (c := (2 : ℝ) ^ k) (by positivity)] with x h1 h2 h3
@@ -165,13 +156,46 @@ theorem jacksonConst_ne_top (hp1 : 1 ≤ p) (hp : p ≠ ∞) (r : ℕ) : jackson
   exact ENNReal.rpow_ne_top_of_nonneg (by positivity)
     (ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by linarith) h1) h2)
 
+omit [Fact (1 ≤ p)] in
+/-- **Weighted averages with the Jackson weight**: for `1 ≤ p < ∞`, `r ∈ ℕ`, an s-finite measure
+space `(α, μ)`, `M < ∞` and a jointly measurable `G : α × V → ℂ` with
+`‖G(·, z)‖_p ≤ (1 + |z|)^r M` for every `z`, `‖∫ Φ(z) G(·, z) dz‖_p ≤ C M` with the constant
+`C = Rd.jacksonConst V r p` of Jackson's inequality, by the weighted averages of
+`MeasureTheory.eLpNorm_integral_kernel_le`. It gives Jackson's inequality on `V` and on the
+torus. -/
+theorem eLpNorm_integral_lpKernel_mul_le {α : Type*} [MeasurableSpace α] {μ : Measure α}
+    [SFinite μ] (hp1 : 1 ≤ p) (hp : p ≠ ∞) (r : ℕ) {G : α → V → ℂ}
+    (hG : Measurable (Function.uncurry G)) {M : ℝ≥0∞} (hM : M ≠ ∞)
+    (hbound : ∀ z, eLpNorm (fun x => G x z) p μ ≤ ENNReal.ofReal (1 + ‖z‖) ^ r * M) :
+    eLpNorm (fun x => ∫ z, lpKernel z * G x z) p μ ≤ jacksonConst V r p * M := by
+  have hq : 0 < p.toReal := ENNReal.toReal_pos (lt_of_lt_of_le zero_lt_one hp1).ne' hp
+  rw [← ENNReal.rpow_le_rpow_iff hq]
+  refine (eLpNorm_integral_kernel_le hp1 hp integrable_lpKernel.aestronglyMeasurable hG).trans ?_
+  calc (∫⁻ z, ‖lpKernel (V := V) z‖ₑ) ^ (p.toReal - 1) *
+        ∫⁻ z, ‖lpKernel z‖ₑ * eLpNorm (fun x => G x z) p μ ^ p.toReal
+      ≤ (∫⁻ z, ‖lpKernel (V := V) z‖ₑ) ^ (p.toReal - 1) *
+          ∫⁻ z, ‖lpKernel z‖ₑ * (ENNReal.ofReal (1 + ‖z‖) ^ ((r : ℝ) * p.toReal) *
+            M ^ p.toReal) := by
+        gcongr with z
+        calc eLpNorm (fun x => G x z) p μ ^ p.toReal
+            ≤ (ENNReal.ofReal (1 + ‖z‖) ^ r * M) ^ p.toReal :=
+              ENNReal.rpow_le_rpow (hbound z) hq.le
+          _ = ENNReal.ofReal (1 + ‖z‖) ^ ((r : ℝ) * p.toReal) * M ^ p.toReal := by
+              rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, ← ENNReal.rpow_natCast,
+                ← ENNReal.rpow_mul]
+    _ = (jacksonConst V r p * M) ^ p.toReal := by
+        rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, jacksonConst, ← ENNReal.rpow_mul,
+          one_div_mul_cancel hq.ne', ENNReal.rpow_one, mul_assoc]
+        congr 1
+        rw [← lintegral_mul_const' _ _ (ENNReal.rpow_ne_top_of_nonneg hq.le hM)]
+        exact lintegral_congr fun z => by ring
+
 /-- **Jackson's inequality for band-limited approximation**: for `f ∈ L_p`, `1 ≤ p < ∞`,
-`‖f - J_k f‖_p ≤ C ω_r(f, 2^(-k))_p`. -/
+`‖f - J_k f‖_p ≤ C ω_r(f, 2^(-k))_p`, from `‖Δ^r_{-2^(-k) z} f‖_p ≤ (1 + |z|)^r ω_r(f, 2^(-k))_p`
+(`Rd.eLpNorm_integral_lpKernel_mul_le`). -/
 theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (volume : Measure V)) :
     ‖f - jacksonApprox hp r k f‖ₑ ≤ jacksonConst V r p * lpModulus p r f k := by
   have hp1 : 1 ≤ p := Fact.out
-  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   have hfm : Measurable (f : V → ℂ) := (Lp.stronglyMeasurable f).measurable
   set w : V → V := fun z => -((2 : ℝ) ^ k)⁻¹ • z with hw
   set G : V → V → ℂ := fun x z => (-1 : ℂ) ^ r * (fwdDiff (w z))^[r] (f : V → ℂ) x with hGdef
@@ -206,26 +230,8 @@ theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ) (f : Lp ℂ p (v
       eLpNorm (fun x => ∫ z, lpKernel z * G x z) p volume := by
     rw [Lp.enorm_def]
     exact eLpNorm_congr_ae (ae_sub_jacksonApprox_eq hp r k f)
-  rw [hlhs, ← ENNReal.rpow_le_rpow_iff hq]
-  refine (eLpNorm_integral_kernel_le hp1 hp integrable_lpKernel.aestronglyMeasurable hG).trans ?_
-  calc (∫⁻ z, ‖lpKernel (V := V) z‖ₑ) ^ (p.toReal - 1) *
-        ∫⁻ z, ‖lpKernel z‖ₑ * eLpNorm (fun x => G x z) p volume ^ p.toReal
-      ≤ (∫⁻ z, ‖lpKernel (V := V) z‖ₑ) ^ (p.toReal - 1) *
-          ∫⁻ z, ‖lpKernel z‖ₑ * (ENNReal.ofReal (1 + ‖z‖) ^ ((r : ℝ) * p.toReal) *
-            lpModulus p r f k ^ p.toReal) := by
-        gcongr with z
-        calc eLpNorm (fun x => G x z) p volume ^ p.toReal
-            ≤ (ENNReal.ofReal (1 + ‖z‖) ^ r * lpModulus p r f k) ^ p.toReal :=
-              ENNReal.rpow_le_rpow (hbound z) hq.le
-          _ = ENNReal.ofReal (1 + ‖z‖) ^ ((r : ℝ) * p.toReal) * lpModulus p r f k ^ p.toReal := by
-              rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, ← ENNReal.rpow_natCast,
-                ← ENNReal.rpow_mul]
-    _ = (jacksonConst V r p * lpModulus p r f k) ^ p.toReal := by
-        rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, jacksonConst, ← ENNReal.rpow_mul,
-          one_div_mul_cancel hq.ne', ENNReal.rpow_one, mul_assoc]
-        congr 1
-        rw [← lintegral_mul_const' _ _ (ENNReal.rpow_ne_top_of_nonneg hq.le hω)]
-        exact lintegral_congr fun z => by ring
+  rw [hlhs]
+  exact eLpNorm_integral_lpKernel_mul_le hp1 hp r hG hω hbound
 
 /-- **Jackson's inequality for the band-limited scheme**:
 `E(f, E_k)_p ≤ C ω_r(f, 2^(-k))_p`. -/

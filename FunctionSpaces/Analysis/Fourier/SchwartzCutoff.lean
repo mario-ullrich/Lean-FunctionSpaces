@@ -16,9 +16,10 @@ public import Mathlib.Analysis.Distribution.TemperedDistribution
 Let `V` be a real normed space; in the section on cut-offs, `V` is a finite-dimensional real inner
 product space, such as `ℝ^d`. A real test function `φ ∈ 𝓓(Ω, ℝ)` on an open set `Ω ⊆ V` is a
 complex Schwartz function on `V` (`Rd.testSchwartz`), with the same iterated directional
-derivatives `∂^v = ∂_{v_0} ⋯ ∂_{v_{k-1}}` (`Rd.iteratedLineDerivOp_testSchwartz`); conversely
-a compactly supported complex Schwartz function with support in `Ω` is `a + i b` for real test
-functions `a`, `b` on `Ω` (`Rd.exists_testSchwartz_eq_of_tsupport_subset`).
+derivatives `∂^v = ∂_{v_0} ⋯ ∂_{v_{k-1}}` (`Rd.iteratedLineDerivOp_testSchwartz`) and the same
+derivative (`Rd.fderiv_testSchwartz_apply`); conversely a compactly supported complex Schwartz
+function with support in `Ω` is `a + i b` for real test functions `a`, `b` on `Ω`
+(`Rd.exists_testSchwartz_eq_of_tsupport_subset`).
 
 * **Directional derivatives commute** on Schwartz functions (`SchwartzMap.lineDerivOp_comm`, by
   Mathlib's symmetry of second derivatives) and on test functions
@@ -119,6 +120,12 @@ theorem lineDerivOp_testSchwartz {Ω : Opens V} (φ : 𝓓(Ω, ℝ)) (a : V) :
   rw [SchwartzMap.lineDerivOp_apply_eq_fderiv, testSchwartz_apply,
     lineDerivOp_testFunction_apply]
   exact congrArg (fun L : V →L[ℝ] ℂ => L a) hd.fderiv
+
+/-- The derivative of a real test function as a complex function:
+`D(φ : ℂ)(x) w = (∂_w φ)(x)`. -/
+theorem fderiv_testSchwartz_apply {Ω : Opens V} (φ : 𝓓(Ω, ℝ)) (x w : V) :
+    fderiv ℝ (testSchwartz φ) x w = (((∂_{w} φ) x : ℝ) : ℂ) := by
+  rw [← SchwartzMap.lineDerivOp_apply_eq_fderiv, lineDerivOp_testSchwartz, testSchwartz_apply]
 
 /-- Passing to complex values commutes with iterated directional derivatives:
 `∂^v (φ : ℂ) = (∂^v φ : ℂ)`. -/

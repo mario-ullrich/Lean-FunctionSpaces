@@ -368,7 +368,7 @@ theorem conv_besselSchwartz_schwartzDilate (σ : ℝ) (ω : ℕ → 𝓢(V, ℂ)
 every finite set `t ⊆ ℕ` and `f ∈ L_p(V)`,
 `‖∑_{j ∈ t} (J_σ (ω_j)_{2^j}) ⋆ (ψ_j ⋆ f)‖_p ≤ S ‖ x ↦ ‖(1_t(j) 2^{jσ} (ψ_j ⋆ f)(x))_j‖_{ℓ_2} ‖_p`
 with `S = Rd.czConst V p B H` (`Rd.conv_besselSchwartz_schwartzDilate`,
-`Rd.IsCZFamily.eLpNorm_sum_conv_le`). -/
+`Rd.IsCZFamily.eLpNorm_sum_conv_smul_blockFun_le` with the coefficients `(2^j)^σ`). -/
 theorem eLpNorm_sum_conv_besselSchwartz_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     {σ : ℝ} {ω : ℕ → 𝓢(V, ℂ)} {B H : ℝ≥0∞}
     (hθ : IsCZFamily (fun j => dilate (2 ^ j) (besselBase σ ω j : V → ℂ)) B H)
@@ -378,106 +378,15 @@ theorem eLpNorm_sum_conv_besselSchwartz_le [Nontrivial V] (hp1 : 1 < p) (hp : p 
         p volume ≤
       czConst V p B H * eLpNorm (fun x => lqNorm 2 fun j =>
         if j ∈ t then dyadicWeight σ j * ‖blockFun j f x‖ₑ else 0) p volume := by
-  set a : ℕ → V → ℂ := fun j =>
-    if j ∈ t then ((((2 : ℝ) ^ j) ^ σ : ℝ) : ℂ) • blockFun j f else 0
-  have ha : ∀ j, MemLp (a j) p volume := fun j => by
-    by_cases h : j ∈ t
-    · simp only [a, h, ↓reduceIte]
-      exact (memLp_blockFun hp j f).const_smul _
-    · simp only [a, h, ↓reduceIte]
-      exact MemLp.zero
   have hsum : (fun x => ∑ j ∈ t, conv (besselSchwartz σ
       (schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (ω j))) (blockFun j f) volume x) =
-      fun x => ∑ j ∈ t, conv (dilate (2 ^ j) (besselBase σ ω j : V → ℂ)) (a j) volume x := by
+      fun x => ∑ j ∈ t, conv (dilate (2 ^ j) (besselBase σ ω j : V → ℂ))
+        (((((2 : ℝ) ^ j) ^ σ : ℝ) : ℂ) • blockFun j f) volume x := by
     funext x
-    refine Finset.sum_congr rfl fun j hj => ?_
-    simp only [a, hj, ↓reduceIte, conv_besselSchwartz_schwartzDilate]
-  have hnorm : (fun x => lqNorm 2 fun j => ‖a j x‖ₑ) = fun x => lqNorm 2 fun j =>
-      if j ∈ t then dyadicWeight σ j * ‖blockFun j f x‖ₑ else 0 := by
-    funext x
-    congr 1
-    funext j
-    by_cases h : j ∈ t
-    · simp only [a, h, ↓reduceIte, Pi.smul_apply, smul_eq_mul]
-      rw [enorm_mul, enorm_two_pow_rpow]
-    · simp only [a, h, ↓reduceIte, Pi.zero_apply, enorm_zero]
-  rw [hsum, ← hnorm]
-  exact hθ.eLpNorm_sum_conv_le hp1 hp t ha
-
-/-! ### Convergent synthesis sums -/
-
-/-- The **synthesis sums** `∑_{j ∈ t} K_j ⋆ (ψ_j ⋆ f)` of Schwartz kernels `K_j` and the blocks of
-`f ∈ L_p(V)` lie in `L_p(V)` for `1 ≤ p < ∞`, by Young's inequality. -/
-theorem memLp_sum_conv_blockFun (hp : p ≠ ∞) (K : ℕ → 𝓢(V, ℂ))
-    (f : Lp ℂ p (volume : Measure V)) (t : Finset ℕ) :
-    MemLp (fun x => ∑ j ∈ t, conv (K j) (blockFun j f) volume x) p volume :=
-  memLp_finsetSum _ fun j _ => memLp_conv Fact.out hp (K j).integrable (memLp_blockFun hp j f)
-
-/-- **Cauchy synthesis sums**: let `1 ≤ p < ∞`, `σ` real, `f ∈ F^σ_{p,2}(V)` and `K_j` Schwartz
-kernels with
-`‖∑_{j ∈ t} K_j ⋆ (ψ_j ⋆ f)‖_p ≤ C ‖ x ↦ ‖(1_t(j) 2^{jσ} (ψ_j ⋆ f)(x))_j‖_{ℓ_2} ‖_p` for every
-finite `t` and some finite `C`. Then the classes of the partial sums
-`∑_{j < J} K_j ⋆ (ψ_j ⋆ f)` form a Cauchy sequence in `L_p(V)`: the difference of the sums at
-`N ≤ N'` is the sum over `{N, …, N' - 1}`, bounded by the tails of the weighted blocks, which tend
-to zero (`Rd.tendsto_eLpNorm_lqNorm_blockFun_tail`). -/
-theorem cauchySeq_toLp_sum_conv_blockFun (hp : p ≠ ∞) {σ : ℝ} {K : ℕ → 𝓢(V, ℂ)} {C : ℝ≥0∞}
-    (hC : C ≠ ∞) {f : Lp ℂ p (volume : Measure V)} (hf : MemTriebelLizorkin σ 2 f)
-    (hK : ∀ t : Finset ℕ, eLpNorm (fun x => ∑ j ∈ t, conv (K j) (blockFun j f) volume x)
-      p volume ≤ C * eLpNorm (fun x => lqNorm 2 fun j =>
-        if j ∈ t then dyadicWeight σ j * ‖blockFun j f x‖ₑ else 0) p volume) :
-    CauchySeq fun J => (memLp_sum_conv_blockFun hp K f (Finset.range J)).toLp _ := by
-  set T : ℕ → ℝ≥0∞ := fun N => eLpNorm (fun x => lqNorm 2 fun j =>
-    if N ≤ j then dyadicWeight σ j * ‖blockFun j f x‖ₑ else 0) p volume
-  have hT : ∀ N, T N ≠ ∞ := fun N =>
-    ne_top_of_le_ne_top hf.ne (eLpNorm_lqNorm_ite_blockFun_le _ _ f)
-  refine cauchySeq_of_le_tendsto_0' (fun N => (C * T N).toReal) (fun N N' hNN' => ?_) ?_
-  · rw [dist_comm, Lp.dist_def]
-    refine ENNReal.toReal_mono (ENNReal.mul_ne_top hC (hT N)) ?_
-    rw [eLpNorm_congr_ae ((MemLp.coeFn_toLp _).sub (MemLp.coeFn_toLp _))]
-    have hd : (fun x => ∑ j ∈ Finset.range N', conv (K j) (blockFun j f) volume x) -
-        (fun x => ∑ j ∈ Finset.range N, conv (K j) (blockFun j f) volume x) =
-        fun x => ∑ j ∈ Finset.Ico N N', conv (K j) (blockFun j f) volume x := by
-      funext x
-      rw [Pi.sub_apply, Finset.sum_Ico_eq_sub _ hNN']
-    rw [hd]
-    refine (hK _).trans ?_
-    gcongr
-    refine eLpNorm_mono_enorm (aemeasurable_lqNorm_ite (P := (· ∈ Finset.Ico N N'))
-      (fun j => (aestronglyMeasurable_blockFun j f).enorm.const_mul _) 2).aestronglyMeasurable
-      fun x => ?_
-    simp only [enorm_eq_self]
-    refine ENNReal.lqNorm_mono fun j => ?_
-    by_cases h : j ∈ Finset.Ico N N'
-    · simp only [h, (Finset.mem_Ico.1 h).1, ↓reduceIte, le_refl]
-    · simp only [h, ↓reduceIte]
-      exact zero_le
-  · have h := ENNReal.Tendsto.const_mul
-      (tendsto_eLpNorm_lqNorm_blockFun_tail hp two_ne_zero ENNReal.ofNat_ne_top hf) (Or.inr hC)
-    rw [mul_zero] at h
-    have h' := (ENNReal.tendsto_toReal ENNReal.zero_ne_top).comp h
-    rw [ENNReal.toReal_zero] at h'
-    exact h'
-
-/-- **Convergent synthesis sums**: under the hypotheses of
-`Rd.cauchySeq_toLp_sum_conv_blockFun`, the partial sums `∑_{j < J} K_j ⋆ (ψ_j ⋆ f)` converge in
-`L_p(V)` to some `g` with `‖g‖_p ≤ C ‖f‖_{F^σ_{p,2}}`. -/
-theorem exists_tendsto_sum_conv_blockFun (hp : p ≠ ∞) {σ : ℝ} {K : ℕ → 𝓢(V, ℂ)} {C : ℝ≥0∞}
-    (hC : C ≠ ∞) {f : Lp ℂ p (volume : Measure V)} (hf : MemTriebelLizorkin σ 2 f)
-    (hK : ∀ t : Finset ℕ, eLpNorm (fun x => ∑ j ∈ t, conv (K j) (blockFun j f) volume x)
-      p volume ≤ C * eLpNorm (fun x => lqNorm 2 fun j =>
-        if j ∈ t then dyadicWeight σ j * ‖blockFun j f x‖ₑ else 0) p volume) :
-    ∃ g : Lp ℂ p (volume : Measure V),
-      Tendsto (fun J => eLpNorm ((fun x => ∑ j ∈ Finset.range J,
-        conv (K j) (blockFun j f) volume x) - ⇑g) p volume) atTop (𝓝 0) ∧
-      ‖g‖ₑ ≤ C * triebelLizorkinNorm σ 2 f := by
-  obtain ⟨g, hg⟩ := cauchySeq_tendsto_of_complete (cauchySeq_toLp_sum_conv_blockFun hp hC hf hK)
-  refine ⟨g, ((Lp.tendsto_Lp_iff_tendsto_eLpNorm' _ g).1 hg).congr fun J =>
-    eLpNorm_congr_ae ((MemLp.coeFn_toLp _).sub EventuallyEq.rfl), le_of_tendsto' hg.enorm
-    fun J => ?_⟩
-  rw [Lp.enorm_def, eLpNorm_congr_ae (MemLp.coeFn_toLp _)]
-  refine (hK _).trans ?_
-  gcongr
-  exact eLpNorm_lqNorm_ite_blockFun_le _ _ f
+    exact Finset.sum_congr rfl fun j _ => conv_besselSchwartz_schwartzDilate σ ω j _ x
+  rw [hsum]
+  exact hθ.eLpNorm_sum_conv_smul_blockFun_le hp1 hp
+    (c := fun j => ((((2 : ℝ) ^ j) ^ σ : ℝ) : ℂ)) (fun j => enorm_two_pow_rpow j σ) t f
 
 /-! ### `F^s_{p,2} ⊆ H^{s,p}` -/
 

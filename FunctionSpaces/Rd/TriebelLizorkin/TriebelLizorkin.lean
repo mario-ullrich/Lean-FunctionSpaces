@@ -24,7 +24,10 @@ spaces (`Rd.littlewoodPaleyNorm`). The blocks are the pointwise convolutions `ψ
 (`Rd.eLpNorm_psi_mul_iSup_psi_ne_top`), and they lie in `L_p` by Young's inequality
 (`Rd.memLp_blockFun`, `Rd.eLpNorm_blockFun_zero_le`). The space `F^s_{p,q}` consists of the
 `f` with a finite quasi-norm (`Rd.MemTriebelLizorkin`); it is a subspace of `L_p` for
-`1 ≤ q ≤ ∞` (`Rd.triebelLizorkinSpace`), increasing in `q` and decreasing in `s`.
+`1 ≤ q ≤ ∞` (`Rd.triebelLizorkinSpace`), increasing in `q` and decreasing in `s`. Setting
+terms of the weighted blocks to zero keeps them below the quasi-norm, and for `q < ∞` and
+`f ∈ F^s_{p,q}` their tails `‖ x ↦ ‖(2^(js) |ψ_j ⋆ f(x)|)_{j ≥ N}‖_{ℓ_q} ‖_p` tend to zero
+(`Rd.eLpNorm_lqNorm_ite_blockFun_le`, `Rd.tendsto_eLpNorm_lqNorm_blockFun_tail`).
 
 The mixed-norm comparisons of `FunctionSpaces.Analysis.Lp.MixedNorms` give, for every `s ∈ ℝ`,
 `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{max(p,q)}} ≤ ‖f‖_{F^s_{p,q}} ≤ ‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{min(p,q)}}`,
@@ -289,6 +292,28 @@ theorem triebelLizorkinNorm_mono_smoothness {s t : ℝ} (hst : s ≤ t) (q : ℝ
   eLpNorm_mono_enorm (aemeasurable_lqNorm_blockFun s q f).aestronglyMeasurable fun x => by
     simp only [enorm_eq_self]
     exact ENNReal.lqNorm_mono fun j => by gcongr; exact ENNReal.dyadicWeight_le_of_le hst j
+
+omit [Fact (1 ≤ p)] in
+/-- **Weighted blocks with terms set to zero**: for every predicate `P` on `ℕ`,
+`‖ x ↦ ‖(1_P(j) 2^{js} |(ψ_j ⋆ f)(x)|)_j‖_{ℓ_q} ‖_p ≤ ‖f‖_{F^s_{p,q}}`, where the terms with `P j`
+false are `0` (`MeasureTheory.eLpNorm_lqNorm_ite_le`). -/
+theorem eLpNorm_lqNorm_ite_blockFun_le {P : ℕ → Prop} [DecidablePred P] (s : ℝ) (q : ℝ≥0∞)
+    (f : Lp ℂ p (volume : Measure V)) :
+    eLpNorm (fun x => lqNorm q fun j =>
+      if P j then dyadicWeight s j * ‖blockFun j f x‖ₑ else 0) p volume ≤
+      triebelLizorkinNorm s q f :=
+  eLpNorm_lqNorm_ite_le fun j => (aestronglyMeasurable_blockFun j f).enorm.const_mul _
+
+open Filter Topology in
+/-- **The tails of the weighted blocks tend to zero**: for `1 ≤ p < ∞`, `0 < q < ∞`, `s ∈ ℝ` and
+`f ∈ F^s_{p,q}(V)`, `‖ x ↦ ‖(2^{js} (ψ_j ⋆ f)(x))_{j ≥ N}‖_{ℓ_q} ‖_p → 0` as `N → ∞`, where the
+terms `j < N` are `0` (`MeasureTheory.tendsto_eLpNorm_lqNorm_ite_le`). -/
+theorem tendsto_eLpNorm_lqNorm_blockFun_tail (hp : p ≠ ∞) {s : ℝ} {q : ℝ≥0∞} (hq0 : q ≠ 0)
+    (hq : q ≠ ∞) {f : Lp ℂ p (volume : Measure V)} (hf : MemTriebelLizorkin s q f) :
+    Tendsto (fun N => eLpNorm (fun x => lqNorm q fun j =>
+      if N ≤ j then dyadicWeight s j * ‖blockFun j f x‖ₑ else 0) p volume) atTop (𝓝 0) :=
+  tendsto_eLpNorm_lqNorm_ite_le (zero_lt_one.trans_le Fact.out).ne' hp hq0 hq
+    (fun j => (aestronglyMeasurable_blockFun j f).enorm.const_mul _) hf.ne
 
 /-! ### The spaces `F^s_{p,q}` -/
 

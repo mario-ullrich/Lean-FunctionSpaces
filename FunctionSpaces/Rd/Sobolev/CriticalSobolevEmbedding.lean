@@ -25,7 +25,9 @@ following Johnsen–Sickel (2007, Proposition 1):
   ‖G‖_{p₀}^θ = ‖f‖_{F^{s₀}_{p₀,∞}}^θ`, the `L_{p₁}` norm of the left side is at most
   `K ‖f‖_{F^{s₀}_{p₀,∞}}` with `K = Rd.criticalEmbeddingConst V p₀ p₁`;
 * **`F^α_{p₀,∞} ↪ L_{p₁}`** (`Rd.exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top`,
-  `Rd.exists_memLp_ae_eq_of_memTriebelLizorkin`), for `p₀ = 1` as well;
+  `Rd.exists_memLp_ae_eq_of_memTriebelLizorkin`), for `p₀ = 1` as well, and
+  `F^s_{p₀,q} ↪ L_{p₁}` for `p₀ ≤ p₁` and `s ≥ α`
+  (`Rd.exists_memLp_ae_eq_of_memTriebelLizorkin_of_le`);
 * **Jawerth's embedding** `F^{s₀}_{p₀,∞} ↪ F^{s₁}_{p₁,q}` for `s₁ ≥ 0`, `s₀ - s₁ = α` and every
   `1 ≤ q ≤ ∞` (`Rd.exists_triebelLizorkinNorm_le_of_nikolskiiExponent`);
 * **the critical Sobolev embedding** `W^m_p ↪ L_r` for `1 < p < ∞`, `r < ∞` and
@@ -223,6 +225,22 @@ theorem exists_memLp_ae_eq_of_memTriebelLizorkin [Nontrivial V] (hp₀₁ : p₀
     (hle.trans_lt hf)
   exact ⟨g, hg, hn.trans (mul_le_mul' le_rfl hle)⟩
 
+/-- **`F^s_{p₀,q} ↪ L_{p₁}` for `p₀ ≤ p₁ < ∞`**: let `n ≥ 1`, `1 ≤ p₀ ≤ p₁ < ∞`, `1 ≤ q ≤ ∞` and
+`n(1/p₀ - 1/p₁) ≤ s`. Every `f ∈ F^s_{p₀,q}(V)` has a representative in `L_{p₁}(V)`: for
+`p₁ = p₀` this is `f` itself; for `p₀ < p₁`, `F^s_{p₀,q} ⊆ F^α_{p₀,∞}` with
+`α = n(1/p₀ - 1/p₁)` (`Rd.triebelLizorkinNorm_mono_exponent`,
+`Rd.MemTriebelLizorkin.mono_smoothness`) and `F^α_{p₀,∞} ↪ L_{p₁}`
+(`Rd.exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top`). -/
+theorem exists_memLp_ae_eq_of_memTriebelLizorkin_of_le [Nontrivial V] (hp₀₁ : p₀ ≤ p₁)
+    (hp₁ : p₁ ≠ ∞) {s : ℝ} (hs : nikolskiiExponent (finrank ℝ V) p₀ p₁ ≤ s) {q : ℝ≥0∞}
+    (hq : 1 ≤ q) {f : Lp ℂ p₀ (volume : Measure V)} (hf : MemTriebelLizorkin s q f) :
+    ∃ g : Lp ℂ p₁ (volume : Measure V), (g : V → ℂ) =ᵐ[volume] f := by
+  rcases hp₀₁.eq_or_lt with rfl | hlt
+  · exact ⟨f, ae_eq_refl _⟩
+  obtain ⟨g, hg, -⟩ := exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top hlt hp₁ rfl
+    ((triebelLizorkinNorm_mono_exponent hq le_top f).trans_lt (hf.mono_smoothness hs))
+  exact ⟨g, hg⟩
+
 /-- **Jawerth's embedding** `F^{s₀}_{p₀,∞} ↪ F^{s₁}_{p₁,q}` (Jawerth 1977; Triebel 1983, §2.7.1;
 Vybíral 2008, Theorem 0.1 (ii); the proof is Johnsen–Sickel's, 2007, Proposition 1): let `n ≥ 1`,
 `1 ≤ p₀ < p₁ < ∞`, `s₁ ≥ 0` and `s₀ - s₁ = n(1/p₀ - 1/p₁)`. Every `f ∈ L_{p₀}(V)` with a finite
@@ -294,20 +312,14 @@ theorem exists_memLp_ae_eq_of_hasWeakLineDeriv_of_eq [Nontrivial V] (hp1 : 1 < p
 
 /-- **The Sobolev embedding `W^m_p ↪ L_r` for `p ≤ r < ∞`**: let `n ≥ 1`, `1 < p < ∞`,
 `p ≤ r < ∞` and `n(1/p - 1/r) ≤ m`. Every `f ∈ W^m_p(V)` has a representative in `L_r(V)`. For
-`r = p` this is `f` itself; for `p < r`, `f ∈ F^m_{p,2} ⊆ F^α_{p,∞}` with `α = n(1/p - 1/r)`
-(`Rd.memTriebelLizorkin_of_memSobolev`) and `F^α_{p,∞} ↪ L_r`
-(`Rd.exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top`). -/
+`r = p` this is `f` itself; for `p < r`, `f ∈ F^m_{p,2}` (`Rd.memTriebelLizorkin_of_memSobolev`)
+and `F^m_{p,2} ↪ L_r` (`Rd.exists_memLp_ae_eq_of_memTriebelLizorkin_of_le`). -/
 theorem exists_memLp_ae_eq_of_memSobolev_of_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     (hpr : p ≤ r) (hr : r ≠ ∞) {m : ℕ} (hs : nikolskiiExponent (finrank ℝ V) p r ≤ m)
     {f : Lp ℂ p (volume : Measure V)} (hf : MemSobolev m f) :
-    ∃ g : Lp ℂ r (volume : Measure V), (g : V → ℂ) =ᵐ[volume] f := by
-  rcases hpr.eq_or_lt with rfl | hlt
-  · exact ⟨f, ae_eq_refl _⟩
-  have hTL : triebelLizorkinNorm (nikolskiiExponent (finrank ℝ V) p r) ∞ f < ∞ :=
-    (triebelLizorkinNorm_mono_exponent one_le_two le_top f).trans_lt
-      ((memTriebelLizorkin_of_memSobolev hp1 hp hf).mono_smoothness hs)
-  obtain ⟨g, hg, -⟩ := exists_memLp_ae_eq_of_triebelLizorkinNorm_lt_top hlt hr rfl hTL
-  exact ⟨g, hg⟩
+    ∃ g : Lp ℂ r (volume : Measure V), (g : V → ℂ) =ᵐ[volume] f :=
+  exists_memLp_ae_eq_of_memTriebelLizorkin_of_le hpr hr hs one_le_two
+    (memTriebelLizorkin_of_memSobolev hp1 hp hf)
 
 /-- **The critical Sobolev embedding** (Sobolev's inequality for `1 < p < n/m`): let `n ≥ 1`,
 `1 < p < ∞`, `r < ∞` and `m = n(1/p - 1/r)`, that is `1/r = 1/p - m/n`. Every `f ∈ W^m_p(V)` has

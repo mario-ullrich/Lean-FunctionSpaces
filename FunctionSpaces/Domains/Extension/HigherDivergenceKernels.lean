@@ -796,22 +796,6 @@ theorem LocalMeansBump.kernel_succ_dilationSmoothed (b : LocalMeansBump V) (L j 
 
 /-! ### Vanishing moments of the kernel weights -/
 
-/-- **Moments of the coefficients of the moment kernels**: `∑_{l<r} a_l (l + 1)^j = 0` for
-`1 ≤ j < r` with `a_l = Rd.jacksonCoeff r l`. The sum is `0^j - (-1)^r Δ^r(x^j)(0)`
-(`Rd.neg_one_pow_mul_sum_higherDiff_coeff`, Mathlib's `fwdDiff_iter_eq_sum_shift`), and
-differences of order `r` annihilate polynomials of degree `j < r` (Mathlib's
-`fwdDiff_iter_pow_eq_zero_of_lt`). -/
-theorem sum_jacksonCoeff_mul_pow {r j : ℕ} (h1 : 1 ≤ j) (hj : j < r) :
-    ∑ l ∈ Finset.range r, jacksonCoeff r l * ((l : ℂ) + 1) ^ j = 0 := by
-  have hΔ := congrFun (fwdDiff_iter_pow_eq_zero_of_lt (R := ℂ) hj) 0
-  rw [fwdDiff_iter_eq_sum_shift] at hΔ
-  simp only [zero_add, nsmul_eq_mul, mul_one, Pi.zero_apply, zsmul_eq_mul, Int.cast_mul,
-    Int.cast_pow, Int.cast_neg, Int.cast_one, Int.cast_natCast] at hΔ
-  have h := neg_one_pow_mul_sum_higherDiff_coeff r fun l => (l : ℂ) ^ j
-  rw [hΔ, mul_zero, Nat.cast_zero, zero_pow (by omega), zero_sub] at h
-  push_cast at h
-  linear_combination h
-
 /-- **Moments of the shifted smoothing weight**: for `l < L` and `r ∈ ℕ`,
 `∫_{-log L}^{log 2} ρ(s + log(l + 1)) e^{-rs} ds = (l + 1)^r ∫_0^{log 2} ρ(s) e^{-rs} ds`, by the
 substitution `s ↦ s + log(l + 1)` (Mathlib's `intervalIntegral.integral_comp_add_right`). -/

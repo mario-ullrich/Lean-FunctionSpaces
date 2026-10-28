@@ -127,7 +127,7 @@ the class of a function (\Cref{def:conv}).
   Rd.triebelLizorkinNorm_zero_left, Rd.triebelLizorkinNorm_mono_exponent,
   Rd.triebelLizorkinNorm_mono_smoothness, Rd.MemTriebelLizorkin.mono_exponent,
   Rd.MemTriebelLizorkin.mono_smoothness, Rd.MemTriebelLizorkin.add, Rd.MemTriebelLizorkin.smul,
-  Rd.triebelLizorkinSpace, Rd.mem_triebelLizorkinSpace, Rd.triebelLizorkinNorm_zero_two_eq}
+  Rd.triebelLizorkinSpace, Rd.mem_triebelLizorkinSpace}
 \leanok
 \uses{def:triebel-lizorkin, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-homogeneity}
 For every $1 \leq p < \infty$, all $s \leq t$ in $\R$, all $1 \leq q \leq r \leq \infty$, all
@@ -1636,7 +1636,7 @@ everywhere.
 \uses{thm:ball-means-by-local-means, thm:local-means-by-ball-means,
   lem:almost-diagonal-pointwise, lem:maximal-bounds-mixed-norm, lem:reproducing-formula,
   lem:dual-kernel-moduli, lem:conv-op, cor:mixed-norm-sandwich, lem:lq-basic,
-  thm:rd-atomic-synthesis, def:tl-local-means, def:ball-means-differences,
+  lem:local-means-synthesis, def:tl-local-means, def:ball-means-differences,
   lem:lp-norm-homogeneity}
 Let $s \in \R$, $L \in \N$, $1 \leq p < \infty$ and $1 \leq q \leq \infty$, and let
 \[
@@ -1671,7 +1671,7 @@ everywhere, after $2^{(j+r+1)s} = 2^{(r+1)s} 2^{js}$.
 Upper bound: the reproducing formula $f = \sum_j \eta_j * k_j * f$ (\Cref{lem:reproducing-formula})
 with $\|\eta_j\|_1 \leq 2 \|m\|_1$ gives
 $\|f\|_p \leq 2 \|m\|_1 (1 - 2^{-s})^{-1} \sup_j 2^{js} \|k_j * f\|_p$ (the series bound of
-\Cref{thm:rd-atomic-synthesis}), and $\sup_j 2^{js} \|k_j * f\|_p \leq \|f\|^{g,L}_{F^s_{p,q}}$
+\Cref{lem:local-means-synthesis}), and $\sup_j 2^{js} \|k_j * f\|_p \leq \|f\|^{g,L}_{F^s_{p,q}}$
 by \Cref{cor:mixed-norm-sandwich} at $q = \infty$ and $\ell_q \subseteq \ell_\infty$.
 \Cref{thm:ball-means-by-local-means} and \Cref{lem:almost-diagonal-pointwise} bound
 $\|(2^{js} d_j f(x))_j\|_{\ell_q}$ by $E_L A_{s,L} \|(M(2^{is} |k_i * f|)(x))_i\|_{\ell_q}$

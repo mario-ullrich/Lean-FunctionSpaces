@@ -28,7 +28,8 @@ quotient map `π` (`Torus.proj`). This file compares integrals of lifts with int
   `Δ^L_{π h} f(π x) = Δ^L_h (f ∘ π)(x)` (`Torus.higherDiff_comp_proj`).
 * **Counting boxes**: a ball of radius `r` meets at most `(2r + 2)^d` boxes, so
   `∫_{B(x,r)} g(π y) dy ≤ (2r + 2)^d ∫_{𝕋^d} g` (`Torus.setLIntegral_ball_comp_proj_le`), lifts
-  of integrable functions are locally integrable (`Torus.locallyIntegrable_comp_proj`), balls of
+  of integrable functions are locally integrable (`Torus.locallyIntegrable_comp_proj`, for `L_p`
+  classes `Torus.locallyIntegrable_comp_proj_Lp`), balls of
   radius `r ≤ 1` around points of `P_0` lie in the box `(-1, 2]^d` of side `3`
   (`Torus.ball_subset_tripleBox`), `‖y‖ ≥ 1` whenever `x ∈ P_0` and `x - y ∉ (-1, 2]^d`
   (`Torus.one_le_norm_of_sub_notMem_tripleBox`), and `∫_{(-1,2]^d} g(π y) dy = 3^d ∫_{𝕋^d} g`
@@ -255,6 +256,17 @@ theorem locallyIntegrable_comp_proj {h : UnitAddTorus d → ℂ} (hh : Integrabl
       quasiMeasurePreserving_proj).restrict
   · refine (setLIntegral_ball_comp_proj_le (fun t => ‖h t‖ₑ) x 1).trans_lt ?_
     exact ENNReal.mul_lt_top (ENNReal.pow_lt_top ENNReal.ofReal_lt_top) hh.2
+
+section Lp
+
+variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
+
+/-- The lift `h ∘ π` of `h ∈ L_p(𝕋^d)`, `1 ≤ p`, is locally integrable on `ℝ^d`. -/
+theorem locallyIntegrable_comp_proj_Lp (h : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
+    LocallyIntegrable (⇑h ∘ proj) volume :=
+  locallyIntegrable_comp_proj ((Lp.memLp h).integrable Fact.out)
+
+end Lp
 
 omit [Fintype d] in
 /-- The box `(-1, 2]^d` is the union of the period boxes `P_m` with `m ∈ {-1, 0, 1}^d`. -/

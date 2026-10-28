@@ -143,21 +143,13 @@ theorem ae_sub_jacksonApprox_eq (hp : p ≠ ∞) (r k : ℕ)
   have hJ : ⇑(jacksonApprox hp r k f) =ᵐ[volume] fun t => ∑ l ∈ Finset.range r,
       Rd.jacksonCoeff r l * econv (Rd.dilate (Rd.jacksonScale k l) Φ) f t := by
     unfold jacksonApprox
-    have h' : ∀ᵐ t ∂volume, ∀ l ∈ Finset.range r,
-        ⇑(Rd.jacksonCoeff r l • econvLp hp (Rd.integrable_dilate (V := EuclideanSpace ℝ d)
-          Rd.integrable_lpKernel (Rd.jacksonScale_pos k l).ne') f) t =
-        Rd.jacksonCoeff r l * econv (Rd.dilate (Rd.jacksonScale k l) Φ) f t :=
-      (Filter.eventually_all_finset _).2 fun l _ => by
-        filter_upwards [Lp.coeFn_smul (Rd.jacksonCoeff r l) (econvLp hp (Rd.integrable_dilate
-          (V := EuclideanSpace ℝ d) Rd.integrable_lpKernel (Rd.jacksonScale_pos k l).ne') f),
-          econvLp_apply_ae hp (Rd.integrable_dilate (V := EuclideanSpace ℝ d)
-            Rd.integrable_lpKernel (Rd.jacksonScale_pos k l).ne') f] with t h1 h2
-        rw [h1, Pi.smul_apply, h2, smul_eq_mul]
-    filter_upwards [Lp.coeFn_fun_finsetSum (Finset.range r) fun l => Rd.jacksonCoeff r l •
-      econvLp hp (Rd.integrable_dilate (V := EuclideanSpace ℝ d) Rd.integrable_lpKernel
-        (Rd.jacksonScale_pos k l).ne') f, h'] with t ht ht'
-    rw [ht]
-    exact Finset.sum_congr rfl ht'
+    refine (Lp.coeFn_finsetSum _ _).trans ((eventuallyEq_sum fun l _ =>
+      (Lp.coeFn_smul _ _).trans ((econvLp_apply_ae hp (Rd.integrable_dilate
+        (V := EuclideanSpace ℝ d) Rd.integrable_lpKernel (Rd.jacksonScale_pos k l).ne')
+        f).const_smul (Rd.jacksonCoeff r l))).trans (.of_eq ?_))
+    funext t
+    rw [Finset.sum_apply]
+    exact Finset.sum_congr rfl fun l _ => by rw [Pi.smul_apply, smul_eq_mul]
   have hint : ∀ᵐ t ∂volume, ∀ l ∈ Finset.range r, Integrable
       (fun z => Φ z * (f : UnitAddTorus d → ℂ) (t - proj ((Rd.jacksonScale k l)⁻¹ • z))) :=
     (Filter.eventually_all_finset _).2 fun l _ =>
@@ -187,15 +179,13 @@ theorem ae_sub_jacksonApprox_eq (hp : p ≠ ∞) (r k : ℕ)
 
 /-- **Jackson's inequality on the torus**: for `f ∈ L_p(𝕋^d)`, `1 ≤ p < ∞`,
 `‖f - J_k f‖_p ≤ C ω_r(f, 2^(-k))_p`, with the constant `Rd.jacksonConst` of `ℝ^d`: by the weighted
-averages of `MeasureTheory.eLpNorm_integral_kernel_le` and
+averages of `Rd.eLpNorm_integral_lpKernel_mul_le` and
 `ω_r(f, 2^(-k) |z|)_p ≤ (1 + |z|)^r ω_r(f, 2^(-k))_p`. -/
 theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ‖f - jacksonApprox hp r k f‖ₑ ≤
       Rd.jacksonConst (EuclideanSpace ℝ d) r p * Rd.lpModulus p r f k := by
   have hp1 : 1 ≤ p := Fact.out
-  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp1).ne'
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   have hfm : Measurable (f : UnitAddTorus d → ℂ) := (Lp.stronglyMeasurable f).measurable
   set w : EuclideanSpace ℝ d → UnitAddTorus d := fun z => proj (-((2 : ℝ) ^ k)⁻¹ • z) with hw
   set G : UnitAddTorus d → EuclideanSpace ℝ d → ℂ :=
@@ -238,28 +228,8 @@ theorem enorm_sub_jacksonApprox_le (hp : p ≠ ∞) (r k : ℕ)
       eLpNorm (fun t => ∫ z, Rd.lpKernel z * G t z) p volume := by
     rw [Lp.enorm_def]
     exact eLpNorm_congr_ae (ae_sub_jacksonApprox_eq hp r k f)
-  rw [hlhs, ← ENNReal.rpow_le_rpow_iff hq]
-  refine (eLpNorm_integral_kernel_le hp1 hp
-    (Rd.integrable_lpKernel (V := EuclideanSpace ℝ d)).aestronglyMeasurable hG).trans ?_
-  calc (∫⁻ z, ‖Rd.lpKernel (V := EuclideanSpace ℝ d) z‖ₑ) ^ (p.toReal - 1) *
-        ∫⁻ z, ‖Rd.lpKernel z‖ₑ * eLpNorm (fun t => G t z) p volume ^ p.toReal
-      ≤ (∫⁻ z, ‖Rd.lpKernel (V := EuclideanSpace ℝ d) z‖ₑ) ^ (p.toReal - 1) *
-          ∫⁻ z, ‖Rd.lpKernel z‖ₑ * (ENNReal.ofReal (1 + ‖z‖) ^ ((r : ℝ) * p.toReal) *
-            Rd.lpModulus p r f k ^ p.toReal) := by
-        gcongr with z
-        calc eLpNorm (fun t => G t z) p volume ^ p.toReal
-            ≤ (ENNReal.ofReal (1 + ‖z‖) ^ r * Rd.lpModulus p r f k) ^ p.toReal :=
-              ENNReal.rpow_le_rpow (hbound z) hq.le
-          _ = ENNReal.ofReal (1 + ‖z‖) ^ ((r : ℝ) * p.toReal) *
-                Rd.lpModulus p r f k ^ p.toReal := by
-              rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, ← ENNReal.rpow_natCast,
-                ← ENNReal.rpow_mul]
-    _ = (Rd.jacksonConst (EuclideanSpace ℝ d) r p * Rd.lpModulus p r f k) ^ p.toReal := by
-        rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, Rd.jacksonConst, ← ENNReal.rpow_mul,
-          one_div_mul_cancel hq.ne', ENNReal.rpow_one, mul_assoc]
-        congr 1
-        rw [← lintegral_mul_const' _ _ (ENNReal.rpow_ne_top_of_nonneg hq.le hω)]
-        exact lintegral_congr fun z => by ring
+  rw [hlhs]
+  exact Rd.eLpNorm_integral_lpKernel_mul_le hp1 hp r hG hω hbound
 
 /-- **Jackson's inequality for the trigonometric polynomials**:
 `E_{2^(k+1)}(f)_p ≤ C ω_r(f, 2^(-k))_p` in `L_p(𝕋^d)`. -/

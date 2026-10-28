@@ -196,40 +196,29 @@ theorem exists_lipschitzOnWith_Phi : ∃ L : ℝ≥0, LipschitzOnWith L T.Phi T.
     T.contDiffOn_Phi T.isCompact_carrier T.carrier_subset
 
 /-- **The derivatives of the cut-off are bounded**: `‖D^l χ‖ ≤ M` within `Ω ∩ U'` for `l ≤ K`;
-on the compact `K₀` by continuity, elsewhere they vanish. -/
+on the compact `K₀` by continuity (`ContDiffOn.exists_norm_iteratedFDerivWithin_le`), elsewhere
+they vanish. -/
 theorem exists_iteratedFDerivWithin_chi_bound (K : ℕ) :
     ∃ M : ℝ, 0 ≤ M ∧ ∀ l ≤ K, ∀ y ∈ Ω ∩ T.U', ‖iteratedFDerivWithin ℝ l T.chi (Ω ∩ T.U') y‖ ≤ M := by
-  have hb : ∀ l, ∃ M : ℝ, ∀ y ∈ T.K0, ‖iteratedFDerivWithin ℝ l T.chi (Ω ∩ T.U') y‖ ≤ M := fun l =>
-    T.isCompact_K0.exists_bound_of_continuousOn
-      ((T.contDiffOn_chi.continuousOn_iteratedFDerivWithin (by exact_mod_cast le_top)
-        (T.uniqueDiffOn_target hΩ hint)).mono T.K0_subset)
-  choose M hM using hb
-  refine ⟨∑ l ∈ Finset.range (K + 1), |M l|, by positivity, fun l hl y hy => ?_⟩
-  have hle : |M l| ≤ ∑ l ∈ Finset.range (K + 1), |M l| :=
-    Finset.single_le_sum (f := fun l => |M l|) (fun _ _ => abs_nonneg _)
-      (Finset.mem_range.2 (Nat.lt_succ_of_le hl))
+  obtain ⟨C, hC⟩ := T.contDiffOn_chi.exists_norm_iteratedFDerivWithin_le
+    (T.uniqueDiffOn_target hΩ hint) T.isCompact_K0 T.K0_subset K
+  refine ⟨max C 0, le_max_right _ _, fun l hl y hy => ?_⟩
   by_cases hyK : y ∈ T.K0
-  · exact (hM l y hyK).trans ((le_abs_self _).trans hle)
+  · exact (hC l hl y hyK).trans (le_max_left _ _)
   · have hzero : iteratedFDerivWithin ℝ l T.chi (Ω ∩ T.U') y = 0 :=
       iteratedFDerivWithin_eq_zero_of_eqOn T.isCompact_K0.isClosed.isOpen_compl hyK hy
         (fun z hz => T.chi_eq_zero z hz.1.1 hz.2) l
     rw [hzero, norm_zero]
-    exact (abs_nonneg _).trans hle
+    exact le_max_right _ _
 
 /-- **The derivatives of `Φ` are bounded on `Ψ(K₀)`**: `‖D^i Φ‖ ≤ D` within `Ω ∩ U` for
-`i ≤ K`, with `D ≥ 1`. -/
+`i ≤ K`, with `D ≥ 1` (`ContDiffOn.exists_norm_iteratedFDerivWithin_le`). -/
 theorem exists_iteratedFDerivWithin_Phi_bound (K : ℕ) :
     ∃ D : ℝ, 1 ≤ D ∧ ∀ i ≤ K, ∀ x ∈ T.carrier,
       ‖iteratedFDerivWithin ℝ i T.Phi (Ω ∩ T.U) x‖ ≤ D := by
-  have hb : ∀ i, ∃ M : ℝ, ∀ x ∈ T.carrier, ‖iteratedFDerivWithin ℝ i T.Phi (Ω ∩ T.U) x‖ ≤ M :=
-    fun i => T.isCompact_carrier.exists_bound_of_continuousOn
-      ((T.contDiffOn_Phi.continuousOn_iteratedFDerivWithin (by exact_mod_cast le_top)
-        (T.uniqueDiffOn_source hΩ hint)).mono T.carrier_subset)
-  choose M hM using hb
-  refine ⟨1 + ∑ i ∈ Finset.range (K + 1), |M i|, le_add_of_nonneg_right (by positivity),
-    fun i hi x hx => (hM i x hx).trans ((le_abs_self _).trans ?_)⟩
-  exact (Finset.single_le_sum (f := fun i => |M i|) (fun _ _ => abs_nonneg _)
-    (Finset.mem_range.2 (Nat.lt_succ_of_le hi))).trans (le_add_of_nonneg_left zero_le_one)
+  obtain ⟨C, hC⟩ := T.contDiffOn_Phi.exists_norm_iteratedFDerivWithin_le
+    (T.uniqueDiffOn_source hΩ hint) T.isCompact_carrier T.carrier_subset K
+  exact ⟨max 1 C, le_max_left _ _, fun i hi x hx => (hC i hi x hx).trans (le_max_right _ _)⟩
 
 end CutoffDiffeo
 

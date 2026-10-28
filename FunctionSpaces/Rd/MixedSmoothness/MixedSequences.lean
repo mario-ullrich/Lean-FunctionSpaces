@@ -29,7 +29,10 @@ weighted Jensen inequality `(∑_k w b)^q ≤ (∑_k w)^(q-1) ∑_k w b^q`
 product over the coordinates of `u(m_i - k_i)` with `u(l) = 2^(-(L-s) l)` for `l ≥ 0` and
 `u(l) = 2^(s l)` for `l < 0`, so its row and column sums are at most `(∑_{l ∈ ℤ} u(l))^d = C^d`.
 This replaces the one-dimensional Hardy inequalities of `ENNReal.lqNorm_almostDiagonal_le`, which
-do not iterate over the coordinates.
+do not iterate over the coordinates. With termwise bounds
+`a_m ≤ C^d ∑_k ∏_i c(m_i, k_i) x_k` it gives
+`‖(2^(s|m|_1) a_m)_m‖_{ℓ_q} ≤ (C C_s)^d ‖(2^(s|k|_1) x_k)_k‖_{ℓ_q}`
+(`Rd.lqNorm_le_of_le_almostDiagonal_pi`).
 -/
 
 @[expose] public section
@@ -224,5 +227,29 @@ theorem lqNorm_almostDiagonal_pi_le (hq : 1 ≤ q) {s L : ℝ} (hs : 0 ≤ s)
         rw [mixedWeight_neg_mul_self, mul_one, mul_assoc]
     _ = mixedWeight s m * (∏ i, almostDiagCoeff L (m i) (k i)) * mixedWeight (-s) k *
           (mixedWeight s k * a k) := by ring
+
+/-- **The almost diagonal lemma for termwise bounds**: for `0 ≤ s`, `1 ≤ q ≤ ∞` and
+`C ∈ [0, ∞]`, if `a_m ≤ C^d ∑_k ∏_i c(m_i, k_i) x_k` for every `m ∈ ℕ^d`, then
+`‖(2^(s|m|_1) a_m)_m‖_{ℓ_q} ≤ (C C_s)^d ‖(2^(s|k|_1) x_k)_k‖_{ℓ_q}` with the constant `C_s` of
+`Rd.lqNorm_almostDiagonal_pi_le`, by the homogeneity of the `ℓ_q` norm and that lemma. -/
+theorem lqNorm_le_of_le_almostDiagonal_pi (hq : 1 ≤ q) {s L : ℝ} (hs : 0 ≤ s) {C : ℝ≥0∞}
+    {a x : (Fin d → ℕ) → ℝ≥0∞}
+    (ha : ∀ m, a m ≤ C ^ d * ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * x k) :
+    lqNorm q (fun m => mixedWeight s m * a m) ≤
+      (C * almostDiagConst s L) ^ d * lqNorm q (fun k => mixedWeight s k * x k) := by
+  calc lqNorm q (fun m => mixedWeight s m * a m)
+      ≤ lqNorm q (fun m => C ^ d * (mixedWeight s m *
+          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * x k)) :=
+        ENNReal.lqNorm_mono fun m => by
+          calc mixedWeight s m * a m
+              ≤ mixedWeight s m * (C ^ d *
+                  ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * x k) :=
+                mul_le_mul' le_rfl (ha m)
+            _ = _ := by ring
+    _ = C ^ d * lqNorm q (fun m => mixedWeight s m *
+          ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * x k) := ENNReal.lqNorm_const_mul _ _
+    _ ≤ C ^ d * (almostDiagConst s L ^ d * lqNorm q (fun k => mixedWeight s k * x k)) :=
+        mul_le_mul' le_rfl (lqNorm_almostDiagonal_pi_le hq hs _)
+    _ = _ := by rw [mul_pow, mul_assoc]
 
 end Rd

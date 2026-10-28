@@ -1140,7 +1140,7 @@ noncomputable def psiDualSupportConst (L N : ℕ) : ℝ≥0∞ :=
 theorem psiDualSupportConst_ne_top (L N : ℕ) : b.psiDualSupportConst L N ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.mul_ne_top (psiDecayConst_ne_top N) ENNReal.ofReal_ne_top)
     (ENNReal.mul_ne_top ENNReal.ofNat_ne_top
-      (memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top)
+      (eLpNorm_momentKernel_ne_top b.integrable L))
 
 /-- `∫ |η_i| ≤ 2 ‖m‖_1`. -/
 theorem lintegral_enorm_dual_le (L i : ℕ) :

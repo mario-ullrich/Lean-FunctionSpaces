@@ -947,8 +947,8 @@ noncomputable def diffUpperConst (L : ℕ) (p q : ℝ≥0∞) (s : ℝ) : ℝ≥
 theorem diffUpperConst_ne_top {L : ℕ} {p q : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) (hq1 : 1 < q)
     {s : ℝ} (hs : 0 < s) (hsL : s < L) : b.diffUpperConst L p q s ≠ ∞ :=
   ENNReal.add_ne_top.2
-    ⟨ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num) (memLp_one_iff_integrable.2
-      (integrable_momentKernel b.integrable L)).eLpNorm_ne_top)
+    ⟨ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num)
+      (eLpNorm_momentKernel_ne_top b.integrable L))
       (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs),
     ENNReal.mul_ne_top (ENNReal.mul_ne_top (b.diffByLocalMeansConst_ne_top L)
       (almostDiagonalConst_ne_top hs hsL)) (feffermanSteinConst_ne_top hp1 hp hq1)⟩
@@ -983,8 +983,8 @@ noncomputable def diffLowerConst (L : ℕ) (s : ℝ) : ℝ≥0∞ :=
 /-- The constant of the bound of the local means quasi-norm by ball means is finite. -/
 theorem diffLowerConst_ne_top (L : ℕ) (s : ℝ) : b.diffLowerConst L s ≠ ∞ :=
   ENNReal.add_ne_top.2
-    ⟨ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num) (memLp_one_iff_integrable.2
-      (integrable_momentKernel b.integrable L)).eLpNorm_ne_top)
+    ⟨ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num)
+      (eLpNorm_momentKernel_ne_top b.integrable L))
       (ENNReal.sum_ne_top.2 fun j _ => ENNReal.dyadicWeight_ne_top s j),
     ENNReal.mul_ne_top (ENNReal.dyadicWeight_ne_top _ _) b.ballMeanConst_ne_top⟩
 

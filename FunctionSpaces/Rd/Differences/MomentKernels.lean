@@ -17,19 +17,21 @@ For an integrable `g` with `∫ g = 1` and an order `L ≥ 1`, the **moment kern
 
 (`Rd.momentKernel`), with the dilations `g_c = c^n g(c ·)` of `Rd.dilate`. Its dilations are
 `m_c = ∑_l (-1)^(l+1) C(L, l) g_{c/l}` (`Rd.dilate_momentKernel`), and `∫ m = 1`
-(`Rd.integral_momentKernel`), since `∑_{l=1}^L (-1)^(l+1) C(L, l) = 1` (`Rd.sum_jacksonCoeff`).
-The coefficients are those of `-(-1)^L Δ^L` without the term `l = 0`
-(`Rd.neg_one_pow_mul_sum_higherDiff_coeff`), so convolution with `m_c` averages differences of
-order `L`:
+(`Rd.integral_momentKernel`), since `∑_{l=1}^L (-1)^(l+1) C(L, l) = 1` (`Rd.sum_jacksonCoeff`),
+and `‖m‖_1 < ∞` for integrable `g` (`Rd.eLpNorm_momentKernel_ne_top`). The coefficients are
+those of `-(-1)^L Δ^L` without the term `l = 0` (`Rd.neg_one_pow_mul_sum_higherDiff_coeff`), so
+convolution with `m_c` averages differences of order `L`:
 
 `f(x) - (m_c ⋆ f)(x) = (-1)^L ∫ g(z) Δ^L_{-c^(-1) z} f(x) dz`
 
 for `f ∈ L_p` and almost every `x` (`Rd.ae_sub_conv_dilate_momentKernel_eq`; in absolute value
-`Rd.ae_enorm_sub_conv_dilate_momentKernel_le`). The moments of `m` of the orders `1, …, L - 1`
-vanish; the estimates below go through the averaged differences instead. If `g` vanishes outside the
-ball of radius `R`, then `‖f - m_c ⋆ f‖_p ≤ ‖g‖_1 ω_L(f, R/c)_p`
-(`Rd.enorm_sub_convLp_momentKernel_le`), and if the steps `-c^(-1) z`, `g(z) ≠ 0`, take a set `U`
-into a set `T`, then `‖1_U (f - m_c ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, R/c, T)_p`
+`Rd.ae_enorm_sub_conv_dilate_momentKernel_le`). If `g` has finite moments of the orders
+`1, …, L - 1`, the moments of `m` of these orders vanish, since the coefficients satisfy
+`∑_{l<L} (-1)^l C(L, l + 1) (l + 1)^j = 0` for `1 ≤ j < L` (`Rd.sum_jacksonCoeff_mul_pow`); the
+estimates below go through the averaged differences instead. If `g` vanishes outside the ball of
+radius `R`, then `‖f - m_c ⋆ f‖_p ≤ ‖g‖_1 ω_L(f, R/c)_p` (`Rd.enorm_sub_convLp_momentKernel_le`),
+and if the steps `-c^(-1) z`, `g(z) ≠ 0`, take a set `U` into a set `T`, then
+`‖1_U (f - m_c ⋆ f)‖_p ≤ ‖g‖_1 ω_L(f, R/c, T)_p`
 (`Rd.eLpNorm_indicator_sub_convLp_momentKernel_le`).
 
 In an inner product space the moment kernel of order two `m = 2 g - g_{1/2}` has vanishing first
@@ -74,6 +76,22 @@ theorem sum_jacksonCoeff {r : ℕ} (hr : 1 ≤ r) : ∑ l ∈ Finset.range r, ja
   have h := neg_one_pow_mul_sum_higherDiff_coeff r (fun _ => 1)
   simp only [mul_one] at h
   rw [h0, mul_zero] at h
+  linear_combination h
+
+/-- **Moments of the coefficients of the moment kernels**: `∑_{l<r} a_l (l + 1)^j = 0` for
+`1 ≤ j < r` with `a_l = Rd.jacksonCoeff r l`. The sum is `0^j - (-1)^r Δ^r(x^j)(0)`
+(`Rd.neg_one_pow_mul_sum_higherDiff_coeff`, Mathlib's `fwdDiff_iter_eq_sum_shift`), and
+differences of order `r` annihilate polynomials of degree `j < r` (Mathlib's
+`fwdDiff_iter_pow_eq_zero_of_lt`). -/
+theorem sum_jacksonCoeff_mul_pow {r j : ℕ} (h1 : 1 ≤ j) (hj : j < r) :
+    ∑ l ∈ Finset.range r, jacksonCoeff r l * ((l : ℂ) + 1) ^ j = 0 := by
+  have hΔ := congrFun (fwdDiff_iter_pow_eq_zero_of_lt (R := ℂ) hj) 0
+  rw [fwdDiff_iter_eq_sum_shift] at hΔ
+  simp only [zero_add, nsmul_eq_mul, mul_one, Pi.zero_apply, zsmul_eq_mul, Int.cast_mul,
+    Int.cast_pow, Int.cast_neg, Int.cast_one, Int.cast_natCast] at hΔ
+  have h := neg_one_pow_mul_sum_higherDiff_coeff r fun l => (l : ℂ) ^ j
+  rw [hΔ, mul_zero, Nat.cast_zero, zero_pow (by omega), zero_sub] at h
+  push_cast at h
   linear_combination h
 
 /-- The `L_1` norm of a function with integral `1` does not vanish. -/
@@ -122,6 +140,18 @@ theorem dilate_momentKernel (c : ℝ) (g : V → ℂ) (L : ℕ) :
 theorem integrable_momentKernel {g : V → ℂ} (hg : Integrable g μ) (L : ℕ) :
     Integrable (momentKernel g L) μ :=
   integrable_finsetSum _ fun l _ => (integrable_dilate hg (by positivity)).const_mul _
+
+/-- **Moment kernels have a finite `L_1` norm**: `‖m‖_1 ≠ ∞` for the moment kernel `m` of an
+integrable `g` (`Rd.integrable_momentKernel`). -/
+theorem eLpNorm_momentKernel_ne_top {g : V → ℂ} (hg : Integrable g μ) (L : ℕ) :
+    eLpNorm (momentKernel g L) 1 μ ≠ ∞ :=
+  (memLp_one_iff_integrable.2 (integrable_momentKernel hg L)).eLpNorm_ne_top
+
+/-- `‖m‖_1 < ∞` for the moment kernel `m` of an integrable `g`
+(`Rd.eLpNorm_momentKernel_ne_top`). -/
+theorem eLpNorm_momentKernel_lt_top {g : V → ℂ} (hg : Integrable g μ) (L : ℕ) :
+    eLpNorm (momentKernel g L) 1 μ < ∞ :=
+  (eLpNorm_momentKernel_ne_top hg L).lt_top
 
 /-- **The moment kernel has integral `1`**: `∫ m = ∑_{l=1}^L (-1)^(l+1) C(L, l) ∫ g = 1`. -/
 theorem integral_momentKernel {g : V → ℂ} (hg : Integrable g μ) (h1 : ∫ x, g x ∂μ = 1)

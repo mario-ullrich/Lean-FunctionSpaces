@@ -138,57 +138,6 @@ theorem tsum_canonical_ne_top {A : ApproximationScheme X} {β : ℝ} (hβ : 0 �
   rw [ENNReal.tsum_add, ENNReal.tsum_dyadicWeight_neg_one, ← ENNReal.lqNorm_one]
   exact ENNReal.add_ne_top.2 ⟨hL.ne, by norm_num⟩
 
-/-! ### Series moved up by a number of levels -/
-
-/-- The sequence `a` moved up by `γ` levels: `a_{i-γ}` at the levels `i ≥ γ`, and `0` below. -/
-def shiftSeq (γ : ℕ) (a : ℕ → X) (i : ℕ) : X := if γ ≤ i then a (i - γ) else 0
-
-omit [NormedSpace ℝ X] in
-/-- `(shiftSeq γ a)_{n+γ} = a_n`. -/
-theorem shiftSeq_add (γ : ℕ) (a : ℕ → X) (n : ℕ) : shiftSeq γ a (n + γ) = a n := by
-  simp [shiftSeq]
-
-omit [NormedSpace ℝ X] in
-/-- The levels below `γ` of the moved sequence are `0`. -/
-theorem shiftSeq_of_lt {γ i : ℕ} (a : ℕ → X) (h : i < γ) : shiftSeq γ a i = 0 := by
-  simp [shiftSeq, not_le.2 h]
-
-omit [NormedSpace ℝ X] in
-/-- **Moving a series up keeps its sum.** -/
-theorem hasSum_shiftSeq {γ : ℕ} {a : ℕ → X} {f : X} (hfa : HasSum a f) :
-    HasSum (shiftSeq γ a) f := by
-  refine (hasSum_nat_add_iff' γ).1 ?_
-  have h1 : (fun n => shiftSeq γ a (n + γ)) = a := funext (shiftSeq_add γ a)
-  have h2 : ∑ i ∈ range γ, shiftSeq γ a i = 0 :=
-    Finset.sum_eq_zero fun i hi => shiftSeq_of_lt a (Finset.mem_range.1 hi)
-  rw [h1, h2, sub_zero]
-  exact hfa
-
-/-- **Moving approximants up**: if `a_j ∈ A_{2^(j+γ)}`, then `(shiftSeq γ a)_i ∈ A_{2^i}`. -/
-theorem shiftSeq_mem {A : ApproximationScheme X} {γ : ℕ} {a : ℕ → X}
-    (ha : ∀ j, a j ∈ A (2 ^ (j + γ))) (i : ℕ) : shiftSeq γ a i ∈ A (2 ^ i) := by
-  by_cases h : γ ≤ i
-  · simp only [shiftSeq, h, ↓reduceIte]
-    have := ha (i - γ)
-    rwa [Nat.sub_add_cancel h] at this
-  · simp only [shiftSeq, h, ↓reduceIte]
-    exact A.zero_mem _
-
-omit [NormedSpace ℝ X] in
-/-- **The weighted norm of a moved sequence**:
-`‖(2^(iσ) ‖(shiftSeq γ a)_i‖)_i‖_{ℓ_q} ≤ ‖(2^((j+γ)σ) ‖a_j‖)_j‖_{ℓ_q}`. -/
-theorem lqNorm_shiftSeq_le (γ : ℕ) (a : ℕ → X) (σ : ℝ) (q : ℝ≥0∞) :
-    lqNorm q (fun i => dyadicWeight σ i * ‖shiftSeq γ a i‖ₑ) ≤
-      lqNorm q (fun j => dyadicWeight σ (j + γ) * ‖a j‖ₑ) := by
-  have : (fun i => dyadicWeight σ i * ‖shiftSeq γ a i‖ₑ) = fun i =>
-      if γ ≤ i then (fun j => dyadicWeight σ (j + γ) * ‖a j‖ₑ) (i - γ) else 0 := by
-    funext i
-    by_cases h : γ ≤ i
-    · simp only [shiftSeq, h, ↓reduceIte, Nat.sub_add_cancel h]
-    · simp [shiftSeq, h]
-  rw [this]
-  exact ENNReal.lqNorm_shiftRight_le γ (fun j => dyadicWeight σ (j + γ) * ‖a j‖ₑ)
-
 namespace TraceBound
 
 variable {A : ApproximationScheme X} {B : ApproximationScheme Y} {β : ℝ} (TB : TraceBound A B β)

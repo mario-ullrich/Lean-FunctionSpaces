@@ -13,7 +13,7 @@ public import FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkin
 
 Let `V` have dimension `n ≥ 1` and `1 < p < ∞`. The **square function** of `f ∈ L_p(V)` is
 `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}`, and its `L_p` norm is the Triebel–Lizorkin norm
-`‖f‖_{F^0_{p,2}}` by definition (`Rd.triebelLizorkinNorm_zero_two_eq`). The square
+`‖f‖_{F^0_{p,2}}` by definition (`Rd.triebelLizorkinNorm_zero_left`). The square
 function theorem is the two-sided bound of this norm by `‖f‖_p`, with named constants,
 formulas in the Schwartz seminorms of the fixed blocks and synthesis kernels that are proved
 finite (`Rd.squareFunctionConst_ne_top`, `Rd.squareSynthesisConst_ne_top`):
@@ -29,7 +29,9 @@ finite (`Rd.squareFunctionConst_ne_top`, `Rd.squareSynthesisConst_ne_top`):
 
 By the upper bound every `f ∈ L_p(V)` lies in `F^0_{p,2}` (`Rd.memTriebelLizorkin_zero_two`), so
 the subspace `F^0_{p,2}` of `L_p(V)` is all of `L_p(V)`
-(`Rd.triebelLizorkinSpace_zero_two_eq_top`).
+(`Rd.triebelLizorkinSpace_zero_two_eq_top`). With the Besov sandwich of `F^s_{p,2}` for `s > 0`,
+every `f` in the Besov space `B^s_{p,min(p,2)}` lies in `F^s_{p,2}` for every `s ≥ 0`
+(`Rd.memTriebelLizorkin_two_of_memApprox`).
 -/
 
 @[expose] public section
@@ -75,22 +77,13 @@ theorem squareSynthesisConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ �
 
 /-! ### The square function -/
 
-omit [Fact (1 ≤ p)] in
-/-- **The norm of `F^0_{p,2}` is the `L_p` norm of the square function**:
-`‖f‖_{F^0_{p,2}} = ‖ x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2} ‖_p`, the definition of the norm, unfolded as
-the case `q = 2` of `Rd.triebelLizorkinNorm_zero_left`. -/
-theorem triebelLizorkinNorm_zero_two_eq (f : Lp ℂ p (volume : Measure V)) :
-    triebelLizorkinNorm 0 2 f =
-      eLpNorm (fun x => lqNorm 2 fun j => ‖blockFun j f x‖ₑ) p volume :=
-  triebelLizorkinNorm_zero_left 2 f
-
 /-- **The upper square function bound**: in dimension `n ≥ 1`, for `1 < p < ∞` and
 `f ∈ L_p(V)`, `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p` with `Q_{V,p} = Rd.squareFunctionConst V p`. This is
 the strong type of the analysis operator of the Calderón–Zygmund family `(ψ_j)_j`. -/
 theorem triebelLizorkinNorm_zero_two_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     (f : Lp ℂ p (volume : Measure V)) :
     triebelLizorkinNorm 0 2 f ≤ squareFunctionConst V p * ‖f‖ₑ := by
-  rw [triebelLizorkinNorm_zero_two_eq, Lp.enorm_def]
+  rw [triebelLizorkinNorm_zero_left, Lp.enorm_def]
   exact isCZFamily_psi.eLpNorm_lqNorm_conv_le hp1 hp (Lp.memLp f)
 
 /-- **`L_p ⊆ F^0_{p,2}`**: in dimension `n ≥ 1`, for `1 < p < ∞`, every `f ∈ L_p(V)` has a
@@ -149,7 +142,7 @@ theorem enorm_le_triebelLizorkinNorm_zero_two [Nontrivial V] (hp1 : 1 < p) (hp :
     (tendsto_sum_lpBlock hp f).enorm
   refine le_of_tendsto' h fun J => ?_
   rw [Lp.enorm_def, ← eLpNorm_congr_ae (sum_conv_psiDual_blockFun_ae hp _ f),
-    triebelLizorkinNorm_zero_two_eq]
+    triebelLizorkinNorm_zero_left]
   exact isCZFamily_psiDual.eLpNorm_sum_conv_le hp1 hp _ fun j => memLp_blockFun hp j f
 
 /-- **The square function theorem `L_p = F^0_{p,2}`**: in dimension `n ≥ 1`, for `1 < p < ∞`,
@@ -158,5 +151,19 @@ the subspace `F^0_{p,2}` of `L_p(V)` is all of `L_p(V)`. The norms are equivalen
 theorem triebelLizorkinSpace_zero_two_eq_top [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) :
     triebelLizorkinSpace (V := V) hp 0 2 one_le_two = ⊤ :=
   Submodule.eq_top_iff'.2 fun f => memTriebelLizorkin_zero_two hp1 hp f
+
+/-! ### Besov spaces in `F^s_{p,2}` -/
+
+/-- **`B^s_{p,min(p,2)} ⊆ F^s_{p,2}` for `s ≥ 0`**: in dimension `n ≥ 1`, for `1 < p < ∞` and
+`s ≥ 0`, every `f` in the approximation space `A^s_{min(p,2)}` of the band-limited scheme lies in
+`F^s_{p,2}(V)`: for `s > 0` by the Besov sandwich (`Rd.memTriebelLizorkin_of_memApprox`), for
+`s = 0` since `F^0_{p,2} = L_p(V)` by the square function theorem
+(`Rd.memTriebelLizorkin_zero_two`). -/
+theorem memTriebelLizorkin_two_of_memApprox [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {s : ℝ}
+    (hs : 0 ≤ s) {f : Lp ℂ p (volume : Measure V)}
+    (hf : (bandScheme hp).MemApprox s (min p 2) f) : MemTriebelLizorkin s 2 f := by
+  rcases hs.eq_or_lt with rfl | hs
+  · exact memTriebelLizorkin_zero_two hp1 hp f
+  · exact memTriebelLizorkin_of_memApprox hp hs one_le_two hf
 
 end Rd

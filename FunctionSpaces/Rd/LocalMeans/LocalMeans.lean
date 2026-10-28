@@ -264,7 +264,7 @@ noncomputable def dualConst (L : ℕ) : ℝ≥0∞ :=
 theorem dualConst_ne_top (L : ℕ) : b.dualConst L ≠ ∞ :=
   ENNReal.mul_ne_top (by norm_num) (ENNReal.add_ne_top.2
     ⟨lintegral_enorm_iteratedFDeriv_ne_top L _, ENNReal.mul_ne_top (by simp)
-      (memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top⟩)
+      (eLpNorm_momentKernel_ne_top b.integrable L)⟩)
 
 /-- One dilated kernel at a scale at most `2^j`: `‖Δ_v^L m_{2^l}‖_1 ≤ C 2^(-(i-j)L)` for
 `l ≤ j ≤ i` and `‖v‖ ≤ 2^(-i)`, and `≤ C` always. -/
@@ -447,7 +447,7 @@ noncomputable def upperConst (L : ℕ) (s : ℝ) : ℝ≥0∞ :=
 /-- The constant of the upper bound is finite. -/
 theorem upperConst_ne_top (L : ℕ) (s : ℝ) : b.upperConst L s ≠ ∞ :=
   ENNReal.add_ne_top.2
-    ⟨(memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top,
+    ⟨(eLpNorm_momentKernel_ne_top b.integrable L),
     ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg' (by norm_num) (by simp))
       (ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num) b.integrable.2.ne)
         (ENNReal.pow_ne_top ENNReal.ofReal_ne_top))⟩
@@ -503,7 +503,7 @@ noncomputable def synthConst (L : ℕ) (s : ℝ) : ℝ≥0∞ :=
 /-- The constant of the synthesis estimate is finite for `0 < s < L`. -/
 theorem synthConst_ne_top {L : ℕ} {s : ℝ} (hs : 0 < s) (hsL : s < L) : b.synthConst L s ≠ ∞ :=
   ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num)
-      (memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable L)).eLpNorm_ne_top)
+      (eLpNorm_momentKernel_ne_top b.integrable L))
       (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs),
     ENNReal.mul_ne_top (b.dualConst_ne_top L) (ENNReal.add_ne_top.2
       ⟨ENNReal.one_sub_two_rpow_neg_inv_ne_top (by linarith),
@@ -511,8 +511,9 @@ theorem synthConst_ne_top {L : ℕ} {s : ℝ} (hs : 0 < s) (hsL : s < L) : b.syn
 
 /-- **Synthesis with the dual kernels**: if `F = ∑_j η_j ⋆ h_j` in `L_p` (as the limit of the
 partial sums), then for `0 < s < L`,
-`‖F‖_p + ‖(2^(is) ω_L(F, 2^(-i))_p)_i‖_{ℓ_q} ≤ C ‖(2^(js) ‖h_j‖_p)_j‖_{ℓ_q}`, by the moduli of
-the terms (`Rd.LocalMeansBump.lpModulus_dual_le`) and Hardy's inequalities. -/
+`‖F‖_p + ‖(2^(is) ω_L(F, 2^(-i))_p)_i‖_{ℓ_q} ≤ C ‖(2^(js) ‖h_j‖_p)_j‖_{ℓ_q}`, by the bound of a
+convergent series by its weighted terms (`ENNReal.enorm_le_of_tendsto_sum`), the moduli of the
+terms (`Rd.LocalMeansBump.lpModulus_dual_le`) and Hardy's inequalities. -/
 theorem modNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {F : Lp ℂ p (volume : Measure V)} {h : ℕ → Lp ℂ p (volume : Measure V)}
     (hrep : Tendsto (fun J => ∑ j ∈ Finset.range (J + 1),
@@ -523,25 +524,10 @@ theorem modNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0�
   set X := lqNorm q (fun j => dyadicWeight s j * a j)
   set M := eLpNorm (momentKernel b.toFun L) 1 volume
   -- the norm of `f`
-  have hnorm : ‖F‖ₑ ≤ 2 * M * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
-    have h1 : ‖F‖ₑ ≤ ∑' j, ‖convLp hp (b.integrable_dual L j) (h j)‖ₑ :=
-      ENNReal.le_tsum_of_tendsto_sum (C := 1) ENNReal.one_ne_top (fun x y => enorm_add_le x y)
-        (fun x => by rw [one_mul]) hrep
-    have h2 : ∀ j, ‖convLp hp (b.integrable_dual L j) (h j)‖ₑ ≤
-        2 * M * (dyadicWeight (-s) j * X) := fun j => by
-      have hX : dyadicWeight s j * a j ≤ X :=
-        ENNReal.le_lqNorm (zero_lt_one.trans_le hq).ne' (fun j => dyadicWeight s j * a j) j
-      calc ‖convLp hp (b.integrable_dual L j) (h j)‖ₑ
-          ≤ eLpNorm (b.dual L j) 1 volume * a j := enorm_convLp_le hp _ _
-        _ ≤ 2 * M * (dyadicWeight (-s) j * (dyadicWeight s j * a j)) := by
-            rw [← mul_assoc (dyadicWeight (-s) j), ENNReal.dyadicWeight_neg_mul_self, one_mul]
-            gcongr
-            exact b.eLpNorm_dual_one_le L j
-        _ ≤ 2 * M * (dyadicWeight (-s) j * X) := by gcongr
-    calc ‖F‖ₑ ≤ ∑' j, 2 * M * (dyadicWeight (-s) j * X) := h1.trans (ENNReal.tsum_le_tsum h2)
-      _ = 2 * M * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
-          rw [ENNReal.tsum_mul_left, ENNReal.tsum_mul_right, ENNReal.tsum_dyadicWeight_neg]
-          ring
+  have hnorm : ‖F‖ₑ ≤ 2 * M * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X :=
+    ENNReal.enorm_le_of_tendsto_sum hrep (K := 2 * M) (b := a)
+      (fun j => (enorm_convLp_le hp _ _).trans (mul_le_mul' (b.eLpNorm_dual_one_le L j) le_rfl))
+      s hq
   -- the moduli
   have hmod : ∀ i, lpModulus p L F i ≤ b.dualConst L *
       ∑' j, (if j ≤ i then dyadicWeight (-(L : ℝ)) (i - j) else 1) * a j := fun i => by

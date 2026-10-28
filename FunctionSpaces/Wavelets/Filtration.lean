@@ -135,21 +135,14 @@ theorem mem_scheme {n : ℕ} (hn : n ≠ 0) {f : Lp ℂ p μ} :
     f ∈ ℱ.scheme p μ n ↔ f ∈ lpMeas ℂ ℝ (ℱ (Nat.log 2 n)) p μ :=
   ApproximationScheme.mem_ofMonotoneSubmodules hn
 
-/-- The conditional expectations `0` for `n = 0`, `E[· | ℱ_⌊log₂ n⌋]` for `n ≥ 1`; they are the
-projections of `projectionScheme`. -/
-noncomputable def proj (n : ℕ) : Lp ℂ p μ →L[ℝ] Lp ℂ p μ :=
-  if n = 0 then 0 else Lp.condExpLp (ℱ (Nat.log 2 n))
-
 /-- **The filtration scheme is a projection scheme** with bound `1`: the conditional
-expectations are contractive projections onto the approximants. -/
+expectations are contractive projections onto the approximants, `P_0 = 0` and
+`P_n = E[· | ℱ_⌊log₂ n⌋]` for `n ≥ 1`, so `P_{2^k} = E[· | ℱ_k]`
+(`ApproximationScheme.ProjectionScheme.ofMonotone_two_pow`). -/
 noncomputable def projectionScheme : (ℱ.scheme p μ).ProjectionScheme :=
   ApproximationScheme.ProjectionScheme.ofMonotone (fun k => lpMeas ℂ ℝ (ℱ k) p μ) _
     (fun k => Lp.condExpLp (ℱ k)) (fun _ => Lp.condExpLp_mem_lpMeas _)
     (fun k _ ha => Lp.condExpLp_of_mem (ℱ.le k) ha) 1 fun _ => Lp.norm_condExpLp_le _
-
-/-- The projection of complexity `2^k` is the conditional expectation onto `ℱ_k`. -/
-theorem proj_two_pow (k : ℕ) : ℱ.proj (p := p) (μ := μ) (2 ^ k) = Lp.condExpLp (ℱ k) := by
-  simp only [proj, pow_ne_zero k two_ne_zero, ↓reduceIte, Nat.log_pow Nat.one_lt_two]
 
 /-- **The martingale-difference characterisation**: for `s > 0`, `1 ≤ q ≤ ∞` and approximants
 dense in `L_p`, `f ∈ A^s_q(L_p, ℱ)` iff

@@ -29,8 +29,9 @@ the distribution `φ ↦ ∫ φ f` on `Ω` (Mathlib's `Distribution.ofFun`, test
   (`Rd.HasWeakLineDeriv.ae_eq_zero_of_ae_eq_zero`), additive over finite sums
   (`Rd.HasWeakLineDeriv.sum`), tested also by smooth compactly supported complex functions
   (`Rd.HasWeakLineDeriv.integral_mul_eq`), satisfy the product rule with smooth real functions
-  (`Rd.HasWeakLineDeriv.mul_contDiff`, through the test functions `Rd.testFunctionMul`),
-  are classical on Schwartz functions
+  `χ` (`Rd.HasWeakLineDeriv.mul_contDiff`), also from `Ω ∩ B` to `Ω` when the closed support of
+  `χ` lies in an open set `B` (`Rd.HasWeakLineDeriv.mul_of_tsupport_subset`, through the test
+  functions `Rd.testFunctionMulOn`), are classical on Schwartz functions
   (`Rd.hasWeakLineDeriv_schwartz`), and pass to limits in `L_p(Ω)`
   (`Rd.HasWeakLineDeriv.of_tendsto`).
 * **Sobolev spaces**: `Rd.MemWeakSobolev Ω m p f` says that `f` and all its weak derivatives of
@@ -281,45 +282,117 @@ theorem lineDerivOp_testFunctionMul_apply (φ : 𝓓(Ω, ℝ)) {χ : V → ℝ}
   simp only [add_apply, smul_apply, smul_eq_mul]
   ring
 
-/-- **The product rule for weak derivatives**: if `g = ∂_w f` weakly on `Ω` and `χ` is a smooth
-real function, then `χ g + (∂_w χ) f = ∂_w (χ f)` weakly on `Ω`. Tested against `φ`, this is the
-weak derivative tested against the test function `φ χ` (`Rd.lineDerivOp_testFunctionMul_apply`). -/
-theorem HasWeakLineDeriv.mul_contDiff {w : V} (h : HasWeakLineDeriv Ω (fun _ : Fin 1 => w) f g)
-    {χ : V → ℝ} (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) :
-    HasWeakLineDeriv Ω (fun _ : Fin 1 => w) (fun x => (χ x : ℂ) * f x)
+section Cutoff
+
+variable {O B : Opens V}
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- The product `φ χ` of a real test function `φ` on `O` with a smooth real function `χ` whose
+closed support lies in `B` is a test function on `O ∩ B`. -/
+noncomputable def testFunctionMulOn (φ : 𝓓(O, ℝ)) {χ : V → ℝ}
+    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (hχB : tsupport χ ⊆ B) : 𝓓(O ⊓ B, ℝ) :=
+  ⟨fun x => φ x * χ x, φ.contDiff.mul hχ, φ.hasCompactSupport.mul_right, by
+    rw [Opens.coe_inf]
+    exact Set.subset_inter ((tsupport_mul_subset_left).trans φ.tsupport_subset)
+      ((tsupport_mul_subset_right).trans hχB)⟩
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- The values of `Rd.testFunctionMulOn`: `(φ χ)(x) = φ(x) χ(x)`. -/
+theorem testFunctionMulOn_apply (φ : 𝓓(O, ℝ)) {χ : V → ℝ}
+    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (hχB : tsupport χ ⊆ B) (x : V) :
+    testFunctionMulOn φ hχ hχB x = φ x * χ x :=
+  rfl
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **The product rule for `Rd.testFunctionMulOn`**: `∂_w (φ χ) = (∂_w φ) χ + φ ∂_w χ`. As a
+function, `φ χ` is the test function `Rd.testFunctionMul φ` on `O`, whose derivative is
+`Rd.lineDerivOp_testFunctionMul_apply`. -/
+theorem lineDerivOp_testFunctionMulOn_apply (φ : 𝓓(O, ℝ)) {χ : V → ℝ}
+    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (hχB : tsupport χ ⊆ B) (w x : V) :
+    (∂_{w} (testFunctionMulOn φ hχ hχB)) x = (∂_{w} φ) x * χ x + φ x * fderiv ℝ χ x w := by
+  rw [lineDerivOp_testFunction_apply]
+  exact (lineDerivOp_testFunction_apply (testFunctionMul φ hχ) w x).symm.trans
+    (lineDerivOp_testFunctionMul_apply φ hχ w x)
+
+/-- **Cutoff products are locally integrable on the larger set**: if `u` is locally integrable
+on `O ∩ B` and `c` is continuous with closed support in `B`, then `c u` is locally integrable on
+`O`; near points of `B` this is the product with a continuous function, and near the other points
+of `O`, `c u` vanishes. -/
+theorem locallyIntegrableOn_mul_of_tsupport_subset {u : V → ℂ}
+    (hu : LocallyIntegrableOn u (O ⊓ B : Opens V) volume) {c : V → ℂ} (hc : Continuous c)
+    (hcB : tsupport c ⊆ B) : LocallyIntegrableOn (fun x => c x * u x) O volume := by
+  intro x hx
+  rw [nhdsWithin_eq_nhds.2 (O.isOpen.mem_nhds hx)]
+  by_cases hxB : x ∈ (B : Set V)
+  · have hxOB : x ∈ ((O ⊓ B : Opens V) : Set V) := by
+      rw [Opens.coe_inf]
+      exact ⟨hx, hxB⟩
+    have h := hu.continuousOn_mul hc.continuousOn (O ⊓ B).isOpen.isLocallyClosed x hxOB
+    rwa [nhdsWithin_eq_nhds.2 ((O ⊓ B).isOpen.mem_nhds hxOB)] at h
+  · have hx' : x ∉ tsupport c := fun h => hxB (hcB h)
+    refine ⟨(tsupport c)ᶜ, (isClosed_tsupport c).isOpen_compl.mem_nhds hx', ?_⟩
+    refine integrableOn_zero.congr_fun (fun y hy => ?_)
+      (isClosed_tsupport c).isOpen_compl.measurableSet
+    simp [image_eq_zero_of_notMem_tsupport hy]
+
+/-- **The product rule with a cutoff**: if `g = ∂_w f` weakly on `O ∩ B` and `χ` is a smooth
+real function with closed support in `B`, then `χ g + (∂_w χ) f = ∂_w (χ f)` weakly on `O`. Tested
+against `φ ∈ 𝓓(O)`, this is the weak derivative on `O ∩ B` tested against the test function
+`φ χ` (`Rd.testFunctionMulOn`, `Rd.lineDerivOp_testFunctionMulOn_apply`). -/
+theorem HasWeakLineDeriv.mul_of_tsupport_subset {w : V} {f g : V → ℂ}
+    (h : HasWeakLineDeriv (O ⊓ B) (fun _ : Fin 1 => w) f g) {χ : V → ℝ}
+    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (hχB : tsupport χ ⊆ B) :
+    HasWeakLineDeriv O (fun _ : Fin 1 => w) (fun x => (χ x : ℂ) * f x)
       (fun x => (χ x : ℂ) * g x + (fderiv ℝ χ x w : ℂ) * f x) := by
   have hχ' : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) fun x => fderiv ℝ χ x w :=
     (hχ.fderiv_right (by simp)).clm_apply contDiff_const
+  have hχ'B : tsupport (fun x => fderiv ℝ χ x w) ⊆ B := (tsupport_fderiv_apply_subset ℝ w).trans hχB
   have hc : Continuous fun x => (χ x : ℂ) := Complex.continuous_ofReal.comp hχ.continuous
   have hc' : Continuous fun x => (fderiv ℝ χ x w : ℂ) :=
     Complex.continuous_ofReal.comp hχ'.continuous
-  have hlo : IsLocallyClosed (Ω : Set V) := Ω.isOpen.isLocallyClosed
-  refine (hasWeakLineDeriv_iff_integral (h.1.continuousOn_mul hc.continuousOn hlo)
-    ((h.2.continuousOn_mul hc.continuousOn hlo).add
-      (h.1.continuousOn_mul hc'.continuousOn hlo))).2 fun φ => ?_
-  have h1 := h.integral_eq (testFunctionMul φ hχ)
-  have i1 := (testFunctionMul φ hχ).integrable_smul h.2
-  have i2 := (testFunctionMul φ hχ').integrable_smul h.1
-  have i3 := (testFunctionMul (∂_{w} φ) hχ).integrable_smul h.1
+  have hcB : tsupport (fun x => (χ x : ℂ)) ⊆ B :=
+    (tsupport_comp_subset Complex.ofReal_zero χ).trans hχB
+  have hcB' : tsupport (fun x => (fderiv ℝ χ x w : ℂ)) ⊆ B :=
+    (tsupport_comp_subset Complex.ofReal_zero _).trans hχ'B
+  refine (hasWeakLineDeriv_iff_integral (locallyIntegrableOn_mul_of_tsupport_subset h.1 hc hcB)
+    ((locallyIntegrableOn_mul_of_tsupport_subset h.2 hc hcB).add
+      (locallyIntegrableOn_mul_of_tsupport_subset h.1 hc' hcB'))).2 fun φ => ?_
+  have h1 := h.integral_eq (testFunctionMulOn φ hχ hχB)
+  have i1 := (testFunctionMulOn φ hχ hχB).integrable_smul h.2
+  have i2 := (testFunctionMulOn φ hχ' hχ'B).integrable_smul h.1
+  have i3 := (testFunctionMulOn (∂_{w} φ) hχ hχB).integrable_smul h.1
   rw [LineDeriv.iteratedLineDerivOp_one] at h1 ⊢
   have e1 : (fun x => φ x • ((χ x : ℂ) * g x + (fderiv ℝ χ x w : ℂ) * f x)) =
-      fun x => testFunctionMul φ hχ x • g x + testFunctionMul φ hχ' x • f x := funext fun x => by
-    simp only [testFunctionMul_apply, Complex.real_smul, Complex.ofReal_mul]
-    ring
-  have e2 : (fun x => (∂_{w} (testFunctionMul φ hχ)) x • f x) =
-      fun x => testFunctionMul (∂_{w} φ) hχ x • f x + testFunctionMul φ hχ' x • f x :=
+      fun x => testFunctionMulOn φ hχ hχB x • g x + testFunctionMulOn φ hχ' hχ'B x • f x :=
     funext fun x => by
-      simp only [lineDerivOp_testFunctionMul_apply, testFunctionMul_apply, Complex.real_smul,
+      simp only [testFunctionMulOn_apply, Complex.real_smul, Complex.ofReal_mul]
+      ring
+  have e2 : (fun x => (∂_{w} (testFunctionMulOn φ hχ hχB)) x • f x) =
+      fun x => testFunctionMulOn (∂_{w} φ) hχ hχB x • f x + testFunctionMulOn φ hχ' hχ'B x • f x :=
+    funext fun x => by
+      simp only [lineDerivOp_testFunctionMulOn_apply, testFunctionMulOn_apply, Complex.real_smul,
         Complex.ofReal_mul, Complex.ofReal_add]
       ring
   have e3 : (fun x => (∂_{w} φ) x • ((χ x : ℂ) * f x)) =
-      fun x => testFunctionMul (∂_{w} φ) hχ x • f x := funext fun x => by
-    simp only [testFunctionMul_apply, Complex.real_smul, Complex.ofReal_mul]
+      fun x => testFunctionMulOn (∂_{w} φ) hχ hχB x • f x := funext fun x => by
+    simp only [testFunctionMulOn_apply, Complex.real_smul, Complex.ofReal_mul]
     ring
   simp only [Pi.add_apply]
   rw [e1, integral_add i1 i2, h1, e2, integral_add i3 i2, e3]
   simp only [pow_one, neg_one_smul]
   abel
+
+end Cutoff
+
+/-- **The product rule for weak derivatives**: if `g = ∂_w f` weakly on `Ω` and `χ` is a smooth
+real function, then `χ g + (∂_w χ) f = ∂_w (χ f)` weakly on `Ω`: the product rule with a cutoff
+(`Rd.HasWeakLineDeriv.mul_of_tsupport_subset`) for `B = V`. -/
+theorem HasWeakLineDeriv.mul_contDiff {w : V} (h : HasWeakLineDeriv Ω (fun _ : Fin 1 => w) f g)
+    {χ : V → ℝ} (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) :
+    HasWeakLineDeriv Ω (fun _ : Fin 1 => w) (fun x => (χ x : ℂ) * f x)
+      (fun x => (χ x : ℂ) * g x + (fderiv ℝ χ x w : ℂ) * f x) := by
+  have h' : HasWeakLineDeriv (Ω ⊓ ⊤) (fun _ : Fin 1 => w) f g := by rwa [inf_top_eq]
+  exact h'.mul_of_tsupport_subset hχ (by simp)
 
 /-! ### Sobolev spaces on open sets -/
 

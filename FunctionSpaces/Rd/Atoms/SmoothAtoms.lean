@@ -124,14 +124,11 @@ theorem contDiff_dilate {Φ : V → ℂ} {n : WithTop ℕ∞} (hΦ : ContDiff �
     ContDiff ℝ n (dilate c Φ) :=
   contDiff_const.mul (hΦ.comp (contDiff_const_smul c))
 
-/-- `2^(jn)` as an extended real is the dyadic weight `2^(jn)`. -/
+/-- `2^(jn)` as an extended real is the dyadic weight `2^(jn)`, since `2^(jn) = (2^j)^n`
+(`ENNReal.ofReal_two_pow_pow`). -/
 theorem ofReal_two_pow_mul (j n : ℕ) :
     ENNReal.ofReal (2 ^ (j * n)) = dyadicWeight n j := by
-  rw [ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat, ENNReal.dyadicWeight,
-    ← ENNReal.rpow_natCast]
-  congr 1
-  push_cast
-  ring
+  rw [pow_mul, ENNReal.ofReal_two_pow_pow]
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Derivatives of a dilation**: `‖D^l (Φ_c)(x)‖ ≤ c^(n+l) ‖D^l Φ(c x)‖` for `c ≥ 0`, since

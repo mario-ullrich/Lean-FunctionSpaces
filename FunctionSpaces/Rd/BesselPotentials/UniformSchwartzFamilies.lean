@@ -167,24 +167,6 @@ theorem hasTemperateGrowth_besselSymbol {ε : ℝ} (hε : 0 < ε) (σ : ℝ) :
   funext ζ
   exact besselSymbol_eq_mul hε σ ζ
 
-/-- **Bounded derivatives on a compact set**: if `f` is smooth on a set `s` of unique
-differentiability and `K ⊆ s` is compact, then the derivatives of `f` within `s` of the orders
-`i ≤ r` are bounded on `K` by one constant (their norms are continuous on `K`). -/
-theorem _root_.ContDiffOn.exists_norm_iteratedFDerivWithin_le {E F : Type*}
-    [NormedAddCommGroup E] [NormedSpace ℝ E] [NormedAddCommGroup F] [NormedSpace ℝ F]
-    {f : E → F} {s K : Set E} (hf : ContDiffOn ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) f s)
-    (hs : UniqueDiffOn ℝ s) (hK : IsCompact K) (hKs : K ⊆ s) (r : ℕ) :
-    ∃ C : ℝ, ∀ i ≤ r, ∀ x ∈ K, ‖iteratedFDerivWithin ℝ i f s x‖ ≤ C := by
-  have hcont : ContinuousOn
-      (fun x => ∑ i ∈ Finset.range (r + 1), ‖iteratedFDerivWithin ℝ i f s x‖) K :=
-    continuousOn_finsetSum _ fun i _ =>
-      ((hf.continuousOn_iteratedFDerivWithin (WithTop.coe_le_coe.2 le_top) hs).mono hKs).norm
-  obtain ⟨C, hC⟩ := hK.exists_bound_of_continuousOn hcont
-  refine ⟨C, fun i hi x hx => ?_⟩
-  refine le_trans ?_ ((Real.le_norm_self _).trans (hC x hx))
-  exact Finset.single_le_sum (f := fun i => ‖iteratedFDerivWithin ℝ i f s x‖)
-    (fun _ _ => norm_nonneg _) (Finset.mem_range.2 (Nat.lt_succ_of_le hi))
-
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- The derivatives of `ζ ↦ ε + ‖ζ‖²` of the orders `1 ≤ i ≤ r` are those of `ζ ↦ ‖ζ‖²`, so on
 the ball of radius `b` they are at most `D^i` for one `D`, uniformly in `ε`. -/

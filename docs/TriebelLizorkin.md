@@ -174,7 +174,7 @@ and of `L_p` and one of them, are Besov spaces.
   family `u_j ‖(u_i)_i‖_{ℓ_2}^{p-2}` (`MeasureTheory.normingFamily`).
 * **The square function theorem.** Let `n = dim V ≥ 1` and `1 < p < ∞`. By definition,
   `‖f‖_{F^0_{p,2}}` is the `L_p` norm of the square function `x ↦ ‖((ψ_j ⋆ f)(x))_j‖_{ℓ_2}` of
-  the Littlewood–Paley blocks (`Rd.triebelLizorkinNorm_zero_two_eq`). The theorem is the
+  the Littlewood–Paley blocks (`Rd.triebelLizorkinNorm_zero_left`). The theorem is the
   two-sided bound: for every `f ∈ L_p(V)`,
   `‖f‖_{F^0_{p,2}} ≤ Q_{V,p} ‖f‖_p` (`Rd.triebelLizorkinNorm_zero_two_le`) and
   `‖f‖_p ≤ Q̃_{V,p} ‖f‖_{F^0_{p,2}}` (`Rd.enorm_le_triebelLizorkinNorm_zero_two`) with the
@@ -209,7 +209,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| Triebel–Lizorkin spaces on `ℝ^d`: definition, `F_{p,p} = B_{p,p}`, the Besov sandwich | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkin` |
+| Triebel–Lizorkin spaces on `ℝ^d`: definition, `F_{p,p} = B_{p,p}`, the Besov sandwich, weighted blocks with terms set to zero and their tails | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkin` |
 | Local means characterisation of Triebel–Lizorkin spaces, and synthesis with the dual kernels in `F^s_{p,q}` | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinLocalMeans` |
 | Characterisation by ball means of differences | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinDifferences` |
 | `f^s_{p,q}`, atomic analysis, synthesis, characterisation | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinAtoms` |
@@ -224,7 +224,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The Cauchy–Schwarz inequality for finite sums, the `L_2` bounds of the analysis operator and of the synthesis operators on finite index sets for a kernel family with Fourier overlap `B`, and for every Calderón–Zygmund family | ✅ | ✗ | `Rd/SingularIntegrals/PlancherelBounds` |
 | The Hörmander condition around a cube, convolutions of pieces with mean zero, and the weak type `(1,1)` of the analysis and synthesis operators of a Calderón–Zygmund family with an explicit constant | ✅ | ✗ | `Rd/SingularIntegrals/VectorValuedWeakType` |
 | The strong type `(p,p)`, `1 < p < ∞`, of the analysis and synthesis operators of a Calderón–Zygmund family with explicit constants: Plancherel for `p = 2`, Marcinkiewicz interpolation for `p < 2`, duality with the adjoint family for `p > 2` | ✅ | ✗ | `Rd/SingularIntegrals/VectorValuedSingularIntegrals` |
-| The square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, the two-sided bound with named constants, and the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p` | ✅ | ✗ | `Rd/TriebelLizorkin/SquareFunction` |
+| The square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, the two-sided bound with named constants, the reproducing formula `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p`, and `B^s_{p,min(p,2)} ⊆ F^s_{p,2}` for `s ≥ 0` | ✅ | ✗ | `Rd/TriebelLizorkin/SquareFunction` |
 | Strong type of vector-valued singular integrals on the torus | ✅ | ✗ | `Torus/SingularIntegrals` |
 | The square function theorem `L_p(𝕋^d) = F^0_{p,2}(𝕋^d)` | ✅ | ✗ | `Torus/SquareFunction` |
 

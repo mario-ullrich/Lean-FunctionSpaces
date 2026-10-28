@@ -909,6 +909,50 @@ finite, $G_N^p \to 0$ by the first part. Dominated convergence gives $\int G_N^p
 $\|G_N\|_p = (\int G_N^p)^{1/p}$ (\Cref{lem:lp-norm-nonnegative}).
 \end{proof}
 
+\begin{lemma}[Restricted families, Cauchy sequences, finite sums and the first term]
+\label{lem:mixed-norm-tools}
+\lean{MeasureTheory.eLpNorm_lqNorm_ite_mono, MeasureTheory.cauchySeq_of_edist_le_lqNorm_ite,
+  MeasureTheory.eLpNorm_le_const_mul_sum_of_ae_le,
+  MeasureTheory.eLpNorm_lqNorm_dyadicWeight_le_zero_add_succ,
+  ENNReal.lqNorm_dyadicWeight_succ_le_sum}
+\leanok
+\uses{lem:mixed-norm-tails, lem:lq-basic, lem:lp-norm-nonnegative, lem:countable-minkowski}
+Let $(X, \mu)$ be a measure space and $g_j, b_j \colon X \to [0, \infty]$, $j \in \N$, measurable.
+\begin{enumerate}
+  \item For all sets $P \subseteq Q \subseteq \N$ and all $p, q$,
+    $\bigl\| x \mapsto \|(\mathbf 1_P(j) g_j(x))_j\|_{\ell_q} \bigr\|_p
+    \leq \bigl\| x \mapsto \|(\mathbf 1_Q(j) g_j(x))_j\|_{\ell_q} \bigr\|_p$.
+  \item Let $0 < p, q < \infty$, $\bigl\| x \mapsto \|(g_j(x))_j\|_{\ell_q} \bigr\|_p < \infty$
+    and $C < \infty$. Every sequence $(S_N)$ in a space with an extended pseudometric $d$ with
+    $d(S_{N'}, S_N) \leq C \, \bigl\| x \mapsto \|(g_j(x))_{j \geq N}\|_{\ell_q} \bigr\|_p$ for
+    all $N \leq N'$ is a Cauchy sequence, where the $\ell_q$ norm is taken of the sequence with
+    the terms $j < N$ replaced by $0$.
+  \item For $1 \leq p$, finitely many measurable $F_i \colon X \to [0, \infty]$, a measurable
+    $B$ and $c \in [0, \infty]$ with $B \leq c \sum_i F_i$ almost everywhere,
+    $\|B\|_p \leq c \sum_i \|F_i\|_p$.
+  \item For $1 \leq p$, $1 \leq q \leq \infty$ and $s \in \R$,
+    \[
+      \bigl\| x \mapsto \|(2^{js} b_j(x))_j\|_{\ell_q} \bigr\|_p \leq \|b_0\|_p
+      + \bigl\| x \mapsto \|(2^{(n+1)s} b_{n+1}(x))_n\|_{\ell_q} \bigr\|_p .
+    \]
+  \item For $m \in \N$, $1 \leq q \leq \infty$, a sequence $b$ in $[0, \infty]$ and finitely
+    many sequences $c_i$ in $[0, \infty]$ with $2^{nm} b_n \leq \sum_i c_{i,n}$ for every $n$,
+    $\|(2^{(n+1)m} b_n)_n\|_{\ell_q} \leq 2^m \sum_i \|c_i\|_{\ell_q}$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) holds pointwise (\Cref{lem:lq-basic}). (2) For $n, m \geq N$ the triangle inequality
+through $S_N$ bounds $d(S_n, S_m)$ by $2 C$ times the tail from $N$, and the tails tend to zero
+(\Cref{lem:mixed-norm-tails}). (3) is the
+monotonicity and homogeneity of the $L_p$ norm and Minkowski's inequality
+(\Cref{lem:lp-norm-nonnegative}). (4) splits off the first term of the $\ell_q$ norm
+(\Cref{lem:lq-basic}) and uses the triangle inequality in $L_p$. (5) follows from
+$2^{(n+1)m} = 2^m 2^{nm}$, the homogeneity of the $\ell_q$ norm and Minkowski's inequality for
+finite sums (\Cref{lem:countable-minkowski}).
+\end{proof}
+
 \section{Dyadic cubes and the Lebesgue differentiation theorem}
 
 The Calder\'on--Zygmund decomposition stops at dyadic cubes of every size, so the cells of
