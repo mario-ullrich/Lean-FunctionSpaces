@@ -133,14 +133,6 @@ coefficients are integrals. -/
 def MemSobolev {p : ℝ≥0∞} (m : ℕ) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) : Prop :=
   ∀ α : d → ℕ, ∑ i, α i ≤ m → ∃ g, HasWeakDeriv α f g
 
-/-- **The weak derivative in `L_2` is unique**, since a function in `L_2` is determined by its
-Fourier coefficients. -/
-theorem HasWeakDeriv.unique {α : d → ℕ} {f g g' : Lp ℂ 2 (volume : Measure (UnitAddTorus d))}
-    (hg : HasWeakDeriv α f g) (hg' : HasWeakDeriv α f g') : g = g' := by
-  refine mFourierBasis.repr.injective (lp.ext (funext fun k => ?_))
-  change mFourierBasis.repr g k = mFourierBasis.repr g' k
-  rw [mFourierBasis_repr, mFourierBasis_repr, hg k, hg' k]
-
 /-- `f ∈ L_p(𝕋^d)` is its own derivative of order `0`. -/
 theorem hasWeakDeriv_zero {p : ℝ≥0∞} (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     HasWeakDeriv 0 f f := fun k => by rw [derivSymbol_zero, one_mul]

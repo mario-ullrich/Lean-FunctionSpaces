@@ -33,7 +33,10 @@ quotient map `π` (`Torus.proj`). This file compares integrals of lifts with int
   radius `r ≤ 1` around points of `P_0` lie in the box `(-1, 2]^d` of side `3`
   (`Torus.ball_subset_tripleBox`), `‖y‖ ≥ 1` whenever `x ∈ P_0` and `x - y ∉ (-1, 2]^d`
   (`Torus.one_le_norm_of_sub_notMem_tripleBox`), and `∫_{(-1,2]^d} g(π y) dy = 3^d ∫_{𝕋^d} g`
-  (`Torus.setLIntegral_tripleBox`).
+  (`Torus.setLIntegral_tripleBox`); hence
+  `‖1_{(-1,2]^d} (F ∘ π)‖_{L_p(ℝ^d)} = 3^{d/p} ‖F‖_{L_p(𝕋^d)}`
+  (`Torus.eLpNorm_indicator_tripleBox_comp_proj`, `Torus.eLpNorm_indicator_tripleBox`,
+  `Torus.memLp_indicator_tripleBox_comp_proj`).
 -/
 
 @[expose] public section
@@ -329,5 +332,41 @@ theorem setLIntegral_tripleBox (g : UnitAddTorus d → ℝ≥0∞) :
   simp only [lintegral_periodBox, Finset.sum_const, nsmul_eq_mul, Fintype.card_piFinset,
     Int.card_Icc, Finset.prod_const, Finset.card_univ]
   norm_num
+
+/-! ### `L_p` norms on the box `(-1, 2]^d` -/
+
+/-- `L_p` norms on the box `(-1, 2]^d`:
+`‖1_{(-1,2]^d} (F ∘ π)‖_{L_p(ℝ^d)} = 3^{d/p} ‖F‖_{L_p(𝕋^d)}` for `0 < p < ∞` and every almost
+everywhere strongly measurable `F` on `𝕋^d` with values in a space with an extended norm, such as
+`ℂ` or `[0, ∞]` (`Torus.setLIntegral_tripleBox` for `|F|^p`). -/
+theorem eLpNorm_indicator_tripleBox_comp_proj {ε : Type*} [TopologicalSpace ε]
+    [ESeminormedAddMonoid ε] {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {F : UnitAddTorus d → ε}
+    (hF : AEStronglyMeasurable F volume) :
+    eLpNorm (tripleBox.indicator (F ∘ proj)) p volume =
+      3 ^ ((Fintype.card d : ℝ) / p.toReal) * eLpNorm F p volume := by
+  rw [eLpNorm_indicator_eq_eLpNorm_restrict measurableSet_tripleBox,
+    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp
+      (hF.comp_quasiMeasurePreserving quasiMeasurePreserving_proj).restrict,
+    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hF, Function.comp_def,
+    setLIntegral_tripleBox (fun t => ‖F t‖ₑ ^ p.toReal),
+    ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_natCast, ← ENNReal.rpow_mul,
+    mul_one_div]
+
+/-- `L_p` norms on the box `(-1, 2]^d` for functions with values in `[0, ∞]`:
+`‖1_{(-1,2]^d} (G ∘ π)‖_{L_p(ℝ^d)} = 3^{d/p} ‖G‖_{L_p(𝕋^d)}` for `0 < p < ∞` and almost everywhere
+measurable `G : 𝕋^d → [0, ∞]` (`Torus.eLpNorm_indicator_tripleBox_comp_proj`). -/
+theorem eLpNorm_indicator_tripleBox {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
+    {G : UnitAddTorus d → ℝ≥0∞} (hG : AEMeasurable G volume) :
+    eLpNorm (tripleBox.indicator fun y => G (proj y)) p volume =
+      3 ^ ((Fintype.card d : ℝ) / p.toReal) * eLpNorm G p volume :=
+  eLpNorm_indicator_tripleBox_comp_proj hp0 hp hG.aestronglyMeasurable
+
+/-- The part `1_{(-1,2]^d} (f ∘ π)` of the lift of `f ∈ L_p(𝕋^d)`, `0 < p < ∞`, lies in
+`L_p(ℝ^d)`. -/
+theorem memLp_indicator_tripleBox_comp_proj {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
+    {f : UnitAddTorus d → ℂ} (hf : MemLp f p volume) :
+    MemLp (tripleBox.indicator (f ∘ proj)) p volume := by
+  rw [memLp_iff, eLpNorm_indicator_tripleBox_comp_proj hp0 hp hf.aestronglyMeasurable]
+  exact ENNReal.mul_lt_top (ENNReal.rpow_lt_top_of_nonneg (by positivity) (by norm_num)) hf
 
 end Torus

@@ -115,15 +115,10 @@ theorem sum_econv_psiDual_lpBlock_ae (hp : p ≠ ∞) (s : Finset ℕ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     (fun t => ∑ j ∈ s, econv (Rd.psiDual j) (lpBlock hp j f) t) =ᵐ[volume]
       ⇑(∑ j ∈ s, lpBlock hp j f) := by
-  have h : ∀ᵐ t ∂volume, ∀ j,
-      econv (Rd.psiDual j) (lpBlock hp j f) t = lpBlock hp j f t := ae_all_iff.2 fun j => by
-    have h1 := econvLp_apply_ae hp (Rd.integrable_psiDual (V := EuclideanSpace ℝ d) j)
-      (lpBlock hp j f)
-    rw [econvLp_psiDual_lpBlock] at h1
-    exact h1.symm
-  filter_upwards [h, Lp.coeFn_fun_finsetSum s fun j => lpBlock hp j f] with t ht hs
-  rw [hs]
-  exact Finset.sum_congr rfl fun j _ => ht j
+  have h := coeFn_sum_econvLp_ae hp s (fun j => Rd.integrable_psiDual (V := EuclideanSpace ℝ d) j)
+    fun j => lpBlock hp j f
+  simp only [econvLp_psiDual_lpBlock] at h
+  exact h.symm
 
 /-! ### The lower bound and `L_p = F^0_{p,2}` -/
 

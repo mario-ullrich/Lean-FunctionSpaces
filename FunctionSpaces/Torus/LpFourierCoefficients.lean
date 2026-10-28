@@ -48,7 +48,7 @@ theorem mFourierCoeff_congr_ae {f g : UnitAddTorus d → ℂ} (h : f =ᵐ[volume
 
 /-- `|e_m(t)| ≤ 1` for every character and every point of the torus. -/
 theorem norm_mFourier_apply_le (m : d → ℤ) (t : UnitAddTorus d) : ‖mFourier m t‖ ≤ 1 :=
-  (ContinuousMap.norm_coe_le_norm _ t).trans mFourier_norm.le
+  (norm_trigMonomial_apply m t).le
 
 /-- **The coefficient is bounded by the `L_1` norm**: `|f̂(m)| ≤ ∫ |f| = ‖f‖_1`. -/
 theorem enorm_mFourierCoeff_le_eLpNorm_one (f : UnitAddTorus d → ℂ) (m : d → ℤ) :
@@ -100,9 +100,8 @@ theorem enorm_mFourierCoeff_le (f : Lp ℂ p (volume : Measure (UnitAddTorus d))
 
 /-- **The coefficient is bounded by the norm**, in real norms: `|f̂(m)| ≤ ‖f‖_p`. -/
 theorem norm_mFourierCoeff_le (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) (m : d → ℤ) :
-    ‖mFourierCoeff f m‖ ≤ ‖f‖ := by
-  rw [← toReal_enorm, ← toReal_enorm f]
-  exact ENNReal.toReal_mono enorm_ne_top (enorm_mFourierCoeff_le f m)
+    ‖mFourierCoeff f m‖ ≤ ‖f‖ :=
+  enorm_le_iff_norm_le.1 (enorm_mFourierCoeff_le f m)
 
 /-! ### The coefficient functional -/
 
@@ -215,19 +214,13 @@ theorem eq_sum_mFourierCoeff_of_mem_trigPolyLp {n : ℕ}
     a = ∑ m ∈ boxLt d n, mFourierCoeff a m • mFourierLp p m := by
   classical
   rw [trigPolyLp_eq_span] at ha
-  induction ha using Submodule.span_induction with
-  | mem x hx =>
-    obtain ⟨k, hk, rfl⟩ := hx
-    simp only [mFourierCoeff_mFourierLp, ite_smul, one_smul, zero_smul]
-    rw [Finset.sum_ite_eq]
-    simp only [Finset.mem_coe.1 hk, ↓reduceIte]
-  | zero => simp only [mFourierCoeff_zero, zero_smul, Finset.sum_const_zero]
-  | add x y _ _ hx hy =>
-    simp only [mFourierCoeff_add, add_smul, Finset.sum_add_distrib]
-    rw [← hx, ← hy]
-  | smul c x _ hx =>
-    simp only [mFourierCoeff_smul, mul_smul, ← Finset.smul_sum]
-    rw [← hx]
+  refine (LinearMap.eqOn_span (f := LinearMap.id)
+    (g := ∑ m ∈ boxLt d n, (coeffCLM p m).toLinearMap.smulRight (mFourierLp p m)) ?_ ha).trans
+    (by simp)
+  rintro _ ⟨k, hk, rfl⟩
+  simp only [LinearMap.id_apply, LinearMap.sum_apply, LinearMap.smulRight_apply,
+    ContinuousLinearMap.coe_coe, coeffCLM_apply, mFourierCoeff_mFourierLp, ite_smul, one_smul,
+    zero_smul, Finset.sum_ite_eq, Finset.mem_coe.1 hk, ↓reduceIte]
 
 /-- A trigonometric polynomial with vanishing Fourier coefficients is `0`. -/
 theorem eq_zero_of_mem_trigPolyLp {n : ℕ} {a : Lp ℂ p (volume : Measure (UnitAddTorus d))}

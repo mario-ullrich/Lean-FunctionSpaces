@@ -347,7 +347,7 @@ theorem memSobolev_iff_comp_proj {m : ℕ} {f : Lp ℂ p (volume : Measure (Unit
     MemSobolev m f ↔ ∀ k ≤ m, ∀ v : Fin k → EuclideanSpace ℝ d,
       ∃ g : Lp ℂ p (volume : Measure (UnitAddTorus d)),
         Rd.HasWeakLineDeriv ⊤ v (⇑f ∘ proj) (⇑g ∘ proj) := by
-  simp only [memSobolev_iff_forall_hasWeakLineDeriv, hasWeakLineDeriv_iff_comp_proj]
+  simp only [memSobolev_iff_exists_hasWeakLineDeriv, hasWeakLineDeriv_iff_comp_proj]
 
 /-! ### Classical derivatives -/
 

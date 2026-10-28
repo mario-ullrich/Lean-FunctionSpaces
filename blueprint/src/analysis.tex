@@ -953,6 +953,44 @@ $2^{(n+1)m} = 2^m 2^{nm}$, the homogeneity of the $\ell_q$ norm and Minkowski's 
 finite sums (\Cref{lem:countable-minkowski}).
 \end{proof}
 
+The quasi-norms of the Triebel--Lizorkin spaces on $\R^d$ and on the torus are mixed norms of
+the weighted families $(2^{js} |\psi_j * f|)_j$. Their elementary properties hold for all
+families with values in $[0, \infty]$; only (3) and (5) below involve the weights.
+
+\begin{lemma}[Mixed norms of dyadically weighted families]
+\label{lem:mixed-norm-dyadic-family}
+\lean{MeasureTheory.eLpNorm_lqNorm_le_add,
+  MeasureTheory.eLpNorm_lqNorm_eq_const_mul,
+  MeasureTheory.eLpNorm_lqNorm_dyadicWeight_zero_left,
+  MeasureTheory.eLpNorm_lqNorm_mono_exponent,
+  MeasureTheory.eLpNorm_lqNorm_dyadicWeight_mono_smoothness}
+\leanok
+\uses{lem:lq-basic, lem:lp-norm-nonnegative, lem:lp-norm-homogeneity}
+Let $(X, \mu)$ be a measure space, $p, q \in [0, \infty]$, $s \leq t$ in $\R$ and
+$u_j, v_j, w_j \colon X \to [0, \infty]$, $j \in \N$, with $u_j$ and $w_j$ measurable, and write
+$N_q(w) = \bigl\| x \mapsto \|(w_j(x))_j\|_{\ell_q} \bigr\|_p$ and
+$2^{\cdot s} u = (2^{js} u_j)_j$.
+\begin{enumerate}
+  \item If $1 \leq p$, $1 \leq q$ and, for almost every $x$, $w_j(x) \leq u_j(x) + v_j(x)$ for
+    all $j$, then $N_q(w) \leq N_q(u) + N_q(v)$.
+  \item For every $c \in [0, \infty]$ with $w_j(x) = c \, u_j(x)$ for all $j$ and almost every
+    $x$, $N_q(w) = c \, N_q(u)$.
+  \item $N_q(2^{\cdot 0} u) = N_q(u)$.
+  \item For all $1 \leq q \leq r \leq \infty$, $N_r(u) \leq N_q(u)$.
+  \item $N_q(2^{\cdot s} u) \leq N_q(2^{\cdot t} u)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) is the triangle inequality in $\ell_q$ at every point (\Cref{lem:lq-basic}) and then in
+$L_p$ (Minkowski's inequality; the pointwise $\ell_q$ norms are measurable by
+\Cref{lem:lp-norm-nonnegative}). (2) is the homogeneity of the $\ell_q$ and of the $L_p$ norm
+(\Cref{lem:lp-norm-homogeneity}). (3) holds since $2^{j \cdot 0} = 1$. (4) and (5) follow from
+$\|\cdot\|_{\ell_r} \leq \|\cdot\|_{\ell_q}$ and $2^{js} \leq 2^{jt}$ at every point and the
+monotonicity of the $L_p$ norm.
+\end{proof}
+
 \section{Dyadic cubes and the Lebesgue differentiation theorem}
 
 The Calder\'on--Zygmund decomposition stops at dyadic cubes of every size, so the cells of

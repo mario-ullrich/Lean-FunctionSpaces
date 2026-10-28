@@ -214,7 +214,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Characterisation by ball means of differences | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinDifferences` |
 | `f^s_{p,q}`, atomic analysis, synthesis, characterisation | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinAtoms` |
 | Triebel–Lizorkin spaces on the torus, the Besov sandwich | ✅ | ✗ | `Torus/TriebelLizorkin` |
-| The periodic lift: period boxes, lifted null sets, counting boxes | ✅ | ✗ | `Torus/PeriodicLift` |
+| The periodic lift: period boxes, lifted null sets, counting boxes, `L_p` norms on the box `(-1, 2]^d` | ✅ | ✗ | `Torus/PeriodicLift` |
 | The Fefferman–Stein inequality for periodic lifts | ✅ | ✗ | `Torus/FeffermanStein` |
 | Local means characterisation on the torus | ✅ | ✗ | `Torus/TriebelLizorkinLocalMeans` |
 | Triebel–Lizorkin spaces on `ℝ^d` interpolate to Besov spaces: `(F^{s₀}_{p,q₀}, F^{s₁}_{p,q₁})_{η,q}` and `(L_p, F^{s₁}_{p,q₁})_{η,q}` | ✅ | ✗ | `Rd/Interpolation/TriebelLizorkinInterpolation` |

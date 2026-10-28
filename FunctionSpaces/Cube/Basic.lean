@@ -26,7 +26,13 @@ out the coordinate `i`: `∫_Q G = ∫_Q (∫_0^1 G(x with t in place i) dt) dx`
 on the cube, also over the regions `{x ∈ Q : x_i ∈ S}`, are `L_p` norms over `x` of the
 `L_p[0, 1]` norms of the slices (`Cube.eLpNorm_rpow_region_eq_slice`), and functions equal
 almost everywhere on the cube have almost everywhere equal slices for almost every `x`
-(`Cube.ae_slice_ae_eq`).
+(`Cube.ae_slice_ae_eq`). The same holds over `R ∩ {x_i ∈ S}` for every measurable set `R` that
+does not depend on `x_i` (`Cube.lintegral_inter_eq_slice`): there
+`‖f‖_{L_p(R ∩ {x_i ∈ S})} = ‖x ↦ ‖slice f x i‖_{L_p(S ∩ [0, 1])}‖_{L_p(R)}`
+(`Cube.eLpNorm_inter_eq_slice`, on `Q` and on the regions `{x ∈ Q : x_i ∈ [a, b]}` with the
+restricted measures `Cube.regionVol`: `Cube.eLpNorm_cubeVol_eq_slice`,
+`Cube.eLpNorm_regionVol_eq_slice`), so bounds of the slices give bounds on the cube
+(`Cube.eLpNorm_inter_le_of_slice_le`, `Cube.eLpNorm_cubeVol_le_of_slice_le`).
 -/
 
 @[expose] public section
@@ -64,6 +70,11 @@ theorem measurable_slice {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (x : 
     (i : Fin d) : Measurable (slice f x i) :=
   hf.comp (measurable_update x)
 
+/-- The slices of a continuous function are continuous. -/
+theorem continuous_slice {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (x : Fin d → ℝ) (i : Fin d) :
+    Continuous (slice f x i) :=
+  hf.comp (continuous_const.update i continuous_id)
+
 /-- The slices of a measurable function are jointly measurable in the point and the variable. -/
 theorem measurable_slice_uncurry {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (i : Fin d) :
     Measurable (fun q : (Fin d → ℝ) × ℝ => slice f q.1 i q.2) :=
@@ -89,22 +100,39 @@ theorem lintegral_cubeVol_eq_slice {G : (Fin d → ℝ) → ℝ≥0∞} (hG : Me
   simp only [F, Function.update_idem]
   rw [lintegral_const, measure_univ, mul_one]
 
+/-- **Integrating out one coordinate under a constraint that does not depend on it**: if the
+measurable set `R` does not depend on the coordinate `i`, then
+`∫_{R ∩ {x_i ∈ S}} G = ∫_R (∫_{S ∩ [0,1]} G(x with t in place i) dt) dx`. -/
+theorem lintegral_inter_eq_slice {G : (Fin d → ℝ) → ℝ≥0∞} (hG : Measurable G) (i : Fin d)
+    {R : Set (Fin d → ℝ)} (hR : MeasurableSet R)
+    (hRi : ∀ x t, Function.update x i t ∈ R ↔ x ∈ R) {S : Set ℝ} (hS : MeasurableSet S) :
+    ∫⁻ x in R ∩ {x | x i ∈ S}, G x ∂cubeVol d =
+      ∫⁻ x in R, (∫⁻ t in S, G (Function.update x i t) ∂unitVol) ∂cubeVol d := by
+  have hRS : MeasurableSet (R ∩ {x : Fin d → ℝ | x i ∈ S}) :=
+    hR.inter (measurable_pi_apply i hS)
+  rw [← lintegral_indicator hRS, lintegral_cubeVol_eq_slice (hG.indicator hRS) i,
+    ← lintegral_indicator hR]
+  refine lintegral_congr fun x => ?_
+  by_cases hx : x ∈ R
+  · rw [indicator_of_mem hx, ← lintegral_indicator hS]
+    refine lintegral_congr fun t => ?_
+    by_cases ht : t ∈ S
+    · rw [indicator_of_mem ht, indicator_of_mem (show Function.update x i t ∈
+        R ∩ {x | x i ∈ S} from ⟨(hRi x t).2 hx, by simpa using ht⟩)]
+    · rw [indicator_of_notMem ht, indicator_of_notMem fun h => ht (by simpa using h.2)]
+  · rw [indicator_of_notMem hx]
+    have h0 : ∀ t, (R ∩ {x | x i ∈ S}).indicator G (Function.update x i t) = 0 := fun t =>
+      indicator_of_notMem (fun h => hx ((hRi x t).1 h.1)) _
+    simp only [h0, lintegral_zero]
+
 /-- **Integrating out one coordinate over a region** `{x ∈ Q : x_i ∈ S}`:
-`∫_{x_i ∈ S} G = ∫_Q (∫_S G(update x i t) dt) dx`. -/
+`∫_{x_i ∈ S} G = ∫_Q (∫_{S ∩ [0,1]} G(update x i t) dt) dx`, the case `R = ℝ^d` of
+`Cube.lintegral_inter_eq_slice`. -/
 theorem lintegral_region_eq_slice {G : (Fin d → ℝ) → ℝ≥0∞} (hG : Measurable G) (i : Fin d)
     {S : Set ℝ} (hS : MeasurableSet S) :
     ∫⁻ x in {x | x i ∈ S}, G x ∂cubeVol d =
       ∫⁻ x, (∫⁻ t in S, G (Function.update x i t) ∂unitVol) ∂cubeVol d := by
-  have hR : MeasurableSet {x : Fin d → ℝ | x i ∈ S} := measurable_pi_apply i hS
-  rw [← lintegral_indicator hR, lintegral_cubeVol_eq_slice (hG.indicator hR) i]
-  refine lintegral_congr fun x => ?_
-  rw [← lintegral_indicator hS]
-  refine lintegral_congr fun t => ?_
-  by_cases ht : t ∈ S
-  · rw [indicator_of_mem ht, indicator_of_mem (show Function.update x i t ∈ {x | x i ∈ S} by
-      simpa using ht)]
-  · rw [indicator_of_notMem ht, indicator_of_notMem (show Function.update x i t ∉ {x | x i ∈ S} by
-      simpa using ht)]
+  simpa using lintegral_inter_eq_slice hG i MeasurableSet.univ (fun _ _ => Iff.rfl) hS
 
 /-- **`L_p` norms over a region through slices**: for measurable `f`, `0 < p < ∞`,
 `‖f‖_{L_p({x_i ∈ S})}^p = ∫_Q ‖slice f x i‖_{L_p(S)}^p dx`. -/
@@ -139,9 +167,86 @@ theorem measurable_eLpNorm_slice {f : (Fin d → ℝ) → ℂ} (hf : Measurable 
   rw [heq]
   exact h.pow_const _
 
-/-- **Minkowski's inequality in the form of bounds**: for `q ≥ 1`, `∫ φ^q ≤ a^q` and
-`∫ ψ^q ≤ b^q` give `∫ (φ + ψ)^q ≤ (a + b)^q` (Mathlib's `ENNReal.lintegral_Lp_add_le`). It
-combines bounds of norms of slices, which are functions of the point with values in `ℝ≥0∞`. -/
+/-- **`L_p` norms as mixed norms of slices**: let the measurable set `R` not depend on the
+coordinate `i`. For measurable `f` and `0 < p < ∞`,
+`‖f‖_{L_p(R ∩ {x_i ∈ S})} = ‖x ↦ ‖slice f x i‖_{L_p(S ∩ [0, 1])}‖_{L_p(R)}`, by integrating out the
+coordinate `i` in `|f|^p` (`Cube.lintegral_inter_eq_slice`). -/
+theorem eLpNorm_inter_eq_slice {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞}
+    (hp0 : p ≠ 0) (hp : p ≠ ∞) (i : Fin d) {R : Set (Fin d → ℝ)} (hR : MeasurableSet R)
+    (hRi : ∀ x t, Function.update x i t ∈ R ↔ x ∈ R) {S : Set ℝ} (hS : MeasurableSet S) :
+    eLpNorm f p ((cubeVol d).restrict (R ∩ {x | x i ∈ S})) =
+      eLpNorm (fun x => eLpNorm (slice f x i) p (unitVol.restrict S)) p
+        ((cubeVol d).restrict R) := by
+  refine (ENNReal.rpow_left_injective (ENNReal.toReal_pos hp0 hp).ne').eq_iff.1 ?_
+  simp only [eLpNorm_rpow_eq hf.aestronglyMeasurable hp0 hp, eLpNorm_rpow_eq
+    (measurable_eLpNorm_slice hf hp0 hp i _).aestronglyMeasurable hp0 hp, enorm_eq_self]
+  rw [lintegral_inter_eq_slice (hf.enorm.pow_const _) i hR hRi hS]
+  refine setLIntegral_congr_fun hR fun x _ => ?_
+  rw [eLpNorm_rpow_eq (measurable_slice hf x i).aestronglyMeasurable hp0 hp]
+  rfl
+
+/-- **Bounds through slices**: let the measurable set `R` not depend on the coordinate `i`. For
+measurable `F, G`, `0 < p < ∞`, measurable `S, S' ⊆ ℝ` and `C ∈ [0, ∞]`, if
+`‖slice F x i‖_{L_p(S ∩ [0, 1])} ≤ C ‖slice G x i‖_{L_p(S' ∩ [0, 1])}` for every point `x`, then
+`‖F‖_{L_p(R ∩ {x_i ∈ S})} ≤ C ‖G‖_{L_p(R ∩ {x_i ∈ S'})}` (`Cube.eLpNorm_inter_eq_slice`). -/
+theorem eLpNorm_inter_le_of_slice_le {F G : (Fin d → ℝ) → ℂ} (hF : Measurable F)
+    (hG : Measurable G) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) (i : Fin d)
+    {R : Set (Fin d → ℝ)} (hR : MeasurableSet R) (hRi : ∀ x t, Function.update x i t ∈ R ↔ x ∈ R)
+    {S S' : Set ℝ} (hS : MeasurableSet S) (hS' : MeasurableSet S') {C : ℝ≥0∞}
+    (h : ∀ x, eLpNorm (slice F x i) p (unitVol.restrict S) ≤
+      C * eLpNorm (slice G x i) p (unitVol.restrict S')) :
+    eLpNorm F p ((cubeVol d).restrict (R ∩ {x | x i ∈ S})) ≤
+      C * eLpNorm G p ((cubeVol d).restrict (R ∩ {x | x i ∈ S'})) := by
+  rw [eLpNorm_inter_eq_slice hF hp0 hp i hR hRi hS, eLpNorm_inter_eq_slice hG hp0 hp i hR hRi hS',
+    ← eLpNorm_const_mul_ennreal C (measurable_eLpNorm_slice hG hp0 hp i _).aemeasurable]
+  exact eLpNorm_mono_enorm (measurable_eLpNorm_slice hF hp0 hp i _).aestronglyMeasurable
+    fun x => by simpa only [enorm_eq_self] using h x
+
+/-- **Bounds through slices on the whole cube**: for measurable `F, G`, `0 < p < ∞` and
+`C ∈ [0, ∞]`, if `‖slice F x i‖_{L_p[0,1]} ≤ C ‖slice G x i‖_{L_p[0,1]}` for every point `x`,
+then `‖F‖_{L_p(Q)} ≤ C ‖G‖_{L_p(Q)}`. -/
+theorem eLpNorm_cubeVol_le_of_slice_le {F G : (Fin d → ℝ) → ℂ} (hF : Measurable F)
+    (hG : Measurable G) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) (i : Fin d) {C : ℝ≥0∞}
+    (h : ∀ x, eLpNorm (slice F x i) p unitVol ≤ C * eLpNorm (slice G x i) p unitVol) :
+    eLpNorm F p (cubeVol d) ≤ C * eLpNorm G p (cubeVol d) := by
+  simpa using eLpNorm_inter_le_of_slice_le hF hG hp0 hp i MeasurableSet.univ
+    (fun _ _ => Iff.rfl) MeasurableSet.univ MeasurableSet.univ (C := C) fun x => by simpa using h x
+
+/-- The cube measure restricted to the region `{x ∈ Q : x_i ∈ [a, b]}`. -/
+noncomputable abbrev regionVol (d : ℕ) (i : Fin d) (a b : ℝ) : Measure (Fin d → ℝ) :=
+  (cubeVol d).restrict {x | x i ∈ Icc a b}
+
+/-- **`L_p` norms over a region through slices**, with Lebesgue measure on the slices:
+`‖f‖_{L_p({x_i ∈ [a, b]})}^p = ∫_Q ‖slice f x i‖_{L_p[a, b]}^p dx` for `[a, b] ⊆ [0, 1]`. -/
+theorem eLpNorm_rpow_regionVol_eq_slice {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞}
+    (hp0 : p ≠ 0) (hp : p ≠ ∞) (i : Fin d) {a b : ℝ} (ha : 0 ≤ a) (hb : b ≤ 1) :
+    eLpNorm f p (regionVol d i a b) ^ p.toReal =
+      ∫⁻ x, eLpNorm (slice f x i) p (volume.restrict (Icc a b)) ^ p.toReal ∂cubeVol d := by
+  rw [regionVol, eLpNorm_rpow_region_eq_slice hf hp0 hp i measurableSet_Icc,
+    unitVol_restrict_Icc_of_subset ha hb]
+
+/-- **`L_p` norms on the cube as mixed norms of slices**: for measurable `f` and `0 < p < ∞`,
+`‖f‖_{L_p(Q)} = ‖x ↦ ‖slice f x i‖_{L_p[0, 1]}‖_{L_p(Q)}` (`Cube.eLpNorm_inter_eq_slice`). -/
+theorem eLpNorm_cubeVol_eq_slice {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞}
+    (hp0 : p ≠ 0) (hp : p ≠ ∞) (i : Fin d) :
+    eLpNorm f p (cubeVol d) = eLpNorm (fun x => eLpNorm (slice f x i) p unitVol) p (cubeVol d) := by
+  simpa using eLpNorm_inter_eq_slice hf hp0 hp i MeasurableSet.univ (fun _ _ => Iff.rfl)
+    MeasurableSet.univ
+
+/-- **`L_p` norms over a region as mixed norms of slices**: for measurable `f`, `0 < p < ∞` and
+`[a, b] ⊆ [0, 1]`, `‖f‖_{L_p({x_i ∈ [a, b]})} = ‖x ↦ ‖slice f x i‖_{L_p[a, b]}‖_{L_p(Q)}`
+(`Cube.eLpNorm_inter_eq_slice`). -/
+theorem eLpNorm_regionVol_eq_slice {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞}
+    (hp0 : p ≠ 0) (hp : p ≠ ∞) (i : Fin d) {a b : ℝ} (ha : 0 ≤ a) (hb : b ≤ 1) :
+    eLpNorm f p (regionVol d i a b) =
+      eLpNorm (fun x => eLpNorm (slice f x i) p (volume.restrict (Icc a b))) p (cubeVol d) := by
+  have h := eLpNorm_inter_eq_slice hf hp0 hp i MeasurableSet.univ (fun _ _ => Iff.rfl)
+    (measurableSet_Icc (a := a) (b := b))
+  rwa [univ_inter, Measure.restrict_univ, unitVol_restrict_Icc_of_subset ha hb] at h
+
+/-- **Minkowski's inequality in the form of bounds**: for `q ≥ 1` and measurable
+`φ, ψ : α → [0, ∞]`, `∫ φ^q ≤ a^q` and `∫ ψ^q ≤ b^q` give `∫ (φ + ψ)^q ≤ (a + b)^q`
+(Mathlib's `ENNReal.lintegral_Lp_add_le`). -/
 theorem lintegral_add_rpow_le {α : Type*} [MeasurableSpace α] {μ : Measure α} {q : ℝ}
     (hq : 1 ≤ q) {φ ψ : α → ℝ≥0∞} (hφ : AEMeasurable φ μ) (hψ : AEMeasurable ψ μ)
     {a b : ℝ≥0∞} (ha : ∫⁻ x, φ x ^ q ∂μ ≤ a ^ q) (hb : ∫⁻ x, ψ x ^ q ∂μ ≤ b ^ q) :

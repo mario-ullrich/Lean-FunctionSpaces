@@ -23,7 +23,9 @@ the convolution of `f` with the periodisation `∑_{m ∈ ℤ^d} Φ(· + m)` of 
 * **Young's inequality** `‖Φ ⋆ f‖_{L_p(𝕋)} ≤ ‖Φ‖_{L_1(ℝ^d)} ‖f‖_p` (`Torus.eLpNorm_econv_le`),
   from the weighted averages of `MeasureTheory.eLpNorm_integral_kernel_le_of_bound` and the
   invariance of the Haar measure of the torus; so `Φ ⋆ ·` is a bounded operator on `L_p(𝕋)`
-  (`Torus.econvLp`).
+  (`Torus.econvLp`). The convolution is linear (`Torus.econv_add_ae`, `Torus.econv_smul`), and a
+  finite sum of convolutions in `L_p` is represented by the pointwise sum
+  (`Torus.coeFn_sum_econvLp_ae`).
 * **Fourier multipliers**: `Φ ⋆ e_m = 𝓕Φ(m) e_m` (`Torus.econv_mFourier`), since
   `e_m(-π y) = e^(-2πi⟨m, y⟩)`. If `𝓕Φ(m) = 0` for `deg m ≥ n`, the operator maps `L_p(𝕋)` into
   the trigonometric polynomials of degree `< n` (`Torus.econvLp_mem_trigPolyLp`): it maps the dense
@@ -195,15 +197,10 @@ theorem eLpNorm_econv_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) {Φ :
     (hΦ : Integrable Φ) {f : UnitAddTorus d → ℂ} (hf : Measurable f) :
     eLpNorm (econv Φ f) p volume ≤ (∫⁻ y, ‖Φ y‖ₑ) * eLpNorm f p volume := by
   by_cases h0 : ∫⁻ y, ‖Φ y‖ₑ = 0
-  · have hΦ0 : Φ =ᵐ[volume] 0 := by
+  · have he : econv Φ f = 0 := funext fun t => integral_eq_zero_of_ae <| by
       filter_upwards [(lintegral_eq_zero_iff' hΦ.aestronglyMeasurable.enorm).1 h0] with y hy
-      simpa using hy
-    have he : econv Φ f = 0 := funext fun t => by
-      refine integral_eq_zero_of_ae ?_
-      filter_upwards [hΦ0] with y hy
-      simp [hy]
-    rw [he, eLpNorm_zero]
-    exact zero_le
+      simp [enorm_eq_zero.1 hy]
+    simp [he]
   · exact eLpNorm_integral_kernel_le_of_bound hp1 hp hΦ.aestronglyMeasurable h0 hΦ.2.ne
       (measurable_comp_sub_proj hf) fun z _ =>
         (eLpNorm_comp_sub hf.aestronglyMeasurable p (proj z)).le
@@ -251,6 +248,22 @@ theorem econv_congr_ae (Φ : EuclideanSpace ℝ d → ℂ) {f g : UnitAddTorus d
   filter_upwards [(Measure.ae_ae_comm hset).2 h] with t ht
   exact integral_congr_ae (ht.mono fun y hy => congrArg (Φ y * ·) hy)
 
+/-- **The convolution is additive almost everywhere** for integrable `f, g` on the torus:
+`Φ ⋆ (f + g) = Φ ⋆ f + Φ ⋆ g` almost everywhere, where both integrals converge absolutely
+(`Torus.ae_integrable_econv`). -/
+theorem econv_add_ae {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ) {f g : UnitAddTorus d → ℂ}
+    (hf : Measurable f) (hg : Measurable g) (hfi : Integrable f volume)
+    (hgi : Integrable g volume) : econv Φ (f + g) =ᵐ[volume] econv Φ f + econv Φ g := by
+  filter_upwards [ae_integrable_econv hΦ hf hfi, ae_integrable_econv hΦ hg hgi] with t h1 h2
+  simp only [econv, Pi.add_apply, mul_add]
+  exact integral_add h1 h2
+
+/-- **The convolution is homogeneous**: `Φ ⋆ (c f) = c (Φ ⋆ f)` at every point, for every
+`c ∈ ℂ`. -/
+theorem econv_smul (Φ : EuclideanSpace ℝ d → ℂ) (c : ℂ) (f : UnitAddTorus d → ℂ) :
+    econv Φ (c • f) = c • econv Φ f := funext fun t => by
+  simp only [econv, Pi.smul_apply, smul_eq_mul, mul_left_comm (Φ _) c, integral_const_mul]
+
 /-! ### The operator on `L_p` -/
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
@@ -274,12 +287,9 @@ noncomputable def econvLp (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d → ℂ} (
             ((memLp_econv Fact.out hp hΦ hgm (Lp.memLp g)).toLp (econv Φ g)),
           econv_congr_ae Φ (Lp.stronglyMeasurable (f + g)).measurable (hfm.add hgm)
             (Lp.coeFn_add f g),
-          ae_integrable_econv hΦ hfm ((Lp.memLp f).integrable Fact.out),
-          ae_integrable_econv hΦ hgm ((Lp.memLp g).integrable Fact.out)]
-          with t h1 h2 h3 h4 h5 h6 h7
-        rw [h1, h4, Pi.add_apply, h2, h3, h5]
-        simp only [econv, Pi.add_apply, mul_add]
-        exact integral_add h6 h7
+          econv_add_ae hΦ hfm hgm ((Lp.memLp f).integrable Fact.out)
+            ((Lp.memLp g).integrable Fact.out)] with t h1 h2 h3 h4 h5 h6
+        rw [h1, h4, Pi.add_apply, h2, h3, h5, h6, Pi.add_apply]
       map_smul' := fun c f => by
         refine Lp.ext ?_
         have hfm := (Lp.stronglyMeasurable f).measurable
@@ -289,10 +299,7 @@ noncomputable def econvLp (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d → ℂ} (
           Lp.coeFn_smul c ((memLp_econv Fact.out hp hΦ hfm (Lp.memLp f)).toLp (econv Φ f)),
           econv_congr_ae Φ (Lp.stronglyMeasurable (c • f)).measurable (hfm.const_smul c)
             (Lp.coeFn_smul c f)] with t h1 h2 h3 h4
-        rw [h1, RingHom.id_apply, h3, Pi.smul_apply, h2, h4]
-        simp only [econv, Pi.smul_apply, smul_eq_mul]
-        rw [← integral_const_mul]
-        exact integral_congr_ae (Eventually.of_forall fun y => by ring) }
+        rw [h1, RingHom.id_apply, h3, Pi.smul_apply, h2, h4, econv_smul, Pi.smul_apply] }
     (∫⁻ y, ‖Φ y‖ₑ).toReal (fun f => by
       rw [LinearMap.coe_mk, AddHom.coe_mk, Lp.norm_toLp, Lp.norm_def, ← ENNReal.toReal_mul]
       exact ENNReal.toReal_mono (ENNReal.mul_ne_top hΦ.2.ne (Lp.eLpNorm_ne_top f))
@@ -302,6 +309,18 @@ noncomputable def econvLp (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d → ℂ} (
 theorem econvLp_apply_ae (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) : econvLp hp hΦ f =ᵐ[volume] econv Φ f :=
   MemLp.coeFn_toLp (memLp_econv Fact.out hp hΦ (Lp.stronglyMeasurable f).measurable (Lp.memLp f))
+
+/-- **Sums of convolutions are pointwise sums**: for integrable kernels `K_j` on `ℝ^d`,
+`u_j ∈ L_p(𝕋^d)` and every finite set `s`, the class `∑_{j ∈ s} K_j ⋆ u_j` is represented by
+`t ↦ ∑_{j ∈ s} (K_j ⋆ u_j)(t)` (`Torus.econvLp_apply_ae`, Mathlib's `Lp.coeFn_fun_finsetSum`). -/
+theorem coeFn_sum_econvLp_ae (hp : p ≠ ∞) {ι : Type*} (s : Finset ι)
+    {K : ι → EuclideanSpace ℝ d → ℂ} (hK : ∀ j, Integrable (K j))
+    (u : ι → Lp ℂ p (volume : Measure (UnitAddTorus d))) :
+    ⇑(∑ j ∈ s, econvLp hp (hK j) (u j)) =ᵐ[volume] fun t => ∑ j ∈ s, econv (K j) (u j) t := by
+  filter_upwards [Lp.coeFn_fun_finsetSum s fun j => econvLp hp (hK j) (u j),
+    (eventually_all_finset s).2 fun j _ => econvLp_apply_ae hp (hK j) (u j)] with t h1 h2
+  rw [h1]
+  exact Finset.sum_congr rfl h2
 
 /-- **Young's inequality on `L_p(𝕋)`** in extended norms: `‖Φ ⋆ f‖_p ≤ ‖Φ‖_1 ‖f‖_p`. -/
 theorem enorm_econvLp_le (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable Φ)
@@ -396,13 +415,9 @@ theorem econvLp_eq_self_of_mem (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d → �
     {a : Lp ℂ p (volume : Measure (UnitAddTorus d))} (ha : a ∈ trigPolyLp p n) :
     econvLp hp hΦ a = a := by
   rw [trigPolyLp_eq_span] at ha
-  induction ha using Submodule.span_induction with
-  | mem x hx =>
-    obtain ⟨m, hm, rfl⟩ := hx
-    rw [econvLp_mFourierLp, hF m (mem_boxLt.1 hm), one_smul]
-  | zero => exact map_zero _
-  | add x y _ _ hx hy => rw [map_add, hx, hy]
-  | smul c x _ hx => rw [map_smul, hx]
+  refine LinearMap.eqOn_span (f := (econvLp hp hΦ).toLinearMap) (g := LinearMap.id) ?_ ha
+  rintro _ ⟨m, hm, rfl⟩
+  simp [econvLp_mFourierLp, hF m (mem_boxLt.1 hm)]
 
 /-! ### Translations and differences -/
 
@@ -490,10 +505,8 @@ noncomputable def econvBCF {Φ : EuclideanSpace ℝ d → ℂ} (hΦ : Integrable
           (integrable_mul_comp_sub_proj hΦ g t)
       map_smul' := fun c f => by
         ext t
-        show econv Φ ⇑(c • f) t = c * econv Φ f t
-        simp only [econv, BoundedContinuousFunction.coe_smul, smul_eq_mul]
-        rw [← integral_const_mul]
-        exact integral_congr_ae (Eventually.of_forall fun y => by ring) }
+        show econv Φ (c • ⇑f) t = c * econv Φ f t
+        rw [econv_smul, Pi.smul_apply, smul_eq_mul] }
     (∫ y, ‖Φ y‖) fun f => (BoundedContinuousFunction.norm_le
       (mul_nonneg (integral_nonneg fun _ => norm_nonneg _) (norm_nonneg _))).2
         fun t => norm_econv_le hΦ f t

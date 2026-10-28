@@ -178,8 +178,7 @@ theorem enorm_mFourier_sub_one_le_blockMult {k : d → ℤ} {K : ℕ} (hk : deg 
   refine ENNReal.ofReal_le_ofReal (le_min ?_ ?_)
   · calc ‖mFourier k h - 1‖ ≤ ‖mFourier k h‖ + ‖(1 : ℂ)‖ := norm_sub_le _ _
       _ = 2 := by
-          rw [norm_one, show ‖mFourier k h‖ = 1 by
-            simpa [trigMonomial_apply] using norm_trigMonomial_apply k h]; norm_num
+          rw [norm_one, show ‖mFourier k h‖ = 1 from norm_trigMonomial_apply k h]; norm_num
   · calc ‖mFourier k h - 1‖ ≤ 2 * π * Fintype.card d * deg k * ‖h‖ :=
           norm_mFourier_sub_one_le k h
       _ ≤ 2 * π * Fintype.card d * 2 ^ (K + 1) * t := by

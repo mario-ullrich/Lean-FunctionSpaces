@@ -17,7 +17,8 @@ not on `L_p`.  This file shows, for `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `s > 
 (`Torus.trace_besov`): the restriction extends from trigonometric polynomials to a map from
 `B^{s+1/p}_{p,q}(𝕋^(n+1))` into `B^s_{p,q}(𝕋^n)`, and every element of `B^s_{p,q}(𝕋^n)` is a
 trace.  Both directions are the abstract trace theorem (`ApproximationSpaces.Trace`) for two
-inequalities on trigonometric polynomials.
+inequalities on trigonometric polynomials.  The restrictions and extensions keep the degree,
+since they send monomials to multiples of monomials (`Torus.restrictFace_mem_trigPoly`).
 
 * **The trace inequality** (`Torus.eLpNorm_restrictFace_le`): for `a` of degree `< m`,
   `‖a(0, ·)‖_{L_p(𝕋^n)} ≤ (2⌈p/2⌉ m)^(1/p) ‖a‖_{L_p(𝕋^(n+1))}`.  On every line
@@ -58,12 +59,11 @@ noncomputable def lineThrough (x' : UnitAddTorus (Fin n)) :
 theorem lineThrough_apply (x' : UnitAddTorus (Fin n)) (v : UnitAddTorus (Fin 1)) :
     lineThrough x' v = Fin.cons (v 0) x' := rfl
 
-/-- Composition with a continuous map, as a linear map of bounded continuous functions. -/
+/-- Composition with a continuous map, as a linear map of bounded continuous functions
+(Mathlib's `BoundedContinuousFunction.compContinuousCLM`). -/
 noncomputable def compLinear {Y Z : Type*} [TopologicalSpace Y] [TopologicalSpace Z]
-    (g : C(Y, Z)) : (Z →ᵇ ℂ) →ₗ[ℂ] (Y →ᵇ ℂ) where
-  toFun a := a.compContinuous g
-  map_add' _ _ := rfl
-  map_smul' _ _ := rfl
+    (g : C(Y, Z)) : (Z →ᵇ ℂ) →ₗ[ℂ] (Y →ᵇ ℂ) :=
+  (BoundedContinuousFunction.compContinuousCLM ℂ ℂ g).toLinearMap
 
 @[simp]
 theorem compLinear_apply {Y Z : Type*} [TopologicalSpace Y] [TopologicalSpace Z] (g : C(Y, Z))
@@ -103,25 +103,19 @@ theorem compLinear_lineThrough_trigMonomial (x' : UnitAddTorus (Fin n)) (k : Fin
 /-- The restriction of a trigonometric polynomial of degree `< m` to the face is a trigonometric
 polynomial of degree `< m`. -/
 theorem restrictFace_mem_trigPoly {m : ℕ} {a : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ}
-    (ha : a ∈ trigPoly (Fin (n + 1)) m) : restrictFace n a ∈ trigPoly (Fin n) m := by
-  obtain ⟨t, ht, c, rfl⟩ := exists_sum_of_mem_trigPoly ha
-  rw [map_sum]
-  refine Submodule.sum_mem _ fun k hk => ?_
-  rw [map_smul, restrictFace_trigMonomial]
-  exact Submodule.smul_mem _ _ (trigMonomial_mem_trigPoly
-    ((deg_tail_le k).trans_lt (mem_boxLt.1 (ht hk))))
+    (ha : a ∈ trigPoly (Fin (n + 1)) m) : restrictFace n a ∈ trigPoly (Fin n) m :=
+  map_mem_trigPoly _ (fun k hk => by
+    rw [restrictFace_trigMonomial]
+    exact trigMonomial_mem_trigPoly ((deg_tail_le k).trans_lt hk)) ha
 
 /-- The restriction of a trigonometric polynomial of degree `< m` to a line is a one-variable
 trigonometric polynomial of degree `< m`. -/
 theorem compLinear_lineThrough_mem_trigPoly (x' : UnitAddTorus (Fin n)) {m : ℕ}
     {a : UnitAddTorus (Fin (n + 1)) →ᵇ ℂ} (ha : a ∈ trigPoly (Fin (n + 1)) m) :
-    compLinear (lineThrough x') a ∈ trigPoly (Fin 1) m := by
-  obtain ⟨t, ht, c, rfl⟩ := exists_sum_of_mem_trigPoly ha
-  rw [map_sum]
-  refine Submodule.sum_mem _ fun k hk => ?_
-  rw [map_smul, compLinear_lineThrough_trigMonomial, smul_smul]
-  exact Submodule.smul_mem _ _ (trigMonomial_mem_trigPoly
-    ((deg_const_le k).trans_lt (mem_boxLt.1 (ht hk))))
+    compLinear (lineThrough x') a ∈ trigPoly (Fin 1) m :=
+  map_mem_trigPoly _ (fun k hk => by
+    rw [compLinear_lineThrough_trigMonomial]
+    exact Submodule.smul_mem _ _ (trigMonomial_mem_trigPoly ((deg_const_le k).trans_lt hk))) ha
 
 /-- **Fubini on `𝕋^(n+1) = 𝕋 × 𝕋^n`**, with the first factor written as `𝕋^1`:
 `∫ F = ∫_{x'} ∫_v F(v_0, x')`. -/
@@ -224,13 +218,10 @@ theorem compLinear_tailMap_trigMonomial (k : Fin n → ℤ) :
 /-- A trigonometric polynomial of the face coordinates is one of `𝕋^(n+1)`, of the same
 degree. -/
 theorem compLinear_tailMap_mem_trigPoly {m : ℕ} {b : UnitAddTorus (Fin n) →ᵇ ℂ}
-    (hb : b ∈ trigPoly (Fin n) m) : compLinear (tailMap n) b ∈ trigPoly (Fin (n + 1)) m := by
-  obtain ⟨t, ht, c, rfl⟩ := exists_sum_of_mem_trigPoly hb
-  rw [map_sum]
-  refine Submodule.sum_mem _ fun k hk => ?_
-  rw [map_smul, compLinear_tailMap_trigMonomial]
-  exact Submodule.smul_mem _ _ (trigMonomial_mem_trigPoly
-    ((deg_cons_zero_le k).trans_lt (mem_boxLt.1 (ht hk))))
+    (hb : b ∈ trigPoly (Fin n) m) : compLinear (tailMap n) b ∈ trigPoly (Fin (n + 1)) m :=
+  map_mem_trigPoly _ (fun k hk => by
+    rw [compLinear_tailMap_trigMonomial]
+    exact trigMonomial_mem_trigPoly ((deg_cons_zero_le k).trans_lt hk)) hb
 
 /-- The monomial `e^{2πi j x_0}` at `(u, x')` is `e^{2πi j u}`. -/
 theorem trigMonomial_single_cons (j : ℤ) (u : UnitAddCircle) (x' : UnitAddTorus (Fin n)) :

@@ -180,14 +180,8 @@ theorem lpBlock_sum_econvLp_dual_ae (hp : p ≠ ∞) (L J j : ℕ)
           (econvLp hp (b.integrable_kernel L i) f) := by
     rw [map_sum]
     exact Finset.sum_congr rfl fun i _ => econvLp_comp_econvLp hp _ _ _
-  have hall := ae_all_iff.2 fun i => econvLp_apply_ae hp
-    (Rd.integrable_conv (Rd.integrable_psi j) (b.integrable_dual L i))
-    (econvLp hp (b.integrable_kernel L i) f)
-  filter_upwards [Lp.coeFn_fun_finsetSum (Finset.range (J + 1)) fun i => econvLp hp
-    (Rd.integrable_conv (Rd.integrable_psi j) (b.integrable_dual L i))
-    (econvLp hp (b.integrable_kernel L i) f), hall] with t ht hi
-  rw [hsum, ht]
-  exact Finset.sum_congr rfl fun i _ => hi i
+  rw [hsum]
+  exact coeFn_sum_econvLp_ae hp _ _ _
 
 /-- The maximal function of the lift of `k_i ⋆ f ∈ L_p(𝕋^d)` is that of the lift of the pointwise
 convolution `k_i ⋆ f`. -/
@@ -252,13 +246,7 @@ theorem econvLp_kernel_sum_lpBlock_ae (hp : p ≠ ∞) (L J j : ℕ)
       ∑ i ∈ Finset.range J, econv (Rd.conv (b.kernel L j) (Rd.Theta i) volume)
         (lpBlock hp i f) t := by
   simp only [map_sum, econvLp_kernel_lpBlock b hp L _ j f]
-  have hall := ae_all_iff.2 fun i => econvLp_apply_ae hp
-    (Rd.integrable_conv (b.integrable_kernel L j) (Rd.integrable_Theta i)) (lpBlock hp i f)
-  filter_upwards [Lp.coeFn_fun_finsetSum (Finset.range J) fun i => econvLp hp
-    (Rd.integrable_conv (b.integrable_kernel L j) (Rd.integrable_Theta i)) (lpBlock hp i f), hall]
-    with t ht hi
-  rw [ht]
-  exact Finset.sum_congr rfl fun i _ => hi i
+  exact coeFn_sum_econvLp_ae hp _ _ _
 
 /-- The maximal function of the lift of `Δ_i f ∈ L_p(𝕋^d)` is that of the lift of the pointwise
 block `ψ_i ⋆ f`. -/

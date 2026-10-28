@@ -95,23 +95,6 @@ theorem maximal_comp_proj_le (g : UnitAddTorus d → ℝ≥0∞) {x : EuclideanS
 
 /-! ### The inequality -/
 
-/-- `L_p` norms on the box `(-1, 2]^d`: `‖1_{(-1,2]^d} (G ∘ π)‖_{L_p(ℝ^d)} = 3^{d/p} ‖G‖_{L_p(𝕋^d)}`
-for `0 < p < ∞` and almost everywhere measurable `G : 𝕋^d → [0, ∞]`. -/
-theorem eLpNorm_indicator_tripleBox {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
-    {G : UnitAddTorus d → ℝ≥0∞} (hG : AEMeasurable G volume) :
-    eLpNorm (tripleBox.indicator fun y => G (proj y)) p volume =
-      3 ^ ((Fintype.card d : ℝ) / p.toReal) * eLpNorm G p volume := by
-  have hp0' : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  have hGp : AEStronglyMeasurable (fun y => G (proj y)) (volume.restrict tripleBox) :=
-    (hG.comp_quasiMeasurePreserving quasiMeasurePreserving_proj).restrict.aestronglyMeasurable
-  rw [eLpNorm_indicator_eq_eLpNorm_restrict measurableSet_tripleBox,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hGp,
-    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hG.aestronglyMeasurable]
-  simp only [enorm_eq_self]
-  rw [setLIntegral_tripleBox (fun t => G t ^ p.toReal),
-    ENNReal.mul_rpow_of_nonneg _ _ (by positivity), ← ENNReal.rpow_natCast, ← ENNReal.rpow_mul,
-    mul_one_div]
-
 /-- The constant `3^{d/p} C_{d,p,q} + 4^d |B(0,1)|⁻¹` of the Fefferman–Stein inequality for
 periodic lifts, with the constant `C_{d,p,q} = Rd.feffermanSteinConst` of `ℝ^d` and the volume
 `|B(0,1)|` of the unit ball of `ℝ^d`. -/

@@ -42,24 +42,6 @@ open Interval
 
 variable {d : ℕ}
 
-/-- The cube measure restricted to the region `{x ∈ Q : x_i ∈ [a, b]}`. -/
-noncomputable abbrev regionVol (d : ℕ) (i : Fin d) (a b : ℝ) : Measure (Fin d → ℝ) :=
-  (cubeVol d).restrict {x | x i ∈ Icc a b}
-
-/-- **`L_p` norms over a region through slices**, with Lebesgue measure on the slices:
-`‖f‖_{L_p({x_i ∈ [a, b]})}^p = ∫_Q ‖slice f x i‖_{L_p[a, b]}^p dx` for `[a, b] ⊆ [0, 1]`. -/
-theorem eLpNorm_rpow_regionVol_eq_slice {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞}
-    (hp0 : p ≠ 0) (hp : p ≠ ∞) (i : Fin d) {a b : ℝ} (ha : 0 ≤ a) (hb : b ≤ 1) :
-    eLpNorm f p (regionVol d i a b) ^ p.toReal =
-      ∫⁻ x, eLpNorm (slice f x i) p (volume.restrict (Icc a b)) ^ p.toReal ∂cubeVol d := by
-  rw [regionVol, eLpNorm_rpow_region_eq_slice hf hp0 hp i measurableSet_Icc,
-    unitVol_restrict_Icc_of_subset ha hb]
-
-/-- The slices of a continuous function are continuous. -/
-theorem continuous_slice {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (x : Fin d → ℝ) (i : Fin d) :
-    Continuous (slice f x i) :=
-  hf.comp (continuous_const.update i continuous_id)
-
 /-- Coordinate differences of a continuous function are jointly continuous in the step and the
 point. -/
 theorem continuous_cubeDiff_uncurry {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ)
@@ -284,25 +266,14 @@ theorem slice_reflect (f : (Fin d → ℝ) → ℂ) (x : Fin d → ℝ) (i : Fin
   simp [slice, reflect]
 
 /-- **Reflection preserves the coordinate modulus**: `ω_r^{(i)}(f(reflect_i ·), t) = ω_r^{(i)}(f, t)`,
-slice by slice (`Interval.eLpNorm_higherDiff_reflect`). -/
+slice by slice (`Interval.eLpNorm_higherDiff_reflect`, `Cube.coordModulus_eq_of_slice`). -/
 theorem coordModulus_reflect {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp0 : p ≠ 0)
     (hp : p ≠ ∞) (r : ℕ) (i : Fin d) (t : ℝ) :
-    coordModulus r p i (fun y => f (reflect i y)) t = coordModulus r p i f t := by
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  have hfr : Measurable fun y => f (reflect i y) := hf.comp (continuous_reflect i).measurable
-  simp only [coordModulus]
-  congr 1
-  funext h
-  congr 1
-  funext hh
-  refine (ENNReal.rpow_left_injective hq.ne').eq_iff.1 ?_
-  rw [eLpNorm_rpow_cubeDiff_eq_slice hfr hp0 hp r hh.1 i,
-    eLpNorm_rpow_cubeDiff_eq_slice hf hp0 hp r hh.1 i]
-  refine lintegral_congr fun x => ?_
-  rw [slice_reflect]
-  have h := eLpNorm_higherDiff_reflect (measurable_slice hf x i) r p 0 1 h
-  simp only [zero_add] at h
-  rw [h]
+    coordModulus r p i (fun y => f (reflect i y)) t = coordModulus r p i f t :=
+  coordModulus_eq_of_slice (f := fun y => f (reflect i y))
+    (hf.comp (continuous_reflect i).measurable) hf hp0 hp r i t fun h _ => ae_of_all _ fun x => by
+      rw [slice_reflect]
+      simpa only [zero_add] using eLpNorm_higherDiff_reflect (measurable_slice hf x i) r p 0 1 h
 
 /-- **Reflection of a region**: `‖F(reflect_i ·)‖_{L_p({x_i ∈ [0, w]})} = ‖F‖_{L_p({x_i ∈ [1-w, 1]})}`
 for `w ≤ 1`. -/
@@ -310,12 +281,11 @@ theorem eLpNorm_reflect_regionVol {F : (Fin d → ℝ) → ℂ} (hF : Measurable
     (hp0 : p ≠ 0) (hp : p ≠ ∞) (i : Fin d) {w : ℝ} (hw1 : w ≤ 1) :
     eLpNorm (fun y => F (reflect i y)) p (regionVol d i 0 w) =
       eLpNorm F p (regionVol d i (1 - w) 1) := by
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   have hFr : Measurable fun y => F (reflect i y) := hF.comp (continuous_reflect i).measurable
-  refine (ENNReal.rpow_left_injective hq.ne').eq_iff.1 ?_
-  rw [eLpNorm_rpow_regionVol_eq_slice hFr hp0 hp i le_rfl hw1,
-    eLpNorm_rpow_regionVol_eq_slice hF hp0 hp i (by linarith) le_rfl]
-  refine lintegral_congr fun x => ?_
+  rw [eLpNorm_regionVol_eq_slice hFr hp0 hp i le_rfl hw1,
+    eLpNorm_regionVol_eq_slice hF hp0 hp i (by linarith) le_rfl]
+  congr 1
+  funext x
   rw [slice_reflect, eLpNorm_comp_sub_Icc (measurable_slice hF x i), sub_zero]
 
 /-- **Smoothing on a right region**: the same as `Cube.exists_left_cubeSmoothing` on

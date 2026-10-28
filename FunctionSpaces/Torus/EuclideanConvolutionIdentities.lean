@@ -115,11 +115,10 @@ theorem econvLp_sub_kernel (hp : p ≠ ∞) {K L : EuclideanSpace ℝ d → ℂ}
 /-- **Constants move from the kernel to the function**: `(c K) ⋆ g = K ⋆ (c g)` at every point
 of the torus, for every `c ∈ ℂ`, every function `K` on `ℝ^d` and every function `g` on `𝕋^d`. -/
 theorem econv_smul_kernel (c : ℂ) (K : EuclideanSpace ℝ d → ℂ) (g : UnitAddTorus d → ℂ) :
-    econv (c • K) g = econv K (c • g) := funext fun t => by
-  simp only [econv, Pi.smul_apply, smul_eq_mul]
-  congr 1
-  funext y
-  ring
+    econv (c • K) g = econv K (c • g) := by
+  rw [econv_smul]
+  funext t
+  simp only [econv, Pi.smul_apply, smul_eq_mul, mul_assoc, integral_const_mul]
 
 /-- Equal integrable kernels `K = L` on `ℝ^d` give the same convolution operator on
 `L_p(𝕋^d)`. -/
@@ -136,13 +135,9 @@ theorem econvLp_eq_zero_of_mem (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d → �
     {a : Lp ℂ p (volume : Measure (UnitAddTorus d))} (ha : a ∈ trigPolyLp p n) :
     econvLp hp hΦ a = 0 := by
   rw [trigPolyLp_eq_span] at ha
-  induction ha using Submodule.span_induction with
-  | mem x hx =>
-    obtain ⟨m, hm, rfl⟩ := hx
-    rw [econvLp_mFourierLp, hF m (mem_boxLt.1 hm), zero_smul]
-  | zero => exact map_zero _
-  | add x y _ _ hx hy => rw [map_add, hx, hy, add_zero]
-  | smul c x _ hx => rw [map_smul, hx, smul_zero]
+  refine LinearMap.eqOn_span (f := (econvLp hp hΦ).toLinearMap) (g := 0) ?_ ha
+  rintro _ ⟨m, hm, rfl⟩
+  simp [econvLp_mFourierLp, hF m (mem_boxLt.1 hm)]
 
 /-! ### Approximate identities -/
 

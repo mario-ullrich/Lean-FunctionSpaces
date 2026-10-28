@@ -129,7 +129,8 @@ the class of a function (\Cref{def:conv}).
   Rd.MemTriebelLizorkin.mono_smoothness, Rd.MemTriebelLizorkin.add, Rd.MemTriebelLizorkin.smul,
   Rd.triebelLizorkinSpace, Rd.mem_triebelLizorkinSpace}
 \leanok
-\uses{def:triebel-lizorkin, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-homogeneity}
+\uses{def:triebel-lizorkin, lem:tl-pointwise-blocks, lem:lq-basic, lem:lp-norm-homogeneity,
+  lem:mixed-norm-dyadic-family}
 For every $1 \leq p < \infty$, all $s \leq t$ in $\R$, all $1 \leq q \leq r \leq \infty$, all
 $f, g \in L_p$ and every $c \in \C$,
 \[
@@ -152,7 +153,35 @@ At almost every point the blocks of $f + g$ are the sums of the blocks of $f$ an
 those of $f$, and $|c|$ leaves the $\ell_q$ and the $L_p$ norm
 (\Cref{lem:lp-norm-homogeneity}). The monotonicity follows from
 $\|\cdot\|_{\ell_r} \leq \|\cdot\|_{\ell_q}$ and $2^{js} \leq 2^{jt}$ at every point. For
-$s = 0$ the weights $2^{j \cdot 0}$ are $1$, for every $q$ and in particular for $q = 2$.
+$s = 0$ the weights $2^{j \cdot 0}$ are $1$, for every $q$ and in particular for $q = 2$. These
+are the properties of the mixed norms of \Cref{lem:mixed-norm-dyadic-family} for the families
+$(|\psi_j * f|)_j$.
+\end{proof}
+
+\begin{lemma}[The weighted blocks and their tails]
+\label{lem:weighted-block-tails}
+\lean{Rd.eLpNorm_lqNorm_ite_blockFun_le, Rd.tendsto_eLpNorm_lqNorm_blockFun_tail}
+\leanok
+\uses{def:triebel-lizorkin, lem:mixed-norm-tails}
+Let $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p(V)$. For every set
+$P \subseteq \N$,
+\[
+  \bigl\| \|(\mathbf 1_P(j) \, 2^{js} |(\psi_j * f)(x)|)_j\|_{\ell_q} \bigr\|_p
+  \leq \|f\|_{\TL{s}{p}{q}} .
+\]
+If $q < \infty$ and $f \in \TL{s}{p}{q}$, then
+\[
+  \bigl\| \|(2^{js} |(\psi_j * f)(x)|)_{j \geq N}\|_{\ell_q} \bigr\|_p \to 0 \qquad
+  (N \to \infty) ,
+\]
+where the $\ell_q$ norm is taken of the sequence with the terms $j < N$ replaced by $0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both claims are \Cref{lem:mixed-norm-tails} for the functions
+$g_j = 2^{js} |\psi_j * f|$, whose mixed norm is $\|f\|_{\TL{s}{p}{q}}$
+(\Cref{def:triebel-lizorkin}).
 \end{proof}
 
 \begin{theorem}[$\TL{s}{p}{p} = \Besov{s}{p}{p}$]
@@ -250,7 +279,7 @@ and $\TL{s}{p}{q}(\T^d)$ consists of the $f \in L_p(\T^d)$ with $\|f\|_{F^s_{p,q
   Torus.mem_triebelLizorkinSpace}
 \leanok
 \uses{def:torus-triebel-lizorkin, lem:torus-econv-young, lem:lp-kernels-basic, lem:lq-basic,
-  lem:lp-norm-homogeneity}
+  lem:lp-norm-homogeneity, lem:mixed-norm-dyadic-family}
 For every $1 \leq p < \infty$, all $s \leq t$ in $\R$, all $1 \leq q \leq r \leq \infty$, all
 $f, g \in L_p(\T^d)$ and every $c \in \C$, for almost every $x \in \T^d$ and all $j \in \N$,
 \[
@@ -281,6 +310,32 @@ for all $j$ at once. Young's inequality on the torus (\Cref{lem:torus-econv-youn
 $\|\psi_0\|_1 = \|\Phi\|_1$ (\Cref{lem:lp-kernels-basic}) give the bound of $\psi_0 * f$. The rest
 is the proof of \Cref{prop:tl-elementary}; for $s = 0$ the weights
 $2^{j \cdot 0}$ are $1$.
+\end{proof}
+
+\begin{lemma}[The weighted blocks on the torus and their tails]
+\label{lem:torus-weighted-block-tails}
+\lean{Torus.eLpNorm_lqNorm_ite_blockFun_le, Torus.tendsto_eLpNorm_lqNorm_blockFun_tail}
+\leanok
+\uses{def:torus-triebel-lizorkin, lem:mixed-norm-tails}
+Let $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p(\T^d)$. For every set
+$P \subseteq \N$,
+\[
+  \bigl\| \|(\mathbf 1_P(j) \, 2^{js} |(\psi_j * f)(t)|)_j\|_{\ell_q} \bigr\|_p
+  \leq \|f\|_{\TL{s}{p}{q}(\T^d)} .
+\]
+If $q < \infty$ and $f \in \TL{s}{p}{q}(\T^d)$, then
+\[
+  \bigl\| \|(2^{js} |(\psi_j * f)(t)|)_{j \geq N}\|_{\ell_q} \bigr\|_p \to 0 \qquad
+  (N \to \infty) ,
+\]
+where the $\ell_q$ norm is taken of the sequence with the terms $j < N$ replaced by $0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both claims are \Cref{lem:mixed-norm-tails} for the functions
+$g_j = 2^{js} |\psi_j * f|$ on $\T^d$, whose mixed norm is $\|f\|_{\TL{s}{p}{q}(\T^d)}$
+(\Cref{def:torus-triebel-lizorkin}).
 \end{proof}
 
 \begin{theorem}[$\TL{s}{p}{p}(\T^d) = \Besov{s}{p}{p}(\T^d)$ and the Besov sandwich on the torus]
@@ -1121,6 +1176,27 @@ $0 < x_i \leq 1$ and $|y_i - x_i| < 1$ give $-1 < y_i < 2$.
 \end{proof}
 For $r \leq 0$ the ball is empty, and the Lean statement of the first bound covers every real $r$.
 
+\begin{lemma}[$L_p$ norms on the box of side $3$]
+\label{lem:triple-box-norm}
+\lean{Torus.eLpNorm_indicator_tripleBox_comp_proj, Torus.eLpNorm_indicator_tripleBox,
+  Torus.memLp_indicator_tripleBox_comp_proj}
+\leanok
+\uses{lem:period-box-counting, def:period-box}
+For every $0 < p < \infty$ and every almost everywhere strongly measurable $F$ on $\T^d$ with
+values in a space with an extended norm (for example $\C$ or $[0, \infty]$),
+\[
+  \|\mathbf 1_T (F \circ \pi)\|_{L_p(\R^d)} = 3^{\#d/p} \|F\|_{L_p(\T^d)} .
+\]
+For every $0 < p < \infty$ and every $f \in L_p(\T^d)$, $\mathbf 1_T (f \circ \pi) \in L_p(\R^d)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both sides are $p$-th roots of integrals of $|F|^p$, and
+$\int_T u(\pi y) \, dy = 3^{\#d} \int_{\T^d} u$ (\Cref{lem:period-box-counting}) for
+$u = |F|^p$.
+\end{proof}
+
 \begin{lemma}[Convolutions and differences of lifts]
 \label{lem:torus-lift-conv}
 \lean{Torus.econv_proj, Torus.higherDiff_comp_proj}
@@ -1176,10 +1252,9 @@ everywhere (\Cref{lem:period-box-measure}), and the maximal function does not se
 
 \begin{theorem}[The Fefferman--Stein inequality for periodic lifts]
 \label{thm:fefferman-stein-periodic}
-\lean{Torus.eLpNorm_indicator_tripleBox, Torus.periodicFSConst, Torus.periodicFSConst_ne_top,
-  Torus.feffermanStein_periodic}
+\lean{Torus.periodicFSConst, Torus.periodicFSConst_ne_top, Torus.feffermanStein_periodic}
 \leanok
-\uses{thm:fefferman-stein, lem:torus-maximal-localisation, lem:period-box-counting,
+\uses{thm:fefferman-stein, lem:torus-maximal-localisation, lem:triple-box-norm,
   lem:period-box-measure, lem:minkowski-integral-lq, lem:maximal-function-measurable,
   lem:lp-norm-nonnegative, lem:fefferman-stein-split}
 Let $1 < p < \infty$ and $1 < q \leq \infty$, and let
@@ -1197,7 +1272,7 @@ almost everywhere measurable $u_j : \T^d \to [0, \infty]$, $j \in \N$,
 Write $G(t) = \|(u_j(t))_j\|_{\ell_q}$. By \Cref{lem:torus-maximal-localisation} the left side is
 at most the sum of two terms. The first is at most its norm in $L_p(\R^d)$, which
 \Cref{thm:fefferman-stein} bounds by $C_{\#d,p,q} \|\mathbf 1_T (G \circ \pi)\|_{L_p(\R^d)}
-= C_{\#d,p,q} \, 3^{\#d/p} \|G\|_{L_p(\T^d)}$ (\Cref{lem:period-box-counting}). The second is a
+= C_{\#d,p,q} \, 3^{\#d/p} \|G\|_{L_p(\T^d)}$ (\Cref{lem:triple-box-norm}). The second is a
 constant on a set of measure $1$, and Minkowski's integral inequality
 (\Cref{lem:minkowski-integral-lq}) on the probability space $\T^d$
 gives $\|(\int u_j)_j\|_{\ell_q} \leq \|G\|_{L_p(\T^d)}$.
@@ -3699,20 +3774,24 @@ and the left side tends to $\|f\|_p$ as $J \to \infty$ (\Cref{lem:lp-blocks}).
 
 \begin{corollary}[The square function theorem]
 \label{cor:square-function-theorem}
-\lean{Rd.triebelLizorkinSpace_zero_two_eq_top}
+\lean{Rd.triebelLizorkinSpace_zero_two_eq_top, Rd.memTriebelLizorkin_two_of_memApprox}
 \leanok
-\uses{thm:square-function-upper, thm:square-function-lower, prop:tl-elementary}
+\uses{thm:square-function-upper, thm:square-function-lower, prop:tl-elementary,
+  thm:tl-besov-sandwich}
 Let $n \geq 1$ and $1 < p < \infty$. Then $\TL{0}{p}{2} = L_p(V)$, and for every
 $f \in L_p(V)$,
 \[
   \|f\|_p \leq \tilde Q_{V,p} \, \|f\|_{\TL{0}{p}{2}} , \qquad
   \|f\|_{\TL{0}{p}{2}} \leq Q_{V,p} \, \|f\|_p .
 \]
+For every $s \geq 0$, $\Besov{s}{p}{\min(p,2)} \subseteq \TL{s}{p}{2}$.
 \end{corollary}
 
 \begin{proof}
 \leanok
-\Cref{thm:square-function-upper} and \Cref{thm:square-function-lower}.
+\Cref{thm:square-function-upper} and \Cref{thm:square-function-lower}. For $s > 0$ the inclusion
+is the Besov sandwich for $q = 2$ (\Cref{thm:tl-besov-sandwich}); for $s = 0$ every
+$f \in L_p(V)$ lies in $\TL{0}{p}{2}$.
 \end{proof}
 
 \section{Vector-valued singular integrals on the torus}
@@ -3805,24 +3884,16 @@ over $j$ is monotone convergence.
 
 \begin{lemma}[The box of side $3$ and the far points]
 \label{lem:torus-triple-box}
-\lean{Torus.one_le_norm_of_sub_notMem_tripleBox, Torus.eLpNorm_indicator_tripleBox_comp_proj,
-  Torus.memLp_indicator_tripleBox_comp_proj}
+\lean{Torus.one_le_norm_of_sub_notMem_tripleBox}
 \leanok
-\uses{def:period-box, lem:period-box-counting, thm:fefferman-stein-periodic}
-For every $x \in P_0$ and every $y \in \R^d$ with $x - y \notin T$, $\|y\| \geq 1$. For every
-$0 < p < \infty$ and every almost everywhere strongly measurable $f : \T^d \to \C$,
-\[
-  \|\mathbf 1_T (f \circ \pi)\|_{L_p(\R^d)} = 3^{\#d/p} \|f\|_{L_p(\T^d)} ,
-\]
-so $\mathbf 1_T (f \circ \pi) \in L_p(\R^d)$ for every $f \in L_p(\T^d)$.
+\uses{def:period-box}
+For every $x \in P_0$ and every $y \in \R^d$ with $x - y \notin T$, $\|y\| \geq 1$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 Some coordinate has $(x - y)_i \leq -1$ or $(x - y)_i > 2$; with $0 < x_i \leq 1$ this gives
-$y_i \geq 1$ or $y_i < -1$, and $|y_i| \leq \|y\|$. The norm identity is the identity
-$\int_T u(\pi y) \, dy = 3^{\#d} \int_{\T^d} u$ of \Cref{lem:period-box-counting} for
-$u = |f|^p$.
+$y_i \geq 1$ or $y_i < -1$, and $|y_i| \leq \|y\|$.
 \end{proof}
 
 \begin{lemma}[Localisation of convolutions]
@@ -3910,7 +3981,7 @@ are.
 \lean{Torus.eLpNorm_lqNorm_econv_le, Torus.eLpNorm_sum_econv_le}
 \leanok
 \uses{thm:vector-valued-strong-type, def:periodic-cz-const, lem:torus-conv-localisation,
-  lem:torus-period-box-split, lem:torus-triple-box, lem:torus-far-conv-young, def:cz-family,
+  lem:torus-period-box-split, lem:triple-box-norm, lem:torus-far-conv-young, def:cz-family,
   lem:torus-econv-young}
 Let $\#d \geq 1$ and $1 < p < \infty$. For all $B, H, D \in [0, \infty]$, every
 Calder\'on--Zygmund family $\theta = (\theta_j)_j$ on $\R^d$ with overlap $B$ and H\"ormander
@@ -3932,7 +4003,7 @@ On the torus $L_p \subseteq L_1$, so \Cref{lem:torus-conv-localisation} applies 
 point of $P_0$, and \Cref{lem:torus-period-box-split} bounds the left side by the sum of two
 terms. The first is the $L_p(\R^d)$ norm of the analysis operator, or of a synthesis operator,
 of the family on $\R^d$ applied to $\mathbf 1_T (f \circ \pi)$, or to the
-$\mathbf 1_T (g_j \circ \pi)$, which lie in $L_p(\R^d)$ (\Cref{lem:torus-triple-box}).
+$\mathbf 1_T (g_j \circ \pi)$, which lie in $L_p(\R^d)$ (\Cref{lem:triple-box-norm}).
 \Cref{thm:vector-valued-strong-type} bounds it by $S_{\R^d,p}(B, H)$ times
 $\|\mathbf 1_T (f \circ \pi)\|_p = 3^{\#d/p} \|f\|_p$, respectively times
 $\|\mathbf 1_T (G \circ \pi)\|_p = 3^{\#d/p} \|G\|_p$ with $G(t) = \|(g_j(t))_j\|_{\ell_2}$, since

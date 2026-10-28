@@ -23,8 +23,12 @@ before the `L_p` norm. The blocks are the pointwise convolutions `ψ_j ⋆ f` wi
 space `F^s_{p,q}(𝕋^d)` consists of the `f` with a finite quasi-norm (`Torus.MemTriebelLizorkin`);
 it is a subspace of `L_p` for `1 ≤ q ≤ ∞` (`Torus.triebelLizorkinSpace`), increasing in `q` and
 decreasing in `s`. For `s = 0` the weights are `1`, so `‖f‖_{F^0_{p,q}}` is the `L_p` norm of
-`t ↦ ‖((ψ_j ⋆ f)(t))_j‖_{ℓ_q}` (`Torus.triebelLizorkinNorm_zero_left`). The comparisons with
-Besov spaces below need `p < ∞`.
+`t ↦ ‖((ψ_j ⋆ f)(t))_j‖_{ℓ_q}` (`Torus.triebelLizorkinNorm_zero_left`). These are the properties
+of the mixed norms of dyadically weighted families in `FunctionSpaces.Analysis.Lp.MixedNorms`.
+Setting terms of the weighted blocks to zero keeps them below the quasi-norm, and for `p < ∞`,
+`0 < q < ∞` and `f ∈ F^s_{p,q}(𝕋^d)` their tails tend to zero
+(`Torus.eLpNorm_lqNorm_ite_blockFun_le`, `Torus.tendsto_eLpNorm_lqNorm_blockFun_tail`). The
+comparisons with Besov spaces below need `p < ∞`.
 
 The mixed-norm comparisons of `FunctionSpaces.Analysis.Lp.MixedNorms` give, for every `s ∈ ℝ`,
 `‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{max(p,q)}} ≤ ‖f‖_{F^s_{p,q}} ≤ ‖(2^(js) ‖Δ_j f‖_p)_j‖_{ℓ_{min(p,q)}}`,
@@ -92,32 +96,24 @@ On the torus `L_p ⊆ L_1`, so the convolution integrals converge absolutely alm
 (`Torus.ae_integrable_econv`). -/
 theorem blockFun_add_ae (f g : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∀ᵐ t ∂volume, ∀ j, blockFun j (f + g) t = blockFun j f t + blockFun j g t := by
-  rw [ae_all_iff]
-  intro j
+  refine ae_all_iff.2 fun j => ?_
   have hfm := (Lp.stronglyMeasurable f).measurable
   have hgm := (Lp.stronglyMeasurable g).measurable
   filter_upwards [econv_congr_ae (Rd.psi j) (Lp.stronglyMeasurable (f + g)).measurable
       (hfm.add hgm) (Lp.coeFn_add f g),
-    ae_integrable_econv (Rd.integrable_psi j) hfm ((Lp.memLp f).integrable Fact.out),
-    ae_integrable_econv (Rd.integrable_psi j) hgm ((Lp.memLp g).integrable Fact.out)]
-    with t h1 h2 h3
-  rw [blockFun, blockFun, blockFun, h1]
-  simp only [econv, Pi.add_apply, mul_add]
-  exact integral_add h2 h3
+    econv_add_ae (Rd.integrable_psi j) hfm hgm ((Lp.memLp f).integrable Fact.out)
+      ((Lp.memLp g).integrable Fact.out)] with t h1 h2
+  rw [blockFun, blockFun, blockFun, h1, h2, Pi.add_apply]
 
 omit [Fact (1 ≤ p)] in
 /-- The block of a complex multiple is the multiple of the block, almost everywhere and for all
 levels at once. -/
 theorem blockFun_smul_ae (c : ℂ) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∀ᵐ t ∂volume, ∀ j, blockFun j (c • f) t = c * blockFun j f t := by
-  rw [ae_all_iff]
-  intro j
+  refine ae_all_iff.2 fun j => ?_
   filter_upwards [econv_congr_ae (Rd.psi j) (Lp.stronglyMeasurable (c • f)).measurable
     ((Lp.stronglyMeasurable f).measurable.const_smul c) (Lp.coeFn_smul c f)] with t h
-  rw [blockFun, blockFun, h]
-  simp only [econv, Pi.smul_apply, smul_eq_mul]
-  rw [← integral_const_mul]
-  exact integral_congr_ae (Eventually.of_forall fun y => by ring)
+  rw [blockFun, blockFun, h, econv_smul, Pi.smul_apply, smul_eq_mul]
 
 /-! ### The Triebel–Lizorkin quasi-norm -/
 
@@ -144,34 +140,21 @@ theorem aemeasurable_lqNorm_blockFun (s : ℝ) (q : ℝ≥0∞)
 `ℓ_q` at every point and in `L_p`. -/
 theorem triebelLizorkinNorm_add_le {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f g : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    triebelLizorkinNorm s q (f + g) ≤ triebelLizorkinNorm s q f + triebelLizorkinNorm s q g := by
-  set F : Lp ℂ p (volume : Measure (UnitAddTorus d)) → UnitAddTorus d → ℝ≥0∞ :=
-    fun h t => lqNorm q (fun j => dyadicWeight s j * ‖blockFun j h t‖ₑ)
-  have hle : ∀ᵐ t ∂volume, ‖F (f + g) t‖ₑ ≤ ‖(F f + F g) t‖ₑ := by
-    filter_upwards [blockFun_add_ae f g] with t ht
-    simp only [enorm_eq_self, Pi.add_apply, F]
-    refine (ENNReal.lqNorm_mono fun j => ?_).trans (ENNReal.lqNorm_add_le hq _ _)
-    rw [ht j, ← mul_add]
-    gcongr
-    exact enorm_add_le _ _
-  exact (eLpNorm_mono_enorm_ae (aemeasurable_lqNorm_blockFun s q (f + g)).aestronglyMeasurable
-    hle).trans (eLpNorm_add_le Fact.out)
+    triebelLizorkinNorm s q (f + g) ≤ triebelLizorkinNorm s q f + triebelLizorkinNorm s q g :=
+  eLpNorm_lqNorm_le_add Fact.out hq
+    (fun j => (aestronglyMeasurable_blockFun j (f + g)).enorm.const_mul _) <| by
+      filter_upwards [blockFun_add_ae f g] with t ht j
+      rw [ht j, ← mul_add]
+      gcongr
+      exact enorm_add_le _ _
 
 omit [Fact (1 ≤ p)] in
 /-- **The quasi-norm is homogeneous**: `‖c f‖_{F^s_{p,q}} = |c| ‖f‖_{F^s_{p,q}}` for `c ∈ ℂ`. -/
 theorem triebelLizorkinNorm_smul (s : ℝ) (q : ℝ≥0∞) (c : ℂ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
-    triebelLizorkinNorm s q (c • f) = ‖c‖ₑ * triebelLizorkinNorm s q f := by
-  have h : (fun t => lqNorm q (fun j => dyadicWeight s j * ‖blockFun j (c • f) t‖ₑ)) =ᵐ[volume]
-      fun t => ‖c‖ₑ * lqNorm q (fun j => dyadicWeight s j * ‖blockFun j f t‖ₑ) := by
-    filter_upwards [blockFun_smul_ae c f] with t ht
-    rw [← ENNReal.lqNorm_const_mul]
-    congr 1
-    funext j
-    rw [ht j, enorm_mul]
-    ring
-  rw [triebelLizorkinNorm, eLpNorm_congr_ae h]
-  exact eLpNorm_const_mul_ennreal _ (aemeasurable_lqNorm_blockFun s q f) p
+    triebelLizorkinNorm s q (c • f) = ‖c‖ₑ * triebelLizorkinNorm s q f :=
+  eLpNorm_lqNorm_eq_const_mul _ (fun j => (aestronglyMeasurable_blockFun j f).enorm.const_mul _) <|
+    by filter_upwards [blockFun_smul_ae c f] with t ht j; rw [ht j, enorm_mul, mul_left_comm]
 
 omit [Fact (1 ≤ p)] in
 /-- The zero function has quasi-norm `0`. -/
@@ -186,8 +169,8 @@ since the weights `2^(j·0)` are `1`. -/
 theorem triebelLizorkinNorm_zero_left (q : ℝ≥0∞)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     triebelLizorkinNorm 0 q f =
-      eLpNorm (fun t => lqNorm q fun j => ‖blockFun j f t‖ₑ) p volume := by
-  simp only [triebelLizorkinNorm, ENNReal.dyadicWeight_zero_left, one_mul]
+      eLpNorm (fun t => lqNorm q fun j => ‖blockFun j f t‖ₑ) p volume :=
+  eLpNorm_lqNorm_dyadicWeight_zero_left _
 
 omit [Fact (1 ≤ p)] in
 /-- **The quasi-norm decreases in `q`**: `‖f‖_{F^s_{p,r}} ≤ ‖f‖_{F^s_{p,q}}` for
@@ -195,9 +178,8 @@ omit [Fact (1 ≤ p)] in
 theorem triebelLizorkinNorm_mono_exponent {s : ℝ} {q r : ℝ≥0∞} (hq : 1 ≤ q) (hqr : q ≤ r)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     triebelLizorkinNorm s r f ≤ triebelLizorkinNorm s q f :=
-  eLpNorm_mono_enorm (aemeasurable_lqNorm_blockFun s r f).aestronglyMeasurable fun t => by
-    simp only [enorm_eq_self]
-    exact ENNReal.lqNorm_le_lqNorm_of_le hq hqr _
+  eLpNorm_lqNorm_mono_exponent hq hqr fun j =>
+    (aestronglyMeasurable_blockFun j f).enorm.const_mul _
 
 omit [Fact (1 ≤ p)] in
 /-- **The quasi-norm increases in `s`**: `‖f‖_{F^s_{p,q}} ≤ ‖f‖_{F^t_{p,q}}` for `s ≤ t`, since
@@ -205,9 +187,30 @@ omit [Fact (1 ≤ p)] in
 theorem triebelLizorkinNorm_mono_smoothness {s t : ℝ} (hst : s ≤ t) (q : ℝ≥0∞)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     triebelLizorkinNorm s q f ≤ triebelLizorkinNorm t q f :=
-  eLpNorm_mono_enorm (aemeasurable_lqNorm_blockFun s q f).aestronglyMeasurable fun x => by
-    simp only [enorm_eq_self]
-    exact ENNReal.lqNorm_mono fun j => by gcongr; exact ENNReal.dyadicWeight_le_of_le hst j
+  eLpNorm_lqNorm_dyadicWeight_mono_smoothness hst fun j =>
+    (aestronglyMeasurable_blockFun j f).enorm
+
+omit [Fact (1 ≤ p)] in
+/-- **Weighted blocks with terms set to zero**: for every predicate `P` on `ℕ`,
+`‖ t ↦ ‖(1_P(j) 2^{js} |(ψ_j ⋆ f)(t)|)_j‖_{ℓ_q} ‖_p ≤ ‖f‖_{F^s_{p,q}(𝕋^d)}`, where the terms with
+`P j` false are `0` (`MeasureTheory.eLpNorm_lqNorm_ite_le`). -/
+theorem eLpNorm_lqNorm_ite_blockFun_le {P : ℕ → Prop} [DecidablePred P] (s : ℝ) (q : ℝ≥0∞)
+    (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
+    eLpNorm (fun t => lqNorm q fun j =>
+      if P j then dyadicWeight s j * ‖blockFun j f t‖ₑ else 0) p volume ≤
+      triebelLizorkinNorm s q f :=
+  eLpNorm_lqNorm_ite_le fun j => (aestronglyMeasurable_blockFun j f).enorm.const_mul _
+
+/-- **The tails of the weighted blocks tend to zero**: for `1 ≤ p < ∞`, `0 < q < ∞`, `s ∈ ℝ` and
+`f ∈ F^s_{p,q}(𝕋^d)`, `‖ t ↦ ‖(2^{js} (ψ_j ⋆ f)(t))_{j ≥ N}‖_{ℓ_q} ‖_p → 0` as `N → ∞`, where
+the terms `j < N` are `0` (`MeasureTheory.tendsto_eLpNorm_lqNorm_ite_le`). -/
+theorem tendsto_eLpNorm_lqNorm_blockFun_tail (hp : p ≠ ∞) {s : ℝ} {q : ℝ≥0∞} (hq0 : q ≠ 0)
+    (hq : q ≠ ∞) {f : Lp ℂ p (volume : Measure (UnitAddTorus d))}
+    (hf : MemTriebelLizorkin s q f) :
+    Tendsto (fun N => eLpNorm (fun t => lqNorm q fun j =>
+      if N ≤ j then dyadicWeight s j * ‖blockFun j f t‖ₑ else 0) p volume) atTop (𝓝 0) :=
+  tendsto_eLpNorm_lqNorm_ite_le (zero_lt_one.trans_le Fact.out).ne' hp hq0 hq
+    (fun j => (aestronglyMeasurable_blockFun j f).enorm.const_mul _) hf.ne
 
 /-! ### The spaces `F^s_{p,q}(𝕋^d)` -/
 

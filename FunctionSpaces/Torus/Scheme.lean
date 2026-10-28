@@ -23,7 +23,8 @@ function `Torus.trigMonomial k`.  The **degree** of a frequency is `deg k = max_
 
 is the space of trigonometric polynomials of degree `< n` (`Torus.trigPoly`).  It contains the
 constants for `n ≥ 1` and is `{0}` for `n = 0`; this strict-degree convention makes the
-spaces an approximation scheme, `Torus.trigScheme d`.
+spaces an approximation scheme, `Torus.trigScheme d`.  A linear map that sends the monomials of
+degree `< n` into `trigPoly n` maps `trigPoly n` into `trigPoly n` (`Torus.map_mem_trigPoly`).
 
 The frequencies of degree `< n` form the box `boxLt n ⊆ ℤ^d` with at most `(2n)^d` elements
 (`card_boxLt_le`).  Since `e_k e_l = e_{k+l}` and `deg (k + l) ≤ deg k + deg l`, products of
@@ -141,6 +142,17 @@ theorem trigPoly_mono : Monotone (trigPoly d) := fun _ _ h =>
 theorem trigMonomial_mem_trigPoly {n : ℕ} {k : d → ℤ} (hk : deg k < n) :
     trigMonomial k ∈ trigPoly d n :=
   Submodule.subset_span ⟨k, by simpa using mem_boxLt.2 hk, rfl⟩
+
+/-- **Linear maps of trigonometric polynomials**: a linear map that sends every monomial `e_k` of
+degree `< m` to a trigonometric polynomial of degree `< m` maps every trigonometric polynomial of
+degree `< m` to one of degree `< m`, since these polynomials are the span of the monomials
+(Mathlib's `Submodule.span_le`). -/
+theorem map_mem_trigPoly {ι κ : Type*} [Fintype ι] [Fintype κ]
+    (L : (UnitAddTorus ι →ᵇ ℂ) →ₗ[ℂ] (UnitAddTorus κ →ᵇ ℂ)) {m : ℕ}
+    (hL : ∀ k : ι → ℤ, deg k < m → L (trigMonomial k) ∈ trigPoly κ m)
+    {a : UnitAddTorus ι →ᵇ ℂ} (ha : a ∈ trigPoly ι m) : L a ∈ trigPoly κ m :=
+  (Submodule.span_le (p := (trigPoly κ m).comap L)).2
+    (by rintro _ ⟨k, hk, rfl⟩; exact hL k (mem_boxLt.1 hk)) ha
 
 /-- **Products of trigonometric polynomials**: degrees `< m` and `< n` give degree `< m + n`. -/
 theorem trigPoly_mul_le (m n : ℕ) : trigPoly d m * trigPoly d n ≤ trigPoly d (m + n) := by

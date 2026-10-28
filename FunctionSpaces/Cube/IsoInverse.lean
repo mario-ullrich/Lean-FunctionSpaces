@@ -24,13 +24,15 @@ coordinate differences (`Cube.higherDiff_eq_sum`). A translate stays in the cube
 norm is at most the norm of the mixed difference on a box (`Cube.eLpNorm_shift_mixedDiff_le`),
 and the mixed difference is bounded one coordinate at a time by Tonelli's theorem
 (`Cube.eLpNorm_cubeDiff_inter_le`, `Cube.eLpNorm_mixedDiff_le`): the box constraint in the other
-coordinates does not depend on the coordinate of the step (`Cube.lintegral_inter_eq_slice`), and
+coordinates does not depend on the coordinate of the step (`Cube.eLpNorm_inter_le_of_slice_le`), and
 the slices of the intermediate functions stay in `V` (`Cube.slice_mixedDiff_mem`).
 
 If `β(m, t) = C (2^j |t|)^{θ_m}` for `|t| ≤ 2^(-j)` and `Θ ≤ ∑_i θ_{m_i}` whenever `∑_i m_i = r`,
 this gives `‖Δ_h^r f‖ ≤ d^r C^d (2^j ‖h‖_∞)^Θ ‖f‖` for `‖h‖_∞ ≤ 2^(-j)`
 (`Cube.eLpNorm_higherDiff_le_of_exponents`): every word `α` carries the total order `r`, and the
-gains in the single coordinates multiply.
+gains in the single coordinates multiply. Together with `ω_r(f, t)_p ≤ 2^r ‖f‖_p` this is the
+inverse inequality `ω_r(a, 2^(-k))_p ≤ (d^r C^d + 2^r) 2^(-(k-j)Θ) ‖a‖_p` for every `a` whose
+slices lie in `V` (`Cube.lpIsoModulus_le_of_exponents`).
 -/
 
 @[expose] public section
@@ -47,44 +49,19 @@ variable {d : ℕ}
 
 /-! ### One coordinate at a time -/
 
-/-- **Integrating out one coordinate under a constraint that does not depend on it**: if
-`R` does not depend on the coordinate `i`, then
-`∫_{R ∩ {x_i ∈ S}} G = ∫_R (∫_S G(x with t in place i) dt) dx`. -/
-theorem lintegral_inter_eq_slice {G : (Fin d → ℝ) → ℝ≥0∞} (hG : Measurable G) (i : Fin d)
-    {R : Set (Fin d → ℝ)} (hR : MeasurableSet R)
-    (hRi : ∀ x t, Function.update x i t ∈ R ↔ x ∈ R) {S : Set ℝ} (hS : MeasurableSet S) :
-    ∫⁻ x in R ∩ {x | x i ∈ S}, G x ∂cubeVol d =
-      ∫⁻ x in R, (∫⁻ t in S, G (Function.update x i t) ∂unitVol) ∂cubeVol d := by
-  have hRS : MeasurableSet (R ∩ {x : Fin d → ℝ | x i ∈ S}) :=
-    hR.inter (measurable_pi_apply i hS)
-  rw [← lintegral_indicator hRS, lintegral_cubeVol_eq_slice (hG.indicator hRS) i,
-    ← lintegral_indicator hR]
-  refine lintegral_congr fun x => ?_
-  by_cases hx : x ∈ R
-  · rw [indicator_of_mem hx, ← lintegral_indicator hS]
-    refine lintegral_congr fun t => ?_
-    by_cases ht : t ∈ S
-    · rw [indicator_of_mem ht, indicator_of_mem (show Function.update x i t ∈
-        R ∩ {x | x i ∈ S} from ⟨(hRi x t).2 hx, by simpa using ht⟩)]
-    · rw [indicator_of_notMem ht, indicator_of_notMem fun h => ht (by simpa using h.2)]
-  · rw [indicator_of_notMem hx]
-    have h0 : ∀ t, (R ∩ {x | x i ∈ S}).indicator G (Function.update x i t) = 0 := fun t =>
-      indicator_of_notMem (fun h => hx ((hRi x t).1 h.1)) _
-    simp only [h0, lintegral_zero]
-
 /-- **One coordinate step**: let `R` not depend on the coordinate `i`, and let every slice of `F`
 in coordinate `i` satisfy `‖Δ_t^m u‖_{L_p(J(m,t))} ≤ β ‖u‖_{L_p[0,1]}`. Then
-`‖Δ^m_{t e_i} F‖_{L_p(R ∩ {x_i + mt ∈ [0,1]})} ≤ β ‖F‖_{L_p(R)}`, by Tonelli in coordinate `i`. -/
+`‖Δ^m_{t e_i} F‖_{L_p(R ∩ {x_i + mt ∈ [0,1]})} ≤ β ‖F‖_{L_p(R)}`, by Tonelli in coordinate `i`
+(`Cube.eLpNorm_inter_le_of_slice_le`). -/
 theorem eLpNorm_cubeDiff_inter_le {F : (Fin d → ℝ) → ℂ} (hF : Measurable F) {p : ℝ≥0∞}
     (hp0 : p ≠ 0) (hp : p ≠ ∞) (m : ℕ) (t : ℝ) (i : Fin d) {R : Set (Fin d → ℝ)}
     (hR : MeasurableSet R) (hRi : ∀ x s, Function.update x i s ∈ R ↔ x ∈ R) {β : ℝ≥0∞}
-    (hβfin : β ≠ ∞)
+    (_hβfin : β ≠ ∞)
     (hβ : ∀ x, eLpNorm (higherDiff m t (slice F x i)) p (volume.restrict (stepRegion m t)) ≤
       β * eLpNorm (slice F x i) p unitVol) :
     eLpNorm (cubeDiff m t i F) p
         ((cubeVol d).restrict (R ∩ {x | x i + m * t ∈ Icc (0 : ℝ) 1})) ≤
       β * eLpNorm F p ((cubeVol d).restrict R) := by
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   set S : Set ℝ := {s | s + m * t ∈ Icc (0 : ℝ) 1}
   have hS : MeasurableSet S := (measurable_add_const _) measurableSet_Icc
   have hstep : unitVol.restrict S = volume.restrict (stepRegion m t) := by
@@ -94,35 +71,12 @@ theorem eLpNorm_cubeDiff_inter_le {F : (Fin d → ℝ) → ℂ} (hF : Measurable
     rw [mem_stepRegion]
     simp only [S, mem_inter_iff, mem_ofPred_eq]
     exact and_comm
-  have hRu : R ∩ {x : Fin d → ℝ | x i ∈ (univ : Set ℝ)} = R := by simp
-  have hGm : Measurable fun x => ‖cubeDiff m t i F x‖ₑ ^ p.toReal :=
-    (measurable_cubeDiff hF m t i).enorm.pow_const _
-  have hFm : Measurable fun x => ‖F x‖ₑ ^ p.toReal := hF.enorm.pow_const _
-  have hRHS : ∫⁻ x in R, ‖F x‖ₑ ^ p.toReal ∂cubeVol d =
-      ∫⁻ x in R, eLpNorm (slice F x i) p unitVol ^ p.toReal ∂cubeVol d := by
-    have h := lintegral_inter_eq_slice hFm i hR hRi MeasurableSet.univ
-    rw [hRu] at h
-    rw [h]
-    refine lintegral_congr fun x => ?_
-    rw [Measure.restrict_univ, eLpNorm_rpow_eq (measurable_slice hF x i).aestronglyMeasurable
-      hp0 hp]
-    rfl
-  refine (ENNReal.rpow_le_rpow_iff hq).1 ?_
-  rw [eLpNorm_rpow_eq (measurable_cubeDiff hF m t i).aestronglyMeasurable hp0 hp,
-    ENNReal.mul_rpow_of_nonneg _ _ hq.le, eLpNorm_rpow_eq hF.aestronglyMeasurable hp0 hp,
-    show R ∩ {x : Fin d → ℝ | x i + m * t ∈ Icc (0 : ℝ) 1} = R ∩ {x | x i ∈ S} from rfl,
-    lintegral_inter_eq_slice hGm i hR hRi hS, hRHS,
-    ← lintegral_const_mul' _ _ (ENNReal.rpow_ne_top_of_nonneg hq.le hβfin)]
-  refine setLIntegral_mono' hR fun x _ => ?_
-  have h1 : ∫⁻ s in S, ‖cubeDiff m t i F (Function.update x i s)‖ₑ ^ p.toReal ∂unitVol =
-      eLpNorm (higherDiff m t (slice F x i)) p (volume.restrict (stepRegion m t)) ^ p.toReal := by
-    rw [← hstep, eLpNorm_rpow_eq
-      (measurable_higherDiff (measurable_slice hF x i) m t).aestronglyMeasurable hp0 hp]
-    refine lintegral_congr fun s => ?_
-    rw [← slice_cubeDiff]
-    rfl
-  rw [h1, ← ENNReal.mul_rpow_of_nonneg _ _ hq.le]
-  exact ENNReal.rpow_le_rpow (hβ x) hq.le
+  have h := eLpNorm_inter_le_of_slice_le (measurable_cubeDiff hF m t i) hF hp0 hp i hR hRi hS
+    MeasurableSet.univ (C := β) fun x => by
+      rw [slice_cubeDiff, hstep, Measure.restrict_univ]
+      exact hβ x
+  simp only [mem_univ, ofPred_true, inter_univ] at h
+  exact h
 
 /-! ### Mixed differences on boxes -/
 
@@ -300,5 +254,35 @@ theorem eLpNorm_higherDiff_le_of_exponents (V : Submodule ℂ (ℝ → ℂ)) {p 
           Fintype.card_fin, nsmul_eq_mul]
         push_cast
         ring
+
+/-- **The isotropic inverse inequality from estimates in one variable**: let `V` be a subspace of
+functions of one variable with `‖Δ_t^m u‖_{L_p(J(m,t))} ≤ C (2^j |t|)^{θ_m} ‖u‖_{L_p[0,1]}` for
+`u ∈ V`, `m ≤ r` and `|t| ≤ 2^(-j)`, where `θ_m ≥ 0` and `0 ≤ Θ ≤ ∑_i θ_{m_i}` whenever
+`∑_i m_i = r`. If `a ∈ L_p(Q)`, `1 ≤ p < ∞`, is represented by a measurable `g` whose slices all
+lie in `V`, then for every `k`
+`ω_r(a, 2^(-k))_p ≤ (d^r C^d + 2^r) 2^(-(k-j)Θ) ‖a‖_p`, with `k - j` truncated
+at `0` (`Cube.eLpNorm_higherDiff_le_of_exponents` for `k ≥ j`, `Cube.isoModulus_le` for
+`k < j`). -/
+theorem lpIsoModulus_le_of_exponents {p : ℝ≥0∞} [Fact (1 ≤ p)] (V : Submodule ℂ (ℝ → ℂ))
+    (hp : p ≠ ∞) (r : ℕ) {C : ℝ≥0∞} (hC : C ≠ ∞) (θ : ℕ → ℝ) (hθ : ∀ m, 0 ≤ θ m) {Θ : ℝ}
+    (hΘ0 : 0 ≤ Θ) (hΘ : ∀ m : Fin d → ℕ, ∑ i, m i = r → Θ ≤ ∑ i, θ (m i)) {j : ℕ}
+    (hV : ∀ u ∈ V, ∀ m ≤ r, ∀ t : ℝ, |t| ≤ 1 / 2 ^ j →
+      eLpNorm (higherDiff m t u) p (volume.restrict (stepRegion m t)) ≤
+        C * ENNReal.ofReal (2 ^ j * |t|) ^ θ m * eLpNorm u p unitVol)
+    {k : ℕ} {a : Lp ℂ p (cubeVol d)} {g : (Fin d → ℝ) → ℂ} (hg : Measurable g)
+    (hgV : ∀ i x, slice g x i ∈ V) (hae : a =ᵐ[cubeVol d] g) :
+    lpIsoModulus p r a k ≤
+      ((d : ℝ≥0∞) ^ r * C ^ d + 2 ^ r) * ENNReal.dyadicWeight (-Θ) (k - j) * ‖a‖ₑ := by
+  rw [lpIsoModulus, isoModulus_congr_ae hae, Lp.enorm_def, eLpNorm_congr_ae hae]
+  rcases lt_or_ge k j with hkj | hjk
+  · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
+    exact (isoModulus_le hg Fact.out r _).trans (by gcongr; exact le_add_self)
+  rw [isoModulus_eq_iSup]
+  refine iSup₂_le fun h hh => ?_
+  have hhj : ‖h‖ ≤ 1 / 2 ^ j := hh.trans (one_div_le_one_div_of_le (by positivity)
+    (pow_le_pow_right₀ (by norm_num) hjk))
+  exact (eLpNorm_higherDiff_le_of_exponents V Fact.out hp r j hC θ hθ hΘ hV hg hgV
+    hhj).trans (mul_le_mul' (mul_le_mul' le_self_add
+      (ENNReal.ofReal_two_pow_mul_rpow_le hjk hh hΘ0)) le_rfl)
 
 end Cube

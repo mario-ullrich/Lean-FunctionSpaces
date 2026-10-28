@@ -28,7 +28,9 @@ smoothings in coordinate `i` on the halves `{x_i ≤ 1/2}` and `{x_i ≥ 1/2}`
 (`Cube.exists_left_cubeSmoothing`, `Cube.exists_right_cubeSmoothing`,
 `Interval.exists_ppFun_approx_of_taylor`), so it need not depend measurably on the slice.
 Minkowski's inequality in the point turns the bounds of the slices into bounds on two regions of
-the cube (`Cube.eLpNorm_le_of_slice_le`, used in `Cube.eLpNorm_sub_slicewise_ppKernel_le`).
+the cube (`Cube.eLpNorm_le_of_slice_le`), and every one-variable bound through such smoothings
+becomes a bound in coordinate `i` (`Cube.eLpNorm_sub_slicewise_le_of_smoothing`, used in
+`Cube.eLpNorm_sub_slicewise_ppKernel_le`).
 General `f ∈ L_p(Q)` follow by density of the bounded continuous functions
 (`Cube.approxError_le_of_continuous`).
 
@@ -54,14 +56,12 @@ variable {d : ℕ}
 
 /-! ### From slices to the cube -/
 
-/-- **From slices to the cube, on two regions**: if every slice of `F` in coordinate `i` satisfies
-`‖F_{x,i}‖_{L_p[0,1]} ≤ c ((‖(G₁)_{x,i}‖_{L_p[a₁,b₁]} + M ‖(D₁)_{x,i}‖_{L_p[a₁,b₁]}) + (‖(G₂)_{x,i}‖_{L_p[a₂,b₂]} + M ‖(D₂)_{x,i}‖_{L_p[a₂,b₂]}))`,
-then the same bound holds for the norms on the cube and on the regions `{x_i ∈ [a_ν, b_ν]}`, by
-Minkowski's inequality in the point (`Cube.lintegral_add_rpow_le`). -/
-theorem eLpNorm_le_of_slice_le {F G₁ D₁ G₂ D₂ : (Fin d → ℝ) → ℂ} (hF : Measurable F)
+/-- **From slices to the cube, on two regions, for all constants**: the statement of
+`Cube.eLpNorm_le_of_slice_le` for all `c, M ∈ [0, ∞]`. -/
+private theorem eLpNorm_le_of_slice_le_core {F G₁ D₁ G₂ D₂ : (Fin d → ℝ) → ℂ} (hF : Measurable F)
     (hG₁ : Measurable G₁) (hD₁ : Measurable D₁) (hG₂ : Measurable G₂) (hD₂ : Measurable D₂)
     {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d) {a₁ b₁ a₂ b₂ : ℝ} (ha₁ : 0 ≤ a₁)
-    (hb₁ : b₁ ≤ 1) (ha₂ : 0 ≤ a₂) (hb₂ : b₂ ≤ 1) {c M : ℝ≥0∞} (hc : c ≠ ∞) (hM : M ≠ ∞)
+    (hb₁ : b₁ ≤ 1) (ha₂ : 0 ≤ a₂) (hb₂ : b₂ ≤ 1) {c M : ℝ≥0∞}
     (h : ∀ x, eLpNorm (slice F x i) p unitVol ≤
       c * ((eLpNorm (slice G₁ x i) p (volume.restrict (Icc a₁ b₁)) +
           M * eLpNorm (slice D₁ x i) p (volume.restrict (Icc a₁ b₁))) +
@@ -70,35 +70,47 @@ theorem eLpNorm_le_of_slice_le {F G₁ D₁ G₂ D₂ : (Fin d → ℝ) → ℂ}
     eLpNorm F p (cubeVol d) ≤
       c * ((eLpNorm G₁ p (regionVol d i a₁ b₁) + M * eLpNorm D₁ p (regionVol d i a₁ b₁)) +
         (eLpNorm G₂ p (regionVol d i a₂ b₂) + M * eLpNorm D₂ p (regionVol d i a₂ b₂))) := by
-  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one hp).ne'
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp'
-  have hq1 : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le hp hp'
-  have hm₁ := measurable_eLpNorm_slice hG₁ hp0 hp' i (volume.restrict (Icc a₁ b₁))
-  have hm₂ := (measurable_eLpNorm_slice hD₁ hp0 hp' i (volume.restrict (Icc a₁ b₁))).const_mul M
-  have hm₃ := measurable_eLpNorm_slice hG₂ hp0 hp' i (volume.restrict (Icc a₂ b₂))
-  have hm₄ := (measurable_eLpNorm_slice hD₂ hp0 hp' i (volume.restrict (Icc a₂ b₂))).const_mul M
-  have hall := lintegral_add_rpow_le hq1 (hm₁.add hm₂).aemeasurable (hm₃.add hm₄).aemeasurable
-    (lintegral_add_rpow_le hq1 hm₁.aemeasurable hm₂.aemeasurable
-      (eLpNorm_rpow_regionVol_eq_slice hG₁ hp0 hp' i ha₁ hb₁).ge
-      (lintegral_const_mul_rpow_le hq.le hM
-        (eLpNorm_rpow_regionVol_eq_slice hD₁ hp0 hp' i ha₁ hb₁).ge))
-    (lintegral_add_rpow_le hq1 hm₃.aemeasurable hm₄.aemeasurable
-      (eLpNorm_rpow_regionVol_eq_slice hG₂ hp0 hp' i ha₂ hb₂).ge
-      (lintegral_const_mul_rpow_le hq.le hM
-        (eLpNorm_rpow_regionVol_eq_slice hD₂ hp0 hp' i ha₂ hb₂).ge))
-  refine (ENNReal.rpow_le_rpow_iff hq).1 ?_
-  rw [eLpNorm_rpow_cubeVol_eq_slice hF hp0 hp' i]
-  exact (lintegral_mono fun x => ENNReal.rpow_le_rpow (h x) hq.le).trans
-    (lintegral_const_mul_rpow_le hq.le hc hall)
+  have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp).ne'
+  have hm : ∀ {G : (Fin d → ℝ) → ℂ} (a b : ℝ), Measurable G →
+      Measurable fun x => eLpNorm (slice G x i) p (volume.restrict (Icc a b)) :=
+    fun a b hG => measurable_eLpNorm_slice hG hp0 hp' i _
+  rw [eLpNorm_cubeVol_eq_slice hF hp0 hp' i, eLpNorm_regionVol_eq_slice hG₁ hp0 hp' i ha₁ hb₁,
+    eLpNorm_regionVol_eq_slice hD₁ hp0 hp' i ha₁ hb₁,
+    eLpNorm_regionVol_eq_slice hG₂ hp0 hp' i ha₂ hb₂,
+    eLpNorm_regionVol_eq_slice hD₂ hp0 hp' i ha₂ hb₂,
+    ← eLpNorm_const_mul_ennreal M (hm a₁ b₁ hD₁).aemeasurable,
+    ← eLpNorm_const_mul_ennreal M (hm a₂ b₂ hD₂).aemeasurable]
+  refine (eLpNorm_mono_enorm (g := fun x =>
+      c * ((eLpNorm (slice G₁ x i) p (volume.restrict (Icc a₁ b₁)) +
+          M * eLpNorm (slice D₁ x i) p (volume.restrict (Icc a₁ b₁))) +
+        (eLpNorm (slice G₂ x i) p (volume.restrict (Icc a₂ b₂)) +
+          M * eLpNorm (slice D₂ x i) p (volume.restrict (Icc a₂ b₂)))))
+    (measurable_eLpNorm_slice hF hp0 hp' i _).aestronglyMeasurable
+    fun x => by simpa only [enorm_eq_self] using h x).trans ?_
+  refine (eLpNorm_const_mul_ennreal c ?_ p).trans_le ?_
+  · exact (((hm a₁ b₁ hG₁).add ((hm a₁ b₁ hD₁).const_mul M)).add
+      ((hm a₂ b₂ hG₂).add ((hm a₂ b₂ hD₂).const_mul M))).aemeasurable
+  gcongr
+  exact (eLpNorm_add_le hp).trans (add_le_add (eLpNorm_add_le hp) (eLpNorm_add_le hp))
 
-/-- The slices of `f - P^{(i)} f` in coordinate `i` are the errors of `P` on the slices of `f`. -/
-theorem slice_sub_slicewise {ι : Type*} [Fintype ι] (T : KernelOp ι) (f : (Fin d → ℝ) → ℂ)
-    (i : Fin d) (x : Fin d → ℝ) :
-    slice (fun y => f y - T.slicewise i f y) x i =
-      fun t => slice f x i t - T.apply (slice f x i) t := by
-  funext t
-  rw [← KernelOp.slice_slicewise]
-  rfl
+/-- **From slices to the cube, on two regions**: if every slice of `F` in coordinate `i` satisfies
+`‖F_{x,i}‖_{L_p[0,1]} ≤ c ((‖(G₁)_{x,i}‖_{L_p[a₁,b₁]} + M ‖(D₁)_{x,i}‖_{L_p[a₁,b₁]}) + (‖(G₂)_{x,i}‖_{L_p[a₂,b₂]} + M ‖(D₂)_{x,i}‖_{L_p[a₂,b₂]}))`,
+then the same bound holds for the norms on the cube and on the regions `{x_i ∈ [a_ν, b_ν]}`: the
+norms are mixed norms of the slices (`Cube.eLpNorm_cubeVol_eq_slice`,
+`Cube.eLpNorm_regionVol_eq_slice`), and Minkowski's inequality in `L_p` over the point applies. -/
+theorem eLpNorm_le_of_slice_le {F G₁ D₁ G₂ D₂ : (Fin d → ℝ) → ℂ} (hF : Measurable F)
+    (hG₁ : Measurable G₁) (hD₁ : Measurable D₁) (hG₂ : Measurable G₂) (hD₂ : Measurable D₂)
+    {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d) {a₁ b₁ a₂ b₂ : ℝ} (ha₁ : 0 ≤ a₁)
+    (hb₁ : b₁ ≤ 1) (ha₂ : 0 ≤ a₂) (hb₂ : b₂ ≤ 1) {c M : ℝ≥0∞} (_hc : c ≠ ∞) (_hM : M ≠ ∞)
+    (h : ∀ x, eLpNorm (slice F x i) p unitVol ≤
+      c * ((eLpNorm (slice G₁ x i) p (volume.restrict (Icc a₁ b₁)) +
+          M * eLpNorm (slice D₁ x i) p (volume.restrict (Icc a₁ b₁))) +
+        (eLpNorm (slice G₂ x i) p (volume.restrict (Icc a₂ b₂)) +
+          M * eLpNorm (slice D₂ x i) p (volume.restrict (Icc a₂ b₂))))) :
+    eLpNorm F p (cubeVol d) ≤
+      c * ((eLpNorm G₁ p (regionVol d i a₁ b₁) + M * eLpNorm D₁ p (regionVol d i a₁ b₁)) +
+        (eLpNorm G₂ p (regionVol d i a₂ b₂) + M * eLpNorm D₂ p (regionVol d i a₂ b₂))) :=
+  eLpNorm_le_of_slice_le_core hF hG₁ hD₁ hG₂ hD₂ hp hp' i ha₁ hb₁ ha₂ hb₂ h
 
 /-- **From one coordinate to all**: if `‖T u‖_{L_p[0,1]} ≤ C ‖u‖_{L_p[0,1]}` and
 `‖f - T^{(i)} f‖_{L_p(Q)} ≤ B ω_r^{(i)}(f, t)_p` in every coordinate, then
@@ -132,6 +144,49 @@ theorem eLpNorm_sub_cubeProj_le_of_coord {f : (Fin d → ℝ) → ℂ} (hfb : Bd
   (ppKernel r k).eLpNorm_sub_foldSlicewise_le_of_coord hp hp' (ppProjConst_ne_top r)
     (fun _ hu => eLpNorm_ppKernel_apply_le hp hp' r k hu) hfb h
 
+/-- **Jackson's estimate in one coordinate from the smoothings**: let `f` be continuous, `r ≥ 1`,
+`L > 0` and `w + L ≤ 1`. Suppose that in one variable the error of `T` on every continuous `u` is
+bounded through any functions `g₁, g₂` that are approximated on every interval `[a, b]` by
+polynomials of degree `< r` up to `(b - a)^r ‖D_ν‖_{L_p[a,b]}`:
+`‖u - T u‖_{L_p[0,1]} ≤ c ((‖u - g₁‖_{L_p[0,w]} + M ‖D₁‖_{L_p[0,w]})`
+`+ (‖u - g₂‖_{L_p[1-w,1]} + M ‖D₂‖_{L_p[1-w,1]}))`.
+If `a + M b ≤ J ω` whenever `a ≤ ω` and `b ≤ L^(-r) 2^r r^(2r) ω`, then
+`‖f - T^{(i)} f‖_{L_p(Q)} ≤ c (2 J) ω_r^{(i)}(f, L)_p`: apply the bound on every slice to the
+smoothings of `f` in coordinate `i` (`Cube.exists_left_cubeSmoothing`,
+`Cube.exists_right_cubeSmoothing`) and pass to the cube as in `Cube.eLpNorm_le_of_slice_le`.
+The constants `c, M, J` may be any elements of `[0, ∞]`. -/
+theorem eLpNorm_sub_slicewise_le_of_smoothing {ι : Type*} [Fintype ι] (T : KernelOp ι)
+    {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) {r : ℕ} (hr : 1 ≤ r) {p : ℝ≥0∞} (hp : 1 ≤ p)
+    (hp' : p ≠ ∞) (i : Fin d) {L w : ℝ} (hL : 0 < L) (hwL : w + L ≤ 1) {c M J : ℝ≥0∞}
+    (hT : ∀ {u g₁ D₁ g₂ D₂ : ℝ → ℂ}, Continuous u → Measurable g₁ → Measurable D₁ →
+      Measurable g₂ → Measurable D₂ →
+      (∀ a b : ℝ, a ≤ b → ∃ P ∈ degreeLT ℂ r,
+        eLpNorm (fun t => g₁ t - polyFun P t) p (volume.restrict (Icc a b)) ≤
+          ENNReal.ofReal (b - a) ^ r * eLpNorm D₁ p (volume.restrict (Icc a b))) →
+      (∀ a b : ℝ, a ≤ b → ∃ P ∈ degreeLT ℂ r,
+        eLpNorm (fun t => g₂ t - polyFun P t) p (volume.restrict (Icc a b)) ≤
+          ENNReal.ofReal (b - a) ^ r * eLpNorm D₂ p (volume.restrict (Icc a b))) →
+      eLpNorm (fun t => u t - T.apply u t) p unitVol ≤
+        c * ((eLpNorm (fun t => u t - g₁ t) p (volume.restrict (Icc 0 w)) +
+            M * eLpNorm D₁ p (volume.restrict (Icc 0 w))) +
+          (eLpNorm (fun t => u t - g₂ t) p (volume.restrict (Icc (1 - w) 1)) +
+            M * eLpNorm D₂ p (volume.restrict (Icc (1 - w) 1)))))
+    (hJ : ∀ {a b ω : ℝ≥0∞}, a ≤ ω →
+      b ≤ ENNReal.ofReal L⁻¹ ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)) * ω → a + M * b ≤ J * ω) :
+    eLpNorm (fun x => f x - T.slicewise i f x) p (cubeVol d) ≤
+      c * (2 * J) * coordModulus r p i f L := by
+  have hfm := hf.measurable
+  obtain ⟨G₁, D₁, hG₁, hD₁, h1L, h2L, hTL⟩ := exists_left_cubeSmoothing hf hr hp hp' i hL hwL
+  obtain ⟨G₂, D₂, hG₂, hD₂, h1R, h2R, hTR⟩ := exists_right_cubeSmoothing hf hr hp hp' i hL hwL
+  refine (eLpNorm_le_of_slice_le_core (hfm.sub (T.measurable_slicewise hfm i)) (hfm.sub hG₁) hD₁
+    (hfm.sub hG₂) hD₂ hp hp' i (a₁ := 0) (b₁ := w) (a₂ := 1 - w) (b₂ := 1) le_rfl (by linarith)
+    (by linarith) le_rfl (c := c) (M := M) fun x => ?_).trans ?_
+  · exact (congrArg (eLpNorm · p unitVol) (slice_sub_slicewise T f i x)).trans_le
+      (hT (continuous_slice hf x i) (measurable_slice hG₁ x i) (measurable_slice hD₁ x i)
+        (measurable_slice hG₂ x i) (measurable_slice hD₂ x i) (hTL x) (hTR x))
+  · rw [mul_assoc, two_mul, add_mul]
+    exact mul_le_mul' le_rfl (add_le_add (hJ h1L h2L) (hJ h1R h2R))
+
 /-! ### Jackson's inequality from level `1` on -/
 
 /-- **Jackson's estimate in one coordinate**: for continuous `f`, `r ≥ 1` and `k ≥ 0`,
@@ -141,36 +196,14 @@ theorem eLpNorm_sub_slicewise_ppKernel_le {f : (Fin d → ℝ) → ℂ} (hf : Co
     eLpNorm (fun x => f x - (ppKernel r (k + 1)).slicewise i f x) p (cubeVol d) ≤
       (1 + ppProjConst r) * (2 * jacksonConst r) * coordModulus r p i f (1 / 2 ^ (k + 1)) := by
   have hL : (0 : ℝ) < 1 / 2 ^ (k + 1) := by positivity
-  have hfm := hf.measurable
-  obtain ⟨G₁, D₁, hG₁, hD₁, h1L, h2L, hTL⟩ :=
-    exists_left_cubeSmoothing hf hr hp hp' i hL (one_half_add_le_one k)
-  obtain ⟨G₂, D₂, hG₂, hD₂, h1R, h2R, hTR⟩ :=
-    exists_right_cubeSmoothing hf hr hp hp' i hL (one_half_add_le_one k)
-  rw [show (1 : ℝ) - 1 / 2 = 1 / 2 by norm_num] at h1R h2R
-  set T := ppKernel r (k + 1)
-  have hslice : ∀ x, eLpNorm (slice (fun y => f y - T.slicewise i f y) x i) p unitVol ≤
-      (1 + ppProjConst r) *
-        ((eLpNorm (slice (fun y => f y - G₁ y) x i) p (volume.restrict (Icc 0 (1 / 2))) +
-            ENNReal.ofReal (1 / 2 ^ (k + 1)) ^ r *
-              eLpNorm (slice D₁ x i) p (volume.restrict (Icc 0 (1 / 2)))) +
-          (eLpNorm (slice (fun y => f y - G₂ y) x i) p (volume.restrict (Icc (1 / 2) 1)) +
-            ENNReal.ofReal (1 / 2 ^ (k + 1)) ^ r *
-              eLpNorm (slice D₂ x i) p (volume.restrict (Icc (1 / 2) 1)))) := fun x => by
-    obtain ⟨Q, hQ, hb⟩ := exists_ppFun_approx_of_taylor (measurable_slice hfm x i)
-      (measurable_slice hG₁ x i) (measurable_slice hD₁ x i) (measurable_slice hG₂ x i)
-      (measurable_slice hD₂ x i) hp hp' (hTL x) (hTR x) k
-    rw [slice_sub_slicewise]
-    exact (eLpNorm_sub_ppKernel_apply_le hp hp' (measurable_slice hfm x i)
-      (continuous_slice hf x i).integrableOn_Icc hQ).trans (mul_le_mul' le_rfl hb)
-  refine (eLpNorm_le_of_slice_le (hfm.sub (T.measurable_slicewise hfm i)) (hfm.sub hG₁) hD₁
-    (hfm.sub hG₂) hD₂ hp hp' i le_rfl (by norm_num) (by norm_num) le_rfl
-    (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ppProjConst_ne_top r⟩)
-    (ENNReal.pow_ne_top ENNReal.ofReal_ne_top) hslice).trans ?_
-  rw [mul_assoc]
-  refine mul_le_mul' le_rfl ?_
-  rw [two_mul, add_mul]
-  exact add_le_add (add_ofReal_pow_mul_le_jacksonConst hL r h1L h2L)
-    (add_ofReal_pow_mul_le_jacksonConst hL r h1R h2R)
+  refine eLpNorm_sub_slicewise_le_of_smoothing (ppKernel r (k + 1)) hf hr hp hp' i hL
+    (one_half_add_le_one k) (c := 1 + ppProjConst r) (M := ENNReal.ofReal (1 / 2 ^ (k + 1)) ^ r)
+    (fun hu hG₁ hD₁ hG₂ hD₂ hTL hTR => ?_)
+    fun ha hb => add_ofReal_pow_mul_le_jacksonConst hL r ha hb
+  obtain ⟨Q, hQ, hb⟩ := exists_ppFun_approx_of_taylor hu.measurable hG₁ hD₁ hG₂ hD₂ hp hp' hTL hTR k
+  rw [show (1 : ℝ) - 1 / 2 = 1 / 2 by norm_num]
+  exact (eLpNorm_sub_ppKernel_apply_le hp hp' hu.measurable hu.integrableOn_Icc hQ).trans
+    (mul_le_mul' le_rfl hb)
 
 /-- The constant of Jackson's inequality on the cube, `(1 + C_r)^(d+1) 2 (1 + 2^r r^(2r))`, with
 the bound `C_r` of the local projections. -/
@@ -290,43 +323,22 @@ theorem exists_eLpNorm_sub_slicewise_ppKernel_zero_le {r : ℕ} (hr : 1 ≤ r) (
     (ENNReal.mul_ne_top (by simp) (ENNReal.pow_ne_top (ENNReal.natCast_ne_top r)))
   refine ⟨K * (2 * (1 + c)), ENNReal.mul_ne_top hK
     (ENNReal.mul_ne_top (by simp) (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, hc⟩)),
-    fun {f} hf i => ?_⟩
-  have hfm := hf.measurable
-  have hwL : (1 - t) + t ≤ 1 := by linarith
-  obtain ⟨G₁, D₁, hG₁, hD₁, h1L, h2L, hTL⟩ := exists_left_cubeSmoothing hf hr hp hp' i ht hwL
-  obtain ⟨G₂, D₂, hG₂, hD₂, h1R, h2R, hTR⟩ := exists_right_cubeSmoothing hf hr hp hp' i ht hwL
-  rw [sub_sub_cancel] at h1R h2R
-  rw [← hc_eq] at h2L h2R
-  set T := ppKernel r 0
-  have hslice : ∀ x, eLpNorm (slice (fun y => f y - T.slicewise i f y) x i) p unitVol ≤
-      K * ((eLpNorm (slice (fun y => f y - G₁ y) x i) p (volume.restrict (Icc 0 (1 - t))) +
-            1 * eLpNorm (slice D₁ x i) p (volume.restrict (Icc 0 (1 - t)))) +
-          (eLpNorm (slice (fun y => f y - G₂ y) x i) p (volume.restrict (Icc t 1)) +
-            1 * eLpNorm (slice D₂ x i) p (volume.restrict (Icc t 1)))) := fun x => by
-    obtain ⟨T₁, hT₁, hT₁b⟩ := hTL x 0 (1 - t) (by linarith)
-    obtain ⟨T₂, hT₂, hT₂b⟩ := hTR x t 1 (by linarith)
-    rw [slice_sub_slicewise]
-    refine (hKb (measurable_slice hfm x i) (continuous_slice hf x i).integrableOn_Icc hT₁
-      hT₂).trans (mul_le_mul' le_rfl (add_le_add ?_ ?_))
+    fun {f} hf i => eLpNorm_sub_slicewise_le_of_smoothing (ppKernel r 0) hf hr hp hp' i ht
+      (by linarith : (1 - t) + t ≤ 1) (c := K) (M := 1) (J := 1 + c)
+      (fun hu _ _ _ _ hTL hTR => ?_) fun ha hb => ?_⟩
+  · obtain ⟨T₁, hT₁, hT₁b⟩ := hTL 0 (1 - t) (by linarith)
+    obtain ⟨T₂, hT₂, hT₂b⟩ := hTR t 1 (by linarith)
+    rw [sub_sub_cancel]
+    refine (hKb hu.measurable hu.integrableOn_Icc hT₁ hT₂).trans
+      (mul_le_mul' le_rfl (add_le_add ?_ ?_))
     · rw [one_mul]
       exact (eLpNorm_Icc_mono _ p le_rfl (by linarith)).trans
         (eLpNorm_sub_polyFun_le_add (by linarith) hT₁b)
     · rw [one_mul]
       exact (eLpNorm_Icc_mono _ p ht3 le_rfl).trans
         (eLpNorm_sub_polyFun_le_add (by linarith) hT₂b)
-  refine (eLpNorm_le_of_slice_le (hfm.sub (T.measurable_slicewise hfm i)) (hfm.sub hG₁) hD₁
-    (hfm.sub hG₂) hD₂ hp hp' i le_rfl (by linarith) ht.le le_rfl hK
-    ENNReal.one_ne_top hslice).trans ?_
-  refine (mul_le_mul' le_rfl ?_).trans_eq (mul_assoc _ _ _).symm
-  calc (eLpNorm (fun y => f y - G₁ y) p (regionVol d i 0 (1 - t)) +
-        1 * eLpNorm D₁ p (regionVol d i 0 (1 - t))) +
-      (eLpNorm (fun y => f y - G₂ y) p (regionVol d i t 1) +
-        1 * eLpNorm D₂ p (regionVol d i t 1))
-      ≤ (coordModulus r p i f t + 1 * (c * coordModulus r p i f t)) +
-          (coordModulus r p i f t + 1 * (c * coordModulus r p i f t)) :=
-        add_le_add (add_le_add h1L (mul_le_mul' le_rfl h2L))
-          (add_le_add h1R (mul_le_mul' le_rfl h2R))
-    _ = 2 * (1 + c) * coordModulus r p i f t := by ring
+  · rw [one_mul, add_mul, one_mul, hc_eq]
+    exact add_le_add ha hb
 
 /-- **Whitney's inequality on the cube**: for `m ≥ 2` there is `W < ∞` with
 `E_1(f)_p ≤ W ω_r(f, 2^(-m))_p` for every `f ∈ L_p(Q)`; the approximants of complexity `1` are the

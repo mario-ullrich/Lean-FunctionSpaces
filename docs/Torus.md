@@ -80,7 +80,7 @@ the trace theorem.
   (`Torus.eq_of_mFourierCoeff_eq`), so the weak derivative is unique; it is linear
   and passes to limits, for `p < ∞` it commutes with convolution by Schwartz kernels
   (`Torus.econvLp_iteratedLineDerivOp`), and `f ∈ W^m_p(𝕋^d)` iff `∂^v f ∈ L_p` for all
-  directions of order `≤ m` (`Torus.memSobolev_iff_forall_hasWeakLineDeriv`). For `d ≥ 1` and
+  directions of order `≤ m` (`Torus.memSobolev_iff_exists_hasWeakLineDeriv`). For `d ≥ 1` and
   `1 < p < ∞`, `W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)` for every `m ∈ ℕ`
   (`Torus.memSobolev_iff_memTriebelLizorkin`), with named constants in both directions
   (`Torus.triebelLizorkinNorm_le_of_hasWeakLineDeriv`,

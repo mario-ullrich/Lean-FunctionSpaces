@@ -23,8 +23,8 @@ For `f ∈ L_2(𝕋^d)` with Fourier coefficients `f̂(k)`, and `s > 0`:
 Both are the spectral statements of `FunctionSpaces.MeasureSpaces.Spectral.Blocks` for the Fourier
 basis, transported along `Torus.toLp_trigScheme_eq`. The smooth Littlewood–Paley blocks
 `Torus.lpBlock` describe `B^s_{p,q}(𝕋^d)` for every `1 ≤ p < ∞`
-(`Torus.memBesov_iff_littlewoodPaleyNorm_lt_top`). The Littlewood–Paley identity
-`F^0_{p,2}(𝕋^d) = L_p(𝕋^d)`, `1 < p < ∞`, needs a Fourier multiplier theorem.
+(`Torus.memBesov_iff_littlewoodPaleyNorm_lt_top`), and for `1 < p < ∞` the Littlewood–Paley
+identity `F^0_{p,2}(𝕋^d) = L_p(𝕋^d)` holds (`Torus.triebelLizorkinSpace_zero_two_eq_top`).
 -/
 
 @[expose] public section

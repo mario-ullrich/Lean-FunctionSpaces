@@ -466,13 +466,18 @@ a local instance of one file; the project re-declares it as a scoped instance.
   Torus.trigScheme, TorusHaar.volume_eq_haarAddCircle, TorusHaar.isAddHaarMeasure,
   TorusHaar.isProbabilityMeasure, Torus.natAbs_le_deg, Torus.deg_le_iff, Torus.deg_add_le,
   Torus.deg_zero, Torus.mem_boxLt, Torus.boxLt_zero, Torus.boxLt_mono, Torus.trigMonomial_apply,
-  Torus.trigPoly_zero, Torus.trigPoly_mono, Torus.trigMonomial_mem_trigPoly, Torus.mem_trigScheme}
+  Torus.trigPoly_zero, Torus.trigPoly_mono, Torus.trigMonomial_mem_trigPoly, Torus.mem_trigScheme,
+  Torus.map_mem_trigPoly}
 \leanok
 \uses{def:function-scheme}
 The degree of $k \in \Z^d$ is $\deg k = \max_j |k_j|$, with $\deg k = 0$ for $d = \emptyset$.
 The space $\mathcal{T}_n$ of trigonometric polynomials of degree $< n$ is the span of
 $\{e_k : \deg k < n\}$ in $C(\T^d)$, a space of dimension at most $(2n)^d$. The spaces
-$\mathcal{T}_n$ form a scheme of functions on $\T^d$, the \emph{trigonometric scheme}.
+$\mathcal{T}_n$ form a scheme of functions on $\T^d$, the \emph{trigonometric scheme}. For all
+finite index sets $\iota, \kappa$, every $m \in \N$ and every linear map $L$ from the bounded
+continuous functions on $\T^\iota$ to those on $\T^\kappa$ with $L e_k \in \mathcal{T}_m$ for all
+$k$ with $\deg k < m$, $L$ maps $\mathcal{T}_m$ on $\T^\iota$ into $\mathcal{T}_m$ on $\T^\kappa$,
+since $\mathcal{T}_m$ is the span of these monomials.
 \end{definition}
 
 \begin{lemma}[Products of trigonometric polynomials]
@@ -649,7 +654,8 @@ trace theorems of \Cref{ch:traces-abstract} extend it to Besov spaces.
 For a bounded continuous $a$ on $\T^{n+1}$, its restriction to the face is
 $a(0, \cdot) : x' \mapsto a(0, x')$ on $\T^n$. It maps $\mathcal{T}_m$ on $\T^{n+1}$ into
 $\mathcal{T}_m$ on $\T^n$, since $e_k(0, x') = e_{(k_1, \dots, k_n)}(x')$; so does the
-restriction to every line $t \mapsto a(t, x')$, onto $\mathcal{T}_m$ on $\T^1$.
+restriction to every line $t \mapsto a(t, x')$, onto $\mathcal{T}_m$ on $\T^1$; both follow
+from the statement on linear maps in \Cref{def:trig-poly}.
 \end{definition}
 
 \begin{lemma}[Fubini on $\T^{n+1} = \T \times \T^n$]
@@ -1086,20 +1092,27 @@ depends on $f$ only through its class modulo null sets.
 
 \begin{lemma}[Young's inequality on the torus]
 \label{lem:torus-econv-young}
-\lean{Torus.eLpNorm_econv_le, Torus.memLp_econv, Torus.ae_integrable_econv, Torus.econvLp,
-  Torus.econvLp_apply_ae, Torus.enorm_econvLp_le}
+\lean{Torus.eLpNorm_econv_le, Torus.memLp_econv, Torus.ae_integrable_econv, Torus.econv_add_ae,
+  Torus.econv_smul, Torus.econvLp, Torus.econvLp_apply_ae, Torus.coeFn_sum_econvLp_ae,
+  Torus.enorm_econvLp_le}
 \leanok
 \uses{def:torus-econv, lem:weighted-jensen}
 For $1 \leq p < \infty$, $\Phi \in L_1(\R^d)$ and $f \in L_p(\T^d)$, the integral converges
 absolutely for almost every $t$ and $\|\Phi * f\|_{L_p(\T^d)} \leq \|\Phi\|_{L_1(\R^d)} \|f\|_p$.
-So $f \mapsto \Phi * f$ is a bounded operator on $L_p(\T^d)$.
+So $f \mapsto \Phi * f$ is a bounded operator on $L_p(\T^d)$. For all $f, g \in L_1(\T^d)$ and
+$c \in \C$, $\Phi * (f + g) = \Phi * f + \Phi * g$ almost everywhere and
+$\Phi * (c f) = c \, (\Phi * f)$ at every point. For every finite set $s$, integrable kernels
+$K_j$ and $u_j \in L_p(\T^d)$, the class $\sum_{j \in s} K_j * u_j$ is represented by
+$t \mapsto \sum_{j \in s} (K_j * u_j)(t)$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 Every translate $f(\cdot - \pi y)$ has the norm of $f$, and \Cref{lem:weighted-jensen} averages
 them with the weight $|\Phi|$. Tonelli's theorem gives
-$\int \int |\Phi(y)| |f(t - \pi y)| \, dy \, dt = \|\Phi\|_1 \|f\|_1$.
+$\int \int |\Phi(y)| |f(t - \pi y)| \, dy \, dt = \|\Phi\|_1 \|f\|_1$, so the integrals of
+$\Phi * f$ and $\Phi * g$ converge absolutely almost everywhere and add there. Constants leave the
+integral, and the class of a finite sum is the sum of the representatives.
 \end{proof}
 
 \begin{theorem}[Fourier multipliers on the torus]
@@ -1505,23 +1518,20 @@ $\partial^\alpha f \in L_p(\T^d)$ for every $\alpha$ with $|\alpha| \leq m$.
 The remaining results of this section are for $p = 2$; \Cref{ch:sobolev-torus} treats weak
 derivatives along directions in $L_p(\T^d)$ for every $1 \leq p \leq \infty$.
 
-\begin{lemma}[Existence and uniqueness of weak derivatives]
+\begin{lemma}[Existence of weak derivatives]
 \label{lem:weak-derivative}
-\lean{Torus.HasWeakDeriv.unique, Torus.hasWeakDeriv_zero, Torus.exists_hasWeakDeriv,
-  Torus.HasWeakDeriv.mem_l2}
+\lean{Torus.hasWeakDeriv_zero, Torus.exists_hasWeakDeriv, Torus.HasWeakDeriv.mem_l2}
 \leanok
 \uses{def:weak-derivative}
 For every $1 \leq p \leq \infty$ and every $f \in L_p(\T^d)$, $\partial^0 f = f$. Let
-$f \in L_2(\T^d)$ and $\alpha \in \N^d$. The weak derivative $\partial^\alpha f$ in $L_2(\T^d)$
-is unique when it exists, and it exists if and only if
-$\sum_k |(2\pi i k)^\alpha \hat f(k)|^2 < \infty$.
+$f \in L_2(\T^d)$ and $\alpha \in \N^d$. The weak derivative $\partial^\alpha f$ exists in
+$L_2(\T^d)$ if and only if $\sum_k |(2\pi i k)^\alpha \hat f(k)|^2 < \infty$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-An element of $L_2(\T^d)$ is determined by its Fourier coefficients, and every
-square-summable family of coefficients is the family of some element, since the
-trigonometric monomials form a Hilbert basis.
+Every square-summable family of coefficients is the family of some element of $L_2(\T^d)$,
+since the trigonometric monomials form a Hilbert basis.
 \end{proof}
 
 \begin{lemma}[Symbols and the Sobolev weight]
@@ -3426,7 +3436,10 @@ $Q_i[a, b] = \{x \in Q : x_i \in [a, b]\}$.
 \label{lem:cube-slices}
 \lean{Cube.lintegral_cubeVol_eq_slice, Cube.lintegral_region_eq_slice,
   Cube.eLpNorm_rpow_region_eq_slice, Cube.eLpNorm_rpow_cubeVol_eq_slice,
-  Cube.eLpNorm_rpow_regionVol_eq_slice, Cube.measurable_eLpNorm_slice, Cube.ae_slice_ae_eq}
+  Cube.eLpNorm_rpow_regionVol_eq_slice, Cube.measurable_eLpNorm_slice, Cube.ae_slice_ae_eq,
+  Cube.lintegral_inter_eq_slice, Cube.eLpNorm_inter_eq_slice, Cube.eLpNorm_cubeVol_eq_slice,
+  Cube.eLpNorm_regionVol_eq_slice, Cube.eLpNorm_inter_le_of_slice_le,
+  Cube.eLpNorm_cubeVol_le_of_slice_le}
 \leanok
 \uses{def:cube}
 Let $G : \R^d \to [0, \infty]$ and $f : \R^d \to \C$ be measurable, $i$ a coordinate,
@@ -3437,15 +3450,33 @@ $0 < p < \infty$ and $[a, b] \subseteq [0, 1]$. Then
 \end{gather*}
 and $x \mapsto \|f_{x,i}\|_{L_p(\mu)}$ is measurable for every $s$-finite measure $\mu$ on $\R$.
 If $f = g$ almost everywhere on $Q$, then for almost every $x \in Q$ the slices $f_{x,i}$ and
-$g_{x,i}$ agree almost everywhere on $[0, 1]$.
+$g_{x,i}$ agree almost everywhere on $[0, 1]$. For every measurable $R \subseteq \R^d$ such that
+$x \in R \Leftrightarrow x' \in R$ whenever $x$ and $x'$ differ only in the coordinate $i$, and
+all measurable $S, S' \subseteq \R$, with integrals over subsets of $\R^d$ taken with respect to
+$\lambda_d$,
+\begin{gather*}
+  \int_{R \cap \{x_i \in S\}} G \, d\lambda_d
+  = \int_R \int_{S \cap [0, 1]} G_{x,i}(t) \, dt \, d\lambda_d(x) , \\
+  \|f\|_{L_p(R \cap \{x_i \in S\})} = \bigl\| x \mapsto \|f_{x,i}\|_{L_p(S \cap [0, 1])}
+  \bigr\|_{L_p(R)} ,
+\end{gather*}
+in particular, for $R = \R^d$, $\|f\|_{L_p(Q)} = \| x \mapsto \|f_{x,i}\|_{L_p[0,1]} \|_{L_p(Q)}$
+and $\|f\|_{L_p(Q_i[a,b])} = \| x \mapsto \|f_{x,i}\|_{L_p[a,b]} \|_{L_p(Q)}$. For all measurable
+$F, H : \R^d \to \C$ and $C \in [0, \infty]$ with
+$\|F_{x,i}\|_{L_p(S \cap [0,1])} \leq C \|H_{x,i}\|_{L_p(S' \cap [0,1])}$ for every $x$,
+$\|F\|_{L_p(R \cap \{x_i \in S\})} \leq C \|H\|_{L_p(R \cap \{x_i \in S'\})}$, in particular
+$\|F\|_{L_p(Q)} \leq C \|H\|_{L_p(Q)}$ for $S = S' = \R$ and $R = \R^d$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 The first identity is Tonelli's theorem for the coordinate $i$, in the form of marginals; the
 inner integral does not depend on $x_i$, and $\lambda_d$ is a probability measure. The second
-applies it to $|f|^p$ times the indicator of $Q_i[a, b]$. For the last statement apply the first to
-the indicator of $\{f \neq g\}$.
+applies it to $|f|^p$ times the indicator of $Q_i[a, b]$. For the statement on $f = g$ apply the
+first to the indicator of $\{f \neq g\}$. The integral over $R \cap \{x_i \in S\}$ is the first
+identity for $G$ times the indicator of $R \cap \{x_i \in S\}$, since the indicator of $R$ does
+not depend on $x_i$; for $|f|^p$ its $p$-th root is the identity of norms, and the bound follows
+from it by the monotonicity and the homogeneity of the $L_p$ norm.
 \end{proof}
 
 \begin{lemma}[Minkowski's inequality in the form of bounds]
@@ -3461,8 +3492,6 @@ and $\int (c \varphi)^q \leq (c a)^q$ for every $c < \infty$.
 \leanok
 Minkowski's inequality for functions with values in $[0, \infty]$.
 \end{proof}
-
-The norms of the slices are such functions of the point, so the lemma combines bounds of slices.
 
 \section{Moduli in the coordinates}
 
@@ -3492,10 +3521,11 @@ stays outside the integral over the other coordinates.
 \begin{lemma}[Properties of the moduli on the cube]
 \label{lem:cube-modulus}
 \lean{Cube.eLpNorm_rpow_cubeDiff_eq_slice, Cube.eLpNorm_cubeDiff_le_coordModulus,
-  Cube.coordModulus_mono, Cube.coordModulus_add_le, Cube.eLpNorm_cubeDiff_le, Cube.coordModulus_le,
+  Cube.coordModulus_mono, Cube.coordModulus_add_le, Cube.eLpNorm_cubeDiff_le_of_slice_le,
+  Cube.eLpNorm_cubeDiff_le, Cube.coordModulus_le, Cube.coordModulus_eq_of_slice,
   Cube.coordModulus_congr_ae, Cube.cubeModulus_mono, Cube.cubeModulus_add_le, Cube.cubeModulus_le,
   Cube.cubeModulus_congr_ae, Cube.lpCubeModulus_add_le, Cube.lpCubeModulus_le,
-  Cube.lpCubeModulus_anti}
+  Cube.lpCubeModulus_anti, Cube.lpCubeModulus_le_of_coord}
 \leanok
 \uses{def:cube-modulus, lem:cube-slices, lem:interval-modulus}
 Let $f$ be measurable, $1 \leq p < \infty$ and $h \geq 0$. Then
@@ -3503,16 +3533,32 @@ Let $f$ be measurable, $1 \leq p < \infty$ and $h \geq 0$. Then
   \|\Delta^r_{h e_i} f\|_{L_p(Q_i[0, 1 - rh])}^p
   = \int_Q \|\Delta_h^r f_{x,i}\|_{L_p[0, 1 - rh]}^p \, d\lambda_d(x) .
 \]
+For every $B \in [0, \infty]$ with
+$\|\Delta_h^r f_{x,i}\|_{L_p[0, 1 - rh]} \leq B \|f_{x,i}\|_{L_p[0,1]}$ for every $x$,
+\[
+  \|\Delta^r_{h e_i} f\|_{L_p(Q_i[0, 1 - rh])} \leq B \|f\|_{L_p(Q)} .
+\]
+If $g$ is measurable and, for
+every $0 \leq h \leq t$ and almost every $x$, the differences $\Delta_h^r f_{x,i}$ and
+$\Delta_h^r g_{x,i}$ have the same norm in $L_p[0, 1 - rh]$, then
+$\omega_r^{(i)}(f, t)_p = \omega_r^{(i)}(g, t)_p$.
 The moduli $\omega_r^{(i)}(f, t)_p$ and $\omega_r(f, t)_p$ increase in $t$, are subadditive in $f$,
 satisfy $\omega_r^{(i)}(f, t)_p \leq 2^r \|f\|_{L_p(Q)}$ and
 $\omega_r(f, t)_p \leq d \, 2^r \|f\|_{L_p(Q)}$, and depend only on the class of $f$ in $L_p(Q)$.
+For all $j, k \in \N$, $\theta \in \R$ and $B \geq 2^r$: if $a \in L_p(Q)$ is represented by a
+measurable $g$ and, in case $j \leq k$,
+$\|\Delta^r_{h e_i} g\|_{L_p(Q_i[0, 1 - rh])} \leq B \, 2^{-(k-j)\theta} \|g\|_{L_p(Q)}$ for every
+coordinate $i$ and every $0 \leq h \leq 2^{-k}$, then
+$\omega_r(a, 2^{-k})_p \leq d B \, 2^{-\max(k-j, 0)\theta} \|a\|_p$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 The identity is \Cref{lem:cube-slices} for the difference, whose slices in coordinate $i$ are the
 differences of the slices. The bounds hold slice by slice by \Cref{lem:interval-modulus}, and
-\Cref{lem:cube-slices} passes them to $Q$.
+\Cref{lem:cube-slices} passes them to $Q$. In the last statement take the supremum over $h$ and
+sum over the $d$ coordinates if $j \leq k$, and use $\omega_r(a, t)_p \leq d \, 2^r \|a\|_p$ if
+$k < j$.
 \end{proof}
 
 \section{Smoothing in one coordinate}
@@ -3760,28 +3806,47 @@ combinations expands into a combination of products of the $\varphi_{n,l}$.
 \begin{lemma}[From slices to the cube]
 \label{lem:slices-to-cube}
 \lean{Cube.eLpNorm_le_of_slice_le, Cube.slice_sub_slicewise,
+  Cube.eLpNorm_sub_slicewise_le_of_smoothing,
   Cube.KernelOp.eLpNorm_sub_foldSlicewise_le_of_coord, Cube.eLpNorm_sub_cubeProj_le_of_coord}
 \leanok
-\uses{lem:minkowski-bounds, lem:cube-slices, lem:kernel-telescoping}
+\uses{lem:cube-slices, lem:cube-two-sided-smoothing, lem:kernel-telescoping}
 Let $1 \leq p < \infty$, $c, M < \infty$, and let $F, G_1, D_1, G_2, D_2$ be measurable on $\R^d$
 and $[a_\nu, b_\nu] \subseteq [0, 1]$. If for every $x$
 \[
   \|F_{x,i}\|_{L_p[0,1]} \leq c \sum_{\nu = 1}^2 \bigl( \|(G_\nu)_{x,i}\|_{L_p[a_\nu, b_\nu]}
     + M \|(D_\nu)_{x,i}\|_{L_p[a_\nu, b_\nu]} \bigr) ,
 \]
-then the same bound holds for $\|F\|_{L_p(Q)}$ with the norms on $Q_i[a_\nu, b_\nu]$. Let $T$
-be a kernel operator with $\|T u\|_{L_p[0,1]} \leq C \|u\|_{L_p[0,1]}$ for measurable $u$. If
-$\|f - T^{(i)} f\|_{L_p(Q)} \leq B \, \omega_r^{(i)}(f, t)_p$ for every coordinate $i$ and a
-bounded measurable $f$, then
+then the same bound holds for $\|F\|_{L_p(Q)}$ with the norms on $Q_i[a_\nu, b_\nu]$.
+
+Let $T$ be a kernel operator, $f$ continuous on $\R^d$, $r \geq 1$, $L > 0$, $w + L \leq 1$ and
+$c, M, J \in [0, \infty]$. Assume that every continuous $u$ on $\R$ satisfies
+\begin{multline*}
+  \|u - T u\|_{L_p[0,1]} \leq c \bigl( \|u - g_1\|_{L_p[0, w]} + M \|D_1\|_{L_p[0, w]} \\
+    + \|u - g_2\|_{L_p[1 - w, 1]} + M \|D_2\|_{L_p[1 - w, 1]} \bigr)
+\end{multline*}
+for all measurable $g_\nu, D_\nu$ such that for all $a \leq b$ some polynomial $P$ of degree
+$< r$ has $\|g_\nu - P\|_{L_p[a,b]} \leq (b - a)^r \|D_\nu\|_{L_p[a,b]}$, and that
+$\alpha + M \beta \leq J \omega$ whenever $\alpha \leq \omega$ and
+$\beta \leq L^{-r} 2^r r^{2r} \omega$ in $[0, \infty]$. Then
+$\|f - T^{(i)} f\|_{L_p(Q)} \leq 2 c J \, \omega_r^{(i)}(f, L)_p$ for every coordinate $i$.
+
+Let $T$ be a kernel operator with $\|T u\|_{L_p[0,1]} \leq C \|u\|_{L_p[0,1]}$ for measurable
+$u$. If $\|f - T^{(i)} f\|_{L_p(Q)} \leq B \, \omega_r^{(i)}(f, t)_p$ for every coordinate $i$
+and a bounded measurable $f$, then
 $\|f - T^{(1)} \cdots T^{(d)} f\|_{L_p(Q)} \leq (1 + C)^d B \, \omega_r(f, t)_p$; for $T = P_k$
 this is $\|f - P^d_k f\|_{L_p(Q)} \leq (1 + C_r)^d B \, \omega_r(f, t)_p$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-The norms of the slices are measurable functions of $x$ (\Cref{lem:cube-slices}); raise the bound
-to the power $p$, integrate over $x$, and apply \Cref{lem:minkowski-bounds} three times. The
-second statement is \Cref{lem:kernel-telescoping}.
+The norms of the slices are measurable functions of $x$, and the norms on $Q$ and on
+$Q_i[a_\nu, b_\nu]$ are the $L_p(Q)$ norms of these functions (\Cref{lem:cube-slices}); the
+bound follows from the monotonicity, the homogeneity and the triangle inequality of the
+$L_p(Q)$ norm. For the second statement, \Cref{lem:cube-two-sided-smoothing} on $Q_i[0, w]$ and
+on $Q_i[1 - w, 1]$ gives $G_1, D_1$ and $G_2, D_2$; the assumption on the slices
+$u = f_{x,i}$, $g_\nu = (G_\nu)_{x,i}$, $D_\nu = (D_\nu)_{x,i}$ and the first statement give
+$\|f - T^{(i)} f\|_{L_p(Q)} \leq c \sum_{\nu} (\|f - G_\nu\| + M \|D_\nu\|) \leq 2 c J \omega$.
+The third statement is \Cref{lem:kernel-telescoping}.
 \end{proof}
 
 \begin{theorem}[Jackson's inequality on the cube]
@@ -4123,11 +4188,11 @@ $Q$ the region $Q_{r s e_i}$ is $\{x_i \leq 1 - rs\}$.
 
 \begin{theorem}[Isotropic differences from the coordinates]
 \label{thm:iso-diff-bound}
-\lean{Cube.lintegral_inter_eq_slice, Cube.eLpNorm_cubeDiff_inter_le, Cube.listRegion,
+\lean{Cube.eLpNorm_cubeDiff_inter_le, Cube.listRegion,
   Cube.listRegion_nil, Cube.listRegion_cons, Cube.measurableSet_listRegion,
   Cube.update_mem_listRegion_iff, Cube.eLpNorm_mixedDiff_le, Cube.eLpNorm_shift_mixedDiff_le,
   Cube.eLpNorm_higherDiff_le_sum, Cube.prod_rpow_eq_rpow_sum,
-  Cube.eLpNorm_higherDiff_le_of_exponents}
+  Cube.eLpNorm_higherDiff_le_of_exponents, Cube.lpIsoModulus_le_of_exponents}
 \leanok
 \uses{lem:iso-expansion, lem:iso-modulus, lem:cube-slices, lem:step-regions}
 Let $1 \leq p < \infty$, $r, j \in \N$, and let $V$ be a subspace of functions of one variable with
@@ -4141,6 +4206,11 @@ measurable $f$ whose slices all lie in $V$ and every $h$ with $\|h\|_\infty \leq
 \[
   \|\Delta_h^r f\|_{L_p(Q_{rh})} \leq d^r C^d (2^j \|h\|_\infty)^{\Theta} \|f\|_p .
 \]
+If $\Theta \geq 0$, then for every $k \in \N$ every $a \in L_p(Q)$ represented by a measurable
+function whose slices all lie in $V$ satisfies
+\[
+  \omega^{\mathrm{iso}}_r(a, 2^{-k})_p \leq (d^r C^d + 2^r) \, 2^{-\max(k - j, 0)\Theta} \|a\|_p .
+\]
 \end{theorem}
 
 \begin{proof}
@@ -4153,7 +4223,9 @@ the other coordinates does not depend on the coordinate of the step, so Tonelli'
 coordinate (\Cref{lem:cube-slices}) and the bound on the slices, which stay in $V$, give the factor
 $C (2^j |h_i|)^{\theta_{m_i}}$. The product is at most
 $C^d (2^j \|h\|_\infty)^{\sum_i \theta_{m_i}} \leq C^d (2^j \|h\|_\infty)^\Theta$, since
-$2^j \|h\|_\infty \leq 1$.
+$2^j \|h\|_\infty \leq 1$. For the modulus with $k \geq j$ take the supremum over
+$\|h\|_\infty \leq 2^{-k}$, where $2^j \|h\|_\infty \leq 2^{-(k-j)}$; for $k < j$ use
+$\omega^{\mathrm{iso}}_r(a, t)_p \leq 2^r \|a\|_p$ (\Cref{lem:iso-modulus}).
 \end{proof}
 
 \begin{lemma}[The gains of piecewise polynomials and splines]
@@ -4201,10 +4273,8 @@ $\theta = r - 1 + 1/p$.
 
 \begin{proof}
 \leanok
-For $k \geq j$ and $\|h\|_\infty \leq 2^{-k}$, \Cref{thm:iso-diff-bound} and
-\Cref{lem:iso-exponents} give $\|\Delta_h^r a\|_{L_p(Q_{rh})} \leq d^r C^d (2^j \|h\|_\infty)^\theta
-\|a\|_p$ and $2^j \|h\|_\infty \leq 2^{-(k-j)}$. For $k < j$ use
-$\omega^{\mathrm{iso}}_r(a, t)_p \leq 2^r \|a\|_p$.
+The slices of $a$ lie in the spaces of \Cref{lem:iso-exponents}, so the bound for the modulus in
+\Cref{thm:iso-diff-bound} applies with $\Theta = \theta$ and $C_B = d^r C^d + 2^r$.
 \end{proof}
 
 \begin{theorem}[Approximation spaces on the cube and the isotropic modulus]
@@ -4544,6 +4614,23 @@ and $\sum_{l=1}^L c_l = 1$ for $L \geq 1$.
 \leanok
 $(-1)^L (-1)^{L-l} = (-1)^l$ for $l \leq L$, and $\sum_{l=0}^L (-1)^l \binom{L}{l} = (1 - 1)^L = 0$
 for $L \geq 1$.
+\end{proof}
+
+\begin{lemma}[Moments of the coefficients of the moment kernels]
+\label{lem:jackson-moments}
+\lean{Rd.sum_jacksonCoeff_mul_pow}
+\leanok
+\uses{lem:moment-coefficients}
+For all $r, j \in \N$ with $1 \leq j < r$,
+$\sum_{l < r} (-1)^l \binom{r}{l+1} (l + 1)^j = 0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:moment-coefficients} the sum is $0^j - (-1)^r \Delta^r_1 (x^j)(0)$, and differences
+of order $r$ annihilate polynomials of degree $j < r$ (Mathlib's
+\texttt{fwdDiff\_\allowbreak iter\_\allowbreak pow\_\allowbreak eq\_\allowbreak zero\_\allowbreak
+of\_\allowbreak lt}).
 \end{proof}
 
 \begin{definition}[Moment kernels]

@@ -47,12 +47,10 @@ frequencies of degree `< n` (`Torus.localWeylBound_fourierEigenbasis`).
 open MeasureTheory Filter Topology
 open scoped ENNReal BoundedContinuousFunction InnerProductSpace lp
 
-/-- `(2^k)^t = (2^t)^k` for real `t`. -/
+/-- `(2^k)^t = (2^t)^k` for real `t` (Mathlib's `Real.rpow_pow_comm`). -/
 theorem Real.natCast_two_pow_rpow (t : ℝ) (k : ℕ) : ((2 ^ k : ℕ) : ℝ) ^ t = ((2 : ℝ) ^ t) ^ k := by
-  rw [← Real.rpow_natCast ((2 : ℝ) ^ t), ← Real.rpow_mul (by norm_num : (0 : ℝ) ≤ 2),
-    show ((2 ^ k : ℕ) : ℝ) = (2 : ℝ) ^ (k : ℝ) by
-      rw [Real.rpow_natCast, Nat.cast_pow, Nat.cast_ofNat],
-    ← Real.rpow_mul (by norm_num : (0 : ℝ) ≤ 2), mul_comm]
+  rw [Nat.cast_pow, Nat.cast_ofNat]
+  exact (Real.rpow_pow_comm zero_le_two t k).symm
 
 variable {M : Type*} [TopologicalSpace M] [MeasurableSpace M] [BorelSpace M]
 
@@ -91,17 +89,15 @@ theorem exists_sum_of_mem_basisSpan {n : ℕ} {a : M →ᵇ ℂ} (ha : a ∈ B.b
     _ = _ := Finset.sum_subset hsub fun i _ hi => by simp [hi]
 
 /-- **Parseval's identity for combinations of the basis functions**:
-`‖∑ c_i ẽ_i‖_2² = ∑ |c_i|²`. -/
+`‖∑ c_i ẽ_i‖_2² = ∑ |c_i|²` (Mathlib's `OrthogonalFamily.norm_sum` for the orthonormal basis). -/
 theorem norm_toLp_sum_sq (t : Finset ι) (c : ι → ℂ) :
     ‖BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ (∑ i ∈ t, c i • B.basisFun i)‖ ^ 2 =
       ∑ i ∈ t, ‖c i‖ ^ 2 := by
   have hsum : BoundedContinuousFunction.toLp (E := ℂ) 2 μ ℂ (∑ i ∈ t, c i • B.basisFun i) =
       ∑ i ∈ t, c i • B.basis i := by
     rw [map_sum]; simp_rw [map_smul, B.toLp_basisFun]
-  rw [hsum, @norm_sq_eq_re_inner ℂ, B.basis.orthonormal.inner_sum c c t, map_sum]
-  refine Finset.sum_congr rfl fun i _ => ?_
-  rw [RCLike.conj_mul]
-  norm_cast
+  rw [hsum]
+  exact B.basis.orthonormal.orthogonalFamily.norm_sum c t
 
 variable {B}
 

@@ -74,8 +74,7 @@ theorem memSobolev_of_memSobolev_of_lt [Nonempty d] (hp1 : 1 < p) (hp : p ≠ �
     ∃ g : Lp ℂ r (volume : Measure (UnitAddTorus d)),
       Lp.inclusionOfExponentLe (𝕜 := ℝ) volume hpr g = f ∧ MemSobolev k g := by
   have hm : (Fintype.card d : ℝ) * (p.toReal⁻¹ - r.toReal⁻¹) < m := by
-    have hk : (0 : ℝ) ≤ k := Nat.cast_nonneg k
-    linarith
+    linarith [Nat.cast_nonneg (α := ℝ) k]
   obtain ⟨g, hgf, hg⟩ := memSobolev_exists_inclusion_eq hp1 hp hpr hm hf
   exact ⟨g, hgf, memSobolev_of_memBesov (hp1.trans_le hpr) hr
     (hg.of_lt (le_max_of_le_right one_le_two) (le_min Fact.out one_le_two) (Nat.cast_nonneg k)

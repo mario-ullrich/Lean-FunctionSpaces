@@ -57,6 +57,15 @@ sum passes to `L_p` by Minkowski's inequality
 (`MeasureTheory.eLpNorm_le_const_mul_sum_of_ae_le`), and `2^(nm) b_n ≤ ∑_i c_{i,n}` gives
 `‖(2^((n+1)m) b_n)_n‖_{ℓ_q} ≤ 2^m ∑_i ‖c_i‖_{ℓ_q}` (`ENNReal.lqNorm_dyadicWeight_succ_le_sum`).
 
+The mixed norm `‖x ↦ ‖(u_j(x))_j‖_{ℓ_q}‖_p` of a family `u_j : α → [0, ∞]` satisfies the
+triangle inequality for `w_j ≤ u_j + v_j`, is homogeneous and decreases in `q`
+(`MeasureTheory.eLpNorm_lqNorm_le_add`, `MeasureTheory.eLpNorm_lqNorm_eq_const_mul`,
+`MeasureTheory.eLpNorm_lqNorm_mono_exponent`). For the weighted family `(2^(js) u_j)_j`, which
+gives the Triebel–Lizorkin quasi-norm for `u_j = |ψ_j ⋆ f|` on `ℝ^d` and on the torus, the weights
+are `1` for `s = 0` and the norm increases in `s`
+(`MeasureTheory.eLpNorm_lqNorm_dyadicWeight_zero_left`,
+`MeasureTheory.eLpNorm_lqNorm_dyadicWeight_mono_smoothness`).
+
 Two facts on conjugate exponents serve the duality arguments: a power cancels in Hölder's
 inequality, `X ≤ K A^{1/u} X^{1/u'}` with `X < ∞` gives `X ≤ K^u A`
 (`ENNReal.le_rpow_mul_of_le_mul_rpow`), and the conjugate exponent of `p > 2` is below `2`
@@ -751,5 +760,73 @@ theorem eLpNorm_lqNorm_dyadicWeight_le_zero_add_succ (hp1 : 1 ≤ p) (hq : 1 ≤
   simp only [enorm_eq_self, Pi.add_apply]
   refine (ENNReal.lqNorm_le_sum_range_add_shift hq _ 1).trans_eq ?_
   simp [ENNReal.dyadicWeight_zero_right]
+
+/-! ### Mixed norms of families and of dyadically weighted families -/
+
+section DyadicFamily
+
+variable {s : ℝ} {u v w : ℕ → α → ℝ≥0∞}
+
+/-- **The triangle inequality for mixed norms**: for `1 ≤ p`, `1 ≤ q ≤ ∞` and families
+`u_j, v_j, w_j : α → [0, ∞]` with `w` measurable and, almost everywhere, `w_j ≤ u_j + v_j` for
+every `j`, `‖x ↦ ‖(w_j(x))_j‖_{ℓ_q}‖_p` is at most the sum of the same norms of `u` and `v`, by
+the triangle inequalities in `ℓ_q` at every point and in `L_p`. -/
+theorem eLpNorm_lqNorm_le_add (hp1 : 1 ≤ p) (hq : 1 ≤ q) (hw : ∀ j, AEMeasurable (w j) μ)
+    (h : ∀ᵐ x ∂μ, ∀ j, w j x ≤ u j x + v j x) :
+    eLpNorm (fun x => lqNorm q fun j => w j x) p μ ≤
+      eLpNorm (fun x => lqNorm q fun j => u j x) p μ +
+        eLpNorm (fun x => lqNorm q fun j => v j x) p μ := by
+  refine (eLpNorm_mono_enorm_ae (g := (fun x => lqNorm q fun j => u j x) +
+    fun x => lqNorm q fun j => v j x)
+    (aemeasurable_lqNorm_comp hw q).aestronglyMeasurable ?_).trans (eLpNorm_add_le hp1)
+  filter_upwards [h] with x hx
+  simp only [enorm_eq_self, Pi.add_apply]
+  exact (ENNReal.lqNorm_mono hx).trans (ENNReal.lqNorm_add_le hq _ _)
+
+/-- **Homogeneity of mixed norms**: for `c ∈ [0, ∞]` and families `u_j, w_j : α → [0, ∞]` with
+`u` measurable and, almost everywhere, `w_j = c u_j` for every `j`,
+`‖x ↦ ‖(w_j(x))_j‖_{ℓ_q}‖_p = c ‖x ↦ ‖(u_j(x))_j‖_{ℓ_q}‖_p`. -/
+theorem eLpNorm_lqNorm_eq_const_mul (c : ℝ≥0∞) (hu : ∀ j, AEMeasurable (u j) μ)
+    (h : ∀ᵐ x ∂μ, ∀ j, w j x = c * u j x) :
+    eLpNorm (fun x => lqNorm q fun j => w j x) p μ =
+      c * eLpNorm (fun x => lqNorm q fun j => u j x) p μ := by
+  rw [← eLpNorm_const_mul_ennreal c (aemeasurable_lqNorm_comp hu q) p]
+  refine eLpNorm_congr_ae ?_
+  filter_upwards [h] with x hx
+  rw [← ENNReal.lqNorm_const_mul]
+  exact congrArg (lqNorm q) (funext hx)
+
+/-- **Smoothness `0` for dyadic families**: for every family `u_j : α → [0, ∞]`,
+`‖x ↦ ‖(2^(j·0) u_j(x))_j‖_{ℓ_q}‖_p = ‖x ↦ ‖(u_j(x))_j‖_{ℓ_q}‖_p`, since the weights are `1`. -/
+theorem eLpNorm_lqNorm_dyadicWeight_zero_left (u : ℕ → α → ℝ≥0∞) :
+    eLpNorm (fun x => lqNorm q fun j => dyadicWeight 0 j * u j x) p μ =
+      eLpNorm (fun x => lqNorm q fun j => u j x) p μ := by
+  simp only [ENNReal.dyadicWeight_zero_left, one_mul]
+
+/-- **Mixed norms decrease in `q`**: for `1 ≤ q ≤ r ≤ ∞` and measurable `u_j : α → [0, ∞]`,
+`‖x ↦ ‖(u_j(x))_j‖_{ℓ_r}‖_p ≤ ‖x ↦ ‖(u_j(x))_j‖_{ℓ_q}‖_p`, since `‖·‖_{ℓ_r} ≤ ‖·‖_{ℓ_q}` at
+every point. -/
+theorem eLpNorm_lqNorm_mono_exponent {r : ℝ≥0∞} (hq : 1 ≤ q) (hqr : q ≤ r)
+    (hu : ∀ j, AEMeasurable (u j) μ) :
+    eLpNorm (fun x => lqNorm r fun j => u j x) p μ ≤
+      eLpNorm (fun x => lqNorm q fun j => u j x) p μ :=
+  eLpNorm_mono_enorm (aemeasurable_lqNorm_comp hu r).aestronglyMeasurable fun x => by
+    simp only [enorm_eq_self]
+    exact ENNReal.lqNorm_le_lqNorm_of_le hq hqr _
+
+/-- **Monotonicity in `s` for dyadic families**: for `s ≤ t` and measurable `u_j : α → [0, ∞]`,
+`‖x ↦ ‖(2^(js) u_j(x))_j‖_{ℓ_q}‖_p ≤ ‖x ↦ ‖(2^(jt) u_j(x))_j‖_{ℓ_q}‖_p`, since
+`2^(js) ≤ 2^(jt)`. -/
+theorem eLpNorm_lqNorm_dyadicWeight_mono_smoothness {t : ℝ} (hst : s ≤ t)
+    (hu : ∀ j, AEMeasurable (u j) μ) :
+    eLpNorm (fun x => lqNorm q fun j => dyadicWeight s j * u j x) p μ ≤
+      eLpNorm (fun x => lqNorm q fun j => dyadicWeight t j * u j x) p μ :=
+  eLpNorm_mono_enorm
+    (aemeasurable_lqNorm_comp (fun j => (hu j).const_mul _) q).aestronglyMeasurable
+    fun x => by
+      simp only [enorm_eq_self]
+      exact ENNReal.lqNorm_mono fun j => by gcongr; exact ENNReal.dyadicWeight_le_of_le hst j
+
+end DyadicFamily
 
 end MeasureTheory

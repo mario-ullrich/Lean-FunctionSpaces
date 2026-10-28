@@ -183,30 +183,6 @@ theorem tsum_setLIntegral_eq_farConv {θ : ℕ → EuclideanSpace ℝ d → ℂ}
     (hθ j).restrict.enorm.mul (hG.comp (measurable_const.sub measurable_proj)).aemeasurable]
   exact lintegral_congr fun y => ENNReal.tsum_mul_right
 
-/-! ### The part of the lift on the box `(-1, 2]^d` -/
-
-/-- `L_p` norms on the box `(-1, 2]^d` for complex functions:
-`‖1_{(-1,2]^d} (f ∘ π)‖_{L_p(ℝ^d)} = 3^{d/p} ‖f‖_{L_p(𝕋^d)}` for `0 < p < ∞` and almost
-everywhere strongly measurable `f : 𝕋^d → ℂ` (`Torus.eLpNorm_indicator_tripleBox` for `|f|`). -/
-theorem eLpNorm_indicator_tripleBox_comp_proj {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
-    {f : UnitAddTorus d → ℂ} (hf : AEStronglyMeasurable f volume) :
-    eLpNorm (tripleBox.indicator (f ∘ proj)) p volume =
-      3 ^ ((Fintype.card d : ℝ) / p.toReal) * eLpNorm f p volume := by
-  have hl : AEStronglyMeasurable (tripleBox.indicator (f ∘ proj)) volume :=
-    (hf.comp_quasiMeasurePreserving quasiMeasurePreserving_proj).indicator measurableSet_tripleBox
-  rw [← eLpNorm_enorm _ hl, ← eLpNorm_enorm _ hf, ← eLpNorm_indicator_tripleBox hp0 hp hf.enorm]
-  congr 1
-  funext x
-  exact enorm_indicator_eq_indicator_enorm _ x
-
-/-- The part `1_{(-1,2]^d} (f ∘ π)` of the lift of `f ∈ L_p(𝕋^d)`, `0 < p < ∞`, lies in
-`L_p(ℝ^d)`. -/
-theorem memLp_indicator_tripleBox_comp_proj {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
-    {f : UnitAddTorus d → ℂ} (hf : MemLp f p volume) :
-    MemLp (tripleBox.indicator (f ∘ proj)) p volume := by
-  rw [memLp_iff, eLpNorm_indicator_tripleBox_comp_proj hp0 hp hf.aestronglyMeasurable]
-  exact ENNReal.mul_lt_top (ENNReal.rpow_lt_top_of_nonneg (by positivity) (by norm_num)) hf
-
 /-! ### Pointwise localisation -/
 
 /-- **Localisation of a convolution**: at `x ∈ P_0 = (0, 1]^d`, if the convolution integral of

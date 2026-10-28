@@ -255,28 +255,9 @@ theorem exists_inverse_cubePPScheme_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞
     (ENNReal.pow_ne_top (ENNReal.natCast_ne_top d)) (ENNReal.pow_ne_top hC), by simp⟩,
     fun j k a ha => ?_⟩
   obtain ⟨g, hg, hae⟩ := mem_cubePPScheme_two_pow.1 ha
-  have hnorm : ‖a‖ₑ = eLpNorm g p (cubeVol d) := by
-    rw [Lp.enorm_def]
-    exact eLpNorm_congr_ae hae
-  rw [lpIsoModulus, isoModulus_congr_ae hae, hnorm]
-  rcases lt_or_ge k j with hkj | hjk
-  · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
-    exact (isoModulus_le hg.1.1 Fact.out r _).trans (by gcongr; exact le_add_self)
-  · rw [isoModulus_eq_iSup]
-    refine iSup₂_le fun h hh => ?_
-    have hhj : ‖h‖ ≤ 1 / 2 ^ j := hh.trans (one_div_le_one_div_of_le (by positivity)
-      (pow_le_pow_right₀ (by norm_num) hjk))
-    calc eLpNorm (higherDiff r h g) p ((cubeVol d).restrict (isoRegion r h))
-        ≤ (d : ℝ≥0∞) ^ r * C ^ d * ENNReal.ofReal (2 ^ j * ‖h‖) ^ (1 / p.toReal) *
-            eLpNorm g p (cubeVol d) :=
-          eLpNorm_higherDiff_le_of_exponents (ppSubmodule r j) Fact.out hp r j hC (ppExponent p)
-            ppExponent_nonneg (fun m hm => le_sum_ppExponent hr m hm) (hCb j) hg.1.1
-            (fun i x => hg.slice_mem_ppSubmodule i x) hhj
-      _ ≤ (d : ℝ≥0∞) ^ r * C ^ d * dyadicWeight (-(1 / p.toReal)) (k - j) *
-            eLpNorm g p (cubeVol d) := by
-          gcongr
-          exact ENNReal.ofReal_two_pow_mul_rpow_le hjk hh (by positivity)
-      _ ≤ _ := by gcongr; exact le_self_add
+  exact lpIsoModulus_le_of_exponents (ppSubmodule r j) hp r hC (ppExponent p) ppExponent_nonneg
+    (by positivity) (fun m hm => le_sum_ppExponent hr m hm) (hCb j) hg.1.1
+    (fun i x => hg.slice_mem_ppSubmodule i x) hae
 
 /-- **The inverse inequality for tensor splines on the cube with the isotropic modulus**, of
 order `θ = r - 1 + 1/p`. -/
@@ -285,57 +266,28 @@ theorem exists_inverse_cubeSplineScheme_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠
       lpIsoModulus p r a k ≤
         CB * dyadicWeight (-(((r - 1 : ℕ) : ℝ) + 1 / p.toReal)) (k - j) * ‖a‖ₑ := by
   obtain ⟨C, hC, hCb⟩ := exists_eLpNorm_higherDiff_stepRegion_spline_le (p := p) hr hp
-  have hθ : 0 ≤ ((r - 1 : ℕ) : ℝ) + 1 / p.toReal := by positivity
   refine ⟨(d : ℝ≥0∞) ^ r * C ^ d + 2 ^ r, ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top
     (ENNReal.pow_ne_top (ENNReal.natCast_ne_top d)) (ENNReal.pow_ne_top hC), by simp⟩,
     fun j k a ha => ?_⟩
   obtain ⟨g, hg, hae⟩ := mem_cubeSplineScheme_two_pow.1 ha
-  have hnorm : ‖a‖ₑ = eLpNorm g p (cubeVol d) := by
-    rw [Lp.enorm_def]
-    exact eLpNorm_congr_ae hae
-  rw [lpIsoModulus, isoModulus_congr_ae hae, hnorm]
-  rcases lt_or_ge k j with hkj | hjk
-  · rw [Nat.sub_eq_zero_of_le hkj.le, ENNReal.dyadicWeight_zero_right, mul_one]
-    exact (isoModulus_le hg.1.1 Fact.out r _).trans (by gcongr; exact le_add_self)
-  · rw [isoModulus_eq_iSup]
-    refine iSup₂_le fun h hh => ?_
-    have hhj : ‖h‖ ≤ 1 / 2 ^ j := hh.trans (one_div_le_one_div_of_le (by positivity)
-      (pow_le_pow_right₀ (by norm_num) hjk))
-    calc eLpNorm (higherDiff r h g) p ((cubeVol d).restrict (isoRegion r h))
-        ≤ (d : ℝ≥0∞) ^ r * C ^ d *
-            ENNReal.ofReal (2 ^ j * ‖h‖) ^ (((r - 1 : ℕ) : ℝ) + 1 / p.toReal) *
-              eLpNorm g p (cubeVol d) :=
-          eLpNorm_higherDiff_le_of_exponents (splineSubmodule r j) Fact.out hp r j hC
-            (splineExponent p r) (splineExponent_nonneg r)
-            (fun m hm => le_sum_splineExponent hr m hm) (hCb j) hg.1.1
-            (fun i x => hg.slice_mem_splineSubmodule i x) hhj
-      _ ≤ (d : ℝ≥0∞) ^ r * C ^ d * dyadicWeight (-(((r - 1 : ℕ) : ℝ) + 1 / p.toReal)) (k - j) *
-            eLpNorm g p (cubeVol d) := by
-          gcongr
-          exact ENNReal.ofReal_two_pow_mul_rpow_le hjk hh hθ
-      _ ≤ _ := by gcongr; exact le_self_add
+  exact lpIsoModulus_le_of_exponents (splineSubmodule r j) hp r hC (splineExponent p r)
+    (splineExponent_nonneg r) (by positivity) (fun m hm => le_sum_splineExponent hr m hm) (hCb j)
+    hg.1.1 (fun i x => hg.slice_mem_splineSubmodule i x) hae
 
 /-! ### The coincidence theorems -/
 
 /-- The **isotropic modulus** `ω_r(f, 2^(-k))_p` on the cube is compatible with the scheme of
 piecewise polynomials, with inverse order `θ = 1/p` and Jackson's inequality at every level. -/
 noncomputable def cubePPIsoModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
-    ApproximationScheme.ModulusData (cubePPScheme p d r) (1 / p.toReal) where
-  modulus := lpIsoModulus p r
-  add_le := lpIsoModulus_add_le r
-  C0 := 2 ^ r
-  C0_ne_top := by simp
-  le_enorm := lpIsoModulus_le r
-  jacksonStart := 0
-  CJ := (exists_approxError_cubePPScheme_le (d := d) (p := p) hr hp).choose * d
-  CJ_ne_top := ENNReal.mul_ne_top (exists_approxError_cubePPScheme_le hr hp).choose_spec.1
-    (ENNReal.natCast_ne_top d)
-  jackson f k _ := ((exists_approxError_cubePPScheme_le hr hp).choose_spec.2 f k).trans (by
-    rw [mul_assoc]
-    exact mul_le_mul' le_rfl (lpCubeModulus_le_lpIsoModulus r f k))
-  CB := (exists_inverse_cubePPScheme_iso (d := d) hr hp).choose
-  CB_ne_top := (exists_inverse_cubePPScheme_iso hr hp).choose_spec.1
-  inverse := (exists_inverse_cubePPScheme_iso hr hp).choose_spec.2
+    ApproximationScheme.ModulusData (cubePPScheme p d r) (1 / p.toReal) :=
+  .ofExists (lpIsoModulus p r) (lpIsoModulus_add_le r) (2 ^ r) (by simp) (lpIsoModulus_le r) 0
+    (by
+      obtain ⟨CJ, hCJ, h⟩ := exists_approxError_cubePPScheme_le (d := d) (p := p) hr hp
+      exact ⟨CJ * d, ENNReal.mul_ne_top hCJ (ENNReal.natCast_ne_top d), fun f k _ =>
+        (h f k).trans (by
+          rw [mul_assoc]
+          exact mul_le_mul' le_rfl (lpCubeModulus_le_lpIsoModulus r f k))⟩)
+    (exists_inverse_cubePPScheme_iso hr hp)
 
 /-- **Piecewise polynomials on the cube and the isotropic modulus.** For `1 ≤ p < ∞`,
 `1 ≤ q ≤ ∞`, `r ≥ 1` and `0 ≤ s < 1/p`, an `f ∈ L_p([0, 1]^d)` lies in the approximation space
@@ -350,23 +302,15 @@ theorem memApprox_cubePPScheme_iff_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞)
 /-- The **isotropic modulus** `ω_r(f, 2^(-k))_p` on the cube is compatible with the scheme of
 tensor splines of order `r`, with inverse order `θ = r - 1 + 1/p`. -/
 noncomputable def cubeSplineIsoModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
-    ApproximationScheme.ModulusData (cubeSplineScheme p d r) (((r - 1 : ℕ) : ℝ) + 1 / p.toReal)
-    where
-  modulus := lpIsoModulus p r
-  add_le := lpIsoModulus_add_le r
-  C0 := 2 ^ r
-  C0_ne_top := by simp
-  le_enorm := lpIsoModulus_le r
-  jacksonStart := 0
-  CJ := (exists_approxError_cubeSplineScheme_le (d := d) (p := p) hr hp).choose * d
-  CJ_ne_top := ENNReal.mul_ne_top (exists_approxError_cubeSplineScheme_le hr hp).choose_spec.1
-    (ENNReal.natCast_ne_top d)
-  jackson f k _ := ((exists_approxError_cubeSplineScheme_le hr hp).choose_spec.2 f k).trans (by
-    rw [mul_assoc]
-    exact mul_le_mul' le_rfl (lpCubeModulus_le_lpIsoModulus r f k))
-  CB := (exists_inverse_cubeSplineScheme_iso (d := d) hr hp).choose
-  CB_ne_top := (exists_inverse_cubeSplineScheme_iso hr hp).choose_spec.1
-  inverse := (exists_inverse_cubeSplineScheme_iso hr hp).choose_spec.2
+    ApproximationScheme.ModulusData (cubeSplineScheme p d r) (((r - 1 : ℕ) : ℝ) + 1 / p.toReal) :=
+  .ofExists (lpIsoModulus p r) (lpIsoModulus_add_le r) (2 ^ r) (by simp) (lpIsoModulus_le r) 0
+    (by
+      obtain ⟨CJ, hCJ, h⟩ := exists_approxError_cubeSplineScheme_le (d := d) (p := p) hr hp
+      exact ⟨CJ * d, ENNReal.mul_ne_top hCJ (ENNReal.natCast_ne_top d), fun f k _ =>
+        (h f k).trans (by
+          rw [mul_assoc]
+          exact mul_le_mul' le_rfl (lpCubeModulus_le_lpIsoModulus r f k))⟩)
+    (exists_inverse_cubeSplineScheme_iso hr hp)
 
 /-- **Tensor splines on the cube and the isotropic modulus.** For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`,
 `r ≥ 1` and `0 ≤ s < r - 1 + 1/p`, an `f ∈ L_p([0, 1]^d)` lies in the approximation space

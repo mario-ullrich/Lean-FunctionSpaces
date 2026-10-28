@@ -34,8 +34,9 @@ time (`Cube.KernelOp.partialTensor_subset_span`): a form in coordinate `i` is re
 the `φ_j(x_i)`.
 
 On `L_p(Q)` the slicewise action inherits the bounds of `T` on `L_p[0, 1]` slice by slice
-(`Cube.KernelOp.eLpNorm_slicewise_le`). By linearity, the error of the action in all coordinates
-telescopes into the errors in the single coordinates
+(`Cube.KernelOp.eLpNorm_slicewise_le`), and the slices of `f - T^{(i)} f` are the errors of `T` on
+the slices of `f` (`Cube.slice_sub_slicewise`). By linearity, the error of the action in all
+coordinates telescopes into the errors in the single coordinates
 (`Cube.KernelOp.eLpNorm_sub_foldSlicewise_le`).
 -/
 
@@ -557,19 +558,14 @@ theorem isForm_foldSlicewise (l : List (Fin d)) {g : (Fin d → ℝ) → ℂ} (h
 
 /-- **Slicewise bounds**: if `‖T u‖_{L_p[0,1]} ≤ C ‖u‖_{L_p[0,1]}` for all measurable `u`, then
 `‖T^{(i)} g‖_{L_p(Q)} ≤ C ‖g‖_{L_p(Q)}` for measurable `g` with measurable `T^{(i)} g`. -/
-theorem eLpNorm_slicewise_le {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {C : ℝ≥0∞} (hC : C ≠ ∞)
+theorem eLpNorm_slicewise_le {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {C : ℝ≥0∞} (_hC : C ≠ ∞)
     (hT : ∀ u : ℝ → ℂ, Measurable u → eLpNorm (T.apply u) p unitVol ≤ C * eLpNorm u p unitVol)
     (i : Fin d) {g : (Fin d → ℝ) → ℂ} (hg : Measurable g)
     (hTg : Measurable (T.slicewise i g)) :
-    eLpNorm (T.slicewise i g) p (cubeVol d) ≤ C * eLpNorm g p (cubeVol d) := by
-  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  refine (ENNReal.rpow_le_rpow_iff hq).1 ?_
-  rw [eLpNorm_rpow_cubeVol_eq_slice hTg hp0 hp i, ENNReal.mul_rpow_of_nonneg _ _ hq.le,
-    eLpNorm_rpow_cubeVol_eq_slice hg hp0 hp i, ← lintegral_const_mul' _ _
-      (ENNReal.rpow_ne_top_of_nonneg hq.le hC)]
-  refine lintegral_mono fun x => ?_
-  rw [slice_slicewise, ← ENNReal.mul_rpow_of_nonneg _ _ hq.le]
-  exact ENNReal.rpow_le_rpow (hT _ (measurable_slice hg x i)) hq.le
+    eLpNorm (T.slicewise i g) p (cubeVol d) ≤ C * eLpNorm g p (cubeVol d) :=
+  eLpNorm_cubeVol_le_of_slice_le hTg hg hp0 hp i fun x => by
+    rw [slice_slicewise]
+    exact hT _ (measurable_slice hg x i)
 
 /-- **Telescoping over the coordinates of a list**: if `‖T u‖_{L_p[0,1]} ≤ C ‖u‖_{L_p[0,1]}`,
 then `‖g - T^{(l_1)} ⋯ T^{(l_m)} g‖_{L_p(Q)} ≤ (1 + C)^m ∑_{i ∈ l} ‖g - T^{(i)} g‖_{L_p(Q)}` for
@@ -612,5 +608,14 @@ theorem eLpNorm_sub_foldSlicewise_le {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p �
       _ = (1 + C) ^ (l.length + 1) * (e + S) := by ring
 
 end KernelOp
+
+/-- The slices of `f - T^{(i)} f` in coordinate `i` are the errors of `T` on the slices of `f`. -/
+theorem slice_sub_slicewise {d : ℕ} {ι : Type*} [Fintype ι] (T : KernelOp ι)
+    (f : (Fin d → ℝ) → ℂ) (i : Fin d) (x : Fin d → ℝ) :
+    slice (fun y => f y - T.slicewise i f y) x i =
+      fun t => slice f x i t - T.apply (slice f x i) t := by
+  funext t
+  rw [← KernelOp.slice_slicewise]
+  rfl
 
 end Cube

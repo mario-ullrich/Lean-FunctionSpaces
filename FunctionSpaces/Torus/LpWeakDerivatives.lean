@@ -27,12 +27,12 @@ dense in the smooth functions.
   composition, with limits in `L_p` and with the inclusions `L_r ⊆ L_p`, and the characters
   have the derivatives `∂^v e_k = σ_v(k) e_k`. Derivatives along the coordinate directions are
   the derivatives `∂^α` of `Torus.HasWeakDeriv` (`Torus.hasWeakDeriv_iff_hasWeakLineDeriv`).
-* **Convolution**: for `1 ≤ p < ∞` and a Schwartz kernel `η` on `ℝ^d`, `(∂^v η) ⋆ f = η ⋆ ∂^v f`
-  (`Torus.econvLp_iteratedLineDerivOp`) and `∂^v (η ⋆ f) = (∂^v η) ⋆ f`
-  (`Torus.hasWeakLineDeriv_econvLp`); for every integrable kernel `Φ`, `Φ ⋆ ∂^v f = ∂^v (Φ ⋆ f)`
-  (`Torus.HasWeakLineDeriv.econvLp`).
+* **Convolution**: for `1 ≤ p < ∞` and a Schwartz kernel `η` on `ℝ^d`,
+  `∂^v (η ⋆ f) = (∂^v η) ⋆ f` (`Torus.hasWeakLineDeriv_econvLp`); for every integrable kernel
+  `Φ`, `Φ ⋆ ∂^v f = ∂^v (Φ ⋆ f)` (`Torus.HasWeakLineDeriv.econvLp`); hence
+  `(∂^v η) ⋆ f = η ⋆ ∂^v f` (`Torus.econvLp_iteratedLineDerivOp`).
 * **Sobolev spaces**: `f ∈ W^m_p(𝕋^d)` iff `∂^v f ∈ L_p` for all directions of order `≤ m`
-  (`Torus.memSobolev_iff_forall_hasWeakLineDeriv`); `W^0_p = L_p`, `W^m_p` is a linear subspace,
+  (`Torus.memSobolev_iff_exists_hasWeakLineDeriv`); `W^0_p = L_p`, `W^m_p` is a linear subspace,
   decreasing in `m`, and `W^m_r ⊆ W^m_p` for `p ≤ r`.
 -/
 
@@ -183,8 +183,9 @@ theorem HasWeakLineDeriv.unique {f g g' : Lp ℂ p (volume : Measure (UnitAddTor
     (hg : HasWeakLineDeriv v f g) (hg' : HasWeakLineDeriv v f g') : g = g' :=
   eq_of_mFourierCoeff_eq fun m => by rw [hg m, hg' m]
 
-/-- **The weak derivative `∂^α` is unique** in `L_p(𝕋^d)`, `1 ≤ p ≤ ∞`. -/
-theorem HasWeakDeriv.eq {α : d → ℕ} {f g g' : Lp ℂ p (volume : Measure (UnitAddTorus d))}
+/-- **The weak derivative `∂^α` is unique** in `L_p(𝕋^d)`, `1 ≤ p ≤ ∞`, since an element of
+`L_p` is determined by its Fourier coefficients (`Torus.eq_of_mFourierCoeff_eq`). -/
+theorem HasWeakDeriv.unique {α : d → ℕ} {f g g' : Lp ℂ p (volume : Measure (UnitAddTorus d))}
     (hg : HasWeakDeriv α f g) (hg' : HasWeakDeriv α f g') : g = g' :=
   eq_of_mFourierCoeff_eq fun m => by rw [hg m, hg' m]
 
@@ -256,19 +257,6 @@ theorem hasWeakLineDeriv_mFourierLp (v : Fin k → EuclideanSpace ℝ d) (n : d 
 
 /-! ### Weak derivatives and convolution -/
 
-/-- **Derivatives move from the kernel to the function**: if `g = ∂^v f` in `L_p(𝕋^d)`,
-`1 ≤ p < ∞`, then `(∂^v η) ⋆ f = η ⋆ g` for every Schwartz kernel `η` on `ℝ^d`. Both sides have
-the coefficients `σ_v(m) 𝓕η(m) f̂(m)` (`SchwartzMap.fourier_iteratedLineDerivOp_apply`). -/
-theorem econvLp_iteratedLineDerivOp (hp : p ≠ ∞)
-    {f g : Lp ℂ p (volume : Measure (UnitAddTorus d))} (h : HasWeakLineDeriv v f g)
-    (η : 𝓢(EuclideanSpace ℝ d, ℂ)) :
-    econvLp hp (∂^{v} η).integrable f = econvLp hp η.integrable g :=
-  eq_of_mFourierCoeff_eq fun m => by
-    rw [mFourierCoeff_econvLp, mFourierCoeff_econvLp, h m, ← SchwartzMap.fourier_coe,
-      SchwartzMap.fourier_iteratedLineDerivOp_apply, ← SchwartzMap.fourier_coe, smul_eq_mul,
-      lineSymbol]
-    ring
-
 /-- **The derivative of a convolution** falls on the kernel: `∂^v (η ⋆ f) = (∂^v η) ⋆ f` for
 `f ∈ L_p(𝕋^d)` and every Schwartz kernel `η` on `ℝ^d`. -/
 theorem hasWeakLineDeriv_econvLp (hp : p ≠ ∞) (v : Fin k → EuclideanSpace ℝ d)
@@ -288,6 +276,16 @@ theorem HasWeakLineDeriv.econvLp (hp : p ≠ ∞) {Φ : EuclideanSpace ℝ d →
     HasWeakLineDeriv v (Torus.econvLp hp hΦ f) (Torus.econvLp hp hΦ g) := fun m => by
   rw [mFourierCoeff_econvLp, mFourierCoeff_econvLp, h m, mul_left_comm]
 
+/-- **Derivatives move from the kernel to the function**: if `g = ∂^v f` in `L_p(𝕋^d)`,
+`1 ≤ p < ∞`, then `(∂^v η) ⋆ f = η ⋆ g` for every Schwartz kernel `η` on `ℝ^d`. Both sides have
+the derivative `∂^v (η ⋆ f)` (`Torus.hasWeakLineDeriv_econvLp`, `Torus.HasWeakLineDeriv.econvLp`),
+which is unique. -/
+theorem econvLp_iteratedLineDerivOp (hp : p ≠ ∞)
+    {f g : Lp ℂ p (volume : Measure (UnitAddTorus d))} (h : HasWeakLineDeriv v f g)
+    (η : 𝓢(EuclideanSpace ℝ d, ℂ)) :
+    econvLp hp (∂^{v} η).integrable f = econvLp hp η.integrable g :=
+  (hasWeakLineDeriv_econvLp hp v η f).unique (h.econvLp hp η.integrable)
+
 /-! ### Sobolev spaces -/
 
 /-- **A derivative along directions from the coordinate derivatives**: if `g_c = ∂^{α_c} f` for
@@ -306,7 +304,7 @@ theorem hasWeakLineDeriv_sum_coordCount [DecidableEq d]
 `k ≤ m` and all directions `v ∈ (ℝ^d)^k` the weak derivative `∂^v f` lies in `L_p`. The coordinate
 directions of a multi-index give one direction (`Torus.coordDirs`); the expansion of `σ_v` into
 coordinate symbols gives the other (`Torus.hasWeakLineDeriv_sum_coordCount`). -/
-theorem memSobolev_iff_forall_hasWeakLineDeriv {m : ℕ}
+theorem memSobolev_iff_exists_hasWeakLineDeriv {m : ℕ}
     {f : Lp ℂ p (volume : Measure (UnitAddTorus d))} :
     MemSobolev m f ↔
       ∀ k ≤ m, ∀ v : Fin k → EuclideanSpace ℝ d, ∃ g, HasWeakLineDeriv v f g := by

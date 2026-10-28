@@ -20,9 +20,9 @@ coordinate `i`, every slice of `f - Q_k^{(i)} f` is the error of the quasi-inter
 variable, and `Interval.exists_eLpNorm_sub_qi_le_of_taylor` bounds it by the smoothings of `f` in
 coordinate `i` on `{x_i ≤ 3/4}` and `{x_i ≥ 1/4}` (`Cube.exists_left_cubeSmoothing`,
 `Cube.exists_right_cubeSmoothing` with `L = 2^(-k)`); the windows of the quasi-interpolant have
-length at most `1/4`. The transfer lemma `Cube.eLpNorm_le_of_slice_le` passes the bound to the
-cube (`Cube.exists_eLpNorm_sub_slicewise_qiKernel_le`), and the errors telescope over the
-coordinates (`Cube.KernelOp.eLpNorm_sub_foldSlicewise_le_of_coord`). The coarse levels
+length at most `1/4`. The transfer lemma `Cube.eLpNorm_sub_slicewise_le_of_smoothing` passes the
+bound to the cube (`Cube.exists_eLpNorm_sub_slicewise_qiKernel_le`), and the errors telescope over
+the coordinates (`Cube.KernelOp.eLpNorm_sub_foldSlicewise_le_of_coord`). The coarse levels
 `k ≤ r + 1` use Whitney's inequality on the cube at the scale `2^(-(r+1))`: the splines of level
 `0` contain the polynomials of degree `< r` in each variable.
 -/
@@ -53,7 +53,6 @@ theorem exists_eLpNorm_sub_slicewise_qiKernel_le {r : ℕ} (hr : 1 ≤ r) (hp : 
       (ENNReal.mul_ne_top (by simp) (ENNReal.pow_ne_top (ENNReal.natCast_ne_top r)))⟩
   refine ⟨A * (2 * (1 + (r : ℝ≥0∞) ^ r * (2 ^ r * (r : ℝ≥0∞) ^ (2 * r)))),
     ENNReal.mul_ne_top hA (ENNReal.mul_ne_top (by simp) hJ), fun {f} hf i {k} hk => ?_⟩
-  have hfm := hf.measurable
   have hL : (0 : ℝ) < 1 / 2 ^ k := by positivity
   have hwL : (3 / 4 : ℝ) + 1 / 2 ^ k ≤ 1 := by
     have : (1 : ℝ) / 2 ^ k ≤ 1 / 4 := by
@@ -61,31 +60,12 @@ theorem exists_eLpNorm_sub_slicewise_qiKernel_le {r : ℕ} (hr : 1 ≤ r) (hp : 
       calc (4 : ℝ) = 2 ^ 2 := by norm_num
         _ ≤ 2 ^ k := pow_le_pow_right₀ (by norm_num) (by omega)
     linarith
-  obtain ⟨G₁, D₁, hG₁, hD₁, h1L, h2L, hTL⟩ := exists_left_cubeSmoothing hf hr hp1 hp i hL hwL
-  obtain ⟨G₂, D₂, hG₂, hD₂, h1R, h2R, hTR⟩ := exists_right_cubeSmoothing hf hr hp1 hp i hL hwL
-  rw [show (1 : ℝ) - 3 / 4 = 1 / 4 by norm_num] at h1R h2R
-  have hslice : ∀ x, eLpNorm (slice (fun y => f y - (qiKernel hr k).slicewise i f y) x i) p
-      unitVol ≤
-      A * ((eLpNorm (slice (fun y => f y - G₁ y) x i) p (volume.restrict (Icc 0 (3 / 4))) +
-            ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r *
-              eLpNorm (slice D₁ x i) p (volume.restrict (Icc 0 (3 / 4)))) +
-          (eLpNorm (slice (fun y => f y - G₂ y) x i) p (volume.restrict (Icc (1 / 4) 1)) +
-            ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r *
-              eLpNorm (slice D₂ x i) p (volume.restrict (Icc (1 / 4) 1)))) := fun x => by
-    have hint : IntegrableOn (slice f x i) (Icc (0 : ℝ) 1) :=
-      (continuous_slice hf x i).integrableOn_Icc
-    rw [slice_sub_slicewise, qiKernel_apply hr k hint]
-    exact hAb hk (measurable_slice hfm x i)
-      (fun m _ => integrableOn_dyadicIco_of_continuous (continuous_slice hf x i) k m)
-      (measurable_slice hG₁ x i) (measurable_slice hD₁ x i) (measurable_slice hG₂ x i)
-      (measurable_slice hD₂ x i) (hTL x) (hTR x)
-  refine (eLpNorm_le_of_slice_le (hfm.sub ((qiKernel hr k).measurable_slicewise hfm i))
-    (hfm.sub hG₁) hD₁ (hfm.sub hG₂) hD₂ hp1 hp i le_rfl (by norm_num) (by norm_num) le_rfl hA
-    (ENNReal.pow_ne_top ENNReal.ofReal_ne_top) hslice).trans ?_
-  rw [mul_assoc]
-  refine mul_le_mul' le_rfl ?_
-  rw [two_mul, add_mul]
-  exact add_le_add (add_ofReal_div_pow_mul_le r k h1L h2L) (add_ofReal_div_pow_mul_le r k h1R h2R)
+  refine eLpNorm_sub_slicewise_le_of_smoothing (qiKernel hr k) hf hr hp1 hp i hL hwL
+    (c := A) (M := ENNReal.ofReal ((r : ℝ) / 2 ^ k) ^ r) (fun hu hG₁ hD₁ hG₂ hD₂ hTL hTR => ?_)
+    fun ha hb => add_ofReal_div_pow_mul_le r k ha hb
+  rw [show (1 : ℝ) - 3 / 4 = 1 / 4 by norm_num, qiKernel_apply hr k hu.integrableOn_Icc]
+  exact hAb hk hu.measurable (fun m _ => integrableOn_dyadicIco_of_continuous hu k m) hG₁ hD₁ hG₂
+    hD₂ hTL hTR
 
 /-- **Jackson's inequality for tensor splines on the cube**: for `1 ≤ p < ∞` and `r ≥ 1` there is
 `C_J < ∞` with `E_{2^k}(f)_p ≤ C_J ω_r(f, 2^(-k))_p` for every `f ∈ L_p(Q)` and every `k ≥ 0`:

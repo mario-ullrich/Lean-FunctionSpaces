@@ -7854,23 +7854,6 @@ Then $k'_{j+1} = (m'_2 - m')_{2^j}$, and $m'_2 = (m')_{e^{\log 2}}$ is the avera
 weight $u_L(\cdot - \log 2)$ on $(-\log L + \log 2, 2 \log 2]$.
 \end{proof}
 
-\begin{lemma}[Moments of the coefficients of the moment kernels]
-\label{lem:jackson-moments}
-\lean{Rd.sum_jacksonCoeff_mul_pow}
-\leanok
-\uses{lem:moment-coefficients}
-For all $r, j \in \N$ with $1 \leq j < r$,
-$\sum_{l < r} (-1)^l \binom{r}{l+1} (l + 1)^j = 0$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-By \Cref{lem:moment-coefficients} the sum is $0^j - (-1)^r \Delta^r_1 (x^j)(0)$, and differences
-of order $r$ annihilate polynomials of degree $j < r$ (Mathlib's
-\texttt{fwdDiff\_\allowbreak iter\_\allowbreak pow\_\allowbreak eq\_\allowbreak zero\_\allowbreak
-of\_\allowbreak lt}).
-\end{proof}
-
 \begin{theorem}[Vanishing moments of the kernel weights]
 \label{thm:kernel-weight-moments}
 \lean{Rd.integral_dilationWeight_add_mul_exp, Rd.integral_momentWeight_mul_exp,

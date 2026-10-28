@@ -234,32 +234,20 @@ theorem aemeasurable_lqNorm_blockFun (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p (v
 `ℓ_q` at every point and in `L_p`. -/
 theorem triebelLizorkinNorm_add_le (hp : p ≠ ∞) {s : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f g : Lp ℂ p (volume : Measure V)) :
-    triebelLizorkinNorm s q (f + g) ≤ triebelLizorkinNorm s q f + triebelLizorkinNorm s q g := by
-  set F : Lp ℂ p (volume : Measure V) → V → ℝ≥0∞ :=
-    fun h x => lqNorm q (fun j => dyadicWeight s j * ‖blockFun j h x‖ₑ)
-  have hle : ∀ᵐ x ∂volume, ‖F (f + g) x‖ₑ ≤ ‖(F f + F g) x‖ₑ := by
-    filter_upwards [blockFun_add_ae hp f g] with x hx
-    simp only [enorm_eq_self, Pi.add_apply, F]
-    refine (ENNReal.lqNorm_mono fun j => ?_).trans (ENNReal.lqNorm_add_le hq _ _)
-    rw [hx j, ← mul_add]
-    gcongr
-    exact enorm_add_le _ _
-  exact (eLpNorm_mono_enorm_ae (aemeasurable_lqNorm_blockFun s q (f + g)).aestronglyMeasurable
-    hle).trans (eLpNorm_add_le Fact.out)
+    triebelLizorkinNorm s q (f + g) ≤ triebelLizorkinNorm s q f + triebelLizorkinNorm s q g :=
+  eLpNorm_lqNorm_le_add Fact.out hq
+    (fun j => (aestronglyMeasurable_blockFun j (f + g)).enorm.const_mul _) <| by
+      filter_upwards [blockFun_add_ae hp f g] with x hx j
+      rw [hx j, ← mul_add]
+      gcongr
+      exact enorm_add_le _ _
 
 omit [Fact (1 ≤ p)] in
 /-- **The quasi-norm is homogeneous**: `‖c f‖_{F^s_{p,q}} = |c| ‖f‖_{F^s_{p,q}}` for `c ∈ ℂ`. -/
 theorem triebelLizorkinNorm_smul (s : ℝ) (q : ℝ≥0∞) (c : ℂ) (f : Lp ℂ p (volume : Measure V)) :
-    triebelLizorkinNorm s q (c • f) = ‖c‖ₑ * triebelLizorkinNorm s q f := by
-  have h : ∀ x, lqNorm q (fun j => dyadicWeight s j * ‖blockFun j (c • f) x‖ₑ) =
-      ‖c‖ₑ * lqNorm q (fun j => dyadicWeight s j * ‖blockFun j f x‖ₑ) := fun x => by
-    rw [← ENNReal.lqNorm_const_mul]
-    congr 1
-    funext j
-    rw [blockFun_smul, enorm_mul]
-    ring
-  simp only [triebelLizorkinNorm, h]
-  exact eLpNorm_const_mul_ennreal _ (aemeasurable_lqNorm_blockFun s q f) p
+    triebelLizorkinNorm s q (c • f) = ‖c‖ₑ * triebelLizorkinNorm s q f :=
+  eLpNorm_lqNorm_eq_const_mul _ (fun j => (aestronglyMeasurable_blockFun j f).enorm.const_mul _)
+    (ae_of_all _ fun x j => by rw [blockFun_smul, enorm_mul, mul_left_comm])
 
 omit [Fact (1 ≤ p)] in
 /-- The zero function has quasi-norm `0`. -/
@@ -272,26 +260,24 @@ omit [Fact (1 ≤ p)] in
 since the weights `2^(j·0)` are `1`. -/
 theorem triebelLizorkinNorm_zero_left (q : ℝ≥0∞) (f : Lp ℂ p (volume : Measure V)) :
     triebelLizorkinNorm 0 q f =
-      eLpNorm (fun x => lqNorm q fun j => ‖blockFun j f x‖ₑ) p volume := by
-  simp only [triebelLizorkinNorm, ENNReal.dyadicWeight_zero_left, one_mul]
+      eLpNorm (fun x => lqNorm q fun j => ‖blockFun j f x‖ₑ) p volume :=
+  eLpNorm_lqNorm_dyadicWeight_zero_left _
 
 omit [Fact (1 ≤ p)] in
 /-- **The quasi-norm decreases in `q`**: `‖f‖_{F^s_{p,r}} ≤ ‖f‖_{F^s_{p,q}}` for
 `1 ≤ q ≤ r ≤ ∞`, since `‖·‖_{ℓ_r} ≤ ‖·‖_{ℓ_q}` at every point. -/
 theorem triebelLizorkinNorm_mono_exponent {s : ℝ} {q r : ℝ≥0∞} (hq : 1 ≤ q) (hqr : q ≤ r)
     (f : Lp ℂ p (volume : Measure V)) : triebelLizorkinNorm s r f ≤ triebelLizorkinNorm s q f :=
-  eLpNorm_mono_enorm (aemeasurable_lqNorm_blockFun s r f).aestronglyMeasurable fun x => by
-    simp only [enorm_eq_self]
-    exact ENNReal.lqNorm_le_lqNorm_of_le hq hqr _
+  eLpNorm_lqNorm_mono_exponent hq hqr fun j =>
+    (aestronglyMeasurable_blockFun j f).enorm.const_mul _
 
 omit [Fact (1 ≤ p)] in
 /-- **The quasi-norm increases in `s`**: `‖f‖_{F^s_{p,q}} ≤ ‖f‖_{F^t_{p,q}}` for `s ≤ t`, since
 `2^(js) ≤ 2^(jt)`. -/
 theorem triebelLizorkinNorm_mono_smoothness {s t : ℝ} (hst : s ≤ t) (q : ℝ≥0∞)
     (f : Lp ℂ p (volume : Measure V)) : triebelLizorkinNorm s q f ≤ triebelLizorkinNorm t q f :=
-  eLpNorm_mono_enorm (aemeasurable_lqNorm_blockFun s q f).aestronglyMeasurable fun x => by
-    simp only [enorm_eq_self]
-    exact ENNReal.lqNorm_mono fun j => by gcongr; exact ENNReal.dyadicWeight_le_of_le hst j
+  eLpNorm_lqNorm_dyadicWeight_mono_smoothness hst fun j =>
+    (aestronglyMeasurable_blockFun j f).enorm
 
 omit [Fact (1 ≤ p)] in
 /-- **Weighted blocks with terms set to zero**: for every predicate `P` on `ℕ`,

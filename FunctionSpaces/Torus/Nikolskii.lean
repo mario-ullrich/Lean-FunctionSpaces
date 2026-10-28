@@ -7,6 +7,7 @@ module
 
 public import FunctionSpaces.Torus.Scheme
 public import FunctionSpaces.MeasureSpaces.Besov.Nikolskii
+public import Mathlib.Algebra.Order.Chebyshev
 
 /-!
 # The Nikolskii inequality for trigonometric polynomials
@@ -58,17 +59,16 @@ theorem exists_sum_of_mem_trigPoly {n : ℕ} {T : UnitAddTorus d →ᵇ ℂ} (hT
   refine Finset.sum_congr rfl fun k _ => ?_
   simp
 
-/-- **Parseval for trigonometric polynomials**: `‖∑ c_k e_k‖_2² = ∑ |c_k|²`. -/
+/-- **Parseval for trigonometric polynomials**: `‖∑ c_k e_k‖_2² = ∑ |c_k|²` (Mathlib's
+`OrthogonalFamily.norm_sum` for the orthonormal characters). -/
 theorem norm_toLp_sum_sq (t : Finset (d → ℤ)) (c : (d → ℤ) → ℂ) :
     ‖BoundedContinuousFunction.toLp (E := ℂ) 2 volume ℂ (∑ k ∈ t, c k • trigMonomial k)‖ ^ 2 =
       ∑ k ∈ t, ‖c k‖ ^ 2 := by
   have hsum : BoundedContinuousFunction.toLp (E := ℂ) 2 volume ℂ (∑ k ∈ t, c k • trigMonomial k)
       = ∑ k ∈ t, c k • mFourierLp 2 k := by
     rw [map_sum]; simp_rw [map_smul, toLp_trigMonomial]
-  rw [hsum, @norm_sq_eq_re_inner ℂ, orthonormal_mFourier.inner_sum c c t, map_sum]
-  refine Finset.sum_congr rfl fun k _ => ?_
-  rw [RCLike.conj_mul]
-  norm_cast
+  rw [hsum]
+  exact orthonormal_mFourier.orthogonalFamily.norm_sum c t
 
 /-- **The Nikolskii inequality from `L_2` to `L_∞`**: for a trigonometric polynomial of degree
 `< n`, `‖T‖_∞² ≤ (2n)^d ‖T‖_2²`. -/
@@ -88,12 +88,9 @@ theorem norm_sq_le_card_mul_norm_toLp_sq {n : ℕ} {T : UnitAddTorus d →ᵇ �
       _ ≤ ∑ k ∈ t, ‖c k * trigMonomial k x‖ := norm_sum_le _ _
       _ = ∑ k ∈ t, ‖c k‖ := Finset.sum_congr rfl fun k _ => by
           rw [norm_mul, norm_trigMonomial_apply, mul_one]
-  have hcs : (∑ k ∈ t, ‖c k‖) ^ 2 ≤ t.card * ∑ k ∈ t, ‖c k‖ ^ 2 := by
-    have := Finset.sum_mul_sq_le_sq_mul_sq t (fun _ => (1 : ℝ)) (fun k => ‖c k‖)
-    simpa using this
   calc ‖∑ k ∈ t, c k • trigMonomial k‖ ^ 2 ≤ (∑ k ∈ t, ‖c k‖) ^ 2 := by
         gcongr
-    _ ≤ t.card * ∑ k ∈ t, ‖c k‖ ^ 2 := hcs
+    _ ≤ t.card * ∑ k ∈ t, ‖c k‖ ^ 2 := sq_sum_le_card_mul_sum_sq
     _ ≤ _ := by gcongr
 
 /-- For a bounded continuous function, `‖T‖^m ≤ ‖T^m‖` (in fact equality holds). -/

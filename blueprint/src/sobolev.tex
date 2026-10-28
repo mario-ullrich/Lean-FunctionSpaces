@@ -2386,32 +2386,6 @@ For $1 < p < \infty$, every $k \in \N$ and all $w \in V^k$,
 which is finite.
 \end{definition}
 
-\begin{lemma}[The weighted blocks and their tails]
-\label{lem:weighted-block-tails}
-\lean{Rd.eLpNorm_lqNorm_ite_blockFun_le, Rd.tendsto_eLpNorm_lqNorm_blockFun_tail}
-\leanok
-\uses{def:triebel-lizorkin, lem:mixed-norm-tails}
-Let $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p(V)$. For every set
-$P \subseteq \N$,
-\[
-  \bigl\| \|(\mathbf 1_P(j) \, 2^{js} |(\psi_j * f)(x)|)_j\|_{\ell_q} \bigr\|_p
-  \leq \|f\|_{\TL{s}{p}{q}} .
-\]
-If $q < \infty$ and $f \in \TL{s}{p}{q}$, then
-\[
-  \bigl\| \|(2^{js} |(\psi_j * f)(x)|)_{j \geq N}\|_{\ell_q} \bigr\|_p \to 0 \qquad
-  (N \to \infty) ,
-\]
-where the $\ell_q$ norm is taken of the sequence with the terms $j < N$ replaced by $0$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-Both claims are \Cref{lem:mixed-norm-tails} for the functions
-$g_j = 2^{js} |\psi_j * f|$, whose mixed norm is $\|f\|_{\TL{s}{p}{q}}$
-(\Cref{def:triebel-lizorkin}).
-\end{proof}
-
 \begin{lemma}[The synthesis bound with scaled blocks]
 \label{lem:scaled-synthesis-bound}
 \lean{Rd.IsCZFamily.eLpNorm_sum_conv_smul_blockFun_le}
@@ -2580,14 +2554,12 @@ function theorem (\Cref{cor:square-function-theorem}).
 
 \begin{corollary}[The Besov sandwich for $\Sob{m}{p}$]
 \label{cor:sobolev-besov-sandwich}
-\lean{Rd.memTriebelLizorkin_two_of_memApprox, Rd.memApprox_of_memSobolev,
-  Rd.memSobolev_of_memApprox, Rd.approxNormDyadic_le_of_hasWeakLineDeriv,
-  Rd.exists_hasWeakLineDeriv_of_memApprox}
+\lean{Rd.memApprox_of_memSobolev, Rd.memSobolev_of_memApprox,
+  Rd.approxNormDyadic_le_of_hasWeakLineDeriv, Rd.exists_hasWeakLineDeriv_of_memApprox}
 \leanok
 \uses{cor:sobolev-triebel-lizorkin, thm:sobolev-to-triebel-lizorkin,
-  thm:triebel-lizorkin-to-sobolev, thm:tl-besov-sandwich, thm:square-function-upper}
-Let $n \geq 1$ and $1 < p < \infty$. For every $s \geq 0$,
-$\Besov{s}{p}{\min(p,2)} \subseteq \TL{s}{p}{2}$. For every $m \in \N$,
+  thm:triebel-lizorkin-to-sobolev, thm:tl-besov-sandwich, cor:square-function-theorem}
+Let $n \geq 1$ and $1 < p < \infty$. For every $m \in \N$,
 \[
   \Besov{m}{p}{\min(p,2)} \subseteq \Sob{m}{p}(V) ,
 \]
@@ -2610,11 +2582,11 @@ $w \in V^k$, the weak derivative $\partial^w f$ is a function $g \in L_p(V)$ wit
 
 \begin{proof}
 \leanok
-For $s > 0$ the first inclusion is the Besov sandwich for $q = 2$ (\Cref{thm:tl-besov-sandwich});
-for $s = 0$ it holds since $\TL{0}{p}{2} = L_p(V)$ (\Cref{thm:square-function-upper}). With
-\Cref{cor:sobolev-triebel-lizorkin} it gives the second inclusion, and the Besov sandwich for
-$s = m > 0$ gives the third. The bounds combine \Cref{thm:sobolev-to-triebel-lizorkin} and
-\Cref{thm:triebel-lizorkin-to-sobolev} with the bounds of \Cref{thm:tl-besov-sandwich}.
+The inclusion $\Besov{m}{p}{\min(p,2)} \subseteq \TL{m}{p}{2}$
+(\Cref{cor:square-function-theorem}) and \Cref{cor:sobolev-triebel-lizorkin} give the first
+inclusion, and the Besov sandwich for $s = m > 0$ gives the second. The bounds combine
+\Cref{thm:sobolev-to-triebel-lizorkin} and \Cref{thm:triebel-lizorkin-to-sobolev} with the
+bounds of \Cref{thm:tl-besov-sandwich}.
 \end{proof}
 
 \begin{corollary}[$\Sob{m}{2} = \Besov{m}{2}{2}$]
@@ -3790,7 +3762,7 @@ $\int g \, e_{-m} = (-1)^k \int f \, \partial^v e_{-m}$ for every $m \in \Z^d$.
 \begin{lemma}[Properties of weak derivatives on the torus]
 \label{lem:torus-weak-line-derivative-basic}
 \lean{Torus.hasWeakLineDeriv_fin_zero, Torus.hasWeakDeriv_iff_hasWeakLineDeriv,
-  Torus.HasWeakLineDeriv.comp, Torus.HasWeakLineDeriv.unique, Torus.HasWeakDeriv.eq,
+  Torus.HasWeakLineDeriv.comp, Torus.HasWeakLineDeriv.unique, Torus.HasWeakDeriv.unique,
   Torus.HasWeakLineDeriv.add, Torus.HasWeakLineDeriv.smul, Torus.HasWeakLineDeriv.neg,
   Torus.HasWeakLineDeriv.sub, Torus.HasWeakLineDeriv.sum, Torus.HasWeakDeriv.add,
   Torus.HasWeakDeriv.smul, Torus.HasWeakLineDeriv.of_tendsto,
@@ -3869,7 +3841,7 @@ $\Phi * f$.
 
 \begin{theorem}[Sobolev spaces on the torus by directional derivatives]
 \label{thm:torus-sobolev-directions}
-\lean{Torus.hasWeakLineDeriv_sum_coordCount, Torus.memSobolev_iff_forall_hasWeakLineDeriv,
+\lean{Torus.hasWeakLineDeriv_sum_coordCount, Torus.memSobolev_iff_exists_hasWeakLineDeriv,
   Torus.memSobolev_zero, Torus.MemSobolev.add, Torus.MemSobolev.smul,
   Torus.MemSobolev.mono_order, Torus.MemSobolev.of_inclusion}
 \leanok
@@ -4291,32 +4263,6 @@ For $1 < p < \infty$, every $k \in \N$ and all $w \in (\R^d)^k$,
 \]
 which is finite.
 \end{definition}
-
-\begin{lemma}[The weighted blocks on the torus and their tails]
-\label{lem:torus-weighted-block-tails}
-\lean{Torus.eLpNorm_lqNorm_ite_blockFun_le, Torus.tendsto_eLpNorm_lqNorm_blockFun_tail}
-\leanok
-\uses{def:torus-triebel-lizorkin, lem:mixed-norm-tails}
-Let $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p(\T^d)$. For every set
-$P \subseteq \N$,
-\[
-  \bigl\| \|(\mathbf 1_P(j) \, 2^{js} |(\psi_j * f)(t)|)_j\|_{\ell_q} \bigr\|_p
-  \leq \|f\|_{\TL{s}{p}{q}(\T^d)} .
-\]
-If $q < \infty$ and $f \in \TL{s}{p}{q}(\T^d)$, then
-\[
-  \bigl\| \|(2^{js} |(\psi_j * f)(t)|)_{j \geq N}\|_{\ell_q} \bigr\|_p \to 0 \qquad
-  (N \to \infty) ,
-\]
-where the $\ell_q$ norm is taken of the sequence with the terms $j < N$ replaced by $0$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-Both claims are \Cref{lem:mixed-norm-tails} for the functions
-$g_j = 2^{js} |\psi_j * f|$ on $\T^d$, whose mixed norm is $\|f\|_{\TL{s}{p}{q}(\T^d)}$
-(\Cref{def:torus-triebel-lizorkin}).
-\end{proof}
 
 \begin{lemma}[The synthesis bound for derivatives of the synthesis kernels on the torus]
 \label{lem:torus-derivative-synthesis-bound}
