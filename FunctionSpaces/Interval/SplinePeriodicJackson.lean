@@ -456,19 +456,9 @@ theorem exists_approxError_perSplineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p �
 splines of order `r`, with inverse order `θ = r - 1 + 1/p` and Jackson's inequality from level `r`
 on. -/
 noncomputable def perSplineModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
-    ApproximationScheme.ModulusData (perSplineScheme p r) (((r - 1 : ℕ) : ℝ) + 1 / p.toReal) where
-  modulus := lpPerModulus p r
-  add_le := lpPerModulus_add_le r
-  C0 := 2 ^ r
-  C0_ne_top := by simp
-  le_enorm := lpPerModulus_le hp r
-  jacksonStart := r
-  CJ := (exists_approxError_perSplineScheme_le hr hp).choose
-  CJ_ne_top := (exists_approxError_perSplineScheme_le hr hp).choose_spec.1
-  jackson := (exists_approxError_perSplineScheme_le hr hp).choose_spec.2
-  CB := (exists_inverse_perSplineScheme (r := r) hp).choose
-  CB_ne_top := (exists_inverse_perSplineScheme hp).choose_spec.1
-  inverse := (exists_inverse_perSplineScheme hp).choose_spec.2
+    ApproximationScheme.ModulusData (perSplineScheme p r) (((r - 1 : ℕ) : ℝ) + 1 / p.toReal) :=
+  .ofExists (lpPerModulus p r) (lpPerModulus_add_le r) (2 ^ r) (by simp) (lpPerModulus_le hp r) r
+    (exists_approxError_perSplineScheme_le hr hp) (exists_inverse_perSplineScheme hp)
 
 /-- **Approximation by periodic dyadic splines.** For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `r ≥ 1` and
 `0 ≤ s < r - 1 + 1/p`, an `f ∈ L_p(𝕋) = L_p[0, 1]` lies in the approximation space `A^s_q` of the

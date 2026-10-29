@@ -1898,7 +1898,9 @@ point.
 \lean{Interval.polyFun, Interval.continuous_polyFun, Interval.measurable_polyFun,
   Interval.finrank_degreeLT, Interval.polyFun_comp_affine, Interval.eq_zero_of_ae_eq_zero,
   Interval.memLp_polyFun, Interval.polyFun_degreeLTEquiv_symm, Interval.coeffToLp,
-  Interval.enorm_coeffToLp, Interval.coeffToLp_injective, Interval.exists_enorm_le_eLpNorm,
+  Interval.enorm_coeffToLp, Interval.coeffToLp_injective,
+  Interval.norm_polyFun_degreeLTEquiv_symm_le, Interval.exists_enorm_linearMap_le_eLpNorm,
+  Interval.exists_enorm_le_eLpNorm,
   Interval.eLpNorm_comp_affine, Interval.NikolskiiBound, Interval.NikolskiiBound.enorm_le,
   Interval.enorm_polyFun_le}
 \leanok
@@ -1907,14 +1909,20 @@ degree $< r$, every interval $[u, u + L]$ with $L > 0$ and every $x \in [u, u + 
 \[
   |P(x)| \leq K L^{-1/p} \|P\|_{L_p[u, u + L]} .
 \]
+Moreover, for every interval $[\alpha, \beta]$ with $\alpha < \beta$ and every linear map $\Phi$
+of the polynomials that maps the polynomials of degree $< r$ into themselves, there is
+$K_\Phi < \infty$ with $|\Phi P(x)| \leq K_\Phi \|P\|_{L_p[\alpha, \beta]}$ for every polynomial
+$P$ of degree $< r$ and every $x \in [0, 1]$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 The polynomials of degree $< r$ form a space of dimension $r$. The map from the coefficients to
 $L_p[0, \tfrac12]$ is injective, since a nonzero polynomial has finitely many zeros, hence bounded
-below in finite dimension; this bounds the coefficients and so $|P(x)|$, $x \in [0, 1]$, by
-$\|P\|_{L_p[0,1/2]}$. The general interval follows by the affine change of variables
+below in finite dimension; this bounds the coefficients and so $|\Phi P(x)|$, $x \in [0, 1]$, by
+$\|P\|_{L_p[0,1/2]}$ for every linear map $\Phi$ of the polynomials of degree $< r$ into
+themselves, a linear map of $\C^r$ in coordinates. The identity $\Phi P = P$ bounds $|P(x)|$.
+The general interval follows by the affine change of variables
 $x = u + 2L y$, which multiplies the $L_p$ norm by $(2L)^{-1/p} \leq L^{-1/p}$.
 \end{proof}
 
@@ -1972,11 +1980,11 @@ translations and differences, so each further average adds one derivative.
 
 \begin{lemma}[Minkowski's inequality for averages]
 \label{lem:minkowski-avg}
-\lean{MeasureTheory.eLpNorm_rpow_eq, Interval.enorm_avg_rpow_le, Interval.eLpNorm_avg_le,
-  Interval.avgStep, Interval.avgStepIter, Interval.avgStepIter_succ, Interval.continuous_avgStep,
-  Interval.continuous_avgStepIter, Interval.eLpNorm_avgStepIter_le,
+\lean{Interval.eLpNorm_avg_le, Interval.avgStep, Interval.avgStepIter, Interval.avgStepIter_succ,
+  Interval.continuous_avgStep, Interval.continuous_avgStepIter, Interval.eLpNorm_avgStepIter_le,
   Interval.avgStepIter_congr_point}
 \leanok
+\uses{lem:weighted-jensen}
 Let $X$ be a second countable topological space with an $s$-finite Borel measure $\mu$, let
 $K : \R \times X \to \C$ be continuous, $\delta > 0$ and $1 \leq p < \infty$. Then
 \[
@@ -1990,16 +1998,21 @@ The average at a point $x$ depends only on the values $G(\cdot, x)$.
 
 \begin{proof}
 \leanok
-Hölder's inequality gives
-$|\delta^{-1} \int_0^\delta K(t, x) \, dt|^p \leq \delta^{-1} \int_0^\delta |K(t, x)|^p \, dt$;
-integrate over $x \in S$ and exchange the integrals by Tonelli's theorem.
+The average is the weighted average with the weight
+$\Phi = \delta^{-1} \mathbf{1}_{(0, \delta]}$, which has $\|\Phi\|_1 = 1$, so
+\Cref{lem:weighted-jensen} bounds it by
+$\sup_{0 < t \leq \delta} \|K(t, \cdot)\|_{L_p(\mu)} \leq
+\sup_{0 \leq t \leq \delta} \|K(t, \cdot)\|_{L_p(\mu)}$.
 \end{proof}
 
 \begin{theorem}[Steklov smoothing]
 \label{thm:steklov-smoothing}
 \lean{Interval.avgStepIter_const, Interval.avgStepIter_shift, Interval.avgStepIter_sum,
   Interval.smooth, Interval.sub_smooth_eq, Interval.contDiff_smooth, Interval.iteratedDeriv_smooth,
-  Interval.continuous_higherDiff_uncurry, Interval.eLpNorm_sub_smooth_le,
+  Interval.continuous_higherDiff_uncurry, Interval.eLpNorm_higherDiff_Icc_le_modulus,
+  Interval.eLpNorm_sub_smooth_le, Interval.iteratedDeriv_smooth_eq_sum_smul,
+  Interval.sum_range_choose_succ_le,
+  Interval.eLpNorm_smoothCoeff_smul_le, Interval.eLpNorm_sum_smoothCoeff_smul_le,
   Interval.eLpNorm_iteratedDeriv_smooth_le}
 \leanok
 \uses{lem:steklov-deriv, lem:minkowski-avg, def:interval-modulus}
@@ -2013,20 +2026,33 @@ and
 \[
   \|(S_\delta f)^{(r)}\|_{L_p[u, w]} \leq 2^r \delta^{-r} \omega_r(f, r\delta, [a, b])_p .
 \]
+At every point,
+$(S_\delta f)^{(r)} = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta_{k\delta}^r f$.
+For every measure $\mu$ on a space $X$, every $1 \leq p \leq \infty$, every $B \in [0, \infty]$
+and every family $(D_h)_{h \in \R}$ of functions $D_h : X \to \C$ with
+$\|D_h\|_{L_p(\mu)} \leq B$ for $0 \leq h \leq r\delta$,
+\[
+  \Bigl\| \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} (k\delta)^{-r} D_{k\delta} \Bigr\|_{L_p(\mu)}
+  \leq 2^r \delta^{-r} B .
+\]
 \end{theorem}
 
 \begin{proof}
 \leanok
 Averaging $f(x + k h)$ over $h = v_1 + \cdots + v_r$, $v \in [0, \delta]^r$, gives
 $M_{k\delta}^r f(x)$, so $f - S_\delta f = (-1)^r$ times the average of $\Delta_h^r f$, which
-\Cref{lem:minkowski-avg} bounds. The derivative is
-$(S_\delta f)^{(r)} = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta_{k\delta}^r f$ by
-\Cref{lem:steklov-deriv}.
+\Cref{lem:minkowski-avg} bounds. The identity for the derivative is \Cref{lem:steklov-deriv} for
+each $M_{k\delta}^r f$. For the general bound, $(k\delta)^{-r} \leq \delta^{-r}$,
+$\sum_{k=1}^r \binom{r}{k} \leq 2^r$, and the triangle inequality. With
+$D_h = \Delta_h^r f$ it gives the bound on $[u, w]$, since $[u, w] \subseteq [a, b - rh]$ and so
+$\|\Delta_h^r f\|_{L_p[u, w]} \leq \omega_r(f, r\delta, [a, b])_p$ for $0 \leq h \leq r\delta$.
 \end{proof}
 
 \begin{lemma}[Smoothing on a left and a right part]
 \label{lem:two-sided-smoothing}
-\lean{Interval.exists_left_smoothing, Interval.exists_right_smoothing}
+\lean{Interval.step_div_sq_bounds, Interval.two_pow_mul_inv_div_sq_pow_mul_le,
+  Interval.exists_left_smoothing, Interval.exists_eLpNorm_sub_polyFun_reflect_le,
+  Interval.exists_right_smoothing}
 \leanok
 \uses{thm:steklov-smoothing, lem:taylor-lp, lem:interval-modulus}
 Let $F$ be continuous, $r \geq 1$, $1 \leq p < \infty$, $L > 0$, $w + L \leq b$ and
@@ -2121,6 +2147,7 @@ are the polynomials of degree $< r$.
   Interval.mem_dyadicIco_floor, Interval.floor_two_pow_succ_div, Interval.ppFun,
   Interval.ppFun_eq_of_mem, Interval.measurable_ppFun, Interval.memLp_ppFun, Interval.ppFun_add,
   Interval.ppFun_const_mul, Interval.polyFun_zero, Interval.ppFun_zero, Interval.ppFun_sum,
+  Interval.dyadicIco_subset, Interval.ppFun_eq_zero, Interval.ppFun_refine_eq,
   Interval.ppFun_refine,
   Interval.ppSpace, Interval.ppSpace_mono, Interval.ppScheme, Interval.mem_ppScheme_zero,
   Interval.mem_ppScheme, Interval.mem_ppScheme_two_pow, Interval.ppScheme_isLinear}
@@ -2135,9 +2162,8 @@ $A_n = V_{\lfloor \log_2 n \rfloor}$ for $n \geq 1$.
 
 \begin{lemma}[Bookkeeping for dyadic intervals]
 \label{lem:pp-bookkeeping}
-\lean{Interval.floor_eq_of_mem_dyadicIco, Interval.dyadicIco_subset,
-  Interval.pairwise_disjoint_dyadicIco, Interval.ppFun_eq_zero, Interval.ppFun_refine_eq,
-  Interval.ppFun_eq_polyFun,
+\lean{Interval.floor_eq_of_mem_dyadicIco,
+  Interval.pairwise_disjoint_dyadicIco, Interval.ppFun_eq_polyFun,
   Interval.ite_mem_degreeLT, Interval.integrableOn_dyadicIco_of_continuous,
   Interval.lintegral_Icc_le_sum, Interval.sum_le_lintegral_Icc,
   Interval.lintegral_Icc_eq_dyadicIco, Interval.zero_add_two_pow_mul_eq_one,
@@ -2225,7 +2251,9 @@ same way, gives $E_1(f)_p \leq W \omega_r(f, \tfrac14, [0,1])_p \leq W \omega_r(
 \lean{Interval.localMass, Interval.tsum_localMass_ppFun_le, Interval.IsPiecewisePoly,
   Interval.isPiecewisePoly_ppFun, Interval.eLpNorm_piece_eq_localMass, Interval.enorm_le_localMass,
   Interval.floor_add_mul_le, Interval.localMass_le_sum_range,
-  Interval.higherDiff_eq_zero_of_isPiecewisePoly, Interval.enorm_higherDiff_le_of_isPiecewisePoly,
+  Interval.higherDiff_eq_of_mem_piece, Interval.higherDiff_eq_zero_of_isPiecewisePoly,
+  Interval.enorm_higherDiff_le_of_isPiecewisePoly_of_le,
+  Interval.enorm_higherDiff_le_of_isPiecewisePoly,
   Interval.stripBound, Interval.lintegral_stripBound_le, Interval.eLpNorm_le_of_strip,
   Interval.eLpNorm_higherDiff_le_of_pointwise, Interval.sum_sum_localMass_le}
 \leanok
@@ -2233,10 +2261,11 @@ same way, gives $E_1(f)_p \leq W \omega_r(f, \tfrac14, [0,1])_p \leq W \omega_r(
 Let $1 \leq p < \infty$, and let $a$ be a piecewise polynomial of level $j$ and degree $< r$
 on $[0, \infty)$: on every $I_{j,n}$, $n \in \N$, it agrees with a polynomial of degree $< r$.
 Let $m_n = \int_{I_{j,n}} |a|^p$ for $n \in \N$, $0 \leq h \leq 2^{-j}$, $x \geq 0$ and
-$n = \lfloor 2^j x \rfloor$. If $x + rh < (n+1) 2^{-j}$, then $\Delta_h^r a(x) = 0$. In every
-case
+$n = \lfloor 2^j x \rfloor$. If $k \in \N$ and $x + kh < (n+1) 2^{-j}$, then
+$\Delta_h^k a(x) = \Delta_h^k P(x)$ for the piece $P$ of $a$ on $I_{j,n}$; for $k = r$ this
+vanishes. In every case, for $k \leq r$,
 \[
-  |\Delta_h^r a(x)| \leq 2^r K 2^{j/p} \Bigl( \sum_{l=0}^r m_{n+l} \Bigr)^{1/p}
+  |\Delta_h^k a(x)| \leq 2^k K 2^{j/p} \Bigl( \sum_{l=0}^r m_{n+l} \Bigr)^{1/p}
 \]
 with the constant $K$ of \Cref{lem:interval-nikolskii}. If $a$ vanishes outside $[0, 1)$, then
 $\sum_{n < 2^j} \sum_{l = 0}^r m_{n+l} \leq (r+1) \|a\|_p^p$. Finally, let $S \subseteq [0, 1]$ be
@@ -2247,12 +2276,12 @@ $\|\Delta_h^r a\|_{L_p(S)} \leq G (rh (r + 1))^{1/p} B$.
 
 \begin{proof}
 \leanok
-In the first case $x, x + h, \dots, x + rh$ lie in $I_{j,n}$, where $a$ is a polynomial of
-degree $< r$, so \Cref{lem:iter-diff-poly} applies. In general $x + ih \in I_{j, n+l}$ with
-$0 \leq l \leq r$, where $|a| \leq K 2^{j/p} m_{n+l}^{1/p}$ by \Cref{lem:interval-nikolskii}, and
-$\sum_i \binom{r}{i} = 2^r$. In the double sum every $m_n$ occurs at most $r + 1$ times. For
-the last statement, $|\Delta_h^r a|^p$ vanishes on $I_{j,n}$ outside the strip
-$[(n+1)2^{-j} - rh, (n+1)2^{-j})$ of width $rh$ and is bounded on it by
+In the first case $x, x + h, \dots, x + kh$ lie in $I_{j,n}$, where $a = P$; for $k = r$,
+\Cref{lem:iter-diff-poly} gives $0$. In general, for $k \leq r$ and $i \leq k$,
+$x + ih \in I_{j, n+l}$ with $0 \leq l \leq r$, where $|a| \leq K 2^{j/p} m_{n+l}^{1/p}$ by
+\Cref{lem:interval-nikolskii}, and $\sum_i \binom{k}{i} = 2^k$. In the double sum every $m_n$
+occurs at most $r + 1$ times. For the last statement, $|\Delta_h^r a|^p$ vanishes on $I_{j,n}$
+outside the strip $[(n+1)2^{-j} - rh, (n+1)2^{-j})$ of width $rh$ and is bounded on it by
 $G^p \sum_{l=0}^r m_{n+l}$.
 \end{proof}
 
@@ -2888,25 +2917,29 @@ $c_n(\tilde Q_m) = c_n(\tilde Q_{m-1})$.
 
 \begin{lemma}[Differences of truncated powers]
 \label{lem:spline-inverse-tools}
-\lean{Interval.truncPow, Interval.enorm_higherDiff_truncPow_le}
+\lean{Interval.truncPow, Interval.enorm_higherDiff_truncPow_le_of_lt,
+  Interval.enorm_higherDiff_truncPow_le}
 \leanok
 \uses{def:iter-diff}
-Let $r \geq 1$, $x < \xi$ and $h \geq 0$. Then
+Let $r \geq 1$, $m \in \N$, $x < \xi$ and $h \geq 0$. Then
+$|\Delta_h^m (\cdot - \xi)_+^{r-1}(x)| \leq 2^m (mh)^{r-1}$, in particular
 $|\Delta_h^r (\cdot - \xi)_+^{r-1}(x)| \leq 2^r (rh)^{r-1}$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-$0 \leq (x + ih - \xi)_+ \leq rh$ for $i \leq r$, and $\sum_i \binom{r}{i} = 2^r$.
+$0 \leq (x + ih - \xi)_+ \leq mh$ for $i \leq m$, and $\sum_i \binom{m}{i} = 2^m$.
 \end{proof}
 
 \begin{lemma}[Splines across the knots]
 \label{lem:spline-across}
 \lean{Interval.eq_add_sum_Ioc_sub, Interval.jumpCoeff, Interval.sub_eq_jumpCoeff,
-  Interval.polyFun_eq_add_sum_jumps, Interval.higherDiff_eq_sum_jumps,
-  Interval.enorm_jumpCoeff_le}
+  Interval.polyFun_eq_add_sum_jumps, Interval.higherDiff_eq_add_sum_jumps,
+  Interval.higherDiff_eq_sum_jumps, Interval.enorm_jumpCoeff_le,
+  Interval.enorm_jumpCoeff_mul_higherDiff_truncPow_le_any_order}
 \leanok
-\uses{def:spline-space, lem:interval-nikolskii, lem:pp-local, lem:iter-diff-poly}
+\uses{def:spline-space, lem:interval-nikolskii, lem:pp-local, lem:iter-diff-poly,
+  lem:spline-inverse-tools}
 Let $N \in \N$ and let $u$ agree on $I_{j,m}$, $m < N$, with polynomials $P_m$ of degree $< r$ such
 that $P_m - P_{m-1} = c_m (x - \xi_m)^{r-1}$, $\xi_m = m 2^{-j}$, for $0 < m < N$; let
 $m_n = \int_{I_{j,n}} |u|^p$. For $0 \leq h \leq 2^{-j}$ and $0 \leq x$ with $x + rh < N 2^{-j}$,
@@ -2915,7 +2948,10 @@ $n_0 = \lfloor 2^j x \rfloor$,
   \Delta_h^r u(x) = \sum_{n_0 < m \leq n_0 + r} c_m \, \Delta_h^r (\cdot - \xi_m)_+^{r-1}(x),
 \]
 and $|c_m| 2^{-j(r-1)} \leq K 2^{j/p} (m_m^{1/p} + m_{m-1}^{1/p})$ for $0 < m < N$. For a spline in
-$S_j$, $N = 2^j$.
+$S_j$, $N = 2^j$. For differences of order $k \leq r$ with $x + kh < N 2^{-j}$ the same holds
+with the piece added, $\Delta_h^k u(x) = \Delta_h^k P_{n_0}(x) +
+\sum_{n_0 < m \leq n_0 + r} c_m \, \Delta_h^k (\cdot - \xi_m)_+^{r-1}(x)$, and every jump term is
+at most $2 \cdot 2^k k^{r-1} K (2^j h)^{r-1} 2^{j/p} (\sum_{l \leq r} m_{n_0+l})^{1/p}$.
 \end{lemma}
 
 \begin{proof}
@@ -2924,7 +2960,12 @@ On $[x, x + rh]$, $u = Q_{n_0} + \sum_m c_m (\cdot - \xi_m)_+^{r-1}$ by telescop
 $\Delta_h^r Q_{n_0} = 0$. With $L = 2^{-j}$,
 $c_m L^{r-1} = Q_m(\xi_m + L) - Q_{m-1}(\xi_m + L)$; the first value is bounded by Nikolskii's
 inequality (\Cref{lem:interval-nikolskii}) on $I_{j,m}$, the second by the same inequality on
-the doubled interval of $I_{j,m-1}$.
+the doubled interval of $I_{j,m-1}$. For order $k \leq r$ the same telescoping on $[x, x + kh]$
+keeps the piece $Q_{n_0}$, and each jump term is $|c_m|$ times
+$|\Delta_h^k (\cdot - \xi_m)_+^{r-1}(x)| \leq 2^k (kh)^{r-1}$
+(\Cref{lem:spline-inverse-tools}). Since $2^{j(r-1)} (kh)^{r-1} = k^{r-1} (2^j h)^{r-1}$ and
+$m_m$, $m_{m-1}$ are among the $m_{n_0+l}$, $l \leq r$, the bound on $c_m$ gives the stated
+bound.
 \end{proof}
 
 \begin{theorem}[Inverse inequality for splines]
@@ -3305,8 +3346,7 @@ bound $\sigma \cdot \sigma^m M$.
 
 \begin{lemma}[Difference bound for polynomials]
 \label{lem:diff-bound}
-\lean{Interval.norm_polyFun_degreeLTEquiv_symm_le, Interval.exists_enorm_linearMap_le_eLpNorm,
-  Interval.DiffBound, Interval.exists_diffBound}
+\lean{Interval.DiffBound, Interval.exists_diffBound}
 \leanok
 \uses{lem:poly-diff-deriv, lem:interval-nikolskii}
 Let $1 \leq p < \infty$ and $r, m \in \N$. There is $K$ such that for every polynomial $P$ of
@@ -3320,9 +3360,8 @@ $x + mt \leq u + 2L$,
 \begin{proof}
 \leanok
 Every linear map of the polynomials of degree $< r$ into themselves, in particular
-$P \mapsto P^{(m)}$, satisfies $|\Phi P(x)| \leq K \|P\|_{L_p[0, 1/2]}$ for $x \in [0, 1]$: in
-coordinates it is a linear map of $\C^r$, and the coordinates are bounded by the $L_p$ norm on an
-interval of positive length, as in \Cref{lem:interval-nikolskii}. With
+$P \mapsto P^{(m)}$, satisfies $|\Phi P(x)| \leq K \|P\|_{L_p[0, 1/2]}$ for $x \in [0, 1]$
+(\Cref{lem:interval-nikolskii}). With
 \Cref{lem:poly-diff-deriv}, $|\Delta_\sigma^m Q(y)| \leq \sigma^m K \|Q\|_{L_p[0,1/2]}$ for
 $y, y + m\sigma \in [0, 1]$; the substitution $x = u + 2Ly$ rescales.
 \end{proof}
@@ -3352,7 +3391,7 @@ translation by $mt$ maps it onto $[0, 1 + mt]$.
 \label{thm:pp-lower-diff}
 \lean{Interval.eLpNorm_le_of_lintegral_le_mul, Interval.mul_rpow_one_div_rpow,
   Interval.lintegral_localBound_le, Interval.sum_localMass_ppFun_le,
-  Interval.enorm_higherDiff_le_of_isPiecewisePoly_of_le, Interval.enorm_higherDiff_le_of_mem_piece,
+  Interval.enorm_higherDiff_le_of_mem_piece,
   Interval.enorm_higherDiff_rpow_le_strip_add_piece, Interval.rpow_strip_mul_eq,
   Interval.rpow_piece_mul_le, Interval.exists_eLpNorm_higherDiff_ppFun_le}
 \leanok
@@ -3377,8 +3416,8 @@ since $2^j h \leq 1$ and $mp \geq 1$.
 
 \begin{theorem}[Differences of lower order of splines]
 \label{thm:spline-lower-diff}
-\lean{Interval.enorm_higherDiff_truncPow_le_of_lt, Interval.higherDiff_eq_add_sum_jumps,
-  Interval.enorm_jumpCoeff_mul_higherDiff_truncPow_le, Interval.enorm_higherDiff_spline_le_of_lt,
+\lean{Interval.enorm_jumpCoeff_mul_higherDiff_truncPow_le,
+  Interval.enorm_higherDiff_spline_le_of_lt,
   Interval.eLpNorm_higherDiff_le_of_lt_mul, Interval.exists_eLpNorm_higherDiff_spline_le_of_lt}
 \leanok
 \uses{lem:diff-bound, lem:spline-across, lem:spline-inverse-tools}
@@ -3568,7 +3607,9 @@ $k < j$.
 \lean{Cube.continuous_slice, Cube.continuous_cubeDiff_uncurry, Cube.continuous_cubeDiff,
   Cube.cubeSmooth, Cube.cubeSmoothDeriv, Cube.slice_cubeSmooth, Cube.slice_cubeSmoothDeriv,
   Cube.sub_cubeSmooth_eq, Cube.cubeSmoothDeriv_eq, Cube.continuous_cubeSmooth,
-  Cube.continuous_cubeSmoothDeriv, Cube.eLpNorm_sub_cubeSmooth_le, Cube.eLpNorm_cubeSmoothDeriv_le}
+  Cube.cubeSmoothDeriv_eq_sum_smul, Cube.continuous_cubeSmoothDeriv,
+  Cube.eLpNorm_cubeDiff_regionVol_le, Cube.eLpNorm_sub_cubeSmooth_le,
+  Cube.eLpNorm_cubeSmoothDeriv_le}
 \leanok
 \uses{thm:steklov-smoothing, lem:minkowski-avg, def:cube-modulus}
 Let $f$ be continuous on $\R^d$, $r \in \N$, $\delta > 0$, and let
@@ -3591,7 +3632,8 @@ average over $v \in [0, \delta]^r$ of $\Delta^r_{(v_1 + \cdots + v_r) e_i} f$, a
 with the averages over the steps only. \Cref{lem:minkowski-avg} with
 the point space $\R^d$ and the cube measure on $Q_i[0, w]$ bounds the average by
 $\sup_h \|\Delta^r_{h e_i} f\|_{L_p(Q_i[0, w])}$, and $Q_i[0, w] \subseteq Q_i[0, 1 - rh]$ for
-$h \leq r \delta$.
+$h \leq r \delta$. The derivative bound of \Cref{thm:steklov-smoothing}, for the cube measure on
+$Q_i[0, w]$ and $D_h = \Delta^r_{h e_i} f$, bounds the derivative.
 \end{proof}
 
 \begin{lemma}[Smoothing near the two ends of a coordinate]
@@ -3600,7 +3642,7 @@ $h \leq r \delta$.
   Cube.slice_reflect, Cube.coordModulus_reflect, Cube.eLpNorm_reflect_regionVol,
   Cube.exists_right_cubeSmoothing}
 \leanok
-\uses{lem:cube-smoothing, lem:taylor-lp, lem:interval-modulus}
+\uses{lem:cube-smoothing, lem:two-sided-smoothing, lem:taylor-lp, lem:interval-modulus}
 Let $f$ be continuous on $\R^d$, $r \geq 1$, $1 \leq p < \infty$, $L > 0$, $w + L \leq 1$ and
 $\omega = \omega_r^{(i)}(f, L)_p$. On $R = Q_i[0, w]$ and on $R = Q_i[1 - w, 1]$ there are measurable
 $G$ and $D$ with $\|f - G\|_{L_p(R)} \leq \omega$, $\|D\|_{L_p(R)} \leq L^{-r} 2^r r^{2r} \omega$,
@@ -3613,7 +3655,8 @@ $\|G_{x,i} - T\|_{L_p[a,b]} \leq (b - a)^r \|D_{x,i}\|_{L_p[a,b]}$.
 On $Q_i[0, w]$ take $G = S^{(i)}_\delta f$ with $\delta = L/r^2$, $D = \partial_i^r G$, and
 \Cref{lem:taylor-lp} on every slice. On $Q_i[1 - w, 1]$ apply this to $f$ composed with the
 reflection $x_i \mapsto 1 - x_i$, which preserves $\omega_r^{(i)}$ slice by slice
-(\Cref{lem:interval-modulus}), and reflect back.
+(\Cref{lem:interval-modulus}), and reflect back, as on the interval
+(\Cref{lem:two-sided-smoothing}).
 \end{proof}
 
 \section{Operators of finite rank on slices}

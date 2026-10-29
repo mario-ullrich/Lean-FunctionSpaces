@@ -84,14 +84,8 @@ theorem perExt_ae_eq {f g : ℝ → ℂ} (hfg : f =ᵐ[volume.restrict (Icc 0 1)
 
 /-- Differences of periodic extensions of almost equal functions agree almost everywhere. -/
 theorem higherDiff_perExt_ae_eq {f g : ℝ → ℂ} (hfg : f =ᵐ[volume.restrict (Icc 0 1)] g)
-    (r : ℕ) (h : ℝ) : higherDiff r h (perExt f) =ᵐ[volume] higherDiff r h (perExt g) := by
-  have htr : ∀ k ∈ Finset.range (r + 1),
-      ∀ᵐ x ∂volume, perExt f (x + k * h) = perExt g (x + k * h) := fun k _ =>
-    (measurePreserving_add_right volume ((k : ℝ) * h)).quasiMeasurePreserving.ae_eq_comp
-      (perExt_ae_eq hfg)
-  filter_upwards [(Filter.eventually_all_finset _).2 htr] with x hx
-  rw [higherDiff_apply, higherDiff_apply]
-  exact Finset.sum_congr rfl fun k hk => by rw [hx k hk]
+    (r : ℕ) (h : ℝ) : higherDiff r h (perExt f) =ᵐ[volume] higherDiff r h (perExt g) :=
+  Rd.higherDiff_congr_ae (perExt_ae_eq hfg) r h
 
 /-- **Integrals of periodic functions over unit intervals**: for `1`-periodic `G`,
 `∫_{[c, c + 1]} G = ∫_{[0, 1]} G`, both being the integral over the circle. -/

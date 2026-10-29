@@ -672,12 +672,13 @@ $g$ of functions $g_i : X \to [0, \infty]$: their right sides are then $\infty$.
 
 \begin{lemma}[{Integrals, powers and measurability in $[0, \infty]$}]
 \label{lem:lp-norm-nonnegative}
-\lean{MeasureTheory.eLpNorm_rpow_eq_lintegral, ENNReal.lqNorm_fun_rpow,
-  MeasureTheory.aemeasurable_lqNorm_comp}
+\lean{MeasureTheory.eLpNorm_rpow_eq, MeasureTheory.eLpNorm_rpow_eq_lintegral,
+  ENNReal.lqNorm_fun_rpow, MeasureTheory.aemeasurable_lqNorm_comp}
 \leanok
 \uses{def:lq-norm}
-For every measurable $h : X \to [0, \infty]$ and every $0 < p < \infty$,
-$\|h\|_p^p = \int h^p \, d\mu$.
+For every almost everywhere strongly measurable $g$ on $X$ with values in a normed space or in
+$[0, \infty]$ and every $0 < p < \infty$, $\|g\|_p^p = \int \|g\|^p \, d\mu$; in particular
+$\|h\|_p^p = \int h^p \, d\mu$ for every measurable $h : X \to [0, \infty]$.
 
 For every family $a$ in $[0, \infty]$ indexed by $I$, every $u \in [0, \infty]$ and every
 $r > 0$, $\|(a_i^r)_i\|_{\ell_u} = \|a\|_{\ell_{ur}}^r$.
@@ -688,10 +689,10 @@ For every $q \in [0, \infty]$ the function $x \mapsto \|(g_i(x))_i\|_{\ell_q}$ i
 \begin{proof}
 \leanok
 \uses{lem:lp-norm-homogeneity}
-For $0 < p < \infty$ the norm is $(\int h^p)^{1/p}$. The statement on $\ell_u$ norms is the power
-rule of \Cref{lem:lp-norm-homogeneity} for the counting measure on $I$. The pointwise $\ell_q$
-norm is a countable supremum for $q = \infty$ and the $1/q$-th power of a series of measurable
-functions for $0 < q < \infty$.
+For $0 < p < \infty$ the norm is $(\int \|g\|^p)^{1/p}$. The statement on $\ell_u$ norms is the
+power rule of \Cref{lem:lp-norm-homogeneity} for the counting measure on $I$. The pointwise
+$\ell_q$ norm is a countable supremum for $q = \infty$ and the $1/q$-th power of a series of
+measurable functions for $0 < q < \infty$.
 \end{proof}
 
 \begin{lemma}[Minkowski's integral inequality for $\ell_u$-valued functions]

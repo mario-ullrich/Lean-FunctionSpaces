@@ -620,19 +620,10 @@ theorem exists_approxError_splineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ 
 /-- The modulus `ω_r(f, 2^(-k), [0, 1])_p` is compatible with the scheme of dyadic splines of
 order `r`, with inverse order `θ = r - 1 + 1/p` and Jackson's inequality at every level. -/
 noncomputable def splineModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
-    ApproximationScheme.ModulusData (splineScheme p r) (((r - 1 : ℕ) : ℝ) + 1 / p.toReal) where
-  modulus := lpModulus p r
-  add_le := lpModulus_add_le r
-  C0 := 2 ^ r
-  C0_ne_top := by simp
-  le_enorm := lpModulus_le r
-  jacksonStart := 0
-  CJ := (exists_approxError_splineScheme_le hr hp).choose
-  CJ_ne_top := (exists_approxError_splineScheme_le hr hp).choose_spec.1
-  jackson f k _ := (exists_approxError_splineScheme_le hr hp).choose_spec.2 f k
-  CB := (exists_inverse_splineScheme (r := r) hp).choose
-  CB_ne_top := (exists_inverse_splineScheme hp).choose_spec.1
-  inverse := (exists_inverse_splineScheme hp).choose_spec.2
+    ApproximationScheme.ModulusData (splineScheme p r) (((r - 1 : ℕ) : ℝ) + 1 / p.toReal) :=
+  .ofExists (lpModulus p r) (lpModulus_add_le r) (2 ^ r) (by simp) (lpModulus_le r) 0
+    ((exists_approxError_splineScheme_le hr hp).imp fun _ h => ⟨h.1, fun f k _ => h.2 f k⟩)
+    (exists_inverse_splineScheme hp)
 
 /-- **Approximation by dyadic splines.** For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `r ≥ 1` and
 `0 ≤ s < r - 1 + 1/p`, an `f ∈ L_p[0, 1]` lies in the approximation space `A^s_q` of the splines

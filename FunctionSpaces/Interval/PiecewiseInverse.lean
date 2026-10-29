@@ -19,8 +19,10 @@ when `x, …, x + rh` lie in one dyadic interval, since there `a` is a polynomia
 left of the knots. There Nikolskii's inequality bounds `|a|` by `2^(j/p)` times the local `L_p`
 norm of a piece (`Interval.enorm_le_localMass`), and the points `x, …, x + rh` meet only `r + 1`
 consecutive pieces (`Interval.floor_add_mul_le`), so each piece is counted at most `r + 1` times
-(`Interval.sum_sum_localMass_le`). The strip integral (`Interval.eLpNorm_le_of_strip`) turns a
-pointwise bound on the strips into the `L_p` bound (`Interval.eLpNorm_higherDiff_le_of_pointwise`);
+(`Interval.sum_sum_localMass_le`). The same pointwise bound holds for differences of every order
+`m ≤ r` (`Interval.enorm_higherDiff_le_of_isPiecewisePoly_of_le`). The strip integral
+(`Interval.eLpNorm_le_of_strip`) turns a pointwise bound on the strips into the `L_p` bound
+(`Interval.eLpNorm_higherDiff_le_of_pointwise`);
 the splines of `FunctionSpaces.Interval.SplineInverse` use it with their own pointwise bound.
 These local estimates hold for every piecewise polynomial on `[0, ∞)`
 (`Interval.IsPiecewisePoly`, `Interval.eLpNorm_higherDiff_le_of_isPiecewisePoly`), so they serve
@@ -138,6 +140,28 @@ theorem localMass_le_sum_range (k : ℕ) (u : ℝ → ℂ) (n : ℕ) {r l : ℕ}
   Finset.single_le_sum (f := fun l' => localMass p k u (n + l')) (fun _ _ => zero_le)
     (Finset.mem_range.2 (Nat.lt_succ_of_le hl))
 
+/-- **Inside a piece a difference sees only the piece**: for `h ≥ 0` and `x ≥ 0`: if `u` agrees
+with `P` on the dyadic interval `I_{k,n}` of `x`, `n = ⌊2^k x⌋`, and `x + mh` lies left of its
+right end, then
+`Δ_h^m u(x) = Δ_h^m P(x)`, since `x, x + h, …, x + mh` lie in `I_{k,n}`. -/
+theorem higherDiff_eq_of_mem_piece {k m : ℕ} {u : ℝ → ℂ} {P : ℂ[X]} {h x : ℝ}
+    (hPu : ∀ y ∈ dyadicIco k ⌊2 ^ k * x⌋₊, u y = polyFun P y) (hh0 : 0 ≤ h) (hx : 0 ≤ x)
+    (hgood : x + m * h < ((⌊2 ^ k * x⌋₊ : ℝ) + 1) / 2 ^ k) :
+    higherDiff m h u x = higherDiff m h (polyFun P) x := by
+  have hpos : (0 : ℝ) < 2 ^ k := by positivity
+  have hfl : (⌊2 ^ k * x⌋₊ : ℝ) ≤ 2 ^ k * x := Nat.floor_le (by positivity)
+  rw [higherDiff_apply, higherDiff_apply]
+  refine Finset.sum_congr rfl fun i hi => ?_
+  have hi' : (i : ℝ) ≤ m := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)
+  have hmem : x + i * h ∈ dyadicIco k ⌊2 ^ k * x⌋₊ := by
+    rw [dyadicIco, mem_Ico]
+    constructor
+    · rw [div_le_iff₀ hpos]
+      nlinarith [mul_nonneg (Nat.cast_nonneg i) hh0]
+    · calc x + i * h ≤ x + m * h := by nlinarith
+        _ < _ := hgood
+  rw [hPu _ hmem]
+
 /-- **Differences vanish inside a piece**: if `x, x + h, …, x + rh` lie in the dyadic interval of
 `x`, then `Δ_h^r u(x) = 0`, since there `u` is a polynomial of degree `< r`. -/
 theorem higherDiff_eq_zero_of_isPiecewisePoly {r k : ℕ} {u : ℝ → ℂ} (hu : IsPiecewisePoly r k u)
@@ -145,35 +169,22 @@ theorem higherDiff_eq_zero_of_isPiecewisePoly {r k : ℕ} {u : ℝ → ℂ} (hu 
     (hgood : x + r * h < ((⌊2 ^ k * x⌋₊ : ℝ) + 1) / 2 ^ k) :
     higherDiff r h u x = 0 := by
   obtain ⟨P, hP, hPu⟩ := hu ⌊2 ^ k * x⌋₊
-  have hpos : (0 : ℝ) < 2 ^ k := by positivity
-  have hmem : ∀ i ∈ Finset.range (r + 1), x + i * h ∈ dyadicIco k ⌊2 ^ k * x⌋₊ := fun i hi => by
-    have hi' : (i : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)
-    have hfl : (⌊2 ^ k * x⌋₊ : ℝ) ≤ 2 ^ k * x := Nat.floor_le (by positivity)
-    rw [dyadicIco, mem_Ico]
-    constructor
-    · rw [div_le_iff₀ hpos]
-      nlinarith [mul_nonneg (Nat.cast_nonneg i) hh0]
-    · calc x + i * h ≤ x + r * h := by nlinarith
-        _ < _ := hgood
-  have h1 : higherDiff r h u x = higherDiff r h (polyFun P) x := by
-    rw [higherDiff_apply, higherDiff_apply]
-    exact Finset.sum_congr rfl fun i hi => by rw [hPu _ (hmem i hi)]
-  rw [h1]
+  rw [higherDiff_eq_of_mem_piece hPu hh0 hx hgood]
   exact congrFun (higherDiff_polynomial hP h) x
 
-/-- **Pointwise bound for differences**: for `0 ≤ h ≤ 2^(-k)` and `x ≥ 0`,
-`|Δ_h^r u(x)| ≤ 2^r K 2^(k/p) (∑_{l ≤ r} ∫_{I_{k,n+l}} |u|^p)^(1/p)` with `n = ⌊2^k x⌋`, since
-`x, …, x + rh` meet only the intervals `I_{k,n}, …, I_{k,n+r}`. -/
-theorem enorm_higherDiff_le_of_isPiecewisePoly {r k : ℕ} {u : ℝ → ℂ} (hu : IsPiecewisePoly r k u)
-    {K : ℝ≥0∞} (hK : NikolskiiBound p r K) (hp : p ≠ ∞) {h x : ℝ} (hh0 : 0 ≤ h)
-    (hh : h ≤ 1 / 2 ^ k) (hx : 0 ≤ x) :
-    ‖higherDiff r h u x‖ₑ ≤ 2 ^ r * (K * ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
+/-- **Pointwise bound for differences of order `m ≤ r`**: for `0 ≤ h ≤ 2^(-k)` and `x ≥ 0`,
+`|Δ_h^m u(x)| ≤ 2^m K 2^(k/p) (∑_{l ≤ r} M_{n+l})^(1/p)` with `n = ⌊2^k x⌋`, since
+`x, …, x + mh` meet only the intervals `I_{k,n}, …, I_{k,n+r}`. -/
+theorem enorm_higherDiff_le_of_isPiecewisePoly_of_le {r k m : ℕ} (hmr : m ≤ r) {u : ℝ → ℂ}
+    (hu : IsPiecewisePoly r k u) {K : ℝ≥0∞} (hK : NikolskiiBound p r K) (hp : p ≠ ∞) {h x : ℝ}
+    (hh0 : 0 ≤ h) (hh : h ≤ 1 / 2 ^ k) (hx : 0 ≤ x) :
+    ‖higherDiff m h u x‖ₑ ≤ 2 ^ m * (K * ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
       (∑ l ∈ Finset.range (r + 1), localMass p k u (⌊2 ^ k * x⌋₊ + l)) ^ (1 / p.toReal)) := by
   have hkh : (2 : ℝ) ^ k * h ≤ 1 := by
     rw [le_div_iff₀ (by positivity)] at hh
     linarith
   refine enorm_higherDiff_le_of_forall fun i hi => ?_
-  have hi' : i ≤ r := Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)
+  have hi' : i ≤ r := (Nat.lt_succ_iff.1 (Finset.mem_range.1 hi)).trans hmr
   have h0 : 0 ≤ 2 ^ k * (x + i * h) := by positivity
   have hm : x + i * h ∈ dyadicIco k ⌊2 ^ k * (x + i * h)⌋₊ :=
     mem_dyadicIco.2 ⟨Nat.floor_le h0, Nat.lt_floor_add_one _⟩
@@ -186,6 +197,16 @@ theorem enorm_higherDiff_le_of_isPiecewisePoly {r k : ℕ} {u : ℝ → ℂ} (hu
   gcongr
   rw [hd]
   exact localMass_le_sum_range k u _ hdr
+
+/-- **Pointwise bound for differences**: for `0 ≤ h ≤ 2^(-k)` and `x ≥ 0`,
+`|Δ_h^r u(x)| ≤ 2^r K 2^(k/p) (∑_{l ≤ r} ∫_{I_{k,n+l}} |u|^p)^(1/p)` with `n = ⌊2^k x⌋`, since
+`x, …, x + rh` meet only the intervals `I_{k,n}, …, I_{k,n+r}`. -/
+theorem enorm_higherDiff_le_of_isPiecewisePoly {r k : ℕ} {u : ℝ → ℂ} (hu : IsPiecewisePoly r k u)
+    {K : ℝ≥0∞} (hK : NikolskiiBound p r K) (hp : p ≠ ∞) {h x : ℝ} (hh0 : 0 ≤ h)
+    (hh : h ≤ 1 / 2 ^ k) (hx : 0 ≤ x) :
+    ‖higherDiff r h u x‖ₑ ≤ 2 ^ r * (K * ENNReal.ofReal (2 ^ k) ^ (1 / p.toReal) *
+      (∑ l ∈ Finset.range (r + 1), localMass p k u (⌊2 ^ k * x⌋₊ + l)) ^ (1 / p.toReal)) :=
+  enorm_higherDiff_le_of_isPiecewisePoly_of_le le_rfl hu hK hp hh0 hh hx
 
 /-- The **strip function** of the inverse estimate: `c M_n` at the points `x` of the strip
 `[(n + 1) 2^(-j) - rh, (n + 1) 2^(-j))` left of the right end of the dyadic interval
@@ -413,19 +434,10 @@ theorem exists_inverse_ppScheme {r : ℕ} (hp : p ≠ ∞) :
 polynomials of degree `< r`, with inverse order `θ = 1/p` and Jackson's inequality at every
 level (Whitney's inequality at level `0`). -/
 noncomputable def ppModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
-    ApproximationScheme.ModulusData (ppScheme p r) (1 / p.toReal) where
-  modulus := lpModulus p r
-  add_le := lpModulus_add_le r
-  C0 := 2 ^ r
-  C0_ne_top := by simp
-  le_enorm := lpModulus_le r
-  jacksonStart := 0
-  CJ := (exists_approxError_ppScheme_le (p := p) hr hp).choose
-  CJ_ne_top := (exists_approxError_ppScheme_le hr hp).choose_spec.1
-  jackson f k _ := (exists_approxError_ppScheme_le hr hp).choose_spec.2 f k
-  CB := (exists_inverse_ppScheme (r := r) hp).choose
-  CB_ne_top := (exists_inverse_ppScheme hp).choose_spec.1
-  inverse := (exists_inverse_ppScheme hp).choose_spec.2
+    ApproximationScheme.ModulusData (ppScheme p r) (1 / p.toReal) :=
+  .ofExists (lpModulus p r) (lpModulus_add_le r) (2 ^ r) (by simp) (lpModulus_le r) 0
+    ((exists_approxError_ppScheme_le hr hp).imp fun _ h => ⟨h.1, fun f k _ => h.2 f k⟩)
+    (exists_inverse_ppScheme hp)
 
 /-- **Approximation by dyadic piecewise polynomials.** For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`, `r ≥ 1` and
 `0 ≤ s < 1/p`, an `f ∈ L_p[0, 1]` lies in the approximation space `A^s_q` of the piecewise

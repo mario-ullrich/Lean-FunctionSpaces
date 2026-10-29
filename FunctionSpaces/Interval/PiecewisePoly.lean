@@ -148,14 +148,39 @@ theorem ppFun_sum {ι : Type*} (k : ℕ) (s : Finset ι) (Q : ι → ℕ → ℂ
   | empty => simp [ppFun_zero]
   | insert j s hj ih => rw [Finset.sum_insert hj, Finset.sum_insert hj, ppFun_add, ih]
 
+/-- The dyadic intervals `I_{k,n}`, `n < 2^k`, lie in `[0, 1)`. -/
+theorem dyadicIco_subset {k n : ℕ} (hn : n < 2 ^ k) : dyadicIco k n ⊆ Ico 0 1 := by
+  intro x hx
+  rw [mem_dyadicIco] at hx
+  have h2 : (0 : ℝ) < 2 ^ k := by positivity
+  have hn' : (n : ℝ) + 1 ≤ 2 ^ k := by exact_mod_cast Nat.succ_le_of_lt hn
+  have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
+  constructor
+  · nlinarith
+  · nlinarith
+
+/-- A piecewise polynomial vanishes outside `[0, 1)`. -/
+theorem ppFun_eq_zero {k : ℕ} (Q : ℕ → ℂ[X]) {x : ℝ} (hx : x ∉ Ico (0 : ℝ) 1) :
+    ppFun k Q x = 0 :=
+  Finset.sum_eq_zero fun _ hn =>
+    indicator_of_notMem (fun h => hx (dyadicIco_subset (Finset.mem_range.1 hn) h)) _
+
+/-- **Refinement of piecewise polynomials, everywhere**: the pieces `Q_{⌊n/2⌋}` of level `k + 1`
+give the same function as the pieces `Q_n` of level `k`, on all of `ℝ`. -/
+theorem ppFun_refine_eq (k : ℕ) (Q : ℕ → ℂ[X]) :
+    ppFun (k + 1) (fun n => Q (n / 2)) = ppFun k Q := by
+  funext x
+  by_cases hx : x ∈ Ico (0 : ℝ) 1
+  · obtain ⟨h1, h1'⟩ := mem_dyadicIco_floor (k := k + 1) hx
+    obtain ⟨h2, h2'⟩ := mem_dyadicIco_floor (k := k) hx
+    rw [ppFun_eq_of_mem _ h1' h1, ppFun_eq_of_mem _ h2' h2, floor_two_pow_succ_div]
+  · rw [ppFun_eq_zero _ hx, ppFun_eq_zero _ hx]
+
 /-- **Refinement**: a piecewise polynomial of level `k` is one of level `k + 1` with the pieces
-`Q_{⌊n/2⌋}`, almost everywhere on `[0, 1]`. -/
+`Q_{⌊n/2⌋}`, almost everywhere on `[0, 1]` (`Interval.ppFun_refine_eq` holds everywhere). -/
 theorem ppFun_refine (k : ℕ) (Q : ℕ → ℂ[X]) :
-    ppFun (k + 1) (fun n => Q (n / 2)) =ᵐ[unitVol] ppFun k Q := by
-  filter_upwards [ae_mem_Ico_unitVol] with x hx
-  obtain ⟨h1, h1'⟩ := mem_dyadicIco_floor (k := k + 1) hx
-  obtain ⟨h2, h2'⟩ := mem_dyadicIco_floor (k := k) hx
-  rw [ppFun_eq_of_mem _ h1' h1, ppFun_eq_of_mem _ h2' h2, floor_two_pow_succ_div]
+    ppFun (k + 1) (fun n => Q (n / 2)) =ᵐ[unitVol] ppFun k Q :=
+  Filter.EventuallyEq.of_eq (ppFun_refine_eq k Q)
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
@@ -292,38 +317,9 @@ theorem floor_eq_of_mem_dyadicIco {k n : ℕ} {x : ℝ} (hx : x ∈ dyadicIco k 
   rw [mem_dyadicIco] at hx
   exact (Nat.floor_eq_iff ((Nat.cast_nonneg n).trans hx.1)).2 hx
 
-/-- The dyadic intervals `I_{k,n}`, `n < 2^k`, lie in `[0, 1)`. -/
-theorem dyadicIco_subset {k n : ℕ} (hn : n < 2 ^ k) : dyadicIco k n ⊆ Ico 0 1 := by
-  intro x hx
-  rw [mem_dyadicIco] at hx
-  have h2 : (0 : ℝ) < 2 ^ k := by positivity
-  have hn' : (n : ℝ) + 1 ≤ 2 ^ k := by exact_mod_cast Nat.succ_le_of_lt hn
-  have hn0 : (0 : ℝ) ≤ n := Nat.cast_nonneg n
-  constructor
-  · nlinarith
-  · nlinarith
-
 /-- The dyadic intervals of one level are pairwise disjoint. -/
 theorem pairwise_disjoint_dyadicIco (k : ℕ) : Pairwise (Function.onFun Disjoint (dyadicIco k)) :=
   fun _ _ hnm => Set.disjoint_left.2 fun _ hn hm => hnm (eq_of_mem_dyadicIco hn hm)
-
-/-- A piecewise polynomial vanishes outside `[0, 1)`. -/
-theorem ppFun_eq_zero {k : ℕ} (Q : ℕ → ℂ[X]) {x : ℝ} (hx : x ∉ Ico (0 : ℝ) 1) :
-    ppFun k Q x = 0 :=
-  Finset.sum_eq_zero fun _ hn =>
-    indicator_of_notMem (fun h => hx (dyadicIco_subset (Finset.mem_range.1 hn) h)) _
-
-/-- **Refinement of piecewise polynomials, everywhere**: the pieces `Q_{⌊n/2⌋}` of level `k + 1`
-give the same function as the pieces `Q_n` of level `k`, on all of `ℝ` (`Interval.ppFun_refine`
-is the statement almost everywhere on `[0, 1]`). -/
-theorem ppFun_refine_eq (k : ℕ) (Q : ℕ → ℂ[X]) :
-    ppFun (k + 1) (fun n => Q (n / 2)) = ppFun k Q := by
-  funext x
-  by_cases hx : x ∈ Ico (0 : ℝ) 1
-  · obtain ⟨h1, h1'⟩ := mem_dyadicIco_floor (k := k + 1) hx
-    obtain ⟨h2, h2'⟩ := mem_dyadicIco_floor (k := k) hx
-    rw [ppFun_eq_of_mem _ h1' h1, ppFun_eq_of_mem _ h2' h2, floor_two_pow_succ_div]
-  · rw [ppFun_eq_zero _ hx, ppFun_eq_zero _ hx]
 
 /-- On `I_{k,m}` a piecewise polynomial of level `k` is a polynomial: `Q_m` for `m < 2^k`, and
 `0` for the intervals beyond `[0, 1)`. -/

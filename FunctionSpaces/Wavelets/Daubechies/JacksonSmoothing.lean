@@ -29,8 +29,8 @@ restriction to an interval. The difference `f - S_δ f` is `(-1)^r` times the av
 for averages (`Interval.eLpNorm_avgStepIter_le`) bounds it by the differences with steps
 `0 ≤ h ≤ rδ`. The derivative is the combination
 `(S_δ f)^(r) = ∑_{k=1}^r (-1)^(k+1) C(r, k) (kδ)^(-r) Δ_{kδ}^r f`
-(`Daubechies.iteratedDeriv_smooth_eq_sum_smul`), bounded term by term
-(`Daubechies.eLpNorm_smul_higherDiff_le_modulus`) with `∑_{k=1}^r C(r, k) ≤ 2^r`.
+(`Interval.iteratedDeriv_smooth_eq_sum_smul`), bounded by the derivative bound for any measure
+(`Interval.eLpNorm_sum_smoothCoeff_smul_le`) with `‖Δ_h^r f‖_p ≤ ω_r(f, rδ)_p` for `0 ≤ h ≤ rδ`.
 
 At the dyadic step `δ = 1/(N 2^j)`, where `Nδ = 2^(-j)` and `δ^(-N) = N^N 2^(jN)`, the two
 bounds read `‖f - S_δ f‖_p ≤ ω_N(f, 2^(-j))_p` and
@@ -78,69 +78,19 @@ theorem eLpNorm_sub_smooth_le_modulus {f : ℝ → ℂ} (hf : Continuous f) (r :
   rw [zero_add] at hh
   exact eLpNorm_higherDiff_le_modulus_of_nonneg hh.1 hh.2
 
-/-- `∑_{k=1}^r C(r, k) ≤ 2^r`, written with the index `k + 1` for `k < r`: the full sum
-`∑_{k=0}^r C(r, k)` is `2^r` (Mathlib's `Nat.sum_range_choose`). -/
-theorem sum_range_choose_succ_le (r : ℕ) :
-    ∑ k ∈ Finset.range r, (r.choose (k + 1) : ℝ≥0∞) ≤ 2 ^ r := by
-  have h := Nat.sum_range_choose r
-  rw [Finset.sum_range_succ'] at h
-  have h' : ∑ k ∈ Finset.range r, r.choose (k + 1) ≤ 2 ^ r := by omega
-  exact_mod_cast h'
-
-/-- **The derivative of the smoothing as a sum of functions**: for continuous `f : ℝ → ℂ`,
-`(S_δ f)^(r) = ∑_{k=1}^r (-1)^(k+1) C(r, k) (kδ)^(-r) Δ_{kδ}^r f`
-as an identity of functions `ℝ → ℂ` (`Interval.iteratedDeriv_smooth` at every point), written
-with the index `k + 1` for `k < r` and as a sum `∑_k c_k • g_k`, the form to which the triangle
-inequality in `L_p` applies. -/
-theorem iteratedDeriv_smooth_eq_sum_smul {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ) :
-    iteratedDeriv r (Interval.smooth r δ f) = ∑ k ∈ Finset.range r,
-      (((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
-        (((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r) • Rd.higherDiff r ((k + 1 : ℕ) * δ) f := by
-  rw [Interval.iteratedDeriv_smooth hf r δ]
-  funext x
-  rw [Finset.sum_apply]
-  refine Finset.sum_congr rfl fun k _ => ?_
-  rw [Pi.smul_apply, smul_eq_mul]
-  ring
-
-/-- **One term of the derivative of the smoothing**: for `1 ≤ k ≤ r` (written `k + 1` with
-`k < r`) and `δ > 0`,
-`‖(-1)^(k+1) C(r, k) (kδ)^(-r) Δ_{kδ}^r f‖_{L_p(ℝ)} ≤ C(r, k) δ^(-r) ω_r(f, rδ)_p`,
-since `(kδ)^(-r) ≤ δ^(-r)` and `0 ≤ kδ ≤ rδ`. -/
-theorem eLpNorm_smul_higherDiff_le_modulus {f : ℝ → ℂ} {r k : ℕ} (hk : k < r) {δ : ℝ}
-    (hδ : 0 < δ) {p : ℝ≥0∞} :
-    eLpNorm ((((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
-      (((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r) • Rd.higherDiff r ((k + 1 : ℕ) * δ) f) p volume ≤
-      (r.choose (k + 1) : ℝ≥0∞) *
-        ((ENNReal.ofReal δ)⁻¹ ^ r * Rd.modulus volume r p f (r * δ)) := by
-  have hkr : ((k + 1 : ℕ) : ℝ) ≤ r := by exact_mod_cast hk
-  have hk1 : (1 : ℝ) ≤ ((k + 1 : ℕ) : ℝ) := by exact_mod_cast Nat.succ_le_succ (Nat.zero_le k)
-  rw [eLpNorm_const_smul, enorm_mul, enorm_mul, enorm_pow, enorm_neg, enorm_one, one_pow,
-    one_mul, mul_assoc]
-  gcongr
-  · rw [← ofReal_norm, Complex.norm_natCast, ENNReal.ofReal_natCast]
-  · rw [enorm_pow, ← ofReal_norm, norm_inv, Complex.norm_real, Real.norm_eq_abs,
-      abs_of_pos (by positivity), ENNReal.ofReal_inv_of_pos (by positivity)]
-    gcongr
-    exact le_mul_of_one_le_left hδ.le hk1
-  · exact eLpNorm_higherDiff_le_modulus_of_nonneg (by positivity)
-      (mul_le_mul_of_nonneg_right hkr hδ.le)
-
 /-- **The derivative of order `r` of the smoothing on the whole line**: for continuous
 `f : ℝ → ℂ`, `r ∈ ℕ`, `δ > 0` and `1 ≤ p ≤ ∞`,
 `‖(S_δ f)^(r)‖_{L_p(ℝ)} ≤ 2^r δ^(-r) ω_r(f, rδ)_p`,
 by the triangle inequality for `(S_δ f)^(r) = ∑_{k=1}^r (-1)^(k+1) C(r, k) (kδ)^(-r) Δ_{kδ}^r f`
-and `∑_{k=1}^r C(r, k) ≤ 2^r`. -/
+and `∑_{k=1}^r C(r, k) ≤ 2^r` (`Interval.eLpNorm_sum_smoothCoeff_smul_le` for Lebesgue measure on
+`ℝ`). -/
 theorem eLpNorm_iteratedDeriv_smooth_le_modulus {f : ℝ → ℂ} (hf : Continuous f) (r : ℕ)
     {δ : ℝ} (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) :
     eLpNorm (iteratedDeriv r (Interval.smooth r δ f)) p volume ≤
       2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * Rd.modulus volume r p f (r * δ) := by
-  rw [iteratedDeriv_smooth_eq_sum_smul hf r δ]
-  refine ((eLpNorm_sum_le hp).trans (Finset.sum_le_sum fun k hk =>
-    eLpNorm_smul_higherDiff_le_modulus (Finset.mem_range.1 hk) hδ)).trans ?_
-  rw [← Finset.sum_mul, mul_assoc]
-  gcongr
-  exact sum_range_choose_succ_le r
+  rw [Interval.iteratedDeriv_smooth_eq_sum_smul hf r δ]
+  exact Interval.eLpNorm_sum_smoothCoeff_smul_le (D := fun h => Rd.higherDiff r h f) hδ hp
+    fun h h0 hh => eLpNorm_higherDiff_le_modulus_of_nonneg h0 hh
 
 /-! ### The dyadic step `δ = 1/(N 2^j)` -/
 

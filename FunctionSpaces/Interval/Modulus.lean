@@ -209,32 +209,23 @@ theorem modulus_polynomial {r : ℕ} {P : Polynomial ℂ} (hP : P ∈ Polynomial
   simp [modulus_eq_iSup_nonneg, higherDiff_polynomial hP]
 
 /-- **Differences depend only on the class in `L_p[a, b]`**: for `h ≥ 0`, functions that agree
-almost everywhere on `[a, b]` have differences of step `h` that agree almost everywhere on
-`[a, b - rh]`, hence the same `L_p` norm there. -/
+almost everywhere on `[a, b]` have differences of step `h` with the same `L_p` norm on
+`[a, b - rh]`: the norm is that of `Δ_h^r (1_{[a,b]} f)` on the step set
+(`Interval.eLpNorm_indicator_stepSet_Icc`, `Rd.indicator_stepSet_higherDiff_indicator`), and the
+differences of `1_{[a,b]} f = 1_{[a,b]} g` agree almost everywhere (`Rd.higherDiff_congr_ae`). -/
 theorem eLpNorm_higherDiff_congr_ae {f g : ℝ → ℂ} {a b : ℝ}
     (hfg : f =ᵐ[volume.restrict (Icc a b)] g) (r : ℕ) (p : ℝ≥0∞) {h : ℝ} (hh : 0 ≤ h) :
     eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) =
       eLpNorm (higherDiff r h g) p (volume.restrict (Icc a (b - r * h))) := by
+  rw [← eLpNorm_indicator_stepSet_Icc r hh p a b f, ← eLpNorm_indicator_stepSet_Icc r hh p a b g,
+    ← Rd.indicator_stepSet_higherDiff_indicator (Icc a b) r h f,
+    ← Rd.indicator_stepSet_higherDiff_indicator (Icc a b) r h g]
+  rw [ae_eq_restrict_iff_indicator_ae_eq measurableSet_Icc] at hfg
   refine eLpNorm_congr_ae ?_
-  have hk : ∀ k ∈ Finset.range (r + 1), (fun x => f (x + k * h)) =ᵐ[volume.restrict
-      (Icc a (b - r * h))] fun x => g (x + k * h) := fun k hk => by
-    have hkr : (k : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)
-    have hpre : (fun x => x + k * h) ⁻¹' Icc (a + k * h) (b - r * h + k * h) =
-        Icc a (b - r * h) := by
-      ext x
-      simp only [mem_preimage, mem_Icc]
-      constructor <;> intro h' <;> constructor <;> linarith [h'.1, h'.2]
-    have hmp : MeasurePreserving (· + k * h) (volume.restrict (Icc a (b - r * h)))
-        (volume.restrict (Icc (a + k * h) (b - r * h + k * h))) := by
-      have := (measurePreserving_add_right volume (k * h)).restrict_preimage
-        (measurableSet_Icc (a := a + k * h) (b := b - r * h + k * h))
-      rwa [hpre] at this
-    have hsub : Icc (a + k * h) (b - r * h + k * h) ⊆ Icc a b :=
-      Icc_subset_Icc (by nlinarith) (by nlinarith)
-    exact hmp.quasiMeasurePreserving.ae_eq_comp (ae_restrict_of_ae_restrict_of_subset hsub hfg)
-  filter_upwards [(Filter.eventually_all_finset _).2 hk] with x hx
-  rw [higherDiff_apply, higherDiff_apply]
-  exact Finset.sum_congr rfl fun k hk' => by rw [hx k hk']
+  filter_upwards [Rd.higherDiff_congr_ae hfg r h] with x hx
+  by_cases hxU : x ∈ Rd.stepSet (Icc a b) r h
+  · rw [Set.indicator_of_mem hxU, Set.indicator_of_mem hxU, hx]
+  · rw [Set.indicator_of_notMem hxU, Set.indicator_of_notMem hxU]
 
 /-- **The modulus depends only on the class in `L_p[a, b]`**: functions that agree almost
 everywhere on `[a, b]` have the same modulus. -/

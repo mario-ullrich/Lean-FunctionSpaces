@@ -22,12 +22,14 @@ variable (`Interval.smooth`). For continuous `f` its two identities hold pointwi
   `∑_k (-1)^(k+1) C(r,k) (kδ)^(-r) Δ^r_{kδ e_i} f` (`Cube.cubeSmoothDeriv_eq`).
 
 Minkowski's inequality for averages on the cube (`Interval.eLpNorm_avgStepIter_le`, for any point
-space) and the triangle inequality then bound both by the coordinate modulus, with the supremum
-over the steps outside the integral over the cube (`Cube.eLpNorm_sub_cubeSmooth_le`,
-`Cube.eLpNorm_cubeSmoothDeriv_le`). With `δ = L / r²` this gives smoothings on the regions
-`{x_i ≤ w}` and, by the reflection `x_i ↦ 1 - x_i` (`Cube.coordModulus_reflect`),
-`{x_i ≥ 1 - w}`, `w + L ≤ 1`, whose slices have Taylor polynomials on all intervals
-(`Cube.exists_left_cubeSmoothing`, `Cube.exists_right_cubeSmoothing`).
+space) and the derivative bound for any measure (`Interval.eLpNorm_sum_smoothCoeff_smul_le`) then
+bound both by the coordinate modulus, with the supremum over the steps outside the integral over
+the cube (`Cube.eLpNorm_sub_cubeSmooth_le`, `Cube.eLpNorm_cubeSmoothDeriv_le`). With `δ = L / r²`
+this gives smoothings on the regions `{x_i ≤ w}` and, by the reflection `x_i ↦ 1 - x_i`
+(`Cube.coordModulus_reflect`), `{x_i ≥ 1 - w}`, `w + L ≤ 1`, whose slices have Taylor polynomials
+on all intervals (`Cube.exists_left_cubeSmoothing`, `Cube.exists_right_cubeSmoothing`), with the
+step bounds and the reflected Taylor polynomials of the interval (`Interval.step_div_sq_bounds`,
+`Interval.two_pow_mul_inv_div_sq_pow_mul_le`, `Interval.exists_eLpNorm_sub_polyFun_reflect_le`).
 -/
 
 @[expose] public section
@@ -112,6 +114,21 @@ theorem cubeSmoothDeriv_eq {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r 
   rw [cubeSmoothDeriv, iteratedDeriv_smooth (continuous_slice hf x i) r δ]
   rfl
 
+/-- **The derivative of the smoothing as a sum of functions**:
+`∂_i^r S^{(i)}_δ f = ∑_{k=1}^r (-1)^(k+1) C(r,k) (kδ)^(-r) Δ^r_{kδ e_i} f` as an identity of
+functions on `ℝ^d` (`Cube.cubeSmoothDeriv_eq` at every point), written as a sum `∑_k c_k • g_k`,
+the form to which the triangle inequality in `L_p` applies. -/
+theorem cubeSmoothDeriv_eq_sum_smul {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) (δ : ℝ)
+    (i : Fin d) :
+    cubeSmoothDeriv r δ i f = ∑ k ∈ Finset.range r,
+      (((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
+        (((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r) • cubeDiff r ((k + 1 : ℕ) * δ) i f := by
+  funext x
+  rw [cubeSmoothDeriv_eq hf r δ i x, Finset.sum_apply]
+  refine Finset.sum_congr rfl fun k _ => ?_
+  rw [Pi.smul_apply, smul_eq_mul]
+  ring
+
 /-- The smoothing of a continuous function is continuous. -/
 theorem continuous_cubeSmooth {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
     (hδ : δ ≠ 0) (i : Fin d) : Continuous (cubeSmooth r δ i f) := by
@@ -136,6 +153,18 @@ theorem continuous_cubeSmoothDeriv {f : (Fin d → ℝ) → ℂ} (hf : Continuou
 
 /-! ### Bounds by the coordinate modulus -/
 
+/-- **Coordinate differences on a region are bounded by the modulus**: for `w + r (rδ) ≤ 1` and
+`0 ≤ h ≤ rδ`, `‖Δ^r_{h e_i} f‖_{L_p({x_i ≤ w})} ≤ ω_r^{(i)}(f, rδ)_p`, since the region
+`{0 ≤ x_i ≤ w}` lies in `{0 ≤ x_i ≤ 1 - rh}`. -/
+theorem eLpNorm_cubeDiff_regionVol_le {f : (Fin d → ℝ) → ℂ} {r : ℕ} {δ : ℝ} {p : ℝ≥0∞}
+    {i : Fin d} {w h : ℝ} (hwb : w + r * (r * δ) ≤ 1) (h0 : 0 ≤ h) (hh : h ≤ r * δ) :
+    eLpNorm (cubeDiff r h i f) p (regionVol d i 0 w) ≤ coordModulus r p i f (r * δ) := by
+  have hsub : {x : Fin d → ℝ | x i ∈ Icc 0 w} ⊆ {x | x i ∈ Icc 0 (1 - r * h)} := fun x hx => by
+    have : (r : ℝ) * h ≤ r * (r * δ) := mul_le_mul_of_nonneg_left hh (Nat.cast_nonneg r)
+    exact ⟨hx.1, by linarith [hx.2]⟩
+  exact (eLpNorm_mono_measure _ (Measure.restrict_mono hsub le_rfl)).trans
+    (eLpNorm_cubeDiff_le_coordModulus ⟨h0, hh⟩)
+
 /-- **The smoothing is close to `f`**: on `{x_i ≤ w}` with `w + r² δ ≤ 1`,
 `‖f - S^{(i)}_δ f‖_p ≤ ω_r^{(i)}(f, rδ)_p`. -/
 theorem eLpNorm_sub_cubeSmooth_le {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
@@ -152,11 +181,7 @@ theorem eLpNorm_sub_cubeSmooth_le {f : (Fin d → ℝ) → ℂ} (hf : Continuous
   refine (eLpNorm_avgStepIter_le (continuous_cubeDiff_uncurry hf r i) hδ hp hp' _ r 0).trans ?_
   refine iSup₂_le fun h hh => ?_
   rw [zero_add] at hh
-  have hsub : {x : Fin d → ℝ | x i ∈ Icc 0 w} ⊆ {x | x i ∈ Icc 0 (1 - r * h)} := fun x hx => by
-    have : (r : ℝ) * h ≤ r * (r * δ) := mul_le_mul_of_nonneg_left hh.2 (Nat.cast_nonneg r)
-    exact ⟨hx.1, by linarith [hx.2]⟩
-  exact (eLpNorm_mono_measure _ (Measure.restrict_mono hsub le_rfl)).trans
-    (eLpNorm_cubeDiff_le_coordModulus ⟨hh.1, hh.2⟩)
+  exact eLpNorm_cubeDiff_regionVol_le hwb hh.1 hh.2
 
 /-- **The derivative of the smoothing**: on `{x_i ≤ w}` with `w + r² δ ≤ 1`,
 `‖∂_i^r S^{(i)}_δ f‖_p ≤ 2^r δ^(-r) ω_r^{(i)}(f, rδ)_p`. -/
@@ -164,46 +189,9 @@ theorem eLpNorm_cubeSmoothDeriv_le {f : (Fin d → ℝ) → ℂ} (hf : Continuou
     (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (i : Fin d) {w : ℝ} (hwb : w + r * (r * δ) ≤ 1) :
     eLpNorm (cubeSmoothDeriv r δ i f) p (regionVol d i 0 w) ≤
       2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * coordModulus r p i f (r * δ) := by
-  have hsum : cubeSmoothDeriv r δ i f = ∑ k ∈ Finset.range r,
-      (((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
-        (((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r) • cubeDiff r ((k + 1 : ℕ) * δ) i f := by
-    funext x
-    rw [cubeSmoothDeriv_eq hf r δ i x, Finset.sum_apply]
-    refine Finset.sum_congr rfl fun k _ => ?_
-    rw [Pi.smul_apply, smul_eq_mul]
-    ring
-  rw [hsum]
-  refine (eLpNorm_sum_le hp).trans ?_
-  have hk : ∀ k ∈ Finset.range r, eLpNorm ((((-1 : ℂ) ^ (k + 2) * (r.choose (k + 1) : ℂ)) *
-      (((k + 1 : ℕ) * δ : ℝ) : ℂ)⁻¹ ^ r) • cubeDiff r ((k + 1 : ℕ) * δ) i f) p
-        (regionVol d i 0 w) ≤
-      (r.choose (k + 1) : ℝ≥0∞) * ((ENNReal.ofReal δ)⁻¹ ^ r * coordModulus r p i f (r * δ)) :=
-    fun k hk => by
-      have hkr : ((k + 1 : ℕ) : ℝ) ≤ r := by exact_mod_cast Finset.mem_range.1 hk
-      have hk1 : (1 : ℝ) ≤ ((k + 1 : ℕ) : ℝ) := by exact_mod_cast Nat.succ_le_succ (Nat.zero_le k)
-      rw [eLpNorm_const_smul, enorm_mul, enorm_mul, enorm_pow, enorm_neg, enorm_one, one_pow,
-        one_mul, mul_assoc]
-      gcongr
-      · rw [← ofReal_norm, Complex.norm_natCast, ENNReal.ofReal_natCast]
-      · rw [enorm_pow, ← ofReal_norm, norm_inv, Complex.norm_real, Real.norm_eq_abs,
-          abs_of_pos (by positivity), ENNReal.ofReal_inv_of_pos (by positivity)]
-        gcongr
-        exact le_mul_of_one_le_left hδ.le hk1
-      · have hsub : {x : Fin d → ℝ | x i ∈ Icc 0 w} ⊆
-            {x | x i ∈ Icc 0 (1 - r * ((k + 1 : ℕ) * δ))} := fun x hx => by
-          have : (r : ℝ) * ((k + 1 : ℕ) * δ) ≤ r * (r * δ) :=
-            mul_le_mul_of_nonneg_left (mul_le_mul_of_nonneg_right hkr hδ.le) (Nat.cast_nonneg r)
-          exact ⟨hx.1, by linarith [hx.2]⟩
-        exact (eLpNorm_mono_measure _ (Measure.restrict_mono hsub le_rfl)).trans
-          (eLpNorm_cubeDiff_le_coordModulus ⟨by positivity, mul_le_mul_of_nonneg_right hkr hδ.le⟩)
-  refine (Finset.sum_le_sum hk).trans ?_
-  rw [← Finset.sum_mul, mul_assoc]
-  gcongr
-  have h' : ∑ k ∈ Finset.range r, r.choose (k + 1) ≤ 2 ^ r := by
-    have := Nat.sum_range_choose r
-    rw [Finset.sum_range_succ'] at this
-    omega
-  exact_mod_cast h'
+  rw [cubeSmoothDeriv_eq_sum_smul hf r δ i]
+  exact eLpNorm_sum_smoothCoeff_smul_le (D := fun h => cubeDiff r h i f) hδ hp
+    fun h h0 hh => eLpNorm_cubeDiff_regionVol_le hwb h0 hh
 
 /-! ### Smoothings on the two ends of a coordinate -/
 
@@ -222,31 +210,17 @@ theorem exists_left_cubeSmoothing {f : (Fin d → ℝ) → ℂ} (hf : Continuous
       ∀ x : Fin d → ℝ, ∀ u v : ℝ, u ≤ v → ∃ T ∈ degreeLT ℂ r,
         eLpNorm (fun t => slice G x i t - polyFun T t) p (volume.restrict (Icc u v)) ≤
           ENNReal.ofReal (v - u) ^ r * eLpNorm (slice D x i) p (volume.restrict (Icc u v)) := by
-  have hr' : (0 : ℝ) < r := by exact_mod_cast hr
-  set δ : ℝ := L / r ^ 2 with hδdef
-  have hδ : 0 < δ := by positivity
-  have hrδ : (r : ℝ) * δ ≤ L := by
-    rw [hδdef, show (r : ℝ) * (L / r ^ 2) = L / r by field_simp]
-    exact div_le_self hL.le (by exact_mod_cast hr)
-  have hrrδ : (r : ℝ) * (r * δ) = L := by rw [hδdef]; field_simp
-  have hwb : w + r * (r * δ) ≤ 1 := by rw [hrrδ]; exact hwL
-  refine ⟨cubeSmooth r δ i f, cubeSmoothDeriv r δ i f,
+  obtain ⟨hδ, hrδ, hrrδ⟩ := step_div_sq_bounds hr hL
+  have hwb : w + r * (r * (L / r ^ 2)) ≤ 1 := by rw [hrrδ]; exact hwL
+  refine ⟨cubeSmooth r (L / r ^ 2) i f, cubeSmoothDeriv r (L / r ^ 2) i f,
     (continuous_cubeSmooth hf r hδ.ne' i).measurable,
-    (continuous_cubeSmoothDeriv hf r δ i).measurable, ?_, ?_, fun x u v huv => ?_⟩
+    (continuous_cubeSmoothDeriv hf r (L / r ^ 2) i).measurable, ?_, ?_, fun x u v huv => ?_⟩
   · exact (eLpNorm_sub_cubeSmooth_le hf r hδ hp hp' i hwb).trans (coordModulus_mono r p i f hrδ)
-  · refine (eLpNorm_cubeSmoothDeriv_le hf r hδ hp i hwb).trans ?_
-    have hinv : (ENNReal.ofReal δ)⁻¹ = (r : ℝ≥0∞) ^ 2 * ENNReal.ofReal L⁻¹ := by
-      rw [← ENNReal.ofReal_inv_of_pos hδ, hδdef, show (L / (r : ℝ) ^ 2)⁻¹ = (r : ℝ) ^ 2 * L⁻¹ by
-        field_simp, ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_pow (Nat.cast_nonneg r),
-        ENNReal.ofReal_natCast]
-    rw [hinv, mul_pow, ← pow_mul]
-    calc 2 ^ r * ((r : ℝ≥0∞) ^ (2 * r) * ENNReal.ofReal L⁻¹ ^ r) * coordModulus r p i f (r * δ)
-        ≤ 2 ^ r * ((r : ℝ≥0∞) ^ (2 * r) * ENNReal.ofReal L⁻¹ ^ r) * coordModulus r p i f L := by
-          gcongr
-          exact coordModulus_mono r p i f hrδ
-      _ = _ := by ring
+  · exact (eLpNorm_cubeSmoothDeriv_le hf r hδ hp i hwb).trans
+      (two_pow_mul_inv_div_sq_pow_mul_le hr hL (coordModulus_mono r p i f hrδ))
   · rw [slice_cubeSmooth, slice_cubeSmoothDeriv]
-    exact exists_eLpNorm_sub_polyFun_le hp r (contDiff_smooth (continuous_slice hf x i) r δ) huv
+    exact exists_eLpNorm_sub_polyFun_le hp r
+      (contDiff_smooth (continuous_slice hf x i) r (L / r ^ 2)) huv
 
 /-- The **reflection in coordinate `i`**, `x ↦ x` with `x_i` replaced by `1 - x_i`. -/
 def reflect (i : Fin d) (x : Fin d → ℝ) : Fin d → ℝ := Function.update x i (1 - x i)
@@ -318,24 +292,8 @@ theorem exists_right_cubeSmoothing {f : (Fin d → ℝ) → ℂ} (hf : Continuou
     simp only [reflect_reflect] at h
     rw [← h]
     exact h2
-  · obtain ⟨T, hT, hTb⟩ := h3 x (1 - v) (1 - u) (by linarith)
-    refine ⟨T.comp (C ((1 : ℝ) : ℂ) + C (((-1 : ℝ) : ℝ) : ℂ) * X),
-      comp_affine_mem_degreeLT hT _ _, ?_⟩
-    have hsG : slice (fun y => G (reflect i y)) x i = fun t => slice G x i (1 - t) :=
-      slice_reflect G x i
-    have hsD : slice (fun y => D (reflect i y)) x i = fun t => slice D x i (1 - t) :=
-      slice_reflect D x i
-    have hfun : (fun t => slice (fun y => G (reflect i y)) x i t -
-        polyFun (T.comp (C ((1 : ℝ) : ℂ) + C (((-1 : ℝ) : ℝ) : ℂ) * X)) t) =
-        fun t => (fun s => slice G x i s - polyFun T s) (1 - t) := by
-      funext t
-      rw [hsG, polyFun_comp_affine]
-      congr 2
-      ring
-    rw [hfun, hsD, eLpNorm_comp_sub_Icc (f := fun s => slice G x i s - polyFun T s)
-      ((measurable_slice hGm x i).sub (measurable_polyFun T)) p 1 u v,
-      eLpNorm_comp_sub_Icc (measurable_slice hDm x i) p 1 u v]
-    rw [show (1 - u) - (1 - v) = v - u by ring] at hTb
-    exact hTb
+  · simp only [slice_reflect]
+    exact exists_eLpNorm_sub_polyFun_reflect_le (measurable_slice hGm x i)
+      (measurable_slice hDm x i) (h3 x (1 - v) (1 - u) (by linarith))
 
 end Cube

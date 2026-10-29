@@ -125,7 +125,8 @@ declarations.
 * **Differences of polynomials by derivatives** (`FunctionSpaces/Interval/PolyDifferences.lean`):
   `|Δ_σ^m P(y)| ≤ σ^m sup_{[y, y+mσ]} |P^(m)|` (`Interval.norm_higherDiff_polyFun_le`), and the
   boundedness of every linear map of the polynomials of degree `< r` by the `L_p` norm on an
-  interval (`Interval.exists_enorm_linearMap_le_eLpNorm`), a form of Markov's inequality.
+  interval (`Interval.exists_enorm_linearMap_le_eLpNorm`, in
+  `FunctionSpaces/Interval/Polynomials.lean`), a form of Markov's inequality.
 * **The translation algebra** (`FunctionSpaces/Analysis/Differences/TranslationAlgebra.lean`):
   `ℂ[G]` acting on functions on an additive commutative monoid `G` by translations
   (`TranslationAlgebra.diffAct`, from `AddMonoidAlgebra.lift`), with `(fwdDiff h)^[r] = (δ_h - 1)^r`

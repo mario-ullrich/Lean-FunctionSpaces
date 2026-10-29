@@ -18,8 +18,9 @@ For a polynomial `P` of degree `< r` the difference of order `m ≥ r` vanishes
 derivative of `Δ_σ^m P` is `Δ_σ^m P'` (`Interval.hasDerivAt_higherDiff_polyFun`).
 
 On the finite-dimensional space of polynomials of degree `< r` every linear map is bounded by
-the `L_p` norm on an interval (`Interval.exists_enorm_linearMap_le_eLpNorm`); for the `m`-th
-derivative this is a form of Markov's inequality. After rescaling, the polynomials satisfy a
+the `L_p` norm on an interval (`Interval.exists_enorm_linearMap_le_eLpNorm`, in
+`FunctionSpaces.Interval.Polynomials`); for the `m`-th derivative this is a form of Markov's
+inequality. After rescaling, the polynomials satisfy a
 **difference bound** of order `m` (`Interval.DiffBound`, `Interval.exists_diffBound`):
 `|Δ_t^m P(x)| ≤ K (t/L)^m L^(-1/p) ‖P‖_{L_p[u, u + L]}` for `x, x + mt ∈ [u, u + 2L]`. For `m = 0`
 this is Nikolskii's bound (`Interval.NikolskiiBound`).
@@ -43,63 +44,7 @@ theorem iterate_derivative_mem_degreeLT {r : ℕ} {P : ℂ[X]} (hP : P ∈ degre
     rw [mem_degreeLT] at ih ⊢
     exact degree_derivative_le.trans_lt ih
 
-/-- The value of a polynomial with coefficients `c` at `x ∈ [0, 1]` is at most `r ‖c‖`. -/
-theorem norm_polyFun_degreeLTEquiv_symm_le (r : ℕ) (c : Fin r → ℂ) {x : ℝ}
-    (hx : x ∈ Icc (0 : ℝ) 1) :
-    ‖polyFun ((degreeLTEquiv ℂ r).symm c : ℂ[X]) x‖ ≤ r * ‖c‖ := by
-  have hx1 : ‖(x : ℂ)‖ ≤ 1 := by
-    rw [Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hx.1]; exact hx.2
-  rw [polyFun_degreeLTEquiv_symm]
-  refine (norm_sum_le _ _).trans ?_
-  calc ∑ i : Fin r, ‖c i * (x : ℂ) ^ (i : ℕ)‖ ≤ ∑ _i : Fin r, ‖c‖ :=
-        Finset.sum_le_sum fun i _ => by
-          rw [norm_mul, norm_pow]
-          exact mul_le_of_le_one_right (norm_nonneg _) (pow_le_one₀ (norm_nonneg _) hx1)
-            |>.trans (norm_le_pi_norm c i)
-    _ = r * ‖c‖ := by rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
-
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
-
-/-- **Linear maps of polynomials are bounded by the norm**: let `Φ` be a linear map of the
-polynomials that preserves the degree bound `< r`, and `[α, β]` an interval of positive length.
-There is `K` with `|Φ P(x)| ≤ K ‖P‖_{L_p[α, β]}` for all `x ∈ [0, 1]` and `P` of degree `< r`. In
-coordinates `Φ` is a linear map of `ℂ^r`, hence bounded, and the coordinates are bounded by the
-`L_p` norm, since `coeffToLp` is injective on a space of finite dimension. -/
-theorem exists_enorm_linearMap_le_eLpNorm (r : ℕ) (Φ : ℂ[X] →ₗ[ℂ] ℂ[X])
-    (hΦ : ∀ P ∈ degreeLT ℂ r, Φ P ∈ degreeLT ℂ r) {α β : ℝ} (hαβ : α < β) :
-    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ P ∈ degreeLT ℂ r, ∀ x ∈ Icc (0 : ℝ) 1,
-      ‖polyFun (Φ P) x‖ₑ ≤ K * eLpNorm (polyFun P) p (volume.restrict (Icc α β)) := by
-  obtain ⟨K, -, hK⟩ := (coeffToLp p r α β).injective_iff_antilipschitz.1
-    (coeffToLp_injective r hαβ)
-  let T : (Fin r → ℂ) →ₗ[ℂ] (Fin r → ℂ) := (degreeLTEquiv ℂ r).toLinearMap ∘ₗ
-    (Φ.restrict hΦ) ∘ₗ (degreeLTEquiv ℂ r).symm.toLinearMap
-  let T' := LinearMap.toContinuousLinearMap T
-  refine ⟨r * (‖T'‖ₑ * K), ENNReal.mul_ne_top (ENNReal.natCast_ne_top r)
-    (ENNReal.mul_ne_top enorm_ne_top ENNReal.coe_ne_top), fun P hP x hx => ?_⟩
-  set c := degreeLTEquiv ℂ r ⟨P, hP⟩
-  have hPc : ((degreeLTEquiv ℂ r).symm c : ℂ[X]) = P := by simp [c]
-  have hΦc : ((degreeLTEquiv ℂ r).symm (T c) : ℂ[X]) = Φ P := by
-    simp [T, c, LinearMap.restrict_apply]
-  have hbound : ‖c‖ ≤ K * ‖coeffToLp p r α β c‖ :=
-    ZeroHomClass.bound_of_antilipschitz (coeffToLp p r α β) hK c
-  have hT : ‖T c‖ ≤ ‖T'‖ * ‖c‖ := T'.le_opNorm c
-  have hval : ‖polyFun (Φ P) x‖ ≤ r * (‖T'‖ * (K * ‖coeffToLp p r α β c‖)) := by
-    rw [← hΦc]
-    refine (norm_polyFun_degreeLTEquiv_symm_le r (T c) hx).trans ?_
-    gcongr
-    exact hT.trans (by gcongr)
-  have hval' : ‖polyFun (Φ P) x‖ₑ ≤ r * (‖T'‖ₑ * (K * ‖coeffToLp p r α β c‖ₑ)) := by
-    rw [← ofReal_norm, ← ofReal_norm]
-    calc ENNReal.ofReal ‖polyFun (Φ P) x‖
-        ≤ ENNReal.ofReal (r * (‖T'‖ * (K * ‖coeffToLp p r α β c‖))) := ENNReal.ofReal_le_ofReal hval
-      _ = _ := by
-        rw [ENNReal.ofReal_mul (Nat.cast_nonneg _), ENNReal.ofReal_mul (norm_nonneg _),
-          ENNReal.ofReal_mul (NNReal.coe_nonneg _), ENNReal.ofReal_natCast,
-          ENNReal.ofReal_coe_nnreal, ofReal_norm, ofReal_norm]
-  rw [enorm_coeffToLp, hPc] at hval'
-  calc ‖polyFun (Φ P) x‖ₑ ≤ r * (‖T'‖ₑ * (K * eLpNorm (polyFun P) p
-        (volume.restrict (Icc α β)))) := hval'
-    _ = _ := by ring
 
 /-! ### Differences of polynomials and derivatives -/
 

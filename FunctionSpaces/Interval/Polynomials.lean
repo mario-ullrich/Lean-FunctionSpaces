@@ -28,7 +28,10 @@ piecewise polynomial also controls its values on the neighbouring interval.
 
 The equivalence of norms is Mathlib's `LinearMap.injective_iff_antilipschitz` for the injective
 map from the coefficients to `L_p[α, β]` (a nonzero polynomial has only finitely many zeros,
-`Polynomial.eq_zero_of_infinite_isRoot`).
+`Polynomial.eq_zero_of_infinite_isRoot`). In coordinates every linear map `Φ` of the polynomials
+of degree `< r` into themselves is a linear map of `ℂ^r`, so
+`|Φ P(x)| ≤ K ‖P‖_{L_p[α, β]}` for `x ∈ [0, 1]` (`Interval.exists_enorm_linearMap_le_eLpNorm`);
+`Φ = id` is the equivalence of norms (`Interval.exists_enorm_le_eLpNorm`).
 -/
 
 @[expose] public section
@@ -155,40 +158,69 @@ theorem coeffToLp_injective (r : ℕ) {α β : ℝ} (hαβ : α < β) :
   have : (degreeLTEquiv ℂ r).symm c = 0 := Subtype.ext hP
   simpa using congrArg (degreeLTEquiv ℂ r) this
 
-/-- **Equivalence of norms on polynomials**: for an interval `[α, β]` of positive length there
-is `K` with `|P(x)| ≤ K ‖P‖_{L_p[α, β]}` for all `x ∈ [0, 1]` and `P` of degree `< r`. -/
-theorem exists_enorm_le_eLpNorm (r : ℕ) {α β : ℝ} (hαβ : α < β) :
-    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ P ∈ degreeLT ℂ r, ∀ x ∈ Icc (0 : ℝ) 1,
-      ‖polyFun P x‖ₑ ≤ K * eLpNorm (polyFun P) p (volume.restrict (Icc α β)) := by
-  obtain ⟨K, -, hK⟩ := (coeffToLp p r α β).injective_iff_antilipschitz.1
-    (coeffToLp_injective r hαβ)
-  refine ⟨r * K, ENNReal.mul_ne_top (ENNReal.natCast_ne_top r) ENNReal.coe_ne_top,
-    fun P hP x hx => ?_⟩
-  set c := degreeLTEquiv ℂ r ⟨P, hP⟩
-  have hPc : ((degreeLTEquiv ℂ r).symm c : ℂ[X]) = P := by simp [c]
-  have hbound : ‖c‖ ≤ K * ‖coeffToLp p r α β c‖ :=
-    ZeroHomClass.bound_of_antilipschitz (coeffToLp p r α β) hK c
+/-- The value of a polynomial with coefficients `c` at `x ∈ [0, 1]` is at most `r ‖c‖`. -/
+theorem norm_polyFun_degreeLTEquiv_symm_le (r : ℕ) (c : Fin r → ℂ) {x : ℝ}
+    (hx : x ∈ Icc (0 : ℝ) 1) :
+    ‖polyFun ((degreeLTEquiv ℂ r).symm c : ℂ[X]) x‖ ≤ r * ‖c‖ := by
   have hx1 : ‖(x : ℂ)‖ ≤ 1 := by
     rw [Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg hx.1]; exact hx.2
-  have hval : ‖polyFun P x‖ ≤ r * ‖c‖ := by
-    rw [← hPc, polyFun_degreeLTEquiv_symm]
-    refine (norm_sum_le _ _).trans ?_
-    calc ∑ i : Fin r, ‖c i * (x : ℂ) ^ (i : ℕ)‖ ≤ ∑ _i : Fin r, ‖c‖ :=
-          Finset.sum_le_sum fun i _ => by
-            rw [norm_mul, norm_pow]
-            exact mul_le_of_le_one_right (norm_nonneg _) (pow_le_one₀ (norm_nonneg _) hx1)
-              |>.trans (norm_le_pi_norm c i)
-      _ = r * ‖c‖ := by rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
-  have hval' : ‖polyFun P x‖ₑ ≤ r * (K * ‖coeffToLp p r α β c‖ₑ) := by
+  rw [polyFun_degreeLTEquiv_symm]
+  refine (norm_sum_le _ _).trans ?_
+  calc ∑ i : Fin r, ‖c i * (x : ℂ) ^ (i : ℕ)‖ ≤ ∑ _i : Fin r, ‖c‖ :=
+        Finset.sum_le_sum fun i _ => by
+          rw [norm_mul, norm_pow]
+          exact mul_le_of_le_one_right (norm_nonneg _) (pow_le_one₀ (norm_nonneg _) hx1)
+            |>.trans (norm_le_pi_norm c i)
+    _ = r * ‖c‖ := by rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul]
+
+/-- **Linear maps of polynomials are bounded by the norm**: let `Φ` be a linear map of the
+polynomials that preserves the degree bound `< r`, and `[α, β]` an interval of positive length.
+There is `K` with `|Φ P(x)| ≤ K ‖P‖_{L_p[α, β]}` for all `x ∈ [0, 1]` and `P` of degree `< r`. In
+coordinates `Φ` is a linear map of `ℂ^r`, hence bounded, and the coordinates are bounded by the
+`L_p` norm, since `coeffToLp` is injective on a space of finite dimension. -/
+theorem exists_enorm_linearMap_le_eLpNorm (r : ℕ) (Φ : ℂ[X] →ₗ[ℂ] ℂ[X])
+    (hΦ : ∀ P ∈ degreeLT ℂ r, Φ P ∈ degreeLT ℂ r) {α β : ℝ} (hαβ : α < β) :
+    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ P ∈ degreeLT ℂ r, ∀ x ∈ Icc (0 : ℝ) 1,
+      ‖polyFun (Φ P) x‖ₑ ≤ K * eLpNorm (polyFun P) p (volume.restrict (Icc α β)) := by
+  obtain ⟨K, -, hK⟩ := (coeffToLp p r α β).injective_iff_antilipschitz.1
+    (coeffToLp_injective r hαβ)
+  let T : (Fin r → ℂ) →ₗ[ℂ] (Fin r → ℂ) := (degreeLTEquiv ℂ r).toLinearMap ∘ₗ
+    (Φ.restrict hΦ) ∘ₗ (degreeLTEquiv ℂ r).symm.toLinearMap
+  let T' := LinearMap.toContinuousLinearMap T
+  refine ⟨r * (‖T'‖ₑ * K), ENNReal.mul_ne_top (ENNReal.natCast_ne_top r)
+    (ENNReal.mul_ne_top enorm_ne_top ENNReal.coe_ne_top), fun P hP x hx => ?_⟩
+  set c := degreeLTEquiv ℂ r ⟨P, hP⟩
+  have hPc : ((degreeLTEquiv ℂ r).symm c : ℂ[X]) = P := by simp [c]
+  have hΦc : ((degreeLTEquiv ℂ r).symm (T c) : ℂ[X]) = Φ P := by
+    simp [T, c, LinearMap.restrict_apply]
+  have hbound : ‖c‖ ≤ K * ‖coeffToLp p r α β c‖ :=
+    ZeroHomClass.bound_of_antilipschitz (coeffToLp p r α β) hK c
+  have hT : ‖T c‖ ≤ ‖T'‖ * ‖c‖ := T'.le_opNorm c
+  have hval : ‖polyFun (Φ P) x‖ ≤ r * (‖T'‖ * (K * ‖coeffToLp p r α β c‖)) := by
+    rw [← hΦc]
+    refine (norm_polyFun_degreeLTEquiv_symm_le r (T c) hx).trans ?_
+    gcongr
+    exact hT.trans (by gcongr)
+  have hval' : ‖polyFun (Φ P) x‖ₑ ≤ r * (‖T'‖ₑ * (K * ‖coeffToLp p r α β c‖ₑ)) := by
     rw [← ofReal_norm, ← ofReal_norm]
-    calc ENNReal.ofReal ‖polyFun P x‖ ≤ ENNReal.ofReal (r * (K * ‖coeffToLp p r α β c‖)) :=
-          ENNReal.ofReal_le_ofReal (hval.trans (by gcongr))
+    calc ENNReal.ofReal ‖polyFun (Φ P) x‖
+        ≤ ENNReal.ofReal (r * (‖T'‖ * (K * ‖coeffToLp p r α β c‖))) := ENNReal.ofReal_le_ofReal hval
       _ = _ := by
-        rw [ENNReal.ofReal_mul (Nat.cast_nonneg _), ENNReal.ofReal_mul (NNReal.coe_nonneg _),
-          ENNReal.ofReal_natCast, ENNReal.ofReal_coe_nnreal]
+        rw [ENNReal.ofReal_mul (Nat.cast_nonneg _), ENNReal.ofReal_mul (norm_nonneg _),
+          ENNReal.ofReal_mul (NNReal.coe_nonneg _), ENNReal.ofReal_natCast,
+          ENNReal.ofReal_coe_nnreal, ofReal_norm, ofReal_norm]
   rw [enorm_coeffToLp, hPc] at hval'
-  rw [mul_assoc]
-  exact hval'
+  calc ‖polyFun (Φ P) x‖ₑ ≤ r * (‖T'‖ₑ * (K * eLpNorm (polyFun P) p
+        (volume.restrict (Icc α β)))) := hval'
+    _ = _ := by ring
+
+/-- **Equivalence of norms on polynomials**: for an interval `[α, β]` of positive length there
+is `K` with `|P(x)| ≤ K ‖P‖_{L_p[α, β]}` for all `x ∈ [0, 1]` and `P` of degree `< r`, the
+case `Φ = id` of `Interval.exists_enorm_linearMap_le_eLpNorm`. -/
+theorem exists_enorm_le_eLpNorm (r : ℕ) {α β : ℝ} (hαβ : α < β) :
+    ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ P ∈ degreeLT ℂ r, ∀ x ∈ Icc (0 : ℝ) 1,
+      ‖polyFun P x‖ₑ ≤ K * eLpNorm (polyFun P) p (volume.restrict (Icc α β)) :=
+  exists_enorm_linearMap_le_eLpNorm (p := p) r LinearMap.id (fun _ hP => hP) hαβ
 
 /-- **Affine change of variables in `L_p`**: for `L > 0` and `p ≠ ∞`,
 `‖g(u + L ·)‖_{L_p[α, β]} = L^(-1/p) ‖g‖_{L_p[u + Lα, u + Lβ]}`. -/

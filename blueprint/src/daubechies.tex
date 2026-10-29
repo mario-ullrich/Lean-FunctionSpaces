@@ -4641,8 +4641,7 @@ every point of $\R$, and its bounds hold on the whole line with the modulus of $
 
 \begin{proposition}[Steklov smoothing on the line]
 \label{prop:daub-steklov-line}
-\lean{Daubechies.eLpNorm_higherDiff_le_modulus_of_nonneg, Daubechies.sum_range_choose_succ_le,
-  Daubechies.iteratedDeriv_smooth_eq_sum_smul, Daubechies.eLpNorm_smul_higherDiff_le_modulus,
+\lean{Daubechies.eLpNorm_higherDiff_le_modulus_of_nonneg,
   Daubechies.eLpNorm_sub_smooth_le_modulus, Daubechies.eLpNorm_iteratedDeriv_smooth_le_modulus,
   Daubechies.memLp_smooth, Daubechies.memLp_iteratedDeriv_smooth}
 \leanok
@@ -4665,21 +4664,11 @@ $(S_\delta f)^{(r)} \in L_p(\R)$ for $1 \leq p \leq \infty$.
 $f - S_\delta f$ is $(-1)^r$ times the average of $\Delta_{v_1 + \cdots + v_r}^r f$ over
 $v \in [0, \delta]^r$ (\Cref{thm:steklov-smoothing}), so Minkowski's inequality for averages
 (\Cref{lem:minkowski-avg}) for Lebesgue measure on $\R$ bounds its norm by the supremum of
-$\|\Delta_h^r f\|_p$ over $0 \leq h \leq r\delta$. For the derivative, take the terms one by
-one: for every $f : \R \to \C$ and $0 < p \leq \infty$, $\|\Delta_h^r f\|_p \leq \omega_r(f, t)_p$
-for $0 \leq h \leq t$, the definition of the modulus (\Cref{lem:rd-modulus}), and
-$\sum_{k=1}^r \binom{r}{k} \leq 2^r$, since $\sum_{k=0}^r \binom{r}{k} = 2^r$; hence for every
-$1 \leq k \leq r$
-\[
-  \Bigl\|(-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta_{k\delta}^r f\Bigr\|_p
-  \leq \binom{r}{k} \delta^{-r} \omega_r(f, r\delta)_p ,
-\]
-as $(k\delta)^{-r} \leq \delta^{-r}$ and $0 \leq k\delta \leq r\delta$. For continuous $f$,
-\[
-  (S_\delta f)^{(r)} = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta_{k\delta}^r f
-\]
-at every point of $\R$ (\Cref{thm:steklov-smoothing}), and the triangle inequality bounds the
-derivative. The memberships follow from $\omega_r(f, t)_p \leq 2^r \|f\|_p$
+$\|\Delta_h^r f\|_p$ over $0 \leq h \leq r\delta$. For the derivative,
+\Cref{thm:steklov-smoothing} for Lebesgue measure on $\R$ with $D_h = \Delta_h^r f$ and
+$B = \omega_r(f, r\delta)_p$ applies, since for every $f : \R \to \C$ and $0 < p \leq \infty$,
+$\|\Delta_h^r f\|_p \leq \omega_r(f, t)_p$ for $0 \leq h \leq t$ by the definition of the
+modulus (\Cref{lem:rd-modulus}). The memberships follow from $\omega_r(f, t)_p \leq 2^r \|f\|_p$
 (\Cref{lem:rd-modulus}).
 \end{proof}
 

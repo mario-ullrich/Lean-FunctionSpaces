@@ -202,19 +202,10 @@ theorem exists_inverse_ppScheme_per {r : ℕ} (hp : p ≠ ∞) :
 /-- The periodic modulus `ω_r^per(f, 2^(-k))_p` is compatible with the scheme of dyadic piecewise
 polynomials of degree `< r`, with inverse order `θ = 1/p`. -/
 noncomputable def ppPerModulusData {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞) :
-    ApproximationScheme.ModulusData (ppScheme p r) (1 / p.toReal) where
-  modulus := lpPerModulus p r
-  add_le := lpPerModulus_add_le r
-  C0 := 2 ^ r
-  C0_ne_top := by simp
-  le_enorm := lpPerModulus_le hp r
-  jacksonStart := 0
-  CJ := (exists_approxError_ppScheme_le_per (p := p) hr hp).choose
-  CJ_ne_top := (exists_approxError_ppScheme_le_per hr hp).choose_spec.1
-  jackson f k _ := (exists_approxError_ppScheme_le_per hr hp).choose_spec.2 f k
-  CB := (exists_inverse_ppScheme_per (r := r) hp).choose
-  CB_ne_top := (exists_inverse_ppScheme_per hp).choose_spec.1
-  inverse := (exists_inverse_ppScheme_per hp).choose_spec.2
+    ApproximationScheme.ModulusData (ppScheme p r) (1 / p.toReal) :=
+  .ofExists (lpPerModulus p r) (lpPerModulus_add_le r) (2 ^ r) (by simp) (lpPerModulus_le hp r) 0
+    ((exists_approxError_ppScheme_le_per hr hp).imp fun _ h => ⟨h.1, fun f k _ => h.2 f k⟩)
+    (exists_inverse_ppScheme_per hp)
 
 /-- **Approximation by piecewise polynomials on the circle.** For `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`,
 `r ≥ 1` and `0 ≤ s < 1/p`, an `f ∈ L_p(𝕋) = L_p[0, 1]` lies in the approximation space `A^s_q`
