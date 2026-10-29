@@ -24,9 +24,11 @@ the derivative `∂^{e_w} = ∂_{e_{w_0}} ⋯ ∂_{e_{w_{k-1}}}` along the ortho
   `m ≤ L`, the local means kernels of order `L` are `k_{j+1} = 2^{-jm} ∑_i ∂^{e_i} (K_i)_{2^j}`
   with the higher divergence kernels `K_i` of `b`, so
   `(k_{j+1} ⋆ 1_T f)(x) = 2^{-jm} ∑_i ((K_i)_{2^j} ⋆ 1_T ∂^{e_i} f)(x)`
-  (`Rd.LocalMeansBump.conv_kernel_succ_eq_sum_higherKernel`). For `m < L` the strong type of the
-  Calderón–Zygmund families `((K_i)_{2^j})_j` bounds the local means quasi-norm of
-  Triebel–Lizorkin type with smoothness `m` on a set by `‖f‖_{L_p(T)} + ∑_i ‖∂^{e_i} f‖_{L_p(T)}`
+  (`Rd.LocalMeansBump.conv_kernel_succ_eq_sum_higherKernel`, by the general identity for kernels
+  that are sums of derivatives, `Rd.conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp`).
+  For `m < L` the strong type of the Calderón–Zygmund families `((K_i)_{2^j})_j` bounds the
+  local means quasi-norm of Triebel–Lizorkin type with smoothness `m` on a set by
+  `‖f‖_{L_p(T)} + ∑_i ‖∂^{e_i} f‖_{L_p(T)}`
   (`Rd.LocalMeansBump.tlLocalNormOn_le_higherPatchConst`).
 * **One patch** (`Rd.LocalMeansBump.extendsSobolevOrder`): for `m ≥ 1` the local extension of
   order `L = m + 1` lies in `F^m_{p,2}(V) = W^m_p(V)` and agrees with `f` on the patch;
@@ -65,41 +67,17 @@ variable (b : LocalMeansBump V) {p : ℝ≥0∞} [Fact (1 ≤ p)]
 `K_i` of `b`. Then the local means kernels of the smoothed bump satisfy
 `(k_{j+1} ⋆ 1_T f)(x) = 2^{-jm} ∑_i ((K_i)_{2^j} ⋆ 1_T g_i)(x)`
 (`Rd.LocalMeansBump.kernel_succ_eq_sum_higherKernel`; each derivative moves to `f` by
-`Rd.conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv`). -/
+`Rd.conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp`). -/
 theorem conv_kernel_succ_eq_sum_higherKernel {L m : ℕ} (hmL : m ≤ L) {T : Opens V}
     {f : V → ℂ} {g : (Fin m → Fin (finrank ℝ V)) → V → ℂ} (hf : MemLp f p (volume.restrict T))
     (hfg : ∀ i, HasWeakLineDeriv T (fun l => gridBasis V (i l)) f (g i)) (j : ℕ) {x : V}
     (hx : ∀ i, ∀ y ∈ tsupport (dilate (2 ^ j) (b.higherKernel L m i : V → ℂ)), x - y ∈ T) :
     conv (b.dilationSmoothed.kernel L (j + 1)) ((T : Set V).indicator f) volume x =
       ((2 : ℂ) ^ (j * m))⁻¹ * ∑ i, conv (dilate (2 ^ j) (b.higherKernel L m i : V → ℂ))
-        ((T : Set V).indicator (g i)) volume x := by
-  have hc : (2 : ℝ) ^ j ≠ 0 := by positivity
-  have hT := T.isOpen.measurableSet
-  have hKc : ∀ i, (schwartzDilate (2 ^ j) hc (b.higherKernel L m i) : V → ℂ) =
-      dilate (2 ^ j) (b.higherKernel L m i) := fun i => coe_schwartzDilate _ _ _
-  have hcs : ∀ i, HasCompactSupport (schwartzDilate (2 ^ j) hc (b.higherKernel L m i) : V → ℂ) :=
-    fun i => by rw [hKc]; exact hasCompactSupport_dilate (b.hasCompactSupport_higherKernel L m i) hc
-  have hloc : LocallyIntegrable ((T : Set V).indicator f) volume :=
-    ((memLp_indicator_iff_restrict hT).2 hf).locallyIntegrable Fact.out
-  have hfg' : ∀ i, HasWeakLineDeriv T (fun l => gridBasis V (i l)) ((T : Set V).indicator f)
-      ((T : Set V).indicator (g i)) := fun i =>
-    (hfg i).congr_ae (indicator_ae_eq_restrict hT).symm (indicator_ae_eq_restrict hT).symm
-  have hstep : ∀ i, conv (dilate (2 ^ j) (b.higherKernel L m i : V → ℂ))
-      ((T : Set V).indicator (g i)) volume x = conv (∂^{fun l => gridBasis V (i l)}
-        (schwartzDilate (2 ^ j) hc (b.higherKernel L m i)) : 𝓢(V, ℂ))
-        ((T : Set V).indicator f) volume x := fun i => by
-    rw [← hKc, conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv (hfg' i) (hcs i)
-      (by rw [hKc]; exact hx i)]
-  have hint : ∀ i, Integrable fun y => (∂^{fun l => gridBasis V (i l)} (schwartzDilate (2 ^ j) hc
-      (b.higherKernel L m i)) : 𝓢(V, ℂ)) y * (T : Set V).indicator f (x - y) := fun i =>
-    ((hcs i).mono' ((subset_tsupport _).trans (SchwartzMap.tsupport_iteratedLineDerivOp_subset _
-      _))).convolutionExists_left (ContinuousLinearMap.mul ℂ ℂ)
-      (∂^{fun l => gridBasis V (i l)} (schwartzDilate (2 ^ j) hc
-        (b.higherKernel L m i))).continuous hloc x
-  rw [Finset.sum_congr rfl fun i _ => hstep i]
-  simp only [conv_apply]
-  simp_rw [b.kernel_succ_eq_sum_higherKernel hmL j, mul_assoc, Finset.sum_mul]
-  rw [integral_const_mul, integral_finsetSum _ fun i _ => hint i]
+        ((T : Set V).indicator (g i)) volume x :=
+  conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp hf hfg
+    (b.hasCompactSupport_higherKernel L m) (by positivity) (b.kernel_succ_eq_sum_higherKernel hmL j)
+    hx
 
 /-- **One local mean by the derivatives of order `m`**: under the hypotheses of
 `Rd.LocalMeansBump.conv_kernel_succ_eq_sum_higherKernel`,
@@ -220,9 +198,7 @@ omit [Fact (1 ≤ p)] in
 /-- The constant of the local means by the derivatives of order `m` is finite for `1 < p < ∞`. -/
 theorem higherPatchConst_ne_top (L m : ℕ) (hp1 : 1 < p) (hp : p ≠ ∞) :
     b.higherPatchConst L m p ≠ ∞ :=
-  ENNReal.add_ne_top.2
-    ⟨(memLp_one_iff_integrable.2
-      (integrable_momentKernel b.dilationSmoothed.integrable L)).eLpNorm_ne_top,
+  ENNReal.add_ne_top.2 ⟨eLpNorm_momentKernel_ne_top b.dilationSmoothed.integrable L,
     ENNReal.mul_ne_top (ENNReal.pow_ne_top ENNReal.ofNat_ne_top)
       (b.higherGradientConst_ne_top L m hp1 hp)⟩
 
@@ -556,8 +532,8 @@ end LipschitzGraph
 
 /-! ### The extension theorem of higher order -/
 
-/-- The radius `R = (1/2) / ((m + 1)(1 + 1/ε))` of the rescaled cone bump satisfies
-`(m + 1) R ≤ ε`, since `(m + 1) R = ε / (2 (ε + 1))`. -/
+/-- **A small radius**: for every `m ∈ ℕ` and `ε > 0`, the radius `R = (1/2) / ((m + 1)(1 + 1/ε))`
+satisfies `(m + 1) R ≤ ε`, since `(m + 1) R = ε / (2 (ε + 1))`. -/
 theorem natCast_succ_mul_half_div_le {m : ℕ} {ε : ℝ} (hε : 0 < ε) :
     ((m + 1 : ℕ) : ℝ) * (1 / 2 / (((m + 1 : ℕ) : ℝ) * (1 + 1 / ε))) ≤ ε := by
   have hm : (0 : ℝ) < ((m + 1 : ℕ) : ℝ) := by positivity
@@ -572,19 +548,15 @@ variable (Ω : BoundedLipschitzDomain V)
 
 /-- **The boundary patches of order `m ≥ 1`**: Sobolev functions of order `m` on `Ω` extend from
 `Ω ∩ B(c_j, ρ_j - 2ε)` with a finite constant, by the extension from one patch
-(`Rd.LocalMeansBump.extendsSobolevOrder`) with the cone bump of `Ω_j` rescaled to radius
-`R ≤ ε / (m + 1)` (`Rd.LipschitzGraph.patch_support`,
+(`Rd.LocalMeansBump.extendsSobolevOrder`) with a cone bump of `Ω_j` of radius `R ≤ ε / (m + 1)`
+(`Rd.LipschitzGraph.exists_coneBump_radius_le`, `Rd.LipschitzGraph.patch_support`,
 `Rd.LipschitzGraph.patch_support_higherKernel`). -/
 theorem exists_extendsSobolevOrder_boundary [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : ℕ}
     (hm : 0 < m) {ε : ℝ} (hε : 0 < ε) (j : Fin Ω.N) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolevOrder p m Ω.toOpens
       (Ω.carrier ∩ ball (Ω.center j) (Ω.radius j - 2 * ε)) C := by
-  have hc0 : 0 < ((m + 1 : ℕ) : ℝ) * (1 + 1 / ε) := by positivity
-  have hR : ((m + 1 : ℕ) : ℝ) * ((Ω.graph j).coneBump.rescale hc0).radius ≤ ε := by
-    rw [LocalMeansBump.rescale_radius, (Ω.graph j).coneBump_radius]
-    exact natCast_succ_mul_half_div_le hε
-  have hb : (Ω.graph j).ConeSupported ((Ω.graph j).coneBump.rescale hc0).toFun :=
-    (Ω.graph j).coneSupported_rescale (Ω.graph j).coneSupported_coneBump hc0
+  obtain ⟨b, hb, -, hR⟩ :=
+    (Ω.graph j).exists_coneBump_radius_le (a := ((m + 1 : ℕ) : ℝ)) (Nat.cast_nonneg _) hε
   have hTo : IsOpen ((Ω.graph j).domain ∩ ball (Ω.center j) (Ω.radius j)) :=
     (Ω.graph j).isOpen_domain.inter isOpen_ball
   have hTΩ : (⟨_, hTo⟩ : Opens V) ≤ Ω.toOpens := by
@@ -594,9 +566,9 @@ theorem exists_extendsSobolevOrder_boundary [Nontrivial V] (hp1 : 1 < p) (hp : p
   have hU : Ω.carrier ∩ ball (Ω.center j) (Ω.radius j - 2 * ε) =
       (Ω.graph j).domain ∩ ball (Ω.center j) (Ω.radius j - 2 * ε) :=
     Ω.inter_ball_eq j (by linarith)
-  refine ⟨_, ((Ω.graph j).coneBump.rescale hc0).higherExtensionConst_ne_top hm hp1 hp, ?_⟩
+  refine ⟨_, b.higherExtensionConst_ne_top hm hp1 hp, ?_⟩
   rw [hU]
-  exact (((Ω.graph j).coneBump.rescale hc0).extendsSobolevOrder hp1 hp hm
+  exact (b.extendsSobolevOrder hp1 hp hm
     (((Ω.graph j).isOpen_domain.inter isOpen_ball).measurableSet)
     (((Ω.graph j).isOpen_domain.inter isOpen_ball).measurableSet) (T := ⟨_, hTo⟩)
     (Set.inter_subset_inter_right _ (ball_subset_ball (by linarith)))
@@ -606,20 +578,13 @@ theorem exists_extendsSobolevOrder_boundary [Nontrivial V] (hp1 : 1 < p) (hp : p
 /-- **The inner patch of order `m`, for every `1 ≤ p ≤ ∞`**: Sobolev functions of order `m` on `Ω`
 extend from `{infDist(·, Ωᶜ) > 2δ}` with a finite constant. The proof takes a smooth cutoff `χ`
 with compact support in `Ω` and `χ = 1` near `{infDist(·, Ωᶜ) ≥ 2δ}`
-(`Rd.exists_contDiff_eventuallyEq_one`); then `χ f` has the derivatives of the Leibniz rule
-(`Rd.exists_hasWeakLineDeriv_top_mul_le`), and the constant is `∑_{k ≤ m} ∑_w C_k(χ)`
+(`Rd.BoundedLipschitzDomain.exists_cutoff_interior`); then `χ f` has the derivatives of the
+Leibniz rule (`Rd.exists_hasWeakLineDeriv_top_mul_le`), and the constant is `∑_{k ≤ m} ∑_w C_k(χ)`
 (`Rd.leibnizConst`). -/
 theorem exists_extendsSobolevOrder_interior [Fact (1 ≤ p)] (m : ℕ) {δ : ℝ} (hδ : 0 < δ) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolevOrder p m Ω.toOpens
       (Ω.carrier ∩ {x : V | 2 * δ < infDist x Ω.carrierᶜ}) C := by
-  have hKΩ : {x : V | 2 * δ ≤ infDist x Ω.carrierᶜ} ⊆ Ω.carrier := fun x hx => by
-    by_contra h
-    have h0 : infDist x Ω.carrierᶜ = 0 := infDist_zero_of_mem h
-    have hx' : 2 * δ ≤ infDist x Ω.carrierᶜ := hx
-    linarith
-  obtain ⟨χ, hχ, hχc, hχΩ, -, hχ1⟩ := exists_contDiff_eventuallyEq_one
-    (isCompact_of_isClosed_isBounded (isClosed_le continuous_const (continuous_infDist_pt _))
-      (Ω.isBounded.subset hKΩ)) Ω.isOpen hKΩ
+  obtain ⟨χ, hχ, hχc, hχΩ, -, hχ1⟩ := Ω.exists_cutoff_interior hδ
   have hC : ∑ k ∈ Finset.range (m + 1), ∑ _w : Fin k → Fin (finrank ℝ V), leibnizConst χ k ≠ ∞ :=
     ENNReal.sum_ne_top.2 fun k _ => ENNReal.sum_ne_top.2 fun _ _ => leibnizConst_ne_top hχ hχc k
   refine ⟨_, hC, extendsSobolevOrder_of_eLpNorm_le hC fun f g hg hfg => ?_⟩
@@ -631,7 +596,8 @@ theorem exists_extendsSobolevOrder_interior [Fact (1 ≤ p)] (m : ℕ) {δ : ℝ
     fun k hk w => exists_hasWeakLineDeriv_top_mul_le (p := p) hfg hχ hχc hχΩ hk w
   refine ⟨fun x => (χ x : ℂ) * f x, H, fun k hk w => (hH k hk w).1, ae_of_all _ fun x hx => ?_, ?_⟩
   · show (χ x : ℂ) * f x = f x
-    rw [hχ1.self_of_nhdsSet x (le_of_lt hx.2), Complex.ofReal_one, one_mul]
+    rw [hχ1.self_of_nhdsSet x (show 2 * δ ≤ infDist x Ω.carrierᶜ from hx.2.le), Complex.ofReal_one,
+      one_mul]
   · calc _ ≤ ∑ k ∈ Finset.range (m + 1), ∑ _w : Fin k → Fin (finrank ℝ V), leibnizConst χ k *
           ∑ k ∈ Finset.range (m + 1), ∑ w : Fin k → Fin (finrank ℝ V),
             eLpNorm (g k w) p (volume.restrict Ω.toOpens) :=
@@ -647,25 +613,18 @@ on `Ω` with some `F ∈ W^m_p(V)` whose weak derivatives `G_{k,w} = ∂^{e_w} F
 `Rd.BoundedLipschitzDomain.patch` cover `Ω̄`
 (`Rd.BoundedLipschitzDomain.exists_extendsSobolevOrder_boundary`,
 `Rd.BoundedLipschitzDomain.exists_extendsSobolevOrder_interior`), pasted by
-`Rd.extendsSobolevOrder_of_cover`; for `m = 0`, `Rd.extendsSobolevOrder_zero`. -/
+`Rd.extendsSobolevOrder_of_cover` (`Rd.BoundedLipschitzDomain.exists_of_patches`); for `m = 0`,
+`Rd.extendsSobolevOrder_zero`. -/
 theorem exists_extendsSobolevOrder [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) (m : ℕ) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolevOrder p m Ω.toOpens Ω.carrier C := by
   have : Fact (1 ≤ p) := ⟨hp1.le⟩
   rcases Nat.eq_zero_or_pos m with rfl | hm
   · exact ⟨1, ENNReal.one_ne_top, extendsSobolevOrder_zero Ω.toOpens⟩
-  obtain ⟨ε, hε0, hε⟩ := Ω.exists_shrink
-  obtain ⟨δ, hδ0, hδ⟩ := Ω.exists_interior_margin Ω.nonempty_compl hε
-  choose Cb hCb hb using fun j => Ω.exists_extendsSobolevOrder_boundary hp1 hp hm hε0 j
-  obtain ⟨C0, hC0, h0⟩ := Ω.exists_extendsSobolevOrder_interior (p := p) m hδ0
-  refine extendsSobolevOrder_of_cover (O := Ω.toOpens) (Ω.patch ε δ) (Ω.isOpen_patch ε δ)
-    (Ω.isBounded_patch ε hδ0.le) (Ω.closure_subset_iUnion_patch hε hδ)
-    (C := fun i => i.elim C0 Cb) (fun i => ?_) (fun i => ?_)
-  · cases i with
-    | none => exact hC0
-    | some j => exact hCb j
-  · cases i with
-    | none => exact h0
-    | some j => exact hb j
+  exact Ω.exists_of_patches (fun U C => ExtendsSobolevOrder p m Ω.toOpens U C)
+    (fun U hUo hUb hcov _ hC hext =>
+      extendsSobolevOrder_of_cover (O := Ω.toOpens) U hUo hUb hcov hC hext)
+    (fun _ hε j => Ω.exists_extendsSobolevOrder_boundary hp1 hp hm hε j)
+    (fun _ hδ => Ω.exists_extendsSobolevOrder_interior (p := p) m hδ)
 
 /-- **The extension theorem of order `m`** (the extension theorem of Calderón and Stein for
 `1 < p < ∞`, by Rychkov's local extension and the local means of the derivatives of order `m`):

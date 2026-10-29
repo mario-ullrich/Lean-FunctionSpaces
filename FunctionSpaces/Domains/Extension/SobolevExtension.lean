@@ -11,6 +11,7 @@ public import FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinLocalMeans
 public import FunctionSpaces.Rd.Sobolev.SobolevTriebelLizorkin
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainH1
 public import FunctionSpaces.Rd.Sobolev.SobolevJets
+public import FunctionSpaces.Rd.Sobolev.WeakDerivativeLeibniz
 
 /-!
 # The extension theorem for Sobolev spaces on bounded Lipschitz domains
@@ -28,7 +29,9 @@ the gradient. For `n = 0`, `F = f` or `F = 0` serves
   kernels `K_i` of `m` (`Rd.LocalMeansBump.divKernel`, `Rd.LocalMeansBump.kernel_two_succ_apply`).
   If `g_i = ∂_{e_i} f` weakly on an open set `T` and the kernels at `x` only see `T`, then
   `(k_{j+1} ⋆ 1_T f)(x) = 2^(-j) ∑_i ((K_i)_{2^j} ⋆ 1_T g_i)(x)`
-  (`Rd.LocalMeansBump.conv_kernel_two_succ_eq`), and the strong type of the Calderón–Zygmund
+  (`Rd.LocalMeansBump.conv_kernel_two_succ_eq`, by the general identity for kernels that are
+  sums of derivatives, `Rd.conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp`), and the
+  strong type of the Calderón–Zygmund
   families `((K_i)_{2^j})_j` bounds the local means quasi-norm of Triebel–Lizorkin type on a set
   (`Rd.LocalMeansBump.tlLocalNormOn`) by `‖f‖_{L_p(T)} + ∑_i ‖g_i‖_{L_p(T)}`
   (`Rd.LocalMeansBump.tlLocalNormOn_le_patchConst`). The step from a pointwise bound of the
@@ -40,7 +43,15 @@ the gradient. For `n = 0`, `F = f` or `F = 0` serves
   `Rd.ExtendsSobolev p O U C` says that such extensions from `U` exist with the constant `C`.
 * **Pasting** (`Rd.extendsSobolev_of_cover`): a smooth resolution of unity subordinate to the
   boundary patches and the inner patch pastes the local extensions in `W^1_p(V)`, by the product
-  rule (`Rd.hasWeakLineDeriv_mulLp`).
+  rule (`Rd.hasWeakLineDeriv_mulLp`). Extensions also come from `L_p` bounds alone
+  (`Rd.extendsSobolev_of_eLpNorm_le`).
+* **Bounded Lipschitz domains**: the boundary patches and the inner patch extend with finite
+  constants (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary`,
+  `Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior`), pasted by
+  `Rd.BoundedLipschitzDomain.exists_of_patches`. The smooth cutoffs of the patches
+  (`Rd.BoundedLipschitzDomain.exists_cutoff_boundary`,
+  `Rd.BoundedLipschitzDomain.exists_cutoff_interior`) serve the extensions by reflection and
+  those of higher order.
 * **For `p = 2`**: `H^1(Ω) = W^1_2(Ω)` (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`,
   `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_restrictL2`), Rellich's theorem in
   `W^1_2(Ω)` (`Rd.BoundedLipschitzDomain.exists_subseq_tendsto_of_memWeakSobolev`), and the
@@ -62,6 +73,47 @@ namespace Rd
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
+
+/-! ### Convolutions with sums of derivatives -/
+
+/-- **A convolution with a sum of derivatives of dilated kernels**: let `g_i = ∂^{u_i} f` weakly
+on an open set `T` with `f ∈ L_p(T)`, let `K_i` be Schwartz functions with compact support, `t ≠ 0`,
+and let `κ = c ∑_i ∂^{u_i} (K_i)_t`. If `x - y ∈ T` for every `i` and every `y` in the support of
+`(K_i)_t`, then `(κ ⋆ 1_T f)(x) = c ∑_i ((K_i)_t ⋆ 1_T g_i)(x)`: each derivative moves from the
+kernel to `1_T f` (`Rd.conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv`). -/
+theorem conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp {p : ℝ≥0∞} [Fact (1 ≤ p)]
+    {ι : Type*} [Fintype ι] {k : ℕ} {T : Opens V} {f : V → ℂ} {g : ι → V → ℂ}
+    {u : ι → Fin k → V} (hf : MemLp f p (volume.restrict T))
+    (hfg : ∀ i, HasWeakLineDeriv T (u i) f (g i)) {K : ι → 𝓢(V, ℂ)}
+    (hK : ∀ i, HasCompactSupport (K i : V → ℂ)) {t : ℝ} (ht : t ≠ 0) {κ : V → ℂ} {c : ℂ}
+    (hκ : ∀ y, κ y = c * ∑ i, (∂^{u i} (schwartzDilate t ht (K i)) : 𝓢(V, ℂ)) y) {x : V}
+    (hx : ∀ i, ∀ y ∈ tsupport (dilate t (K i : V → ℂ)), x - y ∈ T) :
+    conv κ ((T : Set V).indicator f) volume x =
+      c * ∑ i, conv (dilate t (K i : V → ℂ)) ((T : Set V).indicator (g i)) volume x := by
+  have hT := T.isOpen.measurableSet
+  have hKc : ∀ i, (schwartzDilate t ht (K i) : V → ℂ) = dilate t (K i) := fun i =>
+    coe_schwartzDilate _ _ _
+  have hcs : ∀ i, HasCompactSupport (schwartzDilate t ht (K i) : V → ℂ) :=
+    fun i => by rw [hKc]; exact hasCompactSupport_dilate (hK i) ht
+  have hloc : LocallyIntegrable ((T : Set V).indicator f) volume :=
+    ((memLp_indicator_iff_restrict hT).2 hf).locallyIntegrable Fact.out
+  have hfg' : ∀ i, HasWeakLineDeriv T (u i) ((T : Set V).indicator f)
+      ((T : Set V).indicator (g i)) := fun i =>
+    (hfg i).congr_ae (indicator_ae_eq_restrict hT).symm (indicator_ae_eq_restrict hT).symm
+  have hstep : ∀ i, conv (dilate t (K i : V → ℂ)) ((T : Set V).indicator (g i)) volume x =
+      conv (∂^{u i} (schwartzDilate t ht (K i)) : 𝓢(V, ℂ)) ((T : Set V).indicator f) volume x :=
+    fun i => by
+      rw [← hKc, conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv (hfg' i) (hcs i)
+        (by rw [hKc]; exact hx i)]
+  have hint : ∀ i, Integrable fun y => (∂^{u i} (schwartzDilate t ht (K i)) : 𝓢(V, ℂ)) y *
+      (T : Set V).indicator f (x - y) := fun i =>
+    ((hcs i).mono' ((subset_tsupport _).trans (SchwartzMap.tsupport_iteratedLineDerivOp_subset _
+      _))).convolutionExists_left (ContinuousLinearMap.mul ℂ ℂ)
+      (∂^{u i} (schwartzDilate t ht (K i))).continuous hloc x
+  rw [Finset.sum_congr rfl fun i _ => hstep i]
+  simp only [conv_apply]
+  simp_rw [hκ, mul_assoc, Finset.sum_mul]
+  rw [integral_const_mul, integral_finsetSum _ fun i _ => hint i]
 
 /-! ### The local means kernels as divergences -/
 
@@ -94,14 +146,12 @@ theorem divKernel_eq_zero (i : Fin (finrank ℝ V)) {y : V}
     (hy : ∀ t : ℝ, 1 ≤ t → t ≤ 2 → momentKernel b.toFun 2 (t • y) = 0) : b.divKernel i y = 0 :=
   divergenceKernel_eq_zero _ hy
 
-/-- **The local means kernels of order two at dyadic scales**: `k_{j+1} = (m_2 - m)_{2^j}`. -/
+/-- **The local means kernels of order two at dyadic scales**: `k_{j+1} = (m_2 - m)_{2^j}`
+(`Rd.LocalMeansBump.kernel_succ_eq_dilate`). -/
 theorem kernel_two_succ (j : ℕ) :
     b.kernel 2 (j + 1) =
-      dilate (2 ^ j) (fun y => dilate 2 (momentKernel b.toFun 2) y - momentKernel b.toFun 2 y) := by
-  rw [show (fun y => dilate 2 (momentKernel b.toFun 2) y - momentKernel b.toFun 2 y) =
-    dilate 2 (momentKernel b.toFun 2) - momentKernel b.toFun 2 from rfl, dilate_sub,
-    dilate_dilate, ← pow_succ]
-  rfl
+      dilate (2 ^ j) (fun y => dilate 2 (momentKernel b.toFun 2) y - momentKernel b.toFun 2 y) :=
+  b.kernel_succ_eq_dilate 2 j
 
 /-- **The local means kernels are divergences**: `k_{j+1} = 2^(-j) ∑_i ∂_{e_i} (K_i)_{2^j}`
 (`Rd.sum_lineDerivOp_schwartzDilate_divergenceSchwartz`). -/
@@ -139,39 +189,16 @@ variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 open set `T`, `f ∈ L_p(T)`, and let `x - y ∈ T` for every `y` in the support of every
 `(K_i)_{2^j}`. Then `(k_{j+1} ⋆ 1_T f)(x) = 2^(-j) ∑_i ((K_i)_{2^j} ⋆ 1_T g_i)(x)`: the kernel is
 `2^(-j) ∑_i ∂_{e_i} (K_i)_{2^j}` (`Rd.LocalMeansBump.kernel_two_succ_apply`), and each derivative
-moves to `f` (`Rd.conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv`). -/
+moves to `f` (`Rd.conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp`). -/
 theorem conv_kernel_two_succ_eq {T : Opens V} {f : V → ℂ} {g : Fin (finrank ℝ V) → V → ℂ}
     (hf : MemLp f p (volume.restrict T))
     (hfg : ∀ i, HasWeakLineDeriv T (fun _ : Fin 1 => gridBasis V i) f (g i)) (j : ℕ) {x : V}
     (hx : ∀ i, ∀ y ∈ tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)), x - y ∈ T) :
     conv (b.kernel 2 (j + 1)) ((T : Set V).indicator f) volume x =
       ((((2 : ℝ) ^ j)⁻¹ : ℝ) : ℂ) * ∑ i, conv (dilate (2 ^ j) (b.divKernel i : V → ℂ))
-        ((T : Set V).indicator (g i)) volume x := by
-  have hc : (2 : ℝ) ^ j ≠ 0 := by positivity
-  have hT := T.isOpen.measurableSet
-  have hKc : ∀ i, (schwartzDilate (2 ^ j) hc (b.divKernel i) : V → ℂ) =
-      dilate (2 ^ j) (b.divKernel i) := fun i => coe_schwartzDilate _ _ _
-  have hcs : ∀ i, HasCompactSupport (schwartzDilate (2 ^ j) hc (b.divKernel i) : V → ℂ) :=
-    fun i => by rw [hKc]; exact hasCompactSupport_dilate (b.hasCompactSupport_divKernel i) hc
-  have hloc : LocallyIntegrable ((T : Set V).indicator f) volume :=
-    ((memLp_indicator_iff_restrict hT).2 hf).locallyIntegrable Fact.out
-  have hfg' : ∀ i, HasWeakLineDeriv T (fun _ : Fin 1 => gridBasis V i) ((T : Set V).indicator f)
-      ((T : Set V).indicator (g i)) := fun i =>
-    (hfg i).congr_ae (indicator_ae_eq_restrict hT).symm (indicator_ae_eq_restrict hT).symm
-  have hstep : ∀ i, conv (dilate (2 ^ j) (b.divKernel i : V → ℂ)) ((T : Set V).indicator (g i))
-      volume x = conv (∂_{gridBasis V i} (schwartzDilate (2 ^ j) hc (b.divKernel i)) :
-        𝓢(V, ℂ)) ((T : Set V).indicator f) volume x := fun i => by
-    rw [← hKc, conv_eq_conv_iteratedLineDerivOp_of_hasWeakLineDeriv (hfg' i) (hcs i)
-      (by rw [hKc]; exact hx i), LineDeriv.iteratedLineDerivOp_one]
-  have hint : ∀ i, Integrable fun y => (∂_{gridBasis V i} (schwartzDilate (2 ^ j) hc
-      (b.divKernel i)) : 𝓢(V, ℂ)) y * (T : Set V).indicator f (x - y) := fun i =>
-    ((hcs i).fderiv_apply (𝕜 := ℝ) (gridBasis V i)).convolutionExists_left
-      (ContinuousLinearMap.mul ℂ ℂ) (∂_{gridBasis V i} (schwartzDilate (2 ^ j) hc
-        (b.divKernel i))).continuous hloc x
-  rw [Finset.sum_congr rfl fun i _ => hstep i]
-  simp only [conv_apply]
-  simp_rw [b.kernel_two_succ_apply j, mul_assoc, Finset.sum_mul]
-  rw [integral_const_mul, integral_finsetSum _ fun i _ => hint i]
+        ((T : Set V).indicator (g i)) volume x :=
+  conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp hf hfg b.hasCompactSupport_divKernel
+    (by positivity) (b.kernel_two_succ_apply j) hx
 
 /-- The constant `∑_i C_{p}(K_i)` of the gradient bound of the local means, with the constants
 `C_p(K_i) = Rd.czConst V p B_i H_i` of the Calderón–Zygmund families of the divergence kernels
@@ -464,6 +491,49 @@ theorem ExtendsSobolev.of_le {T O : Opens V} {U : Set V} {C : ℝ≥0∞}
   refine ⟨F, hF, hFf, G, hG, hb.trans ?_⟩
   gcongr
 
+/-- **Finiteness from a bound**: if `‖F‖_p + ∑_i ‖G_i‖_p ≤ C X` with finite `C` and `X`, then `F`
+and every `G_i` lie in `L_p(V)`. -/
+theorem memLp_of_eLpNorm_add_sum_le {ι : Type*} [Fintype ι] {F : V → ℂ} {G : ι → V → ℂ}
+    {C X : ℝ≥0∞} (hC : C ≠ ∞) (hX : X ≠ ∞)
+    (hb : eLpNorm F p volume + ∑ i, eLpNorm (G i) p volume ≤ C * X) :
+    MemLp F p volume ∧ ∀ i, MemLp (G i) p volume := by
+  have hfin : C * X < ∞ := ENNReal.mul_lt_top hC.lt_top hX.lt_top
+  refine ⟨memLp_iff.2 ((le_self_add.trans hb).trans_lt hfin), fun i => memLp_iff.2 ?_⟩
+  exact (((Finset.single_le_sum (f := fun j => eLpNorm (G j) p volume) (fun j _ => zero_le)
+    (Finset.mem_univ i)).trans le_add_self).trans hb).trans_lt hfin
+
+/-- **Extensions from `L_p` bounds**: Sobolev functions on `O` extend from `U` with constant `C`
+(`Rd.ExtendsSobolev`) as soon as every `f ∈ L_p(O)` with weak derivatives `g_i = ∂_{e_i} f` in
+`L_p(O)` agrees almost everywhere on `U` with a function `F` on `V` with weak derivatives
+`G_i = ∂_{e_i} F` on `V` and `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(O)} + ∑_i ‖g_i‖_{L_p(O)})`;
+the bound puts `F` and the `G_i` into `L_p(V)` (`Rd.memLp_of_eLpNorm_add_sum_le`, Mathlib's
+`MemLp.toLp`). -/
+theorem extendsSobolev_of_eLpNorm_le [Fact (1 ≤ p)] {O : Opens V} {U : Set V} {C : ℝ≥0∞}
+    (hC : C ≠ ∞)
+    (h : ∀ (f : V → ℂ) (g : Fin (finrank ℝ V) → V → ℂ), MemLp f p (volume.restrict O) →
+      (∀ i, MemLp (g i) p (volume.restrict O)) →
+      (∀ i, HasWeakLineDeriv O (fun _ : Fin 1 => gridBasis V i) f (g i)) →
+      ∃ (F : V → ℂ) (G : Fin (finrank ℝ V) → V → ℂ),
+        (∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) F (G i)) ∧
+        (∀ᵐ x ∂volume, x ∈ U → F x = f x) ∧
+        eLpNorm F p volume + ∑ i, eLpNorm (G i) p volume ≤
+          C * (eLpNorm f p (volume.restrict O) + ∑ i, eLpNorm (g i) p (volume.restrict O))) :
+    ExtendsSobolev p O U C := by
+  intro f g hf hg hfg
+  obtain ⟨F, G, hG, hFf, hb⟩ := h f g hf hg hfg
+  obtain ⟨hFm, hGm⟩ := memLp_of_eLpNorm_add_sum_le hC
+    (ENNReal.add_ne_top.2 ⟨hf.eLpNorm_ne_top, ENNReal.sum_ne_top.2 fun i _ =>
+      (hg i).eLpNorm_ne_top⟩) hb
+  have hW : ∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) (hFm.toLp F)
+      ((hGm i).toLp (G i)) := fun i =>
+    (hG i).congr_ae (by rw [volume_restrict_top]; exact hFm.coeFn_toLp.symm)
+      (by rw [volume_restrict_top]; exact (hGm i).coeFn_toLp.symm)
+  refine ⟨hFm.toLp F, memSobolev_one_of_forall_gridBasis hW, ?_, fun i => (hGm i).toLp (G i), hW,
+    ?_⟩
+  · filter_upwards [hFm.coeFn_toLp, hFf] with x h1 h2 hx
+    rw [h1, h2 hx]
+  · simpa only [Lp.enorm_toLp] using hb
+
 namespace LocalMeansBump
 
 variable (b : LocalMeansBump V)
@@ -474,8 +544,7 @@ noncomputable def patchConst (p : ℝ≥0∞) : ℝ≥0∞ :=
 
 /-- The constant of the local means by the gradient is finite for `1 < p < ∞`. -/
 theorem patchConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) : b.patchConst p ≠ ∞ :=
-  ENNReal.add_ne_top.2
-    ⟨(memLp_one_iff_integrable.2 (integrable_momentKernel b.integrable 2)).eLpNorm_ne_top,
+  ENNReal.add_ne_top.2 ⟨eLpNorm_momentKernel_ne_top b.integrable 2,
     ENNReal.mul_ne_top ENNReal.ofNat_ne_top (b.gradientConst_ne_top hp1 hp)⟩
 
 /-- **The local means of Triebel–Lizorkin type by the gradient, with one constant**: under the
@@ -507,8 +576,7 @@ noncomputable def extensionConst (p : ℝ≥0∞) : ℝ≥0∞ :=
 /-- The constant of the extension from one patch is finite for `1 < p < ∞`. -/
 theorem extensionConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) : b.extensionConst p ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top (ENNReal.mul_ne_top
-    ENNReal.ofNat_ne_top (memLp_one_iff_integrable.2
-      (integrable_momentKernel b.integrable 2)).eLpNorm_ne_top)
+    ENNReal.ofNat_ne_top (eLpNorm_momentKernel_ne_top b.integrable 2))
       (ENNReal.one_sub_two_rpow_neg_inv_ne_top one_pos),
     ENNReal.mul_ne_top (ENNReal.sum_ne_top.2 fun _ _ => tlToSobolevConst_ne_top hp1 hp _)
       (b.tlUpperConst_ne_top 2 hp1 hp ENNReal.one_lt_two one_pos)⟩) (b.patchConst_ne_top hp1 hp)
@@ -609,37 +677,6 @@ end LocalMeansBump
 
 /-! ### Pasting in `W^1_p(V)` -/
 
-/-- **The product rule in `L_p(V)`**: if `G = ∂_w F` weakly on `V` and `χ` is a smooth real
-function, bounded with its derivative `∂_w χ` (bounds `C`, `C'`), then `χ G + (∂_w χ) F` is the weak
-derivative `∂_w (χ F)` on `V`, with the products `Rd.mulLp` in `L_p(V)`
-(`Rd.HasWeakLineDeriv.mul_contDiff`). -/
-theorem hasWeakLineDeriv_mulLp {w : V} {F G : Lp ℂ p (volume : Measure V)}
-    (h : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => w) F G) {χ : V → ℝ}
-    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) {C C' : ℝ}
-    (hc : Continuous fun x => (χ x : ℂ)) (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C)
-    (hc' : Continuous fun x => (fderiv ℝ χ x w : ℂ)) (hC' : ∀ x, ‖(fderiv ℝ χ x w : ℂ)‖ ≤ C') :
-    HasWeakLineDeriv ⊤ (fun _ : Fin 1 => w) (mulLp hc hC F)
-      ((mulLp hc hC G + mulLp hc' hC' F : Lp ℂ p (volume : Measure V)) : V → ℂ) := by
-  refine (h.mul_contDiff hχ).congr_ae ?_ ?_ <;> rw [volume_restrict_top]
-  · exact (mulLp_apply_ae hc hC F).symm
-  · filter_upwards [Lp.coeFn_add (mulLp hc hC G) (mulLp hc' hC' F), mulLp_apply_ae hc hC G,
-      mulLp_apply_ae hc' hC' F] with x h1 h2 h3
-    rw [h1, Pi.add_apply, h2, h3]
-
-/-- **Smooth compactly supported multipliers keep `W^1_p(V)`**: if `F ∈ W^1_p(V)` and `χ` is a
-smooth real function with compact support, then `χ F ∈ W^1_p(V)` (`Rd.hasWeakLineDeriv_mulLp`). -/
-theorem MemSobolev.mulLp [Fact (1 ≤ p)] {F : Lp ℂ p (volume : Measure V)} (hF : MemSobolev 1 F)
-    {χ : V → ℝ} (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (hcs : HasCompactSupport χ) {C : ℝ}
-    (hc : Continuous fun x => (χ x : ℂ)) (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C) :
-    MemSobolev 1 (mulLp hc hC F) := by
-  refine memSobolev_one_of_forall_hasWeakLineDeriv fun v => ?_
-  obtain ⟨G, hG⟩ := (memSobolev_iff_exists_hasWeakLineDeriv F).1 hF 1 le_rfl fun _ => v
-  have hc' : Continuous fun x => (fderiv ℝ χ x v : ℂ) :=
-    Complex.continuous_ofReal.comp ((hχ.continuous_fderiv (by simp)).clm_apply continuous_const)
-  obtain ⟨C', hC'⟩ := hc'.bounded_above_of_compact_support
-    ((hcs.fderiv_apply (𝕜 := ℝ) v).comp_left Complex.ofReal_zero)
-  exact ⟨_, hasWeakLineDeriv_mulLp hG hχ hc hC hc' hC'⟩
-
 /-- **The arithmetic of the pasting bound**: if `‖F‖ ≤ ∑_k a_k x_k`,
 `‖G_i‖ ≤ ∑_k (a_k y_{k,i} + d_{k,i} x_k)` and `x_k + ∑_i y_{k,i} ≤ C_k Y`, then
 `‖F‖ + ∑_i ‖G_i‖ ≤ (∑_k (a_k + ∑_i d_{k,i}) C_k) Y`. -/
@@ -667,8 +704,9 @@ theorem pasting_bound {ι κ : Type*} [Fintype ι] [Fintype κ] {nF : ℝ≥0∞
 /-- **Pasting bounded extensions**: let `(U_k)` be a finite cover of `Ō` by bounded open sets and
 let Sobolev functions on `O` extend from every `O ∩ U_k` with finite constants. Then they extend
 from `O` with a finite constant: for a smooth resolution of unity `(ψ_k)` subordinate to `(U_k)`
-(`Rd.exists_smooth_partition`), `F = ∑_k ψ_k F_k` agrees with `f` on `O`, lies in `W^1_p(V)`
-(`Rd.MemSobolev.mulLp`) and has the weak derivatives `∑_k (ψ_k ∂_{e_i} F_k + (∂_{e_i} ψ_k) F_k)`
+(`Rd.exists_smooth_partition`), `F = ∑_k ψ_k F_k` agrees with `f` on `O` (`Rd.ae_sum_mul_eq`),
+lies in `W^1_p(V)` (`Rd.MemSobolev.mulLp`) and has the weak derivatives
+`∑_k (ψ_k ∂_{e_i} F_k + (∂_{e_i} ψ_k) F_k)`
 (`Rd.hasWeakLineDeriv_mulLp`). -/
 theorem extendsSobolev_of_cover [Fact (1 ≤ p)] {ι : Type*} [Fintype ι] {O : Opens V} (U : ι → Set V)
     (hUo : ∀ k, IsOpen (U k)) (hUb : ∀ k, Bornology.IsBounded (U k))
@@ -696,20 +734,11 @@ theorem extendsSobolev_of_cover [Fact (1 ≤ p)] {ι : Type*} [Fintype ι] {O : 
   refine ⟨∑ k, mulLp (hc k) (ha k) (F k), MemSobolev.sum _ fun k _ =>
     (hF k).mulLp (hψ k) (hcs k) (hc k) (ha k), ?_,
     fun i => ∑ k, (mulLp (hc k) (ha k) (G k i) + mulLp (hc' k i) (hd k i) (F k)), fun i => ?_, ?_⟩
-  · have hall : ∀ᵐ x ∂(volume : Measure V), ∀ k, (x ∈ (O : Set V) ∩ U k → F k x = f x) ∧
-        mulLp (hc k) (ha k) (F k) x = ((ψ k x : ℝ) : ℂ) * F k x :=
-      ae_all_iff.2 fun k => (hFf k).and (mulLp_apply_ae _ _ (F k))
-    filter_upwards [Lp.coeFn_fun_finsetSum Finset.univ fun k => mulLp (hc k) (ha k) (F k), hall]
-      with x h1 h2 hxO
-    have hterm : ∀ k, mulLp (hc k) (ha k) (F k) x = ((ψ k x : ℝ) : ℂ) * f x := fun k => by
-      rw [(h2 k).2]
-      by_cases hψx : ψ k x = 0
-      · simp [hψx]
-      · rw [(h2 k).1 ⟨hxO, hψU k (subset_tsupport _ hψx)⟩]
-    rw [h1]
-    simp_rw [hterm]
-    rw [← Finset.sum_mul, ← Complex.ofReal_sum, hψ1 x (subset_closure hxO), Complex.ofReal_one,
-      one_mul]
+  · filter_upwards [Lp.coeFn_fun_finsetSum Finset.univ fun k => mulLp (hc k) (ha k) (F k),
+      ae_all_iff.2 fun k => mulLp_apply_ae (hc k) (ha k) (F k),
+      ae_sum_mul_eq hψU (fun x hx => hψ1 x (subset_closure hx)) hFf] with x h1 h2 h3 hxO
+    rw [h1, ← h3 hxO]
+    exact Finset.sum_congr rfl fun k _ => h2 k
   · refine (HasWeakLineDeriv.sum (s := Finset.univ) fun k _ => hasWeakLineDeriv_mulLp (hG k i)
       (hψ k) (hc k) (ha k) (hc' k i) (hd k i)).congr_ae ?_ ?_ <;> rw [volume_restrict_top]
     · exact (Lp.coeFn_finsetSum _ _).symm
@@ -832,9 +861,35 @@ namespace BoundedLipschitzDomain
 
 variable (Ω : BoundedLipschitzDomain V)
 
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- **The cutoff of a boundary patch**: for `ε > 0` and every `j` there is a smooth `χ` with values
+in `[0, 1]`, compact closed support in the boundary ball `B(c_j, ρ_j)` and `χ = 1` near
+`B̄(c_j, ρ_j - 2ε)` (`Rd.exists_contDiff_eventuallyEq_one`). -/
+theorem exists_cutoff_boundary {ε : ℝ} (hε : 0 < ε) (j : Fin Ω.N) :
+    ∃ χ : V → ℝ, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ ∧ HasCompactSupport χ ∧
+      tsupport χ ⊆ ball (Ω.center j) (Ω.radius j) ∧ (∀ x, χ x ∈ Set.Icc (0 : ℝ) 1) ∧
+      ∀ᶠ x in 𝓝ˢ (closedBall (Ω.center j) (Ω.radius j - 2 * ε)), χ x = 1 :=
+  exists_contDiff_eventuallyEq_one (isCompact_closedBall _ _) isOpen_ball
+    (closedBall_subset_ball (by linarith))
+
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- **The cutoff of the inner patch**: for `δ > 0` there is a smooth `χ` with values in `[0, 1]`,
+compact closed support in `Ω` and `χ = 1` near the compact set `{infDist(·, Ωᶜ) ≥ 2δ} ⊆ Ω`
+(`Rd.exists_contDiff_eventuallyEq_one`). -/
+theorem exists_cutoff_interior {δ : ℝ} (hδ : 0 < δ) :
+    ∃ χ : V → ℝ, ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ ∧ HasCompactSupport χ ∧
+      tsupport χ ⊆ Ω.carrier ∧ (∀ x, χ x ∈ Set.Icc (0 : ℝ) 1) ∧
+      ∀ᶠ x in 𝓝ˢ {x : V | 2 * δ ≤ infDist x Ω.carrierᶜ}, χ x = 1 := by
+  have hKΩ : {x : V | 2 * δ ≤ infDist x Ω.carrierᶜ} ⊆ Ω.carrier := fun x hx =>
+    setOf_lt_infDist_compl_subset Ω.carrier hδ.le
+      (show δ < infDist x Ω.carrierᶜ from (lt_two_mul_self hδ).trans_le hx)
+  exact exists_contDiff_eventuallyEq_one
+    (isCompact_of_isClosed_isBounded (isClosed_le continuous_const (continuous_infDist_pt _))
+      (Ω.isBounded.subset hKΩ)) Ω.isOpen hKΩ
+
 /-- **The boundary patches**: Sobolev functions on `Ω` extend from `Ω ∩ B(c_j, ρ_j - 2ε)` with a
 finite constant, by the extension from one patch (`Rd.LocalMeansBump.extendsSobolev`) with the cone
-bump of `Ω_j` rescaled to radius `≤ ε / 2`. -/
+bump of `Ω_j` rescaled to radius `≤ ε / 2` (`Rd.LipschitzGraph.exists_coneBump_radius_le`). -/
 theorem exists_extendsSobolev_boundary [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {ε : ℝ}
     (hε : 0 < ε) (j : Fin Ω.N) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens
@@ -843,15 +898,8 @@ theorem exists_extendsSobolev_boundary [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ 
   set G := Ω.graph j
   set c := Ω.center j
   set ρ := Ω.radius j
-  have hc0 : 0 < 1 + 1 / ε := by positivity
-  set b := G.coneBump.rescale hc0
-  have hbR : b.radius = (1 / 2) / (1 + 1 / ε) := by
-    rw [LocalMeansBump.rescale_radius, G.coneBump_radius]
-  have hR : 2 * b.radius ≤ ε := by
-    rw [hbR, show 2 * ((1 : ℝ) / 2 / (1 + 1 / ε)) = ε / (ε + 1) by field_simp]
-    exact div_le_self hε.le (by linarith)
+  obtain ⟨b, hb, -, hR⟩ := G.exists_coneBump_radius_le zero_le_two hε
   have hLR : ((2 : ℕ) : ℝ) * b.radius ≤ ε := by exact_mod_cast hR
-  have hb : G.ConeSupported b.toFun := G.coneSupported_rescale G.coneSupported_coneBump hc0
   have hTo : IsOpen (G.domain ∩ ball c ρ) := G.isOpen_domain.inter isOpen_ball
   have hTΩ : (⟨_, hTo⟩ : Opens V) ≤ Ω.toOpens := by
     show G.domain ∩ ball c ρ ⊆ Ω.carrier
@@ -868,7 +916,7 @@ theorem exists_extendsSobolev_boundary [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ 
 
 /-- **The inner patch**: Sobolev functions on `Ω` extend from `{infDist(·, Ωᶜ) > 2δ}` with a finite
 constant, by the extension from one patch (`Rd.LocalMeansBump.extendsSobolev`) with a centred bump
-of radius `≤ δ / 2`. -/
+of radius `≤ δ / 2` (`Rd.sub_mem_of_lt_infDist_of_norm_le`). -/
 theorem exists_extendsSobolev_interior [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {δ : ℝ}
     (hδ : 0 < δ) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens
@@ -884,14 +932,9 @@ theorem exists_extendsSobolev_interior [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ 
     (measurableSet_infDist_gt Ω.carrier δ) (T := Ω.toOpens) hUΩ
     (fun x hx j y hy => interior_patch_support Ω.carrier (fun y hy =>
       (not_lt.1 fun h => hy (b.dual_eq_zero 2 j h)).trans (by rw [← hR]; push_cast; rfl)) x hx y hy)
-    (fun x hx j i y hy => ?_)
-  have hy' := b.tsupport_dilate_divKernel_subset_closedBall i j hy
-  rw [mem_closedBall, dist_zero_right, hR] at hy'
-  have hx' : dist x (x - y) < infDist x Ω.carrierᶜ := by
-    rw [dist_eq_norm, sub_sub_cancel]
-    exact hy'.trans_lt hx
-  show x - y ∈ Ω.carrier
-  simpa using notMem_of_dist_lt_infDist hx'
+    fun x hx j i y hy => sub_mem_of_lt_infDist_of_norm_le Ω.carrier hx (by
+      rw [← hR]
+      exact mem_closedBall_zero_iff.1 (b.tsupport_dilate_divKernel_subset_closedBall i j hy))
 
 /-- **The extension theorem with a bound**: for a bounded Lipschitz domain `Ω` in dimension
 `n ≥ 1` and `1 < p < ∞` there is a finite constant `C` such that every `f ∈ L_p(Ω)` with weak
@@ -901,23 +944,15 @@ derivatives `G_i = ∂_{e_i} F` satisfy
 `Rd.BoundedLipschitzDomain.patch` cover `Ω̄`
 (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary`,
 `Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior`), pasted by
-`Rd.extendsSobolev_of_cover`. -/
+`Rd.extendsSobolev_of_cover` (`Rd.BoundedLipschitzDomain.exists_of_patches`). -/
 theorem exists_extendsSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens Ω.carrier C := by
   have : Fact (1 ≤ p) := ⟨hp1.le⟩
-  obtain ⟨ε, hε0, hε⟩ := Ω.exists_shrink
-  obtain ⟨δ, hδ0, hδ⟩ := Ω.exists_interior_margin Ω.nonempty_compl hε
-  choose Cb hCb hb using fun j => Ω.exists_extendsSobolev_boundary hp1 hp hε0 j
-  obtain ⟨C0, hC0, h0⟩ := Ω.exists_extendsSobolev_interior hp1 hp hδ0
-  refine extendsSobolev_of_cover (O := Ω.toOpens) (Ω.patch ε δ) (Ω.isOpen_patch ε δ)
-    (Ω.isBounded_patch ε hδ0.le) (Ω.closure_subset_iUnion_patch hε hδ)
-    (C := fun i => i.elim C0 Cb) (fun i => ?_) (fun i => ?_)
-  · cases i with
-    | none => exact hC0
-    | some j => exact hCb j
-  · cases i with
-    | none => exact h0
-    | some j => exact hb j
+  exact Ω.exists_of_patches (fun U C => ExtendsSobolev p Ω.toOpens U C)
+    (fun U hUo hUb hcov _ hC hext =>
+      extendsSobolev_of_cover (O := Ω.toOpens) U hUo hUb hcov hC hext)
+    (fun _ hε j => Ω.exists_extendsSobolev_boundary hp1 hp hε j)
+    (fun _ hδ => Ω.exists_extendsSobolev_interior hp1 hp hδ)
 
 /-- **The extension theorem** (H.2; the extension theorem of Calderón and Stein, by Rychkov's
 extension and the local means of the gradient): for a bounded Lipschitz domain `Ω` and

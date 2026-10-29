@@ -193,36 +193,17 @@ theorem exists_enorm_le_besovNorm (r : ℕ) (s : ℝ) (q : ℝ≥0∞) :
     ∃ C : ℝ≥0∞, C ≠ ⊤ ∧ ∀ f : Lp ℂ p μ, ‖f‖ₑ ≤ C * A.besovNorm hp r s q f := by
   have hp1 : 1 ≤ p := Fact.out
   have hp0 : p ≠ 0 := (zero_lt_one.trans_le hp1).ne'
-  set e := p.toReal
-  have he : 0 < e := ENNReal.toReal_pos hp0 hp
   have hΩ := Rd.BesovDomain.measurableSet (range I)
   -- the chart bound for each piece
   have hchart : ∀ i, ∃ C : ℝ≥0∞, C ≠ ⊤ ∧ ∀ g : M → ℂ, StronglyMeasurable g →
       eLpNorm (fun x => (A.psi i x : ℂ) * g x) p μ ≤ C * eLpNorm (A.piece i g) p volume := by
     intro i
-    have hK : IsCompact (tsupport (A.psi i)) := (isClosed_tsupport _).isCompact
-    obtain ⟨c, C, -, hC, hcmp⟩ := IsSmoothMeasure.exists_lintegral_chart_le (I := I) μ
-      (A.chart_mem i) hK (A.tsupport_psi_subset i)
-    refine ⟨C ^ (1 / e), ENNReal.rpow_ne_top_of_nonneg (by positivity) hC, fun g hg => ?_⟩
-    set F : M → ℝ≥0∞ := fun x => ‖(A.psi i x : ℂ) * g x‖ₑ ^ e
-    have hFm : Measurable F := (((A.contMDiff_psi i).continuous.measurable.complex_ofReal.mul
-      hg.measurable).enorm).pow_const e
-    have hFK : ∀ x ∉ tsupport (A.psi i), F x = 0 := fun x hx => by
-      simp only [F, image_eq_zero_of_notMem_tsupport hx, Complex.ofReal_zero, zero_mul, enorm_zero,
-        ENNReal.zero_rpow_of_pos he]
-    have hpiece : (fun y => ‖A.piece i g y‖ₑ ^ e) =
-        (A.ext i).target.indicator (fun y => F ((A.ext i).symm y)) := funext fun y => by
-      by_cases hy : y ∈ (A.ext i).target
-      · simp only [piece, indicator_of_mem hy, F]
-      · simp only [piece, indicator_of_notMem hy, enorm_zero, ENNReal.zero_rpow_of_pos he]
-    have hψg : AEStronglyMeasurable (fun x => (A.psi i x : ℂ) * g x) μ :=
+    obtain ⟨_, C, -, hC, hcmp⟩ := IsSmoothMeasure.exists_eLpNorm_chart_le (I := I) μ
+      (A.chart_mem i) (isClosed_tsupport _).isCompact (A.tsupport_psi_subset i) hp0 hp (F := ℂ)
+    exact ⟨C, hC, fun g hg => (hcmp (fun x => (A.psi i x : ℂ) * g x)
       ((A.contMDiff_psi i).continuous.measurable.complex_ofReal.mul
-        hg.measurable).aestronglyMeasurable
-    rw [← ENNReal.rpow_le_rpow_iff he, ENNReal.mul_rpow_of_nonneg _ _ he.le, ← ENNReal.rpow_mul,
-      one_div_mul_cancel he.ne', ENNReal.rpow_one, eLpNorm_rpow_eq hψg hp0 hp,
-      eLpNorm_rpow_eq (A.aestronglyMeasurable_piece i hg) hp0 hp, hpiece,
-      lintegral_indicator (measurableSet_extend_target I _)]
-    exact (hcmp F hFm hFK).2
+        hg.measurable).stronglyMeasurable
+      fun x hx => by rw [image_eq_zero_of_notMem_tsupport hx, Complex.ofReal_zero, zero_mul]).2⟩
   choose C hC hle using hchart
   set Cmax := ∑ i, C i
   have hCmax : ∀ i, C i ≤ Cmax := fun i =>

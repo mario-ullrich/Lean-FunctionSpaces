@@ -36,7 +36,9 @@ The proof follows Schneider–Vybíral §3: a covering `Ω̄ ⊆ K_0 ∪ ⋃_j K
   compactness; `Ωᶜ` is nonempty in dimension `n ≥ 1`
   (`Rd.BoundedLipschitzDomain.nonempty_compl`). The shrunk balls and the inner patch are bounded
   open sets that cover `Ω̄` (`Rd.BoundedLipschitzDomain.patch`,
-  `Rd.BoundedLipschitzDomain.closure_subset_iUnion_patch`).
+  `Rd.BoundedLipschitzDomain.closure_subset_iUnion_patch`). A property that pastes over finite
+  covers of `Ω̄` thus passes from the patches to `Ω`
+  (`Rd.BoundedLipschitzDomain.exists_of_patches`).
 * Local extensions with a bound (`Rd.LocalMeansBump.exists_local_extension_le`) on the boundary
   patches `Ω ∩ B(c_j, ρ_j - 2ε)`, with the cone bump of `Ω_j` rescaled to radius `≤ ε / r`, and on
   the inner patch `{infDist(·, Ωᶜ) > 2δ}`, with a centred bump of radius `≤ δ / r`
@@ -438,6 +440,38 @@ theorem closure_subset_iUnion_patch {ε δ : ℝ}
     · push Not at hxb
       exact Set.mem_iUnion.2 ⟨none, hδ x hxΩ hxb⟩
 
+/-- **Pasting over the patches**: let `P U C` be a property of a set `U ⊆ V` and a constant
+`C ∈ [0, ∞]` that passes from the sets `Ω ∩ U_i` of every cover `(U_i)_{i ∈ {0, …, N}}` of `Ω̄` by
+`N + 1` bounded open sets, one for each boundary ball and one inner set (indexed by
+`Option (Fin Ω.N)`), with finite constants, to `Ω`, with a finite constant. If `P` holds with a
+finite constant for every boundary patch `Ω ∩ B(c_j, ρ_j - 2ε)`, `ε > 0`, and for every inner
+patch `Ω ∩ {infDist(·, Ωᶜ) > 2δ}`, `δ > 0`, then it holds for `Ω` with a finite constant: for
+suitable `ε` and `δ` the patches `Rd.BoundedLipschitzDomain.patch` cover `Ω̄`
+(`Rd.BoundedLipschitzDomain.exists_shrink`, `Rd.BoundedLipschitzDomain.exists_interior_margin`,
+`Rd.BoundedLipschitzDomain.closure_subset_iUnion_patch`). -/
+theorem exists_of_patches [Nontrivial V] (P : Set V → ℝ≥0∞ → Prop)
+    (hcover : ∀ U : Option (Fin Ω.N) → Set V, (∀ i, IsOpen (U i)) →
+      (∀ i, Bornology.IsBounded (U i)) → closure Ω.carrier ⊆ ⋃ i, U i →
+      ∀ C : Option (Fin Ω.N) → ℝ≥0∞, (∀ i, C i ≠ ∞) → (∀ i, P (Ω.carrier ∩ U i) (C i)) →
+        ∃ C' : ℝ≥0∞, C' ≠ ∞ ∧ P Ω.carrier C')
+    (hbd : ∀ ε : ℝ, 0 < ε → ∀ j : Fin Ω.N, ∃ C : ℝ≥0∞, C ≠ ∞ ∧
+      P (Ω.carrier ∩ ball (Ω.center j) (Ω.radius j - 2 * ε)) C)
+    (hin : ∀ δ : ℝ, 0 < δ → ∃ C : ℝ≥0∞, C ≠ ∞ ∧
+      P (Ω.carrier ∩ {x : V | 2 * δ < infDist x Ω.carrierᶜ}) C) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ P Ω.carrier C := by
+  obtain ⟨ε, hε0, hε⟩ := Ω.exists_shrink
+  obtain ⟨δ, hδ0, hδ⟩ := Ω.exists_interior_margin Ω.nonempty_compl hε
+  choose Cb hCb hb using hbd ε hε0
+  obtain ⟨C0, hC0, h0⟩ := hin δ hδ0
+  refine hcover (Ω.patch ε δ) (Ω.isOpen_patch ε δ) (Ω.isBounded_patch ε hδ0.le)
+    (Ω.closure_subset_iUnion_patch hε hδ) (fun i => i.elim C0 Cb) (fun i => ?_) (fun i => ?_)
+  · cases i with
+    | none => exact hC0
+    | some j => exact hCb j
+  · cases i with
+    | none => exact h0
+    | some j => exact hb j
+
 variable [MeasurableSpace V] [BorelSpace V] {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 omit [FiniteDimensional ℝ V] in
@@ -461,8 +495,8 @@ theorem modNormOn_mono_set {T : Set V} (hT : MeasurableSet T) (hTΩ : T ⊆ Ω.c
 every `f` with `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` agrees with a
 function `F` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C N_Ω(f)`, by the local extension
 with the cone bump of `Ω_j` rescaled to radius `≤ ε / r`
-(`Rd.LocalMeansBump.exists_local_extension_le`); the bump and `C` depend only on `ε`, `r`, `s`
-and `j`. -/
+(`Rd.LipschitzGraph.exists_coneBump_radius_le`, `Rd.LocalMeansBump.exists_local_extension_le`);
+the bump and `C` depend only on `ε`, `r`, `s` and `j`. -/
 theorem exists_local_extension_boundary_le (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ}
     (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {ε : ℝ} (hε : 0 < ε) (j : Fin Ω.N) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
@@ -477,21 +511,7 @@ theorem exists_local_extension_boundary_le (hp : p ≠ ∞) {r : ℕ} (hr : 1 �
   set G := Ω.graph j
   set c := Ω.center j
   set ρ := Ω.radius j
-  have hc0 : 0 < 1 + (r : ℝ) / (2 * ε) := by positivity
-  set b := G.coneBump.rescale hc0
-  have hbR : b.radius = (1 / 2) / (1 + (r : ℝ) / (2 * ε)) := by
-    rw [LocalMeansBump.rescale_radius, G.coneBump_radius]
-  have hR : b.radius ≤ 1 / 2 := by
-    rw [hbR]
-    exact div_le_self (by norm_num) (le_add_of_nonneg_right (by positivity))
-  have hLR : (r : ℝ) * b.radius ≤ ε := by
-    rw [hbR]
-    have h2ε : 0 < 2 * ε + r := by positivity
-    have : (r : ℝ) * ((1 / 2) / (1 + (r : ℝ) / (2 * ε))) = r * ε / (2 * ε + r) := by
-      field_simp
-    rw [this, div_le_iff₀ h2ε]
-    nlinarith
-  have hb : G.ConeSupported b.toFun := G.coneSupported_rescale G.coneSupported_coneBump hc0
+  obtain ⟨b, hb, hR, hLR⟩ := G.exists_coneBump_radius_le (Nat.cast_nonneg r) hε
   have hU : MeasurableSet (G.domain ∩ ball c (ρ - 2 * ε)) :=
     (G.isOpen_domain.inter isOpen_ball).measurableSet
   have hW : MeasurableSet (G.domain ∩ ball c (ρ - ε)) :=

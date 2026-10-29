@@ -291,28 +291,19 @@ theorem hasWeakLineDeriv_pasteValue (E : ∀ k, SobolevExtensionOp p O ((O : Set
   · exact (Lp.coeFn_finsetSum _ _).symm
 
 /-- The pasted extension agrees with the value of the jet on `O`: `ψ_k F_k = ψ_k f` on `O` since
-`F_k = f` on `O ∩ U_k ⊇ O ∩ supp ψ_k`, and `∑_k ψ_k = 1` on `O`. -/
+`F_k = f` on `O ∩ U_k ⊇ O ∩ supp ψ_k`, and `∑_k ψ_k = 1` on `O` (`Rd.ae_sum_mul_eq`). -/
 theorem ae_pasteValue_eq (E : ∀ k, SobolevExtensionOp p O ((O : Set V) ∩ U k) (C k))
     (hψU : ∀ k, tsupport (ψ k) ⊆ U k) (hψ1 : ∀ x ∈ (O : Set V), ∑ k, ψ k x = 1)
     (hc : ∀ k, Continuous fun x => ((ψ k x : ℝ) : ℂ)) (ha : ∀ k x, ‖((ψ k x : ℝ) : ℂ)‖ ≤ a k)
     (u : weakSobolevJet p O) :
     ∀ᵐ x ∂volume, x ∈ (O : Set V) → pasteValue E hc ha u x = u.1.1 x := by
-  have hall : ∀ᵐ x ∂(volume : Measure V), ∀ k, (x ∈ (O : Set V) ∩ U k →
-      ((E k).toLinearMap u).1.1 x = u.1.1 x) ∧ mulLp (hc k) (ha k) ((E k).toLinearMap u).1.1 x =
-        ((ψ k x : ℝ) : ℂ) * ((E k).toLinearMap u).1.1 x :=
-    ae_all_iff.2 fun k => ((E k).ae_eq u).and (mulLp_apply_ae _ _ _)
   filter_upwards [Lp.coeFn_fun_finsetSum Finset.univ fun k =>
-      mulLp (hc k) (ha k) ((E k).toLinearMap u).1.1, hall] with x h1 h2 hxO
-  have hterm : ∀ k, mulLp (hc k) (ha k) ((E k).toLinearMap u).1.1 x =
-      ((ψ k x : ℝ) : ℂ) * u.1.1 x := fun k => by
-    rw [(h2 k).2]
-    by_cases hψx : ψ k x = 0
-    · simp [hψx]
-    · rw [(h2 k).1 ⟨hxO, hψU k (subset_tsupport _ hψx)⟩]
+      mulLp (hc k) (ha k) ((E k).toLinearMap u).1.1,
+    ae_all_iff.2 fun k => mulLp_apply_ae (hc k) (ha k) ((E k).toLinearMap u).1.1,
+    ae_sum_mul_eq hψU hψ1 fun k => (E k).ae_eq u] with x h1 h2 h3 hxO
   change (⇑(∑ k, mulLp (hc k) (ha k) ((E k).toLinearMap u).1.1)) x = u.1.1 x
-  rw [h1]
-  simp_rw [hterm]
-  rw [← Finset.sum_mul, ← Complex.ofReal_sum, hψ1 x hxO, Complex.ofReal_one, one_mul]
+  rw [h1, ← h3 hxO]
+  exact Finset.sum_congr rfl fun k _ => h2 k
 
 /-- **The pasted extension operator**: for extension operators `E_k` from `O ∩ U_k` and a smooth,
 compactly supported resolution of unity `(ψ_k)` on `O` subordinate to `(U_k)` with `|ψ_k| ≤ a_k`,
@@ -377,7 +368,8 @@ variable (Ω : BoundedLipschitzDomain V)
 
 /-- **The boundary patches**: there are extension operators from `Ω ∩ B(c_j, ρ_j - 2ε)` with finite
 constants (`Rd.LocalMeansBump.sobolevExtensionOp` with the cone bump of `Ω_j` rescaled to radius
-`≤ ε / 2`, as in `Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary`). -/
+`≤ ε / 2`, `Rd.LipschitzGraph.exists_coneBump_radius_le`, as in
+`Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary`). -/
 theorem exists_sobolevExtensionOp_boundary [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {ε : ℝ}
     (hε : 0 < ε) (j : Fin Ω.N) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ Nonempty (SobolevExtensionOp p Ω.toOpens
@@ -385,15 +377,8 @@ theorem exists_sobolevExtensionOp_boundary [Nontrivial V] (hp1 : 1 < p) (hp : p 
   set G := Ω.graph j
   set c := Ω.center j
   set ρ := Ω.radius j
-  have hc0 : 0 < 1 + 1 / ε := by positivity
-  set b := G.coneBump.rescale hc0
-  have hbR : b.radius = (1 / 2) / (1 + 1 / ε) := by
-    rw [LocalMeansBump.rescale_radius, G.coneBump_radius]
-  have hR : 2 * b.radius ≤ ε := by
-    rw [hbR, show 2 * ((1 : ℝ) / 2 / (1 + 1 / ε)) = ε / (ε + 1) by field_simp]
-    exact div_le_self hε.le (by linarith)
+  obtain ⟨b, hb, -, hR⟩ := G.exists_coneBump_radius_le zero_le_two hε
   have hLR : ((2 : ℕ) : ℝ) * b.radius ≤ ε := by exact_mod_cast hR
-  have hb : G.ConeSupported b.toFun := G.coneSupported_rescale G.coneSupported_coneBump hc0
   have hTo : IsOpen (G.domain ∩ ball c ρ) := G.isOpen_domain.inter isOpen_ball
   have hTΩ : (⟨_, hTo⟩ : Opens V) ≤ Ω.toOpens := by
     show G.domain ∩ ball c ρ ⊆ Ω.carrier
@@ -425,40 +410,25 @@ theorem exists_sobolevExtensionOp_interior [Nontrivial V] (hp1 : 1 < p) (hp : p 
     (measurableSet_infDist_gt Ω.carrier δ) (T := Ω.toOpens) le_rfl hUΩ
     (fun x hx j y hy => interior_patch_support Ω.carrier (fun y hy =>
       (not_lt.1 fun h => hy (b.dual_eq_zero 2 j h)).trans (by rw [← hR]; push_cast; rfl)) x hx y hy)
-    (fun x hx j i y hy => ?_)⟩
-  have hy' := b.tsupport_dilate_divKernel_subset_closedBall i j hy
-  rw [mem_closedBall, dist_zero_right, hR] at hy'
-  have hx' : dist x (x - y) < infDist x Ω.carrierᶜ := by
-    rw [dist_eq_norm, sub_sub_cancel]
-    exact hy'.trans_lt hx
-  show x - y ∈ Ω.carrier
-  simpa using notMem_of_dist_lt_infDist hx'
+    fun x hx j i y hy => sub_mem_of_lt_infDist_of_norm_le Ω.carrier hx (by
+      rw [← hR]
+      exact mem_closedBall_zero_iff.1 (b.tsupport_dilate_divKernel_subset_closedBall i j hy))⟩
 
 /-- **Pasting the patch operators**: for a bounded Lipschitz domain `Ω` in dimension `n ≥ 1` and
 `1 ≤ p ≤ ∞`, if for every `ε > 0` and every `j` there is an extension operator from the boundary
 patch `Ω ∩ B(c_j, ρ_j - 2ε)` with a finite constant, and for every `δ > 0` one from the inner patch
 `{x ∈ Ω : infDist(x, Ωᶜ) > 2δ}`, then there is an extension operator from `Ω` with a finite
 constant (the patches of `Rd.BoundedLipschitzDomain.patch`, pasted by
-`Rd.sobolevExtensionOp_of_cover`). -/
+`Rd.sobolevExtensionOp_of_cover`, `Rd.BoundedLipschitzDomain.exists_of_patches`). -/
 theorem exists_sobolevExtensionOp_of_patches [Nontrivial V]
     (hbd : ∀ ε : ℝ, 0 < ε → ∀ j : Fin Ω.N, ∃ C : ℝ≥0∞, C ≠ ∞ ∧ Nonempty (SobolevExtensionOp p
       Ω.toOpens (Ω.carrier ∩ ball (Ω.center j) (Ω.radius j - 2 * ε)) C))
     (hin : ∀ δ : ℝ, 0 < δ → ∃ C : ℝ≥0∞, C ≠ ∞ ∧ Nonempty (SobolevExtensionOp p Ω.toOpens
       (Ω.carrier ∩ {x : V | 2 * δ < infDist x Ω.carrierᶜ}) C)) :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ Nonempty (SobolevExtensionOp p Ω.toOpens Ω.carrier C) := by
-  obtain ⟨ε, hε0, hε⟩ := Ω.exists_shrink
-  obtain ⟨δ, hδ0, hδ⟩ := Ω.exists_interior_margin Ω.nonempty_compl hε
-  choose Cb hCb hb using hbd ε hε0
-  obtain ⟨C0, hC0, h0⟩ := hin δ hδ0
-  refine sobolevExtensionOp_of_cover (O := Ω.toOpens) (Ω.patch ε δ) (Ω.isOpen_patch ε δ)
-    (Ω.isBounded_patch ε hδ0.le) (Ω.closure_subset_iUnion_patch hε hδ)
-    (C := fun i => i.elim C0 Cb) (fun i => ?_) (fun i => ?_)
-  · cases i with
-    | none => exact hC0
-    | some j => exact hCb j
-  · cases i with
-    | none => exact h0.some
-    | some j => exact (hb j).some
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ Nonempty (SobolevExtensionOp p Ω.toOpens Ω.carrier C) :=
+  Ω.exists_of_patches (fun U C => Nonempty (SobolevExtensionOp p Ω.toOpens U C))
+    (fun U hUo hUb hcov _ hC hext => sobolevExtensionOp_of_cover (O := Ω.toOpens) U hUo hUb hcov
+      hC fun i => Nonempty.some (hext i)) hbd hin
 
 /-- **The extension operator with a finite constant**: for a bounded Lipschitz domain `Ω` in
 dimension `n ≥ 1` and `1 < p < ∞` there is an extension operator from `Ω` with a finite constant

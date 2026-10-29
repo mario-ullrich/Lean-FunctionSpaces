@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
-public import FunctionSpaces.Domains.Extension.SobolevExtension
+public import FunctionSpaces.Rd.Sobolev.WeakDerivativeLeibniz
 
 /-!
 # Green's formula on bounded Lipschitz domains

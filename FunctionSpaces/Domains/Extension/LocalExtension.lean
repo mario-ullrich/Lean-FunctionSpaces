@@ -34,7 +34,8 @@ Two kinds of patches satisfy the conditions:
   `L R ≤ ε` (`Rd.LipschitzGraph.patch_support`, `Rd.LipschitzGraph.patch_step`);
 * **interior patches** of an open set `O`, `U = {infDist(·, Oᶜ) > 2δ}`, `W = {infDist(·, Oᶜ) > δ}`,
   `T = O`, for any bump with `L R ≤ δ` (`Rd.interior_patch_support`, `Rd.interior_patch_step`);
-  these sets lie in `O` (`Rd.setOf_lt_infDist_compl_subset`).
+  these sets lie in `O` (`Rd.setOf_lt_infDist_compl_subset`), and so does `x - y` for
+  `δ < infDist(x, Oᶜ)` and `‖y‖ ≤ δ` (`Rd.sub_mem_of_lt_infDist_of_norm_le`).
 
 Short steps `-y ∈ K̄`, `‖y‖ ≤ ε`, take `Ω ∩ B(c, ρ - ε)` into `Ω ∩ B(c, ρ)`
 (`Rd.LipschitzGraph.sub_mem_patch_of_mem_closedCone`); this gives the support conditions of all
@@ -46,7 +47,9 @@ cone-supported kernels of small support. The terms of the local extension are li
 `Rd.LocalMeansBump.summable_localExtTerm_of_forall_le`).
 
 Bumps of every radius come from rescaling (`Rd.LocalMeansBump.rescale`) and from the normalised
-smooth bump centred at `0` (`Rd.LocalMeansBump.centered`).
+smooth bump centred at `0` (`Rd.LocalMeansBump.centered`). The cone bump of a Lipschitz graph
+domain, rescaled, is supported in the reflected cone with a radius `R ≤ 1/2` and `a R ≤ ε`
+(`Rd.LipschitzGraph.exists_coneBump_radius_le`).
 -/
 
 @[expose] public section
@@ -173,6 +176,18 @@ theorem coneSupported_rescale {b : LocalMeansBump V} (hb : Ω.ConeSupported b.to
     (hc : 0 < c) : Ω.ConeSupported (b.rescale hc).toFun :=
   hb.dilate hc
 
+/-- **Cone bumps of small radius**: for `a ≥ 0` and `ε > 0` the cone bump rescaled by
+`1 + a / ε` is supported in `-K` and has a radius `R ≤ 1/2` with `a R ≤ ε`
+(`Rd.LipschitzGraph.coneBump_radius`). -/
+theorem exists_coneBump_radius_le {a ε : ℝ} (ha : 0 ≤ a) (hε : 0 < ε) :
+    ∃ b : LocalMeansBump V, Ω.ConeSupported b.toFun ∧ b.radius ≤ 1 / 2 ∧ a * b.radius ≤ ε := by
+  have hc : 0 < 1 + a / ε := by positivity
+  refine ⟨Ω.coneBump.rescale hc, Ω.coneSupported_rescale Ω.coneSupported_coneBump hc, ?_, ?_⟩ <;>
+    rw [LocalMeansBump.rescale_radius, Ω.coneBump_radius]
+  · exact div_le_self (by norm_num) (le_add_of_nonneg_right (by positivity))
+  · rw [← mul_div_assoc, div_le_iff₀ hc, mul_add, mul_one, mul_div_cancel₀ a hε.ne']
+    linarith
+
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Short steps into the reflected closed cone stay in a patch**: if `x ∈ Ω ∩ B(c, ρ - ε)`,
 `-y ∈ K̄` and `‖y‖ ≤ ε`, then `x - y ∈ Ω ∩ B(c, ρ)` (`Rd.LipschitzGraph.add_mem_of_mem_closedCone`
@@ -254,6 +269,16 @@ theorem interior_patch_support (O : Set V) {k : V → ℂ} {δ : ℝ} (hk : ∀ 
   rw [dist_eq_norm, sub_sub_cancel] at h
   simp only [Set.mem_ofPred_eq] at hx ⊢
   linarith [hk y hy]
+
+omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **Inner patches, the support condition for kernels in a ball**: if `δ < infDist(x, Oᶜ)` and
+`‖y‖ ≤ δ`, then `x - y ∈ O`, since `x - y` lies in the ball `B(x, infDist(x, Oᶜ)) ⊆ O`
+(Mathlib's `Metric.ball_infDist_compl_subset`). -/
+theorem sub_mem_of_lt_infDist_of_norm_le (O : Set V) {δ : ℝ} {x y : V}
+    (hx : x ∈ {x : V | δ < infDist x Oᶜ}) (hy : ‖y‖ ≤ δ) : x - y ∈ O :=
+  ball_infDist_compl_subset (by
+    rw [mem_ball, dist_eq_norm, sub_sub_cancel_left, norm_neg]
+    exact hy.trans_lt hx)
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Interior patches, the step condition**: steps of length at most `δ / L` take
@@ -431,43 +456,19 @@ theorem enorm_indicatorLp_localMean_zero_le (hp : p ≠ ∞) {W : Set V} (hW : M
 
 /-- **The local means on `W` are bounded by the moduli on `T`**:
 `‖(2^(js) ‖1_W (k_j ⋆ f)‖_p)_j‖_{ℓ_q} ≤
-(‖m‖_1 + 2 ‖g‖_1) (‖f‖_p + ‖(2^(js) ω_L(f, 2^(-j), T)_p)_j‖_{ℓ_q})`. -/
+(‖m‖_1 + 2 ‖g‖_1) (‖f‖_p + ‖(2^(js) ω_L(f, 2^(-j), T)_p)_j‖_{ℓ_q})`
+(`Rd.lqNorm_dyadicWeight_le_of_head_of_succ_le`). -/
 theorem localNormOn_le (hp : p ≠ ∞) {W T : Set V} (hW : MeasurableSet W) (L : ℕ) (s : ℝ)
     {q : ℝ≥0∞} (hq : 1 ≤ q)
     (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
     (hR : b.radius ≤ 1 / 2) (f : Lp ℂ p (volume : Measure V)) :
     b.localNormOn hp hW L s q f ≤
       (eLpNorm (momentKernel b.toFun L) 1 volume + 2 * ∫⁻ z, ‖b.toFun z‖ₑ) *
-        (‖f‖ₑ + lqNorm q (fun j => dyadicWeight s j * lpModulusOn p T L f j)) := by
-  set A := ∫⁻ z, ‖b.toFun z‖ₑ
-  set M := eLpNorm (momentKernel b.toFun L) 1 volume
-  set Λ := lqNorm q (fun j => dyadicWeight s j * lpModulusOn p T L f j)
-  have htail : lqNorm q (fun j => dyadicWeight s (j + 1) *
-      ‖indicatorLp hW (b.localMean hp L (j + 1) f)‖ₑ) ≤ 2 * A * Λ :=
-    calc lqNorm q (fun j => dyadicWeight s (j + 1) *
-          ‖indicatorLp hW (b.localMean hp L (j + 1) f)‖ₑ)
-        ≤ lqNorm q (fun j => 2 * A *
-            (dyadicWeight s (j + 1) * lpModulusOn p T L f (j + 1))) :=
-          ENNReal.lqNorm_mono fun j =>
-            (mul_le_mul' le_rfl (b.enorm_indicatorLp_localMean_succ_le hp hW L j hstep hR f)).trans_eq
-              (by ring)
-      _ = 2 * A * lqNorm q (fun j => dyadicWeight s (j + 1) * lpModulusOn p T L f (j + 1)) :=
-          ENNReal.lqNorm_const_mul _ _
-      _ ≤ 2 * A * Λ := mul_le_mul' le_rfl
-          (ENNReal.lqNorm_shift_le fun j => dyadicWeight s j * lpModulusOn p T L f j)
-  calc b.localNormOn hp hW L s q f
-      ≤ dyadicWeight s 0 * ‖indicatorLp hW (b.localMean hp L 0 f)‖ₑ +
-          lqNorm q (fun j => dyadicWeight s (j + 1) *
-            ‖indicatorLp hW (b.localMean hp L (j + 1) f)‖ₑ) :=
-        ENNReal.lqNorm_le_head_add_shift hq _
-    _ ≤ M * ‖f‖ₑ + 2 * A * Λ := by
-        rw [ENNReal.dyadicWeight_zero_right, one_mul]
-        exact add_le_add (b.enorm_indicatorLp_localMean_zero_le hp hW L f) htail
-    _ ≤ (M + 2 * A) * ‖f‖ₑ + (M + 2 * A) * Λ := by
-        gcongr
-        · exact le_self_add
-        · exact le_add_self
-    _ = (M + 2 * A) * (‖f‖ₑ + Λ) := by ring
+        (‖f‖ₑ + lqNorm q (fun j => dyadicWeight s j * lpModulusOn p T L f j)) :=
+  lqNorm_dyadicWeight_le_of_head_of_succ_le hq s
+    (fun j => ‖indicatorLp hW (b.localMean hp L j f)‖ₑ) (lpModulusOn p T L f)
+    (b.enorm_indicatorLp_localMean_zero_le hp hW L f)
+    fun j => b.enorm_indicatorLp_localMean_succ_le hp hW L j hstep hR f
 
 /-- The **constant of the local extension** `C_b(L, s) (‖m‖_1 + 2 ‖g‖_1)`, for the moment kernel
 `m` of the bump `g`: the constant of the synthesis estimate (`Rd.LocalMeansBump.synthConst`) times

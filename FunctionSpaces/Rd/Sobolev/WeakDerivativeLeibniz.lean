@@ -35,7 +35,9 @@ orthonormal basis `e_0, …, e_{n-1}` of `Rd.gridBasis`. A **word** of length `k
 * **Smooth compactly supported multipliers on `W^m_p(V)`**
   (`Rd.MemSobolev.mulLp_of_hasCompactSupport`): `χ F ∈ W^m_p(V)` for `F ∈ W^m_p(V)`, since
   derivatives in `L_p(V)` along all words of length `k ≤ m` give `W^m_p(V)`
-  (`Rd.memSobolev_of_forall_gridBasis_words`).
+  (`Rd.memSobolev_of_forall_gridBasis_words`); the case `m = 1` is `Rd.MemSobolev.mulLp`.
+* **The product rule in `L_p(V)`** (`Rd.hasWeakLineDeriv_mulLp`): `∂_w (χ F) = χ ∂_w F + (∂_w χ) F`
+  for every smooth bounded `χ` with bounded `∂_w χ`.
 -/
 
 @[expose] public section
@@ -477,6 +479,33 @@ theorem MemSobolev.mulLp_of_hasCompactSupport {m : ℕ} {F : Lp ℂ p (volume : 
   refine memSobolev_of_forall_gridBasis_words fun k hk w => ?_
   obtain ⟨G, hG, hGd⟩ := hF.exists_hasWeakLineDeriv_mul hχ hcs hk w
   exact ⟨G, hG, hGd.congr_ae hae EventuallyEq.rfl⟩
+
+omit [Fact (1 ≤ p)] in
+/-- **The product rule in `L_p(V)`**: if `G = ∂_w F` weakly on `V` and `χ` is a smooth real
+function, bounded with its derivative `∂_w χ` (bounds `C`, `C'`), then `χ G + (∂_w χ) F` is the weak
+derivative `∂_w (χ F)` on `V`, with the products `Rd.mulLp` in `L_p(V)`
+(`Rd.HasWeakLineDeriv.mul_contDiff`). -/
+theorem hasWeakLineDeriv_mulLp {w : V} {F G : Lp ℂ p (volume : Measure V)}
+    (h : HasWeakLineDeriv ⊤ (fun _ : Fin 1 => w) F G) {χ : V → ℝ}
+    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) {C C' : ℝ}
+    (hc : Continuous fun x => (χ x : ℂ)) (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C)
+    (hc' : Continuous fun x => (fderiv ℝ χ x w : ℂ)) (hC' : ∀ x, ‖(fderiv ℝ χ x w : ℂ)‖ ≤ C') :
+    HasWeakLineDeriv ⊤ (fun _ : Fin 1 => w) (mulLp hc hC F)
+      ((mulLp hc hC G + mulLp hc' hC' F : Lp ℂ p (volume : Measure V)) : V → ℂ) := by
+  refine (h.mul_contDiff hχ).congr_ae ?_ ?_ <;> rw [volume_restrict_top]
+  · exact (mulLp_apply_ae hc hC F).symm
+  · filter_upwards [Lp.coeFn_add (mulLp hc hC G) (mulLp hc' hC' F), mulLp_apply_ae hc hC G,
+      mulLp_apply_ae hc' hC' F] with x h1 h2 h3
+    rw [h1, Pi.add_apply, h2, h3]
+
+/-- **Smooth compactly supported multipliers keep `W^1_p(V)`**: if `F ∈ W^1_p(V)` and `χ` is a
+smooth real function with compact support, then `χ F ∈ W^1_p(V)`, the case `m = 1` of
+`Rd.MemSobolev.mulLp_of_hasCompactSupport`. -/
+theorem MemSobolev.mulLp {F : Lp ℂ p (volume : Measure V)} (hF : MemSobolev 1 F)
+    {χ : V → ℝ} (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (hcs : HasCompactSupport χ) {C : ℝ}
+    (hc : Continuous fun x => (χ x : ℂ)) (hC : ∀ x, ‖(χ x : ℂ)‖ ≤ C) :
+    MemSobolev 1 (mulLp hc hC F) :=
+  hF.mulLp_of_hasCompactSupport hχ hcs hc hC
 
 end Multipliers
 

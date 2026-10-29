@@ -26,6 +26,9 @@ a chart** `θ · F ∘ κ` on `M` (`Manifold.chartLift`), which lies in `L_p(μ)
 (`Manifold.memLp_chartLift`) and whose pieces are the images of `F` under the changes of charts
 (`Manifold.BesovAtlas.piece_chartLift`).
 
+The change of charts `T_{ij}` acts at `y = κ_i x` with `x` in the source of `κ'_j` by
+`T_{ij} G (y) = ψ_i(x) θ'_j(x) G(κ'_j x)` and vanishes at other points
+(`Manifold.BesovAtlas.transition_apply_of_mem`, `Manifold.BesovAtlas.transition_apply_of_notMem`).
 The pieces of one atlas are sums of the pieces of another transported by the changes of charts
 (`Manifold.BesovAtlas.pieceLp_eq_sum`) for every real model `I` whose range is a Besov domain: the
 half-space, `E`, and the quadrant of manifolds with corners
@@ -213,43 +216,21 @@ theorem aestronglyMeasurable_piece (i : Fin A.n) {g : M → ℂ} (hg : StronglyM
 variable [CompactSpace M] (μ : Measure M) [IsSmoothMeasure I μ]
 
 /-- **The pieces are bounded in `L_p`**: `‖piece_i g‖_{L_p(E)} ≤ C ‖g‖_{L_p(μ)}`, since
-`0 ≤ ψ_i ≤ 1` and the integrals over `M` and in the chart are comparable on `tsupport ψ_i`. -/
+`0 ≤ ψ_i ≤ 1` and the `L_p` norms on `M` and in the chart are comparable on `tsupport ψ_i`
+(`Manifold.IsSmoothMeasure.exists_eLpNorm_chart_le`). -/
 theorem exists_eLpNorm_piece_le (i : Fin A.n) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ⊤) :
     ∃ C : ℝ≥0∞, C ≠ ⊤ ∧ ∀ g : M → ℂ, StronglyMeasurable g →
       eLpNorm (A.piece i g) p volume ≤ C * eLpNorm g p μ := by
-  have hK : IsCompact (tsupport (A.psi i)) := (isClosed_tsupport _).isCompact
-  obtain ⟨c, C, hc, -, hcmp⟩ :=
-    IsSmoothMeasure.exists_lintegral_chart_le (I := I) μ (A.chart_mem i) hK
-      (A.tsupport_psi_subset i)
-  set e := p.toReal
-  have he : 0 < e := ENNReal.toReal_pos hp0 hp
-  refine ⟨c⁻¹ ^ (1 / e), ENNReal.rpow_ne_top_of_nonneg (by positivity) (ENNReal.inv_ne_top.2 hc),
-    fun g hg => ?_⟩
-  set F : M → ℝ≥0∞ := fun x => ‖(A.psi i x : ℂ) * g x‖ₑ ^ e
-  have hFm : Measurable F :=
-    (((A.contMDiff_psi i).continuous.measurable.complex_ofReal.mul hg.measurable).enorm).pow_const e
-  have hFK : ∀ x ∉ tsupport (A.psi i), F x = 0 := fun x hx => by
-    simp only [F, image_eq_zero_of_notMem_tsupport hx, Complex.ofReal_zero, zero_mul, enorm_zero,
-      ENNReal.zero_rpow_of_pos he]
-  have hpiece : (fun y => ‖A.piece i g y‖ₑ ^ e) =
-      (A.ext i).target.indicator (fun y => F ((A.ext i).symm y)) := funext fun y => by
-    by_cases hy : y ∈ (A.ext i).target
-    · simp only [piece, indicator_of_mem hy, F]
-    · simp only [piece, indicator_of_notMem hy, enorm_zero, ENNReal.zero_rpow_of_pos he]
-  rw [← ENNReal.rpow_le_rpow_iff he, ENNReal.mul_rpow_of_nonneg _ _ he.le, ← ENNReal.rpow_mul,
-    one_div_mul_cancel he.ne', ENNReal.rpow_one,
-    eLpNorm_rpow_eq (A.aestronglyMeasurable_piece i hg) hp0 hp,
-    eLpNorm_rpow_eq hg.aestronglyMeasurable hp0 hp, hpiece,
-    lintegral_indicator (measurableSet_extend_target I _)]
-  refine (hcmp F hFm hFK).1.trans (mul_le_mul' le_rfl (lintegral_mono fun x => ?_))
-  refine ENNReal.rpow_le_rpow ?_ he.le
-  rw [enorm_mul]
-  calc ‖(A.psi i x : ℂ)‖ₑ * ‖g x‖ₑ ≤ 1 * ‖g x‖ₑ := by
-        refine mul_le_mul' ?_ le_rfl
-        rw [← ofReal_norm, Complex.norm_real, Real.norm_of_nonneg (A.nonneg_psi i x),
-          ← ENNReal.ofReal_one]
-        exact ENNReal.ofReal_le_ofReal (A.psi_le_one i x)
-    _ = ‖g x‖ₑ := one_mul _
+  obtain ⟨c, _, hc, -, hcmp⟩ := IsSmoothMeasure.exists_eLpNorm_chart_le (I := I) μ (A.chart_mem i)
+    (isClosed_tsupport _).isCompact (A.tsupport_psi_subset i) hp0 hp (F := ℂ)
+  refine ⟨c, hc, fun g hg => ?_⟩
+  have hψg : StronglyMeasurable fun x => (A.psi i x : ℂ) * g x :=
+    ((A.contMDiff_psi i).continuous.measurable.complex_ofReal.mul hg.measurable).stronglyMeasurable
+  refine (hcmp _ hψg fun x hx => by
+    rw [image_eq_zero_of_notMem_tsupport hx, Complex.ofReal_zero, zero_mul]).1.trans
+      (mul_le_mul' le_rfl (eLpNorm_mono hψg.aestronglyMeasurable fun x => ?_))
+  rw [norm_mul, Complex.norm_real, Real.norm_of_nonneg (A.nonneg_psi i x)]
+  exact mul_le_of_le_one_left (norm_nonneg _) (A.psi_le_one i x)
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ⊤)
 
@@ -375,38 +356,54 @@ theorem transition_apply (i : Fin A.n) (j : Fin A'.n) (G : E → ℂ) (y : E) :
   exact chartChange_apply _ _ _ _ _ G y
 
 omit [FiniteDimensional ℝ E] in
+/-- **The change of charts at a point of both sources**: for `y = κ_i x` with `x` in the source
+of `κ'_j`, `T_{ij} G (y) = ψ_i(x) θ'_j(x) G(κ'_j x)`. -/
+theorem transition_apply_of_mem (i : Fin A.n) (j : Fin A'.n) (G : E → ℂ) {y : E}
+    (hy : y ∈ (A.ext i).target) (hx : (A.ext i).symm y ∈ (A'.chart j).source) :
+    (A.transition A' i j).apply G y = ((A.psi i ((A.ext i).symm y) *
+      A'.theta j ((A.ext i).symm y) : ℝ) : ℂ) * G (A'.ext j ((A.ext i).symm y)) := by
+  have hx' : (A.ext i).symm y ∈ (A'.ext j).source := by rwa [OpenPartialHomeomorph.extend_source]
+  rw [transition_apply, indicator_of_mem ((mem_coordChange_source _ _).2 ⟨hy, hx⟩),
+    coordChange_apply]
+  simp only [transition, chartChange]
+  rw [indicator_of_mem ((A'.ext j).map_source hx'), (A'.ext j).left_inv hx']
+
+omit [FiniteDimensional ℝ E] in
+/-- **The change of charts off the common sources**: `T_{ij} G (y) = 0` unless `y = κ_i x` with `x`
+in the source of `κ'_j`. -/
+theorem transition_apply_of_notMem (i : Fin A.n) (j : Fin A'.n) (G : E → ℂ) {y : E}
+    (h : y ∈ (A.ext i).target → (A.ext i).symm y ∉ (A'.chart j).source) :
+    (A.transition A' i j).apply G y = 0 := by
+  rw [transition_apply, indicator_of_notMem fun h' => ?_]
+  obtain ⟨h1, h2⟩ := (mem_coordChange_source _ _).1 h'
+  exact h h1 h2
+
+omit [FiniteDimensional ℝ E] in
 /-- **The pieces of two atlases** (pointwise): `piece_i g = ∑_j T_{ij}(piece'_j g)`, since
-`ψ_i g = ∑_j ψ_i ψ'_j g` and `θ'_j ψ'_j = ψ'_j`. -/
+`ψ_i g = ∑_j ψ_i ψ'_j g` and `θ'_j ψ'_j = ψ'_j` (`Manifold.BesovAtlas.transition_apply_of_mem`). -/
 theorem piece_eq_sum_apply (i : Fin A.n) (g : M → ℂ) (y : E) :
     A.piece i g y = ∑ j, (A.transition A' i j).apply (A'.piece j g) y := by
   by_cases hy : y ∈ (A.ext i).target
   · set x := (A.ext i).symm y
     have hterm : ∀ j, (A.transition A' i j).apply (A'.piece j g) y =
         (A.psi i x : ℂ) * (A'.psi j x : ℂ) * g x := fun j => by
-      rw [transition_apply]
       by_cases hxj : x ∈ (A'.chart j).source
-      · have hyj : y ∈ (I.extendCoordChange (A.chart i) (A'.chart j)).source :=
-          (mem_coordChange_source _ _).2 ⟨hy, hxj⟩
-        have hxj' : x ∈ (A'.ext j).source := by rwa [OpenPartialHomeomorph.extend_source]
-        have hz : A'.ext j x ∈ (A'.ext j).target := (A'.ext j).map_source hxj'
-        have hzx : (A'.ext j).symm (A'.ext j x) = x := (A'.ext j).left_inv hxj'
-        rw [indicator_of_mem hyj, coordChange_apply]
-        simp only [transition, chartChange, piece]
-        rw [indicator_of_mem hz, indicator_of_mem hz, hzx]
+      · have hxj' : x ∈ (A'.ext j).source := by rwa [OpenPartialHomeomorph.extend_source]
+        rw [A.transition_apply_of_mem A' i j _ hy hxj, piece,
+          indicator_of_mem ((A'.ext j).map_source hxj'), (A'.ext j).left_inv hxj']
         push_cast
         have h := congrArg (fun t : ℝ => (t : ℂ)) (A'.theta_mul_psi j x)
         push_cast at h
         linear_combination (A.psi i x : ℂ) * g x * h
-      · have hyj : y ∉ (I.extendCoordChange (A.chart i) (A'.chart j)).source := fun h =>
-          hxj ((mem_coordChange_source _ _).1 h).2
-        have hψ : A'.psi j x = 0 :=
+      · have hψ : A'.psi j x = 0 :=
           image_eq_zero_of_notMem_tsupport fun h => hxj (A'.tsupport_psi_subset j h)
-        rw [indicator_of_notMem hyj, hψ, Complex.ofReal_zero, mul_zero, zero_mul]
+        rw [A.transition_apply_of_notMem A' i j _ fun _ => hxj, hψ, Complex.ofReal_zero, mul_zero,
+          zero_mul]
     rw [Finset.sum_congr rfl fun j _ => hterm j, ← Finset.sum_mul, ← Finset.mul_sum,
       ← Complex.ofReal_sum, A'.sum_psi, Complex.ofReal_one, mul_one, piece, indicator_of_mem hy]
   · rw [piece, indicator_of_notMem hy]
-    refine (Finset.sum_eq_zero fun j _ => ?_).symm
-    rw [transition_apply, indicator_of_notMem fun h => hy ((mem_coordChange_source _ _).1 h).1]
+    exact (Finset.sum_eq_zero fun j _ =>
+      A.transition_apply_of_notMem A' i j _ fun h => (hy h).elim).symm
 
 variable [MeasurableSpace E] [BorelSpace E] [MeasurableSpace M] [BorelSpace M] (μ : Measure M)
   [IsSmoothMeasure I μ] [hB : Rd.BesovDomain (range I)] {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ⊤)
@@ -467,42 +464,38 @@ theorem stronglyMeasurable_chartLift (e : OpenPartialHomeomorph M H) {θ : M →
     (hF.comp_measurable hκ)).indicator e.open_source.measurableSet
 
 /-- **The lift from a chart is in `L_p(μ)`** for `F ∈ L_p(E)`, a continuous cut-off `θ` with
-`tsupport θ ⊆ e.source` and a smooth measure `μ`: the integrals over `M` and in the chart are
-comparable on `tsupport θ`, and `θ` is bounded. -/
+`tsupport θ ⊆ e.source` and a smooth measure `μ`: the `L_p` norms on `M` and in the chart are
+comparable on `tsupport θ` (`Manifold.IsSmoothMeasure.exists_eLpNorm_chart_le`), and `θ` is
+bounded. -/
 theorem memLp_chartLift [CompactSpace M] (μ : Measure M) [IsSmoothMeasure I μ]
     {e : OpenPartialHomeomorph M H} (he : e ∈ atlas H M) {θ : M → ℝ} (hθ : Continuous θ)
     (hθs : tsupport θ ⊆ e.source) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ⊤) {F : E → ℂ}
     (hFm : StronglyMeasurable F) (hF : MemLp F p volume) : MemLp (chartLift I e θ F) p μ := by
-  have he0 : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   have hm := stronglyMeasurable_chartLift (I := I) e hθ hFm
-  obtain ⟨c, C, -, hC, hle⟩ := IsSmoothMeasure.exists_lintegral_chart_le (I := I) μ he
-    (isClosed_tsupport θ).isCompact hθs
+  obtain ⟨_, C, -, hC, hle⟩ := IsSmoothMeasure.exists_eLpNorm_chart_le (I := I) μ he
+    (isClosed_tsupport θ).isCompact hθs hp0 hp (F := ℂ)
   obtain ⟨B, hB⟩ := isCompact_univ.exists_bound_of_continuousOn hθ.continuousOn
-  have hF' := (eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top hp0 hp
-    hF.aestronglyMeasurable).1 hF
-  refine (eLpNorm_lt_top_iff_lintegral_rpow_enorm_lt_top hp0 hp hm.aestronglyMeasurable).2 ?_
-  have hG0 : ∀ x ∉ tsupport θ, ‖chartLift I e θ F x‖ₑ ^ p.toReal = 0 := fun x hx => by
-    by_cases hxs : x ∈ e.source
+  have hT := measurableSet_extend_target I e
+  have hmT : AEStronglyMeasurable ((e.extend I).target.indicator
+      fun y => chartLift I e θ F ((e.extend I).symm y)) volume :=
+    (aestronglyMeasurable_indicator_iff hT).2 (hm.aestronglyMeasurable.comp_aemeasurable
+      ((e.continuousOn_extend_symm (I := I)).aemeasurable hT))
+  refine memLp_iff.2 ((hle _ hm fun x hx => ?_).2.trans_lt (ENNReal.mul_lt_top hC.lt_top
+    ((eLpNorm_le_mul_eLpNorm_of_ae_le_mul (c := max B 0) hmT (ae_of_all _ fun y => ?_)
+      p).trans_lt (ENNReal.mul_lt_top ENNReal.ofReal_lt_top hF.eLpNorm_lt_top))))
+  · by_cases hxs : x ∈ e.source
     · rw [chartLift, indicator_of_mem hxs, image_eq_zero_of_notMem_tsupport hx,
-        Complex.ofReal_zero, zero_mul, enorm_zero, ENNReal.zero_rpow_of_pos he0]
-    · rw [chartLift, indicator_of_notMem hxs, enorm_zero, ENNReal.zero_rpow_of_pos he0]
-  refine ((hle _ (hm.measurable.enorm.pow_const _) hG0).2).trans_lt
-    (ENNReal.mul_lt_top hC.lt_top ?_)
-  calc ∫⁻ y in (e.extend I).target, ‖chartLift I e θ F ((e.extend I).symm y)‖ₑ ^ p.toReal
-      ≤ ∫⁻ y in (e.extend I).target, ENNReal.ofReal B ^ p.toReal * ‖F y‖ₑ ^ p.toReal := by
-        refine setLIntegral_mono' (measurableSet_extend_target I e) fun y hy => ?_
-        have hx : (e.extend I).symm y ∈ e.source := by
-          have h := (e.extend I).map_target hy
-          rwa [e.extend_source] at h
-        rw [chartLift, indicator_of_mem hx, (e.extend I).right_inv hy, enorm_mul,
-          ENNReal.mul_rpow_of_nonneg _ _ he0.le]
-        refine mul_le_mul' (ENNReal.rpow_le_rpow ?_ he0.le) le_rfl
-        rw [← ofReal_norm, Complex.norm_real]
-        exact ENNReal.ofReal_le_ofReal (hB _ (mem_univ _))
-    _ ≤ ∫⁻ y, ENNReal.ofReal B ^ p.toReal * ‖F y‖ₑ ^ p.toReal := setLIntegral_le_lintegral _ _
-    _ = ENNReal.ofReal B ^ p.toReal * ∫⁻ y, ‖F y‖ₑ ^ p.toReal :=
-        lintegral_const_mul' _ _ (ENNReal.rpow_ne_top_of_nonneg he0.le ENNReal.ofReal_ne_top)
-    _ < ⊤ := ENNReal.mul_lt_top (ENNReal.rpow_lt_top_of_nonneg he0.le ENNReal.ofReal_ne_top) hF'
+        Complex.ofReal_zero, zero_mul]
+    · rw [chartLift, indicator_of_notMem hxs]
+  · by_cases hy : y ∈ (e.extend I).target
+    · have hx : (e.extend I).symm y ∈ e.source := by
+        simpa only [e.extend_source] using (e.extend I).map_target hy
+      rw [indicator_of_mem hy, chartLift, indicator_of_mem hx, (e.extend I).right_inv hy,
+        norm_mul, Complex.norm_real]
+      exact mul_le_mul_of_nonneg_right ((hB _ (mem_univ _)).trans (le_max_left B 0))
+        (norm_nonneg _)
+    · rw [indicator_of_notMem hy, norm_zero]
+      exact mul_nonneg (le_max_right B 0) (norm_nonneg _)
 
 end ChartLift
 
@@ -512,31 +505,20 @@ variable (A : BesovAtlas I M) [IsManifold I ∞ M] [CompactSpace M]
 
 omit [FiniteDimensional ℝ E] in
 /-- **The pieces of a lift from a chart**: `piece_i (θ_k · F ∘ κ_k) = T_{ik} F` pointwise, for the
-change of charts `T_{ik}` with the cut-off `ψ_i θ_k`. -/
+change of charts `T_{ik}` with the cut-off `ψ_i θ_k` (`Manifold.BesovAtlas.transition_apply_of_mem`,
+`Manifold.BesovAtlas.transition_apply_of_notMem`). -/
 theorem piece_chartLift (i k : Fin A.n) (F : E → ℂ) :
     A.piece i (chartLift I (A.chart k) (A.theta k) F) = (A.transition A i k).apply F := by
   funext y
-  rw [transition_apply]
   by_cases hy : y ∈ (A.ext i).target
-  · set x := (A.ext i).symm y
-    by_cases hxk : x ∈ (A.chart k).source
-    · have hyk : y ∈ (I.extendCoordChange (A.chart i) (A.chart k)).source :=
-        (mem_coordChange_source _ _).2 ⟨hy, hxk⟩
-      have hxk' : x ∈ (A.ext k).source := by rwa [OpenPartialHomeomorph.extend_source]
-      have hz : A.ext k x ∈ (A.ext k).target := (A.ext k).map_source hxk'
-      have hzx : (A.ext k).symm (A.ext k x) = x := (A.ext k).left_inv hxk'
-      rw [piece, indicator_of_mem hy, indicator_of_mem hyk, coordChange_apply, chartLift,
+  · by_cases hxk : (A.ext i).symm y ∈ (A.chart k).source
+    · rw [A.transition_apply_of_mem A i k F hy hxk, piece, indicator_of_mem hy, chartLift,
         indicator_of_mem hxk]
-      simp only [transition, chartChange]
-      rw [indicator_of_mem hz, hzx]
       push_cast
       ring
-    · have hyk : y ∉ (I.extendCoordChange (A.chart i) (A.chart k)).source := fun h =>
-        hxk ((mem_coordChange_source _ _).1 h).2
-      rw [piece, indicator_of_mem hy, indicator_of_notMem hyk, chartLift,
+    · rw [A.transition_apply_of_notMem A i k F fun _ => hxk, piece, indicator_of_mem hy, chartLift,
         indicator_of_notMem hxk, mul_zero]
-  · rw [piece, indicator_of_notMem hy,
-      indicator_of_notMem fun h => hy ((mem_coordChange_source _ _).1 h).1]
+  · rw [A.transition_apply_of_notMem A i k F fun h => (hy h).elim, piece, indicator_of_notMem hy]
 
 end BesovAtlas
 

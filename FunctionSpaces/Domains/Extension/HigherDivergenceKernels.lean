@@ -760,20 +760,12 @@ theorem LocalMeansBump.momentKernel_dilationSmoothed (b : LocalMeansBump V) (L :
 
 /-- **The local means kernels of the smoothed bump**: `k_{j+1} = (m_2 - m)_{2^j}` with
 `m_2 - m = ∫_{-log L}^{2 log 2} (u(s - log 2) - u(s)) b_{e^s} ds`, the weighted dilation average
-with the kernel weight (`Rd.LocalMeansBump.momentKernel_dilationSmoothed`,
-`Rd.dilate_exp_neg_weightedDilation`). -/
+with the kernel weight (`Rd.LocalMeansBump.kernel_succ_eq_dilate`,
+`Rd.LocalMeansBump.momentKernel_dilationSmoothed`, `Rd.dilate_exp_neg_weightedDilation`). -/
 theorem LocalMeansBump.kernel_succ_dilationSmoothed (b : LocalMeansBump V) (L j : ℕ) :
     b.dilationSmoothed.kernel L (j + 1) = dilate (2 ^ j)
       (weightedDilation (-Real.log L) (2 * Real.log 2) (kernelWeight L) b.toFun) := by
-  have hk : b.dilationSmoothed.kernel L (j + 1) = dilate (2 ^ j) (fun y =>
-      dilate 2 (momentKernel b.dilationSmoothed.toFun L) y -
-        momentKernel b.dilationSmoothed.toFun L y) := by
-    rw [show (fun y => dilate 2 (momentKernel b.dilationSmoothed.toFun L) y -
-        momentKernel b.dilationSmoothed.toFun L y) = dilate 2 (momentKernel b.dilationSmoothed.toFun
-        L) - momentKernel b.dilationSmoothed.toFun L from rfl, dilate_sub, dilate_dilate,
-      ← pow_succ]
-    rfl
-  rw [hk]
+  rw [b.dilationSmoothed.kernel_succ_eq_dilate L j]
   congr 1
   funext y
   have hlog := Real.log_nonneg (one_le_two : (1 : ℝ) ≤ 2)

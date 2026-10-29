@@ -1921,6 +1921,26 @@ $\chi \colon V \to \R$ with compact support:
 \Cref{lem:weak-derivative-words} (4).
 \end{proof}
 
+\begin{lemma}[The product rule in $L_p$]
+\label{lem:product-rule-lp}
+\lean{Rd.hasWeakLineDeriv_mulLp, Rd.MemSobolev.mulLp}
+\leanok
+\uses{lem:weak-derivative-product, lem:product-modulus, lem:weak-derivative-basic,
+  cor:sobolev-multiplier}
+Let $1 \leq p \leq \infty$, $w \in V$, $F, G \in L_p(V)$ with $G = \partial_w F$ weakly on $V$,
+and $\chi$ a smooth real function with $\chi$ and $\partial_w \chi$ bounded. Then
+$\chi G + (\partial_w \chi) F = \partial_w (\chi F)$ weakly on $V$, with the products in
+$L_p(V)$. For every $F \in \Sob{1}{p}(V)$ and every smooth real $\chi$ with compact support,
+$\chi F \in \Sob{1}{p}(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:weak-derivative-product} for the representatives, and
+\Cref{lem:weak-derivative-basic}. The second statement is the case $m = 1$ of
+\Cref{cor:sobolev-multiplier}.
+\end{proof}
+
 \section{Derivative kernels}
 \label{sec:derivative-kernels}
 

@@ -312,10 +312,15 @@ $-2^{-j} z = 2^{-j} (-z)$ lies in $K$ and has length at most $2^{-(j+1)}$; apply
 \lean{Rd.LipschitzGraph.enorm_cutoff_localMean_zero_le,
   Rd.LipschitzGraph.enorm_cutoff_localMean_succ_le, Rd.LipschitzGraph.intrinsicConst,
   Rd.LipschitzGraph.intrinsicConst_ne_top, Rd.LocalMeansBump.momentConst_ne_top,
-  Rd.LipschitzGraph.intrinsicNorm_le,
-  Rd.LipschitzGraph.intrinsicNorm_lt_top}
+  Rd.LipschitzGraph.intrinsicNorm_le, Rd.LipschitzGraph.intrinsicNorm_lt_top,
+  Rd.lqNorm_dyadicWeight_le_of_head_of_succ_le}
 \leanok
 \uses{lem:cone-steps, lem:support-principle, lem:rd-modulus-on, def:intrinsic-local-means}
+For every $1 \leq q \leq \infty$, every $s \in \R$, all sequences $x, w \geq 0$ and all
+$a, M, A \in [0, \infty]$ with $x_0 \leq M a$ and $x_{j+1} \leq A w_{j+1}$ for every $j \in \N$,
+\[
+  \|(2^{js} x_j)_j\|_{\ell_q} \leq (M + A) \bigl( a + \|(2^{js} w_j)_j\|_{\ell_q} \bigr) .
+\]
 Let $1 \leq p < \infty$ and $f \in L_p$. Then
 $\|k_0 * f\|_{L_p(\Omega)} \leq \|m\|_1 \|f\|_{L_p(\Omega)}$ and
 $\|k_{j+1} * f\|_{L_p(\Omega)} \leq 2 \|g\|_1 \, \omega_L(f, 2^{-(j+1)}, \Omega)_p$ for
@@ -332,7 +337,9 @@ $j \in \N$. Hence, for $s \in \R$ and $1 \leq q \leq \infty$,
 $1_\Omega (k_0 * f) = 1_\Omega (k_0 * (1_\Omega f))$ by \Cref{lem:support-principle}. For
 $j \in \N$, $k_{j+1} * f = (f - m_{2^j} * f) - (f - m_{2^{j+1}} * f)$, and \Cref{lem:cone-steps}
 bounds both terms by $\|g\|_1 \, \omega_L(f, 2^{-(j+1)}, \Omega)_p$, since the modulus
-increases in $t$.
+increases in $t$. The $\ell_q$ bound splits off the first term and shifts the others (the
+triangle inequality in $\ell_q$); with $x_j = \|k_j * f\|_{L_p(\Omega)}$,
+$w_j = \omega_L(f, 2^{-j}, \Omega)_p$ and $a = \|f\|_{L_p(\Omega)}$ it gives the last claim.
 \end{proof}
 
 \begin{theorem}[Besov spaces on Lipschitz graph domains by intrinsic differences]
@@ -394,26 +401,30 @@ For $x \in U$, $k(y) (1_W h)(x - y) = k(y) h(x - y)$ for every $y$.
   Rd.LocalMeansBump.kernel_eq_zero, Rd.centeredBumpBase, Rd.LocalMeansBump.centered,
   Rd.LocalMeansBump.centered_radius, Rd.LipschitzGraph.coneSupported_momentKernel_of,
   Rd.LipschitzGraph.coneSupported_scaled_of, Rd.LipschitzGraph.coneSupported_dual_of,
-  Rd.LipschitzGraph.coneSupported_rescale}
+  Rd.LipschitzGraph.coneSupported_rescale, Rd.LipschitzGraph.exists_coneBump_radius_le}
 \leanok
-\uses{def:local-means, def:cone-supported, lem:dilate}
+\uses{def:local-means, def:cone-supported, lem:dilate, lem:cone-bump}
 If $g$ is a bump for local means of radius $R$ (\Cref{def:local-means}) and $c > 0$, then $g_c$ is
 one of radius $R/c$; for every $R > 0$ the normalised smooth bump around $0$ is one of radius $R$.
 The kernels $m_{2^j}$, $k_j$ and $\eta_j$ of a bump of radius $R$ vanish outside the ball of radius
-$L R$, and they are supported in $-K$ if $g$ is.
+$L R$, and they are supported in $-K$ if $g$ is. For every Lipschitz graph domain $\Omega$ with
+cone $K$, every $a \geq 0$ and every $\varepsilon > 0$ there is a bump supported in $-K$ of radius
+$R \leq 1/2$ with $a R \leq \varepsilon$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 $\int g_c = \int g$ (\Cref{lem:dilate}); the kernels are linear combinations of dilations
-$g_{c'}$ with $c' \geq 1/L$.
+$g_{c'}$ with $c' \geq 1/L$. The bump of \Cref{lem:cone-bump} rescaled by
+$c = 1 + a/\varepsilon$ has radius $R = 1/(2c) \leq 1/2$, and
+$a R = a\varepsilon / (2(\varepsilon + a)) \leq \varepsilon$.
 \end{proof}
 
 \begin{lemma}[Patches]
 \label{lem:patches}
 \lean{Rd.LipschitzGraph.sub_mem_patch_of_mem_closedCone, Rd.LipschitzGraph.patch_support,
   Rd.LipschitzGraph.patch_step, Rd.setOf_lt_infDist_compl_subset, Rd.interior_patch_support,
-  Rd.interior_patch_step, Rd.measurableSet_infDist_gt}
+  Rd.interior_patch_step, Rd.measurableSet_infDist_gt, Rd.sub_mem_of_lt_infDist_of_norm_le}
 \leanok
 \uses{lem:graph-cone, lem:bumps-every-radius, def:rd-modulus-on}
 Let $g$ be a bump of radius $R$, $L \in \N$ and $\varepsilon, \delta, \rho > 0$.
@@ -430,14 +441,16 @@ Let $g$ be a bump of radius $R$, $L \in \N$ and $\varepsilon, \delta, \rho > 0$.
 For a Lipschitz graph domain $\Omega$ with the closed cone $\bar K$, every
 $x \in \Omega \cap B(c, \rho - \varepsilon)$ and every $y$ with $-y \in \bar K$ and
 $\|y\| \leq \varepsilon$, $x - y \in \Omega \cap B(c, \rho)$. For every $O \subseteq V$ and every
-$r \geq 0$, $\{\operatorname{dist}(\cdot, O^c) > r\} \subseteq O$.
+$r \geq 0$, $\{\operatorname{dist}(\cdot, O^c) > r\} \subseteq O$, and $x - y \in O$ for every
+$x$ with $\operatorname{dist}(x, O^c) > r$ and every $y$ with $\|y\| \leq r$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 The supports of the kernels lie in the ball of radius $L R$ and, in (1), in $-K$; steps in the
 cone stay in $\Omega$ (\Cref{lem:graph-cone}), and points within distance $L R$ stay in the larger
-balls.
+balls. If $\|y\| \leq r < \operatorname{dist}(x, O^c)$, then
+$\operatorname{dist}(x - y, x) < \operatorname{dist}(x, O^c)$, so $x - y \in O$.
 \end{proof}
 
 \begin{lemma}[Local means on a set]
@@ -528,12 +541,13 @@ exactly the sets of the usual definition, and the open balls and the bounded ope
 among them (\Cref{thm:bounded-lipschitz-sets}, \Cref{thm:ball-lipschitz} and
 \Cref{thm:convex-lipschitz}).
 
-\begin{lemma}[Shrinking and the inner margin]
+\begin{lemma}[Shrinking, the inner margin and pasting over the patches]
 \label{lem:bounded-lipschitz-geometry}
 \lean{Rd.BoundedLipschitzDomain.exists_shrink, Rd.BoundedLipschitzDomain.nonempty_compl,
   Rd.BoundedLipschitzDomain.exists_interior_margin, Rd.BoundedLipschitzDomain.patch,
   Rd.BoundedLipschitzDomain.isOpen_patch, Rd.BoundedLipschitzDomain.isBounded_patch,
-  Rd.BoundedLipschitzDomain.closure_subset_iUnion_patch}
+  Rd.BoundedLipschitzDomain.closure_subset_iUnion_patch,
+  Rd.BoundedLipschitzDomain.exists_of_patches}
 \leanok
 \uses{def:bounded-lipschitz, lem:patches}
 There is $\varepsilon > 0$ with $\partial\Omega \subseteq \bigcup_j B(c_j, \rho_j - 2\varepsilon)$.
@@ -541,7 +555,13 @@ In dimension $n \geq 1$, $\Omega \neq V$. If $\Omega \neq V$, there is $\delta >
 $\operatorname{dist}(x, \Omega^c) > 2\delta$ for every $x \in \Omega$ outside these balls. For
 such $\varepsilon$ and $\delta \geq 0$ the patches $B(c_j, \rho_j - 2\varepsilon)$ and
 $\{\operatorname{dist}(\cdot, \Omega^c) > 2\delta\}$ are bounded open sets that cover
-$\overline\Omega$.
+$\overline\Omega$. In dimension $n \geq 1$, let $P(U, C)$ be a property of sets $U \subseteq V$ and
+constants $C \in [0, \infty]$ that passes from the sets $\Omega \cap U_i$ of every cover
+$(U_i)$ of $\overline\Omega$ by bounded open sets, one $U_j$ for each ball $B_j$ and one inner
+set $U_\ast$, with finite constants, to $\Omega$, with a finite constant. If $P$ holds with a
+finite constant for every $\Omega \cap B(c_j, \rho_j - 2\varepsilon)$, $\varepsilon > 0$, and every
+$\Omega \cap \{\operatorname{dist}(\cdot, \Omega^c) > 2\delta\}$, $\delta > 0$, then $P$ holds for
+$\Omega$ with a finite constant.
 \end{lemma}
 
 \begin{proof}
@@ -551,7 +571,8 @@ $\bigcup_j B(c_j, \rho_j - 1/(n+1))$, and $\operatorname{dist}(\cdot, \Omega^c)$
 minimum on the compact set $\overline{\Omega} \setminus \bigcup_j B(c_j, \rho_j - 2\varepsilon)
 \subseteq \Omega$. In dimension $n \geq 1$ the space $V$ is unbounded and $\Omega$ is bounded.
 The inner patch lies in $\Omega$ (\Cref{lem:patches}), and a point of $\overline\Omega$ lies on
-$\partial\Omega$, in one of the balls, or in $\Omega$ outside them.
+$\partial\Omega$, in one of the balls, or in $\Omega$ outside them. The last statement applies the
+pasting property to the patches for such $\varepsilon$ and $\delta$.
 \end{proof}
 
 \begin{lemma}[Resolutions of unity]
@@ -5950,6 +5971,20 @@ The second identity follows with $\partial_w (G_c) = c \, (\partial_w G)_c$
 (\Cref{lem:derivative-dilate}).
 \end{proof}
 
+\begin{lemma}[The local means kernels as dilation differences]
+\label{lem:local-means-kernel-dilation}
+\lean{Rd.LocalMeansBump.kernel_succ_eq_dilate}
+\leanok
+\uses{def:local-means, lem:dilate}
+For every bump $g$, every $L \in \N$ and every $j \in \N$, the moment kernel $m$ of order $L$ and
+the local means kernels $k_j$ of order $L$ satisfy $k_{j+1} = (m_2 - m)_{2^j}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$k_{j+1} = m_{2^{j+1}} - m_{2^j}$, and $(m_2)_{2^j} = m_{2^{j+1}}$ (\Cref{lem:dilate}).
+\end{proof}
+
 \paragraph{The mean.}
 
 \begin{lemma}[The divergence kernels have mean zero]
@@ -6066,10 +6101,11 @@ $K_i(y) \neq 0$ only if $m(t y) \neq 0$ for some $t \in [1, 2]$.
 \begin{lemma}[The local means kernels as divergences]
 \label{lem:bump-divergence-identity}
 \lean{Rd.LocalMeansBump.kernel_two_succ, Rd.LocalMeansBump.kernel_two_succ_apply,
-  Rd.LocalMeansBump.integral_inner_mul_momentKernel, Rd.LocalMeansBump.isCZFamily_divKernel}
+  Rd.LocalMeansBump.integral_inner_mul_momentKernel,
+  Rd.LocalMeansBump.isCZFamily_divKernel}
 \leanok
 \uses{def:bump-divergence-kernels, thm:dilation-divergence, lem:moment-kernel-first-moment,
-  thm:mean-zero-cz-family}
+  thm:mean-zero-cz-family, lem:local-means-kernel-dilation}
 Let $g$ be a bump with the moment kernel $m$ of order two, the local means kernels $k_j$ of order
 two and the divergence kernels $K_i$. For every $j \in \N$ and every $y \in V$,
 \[
@@ -6083,20 +6119,29 @@ $((K_i)_{2^j})_{j \in \N}$ is a Calder\'on--Zygmund family with the constants $B
 
 \begin{proof}
 \leanok
-$k_{j+1} = m_{2^{j+1}} - m_{2^j} = (m_2 - m)_{2^j}$, and \Cref{thm:dilation-divergence} with
-$c = 2^j$ writes it as a divergence. The first moments vanish by
-\Cref{lem:moment-kernel-first-moment}, and \Cref{thm:mean-zero-cz-family} gives the
+$k_{j+1} = (m_2 - m)_{2^j}$ (\Cref{lem:local-means-kernel-dilation}), and
+\Cref{thm:dilation-divergence} with $c = 2^j$ writes it as a divergence. The first moments
+vanish by \Cref{lem:moment-kernel-first-moment}, and \Cref{thm:mean-zero-cz-family} gives the
 Calder\'on--Zygmund families.
 \end{proof}
 
 \begin{lemma}[Local means by the gradient at a point]
 \label{lem:local-means-gradient-point}
-\lean{Rd.LocalMeansBump.conv_kernel_two_succ_eq,
+\lean{Rd.conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp,
+  Rd.LocalMeansBump.conv_kernel_two_succ_eq,
   Rd.LocalMeansBump.dyadicWeight_mul_enorm_conv_kernel_le}
 \leanok
 \uses{def:bump-divergence-kernels, lem:bump-divergence-identity,
   lem:weak-derivative-convolution-local, lem:weak-derivative-basic, lem:dilate}
-Let $g$ be a bump with the divergence kernels $K_i$, let $T \subseteq V$ be open,
+For every open $T \subseteq V$, every $1 \leq p \leq \infty$, every finite family of words
+$u_i \in V^k$, every $f \in L_p(T)$ with weak derivatives $g_i = \partial^{u_i} f$ on $T$, all
+Schwartz functions $K_i$ with compact support, every $t \neq 0$, every $c \in \C$ and every
+$x \in V$ with $x - y \in T$ for every $i$ and every $y$ in the support of $(K_i)_t$, the kernel
+$\kappa = c \sum_i \partial^{u_i} (K_i)_t$ satisfies
+\[
+  \bigl(\kappa * \mathbf 1_T f\bigr)(x) = c \sum_i \bigl((K_i)_t * \mathbf 1_T g_i\bigr)(x) .
+\]
+In particular, let $g$ be a bump with the divergence kernels $K_i$, let $T \subseteq V$ be open,
 $1 \leq p \leq \infty$, $f \in L_p(T)$ with weak derivatives $g_i = \partial_{e_i} f$ on $T$,
 $j \in \N$ and $x \in V$ with $x - y \in T$ for every $i$ and every $y$ in the support of
 $(K_i)_{2^j}$. Then
@@ -6113,11 +6158,13 @@ and therefore
 
 \begin{proof}
 \leanok
-By \Cref{lem:bump-divergence-identity},
-$(k_{j+1} * \mathbf 1_T f)(x) = 2^{-j} \sum_i ((\partial_{e_i} (K_i)_{2^j}) * \mathbf 1_T f)(x)$,
-and $\mathbf 1_T g_i = \partial_{e_i} (\mathbf 1_T f)$ weakly on $T$
+The dilates $(K_i)_t$ are Schwartz functions with compact support (\Cref{lem:dilate}), and
+$\mathbf 1_T g_i = \partial^{u_i} (\mathbf 1_T f)$ weakly on $T$
 (\Cref{lem:weak-derivative-basic}), so \Cref{lem:weak-derivative-convolution-local} moves each
-derivative to $\mathbf 1_T f$. The bound follows from $2^{j+1} 2^{-j} = 2$.
+derivative from $\kappa$ to $\mathbf 1_T f$. For the gradient,
+$k_{j+1} = 2^{-j} \sum_i \partial_{e_i} (K_i)_{2^j}$ by \Cref{lem:bump-divergence-identity}; this
+is the general identity with $t = 2^j$, $c = 2^{-j}$ and $u_i = (e_i)$. The bound follows from
+$2^{j+1} 2^{-j} = 2$.
 \end{proof}
 
 \begin{definition}[Local means of Triebel--Lizorkin type on a set]
@@ -6273,6 +6320,34 @@ Weak derivatives on $O$ restrict to $T$ (\Cref{lem:weak-derivative-basic}), and
 $\|h\|_{L_p(T)} \leq \|h\|_{L_p(O)}$.
 \end{proof}
 
+\begin{lemma}[Bounded extensions from estimates]
+\label{lem:extends-sobolev-of-bounds}
+\lean{Rd.memLp_of_eLpNorm_add_sum_le, Rd.extendsSobolev_of_eLpNorm_le}
+\leanok
+\uses{def:extends-sobolev, lem:weak-derivative-direction-linear, lem:weak-derivative-basic}
+\begin{enumerate}
+  \item For every open $O \subseteq V$, every $U \subseteq V$, every $1 \leq p \leq \infty$ and
+    every $C < \infty$: if every $f \in L_p(O)$ with weak derivatives
+    $g_i = \partial_{e_i} f \in L_p(O)$ on $O$ agrees almost everywhere on $U$ with a function $F$
+    with weak derivatives $G_i = \partial_{e_i} F$ on $V$ and
+    \[
+      \|F\|_p + \sum_{i \in I} \|G_i\|_p \leq C \Bigl(\|f\|_{L_p(O)} + \sum_{i \in I}
+      \|g_i\|_{L_p(O)}\Bigr) ,
+    \]
+    then Sobolev functions on $O$ extend from $U$ with the constant $C$.
+  \item For every $1 \leq p \leq \infty$, all $C, X < \infty$, every $F \colon V \to \C$ and all
+    $G_k \colon V \to \C$, $k$ in a finite set, with
+    $\|F\|_p + \sum_k \|G_k\|_p \leq C X$, $F$ and every $G_k$ lie in $L_p(V)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The bound puts $F$ and every $G_i$ into $L_p(V)$ by (2); weak derivatives see only the
+classes (\Cref{lem:weak-derivative-basic}), and \Cref{lem:weak-derivative-direction-linear} (4)
+gives $F \in \Sob{1}{p}(V)$. (2) Every term of the left side is at most $C X < \infty$.
+\end{proof}
+
 \begin{theorem}[The extension from one patch]
 \label{thm:one-patch-extension}
 \lean{Rd.LocalMeansBump.extensionConst, Rd.LocalMeansBump.extensionConst_ne_top,
@@ -6305,31 +6380,12 @@ everywhere on $U$.
 
 \paragraph{Pasting in $\Sob{1}{p}(V)$.}
 
-\begin{lemma}[The product rule in $L_p$]
-\label{lem:product-rule-lp}
-\lean{Rd.hasWeakLineDeriv_mulLp, Rd.MemSobolev.mulLp}
-\leanok
-\uses{lem:weak-derivative-product, lem:product-modulus, lem:weak-derivative-basic}
-Let $1 \leq p \leq \infty$, $w \in V$, $F, G \in L_p(V)$ with $G = \partial_w F$ weakly on $V$,
-and $\chi$ a smooth real function with $\chi$ and $\partial_w \chi$ bounded. Then
-$\chi G + (\partial_w \chi) F = \partial_w (\chi F)$ weakly on $V$, with the products in
-$L_p(V)$. For every $F \in \Sob{1}{p}(V)$ and every smooth real $\chi$ with compact support,
-$\chi F \in \Sob{1}{p}(V)$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\Cref{lem:weak-derivative-product} for the representatives, and
-\Cref{lem:weak-derivative-basic}. A smooth function with compact support is bounded with all its
-derivatives.
-\end{proof}
-
 \begin{theorem}[Pasting bounded extensions]
 \label{thm:pasting-sobolev}
 \lean{Rd.pasting_bound, Rd.extendsSobolev_of_cover}
 \leanok
 \uses{def:extends-sobolev, lem:product-rule-lp, lem:resolution-of-unity, lem:product-modulus,
-  lem:weak-derivative-basic}
+  lem:weak-derivative-basic, lem:pasting-agrees}
 Let $O \subseteq V$ be open, $1 \leq p \leq \infty$, and $(U_k)_{k \in \kappa}$ a finite family of
 bounded open sets covering the closure of $O$. If for every $k$ Sobolev functions on $O$ extend
 from $O \cap U_k$ with a finite constant $C_k$, then Sobolev functions on $O$ extend from $O$
@@ -6380,6 +6436,26 @@ contain $y$ whenever they contain $c y$ for some $c \geq 1$, so they contain the
 dilates (\Cref{lem:dyadic-dilate-support}). Finally $\Omega + \bar K \subseteq \Omega$
 (\Cref{lem:graph-cone}) and
 $\|x - y - c\| < \rho - \varepsilon + 2R \leq \rho$.
+\end{proof}
+
+\begin{lemma}[Smooth cutoffs of the patches]
+\label{lem:patch-cutoffs}
+\lean{Rd.BoundedLipschitzDomain.exists_cutoff_boundary,
+  Rd.BoundedLipschitzDomain.exists_cutoff_interior}
+\leanok
+\uses{lem:smooth-cutoff-compact, lem:patches, def:bounded-lipschitz}
+Let $\Omega$ be a bounded Lipschitz domain with boundary balls $B(c_j, \rho_j)$. For every $j$
+and every $\varepsilon > 0$ there is a smooth real $\chi$ with values in $[0, 1]$, compact closed
+support in $B(c_j, \rho_j)$ and $\chi = 1$ near $\bar B(c_j, \rho_j - 2 \varepsilon)$. For every
+$\delta > 0$ there is a smooth real $\chi$ with values in $[0, 1]$, compact closed support in
+$\Omega$ and $\chi = 1$ near $\{x : \dist(x, V \setminus \Omega) \geq 2 \delta\}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The closed ball $\bar B(c_j, \rho_j - 2 \varepsilon)$ is a compact subset of $B(c_j, \rho_j)$, and
+$\{x : \dist(x, V \setminus \Omega) \geq 2 \delta\}$ is a closed bounded subset of $\Omega$
+(\Cref{lem:patches}), hence compact; take $\chi$ of \Cref{lem:smooth-cutoff-compact}.
 \end{proof}
 
 \begin{lemma}[The patches of a bounded Lipschitz domain]
@@ -6611,7 +6687,7 @@ proof of \Cref{thm:one-patch-extension}.
   Rd.sobolevExtensionOp_of_cover, Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_of_patches}
 \leanok
 \uses{thm:pasting-sobolev, def:sobolev-extension-op, lem:sobolev-jets, lem:resolution-of-unity,
-  lem:bounded-lipschitz-geometry}
+  lem:bounded-lipschitz-geometry, lem:pasting-agrees}
 Let $1 \leq p \leq \infty$.
 \begin{enumerate}
   \item For every open $O \subseteq V$, every finite cover $(U_k)_k$ of $\overline O$ by bounded
@@ -7130,37 +7206,19 @@ Minkowski's inequality and \Cref{lem:composition-measure-preserving}. The bound 
 
 \paragraph{Bounded Lipschitz domains.}
 
-\begin{lemma}[Bounded extensions from estimates]
-\label{lem:extends-sobolev-of-bounds}
-\lean{Rd.memLp_of_eLpNorm_add_sum_le, Rd.extendsSobolev_of_eLpNorm_le,
-  Rd.add_sum_le_of_le_two_mul}
+\begin{lemma}[A sum of bounds]
+\label{lem:sum-of-bounds}
+\lean{Rd.add_sum_le_of_le_two_mul}
 \leanok
-\uses{def:extends-sobolev, lem:weak-derivative-direction-linear, lem:weak-derivative-basic}
-\begin{enumerate}
-  \item For every open $O \subseteq V$, every $U \subseteq V$, every $1 \leq p \leq \infty$ and
-    every $C < \infty$: if every $f \in L_p(O)$ with weak derivatives
-    $g_i = \partial_{e_i} f \in L_p(O)$ on $O$ agrees almost everywhere on $U$ with a function $F$
-    with weak derivatives $G_i = \partial_{e_i} F$ on $V$ and
-    \[
-      \|F\|_p + \sum_{i \in I} \|G_i\|_p \leq C \Bigl(\|f\|_{L_p(O)} + \sum_{i \in I}
-      \|g_i\|_{L_p(O)}\Bigr) ,
-    \]
-    then Sobolev functions on $O$ extend from $U$ with the constant $C$.
-  \item For all $a, X, Y, K, d \in [0, \infty]$ and all $b_k \in [0, \infty]$, $k$ in a finite
-    set with $N$ elements, with $a \leq 2 X$ and $b_k \leq K (Y + d X)$ for every $k$,
-    $a + \sum_k b_k \leq (2 + N K (1 + d)) (X + Y)$.
-  \item For every $1 \leq p \leq \infty$, all $C, X < \infty$, every $F \colon V \to \C$ and all
-    $G_k \colon V \to \C$, $k$ in a finite set, with
-    $\|F\|_p + \sum_k \|G_k\|_p \leq C X$, $F$ and every $G_k$ lie in $L_p(V)$.
-\end{enumerate}
+For all $a, X, Y, K, d \in [0, \infty]$ and all $b_k \in [0, \infty]$, $k$ in a finite set with
+$N$ elements, with $a \leq 2 X$ and $b_k \leq K (Y + d X)$ for every $k$,
+$a + \sum_k b_k \leq (2 + N K (1 + d)) (X + Y)$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-(1) The bound puts $F$ and every $G_i$ into $L_p(V)$ by (3); weak derivatives see only the
-classes (\Cref{lem:weak-derivative-basic}), and \Cref{lem:weak-derivative-direction-linear} (4)
-gives $F \in \Sob{1}{p}(V)$. (2) The right side is the bound $2 X + N K (Y + d X)$ of the left
-side plus $2 Y + N K (X + d Y)$. (3) Every term of the left side is at most $C X < \infty$.
+The right side is the bound $2 X + N K (Y + d X)$ of the left side plus
+$2 Y + N K (X + d Y)$.
 \end{proof}
 
 Let $\Omega$ be a bounded Lipschitz domain with boundary balls $B(c_j, \rho_j)$, and let
@@ -7220,13 +7278,12 @@ $d \in [0, \infty]$ let
   Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_reflectionExtension_mul,
   Rd.BoundedLipschitzDomain.reflectionExtension_mul_eq_of_mem,
   Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_mul_interior,
-  Rd.BoundedLipschitzDomain.exists_cutoff_boundary,
-  Rd.BoundedLipschitzDomain.exists_cutoff_interior,
   Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary_reflection,
   Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior_cutoff}
 \leanok
 \uses{def:reflection-const, thm:graph-reflection-extension, lem:graph-reflection,
-  lem:extends-sobolev-of-bounds, lem:smooth-cutoff-compact, lem:cutoff-bound-whole-space,
+  lem:extends-sobolev-of-bounds, lem:sum-of-bounds, lem:patch-cutoffs,
+  lem:smooth-cutoff-compact, lem:cutoff-bound-whole-space,
   lem:mollification-open-set, def:bounded-lipschitz, lem:cutoff-graph-domain,
   lem:weak-derivative-basic}
 Let $\Omega$ be a bounded Lipschitz domain with boundary balls $B(c_j, \rho_j)$ and
@@ -7253,11 +7310,6 @@ $1 \leq p \leq \infty$.
       \|\chi f\|_p + \sum_{i \in I} \|G_i\|_p \leq \Bigl(1 + \sum_{i \in I} d_i\Bigr)
       \Bigl(\|f\|_{L_p(\Omega)} + \sum_{i \in I} \|g_i\|_{L_p(\Omega)}\Bigr) .
     \]
-  \item For every $j$ and every $\varepsilon > 0$ there is a smooth real $\chi$ with values in
-    $[0, 1]$, compact closed support in $B(c_j, \rho_j)$ and $\chi = 1$ near
-    $\bar B(c_j, \rho_j - 2 \varepsilon)$. For every $\delta > 0$ there is a smooth real $\chi$
-    with values in $[0, 1]$, compact closed support in $\Omega$ and $\chi = 1$ near
-    $\{x : \dist(x, V \setminus \Omega) \geq 2 \delta\}$.
   \item For every $\varepsilon > 0$, every $\delta > 0$ and every $j$, Sobolev functions on
     $\Omega$ extend with finite constants from $\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$ and
     from $\{x \in \Omega : \dist(x, V \setminus \Omega) > 2 \delta\}$.
@@ -7271,16 +7323,14 @@ has the weak derivatives $\chi g_i + (\partial_{e_i} \chi) f$ on $\Omega_j$, wit
 $\|\chi f\|_{L_p(\Omega_j)} \leq \|f\|_{L_p(\Omega)}$ and
 $\|\chi g_i + (\partial_{e_i} \chi) f\|_{L_p(\Omega_j)} \leq \|g_i\|_{L_p(\Omega)} + d_i
 \|f\|_{L_p(\Omega)}$. \Cref{thm:graph-reflection-extension} and
-\Cref{lem:extends-sobolev-of-bounds} (2) give the weak derivatives and the bound. The set
+\Cref{lem:sum-of-bounds} give the weak derivatives and the bound. The set
 $\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$ lies in $\Omega_j$, where
 $E_{\Omega_j}(\chi f) = \chi f = f$ (\Cref{lem:graph-reflection}). (2) The function $\chi f$ has
 the weak derivatives $\chi g_i + (\partial_{e_i} \chi) f$ on $V$
 (\Cref{lem:mollification-open-set} (2)), \Cref{lem:cutoff-bound-whole-space} with $\Omega$ for
-$O$ bounds them, and $\chi f = f$ where $\chi = 1$. (3) The closed ball
-$\bar B(c_j, \rho_j - 2 \varepsilon)$ is a compact subset of $B(c_j, \rho_j)$, and
-$\{x : \dist(x, V \setminus \Omega) \geq 2 \delta\}$ is a compact subset of $\Omega$; take $\chi$
-of \Cref{lem:smooth-cutoff-compact}. (4) Take the cutoffs of (3) with the bounds $d_i$ of their
-derivatives of \Cref{lem:smooth-cutoff-compact}; (1), (2) and
+$O$ bounds them, and $\chi f = f$ where $\chi = 1$. (3) Take the cutoffs of
+\Cref{lem:patch-cutoffs} with the bounds $d_i$ of their derivatives of
+\Cref{lem:smooth-cutoff-compact}; (1), (2) and
 \Cref{lem:extends-sobolev-of-bounds} (1) give the extensions, with the constants
 $C_j(\sum_i d_i)$ and $1 + \sum_i d_i$.
 \end{proof}
@@ -7358,7 +7408,7 @@ for the jets of $\Sob{1}{p}(O)$ with the constant $C$.
 \begin{proof}
 \leanok
 For a jet $(f, (g_i)_i)$ the bound puts $E f$ and its weak derivatives into $L_p(V)$
-(\Cref{lem:extends-sobolev-of-bounds} (3)). The class of $E f$ depends only on the class of $f$
+(\Cref{lem:extends-sobolev-of-bounds} (2)). The class of $E f$ depends only on the class of $f$
 on $O$, so $(f, (g_i)_i) \mapsto E f$ is linear from the jets into $L_p(V)$, and the weak
 derivatives make it a linear map into the jets (\Cref{lem:sobolev-jets} (4)). Its values lie in
 $\Sob{1}{p}(V)$ (\Cref{lem:weak-derivative-direction-linear} (4)), and the derivatives of the jet
@@ -7389,7 +7439,7 @@ both products vanish, since $\chi = 0$ there.
 \leanok
 \uses{def:reflection-const, lem:reflection-patches, lem:reflection-extension-linear,
   lem:cutoff-ae-eq, def:sobolev-extension-map, lem:sobolev-extension-map-op,
-  lem:cutoff-graph-domain, lem:smooth-cutoff-compact}
+  lem:cutoff-graph-domain, lem:smooth-cutoff-compact, lem:patch-cutoffs}
 Let $\Omega$ be a bounded Lipschitz domain with boundary balls $B(c_j, \rho_j)$ and
 $1 \leq p \leq \infty$.
 \begin{enumerate}
@@ -7416,7 +7466,7 @@ $1 \leq p \leq \infty$.
 (\Cref{lem:reflection-extension-linear} and \Cref{lem:cutoff-ae-eq}, with
 $\Omega_j \cap B(c_j, \rho_j) \subseteq \Omega$ by \Cref{lem:cutoff-graph-domain}), and
 \Cref{lem:reflection-patches} (1) and (2) give the extensions with their bounds. (3) Take the
-cutoffs of \Cref{lem:reflection-patches} (3) with the bounds $d_i$ of their derivatives of
+cutoffs of \Cref{lem:patch-cutoffs} with the bounds $d_i$ of their derivatives of
 \Cref{lem:smooth-cutoff-compact}; (1), (2) and \Cref{lem:sobolev-extension-map-op} give the
 extension operators.
 \end{proof}
@@ -7831,7 +7881,8 @@ $\rho$ vanishes outside $(0, \log 2)$ (\Cref{lem:smoothed-bump}), and $\log$ is 
   Rd.LocalMeansBump.kernel_succ_dilationSmoothed}
 \leanok
 \uses{def:smoothed-bump, def:moment-weight, lem:moment-weight-support,
-  lem:weighted-dilation-algebra, def:moment-kernel, def:local-means}
+  lem:weighted-dilation-algebra, def:moment-kernel, def:local-means,
+  lem:local-means-kernel-dilation}
 For every bump $g$ with the smoothed bump $g'$, every $L \geq 1$ and every $j \in \N$, the moment
 kernel $m'$ of
 order $L$ of $g'$ and its local means kernels $k'_j$ of order $L$ satisfy
@@ -7850,7 +7901,8 @@ By \Cref{lem:weighted-dilation-algebra} (3),
 \]
 enlarge the interval to $(-\log L, \log 2]$
 (\Cref{lem:weighted-dilation-algebra} (1)) and sum (\Cref{lem:weighted-dilation-algebra} (2)).
-Then $k'_{j+1} = (m'_2 - m')_{2^j}$, and $m'_2 = (m')_{e^{\log 2}}$ is the average with the
+Then $k'_{j+1} = (m'_2 - m')_{2^j}$ (\Cref{lem:local-means-kernel-dilation}), and
+$m'_2 = (m')_{e^{\log 2}}$ is the average with the
 weight $u_L(\cdot - \log 2)$ on $(-\log L + \log 2, 2 \log 2]$.
 \end{proof}
 
@@ -7977,7 +8029,7 @@ $\TL{m}{p}{2} \subseteq \Sob{m}{p}(V)$ and are pasted by the Leibniz rule
   Rd.LocalMeansBump.dyadicWeight_mul_enorm_conv_kernel_succ_le}
 \leanok
 \uses{def:bump-higher-kernels, thm:bump-higher-identity, thm:bump-higher-kernels-cz,
-  lem:weak-derivative-convolution-local, lem:weak-derivative-basic, lem:dilate}
+  lem:local-means-gradient-point}
 Let $g$ be a bump with the smoothed bump $g'$, let $L \geq 1$ and $m \leq L$, and let $K^L_i$,
 $i \in I^m$, be the higher divergence kernels of $g$ (\Cref{def:bump-higher-kernels}). Let
 $T \subseteq V$ be open, $1 \leq p \leq \infty$,
@@ -7997,12 +8049,10 @@ and therefore
 
 \begin{proof}
 \leanok
-$K^L_i$ has compact support (\Cref{thm:bump-higher-kernels-cz} (2)). By
-\Cref{thm:bump-higher-identity},
-$(k'_{j+1} * \mathbf 1_T f)(x) = 2^{-jm} \sum_i ((\partial^{e_i} (K^L_i)_{2^j}) * \mathbf 1_T
-f)(x)$, and $\mathbf 1_T g_i = \partial^{e_i} (\mathbf 1_T f)$ weakly on $T$
-(\Cref{lem:weak-derivative-basic}), so \Cref{lem:weak-derivative-convolution-local} moves each
-derivative to $\mathbf 1_T f$. The bound follows from $2^{(j+1)m} 2^{-jm} = 2^m$.
+$K^L_i$ has compact support (\Cref{thm:bump-higher-kernels-cz} (2)), and
+$k'_{j+1} = 2^{-jm} \sum_i \partial^{e_i} (K^L_i)_{2^j}$ by \Cref{thm:bump-higher-identity}. The
+general identity of \Cref{lem:local-means-gradient-point} with $t = 2^j$ and $c = 2^{-jm}$ gives
+the first claim, and the bound follows from $2^{(j+1)m} 2^{-jm} = 2^m$.
 \end{proof}
 
 \begin{theorem}[The local means of Triebel--Lizorkin type by the derivatives of order $m$]
@@ -8211,7 +8261,7 @@ by \Cref{lem:sums-over-words} (3), and \Cref{lem:extends-sobolev-order} (2) appl
 \uses{thm:one-patch-extension-higher, thm:bump-higher-kernels-cz, lem:smoothed-bump,
   lem:patches, lem:bumps-every-radius, lem:cone-bump, def:bounded-lipschitz, lem:graph-cone,
   lem:extends-sobolev-order, lem:leibniz-pasting, lem:smooth-cutoff-compact,
-  lem:leibniz-constant, lem:sobolev-patches}
+  lem:leibniz-constant, lem:sobolev-patches, lem:patch-cutoffs}
 \begin{enumerate}
   \item For every $m \in \N$ and every $\varepsilon > 0$,
     $(m + 1) \cdot \frac{1/2}{(m + 1)(1 + 1/\varepsilon)} \leq \varepsilon$.
@@ -8235,15 +8285,16 @@ by \Cref{lem:sums-over-words} (3), and \Cref{lem:extends-sobolev-order} (2) appl
 (1) The left side is $\varepsilon / (2 (\varepsilon + 1))$. (2) By
 \Cref{thm:bump-higher-kernels-cz} (3), $-y \in \bar K$ and $\|y\| \leq L R \leq \varepsilon$;
 then $\Omega' + \bar K \subseteq \Omega'$ (\Cref{lem:graph-cone}) and
-$\|x - y - c\| < \rho$. (3) Take the cone bump of the graph domain $\Omega_j$ rescaled to the
-radius $R = \frac{1/2}{(m + 1)(1 + 1/\varepsilon)}$ (\Cref{lem:cone-bump},
-\Cref{lem:bumps-every-radius}), so $(m + 1) R \leq \varepsilon$ by (1). Its smoothed bump has the
+$\|x - y - c\| < \rho$. (3) Take a bump of radius $R$ supported in $-K$ for the graph domain
+$\Omega_j$ with $(m + 1) R \leq \varepsilon$ (\Cref{lem:bumps-every-radius} with $a = m + 1$).
+For the cone bump of \Cref{lem:cone-bump} rescaled to the radius
+$R = \frac{1/2}{(m + 1)(1 + 1/\varepsilon)}$ this bound is (1). Its smoothed bump has the
 same radius and is supported in $-K$ (\Cref{lem:smoothed-bump}), so its dual kernels of order
 $m + 1$ satisfy the support condition of \Cref{lem:patches}, and the higher divergence kernels
 satisfy that of (2). With $U$, $W$ and $T$ as in \Cref{lem:sobolev-patches},
 \Cref{thm:one-patch-extension-higher} applies, and \Cref{lem:extends-sobolev-order} (1) passes
 from $T$ to $\Omega$. (4) The set $\{x : \dist(x, V \setminus \Omega) \geq 2 \delta\}$ is a
-compact subset of $\Omega$; take $\chi$ of \Cref{lem:smooth-cutoff-compact} equal to $1$ near it
+compact subset of $\Omega$; take $\chi$ of \Cref{lem:patch-cutoffs} equal to $1$ near it
 with compact closed support in $\Omega$. Then $\chi f = f$ on the patch, and
 \Cref{lem:leibniz-pasting} with $B = \Omega$ and \Cref{lem:extends-sobolev-order} (2) give
 the constant $\sum_{k \leq m} \sum_{w \in I^k} C_k(\chi)$, finite by
@@ -9508,7 +9559,8 @@ The Riemannian volume and the Lebesgue measure of a smooth domain are smooth mea
 \begin{lemma}[Integrals in a chart]
 \label{lem:chart-integrals}
 \lean{Manifold.IsSmoothMeasure.lintegral_source_eq, Manifold.IsSmoothMeasure.exists_density_bounds,
-  Manifold.IsSmoothMeasure.exists_lintegral_chart_le}
+  Manifold.IsSmoothMeasure.exists_lintegral_chart_le,
+  Manifold.IsSmoothMeasure.exists_eLpNorm_chart_le}
 \leanok
 \uses{def:smooth-measure}
 For a chart $e$ of the atlas and a measurable $F \geq 0$ on $M$,
@@ -9518,14 +9570,19 @@ For a chart $e$ of the atlas and a measurable $F \geq 0$ on $M$,
 For a compact $K \subseteq e.\mathrm{source}$ there are $c > 0$ and $C < \infty$ such that every
 measurable $F \geq 0$ that vanishes outside $K$ satisfies
 $\int_{\kappa(e.\mathrm{source})} F \circ \kappa^{-1} \leq c^{-1} \int_M F \, d\mu$ and
-$\int_M F \, d\mu \leq C \int_{\kappa(e.\mathrm{source})} F \circ \kappa^{-1}$.
+$\int_M F \, d\mu \leq C \int_{\kappa(e.\mathrm{source})} F \circ \kappa^{-1}$. For every
+$0 < p < \infty$ there are $c', C' < \infty$ such that every strongly measurable $G$ on $M$ that
+vanishes outside $K$ satisfies
+$\|\mathbf 1_{\kappa(e.\mathrm{source})} (G \circ \kappa^{-1})\|_p \leq c' \|G\|_{L_p(\mu)}$ and
+$\|G\|_{L_p(\mu)} \leq C' \|\mathbf 1_{\kappa(e.\mathrm{source})} (G \circ \kappa^{-1})\|_p$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 The first identity is the definition of the image measure with $F = (F \circ \kappa^{-1}) \circ
 \kappa$ on the source. The continuous density is bounded above and below by positive finite
-constants on the compact $\kappa(K)$, which carries $F \circ \kappa^{-1}$.
+constants on the compact $\kappa(K)$, which carries $F \circ \kappa^{-1}$. For the $L_p$ norms
+apply this to $F = \|G\|^p$, which vanishes outside $K$, and take $p$-th roots.
 \end{proof}
 
 \section{The Besov atlas}
@@ -9595,7 +9652,8 @@ the range of $I$.
 \label{def:chart-transition}
 \lean{Manifold.BesovAtlas.chartChange, Manifold.BesovAtlas.chartChange_apply,
   Manifold.BesovAtlas.tsupport_psi_mul_theta_subset, Manifold.BesovAtlas.transition,
-  Manifold.BesovAtlas.transition_apply}
+  Manifold.BesovAtlas.transition_apply, Manifold.BesovAtlas.transition_apply_of_mem,
+  Manifold.BesovAtlas.transition_apply_of_notMem}
 \leanok
 \uses{def:cutoff-diffeo, lem:coord-change, def:besov-atlas}
 For charts $e, e'$ of the atlas and a smooth $c : M \to \R$ with $\operatorname{tsupport} c
@@ -9605,7 +9663,9 @@ $K_0 = \kappa'(\operatorname{tsupport} c)$ is a smooth change of variables with 
 $\Omega$. For two Besov atlases $A, A'$ and charts $i$ of $A$ and $j$ of $A'$, the cut-off
 $c = \psi_i \theta'_j$ gives the change of variables $T_{ij}$, with
 $\Phi_{ij} = \kappa'_j \circ \kappa_i^{-1}$ and $\chi_{ij} = (\psi_i \theta'_j) \circ
-\kappa_j'^{-1}$.
+\kappa_j'^{-1}$. For every $G : E \to \C$ and every $y = \kappa_i(x)$ with $x$ in the source of
+$\kappa'_j$, $T_{ij} G(y) = \psi_i(x) \theta'_j(x) G(\kappa'_j(x))$, and $T_{ij} G(y) = 0$ for
+every other $y \in E$.
 \end{definition}
 
 The smoothness of $\Phi_{ij}$ and of its inverse is the compatibility of the charts in the
@@ -9636,7 +9696,7 @@ source of $\Phi_{ij}$.
 \lean{Manifold.BesovAtlas.besovNorm, Manifold.BesovAtlas.besovNorm_add_le,
   Manifold.BesovAtlas.besovNorm_const_smul, Manifold.BesovAtlas.exists_enorm_le_besovNorm}
 \leanok
-\uses{def:chart-pieces, lem:modnorm-on}
+\uses{def:chart-pieces, lem:modnorm-on, lem:chart-integrals}
 For a Besov atlas $A$, $r \in \N$, $s \in \R$ and $1 \leq q \leq \infty$,
 \begin{gather*}
   \|f\|_{A, r, s, q} = \sum_i N_\Omega\bigl((\psi_i f) \circ \kappa_i^{-1}\bigr), \\

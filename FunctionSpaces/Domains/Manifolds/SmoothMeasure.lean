@@ -28,7 +28,7 @@ The Riemannian volume and the Lebesgue measure of a smooth domain are smooth mea
 compact subset `K` of the source, the density is bounded above and below on `κ(K)`, so the
 integrals over `M` and over the chart are comparable
 (`Manifold.IsSmoothMeasure.exists_lintegral_chart_le`): the `L_p` norms on `M` and in the chart
-are equivalent for such functions.
+are equivalent for such functions (`Manifold.IsSmoothMeasure.exists_eLpNorm_chart_le`).
 -/
 
 @[expose] public section
@@ -168,6 +168,41 @@ theorem exists_lintegral_chart_le {e : OpenPartialHomeomorph M H} (he : e ∈ at
               exact hne (hFK _ h)
             exact mul_le_mul' (hbd y ⟨_, hx, (e.extend I).right_inv hy⟩).2 le_rfl
       _ = C * ∫⁻ y in T, F ((e.extend I).symm y) := lintegral_const_mul' _ _ hC
+
+variable (μ) in
+/-- **`L_p` norms on `M` and in a chart are comparable** for strongly measurable functions that
+vanish outside a compact subset `K` of the source of a chart `e` of the atlas: for `0 < p < ∞`
+there are `c, C < ∞` with `‖1_{κ(e.source)} (G ∘ κ⁻¹)‖_p ≤ c ‖G‖_{L_p(μ)}` and
+`‖G‖_{L_p(μ)} ≤ C ‖1_{κ(e.source)} (G ∘ κ⁻¹)‖_p`
+(`Manifold.IsSmoothMeasure.exists_lintegral_chart_le` for `‖G‖^p`, with Mathlib's
+`MeasureTheory.eLpNorm_indicator_eq_eLpNorm_restrict` for the indicator). -/
+theorem exists_eLpNorm_chart_le {e : OpenPartialHomeomorph M H} (he : e ∈ atlas H M)
+    {K : Set M} (hK : IsCompact K) (hKs : K ⊆ e.source) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
+    {F : Type*} [NormedAddCommGroup F] :
+    ∃ c C : ℝ≥0∞, c ≠ ∞ ∧ C ≠ ∞ ∧ ∀ G : M → F, StronglyMeasurable G → (∀ x ∉ K, G x = 0) →
+      eLpNorm ((e.extend I).target.indicator fun y => G ((e.extend I).symm y)) p volume ≤
+          c * eLpNorm G p μ ∧
+        eLpNorm G p μ ≤
+          C * eLpNorm ((e.extend I).target.indicator fun y => G ((e.extend I).symm y)) p
+            volume := by
+  obtain ⟨c, C, hc, hC, hcmp⟩ := exists_lintegral_chart_le (I := I) μ he hK hKs
+  have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  refine ⟨c⁻¹ ^ (1 / p.toReal), C ^ (1 / p.toReal),
+    ENNReal.rpow_ne_top_of_nonneg (by positivity) (ENNReal.inv_ne_top.2 hc),
+    ENNReal.rpow_ne_top_of_nonneg (by positivity) hC, fun G hG hGK => ?_⟩
+  have hT := measurableSet_extend_target I e
+  have hκ : AEMeasurable (e.extend I).symm (volume.restrict (e.extend I).target) :=
+    (e.continuousOn_extend_symm (I := I)).aemeasurable hT
+  have hFK : ∀ x ∉ K, ‖G x‖ₑ ^ p.toReal = 0 := fun x hx => by
+    rw [hGK x hx, enorm_zero, ENNReal.zero_rpow_of_pos hr]
+  obtain ⟨h1, h2⟩ := hcmp _ (hG.enorm.pow_const _) hFK
+  rw [eLpNorm_indicator_eq_eLpNorm_restrict hT,
+    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (f := fun y => G ((e.extend I).symm y))
+      (hG.aestronglyMeasurable.comp_aemeasurable hκ),
+    eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hG.aestronglyMeasurable,
+    ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity : (0 : ℝ) ≤ 1 / p.toReal),
+    ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity : (0 : ℝ) ≤ 1 / p.toReal)]
+  exact ⟨ENNReal.rpow_le_rpow h1 (by positivity), ENNReal.rpow_le_rpow h2 (by positivity)⟩
 
 end IsSmoothMeasure
 
