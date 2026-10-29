@@ -7,6 +7,7 @@ module
 
 public import FunctionSpaces.Analysis.Fourier.Convolution
 public import Mathlib.Topology.Algebra.InfiniteSum.NatInt
+public import ApproximationSpaces.Sequences.Hardy
 
 /-!
 # Sequences on `ℕ^d`
@@ -177,15 +178,6 @@ theorem tsum_almostDiagProfile_le (s L : ℝ) (hs : 0 ≤ s) :
     push_cast
     nlinarith
 
-/-- The constant `(1 - 2^(-(L-s)))⁻¹ + (1 - 2^(-s))⁻¹` of the almost diagonal lemma. -/
-noncomputable def almostDiagConst (s L : ℝ) : ℝ≥0∞ :=
-  (1 - (2 : ℝ≥0∞) ^ (-(L - s)))⁻¹ + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹
-
-/-- The constant of the almost diagonal lemma is finite for `0 < s < L`. -/
-theorem almostDiagConst_ne_top {s L : ℝ} (hs : 0 < s) (hsL : s < L) : almostDiagConst s L ≠ ∞ :=
-  ENNReal.add_ne_top.2 ⟨ENNReal.one_sub_two_rpow_neg_inv_ne_top (by linarith),
-    ENNReal.one_sub_two_rpow_neg_inv_ne_top hs⟩
-
 /-- **The almost diagonal lemma on `ℕ^d`**: for `0 < s < L` and `1 ≤ q ≤ ∞`,
 `‖(2^(s|m|_1) ∑_k ∏_i c(m_i, k_i) a_k)_m‖_{ℓ_q} ≤ C^d ‖(2^(s|k|_1) a_k)_k‖_{ℓ_q}` with
 `C = (1 - 2^(-(L-s)))⁻¹ + (1 - 2^(-s))⁻¹`, by the Schur test: the matrix
@@ -195,8 +187,8 @@ theorem lqNorm_almostDiagonal_pi_le (hq : 1 ≤ q) {s L : ℝ} (hs : 0 ≤ s)
     (a : (Fin d → ℕ) → ℝ≥0∞) :
     lqNorm q (fun m => mixedWeight s m *
         ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * a k) ≤
-      almostDiagConst s L ^ d * lqNorm q (fun k => mixedWeight s k * a k) := by
-  set C := almostDiagConst s L
+      ENNReal.almostDiagonalConst s L ^ d * lqNorm q (fun k => mixedWeight s k * a k) := by
+  set C := ENNReal.almostDiagonalConst s L
   set w : (Fin d → ℕ) → (Fin d → ℕ) → ℝ≥0∞ := fun m k =>
     ∏ i, almostDiagProfile s L ((m i : ℤ) - k i)
   have hw : ∀ m k, mixedWeight s m * (∏ i, almostDiagCoeff L (m i) (k i)) * mixedWeight (-s) k =
@@ -236,7 +228,7 @@ theorem lqNorm_le_of_le_almostDiagonal_pi (hq : 1 ≤ q) {s L : ℝ} (hs : 0 ≤
     {a x : (Fin d → ℕ) → ℝ≥0∞}
     (ha : ∀ m, a m ≤ C ^ d * ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * x k) :
     lqNorm q (fun m => mixedWeight s m * a m) ≤
-      (C * almostDiagConst s L) ^ d * lqNorm q (fun k => mixedWeight s k * x k) := by
+      (C * ENNReal.almostDiagonalConst s L) ^ d * lqNorm q (fun k => mixedWeight s k * x k) := by
   calc lqNorm q (fun m => mixedWeight s m * a m)
       ≤ lqNorm q (fun m => C ^ d * (mixedWeight s m *
           ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * x k)) :=
@@ -248,7 +240,7 @@ theorem lqNorm_le_of_le_almostDiagonal_pi (hq : 1 ≤ q) {s L : ℝ} (hs : 0 ≤
             _ = _ := by ring
     _ = C ^ d * lqNorm q (fun m => mixedWeight s m *
           ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * x k) := ENNReal.lqNorm_const_mul _ _
-    _ ≤ C ^ d * (almostDiagConst s L ^ d * lqNorm q (fun k => mixedWeight s k * x k)) :=
+    _ ≤ C ^ d * (ENNReal.almostDiagonalConst s L ^ d * lqNorm q (fun k => mixedWeight s k * x k)) :=
         mul_le_mul' le_rfl (lqNorm_almostDiagonal_pi_le hq hs _)
     _ = _ := by rw [mul_pow, mul_assoc]
 

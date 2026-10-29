@@ -14,13 +14,17 @@ public import Mathlib.MeasureTheory.Integral.Lebesgue.DominatedConvergence
 /-!
 # Approximate identities in `L_p`
 
+**Changes of scale**: `∫ f(r x) dμ(x) = |r|^(-n) ∫ f dμ` for `r ≠ 0`, every additive Haar
+measure `μ` and every `f : V → [0, ∞]`, also over sets (`Rd.lintegral_comp_smul`,
+`Rd.setLIntegral_comp_smul`, `Rd.lintegral_comp_two_pow_smul`).
+
 The **dilation** `Φ_c(x) = c^n Φ(c x)`, `n = dim V`, keeps the integral and the `L_1` norm of `Φ`
-(`Rd.integral_dilate`, `Rd.eLpNorm_dilate_one`) and compact supports
-(`Rd.hasCompactSupport_dilate`); every `x` in its support has `c x` in the support of `Φ`, so the
-support shrinks into small balls as `c → ∞` (`Rd.smul_mem_tsupport_of_mem_tsupport_dilate`,
-`Rd.norm_le_of_mem_tsupport_dilate`, `Rd.eventually_tsupport_dilate_add_subset_thickening`).
-The convolution with `Φ_c` averages `f` over
-the shifts `c^(-1) z` weighted by `Φ(z)`: `(Φ_c ⋆ f)(x) = ∫ Φ(z) f(x - c^(-1) z) dz`
+(`Rd.integral_dilate`, `Rd.lintegral_enorm_dilate`, `Rd.eLpNorm_dilate_one`) and compact
+supports (`Rd.hasCompactSupport_dilate`); every `x` in its support has `c x` in the support of
+`Φ`, so the support shrinks into small balls as `c → ∞`
+(`Rd.smul_mem_tsupport_of_mem_tsupport_dilate`, `Rd.norm_le_of_mem_tsupport_dilate`,
+`Rd.eventually_tsupport_dilate_add_subset_thickening`). The convolution with `Φ_c` averages `f`
+over the shifts `c^(-1) z` weighted by `Φ(z)`: `(Φ_c ⋆ f)(x) = ∫ Φ(z) f(x - c^(-1) z) dz`
 (`Rd.conv_dilate_apply`, Mathlib's `Measure.integral_comp_smul`).
 
 **Approximate identities** (`Rd.tendsto_eLpNorm_conv_dilate_sub`): for an integrable `Φ` with
@@ -78,6 +82,47 @@ omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] in
 theorem eLpNorm_comp_sub_right {f : V → ℂ} (hf : AEStronglyMeasurable f μ) (p : ℝ≥0∞) (w : V) :
     eLpNorm (fun x => f (x - w)) p μ = eLpNorm f p μ :=
   eLpNorm_comp_measurePreserving hf (measurePreserving_sub_right μ w)
+
+/-! ### Changes of scale -/
+
+/-- **Integrals under a change of scale**: `∫ f(r x) dμ(x) = |r^(-n)| ∫ f dμ` for `r ≠ 0`, every
+additive Haar measure `μ` and every `f : V → [0, ∞]` (Mathlib's `Measure.map_addHaar_smul`). -/
+theorem lintegral_comp_smul (f : V → ℝ≥0∞) {r : ℝ} (hr : r ≠ 0) :
+    ∫⁻ x, f (r • x) ∂μ = ENNReal.ofReal |(r ^ finrank ℝ V)⁻¹| * ∫⁻ x, f x ∂μ := by
+  rw [← smul_eq_mul, ← lintegral_smul_measure, ← Measure.map_addHaar_smul μ hr]
+  exact (lintegral_map_equiv f (Homeomorph.smulOfNeZero r hr).toMeasurableEquiv).symm
+
+open scoped Pointwise in
+/-- The set version of `Rd.lintegral_comp_smul`: `∫_s f(r x) dμ(x) = |r^(-n)| ∫_{r s} f dμ` for
+every set `s`, since `x ↦ r x` is a measurable equivalence (Mathlib's
+`MeasurableEmbedding.restrict_map`). -/
+theorem setLIntegral_comp_smul (f : V → ℝ≥0∞) {r : ℝ} (hr : r ≠ 0) (s : Set V) :
+    ∫⁻ x in s, f (r • x) ∂μ = ENNReal.ofReal |(r ^ finrank ℝ V)⁻¹| * ∫⁻ x in r • s, f x ∂μ := by
+  let e := (Homeomorph.smulOfNeZero (α := V) r hr).toMeasurableEquiv
+  have hpre : e ⁻¹' (r • s) = s := by
+    ext x
+    exact Set.smul_mem_smul_set_iff₀ hr s x
+  rw [← smul_eq_mul, ← lintegral_smul_measure, ← Measure.restrict_smul,
+    ← Measure.map_addHaar_smul μ hr]
+  rw [show (fun x : V => r • x) = ⇑e from rfl, e.measurableEmbedding.restrict_map,
+    lintegral_map_equiv, hpre]
+  rfl
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+open scoped Pointwise in
+/-- `r {z : a ≤ ‖z‖} = {u : r a ≤ ‖u‖}` for `r > 0`. -/
+theorem smul_setOf_le_norm {r : ℝ} (hr : 0 < r) (a : ℝ) :
+    r • {z : V | a ≤ ‖z‖} = {u : V | r * a ≤ ‖u‖} := by
+  ext u
+  rw [Set.mem_smul_set_iff_inv_smul_mem₀ hr.ne', Set.mem_ofPred_eq, Set.mem_ofPred_eq, norm_smul,
+    Real.norm_of_nonneg (inv_nonneg.2 hr.le), le_inv_mul_iff₀ hr]
+
+/-- `∫ f(2^j x) dμ(x) = 2^(-jn) ∫ f dμ`. -/
+theorem lintegral_comp_two_pow_smul (f : V → ℝ≥0∞) (j : ℕ) :
+    ∫⁻ x, f (((2 : ℝ) ^ j) • x) ∂μ = (2 ^ (j * finrank ℝ V))⁻¹ * ∫⁻ x, f x ∂μ := by
+  rw [lintegral_comp_smul f (by positivity), abs_of_pos (by positivity), ← pow_mul,
+    ENNReal.ofReal_inv_of_pos (by positivity), ENNReal.ofReal_pow zero_le_two,
+    ENNReal.ofReal_ofNat]
 
 /-! ### Dilations -/
 
@@ -149,20 +194,26 @@ theorem integral_dilate (Φ : V → ℂ) {c : ℝ} (hc : 0 < c) :
     Complex.real_smul, ← mul_assoc, ← Complex.ofReal_mul, mul_inv_cancel₀ hpow.ne',
     Complex.ofReal_one, one_mul]
 
-/-- **The dilation keeps the `L_1` norm**: `‖Φ_c‖_1 = ‖Φ‖_1` for `c > 0`. -/
+/-- **Dilations keep the `L_1` norm of every function**: `∫ |F_c| dμ = ∫ |F| dμ` for `c > 0` and
+every `F : V → ℂ`, integrable or not, by the change of scale `u = c x`
+(`Rd.lintegral_comp_smul`). -/
+theorem lintegral_enorm_dilate (F : V → ℂ) {c : ℝ} (hc : 0 < c) :
+    ∫⁻ x, ‖dilate c F x‖ₑ ∂μ = ∫⁻ x, ‖F x‖ₑ ∂μ := by
+  have hpow : (0 : ℝ) < c ^ finrank ℝ V := pow_pos hc _
+  have h : ∀ x, ‖dilate c F x‖ₑ = ENNReal.ofReal (c ^ finrank ℝ V) * ‖F (c • x)‖ₑ := fun x => by
+    rw [dilate, enorm_mul, ← ofReal_norm (((c ^ finrank ℝ V : ℝ)) : ℂ), Complex.norm_real,
+      Real.norm_of_nonneg hpow.le]
+  simp_rw [h]
+  rw [lintegral_const_mul' _ _ ENNReal.ofReal_ne_top, lintegral_comp_smul (fun u => ‖F u‖ₑ) hc.ne',
+    ← mul_assoc, abs_of_pos (inv_pos.2 hpow), ← ENNReal.ofReal_mul hpow.le,
+    mul_inv_cancel₀ hpow.ne', ENNReal.ofReal_one, one_mul]
+
+/-- **The dilation keeps the `L_1` norm**: `‖Φ_c‖_1 = ‖Φ‖_1` for `c > 0`
+(`Rd.lintegral_enorm_dilate`). -/
 theorem eLpNorm_dilate_one {Φ : V → ℂ} (hΦ : Integrable Φ μ) {c : ℝ} (hc : 0 < c) :
     eLpNorm (dilate c Φ) 1 μ = eLpNorm Φ 1 μ := by
-  have hpow : (0 : ℝ) < c ^ finrank ℝ V := pow_pos hc _
-  have hd := integrable_dilate hΦ hc.ne'
-  rw [eLpNorm_one_eq_lintegral_enorm hd.aestronglyMeasurable,
-    eLpNorm_one_eq_lintegral_enorm hΦ.aestronglyMeasurable,
-    ← ofReal_integral_norm_eq_lintegral_enorm hd, ← ofReal_integral_norm_eq_lintegral_enorm hΦ]
-  congr 1
-  have hnorm : ∀ x, ‖dilate c Φ x‖ = c ^ finrank ℝ V * ‖Φ (c • x)‖ := fun x => by
-    rw [dilate, norm_mul, Complex.norm_real, Real.norm_eq_abs, abs_of_pos hpow]
-  simp_rw [hnorm]
-  rw [integral_const_mul, Measure.integral_comp_smul μ (fun y => ‖Φ y‖) c,
-    abs_of_pos (inv_pos.2 hpow), smul_eq_mul, ← mul_assoc, mul_inv_cancel₀ hpow.ne', one_mul]
+  rw [eLpNorm_one_eq_lintegral_enorm (integrable_dilate hΦ hc.ne').aestronglyMeasurable,
+    eLpNorm_one_eq_lintegral_enorm hΦ.aestronglyMeasurable, lintegral_enorm_dilate Φ hc]
 
 /-- **Convolution with a dilation**: `(Φ_c ⋆ f)(x) = ∫ Φ(z) f(x - c^(-1) z) dz` for `c > 0`
 (substitute `y = c^(-1) z`, Mathlib's `Measure.integral_comp_smul`). -/

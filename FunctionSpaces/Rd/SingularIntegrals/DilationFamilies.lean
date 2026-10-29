@@ -136,20 +136,6 @@ theorem dilate_sub (c : ℝ) (F G : V → ℂ) : dilate c (F - G) = dilate c F -
   funext x
   simp only [dilate, Pi.sub_apply, mul_sub]
 
-/-- Dilations by `c > 0` keep the `L_1` norm of every function: `∫ |F_c| = ∫ |F|`, by the
-change of scale `u = c x` (`Rd.lintegral_comp_smul`). Unlike `Rd.eLpNorm_dilate_one`, this needs
-no integrability of `F`. -/
-theorem lintegral_enorm_dilate (F : V → ℂ) {c : ℝ} (hc : 0 < c) :
-    ∫⁻ x, ‖dilate c F x‖ₑ = ∫⁻ x, ‖F x‖ₑ := by
-  have hpow : (0 : ℝ) < c ^ finrank ℝ V := pow_pos hc _
-  have h : ∀ x, ‖dilate c F x‖ₑ = ENNReal.ofReal (c ^ finrank ℝ V) * ‖F (c • x)‖ₑ := fun x => by
-    rw [dilate, enorm_mul, ← ofReal_norm (((c ^ finrank ℝ V : ℝ)) : ℂ), Complex.norm_real,
-      Real.norm_of_nonneg hpow.le]
-  simp_rw [h]
-  rw [lintegral_const_mul' _ _ ENNReal.ofReal_ne_top, lintegral_comp_smul (fun u => ‖F u‖ₑ) hc.ne',
-    ← mul_assoc, abs_of_pos (inv_pos.2 hpow), ← ENNReal.ofReal_mul hpow.le,
-    mul_inv_cancel₀ hpow.ne', ENNReal.ofReal_one, one_mul]
-
 /-! ### Uniform Schwartz families -/
 
 /-- A family `(G_j)_{j ∈ ℕ}` of Schwartz functions is **uniformly Schwartz with bounds `A`** if

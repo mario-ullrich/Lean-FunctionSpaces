@@ -541,30 +541,12 @@ theorem modNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0�
     rw [← mul_assoc]
     exact b.lpModulus_dual_le hp L i j _
   have hlq : lqNorm q (fun i => dyadicWeight s i * lpModulus p L F i) ≤
-      b.dualConst L *
-        (((1 - (2 : ℝ≥0∞) ^ (-((L : ℝ) - s)))⁻¹ + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹) * X) := by
-    calc lqNorm q (fun i => dyadicWeight s i * lpModulus p L F i)
-        ≤ lqNorm q (fun i => b.dualConst L * (dyadicWeight s i *
-            ∑' j, (if j ≤ i then dyadicWeight (-(L : ℝ)) (i - j) else 1) * a j)) :=
-          ENNReal.lqNorm_mono fun i => by
-            calc dyadicWeight s i * lpModulus p L F i
-                ≤ dyadicWeight s i * (b.dualConst L *
-                    ∑' j, (if j ≤ i then dyadicWeight (-(L : ℝ)) (i - j) else 1) * a j) :=
-                  mul_le_mul' le_rfl (hmod i)
-              _ = b.dualConst L * (dyadicWeight s i *
-                    ∑' j, (if j ≤ i then dyadicWeight (-(L : ℝ)) (i - j) else 1) * a j) := by
-                  ring
-      _ = b.dualConst L * lqNorm q (fun i => dyadicWeight s i *
-            ∑' j, (if j ≤ i then dyadicWeight (-(L : ℝ)) (i - j) else 1) * a j) :=
-          ENNReal.lqNorm_const_mul _ _
-      _ ≤ b.dualConst L *
-            (((1 - (2 : ℝ≥0∞) ^ (-((L : ℝ) - s)))⁻¹ + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹) * X) :=
-          mul_le_mul' le_rfl (ENNReal.lqNorm_almostDiagonal_le hq s L a)
+      b.dualConst L * ENNReal.almostDiagonalConst s L * X :=
+    ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq s L hmod
   calc ‖F‖ₑ + lqNorm q (fun i => dyadicWeight s i * lpModulus p L F i)
-      ≤ 2 * M * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X + b.dualConst L *
-          (((1 - (2 : ℝ≥0∞) ^ (-((L : ℝ) - s)))⁻¹ + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹) * X) :=
-        add_le_add hnorm hlq
-    _ = _ := by rw [synthConst]; ring
+      ≤ 2 * M * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X +
+          b.dualConst L * ENNReal.almostDiagonalConst s L * X := add_le_add hnorm hlq
+    _ = _ := by rw [synthConst, ENNReal.almostDiagonalConst]; ring
 
 /-- **The modulus is bounded by the local means**: for `0 < s < L`,
 `‖f‖_p + ‖(2^(is) ω_L(f, 2^(-i))_p)_i‖_{ℓ_q} ≤ C ‖(2^(js) ‖k_j ⋆ f‖_p)_j‖_{ℓ_q}`, by the

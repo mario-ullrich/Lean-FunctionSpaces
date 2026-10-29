@@ -27,10 +27,11 @@ bounded by `2^n t` almost everywhere (`Rd.ae_enorm_czGoodC_le`) and has
 The definitions take the cube function `G` as an argument, so the scalar case and the family
 case use the same definitions. The bounds of the good part follow from the comparison
 `‖czGoodC f‖ ≤ czGood ‖f‖` (`Rd.enorm_czGoodC_le`) with the nonnegative good part, and those of
-the bad pieces from general facts on means over a set `s` of finite measure:
-`‖⨍_s f‖ ≤ ⨍_s ‖f‖` (`MeasureTheory.enorm_average_le`), `∫_s ‖f - ⨍_s f‖ ≤ 2 ∫_s ‖f‖`
-(`MeasureTheory.setLIntegral_enorm_sub_setAverage_le`) and its `ℓ_q`-valued form. A last general
-fact is `∫ u² ≤ c ∫ u` for `u ≤ c` (`MeasureTheory.lintegral_sq_le_mul_lintegral_of_ae_le`).
+the bad pieces from general facts on means: `‖⨍ f‖ ≤ ⨍ ‖f‖` for every measure
+(`MeasureTheory.enorm_average_le`) and, for a set `s` of finite measure,
+`∫_s ‖f - ⨍_s f‖ ≤ 2 ∫_s ‖f‖` (`MeasureTheory.setLIntegral_enorm_sub_setAverage_le`) and its
+`ℓ_q`-valued form. The `L_2` bounds of the good part use `∫ u² ≤ c ∫ u` for `u ≤ c`
+(`MeasureTheory.lintegral_sq_le_mul_lintegral_of_ae_le`).
 
 The Carleson project (`github.com/fpvandoorn/carleson`) has a scalar Calderón–Zygmund
 decomposition on doubling metric measure spaces (`czApproximation`, `czRemainder`).
@@ -46,33 +47,6 @@ namespace MeasureTheory
 
 variable {α E : Type*} [MeasurableSpace α] {μ : Measure α} [NormedAddCommGroup E]
   [NormedSpace ℝ E]
-
-/-- The norm of a mean is at most the mean of the norm: `‖⨍ f dμ‖ ≤ ⨍ ‖f‖ dμ` in `[0, ∞]`, for
-every function `f` with values in a real normed space. Both means are integrals for the
-normalised measure `μ(α)⁻¹ μ`. -/
-theorem enorm_average_le (f : α → E) : ‖⨍ x, f x ∂μ‖ₑ ≤ ⨍⁻ x, ‖f x‖ₑ ∂μ := by
-  rw [average_eq', laverage_eq']
-  exact enorm_integral_le_lintegral_enorm f
-
-/-- `μ(s) ‖⨍_s f‖ ≤ ∫_s ‖f‖` for every set `s` of finite measure and every function `f` with
-values in a real normed space, by `MeasureTheory.enorm_average_le` and Mathlib's
-`measure_mul_setLAverage`. -/
-theorem measure_mul_enorm_setAverage_le {s : Set α} (hs : μ s ≠ ∞) (f : α → E) :
-    μ s * ‖⨍ x in s, f x ∂μ‖ₑ ≤ ∫⁻ x in s, ‖f x‖ₑ ∂μ :=
-  (mul_le_mul_right (enorm_average_le f) _).trans_eq (measure_mul_setLAverage _ hs)
-
-/-- **The mass of `f` minus its mean**: `∫_s ‖f - ⨍_s f‖ ≤ 2 ∫_s ‖f‖` for every set `s` of finite
-measure and every function `f` with values in a real normed space, since
-`‖f - ⨍_s f‖ ≤ ‖f‖ + ‖⨍_s f‖` and `μ(s) ‖⨍_s f‖ ≤ ∫_s ‖f‖`. -/
-theorem setLIntegral_enorm_sub_setAverage_le {s : Set α} (hs : μ s ≠ ∞) (f : α → E) :
-    ∫⁻ x in s, ‖f x - ⨍ y in s, f y ∂μ‖ₑ ∂μ ≤ 2 * ∫⁻ x in s, ‖f x‖ₑ ∂μ :=
-  calc ∫⁻ x in s, ‖f x - ⨍ y in s, f y ∂μ‖ₑ ∂μ
-      ≤ ∫⁻ x in s, (‖f x‖ₑ + ‖⨍ y in s, f y ∂μ‖ₑ) ∂μ := lintegral_mono fun _ => enorm_sub_le
-    _ = (∫⁻ x in s, ‖f x‖ₑ ∂μ) + μ s * ‖⨍ y in s, f y ∂μ‖ₑ := by
-        rw [lintegral_add_right _ measurable_const, setLIntegral_const, mul_comm]
-    _ ≤ (∫⁻ x in s, ‖f x‖ₑ ∂μ) + ∫⁻ x in s, ‖f x‖ₑ ∂μ :=
-        add_le_add le_rfl (measure_mul_enorm_setAverage_le hs f)
-    _ = 2 * ∫⁻ x in s, ‖f x‖ₑ ∂μ := (two_mul _).symm
 
 section Countable
 
@@ -112,15 +86,6 @@ theorem setLIntegral_lqNorm_sub_setAverage_le (hq : 1 ≤ q)
     _ = 2 * ∫⁻ x in s, lqNorm q (fun i => ‖g i x‖ₑ) ∂μ := (two_mul _).symm
 
 end Countable
-
-/-- If `u ≤ c` almost everywhere, then `∫ u² ≤ c ∫ u`, for every almost everywhere measurable
-`u : α → [0, ∞]`: the case `r = 2` of
-`MeasureTheory.lintegral_rpow_le_mul_lintegral_of_ae_le`. -/
-theorem lintegral_sq_le_mul_lintegral_of_ae_le {u : α → ℝ≥0∞} {c : ℝ≥0∞} (hu : AEMeasurable u μ)
-    (h : ∀ᵐ x ∂μ, u x ≤ c) : ∫⁻ x, u x ^ 2 ∂μ ≤ c * ∫⁻ x, u x ∂μ := by
-  have h2 := lintegral_rpow_le_mul_lintegral_of_ae_le one_le_two hu h
-  norm_num [ENNReal.rpow_two] at h2
-  exact h2
 
 end MeasureTheory
 

@@ -49,30 +49,6 @@ open scoped ENNReal
 
 open ENNReal (lqNorm dyadicWeight)
 
-namespace ENNReal
-
-/-- **Dividing by a smaller power**: if `w ≤ c v` with `0 < c < ∞` and `a ≥ 0`, then
-`u / v^a ≤ c^a (u / w^a)` in `[0, ∞]`. -/
-theorem div_rpow_le_rpow_mul_div_rpow {u v w c : ℝ≥0∞} (hc0 : c ≠ 0) (hct : c ≠ ∞)
-    (hw : w ≤ c * v) {a : ℝ} (ha : 0 ≤ a) : u / v ^ a ≤ c ^ a * (u / w ^ a) := by
-  have hca0 : c ^ a ≠ 0 := (ENNReal.rpow_pos (pos_iff_ne_zero.2 hc0) hct).ne'
-  have hcat : c ^ a ≠ ∞ := ENNReal.rpow_ne_top_of_nonneg ha hct
-  calc u / v ^ a = c ^ a * u / (c ^ a * v ^ a) := (ENNReal.mul_div_mul_left _ _ hca0 hcat).symm
-    _ ≤ c ^ a * u / w ^ a := ENNReal.div_le_div_left (by
-        rw [← ENNReal.mul_rpow_of_nonneg _ _ ha]
-        exact ENNReal.rpow_le_rpow hw ha) _
-    _ = c ^ a * (u / w ^ a) := mul_div_assoc _ _ _
-
-/-- `a Y + b X + c X ≤ (a + b + c) (X + Y)` in `[0, ∞]`. -/
-theorem mul_add_mul_add_mul_le (a b c X Y : ℝ≥0∞) :
-    a * Y + b * X + c * X ≤ (a + b + c) * (X + Y) :=
-  calc a * Y + b * X + c * X ≤ a * (X + Y) + b * (X + Y) + c * (X + Y) :=
-        add_le_add (add_le_add (mul_le_mul' le_rfl le_add_self) (mul_le_mul' le_rfl le_self_add))
-          (mul_le_mul' le_rfl le_self_add)
-    _ = (a + b + c) * (X + Y) := by ring
-
-end ENNReal
-
 namespace Rd
 
 /-! ### Gagliardo integrands and double integrals -/
@@ -731,8 +707,7 @@ theorem slobodeckijForm_chartPiece_le (ψ : Ω.BoundaryPartition) (j : Fin Ω.N)
     Ω.chartPiece_integrand_le_add ψ j hr hsub hP1 ha g x' y').trans (le_of_eq ?_)
   rw [lintegral_lintegral_add_right _ hT', lintegral_lintegral_add_right _ hT,
     lintegral_lintegral_swap hT'.aemeasurable,
-    lintegral_lintegral_const_mul' (ENNReal.rpow_ne_top_of_nonneg (by linarith)
-      ENNReal.ofNat_ne_top), lintegral_lintegral_add_right _ hB,
+    lintegral_lintegral_const_mul' (ENNReal.two_rpow_ne_top _), lintegral_lintegral_add_right _ hB,
     lintegral_lintegral_const_mul' (ENNReal.mul_ne_top
       (ENNReal.rpow_ne_top_of_nonneg (by linarith) ENNReal.ofReal_ne_top)
       (ENNReal.rpow_ne_top_of_nonneg ha ENNReal.ofReal_ne_top)), add_assoc, ← two_mul]
@@ -764,7 +739,7 @@ theorem exists_slobodeckijForm_chartPiece_le (ψ : Ω.BoundaryPartition) (j : Fi
     rw [(Ω.graph j).finrank_hyperplane_eq_sub_one]
     exact lt_add_of_pos_right _ (mul_pos hs hP)
   have h2 : (2 : ℝ≥0∞) ^ (p.toReal - 1) ≠ ∞ :=
-    ENNReal.rpow_ne_top_of_nonneg (by linarith) ENNReal.ofNat_ne_top
+    ENNReal.two_rpow_ne_top _
   have hD : ENNReal.ofReal (ψ.derivBound j) ^ p.toReal ≠ ∞ :=
     ENNReal.rpow_ne_top_of_nonneg hP.le ENNReal.ofReal_ne_top
   have hc : ENNReal.ofReal (1 + (Ω.graph j).M) ^ (((finrank ℝ V - 1 : ℕ) : ℝ) + s * p.toReal) ≠ ∞ :=
@@ -828,7 +803,7 @@ theorem exists_boundaryBesovNorm_rpow_le (ψ : Ω.BoundaryPartition) (hp : p ≠
         slobodeckijConstUpper (Ω.graph j).hyperplane p s * K j) + 1,
     ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by linarith)
       (ENNReal.natCast_ne_top _)) (ENNReal.sum_ne_top.2 fun j _ => ENNReal.mul_ne_top
-        (ENNReal.rpow_ne_top_of_nonneg (by linarith) ENNReal.ofNat_ne_top)
+        (ENNReal.two_rpow_ne_top _)
         (ENNReal.add_ne_top.2 ⟨ENNReal.rpow_ne_top_of_nonneg hP.le ENNReal.ofReal_ne_top,
           ENNReal.mul_ne_top (slobodeckijConstUpper_ne_top hp0 hp hs) (hK j)⟩)),
       ENNReal.one_ne_top⟩, fun g hg => ?_⟩

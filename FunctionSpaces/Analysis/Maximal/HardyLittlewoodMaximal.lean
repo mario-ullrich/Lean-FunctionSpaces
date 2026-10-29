@@ -32,12 +32,41 @@ over `(0, 2a)` (`MeasureTheory.lintegral_Ioi_indicator_half_lt_mul_rpow`), both 
 **Hardy–Littlewood maximal theorem** `‖M g‖_p ≤ C_{n,p}^{1/p} ‖g‖_p` (`Rd.eLpNorm_maximal_le`),
 with the explicit constant `C_{n,p} = p 2^p 5^n / (p - 1)` (`Rd.maximalConst`). For `p = ∞`,
 `M g ≤ ‖g‖_∞` (`Rd.maximal_le_eLpNorm_top`).
+
+Two geometric facts serve the covering arguments: the balls of radius `ρ 2^(-j)` have the volume
+`ρ^n |B_1| 2^(-jn)` (`Rd.volume_ball_div_two_pow`, `Rd.volume_closedBall_div_two_pow`), and a set
+in `B̄(c, ρ)` that meets `B(x, r)` for some `x ∉ B̄(c, 2ρ)` lies in `B(x, 3r)`
+(`Metric.subset_ball_three_mul_of_inter_nonempty`).
 -/
 
 @[expose] public section
 
 open MeasureTheory Module Metric Filter Set
 open scoped ENNReal Topology
+
+namespace Metric
+
+/-- If a set `Q ⊆ B̄(c, ρ)` meets the ball `B(x, r)` around a point `x ∉ B̄(c, 2ρ)`, then
+`Q ⊆ B(x, 3r)`: a point of `Q` in the ball forces `r > ρ`, so every point of `Q` lies within
+`r + 2ρ < 3r` of `x`. -/
+theorem subset_ball_three_mul_of_inter_nonempty {α : Type*} [PseudoMetricSpace α] {Q : Set α}
+    {c x : α} {ρ r : ℝ} (hQ : Q ⊆ closedBall c ρ) (hx : x ∉ closedBall c (2 * ρ))
+    (hne : (Q ∩ ball x r).Nonempty) : Q ⊆ ball x (3 * r) := by
+  obtain ⟨y, hyQ, hyB⟩ := hne
+  have hy : dist y c ≤ ρ := hQ hyQ
+  have hyx : dist y x < r := hyB
+  have hxc : 2 * ρ < dist x c := not_le.1 hx
+  have h1 : dist x c ≤ dist x y + dist y c := dist_triangle _ _ _
+  rw [dist_comm x y] at h1
+  intro z hz
+  have hz : dist z c ≤ ρ := hQ hz
+  have h2 : dist z x ≤ dist z c + dist c y + dist y x :=
+    (dist_triangle z y x).trans (add_le_add_left (dist_triangle z c y) _) |>.trans_eq (by ring)
+  rw [dist_comm c y] at h2
+  rw [mem_ball]
+  linarith
+
+end Metric
 
 namespace Rd
 
@@ -67,6 +96,14 @@ theorem volume_ball_div_two_pow {ρ : ℝ} (hρ : 0 < ρ) (j : ℕ) (z : V) :
     volume (ball z (ρ / 2 ^ j)) = ENNReal.ofReal (ρ ^ finrank ℝ V) *
       volume (ball (0 : V) 1) * ENNReal.dyadicWeight (-(finrank ℝ V : ℝ)) j := by
   rw [Measure.addHaar_ball_of_pos _ _ (by positivity), div_eq_mul_one_div, mul_pow,
+    ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_one_div_two_pow_pow]
+  ring
+
+/-- The volume of the closed ball of radius `d 2^(-j)` is `d^n |B_1| 2^(-jn)` for `d ≥ 0`. -/
+theorem volume_closedBall_div_two_pow {d : ℝ} (hd : 0 ≤ d) (j : ℕ) (z : V) :
+    volume (closedBall z (d / 2 ^ j)) = ENNReal.ofReal (d ^ finrank ℝ V) *
+      volume (ball (0 : V) 1) * ENNReal.dyadicWeight (-(finrank ℝ V : ℝ)) j := by
+  rw [Measure.addHaar_closedBall _ _ (by positivity), div_eq_mul_one_div, mul_pow,
     ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_one_div_two_pow_pow]
   ring
 
@@ -546,7 +583,7 @@ noncomputable def maximalConst (n : ℕ) (p : ℝ) : ℝ≥0∞ :=
 theorem maximalConst_ne_top {n : ℕ} {p : ℝ} (hp : 1 < p) : maximalConst n p ≠ ∞ := by
   refine ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top ENNReal.ofReal_ne_top ?_)
     (ENNReal.pow_ne_top ENNReal.ofNat_ne_top)) ?_
-  · exact ENNReal.rpow_ne_top_of_nonneg (by linarith) ENNReal.ofNat_ne_top
+  · exact ENNReal.two_rpow_ne_top _
   · exact ENNReal.inv_ne_top.2 (ENNReal.ofReal_pos.2 (by linarith)).ne'
 
 /-- **Cutting `g` at the height `s`**: `M g ≤ M (1_{g > s} g) + s` for measurable `g`, since
@@ -635,7 +672,7 @@ theorem lintegral_Ioi_lintegral_indicator_mul_rpow {g v : V → ℝ≥0∞} (hg 
         ENNReal.ofReal (t ^ (p - 2)) =
       2 ^ (p - 1) / ENNReal.ofReal (p - 1) * ∫⁻ x, g x ^ p * v x := by
   have hc : (2 : ℝ≥0∞) ^ (p - 1) / ENNReal.ofReal (p - 1) ≠ ∞ :=
-    ENNReal.div_ne_top (ENNReal.rpow_ne_top_of_nonneg (by linarith) ENNReal.ofNat_ne_top)
+    ENNReal.div_ne_top (ENNReal.two_rpow_ne_top _)
       (ENNReal.ofReal_pos.2 (by linarith)).ne'
   have hF : AEMeasurable (Function.uncurry fun (t : ℝ) (x : V) =>
       {y | ENNReal.ofReal t / 2 < g y}.indicator g x * v x * ENNReal.ofReal (t ^ (p - 2)))

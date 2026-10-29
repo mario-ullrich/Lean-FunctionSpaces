@@ -936,11 +936,11 @@ theorem enorm_le_tlLocalMeansNorm {L : ℕ} (hL : 1 ≤ L) (hp : p ≠ ∞) {q :
 
 /-- The constant `2 ‖m‖_1 (1 - 2^(-s))⁻¹ + C A_{s,L} C_{FS}` of the bound of the ball means
 quasi-norm by local means: `‖m‖_1` is the `L_1` norm of the moment kernel,
-`C = Rd.LocalMeansBump.diffByLocalMeansConst L`, `A_{s,L} = Rd.almostDiagonalConst s L` and
+`C = Rd.LocalMeansBump.diffByLocalMeansConst L`, `A_{s,L} = ENNReal.almostDiagonalConst s L` and
 `C_{FS} = Rd.feffermanSteinConst V p q`. -/
 noncomputable def diffUpperConst (L : ℕ) (p q : ℝ≥0∞) (s : ℝ) : ℝ≥0∞ :=
   2 * eLpNorm (momentKernel b.toFun L) 1 volume * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ +
-    b.diffByLocalMeansConst L * almostDiagonalConst s L * feffermanSteinConst V p q
+    b.diffByLocalMeansConst L * ENNReal.almostDiagonalConst s L * feffermanSteinConst V p q
 
 /-- The constant of the bound of the ball means quasi-norm by local means is finite for
 `1 < p < ∞`, `1 < q ≤ ∞` and `0 < s < L`. -/
@@ -951,7 +951,7 @@ theorem diffUpperConst_ne_top {L : ℕ} {p q : ℝ≥0∞} (hp1 : 1 < p) (hp : p
       (eLpNorm_momentKernel_ne_top b.integrable L))
       (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs),
     ENNReal.mul_ne_top (ENNReal.mul_ne_top (b.diffByLocalMeansConst_ne_top L)
-      (almostDiagonalConst_ne_top hs hsL)) (feffermanSteinConst_ne_top hp1 hp hq1)⟩
+      (ENNReal.almostDiagonalConst_ne_top hs hsL)) (feffermanSteinConst_ne_top hp1 hp hq1)⟩
 
 /-- **The ball means quasi-norm by local means**: for `L ≥ 1`, `1 < p < ∞`, `1 < q ≤ ∞`, every
 `s` and `f ∈ L_p`, `‖f‖_p + ‖(2^(js) d_j f)_j‖_{L_p(ℓ_q)} ≤ C ‖f‖^{b,L}_{F^s_{p,q}}` with
@@ -963,12 +963,12 @@ theorem tlDiffNorm_le_tlLocalMeansNorm {L : ℕ} (hL : 1 ≤ L) (hp1 : 1 < p) (h
     {q : ℝ≥0∞} (hq1 : 1 < q) (s : ℝ) (f : Lp ℂ p (volume : Measure V)) :
     tlDiffNorm L s q f ≤ b.diffUpperConst L p q s * b.tlLocalMeansNorm L s q f := by
   have h2 : eLpNorm (fun x => lqNorm q (fun j => dyadicWeight s j * ballMeanDiff L j f x)) p
-      volume ≤ b.diffByLocalMeansConst L * almostDiagonalConst s L * feffermanSteinConst V p q *
-        b.tlLocalMeansNorm L s q f :=
+      volume ≤ b.diffByLocalMeansConst L * ENNReal.almostDiagonalConst s L *
+        feffermanSteinConst V p q * b.tlLocalMeansNorm L s q f :=
     eLpNorm_le_of_le_lqNorm_maximal hp1 hp hq1 (measurable_lqNorm_ballMeanDiff L s q f).aemeasurable
       (fun i => (b.measurable_dyadicWeight_mul_conv_kernel L s i f).aemeasurable) (by
         filter_upwards [b.ballMeanDiff_le_tsum_maximal hL hp f] with x hx
-        refine (lqNorm_le_almostDiagonalConst_mul_of_le hq1.le s L hx).trans_eq ?_
+        refine (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq1.le s L hx).trans_eq ?_
         simp only [dyadicWeight_mul_maximal])
   rw [tlDiffNorm, diffUpperConst, add_mul]
   exact add_le_add (b.enorm_le_tlLocalMeansNorm hL hp hq1.le s f) h2

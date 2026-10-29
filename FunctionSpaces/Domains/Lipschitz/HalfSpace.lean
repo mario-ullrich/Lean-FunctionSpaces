@@ -16,10 +16,8 @@ The closed half-space `{x : 0 ≤ ⟪x, e⟫}` for a unit vector `e` (`Rd.closed
 domain (`Rd.BesovDomain.closedHalfSpace`): it differs from the flat Lipschitz graph domain
 `{x : 0 < ⟪x, e⟫}` (`Rd.LipschitzGraph.flat`) by the null set `e^⊥`
 (`Rd.volume_orthogonal_singleton_eq_zero`), and on the latter Rychkov's extension is bounded
-(`Rd.LipschitzGraph.modNorm_extension_le_modNormOn`).
-
-Changing a set by a null set changes neither the step sets up to null sets (`Rd.stepSet_ae_eq`)
-nor the moduli on the set (`Rd.modulusOn_congr_set`) nor the cut-off (`Rd.indicatorLp_congr_set`).
+(`Rd.LipschitzGraph.modNorm_extension_le_modNormOn`); the null set changes neither the moduli on
+the set (`Rd.lpModulusOn_congr_set`) nor the cut-off (`Rd.indicatorLp_congr_set`).
 
 The models of manifolds are Besov domains: the range of the model with corners of the Euclidean
 half-space is the closed half-space `{y : 0 ≤ ⟪y, e₀⟫}` for the unit vector `e₀ = (1, 0, …, 0)`
@@ -41,43 +39,7 @@ namespace Rd
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
 
-/-! ### Changing the set by a null set -/
-
-/-- **Step sets of almost equal sets are almost equal**: the translates by `l h` of almost equal
-sets are almost equal, by the translation invariance of the Lebesgue measure. -/
-theorem stepSet_ae_eq {U U' : Set V} (hUU' : U =ᵐ[volume] U') (r : ℕ) (h : V) :
-    stepSet U r h =ᵐ[volume] stepSet U' r h := by
-  have hl : ∀ l : ℕ, ∀ᵐ x ∂(volume : Measure V),
-      (x + (l : ℝ) • h ∈ U) = (x + (l : ℝ) • h ∈ U') := fun l =>
-    (measurePreserving_add_right volume ((l : ℝ) • h)).quasiMeasurePreserving.ae_eq_comp hUU'
-  filter_upwards [ae_all_iff.2 hl] with x hx
-  exact propext (forall₂_congr fun l _ => (hx l).to_iff)
-
-/-- **The modulus on a set does not see null sets**: `ω_r(f, t, U)_p = ω_r(f, t, U')_p` if `U`
-and `U'` agree up to a null set. -/
-theorem modulusOn_congr_set {U U' : Set V} (hUU' : U =ᵐ[volume] U') (r : ℕ) (p : ℝ≥0∞)
-    (f : V → ℂ) (t : ℝ) : modulusOn volume U r p f t = modulusOn volume U' r p f t := by
-  simp only [modulusOn]
-  congr 1
-  funext h
-  congr 1
-  funext _
-  exact eLpNorm_congr_ae (indicator_ae_eq_of_ae_eq_set (stepSet_ae_eq hUU' r h))
-
-/-- The dyadic moduli on almost equal sets agree. -/
-theorem lpModulusOn_congr_set {p : ℝ≥0∞} {U U' : Set V} (hUU' : U =ᵐ[volume] U') (r : ℕ)
-    (f : Lp ℂ p (volume : Measure V)) (k : ℕ) :
-    lpModulusOn p U r f k = lpModulusOn p U' r f k :=
-  modulusOn_congr_set hUU' r p _ _
-
-/-- The cut-offs to almost equal sets agree. -/
-theorem indicatorLp_congr_set {p : ℝ≥0∞} [Fact (1 ≤ p)] {U U' : Set V} (hU : MeasurableSet U)
-    (hU' : MeasurableSet U') (hUU' : U =ᵐ[volume] U') (f : Lp ℂ p (volume : Measure V)) :
-    indicatorLp hU f = indicatorLp hU' f := by
-  refine Lp.ext ?_
-  filter_upwards [indicatorLp_apply_ae hU f, indicatorLp_apply_ae hU' f,
-    indicator_ae_eq_of_ae_eq_set (f := (f : V → ℂ)) hUU'] with x h1 h2 h3
-  rw [h1, h2, h3]
+/-! ### Hyperplanes are null sets -/
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- For `e ≠ 0` the orthogonal complement `e^⊥` is a proper subspace: `Kᗮ = ⊤` only for `K = ⊥`

@@ -426,79 +426,8 @@ end Global
 
 end CutoffDiffeo
 
-/-! ### The intrinsic quasi-norm -/
-
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
-
-section ModNormOn
-
-variable {p : ℝ≥0∞} [Fact (1 ≤ p)] {Ω : Set V} (hΩ : MeasurableSet Ω)
-
-/-- The **intrinsic Besov quasi-norm** on a measurable set `Ω`:
-`N_Ω(G) = ‖1_Ω G‖_p + ‖(2^(ks) ω_r(G, 2^(-k), Ω)_p)_k‖_{ℓ_q}`. -/
-noncomputable def modNormOn (r : ℕ) (s : ℝ) (q : ℝ≥0∞) (G : Lp ℂ p (volume : Measure V)) :
-    ℝ≥0∞ :=
-  ‖indicatorLp hΩ G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r G k)
-
-/-- **The intrinsic quasi-norm sees only `1_Ω G`**: equal cut-offs give equal quasi-norms. -/
-theorem modNormOn_congr {r : ℕ} {s : ℝ} {q : ℝ≥0∞} {G₁ G₂ : Lp ℂ p (volume : Measure V)}
-    (h : indicatorLp hΩ G₁ = indicatorLp hΩ G₂) :
-    modNormOn hΩ r s q G₁ = modNormOn hΩ r s q G₂ := by
-  have hae : Ω.indicator G₁ =ᵐ[volume] Ω.indicator G₂ := by
-    filter_upwards [indicatorLp_apply_ae hΩ G₁, indicatorLp_apply_ae hΩ G₂] with x h1 h2
-    rw [← h1, ← h2, h]
-  simp only [modNormOn, h, lpModulusOn_congr hae]
-
-/-- `N_Ω(0) = 0`. -/
-theorem modNormOn_zero (r : ℕ) (s : ℝ) (q : ℝ≥0∞) :
-    modNormOn hΩ r s q (0 : Lp ℂ p (volume : Measure V)) = 0 := by
-  have h : ∀ k, lpModulusOn p Ω r (0 : Lp ℂ p (volume : Measure V)) k = 0 := fun k =>
-    le_antisymm ((lpModulusOn_le_lpModulus hΩ r 0 k).trans_eq (lpModulus_zero r k)) zero_le
-  simp only [modNormOn, map_zero, enorm_zero, h, mul_zero, ENNReal.lqNorm_zero_right, add_zero]
-
-/-- **The intrinsic quasi-norm is subadditive** for `q ≥ 1`. -/
-theorem modNormOn_add_le (r : ℕ) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q)
-    (G G' : Lp ℂ p (volume : Measure V)) :
-    modNormOn hΩ r s q (G + G') ≤ modNormOn hΩ r s q G + modNormOn hΩ r s q G' := by
-  have h1 : ‖indicatorLp hΩ (G + G')‖ₑ ≤ ‖indicatorLp hΩ G‖ₑ + ‖indicatorLp hΩ G'‖ₑ := by
-    rw [map_add]
-    exact enorm_add_le _ _
-  have h2 : lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r (G + G') k) ≤
-      lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r G k) +
-        lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r G' k) :=
-    (ENNReal.lqNorm_mono fun k => (mul_le_mul' le_rfl (lpModulusOn_add_le Ω r G G' k)).trans_eq
-      (mul_add _ _ _)).trans (ENNReal.lqNorm_add_le hq _ _)
-  calc modNormOn hΩ r s q (G + G')
-      ≤ (‖indicatorLp hΩ G‖ₑ + ‖indicatorLp hΩ G'‖ₑ) +
-          (lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r G k) +
-            lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r G' k)) := add_le_add h1 h2
-    _ = modNormOn hΩ r s q G + modNormOn hΩ r s q G' := by
-        simp only [modNormOn]
-        ring
-
-/-- **The intrinsic quasi-norm is homogeneous**: `N_Ω(c G) = |c| N_Ω(G)`. -/
-theorem modNormOn_const_smul (r : ℕ) (s : ℝ) (q : ℝ≥0∞) (c : ℂ)
-    (G : Lp ℂ p (volume : Measure V)) :
-    modNormOn hΩ r s q (c • G) = ‖c‖ₑ * modNormOn hΩ r s q G := by
-  have h : (fun k => dyadicWeight s k * lpModulusOn p Ω r (c • G) k) =
-      fun k => ‖c‖ₑ * (dyadicWeight s k * lpModulusOn p Ω r G k) := funext fun k => by
-    rw [lpModulusOn_const_smul]
-    ring
-  simp only [modNormOn, map_smul, enorm_smul, h, ENNReal.lqNorm_const_mul, mul_add]
-
-/-- **The intrinsic quasi-norm of a finite sum** is at most the sum of the quasi-norms. -/
-theorem modNormOn_finsetSum_le (r : ℕ) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q) {ι : Type*}
-    (t : Finset ι) (G : ι → Lp ℂ p (volume : Measure V)) :
-    modNormOn hΩ r s q (∑ i ∈ t, G i) ≤ ∑ i ∈ t, modNormOn hΩ r s q (G i) := by
-  classical
-  induction t using Finset.induction_on with
-  | empty => simp [modNormOn_zero]
-  | insert a t ha ih =>
-    rw [Finset.sum_insert ha, Finset.sum_insert ha]
-    exact (modNormOn_add_le hΩ r s hq _ _).trans (add_le_add le_rfl ih)
-
-end ModNormOn
 
 /-! ### Besov domains -/
 

@@ -172,7 +172,7 @@ theorem memApprox_iff_exists_atomic [CompleteSpace X] (hA : A.IsLinear) {C' : �
     refine ⟨a, c, ha, hsum, hle.trans_lt (ENNReal.mul_lt_top (ENNReal.mul_lt_top hC'.lt_top ?_)
       ((memApprox_iff_approxNormDyadic_lt_top hq hs.le).1 hf))⟩
     exact ENNReal.add_lt_top.2 ⟨ENNReal.mul_lt_top (by norm_num)
-      (ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top).lt_top,
+      (ENNReal.two_rpow_ne_top _).lt_top,
       ENNReal.mul_lt_top (by norm_num) (ENNReal.dyadicWeight_lt_top s 2)⟩
   · rintro ⟨a, c, ha, hsum, hc⟩
     exact AS.memApprox_of_bNorm_lt_top hA hs hsσ hq ha hsum hc

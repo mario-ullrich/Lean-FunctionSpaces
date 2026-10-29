@@ -339,7 +339,7 @@ smoothness, and a finite set for the coefficients of one level of atoms and wave
   ENNReal.lqNorm_le_lqNorm_of_le, ENNReal.lqNorm_le_head_add_shift,
   ENNReal.lqNorm_le_sum_range_add_shift, ENNReal.lqNorm_le_lqNorm_one, ENNReal.lqNorm_geometric_le,
   ENNReal.lqNorm_shift_le, ENNReal.lqNorm_eq_sum, ENNReal.lqNorm_le_card_rpow_mul,
-  ENNReal.lqNorm_prod_rpow, ENNReal.lqNorm_le_sum_of_eq_zero, Rd.lqNorm_ite_eq,
+  ENNReal.lqNorm_prod_rpow, ENNReal.lqNorm_le_sum_of_eq_zero, ENNReal.lqNorm_ite_eq,
   ENNReal.lqNorm_ite_le_eq}
 \leanok
 \uses{def:lq-norm}
@@ -803,8 +803,8 @@ $\|f\|_{A^s_q} < \infty$.
   ApproximationScheme.lqNorm_le_approxNormDyadic, ApproximationScheme.approxSeqDyadic_rpow,
   ApproximationScheme.approxSeqDyadic_zero, ApproximationScheme.approxNormDyadic_zero,
   ApproximationScheme.approxSeqDyadic_smul, ApproximationScheme.approxNormDyadic_smul,
-  ApproximationScheme.approxNormDyadic_neg, ApproximationScheme.one_le_two_rpow,
-  ApproximationScheme.one_le_two_mul_two_rpow, ApproximationScheme.two_rpow_ne_top}
+  ApproximationScheme.approxNormDyadic_neg, ENNReal.one_le_two_rpow,
+  ENNReal.one_le_two_mul_two_rpow, ENNReal.two_rpow_ne_top}
 \leanok
 \uses{def:error, def:lq-norm}
 Let $s \in \R$ and $1 \leq q \leq \infty$. For $f \in X$,

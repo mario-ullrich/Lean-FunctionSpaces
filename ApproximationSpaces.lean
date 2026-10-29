@@ -109,13 +109,14 @@ Names below are relative to the namespace `ApproximationScheme`, except those th
 
 * `ApproximationSpaces.Sequences.Lq`: the `ℓ_q` norm `ENNReal.lqNorm` of a sequence in `ℝ≥0∞`,
   defined as the `L_q` norm for the counting measure, with its monotonicity in `q`, the
-  Cauchy–Schwarz inequality and the dyadic weights `ENNReal.dyadicWeight`.
+  Cauchy–Schwarz inequality, the dyadic weights `ENNReal.dyadicWeight`, powers of two and
+  products in `[0, ∞]`, and `L_q` norms of functions bounded on pieces.
 * `ApproximationSpaces.Sequences.Dyadic`: Cauchy condensation with power weights
   (`ENNReal.tsum_pow_mul_le_dyadic`), three sums over dyadic scales, and the interpolation
   inequality for dyadic suprema (`ENNReal.tsum_dyadicWeight_mul_le_iSup`).
 * `ApproximationSpaces.Sequences.Hardy`: the countable Minkowski inequality, the two discrete
-  Hardy inequalities (`ENNReal.hardy_sum_le`, `ENNReal.hardy_tail_le`), almost diagonal sums,
-  shifts on `ℓ_q(ℤ)` and geometric convolutions.
+  Hardy inequalities (`ENNReal.hardy_sum_le`, `ENNReal.hardy_tail_le`), almost diagonal sums and
+  their constant `ENNReal.almostDiagonalConst`, shifts on `ℓ_q(ℤ)` and geometric convolutions.
 
 ### Embeddings, transfer and lifting
 

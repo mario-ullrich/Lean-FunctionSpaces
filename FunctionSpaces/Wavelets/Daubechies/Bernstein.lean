@@ -58,19 +58,6 @@ open MeasureTheory
 open scoped ENNReal Real
 open ENNReal (dyadicWeight)
 
-namespace ENNReal
-
-/-- **Dyadic scales as dyadic weights**: `(2^(-n))^θ = 2^(-nθ)` for every `n ∈ ℕ` and every real
-exponent `θ`, as an identity in `[0, ∞]` (`ENNReal.dyadicWeight`). -/
-theorem ofReal_one_div_two_pow_rpow (n : ℕ) (θ : ℝ) :
-    ENNReal.ofReal ((1 / 2 ^ n) ^ θ) = dyadicWeight (-θ) n := by
-  rw [← ENNReal.ofReal_rpow_of_pos (by positivity), one_div,
-    ENNReal.ofReal_inv_of_pos (by positivity), ENNReal.ofReal_pow zero_le_two,
-    ENNReal.ofReal_ofNat, ENNReal.inv_rpow, ← ENNReal.rpow_natCast, ← ENNReal.rpow_mul,
-    dyadicWeight, mul_neg, ENNReal.rpow_neg]
-
-end ENNReal
-
 namespace Daubechies
 
 /-! ### Differences of expansions -/

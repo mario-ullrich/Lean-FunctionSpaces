@@ -275,8 +275,8 @@ and the theorems that their characterisations agree. The library builds on
 * `FunctionSpaces.Analysis.Fourier.Convolution`: convolution with integrable kernels on a
   finite-dimensional space, Young's inequality, associativity, and the convolution operators on
   `L_p`.
-* `FunctionSpaces.Analysis.Fourier.ApproxIdentity`: dilations and their supports, continuity of
-  translation in `L_p`, and approximate identities.
+* `FunctionSpaces.Analysis.Fourier.ApproxIdentity`: changes of scale `x ↦ r x` in integrals,
+  dilations and their supports, continuity of translation in `L_p`, and approximate identities.
 * `FunctionSpaces.Analysis.Fourier.LittlewoodPaleyKernels`: the Fourier transform of integrable
   functions (continuity, `L_1` bounds, convolutions, the multiplication formula, conjugation),
   smooth frequency cut-offs, the kernels `Φ_k`, `Θ_k`, `ψ_j` of the Littlewood–Paley decomposition,
@@ -284,15 +284,17 @@ and the theorems that their characterisations agree. The library builds on
 * `FunctionSpaces.Analysis.Differences.Differences`: differences on any additive group, and the
   modulus of smoothness on a finite-dimensional space, its homogeneity, and the dilation of the
   scale.
-* `FunctionSpaces.Analysis.Maximal.DyadicGrid`: the dyadic cells of a finite-dimensional inner
-  product space, their centres, and the counting of centres in balls.
-* `FunctionSpaces.Analysis.Maximal.DyadicCubes`: dyadic cubes of every integer level, their nesting,
+* `FunctionSpaces.Analysis.Maximal.DyadicGrid`: the dyadic cubes of every integer level and the
+  dyadic cells of natural level of a finite-dimensional inner product space, their centres, and
+  the counting of centres in balls.
+* `FunctionSpaces.Analysis.Maximal.DyadicCubes`: the volume and the nesting of the dyadic cubes,
   and the Lebesgue differentiation theorem along them.
-* `FunctionSpaces.Analysis.Maximal.HardyLittlewoodMaximal`: the Hardy–Littlewood maximal function,
-  its weighted weak and strong types, and the Hardy–Littlewood maximal theorem.
-* `FunctionSpaces.Analysis.Maximal.CalderonZygmund`: the Calderón–Zygmund decomposition on dyadic
-  cubes, with the averages over the maximal big cubes, the measure of the exceptional set, and the
-  bound `G ≤ t` almost everywhere outside it.
+* `FunctionSpaces.Analysis.Maximal.HardyLittlewoodMaximal`: volumes of dyadic balls, the
+  Hardy–Littlewood maximal function, its weighted weak and strong types, and the Hardy–Littlewood
+  maximal theorem.
+* `FunctionSpaces.Analysis.Maximal.CalderonZygmund`: norms of means over a set, the
+  Calderón–Zygmund decomposition on dyadic cubes, with the averages over the maximal big cubes,
+  the measure of the exceptional set, and the bound `G ≤ t` almost everywhere outside it.
 * `FunctionSpaces.Analysis.Maximal.FeffermanStein`: the Fefferman–Stein inequality for the maximal
   functions of a family in `L_p(ℓ_q)`, `1 < p < ∞`, `1 < q ≤ ∞`, with the vector-valued weak type
   `(1,1)`.
@@ -353,7 +355,7 @@ and the theorems that their characterisations agree. The library builds on
 * `FunctionSpaces.Rd.Differences.DilatedDifferences`: differences of convolutions and dilations, and
   the modulus of a convolution.
 * `FunctionSpaces.Rd.Differences.DomainModuli`: differences and moduli of smoothness on subsets of a
-  finite-dimensional space.
+  finite-dimensional space, sets equal up to null sets, and the intrinsic quasi-norm on a set.
 * `FunctionSpaces.Rd.Differences.MomentKernels`: moment kernels built from dilations, convolution
   with them as an average of differences, and approximation with the modulus, also on subsets.
 * `FunctionSpaces.Rd.Approximation.BandJackson`: the Jackson approximant and Jackson's inequality
@@ -526,7 +528,7 @@ and the theorems that their characterisations agree. The library builds on
   of unity, pasting with a bound, subadditivity and homogeneity of the Besov quasi-norms by
   differences, and the restrictions of Besov spaces described by intrinsic differences, with an
   extension bounded by a constant times the intrinsic quasi-norm.
-* `FunctionSpaces.Domains.Lipschitz.HalfSpace`: null sets and moduli on sets, the closed half-space,
+* `FunctionSpaces.Domains.Lipschitz.HalfSpace`: null hyperplanes, the closed half-space,
   the first axis `e₀` of `ℝ^n`, and the models of manifolds as Besov domains.
 * `FunctionSpaces.Domains.Traces.HalfSpaceTrace`: restrictions and extensions of smooth atoms on the
   flat graph, the trace theorem and the trace space of the half-space for every smoothness, and the

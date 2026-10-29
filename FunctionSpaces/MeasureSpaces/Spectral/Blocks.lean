@@ -254,7 +254,7 @@ theorem memApprox_two_iff [CompleteSpace H] {s : ℝ} (hs : 0 < s) (f : H) :
   constructor
   · intro h
     exact ne_top_of_le_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.pow_ne_top enorm_ne_top,
-      ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top) h⟩)
+      ENNReal.mul_ne_top (ENNReal.two_rpow_ne_top _) h⟩)
       hTB
   · intro h
     exact ne_top_of_le_ne_top h hBT

@@ -683,7 +683,7 @@ centred at the cells, with radius factor `d ≥ 0` and constant `A`, level sums
 `f_j = ∑_m λ_{j,m} a_{j,m}` almost everywhere with `∑_{j ≤ J} f_j → F` in `L_p`, `1 < p < ∞`,
 `1 < q ≤ ∞` and `s ∈ ℝ`,
 `‖F‖_{F^s_{p,q}}^{b,L} ≤ C A_{s,L} C_{FS} ‖λ‖_{f^s_{p,q}}` with
-`C = Rd.LocalMeansBump.tlAtomSynthesisConst L d A`, `A_{s,L} = Rd.almostDiagonalConst s L`
+`C = Rd.LocalMeansBump.tlAtomSynthesisConst L d A`, `A_{s,L} = ENNReal.almostDiagonalConst s L`
 (finite for `0 < s < L`) and the Fefferman–Stein constant `C_{FS} = Rd.feffermanSteinConst V p q`.
 -/
 theorem tlLocalMeansNorm_le_tlCoeffNorm {L : ℕ} (hL : 1 ≤ L) (hp1 : 1 < p) (hp : p ≠ ∞)
@@ -693,12 +693,12 @@ theorem tlLocalMeansNorm_le_tlCoeffNorm {L : ℕ} (hL : 1 ≤ L) (hp1 : 1 < p) (
     {f : ℕ → Lp ℂ p (volume : Measure V)}
     (hf : ∀ j, ∀ᵐ x ∂volume, f j x = ∑' m, coef j m * a j m x) {F : Lp ℂ p (volume : Measure V)}
     (hF : Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), f j) atTop (𝓝 F)) :
-    b.tlLocalMeansNorm L s q F ≤ b.tlAtomSynthesisConst L d A * almostDiagonalConst s L *
+    b.tlLocalMeansNorm L s q F ≤ b.tlAtomSynthesisConst L d A * ENNReal.almostDiagonalConst s L *
       feffermanSteinConst V p q * tlCoeffNorm p s q coef :=
   eLpNorm_le_of_le_lqNorm_maximal hp1 hp hq1 (b.aemeasurable_lqNorm_conv_kernel L s q F)
     (fun j => ((measurable_cellCoefFun j coef).const_mul _).aemeasurable)
     ((b.enorm_localMean_le_tsum_maximal_cellCoefFun hL hp hd hatom hf hF).mono fun x hx =>
-      (lqNorm_le_almostDiagonalConst_mul_of_le hq1.le s L hx).trans_eq
+      (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq1.le s L hx).trans_eq
         (by simp only [dyadicWeight_mul_maximal]))
 
 /-! ### Analysis -/
@@ -794,7 +794,7 @@ theorem memTriebelLizorkin_iff_atomic {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp1 : 1
   · rintro ⟨d, A, coef, a, f, hd, hatom, hf, hF, hcoef⟩
     exact (b.tlLocalMeansNorm_le_tlCoeffNorm hL hp1 hp hq1 s hd hatom hf hF).trans_lt
       (ENNReal.mul_lt_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top
-        (b.tlAtomSynthesisConst_ne_top L d A) (almostDiagonalConst_ne_top hs hsL))
+        (b.tlAtomSynthesisConst_ne_top L d A) (ENNReal.almostDiagonalConst_ne_top hs hsL))
           (feffermanSteinConst_ne_top hp1 hp hq1)).lt_top hcoef)
 
 end Rd

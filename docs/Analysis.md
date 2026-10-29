@@ -90,13 +90,13 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Differences `higherDiff` on any additive monoid, steps of either sign; the modulus of smoothness on `ℝ^d`, its homogeneity, dilation of the scale | ✅ | ✗ | `Analysis/Differences/Differences` |
 | Translation algebra of an additive monoid, differences as its powers | ✅ | ✗ | `Analysis/Differences/TranslationAlgebra` |
 | Convolution with integrable kernels on `ℝ^d`: Young's inequality, pointwise bounds, associativity, operators on `L_p` | ✅ | ✗ | `Analysis/Fourier/Convolution` |
-| Dilations, their supports and their first moments, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ | ✗ | `Analysis/Fourier/ApproxIdentity` |
+| Changes of scale `x ↦ r x` in integrals, dilations, their supports, `L_1` norms and first moments, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ | ✗ | `Analysis/Fourier/ApproxIdentity` |
 | The Fourier transform of integrable functions (continuity, `L_1` bounds, convolutions, multiplication formula, conjugation, Lipschitz bound for band-limited inverse transforms); Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, the kernels on the frequency side with `|𝓕ψ_j| ≤ 1`, telescoping sums and at most two blocks at every frequency, kernel identities by Fourier inversion | ✅ | ✗ | `Analysis/Fourier/LittlewoodPaleyKernels` |
 | Test functions as Schwartz functions and compactly supported complex Schwartz functions as complex test functions, commuting directional derivatives, the transpose formula for distributions and tempered distributions; cut-offs of Schwartz functions converge in the Schwartz space (smooth compactly supported functions are dense), tempered distributions determined by test functions | ✅ | ✗ | `Analysis/Fourier/SchwartzCutoff` |
-| Dyadic cubes of every level, Lebesgue differentiation along them | ✅ | ✗ | `Analysis/Maximal/DyadicCubes` |
-| Dyadic cells of `ℝ^d`: partition, counting of their centres, bounded overlap | ✅ | ✗ | `Analysis/Maximal/DyadicGrid` |
-| Hardy–Littlewood maximal function: measurability, convolutions with kernels under radial majorants, weighted weak type `(1,1)` and weighted strong type, the maximal theorem | ✅ | ✗ | `Analysis/Maximal/HardyLittlewoodMaximal` |
-| The Calderón–Zygmund decomposition on dyadic cubes | ✅ | ✗ | `Analysis/Maximal/CalderonZygmund` |
+| Volume and nesting of the dyadic cubes, Lebesgue differentiation along them | ✅ | ✗ | `Analysis/Maximal/DyadicCubes` |
+| Dyadic cubes of every level and dyadic cells of `ℝ^d`: partition, counting of their centres, bounded overlap | ✅ | ✗ | `Analysis/Maximal/DyadicGrid` |
+| Hardy–Littlewood maximal function: volumes of dyadic balls, measurability, convolutions with kernels under radial majorants, weighted weak type `(1,1)` and weighted strong type, the maximal theorem | ✅ | ✗ | `Analysis/Maximal/HardyLittlewoodMaximal` |
+| The Calderón–Zygmund decomposition on dyadic cubes, norms of means of vector-valued functions | ✅ | ✗ | `Analysis/Maximal/CalderonZygmund` |
 | The signed Calderón–Zygmund decomposition of functions with values in a normed space and of families: good parts bounded by `2^n t` with `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, bad pieces with mean zero on their cubes and total mass at most `2 ∫ ‖f‖` | ✅ | ✗ | `Analysis/Maximal/CalderonZygmundSigned` |
 | The Fefferman–Stein inequality | ✅ | ✗ | `Analysis/Maximal/FeffermanStein` |
 

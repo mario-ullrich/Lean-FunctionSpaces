@@ -32,21 +32,31 @@ inclusion `lp.monotone`, without the norm bound), the Cauchy–Schwarz inequalit
 `∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for series and for finite sums
 (`ENNReal.lqNorm_one_mul_le`, `ENNReal.sum_mul_le_lqNorm_two_mul`), the splitting off of the
 first term, tails of sequences (`ENNReal.lqNorm_ite_le_eq`), sequences with one nonzero term
-(`Rd.lqNorm_ite_eq`), reindexing along bijections and injections
+(`ENNReal.lqNorm_ite_eq`), reindexing along bijections and injections
 (`ENNReal.lqNorm_comp_equiv`, `ENNReal.lqNorm_extend_zero`), the `ℓ_q` norm of the geometric
 sequence for every `q` (`ENNReal.dyadicGeomConst`), and the **dyadic weights**
 `dyadicWeight s k = 2 ^ (k s)` that every approximation space uses, with the identity
 `2^(ks) 2^(-(k-j)σ) = 2^(-k(σ-s)) 2^(jσ)` of almost diagonal estimates
-(`ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub`).  Two inequalities in `[0, ∞]`,
+(`ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub`), the weights of integer order
+(`ENNReal.dyadicWeight_natCast`), and the powers of two `2^s ≠ ∞`, `1 ≤ 2^s` for `s ≥ 0`
+(`ENNReal.two_rpow_ne_top`, `ENNReal.one_le_two_rpow`) and `(ρ 2^(-j))^b = ρ^b 2^(-jb)`
+(`ENNReal.ofReal_div_two_pow_rpow`).  Two inequalities in `[0, ∞]`,
 `a x + b y ≤ (a + b)(x + y)` and `∑_i a_i b_i ≤ (∑_i a_i)(∑_i b_i)`
 (`ENNReal.mul_add_mul_le_add_mul_add`, `ENNReal.sum_mul_le_sum_mul_sum`), bound sums of
-products by products of sums.
+products by products of sums; further identities and inequalities for products, quotients and
+powers in `[0, ∞]` serve the constants of the K-method and of the trace theorems
+(`ENNReal.mul_div_rpow_eq`, `ENNReal.div_rpow_le_rpow_mul_div_rpow`).
 
 For `L_p` norms of functions with values in `[0, ∞]` the file proves homogeneity
 (`MeasureTheory.eLpNorm_const_mul_ennreal`), powers inside the norm
 (`MeasureTheory.eLpNorm_fun_rpow`), monotone convergence
 (`MeasureTheory.eLpNorm_iSup_of_directed`) and Minkowski's inequality for series
 (`MeasureTheory.eLpNorm_tsum_le`); the `ℓ_q` versions are their cases for the counting measure.
+For a function bounded between step values `a_n` on disjoint pieces of equal measure `c`, the
+`L_q` norm compares with `c^(1/q) ‖a‖_{ℓ_q}` (`MeasureTheory.eLpNorm_le_of_le_on_pieces`,
+`MeasureTheory.le_eLpNorm_of_le_on_pieces`), and `∫ u^r ≤ c^(r-1) ∫ u` for `u ≤ c`
+(`MeasureTheory.lintegral_rpow_le_mul_lintegral_of_ae_le`), in particular `∫ u² ≤ c ∫ u`
+(`MeasureTheory.lintegral_sq_le_mul_lintegral_of_ae_le`).
 -/
 
 @[expose] public section
@@ -92,6 +102,17 @@ theorem lqNorm_one (a : ι → ℝ≥0∞) : lqNorm 1 a = ∑' n, a n := by
 /-- For `1 ≤ q < ∞` the exponent `q.toReal` is at least `1`. -/
 theorem one_le_toReal_of_one_le (hq : 1 ≤ q) (hq' : q ≠ ∞) : 1 ≤ q.toReal := by
   simpa using ENNReal.toReal_mono hq' hq
+
+/-- `a^r = a · a^(r-1)` in `[0, ∞]` for `r ≥ 1`. -/
+theorem rpow_eq_mul_rpow_sub_one (a : ℝ≥0∞) {r : ℝ} (hr : 1 ≤ r) :
+    a ^ r = a * a ^ (r - 1) := by
+  calc a ^ r = a ^ ((1 : ℝ) + (r - 1)) := by ring_nf
+    _ = a ^ (1 : ℝ) * a ^ (r - 1) := ENNReal.rpow_add_of_nonneg _ _ zero_le_one (by linarith)
+    _ = a * a ^ (r - 1) := by rw [ENNReal.rpow_one]
+
+/-- An exponent `1 < p < ∞` in `[0, ∞]` has real value `p.toReal > 1`. -/
+theorem one_lt_toReal {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) : 1 < p.toReal := by
+  simpa using (ENNReal.toReal_lt_toReal ENNReal.one_ne_top hp).2 hp1
 
 /-- The `q`-th power of the norm is the sum of the `q`-th powers. -/
 theorem lqNorm_rpow (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ι → ℝ≥0∞) :
@@ -293,6 +314,16 @@ theorem lqNorm_comp_le_of_injective {g : ι → ι'} (hg : Function.Injective g)
 
 end Generic
 
+/-- Restricting every member of a family to a set `S` restricts its pointwise `ℓ_q` norm:
+`‖(1_S g_i(x))_i‖_{ℓ_q} = 1_S(x) ‖(g_i(x))_i‖_{ℓ_q}`. -/
+theorem lqNorm_indicator {α ι : Type*} [MeasurableSpace ι] [Countable ι]
+    [MeasurableSingletonClass ι] (q : ℝ≥0∞) (S : Set α) (g : ι → α → ℝ≥0∞) (x : α) :
+    lqNorm q (fun i => S.indicator (g i) x) =
+      S.indicator (fun y => lqNorm q (fun i => g i y)) x := by
+  by_cases hx : x ∈ S
+  · simp only [Set.indicator_of_mem hx]
+  · simp only [Set.indicator_of_notMem hx, ENNReal.lqNorm_zero_right]
+
 variable {q r : ℝ≥0∞} {a b : ℕ → ℝ≥0∞}
 
 /-- Dropping the first term does not increase the norm. -/
@@ -352,6 +383,19 @@ noncomputable def dyadicWeight (s : ℝ) (k : ℕ) : ℝ≥0∞ := (2 : ℝ≥0�
 
 variable {s t : ℝ}
 
+/-- `2^s` is finite in `ℝ≥0∞`. -/
+theorem two_rpow_ne_top (s : ℝ) : (2 : ℝ≥0∞) ^ s ≠ ∞ :=
+  rpow_ne_top_of_ne_zero two_ne_zero ofNat_ne_top
+
+/-- `1 ≤ 2^s` for `s ≥ 0`. -/
+theorem one_le_two_rpow (hs : 0 ≤ s) : 1 ≤ (2 : ℝ≥0∞) ^ s := by
+  simpa using ENNReal.rpow_le_rpow_of_exponent_le one_le_two hs
+
+/-- `1 ≤ 2 · 2^s` for `s ≥ 0`: the quasi-triangle constants `2 · 2^s` of the dyadic quasi-norms
+dominate the constant `1` of the norm. -/
+theorem one_le_two_mul_two_rpow (hs : 0 ≤ s) : 1 ≤ (2 : ℝ≥0∞) * 2 ^ s :=
+  one_le_two.trans (le_mul_of_one_le_right' (ENNReal.one_le_two_rpow hs))
+
 /-- `2^(0·s) = 1`. -/
 @[simp]
 theorem dyadicWeight_zero_right (s : ℝ) : dyadicWeight s 0 = 1 := by simp [dyadicWeight]
@@ -362,7 +406,7 @@ theorem dyadicWeight_zero_left (k : ℕ) : dyadicWeight 0 k = 1 := by simp [dyad
 
 /-- The dyadic weights are finite. -/
 theorem dyadicWeight_ne_top (s : ℝ) (k : ℕ) : dyadicWeight s k ≠ ∞ :=
-  ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top
+  ENNReal.two_rpow_ne_top _
 
 /-- The dyadic weights are finite. -/
 theorem dyadicWeight_lt_top (s : ℝ) (k : ℕ) : dyadicWeight s k < ∞ :=
@@ -459,6 +503,70 @@ theorem two_pow_rpow_eq_dyadicWeight (j n : ℕ) (t : ℝ) :
   rw [dyadicWeight, ← ENNReal.rpow_natCast, ← ENNReal.rpow_mul]
   congr 1
   push_cast
+  ring
+
+/-! ### Dyadic weights of integer order -/
+
+/-- For a natural order `L`, the dyadic weight `dyadicWeight L k`, a real power `2^(k·L)` in
+`[0, ∞]`, equals the natural power `2^(kL)`. -/
+theorem dyadicWeight_natCast (L k : ℕ) : dyadicWeight (L : ℝ) k = 2 ^ (k * L) := by
+  rw [dyadicWeight_eq_pow, ENNReal.rpow_natCast, ← pow_mul, mul_comm]
+
+/-- `2^(-kL) = (2^k)^(-L)`. -/
+theorem dyadicWeight_neg_natCast (L k : ℕ) :
+    dyadicWeight (-(L : ℝ)) k = ((2 : ℝ≥0∞) ^ k)⁻¹ ^ L := by
+  rw [ENNReal.dyadicWeight_neg, dyadicWeight_natCast, pow_mul, ENNReal.inv_pow]
+
+/-- For `i ≤ j' ≤ k`, `2^(-(k-i)L) ≤ 2^L 2^(-(j'+1-i)L)`. -/
+theorem dyadicWeight_neg_sub_le (L : ℕ) {i j' k : ℕ} (hij : i ≤ j') (hk : j' ≤ k) :
+    dyadicWeight (-(L : ℝ)) (k - i) ≤ 2 ^ L * dyadicWeight (-(L : ℝ)) (j' + 1 - i) := by
+  have h1 : dyadicWeight (-(L : ℝ)) (k - i) ≤ dyadicWeight (-(L : ℝ)) (j' - i) :=
+    ENNReal.dyadicWeight_anti (neg_nonpos.2 (Nat.cast_nonneg L)) (Nat.sub_le_sub_right hk i)
+  have h2 : j' + 1 - i = (j' - i) + 1 := by omega
+  rw [h2, ENNReal.dyadicWeight_add_nat, dyadicWeight_neg_natCast L 1, pow_one]
+  calc dyadicWeight (-(L : ℝ)) (k - i) ≤ dyadicWeight (-(L : ℝ)) (j' - i) := h1
+    _ = dyadicWeight (-(L : ℝ)) (j' - i) * (2 ^ L * (2 : ℝ≥0∞)⁻¹ ^ L) := by
+        rw [← mul_pow, ENNReal.mul_inv_cancel two_ne_zero ENNReal.ofNat_ne_top, one_pow, mul_one]
+    _ = _ := by ring
+
+/-- `1 ≤ 2^L 2^(-mL)` for `m ≤ 1`. -/
+theorem one_le_two_pow_mul_dyadicWeight_neg (L : ℕ) {m : ℕ} (hm : m ≤ 1) :
+    1 ≤ 2 ^ L * dyadicWeight (-(L : ℝ)) m := by
+  have h : dyadicWeight (-(L : ℝ)) 1 ≤ dyadicWeight (-(L : ℝ)) m :=
+    ENNReal.dyadicWeight_anti (neg_nonpos.2 (Nat.cast_nonneg L)) hm
+  calc (1 : ℝ≥0∞) = 2 ^ L * dyadicWeight (-(L : ℝ)) 1 := by
+        rw [dyadicWeight_neg_natCast, pow_one, ← mul_pow,
+          ENNReal.mul_inv_cancel two_ne_zero ENNReal.ofNat_ne_top, one_pow]
+    _ ≤ 2 ^ L * dyadicWeight (-(L : ℝ)) m := by gcongr
+
+/-- `2^(iL) 2^(-j'L) = 4^L 2^(-(j'+2-i)L)` for `i ≤ j' + 2`. -/
+theorem dyadicWeight_mul_dyadicWeight_neg_eq (L : ℕ) {i j' : ℕ} (hij : i ≤ j' + 2) :
+    dyadicWeight (L : ℝ) i * dyadicWeight (-(L : ℝ)) j' =
+      4 ^ L * dyadicWeight (-(L : ℝ)) (j' + 2 - i) := by
+  have h1 : dyadicWeight (-(L : ℝ)) (j' + 2 - i) * dyadicWeight (-(L : ℝ)) i =
+      dyadicWeight (-(L : ℝ)) j' * dyadicWeight (-(L : ℝ)) 2 := by
+    rw [← ENNReal.dyadicWeight_add_nat, ← ENNReal.dyadicWeight_add_nat, Nat.sub_add_cancel hij]
+  have h4 : (4 : ℝ≥0∞) ^ L * dyadicWeight (-(L : ℝ)) 2 = 1 := by
+    rw [dyadicWeight_neg_natCast, ← mul_pow, show (2 : ℝ≥0∞) ^ 2 = 4 by norm_num,
+      ENNReal.mul_inv_cancel (by norm_num) (by norm_num), one_pow]
+  calc dyadicWeight (L : ℝ) i * dyadicWeight (-(L : ℝ)) j'
+      = dyadicWeight (L : ℝ) i * dyadicWeight (-(L : ℝ)) j' *
+          (4 ^ L * dyadicWeight (-(L : ℝ)) 2) := by rw [h4, mul_one]
+    _ = 4 ^ L * (dyadicWeight (-(L : ℝ)) j' * dyadicWeight (-(L : ℝ)) 2) *
+          dyadicWeight (L : ℝ) i := by ring
+    _ = 4 ^ L * (dyadicWeight (-(L : ℝ)) (j' + 2 - i) * dyadicWeight (-(L : ℝ)) i) *
+          dyadicWeight (L : ℝ) i := by rw [h1]
+    _ = 4 ^ L * dyadicWeight (-(L : ℝ)) (j' + 2 - i) *
+          (dyadicWeight (-(L : ℝ)) i * dyadicWeight (L : ℝ) i) := by ring
+    _ = _ := by rw [ENNReal.dyadicWeight_neg_mul_self, mul_one]
+
+/-- `(X 2^(-jn))^(1/p) = X^(1/p) 2^(-jn/p)`. -/
+theorem rpow_mul_dyadicWeight_neg (X : ℝ≥0∞) (n : ℕ) (p : ℝ≥0∞) (j : ℕ) :
+    (X * dyadicWeight (-(n : ℝ)) j) ^ (1 / p.toReal) =
+      X ^ (1 / p.toReal) * dyadicWeight (-(n / p.toReal)) j := by
+  rw [ENNReal.mul_rpow_of_nonneg _ _ (div_nonneg zero_le_one ENNReal.toReal_nonneg),
+    ENNReal.dyadicWeight_rpow]
+  congr 2
   ring
 
 /-- The product rule for powers of `2` in `[0, ∞]`: `2^x 2^y = 2^(x+y)` for all real `x, y`
@@ -592,6 +700,32 @@ theorem ofReal_two_pow_mul_rpow_le {j k : ℕ} (hjk : j ≤ k) {h : ℝ} (hh : h
           ENNReal.ofReal_ofNat, ENNReal.inv_rpow, ← ENNReal.rpow_natCast, ← ENNReal.rpow_mul,
           dyadicWeight, mul_neg, ENNReal.rpow_neg]
 
+/-- `(ρ 2^(-j))^b = ρ^b 2^(-jb)` in `[0, ∞]` for `ρ > 0` and every real `b`. -/
+theorem ofReal_div_two_pow_rpow {ρ : ℝ} (hρ : 0 < ρ) (b : ℝ) (j : ℕ) :
+    ENNReal.ofReal (ρ / 2 ^ j) ^ b = ENNReal.ofReal ρ ^ b * dyadicWeight (-b) j := by
+  rw [div_eq_mul_inv, ENNReal.ofReal_mul hρ.le,
+    ENNReal.mul_rpow_of_ne_zero (ENNReal.ofReal_pos.2 hρ).ne' (by positivity),
+    ENNReal.ofReal_inv_of_pos (by positivity), ENNReal.ofReal_pow zero_le_two,
+    ENNReal.ofReal_ofNat, ENNReal.inv_rpow, ENNReal.dyadicWeight_neg,
+    ← ENNReal.natCast_two_pow_rpow]
+  norm_cast
+
+/-- `(2^j ρ)^b = ρ^b 2^(jb)` in `[0, ∞]` for `ρ > 0` and every real `b`. -/
+theorem ofReal_two_pow_mul_rpow {ρ : ℝ} (hρ : 0 < ρ) (b : ℝ) (j : ℕ) :
+    ENNReal.ofReal (2 ^ j * ρ) ^ b = ENNReal.ofReal ρ ^ b * dyadicWeight b j := by
+  rw [ENNReal.ofReal_mul (by positivity),
+    ENNReal.mul_rpow_of_ne_zero (by positivity) (ENNReal.ofReal_pos.2 hρ).ne', mul_comm,
+    ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat, ← ENNReal.natCast_two_pow_rpow]
+  norm_cast
+
+/-- **Dyadic scales as dyadic weights**: `(2^(-n))^θ = 2^(-nθ)` for every `n ∈ ℕ` and every real
+exponent `θ`, as an identity in `[0, ∞]` (`ENNReal.dyadicWeight`); the case `ρ = 1` of
+`ENNReal.ofReal_div_two_pow_rpow`. -/
+theorem ofReal_one_div_two_pow_rpow (n : ℕ) (θ : ℝ) :
+    ENNReal.ofReal ((1 / 2 ^ n) ^ θ) = dyadicWeight (-θ) n := by
+  rw [← ENNReal.ofReal_rpow_of_pos (by positivity), ofReal_div_two_pow_rpow one_pos,
+    ENNReal.ofReal_one, ENNReal.one_rpow, one_mul]
+
 /-! ### Subadditive functionals and series -/
 
 /-- **Subadditive functionals and multiple series**: if `Q` is subadditive, `Q a ≤ C ‖a‖` with
@@ -691,6 +825,18 @@ theorem lqNorm_ite_le_eq {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : 
   refine tsum_congr fun j => ?_
   split_ifs <;> simp [ENNReal.zero_rpow_of_pos hpos]
 
+/-- `‖(…, 0, x, 0, …)‖_{ℓ_q} = x` for a sequence with one nonzero term. -/
+theorem lqNorm_ite_eq {q : ℝ≥0∞} (hq : 1 ≤ q) (j : ℕ) (x : ℝ≥0∞) :
+    lqNorm q (fun i => if i = j then x else 0) = x := by
+  have h : (fun i => if i = j then x else 0) = ({j} : Set ℕ).indicator fun _ => x := by
+    funext i
+    by_cases hi : i = j
+    · rw [Set.indicator_of_mem (Set.mem_singleton_iff.2 hi)]; simp [hi]
+    · rw [Set.indicator_of_notMem (mt Set.mem_singleton_iff.1 hi)]; simp [hi]
+  rw [lqNorm, h, eLpNorm_indicator_const' (measurableSet_singleton j).nullMeasurableSet
+    (by simp) (zero_lt_one.trans_le hq).ne', Measure.count_singleton, ENNReal.one_rpow, mul_one]
+  rfl
+
 /-! ### Products of sums -/
 
 /-- `a x + b y ≤ (a + b)(x + y)` in `[0, ∞]`. -/
@@ -707,6 +853,64 @@ theorem sum_mul_le_sum_mul_sum {ι : Type*} (s : Finset ι) (a b : ι → ℝ≥
   rw [Finset.sum_mul]
   exact Finset.sum_le_sum fun i hi => mul_le_mul_right (Finset.single_le_sum
     (fun j _ => zero_le) hi) _
+
+/-- **Dividing by a smaller power**: if `w ≤ c v` with `0 < c < ∞` and `a ≥ 0`, then
+`u / v^a ≤ c^a (u / w^a)` in `[0, ∞]`. -/
+theorem div_rpow_le_rpow_mul_div_rpow {u v w c : ℝ≥0∞} (hc0 : c ≠ 0) (hct : c ≠ ∞)
+    (hw : w ≤ c * v) {a : ℝ} (ha : 0 ≤ a) : u / v ^ a ≤ c ^ a * (u / w ^ a) := by
+  have hca0 : c ^ a ≠ 0 := (ENNReal.rpow_pos (pos_iff_ne_zero.2 hc0) hct).ne'
+  have hcat : c ^ a ≠ ∞ := ENNReal.rpow_ne_top_of_nonneg ha hct
+  calc u / v ^ a = c ^ a * u / (c ^ a * v ^ a) := (ENNReal.mul_div_mul_left _ _ hca0 hcat).symm
+    _ ≤ c ^ a * u / w ^ a := ENNReal.div_le_div_left (by
+        rw [← ENNReal.mul_rpow_of_nonneg _ _ ha]
+        exact ENNReal.rpow_le_rpow hw ha) _
+    _ = c ^ a * (u / w ^ a) := mul_div_assoc _ _ _
+
+/-- `a Y + b X + c X ≤ (a + b + c) (X + Y)` in `[0, ∞]`. -/
+theorem mul_add_mul_add_mul_le (a b c X Y : ℝ≥0∞) :
+    a * Y + b * X + c * X ≤ (a + b + c) * (X + Y) :=
+  calc a * Y + b * X + c * X ≤ a * (X + Y) + b * (X + Y) + c * (X + Y) :=
+        add_le_add (add_le_add (mul_le_mul' le_rfl le_add_self) (mul_le_mul' le_rfl le_self_add))
+          (mul_le_mul' le_rfl le_self_add)
+    _ = (a + b + c) * (X + Y) := by ring
+
+/-! ### Quotients and powers -/
+
+/-- `a (x + (b/a) t y) = a x + t (b y)` for `0 < a < ∞`: the rescaled decomposition term of the
+K-functional under a map. -/
+theorem mul_add_div_mul_mul {a b : ℝ≥0∞} (ha0 : a ≠ 0) (ha : a ≠ ∞) (t x y : ℝ≥0∞) :
+    a * (x + b / a * t * y) = a * x + t * (b * y) := by
+  have h : a * (b / a) = b := ENNReal.mul_div_cancel ha0 ha
+  calc a * (x + b / a * t * y) = a * x + a * (b / a) * t * y := by ring
+    _ = a * x + t * (b * y) := by rw [h]; ring
+
+/-- `a (b/a)^θ = a^(1-θ) b^θ` for `0 < a < ∞` and every `b ∈ [0, ∞]`.  For `b = ∞` the power
+rule for products holds since both factors `∞` and `a⁻¹` are nonzero
+(`ENNReal.mul_rpow_of_ne_zero`). -/
+theorem mul_div_rpow_eq {a b : ℝ≥0∞} (ha0 : a ≠ 0) (ha : a ≠ ∞) (θ : ℝ) :
+    a * (b / a) ^ θ = a ^ (1 - θ) * b ^ θ := by
+  have h : (b * a⁻¹) ^ θ = b ^ θ * a⁻¹ ^ θ := by
+    rcases eq_or_ne b ∞ with rfl | hb
+    · exact ENNReal.mul_rpow_of_ne_zero ENNReal.top_ne_zero (ENNReal.inv_ne_zero.2 ha) θ
+    · exact ENNReal.mul_rpow_of_ne_top hb (ENNReal.inv_ne_top.2 ha0) θ
+  rw [div_eq_mul_inv, h, ENNReal.inv_rpow, ← ENNReal.rpow_neg, sub_eq_add_neg,
+    ENNReal.rpow_add _ _ ha0 ha, ENNReal.rpow_one]
+  ring
+
+/-- The constant `a^(1-θ) b^θ` is finite for `0 < a, b < ∞`. -/
+theorem rpow_mul_rpow_ne_top {a b : ℝ≥0∞} (ha0 : a ≠ 0) (ha : a ≠ ∞) (hb0 : b ≠ 0) (hb : b ≠ ∞)
+    (θ : ℝ) : a ^ (1 - θ) * b ^ θ ≠ ∞ :=
+  ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_ne_zero ha0 ha) (ENNReal.rpow_ne_top_of_ne_zero hb0 hb)
+
+/-- `(1 + t)^N ≤ 2^N (1 + t^N)` for `t ≥ 0`, from Mathlib's `add_pow_le`. -/
+theorem one_add_pow_le_two_pow_mul {t : ℝ} (ht : 0 ≤ t) (N : ℕ) :
+    (1 + t) ^ N ≤ 2 ^ N * (1 + t ^ N) := by
+  calc (1 + t) ^ N ≤ 2 ^ (N - 1) * (1 ^ N + t ^ N) := add_pow_le zero_le_one ht N
+    _ ≤ 2 ^ N * (1 + t ^ N) := by
+      rw [one_pow]
+      gcongr
+      · exact one_le_two
+      · exact Nat.sub_le N 1
 
 end ENNReal
 
@@ -805,32 +1009,126 @@ theorem eLpNorm_tsum_le {ι : Type*} [Countable ι] {g : ι → α → ℝ≥0�
     _ ≤ ∑ i ∈ s, eLpNorm (g i) p μ := eLpNorm_sum_le hp1
     _ ≤ ∑' i, eLpNorm (g i) p μ := ENNReal.sum_le_tsum s
 
+/-! ### Powers of bounded functions -/
+
+/-- **Powers of a bounded function**: if `u ≤ c` almost everywhere, then
+`∫ u^r ≤ c^(r-1) ∫ u` for every `r ≥ 1` and every almost everywhere measurable `u : α → [0, ∞]`,
+since `u^r = u · u^(r-1) ≤ u · c^(r-1)`. -/
+theorem lintegral_rpow_le_mul_lintegral_of_ae_le {u : α → ℝ≥0∞} {c : ℝ≥0∞} {r : ℝ} (hr : 1 ≤ r)
+    (hu : AEMeasurable u μ) (h : ∀ᵐ x ∂μ, u x ≤ c) :
+    ∫⁻ x, u x ^ r ∂μ ≤ c ^ (r - 1) * ∫⁻ x, u x ∂μ :=
+  calc ∫⁻ x, u x ^ r ∂μ ≤ ∫⁻ x, u x * c ^ (r - 1) ∂μ :=
+        lintegral_mono_ae (h.mono fun x hx => by
+          rw [ENNReal.rpow_eq_mul_rpow_sub_one _ hr]
+          exact mul_le_mul_right (ENNReal.rpow_le_rpow hx (by linarith)) _)
+    _ = (∫⁻ x, u x ∂μ) * c ^ (r - 1) := lintegral_mul_const'' _ hu
+    _ = c ^ (r - 1) * ∫⁻ x, u x ∂μ := mul_comm _ _
+
+/-- If `u ≤ c` almost everywhere, then `∫ u² ≤ c ∫ u`, for every almost everywhere measurable
+`u : α → [0, ∞]`: the case `r = 2` of
+`MeasureTheory.lintegral_rpow_le_mul_lintegral_of_ae_le`. -/
+theorem lintegral_sq_le_mul_lintegral_of_ae_le {u : α → ℝ≥0∞} {c : ℝ≥0∞} (hu : AEMeasurable u μ)
+    (h : ∀ᵐ x ∂μ, u x ≤ c) : ∫⁻ x, u x ^ 2 ∂μ ≤ c * ∫⁻ x, u x ∂μ := by
+  have h2 := lintegral_rpow_le_mul_lintegral_of_ae_le one_le_two hu h
+  norm_num [ENNReal.rpow_two] at h2
+  exact h2
+
+/-! ### `L_q` norms of functions that are bounded on pieces -/
+
+section Pieces
+
+open Function Set
+
+variable {ι : Type*} [MeasurableSpace ι] [Countable ι] [MeasurableSingletonClass ι]
+  {S : ι → Set α} {c : ℝ≥0∞} {G : α → ℝ≥0∞} {a : ι → ℝ≥0∞} {q : ℝ≥0∞}
+
+omit [MeasurableSpace ι] [MeasurableSingletonClass ι] in
+/-- **Integral of a function bounded on pieces**: if almost every point lies in one of the
+disjoint measurable sets `S n`, each of measure `c`, and `G ≤ a n` on `S n`, then
+`∫ G dμ ≤ c ∑_n a n`. -/
+theorem lintegral_le_of_le_on_pieces (hS : ∀ n, MeasurableSet (S n))
+    (hd : Pairwise (Disjoint on S)) (hcov : ∀ᵐ x ∂μ, x ∈ ⋃ n, S n) (hμ : ∀ n, μ (S n) = c)
+    (h : ∀ n, ∀ x ∈ S n, G x ≤ a n) : ∫⁻ x, G x ∂μ ≤ c * ∑' n, a n := by
+  calc ∫⁻ x, G x ∂μ = ∫⁻ x in ⋃ n, S n, G x ∂μ := by
+        rw [Measure.restrict_eq_self_of_ae_mem hcov]
+    _ = ∑' n, ∫⁻ x in S n, G x ∂μ := lintegral_iUnion hS hd G
+    _ ≤ ∑' n, ∫⁻ _ in S n, a n ∂μ := ENNReal.tsum_le_tsum fun n =>
+        lintegral_mono_ae ((ae_restrict_iff' (hS n)).2 (Filter.Eventually.of_forall (h n)))
+    _ = c * ∑' n, a n := by
+        simp_rw [setLIntegral_const, hμ]
+        rw [ENNReal.tsum_mul_right, mul_comm]
+
+omit [MeasurableSpace ι] [MeasurableSingletonClass ι] in
+/-- **Integral of a function bounded below on pieces**: if the measurable sets `S n` are
+disjoint, each of measure `c`, and `a n ≤ G` on `S n`, then `c ∑_n a n ≤ ∫ G dμ`. -/
+theorem le_lintegral_of_le_on_pieces (hS : ∀ n, MeasurableSet (S n))
+    (hd : Pairwise (Disjoint on S)) (hμ : ∀ n, μ (S n) = c)
+    (h : ∀ n, ∀ x ∈ S n, a n ≤ G x) : c * ∑' n, a n ≤ ∫⁻ x, G x ∂μ := by
+  calc c * ∑' n, a n = ∑' n, ∫⁻ _ in S n, a n ∂μ := by
+        simp_rw [setLIntegral_const, hμ]
+        rw [ENNReal.tsum_mul_right, mul_comm]
+    _ ≤ ∑' n, ∫⁻ x in S n, G x ∂μ := ENNReal.tsum_le_tsum fun n =>
+        lintegral_mono_ae ((ae_restrict_iff' (hS n)).2 (Filter.Eventually.of_forall (h n)))
+    _ = ∫⁻ x in ⋃ n, S n, G x ∂μ := (lintegral_iUnion hS hd G).symm
+    _ ≤ ∫⁻ x, G x ∂μ := setLIntegral_le_lintegral _ _
+
+/-- **`L_q` norm of a function bounded on pieces**: if almost every point lies in one of the
+disjoint measurable sets `S n`, each of measure `c`, and `G ≤ a n` on `S n`, then
+`‖G‖_{L_q(μ)} ≤ c^(1/q) ‖a‖_{ℓ_q}` for every `q` (with `c^(1/q) = 1` for `q = ∞`).  `G` is
+measurable, since `eLpNorm` is `∞` otherwise. -/
+theorem eLpNorm_le_of_le_on_pieces (hG : AEStronglyMeasurable G μ)
+    (hS : ∀ n, MeasurableSet (S n)) (hd : Pairwise (Disjoint on S))
+    (hcov : ∀ᵐ x ∂μ, x ∈ ⋃ n, S n) (hμ : ∀ n, μ (S n) = c) (h : ∀ n, ∀ x ∈ S n, G x ≤ a n) :
+    eLpNorm G q μ ≤ c ^ (1 / q.toReal) * ENNReal.lqNorm q a := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · rw [eLpNorm_exponent_zero hG]
+    exact zero_le
+  rcases eq_or_ne q ∞ with rfl | hq
+  · rw [eLpNorm_exponent_top hG, ENNReal.lqNorm_top, ENNReal.toReal_top, div_zero,
+      ENNReal.rpow_zero, one_mul]
+    refine essSup_le_of_ae_le _ (hcov.mono fun x hx => ?_)
+    obtain ⟨n, hn⟩ := mem_iUnion.1 hx
+    simpa only [enorm_eq_self] using (h n x hn).trans (le_iSup a n)
+  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
+  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hq0 hq hG, ENNReal.lqNorm_eq_tsum hq0 hq,
+    ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity)]
+  gcongr
+  refine lintegral_le_of_le_on_pieces hS hd hcov hμ fun n x hx => ?_
+  simp only [enorm_eq_self]
+  exact ENNReal.rpow_le_rpow (h n x hx) hp.le
+
+/-- **`L_q` norm of a function bounded below on pieces**: if the measurable sets `S n` are
+disjoint, each of measure `c ≠ 0`, and `a n ≤ G` on `S n`, then
+`c^(1/q) ‖a‖_{ℓ_q} ≤ ‖G‖_{L_q(μ)}` for every `q` (with `c^(1/q) = 1` for `q = ∞`). -/
+theorem le_eLpNorm_of_le_on_pieces (hS : ∀ n, MeasurableSet (S n))
+    (hd : Pairwise (Disjoint on S)) (hμ : ∀ n, μ (S n) = c) (hc : c ≠ 0)
+    (h : ∀ n, ∀ x ∈ S n, a n ≤ G x) :
+    c ^ (1 / q.toReal) * ENNReal.lqNorm q a ≤ eLpNorm G q μ := by
+  by_cases hG : AEStronglyMeasurable G μ
+  swap
+  · rw [eLpNorm_of_not_aestronglyMeasurable hG]
+    exact le_top
+  rcases eq_or_ne q 0 with rfl | hq0
+  · simp [ENNReal.lqNorm_zero_left]
+  rcases eq_or_ne q ∞ with rfl | hq
+  · rw [eLpNorm_exponent_top hG, ENNReal.lqNorm_top, ENNReal.toReal_top, div_zero,
+      ENNReal.rpow_zero, one_mul]
+    refine iSup_le fun n => ?_
+    by_contra hlt
+    push Not at hlt
+    have hae : ∀ᵐ x ∂μ, ‖G x‖ₑ < a n := ae_lt_of_essSup_lt hlt
+    have hsub : S n ⊆ {x | ¬ ‖G x‖ₑ < a n} := fun x hx => by
+      simp only [mem_ofPred_eq, enorm_eq_self, not_lt]
+      exact h n x hx
+    exact hc ((hμ n).symm.trans (measure_mono_null hsub (ae_iff.1 hae)))
+  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
+  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hq0 hq hG, ENNReal.lqNorm_eq_tsum hq0 hq,
+    ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity)]
+  gcongr
+  refine le_lintegral_of_le_on_pieces hS hd hμ fun n x hx => ?_
+  simp only [enorm_eq_self]
+  exact ENNReal.rpow_le_rpow (h n x hx) hp.le
+
+end Pieces
+
 end MeasureTheory
-
-/-- `(1 + t)^N ≤ 2^N (1 + t^N)` for `t ≥ 0`, from Mathlib's `add_pow_le`. -/
-theorem one_add_pow_le_two_pow_mul {t : ℝ} (ht : 0 ≤ t) (N : ℕ) :
-    (1 + t) ^ N ≤ 2 ^ N * (1 + t ^ N) := by
-  calc (1 + t) ^ N ≤ 2 ^ (N - 1) * (1 ^ N + t ^ N) := add_pow_le zero_le_one ht N
-    _ ≤ 2 ^ N * (1 + t ^ N) := by
-      rw [one_pow]
-      gcongr
-      · exact one_le_two
-      · exact Nat.sub_le N 1
-
-namespace Rd
-
-open ENNReal (lqNorm)
-
-/-- `‖(…, 0, x, 0, …)‖_{ℓ_q} = x` for a sequence with one nonzero term. -/
-theorem lqNorm_ite_eq {q : ℝ≥0∞} (hq : 1 ≤ q) (j : ℕ) (x : ℝ≥0∞) :
-    lqNorm q (fun i => if i = j then x else 0) = x := by
-  have h : (fun i => if i = j then x else 0) = ({j} : Set ℕ).indicator fun _ => x := by
-    funext i
-    by_cases hi : i = j
-    · rw [Set.indicator_of_mem (Set.mem_singleton_iff.2 hi)]; simp [hi]
-    · rw [Set.indicator_of_notMem (mt Set.mem_singleton_iff.1 hi)]; simp [hi]
-  rw [lqNorm, h, eLpNorm_indicator_const' (measurableSet_singleton j).nullMeasurableSet
-    (by simp) (zero_lt_one.trans_le hq).ne', Measure.count_singleton, ENNReal.one_rpow, mul_one]
-  rfl
-
-end Rd

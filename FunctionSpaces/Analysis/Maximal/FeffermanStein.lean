@@ -41,63 +41,6 @@ open MeasureTheory Module Metric Filter Set
 open scoped ENNReal
 open ENNReal (lqNorm)
 
-namespace ENNReal
-
-/-- Restricting every member of a family to a set `S` restricts its pointwise `ℓ_q` norm:
-`‖(1_S g_i(x))_i‖_{ℓ_q} = 1_S(x) ‖(g_i(x))_i‖_{ℓ_q}`. -/
-theorem lqNorm_indicator {α ι : Type*} [MeasurableSpace ι] [Countable ι]
-    [MeasurableSingletonClass ι] (q : ℝ≥0∞) (S : Set α) (g : ι → α → ℝ≥0∞) (x : α) :
-    lqNorm q (fun i => S.indicator (g i) x) =
-      S.indicator (fun y => lqNorm q (fun i => g i y)) x := by
-  by_cases hx : x ∈ S
-  · simp only [Set.indicator_of_mem hx]
-  · simp only [Set.indicator_of_notMem hx, ENNReal.lqNorm_zero_right]
-
-end ENNReal
-
-namespace Metric
-
-/-- If a set `Q ⊆ B̄(c, ρ)` meets the ball `B(x, r)` around a point `x ∉ B̄(c, 2ρ)`, then
-`Q ⊆ B(x, 3r)`: a point of `Q` in the ball forces `r > ρ`, so every point of `Q` lies within
-`r + 2ρ < 3r` of `x`. -/
-theorem subset_ball_three_mul_of_inter_nonempty {α : Type*} [PseudoMetricSpace α] {Q : Set α}
-    {c x : α} {ρ r : ℝ} (hQ : Q ⊆ closedBall c ρ) (hx : x ∉ closedBall c (2 * ρ))
-    (hne : (Q ∩ ball x r).Nonempty) : Q ⊆ ball x (3 * r) := by
-  obtain ⟨y, hyQ, hyB⟩ := hne
-  have hy : dist y c ≤ ρ := hQ hyQ
-  have hyx : dist y x < r := hyB
-  have hxc : 2 * ρ < dist x c := not_le.1 hx
-  have h1 : dist x c ≤ dist x y + dist y c := dist_triangle _ _ _
-  rw [dist_comm x y] at h1
-  intro z hz
-  have hz : dist z c ≤ ρ := hQ hz
-  have h2 : dist z x ≤ dist z c + dist c y + dist y x :=
-    (dist_triangle z y x).trans (add_le_add_left (dist_triangle z c y) _) |>.trans_eq (by ring)
-  rw [dist_comm c y] at h2
-  rw [mem_ball]
-  linarith
-
-end Metric
-
-namespace MeasureTheory
-
-variable {α : Type*} [MeasurableSpace α] {μ : Measure α}
-
-/-- **Powers of a bounded function**: if `u ≤ c` almost everywhere, then
-`∫ u^r ≤ c^(r-1) ∫ u` for every `r ≥ 1` and every almost everywhere measurable `u : α → [0, ∞]`,
-since `u^r = u · u^(r-1) ≤ u · c^(r-1)`. -/
-theorem lintegral_rpow_le_mul_lintegral_of_ae_le {u : α → ℝ≥0∞} {c : ℝ≥0∞} {r : ℝ} (hr : 1 ≤ r)
-    (hu : AEMeasurable u μ) (h : ∀ᵐ x ∂μ, u x ≤ c) :
-    ∫⁻ x, u x ^ r ∂μ ≤ c ^ (r - 1) * ∫⁻ x, u x ∂μ :=
-  calc ∫⁻ x, u x ^ r ∂μ ≤ ∫⁻ x, u x * c ^ (r - 1) ∂μ :=
-        lintegral_mono_ae (h.mono fun x hx => by
-          rw [ENNReal.rpow_eq_mul_rpow_sub_one _ hr]
-          exact mul_le_mul_right (ENNReal.rpow_le_rpow hx (by linarith)) _)
-    _ = (∫⁻ x, u x ∂μ) * c ^ (r - 1) := lintegral_mul_const'' _ hu
-    _ = c ^ (r - 1) * ∫⁻ x, u x ∂μ := mul_comm _ _
-
-end MeasureTheory
-
 namespace Rd
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
@@ -403,8 +346,7 @@ theorem weakTypeConst_ne_top {q : ℝ} (hq : 1 < q) : weakTypeConst V q ≠ ∞ 
     (maximalConst_ne_top hq)⟩
   · exact ENNReal.rpow_ne_top_of_nonneg (by linarith)
       (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top, ENNReal.pow_ne_top ENNReal.ofNat_ne_top⟩)
-  · exact ENNReal.rpow_ne_top_of_nonneg (mul_nonneg (Nat.cast_nonneg _) (by linarith))
-      ENNReal.ofNat_ne_top
+  · exact ENNReal.two_rpow_ne_top _
 
 /-- **The `q`-th power of the good parts**: in dimension `n ≥ 1`, for `1 < q < ∞`, almost
 everywhere measurable `g_j` with `G = ‖(g_j)_j‖_{ℓ_q}` integrable, and `0 < t`, the good parts
@@ -624,7 +566,7 @@ theorem interpolationConst_ne_top {p q : ℝ} (hp : 1 < p) (hpq : p < q) :
   · exact ENNReal.mul_ne_top (ENNReal.mul_ne_top ENNReal.ofNat_ne_top (weakTypeConst_ne_top hq))
       (ENNReal.inv_ne_top.2 (ENNReal.ofReal_pos.2 (by linarith)).ne')
   · exact ENNReal.mul_ne_top (ENNReal.mul_ne_top
-      (ENNReal.rpow_ne_top_of_nonneg (by linarith) ENNReal.ofNat_ne_top) (maximalConst_ne_top hq))
+      (ENNReal.two_rpow_ne_top _) (maximalConst_ne_top hq))
       (ENNReal.inv_ne_top.2 (ENNReal.ofReal_pos.2 (by linarith)).ne')
 
 /-- `interpolationConst V p q` is positive for `0 < p` and `0 < q`. -/
@@ -658,7 +600,7 @@ theorem lintegral_lqNorm_maximal_rpow_le_of_lt_of_measurable [Nontrivial V] {p :
   have hc1 : 2 * weakTypeConst V q.toReal ≠ ∞ :=
     ENNReal.mul_ne_top ENNReal.ofNat_ne_top (weakTypeConst_ne_top hr)
   have hc2 : (2 : ℝ≥0∞) ^ q.toReal * maximalConst (finrank ℝ V) q.toReal ≠ ∞ :=
-    ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by linarith) ENNReal.ofNat_ne_top)
+    ENNReal.mul_ne_top (ENNReal.two_rpow_ne_top _)
       (maximalConst_ne_top hr)
   have hm1 : Measurable fun τ : ℝ =>
       (∫⁻ x, {y | ENNReal.ofReal τ < lqNorm q (fun j => g j y)}.indicator

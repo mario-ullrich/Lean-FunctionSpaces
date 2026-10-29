@@ -129,61 +129,6 @@ theorem one_le_ofReal_mul_inv_of_le {a : ℝ≥0∞} {t : ℝ} (ht : 0 ≤ t) (h
           ENNReal.ofReal_one]
         gcongr
 
-/-! ### Dyadic weights of integer order -/
-
-/-- For a natural order `L`, the dyadic weight `dyadicWeight L k`, a real power `2^(k·L)` in
-`[0, ∞]`, equals the natural power `2^(kL)`. -/
-theorem dyadicWeight_natCast (L k : ℕ) : dyadicWeight (L : ℝ) k = 2 ^ (k * L) := by
-  rw [dyadicWeight_eq_pow, ENNReal.rpow_natCast, ← pow_mul, mul_comm]
-
-/-- `2^(-kL) = (2^k)^(-L)`. -/
-theorem dyadicWeight_neg_natCast (L k : ℕ) :
-    dyadicWeight (-(L : ℝ)) k = ((2 : ℝ≥0∞) ^ k)⁻¹ ^ L := by
-  rw [ENNReal.dyadicWeight_neg, dyadicWeight_natCast, pow_mul, ENNReal.inv_pow]
-
-/-- For `i ≤ j' ≤ k`, `2^(-(k-i)L) ≤ 2^L 2^(-(j'+1-i)L)`. -/
-theorem dyadicWeight_neg_sub_le (L : ℕ) {i j' k : ℕ} (hij : i ≤ j') (hk : j' ≤ k) :
-    dyadicWeight (-(L : ℝ)) (k - i) ≤ 2 ^ L * dyadicWeight (-(L : ℝ)) (j' + 1 - i) := by
-  have h1 : dyadicWeight (-(L : ℝ)) (k - i) ≤ dyadicWeight (-(L : ℝ)) (j' - i) :=
-    ENNReal.dyadicWeight_anti (neg_nonpos.2 (Nat.cast_nonneg L)) (Nat.sub_le_sub_right hk i)
-  have h2 : j' + 1 - i = (j' - i) + 1 := by omega
-  rw [h2, ENNReal.dyadicWeight_add_nat, dyadicWeight_neg_natCast L 1, pow_one]
-  calc dyadicWeight (-(L : ℝ)) (k - i) ≤ dyadicWeight (-(L : ℝ)) (j' - i) := h1
-    _ = dyadicWeight (-(L : ℝ)) (j' - i) * (2 ^ L * (2 : ℝ≥0∞)⁻¹ ^ L) := by
-        rw [← mul_pow, ENNReal.mul_inv_cancel two_ne_zero ENNReal.ofNat_ne_top, one_pow, mul_one]
-    _ = _ := by ring
-
-/-- `1 ≤ 2^L 2^(-mL)` for `m ≤ 1`. -/
-theorem one_le_two_pow_mul_dyadicWeight_neg (L : ℕ) {m : ℕ} (hm : m ≤ 1) :
-    1 ≤ 2 ^ L * dyadicWeight (-(L : ℝ)) m := by
-  have h : dyadicWeight (-(L : ℝ)) 1 ≤ dyadicWeight (-(L : ℝ)) m :=
-    ENNReal.dyadicWeight_anti (neg_nonpos.2 (Nat.cast_nonneg L)) hm
-  calc (1 : ℝ≥0∞) = 2 ^ L * dyadicWeight (-(L : ℝ)) 1 := by
-        rw [dyadicWeight_neg_natCast, pow_one, ← mul_pow,
-          ENNReal.mul_inv_cancel two_ne_zero ENNReal.ofNat_ne_top, one_pow]
-    _ ≤ 2 ^ L * dyadicWeight (-(L : ℝ)) m := by gcongr
-
-/-- `2^(iL) 2^(-j'L) = 4^L 2^(-(j'+2-i)L)` for `i ≤ j' + 2`. -/
-theorem dyadicWeight_mul_dyadicWeight_neg_eq (L : ℕ) {i j' : ℕ} (hij : i ≤ j' + 2) :
-    dyadicWeight (L : ℝ) i * dyadicWeight (-(L : ℝ)) j' =
-      4 ^ L * dyadicWeight (-(L : ℝ)) (j' + 2 - i) := by
-  have h1 : dyadicWeight (-(L : ℝ)) (j' + 2 - i) * dyadicWeight (-(L : ℝ)) i =
-      dyadicWeight (-(L : ℝ)) j' * dyadicWeight (-(L : ℝ)) 2 := by
-    rw [← ENNReal.dyadicWeight_add_nat, ← ENNReal.dyadicWeight_add_nat, Nat.sub_add_cancel hij]
-  have h4 : (4 : ℝ≥0∞) ^ L * dyadicWeight (-(L : ℝ)) 2 = 1 := by
-    rw [dyadicWeight_neg_natCast, ← mul_pow, show (2 : ℝ≥0∞) ^ 2 = 4 by norm_num,
-      ENNReal.mul_inv_cancel (by norm_num) (by norm_num), one_pow]
-  calc dyadicWeight (L : ℝ) i * dyadicWeight (-(L : ℝ)) j'
-      = dyadicWeight (L : ℝ) i * dyadicWeight (-(L : ℝ)) j' *
-          (4 ^ L * dyadicWeight (-(L : ℝ)) 2) := by rw [h4, mul_one]
-    _ = 4 ^ L * (dyadicWeight (-(L : ℝ)) j' * dyadicWeight (-(L : ℝ)) 2) *
-          dyadicWeight (L : ℝ) i := by ring
-    _ = 4 ^ L * (dyadicWeight (-(L : ℝ)) (j' + 2 - i) * dyadicWeight (-(L : ℝ)) i) *
-          dyadicWeight (L : ℝ) i := by rw [h1]
-    _ = 4 ^ L * dyadicWeight (-(L : ℝ)) (j' + 2 - i) *
-          (dyadicWeight (-(L : ℝ)) i * dyadicWeight (L : ℝ) i) := by ring
-    _ = _ := by rw [ENNReal.dyadicWeight_neg_mul_self, mul_one]
-
 end ENNReal
 
 namespace Rd
@@ -253,7 +198,7 @@ theorem one_add_norm_pow_mul_le_schwartz (G : 𝓢(V, ℂ)) (r N : ℕ) (x : V) 
   rw [pow_zero, one_mul] at h0
   calc (1 + ‖x‖) ^ N * ‖iteratedFDeriv ℝ r G x‖
       ≤ 2 ^ N * (1 + ‖x‖ ^ N) * ‖iteratedFDeriv ℝ r G x‖ :=
-        mul_le_mul_of_nonneg_right (one_add_pow_le_two_pow_mul (norm_nonneg x) N)
+        mul_le_mul_of_nonneg_right (ENNReal.one_add_pow_le_two_pow_mul (norm_nonneg x) N)
           (norm_nonneg _)
     _ = 2 ^ N * (‖iteratedFDeriv ℝ r G x‖ + ‖x‖ ^ N * ‖iteratedFDeriv ℝ r G x‖) := by ring
     _ ≤ _ := by gcongr
@@ -433,50 +378,11 @@ theorem lintegral_tail_schwartz_le (G : 𝓢(V, ℂ)) (r N : ℕ) (ρ : ℝ) :
           peetreIntegral V (finrank ℝ V + 1) := lintegral_const_mul' _ _ hc
     _ = tailConst G r N * ((1 + ENNReal.ofReal ρ) ^ N)⁻¹ := by rw [tailConst]; ring
 
-/-! ### Changes of scale -/
-
-/-- **Integrals under a change of scale**: `∫ f(r x) dx = |r^(-n)| ∫ f` for `r ≠ 0` and every
-`f : V → [0, ∞]` (Mathlib's `Measure.map_addHaar_smul`). -/
-theorem lintegral_comp_smul (f : V → ℝ≥0∞) {r : ℝ} (hr : r ≠ 0) :
-    ∫⁻ x, f (r • x) = ENNReal.ofReal |(r ^ finrank ℝ V)⁻¹| * ∫⁻ x, f x := by
-  rw [← smul_eq_mul, ← lintegral_smul_measure, ← Measure.map_addHaar_smul volume hr]
-  exact (lintegral_map_equiv f (Homeomorph.smulOfNeZero r hr).toMeasurableEquiv).symm
-
-/-- The set version of `Rd.lintegral_comp_smul`: `∫_s f(r x) dx = |r^(-n)| ∫_{r s} f` for every
-set `s`, since `x ↦ r x` is a measurable equivalence (Mathlib's
-`MeasurableEmbedding.restrict_map`). -/
-theorem setLIntegral_comp_smul (f : V → ℝ≥0∞) {r : ℝ} (hr : r ≠ 0) (s : Set V) :
-    ∫⁻ x in s, f (r • x) = ENNReal.ofReal |(r ^ finrank ℝ V)⁻¹| * ∫⁻ x in r • s, f x := by
-  let e := (Homeomorph.smulOfNeZero (α := V) r hr).toMeasurableEquiv
-  have hpre : e ⁻¹' (r • s) = s := by
-    ext x
-    exact Set.smul_mem_smul_set_iff₀ hr s x
-  rw [← smul_eq_mul, ← lintegral_smul_measure, ← Measure.restrict_smul,
-    ← Measure.map_addHaar_smul volume hr]
-  rw [show (fun x : V => r • x) = ⇑e from rfl, e.measurableEmbedding.restrict_map,
-    lintegral_map_equiv, hpre]
-  rfl
-
-omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
-/-- `r {z : a ≤ ‖z‖} = {u : r a ≤ ‖u‖}` for `r > 0`. -/
-theorem smul_setOf_le_norm [NormedSpace ℝ V] {r : ℝ} (hr : 0 < r) (a : ℝ) :
-    r • {z : V | a ≤ ‖z‖} = {u : V | r * a ≤ ‖u‖} := by
-  ext u
-  rw [Set.mem_smul_set_iff_inv_smul_mem₀ hr.ne', Set.mem_ofPred_eq, Set.mem_ofPred_eq, norm_smul,
-    Real.norm_of_nonneg (inv_nonneg.2 hr.le), le_inv_mul_iff₀ hr]
-
-/-- `∫ f(2^j x) dx = 2^(-jn) ∫ f`. -/
-theorem lintegral_comp_two_pow_smul (f : V → ℝ≥0∞) (j : ℕ) :
-    ∫⁻ x, f (((2 : ℝ) ^ j) • x) = (2 ^ (j * finrank ℝ V))⁻¹ * ∫⁻ x, f x := by
-  rw [lintegral_comp_smul f (by positivity), abs_of_pos (by positivity), ← pow_mul,
-    ENNReal.ofReal_inv_of_pos (by positivity), ENNReal.ofReal_pow zero_le_two,
-    ENNReal.ofReal_ofNat]
-
 /-- The mass of the dilated Peetre weight:
 `∫ 2^(jn) (1 + 2^j ‖u‖)^(-N) du = ∫ (1 + ‖u‖)^(-N) du`. -/
 theorem lintegral_dilate_peetre (j N : ℕ) :
     ∫⁻ u : V, 2 ^ (j * finrank ℝ V) * ((1 + 2 ^ j * ‖u‖ₑ) ^ N)⁻¹ = peetreIntegral V N := by
-  have h := lintegral_comp_two_pow_smul (V := V) (fun u => ((1 + ‖u‖ₑ) ^ N)⁻¹) j
+  have h := lintegral_comp_two_pow_smul (V := V) (μ := volume) (fun u => ((1 + ‖u‖ₑ) ^ N)⁻¹) j
   simp only [enorm_two_pow_smul] at h
   rw [lintegral_const_mul' _ _ (ENNReal.pow_ne_top ENNReal.ofNat_ne_top), h, peetreIntegral,
     ← mul_assoc, ENNReal.mul_inv_cancel (pow_ne_zero _ two_ne_zero)

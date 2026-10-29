@@ -58,12 +58,6 @@ open ENNReal (lqNorm dyadicWeight)
 variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
   {A : ApproximationScheme X} {s : ℝ} {q : ℝ≥0∞}
 
-/-- `1 + 2 + ⋯ + 2^(k-1) < 2^k`. -/
-theorem sum_range_two_pow_lt (k : ℕ) : ∑ j ∈ range k, 2 ^ j < 2 ^ k := by
-  induction k with
-  | zero => simp
-  | succ k ih => rw [Finset.sum_range_succ, pow_succ]; omega
-
 variable (A) in
 /-- The **block decomposition quasi-norm**: the infimum of `‖(2^(ks) ‖g_k‖)_k‖_q` over all
 block decompositions `f = ∑ g_k` with `g_k ∈ A (2^k)`. -/
@@ -319,7 +313,7 @@ theorem memApprox_iff_blockDecompNorm_lt_top [CompleteSpace X] (hs : 0 < s) (hq 
   · intro h
     exact (blockDecompNorm_le_approxNormDyadic hs hq f).trans_lt (ENNReal.mul_lt_top
       (ENNReal.add_lt_top.2 ⟨ENNReal.mul_lt_top (by norm_num)
-        (ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top).lt_top,
+        (ENNReal.two_rpow_ne_top _).lt_top,
         ENNReal.mul_lt_top (by norm_num) (ENNReal.dyadicWeight_lt_top s 2)⟩) h)
   · intro h
     exact (approxNormDyadic_le_blockDecompNorm hs hq f).trans_lt (ENNReal.mul_lt_top

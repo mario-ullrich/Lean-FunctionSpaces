@@ -141,7 +141,7 @@ theorem discreteKSeq_le_of_kFunctional_le (hA : A.IsQuasiNormed C) {B : InterpCo
     A.discreteKSeq ((1 - η) * θ₀ + η * θ₁) 1 u n ≤
       C * B.discreteKSeq η (θ₁ - θ₀) u n := by
   have hne : C * 2 ^ (-((n : ℝ) * (θ₁ - θ₀) * η)) ≠ ∞ :=
-    ENNReal.mul_ne_top hA.ne_top (ApproximationScheme.two_rpow_ne_top _)
+    ENNReal.mul_ne_top hA.ne_top (ENNReal.two_rpow_ne_top _)
   rw [discreteKSeq_one, discreteKSeq, ← mul_assoc]
   conv_rhs => rw [kFunctional, ENNReal.mul_iInf fun h => absurd h hne]
   refine le_iInf fun b => ?_
@@ -417,7 +417,7 @@ theorem kFunctional_kCouple_le (hA : A.IsQuasiNormed C) (hq₀ : 1 ≤ q₀) (hq
       (C * A.kSumBelow θ₀ u m + 2 ^ ((m : ℝ) * (θ₁ - θ₀)) * (C * A.kSumAbove θ₁ u m)) +
         G * 2 ^ (-((m : ℝ) * θ₀)) * A.kFunctional (2 ^ (m : ℝ)) u := by
     refine le_add_mul_kFunctional (A := A)
-      (ENNReal.mul_ne_top hGt (ApproximationScheme.two_rpow_ne_top _)) fun b => ?_
+      (ENNReal.mul_ne_top hGt (ENNReal.two_rpow_ne_top _)) fun b => ?_
     calc (A.kCouple θ₀ q₀ θ₁ q₁).kFunctional (2 ^ ((m : ℝ) * (θ₁ - θ₀))) u
         ≤ A.discreteKMethodNorm θ₀ 1 q₀ (u - b) +
             2 ^ ((m : ℝ) * (θ₁ - θ₀)) * A.discreteKMethodNorm θ₁ 1 q₁ b :=
@@ -520,7 +520,7 @@ theorem kFunctional_rightKCouple_le (hA : A.IsQuasiNormed C) (hq₀ : 1 ≤ q₀
       endpointHolmstedtConst C (1 - θ₀) * A.kSumBelow θ₀ u (m + 1) := by
   have h0 : (2 : ℝ≥0∞) ^ ((m : ℝ) * (1 - θ₀)) ≠ 0 :=
     (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne'
-  have ht : (2 : ℝ≥0∞) ^ ((m : ℝ) * (1 - θ₀)) ≠ ∞ := ApproximationScheme.two_rpow_ne_top _
+  have ht : (2 : ℝ≥0∞) ^ ((m : ℝ) * (1 - θ₀)) ≠ ∞ := ENNReal.two_rpow_ne_top _
   have hK := kFunctional_leftKCouple_le (A := A.swap) (q₁ := q₀) hA.swap hq₀ (sub_pos.2 hθ₀')
     (by linarith) (-m) u
   have e : -((m : ℝ) * (1 - θ₀)) = ((-m : ℤ) : ℝ) * (1 - θ₀) := by push_cast; ring

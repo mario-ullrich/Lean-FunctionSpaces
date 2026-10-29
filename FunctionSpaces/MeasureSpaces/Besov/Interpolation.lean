@@ -104,10 +104,10 @@ theorem memKMethod_besovNormCouple_iff (hs₀ : 0 < s₀) (hs : s₀ < s₁) (h�
     (⟨S.besovNorm μ p s₀ q₀, S.besovNorm μ p s₁ q₁⟩ : InterpCouple (Lp ℂ p μ)).MemKMethod η q f ↔
       S.MemBesov μ p ((1 - η) * s₀ + η * s₁) q f :=
   ApproximationScheme.memKMethod_iff_memApprox_of_two_sandwiches
-    (ApproximationScheme.two_rpow_ne_top s₀)
-    (ENNReal.mul_ne_top (by norm_num) (ApproximationScheme.two_rpow_ne_top s₀))
-    (ApproximationScheme.two_rpow_ne_top s₁)
-    (ENNReal.mul_ne_top (by norm_num) (ApproximationScheme.two_rpow_ne_top s₁))
+    (ENNReal.two_rpow_ne_top s₀)
+    (ENNReal.mul_ne_top (by norm_num) (ENNReal.two_rpow_ne_top s₀))
+    (ENNReal.two_rpow_ne_top s₁)
+    (ENNReal.mul_ne_top (by norm_num) (ENNReal.two_rpow_ne_top s₁))
     hq₀ hq₀ hq₁ hq₁ hs₀ hs hη hη' hq
     (ApproximationScheme.approxNorm_le_approxNormDyadic hq₀ hs₀.le)
     (ApproximationScheme.approxNormDyadic_le_approxNorm hq₀ hs₀.le)
@@ -123,8 +123,8 @@ theorem memKMethod_lpBesovNormCouple_iff (hs₁ : 0 < s₁) (hη : 0 < η) (hη'
     (⟨fun f => ‖f‖ₑ, S.besovNorm μ p s₁ q₁⟩ : InterpCouple (Lp ℂ p μ)).MemKMethod η q f ↔
       S.MemBesov μ p (η * s₁) q f :=
   ApproximationScheme.memKMethod_iff_memApprox_of_sandwich
-    (ApproximationScheme.two_rpow_ne_top s₁)
-    (ENNReal.mul_ne_top (by norm_num) (ApproximationScheme.two_rpow_ne_top s₁))
+    (ENNReal.two_rpow_ne_top s₁)
+    (ENNReal.mul_ne_top (by norm_num) (ENNReal.two_rpow_ne_top s₁))
     hq₁ hq₁ hs₁ hη hη' hq
     (ApproximationScheme.approxNorm_le_approxNormDyadic hq₁ hs₁.le)
     (ApproximationScheme.approxNormDyadic_le_approxNorm hq₁ hs₁.le)

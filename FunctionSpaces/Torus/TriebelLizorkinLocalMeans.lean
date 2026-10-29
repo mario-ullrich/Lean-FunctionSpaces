@@ -305,32 +305,33 @@ theorem enorm_econv_kernel_proj_le_tsum_maximal (L : ℕ) (hp : p ≠ ∞)
 /-- **The blocks by local means in `ℓ_q` on the torus**: for `L ≥ 1`, `L' ≥ 1`, `1 ≤ p < ∞`,
 `1 ≤ q ≤ ∞`, `s ∈ ℝ` and `f ∈ L_p(𝕋^d)`, for almost every `x ∈ P_0`,
 `‖(2^(js) |ψ_j ⋆ f(π x)|)_j‖_{ℓ_q} ≤ C A_{s,L'} ‖(M(2^(is) |k_i ⋆ f| ∘ π)(x))_i‖_{ℓ_q}` with
-`C = Rd.LocalMeansBump.blockByLocalMeansConst L L'` and `A_{s,L'} = Rd.almostDiagonalConst s L'`. -/
+`C = Rd.LocalMeansBump.blockByLocalMeansConst L L'` and
+`A_{s,L'} = ENNReal.almostDiagonalConst s L'`. -/
 theorem lqNorm_blockFun_proj_le_lqNorm_maximal {L : ℕ} (hL : 1 ≤ L) {L' : ℕ} (hL' : 1 ≤ L')
     (hp : p ≠ ∞) {q : ℝ≥0∞} (hq : 1 ≤ q) (s : ℝ)
     (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∀ᵐ x ∂(volume.restrict (periodBox 0)),
       lqNorm q (fun j => dyadicWeight s j * ‖blockFun j f (proj x)‖ₑ) ≤
-        b.blockByLocalMeansConst L L' * Rd.almostDiagonalConst s L' *
+        b.blockByLocalMeansConst L L' * ENNReal.almostDiagonalConst s L' *
           lqNorm q (fun i => Rd.maximal (fun y => dyadicWeight s i *
             ‖econv (b.kernel L i) f (proj y)‖ₑ) x) := by
   filter_upwards [enorm_blockFun_proj_le_tsum_maximal b hL hL' hp f] with x hx
-  refine (Rd.lqNorm_le_almostDiagonalConst_mul_of_le hq s L' hx).trans_eq ?_
+  refine (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq s L' hx).trans_eq ?_
   simp only [Rd.dyadicWeight_mul_maximal]
 
 /-- **The local means by blocks in `ℓ_q` on the torus**: for every order `L`, `1 ≤ p < ∞`,
 `1 ≤ q ≤ ∞`, `s ∈ ℝ` and `f ∈ L_p(𝕋^d)`, for almost every `x ∈ P_0`,
 `‖(2^(js) |k_j ⋆ f(π x)|)_j‖_{ℓ_q} ≤ C A_{s,L} ‖(M(2^(is) |ψ_i ⋆ f| ∘ π)(x))_i‖_{ℓ_q}` with
-`C = Rd.LocalMeansBump.localMeansByBlockConst L` and `A_{s,L} = Rd.almostDiagonalConst s L`. -/
+`C = Rd.LocalMeansBump.localMeansByBlockConst L` and `A_{s,L} = ENNReal.almostDiagonalConst s L`. -/
 theorem lqNorm_econv_kernel_proj_le_lqNorm_maximal (L : ℕ) (hp : p ≠ ∞) {q : ℝ≥0∞}
     (hq : 1 ≤ q) (s : ℝ) (f : Lp ℂ p (volume : Measure (UnitAddTorus d))) :
     ∀ᵐ x ∂(volume.restrict (periodBox 0)),
       lqNorm q (fun j => dyadicWeight s j * ‖econv (b.kernel L j) f (proj x)‖ₑ) ≤
-        b.localMeansByBlockConst L * Rd.almostDiagonalConst s L *
+        b.localMeansByBlockConst L * ENNReal.almostDiagonalConst s L *
           lqNorm q (fun i => Rd.maximal (fun y => dyadicWeight s i *
             ‖blockFun i f (proj y)‖ₑ) x) := by
   filter_upwards [enorm_econv_kernel_proj_le_tsum_maximal b L hp f] with x hx
-  refine (Rd.lqNorm_le_almostDiagonalConst_mul_of_le hq s L hx).trans_eq ?_
+  refine (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq s L hx).trans_eq ?_
   simp only [Rd.dyadicWeight_mul_maximal]
 
 omit [Fact (1 ≤ p)] in
@@ -366,9 +367,9 @@ theorem eLpNorm_le_of_le_lqNorm_maximal_proj (hp1 : 1 < p) (hp : p ≠ ∞) {q :
 
 /-- The constant `C A_{s,L'} C_P` of the bound of the Triebel–Lizorkin quasi-norm on the torus by
 local means, with `L' = ⌈s⌉₊ + 1`: `C = Rd.LocalMeansBump.blockByLocalMeansConst L L'`,
-`A_{s,L'} = Rd.almostDiagonalConst s L'` and `C_P = Torus.periodicFSConst d p q`. -/
+`A_{s,L'} = ENNReal.almostDiagonalConst s L'` and `C_P = Torus.periodicFSConst d p q`. -/
 noncomputable def tlUpperConst (L : ℕ) (p q : ℝ≥0∞) (s : ℝ) : ℝ≥0∞ :=
-  b.blockByLocalMeansConst L (⌈s⌉₊ + 1) * Rd.almostDiagonalConst s ((⌈s⌉₊ + 1 : ℕ) : ℝ) *
+  b.blockByLocalMeansConst L (⌈s⌉₊ + 1) * ENNReal.almostDiagonalConst s ((⌈s⌉₊ + 1 : ℕ) : ℝ) *
     periodicFSConst d p q
 
 /-- The constant of the bound of the Triebel–Lizorkin quasi-norm on the torus by local means is
@@ -376,22 +377,22 @@ finite for `1 < p < ∞`, `1 < q ≤ ∞` and `s > 0`. -/
 theorem tlUpperConst_ne_top (L : ℕ) {p q : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) (hq1 : 1 < q)
     {s : ℝ} (hs : 0 < s) : tlUpperConst b L p q s ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.mul_ne_top (b.blockByLocalMeansConst_ne_top L _)
-    (Rd.almostDiagonalConst_ne_top hs
+    (ENNReal.almostDiagonalConst_ne_top hs
       (by push_cast; exact (Nat.le_ceil s).trans_lt (lt_add_one _))))
     (periodicFSConst_ne_top hp1 hp hq1)
 
 /-- The constant `C A_{s,L} C_P` of the bound of the local means on the torus by the
 Triebel–Lizorkin quasi-norm: `C = Rd.LocalMeansBump.localMeansByBlockConst L`,
-`A_{s,L} = Rd.almostDiagonalConst s L` and `C_P = Torus.periodicFSConst d p q`. -/
+`A_{s,L} = ENNReal.almostDiagonalConst s L` and `C_P = Torus.periodicFSConst d p q`. -/
 noncomputable def tlLowerConst (L : ℕ) (p q : ℝ≥0∞) (s : ℝ) : ℝ≥0∞ :=
-  b.localMeansByBlockConst L * Rd.almostDiagonalConst s L * periodicFSConst d p q
+  b.localMeansByBlockConst L * ENNReal.almostDiagonalConst s L * periodicFSConst d p q
 
 /-- The constant of the bound of the local means on the torus by the Triebel–Lizorkin quasi-norm
 is finite for `1 < p < ∞`, `1 < q ≤ ∞` and `0 < s < L`. -/
 theorem tlLowerConst_ne_top {L : ℕ} {p q : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) (hq1 : 1 < q)
     {s : ℝ} (hs : 0 < s) (hsL : s < L) : tlLowerConst b L p q s ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.mul_ne_top (b.localMeansByBlockConst_ne_top L)
-    (Rd.almostDiagonalConst_ne_top hs hsL)) (periodicFSConst_ne_top hp1 hp hq1)
+    (ENNReal.almostDiagonalConst_ne_top hs hsL)) (periodicFSConst_ne_top hp1 hp hq1)
 
 /-- **The Triebel–Lizorkin quasi-norm on the torus by local means**: for `L ≥ 1`, `1 < p < ∞`,
 `1 < q ≤ ∞`, `s ∈ ℝ` and `f ∈ L_p(𝕋^d)`, `‖f‖_{F^s_{p,q}} ≤ C ‖f‖_{F^s_{p,q}}^{b,L}` with

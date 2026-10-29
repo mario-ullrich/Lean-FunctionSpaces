@@ -144,15 +144,42 @@ Linearity and the identities hold almost everywhere by \Cref{lem:conv-assoc}, an
 
 \section{Approximate identities}
 
+\begin{lemma}[Changes of scale]
+\label{lem:change-of-scale}
+\lean{Rd.lintegral_comp_smul, Rd.setLIntegral_comp_smul, Rd.lintegral_comp_two_pow_smul,
+  Rd.smul_setOf_le_norm}
+\leanok
+For every additive Haar measure $\mu$ on $V$, every $f \colon V \to [0, \infty]$, every real
+$c \neq 0$ and every $S \subseteq V$,
+\[
+  \int_S f(c x) \, d\mu(x) = |c|^{-n} \int_{c S} f \, d\mu ,
+\]
+and for every $j \in \N$, $\int_V f(2^j x) \, d\mu(x) = 2^{-jn} \int_V f \, d\mu$. For every real
+$r > 0$ and every $a \in \R$, $r \{z \in V : a \leq \|z\|\} = \{u \in V : r a \leq \|u\|\}$.
+\end{lemma}
+
+For $S = V$ the change of scale reads $\int_V f(c x) \, d\mu(x) = |c|^{-n} \int_V f \, d\mu$.
+
+\begin{proof}
+\leanok
+The image of $\mu$ under $x \mapsto c x$ is $|c|^{-n} \mu$ (Mathlib's
+\texttt{Measure.\allowbreak map\_\allowbreak addHaar\_\allowbreak smul}). The map
+$x \mapsto c x$ is a measurable equivalence that carries $S$ onto $c S$, so the identity
+restricts to $S$. The last identity is $\|r^{-1} u\| = r^{-1} \|u\|$.
+\end{proof}
+
 \begin{lemma}[Dilations]
 \label{lem:dilate}
-\lean{Rd.dilate, Rd.integrable_dilate, Rd.integral_dilate, Rd.eLpNorm_dilate_one,
-  Rd.conv_dilate_apply, Rd.ae_integrable_dilate_mul, Rd.continuous_dilate, Rd.bddAbove_dilate,
+\lean{Rd.dilate, Rd.integrable_dilate, Rd.integral_dilate, Rd.lintegral_enorm_dilate,
+  Rd.eLpNorm_dilate_one, Rd.conv_dilate_apply, Rd.ae_integrable_dilate_mul, Rd.continuous_dilate,
+  Rd.bddAbove_dilate,
   Rd.hasCompactSupport_dilate, Rd.smul_mem_tsupport_of_mem_tsupport_dilate,
   Rd.norm_le_of_mem_tsupport_dilate, Rd.eventually_tsupport_dilate_add_subset_thickening}
 \leanok
-\uses{def:conv}
-For $c > 0$ and $\Phi : V \to \C$ let $\Phi_c(x) = c^n \Phi(c x)$. If $\Phi$ is integrable, then
+\uses{def:conv, lem:change-of-scale}
+For $c > 0$ and $\Phi : V \to \C$ let $\Phi_c(x) = c^n \Phi(c x)$. For every additive Haar
+measure $\mu$ on $V$, every $F : V \to \C$ and every $c > 0$,
+$\int |F_c| \, d\mu = \int |F| \, d\mu$. If $\Phi$ is integrable, then
 $\Phi_c$ is integrable with $\int \Phi_c = \int \Phi$ and $\|\Phi_c\|_1 = \|\Phi\|_1$. For all
 $f : V \to \C$ and $x \in V$, $(\Phi_c * f)(x) = \int_V \Phi(z) f(x - c^{-1} z) \, dz$, and for
 $f \in L_p$, $1 \leq p < \infty$, the integrand is integrable for almost every $x$. Dilations of
@@ -167,7 +194,9 @@ for all large $k$.
 
 \begin{proof}
 \leanok
-Substitute $y = c x$, which multiplies Lebesgue measure by $c^{-n}$. The support of $\Phi_c$ is
+Substitute $y = c x$, which multiplies Lebesgue measure by $c^{-n}$
+(\Cref{lem:change-of-scale}); then $|F_c(x)| = c^n |F(c x)|$ gives $\int |F_c| = \int |F|$. The
+support of $\Phi_c$ is
 the preimage of $\operatorname{supp} \Phi$ under $x \mapsto c x$, so
 $\operatorname{supp} \Phi_{2^k} \subseteq B(0, \delta)$ once $R / 2^k < \delta$, and
 $B(0, \delta) + S$ is the $\delta$-neighbourhood of $S$.
@@ -994,37 +1023,37 @@ monotonicity of the $L_p$ norm.
 
 \section{Dyadic cubes and the Lebesgue differentiation theorem}
 
-The Calder\'on--Zygmund decomposition stops at dyadic cubes of every size, so the cells of
-\Cref{def:dyadic-cells} are extended to all integer levels. Throughout, $V$ is a
-finite-dimensional real inner product space of dimension $n$ with Lebesgue measure $|\cdot|$,
-$(b_i)_{i=1}^n$ is the orthonormal basis of \Cref{def:dyadic-cells}, $x_i = \langle b_i, x \rangle$
-are the coordinates of $x \in V$, and for a measure $\mu$ and a set $Q$,
-$F_Q = \mu(Q)^{-1} \int_Q F \, d\mu$ is the average of $F$ over $Q$ (with $\mu = |\cdot|$ on $V$;
-as in Mathlib, $F_Q = 0$ when $\mu(Q)$ is $0$ or $\infty$).
+The Calder\'on--Zygmund decomposition stops at dyadic cubes of every size, so the cubes come in
+all integer levels; the dyadic cells of \Cref{def:dyadic-cells} are the cubes of natural level.
+Throughout, $V$ is a finite-dimensional real inner product space of dimension $n$ with Lebesgue
+measure $|\cdot|$, $(b_i)_{i=1}^n$ is a fixed orthonormal basis of $V$, the basis of the dyadic
+grid, $x_i = \langle b_i, x \rangle$ are the coordinates of $x \in V$, and for a measure $\mu$
+and a set $Q$, $F_Q = \mu(Q)^{-1} \int_Q F \, d\mu$ is the average of $F$ over $Q$ (with
+$\mu = |\cdot|$ on $V$; as in Mathlib, $F_Q = 0$ when $\mu(Q)$ is $0$ or $\infty$).
 
 \begin{definition}[Dyadic cubes]
 \label{def:dyadic-cubes}
-\lean{Rd.zcellIndex, Rd.zcell, Rd.zcellCenter, Rd.zcellIndex_natCast, Rd.zcell_natCast,
-  Rd.zcellCenter_natCast, Rd.mem_zcell_zcellIndex, Rd.repr_zcellCenter, Rd.measurable_zcellIndex,
-  Rd.measurableSet_zcell, Rd.cubeAt, Rd.mem_cubeAt}
+\lean{Rd.gridBasis, Rd.zcellIndex, Rd.zcell, Rd.zcellCenter, Rd.mem_zcell_zcellIndex,
+  Rd.repr_zcellCenter, Rd.measurable_zcellIndex, Rd.measurableSet_zcell, Rd.cubeAt,
+  Rd.mem_cubeAt}
 \leanok
-\uses{def:dyadic-cells}
 For $k \in \Z$ and $m \in \Z^n$ the dyadic cube of level $k$ and index $m$ is
 $Q_{k,m} = \{x \in V : \lfloor 2^k x_i \rfloor = m_i \text{ for all } i\}$, with centre
 $c_{k,m} = \sum_i (m_i + 1/2) 2^{-k} b_i$. Every $x$ lies in the cube $Q_k(x)$ of level $k$ with
 index $(\lfloor 2^k x_i \rfloor)_i$. For every $k \in \Z$ and every $m \in \Z^n$ the cube
-$Q_{k,m}$ is measurable, and for every $k \in \N$ it is the cell $P_{k,m}$, with the same centre.
+$Q_{k,m}$ is measurable.
 \end{definition}
 
 \begin{lemma}[Size, partition and volume of cubes]
 \label{lem:dyadic-cubes}
-\lean{Rd.repr_sub_zcellCenter, Rd.abs_repr_sub_zcellCenter_le, Rd.norm_sub_zcellCenter_le,
-  Rd.zcell_subset_closedBall, Rd.ball_subset_zcell, Rd.zcell_disjoint, Rd.iUnion_zcell,
-  Rd.zcell_eq_preimage, Rd.volume_zcell, Rd.volume_zcell_pos, Rd.volume_zcell_lt_top,
-  Rd.volume_real_zcell, Rd.volume_cell}
+\lean{Rd.abs_repr_le_norm, Rd.repr_sub_zcellCenter, Rd.abs_repr_sub_zcellCenter_le,
+  Rd.norm_sub_zcellCenter_le, Rd.zcell_subset_closedBall, Rd.ball_subset_zcell,
+  Rd.zcell_disjoint, Rd.iUnion_zcell, Rd.zcell_eq_preimage, Rd.volume_zcell, Rd.volume_zcell_pos,
+  Rd.volume_zcell_lt_top, Rd.volume_real_zcell}
 \leanok
-\uses{def:dyadic-cubes, lem:dyadic-cells}
-For every $k \in \Z$, every $m \in \Z^n$ and every $x \in V$, the $i$-th coordinate of
+\uses{def:dyadic-cubes}
+For every $y \in V$ every coordinate of $y$ is at most $\|y\|$ in modulus. For every $k \in \Z$,
+every $m \in \Z^n$ and every $x \in V$, the $i$-th coordinate of
 $x - c_{k,m}$ is $(2^k x_i - m_i - 1/2) 2^{-k}$. For every $k \in \Z$, every $m \in \Z^n$ and
 every $x \in Q_{k,m}$, every coordinate of $x - c_{k,m}$ is at most $2^{-k}/2$ in modulus and
 $\|x - c_{k,m}\| \leq n 2^{-k}$. For every $k \in \Z$ and every $m \in \Z^n$,
@@ -1032,13 +1061,19 @@ $\|x - c_{k,m}\| \leq n 2^{-k}$. For every $k \in \Z$ and every $m \in \Z^n$,
   Q_{k,m} = \{x \in V : m_i 2^{-k} \leq x_i < (m_i + 1) 2^{-k} \text{ for all } i\},
 \]
 $B(c_{k,m}, 2^{-k}/2) \subseteq Q_{k,m} \subseteq \bar B(c_{k,m}, n 2^{-k})$ and
-$|Q_{k,m}| = 2^{-kn}$, in particular $|P_{j,m}| = 2^{-jn}$ for $j \in \N$. For every $k \in \Z$
-the cubes of level $k$ are pairwise disjoint and cover $V$.
+$|Q_{k,m}| = 2^{-kn}$. For every $k \in \Z$ the cubes of level $k$ are pairwise disjoint and
+cover $V$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-The bounds are those of \Cref{lem:dyadic-cells} with $2^{-k}$ in place of $2^{-j}$. A point of
+A coordinate of $y$ is the inner product with a unit vector, so it is at most $\|y\|$ by the
+Cauchy--Schwarz inequality. The $i$-th coordinate of $x - c_{k,m}$ is
+$x_i - (m_i + 1/2) 2^{-k} = (2^k x_i - m_i - 1/2) 2^{-k}$. On $Q_{k,m}$,
+$\lfloor 2^k x_i \rfloor = m_i$ gives $m_i \leq 2^k x_i < m_i + 1$, hence
+$|2^k x_i - m_i - 1/2| \leq 1/2$, and every coordinate of $x - c_{k,m}$ is at most $2^{-k}/2$ in
+modulus. Summing over the $n$ coordinates in the orthonormal basis gives
+$\|x - c_{k,m}\| \leq \sum_i |x_i - (c_{k,m})_i| \leq n 2^{-k}$. A point of
 the ball has coordinates within less than $2^{-k}/2$ of $(m_i + 1/2) 2^{-k}$, so
 $\lfloor 2^k x_i \rfloor = m_i$. The description as a set of inequalities is
 $\lfloor t \rfloor = m_i \iff m_i \leq t < m_i + 1$; in the coordinates of the basis the cube is
@@ -1156,6 +1191,23 @@ $\int_{B(x,r)} g \leq |B(0,r)| \, c$ for all $r > 0$, $M g(x) \leq c$.
 \end{definition}
 
 The normalisation by $|B(0, r)| = |B(x, r)|$ keeps the factor independent of $x$.
+
+\begin{lemma}[Volumes of dyadic balls]
+\label{lem:dyadic-ball-volume}
+\lean{Rd.volume_ball_div_two_pow, Rd.volume_closedBall_div_two_pow}
+\leanok
+Let $|B_1| = |B(0, 1)|$. For every $j \in \N$ and every $z \in V$: for every $\rho > 0$,
+$|B(z, \rho 2^{-j})| = \rho^n |B_1| 2^{-jn}$, and for every $d \geq 0$,
+$|\bar B(z, d 2^{-j})| = d^n |B_1| 2^{-jn}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Lebesgue measure is invariant under translations and multiplies by $r^n$ under $x \mapsto r x$,
+and the closed ball has the volume of the open one (Mathlib's
+\texttt{Measure.\allowbreak addHaar\_\allowbreak ball\_\allowbreak of\_\allowbreak pos} and
+\texttt{Measure.\allowbreak addHaar\_\allowbreak closedBall}).
+\end{proof}
 
 \begin{lemma}[Elementary properties of the maximal function]
 \label{lem:maximal-function-basic}

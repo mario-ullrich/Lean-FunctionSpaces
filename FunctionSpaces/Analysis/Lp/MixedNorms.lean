@@ -101,17 +101,6 @@ theorem tendsto_lqNorm_ite_le {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q ≠ ∞) 
 
 /-! ### Powers in `[0, ∞]` -/
 
-/-- `a^r = a · a^(r-1)` in `[0, ∞]` for `r ≥ 1`. -/
-theorem rpow_eq_mul_rpow_sub_one (a : ℝ≥0∞) {r : ℝ} (hr : 1 ≤ r) :
-    a ^ r = a * a ^ (r - 1) := by
-  calc a ^ r = a ^ ((1 : ℝ) + (r - 1)) := by ring_nf
-    _ = a ^ (1 : ℝ) * a ^ (r - 1) := ENNReal.rpow_add_of_nonneg _ _ zero_le_one (by linarith)
-    _ = a * a ^ (r - 1) := by rw [ENNReal.rpow_one]
-
-/-- An exponent `1 < p < ∞` in `[0, ∞]` has real value `p.toReal > 1`. -/
-theorem one_lt_toReal {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) : 1 < p.toReal := by
-  simpa using (ENNReal.toReal_lt_toReal ENNReal.one_ne_top hp).2 hp1
-
 /-- Every term of a finite family is bounded by its `ℓ_r` norm:
 `a_i ≤ (∑_{j ∈ S} a_j^r)^(1/r)` for `i ∈ S` and `r > 0`. -/
 theorem le_rpow_sum_rpow {ι : Type*} {S : Finset ι} {a : ι → ℝ≥0∞} {i : ι}

@@ -102,24 +102,11 @@ theorem approxNormDyadic_neg (f : X) : A.approxNormDyadic s q (-f) = A.approxNor
     rw [approxSeqDyadic, approxSeqDyadic, approxError_neg]
   rw [approxNormDyadic, approxNormDyadic, h, enorm_neg]
 
-/-- `1 ≤ 2^s` for `s ≥ 0`. -/
-theorem one_le_two_rpow (hs : 0 ≤ s) : 1 ≤ (2 : ℝ≥0∞) ^ s := by
-  simpa using ENNReal.rpow_le_rpow_of_exponent_le one_le_two hs
-
-/-- `1 ≤ 2 · 2^s` for `s ≥ 0`: the quasi-triangle constants `2 · 2^s` of the dyadic quasi-norms
-dominate the constant `1` of the norm. -/
-theorem one_le_two_mul_two_rpow (hs : 0 ≤ s) : 1 ≤ (2 : ℝ≥0∞) * 2 ^ s :=
-  one_le_two.trans (le_mul_of_one_le_right' (one_le_two_rpow hs))
-
-/-- `2^s` is finite in `ℝ≥0∞`. -/
-theorem two_rpow_ne_top (s : ℝ) : (2 : ℝ≥0∞) ^ s ≠ ∞ :=
-  ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top
-
 /-- **Pietsch's quasi-norm is dominated by the dyadic one**: for `s ≥ 0` and `1 ≤ q ≤ ∞`,
 `‖f‖_{A^s_q} ≤ 2^s (‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_q)`. -/
 theorem approxNorm_le_approxNormDyadic (hq : 1 ≤ q) (hs : 0 ≤ s) (f : X) :
     A.approxNorm s q f ≤ 2 ^ s * A.approxNormDyadic s q f := by
-  have h2s := one_le_two_rpow hs
+  have h2s := ENNReal.one_le_two_rpow hs
   rcases eq_or_ne q ∞ with rfl | hq'
   · rw [approxNorm_top, approxNormDyadic, ENNReal.lqNorm_top]
     calc ⨆ n, ((n + 1 : ℕ) : ℝ≥0∞) ^ s * A.approxError f n
@@ -198,7 +185,7 @@ theorem lqNorm_dyadic_succ_le (hq : 1 ≤ q) (hs : 0 ≤ s) (f : X) :
 theorem approxNormDyadic_le_approxNorm (hq : 1 ≤ q) (hs : 0 ≤ s) (f : X) :
     A.approxNormDyadic s q f ≤ 4 * 2 ^ s * A.approxNorm s q f := by
   set P := A.approxNorm s q f
-  have h2s := one_le_two_rpow hs
+  have h2s := ENNReal.one_le_two_rpow hs
   have hfP : ‖f‖ₑ ≤ P := enorm_le_approxNorm hq f
   have hhead : A.approxSeqDyadic s f 0 ≤ P := by
     rw [approxSeqDyadic_zero]; exact (approxError_le_enorm f 1).trans hfP
@@ -224,10 +211,10 @@ theorem memApprox_iff_approxNormDyadic_lt_top (hq : 1 ≤ q) (hs : 0 ≤ s) {f :
   constructor
   · intro hf
     exact (approxNormDyadic_le_approxNorm hq hs f).trans_lt
-      (ENNReal.mul_lt_top (ENNReal.mul_lt_top (by norm_num) (two_rpow_ne_top s).lt_top) hf)
+      (ENNReal.mul_lt_top (ENNReal.mul_lt_top (by norm_num) (ENNReal.two_rpow_ne_top s).lt_top) hf)
   · intro hf
     exact (approxNorm_le_approxNormDyadic hq hs f).trans_lt
-      (ENNReal.mul_lt_top (two_rpow_ne_top s).lt_top hf)
+      (ENNReal.mul_lt_top (ENNReal.two_rpow_ne_top s).lt_top hf)
 
 /-- For `s ≥ 0`, `f ∈ A^s_q` iff `(2^(ks) E_{2^k}(f))_k ∈ ℓ_q`. -/
 theorem memApprox_iff_lqNorm_dyadic_lt_top (hq : 1 ≤ q) (hs : 0 ≤ s) {f : X} :

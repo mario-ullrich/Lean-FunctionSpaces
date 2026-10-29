@@ -311,7 +311,8 @@ theorem enorm_mixedLocalMean_mixedBlock_le (hp : p ≠ ∞) (L : ℕ) {C : ℝ�
 theorem exists_mixedLPNorm_le (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ {s : ℝ}, 0 ≤ s → ∀ {q : ℝ≥0∞}, 1 ≤ q →
       ∀ f : Lp ℂ p (volume : Measure (Fin d → ℝ)),
-        mixedLPNorm hp s q f ≤ (C * almostDiagConst s L) ^ d * b.mixedLocalMeansNorm hp L s q f := by
+        mixedLPNorm hp s q f ≤
+          (C * ENNReal.almostDiagonalConst s L) ^ d * b.mixedLocalMeansNorm hp L s q f := by
   obtain ⟨C, hC, hE⟩ := b.exists_eLpNorm_conv_psi_dual_le L
   refine ⟨C, hC, fun {s} hs {q} hq f => ?_⟩
   set h : (Fin d → ℕ) → Lp ℂ p (volume : Measure (Fin d → ℝ)) := fun k => b.mixedLocalMean hp L k f
@@ -336,7 +337,8 @@ theorem exists_mixedLPNorm_le (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) :
 theorem exists_mixedLocalMeansNorm_le (hp : p ≠ ∞) (L : ℕ) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ {s : ℝ}, 0 ≤ s → ∀ {q : ℝ≥0∞}, 1 ≤ q →
       ∀ f : Lp ℂ p (volume : Measure (Fin d → ℝ)),
-        b.mixedLocalMeansNorm hp L s q f ≤ (C * almostDiagConst s L) ^ d * mixedLPNorm hp s q f := by
+        b.mixedLocalMeansNorm hp L s q f ≤
+          (C * ENNReal.almostDiagonalConst s L) ^ d * mixedLPNorm hp s q f := by
   obtain ⟨C, hC, hE⟩ := b.exists_eLpNorm_conv_kernel_Theta_le L
   refine ⟨C, hC, fun {s} hs {q} hq f => ?_⟩
   set h : (Fin d → ℕ) → Lp ℂ p (volume : Measure (Fin d → ℝ)) := fun k => mixedBlock hp k f
@@ -370,7 +372,7 @@ theorem mixedBesov_iff_mixedLP (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : �
   rw [b.mixedBesov_iff_mixedLocalMeans hp hL hR hs hsL hq f]
   obtain ⟨C₁, hC₁, h1⟩ := b.exists_mixedLPNorm_le (d := d) hp hL
   obtain ⟨C₂, hC₂, h2⟩ := b.exists_mixedLocalMeansNorm_le (d := d) hp L
-  have hA := almostDiagConst_ne_top hs hsL
+  have hA := ENNReal.almostDiagonalConst_ne_top hs hsL
   constructor
   · intro h
     exact (h1 hs.le hq f).trans_lt (ENNReal.mul_lt_top

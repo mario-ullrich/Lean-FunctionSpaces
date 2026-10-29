@@ -498,7 +498,7 @@ theorem mixedModNorm_le_of_tendsto (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 
     {h : (Fin d → ℕ) → Lp ℂ p (volume : Measure (Fin d → ℝ))}
     (hrep : Tendsto (fun J => ∑ k ∈ Fintype.piFinset (fun _ : Fin d => Finset.range (J + 1)),
       convLp hp (b.integrable_mixedDual L k) (h k)) atTop (𝓝 F)) :
-    mixedModNorm p L s q F ≤ (b.dualConst L * almostDiagConst s L) ^ d *
+    mixedModNorm p L s q F ≤ (b.dualConst L * ENNReal.almostDiagonalConst s L) ^ d *
       lqNorm q (fun k => mixedWeight s k * ‖h k‖ₑ) := by
   have hmod : ∀ m, lpMixedModulus p L F m ≤ b.dualConst L ^ d *
       ∑' k, (∏ i, almostDiagCoeff L (m i) (k i)) * ‖h k‖ₑ := fun m => by
@@ -519,7 +519,7 @@ the mixed reproducing formula and the synthesis. -/
 theorem mixedModNorm_le_mixedLocalMeansNorm (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ}
     (hs : 0 ≤ s) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) :
     mixedModNorm p L s q f ≤
-      (b.dualConst L * almostDiagConst s L) ^ d * b.mixedLocalMeansNorm hp L s q f :=
+      (b.dualConst L * ENNReal.almostDiagonalConst s L) ^ d * b.mixedLocalMeansNorm hp L s q f :=
   b.mixedModNorm_le_of_tendsto hp L hs hq (b.tendsto_sum_mixedDual_mixedLocalMean hp hL f)
 
 /-- **Mixed local means and mixed differences** (T. Ullrich; Vybíral): for `1 ≤ p < ∞`,
@@ -539,7 +539,7 @@ theorem mixedBesov_iff_mixedLocalMeans (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L)
     refine (b.mixedModNorm_le_mixedLocalMeansNorm hp hL hs.le hq f).trans_lt
       (ENNReal.mul_lt_top ?_ h)
     exact ENNReal.pow_lt_top (ENNReal.mul_lt_top (b.dualConst_ne_top L).lt_top
-      (almostDiagConst_ne_top hs hsL).lt_top)
+      (ENNReal.almostDiagonalConst_ne_top hs hsL).lt_top)
 
 end LocalMeansBump
 

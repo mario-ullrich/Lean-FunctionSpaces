@@ -10,6 +10,11 @@ public import FunctionSpaces.Analysis.Maximal.DyadicCubes
 /-!
 # The Calderón–Zygmund decomposition
 
+Three general facts on means come first: `‖⨍ f‖ ≤ ⨍ ‖f‖` for every measure
+(`MeasureTheory.enorm_average_le`) and, for a set `s` of finite measure,
+`μ(s) ‖⨍_s f‖ ≤ ∫_s ‖f‖` (`MeasureTheory.measure_mul_enorm_setAverage_le`) and
+`∫_s ‖f - ⨍_s f‖ ≤ 2 ∫_s ‖f‖` (`MeasureTheory.setLIntegral_enorm_sub_setAverage_le`).
+
 For `G : V → [0, ∞]` and a height `t ∈ [0, ∞]`, a dyadic cube `Q` is **big** when the average
 `⨍_Q G` exceeds `t` (`Rd.lt_setLAverage_zcell_iff`). The **maximal big cubes** (`Rd.czMaximal`)
 are the big cubes whose strict ancestors are not big. They are pairwise disjoint
@@ -29,6 +34,42 @@ the cube, is the enlarged set `Ω*` (`Rd.czEnlarged`).
 
 open MeasureTheory Module Metric Set
 open scoped ENNReal
+
+namespace MeasureTheory
+
+variable {α E : Type*} [MeasurableSpace α] {μ : Measure α} [NormedAddCommGroup E]
+  [NormedSpace ℝ E]
+
+/-! ### Means over a set -/
+
+/-- The norm of a mean is at most the mean of the norm: `‖⨍ f dμ‖ ≤ ⨍ ‖f‖ dμ` in `[0, ∞]`, for
+every function `f` with values in a real normed space. Both means are integrals for the
+normalised measure `μ(α)⁻¹ μ`. -/
+theorem enorm_average_le (f : α → E) : ‖⨍ x, f x ∂μ‖ₑ ≤ ⨍⁻ x, ‖f x‖ₑ ∂μ := by
+  rw [average_eq', laverage_eq']
+  exact enorm_integral_le_lintegral_enorm f
+
+/-- `μ(s) ‖⨍_s f‖ ≤ ∫_s ‖f‖` for every set `s` of finite measure and every function `f` with
+values in a real normed space, by `MeasureTheory.enorm_average_le` and Mathlib's
+`measure_mul_setLAverage`. -/
+theorem measure_mul_enorm_setAverage_le {s : Set α} (hs : μ s ≠ ∞) (f : α → E) :
+    μ s * ‖⨍ x in s, f x ∂μ‖ₑ ≤ ∫⁻ x in s, ‖f x‖ₑ ∂μ :=
+  (mul_le_mul_right (enorm_average_le f) _).trans_eq (measure_mul_setLAverage _ hs)
+
+/-- **The mass of `f` minus its mean**: `∫_s ‖f - ⨍_s f‖ ≤ 2 ∫_s ‖f‖` for every set `s` of finite
+measure and every function `f` with values in a real normed space, since
+`‖f - ⨍_s f‖ ≤ ‖f‖ + ‖⨍_s f‖` and `μ(s) ‖⨍_s f‖ ≤ ∫_s ‖f‖`. -/
+theorem setLIntegral_enorm_sub_setAverage_le {s : Set α} (hs : μ s ≠ ∞) (f : α → E) :
+    ∫⁻ x in s, ‖f x - ⨍ y in s, f y ∂μ‖ₑ ∂μ ≤ 2 * ∫⁻ x in s, ‖f x‖ₑ ∂μ :=
+  calc ∫⁻ x in s, ‖f x - ⨍ y in s, f y ∂μ‖ₑ ∂μ
+      ≤ ∫⁻ x in s, (‖f x‖ₑ + ‖⨍ y in s, f y ∂μ‖ₑ) ∂μ := lintegral_mono fun _ => enorm_sub_le
+    _ = (∫⁻ x in s, ‖f x‖ₑ ∂μ) + μ s * ‖⨍ y in s, f y ∂μ‖ₑ := by
+        rw [lintegral_add_right _ measurable_const, setLIntegral_const, mul_comm]
+    _ ≤ (∫⁻ x in s, ‖f x‖ₑ ∂μ) + ∫⁻ x in s, ‖f x‖ₑ ∂μ :=
+        add_le_add le_rfl (measure_mul_enorm_setAverage_le hs f)
+    _ = 2 * ∫⁻ x in s, ‖f x‖ₑ ∂μ := (two_mul _).symm
+
+end MeasureTheory
 
 namespace Rd
 

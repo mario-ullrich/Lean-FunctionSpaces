@@ -11,15 +11,12 @@ public import Mathlib.MeasureTheory.Measure.Lebesgue.EqHaar
 public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 
 /-!
-# Dyadic cubes of every level
+# Volume and nesting of dyadic cubes
 
-In the coordinates of `Rd.gridBasis`, the **dyadic cube** of level `k ∈ ℤ` and index `m ∈ ℤ^n`
-is `Q_{k,m} = {x : ⌊2^k x_i⌋ = m_i for all i}` (`Rd.zcell`); for `k ∈ ℕ` it is the cell
-`Rd.cell k m` (`Rd.zcell_natCast`). The cubes of one level partition `V`, have the volume
-`2^(-kn)` (`Rd.volume_zcell`), contain the ball of radius `2^(-k)/2` around their centre
-(`Rd.ball_subset_zcell`), and lie in the closed ball of radius `n 2^(-k)` around it
-(`Rd.zcell_subset_closedBall`). Cubes are **nested**: each cube of level `k + 1` lies in its
-parent of level `k` (`Rd.zcell_succ_subset_cubeParent`), so two cubes are nested or disjoint
+The dyadic cube `Q_{k,m} = {x : ⌊2^k x_i⌋ = m_i for all i}` of level `k ∈ ℤ` (`Rd.zcell`) is a
+box in the coordinates of `Rd.gridBasis` (`Rd.zcell_eq_preimage`) and has the volume `2^(-kn)`
+(`Rd.volume_zcell`). Cubes are **nested**: each cube of level `k + 1` lies in its parent of
+level `k` (`Rd.zcell_succ_subset_cubeParent`), so two cubes are nested or disjoint
 (`Rd.zcell_subset_or_disjoint`).
 
 **Lebesgue differentiation along cubes**: for a locally integrable `F`, the averages of `F` over
@@ -39,126 +36,11 @@ namespace Rd
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
 
-/-! ### Cubes, indices and centres -/
-
-/-- The index `(⌊2^k x_i⌋)_i` of the dyadic cube of level `k ∈ ℤ` containing `x`. -/
-noncomputable def zcellIndex (k : ℤ) (x : V) : Fin (finrank ℝ V) → ℤ :=
-  fun i => ⌊(2 : ℝ) ^ k * (gridBasis V).repr x i⌋
-
-/-- The **dyadic cube** `Q_{k,m}` of level `k ∈ ℤ` and index `m ∈ ℤ^n`: the points whose scaled
-coordinates `2^k x_i` have the integer parts `m_i`. -/
-def zcell (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) : Set V := {x | zcellIndex k x = m}
-
-/-- The **centre** of the dyadic cube `Q_{k,m}`, with the coordinates `(m_i + 1/2) 2^(-k)`. -/
-noncomputable def zcellCenter (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) : V :=
-  (gridBasis V).repr.symm (WithLp.toLp 2 fun i => ((m i : ℝ) + 1 / 2) / 2 ^ k)
-
-/-- For natural levels the cube indices are the cell indices of `Rd.cellIndex`. -/
-theorem zcellIndex_natCast (j : ℕ) : zcellIndex (V := V) (j : ℤ) = cellIndex j := by
-  funext x i
-  simp [zcellIndex, cellIndex]
-
-/-- For natural levels the cubes are the cells of `Rd.cell`. -/
-theorem zcell_natCast (j : ℕ) : zcell (V := V) (j : ℤ) = cell j := by
-  funext m
-  simp [zcell, cell, zcellIndex_natCast]
-
-/-- For natural levels the centres are those of `Rd.cellCenter`. -/
-theorem zcellCenter_natCast (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) :
-    zcellCenter (V := V) (j : ℤ) m = cellCenter j m := by
-  simp [zcellCenter, cellCenter]
-
-/-- Every point lies in the cube of its index. -/
-theorem mem_zcell_zcellIndex (k : ℤ) (x : V) : x ∈ zcell k (zcellIndex k x) := rfl
-
-/-- The coordinates of a centre. -/
-theorem repr_zcellCenter (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) (i : Fin (finrank ℝ V)) :
-    (gridBasis V).repr (zcellCenter k m) i = ((m i : ℝ) + 1 / 2) / 2 ^ k := by
-  simp [zcellCenter]
-
-/-- The `i`-th coordinate of `x - c_{k,m}` is `(2^k x_i - m_i - 1/2) / 2^k`. -/
-theorem repr_sub_zcellCenter (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) (x : V) (i : Fin (finrank ℝ V)) :
-    (gridBasis V).repr (x - zcellCenter k m) i =
-      (2 ^ k * (gridBasis V).repr x i - m i - 1 / 2) / 2 ^ k := by
-  rw [map_sub, PiLp.sub_apply, repr_zcellCenter]
-  field_simp
-  ring
-
-/-- On a cube of level `k`, every coordinate differs from that of the centre by at most
-`2^(-k)/2`. -/
-theorem abs_repr_sub_zcellCenter_le {k : ℤ} {m : Fin (finrank ℝ V) → ℤ} {x : V}
-    (hx : x ∈ zcell k m) (i : Fin (finrank ℝ V)) :
-    |(gridBasis V).repr (x - zcellCenter k m) i| ≤ 1 / 2 / 2 ^ k := by
-  have hm : ⌊(2 : ℝ) ^ k * (gridBasis V).repr x i⌋ = m i := congrFun hx i
-  have h1 := Int.floor_le ((2 : ℝ) ^ k * (gridBasis V).repr x i)
-  have h2 := Int.lt_floor_add_one ((2 : ℝ) ^ k * (gridBasis V).repr x i)
-  rw [hm] at h1 h2
-  have hpos : (0 : ℝ) < 2 ^ k := by positivity
-  rw [repr_sub_zcellCenter, abs_div, abs_of_pos hpos, div_le_div_iff_of_pos_right hpos, abs_le]
-  constructor <;> linarith
-
-/-- **Cubes are small**: `‖x - c_{k,m}‖ ≤ n 2^(-k)` on `Q_{k,m}`. -/
-theorem norm_sub_zcellCenter_le {k : ℤ} {m : Fin (finrank ℝ V) → ℤ} {x : V}
-    (hx : x ∈ zcell k m) : ‖x - zcellCenter k m‖ ≤ finrank ℝ V / 2 ^ k := by
-  have hy : x - zcellCenter k m = ∑ i, (gridBasis V).repr (x - zcellCenter k m) i •
-      (gridBasis V) i := ((gridBasis V).sum_repr _).symm
-  calc ‖x - zcellCenter k m‖
-      = ‖∑ i, (gridBasis V).repr (x - zcellCenter k m) i • (gridBasis V) i‖ := by rw [← hy]
-    _ ≤ ∑ i, ‖(gridBasis V).repr (x - zcellCenter k m) i • (gridBasis V) i‖ := norm_sum_le _ _
-    _ = ∑ i, |(gridBasis V).repr (x - zcellCenter k m) i| := by
-        refine Finset.sum_congr rfl fun i _ => ?_
-        rw [norm_smul, (gridBasis V).orthonormal.1 i, mul_one, Real.norm_eq_abs]
-    _ ≤ ∑ _i : Fin (finrank ℝ V), 1 / 2 ^ k :=
-        Finset.sum_le_sum fun i _ => (abs_repr_sub_zcellCenter_le hx i).trans
-          (div_le_div_of_nonneg_right (by norm_num) (by positivity))
-    _ = finrank ℝ V / 2 ^ k := by
-        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one_div]
-
-/-- **Outer ball**: the cube `Q_{k,m}` lies in the closed ball of radius `n 2^(-k)` around its
-centre. -/
-theorem zcell_subset_closedBall (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
-    zcell k m ⊆ closedBall (zcellCenter k m) (finrank ℝ V / 2 ^ k) := fun _ hx =>
-  mem_closedBall_iff_norm.2 (norm_sub_zcellCenter_le hx)
-
-/-- **Inner ball**: the cube `Q_{k,m}` contains the open ball of radius `2^(-k)/2` around its
-centre. -/
-theorem ball_subset_zcell (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
-    ball (zcellCenter k m) (1 / 2 / 2 ^ k) ⊆ zcell k m := by
-  intro y hy
-  funext i
-  have hpos : (0 : ℝ) < 2 ^ k := by positivity
-  have h := (abs_repr_le_norm (y - zcellCenter k m) i).trans_lt (mem_ball_iff_norm.1 hy)
-  rw [repr_sub_zcellCenter, abs_div, abs_of_pos hpos, div_lt_div_iff_of_pos_right hpos, abs_lt] at h
-  exact Int.floor_eq_iff.2 ⟨by linarith, by linarith⟩
-
-/-! ### Measurability, partition and volume -/
+/-! ### Volume -/
 
 section Measure
 
 variable [MeasurableSpace V] [BorelSpace V]
-
-/-- The cube index is measurable. -/
-theorem measurable_zcellIndex (k : ℤ) : Measurable (zcellIndex (V := V) k) := by
-  refine Measurable.of_eval fun i => ?_
-  simp only [zcellIndex, OrthonormalBasis.repr_apply_apply]
-  exact Int.measurable_floor.comp
-    (measurable_const.mul (continuous_const.inner continuous_id).measurable)
-
-/-- Cubes are measurable. -/
-theorem measurableSet_zcell (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
-    MeasurableSet (zcell (V := V) k m) :=
-  measurable_zcellIndex k (measurableSet_singleton m)
-
-omit [MeasurableSpace V] [BorelSpace V] in
-/-- Cubes of the same level with different indices are disjoint: they are the fibres of the
-cube index (Mathlib's `pairwise_disjoint_fiber`). -/
-theorem zcell_disjoint (k : ℤ) : Pairwise (Function.onFun Disjoint (zcell (V := V) k)) :=
-  pairwise_disjoint_fiber (zcellIndex k)
-
-omit [MeasurableSpace V] [BorelSpace V] in
-/-- The cubes of one level cover the space. -/
-theorem iUnion_zcell (k : ℤ) : ⋃ m, zcell (V := V) k m = Set.univ :=
-  Set.eq_univ_of_forall fun x => Set.mem_iUnion.2 ⟨_, mem_zcell_zcellIndex k x⟩
 
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- In coordinates, the cube `Q_{k,m}` is the box `∏_i [m_i 2^(-k), (m_i + 1) 2^(-k))`. -/

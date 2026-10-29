@@ -130,7 +130,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ | ✗ | `Rd/LittlewoodPaley/BesovDifferences` |
 | Sobolev–Slobodeckij norms: the Gagliardo form, its two-sided bounds by first differences with explicit constants, radial integrals of powers, double integrals of sums, `W^{s,p} = B^s_{p,p}` for `0 < s < 1` | ✅ | ✗ | `Rd/Differences/SobolevSlobodeckij` |
 | Besov spaces on `ℝ^d` as interpolation spaces, by approximation, differences and Littlewood–Paley blocks | ✅ | ✗ | `Rd/Interpolation/BesovInterpolation` |
-| Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences | ✅ | ✗ | `Rd/Differences/DomainModuli` |
+| Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences, sets equal up to null sets, the intrinsic quasi-norm | ✅ | ✗ | `Rd/Differences/DomainModuli` |
 | Moment kernels: finite `L_1` norm, the vanishing moments of their coefficients, averaged differences, approximation with the modulus, also on subsets, vanishing first moments of the moment kernels of order two | ✅ | ✗ | `Rd/Differences/MomentKernels` |
 | Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L` | ✅ | ✗ | `Rd/LocalMeans/LocalMeans` |
 | Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/LocalMeans/KernelMajorants` |

@@ -51,7 +51,7 @@ theorem approxSeqDyadic_add_le_succ (f g : X) (k : ℕ) :
 theorem approxNormDyadic_add_le (hq : 1 ≤ q) (hs : 0 ≤ s) (f g : X) :
     A.approxNormDyadic s q (f + g) ≤
       2 * 2 ^ s * (A.approxNormDyadic s q f + A.approxNormDyadic s q g) := by
-  have h2s := one_le_two_rpow hs
+  have h2s := ENNReal.one_le_two_rpow hs
   have hfg : ‖f + g‖ₑ ≤ ‖f‖ₑ + ‖g‖ₑ := enorm_add_le f g
   have hD : lqNorm q (A.approxSeqDyadic s (f + g)) ≤ (‖f‖ₑ + ‖g‖ₑ) +
       2 ^ s * (lqNorm q (A.approxSeqDyadic s f) + lqNorm q (A.approxSeqDyadic s g)) := by
@@ -94,7 +94,8 @@ theorem MemApprox.add (hq : 1 ≤ q) (hs : 0 ≤ s) {f g : X} (hf : A.MemApprox 
     (hg : A.MemApprox s q g) : A.MemApprox s q (f + g) := by
   rw [memApprox_iff_approxNormDyadic_lt_top hq hs] at hf hg ⊢
   exact (approxNormDyadic_add_le hq hs f g).trans_lt (ENNReal.mul_lt_top
-    (ENNReal.mul_lt_top (by norm_num) (two_rpow_ne_top s).lt_top) (ENNReal.add_lt_top.2 ⟨hf, hg⟩))
+    (ENNReal.mul_lt_top (by norm_num) (ENNReal.two_rpow_ne_top s).lt_top)
+    (ENNReal.add_lt_top.2 ⟨hf, hg⟩))
 
 /-- For `s ≥ 0` and `q ≥ 1`, `A^s_q` is closed under subtraction. -/
 theorem MemApprox.sub (hq : 1 ≤ q) (hs : 0 ≤ s) {f g : X} (hf : A.MemApprox s q f)

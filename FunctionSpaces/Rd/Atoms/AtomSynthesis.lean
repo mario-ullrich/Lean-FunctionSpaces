@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Analysis.Maximal.DyadicGrid
+public import FunctionSpaces.Analysis.Maximal.HardyLittlewoodMaximal
 public import FunctionSpaces.Rd.LocalMeans.LocalMeans
 public import FunctionSpaces.Rd.LocalMeans.Multipliers
 public import FunctionSpaces.Rd.Differences.DomainModuli
@@ -415,29 +415,16 @@ theorem modNormOn_le_coeffNorm {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞
     rw [← ENNReal.tsum_mul_left]
     exact ENNReal.tsum_le_tsum fun j => hlevelMod j k
   have hlq : lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r F k) ≤
-      2 ^ r * K0 * (((1 - (2 : ℝ≥0∞) ^ (-(σ - s)))⁻¹ + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹) * X) := by
-    calc lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r F k)
-        ≤ lqNorm q (fun k => 2 ^ r * K0 * (dyadicWeight s k *
-            ∑' j, (if j ≤ k then dyadicWeight (-σ) (k - j) else 1) * b j)) :=
-          ENNReal.lqNorm_mono fun k => by
-            calc dyadicWeight s k * lpModulusOn p Ω r F k
-                ≤ dyadicWeight s k * (2 ^ r * K0 *
-                    ∑' j, (if j ≤ k then dyadicWeight (-σ) (k - j) else 1) * b j) :=
-                  mul_le_mul' le_rfl (hmod k)
-              _ = _ := by ring
-      _ = 2 ^ r * K0 * lqNorm q (fun k => dyadicWeight s k *
-            ∑' j, (if j ≤ k then dyadicWeight (-σ) (k - j) else 1) * b j) :=
-          ENNReal.lqNorm_const_mul _ _
-      _ ≤ 2 ^ r * K0 * (((1 - (2 : ℝ≥0∞) ^ (-(σ - s)))⁻¹ + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹) * X) :=
-          mul_le_mul' le_rfl (ENNReal.lqNorm_almostDiagonal_le hq s σ b)
+      2 ^ r * K0 * ENNReal.almostDiagonalConst s σ * X :=
+    ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq s σ hmod
   rw [hX]
   calc eLpNorm (Ω.indicator F) p volume +
         lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r F k)
       ≤ K0 * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X +
-          2 ^ r * K0 * (((1 - (2 : ℝ≥0∞) ^ (-(σ - s)))⁻¹ + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹) * X) :=
+          2 ^ r * K0 * ENNReal.almostDiagonalConst s σ * X :=
         add_le_add hnorm hlq
     _ = atomSynthConst p N C r s σ * X := by
-        simp only [atomSynthConst, K0]
+        simp only [atomSynthConst, K0, ENNReal.almostDiagonalConst]
         ring
 
 /-- **Atomic synthesis** (Schneider–Vybíral, Theorem 2.6 and Corollary 2.8, direction ⇐): if the
@@ -538,7 +525,7 @@ theorem modNorm_level_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {ι 
     · have h0 : levelNorm p (coef' i) = 0 := by
         simp [levelNorm, coef', hij]
       simp [hij, h0]
-  rw [hseq, lqNorm_ite_eq hq]
+  rw [hseq, ENNReal.lqNorm_ite_eq hq]
 
 /-! ### Atoms from pointwise bounds -/
 
@@ -554,23 +541,6 @@ theorem eLpNorm_le_of_bound_of_support {α : Type*} [MeasurableSpace α] {μ : M
   rw [← eLpNorm_restrict_eq_of_support_subset hg hsupp]
   refine (eLpNorm_le_of_ae_enorm_bound hg.restrict (Eventually.of_forall hB)).trans_eq ?_
   rw [Measure.restrict_apply_univ, one_div, smul_eq_mul]
-
-/-- The volume of a ball of radius `d 2^(-j)` is `d^n |B_1| 2^(-jn)`. -/
-theorem volume_closedBall_div_two_pow {d : ℝ} (hd : 0 ≤ d) (j : ℕ) (z : V) :
-    volume (closedBall z (d / 2 ^ j)) = ENNReal.ofReal (d ^ finrank ℝ V) *
-      volume (ball (0 : V) 1) * dyadicWeight (-(finrank ℝ V : ℝ)) j := by
-  rw [Measure.addHaar_closedBall _ _ (by positivity), div_eq_mul_one_div, mul_pow,
-    ENNReal.ofReal_mul (by positivity), ENNReal.ofReal_one_div_two_pow_pow]
-  ring
-
-/-- `(X 2^(-jn))^(1/p) = X^(1/p) 2^(-jn/p)`. -/
-theorem rpow_mul_dyadicWeight_neg (X : ℝ≥0∞) (n : ℕ) (p : ℝ≥0∞) (j : ℕ) :
-    (X * dyadicWeight (-(n : ℝ)) j) ^ (1 / p.toReal) =
-      X ^ (1 / p.toReal) * dyadicWeight (-(n / p.toReal)) j := by
-  rw [ENNReal.mul_rpow_of_nonneg _ _ (div_nonneg zero_le_one ENNReal.toReal_nonneg),
-    ENNReal.dyadicWeight_rpow]
-  congr 2
-  ring
 
 /-- **Atoms on `Ω` from pointwise bounds**: a function that vanishes outside `B̄(c, d 2^(-j))`
 with `|a| ≤ A` on `Ω` and `|Δ_h^r a(x)| ≤ A min(1, (2^j ‖h‖)^σ)` at the points `x` whose steps stay
@@ -589,7 +559,7 @@ theorem isRegularAtomOn_of_pointwise {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : 
   have hball : ∀ z : V, volume (closedBall z (d / 2 ^ j)) ^ (1 / p.toReal) ≤
       (((r + 1 : ℕ) : ℝ≥0∞) * K) ^ (1 / p.toReal) * dyadicWeight (-(finrank ℝ V / p.toReal)) j :=
     fun z => by
-      rw [volume_closedBall_div_two_pow hd j z, ← rpow_mul_dyadicWeight_neg]
+      rw [volume_closedBall_div_two_pow hd j z, ← ENNReal.rpow_mul_dyadicWeight_neg]
       refine ENNReal.rpow_le_rpow ?_ hexp
       rw [mul_assoc (((r + 1 : ℕ) : ℝ≥0∞))]
       exact le_mul_of_one_le_left' (by exact_mod_cast Nat.succ_pos r)
@@ -616,7 +586,7 @@ theorem isRegularAtomOn_of_pointwise {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : 
     have hvol : volume T ^ (1 / p.toReal) ≤
         (((r + 1 : ℕ) : ℝ≥0∞) * K) ^ (1 / p.toReal) *
           dyadicWeight (-(finrank ℝ V / p.toReal)) j := by
-      rw [← rpow_mul_dyadicWeight_neg]
+      rw [← ENNReal.rpow_mul_dyadicWeight_neg]
       refine ENNReal.rpow_le_rpow ((measure_biUnion_finset_le _ _).trans_eq ?_) hexp
       simp_rw [volume_closedBall_div_two_pow hd j]
       rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul]

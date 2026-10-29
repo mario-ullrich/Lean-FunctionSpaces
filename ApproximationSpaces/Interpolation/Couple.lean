@@ -377,14 +377,14 @@ theorem memKMethod_iff_discreteKMethodNorm_lt_top (hθ : 0 ≤ θ) (hρ : 0 < ρ
   exact ⟨fun h => ENNReal.lt_top_of_mul_ne_top_right (ENNReal.lt_top_of_mul_ne_top_right
       ((discreteKMethodNorm_le_kMethodNorm hθ hρ u).trans_lt h).ne hc0).ne h2,
     fun h => (kMethodNorm_le_discreteKMethodNorm hθ hρ u).trans_lt (ENNReal.mul_lt_top hct.lt_top
-      (ENNReal.mul_lt_top (ApproximationScheme.two_rpow_ne_top _).lt_top h))⟩
+      (ENNReal.mul_lt_top (ENNReal.two_rpow_ne_top _).lt_top h))⟩
 
 /-- **The discrete K-method of the swapped couple**, termwise: the term `n` for `(N₁, N₀)` and
 `θ` is the term `-n` for `(N₀, N₁)` and `1 - θ`, by `kFunctional_swap`. -/
 theorem discreteKSeq_swap (u : U) (n : ℤ) :
     A.swap.discreteKSeq θ ρ u n = A.discreteKSeq (1 - θ) ρ u (-n) := by
   have h0 : (2 : ℝ≥0∞) ^ ((n : ℝ) * ρ) ≠ 0 := (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne'
-  have ht : (2 : ℝ≥0∞) ^ ((n : ℝ) * ρ) ≠ ∞ := ApproximationScheme.two_rpow_ne_top _
+  have ht : (2 : ℝ≥0∞) ^ ((n : ℝ) * ρ) ≠ ∞ := ENNReal.two_rpow_ne_top _
   have e1 : -((n : ℝ) * ρ * θ) + (n : ℝ) * ρ = -(((-n : ℤ) : ℝ) * ρ * (1 - θ)) := by
     push_cast
     ring
@@ -726,7 +726,7 @@ theorem discreteKMethodNorm_ofMap (f : X) :
   funext n
   rw [discreteKSeq, ApproximationScheme.discreteKSeq,
     kFunctional_ofMap (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne'
-      (ApproximationScheme.two_rpow_ne_top _)]
+      (ENNReal.two_rpow_ne_top _)]
 
 /-- The norm of `ofMap ι` on the grid `2^(-kρ)`, `k ∈ ℕ`, is
 `ApproximationScheme.interpNorm ι`. -/

@@ -28,7 +28,9 @@ the norms of its truncations, which increase (`lqNorm_eq_iSup_lqNorm_ite`, `mono
 
 Together they bound an **almost diagonal sum**: with `c_{ij} = 2^(-(i-j)L)` for `j ≤ i` and
 `c_{ij} = 1` for `j > i`, `‖(2^(is) ∑_j c_{ij} a_j)_i‖_q ≤ C ‖(2^(js) a_j)_j‖_q` for `0 < s < L`
-(`lqNorm_almostDiagonal_le`).
+(`lqNorm_almostDiagonal_le`), with the constant `C = (1 - 2^(-(L-s)))⁻¹ + (1 - 2^(-s))⁻¹`
+(`almostDiagonalConst`); the same bound holds for every sequence below `C' ∑_j c_{ij} m_j`
+(`lqNorm_le_almostDiagonalConst_mul_of_le`).
 
 The Minkowski inequalities and monotone convergence hold for families on every countable index
 set.  On `ℤ`, the norm is invariant under shifts (`lqNorm_comp_add_int`), which gives Young's
@@ -245,6 +247,41 @@ theorem lqNorm_almostDiagonal_le (hq : 1 ≤ q) (s L : ℝ) (a : ℕ → ℝ≥0
         ENNReal.lqNorm_add_le hq _ _
     _ ≤ (1 - (2 : ℝ≥0∞) ^ (-(L - s)))⁻¹ * X + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := add_le_add hP hT
     _ = _ := by ring
+
+/-- The constant `(1 - 2^(-(L-s)))⁻¹ + (1 - 2^(-s))⁻¹` of the almost diagonal estimate in `ℓ_q`
+(`ENNReal.lqNorm_almostDiagonal_le`). -/
+noncomputable def almostDiagonalConst (s L : ℝ) : ℝ≥0∞ :=
+  (1 - (2 : ℝ≥0∞) ^ (-(L - s)))⁻¹ + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹
+
+/-- The constant of the almost diagonal estimate is finite for `0 < s < L`. -/
+theorem almostDiagonalConst_ne_top {s L : ℝ} (hs : 0 < s) (hsL : s < L) :
+    ENNReal.almostDiagonalConst s L ≠ ∞ :=
+  add_ne_top.2 ⟨one_sub_two_rpow_neg_inv_ne_top (sub_pos.2 hsL),
+    one_sub_two_rpow_neg_inv_ne_top hs⟩
+
+/-- **The almost diagonal step at one point**: if `a_j ≤ C ∑_i c_{ji} m_i` for every `j`, with
+`c_{ji} = 2^(-(j-i)L)` for `i ≤ j` and `c_{ji} = 1` for `i > j`, then for `1 ≤ q ≤ ∞`,
+`‖(2^(js) a_j)_j‖_{ℓ_q} ≤ C A_{s,L} ‖(2^(is) m_i)_i‖_{ℓ_q}` with
+`A_{s,L} = ENNReal.almostDiagonalConst s L`. -/
+theorem lqNorm_le_almostDiagonalConst_mul_of_le {q : ℝ≥0∞} (hq : 1 ≤ q) (s L : ℝ) {C : ℝ≥0∞}
+    {a m : ℕ → ℝ≥0∞}
+    (h : ∀ j, a j ≤ C * ∑' i, (if i ≤ j then dyadicWeight (-L) (j - i) else 1) * m i) :
+    lqNorm q (fun j => dyadicWeight s j * a j) ≤
+      C * ENNReal.almostDiagonalConst s L * lqNorm q (fun i => dyadicWeight s i * m i) := by
+  calc lqNorm q (fun j => dyadicWeight s j * a j)
+      ≤ lqNorm q (fun j => C * (dyadicWeight s j *
+          ∑' i, (if i ≤ j then dyadicWeight (-L) (j - i) else 1) * m i)) :=
+        lqNorm_mono fun j => by
+          rw [mul_left_comm]
+          gcongr
+          exact h j
+    _ = C * lqNorm q (fun j => dyadicWeight s j *
+          ∑' i, (if i ≤ j then dyadicWeight (-L) (j - i) else 1) * m i) :=
+        lqNorm_const_mul _ _
+    _ ≤ C * (ENNReal.almostDiagonalConst s L * lqNorm q (fun i => dyadicWeight s i * m i)) := by
+        gcongr
+        exact lqNorm_almostDiagonal_le hq s L m
+    _ = _ := by rw [mul_assoc]
 
 /-! ### Sequences on `ℤ` -/
 

@@ -13,14 +13,19 @@ public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 # The dyadic grid of a finite-dimensional inner product space
 
 In the coordinates `x_i = ⟪b_i, x⟫` of the orthonormal basis `b = stdOrthonormalBasis ℝ V`
-(`Rd.gridBasis`), the **dyadic cells** of level `j ∈ ℕ` are
-`P_{j,m} = {x : ⌊2^j x_i⌋ = m_i for all i}`, `m ∈ ℤ^n` (`Rd.cell`, `Rd.cellIndex`); they partition
-`V`. The centre `c_{j,m}` has the coordinates `(m_i + 1/2) 2^(-j)` (`Rd.cellCenter`), and
-`‖x - c_{j,m}‖ ≤ n 2^(-j)` on `P_{j,m}` (`Rd.norm_sub_cellCenter_le`). **Counting**: at most
-`(2ρ + 2)^n` centres of level `j` lie in a ball of radius `ρ 2^(-j)`
-(`Rd.card_le_of_norm_cellCenter_sub_le`), since each coordinate of such a centre lies in an
-interval of length `2ρ 2^(-j)`. The cells of one level split integrals and `L_p` norms into sums
-(`Rd.lintegral_eq_tsum_cell`, `Rd.eLpNorm_rpow_eq_tsum_cell`).
+(`Rd.gridBasis`), the **dyadic cube** of level `k ∈ ℤ` and index `m ∈ ℤ^n` is
+`Q_{k,m} = {x : ⌊2^k x_i⌋ = m_i for all i}` (`Rd.zcell`, `Rd.zcellIndex`). The cubes of one level
+partition `V` (`Rd.zcell_disjoint`, `Rd.iUnion_zcell`). The centre `c_{k,m}` has the coordinates
+`(m_i + 1/2) 2^(-k)` (`Rd.zcellCenter`), and `‖x - c_{k,m}‖ ≤ n 2^(-k)` on `Q_{k,m}`
+(`Rd.norm_sub_zcellCenter_le`), so the cube lies between the balls of radii `2^(-k)/2` and
+`n 2^(-k)` around its centre (`Rd.ball_subset_zcell`, `Rd.zcell_subset_closedBall`).
+
+The **dyadic cells** `P_{j,m}` of level `j ∈ ℕ` are the cubes of natural level (`Rd.cell`,
+`Rd.cellIndex`, `Rd.cellCenter`, `Rd.zcell_natCast`), and their lemmas are the cases `k = j` of
+those for cubes. **Counting**: at most `(2ρ + 2)^n` centres of level `j` lie in a ball of radius
+`ρ 2^(-j)` (`Rd.card_le_of_norm_cellCenter_sub_le`), since each coordinate of such a centre lies
+in an interval of length `2ρ 2^(-j)`. The cells of one level split integrals and `L_p` norms into
+sums (`Rd.lintegral_eq_tsum_cell`, `Rd.eLpNorm_rpow_eq_tsum_cell`).
 
 **Bounded overlap**: if at every point at most `N` of the functions `g_m` are nonzero and
 `F = ∑_m g_m`, then `‖F‖_p^p ≤ N^(p-1) ∑_m ‖g_m‖_p^p` (`Rd.eLpNorm_rpow_le_of_overlap`).
@@ -28,7 +33,7 @@ interval of length `2ρ 2^(-j)`. The cells of one level split integrals and `L_p
 
 @[expose] public section
 
-open MeasureTheory Module
+open MeasureTheory Module Metric
 open scoped ENNReal
 
 namespace Rd
@@ -41,16 +46,131 @@ noncomputable abbrev gridBasis : OrthonormalBasis (Fin (finrank ℝ V)) ℝ V :=
 
 variable {V}
 
-/-- The index `(⌊2^j x_i⌋)_i` of the dyadic cell of level `j` containing `x`. -/
-noncomputable def cellIndex (j : ℕ) (x : V) : Fin (finrank ℝ V) → ℤ :=
-  fun i => ⌊(2 : ℝ) ^ j * (gridBasis V).repr x i⌋
+/-! ### Dyadic cubes of every level -/
 
-/-- The **dyadic cell** `P_{j,m}` of level `j` and index `m`. -/
-def cell (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) : Set V := {x | cellIndex j x = m}
+/-- The index `(⌊2^k x_i⌋)_i` of the dyadic cube of level `k ∈ ℤ` containing `x`. -/
+noncomputable def zcellIndex (k : ℤ) (x : V) : Fin (finrank ℝ V) → ℤ :=
+  fun i => ⌊(2 : ℝ) ^ k * (gridBasis V).repr x i⌋
+
+/-- The **dyadic cube** `Q_{k,m}` of level `k ∈ ℤ` and index `m ∈ ℤ^n`: the points whose scaled
+coordinates `2^k x_i` have the integer parts `m_i`. -/
+def zcell (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) : Set V := {x | zcellIndex k x = m}
+
+/-- The **centre** of the dyadic cube `Q_{k,m}`, with the coordinates `(m_i + 1/2) 2^(-k)`. -/
+noncomputable def zcellCenter (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) : V :=
+  (gridBasis V).repr.symm (WithLp.toLp 2 fun i => ((m i : ℝ) + 1 / 2) / 2 ^ k)
+
+/-- Every point lies in the cube of its index. -/
+theorem mem_zcell_zcellIndex (k : ℤ) (x : V) : x ∈ zcell k (zcellIndex k x) := rfl
+
+/-- The coordinates of a centre. -/
+theorem repr_zcellCenter (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) (i : Fin (finrank ℝ V)) :
+    (gridBasis V).repr (zcellCenter k m) i = ((m i : ℝ) + 1 / 2) / 2 ^ k := by
+  simp [zcellCenter]
+
+/-- A coordinate is at most the norm. -/
+theorem abs_repr_le_norm (y : V) (i : Fin (finrank ℝ V)) : |(gridBasis V).repr y i| ≤ ‖y‖ := by
+  rw [← Real.norm_eq_abs, ← (gridBasis V).repr.norm_map y]
+  exact PiLp.norm_apply_le _ i
+
+/-- The `i`-th coordinate of `x - c_{k,m}` is `(2^k x_i - m_i - 1/2) / 2^k`. -/
+theorem repr_sub_zcellCenter (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) (x : V) (i : Fin (finrank ℝ V)) :
+    (gridBasis V).repr (x - zcellCenter k m) i =
+      (2 ^ k * (gridBasis V).repr x i - m i - 1 / 2) / 2 ^ k := by
+  rw [map_sub, PiLp.sub_apply, repr_zcellCenter]
+  field_simp
+  ring
+
+/-- On a cube of level `k`, every coordinate differs from that of the centre by at most
+`2^(-k)/2`. -/
+theorem abs_repr_sub_zcellCenter_le {k : ℤ} {m : Fin (finrank ℝ V) → ℤ} {x : V}
+    (hx : x ∈ zcell k m) (i : Fin (finrank ℝ V)) :
+    |(gridBasis V).repr (x - zcellCenter k m) i| ≤ 1 / 2 / 2 ^ k := by
+  have hm : ⌊(2 : ℝ) ^ k * (gridBasis V).repr x i⌋ = m i := congrFun hx i
+  have h1 := Int.floor_le ((2 : ℝ) ^ k * (gridBasis V).repr x i)
+  have h2 := Int.lt_floor_add_one ((2 : ℝ) ^ k * (gridBasis V).repr x i)
+  rw [hm] at h1 h2
+  have hpos : (0 : ℝ) < 2 ^ k := by positivity
+  rw [repr_sub_zcellCenter, abs_div, abs_of_pos hpos, div_le_div_iff_of_pos_right hpos, abs_le]
+  constructor <;> linarith
+
+/-- **Cubes are small**: `‖x - c_{k,m}‖ ≤ n 2^(-k)` on `Q_{k,m}`. -/
+theorem norm_sub_zcellCenter_le {k : ℤ} {m : Fin (finrank ℝ V) → ℤ} {x : V}
+    (hx : x ∈ zcell k m) : ‖x - zcellCenter k m‖ ≤ finrank ℝ V / 2 ^ k := by
+  have hy : x - zcellCenter k m = ∑ i, (gridBasis V).repr (x - zcellCenter k m) i •
+      (gridBasis V) i := ((gridBasis V).sum_repr _).symm
+  calc ‖x - zcellCenter k m‖
+      = ‖∑ i, (gridBasis V).repr (x - zcellCenter k m) i • (gridBasis V) i‖ := by rw [← hy]
+    _ ≤ ∑ i, ‖(gridBasis V).repr (x - zcellCenter k m) i • (gridBasis V) i‖ := norm_sum_le _ _
+    _ = ∑ i, |(gridBasis V).repr (x - zcellCenter k m) i| := by
+        refine Finset.sum_congr rfl fun i _ => ?_
+        rw [norm_smul, (gridBasis V).orthonormal.1 i, mul_one, Real.norm_eq_abs]
+    _ ≤ ∑ _i : Fin (finrank ℝ V), 1 / 2 ^ k :=
+        Finset.sum_le_sum fun i _ => (abs_repr_sub_zcellCenter_le hx i).trans
+          (div_le_div_of_nonneg_right (by norm_num) (by positivity))
+    _ = finrank ℝ V / 2 ^ k := by
+        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one_div]
+
+/-- **Outer ball**: the cube `Q_{k,m}` lies in the closed ball of radius `n 2^(-k)` around its
+centre. -/
+theorem zcell_subset_closedBall (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
+    zcell k m ⊆ closedBall (zcellCenter k m) (finrank ℝ V / 2 ^ k) := fun _ hx =>
+  mem_closedBall_iff_norm.2 (norm_sub_zcellCenter_le hx)
+
+/-- **Inner ball**: the cube `Q_{k,m}` contains the open ball of radius `2^(-k)/2` around its
+centre. -/
+theorem ball_subset_zcell (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
+    ball (zcellCenter k m) (1 / 2 / 2 ^ k) ⊆ zcell k m := by
+  intro y hy
+  funext i
+  have hpos : (0 : ℝ) < 2 ^ k := by positivity
+  have h := (abs_repr_le_norm (y - zcellCenter k m) i).trans_lt (mem_ball_iff_norm.1 hy)
+  rw [repr_sub_zcellCenter, abs_div, abs_of_pos hpos, div_lt_div_iff_of_pos_right hpos, abs_lt] at h
+  exact Int.floor_eq_iff.2 ⟨by linarith, by linarith⟩
+
+/-- The cube index is measurable. -/
+theorem measurable_zcellIndex [MeasurableSpace V] [BorelSpace V] (k : ℤ) :
+    Measurable (zcellIndex (V := V) k) := by
+  refine Measurable.of_eval fun i => ?_
+  simp only [zcellIndex, OrthonormalBasis.repr_apply_apply]
+  exact Int.measurable_floor.comp
+    (measurable_const.mul (continuous_const.inner continuous_id).measurable)
+
+/-- Cubes are measurable. -/
+theorem measurableSet_zcell [MeasurableSpace V] [BorelSpace V] (k : ℤ)
+    (m : Fin (finrank ℝ V) → ℤ) : MeasurableSet (zcell (V := V) k m) :=
+  measurable_zcellIndex k (measurableSet_singleton m)
+
+/-- Cubes of the same level with different indices are disjoint: they are the fibres of the
+cube index (Mathlib's `pairwise_disjoint_fiber`). -/
+theorem zcell_disjoint (k : ℤ) : Pairwise (Function.onFun Disjoint (zcell (V := V) k)) :=
+  pairwise_disjoint_fiber (zcellIndex k)
+
+/-- The cubes of one level cover the space. -/
+theorem iUnion_zcell (k : ℤ) : ⋃ m, zcell (V := V) k m = Set.univ :=
+  Set.eq_univ_of_forall fun x => Set.mem_iUnion.2 ⟨_, mem_zcell_zcellIndex k x⟩
+
+/-! ### Dyadic cells of nonnegative level -/
+
+/-- The index `(⌊2^j x_i⌋)_i` of the dyadic cell of level `j ∈ ℕ` containing `x`: the cube index
+`Rd.zcellIndex` of level `j`. -/
+noncomputable def cellIndex (j : ℕ) (x : V) : Fin (finrank ℝ V) → ℤ := zcellIndex j x
+
+/-- The **dyadic cell** `P_{j,m}` of level `j ∈ ℕ` and index `m`: the dyadic cube `Q_{j,m}`. -/
+def cell (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) : Set V := zcell j m
 
 /-- The **centre** of the dyadic cell `P_{j,m}`, with the coordinates `(m_i + 1/2) 2^(-j)`. -/
-noncomputable def cellCenter (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) : V :=
-  (gridBasis V).repr.symm (WithLp.toLp 2 fun i => ((m i : ℝ) + 1 / 2) / 2 ^ j)
+noncomputable def cellCenter (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) : V := zcellCenter j m
+
+/-- For natural levels the cube indices are the cell indices of `Rd.cellIndex`. -/
+theorem zcellIndex_natCast (j : ℕ) : zcellIndex (V := V) (j : ℤ) = cellIndex j := rfl
+
+/-- For natural levels the cubes are the cells of `Rd.cell`. -/
+theorem zcell_natCast (j : ℕ) : zcell (V := V) (j : ℤ) = cell j := rfl
+
+/-- For natural levels the centres are those of `Rd.cellCenter`. -/
+theorem zcellCenter_natCast (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) :
+    zcellCenter (V := V) (j : ℤ) m = cellCenter j m := rfl
 
 /-- Every point lies in the cell of its index. -/
 theorem mem_cell_cellIndex (j : ℕ) (x : V) : x ∈ cell j (cellIndex j x) := rfl
@@ -58,58 +178,30 @@ theorem mem_cell_cellIndex (j : ℕ) (x : V) : x ∈ cell j (cellIndex j x) := r
 /-- The coordinates of a centre. -/
 theorem repr_cellCenter (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) (i : Fin (finrank ℝ V)) :
     (gridBasis V).repr (cellCenter j m) i = ((m i : ℝ) + 1 / 2) / 2 ^ j := by
-  simp [cellCenter]
-
-/-- A coordinate is at most the norm. -/
-theorem abs_repr_le_norm (y : V) (i : Fin (finrank ℝ V)) : |(gridBasis V).repr y i| ≤ ‖y‖ := by
-  rw [← Real.norm_eq_abs, ← (gridBasis V).repr.norm_map y]
-  exact PiLp.norm_apply_le _ i
+  rw [← zcellCenter_natCast, repr_zcellCenter, zpow_natCast]
 
 /-- On a cell, every coordinate differs from that of the centre by at most `2^(-j)/2`. -/
 theorem abs_repr_sub_cellCenter_le {j : ℕ} {m : Fin (finrank ℝ V) → ℤ} {x : V}
     (hx : x ∈ cell j m) (i : Fin (finrank ℝ V)) :
     |(gridBasis V).repr (x - cellCenter j m) i| ≤ 1 / 2 / 2 ^ j := by
-  have hm : ⌊(2 : ℝ) ^ j * (gridBasis V).repr x i⌋ = m i := congrFun hx i
-  have h1 := Int.floor_le ((2 : ℝ) ^ j * (gridBasis V).repr x i)
-  have h2 := Int.lt_floor_add_one ((2 : ℝ) ^ j * (gridBasis V).repr x i)
-  rw [hm] at h1 h2
-  have hpos : (0 : ℝ) < 2 ^ j := by positivity
-  rw [map_sub, PiLp.sub_apply, repr_cellCenter]
-  set t := (gridBasis V).repr x i
-  have key : t - ((m i : ℝ) + 1 / 2) / 2 ^ j = (2 ^ j * t - m i - 1 / 2) / 2 ^ j := by
-    field_simp
-    ring
-  rw [key, abs_div, abs_of_pos hpos, div_le_div_iff_of_pos_right hpos, abs_le]
-  constructor <;> linarith
+  rw [← zcellCenter_natCast, ← zpow_natCast]
+  exact abs_repr_sub_zcellCenter_le hx i
 
 /-- **Cells are small**: `‖x - c_{j,m}‖ ≤ n 2^(-j)` on `P_{j,m}`. -/
 theorem norm_sub_cellCenter_le {j : ℕ} {m : Fin (finrank ℝ V) → ℤ} {x : V} (hx : x ∈ cell j m) :
     ‖x - cellCenter j m‖ ≤ finrank ℝ V / 2 ^ j := by
-  set y := x - cellCenter j m
-  have hy : y = ∑ i, (gridBasis V).repr y i • (gridBasis V) i := ((gridBasis V).sum_repr y).symm
-  calc ‖y‖ = ‖∑ i, (gridBasis V).repr y i • (gridBasis V) i‖ := by rw [← hy]
-    _ ≤ ∑ i, ‖(gridBasis V).repr y i • (gridBasis V) i‖ := norm_sum_le _ _
-    _ = ∑ i, |(gridBasis V).repr y i| := by
-        refine Finset.sum_congr rfl fun i _ => ?_
-        rw [norm_smul, (gridBasis V).orthonormal.1 i, mul_one, Real.norm_eq_abs]
-    _ ≤ ∑ _i : Fin (finrank ℝ V), 1 / 2 ^ j :=
-        Finset.sum_le_sum fun i _ => (abs_repr_sub_cellCenter_le hx i).trans
-          (div_le_div_of_nonneg_right (by norm_num) (by positivity))
-    _ = finrank ℝ V / 2 ^ j := by
-        rw [Finset.sum_const, Finset.card_univ, Fintype.card_fin, nsmul_eq_mul, mul_one_div]
+  rw [← zcellCenter_natCast, ← zpow_natCast]
+  exact norm_sub_zcellCenter_le hx
 
 /-- The cell index is measurable. -/
 theorem measurable_cellIndex [MeasurableSpace V] [BorelSpace V] (j : ℕ) :
-    Measurable (cellIndex (V := V) j) := by
-  refine Measurable.of_eval fun i => ?_
-  simp only [cellIndex, OrthonormalBasis.repr_apply_apply]
-  exact Int.measurable_floor.comp
-    (measurable_const.mul (continuous_const.inner continuous_id).measurable)
+    Measurable (cellIndex (V := V) j) :=
+  measurable_zcellIndex j
 
 /-- Cells are measurable. -/
 theorem measurableSet_cell [MeasurableSpace V] [BorelSpace V] (j : ℕ)
     (m : Fin (finrank ℝ V) → ℤ) : MeasurableSet (cell (V := V) j m) :=
-  measurable_cellIndex j (measurableSet_singleton m)
+  measurableSet_zcell j m
 
 /-- **Counting centres**: at most `(2ρ + 2)^n` centres of level `j` lie in the ball of radius
 `ρ 2^(-j)` around `x`. -/
@@ -166,12 +258,12 @@ omit [MeasurableSpace V] [BorelSpace V] in
 /-- Cells of the same level with different indices are disjoint: they are the fibres of
 `Rd.cellIndex j` (Mathlib's `pairwise_disjoint_fiber`). -/
 theorem cell_disjoint (j : ℕ) : Pairwise (Function.onFun Disjoint (cell (V := V) j)) :=
-  pairwise_disjoint_fiber (cellIndex j)
+  zcell_disjoint j
 
 omit [MeasurableSpace V] [BorelSpace V] in
 /-- The cells of one level cover the space. -/
 theorem iUnion_cell (j : ℕ) : ⋃ m, cell (V := V) j m = Set.univ :=
-  Set.eq_univ_of_forall fun x => Set.mem_iUnion.2 ⟨_, mem_cell_cellIndex j x⟩
+  iUnion_zcell j
 
 /-- `∫ F = ∑_m ∫_{P_{j,m}} F`. -/
 theorem lintegral_eq_tsum_cell (j : ℕ) (F : V → ℝ≥0∞) :

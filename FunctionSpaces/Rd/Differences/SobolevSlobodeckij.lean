@@ -46,25 +46,7 @@ open scoped ENNReal
 
 namespace ENNReal
 
-/-! ### Powers of dyadic radii in `[0, ∞]` -/
-
-/-- `(ρ 2^(-j))^b = ρ^b 2^(-jb)` in `[0, ∞]` for `ρ > 0` and every real `b`. -/
-theorem ofReal_div_two_pow_rpow {ρ : ℝ} (hρ : 0 < ρ) (b : ℝ) (j : ℕ) :
-    ENNReal.ofReal (ρ / 2 ^ j) ^ b = ENNReal.ofReal ρ ^ b * dyadicWeight (-b) j := by
-  rw [div_eq_mul_inv, ENNReal.ofReal_mul hρ.le,
-    ENNReal.mul_rpow_of_ne_zero (ENNReal.ofReal_pos.2 hρ).ne' (by positivity),
-    ENNReal.ofReal_inv_of_pos (by positivity), ENNReal.ofReal_pow zero_le_two,
-    ENNReal.ofReal_ofNat, ENNReal.inv_rpow, ENNReal.dyadicWeight_neg,
-    ← ENNReal.natCast_two_pow_rpow]
-  norm_cast
-
-/-- `(2^j ρ)^b = ρ^b 2^(jb)` in `[0, ∞]` for `ρ > 0` and every real `b`. -/
-theorem ofReal_two_pow_mul_rpow {ρ : ℝ} (hρ : 0 < ρ) (b : ℝ) (j : ℕ) :
-    ENNReal.ofReal (2 ^ j * ρ) ^ b = ENNReal.ofReal ρ ^ b * dyadicWeight b j := by
-  rw [ENNReal.ofReal_mul (by positivity),
-    ENNReal.mul_rpow_of_ne_zero (by positivity) (ENNReal.ofReal_pos.2 hρ).ne', mul_comm,
-    ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat, ← ENNReal.natCast_two_pow_rpow]
-  norm_cast
+/-! ### Powers in `[0, ∞]` -/
 
 /-- A power of a number between `l` and `u` is at most `l^b + u^b`, whatever the sign of `b`. -/
 theorem rpow_le_rpow_add_rpow_of_le_of_le {x l u : ℝ≥0∞} (hl : l ≤ x) (hu : x ≤ u) (b : ℝ) :
@@ -264,15 +246,13 @@ theorem tsum_setLIntegral_dyadicAnnulus_le (G : V → ℝ≥0∞) {ρ : ℝ} (h�
   exact setLIntegral_le_lintegral _ _
 
 /-- The annulus `j` has volume at most `ρ^n 2^(-jn) |B_1|`, the volume of the closed ball of
-radius `ρ 2^(-j)` (Mathlib's `Measure.addHaar_closedBall`). -/
+radius `ρ 2^(-j)` (`Rd.volume_closedBall_div_two_pow`). -/
 theorem volume_dyadicAnnulus_le {ρ : ℝ} (hρ : 0 < ρ) (j : ℕ) :
     volume (dyadicAnnulus (V := V) ρ j) ≤ ENNReal.ofReal ρ ^ (finrank ℝ V : ℝ) *
-      dyadicWeight (-(finrank ℝ V : ℝ)) j * volume (ball (0 : V) 1) := by
-  calc volume (dyadicAnnulus (V := V) ρ j) ≤ volume (closedBall (0 : V) (ρ / 2 ^ j)) :=
-        measure_mono fun z hz => mem_closedBall_zero_iff.2 hz.2
-    _ = _ := by
-        rw [Measure.addHaar_closedBall _ _ (by positivity), ENNReal.ofReal_pow (by positivity),
-          ← ENNReal.rpow_natCast, ENNReal.ofReal_div_two_pow_rpow hρ]
+      dyadicWeight (-(finrank ℝ V : ℝ)) j * volume (ball (0 : V) 1) :=
+  (measure_mono fun z hz => mem_closedBall_zero_iff.2 hz.2).trans_eq <| by
+    rw [volume_closedBall_div_two_pow hρ.le, ENNReal.ofReal_pow hρ.le, ← ENNReal.rpow_natCast]
+    ring
 
 /-! ### Radial integrals of powers -/
 
@@ -286,7 +266,7 @@ noncomputable def complBallRpowConst (a : ℝ) : ℝ≥0∞ :=
 theorem complBallRpowConst_ne_top {a : ℝ} (ha : (finrank ℝ V : ℝ) < a) :
     complBallRpowConst V a ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.mul_ne_top
-    (ENNReal.rpow_ne_top_of_nonneg (Nat.cast_nonneg _) ENNReal.ofNat_ne_top)
+    (ENNReal.two_rpow_ne_top _)
     (volume_ball_ne_top 1)) (ENNReal.one_sub_two_rpow_neg_inv_ne_top (sub_pos.2 ha))
 
 /-- On the part of the dyadic shell `i` outside the ball of radius `R`, `|z|^(-a)` has the
@@ -358,7 +338,7 @@ noncomputable def ballRpowConst (a : ℝ) : ℝ≥0∞ :=
 /-- The constant of `∫_{|z| < R} |z|^(-a) dz` is finite for `a < n`. -/
 theorem ballRpowConst_ne_top {a : ℝ} (ha : a < finrank ℝ V) : ballRpowConst V a ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
-    ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top⟩) (volume_ball_ne_top 1))
+    ENNReal.two_rpow_ne_top _⟩) (volume_ball_ne_top 1))
     (ENNReal.one_sub_two_rpow_neg_inv_ne_top (sub_pos.2 ha))
 
 /-- On the annulus `R 2^(-(i+1)) < |z| ≤ R 2^(-i)`, `|z|^(-a)` has the integral at most
@@ -603,8 +583,7 @@ theorem eLpNorm_fwdDiff_rpow_le_average {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p
       _ = 2 ^ (p.toReal - 1) *
             ((∫⁻ z in ball (0 : V) t, eLpNorm (fwdDiff (h - z) f) p volume ^ p.toReal) +
               ∫⁻ z in ball (0 : V) t, eLpNorm (fwdDiff z f) p volume ^ p.toReal) := by
-          rw [lintegral_const_mul' _ _ (ENNReal.rpow_ne_top_of_ne_zero two_ne_zero
-            ENNReal.ofNat_ne_top), lintegral_add_right _ hmeas]
+          rw [lintegral_const_mul' _ _ (ENNReal.two_rpow_ne_top _), lintegral_add_right _ hmeas]
       _ ≤ 2 ^ (p.toReal - 1) *
             ((∫⁻ z in ball (0 : V) (2 * t), eLpNorm (fwdDiff z f) p volume ^ p.toReal) +
               ∫⁻ z in ball (0 : V) (2 * t), eLpNorm (fwdDiff z f) p volume ^ p.toReal) := by
@@ -677,7 +656,7 @@ theorem dyadicWeight_mul_setLIntegral_dyadicAnnulus_le (G : V → ℝ≥0∞) {b
     (j : ℕ) : dyadicWeight b j * ∫⁻ z in dyadicAnnulus 2 j, G z ≤
       2 ^ b * ∫⁻ z in dyadicAnnulus 2 j, G z / ‖z‖ₑ ^ b := by
   rw [← lintegral_const_mul' _ _ (ENNReal.dyadicWeight_ne_top b j),
-    ← lintegral_const_mul' _ _ (ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top)]
+    ← lintegral_const_mul' _ _ (ENNReal.two_rpow_ne_top _)]
   refine setLIntegral_mono' (measurableSet_dyadicAnnulus 2 j) fun z hz => ?_
   have hz0 : 0 < ‖z‖ := lt_of_le_of_lt (by positivity) hz.1
   have hn0 : ‖z‖ₑ ^ b ≠ 0 :=
@@ -742,9 +721,9 @@ theorem slobodeckijConstUpper_ne_top (hp0 : p ≠ 0) (hp : p ≠ ∞) {s : ℝ} 
     add_pos_of_nonneg_of_pos (Nat.cast_nonneg _) (mul_pos hs (ENNReal.toReal_pos hp0 hp))
   refine ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top ?_ ?_)
     (ENNReal.one_sub_two_rpow_neg_inv_ne_top hb)) ?_
-  · exact ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top
+  · exact ENNReal.two_rpow_ne_top _
   · exact ENNReal.inv_ne_top.2 (volume_ball_ne_zero one_pos)
-  · exact ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top
+  · exact ENNReal.two_rpow_ne_top _
 
 /-- **The first-difference Besov norm by the Gagliardo form**: for `1 ≤ p < ∞`, `s > 0` and
 `f ∈ L_p(V)`,
@@ -886,8 +865,8 @@ omit [Fact (1 ≤ p)] in
 theorem slobodeckijConstLower_ne_top (hp0 : p ≠ 0) (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) :
     slobodeckijConstLower V p s ≠ ∞ :=
   ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top
-    (ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top) (volume_ball_ne_top 1),
-    ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top)
+    (ENNReal.two_rpow_ne_top _) (volume_ball_ne_top 1),
+    ENNReal.mul_ne_top (ENNReal.two_rpow_ne_top _)
       (complBallRpowConst_ne_top
         (lt_add_of_pos_right _ (mul_pos hs (ENNReal.toReal_pos hp0 hp))))⟩
 

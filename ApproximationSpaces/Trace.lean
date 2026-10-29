@@ -101,7 +101,7 @@ theorem traceSurjConst_ne_top {C' : ℝ≥0∞} (hC' : C' ≠ ∞) {β s : ℝ} 
     (by norm_num) (ENNReal.one_sub_two_rpow_neg_inv_ne_top h))
     (ENNReal.dyadicWeight_ne_top _ γ)) hC') (ENNReal.add_ne_top.2 ⟨?_, ?_⟩)
   · exact ENNReal.mul_ne_top (by norm_num)
-      (ENNReal.rpow_ne_top_of_ne_zero two_ne_zero ENNReal.ofNat_ne_top)
+      (ENNReal.two_rpow_ne_top _)
   · exact ENNReal.mul_ne_top (by norm_num) (ENNReal.dyadicWeight_ne_top s 2)
 
 /-- The canonical near-best approximants with tolerances `2^(-k(β+1))`, used to define the

@@ -58,103 +58,6 @@ grid on `ℕ` and the term `‖f‖`.
 open MeasureTheory Set Function
 open scoped ENNReal
 
-/-! ### `L_q` norms of functions that are bounded on pieces -/
-
-namespace MeasureTheory
-
-variable {α ι : Type*} [MeasurableSpace α] [MeasurableSpace ι] [Countable ι]
-  [MeasurableSingletonClass ι] {μ : Measure α} {S : ι → Set α} {c : ℝ≥0∞} {G : α → ℝ≥0∞}
-  {a : ι → ℝ≥0∞} {q : ℝ≥0∞}
-
-omit [MeasurableSpace ι] [MeasurableSingletonClass ι] in
-/-- **Integral of a function bounded on pieces**: if almost every point lies in one of the
-disjoint measurable sets `S n`, each of measure `c`, and `G ≤ a n` on `S n`, then
-`∫ G dμ ≤ c ∑_n a n`. -/
-theorem lintegral_le_of_le_on_pieces (hS : ∀ n, MeasurableSet (S n))
-    (hd : Pairwise (Disjoint on S)) (hcov : ∀ᵐ x ∂μ, x ∈ ⋃ n, S n) (hμ : ∀ n, μ (S n) = c)
-    (h : ∀ n, ∀ x ∈ S n, G x ≤ a n) : ∫⁻ x, G x ∂μ ≤ c * ∑' n, a n := by
-  calc ∫⁻ x, G x ∂μ = ∫⁻ x in ⋃ n, S n, G x ∂μ := by
-        rw [Measure.restrict_eq_self_of_ae_mem hcov]
-    _ = ∑' n, ∫⁻ x in S n, G x ∂μ := lintegral_iUnion hS hd G
-    _ ≤ ∑' n, ∫⁻ _ in S n, a n ∂μ := ENNReal.tsum_le_tsum fun n =>
-        lintegral_mono_ae ((ae_restrict_iff' (hS n)).2 (Filter.Eventually.of_forall (h n)))
-    _ = c * ∑' n, a n := by
-        simp_rw [setLIntegral_const, hμ]
-        rw [ENNReal.tsum_mul_right, mul_comm]
-
-omit [MeasurableSpace ι] [MeasurableSingletonClass ι] in
-/-- **Integral of a function bounded below on pieces**: if the measurable sets `S n` are
-disjoint, each of measure `c`, and `a n ≤ G` on `S n`, then `c ∑_n a n ≤ ∫ G dμ`. -/
-theorem le_lintegral_of_le_on_pieces (hS : ∀ n, MeasurableSet (S n))
-    (hd : Pairwise (Disjoint on S)) (hμ : ∀ n, μ (S n) = c)
-    (h : ∀ n, ∀ x ∈ S n, a n ≤ G x) : c * ∑' n, a n ≤ ∫⁻ x, G x ∂μ := by
-  calc c * ∑' n, a n = ∑' n, ∫⁻ _ in S n, a n ∂μ := by
-        simp_rw [setLIntegral_const, hμ]
-        rw [ENNReal.tsum_mul_right, mul_comm]
-    _ ≤ ∑' n, ∫⁻ x in S n, G x ∂μ := ENNReal.tsum_le_tsum fun n =>
-        lintegral_mono_ae ((ae_restrict_iff' (hS n)).2 (Filter.Eventually.of_forall (h n)))
-    _ = ∫⁻ x in ⋃ n, S n, G x ∂μ := (lintegral_iUnion hS hd G).symm
-    _ ≤ ∫⁻ x, G x ∂μ := setLIntegral_le_lintegral _ _
-
-/-- **`L_q` norm of a function bounded on pieces**: if almost every point lies in one of the
-disjoint measurable sets `S n`, each of measure `c`, and `G ≤ a n` on `S n`, then
-`‖G‖_{L_q(μ)} ≤ c^(1/q) ‖a‖_{ℓ_q}` for every `q` (with `c^(1/q) = 1` for `q = ∞`).  `G` is
-measurable, since `eLpNorm` is `∞` otherwise. -/
-theorem eLpNorm_le_of_le_on_pieces (hG : AEStronglyMeasurable G μ)
-    (hS : ∀ n, MeasurableSet (S n)) (hd : Pairwise (Disjoint on S))
-    (hcov : ∀ᵐ x ∂μ, x ∈ ⋃ n, S n) (hμ : ∀ n, μ (S n) = c) (h : ∀ n, ∀ x ∈ S n, G x ≤ a n) :
-    eLpNorm G q μ ≤ c ^ (1 / q.toReal) * ENNReal.lqNorm q a := by
-  rcases eq_or_ne q 0 with rfl | hq0
-  · rw [eLpNorm_exponent_zero hG]
-    exact zero_le
-  rcases eq_or_ne q ∞ with rfl | hq
-  · rw [eLpNorm_exponent_top hG, ENNReal.lqNorm_top, ENNReal.toReal_top, div_zero,
-      ENNReal.rpow_zero, one_mul]
-    refine essSup_le_of_ae_le _ (hcov.mono fun x hx => ?_)
-    obtain ⟨n, hn⟩ := mem_iUnion.1 hx
-    simpa only [enorm_eq_self] using (h n x hn).trans (le_iSup a n)
-  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hq0 hq hG, ENNReal.lqNorm_eq_tsum hq0 hq,
-    ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity)]
-  gcongr
-  refine lintegral_le_of_le_on_pieces hS hd hcov hμ fun n x hx => ?_
-  simp only [enorm_eq_self]
-  exact ENNReal.rpow_le_rpow (h n x hx) hp.le
-
-/-- **`L_q` norm of a function bounded below on pieces**: if the measurable sets `S n` are
-disjoint, each of measure `c ≠ 0`, and `a n ≤ G` on `S n`, then
-`c^(1/q) ‖a‖_{ℓ_q} ≤ ‖G‖_{L_q(μ)}` for every `q` (with `c^(1/q) = 1` for `q = ∞`). -/
-theorem le_eLpNorm_of_le_on_pieces (hS : ∀ n, MeasurableSet (S n))
-    (hd : Pairwise (Disjoint on S)) (hμ : ∀ n, μ (S n) = c) (hc : c ≠ 0)
-    (h : ∀ n, ∀ x ∈ S n, a n ≤ G x) :
-    c ^ (1 / q.toReal) * ENNReal.lqNorm q a ≤ eLpNorm G q μ := by
-  by_cases hG : AEStronglyMeasurable G μ
-  swap
-  · rw [eLpNorm_of_not_aestronglyMeasurable hG]
-    exact le_top
-  rcases eq_or_ne q 0 with rfl | hq0
-  · simp [ENNReal.lqNorm_zero_left]
-  rcases eq_or_ne q ∞ with rfl | hq
-  · rw [eLpNorm_exponent_top hG, ENNReal.lqNorm_top, ENNReal.toReal_top, div_zero,
-      ENNReal.rpow_zero, one_mul]
-    refine iSup_le fun n => ?_
-    by_contra hlt
-    push Not at hlt
-    have hae : ∀ᵐ x ∂μ, ‖G x‖ₑ < a n := ae_lt_of_essSup_lt hlt
-    have hsub : S n ⊆ {x | ¬ ‖G x‖ₑ < a n} := fun x hx => by
-      simp only [mem_ofPred_eq, enorm_eq_self, not_lt]
-      exact h n x hx
-    exact hc ((hμ n).symm.trans (measure_mono_null hsub (ae_iff.1 hae)))
-  have hp : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
-  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hq0 hq hG, ENNReal.lqNorm_eq_tsum hq0 hq,
-    ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity)]
-  gcongr
-  refine le_lintegral_of_le_on_pieces hS hd hμ fun n x hx => ?_
-  simp only [enorm_eq_self]
-  exact ENNReal.rpow_le_rpow (h n x hx) hp.le
-
-end MeasureTheory
-
 namespace ApproximationScheme
 
 open ENNReal (lqNorm dyadicWeight LpAddConst dyadicGeomConst)
@@ -642,7 +545,7 @@ theorem kMethodUpperConst_ne_top (hθ : 0 < θ) (hρ : 0 < ρ) (q : ℝ≥0∞) 
     kMethodUpperConst θ ρ q ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.mul_ne_top
     (ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top)
-    (ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofNat_ne_top))
+    (ENNReal.two_rpow_ne_top _))
     (ENNReal.mul_ne_top (ENNReal.LpAddConst_lt_top q).ne
       (ENNReal.dyadicGeomConst_ne_top (mul_pos hρ hθ) q))
 
@@ -688,7 +591,7 @@ theorem lqNorm_discretePhiSeq_le_inv_mul_phiFunctional {φ : ℝ≥0∞ → ℝ�
   refine (ENNReal.mul_le_iff_le_inv (mul_ne_zero (ofReal_mul_log_two_rpow_ne_zero hρ q)
       (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne')
     (ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top)
-      (two_rpow_ne_top _))).1 ?_
+      (ENNReal.two_rpow_ne_top _))).1 ?_
   rw [mul_assoc]
   exact lqNorm_discretePhiSeq_le_phiFunctional hφ hθ hρ
 
@@ -705,13 +608,13 @@ finite. -/
 theorem log_two_rpow_mul_two_rpow_ne_top (θ : ℝ) (q : ℝ≥0∞) :
     ENNReal.ofReal (Real.log 2) ^ (1 / q.toReal) * 2 ^ θ ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top)
-    (two_rpow_ne_top θ)
+    (ENNReal.two_rpow_ne_top θ)
 
 /-- The constant `kMethodLowerConst ι θ ρ q` is finite for `ρ > 0`. -/
 theorem kMethodLowerConst_ne_top (hρ : 0 < ρ) (q : ℝ≥0∞) : kMethodLowerConst ι θ ρ q ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
     max_ne_top ENNReal.one_ne_top enorm_ne_top⟩)
-    (ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg' two_pos ENNReal.ofNat_ne_top)
+    (ENNReal.mul_ne_top (ENNReal.two_rpow_ne_top _)
       (ENNReal.inv_ne_top.2 (ofReal_mul_log_two_rpow_ne_zero hρ q)))
 
 /-- **The discrete K-norm by the continuous one** (Bergh–Löfström, Lemma 3.1.3): for `θ ≥ 0`,

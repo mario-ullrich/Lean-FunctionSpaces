@@ -4643,6 +4643,37 @@ $x - lh$ onto $(x - rh) + lh$, and the translation by $rh$ preserves the measure
 statements follow from the definition.
 \end{proof}
 
+\begin{lemma}[The intrinsic quasi-norm]
+\label{lem:modnorm-on}
+\lean{Rd.modNormOn, Rd.modNormOn_zero, Rd.modNormOn_add_le, Rd.modNormOn_const_smul,
+  Rd.modNormOn_finsetSum_le}
+\leanok
+\uses{def:rd-modulus-on, lem:rd-modulus-on}
+On a measurable set $\Omega$, $N_\Omega(G) = \|G\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(G, 2^{-k},
+\Omega)_p)_k\|_{\ell_q}$ vanishes at $0$, is homogeneous and, for $q \geq 1$, subadditive, also
+for finite sums.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The modulus on $\Omega$ is homogeneous and subadditive (\Cref{lem:rd-modulus-on}), and so are the
+$L_p$ and $\ell_q$ norms.
+\end{proof}
+
+\begin{lemma}[Null sets do not matter]
+\label{lem:null-set-domains}
+\lean{Rd.stepSet_ae_eq, Rd.modulusOn_congr_set, Rd.lpModulusOn_congr_set, Rd.indicatorLp_congr_set}
+\leanok
+\uses{def:rd-modulus-on}
+If $U$ and $U'$ agree up to a null set, so do their step sets $U_{rh}$ and $U'_{rh}$, and
+$\omega_r(f, t, U)_p = \omega_r(f, t, U')_p$ and $1_U f = 1_{U'} f$ in $L_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The step sets are intersections of translates, and translations preserve the Lebesgue measure.
+\end{proof}
+
 \section{Moment kernels}
 
 \begin{lemma}[The coefficients of the moment kernels]
@@ -4789,7 +4820,7 @@ lemma of its own, since it serves the torus as well (\Cref{thm:torus-lp-jackson}
 
 \begin{lemma}[Weighted averages with the Jackson weight]
 \label{lem:jackson-weighted-average}
-\lean{one_add_pow_le_two_pow_mul, Rd.jacksonConst, Rd.jacksonConst_ne_top,
+\lean{ENNReal.one_add_pow_le_two_pow_mul, Rd.jacksonConst, Rd.jacksonConst_ne_top,
   Rd.eLpNorm_integral_lpKernel_mul_le}
 \leanok
 \uses{lem:weighted-jensen, lem:lp-kernels-basic}
@@ -4986,6 +5017,7 @@ measurability of $h \mapsto \|\Delta_h f\|_p^p$.
   Rd.tsum_setLIntegral_dyadicAnnulus_le, ENNReal.ofReal_div_two_pow_rpow,
   Rd.volume_dyadicAnnulus_le}
 \leanok
+\uses{lem:dyadic-ball-volume}
 For every $\rho > 0$ and $j \in \N$ let
 $A_{\rho, j} = \{ z \in V : \rho 2^{-(j+1)} < |z| \leq \rho 2^{-j} \}$. These sets are
 measurable and pairwise disjoint, and $|A_{\rho, j}| \leq \rho^n 2^{-jn} |B(0, 1)|$. For every
@@ -5266,25 +5298,31 @@ $\|v\| \leq 2^{-i}$ this gives $\|\Delta_v^L \eta_j\|_1 \leq C \min(1, 2^{-(i-j)
 
 \begin{lemma}[An almost diagonal estimate]
 \label{lem:almost-diagonal}
-\lean{ENNReal.lqNorm_almostDiagonal_le}
+\lean{ENNReal.lqNorm_almostDiagonal_le, ENNReal.almostDiagonalConst,
+  ENNReal.almostDiagonalConst_ne_top, ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le}
 \leanok
 \uses{lem:hardy}
-Let $1 \leq q \leq \infty$, $s, L \in \R$, and let $c_{ij} = 2^{-(i-j)L}$ for $j \leq i$ and
-$c_{ij} = 1$ for $j > i$. For every sequence $a$ in $[0, \infty]$,
+For all $s, L \in \R$ let $A_{s,L} = (1 - 2^{-(L-s)})^{-1} + (1 - 2^{-s})^{-1}$ in $[0, \infty]$;
+then $A_{s,L} < \infty$ for $0 < s < L$. Let $1 \leq q \leq \infty$, $s, L \in \R$, and let
+$c_{ij} = 2^{-(i-j)L}$ for $j \leq i$ and $c_{ij} = 1$ for $j > i$. For every sequence $a$ in
+$[0, \infty]$,
 \[
   \Bigl\| \Bigl( 2^{is} \sum_j c_{ij} \, a_j \Bigr)_i \Bigr\|_{\ell_q}
-  \leq \bigl( (1 - 2^{-(L-s)})^{-1} + (1 - 2^{-s})^{-1} \bigr) \, \|(2^{js} a_j)_j\|_{\ell_q} .
+  \leq A_{s,L} \, \|(2^{js} a_j)_j\|_{\ell_q} .
 \]
+For every $C \in [0, \infty]$ and all sequences $a, m$ in $[0, \infty]$ with
+$a_j \leq C \sum_i c_{ji} m_i$ for every $j$,
+$\|(2^{js} a_j)_j\|_{\ell_q} \leq C A_{s,L} \, \|(2^{is} m_i)_i\|_{\ell_q}$.
 \end{lemma}
-
-The constant is computed in $[0, \infty]$; it is finite exactly for $0 < s < L$.
 
 \begin{proof}
 \leanok
-For $s \leq 0$ or $s \geq L$ the constant is $\infty$, and the right side vanishes only for
+For $0 < s < L$ both $2^{-(L-s)}$ and $2^{-s}$ are less than $1$, so $A_{s,L} < \infty$. For
+$s \leq 0$ or $s \geq L$ the constant is $\infty$, and the right side vanishes only for
 $a = 0$, where both sides are $0$. For $0 < s < L$, split the sum at $j = i$: the part
 $j \leq i$ is a partial sum with the weights $2^{-i(L-s)}$, the part $j > i$ a tail sum with the
-weights $2^{is}$, and \Cref{lem:hardy} bounds both.
+weights $2^{is}$, and \Cref{lem:hardy} bounds both. For the last claim, multiply the hypothesis
+by $2^{js}$, take the $\ell_q$ norm and apply the displayed bound to $(m_i)_i$.
 \end{proof}
 
 \begin{lemma}[The synthesis estimate]
@@ -5482,11 +5520,13 @@ order of the differences that measure them.
 
 \begin{definition}[Dyadic cells]
 \label{def:dyadic-cells}
-\lean{Rd.gridBasis, Rd.cellIndex, Rd.cell, Rd.cellCenter, Rd.mem_cell_cellIndex,
-  Rd.repr_cellCenter, Rd.measurable_cellIndex, Rd.measurableSet_cell}
+\lean{Rd.cellIndex, Rd.cell, Rd.cellCenter, Rd.zcellIndex_natCast, Rd.zcell_natCast,
+  Rd.zcellCenter_natCast, Rd.mem_cell_cellIndex, Rd.repr_cellCenter, Rd.measurable_cellIndex,
+  Rd.measurableSet_cell}
 \leanok
-Let $(b_i)$ be an orthonormal basis of $V$. For $j \in \N$ and $m \in \Z^n$ the dyadic cell of
-level $j$ and index $m$ is
+\uses{def:dyadic-cubes}
+For $j \in \N$ and $m \in \Z^n$ the dyadic cell of level $j$ and index $m$ is the dyadic cube
+$P_{j,m} = Q_{j,m}$ of \Cref{def:dyadic-cubes}, that is,
 $P_{j,m} = \{x \in V : \lfloor 2^j \langle b_i, x \rangle \rfloor = m_i \text{ for all } i\}$,
 with centre $c_{j,m} = \sum_i (m_i + 1/2) 2^{-j} b_i$. Every $x$ lies in the cell of index
 $(\lfloor 2^j \langle b_i, x \rangle \rfloor)_i$, and the cells are measurable.
@@ -5494,18 +5534,20 @@ $(\lfloor 2^j \langle b_i, x \rangle \rfloor)_i$, and the cells are measurable.
 
 \begin{lemma}[Cells and centres]
 \label{lem:dyadic-cells}
-\lean{Rd.abs_repr_le_norm, Rd.abs_repr_sub_cellCenter_le, Rd.norm_sub_cellCenter_le,
+\lean{Rd.abs_repr_sub_cellCenter_le, Rd.norm_sub_cellCenter_le, Rd.volume_cell,
   Rd.card_le_of_norm_cellCenter_sub_le}
 \leanok
-\uses{def:dyadic-cells}
-For $x \in P_{j,m}$ every coordinate of $x - c_{j,m}$ is at most $2^{-j}/2$ in modulus, and
-$\|x - c_{j,m}\| \leq n 2^{-j}$. For $\rho \geq 0$ at most $(2\rho + 2)^n$ centres of level $j$ lie
-in a closed ball of radius $\rho 2^{-j}$.
+\uses{def:dyadic-cells, lem:dyadic-cubes}
+For every $j \in \N$, every $m \in \Z^n$ and every $x \in P_{j,m}$, every coordinate of
+$x - c_{j,m}$ is at most $2^{-j}/2$ in modulus, $\|x - c_{j,m}\| \leq n 2^{-j}$ and
+$|P_{j,m}| = 2^{-jn}$. For every $j \in \N$ and every $\rho \geq 0$ at most $(2\rho + 2)^n$
+centres of level $j$ lie in a closed ball of radius $\rho 2^{-j}$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-The coordinates of the centres in such a ball lie in intervals of length $2 \rho 2^{-j}$, and such
+The bounds and the volume are the case $k = j$ of \Cref{lem:dyadic-cubes}. The coordinates of
+the centres in such a ball lie in intervals of length $2 \rho 2^{-j}$, and such
 an interval contains at most $2\rho + 2$ points of $(\Z + 1/2) 2^{-j}$.
 \end{proof}
 
@@ -5628,11 +5670,11 @@ zero function is a regular atom, and a sequence with one nonzero term $x$ has $\
 
 \begin{lemma}[Atoms from pointwise bounds]
 \label{lem:pointwise-atoms}
-\lean{Rd.eLpNorm_le_of_bound_of_support, Rd.volume_closedBall_div_two_pow,
-  Rd.rpow_mul_dyadicWeight_neg, Rd.isRegularAtomOn_of_pointwise, Rd.isRegularAtom_of_pointwise,
+\lean{Rd.eLpNorm_le_of_bound_of_support, ENNReal.rpow_mul_dyadicWeight_neg,
+  Rd.isRegularAtomOn_of_pointwise, Rd.isRegularAtom_of_pointwise,
   Rd.enorm_higherDiff_le_of_iteratedFDeriv}
 \leanok
-\uses{def:regular-atoms, lem:smooth-differences}
+\uses{def:regular-atoms, lem:smooth-differences, lem:dyadic-ball-volume}
 Let $a$ be measurable with $a = 0$ outside $\overline{B}(c, d 2^{-j})$, $|a| \leq A$ and
 $|\Delta_h^r a| \leq A \min(1, (2^j \|h\|)^\sigma)$. Then $a$ is a regular atom with the constant
 $A ((r + 1) d^n |B_1|)^{1/p}$; on a measurable set $\Omega$ the bounds are needed only on $\Omega$
@@ -5645,9 +5687,9 @@ $|\Delta_h^r a| \leq 2^r A \min(1, (2^j \|h\|)^r)$.
 \uses{lem:conv-pointwise}
 A function with $|g| \leq B$ that vanishes outside $S$ has $\|g\|_p \leq B |S|^{1/p}$. The
 difference $\Delta_h^r a$ vanishes outside $r + 1$ translates of the ball, and
-$|\overline{B}(c, d 2^{-j})| = d^n |B_1| 2^{-jn}$. For smooth $a$, \Cref{lem:smooth-differences}
-gives $|\Delta_h^r a| \leq A (2^j \|h\|)^r$, and $|\Delta_h^r a| \leq 2^r \sup |a|$
-(\Cref{lem:conv-pointwise}).
+$|\overline{B}(c, d 2^{-j})| = d^n |B_1| 2^{-jn}$ (\Cref{lem:dyadic-ball-volume}). For smooth $a$,
+\Cref{lem:smooth-differences} gives $|\Delta_h^r a| \leq A (2^j \|h\|)^r$, and
+$|\Delta_h^r a| \leq 2^r \sup |a|$ (\Cref{lem:conv-pointwise}).
 \end{proof}
 
 \section{Atomic decompositions}
@@ -6193,23 +6235,6 @@ $K \|\lambda'\|_{b^s_{p,q}} \leq K \|\lambda\|_{b^s_{p,q}}$, which is the local 
 $F$, bounded by the right side (\Cref{thm:local-means}).
 \end{proof}
 
-\begin{lemma}[The intrinsic quasi-norm]
-\label{lem:modnorm-on}
-\lean{Rd.modNormOn, Rd.modNormOn_zero, Rd.modNormOn_add_le, Rd.modNormOn_const_smul,
-  Rd.modNormOn_finsetSum_le}
-\leanok
-\uses{def:rd-modulus-on, lem:rd-modulus-on}
-On a measurable set $\Omega$, $N_\Omega(G) = \|G\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(G, 2^{-k},
-\Omega)_p)_k\|_{\ell_q}$ vanishes at $0$, is homogeneous and, for $q \geq 1$, subadditive, also
-for finite sums.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The modulus on $\Omega$ is homogeneous and subadditive (\Cref{lem:rd-modulus-on}), and so are the
-$L_p$ and $\ell_q$ norms.
-\end{proof}
-
 \begin{definition}[Besov domains]
 \label{def:besov-domain}
 \lean{Rd.BesovDomain, Rd.modNormOn_univ, Rd.BesovDomain.univ, Rd.BesovDomain.measurableSet}
@@ -6256,20 +6281,6 @@ to $F$ with $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq C N_\O
 $T f = T F$, and \Cref{thm:diffeo-invariance} applies. For the order, change it on $V$
 (\Cref{thm:rd-besov}) and restrict, $N_\Omega(f; r') \leq
 \|F\|_p + \|(2^{ks} \omega_{r'}(F, 2^{-k})_p)_k\|_{\ell_q}$ (\Cref{lem:rd-modulus-on}).
-\end{proof}
-
-\begin{lemma}[Null sets do not matter]
-\label{lem:null-set-domains}
-\lean{Rd.stepSet_ae_eq, Rd.modulusOn_congr_set, Rd.lpModulusOn_congr_set, Rd.indicatorLp_congr_set}
-\leanok
-\uses{def:rd-modulus-on}
-If $U$ and $U'$ agree up to a null set, so do their step sets $U_{rh}$ and $U'_{rh}$, and
-$\omega_r(f, t, U)_p = \omega_r(f, t, U')_p$ and $1_U f = 1_{U'} f$ in $L_p$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The step sets are intersections of translates, and translations preserve the Lebesgue measure.
 \end{proof}
 
 \begin{theorem}[The half-space is a Besov domain]
@@ -6454,27 +6465,29 @@ gives at most $A^q \sum_k b_k^q$. The product bound holds on the finite boxes.
 \begin{lemma}[The almost diagonal lemma on $\N^d$]
 \label{lem:mixed-almost-diagonal}
 \lean{Rd.almostDiagCoeff, Rd.almostDiagProfile, Rd.dyadicWeight_mul_almostDiagCoeff_mul,
-  Rd.tsum_almostDiagProfile_le, Rd.almostDiagConst, Rd.almostDiagConst_ne_top,
-  Rd.lqNorm_almostDiagonal_pi_le, Rd.lqNorm_le_of_le_almostDiagonal_pi}
+  Rd.tsum_almostDiagProfile_le, Rd.lqNorm_almostDiagonal_pi_le,
+  Rd.lqNorm_le_of_le_almostDiagonal_pi}
 \leanok
 \uses{lem:schur-test, lem:almost-diagonal}
 Let $c(i, j) = 2^{-(i - j)L}$ for $j \leq i$ and $c(i, j) = 1$ for $j > i$, let $s \geq 0$ and
-$1 \leq q \leq \infty$. Then for every $a \geq 0$
+$1 \leq q \leq \infty$, and let $A_{s,L}$ be the constant of \Cref{lem:almost-diagonal}. Then
+for every $a \geq 0$
 \[
   \bigl\|\bigl(2^{s|m|_1} \textstyle\sum_k \prod_i c(m_i, k_i) \, a_k\bigr)_m\bigr\|_{\ell_q}
-  \leq C^d \, \|(2^{s|k|_1} a_k)_k\|_{\ell_q}
+  \leq A_{s,L}^d \, \|(2^{s|k|_1} a_k)_k\|_{\ell_q} .
 \]
-with $C = (1 - 2^{-(L-s)})^{-1} + (1 - 2^{-s})^{-1}$, and $C < \infty$ for $0 < s < L$.
 Consequently, for every $C_0 \in [0, \infty]$ and every $a' \geq 0$ on $\N^d$ with
 $a'_m \leq C_0^d \sum_k \prod_i c(m_i, k_i) \, a_k$ for every $m$,
-$\|(2^{s|m|_1} a'_m)_m\|_{\ell_q} \leq (C_0 C)^d \, \|(2^{s|k|_1} a_k)_k\|_{\ell_q}$.
+\[
+  \|(2^{s|m|_1} a'_m)_m\|_{\ell_q} \leq (C_0 A_{s,L})^d \, \|(2^{s|k|_1} a_k)_k\|_{\ell_q} .
+\]
 \end{lemma}
 
 \begin{proof}
 \leanok
 $2^{s|m|_1} \prod_i c(m_i, k_i) \, 2^{-s|k|_1} = \prod_i u(m_i - k_i)$ with $u(l) = 2^{-(L-s)l}$
-for $l \geq 0$ and $u(l) = 2^{sl}$ for $l < 0$, and $\sum_{l \in \Z} u(l) \leq C$. All row and
-column sums are therefore at most $C^d$ (\Cref{lem:schur-test}). This replaces the
+for $l \geq 0$ and $u(l) = 2^{sl}$ for $l < 0$, and $\sum_{l \in \Z} u(l) \leq A_{s,L}$. All row
+and column sums are therefore at most $A_{s,L}^d$ (\Cref{lem:schur-test}). This replaces the
 one-dimensional Hardy inequalities of \Cref{lem:almost-diagonal}, which do not iterate over the
 coordinates.
 \end{proof}

@@ -274,7 +274,7 @@ theorem eLpNorm_lqNorm_le_of_forall_enorm_sum_integral_le {p q : ℝ≥0∞} [p.
 and `A ∈ [0, ∞]`. If `|∫ v conj g dμ| ≤ A ‖g‖_q` for every `g ∈ L_q(μ)`, then `‖v‖_p ≤ A`: the
 case of one function in `MeasureTheory.eLpNorm_lqNorm_le_of_forall_enorm_sum_integral_le`,
 where the norming function is `v |v|^{p-2}`; the `ℓ_2` norm of `(v(x), 0, 0, …)` is `|v(x)|`
-(`Rd.lqNorm_ite_eq`). -/
+(`ENNReal.lqNorm_ite_eq`). -/
 theorem eLpNorm_le_of_forall_enorm_integral_mul_conj_le {p q : ℝ≥0∞} [p.HolderConjugate q]
     (hp1 : 1 < p) (hp : p ≠ ∞) {v : α → ℂ} (hv : MemLp v p μ) {A : ℝ≥0∞}
     (hA : ∀ g : α → ℂ, MemLp g q μ → ‖∫ x, v x * conj (g x) ∂μ‖ₑ ≤ A * eLpNorm g q μ) :
@@ -295,7 +295,7 @@ theorem eLpNorm_le_of_forall_enorm_integral_mul_conj_le {p q : ℝ≥0∞} [p.Ho
   have hpt : (fun x => lqNorm 2 fun j => ‖(if j = 0 then v x else 0)‖ₑ) = fun x => ‖v x‖ₑ := by
     funext x
     simp_rw [apply_ite (fun z : ℂ => ‖z‖ₑ), enorm_zero]
-    exact Rd.lqNorm_ite_eq one_le_two 0 _
+    exact ENNReal.lqNorm_ite_eq one_le_two 0 _
   rwa [hpt, eLpNorm_enorm _ hv.aestronglyMeasurable] at h
 
 end MeasureTheory

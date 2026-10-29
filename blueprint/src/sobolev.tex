@@ -447,7 +447,7 @@ statement is \Cref{cor:sobolev-tempered} with $g = \partial^v \eta$.
 \label{sec:weak-derivative-change-of-variables}
 
 Throughout this section $(e_i)_{i \in I}$ is the orthonormal basis of the dyadic grid of $V$
-(\Cref{def:dyadic-cells}). For a function $f$ on $V$, $D_v f(x)$ is the line derivative
+(\Cref{def:dyadic-cubes}). For a function $f$ on $V$, $D_v f(x)$ is the line derivative
 $\lim_{t \to 0} (f(x + t v) - f(x))/t$ where it exists and $0$ elsewhere (Mathlib's
 \texttt{lineDeriv}), and $\partial_v f$ is a weak derivative; for a map $\Phi \colon V \to V$,
 $D\Phi(x)$ is the derivative where it exists and $0$ elsewhere (Mathlib's \texttt{fderiv}). For
@@ -525,7 +525,7 @@ the identity of \Cref{lem:weak-derivative-integral}.
   Rd.memSobolev_one_of_forall_gridBasis}
 \leanok
 \uses{lem:weak-derivative-integral, lem:weak-derivative-basic,
-  lem:directional-derivatives-commute, def:dyadic-cells}
+  lem:directional-derivatives-commute, def:dyadic-cubes}
 For every open $\Omega \subseteq V$:
 \begin{enumerate}
   \item for every finite set $s$, all locally integrable $g_i$ on $\Omega$ and all $c_i$ in $\R$
@@ -751,7 +751,7 @@ $\infty$, so the bound holds for every $h$.
 \lean{Rd.lineDeriv_comp_eq_sum, Rd.hasWeakLineDeriv_comp_of_contDiff,
   Rd.eLpNorm_sum_inner_fderiv_mul_comp_le}
 \leanok
-\uses{lem:lipschitz-weak-derivative, lem:composition-measure-preserving, def:dyadic-cells,
+\uses{lem:lipschitz-weak-derivative, lem:composition-measure-preserving, def:dyadic-cubes,
   lem:weak-derivative-basic, lem:bounded-multiplier-lp}
 \begin{enumerate}
   \item For all $u \colon V \to \C$, $\Phi \colon V \to V$ and $x \in V$ such that $u$ is

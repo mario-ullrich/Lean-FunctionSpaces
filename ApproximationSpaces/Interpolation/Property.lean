@@ -39,40 +39,6 @@ between the spaces of `ApproximationSpaces.KMethod`
 open MeasureTheory Set Function
 open scoped ENNReal
 
-/-! ### Arithmetic of the constants in `[0, ∞]` -/
-
-namespace ENNReal
-
-variable {a b : ℝ≥0∞}
-
-/-- `a (x + (b/a) t y) = a x + t (b y)` for `0 < a < ∞`: the rescaled decomposition term of the
-K-functional under a map. -/
-theorem mul_add_div_mul_mul (ha0 : a ≠ 0) (ha : a ≠ ∞) (t x y : ℝ≥0∞) :
-    a * (x + b / a * t * y) = a * x + t * (b * y) := by
-  have h : a * (b / a) = b := ENNReal.mul_div_cancel ha0 ha
-  calc a * (x + b / a * t * y) = a * x + a * (b / a) * t * y := by ring
-    _ = a * x + t * (b * y) := by rw [h]; ring
-
-/-- `a (b/a)^θ = a^(1-θ) b^θ` for `0 < a < ∞` and every `b ∈ [0, ∞]`.  For `b = ∞` the power
-rule for products holds since both factors `∞` and `a⁻¹` are nonzero
-(`ENNReal.mul_rpow_of_ne_zero`). -/
-theorem mul_div_rpow_eq (ha0 : a ≠ 0) (ha : a ≠ ∞) (θ : ℝ) :
-    a * (b / a) ^ θ = a ^ (1 - θ) * b ^ θ := by
-  have h : (b * a⁻¹) ^ θ = b ^ θ * a⁻¹ ^ θ := by
-    rcases eq_or_ne b ∞ with rfl | hb
-    · exact ENNReal.mul_rpow_of_ne_zero ENNReal.top_ne_zero (ENNReal.inv_ne_zero.2 ha) θ
-    · exact ENNReal.mul_rpow_of_ne_top hb (ENNReal.inv_ne_top.2 ha0) θ
-  rw [div_eq_mul_inv, h, ENNReal.inv_rpow, ← ENNReal.rpow_neg, sub_eq_add_neg,
-    ENNReal.rpow_add _ _ ha0 ha, ENNReal.rpow_one]
-  ring
-
-/-- The constant `a^(1-θ) b^θ` is finite for `0 < a, b < ∞`. -/
-theorem rpow_mul_rpow_ne_top (ha0 : a ≠ 0) (ha : a ≠ ∞) (hb0 : b ≠ 0) (hb : b ≠ ∞) (θ : ℝ) :
-    a ^ (1 - θ) * b ^ θ ≠ ∞ :=
-  ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_ne_zero ha0 ha) (ENNReal.rpow_ne_top_of_ne_zero hb0 hb)
-
-end ENNReal
-
 /-! ### Dilations of `dt/t` -/
 
 namespace ApproximationScheme
@@ -313,7 +279,7 @@ theorem discreteKMethodNorm_le_of_kMethodNorm_le {v : V} {u : U} {M : ℝ≥0∞
   have hLt : ENNReal.ofReal (ρ * Real.log 2) ^ (1 / q.toReal) ≠ ∞ :=
     ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofReal_ne_top
   have h2 : (2 : ℝ≥0∞) ^ (-(ρ * θ)) ≠ 0 := (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne'
-  have h2t : (2 : ℝ≥0∞) ^ (-(ρ * θ)) ≠ ∞ := ApproximationScheme.two_rpow_ne_top _
+  have h2t : (2 : ℝ≥0∞) ^ (-(ρ * θ)) ≠ ∞ := ENNReal.two_rpow_ne_top _
   have e : (2 : ℝ≥0∞) ^ (ρ * θ) = 2 ^ (-(ρ * θ)) * 2 ^ (2 * (ρ * θ)) := by
     rw [← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top]
     congr 1

@@ -74,12 +74,13 @@ theorem leftApproxCouple_norm1 (f : X) :
 (`approxNormDyadic_add_le`). -/
 theorem isQuasiNormed_leftApproxCouple (hs : 0 ≤ s) (hq : 1 ≤ q) :
     (A.leftApproxCouple s q).IsQuasiNormed (2 * 2 ^ s) where
-  ne_top := ENNReal.mul_ne_top (by norm_num) (two_rpow_ne_top s)
+  ne_top := ENNReal.mul_ne_top (by norm_num) (ENNReal.two_rpow_ne_top s)
   norm0_zero := enorm_zero
   norm1_zero := approxNormDyadic_zero s q
   norm0_neg a := enorm_neg a
   norm1_neg a := approxNormDyadic_neg a
-  norm0_add_le a b := (enorm_add_le a b).trans (le_mul_of_one_le_left' (one_le_two_mul_two_rpow hs))
+  norm0_add_le a b :=
+    (enorm_add_le a b).trans (le_mul_of_one_le_left' (ENNReal.one_le_two_mul_two_rpow hs))
   norm1_add_le := approxNormDyadic_add_le hq hs
 
 /-- The couple `(X, A^s_q)` is homogeneous (`approxNormDyadic_smul`). -/
@@ -159,7 +160,7 @@ theorem approxNormDyadic_le_interpNorm_reprCouple (hs : 0 ≤ s) (hr : r ≠ 0) 
           (A.reprCouple r).kFunctional (dyadicWeight (-r) k) f) := by
         rw [← add_assoc, ← two_mul]
         gcongr
-        · exact le_mul_of_one_le_right' (one_le_two_rpow hs)
+        · exact le_mul_of_one_le_right' (ENNReal.one_le_two_rpow hs)
         · exact le_mul_of_one_le_left' one_le_two
     _ = 2 * 2 ^ s * (A.reprCouple r).interpNorm (s / r) r q f := by
         rw [InterpCouple.interpNorm, mul_add]
@@ -260,7 +261,7 @@ theorem memApprox_iff_memKMethod_reprCouple (hs : 0 < s) (hsr : s < r) (hq : 1 �
   exact ⟨fun h => (interpNorm_reprCouple_le_approxNormDyadic hs.le hsr hq f).trans_lt
       (ENNReal.mul_lt_top (devorePopovConst_ne_top hsr).lt_top h),
     fun h => (approxNormDyadic_le_interpNorm_reprCouple hs.le hr.ne' hq f).trans_lt
-      (ENNReal.mul_lt_top (ENNReal.mul_lt_top (by norm_num) (two_rpow_ne_top s).lt_top) h)⟩
+      (ENNReal.mul_lt_top (ENNReal.mul_lt_top (by norm_num) (ENNReal.two_rpow_ne_top s).lt_top) h)⟩
 
 /-- **Approximation spaces are interpolation spaces**, as an equality of subspaces: for
 `0 < s < r` and `1 ≤ q ≤ ∞`, the real interpolation space `(X, A^r_∞)_{s/r,q}` is `A^s_q`. -/
@@ -276,10 +277,10 @@ noncomputable def reprLowerConst (r s : ℝ) (q : ℝ≥0∞) : ℝ≥0∞ :=
 
 /-- The constant `reprLowerConst r s q` is finite for `r > 0`. -/
 theorem reprLowerConst_ne_top (hr : 0 < r) (s : ℝ) (q : ℝ≥0∞) : reprLowerConst r s q ≠ ∞ :=
-  ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num) (two_rpow_ne_top s))
+  ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num) (ENNReal.two_rpow_ne_top s))
     (ENNReal.mul_ne_top (ENNReal.add_ne_top.2 ⟨ENNReal.one_ne_top,
-      ENNReal.mul_ne_top (by norm_num) (two_rpow_ne_top r)⟩)
-      (ENNReal.mul_ne_top (two_rpow_ne_top s)
+      ENNReal.mul_ne_top (by norm_num) (ENNReal.two_rpow_ne_top r)⟩)
+      (ENNReal.mul_ne_top (ENNReal.two_rpow_ne_top s)
         (ENNReal.inv_ne_top.2 (ofReal_mul_log_two_rpow_ne_zero hr q))))
 
 /-- **The dyadic quasi-norm of `A^s_q` by the continuous K-norm of `(X, A^r_∞)`**: for `s ≥ 0`,
@@ -364,7 +365,7 @@ noncomputable def approxCouple (s₀ : ℝ) (q₀ : ℝ≥0∞) (s₁ : ℝ) (q�
 constant `2 · 2^max(s₀, s₁)` (`approxNormDyadic_add_le`). -/
 theorem isQuasiNormed_approxCouple (hs₀ : 0 ≤ s₀) (hs₁ : 0 ≤ s₁) (hq₀ : 1 ≤ q₀) (hq₁ : 1 ≤ q₁) :
     (A.approxCouple s₀ q₀ s₁ q₁).IsQuasiNormed (2 * 2 ^ max s₀ s₁) where
-  ne_top := ENNReal.mul_ne_top (by norm_num) (two_rpow_ne_top _)
+  ne_top := ENNReal.mul_ne_top (by norm_num) (ENNReal.two_rpow_ne_top _)
   norm0_zero := approxNormDyadic_zero s₀ q₀
   norm1_zero := approxNormDyadic_zero s₁ q₁
   norm0_neg a := approxNormDyadic_neg a

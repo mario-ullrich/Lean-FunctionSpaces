@@ -31,7 +31,7 @@ kernels `ψ_j ⋆ η_i` of `FunctionSpaces.Rd.LocalMeans.KernelMajorants` give
 and the cross kernels `k_j ⋆ Θ_i` give `|k_j ⋆ f(x)| ≤ C ∑_i c_{ji} M(ψ_i ⋆ f)(x)`
 (`Rd.LocalMeansBump.enorm_localMean_le_tsum_maximal`). The factors `c_{ji}` decay geometrically
 below the diagonal, so the almost diagonal estimate in `ℓ_q`
-(`Rd.lqNorm_le_almostDiagonalConst_mul_of_le`) and the Fefferman–Stein inequality
+(`ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le`) and the Fefferman–Stein inequality
 (`Rd.feffermanStein`) finish. The partial sums of the two decompositions converge in `L_p`, and
 the pointwise bounds pass to the limit by `MeasureTheory.ae_enorm_le_of_tendsto_Lp`.
 
@@ -60,41 +60,6 @@ theorem ite_dyadicWeight_ne_top (L : ℝ) (i j : ℕ) :
   split_ifs
   · exact ENNReal.dyadicWeight_ne_top _ _
   · exact ENNReal.one_ne_top
-
-/-- The constant `(1 - 2^(-(L-s)))⁻¹ + (1 - 2^(-s))⁻¹` of the almost diagonal estimate in `ℓ_q`
-(`ENNReal.lqNorm_almostDiagonal_le`). -/
-noncomputable def almostDiagonalConst (s L : ℝ) : ℝ≥0∞ :=
-  (1 - (2 : ℝ≥0∞) ^ (-(L - s)))⁻¹ + (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹
-
-/-- The constant of the almost diagonal estimate is finite for `0 < s < L`. -/
-theorem almostDiagonalConst_ne_top {s L : ℝ} (hs : 0 < s) (hsL : s < L) :
-    almostDiagonalConst s L ≠ ∞ :=
-  ENNReal.add_ne_top.2 ⟨ENNReal.one_sub_two_rpow_neg_inv_ne_top (sub_pos.2 hsL),
-    ENNReal.one_sub_two_rpow_neg_inv_ne_top hs⟩
-
-/-- **The almost diagonal step at one point**: if `a_j ≤ C ∑_i c_{ji} m_i` for every `j`, with
-`c_{ji} = 2^(-(j-i)L)` for `i ≤ j` and `c_{ji} = 1` for `i > j`, then for `1 ≤ q ≤ ∞`,
-`‖(2^(js) a_j)_j‖_{ℓ_q} ≤ C A_{s,L} ‖(2^(is) m_i)_i‖_{ℓ_q}` with
-`A_{s,L} = Rd.almostDiagonalConst s L`. -/
-theorem lqNorm_le_almostDiagonalConst_mul_of_le {q : ℝ≥0∞} (hq : 1 ≤ q) (s L : ℝ) {C : ℝ≥0∞}
-    {a m : ℕ → ℝ≥0∞}
-    (h : ∀ j, a j ≤ C * ∑' i, (if i ≤ j then dyadicWeight (-L) (j - i) else 1) * m i) :
-    lqNorm q (fun j => dyadicWeight s j * a j) ≤
-      C * almostDiagonalConst s L * lqNorm q (fun i => dyadicWeight s i * m i) := by
-  calc lqNorm q (fun j => dyadicWeight s j * a j)
-      ≤ lqNorm q (fun j => C * (dyadicWeight s j *
-          ∑' i, (if i ≤ j then dyadicWeight (-L) (j - i) else 1) * m i)) :=
-        ENNReal.lqNorm_mono fun j => by
-          rw [mul_left_comm]
-          gcongr
-          exact h j
-    _ = C * lqNorm q (fun j => dyadicWeight s j *
-          ∑' i, (if i ≤ j then dyadicWeight (-L) (j - i) else 1) * m i) :=
-        ENNReal.lqNorm_const_mul _ _
-    _ ≤ C * (almostDiagonalConst s L * lqNorm q (fun i => dyadicWeight s i * m i)) := by
-        gcongr
-        exact ENNReal.lqNorm_almostDiagonal_le hq s L m
-    _ = _ := by rw [mul_assoc]
 
 /-- The weights go inside the maximal function: `2^(is) M g(x) = M(2^(is) g)(x)`. -/
 theorem dyadicWeight_mul_maximal (s : ℝ) (i : ℕ) (g : V → ℝ≥0∞) (x : V) :
@@ -397,30 +362,30 @@ theorem enorm_localMean_le_tsum_maximal (L : ℕ) (hp : p ≠ ∞) (f : Lp ℂ p
 /-- **The blocks by local means in `ℓ_q`**: for `L ≥ 1`, `L' ≥ 1`, `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`,
 `s ∈ ℝ` and `f ∈ L_p`, almost everywhere,
 `‖(2^(js) |ψ_j ⋆ f(x)|)_j‖_{ℓ_q} ≤ C A_{s,L'} ‖(M(2^(is) |k_i ⋆ f|)(x))_i‖_{ℓ_q}` with
-`C = Rd.LocalMeansBump.blockByLocalMeansConst L L'` and `A_{s,L'} = Rd.almostDiagonalConst s L'`,
-finite for `0 < s < L'`. -/
+`C = Rd.LocalMeansBump.blockByLocalMeansConst L L'` and
+`A_{s,L'} = ENNReal.almostDiagonalConst s L'`, finite for `0 < s < L'`. -/
 theorem lqNorm_blockFun_le_lqNorm_maximal {L : ℕ} (hL : 1 ≤ L) {L' : ℕ} (hL' : 1 ≤ L')
     (hp : p ≠ ∞) {q : ℝ≥0∞} (hq : 1 ≤ q) (s : ℝ) (f : Lp ℂ p (volume : Measure V)) :
     ∀ᵐ x ∂volume, lqNorm q (fun j => dyadicWeight s j * ‖blockFun j f x‖ₑ) ≤
-      b.blockByLocalMeansConst L L' * almostDiagonalConst s L' *
+      b.blockByLocalMeansConst L L' * ENNReal.almostDiagonalConst s L' *
         lqNorm q (fun i => maximal (fun y => dyadicWeight s i *
           ‖conv (b.kernel L i) f volume y‖ₑ) x) := by
   filter_upwards [b.enorm_blockFun_le_tsum_maximal hL hL' hp f] with x hx
-  refine (lqNorm_le_almostDiagonalConst_mul_of_le hq s L' hx).trans_eq ?_
+  refine (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq s L' hx).trans_eq ?_
   simp only [dyadicWeight_mul_maximal]
 
 /-- **The local means by blocks in `ℓ_q`**: for every order `L`, `1 ≤ p < ∞`, `1 ≤ q ≤ ∞`,
 `s ∈ ℝ` and `f ∈ L_p`, almost everywhere,
 `‖(2^(js) |k_j ⋆ f(x)|)_j‖_{ℓ_q} ≤ C A_{s,L} ‖(M(2^(is) |ψ_i ⋆ f|)(x))_i‖_{ℓ_q}` with
-`C = Rd.LocalMeansBump.localMeansByBlockConst L` and `A_{s,L} = Rd.almostDiagonalConst s L`,
+`C = Rd.LocalMeansBump.localMeansByBlockConst L` and `A_{s,L} = ENNReal.almostDiagonalConst s L`,
 finite for `0 < s < L`. -/
 theorem lqNorm_localMean_le_lqNorm_maximal (L : ℕ) (hp : p ≠ ∞) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (s : ℝ) (f : Lp ℂ p (volume : Measure V)) :
     ∀ᵐ x ∂volume, lqNorm q (fun j => dyadicWeight s j * ‖conv (b.kernel L j) f volume x‖ₑ) ≤
-      b.localMeansByBlockConst L * almostDiagonalConst s L *
+      b.localMeansByBlockConst L * ENNReal.almostDiagonalConst s L *
         lqNorm q (fun i => maximal (fun y => dyadicWeight s i * ‖blockFun i f y‖ₑ) x) := by
   filter_upwards [b.enorm_localMean_le_tsum_maximal L hp f] with x hx
-  refine (lqNorm_le_almostDiagonalConst_mul_of_le hq s L hx).trans_eq ?_
+  refine (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq s L hx).trans_eq ?_
   simp only [dyadicWeight_mul_maximal]
 
 /-! ### The characterisation -/
@@ -428,10 +393,10 @@ theorem lqNorm_localMean_le_lqNorm_maximal (L : ℕ) (hp : p ≠ ∞) {q : ℝ�
 /-- The constant `C A_{s,L'} C_{FS}` of the bound of the Triebel–Lizorkin quasi-norm by local
 means, with `L' = ⌈s⌉₊ + 1`, the natural ceiling of `s` plus one, so `L' ≥ 1` and `L' > s`:
 `C = Rd.LocalMeansBump.blockByLocalMeansConst L L'`,
-`A_{s,L'} = Rd.almostDiagonalConst s L'` and the Fefferman–Stein constant
+`A_{s,L'} = ENNReal.almostDiagonalConst s L'` and the Fefferman–Stein constant
 `C_{FS} = Rd.feffermanSteinConst V p q`. -/
 noncomputable def tlUpperConst (L : ℕ) (p q : ℝ≥0∞) (s : ℝ) : ℝ≥0∞ :=
-  b.blockByLocalMeansConst L (⌈s⌉₊ + 1) * almostDiagonalConst s ((⌈s⌉₊ + 1 : ℕ) : ℝ) *
+  b.blockByLocalMeansConst L (⌈s⌉₊ + 1) * ENNReal.almostDiagonalConst s ((⌈s⌉₊ + 1 : ℕ) : ℝ) *
     feffermanSteinConst V p q
 
 /-- The constant of the bound of the Triebel–Lizorkin quasi-norm by local means is finite for
@@ -439,21 +404,22 @@ noncomputable def tlUpperConst (L : ℕ) (p q : ℝ≥0∞) (s : ℝ) : ℝ≥0�
 theorem tlUpperConst_ne_top (L : ℕ) {p q : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) (hq1 : 1 < q)
     {s : ℝ} (hs : 0 < s) : b.tlUpperConst L p q s ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.mul_ne_top (b.blockByLocalMeansConst_ne_top L _)
-    (almostDiagonalConst_ne_top hs (by push_cast; exact (Nat.le_ceil s).trans_lt (lt_add_one _))))
+    (ENNReal.almostDiagonalConst_ne_top hs
+      (by push_cast; exact (Nat.le_ceil s).trans_lt (lt_add_one _))))
     (feffermanSteinConst_ne_top hp1 hp hq1)
 
 /-- The constant `C A_{s,L} C_{FS}` of the bound of the local means by the Triebel–Lizorkin
 quasi-norm: `C = Rd.LocalMeansBump.localMeansByBlockConst L`,
-`A_{s,L} = Rd.almostDiagonalConst s L` and `C_{FS} = Rd.feffermanSteinConst V p q`. -/
+`A_{s,L} = ENNReal.almostDiagonalConst s L` and `C_{FS} = Rd.feffermanSteinConst V p q`. -/
 noncomputable def tlLowerConst (L : ℕ) (p q : ℝ≥0∞) (s : ℝ) : ℝ≥0∞ :=
-  b.localMeansByBlockConst L * almostDiagonalConst s L * feffermanSteinConst V p q
+  b.localMeansByBlockConst L * ENNReal.almostDiagonalConst s L * feffermanSteinConst V p q
 
 /-- The constant of the bound of the local means by the Triebel–Lizorkin quasi-norm is finite
 for `1 < p < ∞`, `1 < q ≤ ∞` and `0 < s < L`. -/
 theorem tlLowerConst_ne_top {L : ℕ} {p q : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) (hq1 : 1 < q)
     {s : ℝ} (hs : 0 < s) (hsL : s < L) : b.tlLowerConst L p q s ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.mul_ne_top (b.localMeansByBlockConst_ne_top L)
-    (almostDiagonalConst_ne_top hs hsL)) (feffermanSteinConst_ne_top hp1 hp hq1)
+    (ENNReal.almostDiagonalConst_ne_top hs hsL)) (feffermanSteinConst_ne_top hp1 hp hq1)
 
 /-- **The Triebel–Lizorkin quasi-norm by local means**: for `L ≥ 1`, `1 < p < ∞`, `1 < q ≤ ∞`,
 `s ∈ ℝ` and `f ∈ L_p`, `‖f‖_{F^s_{p,q}} ≤ C ‖f‖_{F^s_{p,q}}^{b,L}` with
@@ -533,7 +499,7 @@ theorem triebelLizorkinNorm_le_of_tendsto_sum_dual (L : ℕ) (hp1 : 1 < p) (hp :
     (fun i => ((Lp.aestronglyMeasurable (h i)).enorm.const_mul _)) ?_
   filter_upwards [b.enorm_blockFun_le_tsum_maximal_of_tendsto hp L (Nat.le_add_left 1 ⌈s⌉₊) hrep]
     with x hx
-  refine (lqNorm_le_almostDiagonalConst_mul_of_le hq1.le s _ hx).trans_eq ?_
+  refine (ENNReal.lqNorm_le_almostDiagonalConst_mul_of_le hq1.le s _ hx).trans_eq ?_
   simp only [dyadicWeight_mul_maximal]
 
 end LocalMeansBump

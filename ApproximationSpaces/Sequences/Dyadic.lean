@@ -7,6 +7,7 @@ module
 
 public import ApproximationSpaces.Sequences.Lq
 public import Mathlib.Algebra.BigOperators.Intervals
+public import Mathlib.Algebra.Order.Ring.GeomSum
 public import Mathlib.Data.Nat.Log
 
 /-!
@@ -225,6 +226,12 @@ theorem sum_range_two_pow_le (N : ℕ) : ∑ j ∈ Finset.range N, (2 : ℝ≥0�
   have h := sum_range_pow_le_pow_mul_inv one_le_two ofNat_ne_top N
   rwa [ENNReal.sub_eq_of_eq_add one_ne_top one_add_one_eq_two.symm, inv_one, mul_one] at h
 
+/-- `1 + 2 + ⋯ + 2^(k-1) < 2^k` in `ℕ`, the strict form of `ENNReal.sum_range_two_pow_le` for
+natural numbers (Mathlib's `Nat.geomSum_lt`). -/
+theorem _root_.ApproximationScheme.sum_range_two_pow_lt (k : ℕ) :
+    ∑ j ∈ Finset.range k, 2 ^ j < 2 ^ k :=
+  Nat.geomSum_lt le_rfl fun _ hj => Finset.mem_range.1 hj
+
 /-- For `a ≠ 0` in `[0, ∞]` there is `j ∈ ℕ` with `2^j a > 1`: Mathlib's
 `ENNReal.exists_nat_mul_gt` gives `n a > 1`, and `n < 2^n`. -/
 theorem exists_one_lt_two_pow_mul {a : ℝ≥0∞} (ha : a ≠ 0) : ∃ j : ℕ, 1 < 2 ^ j * a := by
@@ -356,7 +363,7 @@ noncomputable def dyadicInterpConst (δ θ : ℝ) : ℝ≥0∞ :=
 theorem dyadicInterpConst_ne_top {δ θ : ℝ} (hδ : 0 < δ) (hθ0 : 0 < θ) (hθ1 : θ < 1) :
     dyadicInterpConst δ θ ≠ ∞ := by
   refine ENNReal.add_ne_top.2 ⟨ENNReal.mul_ne_top
-    (ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofNat_ne_top) ?_,
+    (ENNReal.two_rpow_ne_top _) ?_,
     one_sub_two_rpow_neg_inv_ne_top (_root_.mul_pos (sub_pos.2 hθ1) hδ)⟩
   rw [ENNReal.inv_ne_top]
   exact (tsub_pos_of_lt (ENNReal.one_lt_rpow one_lt_two (_root_.mul_pos hθ0 hδ))).ne'
@@ -417,10 +424,9 @@ theorem sum_range_succ_le_of_le_dyadicWeight (hδ : 0 ≤ δ) (hθ0 : 0 ≤ θ) 
     (hK : Y ≤ dyadicWeight (-δ) K * X) :
     ∑ j ∈ range (K + 1), b j ≤
       2 ^ (θ * δ) * (2 ^ (θ * δ) - 1)⁻¹ * (X ^ θ * Y ^ (1 - θ)) := by
-  have hr1 : 1 ≤ (2 : ℝ≥0∞) ^ (θ * δ) := (ENNReal.rpow_zero (x := 2)).symm.le.trans
-    (ENNReal.rpow_le_rpow_of_exponent_le one_le_two (mul_nonneg hθ0 hδ))
+  have hr1 : 1 ≤ (2 : ℝ≥0∞) ^ (θ * δ) := ENNReal.one_le_two_rpow (mul_nonneg hθ0 hδ)
   have hr : (2 : ℝ≥0∞) ^ (θ * δ) ≠ ∞ :=
-    ENNReal.rpow_ne_top_of_nonneg (by positivity) ENNReal.ofNat_ne_top
+    ENNReal.two_rpow_ne_top _
   calc ∑ j ∈ range (K + 1), b j
       ≤ ∑ j ∈ range (K + 1), ((2 : ℝ≥0∞) ^ (θ * δ)) ^ j * Y :=
         Finset.sum_le_sum fun j _ => (hlow j).trans_eq (by rw [dyadicWeight_eq_pow])

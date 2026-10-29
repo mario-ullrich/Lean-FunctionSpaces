@@ -11,7 +11,7 @@ declarations.
   first terms (`ENNReal.lqNorm_le_head_add_shift`, `ENNReal.lqNorm_le_sum_range_add_shift`);
   reindexing along bijections and injections (`ENNReal.lqNorm_comp_equiv`,
   `ENNReal.lqNorm_extend_zero`, `ENNReal.lqNorm_comp_le_of_injective`).
-* **`L_q` norms of functions bounded on pieces** (`ApproximationSpaces/KMethod.lean`): on any
+* **`L_q` norms of functions bounded on pieces** (`ApproximationSpaces/Sequences/Lq.lean`): on any
   measure space, for disjoint measurable pieces of equal measure `c` and `G` between step
   values `a_n` on the pieces, the comparisons `∫ G ≤ c ∑ a_n`, `c ∑ a_n ≤ ∫ G` and their `L_q`
   forms with `c^(1/q) ‖a‖_{ℓ_q}` (`MeasureTheory.lintegral_le_of_le_on_pieces`,
@@ -91,7 +91,7 @@ declarations.
   `ENNReal.dyadicWeight`.
 * **Discrete Hardy inequalities** (`ApproximationSpaces/Sequences/Hardy.lean`):
   `ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`, and the almost diagonal estimate that combines
-  both (`ENNReal.lqNorm_almostDiagonal_le`, in `FunctionSpaces/Rd/LocalMeans/LocalMeans.lean`).
+  both (`ENNReal.lqNorm_almostDiagonal_le`), with its constant `ENNReal.almostDiagonalConst`.
 * **The tail of a convergent series** (`ApproximationSpaces/Lift.lean`): in every normed group,
   `∑_i a_i = f` gives `‖f - ∑_{i<n} a_i‖ ≤ ∑_{i ≥ 0} ‖a_{i+n}‖` for every `n`
   (`HasSum.enorm_sub_sum_range_le`).
@@ -203,9 +203,10 @@ declarations.
   most `N` of the functions `g_m` are nonzero, then `‖∑_m g_m‖_p^p ≤ N^(p-1) ∑_m ‖g_m‖_p^p`
   (`Rd.eLpNorm_rpow_le_of_overlap`); a set all of whose finite subsets have at most `N` elements is
   finite with at most `N` elements (`Rd.exists_finset_of_card_le`).
-* **Dyadic cells of a finite-dimensional inner product space**
-  (`FunctionSpaces/Analysis/Maximal/DyadicGrid.lean`): the cells `⌊2^j ⟪b_i, x⟫⌋ = m_i`, their
-  centres, and the count of at most `(2ρ + 2)^n` centres in a ball of radius `ρ 2^(-j)`
+* **Dyadic cubes of a finite-dimensional inner product space**
+  (`FunctionSpaces/Analysis/Maximal/DyadicGrid.lean`): the cubes `⌊2^k ⟪b_i, x⟫⌋ = m_i` of every
+  level `k ∈ ℤ` (`Rd.zcell`), the cells `Rd.cell` of the levels `j ∈ ℕ`, their centres, and the
+  count of at most `(2ρ + 2)^n` centres in a ball of radius `ρ 2^(-j)`
   (`Rd.card_le_of_norm_cellCenter_sub_le`).
 * **Pointwise bounds of convolutions** (`FunctionSpaces/Rd/Atoms/AtomAnalysis.lean`): Hölder's
   inequality on a ball `∫_B |g| ≤ |B|^(1-1/p) ‖g‖_p` (`Rd.lintegral_closedBall_le`),
@@ -264,8 +265,8 @@ declarations.
   (`Rd.eLpNorm_maximal_le`), with explicit constants. Mathlib has Vitali's covering lemma and the
   differentiation theorem, but no maximal function.
 * **Dyadic cubes and Lebesgue differentiation along them**
-  (`FunctionSpaces/Analysis/Maximal/DyadicCubes.lean`): the dyadic cubes of every level `k ∈ ℤ`
-  (`Rd.zcell`), their nesting (`Rd.zcell_subset_or_disjoint`), and the convergence of the averages
+  (`FunctionSpaces/Analysis/Maximal/DyadicCubes.lean`): the volume and the nesting of the dyadic
+  cubes (`Rd.volume_zcell`, `Rd.zcell_subset_or_disjoint`), and the convergence of the averages
   over the cubes containing `x` to `F(x)` for almost every `x` and locally integrable `F`
   (`Rd.ae_tendsto_average_cubeAt`), from Mathlib's
   `IsUnifLocDoublingMeasure.ae_tendsto_average_norm_sub`.
@@ -281,7 +282,7 @@ declarations.
   finite measure and `x` outside every `B̄(c_i, 2ρ_i)`, where `g̃ = ∑_i (⨍_{Q_i} g) 1_{Q_i}`
   (`Rd.maximal_indicator_iUnion_le`).
 * **Norms of means of vector-valued functions**
-  (`FunctionSpaces/Analysis/Maximal/CalderonZygmundSigned.lean`): `‖⨍ f‖ₑ ≤ ⨍⁻ ‖f‖ₑ` for `f` with
+  (`FunctionSpaces/Analysis/Maximal/CalderonZygmund.lean`): `‖⨍ f‖ₑ ≤ ⨍⁻ ‖f‖ₑ` for `f` with
   values in a real normed space (`MeasureTheory.enorm_average_le`), next to Mathlib's
   `enorm_integral_le_lintegral_enorm`; on a set `s` of finite measure `μ s * ‖⨍_s f‖ₑ ≤ ∫⁻_s ‖f‖ₑ`
   (`MeasureTheory.measure_mul_enorm_setAverage_le`) and `∫⁻_s ‖f - ⨍_s f‖ₑ ≤ 2 ∫⁻_s ‖f‖ₑ`
@@ -341,10 +342,10 @@ declarations.
   of `L_p` and `L_q` with its upper bound (`lpPairing`), and this is the converse. Also
   Hölder's inequality for `[0, ∞]`-valued functions written with `eLpNorm`
   (`MeasureTheory.lintegral_mul_le_eLpNorm_mul_eLpNorm`).
-* **Integrals under a change of scale** (`FunctionSpaces/Rd/LocalMeans/KernelMajorants.lean`):
-  `∫ f(r x) dx = |r^(-n)| ∫ f` for `f : V → [0, ∞]` and `r ≠ 0` (`Rd.lintegral_comp_smul`),
-  from Mathlib's `Measure.map_addHaar_smul`; Mathlib has the Bochner version
-  `Measure.integral_comp_smul`.
+* **Integrals under a change of scale** (`FunctionSpaces/Analysis/Fourier/ApproxIdentity.lean`):
+  `∫ f(r x) dμ(x) = |r^(-n)| ∫ f dμ` for an additive Haar measure `μ`, `f : V → [0, ∞]` and `r ≠ 0`
+  (`Rd.lintegral_comp_smul`), from Mathlib's `Measure.map_addHaar_smul`; Mathlib has the Bochner
+  version `Measure.integral_comp_smul`.
 * **The quotient map of the torus** (`FunctionSpaces/Torus/PeriodicLift.lean`): Mathlib has the
   period-box identity `∫_{a + (0,1]^d} g(π x) dx = ∫_{𝕋^d} g` on `d → ℝ`
   (`UnitAddTorus.lintegral_preimage`). New here are the measure preservation of

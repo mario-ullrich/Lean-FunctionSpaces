@@ -113,7 +113,7 @@ theorem one_add_deg_pow_le [DecidableEq d] (m : ℕ) (k : d → ℤ) :
   · obtain ⟨j, -, hj⟩ := Finset.exists_mem_eq_sup _ hne fun i => (k i).natAbs
     have hdeg : (deg k : ℝ) = |(k j : ℝ)| := by
       rw [deg, hj, ← Int.cast_abs, ← Int.natCast_natAbs, Int.cast_natCast]
-    refine (one_add_pow_le_two_pow_mul (Nat.cast_nonneg _) m).trans ?_
+    refine (ENNReal.one_add_pow_le_two_pow_mul (Nat.cast_nonneg _) m).trans ?_
     gcongr
     rw [hdeg]
     exact (hsym j).trans
