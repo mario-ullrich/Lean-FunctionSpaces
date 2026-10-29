@@ -10,6 +10,7 @@ public import Mathlib.Algebra.BigOperators.Finprod
 public import Mathlib.Algebra.FiniteSupport.Basic
 public import Mathlib.Analysis.Calculus.IteratedDeriv.Defs
 public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
+public import Mathlib.MeasureTheory.Integral.IntervalIntegral.Periodic
 
 /-!
 # Filter identities of Daubechies masks
@@ -32,8 +33,9 @@ is the `finsum` (Mathlib's `tsum_eq_finsum`).
   (`Daubechies.sum_coeff_mul_coeff_add`). The proof integrates the quadrature mirror filter
   identity `|m_0(ξ)|² + |m_0(ξ + 1/2)|² = 1` against `e^(2πi·2jξ)` over `[0, 1]`. The
   exponentials `e^(-2πikξ)` are orthonormal there (`Daubechies.integral_finsum_mul_conj_finsum`),
-  so the `2j`-th Fourier coefficient of `|m_0|²` is `(1/4) ∑_k c_k c_(k+2j)`; the symbol
-  `m_0(ξ + 1/2)` has the coefficients `(-1)^k c_k` and the same `2j`-th Fourier coefficient.
+  so the `2j`-th Fourier coefficient of `|m_0|²` is `(1/4) ∑_k c_k c_(k+2j)`; the substitution
+  `η = ξ + 1/2` and the period `1` give the same `2j`-th Fourier coefficient for
+  `|m_0(ξ + 1/2)|²`.
 * **Sum rules**: `∑_k (-1)^k k^l c_k = 0` for `l < N` (`Daubechies.sum_rule`), and more generally
   `∑_k (-1)^k Q(k) c_k = 0` for every polynomial `Q` of degree `< N`
   (`Daubechies.sum_rule_poly`). The mask polynomial is divisible by `(z + 1)^N`. The Euler
@@ -335,52 +337,40 @@ theorem integral_expFreq_mul_normSq_symbol (n : ℤ) :
   push_cast
   ring
 
+/-- For every integer `k`, the function `ξ ↦ e^(-2πikξ)` has period `1`, since `e^(-2πik) = 1`
+(`Daubechies.expFreq_intCast`). -/
+theorem periodic_expFreq_intCast_mul (k : ℤ) :
+    Function.Periodic (fun ξ : ℝ => expFreq (k * ξ)) 1 := fun ξ => by
+  simp only
+  rw [mul_add, mul_one, expFreq_add, expFreq_intCast, mul_one]
+
 /-- **Fourier coefficients of `|m_0(· + 1/2)|²`**: for every `n ∈ ℤ`,
-`∫_0^1 e^(-2πinξ) |m_0(ξ + 1/2)|² dξ = (1/4) e^(πin) ∑_k c_(k-n) c_k`. The shifted symbol is
-`m_0(ξ + 1/2) = (1/2) ∑_k c_k e^(-πik) e^(-2πikξ)`, and the factors `e^(-πik)` combine to
-`e^(-πi(k-n)) e^(πik) = e^(πin)`. -/
+`∫_0^1 e^(-2πinξ) |m_0(ξ + 1/2)|² dξ = (1/4) e^(πin) ∑_k c_(k-n) c_k`. The substitution
+`η = ξ + 1/2` (Mathlib's `intervalIntegral.integral_comp_add_right`) gives the factor
+`e^(-2πin(-1/2)) = e^(πin)` and the integral over `[1/2, 3/2]`, which is the integral over
+`[0, 1]` since `η ↦ e^(-2πinη) |m_0(η)|²` has period `1`
+(`Daubechies.periodic_expFreq_intCast_mul`, `Daubechies.symbol_periodic`, Mathlib's
+`Function.Periodic.intervalIntegral_add_eq`); then `Daubechies.integral_expFreq_mul_normSq_symbol`
+applies. -/
 theorem integral_expFreq_mul_normSq_symbol_add_half (n : ℤ) :
     ∫ ξ in (0 : ℝ)..1, expFreq (n * ξ) * ((‖symbol m (ξ + 1 / 2)‖ ^ 2 : ℝ) : ℂ) =
       1 / 4 * expFreq (-(n : ℝ) / 2) * ∑ᶠ k : ℤ, ((coeff m (k - n) * coeff m k : ℝ) : ℂ) := by
-  have hfin : (Function.support fun k : ℤ => (coeff m k : ℂ) * expFreq (k / 2)).Finite :=
-    (finite_support_coeff m).subset fun k hk => by
-      simp only [Function.mem_support, ne_eq, mul_eq_zero, not_or, Complex.ofReal_eq_zero] at hk
-      exact hk.1
-  have hshift : ∀ ξ : ℝ, symbol m (ξ + 1 / 2) =
-      1 / 2 * ∑ᶠ k : ℤ, ((coeff m k : ℂ) * expFreq (k / 2)) * expFreq (k * ξ) := fun ξ => by
-    rw [symbol_eq_finsum]
-    congr 1
-    refine finsum_congr fun k => ?_
-    rw [mul_assoc, ← expFreq_add]
+  have hshift : ∀ ξ : ℝ, expFreq (n * ξ) * ((‖symbol m (ξ + 1 / 2)‖ ^ 2 : ℝ) : ℂ) =
+      expFreq (-(n : ℝ) / 2) *
+        (expFreq (n * (ξ + 1 / 2)) * ((‖symbol m (ξ + 1 / 2)‖ ^ 2 : ℝ) : ℂ)) := fun ξ => by
+    rw [← mul_assoc, ← expFreq_add]
     congr 2
     ring
-  have hsym : ∀ ξ : ℝ, expFreq (n * ξ) * ((‖symbol m (ξ + 1 / 2)‖ ^ 2 : ℝ) : ℂ) = 1 / 4 *
-      (expFreq (n * ξ) *
-        ((‖∑ᶠ k : ℤ, ((coeff m k : ℂ) * expFreq (k / 2)) * expFreq (k * ξ)‖ ^ 2 : ℝ) : ℂ)) :=
-    fun ξ => by
-      rw [hshift, norm_half_mul_sq]
-      push_cast
-      ring
-  simp_rw [hsym, intervalIntegral.integral_const_mul]
-  rw [integral_expFreq_mul_normSq_finsum hfin n, mul_assoc,
-    mul_finsum _ (expFreq (-(n : ℝ) / 2))]
-  congr 1
-  refine finsum_congr fun k => ?_
-  have hE : expFreq (((k - n : ℤ) : ℝ) / 2) * expFreq (-((k : ℝ) / 2)) =
-      expFreq (-(n : ℝ) / 2) := by
-    rw [← expFreq_add]
-    congr 1
-    push_cast
-    ring
-  rw [map_mul, Complex.conj_ofReal, conj_expFreq]
-  calc (coeff m (k - n) : ℂ) * expFreq (((k - n : ℤ) : ℝ) / 2) *
-        ((coeff m k : ℂ) * expFreq (-((k : ℝ) / 2)))
-      = (expFreq (((k - n : ℤ) : ℝ) / 2) * expFreq (-((k : ℝ) / 2))) *
-          ((coeff m (k - n) : ℂ) * coeff m k) := by ring
-    _ = expFreq (-(n : ℝ) / 2) * ((coeff m (k - n) * coeff m k : ℝ) : ℂ) := by
-        rw [hE]
-        push_cast
-        ring
+  have hper : Function.Periodic
+      (fun η : ℝ => expFreq (n * η) * ((‖symbol m η‖ ^ 2 : ℝ) : ℂ)) 1 :=
+    (periodic_expFreq_intCast_mul n).mul
+      ((symbol_periodic m).comp fun z => ((‖z‖ ^ 2 : ℝ) : ℂ))
+  simp_rw [hshift, intervalIntegral.integral_const_mul]
+  rw [intervalIntegral.integral_comp_add_right
+      (fun η : ℝ => expFreq (n * η) * ((‖symbol m η‖ ^ 2 : ℝ) : ℂ)), zero_add,
+    add_comm (1 : ℝ), hper.intervalIntegral_add_eq (1 / 2) 0, zero_add,
+    integral_expFreq_mul_normSq_symbol m n]
+  ring
 
 /-- **Orthogonality of the even shifts of the filter**: `∑_k c_k c_(k+2j) = 2 δ_(j0)` for every
 `j ∈ ℤ`. Integrating the quadrature mirror filter identity

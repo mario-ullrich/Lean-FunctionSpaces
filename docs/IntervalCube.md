@@ -124,7 +124,7 @@ degree.
   as a contraction of `L_p` (`MeasureTheory.Lp.condExpLp`).
 * **The Haar system.** Let `h_{k,m} = 2^(k/2) (1_{[2m, 2m+1) 2^(-k-1)} - 1_{[2m+1, 2m+2) 2^(-k-1)})`
   be the Haar functions on `[0, 1)` and `A_n` the step functions on the dyadic intervals of
-  length `2^(-⌊log₂ n⌋)`. For `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q(L_p[0, 1))` iff
+  length `2^(-⌊log₂ n⌋)`. For `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q(L_p[0, 1])` iff
   `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
   (`Haar.memApprox_iff_haarCoeff`). The proof computes `E[f | ℱ_k]` as averages over dyadic
   intervals, from the formula for the conditional expectation onto a countable partition
@@ -164,7 +164,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Isotropic modulus on the cube, comparison with the moduli in the coordinates | ✅ | ✗ | `Cube/IsoModulus` |
 | Isotropic inverse inequalities, `A^s_q` with the isotropic modulus, coordinate and isotropic Besov conditions agree for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Cube/IsoInverse`, `Cube/IsoCoincidence` |
 | Filtration schemes (Haar), martingale-difference characterisation | ✅ | ✗ | `Wavelets/Filtration` |
-| Haar system on `[0, 1)`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ | ✗ | `Wavelets/Partition`, `Wavelets/Examples/Haar` |
+| Haar system on `[0, 1]`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ | ✗ | `Wavelets/Partition`, `Wavelets/Examples/Haar` |
 | Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarBesov` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.

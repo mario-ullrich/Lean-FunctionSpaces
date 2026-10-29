@@ -32,7 +32,8 @@ at each point.
   (`Daubechies.proj_proj`), by coefficient recovery. Their ranges, the **scaling spaces** `V_j`
   (`Daubechies.scalingSpace`), increase with the level (`Daubechies.scalingSpace_mono`): by the
   refinement equation an expansion of level `j` is one of level `j + 1`
-  (`Daubechies.expand_eq_expand_succ`), so `P_{j+1} P_j = P_j`.
+  (`Daubechies.expand_eq_expand_succ`, for any finite real filter
+  `Daubechies.expand_eq_tsum_refine_of_filter`), so `P_{j+1} P_j = P_j`.
 * **Density.** The partition of unity `∑_k φ(x - k) = 1` gives the kernel form
   `P_j f(x) - f(x) = ∑_k φ_{j,k}(x) ∫ (f(y) - f(x)) conj φ_{j,k}(y) dy`
   (`Daubechies.projFun_sub_eq_tsum`), and for continuous `f` with compact support uniform
@@ -350,53 +351,75 @@ theorem mem_Icc_of_coeff_ne_zero {i : ℤ} (h : coeff m i ≠ 0) : 0 ≤ i ∧ i
   by_contra h'
   exact h (coeff_eq_zero m (by omega))
 
-/-- **The double sum of the refinement has finitely many terms**: for `N ≥ 2`, a level `j`,
-coefficients `a : ℤ → ℂ` and a point `x`, the family
-`(k, n) ↦ a_k (c_{n-2k}/√2) φ_{j+1,n}(x)` is summable over `ℤ × ℤ`. A nonzero term needs
-`0 ≤ n - 2k ≤ 2N - 1` (`Daubechies.mem_Icc_of_coeff_ne_zero`) and
-`0 ≤ 2^(j+1) x - n ≤ 2N - 1`, hence `0 ≤ 2^j x - k ≤ 2N - 1`, which leaves finitely many pairs
+/-- **The double sum of a refinement has finitely many terms**: for `N ≥ 2`, a real filter `h`
+vanishing outside `[a, b]`, a level `j`, coefficients `c : ℤ → ℂ` and a point `x`, the family
+`(k, n) ↦ c_k (h_{n-2k}/√2) φ_{j+1,n}(x)` is summable over `ℤ × ℤ`. A nonzero term needs
+`a ≤ n - 2k ≤ b` and `0 ≤ 2^(j+1) x - n ≤ 2N - 1`, which leaves finitely many pairs
 (`Daubechies.mem_Icc_ceil_floor`). -/
-theorem summable_refine (hN : 2 ≤ N) (j : ℕ) (a : ℤ → ℂ) (x : ℝ) :
+theorem summable_refine_of_filter (hN : 2 ≤ N) {h : ℤ → ℝ} {a b : ℤ}
+    (hh : ∀ i, h i ≠ 0 → a ≤ i ∧ i ≤ b) (j : ℕ) (c : ℤ → ℂ) (x : ℝ) :
     Summable (Function.uncurry fun k n : ℤ =>
-      a k * (((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x)) := by
-  refine summable_of_ne_finset_zero (s := Finset.Icc ⌈2 ^ j * x - (2 * N - 1)⌉ ⌊2 ^ j * x - 0⌋ ×ˢ
-    Finset.Icc ⌈2 ^ (j + 1) * x - (2 * N - 1)⌉ ⌊2 ^ (j + 1) * x - 0⌋) fun kn hkn => ?_
+      c k * (((h (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x)) := by
+  refine summable_of_ne_finset_zero
+    (s := Finset.Icc ⌈2 ^ j * x - (b + (2 * N - 1)) / 2⌉ ⌊2 ^ j * x - a / 2⌋ ×ˢ
+      Finset.Icc ⌈2 ^ (j + 1) * x - (2 * N - 1)⌉ ⌊2 ^ (j + 1) * x - 0⌋) fun kn hkn => ?_
   obtain ⟨k, n⟩ := kn
-  by_contra h
+  by_contra hne
   refine hkn ?_
-  simp only [Function.uncurry_apply_pair] at h
-  obtain ⟨-, h'⟩ := mul_ne_zero_iff.1 h
+  simp only [Function.uncurry_apply_pair] at hne
+  obtain ⟨-, h'⟩ := mul_ne_zero_iff.1 hne
   obtain ⟨hc, hs⟩ := mul_ne_zero_iff.1 h'
-  have hc' : coeff m (n - 2 * k) ≠ 0 := fun h0 => hc (by rw [h0, zero_div, Complex.ofReal_zero])
-  obtain ⟨h1, h2⟩ := mem_Icc_of_coeff_ne_zero m hc'
+  have hc' : h (n - 2 * k) ≠ 0 := fun h0 => hc (by rw [h0, zero_div, Complex.ofReal_zero])
+  obtain ⟨h1, h2⟩ := hh _ hc'
   have hw := mem_supportWindow_of_scaledFun_ne_zero (fun _ hy => scalingFun_eq_zero m hN hy) hs
   refine Finset.mem_product.2 ⟨mem_Icc_ceil_floor ?_, mem_Icc_ceil_floor hw⟩
-  have h1' : (0 : ℝ) ≤ n - 2 * k := by exact_mod_cast h1
-  have h2' : (n : ℝ) - 2 * k ≤ 2 * N - 1 := by exact_mod_cast h2
+  have h1' : (a : ℝ) ≤ n - 2 * k := by exact_mod_cast h1
+  have h2' : (n : ℝ) - 2 * k ≤ b := by exact_mod_cast h2
   obtain ⟨hw1, hw2⟩ := hw
   rw [pow_succ] at hw1 hw2
   constructor <;> linarith
 
+/-- **Refining an expansion through a filter**: if `N ≥ 2`, the real filter `h` vanishes outside
+`[a, b]` and `g_{j,k} = ∑_n (h_{n-2k}/√2) φ_{j+1,n}` for every `k`, then
+`∑_k c_k g_{j,k}(x) = ∑_n (∑_k c_k h_{n-2k}/√2) φ_{j+1,n}(x)` for all `c` and `x`; the two sums
+may be exchanged (`Daubechies.summable_refine_of_filter`). -/
+theorem expand_eq_tsum_refine_of_filter (hN : 2 ≤ N) {g : ℝ → ℂ} {h : ℤ → ℝ} {a b : ℤ}
+    (hh : ∀ i, h i ≠ 0 → a ≤ i ∧ i ≤ b) (j : ℕ)
+    (hg : ∀ (k : ℤ) (x : ℝ), scaledFun g j k x =
+      expand (scalingFun m) (j + 1) (fun n => ((h (n - 2 * k) / √2 : ℝ) : ℂ)) x)
+    (c : ℤ → ℂ) (x : ℝ) :
+    expand g j c x = ∑' n : ℤ,
+      (∑' k : ℤ, c k * ((h (n - 2 * k) / √2 : ℝ) : ℂ)) * scaled m (j + 1) n x := by
+  calc expand g j c x
+      = ∑' k : ℤ, ∑' n : ℤ,
+          c k * (((h (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x) := by
+        refine tsum_congr fun k => ?_
+        rw [hg k x, expand, ← tsum_mul_left]
+    _ = ∑' n : ℤ, ∑' k : ℤ,
+          c k * (((h (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x) :=
+        (summable_refine_of_filter m hN hh j c x).tsum_comm.symm
+    _ = _ := by
+        refine tsum_congr fun n => ?_
+        rw [← tsum_mul_right]
+        exact tsum_congr fun k => (mul_assoc _ _ _).symm
+
+/-- **The double sum of the refinement has finitely many terms**: for `N ≥ 2` the family
+`(k, n) ↦ a_k (c_{n-2k}/√2) φ_{j+1,n}(x)` is summable over `ℤ × ℤ`
+(`Daubechies.summable_refine_of_filter`, `Daubechies.mem_Icc_of_coeff_ne_zero`). -/
+theorem summable_refine (hN : 2 ≤ N) (j : ℕ) (a : ℤ → ℂ) (x : ℝ) :
+    Summable (Function.uncurry fun k n : ℤ =>
+      a k * (((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x)) :=
+  summable_refine_of_filter m hN (h := coeff m) (fun _ hi => mem_Icc_of_coeff_ne_zero m hi)
+    j a x
+
 /-- **Expansions of level `j` are expansions of level `j + 1`**: for `N ≥ 2`, every level `j`,
 coefficients `a : ℤ → ℂ` and point `x`, `∑_k a_k φ_{j,k}(x) = ∑_n a'_n φ_{j+1,n}(x)` with the
-refined coefficients `a'_n = ∑_k a_k c_{n-2k}/√2` (`Daubechies.refineCoeff`). Each `φ_{j,k}` is
-the expansion `∑_n (c_{n-2k}/√2) φ_{j+1,n}` (`Daubechies.scaled_eq_expand`), and the two sums
-may be exchanged since only finitely many terms are nonzero (`Daubechies.summable_refine`). -/
+refined coefficients `a'_n = ∑_k a_k c_{n-2k}/√2` (`Daubechies.refineCoeff`), by
+`Daubechies.expand_eq_tsum_refine_of_filter` and `Daubechies.scaled_eq_expand`. -/
 theorem expand_eq_expand_succ (hN : 2 ≤ N) (j : ℕ) (a : ℤ → ℂ) (x : ℝ) :
-    expand (scalingFun m) j a x = expand (scalingFun m) (j + 1) (refineCoeff m a) x := by
-  calc expand (scalingFun m) j a x
-      = ∑' k : ℤ, ∑' n : ℤ,
-          a k * (((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x) := by
-        refine tsum_congr fun k => ?_
-        rw [show scaledFun (scalingFun m) j k x = _ from scaled_eq_expand m hN j k x, expand,
-          ← tsum_mul_left]
-    _ = ∑' n : ℤ, ∑' k : ℤ,
-          a k * (((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x) :=
-        (summable_refine m hN j a x).tsum_comm.symm
-    _ = expand (scalingFun m) (j + 1) (refineCoeff m a) x := by
-        refine tsum_congr fun n => ?_
-        rw [refineCoeff, ← tsum_mul_right]
-        exact tsum_congr fun k => (mul_assoc _ _ _).symm
+    expand (scalingFun m) j a x = expand (scalingFun m) (j + 1) (refineCoeff m a) x :=
+  expand_eq_tsum_refine_of_filter m hN (h := coeff m)
+    (fun _ hi => mem_Icc_of_coeff_ne_zero m hi) j (scaled_eq_expand m hN j) a x
 
 /-- **The projections of consecutive levels**: `P_{j+1} (P_j f) = P_j f` at every point, for
 `N ≥ 2` and every `f`. The function `P_j f` is an expansion of level `j + 1`
@@ -420,13 +443,6 @@ theorem abs_sub_le_of_mem_supportWindow {a b : ℝ} {j : ℕ} {k : ℤ} {x y : �
   have h : (b - a) / 2 ^ j = (k + b) / 2 ^ j - (k + a) / 2 ^ j := by ring
   rw [h, abs_sub_le_iff]
   constructor <;> linarith [hx.1, hx.2, hy.1, hy.2]
-
-/-- **The normalising factor in extended norm**: `‖2^(j/2)‖ = 2^(j/2)`, written
-`dyadicWeight (1/2) j`. -/
-theorem enorm_two_rpow_half (j : ℕ) :
-    ‖(((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ)‖ₑ = dyadicWeight (1 / 2) j := by
-  rw [← ofReal_norm, Complex.norm_real, Real.norm_of_nonneg (by positivity),
-    ← ENNReal.ofReal_rpow_of_pos two_pos, ENNReal.ofReal_ofNat, dyadicWeight, mul_one_div]
 
 /-- **A pointwise bound of `φ_{j,k}`**: if `‖φ(t)‖ ≤ C` for every `t`, then
 `‖φ_{j,k}(x)‖ ≤ 2^(j/2) C` for every level `j`, position `k` and point `x`. -/

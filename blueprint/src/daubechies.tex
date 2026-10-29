@@ -519,7 +519,7 @@ shifts the coefficients to $a_{k-n}$, and $|z|^2 = z \bar z$.
 \begin{proposition}[Orthogonality of the even shifts]
 \label{prop:daub-even-shifts}
 \lean{Daubechies.sum_coeff_mul_coeff_add, Daubechies.norm_half_mul_sq,
-  Daubechies.integral_expFreq_mul_normSq_symbol,
+  Daubechies.integral_expFreq_mul_normSq_symbol, Daubechies.periodic_expFreq_intCast_mul,
   Daubechies.integral_expFreq_mul_normSq_symbol_add_half}
 \leanok
 \uses{def:daub-symbol}
@@ -531,7 +531,7 @@ For every Daubechies mask and every $j \in \Z$,
 
 \begin{proof}
 \leanok
-\uses{thm:daub-qmf, lem:daub-coeff-finsum, lem:daub-exp-orthonormal}
+\uses{thm:daub-qmf, lem:daub-coeff-finsum, lem:daub-exp-orthonormal, lem:daub-exp}
 First, for every $n \in \Z$,
 \[
   \int_0^1 e^{-2\pi i n \xi} |m_0(\xi)|^2 \, d\xi = \frac14 \sum_{k \in \Z} c_{k-n} c_k
@@ -541,10 +541,12 @@ and
   \int_0^1 e^{-2\pi i n \xi} \bigl|m_0\bigl(\xi + \tfrac12\bigr)\bigr|^2 \, d\xi
   = \frac14 e^{\pi i n} \sum_{k \in \Z} c_{k-n} c_k .
 \]
-Indeed, by \Cref{lem:daub-coeff-finsum}, $m_0(\xi) = \frac12 \sum_k c_k e^{-2\pi i k \xi}$ and
-$m_0(\xi + \frac12) = \frac12 \sum_k c_k e^{-\pi i k} e^{-2\pi i k \xi}$; apply the last identity
-of \Cref{lem:daub-exp-orthonormal}, with $|z/2|^2 = |z|^2/4$. In the second case the factors
-combine to $e^{-\pi i (k - n)} \, \overline{e^{-\pi i k}} = e^{\pi i n}$.
+Indeed, by \Cref{lem:daub-coeff-finsum}, $m_0(\xi) = \frac12 \sum_k c_k e^{-2\pi i k \xi}$;
+apply the last identity of \Cref{lem:daub-exp-orthonormal}, with $|z/2|^2 = |z|^2/4$. The
+second identity follows from the first: the substitution $\eta = \xi + \frac12$ gives the factor
+$e^{-2\pi i n (-1/2)} = e^{\pi i n}$ and the integral over $[\frac12, \frac32]$, which equals the
+integral over $[0, 1]$ since $\eta \mapsto e^{-2\pi i n \eta} |m_0(\eta)|^2$ has period $1$:
+$e^{-2\pi i n} = 1$ (\Cref{lem:daub-exp}), and $m_0$ has period $1$.
 
 Now multiply the quadrature mirror filter identity (\Cref{thm:daub-qmf}) by
 $e^{2\pi i \cdot 2j \xi}$ and integrate over $[0, 1]$. With $n = -2j$, where $e^{\pi i n} = 1$,
@@ -1430,22 +1432,26 @@ where the first summand is integrable since $2(b - a) > 1$, and the second by
 
 \begin{proposition}[The symbol product is integrable and square integrable]
 \label{prop:daub-symbol-product-integrable}
-\lean{Daubechies.integrable_symbolProduct, Daubechies.memLp_symbolProduct_two,
-  Daubechies.transferGrowth_crude, Daubechies.logb_four_two_mul_choose_lt}
+\lean{Daubechies.integrable_symbolProduct_of_growth, Daubechies.integrable_symbolProduct,
+  Daubechies.memLp_symbolProduct_two, Daubechies.transferGrowth_crude,
+  Daubechies.logb_four_two_mul_choose_lt}
 \leanok
-\uses{def:daub-symbol-product}
-For every Daubechies mask of order $N \geq 2$ the symbol product $\Phi$ is integrable and square
-integrable on $\R$.
+\uses{def:daub-symbol-product, def:daub-transfer-growth}
+Let $\lambda, C$ be a growth bound for the transfer operator of order $N$ with
+$\log_4 \lambda < N - \frac12$. Then the symbol product $\Phi$ of every Daubechies mask of order
+$N$ is integrable. For every Daubechies mask of order $N \geq 2$ the symbol product $\Phi$ is
+integrable and square integrable on $\R$.
 \end{proposition}
 
 \begin{proof}
 \leanok
-\uses{def:daub-transfer-growth, lem:daub-transfer-iterates, lem:daub-choose-bound,
-  cor:daub-decay-l1, thm:daub-decay-l2}
-First, the crude growth bound: for every $N \in \N$, $\lambda = 2 \binom{2N-1}{N}$ and $C = 1$
-form a growth bound for the transfer operator of order $N$, by \Cref{lem:daub-transfer-iterates}
-with $g = 1$ and $B = 1$. For every $N \geq 2$,
-$\log_4 \bigl(2 \binom{2N-1}{N}\bigr) < N - \frac12$, since
+\uses{lem:daub-transfer-iterates, lem:daub-choose-bound, cor:daub-decay-l1, thm:daub-decay-l2,
+  thm:daub-symbol-product-continuous}
+The first claim is the case $a = 0$ of \Cref{cor:daub-decay-l1}, since $\Phi$ is continuous
+(\Cref{thm:daub-symbol-product-continuous}). Next, the crude growth bound:
+for every $N \in \N$, $\lambda = 2 \binom{2N-1}{N}$ and $C = 1$ form a growth bound for the
+transfer operator of order $N$, by \Cref{lem:daub-transfer-iterates} with $g = 1$ and $B = 1$.
+For every $N \geq 2$, $\log_4 \bigl(2 \binom{2N-1}{N}\bigr) < N - \frac12$, since
 $2 \binom{2N-1}{N} < 2 \cdot 4^{N-1} = 4^{N - 1/2}$ by \Cref{lem:daub-choose-bound}. Now take
 $a = 0$ in \Cref{cor:daub-decay-l1} and $s = 0$ in \Cref{thm:daub-decay-l2} for this growth
 bound.
@@ -2235,7 +2241,6 @@ $\int w |\Phi|^2 = \lim_n \int w |\Phi_n|^2 = \int_0^1 w$.
 \lean{Daubechies.integral_scalingFun_translate_mul_conj,
   Daubechies.integral_scalingFun_translate_mul_conj_translate,
   Daubechies.integral_scalingFun_translate_mul_translate,
-  Daubechies.periodic_expFreq_intCast_mul,
   Daubechies.integral_normSq_symbolProduct_mul_expFreq}
 \leanok
 \uses{def:daub-scaling-function}
@@ -2589,7 +2594,8 @@ side, a factor of modulus at most $2\pi \min(1, |h \xi|)$.
 \label{lem:daub-difference-multiplier}
 \lean{Daubechies.exp_two_pi_mul_I_eq, Daubechies.norm_exp_sub_one_le_two,
   Daubechies.norm_exp_sub_one_le_min, Daubechies.min_one_rpow_le_rpow,
-  Daubechies.norm_exp_sub_one_pow_le}
+  Daubechies.norm_exp_sub_one_pow_le_mul_rpow, Daubechies.norm_exp_sub_one_pow_le,
+  Real.integrable_exp_sub_one_pow_mul}
 \leanok
 For all $h, \xi \in \R$,
 \[
@@ -2597,18 +2603,24 @@ For all $h, \xi \in \R$,
   |e^{2\pi i h \xi} - 1| \leq 2\pi \min(1, |h \xi|) .
 \]
 For every $x \geq 0$ and all real $a, b$ with $0 \leq a \leq b$, $\min(1, x)^b \leq x^a$. For
-all real $s$ and $r \in \N$ with $0 \leq s \leq r$ and all $h, \xi \in \R$,
+all real $a$ and $r \in \N$ with $0 \leq a \leq r$ and all $h, \xi \in \R$,
 \[
-  |e^{2\pi i h \xi} - 1|^{2r} \leq (2\pi)^{2r} \, |h|^{2s} (1 + |\xi|)^{2s} .
+  |e^{2\pi i h \xi} - 1|^r \leq (2\pi)^r \, |h|^a (1 + |\xi|)^a ,
 \]
+in particular
+$|e^{2\pi i h \xi} - 1|^{2r} \leq (2\pi)^{2r} \, |h|^{2s} (1 + |\xi|)^{2s}$ for every real $s$
+with $0 \leq s \leq r$. For every integrable $F : \R \to \C$, every $r \in \N$ and every
+$h \in \R$ the function $\xi \mapsto (e^{2\pi i h \xi} - 1)^r F(\xi)$ is integrable.
 \end{lemma}
 
 \begin{proof}
 \leanok
 Write $e^{2\pi i h \xi} = e^{i\theta}$ with the real number $\theta = 2\pi h \xi$; then
 $|e^{i\theta}| = 1$, $|e^{i\theta} - 1| \leq |\theta|$, and $2 \leq 2\pi$. For $x \leq 1$ the
-power $x^t$ decreases in $t$, and for $x \geq 1$, $\min(1, x)^b = 1 \leq x^a$. The last bound
-combines these with $|h \xi| \leq |h| (1 + |\xi|)$.
+power $x^t$ decreases in $t$, and for $x \geq 1$, $\min(1, x)^b = 1 \leq x^a$. The power bound
+combines these with $|h \xi| \leq |h| (1 + |\xi|)$; its case of the exponents $2s \leq 2r$ is the
+second power bound. The factor $(e^{2\pi i h \xi} - 1)^r$ is continuous of modulus at most $2^r$,
+so its product with an integrable $F$ is integrable.
 \end{proof}
 
 \begin{lemma}[Differences in $L_p$]
@@ -2850,20 +2862,12 @@ for every $0 \leq a \leq r$ with $a < N - \log_4 \lambda - \frac12$.
 
 \begin{lemma}[The differences of $\varphi$ as inverse transforms]
 \label{lem:daub-scaling-difference-inverse}
-\lean{Daubechies.norm_exp_sub_one_pow_le_mul_rpow, Daubechies.integrable_symbolProduct_of_growth,
-  Real.fourierInv_sub_apply, Real.integrable_exp_mul, Real.integrable_exp_sub_one_pow_mul,
-  Real.fwdDiff_fourierInv_apply, Real.iterate_fwdDiff_fourierInv_apply,
-  Real.norm_iterate_fwdDiff_fourierInv_le, Daubechies.higherDiff_scalingFun_eq_fourierInv,
-  Daubechies.norm_higherDiff_scalingFun_le_integral}
+\lean{Real.fourierInv_sub_apply, Real.integrable_exp_mul, Real.fwdDiff_fourierInv_apply,
+  Real.iterate_fwdDiff_fourierInv_apply, Real.norm_iterate_fwdDiff_fourierInv_le,
+  Daubechies.higherDiff_scalingFun_eq_fourierInv, Daubechies.norm_higherDiff_scalingFun_le_integral}
 \leanok
-\uses{def:daub-scaling-function, def:daub-transfer-growth, def:rd-modulus}
-For all real $a$ and $r \in \N$ with $0 \leq a \leq r$ and all $h, \xi \in \R$,
-\[
-  |e^{2\pi i h \xi} - 1|^r \leq (2\pi)^r \, |h|^a (1 + |\xi|)^a .
-\]
-If $\lambda, C$ is a growth bound for the transfer operator of order $N$ with
-$\log_4 \lambda < N - \frac12$, then the symbol product $\Phi$ of every Daubechies mask of order
-$N$ is integrable. For every Daubechies mask with integrable symbol product, every $r \in \N$
+\uses{def:daub-scaling-function, def:rd-modulus}
+For every Daubechies mask with integrable symbol product, every $r \in \N$
 and all $h, x \in \R$,
 \[
   \Delta_h^r \varphi(x)
@@ -2877,14 +2881,8 @@ and
 
 \begin{proof}
 \leanok
-\uses{lem:daub-difference-multiplier, cor:daub-decay-l1, thm:daub-symbol-product-continuous,
-  lem:fourier-conv, lem:daub-fourier-translate, lem:daub-fourier-continuous}
-The first bound combines $|e^{2\pi i h \xi} - 1| \leq 2\pi \min(1, |h \xi|)$ and
-$\min(1, |h \xi|)^r \leq |h \xi|^a$ (\Cref{lem:daub-difference-multiplier}) with
-$|h \xi| \leq |h| (1 + |\xi|)$. The case $a = 0$ of \Cref{cor:daub-decay-l1} shows that $|\Phi|$
-is integrable, and so is the continuous function $\Phi$
-(\Cref{thm:daub-symbol-product-continuous}).
-
+\uses{lem:daub-difference-multiplier, lem:fourier-conv, lem:daub-fourier-translate,
+  lem:daub-fourier-continuous}
 The identity and the bound for $\Delta_h^r \varphi$ hold for every integrable $F : \R \to \C$ in
 place of $\Phi$, with $\mathcal F^{-1} F$ in place of $\varphi = \mathcal F^{-1} \Phi$: for every
 $r \in \N$ and all $h, x \in \R$,
@@ -2924,9 +2922,11 @@ mask of order $N$ and all $x, h \in \R$,
 
 \begin{proof}
 \leanok
-\uses{lem:daub-scaling-difference-inverse, cor:daub-decay-l1}
-Since $0 \leq a < N - \log_4 \lambda - \frac12$, the symbol product is integrable, and by
-\Cref{lem:daub-scaling-difference-inverse}
+\uses{lem:daub-scaling-difference-inverse, cor:daub-decay-l1, prop:daub-symbol-product-integrable,
+  lem:daub-difference-multiplier}
+Since $0 \leq a < N - \log_4 \lambda - \frac12$, the symbol product is integrable
+(\Cref{prop:daub-symbol-product-integrable}), and by \Cref{lem:daub-scaling-difference-inverse}
+and the power bound of \Cref{lem:daub-difference-multiplier}
 \[
   |\Delta_h^r \varphi(x)| \leq \int_\R |e^{2\pi i h \xi} - 1|^r \, |\Phi(\xi)| \, d\xi
   \leq (2\pi)^r |h|^a \int_\R (1 + |\xi|)^a \, |\Phi(\xi)| \, d\xi ,
@@ -3022,9 +3022,9 @@ for every $t \in (0, 1]$.
 
 \begin{proof}
 \leanok
-\uses{lem:daub-scaling-difference-inverse, lem:daub-fourier-continuous,
+\uses{prop:daub-symbol-product-integrable, lem:daub-fourier-continuous,
   lem:daub-modulus-top-pointwise, prop:daub-scaling-difference-uniform}
-The symbol product is integrable (\Cref{lem:daub-scaling-difference-inverse}), so
+The symbol product is integrable (\Cref{prop:daub-symbol-product-integrable}), so
 $\varphi = \mathcal F^{-1} \Phi$ is continuous (\Cref{lem:daub-fourier-continuous}). Apply
 \Cref{lem:daub-modulus-top-pointwise} to the uniform bound of
 \Cref{prop:daub-scaling-difference-uniform}.
@@ -3704,9 +3704,9 @@ monotone convergence.
 \lean{Daubechies.aestronglyMeasurable_comp_sub_map,
   Daubechies.aestronglyMeasurable_comp_two_pow_mul_sub, Daubechies.aestronglyMeasurable_scaledFun,
   Daubechies.aestronglyMeasurable_expand, Daubechies.eLpNorm_comp_two_pow_mul_sub,
-  Daubechies.eLpNorm_scaledFun, Daubechies.eLpNorm_const_mul_scaledFun,
-  Daubechies.memLp_of_continuous_of_eq_zero, Daubechies.one_div_toReal_conjExponent,
-  Daubechies.eLpNorm_scaledFun_conjExponent}
+  Daubechies.enorm_two_rpow_half, Daubechies.eLpNorm_scaledFun,
+  Daubechies.eLpNorm_const_mul_scaledFun, Daubechies.memLp_of_continuous_of_eq_zero,
+  Daubechies.one_div_toReal_conjExponent, Daubechies.eLpNorm_scaledFun_conjExponent}
 \leanok
 \uses{def:daub-generators}
 Let $F, \gamma : \R \to \C$ be measurable, $j \in \N$, $k \in \Z$, $t \in \R$ and
@@ -3724,7 +3724,8 @@ outside $[a, b]$ lies in $L_p(\R)$ for every $p$.
 \begin{proof}
 \leanok
 The image of Lebesgue measure under $x \mapsto 2^j x$ is $2^{-j}$ times Lebesgue measure, and
-translations preserve Lebesgue measure; the factor $2^{j/2}$ gives the second identity. An
+translations preserve Lebesgue measure; the factor $|2^{j/2}| = 2^{j/2}$ gives the second
+identity. An
 expansion is a countable sum of measurable functions. A continuous function with compact support
 lies in every $L_p$.
 \end{proof}
@@ -4050,7 +4051,8 @@ $\langle Q, \varphi_{j,k} \rangle \varphi_{j,k}(x)
 
 \begin{definition}[Refined coefficients]
 \label{def:daub-refine-coeff}
-\lean{Daubechies.refineCoeff, Daubechies.mem_Icc_of_coeff_ne_zero, Daubechies.summable_refine}
+\lean{Daubechies.refineCoeff, Daubechies.mem_Icc_of_coeff_ne_zero, Daubechies.summable_refine,
+  Daubechies.summable_refine_of_filter}
 \leanok
 \uses{def:daub-symbol, def:daub-scaled}
 For a Daubechies mask of order $N$ and $\lambda : \Z \to \C$ let
@@ -4060,12 +4062,14 @@ For a Daubechies mask of order $N$ and $\lambda : \Z \to \C$ let
 Only the $k$ with $0 \leq n - 2k \leq 2N - 1$ contribute, since $c_i \neq 0$ implies
 $0 \leq i \leq 2N - 1$. For $N \geq 2$, $j \in \N$ and $x \in \R$ the family
 $(k, n) \mapsto \lambda_k (c_{n-2k}/\sqrt 2) \varphi_{j+1,n}(x)$ on $\Z \times \Z$ is summable,
-since only finitely many of its terms are nonzero.
+since only finitely many of its terms are nonzero. The same holds with any real sequence of finite
+support in place of $c$.
 \end{definition}
 
 \begin{proposition}[Nested expansions]
 \label{prop:daub-expand-succ}
-\lean{Daubechies.expand_eq_expand_succ, Daubechies.projFun_succ_projFun}
+\lean{Daubechies.expand_eq_expand_succ, Daubechies.projFun_succ_projFun,
+  Daubechies.expand_eq_tsum_refine_of_filter}
 \leanok
 \uses{def:daub-refine-coeff, def:daub-proj-fun}
 For every Daubechies mask of order $N \geq 2$, every $j \in \N$, every $\lambda : \Z \to \C$ and
@@ -4073,16 +4077,24 @@ every $x \in \R$,
 \[
   \sum_{k \in \Z} \lambda_k \varphi_{j,k}(x) = \sum_{n \in \Z} (H^* \lambda)_n \varphi_{j+1,n}(x) ,
 \]
-and $P_{j+1} P_j f = P_j f$ for every $f : \R \to \C$.
+and $P_{j+1} P_j f = P_j f$ for every $f : \R \to \C$. More generally, let $h : \Z \to \R$ have
+finite support and let $\gamma : \R \to \C$ satisfy
+$\gamma_{j,k} = \sum_{n \in \Z} (h_{n-2k}/\sqrt 2) \varphi_{j+1,n}$ for every $k \in \Z$. Then
+for every $\lambda : \Z \to \C$ and every $x \in \R$,
+\[
+  \sum_{k \in \Z} \lambda_k \gamma_{j,k}(x)
+  = \sum_{n \in \Z} \Bigl(\sum_{k \in \Z} \lambda_k \frac{h_{n-2k}}{\sqrt 2}\Bigr)
+    \varphi_{j+1,n}(x) .
+\]
 \end{proposition}
 
 \begin{proof}
 \leanok
 \uses{prop:daub-scaled-refine, prop:daub-proj-reproduction}
-Insert $\varphi_{j,k} = \sum_n (c_{n-2k}/\sqrt 2) \varphi_{j+1,n}$
-(\Cref{prop:daub-scaled-refine}) and exchange the two sums, which have only finitely many nonzero
-terms (\Cref{def:daub-refine-coeff}). So $P_j f$ is an expansion of level $j + 1$, which
-$P_{j+1}$ reproduces (\Cref{prop:daub-proj-reproduction}).
+Insert $\gamma_{j,k} = \sum_n (h_{n-2k}/\sqrt 2) \varphi_{j+1,n}$ and exchange the two sums,
+which have only finitely many nonzero terms (\Cref{def:daub-refine-coeff}). The case $h = c$,
+$\gamma = \varphi$ (\Cref{prop:daub-scaled-refine}) is the first identity. Hence $P_j f$ is an
+expansion of level $j + 1$, which $P_{j+1}$ reproduces (\Cref{prop:daub-proj-reproduction}).
 \end{proof}
 
 \paragraph{Convergence.}
@@ -4132,9 +4144,9 @@ functions $f \overline{\varphi_{j,k}}$ are integrable (\Cref{lem:daub-proj-fun-b
 
 \begin{proposition}[The error for uniformly continuous functions]
 \label{prop:daub-proj-error}
-\lean{Daubechies.abs_sub_le_of_mem_supportWindow, Daubechies.enorm_two_rpow_half,
-  Daubechies.enorm_scaled_le, Daubechies.enorm_scaled_mul_integral_sub_le,
-  Daubechies.enorm_projFun_sub_le, Daubechies.eLpNorm_sub_projFun_le}
+\lean{Daubechies.abs_sub_le_of_mem_supportWindow, Daubechies.enorm_scaled_le,
+  Daubechies.enorm_scaled_mul_integral_sub_le, Daubechies.enorm_projFun_sub_le,
+  Daubechies.eLpNorm_sub_projFun_le}
 \leanok
 \uses{def:daub-proj-fun}
 Any two points of a support window $W_{j,k}$ have distance at most $(b - a)/2^j$. Let $N \geq 2$,
@@ -4463,7 +4475,8 @@ $\sum_n \lambda_n \delta_{nn'} = \lambda_{n'}$.
 
 \begin{theorem}[The block identity]
 \label{thm:daub-block-identity}
-\lean{Daubechies.coeffFun_scalingFun_eq_tsum, Daubechies.coeffFun_wavelet_eq_tsum,
+\lean{Daubechies.coeffFun_eq_tsum_of_filter, Daubechies.coeffFun_scalingFun_eq_tsum,
+  Daubechies.coeffFun_wavelet_eq_tsum,
   Daubechies.detailFun, Daubechies.projFun_succ_eq_add, Daubechies.memLp_detailFun,
   Daubechies.proj_succ_sub_proj}
 \leanok
@@ -4475,7 +4488,12 @@ $f$ and every $x \in \R$,
   P_{j+1} f(x) = P_j f(x) + Q_j f(x) .
 \]
 For $1 \leq p < \infty$ and $f \in L_p(\R)$, $Q_j f \in L_p(\R)$, and $P_{j+1} f - P_j f$ is the
-class of $Q_j f$.
+class of $Q_j f$. Moreover, for every $h : \Z \to \R$ of finite support, every
+$\gamma : \R \to \C$ and every $k \in \Z$ with
+$\gamma_{j,k} = \sum_{n \in \Z} (h_{n-2k}/\sqrt 2) \varphi_{j+1,n}$, and every locally
+integrable $f$,
+$\langle f, \gamma_{j,k} \rangle
+= \sum_{n \in \Z} (h_{n-2k}/\sqrt 2) \langle f, \varphi_{j+1,n} \rangle$.
 \end{theorem}
 
 \begin{proof}
@@ -4484,8 +4502,10 @@ class of $Q_j f$.
   lem:daub-finite-expansions, lem:daub-shifted-filters, prop:daub-expand-succ,
   lem:daub-expand-wavelet-succ, prop:daub-perfect-reconstruction, lem:daub-expand-coeff,
   lem:daub-wavelet-basic}
-First, the coefficients of two consecutive levels: for every locally integrable $f$ and every
-$k \in \Z$,
+First, the coefficients of two consecutive levels. Insert the finite expansion of
+$\gamma_{j,k}$ into the first identity of \Cref{lem:daub-finite-expansions}, where the filter is
+real; this gives the last claim. Its cases $h = c$, $\gamma = \varphi$ and $h = g$,
+$\gamma = \psi$ say that for every locally integrable $f$ and every $k \in \Z$,
 \[
   \langle f, \varphi_{j,k} \rangle
   = \sum_{n \in \Z} \frac{c_{n-2k}}{\sqrt 2} \langle f, \varphi_{j+1,n} \rangle
@@ -4495,8 +4515,7 @@ $k \in \Z$,
 \]
 since $\varphi_{j,k}$ and $\psi_{j,k}$ are expansions of level $j + 1$
 (\Cref{prop:daub-scaled-refine} and \Cref{lem:daub-wavelet-refine}) whose coefficients vanish
-outside a finite set (\Cref{lem:daub-shifted-filters}); insert them into the first identity of
-\Cref{lem:daub-finite-expansions}, where the filters are real. Let
+outside a finite set (\Cref{lem:daub-shifted-filters}). Let
 $\lambda_n = \langle f, \varphi_{j+1,n} \rangle$. These identities say that the coefficients of
 $P_j f$ and $Q_j f$ are $H \lambda$ and $G \lambda$, so by
 \Cref{prop:daub-expand-succ} and \Cref{lem:daub-expand-wavelet-succ} both are expansions of level

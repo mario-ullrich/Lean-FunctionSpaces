@@ -341,10 +341,9 @@ theorem integral_detailFun_mul {g : ℝ → ℂ} (hg : IntegrableOn g (Icc 0 1))
   have hsub : dyadicIco k m ⊆ Icc 0 1 := (dyadicIco_subset hm).trans Ico_subset_Icc_self
   have hgI : IntegrableOn g (dyadicIco k m) := hg.mono_set hsub
   have hfine : IntegrableOn (fun x => (g x - ppFun (k + 1) (locProj r (k + 1) g) x) *
-      polyFun Q x) (dyadicIco k m) := by
-    refine integrableOn_mul_polyFun (hgI.sub ?_) (measurableSet_dyadicIco _ _) hsub Q
-    exact IntegrableOn.mono_set (show IntegrableOn (ppFun (k + 1) (locProj r (k + 1) g)) (Icc 0 1) volume
-      from (memLp_ppFun (k + 1) (locProj r (k + 1) g) 1).integrable le_rfl) hsub
+      polyFun Q x) (dyadicIco k m) :=
+    integrableOn_mul_polyFun (hgI.sub ((integrableOn_ppFun _ _).mono_set hsub))
+      (measurableSet_dyadicIco _ _) hsub Q
   have hcoarse : IntegrableOn (fun x => (g x - polyFun (locProj r k g m) x) * polyFun Q x)
       (dyadicIco k m) :=
     integrableOn_mul_polyFun (hgI.sub (integrableOn_dyadicIco_of_continuous
@@ -412,47 +411,19 @@ theorem integral_detailFun_mul_conj_psi {g : ℝ → ℂ} (hg : IntegrableOn g (
       ∫ x in dyadicIco k m, g x * conj (psi r i (2 ^ k * x - m)) := by
   have hsub : dyadicIco k m ⊆ Icc 0 1 := (dyadicIco_subset hm).trans Ico_subset_Icc_self
   have hgI : IntegrableOn g (dyadicIco k m) := hg.mono_set hsub
-  -- the rescaled wavelet is bounded
-  have hψ : ∀ e < 2, ∃ Q ∈ degreeLT ℂ r, ∀ x ∈ dyadicIco (k + 1) (2 * m + e),
-      conj (psi r i (2 ^ k * x - m)) = polyFun Q x := fun e he =>
-    exists_conj_psi_eq_polyFun i he
-  have hbdd : ∃ M : ℝ, ∀ x, ‖conj (psi r i (2 ^ k * x - m))‖ ≤ M := by
-    obtain ⟨Q₀, -, h₀⟩ := hψ 0 (by norm_num)
-    obtain ⟨Q₁, -, h₁⟩ := hψ 1 (by norm_num)
-    obtain ⟨M₀, hM₀⟩ := (isCompact_Icc (a := (0 : ℝ)) (b := 1)).exists_bound_of_continuousOn
-      (continuous_polyFun Q₀).continuousOn
-    obtain ⟨M₁, hM₁⟩ := (isCompact_Icc (a := (0 : ℝ)) (b := 1)).exists_bound_of_continuousOn
-      (continuous_polyFun Q₁).continuousOn
-    refine ⟨max M₀ M₁ ⊔ 0, fun x => ?_⟩
-    by_cases hx : x ∈ dyadicIco k m
-    · rw [dyadicIco_eq_union, mem_union] at hx
-      have hxI : x ∈ Icc (0 : ℝ) 1 := hsub ((dyadicIco_eq_union k m).symm ▸ (mem_union _ _ _).2 hx)
-      rcases hx with hx | hx
-      · rw [h₀ x (by simpa using hx)]
-        exact (hM₀ x hxI).trans ((le_max_left _ _).trans le_sup_left)
-      · rw [h₁ x hx]
-        exact (hM₁ x hxI).trans ((le_max_right _ _).trans le_sup_left)
-    · have ht : 2 ^ k * x - m ∉ Ico (0 : ℝ) 1 := by
-        intro ht
-        apply hx
-        rw [mem_dyadicIco]
-        constructor <;> linarith [ht.1, ht.2]
-      rw [psi, ppFun_eq_zero _ ht, map_zero, norm_zero]
-      exact le_sup_right
-  obtain ⟨M, hM⟩ := hbdd
+  -- the rescaled wavelet is bounded, since `ψ_i` is a piecewise polynomial
+  obtain ⟨M, hM⟩ := exists_norm_ppFun_le 1 (twoPieces r (psiPieces r i))
   have hmeas : AEStronglyMeasurable (fun x => conj (psi r i (2 ^ k * x - m)))
       (volume.restrict (dyadicIco k m)) :=
     (Complex.continuous_conj.measurable.comp ((measurable_ppFun 1 _).comp
       (by fun_prop))).aestronglyMeasurable
   have hint : ∀ {F : ℝ → ℂ}, IntegrableOn F (dyadicIco k m) →
       IntegrableOn (fun x => F x * conj (psi r i (2 ^ k * x - m))) (dyadicIco k m) :=
-    fun hF => hF.mul_bdd (c := M) hmeas (Filter.Eventually.of_forall hM)
-  have hPfine : IntegrableOn (ppFun (k + 1) (locProj r (k + 1) g)) (dyadicIco k m) :=
-    IntegrableOn.mono_set (show IntegrableOn (ppFun (k + 1) (locProj r (k + 1) g)) (Icc 0 1) volume
-      from (memLp_ppFun (k + 1) (locProj r (k + 1) g) 1).integrable le_rfl) hsub
-  have hPcoarse : IntegrableOn (ppFun k (locProj r k g)) (dyadicIco k m) :=
-    IntegrableOn.mono_set (show IntegrableOn (ppFun k (locProj r k g)) (Icc 0 1) volume
-      from (memLp_ppFun k (locProj r k g) 1).integrable le_rfl) hsub
+    fun hF => hF.mul_bdd (c := M) hmeas (Filter.Eventually.of_forall fun x => by
+      rw [Complex.norm_conj]
+      exact hM _)
+  have hPfine := (integrableOn_ppFun (k + 1) (locProj r (k + 1) g)).mono_set hsub
+  have hPcoarse := (integrableOn_ppFun k (locProj r k g)).mono_set hsub
   have heq : EqOn (fun x => g x * conj (psi r i (2 ^ k * x - m)) -
       (g x - ppFun (k + 1) (locProj r (k + 1) g) x) * conj (psi r i (2 ^ k * x - m)) -
       ppFun k (locProj r k g) x * conj (psi r i (2 ^ k * x - m)))
@@ -468,7 +439,8 @@ theorem integral_detailFun_mul_conj_psi {g : ℝ → ℂ} (hg : IntegrableOn g (
       (g x - ppFun (k + 1) (locProj r (k + 1) g) x) * conj (psi r i (2 ^ k * x - m)))
       (dyadicIco k m) := hA.sub hB
   rw [← setIntegral_congr_fun (measurableSet_dyadicIco _ _) heq, integral_sub hAB hC,
-    integral_sub hA hB, integral_sub_ppFun_succ_mul r hg hm hψ,
+    integral_sub hA hB,
+    integral_sub_ppFun_succ_mul r hg hm fun _ he => exists_conj_psi_eq_polyFun i he,
     integral_ppFun_mul_conj_psi g hm i, sub_zero, sub_zero]
 
 /-! ### Multiwavelet coefficients -/
@@ -662,7 +634,8 @@ variable (r) in
 /-- **Stability of the multiwavelet combinations** in `L_p[0, 1]`, `1 ≤ p ≤ ∞`: there are
 `K, M < ∞` with `‖β‖_{ℓ_p} ≤ K ‖∑_i β_i ψ_i‖_p` and `‖∑_i β_i ψ_i‖_p ≤ M ‖β‖_{ℓ_p}` for all
 coefficients `β`; the first by the equivalence of norms on the `r`-dimensional space of
-coefficients (`LinearMap.injective_iff_antilipschitz`), the second by the triangle inequality. -/
+coefficients (`LinearMap.injective_iff_antilipschitz`, applied to `β` and `0`), the second by the
+triangle inequality. -/
 theorem exists_stable : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ β : Fin r → ℂ,
     ENNReal.lqNorm p (fun i => ‖β i‖ₑ) ≤
       K * eLpNorm (fun t => ∑ i, β i * psi r i t) p unitVol ∧
@@ -679,11 +652,7 @@ theorem exists_stable : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ β
       rw [Lp.enorm_def]
       exact eLpNorm_congr_ae (coeFn_sumPsi β)
     have hbe : ‖β‖ₑ ≤ K * ‖sumPsi r p β‖ₑ := by
-      rw [← ofReal_norm, ← ofReal_norm]
-      calc ENNReal.ofReal ‖β‖ ≤ ENNReal.ofReal (K * ‖sumPsi r p β‖) :=
-            ENNReal.ofReal_le_ofReal (ZeroHomClass.bound_of_antilipschitz _ hK β)
-        _ = K * ENNReal.ofReal ‖sumPsi r p β‖ := by
-            rw [ENNReal.ofReal_mul (NNReal.coe_nonneg _), ENNReal.ofReal_coe_nnreal]
+      simpa only [edist_zero_right, map_zero] using hK β 0
     calc ENNReal.lqNorm p (fun i => ‖β i‖ₑ)
         ≤ (Fintype.card (Fin r) : ℝ≥0∞) ^ (1 / p.toReal) * ‖β‖ₑ :=
           ENNReal.lqNorm_le_card_rpow_mul fun i => by
@@ -789,8 +758,10 @@ theorem exists_eLpNorm_detailFun_equiv (hp : p ≠ ∞) : ∃ K M : ℝ≥0∞, 
   have hsplit : dyadicWeight (1 / 2 - 1 / p.toReal) k * dyadicWeight (1 / p.toReal) k =
       dyadicWeight (1 / 2) k := by
     rw [← ENNReal.dyadicWeight_add, sub_add_cancel]
+  have hw0 := ENNReal.dyadicWeight_ne_zero (1 / p.toReal) k
+  have hwt := ENNReal.dyadicWeight_ne_top (1 / p.toReal) k
   constructor
-  · -- `2^(k/2) F ≤ K 2^(k/p) A`
+  · -- `2^(k/2) F ≤ K 2^(k/p) A`, then cancel `2^(k/p)`
     have h1 : dyadicWeight (1 / 2) k * F ≤ K * (dyadicWeight (1 / p.toReal) k * A) := by
       refine hroot ?_
       rw [hβm, ENNReal.mul_rpow_of_nonneg _ _ hq.le, ENNReal.mul_rpow_of_nonneg _ _ hq.le, hw, hA,
@@ -798,15 +769,9 @@ theorem exists_eLpNorm_detailFun_equiv (hp : p ≠ ∞) : ∃ K M : ℝ≥0∞, 
       exact Finset.sum_le_sum fun m _ => by
         rw [← ENNReal.mul_rpow_of_nonneg _ _ hq.le]
         exact ENNReal.rpow_le_rpow (hKM (β m)).1 hq.le
-    have h2 : dyadicWeight (1 / 2 - 1 / p.toReal) k * F * dyadicWeight (1 / p.toReal) k ≤
-        K * A * dyadicWeight (1 / p.toReal) k := by
-      calc dyadicWeight (1 / 2 - 1 / p.toReal) k * F * dyadicWeight (1 / p.toReal) k
-          = dyadicWeight (1 / 2) k * F := by rw [← hsplit]; ring
-        _ ≤ K * (dyadicWeight (1 / p.toReal) k * A) := h1
-        _ = K * A * dyadicWeight (1 / p.toReal) k := by ring
-    exact (ENNReal.mul_le_mul_iff_left (ENNReal.dyadicWeight_ne_zero _ _)
-      (ENNReal.dyadicWeight_ne_top _ _)).1 h2
-  · -- `2^(k/p) A ≤ M 2^(k/2) F`
+    rw [← ENNReal.mul_le_mul_iff_left hw0 hwt]
+    exact le_of_eq_of_le (by rw [← hsplit]; ring) (h1.trans_eq (by ring))
+  · -- `2^(k/p) A ≤ M 2^(k/2) F`, then cancel `2^(k/p)`
     have h1 : dyadicWeight (1 / p.toReal) k * A ≤ M * (dyadicWeight (1 / 2) k * F) := by
       refine hroot ?_
       rw [ENNReal.mul_rpow_of_nonneg _ _ hq.le, hw, hA, ENNReal.mul_rpow_of_nonneg _ _ hq.le, hβm,
@@ -814,14 +779,8 @@ theorem exists_eLpNorm_detailFun_equiv (hp : p ≠ ∞) : ∃ K M : ℝ≥0∞, 
       exact Finset.sum_le_sum fun m _ => by
         rw [← ENNReal.mul_rpow_of_nonneg _ _ hq.le]
         exact ENNReal.rpow_le_rpow (hKM (β m)).2 hq.le
-    have h2 : A * dyadicWeight (1 / p.toReal) k ≤
-        M * (dyadicWeight (1 / 2 - 1 / p.toReal) k * F) * dyadicWeight (1 / p.toReal) k := by
-      calc A * dyadicWeight (1 / p.toReal) k = dyadicWeight (1 / p.toReal) k * A := mul_comm _ _
-        _ ≤ M * (dyadicWeight (1 / 2) k * F) := h1
-        _ = M * (dyadicWeight (1 / 2 - 1 / p.toReal) k * F) * dyadicWeight (1 / p.toReal) k := by
-            rw [← hsplit]; ring
-    exact (ENNReal.mul_le_mul_iff_left (ENNReal.dyadicWeight_ne_zero _ _)
-      (ENNReal.dyadicWeight_ne_top _ _)).1 h2
+    rw [← ENNReal.mul_le_mul_iff_left hw0 hwt]
+    exact le_of_eq_of_le (mul_comm _ _) (h1.trans_eq (by rw [← hsplit]; ring))
 
 /-! ### The coefficient characterisation -/
 

@@ -303,13 +303,6 @@ theorem integral_periodic_mul_normSq_symbolProduct (hN : 2 ≤ N) {w : ℝ → �
 
 /-! ### Orthonormality -/
 
-/-- For every integer `k`, the function `ξ ↦ e^(-2πikξ)` has period `1`, since `e^(-2πik) = 1`
-(`Daubechies.expFreq_intCast`). -/
-theorem periodic_expFreq_intCast_mul (k : ℤ) :
-    Function.Periodic (fun ξ : ℝ => expFreq (k * ξ)) 1 := fun ξ => by
-  simp only
-  rw [mul_add, mul_one, expFreq_add, expFreq_intCast, mul_one]
-
 /-- **The Fourier coefficients of `|Φ|²` at the integers**: for a mask of order `N ≥ 2` and every
 `k ∈ ℤ`, `∫ |Φ(ξ)|² e^(-2πikξ) dξ` is `1` for `k = 0` and `0` otherwise. This is the integral
 identity `Daubechies.integral_periodic_mul_normSq_symbolProduct` for `w(ξ) = e^(-2πikξ)`,

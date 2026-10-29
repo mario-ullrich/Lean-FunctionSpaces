@@ -269,13 +269,11 @@ theorem two_div_toReal_mem_Icc {p : ℝ≥0∞} (hp : p ≠ ∞) (hp2 : 2 ≤ p)
   exact ⟨by positivity, (div_le_one (by linarith)).2 h2⟩
 
 /-- **Interpolated orders stay below a common bound**: for every weight `w ∈ [0, 1]` and all real
-`s, a, b` with `s ≤ b` and `a ≤ b`, `w s + (1 - w) a ≤ b`. -/
+`s, a, b` with `s ≤ b` and `a ≤ b`, `w s + (1 - w) a ≤ b`, since a convex combination is at most
+the larger of the two numbers (Mathlib's `Convex.combo_le_max`). -/
 theorem mul_add_one_sub_mul_le {w s a b : ℝ} (hw : w ∈ Set.Icc (0 : ℝ) 1) (hs : s ≤ b)
     (ha : a ≤ b) : w * s + (1 - w) * a ≤ b :=
-  calc w * s + (1 - w) * a ≤ w * b + (1 - w) * b :=
-        add_le_add (mul_le_mul_of_nonneg_left hs hw.1)
-          (mul_le_mul_of_nonneg_left ha (sub_nonneg.2 hw.2))
-    _ = b := by ring
+  (Convex.combo_le_max s a hw.1 (sub_nonneg.2 hw.2) (by ring)).trans (max_le hs ha)
 
 section Lp
 

@@ -36,7 +36,8 @@ projections `P_j f = ∑_k ⟨f, φ_{j,k}⟩ φ_{j,k}`.
   `⟨f, φ_{j,k}⟩ = ∑_n (c_{n-2k}/√2) ⟨f, φ_{j+1,n}⟩` and
   `⟨f, ψ_{j,k}⟩ = ∑_n (g_{n-2k}/√2) ⟨f, φ_{j+1,n}⟩`, both expansions of level `j` are expansions
   of level `j + 1` (`Daubechies.expand_eq_expand_succ`,
-  `Daubechies.expand_wavelet_eq_expand_succ`), and the filter identity
+  `Daubechies.expand_wavelet_eq_expand_succ`, `Daubechies.coeffFun_eq_tsum_of_filter`), and the
+  filter identity
   `∑_k (c_{a-2k} c_{b-2k} + g_{a-2k} g_{b-2k}) = 2 δ_{ab}` gives perfect reconstruction
   (`Daubechies.refineCoeff_add_waveletRefineCoeff`).
 * **The kernel identity.**
@@ -288,44 +289,49 @@ theorem integral_wavelet_translate_mul_conj_scalingFun_translate (hN : 2 ≤ N) 
 
 /-! ### The coefficients of two consecutive levels -/
 
-/-- **The scaling coefficients of level `j` through those of level `j + 1`**: for `N ≥ 2`, locally
-integrable `f`, every level `j` and position `k`,
-`⟨f, φ_{j,k}⟩ = ∑_{n ∈ ℤ} (c_{n-2k}/√2) ⟨f, φ_{j+1,n}⟩`, from the refinement relation
-`φ_{j,k} = ∑_n (c_{n-2k}/√2) φ_{j+1,n}` (`Daubechies.scaled_eq_expand`) and
-`Daubechies.integral_mul_conj_expand`; the filter coefficients are real. -/
+/-- **The coefficients of a refinable generator through those of the next level**: if `N ≥ 2`,
+the real filter `h` vanishes outside `[a, b]`, `f` is locally integrable and
+`g_{j,k} = ∑_n (h_{n-2k}/√2) φ_{j+1,n}`, then `⟨f, g_{j,k}⟩ = ∑_n (h_{n-2k}/√2) ⟨f, φ_{j+1,n}⟩`
+(`Daubechies.integral_mul_conj_expand` for the finite expansion; the filter is real). -/
+theorem coeffFun_eq_tsum_of_filter (hN : 2 ≤ N) {g : ℝ → ℂ} {h : ℤ → ℝ} {a b : ℤ}
+    (hh : ∀ i, h i ≠ 0 → a ≤ i ∧ i ≤ b) {f : ℝ → ℂ} (hf : LocallyIntegrable f volume)
+    (j : ℕ) (k : ℤ)
+    (hg : ∀ x, scaledFun g j k x =
+      expand (scalingFun m) (j + 1) (fun n => ((h (n - 2 * k) / √2 : ℝ) : ℂ)) x) :
+    coeffFun g j f k =
+      ∑' n : ℤ, ((h (n - 2 * k) / √2 : ℝ) : ℂ) * coeffFun (scalingFun m) (j + 1) f n := by
+  have hT : ∀ n ∉ Finset.Icc (2 * k + a) (2 * k + b), ((h (n - 2 * k) / √2 : ℝ) : ℂ) = 0 :=
+    fun n hn => by
+      have h0 : h (n - 2 * k) = 0 := by
+        by_contra hne
+        obtain ⟨h1, h2⟩ := hh _ hne
+        exact hn (Finset.mem_Icc.2 ⟨by omega, by omega⟩)
+      rw [h0, zero_div, Complex.ofReal_zero]
+  rw [coeffFun, show scaledFun g j k = expand (scalingFun m) (j + 1)
+      (fun n => ((h (n - 2 * k) / √2 : ℝ) : ℂ)) from funext hg,
+    integral_mul_conj_expand m hN hf (j + 1) hT,
+    tsum_eq_sum (s := Finset.Icc (2 * k + a) (2 * k + b)) fun n hn => by rw [hT n hn, zero_mul]]
+  simp only [Complex.conj_ofReal]
+
+/-- **The scaling coefficients of level `j` through those of level `j + 1`**: for `N ≥ 2` and
+locally integrable `f`, `⟨f, φ_{j,k}⟩ = ∑_n (c_{n-2k}/√2) ⟨f, φ_{j+1,n}⟩`
+(`Daubechies.coeffFun_eq_tsum_of_filter`, `Daubechies.scaled_eq_expand`). -/
 theorem coeffFun_scalingFun_eq_tsum (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : LocallyIntegrable f volume)
     (j : ℕ) (k : ℤ) :
     coeffFun (scalingFun m) j f k =
-      ∑' n : ℤ, ((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * coeffFun (scalingFun m) (j + 1) f n := by
-  have hT : ∀ n ∉ Finset.Icc (2 * k) (2 * k + (2 * N - 1)),
-      ((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) = 0 := fun n hn => by
-    rw [coeff_sub_eq_zero m hn, zero_div, Complex.ofReal_zero]
-  rw [coeffFun, show scaledFun (scalingFun m) j k = expand (scalingFun m) (j + 1)
-      (fun n => ((coeff m (n - 2 * k) / √2 : ℝ) : ℂ)) from funext (scaled_eq_expand m hN j k),
-    integral_mul_conj_expand m hN hf (j + 1) hT,
-    tsum_eq_sum (s := Finset.Icc (2 * k) (2 * k + (2 * N - 1))) fun n hn => by
-      rw [hT n hn, zero_mul]]
-  simp only [Complex.conj_ofReal]
+      ∑' n : ℤ, ((coeff m (n - 2 * k) / √2 : ℝ) : ℂ) * coeffFun (scalingFun m) (j + 1) f n :=
+  coeffFun_eq_tsum_of_filter m hN (h := coeff m) (fun _ hi => mem_Icc_of_coeff_ne_zero m hi) hf
+    j k (scaled_eq_expand m hN j k)
 
 /-- **The wavelet coefficients of level `j` through the scaling coefficients of level `j + 1`**:
-for `N ≥ 2`, locally integrable `f`, every level `j` and position `k`,
-`⟨f, ψ_{j,k}⟩ = ∑_{n ∈ ℤ} (g_{n-2k}/√2) ⟨f, φ_{j+1,n}⟩`, from
-`ψ_{j,k} = ∑_n (g_{n-2k}/√2) φ_{j+1,n}` (`Daubechies.waveletScaled_eq_expand`) and
-`Daubechies.integral_mul_conj_expand`. -/
+for `N ≥ 2` and locally integrable `f`, `⟨f, ψ_{j,k}⟩ = ∑_n (g_{n-2k}/√2) ⟨f, φ_{j+1,n}⟩`
+(`Daubechies.coeffFun_eq_tsum_of_filter`, `Daubechies.waveletScaled_eq_expand`). -/
 theorem coeffFun_wavelet_eq_tsum (hN : 2 ≤ N) {f : ℝ → ℂ} (hf : LocallyIntegrable f volume)
     (j : ℕ) (k : ℤ) :
     coeffFun (wavelet m) j f k =
-      ∑' n : ℤ, ((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * coeffFun (scalingFun m) (j + 1) f n := by
-  have hT : ∀ n ∉ Finset.Icc (2 * k + (2 - 2 * N)) (2 * k + 1),
-      ((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) = 0 := fun n hn => by
-    rw [dualCoeff_sub_eq_zero m hn, zero_div, Complex.ofReal_zero]
-  rw [coeffFun, show scaledFun (wavelet m) j k = expand (scalingFun m) (j + 1)
-      (fun n => ((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ)) from
-        funext (waveletScaled_eq_expand m j k),
-    integral_mul_conj_expand m hN hf (j + 1) hT,
-    tsum_eq_sum (s := Finset.Icc (2 * k + (2 - 2 * N)) (2 * k + 1)) fun n hn => by
-      rw [hT n hn, zero_mul]]
-  simp only [Complex.conj_ofReal]
+      ∑' n : ℤ, ((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * coeffFun (scalingFun m) (j + 1) f n :=
+  coeffFun_eq_tsum_of_filter m hN (h := dualCoeff m)
+    (fun _ hi => mem_Icc_of_dualCoeff_ne_zero m hi) hf j k (waveletScaled_eq_expand m j k)
 
 /-- **The refined wavelet coefficients**: for coefficients `b : ℤ → ℂ` of level `j`, the
 coefficients `b'_n = ∑_{k ∈ ℤ} b_k g_{n-2k}/√2` of level `j + 1`, with the dual filter `g`
@@ -335,54 +341,23 @@ wavelet expansion of level `j` as an expansion in the scaling functions of level
 noncomputable def waveletRefineCoeff (b : ℤ → ℂ) (n : ℤ) : ℂ :=
   ∑' k : ℤ, b k * ((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ)
 
-/-- **The double sum of the wavelet refinement has finitely many terms**: for `N ≥ 2`, a level
-`j`, coefficients `b : ℤ → ℂ` and a point `x`, the family
-`(k, n) ↦ b_k (g_{n-2k}/√2) φ_{j+1,n}(x)` is summable over `ℤ × ℤ`. A nonzero term needs
-`2 - 2N ≤ n - 2k ≤ 1` (`Daubechies.mem_Icc_of_dualCoeff_ne_zero`) and
-`0 ≤ 2^(j+1) x - n ≤ 2N - 1`, hence `1 - N ≤ 2^j x - k ≤ N`, which leaves finitely many pairs
-(`Daubechies.mem_Icc_ceil_floor`). -/
+/-- **The double sum of the wavelet refinement has finitely many terms**: for `N ≥ 2` the family
+`(k, n) ↦ b_k (g_{n-2k}/√2) φ_{j+1,n}(x)` is summable over `ℤ × ℤ`
+(`Daubechies.summable_refine_of_filter`, `Daubechies.mem_Icc_of_dualCoeff_ne_zero`). -/
 theorem summable_waveletRefine (hN : 2 ≤ N) (j : ℕ) (b : ℤ → ℂ) (x : ℝ) :
     Summable (Function.uncurry fun k n : ℤ =>
-      b k * (((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x)) := by
-  refine summable_of_ne_finset_zero (s := Finset.Icc ⌈2 ^ j * x - (N : ℝ)⌉ ⌊2 ^ j * x - (1 - N)⌋ ×ˢ
-    Finset.Icc ⌈2 ^ (j + 1) * x - (2 * N - 1)⌉ ⌊2 ^ (j + 1) * x - 0⌋) fun kn hkn => ?_
-  obtain ⟨k, n⟩ := kn
-  by_contra h
-  refine hkn ?_
-  simp only [Function.uncurry_apply_pair] at h
-  obtain ⟨-, h'⟩ := mul_ne_zero_iff.1 h
-  obtain ⟨hc, hs⟩ := mul_ne_zero_iff.1 h'
-  have hc' : dualCoeff m (n - 2 * k) ≠ 0 := fun h0 => hc (by rw [h0, zero_div, Complex.ofReal_zero])
-  obtain ⟨h1, h2⟩ := mem_Icc_of_dualCoeff_ne_zero m hc'
-  have hw := mem_supportWindow_of_scaledFun_ne_zero (fun _ hy => scalingFun_eq_zero m hN hy) hs
-  refine Finset.mem_product.2 ⟨mem_Icc_ceil_floor ?_, mem_Icc_ceil_floor hw⟩
-  have h1' : (2 - 2 * N : ℝ) ≤ n - 2 * k := by exact_mod_cast h1
-  have h2' : (n : ℝ) - 2 * k ≤ 1 := by exact_mod_cast h2
-  obtain ⟨hw1, hw2⟩ := hw
-  rw [pow_succ] at hw1 hw2
-  constructor <;> linarith
+      b k * (((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x)) :=
+  summable_refine_of_filter m hN (h := dualCoeff m)
+    (fun _ hi => mem_Icc_of_dualCoeff_ne_zero m hi) j b x
 
 /-- **Wavelet expansions of level `j` are expansions of level `j + 1`**: for `N ≥ 2`, every level
 `j`, coefficients `b : ℤ → ℂ` and point `x`, `∑_k b_k ψ_{j,k}(x) = ∑_n b'_n φ_{j+1,n}(x)` with the
-refined coefficients `b'_n = ∑_k b_k g_{n-2k}/√2` (`Daubechies.waveletRefineCoeff`). Each
-`ψ_{j,k}` is the expansion `∑_n (g_{n-2k}/√2) φ_{j+1,n}` (`Daubechies.waveletScaled_eq_expand`),
-and the two sums may be exchanged since only finitely many terms are nonzero
-(`Daubechies.summable_waveletRefine`). -/
+refined coefficients `b'_n = ∑_k b_k g_{n-2k}/√2` (`Daubechies.waveletRefineCoeff`), by
+`Daubechies.expand_eq_tsum_refine_of_filter` and `Daubechies.waveletScaled_eq_expand`. -/
 theorem expand_wavelet_eq_expand_succ (hN : 2 ≤ N) (j : ℕ) (b : ℤ → ℂ) (x : ℝ) :
-    expand (wavelet m) j b x = expand (scalingFun m) (j + 1) (waveletRefineCoeff m b) x := by
-  calc expand (wavelet m) j b x
-      = ∑' k : ℤ, ∑' n : ℤ,
-          b k * (((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x) := by
-        refine tsum_congr fun k => ?_
-        rw [show scaledFun (wavelet m) j k x = _ from waveletScaled_eq_expand m j k x, expand,
-          ← tsum_mul_left]
-    _ = ∑' n : ℤ, ∑' k : ℤ,
-          b k * (((dualCoeff m (n - 2 * k) / √2 : ℝ) : ℂ) * scaled m (j + 1) n x) :=
-        (summable_waveletRefine m hN j b x).tsum_comm.symm
-    _ = expand (scalingFun m) (j + 1) (waveletRefineCoeff m b) x := by
-        refine tsum_congr fun n => ?_
-        rw [waveletRefineCoeff, ← tsum_mul_right]
-        exact tsum_congr fun k => (mul_assoc _ _ _).symm
+    expand (wavelet m) j b x = expand (scalingFun m) (j + 1) (waveletRefineCoeff m b) x :=
+  expand_eq_tsum_refine_of_filter m hN (h := dualCoeff m)
+    (fun _ hi => mem_Icc_of_dualCoeff_ne_zero m hi) j (waveletScaled_eq_expand m j) b x
 
 /-! ### Perfect reconstruction -/
 

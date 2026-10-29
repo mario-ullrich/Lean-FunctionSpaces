@@ -21,7 +21,8 @@ For a Daubechies mask of order `N` with symbol product `Φ(ξ) = ∏_{j ≥ 0} m
 * `∫ (1 + |ξ|)^(2s) |Φ(ξ)|² dξ < ∞` for every real `s < N - log₄ λ`
   (`Daubechies.integrable_rpow_mul_normSq`);
 * `∫ (1 + |ξ|)^a |Φ(ξ)| dξ < ∞` for every real `a < N - log₄ λ - 1/2`
-  (`Daubechies.integrable_rpow_mul_norm`).
+  (`Daubechies.integrable_rpow_mul_norm`), in particular `Φ ∈ L¹` if `N - log₄ λ - 1/2 > 0`
+  (`Daubechies.integrable_symbolProduct_of_growth`).
 
 The crude growth bound `λ = 2 C(2N - 1, N)`, `C = 1` (`Daubechies.transferGrowth_crude`)
 satisfies `log₄(2 C(2N - 1, N)) < N - 1/2` for `N ≥ 2`
@@ -367,16 +368,24 @@ theorem integrable_rpow_mul_norm {N : ℕ} (m : Mask N) {lam C a : ℝ}
     show -(2 * (b - a)) = 2 * (a - b) by ring]
   exact rpow_mul_le_rpow_add_rpow_mul_sq (by positivity) (norm_nonneg _) a b
 
-/-- **The symbol product is integrable** for every Daubechies mask of order `N ≥ 2`: the crude
-growth bound `T^n 1 ≤ (2 C(2N - 1, N))^n` (`Daubechies.transferGrowth_crude`) and
-`log₄(2 C(2N - 1, N)) < N - 1/2` (`Daubechies.logb_four_two_mul_choose_lt`) give the case
-`a = 0` of `Daubechies.integrable_rpow_mul_norm`. -/
-theorem integrable_symbolProduct {N : ℕ} (m : Mask N) (hN : 2 ≤ N) :
+/-- **The symbol product is integrable under a growth bound**: if `T^n 1 ≤ C λ^n`
+(`Daubechies.TransferGrowth`) and `N - log₄ λ - 1/2 > 0`, then `Φ` is integrable. This is the case
+`a = 0` of the weighted bound `Daubechies.integrable_rpow_mul_norm`. -/
+theorem integrable_symbolProduct_of_growth {N : ℕ} (m : Mask N) {lam C : ℝ}
+    (hg : TransferGrowth N lam C) (hpos : 0 < N - Real.logb 4 lam - 1 / 2) :
     Integrable (symbolProduct m) := by
-  have h := integrable_rpow_mul_norm m (transferGrowth_crude N) (a := 0)
-    (by linarith [logb_four_two_mul_choose_lt hN])
+  have h := integrable_rpow_mul_norm m hg (a := 0) hpos
   simp only [Real.rpow_zero, one_mul] at h
   exact (integrable_norm_iff (continuous_symbolProduct m).aestronglyMeasurable).1 h
+
+/-- **The symbol product is integrable** for every Daubechies mask of order `N ≥ 2`: the crude
+growth bound `T^n 1 ≤ (2 C(2N - 1, N))^n` (`Daubechies.transferGrowth_crude`) satisfies
+`log₄(2 C(2N - 1, N)) < N - 1/2` (`Daubechies.logb_four_two_mul_choose_lt`), so
+`Daubechies.integrable_symbolProduct_of_growth` applies. -/
+theorem integrable_symbolProduct {N : ℕ} (m : Mask N) (hN : 2 ≤ N) :
+    Integrable (symbolProduct m) :=
+  integrable_symbolProduct_of_growth m (transferGrowth_crude N)
+    (by linarith [logb_four_two_mul_choose_lt hN])
 
 /-- **The symbol product is square integrable** for every Daubechies mask of order `N ≥ 2`: the
 case `s = 0` of `Daubechies.integrable_rpow_mul_normSq` with the crude growth bound, since

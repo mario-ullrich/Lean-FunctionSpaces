@@ -37,10 +37,13 @@ For `r = 1` and `a ≤ 1` this is the Hölder estimate `|φ(x) - φ(y)| ≤ K |x
   (`Real.norm_iterate_fwdDiff_fourierInv_le`).
 * **The uniform bound.** For `0 ≤ a ≤ r` and every step `h`,
   `|e^(2πihξ) - 1|^r ≤ (2π)^r |h|^a (1 + |ξ|)^a`
-  (`Daubechies.norm_exp_sub_one_pow_le_mul_rpow`), hence
+  (`Daubechies.norm_exp_sub_one_pow_le_mul_rpow`, in
+  `FunctionSpaces.Wavelets.Daubechies.SobolevRegularity`), hence
   `|Δ_h^r φ(x)| ≤ (2π)^r (∫ (1 + |ξ|)^a |Φ(ξ)| dξ) |h|^a`
   (`Daubechies.norm_higherDiff_scalingFun_le_mul_rpow`), where the integral is finite for
-  `a < N - log₄ λ - 1/2` (`Daubechies.integrable_rpow_mul_norm`).
+  `a < N - log₄ λ - 1/2` (`Daubechies.integrable_rpow_mul_norm`); its case `a = 0` is `Φ ∈ L¹`
+  (`Daubechies.integrable_symbolProduct_of_growth`, in
+  `FunctionSpaces.Wavelets.Daubechies.SymbolDecay`).
 * **Interpolation.** For `2 ≤ p < ∞`, `‖g‖_p ≤ ‖g‖_∞^(1 - 2/p) ‖g‖_2^(2/p)`
   (`Daubechies.eLpNorm_le_rpow_mul_rpow_of_eLpNorm_two_le`, from the project's
   `MeasureTheory.eLpNorm_le_rpow_mul_eLpNorm_rpow`). For differences with a uniform bound
@@ -90,17 +93,6 @@ theorem integrable_exp_mul (hF : Integrable F) (h : ℝ) :
     (Eventually.of_forall fun ξ => by
       rw [Daubechies.exp_two_pi_mul_I_eq, mul_comm, Complex.norm_exp_ofReal_mul_I])
 
-/-- For integrable `F : ℝ → ℂ`, every `r ∈ ℕ` and every `h ∈ ℝ`, the function
-`ξ ↦ (e^(2πihξ) - 1)^r F(ξ)` is integrable: the continuous factor is bounded by `2^r`
-(`Daubechies.norm_exp_sub_one_le_two`, Mathlib's `MeasureTheory.Integrable.bdd_mul`). -/
-theorem integrable_exp_sub_one_pow_mul (hF : Integrable F) (r : ℕ) (h : ℝ) :
-    Integrable (fun ξ : ℝ => (cexp (2 * π * h * ξ * I) - 1) ^ r * F ξ) := by
-  refine hF.bdd_mul (c := 2 ^ r)
-    (by fun_prop : Continuous fun ξ : ℝ => (cexp (2 * π * h * ξ * I) - 1) ^ r).aestronglyMeasurable
-    (Eventually.of_forall fun ξ => ?_)
-  rw [norm_pow]
-  exact pow_le_pow_left₀ (norm_nonneg _) (Daubechies.norm_exp_sub_one_le_two h ξ) r
-
 /-- **A difference of an inverse Fourier transform**: for integrable `F : ℝ → ℂ` and all
 `h, x ∈ ℝ`, `Δ_h (𝓕⁻ F)(x) = 𝓕⁻[ξ ↦ (e^(2πihξ) - 1) F(ξ)](x)`, where `Δ_h g = g(· + h) - g` is
 Mathlib's `fwdDiff h g`. The translate `𝓕⁻ F(x + h)` is the inverse transform of the modulated
@@ -147,41 +139,9 @@ end Real
 
 namespace Daubechies
 
-/-! ### The multiplier of a difference -/
-
-/-- **The multiplier bound in power form**: for real `a` and `r ∈ ℕ` with `0 ≤ a ≤ r`,
-`|e^(2πihξ) - 1|^r ≤ (2π)^r |h|^a (1 + |ξ|)^a` for all `h, ξ ∈ ℝ`. It follows from
-`|e^(2πihξ) - 1| ≤ 2π min(1, |hξ|)` (`Daubechies.norm_exp_sub_one_le_min`),
-`min(1, |hξ|)^r ≤ |hξ|^a` (`Daubechies.min_one_rpow_le_rpow`) and `|ξ| ≤ 1 + |ξ|`. The bound holds
-for every step `h`, small or large; its squared form, with the exponents `2r` and `2a`, is
-`Daubechies.norm_exp_sub_one_pow_le`. -/
-theorem norm_exp_sub_one_pow_le_mul_rpow {a : ℝ} {r : ℕ} (ha0 : 0 ≤ a) (har : a ≤ r)
-    (h ξ : ℝ) :
-    ‖cexp (2 * π * h * ξ * I) - 1‖ ^ r ≤ (2 * π) ^ r * (|h| ^ a * (1 + |ξ|) ^ a) := by
-  have h1 : min 1 |h * ξ| ^ r ≤ |h * ξ| ^ a := by
-    have := min_one_rpow_le_rpow (abs_nonneg (h * ξ)) ha0 har
-    rwa [Real.rpow_natCast] at this
-  have h2 : |h * ξ| ^ a ≤ |h| ^ a * (1 + |ξ|) ^ a := by
-    rw [abs_mul, Real.mul_rpow (abs_nonneg _) (abs_nonneg _)]
-    exact mul_le_mul_of_nonneg_left
-      (Real.rpow_le_rpow (abs_nonneg _) (by linarith) ha0) (by positivity)
-  calc ‖cexp (2 * π * h * ξ * I) - 1‖ ^ r ≤ (2 * π * min 1 |h * ξ|) ^ r :=
-        pow_le_pow_left₀ (norm_nonneg _) (norm_exp_sub_one_le_min h ξ) _
-    _ = (2 * π) ^ r * min 1 |h * ξ| ^ r := mul_pow _ _ _
-    _ ≤ _ := mul_le_mul_of_nonneg_left (h1.trans h2) (by positivity)
-
 /-! ### Pointwise bounds for the differences of the scaling function -/
 
 variable {N : ℕ} (m : Mask N)
-
-/-- **The symbol product is integrable under a growth bound**: if `T^n 1 ≤ C λ^n`
-(`Daubechies.TransferGrowth`) and `N - log₄ λ - 1/2 > 0`, then `Φ` is integrable. This is the case
-`a = 0` of the weighted bound `Daubechies.integrable_rpow_mul_norm`. -/
-theorem integrable_symbolProduct_of_growth {lam C : ℝ} (hg : TransferGrowth N lam C)
-    (hpos : 0 < N - Real.logb 4 lam - 1 / 2) : Integrable (symbolProduct m) := by
-  have h := integrable_rpow_mul_norm m hg (a := 0) hpos
-  simp only [Real.rpow_zero, one_mul] at h
-  exact (integrable_norm_iff (continuous_symbolProduct m).aestronglyMeasurable).1 h
 
 /-- **The differences of the scaling function as inverse Fourier transforms**: if the symbol
 product `Φ` is integrable, then `Δ_h^r φ(x) = 𝓕⁻[ξ ↦ (e^(2πihξ) - 1)^r Φ(ξ)](x)` for every

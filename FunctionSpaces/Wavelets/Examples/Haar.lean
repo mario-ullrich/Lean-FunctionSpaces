@@ -7,17 +7,19 @@ module
 
 public import FunctionSpaces.Wavelets.Filtration
 public import FunctionSpaces.Wavelets.Partition
+public import FunctionSpaces.Interval.PiecewisePoly
 public import ApproximationSpaces.Decompositions.Atomic
 public import Mathlib.MeasureTheory.Function.Floor
 public import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
 public import Mathlib.MeasureTheory.Function.ContinuousMapDense
 
 /-!
-# The Haar system on `[0, 1)`
+# The Haar system on `[0, 1]`
 
 The dyadic intervals of level `j` are `I_{j,n} = [n 2^(-j), (n + 1) 2^(-j))`, the fibres of
-`x ↦ ⌊2^j x⌋` (`Haar.dyadicInterval`).  They generate the dyadic σ-algebras `ℱ_j`, an increasing
-filtration of `ℝ` (`Haar.dyadicFiltration`), and on `[0, 1)` with Lebesgue measure the
+`x ↦ ⌊2^j x⌋` (`Haar.dyadicInterval`; for `n ∈ ℕ` this is `Interval.dyadicIco j n`).  They
+generate the dyadic σ-algebras `ℱ_j`, an increasing filtration of `ℝ` (`Haar.dyadicFiltration`),
+and on `[0, 1]` with Lebesgue measure (`Haar.vol`, which is `Interval.unitVol`) the
 conditional expectation `E[f | ℱ_j]` is the average of `f` over the dyadic interval of level `j`
 (`Haar.condExp_dyadic_ae_eq`, from the general formula `MeasureTheory.condExp_comap_ae_eq` for
 countable partitions).  The filtration scheme `MeasureTheory.Filtration.scheme` is then the
@@ -31,11 +33,11 @@ level (`Haar.condExpLp_succ_sub_ae_eq`):
 
 The Haar functions of one level have disjoint supports, so
 `‖∑_m c_m h_{j,m}‖_p = 2^(j(1/2 - 1/p)) ‖c‖_{ℓ_p}` (`Haar.eLpNorm_sum_haar`).  With the density
-of dyadic step functions in `L_p[0, 1)`, `p < ∞` (`Haar.closure_iUnion_scheme`), the
+of dyadic step functions in `L_p[0, 1]`, `p < ∞` (`Haar.closure_iUnion_scheme`), the
 martingale-difference characterisation of filtration schemes becomes the **Haar coefficient
 characterisation** (`Haar.memApprox_iff_haarCoeff`): for `s > 0`,
 
-`f ∈ A^s_q(L_p[0, 1), Haar)`  iff
+`f ∈ A^s_q(L_p[0, 1], Haar)`  iff
 `|∫ f| + ‖(2^(k(s + 1/2 - 1/p)) ‖(⟨f, h_{k,m}⟩)_m‖_{ℓ_p})_k‖_{ℓ_q} < ∞`.
 -/
 
@@ -46,12 +48,12 @@ open scoped ENNReal BoundedContinuousFunction
 
 namespace Haar
 
-/-- Lebesgue measure on `[0, 1)`, as a measure on `ℝ`. -/
-noncomputable abbrev vol : Measure ℝ := volume.restrict (Ico (0 : ℝ) 1)
+/-- Lebesgue measure on `[0, 1]`, as a measure on `ℝ` (`Interval.unitVol`). -/
+noncomputable abbrev vol : Measure ℝ := Interval.unitVol
 
-/-- `[0, 1)` has measure `1`. -/
+/-- `[0, 1]` has measure `1`. -/
 theorem vol_univ : vol univ = 1 := by
-  rw [Measure.restrict_apply_univ, Real.volume_Ico, sub_zero, ENNReal.ofReal_one]
+  rw [Measure.restrict_apply_univ, Real.volume_Icc, sub_zero, ENNReal.ofReal_one]
 
 /-- The index `⌊2^j x⌋` of the dyadic interval of level `j` containing `x`. -/
 noncomputable def dyadicIndex (j : ℕ) (x : ℝ) : ℤ := ⌊(2 : ℝ) ^ j * x⌋
@@ -80,6 +82,11 @@ theorem dyadicInterval_eq_Ico (j : ℕ) (n : ℤ) :
   rw [mem_dyadicInterval, dyadicIndex, Int.floor_eq_iff, mem_Ico, div_le_iff₀ h, lt_div_iff₀ h,
     mul_comm x]
 
+/-- For `n ∈ ℕ` the dyadic interval `I_{j,n}` is `Interval.dyadicIco j n`. -/
+theorem dyadicInterval_natCast (j n : ℕ) : dyadicInterval j n = Interval.dyadicIco j n := by
+  rw [dyadicInterval_eq_Ico, Int.cast_natCast]
+  rfl
+
 /-- Dyadic intervals of the same level with different indices are disjoint. -/
 theorem disjoint_dyadicInterval (j : ℕ) {n n' : ℤ} (h : n ≠ n') :
     Disjoint (dyadicInterval j n) (dyadicInterval j n') :=
@@ -95,23 +102,20 @@ theorem dyadicIndex_lt {j : ℕ} {x : ℝ} (hx : x ∈ Ico (0 : ℝ) 1) : dyadic
   push_cast
   exact mul_lt_of_lt_one_right (by positivity) hx.2
 
-/-- For `0 ≤ n < 2^j`, the dyadic interval `I_{j,n}` lies in `[0, 1)`. -/
+/-- For `0 ≤ n < 2^j`, the dyadic interval `I_{j,n}` lies in `[0, 1)`
+(`Interval.dyadicIco_subset`). -/
 theorem dyadicInterval_subset {j : ℕ} {n : ℤ} (h0 : 0 ≤ n) (h1 : n < 2 ^ j) :
     dyadicInterval j n ⊆ Ico 0 1 := by
-  intro x hx
-  rw [dyadicInterval_eq_Ico, mem_Ico] at hx
-  have h : (0 : ℝ) < 2 ^ j := by positivity
-  have h0' : (0 : ℝ) ≤ n := by exact_mod_cast h0
-  have h1' : (n : ℝ) + 1 ≤ 2 ^ j := by exact_mod_cast (Int.add_one_le_iff.2 h1)
-  refine ⟨le_trans (div_nonneg h0' h.le) hx.1, lt_of_lt_of_le hx.2 ?_⟩
-  rw [div_le_one h]
-  exact h1'
+  lift n to ℕ using h0
+  rw [dyadicInterval_natCast]
+  exact Interval.dyadicIco_subset (by exact_mod_cast h1)
 
 /-- `|I_{j,n}| = 2^(-j)` for `0 ≤ n < 2^j`. -/
 theorem vol_real_dyadicInterval {j : ℕ} {n : ℤ} (h0 : 0 ≤ n) (h1 : n < 2 ^ j) :
     vol.real (dyadicInterval j n) = ((2 : ℝ) ^ j)⁻¹ := by
   rw [measureReal_def, Measure.restrict_apply (measurableSet_dyadicInterval j n),
-    inter_eq_left.2 (dyadicInterval_subset h0 h1), dyadicInterval_eq_Ico, Real.volume_Ico,
+    inter_eq_left.2 ((dyadicInterval_subset h0 h1).trans Ico_subset_Icc_self),
+    dyadicInterval_eq_Ico, Real.volume_Ico,
     show ((n : ℝ) + 1) / 2 ^ j - n / 2 ^ j = ((2 : ℝ) ^ j)⁻¹ by
       rw [← sub_div, add_sub_cancel_left, one_div],
     ENNReal.toReal_ofReal (by positivity)]
@@ -163,7 +167,7 @@ noncomputable def dyadicFiltration : Filtration ℕ Real.measurableSpace where
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 variable (p) in
-/-- The **Haar scheme** in `L_p[0, 1)`: the approximants of complexity `2^j` are the step
+/-- The **Haar scheme** in `L_p[0, 1]`: the approximants of complexity `2^j` are the step
 functions on the dyadic intervals of level `j`. -/
 noncomputable abbrev scheme : ApproximationScheme (Lp ℂ p vol) := dyadicFiltration.scheme p vol
 
@@ -174,11 +178,11 @@ theorem condExp_dyadic_ae_eq (j : ℕ) {f : ℝ → ℂ} (hf : Integrable f vol)
       fun x => ((2 : ℝ) ^ j) • ∫ y in dyadicInterval j (dyadicIndex j x), f y ∂vol := by
   show vol[f | MeasurableSpace.comap (dyadicIndex j) ⊤] =ᵐ[vol] _
   filter_upwards [condExp_comap_ae_eq (φ := dyadicIndex j) (measurableSet_dyadicInterval j) hf,
-    ae_restrict_mem measurableSet_Ico] with x hx hx01
+    Interval.ae_mem_Ico_unitVol] with x hx hx01
   rw [hx, show dyadicIndex j ⁻¹' {dyadicIndex j x} = dyadicInterval j (dyadicIndex j x) from rfl,
     vol_real_dyadicInterval (dyadicIndex_nonneg hx01) (dyadicIndex_lt hx01), inv_inv]
 
-/-- `E[f | ℱ_j]` on `L_p[0, 1)` is the average over the dyadic interval of level `j`. -/
+/-- `E[f | ℱ_j]` on `L_p[0, 1]` is the average over the dyadic interval of level `j`. -/
 theorem condExpLp_dyadic_ae_eq (j : ℕ) (f : Lp ℂ p vol) :
     Lp.condExpLp (dyadicFiltration j) f =ᵐ[vol]
       fun x => ((2 : ℝ) ^ j) • ∫ y in dyadicInterval j (dyadicIndex j x), f y ∂vol :=
@@ -187,7 +191,7 @@ theorem condExpLp_dyadic_ae_eq (j : ℕ) (f : Lp ℂ p vol) :
 /-- `E[f | ℱ_0] = ∫_0^1 f`, a constant. -/
 theorem condExpLp_zero_ae_eq (f : Lp ℂ p vol) :
     Lp.condExpLp (dyadicFiltration 0) f =ᵐ[vol] fun _ => ∫ x, f x ∂vol := by
-  filter_upwards [condExpLp_dyadic_ae_eq 0 f, ae_restrict_mem measurableSet_Ico] with x h hx
+  filter_upwards [condExpLp_dyadic_ae_eq 0 f, Interval.ae_mem_Ico_unitVol] with x h hx
   have h0 : dyadicIndex 0 x = 0 := by
     have h1 := dyadicIndex_nonneg (j := 0) hx
     have h2 := dyadicIndex_lt (j := 0) hx
@@ -195,7 +199,7 @@ theorem condExpLp_zero_ae_eq (f : Lp ℂ p vol) :
     omega
   rw [h, pow_zero, one_smul, h0,
     show dyadicInterval 0 0 = Ico 0 1 by rw [dyadicInterval_eq_Ico]; norm_num,
-    Measure.restrict_restrict measurableSet_Ico, inter_self]
+    Measure.restrict_eq_self_of_ae_mem Interval.ae_mem_Ico_unitVol]
 
 /-- `‖E[f | ℱ_0]‖_p = |∫_0^1 f|`. -/
 theorem enorm_condExpLp_zero (f : Lp ℂ p vol) :
@@ -263,7 +267,7 @@ theorem haarFunction_mul (j : ℕ) (m : ℤ) (f : ℝ → ℂ) (x : ℝ) :
       indicator_of_notMem (mem_dyadicInterval.not.2 h2)]
     simp
 
-/-- The **Haar coefficient** `⟨f, h_{j,m}⟩ = ∫ h_{j,m} f` of `f` on `[0, 1)`. -/
+/-- The **Haar coefficient** `⟨f, h_{j,m}⟩ = ∫ h_{j,m} f` of `f` on `[0, 1]`. -/
 noncomputable def haarCoeff (f : ℝ → ℂ) (j : ℕ) (m : ℤ) : ℂ :=
   ∫ x, (haarFunction j m x : ℂ) * f x ∂vol
 
@@ -295,7 +299,7 @@ theorem condExpLp_succ_sub_ae_eq (k : ℕ) (f : Lp ℂ p vol) :
   have hf := (Lp.memLp f).integrable (Fact.out : 1 ≤ p)
   filter_upwards [Lp.coeFn_sub (Lp.condExpLp (dyadicFiltration (k + 1)) f)
       (Lp.condExpLp (dyadicFiltration k) f), condExpLp_dyadic_ae_eq (k + 1) f,
-    condExpLp_dyadic_ae_eq k f, ae_restrict_mem measurableSet_Ico] with x h1 h2 h3 hx
+    condExpLp_dyadic_ae_eq k f, Interval.ae_mem_Ico_unitVol] with x h1 h2 h3 hx
   rw [h1, Pi.sub_apply, h2, h3,
     sum_fin_eq_of_ne hx (fun m => haarCoeff f k m * (haarFunction k m x : ℂ))
       fun m hm => by rw [haarFunction_eq_zero (Ne.symm hm), Complex.ofReal_zero, mul_zero],
@@ -344,7 +348,7 @@ theorem eLpNorm_sum_haar (hp : p ≠ ∞) (j : ℕ) (c : Fin (2 ^ j) → ℂ) :
   have hpt : ∀ᵐ x ∂vol, ‖∑ m : Fin (2 ^ j), c m * (haarFunction j ((m : ℕ) : ℤ) x : ℂ)‖ₑ ^ r =
       ∑ m : Fin (2 ^ j), (dyadicInterval j ((m : ℕ) : ℤ)).indicator
         (fun _ => ‖c m‖ₑ ^ r * ENNReal.dyadicWeight (1 / 2 * r) j) x := by
-    filter_upwards [ae_restrict_mem measurableSet_Ico] with x hx
+    filter_upwards [Interval.ae_mem_Ico_unitVol] with x hx
     simp_rw [← hC]
     rw [sum_fin_eq_of_ne hx (fun m => C m * (haarFunction j m x : ℂ))
         fun m hm => by rw [haarFunction_eq_zero (Ne.symm hm), Complex.ofReal_zero, mul_zero],
@@ -408,7 +412,7 @@ theorem exists_norm_sub_stepFun_le {g : ℝ → ℂ} (hg : Continuous g) {ε : �
   rw [← dist_eq_norm]
   exact (hgδ x (Ico_subset_Icc_self hx) _ hy hdist).le
 
-/-- **Bounded continuous functions are limits of dyadic step functions** in `L_p[0, 1)`, even
+/-- **Bounded continuous functions are limits of dyadic step functions** in `L_p[0, 1]`, even
 uniformly on `[0, 1)`: they lie in the closure of the Haar approximants. -/
 theorem toLp_mem_closure (g : ℝ →ᵇ ℂ) :
     BoundedContinuousFunction.toLp (E := ℂ) p vol ℝ g ∈ closure (⋃ n, scheme p n) := by
@@ -427,14 +431,14 @@ theorem toLp_mem_closure (g : ℝ →ᵇ ℂ) :
   · rw [dist_eq_norm, Lp.norm_def, eLpNorm_congr_ae ((Lp.coeFn_sub _ _).trans
       ((BoundedContinuousFunction.coeFn_toLp p vol ℝ g).sub (MemLp.coeFn_toLp hmem)))]
     have hb := eLpNorm_le_of_ae_bound (p := p) (g.continuous.aestronglyMeasurable.sub hmeas)
-      (C := ε / 2) (by filter_upwards [ae_restrict_mem measurableSet_Ico] with x hx using hj x hx)
+      (C := ε / 2) (by filter_upwards [Interval.ae_mem_Ico_unitVol] with x hx using hj x hx)
     rw [vol_univ, ENNReal.one_rpow, one_mul] at hb
     calc (eLpNorm (⇑g - stepFun g j) p vol).toReal ≤ (ENNReal.ofReal (ε / 2)).toReal :=
           ENNReal.toReal_mono ENNReal.ofReal_ne_top hb
       _ = ε / 2 := ENNReal.toReal_ofReal (by positivity)
       _ < ε := half_lt_self hε
 
-/-- **The Haar approximants are dense** in `L_p[0, 1)` for `1 ≤ p < ∞`. -/
+/-- **The Haar approximants are dense** in `L_p[0, 1]` for `1 ≤ p < ∞`. -/
 theorem closure_iUnion_scheme (hp : p ≠ ∞) : closure (⋃ n, scheme p n) = univ := by
   have hsub : range (BoundedContinuousFunction.toLp (E := ℂ) p vol ℝ) ⊆
       closure (⋃ n, scheme p n) := by
@@ -445,10 +449,10 @@ theorem closure_iUnion_scheme (hp : p ≠ ∞) : closure (⋃ n, scheme p n) = u
   exact eq_univ_of_univ_subset h
 
 /-- **Haar coefficient characterisation**: for `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, `f` lies in
-the approximation space `A^s_q(L_p[0, 1), Haar)` iff
+the approximation space `A^s_q(L_p[0, 1], Haar)` iff
 `|∫_0^1 f| + ‖(2^(k(s + 1/2 - 1/p)) ‖(⟨f, h_{k,m}⟩)_{m < 2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`.
 
-For `0 < s < 1/p` this space is the classical Besov space `B^s_{p,q}[0, 1)`; for larger `s` it is
+For `0 < s < 1/p` this space is the classical Besov space `B^s_{p,q}[0, 1]`; for larger `s` it is
 strictly smaller, since the Haar functions themselves are discontinuous.  That comparison is not
 formalised here. -/
 theorem memApprox_iff_haarCoeff (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)

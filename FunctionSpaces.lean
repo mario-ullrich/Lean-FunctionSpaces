@@ -832,7 +832,7 @@ and the theorems that their characterisations agree. The library builds on
   their approximation spaces by martingale differences.
 * `FunctionSpaces.Wavelets.Partition`: the conditional expectation onto the σ-algebra of a
   countable partition is the average over the cells.
-* `FunctionSpaces.Wavelets.Examples.Haar`: the Haar system on `[0, 1)` and the characterisation
+* `FunctionSpaces.Wavelets.Examples.Haar`: the Haar system on `[0, 1]` and the characterisation
   of its approximation spaces by Haar coefficients.
 * `FunctionSpaces.Wavelets.Examples.HaarBesov`: the Haar scheme as the scheme of piecewise
   constants, and Besov spaces on the interval and the circle through Haar coefficients for

@@ -179,7 +179,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   and `0 ≤ s < 1/p` (`Cube.memApprox_cubePPScheme_iff_iso`).
 * **The Haar system.** Let `h_{k,m} = 2^(k/2) (1_{[2m, 2m+1) 2^(-k-1)} - 1_{[2m+1, 2m+2) 2^(-k-1)})`
   be the Haar functions on `[0, 1)` and `A_n` the step functions on the dyadic intervals of
-  length `2^(-⌊log₂ n⌋)`. For `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q(L_p[0, 1))` iff
+  length `2^(-⌊log₂ n⌋)`. For `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q(L_p[0, 1])` iff
   `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
   (`Haar.memApprox_iff_haarCoeff`).
 * **Daubechies wavelets and Besov spaces.** For a mask of order `N ≥ 2` with filter coefficients

@@ -372,9 +372,17 @@ theorem eLpNorm_comp_two_pow_mul_sub {F : ℝ → ℂ} (hF : AEStronglyMeasurabl
     ← ENNReal.inv_rpow, abs_of_pos (by positivity), ENNReal.ofReal_inv_of_pos (by positivity),
     ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat, ENNReal.toReal_div, ENNReal.toReal_one]
 
+/-- **The normalising factor in extended norm**: `‖2^(j/2)‖ = 2^(j/2)`, written
+`dyadicWeight (1/2) j`. -/
+theorem enorm_two_rpow_half (j : ℕ) :
+    ‖(((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ)‖ₑ = dyadicWeight (1 / 2) j := by
+  rw [← ofReal_norm, Complex.norm_real, Real.norm_of_nonneg (by positivity),
+    ← ENNReal.ofReal_rpow_of_pos two_pos, ENNReal.ofReal_ofNat, dyadicWeight, mul_one_div]
+
 /-- **`L_p` norms of the generators**: for every a.e. strongly measurable `g`, every level `j`,
 position `k` and exponent `p`, `‖g_{j,k}‖_p = 2^(j(1/2 - 1/p)) ‖g‖_p`
-(`Daubechies.eLpNorm_comp_two_pow_mul_sub` and the factor `2^(j/2)`). In particular
+(`Daubechies.eLpNorm_comp_two_pow_mul_sub` and the factor `2^(j/2)`,
+`Daubechies.enorm_two_rpow_half`). In particular
 `‖g_{j,k}‖_2 = ‖g‖_2`. -/
 theorem eLpNorm_scaledFun (hg : AEStronglyMeasurable g volume) (j : ℕ) (k : ℤ) (p : ℝ≥0∞) :
     eLpNorm (scaledFun g j k) p volume =
@@ -384,8 +392,7 @@ theorem eLpNorm_scaledFun (hg : AEStronglyMeasurable g volume) (j : ℕ) (k : �
   rw [h, eLpNorm_const_smul, eLpNorm_comp_two_pow_mul_sub hg, ← mul_assoc, sub_eq_add_neg,
     ENNReal.dyadicWeight_add]
   congr 2
-  rw [← ofReal_norm, Complex.norm_real, Real.norm_of_nonneg (by positivity),
-    ← ENNReal.ofReal_rpow_of_pos two_pos, ENNReal.ofReal_ofNat, dyadicWeight, mul_one_div]
+  exact enorm_two_rpow_half j
 
 /-- **`L_p` norm of a multiple of a generator**: `‖z g_{j,k}‖_p = |z| 2^(j(1/2 - 1/p)) ‖g‖_p` for
 every `z ∈ ℂ` (`Daubechies.eLpNorm_scaledFun`). -/

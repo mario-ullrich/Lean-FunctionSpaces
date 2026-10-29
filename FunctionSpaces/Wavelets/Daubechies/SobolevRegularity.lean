@@ -34,9 +34,11 @@ be any number in `[0, N - log₄ λ)`, these bounds express the Sobolev regulari
   (`Real.fourier_iterate_fwdDiff_apply`).
 * **The multiplier.** The elementary bounds `|e^(iθ) - 1| ≤ 2` and `|e^(iθ) - 1| ≤ |θ|` for real
   `θ` give `|e^(2πihξ) - 1| ≤ 2π min(1, |hξ|)` (`Daubechies.norm_exp_sub_one_le_min`). Since
-  `min(1, x)^(2r) ≤ x^(2s)` for `x ≥ 0` and `0 ≤ s ≤ r` (`Daubechies.min_one_rpow_le_rpow`), the
-  power form is `|e^(2πihξ) - 1|^(2r) ≤ (2π)^(2r) |h|^(2s) (1 + |ξ|)^(2s)` for all `h, ξ ∈ ℝ`
-  (`Daubechies.norm_exp_sub_one_pow_le`).
+  `min(1, x)^r ≤ x^a` for `x ≥ 0` and `0 ≤ a ≤ r` (`Daubechies.min_one_rpow_le_rpow`), the
+  power form is `|e^(2πihξ) - 1|^r ≤ (2π)^r |h|^a (1 + |ξ|)^a` for all `h, ξ ∈ ℝ`
+  (`Daubechies.norm_exp_sub_one_pow_le_mul_rpow`), used here with the exponents `2s ≤ 2r`
+  (`Daubechies.norm_exp_sub_one_pow_le`). The factor is bounded by `2^r`, so
+  `(e^(2πihξ) - 1)^r F(ξ)` is integrable with `F` (`Real.integrable_exp_sub_one_pow_mul`).
 * **Parseval's identity for the differences of `φ`.** The scaling function is continuous and
   integrable with `𝓕 φ = Φ`, so `Δ_h^r φ` is continuous and integrable with the integrable
   transform `(e^(2πihξ) - 1)^r Φ(ξ)` (`Daubechies.fourier_higherDiff_scalingFun`,
@@ -146,26 +148,54 @@ theorem min_one_rpow_le_rpow {x a b : ℝ} (hx : 0 ≤ x) (ha : 0 ≤ a) (hab : 
   · rw [min_eq_left hx1, Real.one_rpow]
     exact Real.one_le_rpow hx1 ha
 
-/-- **The power form of the multiplier bound**: for real `s` and `r ∈ ℕ` with `0 ≤ s ≤ r`,
-`|e^(2πihξ) - 1|^(2r) ≤ (2π)^(2r) |h|^(2s) (1 + |ξ|)^(2s)` for all `h, ξ ∈ ℝ`. It follows from
-`Daubechies.norm_exp_sub_one_le_min`, `min(1, |hξ|)^(2r) ≤ |hξ|^(2s)`
-(`Daubechies.min_one_rpow_le_rpow`) and `|ξ| ≤ 1 + |ξ|`. The exponent `s` trades the factor
-`|h|^(2s)` for the weight `(1 + |ξ|)^(2s)` on the Fourier side. -/
-theorem norm_exp_sub_one_pow_le {s : ℝ} {r : ℕ} (hs0 : 0 ≤ s) (hsr : s ≤ r) (h ξ : ℝ) :
-    ‖cexp (2 * π * h * ξ * I) - 1‖ ^ (2 * r) ≤
-      (2 * π) ^ (2 * r) * (|h| ^ (2 * s) * (1 + |ξ|) ^ (2 * s)) := by
-  have h1 : min 1 |h * ξ| ^ (2 * r) ≤ |h * ξ| ^ (2 * s) := by
-    have := min_one_rpow_le_rpow (abs_nonneg (h * ξ)) (by positivity : (0 : ℝ) ≤ 2 * s)
-      (show 2 * s ≤ ((2 * r : ℕ) : ℝ) by push_cast; linarith)
+/-- **The multiplier bound in power form**: for real `a` and `r ∈ ℕ` with `0 ≤ a ≤ r`,
+`|e^(2πihξ) - 1|^r ≤ (2π)^r |h|^a (1 + |ξ|)^a` for all `h, ξ ∈ ℝ`. It follows from
+`|e^(2πihξ) - 1| ≤ 2π min(1, |hξ|)` (`Daubechies.norm_exp_sub_one_le_min`),
+`min(1, |hξ|)^r ≤ |hξ|^a` (`Daubechies.min_one_rpow_le_rpow`) and `|ξ| ≤ 1 + |ξ|`. The bound holds
+for every step `h`, small or large; its squared form, with the exponents `2r` and `2a`, is
+`Daubechies.norm_exp_sub_one_pow_le`. -/
+theorem norm_exp_sub_one_pow_le_mul_rpow {a : ℝ} {r : ℕ} (ha0 : 0 ≤ a) (har : a ≤ r)
+    (h ξ : ℝ) :
+    ‖cexp (2 * π * h * ξ * I) - 1‖ ^ r ≤ (2 * π) ^ r * (|h| ^ a * (1 + |ξ|) ^ a) := by
+  have h1 : min 1 |h * ξ| ^ r ≤ |h * ξ| ^ a := by
+    have := min_one_rpow_le_rpow (abs_nonneg (h * ξ)) ha0 har
     rwa [Real.rpow_natCast] at this
-  have h2 : |h * ξ| ^ (2 * s) ≤ |h| ^ (2 * s) * (1 + |ξ|) ^ (2 * s) := by
+  have h2 : |h * ξ| ^ a ≤ |h| ^ a * (1 + |ξ|) ^ a := by
     rw [abs_mul, Real.mul_rpow (abs_nonneg _) (abs_nonneg _)]
     exact mul_le_mul_of_nonneg_left
-      (Real.rpow_le_rpow (abs_nonneg _) (by linarith) (by positivity)) (by positivity)
-  calc ‖cexp (2 * π * h * ξ * I) - 1‖ ^ (2 * r) ≤ (2 * π * min 1 |h * ξ|) ^ (2 * r) :=
+      (Real.rpow_le_rpow (abs_nonneg _) (by linarith) ha0) (by positivity)
+  calc ‖cexp (2 * π * h * ξ * I) - 1‖ ^ r ≤ (2 * π * min 1 |h * ξ|) ^ r :=
         pow_le_pow_left₀ (norm_nonneg _) (norm_exp_sub_one_le_min h ξ) _
-    _ = (2 * π) ^ (2 * r) * min 1 |h * ξ| ^ (2 * r) := mul_pow _ _ _
+    _ = (2 * π) ^ r * min 1 |h * ξ| ^ r := mul_pow _ _ _
     _ ≤ _ := mul_le_mul_of_nonneg_left (h1.trans h2) (by positivity)
+
+/-- **The power form of the multiplier bound**: for real `s` and `r ∈ ℕ` with `0 ≤ s ≤ r`,
+`|e^(2πihξ) - 1|^(2r) ≤ (2π)^(2r) |h|^(2s) (1 + |ξ|)^(2s)` for all `h, ξ ∈ ℝ`: the case of the
+exponents `2s ≤ 2r` of `Daubechies.norm_exp_sub_one_pow_le_mul_rpow`. The exponent `s` trades the
+factor `|h|^(2s)` for the weight `(1 + |ξ|)^(2s)` on the Fourier side. -/
+theorem norm_exp_sub_one_pow_le {s : ℝ} {r : ℕ} (hs0 : 0 ≤ s) (hsr : s ≤ r) (h ξ : ℝ) :
+    ‖cexp (2 * π * h * ξ * I) - 1‖ ^ (2 * r) ≤
+      (2 * π) ^ (2 * r) * (|h| ^ (2 * s) * (1 + |ξ|) ^ (2 * s)) :=
+  norm_exp_sub_one_pow_le_mul_rpow (by linarith) (by push_cast; linarith) h ξ
+
+end Daubechies
+
+namespace Real
+
+/-- For integrable `F : ℝ → ℂ`, every `r ∈ ℕ` and every `h ∈ ℝ`, the function
+`ξ ↦ (e^(2πihξ) - 1)^r F(ξ)` is integrable: the continuous factor is bounded by `2^r`
+(`Daubechies.norm_exp_sub_one_le_two`, Mathlib's `MeasureTheory.Integrable.bdd_mul`). -/
+theorem integrable_exp_sub_one_pow_mul {F : ℝ → ℂ} (hF : Integrable F) (r : ℕ)
+    (h : ℝ) : Integrable (fun ξ : ℝ => (cexp (2 * π * h * ξ * I) - 1) ^ r * F ξ) := by
+  refine hF.bdd_mul (c := 2 ^ r)
+    (by fun_prop : Continuous fun ξ : ℝ => (cexp (2 * π * h * ξ * I) - 1) ^ r).aestronglyMeasurable
+    (Filter.Eventually.of_forall fun ξ => ?_)
+  rw [norm_pow]
+  exact pow_le_pow_left₀ (norm_nonneg _) (Daubechies.norm_exp_sub_one_le_two h ξ) r
+
+end Real
+
+namespace Daubechies
 
 /-! ### Continuity and `L_p` norms of differences -/
 
@@ -212,16 +242,11 @@ theorem fourier_higherDiff_scalingFun (hN : 2 ≤ N) (r : ℕ) (h ξ : ℝ) :
 
 /-- For `N ≥ 2` the Fourier transform `ξ ↦ (e^(2πihξ) - 1)^r Φ(ξ)` of `Δ_h^r φ`
 (`Daubechies.fourier_higherDiff_scalingFun`) is integrable: `Φ` is integrable
-(`Daubechies.integrable_symbolProduct`) and the continuous factor is bounded by `2^r`
-(`Daubechies.norm_exp_sub_one_le_two`, Mathlib's `MeasureTheory.Integrable.bdd_mul`). -/
+(`Daubechies.integrable_symbolProduct`, `Real.integrable_exp_sub_one_pow_mul`). -/
 theorem integrable_fourier_higherDiff_scalingFun (hN : 2 ≤ N) (r : ℕ) (h : ℝ) :
     Integrable (𝓕 ((fwdDiff h)^[r] (scalingFun m))) := by
   rw [funext (fourier_higherDiff_scalingFun m hN r h)]
-  refine (integrable_symbolProduct m hN).bdd_mul (c := 2 ^ r)
-    (by fun_prop : Continuous fun ξ : ℝ => (cexp (2 * π * h * ξ * I) - 1) ^ r).aestronglyMeasurable
-    (Filter.Eventually.of_forall fun ξ => ?_)
-  rw [norm_pow]
-  exact pow_le_pow_left₀ (norm_nonneg _) (norm_exp_sub_one_le_two h ξ) r
+  exact Real.integrable_exp_sub_one_pow_mul (integrable_symbolProduct m hN) r h
 
 /-- **Parseval's identity for the differences of the scaling function**: for `N ≥ 2`,
 `∫ |Δ_h^r φ(x)|² dx = ∫ |e^(2πihξ) - 1|^(2r) |Φ(ξ)|² dξ` for every `r ∈ ℕ` and every `h ∈ ℝ`.

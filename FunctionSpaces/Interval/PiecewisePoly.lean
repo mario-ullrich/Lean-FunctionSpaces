@@ -26,7 +26,8 @@ polynomial is the polynomial `Q_m`, and `0` beyond `[0, 1)`, `Interval.ppFun_eq_
 for integrals over unions of dyadic intervals (`Interval.lintegral_Icc_le_sum`,
 `Interval.lintegral_Icc_le_sum_dyadicIco`, `Interval.lintegral_unit_eq_sum_dyadicIco`); a dyadic
 interval is the disjoint union of its two halves (`Interval.dyadicIco_eq_union`,
-`Interval.disjoint_dyadicIco_halves`).
+`Interval.disjoint_dyadicIco_halves`). A piecewise polynomial is bounded
+(`Interval.exists_norm_ppFun_le`) and integrable on `[0, 1]` (`Interval.integrableOn_ppFun`).
 Jackson's inequality is in `FunctionSpaces.Interval.PiecewiseJackson`, the inverse inequality and
 the identification of the approximation spaces in `FunctionSpaces.Interval.PiecewiseInverse`.
 -/
@@ -164,6 +165,26 @@ theorem ppFun_eq_zero {k : ℕ} (Q : ℕ → ℂ[X]) {x : ℝ} (hx : x ∉ Ico (
     ppFun k Q x = 0 :=
   Finset.sum_eq_zero fun _ hn =>
     indicator_of_notMem (fun h => hx (dyadicIco_subset (Finset.mem_range.1 hn) h)) _
+
+/-- **Piecewise polynomials are bounded**: for every level `k` and pieces `Q` there is `M` with
+`‖ppFun k Q x‖ ≤ M` for all `x ∈ ℝ`, since each piece is a polynomial on a subinterval of the
+compact interval `[0, 1]`. -/
+theorem exists_norm_ppFun_le (k : ℕ) (Q : ℕ → ℂ[X]) : ∃ M : ℝ, ∀ x, ‖ppFun k Q x‖ ≤ M := by
+  choose M hM using fun n : ℕ =>
+    (isCompact_Icc (a := (0 : ℝ)) (b := 1)).exists_bound_of_continuousOn
+      (continuous_polyFun (Q n)).continuousOn
+  refine ⟨∑ n ∈ Finset.range (2 ^ k), M n, fun x => ?_⟩
+  rw [ppFun]
+  refine (norm_sum_le _ _).trans (Finset.sum_le_sum fun n hn => ?_)
+  by_cases hx : x ∈ dyadicIco k n
+  · rw [indicator_of_mem hx]
+    exact hM n x (Ico_subset_Icc_self (dyadicIco_subset (Finset.mem_range.1 hn) hx))
+  · rw [indicator_of_notMem hx, norm_zero]
+    exact (norm_nonneg _).trans (hM n 0 ⟨le_rfl, zero_le_one⟩)
+
+/-- Piecewise polynomials are integrable on `[0, 1]`. -/
+theorem integrableOn_ppFun (k : ℕ) (Q : ℕ → ℂ[X]) : IntegrableOn (ppFun k Q) (Icc (0 : ℝ) 1) :=
+  memLp_one_iff_integrable.1 (memLp_ppFun k Q 1)
 
 /-- **Refinement of piecewise polynomials, everywhere**: the pieces `Q_{⌊n/2⌋}` of level `k + 1`
 give the same function as the pieces `Q_n` of level `k`, on all of `ℝ`. -/
