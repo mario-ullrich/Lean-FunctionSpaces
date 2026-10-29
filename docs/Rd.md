@@ -132,7 +132,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Besov spaces on `ℝ^d` as interpolation spaces, by approximation, differences and Littlewood–Paley blocks | ✅ | ✗ | `Rd/Interpolation/BesovInterpolation` |
 | Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences, sets equal up to null sets, the intrinsic quasi-norm | ✅ | ✗ | `Rd/Differences/DomainModuli` |
 | Moment kernels: finite `L_1` norm, the vanishing moments of their coefficients, averaged differences, approximation with the modulus, also on subsets, vanishing first moments of the moment kernels of order two | ✅ | ✗ | `Rd/Differences/MomentKernels` |
-| Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L` | ✅ | ✗ | `Rd/LocalMeans/LocalMeans` |
+| Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L`, bumps from smooth bump functions | ✅ | ✗ | `Rd/LocalMeans/LocalMeans` |
 | Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/LocalMeans/KernelMajorants` |
 | Pointwise multipliers on `ℝ^d`: bounded derivatives on compact sets, the multiplication operator on `L_p`, Leibniz's rule for differences, moduli of lower order | ✅ | ✗ | `Rd/LocalMeans/Multipliers` |
 | Atomic synthesis: bounded overlap, regular atoms on sets, coefficient quasi-norm | ✅ | ✗ | `Rd/Atoms/AtomSynthesis` |
@@ -140,7 +140,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Differences within convex sets through derivatives within the set | ✅ | ✗ | `Rd/Atoms/ConvexDifferences` |
 | Smooth atoms on convex sets, smooth cell atoms of every order | ✅ | ✗ | `Rd/Atoms/SmoothAtoms` |
 | Smooth atoms under smooth changes of variables with a cut-off | ✅ | ✗ | `Rd/Atoms/AtomComposition` |
-| Invariance of Besov spaces under changes of variables, Besov domains | ✅ | ✗ | `Rd/Atoms/DiffeoInvariance` |
+| Invariance of Besov spaces under changes of variables, the extension property, Besov domains | ✅ | ✗ | `Rd/Atoms/DiffeoInvariance` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

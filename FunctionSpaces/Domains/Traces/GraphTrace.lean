@@ -410,11 +410,9 @@ K (‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})`. -
 theorem modNorm_trace_le (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞}
     (hq : 1 ≤ q) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖Ω.cutoff f‖ₑ + lqNorm q (fun k =>
-          dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p Ω.domain L f k) < ∞ →
+      modNormOn Ω.measurableSet_domain L (s + 1 / p.toReal) q f < ∞ →
       ‖Ω.trace hp L f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 (Ω.trace hp L f) k) ≤
-        K * (‖Ω.cutoff f‖ₑ + lqNorm q (fun k =>
-          dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p Ω.domain L f k)) := by
+        K * modNormOn Ω.measurableSet_domain L (s + 1 / p.toReal) q f := by
   obtain ⟨K, hK, hle⟩ := Ω.modNorm_traceSeries_le Ω.coneBump hp L hs hs1 hq
   refine ⟨K * Ω.intrinsicConst L, ENNReal.mul_ne_top hK (Ω.intrinsicConst_ne_top L),
     fun f hf => ?_⟩
@@ -502,8 +500,7 @@ and a finite intrinsic `B^{s+1/p}_{p,q}`-norm on `Ω`, then `Tr f = G ∘ γ` al
 (`Rd.conv_dilate_near`, twice), and a subsequence converges almost everywhere to `Tr f`. -/
 theorem trace_ae_eq_comp_graphMap (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
     {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
-    (hf : ‖Ω.cutoff f‖ₑ + lqNorm q (fun k =>
-      dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p Ω.domain L f k) < ∞)
+    (hf : modNormOn Ω.measurableSet_domain L (s + 1 / p.toReal) q f < ∞)
     {G : V → ℂ} (hG : Continuous G) (hfG : (f : V → ℂ) =ᵐ[volume] G) :
     Ω.trace hp L f =ᵐ[volume] G ∘ Ω.graphMap := by
   obtain ⟨ns, hns, hae⟩ := Ω.exists_subseq_tendsto_trace hp L hs hq
@@ -606,8 +603,7 @@ theorem trace_smul (hp : p ≠ ∞) (L : ℕ) (c : ℂ) (f : Lp ℂ p (volume : 
 moduli on `Ω`. -/
 theorem enorm_trace_le_modNormOn (hp : p ≠ ∞) (L : ℕ) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖Ω.trace hp L f‖ₑ ≤ K * (‖Ω.cutoff f‖ₑ + lqNorm 1 (fun k =>
-        dyadicWeight (1 / p.toReal) k * lpModulusOn p Ω.domain L f k)) := by
+      ‖Ω.trace hp L f‖ₑ ≤ K * modNormOn Ω.measurableSet_domain L (1 / p.toReal) 1 f := by
   obtain ⟨K, hK, hle⟩ := Ω.eLpNorm_traceFun_le Ω.coneBump Fact.out hp L
   refine ⟨K * Ω.intrinsicConst L, ENNReal.mul_ne_top hK (Ω.intrinsicConst_ne_top L),
     fun f => ?_⟩
@@ -620,9 +616,8 @@ theorem enorm_trace_le_modNormOn (hp : p ≠ ∞) (L : ℕ) :
           refine (hle j (Lp.memLp _)).trans ?_
           rw [← Lp.enorm_def, mul_assoc]
     _ = K * Ω.intrinsicNorm hp L (1 / p.toReal) 1 f := by
-        rw [ENNReal.tsum_mul_left, intrinsicNorm, ENNReal.lqNorm_one]
-    _ ≤ K * (Ω.intrinsicConst L * (‖Ω.cutoff f‖ₑ + lqNorm 1 (fun k =>
-          dyadicWeight (1 / p.toReal) k * lpModulusOn p Ω.domain L f k))) :=
+        rw [ENNReal.tsum_mul_left, intrinsicNorm_def, ENNReal.lqNorm_one]
+    _ ≤ K * (Ω.intrinsicConst L * modNormOn Ω.measurableSet_domain L (1 / p.toReal) 1 f) :=
         mul_le_mul' le_rfl (Ω.intrinsicNorm_le hp L _ le_rfl f)
     _ = _ := by ring
 

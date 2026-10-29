@@ -4662,11 +4662,13 @@ $L_p$ and $\ell_q$ norms.
 
 \begin{lemma}[Null sets do not matter]
 \label{lem:null-set-domains}
-\lean{Rd.stepSet_ae_eq, Rd.modulusOn_congr_set, Rd.lpModulusOn_congr_set, Rd.indicatorLp_congr_set}
+\lean{Rd.stepSet_ae_eq, Rd.modulusOn_congr_set, Rd.lpModulusOn_congr_set, Rd.indicatorLp_congr_set,
+  Rd.modNormOn_congr_set}
 \leanok
-\uses{def:rd-modulus-on}
+\uses{def:rd-modulus-on, lem:modnorm-on}
 If $U$ and $U'$ agree up to a null set, so do their step sets $U_{rh}$ and $U'_{rh}$, and
-$\omega_r(f, t, U)_p = \omega_r(f, t, U')_p$ and $1_U f = 1_{U'} f$ in $L_p$.
+$\omega_r(f, t, U)_p = \omega_r(f, t, U')_p$, $1_U f = 1_{U'} f$ in $L_p$ and
+$N_U(f) = N_{U'}(f)$.
 \end{lemma}
 
 \begin{proof}
@@ -5390,6 +5392,34 @@ Every estimate runs through the averaged differences of \Cref{lem:averaged-diffe
 to $f$ or to the smooth kernels. With \Cref{thm:rd-besov}, local means are a fourth description of
 $\Besov{s}{p}{q}(V)$ for $0 < s < L$.
 
+\begin{definition}[Bump mollifiers]
+\label{def:bump-mollifier}
+\lean{Rd.bumpMollifier, Rd.contDiff_bumpMollifier, Rd.tsupport_bumpMollifier_subset,
+  Rd.hasCompactSupport_bumpMollifier, Rd.integral_bumpMollifier}
+\leanok
+For every smooth bump function $f$ around $c \in V$ with outer radius $r$ (Mathlib's
+\texttt{ContDiffBump}), the bump mollifier of $f$ is $f / \int f$ with complex values. It is
+smooth with support in $\bar B(c, r)$, compactly supported, and has integral $1$.
+\end{definition}
+
+\begin{lemma}[Bumps from smooth bump functions]
+\label{lem:bump-of-smooth-bump}
+\lean{Rd.LocalMeansBump.ofContDiffBump, Rd.centeredBumpBase, Rd.LocalMeansBump.centered,
+  Rd.LocalMeansBump.centered_radius}
+\leanok
+\uses{def:bump-mollifier, def:local-means}
+For every smooth bump function around $z_0 \in V$ with outer radius $r$, its bump mollifier is a
+bump for local means (\Cref{def:local-means}) of every radius $R \geq \|z_0\| + r$. For every
+$R > 0$ the bump mollifier of the smooth bump function around $0$ with outer radius $R$ is a bump
+for local means of radius $R$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bump mollifier vanishes outside $\bar B(z_0, r) \subseteq \bar B(0, \|z_0\| + r)$, since
+$\|z\| \leq \|z - z_0\| + \|z_0\|$ (\Cref{def:bump-mollifier}).
+\end{proof}
+
 \section{Pointwise multipliers}
 
 \begin{lemma}[Differences along a segment]
@@ -6043,7 +6073,7 @@ $2^{jn}$ against the coefficient as in \Cref{lem:cell-atoms-regular}.
 \lean{Rd.LocalMeansBump.atomic_decomposition_smooth, Rd.stdBumpBase, Rd.LocalMeansBump.std,
   Rd.LocalMeansBump.eLpNorm_std_one}
 \leanok
-\uses{thm:atomic-decomposition, lem:cell-atoms-smooth}
+\uses{thm:atomic-decomposition, lem:cell-atoms-smooth, lem:bump-of-smooth-bump}
 Let $g$ be a bump of radius $R$, $1 \leq p < \infty$ and $L, K \in \N$. There is $A$ such that for
 every $F \in L_p$ the terms of the reproducing formula are
 $\eta_j * (k_j * F) = \sum_m \lambda_{j,m} a_{j,m}$ almost everywhere, with cell atoms that are
@@ -6762,7 +6792,7 @@ inequality suffices.
   Rd.LocalMeansBump.exists_mixedLocalMeansNorm_le, Rd.mixedBesov_iff_mixedLP}
 \leanok
 \uses{def:mixed-lp, lem:mixed-lp-kernels, lem:mixed-reproducing, thm:mixed-local-means,
-  lem:mixed-almost-diagonal, lem:bumps-every-radius}
+  lem:mixed-almost-diagonal, lem:bumps-every-radius, lem:bump-of-smooth-bump}
 Let $1 \leq p < \infty$, $0 < s < L$ and $1 \leq q \leq \infty$. Then
 $\|(2^{s|k|_1} \Omega^{e(k)}_L(f, 2^{-k})_p)_k\|_{\ell_q} < \infty$ if and only if
 $\|(2^{s|k|_1} \|\delta_k * f\|_p)_k\|_{\ell_q} < \infty$.
@@ -6774,7 +6804,8 @@ $\delta_m * f = \sum_k (\delta_m * \eta_k) * (k_k * f)$ and
 $k_m * f = \sum_k (k_m * \otimes_i \Theta_{k_i}) * (\delta_k * f)$, and the tensor kernels have
 $L_1$ norms at most $C^d \prod_i c(m_i, k_i)$ (\Cref{lem:mixed-lp-kernels}), so
 \Cref{lem:mixed-almost-diagonal} compares Vyb\'{\i}ral's quasi-norm with the mixed local means.
-\Cref{thm:mixed-local-means} for the centred bump of radius $1$ concludes.
+\Cref{thm:mixed-local-means} for the centred bump of radius $1$ (\Cref{lem:bump-of-smooth-bump})
+concludes.
 \end{proof}
 
 \section{Hyperbolic crosses}

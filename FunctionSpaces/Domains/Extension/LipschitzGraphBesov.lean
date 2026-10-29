@@ -221,7 +221,7 @@ C (‖f‖_{L_p(Ω)} + ‖(2^(js) ω_L(f, 2^(-j), Ω)_p)_j‖_{ℓ_q})`
 theorem intrinsicNorm_le (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f : Lp ℂ p (volume : Measure V)) :
     Ω.intrinsicNorm hp L s q f ≤ Ω.intrinsicConst L *
-      (‖Ω.cutoff f‖ₑ + lqNorm q (fun j => dyadicWeight s j * lpModulusOn p Ω.domain L f j)) :=
+      modNormOn Ω.measurableSet_domain L s q f :=
   lqNorm_dyadicWeight_le_of_head_of_succ_le hq s
     (fun j => ‖Ω.cutoff (Ω.coneBump.localMean hp L j f)‖ₑ) (lpModulusOn p Ω.domain L f)
     (Ω.enorm_cutoff_localMean_zero_le hp L f) fun j => Ω.enorm_cutoff_localMean_succ_le hp L j f
@@ -229,7 +229,7 @@ theorem intrinsicNorm_le (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0∞} (
 /-- Finite intrinsic moduli give a finite intrinsic local means quasi-norm. -/
 theorem intrinsicNorm_lt_top (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {f : Lp ℂ p (volume : Measure V)}
-    (hf : ‖Ω.cutoff f‖ₑ + lqNorm q (fun j => dyadicWeight s j * lpModulusOn p Ω.domain L f j) < ∞) :
+    (hf : modNormOn Ω.measurableSet_domain L s q f < ∞) :
     Ω.intrinsicNorm hp L s q f < ∞ :=
   (Ω.intrinsicNorm_le hp L s hq f).trans_lt
     (ENNReal.mul_lt_top (Ω.intrinsicConst_ne_top L).lt_top hf)
@@ -242,14 +242,14 @@ theorem intrinsicNorm_lt_top (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0�
 `Rd.modNormOn_le_modNorm_of_indicatorLp`, since the cut-off is `indicatorLp`. -/
 theorem modNormOn_le_modNorm (r : ℕ) (s : ℝ) (q : ℝ≥0∞) {F f : Lp ℂ p (volume : Measure V)}
     (hFf : Ω.cutoff F = Ω.cutoff f) :
-    ‖Ω.cutoff f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.domain r f k) ≤
+    modNormOn Ω.measurableSet_domain r s q f ≤
       ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) :=
   modNormOn_le_modNorm_of_indicatorLp Ω.measurableSet_domain r s q hFf
 
 /-- **Rychkov's extension agrees with `f` on `Ω`** when the intrinsic moduli are finite. -/
 theorem cutoff_extension_of_modNormOn (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
     {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
-    (hf : ‖Ω.cutoff f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.domain r f k) < ∞) :
+    (hf : modNormOn Ω.measurableSet_domain r s q f < ∞) :
     Ω.cutoff (Ω.extension hp r f) = Ω.cutoff f :=
   Ω.cutoff_extension hp hr hs hq (Ω.intrinsicNorm_lt_top hp r s hq hf)
 
@@ -258,11 +258,11 @@ theorem cutoff_extension_of_modNormOn (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) 
 C (‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})`, with `C` finite for `s < r`. -/
 theorem modNorm_extension_le_modNormOn (hp : p ≠ ∞) (r : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
-    (hf : ‖Ω.cutoff f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.domain r f k) < ∞) :
+    (hf : modNormOn Ω.measurableSet_domain r s q f < ∞) :
     ‖Ω.extension hp r f‖ₑ +
         lqNorm q (fun k => dyadicWeight s k * lpModulus p r (Ω.extension hp r f) k) ≤
       Ω.coneBump.synthConst r s * Ω.intrinsicConst r *
-        (‖Ω.cutoff f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.domain r f k)) := by
+        modNormOn Ω.measurableSet_domain r s q f := by
   rw [mul_assoc]
   exact (Ω.modNorm_extension_le hp r hs hq (Ω.intrinsicNorm_lt_top hp r s hq hf)).trans
     (mul_le_mul' le_rfl (Ω.intrinsicNorm_le hp r s hq f))
@@ -276,7 +276,7 @@ theorem exists_besov_extension_iff_modulusOn (hp : p ≠ ∞) {r : ℕ} {s : ℝ
     (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure V)) :
     (∃ F : Lp ℂ p (volume : Measure V), Ω.cutoff F = Ω.cutoff f ∧
         ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) < ∞) ↔
-      ‖Ω.cutoff f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.domain r f k) < ∞ := by
+      modNormOn Ω.measurableSet_domain r s q f < ∞ := by
   have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
   constructor
   · rintro ⟨F, hFf, hF⟩
@@ -292,7 +292,7 @@ theorem exists_memApprox_extension_iff (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs 
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure V)) :
     (∃ F : Lp ℂ p (volume : Measure V), Ω.cutoff F = Ω.cutoff f ∧
         (bandScheme hp).MemApprox s q F) ↔
-      ‖Ω.cutoff f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.domain r f k) < ∞ := by
+      modNormOn Ω.measurableSet_domain r s q f < ∞ := by
   rw [← Ω.exists_besov_extension_iff_modulusOn hp hs hsr hq f]
   exact exists_congr fun F =>
     and_congr_right fun _ => memApprox_bandScheme_iff_modulus hp hs.le hsr hq F

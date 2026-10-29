@@ -559,8 +559,7 @@ theorem memBoundaryBesov_iff_exists_isBoundaryTrace (ψ : Ω.BoundaryPartition) 
     {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (g : V → ℂ) :
     Ω.MemBoundaryBesov p ψ s q g ↔ ∃ f : Lp ℂ p (volume : Measure V),
-      ‖indicatorLp Ω.measurableSet f‖ₑ + lqNorm q (fun k =>
-        dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p Ω.carrier L f k) < ∞ ∧
+      modNormOn Ω.measurableSet L (s + 1 / p.toReal) q f < ∞ ∧
       Ω.IsBoundaryTrace ψ hp L (s + 1 / p.toReal) q f g := by
   have hsL := add_one_div_toReal_lt hp hs1 hL
   have hL1 : 1 ≤ L := le_trans one_le_two hL
@@ -582,8 +581,7 @@ trace `g ∈ B^s_{p,q}(Γ)`, namely `Tr_Γ F` for an extension `F` of `f`
 theorem exists_isBoundaryTrace_of_modNormOn_lt_top (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞)
     {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {f : Lp ℂ p (volume : Measure V)}
-    (hf : ‖indicatorLp Ω.measurableSet f‖ₑ + lqNorm q (fun k =>
-      dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p Ω.carrier L f k) < ∞) :
+    (hf : modNormOn Ω.measurableSet L (s + 1 / p.toReal) q f < ∞) :
     ∃ g : V → ℂ, Ω.MemBoundaryBesov p ψ s q g ∧
       Ω.IsBoundaryTrace ψ hp L (s + 1 / p.toReal) q f g := by
   have hsL := add_one_div_toReal_lt hp hs1 hL
@@ -602,8 +600,7 @@ are `Tr_Γ F` for one extension `F` of `f`
 (`Rd.BoundedLipschitzDomain.exists_besov_extension_of_modulusOn`). -/
 theorem IsBoundaryTrace.unique {ψ : Ω.BoundaryPartition} {hp : p ≠ ∞} {L : ℕ} {σ : ℝ}
     (hσ : 0 < σ) (hσL : σ < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
-    (hf : ‖indicatorLp Ω.measurableSet f‖ₑ + lqNorm q (fun k =>
-      dyadicWeight σ k * lpModulusOn p Ω.carrier L f k) < ∞) {g g' : V → ℂ}
+    (hf : modNormOn Ω.measurableSet L σ q f < ∞) {g g' : V → ℂ}
     (hg : Ω.IsBoundaryTrace ψ hp L σ q f g) (hg' : Ω.IsBoundaryTrace ψ hp L σ q f g') :
     g =ᶠ[Ω.aeBoundary] g' := by
   obtain ⟨F, hFf, hF⟩ := Ω.exists_besov_extension_of_modulusOn hp hσ hσL hq hf
@@ -620,10 +617,10 @@ for every `F` with `F = f` on `Ω` and `‖F‖_p + ‖(2^(kσ) ω_L(F, 2^(-k))_
 statement about at least one extension. -/
 structure HasBoundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) (L : ℕ) (σ : ℝ) (q : ℝ≥0∞)
     (f : Lp ℂ p (volume : Measure V)) (g : V → ℂ) : Prop where
-  /-- The intrinsic norm of `f` on `Ω` is finite, written out as in the hypotheses of the
-  `IsBoundaryTrace` theorems above. -/
-  modNormOn_lt_top : ‖indicatorLp Ω.measurableSet f‖ₑ + lqNorm q (fun k =>
-    dyadicWeight σ k * lpModulusOn p Ω.carrier L f k) < ∞
+  /-- The intrinsic quasi-norm
+  `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(kσ) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}` of `f` on `Ω`
+  (`Rd.modNormOn`) is finite, as in the hypotheses of the `IsBoundaryTrace` theorems above. -/
+  modNormOn_lt_top : modNormOn Ω.measurableSet L σ q f < ∞
   /-- `g` is the boundary trace of every admissible extension of `f`. -/
   isBoundaryTrace : Ω.IsBoundaryTrace ψ hp L σ q f g
 
@@ -634,8 +631,7 @@ structure HasBoundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) (L : ℕ
 theorem hasBoundaryTrace_iff {ψ : Ω.BoundaryPartition} {hp : p ≠ ∞} {L : ℕ} {σ : ℝ} {q : ℝ≥0∞}
     {f : Lp ℂ p (volume : Measure V)} {g : V → ℂ} :
     Ω.HasBoundaryTrace ψ hp L σ q f g ↔
-      ‖indicatorLp Ω.measurableSet f‖ₑ + lqNorm q (fun k =>
-        dyadicWeight σ k * lpModulusOn p Ω.carrier L f k) < ∞ ∧
+      modNormOn Ω.measurableSet L σ q f < ∞ ∧
       Ω.IsBoundaryTrace ψ hp L σ q f g :=
   ⟨fun h => ⟨h.1, h.2⟩, fun h => ⟨h.1, h.2⟩⟩
 
@@ -666,8 +662,7 @@ theorem HasBoundaryTrace.memBoundaryBesov {ψ : Ω.BoundaryPartition} {hp : p �
 theorem exists_hasBoundaryTrace_of_modNormOn_lt_top (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞)
     {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {f : Lp ℂ p (volume : Measure V)}
-    (hf : ‖indicatorLp Ω.measurableSet f‖ₑ + lqNorm q (fun k =>
-      dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p Ω.carrier L f k) < ∞) :
+    (hf : modNormOn Ω.measurableSet L (s + 1 / p.toReal) q f < ∞) :
     ∃ g : V → ℂ, Ω.MemBoundaryBesov p ψ s q g ∧
       Ω.HasBoundaryTrace ψ hp L (s + 1 / p.toReal) q f g := by
   obtain ⟨g, hg, hfg⟩ := Ω.exists_isBoundaryTrace_of_modNormOn_lt_top ψ hp hL hs hs1 hq hf

@@ -12,19 +12,24 @@ public import Mathlib.Geometry.Manifold.Instances.Real
 /-!
 # The half-space as a Besov domain
 
+Lipschitz graph domains have the extension property (`Rd.LipschitzGraph.hasBesovExtension`):
+Rychkov's extension agrees with `f` on the domain and is bounded by a constant times the intrinsic
+quasi-norm (`Rd.LipschitzGraph.modNorm_extension_le_modNormOn`).
+
 The closed half-space `{x : 0 ≤ ⟪x, e⟫}` for a unit vector `e` (`Rd.closedHalfSpace`) is a Besov
 domain (`Rd.BesovDomain.closedHalfSpace`): it differs from the flat Lipschitz graph domain
 `{x : 0 < ⟪x, e⟫}` (`Rd.LipschitzGraph.flat`) by the null set `e^⊥`
-(`Rd.volume_orthogonal_singleton_eq_zero`), and on the latter Rychkov's extension is bounded
-(`Rd.LipschitzGraph.modNorm_extension_le_modNormOn`); the null set changes neither the moduli on
-the set (`Rd.lpModulusOn_congr_set`) nor the cut-off (`Rd.indicatorLp_congr_set`).
+(`Rd.volume_orthogonal_singleton_eq_zero`, `Rd.closedHalfSpace_ae_eq`), and the extension property
+is the same for sets that agree up to a null set (`Rd.HasBesovExtension.congr_set`,
+`Rd.BesovDomain.of_ae_eq`).
 
-The models of manifolds are Besov domains: the range of the model with corners of the Euclidean
-half-space is the closed half-space `{y : 0 ≤ ⟪y, e₀⟫}` for the unit vector `e₀ = (1, 0, …, 0)`
-(`Rd.e0`, `Rd.norm_e0`, `Manifold.range_eq_closedHalfSpace`,
-`Rd.BesovDomain.range_euclideanHalfSpace`), and the range `V` of a model without boundary is the
-whole space (`Rd.BesovDomain.range_of_boundaryless`). The first coordinate is `⟪y, e₀⟫`
-(`Rd.coord_zero_eq_inner`).
+The models of manifolds are Besov domains: the range of a model with corners is one if it agrees
+up to a null set with a set with the extension property (`Rd.BesovDomain.range_of_ae_eq`); the
+range of the model with corners of the Euclidean half-space is the closed half-space
+`{y : 0 ≤ ⟪y, e₀⟫}` for the unit vector `e₀ = (1, 0, …, 0)` (`Rd.e0`, `Rd.norm_e0`,
+`Manifold.range_eq_closedHalfSpace`, `Rd.BesovDomain.range_euclideanHalfSpace`), and the range `V`
+of a model without boundary is the whole space (`Rd.BesovDomain.range_of_boundaryless`). The first
+coordinate is `⟪y, e₀⟫` (`Rd.coord_zero_eq_inner`).
 -/
 
 @[expose] public section
@@ -53,6 +58,21 @@ theorem orthogonal_singleton_ne_top {e : V} (he : e ≠ 0) : (ℝ ∙ e)ᗮ ≠ 
 theorem volume_orthogonal_singleton_eq_zero {e : V} (he : e ≠ 0) :
     volume ((ℝ ∙ e)ᗮ : Set V) = 0 :=
   Measure.addHaar_submodule volume _ (orthogonal_singleton_ne_top he)
+
+/-! ### The extension property of Lipschitz graph domains -/
+
+/-- **Lipschitz graph domains have the extension property**: Rychkov's extension agrees with `f`
+on the domain (`Rd.LipschitzGraph.cutoff_extension_of_modNormOn`) and is bounded by a constant
+times the intrinsic quasi-norm (`Rd.LipschitzGraph.modNorm_extension_le_modNormOn`); the proof
+takes `C = G.coneBump.synthConst r s * G.intrinsicConst r`. -/
+theorem LipschitzGraph.hasBesovExtension (G : LipschitzGraph V) :
+    HasBesovExtension G.measurableSet_domain := by
+  intro p _ hp r s hs hsr q hq
+  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
+  exact ⟨G.coneBump.synthConst r s * G.intrinsicConst r, ENNReal.mul_ne_top
+    (G.coneBump.synthConst_ne_top hs hsr) (G.intrinsicConst_ne_top r), fun f hf =>
+    ⟨G.extension hp r f, G.cutoff_extension_of_modNormOn hp hr hs hq hf,
+      G.modNorm_extension_le_modNormOn hp r hs hq hf⟩⟩
 
 /-! ### The half-space -/
 
@@ -113,28 +133,13 @@ theorem closedHalfSpace_ae_eq {e : V} (he : ‖e‖ = 1) :
       fun x (hx : 0 < inner ℝ x e) => hx.le
     rw [sdiff_eq_empty.2 hsub, measure_empty]
 
-/-- **The closed half-space is a Besov domain**: a function of finite intrinsic Besov quasi-norm
-on it extends by Rychkov's extension of the flat graph domain, since the open and the closed
-half-space differ by a null set. -/
-theorem BesovDomain.closedHalfSpace {e : V} (he : ‖e‖ = 1) : BesovDomain (closedHalfSpace e) where
-  convex := convex_closedHalfSpace e
-  isClosed := isClosed_closedHalfSpace e
-  interior_nonempty := ⟨e, mem_interior_closedHalfSpace fun h => by simp [h] at he⟩
-  exists_extension p _ hp r s hs hsr q hq := by
-    set Ω := LipschitzGraph.flat e he
-    have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
-    have hae := closedHalfSpace_ae_eq he
-    have hC := (isClosed_closedHalfSpace e).measurableSet
-    have hcut : ∀ g : Lp ℂ p (volume : Measure V), indicatorLp hC g = Ω.cutoff g := fun g =>
-      indicatorLp_congr_set hC Ω.measurableSet_domain hae g
-    have hmod : ∀ (g : Lp ℂ p (volume : Measure V)) k,
-        lpModulusOn p (Rd.closedHalfSpace e) r g k = lpModulusOn p Ω.domain r g k :=
-      fun g k => lpModulusOn_congr_set hae r g k
-    refine ⟨Ω.coneBump.synthConst r s * Ω.intrinsicConst r, ENNReal.mul_ne_top
-      (Ω.coneBump.synthConst_ne_top hs hsr) (Ω.intrinsicConst_ne_top r), fun f hf => ?_⟩
-    simp_rw [hcut, hmod] at hf ⊢
-    exact ⟨Ω.extension hp r f, Ω.cutoff_extension_of_modNormOn hp hr hs hq hf,
-      Ω.modNorm_extension_le_modNormOn hp r hs hq hf⟩
+/-- **The closed half-space is a Besov domain**: it agrees up to a null set with the flat Lipschitz
+graph domain (`Rd.closedHalfSpace_ae_eq`), which has the extension property
+(`Rd.LipschitzGraph.hasBesovExtension`). -/
+theorem BesovDomain.closedHalfSpace {e : V} (he : ‖e‖ = 1) : BesovDomain (closedHalfSpace e) :=
+  of_ae_eq (convex_closedHalfSpace e) (isClosed_closedHalfSpace e)
+    ⟨e, mem_interior_closedHalfSpace fun h => by simp [h] at he⟩
+    (LipschitzGraph.flat e he).hasBesovExtension (closedHalfSpace_ae_eq he)
 
 /-! ### The models of manifolds -/
 
@@ -162,6 +167,16 @@ theorem _root_.Manifold.range_eq_closedHalfSpace :
   simp [Rd.closedHalfSpace, Rd.e0, EuclideanSpace.inner_single_right]
 
 end FirstAxis
+
+/-- **Models of manifolds as Besov domains**: the range of a model with corners is a Besov domain
+if it agrees up to a null set with a set with the extension property. The range is closed, convex
+and has nonempty interior for every real model with corners (Mathlib's
+`ModelWithCorners.isClosed_range`, `ModelWithCorners.convex_range`,
+`ModelWithCorners.nonempty_interior`). -/
+theorem BesovDomain.range_of_ae_eq {H : Type*} [TopologicalSpace H] (I : ModelWithCorners ℝ V H)
+    {U : Set V} {hU : MeasurableSet U} (h : HasBesovExtension hU) (hae : range I =ᵐ[volume] U) :
+    BesovDomain (range I) :=
+  of_ae_eq I.convex_range I.isClosed_range I.nonempty_interior h hae
 
 /-- **The Euclidean half-space model is a Besov domain**: the range of the model with corners
 `𝓡∂ n` is the closed half-space `{y : 0 ≤ ⟪y, e₀⟫}` (`Manifold.range_eq_closedHalfSpace`). -/

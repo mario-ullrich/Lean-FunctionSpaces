@@ -18,14 +18,14 @@ kernels `η_j` and radius `R ≤ 1/2`, and let `U ⊆ W` and `U ⊆ T` be measur
 * `W ⊆ T_{L h}` for the steps `h = -c^(-1) z`, `c ≥ 1`, `b(z) ≠ 0` (the averaged differences of
   the moment kernels at points of `W` stay in `T`).
 
-Then for `f ∈ L_p(V)` with `‖f‖_{L_p(T)} + ‖(2^(ks) ω_L(f, 2^(-k), T)_p)_k‖_{ℓ_q} < ∞` and
-`0 < s < L`, the series `F = ∑_j η_j ⋆ 1_W (k_j ⋆ 1_T f)` has a finite Besov quasi-norm on `V`
-and `F = f` almost everywhere on `U` (`Rd.LocalMeansBump.exists_local_extension`); its Besov
-quasi-norm is at most a constant of the bump (`Rd.LocalMeansBump.localExtConst`) times that of `f`
-on `T` (`Rd.LocalMeansBump.exists_local_extension_le`). The proof is
-that of Rychkov's extension (`Rd.LipschitzGraph.extension`), with the support principle for two
-sets (`Rd.indicatorLp_convLp_indicatorLp`) and the moment kernel bound for two sets
-(`Rd.eLpNorm_indicator_sub_convLp_momentKernel_le`).
+Then for `f ∈ L_p(V)` with `‖f‖_{L_p(T)} + ‖(2^(ks) ω_L(f, 2^(-k), T)_p)_k‖_{ℓ_q} < ∞` (the
+intrinsic quasi-norm `Rd.modNormOn` on `T`) and `0 < s < L`, the local extension
+`F = ∑_j η_j ⋆ 1_W (k_j ⋆ 1_T f)` (`Rd.LocalMeansBump.localExtension`) has a finite Besov
+quasi-norm on `V` and `F = f` almost everywhere on `U` (`Rd.LocalMeansBump.exists_local_extension`);
+its Besov quasi-norm is at most a constant of the bump (`Rd.LocalMeansBump.localExtConst`) times
+that of `f` on `T` (`Rd.LocalMeansBump.exists_local_extension_le`). The local means on `W` are
+bounded by the moduli on `T` (`Rd.LocalMeansBump.localNormOn_le`), by the moment kernel bound for
+two sets (`Rd.eLpNorm_indicator_sub_convLp_momentKernel_le`).
 
 Two kinds of patches satisfy the conditions:
 
@@ -39,12 +39,7 @@ Two kinds of patches satisfy the conditions:
 
 Short steps `-y ∈ K̄`, `‖y‖ ≤ ε`, take `Ω ∩ B(c, ρ - ε)` into `Ω ∩ B(c, ρ)`
 (`Rd.LipschitzGraph.sub_mem_patch_of_mem_closedCone`); this gives the support conditions of all
-cone-supported kernels of small support. The terms of the local extension are linear in `f`
-(`Rd.LocalMeansBump.localExtTerm_add`, `Rd.LocalMeansBump.localExtTerm_smul`). A bound
-`2^(js) ‖1_W (k_j ⋆ f)‖_p ≤ X < ∞` makes the local extension converge absolutely
-(`Rd.LocalMeansBump.enorm_localExtTerm_le_of_forall_le`,
-`Rd.LocalMeansBump.tsum_enorm_localExtTerm_le`,
-`Rd.LocalMeansBump.summable_localExtTerm_of_forall_le`).
+cone-supported kernels of small support.
 
 Bumps of every radius come from rescaling (`Rd.LocalMeansBump.rescale`) and from the normalised
 smooth bump centred at `0` (`Rd.LocalMeansBump.centered`). The cone bump of a Lipschitz graph
@@ -62,42 +57,7 @@ open ENNReal (lqNorm dyadicWeight)
 namespace Rd
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
-  [MeasurableSpace V] [BorelSpace V]
-
-/-! ### The support principle for two sets -/
-
-omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [BorelSpace V] in
-/-- **The support principle for two sets**: if `x - y ∈ W` whenever `k(y) ≠ 0`, then
-`(k ⋆ 1_W f)(x) = (k ⋆ f)(x)`. -/
-theorem conv_indicator_eq_of_forall {k : V → ℂ} {W : Set V} (f : V → ℂ) {x : V}
-    (hx : ∀ y, k y ≠ 0 → x - y ∈ W) (μ : Measure V) :
-    conv k (W.indicator f) μ x = conv k f μ x := by
-  rw [conv_apply, conv_apply]
-  congr 1
-  funext y
-  by_cases hy : k y = 0
-  · simp [hy]
-  · rw [Set.indicator_of_mem (hx y hy)]
-
-variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
-
-/-- **The support principle for two sets on `L_p`**: `1_U (k ⋆ (1_W h)) = 1_U (k ⋆ h)` if
-`x - y ∈ W` for `x ∈ U` and `k(y) ≠ 0`. -/
-theorem indicatorLp_convLp_indicatorLp (hp : p ≠ ∞) {k : V → ℂ} (hk : Integrable k)
-    {U W : Set V} (hU : MeasurableSet U) (hW : MeasurableSet W)
-    (hUW : ∀ x ∈ U, ∀ y, k y ≠ 0 → x - y ∈ W) (h : Lp ℂ p (volume : Measure V)) :
-    indicatorLp hU (convLp hp hk (indicatorLp hW h)) = indicatorLp hU (convLp hp hk h) := by
-  refine Lp.ext ?_
-  have h3 : conv k (indicatorLp hW h : V → ℂ) volume = conv k (W.indicator h) volume :=
-    conv_congr_ae (indicatorLp_apply_ae hW h)
-  filter_upwards [indicatorLp_apply_ae hU (convLp hp hk (indicatorLp hW h)),
-    convLp_apply_ae hp hk (indicatorLp hW h), indicatorLp_apply_ae hU (convLp hp hk h),
-    convLp_apply_ae hp hk h] with x hx1 hx2 hx4 hx5
-  rw [hx1, hx4]
-  by_cases hx : x ∈ U
-  · rw [Set.indicator_of_mem hx, Set.indicator_of_mem hx, hx2, hx5, h3,
-      conv_indicator_eq_of_forall _ (hUW x hx) volume]
-  · rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem hx]
+  [MeasurableSpace V] [BorelSpace V] {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-! ### Bumps of every radius -/
 
@@ -153,23 +113,6 @@ end LocalMeansBump
 namespace LipschitzGraph
 
 variable (Ω : LipschitzGraph V)
-
-/-- The moment kernels of a bump supported in `-K` are supported in `-K`. -/
-theorem coneSupported_momentKernel_of {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun)
-    (L : ℕ) : Ω.ConeSupported (momentKernel b.toFun L) :=
-  ConeSupported.finsetSum _ _ fun _ _ => hb.dilate (by positivity)
-
-/-- The dilated moment kernels of a bump supported in `-K` are supported in `-K`. -/
-theorem coneSupported_scaled_of {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun)
-    (L j : ℕ) : Ω.ConeSupported (b.scaled L j) :=
-  (Ω.coneSupported_momentKernel_of hb L).dilate (by positivity)
-
-/-- The dual kernels of a bump supported in `-K` are supported in `-K`. -/
-theorem coneSupported_dual_of {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun)
-    (L j : ℕ) : Ω.ConeSupported (b.dual L j) := by
-  cases j with
-  | zero => exact Ω.coneSupported_scaled_of hb L 0
-  | succ j => exact (Ω.coneSupported_scaled_of hb L (j + 1)).add (Ω.coneSupported_scaled_of hb L j)
 
 /-- Rescaled bumps supported in `-K` are supported in `-K`. -/
 theorem coneSupported_rescale {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun) {c : ℝ}
@@ -302,150 +245,11 @@ theorem measurableSet_infDist_gt (O : Set V) (δ : ℝ) :
     MeasurableSet {x : V | δ < infDist x Oᶜ} :=
   (isOpen_lt continuous_const (continuous_infDist_pt _)).measurableSet
 
-/-! ### The local extension -/
+/-! ### Local means and moduli on a set -/
 
 namespace LocalMeansBump
 
 variable (b : LocalMeansBump V)
-
-/-- The **local means quasi-norm on a set** `‖(2^(js) ‖1_W (k_j ⋆ f)‖_p)_j‖_{ℓ_q}`. -/
-noncomputable def localNormOn (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L : ℕ) (s : ℝ)
-    (q : ℝ≥0∞) (f : Lp ℂ p (volume : Measure V)) : ℝ≥0∞ :=
-  lqNorm q (fun j => dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ)
-
-/-- The terms `η_j ⋆ 1_W (k_j ⋆ f)` of the local extension. -/
-noncomputable def localExtTerm (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L j : ℕ)
-    (f : Lp ℂ p (volume : Measure V)) : Lp ℂ p (volume : Measure V) :=
-  convLp hp (b.integrable_dual L j) (indicatorLp hW (b.localMean hp L j f))
-
-/-- The terms of the local extension are additive in `f`. -/
-theorem localExtTerm_add (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L j : ℕ)
-    (f g : Lp ℂ p (volume : Measure V)) :
-    b.localExtTerm hp hW L j (f + g) = b.localExtTerm hp hW L j f + b.localExtTerm hp hW L j g := by
-  simp only [localExtTerm, map_add]
-
-/-- The terms of the local extension commute with complex scalars. -/
-theorem localExtTerm_smul (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L j : ℕ) (c : ℂ)
-    (f : Lp ℂ p (volume : Measure V)) :
-    b.localExtTerm hp hW L j (c • f) = c • b.localExtTerm hp hW L j f := by
-  simp only [localExtTerm, map_smul]
-
-/-- The **local extension** `∑_j η_j ⋆ 1_W (k_j ⋆ f)`. -/
-noncomputable def localExtension (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L : ℕ)
-    (f : Lp ℂ p (volume : Measure V)) : Lp ℂ p (volume : Measure V) :=
-  ∑' j, b.localExtTerm hp hW L j f
-
-/-- **The terms of the local extension from a bound on the weighted local means**: if
-`2^(js) ‖1_W (k_j ⋆ f)‖_p ≤ X` for every `j`, then `‖η_j ⋆ 1_W (k_j ⋆ f)‖_p ≤ 2 ‖m‖_1 2^(-js) X`. -/
-theorem enorm_localExtTerm_le_of_forall_le (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W)
-    (L : ℕ) {s : ℝ} {f : Lp ℂ p (volume : Measure V)} {X : ℝ≥0∞}
-    (hX : ∀ j, dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ ≤ X) (j : ℕ) :
-    ‖b.localExtTerm hp hW L j f‖ₑ ≤
-      2 * eLpNorm (momentKernel b.toFun L) 1 volume * (dyadicWeight (-s) j * X) :=
-  calc ‖b.localExtTerm hp hW L j f‖ₑ
-      ≤ eLpNorm (b.dual L j) 1 volume * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ :=
-        enorm_convLp_le hp _ _
-    _ ≤ 2 * eLpNorm (momentKernel b.toFun L) 1 volume * (dyadicWeight (-s) j *
-          (dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ)) := by
-        rw [← mul_assoc (dyadicWeight (-s) j), ENNReal.dyadicWeight_neg_mul_self, one_mul]
-        exact mul_le_mul' (b.eLpNorm_dual_one_le L j) le_rfl
-    _ ≤ _ := by gcongr; exact hX j
-
-/-- **The sum of the norms of the terms**: if `2^(js) ‖1_W (k_j ⋆ f)‖_p ≤ X` for every `j`, then
-`∑_j ‖η_j ⋆ 1_W (k_j ⋆ f)‖_p ≤ 2 ‖m‖_1 (1 - 2^(-s))⁻¹ X`
-(`Rd.LocalMeansBump.enorm_localExtTerm_le_of_forall_le`, `ENNReal.tsum_dyadicWeight_neg`). -/
-theorem tsum_enorm_localExtTerm_le (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L : ℕ)
-    {s : ℝ} {f : Lp ℂ p (volume : Measure V)} {X : ℝ≥0∞}
-    (hX : ∀ j, dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ ≤ X) :
-    ∑' j, ‖b.localExtTerm hp hW L j f‖ₑ ≤
-      2 * eLpNorm (momentKernel b.toFun L) 1 volume * (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
-  refine (ENNReal.tsum_le_tsum (b.enorm_localExtTerm_le_of_forall_le hp hW L hX)).trans_eq ?_
-  rw [ENNReal.tsum_mul_left, ENNReal.tsum_mul_right, ENNReal.tsum_dyadicWeight_neg]
-  ring
-
-/-- **The local extension converges absolutely** for `s > 0` if
-`2^(js) ‖1_W (k_j ⋆ f)‖_p ≤ X < ∞` for every `j`
-(`Rd.LocalMeansBump.tsum_enorm_localExtTerm_le`). -/
-theorem summable_localExtTerm_of_forall_le (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W)
-    (L : ℕ) {s : ℝ} (hs : 0 < s) {f : Lp ℂ p (volume : Measure V)} {X : ℝ≥0∞} (hXf : X ≠ ∞)
-    (hX : ∀ j, dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ ≤ X) :
-    Summable fun j => b.localExtTerm hp hW L j f := by
-  have htsum : ∑' j, ‖b.localExtTerm hp hW L j f‖ₑ ≠ ∞ :=
-    ne_top_of_le_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top (ENNReal.mul_ne_top (by norm_num)
-      (eLpNorm_momentKernel_ne_top b.integrable L))
-      (ENNReal.one_sub_two_rpow_neg_inv_ne_top hs)) hXf) (b.tsum_enorm_localExtTerm_le hp hW L hX)
-  exact Summable.of_enorm htsum
-
-/-- **The local extension converges absolutely** for `s > 0` and a finite local means
-quasi-norm on `W`: `‖η_j ⋆ 1_W (k_j ⋆ f)‖_p ≤ 2 ‖m‖_1 2^(-js) ‖f‖_W`
-(`Rd.LocalMeansBump.summable_localExtTerm_of_forall_le`). -/
-theorem summable_localExtTerm (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L : ℕ) {s : ℝ}
-    (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
-    (hf : b.localNormOn hp hW L s q f < ∞) : Summable fun j => b.localExtTerm hp hW L j f :=
-  b.summable_localExtTerm_of_forall_le hp hW L hs hf.ne fun j =>
-    ENNReal.le_lqNorm (zero_lt_one.trans_le hq).ne'
-      (fun j => dyadicWeight s j * ‖indicatorLp hW (b.localMean hp L j f)‖ₑ) j
-
-/-- The partial sums of the local extension converge to it if its terms are summable. -/
-theorem tendsto_sum_localExtTerm_of_summable (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W)
-    (L : ℕ) {f : Lp ℂ p (volume : Measure V)}
-    (hsum : Summable fun j => b.localExtTerm hp hW L j f) :
-    Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), b.localExtTerm hp hW L j f) atTop
-      (𝓝 (b.localExtension hp hW L f)) :=
-  (hsum.hasSum.tendsto_sum_nat).comp (tendsto_add_atTop_nat 1)
-
-/-- The partial sums of the local extension converge to it. -/
-theorem tendsto_sum_localExtTerm (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L : ℕ)
-    {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
-    (hf : b.localNormOn hp hW L s q f < ∞) :
-    Tendsto (fun J => ∑ j ∈ Finset.range (J + 1), b.localExtTerm hp hW L j f) atTop
-      (𝓝 (b.localExtension hp hW L f)) :=
-  b.tendsto_sum_localExtTerm_of_summable hp hW L (b.summable_localExtTerm hp hW L hs hq hf)
-
-/-- **The local extension satisfies the Besov condition by differences**: for `0 < s`,
-`‖F‖_p + ‖(2^(is) ω_L(F, 2^(-i))_p)_i‖_{ℓ_q} ≤ C ‖(2^(js) ‖1_W (k_j ⋆ f)‖_p)_j‖_{ℓ_q}`. -/
-theorem modNorm_localExtension_le (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W) (L : ℕ)
-    {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
-    (hf : b.localNormOn hp hW L s q f < ∞) :
-    ‖b.localExtension hp hW L f‖ₑ +
-        lqNorm q (fun i => dyadicWeight s i * lpModulus p L (b.localExtension hp hW L f) i) ≤
-      b.synthConst L s * b.localNormOn hp hW L s q f :=
-  b.modNorm_le_of_tendsto hp L s hq (b.tendsto_sum_localExtTerm hp hW L hs hq hf)
-
-/-- **The local extension agrees with `f` on `U`** if its terms are summable and the dual kernels
-at points of `U` only see `W`: on `U` the terms are those of the reproducing formula. -/
-theorem indicatorLp_localExtension_of_summable (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {U W : Set V}
-    (hU : MeasurableSet U) (hW : MeasurableSet W)
-    (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W) {f : Lp ℂ p (volume : Measure V)}
-    (hsum : Summable fun j => b.localExtTerm hp hW L j f) :
-    indicatorLp hU (b.localExtension hp hW L f) = indicatorLp hU f := by
-  have hsum' : ∀ J, indicatorLp hU (∑ j ∈ Finset.range (J + 1), b.localExtTerm hp hW L j f) =
-      indicatorLp hU (∑ j ∈ Finset.range (J + 1),
-        convLp hp (b.integrable_dual L j) (b.localMean hp L j f)) := fun J => by
-    rw [map_sum, map_sum]
-    exact Finset.sum_congr rfl fun j _ =>
-      indicatorLp_convLp_indicatorLp hp _ hU hW (fun x hx y hy => hUW x hx j y hy) _
-  have h1 : Tendsto (fun J => indicatorLp hU (∑ j ∈ Finset.range (J + 1),
-      b.localExtTerm hp hW L j f)) atTop (𝓝 (indicatorLp hU (b.localExtension hp hW L f))) :=
-    ((indicatorLp hU).continuous.tendsto _).comp
-      (b.tendsto_sum_localExtTerm_of_summable hp hW L hsum)
-  have h2 : Tendsto (fun J => indicatorLp hU (∑ j ∈ Finset.range (J + 1),
-      convLp hp (b.integrable_dual L j) (b.localMean hp L j f))) atTop (𝓝 (indicatorLp hU f)) :=
-    ((indicatorLp hU).continuous.tendsto _).comp (b.tendsto_sum_dual_localMean hp hL f)
-  simp_rw [hsum'] at h1
-  exact tendsto_nhds_unique h1 h2
-
-/-- **The local extension agrees with `f` on `U`** if the dual kernels at points of `U` only see
-`W`: on `U` the terms are those of the reproducing formula. -/
-theorem indicatorLp_localExtension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {U W : Set V}
-    (hU : MeasurableSet U) (hW : MeasurableSet W)
-    (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞}
-    (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)} (hf : b.localNormOn hp hW L s q f < ∞) :
-    indicatorLp hU (b.localExtension hp hW L f) = indicatorLp hU f :=
-  b.indicatorLp_localExtension_of_summable hp hL hU hW hUW
-    (b.summable_localExtTerm hp hW L hs hq hf)
-
-/-! ### Local means and moduli on a set -/
 
 /-- `‖1_W (k_0 ⋆ f)‖_p ≤ ‖m‖_1 ‖f‖_p`. -/
 theorem enorm_indicatorLp_localMean_zero_le (hp : p ≠ ∞) {W : Set V} (hW : MeasurableSet W)
@@ -497,12 +301,10 @@ theorem exists_local_extension_le (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s :
     (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W)
     (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
     (hR : b.radius ≤ 1 / 2) (f : Lp ℂ p (volume : Measure V))
-    (hf : ‖indicatorLp hT f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p T L f k) <
-      ∞) :
+    (hf : modNormOn hT L s q f < ∞) :
     ∃ F : Lp ℂ p (volume : Measure V),
       ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p L F k) ≤
-          b.localExtConst L s * (‖indicatorLp hT f‖ₑ +
-            lqNorm q (fun k => dyadicWeight s k * lpModulusOn p T L f k)) ∧
+          b.localExtConst L s * modNormOn hT L s q f ∧
         indicatorLp hU F = indicatorLp hU f := by
   set f' := indicatorLp hT f
   have hae : T.indicator f' =ᵐ[volume] T.indicator f := by
@@ -545,8 +347,7 @@ theorem exists_local_extension (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : �
     (hUW : ∀ x ∈ U, ∀ j y, b.dual L j y ≠ 0 → x - y ∈ W)
     (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
     (hR : b.radius ≤ 1 / 2) (f : Lp ℂ p (volume : Measure V))
-    (hf : ‖indicatorLp hT f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p T L f k) <
-      ∞) :
+    (hf : modNormOn hT L s q f < ∞) :
     ∃ F : Lp ℂ p (volume : Measure V),
       ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p L F k) < ∞ ∧
         indicatorLp hU F = indicatorLp hU f := by

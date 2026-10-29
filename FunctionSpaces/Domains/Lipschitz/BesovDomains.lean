@@ -13,23 +13,17 @@ public import FunctionSpaces.Domains.Lipschitz.ConvexDomains
 public import Mathlib.Analysis.Convex.Measure
 
 /-!
-# The extension property and Besov domains: graph domains, the quadrant, bounded domains
+# Besov domains: graph domains, the quadrant, bounded domains
 
-**The extension property** (`Rd.HasBesovExtension`): a measurable set `Ω` has it if every function
-of finite intrinsic Besov quasi-norm on `Ω` agrees on `Ω` with a function on `V` whose Besov
-quasi-norm is at most a constant times the intrinsic one, for `1 ≤ p < ∞`, `0 < s < r` and
-`1 ≤ q ≤ ∞`. This is the extension field of the class `Rd.BesovDomain`, without convexity. It
-passes to almost equal sets (`Rd.HasBesovExtension.congr_set`), and with it the order of the
-differences does not matter (`Rd.HasBesovExtension.modNormOn_order_le`). A closed convex set with
-nonempty interior that agrees up to a null set with a set with the property is a Besov domain
-(`Rd.BesovDomain.of_ae_eq`); for the range of a model with corners convexity, closedness and the
-interior point come from Mathlib (`Rd.BesovDomain.range_of_ae_eq`).
+The results rest on the extension property (`Rd.HasBesovExtension`) of Lipschitz graph domains
+(`Rd.LipschitzGraph.hasBesovExtension`) and on Besov domains up to null sets
+(`Rd.BesovDomain.of_ae_eq`).
 
-**Lipschitz graph domains** have the property (`Rd.LipschitzGraph.hasBesovExtension`), by
-Rychkov's extension. Their graph `{φ = ⟪·, e⟫}` is a null set (`Rd.LipschitzGraph.volume_graph`):
-it lies in the image of the hyperplane `e^⊥` under the Lipschitz map `y ↦ y + φ(y) e`. So is their
-frontier (`Rd.LipschitzGraph.volume_frontier_domain`). Hence the closure of a graph domain with
-convex `φ` is a Besov domain (`Rd.BesovDomain.closure_lipschitzGraph`).
+**Lipschitz graph domains.** Their graph `{φ = ⟪·, e⟫}` is a null set
+(`Rd.LipschitzGraph.volume_graph`): it lies in the image of the hyperplane `e^⊥` under the
+Lipschitz map `y ↦ y + φ(y) e`. So is their frontier (`Rd.LipschitzGraph.volume_frontier_domain`).
+Hence the closure of a graph domain with convex `φ` is a Besov domain
+(`Rd.BesovDomain.closure_lipschitzGraph`).
 
 **The quadrant** `{y : ∀ i, 0 < y_i}` in `ℝ^n` is a single Lipschitz graph domain, near the corner
 as well, in the diagonal direction (`Rd.LipschitzGraph.quadrant`): with the diagonal unit vector
@@ -65,106 +59,11 @@ namespace Rd
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
 
-/-! ### The extension property -/
-
-/-- The **extension property** of a measurable set `Ω`: for `1 ≤ p < ∞`, `0 < s < r` and
-`1 ≤ q ≤ ∞` there is `C < ∞` such that every `f ∈ L_p(V)` with
-`N_Ω(f) = ‖1_Ω f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` agrees on `Ω` with some
-`F ∈ L_p(V)` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C N_Ω(f)`. This is the extension
-field of `Rd.BesovDomain`, for every measurable set. -/
-def HasBesovExtension {Ω : Set V} (hΩ : MeasurableSet Ω) : Prop :=
-  ∀ (p : ℝ≥0∞) [Fact (1 ≤ p)], p ≠ ∞ → ∀ (r : ℕ) (s : ℝ), 0 < s → s < r →
-    ∀ q : ℝ≥0∞, 1 ≤ q → ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖indicatorLp hΩ f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r f k) < ∞ →
-      ∃ F : Lp ℂ p (volume : Measure V),
-        indicatorLp hΩ F = indicatorLp hΩ f ∧
-        ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) ≤
-          C * (‖indicatorLp hΩ f‖ₑ +
-            lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r f k))
-
-/-- **A Besov domain has the extension property.** -/
-theorem BesovDomain.hasBesovExtension (Ω : Set V) [BesovDomain Ω] :
-    HasBesovExtension (BesovDomain.measurableSet Ω) :=
-  BesovDomain.exists_extension (Ω := Ω)
-
-/-- **A closed convex set with nonempty interior and the extension property is a Besov
-domain.** -/
-theorem BesovDomain.of_hasBesovExtension {Ω : Set V} (hc : Convex ℝ Ω) (hcl : IsClosed Ω)
-    (hint : (interior Ω).Nonempty) (h : HasBesovExtension hcl.measurableSet) : BesovDomain Ω :=
-  ⟨hc, hcl, hint, h⟩
-
-/-- **The extension property is the same for sets that agree up to a null set**: if `U` has it and
-`U'` agrees with `U` up to a null set, then `U'` has it; the proof keeps the constant `C`, since
-the cut-offs and the moduli on `U` and `U'` agree (`Rd.indicatorLp_congr_set`,
-`Rd.lpModulusOn_congr_set`). -/
-theorem HasBesovExtension.congr_set {U U' : Set V} {hU : MeasurableSet U} (hU' : MeasurableSet U')
-    (hUU' : U =ᵐ[volume] U') (h : HasBesovExtension hU) : HasBesovExtension hU' := by
-  intro p _ hp r s hs hsr q hq
-  obtain ⟨C, hC, hext⟩ := h p hp r s hs hsr q hq
-  have hcut : ∀ g : Lp ℂ p (volume : Measure V), indicatorLp hU' g = indicatorLp hU g :=
-    fun g => (indicatorLp_congr_set hU hU' hUU' g).symm
-  have hmod : ∀ (g : Lp ℂ p (volume : Measure V)) k,
-      lpModulusOn p U' r g k = lpModulusOn p U r g k :=
-    fun g k => (lpModulusOn_congr_set hUU' r g k).symm
-  refine ⟨C, hC, fun f hf => ?_⟩
-  simp_rw [hcut, hmod] at hf ⊢
-  exact hext f hf
-
-/-- **Besov domains up to null sets**: a closed convex set `Ω` with nonempty interior is a Besov
-domain if it agrees up to a null set with a set `U` with the extension property. -/
-theorem BesovDomain.of_ae_eq {Ω U : Set V} (hc : Convex ℝ Ω) (hcl : IsClosed Ω)
-    (hint : (interior Ω).Nonempty) {hU : MeasurableSet U} (h : HasBesovExtension hU)
-    (hae : Ω =ᵐ[volume] U) : BesovDomain Ω :=
-  of_hasBesovExtension hc hcl hint (h.congr_set hcl.measurableSet hae.symm)
-
-/-- **Models of manifolds as Besov domains**: the range of a model with corners is a Besov domain
-if it agrees up to a null set with a set with the extension property. The range is closed, convex
-and has nonempty interior for every real model with corners (Mathlib's
-`ModelWithCorners.isClosed_range`, `ModelWithCorners.convex_range`,
-`ModelWithCorners.nonempty_interior`). -/
-theorem BesovDomain.range_of_ae_eq {H : Type*} [TopologicalSpace H] (I : ModelWithCorners ℝ V H)
-    {U : Set V} {hU : MeasurableSet U} (h : HasBesovExtension hU) (hae : range I =ᵐ[volume] U) :
-    BesovDomain (range I) :=
-  of_ae_eq I.convex_range I.isClosed_range I.nonempty_interior h hae
-
-/-- **The order of the differences does not matter on a set with the extension property**: for
-`0 < s < r` and `s < r'` there is `C < ∞` with `N_Ω(f; r') ≤ C N_Ω(f; r)` whenever
-`N_Ω(f; r) < ∞`, where `N_Ω(f; r) = ‖1_Ω f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}`. Extend
-`f` to `V`, change the order there (`Rd.modNorm_le_modNorm_of_lt`), and restrict. -/
-theorem HasBesovExtension.modNormOn_order_le {Ω : Set V} {hΩ : MeasurableSet Ω}
-    (h : HasBesovExtension hΩ) {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {r r' : ℕ} {s : ℝ}
-    (hs : 0 < s) (hsr : s < r) (hsr' : s < r') {q : ℝ≥0∞} (hq : 1 ≤ q) :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖indicatorLp hΩ f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r f k) < ∞ →
-      ‖indicatorLp hΩ f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r' f k) ≤
-        C * (‖indicatorLp hΩ f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r f k)) := by
-  obtain ⟨C₁, hC₁, hext⟩ := h p hp r s hs hsr q hq
-  obtain ⟨C₂, hC₂, hord⟩ := modNorm_le_modNorm_of_lt (V := V) hp r hs.le hsr' hq
-  refine ⟨C₂ * C₁, ENNReal.mul_ne_top hC₂ hC₁, fun f hf => ?_⟩
-  obtain ⟨F, hFf, hFle⟩ := hext f hf
-  rw [mul_assoc]
-  exact (modNormOn_le_modNorm_of_indicatorLp hΩ r' s q hFf).trans
-    ((hord F).trans (mul_le_mul' le_rfl hFle))
-
 /-! ### Lipschitz graph domains -/
 
 namespace LipschitzGraph
 
 variable (G : LipschitzGraph V)
-
-/-- **Lipschitz graph domains have the extension property**: Rychkov's extension agrees with `f`
-on the domain (`Rd.LipschitzGraph.cutoff_extension_of_modNormOn`) and is bounded by a constant
-times the intrinsic quasi-norm (`Rd.LipschitzGraph.modNorm_extension_le_modNormOn`); the proof
-takes `C = G.coneBump.synthConst r s * G.intrinsicConst r`. -/
-theorem hasBesovExtension : HasBesovExtension G.measurableSet_domain := by
-  intro p _ hp r s hs hsr q hq
-  have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
-  exact ⟨G.coneBump.synthConst r s * G.intrinsicConst r, ENNReal.mul_ne_top
-    (G.coneBump.synthConst_ne_top hs hsr) (G.intrinsicConst_ne_top r), fun f hf =>
-    ⟨G.extension hp r f, G.cutoff_extension_of_modNormOn hp hr hs hq hf,
-      G.modNorm_extension_le_modNormOn hp r hs hq hf⟩⟩
 
 /-- **The graph of a Lipschitz graph domain is a null set**: `{x : φ(x) = ⟪x, e⟫}` lies in a
 Lipschitz image of the null hyperplane `e^⊥` (`Rd.LipschitzGraph.graph_subset_image_unflatten`,
@@ -412,12 +311,8 @@ Lipschitz domain, convex or not (`Rd.HasBesovExtension.modNormOn_order_le`). -/
 theorem modNormOn_order_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {r r' : ℕ} {s : ℝ}
     (hs : 0 < s) (hsr : s < r) (hsr' : s < r') {q : ℝ≥0∞} (hq : 1 ≤ q) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖indicatorLp Ω.measurableSet f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞ →
-      ‖indicatorLp Ω.measurableSet f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r' f k) ≤
-        C * (‖indicatorLp Ω.measurableSet f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k)) :=
+      modNormOn Ω.measurableSet r s q f < ∞ →
+      modNormOn Ω.measurableSet r' s q f ≤ C * modNormOn Ω.measurableSet r s q f :=
   Ω.hasBesovExtension.modNormOn_order_le hp hs hsr hsr' hq
 
 end BoundedLipschitzDomain

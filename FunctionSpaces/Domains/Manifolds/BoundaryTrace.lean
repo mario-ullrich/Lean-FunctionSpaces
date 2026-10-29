@@ -69,12 +69,8 @@ theorem cutoff_eq_indicatorLp (hΩm : MeasurableSet (range (𝓡∂ n)))
 differ by the null set `H₀`. -/
 theorem modNormOn_range_eq (hΩm : MeasurableSet (range (𝓡∂ n))) (r : ℕ) (σ : ℝ) (q : ℝ≥0∞)
     (G : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin n)))) :
-    ‖Rd.indicatorLp hΩm G‖ₑ + lqNorm q (fun k =>
-        dyadicWeight σ k * Rd.lpModulusOn p (range (𝓡∂ n)) r G k) =
-      ‖(flatDomain n).cutoff G‖ₑ + lqNorm q (fun k =>
-        dyadicWeight σ k * Rd.lpModulusOn p (flatDomain n).domain r G k) := by
-  rw [cutoff_eq_indicatorLp hΩm]
-  simp_rw [Rd.lpModulusOn_congr_set range_ae_eq_domain]
+    Rd.modNormOn hΩm r σ q G = Rd.modNormOn (flatDomain n).measurableSet_domain r σ q G :=
+  Rd.modNormOn_congr_set hΩm (flatDomain n).measurableSet_domain range_ae_eq_domain r σ q G
 
 /-! ### The trace commutes with the changes of charts -/
 
@@ -202,8 +198,8 @@ theorem trace_chartChange_applyLp_of_modNorm {L : ℕ} (hL : 1 ≤ L) {s : ℝ} 
 theorem trace_chartChange_applyLp {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
     (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {G : Lp ℂ p (volume : Measure (EuclideanSpace ℝ (Fin n)))}
-    (hG : ‖Rd.indicatorLp (Rd.BesovDomain.measurableSet (range (𝓡∂ n))) G‖ₑ + lqNorm q (fun k =>
-      dyadicWeight (s + 1 / p.toReal) k * Rd.lpModulusOn p (range (𝓡∂ n)) L G k) < ⊤) :
+    (hG : Rd.modNormOn (Rd.BesovDomain.measurableSet (range (𝓡∂ n))) L (s + 1 / p.toReal) q
+      G < ⊤) :
     (flatDomain n).trace hp L ((BesovAtlas.chartChange he he' c hc hcs).applyLp
         Rd.BesovDomain.convex Rd.BesovDomain.interior_nonempty
         (Rd.BesovDomain.measurableSet _) hp G) =
@@ -392,7 +388,7 @@ theorem memBoundaryBesov_boundaryTrace {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 
     (Rd.e0 : EuclideanSpace ℝ (Fin n)) Rd.norm_e0 hp L hr hs hsr hq
   have hG : Rd.modNormOn (Rd.BesovDomain.measurableSet (range (𝓡∂ n))) L (s + 1 / p.toReal) q
       (A.pieceLp μ hp k f) < ⊤ := hf.modNormOn_pieceLp_lt_top hp A hσ0 hsL hq k
-  rw [Rd.modNormOn, modNormOn_range_eq] at hG
+  rw [modNormOn_range_eq] at hG
   exact ⟨_, (A.boundaryPiece_boundaryTrace μ hp hL hs hsL hq hf k).symm,
     (hle _ hG).trans_lt (ENNReal.mul_lt_top hK.lt_top hG)⟩
 

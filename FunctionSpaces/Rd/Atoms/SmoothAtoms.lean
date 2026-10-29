@@ -459,23 +459,12 @@ theorem atomic_decomposition_smooth (hp : p ≠ ∞) (L K : ℕ) : ∃ A : ℝ, 
 
 end LocalMeansBump
 
-/-- The smooth bump around `0` with radii `1/2` and `1`. -/
-noncomputable def stdBumpBase : ContDiffBump (0 : V) := ⟨1 / 2, 1, by norm_num, by norm_num⟩
+/-- The smooth bump around `0` with radii `1/2` and `1` (`Rd.centeredBumpBase` for `R = 1`). -/
+noncomputable def stdBumpBase : ContDiffBump (0 : V) := centeredBumpBase one_pos
 
 /-- The **standard bump for local means**: the normalised `ContDiffBump` around `0` with outer
-radius `1`. -/
-noncomputable def LocalMeansBump.std : LocalMeansBump V where
-  toFun z := (((stdBumpBase (V := V)).normed volume z : ℝ) : ℂ)
-  radius := 1
-  radius_nonneg := zero_le_one
-  contDiff := Complex.ofRealCLM.contDiff.comp ((stdBumpBase (V := V)).contDiff_normed (n := ⊤))
-  eq_zero z hz := by
-    have hz' : z ∉ Function.support ((stdBumpBase (V := V)).normed volume) := by
-      rw [ContDiffBump.support_normed_eq, Metric.mem_ball, dist_zero_right]
-      exact not_lt.2 hz.le
-    rw [Function.notMem_support.1 hz', Complex.ofReal_zero]
-  integral_eq_one := by
-    rw [integral_complex_ofReal, ContDiffBump.integral_normed, Complex.ofReal_one]
+radius `1`, the centred bump `Rd.LocalMeansBump.centered` of radius `1`. -/
+noncomputable def LocalMeansBump.std : LocalMeansBump V := LocalMeansBump.centered one_pos
 
 /-- The standard bump `Rd.LocalMeansBump.std`, a nonnegative function of integral `1`, has `L_1`
 norm `1`. -/

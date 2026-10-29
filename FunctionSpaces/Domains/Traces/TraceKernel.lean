@@ -150,35 +150,6 @@ theorem mem_tildeSpace_of_dilate {Ω : Opens V} {U : H^{1}(V)} {S : Set V} (hS :
   exact mem_closure_of_tendsto ht (hΩ.mono fun n hn =>
     ofSchwartz_mem_testSpan 1 (hwc n) ((hws n).trans hn))
 
-/-! ### Mollifiers from bump functions -/
-
-/-- **The mollifier of a bump function**: the normalised smooth bump `f` around `c` (Mathlib's
-`ContDiffBump.normed`), with complex values; it is smooth with compact support in the closed ball
-`B̄(c, r_out)` and has integral `1`. -/
-noncomputable def bumpMollifier {c : V} (f : ContDiffBump c) : V → ℂ :=
-  fun z => ((f.normed volume z : ℝ) : ℂ)
-
-/-- The mollifier of a bump function is smooth. -/
-theorem contDiff_bumpMollifier {c : V} (f : ContDiffBump c) :
-    ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (bumpMollifier f) :=
-  Complex.ofRealCLM.contDiff.comp (f.contDiff_normed (n := ⊤))
-
-/-- The mollifier of a bump function has its closed support in `B̄(c, r_out)`. -/
-theorem tsupport_bumpMollifier_subset {c : V} (f : ContDiffBump c) :
-    tsupport (bumpMollifier f) ⊆ closedBall c f.rOut :=
-  (tsupport_comp_subset Complex.ofReal_zero _).trans (f.tsupport_normed_eq (μ := volume)).subset
-
-/-- The mollifier of a bump function has compact support, since the normalised bump has
-(Mathlib's `ContDiffBump.hasCompactSupport_normed`). -/
-theorem hasCompactSupport_bumpMollifier {c : V} (f : ContDiffBump c) :
-    HasCompactSupport (bumpMollifier f) :=
-  (f.hasCompactSupport_normed (μ := volume)).comp_left Complex.ofReal_zero
-
-/-- The mollifier of a bump function has integral `1` (Mathlib's `ContDiffBump.integral_normed`). -/
-theorem integral_bumpMollifier {c : V} (f : ContDiffBump c) : ∫ z, bumpMollifier f z = 1 := by
-  change ∫ z, ((f.normed volume z : ℝ) : ℂ) = 1
-  rw [integral_complex_ofReal, f.integral_normed, Complex.ofReal_one]
-
 /-- **Mollified functions with compact support in `Ω`**: for an open set `Ω`, every `U ∈ H^1(V)`
 vanishing almost everywhere outside a compact subset `S` of `Ω` lies in `H̃^1(Ω)`. Some
 thickening `S_δ` lies in `Ω` (Mathlib's `IsCompact.exists_thickening_subset_open`), and for the

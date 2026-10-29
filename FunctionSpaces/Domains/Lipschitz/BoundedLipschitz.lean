@@ -481,9 +481,8 @@ theorem measurableSet : MeasurableSet Ω.carrier := Ω.isOpen.measurableSet
 /-- The intrinsic quasi-norm of `f` on a measurable `T ⊆ Ω` is at most that on `Ω`. -/
 theorem modNormOn_mono_set {T : Set V} (hT : MeasurableSet T) (hTΩ : T ⊆ Ω.carrier) (r : ℕ)
     (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p (volume : Measure V)) :
-    ‖indicatorLp hT f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p T r f k) ≤
-      ‖indicatorLp Ω.measurableSet f‖ₑ +
-        lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) := by
+    modNormOn hT r s q f ≤ modNormOn Ω.measurableSet r s q f := by
+  unfold modNormOn
   refine add_le_add ?_ (ENNReal.lqNorm_mono fun k =>
     mul_le_mul' le_rfl (lpModulusOn_mono_set hT hTΩ r f k))
   rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hT f),
@@ -500,12 +499,10 @@ the bump and `C` depend only on `ε`, `r`, `s` and `j`. -/
 theorem exists_local_extension_boundary_le (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ}
     (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {ε : ℝ} (hε : 0 < ε) (j : Fin Ω.N) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖indicatorLp Ω.measurableSet f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞ →
+      modNormOn Ω.measurableSet r s q f < ∞ →
       ∃ F : Lp ℂ p (volume : Measure V),
         ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) ≤
-            C * (‖indicatorLp Ω.measurableSet f‖ₑ +
-              lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k)) ∧
+            C * modNormOn Ω.measurableSet r s q f ∧
           ∀ᵐ x ∂(volume : Measure V), x ∈ Ω.carrier →
             x ∈ ball (Ω.center j) (Ω.radius j - 2 * ε) → F x = f x := by
   set G := Ω.graph j
@@ -540,8 +537,7 @@ Besov quasi-norm on `V`, by the local extension with the cone bump of `Ω_j` res
 theorem exists_local_extension_boundary (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
     (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {ε : ℝ} (hε : 0 < ε) (j : Fin Ω.N)
     (f : Lp ℂ p (volume : Measure V))
-    (hf : ‖indicatorLp Ω.measurableSet f‖ₑ +
-      lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞) :
+    (hf : modNormOn Ω.measurableSet r s q f < ∞) :
     ∃ F : Lp ℂ p (volume : Measure V),
       ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) < ∞ ∧
         ∀ᵐ x ∂(volume : Measure V), x ∈ Ω.carrier →
@@ -558,12 +554,10 @@ and `C` depend only on `δ`, `r` and `s`. -/
 theorem exists_local_extension_interior_le (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ}
     (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {δ : ℝ} (hδ : 0 < δ) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖indicatorLp Ω.measurableSet f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞ →
+      modNormOn Ω.measurableSet r s q f < ∞ →
       ∃ F : Lp ℂ p (volume : Measure V),
         ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) ≤
-            C * (‖indicatorLp Ω.measurableSet f‖ₑ +
-              lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k)) ∧
+            C * modNormOn Ω.measurableSet r s q f ∧
           ∀ᵐ x ∂(volume : Measure V), x ∈ Ω.carrier →
             x ∈ {x : V | 2 * δ < infDist x Ω.carrierᶜ} → F x = f x := by
   have hR0 : 0 < min (1 / 2 : ℝ) (δ / ((r : ℝ) + 1)) := lt_min (by norm_num) (by positivity)
@@ -604,8 +598,7 @@ Besov quasi-norm on `V`, by the local extension with a centred bump of radius `�
 (`Rd.BoundedLipschitzDomain.exists_local_extension_interior_le`). -/
 theorem exists_local_extension_interior (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s)
     (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {δ : ℝ} (hδ : 0 < δ) (f : Lp ℂ p (volume : Measure V))
-    (hf : ‖indicatorLp Ω.measurableSet f‖ₑ +
-      lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞) :
+    (hf : modNormOn Ω.measurableSet r s q f < ∞) :
     ∃ F : Lp ℂ p (volume : Measure V),
       ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) < ∞ ∧
         ∀ᵐ x ∂(volume : Measure V), x ∈ Ω.carrier →
@@ -621,14 +614,9 @@ theorem exists_local_extension_interior (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r
 theorem modNorm_eq_modNormOn_of_carrier_eq_univ (hu : Ω.carrier = Set.univ) (r : ℕ) (s : ℝ)
     (q : ℝ≥0∞) (f : Lp ℂ p (volume : Measure V)) :
     ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) =
-      ‖indicatorLp Ω.measurableSet f‖ₑ +
-        lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) := by
-  have key : ∀ {U : Set V} (hU : MeasurableSet U), U = Set.univ →
-      ‖f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r f k) =
-        ‖indicatorLp hU f‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulusOn p U r f k) := by
-    rintro U hU rfl
-    exact (modNormOn_univ r s q f).symm
-  exact key Ω.measurableSet hu
+      modNormOn Ω.measurableSet r s q f :=
+  (modNormOn_univ r s q f).symm.trans
+    (modNormOn_congr_set MeasurableSet.univ Ω.measurableSet (by rw [hu]) r s q f)
 
 /-- **The extension for bounded Lipschitz domains with a bound** (Rychkov): for `1 ≤ p < ∞`,
 `0 < s < r` and `1 ≤ q ≤ ∞` there is `C < ∞` such that every `f` with
@@ -643,13 +631,11 @@ operator, as in Rychkov; this theorem records its bound for each `f`. -/
 theorem exists_besov_extension_le (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s < r)
     {q : ℝ≥0∞} (hq : 1 ≤ q) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖indicatorLp Ω.measurableSet f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞ →
+      modNormOn Ω.measurableSet r s q f < ∞ →
       ∃ F : Lp ℂ p (volume : Measure V), indicatorLp Ω.measurableSet F =
           indicatorLp Ω.measurableSet f ∧
         ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) ≤
-          C * (‖indicatorLp Ω.measurableSet f‖ₑ +
-            lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k)) := by
+          C * modNormOn Ω.measurableSet r s q f := by
   have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
   rcases (Ω.carrierᶜ).eq_empty_or_nonempty with hc | hc
   · -- `Ω = V`
@@ -688,8 +674,7 @@ theorem exists_besov_extension_le (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 <
 (`Rd.BoundedLipschitzDomain.exists_besov_extension_le`). -/
 theorem exists_besov_extension_of_modulusOn (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs : 0 < s)
     (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
-    (hf : ‖indicatorLp Ω.measurableSet f‖ₑ +
-      lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞) :
+    (hf : modNormOn Ω.measurableSet r s q f < ∞) :
     ∃ F : Lp ℂ p (volume : Measure V), indicatorLp Ω.measurableSet F =
         indicatorLp Ω.measurableSet f ∧
       ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) < ∞ := by
@@ -706,8 +691,7 @@ theorem exists_besov_extension_iff_modulusOn (hp : p ≠ ∞) {r : ℕ} {s : ℝ
     (∃ F : Lp ℂ p (volume : Measure V), indicatorLp Ω.measurableSet F =
         indicatorLp Ω.measurableSet f ∧
       ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) < ∞) ↔
-      ‖indicatorLp Ω.measurableSet f‖ₑ +
-        lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞ := by
+      modNormOn Ω.measurableSet r s q f < ∞ := by
   constructor
   · rintro ⟨F, hFf, hF⟩
     exact (modNormOn_le_modNorm_of_indicatorLp Ω.measurableSet r s q hFf).trans_lt hF
@@ -721,8 +705,7 @@ theorem exists_memApprox_extension_iff (hp : p ≠ ∞) {r : ℕ} {s : ℝ} (hs 
     {q : ℝ≥0∞} (hq : 1 ≤ q) (f : Lp ℂ p (volume : Measure V)) :
     (∃ F : Lp ℂ p (volume : Measure V), indicatorLp Ω.measurableSet F =
         indicatorLp Ω.measurableSet f ∧ (bandScheme hp).MemApprox s q F) ↔
-      ‖indicatorLp Ω.measurableSet f‖ₑ +
-        lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω.carrier r f k) < ∞ := by
+      modNormOn Ω.measurableSet r s q f < ∞ := by
   rw [← Ω.exists_besov_extension_iff_modulusOn hp hs hsr hq f]
   exact exists_congr fun F =>
     and_congr_right fun _ => memApprox_bandScheme_iff_modulus hp hs.le hsr hq F

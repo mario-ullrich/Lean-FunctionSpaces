@@ -475,10 +475,8 @@ of order `L ≥ 2` on `Ω`. -/
 theorem intrinsicNorm_lt_top_of_modNorm (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {σ : ℝ} {q : ℝ≥0∞}
     (hq : 1 ≤ q) {G : Lp ℂ p (volume : Measure V)}
     (hG : ‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p 2 G k) < ∞) :
-    ‖Ω.cutoff G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulusOn p Ω.domain L G k) < ∞ ∧
-      Ω.intrinsicNorm hp L σ q G < ∞ := by
-  have h1 : ‖Ω.cutoff G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulusOn p Ω.domain L G k) <
-      ∞ :=
+    modNormOn Ω.measurableSet_domain L σ q G < ∞ ∧ Ω.intrinsicNorm hp L σ q G < ∞ := by
+  have h1 : modNormOn Ω.measurableSet_domain L σ q G < ∞ :=
     ((Ω.modNormOn_le_modNorm L σ q rfl).trans (modNorm_order_le hL σ q G)).trans_lt
       (ENNReal.mul_lt_top (by simp) hG)
   exact ⟨h1, Ω.intrinsicNorm_lt_top hp L σ hq h1⟩
@@ -645,9 +643,8 @@ theorem trace_graphExtension (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ}
 (`Rd.LipschitzGraph.trace_graphExtension`). -/
 theorem exists_trace_eq_iff (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s) (hs1 : s < 1)
     {q : ℝ≥0∞} (hq : 1 ≤ q) (g : Lp ℂ p (volume : Measure Ω.hyperplane)) :
-    (∃ f : Lp ℂ p (volume : Measure V), ‖Ω.cutoff f‖ₑ + lqNorm q (fun k =>
-        dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p Ω.domain L f k) < ∞ ∧
-        Ω.trace hp L f = g) ↔
+    (∃ f : Lp ℂ p (volume : Measure V),
+        modNormOn Ω.measurableSet_domain L (s + 1 / p.toReal) q f < ∞ ∧ Ω.trace hp L f = g) ↔
       ‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 g k) < ∞ := by
   constructor
   · rintro ⟨f, hf, rfl⟩

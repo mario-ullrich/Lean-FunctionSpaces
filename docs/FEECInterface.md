@@ -198,8 +198,9 @@ Files `FunctionSpaces/Domains/Sobolev/LipschitzDomainH1.lean`,
   matter (`.MemSobolevOn.congr_ae`), and `H^1(Ω)` is a linear subspace
   (`.memSobolevOn_of_memSobolev`, `.zero_memSobolevOn`, `.MemSobolevOn.add`, `.MemSobolevOn.smul`).
 * Intrinsic description, `Rd.BoundedLipschitzDomain.memSobolevOn_iff_modulusOn (hr : 2 ≤ r)`:
-  `f ∈ H^1(Ω)` iff `‖f‖_{L_2(Ω)} + ‖(2^k ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞`, with the moduli of
-  smoothness inside `Ω` (`Rd.lpModulusOn`); the Besov form is
+  `f ∈ H^1(Ω)` iff the intrinsic quasi-norm
+  `‖f‖_{L_2(Ω)} + ‖(2^k ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_2}` (`Rd.modNormOn`) is finite, with the
+  moduli of smoothness inside `Ω` (`Rd.lpModulusOn`); the Besov form is
   `Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_memApprox`.
 * The weak gradient, `Rd.BoundedLipschitzDomain.MemSobolevOn.memWeakSobolev`: every
   `f ∈ H^1(Ω)` satisfies `Rd.MemWeakSobolev Ω.toOpens 1 2 f`, so its weak derivatives on `Ω`

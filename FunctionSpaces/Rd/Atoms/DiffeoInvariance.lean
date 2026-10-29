@@ -32,13 +32,18 @@ a cut-off on `Ω` (`Rd.CutoffDiffeo`), acting by `T f = 1_{Ω ∩ U} (χ f) ∘ 
   Decompose `F` into smooth cell atoms of order `r`
   (`Rd.LocalMeansBump.atomic_decomposition_smooth`), transport them, and synthesise on `Ω`
   (`Rd.modNormOn_le_coeffNorm`).
-* **Besov domains** (`Rd.BesovDomain`): convex closed sets with nonempty interior on which every
-  function of finite intrinsic Besov quasi-norm extends to `V` with a bound. On a Besov domain the
-  intrinsic quasi-norm is invariant (`Rd.CutoffDiffeo.modNormOn_applyLp_le_modNormOn`), and the
-  order of the differences does not matter (`Rd.BesovDomain.modNormOn_order_le`); `V` itself is a
-  Besov domain, and so are the closed half-space, the quadrant, closed balls of positive radius,
-  the closed unit cube and the closures of nonempty bounded open convex sets
-  (`FunctionSpaces.Domains.Lipschitz.HalfSpace`, `FunctionSpaces.Domains.Lipschitz.BesovDomains`).
+* **The extension property** (`Rd.HasBesovExtension`): every function of finite intrinsic Besov
+  quasi-norm on a measurable set (`Rd.modNormOn`) extends to `V` with a bound. It is the same for
+  sets that agree up to a null set (`Rd.HasBesovExtension.congr_set`), and with it the order of
+  the differences does not matter (`Rd.HasBesovExtension.modNormOn_order_le`).
+* **Besov domains** (`Rd.BesovDomain`): convex closed sets with nonempty interior with the
+  extension property (`Rd.BesovDomain.of_hasBesovExtension`, up to null sets
+  `Rd.BesovDomain.of_ae_eq`). On a Besov domain the intrinsic quasi-norm is invariant
+  (`Rd.CutoffDiffeo.modNormOn_applyLp_le_modNormOn`), and the order of the differences does not
+  matter (`Rd.BesovDomain.modNormOn_order_le`); `V` itself is a Besov domain, and so are the
+  closed half-space, the quadrant, closed balls of positive radius, the closed unit cube and the
+  closures of nonempty bounded open convex sets (`FunctionSpaces.Domains.Lipschitz.HalfSpace`,
+  `FunctionSpaces.Domains.Lipschitz.BesovDomains`).
 -/
 
 @[expose] public section
@@ -336,8 +341,7 @@ C (‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q})`. The smooth cell ato
 (`Rd.modNormOn_le_coeffNorm`). -/
 theorem modNormOn_applyLp_le {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞}
     (hq : 1 ≤ q) : ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ F : Lp ℂ p (volume : Measure V),
-      ‖indicatorLp hΩm (T.applyLp hΩ hint hΩm hp F)‖ₑ + lqNorm q (fun k =>
-          dyadicWeight s k * lpModulusOn p Ω r (T.applyLp hΩ hint hΩm hp F) k) ≤
+      modNormOn hΩm r s q (T.applyLp hΩ hint hΩm hp F) ≤
         C * (‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k)) := by
   have hp1 : 1 ≤ p := Fact.out
   set b := LocalMeansBump.std (V := V)
@@ -367,7 +371,7 @@ theorem modNormOn_applyLp_le {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s) (hs
       (b.tendsto_sum_dual_localMean hp hr F)
     simpa only [Function.comp_def, map_sum] using h
   have hsyn := modNormOn_le_coeffNorm hp hΩm c' _ coef' hN ha' hf hF hs hsr hq
-  rw [Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hΩm _)]
+  rw [modNormOn, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hΩm _)]
   refine hsyn.trans ?_
   rw [mul_assoc]
   refine mul_le_mul' le_rfl ?_
@@ -429,19 +433,62 @@ end CutoffDiffeo
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
 
+/-! ### The extension property -/
+
+/-- The **extension property** of a measurable set `Ω`: for `1 ≤ p < ∞`, `0 < s < r` and
+`1 ≤ q ≤ ∞` there is `C < ∞` such that every `f ∈ L_p(V)` with
+`N_Ω(f) = ‖1_Ω f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` (`Rd.modNormOn`) agrees on `Ω`
+with some `F ∈ L_p(V)` with `‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q} ≤ C N_Ω(f)`. -/
+def HasBesovExtension {Ω : Set V} (hΩ : MeasurableSet Ω) : Prop :=
+  ∀ (p : ℝ≥0∞) [Fact (1 ≤ p)], p ≠ ∞ → ∀ (r : ℕ) (s : ℝ), 0 < s → s < r →
+    ∀ q : ℝ≥0∞, 1 ≤ q → ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
+      modNormOn hΩ r s q f < ∞ → ∃ F : Lp ℂ p (volume : Measure V),
+        indicatorLp hΩ F = indicatorLp hΩ f ∧
+        ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) ≤
+          C * modNormOn hΩ r s q f
+
+/-- **The extension property is the same for sets that agree up to a null set**: if `U` has it and
+`U'` agrees with `U` up to a null set, then `U'` has it; the proof keeps the constant `C`, since
+the cut-offs and the intrinsic quasi-norms on `U` and `U'` agree (`Rd.indicatorLp_congr_set`,
+`Rd.modNormOn_congr_set`). -/
+theorem HasBesovExtension.congr_set {U U' : Set V} {hU : MeasurableSet U} (hU' : MeasurableSet U')
+    (hUU' : U =ᵐ[volume] U') (h : HasBesovExtension hU) : HasBesovExtension hU' := by
+  intro p _ hp r s hs hsr q hq
+  obtain ⟨C, hC, hext⟩ := h p hp r s hs hsr q hq
+  refine ⟨C, hC, fun f hf => ?_⟩
+  simp_rw [← modNormOn_congr_set hU hU' hUU', ← indicatorLp_congr_set hU hU' hUU'] at hf ⊢
+  exact hext f hf
+
+/-- **The order of the differences does not matter on a set with the extension property**: for
+`0 < s < r` and `s < r'` there is `C < ∞` with `N_Ω(f; r') ≤ C N_Ω(f; r)` whenever
+`N_Ω(f; r) < ∞`, where `N_Ω(f; r) = ‖1_Ω f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}`. Extend
+`f` to `V`, change the order there (`Rd.modNorm_le_modNorm_of_lt`), and restrict. -/
+theorem HasBesovExtension.modNormOn_order_le {Ω : Set V} {hΩ : MeasurableSet Ω}
+    (h : HasBesovExtension hΩ) {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {r r' : ℕ} {s : ℝ}
+    (hs : 0 < s) (hsr : s < r) (hsr' : s < r') {q : ℝ≥0∞} (hq : 1 ≤ q) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
+      modNormOn hΩ r s q f < ∞ → modNormOn hΩ r' s q f ≤ C * modNormOn hΩ r s q f := by
+  obtain ⟨C₁, hC₁, hext⟩ := h p hp r s hs hsr q hq
+  obtain ⟨C₂, hC₂, hord⟩ := modNorm_le_modNorm_of_lt (V := V) hp r hs.le hsr' hq
+  refine ⟨C₂ * C₁, ENNReal.mul_ne_top hC₂ hC₁, fun f hf => ?_⟩
+  obtain ⟨F, hFf, hFle⟩ := hext f hf
+  rw [mul_assoc]
+  exact (modNormOn_le_modNorm_of_indicatorLp hΩ r' s q hFf).trans
+    ((hord F).trans (mul_le_mul' le_rfl hFle))
+
 /-! ### Besov domains -/
 
-/-- A **Besov domain**: a closed convex set with nonempty interior on which every function of
-finite intrinsic Besov quasi-norm agrees with a function on `V` whose Besov quasi-norm is bounded
-by a constant times the intrinsic one, for `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`. The
-extension is a field of the class, so the class is a hypothesis; its instances are `univ`, the
-closed half-space, the models of manifolds with and without boundary and the quadrant model of
-manifolds with corners (`Rd.BesovDomain.univ`, `Rd.BesovDomain.closedHalfSpace`,
-`Rd.BesovDomain.range_euclideanHalfSpace`, `Rd.BesovDomain.range_of_boundaryless`,
-`Rd.BesovDomain.range_euclideanQuadrant`) and the closed unit cube
-(`Rd.BesovDomain.closedUnitCube`). The closure of a Lipschitz graph domain with convex graph
-function, of a nonempty convex bounded Lipschitz domain and of a nonempty bounded open convex set
-is a Besov domain (`Rd.BesovDomain.closure_lipschitzGraph`,
+/-- A **Besov domain**: a closed convex set with nonempty interior with the extension property
+(`Rd.HasBesovExtension`): every function of finite intrinsic Besov quasi-norm agrees with a
+function on `V` whose Besov quasi-norm is bounded by a constant times the intrinsic one, for
+`1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`. The extension is a field of the class, so the class is a
+hypothesis; its instances are `univ`, the closed half-space, the models of manifolds with and
+without boundary and the quadrant model of manifolds with corners (`Rd.BesovDomain.univ`,
+`Rd.BesovDomain.closedHalfSpace`, `Rd.BesovDomain.range_euclideanHalfSpace`,
+`Rd.BesovDomain.range_of_boundaryless`, `Rd.BesovDomain.range_euclideanQuadrant`) and the closed
+unit cube (`Rd.BesovDomain.closedUnitCube`). The closure of a Lipschitz graph domain with convex
+graph function, of a nonempty convex bounded Lipschitz domain and of a nonempty bounded open
+convex set is a Besov domain (`Rd.BesovDomain.closure_lipschitzGraph`,
 `Rd.BesovDomain.closure_boundedLipschitzDomain`, `Rd.BesovDomain.closure_of_convex`), and so is
 every closed ball of positive radius (`Rd.BesovDomain.closedBall`).
 The class consists of closed convex sets; every Lipschitz graph domain and every bounded Lipschitz
@@ -451,15 +498,7 @@ class BesovDomain (Ω : Set V) : Prop where
   convex : Convex ℝ Ω
   isClosed : IsClosed Ω
   interior_nonempty : (interior Ω).Nonempty
-  exists_extension : ∀ (p : ℝ≥0∞) [Fact (1 ≤ p)], p ≠ ∞ → ∀ (r : ℕ) (s : ℝ), 0 < s → s < r →
-    ∀ q : ℝ≥0∞, 1 ≤ q → ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖indicatorLp isClosed.measurableSet f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r f k) < ∞ →
-      ∃ F : Lp ℂ p (volume : Measure V),
-        indicatorLp isClosed.measurableSet F = indicatorLp isClosed.measurableSet f ∧
-        ‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k) ≤
-          C * (‖indicatorLp isClosed.measurableSet f‖ₑ +
-            lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r f k))
+  exists_extension : HasBesovExtension isClosed.measurableSet
 
 /-- **`V` is a Besov domain**, with the extension `F = f`. -/
 instance BesovDomain.univ : BesovDomain (Set.univ : Set V) where
@@ -471,6 +510,20 @@ instance BesovDomain.univ : BesovDomain (Set.univ : Set V) where
   exists_extension p _ _ r s _ _ q _ := ⟨1, ENNReal.one_ne_top, fun f _ =>
     ⟨f, rfl, by rw [one_mul, modNormOn_univ]⟩⟩
 
+/-- **A closed convex set with nonempty interior and the extension property is a Besov
+domain.** -/
+theorem BesovDomain.of_hasBesovExtension {Ω : Set V} (hc : Convex ℝ Ω) (hcl : IsClosed Ω)
+    (hint : (interior Ω).Nonempty) (h : HasBesovExtension hcl.measurableSet) : BesovDomain Ω :=
+  ⟨hc, hcl, hint, h⟩
+
+/-- **Besov domains up to null sets**: a closed convex set `Ω` with nonempty interior is a Besov
+domain if it agrees up to a null set with a set `U` with the extension property
+(`Rd.HasBesovExtension.congr_set`). -/
+theorem BesovDomain.of_ae_eq {Ω U : Set V} (hc : Convex ℝ Ω) (hcl : IsClosed Ω)
+    (hint : (interior Ω).Nonempty) {hU : MeasurableSet U} (h : HasBesovExtension hU)
+    (hae : Ω =ᵐ[volume] U) : BesovDomain Ω :=
+  of_hasBesovExtension hc hcl hint (h.congr_set hcl.measurableSet hae.symm)
+
 namespace BesovDomain
 
 variable (Ω : Set V) [BesovDomain Ω]
@@ -478,27 +531,21 @@ variable (Ω : Set V) [BesovDomain Ω]
 /-- A Besov domain is measurable. -/
 theorem measurableSet : MeasurableSet Ω := (isClosed (Ω := Ω)).measurableSet
 
+/-- **A Besov domain has the extension property.** -/
+theorem hasBesovExtension : HasBesovExtension (measurableSet Ω) :=
+  exists_extension (Ω := Ω)
+
 variable {Ω} in
 /-- **The order of the differences on a Besov domain does not matter**: for `0 < s < r` and
 `s < r'` there is `C < ∞` with `N_Ω(f; r') ≤ C N_Ω(f; r)` whenever `N_Ω(f; r) < ∞`, where
-`N_Ω(f; r) = ‖1_Ω f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}`. Extend `f` to `V`, change the
-order there (`Rd.modNorm_le_modNorm_of_lt`), and restrict. -/
+`N_Ω(f; r) = ‖1_Ω f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q}`
+(`Rd.HasBesovExtension.modNormOn_order_le`). -/
 theorem modNormOn_order_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞)
     {r r' : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s < r) (hsr' : s < r') {q : ℝ≥0∞} (hq : 1 ≤ q) :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖indicatorLp (measurableSet Ω) f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r f k) < ∞ →
-      ‖indicatorLp (measurableSet Ω) f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r' f k) ≤
-        C * (‖indicatorLp (measurableSet Ω) f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r f k)) := by
-  obtain ⟨C₁, hC₁, hext⟩ := exists_extension (Ω := Ω) p hp r s hs hsr q hq
-  obtain ⟨C₂, hC₂, hord⟩ := modNorm_le_modNorm_of_lt (V := V) hp r hs.le hsr' hq
-  refine ⟨C₂ * C₁, ENNReal.mul_ne_top hC₂ hC₁, fun f hf => ?_⟩
-  obtain ⟨F, hFf, hFle⟩ := hext f hf
-  rw [mul_assoc]
-  exact (modNormOn_le_modNorm_of_indicatorLp (measurableSet Ω) r' s q hFf).trans
-    ((hord F).trans (mul_le_mul' le_rfl hFle))
+      modNormOn (measurableSet Ω) r s q f < ∞ →
+      modNormOn (measurableSet Ω) r' s q f ≤ C * modNormOn (measurableSet Ω) r s q f :=
+  (hasBesovExtension Ω).modNormOn_order_le hp hs hsr hsr' hq
 
 end BesovDomain
 
@@ -532,14 +579,10 @@ variables with a cut-off: for `1 ≤ p < ∞`, `0 < s < r` and `1 ≤ q ≤ ∞`
 (`Rd.BesovDomain.exists_extension`) and apply `Rd.CutoffDiffeo.modNormOn_applyLp_le`. -/
 theorem modNormOn_applyLp_le_modNormOn {r : ℕ} (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s) (hsr : s < r)
     {q : ℝ≥0∞} (hq : 1 ≤ q) : ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖indicatorLp (BesovDomain.measurableSet Ω) f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r f k) < ∞ →
-      ‖indicatorLp (BesovDomain.measurableSet Ω)
-          (T.applyLp hB.convex hB.interior_nonempty (BesovDomain.measurableSet Ω) hp f)‖ₑ +
-        lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r
-          (T.applyLp hB.convex hB.interior_nonempty (BesovDomain.measurableSet Ω) hp f) k) ≤
-      C * (‖indicatorLp (BesovDomain.measurableSet Ω) f‖ₑ +
-          lqNorm q (fun k => dyadicWeight s k * lpModulusOn p Ω r f k)) := by
+      modNormOn (BesovDomain.measurableSet Ω) r s q f < ∞ →
+      modNormOn (BesovDomain.measurableSet Ω) r s q
+          (T.applyLp hB.convex hB.interior_nonempty (BesovDomain.measurableSet Ω) hp f) ≤
+        C * modNormOn (BesovDomain.measurableSet Ω) r s q f := by
   obtain ⟨C₁, hC₁, hext⟩ := hB.exists_extension p hp r s hs hsr q hq
   obtain ⟨C₂, hC₂, hT⟩ := T.modNormOn_applyLp_le hB.convex hB.interior_nonempty
     (BesovDomain.measurableSet Ω) hp hr hs hsr hq

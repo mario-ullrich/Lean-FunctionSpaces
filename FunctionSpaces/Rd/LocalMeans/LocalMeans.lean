@@ -38,8 +38,12 @@ quasi-norm is finite, with equivalent quasi-norms:
   (`Rd.LocalMeansBump.modNorm_le_localMeansNorm`).
 
 Local means therefore describe the same spaces as band-limited approximation, Littlewood–Paley
-blocks and differences (`Rd.LocalMeansBump.memApprox_bandScheme_iff_localMeans`). Every radius
-`R > 0` has a bump: the normalised smooth bump function around `0` (`Rd.LocalMeansBump.centered`).
+blocks and differences (`Rd.LocalMeansBump.memApprox_bandScheme_iff_localMeans`).
+
+**Bumps from smooth bump functions**: the normalised smooth bump function around `c` with outer
+radius `r` (Mathlib's `ContDiffBump.normed`), with complex values (`Rd.bumpMollifier`), is a bump
+of every radius `R ≥ ‖c‖ + r` (`Rd.LocalMeansBump.ofContDiffBump`). Hence every radius `R > 0` has
+a bump, the one around `0` (`Rd.LocalMeansBump.centered`).
 -/
 
 @[expose] public section
@@ -582,6 +586,49 @@ theorem memApprox_bandScheme_iff_localMeans (hp : p ≠ ∞) {L : ℕ} (hL : 1 �
 
 end LocalMeansBump
 
+/-! ### Bumps from smooth bump functions -/
+
+/-- **The mollifier of a bump function**: the normalised smooth bump `f` around `c` (Mathlib's
+`ContDiffBump.normed`), with complex values; it is smooth with compact support in the closed ball
+`B̄(c, r_out)` and has integral `1`. -/
+noncomputable def bumpMollifier {c : V} (f : ContDiffBump c) : V → ℂ :=
+  fun z => ((f.normed volume z : ℝ) : ℂ)
+
+/-- The mollifier of a bump function is smooth. -/
+theorem contDiff_bumpMollifier {c : V} (f : ContDiffBump c) :
+    ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (bumpMollifier f) :=
+  Complex.ofRealCLM.contDiff.comp (f.contDiff_normed (n := ⊤))
+
+/-- The mollifier of a bump function has its closed support in `B̄(c, r_out)`. -/
+theorem tsupport_bumpMollifier_subset {c : V} (f : ContDiffBump c) :
+    tsupport (bumpMollifier f) ⊆ Metric.closedBall c f.rOut :=
+  (tsupport_comp_subset Complex.ofReal_zero _).trans (f.tsupport_normed_eq (μ := volume)).subset
+
+/-- The mollifier of a bump function has compact support, since the normalised bump has
+(Mathlib's `ContDiffBump.hasCompactSupport_normed`). -/
+theorem hasCompactSupport_bumpMollifier {c : V} (f : ContDiffBump c) :
+    HasCompactSupport (bumpMollifier f) :=
+  (f.hasCompactSupport_normed (μ := volume)).comp_left Complex.ofReal_zero
+
+/-- The mollifier of a bump function has integral `1` (Mathlib's `ContDiffBump.integral_normed`). -/
+theorem integral_bumpMollifier {c : V} (f : ContDiffBump c) : ∫ z, bumpMollifier f z = 1 := by
+  change ∫ z, ((f.normed volume z : ℝ) : ℂ) = 1
+  rw [integral_complex_ofReal, f.integral_normed, Complex.ofReal_one]
+
+/-- **The bump for local means of a smooth bump function**: the mollifier of a smooth bump `f`
+around `c` with outer radius `r_out` vanishes outside `B̄(c, r_out)`, hence outside the ball of
+every radius `R ≥ ‖c‖ + r_out` around `0`, since `‖z‖ ≤ ‖z - c‖ + ‖c‖`. -/
+noncomputable def LocalMeansBump.ofContDiffBump {c : V} (f : ContDiffBump c) {R : ℝ}
+    (hR : ‖c‖ + f.rOut ≤ R) : LocalMeansBump V where
+  toFun := bumpMollifier f
+  radius := R
+  radius_nonneg := (add_nonneg (norm_nonneg c) f.rOut_pos.le).trans hR
+  contDiff := contDiff_bumpMollifier f
+  eq_zero z hz := image_eq_zero_of_notMem_tsupport fun h => by
+    have := mem_closedBall_iff_norm.1 (tsupport_bumpMollifier_subset f h)
+    linarith [norm_sub_norm_le z c]
+  integral_eq_one := integral_bumpMollifier f
+
 /-! ### The centred bump -/
 
 section Centered
@@ -594,20 +641,8 @@ noncomputable def centeredBumpBase {R : ℝ} (hR : 0 < R) : ContDiffBump (0 : V)
   ⟨R / 2, R, by positivity, by linarith⟩
 
 /-- The **centred bump** of radius `R > 0`: the normalised smooth bump function around `0`. -/
-noncomputable def LocalMeansBump.centered {R : ℝ} (hR : 0 < R) : LocalMeansBump V where
-  toFun z := (((centeredBumpBase (V := V) hR).normed volume z : ℝ) : ℂ)
-  radius := R
-  radius_nonneg := hR.le
-  contDiff := Complex.ofRealCLM.contDiff.comp
-    ((centeredBumpBase (V := V) hR).contDiff_normed (n := ⊤))
-  eq_zero z hz := by
-    have hz' : z ∉ Function.support ((centeredBumpBase (V := V) hR).normed volume) := by
-      rw [(centeredBumpBase (V := V) hR).support_normed_eq, Metric.mem_ball, dist_zero_right]
-      exact fun h => (lt_irrefl _ (hz.trans h))
-    rw [Function.notMem_support.1 hz', Complex.ofReal_zero]
-  integral_eq_one := by
-    rw [integral_complex_ofReal, (centeredBumpBase (V := V) hR).integral_normed,
-      Complex.ofReal_one]
+noncomputable def LocalMeansBump.centered {R : ℝ} (hR : 0 < R) : LocalMeansBump V :=
+  ofContDiffBump (centeredBumpBase hR) (R := R) (by simp [centeredBumpBase])
 
 /-- The centred bump has radius `R`. -/
 theorem LocalMeansBump.centered_radius {R : ℝ} (hR : 0 < R) :

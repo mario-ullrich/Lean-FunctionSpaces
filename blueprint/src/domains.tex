@@ -127,7 +127,8 @@ $c^{-1} K \subseteq K$.
   Rd.LipschitzGraph.coneSupported_momentKernel, Rd.LipschitzGraph.coneSupported_scaled,
   Rd.LipschitzGraph.coneSupported_kernel, Rd.LipschitzGraph.coneSupported_dual}
 \leanok
-\uses{lem:graph-cone, def:cone-supported, def:local-means}
+\uses{lem:graph-cone, def:cone-supported, def:local-means, def:bump-mollifier,
+  lem:bump-of-smooth-bump}
 There is a smooth $g : V \to \C$ with $\int_V g = 1$ that vanishes outside the ball of radius
 $1/2$ and is supported in $-K$. For every $L \geq 1$ the kernels $m_{2^j}$, $k_j$ and $\eta_j$
 of \Cref{def:local-means} built from $g$ are supported in $-K$.
@@ -135,9 +136,11 @@ of \Cref{def:local-means} built from $g$ are supported in $-K$.
 
 \begin{proof}
 \leanok
-Take the normalised smooth bump of radius $\rho$ around $-e/4$ (\Cref{lem:graph-cone}). It
-vanishes outside the ball of radius $1/4 + \rho \leq 1/2$, and $g(y) \neq 0$ gives
-$\|y + e/4\| < \rho$, so $-y$ lies in the ball of radius $\rho$ around $e/4$ and in $K$. The kernels are linear combinations of dilations of $g$.
+Take the bump mollifier (\Cref{def:bump-mollifier}) of the smooth bump of radius $\rho$ around
+$-e/4$ (\Cref{lem:graph-cone}). It vanishes outside the ball of radius $1/4 + \rho \leq 1/2$
+(\Cref{lem:bump-of-smooth-bump}), and $g(y) \neq 0$ gives $\|y + e/4\| < \rho$, so $-y$ lies in
+the ball of radius $\rho$ around $e/4$ and in $K$. The kernels are linear combinations of
+dilations of $g$.
 \end{proof}
 
 \begin{lemma}[Multiplication by an indicator]
@@ -198,10 +201,12 @@ almost everywhere.
 \lean{Rd.LipschitzGraph.conv_indicator_eq, Rd.LipschitzGraph.cutoff,
   Rd.LipschitzGraph.cutoff_apply_ae, Rd.LipschitzGraph.enorm_cutoff,
   Rd.LipschitzGraph.enorm_cutoff_le, Rd.LipschitzGraph.indicator_ae_eq_of_cutoff_eq,
-  Rd.LipschitzGraph.cutoff_convLp_cutoff, Rd.LipschitzGraph.cutoff_convLp_eq}
+  Rd.LipschitzGraph.cutoff_convLp_cutoff, Rd.LipschitzGraph.cutoff_convLp_eq,
+  Rd.LipschitzGraph.ConeSupported.sub_mem}
 \leanok
 \uses{def:cone-supported, lem:graph-cone, lem:indicator-lp, lem:conv-op}
-Let $k \in L_1$ be supported in $-K$ and $1 \leq p < \infty$. For $x \in \Omega$ and
+Let $k$ be supported in $-K$. For every $x \in \Omega$ and every $y$ with $k(y) \neq 0$,
+$x - y \in \Omega$. If moreover $k \in L_1$ and $1 \leq p < \infty$, then for $x \in \Omega$ and
 $f : V \to \C$, $(k * (1_\Omega f))(x) = (k * f)(x)$. Hence
 $1_\Omega (k * (1_\Omega h)) = 1_\Omega (k * h)$ for $h \in L_p$, and
 $1_\Omega (k * F) = 1_\Omega (k * f)$ whenever $F, f \in L_p$ agree almost everywhere on
@@ -223,8 +228,8 @@ kernels.
 
 \begin{definition}[Intrinsic local means]
 \label{def:intrinsic-local-means}
-\lean{Rd.LipschitzGraph.intrinsicNorm, Rd.LipschitzGraph.intrinsicNorm_congr,
-  Rd.LipschitzGraph.intrinsicNorm_le_localMeansNorm}
+\lean{Rd.LipschitzGraph.intrinsicNorm, Rd.LipschitzGraph.intrinsicNorm_def,
+  Rd.LipschitzGraph.intrinsicNorm_congr, Rd.LipschitzGraph.intrinsicNorm_le_localMeansNorm}
 \leanok
 \uses{lem:cone-bump, lem:support-principle}
 For $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p$, the intrinsic local
@@ -398,18 +403,16 @@ For $x \in U$, $k(y) (1_W h)(x - y) = k(y) h(x - y)$ for every $y$.
 \label{lem:bumps-every-radius}
 \lean{Rd.LocalMeansBump.rescale, Rd.LocalMeansBump.rescale_radius,
   Rd.LocalMeansBump.scaled_eq_zero, Rd.LocalMeansBump.dual_eq_zero,
-  Rd.LocalMeansBump.kernel_eq_zero, Rd.centeredBumpBase, Rd.LocalMeansBump.centered,
-  Rd.LocalMeansBump.centered_radius, Rd.LipschitzGraph.coneSupported_momentKernel_of,
+  Rd.LocalMeansBump.kernel_eq_zero, Rd.LipschitzGraph.coneSupported_momentKernel_of,
   Rd.LipschitzGraph.coneSupported_scaled_of, Rd.LipschitzGraph.coneSupported_dual_of,
   Rd.LipschitzGraph.coneSupported_rescale, Rd.LipschitzGraph.exists_coneBump_radius_le}
 \leanok
 \uses{def:local-means, def:cone-supported, lem:dilate, lem:cone-bump}
 If $g$ is a bump for local means of radius $R$ (\Cref{def:local-means}) and $c > 0$, then $g_c$ is
-one of radius $R/c$; for every $R > 0$ the normalised smooth bump around $0$ is one of radius $R$.
-The kernels $m_{2^j}$, $k_j$ and $\eta_j$ of a bump of radius $R$ vanish outside the ball of radius
-$L R$, and they are supported in $-K$ if $g$ is. For every Lipschitz graph domain $\Omega$ with
-cone $K$, every $a \geq 0$ and every $\varepsilon > 0$ there is a bump supported in $-K$ of radius
-$R \leq 1/2$ with $a R \leq \varepsilon$.
+one of radius $R/c$. The kernels $m_{2^j}$, $k_j$ and $\eta_j$ of a bump of radius $R$ vanish
+outside the ball of radius $L R$, and they are supported in $-K$ if $g$ is. For every Lipschitz
+graph domain $\Omega$ with cone $K$, every $a \geq 0$ and every $\varepsilon > 0$ there is a
+bump supported in $-K$ of radius $R \leq 1/2$ with $a R \leq \varepsilon$.
 \end{lemma}
 
 \begin{proof}
@@ -660,7 +663,8 @@ replaced by a measurable subset.
   Rd.BoundedLipschitzDomain.exists_local_extension_boundary,
   Rd.BoundedLipschitzDomain.exists_local_extension_interior}
 \leanok
-\uses{thm:local-extension, lem:patches, lem:bumps-every-radius, lem:restriction-moduli}
+\uses{thm:local-extension, lem:patches, lem:bumps-every-radius, lem:restriction-moduli,
+  lem:bump-of-smooth-bump}
 Let $1 \leq p < \infty$, $0 < s < r$, $1 \leq q \leq \infty$ and $\varepsilon, \delta > 0$, and
 write $N_\Omega(f) = \|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q}$.
 For every $j$ there is $C < \infty$ such that every $f \in L_p$ with $N_\Omega(f) < \infty$ agrees
@@ -673,9 +677,9 @@ $\{\operatorname{dist}(\cdot, \Omega^c) > 2\delta\}$.
 \leanok
 \Cref{thm:local-extension} with the patches of \Cref{lem:patches}: for the boundary balls the cone
 bump of $\Omega_j$ rescaled to radius $\leq \varepsilon / r$, inside a centred bump of radius
-$\leq \delta / r$; the moduli on the smaller sets are bounded by those on $\Omega$
-(\Cref{lem:restriction-moduli}). The bumps depend only on $\varepsilon$, $\delta$, $r$ and $j$, so
-$C$ is the constant of \Cref{thm:local-extension} for that bump.
+$\leq \delta / r$ (\Cref{lem:bump-of-smooth-bump}); the moduli on the smaller sets are bounded by
+those on $\Omega$ (\Cref{lem:restriction-moduli}). The bumps depend only on $\varepsilon$,
+$\delta$, $r$ and $j$, so $C$ is the constant of \Cref{thm:local-extension} for that bump.
 \end{proof}
 
 \begin{theorem}[Besov spaces on bounded Lipschitz domains by intrinsic differences]
@@ -2628,7 +2632,7 @@ $\|z\| \leq R + 2\|h\|$ on the support of $\Delta_h^2 K$.
   Rd.LipschitzGraph.integrable_graphBump_mul, Rd.LipschitzGraph.smoothGraph,
   Rd.LipschitzGraph.continuous_smoothGraph}
 \leanok
-\uses{def:graph-map, def:moment-kernel}
+\uses{def:graph-map, def:moment-kernel, lem:bump-of-smooth-bump}
 Let $\rho$ be the moment kernel of order $2$ of a bump of radius $1$ on $H$. The mollified graph at
 scale $2^{-j}$ is $\phi_j = \operatorname{Re} (\rho_{2^j} * \phi)$ on $H$.
 \end{definition}
@@ -6466,7 +6470,8 @@ $\{x : \dist(x, V \setminus \Omega) \geq 2 \delta\}$ is a closed bounded subset 
   Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior}
 \leanok
 \uses{thm:one-patch-extension, lem:divergence-kernel-supports, lem:patches,
-  lem:bumps-every-radius, lem:cone-bump, def:bounded-lipschitz, lem:extends-sobolev-mono}
+  lem:bumps-every-radius, lem:cone-bump, def:bounded-lipschitz, lem:extends-sobolev-mono,
+  lem:bump-of-smooth-bump}
 Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$ with boundary balls
 $B(c_j, \rho_j)$. For every $1 < p < \infty$, every $\varepsilon > 0$, every $\delta > 0$ and
 every $j$, Sobolev functions on $\Omega$ extend with finite constants from
@@ -6482,7 +6487,8 @@ domain $\Omega_j$ rescaled to a radius $R$ with $2R \leq \varepsilon$ (\Cref{lem
 $W = \Omega_j \cap B(c_j, \rho_j - \varepsilon)$ and $T = \Omega_j \cap B(c_j, \rho_j)
 = \Omega \cap B(c_j, \rho_j)$; the dual kernels satisfy the support condition by
 \Cref{lem:patches} and the divergence kernels by \Cref{lem:divergence-kernel-supports}. For the
-inner patch take the centred bump of radius $\delta/2$ and $T = \Omega$. In both cases
+inner patch take the centred bump of radius $\delta/2$ (\Cref{lem:bump-of-smooth-bump}) and
+$T = \Omega$. In both cases
 \Cref{thm:one-patch-extension} applies, and \Cref{lem:extends-sobolev-mono} passes from $T$ to
 $\Omega$.
 \end{proof}
@@ -6722,7 +6728,7 @@ are bounded open sets that cover $\overline\Omega$; apply (1).
   Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp}
 \leanok
 \uses{lem:sobolev-extension-op-pasting, def:sobolev-extension-op,
-  lem:sobolev-extension-op-patch, lem:sobolev-patches}
+  lem:sobolev-extension-op-patch, lem:sobolev-patches, lem:bump-of-smooth-bump}
 For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$ with boundary balls
 $B(c_j, \rho_j)$ and every $1 < p < \infty$ there are extension operators with finite constants
 from $\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$ for every $\varepsilon > 0$ and every $j$, from
@@ -9323,16 +9329,6 @@ support in $\operatorname{supp} K + S$.
 $K * f$ is smooth (\Cref{lem:conv-derivatives}), and its support lies in
 $\operatorname{supp} K + S$, which is compact, hence closed.
 \end{proof}
-
-\begin{definition}[Bump mollifiers]
-\label{def:bump-mollifier}
-\lean{Rd.bumpMollifier, Rd.contDiff_bumpMollifier, Rd.tsupport_bumpMollifier_subset,
-  Rd.hasCompactSupport_bumpMollifier, Rd.integral_bumpMollifier}
-\leanok
-For every smooth bump function $f$ around $c \in V$ with outer radius $r$ (Mathlib's
-\texttt{ContDiffBump}), the bump mollifier of $f$ is $f / \int f$ with complex values. It is
-smooth with support in $\bar B(c, r)$, compactly supported, and has integral $1$.
-\end{definition}
 
 \begin{theorem}[Mollified functions in $\tilde H^1$]
 \label{thm:tilde-space-mollified}

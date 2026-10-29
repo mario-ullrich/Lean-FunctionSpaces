@@ -28,14 +28,19 @@ closed under positive scaling and contains a ball around `e/4`
 dilate `η_c`, `c > 0` (`Rd.LipschitzGraph.mem_cone_of_mem_tsupport_dilate`).
 
 The **cone bump** (`Rd.LipschitzGraph.coneBump`) is a bump for local means supported in
-`-K ∩ B(0, 1/2)`. A kernel `k` is **supported in `-K`** if `k(y) ≠ 0` implies `-y ∈ K`
-(`Rd.LipschitzGraph.ConeSupported`); this passes to sums, differences and dilations, so the moment
-kernels, the local means kernels and the dual kernels of the cone bump are supported in `-K`.
+`-K ∩ B(0, 1/2)`: the bump of the smooth bump function around `-e/4` of radius `ρ`
+(`Rd.LocalMeansBump.ofContDiffBump`). A kernel `k` is **supported in `-K`** if `k(y) ≠ 0` implies
+`-y ∈ K` (`Rd.LipschitzGraph.ConeSupported`); this passes to sums, differences and dilations, so
+the moment kernels and the dual kernels of every bump supported in `-K` are supported in `-K`
+(`Rd.LipschitzGraph.coneSupported_momentKernel_of`, `Rd.LipschitzGraph.coneSupported_dual_of`),
+and so are the local means kernels of the cone bump (`Rd.LipschitzGraph.coneSupported_kernel`).
 
 **Support principle** (`Rd.LipschitzGraph.conv_indicator_eq`): for a kernel supported in `-K` and
-`x ∈ Ω`, `(k ⋆ f)(x)` depends only on `f` on `Ω`, since `x - y ∈ x + K ⊆ Ω` whenever
-`k(y) ≠ 0`. On `L_p`, with the cut-off `f ↦ 1_Ω f` (`Rd.LipschitzGraph.cutoff`, from
-`Rd.indicatorLp`): `1_Ω (k ⋆ (1_Ω h)) = 1_Ω (k ⋆ h)` (`Rd.LipschitzGraph.cutoff_convLp_cutoff`).
+`x ∈ Ω`, `(k ⋆ f)(x)` depends only on `f` on `Ω`, since `x - y ∈ x + K ⊆ Ω` whenever `k(y) ≠ 0`.
+This is the support principle for two sets, `(k ⋆ 1_W f)(x) = (k ⋆ f)(x)` if `x - y ∈ W` whenever
+`k(y) ≠ 0` (`Rd.conv_indicator_eq_of_forall`, `Rd.indicatorLp_convLp_indicatorLp`), for `W = Ω`.
+On `L_p`, with the cut-off `f ↦ 1_Ω f` (`Rd.LipschitzGraph.cutoff`, from `Rd.indicatorLp`):
+`1_Ω (k ⋆ (1_Ω h)) = 1_Ω (k ⋆ h)` (`Rd.LipschitzGraph.cutoff_convLp_cutoff`).
 Two classes have the same cut-off iff they agree almost everywhere on the set
 (`Rd.indicatorLp_eq_iff_ae_eq_restrict`).
 -/
@@ -48,6 +53,47 @@ open scoped ENNReal
 namespace Rd
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V]
+
+/-! ### The support principle for two sets -/
+
+section SupportPrincipleTwoSets
+
+variable [MeasurableSpace V]
+
+omit [InnerProductSpace ℝ V] in
+/-- **The support principle for two sets**: if `x - y ∈ W` whenever `k(y) ≠ 0`, then
+`(k ⋆ 1_W f)(x) = (k ⋆ f)(x)`. -/
+theorem conv_indicator_eq_of_forall {k : V → ℂ} {W : Set V} (f : V → ℂ) {x : V}
+    (hx : ∀ y, k y ≠ 0 → x - y ∈ W) (μ : Measure V) :
+    conv k (W.indicator f) μ x = conv k f μ x := by
+  rw [conv_apply, conv_apply]
+  congr 1
+  funext y
+  by_cases hy : k y = 0
+  · simp [hy]
+  · rw [Set.indicator_of_mem (hx y hy)]
+
+variable [FiniteDimensional ℝ V] [BorelSpace V] {p : ℝ≥0∞} [Fact (1 ≤ p)]
+
+/-- **The support principle for two sets on `L_p`**: `1_U (k ⋆ (1_W h)) = 1_U (k ⋆ h)` if
+`x - y ∈ W` for `x ∈ U` and `k(y) ≠ 0`. -/
+theorem indicatorLp_convLp_indicatorLp (hp : p ≠ ∞) {k : V → ℂ} (hk : Integrable k)
+    {U W : Set V} (hU : MeasurableSet U) (hW : MeasurableSet W)
+    (hUW : ∀ x ∈ U, ∀ y, k y ≠ 0 → x - y ∈ W) (h : Lp ℂ p (volume : Measure V)) :
+    indicatorLp hU (convLp hp hk (indicatorLp hW h)) = indicatorLp hU (convLp hp hk h) := by
+  refine Lp.ext ?_
+  have h3 : conv k (indicatorLp hW h : V → ℂ) volume = conv k (W.indicator h) volume :=
+    conv_congr_ae (indicatorLp_apply_ae hW h)
+  filter_upwards [indicatorLp_apply_ae hU (convLp hp hk (indicatorLp hW h)),
+    convLp_apply_ae hp hk (indicatorLp hW h), indicatorLp_apply_ae hU (convLp hp hk h),
+    convLp_apply_ae hp hk h] with x hx1 hx2 hx4 hx5
+  rw [hx1, hx4]
+  by_cases hx : x ∈ U
+  · rw [Set.indicator_of_mem hx, Set.indicator_of_mem hx, hx2, hx5, h3,
+      conv_indicator_eq_of_forall _ (hUW x hx) volume]
+  · rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem hx]
+
+end SupportPrincipleTwoSets
 
 /-! ### Lipschitz graph domains and their cones -/
 
@@ -291,6 +337,13 @@ theorem ConeSupported.finsetSum {ι : Type*} (s : Finset ι) (a : ι → ℂ) {k
   obtain ⟨i, hi, hne⟩ := Finset.exists_ne_zero_of_sum_ne_zero hy
   exact hk i hi y (right_ne_zero_of_mul hne)
 
+/-- **Kernels supported in `-K` look into `Ω` from points of `Ω`**: if `x ∈ Ω` and `k(y) ≠ 0`,
+then `x - y ∈ x + K ⊆ Ω` (`Rd.LipschitzGraph.add_mem`). -/
+theorem ConeSupported.sub_mem {k : V → ℂ} (hk : Ω.ConeSupported k) {x y : V}
+    (hx : x ∈ Ω.domain) (hy : k y ≠ 0) : x - y ∈ Ω.domain := by
+  rw [sub_eq_add_neg]
+  exact Ω.add_mem hx (hk y hy)
+
 variable (Ω)
 
 /-! ### The cone bump -/
@@ -302,27 +355,14 @@ noncomputable def coneBumpBase : ContDiffBump (-((1 / 4 : ℝ) • Ω.e)) :=
   ⟨Ω.coneRadius / 2, Ω.coneRadius, by have := Ω.coneRadius_pos; positivity,
     by have := Ω.coneRadius_pos; linarith⟩
 
-/-- The **cone bump**: a bump for local means supported in `-K ∩ B(0, 1/2)` (the normalised
-`ContDiffBump` around `-e/4` of radius `ρ`). -/
-noncomputable def coneBump : LocalMeansBump V where
-  toFun z := ((Ω.coneBumpBase.normed volume z : ℝ) : ℂ)
-  radius := 1 / 2
-  radius_nonneg := by norm_num
-  contDiff := Complex.ofRealCLM.contDiff.comp (Ω.coneBumpBase.contDiff_normed (n := ⊤))
-  eq_zero z hz := by
-    have hz' : z ∉ Function.support (Ω.coneBumpBase.normed volume) := by
-      rw [Ω.coneBumpBase.support_normed_eq, Metric.mem_ball, dist_eq_norm, sub_neg_eq_add]
-      intro h
-      have h1 : ‖z‖ ≤ ‖z + (1 / 4 : ℝ) • Ω.e‖ + ‖(1 / 4 : ℝ) • Ω.e‖ := by
-        have := norm_sub_le (z + (1 / 4 : ℝ) • Ω.e) ((1 / 4 : ℝ) • Ω.e)
-        rwa [add_sub_cancel_right] at this
-      rw [norm_smul, Ω.norm_e, mul_one, Real.norm_of_nonneg (by norm_num)] at h1
-      have h2 : Ω.coneBumpBase.rOut = Ω.coneRadius := rfl
-      rw [h2] at h
-      linarith [Ω.coneRadius_le]
-    rw [Function.notMem_support.1 hz', Complex.ofReal_zero]
-  integral_eq_one := by
-    rw [integral_complex_ofReal, Ω.coneBumpBase.integral_normed, Complex.ofReal_one]
+/-- The **cone bump**: a bump for local means supported in `-K ∩ B(0, 1/2)`, the normalised
+`ContDiffBump` around `-e/4` of radius `ρ` (`Rd.LocalMeansBump.ofContDiffBump`, since
+`‖-e/4‖ + ρ ≤ 1/4 + 1/8 ≤ 1/2`). -/
+noncomputable def coneBump : LocalMeansBump V :=
+  LocalMeansBump.ofContDiffBump Ω.coneBumpBase (R := 1 / 2) (by
+    have h : Ω.coneBumpBase.rOut = Ω.coneRadius := rfl
+    rw [h, norm_neg, norm_smul, Ω.norm_e, mul_one, Real.norm_of_nonneg (by norm_num)]
+    linarith [Ω.coneRadius_le])
 
 /-- The cone bump vanishes outside the ball of radius `1/2`. -/
 theorem coneBump_radius : Ω.coneBump.radius = 1 / 2 := rfl
@@ -330,21 +370,38 @@ theorem coneBump_radius : Ω.coneBump.radius = 1 / 2 := rfl
 /-- The cone bump is supported in `-K`. -/
 theorem coneSupported_coneBump : Ω.ConeSupported Ω.coneBump.toFun := fun y hy => by
   have hy' : y ∈ Function.support (Ω.coneBumpBase.normed volume) := fun h =>
-    hy (by simp [coneBump, h])
+    hy (show ((Ω.coneBumpBase.normed volume y : ℝ) : ℂ) = 0 by rw [h, Complex.ofReal_zero])
   rw [Ω.coneBumpBase.support_normed_eq, Metric.mem_ball, dist_eq_norm] at hy'
   refine Ω.ball_subset_cone ?_
   rw [Metric.mem_ball, dist_eq_norm, show -y - (1 / 4 : ℝ) • Ω.e = -(y - -((1 / 4 : ℝ) • Ω.e))
     by abel, norm_neg]
   exact hy'
 
+/-- The moment kernels of a bump supported in `-K` are supported in `-K`. -/
+theorem coneSupported_momentKernel_of {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun)
+    (L : ℕ) : Ω.ConeSupported (momentKernel b.toFun L) :=
+  ConeSupported.finsetSum _ _ fun _ _ => hb.dilate (by positivity)
+
+/-- The dilated moment kernels of a bump supported in `-K` are supported in `-K`. -/
+theorem coneSupported_scaled_of {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun)
+    (L j : ℕ) : Ω.ConeSupported (b.scaled L j) :=
+  (Ω.coneSupported_momentKernel_of hb L).dilate (by positivity)
+
+/-- The dual kernels of a bump supported in `-K` are supported in `-K`. -/
+theorem coneSupported_dual_of {b : LocalMeansBump V} (hb : Ω.ConeSupported b.toFun)
+    (L j : ℕ) : Ω.ConeSupported (b.dual L j) := by
+  cases j with
+  | zero => exact Ω.coneSupported_scaled_of hb L 0
+  | succ j => exact (Ω.coneSupported_scaled_of hb L (j + 1)).add (Ω.coneSupported_scaled_of hb L j)
+
 /-- The moment kernels of the cone bump are supported in `-K`. -/
 theorem coneSupported_momentKernel (L : ℕ) :
     Ω.ConeSupported (momentKernel Ω.coneBump.toFun L) :=
-  ConeSupported.finsetSum _ _ fun _ _ => (Ω.coneSupported_coneBump).dilate (by positivity)
+  Ω.coneSupported_momentKernel_of Ω.coneSupported_coneBump L
 
 /-- The dilated moment kernels of the cone bump are supported in `-K`. -/
 theorem coneSupported_scaled (L j : ℕ) : Ω.ConeSupported (Ω.coneBump.scaled L j) :=
-  (Ω.coneSupported_momentKernel L).dilate (by positivity)
+  Ω.coneSupported_scaled_of Ω.coneSupported_coneBump L j
 
 /-- The local means kernels of the cone bump are supported in `-K`. -/
 theorem coneSupported_kernel (L j : ℕ) : Ω.ConeSupported (Ω.coneBump.kernel L j) := by
@@ -353,10 +410,8 @@ theorem coneSupported_kernel (L j : ℕ) : Ω.ConeSupported (Ω.coneBump.kernel 
   | succ j => exact (Ω.coneSupported_scaled L (j + 1)).sub (Ω.coneSupported_scaled L j)
 
 /-- The dual kernels of the cone bump are supported in `-K`. -/
-theorem coneSupported_dual (L j : ℕ) : Ω.ConeSupported (Ω.coneBump.dual L j) := by
-  cases j with
-  | zero => exact Ω.coneSupported_scaled L 0
-  | succ j => exact (Ω.coneSupported_scaled L (j + 1)).add (Ω.coneSupported_scaled L j)
+theorem coneSupported_dual (L j : ℕ) : Ω.ConeSupported (Ω.coneBump.dual L j) :=
+  Ω.coneSupported_dual_of Ω.coneSupported_coneBump L j
 
 /-! ### The support principle -/
 
@@ -369,16 +424,8 @@ omit [FiniteDimensional ℝ V] [BorelSpace V] in
 `(k ⋆ (1_Ω f))(x) = (k ⋆ f)(x)`. -/
 theorem conv_indicator_eq {k : V → ℂ} (hk : Ω.ConeSupported k) (f : V → ℂ) {x : V}
     (hx : x ∈ Ω.domain) (μ : Measure V) :
-    conv k (Ω.domain.indicator f) μ x = conv k f μ x := by
-  rw [conv_apply, conv_apply]
-  congr 1
-  funext y
-  by_cases hy : k y = 0
-  · simp [hy]
-  · have hmem : x - y ∈ Ω.domain := by
-      have h := Ω.add_mem hx (hk y hy)
-      rwa [← sub_eq_add_neg] at h
-    rw [Set.indicator_of_mem hmem]
+    conv k (Ω.domain.indicator f) μ x = conv k f μ x :=
+  conv_indicator_eq_of_forall f (fun _ hy => hk.sub_mem hx hy) μ
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
@@ -407,24 +454,12 @@ theorem indicator_ae_eq_of_cutoff_eq {F f : Lp ℂ p (volume : Measure V)}
   rw [← h1, ← h2, hFf]
 
 /-- **The support principle on `L_p`**: `1_Ω (k ⋆ (1_Ω h)) = 1_Ω (k ⋆ h)` for an integrable
-kernel supported in `-K`. -/
+kernel supported in `-K` (`Rd.indicatorLp_convLp_indicatorLp` for `U = W = Ω`). -/
 theorem cutoff_convLp_cutoff (hp : p ≠ ∞) {k : V → ℂ} (hk : Integrable k)
     (hks : Ω.ConeSupported k) (h : Lp ℂ p (volume : Measure V)) :
-    Ω.cutoff (convLp hp hk (Ω.cutoff h)) = Ω.cutoff (convLp hp hk h) := by
-  refine Lp.ext ?_
-  have h3 : conv k (Ω.cutoff h : V → ℂ) volume = conv k (Ω.domain.indicator h) volume :=
-    conv_congr_ae (indicatorLp_apply_ae Ω.measurableSet_domain h)
-  filter_upwards [indicatorLp_apply_ae Ω.measurableSet_domain (convLp hp hk (Ω.cutoff h)),
-    convLp_apply_ae hp hk (Ω.cutoff h),
-    indicatorLp_apply_ae Ω.measurableSet_domain (convLp hp hk h), convLp_apply_ae hp hk h]
-    with x hx1 hx2 hx4 hx5
-  change (indicatorLp Ω.measurableSet_domain (convLp hp hk (Ω.cutoff h)) : V → ℂ) x =
-    (indicatorLp Ω.measurableSet_domain (convLp hp hk h) : V → ℂ) x
-  rw [hx1, hx4]
-  by_cases hx : x ∈ Ω.domain
-  · rw [Set.indicator_of_mem hx, Set.indicator_of_mem hx, hx2, hx5, h3,
-      Ω.conv_indicator_eq hks _ hx]
-  · rw [Set.indicator_of_notMem hx, Set.indicator_of_notMem hx]
+    Ω.cutoff (convLp hp hk (Ω.cutoff h)) = Ω.cutoff (convLp hp hk h) :=
+  indicatorLp_convLp_indicatorLp hp hk Ω.measurableSet_domain Ω.measurableSet_domain
+    (fun _ hx _ hy => hks.sub_mem hx hy) h
 
 /-- **Convolutions of functions that agree on `Ω` agree on `Ω`**: if `1_Ω F = 1_Ω f`, then
 `1_Ω (k ⋆ F) = 1_Ω (k ⋆ f)` for an integrable kernel supported in `-K`. -/

@@ -168,12 +168,10 @@ K (‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q})`. -
 theorem modNorm_trace_le_flat {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) (L : ℕ) {r : ℕ}
     (hr : 1 ≤ r) {s : ℝ} (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure V),
-      ‖(flat e he).cutoff f‖ₑ + lqNorm q (fun k =>
-          dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p (flat e he).domain L f k) < ∞ →
+      modNormOn (flat e he).measurableSet_domain L (s + 1 / p.toReal) q f < ∞ →
       ‖(flat e he).trace hp L f‖ₑ +
           lqNorm q (fun k => dyadicWeight s k * lpModulus p r ((flat e he).trace hp L f) k) ≤
-        K * (‖(flat e he).cutoff f‖ₑ + lqNorm q (fun k =>
-          dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p (flat e he).domain L f k)) := by
+        K * modNormOn (flat e he).measurableSet_domain L (s + 1 / p.toReal) q f := by
   set Ω := flat e he
   obtain ⟨K, hK, hle⟩ := modNorm_traceSeries_le_flat e he Ω.coneBump hp L hr hs hsr hq
   refine ⟨K * Ω.intrinsicConst L, ENNReal.mul_ne_top hK (Ω.intrinsicConst_ne_top L),
@@ -672,9 +670,9 @@ theorem trace_flatExtension (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {Lh : ℕ}
 theorem exists_trace_eq_iff_flat (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {r : ℕ} {s : ℝ} (hs : 0 < s)
     (hsr : s < r) (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (g : Lp ℂ p (volume : Measure (flat e he).hyperplane)) :
-    (∃ f : Lp ℂ p (volume : Measure V), ‖(flat e he).cutoff f‖ₑ + lqNorm q (fun k =>
-        dyadicWeight (s + 1 / p.toReal) k * lpModulusOn p (flat e he).domain L f k) < ∞ ∧
-        (flat e he).trace hp L f = g) ↔
+    (∃ f : Lp ℂ p (volume : Measure V),
+        modNormOn (flat e he).measurableSet_domain L (s + 1 / p.toReal) q f < ∞ ∧
+          (flat e he).trace hp L f = g) ↔
       ‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r g k) < ∞ := by
   have hr : 1 ≤ r := Nat.one_le_iff_ne_zero.2 (Nat.cast_pos.1 (hs.trans hsr)).ne'
   constructor
@@ -749,9 +747,7 @@ is continuous with compact support and agrees with `f` on the half-space, and tr
 functions are restrictions (`Rd.LipschitzGraph.trace_ae_eq_comp_graphMap`). -/
 theorem trace_ae_eq_of_continuousOn (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
     {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p (volume : Measure V)}
-    (hf : ‖(LipschitzGraph.flat e he).cutoff f‖ₑ + lqNorm q (fun k =>
-      dyadicWeight (s + 1 / p.toReal) k *
-        lpModulusOn p (LipschitzGraph.flat e he).domain L f k) < ∞)
+    (hf : modNormOn (LipschitzGraph.flat e he).measurableSet_domain L (s + 1 / p.toReal) q f < ∞)
     {G : V → ℂ} (hG : ContinuousOn G (closedHalfSpace e)) {K : Set V} (hK : IsCompact K)
     (hGK : ∀ x ∈ closedHalfSpace e, x ∉ K → G x = 0)
     (hfG : ∀ᵐ x ∂volume, x ∈ (LipschitzGraph.flat e he).domain → f x = G x) :
@@ -780,12 +776,8 @@ theorem trace_ae_eq_of_continuousOn (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s
       show G (foldHalfSpace e x) = G x
       rw [foldHalfSpace_of_nonneg e (le_of_lt (show 0 < inner ℝ x e from hx))]
     · rw [indicator_of_notMem hx, indicator_of_notMem hx]
-  have hmod : ∀ k, lpModulusOn p Ω.domain L (hmem.toLp G') k = lpModulusOn p Ω.domain L f k :=
-    fun k => lpModulusOn_congr (Ω.indicator_ae_eq_of_cutoff_eq hcut) L k
-  have hFfin : ‖Ω.cutoff (hmem.toLp G')‖ₑ + lqNorm q (fun k => dyadicWeight (s + 1 / p.toReal) k *
-      lpModulusOn p Ω.domain L (hmem.toLp G') k) < ∞ := by
-    simp_rw [hcut, hmod]
-    exact hf
+  have hFfin : modNormOn Ω.measurableSet_domain L (s + 1 / p.toReal) q (hmem.toLp G') < ∞ :=
+    (modNormOn_congr Ω.measurableSet_domain hcut).trans_lt hf
   rw [← Ω.trace_congr hp L hcut]
   filter_upwards [Ω.trace_ae_eq_comp_graphMap hp hL hs hq hFfin hG'c hFG] with x' hx'
   have hx'0 : inner ℝ (x' : V) e = 0 := by

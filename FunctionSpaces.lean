@@ -370,7 +370,8 @@ and the theorems that their characterisations agree. The library builds on
   spaces, its two-sided bounds by the first-difference Besov norm with explicit constants, radial
   integrals of powers, double integrals of sums, and `W^{s,p} = B^s_{p,p}` for `0 < s < 1`.
 * `FunctionSpaces.Rd.LocalMeans.LocalMeans`: local means with moment kernels, the reproducing
-  formula, and the characterisation of Besov spaces by local means.
+  formula, the characterisation of Besov spaces by local means, and bumps for local means from
+  smooth bump functions.
 * `FunctionSpaces.Rd.LocalMeans.Multipliers`: Leibniz's rule for differences, pointwise
   multipliers of the Besov spaces by differences, and multiplication by bounded continuous
   functions as an operator on `L_p`.
@@ -385,7 +386,8 @@ and the theorems that their characterisations agree. The library builds on
 * `FunctionSpaces.Rd.Atoms.AtomComposition`: smooth changes of variables with a cut-off on a convex
   set, their action on continuous functions, and smooth atoms under them.
 * `FunctionSpaces.Rd.Atoms.DiffeoInvariance`: the change of variables on `L_p`, the transport of
-  smooth atoms, the invariance of the Besov spaces, and Besov domains.
+  smooth atoms, the invariance of the Besov spaces, the extension property of a set, and Besov
+  domains.
 * `FunctionSpaces.Rd.MixedSmoothness.TensorKernels`: tensor products of one-dimensional kernels on
   `ℝ^d`, their integrals, convolutions, dilations, and diagonal changes of variables.
 * `FunctionSpaces.Rd.MixedSmoothness.MixedSequences`: `ℓ_q` norms on `ℕ^d`, the mixed weights
@@ -518,9 +520,10 @@ and the theorems that their characterisations agree. The library builds on
 * `FunctionSpaces.Domains.Lipschitz.LipschitzGraph`: Lipschitz graph domains, their cones, the
   closure of the domain plus the cone, the cone bump, the support principle, the cut-off on `L_p`,
   and integrals over a set as `L_2` pairings.
-* `FunctionSpaces.Domains.Extension.RychkovExtension`: intrinsic local means on a Lipschitz graph
-  domain, Rychkov's extension, and the restrictions of Besov spaces described by intrinsic local
-  means.
+* `FunctionSpaces.Domains.Extension.RychkovExtension`: the local extension of a bump on a
+  measurable set, its convergence, its Besov bound and its agreement on the set it sees; Rychkov's
+  extension on a Lipschitz graph domain as its case `W = Ω`, and the restrictions of Besov spaces
+  described by intrinsic local means.
 * `FunctionSpaces.Domains.Extension.LipschitzGraphBesov`: the restrictions of Besov spaces to
   Lipschitz graph domains described by intrinsic differences.
 * `FunctionSpaces.Domains.Extension.LocalExtension`: local versions of Rychkov's extension, for
@@ -529,8 +532,9 @@ and the theorems that their characterisations agree. The library builds on
   of unity, pasting with a bound, subadditivity and homogeneity of the Besov quasi-norms by
   differences, and the restrictions of Besov spaces described by intrinsic differences, with an
   extension bounded by a constant times the intrinsic quasi-norm.
-* `FunctionSpaces.Domains.Lipschitz.HalfSpace`: null hyperplanes, the closed half-space,
-  the first axis `e₀` of `ℝ^n`, and the models of manifolds as Besov domains.
+* `FunctionSpaces.Domains.Lipschitz.HalfSpace`: null hyperplanes, the extension property of
+  Lipschitz graph domains, the closed half-space, the first axis `e₀` of `ℝ^n`, and the models of
+  manifolds as Besov domains.
 * `FunctionSpaces.Domains.Traces.HalfSpaceTrace`: restrictions and extensions of smooth atoms on the
   flat graph, the trace theorem and the trace space of the half-space for every smoothness, and the
   traces of functions continuous on the closed half-space.
@@ -670,12 +674,12 @@ and the theorems that their characterisations agree. The library builds on
 * `FunctionSpaces.Domains.Lipschitz.ConvexDomains`: the ray length of a convex set, its cone
   estimate, bounded open convex sets and the open unit cube as bounded Lipschitz domains, and the
   closed unit cube as the closure of the open one.
-* `FunctionSpaces.Domains.Lipschitz.BesovDomains`: the extension property of a set, its invariance
-  under null sets, Lipschitz graph domains with it, their null graphs, closures of convex Lipschitz
-  graph domains as Besov domains, the quadrant as a Lipschitz graph domain, the quadrant model
-  of manifolds with corners as a Besov domain, bounded Lipschitz domains with the extension
-  property, and the closures of nonempty convex bounded Lipschitz domains and of nonempty bounded
-  open convex sets, closed balls of positive radius and the closed unit cube as Besov domains.
+* `FunctionSpaces.Domains.Lipschitz.BesovDomains`: the null graphs of Lipschitz graph domains,
+  closures of convex Lipschitz graph domains as Besov domains, the quadrant as a Lipschitz graph
+  domain, the quadrant model of manifolds with corners as a Besov domain, bounded Lipschitz
+  domains with the extension property, and the closures of nonempty convex bounded Lipschitz
+  domains and of nonempty bounded open convex sets, closed balls of positive radius and the closed
+  unit cube as Besov domains.
 * `FunctionSpaces.Domains.Manifolds.SmoothLocalGraphs`: the usual set-level definition of
   bounded domains with smooth boundary by smooth local graphs, the smooth cut-off of a local graph,
   the smooth domain of a set satisfying the definition and the converse, and the ball as a smooth

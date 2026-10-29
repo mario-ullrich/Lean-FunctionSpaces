@@ -282,7 +282,7 @@ theorem intrinsicNorm_sub_le (hp : p ≠ ∞) (L : ℕ) (σ : ℝ) {q : ℝ≥0�
     (f₁ f₂ : Lp ℂ p (volume : Measure V)) :
     Ω.intrinsicNorm hp L σ q (f₁ - f₂) ≤
       Ω.intrinsicNorm hp L σ q f₁ + Ω.intrinsicNorm hp L σ q f₂ := by
-  simp only [intrinsicNorm]
+  simp only [intrinsicNorm_def]
   refine (ENNReal.lqNorm_mono fun j => ?_).trans (ENNReal.lqNorm_add_le hq _ _)
   rw [map_sub, map_sub, ← mul_add]
   exact mul_le_mul' le_rfl (enorm_sub_le)
@@ -339,7 +339,7 @@ theorem finrank_hyperplane_eq_finrank (Ω₁ Ω₂ : LipschitzGraph V) :
 theorem intrinsicNorm_lt_top_of_modNorm' (hp : p ≠ ∞) (L : ℕ) {σ : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
     {G : Lp ℂ p (volume : Measure V)}
     (hG : ‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p L G k) < ∞) :
-    ‖Ω.cutoff G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulusOn p Ω.domain L G k) < ∞ ∧
+    modNormOn Ω.measurableSet_domain L σ q G < ∞ ∧
       Ω.intrinsicNorm hp L σ q G < ∞ := by
   have h1 := (Ω.modNormOn_le_modNorm L σ q rfl).trans_lt hG
   exact ⟨h1, Ω.intrinsicNorm_lt_top hp L σ hq h1⟩
@@ -550,7 +550,7 @@ theorem intrinsicNorm_add_le (hp : p ≠ ∞) (L : ℕ) (σ : ℝ) {q : ℝ≥0�
     (f₁ f₂ : Lp ℂ p (volume : Measure V)) :
     Ω.intrinsicNorm hp L σ q (f₁ + f₂) ≤
       Ω.intrinsicNorm hp L σ q f₁ + Ω.intrinsicNorm hp L σ q f₂ := by
-  simp only [intrinsicNorm]
+  simp only [intrinsicNorm_def]
   refine (ENNReal.lqNorm_mono fun j => ?_).trans (ENNReal.lqNorm_add_le hq _ _)
   rw [map_add, map_add, ← mul_add]
   exact mul_le_mul' le_rfl (enorm_add_le _ _)
@@ -564,7 +564,7 @@ theorem intrinsicNorm_finsetSum_lt_top (hp : p ≠ ∞) (L : ℕ) (σ : ℝ) {q 
   classical
   induction t using Finset.induction_on with
   | empty =>
-    simp only [Finset.sum_empty, intrinsicNorm, map_zero, enorm_zero, mul_zero,
+    simp only [Finset.sum_empty, intrinsicNorm_def, map_zero, enorm_zero, mul_zero,
       ENNReal.lqNorm_zero_right]
     exact ENNReal.zero_lt_top
   | insert i t hi ih =>

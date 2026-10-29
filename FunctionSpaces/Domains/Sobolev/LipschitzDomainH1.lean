@@ -138,8 +138,7 @@ iff `‖f‖_{L_2(Ω)} + ‖(2^k ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞`, wit
 inside `Ω`. This is the extension theorem for bounded Lipschitz domains
 (`Rd.BoundedLipschitzDomain.exists_memApprox_extension_iff`) at `p = q = 2`, `s = 1`. -/
 theorem memSobolevOn_iff_modulusOn {r : ℕ} (hr : 2 ≤ r) (f : Lp ℂ 2 (volume : Measure V)) :
-    Ω.MemSobolevOn f ↔ ‖indicatorLp Ω.measurableSet f‖ₑ +
-      lqNorm 2 (fun k => dyadicWeight 1 k * lpModulusOn 2 Ω.carrier r f k) < ∞ := by
+    Ω.MemSobolevOn f ↔ modNormOn Ω.measurableSet r 1 2 f < ∞ := by
   have hr' : (1 : ℝ) < r := by exact_mod_cast Nat.lt_of_lt_of_le one_lt_two hr
   rw [memSobolevOn_iff_exists_memApprox,
     Ω.exists_memApprox_extension_iff two_ne_top one_pos hr' one_le_two f]
@@ -151,8 +150,7 @@ theorem memSobolevOn_iff_modulusOn {r : ℕ} (hr : 2 ≤ r) (f : Lp ℂ 2 (volum
 quantity of `f ∈ H^1(Ω)` by the `B^1_{2,2}(V)` quantity of its extension `F`, with constant `1`. -/
 theorem modNormOn_le_modNorm_of_ae_eq (r : ℕ) {F f : Lp ℂ 2 (volume : Measure V)}
     (hFf : (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f) :
-    ‖indicatorLp Ω.measurableSet f‖ₑ +
-        lqNorm 2 (fun k => dyadicWeight 1 k * lpModulusOn 2 Ω.carrier r f k) ≤
+    modNormOn Ω.measurableSet r 1 2 f ≤
       ‖F‖ₑ + lqNorm 2 (fun k => dyadicWeight 1 k * lpModulus 2 r F k) :=
   modNormOn_le_modNorm_of_indicatorLp Ω.measurableSet r 1 2
     ((indicatorLp_eq_iff_ae_eq_restrict _).2 hFf)
