@@ -14,15 +14,15 @@ public import FunctionSpaces.Rd.Sobolev.SobolevJets
 public import FunctionSpaces.Rd.Sobolev.WeakDerivativeLeibniz
 
 /-!
-# The extension theorem for Sobolev spaces on bounded Lipschitz domains
+# Bounded extensions of `W^1_p` by the local means of the gradient
 
-Let `Ω` be a bounded Lipschitz domain in a finite-dimensional real inner product space `V` of
-dimension `n`, and `1 < p < ∞`. Every `f ∈ W^1_p(Ω)` agrees on `Ω` with some `F ∈ W^1_p(V)`
-(`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`), for `n ≥ 1` with
-`‖F‖_{W^1_p(V)} ≤ C ‖f‖_{W^1_p(Ω)}` (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`): the
-extension theorem of Calderón and Stein, here by Rychkov's local extension and the local means of
-the gradient. For `n = 0`, `F = f` or `F = 0` serves
-(`Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`).
+Let `V` be a finite-dimensional real inner product space of dimension `n` and `1 ≤ p ≤ ∞`; the
+bounds of the local extension need `1 < p < ∞`. This file holds the estimates behind the extension
+theorem of Calderón and Stein in Rychkov's form: the local extension
+`∑_j η_j ⋆ 1_W (k_j ⋆ 1_T f)` of a Sobolev function `f` on an open set `T` lies in `W^1_p(V)`,
+with a bound by `‖f‖_{L_p(T)} + ∑_i ‖∂_{e_i} f‖_{L_p(T)}`. The extension operators
+(`Rd.SobolevExtensionOp`, `Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp`) and the
+extension theorem itself (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`) are built from it.
 
 * **Local means by the gradient**: for a bump with moment kernel `m` of order two, the local
   means kernels are divergences, `k_{j+1} = 2^(-j) ∑_i ∂_{e_i} (K_i)_{2^j}` with the divergence
@@ -37,29 +37,23 @@ the gradient. For `n = 0`, `F = f` or `F = 0` serves
   (`Rd.LocalMeansBump.tlLocalNormOn_le_patchConst`). The step from a pointwise bound of the
   local means by convolutions with Schwartz kernels to the quasi-norm holds for every kernel family
   (`Rd.LocalMeansBump.tlLocalNormOn_le_of_pointwise`).
-* **One patch** (`Rd.LocalMeansBump.extendsSobolev`): the local extension
-  `∑_j η_j ⋆ 1_W (k_j ⋆ 1_T f)` lies in `F^1_{p,2}(V) = W^1_p(V)`
-  (`Rd.LocalMeansBump.triebelLizorkinNorm_localExtension_le`) and agrees with `f` on the patch;
-  `Rd.ExtendsSobolev p O U C` says that such extensions from `U` exist with the constant `C`.
-* **Pasting** (`Rd.extendsSobolev_of_cover`): a smooth resolution of unity subordinate to the
-  boundary patches and the inner patch pastes the local extensions in `W^1_p(V)`, by the product
-  rule (`Rd.hasWeakLineDeriv_mulLp`). Extensions also come from `L_p` bounds alone
+* **One patch**: the local extension lies in `F^1_{p,2}(V) = W^1_p(V)`
+  (`Rd.LocalMeansBump.memTriebelLizorkin_localExtension_of_tlLocalNormOn`), agrees with `f` on the
+  patch (`Rd.LocalMeansBump.ae_localExtension_eq_of_ae_eq_indicator`) and has the constant
+  `Rd.LocalMeansBump.extensionConst`
+  (`Rd.LocalMeansBump.enorm_localExtension_add_le_extensionConst`);
+  `Rd.ExtendsSobolev p O U C` says that extensions from `U` exist with the constant `C`.
+* **Pasting** (`Rd.extendsSobolev_of_cover`): a smooth resolution of unity subordinate to a finite
+  cover pastes extensions in `W^1_p(V)`, by the product rule (`Rd.hasWeakLineDeriv_mulLp`), with
+  the arithmetic of `Rd.pasting_bound`. Extensions also come from `L_p` bounds alone
   (`Rd.extendsSobolev_of_eLpNorm_le`).
-* **Bounded Lipschitz domains**: the boundary patches and the inner patch extend with finite
-  constants (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary`,
-  `Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior`), pasted by
-  `Rd.BoundedLipschitzDomain.exists_of_patches`. The smooth cutoffs of the patches
-  (`Rd.BoundedLipschitzDomain.exists_cutoff_boundary`,
-  `Rd.BoundedLipschitzDomain.exists_cutoff_interior`) serve the extensions by reflection and
+* **Supports and cutoffs**: the dilates of the divergence kernels of a cone bump keep the patches
+  inside the domain (`Rd.LipschitzGraph.patch_support_divKernel`), and the patches of a bounded
+  Lipschitz domain have smooth cutoffs (`Rd.BoundedLipschitzDomain.exists_cutoff_boundary`,
+  `Rd.BoundedLipschitzDomain.exists_cutoff_interior`), which serve the extensions by reflection and
   those of higher order.
-* **For `p = 2`**: `H^1(Ω) = W^1_2(Ω)` (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`,
-  `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_restrictL2`), Rellich's theorem in
-  `W^1_2(Ω)` (`Rd.BoundedLipschitzDomain.exists_subseq_tendsto_of_memWeakSobolev`), and the
-  quotient norm of `H^1(Ω)` is bounded by the `W^1_2(Ω)` norm
-  (`Rd.BoundedLipschitzDomain.exists_norm_le_restrictL2`), so the two norms are equivalent. The
-  boundary traces of `H^1(Ω)` serve for `W^1_2(Ω)`
-  (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memWeakSobolev`,
-  `Rd.BoundedLipschitzDomain.isBoundaryTrace_unique_of_memWeakSobolev`).
+* **Dimension zero**: for `n = 0`, every `f ∈ W^m_p(O)` agrees on `O` with `F = f` or `F = 0` in
+  `W^m_p(V)` (`Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`).
 -/
 
 @[expose] public section
@@ -644,35 +638,6 @@ theorem enorm_localExtension_add_le_extensionConst [Fact (1 ≤ p)] [Nontrivial 
         (b.patchConst p * Y) := mul_le_mul_right hX _
     _ = _ := by rw [extensionConst]; ring
 
-/-- **The extension from one patch** (Rychkov's local extension with the local means of the
-gradient): let `U ⊆ T` with `T` open, let the dual kernels at points of `U` only see `W`, and let
-`x - y ∈ T` for every `x ∈ W`, every level `j` and every `y` in the support of `(K_i)_{2^j}`. Then
-for `1 < p < ∞` the local extension `F = ∑_j η_j ⋆ 1_W (k_j ⋆ 1_T f)` of order two lies in
-`F^1_{p,2}(V) = W^1_p(V)` and agrees with `f` on `U`, with the constant
-`Rd.LocalMeansBump.extensionConst b p` (`Rd.LocalMeansBump.tlLocalNormOn_le_patchConst`,
-`Rd.LocalMeansBump.memTriebelLizorkin_localExtension_of_tlLocalNormOn`,
-`Rd.LocalMeansBump.ae_localExtension_eq_of_ae_eq_indicator`,
-`Rd.LocalMeansBump.enorm_localExtension_add_le_extensionConst`). -/
-theorem extendsSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {U W : Set V}
-    (hU : MeasurableSet U) (hW : MeasurableSet W) {T : Opens V} (hUT : U ⊆ T)
-    (hUW : ∀ x ∈ U, ∀ j y, b.dual 2 j y ≠ 0 → x - y ∈ W)
-    (hsupp : ∀ x ∈ W, ∀ j i, ∀ y ∈ tsupport (dilate (2 ^ j) (b.divKernel i : V → ℂ)), x - y ∈ T) :
-    ExtendsSobolev p T U (b.extensionConst p) := by
-  have : Fact (1 ≤ p) := ⟨hp1.le⟩
-  intro f g hf hg hfg
-  have hf₀ := (memLp_indicator_iff_restrict T.isOpen.measurableSet).2 hf
-  have hY : eLpNorm f p (volume.restrict T) + ∑ i, eLpNorm (g i) p (volume.restrict T) ≠ ∞ :=
-    ENNReal.add_ne_top.2 ⟨hf.eLpNorm_ne_top, ENNReal.sum_ne_top.2 fun i _ => (hg i).eLpNorm_ne_top⟩
-  have hX := b.tlLocalNormOn_le_patchConst hp1 hp hW hf hg hfg hsupp hf₀.coeFn_toLp
-  have hXf := hX.trans_lt (ENNReal.mul_lt_top (b.patchConst_ne_top hp1 hp).lt_top hY.lt_top)
-  have hmem := b.memTriebelLizorkin_localExtension_of_tlLocalNormOn hp1 hp hW hXf
-  choose G hG using fun i => (exists_hasWeakLineDeriv_of_memTriebelLizorkin hp1 hp
-    (fun _ : Fin 1 => gridBasis V i) hmem).imp fun _ h => h.1
-  exact ⟨_, memSobolev_of_memTriebelLizorkin hp1 hp hmem,
-    b.ae_localExtension_eq_of_ae_eq_indicator hp one_le_two hU hW hUT hUW hf₀.coeFn_toLp
-      (b.summable_localExtTerm_of_tlLocalNormOn hp hW 2 one_pos two_ne_zero hXf),
-    G, hG, b.enorm_localExtension_add_le_extensionConst hp1 hp hW hX hXf hG⟩
-
 end LocalMeansBump
 
 /-! ### Pasting in `W^1_p(V)` -/
@@ -844,18 +809,7 @@ theorem exists_memSobolev_of_memWeakSobolev_of_subsingleton [Subsingleton V] {O 
     · exact hf1.coeFn_toLp.symm
     · exact hf1.coeFn_toLp
 
-/-! ### The extension theorem -/
-
-omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
-/-- If `‖x‖ + ∑_i ‖y_i‖ ≤ K` in `ℝ≥0∞` with `K` finite, then `‖x‖² + ∑_i ‖y_i‖² ≤ K²` in `ℝ`. -/
-theorem sq_norm_add_sum_sq_le {E : Type*} [NormedAddCommGroup E] {ι : Type*} [Fintype ι] {x : E}
-    {y : ι → E} {K : ℝ≥0∞} (hK : K ≠ ∞) (h : ‖x‖ₑ + ∑ i, ‖y i‖ₑ ≤ K) :
-    ‖x‖ ^ 2 + ∑ i, ‖y i‖ ^ 2 ≤ K.toReal ^ 2 := by
-  have hr : ‖x‖ + ∑ i, ‖y i‖ ≤ K.toReal :=
-    toReal_enorm_add_sum x y ▸ ENNReal.toReal_mono hK h
-  have hs := Finset.sum_sq_le_sq_sum_of_nonneg (s := Finset.univ) fun i _ => norm_nonneg (y i)
-  have h0 : 0 ≤ ∑ i, ‖y i‖ := Finset.sum_nonneg fun i _ => norm_nonneg _
-  nlinarith [norm_nonneg x]
+/-! ### The cutoffs of the patches -/
 
 namespace BoundedLipschitzDomain
 
@@ -886,210 +840,6 @@ theorem exists_cutoff_interior {δ : ℝ} (hδ : 0 < δ) :
   exact exists_contDiff_eventuallyEq_one
     (isCompact_of_isClosed_isBounded (isClosed_le continuous_const (continuous_infDist_pt _))
       (Ω.isBounded.subset hKΩ)) Ω.isOpen hKΩ
-
-/-- **The boundary patches**: Sobolev functions on `Ω` extend from `Ω ∩ B(c_j, ρ_j - 2ε)` with a
-finite constant, by the extension from one patch (`Rd.LocalMeansBump.extendsSobolev`) with the cone
-bump of `Ω_j` rescaled to radius `≤ ε / 2` (`Rd.LipschitzGraph.exists_coneBump_radius_le`). -/
-theorem exists_extendsSobolev_boundary [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {ε : ℝ}
-    (hε : 0 < ε) (j : Fin Ω.N) :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens
-      (Ω.carrier ∩ ball (Ω.center j) (Ω.radius j - 2 * ε)) C := by
-  have : Fact (1 ≤ p) := ⟨hp1.le⟩
-  set G := Ω.graph j
-  set c := Ω.center j
-  set ρ := Ω.radius j
-  obtain ⟨b, hb, -, hR⟩ := G.exists_coneBump_radius_le zero_le_two hε
-  have hLR : ((2 : ℕ) : ℝ) * b.radius ≤ ε := by exact_mod_cast hR
-  have hTo : IsOpen (G.domain ∩ ball c ρ) := G.isOpen_domain.inter isOpen_ball
-  have hTΩ : (⟨_, hTo⟩ : Opens V) ≤ Ω.toOpens := by
-    show G.domain ∩ ball c ρ ⊆ Ω.carrier
-    rw [← Ω.inter_ball_eq j le_rfl]
-    exact Set.inter_subset_left
-  have hU : Ω.carrier ∩ ball c (ρ - 2 * ε) = G.domain ∩ ball c (ρ - 2 * ε) :=
-    Ω.inter_ball_eq j (by linarith)
-  refine ⟨b.extensionConst p, b.extensionConst_ne_top hp1 hp, ?_⟩
-  rw [hU]
-  exact (b.extendsSobolev hp1 hp ((G.isOpen_domain.inter isOpen_ball).measurableSet)
-    ((G.isOpen_domain.inter isOpen_ball).measurableSet) (T := ⟨_, hTo⟩)
-    (Set.inter_subset_inter_right _ (ball_subset_ball (by linarith)))
-    (G.patch_support hb hLR) (G.patch_support_divKernel hb hR)).of_le hTΩ
-
-/-- **The inner patch**: Sobolev functions on `Ω` extend from `{infDist(·, Ωᶜ) > 2δ}` with a finite
-constant, by the extension from one patch (`Rd.LocalMeansBump.extendsSobolev`) with a centred bump
-of radius `≤ δ / 2` (`Rd.sub_mem_of_lt_infDist_of_norm_le`). -/
-theorem exists_extendsSobolev_interior [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {δ : ℝ}
-    (hδ : 0 < δ) :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens
-      (Ω.carrier ∩ {x : V | 2 * δ < infDist x Ω.carrierᶜ}) C := by
-  have : Fact (1 ≤ p) := ⟨hp1.le⟩
-  have hR0 : 0 < δ / 2 := by positivity
-  set b := LocalMeansBump.centered (V := V) hR0
-  have hR : 2 * b.radius = δ := by rw [LocalMeansBump.centered_radius]; ring
-  have hUΩ := setOf_lt_infDist_compl_subset Ω.carrier (by positivity : (0 : ℝ) ≤ 2 * δ)
-  refine ⟨b.extensionConst p, b.extensionConst_ne_top hp1 hp, ?_⟩
-  rw [Set.inter_eq_right.2 hUΩ]
-  refine b.extendsSobolev hp1 hp (measurableSet_infDist_gt Ω.carrier (2 * δ))
-    (measurableSet_infDist_gt Ω.carrier δ) (T := Ω.toOpens) hUΩ
-    (fun x hx j y hy => interior_patch_support Ω.carrier (fun y hy =>
-      (not_lt.1 fun h => hy (b.dual_eq_zero 2 j h)).trans (by rw [← hR]; push_cast; rfl)) x hx y hy)
-    fun x hx j i y hy => sub_mem_of_lt_infDist_of_norm_le Ω.carrier hx (by
-      rw [← hR]
-      exact mem_closedBall_zero_iff.1 (b.tsupport_dilate_divKernel_subset_closedBall i j hy))
-
-/-- **The extension theorem with a bound**: for a bounded Lipschitz domain `Ω` in dimension
-`n ≥ 1` and `1 < p < ∞` there is a finite constant `C` such that every `f ∈ L_p(Ω)` with weak
-derivatives `g_i = ∂_{e_i} f ∈ L_p(Ω)` agrees on `Ω` with some `F ∈ W^1_p(V)` whose weak
-derivatives `G_i = ∂_{e_i} F` satisfy
-`‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`. The patches
-`Rd.BoundedLipschitzDomain.patch` cover `Ω̄`
-(`Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary`,
-`Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior`), pasted by
-`Rd.extendsSobolev_of_cover` (`Rd.BoundedLipschitzDomain.exists_of_patches`). -/
-theorem exists_extendsSobolev [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens Ω.carrier C := by
-  have : Fact (1 ≤ p) := ⟨hp1.le⟩
-  exact Ω.exists_of_patches (fun U C => ExtendsSobolev p Ω.toOpens U C)
-    (fun U hUo hUb hcov _ hC hext =>
-      extendsSobolev_of_cover (O := Ω.toOpens) U hUo hUb hcov hC hext)
-    (fun _ hε j => Ω.exists_extendsSobolev_boundary hp1 hp hε j)
-    (fun _ hδ => Ω.exists_extendsSobolev_interior hp1 hp hδ)
-
-/-- **The extension theorem** (H.2; the extension theorem of Calderón and Stein, by Rychkov's
-extension and the local means of the gradient): for a bounded Lipschitz domain `Ω` and
-`1 < p < ∞`, every `f ∈ W^1_p(Ω)` agrees almost everywhere on `Ω` with some `F ∈ W^1_p(V)`
-(`Rd.BoundedLipschitzDomain.exists_extendsSobolev` in dimension `n ≥ 1`,
-`Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton` in dimension `0`). -/
-theorem exists_memSobolev_of_memWeakSobolev (hp1 : 1 < p) (hp : p ≠ ∞)
-    {f : V → ℂ} (hf : MemWeakSobolev Ω.toOpens 1 p f) :
-    ∃ F : Lp ℂ p (volume : Measure V), MemSobolev 1 F ∧
-      (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f := by
-  rcases subsingleton_or_nontrivial V with hV | hV
-  · exact exists_memSobolev_of_memWeakSobolev_of_subsingleton hf
-  obtain ⟨C, -, hC⟩ := Ω.exists_extendsSobolev hp1 hp
-  choose g hg hfg using fun i => hf.2 1 le_rfl fun _ => gridBasis V i
-  obtain ⟨F, hF, hFf, -⟩ := hC f g hf.1 hg hfg
-  exact ⟨F, hF, (ae_restrict_iff' Ω.measurableSet).2 hFf⟩
-
-/-- **`W^1_p(Ω)` is the space of restrictions of `W^1_p(V)`**: for a bounded Lipschitz domain `Ω`
-and `1 < p < ∞`, `f` lies in `W^1_p(Ω)` iff it agrees almost everywhere on
-`Ω` with some `F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev`;
-the converse restricts the weak derivatives, `Rd.MemWeakSobolev.mono_set`). -/
-theorem memWeakSobolev_iff_exists_memSobolev (hp1 : 1 < p) (hp : p ≠ ∞)
-    (f : V → ℂ) :
-    MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p (volume : Measure V), MemSobolev 1 F ∧
-      (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f := by
-  refine ⟨Ω.exists_memSobolev_of_memWeakSobolev hp1 hp, ?_⟩
-  rintro ⟨F, hF, hFf⟩
-  exact (MemWeakSobolev.mono_set hF le_top).congr_ae hFf
-
-/-- **`H^1(Ω) = W^1_2(Ω)`** (H.2 for `p = 2`): for a bounded Lipschitz domain `Ω`, `f ∈ L_2(V)`
-lies in the restriction space `H^1(Ω)` iff it lies in the Sobolev space
-`W^1_2(Ω)` of weak derivatives on `Ω`. -/
-theorem memSobolevOn_iff_memWeakSobolev (f : Lp ℂ 2 (volume : Measure V)) :
-    Ω.MemSobolevOn f ↔ MemWeakSobolev Ω.toOpens 1 2 f :=
-  (Ω.memWeakSobolev_iff_exists_memSobolev ENNReal.one_lt_two ENNReal.ofNat_ne_top f).symm
-
-/-- **Rellich's theorem in `W^1_2(Ω)`** (I.6 and H.1 in the weak-derivative form): for a bounded
-Lipschitz domain `Ω` in dimension `n ≥ 1`, every sequence `f_n ∈ L_2(Ω)` with weak derivatives
-`g_{n,i} = ∂_{e_i} f_n ∈ L_2(Ω)` and `‖f_n‖_{L_2(Ω)} + ∑_i ‖g_{n,i}‖_{L_2(Ω)} ≤ M` has a
-subsequence converging in `L_2(Ω)`: the bounded extensions
-(`Rd.BoundedLipschitzDomain.exists_extendsSobolev`) are bounded in `W^1_2(V)`, and Rellich's
-compactness on `V` (`Rd.exists_subseq_tendsto_restr_of_hasWeakLineDeriv`) gives the subsequence.
--/
-theorem exists_subseq_tendsto_of_memWeakSobolev [Nontrivial V] {f : ℕ → V → ℂ}
-    {g : ℕ → Fin (finrank ℝ V) → V → ℂ} (hf : ∀ n, MemLp (f n) 2 (volume.restrict Ω.carrier))
-    (hg : ∀ n i, MemLp (g n i) 2 (volume.restrict Ω.carrier))
-    (hfg : ∀ n i, HasWeakLineDeriv Ω.toOpens (fun _ : Fin 1 => gridBasis V i) (f n) (g n i))
-    {M : ℝ≥0∞} (hM : M ≠ ∞) (hb : ∀ n, eLpNorm (f n) 2 (volume.restrict Ω.carrier) +
-      ∑ i, eLpNorm (g n i) 2 (volume.restrict Ω.carrier) ≤ M) :
-    ∃ φ : ℕ → ℕ, StrictMono φ ∧ ∃ u : Lp ℂ 2 (volume.restrict Ω.carrier),
-      Tendsto (fun k => eLpNorm (f (φ k) - (u : V → ℂ)) 2 (volume.restrict Ω.carrier)) atTop
-        (𝓝 0) := by
-  obtain ⟨C, hC, hext⟩ := Ω.exists_extendsSobolev (p := 2) ENNReal.one_lt_two ENNReal.ofNat_ne_top
-  choose F hF hFf G hG hFG using fun n => hext (f n) (g n) (hf n) (hg n) (hfg n)
-  have hK : C * M ≠ ∞ := ENNReal.mul_ne_top hC hM
-  obtain ⟨φ, hφ, u, hu⟩ := exists_subseq_tendsto_restr_of_hasWeakLineDeriv Ω.isBounded
-    (gridBasis V) hG (M := (C * M).toReal) fun n =>
-      Rd.sq_norm_add_sum_sq_le hK ((hFG n).trans (mul_le_mul_right (hb n) _))
-  refine ⟨φ, hφ, u, ((Lp.tendsto_Lp_iff_tendsto_eLpNorm' _ _).1 hu).congr fun k => ?_⟩
-  refine eLpNorm_congr_ae (EventuallyEq.sub ?_ EventuallyEq.rfl)
-  exact (LpToLpRestrictCLM_coeFn ℂ _ _).trans ((ae_restrict_iff' Ω.measurableSet).2 (hFf (φ k)))
-
-/-- **The quotient norm of `H^1(Ω)` is bounded by the `W^1_2(Ω)` norm**: for a bounded Lipschitz
-domain `Ω` in dimension `n ≥ 1` there is a constant `C` such that every `u ∈ H^1(Ω)` and all
-`g_i ∈ L_2(Ω)` with `g_i = ∂_{e_i} u` weakly on `Ω` (`u` read as its `L_2` function) satisfy
-`‖u‖_{H^1(Ω)} ≤ C (‖u|_Ω‖_{L_2(Ω)} + ∑_i ‖g_i‖_{L_2(Ω)})`. With
-`Rd.sq_norm_restrictL2_add_sum_le`, the quotient norm of `H^1(Ω)` and the `W^1_2(Ω)` norm are
-equivalent. The bounded extension `F` of `u|_Ω` (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`)
-is an element of `H^1(V)` whose restriction is `u`. -/
-theorem exists_norm_le_restrictL2 [Nontrivial V] :
-    ∃ C : ℝ, ∀ (u : RestrictionSpace 1 Ω.toOpens)
-      (g : Fin (finrank ℝ V) → Lp ℂ 2 (volume.restrict Ω.carrier)),
-      (∀ i, HasWeakLineDeriv Ω.toOpens (fun _ : Fin 1 => gridBasis V i)
-        (toL2 (u : H^{1}(V))) (g i)) →
-      ‖u‖ ≤ C * (‖restrictL2 Ω.toOpens u‖ + ∑ i, ‖g i‖) := by
-  obtain ⟨C, hC, hext⟩ := Ω.exists_extendsSobolev (p := 2) ENNReal.one_lt_two ENNReal.ofNat_ne_top
-  refine ⟨C.toReal, fun u g hg => ?_⟩
-  have hf : MemLp (toL2 (u : H^{1}(V)) : V → ℂ) 2 (volume.restrict Ω.carrier) :=
-    (Lp.memLp _).restrict _
-  obtain ⟨F, hF, hFf, G, hG, hb⟩ := hext _ (fun i => g i) hf (fun i => Lp.memLp (g i)) hg
-  have hS := (memSobolev_one_iff F).1 hF
-  have hU : toL2 hS.toBesselPotentialSpace = F :=
-    toL2_eq_of_toDistr_eq _ hS.toBesselPotentialSpace_toDistr.symm
-  have hproj : restrictProj 1 Ω.toOpens hS.toBesselPotentialSpace = u := by
-    refine restrictL2_injective (Ω := Ω.toOpens) ?_
-    rw [restrictL2_restrictProj, hU]
-    have hFu : (F : V → ℂ) =ᵐ[volume.restrict (Ω.toOpens : Set V)] (toL2 (u : H^{1}(V)) : V → ℂ) :=
-      (ae_restrict_iff' Ω.measurableSet).2 hFf
-    exact ((restrictL2_eq_iff_ae_eq u F).2 hFu.symm).symm
-  have hY : eLpNorm (toL2 (u : H^{1}(V)) : V → ℂ) 2 (volume.restrict (Ω.toOpens : Set V)) +
-      ∑ i, eLpNorm (g i : V → ℂ) 2 (volume.restrict (Ω.toOpens : Set V)) =
-      ENNReal.ofReal (‖restrictL2 Ω.toOpens u‖ + ∑ i, ‖g i‖) := by
-    rw [ENNReal.ofReal_add (norm_nonneg _) (Finset.sum_nonneg fun i _ => norm_nonneg _),
-      ENNReal.ofReal_sum_of_nonneg fun i _ => norm_nonneg _, ofReal_norm, restrictL2_apply,
-      Lp.enorm_def, eLpNorm_congr_ae (LpToLpRestrictCLM_coeFn ℂ _ _)]
-    simp_rw [ofReal_norm, Lp.enorm_def]
-    rfl
-  rw [hY] at hb
-  have hFG : ‖F‖ + ∑ i, ‖G i‖ ≤ C.toReal * (‖restrictL2 Ω.toOpens u‖ + ∑ i, ‖g i‖) := by
-    have h1 := ENNReal.toReal_mono (ENNReal.mul_ne_top hC ENNReal.ofReal_ne_top) hb
-    rwa [toReal_enorm_add_sum, ENNReal.toReal_mul, ENNReal.toReal_ofReal (by positivity)] at h1
-  calc ‖u‖ = ‖restrictProj 1 Ω.toOpens hS.toBesselPotentialSpace‖ := by rw [hproj]
-    _ ≤ ‖hS.toBesselPotentialSpace‖ := norm_restrictProj_apply_le _
-    _ ≤ ‖toL2 hS.toBesselPotentialSpace‖ + ∑ i, ‖G i‖ :=
-        norm_le_norm_toL2_add_sum (gridBasis V) _ fun i => by rw [hU]; exact hG i
-    _ ≤ _ := by rw [hU]; exact hFG
-
-/-- **`W^1_2(Ω)` and the Hilbert space `H^1(Ω)`**: for a bounded Lipschitz domain `Ω`,
-`f ∈ L_2(V)` lies in `W^1_2(Ω)` iff its restriction to `Ω` is `u|_Ω` for some `u` in
-the Hilbert space `H^1(Ω)` (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`,
-`Rd.BoundedLipschitzDomain.memSobolevOn_iff_exists_restrictL2`). -/
-theorem memWeakSobolev_iff_exists_restrictL2 (f : Lp ℂ 2 (volume : Measure V)) :
-    MemWeakSobolev Ω.toOpens 1 2 f ↔ ∃ u : RestrictionSpace 1 Ω.toOpens,
-      restrictL2 Ω.toOpens u = LpToLpRestrictCLM V ℂ ℂ volume 2 Ω.carrier f := by
-  rw [← Ω.memSobolevOn_iff_memWeakSobolev f, Ω.memSobolevOn_iff_exists_restrictL2 f]
-
-/-- **The boundary trace of a function of `W^1_2(Ω)`**: for a bounded Lipschitz domain `Ω`, every
-resolution of unity `ψ` on the boundary `Γ` and every `f ∈ L_2(V)` whose restriction lies in
-`W^1_2(Ω)`, `f` has a boundary trace `g ∈ B^{1/2}_{2,2}(Γ)`
-(`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memSobolevOn` through
-`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`). -/
-theorem exists_isBoundaryTrace_of_memWeakSobolev (ψ : Ω.BoundaryPartition)
-    {f : Lp ℂ 2 (volume : Measure V)} (hf : MemWeakSobolev Ω.toOpens 1 2 f) :
-    ∃ g : V → ℂ, Ω.MemBoundaryBesov 2 ψ (1 / 2) 2 g ∧
-      Ω.IsBoundaryTrace ψ two_ne_top 2 1 2 f g :=
-  exists_isBoundaryTrace_of_memSobolevOn ψ ((Ω.memSobolevOn_iff_memWeakSobolev f).2 hf)
-
-/-- **The boundary trace of a function of `W^1_2(Ω)` is unique** up to null sets of the boundary:
-for every resolution of unity `ψ` on `Γ` and every `f ∈ L_2(V)` whose restriction lies in
-`W^1_2(Ω)`, two boundary traces `g`, `g'` of `f` agree almost everywhere on `Γ`
-(`Rd.BoundedLipschitzDomain.MemSobolevOn.isBoundaryTrace_unique` through
-`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`). -/
-theorem isBoundaryTrace_unique_of_memWeakSobolev (ψ : Ω.BoundaryPartition)
-    {f : Lp ℂ 2 (volume : Measure V)} (hf : MemWeakSobolev Ω.toOpens 1 2 f) {g g' : V → ℂ}
-    (hg : Ω.IsBoundaryTrace ψ two_ne_top 2 1 2 f g)
-    (hg' : Ω.IsBoundaryTrace ψ two_ne_top 2 1 2 f g') : g =ᶠ[Ω.aeBoundary] g' :=
-  MemSobolevOn.isBoundaryTrace_unique ψ ((Ω.memSobolevOn_iff_memWeakSobolev f).2 hf) hg hg'
 
 end BoundedLipschitzDomain
 

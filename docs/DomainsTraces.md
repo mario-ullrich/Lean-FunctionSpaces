@@ -462,7 +462,10 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memWeakSobolev`,
   `Rd.BoundedLipschitzDomain.isBoundaryTrace_unique_of_memWeakSobolev`). The membership
   statements hold in every dimension; for `n = 0`, `F = f` or `F = 0` serves
-  (`Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`). The proof is Rychkov's local
+  (`Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`). The membership statements are the
+  cases `1 < p < ∞` of the theorem by reflection below
+  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`); the bound with
+  the constant `C`, and with it Rellich's theorem and the quotient norm, is Rychkov's local
   extension with the local means of the gradient: for a bump with the moment kernel `m` of order
   two, `k_{j+1} = 2^{-j} ∑_i ∂_{e_i} (K_i)_{2^j}`
   (`Rd.LocalMeansBump.kernel_two_succ_apply`), so on a patch
@@ -470,12 +473,12 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   (`Rd.LocalMeansBump.conv_kernel_two_succ_eq`),
   the strong type of the Calderón–Zygmund families `((K_i)_{2^j})_j` bounds the local means of
   Triebel–Lizorkin type of `f` on the patch (`Rd.LocalMeansBump.tlLocalNormOn_le_patchConst`), the
-  local extension lies in `F^1_{p,2} = W^1_p` (`Rd.LocalMeansBump.extendsSobolev`), and a smooth
-  resolution of unity pastes the local extensions in `W^1_p(V)` (`Rd.extendsSobolev_of_cover`).
-  The constants are existential. The extension is a bounded linear operator
-  `E : W^1_p(Ω) → W^1_p(V)` on value–derivative jets with `E u = u` on `Ω`
-  (`Rd.BoundedLipschitzDomain.sobolevExtensionL`, `Rd.BoundedLipschitzDomain.exists_extensionL`);
-  it is of first order.
+  local extension lies in `F^1_{p,2} = W^1_p` and is linear in `f`
+  (`Rd.LocalMeansBump.sobolevExtensionOp`, `Rd.LocalMeansBump.extendsSobolev`), and a smooth
+  resolution of unity pastes the local extensions in `W^1_p(V)` (`Rd.sobolevExtensionOp_of_cover`).
+  The constants are existential. The extension is a linear extension operator on value–derivative
+  jets with a finite constant (`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp`), so a
+  bounded linear right inverse of the restriction; it is of first order.
 * **The extension theorem for `1 ≤ p ≤ ∞` by reflection.** For a bounded Lipschitz domain `Ω` in
   `V` of dimension `n ≥ 1` and every `1 ≤ p ≤ ∞` there is a finite `C` such that every
   `f ∈ L_p(Ω)` with weak derivatives `g_i = ∂_{e_i} f ∈ L_p(Ω)` on `Ω` agrees almost everywhere on
@@ -495,11 +498,12 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   `Rd.LipschitzGraph.eLpNorm_reflectionDeriv_le`). On the half-space the even reflection is
   weakly differentiable by integration by parts with cutoffs near the hyperplane
   (`Rd.hasWeakLineDeriv_evenReflection`). The boundary patches of `Ω` extend by a cutoff and the
-  reflection, the inner patch by a cutoff, and `Rd.extendsSobolev_of_cover` pastes them. The
+  reflection, the inner patch by a cutoff, and `Rd.sobolevExtensionOp_of_cover` pastes them. The
   extension is a bounded linear operator `E : W^1_p(Ω) → W^1_p(V)` on value–derivative jets with
-  `E u = u` on `Ω` (`Rd.BoundedLipschitzDomain.sobolevExtensionL_of_one_le`,
-  `Rd.BoundedLipschitzDomain.exists_extensionL_of_one_le`), since every patch extension is linear
-  and sees only the values on `Ω` (`Rd.IsSobolevExtensionMap`).
+  `E u = u` on `Ω` (`Rd.BoundedLipschitzDomain.sobolevExtensionL`,
+  `Rd.BoundedLipschitzDomain.exists_extensionL`), since every patch extension is linear and sees
+  only the values on `Ω` (`Rd.IsSobolevExtensionMap`); it is the chosen extension operator for
+  every `1 ≤ p ≤ ∞`.
 * **The extension theorem of higher order.** For a bounded Lipschitz domain `Ω` in `V` of
   dimension `n ≥ 1`, `1 < p < ∞` and `m ∈ ℕ` there is a finite `C` such that every `f` with weak
   derivatives `g_{k,w} = ∂^{e_w} f ∈ L_p(Ω)` on `Ω` along all words `w` of length `k ≤ m` agrees
@@ -627,13 +631,14 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The norm of the trace space: least extension norm, equivalence with the norm of `B^{1/2}_{2,2}(Γ)`, bounded preimages, the range of `H^{1/2}(Γ) → L_2(Γ)`, the Banach space `B^{1/2}_{2,2}(Γ)` isomorphic to `H^{1/2}(Γ)`, and the bounded linear right inverse of the trace | ✅ | ✗ | `Domains/Traces/TraceSpaceNorm` |
 | The Sobolev–Slobodeckij norm on the boundary: Gagliardo's double integral for the surface measure, double integrals in the charts, the bounds by the chart-wise norm of `B^s_{p,p}(Γ)` in both directions, `W^{s,p}(Γ) = B^s_{p,p}(Γ)` for `0 < s < 1`, and the norm of `H^{1/2}(Γ)` as the Sobolev–Slobodeckij norm of `W^{1/2,2}(Γ)` | ✅ | ✗ | `Domains/Traces/BoundaryGagliardo` |
 | Smoothness of parametric integrals, the dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, their supports and those of dyadic dilates, mean zero, the local means kernels as dilation differences `k_{j+1} = (m_2 - m)_{2^j}`, and the Calderón–Zygmund families of the dilates of mean-zero Schwartz functions | ✅ | ✗ | `Domains/Extension/DivergenceKernels` |
-| Convolutions with sums of derivatives of dilated kernels, the local means of order two by the gradient, local means of Triebel–Lizorkin type on a set, bounded extensions from one patch and from `L_p` bounds, pasting in `W^1_p(ℝ^d)`, the smooth cutoffs of the patches, the extension theorem (`W^1_p(Ω)` is the space of restrictions of `W^1_p(ℝ^d)`) for `1 < p < ∞` with a bound, and for `p = 2` `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the quotient norm of `H^1(Ω)` and the boundary traces of `W^1_2(Ω)` | ✅ | ✗ | `Domains/Extension/SobolevExtension` |
-| The extension operator for `W^1_p`, `1 < p < ∞`, on value–derivative jets, `E u = u` on `Ω` | ✅ | ✗ | `Domains/Extension/SobolevExtensionOperator` |
+| Convolutions with sums of derivatives of dilated kernels, the local means of order two by the gradient, local means of Triebel–Lizorkin type on a set, the bounds of the local extension from one patch, bounded extensions from `L_p` bounds, pasting in `W^1_p(ℝ^d)`, the supports of the divergence kernels in the patches, the smooth cutoffs of the patches, dimension zero | ✅ | ✗ | `Domains/Extension/SobolevExtension` |
+| Rychkov's extension operator for `W^1_p`, `1 < p < ∞`, on value–derivative jets with a finite constant, and from it the extension from one patch and the extension theorem for `1 < p < ∞` with a bound | ✅ | ✗ | `Domains/Extension/SobolevExtensionOperator` |
 | The half-space and the reflection across a hyperplane, cutoffs near the hyperplane, integration by parts on the half-space, the linearity, weak derivatives and `L_p` bounds of the even reflection | ✅ | ✗ | `Domains/Extension/HalfSpaceReflection` |
-| The flattening of a Lipschitz graph domain as a measure-preserving map, the extension by reflection across the graph with its linearity, weak derivatives and `L_p` bounds, cutoffs from a bounded Lipschitz domain to its graph domains, and the extension theorem for `W^1_p` on bounded Lipschitz domains for `1 ≤ p ≤ ∞` with a bound | ✅ | ✗ | `Domains/Extension/ReflectionExtension` |
-| Linear extensions of functions as extension operators on jets, the patches by reflection as linear extensions, and an extension operator for `W^1_p`, `1 ≤ p ≤ ∞`, built by reflection on value–derivative jets, `E u = u` on `Ω` | ✅ | ✗ | `Domains/Extension/ReflectionExtensionOperator` |
+| The flattening of a Lipschitz graph domain as a measure-preserving map, the extension by reflection across the graph with its linearity, weak derivatives and `L_p` bounds, cutoffs from a bounded Lipschitz domain to its graph domains with the bounds of the patches | ✅ | ✗ | `Domains/Extension/ReflectionExtension` |
+| Linear extensions of functions as extension operators on jets, the patches by reflection as linear extensions, the chosen extension operator for `W^1_p`, `1 ≤ p ≤ ∞`, built by reflection on value–derivative jets, `E u = u` on `Ω`, and from it the extension theorem for `W^1_p` on bounded Lipschitz domains for `1 ≤ p ≤ ∞` with a bound | ✅ | ✗ | `Domains/Extension/ReflectionExtensionOperator` |
 | Weighted dilation averages `∫_a^b w(s) G_{e^s} ds`, their writing as sums of derivatives of order `m` of the higher divergence kernels when the weight has vanishing moments, the smoothed bump with its moment and kernel weights, and the local means kernels of order `L` as sums of derivatives of order `m ≤ L` of the higher divergence kernels, which have mean zero for `m < L` and lie in the reflected cone for bumps supported in `-K` | ✅ | ✗ | `Domains/Extension/HigherDivergenceKernels` |
 | The local means of order `m + 1` of the smoothed bump by the derivatives of order `m`, local means of Triebel–Lizorkin type with smoothness `m` on a set, bounded extensions of order `m` from one patch and by a cutoff, pasting in `W^m_p(ℝ^d)` by the Leibniz rule, and the extension theorem (`W^m_p(Ω)` is the space of restrictions of `W^m_p(ℝ^d)`) on bounded Lipschitz domains for `1 < p < ∞` and every `m`, with a bound | ✅ | ✗ | `Domains/Extension/HigherSobolevExtension` |
+| `W^1_p(Ω)` as the space of restrictions of `W^1_p(ℝ^d)` for `1 < p < ∞` (the extension theorem), and for `p = 2` `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the quotient norm of `H^1(Ω)` and the boundary traces of `W^1_2(Ω)` | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainW1p` |
 | Gauss–Green on Lipschitz graph domains: product coordinates and Fubini, ray integrals, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and surface form, the product rule for line derivatives, and Green's formula `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)` | ✅ | ✗ | `Domains/Sobolev/LipschitzGraphGreen` |
 | Green's formula on bounded Lipschitz domains: integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary, the chart form for every resolution of unity, the outward unit normal as the chart normal and a unit vector almost everywhere on the boundary, `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, the traces from both sides of a graph, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u` vanishes | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainGreen` |
 | The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, smoothing with compact support, bump mollifiers and cone mollifiers, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)` | ✅ | ✗ | `Domains/Traces/TraceKernel` |

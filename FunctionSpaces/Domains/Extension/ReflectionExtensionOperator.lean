@@ -9,16 +9,16 @@ public import FunctionSpaces.Domains.Extension.ReflectionExtension
 public import FunctionSpaces.Domains.Extension.SobolevExtensionOperator
 
 /-!
-# The extension by reflection as a bounded linear operator
+# The extension operator for `W^1_p` on bounded Lipschitz domains, by reflection
 
 Let `Ω` be a bounded Lipschitz domain in a finite-dimensional real inner product space `V` of
 dimension `n ≥ 1`, and `1 ≤ p ≤ ∞`. There is a bounded linear operator `E` (built by reflection)
 from the jets of `W^1_p(Ω)` to the jets of `W^1_p(V)` with `E u = u` on `Ω`
-(`Rd.BoundedLipschitzDomain.sobolevExtensionL_of_one_le`,
-`Rd.BoundedLipschitzDomain.restrictL_comp_sobolevExtensionL_of_one_le`), in the shape of TauCeti's
-`W1p.exists_extensionL_of_isLipschitzDomainWith`
-(`Rd.BoundedLipschitzDomain.exists_extensionL_of_one_le`,
-`Rd.exists_extensionL_of_isBoundedLipschitzDomain_of_one_le`).
+(`Rd.BoundedLipschitzDomain.sobolevExtensionL`,
+`Rd.BoundedLipschitzDomain.restrictL_comp_sobolevExtensionL`), in the shape of TauCeti's
+`W1p.exists_extensionL_of_isLipschitzDomainWith` (`Rd.BoundedLipschitzDomain.exists_extensionL`,
+`Rd.exists_extensionL_of_isBoundedLipschitzDomain`). It is the chosen extension operator of the
+project for every `1 ≤ p ≤ ∞`.
 
 * **Linear extensions of functions** (`Rd.IsSobolevExtensionMap`): a linear map on functions
   `V → ℂ` that sees only the values on `O` and extends every Sobolev function on `O` from `U` with
@@ -29,6 +29,15 @@ from the jets of `W^1_p(Ω)` to the jets of `W^1_p(V)` with `E u = u` on `Ω`
   extensions of functions (`Rd.BoundedLipschitzDomain.isSobolevExtensionMap_boundary_reflection`,
   `Rd.BoundedLipschitzDomain.isSobolevExtensionMap_interior_cutoff`), and pasting gives an
   extension operator from `Ω` (`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_of_one_le`).
+* **The extension theorem for `1 ≤ p ≤ ∞`** (Evans–Gariepy, Section 4.4): applied to single
+  functions, the operators extend from the patches
+  (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary_reflection`,
+  `Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior_cutoff`) and from `Ω` with a bound
+  (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le`), so `W^1_p(Ω)` is the space of
+  restrictions of `W^1_p(V)` in every dimension
+  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`), and the value of
+  every jet of `W^1_p(Ω)` lies in `W^1_p(Ω)`
+  (`Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet`).
 -/
 
 @[expose] public section
@@ -235,6 +244,17 @@ theorem exists_sobolevExtensionOp_boundary_reflection [Fact (1 ≤ p)] {ε : ℝ
   exact ⟨_, hC, ⟨(Ω.isSobolevExtensionMap_boundary_reflection j hε.le hχ hχB hχ01 hd
     hχ1).toSobolevExtensionOp hC⟩⟩
 
+/-- **The boundary patches by reflection**: for `1 ≤ p ≤ ∞` and `ε > 0`, Sobolev functions on `Ω`
+extend from `Ω ∩ B(c_j, ρ_j - 2ε)` with a finite constant, by the extension operator of the patch
+(`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_boundary_reflection`,
+`Rd.SobolevExtensionOp.extendsSobolev`). -/
+theorem exists_extendsSobolev_boundary_reflection [Fact (1 ≤ p)] {ε : ℝ} (hε : 0 < ε)
+    (j : Fin Ω.N) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens
+      (Ω.carrier ∩ ball (Ω.center j) (Ω.radius j - 2 * ε)) C := by
+  obtain ⟨C, hC, ⟨E⟩⟩ := Ω.exists_sobolevExtensionOp_boundary_reflection (p := p) hε j
+  exact ⟨C, hC, E.extendsSobolev fun _ hx => hx.1⟩
+
 /-- **The inner patch by a cutoff is linear**: for `1 ≤ p ≤ ∞` and a smooth `χ` with values in
 `[0, 1]`, compact closed support in `Ω`, `|∂_{e_i} χ| ≤ d_i` and `χ = 1` near
 `{infDist(·, Ωᶜ) ≥ 2δ}`, the map `f ↦ χ f` is a linear extension of Sobolev functions on `Ω` from
@@ -269,6 +289,16 @@ theorem exists_sobolevExtensionOp_interior_cutoff [Fact (1 ≤ p)] {δ : ℝ} (h
   exact ⟨_, hC, ⟨(Ω.isSobolevExtensionMap_interior_cutoff hχ hχc hχΩ hχ01 hd
     hχ1).toSobolevExtensionOp hC⟩⟩
 
+/-- **The inner patch by a cutoff**: for `1 ≤ p ≤ ∞` and `δ > 0`, Sobolev functions on `Ω` extend
+from `{x ∈ Ω : infDist(x, Ωᶜ) > 2δ}` with a finite constant, by the extension operator of the patch
+(`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_interior_cutoff`,
+`Rd.SobolevExtensionOp.extendsSobolev`). -/
+theorem exists_extendsSobolev_interior_cutoff [Fact (1 ≤ p)] {δ : ℝ} (hδ : 0 < δ) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens
+      (Ω.carrier ∩ {x : V | 2 * δ < infDist x Ω.carrierᶜ}) C := by
+  obtain ⟨C, hC, ⟨E⟩⟩ := Ω.exists_sobolevExtensionOp_interior_cutoff (p := p) hδ
+  exact ⟨C, hC, E.extendsSobolev fun _ hx => hx.1⟩
+
 /-- **The extension operator by reflection with a finite constant**: for a bounded Lipschitz
 domain `Ω` in dimension `n ≥ 1` and `1 ≤ p ≤ ∞` there is an extension operator from `Ω` with a
 finite constant (`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_of_patches` with the patch
@@ -280,81 +310,119 @@ theorem exists_sobolevExtensionOp_of_one_le [Fact (1 ≤ p)] [Nontrivial V] :
     (fun _ hε j => Ω.exists_sobolevExtensionOp_boundary_reflection hε j)
     (fun _ hδ => Ω.exists_sobolevExtensionOp_interior_cutoff hδ)
 
+/-- **The extension theorem for `1 ≤ p ≤ ∞` with a bound**: for a bounded Lipschitz domain `Ω` in
+dimension `n ≥ 1` and `1 ≤ p ≤ ∞` there is a finite constant `C` such that every `f ∈ L_p(Ω)` with
+weak derivatives `g_i = ∂_{e_i} f ∈ L_p(Ω)` agrees on `Ω` with some `F ∈ W^1_p(V)` whose weak
+derivatives `G_i = ∂_{e_i} F` satisfy
+`‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`: the extension operator by
+reflection (`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_of_one_le`) applied to `f`
+(`Rd.SobolevExtensionOp.extendsSobolev`). -/
+theorem exists_extendsSobolev_of_one_le [Nontrivial V] (hp : 1 ≤ p) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens Ω.carrier C := by
+  have : Fact (1 ≤ p) := ⟨hp⟩
+  obtain ⟨C, hC, ⟨E⟩⟩ := Ω.exists_sobolevExtensionOp_of_one_le (p := p)
+  exact ⟨C, hC, E.extendsSobolev subset_rfl⟩
+
+/-- **The extension theorem for `W^1_p`, `1 ≤ p ≤ ∞`** (Evans–Gariepy, Section 4.4; Brezis 2011,
+Chapter 9): for a bounded Lipschitz domain `Ω` and `1 ≤ p ≤ ∞`, every `f ∈ W^1_p(Ω)` agrees almost
+everywhere on `Ω` with some `F ∈ W^1_p(V)`
+(`Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le` in dimension `n ≥ 1`,
+`Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton` in dimension `0`). -/
+theorem exists_memSobolev_of_memWeakSobolev_of_one_le (hp : 1 ≤ p) {f : V → ℂ}
+    (hf : MemWeakSobolev Ω.toOpens 1 p f) :
+    ∃ F : Lp ℂ p (volume : Measure V), MemSobolev 1 F ∧
+      (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f := by
+  rcases subsingleton_or_nontrivial V with hV | hV
+  · exact exists_memSobolev_of_memWeakSobolev_of_subsingleton hf
+  obtain ⟨C, -, hC⟩ := Ω.exists_extendsSobolev_of_one_le hp
+  choose g hg hfg using fun i => hf.2 1 le_rfl fun _ => gridBasis V i
+  obtain ⟨F, hF, hFf, -⟩ := hC f g hf.1 hg hfg
+  exact ⟨F, hF, (ae_restrict_iff' Ω.measurableSet).2 hFf⟩
+
+/-- **`W^1_p(Ω)` is the space of restrictions of `W^1_p(V)` for `1 ≤ p ≤ ∞`**: for a bounded
+Lipschitz domain `Ω`, `f` lies in `W^1_p(Ω)` iff it agrees almost everywhere on `Ω` with some
+`F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev_of_one_le`; the
+converse restricts the weak derivatives, `Rd.MemWeakSobolev.mono_set`). -/
+theorem memWeakSobolev_iff_exists_memSobolev_of_one_le (hp : 1 ≤ p) (f : V → ℂ) :
+    MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p (volume : Measure V), MemSobolev 1 F ∧
+      (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f := by
+  refine ⟨Ω.exists_memSobolev_of_memWeakSobolev_of_one_le hp, ?_⟩
+  rintro ⟨F, hF, hFf⟩
+  exact (MemWeakSobolev.mono_set hF le_top).congr_ae hFf
+
 variable (p) in
 /-- **The extension operator for `W^1_p`, `1 ≤ p ≤ ∞`** (Evans–Gariepy, Section 4.4, by
 reflection): for a bounded Lipschitz domain `Ω` in dimension `n ≥ 1`, a bounded linear operator
 `E` from the jets of `W^1_p(Ω)` to the jets of `W^1_p(V)` with `E u = u` on `Ω`, chosen among the
 extension operators of `Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_of_one_le`. -/
-noncomputable def sobolevExtensionL_of_one_le [Fact (1 ≤ p)] [Nontrivial V] :
+noncomputable def sobolevExtensionL [Fact (1 ≤ p)] [Nontrivial V] :
     weakSobolevJet p Ω.toOpens →L[ℂ] sobolevJet (V := V) p :=
   SobolevExtensionOp.toContinuousLinearMap
     (Classical.choice (Ω.exists_sobolevExtensionOp_of_one_le (p := p)).choose_spec.2)
     (Ω.exists_sobolevExtensionOp_of_one_le (p := p)).choose_spec.1
 
-/-- The values of the extension operator for `1 ≤ p ≤ ∞` lie in `W^1_p(V)`. -/
-theorem memSobolev_sobolevExtensionL_of_one_le [Fact (1 ≤ p)] [Nontrivial V]
-    (u : weakSobolevJet p Ω.toOpens) : MemSobolev 1 (Ω.sobolevExtensionL_of_one_le p u).1.1 :=
+/-- The values of the extension operator lie in `W^1_p(V)`. -/
+theorem memSobolev_sobolevExtensionL [Fact (1 ≤ p)] [Nontrivial V]
+    (u : weakSobolevJet p Ω.toOpens) : MemSobolev 1 (Ω.sobolevExtensionL p u).1.1 :=
   (Classical.choice (Ω.exists_sobolevExtensionOp_of_one_le (p := p)).choose_spec.2).memSobolev u
 
-/-- **The extension operator for `1 ≤ p ≤ ∞` extends**: the value of `E u` agrees with the value
-of `u` almost everywhere on `Ω`. -/
-theorem sobolevExtensionL_fst_ae_eq_of_one_le [Fact (1 ≤ p)] [Nontrivial V]
+/-- **The extension operator extends**: the value of `E u` agrees with the value of `u` almost
+everywhere on `Ω`. -/
+theorem sobolevExtensionL_fst_ae_eq [Fact (1 ≤ p)] [Nontrivial V]
     (u : weakSobolevJet p Ω.toOpens) :
-    ⇑(Ω.sobolevExtensionL_of_one_le p u).1.1 =ᵐ[volume.restrict Ω.carrier] ⇑u.1.1 :=
+    ⇑(Ω.sobolevExtensionL p u).1.1 =ᵐ[volume.restrict Ω.carrier] ⇑u.1.1 :=
   (ae_restrict_iff' Ω.measurableSet).2
     ((Classical.choice (Ω.exists_sobolevExtensionOp_of_one_le (p := p)).choose_spec.2).ae_eq u)
 
-/-- **The value of every jet of `W^1_p(Ω)` lies in `W^1_p(Ω)` for `1 ≤ p ≤ ∞`**: it agrees on `Ω`
-with the value of `E u ∈ W^1_p(V)`
-(`Rd.BoundedLipschitzDomain.memSobolev_sobolevExtensionL_of_one_le`,
-`Rd.BoundedLipschitzDomain.sobolevExtensionL_fst_ae_eq_of_one_le`). -/
-theorem memWeakSobolev_of_mem_weakSobolevJet_of_one_le [Fact (1 ≤ p)] [Nontrivial V]
+/-- **The value of every jet of `W^1_p(Ω)` lies in `W^1_p(Ω)`** for `1 ≤ p ≤ ∞`: it agrees on `Ω`
+with the value of `E u ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.memSobolev_sobolevExtensionL`,
+`Rd.BoundedLipschitzDomain.sobolevExtensionL_fst_ae_eq`). With
+`Rd.exists_mem_weakSobolevJet_of_memWeakSobolev`, the values of the jets of `W^1_p(Ω)` are exactly
+the functions of `W^1_p(Ω)`. On every open set the same follows from the weak derivatives along
+the basis (`Rd.hasWeakLineDeriv_of_forall_gridBasis`). -/
+theorem memWeakSobolev_of_mem_weakSobolevJet [Fact (1 ≤ p)] [Nontrivial V]
     (u : weakSobolevJet p Ω.toOpens) : MemWeakSobolev Ω.toOpens 1 p u.1.1 :=
-  ((Ω.memSobolev_sobolevExtensionL_of_one_le u).mono_set le_top).congr_ae
-    (Ω.sobolevExtensionL_fst_ae_eq_of_one_le u)
+  ((Ω.memSobolev_sobolevExtensionL u).mono_set le_top).congr_ae (Ω.sobolevExtensionL_fst_ae_eq u)
 
-/-- **The bound of the extension operator for `1 ≤ p ≤ ∞`** in the norm `‖f‖_p + ∑_i ‖g_i‖_p`:
-there is a finite `C` with `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})` for
-`E (f, g) = (F, G)`. -/
-theorem exists_enorm_sobolevExtensionL_le_of_one_le [Fact (1 ≤ p)] [Nontrivial V] :
+/-- **The bound of the extension operator** in the norm `‖f‖_p + ∑_i ‖g_i‖_p`: there is a finite
+`C` with `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})` for `E (f, g) = (F, G)`. -/
+theorem exists_enorm_sobolevExtensionL_le [Fact (1 ≤ p)] [Nontrivial V] :
     ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ u : weakSobolevJet p Ω.toOpens,
-      ‖(Ω.sobolevExtensionL_of_one_le p u).1.1‖ₑ +
-          ∑ i, ‖(Ω.sobolevExtensionL_of_one_le p u).1.2 i‖ₑ ≤
+      ‖(Ω.sobolevExtensionL p u).1.1‖ₑ + ∑ i, ‖(Ω.sobolevExtensionL p u).1.2 i‖ₑ ≤
         C * (‖u.1.1‖ₑ + ∑ i, ‖u.1.2 i‖ₑ) :=
   ⟨_, (Ω.exists_sobolevExtensionOp_of_one_le (p := p)).choose_spec.1,
     (Classical.choice (Ω.exists_sobolevExtensionOp_of_one_le (p := p)).choose_spec.2).bound⟩
 
-/-- **Restriction after the extension operator for `1 ≤ p ≤ ∞` is the identity**: `(E u)|_Ω = u`
-for every jet `u` of `W^1_p(Ω)` (`Rd.SobolevExtensionOp.restrictL_comp_toContinuousLinearMap`). -/
-theorem restrictL_comp_sobolevExtensionL_of_one_le [Fact (1 ≤ p)] [Nontrivial V] :
-    (sobolevJet.restrictL Ω.toOpens).comp (Ω.sobolevExtensionL_of_one_le p) =
+/-- **Restriction after extension is the identity**: `(E u)|_Ω = u` for every jet `u` of
+`W^1_p(Ω)` (`Rd.SobolevExtensionOp.restrictL_comp_toContinuousLinearMap`). -/
+theorem restrictL_comp_sobolevExtensionL [Fact (1 ≤ p)] [Nontrivial V] :
+    (sobolevJet.restrictL Ω.toOpens).comp (Ω.sobolevExtensionL p) =
       ContinuousLinearMap.id ℂ _ :=
   SobolevExtensionOp.restrictL_comp_toContinuousLinearMap _ _ subset_rfl
 
-/-- **The extension theorem in operator form for `1 ≤ p ≤ ∞`** (TauCeti's
+/-- **The extension theorem in operator form** (TauCeti's
 `W1p.exists_extensionL_of_isLipschitzDomainWith`): for a bounded Lipschitz domain `Ω` in dimension
 `n ≥ 1` and `1 ≤ p ≤ ∞` there is a bounded linear operator `E` from the jets of `W^1_p(Ω)` to the
 jets of `W^1_p(V)` that is a right inverse of the restriction and has values in `W^1_p(V)`. -/
-theorem exists_extensionL_of_one_le [Fact (1 ≤ p)] [Nontrivial V] :
+theorem exists_extensionL [Fact (1 ≤ p)] [Nontrivial V] :
     ∃ E : weakSobolevJet p Ω.toOpens →L[ℂ] sobolevJet (V := V) p,
       (sobolevJet.restrictL Ω.toOpens).comp E = ContinuousLinearMap.id ℂ _ ∧
         ∀ u, MemSobolev 1 (E u).1.1 :=
-  ⟨Ω.sobolevExtensionL_of_one_le p, Ω.restrictL_comp_sobolevExtensionL_of_one_le,
-    Ω.memSobolev_sobolevExtensionL_of_one_le⟩
+  ⟨Ω.sobolevExtensionL p, Ω.restrictL_comp_sobolevExtensionL, Ω.memSobolev_sobolevExtensionL⟩
 
 end BoundedLipschitzDomain
 
-/-- **The extension theorem in operator form for the usual definition and `1 ≤ p ≤ ∞`**: for a
-bounded Lipschitz set `Ω` (`Rd.IsBoundedLipschitzDomain`) in dimension `n ≥ 1` there is a bounded
+/-- **The extension theorem in operator form for the usual definition**: for a bounded Lipschitz
+set `Ω` (`Rd.IsBoundedLipschitzDomain`) in dimension `n ≥ 1` and `1 ≤ p ≤ ∞` there is a bounded
 linear extension operator from the jets of `W^1_p(Ω)` to those of `W^1_p(V)`
-(`Rd.BoundedLipschitzDomain.exists_extensionL_of_one_le` for
+(`Rd.BoundedLipschitzDomain.exists_extensionL` for
 `Rd.BoundedLipschitzDomain.ofIsBoundedLipschitzDomain`). -/
-theorem exists_extensionL_of_isBoundedLipschitzDomain_of_one_le [Fact (1 ≤ p)] [Nontrivial V]
+theorem exists_extensionL_of_isBoundedLipschitzDomain [Fact (1 ≤ p)] [Nontrivial V]
     {Ω : Set V} (h : IsBoundedLipschitzDomain Ω) :
     ∃ E : weakSobolevJet p ⟨Ω, h.1⟩ →L[ℂ] sobolevJet (V := V) p,
       (sobolevJet.restrictL ⟨Ω, h.1⟩).comp E = ContinuousLinearMap.id ℂ _ ∧
         ∀ u, MemSobolev 1 (E u).1.1 :=
-  (BoundedLipschitzDomain.ofIsBoundedLipschitzDomain h).exists_extensionL_of_one_le
+  (BoundedLipschitzDomain.ofIsBoundedLipschitzDomain h).exists_extensionL
 
 end BoundedDomains
 

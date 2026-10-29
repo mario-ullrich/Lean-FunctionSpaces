@@ -6080,8 +6080,10 @@ divergence kernels (\Cref{lem:bump-divergence-identity}), the derivatives move o
 strong type of the Calder\'on--Zygmund families of the divergence kernels
 (\Cref{thm:vector-valued-strong-type}) bounds the local means of Triebel--Lizorkin type of $f$ on
 a patch by $\|f\|_{\Sob{1}{p}(\Omega)}$. The local extensions lie in
-$\TL{1}{p}{2} = \Sob{1}{p}(V)$ and are pasted in $\Sob{1}{p}(V)$. The extension is a bounded
-linear operator on the jets of \Cref{def:sobolev-jets} (\Cref{thm:sobolev-extension-operator}).
+$\TL{1}{p}{2} = \Sob{1}{p}(V)$ and are pasted in $\Sob{1}{p}(V)$. The construction gives an
+extension operator with a finite constant (\Cref{thm:sobolev-extension-operator}), hence a
+bounded linear operator on the jets of \Cref{def:sobolev-jets}
+(\Cref{lem:sobolev-extension-op-bounded}).
 
 \paragraph{Local means by the gradient.}
 
@@ -6520,7 +6522,9 @@ $n = 0$ the open set $\Omega$ is empty, where $F = 0$ serves, or all of $V$, whe
 serves.
 \end{proof}
 
-The extension is a bounded linear operator (\Cref{thm:sobolev-extension-operator}). For every
+The construction gives an extension operator with a finite constant
+(\Cref{thm:sobolev-extension-operator}), hence a bounded linear operator on the jets
+(\Cref{lem:sobolev-extension-op-bounded}). For every
 $1 \leq p \leq \infty$ the theorem holds by reflection (\Cref{thm:reflection-extension}), and for
 every order $m$ and $1 < p < \infty$ by the local means of the derivatives of order $m$
 (\Cref{thm:higher-sobolev-extension}).
@@ -6711,28 +6715,19 @@ estimate of \Cref{thm:pasting-sobolev}. (2) The patches of \Cref{lem:bounded-lip
 are bounded open sets that cover $\overline\Omega$; apply (1).
 \end{proof}
 
-\begin{theorem}[The extension operator]
+\begin{theorem}[Rychkov's extension operator]
 \label{thm:sobolev-extension-operator}
 \lean{Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_boundary,
   Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_interior,
-  Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp, Rd.BoundedLipschitzDomain.sobolevExtensionL,
-  Rd.BoundedLipschitzDomain.memSobolev_sobolevExtensionL,
-  Rd.BoundedLipschitzDomain.sobolevExtensionL_fst_ae_eq,
-  Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet,
-  Rd.BoundedLipschitzDomain.exists_enorm_sobolevExtensionL_le,
-  Rd.BoundedLipschitzDomain.restrictL_comp_sobolevExtensionL,
-  Rd.BoundedLipschitzDomain.exists_extensionL, Rd.exists_extensionL_of_isBoundedLipschitzDomain}
+  Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp}
 \leanok
-\uses{lem:sobolev-extension-op-pasting, thm:sobolev-extension, def:sobolev-jets,
-  lem:sobolev-extension-op-patch, lem:sobolev-extension-op-bounded, lem:sobolev-patches,
-  def:lipschitz-near-point, thm:bounded-lipschitz-sets, lem:weak-derivative-basic}
-For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$ and every $1 < p < \infty$
-there is a bounded linear operator $E$ from the jets of $\Sob{1}{p}(\Omega)$ to the jets of
-$\Sob{1}{p}(V)$ such that for every jet $u = (f, (g_i)_i)$ and $E u = (F, (G_i)_i)$,
-$F \in \Sob{1}{p}(V)$, $F = f$ almost everywhere on $\Omega$, and the restriction of $E u$ to
-$\Omega$ is $u$; in particular $f \in \Sob{1}{p}(\Omega)$ for every jet $(f, (g_i)_i)$ of
-$\Sob{1}{p}(\Omega)$. The same holds for every bounded Lipschitz set $\Omega \subseteq V$
-(\Cref{def:lipschitz-near-point}) in dimension $n \geq 1$.
+\uses{lem:sobolev-extension-op-pasting, def:sobolev-extension-op,
+  lem:sobolev-extension-op-patch, lem:sobolev-patches}
+For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$ with boundary balls
+$B(c_j, \rho_j)$ and every $1 < p < \infty$ there are extension operators with finite constants
+from $\Omega \cap B(c_j, \rho_j - 2 \varepsilon)$ for every $\varepsilon > 0$ and every $j$, from
+$\{x \in \Omega : \dist(x, V \setminus \Omega) > 2 \delta\}$ for every $\delta > 0$, and from
+$\Omega$.
 \end{theorem}
 
 \begin{proof}
@@ -6740,11 +6735,12 @@ $\Sob{1}{p}(\Omega)$. The same holds for every bounded Lipschitz set $\Omega \su
 The patches of \Cref{lem:sobolev-patches} carry extension operators by
 \Cref{lem:sobolev-extension-op-patch}, and \Cref{lem:sobolev-extension-op-pasting} (2) pastes
 them to an extension operator from $\Omega$ with a finite constant.
-\Cref{lem:sobolev-extension-op-bounded} gives boundedness and the right inverse. The value $f$
-of a jet agrees on $\Omega$ with $F \in \Sob{1}{p}(V)$, so $f \in \Sob{1}{p}(\Omega)$
-(\Cref{lem:weak-derivative-basic}). The claim for bounded Lipschitz sets is the first for the
-bounded Lipschitz domain of \Cref{thm:bounded-lipschitz-sets}.
 \end{proof}
+
+By \Cref{lem:sobolev-extension-op-bounded} such an operator is a bounded linear right inverse of
+the restriction. Reflection gives such an operator for every $1 \leq p \leq \infty$, and that
+operator is the one chosen for the statements in operator form
+(\Cref{thm:reflection-extension-operator}).
 
 \section{Extension by reflection}
 \label{sec:reflection-extension}
@@ -7474,18 +7470,17 @@ extension operators.
 \begin{theorem}[The extension operator by reflection]
 \label{thm:reflection-extension-operator}
 \lean{Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_of_one_le,
-  Rd.BoundedLipschitzDomain.sobolevExtensionL_of_one_le,
-  Rd.BoundedLipschitzDomain.memSobolev_sobolevExtensionL_of_one_le,
-  Rd.BoundedLipschitzDomain.sobolevExtensionL_fst_ae_eq_of_one_le,
-  Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet_of_one_le,
-  Rd.BoundedLipschitzDomain.exists_enorm_sobolevExtensionL_le_of_one_le,
-  Rd.BoundedLipschitzDomain.restrictL_comp_sobolevExtensionL_of_one_le,
-  Rd.BoundedLipschitzDomain.exists_extensionL_of_one_le,
-  Rd.exists_extensionL_of_isBoundedLipschitzDomain_of_one_le}
+  Rd.BoundedLipschitzDomain.sobolevExtensionL,
+  Rd.BoundedLipschitzDomain.memSobolev_sobolevExtensionL,
+  Rd.BoundedLipschitzDomain.sobolevExtensionL_fst_ae_eq,
+  Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet,
+  Rd.BoundedLipschitzDomain.exists_enorm_sobolevExtensionL_le,
+  Rd.BoundedLipschitzDomain.restrictL_comp_sobolevExtensionL,
+  Rd.BoundedLipschitzDomain.exists_extensionL, Rd.exists_extensionL_of_isBoundedLipschitzDomain}
 \leanok
 \uses{lem:reflection-patches-linear, lem:sobolev-extension-op-pasting,
   lem:sobolev-extension-op-bounded, def:lipschitz-near-point, thm:bounded-lipschitz-sets,
-  lem:weak-derivative-basic}
+  lem:weak-derivative-basic, def:sobolev-jets}
 For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$ and every
 $1 \leq p \leq \infty$ there is a bounded linear operator $E$ from the jets of
 $\Sob{1}{p}(\Omega)$ to the jets of $\Sob{1}{p}(V)$ such that for every jet

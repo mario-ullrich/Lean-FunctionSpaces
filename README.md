@@ -516,9 +516,9 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`).
   For `1 ≤ p ≤ ∞` the extension is a bounded linear operator `E : W^1_p(Ω) → W^1_p(V)` on
   value–derivative jets with `E u = u` on `Ω`
-  (`Rd.BoundedLipschitzDomain.sobolevExtensionL_of_one_le`,
-  `Rd.BoundedLipschitzDomain.exists_extensionL_of_one_le`, by reflection; for `1 < p < ∞` also
-  `Rd.BoundedLipschitzDomain.sobolevExtensionL`, by Rychkov's local extension).
+  (`Rd.BoundedLipschitzDomain.sobolevExtensionL`, `Rd.BoundedLipschitzDomain.exists_extensionL`,
+  by reflection; for `1 < p < ∞` also `Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp`, by
+  Rychkov's local extension).
   For `1 < p < ∞` and every order `m`, with the derivatives
   `∂^{e_w} = ∂_{e_{w_0}} ⋯ ∂_{e_{w_{k-1}}}` along the words `w` of length `k ≤ m`, there is a
   finite `C` such that every `f` whose weak

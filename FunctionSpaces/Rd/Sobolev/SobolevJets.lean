@@ -17,7 +17,8 @@ its orthonormal basis, `O ⊆ V` open and `1 ≤ p ≤ ∞`. A **jet** of `W^1_p
 (`Rd.weakSobolevJet p O`); the jets of `W^1_p(V)` are the same over `L_p(V)` (`Rd.sobolevJet p`).
 Both are complex linear subspaces of `L_p × L_p^n` with the norm `max(‖f‖_p, max_i ‖g_i‖_p)`, which
 is equivalent to `‖f‖_p + ∑_i ‖g_i‖_p` (`Rd.norm_le_norm_fst_add_sum`,
-`Rd.norm_fst_add_sum_le`; in `ℝ≥0∞`, `Rd.toReal_enorm_add_sum`).
+`Rd.norm_fst_add_sum_le`; in `ℝ≥0∞`, `Rd.toReal_enorm_add_sum`, and the squared form
+`Rd.sq_norm_add_sum_sq_le`).
 
 * The derivatives of a jet are determined by its value (`Rd.weakSobolevJet.snd_eq_of_fst_eq`,
   `Rd.sobolevJet.snd_eq_of_fst_eq`), and every `f ∈ W^1_p(O)` is the value of a jet
@@ -64,6 +65,16 @@ theorem toReal_enorm_add_sum {E ι : Type*} [NormedAddCommGroup E] [Fintype ι] 
   rw [ENNReal.toReal_add enorm_ne_top (ENNReal.sum_ne_top.2 fun _ _ => enorm_ne_top),
     ENNReal.toReal_sum fun _ _ => enorm_ne_top]
   simp only [toReal_enorm]
+
+/-- If `‖x‖ + ∑_i ‖y_i‖ ≤ K` in `ℝ≥0∞` with `K` finite, then `‖x‖² + ∑_i ‖y_i‖² ≤ K²` in `ℝ`. -/
+theorem sq_norm_add_sum_sq_le {E : Type*} [NormedAddCommGroup E] {ι : Type*} [Fintype ι] {x : E}
+    {y : ι → E} {K : ℝ≥0∞} (hK : K ≠ ∞) (h : ‖x‖ₑ + ∑ i, ‖y i‖ₑ ≤ K) :
+    ‖x‖ ^ 2 + ∑ i, ‖y i‖ ^ 2 ≤ K.toReal ^ 2 := by
+  have hr : ‖x‖ + ∑ i, ‖y i‖ ≤ K.toReal :=
+    toReal_enorm_add_sum x y ▸ ENNReal.toReal_mono hK h
+  have hs := Finset.sum_sq_le_sq_sum_of_nonneg (s := Finset.univ) fun i _ => norm_nonneg (y i)
+  have h0 : 0 ≤ ∑ i, ‖y i‖ := Finset.sum_nonneg fun i _ => norm_nonneg _
+  nlinarith [norm_nonneg x]
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V] {p : ℝ≥0∞}

@@ -186,9 +186,10 @@ other; Lean-FunctionSpaces follows its statement shapes where that costs nothing
 ### 4.3 `H^1` on bounded Lipschitz domains and the extension theorem H.2 (step 2 of the proposal)
 
 Files `FunctionSpaces/Domains/Sobolev/LipschitzDomainH1.lean`,
-`FunctionSpaces/Domains/Extension/SobolevExtension.lean`,
-`FunctionSpaces/Domains/Extension/ReflectionExtension.lean` and
-`FunctionSpaces/Domains/Extension/ReflectionExtensionOperator.lean`;
+`FunctionSpaces/Domains/Extension/SobolevExtension.lean` (`Rd.ExtendsSobolev`),
+`FunctionSpaces/Domains/Extension/SobolevExtensionOperator.lean`,
+`FunctionSpaces/Domains/Extension/ReflectionExtensionOperator.lean` and
+`FunctionSpaces/Domains/Sobolev/LipschitzDomainW1p.lean`;
 `Ω : Rd.BoundedLipschitzDomain V` (X.1), with `Ω.carrier` the open set and
 `Ω.toOpens : Opens V` the same set as an element of `Opens V`.
 
@@ -213,29 +214,24 @@ Files `FunctionSpaces/Domains/Sobolev/LipschitzDomainH1.lean`,
   `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`. The same holds for every
   `1 ≤ p ≤ ∞`, by reflection across the boundary in flattened coordinates (Evans–Gariepy,
   Section 4.4): `Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le (hp : 1 ≤ p) :
-  ∃ C, C ≠ ∞ ∧ Rd.ExtendsSobolev p Ω.toOpens Ω.carrier C`, with `[Nontrivial V]`. For
-  `1 < p < ∞` the extension is a bounded
-  linear operator on value–derivative jets (`FunctionSpaces/Rd/Sobolev/SobolevJets.lean`,
-  `FunctionSpaces/Domains/Extension/SobolevExtensionOperator.lean`):
-  `Rd.BoundedLipschitzDomain.exists_extensionL (hp1 : 1 < p) (hp : p ≠ ∞) : ∃ E :
+  ∃ C, C ≠ ∞ ∧ Rd.ExtendsSobolev p Ω.toOpens Ω.carrier C`, with `[Nontrivial V]`. For every
+  `1 ≤ p ≤ ∞` the extension is a bounded linear operator on value–derivative jets, built by
+  reflection (`FunctionSpaces/Rd/Sobolev/SobolevJets.lean`,
+  `FunctionSpaces/Domains/Extension/ReflectionExtensionOperator.lean`):
+  `Rd.BoundedLipschitzDomain.exists_extensionL : ∃ E :
   Rd.weakSobolevJet p Ω.toOpens →L[ℂ] Rd.sobolevJet p, (Rd.sobolevJet.restrictL Ω.toOpens).comp E
-  = ContinuousLinearMap.id ℂ _ ∧ ∀ u, MemSobolev 1 (E u).1.1`, with `[Nontrivial V]` and
-  `[Fact (1 ≤ p)]`. Here `Rd.weakSobolevJet p O` is the submodule of `L_p(O) × L_p(O)^d` of the
+  = ContinuousLinearMap.id ℂ _ ∧ ∀ u, MemSobolev 1 (E u).1.1`, with `[Fact (1 ≤ p)]` and
+  `[Nontrivial V]`. Here `Rd.weakSobolevJet p O` is the submodule of `L_p(O) × L_p(O)^d` of the
   pairs `(f, (g_i)_i)` with `g_i = ∂_{e_i} f` weakly on `O`, `Rd.sobolevJet p` the same on `V`,
-  and `Rd.sobolevJet.restrictL O` the restriction. The values of the jets of `W^{1,p}(Ω)` are
+  and `Rd.sobolevJet.restrictL O` the restriction. The chosen operator is
+  `Rd.BoundedLipschitzDomain.sobolevExtensionL p`. The values of the jets of `W^{1,p}(Ω)` are
   exactly the functions of `W^{1,p}(Ω)` (`Rd.exists_mem_weakSobolevJet_of_memWeakSobolev`,
-  `Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet`). A chosen operator is
-  `Rd.BoundedLipschitzDomain.sobolevExtensionL`, and
+  `Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet`), and
   `Rd.exists_extensionL_of_isBoundedLipschitzDomain` is the same for the set-level definition
-  `Rd.IsBoundedLipschitzDomain`. For every `1 ≤ p ≤ ∞` there is such an operator, built by
-  reflection: `Rd.BoundedLipschitzDomain.exists_extensionL_of_one_le : ∃ E :
-  Rd.weakSobolevJet p Ω.toOpens →L[ℂ] Rd.sobolevJet p, (Rd.sobolevJet.restrictL Ω.toOpens).comp E
-  = ContinuousLinearMap.id ℂ _ ∧ ∀ u, MemSobolev 1 (E u).1.1`, with `[Nontrivial V]` and
-  `[Fact (1 ≤ p)]`; a chosen operator is `Rd.BoundedLipschitzDomain.sobolevExtensionL_of_one_le p`,
-  the values of the jets are the functions of `W^{1,p}(Ω)`
-  (`Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet_of_one_le`), and
-  `Rd.exists_extensionL_of_isBoundedLipschitzDomain_of_one_le` is the set-level form. The theorem
-  is of first order. Membership form, for every `1 ≤ p ≤ ∞`:
+  `Rd.IsBoundedLipschitzDomain`. For `1 < p < ∞` Rychkov's extension gives an extension operator
+  as well (`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp`,
+  `FunctionSpaces/Domains/Extension/SobolevExtensionOperator.lean`). The theorem is of first
+  order. Membership form, for every `1 ≤ p ≤ ∞`:
   `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le (hp : 1 ≤ p)
   (f : V → ℂ) : MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p volume, MemSobolev 1 F ∧
   (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f`, and the direction
@@ -915,13 +911,17 @@ Section 4.12, and `ker γ = H^1_0(Ω)`, with its Lean names in Section 4.13.
   (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace`). File
   `FunctionSpaces/Domains/Traces/TraceKernel.lean`.
 * **The extension theorem H.2 (formalised, Section 4.3)** for `W^{1,2}` on bounded Lipschitz domains
-  (the restriction space equals the weak-derivative space), by Rychkov's extension operator with
-  local means of the gradient; with it Rellich and the trace statements hold for the weak-derivative
-  space (`Rd.BoundedLipschitzDomain.exists_subseq_tendsto_of_memWeakSobolev`,
-  `Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memWeakSobolev`,
-  `Rd.BoundedLipschitzDomain.isBoundaryTrace_unique_of_memWeakSobolev`). Files
-  `FunctionSpaces/Domains/Extension/DivergenceKernels.lean` and
-  `FunctionSpaces/Domains/Extension/SobolevExtension.lean`. **Extended (decision of 21 October
+  (the restriction space equals the weak-derivative space), by the extension by reflection. With
+  it the trace statements hold for the weak-derivative space
+  (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memWeakSobolev`,
+  `Rd.BoundedLipschitzDomain.isBoundaryTrace_unique_of_memWeakSobolev`), and Rychkov's extension
+  operator with local means of the gradient gives Rellich's theorem in the weak-derivative form
+  (`Rd.BoundedLipschitzDomain.exists_subseq_tendsto_of_memWeakSobolev`). Files
+  `FunctionSpaces/Domains/Extension/DivergenceKernels.lean`,
+  `FunctionSpaces/Domains/Extension/SobolevExtension.lean`,
+  `FunctionSpaces/Domains/Extension/SobolevExtensionOperator.lean`,
+  `FunctionSpaces/Domains/Extension/ReflectionExtensionOperator.lean` and
+  `FunctionSpaces/Domains/Sobolev/LipschitzDomainW1p.lean`. **Extended (decision of 21 October
   2026):** H.2 is stated for every `1 < p < ∞`, every function of `W^{1,p}(Ω)` is the restriction of
   a function of `W^{1,p}(ℝ^d)`, through the `L_p` bounds of the part on `L_p` Sobolev spaces;
   Rellich in the weak-derivative form and the equivalence of the quotient norm of `H^1(Ω)` with the
@@ -1110,10 +1110,23 @@ namespaces and every declaration name are unchanged.
 **The extension as a bounded linear operator** (24 October 2026). H.2 also holds in operator
 form: a bounded linear extension operator on value–derivative jets, a right inverse of the
 restriction, in the shape of TauCeti's `W1p.exists_extensionL_of_isLipschitzDomainWith`, for
-`1 < p < ∞` by Rychkov's extension (`Rd.BoundedLipschitzDomain.exists_extensionL`) and for every
-`1 ≤ p ≤ ∞` by reflection (`Rd.BoundedLipschitzDomain.exists_extensionL_of_one_le`,
-`Rd.BoundedLipschitzDomain.sobolevExtensionL_of_one_le`), Section 4.3; the extension for each `f`
-(`Rd.BoundedLipschitzDomain.exists_extendsSobolev`) keeps its name and statement.
+every `1 ≤ p ≤ ∞` by reflection (`Rd.BoundedLipschitzDomain.exists_extensionL`,
+`Rd.BoundedLipschitzDomain.sobolevExtensionL`), Section 4.3; for `1 < p < ∞` Rychkov's extension
+gives an extension operator as well (`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp`).
+
+**The extension theorem from the operators** (29 October 2026). The extensions of single
+functions are the extension operators applied to one function
+(`Rd.SobolevExtensionOp.extendsSobolev`): `Rd.BoundedLipschitzDomain.exists_extendsSobolev` lies
+in `FunctionSpaces.Domains.Extension.SobolevExtensionOperator`, the forms for `1 ≤ p ≤ ∞`
+(`Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le`,
+`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`) in
+`FunctionSpaces.Domains.Extension.ReflectionExtensionOperator`, and the consequences of
+Section 4.3 (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`,
+`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`, Rellich, the quotient norm and the
+boundary traces of `W^{1,2}(Ω)`) in `FunctionSpaces.Domains.Sobolev.LipschitzDomainW1p`. The
+chosen extension operator is the one by reflection for every `1 ≤ p ≤ ∞`, under the names
+`Rd.BoundedLipschitzDomain.sobolevExtensionL`, `Rd.BoundedLipschitzDomain.exists_extensionL` and
+`Rd.exists_extensionL_of_isBoundedLipschitzDomain`, stated with `[Fact (1 ≤ p)]`.
 
 ## References
 

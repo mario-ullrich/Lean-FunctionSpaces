@@ -31,14 +31,14 @@ flattening `F(x) = x - φ(x) e` and its inverse `F⁻¹(y) = y + φ(y) e`.
   by the chain rule `Rd.HasWeakLineDeriv.comp_lipschitzWith` for `F⁻¹` and for `F`); for
   `1 ≤ p ≤ ∞` and `f ∈ W^1_p(Ω)`, with `‖E f‖_{L_p(V)} ≤ 2 ‖f‖_{L_p(Ω)}` and
   `‖∂_v E f‖_{L_p(V)} ≤ 2 (1 + M)² ‖v‖ ∑_i ‖∂_{e_i} f‖_{L_p(Ω)}`.
-* **Bounded Lipschitz domains** (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le`,
-  `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`): a boundary patch
-  extends by a cutoff (`Rd.BoundedLipschitzDomain.hasWeakLineDeriv_mul_graph`) and the
-  reflection in its graph domain with the constant `Rd.reflectionConst`
+* **Bounded Lipschitz domains**: a boundary patch extends by a cutoff
+  (`Rd.BoundedLipschitzDomain.hasWeakLineDeriv_mul_graph`) and the reflection in its graph domain
+  with the constant `Rd.reflectionConst`
   (`Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_reflectionExtension_mul`), the inner patch
-  by a cutoff (`Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_mul_interior`), and
-  `Rd.extendsSobolev_of_cover` pastes them. So for every `1 ≤ p ≤ ∞` the space `W^1_p(Ω)` is the
-  space of restrictions of `W^1_p(V)`, with a bounded extension (Evans–Gariepy, Section 4.4).
+  by a cutoff (`Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_mul_interior`). These bounds
+  give the extension operator by reflection and with it the extension theorem for every
+  `1 ≤ p ≤ ∞` (Evans–Gariepy, Section 4.4), in
+  `FunctionSpaces.Domains.Extension.ReflectionExtensionOperator`.
 -/
 
 @[expose] public section
@@ -528,7 +528,7 @@ end Derivatives
 
 end LipschitzGraph
 
-/-! ### Extensions on bounded Lipschitz domains -/
+/-! ### The patches of bounded Lipschitz domains -/
 
 section BoundedDomains
 
@@ -687,26 +687,6 @@ theorem reflectionExtension_mul_eq_of_mem (j : Fin Ω.N) {ε : ℝ} (hε : 0 ≤
   rw [LipschitzGraph.reflectionExtension_of_mem _ _ hxG,
     hχ1.self_of_nhdsSet x (ball_subset_closedBall hx.2), Complex.ofReal_one, one_mul]
 
-/-- **The boundary patches by reflection**: for `1 ≤ p ≤ ∞`, Sobolev functions on `Ω` extend from
-`Ω ∩ B(c_j, ρ_j - 2ε)` with a finite constant. The cutoff
-`Rd.BoundedLipschitzDomain.exists_cutoff_boundary` turns `f` into a Sobolev function `χ f` on the
-graph domain `Ω_j`, and its extension by reflection
-(`Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_reflectionExtension_mul`) agrees with `f`
-there (`Rd.BoundedLipschitzDomain.reflectionExtension_mul_eq_of_mem`). -/
-theorem exists_extendsSobolev_boundary_reflection [Fact (1 ≤ p)] {ε : ℝ} (hε : 0 < ε)
-    (j : Fin Ω.N) :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens
-      (Ω.carrier ∩ ball (Ω.center j) (Ω.radius j - 2 * ε)) C := by
-  obtain ⟨χ, hχ, hχc, hχB, hχ01, hχ1⟩ := Ω.exists_cutoff_boundary hε j
-  obtain ⟨d, hd⟩ := exists_norm_fderiv_gridBasis_le hχ hχc
-  have hC := reflectionConst_ne_top (finrank ℝ V) (Ω.graph j).M
-    (ENNReal.sum_ne_top.2 fun i _ => ENNReal.coe_ne_top : ∑ i, (d i : ℝ≥0∞) ≠ ∞)
-  refine ⟨_, hC, extendsSobolev_of_eLpNorm_le hC fun f g hf hg hfg => ?_⟩
-  obtain ⟨G, hG, hb⟩ := Ω.exists_hasWeakLineDeriv_reflectionExtension_mul j Fact.out hχ hχB hχ01
-    hd hf hg hfg
-  exact ⟨_, G, hG, ae_of_all _ fun x hx => Ω.reflectionExtension_mul_eq_of_mem j hε.le hχ1 f hx,
-    hb⟩
-
 /-- **The cutoff of a function on the inner patch, with its bound**: for `1 ≤ p`, a smooth `χ` with
 values in `[0, 1]`, compact closed support in `Ω`, `|∂_{e_i} χ| ≤ d_i` and `χ = 1` near
 `{infDist(·, Ωᶜ) ≥ 2δ}`, and `f` with weak derivatives `g_i = ∂_{e_i} f` on `Ω`, the function
@@ -733,66 +713,6 @@ theorem exists_hasWeakLineDeriv_mul_interior (hp : 1 ≤ p) {δ : ℝ} {χ : V �
     eLpNorm_mul_add_sum_le_of_tsupport_subset (O := Ω.toOpens) hp hχ hχΩ hχ01 hd f g⟩
   rw [hχ1.self_of_nhdsSet x (le_of_lt hx.2 : 2 * δ ≤ infDist x Ω.carrierᶜ), Complex.ofReal_one,
     one_mul]
-
-/-- **The inner patch by a cutoff**: for `1 ≤ p ≤ ∞` and `δ > 0`, Sobolev functions on `Ω` extend
-from `{x ∈ Ω : infDist(x, Ωᶜ) > 2δ}` with a finite constant, by the cutoff
-`Rd.BoundedLipschitzDomain.exists_cutoff_interior` and
-`Rd.BoundedLipschitzDomain.exists_hasWeakLineDeriv_mul_interior`. -/
-theorem exists_extendsSobolev_interior_cutoff [Fact (1 ≤ p)] {δ : ℝ} (hδ : 0 < δ) :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens
-      (Ω.carrier ∩ {x : V | 2 * δ < infDist x Ω.carrierᶜ}) C := by
-  obtain ⟨χ, hχ, hχc, hχΩ, hχ01, hχ1⟩ := Ω.exists_cutoff_interior hδ
-  obtain ⟨d, hd⟩ := exists_norm_fderiv_gridBasis_le hχ hχc
-  have hC : 1 + ∑ i, (d i : ℝ≥0∞) ≠ ∞ := by simp [ENNReal.sum_eq_top]
-  refine ⟨_, hC, extendsSobolev_of_eLpNorm_le hC fun f g _ _ hfg => ?_⟩
-  obtain ⟨G, hG, hU, hb⟩ :=
-    Ω.exists_hasWeakLineDeriv_mul_interior (p := p) Fact.out hχ hχc hχΩ hχ01 hd hχ1 hfg
-  exact ⟨_, G, hG, ae_of_all _ hU, hb⟩
-
-/-- **The extension theorem for `1 ≤ p ≤ ∞` with a bound**: for a bounded Lipschitz domain `Ω` in
-dimension `n ≥ 1` and `1 ≤ p ≤ ∞` there is a finite constant `C` such that every `f ∈ L_p(Ω)` with
-weak derivatives `g_i = ∂_{e_i} f ∈ L_p(Ω)` agrees on `Ω` with some `F ∈ W^1_p(V)` whose weak
-derivatives `G_i = ∂_{e_i} F` satisfy
-`‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`. The patches
-`Rd.BoundedLipschitzDomain.patch` cover `Ω̄`; the boundary patches extend by reflection
-(`Rd.BoundedLipschitzDomain.exists_extendsSobolev_boundary_reflection`), the inner patch by a
-cutoff (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior_cutoff`), and
-`Rd.extendsSobolev_of_cover` pastes them (`Rd.BoundedLipschitzDomain.exists_of_patches`). -/
-theorem exists_extendsSobolev_of_one_le [Nontrivial V] (hp : 1 ≤ p) :
-    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ExtendsSobolev p Ω.toOpens Ω.carrier C := by
-  have : Fact (1 ≤ p) := ⟨hp⟩
-  exact Ω.exists_of_patches (fun U C => ExtendsSobolev p Ω.toOpens U C)
-    (fun U hUo hUb hcov _ hC hext =>
-      extendsSobolev_of_cover (O := Ω.toOpens) U hUo hUb hcov hC hext)
-    (fun _ hε j => Ω.exists_extendsSobolev_boundary_reflection (p := p) hε j)
-    (fun _ hδ => Ω.exists_extendsSobolev_interior_cutoff (p := p) hδ)
-
-/-- **The extension theorem for `W^1_p`, `1 ≤ p ≤ ∞`** (Evans–Gariepy, Section 4.4; Brezis 2011,
-Chapter 9): for a bounded Lipschitz domain `Ω` and `1 ≤ p ≤ ∞`, every `f ∈ W^1_p(Ω)` agrees almost
-everywhere on `Ω` with some `F ∈ W^1_p(V)`
-(`Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le` in dimension `n ≥ 1`,
-`Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton` in dimension `0`). -/
-theorem exists_memSobolev_of_memWeakSobolev_of_one_le (hp : 1 ≤ p) {f : V → ℂ}
-    (hf : MemWeakSobolev Ω.toOpens 1 p f) :
-    ∃ F : Lp ℂ p (volume : Measure V), MemSobolev 1 F ∧
-      (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f := by
-  rcases subsingleton_or_nontrivial V with hV | hV
-  · exact exists_memSobolev_of_memWeakSobolev_of_subsingleton hf
-  obtain ⟨C, -, hC⟩ := Ω.exists_extendsSobolev_of_one_le hp
-  choose g hg hfg using fun i => hf.2 1 le_rfl fun _ => gridBasis V i
-  obtain ⟨F, hF, hFf, -⟩ := hC f g hf.1 hg hfg
-  exact ⟨F, hF, (ae_restrict_iff' Ω.measurableSet).2 hFf⟩
-
-/-- **`W^1_p(Ω)` is the space of restrictions of `W^1_p(V)` for `1 ≤ p ≤ ∞`**: for a bounded
-Lipschitz domain `Ω`, `f` lies in `W^1_p(Ω)` iff it agrees almost everywhere on `Ω` with some
-`F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev_of_one_le`; the
-converse restricts the weak derivatives, `Rd.MemWeakSobolev.mono_set`). -/
-theorem memWeakSobolev_iff_exists_memSobolev_of_one_le (hp : 1 ≤ p) (f : V → ℂ) :
-    MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p (volume : Measure V), MemSobolev 1 F ∧
-      (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f := by
-  refine ⟨Ω.exists_memSobolev_of_memWeakSobolev_of_one_le hp, ?_⟩
-  rintro ⟨F, hF, hFf⟩
-  exact (MemWeakSobolev.mono_set hF le_top).congr_ae hFf
 
 end BoundedLipschitzDomain
 

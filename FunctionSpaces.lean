@@ -131,6 +131,7 @@ public import FunctionSpaces.Domains.Extension.ReflectionExtension
 public import FunctionSpaces.Domains.Extension.ReflectionExtensionOperator
 public import FunctionSpaces.Domains.Extension.HigherDivergenceKernels
 public import FunctionSpaces.Domains.Extension.HigherSobolevExtension
+public import FunctionSpaces.Domains.Sobolev.LipschitzDomainW1p
 public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen
 public import FunctionSpaces.Domains.Traces.TraceKernel
@@ -613,26 +614,25 @@ and the theorems that their characterisations agree. The library builds on
   supports of dyadic dilates, and the Calderón–Zygmund families of the dilates of mean-zero
   Schwartz functions.
 * `FunctionSpaces.Domains.Extension.SobolevExtension`: the local means of order two by the gradient,
-  the local means of Triebel–Lizorkin type on a set, bounded extensions from the patches of a
-  bounded Lipschitz domain pasted in `W^1_p(ℝ^d)`, and the extension theorem
-  `W^1_p(Ω) = W^1_p(ℝ^d)|_Ω` for `1 < p < ∞` with a bound; for `p = 2`, `H^1(Ω) = W^1_2(Ω)`,
-  Rellich's theorem in `W^1_2(Ω)`, the equivalence of the quotient norm of `H^1(Ω)` with the
-  `W^1_2(Ω)` norm, and the boundary traces of `W^1_2(Ω)`.
+  the local means of Triebel–Lizorkin type on a set, the bounds of Rychkov's local extension from
+  one patch, bounded extensions from a set and their pasting in `W^1_p(ℝ^d)`, the supports of the
+  divergence kernels in the patches, the cutoffs of the patches, and dimension zero.
 * `FunctionSpaces.Domains.Extension.SobolevExtensionOperator`: extension operators on jets, the
-  local extension of jets from one patch, pasting, and the extension operator
-  `W^1_p(Ω) → W^1_p(ℝ^d)` for `1 < p < ∞` as a bounded linear right inverse of the restriction.
+  local extension of jets from one patch, pasting, Rychkov's extension operator
+  `W^1_p(Ω) → W^1_p(ℝ^d)` for `1 < p < ∞` with a finite constant, and from it the extension
+  theorem `W^1_p(Ω) = W^1_p(ℝ^d)|_Ω` for `1 < p < ∞` with a bound.
 * `FunctionSpaces.Domains.Extension.HalfSpaceReflection`: the open half-space, the reflection
   across a hyperplane, cutoffs near the hyperplane, integration by parts on the half-space, and
   the linearity, weak derivatives and `L_p` bounds of the even reflection.
 * `FunctionSpaces.Domains.Extension.ReflectionExtension`: the flattening of a Lipschitz graph
   domain as a measure-preserving map, the extension by reflection across the graph with its
-  linearity, weak derivatives and `L_p` bounds, cutoffs from a bounded Lipschitz domain to its
-  graph domains, and the extension theorem `W^1_p(Ω) = W^1_p(ℝ^d)|_Ω` for `1 ≤ p ≤ ∞` with a
-  bound on a bounded Lipschitz domain.
+  linearity, weak derivatives and `L_p` bounds, and cutoffs from a bounded Lipschitz domain to its
+  graph domains with the bounds of the patches.
 * `FunctionSpaces.Domains.Extension.ReflectionExtensionOperator`: linear extensions of functions
-  as extension operators on jets, the patches by reflection as linear extensions, and an extension
-  operator `W^1_p(Ω) → W^1_p(ℝ^d)` built by reflection for `1 ≤ p ≤ ∞` as a bounded linear right
-  inverse of the restriction.
+  as extension operators on jets, the patches by reflection as linear extensions, the chosen
+  extension operator `W^1_p(Ω) → W^1_p(ℝ^d)` built by reflection for `1 ≤ p ≤ ∞` as a bounded
+  linear right inverse of the restriction, and from it the extension theorem
+  `W^1_p(Ω) = W^1_p(ℝ^d)|_Ω` for `1 ≤ p ≤ ∞` with a bound on a bounded Lipschitz domain.
 * `FunctionSpaces.Domains.Extension.HigherDivergenceKernels`: weighted dilation averages, their
   writing as sums of derivatives of order `m` of the higher divergence kernels when the weight has
   vanishing moments, the smoothed bump with smooth moment and kernel weights, and the local means
@@ -643,6 +643,11 @@ and the theorems that their characterisations agree. The library builds on
   and by a cutoff, pasting with the Leibniz rule, and the extension theorem
   `W^m_p(Ω) = W^m_p(ℝ^d)|_Ω` on bounded Lipschitz domains for `1 < p < ∞` and every `m`, with a
   bound.
+* `FunctionSpaces.Domains.Sobolev.LipschitzDomainW1p`: `W^1_p(Ω)` on a bounded Lipschitz domain
+  as the space of restrictions of `W^1_p(ℝ^d)` for `1 < p < ∞` (the extension theorem), and for
+  `p = 2`
+  `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the equivalence of the quotient norm of
+  `H^1(Ω)` with the `W^1_2(Ω)` norm, and the boundary traces of `W^1_2(Ω)`.
 * `FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen`: Gauss–Green on a Lipschitz graph domain:
   product coordinates and Fubini, ray integrals, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ`
   for compactly supported `C^1` functions in chart and surface form, the product rule for line
