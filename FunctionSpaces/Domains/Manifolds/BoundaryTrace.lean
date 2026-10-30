@@ -225,8 +225,9 @@ end Commutation
 
 /-- **Extensions from the boundary hyperplane**: for `G ∈ L_p(H₀)` with
 `‖G‖_p + ‖(2^(ks) ω_r(G, 2^(-k))_p)_k‖_{ℓ_q} < ∞`, `r = ⌊s⌋ + 1`, the extension `E G` of moment
-order `r` (`Rd.LipschitzGraph.flatExtension`) has a finite `B^{s+1/p}_{p,q}`-norm of order `L` and
-the trace `Tr (E G) = G` (`Rd.LipschitzGraph.trace_flatExtension`). -/
+order `r` (`Rd.LipschitzGraph.graphExtension` of the flat graph) has a finite
+`B^{s+1/p}_{p,q}`-norm of order `L` and the trace `Tr (E G) = G`
+(`Rd.LipschitzGraph.trace_flatExtension`). -/
 theorem exists_flatExtension (hp : p ≠ ⊤) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s)
     (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {G : Lp ℂ p (volume : Measure (bdry n))}

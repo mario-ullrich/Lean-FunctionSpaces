@@ -536,8 +536,8 @@ and the theorems that their characterisations agree. The library builds on
   Lipschitz graph domains, the closed half-space, the first axis `e₀` of `ℝ^n`, and the models of
   manifolds as Besov domains.
 * `FunctionSpaces.Domains.Traces.HalfSpaceTrace`: restrictions and extensions of smooth atoms on the
-  flat graph, the trace theorem and the trace space of the half-space for every smoothness, and the
-  traces of functions continuous on the closed half-space.
+  flat graph, the trace theorem, the extension and the trace space of the half-space for every
+  smoothness, and the traces of functions continuous on the closed half-space.
 * `FunctionSpaces.Domains.Lipschitz.GraphParametrization`: the hyperplane and the graph map of a
   Lipschitz graph domain, the boundary as the graph, and the restrictions of atoms to the graph.
 * `FunctionSpaces.Domains.Traces.GraphTrace`: the trace on the boundary of a Lipschitz graph domain,
@@ -546,7 +546,8 @@ and the theorems that their characterisations agree. The library builds on
 * `FunctionSpaces.Domains.Traces.MollifiedGraph`: the mollified graph function and the vertical
   cut-off, with bounds of their differences.
 * `FunctionSpaces.Domains.Traces.GraphTraceExtension`: the extension from the boundary by extended
-  atoms and the trace space of a Lipschitz graph domain.
+  atoms, its bounds and its trace from a package of extended atoms of any order, and the trace
+  space of a Lipschitz graph domain.
 * `FunctionSpaces.Domains.Traces.GraphTraceCharts`: locality of the trace, approximation by the
   partial sums of the reproducing formula, change of chart, traces of products with smooth functions
   and their bound, and traces of finite sums.

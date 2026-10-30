@@ -74,17 +74,6 @@ theorem ae_eq_of_indicatorLp_eq {O : Set α} (hO : MeasurableSet O) {F f : Lp �
     (h : indicatorLp hO F = indicatorLp hO f) : ∀ᵐ x ∂μ, x ∈ O → F x = f x :=
   (ae_restrict_iff' hO).1 ((indicatorLp_eq_iff_ae_eq_restrict hO).1 h)
 
-omit [MeasurableSpace α] in
-/-- `s + 1/p < L` for `s < 1`, `1 ≤ p < ∞` and `L ≥ 2`. -/
-theorem add_one_div_toReal_lt (hp : p ≠ ∞) {s : ℝ} (hs1 : s < 1) {L : ℕ} (hL : 2 ≤ L) :
-    s + 1 / p.toReal < L := by
-  have hpr : 1 ≤ p.toReal := ENNReal.one_le_toReal_of_one_le Fact.out hp
-  have h1 : 1 / p.toReal ≤ 1 := by
-    rw [div_le_one (by linarith)]
-    exact hpr
-  have h2 : (2 : ℝ) ≤ L := by exact_mod_cast hL
-  linarith
-
 end Auxiliary
 
 namespace BoundedLipschitzDomain
@@ -428,9 +417,9 @@ theorem modNorm_extensionSum_lt_top (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s
     (G : ∀ j, Lp ℂ p (volume : Measure (Ω.graph j).hyperplane))
     (hGfin : ∀ j, ‖G j‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 (G j) k) < ∞) :
     ‖∑ j, mulLp (hζs j).continuous (norm_le_of_iteratedFDeriv_le (hC j))
-        ((Ω.graph j).graphExtension hp (G j))‖ₑ + lqNorm q (fun k =>
+        ((Ω.graph j).graphExtension hp 1 (G j))‖ₑ + lqNorm q (fun k =>
       dyadicWeight (s + 1 / p.toReal) k * lpModulus p L (∑ j, mulLp (hζs j).continuous
-        (norm_le_of_iteratedFDeriv_le (hC j)) ((Ω.graph j).graphExtension hp (G j))) k) < ∞ :=
+        (norm_le_of_iteratedFDeriv_le (hC j)) ((Ω.graph j).graphExtension hp 1 (G j))) k) < ∞ :=
   modNorm_finsetSum_lt_top Finset.univ _ hq fun j _ =>
     modNorm_mulLp_lt_top hp (hζs j) (hC j) (add_one_div_toReal_lt hp hs1 hL) hq
       ((Ω.graph j).modNorm_graphExtension_lt_top hp hL hs hs1 hq (hGfin j))
@@ -454,7 +443,7 @@ theorem boundaryTrace_extensionSum_eventuallyEq (ψ : Ω.BoundaryPartition) (hp 
       fun x' => ψ.toComplex j ((Ω.graph j).graphMap x') * g ((Ω.graph j).graphMap x'))
     (hGfin : ∀ j, ‖G j‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 (G j) k) < ∞) :
     Ω.boundaryTrace ψ hp L (∑ j, mulLp (hζs j).continuous (norm_le_of_iteratedFDeriv_le (hC j))
-      ((Ω.graph j).graphExtension hp (G j))) =ᶠ[Ω.aeBoundary] g := by
+      ((Ω.graph j).graphExtension hp 1 (G j))) =ᶠ[Ω.aeBoundary] g := by
   have hL1 : 1 ≤ L := le_trans one_le_two hL
   have hsL := add_one_div_toReal_lt hp hs1 hL
   have hEfin := fun j => (Ω.graph j).modNorm_graphExtension_lt_top hp hL hs hs1 hq (hGfin j)
@@ -464,18 +453,18 @@ theorem boundaryTrace_extensionSum_eventuallyEq (ψ : Ω.BoundaryPartition) (hp 
   -- the trace in the chart of `Ω_k`
   have htr := (Ω.graph k).trace_finsetSum hp L hs hq Finset.univ
     (F := fun j => mulLp (hζs j).continuous (norm_le_of_iteratedFDeriv_le (hC j))
-      ((Ω.graph j).graphExtension hp (G j))) fun j _ => hFfin j
+      ((Ω.graph j).graphExtension hp 1 (G j))) fun j _ => hFfin j
   have hmul := fun j => (Ω.graph k).trace_mulLp_ae hp hL1 hs hsL hq (hζs j) (hC j) (hEfin j)
   have hcc := fun j => (Ω.graph k).trace_ae_eq_trace_comp (Ω.graph j) hp hL1 hs hsL hq (hEfin j)
   have hGj := fun j => (Ω.graph k).ae_proj_graphMap (Ω.graph j) (hG j)
   filter_upwards [Ω.boundaryTrace_graphMap ψ hp hL1 hs hsL hq hsum k,
     Lp.coeFn_fun_finsetSum Finset.univ fun j => (Ω.graph k).trace hp L
       (mulLp (hζs j).continuous (norm_le_of_iteratedFDeriv_le (hC j))
-        ((Ω.graph j).graphExtension hp (G j))),
+        ((Ω.graph j).graphExtension hp 1 (G j))),
     ae_all_iff.2 hmul, ae_all_iff.2 hcc, ae_all_iff.2 hGj] with x' h1 h2 h3 h4 h5 hk
   have hΓ := Ω.graphMap_mem_frontier k hk
   have hterm : ∀ j, (Ω.graph k).trace hp L (mulLp (hζs j).continuous
-      (norm_le_of_iteratedFDeriv_le (hC j)) ((Ω.graph j).graphExtension hp (G j))) x' =
+      (norm_le_of_iteratedFDeriv_le (hC j)) ((Ω.graph j).graphExtension hp 1 (G j))) x' =
         ψ.toComplex j ((Ω.graph k).graphMap x') * g ((Ω.graph k).graphMap x') := fun j => by
     rw [h3 j]
     by_cases hζ : ζ j ((Ω.graph k).graphMap x') = 0

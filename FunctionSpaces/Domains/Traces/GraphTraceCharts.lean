@@ -335,15 +335,6 @@ theorem finrank_hyperplane_eq_finrank (Ω₁ Ω₂ : LipschitzGraph V) :
   have h2 := Ω₂.finrank_hyperplane_add_one
   omega
 
-/-- A finite norm of order `L` on `V` gives a finite intrinsic norm of order `L` on `Ω`. -/
-theorem intrinsicNorm_lt_top_of_modNorm' (hp : p ≠ ∞) (L : ℕ) {σ : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
-    {G : Lp ℂ p (volume : Measure V)}
-    (hG : ‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p L G k) < ∞) :
-    modNormOn Ω.measurableSet_domain L σ q G < ∞ ∧
-      Ω.intrinsicNorm hp L σ q G < ∞ := by
-  have h1 := (Ω.modNormOn_le_modNorm L σ q rfl).trans_lt hG
-  exact ⟨h1, Ω.intrinsicNorm_lt_top hp L σ hq h1⟩
-
 /-- **Null sets under the change of chart**: a property of almost every point of `H₂` holds at
 `P₂ γ₁ x'` for almost every `x' ∈ H₁` whose boundary point `γ₁ x'` lies on the boundary of `Ω₂`:
 the exceptional `x'` lie in the image of a null set under the Lipschitz map `P₁ ∘ γ₂`

@@ -117,7 +117,8 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   `L ≥ 2`, `g ∈ L_p(H)` is the trace of some `f ∈ L_p(V)` with
   `‖f‖_{L_p(Ω)} + ‖(2^(k(s+1/p)) ω_L(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` iff
   `‖g‖_p + ‖(2^(ks) ω_1(g, 2^(-k))_p)_k‖_{ℓ_q} < ∞` (`Rd.LipschitzGraph.exists_trace_eq_iff`). The
-  extension `E g` (`Rd.LipschitzGraph.graphExtension`) extends the atoms of `g` by
+  extension `E g` of moment order `1` (`Rd.LipschitzGraph.graphExtension`) extends the atoms of
+  `g` by
   `A(x) = a(Px) χ(2^j (⟪x, e⟫ - φ_j(Px)))` with a graph `φ_j` mollified at scale `2^(-j)`; it has a
   finite `B^{s+1/p}_{p,q}`-norm on `V` (`Rd.LipschitzGraph.modNorm_graphExtension_le`) and the trace
   `g` (`Rd.LipschitzGraph.trace_graphExtension`).
@@ -129,7 +130,8 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   The trace is bounded for every `s > 0` (`Rd.LipschitzGraph.modNorm_trace_le_flat`), since the cell
   atoms restrict to smooth atoms on `H`; the extension
   `E g = ∑_j (η_j ⋆ k_j ⋆ g)(Px) χ(2^j ⟪x, e⟫)` with local means of moment order `r` on `H`
-  (`Rd.LipschitzGraph.flatExtension`) is bounded
+  (`Rd.LipschitzGraph.graphExtension` of the flat graph, whose extended atoms are smooth of every
+  order) is bounded
   (`Rd.LipschitzGraph.modNorm_flatExtension_le`) and has the trace `g`
   (`Rd.LipschitzGraph.trace_flatExtension`).
 * **The half-space is a Besov domain.** A Besov domain is a closed convex set with nonempty

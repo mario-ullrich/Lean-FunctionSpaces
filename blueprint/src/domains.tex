@@ -2702,7 +2702,8 @@ $\|h\| > 2^{-j}$, $|\Delta_h^m v_j| \leq 4$.
 \lean{Rd.min_one_rpow_mul_le, Rd.LipschitzGraph.extendAtom, Rd.LipschitzGraph.extendAtom_graphMap,
   Rd.LipschitzGraph.continuous_extendAtom, Rd.LipschitzGraph.higherDiff_comp_proj,
   Rd.LipschitzGraph.enorm_extendAtom_le, Rd.LipschitzGraph.enorm_higherDiff_two_extendAtom_le,
-  Rd.LipschitzGraph.extendRadius, Rd.LipschitzGraph.extendCenter,
+  Rd.LipschitzGraph.extendRadius, Rd.LipschitzGraph.extendRadius_nonneg,
+  Rd.LipschitzGraph.extendCenter,
   Rd.LipschitzGraph.proj_extendCenter, Rd.LipschitzGraph.extendAtom_eq_zero,
   Rd.LipschitzGraph.isRegularAtom_extendAtom}
 \leanok
@@ -2722,49 +2723,111 @@ $\Delta_h^2 A(x) = \sum_{l \leq 2} \binom{2}{l} \Delta_{Ph}^l a(Px) \, \Delta_h^
 and $\min(1, t^l) \min(1, t^{2-l}) \leq \min(1, t^2)$. \Cref{lem:pointwise-atoms} concludes.
 \end{proof}
 
+For $g \in L_p(H)$ and a moment order $L_H$ let $g_j = \eta_j * (k_j * g)$ be the terms of the
+reproducing formula on $H$, $F_j(x) = g_j(Px) v_j(x)$ and $E g = \sum_j F_j$. The levels are
+$F_j = \sum_m \lambda_{j,m} A_{j,m}$, with the extensions $A_{j,m}(x) = a_{j,m}(Px) v_j(x)$ of the
+cell atoms $a_{j,m}$ of $g_j$. The bounds for $E g$ depend only on the properties of these
+extended atoms collected in the following definition.
+
+\begin{definition}[Packages of extended atoms]
+\label{def:extension-atom-package}
+\lean{Rd.LipschitzGraph.HasExtensionAtoms}
+\leanok
+\uses{lem:extended-atoms, lem:cell-decomposition}
+Let $1 \leq p < \infty$, $L_H, r \in \N$, $d \in \R$, $C \in [0, \infty]$ and $N \in \N$. The
+extended atoms form a \emph{package of order $r$} with radius factor $d$, constant $C$ and overlap
+$N$ if for every level $j$ and every $h \in L_p(H)$ the extensions $A_{j,m}$ of the cell atoms of
+$\eta_j * h$ (moment order $L_H$) are regular atoms on $V$ of order and exponent $r$ with radius
+factor $d$ and constant $C$, centred at $c_{j,m} + \phi_j(c_{j,m}) e$, and for every $x \in V$ at
+most $N$ of these centres whose cell coefficients $\lambda_{j,m}(h)$ of $h$ are nonzero lie
+within $(d + r) 2^{-j}$ of $x$.
+\end{definition}
+
+\begin{lemma}[Extended atoms of order two]
+\label{lem:extension-atoms-two}
+\lean{Rd.LipschitzGraph.extRadiusH, Rd.LipschitzGraph.extRadiusH_nonneg,
+  Rd.LipschitzGraph.exists_extension_atoms}
+\leanok
+\uses{def:extension-atom-package, lem:extended-atoms, lem:cell-atoms-dual, lem:cells-partition}
+For every $1 \leq p < \infty$ and every moment order $L_H$ there are $C < \infty$ and $N \in \N$
+such that the extended atoms form a package of order $2$ with radius factor
+$(2 L_H + n - 1)(1 + M \|\rho\|_1) + c + 1$, constant $C$ and overlap $N$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The cell atoms satisfy $|\Delta_h^l a| \leq A_0 \min(1, (2^j \|h\|)^l)$ for $l \leq 2$
+(\Cref{lem:cell-atoms-dual}), so their extensions are regular atoms of order and exponent $2$
+(\Cref{lem:extended-atoms}). Their centres project to the cell centres of $H$, and
+\Cref{lem:cells-partition} counts these.
+\end{proof}
+
 \begin{theorem}[The extension from the boundary]
 \label{thm:graph-trace-extension}
 \lean{Rd.LipschitzGraph.extLevelH, Rd.LipschitzGraph.continuous_extLevelH,
-  Rd.LipschitzGraph.extRadiusH, Rd.LipschitzGraph.extRadiusH_nonneg,
-  Rd.LipschitzGraph.exists_extension_atoms, Rd.LipschitzGraph.extLevel,
-  Rd.LipschitzGraph.extLevel_eq_tsum, Rd.LipschitzGraph.continuous_extLevel,
-  Rd.LipschitzGraph.eLpNorm_extLevel_le, Rd.LipschitzGraph.memLp_extLevel,
-  Rd.LipschitzGraph.traceExtTerm, Rd.LipschitzGraph.traceExtTerm_ae,
-  Rd.LipschitzGraph.graphExtension, Rd.LipschitzGraph.summable_traceExtTerm,
+  Rd.LipschitzGraph.extLevel, Rd.LipschitzGraph.extLevel_eq_tsum,
+  Rd.LipschitzGraph.continuous_extLevel, Rd.LipschitzGraph.eLpNorm_extLevel_le,
+  Rd.LipschitzGraph.memLp_extLevel, Rd.LipschitzGraph.traceExtTerm,
+  Rd.LipschitzGraph.traceExtTerm_ae, Rd.LipschitzGraph.graphExtension,
+  Rd.LipschitzGraph.summable_traceExtTerm, Rd.LipschitzGraph.coeffNorm_cellCoef_eq,
+  Rd.LipschitzGraph.modNorm_graphExtension_le_localMeansNorm,
+  Rd.LipschitzGraph.modNorm_graphExtension_le_of_atoms,
   Rd.LipschitzGraph.modNorm_graphExtension_le, Rd.LipschitzGraph.modNorm_graphExtension_lt_top}
 \leanok
-\uses{lem:extended-atoms, thm:atomic-decomposition, lem:cell-atoms-dual, thm:rd-atomic-synthesis,
-  thm:local-means, lem:moduli-orders}
-Let $1 \leq p < \infty$, $0 < s < 1$ and $1 \leq q \leq \infty$. For $g \in L_p(H)$ let
-$g_j = \eta_j * (k_j * g)$ be the terms of the reproducing formula on $H$, with moment order $1$,
-and $F_j(x) = g_j(Px) v_j(x)$. There is $K < \infty$ such that $E g = \sum_j F_j$ satisfies
-\begin{multline*}
-  \|E g\|_p + \|(2^{k(s + 1/p)} \omega_2(E g, 2^{-k})_p)_k\|_{\ell_q}
-  \\ \leq K \bigl( \|g\|_{L_p(H)} + \|(2^{ks} \omega_1(g, 2^{-k})_p)_k\|_{\ell_q} \bigr).
-\end{multline*}
-For every $L \geq 2$ and every $g$ with a finite right side,
-$\|E g\|_p + \|(2^{k(s + 1/p)} \omega_L(E g, 2^{-k})_p)_k\|_{\ell_q} < \infty$.
+\uses{def:extension-atom-package, lem:extension-atoms-two, thm:atomic-decomposition,
+  thm:rd-atomic-synthesis, lem:cell-coefficients, thm:local-means, lem:moduli-orders}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $L_H \in \N$.
+\begin{enumerate}
+  \item For every package of extended atoms of order $r$ with constant $C < \infty$ and every
+    $s > 0$ with $s + 1/p < r$ there is $K < \infty$ such that for every $g \in L_p(H)$ with a
+    finite right side
+    \begin{multline*}
+      \|E g\|_p + \|(2^{k(s + 1/p)} \omega_r(E g, 2^{-k})_p)_k\|_{\ell_q}
+      \\ \leq K \bigl( \|g\|_{L_p(H)} + \|(2^{ks} \omega_{L_H}(g, 2^{-k})_p)_k\|_{\ell_q} \bigr).
+    \end{multline*}
+  \item Let $L_H = 1$. For every $0 < s < 1$ there is $K < \infty$ such that for every
+    $g \in L_p(H)$ with a finite right side
+    \begin{multline*}
+      \|E g\|_p + \|(2^{k(s + 1/p)} \omega_2(E g, 2^{-k})_p)_k\|_{\ell_q}
+      \\ \leq K \bigl( \|g\|_{L_p(H)} + \|(2^{ks} \omega_1(g, 2^{-k})_p)_k\|_{\ell_q} \bigr),
+    \end{multline*}
+    and $\|E g\|_p + \|(2^{k(s + 1/p)} \omega_L(E g, 2^{-k})_p)_k\|_{\ell_q} < \infty$ for every
+    $L \geq 2$.
+\end{enumerate}
 \end{theorem}
 
 \begin{proof}
 \leanok
-This is \cite[Theorem 4.10]{SchneiderVybiral} for $p \geq 1$. $F_j = \sum_m \lambda_{j,m} A_{j,m}$
-with the extensions of the cell atoms of $g_j$ (\Cref{lem:extended-atoms}), whose centres project to
-the cell centres of $H$ and so have bounded overlap. The atomic synthesis on $V$
-(\Cref{thm:rd-atomic-synthesis}) with exponent $2 > s + 1/p$ bounds the left side by the coefficient
-quasi-norm with smoothness $s + 1/p$ on $V$, which is the one with smoothness $s$ on $H$ since
+(1) The levels converge absolutely in $L_p$, since $\|F_j\|_p \leq K 2^{-j/p} \|k_j * g\|_p$ by
+the package of order $2$ (\Cref{lem:extension-atoms-two}). The atomic synthesis on $V$
+(\Cref{thm:rd-atomic-synthesis})
+with exponent $r > s + 1/p$ bounds the left side by the coefficient quasi-norm with smoothness
+$s + 1/p$ on $V$, which is the one with smoothness $s$ on $H$ since
 $(s + 1/p) - n/p = s - (n-1)/p$, that is, the local means quasi-norm of $g$
-(\Cref{lem:cell-coefficients}, \Cref{thm:local-means}).
+(\Cref{lem:cell-coefficients}, \Cref{thm:local-means}); the constant is
+$K = K_{\mathrm{syn}} \cdot K_{\mathrm{LM}}$ with the constants of the synthesis and of the local
+means. (2) is (1) with the package of order $2$ of \Cref{lem:extension-atoms-two}, since
+$s + 1/p < 2$; \Cref{lem:moduli-orders} passes to $\omega_L$. This is
+\cite[Theorem 4.10]{SchneiderVybiral} for $p \geq 1$.
 \end{proof}
 
 \begin{lemma}[Moduli of different orders]
 \label{lem:moduli-orders}
-\lean{Rd.lpModulus_add_order_le, Rd.modNorm_order_le,
+\lean{Rd.lpModulus_add_order_le, Rd.modNorm_order_le_of_le, Rd.modNorm_order_le,
+  Rd.LipschitzGraph.intrinsicNorm_lt_top_of_modNorm',
   Rd.LipschitzGraph.intrinsicNorm_lt_top_of_modNorm}
 \leanok
 \uses{lem:rd-modulus, lem:intrinsic-upper}
-$\omega_{r + l}(f, t)_p \leq 2^l \omega_r(f, t)_p$. Hence a finite norm with moduli of order $2$ on
-$V$ gives a finite intrinsic norm of every order $L \geq 2$ on $\Omega$.
+For all $r, l \in \N$, $f \in L_p(V)$ and $t > 0$,
+$\omega_{r + l}(f, t)_p \leq 2^l \omega_r(f, t)_p$. Hence for all $r \leq L$, $\sigma \in \R$ and
+$G \in L_p(V)$,
+\begin{multline*}
+  \|G\|_p + \|(2^{k\sigma} \omega_L(G, 2^{-k})_p)_k\|_{\ell_q}
+  \\ \leq 2^{L-r} \bigl(\|G\|_p + \|(2^{k\sigma} \omega_r(G, 2^{-k})_p)_k\|_{\ell_q}\bigr).
+\end{multline*}
+For every $L \in \N$, a finite norm with moduli of order $L$ on $V$ gives a finite intrinsic norm of
+order $L$ on $\Omega$; in particular, for $L \geq 2$, a finite norm with moduli of order $2$ on $V$
+gives a finite intrinsic norm of order $L$ on $\Omega$.
 \end{lemma}
 
 \begin{proof}
@@ -2774,24 +2837,38 @@ $\Delta_h^{r + l} f = \Delta_h^l \Delta_h^r f$ and $\|\Delta_h^l g\|_p \leq 2^l 
 
 \begin{theorem}[The trace of the extension]
 \label{thm:trace-extension}
-\lean{Rd.modNorm_one_tsum_le, Rd.LipschitzGraph.exists_modNorm_traceExtTerm_le,
-  Rd.LipschitzGraph.trace_sum_traceExtTerm, Rd.LipschitzGraph.trace_graphExtension}
+\lean{Rd.add_one_div_toReal_lt, Rd.one_div_toReal_pos, Rd.one_le_of_add_one_div_toReal_lt,
+  Rd.modNorm_one_tsum_le, Rd.LipschitzGraph.modNorm_traceExtTerm_le,
+  Rd.LipschitzGraph.modNorm_one_traceExtTerm_le, Rd.LipschitzGraph.trace_sum_traceExtTerm,
+  Rd.LipschitzGraph.modNorm_graphExtension_lt_top_of_atoms,
+  Rd.LipschitzGraph.trace_graphExtension_of_atoms, Rd.LipschitzGraph.trace_graphExtension}
 \leanok
-\uses{thm:graph-trace-extension, thm:trace-continuous, lem:trace-linear, lem:moduli-orders,
-  lem:reproducing-formula}
-Let $1 \leq p < \infty$, $0 < s < 1$, $1 \leq q \leq \infty$, $L \geq 2$, and $g \in L_p(H)$ with
-$\|g\|_p + \|(2^{ks} \omega_1(g, 2^{-k})_p)_k\|_{\ell_q} < \infty$. Then
-$\operatorname{Tr}(E g) = g$.
+\uses{def:extension-atom-package, lem:extension-atoms-two, thm:graph-trace-extension,
+  thm:trace-continuous, lem:trace-linear, lem:moduli-orders, lem:reproducing-formula,
+  lem:single-level, thm:local-means}
+Let $1 \leq p < \infty$ and $1 \leq q \leq \infty$.
+\begin{enumerate}
+  \item For every $L_H \geq 1$, every package of extended atoms of order $r$ with constant
+    $C < \infty$, every $L \geq r$,
+    every $s > 0$ with $s + 1/p < r$ and every $g \in L_p(H)$ with
+    $\|(2^{js} \|k_j * g\|_p)_j\|_{\ell_q} < \infty$, $\operatorname{Tr}(E g) = g$, with the trace
+    of order $L$.
+  \item For every $0 < s < 1$, every $L \geq 2$ and every $g \in L_p(H)$ with
+    $\|g\|_p + \|(2^{ks} \omega_1(g, 2^{-k})_p)_k\|_{\ell_q} < \infty$, the extension with
+    $L_H = 1$ has $\operatorname{Tr}(E g) = g$.
+\end{enumerate}
 \end{theorem}
 
 \begin{proof}
 \leanok
-The partial sums $\sum_{j \leq J} F_j$ are continuous, so their traces are
+(1) The partial sums $\sum_{j \leq J} F_j$ are continuous, so their traces are
 $\sum_{j \leq J} F_j \circ \gamma = \sum_{j \leq J} g_j$ (\Cref{thm:trace-continuous}), which converge
 to $g$ (\Cref{lem:reproducing-formula}). They converge to $E g$ in the norm
-$\|\cdot\|_p + \sum_k 2^{k/p} \omega_L(\cdot, 2^{-k})_p$, since each level has norm at most a constant
-times $\|k_j * g\|_p$ by \Cref{lem:single-level} and \Cref{lem:moduli-orders}, and
+$\|\cdot\|_p + \sum_k 2^{k/p} \omega_L(\cdot, 2^{-k})_p$, since each level has norm at most
+$2^{L - r} K \|k_j * g\|_p$ by \Cref{lem:single-level} and \Cref{lem:moduli-orders}, and
 $\sum_j \|k_j * g\|_p < \infty$; there the trace is linear and continuous (\Cref{lem:trace-linear}).
+(2) is (1) with the package of order $2$ of \Cref{lem:extension-atoms-two}, since $s + 1/p < 2$ and
+the local means quasi-norm of $g$ is finite (\Cref{thm:local-means}).
 \end{proof}
 
 \begin{theorem}[The trace space of a Lipschitz graph domain]
@@ -2884,30 +2961,23 @@ $\|D^i (a \circ P)\| \leq A 2^{ji}$ and the derivatives of $x \mapsto \chi(2^j \
 of order $i$ are at most $2^{ji} \sup |\chi^{(i)}|$.
 \end{proof}
 
-\begin{definition}[The extension of every order]
-\label{def:flat-extension}
-\lean{Rd.LipschitzGraph.flatLevelH, Rd.LipschitzGraph.continuous_flatLevelH,
-  Rd.LipschitzGraph.flatLevel, Rd.LipschitzGraph.flatLevel_eq_tsum,
-  Rd.LipschitzGraph.continuous_flatLevel, Rd.LipschitzGraph.flatTerm,
-  Rd.LipschitzGraph.flatTerm_ae, Rd.LipschitzGraph.flatExtension}
-\leanok
-\uses{def:local-means, lem:cell-decomposition}
-For $g \in L_p(H)$ and a moment order $L_H$ let $g_j = \eta_j * (k_j * g)$ be the terms of the
-reproducing formula on $H$. The extension is $E g = \sum_j F_j$ with the continuous levels
-$F_j(x) = g_j(Px) \chi(2^j \langle x, e \rangle) = \sum_m \lambda_{j,m} A_{j,m}(x)$, the
-extensions of the cell atoms of $g_j$.
-\end{definition}
+On the half-space $\Omega$, the extension of \Cref{thm:graph-trace-extension} with moment order
+$L_H$ is $E g = \sum_j F_j$ with $F_j(x) = g_j(Px) \chi(2^j \langle x, e \rangle)$, and its extended
+atoms are smooth of every order.
 
 \begin{theorem}[The extension of every order is bounded]
 \label{thm:flat-extension-bounded}
-\lean{Rd.LipschitzGraph.exists_flat_extension_atoms, Rd.LipschitzGraph.eLpNorm_flatLevel_le,
-  Rd.LipschitzGraph.memLp_flatLevel, Rd.LipschitzGraph.summable_flatTerm,
-  Rd.LipschitzGraph.coeffNorm_flat_eq, Rd.LipschitzGraph.modNorm_flatExtension_le_localMeansNorm,
+\lean{Rd.LipschitzGraph.exists_flat_extension_atoms,
+  Rd.LipschitzGraph.modNorm_flatExtension_le_localMeansNorm,
   Rd.LipschitzGraph.modNorm_flatExtension_le}
 \leanok
-\uses{def:flat-extension, lem:extended-atoms-every-order, lem:cell-atoms-smooth,
-  thm:rd-atomic-synthesis, thm:local-means}
-Let $1 \leq p < \infty$, $s > 0$ and $s + 1/p < r$. There is $K < \infty$ with
+\uses{def:extension-atom-package, lem:extended-atoms-every-order, lem:cell-atoms-smooth,
+  lem:smooth-atoms-regular, thm:graph-trace-extension}
+Let $1 \leq p < \infty$, $1 \leq q \leq \infty$ and $L_H \in \N$. For every $r \geq 1$ there are
+$d \in \R$, $C < \infty$ and $N \in \N$ such that the extended atoms of $\Omega$ form a package of
+order $r$ with radius factor $d$, constant $C$ and overlap $N$. For every $r \in \N$ and every
+$s > 0$ with $s + 1/p < r$ there is $K < \infty$ such that for every $g \in L_p(H)$ with a finite
+right side
 \begin{multline*}
   \|E g\|_p + \|(2^{k(s + 1/p)} \omega_r(E g, 2^{-k})_p)_k\|_{\ell_q} \\ \leq
   K \bigl(\|g\|_{L_p(H)} + \|(2^{ks} \omega_{L_H}(g, 2^{-k})_p)_k\|_{\ell_q}\bigr) .
@@ -2916,28 +2986,26 @@ Let $1 \leq p < \infty$, $s > 0$ and $s + 1/p < r$. There is $K < \infty$ with
 
 \begin{proof}
 \leanok
-The extended atoms are smooth of order $r$ (\Cref{lem:extended-atoms-every-order}), hence regular
-atoms of order and exponent $r$ on $V$; they project to the cell centres of $H$, so they have
-bounded overlap. The coefficient quasi-norm with smoothness $s + 1/p$ in dimension $n$ is the local
-means quasi-norm of $g$ with smoothness $s$, since $(s + 1/p) - n/p = s - (n-1)/p$, and
-\Cref{thm:local-means} bounds it.
+The extended atoms are smooth of order $r$ (\Cref{lem:cell-atoms-smooth},
+\Cref{lem:extended-atoms-every-order}), hence regular atoms of order and exponent $r$ on $V$
+(\Cref{lem:smooth-atoms-regular}); they project to the cell centres of $H$, so they have bounded
+overlap. \Cref{thm:graph-trace-extension} (1) with this package of order $r$ concludes.
 \end{proof}
 
 \begin{theorem}[The trace of the extension of every order]
 \label{thm:trace-flat-extension}
-\lean{Rd.LipschitzGraph.exists_modNorm_flatTerm_le, Rd.LipschitzGraph.trace_sum_flatTerm,
-  Rd.LipschitzGraph.trace_flatExtension}
+\lean{Rd.LipschitzGraph.trace_flatExtension}
 \leanok
-\uses{thm:flat-extension-bounded, thm:trace-continuous, thm:trace-extension}
-Let $L \geq 2$, $L_H \geq 1$, $s > 0$ with $s + 1/p < L$, and $g \in L_p(H)$ with
-$\|(2^{js} \|k_j * g\|_p)_j\|_{\ell_q} < \infty$. Then $\operatorname{Tr}(E g) = g$.
+\uses{thm:flat-extension-bounded, thm:trace-extension}
+Let $1 \leq p < \infty$ and $1 \leq q \leq \infty$. For every $L \geq 2$, $L_H \geq 1$, $s > 0$
+with $s + 1/p < L$, and every $g \in L_p(H)$ with
+$\|(2^{js} \|k_j * g\|_p)_j\|_{\ell_q} < \infty$, $\operatorname{Tr}(E g) = g$.
 \end{theorem}
 
 \begin{proof}
 \leanok
-As \Cref{thm:trace-extension}: the partial sums $\sum_{j \leq J} F_j$ are continuous with traces
-$\sum_{j \leq J} g_j \to g$ (\Cref{thm:trace-continuous}), and they converge to $E g$ in the norm of
-$\Besov{1/p}{p}{1}$ with order $L$, where the trace is continuous.
+\Cref{thm:trace-extension} (1) with the package of order $r = L$ of
+\Cref{thm:flat-extension-bounded}.
 \end{proof}
 
 \begin{theorem}[The trace space of the half-space]
@@ -3041,10 +3109,9 @@ means quasi-norm is finite (\Cref{lem:intrinsic-upper}).
 
 \begin{lemma}[The traces of the partial sums]
 \label{lem:trace-partial-sums}
-\lean{Rd.LipschitzGraph.intrinsicNorm_lt_top_of_modNorm',
-  Rd.LipschitzGraph.tendsto_trace_partialSum}
+\lean{Rd.LipschitzGraph.tendsto_trace_partialSum}
 \leanok
-\uses{lem:partial-sums-approx, lem:trace-linear, lem:restriction-moduli}
+\uses{lem:partial-sums-approx, lem:trace-linear, lem:restriction-moduli, lem:moduli-orders}
 Let $s > 0$, $s + 1/p < L$ and
 $\|F\|_p + \|(2^{k(s + 1/p)} \omega_L(F, 2^{-k})_p)_k\|_{\ell_q} < \infty$. Then $F$ and the $G_J$
 have finite intrinsic norms on every Lipschitz graph domain, and
@@ -3351,7 +3418,7 @@ Summing (\Cref{lem:trace-sums}), $\operatorname{Tr}_k F(x') = g(y)$, and
 
 \begin{theorem}[The trace space of a bounded Lipschitz domain]
 \label{thm:boundary-trace-space}
-\lean{Rd.add_one_div_toReal_lt, Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq_iff,
+\lean{Rd.BoundedLipschitzDomain.exists_boundaryTrace_eq_iff,
   Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_of_boundaryPartition,
   Rd.BoundedLipschitzDomain.IsBoundaryTrace, Rd.ae_eq_of_indicatorLp_eq,
   Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_isBoundaryTrace,

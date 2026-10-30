@@ -65,9 +65,9 @@ theorem exists_modNorm_mulLp_graphExtension_le (hp : p ≠ ∞) {L : ℕ} (hL : 
     (hM : ∀ l ≤ L, ∀ x, ‖iteratedFDeriv ℝ l ζ x‖ ≤ M) :
     ∃ K : ℝ≥0∞, K ≠ ∞ ∧ ∀ g : Lp ℂ p (volume : Measure Ω.hyperplane),
       ‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 g k) < ∞ →
-      ‖mulLp hζ.continuous (norm_le_of_iteratedFDeriv_le hM) (Ω.graphExtension hp g)‖ₑ +
+      ‖mulLp hζ.continuous (norm_le_of_iteratedFDeriv_le hM) (Ω.graphExtension hp 1 g)‖ₑ +
           lqNorm q (fun k => dyadicWeight (s + 1 / p.toReal) k * lpModulus p L
-            (mulLp hζ.continuous (norm_le_of_iteratedFDeriv_le hM) (Ω.graphExtension hp g)) k) ≤
+            (mulLp hζ.continuous (norm_le_of_iteratedFDeriv_le hM) (Ω.graphExtension hp 1 g)) k) ≤
         K * (‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 g k)) := by
   have hsL := add_one_div_toReal_lt hp hs1 hL
   obtain ⟨K, hK, hle⟩ := Ω.modNorm_graphExtension_le hp hs hs1 hq
@@ -75,11 +75,11 @@ theorem exists_modNorm_mulLp_graphExtension_le (hp : p ≠ ∞) {L : ℕ} (hL : 
     ENNReal.mul_ne_top (ENNReal.mul_ne_top (multiplierTotal_ne_top hp hsL M) (by simp)) hK,
     fun g hg => ?_⟩
   calc _ ≤ multiplierTotal (V := V) hp L (s + 1 / p.toReal) M *
-        (‖Ω.graphExtension hp g‖ₑ + lqNorm q (fun k => dyadicWeight (s + 1 / p.toReal) k *
-          lpModulus p L (Ω.graphExtension hp g) k)) := modNorm_mulLp_le hp hζ hM hsL hq _
+        (‖Ω.graphExtension hp 1 g‖ₑ + lqNorm q (fun k => dyadicWeight (s + 1 / p.toReal) k *
+          lpModulus p L (Ω.graphExtension hp 1 g) k)) := modNorm_mulLp_le hp hζ hM hsL hq _
     _ ≤ multiplierTotal (V := V) hp L (s + 1 / p.toReal) M *
-        (2 ^ (L - 2) * (‖Ω.graphExtension hp g‖ₑ + lqNorm q (fun k =>
-          dyadicWeight (s + 1 / p.toReal) k * lpModulus p 2 (Ω.graphExtension hp g) k))) :=
+        (2 ^ (L - 2) * (‖Ω.graphExtension hp 1 g‖ₑ + lqNorm q (fun k =>
+          dyadicWeight (s + 1 / p.toReal) k * lpModulus p 2 (Ω.graphExtension hp 1 g) k))) :=
         mul_le_mul' le_rfl (modNorm_order_le hL _ q _)
     _ ≤ multiplierTotal (V := V) hp L (s + 1 / p.toReal) M * (2 ^ (L - 2) *
         (K * (‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 g k)))) :=

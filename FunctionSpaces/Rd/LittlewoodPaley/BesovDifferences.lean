@@ -104,22 +104,30 @@ theorem modNorm_le_modNorm_of_lt (hp : p ≠ ∞) (r : ℕ) {r' : ℕ} {s : ℝ}
   exact (M'.modNorm_le_approxNormDyadic hq hs hsr' F).trans
     (mul_le_mul' le_rfl (M.approxNormDyadic_le_modNorm hq F))
 
-/-- The norm with moduli of order `L ≥ 2` is at most `2^(L-2)` times that with order `2`. -/
-theorem modNorm_order_le {L : ℕ} (hL : 2 ≤ L) (σ : ℝ) (q : ℝ≥0∞)
+/-- The norm with moduli of order `L ≥ r` is at most `2^(L-r)` times that with order `r`
+(`Rd.lpModulus_add_order_le`). -/
+theorem modNorm_order_le_of_le {r L : ℕ} (hrL : r ≤ L) (σ : ℝ) (q : ℝ≥0∞)
     (G : Lp ℂ p (volume : Measure V)) :
     ‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p L G k) ≤
-      2 ^ (L - 2) * (‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p 2 G k)) := by
-  have hL' : L = 2 + (L - 2) := by omega
+      2 ^ (L - r) * (‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p r G k)) := by
+  have hL' : L = r + (L - r) := by omega
   rw [mul_add]
   refine add_le_add (le_mul_of_one_le_left' (one_le_pow₀ one_le_two)) ?_
   rw [← ENNReal.lqNorm_const_mul]
   refine ENNReal.lqNorm_mono fun k => ?_
   calc dyadicWeight σ k * lpModulus p L G k
-      ≤ dyadicWeight σ k * (2 ^ (L - 2) * lpModulus p 2 G k) := by
+      ≤ dyadicWeight σ k * (2 ^ (L - r) * lpModulus p r G k) := by
         refine mul_le_mul' le_rfl ?_
         conv_lhs => rw [hL']
-        exact lpModulus_add_order_le 2 (L - 2) G k
-    _ = 2 ^ (L - 2) * (dyadicWeight σ k * lpModulus p 2 G k) := by ring
+        exact lpModulus_add_order_le r (L - r) G k
+    _ = 2 ^ (L - r) * (dyadicWeight σ k * lpModulus p r G k) := by ring
+
+/-- The norm with moduli of order `L ≥ 2` is at most `2^(L-2)` times that with order `2`. -/
+theorem modNorm_order_le {L : ℕ} (hL : 2 ≤ L) (σ : ℝ) (q : ℝ≥0∞)
+    (G : Lp ℂ p (volume : Measure V)) :
+    ‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p L G k) ≤
+      2 ^ (L - 2) * (‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p 2 G k)) :=
+  modNorm_order_le_of_le hL σ q G
 
 /-- **The norm with moduli is countably subadditive in `ℓ_1`**: for a summable series in `L_p`
 and `N(G) = ‖G‖ + ‖(2^(kσ) ω_L(G, 2^(-k)))_k‖_{ℓ_1}`, `N(∑ G_i) ≤ ∑_i N(G_i)`, by
