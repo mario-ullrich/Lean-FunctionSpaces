@@ -5,9 +5,9 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Domains.Lipschitz.LipschitzGraph
+public import FunctionSpaces.Domains.Lipschitz.GraphParametrization
+public import Mathlib.Geometry.Euclidean.Volume.Measure
 public import Mathlib.LinearAlgebra.Transvection.Basic
-public import Mathlib.MeasureTheory.Function.Jacobian
 
 /-!
 # Flattening a graph domain
@@ -19,11 +19,17 @@ For a Lipschitz graph domain `Ω = {x : φ(x) < ⟪x, e⟫}` the **flattening**
 `(1 + M)`-Lipschitz (`Rd.LipschitzGraph.lipschitzWith_flatten`,
 `Rd.LipschitzGraph.lipschitzWith_unflatten`), and the image of the hyperplane
 `e^⊥` under it contains the graph (`Rd.LipschitzGraph.graph_subset_image_unflatten`). For smooth
-`φ` both maps are smooth, and the flattening preserves the Lebesgue measure
-(`Rd.LipschitzGraph.measurePreserving_flatten`): its derivative `id - e ⊗ Dφ(x)` is a
-transvection, since `Dφ(x) e = 0`, so its determinant is `1` (Mathlib's
-`LinearMap.transvection.det`), and the change of variables formula
-(`map_withDensity_abs_det_fderiv_eq_addHaar`) applies.
+`φ` both maps are smooth, and the derivative `id - e ⊗ Dφ(x)` of the flattening is a
+transvection, since `Dφ(x) e = 0`, so its determinant is `1`
+(`Rd.LipschitzGraph.det_fderiv_flatten`, Mathlib's `LinearMap.transvection.det`).
+
+Over `H = e^⊥` the **product coordinates** `(x', t) ↦ x' + t e` and the **graph coordinates**
+`(x', t) ↦ γ(x') + t e` with `γ(x') = x' + φ(x') e` (`Rd.LipschitzGraph.prodEquiv`,
+`Rd.LipschitzGraph.graphEquiv`) preserve the Lebesgue measure, and the inverse flattening is the
+graph coordinates after the inverse of the product coordinates (`Rd.LipschitzGraph.unflatten_eq`).
+So both maps preserve the Lebesgue measure for every Lipschitz graph
+(`Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz`,
+`Rd.LipschitzGraph.measurePreserving_unflatten`).
 -/
 
 @[expose] public section
@@ -148,22 +154,126 @@ theorem det_fderiv_flatten [FiniteDimensional ℝ V] {x : V} (hφ : Differentiab
   rw [ContinuousLinearMap.det, h, LinearMap.transvection.det]
   simp [Ω.fderiv_phi_e hφ]
 
-/-- **The flattening preserves the Lebesgue measure** for `C^1` graph functions. -/
-theorem measurePreserving_flatten [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
-    (hφ : ContDiff ℝ 1 Ω.phi) : MeasurePreserving Ω.flatten volume volume := by
-  have hdiff : Differentiable ℝ Ω.phi := hφ.differentiable one_ne_zero
-  have hmap := map_withDensity_abs_det_fderiv_eq_addHaar (volume : Measure V)
-    (s := univ) nullMeasurableSet_univ
-    (fun x _ => (Ω.hasFDerivAt_flatten (hdiff x)).hasFDerivWithinAt)
-    (Ω.flattenEquiv.injective.injOn)
-  have hdet : (fun x => ENNReal.ofReal |(ContinuousLinearMap.id ℝ V -
-      (fderiv ℝ Ω.phi x).smulRight Ω.e).det|) = fun _ => 1 := funext fun x => by
-    rw [Ω.det_fderiv_flatten (hdiff x), abs_one, ENNReal.ofReal_one]
-  have hsurj : Ω.flatten '' univ = univ :=
-    image_univ_of_surjective (f := Ω.flatten) Ω.flattenEquiv.surjective
-  rw [hdet, Measure.restrict_univ, withDensity_const, one_smul, hsurj,
-    Measure.restrict_univ] at hmap
-  exact ⟨(Ω.contDiff_flatten hφ).continuous.measurable, hmap⟩
+/-! ### Product and graph coordinates -/
+
+section Coordinates
+
+variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
+
+omit [MeasurableSpace V] [BorelSpace V] in
+/-- The isometry `t ↦ t e` of `ℝ` onto the orthogonal complement `H^⊥ = ℝ e` of the hyperplane
+(Mathlib's `LinearIsometryEquiv.toSpanUnitSingleton`). -/
+noncomputable def lineEquiv : ℝ ≃ₗᵢ[ℝ] Ω.hyperplaneᗮ :=
+  (LinearIsometryEquiv.toSpanUnitSingleton Ω.e Ω.norm_e).trans
+    (LinearIsometryEquiv.ofEq _ _ Ω.orthogonal_hyperplane.symm)
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- `lineEquiv t = t e`. -/
+theorem coe_lineEquiv (t : ℝ) : (Ω.lineEquiv t : V) = t • Ω.e := rfl
+
+/-- The **product coordinates** `(x', t) ↦ x' + t e` of `V = H ⊕ ℝ e`, as a measurable
+equivalence (Mathlib's `Submodule.measurableEquivProd`). -/
+noncomputable def prodEquiv : Ω.hyperplane × ℝ ≃ᵐ V :=
+  (MeasurableEquiv.prodCongr (MeasurableEquiv.refl _)
+    Ω.lineEquiv.toHomeomorph.toMeasurableEquiv).trans
+    (Ω.hyperplane.measurableEquivProd (0 : V)).symm
+
+/-- `prodEquiv (x', t) = x' + t e`. -/
+theorem prodEquiv_apply (p : Ω.hyperplane × ℝ) : Ω.prodEquiv p = (p.1 : V) + p.2 • Ω.e := by
+  simp [prodEquiv]
+  rfl
+
+/-- **The product coordinates preserve the Lebesgue measure**: `(x', t) ↦ x' + t e` carries the
+product of the Lebesgue measures of `H` and `ℝ` to the Lebesgue measure of `V` (Mathlib's
+`Submodule.measurePreserving_measurableEquivProd`,
+`InnerProductSpace.euclideanHausdorffMeasure_eq_volume` and
+`LinearIsometryEquiv.measurePreserving`). -/
+theorem measurePreserving_prodEquiv :
+    MeasurePreserving Ω.prodEquiv (volume.prod volume) volume := by
+  have h1 := (Ω.hyperplane.measurePreserving_measurableEquivProd (0 : V)).symm
+  rw [InnerProductSpace.euclideanHausdorffMeasure_eq_volume] at h1
+  exact h1.comp ((MeasurePreserving.id volume).prod Ω.lineEquiv.measurePreserving)
+
+/-- The **shear** `(x', t) ↦ (x', t + φ(x'))` of `H × ℝ`, as a measurable equivalence. -/
+noncomputable def graphShear : Ω.hyperplane × ℝ ≃ᵐ Ω.hyperplane × ℝ where
+  toFun p := (p.1, p.2 + Ω.phiH p.1)
+  invFun p := (p.1, p.2 - Ω.phiH p.1)
+  left_inv p := by simp
+  right_inv p := by simp
+  measurable_toFun :=
+    measurable_fst.prodMk (measurable_snd.add (Ω.continuous_phiH.measurable.comp measurable_fst))
+  measurable_invFun :=
+    measurable_fst.prodMk (measurable_snd.sub (Ω.continuous_phiH.measurable.comp measurable_fst))
+
+/-- The shear preserves the Lebesgue measure of `H × ℝ`: it translates each vertical line
+(Mathlib's `MeasurePreserving.skew_product`). -/
+theorem measurePreserving_graphShear :
+    MeasurePreserving Ω.graphShear (volume.prod volume) (volume.prod volume) :=
+  (MeasurePreserving.id volume).skew_product (g := fun x' t => t + Ω.phiH x')
+    (measurable_snd.add (Ω.continuous_phiH.measurable.comp measurable_fst))
+    (ae_of_all _ fun _ => map_add_right_eq_self volume _)
+
+/-- The **graph coordinates** `(x', t) ↦ γ(x') + t e`, the product coordinates after the shear. -/
+noncomputable def graphEquiv : Ω.hyperplane × ℝ ≃ᵐ V := Ω.graphShear.trans Ω.prodEquiv
+
+/-- `graphEquiv (x', t) = γ(x') + t e`. -/
+theorem graphEquiv_apply (p : Ω.hyperplane × ℝ) :
+    Ω.graphEquiv p = Ω.graphMap p.1 + p.2 • Ω.e := by
+  simp only [graphEquiv, MeasurableEquiv.trans_apply, prodEquiv_apply]
+  change (p.1 : V) + (p.2 + Ω.phi p.1) • Ω.e = (p.1 : V) + Ω.phi p.1 • Ω.e + p.2 • Ω.e
+  rw [add_smul]
+  abel
+
+/-- The graph coordinates preserve the Lebesgue measure. -/
+theorem measurePreserving_graphEquiv :
+    MeasurePreserving Ω.graphEquiv (volume.prod volume) volume :=
+  Ω.measurePreserving_prodEquiv.comp Ω.measurePreserving_graphShear
+
+/-! ### The flattening preserves the Lebesgue measure -/
+
+/-- **The inverse flattening in coordinates**: `y ↦ y + φ(y) e` is the graph coordinates
+`(x', t) ↦ γ(x') + t e` after the inverse of the product coordinates `(x', t) ↦ x' + t e`, since
+`φ` is constant along `e`. -/
+theorem unflatten_eq : Ω.unflatten = Ω.graphEquiv ∘ Ω.prodEquiv.symm := by
+  funext y
+  have hy : y = ((Ω.prodEquiv.symm y).1 : V) + (Ω.prodEquiv.symm y).2 • Ω.e := by
+    rw [← prodEquiv_apply, MeasurableEquiv.apply_symm_apply]
+  rw [Function.comp_apply, graphEquiv_apply, graphMap, unflatten]
+  conv_lhs => rw [hy, Ω.const]
+  abel
+
+/-- **The flattening in coordinates**: `x ↦ x - φ(x) e` is the product coordinates after the
+inverse of the graph coordinates (`Rd.LipschitzGraph.unflatten_eq`). -/
+theorem flatten_eq : Ω.flatten = Ω.prodEquiv ∘ Ω.graphEquiv.symm := by
+  funext x
+  have h : Ω.unflatten (Ω.prodEquiv (Ω.graphEquiv.symm x)) = x := by
+    rw [unflatten_eq, Function.comp_apply, MeasurableEquiv.symm_apply_apply,
+      MeasurableEquiv.apply_symm_apply]
+  conv_lhs => rw [← h]
+  rw [Function.comp_apply, flatten_unflatten]
+
+/-- **The inverse flattening preserves the Lebesgue measure** for every Lipschitz graph
+(`Rd.LipschitzGraph.measurePreserving_graphEquiv`, `Rd.LipschitzGraph.measurePreserving_prodEquiv`):
+it is a shear along `e` in the product coordinates. -/
+theorem measurePreserving_unflatten : MeasurePreserving Ω.unflatten volume volume := by
+  rw [unflatten_eq]
+  exact Ω.measurePreserving_graphEquiv.comp Ω.measurePreserving_prodEquiv.symm
+
+/-- **The flattening preserves the Lebesgue measure** for every Lipschitz graph, the inverse of
+`Rd.LipschitzGraph.measurePreserving_unflatten`: it is the product coordinates after the inverse of
+the graph coordinates (`Rd.LipschitzGraph.flatten_eq`). -/
+theorem measurePreserving_flatten_of_lipschitz : MeasurePreserving Ω.flatten volume volume := by
+  rw [flatten_eq]
+  exact Ω.measurePreserving_prodEquiv.comp Ω.measurePreserving_graphEquiv.symm
+
+/-- **The flattening preserves the Lebesgue measure for `C^1` graph functions**, the smooth case
+of `Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz`. The smoothness hypothesis is not
+used: the flattening preserves the Lebesgue measure for every Lipschitz graph. -/
+theorem measurePreserving_flatten (_hφ : ContDiff ℝ 1 Ω.phi) :
+    MeasurePreserving Ω.flatten volume volume :=
+  Ω.measurePreserving_flatten_of_lipschitz
+
+end Coordinates
 
 end LipschitzGraph
 

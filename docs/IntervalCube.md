@@ -140,29 +140,29 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| One variable: differences, moduli on intervals, Nikolskii for polynomials, Taylor in `L_p`, Steklov smoothing | ✅ | ✗ | `Interval/Differences`, `Interval/Modulus`, `Interval/Polynomials`, `Interval/Taylor`, `Interval/Steklov`, `Interval/Smoothing` |
-| Whitney's inequality on `[0, 1]` | ✅ | ✗ | `Interval/Whitney` |
-| Dyadic piecewise polynomials on `[0, 1]`: Jackson and inverse inequalities, `A^s_q = B^s_{p,q}[0, 1]` for `0 < s < 1/p` | ✅ | ✗ | `Interval/PiecewisePoly`, `Interval/PiecewiseJackson`, `Interval/PiecewiseInverse` |
-| Periodic modulus, piecewise polynomials on the circle, `A^s_q = B^s_{p,q}(𝕋) = B^s_{p,q}[0, 1]` for `0 < s < 1/p` | ✅ | ✗ | `Interval/Periodic`, `Interval/PiecewisePeriodic` |
-| Dual basis for `∫_0^1 P Q`, local projections, bounded projections onto piecewise polynomials | ✅ | ✗ | `Interval/LocalProjection` |
-| Cardinal B-splines, B-spline basis on a unit interval, Marsden's identity, vanishing coefficients of shifted powers | ✅ | ✗ | `Interval/BSpline` |
-| Dyadic splines (jump form = `C^(r-2)`), spline scheme, dyadic B-splines, B-spline coefficients of the pieces | ✅ | ✗ | `Interval/Splines` |
-| Inverse inequality of order `r - 1 + 1/p` for splines | ✅ | ✗ | `Interval/SplineInverse` |
-| Spline quasi-interpolant: local reproduction of polynomials, reproduction of splines, B-splines span the splines, local bounds | ✅ | ✗ | `Interval/QuasiInterp` |
-| Jackson's inequality for splines, `A^s_q(splines) = B^s_{p,q}[0, 1]` for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Interval/SplineJackson` |
-| Periodic splines, their inverse inequality | ✅ | ✗ | `Interval/SplinePeriodic` |
-| Periodic quasi-interpolant, Jackson's inequality for periodic splines, `A^s_q(periodic splines) = B^s_{p,q}(𝕋)` for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Interval/SplinePeriodicJackson` |
+| One variable: differences, moduli on intervals, Nikolskii for polynomials, Taylor in `L_p`, Steklov smoothing | ✅ | ✗ | `Domains/Interval/Differences`, `Domains/Interval/Modulus`, `Domains/Interval/Polynomials`, `Domains/Interval/Taylor`, `Domains/Interval/Steklov`, `Domains/Interval/Smoothing` |
+| Whitney's inequality on `[0, 1]` | ✅ | ✗ | `Domains/Interval/Whitney` |
+| Dyadic piecewise polynomials on `[0, 1]`: Jackson and inverse inequalities, `A^s_q = B^s_{p,q}[0, 1]` for `0 < s < 1/p` | ✅ | ✗ | `Domains/Interval/PiecewisePoly`, `Domains/Interval/PiecewiseJackson`, `Domains/Interval/PiecewiseInverse` |
+| Periodic modulus, piecewise polynomials on the circle, `A^s_q = B^s_{p,q}(𝕋) = B^s_{p,q}[0, 1]` for `0 < s < 1/p` | ✅ | ✗ | `Domains/Interval/Periodic`, `Domains/Interval/PiecewisePeriodic` |
+| Dual basis for `∫_0^1 P Q`, local projections, bounded projections onto piecewise polynomials | ✅ | ✗ | `Domains/Interval/LocalProjection` |
+| Cardinal B-splines, B-spline basis on a unit interval, Marsden's identity, vanishing coefficients of shifted powers | ✅ | ✗ | `Domains/Interval/BSpline` |
+| Dyadic splines (jump form = `C^(r-2)`), spline scheme, dyadic B-splines, B-spline coefficients of the pieces | ✅ | ✗ | `Domains/Interval/Splines` |
+| Inverse inequality of order `r - 1 + 1/p` for splines | ✅ | ✗ | `Domains/Interval/SplineInverse` |
+| Spline quasi-interpolant: local reproduction of polynomials, reproduction of splines, B-splines span the splines, local bounds | ✅ | ✗ | `Domains/Interval/QuasiInterp` |
+| Jackson's inequality for splines, `A^s_q(splines) = B^s_{p,q}[0, 1]` for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Domains/Interval/SplineJackson` |
+| Periodic splines, their inverse inequality | ✅ | ✗ | `Domains/Interval/SplinePeriodic` |
+| Periodic quasi-interpolant, Jackson's inequality for periodic splines, `A^s_q(periodic splines) = B^s_{p,q}(𝕋)` for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Domains/Interval/SplinePeriodicJackson` |
 | Density of piecewise polynomials, multiscale characterisation of `A^s_q` and of `B^s_{p,q}` for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/Multiscale` |
 | Multiwavelets (orthonormal, `r` vanishing moments), stability, coefficient characterisation of `A^s_q` and of `B^s_{p,q}` for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/Alpert` |
-| The cube `[0, 1]^d`: slices, integration through slices, moduli in the coordinates | ✅ | ✗ | `Cube/Basic`, `Cube/Modulus` |
-| Steklov smoothing in one coordinate near both ends of the cube | ✅ | ✗ | `Cube/Smoothing` |
-| Kernel operators of finite rank on slices, their forms, tensor products, telescoping over the coordinates | ✅ | ✗ | `Cube/SlicewiseOperators` |
-| Piecewise polynomials on the cube: tensor projection, tensor-product description, Whitney, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p` | ✅ | ✗ | `Cube/PiecewisePoly`, `Cube/PiecewiseJackson`, `Cube/PiecewiseInverse` |
-| Tensor splines on the cube: quasi-interpolant as a kernel operator, tensor-product description, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Cube/Splines`, `Cube/SplineJackson`, `Cube/SplineInverse` |
-| Differences of every order: difference bound for polynomials, piecewise polynomials (gain `1/p`), splines (gain `m` below order `r`), steps of either sign | ✅ | ✗ | `Interval/PolyDifferences`, `Interval/LowerDifferences` |
-| Isotropic differences and their expansion into mixed coordinate differences | ✅ | ✗ | `Cube/Translation` |
-| Isotropic modulus on the cube, comparison with the moduli in the coordinates | ✅ | ✗ | `Cube/IsoModulus` |
-| Isotropic inverse inequalities, `A^s_q` with the isotropic modulus, coordinate and isotropic Besov conditions agree for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Cube/IsoInverse`, `Cube/IsoCoincidence` |
+| The cube `[0, 1]^d`: slices, integration through slices, moduli in the coordinates | ✅ | ✗ | `Domains/Cube/Basic`, `Domains/Cube/Modulus` |
+| Steklov smoothing in one coordinate near both ends of the cube | ✅ | ✗ | `Domains/Cube/Smoothing` |
+| Kernel operators of finite rank on slices, their forms, tensor products, telescoping over the coordinates | ✅ | ✗ | `Domains/Cube/SlicewiseOperators` |
+| Piecewise polynomials on the cube: tensor projection, tensor-product description, Whitney, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p` | ✅ | ✗ | `Domains/Cube/PiecewisePoly`, `Domains/Cube/PiecewiseJackson`, `Domains/Cube/PiecewiseInverse` |
+| Tensor splines on the cube: quasi-interpolant as a kernel operator, tensor-product description, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Domains/Cube/Splines`, `Domains/Cube/SplineJackson`, `Domains/Cube/SplineInverse` |
+| Differences of every order: difference bound for polynomials, piecewise polynomials (gain `1/p`), splines (gain `m` below order `r`), steps of either sign | ✅ | ✗ | `Domains/Interval/PolyDifferences`, `Domains/Interval/LowerDifferences` |
+| Isotropic differences and their expansion into mixed coordinate differences | ✅ | ✗ | `Domains/Cube/Translation` |
+| Isotropic modulus on the cube, comparison with the moduli in the coordinates | ✅ | ✗ | `Domains/Cube/IsoModulus` |
+| Isotropic inverse inequalities, `A^s_q` with the isotropic modulus, coordinate and isotropic Besov conditions agree for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Domains/Cube/IsoInverse`, `Domains/Cube/IsoCoincidence` |
 | Filtration schemes (Haar), martingale-difference characterisation | ✅ | ✗ | `Wavelets/Filtration` |
 | Haar system on `[0, 1]`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ | ✗ | `Wavelets/Partition`, `Wavelets/Examples/Haar` |
 | Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarBesov` |

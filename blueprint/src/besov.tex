@@ -6313,6 +6313,70 @@ $T f = T F$, and \Cref{thm:diffeo-invariance} applies. For the order, change it 
 \|F\|_p + \|(2^{ks} \omega_{r'}(F, 2^{-k})_p)_k\|_{\ell_q}$ (\Cref{lem:rd-modulus-on}).
 \end{proof}
 
+\begin{definition}[The extension property]
+\label{def:besov-extension-property}
+\lean{Rd.HasBesovExtension, Rd.BesovDomain.hasBesovExtension, Rd.BesovDomain.of_hasBesovExtension}
+\leanok
+\uses{def:besov-domain}
+A measurable set $\Omega \subseteq V$ has the extension property if for every $1 \leq p < \infty$,
+all $r \in \N$ and $s \in \R$ with $0 < s < r$, and every $1 \leq q \leq \infty$ there is
+$C < \infty$ such that every $f \in L_p(V)$ with $N_\Omega(f) < \infty$ agrees on $\Omega$ with
+some $F \in L_p(V)$ with $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq
+C N_\Omega(f)$. For every closed convex set $\Omega \subseteq V$ with nonempty interior, $\Omega$ is
+a Besov domain if and only if $\Omega$ has the extension property.
+\end{definition}
+
+The extension property is the extension condition of \Cref{def:besov-domain} without convexity.
+It is the same for sets that agree up to a null set, and it makes the order of the differences a
+free parameter, as on a Besov domain (\Cref{thm:besov-domain-invariance}). DeVore and Sharpley
+define Besov spaces on domains by the same moduli $\omega_r(f, t, \Omega)_p$ and construct
+extension operators to $\R^d$ on Lipschitz graph domains \cite[Section~4]{DeVoreSharpley} and on
+$(\varepsilon, \delta)$-domains \cite[Section~5]{DeVoreSharpley}.
+
+\begin{lemma}[The extension property up to null sets]
+\label{lem:besov-extension-null-sets}
+\lean{Rd.HasBesovExtension.congr_set, Rd.BesovDomain.of_ae_eq, Rd.BesovDomain.range_of_ae_eq}
+\leanok
+\uses{def:besov-extension-property, lem:null-set-domains}
+For all measurable sets $U, U' \subseteq V$ that agree up to a null set, if $U$ has the extension
+property, then so does $U'$. For every closed convex set $\Omega \subseteq V$ with nonempty
+interior and every measurable set $U \subseteq V$ with the extension property that agrees with
+$\Omega$ up to a null set, $\Omega$ is a Besov domain. For
+every real model with corners $I$ with model vector space $V$ and every measurable set
+$U \subseteq V$ with the extension property that agrees with $\operatorname{range} I$ up to a null
+set, $\operatorname{range} I$ is a Besov domain.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The cut-offs $1_U f$, $1_{U'} f$ and the moduli on $U$ and $U'$ agree (\Cref{lem:null-set-domains}),
+so $N_U = N_{U'}$, and $F$ agrees with $f$ on $U$ if and only if it does on $U'$; the proof keeps
+the constant $C$. The range of a real model with corners is closed, convex and has nonempty
+interior (Mathlib's
+\texttt{ModelWithCorners.\allowbreak isClosed\_\allowbreak range},
+\texttt{ModelWithCorners.\allowbreak convex\_\allowbreak range} and
+\texttt{ModelWithCorners.\allowbreak nonempty\_\allowbreak interior}).
+\end{proof}
+
+\begin{corollary}[The order of the differences]
+\label{cor:besov-extension-order}
+\lean{Rd.HasBesovExtension.modNormOn_order_le}
+\leanok
+\uses{def:besov-extension-property, thm:rd-besov, lem:rd-modulus-on}
+For every measurable set $\Omega \subseteq V$ with the extension property, every
+$1 \leq p < \infty$, all $r, r' \in \N$ and $s \in \R$ with $0 < s < r$ and $s < r'$, and every
+$1 \leq q \leq \infty$, there is $C < \infty$ with $N_\Omega(f; r') \leq C N_\Omega(f; r)$ for every
+$f \in L_p(V)$ with $N_\Omega(f; r) < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+Extend $f$ to $F$ with $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq
+C_1 N_\Omega(f; r)$, change the order on $V$ (\Cref{thm:rd-besov}) and restrict,
+$N_\Omega(f; r') \leq \|F\|_p + \|(2^{ks} \omega_{r'}(F, 2^{-k})_p)_k\|_{\ell_q}$
+(\Cref{lem:rd-modulus-on}).
+\end{proof}
+
 \begin{theorem}[The half-space is a Besov domain]
 \label{thm:half-space-besov-domain}
 \lean{Rd.orthogonal_singleton_ne_top, Rd.volume_orthogonal_singleton_eq_zero,

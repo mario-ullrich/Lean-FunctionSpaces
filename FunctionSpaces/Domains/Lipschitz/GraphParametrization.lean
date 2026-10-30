@@ -19,10 +19,11 @@ The **graph map** `γ(x') = x' + φ(x') e` (`Rd.LipschitzGraph.graphMap`) satisf
 for the orthogonal projection `Px = x - ⟪x, e⟫ e` onto `H` (`Rd.LipschitzGraph.proj`, from the
 formula for the projection onto the hyperplane of any unit vector,
 `Rd.coe_orthogonalProjectionOnto_orthogonalComplement_singleton`), and it is Lipschitz with
-constant `1 + M` (`Rd.LipschitzGraph.norm_graphMap_sub_le`). The boundary of `Ω` is the graph:
-`y ∈ ∂Ω` iff `γ(Py) = y` iff `⟪y, e⟫ = φ(y)` (`Rd.LipschitzGraph.mem_frontier_domain_iff`,
-`Rd.LipschitzGraph.graphMap_proj_eq_iff`), so `∂Ω` is the range of `γ`
-(`Rd.LipschitzGraph.range_graphMap`).
+constant `1 + M` (`Rd.LipschitzGraph.norm_graphMap_sub_le`), and the graph function `φ|_H`
+(`Rd.LipschitzGraph.phiH`) is `M`-Lipschitz (`Rd.LipschitzGraph.lipschitzWith_phiH`). The
+boundary of `Ω` is the graph: `y ∈ ∂Ω` iff `γ(Py) = y` iff `⟪y, e⟫ = φ(y)`
+(`Rd.LipschitzGraph.mem_frontier_domain_iff`, `Rd.LipschitzGraph.graphMap_proj_eq_iff`), so `∂Ω`
+is the range of `γ` (`Rd.LipschitzGraph.range_graphMap`).
 
 **Traces of atoms** (`Rd.LipschitzGraph.isRegularAtom_comp_graphMap`): a continuous `a` on `V`
 that vanishes outside `B̄(c, d 2^(-j))`, with `|a| ≤ A` and `|a(x + h) - a(x)| ≤ A min(1, 2^j ‖h‖)`,
@@ -165,6 +166,18 @@ theorem norm_graphMap_sub_le (x' y' : Ω.hyperplane) :
 /-- The graph map is continuous. -/
 theorem continuous_graphMap : Continuous Ω.graphMap :=
   continuous_subtype_val.add ((Ω.continuous_phi.comp continuous_subtype_val).smul continuous_const)
+
+/-- The graph function on the hyperplane, `φ|_H`. -/
+noncomputable def phiH (x' : Ω.hyperplane) : ℝ := Ω.phi x'
+
+/-- `φ|_H` is `M`-Lipschitz. -/
+theorem lipschitzWith_phiH : LipschitzWith ⟨Ω.M, Ω.M_nonneg⟩ Ω.phiH :=
+  LipschitzWith.of_dist_le_mul fun x' y' => by
+    rw [Real.dist_eq, dist_eq_norm, ← Submodule.norm_coe, Submodule.coe_sub]
+    exact Ω.lipschitz x' y'
+
+/-- `φ|_H` is continuous. -/
+theorem continuous_phiH : Continuous Ω.phiH := Ω.lipschitzWith_phiH.continuous
 
 /-- **Steps into the cone from the boundary stay in the domain**: `γ x' + K ⊆ Ω`, since
 `φ(γ x') = ⟪γ x', e⟫` and a step `y` into the cone raises `⟪·, e⟫` faster than `φ`

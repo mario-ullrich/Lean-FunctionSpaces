@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Wavelets.Examples.HaarBesov
-public import FunctionSpaces.Interval.LocalProjection
+public import FunctionSpaces.Domains.Interval.LocalProjection
 
 /-!
 # Multiscale decompositions by local polynomial projections

@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Wavelets.Examples.Haar
-public import FunctionSpaces.Interval.PiecewisePeriodic
+public import FunctionSpaces.Domains.Interval.PiecewisePeriodic
 public import ApproximationSpaces.Transfer
 
 /-!

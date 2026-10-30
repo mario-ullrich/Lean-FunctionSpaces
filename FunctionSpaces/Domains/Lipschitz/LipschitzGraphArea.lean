@@ -348,23 +348,11 @@ theorem linearGraph_eq_tilt_comp_stretch {g : Ω.hyperplane} (hg : g ≠ 0) :
 
 /-! ### The graph map -/
 
-/-- The graph function on the hyperplane, `φ|_H`. -/
-noncomputable def phiH (x' : Ω.hyperplane) : ℝ := Ω.phi x'
-
 /-- The graph map is the graph of `φ|_H` over the hyperplane. -/
 theorem graphMap_eq_graphOver : Ω.graphMap = Ω.graphOver Ω.phiH := rfl
 
 /-- The graph map is injective. -/
 theorem graphMap_injective : Function.Injective Ω.graphMap := Ω.graphOver_injective Ω.phiH
-
-/-- `φ|_H` is `M`-Lipschitz. -/
-theorem lipschitzWith_phiH : LipschitzWith ⟨Ω.M, Ω.M_nonneg⟩ Ω.phiH :=
-  LipschitzWith.of_dist_le_mul fun x' y' => by
-    rw [Real.dist_eq, dist_eq_norm, ← Submodule.norm_coe, Submodule.coe_sub]
-    exact Ω.lipschitz x' y'
-
-/-- `φ|_H` is continuous. -/
-theorem continuous_phiH : Continuous Ω.phiH := Ω.lipschitzWith_phiH.continuous
 
 /-- The graph map is Lipschitz with constant `1 + M`. -/
 theorem lipschitzWith_graphMap :

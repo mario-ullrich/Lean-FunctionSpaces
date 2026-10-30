@@ -5,6 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
+public import FunctionSpaces.Domains.Lipschitz.GraphStraightening
 public import FunctionSpaces.Domains.Lipschitz.SurfaceMeasure
 public import FunctionSpaces.Rd.Sobolev.WeakDerivativeChangeOfVariables
 public import Mathlib.MeasureTheory.Integral.IntegralEqImproper
@@ -19,9 +20,9 @@ Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph domain in `V`, `dim V =
 `√(1 + ‖∇φ‖²)` and the outward unit normal `ν` of
 `FunctionSpaces.Domains.Lipschitz.LipschitzGraphArea`.
 
-* **Product coordinates**: `(x', t) ↦ x' + t e` and `(x', t) ↦ γ(x') + t e` carry the Lebesgue
-  measure of `H × ℝ` to that of `V` (`Rd.LipschitzGraph.measurePreserving_prodEquiv`,
-  `Rd.LipschitzGraph.measurePreserving_graphEquiv`), so
+* **Fubini in product coordinates**: the coordinates `(x', t) ↦ x' + t e` and
+  `(x', t) ↦ γ(x') + t e` of `FunctionSpaces.Domains.Lipschitz.GraphStraightening` carry the
+  Lebesgue measure of `H × ℝ` to that of `V`, so
   `∫_Ω F = ∫_H ∫_{φ(x')}^∞ F(x' + t e) dt dx' = ∫_H ∫_0^∞ F(γ(x') + t e) dt dx'`
   (`Rd.LipschitzGraph.setIntegral_domain_eq`, `Rd.LipschitzGraph.setIntegral_domain_eq_graphMap`).
 * **Gauss–Green for `C^1` functions** (`Rd.LipschitzGraph.setIntegral_lineDeriv_eq`): for
@@ -314,76 +315,7 @@ namespace LipschitzGraph
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V] (Ω : LipschitzGraph V)
 
-/-! ### Product coordinates -/
-
-omit [MeasurableSpace V] [BorelSpace V] in
-/-- The isometry `t ↦ t e` of `ℝ` onto the orthogonal complement `H^⊥ = ℝ e` of the hyperplane
-(Mathlib's `LinearIsometryEquiv.toSpanUnitSingleton`). -/
-noncomputable def lineEquiv : ℝ ≃ₗᵢ[ℝ] Ω.hyperplaneᗮ :=
-  (LinearIsometryEquiv.toSpanUnitSingleton Ω.e Ω.norm_e).trans
-    (LinearIsometryEquiv.ofEq _ _ Ω.orthogonal_hyperplane.symm)
-
-omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
-/-- `lineEquiv t = t e`. -/
-theorem coe_lineEquiv (t : ℝ) : (Ω.lineEquiv t : V) = t • Ω.e := rfl
-
-/-- The **product coordinates** `(x', t) ↦ x' + t e` of `V = H ⊕ ℝ e`, as a measurable
-equivalence (Mathlib's `Submodule.measurableEquivProd`). -/
-noncomputable def prodEquiv : Ω.hyperplane × ℝ ≃ᵐ V :=
-  (MeasurableEquiv.prodCongr (MeasurableEquiv.refl _)
-    Ω.lineEquiv.toHomeomorph.toMeasurableEquiv).trans
-    (Ω.hyperplane.measurableEquivProd (0 : V)).symm
-
-/-- `prodEquiv (x', t) = x' + t e`. -/
-theorem prodEquiv_apply (p : Ω.hyperplane × ℝ) : Ω.prodEquiv p = (p.1 : V) + p.2 • Ω.e := by
-  simp [prodEquiv]
-  rfl
-
-/-- **The product coordinates preserve the Lebesgue measure**: `(x', t) ↦ x' + t e` carries the
-product of the Lebesgue measures of `H` and `ℝ` to the Lebesgue measure of `V` (Mathlib's
-`Submodule.measurePreserving_measurableEquivProd`,
-`InnerProductSpace.euclideanHausdorffMeasure_eq_volume` and
-`LinearIsometryEquiv.measurePreserving`). -/
-theorem measurePreserving_prodEquiv :
-    MeasurePreserving Ω.prodEquiv (volume.prod volume) volume := by
-  have h1 := (Ω.hyperplane.measurePreserving_measurableEquivProd (0 : V)).symm
-  rw [InnerProductSpace.euclideanHausdorffMeasure_eq_volume] at h1
-  exact h1.comp ((MeasurePreserving.id volume).prod Ω.lineEquiv.measurePreserving)
-
-/-- The **shear** `(x', t) ↦ (x', t + φ(x'))` of `H × ℝ`, as a measurable equivalence. -/
-noncomputable def graphShear : Ω.hyperplane × ℝ ≃ᵐ Ω.hyperplane × ℝ where
-  toFun p := (p.1, p.2 + Ω.phiH p.1)
-  invFun p := (p.1, p.2 - Ω.phiH p.1)
-  left_inv p := by simp
-  right_inv p := by simp
-  measurable_toFun :=
-    measurable_fst.prodMk (measurable_snd.add (Ω.continuous_phiH.measurable.comp measurable_fst))
-  measurable_invFun :=
-    measurable_fst.prodMk (measurable_snd.sub (Ω.continuous_phiH.measurable.comp measurable_fst))
-
-/-- The shear preserves the Lebesgue measure of `H × ℝ`: it translates each vertical line
-(Mathlib's `MeasurePreserving.skew_product`). -/
-theorem measurePreserving_graphShear :
-    MeasurePreserving Ω.graphShear (volume.prod volume) (volume.prod volume) :=
-  (MeasurePreserving.id volume).skew_product (g := fun x' t => t + Ω.phiH x')
-    (measurable_snd.add (Ω.continuous_phiH.measurable.comp measurable_fst))
-    (ae_of_all _ fun _ => map_add_right_eq_self volume _)
-
-/-- The **graph coordinates** `(x', t) ↦ γ(x') + t e`, the product coordinates after the shear. -/
-noncomputable def graphEquiv : Ω.hyperplane × ℝ ≃ᵐ V := Ω.graphShear.trans Ω.prodEquiv
-
-/-- `graphEquiv (x', t) = γ(x') + t e`. -/
-theorem graphEquiv_apply (p : Ω.hyperplane × ℝ) :
-    Ω.graphEquiv p = Ω.graphMap p.1 + p.2 • Ω.e := by
-  simp only [graphEquiv, MeasurableEquiv.trans_apply, prodEquiv_apply]
-  change (p.1 : V) + (p.2 + Ω.phi p.1) • Ω.e = (p.1 : V) + Ω.phi p.1 • Ω.e + p.2 • Ω.e
-  rw [add_smul]
-  abel
-
-/-- The graph coordinates preserve the Lebesgue measure. -/
-theorem measurePreserving_graphEquiv :
-    MeasurePreserving Ω.graphEquiv (volume.prod volume) volume :=
-  Ω.measurePreserving_prodEquiv.comp Ω.measurePreserving_graphShear
+/-! ### Fubini in product coordinates -/
 
 /-- **Integrals over `Ω` in coordinates**: if `T : H × ℝ → V` preserves the Lebesgue measures and
 `T(x', t) ∈ Ω` iff `a(x') < t`, then `∫_Ω F = ∫_H ∫_{a(x')}^∞ F(T(x', t)) dt dx'` for every `F`

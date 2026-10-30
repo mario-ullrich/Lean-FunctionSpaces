@@ -2077,15 +2077,15 @@ $\mathcal F \mathcal F^{-1} \Phi = \Phi$. Finally $\int \varphi = \widehat\varph
 So $\varphi$ is a continuous function with support in $[0, 2N - 1]$, integral $1$ and Fourier
 transform $\Phi$.
 
-\section{Orthonormality and polynomial reproduction}
+\section{Orthonormality and moments}
 
 This section proves that the integer translates $\varphi(\cdot - k)$, $k \in \Z$, of the scaling
-function of a mask of order $N \geq 2$ are orthonormal in $L_2(\R)$ and reproduce the
-polynomials of degree less than $N$. Orthonormality amounts to the identity
+function of a mask of order $N \geq 2$ are orthonormal in $L_2(\R)$ and computes their periodised
+moments. Orthonormality amounts to the identity
 $\int_\R w |\Phi|^2 = \int_0^1 w$ for continuous $1$-periodic functions $w$, proved for
-truncated products by induction with the quadrature mirror filter identity. Polynomial
-reproduction rests on the zeros of the derivatives of $\Phi$ at the nonzero integers and on
-Poisson summation.
+truncated products by induction with the quadrature mirror filter identity. The moments rest on
+the zeros of the derivatives of $\Phi$ at the nonzero integers and on Poisson summation; they give
+the reproduction of the polynomials of degree less than $N$ (\Cref{thm:daub-poly-reproduction}).
 
 \paragraph{Halving a period.}
 Two substitutions and the quadrature mirror filter identity halve an integral over a period.
@@ -2434,142 +2434,6 @@ For every Daubechies mask of order $N \geq 2$ and every $x \in \R$,
 \Cref{prop:daub-periodised-moments} for $l = 0$, with $\int_\R \varphi = 1$
 (\Cref{thm:daub-scaling-fourier}), and \Cref{lem:daub-finite-sums}.
 \end{proof}
-
-\paragraph{Polynomial reproduction.}
-The sums $\sum_k k^l \varphi(x - k)$ are polynomials of degree $l$ in $x$ with leading
-coefficient $1$. By induction on the degree, every polynomial of degree less than $N$ is a
-combination of the translates with polynomial coefficients, and orthonormality identifies these
-coefficients with inner products. Polynomials have complex coefficients and are evaluated at
-real points.
-
-\begin{proposition}[Polynomials as combinations of the translates]
-\label{prop:daub-poly-combination}
-\lean{Daubechies.exists_coeff_poly_of_mem_degreeLT, Daubechies.exists_coeff_poly,
-  Daubechies.tsum_intCast_pow_mul_scalingFun_sub, Daubechies.exists_poly_sum_pow_mul,
-  Daubechies.sub_C_coeff_mul_mem_degreeLT}
-\leanok
-\uses{def:daub-scaling-function}
-Let $N \geq 2$ and $n \leq N$. For every Daubechies mask of order $N$ and every polynomial $Q$
-of degree less than $n$ there is a polynomial $a$ of degree less than $n$ with
-\[
-  Q(x) = \sum_{k \in \Z} a(k) \, \varphi(x - k) \quad\text{for every } x \in \R .
-\]
-\end{proposition}
-
-\begin{proof}
-\leanok
-\uses{lem:daub-finite-sums, prop:daub-periodised-moments, thm:daub-scaling-fourier}
-First, the integer moments of the translates: with $\mu_r = \int_\R y^r \varphi(y) \, dy$ for
-$r \in \N$, for every $l < N$ and every $x \in \R$
-\[
-  \sum_{k \in \Z} k^l \, \varphi(x - k)
-  = \sum_{i=0}^{l} \binom{l}{i} (-1)^{l-i} \mu_{l-i} \, x^i ,
-\]
-and the right side is a polynomial of degree $l$ in $x$ with leading coefficient $1$. Indeed,
-write $k = x - (x - k)$ and expand $k^l$ by the binomial theorem. The sums over $k$ are finite
-(\Cref{lem:daub-finite-sums}), so they can be exchanged with the sum over $i$, and
-$\sum_k (x - k)^r \varphi(x - k) = \mu_r$ for every $r < N$
-(\Cref{prop:daub-periodised-moments}). The coefficient of $x^l$ is $\mu_0 = \int_\R \varphi = 1$
-(\Cref{thm:daub-scaling-fourier}). Second, lowering the degree: for a ring $R$, $n \in \N$, a
-polynomial $Q \in R[X]$ of degree less than $n + 1$ and a polynomial $P \in R[X]$ of degree at
-most $n$ with coefficient $1$ at $X^n$, the polynomial $Q - q_n P$ has degree less than $n$,
-where $q_n$ is the coefficient of $X^n$ in $Q$: the coefficients at $X^n$ cancel, and both
-polynomials have degree at most $n$.
-
-Now induction on $n$; for $n = 0$, $Q = 0$. For the step let $q_n$ be the coefficient of $X^n$
-in $Q$, and let $P$ be the polynomial of degree $n$ with leading coefficient $1$ and
-$P(x) = \sum_k k^n \varphi(x - k)$, which exists since $n < N$. By lowering the degree and the
-induction hypothesis, $Q - q_n P = \sum_k a'(k) \varphi(\cdot - k)$ with a polynomial $a'$ of
-degree less than $n$, and $a = q_n X^n + a'$ represents $Q$; all sums over $k$ are finite
-(\Cref{lem:daub-finite-sums}).
-\end{proof}
-
-\begin{theorem}[Polynomial reproduction]
-\label{thm:daub-poly-reproduction}
-\lean{Daubechies.sum_inner_poly_mul_scalingFun, Daubechies.sum_integral_poly_mul_scalingFun,
-  Daubechies.scalingFun_sub_mul_conj_eq_zero, Daubechies.integrable_scalingFun_sub_mul_conj,
-  Daubechies.integral_tsum_mul_scalingFun_sub_mul_conj}
-\leanok
-\uses{def:daub-scaling-function}
-For every Daubechies mask of order $N \geq 2$, every polynomial $Q$ of degree less than $N$ and
-every $x \in \R$,
-\[
-  \sum_{k \in \Z} \Bigl(\int_\R Q(y) \, \overline{\varphi(y - k)} \, dy\Bigr) \varphi(x - k)
-  = Q(x) ,
-\]
-and the same holds with $\varphi(y - k)$ in place of $\overline{\varphi(y - k)}$.
-\end{theorem}
-
-\begin{proof}
-\leanok
-\uses{thm:daub-scaling-support, prop:daub-scaling-integrable, prop:daub-scaling-continuous,
-  prop:daub-scaling-real, thm:daub-orthonormal, prop:daub-poly-combination}
-First, the recovery of the coefficients: for all $j, k \in \Z$ the function
-$y \mapsto \varphi(y - j) \, \overline{\varphi(y - k)}$ is integrable, and it vanishes
-identically if $|j - k| > 2N - 1$; and for every $a : \Z \to \C$ and every $k \in \Z$,
-\[
-  \int_\R \Bigl(\sum_{j \in \Z} a(j) \, \varphi(y - j)\Bigr) \overline{\varphi(y - k)} \, dy
-  = a(k) .
-\]
-Indeed, if both factors are nonzero at $y$, then $y - j, y - k \in [0, 2N - 1]$
-(\Cref{thm:daub-scaling-support}), so $|j - k| \leq 2N - 1$. The product of the integrable
-function $\varphi(\cdot - j)$ (\Cref{prop:daub-scaling-integrable}) and the bounded continuous
-function $\overline{\varphi(\cdot - k)} = \varphi(\cdot - k)$
-(\Cref{prop:daub-scaling-continuous} and \Cref{prop:daub-scaling-real}) is integrable. Hence the
-integrand is a finite sum over the $j$ with $|j - k| \leq 2N - 1$, and orthonormality
-(\Cref{thm:daub-orthonormal}) leaves the term $j = k$.
-
-Now write $Q = \sum_j a(j) \varphi(\cdot - j)$ with a polynomial $a$
-(\Cref{prop:daub-poly-combination}). Then
-$\int_\R Q(y) \overline{\varphi(y - k)} \, dy = a(k)$, so the left side is
-$\sum_k a(k) \varphi(x - k) = Q(x)$. Since $\varphi$ is real (\Cref{prop:daub-scaling-real}),
-the second form is the same identity.
-\end{proof}
-
-So the operator $f \mapsto \sum_k \langle f, \varphi(\cdot - k) \rangle \varphi(\cdot - k)$
-fixes every polynomial of degree less than $N$, and at each point the sum has at most $2N$
-nonzero terms. The same holds at every dyadic level.
-
-\begin{lemma}[Dyadic substitutions]
-\label{lem:daub-dyadic-substitution}
-\lean{Daubechies.integral_eq_two_pow_mul_integral_comp, Daubechies.exists_poly_comp_two_pow_mul}
-\leanok
-For every $g : \R \to \C$ and every $j \in \N$,
-$\int_\R g(u) \, du = 2^j \int_\R g(2^j y) \, dy$. For every $N \in \N$, every polynomial $Q$ of
-degree less than $N$ and every $j \in \N$ there is a polynomial $R$ of degree less than $N$ with
-$R(2^j y) = Q(y)$ for every $y \in \R$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-\uses{lem:iter-diff-poly}
-The substitution $u = 2^j y$, and $R(u) = Q(2^{-j} u)$; affine substitutions keep the degree
-below $N$ (\Cref{lem:iter-diff-poly}).
-\end{proof}
-
-\begin{corollary}[Polynomial reproduction at the dyadic levels]
-\label{cor:daub-poly-reproduction-dyadic}
-\lean{Daubechies.sum_inner_poly_mul_scalingFun_two_pow}
-\leanok
-\uses{def:daub-scaling-function}
-For every Daubechies mask of order $N \geq 2$, every polynomial $Q$ of degree less than $N$,
-every $j \in \N$ and every $x \in \R$,
-\[
-  \sum_{k \in \Z} 2^j \Bigl(\int_\R Q(y) \, \overline{\varphi(2^j y - k)} \, dy\Bigr)
-  \varphi(2^j x - k) = Q(x) .
-\]
-\end{corollary}
-
-\begin{proof}
-\leanok
-\uses{thm:daub-poly-reproduction, lem:daub-dyadic-substitution}
-Apply \Cref{thm:daub-poly-reproduction} to the polynomial $R$ of
-\Cref{lem:daub-dyadic-substitution} at the point $2^j x$, and substitute $u = 2^j y$ in the
-integrals (\Cref{lem:daub-dyadic-substitution}).
-\end{proof}
-
-For the functions $\varphi_{j,k}(x) = 2^{j/2} \varphi(2^j x - k)$ the identity reads
-$\sum_k \langle Q, \varphi_{j,k} \rangle \varphi_{j,k}(x) = Q(x)$.
 
 \section{Regularity}
 
@@ -3535,7 +3399,7 @@ boundedly many dilated and translated copies of $\gamma$ of one level are nonzer
 
 \begin{definition}[Generators, expansions and coefficients]
 \label{def:daub-generators}
-\lean{Daubechies.scaledFun, Daubechies.expand, Daubechies.coeffFun}
+\lean{Daubechies.scaledFun, Daubechies.expand, Daubechies.coeffFun, Daubechies.scaledFun_zero}
 \leanok
 For $\gamma : \R \to \C$, a level $j \in \N$ and a position $k \in \Z$ let
 \[
@@ -3545,6 +3409,7 @@ For coefficients $\lambda : \Z \to \C$ the \emph{expansion} of level $j$ is the 
 $x \mapsto \sum_{k \in \Z} \lambda_k \gamma_{j,k}(x)$, and for $f : \R \to \C$ the
 \emph{coefficient} of level $j$ and position $k$ is
 $\langle f, \gamma_{j,k} \rangle = \int_\R f(y) \overline{\gamma_{j,k}(y)} \, dy$.
+The generators of level $0$ are the integer translates, $\gamma_{0,k} = \gamma(\cdot - k)$.
 \end{definition}
 
 The factor $2^{j/2}$ makes the $L_2$ norm of $\gamma_{j,k}$ independent of $j$ and $k$.
@@ -3624,6 +3489,23 @@ $y$. Finite sums are linear.
 \paragraph{Orthonormality and coefficient recovery.}
 The substitution $u = 2^j x$ carries the orthonormality of the integer translates to every level,
 and orthonormality recovers the coefficients of an expansion.
+
+\begin{lemma}[The dyadic substitution]
+\label{lem:daub-dyadic-substitution}
+\lean{Daubechies.integral_eq_two_pow_mul_integral_comp}
+\leanok
+For every $F : \R \to \C$ and every $j \in \N$,
+$\int_\R F(u) \, du = 2^j \int_\R F(2^j y) \, dy$, where the integral of a non-integrable
+function is $0$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The substitution $u = 2^j y$ (Mathlib's
+\texttt{MeasureTheory.\allowbreak Measure.\allowbreak integral\_\allowbreak
+comp\_\allowbreak mul\_\allowbreak left});
+$y \mapsto F(2^j y)$ is integrable exactly when $F$ is.
+\end{proof}
 
 \begin{lemma}[Orthonormality at every level]
 \label{lem:daub-generators-orthonormal}
@@ -3909,6 +3791,140 @@ $2(2^j x - k) - i = 2^{j+1} x - (2k + i)$ and $2^{(j+1)/2} = 2^{j/2} \sqrt 2$. T
 follows by the substitution $n = 2k + i$, since $c_i = 0$ outside $0 \leq i \leq 2N - 1$
 (\Cref{lem:daub-mask-poly}).
 \end{proof}
+
+\paragraph{Polynomial reproduction.}
+The sums $\sum_k k^l \varphi(x - k)$ are polynomials of degree $l$ in $x$ with leading
+coefficient $1$. By induction on the degree, every polynomial of degree less than $N$ is a
+combination of the translates with polynomial coefficients, and orthonormality identifies these
+coefficients with inner products. Polynomials have complex coefficients and are evaluated at
+real points.
+
+\begin{proposition}[Polynomials as combinations of the translates]
+\label{prop:daub-poly-combination}
+\lean{Daubechies.exists_coeff_poly_of_mem_degreeLT, Daubechies.exists_coeff_poly,
+  Daubechies.tsum_intCast_pow_mul_scalingFun_sub, Daubechies.exists_poly_sum_pow_mul,
+  Daubechies.sub_C_coeff_mul_mem_degreeLT}
+\leanok
+\uses{def:daub-scaling-function}
+Let $N \geq 2$ and $n \leq N$. For every Daubechies mask of order $N$ and every polynomial $Q$
+of degree less than $n$ there is a polynomial $a$ of degree less than $n$ with
+\[
+  Q(x) = \sum_{k \in \Z} a(k) \, \varphi(x - k) \quad\text{for every } x \in \R .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-finite-sums, prop:daub-periodised-moments, thm:daub-scaling-fourier}
+First, the integer moments of the translates: with $\mu_r = \int_\R y^r \varphi(y) \, dy$ for
+$r \in \N$, for every $l < N$ and every $x \in \R$
+\[
+  \sum_{k \in \Z} k^l \, \varphi(x - k)
+  = \sum_{i=0}^{l} \binom{l}{i} (-1)^{l-i} \mu_{l-i} \, x^i ,
+\]
+and the right side is a polynomial of degree $l$ in $x$ with leading coefficient $1$. Indeed,
+write $k = x - (x - k)$ and expand $k^l$ by the binomial theorem. The sums over $k$ are finite
+(\Cref{lem:daub-finite-sums}), so they can be exchanged with the sum over $i$, and
+$\sum_k (x - k)^r \varphi(x - k) = \mu_r$ for every $r < N$
+(\Cref{prop:daub-periodised-moments}). The coefficient of $x^l$ is $\mu_0 = \int_\R \varphi = 1$
+(\Cref{thm:daub-scaling-fourier}). Second, lowering the degree: for a ring $R$, $n \in \N$, a
+polynomial $Q \in R[X]$ of degree less than $n + 1$ and a polynomial $P \in R[X]$ of degree at
+most $n$ with coefficient $1$ at $X^n$, the polynomial $Q - q_n P$ has degree less than $n$,
+where $q_n$ is the coefficient of $X^n$ in $Q$: the coefficients at $X^n$ cancel, and both
+polynomials have degree at most $n$.
+
+Now induction on $n$; for $n = 0$, $Q = 0$. For the step let $q_n$ be the coefficient of $X^n$
+in $Q$, and let $P$ be the polynomial of degree $n$ with leading coefficient $1$ and
+$P(x) = \sum_k k^n \varphi(x - k)$, which exists since $n < N$. By lowering the degree and the
+induction hypothesis, $Q - q_n P = \sum_k a'(k) \varphi(\cdot - k)$ with a polynomial $a'$ of
+degree less than $n$, and $a = q_n X^n + a'$ represents $Q$; all sums over $k$ are finite
+(\Cref{lem:daub-finite-sums}).
+\end{proof}
+
+\begin{theorem}[Polynomial reproduction]
+\label{thm:daub-poly-reproduction}
+\lean{Daubechies.sum_inner_poly_mul_scalingFun, Daubechies.sum_integral_poly_mul_scalingFun,
+  Daubechies.scalingFun_sub_mul_conj_eq_zero, Daubechies.integrable_scalingFun_sub_mul_conj,
+  Daubechies.integral_tsum_mul_scalingFun_sub_mul_conj}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$, every polynomial $Q$ of degree less than $N$ and
+every $x \in \R$,
+\[
+  \sum_{k \in \Z} \Bigl(\int_\R Q(y) \, \overline{\varphi(y - k)} \, dy\Bigr) \varphi(x - k)
+  = Q(x) ,
+\]
+and the same holds with $\varphi(y - k)$ in place of $\overline{\varphi(y - k)}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{def:daub-generators, prop:daub-generators-recovery, prop:daub-scaled-orthonormal,
+  thm:daub-scaling-support, prop:daub-scaling-continuous, prop:daub-scaling-real,
+  prop:daub-poly-combination}
+First, the recovery of the coefficients: for all $j, k \in \Z$ the function
+$y \mapsto \varphi(y - j) \, \overline{\varphi(y - k)}$ is integrable, and it vanishes
+identically if $|j - k| > 2N - 1$; and for every $a : \Z \to \C$ and every $k \in \Z$,
+\[
+  \int_\R \Bigl(\sum_{j \in \Z} a(j) \, \varphi(y - j)\Bigr) \overline{\varphi(y - k)} \, dy
+  = a(k) .
+\]
+The integer translates are the generators of level $0$ (\Cref{def:daub-generators}), and
+$\varphi$ is continuous and vanishes outside $[0, 2N - 1]$ (\Cref{prop:daub-scaling-continuous}
+and \Cref{thm:daub-scaling-support}). So the first two claims are
+\Cref{prop:daub-generators-recovery} for $\gamma = \varphi$ on the interval $[0, 2N - 1]$ at
+level $0$, with $\lceil 2N - 1 \rceil = 2N - 1$, and the identity is coefficient recovery for
+$\varphi$ at level $0$ (\Cref{prop:daub-scaled-orthonormal}).
+
+Now write $Q = \sum_j a(j) \varphi(\cdot - j)$ with a polynomial $a$
+(\Cref{prop:daub-poly-combination}). Then
+$\int_\R Q(y) \overline{\varphi(y - k)} \, dy = a(k)$, so the left side is
+$\sum_k a(k) \varphi(x - k) = Q(x)$. Since $\varphi$ is real (\Cref{prop:daub-scaling-real}),
+the second form is the same identity.
+\end{proof}
+
+So the operator $f \mapsto \sum_k \langle f, \varphi(\cdot - k) \rangle \varphi(\cdot - k)$
+fixes every polynomial of degree less than $N$, and at each point the sum has at most $2N$
+nonzero terms. The same holds at every dyadic level.
+
+\begin{lemma}[Dilating a polynomial]
+\label{lem:daub-polynomial-dilation}
+\lean{Daubechies.exists_poly_comp_two_pow_mul}
+\leanok
+For every $N \in \N$, every polynomial $Q$ of degree less than $N$ and every $j \in \N$ there is
+a polynomial $R$ of degree less than $N$ with $R(2^j y) = Q(y)$ for every $y \in \R$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:iter-diff-poly}
+$R(u) = Q(2^{-j} u)$; affine substitutions keep the degree below $N$ (\Cref{lem:iter-diff-poly}).
+\end{proof}
+
+\begin{corollary}[Polynomial reproduction at the dyadic levels]
+\label{cor:daub-poly-reproduction-dyadic}
+\lean{Daubechies.sum_inner_poly_mul_scalingFun_two_pow}
+\leanok
+\uses{def:daub-scaling-function}
+For every Daubechies mask of order $N \geq 2$, every polynomial $Q$ of degree less than $N$,
+every $j \in \N$ and every $x \in \R$,
+\[
+  \sum_{k \in \Z} 2^j \Bigl(\int_\R Q(y) \, \overline{\varphi(2^j y - k)} \, dy\Bigr)
+  \varphi(2^j x - k) = Q(x) .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-poly-reproduction, lem:daub-polynomial-dilation,
+  lem:daub-dyadic-substitution}
+Apply \Cref{thm:daub-poly-reproduction} to the polynomial $R$ of
+\Cref{lem:daub-polynomial-dilation} at the point $2^j x$, and substitute $u = 2^j y$ in the
+integrals (\Cref{lem:daub-dyadic-substitution}).
+\end{proof}
+
+For the functions $\varphi_{j,k}(x) = 2^{j/2} \varphi(2^j x - k)$ the identity reads
+$\sum_k \langle Q, \varphi_{j,k} \rangle \varphi_{j,k}(x) = Q(x)$.
 
 \paragraph{The projections.}
 The projection of level $j$ is defined at every point for every function; for locally
@@ -4379,7 +4395,7 @@ $\sqrt 2 \sqrt 2 = 2$ for real sequences the second.
 \begin{theorem}[Orthonormality of the wavelets]
 \label{thm:daub-wavelet-orthonormal}
 \lean{Daubechies.integral_waveletScaled_mul_conj, Daubechies.integral_waveletScaled_mul_conj_scaled,
-  Daubechies.scaledFun_zero, Daubechies.integral_wavelet_translate_mul_conj_translate,
+  Daubechies.integral_wavelet_translate_mul_conj_translate,
   Daubechies.integral_wavelet_translate_mul_conj_scalingFun_translate}
 \leanok
 \uses{def:daub-wavelet, def:daub-scaled}

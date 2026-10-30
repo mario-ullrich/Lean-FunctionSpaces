@@ -84,19 +84,19 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| The Daubechies polynomial, its Bézout identity, values and bounds | ✅ | ✗ | `Wavelets/Daubechies/DaubechiesPolynomial` |
-| Fourier transforms of integrable functions on `ℝ`: multiplication formula, Parseval, Schwartz test functions | ✅ | ✗ | `Wavelets/Daubechies/FourierIntegrable` |
-| The Fejér–Riesz theorem and masks of every order | ✅ | ✗ | `Wavelets/Daubechies/FejerRiesz`, `Wavelets/Daubechies/MaskExistence` |
-| Masks, the symbol, filter identities, the mask D4 | ✅ | ✗ | `Wavelets/Daubechies/Mask`, `Wavelets/Daubechies/FilterIdentities`, `Wavelets/Daubechies/D4` |
-| The symbol product and its modulus | ✅ | ✗ | `Wavelets/Daubechies/SymbolProduct` |
-| The transfer operator, the decay of the symbol product, orders two and three | ✅ | ✗ | `Wavelets/Daubechies/TransferOperator`, `Wavelets/Daubechies/SymbolDecay`, `Wavelets/Daubechies/TransferExamples` |
-| The scaling function, the cascade algorithm, compact support | ✅ | ✗ | `Wavelets/Daubechies/ScalingFunction`, `Wavelets/Daubechies/Cascade` |
-| Orthonormality, moments, polynomial reproduction | ✅ | ✗ | `Wavelets/Daubechies/Orthonormality`, `Wavelets/Daubechies/ScalingMoments`, `Wavelets/Daubechies/PolynomialReproduction` |
-| Sobolev and Hölder regularity of the scaling function | ✅ | ✗ | `Wavelets/Daubechies/SobolevRegularity`, `Wavelets/Daubechies/HolderRegularity` |
-| The matrix method and the Hölder exponent of D4 | ✅ | ✗ | `Wavelets/Daubechies/MatrixMethod`, `Wavelets/Daubechies/MatrixMethodD4` |
-| Expansions, projections, the multiresolution analysis, the wavelet | ✅ | ✗ | `Wavelets/Daubechies/Expansion`, `Wavelets/Daubechies/ExpansionScaling`, `Wavelets/Daubechies/Projections`, `Wavelets/Daubechies/Wavelet` |
-| Jackson's and Bernstein's inequalities | ✅ | ✗ | `Wavelets/Daubechies/JacksonSmoothing`, `Wavelets/Daubechies/Jackson`, `Wavelets/Daubechies/Bernstein` |
-| Besov spaces by Daubechies coefficients; D4 and order three | ✅ | ✗ | `Wavelets/Daubechies/Besov`, `Wavelets/Daubechies/D4Besov`, `Wavelets/Daubechies/OrderThree` |
+| The Daubechies polynomial, its Bézout identity, values and bounds | ✅ | ✗ | `Wavelets/Examples/Daubechies/DaubechiesPolynomial` |
+| Fourier transforms of integrable functions on `ℝ`: multiplication formula, Parseval, Schwartz test functions | ✅ | ✗ | `Wavelets/Examples/Daubechies/FourierIntegrable` |
+| The Fejér–Riesz theorem and masks of every order | ✅ | ✗ | `Wavelets/Examples/Daubechies/FejerRiesz`, `Wavelets/Examples/Daubechies/MaskExistence` |
+| Masks, the symbol, filter identities, the mask D4 | ✅ | ✗ | `Wavelets/Examples/Daubechies/Mask`, `Wavelets/Examples/Daubechies/FilterIdentities`, `Wavelets/Examples/Daubechies/D4` |
+| The symbol product and its modulus | ✅ | ✗ | `Wavelets/Examples/Daubechies/SymbolProduct` |
+| The transfer operator, the decay of the symbol product, orders two and three | ✅ | ✗ | `Wavelets/Examples/Daubechies/TransferOperator`, `Wavelets/Examples/Daubechies/SymbolDecay`, `Wavelets/Examples/Daubechies/TransferExamples` |
+| The scaling function, the cascade algorithm, compact support | ✅ | ✗ | `Wavelets/Examples/Daubechies/ScalingFunction`, `Wavelets/Examples/Daubechies/Cascade` |
+| Orthonormality and moments | ✅ | ✗ | `Wavelets/Examples/Daubechies/Orthonormality`, `Wavelets/Examples/Daubechies/ScalingMoments` |
+| Sobolev and Hölder regularity of the scaling function | ✅ | ✗ | `Wavelets/Examples/Daubechies/SobolevRegularity`, `Wavelets/Examples/Daubechies/HolderRegularity` |
+| The matrix method and the Hölder exponent of D4 | ✅ | ✗ | `Wavelets/Examples/Daubechies/MatrixMethod`, `Wavelets/Examples/Daubechies/MatrixMethodD4` |
+| Expansions, polynomial reproduction, projections, the multiresolution analysis, the wavelet | ✅ | ✗ | `Wavelets/Examples/Daubechies/Expansion`, `Wavelets/Examples/Daubechies/ExpansionScaling`, `Wavelets/Examples/Daubechies/PolynomialReproduction`, `Wavelets/Examples/Daubechies/Projections`, `Wavelets/Examples/Daubechies/Wavelet` |
+| Jackson's and Bernstein's inequalities | ✅ | ✗ | `Wavelets/Examples/Daubechies/JacksonSmoothing`, `Wavelets/Examples/Daubechies/Jackson`, `Wavelets/Examples/Daubechies/Bernstein` |
+| Besov spaces by Daubechies coefficients; D4 and order three | ✅ | ✗ | `Wavelets/Examples/Daubechies/Besov`, `Wavelets/Examples/Daubechies/D4Besov`, `Wavelets/Examples/Daubechies/OrderThree` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

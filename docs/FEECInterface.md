@@ -552,7 +552,7 @@ with boundary `Γ`, boundary balls `B_j = ball (Ω.center j) (Ω.radius j)` and 
   `Rd.BoundedLipschitzDomain.memBoundaryBesov_iff_exists_isBoundaryTrace`
   (`FunctionSpaces/Domains/Traces/LipschitzBoundaryTrace.lean`).
 * X.4, Daubechies wavelets on `ℝ`: `Daubechies.besov_iff_coeff`
-  (`FunctionSpaces/Wavelets/Daubechies/Besov.lean`).
+  (`FunctionSpaces/Wavelets/Examples/Daubechies/Besov.lean`).
 * X.5, `F^s_{p,p} = B^s_{p,p}` on `ℝ^d`: `Rd.memTriebelLizorkin_iff_memApprox`
   (`FunctionSpaces/Rd/TriebelLizorkin/TriebelLizorkin.lean`); `B^s_{2,2} = H^s` on the torus:
   `Torus.memBesov_two_two_iff` (`FunctionSpaces/Torus/Coefficients.lean`).

@@ -122,11 +122,12 @@ declarations.
   in `Mathlib/Analysis/Fourier/AddCircleMulti.lean`, so `mFourierBasis` cannot be used
   outside that file without re-declaring it (`FunctionSpaces/Torus/Measure.lean`); worth
   reporting upstream.
-* **Differences of polynomials by derivatives** (`FunctionSpaces/Interval/PolyDifferences.lean`):
+* **Differences of polynomials by derivatives**
+  (`FunctionSpaces/Domains/Interval/PolyDifferences.lean`):
   `|Δ_σ^m P(y)| ≤ σ^m sup_{[y, y+mσ]} |P^(m)|` (`Interval.norm_higherDiff_polyFun_le`), and the
   boundedness of every linear map of the polynomials of degree `< r` by the `L_p` norm on an
   interval (`Interval.exists_enorm_linearMap_le_eLpNorm`, in
-  `FunctionSpaces/Interval/Polynomials.lean`), a form of Markov's inequality.
+  `FunctionSpaces/Domains/Interval/Polynomials.lean`), a form of Markov's inequality.
 * **The translation algebra** (`FunctionSpaces/Analysis/Differences/TranslationAlgebra.lean`):
   `ℂ[G]` acting on functions on an additive commutative monoid `G` by translations
   (`TranslationAlgebra.diffAct`, from `AddMonoidAlgebra.lift`), with `(fwdDiff h)^[r] = (δ_h - 1)^r`
@@ -360,35 +361,36 @@ declarations.
   (`Torus.mFourierCoeff_econvLp`), and uniqueness for `1 ≤ p ≤ ∞`
   (`Torus.eq_of_mFourierCoeff_eq`). Mathlib has uniqueness in `L_2`, through `mFourierBasis`;
   the open PR #43803 (Fejér's theorem on `AddCircle`) overlaps with uniqueness for `d = 1`.
-* **The Fejér–Riesz theorem** (`FunctionSpaces/Wavelets/Daubechies/FejerRiesz.lean`): a real
-  polynomial `Q` with `Q > 0` on `[-1, 1]` satisfies `Q(cos θ) = |L(e^(iθ))|²` for a real
+* **The Fejér–Riesz theorem** (`FunctionSpaces/Wavelets/Examples/Daubechies/FejerRiesz.lean`): a
+  real polynomial `Q` with `Q > 0` on `[-1, 1]` satisfies `Q(cos θ) = |L(e^(iθ))|²` for a real
   polynomial `L` of degree `≤ deg Q` with `L(1) > 0` and without zeros in the closed unit disk
   (`Polynomial.fejer_riesz`, `Polynomial.fejer_riesz_outer`); Mathlib has no factorisation of
   positive trigonometric polynomials.
 * **Fourier transforms of integrable functions**
-  (`FunctionSpaces/Wavelets/Daubechies/FourierIntegrable.lean`):
+  (`FunctionSpaces/Wavelets/Examples/Daubechies/FourierIntegrable.lean`):
   the fundamental lemma with Schwartz test functions on an open set, pointwise for continuous `f`
   (`Real.eqOn_zero_of_integral_mul_schwartz_eq_zero`); Mathlib's
   `IsOpen.ae_eq_zero_of_integral_contDiff_smul_eq_zero` tests with smooth compactly supported
   functions and concludes almost everywhere. Also the transform of differences
   `𝓕(Δ_h^r f)(ξ) = (e^(2πihξ) - 1)^r 𝓕 f(ξ)` (`Real.fourier_iterate_fwdDiff_apply`,
   `SobolevRegularity.lean`).
-* **Viète's product** (`FunctionSpaces/Wavelets/Daubechies/SymbolProduct.lean`):
+* **Viète's product** (`FunctionSpaces/Wavelets/Examples/Daubechies/SymbolProduct.lean`):
   `∏_{j ≥ 0} cos(x/2^(j+1)) = sinc x` (`Daubechies.tprod_cos`), with `|cos y - 1| ≤ y²/2`
   (`Daubechies.norm_cos_sub_one_le`) and the two-sided bound `|sinc x| ≤ 1/|x|`
   (`Daubechies.abs_sinc_le_inv_abs`, `SymbolDecay.lean`); Mathlib has Wallis's product and the
   one-sided `Real.sinc_le_inv_abs`.
 * **Poisson summation with vanishing coefficients**
-  (`FunctionSpaces/Wavelets/Daubechies/ScalingMoments.lean`):
+  (`FunctionSpaces/Wavelets/Examples/Daubechies/ScalingMoments.lean`):
   the periodisation `∑_n f(x + n)` of a continuous `f` vanishing outside a bounded interval, with
   `𝓕 f(n) = 0` for `n ≠ 0`, is the constant `∫ f` (`Real.tsum_comp_add_int_eq_integral`).
 * **Sums over overlapping sets and shifts in `ℓ_q(ℤ)`**
-  (`FunctionSpaces/Wavelets/Daubechies/Expansion.lean`, `ApproximationSpaces/Sequences/Hardy.lean`):
+  (`FunctionSpaces/Wavelets/Examples/Daubechies/Expansion.lean`,
+  `ApproximationSpaces/Sequences/Hardy.lean`):
   if every point lies in at most `M` of the sets `I_i`, then `∑_i ∫_{I_i} F ≤ M ∫ F`
   (`MeasureTheory.tsum_setLIntegral_le_mul_lintegral`); `ℓ_q(ℤ)` norms are invariant under
   shifts (`ENNReal.lqNorm_comp_add_int`).
 * **Derivatives of exponential sums in a real variable**
-  (`FunctionSpaces/Wavelets/Daubechies/FilterIdentities.lean`):
+  (`FunctionSpaces/Wavelets/Examples/Daubechies/FilterIdentities.lean`):
   `(d/dt)^l ∑_i a_i e^(b_i t) = ∑_i a_i b_i^l e^(b_i t)` for `t ∈ ℝ`
   (`Daubechies.iteratedDeriv_sum_mul_cexp`); Mathlib has these derivatives for a complex variable.
 * **Distributions and Schwartz functions** (`FunctionSpaces/Analysis/Fourier/SchwartzCutoff.lean`):

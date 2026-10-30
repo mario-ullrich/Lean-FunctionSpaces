@@ -967,12 +967,11 @@ $D x' + c a w = x' + (c - 1) a u + a (u + b e) - c a u = x' + a b e$.
 
 \begin{lemma}[The graph map]
 \label{lem:graph-map-area}
-\lean{Rd.LipschitzGraph.phiH, Rd.LipschitzGraph.graphMap_eq_graphOver,
-  Rd.LipschitzGraph.graphMap_injective, Rd.LipschitzGraph.lipschitzWith_phiH,
-  Rd.LipschitzGraph.continuous_phiH, Rd.LipschitzGraph.lipschitzWith_graphMap,
+\lean{Rd.LipschitzGraph.graphMap_eq_graphOver,
+  Rd.LipschitzGraph.graphMap_injective, Rd.LipschitzGraph.lipschitzWith_graphMap,
   Rd.LipschitzGraph.antilipschitzWith_graphMap, Rd.LipschitzGraph.measurableEmbedding_graphMap}
 \leanok
-\uses{def:graph-over, lem:graph-over}
+\uses{def:graph-over, lem:graph-over, def:graph-map}
 The graph map is the graph $\gamma = \gamma_{\varphi|_H}$ of the $M$-Lipschitz function
 $\varphi|_H$ over $H$. It is injective, $(1 + M)$-Lipschitz, satisfies
 $\|x' - y'\| \leq \|\gamma(x') - \gamma(y')\|$ for all $x', y' \in H$, and is a measurable
@@ -2005,82 +2004,19 @@ bounded, since $\|x\| \leq \sqrt{n}$ on it (Mathlib's
 
 A Besov domain (\Cref{def:besov-domain}) is a closed convex set with nonempty interior whose
 functions of finite intrinsic quasi-norm extend to $V$ with a bound. The extension alone makes
-sense on every measurable set. Rychkov's extension \cite{Rychkov} gives it on every Lipschitz
-graph domain, and it passes to sets that agree with such a domain up to a null set. Hence the
-closures of convex Lipschitz graph domains and the quadrant (the model of manifolds with corners)
-are Besov domains. The extension with a bound on bounded Lipschitz domains
-(\Cref{thm:bounded-lipschitz-besov}) gives the property there as well, and with it the closures of
-nonempty bounded open convex sets, such as closed balls of positive radius and the closed unit
-cube, are Besov domains. In this section $V$ is a finite-dimensional real inner product space, and
+sense on every measurable set (\Cref{def:besov-extension-property}). Rychkov's extension
+\cite{Rychkov} gives it on every Lipschitz graph domain, and it passes to sets that agree with such
+a domain up to a null set. Hence the closures of convex Lipschitz graph domains and the quadrant
+(the model of manifolds with corners) are Besov domains. The extension with a bound on bounded
+Lipschitz domains (\Cref{thm:bounded-lipschitz-besov}) gives the property there as well, and with
+it the closures of nonempty bounded open convex sets, such as closed balls of positive radius and
+the closed unit cube, are Besov domains. In this section $V$ is a finite-dimensional real inner
+product space, and
 \[
   N_\Omega(f; r) = \|f\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(f, 2^{-k}, \Omega)_p)_k\|_{\ell_q}
 \]
 is the intrinsic quasi-norm on a measurable set $\Omega \subseteq V$, with $N_\Omega(f) =
 N_\Omega(f; r)$ when the order $r$ is fixed.
-
-\begin{definition}[The extension property]
-\label{def:besov-extension-property}
-\lean{Rd.HasBesovExtension, Rd.BesovDomain.hasBesovExtension, Rd.BesovDomain.of_hasBesovExtension}
-\leanok
-\uses{def:besov-domain}
-A measurable set $\Omega \subseteq V$ has the extension property if for every $1 \leq p < \infty$,
-all $r \in \N$ and $s \in \R$ with $0 < s < r$, and every $1 \leq q \leq \infty$ there is
-$C < \infty$ such that every $f \in L_p(V)$ with $N_\Omega(f) < \infty$ agrees on $\Omega$ with
-some $F \in L_p(V)$ with $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq
-C N_\Omega(f)$. For every closed convex set $\Omega \subseteq V$ with nonempty interior, $\Omega$ is
-a Besov domain if and only if $\Omega$ has the extension property.
-\end{definition}
-
-The extension property is the extension condition of \Cref{def:besov-domain} without convexity.
-It is the same for sets that agree up to a null set, and it makes the order of the differences a
-free parameter, as on a Besov domain (\Cref{thm:besov-domain-invariance}). DeVore and Sharpley
-define Besov spaces on domains by the same moduli $\omega_r(f, t, \Omega)_p$ and construct
-extension operators to $\R^d$ on Lipschitz graph domains \cite[Section~4]{DeVoreSharpley} and on
-$(\varepsilon, \delta)$-domains \cite[Section~5]{DeVoreSharpley}.
-
-\begin{lemma}[The extension property up to null sets]
-\label{lem:besov-extension-null-sets}
-\lean{Rd.HasBesovExtension.congr_set, Rd.BesovDomain.of_ae_eq, Rd.BesovDomain.range_of_ae_eq}
-\leanok
-\uses{def:besov-extension-property, lem:null-set-domains}
-For all measurable sets $U, U' \subseteq V$ that agree up to a null set, if $U$ has the extension
-property, then so does $U'$. For every closed convex set $\Omega \subseteq V$ with nonempty
-interior and every measurable set $U \subseteq V$ with the extension property that agrees with
-$\Omega$ up to a null set, $\Omega$ is a Besov domain. For
-every real model with corners $I$ with model vector space $V$ and every measurable set
-$U \subseteq V$ with the extension property that agrees with $\operatorname{range} I$ up to a null
-set, $\operatorname{range} I$ is a Besov domain.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The cut-offs $1_U f$, $1_{U'} f$ and the moduli on $U$ and $U'$ agree (\Cref{lem:null-set-domains}),
-so $N_U = N_{U'}$, and $F$ agrees with $f$ on $U$ if and only if it does on $U'$; the proof keeps
-the constant $C$. The range of a real model with corners is closed, convex and has nonempty
-interior (Mathlib's
-\texttt{ModelWithCorners.\allowbreak isClosed\_\allowbreak range},
-\texttt{ModelWithCorners.\allowbreak convex\_\allowbreak range} and
-\texttt{ModelWithCorners.\allowbreak nonempty\_\allowbreak interior}).
-\end{proof}
-
-\begin{corollary}[The order of the differences]
-\label{cor:besov-extension-order}
-\lean{Rd.HasBesovExtension.modNormOn_order_le}
-\leanok
-\uses{def:besov-extension-property, thm:rd-besov, lem:restriction-moduli}
-For every measurable set $\Omega \subseteq V$ with the extension property, every
-$1 \leq p < \infty$, all $r, r' \in \N$ and $s \in \R$ with $0 < s < r$ and $s < r'$, and every
-$1 \leq q \leq \infty$, there is $C < \infty$ with $N_\Omega(f; r') \leq C N_\Omega(f; r)$ for every
-$f \in L_p(V)$ with $N_\Omega(f; r) < \infty$.
-\end{corollary}
-
-\begin{proof}
-\leanok
-Extend $f$ to $F$ with $\|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \leq
-C_1 N_\Omega(f; r)$, change the order on $V$ (\Cref{thm:rd-besov}) and restrict,
-$N_\Omega(f; r') \leq \|F\|_p + \|(2^{ks} \omega_{r'}(F, 2^{-k})_p)_k\|_{\ell_q}$
-(\Cref{lem:restriction-moduli}).
-\end{proof}
 
 \paragraph{Lipschitz graph domains.}
 
@@ -2106,8 +2042,7 @@ frontier agrees with its closure up to a null set (Mathlib's \texttt{closure\_\a
 ae\_\allowbreak eq\_\allowbreak of\_\allowbreak null\_\allowbreak frontier}).
 \end{proof}
 
-The argument uses only the Lipschitz bound of $\varphi$; the preservation of the Lebesgue measure
-by the flattening (\Cref{lem:flattening}) uses $\varphi \in C^1$.
+The argument uses only the Lipschitz bound of $\varphi$.
 
 \begin{theorem}[Lipschitz graph domains and Besov domains]
 \label{thm:graph-besov-domain}
@@ -2316,8 +2251,9 @@ function on $H$.
   Rd.LipschitzGraph.proj_coe, Rd.LipschitzGraph.proj_e, Rd.LipschitzGraph.graphMap,
   Rd.LipschitzGraph.proj_graphMap, Rd.LipschitzGraph.inner_graphMap,
   Rd.LipschitzGraph.phi_graphMap, Rd.LipschitzGraph.norm_graphMap_sub_le,
-  Rd.LipschitzGraph.continuous_graphMap, Rd.LipschitzGraph.norm_sub_proj_le,
-  Rd.LipschitzGraph.graphMap_add_mem}
+  Rd.LipschitzGraph.continuous_graphMap, Rd.LipschitzGraph.phiH,
+  Rd.LipschitzGraph.lipschitzWith_phiH, Rd.LipschitzGraph.continuous_phiH,
+  Rd.LipschitzGraph.norm_sub_proj_le, Rd.LipschitzGraph.graphMap_add_mem}
 \leanok
 \uses{def:lipschitz-graph, lem:graph-cone}
 Let $P x = x - \langle x, e \rangle e$ be the orthogonal projection onto $H$ and
@@ -2325,12 +2261,69 @@ $\gamma(x') = x' + \phi(x') e$ for $x' \in H$. Then $H^\perp = \R e$,
 $\langle a, v \rangle = \langle a, P v \rangle$ for all $a \in H$ and $v \in V$,
 $P \gamma(x') = x'$,
 $\langle \gamma(x'), e \rangle = \phi(x') = \phi(\gamma(x'))$,
-$\|\gamma(x') - \gamma(y')\| \leq (1 + M) \|x' - y'\|$, $\|x' - Pc\| \leq \|\gamma(x') - c\|$, and
+$\|\gamma(x') - \gamma(y')\| \leq (1 + M) \|x' - y'\|$, the restriction $\phi|_H$ is
+$M$-Lipschitz, $\|x' - Pc\| \leq \|\gamma(x') - c\|$, and
 $\gamma(x') + K \subseteq \Omega$ for the cone $K$ of \Cref{lem:graph-cone}.
 \end{definition}
 
 The last property holds since a step $y \in K$ raises $\langle \cdot, e \rangle$ by more than
 $M \|Py\|$ and $\phi$ by at most $M \|Py\|$.
+
+The flattening of a graph domain straightens its boundary onto the hyperplane $H$, and the
+product and graph coordinates over $H$ write it as a shear along $e$.
+
+\begin{lemma}[Flattening and product coordinates]
+\label{lem:flattening}
+\lean{Rd.LipschitzGraph.flatten, Rd.LipschitzGraph.unflatten, Rd.LipschitzGraph.phi_sub_smul,
+  Rd.LipschitzGraph.unflatten_flatten, Rd.LipschitzGraph.flatten_unflatten,
+  Rd.LipschitzGraph.inner_flatten, Rd.LipschitzGraph.flattenEquiv,
+  Rd.LipschitzGraph.continuous_flatten, Rd.LipschitzGraph.continuous_unflatten,
+  Rd.LipschitzGraph.lipschitzWith_unflatten, Rd.LipschitzGraph.lipschitzWith_flatten,
+  Rd.LipschitzGraph.graph_subset_image_unflatten,
+  Rd.LipschitzGraph.contDiff_flatten, Rd.LipschitzGraph.contDiff_unflatten,
+  Rd.LipschitzGraph.fderiv_phi_e, Rd.LipschitzGraph.hasFDerivAt_flatten,
+  Rd.LipschitzGraph.det_fderiv_flatten, Rd.LipschitzGraph.lineEquiv,
+  Rd.LipschitzGraph.coe_lineEquiv, Rd.LipschitzGraph.prodEquiv,
+  Rd.LipschitzGraph.prodEquiv_apply, Rd.LipschitzGraph.measurePreserving_prodEquiv,
+  Rd.LipschitzGraph.graphShear, Rd.LipschitzGraph.measurePreserving_graphShear,
+  Rd.LipschitzGraph.graphEquiv, Rd.LipschitzGraph.graphEquiv_apply,
+  Rd.LipschitzGraph.measurePreserving_graphEquiv, Rd.LipschitzGraph.unflatten_eq,
+  Rd.LipschitzGraph.flatten_eq, Rd.LipschitzGraph.measurePreserving_unflatten,
+  Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz,
+  Rd.LipschitzGraph.measurePreserving_flatten}
+\leanok
+\uses{def:lipschitz-graph, def:graph-map}
+For a Lipschitz graph domain $\{x : \phi(x) < \langle x, e \rangle\}$ with $M$-Lipschitz
+$\phi$ the flattening $F(x) = x - \phi(x) e$ is a bijection of $V$ with inverse
+$y \mapsto y + \phi(y) e$ and $\langle F(x), e \rangle = \langle x, e \rangle - \phi(x)$.
+Both maps are $(1 + M)$-Lipschitz, and the graph $\{x : \phi(x) = \langle x, e \rangle\}$ lies
+in the image of $H$ under the inverse. The map $t \mapsto t e$ is a linear isometry of $\R$ onto
+$H^\perp = \R e$. The product coordinates $(x', t) \mapsto x' + t e$ and the graph coordinates
+$(x', t) \mapsto \gamma(x') + t e$ are measurable bijections of $H \times \R$ onto $V$ with
+measurable inverses that carry the product of the Lebesgue measures of $H$ and $\R$ to the
+Lebesgue measure of $V$, and $F^{-1}(x' + t e) = \gamma(x') + t e$ for every $x' \in H$ and
+every $t \in \R$. Both $F$ and $F^{-1}$ preserve the Lebesgue measure. For smooth $\phi$ both
+maps are smooth, and the derivative of $F$ has determinant $1$ at every point.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\phi$ is constant along $e$, so $\phi(x - \phi(x) e) = \phi(x)$ and $D\phi(x) e = 0$.
+The bounds $\|(y \pm \phi(y) e) - (z \pm \phi(z) e)\| \leq \|y - z\| +
+|\phi(y) - \phi(z)|$ give the Lipschitz constants, and a point $x$ of the graph is the image
+of $F(x) \in H$.
+The derivative $\mathrm{id} - e \otimes D\phi(x)$ is a transvection with determinant
+$1 - D\phi(x) e = 1$ (Mathlib's \texttt{LinearMap.transvection.det}).
+$V$ is the orthogonal sum of $H$ and $H^\perp = \R e$, and Mathlib's
+\texttt{Submodule.\allowbreak measurePreserving\_\allowbreak measurableEquivProd} carries
+$\mathcal H^n$, which is the Lebesgue measure of $V$, to the product of the Lebesgue measures of
+$H$ and $H^\perp$; $t \mapsto t e$ is an isometry of $\R$ onto $H^\perp$ and preserves the
+Lebesgue measures. The graph coordinates are the product coordinates after the shear
+$(x', t) \mapsto (x', t + \phi(x'))$, which translates each vertical line and so preserves the
+product measure. Finally $F^{-1}(x' + t e) = x' + \phi(x') e + t e$, so $F^{-1}$ is the graph
+coordinates after the inverse of the product coordinates, and $F$ the product coordinates after
+the inverse of the graph coordinates; all of them preserve the Lebesgue measure.
+\end{proof}
 
 \begin{lemma}[Traces of atoms]
 \label{lem:atom-traces}
@@ -7088,30 +7081,21 @@ flattening and $F^{-1}(y) = y + \varphi(y) e$ its inverse (\Cref{lem:flattening}
 \begin{lemma}[Flattening a Lipschitz graph domain]
 \label{lem:lipschitz-flattening}
 \lean{Rd.LipschitzGraph.mapsTo_flatten, Rd.LipschitzGraph.mapsTo_unflatten,
-  Rd.LipschitzGraph.mapsTo_unflatten_inter_ball, Rd.LipschitzGraph.unflatten_eq,
-  Rd.LipschitzGraph.flatten_eq, Rd.LipschitzGraph.measurePreserving_unflatten,
-  Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz}
+  Rd.LipschitzGraph.mapsTo_unflatten_inter_ball}
 \leanok
-\uses{lem:flattening, lem:graph-product-coordinates, def:half-space-reflection}
+\uses{lem:flattening, def:half-space-reflection}
 For every Lipschitz graph domain $G$ with $M$-Lipschitz $\varphi$, $F(G) \subseteq H_+$,
 $F^{-1}(H_+) \subseteq G$ and
-$F^{-1}(H_+ \cap B(0, R)) \subseteq G \cap B(0, \|F^{-1}(0)\| + (1 + M) R)$ for every $R \in \R$,
-and $F^{-1}(x' + t e) = \gamma(x') + t e$ for every $x' \in e^\perp$ and every $t \in \R$, with the
-graph map $\gamma$. Both $F$ and $F^{-1}$ preserve Lebesgue measure.
+$F^{-1}(H_+ \cap B(0, R)) \subseteq G \cap B(0, \|F^{-1}(0)\| + (1 + M) R)$ for every $R \in \R$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 $\langle F(x), e \rangle = \langle x, e \rangle - \varphi(x)$, and $F^{-1}$ is
-$(1 + M)$-Lipschitz (\Cref{lem:flattening}). Since
-$\varphi$ is constant along $e$, $F^{-1}(x' + t e) = x' + \varphi(x') e + t e$, so $F^{-1}$ is the
-graph coordinates after the inverse of the product coordinates, and $F$ the product
-coordinates after the inverse of the graph coordinates; all of them preserve Lebesgue measure
-(\Cref{lem:graph-product-coordinates}).
+$(1 + M)$-Lipschitz (\Cref{lem:flattening}).
 \end{proof}
 
-The flattening of \Cref{lem:flattening} preserves Lebesgue measure for $C^1$ graphs by the change
-of variables formula; the product coordinates give it for every Lipschitz graph.
+Both $F$ and $F^{-1}$ preserve Lebesgue measure (\Cref{lem:flattening}).
 
 \begin{definition}[The extension by reflection]
 \label{def:graph-reflection-extension}
@@ -7130,7 +7114,8 @@ $e^\perp$ (\Cref{def:half-space-reflection}).
   Rd.LipschitzGraph.reflectionExtension_of_mem, Rd.LipschitzGraph.reflectionExtension_of_lt,
   Rd.LipschitzGraph.measurePreserving_reflect}
 \leanok
-\uses{def:graph-reflection-extension, lem:half-space-reflection, lem:lipschitz-flattening}
+\uses{def:graph-reflection-extension, lem:half-space-reflection, lem:lipschitz-flattening,
+  lem:flattening}
 For every Lipschitz graph domain $G$, $R = F^{-1} \circ \sigma \circ F$, $R(R(x)) = x$ for every
 $x \in V$, and $R$ preserves Lebesgue measure. For every $u \colon V \to \C$, $E_G u(x) = u(x)$
 for every $x \in G$, and $E_G u(x) = u(R(x))$ for every $x$ with
@@ -7143,7 +7128,8 @@ $\sigma(F x) = F x - 2 (\langle x, e \rangle - \varphi(x)) e$ (\Cref{lem:half-sp
 \Cref{lem:lipschitz-flattening}), and $\varphi$ is constant along $e$, so
 $F^{-1}(\sigma(F x)) = R(x)$. The rest follows from \Cref{lem:half-space-reflection} and
 \Cref{lem:lipschitz-flattening}: $F(G) \subseteq H_+$, and $\sigma(F x) \in H_+$ if
-$\langle x, e \rangle < \varphi(x)$.
+$\langle x, e \rangle < \varphi(x)$. The maps $F$, $F^{-1}$ and $\sigma$ preserve Lebesgue measure
+(\Cref{lem:flattening}, \Cref{lem:half-space-reflection}).
 \end{proof}
 
 \begin{lemma}[The extension by reflection is linear]
@@ -7153,7 +7139,8 @@ $\langle x, e \rangle < \varphi(x)$.
   Rd.LipschitzGraph.reflectionExtensionLinearMap_apply,
   Rd.LipschitzGraph.reflectionExtension_congr_ae}
 \leanok
-\uses{def:graph-reflection-extension, lem:half-space-reflection, lem:lipschitz-flattening}
+\uses{def:graph-reflection-extension, lem:half-space-reflection, lem:lipschitz-flattening,
+  lem:flattening}
 For every Lipschitz graph domain $G$ the extension by reflection $E_G$ is linear, and for all
 $u, u' \colon V \to \C$ with $u = u'$ almost everywhere on $G$, $E_G u = E_G u'$ almost
 everywhere on $V$.
@@ -7165,7 +7152,7 @@ The even reflection is linear (\Cref{lem:half-space-reflection}), and so is the 
 $F^{-1}$ and $F$. The inverse flattening maps $H_+$ into $G$, so
 $u \circ F^{-1} = u' \circ F^{-1}$ almost everywhere on $H_+$; the flattening, its inverse and
 $\sigma$ preserve Lebesgue measure (\Cref{lem:half-space-reflection},
-\Cref{lem:lipschitz-flattening}), so they carry null sets to null sets.
+\Cref{lem:flattening}), so they carry null sets to null sets.
 \end{proof}
 
 For $g_i \colon V \to \C$ ($i \in I$) and $w, y \in V$ let
@@ -7183,8 +7170,8 @@ with the derivative $DF^{-1}(y)$ where it exists and $0$ elsewhere.
   Rd.LipschitzGraph.integrableOn_comp_unflatten_inter_ball,
   Rd.LipschitzGraph.integrableOn_flatDeriv_inter_ball}
 \leanok
-\uses{lem:lipschitz-flattening, thm:weak-derivative-chain-rule, lem:chain-rule-smooth,
-  lem:composition-measure-preserving}
+\uses{lem:lipschitz-flattening, lem:flattening, thm:weak-derivative-chain-rule,
+  lem:chain-rule-smooth, lem:composition-measure-preserving}
 Let $G$ be a Lipschitz graph domain with $M$-Lipschitz $\varphi$ and $g_i \colon V \to \C$
 ($i \in I$).
 \begin{enumerate}
@@ -7211,8 +7198,9 @@ Let $G$ be a Lipschitz graph domain with $M$-Lipschitz $\varphi$ and $g_i \colon
 $\|DF^{-1}(y)\| \leq 1 + M$ for the $(1 + M)$-Lipschitz $F^{-1}$ (Mathlib's
 \texttt{norm\_\allowbreak fderiv\_\allowbreak le\_\allowbreak of\_\allowbreak lipschitz}).
 (2) \Cref{thm:weak-derivative-chain-rule} for $F^{-1}$, which preserves Lebesgue measure and maps
-$H_+$ into $G$ (\Cref{lem:lipschitz-flattening}). (3) \Cref{lem:chain-rule-smooth} (3) and
-\Cref{lem:composition-measure-preserving}. (4) The same lemmas for $p = 1$ with the sets
+$H_+$ into $G$ (\Cref{lem:flattening}, \Cref{lem:lipschitz-flattening}).
+(3) \Cref{lem:chain-rule-smooth} (3) and \Cref{lem:composition-measure-preserving}. (4) The same
+lemmas for $p = 1$ with the sets
 $H_+ \cap B(0, R)$ and $G \cap B(0, \|F^{-1}(0)\| + (1 + M) R)$, the second containing the
 image of the first (\Cref{lem:lipschitz-flattening}).
 \end{proof}
@@ -8426,33 +8414,19 @@ directional derivatives vanishes.
 
 \paragraph{Product coordinates.}
 
-\begin{lemma}[Product coordinates]
+\begin{lemma}[The domain in product coordinates]
 \label{lem:graph-product-coordinates}
-\lean{Rd.LipschitzGraph.lineEquiv, Rd.LipschitzGraph.coe_lineEquiv, Rd.LipschitzGraph.prodEquiv,
-  Rd.LipschitzGraph.prodEquiv_apply, Rd.LipschitzGraph.measurePreserving_prodEquiv,
-  Rd.LipschitzGraph.graphShear, Rd.LipschitzGraph.measurePreserving_graphShear,
-  Rd.LipschitzGraph.graphEquiv, Rd.LipschitzGraph.graphEquiv_apply,
-  Rd.LipschitzGraph.measurePreserving_graphEquiv, Rd.LipschitzGraph.prodEquiv_mem_domain_iff,
+\lean{Rd.LipschitzGraph.prodEquiv_mem_domain_iff,
   Rd.LipschitzGraph.graphMap_add_smul_mem_domain_iff}
 \leanok
-\uses{def:lipschitz-graph, def:graph-map}
-The map $t \mapsto t e$ is a linear isometry of $\R$ onto $H^\perp = \R e$. The maps
-$(x', t) \mapsto x' + t e$ and $(x', t) \mapsto \gamma(x') + t e$ are measurable
-bijections of $H \times \R$ onto $V$ with measurable inverses that carry the product of the
-Lebesgue measures of $H$ and $\R$ to the Lebesgue measure of $V$. For every $x' \in H$ and every
-$t \in \R$, $x' + t e \in \Omega$ if and only if $\varphi(x') < t$, and
-$\gamma(x') + t e \in \Omega$ if and only if $t > 0$.
+\uses{def:lipschitz-graph, lem:flattening}
+For every $x' \in H$ and every $t \in \R$, $x' + t e \in \Omega$ if and only if
+$\varphi(x') < t$, and $\gamma(x') + t e \in \Omega$ if and only if $t > 0$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-$V$ is the orthogonal sum of $H$ and $H^\perp = \R e$, and Mathlib's
-\texttt{Submodule.\allowbreak measurePreserving\_\allowbreak measurableEquivProd} carries
-$\mathcal H^n$, which is the Lebesgue measure of $V$, to the product of the Lebesgue measures of
-$H$ and $H^\perp$; $t \mapsto t e$ is an isometry of $\R$ onto $H^\perp$ and preserves the
-Lebesgue measures. The second map is the first after the shear
-$(x', t) \mapsto (x', t + \varphi(x'))$, which translates each vertical line and so preserves the
-product measure. Finally $\varphi(x' + t e) = \varphi(x')$, $\langle x' + t e, e \rangle = t$ and
+$\varphi(x' + t e) = \varphi(x')$, $\langle x' + t e, e \rangle = t$ and
 $\gamma(x') + t e = x' + (\varphi(x') + t) e$.
 \end{proof}
 
@@ -8461,7 +8435,7 @@ $\gamma(x') + t e = x' + (\varphi(x') + t) e$.
 \lean{Rd.LipschitzGraph.setIntegral_domain_eq_of_measurePreserving,
   Rd.LipschitzGraph.setIntegral_domain_eq, Rd.LipschitzGraph.setIntegral_domain_eq_graphMap}
 \leanok
-\uses{lem:graph-product-coordinates}
+\uses{lem:flattening, lem:graph-product-coordinates}
 For every real Banach space $E$ and every $F \colon V \to E$ integrable on $\Omega$,
 \[
   \int_\Omega F = \int_H \int_{\varphi(x')}^\infty F(x' + t e) \, dt \, dx'
@@ -8479,8 +8453,9 @@ For a measure preserving bijection $T$ of $H \times \R$ onto $V$ with $T(x', t) 
 and only if $a(x') < t$, the change of variables and Fubini's theorem (Mathlib's
 \texttt{MeasurePreserving.\allowbreak integral\_\allowbreak comp'} and
 \texttt{integral\_\allowbreak prod}) applied to $\mathbf 1_\Omega F$ give
-$\int_\Omega F = \int_H \int_{a(x')}^\infty F(T(x', t)) \, dt \, dx'$. The two maps of
-\Cref{lem:graph-product-coordinates} have $a = \varphi$ and $a = 0$.
+$\int_\Omega F = \int_H \int_{a(x')}^\infty F(T(x', t)) \, dt \, dx'$. The product and graph
+coordinates of \Cref{lem:flattening} have $a = \varphi$ and $a = 0$
+(\Cref{lem:graph-product-coordinates}).
 \end{proof}
 
 \paragraph{Ray integrals.}
@@ -9830,37 +9805,8 @@ F(\Phi_{ik} y)$. The changes of charts are bounded into the intrinsic space on $
 
 \section{Smooth bounded domains}
 
-\begin{lemma}[Flattening a graph domain]
-\label{lem:flattening}
-\lean{Rd.LipschitzGraph.flatten, Rd.LipschitzGraph.unflatten, Rd.LipschitzGraph.phi_sub_smul,
-  Rd.LipschitzGraph.unflatten_flatten, Rd.LipschitzGraph.flatten_unflatten,
-  Rd.LipschitzGraph.inner_flatten, Rd.LipschitzGraph.flattenEquiv,
-  Rd.LipschitzGraph.continuous_flatten, Rd.LipschitzGraph.continuous_unflatten,
-  Rd.LipschitzGraph.lipschitzWith_unflatten, Rd.LipschitzGraph.lipschitzWith_flatten,
-  Rd.LipschitzGraph.graph_subset_image_unflatten,
-  Rd.LipschitzGraph.contDiff_flatten, Rd.LipschitzGraph.contDiff_unflatten,
-  Rd.LipschitzGraph.fderiv_phi_e, Rd.LipschitzGraph.hasFDerivAt_flatten,
-  Rd.LipschitzGraph.det_fderiv_flatten, Rd.LipschitzGraph.measurePreserving_flatten}
-\leanok
-\uses{def:lipschitz-graph}
-For a Lipschitz graph domain $\{x : \varphi(x) < \langle x, e \rangle\}$ with $M$-Lipschitz
-$\varphi$ the flattening $F(x) = x - \varphi(x) e$ is a bijection of $V$ with inverse
-$y \mapsto y + \varphi(y) e$ and $\langle F(x), e \rangle = \langle x, e \rangle - \varphi(x)$.
-Both maps are $(1 + M)$-Lipschitz, and the graph $\{x : \varphi(x) = \langle x, e \rangle\}$ lies
-in the image of $e^\perp$ under the inverse. For smooth $\varphi$ both maps are smooth and $F$
-preserves the Lebesgue measure.
-\end{lemma}
-
-\begin{proof}
-\leanok
-$\varphi$ is constant along $e$, so $\varphi(x - \varphi(x) e) = \varphi(x)$ and $D\varphi(x) e = 0$.
-The bounds $\|(y \pm \varphi(y) e) - (z \pm \varphi(z) e)\| \leq \|y - z\| +
-|\varphi(y) - \varphi(z)|$ give the Lipschitz constants, and a point $x$ of the graph is the image
-of $F(x) \in e^\perp$.
-The derivative $\mathrm{id} - e \otimes D\varphi(x)$ is a transvection with determinant
-$1 - D\varphi(x) e = 1$ (Mathlib's \texttt{LinearMap.transvection.det}), and the change of variables
-formula gives $F_* \mathrm{vol} = \mathrm{vol}$.
-\end{proof}
+The boundary charts of a smooth bounded domain flatten its graph patches
+(\Cref{lem:flattening}).
 
 \begin{definition}[Smooth bounded domains]
 \label{def:smooth-domain}

@@ -7,7 +7,7 @@ module
 
 public import FunctionSpaces.Wavelets.Filtration
 public import FunctionSpaces.Wavelets.Partition
-public import FunctionSpaces.Interval.PiecewisePoly
+public import FunctionSpaces.Domains.Interval.PiecewisePoly
 public import ApproximationSpaces.Decompositions.Atomic
 public import Mathlib.MeasureTheory.Function.Floor
 public import Mathlib.MeasureTheory.Measure.Lebesgue.Basic

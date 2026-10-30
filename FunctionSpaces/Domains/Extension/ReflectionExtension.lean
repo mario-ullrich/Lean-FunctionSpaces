@@ -16,11 +16,11 @@ public import FunctionSpaces.Domains.Lipschitz.GraphStraightening
 Let `Ω = {x : φ(x) < ⟪x, e⟫}` be a Lipschitz graph domain (`Rd.LipschitzGraph`) with the
 flattening `F(x) = x - φ(x) e` and its inverse `F⁻¹(y) = y + φ(y) e`.
 
-* **Flattening** (`Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz`,
-  `Rd.LipschitzGraph.measurePreserving_unflatten`): `F` and `F⁻¹` preserve Lebesgue measure,
-  since they are shears along `e` in the coordinates `Rd.LipschitzGraph.prodEquiv` and
-  `Rd.LipschitzGraph.graphEquiv`; `F` maps `Ω` into the half-space `H₊ = {⟪y, e⟫ > 0}` and `F⁻¹`
-  maps `H₊ ∩ B(0, R)` into `Ω ∩ B(0, R')`.
+* **Flattening** (`Rd.LipschitzGraph.mapsTo_flatten`,
+  `Rd.LipschitzGraph.mapsTo_unflatten_inter_ball`): `F` maps `Ω` into the half-space
+  `H₊ = {⟪y, e⟫ > 0}` and `F⁻¹` maps `H₊ ∩ B(0, R)` into `Ω ∩ B(0, R')`. Both preserve Lebesgue
+  measure (`Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz`,
+  `Rd.LipschitzGraph.measurePreserving_unflatten`).
 * **The extension by reflection** (`Rd.LipschitzGraph.reflectionExtension`): the even reflection
   (`Rd.evenReflection`) of `f ∘ F⁻¹` across `e^⊥`, composed with `F`. It is `f` on `Ω` and
   `f ∘ R` below the graph, for the graph reflection `R = F⁻¹ ∘ σ ∘ F`
@@ -87,43 +87,6 @@ theorem mapsTo_unflatten_inter_ball (R : ℝ) :
     (Ω.lipschitzWith_unflatten.mapsTo_ball hK 0 R hy.2)⟩
   show (1 + Ω.M) * R + dist (Ω.unflatten 0) 0 ≤ ‖Ω.unflatten 0‖ + (1 + Ω.M) * R
   rw [dist_zero_right, add_comm]
-
-variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
-
-/-- **The inverse flattening in coordinates**: `y ↦ y + φ(y) e` is the graph coordinates
-`(x', t) ↦ γ(x') + t e` after the inverse of the product coordinates `(x', t) ↦ x' + t e`, since
-`φ` is constant along `e`. -/
-theorem unflatten_eq : Ω.unflatten = Ω.graphEquiv ∘ Ω.prodEquiv.symm := by
-  funext y
-  have hy : y = ((Ω.prodEquiv.symm y).1 : V) + (Ω.prodEquiv.symm y).2 • Ω.e := by
-    rw [← prodEquiv_apply, MeasurableEquiv.apply_symm_apply]
-  rw [Function.comp_apply, graphEquiv_apply, graphMap, unflatten]
-  conv_lhs => rw [hy, Ω.const]
-  abel
-
-/-- **The flattening in coordinates**: `x ↦ x - φ(x) e` is the product coordinates after the
-inverse of the graph coordinates (`Rd.LipschitzGraph.unflatten_eq`). -/
-theorem flatten_eq : Ω.flatten = Ω.prodEquiv ∘ Ω.graphEquiv.symm := by
-  funext x
-  have h : Ω.unflatten (Ω.prodEquiv (Ω.graphEquiv.symm x)) = x := by
-    rw [unflatten_eq, Function.comp_apply, MeasurableEquiv.symm_apply_apply,
-      MeasurableEquiv.apply_symm_apply]
-  conv_lhs => rw [← h]
-  rw [Function.comp_apply, flatten_unflatten]
-
-/-- **The inverse flattening preserves the Lebesgue measure** for every Lipschitz graph
-(`Rd.LipschitzGraph.measurePreserving_graphEquiv`, `Rd.LipschitzGraph.measurePreserving_prodEquiv`):
-it is a shear along `e` in the product coordinates. -/
-theorem measurePreserving_unflatten : MeasurePreserving Ω.unflatten volume volume := by
-  rw [unflatten_eq]
-  exact Ω.measurePreserving_graphEquiv.comp Ω.measurePreserving_prodEquiv.symm
-
-/-- **The flattening preserves the Lebesgue measure** for every Lipschitz graph, the inverse of
-`Rd.LipschitzGraph.measurePreserving_unflatten`; `Rd.LipschitzGraph.measurePreserving_flatten`
-is the case of a `C^1` graph by the change of variables formula. -/
-theorem measurePreserving_flatten_of_lipschitz : MeasurePreserving Ω.flatten volume volume := by
-  rw [flatten_eq]
-  exact Ω.measurePreserving_prodEquiv.comp Ω.measurePreserving_graphEquiv.symm
 
 end Flattening
 

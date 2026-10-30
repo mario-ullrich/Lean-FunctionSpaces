@@ -626,8 +626,10 @@ interpolation of operators); `MeasureSpaces/` holds the Besov and Sobolev spaces
 finite measure space; `Rd/` holds the spaces on `ℝ^d` with one folder per characterisation
 (approximation, Littlewood–Paley blocks, differences, local means, atoms, Triebel–Lizorkin
 spaces, vector-valued singular integrals, weak derivatives, Bessel potentials, interpolation,
-mixed smoothness); `Domains/` holds Lipschitz domains, extensions, traces, Sobolev spaces on domains
-and compact manifolds; `Torus/`, `Interval/`, `Cube/` and `Wavelets/` hold the other settings.
+mixed smoothness); `Domains/` holds Lipschitz domains, extensions, traces, Sobolev spaces on
+domains, compact manifolds, intervals and the cube; `Torus/` holds the torus; `Wavelets/` holds
+filtrations and martingale differences, with the examples (Haar, multiwavelets, Daubechies
+wavelets) in `Wavelets/Examples/`.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 [docs/FEECInterface.md](docs/FEECInterface.md) describes the interface to a FEEC/BEEC library
