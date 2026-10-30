@@ -918,7 +918,7 @@ Section 4.12, and `ker γ = H^1_0(Ω)`, with its Lean names in Section 4.13.
   `Rd.BoundedLipschitzDomain.isBoundaryTrace_unique_of_memWeakSobolev`), and Rychkov's extension
   operator with local means of the gradient gives Rellich's theorem in the weak-derivative form
   (`Rd.BoundedLipschitzDomain.exists_subseq_tendsto_of_memWeakSobolev`). Files
-  `FunctionSpaces/Domains/Extension/DivergenceKernels.lean`,
+  `FunctionSpaces/Rd/Sobolev/DivergenceKernels.lean`,
   `FunctionSpaces/Domains/Extension/SobolevExtension.lean`,
   `FunctionSpaces/Domains/Extension/SobolevExtensionOperator.lean`,
   `FunctionSpaces/Domains/Extension/ReflectionExtensionOperator.lean` and

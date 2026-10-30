@@ -757,7 +757,8 @@ variable {X Y : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X] [NormedAddComm
 
 /-- **The reiteration theorem for a bounded linear map** `ι : Y → X`: for `0 < θ₀ < θ₁ < 1`,
 `0 < η < 1` and `q₀, q₁, q ≥ 1`, `((X, Y)_{θ₀,q₀}, (X, Y)_{θ₁,q₁})_{η,q} = (X, Y)_{θ,q}` with
-`θ = (1 - η) θ₀ + η θ₁`, for the continuous K-norms of `ApproximationSpaces.KMethod`. -/
+`θ = (1 - η) θ₀ + η θ₁`, for the continuous K-norms of
+`ApproximationSpaces.Interpolation.KMethod`. -/
 theorem memKMethod_reiteration (hθ₀ : 0 < θ₀) (hθ : θ₀ < θ₁) (hθ₁ : θ₁ < 1) (hη : 0 < η)
     (hη' : η < 1) (hq₀ : 1 ≤ q₀) (hq₁ : 1 ≤ q₁) (hq : 1 ≤ q) {f : X} :
     (⟨kMethodNorm ι θ₀ q₀, kMethodNorm ι θ₁ q₁⟩ : InterpCouple X).MemKMethod η q f ↔

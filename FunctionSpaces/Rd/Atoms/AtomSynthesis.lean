@@ -7,8 +7,8 @@ module
 
 public import FunctionSpaces.Analysis.Maximal.HardyLittlewoodMaximal
 public import FunctionSpaces.Rd.LocalMeans.LocalMeans
-public import FunctionSpaces.Rd.LocalMeans.Multipliers
-public import FunctionSpaces.Rd.Differences.DomainModuli
+public import FunctionSpaces.Rd.Differences.PointwiseMultipliers
+public import FunctionSpaces.Analysis.Differences.DomainModuli
 
 /-!
 # Atomic synthesis

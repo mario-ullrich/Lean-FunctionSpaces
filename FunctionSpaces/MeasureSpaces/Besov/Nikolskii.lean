@@ -5,8 +5,9 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.MeasureSpaces.Besov.Trivial
+public import FunctionSpaces.MeasureSpaces.Besov.ElementaryEmbeddings
 public import FunctionSpaces.Analysis.Lp.Interpolation
+public import ApproximationSpaces.Lift
 
 /-!
 # The Nikolskii inequality of a scheme

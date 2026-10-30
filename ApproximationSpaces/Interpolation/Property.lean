@@ -30,7 +30,7 @@ K-norms and the same interpolation spaces (`InterpCouple.kMethodNorm_le_of_le`,
 interpolation space (`InterpCouple.memKMethod_iff_of_retract`,
 `InterpCouple.memKMethod_iff_exists_map_eq`, Bergh–Löfström, Theorem 6.4.2);
 and for bounded linear maps `T : X → X'`, `S : Y → Y'` with `T ι = ι' S`, the map `T` is bounded
-between the spaces of `ApproximationSpaces.KMethod`
+between the spaces of `ApproximationSpaces.Interpolation.KMethod`
 (`ApproximationScheme.kMethodNorm_map_le_of_comp_eq`, `ApproximationScheme.MemInterp.map`).
 -/
 

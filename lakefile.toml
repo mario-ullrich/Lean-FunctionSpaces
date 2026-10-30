@@ -10,8 +10,10 @@ version = "git#v4.35.0-rc2"
 
 # The abstract theory of approximation spaces in the sense of Pietsch: approximation
 # schemes in a normed space, the errors of best approximation, the spaces A^s_q, embeddings,
-# transfer theorems, Jackson and Bernstein inequalities and real interpolation. Nothing here
-# mentions functions or measures.
+# transfer theorems, Jackson and Bernstein inequalities and real interpolation. Functions enter
+# only as sequences and through the K-functional: the ℓ_q norms are L_q norms for the counting
+# measure, the continuous K-method integrates against dt/t on (0, ∞), and Sequences/Lq compares
+# L_q norms with ℓ_q norms on any measure space.
 [[lean_lib]]
 name = "ApproximationSpaces"
 

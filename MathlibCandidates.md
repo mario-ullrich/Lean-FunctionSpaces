@@ -17,7 +17,7 @@ declarations.
   forms with `c^(1/q) ‖a‖_{ℓ_q}` (`MeasureTheory.lintegral_le_of_le_on_pieces`,
   `MeasureTheory.le_lintegral_of_le_on_pieces`, `MeasureTheory.eLpNorm_le_of_le_on_pieces`,
   `MeasureTheory.le_eLpNorm_of_le_on_pieces`).
-* **The K-method** (`ApproximationSpaces/KMethod.lean`): the change of scale
+* **The K-method** (`ApproximationSpaces/Interpolation/KMethod.lean`): the change of scale
   `K(c t, f) ≤ max(1, c) K(t, f)` (`ApproximationScheme.kFunctional_mul_le`); for every increasing
   `φ` and `θ ≥ 0`, the comparison of the functional `Φ_{θ,q}(φ)` with its discrete version on the
   grid `2^(nρ)`, `n ∈ ℤ` (`ApproximationScheme.phiFunctional_le_lqNorm_discretePhiSeq`,
@@ -108,19 +108,20 @@ declarations.
   (`FunctionSpaces/Analysis/Lp/BoundedContinuous.lean`): for a measure charging open sets,
   `‖toLp ∞ μ a‖ = ‖a‖`, and the range is closed (`BoundedContinuousFunction.norm_toLp_top`,
   `.isClosed_range_toLp_top`).
-* **Conditional expectation on `L_p`** (`FunctionSpaces/Wavelets/Filtration.lean`): for a finite
-  measure and `1 ≤ p ≤ ∞`, `E[· | m]` as a contraction `Lp E p μ →L Lp E p μ`
+* **Conditional expectation on `L_p`**
+  (`FunctionSpaces/MeasureSpaces/Martingales/Filtration.lean`): for a finite measure and
+  `1 ≤ p ≤ ∞`, `E[· | m]` as a contraction `Lp E p μ →L Lp E p μ`
   (`MeasureTheory.Lp.condExpLp`); Mathlib bundles it only on `L_1` and `L_2`.
 * **Conditional expectation onto a countable partition**
-  (`FunctionSpaces/Wavelets/Partition.lean`): for `φ : α → ι` with `ι` countable, measurable
-  fibres and a finite measure, `μ[f | MeasurableSpace.comap φ ⊤]` is a.e. the average of `f`
-  over the fibre through the point (`MeasureTheory.condExp_comap_ae_eq`).
+  (`FunctionSpaces/MeasureSpaces/Martingales/Partition.lean`): for `φ : α → ι` with `ι` countable,
+  measurable fibres and a finite measure, `μ[f | MeasurableSpace.comap φ ⊤]` is a.e. the average
+  of `f` over the fibre through the point (`MeasureTheory.condExp_comap_ae_eq`).
 * **Fourier analysis on the torus** (`FunctionSpaces/Torus/Translation.lean`): the Fourier
   coefficients of a translate, `(τ_h f)^(k) = e_k(h) f̂(k)`
   (`Torus.mFourierCoeff_translate`), and `|∏ aᵢ - 1| ≤ ∑ |aᵢ - 1|` for unimodular `aᵢ`
   (`Torus.norm_prod_sub_one_le`). Mathlib's measure on `UnitAddCircle` is a local instance
   in `Mathlib/Analysis/Fourier/AddCircleMulti.lean`, so `mFourierBasis` cannot be used
-  outside that file without re-declaring it (`FunctionSpaces/Torus/Measure.lean`); worth
+  outside that file without re-declaring it (`FunctionSpaces/Torus/HaarMeasure.lean`); worth
   reporting upstream.
 * **Differences of polynomials by derivatives**
   (`FunctionSpaces/Domains/Interval/PolyDifferences.lean`):
@@ -164,7 +165,7 @@ declarations.
   (`Rd.modulus_mul_le`), and `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost everywhere
   (`Rd.higherDiff_conv_ae`); the modulus on a subset `U`, with the differences restricted to the
   points `x` with `x, …, x + rh ∈ U` (`Rd.modulusOn`,
-  `FunctionSpaces/Rd/Differences/DomainModuli.lean`).
+  `FunctionSpaces/Analysis/Differences/DomainModuli.lean`).
 * **Sobolev–Slobodeckij norms** (`FunctionSpaces/Rd/Differences/SobolevSlobodeckij.lean`):
   Mathlib has no fractional Sobolev spaces. The Gagliardo form
   `∫∫ |f(y) - f(x)|^p / |y - x|^(n+sp) dy dx` on a finite-dimensional inner product space
@@ -178,7 +179,7 @@ declarations.
   `integrableOn_ball_of_norm_le_rpow`. The Lean project *quadratic-forms-sobolev-lean* has the
   form for `p = 2` (`formHs`); *grunweg/SobolevSlobodeckij* has integer orders only.
 * **Leibniz's rule for iterated forward differences**
-  (`FunctionSpaces/Rd/LocalMeans/Multipliers.lean`):
+  (`FunctionSpaces/Rd/Differences/PointwiseMultipliers.lean`):
   `Δ_h^r(u v)(x) = ∑_{l ≤ r} C(r, l) Δ_h^l u(x) Δ_h^(r-l) v(x + l h)` (`Rd.higherDiff_mul`); Mathlib
   has only the one-step `fwdDiff_smul`. Also `‖Δ_h^l G(x)‖ ≤ C ‖h‖^l` for `G` of class `C^l` with
   `‖D^l G‖ ≤ C` on the segment from `x` to `x + l h` (`Rd.norm_higherDiff_le_of_segment`), and its
@@ -188,7 +189,7 @@ declarations.
   `ContDiff` functions, from Mathlib's manifold version, its form equal to `1` on a neighbourhood of
   a compact set (`Rd.exists_smooth_partition_nhds`), and bounded derivatives of compactly supported
   smooth functions (`Rd.exists_iteratedFDeriv_bound`,
-  `FunctionSpaces/Rd/LocalMeans/Multipliers.lean`).
+  `FunctionSpaces/Rd/Differences/PointwiseMultipliers.lean`).
 * **Multiplication by an indicator on `L_p`** (`FunctionSpaces/Analysis/Lp/IndicatorOperator.lean`):
   for a measurable set `s`, `g ↦ 1_s g` as a continuous linear operator of norm at most `1` on
   `Lp ℂ p μ` (`Rd.indicatorLp`). Mathlib has `indicatorConstLp` for constant functions.
@@ -525,7 +526,7 @@ declarations.
   finite-dimensional inner product space agrees on `B(0, r/4)` with a smooth Lipschitz function on
   the whole space (`Rd.exists_contDiff_lipschitzWith_eqOn_ball`).
 * **Smoothness of parametric integrals**
-  (`FunctionSpaces/Domains/Extension/DivergenceKernels.lean`): if `(x, t) ↦ F(x, t)` is smooth on
+  (`FunctionSpaces/Rd/Sobolev/DivergenceKernels.lean`): if `(x, t) ↦ F(x, t)` is smooth on
   `H × ℝ`, `H` finite dimensional, then `x ↦ ∫_a^b F(x, t) dt` is smooth
   (`intervalIntegral.contDiff_parametric_intervalIntegral_of_contDiff`), with the derivative under
   the integral sign for jointly `C^1` integrands

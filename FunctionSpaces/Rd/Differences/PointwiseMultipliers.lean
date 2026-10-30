@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Rd.LittlewoodPaley.BesovDifferences
+public import FunctionSpaces.Rd.Differences.BesovDifferences
 
 /-!
 # Pointwise multipliers on `V`

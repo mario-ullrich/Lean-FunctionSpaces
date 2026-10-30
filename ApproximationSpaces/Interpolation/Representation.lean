@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import ApproximationSpaces.KFunctional
+public import ApproximationSpaces.Interpolation.KFunctional
 public import ApproximationSpaces.Sequences.Hardy
 
 /-!
@@ -19,8 +19,8 @@ Let `ι : Y → X` satisfy Jackson's and Bernstein's inequalities of order `r > 
 (DeVore–Lorentz, Chapter 7, Theorem 9.1; Pietsch), where `(X, Y)_{s/r, q}` is the discrete
 K-method on the grid `t = 2^(-kr)` (`ApproximationScheme.MemInterp`); the same space comes from
 the continuous K-method `(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)`
-(`ApproximationScheme.memApprox_iff_memKMethod` in `ApproximationSpaces.KMethod`).  The two
-halves:
+(`ApproximationScheme.memApprox_iff_memKMethod` in
+`ApproximationSpaces.Interpolation.KMethod`).  The two halves:
 
 * **Jackson** (`approxNormDyadic_le_interpNorm_of_jackson`):
   `E_n(f) ≤ max(1, C) K(n^(-r), f)` (`approxError_le_kFunctional_of_jackson`), so at the

@@ -121,7 +121,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| The torus: trigonometric polynomials and their uniform density, Nikolskii inequality | ✅ | ✗ | `Torus/Measure`, `Torus/Scheme`, `Torus/Nikolskii` |
+| The torus: trigonometric polynomials and their uniform density, Nikolskii inequality | ✅ | ✗ | `Torus/HaarMeasure`, `Torus/TrigPolynomials`, `Torus/Nikolskii` |
 | The torus: `H^s(𝕋^d)`, Besov and Sobolev embeddings, `H^s(𝕋^d) ↪ C(𝕋^d)` | ✅ | ✗ | `Torus/Sobolev`, `Torus/Embeddings` |
 | Fourier-coefficient characterisations, `H^s(𝕋^d) = B^s_{2,2}(𝕋^d)` | ✅ | ✗ | `Torus/Coefficients` |
 | The Fourier basis as a continuous spectral basis with the local Weyl bound | ✅ | ✗ | `Torus/FourierSpectralBasis` |

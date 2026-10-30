@@ -5,8 +5,8 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Domains.Cube.Translation
-public import FunctionSpaces.Rd.Differences.DomainModuli
+public import FunctionSpaces.Domains.Cube.IsoDifferences
+public import FunctionSpaces.Analysis.Differences.DomainModuli
 
 /-!
 # The isotropic modulus of smoothness on the cube

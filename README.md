@@ -597,14 +597,14 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | Block | Lean | Checked |
 |---|---|---|
 | [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, couples, their K-method, the interpolation property and the reiteration theorem, approximation spaces as interpolation spaces, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
-| [**Besov and Sobolev spaces on measure spaces**](docs/MeasureSpaces.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, Besov spaces as interpolation spaces, spectral schemes, continuous spectral bases | ✅ | ✗ |
+| [**Besov and Sobolev spaces on measure spaces**](docs/MeasureSpaces.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, Besov spaces as interpolation spaces, spectral schemes, continuous spectral bases, filtrations and martingale differences | ✅ | ✗ |
 | [**Tools from analysis**](docs/Analysis.md): `L_p` norms, the inclusion `L_r ↪ L_p`, Young's inequality, mixed norms, differences and the translation algebra, convolution, approximate identities, Littlewood–Paley kernels, test functions in the Schwartz space, dyadic cubes and cells, the Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, weak type and Marcinkiewicz interpolation, `L_p` norms by duality | ✅ | ✗ |
 | [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness and smooth Littlewood–Paley blocks for all `p`, interpolation of Besov spaces by differences, `W^m_2` by Fourier multipliers, weak derivatives in `L_p` as distributional derivatives of the periodic lifts, `W^m_p = F^m_{p,2}` for `1 < p < ∞` with the Besov sandwich and the Sobolev embeddings, the trace on a face, the restriction for continuous functions | ✅ | ✗ |
 | [**Intervals, the cube, splines and wavelets**](docs/IntervalCube.md): piecewise polynomials and splines on `[0, 1]`, the circle and `[0, 1]^d`, Whitney's inequality, coordinate and isotropic moduli, multiwavelets, the Haar system | ✅ | ✗ |
 | [**Daubechies wavelets**](docs/Daubechies.md): masks of every order by Fejér–Riesz, the scaling function and its orthonormal translates, Sobolev and Hölder regularity, the D4 Hölder exponent, the multiresolution analysis, Jackson and Bernstein inequalities, Besov spaces by Daubechies coefficients | ✅ | ✗ |
-| [**Besov spaces on `ℝ^d`**](docs/Rd.md): band-limited approximation, Littlewood–Paley blocks, differences, Sobolev–Slobodeckij norms, local means, kernel majorants, atoms, invariance under changes of variables, Besov spaces as interpolation spaces | ✅ | ✗ |
+| [**Besov spaces on `ℝ^d`**](docs/Rd.md): band-limited approximation, Littlewood–Paley blocks, differences, Sobolev–Slobodeckij norms, local means, atoms, invariance under changes of variables, Besov spaces as interpolation spaces | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
-| [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, Triebel–Lizorkin spaces as interpolation spaces | ✅ | ✗ |
+| [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, kernel majorants, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, Triebel–Lizorkin spaces as interpolation spaces | ✅ | ✗ |
 | [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings including the critical case and the Gagliardo–Nirenberg–Sobolev inequality, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
 | [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph and bounded Lipschitz domains, closures of convex ones, closed balls, the closed cube and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators and its norm equivalent to that of `B^{1/2}_{2,2}(Γ)`, the extension theorems for `W^1_p` and `W^m_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary or with corners, smooth domains | ✅ | ✗ |
 
@@ -618,18 +618,20 @@ resets its row there and the block here to ✗.
 
 Two libraries. `ApproximationSpaces` holds the abstract theory of approximation in normed spaces
 and of real interpolation of couples of extended quasi-norms on abelian groups; the continuous
-K-method integrates over `t ∈ (0, ∞)`.
+K-method integrates over `t ∈ (0, ∞)`. Its top level holds the schemes and the spaces `A^s_q`,
+with the folders `Instances/` (two basic schemes), `Sequences/` (sequence spaces),
+`Interpolation/` (real interpolation) and `Decompositions/`.
 `FunctionSpaces` holds the function spaces, in folders by setting with the characterisations
 inside: `Analysis/` collects the tools without function-space content
-(`L_p` norms, differences, convolution and the Fourier transform, maximal functions and
-interpolation of operators); `MeasureSpaces/` holds the Besov and Sobolev spaces of a scheme on a
-finite measure space; `Rd/` holds the spaces on `ℝ^d` with one folder per characterisation
+(`L_p` norms, differences and moduli of smoothness, convolution and the Fourier transform, maximal
+functions and interpolation of operators); `MeasureSpaces/` holds the Besov and Sobolev spaces of
+a scheme on a finite measure space, spectral schemes, and filtrations with martingale
+differences; `Rd/` holds the spaces on `ℝ^d` in folders by characterisation and by space
 (approximation, Littlewood–Paley blocks, differences, local means, atoms, Triebel–Lizorkin
 spaces, vector-valued singular integrals, weak derivatives, Bessel potentials, interpolation,
 mixed smoothness); `Domains/` holds Lipschitz domains, extensions, traces, Sobolev spaces on
 domains, compact manifolds, intervals and the cube; `Torus/` holds the torus; `Wavelets/` holds
-filtrations and martingale differences, with the examples (Haar, multiwavelets, Daubechies
-wavelets) in `Wavelets/Examples/`.
+the wavelet examples (Haar, multiwavelets, Daubechies wavelets) in `Wavelets/Examples/`.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 [docs/FEECInterface.md](docs/FEECInterface.md) describes the interface to a FEEC/BEEC library

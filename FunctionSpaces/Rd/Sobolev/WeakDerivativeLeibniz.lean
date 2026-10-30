@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Rd.Sobolev.WeakDerivativeChangeOfVariables
-public import FunctionSpaces.Rd.LocalMeans.Multipliers
+public import FunctionSpaces.Rd.Differences.PointwiseMultipliers
 
 /-!
 # The Leibniz rule in `W^m_p`

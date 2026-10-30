@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Domains.Extension.DivergenceKernels
+public import FunctionSpaces.Rd.Sobolev.DivergenceKernels
 public import FunctionSpaces.Domains.Lipschitz.LipschitzGraph
 
 /-!

@@ -1,8 +1,7 @@
 # Besov spaces on `ℝ^d`
 
 Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Besov spaces*,
-chapter *Besov spaces on `ℝ^d`*; the kernel majorants are the section *Kernel majorants* of
-*Triebel–Lizorkin spaces*.
+chapter *Besov spaces on `ℝ^d`*.
 
 Here `V` is a finite-dimensional real inner product space, such as `ℝ^d`, with its Lebesgue
 measure, and `1 ≤ p < ∞`. The scheme consists of the band-limited classes
@@ -127,17 +126,15 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Differences of convolutions and dilations | ✅ | ✗ | `Rd/Differences/DilatedDifferences` |
 | Jackson's inequality for band-limited approximation | ✅ | ✗ | `Rd/Approximation/BandJackson` |
 | Differences of Schwartz functions in `L_1`, inverse inequality for band-limited functions | ✅ | ✗ | `Rd/Approximation/BandInverse` |
-| Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ | ✗ | `Rd/LittlewoodPaley/BesovDifferences` |
+| Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ | ✗ | `Rd/Differences/BesovDifferences` |
 | Sobolev–Slobodeckij norms: the Gagliardo form, its two-sided bounds by first differences with explicit constants, radial integrals of powers, double integrals of sums, `W^{s,p} = B^s_{p,p}` for `0 < s < 1` | ✅ | ✗ | `Rd/Differences/SobolevSlobodeckij` |
 | Besov spaces on `ℝ^d` as interpolation spaces, by approximation, differences and Littlewood–Paley blocks | ✅ | ✗ | `Rd/Interpolation/BesovInterpolation` |
-| Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences, sets equal up to null sets, the intrinsic quasi-norm | ✅ | ✗ | `Rd/Differences/DomainModuli` |
 | Moment kernels: finite `L_1` norm, the vanishing moments of their coefficients, averaged differences, approximation with the modulus, also on subsets, vanishing first moments of the moment kernels of order two | ✅ | ✗ | `Rd/Differences/MomentKernels` |
 | Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L`, bumps from smooth bump functions | ✅ | ✗ | `Rd/LocalMeans/LocalMeans` |
-| Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/LocalMeans/KernelMajorants` |
-| Pointwise multipliers on `ℝ^d`: bounded derivatives on compact sets, the multiplication operator on `L_p`, Leibniz's rule for differences, moduli of lower order | ✅ | ✗ | `Rd/LocalMeans/Multipliers` |
+| Pointwise multipliers on `ℝ^d`: bounded derivatives on compact sets, the multiplication operator on `L_p`, Leibniz's rule for differences, moduli of lower order | ✅ | ✗ | `Rd/Differences/PointwiseMultipliers` |
 | Atomic synthesis: bounded overlap, regular atoms on sets, coefficient quasi-norm | ✅ | ✗ | `Rd/Atoms/AtomSynthesis` |
 | Atomic decomposition by cell atoms, atomic characterisation of Besov spaces | ✅ | ✗ | `Rd/Atoms/AtomAnalysis` |
-| Differences within convex sets through derivatives within the set | ✅ | ✗ | `Rd/Atoms/ConvexDifferences` |
+| Differences within convex sets through derivatives within the set | ✅ | ✗ | `Rd/Differences/ConvexDifferences` |
 | Smooth atoms on convex sets, smooth cell atoms of every order | ✅ | ✗ | `Rd/Atoms/SmoothAtoms` |
 | Smooth atoms under smooth changes of variables with a cut-off | ✅ | ✗ | `Rd/Atoms/AtomComposition` |
 | Invariance of Besov spaces under changes of variables, the extension property, Besov domains | ✅ | ✗ | `Rd/Atoms/DiffeoInvariance` |

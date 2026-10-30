@@ -433,19 +433,6 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   (`Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij`), and `g ∈ L_2(Γ)` lies in
   the range of `τ` iff its form is finite
   (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`).
-* **Divergence kernels.** Let `(e_i)` be an orthonormal basis of `V`, `n = dim V`, and
-  `m_c(x) = c^n m(c x)`. For every smooth `m`, `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence
-  kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt` (`Rd.divergenceKernel`,
-  `Rd.dilationAverage_eq_integral_inv_mul`, `Rd.sum_fderiv_divergenceKernel`), by Euler's identity
-  `d/ds m_{e^s}(x) = n m_{e^s}(x) + D(m_{e^s})(x) x` (`Rd.hasDerivAt_dilate_exp`). The kernels
-  are smooth, since parametric integrals of smooth functions are smooth
-  (`intervalIntegral.contDiff_parametric_intervalIntegral_of_contDiff`), they vanish where
-  `m(t x) = 0` for all `t ∈ [1, 2]` (`Rd.divergenceKernel_eq_zero`), and they have mean zero when
-  the first moments of `m` vanish (`Rd.integral_divergenceKernel`), as for the moment kernels of
-  order two (`Rd.integral_inner_mul_momentKernel_two`). For every Schwartz function `G` with
-  `∫ G = 0`, `|𝓕G(ξ)| ≤ C min(‖ξ‖, ‖ξ‖⁻¹)` with `C = 2π ∫ ‖x‖ |G(x)| dx + C_G/(2π)`
-  (`Rd.enorm_fourier_le_mul_min`), so `∑_j |𝓕(G_{2^j})(ξ)|² ≤ 4C²` and the dilates `G_{2^j}`
-  form a Calderón–Zygmund family (`Rd.isCZFamily_dilate_of_integral_eq_zero`).
 * **The extension theorem.** Let `Ω` be a bounded Lipschitz domain in `V` of dimension `n ≥ 1`,
   `(e_i)` the orthonormal basis `Rd.gridBasis V`, and `1 < p < ∞`. There is a finite `C` such that
   every `f ∈ L_p(Ω)` with weak derivatives `g_i = ∂_{e_i} f ∈ L_p(Ω)` on `Ω` agrees almost
@@ -632,7 +619,6 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The surface measure of a bounded Lipschitz domain as `μHE[n-1]` on the boundary, its chart form, finiteness and null sets, the boundary `Γ` as a Lebesgue null set, the boundary trace in `L_p(Γ)`, `L_2(Γ)` with the traces of `H^1(Ω)` and `H^{1/2}(Γ)`, and the outward unit normal field | ✅ | ✗ | `Domains/Lipschitz/SurfaceMeasure` |
 | The norm of the trace space: least extension norm, equivalence with the norm of `B^{1/2}_{2,2}(Γ)`, bounded preimages, the range of `H^{1/2}(Γ) → L_2(Γ)`, the Banach space `B^{1/2}_{2,2}(Γ)` isomorphic to `H^{1/2}(Γ)`, and the bounded linear right inverse of the trace | ✅ | ✗ | `Domains/Traces/TraceSpaceNorm` |
 | The Sobolev–Slobodeckij norm on the boundary: Gagliardo's double integral for the surface measure, double integrals in the charts, the bounds by the chart-wise norm of `B^s_{p,p}(Γ)` in both directions, `W^{s,p}(Γ) = B^s_{p,p}(Γ)` for `0 < s < 1`, and the norm of `H^{1/2}(Γ)` as the Sobolev–Slobodeckij norm of `W^{1/2,2}(Γ)` | ✅ | ✗ | `Domains/Traces/BoundaryGagliardo` |
-| Smoothness of parametric integrals, the dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, their supports and those of dyadic dilates, mean zero, the local means kernels as dilation differences `k_{j+1} = (m_2 - m)_{2^j}`, and the Calderón–Zygmund families of the dilates of mean-zero Schwartz functions | ✅ | ✗ | `Domains/Extension/DivergenceKernels` |
 | Convolutions with sums of derivatives of dilated kernels, the local means of order two by the gradient, local means of Triebel–Lizorkin type on a set, the bounds of the local extension from one patch, bounded extensions from `L_p` bounds, pasting in `W^1_p(ℝ^d)`, the supports of the divergence kernels in the patches, the smooth cutoffs of the patches, dimension zero | ✅ | ✗ | `Domains/Extension/SobolevExtension` |
 | Rychkov's extension operator for `W^1_p`, `1 < p < ∞`, on value–derivative jets with a finite constant, and from it the extension from one patch and the extension theorem for `1 < p < ∞` with a bound | ✅ | ✗ | `Domains/Extension/SobolevExtensionOperator` |
 | The half-space and the reflection across a hyperplane, cutoffs near the hyperplane, integration by parts on the half-space, the linearity, weak derivatives and `L_p` bounds of the even reflection | ✅ | ✗ | `Domains/Extension/HalfSpaceReflection` |

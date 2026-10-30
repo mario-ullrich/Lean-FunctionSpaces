@@ -6,6 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.MeasureSpaces.Besov.Nikolskii
+public import ApproximationSpaces.Nikolskii
 
 /-!
 # Embedding theorems for Besov spaces

@@ -28,7 +28,7 @@ are controlled by `‖f‖` since `K(t, f) ≤ ‖f‖`, which is why `‖f‖` 
 `t = 2^(-kr)`.  So `MemInterp` is the **discrete K-method** on the grid `t = 2^(-kρ)`.  For
 `θ > 0` it gives the same space for every `ρ > 0`, the space of the continuous K-method
 `(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)` (`ApproximationScheme.memInterp_iff_memKMethod` in
-`ApproximationSpaces.KMethod`).
+`ApproximationSpaces.Interpolation.KMethod`).
 -/
 
 @[expose] public section

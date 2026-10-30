@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import ApproximationSpaces.Representation
+public import ApproximationSpaces.Interpolation.Representation
 public import Mathlib.Analysis.SpecialFunctions.Integrals.Basic
 public import Mathlib.Order.SuccPred.IntervalSucc
 

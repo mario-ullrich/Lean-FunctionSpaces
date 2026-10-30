@@ -7,7 +7,7 @@ module
 
 public import FunctionSpaces.Analysis.Differences.Differences
 public import FunctionSpaces.Analysis.Maximal.HardyLittlewoodMaximal
-public import FunctionSpaces.Rd.LittlewoodPaley.BesovDifferences
+public import FunctionSpaces.Rd.Differences.BesovDifferences
 
 /-!
 # Sobolev–Slobodeckij norms by first differences

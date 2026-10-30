@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import ApproximationSpaces.Moduli
-public import FunctionSpaces.Rd.LittlewoodPaley.BesovDifferences
+public import FunctionSpaces.Rd.Differences.BesovDifferences
 public import FunctionSpaces.Wavelets.Examples.Daubechies.Bernstein
 public import FunctionSpaces.Wavelets.Examples.Daubechies.Jackson
 public import FunctionSpaces.Wavelets.Examples.Daubechies.Wavelet

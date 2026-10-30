@@ -13,9 +13,12 @@ Bessel potential spaces `H^s`, `s ≥ 0`, with the Triebel–Lizorkin spaces `F^
 `s > 0`, with the Besov spaces `B^s_{2,2}`) and shows `W^1_2 = H^1 = B^1_{2,2}`. On every bounded
 set the restriction from `H^1(ℝ^d)` to `L_2` is compact (Rellich's theorem). For `W^m_p`, the block
 `ψ_1` is a sum of derivatives of order `m` of Schwartz kernels, whose dilates form Calderón–Zygmund
-families, and so do the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels. With them,
-`W^m_p = F^m_{p,2}` for `1 < p < ∞`, with named constants in both directions, and, for `m ≥ 1`,
-`W^m_p` lies between the Besov spaces `B^m_{p,min(p,2)}` and `B^m_{p,max(p,2)}`. The
+families, and so do the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels.
+With them, `W^m_p = F^m_{p,2}` for `1 < p < ∞`, with named constants in both directions, and,
+for `m ≥ 1`, `W^m_p` lies between the Besov spaces `B^m_{p,min(p,2)}` and `B^m_{p,max(p,2)}`.
+The difference of two dilates of a smooth function is a divergence of smooth kernels, with mean
+zero when its first moments vanish; these kernels give the extension theorems on Lipschitz
+domains ([Domains, traces and manifolds](DomainsTraces.md)). The
 Littlewood–Paley blocks are continuous and satisfy the Nikolskii inequality, which gives the
 embeddings of `B^s_{p,q}` into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions
 for `s > n/p`, and with `W^m_p ⊆ F^m_{p,2}` the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b`,
@@ -148,6 +151,19 @@ project, with the decisions behind their form.
   (`SchwartzMap.fourier_iteratedLineDerivOp_apply`) and
   `∂^w (G_c) = c^k (∂^w G)_c` for the dilation `G_c(x) = c^n G(cx)`
   (`Rd.iteratedLineDerivOp_schwartzDilate`).
+* **Divergence kernels.** Let `(e_i)` be an orthonormal basis of `V`, `n = dim V`, and
+  `m_c(x) = c^n m(c x)`. For every smooth `m`, `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence
+  kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt` (`Rd.divergenceKernel`,
+  `Rd.dilationAverage_eq_integral_inv_mul`, `Rd.sum_fderiv_divergenceKernel`), by Euler's identity
+  `d/ds m_{e^s}(x) = n m_{e^s}(x) + D(m_{e^s})(x) x` (`Rd.hasDerivAt_dilate_exp`). The kernels
+  are smooth, since parametric integrals of smooth functions are smooth
+  (`intervalIntegral.contDiff_parametric_intervalIntegral_of_contDiff`), they vanish where
+  `m(t x) = 0` for all `t ∈ [1, 2]` (`Rd.divergenceKernel_eq_zero`), and they have mean zero when
+  the first moments of `m` vanish (`Rd.integral_divergenceKernel`), as for the moment kernels of
+  order two (`Rd.integral_inner_mul_momentKernel_two`). For every Schwartz function `G` with
+  `∫ G = 0`, `|𝓕G(ξ)| ≤ C min(‖ξ‖, ‖ξ‖⁻¹)` with `C = 2π ∫ ‖x‖ |G(x)| dx + C_G/(2π)`
+  (`Rd.enorm_fourier_le_mul_min`), so `∑_j |𝓕(G_{2^j})(ξ)|² ≤ 4C²` and the dilates `G_{2^j}`
+  form a Calderón–Zygmund family (`Rd.isCZFamily_dilate_of_integral_eq_zero`).
 * **`W^m_p = F^m_{p,2}`.** Let `dim V ≥ 1`, `1 < p < ∞` and `m ∈ ℕ`. For `f ∈ L_p(V)`,
   `f ∈ W^m_p(V)` iff `f ∈ F^m_{p,2}(V)` (`Rd.memSobolev_iff_memTriebelLizorkin`), with named
   constants in both directions. If the weak derivatives
@@ -305,6 +321,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The convolution theorem and Plancherel for a convolution on `L_2`, the Bessel potential on Schwartz functions, even Fourier multipliers acting by the transpose, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/Sobolev/SobolevTwoLittlewoodPaley` |
 | The inverse Fourier transform of integrable `L_2` functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, the injectivity of `H^1(ℝ^d) → L_2(ℝ^d)`, and Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω` | ✅ | ✗ | `Rd/Sobolev/RellichCompactness` |
 | Fourier transforms of iterated derivatives, the derivative symbols and kernels, the block `ψ_1` as a sum of derivatives of order `m`, and the Calderón–Zygmund families of the dilated derivative kernels and of the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels | ✅ | ✗ | `Rd/Sobolev/DerivativeKernels` |
+| Smoothness of parametric integrals, the dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, their supports and those of dyadic dilates, mean zero, the local means kernels as dilation differences `k_{j+1} = (m_2 - m)_{2^j}`, and the Calderón–Zygmund families of the dilates of mean-zero Schwartz functions | ✅ | ✗ | `Rd/Sobolev/DivergenceKernels` |
 | `W^m_p = F^m_{p,2}` for `1 < p < ∞` with named constants in both directions: the blocks as convolutions with the weak derivatives, convergent synthesis sums, the derivatives of the reproducing sums and their limit, the Besov sandwich `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}` and `W^m_2 = B^m_{2,2}` for `m ≥ 1` | ✅ | ✗ | `Rd/Sobolev/SobolevTriebelLizorkin` |
 | Continuity of convolutions of integrable bounded kernels with `L_p` functions, the Nikolskii inequality for the Littlewood–Paley blocks, almost everywhere convergence of the block series, the Besov embeddings into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions for `s > n/p`, and the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b` with named constants | ✅ | ✗ | `Rd/Sobolev/SobolevEmbedding` |
 | The Nikolskii inequality in supremum form, the pointwise and the integrated bound of the weighted blocks, `F^{n(1/p₀ - 1/p₁)}_{p₀,q} ↪ L_{p₁}`, Jawerth's embedding `F^{s₀}_{p₀,∞} ↪ F^{s₁}_{p₁,q}` and the critical Sobolev embedding `W^m_p ↪ L_r` for `1/r = 1/p - m/n` with named constants | ✅ | ✗ | `Rd/Sobolev/CriticalSobolevEmbedding` |

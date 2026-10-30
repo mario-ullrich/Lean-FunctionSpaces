@@ -5,8 +5,8 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Wavelets.Filtration
-public import FunctionSpaces.Wavelets.Partition
+public import FunctionSpaces.MeasureSpaces.Martingales.Filtration
+public import FunctionSpaces.MeasureSpaces.Martingales.Partition
 public import FunctionSpaces.Domains.Interval.PiecewisePoly
 public import ApproximationSpaces.Decompositions.Atomic
 public import Mathlib.MeasureTheory.Function.Floor

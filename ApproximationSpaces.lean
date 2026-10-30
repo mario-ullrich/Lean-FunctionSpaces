@@ -9,20 +9,20 @@ public import ApproximationSpaces.Scheme
 public import ApproximationSpaces.Error
 public import ApproximationSpaces.Instances.Span
 public import ApproximationSpaces.Instances.NTerm
-public import ApproximationSpaces.Sequences.Lq
-public import ApproximationSpaces.Sequences.Dyadic
-public import ApproximationSpaces.Sequences.Hardy
 public import ApproximationSpaces.Norm
 public import ApproximationSpaces.Dyadic
 public import ApproximationSpaces.Space
+public import ApproximationSpaces.Sequences.Lq
+public import ApproximationSpaces.Sequences.Dyadic
+public import ApproximationSpaces.Sequences.Hardy
 public import ApproximationSpaces.Embedding
 public import ApproximationSpaces.Transfer
 public import ApproximationSpaces.Lift
 public import ApproximationSpaces.Nikolskii
 public import ApproximationSpaces.Jackson
-public import ApproximationSpaces.KFunctional
-public import ApproximationSpaces.Representation
-public import ApproximationSpaces.KMethod
+public import ApproximationSpaces.Interpolation.KFunctional
+public import ApproximationSpaces.Interpolation.Representation
+public import ApproximationSpaces.Interpolation.KMethod
 public import ApproximationSpaces.Interpolation.Couple
 public import ApproximationSpaces.Interpolation.Property
 public import ApproximationSpaces.Interpolation.Reiteration
@@ -76,8 +76,11 @@ concrete schemes.
 
 ## Layout
 
-Names below are relative to the namespace `ApproximationScheme`, except those that start with
-`ENNReal` or `InterpCouple`.
+The files at the top level hold the schemes, the spaces `A^s_q` and the theorems about them. The
+subfolders hold the two basic examples of schemes (`Instances`), the sequence spaces
+(`Sequences`), real interpolation (`Interpolation`) and decompositions (`Decompositions`). Names
+below are relative to the namespace `ApproximationScheme`, except those that start with `ENNReal`
+or `InterpCouple`.
 
 ### The scheme and the error
 
@@ -91,6 +94,9 @@ Names below are relative to the namespace `ApproximationScheme`, except those th
   (`tendsto_approxError_zero_iff`), the bound for linear maps (`approxError_map_le`), the
   extension of modulus bounds from a dense set (`approxError_le_of_dense`) and the Lebesgue
   inequality.
+
+### Two examples of schemes (`Instances/`)
+
 * `ApproximationSpaces.Instances.Span`: linear approximation from the first `n` elements of a
   sequence, `ofSpan`. Its errors tend to zero exactly on the closed span.
 * `ApproximationSpaces.Instances.NTerm`: nonlinear `n`-term approximation from a dictionary,
@@ -135,14 +141,16 @@ Names below are relative to the namespace `ApproximationScheme`, except those th
 * `ApproximationSpaces.Jackson`: Jackson's inequality `JacksonBound`, which gives
   `ι(Y) ⊆ A^r_∞`, and smoothness spaces `SmoothnessSpace`, with `A^r_1 ⊆ ι(Y) ⊆ A^r_∞`.
 
-### Real interpolation
+### Real interpolation (`Interpolation/`)
 
-* `ApproximationSpaces.KFunctional`: the K-functional `kFunctional` of a bounded linear map
-  `ι : Y → X` and the spaces `(X, Y)_{θ,q}` of the discrete K-method (`interpNorm`, `MemInterp`).
-* `ApproximationSpaces.Representation`: the representation theorem `A^s_q = (X, Y)_{s/r,q}`
-  under Jackson's and Bernstein's inequalities of order `r` (`approxSpace_eq_interpSpace`).
-* `ApproximationSpaces.KMethod`: the continuous K-method `kMethodNorm` and its equivalence with
-  the discrete K-method on every dyadic grid (Bergh–Löfström, Lemma 3.1.3;
+* `ApproximationSpaces.Interpolation.KFunctional`: the K-functional `kFunctional` of a bounded
+  linear map `ι : Y → X` and the spaces `(X, Y)_{θ,q}` of the discrete K-method (`interpNorm`,
+  `MemInterp`).
+* `ApproximationSpaces.Interpolation.Representation`: the representation theorem
+  `A^s_q = (X, Y)_{s/r,q}` under Jackson's and Bernstein's inequalities of order `r`
+  (`approxSpace_eq_interpSpace`).
+* `ApproximationSpaces.Interpolation.KMethod`: the continuous K-method `kMethodNorm` and its
+  equivalence with the discrete K-method on every dyadic grid (Bergh–Löfström, Lemma 3.1.3;
   `memInterp_iff_memKMethod`).
 * `ApproximationSpaces.Interpolation.Couple`: couples `InterpCouple` of two extended quasi-norms
   on an abelian group, their K-functional and K-methods, and the couple `InterpCouple.ofMap ι`
@@ -156,7 +164,7 @@ Names below are relative to the namespace `ApproximationScheme`, except those th
   spaces, `A^s_q = (X, A^r_∞)_{s/r,q}` for every scheme (`memApprox_iff_memKMethod_reprCouple`),
   their reiteration (`memKMethod_approxCouple_iff`) and the sandwich principle.
 
-### Decompositions
+### Decompositions (`Decompositions/`)
 
 * `ApproximationSpaces.Decompositions.Projection`: schemes with uniformly bounded projections
   `ProjectionScheme` and the characterisation of `A^s_q` by dyadic blocks.

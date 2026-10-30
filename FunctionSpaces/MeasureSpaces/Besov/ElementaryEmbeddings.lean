@@ -6,6 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.MeasureSpaces.Besov.Basic
+public import ApproximationSpaces.Transfer
 
 /-!
 # Elementary embeddings of Besov spaces

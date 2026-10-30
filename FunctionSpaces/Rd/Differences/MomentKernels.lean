@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Rd.Differences.DilatedDifferences
-public import FunctionSpaces.Rd.Differences.DomainModuli
+public import FunctionSpaces.Analysis.Differences.DomainModuli
 
 /-!
 # Moment kernels

@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Torus.Scheme
+public import FunctionSpaces.Torus.TrigPolynomials
 public import FunctionSpaces.MeasureSpaces.Besov.Nikolskii
 public import Mathlib.Algebra.Order.Chebyshev
 

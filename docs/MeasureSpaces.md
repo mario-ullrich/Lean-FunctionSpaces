@@ -2,7 +2,8 @@
 
 Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Approximation
 spaces*, chapters *Besov spaces and their embeddings*, *Sobolev spaces and their embeddings* and
-*Spectral schemes*.
+*Spectral schemes*; part *Besov spaces*, the opening of chapter *Filtrations and martingale
+differences*.
 
 For a finite measure space `(Ω, μ)` and a scheme `S` of bounded continuous functions, the
 Besov space is `B^s_{p,q}(Ω, S) = A^s_q(L_p(μ), S)`, and the embedding theorems follow from the
@@ -12,7 +13,8 @@ Nikolskii inequality for the scheme. Spectral schemes in a Hilbert space give th
 `A^s_q` (`SpectralScheme.memApprox_iff_blockNorm_lt_top`). Orthonormal bases of continuous
 functions with levels (continuous spectral bases), modelled on the eigenfunctions of the
 Laplacian on a compact manifold, enter as a hypothesis. The torus is the first instance
-([The torus](Torus.md)). The `L_p` tools are in [Tools from analysis](Analysis.md).
+([The torus](Torus.md)). A filtration gives a projection scheme, whose approximation spaces are
+described by martingale differences. The `L_p` tools are in [Tools from analysis](Analysis.md).
 
 ## Main results
 
@@ -60,6 +62,13 @@ Laplacian on a compact manifold, enter as a hypothesis. The torus is the first i
   `‖a‖_∞^p ≤ C n^D ‖a‖_p^p` for `1 ≤ p ≤ 2` and `a` in the span of level `< n`
   (`ContinuousSpectralBasis.norm_rpow_le_of_localWeyl`), and for `2s > D` every such `f` has a
   bounded continuous representative (`ContinuousSpectralBasis.exists_continuous_of_localWeyl`).
+* **Martingale differences.** For a filtration `ℱ_0 ≤ ℱ_1 ≤ ⋯` on a finite measure space,
+  let `A_n ⊆ L_p` be the `ℱ_⌊log₂ n⌋`-measurable functions (for the dyadic filtration of
+  `[0, 1)`, the step functions of the Haar system). If these are dense in `L_p`, then for
+  `s > 0`, `f ∈ A^s_q` iff
+  `‖E[f | ℱ_0]‖_p + ‖(2^(ks) ‖E[f | ℱ_{k+1}] - E[f | ℱ_k]‖_p)_k‖_{ℓ_q} < ∞`
+  (`MeasureTheory.Filtration.memApprox_iff_martingale`), using the conditional expectation
+  as a contraction of `L_p` (`MeasureTheory.Lp.condExpLp`).
 
 ## What is formalised
 
@@ -67,13 +76,15 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| Schemes of functions, Besov spaces, elementary embeddings | ✅ | ✗ | `MeasureSpaces/Scheme`, `MeasureSpaces/Besov/Basic`, `MeasureSpaces/Besov/Trivial` |
+| Schemes of functions, Besov spaces, elementary embeddings | ✅ | ✗ | `MeasureSpaces/Scheme`, `MeasureSpaces/Besov/Basic`, `MeasureSpaces/Besov/ElementaryEmbeddings` |
 | Nikolskii property, the sign of the Nikolskii exponent, Besov embeddings | ✅ | ✗ | `MeasureSpaces/Besov/Nikolskii`, `MeasureSpaces/Besov/Embeddings` |
 | Besov spaces as interpolation spaces | ✅ | ✗ | `MeasureSpaces/Besov/Interpolation` |
 | Sobolev spaces as a hypothesis structure, Sobolev embeddings | ✅ | ✗ | `MeasureSpaces/Sobolev/Embeddings` |
 | Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ | ✗ | `MeasureSpaces/Spectral/Basic` |
 | Coefficient characterisations of spectral schemes, `H^s = B^s_{2,2}` | ✅ | ✗ | `MeasureSpaces/Spectral/Blocks` |
 | Continuous spectral bases (hypothesis), `B^s_{2,2} = H^s`, local Weyl bound, Nikolskii for `p ≤ 2`, continuity of `H^s` for `s > D/2` | ✅ | ✗ | `MeasureSpaces/Spectral/ContinuousSpectralBasis`, `MeasureSpaces/Spectral/LocalWeyl` |
+| Conditional expectations on `L_p`, filtration schemes (Haar), martingale-difference characterisation | ✅ | ✗ | `MeasureSpaces/Martingales/Filtration` |
+| The conditional expectation onto a countable partition as the average over the cells | ✅ | ✗ | `MeasureSpaces/Martingales/Partition` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

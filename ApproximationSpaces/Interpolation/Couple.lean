@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import ApproximationSpaces.KMethod
+public import ApproximationSpaces.Interpolation.KMethod
 
 /-!
 # Couples of extended quasi-norms and their K-method
@@ -695,7 +695,7 @@ theorem norm0_ofMap_le (f : X) : (ofMap ι).norm0 f ≤ max 1 ‖ι‖ₑ * (ofM
       _ ≤ max 1 ‖ι‖ₑ * ‖(y : Y)‖ₑ := by gcongr; exact le_max_right _ _
 
 /-- **The K-functional of `ofMap ι`** is the K-functional `inf_y (‖f - ι y‖ + t ‖y‖)` of
-`ApproximationSpaces.KFunctional`, for `0 < t < ∞`. -/
+`ApproximationSpaces.Interpolation.KFunctional`, for `0 < t < ∞`. -/
 theorem kFunctional_ofMap (ht0 : t ≠ 0) (ht : t ≠ ∞) (f : X) :
     (ofMap ι).kFunctional t f = ApproximationScheme.kFunctional ι t f := by
   refine le_antisymm (le_iInf fun y => ?_) (le_iInf fun b => ?_)
@@ -711,7 +711,8 @@ theorem kMethodNorm_ofMap (f : X) :
     (ofMap ι).kMethodNorm θ q f = ApproximationScheme.kMethodNorm ι θ q f :=
   ApproximationScheme.phiFunctional_congr fun _ ht0 ht => kFunctional_ofMap ht0 ht f
 
-/-- The real interpolation space of `ofMap ι` is that of `ApproximationSpaces.KMethod`. -/
+/-- The real interpolation space of `ofMap ι` is that of
+`ApproximationSpaces.Interpolation.KMethod`. -/
 theorem memKMethod_ofMap_iff {f : X} :
     (ofMap ι).MemKMethod θ q f ↔ ApproximationScheme.MemKMethod ι θ q f := by
   rw [MemKMethod, kMethodNorm_ofMap]

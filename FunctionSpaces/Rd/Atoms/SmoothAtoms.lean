@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Rd.Atoms.AtomAnalysis
-public import FunctionSpaces.Rd.Atoms.ConvexDifferences
+public import FunctionSpaces.Rd.Differences.ConvexDifferences
 public import Mathlib.Analysis.Calculus.ContDiff.Convolution
 
 /-!

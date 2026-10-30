@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import FunctionSpaces.Rd.Differences.DomainModuli
+public import FunctionSpaces.Analysis.Differences.DomainModuli
 public import Mathlib.Analysis.Calculus.Taylor
 public import Mathlib.Analysis.Calculus.ContDiff.Bounds
 
@@ -20,7 +20,7 @@ On a convex set `Ω` with nonempty interior, the differences of a function that 
 
 The model is the closed half-space, where the derivatives of functions on the boundary are
 one-sided; on `Ω = V` the bound is `Rd.norm_higherDiff_le_of_iteratedFDeriv` of
-`FunctionSpaces.Rd.LocalMeans.Multipliers` up to the constant.
+`FunctionSpaces.Rd.Differences.PointwiseMultipliers` up to the constant.
 
 The proof restricts `a` to the segment, `g(t) = a(x + t h)` on `[0, r]`, which lies in `Ω` by
 convexity. Taylor's theorem on the interval (Mathlib's `taylor_mean_remainder_bound`) writes

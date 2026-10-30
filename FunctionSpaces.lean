@@ -19,6 +19,7 @@ public import FunctionSpaces.Analysis.Lp.Marcinkiewicz
 public import FunctionSpaces.Analysis.Lp.NormingFamily
 public import FunctionSpaces.Analysis.Differences.TranslationAlgebra
 public import FunctionSpaces.Analysis.Differences.Differences
+public import FunctionSpaces.Analysis.Differences.DomainModuli
 public import FunctionSpaces.Analysis.Fourier.Convolution
 public import FunctionSpaces.Analysis.Fourier.ApproxIdentity
 public import FunctionSpaces.Analysis.Fourier.LittlewoodPaleyKernels
@@ -31,7 +32,7 @@ public import FunctionSpaces.Analysis.Maximal.FeffermanStein
 public import FunctionSpaces.Analysis.Maximal.CalderonZygmundSigned
 public import FunctionSpaces.MeasureSpaces.Scheme
 public import FunctionSpaces.MeasureSpaces.Besov.Basic
-public import FunctionSpaces.MeasureSpaces.Besov.Trivial
+public import FunctionSpaces.MeasureSpaces.Besov.ElementaryEmbeddings
 public import FunctionSpaces.MeasureSpaces.Besov.Nikolskii
 public import FunctionSpaces.MeasureSpaces.Besov.Embeddings
 public import FunctionSpaces.MeasureSpaces.Besov.Interpolation
@@ -40,21 +41,22 @@ public import FunctionSpaces.MeasureSpaces.Spectral.Basic
 public import FunctionSpaces.MeasureSpaces.Spectral.Blocks
 public import FunctionSpaces.MeasureSpaces.Spectral.ContinuousSpectralBasis
 public import FunctionSpaces.MeasureSpaces.Spectral.LocalWeyl
+public import FunctionSpaces.MeasureSpaces.Martingales.Filtration
+public import FunctionSpaces.MeasureSpaces.Martingales.Partition
 public import FunctionSpaces.Rd.Approximation.BandLimited
 public import FunctionSpaces.Rd.Approximation.BandJackson
 public import FunctionSpaces.Rd.Approximation.BandInverse
 public import FunctionSpaces.Rd.LittlewoodPaley.LittlewoodPaley
-public import FunctionSpaces.Rd.LittlewoodPaley.BesovDifferences
+public import FunctionSpaces.Rd.Differences.BesovDifferences
 public import FunctionSpaces.Rd.Differences.DilatedDifferences
-public import FunctionSpaces.Rd.Differences.DomainModuli
 public import FunctionSpaces.Rd.Differences.MomentKernels
 public import FunctionSpaces.Rd.Differences.SobolevSlobodeckij
+public import FunctionSpaces.Rd.Differences.PointwiseMultipliers
+public import FunctionSpaces.Rd.Differences.ConvexDifferences
 public import FunctionSpaces.Rd.LocalMeans.LocalMeans
-public import FunctionSpaces.Rd.LocalMeans.Multipliers
 public import FunctionSpaces.Rd.LocalMeans.KernelMajorants
 public import FunctionSpaces.Rd.Atoms.AtomSynthesis
 public import FunctionSpaces.Rd.Atoms.AtomAnalysis
-public import FunctionSpaces.Rd.Atoms.ConvexDifferences
 public import FunctionSpaces.Rd.Atoms.SmoothAtoms
 public import FunctionSpaces.Rd.Atoms.AtomComposition
 public import FunctionSpaces.Rd.Atoms.DiffeoInvariance
@@ -81,6 +83,7 @@ public import FunctionSpaces.Rd.Sobolev.RellichCompactness
 public import FunctionSpaces.Rd.Sobolev.WeakDerivativeChangeOfVariables
 public import FunctionSpaces.Rd.Sobolev.WeakDerivativeLeibniz
 public import FunctionSpaces.Rd.Sobolev.DerivativeKernels
+public import FunctionSpaces.Rd.Sobolev.DivergenceKernels
 public import FunctionSpaces.Rd.Sobolev.SobolevTriebelLizorkin
 public import FunctionSpaces.Rd.Sobolev.SobolevEmbedding
 public import FunctionSpaces.Rd.Sobolev.CriticalSobolevEmbedding
@@ -106,7 +109,6 @@ public import FunctionSpaces.Domains.Lipschitz.BesovDomains
 public import FunctionSpaces.Domains.Extension.RychkovExtension
 public import FunctionSpaces.Domains.Extension.LipschitzGraphBesov
 public import FunctionSpaces.Domains.Extension.LocalExtension
-public import FunctionSpaces.Domains.Extension.DivergenceKernels
 public import FunctionSpaces.Domains.Extension.SobolevExtension
 public import FunctionSpaces.Domains.Extension.SobolevExtensionOperator
 public import FunctionSpaces.Domains.Extension.HalfSpaceReflection
@@ -171,12 +173,12 @@ public import FunctionSpaces.Domains.Cube.PiecewiseInverse
 public import FunctionSpaces.Domains.Cube.Splines
 public import FunctionSpaces.Domains.Cube.SplineJackson
 public import FunctionSpaces.Domains.Cube.SplineInverse
-public import FunctionSpaces.Domains.Cube.Translation
+public import FunctionSpaces.Domains.Cube.IsoDifferences
 public import FunctionSpaces.Domains.Cube.IsoModulus
 public import FunctionSpaces.Domains.Cube.IsoInverse
 public import FunctionSpaces.Domains.Cube.IsoCoincidence
-public import FunctionSpaces.Torus.Measure
-public import FunctionSpaces.Torus.Scheme
+public import FunctionSpaces.Torus.HaarMeasure
+public import FunctionSpaces.Torus.TrigPolynomials
 public import FunctionSpaces.Torus.Nikolskii
 public import FunctionSpaces.Torus.Sobolev
 public import FunctionSpaces.Torus.Embeddings
@@ -206,8 +208,6 @@ public import FunctionSpaces.Torus.LpWeakDerivatives
 public import FunctionSpaces.Torus.SobolevTriebelLizorkin
 public import FunctionSpaces.Torus.SobolevEmbedding
 public import FunctionSpaces.Torus.PeriodicDistributions
-public import FunctionSpaces.Wavelets.Filtration
-public import FunctionSpaces.Wavelets.Partition
 public import FunctionSpaces.Wavelets.Examples.Haar
 public import FunctionSpaces.Wavelets.Examples.HaarBesov
 public import FunctionSpaces.Wavelets.Examples.Multiscale
@@ -250,10 +250,10 @@ Besov, Triebel–Lizorkin, Sobolev and Bessel potential spaces on finite measure
 the torus, intervals, the cube, Lipschitz domains and compact manifolds, their embedding theorems,
 and the theorems that their characterisations agree. The library builds on
 `ApproximationSpaces`. The top folders follow the settings:
-`MeasureSpaces` (finite measure spaces), `Rd` (`ℝ^d`, with one subfolder per
-characterisation), `Domains` (Lipschitz domains, traces, compact manifolds, intervals and the
-cube), `Torus`, and `Wavelets` (martingale differences and the wavelet examples); `Analysis`
-holds the tools without function-space content.
+`MeasureSpaces` (finite measure spaces, with filtrations and martingale differences), `Rd`
+(`ℝ^d`, in subfolders by characterisation and by space), `Domains` (Lipschitz domains, traces,
+compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet examples);
+`Analysis` holds the tools without function-space content.
 
 ## Layout
 
@@ -297,6 +297,9 @@ holds the tools without function-space content.
 * `FunctionSpaces.Analysis.Differences.Differences`: differences on any additive group, and the
   modulus of smoothness on a finite-dimensional space, its homogeneity, and the dilation of the
   scale.
+* `FunctionSpaces.Analysis.Differences.DomainModuli`: differences and moduli of smoothness on
+  subsets of a finite-dimensional space, sets equal up to null sets, and the intrinsic quasi-norm on
+  a set.
 
 #### `Analysis/Fourier`: convolution and the Fourier transform
 
@@ -345,7 +348,8 @@ holds the tools without function-space content.
 #### `MeasureSpaces/Besov`: Besov spaces of a scheme
 
 * `FunctionSpaces.MeasureSpaces.Besov.Basic`: the Besov spaces `B^s_{p,q}(Ω, S) = A^s_q(L_p(μ), S)`.
-* `FunctionSpaces.MeasureSpaces.Besov.Trivial`: the embeddings that need no property of the scheme.
+* `FunctionSpaces.MeasureSpaces.Besov.ElementaryEmbeddings`: the embeddings that need no property of
+  the scheme.
 * `FunctionSpaces.MeasureSpaces.Besov.Nikolskii`: the Nikolskii property of a scheme and the
   Nikolskii inequality `‖a‖_r ≲ n^(D(1/p-1/r)) ‖a‖_p` it implies.
 * `FunctionSpaces.MeasureSpaces.Besov.Embeddings`: the Besov embeddings into `B^{s-α}_{r,q}`, `L_∞`
@@ -372,6 +376,14 @@ holds the tools without function-space content.
 * `FunctionSpaces.MeasureSpaces.Spectral.LocalWeyl`: the local Weyl bound, the Nikolskii inequality
   for `p ≤ 2` and the continuity of `H^s` for `s > D/2`.
 
+#### `MeasureSpaces/Martingales`: filtrations and martingale differences
+
+* `FunctionSpaces.MeasureSpaces.Martingales.Filtration`: conditional expectations as contractions on
+  `L_p`, filtration schemes (the Haar system for the dyadic filtration) and the characterisation of
+  their approximation spaces by martingale differences.
+* `FunctionSpaces.MeasureSpaces.Martingales.Partition`: the conditional expectation onto the
+  σ-algebra of a countable partition is the average over the cells.
+
 ### Function spaces on ℝ^d
 
 #### `Rd/Approximation`: band-limited approximation
@@ -387,30 +399,30 @@ holds the tools without function-space content.
 
 * `FunctionSpaces.Rd.LittlewoodPaley.LittlewoodPaley`: the Littlewood–Paley blocks, reconstruction,
   and the characterisation of band-limited approximation spaces by Littlewood–Paley blocks.
-* `FunctionSpaces.Rd.LittlewoodPaley.BesovDifferences`: the modulus of smoothness as a modulus
-  compatible with the band-limited scheme, and the agreement of the Besov conditions by
-  approximation, by Littlewood–Paley blocks and by differences.
 
 #### `Rd/Differences`: differences and moduli of smoothness
 
+* `FunctionSpaces.Rd.Differences.BesovDifferences`: the modulus of smoothness as a modulus
+  compatible with the band-limited scheme, and the agreement of the Besov conditions by
+  approximation, by Littlewood–Paley blocks and by differences.
 * `FunctionSpaces.Rd.Differences.DilatedDifferences`: differences of convolutions and dilations, and
   the modulus of a convolution.
-* `FunctionSpaces.Rd.Differences.DomainModuli`: differences and moduli of smoothness on subsets of a
-  finite-dimensional space, sets equal up to null sets, and the intrinsic quasi-norm on a set.
 * `FunctionSpaces.Rd.Differences.MomentKernels`: moment kernels built from dilations, convolution
   with them as an average of differences, and approximation with the modulus, also on subsets.
 * `FunctionSpaces.Rd.Differences.SobolevSlobodeckij`: the Gagliardo form of the Sobolev–Slobodeckij
   spaces, its two-sided bounds by the first-difference Besov norm with explicit constants, radial
   integrals of powers, double integrals of sums, and `W^{s,p} = B^s_{p,p}` for `0 < s < 1`.
+* `FunctionSpaces.Rd.Differences.PointwiseMultipliers`: Leibniz's rule for differences, pointwise
+  multipliers of the Besov spaces by differences, and multiplication by bounded continuous
+  functions as an operator on `L_p`.
+* `FunctionSpaces.Rd.Differences.ConvexDifferences`: differences within a convex set bounded by
+  derivatives within the set.
 
 #### `Rd/LocalMeans`: local means
 
 * `FunctionSpaces.Rd.LocalMeans.LocalMeans`: local means with moment kernels, the reproducing
   formula, the characterisation of Besov spaces by local means, and bumps for local means from
   smooth bump functions.
-* `FunctionSpaces.Rd.LocalMeans.Multipliers`: Leibniz's rule for differences, pointwise
-  multipliers of the Besov spaces by differences, and multiplication by bounded continuous
-  functions as an operator on `L_p`.
 * `FunctionSpaces.Rd.LocalMeans.KernelMajorants`: Peetre majorants of the cross kernels `k_j ⋆ Θ_i`
   and `ψ_j ⋆ η_i` with explicit constants, and the maximal function bound of convolutions with such
   kernels.
@@ -421,8 +433,6 @@ holds the tools without function-space content.
   quasi-norm, and the atomic synthesis of Besov spaces by differences, on `V` and on a set.
 * `FunctionSpaces.Rd.Atoms.AtomAnalysis`: cell atoms of convolutions, the atomic decomposition by
   local means, and the atomic characterisation of Besov spaces.
-* `FunctionSpaces.Rd.Atoms.ConvexDifferences`: differences within a convex set bounded by
-  derivatives within the set.
 * `FunctionSpaces.Rd.Atoms.SmoothAtoms`: derivatives of convolutions and dilations, smooth atoms on
   a convex set as regular atoms, and the atomic decomposition into smooth atoms of every order.
 * `FunctionSpaces.Rd.Atoms.AtomComposition`: smooth changes of variables with a cut-off on a convex
@@ -520,6 +530,11 @@ holds the tools without function-space content.
   `m` of Schwartz kernels, `ψ_1 = ∑_i ∂_{e_{i_0}} ⋯ ∂_{e_{i_{m-1}}} η_i`, the Fourier transforms of
   iterated derivatives, and the Calderón–Zygmund families of the dilated derivative kernels and of
   the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels.
+* `FunctionSpaces.Rd.Sobolev.DivergenceKernels`: smoothness of parametric integrals, the
+  dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, the
+  divergence kernels as Schwartz functions with mean zero when `m` has vanishing first moments, the
+  supports of dyadic dilates, and the Calderón–Zygmund families of the dilates of mean-zero
+  Schwartz functions.
 * `FunctionSpaces.Rd.Sobolev.SobolevTriebelLizorkin`: the Sobolev spaces `W^m_p = F^m_{p,2}` for
   `1 < p < ∞` with named constants in both directions, and, for `m ≥ 1`, the Besov sandwich
   `B^m_{p,min(p,2)} ⊆ W^m_p ⊆ B^m_{p,max(p,2)}`.
@@ -623,11 +638,6 @@ holds the tools without function-space content.
   Lipschitz graph domains described by intrinsic differences.
 * `FunctionSpaces.Domains.Extension.LocalExtension`: local versions of Rychkov's extension, for
   boundary patches of Lipschitz graph domains and for inner patches, with a bound.
-* `FunctionSpaces.Domains.Extension.DivergenceKernels`: smoothness of parametric integrals, the
-  dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, the
-  divergence kernels as Schwartz functions with mean zero when `m` has vanishing first moments, the
-  supports of dyadic dilates, and the Calderón–Zygmund families of the dilates of mean-zero
-  Schwartz functions.
 * `FunctionSpaces.Domains.Extension.SobolevExtension`: the local means of order two by the gradient,
   the local means of Triebel–Lizorkin type on a set, the bounds of Rychkov's local extension from
   one patch, bounded extensions from a set and their pasting in `W^1_p(ℝ^d)`, the supports of the
@@ -834,7 +844,7 @@ holds the tools without function-space content.
 * `FunctionSpaces.Domains.Cube.SplineInverse`: the inverse inequality of order `r - 1 + 1/p` for
   tensor splines and the identification of their approximation spaces with `B^s_{p,q}([0, 1]^d)` for
   `0 < s < r - 1 + 1/p`.
-* `FunctionSpaces.Domains.Cube.Translation`: the isotropic difference `Δ_h^r` on `ℝ^d` and its
+* `FunctionSpaces.Domains.Cube.IsoDifferences`: the isotropic difference `Δ_h^r` on `ℝ^d` and its
   expansion into mixed coordinate differences.
 * `FunctionSpaces.Domains.Cube.IsoModulus`: the isotropic modulus of smoothness on the cube and its
   comparison with the moduli in the coordinates.
@@ -846,9 +856,9 @@ holds the tools without function-space content.
 
 ### The torus
 
-* `FunctionSpaces.Torus.Measure`: Mathlib's normalised Haar measure on the torus as a scoped
+* `FunctionSpaces.Torus.HaarMeasure`: Mathlib's normalised Haar measure on the torus as a scoped
   instance, `open scoped TorusHaar`.
-* `FunctionSpaces.Torus.Scheme`: trigonometric polynomials of degree `< n` and their scheme
+* `FunctionSpaces.Torus.TrigPolynomials`: trigonometric polynomials of degree `< n` and their scheme
   `Torus.trigScheme`.
 * `FunctionSpaces.Torus.Nikolskii`: the Nikolskii inequality for trigonometric polynomials by
   the power trick, `Torus.trigScheme_hasNikolskii`.
@@ -913,14 +923,6 @@ holds the tools without function-space content.
   derivatives of the periodic lifts on `ℝ^d`, and classical derivatives of `C^1` lifts.
 
 ### Wavelets
-
-#### `Wavelets`: filtrations and martingale differences
-
-* `FunctionSpaces.Wavelets.Filtration`: conditional expectations as contractions on `L_p`,
-  filtration schemes (the Haar system for the dyadic filtration) and the characterisation of
-  their approximation spaces by martingale differences.
-* `FunctionSpaces.Wavelets.Partition`: the conditional expectation onto the σ-algebra of a
-  countable partition is the average over the cells.
 
 #### `Wavelets/Examples`: Haar wavelets and multiwavelets
 

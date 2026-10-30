@@ -10,12 +10,12 @@ This block holds the folder `FunctionSpaces/Analysis/`, whose files import only 
 `ApproximationSpaces` and each other: `L_p` norms, the inclusion `L_r ↪ L_p` and bounded
 continuous functions on finite measure spaces, Young's inequality on measurable groups, mixed
 norms `L_p(ℓ_q)` and `ℓ_q(L_p)` on every measure space, weak type, the layer cake formula,
-Marcinkiewicz interpolation and `L_p` norms by duality; differences on additive monoids and the
-translation algebra; convolution, approximate identities, the Littlewood–Paley kernels and test
-functions on `ℝ^d`; dyadic cubes and cells, the Hardy–Littlewood maximal function, the
-Calderón–Zygmund decomposition, also for functions with values in a normed space, and the
-Fefferman–Stein inequality. The `L_p` norms are handled through integrals of powers
-(`MeasureTheory.eLpNorm_rpow_eq`).
+Marcinkiewicz interpolation and `L_p` norms by duality; differences on additive monoids, the
+translation algebra and moduli of smoothness on subsets; convolution, approximate identities,
+the Littlewood–Paley kernels and test functions on `ℝ^d`; dyadic cubes and cells, the
+Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, also for functions with
+values in a normed space, and the Fefferman–Stein inequality. The `L_p` norms are handled through
+integrals of powers (`MeasureTheory.eLpNorm_rpow_eq`).
 
 ## Main results
 
@@ -89,6 +89,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | `L_p` and `L_p(ℓ_2)` norms by duality for `1 < p < ∞` through the norming family, Hölder's inequality for `[0, ∞]`-valued functions in `L_p` norms, and families in `L_p` vanishing outside a finite set | ✅ | ✗ | `Analysis/Lp/NormingFamily` |
 | Differences `higherDiff` on any additive monoid, steps of either sign; the modulus of smoothness on `ℝ^d`, its homogeneity, dilation of the scale | ✅ | ✗ | `Analysis/Differences/Differences` |
 | Translation algebra of an additive monoid, differences as its powers | ✅ | ✗ | `Analysis/Differences/TranslationAlgebra` |
+| Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences, sets equal up to null sets, the intrinsic quasi-norm | ✅ | ✗ | `Analysis/Differences/DomainModuli` |
 | Convolution with integrable kernels on `ℝ^d`: Young's inequality, pointwise bounds, associativity, operators on `L_p` | ✅ | ✗ | `Analysis/Fourier/Convolution` |
 | Changes of scale `x ↦ r x` in integrals, dilations, their supports, `L_1` norms and first moments, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ | ✗ | `Analysis/Fourier/ApproxIdentity` |
 | The Fourier transform of integrable functions (continuity, `L_1` bounds, convolutions, multiplication formula, conjugation, Lipschitz bound for band-limited inverse transforms); Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, the kernels on the frequency side with `|𝓕ψ_j| ≤ 1`, telescoping sums and at most two blocks at every frequency, kernel identities by Fourier inversion | ✅ | ✗ | `Analysis/Fourier/LittlewoodPaleyKernels` |

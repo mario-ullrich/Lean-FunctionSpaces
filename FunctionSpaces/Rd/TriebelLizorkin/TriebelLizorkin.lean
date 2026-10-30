@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Rd.LittlewoodPaley.LittlewoodPaley
-public import FunctionSpaces.Rd.LittlewoodPaley.BesovDifferences
+public import FunctionSpaces.Rd.Differences.BesovDifferences
 public import FunctionSpaces.Analysis.Lp.MixedNorms
 
 /-!

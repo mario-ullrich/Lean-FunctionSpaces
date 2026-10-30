@@ -217,8 +217,8 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | `A^s_q`, its dyadic quasi-norm and linear structure | ✅ | ✗ | `Norm`, `Dyadic`, `Space` |
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ | ✗ | `Embedding`, `Transfer` |
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ | ✗ | `Lift`, `Nikolskii` |
-| K-functional, real interpolation, representation theorem | ✅ | ✗ | `KFunctional`, `Representation` |
-| Continuous K-method and its equivalence with the discrete K-method | ✅ | ✗ | `KMethod` |
+| K-functional, real interpolation, representation theorem | ✅ | ✗ | `Interpolation/KFunctional`, `Interpolation/Representation` |
+| Continuous K-method and its equivalence with the discrete K-method | ✅ | ✗ | `Interpolation/KMethod` |
 | Couples of extended quasi-norms, their K-functional and K-method, quasi-triangle inequalities of the K-norms, the couple of a bounded linear map | ✅ | ✗ | `Interpolation/Couple` |
 | Dilations of `dt/t`, the interpolation property of the K-method, comparable couples, retracts, compatible maps between couples of bounded linear maps | ✅ | ✗ | `Interpolation/Property` |
 | Couples of K-spaces, Holmstedt's formula, the reiteration theorem and its endpoint cases | ✅ | ✗ | `Interpolation/Reiteration` |

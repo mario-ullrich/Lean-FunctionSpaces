@@ -6,6 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.MeasureSpaces.Besov.Basic
+public import ApproximationSpaces.Interpolation.ApproxSpaces
 
 /-!
 # Besov spaces as interpolation spaces

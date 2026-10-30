@@ -5,7 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
-public import ApproximationSpaces
+public import ApproximationSpaces.Scheme
 public import FunctionSpaces.Analysis.Lp.BoundedContinuous
 public import Mathlib.Analysis.Complex.Basic
 

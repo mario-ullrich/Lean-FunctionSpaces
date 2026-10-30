@@ -6,7 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Domains.Extension.LocalExtension
-public import FunctionSpaces.Rd.LocalMeans.Multipliers
+public import FunctionSpaces.Rd.Differences.PointwiseMultipliers
 public import Mathlib.Geometry.Manifold.PartitionOfUnity
 
 /-!

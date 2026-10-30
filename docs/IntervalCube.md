@@ -11,8 +11,8 @@ for `0 < s < 1/p` with piecewise polynomials and for `0 < s < r - 1 + 1/p` with 
 B-splines with Marsden's identity and quasi-interpolants; on the cube, operators act on slices
 one coordinate at a time, and the translation algebra `ℂ[ℝ^d]` of
 [Tools from analysis](Analysis.md) relates the isotropic modulus to
-the moduli in the coordinates. Martingale differences of a filtration on a finite measure space
-are the general theorem behind the Haar characterisation, and multiwavelets refine it to higher
+the moduli in the coordinates. The martingale differences of [Besov and Sobolev spaces on measure
+spaces](MeasureSpaces.md) give the Haar characterisation, and multiwavelets refine it to higher
 degree.
 
 ## Main results
@@ -115,13 +115,6 @@ degree.
   them by differences of every order in one variable
   (`Interval.exists_eLpNorm_higherDiff_ppFun_le`,
   `Interval.exists_eLpNorm_higherDiff_spline_le_of_lt`).
-* **Martingale differences.** For a filtration `ℱ_0 ≤ ℱ_1 ≤ ⋯` on a finite measure space,
-  let `A_n ⊆ L_p` be the `ℱ_⌊log₂ n⌋`-measurable functions (for the dyadic filtration of
-  `[0, 1)`, the step functions of the Haar system). If these are dense in `L_p`, then for
-  `s > 0`, `f ∈ A^s_q` iff
-  `‖E[f | ℱ_0]‖_p + ‖(2^(ks) ‖E[f | ℱ_{k+1}] - E[f | ℱ_k]‖_p)_k‖_{ℓ_q} < ∞`
-  (`MeasureTheory.Filtration.memApprox_iff_martingale`), using the conditional expectation
-  as a contraction of `L_p` (`MeasureTheory.Lp.condExpLp`).
 * **The Haar system.** Let `h_{k,m} = 2^(k/2) (1_{[2m, 2m+1) 2^(-k-1)} - 1_{[2m+1, 2m+2) 2^(-k-1)})`
   be the Haar functions on `[0, 1)` and `A_n` the step functions on the dyadic intervals of
   length `2^(-⌊log₂ n⌋)`. For `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q(L_p[0, 1])` iff
@@ -160,11 +153,10 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Piecewise polynomials on the cube: tensor projection, tensor-product description, Whitney, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p` | ✅ | ✗ | `Domains/Cube/PiecewisePoly`, `Domains/Cube/PiecewiseJackson`, `Domains/Cube/PiecewiseInverse` |
 | Tensor splines on the cube: quasi-interpolant as a kernel operator, tensor-product description, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Domains/Cube/Splines`, `Domains/Cube/SplineJackson`, `Domains/Cube/SplineInverse` |
 | Differences of every order: difference bound for polynomials, piecewise polynomials (gain `1/p`), splines (gain `m` below order `r`), steps of either sign | ✅ | ✗ | `Domains/Interval/PolyDifferences`, `Domains/Interval/LowerDifferences` |
-| Isotropic differences and their expansion into mixed coordinate differences | ✅ | ✗ | `Domains/Cube/Translation` |
+| Isotropic differences and their expansion into mixed coordinate differences | ✅ | ✗ | `Domains/Cube/IsoDifferences` |
 | Isotropic modulus on the cube, comparison with the moduli in the coordinates | ✅ | ✗ | `Domains/Cube/IsoModulus` |
 | Isotropic inverse inequalities, `A^s_q` with the isotropic modulus, coordinate and isotropic Besov conditions agree for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Domains/Cube/IsoInverse`, `Domains/Cube/IsoCoincidence` |
-| Filtration schemes (Haar), martingale-difference characterisation | ✅ | ✗ | `Wavelets/Filtration` |
-| Haar system on `[0, 1]`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ | ✗ | `Wavelets/Partition`, `Wavelets/Examples/Haar` |
+| Haar system on `[0, 1]`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ | ✗ | `Wavelets/Examples/Haar` |
 | Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarBesov` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.

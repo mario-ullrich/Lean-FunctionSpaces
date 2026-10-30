@@ -6,7 +6,8 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.MeasureSpaces.Scheme
-public import FunctionSpaces.Torus.Measure
+public import ApproximationSpaces.Error
+public import FunctionSpaces.Torus.HaarMeasure
 public import Mathlib.Algebra.Algebra.Operations
 public import Mathlib.Data.Int.Interval
 public import Mathlib.Analysis.Fourier.AddCircleMulti
