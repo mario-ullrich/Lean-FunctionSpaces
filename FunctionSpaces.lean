@@ -39,6 +39,8 @@ public import FunctionSpaces.MeasureSpaces.Besov.Interpolation
 public import FunctionSpaces.MeasureSpaces.Sobolev.Embeddings
 public import FunctionSpaces.MeasureSpaces.Spectral.Basic
 public import FunctionSpaces.MeasureSpaces.Spectral.Blocks
+public import FunctionSpaces.MeasureSpaces.Spectral.CompactEigenbasis
+public import FunctionSpaces.MeasureSpaces.Spectral.CompactEmbedding
 public import FunctionSpaces.MeasureSpaces.Spectral.ContinuousSpectralBasis
 public import FunctionSpaces.MeasureSpaces.Spectral.LocalWeyl
 public import FunctionSpaces.MeasureSpaces.Martingales.Filtration
@@ -370,6 +372,11 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   Sobolev spaces, with Jackson and Bernstein inequalities from Parseval's identity.
 * `FunctionSpaces.MeasureSpaces.Spectral.Blocks`: spectral schemes as projection schemes, the
   coefficient characterisation of their approximation spaces and `H^s = A^s_2`.
+* `FunctionSpaces.MeasureSpaces.Spectral.CompactEigenbasis`: the Hilbert basis of eigenvectors of a
+  compact self-adjoint operator, indexed by eigenvalues and bases of the eigenspaces.
+* `FunctionSpaces.MeasureSpaces.Spectral.CompactEmbedding`: compact dense embeddings of Hilbert
+  spaces, their eigenvector and singular bases, the spectral scheme with level `⌊σ⁻¹⌋₊`, Jackson
+  and Bernstein inequalities and the interpolation spaces `(H, J(V))_{θ,q} = A^θ_q`.
 * `FunctionSpaces.MeasureSpaces.Spectral.ContinuousSpectralBasis`: continuous spectral bases,
   Hilbert bases of `L_2` of a finite measure represented by bounded continuous functions (modelled
   on the eigenfunctions of a Laplacian), their scheme, `B^s_{2,2} = H^s` and the Sobolev spaces.

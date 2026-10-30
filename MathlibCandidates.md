@@ -116,6 +116,24 @@ declarations.
   (`FunctionSpaces/MeasureSpaces/Martingales/Partition.lean`): for `φ : α → ι` with `ι` countable,
   measurable fibres and a finite measure, `μ[f | MeasurableSpace.comap φ ⊤]` is a.e. the average
   of `f` over the fibre through the point (`MeasureTheory.condExp_comap_ae_eq`).
+* **Hilbert bases of eigenvectors**
+  (`FunctionSpaces/MeasureSpaces/Spectral/CompactEigenbasis.lean`): for a symmetric operator such
+  that the orthogonal complement of the sum of all eigenspaces is `{0}`, in particular a compact
+  self-adjoint one, every choice of Hilbert bases of the eigenspaces gives a Hilbert basis of
+  eigenvectors indexed by pairs of an eigenvalue and an index of a basis of its eigenspace
+  (`ContinuousLinearMap.hilbertBasisOfEigenspaces`), with nonzero eigenvalues for injective
+  operators (`ContinuousLinearMap.exists_hilbertBasis_forall_hasEigenvector_ne_zero`), and the
+  helper `HilbertBasis.inner_eq_zero_of_forall_inner_eq_zero`. The construction follows
+  TauCeti's proof, and the helper and the statement of the theorem are taken from TauCeti
+  (`TauCeti/Analysis/InnerProductSpace/Spectrum.lean` and `HilbertBasis/Basic.lean`, commit
+  `463ab293`, Apache-2.0).
+* **Compact dense embeddings have finitely many large singular values**
+  (`FunctionSpaces/MeasureSpaces/Spectral/CompactEmbedding.lean`): for a compact injective
+  `J : V → H` with dense range, the singular values `σ_i = ‖J† e_i‖` of the eigenvector basis of
+  `J J†` satisfy `σ_i² = μ_i`, `v_i = σ_i⁻¹ J† e_i` is a Hilbert basis of `V`, and
+  `{i : σ_i ≥ ε}` is finite for every `ε > 0` (`CompactDenseEmbedding.singularBasis`,
+  `CompactDenseEmbedding.finite_setOf_le_singularValue`). EllipticPDE has the eigenvalue form,
+  `IsCompactOperator.finite_setOf_hasEigenvalue_norm_ge` (`CompactSpectrum.lean`).
 * **Fourier analysis on the torus** (`FunctionSpaces/Torus/Translation.lean`): the Fourier
   coefficients of a translate, `(τ_h f)^(k) = e_k(h) f̂(k)`
   (`Torus.mFourierCoeff_translate`), and `|∏ aᵢ - 1| ≤ ∑ |aᵢ - 1|` for unimodular `aᵢ`

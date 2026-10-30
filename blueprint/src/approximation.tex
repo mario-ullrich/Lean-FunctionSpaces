@@ -4036,7 +4036,9 @@ scheme in $H$, the \emph{spectral scheme} of $(e_i, \lambda)$.
 On the torus, $e_k$ is the Fourier basis and $\lambda(k) = \max_j |k_j|$. On a compact
 manifold, $e_i$ are the eigenfunctions of the Laplacian and $\lambda$ a function of the
 eigenvalue; \Cref{sec:continuous-spectral-bases} assumes an orthonormal basis of continuous
-functions with levels, the structure this case provides.
+functions with levels, the structure this case provides. Every compact dense embedding $J$ of
+Hilbert spaces gives a spectral scheme, from the eigenvectors of $J J^*$
+(\Cref{sec:compact-embedding-schemes}).
 
 \begin{definition}[Sobolev embedding of $\ell_2$]
 \label{def:sobolev-embed}
@@ -4137,6 +4139,284 @@ where $\omega_i = 2^{2ks}$ on the block $2^k \leq \lambda(i) < 2^{k+1}$ and $\om
 for $\lambda(i) = 0$; and $\omega_i \leq (1 + \lambda(i))^{2s} \leq 4^s \omega_i$.
 \end{proof}
 
+
+\section{Eigenbases of compact self-adjoint operators}
+\label{sec:compact-eigenbasis}
+
+Let $E$ be a Hilbert space over $\R$ or $\C$. Mathlib's spectral theorem for a compact
+self-adjoint operator $T$ on $E$ states that the orthogonal complement of the sum of all
+eigenspaces of $T$ is $\{0\}$, that is, the eigenspaces together span a dense subspace. The
+theorem below turns this into a Hilbert basis of eigenvectors. Its construction follows the proof
+of the corresponding theorem of the Lean project TauCeti~\cite{TauCeti}, turned into
+definitions; the auxiliary statement on Hilbert bases of subspaces is copied from there with its
+name, and TauCeti's theorem for injective operators (\Cref{cor:compact-injective-eigenbasis}) is
+restated with its name and proved as a corollary. In contrast to
+\cite[Theorem~6.11, p.~167]{Brezis2011}, $E$ need not be separable: the basis is indexed by the
+pairs of an eigenvalue and an index of a basis of its eigenspace.
+
+\begin{theorem}[Hilbert basis of eigenvectors]
+\label{thm:compact-self-adjoint-eigenbasis}
+\lean{HilbertBasis.inner_eq_zero_of_forall_inner_eq_zero,
+  ContinuousLinearMap.completeSpace_eigenspace, ContinuousLinearMap.eigenspaceIndex,
+  ContinuousLinearMap.eigenspaceBasis, ContinuousLinearMap.eigenIndex,
+  ContinuousLinearMap.eigenvector, ContinuousLinearMap.eigenvector_mem,
+  ContinuousLinearMap.apply_eigenvector, ContinuousLinearMap.norm_eigenvector,
+  ContinuousLinearMap.hasEigenvector_eigenvector, ContinuousLinearMap.eigenIndex_fst_ne_zero,
+  ContinuousLinearMap.isEmpty_hilbertBasis_eigenspace_zero,
+  ContinuousLinearMap.orthonormal_sigma_eigenspaces,
+  ContinuousLinearMap.orthogonal_span_sigma_eigenspaces_eq_bot,
+  ContinuousLinearMap.hilbertBasisOfEigenspaces,
+  ContinuousLinearMap.coe_hilbertBasisOfEigenspaces,
+  ContinuousLinearMap.apply_hilbertBasisOfEigenspaces,
+  ContinuousLinearMap.orthonormal_eigenvector,
+  ContinuousLinearMap.orthogonal_span_eigenvector_eq_bot, ContinuousLinearMap.eigenHilbertBasis,
+  ContinuousLinearMap.coe_eigenHilbertBasis}
+\leanok
+Let $T$ be a bounded symmetric operator on $E$ such that the orthogonal complement of the sum of
+all eigenspaces of $T$ is $\{0\}$, and for every scalar $\mu$ let $(e_{\mu, j})_{j \in W_\mu}$
+be a Hilbert basis of the eigenspace $\ker(T - \mu)$. Then
+$(e_{\mu, j})_{\mu, \, j \in W_\mu}$ is a Hilbert basis of $E$, and
+$T e_{\mu, j} = \mu e_{\mu, j}$ for every $\mu$ and every $j \in W_\mu$. If $T$ is injective,
+then $W_0$ is empty.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Each eigenspace is closed, hence a Hilbert space, so the bases $(e_{\mu, j})_j$ exist. The
+eigenspaces of a symmetric operator are mutually orthogonal, so the whole family is
+orthonormal. A vector $x$ orthogonal to every $e_{\mu, j}$ is orthogonal to the eigenspace of
+$\mu$, since every $y$ in it is the sum $\sum_j \langle e_{\mu, j}, y \rangle e_{\mu, j}$; so
+$x$ lies in the orthogonal complement of all eigenspaces, and $x = 0$. If $T$ is injective,
+the eigenspace of $0$ is $\ker T = \{0\}$, which contains no unit vector.
+\end{proof}
+
+\begin{corollary}[Eigenbasis of an injective compact self-adjoint operator]
+\label{cor:compact-injective-eigenbasis}
+\lean{ContinuousLinearMap.exists_hilbertBasis_forall_hasEigenvector_ne_zero}
+\leanok
+\uses{thm:compact-self-adjoint-eigenbasis}
+For every injective compact self-adjoint operator $T$ on $E$ there is a Hilbert basis of $E$ of
+eigenvectors of $T$ with nonzero eigenvalues.
+\end{corollary}
+
+\begin{proof}
+\leanok
+By Mathlib's spectral theorem the orthogonal complement of the sum of all eigenspaces of $T$ is
+$\{0\}$, so \Cref{thm:compact-self-adjoint-eigenbasis} applies, with $W_0$ empty.
+\end{proof}
+
+\section{Spectral schemes of compact embeddings}
+\label{sec:compact-embedding-schemes}
+
+Throughout, $V$ and $H$ are complex Hilbert spaces. The model is the embedding
+$H^1_0(\Omega) \hookrightarrow L_2(\Omega)$ for a bounded open set $\Omega$. For $H^1_0(\Omega)$
+with the inner product $\langle u, w \rangle + (2\pi)^{-2} \langle \nabla u, \nabla w \rangle$,
+the eigenvectors of $J J^*$ are the eigenfunctions of the Dirichlet Laplacian, the singular
+values below satisfy $\sigma_i^{-2} = 1 + \lambda_i/(4\pi^2)$ for the eigenvalues $\lambda_i$,
+and the levels below are the integer parts of the square roots of $1 + \lambda_i/(4\pi^2)$.
+
+\begin{definition}[Compact dense embedding]
+\label{def:compact-dense-embedding}
+\lean{CompactDenseEmbedding, CompactDenseEmbedding.orthogonal_range_eq_bot,
+  CompactDenseEmbedding.ker_adjoint, CompactDenseEmbedding.adjoint_injective}
+\leanok
+A \emph{compact dense embedding} of $V$ into $H$ is a bounded linear map $J : V \to H$ that is
+compact, injective and has dense range. Its adjoint $J^* : H \to V$ is then injective.
+\end{definition}
+
+\begin{proof}
+\leanok
+The kernel of $J^*$ is the orthogonal complement of the range of $J$, which is $\{0\}$ since
+the range is dense.
+\end{proof}
+
+\begin{lemma}[The operator $J J^*$]
+\label{lem:gram-operator}
+\lean{CompactDenseEmbedding.gram, CompactDenseEmbedding.isCompactOperator_gram,
+  CompactDenseEmbedding.isPositive_gram, CompactDenseEmbedding.isSymmetric_gram,
+  CompactDenseEmbedding.ker_gram}
+\leanok
+\uses{def:compact-dense-embedding}
+For every compact dense embedding $J : V \to H$, the operator $T = J J^*$ on $H$ is compact,
+positive (hence symmetric) and injective.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$T$ is compact as $J$ is, and positive, hence symmetric. Its kernel is the kernel of $J^*$, the
+orthogonal complement of the range of $J$, which is trivial since the range is dense.
+\end{proof}
+
+\begin{theorem}[Eigenvector basis of a compact dense embedding]
+\label{thm:eigenbasis-compact-embedding}
+\lean{CompactDenseEmbedding.index, CompactDenseEmbedding.eigenBasis,
+  CompactDenseEmbedding.coe_eigenBasis, CompactDenseEmbedding.gram_eigenBasis,
+  CompactDenseEmbedding.index_fst_ne_zero}
+\leanok
+\uses{thm:compact-self-adjoint-eigenbasis, lem:gram-operator}
+For every compact dense embedding $J : V \to H$ there is a Hilbert basis $(e_i)_{i \in I}$ of
+$H$ and nonzero scalars $\mu_i$ with $J J^* e_i = \mu_i e_i$ for every $i \in I$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:compact-self-adjoint-eigenbasis} for the operator of \Cref{lem:gram-operator}, with
+$I$ the set of pairs $(\mu, j)$, $j \in W_\mu$, and $\mu_{(\mu, j)} = \mu$.
+\end{proof}
+
+The construction follows TauCeti~\cite{TauCeti}; \cite[Theorem~6.11, p.~167]{Brezis2011}
+gives the same basis for separable $H$, and the Lean statement needs no separability.
+
+\begin{definition}[Singular values and singular basis]
+\label{def:singular-basis}
+\lean{CompactDenseEmbedding.singularValue, CompactDenseEmbedding.singularVector,
+  CompactDenseEmbedding.singularBasis, CompactDenseEmbedding.coe_singularBasis,
+  CompactDenseEmbedding.inner_adjoint_eigenBasis, CompactDenseEmbedding.sq_singularValue,
+  CompactDenseEmbedding.singularValue_pos, CompactDenseEmbedding.ofReal_singularValue_ne_zero,
+  CompactDenseEmbedding.norm_inv_singularValue_mul, CompactDenseEmbedding.singularValue_le_norm,
+  CompactDenseEmbedding.adjoint_eigenBasis_eq, CompactDenseEmbedding.orthonormal_singularVector,
+  CompactDenseEmbedding.eq_zero_of_forall_inner_eigenBasis,
+  CompactDenseEmbedding.orthogonal_span_singularVector_eq_bot,
+  CompactDenseEmbedding.adjoint_eigenBasis, CompactDenseEmbedding.apply_singularBasis}
+\leanok
+\uses{thm:eigenbasis-compact-embedding}
+Let $J : V \to H$ be a compact dense embedding with the eigenvector basis $(e_i)_{i \in I}$ of
+\Cref{thm:eigenbasis-compact-embedding}. The \emph{singular values} are
+$\sigma_i = \|J^* e_i\|$, and the \emph{singular vectors} are $v_i = \sigma_i^{-1} J^* e_i$.
+For every $i \in I$, $\sigma_i^2 = \mu_i$ and $0 < \sigma_i \leq \|J\|$; the family
+$(v_i)_{i \in I}$ is a Hilbert basis of $V$, the \emph{singular basis}, and
+$J v_i = \sigma_i e_i$, $J^* e_i = \sigma_i v_i$.
+\end{definition}
+
+\begin{proof}
+\leanok
+$\langle J^* e_i, J^* e_j \rangle = \langle e_i, J J^* e_j \rangle = \mu_j \langle e_i, e_j
+\rangle$. For $i = j$ this gives $\sigma_i^2 = \mu_i \neq 0$, and for $i \neq j$ the
+orthogonality of $v_i$ and $v_j$. If $w \in V$ is orthogonal to every $v_i$, then
+$\langle e_i, J w \rangle = \langle J^* e_i, w \rangle = \sigma_i \langle v_i, w \rangle = 0$ for
+every $i$, so $J w = 0$ and $w = 0$. Finally $J v_i = \sigma_i^{-1} J J^* e_i =
+\sigma_i^{-1} \mu_i e_i = \sigma_i e_i$.
+\end{proof}
+
+\begin{lemma}[Coefficients and the weak eigenvalue equation]
+\label{lem:singular-coefficients}
+\lean{CompactDenseEmbedding.repr_apply, CompactDenseEmbedding.repr_apply_repr_symm,
+  CompactDenseEmbedding.mem_range_iff, CompactDenseEmbedding.norm_sq_eq_of_apply_eq,
+  CompactDenseEmbedding.inner_singularBasis, CompactDenseEmbedding.repr_singularBasis_eq}
+\leanok
+\uses{def:singular-basis}
+Let $J : V \to H$ be a compact dense embedding. For every $u, w \in V$, every $f \in H$ and
+every $i \in I$:
+\begin{enumerate}
+  \item $\langle e_i, J u \rangle = \sigma_i \langle v_i, u \rangle$;
+  \item $f \in J(V)$ if and only if $\sum_i \sigma_i^{-2} |\langle e_i, f \rangle|^2 < \infty$,
+    and if $J u = f$, then $\|u\|^2 = \sum_i \sigma_i^{-2} |\langle e_i, f \rangle|^2$;
+  \item $\langle v_i, w \rangle_V = \sigma_i^{-2} \langle J v_i, J w \rangle_H$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) $\langle e_i, J u \rangle = \langle J^* e_i, u \rangle = \sigma_i \langle v_i, u \rangle$.
+(2) By (1) the coefficients of $u$ in the singular basis are
+$\sigma_i^{-1} \langle e_i, f \rangle$; conversely, if these are square summable, they are the
+coefficients of some $u \in V$, and $J u = f$ by (1). The norm is Parseval's identity.
+(3) $\langle J v_i, J w \rangle = \sigma_i \langle e_i, J w \rangle = \sigma_i^2 \langle v_i, w
+\rangle$ by (1).
+\end{proof}
+
+For $V = H^1_0(\Omega)$ and $H = L_2(\Omega)$, part (3) is the weak form of the eigenvalue
+equation of the Dirichlet Laplacian.
+
+\begin{lemma}[Finitely many large singular values]
+\label{lem:finite-large-singular-values}
+\lean{CompactDenseEmbedding.singularValue_le_norm_sub,
+  CompactDenseEmbedding.finite_setOf_le_singularValue}
+\leanok
+\uses{def:singular-basis}
+For every compact dense embedding $J : V \to H$ and every $\varepsilon > 0$, the set
+$\{i \in I : \sigma_i \geq \varepsilon\}$ is finite.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $i \neq j$, the coefficient of $J v_i - J v_j = \sigma_i e_i - \sigma_j e_j$ at $e_i$ is
+$\sigma_i$, so $\|J v_i - J v_j\| \geq \sigma_i$. If the set were infinite, it would contain a
+sequence of distinct indices $i_n$; the $v_{i_n}$ lie in the unit ball, and by compactness of
+$J$ a subsequence of $(J v_{i_n})_n$ converges, hence is a Cauchy sequence. This contradicts
+$\|J v_{i_n} - J v_{i_m}\| \geq \sigma_{i_n} \geq \varepsilon$ for $n \neq m$.
+\end{proof}
+
+\begin{definition}[The spectral scheme of a compact dense embedding]
+\label{def:compact-embedding-scheme}
+\lean{CompactDenseEmbedding.level, CompactDenseEmbedding.spectralScheme,
+  CompactDenseEmbedding.spectralScheme_basis, CompactDenseEmbedding.spectralScheme_level,
+  CompactDenseEmbedding.level_le_inv_singularValue,
+  CompactDenseEmbedding.inv_singularValue_lt_level_add_one,
+  CompactDenseEmbedding.inv_singularValue_lt_of_level_lt,
+  CompactDenseEmbedding.singularValue_le_of_le_level, CompactDenseEmbedding.finite_level}
+\leanok
+\uses{lem:finite-large-singular-values, def:spectral}
+For a compact dense embedding $J : V \to H$, the \emph{level} of $i \in I$ is
+$\lambda(i) = \lfloor \sigma_i^{-1} \rfloor$. For every $n \in \N$ the set
+$\{i : \lambda(i) < n\}$ is finite, and $(e_i, \lambda)$ is a spectral scheme in $H$, the
+\emph{spectral scheme of $J$}.
+\end{definition}
+
+\begin{proof}
+\leanok
+$\lambda(i) < n$ gives $\sigma_i^{-1} < n$, so $\sigma_i \geq (n + 1)^{-1}$, which holds for
+finitely many $i$ by \Cref{lem:finite-large-singular-values}.
+\end{proof}
+
+\begin{theorem}[Jackson and Bernstein inequalities for a compact dense embedding]
+\label{thm:compact-embedding-jackson-bernstein}
+\lean{CompactDenseEmbedding.norm_sub_truncate_le, CompactDenseEmbedding.jacksonBound,
+  CompactDenseEmbedding.liftBound}
+\leanok
+\uses{def:compact-embedding-scheme, lem:singular-coefficients, def:jackson, def:lift-bound,
+  prop:spectral-jackson-bernstein}
+Let $J : V \to H$ be a compact dense embedding with spectral scheme $(A_n)$. For every
+$n \geq 1$ and $u \in V$, $E_n(J u) \leq n^{-1} \|u\|$; and every $a \in A_n$ is $J u$ for some
+$u \in V$ with $\|u\| \leq n \|a\|$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:singular-coefficients}, $J u - P_n J u$ has the coefficients
+$\sigma_i \langle v_i, u \rangle$ at the levels $\lambda(i) \geq n$, where
+$n \leq \sigma_i^{-1}$; Parseval's identity gives $\|J u - P_n J u\| \leq n^{-1} \|u\|$. An
+element $a \in A_n$ has coefficients only at levels $\lambda(i) < n$, where $\sigma_i^{-1} < n$;
+so $\sum_i \sigma_i^{-2} |\langle e_i, a \rangle|^2 \leq n^2 \|a\|^2$, and
+\Cref{lem:singular-coefficients} gives $u$.
+\end{proof}
+
+\begin{corollary}[Interpolation spaces of a compact dense embedding]
+\label{cor:compact-embedding-interpolation}
+\lean{CompactDenseEmbedding.memKMethod_iff_memApprox,
+  CompactDenseEmbedding.range_eq_range_sobolevEmbed,
+  CompactDenseEmbedding.inv_singularValue_le_one_add_level,
+  CompactDenseEmbedding.one_add_level_le}
+\leanok
+\uses{thm:compact-embedding-jackson-bernstein, cor:representation-sandwich, def:map-couple,
+  lem:sobolev-range, lem:singular-coefficients}
+Let $J : V \to H$ be a compact dense embedding with spectral scheme $(A_n)$. For every
+$0 < \theta < 1$, every $q \in [1, \infty]$ and every $f \in H$, $f \in (H, J(V))_{\theta, q}$,
+the space of the continuous $K$-method of the couple of $J$, if and only if $f \in A^\theta_q$.
+Moreover $J(V)$ is the range of the Sobolev embedding of order $1$ of the spectral scheme
+(\Cref{def:sobolev-embed}), the Sobolev space of order $1$: for every $f \in H$, $f \in J(V)$ if
+and only if
+$\sum_i (1 + \lambda(i))^2 |\langle e_i, f \rangle|^2 < \infty$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+The first statement is \Cref{cor:representation-sandwich} with $r = 1$ and
+\Cref{thm:compact-embedding-jackson-bernstein}. For the second,
+$\sigma_i^{-1} \leq 1 + \lambda(i) \leq (1 + \|J\|) \sigma_i^{-1}$, since
+$1 = \sigma_i \sigma_i^{-1} \leq \|J\| \sigma_i^{-1}$; so the condition of
+\Cref{lem:sobolev-range} with $s = 1$ and that of \Cref{lem:singular-coefficients} agree.
+\end{proof}
 
 \section{Continuous spectral bases}
 \label{sec:continuous-spectral-bases}
