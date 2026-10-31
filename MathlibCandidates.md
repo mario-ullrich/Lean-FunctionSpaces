@@ -134,6 +134,11 @@ declarations.
   `{i : σ_i ≥ ε}` is finite for every `ε > 0` (`CompactDenseEmbedding.singularBasis`,
   `CompactDenseEmbedding.finite_setOf_le_singularValue`). EllipticPDE has the eigenvalue form,
   `IsCompactOperator.finite_setOf_hasEigenvalue_norm_ge` (`CompactSpectrum.lean`).
+* **Polarization of a norm identity**
+  (`FunctionSpaces/MeasureSpaces/Spectral/CompactEigenbasis.lean`):
+  for linear maps `T`, `S_i` between inner product spaces over `ℝ` or `ℂ` and a real `c` with
+  `‖x‖² = ‖T x‖² + c ∑_i ‖S_i x‖²`, the inner products satisfy
+  `⟨x, y⟩ = ⟨T x, T y⟩ + c ∑_i ⟨S_i x, S_i y⟩` (`inner_eq_of_forall_sq_norm_eq`).
 * **Fourier analysis on the torus** (`FunctionSpaces/Torus/Translation.lean`): the Fourier
   coefficients of a translate, `(τ_h f)^(k) = e_k(h) f̂(k)`
   (`Torus.mFourierCoeff_translate`), and `|∏ aᵢ - 1| ≤ ∑ |aᵢ - 1|` for unimodular `aᵢ`

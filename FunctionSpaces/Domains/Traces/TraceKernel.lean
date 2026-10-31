@@ -25,9 +25,10 @@ closure of their restrictions in `H^1(Ω)`.
   `supp η_c + S` (`Rd.exists_schwartz_eq_conv`), hence elements of `H̃^1(Ω)` when these sets lie
   in `Ω` (`Rd.mem_tildeSpace_of_dilate`, `Rd.mem_tildeSpace_of_isCompact`); the mollifiers are
   normalised bump functions (`Rd.bumpMollifier`).
-* **`H̃^1(Ω)` by supports**: the elements of `H̃^1(Ω)` vanish outside `Ω`, for every open `Ω`
-  (`Rd.toL2_ae_eq_zero_of_mem_tildeSpace`), and on a bounded Lipschitz domain every `U ∈ H^1(V)`
-  vanishing outside `Ω` lies in `H̃^1(Ω)` (`Rd.BoundedLipschitzDomain.mem_tildeSpace_iff`). The
+* **`H̃^1(Ω)` by supports**: for `U ∈ H^1(V)` vanishing outside an open set `Ω`, the zero
+  extension of `U|_Ω` is `U` (`Rd.indicatorLp_toL2_restrictProj`), and on a bounded Lipschitz
+  domain every `U ∈ H^1(V)` vanishing outside `Ω` lies in `H̃^1(Ω)`
+  (`Rd.BoundedLipschitzDomain.mem_tildeSpace_iff`). The
   pieces of `U` near the boundary are pushed into `Ω` by a mollifier supported in the cone of the
   chart (`Rd.LipschitzGraph.coneMollifier`,
   `Rd.BoundedLipschitzDomain.mem_tildeSpace_of_mulLp_chart`).
@@ -206,29 +207,6 @@ theorem tsupport_coneMollifier_subset :
 end LipschitzGraph
 
 /-! ### `H̃^1(Ω)` by supports -/
-
-/-- **The elements of `H̃^1(Ω)` vanish outside `Ω`**: for every open `Ω` and `U ∈ H̃^1(Ω)`, the
-`L_2` function of `U` vanishes almost everywhere outside `Ω`. The `U` with this property form the
-kernel of `U ↦ (ι U)|_{V \ Ω}`, a closed subspace containing the test functions of `Ω`
-(`Rd.exists_opens_toL2_ae_eq_zero`). -/
-theorem toL2_ae_eq_zero_of_mem_tildeSpace {Ω : Opens V} {U : H^{1}(V)}
-    (hU : U ∈ tildeSpace 1 Ω) : ∀ᵐ x ∂volume, x ∉ (Ω : Set V) → toL2 U x = 0 := by
-  have hker : tildeSpace 1 Ω ≤
-      (LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V)ᶜ ∘L toL2).ker := by
-    refine Submodule.topologicalClosure_minimal _ (fun W hW => ?_)
-      (ContinuousLinearMap.isClosed_ker _)
-    obtain ⟨O, hO, hWO⟩ := exists_opens_toL2_ae_eq_zero hW
-    rw [LinearMap.mem_ker]
-    change LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V)ᶜ (toL2 W) = 0
-    rw [Lp.eq_zero_iff_ae_eq_zero]
-    exact (LpToLpRestrictCLM_coeFn ℂ _ _).trans (ae_restrict_of_ae_restrict_of_subset hO hWO)
-  have h := hker hU
-  rw [LinearMap.mem_ker] at h
-  change LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V)ᶜ (toL2 U) = 0 at h
-  rw [Lp.eq_zero_iff_ae_eq_zero] at h
-  have h' := (LpToLpRestrictCLM_coeFn ℂ _ _).symm.trans h
-  rw [EventuallyEq, ae_restrict_iff' Ω.isOpen.measurableSet.compl] at h'
-  exact h'
 
 /-- **The zero extension of the restriction**: for an open `Ω` and `U ∈ H^1(V)` vanishing almost
 everywhere outside `Ω`, the zero extension of the `L_2` function of `U|_Ω ∈ H^1(Ω)` is `ι U`, since

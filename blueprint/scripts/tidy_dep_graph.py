@@ -121,6 +121,7 @@ BLOCKS: list[tuple[str, list]] = [
     ("Lipschitz domains", ["Lipschitz domains"]),
     ("Traces", ["Traces on Lipschitz domains"]),
     ("Sobolev spaces on domains and boundaries", ["Sobolev spaces on domains"]),
+    ("Eigenbases of the Laplacian", ["Eigenbases of the Laplacian"]),
     ("Compact manifolds", ["Besov spaces on compact manifolds"]),
 ]
 
@@ -144,7 +145,7 @@ COLUMNS: list[list[str]] = [
      "Sobolev spaces: the bridge for p = 2", "Interpolation of operators",
      "Vector-valued singular integrals", "Sobolev spaces W^m_p", "Sobolev spaces on the torus",
      "Bessel potential spaces"],
-    ["Traces", "Sobolev spaces on domains and boundaries"],
+    ["Traces", "Sobolev spaces on domains and boundaries", "Eigenbases of the Laplacian"],
     ["Approximation spaces: general theory", "Real interpolation of couples"],
 ]
 GAP = 2

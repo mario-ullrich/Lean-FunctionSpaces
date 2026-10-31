@@ -4205,6 +4205,30 @@ By Mathlib's spectral theorem the orthogonal complement of the sum of all eigens
 $\{0\}$, so \Cref{thm:compact-self-adjoint-eigenbasis} applies, with $W_0$ empty.
 \end{proof}
 
+A norm identity for linear maps carries over to inner products; \Cref{lem:h1-inner-weak-gradient}
+applies it to the inner product of $H^1$.
+
+\begin{lemma}[Polarization of a norm identity]
+\label{lem:polarization-norm-identity}
+\lean{inner_eq_of_forall_sq_norm_eq}
+\leanok
+For every field $\mathbb K \in \{\R, \C\}$, all inner product spaces $E$, $F$, $G$ over
+$\mathbb K$, every finite set $K$, all linear maps $T : E \to F$ and $S_k : E \to G$, $k \in K$,
+and every $c \in \R$ with $\|x\|^2 = \|T x\|^2 + c \sum_k \|S_k x\|^2$ for every $x \in E$,
+\[
+  \langle x, y \rangle = \langle T x, T y \rangle + c \sum_k \langle S_k x, S_k y \rangle
+  \qquad \text{for all } x, y \in E .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The polarization identity expresses $\langle x, y \rangle$ by the norms of $x + i^m y$,
+$m = 0, 1, 2, 3$ (Mathlib's \texttt{inner\_\allowbreak eq\_\allowbreak sum\_\allowbreak
+norm\_\allowbreak sq\_\allowbreak div\_\allowbreak four}), and $T$ and $S_k$ map $x + i^m y$ to
+$T x + i^m T y$ and $S_k x + i^m S_k y$.
+\end{proof}
+
 \section{Spectral schemes of compact embeddings}
 \label{sec:compact-embedding-schemes}
 
@@ -4424,7 +4448,9 @@ $1 = \sigma_i \sigma_i^{-1} \leq \|J\| \sigma_i^{-1}$; so the condition of
 Let $M$ be a topological space with a finite Borel measure $\mu$. On a compact Riemannian
 manifold the eigenfunctions of the Laplace--Beltrami operator form an orthonormal basis of
 $L_2(M)$; they are continuous by elliptic regularity, and the eigenvalues $\lambda_i$ tend to
-infinity. Mathlib has neither the operator nor these facts. The statements below therefore assume
+infinity. The Dirichlet eigenbasis of a bounded open set is a spectral scheme
+(\Cref{thm:dirichlet-eigenbasis}); the boundedness and continuity of its elements is elliptic
+regularity, a later goal. The statements below therefore assume
 an orthonormal basis of continuous functions with levels, and every one of them is proved from
 this assumption; the torus satisfies it (\Cref{prop:fourier-eigenbasis}). The assumption
 consists of the basis, its levels and its continuous representatives alone.

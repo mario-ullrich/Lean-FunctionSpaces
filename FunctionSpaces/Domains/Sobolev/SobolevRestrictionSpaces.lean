@@ -50,7 +50,8 @@ and McLean (Chapter 3), and are Hilbert spaces as well.
   `Rd.zeroBoundarySpace s Ω` the closure of their restrictions in `H^s(Ω)`. For `s = 1` and every
   open `Ω`, restriction is an isometry of `H̃^1(Ω)` onto `H^1_0(Ω)` (`Rd.tildeEquivZeroBoundary`),
   and inside `H^1(V)` the two are the same subspace (`Rd.tildeSpace_one_le_orthogonal`,
-  `Rd.coe_tildeEquivZeroBoundary_symm_apply`). On the whole space, `H̃^s(V) = H^s(V)`
+  `Rd.coe_tildeEquivZeroBoundary_symm_apply`); the elements of `H̃^1(Ω)` vanish outside `Ω`
+  (`Rd.toL2_ae_eq_zero_of_mem_tildeSpace`). On the whole space, `H̃^s(V) = H^s(V)`
   (`Rd.tildeSpace_top`).
 -/
 
@@ -706,6 +707,29 @@ theorem exists_opens_toL2_ae_eq_zero {U : H^{1}(V)} (hU : U ∈ testSpan 1 Ω) :
     ae_restrict_mem (isClosed_tsupport w).isOpen_compl.measurableSet] with x hx hxO
   rw [hx]
   exact image_eq_zero_of_notMem_tsupport hxO
+
+/-- **The elements of `H̃^1(Ω)` vanish outside `Ω`**: for every open `Ω` and `U ∈ H̃^1(Ω)`, the
+`L_2` function of `U` vanishes almost everywhere outside `Ω`. The `U` with this property form the
+kernel of `U ↦ (ι U)|_{V \ Ω}`, a closed subspace containing the test functions of `Ω`
+(`Rd.exists_opens_toL2_ae_eq_zero`). -/
+theorem toL2_ae_eq_zero_of_mem_tildeSpace {Ω : Opens V} {U : H^{1}(V)}
+    (hU : U ∈ tildeSpace 1 Ω) : ∀ᵐ x ∂volume, x ∉ (Ω : Set V) → toL2 U x = 0 := by
+  have hker : tildeSpace 1 Ω ≤
+      (LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V)ᶜ ∘L toL2).ker := by
+    refine Submodule.topologicalClosure_minimal _ (fun W hW => ?_)
+      (ContinuousLinearMap.isClosed_ker _)
+    obtain ⟨O, hO, hWO⟩ := exists_opens_toL2_ae_eq_zero hW
+    rw [LinearMap.mem_ker]
+    change LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V)ᶜ (toL2 W) = 0
+    rw [Lp.eq_zero_iff_ae_eq_zero]
+    exact (LpToLpRestrictCLM_coeFn ℂ _ _).trans (ae_restrict_of_ae_restrict_of_subset hO hWO)
+  have h := hker hU
+  rw [LinearMap.mem_ker] at h
+  change LpToLpRestrictCLM V ℂ ℂ volume 2 (Ω : Set V)ᶜ (toL2 U) = 0 at h
+  rw [Lp.eq_zero_iff_ae_eq_zero] at h
+  have h' := (LpToLpRestrictCLM_coeFn ℂ _ _).symm.trans h
+  rw [EventuallyEq, ae_restrict_iff' Ω.isOpen.measurableSet.compl] at h'
+  exact h'
 
 /-- **Functions with disjoint supports**: in every `L_p(μ)` with values in a normed group, if
 `a` vanishes almost everywhere outside a measurable set `S` and `b` vanishes almost everywhere on

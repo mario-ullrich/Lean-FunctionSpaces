@@ -734,7 +734,8 @@ File `FunctionSpaces/Domains/Traces/TraceKernel.lean`, namespace `Rd.BoundedLips
   `dualTraceKerEquiv_eq_iff`).
 * `H̃^1(Ω)` by supports: `mem_tildeSpace_iff (U : H^{1, 2}(V, ℂ)) : U ∈ Rd.tildeSpace 1 Ω.toOpens ↔
   ∀ᵐ x ∂volume, x ∉ Ω.carrier → toL2 U x = 0`; the direction `⇒` holds for every open set
-  (`Rd.toL2_ae_eq_zero_of_mem_tildeSpace`).
+  (`Rd.toL2_ae_eq_zero_of_mem_tildeSpace`, file
+  `FunctionSpaces/Domains/Sobolev/SobolevRestrictionSpaces.lean`).
 * General tools: weak derivatives commute with convolution by Schwartz functions in every `L_p`,
   `1 ≤ p < ∞` (`Rd.hasWeakLineDeriv_convLp`, file
   `FunctionSpaces/Rd/SingularIntegrals/ConvolutionAdjoint.lean`); mollification converges in

@@ -84,7 +84,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Sobolev spaces as a hypothesis structure, Sobolev embeddings | ✅ | ✗ | `MeasureSpaces/Sobolev/Embeddings` |
 | Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ | ✗ | `MeasureSpaces/Spectral/Basic` |
 | Coefficient characterisations of spectral schemes, `H^s = B^s_{2,2}` | ✅ | ✗ | `MeasureSpaces/Spectral/Blocks` |
-| Hilbert bases of eigenvectors of compact self-adjoint operators | ✅ | ✗ | `MeasureSpaces/Spectral/CompactEigenbasis` |
+| Hilbert bases of eigenvectors of compact self-adjoint operators, and the polarization of a norm identity | ✅ | ✗ | `MeasureSpaces/Spectral/CompactEigenbasis` |
 | Compact dense embeddings: singular basis, spectral scheme, Jackson and Bernstein, `(H, J(V))_{θ,q} = A^θ_q` | ✅ | ✗ | `MeasureSpaces/Spectral/CompactEmbedding` |
 | Continuous spectral bases (hypothesis), `B^s_{2,2} = H^s`, local Weyl bound, Nikolskii for `p ≤ 2`, continuity of `H^s` for `s > D/2` | ✅ | ✗ | `MeasureSpaces/Spectral/ContinuousSpectralBasis`, `MeasureSpaces/Spectral/LocalWeyl` |
 | Conditional expectations on `L_p`, filtration schemes (Haar), martingale-difference characterisation | ✅ | ✗ | `MeasureSpaces/Martingales/Filtration` |

@@ -10,8 +10,9 @@ from the area formula; \Cref{ch:traces-lipschitz} proves the trace theorems on L
 boundaries for $0 < s < 1$ and on the half-space for every $s > 0$; \Cref{ch:sobolev-domains}
 builds the Sobolev spaces on open sets as Hilbert spaces, with their duality, the trace space
 $H^{1/2}(\Gamma)$, the extension theorem for $\Sob{1}{p}$, Green's formula and the kernel of the
-trace; and \Cref{ch:manifolds} defines Besov spaces on compact manifolds by charts and proves the
-trace theorem on their boundary.
+trace; \Cref{ch:laplacian-eigenbases} builds the Dirichlet eigenbasis of the Laplacian on bounded
+open sets as a spectral scheme; and \Cref{ch:manifolds} defines Besov spaces on compact
+manifolds by charts and proves the trace theorem on their boundary.
 
 \chapter{Lipschitz domains}
 \label{ch:lipschitz-domains}
@@ -4234,6 +4235,22 @@ An $L_2$ function is determined by its tempered distribution (\Cref{lem:sobolev-
 Sums and multiples of Schwartz functions with closed support in $\Omega$ are such functions. For
 $U \in T^1(\Omega)$, $\iota U = w$ almost everywhere, and $O$ is the complement of the closed
 support of $w$.
+\end{proof}
+
+\begin{lemma}[$\tilde H^1(\Omega)$ vanishes outside $\Omega$]
+\label{lem:tilde-space-vanishes-outside}
+\lean{Rd.toL2_ae_eq_zero_of_mem_tildeSpace}
+\leanok
+\uses{def:sobolev-tilde-zero-boundary, lem:sobolev-test-span-schwartz}
+For every open $\Omega \subseteq V$ and every $U \in \tilde H^1(\Omega)$, $\iota U = 0$ almost
+everywhere outside $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The $U$ with $\iota U = 0$ almost everywhere outside $\Omega$ form the kernel of a bounded
+operator into $L_2(V \setminus \Omega)$, a closed subspace that contains $T^1(\Omega)$
+(\Cref{lem:sobolev-test-span-schwartz}), hence $\tilde H^1(\Omega)$.
 \end{proof}
 
 \begin{lemma}[Schwartz functions in $H^s(V)$]
@@ -9116,25 +9133,20 @@ and $\|e/4\| + \rho/2 \leq 1/2$.
 
 \paragraph{$\tilde H^1(\Omega)$ by supports.}
 
-\begin{lemma}[$\tilde H^1$ and vanishing outside $\Omega$]
-\label{lem:tilde-space-vanishes-outside}
-\lean{Rd.toL2_ae_eq_zero_of_mem_tildeSpace, Rd.indicatorLp_toL2_restrictProj}
+\begin{lemma}[The zero extension of the restriction]
+\label{lem:zero-extension-restriction}
+\lean{Rd.indicatorLp_toL2_restrictProj}
 \leanok
-\uses{def:sobolev-tilde-zero-boundary, lem:sobolev-test-span-schwartz,
-  prop:sobolev-vanishing-one, lem:sobolev-restriction-basic, lem:indicator-lp}
-For every open $\Omega' \subseteq V$ and every $U \in \tilde H^1(\Omega')$, $\iota U = 0$ almost
-everywhere outside $\Omega'$. For every open $\Omega' \subseteq V$ and every $U \in H^1(V)$ with
-$\iota U = 0$ almost everywhere outside $\Omega'$, $\mathbf 1_{\Omega'} \iota (r_{\Omega'} U) =
-\iota U$.
+\uses{prop:sobolev-vanishing-one, lem:sobolev-restriction-basic, lem:indicator-lp}
+For every open $\Omega' \subseteq V$ and every $U \in H^1(V)$ with $\iota U = 0$ almost everywhere
+outside $\Omega'$, $\mathbf 1_{\Omega'} \iota (r_{\Omega'} U) = \iota U$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-The $U$ with $\iota U = 0$ almost everywhere outside $\Omega'$ form the kernel of a bounded
-operator into $L_2(V \setminus \Omega')$, a closed subspace that contains $T^1(\Omega')$
-(\Cref{lem:sobolev-test-span-schwartz}), hence $\tilde H^1(\Omega')$. $U - r_{\Omega'} U$ vanishes
-on $\Omega'$ (\Cref{lem:sobolev-restriction-basic}), so $\iota (r_{\Omega'} U) = \iota U$ almost
-everywhere on $\Omega'$ (\Cref{prop:sobolev-vanishing-one}).
+$U - r_{\Omega'} U$ vanishes on $\Omega'$ (\Cref{lem:sobolev-restriction-basic}), so
+$\iota (r_{\Omega'} U) = \iota U$ almost everywhere on $\Omega'$
+(\Cref{prop:sobolev-vanishing-one}).
 \end{proof}
 
 \begin{lemma}[Chart pieces]
@@ -9204,7 +9216,7 @@ the elements of $H^1(V)$ supported in $\overline\Omega$, since $\Gamma$ is a nul
   Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace}
 \leanok
 \uses{thm:tilde-space-supports, lem:tilde-space-vanishes-outside,
-  thm:zero-extension-trace-kernel, thm:sobolev-tilde-zero-boundary,
+  lem:zero-extension-restriction, thm:zero-extension-trace-kernel, thm:sobolev-tilde-zero-boundary,
   lem:sobolev-one-weak-gradient-norm, def:trace-kernel, lem:indicator-lp,
   prop:sobolev-restriction-l2}
 $N_\Gamma = H^1_0(\Omega)$.
@@ -9215,9 +9227,9 @@ $N_\Gamma = H^1_0(\Omega)$.
 Every element of $H^1_0(\Omega)$ is $r_\Omega U$ for some $U \in \tilde H^1(\Omega)$
 (\Cref{thm:sobolev-tilde-zero-boundary}); $U$ vanishes outside $\Omega$, so
 $\mathbf 1_\Omega \iota (r_\Omega U) = \iota U \in \Sob{1}{2}(V)$
-(\Cref{lem:tilde-space-vanishes-outside}) and $r_\Omega U \in N_\Gamma$
-(\Cref{thm:zero-extension-trace-kernel}). Conversely, for $u \in N_\Gamma$,
-$\mathbf 1_\Omega \iota u = \iota U$ for some $U \in H^1(V)$
+(\Cref{lem:tilde-space-vanishes-outside}, \Cref{lem:zero-extension-restriction}) and
+$r_\Omega U \in N_\Gamma$ (\Cref{thm:zero-extension-trace-kernel}). Conversely, for
+$u \in N_\Gamma$, $\mathbf 1_\Omega \iota u = \iota U$ for some $U \in H^1(V)$
 (\Cref{thm:zero-extension-trace-kernel}, \Cref{lem:sobolev-one-weak-gradient-norm}); $U$ vanishes
 outside $\Omega$, so $U \in \tilde H^1(\Omega)$ (\Cref{thm:tilde-space-supports}), and
 $u = r_\Omega U \in H^1_0(\Omega)$ (\Cref{prop:sobolev-restriction-l2},
@@ -9260,6 +9272,225 @@ theorem on $N_\Gamma$, this isometry and $\Theta_1 \colon \tilde H^1(\Omega) \to
 
 For the trace spaces of Hiptmair, Pauly and Schulz \cite{HiptmairPaulySchulz} at $k = 0$ the
 quotient $H^1(\Omega) / H^1_0(\Omega)$ is the classical $H^{1/2}(\Gamma)$.
+
+\chapter{Eigenbases of the Laplacian}
+\label{ch:laplacian-eigenbases}
+
+In this chapter $V$ is a finite-dimensional real inner product space with Lebesgue measure, and
+$\Omega \subseteq V$ is open; $H^1(V)$, the $L_2$ function $\iota U$ of $U \in H^1(V)$, its weak
+derivatives and the Hilbert spaces $H^1(\Omega)$ and $H^1_0(\Omega)$ are those of
+\Cref{sec:sobolev-restriction-spaces}. Inner products are conjugate-linear in the first argument,
+as in Mathlib. The eigenfunctions of the Laplacian come from the singular basis of a compact
+dense embedding (\Cref{sec:compact-embedding-schemes}): for the embedding
+$H^1_0(\Omega) \hookrightarrow L_2(\Omega)$ the weak eigenvalue equation of the singular basis is
+the weak form of the Dirichlet problem. \Cref{sec:dirichlet-eigenbasis} treats the Dirichlet
+Laplacian on bounded open sets.
+
+\section{The Dirichlet Laplacian}
+\label{sec:dirichlet-eigenbasis}
+
+For an orthonormal basis $(b_k)_{k \in K}$ of $V$, the inner product of $H^1(V)$ is
+$\langle \iota U, \iota W \rangle_2 + (2\pi)^{-2} \sum_k \langle \partial_{b_k} \iota U,
+\partial_{b_k} \iota W \rangle_2$, Mathlib's normalisation of $H^1$ by the Bessel potential.
+With it the Dirichlet eigenvalues below are those of the Laplacian $-\Delta$, and the singular
+values of $H^1_0(\Omega) \hookrightarrow L_2(\Omega)$ satisfy
+$\sigma_i^{-2} = 1 + \lambda_i/(4\pi^2)$.
+
+\begin{lemma}[The inner product of $H^1(V)$ by the weak gradient]
+\label{lem:h1-inner-weak-gradient}
+\lean{Rd.inner_eq_of_hasWeakLineDeriv}
+\leanok
+\uses{lem:polarization-norm-identity, lem:sobolev-one-weak-gradient-norm,
+  lem:sobolev-one-weak-derivative-operator}
+For every orthonormal basis $(b_k)_{k \in K}$ of $V$, all $U, W \in H^1(V)$ and all
+$g_k, h_k \in L_2(V)$ such that $g_k$ and $h_k$ are the weak derivatives $\partial_{b_k} \iota U$
+and $\partial_{b_k} \iota W$ on $V$ for every $k \in K$,
+\[
+  \langle U, W \rangle = \langle \iota U, \iota W \rangle_2
+    + (2\pi)^{-2} \sum_k \langle g_k, h_k \rangle_2 .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:polarization-norm-identity} for $T = \iota$ and $S_k = \partial_{b_k}$
+(\Cref{lem:sobolev-one-weak-derivative-operator}) with the identity
+$\|U\|^2 = \|\iota U\|_2^2 + (2\pi)^{-2} \sum_k \|\partial_{b_k} \iota U\|_2^2$ of
+\Cref{lem:sobolev-one-weak-gradient-norm}.
+\end{proof}
+
+\begin{definition}[The Dirichlet embedding]
+\label{def:dirichlet-embedding}
+\lean{Rd.dirichletEmbedding, Rd.dirichletEmbedding_apply, Rd.dirichletEmbedding_injective,
+  Rd.norm_dirichletEmbedding_le, Rd.isCompactOperator_dirichletEmbedding}
+\leanok
+\uses{def:sobolev-tilde-zero-boundary, def:sobolev-restriction-l2,
+  prop:sobolev-restriction-l2, thm:sobolev-restriction-rellich}
+For every open $\Omega \subseteq V$, the \emph{Dirichlet embedding}
+$J_\Omega : H^1_0(\Omega) \to L_2(\Omega)$ is the operator $R_\Omega$ of
+\Cref{def:sobolev-restriction-l2} on $H^1_0(\Omega) \subseteq H^1(\Omega)$. It is injective and
+has norm at most $1$; for bounded $\Omega$ it is compact.
+\end{definition}
+
+\begin{proof}
+\leanok
+$R_\Omega$ is injective with norm at most $1$ (\Cref{prop:sobolev-restriction-l2}) and compact
+for bounded $\Omega$ (\Cref{thm:sobolev-restriction-rellich}).
+\end{proof}
+
+Compactness for every bounded open set, with no condition on the boundary, is
+\cite[Theorem~9.16 and Remark~20, pp.~285 and~290]{Brezis2011}.
+
+\begin{lemma}[$L_2(\Omega)$ inner products of elements of $H^1_0(\Omega)$]
+\label{lem:dirichlet-l2-inner}
+\lean{Rd.toL2_ae_eq_zero_of_mem_zeroBoundarySpace, Rd.inner_dirichletEmbedding}
+\leanok
+\uses{def:dirichlet-embedding, lem:sobolev-tilde-in-restriction,
+  lem:tilde-space-vanishes-outside}
+For every open $\Omega \subseteq V$ and all $u, w \in H^1_0(\Omega)$, $\iota u = 0$ almost
+everywhere outside $\Omega$, and
+$\langle J_\Omega u, J_\Omega w \rangle_{L_2(\Omega)} = \langle \iota u, \iota w \rangle_{L_2(V)}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+As an element of $H^1(V)$, $u$ lies in $\tilde H^1(\Omega)$
+(\Cref{lem:sobolev-tilde-in-restriction}), so $\iota u$ vanishes almost everywhere outside
+$\Omega$ (\Cref{lem:tilde-space-vanishes-outside}); hence the integrand
+$\overline{\iota u}\, \iota w$ vanishes outside $\Omega$.
+\end{proof}
+
+\begin{lemma}[The range of the Dirichlet embedding is dense]
+\label{lem:dirichlet-dense}
+\lean{Rd.restrictProj_ofTest_mem, Rd.inner_dirichletEmbedding_ofTest,
+  Rd.orthogonal_range_dirichletEmbedding, Rd.denseRange_dirichletEmbedding}
+\leanok
+\uses{def:dirichlet-embedding, def:sobolev-tilde-zero-boundary, lem:sobolev-test-span-schwartz,
+  prop:sobolev-restriction-l2, prop:sobolev-vanishing-one}
+For every open $\Omega \subseteq V$ and every real test function $\varphi \in \mathcal D(\Omega)$,
+$r_\Omega \varphi \in H^1_0(\Omega)$ and
+$\langle J_\Omega r_\Omega \varphi, f \rangle_{L_2(\Omega)} = \int_\Omega \varphi f$ for every
+$f \in L_2(\Omega)$. For every open $\Omega \subseteq V$, the orthogonal complement of the range
+of $J_\Omega$ is $\{0\}$, so the range is dense in $L_2(\Omega)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$r_\Omega \varphi$ lies in $r_\Omega(T^1(\Omega)) \subseteq H^1_0(\Omega)$, and
+$J_\Omega r_\Omega \varphi = (\iota \varphi)|_\Omega = \varphi|_\Omega$
+(\Cref{prop:sobolev-restriction-l2}, \Cref{lem:sobolev-test-span-schwartz}); $\varphi$ is real.
+If $f$ is orthogonal to the range, then $\int_\Omega \varphi f = 0$ for every real test function
+$\varphi$ of $\Omega$, so $f = 0$ almost everywhere on $\Omega$ by Mathlib's
+\texttt{IsOpen.\allowbreak ae\_\allowbreak eq\_\allowbreak zero\_\allowbreak of\_\allowbreak
+integral\_\allowbreak contDiff\_\allowbreak smul\_\allowbreak eq\_\allowbreak zero}, as in
+\Cref{prop:sobolev-vanishing-one}.
+\end{proof}
+
+\begin{theorem}[The Dirichlet eigenbasis]
+\label{thm:dirichlet-eigenbasis}
+\lean{Rd.dirichletCompactEmbedding, Rd.dirichletCompactEmbedding_toCLM, Rd.dirichletScheme,
+  Rd.singularValue_dirichletCompactEmbedding_le_one, Rd.dirichletEigenvalue,
+  Rd.dirichletEigenvalue_nonneg, Rd.one_add_dirichletEigenvalue_div, Rd.dirichletScheme_level,
+  Rd.dirichletEigenfunction, Rd.dirichletEmbedding_dirichletEigenfunction}
+\leanok
+\uses{def:dirichlet-embedding, lem:dirichlet-dense, def:compact-dense-embedding,
+  def:singular-basis, def:compact-embedding-scheme}
+For every bounded open set $\Omega \subseteq V$, $J_\Omega$ is a compact dense embedding. Let
+$(e_i)_{i \in I}$ be its eigenvector basis of $L_2(\Omega)$, $\sigma_i$ its singular values,
+$(v_i)_{i \in I}$ its singular basis of $H^1_0(\Omega)$ and $\lfloor \sigma_i^{-1} \rfloor$ the
+levels of its spectral scheme, and put $\lambda_i = 4\pi^2 (\sigma_i^{-2} - 1)$ and
+$\varphi_i = \sigma_i^{-1} v_i \in H^1_0(\Omega)$. Then for every $i \in I$,
+\[
+  \sigma_i \leq 1, \qquad \lambda_i \geq 0, \qquad
+  1 + \frac{\lambda_i}{4\pi^2} = \sigma_i^{-2},
+\]
+and
+\[
+  \lfloor \sigma_i^{-1} \rfloor = \Bigl\lfloor \sqrt{1 + \lambda_i/(4\pi^2)} \Bigr\rfloor,
+  \qquad
+  J_\Omega \varphi_i = e_i .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+$J_\Omega$ is compact and injective (\Cref{def:dirichlet-embedding}) with dense range
+(\Cref{lem:dirichlet-dense}). $\sigma_i \leq \|J_\Omega\|$ (\Cref{def:singular-basis}) and
+$\|J_\Omega\| \leq 1$ (\Cref{def:dirichlet-embedding}), so $\sigma_i^{-2} \geq 1$ and
+$\lambda_i \geq 0$. The level is $\lfloor \sigma_i^{-1} \rfloor$
+(\Cref{def:compact-embedding-scheme}), and
+$J_\Omega v_i = \sigma_i e_i$ (\Cref{def:singular-basis}).
+\end{proof}
+
+The spectral scheme of \Cref{thm:dirichlet-eigenbasis} is the \emph{Dirichlet scheme}. The
+$\lambda_i$ are the Dirichlet eigenvalues $\lambda_n$ of
+\cite[Theorem~9.31, p.~311]{Brezis2011}, and
+$(v_i) = (\varphi_i/\sqrt{1 + \lambda_i/(4\pi^2)})$ is the counterpart, for the inner product of
+$H^1(V)$ above, of the Hilbert basis $(e_n/\sqrt{\lambda_n + 1})$ of $H^1_0(\Omega)$ in
+\cite[Remark~28, p.~311]{Brezis2011}, which uses the inner product
+$\langle u, w \rangle_2 + \langle \nabla u, \nabla w \rangle_2$. The level
+$\lfloor \sqrt{1 + \lambda_i/(4\pi^2)} \rfloor$ is the frequency in the units of the Fourier
+scheme of the torus; the factor $2\pi$ rescales the levels and changes no approximation space.
+TauCeti \cite{TauCeti} has the real-valued counterpart for divergence-form operators,
+\texttt{TauCeti.\allowbreak PDE.\allowbreak exists\_\allowbreak hilbertBasis\_\allowbreak
+forall\_\allowbreak isDirichletEigenvalue}.
+
+\begin{theorem}[The weak Dirichlet eigenvalue equation]
+\label{thm:dirichlet-weak-eigen}
+\lean{Rd.inner_zeroBoundarySpace_eq, Rd.dirichletEigenfunction_weak}
+\leanok
+\uses{thm:dirichlet-eigenbasis, lem:h1-inner-weak-gradient, lem:dirichlet-l2-inner,
+  lem:singular-coefficients}
+For every bounded open set $\Omega \subseteq V$, every orthonormal basis $(b_k)_{k \in K}$ of $V$
+and all $u, w \in H^1_0(\Omega)$,
+\[
+  \langle u, w \rangle = \langle J_\Omega u, J_\Omega w \rangle_{L_2(\Omega)}
+    + (2\pi)^{-2} \sum_k \langle \partial_{b_k} \iota u, \partial_{b_k} \iota w \rangle_{L_2(V)},
+\]
+and for every $i \in I$ and every $w \in H^1_0(\Omega)$, with $\lambda_i$ and $\varphi_i$ as in
+\Cref{thm:dirichlet-eigenbasis},
+\[
+  \sum_k \langle \partial_{b_k} \iota \varphi_i, \partial_{b_k} \iota w \rangle_{L_2(V)}
+    = \lambda_i \langle \iota \varphi_i, \iota w \rangle_{L_2(V)} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first identity is \Cref{lem:h1-inner-weak-gradient} with \Cref{lem:dirichlet-l2-inner}. By
+\Cref{lem:singular-coefficients}, $\langle v_i, w \rangle = \sigma_i^{-2}
+\langle J_\Omega v_i, J_\Omega w \rangle$, and multiplying by $\sigma_i^{-1}$ gives the same for
+$\varphi_i$. With $P = \langle \iota \varphi_i, \iota w \rangle$ and $D$ the sum on the left,
+the first identity and \Cref{lem:dirichlet-l2-inner} turn this into
+$P + (2\pi)^{-2} D = \sigma_i^{-2} P$, so $D = 4\pi^2 (\sigma_i^{-2} - 1) P = \lambda_i P$.
+\end{proof}
+
+This is the weak form of $-\Delta \varphi_i = \lambda_i \varphi_i$ in $\Omega$ with
+$\varphi_i = 0$ on $\partial \Omega$. The integrals run over $V$, and $\iota \varphi_i$ and
+$\iota w$ vanish outside $\Omega$, so the boundary needs no hypothesis.
+
+\begin{corollary}[$H^1_0(\Omega)$ and its interpolation spaces in the Dirichlet eigenbasis]
+\label{cor:dirichlet-interpolation}
+\lean{Rd.exists_dirichletEmbedding_eq_iff, Rd.memKMethod_dirichlet_iff,
+  Rd.memKMethod_dirichlet_iff_blockNorm_lt_top}
+\leanok
+\uses{thm:dirichlet-eigenbasis, cor:compact-embedding-interpolation, lem:sobolev-range,
+  thm:spectral-coefficients}
+Let $\Omega \subseteq V$ be a bounded open set, with $(e_i)$ and $\sigma_i$ as in
+\Cref{thm:dirichlet-eigenbasis} and the approximation spaces $A^\theta_q$ of the Dirichlet scheme.
+For every $f \in L_2(\Omega)$, $f = J_\Omega w$ for some $w \in H^1_0(\Omega)$ if and only if
+$\sum_i (1 + \lfloor \sigma_i^{-1} \rfloor)^2 |\langle e_i, f \rangle|^2 < \infty$. For every
+$0 < \theta < 1$, every $q \in [1, \infty]$ and every $f \in L_2(\Omega)$, the following are
+equivalent:
+$f \in (L_2(\Omega), J_\Omega(H^1_0(\Omega)))_{\theta, q}$; $f \in A^\theta_q$; the block norm of
+\Cref{thm:spectral-coefficients} with $s = \theta$ is finite.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{cor:compact-embedding-interpolation} for $J_\Omega$ (\Cref{thm:dirichlet-eigenbasis}) and
+\Cref{thm:spectral-coefficients}.
+\end{proof}
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

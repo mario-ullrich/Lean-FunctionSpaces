@@ -17,9 +17,10 @@ of `L_2(μ)` (`ContinuousSpectralBasis`) is a spectral scheme in `L_2(μ)`, a Hi
 with a level `λ : ι → ℕ` and finitely many basis elements of each level, whose elements are the
 `L_2` classes of bounded continuous functions `ẽ_i` (`ContinuousSpectralBasis.basisFun`). The
 model is the eigenbasis of the Laplace–Beltrami operator of a compact Riemannian manifold,
-continuous by elliptic regularity, with `λ(i) = ⌊√λ_i⌋`; Mathlib has neither the operator nor
-these facts. The Fourier basis of the torus is a continuous spectral basis
-(`Torus.fourierEigenbasis`).
+continuous by elliptic regularity, with `λ(i) = ⌊√λ_i⌋`. The Dirichlet eigenbasis of a bounded
+open set is a spectral scheme (`Rd.dirichletScheme`); the boundedness and continuity of its
+elements is elliptic regularity, a later goal. The Fourier basis of the torus is a
+continuous spectral basis (`Torus.fourierEigenbasis`).
 
 The functions `ẽ_i` of level `< n` span the space `basisSpan n` of bounded continuous functions
 (`ContinuousSpectralBasis.basisSpan`), and these spaces form a scheme of functions
@@ -50,10 +51,10 @@ variable {M : Type*} [TopologicalSpace M] [MeasurableSpace M] [BorelSpace M]
 `λ : ι → ℕ` that takes each value finitely often (a spectral scheme), together with bounded
 continuous functions `ẽ_i` whose `L_2` classes are the `e_i`. The eigenfunctions of the
 Laplace–Beltrami operator of a compact Riemannian manifold, with the level `⌊√λ⌋` of the
-eigenvalue `λ`, are the model; their existence rests on Rellich's compactness and elliptic
-regularity. The structure consists of the basis, its levels and its continuous
-representatives; it enters the theorems as a hypothesis, and the Fourier basis of the torus is
-an instance (`Torus.fourierEigenbasis`). -/
+eigenvalue `λ`, are the model; their continuity is elliptic regularity. On a bounded open set of
+`ℝ^d` the Dirichlet eigenbasis is a spectral scheme (`Rd.dirichletScheme`). The structure
+consists of the basis, its levels and its continuous representatives; it enters the theorems as
+a hypothesis, and the Fourier basis of the torus is an instance (`Torus.fourierEigenbasis`). -/
 structure ContinuousSpectralBasis (ι : Type*) (μ : Measure M) [IsFiniteMeasure μ]
     extends SpectralScheme ι (Lp ℂ 2 μ) where
   /-- The continuous representatives of the basis elements. -/
