@@ -17,7 +17,8 @@ Bessel potential on Schwartz functions, the Fourier multiplier with the Bessel w
 `ω_{2^j}`, `ω_c(x) = c^n ω(c x)`, to `2^{jσ} (K_j)_{2^j}` with the **Bessel kernels**
 `K_j = 𝓕⁻¹[(2^{-2j} + ‖ζ‖²)^{σ/2} ω̂]` (`Rd.besselKernelFamily`,
 `Rd.besselSchwartz_schwartzDilate`, and `Rd.besselPotential_schwartzDilate` for Mathlib's
-`J_σ` on tempered distributions).
+`J_σ` on tempered distributions); the factor has size `|(2^j)^σ| = 2^{jσ}`
+(`Rd.enorm_two_pow_rpow`).
 
 * **Uniform families under continuous linear maps**: a family is uniformly Schwartz exactly
   when its range is bounded in the Schwartz space
@@ -366,6 +367,14 @@ theorem besselPotential_schwartzDilate (ω : 𝓢(V, ℂ)) (σ : ℝ) (j : ℕ) 
           𝓢'(V, ℂ)) := by
   rw [besselPotential_schwartz, besselSchwartz_schwartzDilate]
   exact map_smul _ _ _
+
+/-- The factor of a dilate has size `|(2^j)^σ| = 2^{jσ}`, the dyadic weight
+`ENNReal.dyadicWeight σ j`. -/
+theorem enorm_two_pow_rpow (j : ℕ) (σ : ℝ) :
+    ‖((((2 : ℝ) ^ j) ^ σ : ℝ) : ℂ)‖ₑ = ENNReal.dyadicWeight σ j := by
+  rw [← ofReal_norm, Complex.norm_real, Real.norm_of_nonneg (by positivity),
+    ← ENNReal.ofReal_rpow_of_pos (by positivity), ENNReal.ofReal_pow (by norm_num),
+    ENNReal.ofReal_ofNat, ENNReal.dyadicWeight, ← ENNReal.rpow_natCast, ← ENNReal.rpow_mul]
 
 /-! ### The dilated Bessel kernels as a Calderón–Zygmund family -/
 

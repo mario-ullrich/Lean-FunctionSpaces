@@ -11,7 +11,8 @@ $\Sob{m}{p} = \TL{m}{p}{2}$ for $1 < p < \infty$ and the Sobolev embeddings;
 \Cref{ch:sobolev-torus} defines weak derivatives in $L_p(\T^d)$ through Fourier coefficients and
 describes $\Sob{m}{p}(\T^d)$ by directional derivatives; \Cref{ch:bessel-potential-spaces}
 proves, also from the singular integrals, $H^{s,p} = \TL{s}{p}{2}$ for $s \geq 0$ and
-Calder\'on's theorem $\Sob{m}{p} = H^{m,p}$.
+Calder\'on's theorem $\Sob{m}{p} = H^{m,p}$; \Cref{ch:fourier-multipliers} treats the
+symbols of order $\sigma$ and their Fourier multipliers.
 
 \chapter{Sobolev spaces on \texorpdfstring{$\R^d$}{R\^{}d}}
 \label{ch:sobolev-rd}
@@ -1054,6 +1055,20 @@ and on tempered distributions (\texttt{SchwartzMap.\allowbreak fourier\allowbrea
 $m = \langle \cdot \rangle^t$. Mathlib lets $m(D)$ act on a tempered distribution $T$ by
 $(m(D) T)(u) = T\bigl(\mathcal F(m \, \mathcal F^{-1} u)\bigr)$. The symbol $m$ is even if
 $m(-\xi) = m(\xi)$ for every $\xi \in V$.
+
+\begin{lemma}[Fourier multipliers multiply the Fourier transform]
+\label{lem:fourier-multiplier-fourier}
+\lean{Rd.fourier_fourierMultiplierCLM_apply}
+\leanok
+Let $m$ be a function on $V$, smooth with polynomially bounded derivatives. For every Schwartz
+function $\varphi$ and every $\xi \in V$,
+$\widehat{m(D) \varphi}(\xi) = m(\xi) \, \widehat\varphi(\xi)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Fourier inversion on Schwartz functions.
+\end{proof}
 
 \begin{lemma}[Even Fourier multipliers act by the transpose]
 \label{lem:even-multiplier-transpose}
@@ -5078,7 +5093,8 @@ by \Cref{lem:leibniz-schwartz}, for every $j$. The kernels follow by
 
 \begin{theorem}[Bessel potentials of dilates]
 \label{thm:bessel-potential-dilate}
-\lean{Rd.besselSchwartz_schwartzDilate, Rd.besselPotential_schwartzDilate}
+\lean{Rd.besselSchwartz_schwartzDilate, Rd.besselPotential_schwartzDilate,
+  Rd.enorm_two_pow_rpow}
 \leanok
 \uses{def:bessel-kernel-family, lem:bessel-weight-scaling, def:schwartz-dilate,
   lem:fourier-dilate, lem:bessel-weight-basic, def:bessel-schwartz,
@@ -5089,7 +5105,8 @@ let $K_j$ be the Bessel kernels of $\widehat\omega$. Then
   J_\sigma \omega_{2^j} = 2^{j\sigma} (K_j)_{2^j} ,
 \]
 and Mathlib's Bessel potential $J_\sigma$ maps the tempered distribution of $\omega_{2^j}$ to
-that of $2^{j\sigma} (K_j)_{2^j}$.
+that of $2^{j\sigma} (K_j)_{2^j}$. For every $j \in \N$ and every real $\sigma$,
+$|(2^j)^\sigma| = 2^{j\sigma}$.
 \end{theorem}
 
 \begin{proof}
@@ -5100,7 +5117,7 @@ the Fourier transform of the left side is $\langle \xi \rangle^\sigma \widehat\o
 $2^{j\sigma} \, \beta_{2^{-2j},\sigma}(2^{-j} \xi) \, \widehat\omega(2^{-j} \xi)$
 (\Cref{lem:fourier-dilate}, \Cref{def:bessel-kernel-family}). They agree by
 \Cref{lem:bessel-weight-scaling} with $c = 2^j$. The statement on tempered distributions follows
-with \Cref{lem:bessel-schwartz-distribution}.
+with \Cref{lem:bessel-schwartz-distribution}, and $(2^j)^\sigma = 2^{j\sigma} > 0$.
 \end{proof}
 
 The identity holds for every Schwartz function $\omega$; the annulus condition of
@@ -5236,21 +5253,19 @@ first two paragraphs hold for every even Fourier multiplier $m(D)$ of
 
 \begin{lemma}[Even Fourier multipliers commute with translations and reflections]
 \label{lem:bessel-schwartz-translation}
-\lean{Rd.fourier_fourierMultiplierCLM_apply, Rd.fourier_besselSchwartz_apply,
-  Rd.fourier_compSubConstCLM_apply, Rd.fourierMultiplierCLM_compSubConstCLM,
-  Rd.besselSchwartz_compSubConstCLM, Rd.fourierMultiplierCLM_schwartzReflect,
-  Rd.fourierMultiplierCLM_shiftReflect}
+\lean{Rd.fourier_besselSchwartz_apply, Rd.fourier_compSubConstCLM_apply,
+  Rd.fourierMultiplierCLM_compSubConstCLM, Rd.besselSchwartz_compSubConstCLM,
+  Rd.fourierMultiplierCLM_schwartzReflect, Rd.fourierMultiplierCLM_shiftReflect}
 \leanok
 \uses{def:bessel-schwartz, lem:bessel-weight-basic, lem:reflect-basic, lem:schwartz-shift-reflect,
-  def:schwartz-dilate}
+  def:schwartz-dilate, lem:fourier-multiplier-fourier}
 Let $m$ be a function on $V$, smooth with polynomially bounded derivatives. For all Schwartz
 functions $\varphi, \eta$ and all $x, y, \xi \in V$,
-\begin{gather*}
-  \widehat{m(D) \varphi}(\xi) = m(\xi) \, \widehat\varphi(\xi), \qquad
+\[
   \widehat{\varphi(\cdot - y)}(\xi) = e^{-2\pi i \langle y, \xi \rangle} \,
-  \widehat\varphi(\xi), \\
+  \widehat\varphi(\xi), \qquad
   m(D) \bigl(\varphi(\cdot - y)\bigr) = (m(D) \varphi)(\cdot - y),
-\end{gather*}
+\]
 in particular $\widehat{J_t \varphi} = \langle \cdot \rangle^t \widehat\varphi$ and
 $J_t (\varphi(\cdot - y)) = (J_t \varphi)(\cdot - y)$ for every $t \in \R$. If $m$ is even, then
 \[
@@ -5261,13 +5276,12 @@ $J_t (\varphi(\cdot - y)) = (J_t \varphi)(\cdot - y)$ for every $t \in \R$. If $
 
 \begin{proof}
 \leanok
-The first identity is Fourier inversion on Schwartz functions, the second the substitution
-$z \mapsto z + y$ (Mathlib's
+The first identity is the substitution $z \mapsto z + y$ (Mathlib's
 \texttt{VectorFourier.\allowbreak fourierIntegral\_\allowbreak comp\_\allowbreak add\_\allowbreak
-right}). The Fourier transform is injective on Schwartz functions, and the Fourier transforms of
-the two sides of the third identity are both
-$m(\xi) e^{-2\pi i \langle y, \xi \rangle} \widehat\varphi(\xi)$, those of the
-fourth both $m(\xi) \widehat\varphi(-\xi) = m(-\xi) \widehat\varphi(-\xi)$
+right}). The Fourier transform is injective on Schwartz functions, and by
+\Cref{lem:fourier-multiplier-fourier} the Fourier transforms of the two sides of the second
+identity are both $m(\xi) e^{-2\pi i \langle y, \xi \rangle} \widehat\varphi(\xi)$, those
+of the third both $m(\xi) \widehat\varphi(-\xi) = m(-\xi) \widehat\varphi(-\xi)$
 (\Cref{lem:reflect-basic}). The function $\eta(x - \cdot)$ is the translate by $x$ of
 $\eta(-\,\cdot)$. For $J_t$, $m$ is the Bessel weight (\Cref{def:bessel-schwartz}).
 \end{proof}
@@ -5397,11 +5411,11 @@ $N = 2$, and $\tilde G$ from $j = 2$ on, with $a = 1/4$ and $N = 4$ (\Cref{def:p
 
 \begin{lemma}[Convolutions with Bessel potentials of dilates]
 \label{lem:bessel-dilate-convolution}
-\lean{Rd.enorm_two_pow_rpow, Rd.conv_besselSchwartz_schwartzDilate}
+\lean{Rd.conv_besselSchwartz_schwartzDilate}
 \leanok
 \uses{def:bessel-base, thm:bessel-potential-dilate, def:schwartz-dilate}
-For every $j \in \N$ and every real $\sigma$, $|(2^j)^\sigma| = 2^{j\sigma}$. For every family
-$(\omega_j)$ of Schwartz functions, every $F \colon V \to \C$ and every $x \in V$,
+For every $j \in \N$, every real $\sigma$, every family $(\omega_j)$ of Schwartz functions,
+every $F \colon V \to \C$ and every $x \in V$,
 \[
   \bigl( (J_\sigma (\omega_j)_{2^j}) * F \bigr)(x)
   = \bigl( (K^\sigma_j[\omega])_{2^j} * (2^{j\sigma} F) \bigr)(x) .
@@ -5772,4 +5786,347 @@ $\|g_0\|_{F^\alpha_{p,\infty}} \leq \|g_0\|_{F^s_{p,2}}$ (\Cref{prop:tl-elementa
 \Cref{thm:triebel-lizorkin-into-lp} gives $g \in L_r(V)$ with $g = g_0$ almost everywhere and
 $\|g\|_r \leq K_{V,p,r} \|g_0\|_{F^\alpha_{p,\infty}}$; by
 \Cref{lem:ae-equal-classes-distribution} $g = g_0 = f$ as tempered distributions.
+\end{proof}
+
+\chapter{Fourier multipliers}
+\label{ch:fourier-multipliers}
+
+In this chapter $V$ is a finite-dimensional real inner product space of dimension $n$ with
+Lebesgue measure. A symbol of order $\sigma$ is a smooth function $m$ on $V$ whose derivatives
+satisfy $\|D^k m(\xi)\| \leq C_k \langle \xi \rangle^{\sigma - k}$, with the Japanese bracket
+$\langle \xi \rangle = (1 + \|\xi\|^2)^{1/2}$; this is H\"ormander's class
+$S^\sigma_{1,0}$. \Cref{sec:symbol-classes} sets up the class, shows that
+Schwartz functions, the Bessel weights, linear functions and $\|\xi\|^2$ are symbols, and proves
+that a symbol rescaled to the dyadic annuli gives uniformly Schwartz kernels:
+$m(D) \omega_{2^j} = 2^{j\sigma} (K_j)_{2^j}$ with $(K_j)$ uniformly Schwartz. Convolutions with
+such kernels lie below the Hardy--Littlewood maximal function, uniformly in $j$. The constants
+come from uniform Schwartz bounds and are existential.
+
+\section{Symbols of order \texorpdfstring{$\sigma$}{sigma} and their kernel families}
+\label{sec:symbol-classes}
+
+For a function $m$ on $V$ that is smooth with polynomially bounded derivatives, $m(D)$ is Mathlib's
+Fourier multiplier on Schwartz functions and on tempered distributions, as in the paragraph before
+\Cref{lem:fourier-multiplier-fourier}. The derivative bounds for the powers of the Japanese bracket
+below are mirrored from TauCeti (\texttt{Analysis/\allowbreak SpecialFunctions/\allowbreak
+JapaneseBracket/\allowbreak Deriv.lean}, commit \texttt{b61a90d}, Apache-2.0), where they serve the
+same purpose. TauCeti also proves Mihlin's multiplier theorem on $L_p$ for homogeneous symbols with
+finitely many derivatives, through its own Calder\'on--Zygmund theory; the class $S^0_{1,0}$ lies in
+Mihlin's class. Write $\|G\|_{k,l} = \sup_x \|x\|^k \|D^l G(x)\|$ for the seminorms of a Schwartz
+function $G$.
+
+\paragraph{Powers of the Japanese bracket.}
+
+\begin{lemma}[Derivatives of powers of the Japanese bracket]
+\label{lem:bracket-power-derivatives}
+\lean{ContinuousLinearMap.norm_iteratedFDeriv_le_one_add_norm_sq_rpow,
+  ContinuousLinearMap.exists_norm_iteratedFDeriv_smul_le_one_add_norm_sq_rpow,
+  Rd.hasFDerivAt_one_add_norm_sq_rpow, Rd.exists_norm_iteratedFDeriv_one_add_norm_sq_rpow_le}
+\leanok
+Let $E$, $G$ be real normed spaces.
+\begin{enumerate}
+  \item For every continuous linear map $L \colon E \to G$, every $j \in \N$ and every
+    $x \in E$, $\|D^j L(x)\| \leq \|L\| (1 + \|x\|^2)^{(1-j)/2}$.
+  \item For every continuous linear map $L \colon E \to G$, every $k \in \N$, every real $\rho$
+    and every $C^k$ function $g \colon E \to \R$ such that for every $i \leq k$ there is $C$
+    with $\|D^i g(x)\| \leq C (1 + \|x\|^2)^{\rho - i/2}$ for every $x$, there is $C'$ with
+    $\|D^k (g L)(x)\| \leq C' (1 + \|x\|^2)^{\rho + 1/2 - k/2}$ for every $x \in E$.
+  \item If $E$ is an inner product space, then for every real $r$ and every $x \in E$ the
+    derivative of $y \mapsto (1 + \|y\|^2)^r$ at $x$ is
+    $(1 + \|x\|^2)^{r-1} \, 2r \langle x, \cdot \rangle$.
+  \item If $E$ is an inner product space, then for every real $r$ and every $k \in \N$ there is
+    $C$ with $\|D^k (1 + \|\cdot\|^2)^r(x)\| \leq C (1 + \|x\|^2)^{r - k/2}$ for every $x \in E$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) $\|L x\| \leq \|L\| \, \|x\| \leq \|L\| (1 + \|x\|^2)^{1/2}$, $D L = L$ is constant, and the
+higher derivatives vanish. (2) The Leibniz rule (Mathlib's
+\texttt{norm\_\allowbreak iteratedFDeriv\_\allowbreak smul\_\allowbreak le}) and (1): the
+exponents of $D^i g$ and $D^{k-i} L$ add up to $\rho + 1/2 - k/2$. (3) The chain rule for
+$t \mapsto t^r$ and $\|\cdot\|^2$. (4) Induction on $k$: by (3) the derivative is
+$(1 + \|\cdot\|^2)^{r-1}$ times the linear map $2r \langle \cdot, \cdot \rangle$, so (2) with
+$\rho = r - 1$ and the induction hypothesis for $r - 1$ give the bound for $D^{k+1}$.
+\end{proof}
+
+\paragraph{The class.}
+
+\begin{definition}[Symbols of order $\sigma$]
+\label{def:symbol-growth}
+\lean{Rd.HasSymbolGrowth, Rd.HasSymbolGrowth.contDiff, Rd.HasSymbolGrowth.exists_bound}
+\leanok
+Let $E$, $F$ be real normed spaces and $\sigma$ real. A function $m \colon E \to F$ is a
+\emph{symbol of order $\sigma$} if it is smooth and for every $k \in \N$ there is $C_k$ with
+\[
+  \|D^k m(\xi)\| \leq C_k (1 + \|\xi\|^2)^{(\sigma - k)/2} \qquad \text{for every } \xi \in E .
+\]
+The constants $C_k$ can be taken nonnegative.
+\end{definition}
+
+\begin{lemma}[Symbols, Schwartz functions and temperate growth]
+\label{lem:symbol-temperate-schwartz}
+\lean{Rd.one_add_norm_sq_rpow_le_one_add_norm_pow, Rd.HasSymbolGrowth.hasTemperateGrowth,
+  Rd.hasSymbolGrowth_schwartz}
+\leanok
+\uses{def:symbol-growth}
+Let $E$, $F$ be real normed spaces.
+\begin{enumerate}
+  \item For every real $a$, every $N \in \N$ with $a \leq N$ and every $\xi \in E$,
+    $(1 + \|\xi\|^2)^{a/2} \leq (1 + \|\xi\|)^N$.
+  \item For every real $\sigma$, every symbol $m \colon E \to F$ of order $\sigma$ is smooth
+    with polynomially bounded derivatives (Mathlib's
+    \texttt{Function.\allowbreak HasTemperateGrowth}).
+  \item For every Schwartz function $\varphi \colon E \to F$ and every real $\sigma$, $\varphi$
+    is a symbol of order $\sigma$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) $1 + \|\xi\|^2 \geq 1$, so $(1 + \|\xi\|^2)^{a/2} \leq (1 + \|\xi\|^2)^{N/2}$, and
+$(1 + \|\xi\|^2)^{1/2} \leq 1 + \|\xi\|$. (2) By (1) with $a = \sigma - k \leq N$.
+(3) With $N \geq k - \sigma$, $(1 + \|\xi\|)^N \|D^k \varphi(\xi)\|$ is at most $2^N$ times a
+finite maximum of seminorms of $\varphi$ (Mathlib's
+\texttt{SchwartzMap.\allowbreak one\_\allowbreak add\_\allowbreak le\_\allowbreak
+sup\_\allowbreak seminorm\_\allowbreak apply}), and
+$(1 + \|\xi\|^2)^{(k - \sigma)/2} \leq (1 + \|\xi\|)^N$ by (1).
+\end{proof}
+
+\begin{lemma}[Algebra of symbols]
+\label{lem:symbol-algebra}
+\lean{Rd.HasSymbolGrowth.mono, Rd.HasSymbolGrowth.add, Rd.HasSymbolGrowth.neg,
+  Rd.HasSymbolGrowth.sub, Rd.hasSymbolGrowth_const, Rd.hasSymbolGrowth_continuousLinearMap,
+  Rd.HasSymbolGrowth.mul, Rd.HasSymbolGrowth.const_mul, Rd.HasSymbolGrowth.ofReal}
+\leanok
+\uses{def:symbol-growth, lem:bracket-power-derivatives}
+Let $E$, $F$ be real normed spaces and $\sigma, \tau$ real.
+\begin{enumerate}
+  \item If $\sigma \leq \tau$, every symbol of order $\sigma$ is a symbol of order $\tau$.
+  \item For all symbols $m, m' \colon E \to F$ of order $\sigma$, $m + m'$, $-m$ and $m - m'$
+    are symbols of order $\sigma$.
+  \item For every $c \in F$, the constant function $c$ is a symbol of order $0$; every
+    continuous linear map $L \colon E \to F$ is a symbol of order $1$.
+  \item For every real normed algebra $A$, every symbol $m \colon E \to A$ of order $\sigma$,
+    every symbol $m' \colon E \to A$ of order $\tau$ and every $c \in A$, $m m'$ is a symbol of
+    order $\sigma + \tau$ and $c m$ is a symbol of order $\sigma$.
+  \item For every symbol $m \colon E \to \R$ of order $\sigma$, $\xi \mapsto m(\xi) \in \C$ is
+    a symbol of order $\sigma$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) $1 + \|\xi\|^2 \geq 1$. (2) Derivatives are linear. (3) The derivatives of positive order of
+a constant vanish; continuous linear maps by \Cref{lem:bracket-power-derivatives}~(1).
+(4) By the Leibniz rule (Mathlib's
+\texttt{norm\_\allowbreak iteratedFDeriv\_\allowbreak mul\_\allowbreak le}),
+$\|D^k (m m')(\xi)\| \leq \sum_{i \leq k} \binom{k}{i} C_i C'_{k-i}
+(1 + \|\xi\|^2)^{(\sigma - i)/2} (1 + \|\xi\|^2)^{(\tau - k + i)/2}$, and the exponents add up to
+$(\sigma + \tau - k)/2$; $c m$ is the product with the constant $c$ of order $0$. (5) The
+embedding $\R \to \C$ is a linear isometry, so it keeps the norms of the derivatives (Mathlib's
+\texttt{LinearIsometry.\allowbreak norm\_\allowbreak iteratedFDeriv\_\allowbreak
+comp\_\allowbreak left}).
+\end{proof}
+
+\begin{lemma}[Examples of symbols]
+\label{lem:symbol-examples}
+\lean{Rd.hasSymbolGrowth_one_add_norm_sq_rpow, Rd.hasSymbolGrowth_besselWeight,
+  Rd.hasSymbolGrowth_inner, Rd.hasSymbolGrowth_norm_sq}
+\leanok
+\uses{def:symbol-growth, lem:bracket-power-derivatives, lem:symbol-algebra, def:bessel-weight}
+For every real $r$, $\xi \mapsto (1 + \|\xi\|^2)^r$ is a symbol of order $2r$ on $V$. For every
+real $s$, the Bessel weight $\xi \mapsto \langle \xi \rangle^s \in \C$ is a symbol of order $s$.
+For every $v \in V$, $\xi \mapsto \langle \xi, v \rangle \in \C$ is a symbol of order $1$, and
+$\xi \mapsto \|\xi\|^2 \in \C$ is a symbol of order $2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first claim is \Cref{lem:bracket-power-derivatives}~(4), since $r - k/2 = (2r - k)/2$; the
+Bessel weight is the case $r = s/2$, taken into $\C$ by \Cref{lem:symbol-algebra}~(5). The
+function $\langle \cdot, v \rangle$ is continuous and linear, and
+$\|\xi\|^2 = \langle \xi \rangle^2 - 1$ with the constant $1$ of order $0 \leq 2$
+(\Cref{lem:symbol-algebra}).
+\end{proof}
+
+The symbols $2\pi i \langle \xi, v \rangle$ and $-4\pi^2 \|\xi\|^2$ give the derivative
+$\partial_v$ and the Laplacian of tempered distributions (Mathlib's
+\texttt{TemperedDistribution.\allowbreak lineDeriv\_\allowbreak eq\_\allowbreak
+fourier\allowbreak MultiplierCLM} and \texttt{TemperedDistribution.\allowbreak
+laplacian\_\allowbreak eq\_\allowbreak fourier\allowbreak MultiplierCLM}).
+
+\paragraph{Rescaled symbols.}
+
+\begin{definition}[Rescaled symbols]
+\label{def:scaled-symbol}
+\lean{Rd.scaledSymbol, Rd.hasTemperateGrowth_scaledSymbol}
+\leanok
+For every $m \colon V \to \C$, every real $\sigma$ and every $j \in \N$ let
+\[
+  m^\sigma_j(\zeta) = 2^{-j\sigma} \, m(2^j \zeta) \qquad (\zeta \in V) .
+\]
+If $m$ is smooth with polynomially bounded derivatives, so is every $m^\sigma_j$.
+\end{definition}
+
+\begin{lemma}[Derivatives of rescaled symbols]
+\label{lem:scaled-symbol-derivatives}
+\lean{Rd.iteratedFDeriv_scaledSymbol, Rd.rpow_neg_mul_pow_mul_one_add_sq_rpow,
+  Rd.norm_iteratedFDeriv_scaledSymbol_le}
+\leanok
+\uses{def:scaled-symbol}
+For every smooth $m \colon V \to \C$, every real $\sigma$, all $j, k \in \N$ and every
+$\zeta \in V$,
+$D^k m^\sigma_j(\zeta) = 2^{-j\sigma} 2^{jk} \, D^k m(2^j \zeta)$. For every real $c > 0$,
+every real $\sigma$, every $k \in \N$ and every real $x$,
+\[
+  c^{-\sigma} c^k (1 + (c x)^2)^{(\sigma - k)/2} = (c^{-2} + x^2)^{(\sigma - k)/2} .
+\]
+Hence, for every real $C$ with $\|D^k m(\xi)\| \leq C (1 + \|\xi\|^2)^{(\sigma - k)/2}$ for every
+$\xi \in V$, $\|D^k m^\sigma_j(\zeta)\| \leq C (2^{-2j} + \|\zeta\|^2)^{(\sigma - k)/2}$ for
+every $j \in \N$ and every $\zeta \in V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The chain rule for $\zeta \mapsto m(2^j \zeta)$ (Mathlib's
+\texttt{iteratedFDeriv\_\allowbreak comp\_\allowbreak const\_\allowbreak smul}). For the
+identity, $c^{-2} + x^2 = c^{-2} (1 + (cx)^2)$ and $(c^{-2})^{(\sigma - k)/2} = c^{k - \sigma}$.
+The bound combines both with $c = 2^j$ and $x = \|\zeta\|$.
+\end{proof}
+
+\begin{lemma}[Rescaled symbols on an annulus]
+\label{lem:scaled-symbol-annulus}
+\lean{Rd.HasSymbolGrowth.exists_norm_iteratedFDeriv_scaledSymbol_le}
+\leanok
+\uses{lem:scaled-symbol-derivatives, def:symbol-growth, lem:shifted-bessel-symbol-bounds}
+Let $\sigma$ be real, $m \colon V \to \C$ a symbol of order $\sigma$, $a > 0$ and $b$ real. For
+every $k \in \N$ there is $C \geq 0$ with $\|D^k m^\sigma_j(\zeta)\| \leq C$ for every $j \in \N$
+and every $\zeta \in V$ with $a \leq \|\zeta\| \leq b$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:scaled-symbol-derivatives},
+$\|D^k m^\sigma_j(\zeta)\| \leq C_k |\beta_{2^{-2j}, \sigma - k}(\zeta)|$, and
+$2^{-2j} \in [0, 1]$, so \Cref{lem:shifted-bessel-symbol-bounds} gives the bound
+$C = C_k M_{a,b,\sigma-k}$.
+\end{proof}
+
+\paragraph{The symbol and kernel families.}
+
+\begin{definition}[Symbol families and symbol kernels]
+\label{def:symbol-family}
+\lean{Rd.symbolFamily, Rd.coe_symbolFamily, Rd.symbolKernelFamily,
+  Rd.fourier_symbolKernelFamily, Rd.symbolBase}
+\leanok
+\uses{def:scaled-symbol}
+For every $m \colon V \to \C$ that is smooth with polynomially bounded derivatives, every real
+$\sigma$ and every Schwartz function $\widehat\omega \colon V \to \C$ let, for $j \in \N$,
+\[
+  S^m_j = m^\sigma_j \, \widehat\omega , \qquad K^m_j = \mathcal F^{-1} S^m_j ,
+\]
+Schwartz functions with $\widehat{K^m_j} = m^\sigma_j \, \widehat\omega$. For every family
+$\omega = (\omega_j)_{j \in \N}$ of Schwartz functions and every $j \in \N$, let
+$K^m_j[\omega]$ be the $j$-th symbol kernel $K^m_j$ of $\widehat{\omega_j}$.
+\end{definition}
+
+\begin{theorem}[The symbol kernels are uniformly Schwartz]
+\label{thm:symbol-kernels-uniform}
+\lean{Rd.HasSymbolGrowth.exists_isUniformSchwartz_symbolFamily,
+  Rd.HasSymbolGrowth.exists_isUniformSchwartz_symbolKernelFamily}
+\leanok
+\uses{def:symbol-family, lem:scaled-symbol-annulus, lem:leibniz-schwartz, lem:tsupport-annulus,
+  thm:uniform-schwartz-linear-map, def:uniform-schwartz, lem:symbol-temperate-schwartz}
+Let $\sigma$ be real, $m \colon V \to \C$ a symbol of order $\sigma$, $a > 0$ and $b$ real, and
+let $\widehat\omega \colon V \to \C$ be a Schwartz function that vanishes outside the annulus
+$\{a \leq \|\zeta\| \leq b\}$. Then there are bounds $A$ such that $(S^m_j)$ is uniformly
+Schwartz with bounds $A$, and bounds $A'$ such that $(K^m_j)$ is uniformly Schwartz with
+bounds $A'$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+As for the Bessel kernels (\Cref{thm:bessel-kernels-uniform}): let $C_r \geq 0$ be the bounds of
+\Cref{lem:scaled-symbol-annulus}. Outside the closure of the support of $\widehat\omega$ every
+derivative of $S^m_j$ vanishes; on it $a \leq \|x\| \leq b$ (\Cref{lem:tsupport-annulus}), so
+$\|x\|^k \|D^l S^m_j(x)\| \leq |b|^k \sum_{i \leq l} \binom{l}{i} C_i
+\|\widehat\omega\|_{0,l-i}$ by \Cref{lem:leibniz-schwartz}. The kernels follow by
+\Cref{thm:uniform-schwartz-linear-map}.
+\end{proof}
+
+\begin{theorem}[Fourier multipliers of dilates]
+\label{thm:symbol-dilate}
+\lean{Rd.fourierMultiplierCLM_schwartzDilate}
+\leanok
+\uses{def:symbol-family, def:schwartz-dilate, lem:fourier-dilate, lem:fourier-multiplier-fourier}
+For every $m \colon V \to \C$ that is smooth with polynomially bounded derivatives, every real
+$\sigma$, every Schwartz function $\omega \colon V \to \C$ and every $j \in \N$, with the symbol
+kernels $K^m_j$ of $\widehat\omega$,
+\[
+  m(D) \, \omega_{2^j} = 2^{j\sigma} (K^m_j)_{2^j} .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Both sides are Schwartz functions, and the Fourier transform is injective on them. At $\xi$ the
+Fourier transform of the left side is $m(\xi) \, \widehat\omega(2^{-j} \xi)$, and that of the
+right side is $2^{j\sigma} 2^{-j\sigma} m(2^j 2^{-j} \xi) \, \widehat\omega(2^{-j} \xi)$
+(\Cref{lem:fourier-dilate}, \Cref{lem:fourier-multiplier-fourier}).
+\end{proof}
+
+\begin{corollary}[Symbols applied to the synthesis kernels]
+\label{cor:symbol-psi-dual}
+\lean{Rd.HasSymbolGrowth.exists_isUniformSchwartz_symbolBase,
+  Rd.HasSymbolGrowth.exists_isUniformSchwartz_psiDualS}
+\leanok
+\uses{thm:symbol-kernels-uniform, thm:symbol-dilate, lem:uniform-schwartz-exceptions,
+  lem:littlewood-paley-annuli, def:psi-dual, lem:psi-dual-derivatives}
+Let $\sigma$ be real and $m \colon V \to \C$ a symbol of order $\sigma$.
+\begin{enumerate}
+  \item For every family $(\omega_j)$ of Schwartz functions, every $M \in \N$ with
+    $\omega_j = \omega_M$ for $j \geq M$, and all reals $a > 0$, $b$ such that
+    $\widehat{\omega_M}$ vanishes outside $\{a \leq \|\zeta\| \leq b\}$, the symbol kernels
+    $j \mapsto K^m_j[\omega]$ are uniformly Schwartz with some bounds.
+  \item There are a uniformly Schwartz family $(G_j)$ and bounds $A$ such that
+    $m(D) \tilde\psi_j = 2^{j\sigma} (G_j)_{2^j}$ for every $j \in \N$, with the synthesis
+    kernels $\tilde\psi_j$ of \Cref{def:psi-dual}.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+\leanok
+(1) From $M$ on the kernels are those of $\widehat{\omega_M}$
+(\Cref{thm:symbol-kernels-uniform}), and the first $M$ are exceptions
+(\Cref{lem:uniform-schwartz-exceptions}). (2) $\tilde\psi_j = (\tilde G_j)_{2^j}$ with the bases
+$\tilde G_j$ of \Cref{def:psi-dual}, constant from $j = 2$ on, with Fourier transform in
+$\{1/4 \leq \|\zeta\| \leq 4\}$ (\Cref{lem:littlewood-paley-annuli}); take
+$G_j = K^m_j[\tilde G]$ and apply (1) and \Cref{thm:symbol-dilate}.
+\end{proof}
+
+\paragraph{The maximal bound.}
+
+\begin{theorem}[Uniform families below the maximal function]
+\label{thm:uniform-family-maximal}
+\lean{Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximal,
+  Rd.decayMaximalConst_mul_familyDecayConst_ne_top}
+\leanok
+\uses{def:uniform-schwartz, lem:uniform-schwartz-constants, lem:schwartz-decay,
+  thm:decay-kernels-maximal, def:maximal-function, lem:maximal-function-kernels}
+Let $(G_j)$ be uniformly Schwartz with bounds $A$ and let $N > n$. For every $j \in \N$, every
+function $g \colon V \to \C$ and every $x \in V$,
+\[
+  |((G_j)_{2^j} \ast g)(x)| \leq C_{n,N} \, C_{A,0,N} \, M|g|(x)
+\]
+with the constants $C_{n,N}$ of \Cref{lem:maximal-function-kernels} and $C_{A,0,N}$ of
+\Cref{def:uniform-schwartz}, independent of $j$; the product $C_{n,N} \, C_{A,0,N}$ is
+finite.
+\end{theorem}
+
+\begin{proof}
+\leanok
+$|(G_j)_{2^j}(y)| \leq C_{A,0,N} 2^{jn} (1 + 2^j \|y\|)^{-N}$ (\Cref{lem:schwartz-decay},
+\Cref{lem:uniform-schwartz-constants}), and kernels with this bound lie below the maximal
+function (\Cref{thm:decay-kernels-maximal}).
 \end{proof}

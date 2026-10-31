@@ -517,6 +517,21 @@ declarations.
   `Rd.fourierMultiplierCLM_schwartzReflect`, with the Fourier transform of a translate
   `Rd.fourier_compSubConstCLM_apply`); they belong in
   `Mathlib/Analysis/Distribution/FourierMultiplier.lean` and next to `SchwartzMap.compSubConstCLM`.
+* **Symbols of order `σ`** (`FunctionSpaces/Rd/FourierMultipliers/SymbolKernels.lean`): the
+  predicate `Rd.HasSymbolGrowth σ m`, Hörmander's class `S^σ_{1,0}` with the bracket weight
+  `(1 + ‖ξ‖²)^{(σ - k)/2}`, beside Mathlib's `Function.HasTemperateGrowth`, with Schwartz
+  functions as symbols of every order (`Rd.hasSymbolGrowth_schwartz`), symbols of temperate
+  growth (`Rd.HasSymbolGrowth.hasTemperateGrowth`), products (`Rd.HasSymbolGrowth.mul`) and the
+  Bessel weight (`Rd.hasSymbolGrowth_besselWeight`); it belongs in
+  `Mathlib/Analysis/Distribution/TemperateGrowth.lean`. The derivative bounds for powers of the
+  Japanese bracket behind the Bessel weight
+  (`ContinuousLinearMap.norm_iteratedFDeriv_le_one_add_norm_sq_rpow`,
+  `ContinuousLinearMap.exists_norm_iteratedFDeriv_smul_le_one_add_norm_sq_rpow`,
+  `Rd.hasFDerivAt_one_add_norm_sq_rpow`, `Rd.exists_norm_iteratedFDeriv_one_add_norm_sq_rpow_le`)
+  are mirrored from TauCeti (`TauCeti/Analysis/SpecialFunctions/JapaneseBracket/Deriv.lean`,
+  commit `b61a90d`, Apache-2.0), which imports only Mathlib; they belong next to
+  `Mathlib/Analysis/SpecialFunctions/JapaneseBracket.lean`, and an upstream version should come
+  from TauCeti.
 * **The area formula for Lipschitz graphs**
   (`FunctionSpaces/Domains/Lipschitz/LipschitzGraphArea.lean`): Mathlib has the area formula for
   linear maps, `μHE[dim U] (f '' s) = normDet f · vol(s)`

@@ -57,15 +57,6 @@ variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 
 /-! ### Even Fourier multipliers on Schwartz functions -/
 
-/-- **Fourier multipliers multiply the Fourier transform**: `𝓕(m(D) u)(ξ) = m(ξ) 𝓕u(ξ)` for a
-symbol `m` of temperate growth and a Schwartz function `u` (Fourier inversion on Schwartz
-functions). -/
-theorem fourier_fourierMultiplierCLM_apply {m : V → ℂ} (hm : m.HasTemperateGrowth)
-    (u : 𝓢(V, ℂ)) (ξ : V) :
-    𝓕 (SchwartzMap.fourierMultiplierCLM ℂ m u) ξ = m ξ * 𝓕 u ξ := by
-  rw [SchwartzMap.fourierMultiplierCLM_apply, FourierInvPair.fourier_fourierInv_eq,
-    SchwartzMap.smulLeftCLM_apply_apply hm, smul_eq_mul]
-
 /-- `𝓕(J_t u)(ξ) = ⟨ξ⟩^t 𝓕u(ξ)` for Schwartz functions `u`
 (`Rd.fourier_fourierMultiplierCLM_apply`). -/
 theorem fourier_besselSchwartz_apply (t : ℝ) (u : 𝓢(V, ℂ)) (ξ : V) :
@@ -340,15 +331,6 @@ theorem exists_isCZFamily_besselBase_psiBase (σ : ℝ) :
       rfl)
     (fun _ h => mem_annulus_of_fourier_psiBase_ne_zero (j := 0) h) σ
 
-omit [InnerProductSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
-  [Fact (1 ≤ p)] in
-/-- `|(2^j)^σ| = 2^{jσ}`, the dyadic weight. -/
-theorem enorm_two_pow_rpow (j : ℕ) (σ : ℝ) :
-    ‖((((2 : ℝ) ^ j) ^ σ : ℝ) : ℂ)‖ₑ = dyadicWeight σ j := by
-  rw [← ofReal_norm, Complex.norm_real, Real.norm_of_nonneg (by positivity),
-    ← ENNReal.ofReal_rpow_of_pos (by positivity), ENNReal.ofReal_pow (by norm_num),
-    ENNReal.ofReal_ofNat, ENNReal.dyadicWeight, ← ENNReal.rpow_natCast, ← ENNReal.rpow_mul]
-
 omit [Fact (1 ≤ p)] in
 /-- **Convolution with the Bessel potential of a dilate**: for a family `(ω_j)` of Schwartz
 functions, `(J_σ (ω_j)_{2^j}) ⋆ F = (K^σ_j)_{2^j} ⋆ ((2^j)^σ F)` at every point
@@ -437,10 +419,11 @@ theorem dyadicWeight_mul_enorm_blockFun_eq {q r : ℝ≥0∞} [Fact (1 ≤ q)] [
   have hpsi : psi (V := V) j =
       ⇑(schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (psiBase (V := V) j)) := by
     rw [coe_schwartzDilate, dilate_psiBase]
-  rw [blockFun, hpsi, conv_eq_conv_besselSchwartz hgh, conv_besselSchwartz_schwartzDilate,
-    conv_smul, Pi.smul_apply, smul_eq_mul, enorm_mul, enorm_two_pow_rpow, ← mul_assoc,
-    ENNReal.dyadicWeight_neg, ENNReal.mul_inv_cancel (ENNReal.dyadicWeight_ne_zero s j)
-      (ENNReal.dyadicWeight_ne_top s j), one_mul]
+  rw [blockFun, hpsi, conv_eq_conv_besselSchwartz hgh,
+    conv_besselSchwartz_schwartzDilate, conv_smul, Pi.smul_apply, smul_eq_mul, enorm_mul,
+    enorm_two_pow_rpow, ← mul_assoc, ENNReal.dyadicWeight_neg,
+    ENNReal.mul_inv_cancel (ENNReal.dyadicWeight_ne_zero s j) (ENNReal.dyadicWeight_ne_top s j),
+    one_mul]
 
 /-- **`H^{s,p} ⊆ F^s_{p,2}` on `L_p`, with norm bound**: in dimension `n ≥ 1`, for `1 < p < ∞`
 and every real `s` there is a finite constant `C` such that `‖g‖_{F^s_{p,2}} ≤ C ‖h‖_p` for all

@@ -1,7 +1,8 @@
 # Sobolev spaces on `ℝ^d`
 
 Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Sobolev and Bessel
-potential spaces*, chapters *Sobolev spaces on `ℝ^d`* and *Bessel potential spaces*.
+potential spaces*, chapters *Sobolev spaces on `ℝ^d`*, *Bessel potential spaces* and *Fourier
+multipliers*.
 
 This block develops the Sobolev spaces `W^m_p` defined by weak derivatives. A weak derivative is an
 identity between distributions on an open set, in Mathlib's distributions `𝓓'(Ω, ℂ)`; on the whole
@@ -37,7 +38,9 @@ family. Applied to the Littlewood–Paley blocks and their synthesis kernels, th
 `1 < p < ∞` and with existential constants, `H^{s,p} ∩ L_p = F^s_{p,2}` for every real `s`,
 `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, and Calderón's theorem `W^m_p = H^{m,p}`. The real
 interpolation spaces of `L_p` and `W^m_p`, of two Sobolev spaces, and of two Bessel potential
-spaces are Besov spaces.
+spaces are Besov spaces. Symbols of order `σ`, Hörmander's class `S^σ_{1,0}`, lie between the
+Schwartz functions and the functions of temperate growth; rescaled to the dyadic annuli they
+give uniformly Schwartz kernels, whose convolutions lie below the maximal function.
 
 Sobolev spaces on open sets and on bounded Lipschitz domains, the trace space, the extension
 theorem, Green's formula and the kernel of the trace are in [Domains, traces and
@@ -282,6 +285,22 @@ project, with the decisions behind their form.
   For `p ≤ r < ∞` and real `s ≥ n(1/p - 1/r)`, every element of `H^{s,p}(V)` is a function in
   `L_r(V)` (`Rd.exists_memLp_eq_of_memSobolev_bessel`), with `‖g‖_r ≤ C ‖F‖_{H^{s,p}}` in Mathlib's
   bundled space (`Rd.exists_enorm_le_of_besselPotentialSpace`).
+* **Symbols of order `σ`.** A smooth `m` is a symbol of order `σ` (`Rd.HasSymbolGrowth σ m`,
+  Hörmander's class `S^σ_{1,0}`) if `‖D^k m(ξ)‖ ≤ C_k (1 + ‖ξ‖²)^{(σ - k)/2}` for every `k`.
+  Schwartz functions are symbols of every order (`Rd.hasSymbolGrowth_schwartz`), and symbols
+  have temperate growth (`Rd.HasSymbolGrowth.hasTemperateGrowth`), so they are Fourier
+  multipliers of tempered distributions; orders add under products
+  (`Rd.HasSymbolGrowth.mul`). The Bessel weight `⟨ξ⟩^s` is a symbol of order `s`
+  (`Rd.hasSymbolGrowth_besselWeight`, from the derivative bounds for powers of the Japanese
+  bracket mirrored from TauCeti), `⟪ξ, v⟫` one of order `1` and `‖ξ‖²` one of order `2`. For a
+  symbol `m` of order `σ` and a Schwartz `ω̂` vanishing outside an annulus `{a ≤ ‖ζ‖ ≤ b}`,
+  `a > 0`, the kernels `K_j = 𝓕⁻¹[2^{-jσ} m(2^j ·) ω̂]` are uniformly Schwartz
+  (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_symbolKernelFamily`), and
+  `m(D) ω_{2^j} = 2^{jσ} (K_j)_{2^j}` with `ω = 𝓕⁻¹ ω̂` (`Rd.fourierMultiplierCLM_schwartzDilate`);
+  in particular `m(D) ψ̃_j = 2^{jσ} (G_j)_{2^j}` for the synthesis kernels with a uniform family
+  `(G_j)` (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_psiDualS`). Convolutions with the
+  dilates of a uniform family lie below the maximal function, uniformly in `j`
+  (`Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximal`).
 * **Sobolev spaces and real interpolation.** Let `dim V ≥ 1` and `1 < p < ∞`. The grid norm
   of `W^m_p(V)` is `‖f‖_p + inf ∑_α ‖g_α‖_p`, the infimum over the families of weak derivatives
   `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f ∈ L_p(V)` along the basis of `Rd.gridBasis`
@@ -321,7 +340,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Weak derivatives and Sobolev spaces on open sets, integration by parts, also against complex test functions, uniqueness, locality, finite sums, the product rule with smooth functions, also with a cutoff `χ` supported in `B`, which carries a weak derivative on `O ∩ B` to one on `O`, limits; the bridge to tempered distributions | ✅ | ✗ | `Rd/Sobolev/WeakDerivatives` |
 | Lipschitz and `C^1` functions as weakly differentiable functions, weak derivatives linear in the direction, `W^1_p(ℝ^d)` from the basis directions, the `L_p` bounds of the product rule with a cutoff, bounded multipliers on `L_p`, smooth cutoffs with bounded derivatives, the derivative of a mollification, mollification on open sets in `L_1`, `L_p` norms of compositions with measure-preserving maps, and the chain rule for Lipschitz measure-preserving maps | ✅ | ✗ | `Rd/Sobolev/WeakDerivativeChangeOfVariables` |
 | Composition of weak derivatives, the derivatives along all directions from those along words in the basis, sums and choices over words, the Leibniz rule for `χ f` with a smooth compactly supported `χ` and the Leibniz constant `2^k sup_x ∑_{j ≤ k} ‖D^j χ(x)‖`, smooth compactly supported multipliers on `W^m_p(ℝ^d)`, the product rule in `L_p(ℝ^d)` | ✅ | ✗ | `Rd/Sobolev/WeakDerivativeLeibniz` |
-| The convolution theorem and Plancherel for a convolution on `L_2`, the Bessel potential on Schwartz functions, even Fourier multipliers acting by the transpose, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/Sobolev/SobolevTwoLittlewoodPaley` |
+| The convolution theorem and Plancherel for a convolution on `L_2`, the Bessel potential on Schwartz functions, Fourier multipliers multiplying the Fourier transform and even ones acting by the transpose, the comparison of the Bessel weight with the Littlewood–Paley weights, Mathlib's `H^s` as `F^s_{2,2}` (`s ≥ 0`) and `B^s_{2,2}` (`s > 0`) with explicit constants, `W^1_2 = H^1 = B^1_{2,2}` | ✅ | ✗ | `Rd/Sobolev/SobolevTwoLittlewoodPaley` |
 | The inverse Fourier transform of integrable `L_2` functions, band-limited functions as bounded Lipschitz functions, truncation in frequency, the injectivity of `H^1(ℝ^d) → L_2(ℝ^d)`, and Rellich's theorem: the restriction from `H^1(ℝ^d)` to `L_2(Ω)` is compact for bounded `Ω` | ✅ | ✗ | `Rd/Sobolev/RellichCompactness` |
 | Fourier transforms of iterated derivatives, the derivative symbols and kernels, the block `ψ_1` as a sum of derivatives of order `m`, and the Calderón–Zygmund families of the dilated derivative kernels and of the rescaled derivatives `2^{-jk} ∂^w ψ̃_j` of the synthesis kernels | ✅ | ✗ | `Rd/Sobolev/DerivativeKernels` |
 | Smoothness of parametric integrals, the dilation identity `m_2 - m = ∑_i ∂_{e_i} K_i` with the divergence kernels `K_i(x) = ⟪e_i, x⟫ ∫_1^2 t⁻¹ m_t(x) dt`, their supports and those of dyadic dilates, mean zero, the local means kernels as dilation differences `k_{j+1} = (m_2 - m)_{2^j}`, and the Calderón–Zygmund families of the dilates of mean-zero Schwartz functions | ✅ | ✗ | `Rd/Sobolev/DivergenceKernels` |
@@ -335,6 +354,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Uniform Schwartz families as bounded sets and under continuous linear maps, the shifted Bessel symbols `(ε + ‖ζ‖²)^{σ/2}` with derivative bounds on annuli uniform in `ε`, the Bessel symbol and kernel families as uniform Schwartz families, the Bessel potential of a dilate, the dilated Bessel kernels as a Calderón–Zygmund family with explicit overlap, and the annuli of the Littlewood–Paley kernels | ✅ | ✗ | `Rd/BesselPotentials/UniformSchwartzFamilies` |
 | Even Fourier multipliers, among them Mathlib's Bessel potential, commuting with translations and reflections of Schwartz functions and with convolutions, the Bessel kernels of the Littlewood–Paley kernels, `H^{s,p} ∩ L_p = F^s_{p,2}` for real `s`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0` and `W^m_p = H^{m,p}` for `1 < p < ∞`, with existential constants | ✅ | ✗ | `Rd/BesselPotentials/BesselPotentialLifting` |
 | `H^{s,p} ↪ L_r` for `1 < p ≤ r < ∞` and `s ≥ n(1/p - 1/r)`, also in Mathlib's bundled space | ✅ | ✗ | `Rd/BesselPotentials/BesselPotentialEmbedding` |
+| Derivative bounds for powers of the Japanese bracket (mirrored from TauCeti), symbols of order `σ` between the Schwartz functions and the functions of temperate growth, their algebra, the Bessel weight, `⟪ξ, v⟫` and `‖ξ‖²` as symbols, rescaled symbols on annuli, the uniformly Schwartz symbol kernels with `m(D) ω_{2^j} = 2^{jσ} (K_j)_{2^j}`, and the maximal bound of convolutions with dilates of uniform families | ✅ | ✗ | `Rd/FourierMultipliers/SymbolKernels` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

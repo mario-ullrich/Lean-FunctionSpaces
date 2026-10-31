@@ -94,6 +94,7 @@ public import FunctionSpaces.Rd.Sobolev.SobolevJets
 public import FunctionSpaces.Rd.BesselPotentials.UniformSchwartzFamilies
 public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialLifting
 public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialEmbedding
+public import FunctionSpaces.Rd.FourierMultipliers.SymbolKernels
 public import FunctionSpaces.Rd.Interpolation.BesovInterpolation
 public import FunctionSpaces.Rd.Interpolation.SobolevInterpolation
 public import FunctionSpaces.Rd.Interpolation.TriebelLizorkinInterpolation
@@ -586,6 +587,15 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   with existential constants, and `W^m_p = H^{m,p}`.
 * `FunctionSpaces.Rd.BesselPotentials.BesselPotentialEmbedding`: the Sobolev embedding
   `H^{s,p} ↪ L_r` for `1 < p ≤ r < ∞` and `s ≥ n(1/p - 1/r)`, also in Mathlib's bundled space.
+
+#### `Rd/FourierMultipliers`: Fourier multipliers
+
+* `FunctionSpaces.Rd.FourierMultipliers.SymbolKernels`: symbols of order `σ`
+  (`Rd.HasSymbolGrowth`, Hörmander's class `S^σ_{1,0}`) between the Schwartz functions and the
+  functions of temperate growth, their algebra and the examples `⟨ξ⟩^s`, `⟪ξ, v⟫`, `‖ξ‖²`, the
+  rescaled symbols `2^{-jσ} m(2^j ·)`, the uniformly Schwartz kernels `K_j` with
+  `m(D) ω_{2^j} = 2^{jσ} (K_j)_{2^j}`, and the maximal bound of convolutions with dilates of
+  uniform families.
 
 #### `Rd/Interpolation`: real interpolation
 

@@ -29,7 +29,9 @@ explicit constants, and proves `W^1_2(V) = H^1(V) = B^1_{2,2}(V)`.
 * **The Bessel potential on Schwartz functions**: `J_t u = 𝓕⁻(⟨ξ⟩^t 𝓕u)` (`Rd.besselSchwartz`)
   is Mathlib's `J_t` on the tempered distribution of `u` (`Rd.besselPotential_schwartz`), with
   inverse `J_{-t}` (`Rd.besselSchwartz_besselSchwartz_neg`).
-  Mathlib's Fourier multiplier of an even temperate symbol `m` acts on tempered distributions by
+  Mathlib's Fourier multiplier `m(D)` of a temperate symbol `m` multiplies the Fourier transform
+  of a Schwartz function by `m` (`Rd.fourier_fourierMultiplierCLM_apply`); for even `m` it acts
+  on tempered distributions by
   the transpose, `(m(D) T)(u) = T(m(D) u)` (`Rd.fourierMultiplierCLM_apply_apply_of_even`); for
   the even Bessel weight this is `(J_t T)(u) = T(J_t u)` (`Rd.besselPotential_apply_apply`), so
   `J_t` is symmetric on Schwartz functions (`Rd.integral_besselSchwartz_mul`).
@@ -279,6 +281,15 @@ theorem besselSchwartz_apply (t : ℝ) (u : 𝓢(V, ℂ)) (x : V) :
   rw [besselSchwartz, SchwartzMap.fourierMultiplierCLM_apply, SchwartzMap.fourierInv_coe,
     SchwartzMap.smulLeftCLM_apply (hasTemperateGrowth_besselWeight t), SchwartzMap.fourier_coe]
   rfl
+
+/-- **Fourier multipliers multiply the Fourier transform**: `𝓕(m(D) u)(ξ) = m(ξ) 𝓕u(ξ)` for a
+symbol `m` of temperate growth and a Schwartz function `u` (Fourier inversion on Schwartz
+functions). -/
+theorem fourier_fourierMultiplierCLM_apply {m : V → ℂ} (hm : m.HasTemperateGrowth)
+    (u : 𝓢(V, ℂ)) (ξ : V) :
+    𝓕 (SchwartzMap.fourierMultiplierCLM ℂ m u) ξ = m ξ * 𝓕 u ξ := by
+  rw [SchwartzMap.fourierMultiplierCLM_apply, FourierInvPair.fourier_fourierInv_eq,
+    SchwartzMap.smulLeftCLM_apply_apply hm, smul_eq_mul]
 
 /-- **The transpose form of an even Fourier multiplier**: for an even symbol `m` of temperate
 growth, `m(-ξ) = m(ξ)`, Mathlib's Fourier multiplier `m(D) u = 𝓕⁻(m 𝓕u)` on Schwartz functions
