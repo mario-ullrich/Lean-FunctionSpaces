@@ -9309,7 +9309,8 @@ functions that vanish outside a ball on a Besov domain, the setting of the chart
 functions on compact manifolds. \Cref{sec:chart-sobolev} builds the chart Sobolev space
 $H^1_A(M)$ of a compact manifold from the weak gradients of its chart pieces and identifies it
 with $\Besov{1}{2}{2}(M)$; \Cref{sec:chart-eigenbasis} proves Rellich's theorem for it and builds
-the eigenbasis of its chart form.
+the eigenbasis of its chart form, and \Cref{sec:spectral-besov-manifold} describes
+$\Besov{\theta}{2}{q}(M)$, $0 < \theta < 1$, by expansions in this eigenbasis.
 
 \section{The Dirichlet Laplacian}
 \label{sec:dirichlet-eigenbasis}
@@ -10586,6 +10587,208 @@ Let $\dim E \geq 1$, let $A$ be a Besov atlas, and let $(e_i)$ and $\lambda_i$ b
 space of order $1$ of the chart scheme (\Cref{cor:compact-embedding-interpolation}), which is (3)
 with the levels $\lfloor \sqrt{1 + \lambda_i} \rfloor$ of \Cref{thm:chart-eigenbasis}.
 \end{proof}
+
+\section{Besov spaces on compact manifolds by eigenfunction expansions}
+\label{sec:spectral-besov-manifold}
+
+In this section $M$, $\mu$, $A$, $O_I$, the pieces $D_k$, the operators $T_k$, the chart Sobolev
+embedding $J_A$ and the chart scheme are as in \Cref{sec:chart-eigenbasis}, with
+$\dim E \geq 1$, and $N_{\Omega_I}$ is the intrinsic quasi-norm on $\Omega_I$
+(\Cref{lem:modnorm-on}). Let $0 < \theta < 1$ and $q \in [1, \infty]$. The interpolation space
+$(L_2(\mu), J_A(H^1_A(M)))_{\theta, q}$ is the approximation space $A^\theta_q$ of the chart scheme
+(\Cref{cor:compact-embedding-interpolation}); this section identifies it with
+$\Besov{\theta}{2}{q}(M)$ (\Cref{def:manifold-besov}). The pieces map the couple into the Neumann
+couples of the $D_k$, where \Cref{thm:spectral-besov-neumann} applies, and the lifts map the couple
+$(L_2(E), H^1(E))$ back into it; $(L_2(\mu), H^1_A(M))$ is a retract of finitely many such
+couples, as in \cite[Theorem~6.4.2]{BerghLofstrom}. On a compact Riemannian manifold without
+boundary, Geller and Pesenson show that the eigenfunction expansions of every smooth positive
+elliptic differential operator of order two give the same Besov spaces
+\cite[Theorem~7.5]{GellerPesenson2011}. For $p = 2$ and $0 < \theta < 1$ interpolation suffices,
+and the chart form gives these spaces as well, also on manifolds with boundary.
+
+\begin{lemma}[The pieces of interpolation functions]
+\label{lem:chart-couple-forward}
+\lean{Manifold.BesovAtlas.memKMethod_neumann_pieceLp_of_memKMethod,
+  Manifold.BesovAtlas.modNormOn_pieceLp_lt_top_of_memKMethod}
+\leanok
+\uses{def:chart-to-neumann, prop:interpolation-property-map-couples, prop:map-couple-k-method,
+  cor:neumann-interpolation, thm:spectral-besov-neumann, def:chart-piece-domain,
+  lem:chart-carriers, lem:besov-domain-localisation}
+For every chart index $k$ and every $f \in (L_2(\mu), J_A(H^1_A(M)))_{\theta, q}$, the
+restriction $(P_k f)|_{D_k}$ lies in $(L_2(D_k), J^N_{D_k}(N(D_k)))_{\theta, q}$. For every order
+$r \geq 1$, every chart index $k$ and every $f \in (L_2(\mu), J_A(H^1_A(M)))_{\theta, q}$,
+$N_{\Omega_I}(P_k f) < \infty$ with differences of order $r$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bounded operators $f \mapsto (P_k f)|_{D_k}$ on $L_2(\mu)$ and $T_k$ on $H^1_A(M)$ satisfy
+$J^N_{D_k} T_k = (P_k J_A \cdot)|_{D_k}$ (\Cref{def:chart-to-neumann}), so the interpolation
+property applies (\Cref{prop:interpolation-property-map-couples},
+\Cref{prop:map-couple-k-method}). The Neumann interpolation space is the approximation space of
+the Neumann scheme of $D_k$ (\Cref{cor:neumann-interpolation}), so $N_{D_k}(P_k f) < \infty$
+(\Cref{thm:spectral-besov-neumann}). The piece vanishes outside $B(0, R_k)$
+(\Cref{lem:chart-carriers}), so $N_{\Omega_I}(P_k f) < \infty$
+(\Cref{lem:besov-domain-localisation}).
+\end{proof}
+
+\begin{lemma}[Lifts map couples]
+\label{lem:chart-couple-lift}
+\lean{Manifold.BesovAtlas.chartLiftSobolevLinear,
+  Manifold.BesovAtlas.chartSobolevEmbedding_chartLiftSobolevLinear,
+  Manifold.BesovAtlas.isClosed_graph_chartLiftSobolevLinear, Manifold.BesovAtlas.chartLiftSobolev,
+  Manifold.BesovAtlas.chartSobolevEmbedding_chartLiftSobolev,
+  Manifold.BesovAtlas.memKMethod_chartLiftLp}
+\leanok
+\uses{lem:chart-sobolev-dense, def:chart-sobolev-embedding, def:chart-sobolev,
+  lem:chart-lift-operator, lem:sobolev-one-to-l2, prop:interpolation-property-map-couples,
+  prop:map-couple-k-method}
+For every chart index $k$, there is a bounded linear operator $S_k \colon H^1(E) \to H^1_A(M)$
+with $J_A S_k U = L_k \iota U$ for every $U \in H^1(E)$. For every chart index $k$ and every
+$F \in (L_2(E), \iota(H^1(E)))_{\theta, q}$, $L_k F \in (L_2(\mu), J_A(H^1_A(M)))_{\theta, q}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$L_k \iota U$ lies in the range of the injective $J_A$ (\Cref{lem:chart-sobolev-dense},
+\Cref{def:chart-sobolev-embedding}), so $S_k U = J_A^{-1} L_k \iota U$ is well defined and
+linear. Its graph is $\{(U, u) : J_A u = L_k \iota U\}$, closed since $J_A$, $L_k$ and $\iota$ are
+continuous (\Cref{lem:chart-lift-operator}, \Cref{lem:sobolev-one-to-l2}); $H^1(E)$ and
+$H^1_A(M)$ are Hilbert spaces (\Cref{def:chart-sobolev}), so $S_k$ is bounded by the closed graph
+theorem (Mathlib's \texttt{ContinuousLinearMap.\allowbreak ofIsClosedGraph}). With
+$L_k \iota = J_A S_k$ the interpolation property applies
+(\Cref{prop:interpolation-property-map-couples}, \Cref{prop:map-couple-k-method}).
+\end{proof}
+
+\begin{lemma}[The chart couple by the pieces]
+\label{lem:chart-couple-retract}
+\lean{Manifold.BesovAtlas.memKMethod_chartLiftLp_pieceLp,
+  Manifold.BesovAtlas.memKMethod_chartSobolev_iff}
+\leanok
+\uses{lem:chart-couple-forward, lem:chart-couple-lift, def:besov-extension-property,
+  lem:sobolev-whole-space-interpolation, lem:indicator-lp-eq-iff, lem:chart-carriers,
+  lem:chart-retract, prop:couple-k-method-space}
+For every order $r \geq 1$ and every $f \in L_2(\mu)$, the following are equivalent:
+\begin{enumerate}
+  \item $f \in (L_2(\mu), J_A(H^1_A(M)))_{\theta, q}$;
+  \item $N_{\Omega_I}(P_k f) < \infty$ with differences of order $r$ for every chart index $k$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) implies (2) by \Cref{lem:chart-couple-forward}. Conversely, the extension property of
+$\Omega_I$ (\Cref{def:besov-extension-property}) gives $F_k \in L_2(E)$ with $F_k = P_k f$ on
+$\Omega_I$ and finite quasi-norm on $E$, so $F_k \in (L_2(E), \iota(H^1(E)))_{\theta, q}$
+(\Cref{lem:sobolev-whole-space-interpolation}) and $L_k F_k$ lies in the chart interpolation space
+(\Cref{lem:chart-couple-lift}). The carrier of the lift $L_k$ (\Cref{lem:chart-carriers}) lies in
+$\Omega_I$, so $L_k F_k = L_k P_k f$ (\Cref{lem:indicator-lp-eq-iff}).
+Finally $f = \sum_k L_k P_k f$ (\Cref{lem:chart-retract}), and the interpolation space is a linear
+subspace (\Cref{prop:couple-k-method-space}).
+\end{proof}
+
+\begin{theorem}[Besov spaces on compact manifolds by eigenfunction expansions]
+\label{thm:spectral-besov-manifold}
+\lean{Manifold.BesovAtlas.memApprox_chartScheme_iff}
+\leanok
+\uses{lem:chart-couple-retract, cor:compact-embedding-interpolation, thm:chart-eigenbasis,
+  lem:manifold-besov-pieces, def:manifold-besov}
+Let $\dim E \geq 1$, let $A$ be a Besov atlas and $A^\theta_q$ the approximation spaces of the
+chart scheme (\Cref{thm:chart-eigenbasis}). For every $0 < \theta < 1$, every $q \in [1, \infty]$
+and every $f \in L_2(\mu)$,
+\[
+  f \in A^\theta_q \iff f \in \Besov{\theta}{2}{q}(M) .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+$A^\theta_q = (L_2(\mu), J_A(H^1_A(M)))_{\theta, q}$
+(\Cref{cor:compact-embedding-interpolation}), described by the pieces with differences of order
+$1$ (\Cref{lem:chart-couple-retract}); so is $\Besov{\theta}{2}{q}(M)$ for the atlas $A$
+(\Cref{lem:manifold-besov-pieces}), which is $\Besov{\theta}{2}{q}(M)$ for every atlas
+(\Cref{def:manifold-besov}).
+\end{proof}
+
+So on every compact manifold, without boundary, with boundary or with corners, the Besov spaces
+$\Besov{\theta}{2}{q}(M)$, $0 < \theta < 1$, defined by charts and differences, are the
+approximation spaces of the eigenbasis of the chart form. The eigenbasis depends on the atlas and
+the measure; the spaces do not.
+
+For a Besov atlas $A$ let $(e_i)$ and $\lambda_i$ be as in \Cref{thm:chart-eigenbasis}, with the
+levels $\ell_i = \lfloor \sqrt{1 + \lambda_i} \rfloor$ of the chart scheme. For $f \in L_2(\mu)$,
+$P_1 f = \sum_{\ell_i = 0} \langle e_i, f \rangle e_i$ is its truncation and
+$\Delta_k f = \sum_{2^k \leq \ell_i < 2^{k+1}} \langle e_i, f \rangle e_i$ are the dyadic blocks
+of its expansion in the eigenbasis of the chart form (\Cref{prop:spectral-projections}).
+
+\begin{corollary}[Dyadic blocks of the eigenfunction expansion]
+\label{cor:spectral-besov-manifold-blocks}
+\lean{Manifold.BesovAtlas.memBesov_iff_blockNorm_lt_top}
+\leanok
+\uses{thm:spectral-besov-manifold, thm:spectral-coefficients, prop:spectral-projections,
+  thm:chart-eigenbasis}
+Let $\dim E \geq 1$ and let $A$ be a Besov atlas. For every $0 < \theta < 1$, every
+$q \in [1, \infty]$ and every $f \in L_2(\mu)$,
+\[
+  f \in \Besov{\theta}{2}{q}(M) \iff
+  \|P_1 f\|_2 + \bigl\| \bigl(2^{k\theta} \|\Delta_k f\|_2\bigr)_k \bigr\|_{\ell_q} < \infty .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:spectral-besov-manifold} and \Cref{thm:spectral-coefficients}.
+\end{proof}
+
+\begin{corollary}[$\Besov{\theta}{2}{2}(M)$ by the eigenvalues of the chart form]
+\label{cor:spectral-sobolev-manifold}
+\lean{Manifold.BesovAtlas.memBesov_two_iff_chartEigenvalue}
+\leanok
+\uses{thm:spectral-besov-manifold, cor:compact-embedding-interpolation, thm:chart-eigenbasis}
+Let $\dim E \geq 1$, let $A$ be a Besov atlas, and let $(e_i)$ and $\lambda_i$ be as in
+\Cref{thm:chart-eigenbasis}. For every $0 < \theta < 1$ and every $f \in L_2(\mu)$,
+\[
+  f \in \Besov{\theta}{2}{2}(M) \iff
+  \sum_{i \in \mathcal{I}} (1 + \lambda_i)^\theta |\langle e_i, f \rangle|^2 < \infty .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:spectral-besov-manifold} with $q = 2$, \Cref{cor:compact-embedding-interpolation} for
+$A^\theta_2$, and $(1 + \lambda_i)^{\theta/2} = \sigma_i^{-\theta}$ (\Cref{thm:chart-eigenbasis}).
+\end{proof}
+
+\begin{example}[Smooth domains and the closed ball]
+\label{ex:spectral-besov-smooth-domain}
+\lean{Rd.SmoothDomain.memApprox_chartScheme_iff_modNormOn,
+  Rd.SmoothDomain.memApprox_chartScheme_ball_iff}
+\leanok
+\uses{thm:spectral-besov-manifold, thm:smooth-domain-manifold, thm:smooth-domain-besov,
+  cor:ball-besov}
+Let $n \geq 1$, let $\Omega \subseteq \R^n$ be a bounded smooth domain, and let $A$ be a Besov atlas
+of the compact manifold with boundary $\overline{\Omega}$ with the Lebesgue measure
+(\Cref{thm:smooth-domain-manifold}), with $A^\theta_q$ the approximation spaces of its chart
+scheme. For every $0 < \theta < 1$, every $q \in [1, \infty]$, every order $r \geq 1$ and every
+$f \in L_2(\overline{\Omega})$, extended by $0$ to $\R^n$,
+\[
+  f \in A^\theta_q \iff
+  \|f\|_{L_2(\Omega)} + \bigl\| \bigl(2^{k\theta} \omega_r(f, 2^{-k}, \Omega)_2\bigr)_k
+    \bigr\|_{\ell_q} < \infty .
+\]
+In particular this holds for every open ball $\Omega = B(c, R)$.
+\end{example}
+
+\begin{proof}
+\leanok
+\Cref{thm:spectral-besov-manifold} and \Cref{thm:smooth-domain-besov}; for the ball
+\Cref{cor:ball-besov}.
+\end{proof}
+
+On a bounded smooth domain $\Omega$ the Neumann eigenbasis of \Cref{thm:neumann-eigenbasis} and the
+eigenbasis of the chart form of $\overline{\Omega}$ are two eigenbases with the same approximation
+spaces $\Besov{\theta}{2}{q}(\Omega)$, $0 < \theta < 1$
+(\Cref{thm:spectral-besov-neumann}).
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

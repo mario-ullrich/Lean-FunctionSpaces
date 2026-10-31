@@ -604,6 +604,25 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   piece `(ψ_i f) ∘ κ_i⁻¹` has finite intrinsic Besov quasi-norm on the model space. For
   `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞` this depends neither on the atlas nor on the order of the
   differences (`Manifold.memBesov_iff`, `Manifold.BesovAtlas.memBesov_iff_besovNorm_lt_top`).
+* **Eigenfunction expansions on compact manifolds.** Let `M` be a compact smooth manifold as
+  above, without boundary, with boundary or with corners, of dimension `n ≥ 1`, with a smooth
+  measure `μ` and a Besov atlas `A` with pieces `P_k`. The chart Sobolev space `H^1_A(M)` consists
+  of the pairs `u = (f, g)` of `f ∈ L_2(μ)` and the weak gradients `g` in `L_2` of its pieces on
+  the interior of the model range. The map `J u = f` is injective and compact with dense range
+  (`Manifold.BesovAtlas.isCompactOperator_chartSobolevEmbedding`,
+  `Manifold.BesovAtlas.denseRange_chartSobolevEmbedding`), and its range is `B^1_{2,2}(M)`
+  (`Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff`). So `L_2(μ)` has an orthonormal basis
+  `(e_i)` of weak eigenfunctions of the chart form `a_A(u, w) = ∑_{k,j} ⟨∂_j P_k u, ∂_j P_k w⟩`
+  with the natural boundary condition: `e_i = J φ_i` with `φ_i ∈ H^1_A(M)`, eigenvalues
+  `λ_i ≥ 0` and `a_A(φ_i, w) = λ_i ⟨e_i, J w⟩_{L_2(μ)}` for every `w ∈ H^1_A(M)`
+  (`Manifold.BesovAtlas.chartScheme`, `Manifold.BesovAtlas.chartForm_eigenfunction`). For
+  `0 < s < 1`, `1 ≤ q ≤ ∞` and every `f ∈ L_2(μ)`, `f ∈ B^s_{2,q}(M)` iff
+  `(2^(ks) ‖f - ∑_{⌊√(1 + λ_i)⌋ < 2^k} ⟨e_i, f⟩ e_i‖_2)_k ∈ ℓ_q`
+  (`Manifold.BesovAtlas.memApprox_chartScheme_iff`); for `q = 2` iff
+  `∑_i (1 + λ_i)^s |⟨e_i, f⟩|² < ∞` (`Manifold.BesovAtlas.memBesov_two_iff_chartEigenvalue`). The
+  closure of a bounded smooth domain is an example with boundary
+  (`Rd.SmoothDomain.memApprox_chartScheme_iff_modNormOn`). The chart form depends on the atlas;
+  it is local and uniformly elliptic in the charts, and the Laplace–Beltrami form is a later goal.
 * **The trace theorem on compact manifolds with boundary.** Let `M` be as above with boundary,
   modelled on the half-space `{y ∈ ℝ^n : y_0 ≥ 0}`, and let `B^s_{p,q}(∂M)` consist of the `g`
   whose chart pieces restricted to the boundary hyperplane lie in its Besov space. For
@@ -632,7 +651,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, kernel majorants, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, Triebel–Lizorkin spaces as interpolation spaces | ✅ | ✗ |
 | [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings including the critical case and the Gagliardo–Nirenberg–Sobolev inequality, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
-| [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph and bounded Lipschitz domains, closures of convex ones, closed balls, the closed cube and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators and its norm equivalent to that of `B^{1/2}_{2,2}(Γ)`, the extension theorems for `W^1_p` and `W^m_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, eigenbases of the Dirichlet and Neumann Laplacians, Besov spaces by eigenfunction expansions, compact manifolds with boundary or with corners, smooth domains | ✅ | ✗ |
+| [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph and bounded Lipschitz domains, closures of convex ones, closed balls, the closed cube and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators and its norm equivalent to that of `B^{1/2}_{2,2}(Γ)`, the extension theorems for `W^1_p` and `W^m_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, eigenbases of the Dirichlet and Neumann Laplacians, Besov spaces by eigenfunction expansions, compact manifolds with boundary or with corners, the chart Sobolev space `H^1(M)`, eigenbases of chart forms and `B^s_{2,q}(M)` by eigenfunction expansions, smooth domains | ✅ | ✗ |
 
 Lean: ✅ every file proved without `sorry` · 🟡 some statement still `sorry` · ⬜ planned.
 Checked (human-checked): ✅ mathematics and documentation both reviewed by the author ·
@@ -679,8 +698,8 @@ that library builds itself.
   local Weyl law (elliptic regularity), which give the Nikolskii property and spectral
   `B^s_{p,q}` for `p ≠ 2`; the two-sided Dirichlet description on Lipschitz domains (Hardy-type
   inequalities, the Lions–Magenes space `H^{1/2}_{00}` at `θ = 1/2`, `q = 2`); eigenbases of the
-  Laplace–Beltrami operator on compact manifolds (Rellich's compactness), joining the spectral
-  and the chart descriptions of Besov spaces.
+  Laplace–Beltrami operator (Riemannian volume and metric form), continuity of eigenfunctions and
+  the local Weyl law on compact manifolds, and spectral `B^s_{p,q}(M)` for `p ≠ 2` or `s ≥ 1`.
 * **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and their ball means and atoms on the
   torus.
 * **Sobolev spaces**: Mihlin multipliers and `H^{s,p}` for `s < 0`; the Jawerth–Franke
@@ -797,6 +816,10 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   [Numdam](https://www.numdam.org/item/RSMUP_1957__27__284_0). The Sobolev–Slobodeckij seminorm.
 * E. Gagliardo, *Proprietà di alcune classi di funzioni in più variabili*, Ricerche Mat. **7**
   (1958), 102–137. The Sobolev inequality for `p = 1`.
+* D. Geller, I. Z. Pesenson, *Band-limited localized Parseval frames and Besov spaces on compact
+  homogeneous manifolds*, J. Geom. Anal. **21** (2011), 334–371. Besov spaces on compact
+  manifolds without boundary by the eigenfunction expansions of second-order elliptic operators
+  (their Theorem 7.5).
 * L. Grafakos, *Classical Fourier Analysis*, 3rd ed., Graduate Texts in Mathematics **249**,
   Springer, 2014. Littlewood–Paley theory, vector-valued singular integrals and Marcinkiewicz
   interpolation.

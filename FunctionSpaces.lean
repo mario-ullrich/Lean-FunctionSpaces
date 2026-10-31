@@ -140,6 +140,7 @@ public import FunctionSpaces.Domains.Spectral.DirichletEigenbasis
 public import FunctionSpaces.Domains.Spectral.NeumannEigenbasis
 public import FunctionSpaces.Domains.Spectral.SpectralBesov
 public import FunctionSpaces.Domains.Spectral.ChartFormEigenbasis
+public import FunctionSpaces.Domains.Spectral.ManifoldSpectralBesov
 public import FunctionSpaces.Domains.Manifolds.SmoothMeasure
 public import FunctionSpaces.Domains.Manifolds.BesovAtlas
 public import FunctionSpaces.Domains.Manifolds.Besov
@@ -790,6 +791,12 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   the spectral scheme with eigenvalues `λ_i = σ_i⁻² - 1 ≥ 0` and eigenfunctions, the weak
   eigenvalue equation of the chart form with the natural boundary condition, and
   `H^1(M) = B^1_{2,2}(M)` in the eigenbasis.
+* `FunctionSpaces.Domains.Spectral.ManifoldSpectralBesov`: Besov spaces on compact manifolds by
+  eigenfunction expansions of the chart form: the pieces map `(L_2(μ), H^1_A(M))` into the
+  Neumann couples of the bounded convex pieces, the lifts map `(L_2(E), H^1(E))` into it, and for
+  `0 < θ < 1` the approximation space `A^θ_q` of the chart eigenbasis is `B^θ_{2,q}(M)`, in dyadic
+  blocks and for `q = 2` by the eigenvalues; closures of smooth domains and the closed ball as
+  examples with boundary.
 
 #### `Domains/Manifolds`: compact manifolds and smooth domains
 

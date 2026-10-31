@@ -62,9 +62,12 @@ gradient in `L_2(Ω) × L_2(Ω)^n`: Rellich's theorem through the extension theo
 with the eigenvalue `0` of the constants. There the Besov space
 `B^θ_{2,q}(Ω)`, `0 < θ < 1`, defined by intrinsic differences, is the approximation space of the
 Neumann eigenbasis; on a bounded open set the zero extension maps the approximation spaces of the
-Dirichlet eigenbasis into `B^θ_{2,q}(ℝ^d)`. The [interface document](FEECInterface.md) lists the
-results for `p = 2` for a FEEC/BEEC library built on this project, with the decisions behind their
-form.
+Dirichlet eigenbasis into `B^θ_{2,q}(ℝ^d)`. On a compact manifold, with or without boundary, the
+chart Sobolev space `H^1_A(M) = B^1_{2,2}(M)` embeds compactly and densely into `L_2(μ)`, and the
+eigenvector basis `e_i = J φ_i` of the embedding is an eigenbasis of the chart form whose
+approximation spaces are `B^θ_{2,q}(M)`, `0 < θ < 1`. The
+[interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library built
+on this project, with the decisions behind their form.
 
 ## Main results
 
@@ -653,6 +656,29 @@ form.
   `ω_r(ι U, 2^(-k))_2 ≤ 2^(r-1) 2π 2^(-k) ‖U‖` for `U ∈ H^1(V)` (`Rd.lpModulus_toL2_le`), and
   restricts `(L_2(V), H^1(V))_{θ,q} = B^θ_{2,q}(V)` to `Ω`
   (`Rd.memKMethod_neumann_restrict_of_memKMethod`).
+* **Eigenfunction expansions on compact manifolds.** Let `M` be a compact manifold whose model
+  range `Ω_I` is a Besov domain, of dimension `n ≥ 1`, with a smooth measure `μ`, a Besov atlas
+  `A` with pieces `P_k` and lifts `L_k`, and `J : H^1_A(M) → L_2(μ)` the chart Sobolev embedding.
+  `J = ∑_k L_k E_k J^N_k T_k` through the Neumann embeddings `J^N_k` of the bounded convex pieces
+  `D_k = O_I ∩ B(0, R_k + 1)` (`Manifold.BesovAtlas.chartSobolevEmbedding_eq_sum`), so `J` is
+  compact (`Manifold.BesovAtlas.isCompactOperator_chartSobolevEmbedding`); its range is dense
+  (`Manifold.BesovAtlas.denseRange_chartSobolevEmbedding`). Its spectral scheme
+  (`Manifold.BesovAtlas.chartScheme`) is a Hilbert basis `(e_i)` of `L_2(μ)` with eigenvalues
+  `λ_i = σ_i⁻² - 1 ≥ 0` (`Manifold.BesovAtlas.chartEigenvalue_nonneg`), finitely many below each
+  bound, and eigenfunctions `φ_i ∈ H^1_A(M)`, `J φ_i = e_i`, with
+  `a_A(φ_i, w) = λ_i ⟨e_i, J w⟩` for every `w ∈ H^1_A(M)`
+  (`Manifold.BesovAtlas.chartForm_eigenfunction`), the weak eigenvalue equation of the chart form
+  with the natural boundary condition. `f ∈ B^1_{2,2}(M)` iff
+  `∑_i (1 + ⌊√(1 + λ_i)⌋)² |⟨e_i, f⟩|² < ∞` (`Manifold.BesovAtlas.memBesov_one_two_iff_spectral`).
+  For `0 < θ < 1` and `1 ≤ q ≤ ∞`, `f ∈ (L_2(μ), H^1_A(M))_{θ,q}` iff every piece `P_k f` has a
+  finite intrinsic quasi-norm on `Ω_I` (`Manifold.BesovAtlas.memKMethod_chartSobolev_iff`), so
+  `f ∈ B^θ_{2,q}(M)` iff `f` lies in the approximation space `A^θ_q` of the chart eigenbasis
+  (`Manifold.BesovAtlas.memApprox_chartScheme_iff`), iff
+  `‖P_1 f‖_2 + ‖(2^(kθ) ‖Δ_k f‖_2)_k‖_{ℓ_q} < ∞` for the dyadic blocks `Δ_k f` of its
+  eigenfunction expansion (`Manifold.BesovAtlas.memBesov_iff_blockNorm_lt_top`), and for `q = 2`
+  iff `∑_i (1 + λ_i)^θ |⟨e_i, f⟩|² < ∞` (`Manifold.BesovAtlas.memBesov_two_iff_chartEigenvalue`).
+  On the closure of a bounded smooth domain `Ω` these are the intrinsic `B^θ_{2,q}(Ω)`
+  (`Rd.SmoothDomain.memApprox_chartScheme_iff_modNormOn`).
 
 ## What is formalised
 
@@ -706,6 +732,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The Neumann Laplacian on bounded Lipschitz domains: `W^1_2(Ω)` as the graph of the weak gradient in `L_2(Ω) × L_2(Ω)^n` and as jets, the dense embedding into `L_2(Ω)` through `H^1_0(Ω)`, Rellich's theorem with bounded `H^1(Ω)` representatives, the Neumann eigenbasis as a spectral scheme with eigenvalues `λ_i = σ_i⁻² - 1 ≥ 0`, among them `0`, the weak eigenvalue equation, `W^1_2(Ω)` as the Sobolev space of order `1` of the scheme, and `(L_2(Ω), W^1_2(Ω))_{θ,q} = A^θ_q` | ✅ | ✗ | `Domains/Spectral/NeumannEigenbasis` |
 | Besov spaces on domains by eigenfunction expansions: differences and moduli of `H^1(ℝ^d)` functions by the gradient, the intrinsic modulus by the K-functional of `(L_2(Ω), W^1_2(Ω))`, `B^θ_{2,q}(Ω)` for `0 < θ < 1` as the approximation space of the Neumann eigenbasis on bounded Lipschitz domains, in dyadic blocks and for `q = 2` by the eigenvalues, and the Dirichlet approximation spaces in `B^θ_{2,q}(ℝ^d)` by zero extension | ✅ | ✗ | `Domains/Spectral/SpectralBesov` |
 | The eigenbasis of the chart form on a compact manifold with or without boundary: zero extensions of restrictions, the bounded convex piece of each chart, the jets of the pieces in its Neumann space, Rellich's theorem `J = ∑_k L_k E_k J^N_k T_k` compact, dense range by lifts of `H^1(E)` functions, the chart scheme with eigenvalues `λ_i = σ_i⁻² - 1 ≥ 0`, levels `⌊√(1 + λ_i)⌋₊` and finitely many eigenvalues below each bound, the weak eigenvalue equation `a_A(φ_i, w) = λ_i ⟨e_i, J w⟩` with the natural boundary condition, and `H^1(M) = B^1_{2,2}(M)` in the eigenbasis | ✅ | ✗ | `Domains/Spectral/ChartFormEigenbasis` |
+| Besov spaces on compact manifolds by eigenfunction expansions of the chart form: the pieces map `(L_2(μ), H^1_A(M))` into the Neumann couples of the bounded convex pieces, the lifts `H^1(E) → H^1_A(M)` by the closed graph theorem map `(L_2(E), H^1(E))` into it, `(L_2(μ), H^1_A(M))_{θ,q}` by the pieces, `B^θ_{2,q}(M)` for `0 < θ < 1` as the approximation space of the chart eigenbasis, in dyadic blocks and for `q = 2` by the eigenvalues, and closures of smooth domains and the closed ball as examples with boundary | ✅ | ✗ | `Domains/Spectral/ManifoldSpectralBesov` |
 | Bounded Lipschitz domains from the set-level definition: sets Lipschitz near a point, local graphs as Lipschitz graph domains, McShane's extension of local graphs, the structure from a family of charts and the converse, the ball | ✅ | ✗ | `Domains/Lipschitz/LocalLipschitzGraphs` |
 | Bounded open convex sets as bounded Lipschitz domains: the ray length, its cone estimate, open convex sets, bounded or not, near a frontier point as regions above a Lipschitz graph, and the open unit cube with its closure | ✅ | ✗ | `Domains/Lipschitz/ConvexDomains` |
 | Lipschitz graph domains with null graphs and boundaries, closures of convex Lipschitz graph domains as Besov domains, the quadrant as a Lipschitz graph domain and the quadrant model of manifolds with corners as a Besov domain, bounded Lipschitz domains with the extension property, closures of nonempty convex bounded Lipschitz domains and of nonempty bounded open convex sets, closed balls of positive radius and the closed unit cube as Besov domains | ✅ | ✗ | `Domains/Lipschitz/BesovDomains` |
