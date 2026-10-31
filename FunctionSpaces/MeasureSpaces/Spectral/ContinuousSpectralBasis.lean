@@ -18,9 +18,10 @@ with a level `λ : ι → ℕ` and finitely many basis elements of each level, w
 `L_2` classes of bounded continuous functions `ẽ_i` (`ContinuousSpectralBasis.basisFun`). The
 model is the eigenbasis of the Laplace–Beltrami operator of a compact Riemannian manifold,
 continuous by elliptic regularity, with `λ(i) = ⌊√λ_i⌋`. The Dirichlet eigenbasis of a bounded
-open set and the Neumann eigenbasis of a bounded Lipschitz domain are spectral schemes
-(`Rd.dirichletScheme`, `Rd.BoundedLipschitzDomain.neumannScheme`); the boundedness and
-continuity of their elements is elliptic regularity, a later goal. The Fourier basis of the
+open set, the Neumann eigenbasis of a bounded Lipschitz domain and the eigenbasis of the chart
+form of a compact manifold are spectral schemes (`Rd.dirichletScheme`,
+`Rd.BoundedLipschitzDomain.neumannScheme`, `Manifold.BesovAtlas.chartScheme`); the boundedness
+and continuity of their elements is elliptic regularity, a later goal. The Fourier basis of the
 torus is a continuous spectral basis (`Torus.fourierEigenbasis`).
 
 The functions `ẽ_i` of level `< n` span the space `basisSpan n` of bounded continuous functions
@@ -53,8 +54,9 @@ variable {M : Type*} [TopologicalSpace M] [MeasurableSpace M] [BorelSpace M]
 continuous functions `ẽ_i` whose `L_2` classes are the `e_i`. The eigenfunctions of the
 Laplace–Beltrami operator of a compact Riemannian manifold, with the level `⌊√λ⌋` of the
 eigenvalue `λ`, are the model; their continuity is elliptic regularity. On a bounded open set of
-`ℝ^d` the Dirichlet eigenbasis is a spectral scheme (`Rd.dirichletScheme`), and so is the Neumann
-eigenbasis of a bounded Lipschitz domain (`Rd.BoundedLipschitzDomain.neumannScheme`). The data of
+`ℝ^d` the Dirichlet eigenbasis is a spectral scheme (`Rd.dirichletScheme`), and so are the Neumann
+eigenbasis of a bounded Lipschitz domain (`Rd.BoundedLipschitzDomain.neumannScheme`) and the
+eigenbasis of the chart form of a compact manifold (`Manifold.BesovAtlas.chartScheme`). The data of
 the structure are the basis, its levels and its continuous representatives; it enters the
 theorems as a hypothesis, and the Fourier basis of the torus is an instance
 (`Torus.fourierEigenbasis`). -/

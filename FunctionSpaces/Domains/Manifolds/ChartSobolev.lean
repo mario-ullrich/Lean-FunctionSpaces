@@ -29,7 +29,8 @@ boundary, the half-space, the quadrant), `μ` a smooth measure and `A` a Besov a
   `κ_k(tsupport θ_k) ∩ O_I`, where `κ_k(tsupport θ_k)` is compact
   (`Manifold.BesovAtlas.isCompact_liftCarrier`, `Manifold.BesovAtlas.chartLiftLp_eq_of_ae_eq_on`),
   and `P_i f` vanishes outside the compact `κ_i(tsupport ψ_i) ⊆ Ω_I`
-  (`Manifold.BesovAtlas.pieceLp_eq_zero_off`).
+  (`Manifold.BesovAtlas.pieceLp_eq_zero_off`), hence outside a ball `B(0, R_i)`
+  (`Manifold.BesovAtlas.pieceRadius`, `Manifold.BesovAtlas.pieceLp_eq_zero_off_ball`).
 * **The chart Sobolev space** `H^1_A(M)` (`Manifold.BesovAtlas.chartSobolev`) is the graph space of
   the pairs `(f, g)` in `L_2(μ) × ∏_{i,j} L_2(O_I)` with `g_{ij} = ∂_{b_j} P_i f` weakly on `O_I`
   for the basis `b_j = Rd.gridBasis E j`. It is a closed subspace
@@ -269,12 +270,30 @@ theorem pieceLp_eq_zero_off (i : Fin A.n) (f : Lp ℂ p μ) :
     rw [hy]
     exact A.piece_eq_zero_of_notMem i _ hy'
 
+/-- **The radius of the `i`-th piece**: a radius `R_i` with `κ_i(tsupport ψ_i) ⊆ B(0, R_i)`, which
+exists as the carrier of the piece is compact (`Manifold.BesovAtlas.isCompact_pieceCarrier`). -/
+noncomputable def pieceRadius (i : Fin A.n) : ℝ :=
+  Classical.choose ((A.isCompact_pieceCarrier i).isBounded.subset_ball (0 : E))
+
+omit [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] [MeasurableSpace M]
+  [BorelSpace M] in
+/-- The carrier `κ_i(tsupport ψ_i)` of the `i`-th piece lies in the ball `B(0, R_i)`. -/
+theorem pieceCarrier_subset_ball (i : Fin A.n) : A.pieceCarrier i ⊆ ball 0 (A.pieceRadius i) :=
+  Classical.choose_spec ((A.isCompact_pieceCarrier i).isBounded.subset_ball (0 : E))
+
+/-- **The pieces vanish outside the ball of radius `R_i`**: `P_i f = 0` almost everywhere outside
+`B(0, R_i)`, for every `f ∈ L_p(μ)` (`Manifold.BesovAtlas.pieceLp_eq_zero_off`). -/
+theorem pieceLp_eq_zero_off_ball (i : Fin A.n) (f : Lp ℂ p μ) :
+    ∀ᵐ y ∂volume, y ∉ ball (0 : E) (A.pieceRadius i) → A.pieceLp μ hp i f y = 0 :=
+  (A.pieceLp_eq_zero_off hp i f).mono fun _ hy hyR =>
+    hy fun h => hyR (A.pieceCarrier_subset_ball i h)
+
 /-- **The pieces vanish outside a ball**: there is `R` with `P_i f = 0` almost everywhere outside
-`B(0, R)` for every `f ∈ L_p(μ)`, since the carrier of the piece is compact. -/
+`B(0, R)` for every `f ∈ L_p(μ)`, for example `R = R_i`
+(`Manifold.BesovAtlas.pieceLp_eq_zero_off_ball`). -/
 theorem exists_pieceLp_eq_zero_off_ball (i : Fin A.n) :
-    ∃ R : ℝ, ∀ f : Lp ℂ p μ, ∀ᵐ y ∂volume, y ∉ ball (0 : E) R → A.pieceLp μ hp i f y = 0 := by
-  obtain ⟨R, hR⟩ := (A.isCompact_pieceCarrier i).isBounded.subset_ball 0
-  exact ⟨R, fun f => (A.pieceLp_eq_zero_off hp i f).mono fun y hy hyR => hy fun h => hyR (hR h)⟩
+    ∃ R : ℝ, ∀ f : Lp ℂ p μ, ∀ᵐ y ∂volume, y ∉ ball (0 : E) R → A.pieceLp μ hp i f y = 0 :=
+  ⟨A.pieceRadius i, A.pieceLp_eq_zero_off_ball hp i⟩
 
 /-! ### The chart Sobolev space -/
 

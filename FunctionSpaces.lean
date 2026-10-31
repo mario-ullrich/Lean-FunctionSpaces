@@ -139,6 +139,7 @@ public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen
 public import FunctionSpaces.Domains.Spectral.DirichletEigenbasis
 public import FunctionSpaces.Domains.Spectral.NeumannEigenbasis
 public import FunctionSpaces.Domains.Spectral.SpectralBesov
+public import FunctionSpaces.Domains.Spectral.ChartFormEigenbasis
 public import FunctionSpaces.Domains.Manifolds.SmoothMeasure
 public import FunctionSpaces.Domains.Manifolds.BesovAtlas
 public import FunctionSpaces.Domains.Manifolds.Besov
@@ -783,6 +784,12 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   approximation space `A^θ_q` of the Neumann eigenbasis on a bounded Lipschitz domain, in dyadic
   blocks and for `q = 2` by the eigenvalues, and the zero extension of the Dirichlet
   approximation spaces into `B^θ_{2,q}(ℝ^d)` on a bounded open set.
+* `FunctionSpaces.Domains.Spectral.ChartFormEigenbasis`: the eigenbasis of the chart form on a
+  compact manifold with or without boundary: the bounded convex pieces of the charts, the jets of
+  the pieces in their Neumann spaces, Rellich's theorem for `H^1_A(M) → L_2(μ)`, its dense range,
+  the spectral scheme with eigenvalues `λ_i = σ_i⁻² - 1 ≥ 0` and eigenfunctions, the weak
+  eigenvalue equation of the chart form with the natural boundary condition, and
+  `H^1(M) = B^1_{2,2}(M)` in the eigenbasis.
 
 #### `Domains/Manifolds`: compact manifolds and smooth domains
 
