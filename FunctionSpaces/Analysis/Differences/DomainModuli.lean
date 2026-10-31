@@ -30,7 +30,8 @@ for every `G ∈ L_p`, `ω_r(f, 2^(-k), Ω)_p ≤ 2^r ‖1_Ω (f - G)‖_p + ω_
 The **intrinsic Besov quasi-norm** on a measurable set `Ω` is
 `N_Ω(G) = ‖1_Ω G‖_p + ‖(2^(ks) ω_r(G, 2^(-k), Ω)_p)_k‖_{ℓ_q}` (`Rd.modNormOn`); it depends only
 on `1_Ω G` (`Rd.modNormOn_congr`), is subadditive for `q ≥ 1` and homogeneous
-(`Rd.modNormOn_add_le`, `Rd.modNormOn_finsetSum_le`, `Rd.modNormOn_const_smul`). If
+(`Rd.modNormOn_add_le`, `Rd.modNormOn_finsetSum_le`, `Rd.modNormOn_const_smul`), and grows with
+the set (`Rd.modNormOn_mono_set`). If
 `1_O F = 1_O f`, the intrinsic quasi-norm of `f` on `O` is at most that of `F` on `V`
 (`Rd.modNormOn_le_modNorm_of_indicatorLp`), and on `O = V` the two agree (`Rd.modNormOn_univ`).
 
@@ -374,6 +375,20 @@ theorem modNormOn_finsetSum_le (r : ℕ) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ 
     exact (modNormOn_add_le hΩ r s hq _ _).trans (add_le_add le_rfl ih)
 
 end ModNormOn
+
+/-- **The intrinsic quasi-norm grows with the set**: for measurable `T ⊆ U`,
+`N_T(f) ≤ N_U(f)`, where `N_U(f) = ‖1_U f‖_p + ‖(2^(ks) ω_r(f, 2^(-k), U)_p)_k‖_{ℓ_q}`
+(`Rd.lpModulusOn_mono_set`). -/
+theorem modNormOn_mono_set [Fact (1 ≤ p)] {T U : Set V} (hT : MeasurableSet T)
+    (hU : MeasurableSet U) (hTU : T ⊆ U) (r : ℕ) (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p μ) :
+    modNormOn hT r s q f ≤ modNormOn hU r s q f := by
+  unfold modNormOn
+  refine add_le_add ?_ (ENNReal.lqNorm_mono fun k =>
+    mul_le_mul' le_rfl (lpModulusOn_mono_set hT hTU r f k))
+  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hT f),
+    eLpNorm_congr_ae (indicatorLp_apply_ae hU f)]
+  exact eLpNorm_mono ((Lp.aestronglyMeasurable f).indicator hT)
+    fun x => norm_indicator_le_of_subset hTU _ x
 
 /-- **Restrictions have finite intrinsic moduli**: if `1_O F = 1_O f` for a measurable `O`, the
 intrinsic quasi-norm of `f` on `O` is at most the quasi-norm of `F` on `V`. -/

@@ -11,8 +11,8 @@ public import FunctionSpaces.Rd.Differences.BesovDifferences
 # Pointwise multipliers on `V`
 
 A smooth `ψ : V → ℂ` with bounded derivatives up to order `r` multiplies the Besov spaces by
-differences into themselves (`Rd.exists_modNorm_mulLp_le`): for `1 ≤ p < ∞`, `0 < s < r` and
-`1 ≤ q ≤ ∞` there is `C < ∞` with
+differences into themselves (`Rd.modNorm_mulLp_le`): for `1 ≤ p < ∞`, `0 < s < r` and
+`1 ≤ q ≤ ∞` there is `C < ∞` (`Rd.multiplierTotal`) with
 
 `‖ψ f‖_p + ‖(2^(ks) ω_r(ψ f, 2^(-k))_p)_k‖_{ℓ_q} ≤ C (‖f‖_p + ‖(2^(ks) ω_r(f, 2^(-k))_p)_k‖_{ℓ_q})`.
 
@@ -34,7 +34,8 @@ The ingredients:
   (`Rd.bandModulusData`); for `l > s` the bound `ω_(r-l) ≤ 2^(r-l) ‖f‖_p` suffices.
 
 Multiplication by a bounded continuous function is a bounded linear operator on `L_p`
-(`Rd.mulLpL`).
+(`Rd.mulLpL`). In particular, multiplication by a smooth `χ` with compact support is bounded in
+the Besov quasi-norm by differences (`Rd.exists_mul_modNorm_le`).
 -/
 
 @[expose] public section
@@ -521,6 +522,24 @@ theorem modNorm_mulLp_lt_top (hp : p ≠ ∞) {ψ : V → ℂ}
           lpModulus p r (mulLp hψ.continuous (norm_le_of_iteratedFDeriv_le hC) F) k) < ∞ :=
   (modNorm_mulLp_le hp hψ hC hsr hq F).trans_lt
     (ENNReal.mul_lt_top (multiplierTotal_ne_top hp hsr C).lt_top hF)
+
+/-- **Smooth cutoffs are Besov multipliers**: for a smooth `χ : V → ℂ` with compact support,
+`1 ≤ p < ∞`, `s < r` and `1 ≤ q ≤ ∞` there is `C < ∞` such that for every `F ∈ L_p(V)` the class
+`G` of `χ F` satisfies
+`‖G‖_p + ‖(2^(ks) ω_r(G, 2^(-k))_p)_k‖_{ℓ_q} ≤ C (‖F‖_p + ‖(2^(ks) ω_r(F, 2^(-k))_p)_k‖_{ℓ_q})`.
+The derivatives of `χ` up to order `r` are bounded (`Rd.exists_iteratedFDeriv_bound`), so the
+pointwise multiplier theorem applies (`Rd.modNorm_mulLp_le`, with the constant
+`Rd.multiplierTotal`). -/
+theorem exists_mul_modNorm_le (hp : p ≠ ∞) {χ : V → ℂ}
+    (hχ : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) χ) (hχc : HasCompactSupport χ) {r : ℕ} {s : ℝ}
+    (hsr : s < r) {q : ℝ≥0∞} (hq : 1 ≤ q) :
+    ∃ C : ℝ≥0∞, C ≠ ∞ ∧ ∀ F : Lp ℂ p (volume : Measure V), ∃ G : Lp ℂ p (volume : Measure V),
+      (G : V → ℂ) =ᵐ[volume] (fun x => χ x * F x) ∧
+      ‖G‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r G k) ≤
+        C * (‖F‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p r F k)) := by
+  obtain ⟨C, hC⟩ := exists_iteratedFDeriv_bound hχ hχc r
+  exact ⟨multiplierTotal (V := V) hp r s C, multiplierTotal_ne_top hp hsr C, fun F =>
+    ⟨_, mulLp_apply_ae _ _ F, modNorm_mulLp_le hp hχ hC hsr hq F⟩⟩
 
 end Multiplier
 

@@ -32,8 +32,8 @@ measure-preserving map between measure spaces.
   gradient zero (`Rd.hasWeakLineDeriv_const`).
 * **Directions** (`Rd.HasWeakLineDeriv.sum_smul_dir`, `Rd.hasWeakLineDeriv_of_forall_gridBasis`):
   weak derivatives are linear in the direction, so the derivatives `g_i = ∂_{e_i} f` give
-  `∂_v f = ∑_i ⟪v, e_i⟫ g_i` for every `v`, and `W^1_p(V)` needs only the basis directions
-  (`Rd.memSobolev_one_of_forall_gridBasis`).
+  `∂_v f = ∑_i ⟪v, e_i⟫ g_i` for every `v`, and `W^1_p(V)` and `W^1_p(Ω)` need only the basis
+  directions (`Rd.memSobolev_one_of_forall_gridBasis`, `Rd.memWeakSobolev_one_of_forall_gridBasis`).
 * **Cutoffs**: the `L_p` bounds of the product rule with a cutoff of
   `FunctionSpaces.Rd.Sobolev.WeakDerivatives`: if the smooth `χ` has closed support in `B`, the
   `L_p(O)` norms of `χ g + (∂_w χ) f` and `χ f` are bounded by the `L_p(O ∩ B)` norms of `f`
@@ -351,15 +351,30 @@ theorem memSobolev_one_of_forall_gridBasis {p : ℝ≥0∞} [Fact (1 ≤ p)]
     {F : Lp ℂ p (volume : Measure V)} {G : Fin (finrank ℝ V) → Lp ℂ p (volume : Measure V)}
     (h : ∀ i, HasWeakLineDeriv ⊤ (fun _ : Fin 1 => gridBasis V i) F (G i)) : MemSobolev 1 F := by
   refine memSobolev_one_of_forall_hasWeakLineDeriv fun v => ?_
-  have hm : MemLp (fun x => ∑ i, (inner ℝ v (gridBasis V i) : ℂ) * G i x) p volume := by
-    have h' := memLp_finsetSum' Finset.univ fun i _ =>
-      (Lp.memLp (G i)).const_mul (inner ℝ v (gridBasis V i) : ℂ)
-    convert h' using 1
-    funext x
-    simp [Finset.sum_apply]
+  have hm : MemLp (fun x => ∑ i, (inner ℝ v (gridBasis V i) : ℂ) * G i x) p volume :=
+    memLp_finsetSum Finset.univ fun i _ => (Lp.memLp (G i)).const_mul _
   refine ⟨hm.toLp _, (hasWeakLineDeriv_of_forall_gridBasis h v).congr_ae EventuallyEq.rfl ?_⟩
   rw [volume_restrict_top]
   exact hm.coeFn_toLp.symm
+
+/-- **`W^1_p(Ω)` from the basis derivatives**: on an open set `Ω`, for `1 ≤ p`, a function
+`f ∈ L_p(Ω)` with weak derivatives `g_i = ∂_{e_i} f ∈ L_p(Ω)` along the basis vectors
+`e_i = Rd.gridBasis V i` lies in `W^1_p(Ω)`; the derivative along `v` is
+`∑_i ⟪v, e_i⟫ g_i` (`Rd.hasWeakLineDeriv_of_forall_gridBasis`), and the derivative of order zero
+is `f` itself. -/
+theorem memWeakSobolev_one_of_forall_gridBasis {p : ℝ≥0∞} (hp : 1 ≤ p)
+    {g : Fin (finrank ℝ V) → V → ℂ} (hf : MemLp f p (volume.restrict Ω))
+    (hg : ∀ i, MemLp (g i) p (volume.restrict Ω))
+    (h : ∀ i, HasWeakLineDeriv Ω (fun _ : Fin 1 => gridBasis V i) f (g i)) :
+    MemWeakSobolev Ω 1 p f := by
+  refine ⟨hf, fun k hk v => ?_⟩
+  rcases Nat.le_one_iff_eq_zero_or_eq_one.1 hk with rfl | rfl
+  · exact ⟨f, hf, hasWeakLineDeriv_fin_zero v (locallyIntegrableOn_of_memLp hp hf)⟩
+  have hv : v = fun _ => v 0 := funext fun i => congrArg v (Subsingleton.elim i 0)
+  rw [hv]
+  refine ⟨fun x => ∑ i, (inner ℝ (v 0) (gridBasis V i) : ℂ) * g i x, ?_,
+    hasWeakLineDeriv_of_forall_gridBasis h (v 0)⟩
+  exact memLp_finsetSum Finset.univ fun i _ => (hg i).const_mul _
 
 end Directions
 

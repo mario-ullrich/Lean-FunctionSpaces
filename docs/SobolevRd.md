@@ -307,7 +307,10 @@ project, with the decisions behind their form.
   `1 ≤ q ≤ ∞`, `(H^{s₀,p}, H^{s₁,p})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` for `0 < s₀ < s₁` and
   `(L_p, H^{s₁,p})_{η,q} = B^{ηs₁}_{p,q}` for `s₁ > 0`, in the Bessel potential norms
   (Bergh–Löfström, Theorem 6.4.5(4); `Rd.memKMethod_besselPotentialCouple_iff`,
-  `Rd.memKMethod_lpBesselPotentialCouple_iff`).
+  `Rd.memKMethod_lpBesselPotentialCouple_iff`). For `p = 2` and `s₁ = 1` the couple is that of the
+  embedding `H^1(V) → L_2(V)` with its quotient norm (`Rd.ofMap_toL2_eq_lpBesselPotentialCouple`),
+  so `(L_2(V), H^1(V))_{θ,q} = B^θ_{2,q}(V)` for `0 < θ < 1`, by differences of every order
+  `r > θ` (`Rd.memKMethod_ofMap_toL2_iff`).
 
 ## What is formalised
 
@@ -328,7 +331,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Mathlib's Gagliardo–Nirenberg–Sobolev inequality for weakly differentiable functions, by mollification, cut-off and Fatou's lemma; `W^1_p ↪ L_r` for `1/r = 1/p - 1/n` and every `1 ≤ p`, and `W^m_1 ↪ L_r` for `1/r = 1 - m/n` | ✅ | ✗ | `Rd/Sobolev/GagliardoNirenbergSobolev` |
 | Value–derivative jets of `W^1_p(O)` and `W^1_p(V)`, restriction | ✅ | ✗ | `Rd/Sobolev/SobolevJets` |
 | The grid norm of `W^m_p` between two Besov quasi-norms with named constants, `(L_p, W^m_p)_{θ,q} = B^{θm}_{p,q}`, `(W^{m₀}_p, W^{m₁}_p)_{η,q} = B^{(1-η)m₀+ηm₁}_{p,q}` for `1 < p < ∞`, and operators bounded on `L_p` and on `W^m_p` | ✅ | ✗ | `Rd/Interpolation/SobolevInterpolation` |
-| The Bessel potential norm `‖J_s f‖_p`, equivalent to the quasi-norm of `F^s_{p,2}`; `(H^{s₀,p}, H^{s₁,p})_{η,q}` and `(L_p, H^{s₁,p})_{η,q}` are Besov spaces | ✅ | ✗ | `Rd/Interpolation/BesselPotentialInterpolation` |
+| The Bessel potential norm `‖J_s f‖_p`, equivalent to the quasi-norm of `F^s_{p,2}`; `(H^{s₀,p}, H^{s₁,p})_{η,q}` and `(L_p, H^{s₁,p})_{η,q}` are Besov spaces, and the couple of `H^1 → L_2` with `(L_2, H^1)_{θ,q} = B^θ_{2,q}` | ✅ | ✗ | `Rd/Interpolation/BesselPotentialInterpolation` |
 | Uniform Schwartz families as bounded sets and under continuous linear maps, the shifted Bessel symbols `(ε + ‖ζ‖²)^{σ/2}` with derivative bounds on annuli uniform in `ε`, the Bessel symbol and kernel families as uniform Schwartz families, the Bessel potential of a dilate, the dilated Bessel kernels as a Calderón–Zygmund family with explicit overlap, and the annuli of the Littlewood–Paley kernels | ✅ | ✗ | `Rd/BesselPotentials/UniformSchwartzFamilies` |
 | Even Fourier multipliers, among them Mathlib's Bessel potential, commuting with translations and reflections of Schwartz functions and with convolutions, the Bessel kernels of the Littlewood–Paley kernels, `H^{s,p} ∩ L_p = F^s_{p,2}` for real `s`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0` and `W^m_p = H^{m,p}` for `1 < p < ∞`, with existential constants | ✅ | ✗ | `Rd/BesselPotentials/BesselPotentialLifting` |
 | `H^{s,p} ↪ L_r` for `1 < p ≤ r < ∞` and `s ≥ n(1/p - 1/r)`, also in Mathlib's bundled space | ✅ | ✗ | `Rd/BesselPotentials/BesselPotentialEmbedding` |

@@ -108,6 +108,7 @@ public import FunctionSpaces.Domains.Lipschitz.SurfaceMeasure
 public import FunctionSpaces.Domains.Lipschitz.LocalLipschitzGraphs
 public import FunctionSpaces.Domains.Lipschitz.ConvexDomains
 public import FunctionSpaces.Domains.Lipschitz.BesovDomains
+public import FunctionSpaces.Domains.Lipschitz.BesovDomainLocalisation
 public import FunctionSpaces.Domains.Extension.RychkovExtension
 public import FunctionSpaces.Domains.Extension.LipschitzGraphBesov
 public import FunctionSpaces.Domains.Extension.LocalExtension
@@ -425,8 +426,8 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   spaces, its two-sided bounds by the first-difference Besov norm with explicit constants, radial
   integrals of powers, double integrals of sums, and `W^{s,p} = B^s_{p,p}` for `0 < s < 1`.
 * `FunctionSpaces.Rd.Differences.PointwiseMultipliers`: Leibniz's rule for differences, pointwise
-  multipliers of the Besov spaces by differences, and multiplication by bounded continuous
-  functions as an operator on `L_p`.
+  multipliers of the Besov spaces by differences, among them smooth cutoffs with compact support,
+  and multiplication by bounded continuous functions as an operator on `L_p`.
 * `FunctionSpaces.Rd.Differences.ConvexDifferences`: differences within a convex set bounded by
   derivatives within the set.
 
@@ -596,8 +597,9 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   `(F^{s₀}_{p,q₀}, F^{s₁}_{p,q₁})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` and
   `(L_p, F^{s₁}_{p,q₁})_{η,q} = B^{ηs₁}_{p,q}`, and the same for equivalent couples.
 * `FunctionSpaces.Rd.Interpolation.BesselPotentialInterpolation`: the Bessel potential norm
-  `‖J_s f‖_p`, equivalent to the quasi-norm of `F^s_{p,2}`, and
-  `(H^{s₀,p}, H^{s₁,p})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}`, `(L_p, H^{s₁,p})_{η,q} = B^{ηs₁}_{p,q}`.
+  `‖J_s f‖_p`, equivalent to the quasi-norm of `F^s_{p,2}`,
+  `(H^{s₀,p}, H^{s₁,p})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}`, `(L_p, H^{s₁,p})_{η,q} = B^{ηs₁}_{p,q}`,
+  and `(L_2, H^1)_{θ,q} = B^θ_{2,q}` for the couple of the embedding `H^1(ℝ^d) → L_2(ℝ^d)`.
 
 ### Domains: Lipschitz domains, traces, manifolds, intervals and the cube
 
@@ -639,6 +641,11 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   domains with the extension property, and the closures of nonempty convex bounded Lipschitz
   domains and of nonempty bounded open convex sets, closed balls of positive radius and the closed
   unit cube as Besov domains.
+* `FunctionSpaces.Domains.Lipschitz.BesovDomainLocalisation`: functions vanishing outside a ball
+  on a Besov domain: the interior up to a null set, the bounded convex pieces
+  `interior Ω ∩ B(0, R)`, the cutoff identity, the intrinsic quasi-norm on `Ω` through the pieces,
+  and a weak gradient in `L_2` on the interior iff the intrinsic `B^1_{2,2}(Ω)` quasi-norm is
+  finite.
 
 #### `Domains/Extension`: extensions from domains
 

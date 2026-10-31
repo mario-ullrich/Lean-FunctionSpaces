@@ -5575,6 +5575,26 @@ By \Cref{lem:product-modulus}, $2^{ks} \omega_r(\psi F, 2^{-k})_p \leq C \sum_l 
 bound the $\ell_q$ norm.
 \end{proof}
 
+\begin{lemma}[Smooth cutoffs are Besov multipliers]
+\label{lem:besov-multiplier}
+\lean{Rd.exists_mul_modNorm_le}
+\leanok
+\uses{thm:multipliers, lem:resolution-of-unity}
+For every smooth $\chi \colon V \to \C$ with compact support, every $1 \leq p < \infty$, all
+$r \in \N$ and $s \in \R$ with $s < r$, and every $q \in [1, \infty]$, there is $C < \infty$ such
+that for every $F \in L_p(V)$,
+\[
+  \|\chi F\|_p + \|(2^{ks} \omega_r(\chi F, 2^{-k})_p)_k\|_{\ell_q}
+  \leq C \bigl( \|F\|_p + \|(2^{ks} \omega_r(F, 2^{-k})_p)_k\|_{\ell_q} \bigr) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The derivatives of $\chi$ up to order $r$ are bounded (\Cref{lem:resolution-of-unity}), so
+\Cref{thm:multipliers} applies.
+\end{proof}
+
 \section{Atoms}
 
 Atoms are functions of small support with size bounds at a dyadic scale. As in Schneider and

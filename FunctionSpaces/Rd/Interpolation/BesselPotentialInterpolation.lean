@@ -7,6 +7,7 @@ module
 
 public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialLifting
 public import FunctionSpaces.Rd.Interpolation.TriebelLizorkinInterpolation
+public import FunctionSpaces.Rd.Sobolev.RellichCompactness
 
 /-!
 # Bessel potential spaces on `V` and real interpolation
@@ -24,6 +25,11 @@ Triebel–Lizorkin spaces gives, for `0 < η < 1`, `1 ≤ q ≤ ∞`, `0 < s₀ 
 
 in the Bessel potential norms (Bergh–Löfström, Theorem 6.4.5(4);
 `Rd.memKMethod_besselPotentialCouple_iff`, `Rd.memKMethod_lpBesselPotentialCouple_iff`).
+
+For `p = 2` and `s₁ = 1` the couple `(L_2, H^1)` is the couple of the embedding
+`H^1(V) → L_2(V)` (`Rd.ofMap_toL2_eq_lpBesselPotentialCouple`), so
+`(L_2(V), H^1(V))_{θ,q} = B^θ_{2,q}(V)` for `0 < θ < 1`, with the Besov space by differences of
+every order `r > θ` (`Rd.memKMethod_ofMap_toL2_iff`).
 -/
 
 @[expose] public section
@@ -31,6 +37,7 @@ in the Bessel potential norms (Bergh–Löfström, Theorem 6.4.5(4);
 open MeasureTheory
 open scoped ENNReal SchwartzMap BesselPotentialSpace
 open TemperedDistribution (besselPotential)
+open ENNReal (lqNorm dyadicWeight)
 
 namespace Rd
 
@@ -178,5 +185,58 @@ theorem memKMethod_lpBesselPotentialCouple_iff [Nontrivial V] (hp1 : 1 < p) (hp 
   obtain ⟨C₁', hC₁', h₁'⟩ := exists_triebelLizorkinNorm_le_besselPotentialNorm (V := V) hp1 hp s₁
   exact memKMethod_iff_memApprox_of_triebelLizorkin_equiv_left hp hC₁ hC₁' hs₁ hη hη' one_le_two hq
     h₁ h₁'
+
+/-! ### The couple of the embedding `H^1(V) → L_2(V)` -/
+
+/-- **The quotient norm of `H^1(V) → L_2(V)` is the Bessel potential norm**: for `f ∈ L_2(V)`,
+`inf {‖U‖ : U ∈ H^1(V), ι U = f} = ‖J_1 f‖_2`, where `ι = Rd.toL2`. If `J_1 f ∈ L_2`, then `f`
+is the `L_2` function of an element of `H^1(V)` with norm `‖J_1 f‖_2`
+(`Rd.besselPotentialNorm_eq_enorm_toBesselPotentialSpace`, `Rd.toL2_eq_of_toDistr_eq`); every `U`
+with `ι U = f` has norm `‖J_1 f‖_2`
+(`Rd.besselPotentialNorm_eq_enorm`, `Rd.toTemperedDistribution_toL2`). -/
+theorem norm1_ofMap_toL2 (f : Lp ℂ 2 (volume : Measure V)) :
+    (InterpCouple.ofMap ((toL2 : H^{1, 2}(V, ℂ) →L[ℂ] Lp ℂ 2 (volume : Measure V)).restrictScalars
+      ℝ)).norm1 f = besselPotentialNorm 1 f := by
+  refine le_antisymm ?_ ?_
+  · by_cases hf : besselPotentialNorm 1 f < ∞
+    · have hS := besselPotentialNorm_lt_top_iff.1 hf
+      rw [besselPotentialNorm_eq_enorm_toBesselPotentialSpace hS]
+      exact InterpCouple.norm1_ofMap_le
+        (toL2_eq_of_toDistr_eq _ hS.toBesselPotentialSpace_toDistr.symm)
+    · rw [not_lt, top_le_iff] at hf
+      rw [hf]
+      exact le_top
+  · rw [InterpCouple.ofMap_norm1]
+    refine le_iInf fun y => ?_
+    obtain ⟨y, hy⟩ := y
+    have hy' : toL2 y = f := hy
+    have hf : (f : 𝓢'(V, ℂ)) = y.toDistr := by rw [← hy', toTemperedDistribution_toL2]
+    exact (besselPotentialNorm_eq_enorm y hf).le
+
+/-- **`(L_2, H^1)` is the couple of the embedding `H^1(V) → L_2(V)`**: the couple
+`(L_2(V), toL2(H^1(V)))` with the quotient norm (`InterpCouple.ofMap`) is the couple of the `L_2`
+norm and the Bessel potential norm of order `1` (`Rd.norm1_ofMap_toL2`). -/
+theorem ofMap_toL2_eq_lpBesselPotentialCouple :
+    InterpCouple.ofMap ((toL2 : H^{1, 2}(V, ℂ) →L[ℂ] Lp ℂ 2 (volume : Measure V)).restrictScalars
+      ℝ) = lpBesselPotentialCouple (p := 2) 1 := by
+  unfold InterpCouple.ofMap lpBesselPotentialCouple
+  congr 1
+  funext f
+  exact norm1_ofMap_toL2 f
+
+/-- **`(L_2(V), H^1(V))_{θ,q} = B^θ_{2,q}(V)`**: in dimension `n ≥ 1`, for `0 < θ < 1`,
+`1 ≤ q ≤ ∞` and every order `r > θ`, `F ∈ L_2(V)` lies in the real interpolation space of the
+couple of the embedding `H^1(V) → L_2(V)` iff
+`‖F‖_2 + ‖(2^(kθ) ω_r(F, 2^(-k))_2)_k‖_{ℓ_q} < ∞`
+(`Rd.ofMap_toL2_eq_lpBesselPotentialCouple`, `Rd.memKMethod_lpBesselPotentialCouple_iff`,
+`Rd.memApprox_bandScheme_iff_modulus`). -/
+theorem memKMethod_ofMap_toL2_iff [Nontrivial V] {θ : ℝ} (hθ : 0 < θ) (hθ' : θ < 1) (hq : 1 ≤ q)
+    {r : ℕ} (hθr : θ < r) (F : Lp ℂ 2 (volume : Measure V)) :
+    (InterpCouple.ofMap ((toL2 : H^{1, 2}(V, ℂ) →L[ℂ] Lp ℂ 2 (volume : Measure V)).restrictScalars
+      ℝ)).MemKMethod θ q F ↔
+      ‖F‖ₑ + lqNorm q (fun k => dyadicWeight θ k * lpModulus 2 r F k) < ∞ := by
+  rw [ofMap_toL2_eq_lpBesselPotentialCouple, memKMethod_lpBesselPotentialCouple_iff
+    ENNReal.one_lt_two two_ne_top one_pos hθ hθ' hq, mul_one]
+  exact memApprox_bandScheme_iff_modulus two_ne_top hθ.le hθr hq F
 
 end Rd

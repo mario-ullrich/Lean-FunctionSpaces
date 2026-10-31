@@ -653,7 +653,8 @@ $C = \sum_i C_i$ works, and $\psi_i F_i = \psi_i f$ almost everywhere on $O$, so
 
 \begin{lemma}[Restrictions and smaller sets]
 \label{lem:restriction-moduli}
-\lean{Rd.modNormOn_le_modNorm_of_indicatorLp, Rd.BoundedLipschitzDomain.modNormOn_mono_set}
+\lean{Rd.modNormOn_le_modNorm_of_indicatorLp, Rd.modNormOn_mono_set,
+  Rd.BoundedLipschitzDomain.modNormOn_mono_set}
 \leanok
 \uses{lem:rd-modulus-on}
 Let $O \subseteq V$ be measurable. If $F = f$ almost everywhere on $O$, then
@@ -9303,7 +9304,9 @@ the weak form of the Dirichlet problem. \Cref{sec:dirichlet-eigenbasis} treats t
 Laplacian on bounded open sets, and \Cref{sec:neumann-eigenbasis} the Neumann Laplacian on
 bounded Lipschitz domains, with the embedding $\Sob{1}{2}(\Omega) \hookrightarrow L_2(\Omega)$.
 \Cref{sec:spectral-besov-domains} describes the Besov spaces $B^\theta_{2,q}(\Omega)$,
-$0 < \theta < 1$, by expansions in these eigenbases.
+$0 < \theta < 1$, by expansions in these eigenbases. \Cref{sec:besov-domain-localisation} treats
+functions that vanish outside a ball on a Besov domain, the setting of the chart pieces of
+functions on compact manifolds.
 
 \section{The Dirichlet Laplacian}
 \label{sec:dirichlet-eigenbasis}
@@ -10051,6 +10054,119 @@ inequalities. For $\theta > 1/2$, and for $\theta = 1/2$ with $q < \infty$, the 
 carry the boundary condition; for $\theta = 1/2$ and $q = 2$ the interpolation space is the
 Lions--Magenes space $H^{1/2}_{00}(\Omega)$ \cite[Chapter~1, Theorem~11.7]{LionsMagenes1972}.
 Both descriptions are later goals.
+
+\section{Compactly supported functions on Besov domains}
+\label{sec:besov-domain-localisation}
+
+In this section $\Omega \subseteq V$ is a Besov domain (\Cref{def:besov-domain}): a closed convex
+set with nonempty interior $O = \operatorname{int} \Omega$ and the extension property, and
+$N_U(f)$ is the intrinsic quasi-norm on a measurable set $U$ (\Cref{lem:modnorm-on}). For
+functions that vanish outside a ball, finiteness of $N_\Omega$ is decided on the bounded convex
+pieces $O \cap B(0, R)$. These pieces are bounded Lipschitz domains, on which
+$\Sob{1}{2} = B^1_{2,2}$ (\Cref{thm:sobolev-lipschitz-domain-intrinsic}); so the same holds on
+$O$ for such functions.
+
+\begin{lemma}[A Besov domain and its interior]
+\label{lem:besov-domain-interior-ae}
+\lean{Rd.BesovDomain.interior_ae_eq, Rd.BesovDomain.restrict_interior}
+\leanok
+\uses{def:besov-domain}
+For every Besov domain $\Omega$, the interior $O$ agrees with $\Omega$ up to a null set, and the
+Lebesgue measure restricted to $O$ is the Lebesgue measure restricted to $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The frontier of the convex set $\Omega$ is a null set (Mathlib's \texttt{Convex.\allowbreak
+addHaar\_\allowbreak frontier}), so $\Omega$ agrees with its interior up to a null set (Mathlib's
+\texttt{interior\_\allowbreak ae\_\allowbreak eq\_\allowbreak of\_\allowbreak null\_\allowbreak
+frontier}).
+\end{proof}
+
+\begin{definition}[The bounded convex pieces]
+\label{def:besov-domain-ball}
+\lean{Rd.BesovDomain.ballDomain, Rd.BesovDomain.carrier_ballDomain,
+  Rd.BesovDomain.toOpens_ballDomain_le, Rd.BesovDomain.ballDomain_subset_interior,
+  Rd.BesovDomain.ballDomain_subset}
+\leanok
+\uses{def:besov-domain, thm:convex-lipschitz}
+For every Besov domain $\Omega$ and every $R \in \R$, the piece $D_R = O \cap B(0, R)$ is the
+bounded Lipschitz domain of the bounded open convex set $O \cap B(0, R)$
+(\Cref{thm:convex-lipschitz}). It satisfies $D_R \subseteq O \subseteq \Omega$.
+\end{definition}
+
+\begin{lemma}[The cutoff identity]
+\label{lem:besov-domain-cutoff}
+\lean{Rd.BesovDomain.mul_ae_eq_of_ballDomain}
+\leanok
+\uses{lem:besov-domain-interior-ae, def:besov-domain-ball}
+Let $\Omega$ be a Besov domain and $R \leq R'$. For all $g, F \in L_p(V)$ with $g = 0$ almost
+everywhere outside $B(0, R)$ and $F = g$ almost everywhere on $D_{R'}$, and every real $\chi$ that
+equals $1$ on $\overline{B}(0, R)$ and has closed support in $B(0, R')$, $\chi F = g$ almost
+everywhere on $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:besov-domain-interior-ae} it suffices to check almost every $y \in O$. On
+$D_{R'}$, $\chi F = \chi g$, which is $g$ on $B(0, R)$, where $\chi = 1$, and $0 = g$ outside it.
+Outside $B(0, R')$ both $\chi F$ and $g$ vanish.
+\end{proof}
+
+\begin{lemma}[Localisation on Besov domains]
+\label{lem:besov-domain-localisation}
+\lean{Rd.BesovDomain.modNormOn_lt_top_of_ballDomain, Rd.BesovDomain.modNormOn_lt_top_iff_ballDomain}
+\leanok
+\uses{def:besov-domain-ball, lem:restriction-moduli, thm:bounded-lipschitz-besov-domain,
+  lem:smooth-cutoff-compact, lem:besov-multiplier, lem:besov-domain-cutoff}
+Let $\Omega$ be a Besov domain, $1 \leq p < \infty$, $0 < s < r$, $q \in [1, \infty]$ and
+$R < R'$. For every $g \in L_p(V)$ with $g = 0$ almost everywhere outside $B(0, R)$,
+$N_\Omega(g) < \infty$ if and only if $N_{D_{R'}}(g) < \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$N_{D_{R'}}(g) \leq N_\Omega(g)$ since $D_{R'} \subseteq \Omega$ (\Cref{lem:restriction-moduli}).
+Conversely, $D_{R'}$ has the extension property (\Cref{thm:bounded-lipschitz-besov-domain}): there
+is $F \in L_p(V)$ with $F = g$ on $D_{R'}$ and finite quasi-norm on $V$. Take a smooth $\chi$ equal
+to $1$ near $\overline{B}(0, R)$ with compact closed support in $B(0, R')$
+(\Cref{lem:smooth-cutoff-compact}). Then $\chi F$ has finite quasi-norm on $V$
+(\Cref{lem:besov-multiplier}) and agrees with $g$ on $\Omega$ (\Cref{lem:besov-domain-cutoff}), so
+$N_\Omega(g) < \infty$ (\Cref{lem:restriction-moduli}).
+\end{proof}
+
+\begin{lemma}[$\Sob{1}{2} = B^1_{2,2}$ for functions vanishing outside a ball]
+\label{lem:besov-domain-weak-gradient}
+\lean{Rd.BesovDomain.exists_hasWeakLineDeriv_of_modNormOn_lt_top,
+  Rd.BesovDomain.modNormOn_lt_top_of_hasWeakLineDeriv,
+  Rd.BesovDomain.exists_hasWeakLineDeriv_iff_modNormOn_lt_top}
+\leanok
+\uses{def:besov-extension-property, thm:sobolev-one-two-besov, lem:weak-derivative-basic,
+  lem:weak-derivative-direction-linear, def:besov-domain-ball, cor:sobolev-extension-two,
+  thm:sobolev-lipschitz-domain-intrinsic, lem:besov-domain-localisation}
+Let $\Omega$ be a Besov domain, $(e_i)_{i \in I}$ the orthonormal basis of
+\Cref{def:dyadic-cubes}, $r \geq 2$ an order, and write
+$N_\Omega(g) = \|g\|_{L_2(\Omega)} + \|(2^k \omega_r(g, 2^{-k}, \Omega)_2)_k\|_{\ell_2}$.
+\begin{enumerate}
+  \item For every $g \in L_2(V)$ with $N_\Omega(g) < \infty$ there are $g_i \in L_2(O)$ with
+    $g_i = \partial_{e_i} g$ weakly on $O$ for every $i \in I$.
+  \item For every $R \in \R$ and every $g \in L_2(V)$ with $g = 0$ almost everywhere outside
+    $B(0, R)$, such $g_i$ exist if and only if $N_\Omega(g) < \infty$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The extension property of $\Omega$ (\Cref{def:besov-extension-property}) gives $F \in L_2(V)$
+with $F = g$ on $\Omega$ and finite quasi-norm on $V$, so $F \in \Sob{1}{2}(V)$
+(\Cref{thm:sobolev-one-two-besov}). Its weak derivatives on $V$ are weak derivatives on $O$, and
+there of $g$ (\Cref{lem:weak-derivative-basic}). (2) If the $g_i$ exist, then on the piece
+$D = D_{R+1}$, $g \in \Sob{1}{2}(D)$ (\Cref{lem:weak-derivative-basic},
+\Cref{lem:weak-derivative-direction-linear}), which is the space $H^1(D)$
+(\Cref{cor:sobolev-extension-two}), so $N_D(g) < \infty$
+(\Cref{thm:sobolev-lipschitz-domain-intrinsic}) and $N_\Omega(g) < \infty$
+(\Cref{lem:besov-domain-localisation}). The converse is (1).
+\end{proof}
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

@@ -526,7 +526,7 @@ the identity of \Cref{lem:weak-derivative-integral}.
 \label{lem:weak-derivative-direction-linear}
 \lean{Rd.locallyIntegrableOn_sum_smul, Rd.HasWeakLineDeriv.sum_smul_dir,
   Rd.locallyIntegrableOn_of_forall_gridBasis, Rd.hasWeakLineDeriv_of_forall_gridBasis,
-  Rd.memSobolev_one_of_forall_gridBasis}
+  Rd.memSobolev_one_of_forall_gridBasis, Rd.memWeakSobolev_one_of_forall_gridBasis}
 \leanok
 \uses{lem:weak-derivative-integral, lem:weak-derivative-basic,
   lem:directional-derivatives-commute, def:dyadic-cubes}
@@ -542,7 +542,10 @@ For every open $\Omega \subseteq V$:
     $i \in I$, $f$ is locally integrable on $\Omega$, and for every $v \in V$,
     $\sum_{i \in I} \langle v, e_i \rangle g_i = \partial_v f$ weakly on $\Omega$;
   \item for every $1 \leq p \leq \infty$, every $f \in L_p(V)$ and all $g_i \in L_p(V)$ with
-    $g_i = \partial_{e_i} f$ weakly on $V$ for every $i \in I$, $f \in \Sob{1}{p}(V)$.
+    $g_i = \partial_{e_i} f$ weakly on $V$ for every $i \in I$, $f \in \Sob{1}{p}(V)$;
+  \item for every $1 \leq p \leq \infty$, every $f \in L_p(\Omega)$ and all $g_i \in L_p(\Omega)$
+    with $g_i = \partial_{e_i} f$ weakly on $\Omega$ for every $i \in I$,
+    $f \in \Sob{1}{p}(\Omega)$.
 \end{enumerate}
 \end{lemma}
 
@@ -556,7 +559,10 @@ $\partial_w \varphi = D\varphi(\cdot) \, w$ is linear in $w$
 as a function with a weak derivative; for $n = 0$, $V$ is a point and every function on it is
 continuous. Then (2) with $v = \sum_i \langle v, e_i \rangle e_i$. (4) By (3) the class of
 $\sum_i \langle v, e_i \rangle g_i$ in $L_p(V)$ is the weak derivative $\partial_v f$ for every
-$v$, and \Cref{lem:weak-derivative-basic} for $m = 1$ applies.
+$v$, and \Cref{lem:weak-derivative-basic} for $m = 1$ applies. (5) By (3),
+$\sum_i \langle v, e_i \rangle g_i \in L_p(\Omega)$ is the weak derivative $\partial_v f$ on
+$\Omega$ for every $v$, and $f$ is its own derivative of order $0$
+(\Cref{lem:weak-derivative-basic}).
 \end{proof}
 
 \paragraph{Cutoffs.}
@@ -5674,6 +5680,56 @@ Let $n \geq 1$, $1 < p < \infty$, $0 < \eta < 1$, $q \in [1, \infty]$ and $f \in
 The Bessel potential norms are equivalent to the quasi-norms of $\TL{s_i}{p}{2}$
 (\Cref{lem:bessel-potential-norm-tl}); apply parts (3) and (4) of \Cref{thm:tl-interpolate} with
 $q_0 = q_1 = 2$.
+\end{proof}
+
+\paragraph{The couple of $H^1(V) \hookrightarrow L_2(V)$.}
+For $p = 2$ and $s_1 = 1$ the second space of the couple $(L_2, H^{1,2})$ is the image of the
+embedding $\iota \colon H^1(V) \to L_2(V)$ of \Cref{def:sobolev-one-to-l2}, with the quotient norm
+of the couple of $\iota$ (\Cref{def:map-couple}).
+
+\begin{lemma}[The quotient norm of $\iota$]
+\label{lem:sobolev-one-map-couple}
+\lean{Rd.norm1_ofMap_toL2, Rd.ofMap_toL2_eq_lpBesselPotentialCouple}
+\leanok
+\uses{def:map-couple, def:sobolev-one-to-l2, lem:sobolev-one-to-l2, def:bessel-potential-norm,
+  def:bessel-potential-couples}
+For every $f \in L_2(V)$,
+\[
+  \inf \{\|U\| : U \in H^1(V), \ \iota U = f\} = \|f\|_{H^{1,2}} ,
+\]
+and the couple of $\iota$ on $L_2(V)$ is the couple $(L_2, H^{1,2})$ of
+\Cref{def:bessel-potential-couples}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $\|f\|_{H^{1,2}} < \infty$, then $f$ is the tempered distribution of some $U \in H^1(V)$ with
+$\|U\| = \|f\|_{H^{1,2}}$ (\Cref{def:bessel-potential-norm}), and $\iota U = f$
+(\Cref{lem:sobolev-one-to-l2}); so the infimum is at most $\|f\|_{H^{1,2}}$, also when
+$\|f\|_{H^{1,2}} = \infty$. Conversely, for every $U$ with $\iota U = f$ the tempered distribution
+of $f$ is that of $U$ (\Cref{lem:sobolev-one-to-l2}), so $\|U\| = \|f\|_{H^{1,2}}$
+(\Cref{def:bessel-potential-norm}). Both couples have the first norm $\|\cdot\|_2$.
+\end{proof}
+
+\begin{lemma}[$(L_2(V), H^1(V))_{\theta, q} = B^\theta_{2,q}(V)$]
+\label{lem:sobolev-whole-space-interpolation}
+\lean{Rd.memKMethod_ofMap_toL2_iff}
+\leanok
+\uses{lem:sobolev-one-map-couple, thm:bessel-potential-interpolate, thm:rd-besov}
+Let $n \geq 1$. For every $0 < \theta < 1$, every $q \in [1, \infty]$, every order $r \in \N$
+with $r > \theta$ and every $F \in L_2(V)$, $F$ lies in the real interpolation space
+$(L_2(V), \iota(H^1(V)))_{\theta, q}$ of the couple of $\iota$ if and only if
+\[
+  \|F\|_2 + \bigl\| \bigl(2^{k\theta} \omega_r(F, 2^{-k})_2\bigr)_k \bigr\|_{\ell_q} < \infty .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:sobolev-one-map-couple} the couple is $(L_2, H^{1,2})$, whose interpolation space is
+$\Besov{\theta}{2}{q}$ (\Cref{thm:bessel-potential-interpolate} with $p = 2$, $s_1 = 1$ and
+$\eta = \theta$), and part (1) of \Cref{thm:rd-besov} describes $\Besov{\theta}{2}{q}$ by the moduli
+of order $r$.
 \end{proof}
 
 \section{Embeddings of Bessel potential spaces}

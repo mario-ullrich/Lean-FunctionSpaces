@@ -177,6 +177,15 @@ form.
   the closure of every nonempty bounded open convex set is a Besov domain
   (`Rd.BesovDomain.closure_of_convex`), for example every closed ball `B̄(c, R)` with `R > 0` and
   the closed unit cube `[0, 1]^n` (`Rd.BesovDomain.closedBall`, `Rd.BesovDomain.closedUnitCube`).
+* **Functions vanishing outside a ball on a Besov domain.** Let `Ω` be a Besov domain with interior
+  `O`, which agrees with `Ω` up to a null set (`Rd.BesovDomain.interior_ae_eq`), and let `g` vanish
+  almost everywhere outside `B(0, R)`. For `1 ≤ p < ∞`, `0 < s < r`, `1 ≤ q ≤ ∞` and `R < R'`,
+  `N_Ω(g) < ∞` iff `N_D(g) < ∞` on the bounded convex Lipschitz domain `D = O ∩ B(0, R')`
+  (`Rd.BesovDomain.ballDomain`, `Rd.BesovDomain.modNormOn_lt_top_iff_ballDomain`), through the
+  extension from `D` and a smooth cutoff, a Besov multiplier (`Rd.exists_mul_modNorm_le`). Hence
+  `g ∈ L_2(V)` has weak derivatives `∂_{e_j} g ∈ L_2(O)` on `O` iff
+  `‖g‖_{L_2(Ω)} + ‖(2^k ω_r(g, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞` for every order `r ≥ 2`
+  (`Rd.BesovDomain.exists_hasWeakLineDeriv_iff_modNormOn_lt_top`).
 * **Besov spaces on compact manifolds.** Let `M` be a compact smooth manifold modelled on `E` with
   corners `I` whose range is a Besov domain (the half-space, the quadrant of manifolds with
   corners, or `E`), `μ` a smooth measure (in every chart a continuous positive density with
@@ -698,6 +707,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Bounded Lipschitz domains from the set-level definition: sets Lipschitz near a point, local graphs as Lipschitz graph domains, McShane's extension of local graphs, the structure from a family of charts and the converse, the ball | ✅ | ✗ | `Domains/Lipschitz/LocalLipschitzGraphs` |
 | Bounded open convex sets as bounded Lipschitz domains: the ray length, its cone estimate, open convex sets, bounded or not, near a frontier point as regions above a Lipschitz graph, and the open unit cube with its closure | ✅ | ✗ | `Domains/Lipschitz/ConvexDomains` |
 | Lipschitz graph domains with null graphs and boundaries, closures of convex Lipschitz graph domains as Besov domains, the quadrant as a Lipschitz graph domain and the quadrant model of manifolds with corners as a Besov domain, bounded Lipschitz domains with the extension property, closures of nonempty convex bounded Lipschitz domains and of nonempty bounded open convex sets, closed balls of positive radius and the closed unit cube as Besov domains | ✅ | ✗ | `Domains/Lipschitz/BesovDomains` |
+| Functions vanishing outside a ball on a Besov domain: the interior up to a null set, the bounded convex pieces `interior Ω ∩ B(0, R)`, the cutoff identity, the intrinsic quasi-norm through the pieces, and `W^1_2 = B^1_{2,2}` on the interior | ✅ | ✗ | `Domains/Lipschitz/BesovDomainLocalisation` |
 | Smooth bounded domains from the set-level definition: sets smooth near a point, the smooth cut-off of a local graph, the smooth domain from smooth charts and the converse, the ball as a smooth domain and the Besov spaces of its closure | ✅ | ✗ | `Domains/Manifolds/SmoothLocalGraphs` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.

@@ -131,7 +131,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Besov spaces on `ℝ^d` as interpolation spaces, by approximation, differences and Littlewood–Paley blocks | ✅ | ✗ | `Rd/Interpolation/BesovInterpolation` |
 | Moment kernels: finite `L_1` norm, the vanishing moments of their coefficients, averaged differences, approximation with the modulus, also on subsets, vanishing first moments of the moment kernels of order two | ✅ | ✗ | `Rd/Differences/MomentKernels` |
 | Local means on `ℝ^d`: reproducing formula, agreement with differences for `0 < s < L`, bumps from smooth bump functions | ✅ | ✗ | `Rd/LocalMeans/LocalMeans` |
-| Pointwise multipliers on `ℝ^d`: bounded derivatives on compact sets, the multiplication operator on `L_p`, Leibniz's rule for differences, moduli of lower order | ✅ | ✗ | `Rd/Differences/PointwiseMultipliers` |
+| Pointwise multipliers on `ℝ^d`: bounded derivatives on compact sets, the multiplication operator on `L_p`, Leibniz's rule for differences, moduli of lower order, smooth cutoffs with compact support as Besov multipliers | ✅ | ✗ | `Rd/Differences/PointwiseMultipliers` |
 | Atomic synthesis: bounded overlap, regular atoms on sets, coefficient quasi-norm | ✅ | ✗ | `Rd/Atoms/AtomSynthesis` |
 | Atomic decomposition by cell atoms, atomic characterisation of Besov spaces | ✅ | ✗ | `Rd/Atoms/AtomAnalysis` |
 | Differences within convex sets through derivatives within the set | ✅ | ✗ | `Rd/Differences/ConvexDifferences` |

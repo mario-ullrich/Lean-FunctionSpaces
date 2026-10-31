@@ -478,17 +478,12 @@ omit [FiniteDimensional ℝ V] in
 /-- A bounded Lipschitz domain is measurable. -/
 theorem measurableSet : MeasurableSet Ω.carrier := Ω.isOpen.measurableSet
 
-/-- The intrinsic quasi-norm of `f` on a measurable `T ⊆ Ω` is at most that on `Ω`. -/
+/-- The intrinsic quasi-norm of `f` on a measurable `T ⊆ Ω` is at most that on `Ω`
+(`Rd.modNormOn_mono_set`). -/
 theorem modNormOn_mono_set {T : Set V} (hT : MeasurableSet T) (hTΩ : T ⊆ Ω.carrier) (r : ℕ)
     (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p (volume : Measure V)) :
-    modNormOn hT r s q f ≤ modNormOn Ω.measurableSet r s q f := by
-  unfold modNormOn
-  refine add_le_add ?_ (ENNReal.lqNorm_mono fun k =>
-    mul_le_mul' le_rfl (lpModulusOn_mono_set hT hTΩ r f k))
-  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hT f),
-    eLpNorm_congr_ae (indicatorLp_apply_ae Ω.measurableSet f)]
-  exact eLpNorm_mono ((Lp.aestronglyMeasurable f).indicator hT)
-    fun x => norm_indicator_le_of_subset hTΩ _ x
+    modNormOn hT r s q f ≤ modNormOn Ω.measurableSet r s q f :=
+  Rd.modNormOn_mono_set hT Ω.measurableSet hTΩ r s q f
 
 /-- **The boundary patches with a bound**: there is `C < ∞` such that on `Ω ∩ B(c_j, ρ_j - 2ε)`
 every `f` with `N_Ω(f) = ‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞` agrees with a
