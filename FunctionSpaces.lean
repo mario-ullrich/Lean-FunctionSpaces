@@ -74,6 +74,7 @@ public import FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinLocalMeans
 public import FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinDifferences
 public import FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinAtoms
 public import FunctionSpaces.Rd.TriebelLizorkin.SquareFunction
+public import FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinDistributions
 public import FunctionSpaces.Rd.SingularIntegrals.DilationFamilies
 public import FunctionSpaces.Rd.SingularIntegrals.ConvolutionAdjoint
 public import FunctionSpaces.Rd.SingularIntegrals.PlancherelBounds
@@ -95,6 +96,7 @@ public import FunctionSpaces.Rd.BesselPotentials.UniformSchwartzFamilies
 public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialLifting
 public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialEmbedding
 public import FunctionSpaces.Rd.FourierMultipliers.SymbolKernels
+public import FunctionSpaces.Rd.FourierMultipliers.TriebelLizorkinMultipliers
 public import FunctionSpaces.Rd.Interpolation.BesovInterpolation
 public import FunctionSpaces.Rd.Interpolation.SobolevInterpolation
 public import FunctionSpaces.Rd.Interpolation.TriebelLizorkinInterpolation
@@ -495,6 +497,10 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
 * `FunctionSpaces.Rd.TriebelLizorkin.SquareFunction`: the square function theorem `L_p = F^0_{p,2}`
   for `1 < p < ∞`, with named constants in both directions, and the reproducing formula
   `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p` with the synthesis kernels `ψ̃_j`.
+* `FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinDistributions`: convolutions with Schwartz
+  kernels as Fourier multipliers on `L_r`, the Littlewood–Paley blocks of tempered distributions
+  and their convergence in `𝓢'`, and the Triebel–Lizorkin quasi-norm of tempered distributions for
+  every real `s`, equal to that of `L_p` on `L_p`.
 
 #### `Rd/SingularIntegrals`: vector-valued singular integrals
 
@@ -596,6 +602,9 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   rescaled symbols `2^{-jσ} m(2^j ·)`, the uniformly Schwartz kernels `K_j` with
   `m(D) ω_{2^j} = 2^{jσ} (K_j)_{2^j}`, and the maximal bound of convolutions with dilates of
   uniform families.
+* `FunctionSpaces.Rd.FourierMultipliers.TriebelLizorkinMultipliers`: the blocks of `m(D) u` as
+  convolutions of the blocks of `u`, and symbols of order `σ` as maps from `F^s_{p,q}` to
+  `F^{s-σ}_{p,q}` of tempered distributions for every real `s`, `1 < p < ∞`, `1 < q ≤ ∞`.
 
 #### `Rd/Interpolation`: real interpolation
 

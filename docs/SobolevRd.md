@@ -40,7 +40,9 @@ family. Applied to the Littlewood–Paley blocks and their synthesis kernels, th
 interpolation spaces of `L_p` and `W^m_p`, of two Sobolev spaces, and of two Bessel potential
 spaces are Besov spaces. Symbols of order `σ`, Hörmander's class `S^σ_{1,0}`, lie between the
 Schwartz functions and the functions of temperate growth; rescaled to the dyadic annuli they
-give uniformly Schwartz kernels, whose convolutions lie below the maximal function.
+give uniformly Schwartz kernels, whose convolutions lie below the maximal function; hence a
+symbol of order `σ` maps `F^s_{p,q}` of tempered distributions into `F^{s-σ}_{p,q}` for every real
+`s`, `1 < p < ∞` and `1 < q ≤ ∞`.
 
 Sobolev spaces on open sets and on bounded Lipschitz domains, the trace space, the extension
 theorem, Green's formula and the kernel of the trace are in [Domains, traces and
@@ -301,6 +303,18 @@ project, with the decisions behind their form.
   `(G_j)` (`Rd.HasSymbolGrowth.exists_isUniformSchwartz_psiDualS`). Convolutions with the
   dilates of a uniform family lie below the maximal function, uniformly in `j`
   (`Rd.IsUniformSchwartz.enorm_conv_dilate_le_maximal`).
+* **Fourier multipliers on Triebel–Lizorkin spaces.** Let `1 < p < ∞`, `1 < q ≤ ∞` and `m` a
+  symbol of order `σ`. For every real `s` there is `C < ∞` with
+  `‖m(D) u‖_{F^{s-σ}_{p,q}} ≤ C ‖u‖_{F^s_{p,q}}` for every tempered distribution `u`, in the
+  Triebel–Lizorkin quasi-norm of tempered distributions of
+  [Triebel–Lizorkin spaces](TriebelLizorkin.md)
+  (`Rd.exists_triebelLizorkinNormDistr_fourierMultiplier_le`,
+  `Rd.MemTriebelLizorkinDistr.fourierMultiplierCLM`); in particular
+  `‖g‖_{F^{s-σ}_{p,q}} ≤ C ‖f‖_{F^s_{p,q}}` for `f, g ∈ L_p(V)` with `g = m(D) f`
+  (`Rd.exists_triebelLizorkinNorm_le_of_fourierMultiplier_eq`). The block of `m(D) u` is the
+  convolution of the block of `u` with `m(D) ψ̃_j = 2^{jσ} (G_j)_{2^j}`
+  (`Rd.distribBlock_fourierMultiplierCLM_eq_convLp`), which lies below the maximal function, and
+  the Fefferman–Stein inequality finishes.
 * **Sobolev spaces and real interpolation.** Let `dim V ≥ 1` and `1 < p < ∞`. The grid norm
   of `W^m_p(V)` is `‖f‖_p + inf ∑_α ‖g_α‖_p`, the infimum over the families of weak derivatives
   `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f ∈ L_p(V)` along the basis of `Rd.gridBasis`
@@ -355,6 +369,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Even Fourier multipliers, among them Mathlib's Bessel potential, commuting with translations and reflections of Schwartz functions and with convolutions, the Bessel kernels of the Littlewood–Paley kernels, `H^{s,p} ∩ L_p = F^s_{p,2}` for real `s`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0` and `W^m_p = H^{m,p}` for `1 < p < ∞`, with existential constants | ✅ | ✗ | `Rd/BesselPotentials/BesselPotentialLifting` |
 | `H^{s,p} ↪ L_r` for `1 < p ≤ r < ∞` and `s ≥ n(1/p - 1/r)`, also in Mathlib's bundled space | ✅ | ✗ | `Rd/BesselPotentials/BesselPotentialEmbedding` |
 | Derivative bounds for powers of the Japanese bracket (mirrored from TauCeti), symbols of order `σ` between the Schwartz functions and the functions of temperate growth, their algebra, the Bessel weight, `⟪ξ, v⟫` and `‖ξ‖²` as symbols, rescaled symbols on annuli, the uniformly Schwartz symbol kernels with `m(D) ω_{2^j} = 2^{jσ} (K_j)_{2^j}`, and the maximal bound of convolutions with dilates of uniform families | ✅ | ✗ | `Rd/FourierMultipliers/SymbolKernels` |
+| The blocks of `m(D) u` as convolutions of the blocks of `u`, and symbols of order `σ` as maps from `F^s_{p,q}` to `F^{s-σ}_{p,q}` of tempered distributions for every real `s`, `1 < p < ∞`, `1 < q ≤ ∞`, also on `L_p` | ✅ | ✗ | `Rd/FourierMultipliers/TriebelLizorkinMultipliers` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

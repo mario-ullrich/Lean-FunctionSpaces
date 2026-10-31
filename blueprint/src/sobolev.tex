@@ -5799,8 +5799,10 @@ $S^\sigma_{1,0}$. \Cref{sec:symbol-classes} sets up the class, shows that
 Schwartz functions, the Bessel weights, linear functions and $\|\xi\|^2$ are symbols, and proves
 that a symbol rescaled to the dyadic annuli gives uniformly Schwartz kernels:
 $m(D) \omega_{2^j} = 2^{j\sigma} (K_j)_{2^j}$ with $(K_j)$ uniformly Schwartz. Convolutions with
-such kernels lie below the Hardy--Littlewood maximal function, uniformly in $j$. The constants
-come from uniform Schwartz bounds and are existential.
+such kernels lie below the Hardy--Littlewood maximal function, uniformly in $j$.
+\Cref{sec:tl-multipliers} proves with them that a symbol of order $\sigma$ maps $\TL{s}{p}{q}$ of
+tempered distributions into $\TL{s-\sigma}{p}{q}$, for every real $s$. The constants come from
+uniform Schwartz bounds and are existential.
 
 \section{Symbols of order \texorpdfstring{$\sigma$}{sigma} and their kernel families}
 \label{sec:symbol-classes}
@@ -6129,4 +6131,117 @@ finite.
 $|(G_j)_{2^j}(y)| \leq C_{A,0,N} 2^{jn} (1 + 2^j \|y\|)^{-N}$ (\Cref{lem:schwartz-decay},
 \Cref{lem:uniform-schwartz-constants}), and kernels with this bound lie below the maximal
 function (\Cref{thm:decay-kernels-maximal}).
+\end{proof}
+
+\section{Fourier multipliers on Triebel--Lizorkin spaces}
+\label{sec:tl-multipliers}
+
+A symbol $m$ of order $\sigma$ maps $\TL{s}{p}{q}$ into $\TL{s-\sigma}{p}{q}$, for tempered
+distributions (\Cref{def:tl-distr}), every real $s$, $1 < p < \infty$ and $1 < q \leq \infty$;
+Triebel proves this for the classical spaces~\cite[pp.~73--77]{Triebel}. The proof is
+pointwise: since $\widehat{\tilde\psi_j} \, \widehat{\psi_j} = \widehat{\psi_j}$, the block
+$\Delta_j(m(D) u)$ is the convolution of $\Delta_j u$ with $m(D) \tilde\psi_j =
+2^{j\sigma} (G_j)_{2^j}$ (\Cref{cor:symbol-psi-dual}), whose weighted size lies below the maximal
+function of the weighted block (\Cref{thm:uniform-family-maximal}); the Fefferman--Stein
+inequality finishes. The constants are existential.
+
+\begin{lemma}[The blocks of a Fourier multiplier]
+\label{lem:distrib-block-multiplier}
+\lean{Rd.distribBlock_fourierMultiplierCLM, Rd.distribBlock_fourierMultiplierCLM_eq_convLp}
+\leanok
+\uses{def:distrib-block, lem:psi-dual-reproduces, lem:psi-dual-derivatives,
+  lem:conv-fourier-multiplier, lem:fourier-multiplier-fourier}
+Let $m \colon V \to \C$ be smooth with polynomially bounded derivatives. For every tempered
+distribution $u$ on $V$ and every $j \in \N$,
+\[
+  \Delta_j (m(D) u) = \bigl(\widehat{m(D) \tilde\psi_j}\bigr)(D) \, \Delta_j u .
+\]
+For every $1 \leq p < \infty$, every tempered distribution $u$, every $j \in \N$ and every
+$g \in L_p(V)$ with $\Delta_j u = g$, $\Delta_j(m(D) u)$ is the tempered distribution of
+$(m(D) \tilde\psi_j) * g \in L_p(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both sides of the identity are Fourier multipliers of $u$, with the symbols
+$m \, \widehat{\psi_j}$ and $\widehat{\psi_j} \, m \, \widehat{\tilde\psi_j}$
+(\Cref{lem:fourier-multiplier-fourier}), and these agree since
+$\widehat{\tilde\psi_j} \, \widehat{\psi_j} = \widehat{\psi_j}$ (\Cref{lem:psi-dual-reproduces}).
+The second claim follows with \Cref{lem:conv-fourier-multiplier}.
+\end{proof}
+
+\begin{lemma}[Weighted convolutions below the maximal function]
+\label{lem:symbol-kernel-maximal}
+\lean{Rd.dyadicWeight_mul_enorm_conv_le_maximal}
+\leanok
+\uses{thm:uniform-family-maximal, lem:almost-diagonal-pointwise, def:schwartz-dilate,
+  thm:bessel-potential-dilate}
+Let $(G_j)$ be uniformly Schwartz with bounds $A$, $N > n$, $\sigma$ real, $j \in \N$ and
+$K = 2^{j\sigma} (G_j)_{2^j}$. For every real $s$, every $g \colon V \to \C$ and every $x \in V$,
+\[
+  2^{j(s - \sigma)} |(K * g)(x)| \leq C_{n,N} \, C_{A,0,N} \, M\bigl(2^{js} |g|\bigr)(x) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$2^{j(s - \sigma)} |(K * g)(x)| = 2^{js} |((G_j)_{2^j} * g)(x)|$, since
+$|(2^j)^\sigma| = 2^{j\sigma}$ (\Cref{thm:bessel-potential-dilate}); apply
+\Cref{thm:uniform-family-maximal} and move the constant $2^{js}$ into the maximal function
+(\Cref{lem:almost-diagonal-pointwise}).
+\end{proof}
+
+\begin{theorem}[Fourier multipliers on $\TL{s}{p}{q}$]
+\label{thm:tl-multiplier}
+\lean{Rd.triebelLizorkinNormDistr_fourierMultiplier_le,
+  Rd.exists_triebelLizorkinNormDistr_fourierMultiplier_le,
+  Rd.MemTriebelLizorkinDistr.fourierMultiplierCLM}
+\leanok
+\uses{def:tl-distr, lem:tl-distr-eq, cor:symbol-psi-dual, lem:distrib-block-multiplier,
+  lem:symbol-kernel-maximal, lem:maximal-bounds-mixed-norm, thm:fefferman-stein,
+  lem:maximal-function-kernels, def:uniform-schwartz, def:symbol-growth}
+Let $1 < p < \infty$, $1 < q \leq \infty$, $\sigma$ real and $m \colon V \to \C$ a symbol of order
+$\sigma$. For every real $s$ there is $C < \infty$ such that for every tempered distribution $u$
+on $V$,
+\[
+  \|m(D) u\|_{F^{s-\sigma}_{p,q}} \leq C \, \|u\|_{F^s_{p,q}} .
+\]
+In particular $m(D)$ maps $\TL{s}{p}{q}$ into $\TL{s-\sigma}{p}{q}$. More precisely, for every
+$m \colon V \to \C$ that is smooth with polynomially bounded derivatives, every uniformly
+Schwartz family $(G_j)$ with bounds $A$ and $m(D) \tilde\psi_j = 2^{j\sigma} (G_j)_{2^j}$ for
+every $j$, every $N > n$, every tempered distribution $u$ and every family $(g_j)$ in $L_p(V)$
+with $\Delta_j u = g_j$ for every $j$,
+\[
+  \|m(D) u\|_{F^{s-\sigma}_{p,q}} \leq C_{n,N} \, C_{A,0,N} \, C^{\mathrm{FS}}_{p,q}
+  \Bigl\| x \mapsto \bigl\| (2^{js} |g_j(x)|)_j \bigr\|_{\ell_q} \Bigr\|_{L_p}
+\]
+with the Fefferman--Stein constant $C^{\mathrm{FS}}_{p,q}$ of \Cref{thm:fefferman-stein}.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:distrib-block-multiplier} the blocks of $m(D) u$ are the $L_p$ functions
+$h_j = (m(D) \tilde\psi_j) * g_j$, and by \Cref{lem:symbol-kernel-maximal}, at almost every $x$,
+$2^{j(s - \sigma)} |h_j(x)| \leq C_{n,N} C_{A,0,N} \, M(2^{js} |g_j|)(x)$ for every $j$. Hence
+\Cref{lem:tl-distr-eq} and \Cref{lem:maximal-bounds-mixed-norm} give the second bound, which
+uses only that $m$ has polynomially bounded derivatives. For a symbol of order $\sigma$ the
+family $(G_j)$ exists by \Cref{cor:symbol-psi-dual}; with $N = n + 1$ and
+$C = \max(1, C_{n,N} C_{A,0,N} C^{\mathrm{FS}}_{p,q})$, \Cref{lem:tl-distr-eq} gives the first
+bound, also when the blocks of $u$ are no $L_p$ functions.
+\end{proof}
+
+\begin{corollary}[Fourier multipliers on $\TL{s}{p}{q}$ of $L_p$ functions]
+\label{cor:tl-multiplier-lp}
+\lean{Rd.exists_triebelLizorkinNorm_le_of_fourierMultiplier_eq}
+\leanok
+\uses{thm:tl-multiplier, thm:tl-distr-lp}
+Let $1 < p < \infty$, $1 < q \leq \infty$, $\sigma$ real and $m \colon V \to \C$ a symbol of order
+$\sigma$. For every real $s$ there is $C < \infty$ with
+$\|g\|_{F^{s-\sigma}_{p,q}} \leq C \|f\|_{F^s_{p,q}}$ for all $f, g \in L_p(V)$ with
+$g = m(D) f$ as tempered distributions.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:tl-multiplier} with $u = f$ and \Cref{thm:tl-distr-lp} for $f$ and $g$.
 \end{proof}

@@ -44,9 +44,9 @@ Littlewood–Paley kernels are `Φ_k = δ_{2^k} Φ`.
   for the overlap).
 * **Adjoints**: `θ_j^*(x) = conj θ_j(-x)` has the same overlap and Hörmander constants
   (`Rd.IsCZFamily.adjoint`).
-* **The Littlewood–Paley families**: the blocks `ψ_j` (`Rd.isCZFamily_psi`, overlap `2`) and the
-  synthesis kernels `Rd.psiDual` with `psiDual_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_psi`,
-  `Rd.isCZFamily_psiDual`, overlap `4`).
+* **The Littlewood–Paley families**: the blocks `ψ_j = (psiBase j)_{2^j}`, Schwartz functions
+  (`Rd.psiS`), with overlap `2` (`Rd.isCZFamily_psi`), and the synthesis kernels `Rd.psiDual`
+  with `psiDual_j ⋆ ψ_j = ψ_j` (`Rd.conv_psiDual_psi`, `Rd.isCZFamily_psiDual`, overlap `4`).
 -/
 
 @[expose] public section
@@ -652,6 +652,14 @@ theorem dilate_psiBase (j : ℕ) : dilate (2 ^ j) (psiBase (V := V) j : V → �
     show dilate (2 ^ (j + 1)) lpKernel - dilate (2 ^ (j + 1) * (1 / 2)) lpKernel = psi (j + 1)
     rw [show (2 : ℝ) ^ (j + 1) * (1 / 2) = 2 ^ j by ring]
     rfl
+
+/-- The Littlewood–Paley block `ψ_j = (psiBase j)_{2^j}` as a Schwartz function. -/
+noncomputable def psiS (j : ℕ) : 𝓢(V, ℂ) :=
+  schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (psiBase j)
+
+/-- The Schwartz function `Rd.psiS j` is the block `ψ_j` (`Rd.dilate_psiBase`). -/
+theorem coe_psiS (j : ℕ) : (psiS j : V → ℂ) = psi j := by
+  rw [psiS, coe_schwartzDilate, dilate_psiBase]
 
 variable (V) in
 /-- The seminorm bounds of the family `psiBase`, the larger of the seminorms of `Φ` and of

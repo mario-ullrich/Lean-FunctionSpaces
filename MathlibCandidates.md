@@ -532,6 +532,18 @@ declarations.
   commit `b61a90d`, Apache-2.0), which imports only Mathlib; they belong next to
   `Mathlib/Analysis/SpecialFunctions/JapaneseBracket.lean`, and an upstream version should come
   from TauCeti.
+* **Convolution with a Schwartz kernel as a Fourier multiplier**
+  (`FunctionSpaces/Rd/TriebelLizorkin/TriebelLizorkinDistributions.lean`): for Schwartz functions
+  `η`, `φ`, `SchwartzMap.convolution (mul ℂ ℂ) η φ = SchwartzMap.fourierMultiplierCLM ℂ (𝓕η) φ`
+  (`Rd.fourierMultiplierCLM_fourier_eq_convolution`), and for `G ∈ L_r`, `1 ≤ r < ∞`,
+  `(𝓕η)(D) G = η ⋆ G` as tempered distributions (`Rd.fourierMultiplierCLM_fourier_toLp_eq_conv`,
+  by density of the Schwartz functions in `L_r`). Mathlib defines the convolution of Schwartz
+  functions through the Fourier transform and identifies it with the convolution integral
+  (`SchwartzMap.convolution`, `SchwartzMap.fourier_convolution`,
+  `SchwartzMap.convolution_apply`); the identification with
+  `SchwartzMap.fourierMultiplierCLM ℂ (𝓕η)` and its extension to `L_r` and to
+  `TemperedDistribution.fourierMultiplierCLM` are missing. They belong in
+  `Mathlib/Analysis/Distribution/FourierMultiplier.lean`.
 * **The area formula for Lipschitz graphs**
   (`FunctionSpaces/Domains/Lipschitz/LipschitzGraphArea.lean`): Mathlib has the area formula for
   linear maps, `μHE[dim U] (f '' s) = normDet f · vol(s)`

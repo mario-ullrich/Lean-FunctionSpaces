@@ -45,6 +45,17 @@ and of `L_p` and one of them, are Besov spaces.
   `Rd.memApprox_of_memTriebelLizorkin`), where `B^s_{p,q}` is the approximation space `A^s_q` of
   the band-limited classes, with explicit constants
   (`Rd.approxNormDyadic_le_triebelLizorkinNorm`, `Rd.triebelLizorkinNorm_le_approxNormDyadic`).
+* **Triebel–Lizorkin spaces of tempered distributions.** The Littlewood–Paley blocks of a
+  tempered distribution `u` on `V` are the Fourier multipliers `Δ_j u = (𝓕ψ_j)(D) u`
+  (`Rd.distribBlock`), and `∑_{j < J} Δ_j u → u` in `𝓢'(V)` (`Rd.tendsto_sum_distribBlock`).
+  For a Schwartz function `η`, `1 ≤ r < ∞` and `G ∈ L_r(V)`, `(𝓕η)(D) G = η ⋆ G`
+  (`Rd.fourierMultiplierCLM_fourier_toLp_eq_conv`), so the blocks of an `L_r` function are its
+  blocks `ψ_j ⋆ f`. For every real `s`, `1 ≤ p ≤ ∞` and `1 ≤ q ≤ ∞` the quasi-norm
+  `‖u‖_{F^s_{p,q}} = ‖ x ↦ ‖(2^{js} |g_j(x)|)_j‖_{ℓ_q} ‖_p` when every block is an `L_p` function
+  `g_j`, and `∞` otherwise (`Rd.triebelLizorkinNormDistr`, `Rd.MemTriebelLizorkinDistr`),
+  decreases in `q` and increases in `s`; for `p < ∞` it is the quasi-norm above on `L_p`
+  (`Rd.triebelLizorkinNormDistr_toTemperedDistribution`). Symbols of order `σ` map these spaces
+  into each other, see [Sobolev spaces on `ℝ^d`](SobolevRd.md).
 * **Triebel–Lizorkin spaces and the Besov sandwich on the torus.** For `f ∈ L_p(𝕋^d)`,
   `1 ≤ p < ∞`, the same quasi-norm with the blocks `ψ_j ⋆ f(t) = ∫ ψ_j(y) f(t - π y) dy` of the
   kernels on `ℝ^d`, with the quotient map `π : ℝ^d → 𝕋^d`, defines `F^s_{p,q}(𝕋^d)`
@@ -210,6 +221,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
 | Triebel–Lizorkin spaces on `ℝ^d`: definition, `F_{p,p} = B_{p,p}`, the Besov sandwich, weighted blocks with terms set to zero and their tails | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkin` |
+| Convolutions with Schwartz kernels as Fourier multipliers on `L_r`, the Littlewood–Paley blocks of tempered distributions and their convergence in `𝓢'`, the Triebel–Lizorkin quasi-norm of tempered distributions for every real `s`, its compatibility with `L_p` and its monotonicity | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinDistributions` |
 | Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/LocalMeans/KernelMajorants` |
 | Local means characterisation of Triebel–Lizorkin spaces, and synthesis with the dual kernels in `F^s_{p,q}` | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinLocalMeans` |
 | Characterisation by ball means of differences | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinDifferences` |
@@ -220,7 +232,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Local means characterisation on the torus | ✅ | ✗ | `Torus/TriebelLizorkinLocalMeans` |
 | Triebel–Lizorkin spaces on `ℝ^d` interpolate to Besov spaces: `(F^{s₀}_{p,q₀}, F^{s₁}_{p,q₁})_{η,q}` and `(L_p, F^{s₁}_{p,q₁})_{η,q}` | ✅ | ✗ | `Rd/Interpolation/TriebelLizorkinInterpolation` |
 | Triebel–Lizorkin spaces on the torus interpolate to Besov spaces | ✅ | ✗ | `Torus/TriebelLizorkinInterpolation` |
-| Dilation, reflection and conjugation of Schwartz functions, derivatives of dilations, uniform Schwartz families and finitely many exceptions in them, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families, also with finitely many exceptional members, and their adjoints, the Littlewood–Paley blocks and the synthesis kernels as such families | ✅ | ✗ | `Rd/SingularIntegrals/DilationFamilies` |
+| Dilation, reflection and conjugation of Schwartz functions, derivatives of dilations, uniform Schwartz families and finitely many exceptions in them, the Hörmander condition for dilation families with explicit constants, Calderón–Zygmund families, also with finitely many exceptional members, and their adjoints, the Littlewood–Paley blocks, also as Schwartz functions, and the synthesis kernels as such families | ✅ | ✗ | `Rd/SingularIntegrals/DilationFamilies` |
 | The adjoint identity `∫ (K ⋆ f) g = ∫ f (K^∨ ⋆ g)` for `f ∈ L_p`, `g ∈ L_q`, and its form `∫ (K ⋆ f) conj g = ∫ f conj(K^* ⋆ g)` with the adjoint kernel, derivatives of Schwartz kernels moved to the other Schwartz factor, translates and reflections of Schwartz functions, and weak derivatives commuting with convolution by Schwartz functions, on `ℝ^d`, in `L_p` and on open sets | ✅ | ✗ | `Rd/SingularIntegrals/ConvolutionAdjoint` |
 | The Cauchy–Schwarz inequality for finite sums, the `L_2` bounds of the analysis operator and of the synthesis operators on finite index sets for a kernel family with Fourier overlap `B`, and for every Calderón–Zygmund family | ✅ | ✗ | `Rd/SingularIntegrals/PlancherelBounds` |
 | The Hörmander condition around a cube, convolutions of pieces with mean zero, and the weak type `(1,1)` of the analysis and synthesis operators of a Calderón–Zygmund family with an explicit constant | ✅ | ✗ | `Rd/SingularIntegrals/VectorValuedWeakType` |

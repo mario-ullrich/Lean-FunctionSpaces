@@ -38,10 +38,12 @@ inequalities of order `s`, the form in which the embeddings on measure spaces ar
 **Triebel–Lizorkin spaces** `F^s_{p,q}(ℝ^d)` take the `ℓ_q` norm of the Littlewood–Paley blocks
 `ψ_j ⋆ f` at every point before the `L_p` norm: they consist of the `f ∈ L_p(ℝ^d)` with
 `‖ x ↦ ‖(2^(js) |ψ_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p < ∞`. For `q = p` and `s > 0` they are the Besov
-spaces `B^s_{p,p}`. All Besov and Triebel–Lizorkin spaces here are subspaces of `L_p` with
-`1 ≤ p`, in most results with `1 ≤ q` and `p < ∞`. The Triebel–Lizorkin spaces and the
-Littlewood–Paley descriptions on `ℝ^d` use one fixed family `ψ_j`; for `s < 0`, `F^s_{p,q}` is
-the part `F^s_{p,q} ∩ L_p` of the classical space.
+spaces `B^s_{p,p}`. The Besov spaces and the Triebel–Lizorkin spaces of functions here are
+subspaces of `L_p` with `1 ≤ p`, in most results with `1 ≤ q` and `p < ∞`. The Triebel–Lizorkin
+spaces and the Littlewood–Paley descriptions on `ℝ^d` use one fixed family `ψ_j`; for `s < 0`,
+`F^s_{p,q}` is the part `F^s_{p,q} ∩ L_p` of the classical space. For tempered distributions,
+`Rd.triebelLizorkinNormDistr` describes `F^s_{p,q}` for every real `s` without the restriction to
+`L_p`.
 
 **Characterisations and domains.** Each setting has its natural descriptions of these spaces:
 Fourier coefficients and Littlewood–Paley blocks on the torus and on `ℝ^d`, splines and Haar or

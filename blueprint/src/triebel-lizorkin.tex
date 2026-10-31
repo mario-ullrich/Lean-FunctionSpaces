@@ -27,8 +27,9 @@ those of Triebel~\cite{TriebelII}; the descriptions are proved here for $1 < p <
 $1 < q \leq \infty$. The atoms here are normalised in $L_\infty$ and the sequence space
 $f^s_{p,q}$ carries the weights $2^{js}$; Triebel states the atomic characterisation with
 $(s,p)$-atoms normalised in $L_p$, and the two forms correspond under
-$\lambda_{j,m} \mapsto 2^{j(s - n/p)} \lambda_{j,m}$. The last two sections identify the real
-interpolation spaces of Triebel--Lizorkin and of Bessel potential spaces with Besov spaces
+$\lambda_{j,m} \mapsto 2^{j(s - n/p)} \lambda_{j,m}$. \Cref{sec:tl-distributions} defines
+$\TL{s}{p}{q}$ for tempered distributions and every real $s$. The last two sections identify
+the real interpolation spaces of Triebel--Lizorkin and of Bessel potential spaces with Besov spaces
 (\Cref{sec:tl-interpolation}), and those of Triebel--Lizorkin spaces on the torus
 (\Cref{sec:torus-tl-interpolation}).
 
@@ -83,6 +84,7 @@ and $\TL{s}{p}{q}$ consists of the $f \in L_p$ with $\|f\|_{F^s_{p,q}} < \infty$
 \end{definition}
 
 For $s < 0$ this is the part $\TL{s}{p}{q} \cap L_p$ of the classical space of tempered
+distributions; \Cref{sec:tl-distributions} defines $\TL{s}{p}{q}$ for tempered
 distributions.
 
 The Littlewood--Paley quasi-norm of the Besov spaces (\Cref{def:lp-blocks}) takes the two norms
@@ -242,6 +244,181 @@ $\min(p,q)$, and so do the inclusions.
 For $q = 2$ the theorem places $\TL{s}{p}{2}$ between $\Besov{s}{p}{\min(p,2)}$ and
 $\Besov{s}{p}{\max(p,2)}$: for $p \geq 2$ between $\Besov{s}{p}{2}$ and $\Besov{s}{p}{p}$, for
 $p \leq 2$ between $\Besov{s}{p}{p}$ and $\Besov{s}{p}{2}$.
+
+\section{Triebel--Lizorkin spaces of tempered distributions}
+\label{sec:tl-distributions}
+
+The quasi-norm of \Cref{def:triebel-lizorkin} is defined on $L_p$. Here the Littlewood--Paley
+blocks act on tempered distributions as Fourier multipliers, $\Delta_j u = (\widehat{\psi_j})(D) u$,
+and a tempered distribution lies in $\TL{s}{p}{q}$ when every block is an $L_p$ function and the
+mixed norm of the weighted blocks is finite; this describes $\TL{s}{p}{q}$ for every real $s$. The
+blocks need the kernels $\psi_j = (G^\psi_j)_{2^j}$ as Schwartz functions (\Cref{lem:psi-base},
+\Cref{def:schwartz-dilate}). The Fourier multiplier $m(D)$ of a tempered distribution is defined
+in the paragraph before \Cref{lem:fourier-multiplier-fourier}; Fourier multipliers on these spaces
+are the subject of \Cref{sec:tl-multipliers}.
+
+\paragraph{Convolutions as Fourier multipliers.}
+
+\begin{lemma}[Convolutions as Fourier multipliers]
+\label{lem:conv-fourier-multiplier}
+\lean{Rd.fourierMultiplierCLM_fourier_eq_convolution, Rd.fourierMultiplierCLM_fourier_eq_conv,
+  Rd.fourierMultiplierCLM_fourier_toLp_eq_conv}
+\leanok
+\uses{def:conv, lem:conv-op, lem:ae-equal-classes-distribution, lem:lp-kernels-basic}
+For all Schwartz functions $\eta, \varphi \colon V \to \C$,
+$(\widehat\eta)(D) \varphi = \eta * \varphi$, Mathlib's convolution of Schwartz functions. For
+every $1 \leq r < \infty$, every Schwartz function $\eta$ and every $G \in L_r(V)$,
+$(\widehat\eta)(D) G = \eta * G$ as tempered distributions.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Both sides of the first identity are Schwartz functions with the Fourier transform $\widehat\eta \,
+\widehat\varphi$ (Mathlib's \texttt{SchwartzMap.\allowbreak fourier\_\allowbreak convolution}), and
+the Fourier transform is injective on Schwartz functions; Mathlib's convolution of Schwartz
+functions is the convolution integral (\texttt{SchwartzMap.\allowbreak convolution\_\allowbreak
+apply}). For the second, both sides are continuous in $G \in L_r(V)$, as maps into the tempered
+distributions: $(\widehat\eta)(D)$ is continuous on $\mathcal S'(V)$, $L_r(V)$ embeds continuously,
+and $G \mapsto \eta * G$ is bounded on $L_r(V)$ (\Cref{lem:conv-op}). They agree on Schwartz
+functions by the first identity, and Schwartz functions are dense in $L_r(V)$ for $r < \infty$
+(Mathlib's \texttt{SchwartzMap.\allowbreak denseRange\_\allowbreak toLpCLM}); two continuous maps
+into a Hausdorff space that agree on a dense set are equal.
+\end{proof}
+
+\paragraph{The blocks of tempered distributions.}
+
+\begin{definition}[Blocks of tempered distributions]
+\label{def:distrib-block}
+\lean{Rd.fourier_psiS_apply, Rd.distribBlock}
+\leanok
+\uses{def:psi-base, lem:psi-base, def:schwartz-dilate, def:lp-kernels}
+For every $j \in \N$ and every tempered distribution $u$ on $V$ let
+$\Delta_j u = (\widehat{\psi_j})(D) u$, with the Schwartz function $\psi_j = (G^\psi_j)_{2^j}$
+of \Cref{lem:psi-base}.
+\end{definition}
+
+\begin{lemma}[Blocks of $L_r$ functions]
+\label{lem:distrib-block-lp}
+\lean{Rd.distribBlock_toTemperedDistribution}
+\leanok
+\uses{def:distrib-block, lem:conv-fourier-multiplier, def:lp-blocks, def:triebel-lizorkin}
+For every $1 \leq r < \infty$, every $f \in L_r(V)$ and every $j \in \N$, the block $\Delta_j f$
+of the tempered distribution of $f$ is the tempered distribution of the block
+$\psi_j * f \in L_r(V)$ of \Cref{def:lp-blocks}.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:conv-fourier-multiplier} with $\eta = \psi_j$.
+\end{proof}
+
+\begin{theorem}[Littlewood--Paley decomposition of tempered distributions]
+\label{thm:distrib-block-decomposition}
+\lean{Rd.sum_fourier_psiS_apply, Rd.sum_distribBlock, Rd.smulLeftCLM_sum_fourier_psiS,
+  Rd.tendsto_sum_distribBlock}
+\leanok
+\uses{def:distrib-block, lem:fourier-psi-window, lem:lp-kernels-frequency, def:schwartz-cutoff,
+  lem:schwartz-cutoff-tendsto}
+For every $J \in \N$ and every $\xi \in V$, $\sum_{j \leq J} \widehat{\psi_j}(\xi) =
+\chi(2^{-J} \xi)$ with the cut-off $\chi = \chi_{1,2}$ of \Cref{def:lp-kernels}, so
+$\sum_{j \leq J} \Delta_j u$ is the Fourier multiplier with $\chi(2^{-J} \cdot)$ for every
+tempered distribution $u$. For every tempered distribution $u$ on $V$,
+\[
+  \sum_{j < J} \Delta_j u \to u \qquad (J \to \infty)
+\]
+in $\mathcal S'(V)$, that is, $\sum_{j < J} \Delta_j u(\varphi) \to u(\varphi)$ for every
+Schwartz function $\varphi$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The Fourier transforms of the blocks telescope to $\widehat{\Phi_J}(\xi) = \chi(2^{-J} \xi)$
+(\Cref{lem:fourier-psi-window}, \Cref{lem:lp-kernels-frequency}), and Fourier multipliers add
+(Mathlib's \texttt{TemperedDistribution.\allowbreak fourierMultiplierCLM\_\allowbreak sum}). For a
+Schwartz function $\varphi$, with $w = \mathcal F^{-1} \varphi$,
+$\sum_{j \leq J} \Delta_j u(\varphi) = u\bigl(\mathcal F(\chi(2^{-J} \cdot) \, w)\bigr)$, and
+$\chi(2^{-J} \cdot) \, w$ is the cut-off of $w$ at radius $2^J$ (\Cref{def:schwartz-cutoff}). The
+cut-offs converge to $w$ in the Schwartz space (\Cref{lem:schwartz-cutoff-tendsto}), and
+$\mathcal F$ and $u$ are continuous, so the values converge to $u(\mathcal F w) = u(\varphi)$.
+\end{proof}
+
+\paragraph{The quasi-norm.}
+
+\begin{definition}[Triebel--Lizorkin spaces of tempered distributions]
+\label{def:tl-distr}
+\lean{Rd.triebelLizorkinNormDistr, Rd.MemTriebelLizorkinDistr,
+  Rd.aemeasurable_lqNorm_dyadicWeight_Lp}
+\leanok
+\uses{def:distrib-block, def:lq-norm}
+Let $1 \leq p \leq \infty$, $s \in \R$ and $1 \leq q \leq \infty$. For every tempered distribution
+$u$ on $V$ let
+\[
+  \|u\|_{F^s_{p,q}} = \inf \Bigl\| x \mapsto \bigl\| (2^{js} |g_j(x)|)_{j \in \N}
+  \bigr\|_{\ell_q} \Bigr\|_{L_p} ,
+\]
+the infimum over the families $(g_j)$ of functions in $L_p(V)$ with $\Delta_j u = g_j$ as
+tempered distributions for every $j$; it is $\infty$ if there is no such family. The space
+$\TL{s}{p}{q}$ consists of the tempered distributions $u$ with $\|u\|_{F^s_{p,q}} < \infty$.
+For every family $(g_j)$ in $L_p(V)$ the function
+$x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_q}$ is almost everywhere measurable.
+\end{definition}
+
+\begin{lemma}[The quasi-norm of the representing family]
+\label{lem:tl-distr-eq}
+\lean{Rd.triebelLizorkinNormDistr_le, Rd.triebelLizorkinNormDistr_eq,
+  Rd.triebelLizorkinNormDistr_eq_top, Rd.le_mul_triebelLizorkinNormDistr}
+\leanok
+\uses{def:tl-distr, lem:lp-distribution-determined}
+Let $1 \leq p \leq \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $u$ a tempered distribution.
+For every family $(g_j)$ in $L_p(V)$ with $\Delta_j u = g_j$ for every $j$,
+$\|u\|_{F^s_{p,q}} = \| x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_q} \|_{L_p}$. If there is no such
+family, $\|u\|_{F^s_{p,q}} = \infty$. Hence, for every $X \in [0, \infty]$ and every
+$C \in (0, \infty]$ such that $X \leq C \| x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_q} \|_{L_p}$
+for every such family, $X \leq C \|u\|_{F^s_{p,q}}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$L_p$ functions are determined by their tempered distributions
+(\Cref{lem:lp-distribution-determined}), so there is at most one such family. Without a
+family, $C \cdot \infty = \infty$ since $C \neq 0$.
+\end{proof}
+
+\begin{theorem}[Compatibility with $L_p$]
+\label{thm:tl-distr-lp}
+\lean{Rd.triebelLizorkinNormDistr_toTemperedDistribution,
+  Rd.memTriebelLizorkinDistr_toTemperedDistribution_iff}
+\leanok
+\uses{lem:tl-distr-eq, lem:distrib-block-lp, def:triebel-lizorkin}
+For every $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p(V)$, the
+quasi-norm of the tempered distribution of $f$ (\Cref{def:tl-distr}) is the quasi-norm
+$\|f\|_{F^s_{p,q}}$ of \Cref{def:triebel-lizorkin}. In particular the two definitions of
+$f \in \TL{s}{p}{q}$ agree.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The blocks of $f$ are the $L_p$ functions $\psi_j * f$ (\Cref{lem:distrib-block-lp}), and
+\Cref{lem:tl-distr-eq} applies to them.
+\end{proof}
+
+\begin{proposition}[Monotonicity in $q$ and $s$]
+\label{prop:tl-distr-mono}
+\lean{Rd.triebelLizorkinNormDistr_mono_exponent, Rd.triebelLizorkinNormDistr_mono_smoothness,
+  Rd.MemTriebelLizorkinDistr.mono_exponent, Rd.MemTriebelLizorkinDistr.mono_smoothness}
+\leanok
+\uses{def:tl-distr, lem:tl-distr-eq, lem:mixed-norm-dyadic-family}
+Let $1 \leq p \leq \infty$ and $u$ a tempered distribution. For all $1 \leq q \leq r \leq \infty$
+and every real $s$, $\|u\|_{F^s_{p,r}} \leq \|u\|_{F^s_{p,q}}$, so
+$\TL{s}{p}{q} \subseteq \TL{s}{p}{r}$. For all reals $s \leq t$ and every $q$,
+$\|u\|_{F^s_{p,q}} \leq \|u\|_{F^t_{p,q}}$, so $\TL{t}{p}{q} \subseteq \TL{s}{p}{q}$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+For every representing family, $\|\cdot\|_{\ell_r} \leq \|\cdot\|_{\ell_q}$ and
+$2^{js} \leq 2^{jt}$ at every point.
+\end{proof}
 
 \section{Triebel--Lizorkin spaces on the torus}
 
@@ -2666,11 +2843,11 @@ $\sup_x \|x\|^k \|D^l \Phi(x)\|$ and $\sup_x \|x\|^k \|D^l (\Phi - \delta_{1/2} 
 
 \begin{lemma}[The blocks form a uniform family]
 \label{lem:psi-base}
-\lean{Rd.dilate_psiBase, Rd.isUniformSchwartz_psiBase}
+\lean{Rd.dilate_psiBase, Rd.psiS, Rd.coe_psiS, Rd.isUniformSchwartz_psiBase}
 \leanok
 \uses{def:psi-base, lem:dilate-sub-l1, def:moment-kernel, lem:uniform-schwartz-constants}
-For every $j \in \N$, $\psi_j = (G^{\psi}_j)_{2^j}$, and $(G^{\psi}_j)$ is uniformly Schwartz
-with bounds $A^{\psi}$.
+For every $j \in \N$, $\psi_j = (G^{\psi}_j)_{2^j}$, a Schwartz function, and $(G^{\psi}_j)$ is
+uniformly Schwartz with bounds $A^{\psi}$.
 \end{lemma}
 
 \begin{proof}

@@ -416,10 +416,7 @@ theorem dyadicWeight_mul_enorm_blockFun_eq {q r : ℝ≥0∞} [Fact (1 ≤ q)] [
     (hgh : (g : 𝓢'(V, ℂ)) = besselPotential V ℂ (-s) (h : 𝓢'(V, ℂ))) (j : ℕ) (x : V) :
     dyadicWeight s j * ‖blockFun j g x‖ₑ =
       ‖conv (dilate (2 ^ j) (besselBase (-s) (psiBase (V := V)) j : V → ℂ)) h volume x‖ₑ := by
-  have hpsi : psi (V := V) j =
-      ⇑(schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (psiBase (V := V) j)) := by
-    rw [coe_schwartzDilate, dilate_psiBase]
-  rw [blockFun, hpsi, conv_eq_conv_besselSchwartz hgh,
+  rw [blockFun, ← coe_psiS, psiS, conv_eq_conv_besselSchwartz hgh,
     conv_besselSchwartz_schwartzDilate, conv_smul, Pi.smul_apply, smul_eq_mul, enorm_mul,
     enorm_two_pow_rpow, ← mul_assoc, ENNReal.dyadicWeight_neg,
     ENNReal.mul_inv_cancel (ENNReal.dyadicWeight_ne_zero s j) (ENNReal.dyadicWeight_ne_top s j),
