@@ -137,6 +137,7 @@ public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen
 public import FunctionSpaces.Domains.Spectral.DirichletEigenbasis
 public import FunctionSpaces.Domains.Spectral.NeumannEigenbasis
+public import FunctionSpaces.Domains.Spectral.SpectralBesov
 public import FunctionSpaces.Domains.Manifolds.SmoothMeasure
 public import FunctionSpaces.Domains.Manifolds.BesovAtlas
 public import FunctionSpaces.Domains.Manifolds.Besov
@@ -379,7 +380,8 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   polarization of a norm identity.
 * `FunctionSpaces.MeasureSpaces.Spectral.CompactEmbedding`: compact dense embeddings of Hilbert
   spaces, their eigenvector and singular bases, the spectral scheme with level `⌊σ⁻¹⌋₊`, Jackson
-  and Bernstein inequalities and the interpolation spaces `(H, J(V))_{θ,q} = A^θ_q`.
+  and Bernstein inequalities, the interpolation spaces `(H, J(V))_{θ,q} = A^θ_q` and `A^s_2` by
+  the singular values.
 * `FunctionSpaces.MeasureSpaces.Spectral.ContinuousSpectralBasis`: continuous spectral bases,
   Hilbert bases of `L_2` of a finite measure represented by bounded continuous functions (modelled
   on the eigenfunctions of a Laplacian), their scheme, `B^s_{2,2} = H^s` and the Sobolev spaces.
@@ -766,6 +768,13 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   eigenvalues `λ_i = σ_i⁻² - 1 ≥ 0`, among them `0`, the weak eigenvalue equation, `W^1_2(Ω)` as
   the Sobolev space of order `1` of the scheme, and `(L_2(Ω), W^1_2(Ω))_{θ,q}` as its
   approximation spaces.
+* `FunctionSpaces.Domains.Spectral.SpectralBesov`: Besov spaces on domains by eigenfunction
+  expansions: differences and moduli of `H^1(ℝ^d)` functions by the gradient, the intrinsic
+  modulus on a domain by the K-functional of `(L_2(Ω), W^1_2(Ω))`, the restriction of
+  `(L_2(ℝ^d), H^1(ℝ^d))` to the Neumann couple, `B^θ_{2,q}(Ω)` for `0 < θ < 1` as the
+  approximation space `A^θ_q` of the Neumann eigenbasis on a bounded Lipschitz domain, in dyadic
+  blocks and for `q = 2` by the eigenvalues, and the zero extension of the Dirichlet
+  approximation spaces into `B^θ_{2,q}(ℝ^d)` on a bounded open set.
 
 #### `Domains/Manifolds`: compact manifolds and smooth domains
 

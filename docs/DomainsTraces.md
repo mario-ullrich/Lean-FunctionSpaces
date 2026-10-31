@@ -59,7 +59,10 @@ scheme, and the real interpolation spaces between `L_2(Ω)` and `H^1_0(Ω)` are 
 spaces. On a bounded Lipschitz domain the same holds for `W^1_2(Ω)`, the graph of the weak
 gradient in `L_2(Ω) × L_2(Ω)^n`: Rellich's theorem through the extension theorem makes
 `W^1_2(Ω) → L_2(Ω)` compact, and its singular basis is the eigenbasis of the Neumann Laplacian,
-with the eigenvalue `0` of the constants. The [interface document](FEECInterface.md) lists the
+with the eigenvalue `0` of the constants. There the Besov space
+`B^θ_{2,q}(Ω)`, `0 < θ < 1`, defined by intrinsic differences, is the approximation space of the
+Neumann eigenbasis; on a bounded open set the zero extension maps the approximation spaces of the
+Dirichlet eigenbasis into `B^θ_{2,q}(ℝ^d)`. The [interface document](FEECInterface.md) lists the
 results for `p = 2` for a FEEC/BEEC library built on this project, with the decisions behind their
 form.
 
@@ -625,6 +628,22 @@ form.
   `1 ≤ q ≤ ∞`, `(L_2(Ω), W^1_2(Ω))_{θ,q}` is the approximation space `A^θ_q` of the Neumann
   scheme (`Rd.BoundedLipschitzDomain.memKMethod_neumann_iff`), described by dyadic blocks of
   coefficients (`Rd.BoundedLipschitzDomain.memKMethod_neumann_iff_blockNorm_lt_top`).
+* **Besov spaces on domains by eigenfunction expansions.** Let `Ω` be a bounded Lipschitz domain
+  in dimension `n ≥ 1`, `0 < θ < 1`, `1 ≤ q ≤ ∞` and `r ≥ 1` an integer. For every `f ∈ L_2(V)`,
+  `f|_Ω` lies in the approximation space `A^θ_q` of the Neumann eigenbasis iff
+  `‖f‖_{L_2(Ω)} + ‖(2^(kθ) ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_q} < ∞`, that is iff
+  `f|_Ω ∈ B^θ_{2,q}(Ω)` (`Rd.BoundedLipschitzDomain.memApprox_neumannScheme_iff`); equivalently
+  the dyadic blocks of the Neumann coefficients of `f|_Ω` have finite `B^θ_{2,q}` norm
+  (`Rd.BoundedLipschitzDomain.modNormOn_lt_top_iff_blockNorm_lt_top`), and for `q = 2` iff
+  `∑_i (1 + λ_i)^θ |⟨e_i, f|_Ω⟩|² < ∞` (`Rd.BoundedLipschitzDomain.modNormOn_two_lt_top_iff`).
+  On every bounded open set `Ω` in dimension `n ≥ 1`, the zero extension of every `g` in the
+  approximation space `A^θ_q` of the Dirichlet eigenbasis lies in `B^θ_{2,q}(V)`
+  (`Rd.memApprox_bandScheme_extendByZero_of_memApprox_dirichletScheme`).
+  The proof bounds the modulus on `Ω` by the K-functional of `(L_2(Ω), W^1_2(Ω))`
+  (`Rd.BoundedLipschitzDomain.exists_lpModulusOn_le_kFunctional`), with
+  `ω_r(ι U, 2^(-k))_2 ≤ 2^(r-1) 2π 2^(-k) ‖U‖` for `U ∈ H^1(V)` (`Rd.lpModulus_toL2_le`), and
+  restricts `(L_2(V), H^1(V))_{θ,q} = B^θ_{2,q}(V)` to `Ω`
+  (`Rd.memKMethod_neumann_restrict_of_memKMethod`).
 
 ## What is formalised
 
@@ -675,6 +694,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, smoothing with compact support, cone mollifiers, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)` | ✅ | ✗ | `Domains/Traces/TraceKernel` |
 | The Dirichlet Laplacian on bounded open sets: the inner product of `H^1(ℝ^d)` by the weak gradient, the compact dense embedding `H^1_0(Ω) → L_2(Ω)`, the Dirichlet eigenbasis as a spectral scheme with eigenvalues `λ_i ≥ 0`, the weak eigenvalue equation, `H^1_0(Ω)` as the Sobolev space of order `1` of the scheme, and `(L_2(Ω), H^1_0(Ω))_{θ,q} = A^θ_q` | ✅ | ✗ | `Domains/Spectral/DirichletEigenbasis` |
 | The Neumann Laplacian on bounded Lipschitz domains: `W^1_2(Ω)` as the graph of the weak gradient in `L_2(Ω) × L_2(Ω)^n` and as jets, the dense embedding into `L_2(Ω)` through `H^1_0(Ω)`, Rellich's theorem with bounded `H^1(Ω)` representatives, the Neumann eigenbasis as a spectral scheme with eigenvalues `λ_i = σ_i⁻² - 1 ≥ 0`, among them `0`, the weak eigenvalue equation, `W^1_2(Ω)` as the Sobolev space of order `1` of the scheme, and `(L_2(Ω), W^1_2(Ω))_{θ,q} = A^θ_q` | ✅ | ✗ | `Domains/Spectral/NeumannEigenbasis` |
+| Besov spaces on domains by eigenfunction expansions: differences and moduli of `H^1(ℝ^d)` functions by the gradient, the intrinsic modulus by the K-functional of `(L_2(Ω), W^1_2(Ω))`, `B^θ_{2,q}(Ω)` for `0 < θ < 1` as the approximation space of the Neumann eigenbasis on bounded Lipschitz domains, in dyadic blocks and for `q = 2` by the eigenvalues, and the Dirichlet approximation spaces in `B^θ_{2,q}(ℝ^d)` by zero extension | ✅ | ✗ | `Domains/Spectral/SpectralBesov` |
 | Bounded Lipschitz domains from the set-level definition: sets Lipschitz near a point, local graphs as Lipschitz graph domains, McShane's extension of local graphs, the structure from a family of charts and the converse, the ball | ✅ | ✗ | `Domains/Lipschitz/LocalLipschitzGraphs` |
 | Bounded open convex sets as bounded Lipschitz domains: the ray length, its cone estimate, open convex sets, bounded or not, near a frontier point as regions above a Lipschitz graph, and the open unit cube with its closure | ✅ | ✗ | `Domains/Lipschitz/ConvexDomains` |
 | Lipschitz graph domains with null graphs and boundaries, closures of convex Lipschitz graph domains as Besov domains, the quadrant as a Lipschitz graph domain and the quadrant model of manifolds with corners as a Besov domain, bounded Lipschitz domains with the extension property, closures of nonempty convex bounded Lipschitz domains and of nonempty bounded open convex sets, closed balls of positive radius and the closed unit cube as Besov domains | ✅ | ✗ | `Domains/Lipschitz/BesovDomains` |

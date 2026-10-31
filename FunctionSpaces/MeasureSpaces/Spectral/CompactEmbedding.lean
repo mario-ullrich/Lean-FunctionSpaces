@@ -31,7 +31,8 @@ Hilbert basis `(e_i)` of eigenvectors with eigenvalues `μ_i ≠ 0`
   (`CompactDenseEmbedding.spectralScheme`), for which `J` satisfies Jackson's and Bernstein's
   inequalities of order `1` with constant `1`;
 * hence `(H, J(V))_{θ,q} = A^θ_q` for `0 < θ < 1`, and `J(V)` is the Sobolev space of order `1`
-  of the scheme.
+  of the scheme; for `s > 0`, `f ∈ A^s_2` iff `∑_i σ_i^(-2s) |⟨e_i, f⟩|² < ∞`
+  (`CompactDenseEmbedding.memApprox_two_iff`).
 
 Every eigenvalue of `J J†` is some `μ_i`; in particular a nonzero `u ∈ V` with
 `⟨u, w⟩_V = ⟨J u, J w⟩_H` for all `w` gives a singular value `1`
@@ -528,5 +529,34 @@ theorem range_eq_range_sobolevEmbed :
       abs_of_pos (show (0 : ℝ) < 1 + J.level i by positivity)]
     gcongr
     exact J.inv_singularValue_le_one_add_level i
+
+/-- **`A^s_2` by the singular values**: for `s > 0`, `f ∈ H` lies in the approximation space
+`A^s_2` of the spectral scheme iff `∑_i σ_i^(-2s) |⟨e_i, f⟩|² < ∞`, that is,
+`(σ_i^(-s) ⟨e_i, f⟩)_i ∈ ℓ_2`: by
+`SpectralScheme.memApprox_two_iff` the weights are `(1 + ⌊σ_i⁻¹⌋₊)^s`, and
+`σ_i⁻¹ ≤ 1 + ⌊σ_i⁻¹⌋₊ ≤ (1 + ‖J‖) σ_i⁻¹`. -/
+theorem memApprox_two_iff {s : ℝ} (hs : 0 < s) (f : H) :
+    J.spectralScheme.toScheme.MemApprox s 2 f ↔
+      Memℓp (fun i => (((J.singularValue i)⁻¹ ^ s : ℝ) : ℂ) * J.eigenBasis.repr f i) 2 := by
+  have hw : ∀ i, J.spectralScheme.weight s i = (1 + J.level i) ^ s := fun i => by
+    simp [SpectralScheme.weight]
+  have hσ : ∀ i, 0 ≤ (J.singularValue i)⁻¹ := fun i => inv_nonneg.2 (J.singularValue_pos i).le
+  rw [J.spectralScheme.memApprox_two_iff hs f, spectralScheme_basis]
+  constructor
+  · intro h
+    refine h.mono' fun i => ?_
+    rw [norm_mul, norm_mul, Complex.norm_real, Complex.norm_real, Real.norm_eq_abs,
+      Real.norm_eq_abs, abs_of_nonneg (Real.rpow_nonneg (hσ i) s), hw,
+      abs_of_nonneg (Real.rpow_nonneg (by positivity) s)]
+    exact mul_le_mul_of_nonneg_right
+      (Real.rpow_le_rpow (hσ i) (J.inv_singularValue_le_one_add_level i) hs.le) (norm_nonneg _)
+  · intro h
+    refine ((h.norm).const_mul ((1 + ‖J.toCLM‖) ^ s)).mono fun i => ?_
+    rw [norm_mul, norm_mul, Complex.norm_real, Complex.norm_real, Real.norm_eq_abs,
+      Real.norm_eq_abs, abs_of_nonneg (Real.rpow_nonneg (hσ i) s), hw,
+      abs_of_nonneg (Real.rpow_nonneg (by positivity) s), ← mul_assoc,
+      ← Real.mul_rpow (by positivity) (hσ i)]
+    exact mul_le_mul_of_nonneg_right
+      (Real.rpow_le_rpow (by positivity) (J.one_add_level_le i) hs.le) (norm_nonneg _)
 
 end CompactDenseEmbedding

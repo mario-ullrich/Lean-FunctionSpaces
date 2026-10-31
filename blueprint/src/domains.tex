@@ -148,17 +148,21 @@ dilations of $g$.
 \begin{lemma}[Multiplication by an indicator]
 \label{lem:indicator-lp}
 \lean{Rd.memLp_indicator_coe, Rd.norm_toLp_indicator_le, Rd.indicatorLp,
-  Rd.indicatorLp_apply_ae, Rd.setIntegral_mul_eq_lpPairing, Rd.enorm_indicatorLp_le}
+  Rd.indicatorLp_apply_ae, Rd.setIntegral_mul_eq_lpPairing, Rd.enorm_indicatorLp_le,
+  Rd.enorm_indicatorLp_eq}
 \leanok
 Let $\mu$ be a measure on $X$, $S \subseteq X$ measurable and $1 \leq p \leq \infty$. Then
-$h \mapsto 1_S h$ is a bounded linear operator on $L_p(\mu)$ of norm at most $1$. For all
+$h \mapsto 1_S h$ is a bounded linear operator on $L_p(\mu)$ of norm at most $1$, and for every
+$h \in L_p(\mu)$, $\|1_S h\|_{L_p(\mu)} = \|h|_S\|_{L_p(\mu|_S)}$. For all
 $a, b \in L_2(\mu)$, $\int_S a b \, d\mu = \langle 1_S a, b \rangle$ with the bilinear pairing
 $\langle a, b \rangle = \int a b \, d\mu$ of $L_2(\mu)$ with itself.
 \end{lemma}
 
 \begin{proof}
 \leanok
-$|1_S h| \leq |h|$ pointwise, and $1_S a = a$ on $S$, $1_S a = 0$ off $S$ (Mathlib's
+$|1_S h| \leq |h|$ pointwise, $\|1_S h\|_{L_p(\mu)} = \|h\|_{L_p(\mu|_S)}$ (Mathlib's
+\texttt{MeasureTheory.\allowbreak eLpNorm\_\allowbreak indicator\_\allowbreak eq\_\allowbreak
+eLpNorm\_\allowbreak restrict}), and $1_S a = a$ on $S$, $1_S a = 0$ off $S$ (Mathlib's
 \texttt{ContinuousLinearMap.\allowbreak lpPairing\_\allowbreak eq\_\allowbreak integral}).
 \end{proof}
 
@@ -183,11 +187,15 @@ iff\_\allowbreak indicator\_\allowbreak ae\_\allowbreak eq}), and the class $1_S
 \begin{lemma}[Extension by zero in $L_p$]
 \label{lem:zero-extension-lp}
 \lean{Rd.memLp_indicator_restrict, Rd.eLpNorm_indicator_restrict_le, Rd.indicatorExtendLp,
-  Rd.indicatorExtendLp_apply_ae, Rd.enorm_indicatorExtendLp_le}
+  Rd.indicatorExtendLp_apply_ae, Rd.enorm_indicatorExtendLp_le,
+  Rd.indicatorLp_indicatorExtendLp_restrict}
 \leanok
+\uses{lem:indicator-lp-eq-iff}
 For every measure $\mu$ on $X$, every $O \subseteq X$, every measurable $T \subseteq O$ and every
 $1 \leq p \leq \infty$, the extension by zero $g \mapsto 1_T g$ is a bounded linear operator
-from $L_p(\mu|_O)$ to $L_p(\mu)$ of norm at most $1$.
+from $L_p(\mu|_O)$ to $L_p(\mu)$ of norm at most $1$. For every measure $\mu$ on $X$, every
+measurable $S \subseteq X$, every $1 \leq p \leq \infty$ and every $f \in L_p(\mu)$, the
+extension by zero of $f|_S \in L_p(\mu|_S)$ agrees with $f$ on $S$.
 \end{lemma}
 
 \begin{proof}
@@ -195,7 +203,8 @@ from $L_p(\mu|_O)$ to $L_p(\mu)$ of norm at most $1$.
 $\|1_T g\|_{L_p(\mu)} = \|g\|_{L_p(\mu|_T)} \leq \|g\|_{L_p(\mu|_O)}$ (Mathlib's
 \texttt{MeasureTheory.\allowbreak eLpNorm\_\allowbreak indicator\_\allowbreak eq\_\allowbreak
 eLpNorm\_\allowbreak restrict}), and $1_T (g + h) = 1_T g + 1_T h$, $1_T (c g) = c \, 1_T g$
-almost everywhere.
+almost everywhere. The last statement holds almost everywhere on $S$
+(\Cref{lem:indicator-lp-eq-iff}).
 \end{proof}
 
 \begin{lemma}[The support principle]
@@ -9293,6 +9302,8 @@ $H^1_0(\Omega) \hookrightarrow L_2(\Omega)$ the weak eigenvalue equation of the 
 the weak form of the Dirichlet problem. \Cref{sec:dirichlet-eigenbasis} treats the Dirichlet
 Laplacian on bounded open sets, and \Cref{sec:neumann-eigenbasis} the Neumann Laplacian on
 bounded Lipschitz domains, with the embedding $\Sob{1}{2}(\Omega) \hookrightarrow L_2(\Omega)$.
+\Cref{sec:spectral-besov-domains} describes the Besov spaces $B^\theta_{2,q}(\Omega)$,
+$0 < \theta < 1$, by expansions in these eigenbases.
 
 \section{The Dirichlet Laplacian}
 \label{sec:dirichlet-eigenbasis}
@@ -9762,6 +9773,284 @@ block norm of \Cref{thm:spectral-coefficients} with $s = \theta$ is finite.
 \Cref{cor:compact-embedding-interpolation} for $J^N_\Omega$ (\Cref{thm:neumann-eigenbasis}) and
 \Cref{thm:spectral-coefficients}.
 \end{proof}
+
+\section{Besov spaces by eigenfunction expansions}
+\label{sec:spectral-besov-domains}
+
+Let $0 < \theta < 1$ and $q \in [1, \infty]$. On a bounded Lipschitz domain the interpolation
+space $(L_2(\Omega), \Sob{1}{2}(\Omega))_{\theta, q}$ is the approximation space $A^\theta_q$ of
+the Neumann scheme (\Cref{cor:neumann-interpolation}). This section identifies it with the Besov
+space $B^\theta_{2,q}(\Omega)$ of the intrinsic moduli of smoothness (\Cref{lem:modnorm-on}). One
+inclusion bounds the modulus on $\Omega$ by the $K$-functional, in the spirit of the
+equivalence of $K$-functionals and moduli of smoothness of Johnen and Scherer
+\cite{JohnenScherer1977} (see also \cite[(6.12) and Theorem~6.3]{DeVoreSharpley} and
+\cite[Theorem~6.7.3]{BerghLofstrom}); the other restricts the interpolation space
+$(L_2(V), H^1(V))_{\theta, q} = B^\theta_{2,q}(V)$ (\Cref{thm:bessel-potential-interpolate})
+and uses the Besov extension theorem. Throughout, $\iota U$ is the $L_2$ function of
+$U \in H^1(V)$ and $f|_\Omega \in L_2(\Omega)$ the restriction of $f \in L_2(V)$.
+
+\begin{lemma}[Differences of Schwartz functions in $L_2$]
+\label{lem:schwartz-differences-l2}
+\lean{Rd.sq_lintegral_Ioc_le, Rd.enorm_fwdDiff_schwartz_sq_le, Rd.eLpNorm_fwdDiff_schwartz_le}
+\leanok
+\uses{lem:schwartz-differences}
+For every measurable $\varphi \colon (0, 1] \to [0, \infty]$,
+$\bigl(\int_0^1 \varphi\bigr)^2 \leq \int_0^1 \varphi^2$. For every Schwartz function $G$ on $V$
+and all $v, x \in V$,
+\[
+  |G(x + v) - G(x)|^2 \leq \int_0^1 |\partial_v G(x + t v)|^2 \, dt .
+\]
+For every Schwartz function $G$ on $V$ and every $v \in V$,
+$\|G(\cdot + v) - G\|_2 \leq \|\partial_v G\|_2$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first inequality is H\"older's inequality with the constant function $1$ on an interval of
+length $1$. With the pointwise bound
+$|G(x + v) - G(x)| \leq \int_0^1 |\partial_v G(x + t v)| \, dt$ of
+\Cref{lem:schwartz-differences} it gives the second. Integrating over $x$ and averaging the
+translates of $|\partial_v G|^2$ along the segment (\Cref{lem:schwartz-differences}) gives the
+last bound.
+\end{proof}
+
+\begin{lemma}[Differences in $H^1(V)$]
+\label{lem:sobolev-one-differences}
+\lean{Rd.fwdDiffL2, Rd.fwdDiffL2_ae_eq, Rd.enorm_fwdDiffL2, Rd.enorm_fwdDiffL2_toLp_le,
+  Rd.norm_fwdDiffL2_toL2_le}
+\leanok
+\uses{lem:schwartz-differences-l2, def:sobolev-one-to-l2, lem:sobolev-of-schwartz,
+  thm:sobolev-schwartz-dense, lem:sobolev-one-weak-derivative-operator}
+For every $v \in V$, $\Delta_v f = f(\cdot + v) - f$ is a bounded linear operator on $L_2(V)$, and
+for every $U \in H^1(V)$,
+\[
+  \|\Delta_v \iota U\|_2 \leq 2\pi \|v\| \, \|U\| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\Delta_v$ is the translation by $v$, an isometry, minus the identity. For a Schwartz function $G$,
+$\|\Delta_v G\|_2 \leq \|\partial_v G\|_2 \leq 2\pi \|v\| \, \|G\|_{H^1}$
+(\Cref{lem:schwartz-differences-l2}, \Cref{lem:sobolev-of-schwartz},
+\Cref{lem:sobolev-one-weak-derivative-operator}). Both sides are continuous in $U$, and the
+Schwartz functions are dense in $H^1(V)$ (\Cref{thm:sobolev-schwartz-dense}).
+\end{proof}
+
+\begin{lemma}[The modulus of an $H^1$ function]
+\label{lem:modulus-h1-bound}
+\lean{Rd.lpModulus_one_toL2_le, Rd.lpModulus_toL2_le}
+\leanok
+\uses{lem:sobolev-one-differences, def:rd-modulus, lem:moduli-orders}
+For every order $r \geq 1$, every $U \in H^1(V)$ and every $k \in \N$,
+\[
+  \omega_r(\iota U, 2^{-k})_2 \leq 2^{r-1} \cdot 2\pi \cdot 2^{-k} \|U\| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $r = 1$ this is \Cref{lem:sobolev-one-differences} with $\|h\| \leq 2^{-k}$, and
+$\omega_{1 + l} \leq 2^l \omega_1$ (\Cref{lem:moduli-orders}).
+\end{proof}
+
+\begin{lemma}[The intrinsic modulus by the $K$-functional]
+\label{lem:modulus-on-k-functional}
+\lean{Rd.BoundedLipschitzDomain.exists_lpModulusOn_le_kFunctional,
+  Rd.BoundedLipschitzDomain.exists_modNormOn_le_interpNorm}
+\leanok
+\uses{lem:modulus-on-extension, lem:modulus-h1-bound, thm:neumann-rellich, def:k-functional,
+  def:interpolation, lem:modnorm-on, lem:indicator-lp}
+Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$, $K$ the $K$-functional of
+$J^N_\Omega$ and $r \geq 1$ an order. There is $C < \infty$ such that for every $f \in L_2(V)$ and
+every $k \in \N$,
+\[
+  \omega_r(f, 2^{-k}, \Omega)_2 \leq C \, K(2^{-k}, f|_\Omega).
+\]
+For every $\theta \in \R$ and every $q \in (0, \infty]$ there is $C' < \infty$ such that for every
+$f \in L_2(V)$
+\[
+  \|f\|_{L_2(\Omega)} + \bigl\| \bigl(2^{k\theta} \omega_r(f, 2^{-k}, \Omega)_2\bigr)_k
+    \bigr\|_{\ell_q}
+  \leq C' \Bigl( \|f|_\Omega\|_2 + \bigl\| \bigl(2^{k\theta} K(2^{-k}, f|_\Omega)\bigr)_k
+    \bigr\|_{\ell_q} \Bigr).
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Let $C_0$ be the constant of \Cref{thm:neumann-rellich}. For $w \in N(\Omega)$ take
+$u \in H^1(\Omega)$ with $u|_\Omega = J^N_\Omega w$ and $\|u\| \leq C_0 \|w\|$; as an element of
+$H^1(V)$, $u$ extends $J^N_\Omega w$, so
+$\|\mathbf 1_\Omega (f - \iota u)\|_2 = \|f|_\Omega - J^N_\Omega w\|_2$ (\Cref{lem:indicator-lp}).
+\Cref{lem:modulus-on-extension} with $G = \iota u$ and \Cref{lem:modulus-h1-bound} give
+\[
+  \omega_r(f, 2^{-k}, \Omega)_2 \leq 2^r \|f|_\Omega - J^N_\Omega w\|_2
+    + 2^{r-1} \cdot 2\pi \, C_0 \, 2^{-k} \|w\| ,
+\]
+and the infimum over $w$ gives the first bound with $C = \max(2^r, 2^{r-1} \cdot 2\pi C_0)$.
+Multiplying by $2^{k\theta}$ and taking $\ell_q$ norms gives the second with $C' = \max(1, C)$.
+\end{proof}
+
+\begin{lemma}[Restriction to the Neumann couple]
+\label{lem:neumann-restriction-couple}
+\lean{Rd.norm_restrictNeumann_apply_le, Rd.memKMethod_neumann_restrict_of_memKMethod}
+\leanok
+\uses{lem:neumann-dense, def:neumann-space, lem:sobolev-one-weak-gradient-norm,
+  def:bessel-potential-couples, def:bessel-potential-norm, lem:sobolev-one-to-l2, def:map-couple,
+  thm:interpolation-property}
+For every open $O \subseteq V$ and every $U \in H^1(V)$, the element
+$(\iota U|_O, ((\partial_{b_k} \iota U)|_O)_k)$ of $N(O)$ has norm at most $2\pi \|U\|$. For every
+open $O \subseteq V$, every $\theta \in \R$, every $q \in (0, \infty]$ and every $f \in L_2(V)$ in
+the interpolation space
+$(L_2(V), H^1(V))_{\theta, q}$ of the $L_2$ norm and the Bessel potential norm of order $1$,
+$f|_O \in (L_2(O), J^N_O(N(O)))_{\theta, q}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The squared norm of the element is
+$\|\iota U|_O\|_2^2 + \sum_k \|(\partial_{b_k} \iota U)|_O\|_2^2 \leq \|\iota U\|_2^2
++ \sum_k \|\partial_{b_k} \iota U\|_2^2 \leq (2\pi)^2 \|U\|^2$
+(\Cref{def:neumann-space}, \Cref{lem:sobolev-one-weak-gradient-norm}). The restriction has norm
+at most $1$ on $L_2$; a function of finite Bessel potential norm is $\iota U$ with $\|U\|$ equal to
+that norm (\Cref{def:bessel-potential-norm}, \Cref{lem:sobolev-one-to-l2}), and its restriction
+is the value of the element above (\Cref{lem:neumann-dense}). So the restriction maps the couple
+with constants $1$ and $2\pi$, and \Cref{thm:interpolation-property} applies.
+\end{proof}
+
+\begin{theorem}[Besov spaces by Neumann eigenfunction expansions]
+\label{thm:spectral-besov-neumann}
+\lean{Rd.BoundedLipschitzDomain.modNormOn_lt_top_of_memApprox_neumannScheme,
+  Rd.BoundedLipschitzDomain.memApprox_neumannScheme_of_modNormOn_lt_top,
+  Rd.BoundedLipschitzDomain.memApprox_neumannScheme_iff}
+\leanok
+\uses{lem:modulus-on-k-functional, lem:neumann-restriction-couple, cor:neumann-interpolation,
+  prop:couple-natural-grid, prop:map-couple-k-method, thm:bounded-lipschitz-besov,
+  thm:bessel-potential-interpolate, lem:indicator-lp-eq-iff}
+Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$ and $A^\theta_q$ the
+approximation spaces of the Neumann scheme (\Cref{thm:neumann-eigenbasis}). For every
+$0 < \theta < 1$, every $q \in [1, \infty]$, every order $r \geq 1$ and every $f \in L_2(V)$,
+\[
+  f|_\Omega \in A^\theta_q \iff
+  \|f\|_{L_2(\Omega)} + \bigl\| \bigl(2^{k\theta} \omega_r(f, 2^{-k}, \Omega)_2\bigr)_k
+    \bigr\|_{\ell_q} < \infty .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+$\Rightarrow$: $A^\theta_q = (L_2(\Omega), J^N_\Omega(N(\Omega)))_{\theta, q}$
+(\Cref{cor:neumann-interpolation}), whose norm on the grid $2^{-k}$ is finite
+(\Cref{prop:couple-natural-grid}, \Cref{prop:map-couple-k-method}) and bounds the right side
+(\Cref{lem:modulus-on-k-functional}). $\Leftarrow$: the Besov extension theorem gives
+$F \in B^\theta_{2,q}(V)$ with $F = f$ on $\Omega$ (\Cref{thm:bounded-lipschitz-besov},
+$r > \theta$), so $F \in (L_2(V), H^1(V))_{\theta, q}$
+(\Cref{thm:bessel-potential-interpolate}), and
+$f|_\Omega = F|_\Omega$ (\Cref{lem:indicator-lp-eq-iff}) lies in
+$(L_2(\Omega), J^N_\Omega(N(\Omega)))_{\theta, q}$ (\Cref{lem:neumann-restriction-couple}), which
+is $A^\theta_q$.
+\end{proof}
+
+So $B^\theta_{2,q}(\Omega)$, $0 < \theta < 1$, defined intrinsically by differences in $\Omega$,
+is the approximation space of the Neumann eigenbasis, with the order $r$ of the differences free.
+
+\begin{corollary}[Dyadic blocks of Neumann coefficients]
+\label{cor:spectral-besov-neumann-blocks}
+\lean{Rd.BoundedLipschitzDomain.modNormOn_lt_top_iff_blockNorm_lt_top}
+\leanok
+\uses{thm:spectral-besov-neumann, thm:spectral-coefficients}
+Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$. For every $0 < \theta < 1$,
+every $q \in [1, \infty]$, every order $r \geq 1$ and every $f \in L_2(V)$, the right side of
+\Cref{thm:spectral-besov-neumann} is finite if and only if the block norm of
+\Cref{thm:spectral-coefficients} of $f|_\Omega$ for the Neumann scheme with $s = \theta$ is finite.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:spectral-besov-neumann} and \Cref{thm:spectral-coefficients}.
+\end{proof}
+
+\begin{corollary}[$B^\theta_{2,2}(\Omega)$ by Neumann eigenvalues]
+\label{cor:spectral-sobolev-neumann}
+\lean{Rd.BoundedLipschitzDomain.modNormOn_two_lt_top_iff}
+\leanok
+\uses{thm:spectral-besov-neumann, cor:compact-embedding-interpolation, thm:neumann-eigenbasis}
+Let $\Omega$ be a bounded Lipschitz domain in dimension $n \geq 1$, with $(e_i)$ and $\lambda_i$ as
+in \Cref{thm:neumann-eigenbasis}. For every $0 < \theta < 1$, every order $r \geq 1$ and every
+$f \in L_2(V)$,
+\[
+  \|f\|_{L_2(\Omega)} + \bigl\| \bigl(2^{k\theta} \omega_r(f, 2^{-k}, \Omega)_2\bigr)_k
+    \bigr\|_{\ell_2} < \infty
+  \iff \sum_i (1 + \lambda_i)^\theta |\langle e_i, f|_\Omega \rangle|^2 < \infty .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:spectral-besov-neumann} with $q = 2$, \Cref{cor:compact-embedding-interpolation} for
+$A^\theta_2$, and $(1 + \lambda_i)^{\theta/2} = \sigma_i^{-\theta}$ (\Cref{thm:neumann-eigenbasis}).
+\end{proof}
+
+For the Dirichlet scheme on a bounded open set one inclusion holds in a stronger form: the zero
+extension lies in $B^\theta_{2,q}(V)$.
+
+\begin{lemma}[$H^1_0(\Omega)$ by zero extension]
+\label{lem:dirichlet-zero-extension}
+\lean{Rd.indicatorExtendLp_dirichletEmbedding,
+  Rd.memKMethod_indicatorExtendLp_of_memKMethod_dirichlet}
+\leanok
+\uses{def:dirichlet-embedding, lem:dirichlet-l2-inner, lem:zero-extension-lp,
+  def:bessel-potential-couples, def:bessel-potential-norm,
+  lem:sobolev-one-to-l2, def:map-couple, thm:interpolation-property}
+For every open $\Omega \subseteq V$ and every $w \in H^1_0(\Omega)$, the zero extension of
+$J_\Omega w$ is $\iota w$. For every open $\Omega \subseteq V$, every $\theta \in \R$, every
+$q \in (0, \infty]$ and every $g \in (L_2(\Omega), J_\Omega(H^1_0(\Omega)))_{\theta, q}$, the
+zero extension of $g$ lies in $(L_2(V), H^1(V))_{\theta, q}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\iota w$ vanishes outside $\Omega$ (\Cref{lem:dirichlet-l2-inner}) and equals $J_\Omega w$ on
+$\Omega$ (\Cref{def:dirichlet-embedding}). The zero extension has norm at most $1$ on $L_2$
+(\Cref{lem:zero-extension-lp}) and maps $J_\Omega w$ to $\iota w$, whose Bessel potential norm
+is $\|w\|$ (\Cref{def:bessel-potential-norm}, \Cref{lem:sobolev-one-to-l2}); so it maps the couple
+with constants $1$, and \Cref{thm:interpolation-property} applies.
+\end{proof}
+
+\begin{proposition}[The Dirichlet inclusion]
+\label{prop:spectral-besov-dirichlet-inclusion}
+\lean{Rd.memApprox_bandScheme_extendByZero_of_memApprox_dirichletScheme,
+  Rd.modNormOn_lt_top_of_memApprox_dirichletScheme}
+\leanok
+\uses{lem:dirichlet-zero-extension, cor:dirichlet-interpolation, thm:bessel-potential-interpolate,
+  thm:rd-besov, lem:restriction-moduli, lem:zero-extension-lp}
+Let $\Omega$ be a bounded open set in dimension $n \geq 1$ and $A^\theta_q$ the approximation
+spaces of the Dirichlet scheme (\Cref{thm:dirichlet-eigenbasis}). For every $0 < \theta < 1$,
+every $q \in [1, \infty]$ and every $g \in A^\theta_q$, the zero extension of $g$ lies in
+$B^\theta_{2,q}(V)$. For every $0 < \theta < 1$, every $q \in [1, \infty]$, every order
+$r \geq 1$ and every $f \in L_2(V)$ with $f|_\Omega \in A^\theta_q$,
+\[
+  \|f\|_{L_2(\Omega)} + \bigl\| \bigl(2^{k\theta} \omega_r(f, 2^{-k}, \Omega)_2\bigr)_k
+    \bigr\|_{\ell_q} < \infty .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+$A^\theta_q = (L_2(\Omega), J_\Omega(H^1_0(\Omega)))_{\theta, q}$
+(\Cref{cor:dirichlet-interpolation}); \Cref{lem:dirichlet-zero-extension} maps it into
+$(L_2(V), H^1(V))_{\theta, q} = B^\theta_{2,q}(V)$ (\Cref{thm:bessel-potential-interpolate}). The
+zero extension of $f|_\Omega$ agrees with $f$ on $\Omega$ (\Cref{lem:zero-extension-lp}), so its
+quasi-norm by differences (\Cref{thm:rd-besov}, $r > \theta$) bounds the intrinsic one
+(\Cref{lem:restriction-moduli}).
+\end{proof}
+
+On a bounded Lipschitz domain the converse inclusion holds for $\theta < 1/2$ by Hardy-type
+inequalities. For $\theta > 1/2$, and for $\theta = 1/2$ with $q < \infty$, the Dirichlet spaces
+carry the boundary condition; for $\theta = 1/2$ and $q = 2$ the interpolation space is the
+Lions--Magenes space $H^{1/2}_{00}(\Omega)$ \cite[Chapter~1, Theorem~11.7]{LionsMagenes1972}.
+Both descriptions are later goals.
 
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}

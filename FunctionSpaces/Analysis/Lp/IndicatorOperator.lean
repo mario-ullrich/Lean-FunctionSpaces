@@ -18,7 +18,9 @@ linear operator on `L_p(μ)` of norm at most `1` (`Rd.indicatorLp`); it is multi
 on `s` (`Rd.indicatorLp_eq_iff_ae_eq_restrict`), and `∫_s a b = ⟨1_s a, b⟩` for `a, b ∈ L_2`
 with Mathlib's pairing of `L_2` with `L_2` (`Rd.setIntegral_mul_eq_lpPairing`). For a measurable
 `T ⊆ O`, the extension by zero `g ↦ 1_T g` from `L_p(μ|_O)` to `L_p(μ)` is a bounded linear
-operator of norm at most `1` (`Rd.indicatorExtendLp`).
+operator of norm at most `1` (`Rd.indicatorExtendLp`). The cut-off norm `‖1_s f‖_{L_p(μ)}` is the
+norm of the restriction `f|_s ∈ L_p(μ|_s)` (`Rd.enorm_indicatorLp_eq`), and the extension by zero
+of `f|_s` agrees with `f` on `s` (`Rd.indicatorLp_indicatorExtendLp_restrict`).
 -/
 
 @[expose] public section
@@ -101,6 +103,14 @@ theorem enorm_indicatorLp_le {s : Set α} (hs : MeasurableSet s) (g : Lp ℂ p �
   rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hs g)]
   exact eLpNorm_indicator_le _ hs
 
+/-- **The `L_p(μ|_s)` norm as a cut-off norm**: `‖1_s f‖_{L_p(μ)} = ‖f|_s‖_{L_p(μ|_s)}` for a
+measurable `s` (Mathlib's `MeasureTheory.eLpNorm_indicator_eq_eLpNorm_restrict` and
+`MeasureTheory.LpToLpRestrictCLM_coeFn`). -/
+theorem enorm_indicatorLp_eq {s : Set α} (hs : MeasurableSet s) (f : Lp ℂ p μ) :
+    ‖indicatorLp hs f‖ₑ = ‖LpToLpRestrictCLM α ℂ ℂ μ p s f‖ₑ := by
+  rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hs f),
+    eLpNorm_indicator_eq_eLpNorm_restrict hs, eLpNorm_congr_ae (LpToLpRestrictCLM_coeFn ℂ s f)]
+
 /-- Two elements of `L_p` have the same restriction `1_s F = 1_s f` to a measurable set `s` iff
 they agree almost everywhere on `s`: Mathlib's `MeasureTheory.ae_eq_restrict_iff_indicator_ae_eq`
 for the classes in `L_p`. -/
@@ -173,5 +183,18 @@ theorem enorm_indicatorExtendLp_le {T O : Set α} (hT : MeasurableSet T) (hTO : 
     (g : Lp ℂ p (μ.restrict O)) : ‖indicatorExtendLp hT hTO g‖ₑ ≤ ‖g‖ₑ := by
   rw [Lp.enorm_def, Lp.enorm_def g, eLpNorm_congr_ae (indicatorExtendLp_apply_ae hT hTO g)]
   exact eLpNorm_indicator_restrict_le hT hTO g
+
+/-- **The zero extension of a restriction agrees with the function on the set**: for a
+measurable `s` and `f ∈ L_p(μ)`, `1_s E(f|_s) = 1_s f` in `L_p(μ)`, where `E` is the extension by
+zero from `L_p(μ|_s)` (`Rd.indicatorLp_eq_iff_ae_eq_restrict`). -/
+theorem indicatorLp_indicatorExtendLp_restrict {s : Set α} (hs : MeasurableSet s)
+    (f : Lp ℂ p μ) :
+    indicatorLp hs (indicatorExtendLp hs subset_rfl (LpToLpRestrictCLM α ℂ ℂ μ p s f)) =
+      indicatorLp hs f := by
+  refine (indicatorLp_eq_iff_ae_eq_restrict hs).2 ?_
+  filter_upwards [ae_restrict_of_ae (indicatorExtendLp_apply_ae hs subset_rfl
+    (LpToLpRestrictCLM α ℂ ℂ μ p s f)), LpToLpRestrictCLM_coeFn ℂ s f,
+    ae_restrict_mem hs] with x hx1 hx2 hx3
+  rw [hx1, Set.indicator_of_mem hx3, hx2]
 
 end Rd

@@ -85,7 +85,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ | ✗ | `MeasureSpaces/Spectral/Basic` |
 | Coefficient characterisations of spectral schemes, `H^s = B^s_{2,2}` | ✅ | ✗ | `MeasureSpaces/Spectral/Blocks` |
 | Hilbert bases of eigenvectors of compact self-adjoint operators, and the polarization of a norm identity | ✅ | ✗ | `MeasureSpaces/Spectral/CompactEigenbasis` |
-| Compact dense embeddings: singular basis, eigenvalues of `J J†` and the singular value `1`, spectral scheme, Jackson and Bernstein, `(H, J(V))_{θ,q} = A^θ_q` | ✅ | ✗ | `MeasureSpaces/Spectral/CompactEmbedding` |
+| Compact dense embeddings: singular basis, eigenvalues of `J J†` and the singular value `1`, spectral scheme, Jackson and Bernstein, `(H, J(V))_{θ,q} = A^θ_q`, `A^s_2` by the singular values | ✅ | ✗ | `MeasureSpaces/Spectral/CompactEmbedding` |
 | Continuous spectral bases (hypothesis), `B^s_{2,2} = H^s`, local Weyl bound, Nikolskii for `p ≤ 2`, continuity of `H^s` for `s > D/2` | ✅ | ✗ | `MeasureSpaces/Spectral/ContinuousSpectralBasis`, `MeasureSpaces/Spectral/LocalWeyl` |
 | Conditional expectations on `L_p`, filtration schemes (Haar), martingale-difference characterisation | ✅ | ✗ | `MeasureSpaces/Martingales/Filtration` |
 | The conditional expectation onto a countable partition as the average over the cells | ✅ | ✗ | `MeasureSpaces/Martingales/Partition` |

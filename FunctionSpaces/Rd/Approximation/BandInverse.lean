@@ -20,7 +20,9 @@ inequality and the dilation `Δ_h^r Θ_j = (Δ_{2^j h}^r Θ)_{2^j}` (`Rd.higherD
 
 **Differences of Schwartz functions in `L_1`** (`Rd.lintegral_enorm_higherDiff_schwartz_le`):
 `‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1`. The fundamental theorem of calculus along the segment from `x`
-to `x + v` gives `G(x + v) - G(x) = ∫_0^1 ∂_v G(x + t v) dt`, hence `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1`
+to `x + v` gives `G(x + v) - G(x) = ∫_0^1 ∂_v G(x + t v) dt` (`Rd.fwdDiff_schwartz_eq_integral`),
+and Tonelli's theorem with the translation invariance of Lebesgue measure
+(`Rd.lintegral_lintegral_Ioc_add_smul`) gives `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1`
 (`Rd.lintegral_enorm_fwdDiff_le`); differences commute with line derivatives
 (`Rd.lineDerivOp_fwdDiffSchwartz`), so induction gives `‖Δ_v^r G‖_1 ≤ ‖∂_v^r G‖_1`, and
 `|∂_v^r G(x)| ≤ ‖v‖^r ‖D^r G(x)‖`. Mathlib's Schwartz space provides the translations, the line
@@ -81,41 +83,56 @@ theorem iteratedLineDerivOp_fwdDiffSchwartz (v : V) (r : ℕ) (G : 𝓢(V, ℂ))
     rw [LineDeriv.iteratedLineDerivOp_succ_left, LineDeriv.iteratedLineDerivOp_succ_left]
     exact (congrArg _ ih).trans (lineDerivOp_fwdDiffSchwartz v v _)
 
-/-- **A difference is bounded by the line derivative in `L_1`**: `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1`, from
-`G(x + v) - G(x) = ∫_0^1 ∂_v G(x + t v) dt` and the translation invariance of `∫ |∂_v G|`. -/
-theorem lintegral_enorm_fwdDiff_le (v : V) (G : 𝓢(V, ℂ)) :
-    ∫⁻ x, ‖fwdDiff v (G : V → ℂ) x‖ₑ ≤ ∫⁻ x, ‖(∂_{v} G : 𝓢(V, ℂ)) x‖ₑ := by
-  have hftc : ∀ x, fwdDiff v (G : V → ℂ) x =
-      ∫ t in (0 : ℝ)..1, (∂_{v} G : 𝓢(V, ℂ)) (x + t • v) := fun x => by
-    have hderiv : ∀ t ∈ Set.uIcc (0 : ℝ) 1, HasDerivAt (fun t : ℝ => G (x + t • v))
-        ((∂_{v} G : 𝓢(V, ℂ)) (x + t • v)) t := fun t _ => by
-      rw [SchwartzMap.lineDerivOp_apply_eq_fderiv]
-      have h1 : HasDerivAt (fun t : ℝ => x + t • v) v t := by
-        simpa using ((hasDerivAt_id t).smul_const v).const_add x
-      exact (G.hasFDerivAt (x + t • v)).comp_hasDerivAt t h1
-    have hcont : Continuous fun t : ℝ => (∂_{v} G : 𝓢(V, ℂ)) (x + t • v) :=
-      (SchwartzMap.continuous _).comp (continuous_const.add (continuous_id.smul continuous_const))
-    rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv (hcont.intervalIntegrable 0 1)]
-    simp [fwdDiff]
-  have hle : ∀ x, ‖fwdDiff v (G : V → ℂ) x‖ₑ ≤
-      ∫⁻ t in Set.Ioc (0 : ℝ) 1, ‖(∂_{v} G : 𝓢(V, ℂ)) (x + t • v)‖ₑ := fun x => by
-    rw [hftc x, intervalIntegral.integral_of_le zero_le_one]
-    exact enorm_integral_le_lintegral_enorm _
-  have hmeas : Measurable (Function.uncurry fun (x : V) (t : ℝ) =>
-      ‖(∂_{v} G : 𝓢(V, ℂ)) (x + t • v)‖ₑ) :=
-    ((SchwartzMap.continuous _).comp
-      (continuous_fst.add (continuous_snd.smul continuous_const))).enorm.measurable
-  calc ∫⁻ x, ‖fwdDiff v (G : V → ℂ) x‖ₑ
-      ≤ ∫⁻ x, ∫⁻ t in Set.Ioc (0 : ℝ) 1, ‖(∂_{v} G : 𝓢(V, ℂ)) (x + t • v)‖ₑ :=
-        lintegral_mono hle
-    _ = ∫⁻ t in Set.Ioc (0 : ℝ) 1, ∫⁻ x, ‖(∂_{v} G : 𝓢(V, ℂ)) (x + t • v)‖ₑ :=
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **The fundamental theorem of calculus along a segment**: for a Schwartz function `G`,
+`G(x + v) - G(x) = ∫_0^1 ∂_v G(x + t v) dt` (Mathlib's
+`intervalIntegral.integral_eq_sub_of_hasDerivAt`). -/
+theorem fwdDiff_schwartz_eq_integral (v : V) (G : 𝓢(V, ℂ)) (x : V) :
+    fwdDiff v (G : V → ℂ) x = ∫ t in (0 : ℝ)..1, (∂_{v} G : 𝓢(V, ℂ)) (x + t • v) := by
+  have hderiv : ∀ t ∈ Set.uIcc (0 : ℝ) 1, HasDerivAt (fun t : ℝ => G (x + t • v))
+      ((∂_{v} G : 𝓢(V, ℂ)) (x + t • v)) t := fun t _ => by
+    rw [SchwartzMap.lineDerivOp_apply_eq_fderiv]
+    have h1 : HasDerivAt (fun t : ℝ => x + t • v) v t := by
+      simpa using ((hasDerivAt_id t).smul_const v).const_add x
+    exact (G.hasFDerivAt (x + t • v)).comp_hasDerivAt t h1
+  have hcont : Continuous fun t : ℝ => (∂_{v} G : 𝓢(V, ℂ)) (x + t • v) :=
+    (SchwartzMap.continuous _).comp (continuous_const.add (continuous_id.smul continuous_const))
+  rw [intervalIntegral.integral_eq_sub_of_hasDerivAt hderiv (hcont.intervalIntegrable 0 1)]
+  simp [fwdDiff]
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **A difference by the line derivative, pointwise**: for a Schwartz function `G`,
+`|G(x + v) - G(x)| ≤ ∫_0^1 |∂_v G(x + t v)| dt` (`Rd.fwdDiff_schwartz_eq_integral`). -/
+theorem enorm_fwdDiff_schwartz_le_lintegral (v : V) (G : 𝓢(V, ℂ)) (x : V) :
+    ‖fwdDiff v (G : V → ℂ) x‖ₑ ≤
+      ∫⁻ t in Set.Ioc (0 : ℝ) 1, ‖(∂_{v} G : 𝓢(V, ℂ)) (x + t • v)‖ₑ := by
+  rw [fwdDiff_schwartz_eq_integral, intervalIntegral.integral_of_le zero_le_one]
+  exact enorm_integral_le_lintegral_enorm _
+
+/-- **Averages of translates along a segment**: for a measurable `φ : V → [0, ∞]` and `v ∈ V`,
+`∫_V ∫_0^1 φ(x + t v) dt dx = ∫_V φ`, by Tonelli's theorem (Mathlib's `lintegral_lintegral_swap`)
+and the translation invariance of Lebesgue measure. -/
+theorem lintegral_lintegral_Ioc_add_smul {φ : V → ℝ≥0∞} (hφ : Measurable φ) (v : V) :
+    ∫⁻ x, ∫⁻ t in Set.Ioc (0 : ℝ) 1, φ (x + t • v) = ∫⁻ x, φ x := by
+  have hmeas : Measurable (Function.uncurry fun (x : V) (t : ℝ) => φ (x + t • v)) :=
+    hφ.comp (continuous_fst.add (continuous_snd.smul continuous_const)).measurable
+  calc ∫⁻ x, ∫⁻ t in Set.Ioc (0 : ℝ) 1, φ (x + t • v)
+      = ∫⁻ t in Set.Ioc (0 : ℝ) 1, ∫⁻ x, φ (x + t • v) :=
         lintegral_lintegral_swap hmeas.aemeasurable
-    _ = ∫⁻ _t in Set.Ioc (0 : ℝ) 1, ∫⁻ x, ‖(∂_{v} G : 𝓢(V, ℂ)) x‖ₑ :=
-        lintegral_congr fun t =>
-          lintegral_add_right_eq_self (fun x => ‖(∂_{v} G : 𝓢(V, ℂ)) x‖ₑ) (t • v)
-    _ = ∫⁻ x, ‖(∂_{v} G : 𝓢(V, ℂ)) x‖ₑ := by
+    _ = ∫⁻ _t in Set.Ioc (0 : ℝ) 1, ∫⁻ x, φ x :=
+        lintegral_congr fun t => lintegral_add_right_eq_self φ (t • v)
+    _ = ∫⁻ x, φ x := by
         rw [lintegral_const, Measure.restrict_apply_univ, Real.volume_Ioc, sub_zero,
           ENNReal.ofReal_one, mul_one]
+
+/-- **A difference is bounded by the line derivative in `L_1`**: `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1`. Integrate
+the pointwise bound `Rd.enorm_fwdDiff_schwartz_le_lintegral` over `x` and use
+`Rd.lintegral_lintegral_Ioc_add_smul`. -/
+theorem lintegral_enorm_fwdDiff_le (v : V) (G : 𝓢(V, ℂ)) :
+    ∫⁻ x, ‖fwdDiff v (G : V → ℂ) x‖ₑ ≤ ∫⁻ x, ‖(∂_{v} G : 𝓢(V, ℂ)) x‖ₑ :=
+  (lintegral_mono fun x => enorm_fwdDiff_schwartz_le_lintegral v G x).trans_eq
+    (lintegral_lintegral_Ioc_add_smul (φ := fun y => ‖(∂_{v} G : 𝓢(V, ℂ)) y‖ₑ)
+      (SchwartzMap.continuous _).enorm.measurable v)
 
 /-- **Differences of order `r` are bounded by line derivatives of order `r` in `L_1`**:
 `‖Δ_v^r G‖_1 ≤ ‖∂_v^r G‖_1`. -/

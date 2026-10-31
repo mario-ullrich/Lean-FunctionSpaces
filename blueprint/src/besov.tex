@@ -4643,6 +4643,26 @@ $x - lh$ onto $(x - rh) + lh$, and the translation by $rh$ preserves the measure
 statements follow from the definition.
 \end{proof}
 
+\begin{lemma}[The modulus on $\Omega$ through a function on $V$]
+\label{lem:modulus-on-extension}
+\lean{Rd.lpModulusOn_le_add_lpModulus}
+\leanok
+\uses{lem:rd-modulus-on, lem:indicator-lp}
+For every measurable $\Omega \subseteq V$, every $p \geq 1$, every order $r$, all
+$f, G \in L_p(V)$ and every $k \in \N$,
+\[
+  \omega_r(f, 2^{-k}, \Omega)_p
+    \leq 2^r \|\mathbf 1_\Omega (f - G)\|_p + \omega_r(G, 2^{-k})_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Split $f = (f - G) + G$. The modulus on $\Omega$ of $f - G$ depends only on
+$\mathbf 1_\Omega (f - G)$ and is at most $2^r \|\mathbf 1_\Omega (f - G)\|_p$, and that of $G$ is
+at most the modulus of $G$ on $V$ (\Cref{lem:rd-modulus-on}).
+\end{proof}
+
 \begin{lemma}[The intrinsic quasi-norm]
 \label{lem:modnorm-on}
 \lean{Rd.modNormOn, Rd.modNormOn_zero, Rd.modNormOn_add_le, Rd.modNormOn_const_smul,
@@ -4875,12 +4895,24 @@ $M = \omega_r(f, 2^{-k})_p$ gives the bound.
 \begin{lemma}[Differences of Schwartz functions]
 \label{lem:schwartz-differences}
 \lean{Rd.fwdDiffSchwartz, Rd.coe_fwdDiffSchwartz, Rd.lineDerivOp_fwdDiffSchwartz,
-  Rd.iteratedLineDerivOp_fwdDiffSchwartz, Rd.lintegral_enorm_fwdDiff_le,
-  Rd.lintegral_enorm_higherDiff_le, Rd.enorm_iteratedLineDerivOp_le,
-  Rd.lintegral_enorm_higherDiff_schwartz_le, Rd.lintegral_enorm_iteratedFDeriv_ne_top}
+  Rd.iteratedLineDerivOp_fwdDiffSchwartz, Rd.fwdDiff_schwartz_eq_integral,
+  Rd.enorm_fwdDiff_schwartz_le_lintegral, Rd.lintegral_lintegral_Ioc_add_smul,
+  Rd.lintegral_enorm_fwdDiff_le, Rd.lintegral_enorm_higherDiff_le,
+  Rd.enorm_iteratedLineDerivOp_le, Rd.lintegral_enorm_higherDiff_schwartz_le,
+  Rd.lintegral_enorm_iteratedFDeriv_ne_top}
 \leanok
 \uses{def:rd-modulus}
-For every Schwartz function $G$ on $V$, $v \in V$ and $r \in \N$,
+For every Schwartz function $G$ on $V$ and all $v, x \in V$,
+\[
+  G(x + v) - G(x) = \int_0^1 \partial_v G(x + t v) \, dt
+\]
+and
+\[
+  |G(x + v) - G(x)| \leq \int_0^1 |\partial_v G(x + t v)| \, dt .
+\]
+For every measurable $\varphi \colon V \to [0, \infty]$ and every $v \in V$,
+$\int_V \int_0^1 \varphi(x + t v) \, dt \, dx = \int_V \varphi$. For every Schwartz function $G$
+on $V$, $v \in V$ and $r \in \N$,
 \[
   \|\Delta_v^r G\|_1 \leq \|v\|^r \int_V \|D^r G(x)\| \, dx < \infty .
 \]
@@ -4888,8 +4920,9 @@ For every Schwartz function $G$ on $V$, $v \in V$ and $r \in \N$,
 
 \begin{proof}
 \leanok
-By the fundamental theorem of calculus, $G(x + v) - G(x) = \int_0^1 \partial_v G(x + t v) \, dt$,
-so $\|\Delta_v G\|_1 \leq \|\partial_v G\|_1$ by Tonelli's theorem and translation invariance. The
+The identity is the fundamental theorem of calculus along the segment from $x$ to $x + v$. The
+integral identity is Tonelli's theorem with the translation invariance of Lebesgue measure; with
+the pointwise bound it gives $\|\Delta_v G\|_1 \leq \|\partial_v G\|_1$. The
 difference $\Delta_v$ and the line derivative $\partial_v$ commute and preserve Schwartz
 functions; induction gives $\|\Delta_v^r G\|_1 \leq \|\partial_v^r G\|_1$, and
 $|\partial_v^r G(x)| \leq \|v\|^r \|D^r G(x)\|$.

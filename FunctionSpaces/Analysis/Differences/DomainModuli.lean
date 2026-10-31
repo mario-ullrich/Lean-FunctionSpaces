@@ -24,7 +24,9 @@ smoothness on `U`** is
 modulus uses only the values of `f` on `U` (`Rd.modulusOn_indicator`, `Rd.modulusOn_congr_ae`),
 increases in `t`, is subadditive, is bounded by `2^r ‖f‖_{L_p(U)}` (`Rd.modulusOn_le`) and by
 the modulus on `V` (`Rd.modulusOn_le_modulus`), and on `U = V` it is the modulus on `V`
-(`Rd.modulusOn_univ`). `Rd.lpModulusOn` samples it for `f ∈ L_p` at the dyadic scales `2^(-k)`.
+(`Rd.modulusOn_univ`). `Rd.lpModulusOn` samples it for `f ∈ L_p` at the dyadic scales `2^(-k)`;
+for every `G ∈ L_p`, `ω_r(f, 2^(-k), Ω)_p ≤ 2^r ‖1_Ω (f - G)‖_p + ω_r(G, 2^(-k))_p`
+(`Rd.lpModulusOn_le_add_lpModulus`).
 The **intrinsic Besov quasi-norm** on a measurable set `Ω` is
 `N_Ω(G) = ‖1_Ω G‖_p + ‖(2^(ks) ω_r(G, 2^(-k), Ω)_p)_k‖_{ℓ_q}` (`Rd.modNormOn`); it depends only
 on `1_Ω G` (`Rd.modNormOn_congr`), is subadditive for `q ≥ 1` and homogeneous
@@ -281,6 +283,28 @@ theorem lpModulusOn_le [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet U) (r : 
     (k : ℕ) : lpModulusOn p U r f k ≤ 2 ^ r * ‖f‖ₑ :=
   (modulusOn_le (Lp.aestronglyMeasurable f) hU Fact.out r _).trans
     (mul_le_mul' le_rfl ((eLpNorm_indicator_le _ hU).trans_eq (Lp.enorm_def f).symm))
+
+/-- **The modulus on `Ω` through a function on `V`**: for a measurable `Ω`, `p ≥ 1` and
+`f, G ∈ L_p`, `ω_r(f, 2^(-k), Ω)_p ≤ 2^r ‖1_Ω (f - G)‖_p + ω_r(G, 2^(-k))_p`. Split
+`f = (f - G) + G` (`Rd.lpModulusOn_add_le`); the modulus of `f - G` on `Ω` sees only
+`1_Ω (f - G)` (`Rd.lpModulusOn_congr`, `Rd.lpModulusOn_le`), and that of `G` is at most its
+modulus on `V` (`Rd.lpModulusOn_le_lpModulus`). -/
+theorem lpModulusOn_le_add_lpModulus [Fact (1 ≤ p)] {Ω : Set V} (hΩ : MeasurableSet Ω) (r : ℕ)
+    (f G : Lp ℂ p μ) (k : ℕ) :
+    lpModulusOn p Ω r f k ≤ 2 ^ r * ‖indicatorLp hΩ (f - G)‖ₑ + lpModulus p r G k := by
+  have hfG : Ω.indicator ((f - G : Lp ℂ p μ) : V → ℂ) =ᵐ[μ]
+      Ω.indicator (indicatorLp hΩ (f - G) : V → ℂ) := by
+    filter_upwards [indicatorLp_apply_ae hΩ (f - G)] with x hx
+    by_cases hxΩ : x ∈ Ω
+    · rw [Set.indicator_of_mem hxΩ, Set.indicator_of_mem hxΩ, hx, Set.indicator_of_mem hxΩ]
+    · rw [Set.indicator_of_notMem hxΩ, Set.indicator_of_notMem hxΩ]
+  calc lpModulusOn p Ω r f k = lpModulusOn p Ω r ((f - G) + G) k := by rw [sub_add_cancel]
+    _ ≤ lpModulusOn p Ω r (f - G) k + lpModulusOn p Ω r G k := lpModulusOn_add_le Ω r _ _ k
+    _ ≤ 2 ^ r * ‖indicatorLp hΩ (f - G)‖ₑ + lpModulus p r G k := by
+        gcongr
+        · rw [lpModulusOn_congr hfG r k]
+          exact lpModulusOn_le hΩ r _ k
+        · exact lpModulusOn_le_lpModulus hΩ r G k
 
 /-! ### The intrinsic quasi-norm -/
 

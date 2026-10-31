@@ -4443,17 +4443,19 @@ so $\sum_i \sigma_i^{-2} |\langle e_i, a \rangle|^2 \leq n^2 \|a\|^2$, and
 \lean{CompactDenseEmbedding.memKMethod_iff_memApprox,
   CompactDenseEmbedding.range_eq_range_sobolevEmbed,
   CompactDenseEmbedding.inv_singularValue_le_one_add_level,
-  CompactDenseEmbedding.one_add_level_le}
+  CompactDenseEmbedding.one_add_level_le, CompactDenseEmbedding.memApprox_two_iff}
 \leanok
 \uses{thm:compact-embedding-jackson-bernstein, cor:representation-sandwich, def:map-couple,
-  lem:sobolev-range, lem:singular-coefficients}
+  lem:sobolev-range, lem:singular-coefficients, thm:spectral-coefficients}
 Let $J : V \to H$ be a compact dense embedding with spectral scheme $(A_n)$. For every
 $0 < \theta < 1$, every $q \in [1, \infty]$ and every $f \in H$, $f \in (H, J(V))_{\theta, q}$,
 the space of the continuous $K$-method of the couple of $J$, if and only if $f \in A^\theta_q$.
 Moreover $J(V)$ is the range of the Sobolev embedding of order $1$ of the spectral scheme
 (\Cref{def:sobolev-embed}), the Sobolev space of order $1$: for every $f \in H$, $f \in J(V)$ if
 and only if
-$\sum_i (1 + \lambda(i))^2 |\langle e_i, f \rangle|^2 < \infty$.
+$\sum_i (1 + \lambda(i))^2 |\langle e_i, f \rangle|^2 < \infty$. For every $s > 0$ and every
+$f \in H$, $f \in A^s_2$ if and only if
+$\sum_i \sigma_i^{-2s} |\langle e_i, f \rangle|^2 < \infty$.
 \end{corollary}
 
 \begin{proof}
@@ -4463,6 +4465,8 @@ The first statement is \Cref{cor:representation-sandwich} with $r = 1$ and
 $\sigma_i^{-1} \leq 1 + \lambda(i) \leq (1 + \|J\|) \sigma_i^{-1}$, since
 $1 = \sigma_i \sigma_i^{-1} \leq \|J\| \sigma_i^{-1}$; so the condition of
 \Cref{lem:sobolev-range} with $s = 1$ and that of \Cref{lem:singular-coefficients} agree.
+The same two inequalities, raised to the power $s$, compare the weights $(1 + \lambda(i))^s$ of
+\Cref{thm:spectral-coefficients} with $\sigma_i^{-s}$.
 \end{proof}
 
 \section{Continuous spectral bases}

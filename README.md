@@ -568,6 +568,32 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   `H^{1/2}(Γ)` by `[u] ↦ γ u` (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace`).
   An element of `H^1(V)` lies in the closure `H̃^1(Ω)` of the test functions of `Ω` iff it
   vanishes almost everywhere outside `Ω` (`Rd.BoundedLipschitzDomain.mem_tildeSpace_iff`).
+* **Eigenbases of the Dirichlet and Neumann Laplacians.** Let `Ω ⊆ V` be a bounded open set. The
+  restriction `H^1_0(Ω) → L_2(Ω)` is a compact dense embedding (`Rd.dirichletCompactEmbedding`),
+  and its spectral scheme (`Rd.dirichletScheme`) is a Hilbert basis `(e_i)` of `L_2(Ω)` with
+  eigenvalues `λ_i ≥ 0` (`Rd.dirichletEigenvalue`, `Rd.dirichletEigenvalue_nonneg`) whose
+  eigenfunctions `φ_i ∈ H^1_0(Ω)`, `φ_i = e_i` on `Ω`, satisfy
+  `∑_k ⟨∂_k φ_i, ∂_k w⟩_2 = λ_i ⟨φ_i, w⟩_2` for every `w ∈ H^1_0(Ω)`
+  (`Rd.dirichletEigenfunction_weak`), the weak form of `-Δ φ_i = λ_i φ_i`, `φ_i = 0` on `∂Ω`. If
+  `Ω` is a bounded Lipschitz domain in dimension `n ≥ 1`, the same holds for `W^1_2(Ω)`, the pairs
+  `(f, ∇f)` in `L_2(Ω) × L_2(Ω)^n` (`Rd.neumannSpace`, `Rd.BoundedLipschitzDomain.neumannScheme`):
+  the eigenfunctions satisfy `∑_k ⟨∂_k φ_i, g_k⟩_{L_2(Ω)} = λ_i ⟨φ_i, f⟩_{L_2(Ω)}` for every
+  `(f, g) ∈ W^1_2(Ω)` (`Rd.BoundedLipschitzDomain.neumannEigenfunction_weak`), the weak form with
+  `∂_ν φ_i = 0` on `∂Ω`. In both cases the real interpolation spaces `(L_2(Ω), H^1_0(Ω))_{θ,q}`
+  and `(L_2(Ω), W^1_2(Ω))_{θ,q}`, `0 < θ < 1`, `1 ≤ q ≤ ∞`, are the approximation spaces
+  `A^θ_q` of the eigenbases (`Rd.memKMethod_dirichlet_iff`,
+  `Rd.BoundedLipschitzDomain.memKMethod_neumann_iff`).
+* **Besov spaces on domains by eigenfunction expansions.** Let `Ω` be a bounded Lipschitz domain
+  in dimension `n ≥ 1`, `0 < θ < 1`, `1 ≤ q ≤ ∞` and `r ≥ 1` an integer. For every `f ∈ L_2(V)`,
+  `f|_Ω` lies in the approximation space `A^θ_q` of the Neumann eigenbasis iff
+  `‖f‖_{L_2(Ω)} + ‖(2^(kθ) ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_q} < ∞`, that is iff
+  `f|_Ω ∈ B^θ_{2,q}(Ω)` (`Rd.BoundedLipschitzDomain.memApprox_neumannScheme_iff`); equivalently
+  the dyadic blocks of the Neumann coefficients of `f|_Ω` have finite `B^θ_{2,q}` norm
+  (`Rd.BoundedLipschitzDomain.modNormOn_lt_top_iff_blockNorm_lt_top`), and for `q = 2` iff
+  `∑_i (1 + λ_i)^θ |⟨e_i, f|_Ω⟩|² < ∞` (`Rd.BoundedLipschitzDomain.modNormOn_two_lt_top_iff`).
+  On every bounded open set `Ω` in dimension `n ≥ 1`, the zero extension of every `g` in the
+  approximation space `A^θ_q` of the Dirichlet eigenbasis lies in `B^θ_{2,q}(V)`
+  (`Rd.memApprox_bandScheme_extendByZero_of_memApprox_dirichletScheme`).
 * **Besov spaces on compact manifolds.** Let `M` be a compact smooth manifold, without boundary or
   with boundary modelled on the half-space, or with corners modelled on the quadrant, and `μ` a
   smooth measure; the range of the model is a Besov domain, a hypothesis class
@@ -597,7 +623,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | Block | Lean | Checked |
 |---|---|---|
 | [**Approximation spaces**](docs/ApproximationSpaces.md): schemes, `A^s_q` and its embeddings, lifting and the Nikolskii transfer theorem, the representation theorem, couples, their K-method, the interpolation property and the reiteration theorem, approximation spaces as interpolation spaces, moduli of smoothness, decompositions, traces and intrinsic norms | ✅ | ✗ |
-| [**Besov and Sobolev spaces on measure spaces**](docs/MeasureSpaces.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, Besov spaces as interpolation spaces, spectral schemes, continuous spectral bases, filtrations and martingale differences | ✅ | ✗ |
+| [**Besov and Sobolev spaces on measure spaces**](docs/MeasureSpaces.md): schemes of functions, Besov and Sobolev embeddings under a Nikolskii inequality, Besov spaces as interpolation spaces, spectral schemes, spectral schemes of compact embeddings, continuous spectral bases, filtrations and martingale differences | ✅ | ✗ |
 | [**Tools from analysis**](docs/Analysis.md): `L_p` norms, the inclusion `L_r ↪ L_p`, Young's inequality, mixed norms, differences and the translation algebra, convolution, approximate identities, Littlewood–Paley kernels, test functions in the Schwartz space, dyadic cubes and cells, the Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, the Fefferman–Stein inequality, weak type and Marcinkiewicz interpolation, `L_p` norms by duality | ✅ | ✗ |
 | [**The torus**](docs/Torus.md): trigonometric polynomials, `H^s`, embeddings, Fourier coefficients, moduli of smoothness and smooth Littlewood–Paley blocks for all `p`, interpolation of Besov spaces by differences, `W^m_2` by Fourier multipliers, weak derivatives in `L_p` as distributional derivatives of the periodic lifts, `W^m_p = F^m_{p,2}` for `1 < p < ∞` with the Besov sandwich and the Sobolev embeddings, the trace on a face, the restriction for continuous functions | ✅ | ✗ |
 | [**Intervals, the cube, splines and wavelets**](docs/IntervalCube.md): piecewise polynomials and splines on `[0, 1]`, the circle and `[0, 1]^d`, Whitney's inequality, coordinate and isotropic moduli, multiwavelets, the Haar system | ✅ | ✗ |
@@ -606,7 +632,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, kernel majorants, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, Triebel–Lizorkin spaces as interpolation spaces | ✅ | ✗ |
 | [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings including the critical case and the Gagliardo–Nirenberg–Sobolev inequality, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
-| [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph and bounded Lipschitz domains, closures of convex ones, closed balls, the closed cube and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators and its norm equivalent to that of `B^{1/2}_{2,2}(Γ)`, the extension theorems for `W^1_p` and `W^m_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, compact manifolds with boundary or with corners, smooth domains | ✅ | ✗ |
+| [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph and bounded Lipschitz domains, closures of convex ones, closed balls, the closed cube and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators and its norm equivalent to that of `B^{1/2}_{2,2}(Γ)`, the extension theorems for `W^1_p` and `W^m_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, eigenbases of the Dirichlet and Neumann Laplacians, Besov spaces by eigenfunction expansions, compact manifolds with boundary or with corners, smooth domains | ✅ | ✗ |
 
 Lean: ✅ every file proved without `sorry` · 🟡 some statement still `sorry` · ⬜ planned.
 Checked (human-checked): ✅ mathematics and documentation both reviewed by the author ·
@@ -649,8 +675,12 @@ that library builds itself.
   operator), and bounded linear extension operators for higher order.
 * **Manifolds with corners**: a compact example (the cube with charts at its vertices), traces on
   the faces and products of models.
-* **Eigenbases of the Laplace–Beltrami operator** on compact manifolds (Rellich's compactness,
-  elliptic regularity), joining the spectral and the chart descriptions of Besov spaces.
+* **Eigenbases of the Laplacian**: boundedness and continuity of the eigenfunctions and the
+  local Weyl law (elliptic regularity), which give the Nikolskii property and spectral
+  `B^s_{p,q}` for `p ≠ 2`; the two-sided Dirichlet description on Lipschitz domains (Hardy-type
+  inequalities, the Lions–Magenes space `H^{1/2}_{00}` at `θ = 1/2`, `q = 2`); eigenbases of the
+  Laplace–Beltrami operator on compact manifolds (Rellich's compactness), joining the spectral
+  and the chart descriptions of Besov spaces.
 * **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and their ball means and atoms on the
   torus.
 * **Sobolev spaces**: Mihlin multipliers and `H^{s,p}` for `s < 0`; the Jawerth–Franke
