@@ -9306,7 +9306,9 @@ bounded Lipschitz domains, with the embedding $\Sob{1}{2}(\Omega) \hookrightarro
 \Cref{sec:spectral-besov-domains} describes the Besov spaces $B^\theta_{2,q}(\Omega)$,
 $0 < \theta < 1$, by expansions in these eigenbases. \Cref{sec:besov-domain-localisation} treats
 functions that vanish outside a ball on a Besov domain, the setting of the chart pieces of
-functions on compact manifolds.
+functions on compact manifolds. \Cref{sec:chart-sobolev} builds the chart Sobolev space
+$H^1_A(M)$ of a compact manifold from the weak gradients of its chart pieces and identifies it
+with $\Besov{1}{2}{2}(M)$.
 
 \section{The Dirichlet Laplacian}
 \label{sec:dirichlet-eigenbasis}
@@ -10168,6 +10170,183 @@ $D = D_{R+1}$, $g \in \Sob{1}{2}(D)$ (\Cref{lem:weak-derivative-basic},
 (\Cref{lem:besov-domain-localisation}). The converse is (1).
 \end{proof}
 
+\section{The chart Sobolev space of a compact manifold}
+\label{sec:chart-sobolev}
+
+In this section $M$ is a compact smooth manifold with model with corners $I$ on $E$ whose range
+$\Omega_I = \operatorname{range} I$ is a Besov domain, $\mu$ is a smooth measure and $A$ is a Besov
+atlas with extended charts $\kappa_i$, partition of unity $(\psi_i)$ and cut-offs $\theta_i$, as in
+\Cref{ch:manifolds} (\Cref{def:smooth-measure}, \Cref{def:besov-atlas}). The pieces of a function
+are $P_i f = (\psi_i f) \circ \kappa_i^{-1}$ (\Cref{def:chart-pieces}), the lifts from a chart are
+$L_k F = \theta_k \cdot F \circ \kappa_k$ (\Cref{lem:chart-lift}), and $(b_j)_{j \in K}$, indexed
+by $K = \{0, \dots, \dim E - 1\}$, is the orthonormal basis of $E$ of \Cref{def:dyadic-cubes}.
+
+\begin{definition}[The open model set]
+\label{def:model-interior}
+\lean{Manifold.modelInterior, Manifold.modelInterior_eq_top,
+  Manifold.modelInterior_euclideanHalfSpace, Manifold.modelInterior_ae_eq_range}
+\leanok
+\uses{lem:besov-domain-interior-ae}
+For every model with corners $I$, the open model set is $O_I = \operatorname{int}
+(\operatorname{range} I)$, an open subset of $E$. If $I$ has no boundary, then $O_I = E$. For the
+half-space model on $\R^n$, $O_I = \{y : y_0 > 0\}$. If $\operatorname{range} I$ is a Besov
+domain, then $O_I$ agrees with $\operatorname{range} I$ up to a null set.
+\end{definition}
+
+\begin{proof}
+\leanok
+Without boundary $\operatorname{range} I = E$. The half-space is $\{y : y_0 \geq 0\}$, whose
+interior is $\{y : y_0 > 0\}$ (Mathlib's
+\texttt{interior\_\allowbreak range\_\allowbreak modelWithCornersEuclideanHalfSpace}). For a Besov
+domain apply \Cref{lem:besov-domain-interior-ae}.
+\end{proof}
+
+\begin{lemma}[Pieces and lifts as operators]
+\label{lem:chart-lift-operator}
+\lean{Manifold.BesovAtlas.pieceCLM, Manifold.BesovAtlas.pieceCLM_apply,
+  Manifold.BesovAtlas.chartLiftCLM, Manifold.BesovAtlas.chartLiftCLM_apply}
+\leanok
+\uses{def:chart-pieces, lem:chart-lift}
+For every $1 \leq p < \infty$ and every chart index $i$, the piece $P_i$ is a bounded linear
+operator from $L_p(\mu)$ to $L_p(E)$, and the lift $L_i$ is a bounded linear operator from
+$L_p(E)$ to $L_p(\mu)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The pieces are linear and bounded by \Cref{def:chart-pieces}, the lifts by \Cref{lem:chart-lift}.
+\end{proof}
+
+\begin{lemma}[The retract identity]
+\label{lem:chart-retract}
+\lean{Manifold.BesovAtlas.chartLift_piece, Manifold.BesovAtlas.sum_chartLiftLp_pieceLp,
+  Manifold.BesovAtlas.sum_chartLiftCLM_comp_pieceCLM}
+\leanok
+\uses{lem:chart-lift-operator, def:besov-atlas}
+For every $g \colon M \to \C$ and every chart index $k$,
+$\theta_k \cdot (P_k g) \circ \kappa_k = \psi_k g$ at every point. For every $1 \leq p < \infty$,
+\[
+  \sum_k L_k P_k f = f \qquad \text{for every } f \in L_p(\mu) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+On the source of $\kappa_k$, $(P_k g)(\kappa_k x) = \psi_k(x) g(x)$ and
+$\theta_k \psi_k = \psi_k$; outside the source $\psi_k = 0$. Sum over $k$ with
+$\sum_k \psi_k = 1$; the lifts see only classes (\Cref{lem:chart-lift}).
+\end{proof}
+
+\begin{lemma}[Where lifts and pieces live]
+\label{lem:chart-carriers}
+\lean{Manifold.BesovAtlas.liftCarrier, Manifold.BesovAtlas.isCompact_liftCarrier,
+  Manifold.BesovAtlas.liftCarrier_subset_range, Manifold.BesovAtlas.chartLiftLp_eq_of_ae_eq_on,
+  Manifold.BesovAtlas.pieceCarrier, Manifold.BesovAtlas.isCompact_pieceCarrier,
+  Manifold.BesovAtlas.pieceCarrier_subset_range, Manifold.BesovAtlas.piece_eq_zero_of_notMem,
+  Manifold.BesovAtlas.pieceLp_eq_zero_off,
+  Manifold.BesovAtlas.exists_pieceLp_eq_zero_off_ball}
+\leanok
+\uses{def:model-interior, lem:chart-integrals, lem:chart-lift-operator}
+Let $1 \leq p < \infty$ and let $k$ and $i$ be chart indices.
+\begin{enumerate}
+  \item The set $\kappa_k(\operatorname{tsupport} \theta_k)$ is a compact subset of $\Omega_I$,
+    and for all $F, G \in L_p(E)$ with $F = G$ almost everywhere on
+    $\kappa_k(\operatorname{tsupport} \theta_k) \cap O_I$, $L_k F = L_k G$.
+  \item The set $\kappa_i(\operatorname{tsupport} \psi_i)$ is a compact subset of $\Omega_I$, the
+    piece of every
+    $g \colon M \to \C$ vanishes outside it, and there is $R \in \R$ such that for every
+    $f \in L_p(\mu)$, $P_i f = 0$ almost everywhere outside $B(0, R)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The chart is continuous on its source, which contains the compact
+$\operatorname{tsupport} \theta_k$. The points of $\Omega_I \setminus O_I$ form a null set
+(\Cref{def:model-interior}), so by \Cref{lem:chart-integrals} $F(\kappa_k x) = G(\kappa_k x)$ for
+$\mu$-almost every $x \in \operatorname{tsupport} \theta_k$; off this set both lifts vanish.
+(2) At $y = \kappa_i(x)$ outside $\kappa_i(\operatorname{tsupport} \psi_i)$, $\psi_i(x) = 0$. A
+compact set lies in a ball.
+\end{proof}
+
+\begin{definition}[The chart Sobolev space]
+\label{def:chart-sobolev}
+\lean{Manifold.BesovAtlas.ValueGradientL2, Manifold.BesovAtlas.chartSobolev,
+  Manifold.BesovAtlas.mem_chartSobolev, Manifold.BesovAtlas.isClosed_chartSobolev,
+  Manifold.BesovAtlas.completeSpace_chartSobolev, Manifold.BesovAtlas.chartForm,
+  Manifold.BesovAtlas.inner_chartSobolev}
+\leanok
+\uses{def:model-interior, lem:chart-lift-operator, def:weak-line-derivative,
+  lem:weak-derivative-basic, thm:weak-derivative-limits}
+The \emph{chart Sobolev space} $H^1_A(M)$ is the set of pairs $(f, g)$ in the Hilbert space
+$L_2(\mu) \times \prod_{i, j} L_2(O_I)$, with $i$ over the charts and $j \in K$, such that
+$g_{ij}$ is the weak derivative $\partial_{b_j} P_i f$ on $O_I$ for all $i$ and $j$. Its inner
+product is
+\begin{gather*}
+  \langle (f, g), (f', g') \rangle = \langle f, f' \rangle_{L_2(\mu)}
+    + a_A\bigl((f, g), (f', g')\bigr), \\
+  a_A\bigl((f, g), (f', g')\bigr) = \sum_{i, j} \langle g_{ij}, g'_{ij} \rangle_{L_2(O_I)},
+\end{gather*}
+with the \emph{chart form} $a_A$. It is a closed subspace, hence a Hilbert space.
+\end{definition}
+
+\begin{proof}
+\leanok
+Weak derivatives are linear (\Cref{lem:weak-derivative-basic}). If $(f_m, g_m) \to (f, g)$, then
+$P_i f_m \to P_i f$ in $L_2(E)$ (\Cref{lem:chart-lift-operator}), hence in $L_2(O_I)$, and
+$g_{m,ij} \to g_{ij}$, so $g_{ij} = \partial_{b_j} P_i f$ weakly on $O_I$
+(\Cref{thm:weak-derivative-limits}).
+\end{proof}
+
+For manifolds with boundary the weak gradients live on the open half-space $O_I$, as for the
+Neumann space (\Cref{def:neumann-space}); with corners $O_I$ is the open quadrant.
+
+\begin{definition}[The chart Sobolev embedding]
+\label{def:chart-sobolev-embedding}
+\lean{Manifold.BesovAtlas.chartSobolevEmbedding, Manifold.BesovAtlas.chartSobolevEmbedding_apply,
+  Manifold.BesovAtlas.norm_chartSobolevEmbedding_le,
+  Manifold.BesovAtlas.chartSobolevEmbedding_injective}
+\leanok
+\uses{def:chart-sobolev, lem:weak-derivative-basic}
+The \emph{chart Sobolev embedding} $J_A \colon H^1_A(M) \to L_2(\mu)$ is $(f, g) \mapsto f$. It is
+injective and has norm at most $1$.
+\end{definition}
+
+\begin{proof}
+\leanok
+The weak derivatives of $P_i f$ are unique (\Cref{lem:weak-derivative-basic}), so $f$ determines
+$g$.
+\end{proof}
+
+\begin{theorem}[$H^1_A(M) = B^1_{2,2}(M)$]
+\label{thm:chart-sobolev-besov}
+\lean{Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff_forall_piece,
+  Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff_memBesov,
+  Manifold.BesovAtlas.range_chartSobolevEmbedding_eq,
+  Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff}
+\leanok
+\uses{def:chart-sobolev-embedding, lem:chart-carriers, lem:manifold-besov-pieces,
+  lem:besov-domain-weak-gradient, def:manifold-besov}
+For every Besov atlas $A$ and every $f \in L_2(\mu)$, the following are equivalent:
+\begin{enumerate}
+  \item $f = J_A u$ for some $u \in H^1_A(M)$;
+  \item for every chart index $i$ there are $g_{ij} \in L_2(O_I)$, $j \in K$, with
+    $g_{ij} = \partial_{b_j} P_i f$ weakly on $O_I$;
+  \item $f \in \Besov{1}{2}{2}(M)$.
+\end{enumerate}
+In particular, for all Besov atlases $A$ and $A'$, the ranges of $J_A$ and $J_{A'}$ agree.
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) and (2) are equivalent by the definition of $H^1_A(M)$. Each piece $P_i f$ vanishes outside a
+ball (\Cref{lem:chart-carriers}), so it has such weak derivatives if and only if
+$N_{\Omega_I}(P_i f) < \infty$ with $p = q = 2$, $s = 1$ and differences of order $2$
+(\Cref{lem:besov-domain-weak-gradient}). By \Cref{lem:manifold-besov-pieces} this holds for every
+$i$ if and only if $f \in \Besov{1}{2}{2}(M)$ for the atlas $A$, which is
+$\Besov{1}{2}{2}(M)$ for every atlas (\Cref{def:manifold-besov}).
+\end{proof}
+
 \chapter{Besov spaces on compact manifolds}
 \label{ch:manifolds}
 
@@ -10184,12 +10363,14 @@ boundary trace is built for the half-space model.
 
 \begin{definition}[Smooth measures]
 \label{def:smooth-measure}
-\lean{Manifold.IsSmoothMeasure, Manifold.measurableSet_extend_target}
+\lean{Manifold.IsSmoothMeasure, Manifold.measurableSet_extend_target,
+  Manifold.measurable_piecewise_extend}
 \leanok
 A measure $\mu$ on $M$ is smooth if for every chart $e$ of the atlas there is a function $\rho_e$,
 continuous on the target $\kappa(e.\mathrm{source})$ with $0 < \rho_e < \infty$ there, such that
 $\kappa_* (\mu|_{e.\mathrm{source}}) = \rho_e \, \mathrm{vol}|_{\kappa(e.\mathrm{source})}$. The
-target is measurable, the intersection of an open set with the closed range of $I$.
+target is measurable, the intersection of an open set with the closed range of $I$, and the
+extended chart $\kappa$, set to $0$ outside the open source, is measurable.
 \end{definition}
 
 The Riemannian volume and the Lebesgue measure of a smooth domain are smooth measures.
@@ -10198,7 +10379,10 @@ The Riemannian volume and the Lebesgue measure of a smooth domain are smooth mea
 \label{lem:chart-integrals}
 \lean{Manifold.IsSmoothMeasure.lintegral_source_eq, Manifold.IsSmoothMeasure.exists_density_bounds,
   Manifold.IsSmoothMeasure.exists_lintegral_chart_le,
-  Manifold.IsSmoothMeasure.exists_eLpNorm_chart_le}
+  Manifold.IsSmoothMeasure.exists_eLpNorm_chart_le,
+  Manifold.IsSmoothMeasure.setLIntegral_indicator_preimage_le,
+  Manifold.IsSmoothMeasure.quasiMeasurePreserving_piecewise_extend,
+  Manifold.IsSmoothMeasure.ae_comp_extend}
 \leanok
 \uses{def:smooth-measure}
 For a chart $e$ of the atlas and a measurable $F \geq 0$ on $M$,
@@ -10212,7 +10396,10 @@ $\int_M F \, d\mu \leq C \int_{\kappa(e.\mathrm{source})} F \circ \kappa^{-1}$. 
 $0 < p < \infty$ there are $c', C' < \infty$ such that every strongly measurable $G$ on $M$ that
 vanishes outside $K$ satisfies
 $\|\mathbf 1_{\kappa(e.\mathrm{source})} (G \circ \kappa^{-1})\|_p \leq c' \|G\|_{L_p(\mu)}$ and
-$\|G\|_{L_p(\mu)} \leq C' \|\mathbf 1_{\kappa(e.\mathrm{source})} (G \circ \kappa^{-1})\|_p$.
+$\|G\|_{L_p(\mu)} \leq C' \|\mathbf 1_{\kappa(e.\mathrm{source})} (G \circ \kappa^{-1})\|_p$. If $M$
+is compact, then for every closed $K \subseteq e.\mathrm{source}$ the map $\kappa$, set to $0$
+outside the source, pulls null sets of $E$ back to $\mu$-null subsets of $K$; so for every property
+$P$ that holds at almost every point of $E$, $P(\kappa x)$ holds for $\mu$-almost every $x \in K$.
 \end{lemma}
 
 \begin{proof}
@@ -10220,7 +10407,9 @@ $\|G\|_{L_p(\mu)} \leq C' \|\mathbf 1_{\kappa(e.\mathrm{source})} (G \circ \kapp
 The first identity is the definition of the image measure with $F = (F \circ \kappa^{-1}) \circ
 \kappa$ on the source. The continuous density is bounded above and below by positive finite
 constants on the compact $\kappa(K)$, which carries $F \circ \kappa^{-1}$. For the $L_p$ norms
-apply this to $F = \|G\|^p$, which vanishes outside $K$, and take $p$-th roots.
+apply this to $F = \|G\|^p$, which vanishes outside $K$, and take $p$-th roots. For a measurable
+null set $N$ of $E$, $S = K \cap \kappa^{-1}(N)$ is measurable, and
+$\mu(S) \leq C \int_{\kappa(e.\mathrm{source})} \mathbf 1_S \circ \kappa^{-1} \leq C |N| = 0$.
 \end{proof}
 
 \section{The Besov atlas}
@@ -10259,7 +10448,8 @@ $K = \operatorname{tsupport} \psi_i$ and $U = e_i.\mathrm{source}$.
   Manifold.BesovAtlas.exists_eLpNorm_piece_le, Manifold.BesovAtlas.memLp_piece,
   Manifold.BesovAtlas.pieceLp, Manifold.BesovAtlas.pieceLp_ae, Manifold.BesovAtlas.piece_add,
   Manifold.BesovAtlas.piece_smul, Manifold.BesovAtlas.piece_ae_eq, Manifold.BesovAtlas.pieceLp_add,
-  Manifold.BesovAtlas.pieceLp_smul, Manifold.BesovAtlas.pieceLp_finsetSum}
+  Manifold.BesovAtlas.pieceLp_smul, Manifold.BesovAtlas.pieceLp_zero,
+  Manifold.BesovAtlas.pieceLp_finsetSum}
 \leanok
 \uses{def:besov-atlas, lem:chart-integrals}
 The $i$-th piece of $g : M \to \C$ is $(\psi_i g) \circ \kappa_i^{-1}$ on the target of
@@ -10382,30 +10572,64 @@ $L_p(\mu)$.
 Besov domain (\Cref{thm:besov-domain-invariance}) piece by piece.
 \end{proof}
 
-\begin{lemma}[Functions from a chart]
-\label{lem:chart-lift}
-\lean{Manifold.chartLift, Manifold.stronglyMeasurable_chartLift, Manifold.memLp_chartLift,
-  Manifold.BesovAtlas.piece_chartLift, Manifold.BesovAtlas.chartLiftLp,
-  Manifold.BesovAtlas.pieceLp_chartLiftLp, Manifold.BesovAtlas.memBesov_chartLiftLp}
+\begin{lemma}[Besov spaces of an atlas by the pieces]
+\label{lem:manifold-besov-pieces}
+\lean{Manifold.BesovAtlas.memBesov_iff_forall_modNormOn_lt_top}
 \leanok
-\uses{def:manifold-besov, def:chart-transition, thm:diffeo-invariance, lem:chart-integrals}
-For a chart $e$ of the atlas, a continuous $\theta$ on $M$ with $\operatorname{tsupport} \theta
-\subseteq e.\mathrm{source}$ and $F \in L_p(E)$, the lift $\theta \cdot F \circ \kappa$ on
-$e.\mathrm{source}$, $0$ elsewhere, lies in $L_p(\mu)$. For a Besov atlas, the $i$-th piece of the
-lift $\theta_k \cdot F \circ \kappa_k$ is $T_{ik} F$. If
-$\|F\|_p + \|(2^{j\sigma} \omega_r(F, 2^{-j})_p)_j\|_{\ell_q} < \infty$ with $0 < \sigma < r$,
-the lift lies in $\Besov{\sigma}{p}{q}(M)$.
+\uses{def:manifold-besov, def:manifold-besov-norm}
+For every $s > 0$, every integer $r > s$, every $q \in [1, \infty]$ and every
+$f \in L_p(\mu)$, $\|f\|_{A, \lfloor s \rfloor + 1, s, q} < \infty$ if and only if
+$N_{\Omega_I}(P_i f) < \infty$ with differences of order $r$ for every $i$.
 \end{lemma}
 
 \begin{proof}
 \leanok
-The chart $\kappa$ is continuous on the open source, so the lift is measurable (Mathlib's
-\texttt{ContinuousOn.\allowbreak measurable\_\allowbreak piecewise}). Its integral is comparable to
-the integral in the chart on the compact $\operatorname{tsupport} \theta$
-(\Cref{lem:chart-integrals}), where $\theta$ is bounded. At $y = \kappa_i(x)$ with
+A finite sum is finite if and only if every term is finite, and the order does not matter
+(\Cref{def:manifold-besov}).
+\end{proof}
+
+\begin{lemma}[Functions from a chart]
+\label{lem:chart-lift}
+\lean{Manifold.chartLift, Manifold.chartLift_add, Manifold.chartLift_smul,
+  Manifold.stronglyMeasurable_chartLift, Manifold.chartLift_ae_eq,
+  Manifold.exists_eLpNorm_chartLift_le, Manifold.memLp_chartLift,
+  Manifold.BesovAtlas.piece_chartLift, Manifold.BesovAtlas.chartLiftLp,
+  Manifold.BesovAtlas.chartLiftLp_ae, Manifold.BesovAtlas.chartLiftLp_add,
+  Manifold.BesovAtlas.chartLiftLp_smul, Manifold.BesovAtlas.pieceLp_chartLiftLp,
+  Manifold.BesovAtlas.memBesov_chartLiftLp}
+\leanok
+\uses{def:manifold-besov, def:chart-transition, thm:diffeo-invariance, lem:chart-integrals}
+Let $e$ be a chart of the atlas with extended chart $\kappa$. For $\theta \colon M \to \R$ and
+$F \colon E \to \C$, the lift $\theta \cdot F \circ \kappa$ is this function on
+$e.\mathrm{source}$ and $0$ elsewhere.
+\begin{enumerate}
+  \item For every $\theta$, the lift $F \mapsto \theta \cdot F \circ \kappa$ is linear.
+  \item For every $\theta$ with $\operatorname{tsupport} \theta \subseteq e.\mathrm{source}$ and
+    all $F, G$ with $F = G$ almost everywhere,
+    $\theta \cdot F \circ \kappa = \theta \cdot G \circ \kappa$ $\mu$-almost everywhere.
+  \item If moreover $\theta$ is continuous, then for every $0 < p < \infty$ there is $C < \infty$
+    with $\|\theta \cdot F \circ \kappa\|_{L_p(\mu)} \leq C \|F\|_{L_p(E)}$ for every strongly
+    measurable $F$; in particular the lift of $F \in L_p(E)$ lies in $L_p(\mu)$.
+  \item For a Besov atlas and every $F$, the $i$-th piece of the lift
+    $\theta_k \cdot F \circ \kappa_k$ is $T_{ik} F$, and the lift $L_k$ from the $k$-th chart is
+    linear from $L_p(E)$ to $L_p(\mu)$.
+  \item For every $F \in L_p(E)$ with
+    $\|F\|_p + \|(2^{j\sigma} \omega_r(F, 2^{-j})_p)_j\|_{\ell_q} < \infty$ and $0 < \sigma < r$,
+    the lift $\theta_k \cdot F \circ \kappa_k$ lies in $\Besov{\sigma}{p}{q}(M)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) holds pointwise. (2) Apply the null-set statement of \Cref{lem:chart-integrals} to
+$K = \operatorname{tsupport} \theta$; outside $K$ both lifts vanish. (3) The chart $\kappa$ is
+continuous on the open source, so the lift is measurable (\Cref{def:smooth-measure}). Its integral
+is comparable to the integral in the chart on the compact $\operatorname{tsupport} \theta$
+(\Cref{lem:chart-integrals}), where $|\theta| \leq B$ on the compact $M$. (4) At $y = \kappa_i(x)$
+with
 $x \in e_k.\mathrm{source}$, $\psi_i(x) \theta_k(x) F(\kappa_k x) = \chi_{ik}(\Phi_{ik} y)
-F(\Phi_{ik} y)$. The changes of charts are bounded into the intrinsic space on $\Omega$
-(\Cref{thm:diffeo-invariance}).
+F(\Phi_{ik} y)$; linearity on classes follows from (1) and (2). (5) The changes of charts are
+bounded into the intrinsic space on $\Omega$ (\Cref{thm:diffeo-invariance}).
 \end{proof}
 
 \section{Smooth bounded domains}

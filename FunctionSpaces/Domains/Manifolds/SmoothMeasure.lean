@@ -29,6 +29,12 @@ compact subset `K` of the source, the density is bounded above and below on `κ(
 integrals over `M` and over the chart are comparable
 (`Manifold.IsSmoothMeasure.exists_lintegral_chart_le`): the `L_p` norms on `M` and in the chart
 are equivalent for such functions (`Manifold.IsSmoothMeasure.exists_eLpNorm_chart_le`).
+
+**Null sets in charts**: on a closed subset `K` of the source, the extended chart (set to `0` off
+the source, `Manifold.measurable_piecewise_extend`) is quasi-measure-preserving from `μ|_K` to the
+Lebesgue measure (`Manifold.IsSmoothMeasure.quasiMeasurePreserving_piecewise_extend`), so a
+property of almost every point of `E` holds at `κ x` for `μ`-almost every `x ∈ K`
+(`Manifold.IsSmoothMeasure.ae_comp_extend`).
 -/
 
 @[expose] public section
@@ -60,6 +66,16 @@ theorem measurableSet_extend_target (e : OpenPartialHomeomorph M H) :
   rw [e.extend_target]
   exact (I.continuous_symm.isOpen_preimage _ e.open_target).measurableSet.inter
     I.isClosed_range.measurableSet
+
+omit [FiniteDimensional ℝ E] [ChartedSpace H M] in
+/-- **The extended chart, set to `0` off the source, is measurable**: `κ = e.extend I` is
+continuous on the open source (Mathlib's `ContinuousOn.measurable_piecewise`). -/
+theorem measurable_piecewise_extend (e : OpenPartialHomeomorph M H)
+    [∀ x, Decidable (x ∈ e.source)] :
+    Measurable (e.source.piecewise (e.extend I) fun _ => (0 : E)) := by
+  refine ContinuousOn.measurable_piecewise ?_ continuousOn_const e.open_source.measurableSet
+  have h := e.continuousOn_extend (I := I)
+  rwa [e.extend_source] at h
 
 namespace IsSmoothMeasure
 
@@ -203,6 +219,67 @@ theorem exists_eLpNorm_chart_le {e : OpenPartialHomeomorph M H} (he : e ∈ atla
     ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity : (0 : ℝ) ≤ 1 / p.toReal),
     ← ENNReal.mul_rpow_of_nonneg _ _ (by positivity : (0 : ℝ) ≤ 1 / p.toReal)]
   exact ⟨ENNReal.rpow_le_rpow h1 (by positivity), ENNReal.rpow_le_rpow h2 (by positivity)⟩
+
+omit [ChartedSpace H M] [MeasurableSpace M] [BorelSpace M] in
+/-- **A chart integral of the indicator of a pulled-back set**: for `K ⊆ e.source` and a set `N`
+of `E`, the integral over the target of `1_S ∘ κ⁻¹`, `S = K ∩ κ⁻¹(N)`, is at most `|N|`, where
+`κ = e.extend I` is set to `0` off the source. -/
+theorem setLIntegral_indicator_preimage_le {e : OpenPartialHomeomorph M H} {K : Set M}
+    (hKs : K ⊆ e.source) [∀ x, Decidable (x ∈ e.source)] (N : Set E) :
+    ∫⁻ y in (e.extend I).target,
+        (K ∩ (e.source.piecewise (e.extend I) fun _ => (0 : E)) ⁻¹' N).indicator 1
+          ((e.extend I).symm y) ≤ volume N := by
+  set S := K ∩ (e.source.piecewise (e.extend I) fun _ => (0 : E)) ⁻¹' N
+  calc ∫⁻ y in (e.extend I).target, S.indicator 1 ((e.extend I).symm y)
+      ≤ ∫⁻ y in (e.extend I).target, (toMeasurable volume N).indicator 1 y := by
+        refine setLIntegral_mono' (measurableSet_extend_target I e) fun y hy => ?_
+        by_cases hyS : (e.extend I).symm y ∈ S
+        · have hyN : y ∈ N := by
+            have h := hyS.2
+            rwa [mem_preimage, piecewise_eq_of_mem _ _ _ (hKs hyS.1),
+              (e.extend I).right_inv hy] at h
+          rw [indicator_of_mem hyS, indicator_of_mem (subset_toMeasurable _ _ hyN)]
+          exact le_rfl
+        · rw [indicator_of_notMem hyS]
+          exact zero_le
+    _ ≤ ∫⁻ y, (toMeasurable volume N).indicator 1 y := setLIntegral_le_lintegral _ _
+    _ = volume N := by
+        rw [lintegral_indicator_one (measurableSet_toMeasurable _ _), measure_toMeasurable]
+
+variable (μ) in
+/-- **Charts pull null sets back to null sets**: for a chart `e` of the atlas and a closed
+`K ⊆ e.source`, the extended chart `κ = e.extend I`, set to `0` off the source, is
+quasi-measure-preserving from `μ|_K` to the Lebesgue measure. For a null set `N`,
+`μ(K ∩ κ⁻¹(N)) ≤ C ∫_{κ(e.source)} 1_{K ∩ κ⁻¹(N)} ∘ κ⁻¹ ≤ C |N| = 0`
+(`Manifold.IsSmoothMeasure.exists_lintegral_chart_le`). -/
+theorem quasiMeasurePreserving_piecewise_extend [CompactSpace M] {e : OpenPartialHomeomorph M H}
+    (he : e ∈ atlas H M) {K : Set M} (hK : IsClosed K) (hKs : K ⊆ e.source)
+    [∀ x, Decidable (x ∈ e.source)] :
+    Measure.QuasiMeasurePreserving (e.source.piecewise (e.extend I) fun _ => (0 : E))
+      (μ.restrict K) volume := by
+  have hκ := measurable_piecewise_extend I e
+  refine ⟨hκ, Measure.AbsolutelyContinuous.mk fun N hN hN0 => ?_⟩
+  obtain ⟨c, C, -, -, hcmp⟩ := exists_lintegral_chart_le (I := I) μ he hK.isCompact hKs
+  have hS : MeasurableSet (K ∩ (e.source.piecewise (e.extend I) fun _ => (0 : E)) ⁻¹' N) :=
+    hK.measurableSet.inter (hκ hN)
+  have h := (hcmp _ (measurable_one.indicator hS)
+    fun x hx => indicator_of_notMem (fun h => hx h.1) _).2
+  rw [lintegral_indicator_one hS] at h
+  rw [Measure.map_apply hκ hN, Measure.restrict_apply (hκ hN), inter_comm]
+  exact le_antisymm (h.trans ((mul_le_mul' le_rfl (setLIntegral_indicator_preimage_le hKs N)).trans
+    (by rw [hN0, mul_zero]))) zero_le
+
+/-- **Null sets in a chart are null on `M`**: for a chart `e` of the atlas, a closed set
+`K ⊆ e.source` and a property `P` of almost every point of `E`, `P (κ x)` holds for `μ`-almost every
+`x ∈ K`, `κ = e.extend I` (`Manifold.IsSmoothMeasure.quasiMeasurePreserving_piecewise_extend` and
+Mathlib's `MeasureTheory.Measure.QuasiMeasurePreserving.ae`). -/
+theorem ae_comp_extend [CompactSpace M] {e : OpenPartialHomeomorph M H} (he : e ∈ atlas H M)
+    {K : Set M} (hK : IsClosed K) (hKs : K ⊆ e.source) {P : E → Prop}
+    (hP : ∀ᵐ y ∂volume, P y) : ∀ᵐ x ∂μ, x ∈ K → P (e.extend I x) := by
+  classical
+  have h := (quasiMeasurePreserving_piecewise_extend (I := I) μ he hK hKs).ae hP
+  filter_upwards [(ae_restrict_iff' hK.measurableSet).1 h] with x hx hxK
+  simpa only [piecewise_eq_of_mem _ _ _ (hKs hxK)] using hx hxK
 
 end IsSmoothMeasure
 

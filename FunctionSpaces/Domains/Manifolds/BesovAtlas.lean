@@ -22,9 +22,10 @@ inside an open set (`Manifold.exists_contMDiff_eq_one_tsupport_subset`).
 
 A smooth function on `M` read in an extended chart is smooth within the target of the chart
 (`Manifold.contDiffOn_comp_extend_symm`). Conversely, a function `F` on `E` gives the **lift from
-a chart** `θ · F ∘ κ` on `M` (`Manifold.chartLift`), which lies in `L_p(μ)` for `F ∈ L_p(E)`
-(`Manifold.memLp_chartLift`) and whose pieces are the images of `F` under the changes of charts
-(`Manifold.BesovAtlas.piece_chartLift`).
+a chart** `θ · F ∘ κ` on `M` (`Manifold.chartLift`). It is linear in `F`, depends only on the
+class of `F` (`Manifold.chartLift_ae_eq`), is bounded from `L_p(E)` to `L_p(μ)`
+(`Manifold.exists_eLpNorm_chartLift_le`, `Manifold.memLp_chartLift`), and its pieces are the images
+of `F` under the changes of charts (`Manifold.BesovAtlas.piece_chartLift`).
 
 The change of charts `T_{ij}` acts at `y = κ_i x` with `x` in the source of `κ'_j` by
 `T_{ij} G (y) = ψ_i(x) θ'_j(x) G(κ'_j x)` and vanishes at other points
@@ -440,19 +441,35 @@ cut-off `θ` on `M` and `F : E → ℂ`. -/
 noncomputable def chartLift (e : OpenPartialHomeomorph M H) (θ : M → ℝ) (F : E → ℂ) : M → ℂ :=
   e.source.indicator fun x => (θ x : ℂ) * F (e.extend I x)
 
+omit [FiniteDimensional ℝ E] [ChartedSpace H M] in
+/-- The lift from a chart is additive in the function on `E`. -/
+theorem chartLift_add (e : OpenPartialHomeomorph M H) (θ : M → ℝ) (F G : E → ℂ) :
+    chartLift I e θ (F + G) = chartLift I e θ F + chartLift I e θ G := by
+  funext x
+  by_cases hx : x ∈ e.source
+  · simp only [chartLift, indicator_of_mem hx, Pi.add_apply, mul_add]
+  · simp only [chartLift, indicator_of_notMem hx, Pi.add_apply, add_zero]
+
+omit [FiniteDimensional ℝ E] [ChartedSpace H M] in
+/-- The lift from a chart is homogeneous in the function on `E`. -/
+theorem chartLift_smul (e : OpenPartialHomeomorph M H) (θ : M → ℝ) (c : ℂ) (F : E → ℂ) :
+    chartLift I e θ (c • F) = c • chartLift I e θ F := by
+  funext x
+  by_cases hx : x ∈ e.source
+  · simp only [chartLift, indicator_of_mem hx, Pi.smul_apply, smul_eq_mul]
+    ring
+  · simp only [chartLift, indicator_of_notMem hx, Pi.smul_apply, smul_zero]
+
 variable [MeasurableSpace E] [BorelSpace E] [MeasurableSpace M] [BorelSpace M]
 
 omit [FiniteDimensional ℝ E] [ChartedSpace H M] in
 /-- The lift from a chart is strongly measurable for continuous `θ` and strongly measurable `F`,
-since `κ` is continuous on the open source (Mathlib's `ContinuousOn.measurable_piecewise`). -/
+since `κ`, set to `0` off the open source, is measurable
+(`Manifold.measurable_piecewise_extend`). -/
 theorem stronglyMeasurable_chartLift (e : OpenPartialHomeomorph M H) {θ : M → ℝ}
     (hθ : Continuous θ) {F : E → ℂ} (hF : StronglyMeasurable F) :
     StronglyMeasurable (chartLift I e θ F) := by
   classical
-  have hκ : Measurable (e.source.piecewise (e.extend I) fun _ => (0 : E)) := by
-    refine ContinuousOn.measurable_piecewise ?_ continuousOn_const e.open_source.measurableSet
-    have h := e.continuousOn_extend (I := I)
-    rwa [e.extend_source] at h
   have h : chartLift I e θ F = e.source.indicator fun x =>
       (θ x : ℂ) * F (e.source.piecewise (e.extend I) (fun _ => (0 : E)) x) := by
     funext x
@@ -461,41 +478,72 @@ theorem stronglyMeasurable_chartLift (e : OpenPartialHomeomorph M H) {θ : M →
     · rw [chartLift, indicator_of_notMem hx, indicator_of_notMem hx]
   rw [h]
   exact ((Complex.continuous_ofReal.comp hθ).stronglyMeasurable.mul
-    (hF.comp_measurable hκ)).indicator e.open_source.measurableSet
+    (hF.comp_measurable (measurable_piecewise_extend I e))).indicator
+    e.open_source.measurableSet
 
-/-- **The lift from a chart is in `L_p(μ)`** for `F ∈ L_p(E)`, a continuous cut-off `θ` with
-`tsupport θ ⊆ e.source` and a smooth measure `μ`: the `L_p` norms on `M` and in the chart are
-comparable on `tsupport θ` (`Manifold.IsSmoothMeasure.exists_eLpNorm_chart_le`), and `θ` is
-bounded. -/
-theorem memLp_chartLift [CompactSpace M] (μ : Measure M) [IsSmoothMeasure I μ]
+/-- **The lift from a chart sees only classes**: if `F = G` almost everywhere on `E`, then
+`θ · F ∘ κ = θ · G ∘ κ` `μ`-almost everywhere, for every `θ` with `tsupport θ ⊆ e.source`
+(`Manifold.IsSmoothMeasure.ae_comp_extend` on `tsupport θ`). -/
+theorem chartLift_ae_eq [CompactSpace M] {μ : Measure M} [IsSmoothMeasure I μ]
+    {e : OpenPartialHomeomorph M H} (he : e ∈ atlas H M) {θ : M → ℝ}
+    (hθs : tsupport θ ⊆ e.source) {F G : E → ℂ} (h : F =ᵐ[volume] G) :
+    chartLift I e θ F =ᵐ[μ] chartLift I e θ G := by
+  filter_upwards [IsSmoothMeasure.ae_comp_extend (I := I) (μ := μ) he (isClosed_tsupport θ) hθs h]
+    with x hx
+  by_cases hxs : x ∈ e.source
+  · simp only [chartLift, indicator_of_mem hxs]
+    by_cases hxt : x ∈ tsupport θ
+    · rw [hx hxt]
+    · rw [image_eq_zero_of_notMem_tsupport hxt, Complex.ofReal_zero, zero_mul, zero_mul]
+  · simp only [chartLift, indicator_of_notMem hxs]
+
+/-- **The lift from a chart is bounded in `L_p`**: for a chart `e` of the atlas, a continuous
+cut-off `θ` with `tsupport θ ⊆ e.source`, a smooth measure `μ` and `0 < p < ∞` there is `C < ∞`
+with `‖θ · F ∘ κ‖_{L_p(μ)} ≤ C ‖F‖_{L_p(E)}` for every strongly measurable `F`. The `L_p` norms on
+`M` and in the chart are comparable on `tsupport θ`
+(`Manifold.IsSmoothMeasure.exists_eLpNorm_chart_le`), and `|θ| ≤ B` on the compact `M`. -/
+theorem exists_eLpNorm_chartLift_le [CompactSpace M] (μ : Measure M) [IsSmoothMeasure I μ]
     {e : OpenPartialHomeomorph M H} (he : e ∈ atlas H M) {θ : M → ℝ} (hθ : Continuous θ)
-    (hθs : tsupport θ ⊆ e.source) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ⊤) {F : E → ℂ}
-    (hFm : StronglyMeasurable F) (hF : MemLp F p volume) : MemLp (chartLift I e θ F) p μ := by
-  have hm := stronglyMeasurable_chartLift (I := I) e hθ hFm
+    (hθs : tsupport θ ⊆ e.source) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ⊤) :
+    ∃ C : ℝ≥0∞, C ≠ ⊤ ∧ ∀ F : E → ℂ, StronglyMeasurable F →
+      eLpNorm (chartLift I e θ F) p μ ≤ C * eLpNorm F p volume := by
   obtain ⟨_, C, -, hC, hle⟩ := IsSmoothMeasure.exists_eLpNorm_chart_le (I := I) μ he
     (isClosed_tsupport θ).isCompact hθs hp0 hp (F := ℂ)
   obtain ⟨B, hB⟩ := isCompact_univ.exists_bound_of_continuousOn hθ.continuousOn
+  refine ⟨C * ENNReal.ofReal (max B 0), ENNReal.mul_ne_top hC ENNReal.ofReal_ne_top,
+    fun F hF => ?_⟩
+  have hm := stronglyMeasurable_chartLift (I := I) e hθ hF
   have hT := measurableSet_extend_target I e
   have hmT : AEStronglyMeasurable ((e.extend I).target.indicator
       fun y => chartLift I e θ F ((e.extend I).symm y)) volume :=
     (aestronglyMeasurable_indicator_iff hT).2 (hm.aestronglyMeasurable.comp_aemeasurable
       ((e.continuousOn_extend_symm (I := I)).aemeasurable hT))
-  refine memLp_iff.2 ((hle _ hm fun x hx => ?_).2.trans_lt (ENNReal.mul_lt_top hC.lt_top
-    ((eLpNorm_le_mul_eLpNorm_of_ae_le_mul (c := max B 0) hmT (ae_of_all _ fun y => ?_)
-      p).trans_lt (ENNReal.mul_lt_top ENNReal.ofReal_lt_top hF.eLpNorm_lt_top))))
+  refine (hle _ hm fun x hx => ?_).2.trans ?_
   · by_cases hxs : x ∈ e.source
     · rw [chartLift, indicator_of_mem hxs, image_eq_zero_of_notMem_tsupport hx,
         Complex.ofReal_zero, zero_mul]
     · rw [chartLift, indicator_of_notMem hxs]
-  · by_cases hy : y ∈ (e.extend I).target
-    · have hx : (e.extend I).symm y ∈ e.source := by
-        simpa only [e.extend_source] using (e.extend I).map_target hy
-      rw [indicator_of_mem hy, chartLift, indicator_of_mem hx, (e.extend I).right_inv hy,
-        norm_mul, Complex.norm_real]
-      exact mul_le_mul_of_nonneg_right ((hB _ (mem_univ _)).trans (le_max_left B 0))
-        (norm_nonneg _)
-    · rw [indicator_of_notMem hy, norm_zero]
-      exact mul_nonneg (le_max_right B 0) (norm_nonneg _)
+  rw [mul_assoc]
+  refine mul_le_mul' le_rfl (eLpNorm_le_mul_eLpNorm_of_ae_le_mul hmT (ae_of_all _ fun y => ?_) p)
+  by_cases hy : y ∈ (e.extend I).target
+  · have hx : (e.extend I).symm y ∈ e.source := by
+      simpa only [e.extend_source] using (e.extend I).map_target hy
+    rw [indicator_of_mem hy, chartLift, indicator_of_mem hx, (e.extend I).right_inv hy,
+      norm_mul, Complex.norm_real]
+    exact mul_le_mul_of_nonneg_right ((hB _ (mem_univ _)).trans (le_max_left B 0))
+      (norm_nonneg _)
+  · rw [indicator_of_notMem hy, norm_zero]
+    exact mul_nonneg (le_max_right B 0) (norm_nonneg _)
+
+/-- **The lift from a chart is in `L_p(μ)`** for `F ∈ L_p(E)`, a continuous cut-off `θ` with
+`tsupport θ ⊆ e.source` and a smooth measure `μ`, by the `L_p` bound
+(`Manifold.exists_eLpNorm_chartLift_le`). -/
+theorem memLp_chartLift [CompactSpace M] (μ : Measure M) [IsSmoothMeasure I μ]
+    {e : OpenPartialHomeomorph M H} (he : e ∈ atlas H M) {θ : M → ℝ} (hθ : Continuous θ)
+    (hθs : tsupport θ ⊆ e.source) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ⊤) {F : E → ℂ}
+    (hFm : StronglyMeasurable F) (hF : MemLp F p volume) : MemLp (chartLift I e θ F) p μ := by
+  obtain ⟨C, hC, hle⟩ := exists_eLpNorm_chartLift_le (I := I) μ he hθ hθs hp0 hp
+  exact memLp_iff.2 ((hle F hFm).trans_lt (ENNReal.mul_lt_top hC.lt_top hF.eLpNorm_lt_top))
 
 end ChartLift
 

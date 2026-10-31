@@ -147,6 +147,7 @@ public import FunctionSpaces.Domains.Manifolds.SmoothDomainBesov
 public import FunctionSpaces.Domains.Manifolds.BoundaryBesov
 public import FunctionSpaces.Domains.Manifolds.BoundaryTrace
 public import FunctionSpaces.Domains.Manifolds.SmoothLocalGraphs
+public import FunctionSpaces.Domains.Manifolds.ChartSobolev
 public import FunctionSpaces.Domains.Interval.Differences
 public import FunctionSpaces.Domains.Interval.Modulus
 public import FunctionSpaces.Domains.Interval.Polynomials
@@ -786,9 +787,10 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
 #### `Domains/Manifolds`: compact manifolds and smooth domains
 
 * `FunctionSpaces.Domains.Manifolds.SmoothMeasure`: smooth measures on manifolds, integrals in
-  charts and their comparison with integrals on the manifold.
+  charts and their comparison with integrals on the manifold, and null sets in charts.
 * `FunctionSpaces.Domains.Manifolds.BesovAtlas`: Besov atlases, chart pieces in `L_p`, the changes
-  of charts with cut-offs, the pieces of two atlases, and lifts of functions from a chart.
+  of charts with cut-offs, the pieces of two atlases, and lifts of functions from a chart with
+  their `L_p` bound.
 * `FunctionSpaces.Domains.Manifolds.Besov`: the Besov quasi-norm of an atlas, its independence of
   the atlas and of the order, the Besov spaces of a compact manifold, and lifts from a chart in
   them.
@@ -807,6 +809,11 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   bounded domains with smooth boundary by smooth local graphs, the smooth cut-off of a local graph,
   the smooth domain of a set satisfying the definition and the converse, and the ball as a smooth
   domain with its Besov spaces.
+* `FunctionSpaces.Domains.Manifolds.ChartSobolev`: the chart Sobolev space `H^1_A(M)` of a compact
+  manifold with or without boundary: the open model set, chart pieces and lifts from a chart as
+  bounded operators, the retract identity `∑_k L_k P_k = id`, the graph space of the weak
+  gradients of the pieces on the open model set with the chart form, its embedding into
+  `L_2(μ)`, and `H^1_A(M) = B^1_{2,2}(M)` for every Besov atlas.
 
 #### `Domains/Interval`: intervals
 
