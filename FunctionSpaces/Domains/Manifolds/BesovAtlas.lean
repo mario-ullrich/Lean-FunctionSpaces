@@ -27,6 +27,10 @@ class of `F` (`Manifold.chartLift_ae_eq`), is bounded from `L_p(E)` to `L_p(μ)`
 (`Manifold.exists_eLpNorm_chartLift_le`, `Manifold.memLp_chartLift`), and its pieces are the images
 of `F` under the changes of charts (`Manifold.BesovAtlas.piece_chartLift`).
 
+A change of charts `κ' ∘ κ⁻¹` has a measurable source (`Manifold.measurableSet_coordChange_source`)
+and maps the part of a set `B` inside its source onto the points `y` of the target of `κ'` with
+`κ'⁻¹ y ∈ e.source` and `κ(κ'⁻¹ y) ∈ B` (`Manifold.image_coordChange_inter`).
+
 The change of charts `T_{ij}` acts at `y = κ_i x` with `x` in the source of `κ'_j` by
 `T_{ij} G (y) = ψ_i(x) θ'_j(x) G(κ'_j x)` and vanishes at other points
 (`Manifold.BesovAtlas.transition_apply_of_mem`, `Manifold.BesovAtlas.transition_apply_of_notMem`).
@@ -169,6 +173,26 @@ theorem coordChange_target_eq_image :
 /-- The change of charts is `e'.extend I ∘ (e.extend I).symm`. -/
 theorem coordChange_apply (y : E) :
     I.extendCoordChange e e' y = e'.extend I ((e.extend I).symm y) := rfl
+
+/-- **The image of a set under a change of charts**: for charts `e`, `e'` with extended charts
+`κ`, `κ'` and the change of charts `Φ = κ' ∘ κ⁻¹`, the image of `B ∩ source Φ` under `Φ` is the set
+of points `y` of the target of `κ'` with `κ'⁻¹ y ∈ e.source` and `κ(κ'⁻¹ y) ∈ B` (Mathlib's
+`PartialEquiv.image_source_inter_eq'`, with `Φ⁻¹` the change of charts from `e'` to `e`). -/
+theorem image_coordChange_inter (B : Set E) :
+    I.extendCoordChange e e' '' (B ∩ (I.extendCoordChange e e').source) =
+      (e'.extend I).target ∩ (e'.extend I).symm ⁻¹' (e.source ∩ e.extend I ⁻¹' B) := by
+  rw [inter_comm, PartialEquiv.image_source_inter_eq', ← (I.extendCoordChange e e').symm_source,
+    ModelWithCorners.extendCoordChange_symm]
+  ext y
+  simp only [mem_inter_iff, mem_preimage, mem_coordChange_source, coordChange_apply, and_assoc]
+
+/-- The source of a change of charts is measurable: it is the intersection of the closed range
+of `I` with an open set (`Manifold.range_inter_coordChange_source`). -/
+theorem measurableSet_coordChange_source [MeasurableSpace E] [BorelSpace E] :
+    MeasurableSet (I.extendCoordChange e e').source := by
+  rw [← range_inter_coordChange_source]
+  exact I.isClosed_range.measurableSet.inter
+    (I.continuous_symm.isOpen_preimage _ (OpenPartialHomeomorph.open_source _)).measurableSet
 
 end CoordChange
 

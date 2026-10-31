@@ -143,6 +143,7 @@ public import FunctionSpaces.Domains.Spectral.ChartFormEigenbasis
 public import FunctionSpaces.Domains.Spectral.ManifoldSpectralBesov
 public import FunctionSpaces.Domains.Manifolds.SmoothMeasure
 public import FunctionSpaces.Domains.Manifolds.BesovAtlas
+public import FunctionSpaces.Domains.Manifolds.SmoothMeasureExistence
 public import FunctionSpaces.Domains.Manifolds.Besov
 public import FunctionSpaces.Domains.Manifolds.SmoothDomain
 public import FunctionSpaces.Domains.Manifolds.SmoothDomainBesov
@@ -796,15 +797,21 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   Neumann couples of the bounded convex pieces, the lifts map `(L_2(E), H^1(E))` into it, and for
   `0 < θ < 1` the approximation space `A^θ_q` of the chart eigenbasis is `B^θ_{2,q}(M)`, in dyadic
   blocks and for `q = 2` by the eigenvalues; closures of smooth domains and the closed ball as
-  examples with boundary.
+  examples with boundary, the sphere with the chart measure of an atlas as an example without
+  boundary.
 
 #### `Domains/Manifolds`: compact manifolds and smooth domains
 
-* `FunctionSpaces.Domains.Manifolds.SmoothMeasure`: smooth measures on manifolds, integrals in
-  charts and their comparison with integrals on the manifold, and null sets in charts.
-* `FunctionSpaces.Domains.Manifolds.BesovAtlas`: Besov atlases, chart pieces in `L_p`, the changes
-  of charts with cut-offs, the pieces of two atlases, and lifts of functions from a chart with
-  their `L_p` bound.
+* `FunctionSpaces.Domains.Manifolds.SmoothMeasure`: smooth measures on manifolds, measurability of
+  extended charts on their sources, integrals in charts and their comparison with integrals on the
+  manifold, and null sets in charts.
+* `FunctionSpaces.Domains.Manifolds.BesovAtlas`: Besov atlases, chart pieces in `L_p`, images and
+  measurable sources of changes of charts, the changes of charts with cut-offs, the pieces of two
+  atlases, and lifts of functions from a chart with their `L_p` bound.
+* `FunctionSpaces.Domains.Manifolds.SmoothMeasureExistence`: the chart measure of a Besov atlas,
+  its density in every chart by the change of variables, and its smoothness and finiteness, so
+  every compact manifold, with or without boundary, carries a finite smooth measure; the sphere as
+  an example without boundary.
 * `FunctionSpaces.Domains.Manifolds.Besov`: the Besov quasi-norm of an atlas, its independence of
   the atlas and of the order, the Besov spaces of a compact manifold, and lifts from a chart in
   them.

@@ -21,6 +21,10 @@ with respect to the Lebesgue measure on the target `κ(e.source) ⊆ range I`:
 
 `κ_* (μ|_{e.source}) = ρ_e · vol|_{κ(e.source)}`.
 
+The extended chart is almost everywhere measurable on its source
+(`Manifold.aemeasurable_extend_restrict`), and the parts inside the source of preimages of
+measurable sets are measurable (`Manifold.measurableSet_source_inter_extend_preimage`).
+
 The Riemannian volume and the Lebesgue measure of a smooth domain are smooth measures.
 
 **Integrals in a chart** (`Manifold.IsSmoothMeasure.lintegral_source_eq`):
@@ -77,6 +81,27 @@ theorem measurable_piecewise_extend (e : OpenPartialHomeomorph M H)
   have h := e.continuousOn_extend (I := I)
   rwa [e.extend_source] at h
 
+omit [FiniteDimensional ℝ E] [ChartedSpace H M] in
+/-- **The extended chart is almost everywhere measurable on its source**: for every measure `μ` on
+`M`, `κ = e.extend I` is almost everywhere measurable for `μ` restricted to the open source, on
+which `κ` is continuous. -/
+theorem aemeasurable_extend_restrict (e : OpenPartialHomeomorph M H) (μ : Measure M) :
+    AEMeasurable (e.extend I) (μ.restrict e.source) := by
+  have h := (e.continuousOn_extend (I := I)).aemeasurable (μ := μ)
+    (by rw [e.extend_source]; exact e.open_source.measurableSet)
+  rwa [e.extend_source] at h
+
+omit [FiniteDimensional ℝ E] [ChartedSpace H M] in
+/-- **Preimages under the extended chart within its source are measurable**: for a measurable
+`B ⊆ E`, the set `e.source ∩ κ⁻¹(B)`, `κ = e.extend I`, is measurable. It is the part inside the
+source of the preimage of `B` under the measurable map `Manifold.measurable_piecewise_extend`
+(Mathlib's `Set.piecewise_preimage`). -/
+theorem measurableSet_source_inter_extend_preimage (e : OpenPartialHomeomorph M H) {B : Set E}
+    (hB : MeasurableSet B) : MeasurableSet (e.source ∩ e.extend I ⁻¹' B) := by
+  classical
+  have h := (measurable_piecewise_extend I e hB).inter e.open_source.measurableSet
+  rwa [piecewise_preimage, ite_inter_self, inter_comm] at h
+
 namespace IsSmoothMeasure
 
 variable {I} {μ : Measure M} [IsSmoothMeasure I μ]
@@ -93,10 +118,7 @@ theorem lintegral_source_eq {e : OpenPartialHomeomorph M H} {ρ : E → ℝ≥0�
       ∫⁻ y in (e.extend I).target, ρ y * F ((e.extend I).symm y) := by
   have hT := measurableSet_extend_target I e
   have hsrc : MeasurableSet e.source := e.open_source.measurableSet
-  have hκ : AEMeasurable (e.extend I) (μ.restrict e.source) := by
-    have h := (e.continuousOn_extend (I := I)).aemeasurable (μ := μ)
-      (by rw [e.extend_source]; exact hsrc)
-    rwa [e.extend_source] at h
+  have hκ := aemeasurable_extend_restrict I e μ
   have hFs : AEMeasurable (fun y => F ((e.extend I).symm y))
       (volume.restrict (e.extend I).target) :=
     hF.comp_aemeasurable ((e.continuousOn_extend_symm (I := I)).aemeasurable hT)

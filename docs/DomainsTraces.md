@@ -195,7 +195,13 @@ on this project, with the decisions behind their form.
   respect to the Lebesgue measure, `Manifold.IsSmoothMeasure`) and `1 ≤ p < ∞`. A Besov atlas
   consists of finitely many charts `κ_i`, a smooth partition of unity `ψ_i` subordinate to them and
   cut-offs (`Manifold.BesovAtlas`); every compact manifold has one
-  (`Manifold.BesovAtlas.nonempty`). Its Besov quasi-norm is
+  (`Manifold.BesovAtlas.nonempty`). Its chart measure
+  `μ_A = ∑_i (κ_i⁻¹)_* (ψ_i ∘ κ_i⁻¹ · vol|_{T_i})`, with `T_i = κ_i(e_i.source)` the target of
+  the extended chart (`Manifold.BesovAtlas.chartMeasure`), has the density
+  `∑_i |det DΦ_i| ψ_i ∘ κ⁻¹` in every chart `κ`, `Φ_i = κ_i ∘ κ⁻¹`, so it is a finite smooth
+  measure (`Manifold.BesovAtlas.isSmoothMeasure_chartMeasure`), and every compact manifold, with or
+  without boundary, carries one (`Manifold.exists_isSmoothMeasure`), for example the sphere
+  (`Manifold.exists_isSmoothMeasure_sphere`). The Besov quasi-norm of a Besov atlas `A` is
   `‖f‖_{A,r,s,q} = ∑_i N_Ω((ψ_i f) ∘ κ_i⁻¹)` with
   `N_Ω(G) = ‖G‖_{L_p(Ω)} + ‖(2^(ks) ω_r(G, 2^(-k), Ω)_p)_k‖_{ℓ_q}`, `Ω = range I`
   (`Manifold.BesovAtlas.besovNorm`). For two Besov atlases, `0 < s < r` and `1 ≤ q ≤ ∞` there is
@@ -678,7 +684,9 @@ on this project, with the decisions behind their form.
   eigenfunction expansion (`Manifold.BesovAtlas.memBesov_iff_blockNorm_lt_top`), and for `q = 2`
   iff `∑_i (1 + λ_i)^θ |⟨e_i, f⟩|² < ∞` (`Manifold.BesovAtlas.memBesov_two_iff_chartEigenvalue`).
   On the closure of a bounded smooth domain `Ω` these are the intrinsic `B^θ_{2,q}(Ω)`
-  (`Rd.SmoothDomain.memApprox_chartScheme_iff_modNormOn`).
+  (`Rd.SmoothDomain.memApprox_chartScheme_iff_modNormOn`); the sphere `S^n`, `n ≥ 1`, with the
+  chart measure of a Besov atlas is an example without boundary
+  (`Manifold.memApprox_chartScheme_sphere_iff`).
 
 ## What is formalised
 
@@ -700,8 +708,9 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Traces in charts: locality, approximation, change of chart, products and their bound, finite sums | ✅ | ✗ | `Domains/Traces/GraphTraceCharts` |
 | Traces on bounded Lipschitz domains: Besov spaces on the boundary, the trace space | ✅ | ✗ | `Domains/Traces/LipschitzBoundaryTrace` |
 | Besov quasi-norms on the boundary: chart pieces, bounded trace and extension for `1 ≤ p < ∞`, independence of the resolution of unity | ✅ | ✗ | `Domains/Traces/BoundaryBesovNorm` |
-| Smooth measures on manifolds, integrals and `L_p` norms in charts, null sets in charts | ✅ | ✗ | `Domains/Manifolds/SmoothMeasure` |
-| Besov atlases, chart pieces, changes of charts with cut-offs, lifts from a chart and their `L_p` bound | ✅ | ✗ | `Domains/Manifolds/BesovAtlas` |
+| Smooth measures on manifolds, measurability of extended charts on their sources, integrals and `L_p` norms in charts, null sets in charts | ✅ | ✗ | `Domains/Manifolds/SmoothMeasure` |
+| Besov atlases, chart pieces, images and measurable sources of changes of charts, changes of charts with cut-offs, lifts from a chart and their `L_p` bound | ✅ | ✗ | `Domains/Manifolds/BesovAtlas` |
+| Smooth measures exist: the chart measure of a Besov atlas, its density in every chart by the Jacobian determinants of the changes of charts, continuity and positivity of the density, finiteness, every compact manifold with or without boundary carries a finite smooth measure, the sphere as an example without boundary | ✅ | ✗ | `Domains/Manifolds/SmoothMeasureExistence` |
 | Besov spaces on compact manifolds, independence of the atlas and of the order, membership piece by piece, lifts from a chart | ✅ | ✗ | `Domains/Manifolds/Besov` |
 | Flattening of graph domains, the Lipschitz bounds of the flattening and its inverse, the graph in the image of the hyperplane, product and graph coordinates, preservation of the Lebesgue measure for every Lipschitz graph | ✅ | ✗ | `Domains/Lipschitz/GraphStraightening` |
 | Smooth bounded domains as compact manifolds with boundary, Lebesgue measure as smooth measure | ✅ | ✗ | `Domains/Manifolds/SmoothDomain` |
@@ -732,7 +741,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The Neumann Laplacian on bounded Lipschitz domains: `W^1_2(Ω)` as the graph of the weak gradient in `L_2(Ω) × L_2(Ω)^n` and as jets, the dense embedding into `L_2(Ω)` through `H^1_0(Ω)`, Rellich's theorem with bounded `H^1(Ω)` representatives, the Neumann eigenbasis as a spectral scheme with eigenvalues `λ_i = σ_i⁻² - 1 ≥ 0`, among them `0`, the weak eigenvalue equation, `W^1_2(Ω)` as the Sobolev space of order `1` of the scheme, and `(L_2(Ω), W^1_2(Ω))_{θ,q} = A^θ_q` | ✅ | ✗ | `Domains/Spectral/NeumannEigenbasis` |
 | Besov spaces on domains by eigenfunction expansions: differences and moduli of `H^1(ℝ^d)` functions by the gradient, the intrinsic modulus by the K-functional of `(L_2(Ω), W^1_2(Ω))`, `B^θ_{2,q}(Ω)` for `0 < θ < 1` as the approximation space of the Neumann eigenbasis on bounded Lipschitz domains, in dyadic blocks and for `q = 2` by the eigenvalues, and the Dirichlet approximation spaces in `B^θ_{2,q}(ℝ^d)` by zero extension | ✅ | ✗ | `Domains/Spectral/SpectralBesov` |
 | The eigenbasis of the chart form on a compact manifold with or without boundary: zero extensions of restrictions, the bounded convex piece of each chart, the jets of the pieces in its Neumann space, Rellich's theorem `J = ∑_k L_k E_k J^N_k T_k` compact, dense range by lifts of `H^1(E)` functions, the chart scheme with eigenvalues `λ_i = σ_i⁻² - 1 ≥ 0`, levels `⌊√(1 + λ_i)⌋₊` and finitely many eigenvalues below each bound, the weak eigenvalue equation `a_A(φ_i, w) = λ_i ⟨e_i, J w⟩` with the natural boundary condition, and `H^1(M) = B^1_{2,2}(M)` in the eigenbasis | ✅ | ✗ | `Domains/Spectral/ChartFormEigenbasis` |
-| Besov spaces on compact manifolds by eigenfunction expansions of the chart form: the pieces map `(L_2(μ), H^1_A(M))` into the Neumann couples of the bounded convex pieces, the lifts `H^1(E) → H^1_A(M)` by the closed graph theorem map `(L_2(E), H^1(E))` into it, `(L_2(μ), H^1_A(M))_{θ,q}` by the pieces, `B^θ_{2,q}(M)` for `0 < θ < 1` as the approximation space of the chart eigenbasis, in dyadic blocks and for `q = 2` by the eigenvalues, and closures of smooth domains and the closed ball as examples with boundary | ✅ | ✗ | `Domains/Spectral/ManifoldSpectralBesov` |
+| Besov spaces on compact manifolds by eigenfunction expansions of the chart form: the pieces map `(L_2(μ), H^1_A(M))` into the Neumann couples of the bounded convex pieces, the lifts `H^1(E) → H^1_A(M)` by the closed graph theorem map `(L_2(E), H^1(E))` into it, `(L_2(μ), H^1_A(M))_{θ,q}` by the pieces, `B^θ_{2,q}(M)` for `0 < θ < 1` as the approximation space of the chart eigenbasis, in dyadic blocks and for `q = 2` by the eigenvalues, closures of smooth domains and the closed ball as examples with boundary, and the sphere with the chart measure of an atlas as an example without boundary | ✅ | ✗ | `Domains/Spectral/ManifoldSpectralBesov` |
 | Bounded Lipschitz domains from the set-level definition: sets Lipschitz near a point, local graphs as Lipschitz graph domains, McShane's extension of local graphs, the structure from a family of charts and the converse, the ball | ✅ | ✗ | `Domains/Lipschitz/LocalLipschitzGraphs` |
 | Bounded open convex sets as bounded Lipschitz domains: the ray length, its cone estimate, open convex sets, bounded or not, near a frontier point as regions above a Lipschitz graph, and the open unit cube with its closure | ✅ | ✗ | `Domains/Lipschitz/ConvexDomains` |
 | Lipschitz graph domains with null graphs and boundaries, closures of convex Lipschitz graph domains as Besov domains, the quadrant as a Lipschitz graph domain and the quadrant model of manifolds with corners as a Besov domain, bounded Lipschitz domains with the extension property, closures of nonempty convex bounded Lipschitz domains and of nonempty bounded open convex sets, closed balls of positive radius and the closed unit cube as Besov domains | ✅ | ✗ | `Domains/Lipschitz/BesovDomains` |

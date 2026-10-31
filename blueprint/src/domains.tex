@@ -10785,6 +10785,26 @@ In particular this holds for every open ball $\Omega = B(c, R)$.
 \Cref{cor:ball-besov}.
 \end{proof}
 
+\begin{example}[The sphere]
+\label{ex:sphere-eigenbasis}
+\lean{Manifold.memApprox_chartScheme_sphere_iff}
+\leanok
+\uses{thm:spectral-besov-manifold, thm:smooth-measure-exists}
+Let $n \geq 1$, let $A$ be a Besov atlas of the unit sphere $S^n \subseteq \R^{n+1}$, a compact
+manifold without boundary modelled on $\R^n$, with its chart measure $\mu_A$
+(\Cref{thm:smooth-measure-exists}), and let $A^\theta_q$ be the approximation spaces of its chart
+scheme. For every $0 < \theta < 1$, every $q \in [1, \infty]$ and every $f \in L_2(\mu_A)$,
+\[
+  f \in A^\theta_q \iff f \in \Besov{\theta}{2}{q}(S^n) .
+\]
+\end{example}
+
+\begin{proof}
+\leanok
+\Cref{thm:spectral-besov-manifold} for $M = S^n$ and the smooth measure $\mu_A$
+(\Cref{thm:smooth-measure-exists}).
+\end{proof}
+
 On a bounded smooth domain $\Omega$ the Neumann eigenbasis of \Cref{thm:neumann-eigenbasis} and the
 eigenbasis of the chart form of $\overline{\Omega}$ are two eigenbases with the same approximation
 spaces $\Besov{\theta}{2}{q}(\Omega)$, $0 < \theta < 1$
@@ -10807,16 +10827,20 @@ boundary trace is built for the half-space model.
 \begin{definition}[Smooth measures]
 \label{def:smooth-measure}
 \lean{Manifold.IsSmoothMeasure, Manifold.measurableSet_extend_target,
-  Manifold.measurable_piecewise_extend}
+  Manifold.measurable_piecewise_extend, Manifold.aemeasurable_extend_restrict,
+  Manifold.measurableSet_source_inter_extend_preimage}
 \leanok
 A measure $\mu$ on $M$ is smooth if for every chart $e$ of the atlas there is a function $\rho_e$,
 continuous on the target $\kappa(e.\mathrm{source})$ with $0 < \rho_e < \infty$ there, such that
 $\kappa_* (\mu|_{e.\mathrm{source}}) = \rho_e \, \mathrm{vol}|_{\kappa(e.\mathrm{source})}$. The
 target is measurable, the intersection of an open set with the closed range of $I$, and the
-extended chart $\kappa$, set to $0$ outside the open source, is measurable.
+extended chart $\kappa$, set to $0$ outside the open source, is measurable. For every measure $\nu$
+on $M$, $\kappa$ is almost everywhere measurable for $\nu|_{e.\mathrm{source}}$, and for every
+measurable $B \subseteq E$ the set $e.\mathrm{source} \cap \kappa^{-1}(B)$ is measurable.
 \end{definition}
 
-The Riemannian volume and the Lebesgue measure of a smooth domain are smooth measures.
+The Riemannian volume and the Lebesgue measure of a smooth domain are smooth measures, and every
+compact manifold carries a finite smooth measure (\Cref{thm:smooth-measure-exists}).
 
 \begin{lemma}[Integrals in a chart]
 \label{lem:chart-integrals}
@@ -10905,18 +10929,25 @@ pieces of $f \in L_p(\mu)$ lie in $L_p(E)$.
 \label{lem:coord-change}
 \lean{Manifold.range_inter_coordChange_source, Manifold.range_inter_coordChange_target,
   Manifold.mem_coordChange_source, Manifold.coordChange_target_eq_image,
-  Manifold.coordChange_apply}
+  Manifold.coordChange_apply, Manifold.image_coordChange_inter,
+  Manifold.measurableSet_coordChange_source}
 \leanok
-For charts $e, e'$ the change of charts $\kappa' \circ \kappa^{-1}$ (Mathlib's
+For charts $e, e'$ the change of charts $\Phi = \kappa' \circ \kappa^{-1}$ (Mathlib's
 \texttt{ModelWithCorners.extendCoordChange}) has the source $\kappa(e.\mathrm{source} \cap
 e'.\mathrm{source}) = \Omega \cap U$ and the target
-$\kappa'(e.\mathrm{source} \cap e'.\mathrm{source}) = \Omega \cap U'$ with open $U, U'$.
+$\kappa'(e.\mathrm{source} \cap e'.\mathrm{source}) = \Omega \cap U'$ with open $U, U'$. The
+source is measurable, and for every $B \subseteq E$ the change of charts $\Phi$ maps $B$ intersected
+with its source onto the set of $y$ in the target of $\kappa'$ with
+$\kappa'^{-1}(y) \in e.\mathrm{source}$ and $\kappa(\kappa'^{-1}(y)) \in B$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 The image of an open subset $S$ of $H$ under $I$ is $I^{-1}$-preimage of $S$ intersected with
-the range of $I$.
+the range of $I$; so the source is the intersection of the closed $\Omega$ with an open set. The
+inverse of $\Phi$ is the change of charts $\kappa \circ \kappa'^{-1}$, whose source is the set of
+$y$ in the target of $\kappa'$ with $\kappa'^{-1}(y) \in e.\mathrm{source}$; the image of $B$
+intersected with the source of $\Phi$ is the preimage of $B$ under $\Phi^{-1}$ within this set.
 \end{proof}
 
 \begin{definition}[The changes of charts with cut-offs]
@@ -10959,6 +10990,133 @@ $\chi_{ij}(\Phi_{ij} y) \cdot (\psi'_j g)(\kappa_j'^{-1} \Phi_{ij} y)$ when $x$ 
 of $e'_j$, since $\theta'_j \psi'_j = \psi'_j$; otherwise $\psi'_j(x) = 0$ and $y$ lies outside the
 source of $\Phi_{ij}$.
 \end{proof}
+
+\section{Existence of smooth measures}
+
+Let $A$ be a Besov atlas with charts $e_k$, extended charts $\kappa_k$ with targets
+$T_k = \kappa_k(e_k.\mathrm{source})$, and partition of unity $(\psi_k)$. Transporting the
+Lebesgue measure with the weights $\psi_k \circ \kappa_k^{-1}$ from $T_k$ to $M$ gives a smooth
+measure. The proof is the change of variables formula for the changes of charts within their
+sources, which are relatively open in $\Omega$; so it covers manifolds without boundary, with
+boundary and with corners at once.
+
+\begin{definition}[The chart measure]
+\label{def:chart-measure}
+\lean{Manifold.BesovAtlas.chartMeasure, Manifold.BesovAtlas.chartMeasure_apply}
+\leanok
+\uses{def:besov-atlas}
+The chart measure of $A$ is
+\[
+  \mu_A = \sum_k (\kappa_k^{-1})_* \bigl( (\psi_k \circ \kappa_k^{-1}) \,
+    \mathrm{vol}|_{T_k} \bigr) .
+\]
+For every measurable $S \subseteq M$,
+$\mu_A(S) = \sum_k \int_{\{y \in T_k : \kappa_k^{-1}(y) \in S\}} \psi_k(\kappa_k^{-1}(y)) \, dy$.
+\end{definition}
+
+\begin{proof}
+\leanok
+The formula is the definition of the image measures and of measures with a density.
+\end{proof}
+
+\begin{lemma}[The chart measure is finite]
+\label{lem:chart-measure-finite}
+\lean{Manifold.BesovAtlas.isFiniteMeasure_chartMeasure}
+\leanok
+\uses{def:chart-measure}
+If $M$ is compact, then $\mu_A(M) < \infty$ for every Besov atlas $A$ of $M$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{def:chart-measure}, the $k$-th term of $\mu_A(M)$ is at most the Lebesgue measure of the
+compact set $\kappa_k(\operatorname{tsupport} \psi_k)$, since $0 \leq \psi_k \leq 1$.
+\end{proof}
+
+For a chart $e$ of $M$, that is, any chart of the atlas of $M$, among them the $e_k$, with
+extended chart $\kappa$ and target $T = \kappa(e.\mathrm{source})$, let
+$\Phi_k = \kappa_k \circ \kappa^{-1}$ be the change of charts, with source
+$U_k = \kappa(e.\mathrm{source} \cap e_k.\mathrm{source}) \subseteq T$ (\Cref{lem:coord-change}),
+and let $D\Phi_k(y)$ be its derivative within $U_k$.
+
+\begin{lemma}[The density of the chart measure]
+\label{lem:chart-measure-density}
+\lean{Manifold.BesovAtlas.densityTerm, Manifold.BesovAtlas.chartDensity,
+  Manifold.BesovAtlas.densityTerm_nonneg, Manifold.BesovAtlas.densityTerm_eq_zero,
+  Manifold.BesovAtlas.setLIntegral_densityTerm, Manifold.BesovAtlas.map_extend_chartMeasure}
+\leanok
+\uses{def:chart-measure, lem:coord-change}
+For every chart $e$ of $M$,
+\[
+  \kappa_* (\mu_A|_{e.\mathrm{source}}) = \rho_e \, \mathrm{vol}|_T , \qquad
+  \rho_e(y) = \sum_k |\det D\Phi_k(y)| \, \psi_k(\kappa^{-1}(y)) .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Evaluate both sides at a measurable $B \subseteq E$; both are sums over $k$. The change of charts
+$\Phi_k$ maps $B \cap U_k$ bijectively onto the set of $y \in T_k$ with
+$\kappa_k^{-1}(y) \in e.\mathrm{source}$ and $\kappa(\kappa_k^{-1}(y)) \in B$, and
+$\kappa_k^{-1}(\Phi_k(z)) = \kappa^{-1}(z)$. The change of variables formula (Mathlib's
+\texttt{lintegral\_image\_eq\_\allowbreak lintegral\_abs\_\allowbreak det\_fderiv\_mul}), which
+needs only the derivatives within the measurable set $B \cap U_k$, turns the $k$-th term of
+$\mu_A(e.\mathrm{source} \cap \kappa^{-1}(B))$ into
+$\int_{B \cap U_k} |\det D\Phi_k(z)| \, \psi_k(\kappa^{-1}(z)) \, dz$. On $T \setminus U_k$ the
+point $\kappa^{-1}(z)$ lies outside $e_k.\mathrm{source} \supseteq \operatorname{tsupport}
+\psi_k$, so the $k$-th term of $\rho_e$ vanishes there, and the integral over $B \cap U_k$ is the
+integral over $B \cap T$. The source $U_k$ is measurable, the intersection of the closed $\Omega$
+with an open set.
+\end{proof}
+
+\begin{lemma}[The density is continuous and positive]
+\label{lem:chart-density-positive}
+\lean{Manifold.BesovAtlas.continuousOn_densityTerm_source,
+  Manifold.BesovAtlas.continuousOn_densityTerm, Manifold.BesovAtlas.chartDensity_pos}
+\leanok
+\uses{lem:chart-measure-density}
+For every chart $e$ of $M$, $\rho_e$ is continuous on $T$, and $\rho_e(y) > 0$ for every
+$y \in T$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $U_k$ the change of charts $\Phi_k$ is smooth and derivatives within $U_k$ are unique, so
+$D\Phi_k$ and the $k$-th term are continuous on $U_k$, which is relatively open in $T$. At
+$y \in T \setminus U_k$ the point $\kappa^{-1}(y)$ lies outside the closed set
+$\operatorname{tsupport} \psi_k$, and so does $\kappa^{-1}(w)$ for $w \in T$ near $y$; the $k$-th
+term vanishes there. For positivity, $\sum_k \psi_k = 1$ gives a $k$ with
+$\psi_k(\kappa^{-1}(y)) > 0$. Then $y \in U_k$, and $D\Phi_k(y)$ is invertible with the derivative
+of $\Phi_k^{-1}$ as inverse (Mathlib's
+\texttt{ModelWithCorners.\allowbreak isInvertible\_\allowbreak fderivWithin\_\allowbreak
+extendCoordChange}), so the $k$-th term is positive; the other terms are nonnegative.
+\end{proof}
+
+\begin{theorem}[Smooth measures exist]
+\label{thm:smooth-measure-exists}
+\lean{Manifold.BesovAtlas.isSmoothMeasure_chartMeasure, Manifold.exists_isSmoothMeasure,
+  Manifold.exists_isSmoothMeasure_sphere}
+\leanok
+\uses{def:smooth-measure, def:besov-atlas, def:chart-measure, lem:chart-measure-finite,
+  lem:chart-measure-density, lem:chart-density-positive}
+For every Besov atlas $A$ of a smooth manifold $M$, the chart measure $\mu_A$ is a smooth
+measure. Every compact Hausdorff smooth manifold, with or without boundary, carries a finite
+smooth measure. For every $n \geq 0$, the unit sphere $S^n \subseteq \R^{n+1}$ with its
+stereographic charts carries a finite smooth measure.
+\end{theorem}
+
+\begin{proof}
+\leanok
+In every chart, $\rho_e$ is a density of $\kappa_* (\mu_A|_{e.\mathrm{source}})$
+(\Cref{lem:chart-measure-density}), continuous and positive on $T$
+(\Cref{lem:chart-density-positive}), and finite as a real number. A compact manifold has a Besov
+atlas (\Cref{def:besov-atlas}), whose chart measure is finite (\Cref{lem:chart-measure-finite}).
+Mathlib's sphere is a compact smooth manifold without boundary modelled on $\R^n$.
+\end{proof}
+
+So the results of this chapter and of \Cref{ch:laplacian-eigenbases} apply, with the chart
+measure of an atlas, to every compact manifold of positive dimension whose model range is a Besov
+domain, for example to the sphere $S^n$, $n \geq 1$ (\Cref{ex:sphere-eigenbasis}).
 
 \section{Besov spaces on compact manifolds}
 

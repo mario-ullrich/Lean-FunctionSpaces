@@ -8,6 +8,7 @@ module
 public import FunctionSpaces.Domains.Spectral.ChartFormEigenbasis
 public import FunctionSpaces.Domains.Spectral.SpectralBesov
 public import FunctionSpaces.Domains.Manifolds.SmoothLocalGraphs
+public import FunctionSpaces.Domains.Manifolds.SmoothMeasureExistence
 
 /-!
 # Besov spaces on compact manifolds by eigenfunction expansions
@@ -38,6 +39,9 @@ the chart form (`Manifold.BesovAtlas.chartScheme`). Let `0 < θ < 1` and `1 ≤ 
   spaces of the chart scheme are the intrinsic `B^θ_{2,q}(Ω)`
   (`Rd.SmoothDomain.memApprox_chartScheme_iff_modNormOn`), for example on the closed ball
   (`Rd.SmoothDomain.memApprox_chartScheme_ball_iff`).
+* **The sphere**: on the sphere `S^n`, `n ≥ 1`, a compact manifold without boundary, with the
+  chart measure of a Besov atlas, the approximation spaces of the chart scheme are
+  `B^θ_{2,q}(S^n)` (`Manifold.memApprox_chartScheme_sphere_iff`).
 -/
 
 @[expose] public section
@@ -267,6 +271,18 @@ theorem memBesov_two_iff_chartEigenvalue [T2Space M] (hθ : 0 < θ) (hθ' : θ <
   exact (A.chartCompactEmbedding μ).memApprox_two_iff hθ _
 
 end BesovAtlas
+
+/-- **The sphere by the chart eigenbasis**: for `n ≥ 1`, every Besov atlas `A` of the sphere
+`S^n ⊆ ℝ^(n+1)`, a compact manifold without boundary modelled on `ℝ^n`, with its chart measure
+`μ_A` (`Manifold.BesovAtlas.isSmoothMeasure_chartMeasure`), for `0 < θ < 1`, `1 ≤ q ≤ ∞` and every
+`f ∈ L_2(μ_A)`, `f` lies in the approximation space `A^θ_q` of the eigenbasis of the chart form iff
+`f ∈ B^θ_{2,q}(S^n)` (`Manifold.BesovAtlas.memApprox_chartScheme_iff`). -/
+theorem memApprox_chartScheme_sphere_iff {n : ℕ} [NeZero n]
+    (A : BesovAtlas (𝓡 n) (sphere (0 : EuclideanSpace ℝ (Fin (n + 1))) 1)) {θ : ℝ} {q : ℝ≥0∞}
+    (hθ : 0 < θ) (hθ' : θ < 1) (hq : 1 ≤ q) (f : Lp ℂ 2 A.chartMeasure) :
+    (A.chartScheme A.chartMeasure).toScheme.MemApprox θ q f ↔
+      Manifold.MemBesov (𝓡 n) A.chartMeasure Rd.two_ne_top θ q f :=
+  A.memApprox_chartScheme_iff hθ hθ' hq f
 
 end Manifold
 

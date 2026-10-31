@@ -621,7 +621,10 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   (`Manifold.BesovAtlas.memApprox_chartScheme_iff`); for `q = 2` iff
   `∑_i (1 + λ_i)^s |⟨e_i, f⟩|² < ∞` (`Manifold.BesovAtlas.memBesov_two_iff_chartEigenvalue`). The
   closure of a bounded smooth domain is an example with boundary
-  (`Rd.SmoothDomain.memApprox_chartScheme_iff_modNormOn`). The chart form depends on the atlas;
+  (`Rd.SmoothDomain.memApprox_chartScheme_iff_modNormOn`); every compact manifold carries a finite
+  smooth measure, the chart measure of a Besov atlas (`Manifold.exists_isSmoothMeasure`), and the
+  sphere `S^n`, `n ≥ 1`, is an example without boundary
+  (`Manifold.memApprox_chartScheme_sphere_iff`). The chart form depends on the atlas;
   it is local and uniformly elliptic in the charts, and the Laplace–Beltrami form is a later goal.
 * **The trace theorem on compact manifolds with boundary.** Let `M` be as above with boundary,
   modelled on the half-space `{y ∈ ℝ^n : y_0 ≥ 0}`, and let `B^s_{p,q}(∂M)` consist of the `g`
