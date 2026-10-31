@@ -136,6 +136,7 @@ public import FunctionSpaces.Domains.Sobolev.LipschitzDomainW1p
 public import FunctionSpaces.Domains.Sobolev.LipschitzGraphGreen
 public import FunctionSpaces.Domains.Sobolev.LipschitzDomainGreen
 public import FunctionSpaces.Domains.Spectral.DirichletEigenbasis
+public import FunctionSpaces.Domains.Spectral.NeumannEigenbasis
 public import FunctionSpaces.Domains.Manifolds.SmoothMeasure
 public import FunctionSpaces.Domains.Manifolds.BesovAtlas
 public import FunctionSpaces.Domains.Manifolds.Besov
@@ -759,6 +760,12 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   `H^1_0(Ω) → L_2(Ω)`, its spectral scheme as the Dirichlet eigenbasis with eigenvalues
   `λ_i = 4π²(σ_i⁻² - 1) ≥ 0`, the weak eigenvalue equation, `H^1_0(Ω)` as the Sobolev space of
   order `1` of the scheme, and `(L_2(Ω), H^1_0(Ω))_{θ,q}` as its approximation spaces.
+* `FunctionSpaces.Domains.Spectral.NeumannEigenbasis`: the Neumann Laplacian on a bounded
+  Lipschitz domain: `W^1_2(Ω)` as the graph of the weak gradient in `L_2(Ω) × L_2(Ω)^n`, its
+  compact dense embedding into `L_2(Ω)`, its spectral scheme as the Neumann eigenbasis with
+  eigenvalues `λ_i = σ_i⁻² - 1 ≥ 0`, among them `0`, the weak eigenvalue equation, `W^1_2(Ω)` as
+  the Sobolev space of order `1` of the scheme, and `(L_2(Ω), W^1_2(Ω))_{θ,q}` as its
+  approximation spaces.
 
 #### `Domains/Manifolds`: compact manifolds and smooth domains
 

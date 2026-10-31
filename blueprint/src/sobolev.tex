@@ -4217,13 +4217,15 @@ real smooth function with compact support on $\R^d$.
 
 \begin{lemma}[Classical derivatives are weak derivatives]
 \label{lem:weak-derivative-classical}
-\lean{Rd.fderiv_testSchwartz_apply, Rd.hasWeakLineDeriv_of_contDiff}
+\lean{Rd.fderiv_testSchwartz_apply, Rd.hasWeakLineDeriv_of_contDiff, Rd.hasWeakLineDeriv_const}
 \leanok
 \uses{def:weak-line-derivative, lem:weak-derivative-integral, def:test-schwartz,
   lem:directional-derivatives-commute}
 Let $V$ be a finite-dimensional real inner product space and $\Omega \subseteq V$ open. For every
 continuously differentiable $F \colon V \to \C$ and every $w \in V$, the function
-$x \mapsto DF(x) w$ is the weak derivative $\partial_w F$ on $\Omega$. For every real test
+$x \mapsto DF(x) w$ is the weak derivative $\partial_w F$ on $\Omega$. For every $w \in V$ and
+every $c \in \C$, the weak derivative $\partial_w$ of the constant function $c$ on $\Omega$ is
+$0$. For every real test
 function $\varphi$ on $\Omega$ and all $x, w \in V$, the derivative of $\varphi$, regarded as a
 complex function, at $x$ in the direction $w$ is $(\partial_w \varphi)(x)$.
 \end{lemma}
@@ -4237,7 +4239,8 @@ $\varphi \, DF(\cdot) w$, $(\partial_w \varphi) F$ and $\varphi F$ are integrabl
 by parts (Mathlib's \texttt{integral\_\allowbreak mul\_\allowbreak fderiv\_\allowbreak
 eq\_\allowbreak neg\_\allowbreak fderiv\_\allowbreak mul\_\allowbreak of\_\allowbreak integrable})
 gives $\int \varphi \, DF(\cdot) w = -\int (\partial_w \varphi) F$. This is the identity of
-\Cref{lem:weak-derivative-integral} for $k = 1$.
+\Cref{lem:weak-derivative-integral} for $k = 1$. A constant function has the classical
+derivative $0$.
 \end{proof}
 
 \begin{definition}[The periodic pairing]

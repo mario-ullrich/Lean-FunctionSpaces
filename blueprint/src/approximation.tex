@@ -4352,6 +4352,29 @@ coefficients of some $u \in V$, and $J u = f$ by (1). The norm is Parseval's ide
 For $V = H^1_0(\Omega)$ and $H = L_2(\Omega)$, part (3) is the weak form of the eigenvalue
 equation of the Dirichlet Laplacian.
 
+\begin{lemma}[Eigenvalues of $J J^*$ and the singular value $1$]
+\label{lem:gram-eigenvalue-index}
+\lean{CompactDenseEmbedding.exists_index_fst_eq_of_gram_apply_eq_smul,
+  CompactDenseEmbedding.exists_singularValue_eq_one}
+\leanok
+\uses{def:singular-basis, lem:gram-operator}
+Let $J : V \to H$ be a compact dense embedding. For every $\mu \in \C$ and every $y \in H$ with
+$y \neq 0$ and $J J^* y = \mu y$ there is $i \in I$ with $\mu_i = \mu$. For every $u \in V$ with
+$u \neq 0$ and $\langle u, w \rangle_V = \langle J u, J w \rangle_H$ for every $w \in V$ there
+is $i \in I$ with $\sigma_i = 1$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+If $\mu_i \neq \mu$ for every $i$, then
+$\mu_i \langle e_i, y \rangle = \langle J J^* e_i, y \rangle = \langle e_i, J J^* y \rangle
+= \mu \langle e_i, y \rangle$ for every $i$, since $\mu_i = \sigma_i^2$ is real and $J J^*$ is
+symmetric (\Cref{lem:gram-operator}); so $\langle e_i, y \rangle = 0$ for every $i$ and $y = 0$.
+For the second statement, $\langle J^* J u, w \rangle = \langle J u, J w \rangle
+= \langle u, w \rangle$ for every $w$, so $J^* J u = u$ and $J J^* (J u) = J u$ with
+$J u \neq 0$; the first statement gives $i$ with $\sigma_i^2 = \mu_i = 1$.
+\end{proof}
+
 \begin{lemma}[Finitely many large singular values]
 \label{lem:finite-large-singular-values}
 \lean{CompactDenseEmbedding.singularValue_le_norm_sub,
@@ -4449,7 +4472,8 @@ Let $M$ be a topological space with a finite Borel measure $\mu$. On a compact R
 manifold the eigenfunctions of the Laplace--Beltrami operator form an orthonormal basis of
 $L_2(M)$; they are continuous by elliptic regularity, and the eigenvalues $\lambda_i$ tend to
 infinity. The Dirichlet eigenbasis of a bounded open set is a spectral scheme
-(\Cref{thm:dirichlet-eigenbasis}); the boundedness and continuity of its elements is elliptic
+(\Cref{thm:dirichlet-eigenbasis}), and so is the Neumann eigenbasis of a bounded Lipschitz domain
+(\Cref{thm:neumann-eigenbasis}); the boundedness and continuity of their elements is elliptic
 regularity, a later goal. The statements below therefore assume
 an orthonormal basis of continuous functions with levels, and every one of them is proved from
 this assumption; the torus satisfies it (\Cref{prop:fourier-eigenbasis}). The assumption

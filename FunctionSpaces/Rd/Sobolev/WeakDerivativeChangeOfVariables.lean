@@ -28,7 +28,8 @@ measure-preserving map between measure spaces.
   function `f` is its weak derivative on every open set (Mathlib's integration by parts
   `LipschitzWith.integral_lineDeriv_mul_eq` and Rademacher's theorem). The classical derivative
   of a `C^1` function is its weak derivative (`Rd.hasWeakLineDeriv_of_contDiff`, Mathlib's
-  `integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable`).
+  `integral_mul_fderiv_eq_neg_fderiv_mul_of_integrable`); in particular constants have weak
+  gradient zero (`Rd.hasWeakLineDeriv_const`).
 * **Directions** (`Rd.HasWeakLineDeriv.sum_smul_dir`, `Rd.hasWeakLineDeriv_of_forall_gridBasis`):
   weak derivatives are linear in the direction, so the derivatives `g_i = ∂_{e_i} f` give
   `∂_v f = ∑_i ⟪v, e_i⟫ g_i` for every `v`, and `W^1_p(V)` needs only the basis directions
@@ -248,6 +249,14 @@ theorem hasWeakLineDeriv_of_contDiff {F : V → ℂ} (hF : ContDiff ℝ 1 F) (Ω
   simp only [fderiv_testSchwartz_apply, testSchwartz_apply] at h
   rw [LineDeriv.iteratedLineDerivOp_one, pow_one, neg_one_smul]
   simpa only [Complex.real_smul] using h
+
+/-- **Constants have weak gradient zero**: on every open set `O`, the constant function `c` has
+the weak derivative `0` in every direction `w` (`Rd.hasWeakLineDeriv_of_contDiff`). -/
+theorem hasWeakLineDeriv_const (O : Opens V) (w : V) (c : ℂ) :
+    HasWeakLineDeriv O (fun _ : Fin 1 => w) (fun _ => c) 0 := by
+  have h := hasWeakLineDeriv_of_contDiff (contDiff_const (c := c)) O w
+  have h0 : (fun x => fderiv ℝ (fun _ : V => c) x w) = 0 := funext fun x => by simp
+  rwa [h0] at h
 
 end Lipschitz
 

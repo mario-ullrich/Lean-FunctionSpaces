@@ -56,8 +56,12 @@ extension this gives `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ
 dense range, and its singular basis gives the eigenbasis of the Dirichlet Laplacian as a spectral
 scheme, with the weak eigenvalue equation; `H^1_0(Ω)` is the Sobolev space of order `1` of this
 scheme, and the real interpolation spaces between `L_2(Ω)` and `H^1_0(Ω)` are its approximation
-spaces. The [interface document](FEECInterface.md) lists the results for `p = 2`
-for a FEEC/BEEC library built on this project, with the decisions behind their form.
+spaces. On a bounded Lipschitz domain the same holds for `W^1_2(Ω)`, the graph of the weak
+gradient in `L_2(Ω) × L_2(Ω)^n`: Rellich's theorem through the extension theorem makes
+`W^1_2(Ω) → L_2(Ω)` compact, and its singular basis is the eigenbasis of the Neumann Laplacian,
+with the eigenvalue `0` of the constants. The [interface document](FEECInterface.md) lists the
+results for `p = 2` for a FEEC/BEEC library built on this project, with the decisions behind their
+form.
 
 ## Main results
 
@@ -601,6 +605,26 @@ for a FEEC/BEEC library built on this project, with the decisions behind their f
   `0 < θ < 1`, `1 ≤ q ≤ ∞`, `(L_2(Ω), H^1_0(Ω))_{θ,q}` is the approximation space `A^θ_q` of the
   Dirichlet scheme (`Rd.memKMethod_dirichlet_iff`), described by dyadic blocks of coefficients
   (`Rd.memKMethod_dirichlet_iff_blockNorm_lt_top`).
+* **The Neumann eigenbasis.** Let `Ω ⊆ V` be a bounded Lipschitz domain in dimension `n ≥ 1`
+  and `N(Ω)` the pairs `(f, g)` in `L_2(Ω) × L_2(Ω)^n` with `g_k = ∂_{b_k} f` weakly on `Ω` for
+  the basis `b_k = Rd.gridBasis V k`, with the inner product `⟨f, f'⟩_2 + ∑_k ⟨g_k, g'_k⟩_2`
+  (`Rd.neumannSpace`). The embedding `(f, g) ↦ f` into `L_2(Ω)` (`Rd.neumannEmbedding`) is compact
+  (`Rd.BoundedLipschitzDomain.isCompactOperator_neumannEmbedding`), injective and has dense range,
+  and its spectral scheme (`Rd.BoundedLipschitzDomain.neumannScheme`) is a Hilbert basis `(e_i)`
+  of `L_2(Ω)` with eigenvalues `λ_i = σ_i⁻² - 1 ≥ 0` (`Rd.BoundedLipschitzDomain.neumannEigenvalue`,
+  `Rd.BoundedLipschitzDomain.neumannEigenvalue_nonneg`) and levels `⌊√(1 + λ_i)⌋`
+  (`Rd.BoundedLipschitzDomain.neumannScheme_level`). The eigenfunctions `φ_i ∈ N(Ω)` with value
+  `e_i` satisfy `∑_k ⟨∂_{b_k} φ_i, g_k⟩_{L_2(Ω)} = λ_i ⟨φ_i, f⟩_{L_2(Ω)}` for every `(f, g)` in
+  `N(Ω)` (`Rd.BoundedLipschitzDomain.neumannEigenfunction_weak`), the weak form of
+  `-Δ φ_i = λ_i φ_i`, `∂_ν φ_i = 0` on `∂Ω`; for nonempty `Ω` some `λ_i` is `0`
+  (`Rd.BoundedLipschitzDomain.exists_neumannEigenvalue_eq_zero`). Every `(f, g)` in `N(Ω)` has
+  `f = u|_Ω` for some `u ∈ H^1(Ω)` with `‖u‖ ≤ C ‖(f, g)‖`
+  (`Rd.BoundedLipschitzDomain.exists_restrictionSpace_of_neumannSpace`). `f ∈ L_2(Ω)` lies in
+  `W^1_2(Ω)` iff `∑_i (1 + ⌊σ_i⁻¹⌋)² |⟨e_i, f⟩|² < ∞`
+  (`Rd.BoundedLipschitzDomain.exists_neumannEmbedding_eq_iff`), and for `0 < θ < 1`,
+  `1 ≤ q ≤ ∞`, `(L_2(Ω), W^1_2(Ω))_{θ,q}` is the approximation space `A^θ_q` of the Neumann
+  scheme (`Rd.BoundedLipschitzDomain.memKMethod_neumann_iff`), described by dyadic blocks of
+  coefficients (`Rd.BoundedLipschitzDomain.memKMethod_neumann_iff_blockNorm_lt_top`).
 
 ## What is formalised
 
@@ -650,6 +674,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Green's formula on bounded Lipschitz domains: integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary, the chart form for every resolution of unity, the outward unit normal as the chart normal and a unit vector almost everywhere on the boundary, `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, the traces from both sides of a graph, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u` vanishes | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainGreen` |
 | The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, smoothing with compact support, cone mollifiers, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)` | ✅ | ✗ | `Domains/Traces/TraceKernel` |
 | The Dirichlet Laplacian on bounded open sets: the inner product of `H^1(ℝ^d)` by the weak gradient, the compact dense embedding `H^1_0(Ω) → L_2(Ω)`, the Dirichlet eigenbasis as a spectral scheme with eigenvalues `λ_i ≥ 0`, the weak eigenvalue equation, `H^1_0(Ω)` as the Sobolev space of order `1` of the scheme, and `(L_2(Ω), H^1_0(Ω))_{θ,q} = A^θ_q` | ✅ | ✗ | `Domains/Spectral/DirichletEigenbasis` |
+| The Neumann Laplacian on bounded Lipschitz domains: `W^1_2(Ω)` as the graph of the weak gradient in `L_2(Ω) × L_2(Ω)^n` and as jets, the dense embedding into `L_2(Ω)` through `H^1_0(Ω)`, Rellich's theorem with bounded `H^1(Ω)` representatives, the Neumann eigenbasis as a spectral scheme with eigenvalues `λ_i = σ_i⁻² - 1 ≥ 0`, among them `0`, the weak eigenvalue equation, `W^1_2(Ω)` as the Sobolev space of order `1` of the scheme, and `(L_2(Ω), W^1_2(Ω))_{θ,q} = A^θ_q` | ✅ | ✗ | `Domains/Spectral/NeumannEigenbasis` |
 | Bounded Lipschitz domains from the set-level definition: sets Lipschitz near a point, local graphs as Lipschitz graph domains, McShane's extension of local graphs, the structure from a family of charts and the converse, the ball | ✅ | ✗ | `Domains/Lipschitz/LocalLipschitzGraphs` |
 | Bounded open convex sets as bounded Lipschitz domains: the ray length, its cone estimate, open convex sets, bounded or not, near a frontier point as regions above a Lipschitz graph, and the open unit cube with its closure | ✅ | ✗ | `Domains/Lipschitz/ConvexDomains` |
 | Lipschitz graph domains with null graphs and boundaries, closures of convex Lipschitz graph domains as Besov domains, the quadrant as a Lipschitz graph domain and the quadrant model of manifolds with corners as a Besov domain, bounded Lipschitz domains with the extension property, closures of nonempty convex bounded Lipschitz domains and of nonempty bounded open convex sets, closed balls of positive radius and the closed unit cube as Besov domains | ✅ | ✗ | `Domains/Lipschitz/BesovDomains` |

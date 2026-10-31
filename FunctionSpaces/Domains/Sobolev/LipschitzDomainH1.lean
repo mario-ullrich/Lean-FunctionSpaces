@@ -16,7 +16,8 @@ Let `Ω` be a bounded Lipschitz domain with boundary `Γ` in a finite-dimensiona
 space `V`, such as `ℝ^d`, with Lebesgue measure. The Sobolev space `H^1(Ω)` is the space of
 restrictions of `H^1(V) = W^1_2(V)` (`Rd.BoundedLipschitzDomain.MemSobolevOn`): `f ∈ L_2(V)` lies
 in `H^1(Ω)` if it agrees almost everywhere on `Ω` with some `F ∈ W^1_2(V)`; membership depends
-only on the values of `f` on `Ω` (`Rd.BoundedLipschitzDomain.MemSobolevOn.congr_ae`).
+only on the values of `f` on `Ω` (`Rd.BoundedLipschitzDomain.MemSobolevOn.congr_ae`). The open
+set `Ω` has finite measure (`Rd.BoundedLipschitzDomain.isFiniteMeasure_volume_restrict`).
 
 * **The intrinsic description** (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_modulusOn`):
   `f ∈ H^1(Ω)` iff `‖f‖_{L_2(Ω)} + ‖(2^k ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_2} < ∞`, for every order
@@ -64,6 +65,12 @@ theorem BoundedLipschitzDomain.coe_toOpens (Ω : BoundedLipschitzDomain V) :
   rfl
 
 variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
+
+/-- Lebesgue measure restricted to a bounded Lipschitz domain is finite, as the domain is
+bounded. -/
+instance BoundedLipschitzDomain.isFiniteMeasure_volume_restrict (Ω : BoundedLipschitzDomain V) :
+    IsFiniteMeasure (volume.restrict (Ω.toOpens : Set V)) :=
+  isFiniteMeasure_restrict.2 Ω.isBounded.measure_lt_top.ne
 
 /-! ### The restriction space `H^1(Ω)` -/
 

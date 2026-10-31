@@ -32,6 +32,10 @@ Hilbert basis `(e_i)` of eigenvectors with eigenvalues `μ_i ≠ 0`
   inequalities of order `1` with constant `1`;
 * hence `(H, J(V))_{θ,q} = A^θ_q` for `0 < θ < 1`, and `J(V)` is the Sobolev space of order `1`
   of the scheme.
+
+Every eigenvalue of `J J†` is some `μ_i`; in particular a nonzero `u ∈ V` with
+`⟨u, w⟩_V = ⟨J u, J w⟩_H` for all `w` gives a singular value `1`
+(`CompactDenseEmbedding.exists_singularValue_eq_one`).
 -/
 
 @[expose] public section
@@ -235,6 +239,37 @@ theorem apply_singularBasis (i : J.index) :
   refine smul_right_injective H (J.ofReal_singularValue_ne_zero i) ?_
   simp only
   rw [h, smul_smul, Complex.ofReal_pow, sq]
+
+/-- **Every eigenvalue of `J J†` occurs in the index**: if `J J† y = μ y` for some `y ≠ 0`, then
+`μ = μ_i` for some `i`. Otherwise `y` is orthogonal to every `e_i`, since
+`μ_i ⟨e_i, y⟩ = ⟨J J† e_i, y⟩ = ⟨e_i, J J† y⟩ = μ ⟨e_i, y⟩` with `μ_i = σ_i²` real. -/
+theorem exists_index_fst_eq_of_gram_apply_eq_smul {μ : ℂ} {y : H} (hy : J.gram y = μ • y)
+    (hy0 : y ≠ 0) : ∃ i : J.index, i.1 = μ := by
+  by_contra h
+  push Not at h
+  refine hy0 (J.eq_zero_of_forall_inner_eigenBasis fun i => ?_)
+  have hs : ⟪J.gram (J.eigenBasis i), y⟫_ℂ = ⟪J.eigenBasis i, J.gram y⟫_ℂ :=
+    J.isSymmetric_gram (J.eigenBasis i) y
+  have hr : (starRingEnd ℂ) i.1 = i.1 := by rw [← J.sq_singularValue i, Complex.conj_ofReal]
+  rw [J.gram_eigenBasis, hy, inner_smul_left, inner_smul_right, hr] at hs
+  have h0 : (i.1 - μ) * ⟪J.eigenBasis i, y⟫_ℂ = 0 := by rw [sub_mul, hs, sub_self]
+  exact (mul_eq_zero.1 h0).resolve_left (sub_ne_zero.2 (h i))
+
+/-- **A singular value `1`**: if some `u ≠ 0` in `V` satisfies `⟨u, w⟩_V = ⟨J u, J w⟩_H` for
+every `w ∈ V`, then `σ_i = 1` for some `i`. Indeed `J† J u = u`, so `J u ≠ 0` is an eigenvector
+of `J J†` with eigenvalue `1 = σ_i²`
+(`CompactDenseEmbedding.exists_index_fst_eq_of_gram_apply_eq_smul`). -/
+theorem exists_singularValue_eq_one {u : V} (hu0 : u ≠ 0)
+    (hu : ∀ w, ⟪u, w⟫_ℂ = ⟪J.toCLM u, J.toCLM w⟫_ℂ) : ∃ i : J.index, J.singularValue i = 1 := by
+  have hadj : (J.toCLM)† (J.toCLM u) = u :=
+    ext_inner_right ℂ fun w => by rw [ContinuousLinearMap.adjoint_inner_left, hu]
+  have hg : J.gram (J.toCLM u) = (1 : ℂ) • J.toCLM u := by
+    rw [one_smul]
+    exact congrArg J.toCLM hadj
+  have hJu : J.toCLM u ≠ 0 := fun h0 => hu0 (J.injective (by rw [h0, map_zero]))
+  obtain ⟨i, hi⟩ := J.exists_index_fst_eq_of_gram_apply_eq_smul hg hJu
+  refine ⟨i, (pow_eq_one_iff_of_nonneg (J.singularValue_pos i).le two_ne_zero).1 ?_⟩
+  rw [← Complex.ofReal_eq_one, J.sq_singularValue i, hi]
 
 /-! ### Coefficients -/
 
