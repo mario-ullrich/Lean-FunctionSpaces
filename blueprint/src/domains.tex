@@ -9,11 +9,14 @@ Lipschitz domains by intrinsic differences and as restrictions, and builds the s
 from the area formula; \Cref{ch:traces-lipschitz} proves the trace theorems on Lipschitz
 boundaries for $0 < s < 1$ and on the half-space for every $s > 0$; \Cref{ch:sobolev-domains}
 builds the Sobolev spaces on open sets as Hilbert spaces, with their duality, the trace space
-$H^{1/2}(\Gamma)$, the extension theorem for $\Sob{1}{p}$, Green's formula and the kernel of the
-trace; \Cref{ch:laplacian-eigenbases} builds the Dirichlet eigenbasis of the Laplacian on bounded
-open sets and the Neumann eigenbasis on bounded Lipschitz domains as spectral schemes; and
-\Cref{ch:manifolds} defines Besov spaces on compact manifolds by charts and proves the trace
-theorem on their boundary.
+$H^{1/2}(\Gamma)$, the extension theorems for $\Sob{1}{p}$ and $\Sob{m}{p}$, Green's formula and
+the kernel of the trace; \Cref{ch:laplacian-eigenbases} builds the Dirichlet eigenbasis of the
+Laplacian on bounded open sets and the Neumann eigenbasis on bounded Lipschitz domains as
+spectral schemes, describes $\Besov{\theta}{2}{q}(\Omega)$, $0 < \theta < 1$, by Neumann
+eigenfunction expansions, and does the same on compact manifolds with the eigenbasis of a chart
+form; and \Cref{ch:manifolds} defines Besov spaces on compact manifolds by charts, shows that
+every compact manifold carries a smooth measure, treats smooth bounded domains as manifolds with
+boundary and proves the trace theorem on the boundary.
 
 \chapter{Lipschitz domains}
 \label{ch:lipschitz-domains}
@@ -3686,7 +3689,11 @@ identifies their boundary traces with $B^{1/2}_{2,2}(\Gamma)$.
 $\tilde H^s(\Omega)$ and $H^s_0(\Omega)$ inside $H^s(V)$, for every open $\Omega$ and every real
 $s$, and \Cref{sec:sobolev-duality} proves the duality of $\tilde H^s(\Omega)$ and
 $H^{-s}(\Omega)$. \Cref{sec:boundary-trace-space} defines the trace space $H^{1/2}(\Gamma)$ of a
-bounded Lipschitz domain as the orthogonal complement of the trace kernel in $H^1(\Omega)$.
+bounded Lipschitz domain as the orthogonal complement of the trace kernel in $H^1(\Omega)$;
+\Cref{sec:trace-space-norm} shows that its norm is the least $H^1(V)$ norm of a function with
+the given boundary trace and is equivalent to the norm of $B^{1/2}_{2,2}(\Gamma)$, and
+\Cref{sec:boundary-slobodeckij} identifies $\Besov{s}{p}{p}(\Gamma)$, $0 < s < 1$, with the
+Sobolev--Slobodeckij space of $\Gamma$, which gives this norm in Gagliardo's form.
 \Cref{sec:sobolev-extension} proves the extension theorem for $\Sob{1}{p}$ on bounded
 Lipschitz domains, $1 < p < \infty$, with a bounded linear extension operator on the jets of
 \Cref{def:sobolev-jets}, from the divergence kernels of \Cref{sec:divergence-kernels};
@@ -10820,9 +10827,20 @@ closed set $\Omega = \operatorname{range} I \subseteq E$, the half-space for man
 boundary, the quadrant for manifolds with corners and $E$ itself for manifolds without boundary.
 The results assume that $\Omega$ is a Besov domain (\Cref{def:besov-domain}), which holds for these
 three models (\Cref{thm:half-space-besov-domain} and \Cref{thm:quadrant-besov-domain}); the
-boundary trace is built for the half-space model.
+boundary trace is built for the half-space model. \Cref{sec:smooth-measures} defines smooth
+measures and \Cref{sec:besov-atlas} the Besov atlases with their chart pieces;
+\Cref{sec:smooth-measure-existence} shows that the chart measure of a Besov atlas is a finite
+smooth measure, so every compact manifold carries one, the sphere among them.
+\Cref{sec:manifold-besov} defines $\Besov{s}{p}{q}(M)$ and shows that it depends neither on the
+atlas nor on the order of the differences. \Cref{sec:smooth-domains} makes the closure of a
+smooth bounded domain a compact manifold with boundary, and \Cref{sec:smooth-domain-charts}
+identifies its Besov spaces by charts with the intrinsic ones. \Cref{sec:manifold-boundary-besov}
+defines the Besov spaces of the boundary, \Cref{sec:manifold-trace} proves the trace theorem for
+every $s > 0$, and \Cref{sec:smooth-local-graphs} shows that the smooth bounded domains are the
+sets of the usual definition by smooth local graphs, with the open balls as examples.
 
 \section{Smooth measures}
+\label{sec:smooth-measures}
 
 \begin{definition}[Smooth measures]
 \label{def:smooth-measure}
@@ -10880,6 +10898,7 @@ $\mu(S) \leq C \int_{\kappa(e.\mathrm{source})} \mathbf 1_S \circ \kappa^{-1} \l
 \end{proof}
 
 \section{The Besov atlas}
+\label{sec:besov-atlas}
 
 From now on $M$ is compact, smooth, and the range $\Omega$ of $I$ is a Besov domain
 (\Cref{def:besov-domain}); $\mu$ is a smooth measure and $1 \leq p < \infty$.
@@ -10992,6 +11011,7 @@ source of $\Phi_{ij}$.
 \end{proof}
 
 \section{Existence of smooth measures}
+\label{sec:smooth-measure-existence}
 
 Let $A$ be a Besov atlas with charts $e_k$, extended charts $\kappa_k$ with targets
 $T_k = \kappa_k(e_k.\mathrm{source})$, and partition of unity $(\psi_k)$. Transporting the
@@ -11119,6 +11139,7 @@ measure of an atlas, to every compact manifold of positive dimension whose model
 domain, for example to the sphere $S^n$, $n \geq 1$ (\Cref{ex:sphere-eigenbasis}).
 
 \section{Besov spaces on compact manifolds}
+\label{sec:manifold-besov}
 
 \begin{definition}[The Besov quasi-norm of an atlas]
 \label{def:manifold-besov-norm}
@@ -11234,6 +11255,7 @@ bounded into the intrinsic space on $\Omega$ (\Cref{thm:diffeo-invariance}).
 \end{proof}
 
 \section{Smooth bounded domains}
+\label{sec:smooth-domains}
 
 The boundary charts of a smooth bounded domain flatten its graph patches
 (\Cref{lem:flattening}).
@@ -11314,6 +11336,7 @@ $\sigma(\overline{\Omega} \cap B)$, the target of the chart.
 \end{proof}
 
 \section{Besov spaces of smooth domains by charts}
+\label{sec:smooth-domain-charts}
 
 \begin{definition}[Global atlases]
 \label{def:global-atlas}
@@ -11404,6 +11427,7 @@ since $\theta_i \psi_i = \psi_i$ and $\sum_i \psi_i = 1$ on $\overline{\Omega}$.
 \end{proof}
 
 \section{Besov spaces on the boundary}
+\label{sec:manifold-boundary-besov}
 
 In this section $M$ is a compact smooth manifold with boundary modelled on the half-space
 $\{y \in \R^n : y_0 \geq 0\}$. Its boundary hyperplane is $H_0 = e_0^\perp = \{y : y_0 = 0\}$, with
@@ -11482,6 +11506,7 @@ subadditive (\Cref{lem:modnorm-on}).
 \end{proof}
 
 \section{The trace theorem on compact manifolds}
+\label{sec:manifold-trace}
 
 In this section $M$ is a compact manifold with boundary as in the previous section, $\mu$ a smooth
 measure, $1 \leq p < \infty$, and $\operatorname{Tr}$ the trace of order $L$ of the open

@@ -59,15 +59,15 @@ scheme, and the real interpolation spaces between `L_2(Ω)` and `H^1_0(Ω)` are 
 spaces. On a bounded Lipschitz domain the same holds for `W^1_2(Ω)`, the graph of the weak
 gradient in `L_2(Ω) × L_2(Ω)^n`: Rellich's theorem through the extension theorem makes
 `W^1_2(Ω) → L_2(Ω)` compact, and its singular basis is the eigenbasis of the Neumann Laplacian,
-with the eigenvalue `0` of the constants. There the Besov space
-`B^θ_{2,q}(Ω)`, `0 < θ < 1`, defined by intrinsic differences, is the approximation space of the
-Neumann eigenbasis; on a bounded open set the zero extension maps the approximation spaces of the
-Dirichlet eigenbasis into `B^θ_{2,q}(ℝ^d)`. On a compact manifold, with or without boundary, the
+with the eigenvalue `0` of the constants. There the Besov space `B^θ_{2,q}(Ω)`, `0 < θ < 1`, defined
+by intrinsic differences, is the approximation space of the Neumann eigenbasis; on a bounded open
+set the zero extension maps the approximation spaces of the Dirichlet eigenbasis into
+`B^θ_{2,q}(ℝ^d)`. On every compact manifold, without boundary, with boundary or with corners, the
 chart Sobolev space `H^1_A(M) = B^1_{2,2}(M)` embeds compactly and densely into `L_2(μ)`, and the
 eigenvector basis `e_i = J φ_i` of the embedding is an eigenbasis of the chart form whose
-approximation spaces are `B^θ_{2,q}(M)`, `0 < θ < 1`. The
-[interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library built
-on this project, with the decisions behind their form.
+approximation spaces are `B^θ_{2,q}(M)`, `0 < θ < 1`. The [interface document](FEECInterface.md)
+lists the results for `p = 2` for a FEEC/BEEC library built on this project, with the decisions
+behind their form.
 
 ## Main results
 

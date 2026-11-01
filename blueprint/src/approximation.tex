@@ -3,16 +3,17 @@
 \part{Approximation spaces}
 \label{part:approximation}
 
-This part develops the abstract theory: approximation schemes in a normed space, the
-approximation spaces $A^s_q$ and their embeddings, Jackson's and Bernstein's inequalities with
-the Nikolskii transfer theorem, the representation of $A^s_q$ as a real interpolation space of
-the discrete $K$-method, real interpolation of couples of quasi-normed abelian groups, block
-decompositions and projections, traces and intrinsic norms, and
-moduli of smoothness. Its last three chapters apply the theory to schemes of functions on a
+This part develops the abstract theory: approximation schemes in a normed space, sequence
+spaces, the approximation spaces $A^s_q$ and their embeddings, Jackson's and Bernstein's
+inequalities with the Nikolskii transfer theorem, the representation of $A^s_q$ as a real
+interpolation space of the discrete $K$-method, real interpolation of couples of quasi-normed
+abelian groups, block decompositions and projections, traces and intrinsic norms, and moduli of
+smoothness. Its last three chapters apply the theory to schemes of functions on a
 finite measure space, whose approximation spaces are Besov spaces with embeddings from a
-Nikolskii inequality, and to spectral schemes in a Hilbert space. The characterisations proved
-here are the abstract ones: by the error of best approximation, by blocks, by real interpolation
-(the discrete $K$-method) and by moduli of smoothness.
+Nikolskii inequality, and to spectral schemes in a Hilbert space, among them the eigenbases of
+compact self-adjoint operators and the eigenbases of $J J^*$ for compact dense embeddings $J$.
+The characterisations proved here are the abstract ones: by the error of best approximation, by
+blocks, by real interpolation (the discrete $K$-method) and by moduli of smoothness.
 
 \chapter{Approximation schemes}
 \label{ch:schemes}
@@ -4060,9 +4061,12 @@ scheme in $H$, the \emph{spectral scheme} of $(e_i, \lambda)$.
 On the torus, $e_k$ is the Fourier basis and $\lambda(k) = \max_j |k_j|$. On a compact
 manifold, $e_i$ are the eigenfunctions of the Laplacian and $\lambda$ a function of the
 eigenvalue; \Cref{sec:continuous-spectral-bases} assumes an orthonormal basis of continuous
-functions with levels, the structure this case provides. Every compact dense embedding $J$ of
-Hilbert spaces gives a spectral scheme, from the eigenvectors of $J J^*$
-(\Cref{sec:compact-embedding-schemes}).
+functions with levels, the structure this case provides. Every compact self-adjoint operator
+with trivial kernel has a Hilbert basis of eigenvectors (\Cref{sec:compact-eigenbasis}), and
+every compact dense embedding $J$ of Hilbert spaces gives a spectral scheme, from the
+eigenvectors of $J J^*$ (\Cref{sec:compact-embedding-schemes}); the eigenbases of the Laplacian
+on domains and of chart forms on compact manifolds arise this way
+(\Cref{ch:laplacian-eigenbases}).
 
 \begin{definition}[Sobolev embedding of $\ell_2$]
 \label{def:sobolev-embed}

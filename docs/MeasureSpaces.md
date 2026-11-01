@@ -51,6 +51,21 @@ described by martingale differences. The `L_p` tools are in [Tools from analysis
   instances of the structure are the spaces `H^s`, `p = 2`, on the torus and for a continuous
   spectral basis (`Torus.sobolevSpace`, `ContinuousSpectralBasis.sobolevSpace`). The limiting cases
   are not covered.
+* **Spectral schemes of compact dense embeddings.** An injective compact self-adjoint operator on
+  a Hilbert space has a Hilbert basis of eigenvectors with nonzero eigenvalues
+  (`ContinuousLinearMap.exists_hilbertBasis_forall_hasEigenvector_ne_zero`, statement from
+  TauCeti; the basis `ContinuousLinearMap.eigenHilbertBasis`). Let `J : V → H` be a compact
+  injective bounded linear map with dense range between complex Hilbert spaces
+  (`CompactDenseEmbedding`). Then `H` has a Hilbert basis `(e_i)` of eigenvectors of `J J†` with
+  eigenvalues `σ_i²`, `σ_i = ‖J† e_i‖ > 0`, and `v_i = σ_i⁻¹ J† e_i` is a Hilbert basis of `V`
+  (`CompactDenseEmbedding.eigenBasis`, `CompactDenseEmbedding.singularBasis`); for every `ε > 0`
+  only finitely many `σ_i` are at least `ε` (`CompactDenseEmbedding.finite_setOf_le_singularValue`).
+  With the levels `⌊σ_i⁻¹⌋` the basis is a spectral scheme (`CompactDenseEmbedding.spectralScheme`),
+  and for `0 < θ < 1` and `1 ≤ q ≤ ∞`, `(H, J(V))_{θ,q} = A^θ_q`
+  (`CompactDenseEmbedding.memKMethod_iff_memApprox`); for `s > 0`, `f ∈ A^s_2` iff
+  `∑_i σ_i^(-2s) |⟨e_i, f⟩|² < ∞` (`CompactDenseEmbedding.memApprox_two_iff`). The Dirichlet and
+  Neumann Laplacians and the chart forms of compact manifolds are instances
+  ([Domains, traces and manifolds](DomainsTraces.md)).
 * **Spaces with a continuous spectral basis.** Let `μ` be a finite Borel measure on a
   topological space `M`, and `(e_i)` an orthonormal basis of `L_2(μ)` of bounded continuous
   functions with levels `λ(i) ∈ ℕ`, finitely many of each level (`ContinuousSpectralBasis`). The

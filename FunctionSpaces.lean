@@ -267,9 +267,10 @@ Besov, Triebel–Lizorkin, Sobolev and Bessel potential spaces on finite measure
 the torus, intervals, the cube, Lipschitz domains and compact manifolds, their embedding theorems,
 and the theorems that their characterisations agree. The library builds on
 `ApproximationSpaces`. The top folders follow the settings:
-`MeasureSpaces` (finite measure spaces, with filtrations and martingale differences), `Rd`
-(`ℝ^d`, in subfolders by characterisation and by space), `Domains` (Lipschitz domains, traces,
-compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet examples);
+`MeasureSpaces` (finite measure spaces, with spectral schemes, filtrations and martingale
+differences), `Rd` (`ℝ^d`, in subfolders by characterisation and by space), `Domains` (Lipschitz
+domains, extensions, traces, Sobolev spaces on domains, eigenbases of the Laplacian, compact
+manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet examples);
 `Analysis` holds the tools without function-space content.
 
 ## Layout
@@ -641,7 +642,7 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   `(H^{s₀,p}, H^{s₁,p})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}`, `(L_p, H^{s₁,p})_{η,q} = B^{ηs₁}_{p,q}`,
   and `(L_2, H^1)_{θ,q} = B^θ_{2,q}` for the couple of the embedding `H^1(ℝ^d) → L_2(ℝ^d)`.
 
-### Domains: Lipschitz domains, traces, manifolds, intervals and the cube
+### Domains: Lipschitz domains, extensions, traces, Sobolev, eigenbases, manifolds, interval, cube
 
 #### `Domains/Lipschitz`: Lipschitz domains
 

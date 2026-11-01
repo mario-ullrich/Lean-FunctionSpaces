@@ -3,10 +3,10 @@
 A Lean 4 / Mathlib formalisation of the **characterisations** of Besov, Triebel–Lizorkin,
 Sobolev and Bessel potential spaces, and of the theorems that they agree: by approximation,
 moduli of smoothness, Littlewood–Paley blocks, local means, atoms, wavelet and spline
-coefficients, weak derivatives, Bessel potentials, interpolation, restriction and traces, on
-`ℝ^d`, the torus, intervals, the cube, Lipschitz domains and compact manifolds, together with
-the **embedding theorems**. The abstract theory of **approximation spaces** is one part of it. The
-project is work in progress; the details are in eleven block documents under [`docs/`](docs/),
+coefficients, eigenfunction expansions, weak derivatives, Bessel potentials, interpolation,
+restriction and traces, on `ℝ^d`, the torus, intervals, the cube, Lipschitz domains and compact
+manifolds, together with the **embedding theorems**. The abstract theory of **approximation
+spaces** is one part of it. The details are in eleven block documents under [`docs/`](docs/),
 listed under [What is formalised](#what-is-formalised).
 
 * **Blueprint** (a webpage explaining the mathematics):
@@ -49,8 +49,9 @@ quasi-norms agree.
 **Characterisations and domains.** Each setting has its natural descriptions of these spaces:
 Fourier coefficients and Littlewood–Paley blocks on the torus and on `ℝ^d`, splines and Haar or
 multiwavelet coefficients on intervals and the cube, local means and atoms on `ℝ^d`, intrinsic
-differences and extensions on Lipschitz domains, chart pieces on manifolds, traces on
-boundaries, and mixed differences for dominating mixed smoothness. Triebel–Lizorkin spaces are
+differences, extensions and eigenfunction expansions of the Laplacian on Lipschitz domains,
+chart pieces and eigenfunction expansions of chart forms on manifolds, traces on boundaries, and
+mixed differences for dominating mixed smoothness. Triebel–Lizorkin spaces are
 described by local means on `ℝ^d` and on the torus, and by ball means of differences and atoms
 on `ℝ^d`. The project proves them equivalent; the first chapter of the Besov part of the
 blueprint, *The representations of Besov spaces*, lists them with their settings and ranges of
@@ -697,9 +698,10 @@ functions and interpolation of operators); `MeasureSpaces/` holds the Besov and 
 a scheme on a finite measure space, spectral schemes, and filtrations with martingale
 differences; `Rd/` holds the spaces on `ℝ^d` in folders by characterisation and by space
 (approximation, Littlewood–Paley blocks, differences, local means, atoms, Triebel–Lizorkin
-spaces, vector-valued singular integrals, weak derivatives, Bessel potentials, interpolation,
-mixed smoothness); `Domains/` holds Lipschitz domains, extensions, traces, Sobolev spaces on
-domains, compact manifolds, intervals and the cube; `Torus/` holds the torus; `Wavelets/` holds
+spaces, vector-valued singular integrals, weak derivatives, Bessel potentials, Fourier
+multipliers, interpolation, mixed smoothness); `Domains/` holds Lipschitz domains, extensions,
+traces, Sobolev spaces on domains, eigenbases of the Laplacian, compact manifolds, intervals and
+the cube; `Torus/` holds the torus; `Wavelets/` holds
 the wavelet examples (Haar, multiwavelets, Daubechies wavelets) in `Wavelets/Examples/`.
 Each block document lists its files.
 [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
@@ -711,27 +713,20 @@ that library builds itself.
 
 ## What is left to do
 
-* **Interpolation**: the J-method and the equivalence theorem, the complex method,
-  `(L_{p₀}, L_{p₁})_{θ,q} = L_{p,q}` with Lorentz spaces, the real Riesz–Thorin theorem, and the
-  off-diagonal Marcinkiewicz theorem.
-* **Traces and extensions**: the extension of higher order for `p ∈ {1, ∞}` (Stein's extension
-  operator), and bounded linear extension operators for higher order.
-* **Manifolds with corners**: a compact example (the cube with charts at its vertices), traces on
-  the faces and products of models.
-* **Eigenbases of the Laplacian**: boundedness and continuity of the eigenfunctions and the
-  local Weyl law (elliptic regularity), which give the Nikolskii property and spectral
-  `B^s_{p,q}` for `p ≠ 2`; the two-sided Dirichlet description on Lipschitz domains (Hardy-type
-  inequalities, the Lions–Magenes space `H^{1/2}_{00}` at `θ = 1/2`, `q = 2`); eigenbases of the
-  Laplace–Beltrami operator (Riemannian volume and metric form), continuity of eigenfunctions and
-  the local Weyl law on compact manifolds, and spectral `B^s_{p,q}(M)` for `p ≠ 2` or `s ≥ 1`.
-* **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and their ball means and atoms on the
-  torus.
-* **Sobolev spaces**: the Jawerth–Franke embeddings with Besov targets, Hardy–Littlewood–Sobolev
-  for Riesz potentials, `p = n` (Trudinger).
-* **Higher smoothness**: Marchaud's inequality, splines on domains; for the Daubechies wavelets
-  the sharp `L_p` exponents of the scaling functions, Hölder exponents beyond D4, and tensor
-  wavelets on `ℝ^d`.
-* **The quasi-Banach range** `0 < p, q < 1` and best `n`-term approximation from a basis.
+* **Interpolation**: Lorentz spaces, real Riesz–Thorin, off-diagonal Marcinkiewicz, J- and
+  complex method.
+* **`n`-term approximation** from a Hilbert basis, and the quasi-Banach range `0 < p, q < 1`.
+* **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and ball means and atoms on the torus.
+* **Sobolev spaces**: Jawerth–Franke with Besov targets, Hardy–Littlewood–Sobolev, Trudinger.
+* **Manifolds with corners**: the cube as an example, traces on faces, products of models.
+* **Higher smoothness**: Marchaud's inequality, splines on domains, sharp Daubechies exponents,
+  tensor wavelets.
+* **Extensions**: bounded linear extension operators for `W^m_p`, every `m`, `1 < p < ∞`, and
+  Stein's universal operator for `1 ≤ p ≤ ∞`.
+* **Eigenbases**: elliptic regularity, local Weyl law, spectral `B^s_{p,q}` for `p ≠ 2` or `s ≥ 1`.
+* **Dirichlet eigenbases**: the two-sided description of their approximation spaces, with
+  Hardy-type inequalities for `θ < 1/2` and the space `H^{1/2}_{00}(Ω)` at `θ = 1/2`, `q = 2`.
+* **Laplace–Beltrami operator** and its eigenbases on compact manifolds.
 
 ## Building
 
@@ -825,6 +820,13 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   (1988), no. 1, 397–414. Besov spaces as interpolation spaces.
 * R. A. DeVore, R. C. Sharpley, *Besov spaces on domains in ℝ^d*, Trans. Amer. Math. Soc.
   **335** (1993), no. 2, 843–864. The modulus of smoothness on a domain.
+* F. van Doorn, J. Portegies, M. Rothgang, L. Viana Reis, *MultilinearInterpolation*, Lean
+  project, 2026,
+  [GitHub: lua-vr/MultilinearInterpolation](https://github.com/lua-vr/MultilinearInterpolation).
+  The encoding of couples as two extended quasi-norms on one group.
+* D. E. Edmunds, W. D. Evans, *Spectral Theory and Differential Operators*, 2nd ed., Oxford
+  Mathematical Monographs, Oxford University Press, 2018. The generalized Neumann problem from
+  the compact embedding of `W^1_2(Ω)` into `L_2(Ω)`.
 * T. Eirola, *Sobolev characterization of solutions of dilation equations*, SIAM J. Math.
   Anal. **23** (1992), no. 4, 1015–1030. The transfer operator and the Sobolev exponent.
 * L. C. Evans, R. F. Gariepy, *Measure Theory and Fine Properties of Functions*, revised ed.,
@@ -867,13 +869,22 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
   **104** (1960), no. 1–2, 93–140. The Hörmander condition.
 * B. Jawerth, *Some observations on Besov and Lizorkin–Triebel spaces*, Math. Scand. **40**
   (1977), 94–104. The embedding `F^{s₀}_{p₀,∞} ↪ F^{s₁}_{p₁,q}`.
+* H. Johnen, K. Scherer, *On the equivalence of the K-functional and moduli of continuity and
+  some applications*, in: Constructive Theory of Functions of Several Variables (Oberwolfach,
+  1976), Lecture Notes in Math. **571**, Springer-Verlag, 1977, 119–140. K-functionals and
+  moduli of smoothness.
 * J. Johnsen, W. Sickel, *A direct proof of Sobolev embeddings for quasi-homogeneous
   Lizorkin–Triebel spaces with mixed norms*, J. Funct. Spaces Appl. **5** (2007), no. 2,
   183–198. The direct proof of the critical embedding from the Littlewood–Paley blocks.
+* J.-L. Lions, E. Magenes, *Non-Homogeneous Boundary Value Problems and Applications*, Vol. I,
+  Grundlehren der mathematischen Wissenschaften **181**, Springer-Verlag, 1972. The space
+  `H^{1/2}_{00}(Ω)`, among the goals in *What is left to do*.
 * J. Marcinkiewicz, *Sur l'interpolation d'opérations*, C. R. Acad. Sci. Paris **208** (1939),
   1272–1273. The interpolation theorem.
 * W. McLean, *Strongly Elliptic Systems and Boundary Integral Equations*, Cambridge University
   Press, 2000. Traces on Lipschitz domains and the kernel of the trace map.
+* S. G. Mihlin, *On the multipliers of Fourier integrals* (Russian), Dokl. Akad. Nauk SSSR
+  (N.S.) **109** (1956), 701–703. The multiplier theorem.
 * S. M. Nikol'skii, *Approximation of Functions of Several Variables and Imbedding
   Theorems*, Grundlehren der mathematischen Wissenschaften **205**, Springer-Verlag, 1975.
   The Nikolskii inequality and the embedding theorems it yields.
@@ -890,6 +901,8 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * V. S. Rychkov, *On restrictions and extensions of the Besov and Triebel–Lizorkin spaces with
   respect to Lipschitz domains*, J. London Math. Soc. (2) **60** (1999), no. 1, 237–257. Local
   means and the universal extension operator for Lipschitz domains.
+* H.-J. Schmeisser, H. Triebel, *Topics in Fourier Analysis and Function Spaces*, Wiley, 1987.
+  Periodic distributions and function spaces on the torus.
 * C. Schneider, J. Vybíral, *Non-smooth atomic decompositions, traces on Lipschitz domains, and
   pointwise multipliers in function spaces*, J. Funct. Anal. **264** (2013), no. 5, 1197–1237,
   [arXiv:1201.2280](https://arxiv.org/abs/1201.2280). Atoms with bounds instead of smoothness, and
@@ -902,6 +915,10 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * E. M. Stein, *Harmonic Analysis: Real-Variable Methods, Orthogonality, and Oscillatory
   Integrals*, Princeton Mathematical Series **43**, Princeton University Press, 1993. The
   maximal function and the Calderón–Zygmund decomposition.
+* The Tau Ceti contributors, *TauCeti*, Lean project, 2026,
+  [GitHub: TauCetiProject/TauCeti](https://github.com/TauCetiProject/TauCeti). Hilbert bases of
+  eigenvectors of compact self-adjoint operators, derivative bounds of the Japanese bracket and
+  statements on Mathlib's Bessel potential spaces, mirrored here with credit.
 * V. Temlyakov, *Multivariate Approximation*, Cambridge University Press, 2018. Periodic
   function spaces and trigonometric approximation.
 * H. Triebel, *Interpolation Theory, Function Spaces, Differential Operators*, North-Holland
@@ -912,6 +929,9 @@ Apache 2.0, the same as Mathlib. See [LICENSE](LICENSE).
 * H. Triebel, *Theory of Function Spaces II*, Monographs in Mathematics **84**, Birkhäuser, 1992.
   Triebel–Lizorkin spaces, local means, ball means of differences and atoms; the atoms there are
   `(s,p)`-atoms normalised in `L_p`, here they are normalised in `L_∞`.
+* H. Triebel, *Function spaces in Lipschitz domains and on Lipschitz manifolds. Characteristic
+  functions as pointwise multipliers*, Rev. Mat. Complut. **15** (2002), no. 2, 475–524.
+  Besov spaces on Lipschitz boundaries by chart pieces.
 * T. Ullrich, *Function spaces with dominating mixed smoothness, characterization by
   differences*, Jenaer Schriften zur Mathematik und Informatik Math/Inf/05/06, 2006. Mixed
   differences and mixed local means.

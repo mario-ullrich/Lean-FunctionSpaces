@@ -7,12 +7,14 @@ This part describes the Besov spaces $\Besov{s}{p}{q}$ in each setting by the ch
 available there. Its first chapter, \Cref{chap:representations}, is the overview: it lists the
 descriptions, the settings and parameters in which each is proved, and how they differ. The
 chapters after it prove them: Fourier coefficients, moduli of smoothness and Littlewood--Paley
-blocks on the torus; martingale differences of a filtration on a finite measure space; the Haar
-system, piecewise polynomials, splines and multiwavelets on intervals and on the cube;
-band-limited approximation, Littlewood--Paley blocks, differences, local means and atoms on
-$\R^d$, with the invariance under smooth changes of variables; the coefficients of the Daubechies
-wavelets on $\R$; and, for dominating mixed smoothness on $\R^d$ (\Cref{ch:mixed-smoothness}),
-mixed differences, mixed local means and tensor Littlewood--Paley blocks.
+blocks on the torus (\Cref{ch:torus} and \Cref{ch:classical}); martingale differences of a
+filtration on a finite measure space (\Cref{ch:filtrations}); the Haar system, piecewise
+polynomials, splines and multiwavelets on intervals and on the cube (\Cref{ch:interval} and
+\Cref{ch:cube}); band-limited approximation, Littlewood--Paley blocks, differences, local means
+and atoms on $\R^d$, with the invariance under smooth changes of variables (\Cref{ch:rd}); the
+coefficients of the Daubechies wavelets on $\R$ (\Cref{ch:daubechies}); and, for dominating mixed
+smoothness on $\R^d$ (\Cref{ch:mixed-smoothness}), mixed differences, mixed local means and
+tensor Littlewood--Paley blocks.
 
 \chapter{The representations of Besov spaces}
 \label{chap:representations}
@@ -20,8 +22,8 @@ mixed differences, mixed local means and tensor Littlewood--Paley blocks.
 The chapters of this part, the abstract chapters on approximation spaces
 (\Cref{ch:approximation-spaces}, \Cref{ch:interpolation}, \Cref{ch:decompositions} and
 \Cref{ch:spectral}), the chapter on Triebel--Lizorkin spaces (\Cref{ch:triebel-lizorkin}) and
-the chapters on domains (\Cref{ch:lipschitz-domains},
-\Cref{ch:traces-lipschitz} and \Cref{ch:manifolds}) describe Besov spaces in many ways and
+the chapters on domains (\Cref{ch:lipschitz-domains}, \Cref{ch:traces-lipschitz},
+\Cref{ch:laplacian-eigenbases} and \Cref{ch:manifolds}) describe Besov spaces in many ways and
 prove that the descriptions agree. This chapter collects them: what each description measures
 (\Cref{sec:descriptions}), in which setting and for which parameters it is proved to give the
 Besov space (\Cref{sec:where}), and how the descriptions differ (\Cref{sec:differences}).
@@ -72,7 +74,8 @@ each quasi-norm by a constant times the other. The dimension of the underlying s
     \Cref{def:spectral}).
     Weighted $\ell_q(\ell_p)$ norms of the coefficients of $f$ in a basis, level by level: Haar
     functions, multiwavelets, Daubechies wavelets, the Fourier basis, a Hilbert basis of a
-    spectral scheme.
+    spectral scheme, among them the Neumann eigenbasis of the Laplacian on a bounded Lipschitz
+    domain and the eigenbasis of a chart form on a compact manifold.
   \item \emph{Blocks} (\Cref{def:block-decomposition} and \Cref{def:blocks}).
     Decompositions $f = \sum_k g_k$ with $g_k$ in the $2^k$-th set of the scheme, measured by
     $\|(2^{ks} \|g_k\|)_k\|_{\ell_q}$; for a scheme with uniformly bounded projections $P_m$, the
@@ -284,6 +287,9 @@ Descriptions & Range & Result \\
   & \Cref{thm:bounded-lipschitz-besov} \\
 \raggedright Smooth bounded domains: charts of the closure, intrinsic differences and
   restrictions & $0 < s < r$ & \Cref{thm:smooth-domain-besov} \\
+\raggedright Bounded Lipschitz domains, $p = 2$: Neumann eigenfunction expansions and
+  intrinsic differences & $0 < s < 1$ & \Cref{thm:spectral-besov-neumann}\newline
+  \Cref{cor:spectral-besov-neumann-blocks} \\
 \hline
 \end{tabular}
 \end{center}
@@ -300,6 +306,8 @@ Descriptions & Range & Result \\
   & \Cref{def:manifold-besov} \\
 \raggedright The boundary: charts of the boundary hyperplane & $s > 0$
   & \Cref{thm:boundary-atlas-independence} \\
+\raggedright Charts and eigenfunction expansions of a chart form, $p = 2$ & $0 < s < 1$
+  & \Cref{thm:spectral-besov-manifold}\newline \Cref{cor:spectral-besov-manifold-blocks} \\
 \hline
 \end{tabular}
 \end{center}

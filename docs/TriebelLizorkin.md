@@ -10,7 +10,11 @@ Besov quasi-norms take the `L_p` norm of every Littlewood–Paley block `ψ_j �
 `ℓ_q` norm at every point first. This block develops the spaces `F^s_{p,q}` on `ℝ^d` and on the
 torus `𝕋^d` with the blocks of [Besov spaces on `ℝ^d`](Rd.md); the mixed norms `L_p(ℓ_q)` and
 `ℓ_q(L_p)`, the maximal functions and the Fefferman–Stein inequality are in
-[Tools from analysis](Analysis.md).
+[Tools from analysis](Analysis.md). For `s > 0` the spaces lie between Besov spaces (the Besov
+sandwich), and for `s > 0`, `1 < p < ∞`, `1 < q ≤ ∞` they are described by local means on `ℝ^d` and
+on `𝕋^d`, and by ball means of differences and by atoms on `ℝ^d`. For tempered distributions the
+same quasi-norm defines `F^s_{p,q}` for every real `s`, and for `1 < p < ∞`, `1 < q ≤ ∞` every
+admissible Littlewood–Paley family gives the same spaces.
 The theory for `1 < p < ∞` starts with families of dilated Schwartz kernels with their Fourier
 overlap and Hörmander condition, the adjoint of a convolution, which moves kernels and their
 derivatives to the other side of an integral, the `L_2` bounds of the analysis and synthesis
