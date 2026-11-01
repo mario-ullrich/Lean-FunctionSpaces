@@ -36,7 +36,8 @@ The kernels of the Littlewood–Paley decomposition are inverse transforms of sm
 * `Rd.cutoff a b`: a smooth function equal to `1` on the closed ball of radius `a` and to `0`
   outside the ball of radius `b` (Mathlib's `ContDiffBump`), a Schwartz function
   (`Rd.cutoffSchwartz`);
-* `Rd.lpKernel = 𝓕⁻¹ χ_{1,2}` with `∫ lpKernel = 1` (`Rd.integral_lpKernel`), hence
+* `Rd.lpKernel = 𝓕⁻¹ χ_{1,2}` (`Rd.fourier_lpKernel`, `Rd.fourier_lpKernelS`) with
+  `∫ lpKernel = 1` (`Rd.integral_lpKernel`), hence
   `1 ≤ ‖lpKernel‖_1 < ∞` (`Rd.one_le_eLpNorm_lpKernel`, `Rd.eLpNorm_lpKernel_ne_top`,
   `Rd.eLpNorm_lpKernel_lt_top`), and
   `Rd.bandKernel = 𝓕⁻¹ χ_{2,4}`;
@@ -342,6 +343,11 @@ noncomputable def bandKernel : V → ℂ := (bandKernelS : 𝓢(V, ℂ))
 theorem fourier_lpKernel : 𝓕 (lpKernel (V := V)) = cutoff 1 2 one_pos one_lt_two := by
   rw [lpKernel, ← SchwartzMap.fourier_coe, lpKernelS, FourierInvPair.fourier_fourierInv_eq,
     coe_cutoffSchwartz]
+
+/-- `𝓕 Φ = χ_{1,2}` as Schwartz functions (Mathlib's `FourierInvPair.fourier_fourierInv_eq`). -/
+theorem fourier_lpKernelS :
+    (𝓕 (lpKernelS (V := V)) : 𝓢(V, ℂ)) = cutoffSchwartz 1 2 one_pos one_lt_two :=
+  FourierInvPair.fourier_fourierInv_eq _
 
 /-- `𝓕 Θ = χ_{2,4}`. -/
 theorem fourier_bandKernel : 𝓕 (bandKernel (V := V)) = cutoff 2 4 two_pos (by norm_num) := by

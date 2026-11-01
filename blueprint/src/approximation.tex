@@ -557,6 +557,30 @@ argument with $2^{-k\alpha} \sum_{j \leq k} b_j = \sum_{i \leq k} 2^{-i\alpha} \
 gives the last one.
 \end{proof}
 
+\begin{lemma}[Window sums]
+\label{lem:window-sums}
+\lean{ENNReal.sum_Icc_eq_sum_range_ite, ENNReal.lqNorm_ite_add_sub_le, ENNReal.lqNorm_sum_Icc_le,
+  ENNReal.dyadicWeight_le_of_mem_Icc}
+\leanok
+\uses{lem:countable-minkowski, lem:hardy}
+Let $1 \leq q \leq \infty$ and $c \in \N$. For every sequence $b$ in $[0, \infty]$,
+\[
+  \Bigl\| \Bigl(\sum_{k = j - c}^{j + c} b_k\Bigr)_j \Bigr\|_{\ell_q}
+  \leq (2c + 1) \, \|b\|_{\ell_q} ,
+\]
+where the sum runs over the $k \in \N$ with $j - c \leq k \leq j + c$. For every real $s$ and
+all $j, k \in \N$ with $|j - k| \leq c$, $2^{js} \leq 2^{c|s|} \, 2^{ks}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The window sum is $\sum_{i = 0}^{2c} b_{j + i - c}$, with the terms $j + i < c$ set to $0$; for
+$i \leq c$ the sequence $j \mapsto b_{j + i - c}$ is a shift of $b$ to the right, for $i > c$ to
+the left, and shifts do not increase the norm (\Cref{lem:hardy}). Minkowski's inequality
+(\Cref{lem:countable-minkowski}) gives the factor $2c + 1$. The second claim is
+$s(j - k) \leq |s| \, |j - k| \leq |s| c$.
+\end{proof}
+
 On $\Z$ the $\ell_q$ norm is invariant under every shift, so the same argument bounds
 convolutions with a geometric kernel on both sides; the reiteration theorem
 (\Cref{sec:reiteration}) uses them.

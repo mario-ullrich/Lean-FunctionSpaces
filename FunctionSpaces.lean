@@ -75,6 +75,7 @@ public import FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinDifferences
 public import FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinAtoms
 public import FunctionSpaces.Rd.TriebelLizorkin.SquareFunction
 public import FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinDistributions
+public import FunctionSpaces.Rd.TriebelLizorkin.LittlewoodPaleyFamilies
 public import FunctionSpaces.Rd.SingularIntegrals.DilationFamilies
 public import FunctionSpaces.Rd.SingularIntegrals.ConvolutionAdjoint
 public import FunctionSpaces.Rd.SingularIntegrals.PlancherelBounds
@@ -504,6 +505,9 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   kernels as Fourier multipliers on `L_r`, the Littlewood–Paley blocks of tempered distributions
   and their convergence in `𝓢'`, and the Triebel–Lizorkin quasi-norm of tempered distributions for
   every real `s`, equal to that of `L_p` on `L_p`.
+* `FunctionSpaces.Rd.TriebelLizorkin.LittlewoodPaleyFamilies`: admissible Littlewood–Paley
+  kernels, the finite Fourier-side identity between the blocks of two kernels, and the
+  equivalence of their Triebel–Lizorkin quasi-norms on tempered distributions and on `L_p`.
 
 #### `Rd/SingularIntegrals`: vector-valued singular integrals
 

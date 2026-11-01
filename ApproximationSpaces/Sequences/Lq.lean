@@ -37,7 +37,8 @@ first term, tails of sequences (`ENNReal.lqNorm_ite_le_eq`), sequences with one 
 sequence for every `q` (`ENNReal.dyadicGeomConst`), and the **dyadic weights**
 `dyadicWeight s k = 2 ^ (k s)` that every approximation space uses, with the identity
 `2^(ks) 2^(-(k-j)σ) = 2^(-k(σ-s)) 2^(jσ)` of almost diagonal estimates
-(`ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub`), the weights of integer order
+(`ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub`), the bound `2^{js} ≤ 2^{c|s|} 2^{ks}` for
+`|j - k| ≤ c` (`ENNReal.dyadicWeight_le_of_mem_Icc`), the weights of integer order
 (`ENNReal.dyadicWeight_natCast`), and the powers of two `2^s ≠ ∞`, `1 ≤ 2^s` for `s ≥ 0`
 (`ENNReal.two_rpow_ne_top`, `ENNReal.one_le_two_rpow`) and `(ρ 2^(-j))^b = ρ^b 2^(-jb)`
 (`ENNReal.ofReal_div_two_pow_rpow`).  Two inequalities in `[0, ∞]`,
@@ -457,6 +458,24 @@ theorem dyadicWeight_mul_dyadicWeight_neg_sub (s σ : ℝ) {j k : ℕ} (hjk : j 
     ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top, Nat.cast_sub hjk]
   congr 1
   ring
+
+/-- **Weights inside a window**: for `|j - k| ≤ c`, `2^{js} ≤ 2^{c|s|} 2^{ks}`, since
+`s(j - k) ≤ |s| c`. -/
+theorem dyadicWeight_le_of_mem_Icc (s : ℝ) {c j k : ℕ} (hk : k ∈ Finset.Icc (j - c) (j + c)) :
+    dyadicWeight s j ≤ dyadicWeight |s| c * dyadicWeight s k := by
+  rw [Finset.mem_Icc] at hk
+  rw [dyadicWeight, dyadicWeight, dyadicWeight,
+    ← ENNReal.rpow_add _ _ two_ne_zero ENNReal.ofNat_ne_top]
+  refine ENNReal.rpow_le_rpow_of_exponent_le one_le_two ?_
+  have h1 : (j : ℝ) ≤ k + c := by exact_mod_cast (by omega : j ≤ k + c)
+  have h2 : (k : ℝ) ≤ j + c := by exact_mod_cast hk.2
+  have hjk : |(j : ℝ) - k| ≤ c := abs_le.2 ⟨by linarith, by linarith⟩
+  have h3 : ((j : ℝ) - k) * s ≤ |s| * c := by
+    calc ((j : ℝ) - k) * s ≤ |((j : ℝ) - k) * s| := le_abs_self _
+      _ = |(j : ℝ) - k| * |s| := abs_mul _ _
+      _ ≤ c * |s| := mul_le_mul_of_nonneg_right hjk (abs_nonneg s)
+      _ = |s| * c := mul_comm _ _
+  linarith [h3]
 
 /-- `(2^(ks))^p = 2^(k s p)`. -/
 theorem dyadicWeight_rpow (s p : ℝ) (k : ℕ) : dyadicWeight s k ^ p = dyadicWeight (s * p) k := by

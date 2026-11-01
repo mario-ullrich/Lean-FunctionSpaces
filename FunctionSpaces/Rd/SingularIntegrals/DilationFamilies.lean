@@ -26,7 +26,8 @@ bounded uniformly in `j` (`Rd.IsUniformSchwartz`). Two numbers control such a fa
 Littlewood–Paley kernels are `Φ_k = δ_{2^k} Φ`.
 
 * **Schwartz forms of dilation, reflection and conjugation** (`Rd.schwartzDilate`,
-  `Rd.schwartzReflect`, `Rd.schwartzConj`), with the chain rule
+  `Rd.schwartzReflect`, `Rd.schwartzConj`), with `𝓕(G_c)(ξ) = 𝓕G(c⁻¹ ξ)`
+  (`Rd.fourier_schwartzDilate_apply`) and the chain rule
   `∂_{w_0} ⋯ ∂_{w_{k-1}} (G_c) = c^k (∂_{w_0} ⋯ ∂_{w_{k-1}} G)_c` for dilations
   (`Rd.iteratedLineDerivOp_schwartzDilate`).
 * **One dilate** (`Rd.setLIntegral_enorm_dilate_sub_le_min`): the Hörmander integral of
@@ -76,6 +77,12 @@ theorem coe_schwartzDilate (c : ℝ) (hc : c ≠ 0) (G : 𝓢(V, ℂ)) :
     (schwartzDilate c hc G : V → ℂ) = dilate c G := by
   funext x
   simp [schwartzDilate, dilate, Units.smul_def]
+
+/-- The Fourier transform of a dilate: `𝓕(G_c)(ξ) = 𝓕G(c⁻¹ ξ)` for a Schwartz function `G` and
+`c > 0` (`Rd.fourier_dilate`). -/
+theorem fourier_schwartzDilate_apply {c : ℝ} (hc : 0 < c) (G : 𝓢(V, ℂ)) (ξ : V) :
+    (𝓕 (schwartzDilate c hc.ne' G) : 𝓢(V, ℂ)) ξ = (𝓕 G : 𝓢(V, ℂ)) (c⁻¹ • ξ) := by
+  rw [SchwartzMap.fourier_coe, coe_schwartzDilate, fourier_dilate _ hc, SchwartzMap.fourier_coe]
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- The dilation of Schwartz functions is additive: `(∑_i G_i)_c = ∑_i (G_i)_c`. -/

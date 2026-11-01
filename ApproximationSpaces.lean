@@ -120,9 +120,10 @@ or `InterpCouple`.
 * `ApproximationSpaces.Sequences.Dyadic`: Cauchy condensation with power weights
   (`ENNReal.tsum_pow_mul_le_dyadic`), three sums over dyadic scales, and the interpolation
   inequality for dyadic suprema (`ENNReal.tsum_dyadicWeight_mul_le_iSup`).
-* `ApproximationSpaces.Sequences.Hardy`: the countable Minkowski inequality, the two discrete
-  Hardy inequalities (`ENNReal.hardy_sum_le`, `ENNReal.hardy_tail_le`), almost diagonal sums and
-  their constant `ENNReal.almostDiagonalConst`, shifts on `ℓ_q(ℤ)` and geometric convolutions.
+* `ApproximationSpaces.Sequences.Hardy`: the countable Minkowski inequality, window sums
+  (`ENNReal.lqNorm_sum_Icc_le`), the two discrete Hardy inequalities (`ENNReal.hardy_sum_le`,
+  `ENNReal.hardy_tail_le`), almost diagonal sums and their constant
+  `ENNReal.almostDiagonalConst`, shifts on `ℓ_q(ℤ)` and geometric convolutions.
 
 ### Embeddings, transfer and lifting
 

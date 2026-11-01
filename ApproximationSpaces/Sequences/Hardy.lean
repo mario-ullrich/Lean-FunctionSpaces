@@ -25,6 +25,8 @@ copies of `c` and uses the **countable Minkowski inequality** `lqNorm_tsum_le`, 
 `MeasureTheory.eLpNorm_tsum_le` for the counting measure; monotone convergence (`lqNorm_iSup`, the
 case of `MeasureTheory.eLpNorm_iSup_of_directed`) gives the norm of a sequence as the supremum of
 the norms of its truncations, which increase (`lqNorm_eq_iSup_lqNorm_ite`, `monotone_ite_lt`).
+Shifts do not increase the norm, so window sums cost a constant:
+`‖(∑_{k = j - c}^{j + c} b_k)_j‖_q ≤ (2c + 1) ‖b‖_q` (`lqNorm_sum_Icc_le`).
 
 Together they bound an **almost diagonal sum**: with `c_{ij} = 2^(-(i-j)L)` for `j ≤ i` and
 `c_{ij} = 1` for `j > i`, `‖(2^(is) ∑_j c_{ij} a_j)_i‖_q ≤ C ‖(2^(js) a_j)_j‖_q` for `0 < s < L`
@@ -120,6 +122,78 @@ theorem lqNorm_shiftRight_le (i : ℕ) (a : ℕ → ℝ≥0∞) :
     · rw [Function.extend_apply' _ _ _ fun ⟨m, hm⟩ => hk (hm ▸ Nat.le_add_left i m)]
       rfl
   rw [h, lqNorm_extend_zero (add_left_injective i)]
+
+/-! ### Window sums -/
+
+/-- **Window sums as shifted sequences**: for `c, j ∈ ℕ` and `b : ℕ → [0, ∞]`,
+`∑_{k = j - c}^{j + c} b_k = ∑_{i < 2c + 1} b_{j + i - c}`, where the terms with `j + i < c` are
+`0` (Mathlib's `Finset.sum_nbij'` with `k ↦ k + c - j`). -/
+theorem sum_Icc_eq_sum_range_ite (c j : ℕ) (b : ℕ → ℝ≥0∞) :
+    ∑ k ∈ Finset.Icc (j - c) (j + c), b k =
+      ∑ i ∈ Finset.range (2 * c + 1), if c ≤ j + i then b (j + i - c) else 0 := by
+  rw [← Finset.sum_filter]
+  refine Finset.sum_nbij' (fun k => k + c - j) (fun i => j + i - c) ?_ ?_ ?_ ?_ ?_
+  · intro k hk
+    simp only [Finset.mem_Icc, Finset.mem_filter, Finset.mem_range] at hk ⊢
+    omega
+  · intro i hi
+    simp only [Finset.mem_Icc, Finset.mem_filter, Finset.mem_range] at hi ⊢
+    omega
+  · intro k hk
+    rw [Finset.mem_Icc] at hk
+    omega
+  · intro i hi
+    rw [Finset.mem_filter, Finset.mem_range] at hi
+    omega
+  · intro k hk
+    rw [Finset.mem_Icc] at hk
+    congr 1
+    omega
+
+/-- **One shifted sequence**: for `c, i ∈ ℕ`, the sequence `j ↦ b_{j + i - c}` (with the terms
+`j + i < c` set to `0`) has `ℓ_q` norm at most `‖b‖_{ℓ_q}`: it is a shift of `b` to the right
+(`ENNReal.lqNorm_shiftRight_le`) for `i ≤ c`, and to the left (`ENNReal.lqNorm_shift_le'`)
+otherwise. -/
+theorem lqNorm_ite_add_sub_le {q : ℝ≥0∞} (c i : ℕ) (b : ℕ → ℝ≥0∞) :
+    lqNorm q (fun j => if c ≤ j + i then b (j + i - c) else 0) ≤ lqNorm q b := by
+  rcases le_or_gt i c with hic | hic
+  · have h : (fun j => if c ≤ j + i then b (j + i - c) else 0) =
+        fun j => if c - i ≤ j then b (j - (c - i)) else 0 := by
+      funext j
+      split_ifs with h1 h2 h2
+      · congr 1
+        omega
+      · exfalso
+        omega
+      · exfalso
+        omega
+      · rfl
+    rw [h]
+    exact lqNorm_shiftRight_le _ b
+  · have h : (fun j => if c ≤ j + i then b (j + i - c) else 0) = fun j => b (j + (i - c)) := by
+      funext j
+      split_ifs with h1
+      · congr 1
+        omega
+      · exfalso
+        omega
+    rw [h]
+    exact lqNorm_shift_le' _ b
+
+/-- **Window sums in `ℓ_q`**: for `1 ≤ q ≤ ∞`, `c ∈ ℕ` and every sequence `b` in `[0, ∞]`,
+`‖(∑_{k = j - c}^{j + c} b_k)_j‖_{ℓ_q} ≤ (2c + 1) ‖b‖_{ℓ_q}`: the window sum is a sum of `2c + 1`
+shifted sequences (`ENNReal.sum_Icc_eq_sum_range_ite`, `ENNReal.lqNorm_ite_add_sub_le`), and
+Minkowski's inequality applies (`ENNReal.lqNorm_sum_le`). -/
+theorem lqNorm_sum_Icc_le {q : ℝ≥0∞} (hq : 1 ≤ q) (c : ℕ) (b : ℕ → ℝ≥0∞) :
+    lqNorm q (fun j => ∑ k ∈ Finset.Icc (j - c) (j + c), b k) ≤ (2 * c + 1) * lqNorm q b := by
+  simp_rw [sum_Icc_eq_sum_range_ite c _ b]
+  refine (lqNorm_sum_le hq _ _).trans ?_
+  refine (Finset.sum_le_sum fun i _ => lqNorm_ite_add_sub_le c i b).trans ?_
+  rw [Finset.sum_const, Finset.card_range, nsmul_eq_mul]
+  push_cast
+  exact le_rfl
+
+/-! ### Hardy's inequalities -/
 
 /-- **Hardy's inequality for tails**: for `α > 0` and `1 ≤ q ≤ ∞`,
 `‖(2^(kα) ∑_{i ≥ 0} b (k + i))ₖ‖_q ≤ (1 - 2^(-α))⁻¹ ‖(2^(kα) b k)ₖ‖_q`. -/
