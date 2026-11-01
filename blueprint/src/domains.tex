@@ -191,14 +191,15 @@ iff\_\allowbreak indicator\_\allowbreak ae\_\allowbreak eq}), and the class $1_S
 \label{lem:zero-extension-lp}
 \lean{Rd.memLp_indicator_restrict, Rd.eLpNorm_indicator_restrict_le, Rd.indicatorExtendLp,
   Rd.indicatorExtendLp_apply_ae, Rd.enorm_indicatorExtendLp_le,
-  Rd.indicatorLp_indicatorExtendLp_restrict}
+  Rd.indicatorLp_indicatorExtendLp_restrict, Rd.indicatorExtendLp_restrict_of_ae_eq_zero}
 \leanok
 \uses{lem:indicator-lp-eq-iff}
 For every measure $\mu$ on $X$, every $O \subseteq X$, every measurable $T \subseteq O$ and every
 $1 \leq p \leq \infty$, the extension by zero $g \mapsto 1_T g$ is a bounded linear operator
 from $L_p(\mu|_O)$ to $L_p(\mu)$ of norm at most $1$. For every measure $\mu$ on $X$, every
 measurable $S \subseteq X$, every $1 \leq p \leq \infty$ and every $f \in L_p(\mu)$, the
-extension by zero of $f|_S \in L_p(\mu|_S)$ agrees with $f$ on $S$.
+extension by zero of $f|_S \in L_p(\mu|_S)$ agrees with $f$ on $S$, and it equals $f$ if
+$f = 0$ almost everywhere outside $S$.
 \end{lemma}
 
 \begin{proof}
@@ -206,8 +207,26 @@ extension by zero of $f|_S \in L_p(\mu|_S)$ agrees with $f$ on $S$.
 $\|1_T g\|_{L_p(\mu)} = \|g\|_{L_p(\mu|_T)} \leq \|g\|_{L_p(\mu|_O)}$ (Mathlib's
 \texttt{MeasureTheory.\allowbreak eLpNorm\_\allowbreak indicator\_\allowbreak eq\_\allowbreak
 eLpNorm\_\allowbreak restrict}), and $1_T (g + h) = 1_T g + 1_T h$, $1_T (c g) = c \, 1_T g$
-almost everywhere. The last statement holds almost everywhere on $S$
-(\Cref{lem:indicator-lp-eq-iff}).
+almost everywhere. The extension by zero of $f|_S$ equals $f$ almost everywhere on $S$
+(\Cref{lem:indicator-lp-eq-iff}); if $f = 0$ almost everywhere outside $S$, both vanish
+outside $S$.
+\end{proof}
+
+\begin{lemma}[Restriction to a smaller set]
+\label{lem:restriction-smaller-set}
+\lean{Rd.restrictSubsetLp, Rd.restrictSubsetLp_ae}
+\leanok
+\uses{lem:zero-extension-lp}
+For every measure $\mu$ on $X$, every $1 \leq p \leq \infty$, every $O \subseteq X$ and every
+measurable $D \subseteq O$, the restriction $g \mapsto g|_D$ is a bounded linear operator from
+$L_p(\mu|_O)$ to $L_p(\mu|_D)$, and $g|_D = g$ almost everywhere on $D$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The restriction is the extension by zero to $X$ (\Cref{lem:zero-extension-lp}) followed by the
+restriction of $L_p(\mu)$ to $D$ (Mathlib's \texttt{MeasureTheory.\allowbreak
+LpToLpRestrictCLM}).
 \end{proof}
 
 \begin{lemma}[The support principle]
@@ -10026,7 +10045,8 @@ zero extension of $g$ lies in $(L_2(V), H^1(V))_{\theta, q}$.
 \begin{proof}
 \leanok
 $\iota w$ vanishes outside $\Omega$ (\Cref{lem:dirichlet-l2-inner}) and equals $J_\Omega w$ on
-$\Omega$ (\Cref{def:dirichlet-embedding}). The zero extension has norm at most $1$ on $L_2$
+$\Omega$ (\Cref{def:dirichlet-embedding}), so it is the zero extension of $J_\Omega w$
+(\Cref{lem:zero-extension-lp}). The zero extension has norm at most $1$ on $L_2$
 (\Cref{lem:zero-extension-lp}) and maps $J_\Omega w$ to $\iota w$, whose Bessel potential norm
 is $\|w\|$ (\Cref{def:bessel-potential-norm}, \Cref{lem:sobolev-one-to-l2}); so it maps the couple
 with constants $1$, and \Cref{thm:interpolation-property} applies.
@@ -10370,27 +10390,6 @@ $e_i = J_A \varphi_i$, is an orthonormal basis of $L_2(\mu)$ of weak eigenfuncti
 form. To avoid a clash with
 the model $I$, the eigenvalue indices run over a set $\mathcal{I}$.
 
-\begin{lemma}[Restriction to a smaller set]
-\label{lem:restriction-smaller-set}
-\lean{Rd.restrictSubsetLp, Rd.restrictSubsetLp_ae, Rd.indicatorExtendLp_restrict_of_ae_eq_zero}
-\leanok
-\uses{lem:zero-extension-lp}
-For every measure $\mu$ on $X$, every $1 \leq p \leq \infty$, every $O \subseteq X$ and every
-measurable $D \subseteq O$, the restriction $g \mapsto g|_D$ is a bounded linear operator from
-$L_p(\mu|_O)$ to $L_p(\mu|_D)$, and $g|_D = g$ almost everywhere on $D$. For every measure $\mu$
-on $X$, every $1 \leq p \leq \infty$, every measurable $S \subseteq X$ and every
-$f \in L_p(\mu)$ with $f = 0$ almost everywhere outside $S$, the extension by zero of
-$f|_S \in L_p(\mu|_S)$ is $f$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The restriction is the extension by zero to $X$ (\Cref{lem:zero-extension-lp}) followed by the
-restriction of $L_p(\mu)$ to $D$ (Mathlib's \texttt{MeasureTheory.\allowbreak
-LpToLpRestrictCLM}). The extension by zero of $f|_S$ equals $f$ on $S$, and outside $S$ both
-vanish.
-\end{proof}
-
 \begin{definition}[The bounded convex pieces of the charts]
 \label{def:chart-piece-domain}
 \lean{Manifold.BesovAtlas.pieceDomain, Manifold.BesovAtlas.pieceDomain_subset_interior,
@@ -10418,8 +10417,8 @@ a null set (\Cref{def:model-interior}).
   Manifold.BesovAtlas.indicatorExtendLp_neumannEmbedding_toNeumann}
 \leanok
 \uses{def:chart-piece-domain, def:chart-sobolev, def:chart-sobolev-embedding, def:neumann-space,
-  def:neumann-embedding, lem:restriction-smaller-set, lem:weak-derivative-basic,
-  lem:chart-lift-operator}
+  def:neumann-embedding, lem:restriction-smaller-set, lem:zero-extension-lp,
+  lem:weak-derivative-basic, lem:chart-lift-operator}
 For every chart index $k$, the map
 \[
   T_k (f, g) = \bigl( (P_k f)|_{D_k}, (g_{kj}|_{D_k})_{j \in K} \bigr)
@@ -10434,8 +10433,7 @@ $E_k J^N_{D_k} T_k u$ to $E$ is $P_k J_A u$.
 The pieces and the restrictions are bounded and linear (\Cref{lem:chart-lift-operator},
 \Cref{lem:restriction-smaller-set}). A weak derivative on $O_I$ is one on $D_k \subseteq O_I$
 (\Cref{lem:weak-derivative-basic}). The piece $P_k J_A u$ vanishes outside $D_k$
-(\Cref{def:chart-piece-domain}), so \Cref{lem:restriction-smaller-set} gives the last
-statement.
+(\Cref{def:chart-piece-domain}), so \Cref{lem:zero-extension-lp} gives the last statement.
 \end{proof}
 
 \begin{theorem}[Rellich's theorem for the chart Sobolev space]

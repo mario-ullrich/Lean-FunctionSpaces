@@ -47,47 +47,6 @@ conjugate-linear in the first argument, as in Mathlib.
 open MeasureTheory Set Filter Topology TopologicalSpace Module Metric
 open scoped ENNReal Manifold ContDiff InnerProductSpace BesselPotentialSpace ComplexConjugate
 
-namespace Rd
-
-/-! ### Restriction to a smaller set and zero extension -/
-
-section Restriction
-
-variable {α : Type*} [MeasurableSpace α] {μ : Measure α} {p : ℝ≥0∞} [Fact (1 ≤ p)]
-
-/-- **Restriction to a smaller set**: for measurable `D ⊆ O`, the operator
-`L_p(μ|_O) → L_p(μ|_D)`, `g ↦ g|_D`, as the zero extension to the whole space
-(`Rd.indicatorExtendLp`) followed by the restriction to `D` (Mathlib's
-`MeasureTheory.LpToLpRestrictCLM`). -/
-noncomputable def restrictSubsetLp {D O : Set α} (hD : MeasurableSet D) (hDO : D ⊆ O) :
-    Lp ℂ p (μ.restrict O) →L[ℂ] Lp ℂ p (μ.restrict D) :=
-  LpToLpRestrictCLM α ℂ ℂ μ p D ∘L indicatorExtendLp hD hDO
-
-/-- The restriction to `D` agrees with `g` almost everywhere on `D`. -/
-theorem restrictSubsetLp_ae {D O : Set α} (hD : MeasurableSet D) (hDO : D ⊆ O)
-    (g : Lp ℂ p (μ.restrict O)) : restrictSubsetLp hD hDO g =ᵐ[μ.restrict D] g := by
-  filter_upwards [LpToLpRestrictCLM_coeFn ℂ D (indicatorExtendLp hD hDO g),
-    ae_restrict_of_ae (indicatorExtendLp_apply_ae hD hDO g), ae_restrict_mem hD] with x h1 h2 h3
-  change LpToLpRestrictCLM α ℂ ℂ μ p D (indicatorExtendLp hD hDO g) x = g x
-  rw [h1, h2, indicator_of_mem h3]
-
-/-- **The zero extension of a restriction**: if `f ∈ L_p(μ)` vanishes almost everywhere outside a
-measurable set `s`, then the zero extension of `f|_s` is `f`. -/
-theorem indicatorExtendLp_restrict_of_ae_eq_zero {s : Set α} (hs : MeasurableSet s)
-    {f : Lp ℂ p μ} (hf : ∀ᵐ x ∂μ, x ∉ s → f x = 0) :
-    indicatorExtendLp hs subset_rfl (LpToLpRestrictCLM α ℂ ℂ μ p s f) = f := by
-  refine Lp.ext ?_
-  filter_upwards [indicatorExtendLp_apply_ae hs subset_rfl (LpToLpRestrictCLM α ℂ ℂ μ p s f),
-    (ae_restrict_iff' hs).1 (LpToLpRestrictCLM_coeFn ℂ s f), hf] with x h1 h2 h3
-  rw [h1]
-  by_cases hx : x ∈ s
-  · rw [indicator_of_mem hx, h2 hx]
-  · rw [indicator_of_notMem hx, h3 hx]
-
-end Restriction
-
-end Rd
-
 namespace Manifold
 
 variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDimensional ℝ E]

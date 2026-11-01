@@ -283,8 +283,9 @@ manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet example
 * `FunctionSpaces.Analysis.Lp.Young`: the weighted Jensen inequality, Young's inequality on
   measurable groups, and weighted averages in `L_p`.
 * `FunctionSpaces.Analysis.Lp.IndicatorOperator`: multiplication by the indicator of a measurable
-  set as an operator on `L_p` of norm at most `1`, integrals over a set as `L_2` pairings, and the
-  extension by zero from `L_p(μ|_O)` to `L_p(μ)`.
+  set as an operator on `L_p` of norm at most `1`, integrals over a set as `L_2` pairings, the
+  extension by zero from `L_p(μ|_O)` to `L_p(μ)`, and the restriction from `L_p(μ|_O)` to
+  `L_p(μ|_D)` for `D ⊆ O`.
 * `FunctionSpaces.Analysis.Lp.Inclusion`: the bounded linear inclusion `L_r ↪ L_p` for `p ≤ r` and a
   finite measure, `MeasureTheory.Lp.inclusionOfExponentLe`.
 * `FunctionSpaces.Analysis.Lp.BoundedContinuous`: bounded continuous functions in `L_p`; for a

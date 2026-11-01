@@ -78,7 +78,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
 | `L_p` norms through integrals of powers | ✅ | ✗ | `Analysis/Lp/LintegralForm` |
-| Multiplication by an indicator as an operator on `L_p`, integrals over a set as `L_2` pairings, zero extension from `L_p(μ|_s)` | ✅ | ✗ | `Analysis/Lp/IndicatorOperator` |
+| Multiplication by an indicator as an operator on `L_p`, integrals over a set as `L_2` pairings, zero extension from `L_p(μ|_s)`, restriction to a smaller set | ✅ | ✗ | `Analysis/Lp/IndicatorOperator` |
 | Inclusion `L_r ↪ L_p`, bounded continuous functions in `L_p` | ✅ | ✗ | `Analysis/Lp/Inclusion`, `Analysis/Lp/BoundedContinuous` |
 | Interpolation `L_p`–`L_∞` | ✅ | ✗ | `Analysis/Lp/Interpolation` |
 | Young's inequality on measurable groups, weighted Jensen inequality, weighted averages in `L_p` | ✅ | ✗ | `Analysis/Lp/Young` |

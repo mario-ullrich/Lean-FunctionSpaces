@@ -9,7 +9,7 @@ public import Mathlib.MeasureTheory.Function.Holder
 public import Mathlib.MeasureTheory.Integral.Bochner.Set
 
 /-!
-# Multiplication by an indicator on `L_p`
+# Indicators, extension by zero and restriction in `L_p`
 
 For a measurable set `s` of a measure space, multiplication by the indicator `1_s` is a bounded
 linear operator on `L_p(μ)` of norm at most `1` (`Rd.indicatorLp`); it is multiplication by
@@ -20,7 +20,11 @@ with Mathlib's pairing of `L_2` with `L_2` (`Rd.setIntegral_mul_eq_lpPairing`). 
 `T ⊆ O`, the extension by zero `g ↦ 1_T g` from `L_p(μ|_O)` to `L_p(μ)` is a bounded linear
 operator of norm at most `1` (`Rd.indicatorExtendLp`). The cut-off norm `‖1_s f‖_{L_p(μ)}` is the
 norm of the restriction `f|_s ∈ L_p(μ|_s)` (`Rd.enorm_indicatorLp_eq`), and the extension by zero
-of `f|_s` agrees with `f` on `s` (`Rd.indicatorLp_indicatorExtendLp_restrict`).
+of `f|_s` agrees with `f` on `s` (`Rd.indicatorLp_indicatorExtendLp_restrict`); it is `f` when `f`
+vanishes almost everywhere outside `s` (`Rd.indicatorExtendLp_restrict_of_ae_eq_zero`). For a
+measurable `D ⊆ O`, the restriction `g ↦ g|_D` from `L_p(μ|_O)` to `L_p(μ|_D)` is a bounded
+linear operator (`Rd.restrictSubsetLp`) that agrees with `g` almost everywhere on `D`
+(`Rd.restrictSubsetLp_ae`).
 -/
 
 @[expose] public section
@@ -196,5 +200,37 @@ theorem indicatorLp_indicatorExtendLp_restrict {s : Set α} (hs : MeasurableSet 
     (LpToLpRestrictCLM α ℂ ℂ μ p s f)), LpToLpRestrictCLM_coeFn ℂ s f,
     ae_restrict_mem hs] with x hx1 hx2 hx3
   rw [hx1, Set.indicator_of_mem hx3, hx2]
+
+/-- **The zero extension of a restriction**: if `f ∈ L_p(μ)` vanishes almost everywhere outside a
+measurable set `s`, then the zero extension of `f|_s` is `f`. -/
+theorem indicatorExtendLp_restrict_of_ae_eq_zero {s : Set α} (hs : MeasurableSet s)
+    {f : Lp ℂ p μ} (hf : ∀ᵐ x ∂μ, x ∉ s → f x = 0) :
+    indicatorExtendLp hs subset_rfl (LpToLpRestrictCLM α ℂ ℂ μ p s f) = f := by
+  refine Lp.ext ?_
+  filter_upwards [indicatorExtendLp_apply_ae hs subset_rfl (LpToLpRestrictCLM α ℂ ℂ μ p s f),
+    (ae_restrict_iff' hs).1 (LpToLpRestrictCLM_coeFn ℂ s f), hf] with x h1 h2 h3
+  rw [h1]
+  by_cases hx : x ∈ s
+  · rw [Set.indicator_of_mem hx, h2 hx]
+  · rw [Set.indicator_of_notMem hx, h3 hx]
+
+/-! ### Restriction to a smaller set -/
+
+/-- **Restriction to a smaller set**: for measurable `D ⊆ O`, the operator
+`L_p(μ|_O) → L_p(μ|_D)`, `g ↦ g|_D`, as the zero extension to the whole space
+(`Rd.indicatorExtendLp`) followed by the restriction to `D` (Mathlib's
+`MeasureTheory.LpToLpRestrictCLM`). Mathlib's `MeasureTheory.Lp.LpToLpOfMeasureLeSMul` gives the
+same map as an `ℝ`-linear operator. -/
+noncomputable def restrictSubsetLp {D O : Set α} (hD : MeasurableSet D) (hDO : D ⊆ O) :
+    Lp ℂ p (μ.restrict O) →L[ℂ] Lp ℂ p (μ.restrict D) :=
+  LpToLpRestrictCLM α ℂ ℂ μ p D ∘L indicatorExtendLp hD hDO
+
+/-- The restriction to `D` agrees with `g` almost everywhere on `D`. -/
+theorem restrictSubsetLp_ae {D O : Set α} (hD : MeasurableSet D) (hDO : D ⊆ O)
+    (g : Lp ℂ p (μ.restrict O)) : restrictSubsetLp hD hDO g =ᵐ[μ.restrict D] g := by
+  filter_upwards [LpToLpRestrictCLM_coeFn ℂ D (indicatorExtendLp hD hDO g),
+    ae_restrict_of_ae (indicatorExtendLp_apply_ae hD hDO g), ae_restrict_mem hD] with x h1 h2 h3
+  change LpToLpRestrictCLM α ℂ ℂ μ p D (indicatorExtendLp hD hDO g) x = g x
+  rw [h1, h2, Set.indicator_of_mem h3]
 
 end Rd

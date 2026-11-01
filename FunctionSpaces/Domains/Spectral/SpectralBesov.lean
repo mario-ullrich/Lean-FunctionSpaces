@@ -439,20 +439,14 @@ variable {Ω : Opens V}
 
 /-- **Elements of `H^1_0(Ω)` are the zero extensions of their values on `Ω`**: for
 `w ∈ H^1_0(Ω)`, the zero extension of `J w ∈ L_2(Ω)` is the `L_2` function of `w ∈ H^1(V)`,
-which vanishes outside `Ω` (`Rd.toL2_ae_eq_zero_of_mem_zeroBoundarySpace`). -/
+which vanishes outside `Ω` (`Rd.toL2_ae_eq_zero_of_mem_zeroBoundarySpace`,
+`Rd.indicatorExtendLp_restrict_of_ae_eq_zero`). -/
 theorem indicatorExtendLp_dirichletEmbedding (w : zeroBoundarySpace 1 Ω) :
     indicatorExtendLp Ω.isOpen.measurableSet subset_rfl (dirichletEmbedding Ω w) =
       toL2 ((w : RestrictionSpace 1 Ω) : H^{1}(V)) := by
-  refine Lp.ext ?_
-  have h1 := indicatorExtendLp_apply_ae Ω.isOpen.measurableSet subset_rfl (dirichletEmbedding Ω w)
-  have h2 := (ae_restrict_iff' Ω.isOpen.measurableSet).1
-    (LpToLpRestrictCLM_coeFn ℂ (Ω : Set V) (toL2 ((w : RestrictionSpace 1 Ω) : H^{1}(V))))
-  filter_upwards [h1, h2, toL2_ae_eq_zero_of_mem_zeroBoundarySpace w] with x hx1 hx2 hx3
-  rw [hx1]
-  by_cases hxΩ : x ∈ (Ω : Set V)
-  · rw [Set.indicator_of_mem hxΩ]
-    exact hx2 hxΩ
-  · rw [Set.indicator_of_notMem hxΩ, hx3 hxΩ]
+  rw [dirichletEmbedding_apply, restrictL2_apply]
+  exact indicatorExtendLp_restrict_of_ae_eq_zero Ω.isOpen.measurableSet
+    (toL2_ae_eq_zero_of_mem_zeroBoundarySpace w)
 
 /-- **The zero extension maps the Dirichlet couple into `(L_2(V), H^1(V))`**: for an open set
 `Ω`, if `g ∈ L_2(Ω)` lies in `(L_2(Ω), H^1_0(Ω))_{θ,q}`, then its zero extension lies in the real
