@@ -38,7 +38,8 @@ kernels that are proved finite.
   `‖∑_{j ∈ t} K_j ⋆ (ψ_j ⋆ f)‖_p ≤ C ‖ x ↦ ‖(1_t(j) 2^{jσ} (ψ_j ⋆ f)(x))_j‖_{ℓ_2} ‖_p`, the
   partial sums converge in `L_p` for `f ∈ F^σ_{p,2}` (`Rd.cauchySeq_toLp_sum_conv_blockFun`,
   `Rd.exists_tendsto_sum_conv_blockFun`); a Calderón–Zygmund family with the coefficients
-  `|c_j| = 2^{jσ}` has this bound (`Rd.IsCZFamily.eLpNorm_sum_conv_smul_blockFun_le`). The
+  `|c_j| = 2^{jσ}` has this bound (`Rd.IsCZFamily.eLpNorm_sum_conv_smul_le` for every family
+  in `L_p`, `Rd.IsCZFamily.eLpNorm_sum_conv_smul_blockFun_le` for the blocks). The
   Bessel potentials of `FunctionSpaces.Rd.BesselPotentials.BesselPotentialLifting` use the same
   sums.
 
@@ -211,29 +212,29 @@ theorem tlToSobolevConst_ne_top {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) 
   czConst_ne_top hp1 hp (derivDualOverlap_ne_top w)
     (ENNReal.mul_ne_top ENNReal.ofNat_ne_top (familyHormanderConst_ne_top _))
 
-/-- **The synthesis bound with scaled blocks**: in dimension `n ≥ 1`, for `1 < p < ∞`, a
+omit [Fact (1 ≤ p)] in
+/-- **The synthesis bound with scaled coefficients**: in dimension `n ≥ 1`, for `1 < p < ∞`, a
 Calderón–Zygmund family `(θ_j)_j` with overlap `B` and Hörmander constant `H`, coefficients
-`c_j ∈ ℂ` with `|c_j| = 2^{jσ}`, every finite set `t ⊆ ℕ` and `f ∈ L_p(V)`,
-`‖∑_{j ∈ t} θ_j ⋆ (c_j ψ_j ⋆ f)‖_p ≤ S ‖ x ↦ ‖(1_t(j) 2^{jσ} (ψ_j ⋆ f)(x))_j‖_{ℓ_2} ‖_p` with
-`S = Rd.czConst V p B H`: the synthesis bound of the family (`Rd.IsCZFamily.eLpNorm_sum_conv_le`)
-for the coefficients `1_t(j) c_j ψ_j ⋆ f`, which lie in `L_p(V)` (`Rd.memLp_blockFun`). -/
-theorem IsCZFamily.eLpNorm_sum_conv_smul_blockFun_le [Nontrivial V] {θ : ℕ → V → ℂ}
-    {B H : ℝ≥0∞} (hθ : IsCZFamily θ B H) (hp1 : 1 < p) (hp : p ≠ ∞) {σ : ℝ} {c : ℕ → ℂ}
-    (hc : ∀ j, ‖c j‖ₑ = dyadicWeight σ j) (t : Finset ℕ) (f : Lp ℂ p (volume : Measure V)) :
-    eLpNorm (fun x => ∑ j ∈ t, conv (θ j) (c j • blockFun j f) volume x) p volume ≤
+`c_j ∈ ℂ` with `|c_j| = 2^{jσ}`, every finite set `t ⊆ ℕ` and functions `g_j ∈ L_p(V)`,
+`‖∑_{j ∈ t} θ_j ⋆ (c_j g_j)‖_p ≤ S ‖ x ↦ ‖(1_t(j) 2^{jσ} |g_j(x)|)_j‖_{ℓ_2} ‖_p` with
+`S = Rd.czConst V p B H`: the synthesis bound of the family
+(`Rd.IsCZFamily.eLpNorm_sum_conv_le`) for the functions `1_t(j) c_j g_j`. -/
+theorem IsCZFamily.eLpNorm_sum_conv_smul_le [Nontrivial V] {θ : ℕ → V → ℂ} {B H : ℝ≥0∞}
+    (hθ : IsCZFamily θ B H) (hp1 : 1 < p) (hp : p ≠ ∞) {σ : ℝ} {c : ℕ → ℂ}
+    (hc : ∀ j, ‖c j‖ₑ = dyadicWeight σ j) (t : Finset ℕ) {g : ℕ → V → ℂ}
+    (hg : ∀ j, MemLp (g j) p volume) :
+    eLpNorm (fun x => ∑ j ∈ t, conv (θ j) (c j • g j) volume x) p volume ≤
       czConst V p B H * eLpNorm (fun x => lqNorm 2 fun j =>
-        if j ∈ t then dyadicWeight σ j * ‖blockFun j f x‖ₑ else 0) p volume := by
-  set a : ℕ → V → ℂ := fun j => (if j ∈ t then c j else 0) • blockFun j f
-  have ha : ∀ j, MemLp (a j) p volume := fun j => by
-    simp only [a]
-    exact (memLp_blockFun hp j f).const_smul _
-  have hsum : (fun x => ∑ j ∈ t, conv (θ j) (c j • blockFun j f) volume x) =
+        if j ∈ t then dyadicWeight σ j * ‖g j x‖ₑ else 0) p volume := by
+  set a : ℕ → V → ℂ := fun j => (if j ∈ t then c j else 0) • g j
+  have ha : ∀ j, MemLp (a j) p volume := fun j => (hg j).const_smul _
+  have hsum : (fun x => ∑ j ∈ t, conv (θ j) (c j • g j) volume x) =
       fun x => ∑ j ∈ t, conv (θ j) (a j) volume x := by
     funext x
     refine Finset.sum_congr rfl fun j hj => ?_
     simp only [a, hj, ↓reduceIte]
   have hnorm : (fun x => lqNorm 2 fun j => ‖a j x‖ₑ) = fun x => lqNorm 2 fun j =>
-      if j ∈ t then dyadicWeight σ j * ‖blockFun j f x‖ₑ else 0 := by
+      if j ∈ t then dyadicWeight σ j * ‖g j x‖ₑ else 0 := by
     funext x
     congr 1
     funext j
@@ -242,6 +243,20 @@ theorem IsCZFamily.eLpNorm_sum_conv_smul_blockFun_le [Nontrivial V] {θ : ℕ �
     · simp only [a, h, ↓reduceIte, zero_smul, Pi.zero_apply, enorm_zero]
   rw [hsum, ← hnorm]
   exact hθ.eLpNorm_sum_conv_le hp1 hp t ha
+
+/-- **The synthesis bound with scaled blocks**: in dimension `n ≥ 1`, for `1 < p < ∞`, a
+Calderón–Zygmund family `(θ_j)_j` with overlap `B` and Hörmander constant `H`, coefficients
+`c_j ∈ ℂ` with `|c_j| = 2^{jσ}`, every finite set `t ⊆ ℕ` and `f ∈ L_p(V)`,
+`‖∑_{j ∈ t} θ_j ⋆ (c_j ψ_j ⋆ f)‖_p ≤ S ‖ x ↦ ‖(1_t(j) 2^{jσ} (ψ_j ⋆ f)(x))_j‖_{ℓ_2} ‖_p` with
+`S = Rd.czConst V p B H`: `Rd.IsCZFamily.eLpNorm_sum_conv_smul_le` for the blocks `ψ_j ⋆ f`,
+which lie in `L_p(V)` (`Rd.memLp_blockFun`). -/
+theorem IsCZFamily.eLpNorm_sum_conv_smul_blockFun_le [Nontrivial V] {θ : ℕ → V → ℂ}
+    {B H : ℝ≥0∞} (hθ : IsCZFamily θ B H) (hp1 : 1 < p) (hp : p ≠ ∞) {σ : ℝ} {c : ℕ → ℂ}
+    (hc : ∀ j, ‖c j‖ₑ = dyadicWeight σ j) (t : Finset ℕ) (f : Lp ℂ p (volume : Measure V)) :
+    eLpNorm (fun x => ∑ j ∈ t, conv (θ j) (c j • blockFun j f) volume x) p volume ≤
+      czConst V p B H * eLpNorm (fun x => lqNorm 2 fun j =>
+        if j ∈ t then dyadicWeight σ j * ‖blockFun j f x‖ₑ else 0) p volume :=
+  hθ.eLpNorm_sum_conv_smul_le hp1 hp hc t fun j => memLp_blockFun hp j f
 
 /-- **The synthesis bound for derivatives of the synthesis kernels**: in dimension `n ≥ 1`, for
 `1 < p < ∞`, directions `w ∈ V^k`, every finite set `s ⊆ ℕ` and `f ∈ L_p(V)`,

@@ -95,8 +95,11 @@ public import FunctionSpaces.Rd.Sobolev.SobolevJets
 public import FunctionSpaces.Rd.BesselPotentials.UniformSchwartzFamilies
 public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialLifting
 public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialEmbedding
+public import FunctionSpaces.Rd.BesselPotentials.BesselPotentialDistributions
 public import FunctionSpaces.Rd.FourierMultipliers.SymbolKernels
 public import FunctionSpaces.Rd.FourierMultipliers.TriebelLizorkinMultipliers
+public import FunctionSpaces.Rd.FourierMultipliers.MihlinMultipliers
+public import FunctionSpaces.Rd.FourierMultipliers.BesselPotentialMultipliers
 public import FunctionSpaces.Rd.Interpolation.BesovInterpolation
 public import FunctionSpaces.Rd.Interpolation.SobolevInterpolation
 public import FunctionSpaces.Rd.Interpolation.TriebelLizorkinInterpolation
@@ -593,6 +596,10 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
   with existential constants, and `W^m_p = H^{m,p}`.
 * `FunctionSpaces.Rd.BesselPotentials.BesselPotentialEmbedding`: the Sobolev embedding
   `H^{s,p} ↪ L_r` for `1 < p ≤ r < ∞` and `s ≥ n(1/p - 1/r)`, also in Mathlib's bundled space.
+* `FunctionSpaces.Rd.BesselPotentials.BesselPotentialDistributions`: `H^{s,p} = F^s_{p,2}` for
+  tempered distributions and every real `s`, `1 < p < ∞`, with existential constants, also in
+  Mathlib's bundled space, through the blocks of `J_s u` and convergent synthesis sums of `L_p`
+  families.
 
 #### `Rd/FourierMultipliers`: Fourier multipliers
 
@@ -605,6 +612,12 @@ compact manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet
 * `FunctionSpaces.Rd.FourierMultipliers.TriebelLizorkinMultipliers`: the blocks of `m(D) u` as
   convolutions of the blocks of `u`, and symbols of order `σ` as maps from `F^s_{p,q}` to
   `F^{s-σ}_{p,q}` of tempered distributions for every real `s`, `1 < p < ∞`, `1 < q ≤ ∞`.
+* `FunctionSpaces.Rd.FourierMultipliers.MihlinMultipliers`: Mihlin's multiplier theorem on `L_p`,
+  `1 < p < ∞`, for symbols of order `0`, and the multiplier as a bounded operator on `L_p`.
+* `FunctionSpaces.Rd.FourierMultipliers.BesselPotentialMultipliers`: symbols of order `σ` from
+  `H^{s,p}` to `H^{s-σ,p}`, the inclusions `H^{s,p} ⊆ H^{s',p}`, derivatives and the Laplacian on
+  `H^{s,p}`, the derivative characterisation of `H^{s+1,p}` (mirrored from TauCeti), and the
+  lifting property of `J_σ` on `F^s_{p,q}` for `1 < q ≤ ∞`.
 
 #### `Rd/Interpolation`: real interpolation
 

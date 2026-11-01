@@ -544,6 +544,24 @@ declarations.
   `SchwartzMap.fourierMultiplierCLM ℂ (𝓕η)` and its extension to `L_r` and to
   `TemperedDistribution.fourierMultiplierCLM` are missing. They belong in
   `Mathlib/Analysis/Distribution/FourierMultiplier.lean`.
+* **Mihlin multipliers and Bessel potential spaces for every `p`**
+  (`FunctionSpaces/Rd/FourierMultipliers/MihlinMultipliers.lean`,
+  `BesselPotentialMultipliers.lean`): for `1 < p < ∞`, a symbol of order `0` is a bounded Fourier
+  multiplier on `L_p` (`Rd.exists_fourierMultiplier_eq_of_hasSymbolGrowth`), and a symbol of
+  order `σ` maps Mathlib's `H^{s,p}` into `H^{s-σ,p}`
+  (`TemperedDistribution.MemSobolev.fourierMultiplierCLM_of_hasSymbolGrowth`), with the
+  inclusions `H^{s,p} ⊆ H^{s',p}`, derivatives, the Laplacian and the derivative characterisation
+  of `H^{s+1,p}` (`TemperedDistribution.MemSobolev.mono_of_one_lt`, `.lineDerivOp_of_one_lt`,
+  `.laplacian_of_one_lt`, `TemperedDistribution.memSobolev_add_one_iff`). Mathlib proves these
+  for `p = 2` only. TauCeti is prior work and the likely upstream source: it proves Mihlin's
+  theorem for Mihlin's condition with finitely many derivatives
+  (`TauCeti.exists_fourierMultiplierCLM_eq_and_norm_le_of_norm_iteratedFDeriv_le`,
+  `TauCeti/Analysis/Fourier/MihlinHormander.lean`), and the statements of `mono_of_one_lt`,
+  `lineDerivOp_of_one_lt` and the derivative characterisation, with the proofs of the latter, are
+  mirrored from `TauCeti/Analysis/Distribution/Sobolev.lean` (commit `b61a90d`, Apache-2.0). The
+  project's proofs go through `H^{s,p} = F^s_{p,2}` for tempered distributions
+  (`Rd.memSobolev_bessel_iff_memTriebelLizorkinDistr`) instead of TauCeti's Calderón–Zygmund
+  theory.
 * **The area formula for Lipschitz graphs**
   (`FunctionSpaces/Domains/Lipschitz/LipschitzGraphArea.lean`): Mathlib has the area formula for
   linear maps, `μHE[dim U] (f '' s) = normDet f · vol(s)`

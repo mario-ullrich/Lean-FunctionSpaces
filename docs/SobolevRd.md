@@ -42,7 +42,11 @@ spaces are Besov spaces. Symbols of order `σ`, Hörmander's class `S^σ_{1,0}`,
 Schwartz functions and the functions of temperate growth; rescaled to the dyadic annuli they
 give uniformly Schwartz kernels, whose convolutions lie below the maximal function; hence a
 symbol of order `σ` maps `F^s_{p,q}` of tempered distributions into `F^{s-σ}_{p,q}` for every real
-`s`, `1 < p < ∞` and `1 < q ≤ ∞`.
+`s`, `1 < p < ∞` and `1 < q ≤ ∞`. With `L_p = F^0_{p,2}` this gives `H^{s,p} = F^s_{p,2}` for
+tempered distributions and every real `s`, Mihlin's theorem on `L_p` for symbols of order `0`, and
+the mapping properties of `H^{s,p}` for all `1 < p < ∞`: symbols of order `σ` lower the
+smoothness by `σ`, derivatives by `1`, and `H^{s+1,p}` consists of the `u ∈ H^{s,p}` whose first
+derivatives lie in `H^{s,p}`.
 
 Sobolev spaces on open sets and on bounded Lipschitz domains, the trace space, the extension
 theorem, Green's formula and the kernel of the trace are in [Domains, traces and
@@ -287,6 +291,18 @@ project, with the decisions behind their form.
   For `p ≤ r < ∞` and real `s ≥ n(1/p - 1/r)`, every element of `H^{s,p}(V)` is a function in
   `L_r(V)` (`Rd.exists_memLp_eq_of_memSobolev_bessel`), with `‖g‖_r ≤ C ‖F‖_{H^{s,p}}` in Mathlib's
   bundled space (`Rd.exists_enorm_le_of_besselPotentialSpace`).
+* **`H^{s,p} = F^s_{p,2}` for tempered distributions.** Let `n ≥ 1` and `1 < p < ∞`. For every
+  real `s` a tempered distribution `u` lies in `H^{s,p}(V)` iff it lies in `F^s_{p,2}` of tempered
+  distributions (`Rd.memSobolev_bessel_iff_memTriebelLizorkinDistr`), with finite constants in
+  `‖u‖_{F^s_{p,2}} ≤ C ‖h‖_p` whenever `J_s u = h ∈ L_p(V)`
+  (`Rd.exists_triebelLizorkinNormDistr_le_of_besselPotential_eq`) and in
+  `‖J_s u‖_p ≤ C' ‖u‖_{F^s_{p,2}}` (`Rd.exists_besselPotential_eq_of_memTriebelLizorkinDistr`;
+  for Mathlib's bundled space `Rd.exists_triebelLizorkinNormDistr_le_besselPotentialSpace`,
+  `Rd.exists_enorm_besselPotentialSpace_le_triebelLizorkinNormDistr`). The first is the multiplier
+  theorem below for `⟨ξ⟩^{-s}` and `L_p = F^0_{p,2}`; for the second, the blocks of `J_s u` are
+  `(J_s ψ̃_j) ⋆ g_j` with the blocks `g_j` of `u` (`Rd.distribBlock_besselPotential`), whose
+  partial sums converge in `L_p` (`Rd.exists_tendsto_sum_convLp`) to `J_s u`
+  (`Rd.eq_of_tendsto_sum_distribBlock`).
 * **Symbols of order `σ`.** A smooth `m` is a symbol of order `σ` (`Rd.HasSymbolGrowth σ m`,
   Hörmander's class `S^σ_{1,0}`) if `‖D^k m(ξ)‖ ≤ C_k (1 + ‖ξ‖²)^{(σ - k)/2}` for every `k`.
   Schwartz functions are symbols of every order (`Rd.hasSymbolGrowth_schwartz`), and symbols
@@ -315,6 +331,23 @@ project, with the decisions behind their form.
   convolution of the block of `u` with `m(D) ψ̃_j = 2^{jσ} (G_j)_{2^j}`
   (`Rd.distribBlock_fourierMultiplierCLM_eq_convLp`), which lies below the maximal function, and
   the Fefferman–Stein inequality finishes.
+* **Mihlin's theorem and Fourier multipliers on `H^{s,p}`.** Let `1 < p < ∞`. For `n ≥ 1` and a
+  symbol `m` of order `0` there is `C < ∞` such that `m(D) f` is a function `g ∈ L_p(V)` with
+  `‖g‖_p ≤ C ‖f‖_p` for every `f ∈ L_p(V)` (`Rd.exists_fourierMultiplier_eq_of_hasSymbolGrowth`;
+  the bounded operator `Rd.symbolLp`), a case of Mihlin's theorem, which TauCeti proves for
+  Mihlin's condition with finitely many derivatives. In every dimension a symbol of order `σ` maps
+  `H^{s,p}(V)` into `H^{s-σ,p}(V)` for every real `s`
+  (`TemperedDistribution.MemSobolev.fourierMultiplierCLM_of_hasSymbolGrowth`); hence
+  `H^{s,p} ⊆ H^{s',p}` for `s' ≤ s` (`TemperedDistribution.MemSobolev.mono_of_one_lt`),
+  `L_p ⊆ H^{s,p}` for `s ≤ 0` (`Rd.memSobolev_bessel_of_nonpos`), `∂_v` maps `H^{s,p}` into
+  `H^{s-1,p}` and `Δ` into `H^{s-2,p}` (`TemperedDistribution.MemSobolev.lineDerivOp_of_one_lt`,
+  `TemperedDistribution.MemSobolev.laplacian_of_one_lt`), and `u ∈ H^{s+1,p}` iff
+  `u ∈ H^{s,p}` and `∂_v u ∈ H^{s,p}` for every `v`
+  (`TemperedDistribution.memSobolev_add_one_iff`, mirrored from TauCeti with
+  `J_2 = 1 - (2π)^{-2} Δ`, `TemperedDistribution.besselPotential_two_eq_sub_laplacian`). For
+  `1 < q ≤ ∞` and `g, J_σ g ∈ L_p(V)`, `‖J_σ g‖_{F^{s-σ}_{p,q}}` and `‖g‖_{F^s_{p,q}}` are
+  equivalent, Triebel's lifting property (`Rd.exists_triebelLizorkinNorm_besselPotential_le`,
+  `Rd.exists_triebelLizorkinNorm_le_besselPotential`).
 * **Sobolev spaces and real interpolation.** Let `dim V ≥ 1` and `1 < p < ∞`. The grid norm
   of `W^m_p(V)` is `‖f‖_p + inf ∑_α ‖g_α‖_p`, the infimum over the families of weak derivatives
   `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f ∈ L_p(V)` along the basis of `Rd.gridBasis`
@@ -368,8 +401,11 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Uniform Schwartz families as bounded sets and under continuous linear maps, the shifted Bessel symbols `(ε + ‖ζ‖²)^{σ/2}` with derivative bounds on annuli uniform in `ε`, the Bessel symbol and kernel families as uniform Schwartz families, the Bessel potential of a dilate, the dilated Bessel kernels as a Calderón–Zygmund family with explicit overlap, and the annuli of the Littlewood–Paley kernels | ✅ | ✗ | `Rd/BesselPotentials/UniformSchwartzFamilies` |
 | Even Fourier multipliers, among them Mathlib's Bessel potential, commuting with translations and reflections of Schwartz functions and with convolutions, the Bessel kernels of the Littlewood–Paley kernels, `H^{s,p} ∩ L_p = F^s_{p,2}` for real `s`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0` and `W^m_p = H^{m,p}` for `1 < p < ∞`, with existential constants | ✅ | ✗ | `Rd/BesselPotentials/BesselPotentialLifting` |
 | `H^{s,p} ↪ L_r` for `1 < p ≤ r < ∞` and `s ≥ n(1/p - 1/r)`, also in Mathlib's bundled space | ✅ | ✗ | `Rd/BesselPotentials/BesselPotentialEmbedding` |
+| `H^{s,p} = F^s_{p,2}` for tempered distributions and every real `s`, `1 < p < ∞`, with existential constants, also in Mathlib's bundled space; the blocks of `J_s u` and convergent synthesis sums of `L_p` families | ✅ | ✗ | `Rd/BesselPotentials/BesselPotentialDistributions` |
 | Derivative bounds for powers of the Japanese bracket (mirrored from TauCeti), symbols of order `σ` between the Schwartz functions and the functions of temperate growth, their algebra, the Bessel weight, `⟪ξ, v⟫` and `‖ξ‖²` as symbols, rescaled symbols on annuli, the uniformly Schwartz symbol kernels with `m(D) ω_{2^j} = 2^{jσ} (K_j)_{2^j}`, and the maximal bound of convolutions with dilates of uniform families | ✅ | ✗ | `Rd/FourierMultipliers/SymbolKernels` |
 | The blocks of `m(D) u` as convolutions of the blocks of `u`, and symbols of order `σ` as maps from `F^s_{p,q}` to `F^{s-σ}_{p,q}` of tempered distributions for every real `s`, `1 < p < ∞`, `1 < q ≤ ∞`, also on `L_p` | ✅ | ✗ | `Rd/FourierMultipliers/TriebelLizorkinMultipliers` |
+| Mihlin's theorem on `L_p`, `1 < p < ∞`, for symbols of order `0`, and the multiplier as a bounded operator on `L_p` | ✅ | ✗ | `Rd/FourierMultipliers/MihlinMultipliers` |
+| Symbols of order `σ` from `H^{s,p}` to `H^{s-σ,p}` for `1 < p < ∞`, `H^{s,p} ⊆ H^{s',p}`, derivatives and the Laplacian on `H^{s,p}`, `J_2 = 1 - (2π)^{-2} Δ`, the derivative characterisation of `H^{s+1,p}` (mirrored from TauCeti), and the lifting property of `J_σ` on `F^s_{p,q}` for `1 < q ≤ ∞` | ✅ | ✗ | `Rd/FourierMultipliers/BesselPotentialMultipliers` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

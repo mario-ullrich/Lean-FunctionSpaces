@@ -262,13 +262,16 @@ are the subject of \Cref{sec:tl-multipliers}.
 \begin{lemma}[Convolutions as Fourier multipliers]
 \label{lem:conv-fourier-multiplier}
 \lean{Rd.fourierMultiplierCLM_fourier_eq_convolution, Rd.fourierMultiplierCLM_fourier_eq_conv,
-  Rd.fourierMultiplierCLM_fourier_toLp_eq_conv}
+  Rd.fourierMultiplierCLM_fourier_toLp_eq_conv, Rd.coeFn_sum_convLp_ae}
 \leanok
 \uses{def:conv, lem:conv-op, lem:ae-equal-classes-distribution, lem:lp-kernels-basic}
 For all Schwartz functions $\eta, \varphi \colon V \to \C$,
 $(\widehat\eta)(D) \varphi = \eta * \varphi$, Mathlib's convolution of Schwartz functions. For
 every $1 \leq r < \infty$, every Schwartz function $\eta$ and every $G \in L_r(V)$,
-$(\widehat\eta)(D) G = \eta * G$ as tempered distributions.
+$(\widehat\eta)(D) G = \eta * G$ as tempered distributions. For every $1 \leq r < \infty$, all
+Schwartz functions $K_j$, all $g_j \in L_r(V)$ and every finite set $t \subseteq \N$, the sum
+$\sum_{j \in t} K_j * g_j$ of the classes in $L_r(V)$ is almost everywhere the pointwise sum of
+the convolutions.
 \end{lemma}
 
 \begin{proof}
@@ -342,6 +345,23 @@ cut-offs converge to $w$ in the Schwartz space (\Cref{lem:schwartz-cutoff-tendst
 $\mathcal F$ and $u$ are continuous, so the values converge to $u(\mathcal F w) = u(\varphi)$.
 \end{proof}
 
+\begin{lemma}[Limits of $L_p$ blocks]
+\label{lem:distrib-block-limit}
+\lean{Rd.eq_of_tendsto_sum_distribBlock}
+\leanok
+\uses{thm:distrib-block-decomposition}
+Let $1 \leq p \leq \infty$, $w$ a tempered distribution on $V$, $G_j \in L_p(V)$ with
+$\Delta_j w = G_j$ for every $j \in \N$, and $h \in L_p(V)$. If $\sum_{j < J} G_j \to h$ in
+$L_p(V)$, then $w = h$ as tempered distributions.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The partial sums tend to $w$ in $\mathcal S'(V)$ (\Cref{thm:distrib-block-decomposition}) and to
+$h$, since $L_p(V)$ embeds continuously into $\mathcal S'(V)$; limits in $\mathcal S'(V)$ are
+unique.
+\end{proof}
+
 \paragraph{The quasi-norm.}
 
 \begin{definition}[Triebel--Lizorkin spaces of tempered distributions]
@@ -366,13 +386,15 @@ $x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_q}$ is almost everywhere measurable.
 \begin{lemma}[The quasi-norm of the representing family]
 \label{lem:tl-distr-eq}
 \lean{Rd.triebelLizorkinNormDistr_le, Rd.triebelLizorkinNormDistr_eq,
-  Rd.triebelLizorkinNormDistr_eq_top, Rd.le_mul_triebelLizorkinNormDistr}
+  Rd.triebelLizorkinNormDistr_eq_top, Rd.le_mul_triebelLizorkinNormDistr,
+  Rd.MemTriebelLizorkinDistr.exists_blocks}
 \leanok
 \uses{def:tl-distr, lem:lp-distribution-determined}
 Let $1 \leq p \leq \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $u$ a tempered distribution.
 For every family $(g_j)$ in $L_p(V)$ with $\Delta_j u = g_j$ for every $j$,
 $\|u\|_{F^s_{p,q}} = \| x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_q} \|_{L_p}$. If there is no such
-family, $\|u\|_{F^s_{p,q}} = \infty$. Hence, for every $X \in [0, \infty]$ and every
+family, $\|u\|_{F^s_{p,q}} = \infty$; so for every $u \in \TL{s}{p}{q}$ there is such a family.
+Hence, for every $X \in [0, \infty]$ and every
 $C \in (0, \infty]$ such that $X \leq C \| x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_q} \|_{L_p}$
 for every such family, $X \leq C \|u\|_{F^s_{p,q}}$.
 \end{lemma}

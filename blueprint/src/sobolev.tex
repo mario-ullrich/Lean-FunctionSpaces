@@ -2734,27 +2734,30 @@ For $1 < p < \infty$, every $k \in \N$ and all $w \in V^k$,
 which is finite.
 \end{definition}
 
-\begin{lemma}[The synthesis bound with scaled blocks]
+\begin{lemma}[The synthesis bound with scaled coefficients]
 \label{lem:scaled-synthesis-bound}
-\lean{Rd.IsCZFamily.eLpNorm_sum_conv_smul_blockFun_le}
+\lean{Rd.IsCZFamily.eLpNorm_sum_conv_smul_le, Rd.IsCZFamily.eLpNorm_sum_conv_smul_blockFun_le}
 \leanok
 \uses{thm:vector-valued-strong-type, def:cz-const, def:triebel-lizorkin, lem:tl-pointwise-blocks}
 Let $n \geq 1$, $1 < p < \infty$, $(\theta_j)_j$ a Calder\'on--Zygmund family with overlap $B$ and
 H\"ormander constant $H$, $\sigma \in \R$ and $c_j \in \C$ with $|c_j| = 2^{j\sigma}$. For every
-finite set $t \subseteq \N$ and every $f \in L_p(V)$,
+finite set $t \subseteq \N$ and all $g_j \in L_p(V)$,
 \[
-  \Bigl\| \sum_{j \in t} \theta_j * (c_j \, \psi_j * f) \Bigr\|_p
+  \Bigl\| \sum_{j \in t} \theta_j * (c_j g_j) \Bigr\|_p
   \leq S_{V,p}(B, H) \, \Bigl\| x \mapsto \bigl\| \bigl(\mathbf 1_t(j) \, 2^{j\sigma}
-  |(\psi_j * f)(x)|\bigr)_j \bigr\|_{\ell_2} \Bigr\|_p .
+  |g_j(x)|\bigr)_j \bigr\|_{\ell_2} \Bigr\|_p .
 \]
 \end{lemma}
 
 \begin{proof}
 \leanok
-The functions $g_j = \mathbf 1_t(j) \, c_j \, \psi_j * f$ lie in $L_p(V)$
-(\Cref{lem:tl-pointwise-blocks}) and $|g_j| = \mathbf 1_t(j) \, 2^{j\sigma} |\psi_j * f|$; the
-synthesis bound of \Cref{thm:vector-valued-strong-type} applies.
+The functions $\mathbf 1_t(j) \, c_j g_j$ lie in $L_p(V)$ and have the absolute values
+$\mathbf 1_t(j) \, 2^{j\sigma} |g_j|$; the synthesis bound of \Cref{thm:vector-valued-strong-type}
+applies.
 \end{proof}
+
+For $f \in L_p(V)$ the blocks $g_j = \psi_j * f$ lie in $L_p(V)$ (\Cref{lem:tl-pointwise-blocks}),
+and the lemma bounds $\sum_{j \in t} \theta_j * (c_j \, \psi_j * f)$ by the weighted blocks of $f$.
 
 \begin{lemma}[Convergent synthesis sums]
 \label{lem:synthesis-sums-convergent}
@@ -4838,8 +4841,11 @@ dilated Littlewood--Paley kernels are multiples of the dilates of Bessel kernels
 uniform Schwartz families whose dilates are Calder\'on--Zygmund families (\Cref{def:cz-family});
 \Cref{sec:bessel-potential-lifting} proves $\TL{s}{p}{2} \subseteq H^{s,p}(V)$ for every real
 $s$, $H^{s,p}(V) = \TL{s}{p}{2}$ for $s \geq 0$, and Calder\'on's theorem
-$\Sob{m}{p}(V) = H^{m,p}(V)$ (\Cref{cor:sobolev-bessel}). The constants come from uniform
-Schwartz bounds and are existential. The real interpolation spaces of Bessel potential spaces are
+$\Sob{m}{p}(V) = H^{m,p}(V)$ (\Cref{cor:sobolev-bessel}).
+\Cref{sec:bessel-potential-distributions} proves $H^{s,p}(V) = \TL{s}{p}{2}$ for tempered
+distributions and every real $s$, with the Fourier multipliers of \Cref{ch:fourier-multipliers}.
+The constants come from uniform Schwartz bounds and are existential. The real interpolation spaces
+of Bessel potential spaces are
 Besov spaces (\Cref{sec:bessel-potential-interpolation}), and
 \Cref{sec:bessel-potential-embedding} proves $H^{s,p}(V) \hookrightarrow L_r(V)$ for
 $p \leq r < \infty$ and $s \geq n(1/p - 1/r)$.
@@ -5431,25 +5437,24 @@ every $F \colon V \to \C$ and every $x \in V$,
 \label{thm:bessel-synthesis-bound}
 \lean{Rd.eLpNorm_sum_conv_besselSchwartz_le}
 \leanok
-\uses{lem:bessel-dilate-convolution, thm:vector-valued-strong-type, def:cz-const,
-  def:triebel-lizorkin, lem:tl-pointwise-blocks, lem:scaled-synthesis-bound}
+\uses{lem:bessel-dilate-convolution, thm:bessel-potential-dilate, def:cz-const,
+  lem:scaled-synthesis-bound}
 Let $n \geq 1$, $1 < p < \infty$, $\sigma$ real, and let $(\omega_j)$ be Schwartz functions such
 that $((K^\sigma_j[\omega])_{2^j})_j$ is a Calder\'on--Zygmund family with overlap $B$ and
-H\"ormander constant $H$. Then for every finite set $t \subseteq \N$ and every $f \in L_p(V)$,
+H\"ormander constant $H$. Then for every finite set $t \subseteq \N$ and all $g_j \in L_p(V)$,
 \[
-  \Bigl\| \sum_{j \in t} \bigl(J_\sigma (\omega_j)_{2^j}\bigr) * (\psi_j * f) \Bigr\|_p
+  \Bigl\| \sum_{j \in t} \bigl(J_\sigma (\omega_j)_{2^j}\bigr) * g_j \Bigr\|_p
   \leq S_{V,p}(B, H) \, \Bigl\| x \mapsto \bigl\| \bigl(\mathbf 1_t(j) \, 2^{j\sigma}
-  |(\psi_j * f)(x)|\bigr)_j \bigr\|_{\ell_2} \Bigr\|_p .
+  |g_j(x)|\bigr)_j \bigr\|_{\ell_2} \Bigr\|_p .
 \]
 \end{theorem}
 
 \begin{proof}
 \leanok
 By \Cref{lem:bessel-dilate-convolution} the sum is
-$\sum_{j \in t} (K^\sigma_j[\omega])_{2^j} * g_j$ with $g_j = 2^{j\sigma} \psi_j * f \in L_p(V)$
-for $j \in t$ (\Cref{lem:tl-pointwise-blocks}) and $g_j = 0$ otherwise, and
-$|g_j| = \mathbf 1_t(j) \, 2^{j\sigma} |\psi_j * f|$. The synthesis bound of
-\Cref{thm:vector-valued-strong-type} applies.
+$\sum_{j \in t} (K^\sigma_j[\omega])_{2^j} * ((2^j)^\sigma g_j)$, and $|(2^j)^\sigma| = 2^{j\sigma}$
+(\Cref{thm:bessel-potential-dilate}); \Cref{lem:scaled-synthesis-bound} with
+$c_j = (2^j)^\sigma$ applies.
 \end{proof}
 
 \paragraph{Triebel--Lizorkin spaces in Bessel potential spaces.}
@@ -5460,7 +5465,8 @@ $|g_j| = \mathbf 1_t(j) \, 2^{j\sigma} |\psi_j * f|$. The synthesis bound of
   Rd.memSobolev_bessel_of_memTriebelLizorkin}
 \leanok
 \uses{thm:cz-family-bessel-base, thm:bessel-synthesis-bound, lem:synthesis-sums-convergent,
-  lem:bessel-potential-limits, lem:square-function-reproducing, lem:psi-dual-derivatives}
+  lem:bessel-potential-limits, lem:square-function-reproducing, lem:psi-dual-derivatives,
+  lem:tl-pointwise-blocks}
 Let $n \geq 1$ and $1 < p < \infty$. For every real $s$ there is $C < \infty$ such that for every
 $f \in \TL{s}{p}{2}$ there is $h \in L_p(V)$ with $J_s f = h$ as tempered distributions and
 $\|h\|_p \leq C \|f\|_{F^s_{p,2}}$. In particular $f \in H^{s,p}(V)$ for every
@@ -5471,7 +5477,8 @@ $f \in \TL{s}{p}{2}$.
 \leanok
 Let $B, H$ be the constants of \Cref{thm:cz-family-bessel-base} for $\omega = \tilde G$ and
 $\sigma = s$, and $C = S_{V,p}(B, H)$. Since $(\tilde G_j)_{2^j} = \tilde\psi_j$
-(\Cref{lem:psi-dual-derivatives}), \Cref{thm:bessel-synthesis-bound} gives the hypothesis of
+(\Cref{lem:psi-dual-derivatives}), \Cref{thm:bessel-synthesis-bound} for the blocks
+$g_j = \psi_j * f \in L_p(V)$ (\Cref{lem:tl-pointwise-blocks}) gives the hypothesis of
 \Cref{lem:synthesis-sums-convergent} for $K_j = J_s \tilde\psi_j$, so by its item (3)
 $\sum_{j < J} (J_s \tilde\psi_j) * (\psi_j * f)$ converges to some $h \in L_p(V)$ with
 $\|h\|_p \leq C \|f\|_{F^s_{p,2}}$. The sums $\sum_{j < J} \tilde\psi_j * (\psi_j * f)$ tend to
@@ -5605,6 +5612,142 @@ Both are $\TL{m}{p}{2}$ (\Cref{cor:sobolev-triebel-lizorkin},
 
 For $p = 2$, \Cref{sec:sobolev-two-littlewood-paley} proves $H^s(V) = \TL{s}{2}{2}$ directly by
 Plancherel's theorem, with explicit constants (\Cref{thm:sobolev-two-triebel-lizorkin}).
+
+\section{Bessel potential spaces of tempered distributions}
+\label{sec:bessel-potential-distributions}
+
+For tempered distributions the quasi-norm of \Cref{def:tl-distr} describes $\TL{s}{p}{2}$ for
+every real $s$, and $H^{s,p}(V) = \TL{s}{p}{2}$ holds without the restriction to $L_p$. One
+inclusion is the multiplier theorem (\Cref{thm:tl-multiplier}) for the symbol
+$\langle \xi \rangle^{-s}$ applied to $L_p = \TL{0}{p}{2}$; the other sums the blocks of $J_s u$,
+which are convolutions of the blocks of $u$ with the Bessel potentials $J_s \tilde\psi_j$, by the
+synthesis bound of their Calder\'on--Zygmund family. In this section $J_s$ is Mathlib's Bessel
+potential, and the constants are existential.
+
+\begin{lemma}[Synthesis sums of $L_p$ families]
+\label{lem:synthesis-sums-lp-families}
+\lean{Rd.exists_tendsto_sum_convLp}
+\leanok
+\uses{lem:conv-op, lem:mixed-norm-tails, lem:mixed-norm-tools, lem:conv-fourier-multiplier}
+Let $1 \leq p < \infty$, $\sigma \in \R$, $C < \infty$, $g_j \in L_p(V)$ with
+$\| x \mapsto \| (2^{j\sigma} |g_j(x)|)_j \|_{\ell_2} \|_p < \infty$, and $K_j$ Schwartz functions
+with
+\[
+  \Bigl\| \sum_{j \in t} K_j * g_j \Bigr\|_p \leq C \, \Bigl\| x \mapsto \bigl\|
+  \bigl(\mathbf 1_t(j) \, 2^{j\sigma} |g_j(x)|\bigr)_j \bigr\|_{\ell_2} \Bigr\|_p
+\]
+for every finite set $t \subseteq \N$. Then the partial sums $\sum_{j < J} K_j * g_j$ converge in
+$L_p(V)$ to some $h$ with
+$\|h\|_p \leq C \, \| x \mapsto \| (2^{j\sigma} |g_j(x)|)_j \|_{\ell_2} \|_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The convolutions lie in $L_p(V)$ (\Cref{lem:conv-op}). For $N \leq N'$ the difference of the
+partial sums at $N'$ and at $N$ is the sum over $t = \{N, \dots, N' - 1\}$, so its norm is at most
+$C$ times the mixed norm of the weighted family with the terms $j < N$ set to $0$. These tails
+tend to $0$ (\Cref{lem:mixed-norm-tails}), so the partial sums form a Cauchy sequence
+(\Cref{lem:mixed-norm-tools}) and converge in the complete space $L_p(V)$. Every partial sum has
+norm at most $C \, \| x \mapsto \| (2^{j\sigma} |g_j(x)|)_j \|_{\ell_2} \|_p$, and so has the limit.
+\end{proof}
+
+For the blocks $g_j = \psi_j * f$ of $f \in L_p(V)$ this is \Cref{lem:synthesis-sums-convergent}.
+
+\begin{lemma}[The blocks of a Bessel potential]
+\label{lem:bessel-potential-distrib-blocks}
+\lean{Rd.distribBlock_besselPotential}
+\leanok
+\uses{lem:distrib-block-multiplier, lem:bessel-weight-basic}
+Let $1 \leq p < \infty$ and $s \in \R$. For every tempered distribution $u$ on $V$, every
+$j \in \N$ and every $g \in L_p(V)$ with $\Delta_j u = g$, the block $\Delta_j(J_s u)$ is the
+tempered distribution of $(J_s \tilde\psi_j) * g \in L_p(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$J_s$ is the Fourier multiplier with the Bessel weight $\langle \xi \rangle^s$, which is smooth
+with polynomially bounded derivatives (\Cref{lem:bessel-weight-basic}); apply
+\Cref{lem:distrib-block-multiplier}.
+\end{proof}
+
+\begin{theorem}[$H^{s,p} \subseteq \TL{s}{p}{2}$ for tempered distributions]
+\label{thm:bessel-to-triebel-lizorkin-distr}
+\lean{Rd.exists_triebelLizorkinNormDistr_le_of_besselPotential_eq}
+\leanok
+\uses{thm:tl-multiplier, lem:symbol-examples, thm:tl-distr-lp, thm:square-function-upper}
+Let $n \geq 1$ and $1 < p < \infty$. For every real $s$ there is $C < \infty$ such that for every
+tempered distribution $u$ on $V$ and every $h \in L_p(V)$ with $J_s u = h$,
+\[
+  \|u\|_{F^s_{p,2}} \leq C \, \|h\|_p .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+Since $J_s u = h$, $u = J_{-s} h$ (Mathlib's \texttt{TemperedDistribution.\allowbreak
+besselPotential\_\allowbreak neg\_\allowbreak apply\_\allowbreak eq\_\allowbreak iff}), the
+Fourier multiplier of $h$ with the symbol $\langle \xi \rangle^{-s}$ of order $-s$
+(\Cref{lem:symbol-examples}). \Cref{thm:tl-multiplier} with the smoothness $0$ gives $C_1 < \infty$
+with $\|u\|_{F^s_{p,2}} \leq C_1 \|h\|_{F^0_{p,2}}$, the quasi-norm of $h$ is that of
+\Cref{def:triebel-lizorkin} (\Cref{thm:tl-distr-lp}), and
+$\|h\|_{F^0_{p,2}} \leq Q_{V,p} \|h\|_p$ (\Cref{thm:square-function-upper}). Take
+$C = C_1 Q_{V,p}$.
+\end{proof}
+
+\begin{theorem}[$\TL{s}{p}{2} \subseteq H^{s,p}$ for tempered distributions]
+\label{thm:triebel-lizorkin-distr-to-bessel}
+\lean{Rd.exists_besselPotential_eq_of_memTriebelLizorkinDistr,
+  Rd.memSobolev_bessel_of_memTriebelLizorkinDistr}
+\leanok
+\uses{lem:tl-distr-eq, lem:bessel-potential-distrib-blocks, lem:synthesis-sums-lp-families,
+  thm:cz-family-bessel-base, thm:bessel-synthesis-bound, lem:distrib-block-limit}
+Let $n \geq 1$ and $1 < p < \infty$. For every real $s$ there is $C < \infty$ such that for every
+tempered distribution $u \in \TL{s}{p}{2}$ there is $h \in L_p(V)$ with $J_s u = h$ as tempered
+distributions and $\|h\|_p \leq C \|u\|_{F^s_{p,2}}$. In particular $u \in H^{s,p}(V)$ for every
+tempered distribution $u \in \TL{s}{p}{2}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $B, H < \infty$ be such that $((K^s_j[\tilde G])_{2^j})_j$ is a Calder\'on--Zygmund family
+with overlap $B$ and H\"ormander constant $H$ (\Cref{thm:cz-family-bessel-base}), and
+$C = S_{V,p}(B, H)$. For $u \in \TL{s}{p}{2}$ the blocks are $L_p$ functions $g_j$ and
+$\|u\|_{F^s_{p,2}} = \| x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_2} \|_p < \infty$
+(\Cref{lem:tl-distr-eq}). The blocks of $J_s u$ are $(J_s \tilde\psi_j) * g_j$, and their sums
+over finite sets satisfy the synthesis bound with the constant $C$
+(\Cref{lem:bessel-potential-distrib-blocks}, \Cref{thm:bessel-synthesis-bound} with
+$\omega = \tilde G$). By \Cref{lem:synthesis-sums-lp-families} the partial sums
+$\sum_{j < J} (J_s \tilde\psi_j) * g_j$ converge in $L_p(V)$ to some $h$ with
+$\|h\|_p \leq C \|u\|_{F^s_{p,2}}$, and $J_s u = h$ by \Cref{lem:distrib-block-limit}.
+\end{proof}
+
+\begin{theorem}[$H^{s,p} = \TL{s}{p}{2}$ for every real $s$]
+\label{thm:bessel-triebel-lizorkin-distr}
+\lean{Rd.memSobolev_bessel_iff_memTriebelLizorkinDistr,
+  Rd.exists_triebelLizorkinNormDistr_le_besselPotentialSpace,
+  Rd.exists_enorm_besselPotentialSpace_le_triebelLizorkinNormDistr}
+\leanok
+\uses{thm:bessel-to-triebel-lizorkin-distr, thm:triebel-lizorkin-distr-to-bessel,
+  lem:bessel-space-enorm, lem:lp-distribution-determined}
+Let $n \geq 1$ and $1 < p < \infty$. For every real $s$ and every tempered distribution $u$ on
+$V$, $u \in H^{s,p}(V)$ if and only if $u \in \TL{s}{p}{2}$. For every real $s$ there are
+$C, C' < \infty$ such that $\|F\|_{F^s_{p,2}} \leq C \|F\|_{H^{s,p}}$ for every element $F$ of
+Mathlib's bundled space $H^{s,p}(V)$, as a tempered distribution, and
+$\|u\|_{H^{s,p}} \leq C' \|u\|_{F^s_{p,2}}$ for every tempered distribution
+$u \in \TL{s}{p}{2}$, as an element of the bundled space.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The equivalence is \Cref{thm:bessel-to-triebel-lizorkin-distr} and
+\Cref{thm:triebel-lizorkin-distr-to-bessel}. The norm of the bundled space is $\|J_s F\|_p$
+(\Cref{lem:bessel-space-enorm}), and for $u \in \TL{s}{p}{2}$ the $L_p$ function of the bundled
+element is the function $h$ of \Cref{thm:triebel-lizorkin-distr-to-bessel}, since both represent
+$J_s u$ (\Cref{lem:lp-distribution-determined}).
+\end{proof}
+
+For $f \in L_p(V)$ the theorem contains \Cref{cor:bessel-triebel-lizorkin}, since the two
+quasi-norms of $f$ agree (\Cref{thm:tl-distr-lp}).
 
 \section{Bessel potential spaces as interpolation spaces}
 \label{sec:bessel-potential-interpolation}
@@ -5801,8 +5944,12 @@ that a symbol rescaled to the dyadic annuli gives uniformly Schwartz kernels:
 $m(D) \omega_{2^j} = 2^{j\sigma} (K_j)_{2^j}$ with $(K_j)$ uniformly Schwartz. Convolutions with
 such kernels lie below the Hardy--Littlewood maximal function, uniformly in $j$.
 \Cref{sec:tl-multipliers} proves with them that a symbol of order $\sigma$ maps $\TL{s}{p}{q}$ of
-tempered distributions into $\TL{s-\sigma}{p}{q}$, for every real $s$. The constants come from
-uniform Schwartz bounds and are existential.
+tempered distributions into $\TL{s-\sigma}{p}{q}$, for every real $s$. With
+$L_p = \TL{0}{p}{2}$ and $H^{s,p} = \TL{s}{p}{2}$ (\Cref{thm:bessel-triebel-lizorkin-distr}) this
+gives Mihlin's multiplier theorem on $L_p$ for symbols of order $0$
+(\Cref{sec:mihlin-multipliers}) and the mapping properties of the Bessel potential spaces
+$H^{s,p}$ for all $1 < p < \infty$ (\Cref{sec:bessel-potential-multipliers}). The constants come
+from uniform Schwartz bounds and are existential.
 
 \section{Symbols of order \texorpdfstring{$\sigma$}{sigma} and their kernel families}
 \label{sec:symbol-classes}
@@ -6245,3 +6392,241 @@ $g = m(D) f$ as tempered distributions.
 \leanok
 \Cref{thm:tl-multiplier} with $u = f$ and \Cref{thm:tl-distr-lp} for $f$ and $g$.
 \end{proof}
+
+\section{Mihlin's multiplier theorem}
+\label{sec:mihlin-multipliers}
+
+Mihlin~\cite{Mihlin1956} proved that a function $m$ with
+$|\partial^\alpha m(\xi)| \leq C |\xi|^{-|\alpha|}$ for $\xi \neq 0$ and enough multi-indices
+$\alpha$ is a bounded Fourier multiplier on $L_p(\R^n)$, $1 < p < \infty$; H\"ormander weakened
+the condition~\cite[Theorem~2.5]{Hormander1960}, see also~\cite[Theorem~6.2.7]{Grafakos}. Symbols
+of order $0$ satisfy Mihlin's condition, so the theorem below is a case of Mihlin's theorem. Here
+it follows from $L_p = \TL{0}{p}{2}$ and the multiplier theorem on $\TL{0}{p}{2}$. TauCeti proves
+Mihlin's theorem for Mihlin's condition with finitely many derivatives and Hilbert-valued $L_p$
+(\texttt{Analysis/\allowbreak Fourier/\allowbreak MihlinHormander.lean}, commit
+\texttt{b61a90d}), through its own Calder\'on--Zygmund theory. In this section $n \geq 1$ and
+$1 < p < \infty$.
+
+\begin{theorem}[Mihlin's multiplier theorem for symbols of order $0$]
+\label{thm:mihlin-symbols}
+\lean{Rd.exists_fourierMultiplier_eq_of_hasSymbolGrowth}
+\leanok
+\uses{thm:square-function-upper, thm:tl-distr-lp, thm:tl-multiplier,
+  thm:triebel-lizorkin-distr-to-bessel}
+Let $n \geq 1$, $1 < p < \infty$ and $m \colon V \to \C$ a symbol of order $0$. There is
+$C < \infty$ such that for every $f \in L_p(V)$ the tempered distribution $m(D) f$ is a function
+$g \in L_p(V)$ with $\|g\|_p \leq C \|f\|_p$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:tl-distr-lp} and \Cref{thm:square-function-upper},
+$\|f\|_{F^0_{p,2}} \leq Q_{V,p} \|f\|_p$. \Cref{thm:tl-multiplier} with $\sigma = 0$ and $s = 0$
+gives $C_1 < \infty$ with $\|m(D) f\|_{F^0_{p,2}} \leq C_1 Q_{V,p} \|f\|_p$, and
+\Cref{thm:triebel-lizorkin-distr-to-bessel} with $s = 0$, where $J_0$ is the identity, gives
+$C_2 < \infty$ and $g \in L_p(V)$ with $m(D) f = g$ and
+$\|g\|_p \leq C_2 \|m(D) f\|_{F^0_{p,2}}$. Take $C = C_2 C_1 Q_{V,p}$.
+\end{proof}
+
+\begin{definition}[The multiplier on $L_p$]
+\label{def:symbol-lp}
+\lean{Rd.symbolLpConst, Rd.symbolLpConst_ne_top, Rd.symbolLpFun, Rd.symbolLp}
+\leanok
+\uses{thm:mihlin-symbols, lem:lp-distribution-determined}
+Let $n \geq 1$, $1 < p < \infty$ and $m \colon V \to \C$ a symbol of order $0$, and fix a constant
+$C_m < \infty$ of \Cref{thm:mihlin-symbols}. For $f \in L_p(V)$ let $m(D) f \in L_p(V)$ be the
+function $g$ of \Cref{thm:mihlin-symbols} with $m(D) f = g$ as tempered distributions and
+$\|g\|_p \leq C_m \|f\|_p$.
+\end{definition}
+
+The function $g$ is unique, since $L_p$ functions are determined by their tempered distributions
+(\Cref{lem:lp-distribution-determined}).
+
+\begin{lemma}[The multiplier on $L_p$ is bounded]
+\label{lem:symbol-lp-bounded}
+\lean{Rd.exists_fourierMultiplier_eq_symbolLpConst, Rd.toTemperedDistributionCLM_symbolLpFun,
+  Rd.norm_symbolLpFun_le, Rd.toTemperedDistribution_symbolLp, Rd.enorm_symbolLp_le}
+\leanok
+\uses{def:symbol-lp, thm:mihlin-symbols, lem:lp-distribution-determined}
+Let $n \geq 1$, $1 < p < \infty$ and $m \colon V \to \C$ a symbol of order $0$. The map
+$f \mapsto m(D) f$ is a linear operator on $L_p(V)$, and for every $f \in L_p(V)$ the function
+$m(D) f$ represents the tempered distribution $m(D) f$ and satisfies
+$\|m(D) f\|_p \leq C_m \|f\|_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The representation and the bound hold by the choice of $C_m$ and of $m(D) f$
+(\Cref{thm:mihlin-symbols}). The map is linear, since $m(D)$ is linear on tempered distributions
+and $L_p$ functions are determined by their tempered distributions
+(\Cref{lem:lp-distribution-determined}).
+\end{proof}
+
+\section{Fourier multipliers on Bessel potential spaces}
+\label{sec:bessel-potential-multipliers}
+
+A symbol of order $\sigma$ maps $H^{s,p}$ into $H^{s-\sigma,p}$ for every real $s$ and
+$1 < p < \infty$; this gives the inclusions of the Bessel potential spaces, the action of
+derivatives and of the Laplacian, and the characterisation of $H^{s+1,p}$ by first derivatives.
+Mathlib proves the case $p = 2$ (\texttt{TemperedDistribution.\allowbreak MemSobolev.\allowbreak
+mono}, \texttt{.lineDerivOp}, \texttt{.laplacian}) by Plancherel's theorem. The statements of
+\Cref{cor:bessel-potential-mapping} (1), (2), of \Cref{lem:bessel-potential-closure}, of
+\Cref{lem:bessel-two-laplacian} and of
+\Cref{thm:bessel-potential-derivatives}, and the proofs of the last two, are mirrored from TauCeti
+(\texttt{Analysis/\allowbreak Distribution/\allowbreak Sobolev.lean}, commit \texttt{b61a90d},
+Apache-2.0), where Mihlin's theorem supplies the multipliers of order $0$; here
+\Cref{thm:bessel-potential-multiplier} supplies all orders. Mathlib's Bessel potential spaces are
+spaces of tempered distributions $u$ with $J_s u \in L_p(V)$; here they are complex-valued.
+
+\begin{lemma}[Dimension $0$]
+\label{lem:bessel-potential-dimension-zero}
+\lean{Rd.besselPotential_of_subsingleton, Rd.memSobolev_fourierMultiplierCLM_of_subsingleton}
+\leanok
+Let $V = \{0\}$. Then $J_s u = u$ for every real $s$ and every tempered distribution $u$, and for
+every $1 \leq p \leq \infty$, all reals $s, t$, every $m \colon V \to \C$ and every
+$u \in H^{s,p}(V)$, $m(D) u \in H^{t,p}(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Bessel weight is $\langle 0 \rangle^s = 1$, and $m$ is the constant $m(0)$, so
+$m(D) u = m(0) \, u$ (Mathlib's \texttt{fourierMultiplierCLM\_\allowbreak const} for tempered
+distributions).
+\end{proof}
+
+\begin{lemma}[Sums and scalar multiples in $H^{s,p}$]
+\label{lem:bessel-potential-closure}
+\lean{TemperedDistribution.MemSobolev.sum, TemperedDistribution.MemSobolev.smul_of_tower}
+\leanok
+For every $1 \leq p \leq \infty$, every real $s$, every finite family $(u_i)$ in $H^{s,p}(V)$,
+every $u \in H^{s,p}(V)$ and every scalar $c$ acting on tempered distributions through $\C$, such
+as a real number, $\sum_i u_i \in H^{s,p}(V)$ and $c \, u \in H^{s,p}(V)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Mathlib's \texttt{MemSobolev.\allowbreak add}, \texttt{MemSobolev.\allowbreak smul} and induction
+over the finite set.
+\end{proof}
+
+\begin{theorem}[Fourier multipliers on Bessel potential spaces]
+\label{thm:bessel-potential-multiplier}
+\lean{TemperedDistribution.MemSobolev.fourierMultiplierCLM_of_hasSymbolGrowth}
+\leanok
+\uses{thm:bessel-triebel-lizorkin-distr, thm:tl-multiplier, lem:bessel-potential-dimension-zero}
+Let $1 < p < \infty$ and $\sigma$ real. For every symbol $m \colon V \to \C$ of order $\sigma$,
+every real $s$ and every tempered distribution $u \in H^{s,p}(V)$,
+$m(D) u \in H^{s-\sigma,p}(V)$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+For $n \geq 1$, $H^{s,p}(V) = \TL{s}{p}{2}$ for every real $s$
+(\Cref{thm:bessel-triebel-lizorkin-distr}), and $m(D)$ maps $\TL{s}{p}{2}$ into
+$\TL{s-\sigma}{p}{2}$ (\Cref{thm:tl-multiplier}). For $n = 0$ apply
+\Cref{lem:bessel-potential-dimension-zero}.
+\end{proof}
+
+\begin{corollary}[Mapping properties of Bessel potential spaces]
+\label{cor:bessel-potential-mapping}
+\lean{TemperedDistribution.MemSobolev.mono_of_one_lt, Rd.memSobolev_bessel_of_nonpos,
+  TemperedDistribution.MemSobolev.lineDerivOp_of_one_lt,
+  TemperedDistribution.MemSobolev.laplacian_of_one_lt}
+\leanok
+\uses{thm:bessel-potential-multiplier, lem:symbol-examples, lem:symbol-algebra}
+Let $s$ be real.
+\begin{enumerate}
+  \item For every $1 < p < \infty$ and every real $s' \leq s$, $H^{s,p}(V) \subseteq H^{s',p}(V)$.
+    In particular, for every $1 < p < \infty$, every $f \in L_p(V)$ lies in $H^{s,p}(V)$ if
+    $s \leq 0$.
+  \item For every $1 < p < \infty$, every $v \in V$ and every $u \in H^{s,p}(V)$,
+    $\partial_v u \in H^{s-1,p}(V)$.
+  \item For every $1 < p < \infty$ and every $u \in H^{s,p}(V)$, $\Delta u \in H^{s-2,p}(V)$.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+\leanok
+(1) $u \in H^{s',p}$ if and only if $J_{s'-s} u \in H^{s,p}$ (Mathlib's
+\texttt{memSobolev\_\allowbreak besselPotential\_\allowbreak iff}), and
+$\langle \xi \rangle^{s'-s}$ is a symbol of order $s' - s \leq 0$, hence of order $0$
+(\Cref{lem:symbol-examples}, \Cref{lem:symbol-algebra}); apply
+\Cref{thm:bessel-potential-multiplier}. An $L_p$ function lies in $H^{0,p}$, since $J_0$ is the
+identity. (2) $\partial_v = 2\pi i \, \langle \xi, v \rangle(D)$ (Mathlib's
+\texttt{TemperedDistribution.\allowbreak lineDeriv\_\allowbreak eq\_\allowbreak
+fourierMultiplierCLM}) with the symbol $\langle \xi, v \rangle$ of order $1$. (3)
+$\Delta = -(2\pi)^2 \|\xi\|^2(D)$ (Mathlib's \texttt{TemperedDistribution.\allowbreak
+laplacian\_\allowbreak eq\_\allowbreak fourierMultiplierCLM}) with the symbol $\|\xi\|^2$ of
+order $2$ (\Cref{lem:symbol-examples}).
+\end{proof}
+
+\begin{lemma}[$J_2 = 1 - (2\pi)^{-2} \Delta$]
+\label{lem:bessel-two-laplacian}
+\lean{TemperedDistribution.besselPotential_two_eq_sub_laplacian}
+\leanok
+For every tempered distribution $u$ on $V$ with values in a complex normed space,
+$J_2 u = u - (2\pi)^{-2} \Delta u$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The symbol of $J_2$ is $1 + \|\xi\|^2$, and $\Delta = -(2\pi)^2 \|\xi\|^2(D)$ (Mathlib's
+\texttt{TemperedDistribution.\allowbreak laplacian\_\allowbreak eq\_\allowbreak
+fourierMultiplierCLM}); the factor comes from Mathlib's normalisation of the Fourier transform.
+\end{proof}
+
+\begin{theorem}[The derivative characterisation of $H^{s+1,p}$]
+\label{thm:bessel-potential-derivatives}
+\lean{TemperedDistribution.memSobolev_add_one_of_lineDerivOp,
+  TemperedDistribution.memSobolev_add_one_iff, TemperedDistribution.memSobolev_natCast_add_one_iff}
+\leanok
+\uses{cor:bessel-potential-mapping, lem:bessel-two-laplacian, lem:bessel-potential-closure}
+Let $1 < p < \infty$ and $s$ real. For every tempered distribution $u$ on $V$,
+\[
+  u \in H^{s+1,p}(V) \iff u \in H^{s,p}(V) \text{ and } \partial_v u \in H^{s,p}(V)
+  \text{ for every } v \in V ,
+\]
+and it suffices that $\partial_{b_i} u \in H^{s,p}(V)$ for the vectors $b_i$ of one orthonormal
+basis. For every $k \in \N$, $u \in H^{k+1,p}(V)$ if and only if $u \in H^{0,p}(V)$ and
+$\partial_v u \in H^{k,p}(V)$ for every $v \in V$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+If $u \in H^{s+1,p}$, then $u \in H^{s,p}$ and $\partial_v u \in H^{s,p}$ by
+\Cref{cor:bessel-potential-mapping}. Conversely, $u \in H^{s+1,p}$ if and only if
+$J_1 u \in H^{s,p}$, and by \Cref{lem:bessel-two-laplacian} and
+$\Delta = \sum_i \partial_{b_i} \partial_{b_i}$ (Mathlib's \texttt{TemperedDistribution.\allowbreak
+laplacian\_\allowbreak eq\_\allowbreak sum}),
+\[
+  J_1 u = J_{-1} J_2 u = J_{-1} u - (2\pi)^{-2} \sum_i J_{-1} \partial_{b_i} \partial_{b_i} u .
+\]
+Here $J_{-1} u \in H^{s+1,p} \subseteq H^{s,p}$ and
+$J_{-1} \partial_{b_i} \partial_{b_i} u \in H^{s,p}$, since $\partial_{b_i} \partial_{b_i} u \in
+H^{s-1,p}$ (\Cref{cor:bessel-potential-mapping}), so $J_1 u \in H^{s,p}$
+(\Cref{lem:bessel-potential-closure}). The statement for $k \in \N$ follows by induction on $k$.
+\end{proof}
+
+\begin{corollary}[The lifting property for every $q$]
+\label{cor:tl-lifting}
+\lean{Rd.exists_triebelLizorkinNorm_besselPotential_le,
+  Rd.exists_triebelLizorkinNorm_le_besselPotential}
+\leanok
+\uses{cor:tl-multiplier-lp, lem:symbol-examples}
+Let $1 < p < \infty$, $1 < q \leq \infty$ and $\sigma, s$ real. There are $C, C' < \infty$ such that
+for all $g, h \in L_p(V)$ with $J_\sigma g = h$,
+\[
+  \|h\|_{F^{s-\sigma}_{p,q}} \leq C \, \|g\|_{F^s_{p,q}}
+  \quad \text{and} \quad
+  \|g\|_{F^s_{p,q}} \leq C' \, \|h\|_{F^{s-\sigma}_{p,q}} .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+$J_\sigma$ is the Fourier multiplier with the symbol $\langle \xi \rangle^\sigma$ of order
+$\sigma$, and $g = J_{-\sigma} h$ with the symbol $\langle \xi \rangle^{-\sigma}$ of order
+$-\sigma$ (\Cref{lem:symbol-examples}); apply \Cref{cor:tl-multiplier-lp} twice.
+\end{proof}
+
+This is Triebel's lifting property~\cite[Theorem~2.3.8]{Triebel} for $1 < q \leq \infty$.

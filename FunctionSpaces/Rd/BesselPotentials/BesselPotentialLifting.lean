@@ -344,31 +344,33 @@ theorem conv_besselSchwartz_schwartzDilate (σ : ℝ) (ω : ℕ → 𝓢(V, ℂ)
   rw [besselSchwartz_schwartzDilate, FunLike.coe_smul, smul_conv, conv_smul,
     coe_schwartzDilate, besselBase]
 
+omit [Fact (1 ≤ p)] in
 /-- **The synthesis bound for Bessel potentials of dilates**: in dimension `n ≥ 1`, for
 `1 < p < ∞`, real `σ`, a family `(ω_j)` of Schwartz functions whose dilated Bessel kernels
 `((K^σ_j)_{2^j})_j` form a Calderón–Zygmund family with overlap `B` and Hörmander constant `H`,
-every finite set `t ⊆ ℕ` and `f ∈ L_p(V)`,
-`‖∑_{j ∈ t} (J_σ (ω_j)_{2^j}) ⋆ (ψ_j ⋆ f)‖_p ≤ S ‖ x ↦ ‖(1_t(j) 2^{jσ} (ψ_j ⋆ f)(x))_j‖_{ℓ_2} ‖_p`
+every finite set `t ⊆ ℕ` and functions `g_j ∈ L_p(V)`,
+`‖∑_{j ∈ t} (J_σ (ω_j)_{2^j}) ⋆ g_j‖_p ≤ S ‖ x ↦ ‖(1_t(j) 2^{jσ} |g_j(x)|)_j‖_{ℓ_2} ‖_p`
 with `S = Rd.czConst V p B H` (`Rd.conv_besselSchwartz_schwartzDilate`,
-`Rd.IsCZFamily.eLpNorm_sum_conv_smul_blockFun_le` with the coefficients `(2^j)^σ`). -/
+`Rd.IsCZFamily.eLpNorm_sum_conv_smul_le` with the coefficients `(2^j)^σ`). For the blocks
+`g_j = ψ_j ⋆ f` of `f ∈ L_p(V)` this bounds the synthesis sums of `F^σ_{p,2} ⊆ H^{σ,p}`. -/
 theorem eLpNorm_sum_conv_besselSchwartz_le [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞)
     {σ : ℝ} {ω : ℕ → 𝓢(V, ℂ)} {B H : ℝ≥0∞}
     (hθ : IsCZFamily (fun j => dilate (2 ^ j) (besselBase σ ω j : V → ℂ)) B H)
-    (t : Finset ℕ) (f : Lp ℂ p (volume : Measure V)) :
+    (t : Finset ℕ) {g : ℕ → V → ℂ} (hg : ∀ j, MemLp (g j) p volume) :
     eLpNorm (fun x => ∑ j ∈ t, conv (besselSchwartz σ
-        (schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (ω j))) (blockFun j f) volume x)
+        (schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (ω j))) (g j) volume x)
         p volume ≤
       czConst V p B H * eLpNorm (fun x => lqNorm 2 fun j =>
-        if j ∈ t then dyadicWeight σ j * ‖blockFun j f x‖ₑ else 0) p volume := by
+        if j ∈ t then dyadicWeight σ j * ‖g j x‖ₑ else 0) p volume := by
   have hsum : (fun x => ∑ j ∈ t, conv (besselSchwartz σ
-      (schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (ω j))) (blockFun j f) volume x) =
+      (schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (ω j))) (g j) volume x) =
       fun x => ∑ j ∈ t, conv (dilate (2 ^ j) (besselBase σ ω j : V → ℂ))
-        (((((2 : ℝ) ^ j) ^ σ : ℝ) : ℂ) • blockFun j f) volume x := by
+        (((((2 : ℝ) ^ j) ^ σ : ℝ) : ℂ) • g j) volume x := by
     funext x
     exact Finset.sum_congr rfl fun j _ => conv_besselSchwartz_schwartzDilate σ ω j _ x
   rw [hsum]
-  exact hθ.eLpNorm_sum_conv_smul_blockFun_le hp1 hp
-    (c := fun j => ((((2 : ℝ) ^ j) ^ σ : ℝ) : ℂ)) (fun j => enorm_two_pow_rpow j σ) t f
+  exact hθ.eLpNorm_sum_conv_smul_le hp1 hp
+    (c := fun j => ((((2 : ℝ) ^ j) ^ σ : ℝ) : ℂ)) (fun j => enorm_two_pow_rpow j σ) t hg
 
 /-! ### `F^s_{p,2} ⊆ H^{s,p}` -/
 
@@ -390,7 +392,7 @@ theorem exists_besselPotential_eq_of_memTriebelLizorkin [Nontrivial V] (hp1 : 1 
   refine ⟨czConst V p B H, czConst_ne_top hp1 hp hB hH, fun f hf => ?_⟩
   obtain ⟨h, hlim, hnorm⟩ := exists_tendsto_sum_conv_blockFun hp
     (K := fun j => besselSchwartz s (psiDualS j)) (czConst_ne_top hp1 hp hB hH) hf
-    fun t => eLpNorm_sum_conv_besselSchwartz_le hp1 hp hθ t f
+    fun t => eLpNorm_sum_conv_besselSchwartz_le hp1 hp hθ t fun j => memLp_blockFun hp j f
   refine ⟨h, besselPotential_eq_of_tendsto hp s (η := psiDualS)
     (fun j => memLp_blockFun hp j f) ?_ hlim, hnorm⟩
   simpa only [coe_psiDualS] using tendsto_eLpNorm_sum_conv_psiDual_blockFun_sub hp f

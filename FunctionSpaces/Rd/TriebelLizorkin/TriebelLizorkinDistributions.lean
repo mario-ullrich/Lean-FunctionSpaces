@@ -23,15 +23,19 @@ describes `F^s_{p,q}` for every real `s`, without the restriction to `L_p`.
   (`Rd.fourierMultiplierCLM_fourier_eq_convolution`, `Rd.fourierMultiplierCLM_fourier_eq_conv`),
   and, since Schwartz functions are dense in `L_r`, `(𝓕η)(D) G = η ⋆ G` for `G ∈ L_r`, `1 ≤ r < ∞`
   (`Rd.fourierMultiplierCLM_fourier_toLp_eq_conv`). In particular the blocks of an `L_r`
-  function are its blocks `ψ_j ⋆ f` (`Rd.distribBlock_toTemperedDistribution`).
+  function are its blocks `ψ_j ⋆ f` (`Rd.distribBlock_toTemperedDistribution`). Finite sums of
+  such convolutions in `L_p` are the pointwise sums (`Rd.coeFn_sum_convLp_ae`).
 * **The decomposition converges**: `∑_{j < J} Δ_j u → u` in `𝓢'` for every tempered
   distribution `u` (`Rd.tendsto_sum_distribBlock`), since `∑_{j ≤ J} 𝓕ψ_j = χ(2^{-J} ·)` and the
-  cut-offs converge in the Schwartz space (`Rd.tendsto_cutoffMul`).
+  cut-offs converge in the Schwartz space (`Rd.tendsto_cutoffMul`). If the blocks are `L_p`
+  functions whose partial sums converge in `L_p`, the limit is `u`
+  (`Rd.eq_of_tendsto_sum_distribBlock`).
 * **The quasi-norm**: the blocks determine their `L_p` functions, so the quasi-norm is that of the
   unique family (`Rd.triebelLizorkinNormDistr_eq`); for `f ∈ L_p` it is the Triebel–Lizorkin
   quasi-norm of `f` (`Rd.triebelLizorkinNormDistr_toTemperedDistribution`); it decreases in `q`
-  and increases in `s`. The weighted `ℓ_q` norm of a family of `L_p` functions is almost
-  everywhere measurable (`Rd.aemeasurable_lqNorm_dyadicWeight_Lp`).
+  and increases in `s`; when it is finite, the blocks are `L_p` functions
+  (`Rd.MemTriebelLizorkinDistr.exists_blocks`). The weighted `ℓ_q` norm of a family of `L_p`
+  functions is almost everywhere measurable (`Rd.aemeasurable_lqNorm_dyadicWeight_Lp`).
 -/
 
 @[expose] public section
@@ -190,6 +194,18 @@ theorem tendsto_sum_distribBlock (u : 𝓢'(V, ℂ)) :
 
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
+/-- The **partial sums of convolutions in `L_p`**: for Schwartz kernels `K_j`, `g_j ∈ L_p(V)`,
+`1 ≤ p < ∞` and a finite set `t`, the sum `∑_{j ∈ t} K_j ⋆ g_j` of the classes in `L_p(V)` is
+almost everywhere the pointwise sum of the convolutions (`Rd.convLp_apply_ae`). -/
+theorem coeFn_sum_convLp_ae (hp : p ≠ ∞) (K : ℕ → 𝓢(V, ℂ))
+    (g : ℕ → Lp ℂ p (volume : Measure V)) (t : Finset ℕ) :
+    ⇑(∑ j ∈ t, convLp hp (K j).integrable (g j)) =ᵐ[volume]
+      fun x => ∑ j ∈ t, conv (K j) (g j) volume x := by
+  filter_upwards [ae_all_iff.2 fun j => convLp_apply_ae hp (K j).integrable (g j),
+    Lp.coeFn_fun_finsetSum t fun j => convLp hp (K j).integrable (g j)] with x hx1 hx2
+  rw [hx2]
+  exact Finset.sum_congr rfl fun j _ => hx1 j
+
 omit [Fact (1 ≤ p)] in
 /-- The weighted `L_p` blocks of a family `g` are almost everywhere measurable, and so is their
 pointwise `ℓ_q` norm `x ↦ ‖(2^{js} |g_j(x)|)_j‖_{ℓ_q}`. -/
@@ -301,5 +317,30 @@ theorem MemTriebelLizorkinDistr.mono_exponent {s : ℝ} {q r : ℝ≥0∞} (hq :
 theorem MemTriebelLizorkinDistr.mono_smoothness {s t : ℝ} (hst : s ≤ t) {q : ℝ≥0∞}
     {u : 𝓢'(V, ℂ)} (hu : MemTriebelLizorkinDistr p t q u) : MemTriebelLizorkinDistr p s q u :=
   (triebelLizorkinNormDistr_mono_smoothness hst q u).trans_lt hu
+
+/-- **The blocks of `u ∈ F^s_{p,q}` are `L_p` functions**: if the quasi-norm of `u` is finite,
+there is a family `(g_j)` in `L_p(V)` with `Δ_j u = g_j` for every `j`
+(`Rd.triebelLizorkinNormDistr_eq_top`). -/
+theorem MemTriebelLizorkinDistr.exists_blocks {s : ℝ} {q : ℝ≥0∞} {u : 𝓢'(V, ℂ)}
+    (hu : MemTriebelLizorkinDistr p s q u) :
+    ∃ g : ℕ → Lp ℂ p (volume : Measure V), ∀ j, distribBlock j u = (g j : 𝓢'(V, ℂ)) := by
+  by_contra h
+  exact hu.ne (triebelLizorkinNormDistr_eq_top h)
+
+/-! ### Limits of the decomposition -/
+
+/-- **A tempered distribution is the limit of its `L_p` blocks**: if every block `Δ_j w` is an
+`L_p` function `G_j` and the partial sums `∑_{j < J} G_j` converge in `L_p(V)` to `h`, then
+`w = h` as tempered distributions. The partial sums tend to `w` in `𝓢'`
+(`Rd.tendsto_sum_distribBlock`) and to `h`, since `L_p` embeds continuously into `𝓢'`; limits in
+`𝓢'` are unique. -/
+theorem eq_of_tendsto_sum_distribBlock {w : 𝓢'(V, ℂ)} {G : ℕ → Lp ℂ p (volume : Measure V)}
+    (hw : ∀ j, distribBlock j w = (G j : 𝓢'(V, ℂ))) {h : Lp ℂ p (volume : Measure V)}
+    (hG : Tendsto (fun J => ∑ j ∈ Finset.range J, G j) atTop (𝓝 h)) :
+    w = (h : 𝓢'(V, ℂ)) := by
+  refine tendsto_nhds_unique (tendsto_sum_distribBlock w) ?_
+  refine (((Lp.toTemperedDistributionCLM ℂ volume p).continuous.tendsto h).comp hG).congr
+    fun J => ?_
+  simp only [Function.comp_apply, map_sum, Lp.toTemperedDistributionCLM_apply, hw]
 
 end Rd

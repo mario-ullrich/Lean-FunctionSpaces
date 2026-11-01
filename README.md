@@ -40,10 +40,9 @@ inequalities of order `s`, the form in which the embeddings on measure spaces ar
 `‖ x ↦ ‖(2^(js) |ψ_j ⋆ f(x)|)_j‖_{ℓ_q} ‖_p < ∞`. For `q = p` and `s > 0` they are the Besov
 spaces `B^s_{p,p}`. The Besov spaces and the Triebel–Lizorkin spaces of functions here are
 subspaces of `L_p` with `1 ≤ p`, in most results with `1 ≤ q` and `p < ∞`. The Triebel–Lizorkin
-spaces and the Littlewood–Paley descriptions on `ℝ^d` use one fixed family `ψ_j`; for `s < 0`,
-`F^s_{p,q}` is the part `F^s_{p,q} ∩ L_p` of the classical space. For tempered distributions,
-`Rd.triebelLizorkinNormDistr` describes `F^s_{p,q}` for every real `s` without the restriction to
-`L_p`.
+spaces and the Littlewood–Paley descriptions on `ℝ^d` use one fixed family `ψ_j`. For tempered
+distributions, `Rd.triebelLizorkinNormDistr` describes `F^s_{p,q}` for every real `s` without the
+restriction to `L_p`; for `f ∈ L_p` the two quasi-norms agree.
 
 **Characterisations and domains.** Each setting has its natural descriptions of these spaces:
 Fourier coefficients and Littlewood–Paley blocks on the torus and on `ℝ^d`, splines and Haar or
@@ -332,18 +331,32 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
   norm bounds `Rd.exists_hasWeakLineDeriv_of_memApprox`,
   `Rd.approxNormDyadic_le_of_hasWeakLineDeriv`), and `W^m_2 = B^m_{2,2}` for `m ≥ 1`
   (`Rd.memSobolev_two_iff_memApprox`).
-* **`H^{s,p} = F^s_{p,2}` and `W^m_p = H^{m,p}`.** Let `dim V ≥ 1` and `1 < p < ∞`, and let
-  `J_s` be Mathlib's Bessel potential, the Fourier multiplier with `(1 + ‖ξ‖²)^{s/2}`; a tempered
-  distribution `f` lies in Mathlib's Bessel potential space `H^{s,p}(V)` iff `J_s f ∈ L_p(V)`.
-  For every real `s` there is `C < ∞` such that for every `f ∈ F^s_{p,2}(V)`, `J_s f` is a
-  function `h ∈ L_p(V)` with `‖h‖_p ≤ C ‖f‖_{F^s_{p,2}}`
-  (`Rd.exists_besselPotential_eq_of_memTriebelLizorkin`). For every real `s ≥ 0` there is
-  `C < ∞` such that every tempered distribution `f` with `J_s f = h ∈ L_p(V)` is a function
-  `g ∈ F^s_{p,2}(V)` with `‖g‖_{F^s_{p,2}} ≤ C ‖h‖_p`
-  (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`). For every real `s`, `f ∈ L_p(V)` lies
-  in `F^s_{p,2}(V)` iff it lies in `H^{s,p}(V)` (`Rd.memTriebelLizorkin_iff_memSobolev_bessel`),
-  and for every `m ∈ ℕ`, `f ∈ W^m_p(V)` iff `f ∈ H^{m,p}(V)`, Calderón's theorem
-  (`Rd.memSobolev_iff_memSobolev_bessel`).
+* **`H^{s,p} = F^s_{p,2}` for every real `s`, and `W^m_p = H^{m,p}`.** Let `dim V ≥ 1` and
+  `1 < p < ∞`, and let `J_s` be Mathlib's Bessel potential, the Fourier multiplier with
+  `(1 + ‖ξ‖²)^{s/2}`; a tempered distribution `u` lies in Mathlib's Bessel potential space
+  `H^{s,p}(V)` iff `J_s u ∈ L_p(V)`. For every real `s`, a tempered distribution lies in
+  `H^{s,p}(V)` iff it lies in `F^s_{p,2}` of tempered distributions
+  (`Rd.memSobolev_bessel_iff_memTriebelLizorkinDistr`), with `C < ∞` such that
+  `‖u‖_{F^s_{p,2}} ≤ C ‖h‖_p` whenever `J_s u = h ∈ L_p(V)`
+  (`Rd.exists_triebelLizorkinNormDistr_le_of_besselPotential_eq`) and `C' < ∞` such that `J_s u`
+  is a function `h ∈ L_p(V)` with `‖h‖_p ≤ C' ‖u‖_{F^s_{p,2}}` for every `u ∈ F^s_{p,2}`
+  (`Rd.exists_besselPotential_eq_of_memTriebelLizorkinDistr`). For `f ∈ L_p(V)` this is
+  `F^s_{p,2}(V) = H^{s,p}(V) ∩ L_p(V)` (`Rd.memTriebelLizorkin_iff_memSobolev_bessel`), and for
+  `s ≥ 0` every tempered distribution in `H^{s,p}(V)` is a function in `F^s_{p,2}(V)`
+  (`Rd.exists_memTriebelLizorkin_of_besselPotential_eq`). For every `m ∈ ℕ`, `f ∈ W^m_p(V)` iff
+  `f ∈ H^{m,p}(V)`, Calderón's theorem (`Rd.memSobolev_iff_memSobolev_bessel`).
+* **Fourier multipliers.** A smooth `m : V → ℂ` is a symbol of order `σ` if
+  `‖D^k m(ξ)‖ ≤ C_k (1 + ‖ξ‖²)^{(σ-k)/2}` for every `k` (`Rd.HasSymbolGrowth`, Hörmander's class
+  `S^σ_{1,0}`). For `1 < p < ∞`, `1 < q ≤ ∞` and every real `s` there is `C < ∞` with
+  `‖m(D) u‖_{F^{s-σ}_{p,q}} ≤ C ‖u‖_{F^s_{p,q}}` for every tempered distribution `u`
+  (`Rd.exists_triebelLizorkinNormDistr_fourierMultiplier_le`). Hence, for `dim V ≥ 1`, a symbol of
+  order `0` is a bounded Fourier multiplier on `L_p(V)`, Mihlin's theorem for this class
+  (`Rd.exists_fourierMultiplier_eq_of_hasSymbolGrowth`, the operator `Rd.symbolLp`), and in every
+  dimension a symbol of order `σ` maps `H^{s,p}(V)` into `H^{s-σ,p}(V)`
+  (`TemperedDistribution.MemSobolev.fourierMultiplierCLM_of_hasSymbolGrowth`). In particular
+  `H^{s,p} ⊆ H^{s',p}` for `s' ≤ s`, derivatives map `H^{s,p}` into `H^{s-1,p}`, the Laplacian
+  into `H^{s-2,p}`, and `u ∈ H^{s+1,p}` iff `u ∈ H^{s,p}` and `∂_v u ∈ H^{s,p}` for every
+  direction `v` (`TemperedDistribution.memSobolev_add_one_iff`, mirrored from TauCeti).
 * **Sobolev and Bessel potential spaces interpolate to Besov spaces.** Let `dim V ≥ 1` and
   `1 < p < ∞`, and give `W^m_p(V)` the norm `‖f‖_p + inf ∑_α ‖g_α‖_p` over the weak derivatives
   `g_α = ∂_{e_{α_0}} ⋯ ∂_{e_{α_{m-1}}} f ∈ L_p(V)` along the basis `e` of `Rd.gridBasis`
@@ -655,7 +668,7 @@ blueprint chapter *The representations of Besov spaces* collects the characteris
 | [**Besov spaces on `ℝ^d`**](docs/Rd.md): band-limited approximation, Littlewood–Paley blocks, differences, Sobolev–Slobodeckij norms, local means, atoms, invariance under changes of variables, Besov spaces as interpolation spaces | ✅ | ✗ |
 | [**Dominating mixed smoothness**](docs/MixedSmoothness.md): mixed differences, mixed local means, tensor Littlewood–Paley blocks, hyperbolic crosses | ✅ | ✗ |
 | [**Triebel–Lizorkin spaces**](docs/TriebelLizorkin.md): the Besov sandwich, kernel majorants, local means, ball means of differences, atoms, the torus, vector-valued singular integrals with Calderón–Zygmund kernel families, the square function theorem `L_p = F^0_{p,2}` for `1 < p < ∞`, Triebel–Lizorkin spaces as interpolation spaces | ✅ | ✗ |
-| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings including the critical case and the Gagliardo–Nirenberg–Sobolev inequality, `H^{s,p} ∩ L_p = F^s_{p,2}`, `H^{s,p} = F^s_{p,2}` for `s ≥ 0`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces | ✅ | ✗ |
+| [**Sobolev spaces on `ℝ^d`**](docs/SobolevRd.md): weak derivatives on open sets, `W^m_p(Ω)` and `W^m_p(ℝ^d)`, weak derivatives as derivatives of tempered distributions, Mathlib's `H^s` as `F^s_{2,2}` and `B^s_{2,2}`, `W^1_2 = H^1`, Rellich's theorem, `W^m_p = F^m_{p,2}` with the Besov sandwich, the Sobolev embeddings including the critical case and the Gagliardo–Nirenberg–Sobolev inequality, `H^{s,p} = F^s_{p,2}` for tempered distributions and every real `s`, `W^m_p = H^{m,p}`, Sobolev and Bessel potential spaces as interpolation spaces, Fourier multipliers on `F^s_{p,q}` and `H^{s,p}`, Mihlin's theorem for symbols of order `0` | ✅ | ✗ |
 | [**Domains, traces and manifolds**](docs/DomainsTraces.md): Lipschitz graph and bounded Lipschitz domains, the area formula for Lipschitz graphs with the outward unit normal, the surface measure with `L_2(Γ)` and the trace into it, traces, the half-space, the extension property of Lipschitz graph and bounded Lipschitz domains, closures of convex ones, closed balls, the closed cube and the quadrant as Besov domains, `H^1` on bounded Lipschitz domains with weak gradient and trace, the Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)`, `H^s_0(Ω)` on open sets and their duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, the trace space `H^{1/2}(Γ)` of a bounded Lipschitz domain, defined as the orthogonal complement of the trace kernel, with trace and extension operators and its norm equivalent to that of `B^{1/2}_{2,2}(Γ)`, the extension theorems for `W^1_p` and `W^m_p` on bounded Lipschitz domains with `H^1(Ω) = W^1_2(Ω)`, Gauss–Green and Green's formula on Lipschitz graph domains, Green's formula on bounded Lipschitz domains with the zero extension of functions with vanishing trace, `ker γ = H^1_0(Ω)` with `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, eigenbases of the Dirichlet and Neumann Laplacians, Besov spaces by eigenfunction expansions, compact manifolds with boundary or with corners, the chart Sobolev space `H^1(M)`, eigenbases of chart forms and `B^s_{2,q}(M)` by eigenfunction expansions, smooth domains | ✅ | ✗ |
 
 Lean: ✅ every file proved without `sorry` · 🟡 some statement still `sorry` · ⬜ planned.
@@ -693,8 +706,8 @@ that library builds itself.
 ## What is left to do
 
 * **Interpolation**: the J-method and the equivalence theorem, the complex method,
-  `(L_{p₀}, L_{p₁})_{θ,q} = L_{p,q}` with Lorentz spaces, and the off-diagonal Marcinkiewicz
-  theorem.
+  `(L_{p₀}, L_{p₁})_{θ,q} = L_{p,q}` with Lorentz spaces, the real Riesz–Thorin theorem, and the
+  off-diagonal Marcinkiewicz theorem.
 * **Traces and extensions**: the extension of higher order for `p ∈ {1, ∞}` (Stein's extension
   operator), and bounded linear extension operators for higher order.
 * **Manifolds with corners**: a compact example (the cube with charts at its vertices), traces on
@@ -707,11 +720,12 @@ that library builds itself.
   the local Weyl law on compact manifolds, and spectral `B^s_{p,q}(M)` for `p ≠ 2` or `s ≥ 1`.
 * **Triebel–Lizorkin spaces** with `p = 1` or `q = 1`, and their ball means and atoms on the
   torus.
-* **Sobolev spaces**: Mihlin multipliers and `H^{s,p}` for `s < 0`; the Jawerth–Franke
-  embeddings with Besov targets, Hardy–Littlewood–Sobolev for Riesz potentials, `p = n`.
-* **Higher smoothness**: splines on domains; for the Daubechies wavelets the sharp `L_p`
-  exponents of the scaling functions, Hölder exponents beyond D4, and `ℝ^d`.
-* **The quasi-Banach range** `0 < p, q < 1`, the setting of nonlinear `n`-term approximation.
+* **Sobolev spaces**: the Jawerth–Franke embeddings with Besov targets, Hardy–Littlewood–Sobolev
+  for Riesz potentials, `p = n` (Trudinger).
+* **Higher smoothness**: Marchaud's inequality, splines on domains; for the Daubechies wavelets
+  the sharp `L_p` exponents of the scaling functions, Hölder exponents beyond D4, and tensor
+  wavelets on `ℝ^d`.
+* **The quasi-Banach range** `0 < p, q < 1` and best `n`-term approximation from a basis.
 
 ## Building
 

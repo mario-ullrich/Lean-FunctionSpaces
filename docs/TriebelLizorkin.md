@@ -221,7 +221,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
 | Triebel–Lizorkin spaces on `ℝ^d`: definition, `F_{p,p} = B_{p,p}`, the Besov sandwich, weighted blocks with terms set to zero and their tails | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkin` |
-| Convolutions with Schwartz kernels as Fourier multipliers on `L_r`, the Littlewood–Paley blocks of tempered distributions and their convergence in `𝓢'`, the Triebel–Lizorkin quasi-norm of tempered distributions for every real `s`, its compatibility with `L_p` and its monotonicity | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinDistributions` |
+| Convolutions with Schwartz kernels as Fourier multipliers on `L_r`, the Littlewood–Paley blocks of tempered distributions and their convergence in `𝓢'`, the Triebel–Lizorkin quasi-norm of tempered distributions for every real `s`, its compatibility with `L_p` and its monotonicity, finite sums of convolutions in `L_p`, and limits of `L_p` blocks | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinDistributions` |
 | Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/LocalMeans/KernelMajorants` |
 | Local means characterisation of Triebel–Lizorkin spaces, and synthesis with the dual kernels in `F^s_{p,q}` | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinLocalMeans` |
 | Characterisation by ball means of differences | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinDifferences` |
