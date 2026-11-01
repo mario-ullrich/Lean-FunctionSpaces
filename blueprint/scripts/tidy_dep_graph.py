@@ -123,7 +123,8 @@ BLOCKS: list[tuple[str, list]] = [
     ("Traces", ["Traces on Lipschitz domains"]),
     ("Sobolev spaces on domains and boundaries", ["Sobolev spaces on domains"]),
     ("Eigenbases of the Laplacian", ["Eigenbases of the Laplacian"]),
-    ("Compact manifolds", ["Besov spaces on compact manifolds"]),
+    ("Compact manifolds", ["Besov spaces on compact manifolds",
+                           "Eigenfunction expansions on compact manifolds"]),
 ]
 
 # Columns of blocks: in each list, every block is placed below the one before it. Without

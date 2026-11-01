@@ -12,9 +12,9 @@ torus `𝕋^d` with the blocks of [Besov spaces on `ℝ^d`](Rd.md); the mixed no
 `ℓ_q(L_p)`, the maximal functions and the Fefferman–Stein inequality are in
 [Tools from analysis](Analysis.md). For `s > 0` the spaces lie between Besov spaces (the Besov
 sandwich), and for `s > 0`, `1 < p < ∞`, `1 < q ≤ ∞` they are described by local means on `ℝ^d` and
-on `𝕋^d`, and by ball means of differences and by atoms on `ℝ^d`. For tempered distributions the
-same quasi-norm defines `F^s_{p,q}` for every real `s`, and for `1 < p < ∞`, `1 < q ≤ ∞` every
-admissible Littlewood–Paley family gives the same spaces.
+on `𝕋^d`, and by ball means of differences and by atoms on `ℝ^d`. For tempered distributions and
+`p < ∞` the same quasi-norm defines `F^s_{p,q}` for every real `s`, and for `1 < p < ∞`,
+`1 < q ≤ ∞` every admissible Littlewood–Paley family gives the same spaces.
 The theory for `1 < p < ∞` starts with families of dilated Schwartz kernels with their Fourier
 overlap and Hörmander condition, the adjoint of a convolution, which moves kernels and their
 derivatives to the other side of an integral, the `L_2` bounds of the analysis and synthesis
@@ -54,12 +54,18 @@ and of `L_p` and one of them, are Besov spaces.
   (`Rd.distribBlock`), and `∑_{j < J} Δ_j u → u` in `𝓢'(V)` (`Rd.tendsto_sum_distribBlock`).
   For a Schwartz function `η`, `1 ≤ r < ∞` and `G ∈ L_r(V)`, `(𝓕η)(D) G = η ⋆ G`
   (`Rd.fourierMultiplierCLM_fourier_toLp_eq_conv`), so the blocks of an `L_r` function are its
-  blocks `ψ_j ⋆ f`. For every real `s`, `1 ≤ p ≤ ∞` and `1 ≤ q ≤ ∞` the quasi-norm
-  `‖u‖_{F^s_{p,q}} = ‖ x ↦ ‖(2^{js} |g_j(x)|)_j‖_{ℓ_q} ‖_p` when every block is an `L_p` function
-  `g_j`, and `∞` otherwise (`Rd.triebelLizorkinNormDistr`, `Rd.MemTriebelLizorkinDistr`),
-  decreases in `q` and increases in `s`; for `p < ∞` it is the quasi-norm above on `L_p`
-  (`Rd.triebelLizorkinNormDistr_toTemperedDistribution`). Symbols of order `σ` map these spaces
-  into each other, see [Sobolev spaces on `ℝ^d`](SobolevRd.md).
+  blocks `ψ_j ⋆ f`. The quasi-norm is defined once, for the blocks `Δ'_j` of an admissible
+  kernel `K` (below): for every real `s`, `1 ≤ p ≤ ∞` and `1 ≤ q ≤ ∞`,
+  `‖u‖_{F^s_{p,q}, K} = ‖ x ↦ ‖(2^{js} |g_j(x)|)_j‖_{ℓ_q} ‖_p` when every block `Δ'_j u` is an
+  `L_p` function `g_j`, and `∞` otherwise (`Rd.LPKernel.triebelLizorkinNormDistr`); it decreases
+  in `q` and increases in `s`. The standard kernel gives `‖u‖_{F^s_{p,q}}`
+  (`Rd.triebelLizorkinNormDistr`, `Rd.MemTriebelLizorkinDistr`, with the blocks `Δ_j`); for
+  `p < ∞` it is the quasi-norm above on `L_p`
+  (`Rd.triebelLizorkinNormDistr_toTemperedDistribution`) and describes `F^s_{p,q}` for every
+  real `s`. For every kernel and `f ∈ L_p`, `p < ∞`, the quasi-norm is
+  `‖ x ↦ ‖(2^{js} |(ψ'_j ⋆ f)(x)|)_j‖_{ℓ_q} ‖_p` (`Rd.LPKernel.triebelLizorkinNorm`,
+  `Rd.LPKernel.triebelLizorkinNormDistr_toTemperedDistribution`). Symbols of order `σ` map
+  these spaces into each other, see [Sobolev spaces on `ℝ^d`](SobolevRd.md).
 * **Independence of the Littlewood–Paley family.** An admissible kernel is a Schwartz function
   `Φ'` with `𝓕Φ' = 1` on `{‖ξ‖ ≤ a}` and `𝓕Φ' = 0` outside the ball of radius `b`, `0 < a < b`
   (`Rd.LPKernel`), with the blocks `ψ'_0 = Φ'`, `ψ'_j = (Φ' - δ_{1/2} Φ')_{2^j}`. For two
@@ -69,10 +75,10 @@ and of `L_p` and one of them, are Besov spaces.
   on tempered distributions and on `L_p`, with the explicit constant
   `Rd.LPKernel.comparisonConst N c s` times the Fefferman–Stein constant
   (`Rd.LPKernel.triebelLizorkinNormDistr_le_of_blocks`,
-  `Rd.LPKernel.triebelLizorkinNormDistr_le_mul`); the window `c` is existential
-  (`Rd.LPKernel.exists_window`, `Rd.LPKernel.exists_triebelLizorkinNormDistr_le`,
-  `Rd.LPKernel.exists_triebelLizorkinNorm_le`). Every admissible kernel gives the spaces
-  `F^s_{p,q}` of the project
+  `Rd.LPKernel.triebelLizorkinNormDistr_le_mul`) for every window `c` with
+  `2^c ≥ max(b/a', b'/a)`; such a window exists (`Rd.LPKernel.exists_window`,
+  `Rd.LPKernel.exists_triebelLizorkinNormDistr_le`, `Rd.LPKernel.exists_triebelLizorkinNorm_le`).
+  Every admissible kernel gives the spaces `F^s_{p,q}` of the project
   (`Rd.LPKernel.memTriebelLizorkinDistr_iff`, `Rd.LPKernel.memTriebelLizorkin_iff`). The bound
   is pointwise: the window sums lie below `2^{c|s|}` times sums of maximal functions, cost `2c + 1`
   in `ℓ_q` (`ENNReal.lqNorm_sum_Icc_le`), and the Fefferman–Stein inequality finishes.
@@ -241,8 +247,8 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
 | Triebel–Lizorkin spaces on `ℝ^d`: definition, `F_{p,p} = B_{p,p}`, the Besov sandwich, weighted blocks with terms set to zero and their tails | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkin` |
-| Convolutions with Schwartz kernels as Fourier multipliers on `L_r`, the Littlewood–Paley blocks of tempered distributions and their convergence in `𝓢'`, the Triebel–Lizorkin quasi-norm of tempered distributions for every real `s`, its compatibility with `L_p` and its monotonicity, finite sums of convolutions in `L_p`, and limits of `L_p` blocks | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinDistributions` |
-| Admissible Littlewood–Paley kernels, their blocks and Fourier supports, the finite identity between the blocks of two kernels, and the equivalence of their Triebel–Lizorkin quasi-norms on tempered distributions and on `L_p` for every real `s`, `1 < p < ∞`, `1 < q ≤ ∞` | ✅ | ✗ | `Rd/TriebelLizorkin/LittlewoodPaleyFamilies` |
+| Convolutions with Schwartz kernels as Fourier multipliers on `L_r`, the Littlewood–Paley blocks of tempered distributions and their convergence in `𝓢'`, admissible Littlewood–Paley kernels and their blocks, the Triebel–Lizorkin quasi-norm of tempered distributions for every admissible kernel and every real `s` with the standard kernel as a case, its compatibility with `L_p` for every kernel and its monotonicity, finite sums of convolutions in `L_p`, and limits of `L_p` blocks | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinDistributions` |
+| The Fourier supports of the blocks of admissible Littlewood–Paley kernels, the finite identity between the blocks of two kernels, and the equivalence of their Triebel–Lizorkin quasi-norms on tempered distributions and on `L_p` for every real `s`, `1 < p < ∞`, `1 < q ≤ ∞` | ✅ | ✗ | `Rd/TriebelLizorkin/LittlewoodPaleyFamilies` |
 | Peetre majorants of cross kernels, maximal function bounds | ✅ | ✗ | `Rd/LocalMeans/KernelMajorants` |
 | Local means characterisation of Triebel–Lizorkin spaces, and synthesis with the dual kernels in `F^s_{p,q}` | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinLocalMeans` |
 | Characterisation by ball means of differences | ✅ | ✗ | `Rd/TriebelLizorkin/TriebelLizorkinDifferences` |

@@ -12,21 +12,22 @@ public import FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinLocalMeans
 /-!
 # Independence of the Littlewood–Paley family
 
-An admissible Littlewood–Paley kernel (`Rd.LPKernel`) is a Schwartz function `Φ'` with
-`𝓕Φ' = 1` on the ball `{‖ξ‖ ≤ a}` and `𝓕Φ' = 0` outside the ball of radius `b`, `0 < a < b`.
-Its blocks are `ψ'_0 = Φ'` and `ψ'_j = (Φ' - δ_{1/2} Φ')_{2^j}`, with the dilation
-`G_c(x) = c^n G(c x)`, so that `𝓕ψ'_j(ξ) = 𝓕Φ'(2^{-j} ξ) - 𝓕Φ'(2^{1-j} ξ)` for `j ≥ 1`
-(`Rd.LPKernel.fourier_psiS_succ`), as in Triebel's example of a Littlewood–Paley system
-(Triebel 1983, §2.3.1). The kernel of the project, `Rd.LPKernel.standard`, has `a = 1`, `b = 2`,
-and its blocks are those of `Rd.distribBlock`.
+The blocks of an admissible Littlewood–Paley kernel (`Rd.LPKernel`, with `𝓕Φ' = 1` on the ball
+`{‖ξ‖ ≤ a}` and `𝓕Φ' = 0` outside the ball of radius `b`) are `ψ'_0 = Φ'` and
+`ψ'_j = (Φ' - δ_{1/2} Φ')_{2^j}`, with the dilation `G_c(x) = c^n G(c x)`, so that
+`𝓕ψ'_j(ξ) = 𝓕Φ'(2^{-j} ξ) - 𝓕Φ'(2^{1-j} ξ)` for `j ≥ 1` (`Rd.LPKernel.fourier_psiS_succ`), as in
+Triebel's example of a Littlewood–Paley system (Triebel 1983, §2.3.1). The bases `Φ'` and
+`Φ' - δ_{1/2} Φ'` are uniformly Schwartz with the seminorm bounds `Rd.LPKernel.baseBound`
+(`Rd.LPKernel.isUniformSchwartz_base`).
 
 Any two admissible kernels give equivalent Triebel–Lizorkin quasi-norms on tempered distributions,
 for every real `s`, `1 < p < ∞` and `1 < q ≤ ∞`, with the explicit constant
 `Rd.LPKernel.comparisonConst N c s` times the Fefferman–Stein constant
 (`Rd.LPKernel.triebelLizorkinNormDistr_le_of_blocks`,
-`Rd.LPKernel.triebelLizorkinNormDistr_le_mul`); the window `c` is existential
-(`Rd.LPKernel.exists_window`). Hence they give the same spaces, also on `L_p`
-(`Rd.LPKernel.memTriebelLizorkinDistr_iff`, `Rd.LPKernel.memTriebelLizorkin_iff`).
+`Rd.LPKernel.triebelLizorkinNormDistr_le_mul`), for every window `c ∈ ℕ` with `b ≤ 2^c a'` and
+`b' ≤ 2^c a`, that is `2^c ≥ max(b/a', b'/a)`; such a window exists (`Rd.LPKernel.exists_window`).
+Hence they give the same spaces, also on `L_p` (`Rd.LPKernel.memTriebelLizorkinDistr_iff`,
+`Rd.LPKernel.memTriebelLizorkin_iff`).
 
 The proof is a finite identity on the Fourier side. With `2^c ≥ max(b/a', b'/a)`,
 `∑_{|k - j| ≤ c} 𝓕ψ'_k = 1` wherever `𝓕ψ_j ≠ 0` (`Rd.LPKernel.fourier_psiS_mul_sum_Icc`), so
@@ -48,37 +49,11 @@ namespace Rd
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
 
-variable (V) in
-/-- An **admissible Littlewood–Paley kernel**: a Schwartz function `Φ'` whose Fourier transform
-is `1` on the closed ball of radius `a` and `0` outside the ball of radius `b`, with
-`0 < a < b` (modelled on Triebel's example of a Littlewood–Paley system, 1983, §2.3.1). -/
-structure LPKernel where
-  /-- The kernel `Φ'`. -/
-  kernel : 𝓢(V, ℂ)
-  /-- The radius of the ball where `𝓕Φ' = 1`. -/
-  a : ℝ
-  /-- The radius outside of which `𝓕Φ' = 0`. -/
-  b : ℝ
-  a_pos : 0 < a
-  a_lt_b : a < b
-  fourier_eq_one : ∀ ξ : V, ‖ξ‖ ≤ a → (𝓕 kernel : 𝓢(V, ℂ)) ξ = 1
-  fourier_eq_zero : ∀ ξ : V, b ≤ ‖ξ‖ → (𝓕 kernel : 𝓢(V, ℂ)) ξ = 0
-
 namespace LPKernel
 
 variable (K K' : LPKernel V)
 
 /-! ### The blocks of an admissible kernel -/
-
-/-- The Schwartz functions behind the blocks: `base 0 = Φ'` and `base (j+1) = Φ' - δ_{1/2} Φ'`,
-with the dilation `δ_c G(x) = c^n G(c x)`, as `Rd.psiBase` for the kernel of the project. -/
-noncomputable def base : ℕ → 𝓢(V, ℂ)
-  | 0 => K.kernel
-  | _ + 1 => K.kernel - schwartzDilate (1 / 2) (by norm_num) K.kernel
-
-/-- The **blocks** `ψ'_j = (base j)_{2^j}` of an admissible kernel, as Schwartz functions. -/
-noncomputable def psiS (j : ℕ) : 𝓢(V, ℂ) :=
-  schwartzDilate (2 ^ j) (pow_ne_zero j two_ne_zero) (K.base j)
 
 /-- The seminorm bounds of the bases: the larger of the seminorms of `Φ'` and `Φ' - δ_{1/2} Φ'`. -/
 noncomputable def baseBound (k l : ℕ) : ℝ :=
@@ -92,10 +67,6 @@ theorem isUniformSchwartz_base : IsUniformSchwartz K.base K.baseBound :=
     cases j with
     | zero => exact Or.inl rfl
     | succ j => exact Or.inr rfl
-
-/-- The block `ψ'_j` is the dilate `(base j)_{2^j}` as a function. -/
-theorem coe_psiS (j : ℕ) : (K.psiS j : V → ℂ) = dilate (2 ^ j) (K.base j : V → ℂ) :=
-  coe_schwartzDilate _ _ _
 
 /-- `𝓕ψ'_0 = 𝓕Φ'`. -/
 theorem fourier_psiS_zero (ξ : V) :
@@ -213,12 +184,7 @@ theorem fourier_psiS_mul_sum_Icc {c : ℕ} (hb : K.b ≤ 2 ^ c * K'.a) (hb' : K'
   · rw [h, zero_mul]
   · rw [K.sum_Icc_fourier_psiS_eq_one K' hb hb' h, mul_one]
 
-/-! ### The blocks of tempered distributions -/
-
-/-- The **blocks of a tempered distribution** for the kernel `K`: `Δ'_j u = (𝓕ψ'_j)(D) u`, as
-`Rd.distribBlock` for the kernel of the project. -/
-noncomputable def distribBlock (j : ℕ) : 𝓢'(V, ℂ) →L[ℂ] 𝓢'(V, ℂ) :=
-  TemperedDistribution.fourierMultiplierCLM ℂ (𝓕 (K.psiS j) : 𝓢(V, ℂ))
+/-! ### The finite identity for tempered distributions -/
 
 /-- **The finite identity for tempered distributions**: under the hypotheses of
 `Rd.LPKernel.sum_Icc_fourier_psiS_eq_one`, for every tempered distribution `u` and every `j`,
@@ -255,108 +221,6 @@ theorem distribBlock_eq_sum_convLp (hp : p ≠ ∞) {c : ℕ} (hb : K.b ≤ 2 ^ 
   rw [K.distribBlock_eq_sum K' hb hb', ← Lp.toTemperedDistributionCLM_apply, map_sum]
   refine Finset.sum_congr rfl fun k _ => ?_
   rw [hg, fourierMultiplierCLM_fourier_toLp_eq_conv hp, Lp.toTemperedDistributionCLM_apply]
-
-/-! ### The Triebel–Lizorkin quasi-norm of an admissible kernel -/
-
-variable (p) in
-/-- The **Triebel–Lizorkin quasi-norm of a tempered distribution for the kernel `K`**:
-`‖ x ↦ ‖(2^{js} |g_j(x)|)_j‖_{ℓ_q} ‖_p` when every block `Δ'_j u` is an `L_p` function `g_j`, and
-`∞` otherwise, as `Rd.triebelLizorkinNormDistr` for the kernel of the project. -/
-noncomputable def triebelLizorkinNormDistr (s : ℝ) (q : ℝ≥0∞) (u : 𝓢'(V, ℂ)) : ℝ≥0∞ :=
-  ⨅ (g : ℕ → Lp ℂ p (volume : Measure V)) (_ : ∀ j, K.distribBlock j u = (g j : 𝓢'(V, ℂ))),
-    eLpNorm (fun x => lqNorm q fun j => dyadicWeight s j * ‖g j x‖ₑ) p volume
-
-/-- The quasi-norm is at most that of any family of `L_p` functions representing the blocks. -/
-theorem triebelLizorkinNormDistr_le {s : ℝ} {q : ℝ≥0∞} {u : 𝓢'(V, ℂ)}
-    {g : ℕ → Lp ℂ p (volume : Measure V)} (hg : ∀ j, K.distribBlock j u = (g j : 𝓢'(V, ℂ))) :
-    K.triebelLizorkinNormDistr p s q u ≤
-      eLpNorm (fun x => lqNorm q fun j => dyadicWeight s j * ‖g j x‖ₑ) p volume :=
-  iInf₂_le g hg
-
-/-- **The quasi-norm of the representing family**: if the blocks of `u` are the `L_p` functions
-`g_j`, the quasi-norm is `‖ x ↦ ‖(2^{js} |g_j(x)|)_j‖_{ℓ_q} ‖_p`
-(`Rd.eq_of_toTemperedDistribution_eq`). -/
-theorem triebelLizorkinNormDistr_eq {s : ℝ} {q : ℝ≥0∞} {u : 𝓢'(V, ℂ)}
-    {g : ℕ → Lp ℂ p (volume : Measure V)} (hg : ∀ j, K.distribBlock j u = (g j : 𝓢'(V, ℂ))) :
-    K.triebelLizorkinNormDistr p s q u =
-      eLpNorm (fun x => lqNorm q fun j => dyadicWeight s j * ‖g j x‖ₑ) p volume := by
-  refine le_antisymm (K.triebelLizorkinNormDistr_le hg) (le_iInf₂ fun g' hg' => ?_)
-  rw [funext fun j => eq_of_toTemperedDistribution_eq ((hg' j).symm.trans (hg j))]
-
-/-- **Bounding by the quasi-norm**: if `x ≤ C ‖ x ↦ ‖(2^{js} |g_j(x)|)_j‖_{ℓ_q} ‖_p` for every
-family of `L_p` functions representing the blocks of `u`, and `C ≠ 0`, then
-`x ≤ C ‖u‖_{F^s_{p,q}}` for the kernel `K`. -/
-theorem le_mul_triebelLizorkinNormDistr {s : ℝ} {q : ℝ≥0∞} {u : 𝓢'(V, ℂ)} {x C : ℝ≥0∞}
-    (hC : C ≠ 0) (h : ∀ g : ℕ → Lp ℂ p (volume : Measure V),
-      (∀ j, K.distribBlock j u = (g j : 𝓢'(V, ℂ))) →
-        x ≤ C * eLpNorm (fun y => lqNorm q fun j => dyadicWeight s j * ‖g j y‖ₑ) p volume) :
-    x ≤ C * K.triebelLizorkinNormDistr p s q u := by
-  by_cases hex : ∃ g : ℕ → Lp ℂ p (volume : Measure V),
-      ∀ j, K.distribBlock j u = (g j : 𝓢'(V, ℂ))
-  · obtain ⟨g, hg⟩ := hex
-    rw [K.triebelLizorkinNormDistr_eq hg]
-    exact h g hg
-  · have htop : K.triebelLizorkinNormDistr p s q u = ∞ :=
-      iInf_eq_top.2 fun g => iInf_eq_top.2 fun hg => (hex ⟨g, hg⟩).elim
-    rw [htop, ENNReal.mul_top hC]
-    exact le_top
-
-/-- The **Triebel–Lizorkin quasi-norm of `f ∈ L_p` for the kernel `K`**:
-`‖ x ↦ ‖(2^{js} |(ψ'_j ⋆ f)(x)|)_j‖_{ℓ_q} ‖_p`. -/
-noncomputable def triebelLizorkinNorm (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p (volume : Measure V)) :
-    ℝ≥0∞ :=
-  eLpNorm (fun x => lqNorm q fun j => dyadicWeight s j * ‖conv (K.psiS j) f volume x‖ₑ) p volume
-
-/-- **Compatibility with `L_p`**: for `1 ≤ p < ∞` and `f ∈ L_p(V)`, the quasi-norm of the tempered
-distribution of `f` for the kernel `K` is `K.triebelLizorkinNorm s q f`, since the blocks of `f`
-are the convolutions `ψ'_j ⋆ f` (`Rd.fourierMultiplierCLM_fourier_toLp_eq_conv`). -/
-theorem triebelLizorkinNormDistr_toTemperedDistribution (hp : p ≠ ∞) (s : ℝ) (q : ℝ≥0∞)
-    (f : Lp ℂ p (volume : Measure V)) :
-    K.triebelLizorkinNormDistr p s q (f : 𝓢'(V, ℂ)) = K.triebelLizorkinNorm s q f := by
-  rw [K.triebelLizorkinNormDistr_eq (g := fun j => convLp hp (K.psiS j).integrable f)
-    (fun j => fourierMultiplierCLM_fourier_toLp_eq_conv hp (K.psiS j) f), triebelLizorkinNorm]
-  refine eLpNorm_congr_ae ?_
-  filter_upwards [ae_all_iff.2 fun j => convLp_apply_ae hp (K.psiS j).integrable f] with x hx
-  simp_rw [hx]
-
-/-! ### The kernel of the project -/
-
-variable (V) in
-/-- The **kernel of the project** `Φ = 𝓕⁻¹ χ_{1,2}` (`Rd.lpKernelS`) as an admissible kernel, with
-`a = 1` and `b = 2`. -/
-noncomputable def standard : LPKernel V where
-  kernel := lpKernelS
-  a := 1
-  b := 2
-  a_pos := one_pos
-  a_lt_b := one_lt_two
-  fourier_eq_one ξ h := by
-    rw [fourier_lpKernelS]
-    exact cutoff_eq_one one_pos one_lt_two h
-  fourier_eq_zero ξ h := by
-    rw [fourier_lpKernelS]
-    exact cutoff_eq_zero one_pos one_lt_two h
-
-/-- The blocks of the kernel of the project are the blocks `Rd.psiS` of the project. -/
-theorem standard_psiS (j : ℕ) : (standard V).psiS j = Rd.psiS j := by
-  cases j <;> rfl
-
-/-- The blocks of tempered distributions of the kernel of the project are `Rd.distribBlock`. -/
-theorem standard_distribBlock (j : ℕ) : (standard V).distribBlock j = Rd.distribBlock j := by
-  rw [distribBlock, standard_psiS]
-  rfl
-
-/-- The quasi-norm of the kernel of the project is `Rd.triebelLizorkinNormDistr`. -/
-theorem standard_triebelLizorkinNormDistr (s : ℝ) (q : ℝ≥0∞) (u : 𝓢'(V, ℂ)) :
-    (standard V).triebelLizorkinNormDistr p s q u = Rd.triebelLizorkinNormDistr p s q u := by
-  simp only [triebelLizorkinNormDistr, Rd.triebelLizorkinNormDistr, standard_distribBlock]
-
-omit [Fact (1 ≤ p)] in
-/-- The quasi-norm of the kernel of the project on `L_p` is `Rd.triebelLizorkinNorm`, for every
-`1 ≤ p ≤ ∞`: the blocks are the same functions (`Rd.LPKernel.standard_psiS`, `Rd.coe_psiS`). -/
-theorem standard_triebelLizorkinNorm (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p (volume : Measure V)) :
-    (standard V).triebelLizorkinNorm s q f = Rd.triebelLizorkinNorm s q f := by
-  simp only [triebelLizorkinNorm, Rd.triebelLizorkinNorm, blockFun, standard_psiS, Rd.coe_psiS]
 
 /-! ### The comparison of two kernels -/
 

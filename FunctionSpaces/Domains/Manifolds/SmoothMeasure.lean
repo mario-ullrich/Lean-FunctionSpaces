@@ -21,11 +21,16 @@ with respect to the Lebesgue measure on the target `κ(e.source) ⊆ range I`:
 
 `κ_* (μ|_{e.source}) = ρ_e · vol|_{κ(e.source)}`.
 
+So a smooth measure in this project is a measure with a continuous positive density in every
+chart; the results use the continuity of the densities and the bounds `0 < ρ_e < ∞`, and no
+differentiability.
+
 The extended chart is almost everywhere measurable on its source
 (`Manifold.aemeasurable_extend_restrict`), and the parts inside the source of preimages of
 measurable sets are measurable (`Manifold.measurableSet_source_inter_extend_preimage`).
 
-The Riemannian volume and the Lebesgue measure of a smooth domain are smooth measures.
+The Lebesgue measure of a smooth bounded domain is a smooth measure on its closure
+(`Rd.SmoothDomain.isSmoothMeasure_volumeOn`).
 
 **Integrals in a chart** (`Manifold.IsSmoothMeasure.lintegral_source_eq`):
 `∫_{e.source} F dμ = ∫_{κ(e.source)} ρ_e(y) F(κ⁻¹ y) dy`. For functions that vanish outside a
@@ -53,9 +58,10 @@ variable {E : Type*} [NormedAddCommGroup E] [InnerProductSpace ℝ E] [FiniteDim
   (I : ModelWithCorners ℝ E H) {M : Type*} [TopologicalSpace M] [ChartedSpace H M]
   [MeasurableSpace M] [BorelSpace M]
 
-/-- A **smooth measure** on `M`: in every chart `e` of the atlas, the image of `μ` on the source of
-`e` under the extended chart is a measure with a continuous density `ρ_e` with `0 < ρ_e < ∞` on the
-target, with respect to the Lebesgue measure on the target. -/
+/-- A **smooth measure** on `M`, here a measure with a continuous positive density in every chart:
+in every chart `e` of the atlas, the image of `μ` on the source of `e` under the extended chart is
+a measure with a continuous density `ρ_e` with `0 < ρ_e < ∞` on the target, with respect to the
+Lebesgue measure on the target. -/
 class IsSmoothMeasure (μ : Measure M) : Prop where
   exists_density : ∀ e ∈ atlas H M, ∃ ρ : E → ℝ≥0∞, ContinuousOn ρ (e.extend I).target ∧
     (∀ y ∈ (e.extend I).target, 0 < ρ y ∧ ρ y < ∞) ∧

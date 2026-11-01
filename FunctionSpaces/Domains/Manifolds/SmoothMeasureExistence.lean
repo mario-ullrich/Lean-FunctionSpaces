@@ -26,11 +26,12 @@ variables `Φ_k = κ_k ∘ κ⁻¹` (Mathlib's `lintegral_image_eq_lintegral_abs
 `Manifold.BesovAtlas.map_extend_chartMeasure`), where `DΦ_k` is the derivative within the source of
 `Φ_k`, a relatively open subset of `range I`. The density is continuous, because each term vanishes
 near the points where `κ⁻¹ y` leaves the source of `κ_k`, and positive, because some `ψ_k(κ⁻¹ y)`
-is positive and `DΦ_k(y)` is invertible. So `μ_A` is a finite smooth measure
+is positive and `DΦ_k(y)` is invertible. So `μ_A` is a finite smooth measure, that is, a measure
+with a continuous positive density in every chart
 (`Manifold.BesovAtlas.isSmoothMeasure_chartMeasure`,
 `Manifold.BesovAtlas.isFiniteMeasure_chartMeasure`) for every model, with or without boundary,
-and every compact manifold carries one (`Manifold.exists_isSmoothMeasure`); for example the
-sphere `S^n ⊆ ℝ^(n+1)`, a compact manifold without boundary
+and every compact Hausdorff manifold carries one (`Manifold.exists_isSmoothMeasure`); for example
+the sphere `S^n ⊆ ℝ^(n+1)`, a compact manifold without boundary
 (`Manifold.exists_isSmoothMeasure_sphere`).
 -/
 
@@ -278,7 +279,8 @@ end BesovAtlas
 /-! ### Existence -/
 
 /-- **Smooth measures exist**: every compact Hausdorff smooth manifold, with or without boundary,
-carries a finite smooth measure, the chart measure of a Besov atlas
+carries a finite smooth measure (a continuous positive density in every chart), the chart
+measure of a Besov atlas
 (`Manifold.BesovAtlas.nonempty`, `Manifold.BesovAtlas.isSmoothMeasure_chartMeasure`,
 `Manifold.BesovAtlas.isFiniteMeasure_chartMeasure`). -/
 theorem exists_isSmoothMeasure [CompactSpace M] [T2Space M] [IsManifold I ∞ M] :
@@ -288,7 +290,7 @@ theorem exists_isSmoothMeasure [CompactSpace M] [T2Space M] [IsManifold I ∞ M]
 
 /-- **The sphere carries a smooth measure**: the unit sphere `S^n ⊆ ℝ^(n+1)`, with Mathlib's
 stereographic charts modelled on `ℝ^n`, is a compact manifold without boundary, and it carries a
-finite smooth measure (`Manifold.exists_isSmoothMeasure`). -/
+finite smooth measure, the chart measure of a Besov atlas (`Manifold.exists_isSmoothMeasure`). -/
 theorem exists_isSmoothMeasure_sphere (n : ℕ) :
     ∃ μ : Measure (sphere (0 : EuclideanSpace ℝ (Fin (n + 1))) 1),
       IsSmoothMeasure (𝓡 n) μ ∧ IsFiniteMeasure μ :=

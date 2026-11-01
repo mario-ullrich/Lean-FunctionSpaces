@@ -255,7 +255,9 @@ $p \leq 2$ between $\Besov{s}{p}{p}$ and $\Besov{s}{p}{2}$.
 The quasi-norm of \Cref{def:triebel-lizorkin} is defined on $L_p$. Here the Littlewood--Paley
 blocks act on tempered distributions as Fourier multipliers, $\Delta_j u = (\widehat{\psi_j})(D) u$,
 and a tempered distribution lies in $\TL{s}{p}{q}$ when every block is an $L_p$ function and the
-mixed norm of the weighted blocks is finite; this describes $\TL{s}{p}{q}$ for every real $s$. The
+mixed norm of the weighted blocks is finite; for $p < \infty$ this describes $\TL{s}{p}{q}$ for
+every real $s$ (Triebel defines $F^s_{p,q}$ for $p < \infty$; the standard space
+$F^s_{\infty,q}$, $q < \infty$, of Frazier and Jawerth has a different quasi-norm). The
 blocks need the kernels $\psi_j = (G^\psi_j)_{2^j}$ as Schwartz functions (\Cref{lem:psi-base},
 \Cref{def:schwartz-dilate}). The Fourier multiplier $m(D)$ of a tempered distribution is defined
 in the paragraph before \Cref{lem:fourier-multiplier-fourier}; Fourier multipliers on these spaces
@@ -366,48 +368,128 @@ $h$, since $L_p(V)$ embeds continuously into $\mathcal S'(V)$; limits in $\mathc
 unique.
 \end{proof}
 
+\paragraph{Admissible kernels.}
+The quasi-norm below is defined once, for the blocks of an admissible kernel; the kernel $\Phi$
+of \Cref{def:lp-kernels} is one of them and gives the blocks $\Delta_j$. Every admissible kernel
+gives the same spaces for $1 < p < \infty$ and $1 < q \leq \infty$
+(\Cref{sec:lp-family-independence}).
+
+\begin{definition}[Admissible kernels and their blocks]
+\label{def:lp-kernel-admissible}
+\lean{Rd.LPKernel, Rd.LPKernel.base, Rd.LPKernel.psiS, Rd.LPKernel.coe_psiS,
+  Rd.LPKernel.distribBlock, Rd.LPKernel.standard}
+\leanok
+\uses{def:schwartz-dilate, def:lp-kernels, lem:lp-kernels-basic, def:psi-base, def:distrib-block}
+An \emph{admissible kernel} $K$ is a Schwartz function $\Phi' \colon V \to \C$ with reals
+$0 < a < b$ such that $\widehat{\Phi'}(\xi) = 1$ for $\|\xi\| \leq a$ and
+$\widehat{\Phi'}(\xi) = 0$ for $\|\xi\| \geq b$. Its bases are $G'_0 = \Phi'$ and
+$G'_j = \Phi' - \delta_{1/2} \Phi'$ for $j \geq 1$, its blocks are $\psi'_j = (G'_j)_{2^j}$, and
+for every tempered distribution $u$ its blocks are $\Delta'_j u = (\widehat{\psi'_j})(D) u$. The
+kernel $\Phi$ of \Cref{def:lp-kernels}, with $\widehat\Phi = \chi_{1,2}$, $a = 1$ and $b = 2$, is
+the \emph{standard} admissible kernel.
+\end{definition}
+
+\begin{lemma}[The blocks of the standard kernel]
+\label{lem:lp-kernel-standard-blocks}
+\lean{Rd.LPKernel.standard_psiS, Rd.LPKernel.standard_distribBlock,
+  Rd.LPKernel.standard_distribBlock_eq_iff}
+\leanok
+\uses{def:lp-kernel-admissible, def:psi-base, def:distrib-block}
+For the standard kernel and every $j \in \N$, $\psi'_j = \psi_j$ and $\Delta'_j = \Delta_j$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The bases of the standard kernel are those of \Cref{def:psi-base}.
+\end{proof}
+
 \paragraph{The quasi-norm.}
 
 \begin{definition}[Triebel--Lizorkin spaces of tempered distributions]
 \label{def:tl-distr}
-\lean{Rd.triebelLizorkinNormDistr, Rd.MemTriebelLizorkinDistr,
+\lean{Rd.LPKernel.triebelLizorkinNormDistr, Rd.triebelLizorkinNormDistr,
+  Rd.MemTriebelLizorkinDistr, Rd.LPKernel.standard_triebelLizorkinNormDistr,
   Rd.aemeasurable_lqNorm_dyadicWeight_Lp}
 \leanok
-\uses{def:distrib-block, def:lq-norm}
-Let $1 \leq p \leq \infty$, $s \in \R$ and $1 \leq q \leq \infty$. For every tempered distribution
-$u$ on $V$ let
+\uses{def:lp-kernel-admissible, def:lq-norm}
+Let $K$ be an admissible kernel, $1 \leq p \leq \infty$, $s \in \R$ and $1 \leq q \leq \infty$.
+For every tempered distribution $u$ on $V$ let
 \[
-  \|u\|_{F^s_{p,q}} = \inf \Bigl\| x \mapsto \bigl\| (2^{js} |g_j(x)|)_{j \in \N}
+  \|u\|_{F^s_{p,q}, K} = \inf \Bigl\| x \mapsto \bigl\| (2^{js} |g_j(x)|)_{j \in \N}
   \bigr\|_{\ell_q} \Bigr\|_{L_p} ,
 \]
-the infimum over the families $(g_j)$ of functions in $L_p(V)$ with $\Delta_j u = g_j$ as
-tempered distributions for every $j$; it is $\infty$ if there is no such family. The space
-$\TL{s}{p}{q}$ consists of the tempered distributions $u$ with $\|u\|_{F^s_{p,q}} < \infty$.
-For every family $(g_j)$ in $L_p(V)$ the function
+the infimum over the families $(g_j)$ of functions in $L_p(V)$ with $\Delta'_j u = g_j$ as
+tempered distributions for every $j$; it is $\infty$ if there is no such family. For the
+standard kernel write $\|u\|_{F^s_{p,q}} = \|u\|_{F^s_{p,q}, K}$, with the blocks
+$\Delta'_j = \Delta_j$. The space $\TL{s}{p}{q}$ consists of the tempered distributions $u$ with
+$\|u\|_{F^s_{p,q}} < \infty$. For every family $(g_j)$ in $L_p(V)$ the function
 $x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_q}$ is almost everywhere measurable.
 \end{definition}
 
 \begin{lemma}[The quasi-norm of the representing family]
 \label{lem:tl-distr-eq}
-\lean{Rd.triebelLizorkinNormDistr_le, Rd.triebelLizorkinNormDistr_eq,
+\lean{Rd.LPKernel.triebelLizorkinNormDistr_le, Rd.LPKernel.triebelLizorkinNormDistr_eq,
+  Rd.LPKernel.triebelLizorkinNormDistr_eq_top, Rd.LPKernel.le_mul_triebelLizorkinNormDistr,
+  Rd.triebelLizorkinNormDistr_le, Rd.triebelLizorkinNormDistr_eq,
   Rd.triebelLizorkinNormDistr_eq_top, Rd.le_mul_triebelLizorkinNormDistr,
   Rd.MemTriebelLizorkinDistr.exists_blocks}
 \leanok
-\uses{def:tl-distr, lem:lp-distribution-determined}
-Let $1 \leq p \leq \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $u$ a tempered distribution.
-For every family $(g_j)$ in $L_p(V)$ with $\Delta_j u = g_j$ for every $j$,
-$\|u\|_{F^s_{p,q}} = \| x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_q} \|_{L_p}$. If there is no such
-family, $\|u\|_{F^s_{p,q}} = \infty$; so for every $u \in \TL{s}{p}{q}$ there is such a family.
-Hence, for every $X \in [0, \infty]$ and every
+\uses{def:tl-distr, lem:lp-distribution-determined, lem:lp-kernel-standard-blocks}
+Let $K$ be an admissible kernel, $1 \leq p \leq \infty$, $s \in \R$, $1 \leq q \leq \infty$ and
+$u$ a tempered distribution. For every family $(g_j)$ in $L_p(V)$ with $\Delta'_j u = g_j$ for
+every $j$, $\|u\|_{F^s_{p,q}, K} = \| x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_q} \|_{L_p}$. If
+there is no such family, $\|u\|_{F^s_{p,q}, K} = \infty$; so for every $u \in \TL{s}{p}{q}$ there
+is such a family for the standard kernel. Hence, for every $X \in [0, \infty]$ and every
 $C \in (0, \infty]$ such that $X \leq C \| x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_q} \|_{L_p}$
-for every such family, $X \leq C \|u\|_{F^s_{p,q}}$.
+for every such family, $X \leq C \|u\|_{F^s_{p,q}, K}$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 $L_p$ functions are determined by their tempered distributions
 (\Cref{lem:lp-distribution-determined}), so there is at most one such family. Without a
-family, $C \cdot \infty = \infty$ since $C \neq 0$.
+family, $C \cdot \infty = \infty$ since $C \neq 0$. For the standard kernel the blocks are
+$\Delta_j$ (\Cref{lem:lp-kernel-standard-blocks}).
+\end{proof}
+
+On $L_p$ each admissible kernel also gives a quasi-norm with the convolutions $\psi'_j * f$.
+
+\begin{definition}[The quasi-norm of an admissible kernel on $L_p$]
+\label{def:lp-kernel-tl-norm}
+\lean{Rd.LPKernel.triebelLizorkinNorm}
+\leanok
+\uses{def:lp-kernel-admissible}
+Let $K$ be an admissible kernel, $1 \leq p \leq \infty$, $s \in \R$ and $1 \leq q \leq \infty$.
+For $f \in L_p(V)$,
+\[
+  \|f\|_{F^s_{p,q}, K} = \Bigl\| x \mapsto \bigl\| (2^{js} |(\psi'_j * f)(x)|)_j
+  \bigr\|_{\ell_q} \Bigr\|_{L_p} .
+\]
+\end{definition}
+
+\begin{lemma}[The quasi-norm of an admissible kernel on $L_p$]
+\label{lem:lp-kernel-tl-norm-basic}
+\lean{Rd.LPKernel.triebelLizorkinNormDistr_toTemperedDistribution,
+  Rd.LPKernel.standard_triebelLizorkinNorm}
+\leanok
+\uses{def:lp-kernel-tl-norm, def:tl-distr, lem:tl-distr-eq, lem:lp-kernel-standard-blocks,
+  lem:conv-fourier-multiplier, def:triebel-lizorkin}
+Let $K$ be an admissible kernel, $1 \leq p \leq \infty$, $s \in \R$ and $1 \leq q \leq \infty$.
+\begin{enumerate}
+  \item If $p < \infty$, then for every $f \in L_p(V)$, with $T_f$ the tempered distribution of
+    $f$, $\|T_f\|_{F^s_{p,q}, K} = \|f\|_{F^s_{p,q}, K}$, the left side from \Cref{def:tl-distr}
+    and the right side from \Cref{def:lp-kernel-tl-norm}.
+  \item For the standard kernel $K$ and every $f \in L_p(V)$,
+    $\|f\|_{F^s_{p,q}, K} = \|f\|_{F^s_{p,q}}$, the quasi-norm of \Cref{def:triebel-lizorkin}.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The blocks of $f$ are the $L_p$ functions $\psi'_j * f$ (\Cref{lem:conv-fourier-multiplier}),
+and \Cref{lem:tl-distr-eq} applies to them. (2) For the standard kernel the blocks are the blocks
+$\psi_j$ of \Cref{def:lp-kernels} (\Cref{lem:lp-kernel-standard-blocks}), so both quasi-norms are
+the expression of \Cref{def:triebel-lizorkin}.
 \end{proof}
 
 \begin{theorem}[Compatibility with $L_p$]
@@ -415,7 +497,7 @@ family, $C \cdot \infty = \infty$ since $C \neq 0$.
 \lean{Rd.triebelLizorkinNormDistr_toTemperedDistribution,
   Rd.memTriebelLizorkinDistr_toTemperedDistribution_iff}
 \leanok
-\uses{lem:tl-distr-eq, lem:distrib-block-lp, def:triebel-lizorkin}
+\uses{lem:lp-kernel-tl-norm-basic, def:triebel-lizorkin}
 For every $1 \leq p < \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $f \in L_p(V)$, the
 quasi-norm of the tempered distribution of $f$ (\Cref{def:tl-distr}) is the quasi-norm
 $\|f\|_{F^s_{p,q}}$ of \Cref{def:triebel-lizorkin}. In particular the two definitions of
@@ -424,20 +506,21 @@ $f \in \TL{s}{p}{q}$ agree.
 
 \begin{proof}
 \leanok
-The blocks of $f$ are the $L_p$ functions $\psi_j * f$ (\Cref{lem:distrib-block-lp}), and
-\Cref{lem:tl-distr-eq} applies to them.
+This is \Cref{lem:lp-kernel-tl-norm-basic} for the standard kernel.
 \end{proof}
 
 \begin{proposition}[Monotonicity in $q$ and $s$]
 \label{prop:tl-distr-mono}
-\lean{Rd.triebelLizorkinNormDistr_mono_exponent, Rd.triebelLizorkinNormDistr_mono_smoothness,
+\lean{Rd.LPKernel.triebelLizorkinNormDistr_mono_exponent,
+  Rd.LPKernel.triebelLizorkinNormDistr_mono_smoothness,
+  Rd.triebelLizorkinNormDistr_mono_exponent, Rd.triebelLizorkinNormDistr_mono_smoothness,
   Rd.MemTriebelLizorkinDistr.mono_exponent, Rd.MemTriebelLizorkinDistr.mono_smoothness}
 \leanok
 \uses{def:tl-distr, lem:tl-distr-eq, lem:mixed-norm-dyadic-family}
-Let $1 \leq p \leq \infty$ and $u$ a tempered distribution. For all $1 \leq q \leq r \leq \infty$
-and every real $s$, $\|u\|_{F^s_{p,r}} \leq \|u\|_{F^s_{p,q}}$, so
-$\TL{s}{p}{q} \subseteq \TL{s}{p}{r}$. For all reals $s \leq t$ and every $q$,
-$\|u\|_{F^s_{p,q}} \leq \|u\|_{F^t_{p,q}}$, so $\TL{t}{p}{q} \subseteq \TL{s}{p}{q}$.
+Let $K$ be an admissible kernel, $1 \leq p \leq \infty$ and $u$ a tempered distribution. For all
+$1 \leq q \leq r \leq \infty$ and every real $s$, $\|u\|_{F^s_{p,r}, K} \leq \|u\|_{F^s_{p,q}, K}$,
+so $\TL{s}{p}{q} \subseteq \TL{s}{p}{r}$. For all reals $s \leq t$ and every $q$,
+$\|u\|_{F^s_{p,q}, K} \leq \|u\|_{F^t_{p,q}, K}$, so $\TL{t}{p}{q} \subseteq \TL{s}{p}{q}$.
 \end{proposition}
 
 \begin{proof}
@@ -1291,46 +1374,43 @@ the Littlewood--Paley blocks.
 \section{Independence of the Littlewood--Paley family}
 \label{sec:lp-family-independence}
 
-The spaces $\TL{s}{p}{q}$ of this chapter use the fixed kernel $\Phi$ of \Cref{def:lp-kernels}.
-An admissible kernel is a Schwartz function $\Phi'$ with $\widehat{\Phi'} = 1$ on a ball and
-$\widehat{\Phi'} = 0$ outside a larger ball; its blocks are generated by dilation, as in
-Triebel's standard example of a system in his class $\Phi(\R^n)$~\cite[Section~2.3.1]{Triebel}.
-Triebel proves independence for his whole class $\Phi(\R^n)$~\cite[Section~2.3.2]{Triebel}. This
-section proves it for the families generated by one admissible kernel, with arbitrary radii
-$0 < a < b$: any two admissible kernels give equivalent quasi-norms, on tempered distributions
-(\Cref{sec:tl-distributions}) and on $L_p$, for every real $s$, $1 < p < \infty$ and
-$1 < q \leq \infty$, with the explicit constant $C_{K,N,c,s}$ times the Fefferman--Stein
-constant (\Cref{lem:lp-kernel-comparison-blocks}); the window $c$ is existential
-(\Cref{lem:lp-kernel-finite-identity}). The proof uses only finite sums: on the Fourier side the
+The spaces $\TL{s}{p}{q}$ of this chapter use the standard kernel $\Phi$ of
+\Cref{def:lp-kernels}. An admissible kernel (\Cref{def:lp-kernel-admissible}) is a Schwartz
+function $\Phi'$ with $\widehat{\Phi'} = 1$ on a ball and $\widehat{\Phi'} = 0$ outside a larger
+ball; its blocks are generated by dilation, as in Triebel's standard example of a system in his
+class $\Phi(\R^n)$~\cite[Section~2.3.1]{Triebel}, and it defines the quasi-norm
+$\|u\|_{F^s_{p,q}, K}$ of \Cref{def:tl-distr}. Triebel proves independence for his whole class
+$\Phi(\R^n)$~\cite[Section~2.3.2]{Triebel}. This section proves it for the families generated by
+one admissible kernel, with arbitrary radii $0 < a < b$: any two admissible kernels give
+equivalent Triebel--Lizorkin quasi-norms, on tempered distributions and on $L_p$, for every real
+$s$, $1 < p < \infty$ and $1 < q \leq \infty$, with the explicit constant $C_{K,N,c,s}$ times the
+Fefferman--Stein constant (\Cref{lem:lp-kernel-comparison-blocks}), for every window $c \in \N$
+with $b \leq 2^c a'$ and $b' \leq 2^c a$; such a window exists
+(\Cref{lem:lp-kernel-finite-identity}). The Littlewood--Paley description of the Besov spaces in
+\Cref{ch:rd} uses only the standard kernel; the Besov spaces themselves are described by
+differences (\Cref{thm:rd-besov}). The proof uses only finite sums: on the Fourier side the
 blocks of one kernel are finite sums of the blocks of the other.
 
-\begin{definition}[Admissible kernels and their blocks]
-\label{def:lp-kernel-admissible}
-\lean{Rd.LPKernel, Rd.LPKernel.base, Rd.LPKernel.psiS, Rd.LPKernel.baseBound,
-  Rd.LPKernel.distribBlock, Rd.LPKernel.standard}
+\begin{definition}[The seminorm bounds of an admissible kernel]
+\label{def:lp-kernel-base-bound}
+\lean{Rd.LPKernel.baseBound}
 \leanok
-\uses{def:schwartz-dilate, def:lp-kernels, lem:lp-kernels-basic, def:psi-base, def:distrib-block}
-An \emph{admissible kernel} $K$ is a Schwartz function $\Phi' \colon V \to \C$ with reals
-$0 < a < b$ such that $\widehat{\Phi'}(\xi) = 1$ for $\|\xi\| \leq a$ and
-$\widehat{\Phi'}(\xi) = 0$ for $\|\xi\| \geq b$. Its bases are $G'_0 = \Phi'$ and
-$G'_j = \Phi' - \delta_{1/2} \Phi'$ for $j \geq 1$, its blocks are $\psi'_j = (G'_j)_{2^j}$, and
-for every tempered distribution $u$ its blocks are $\Delta'_j u = (\widehat{\psi'_j})(D) u$. For
-all $k, l \in \N$ let $A^{K}_{k,l}$ be the larger of the seminorms
-$\sup_x \|x\|^k \|D^l \Phi'(x)\|$ and $\sup_x \|x\|^k \|D^l (\Phi' - \delta_{1/2} \Phi')(x)\|$.
-The kernel $\Phi$ of \Cref{def:lp-kernels}, with $\widehat\Phi = \chi_{1,2}$, $a = 1$ and $b = 2$,
-is the \emph{standard} admissible kernel.
+\uses{def:lp-kernel-admissible}
+Let $K$ be an admissible kernel with $\Phi'$. For all $k, l \in \N$ let $A^{K}_{k,l}$ be the
+larger of the seminorms $\sup_x \|x\|^k \|D^l \Phi'(x)\|$ and
+$\sup_x \|x\|^k \|D^l (\Phi' - \delta_{1/2} \Phi')(x)\|$.
 \end{definition}
 
 \begin{lemma}[The blocks of an admissible kernel]
 \label{lem:lp-kernel-blocks}
-\lean{Rd.fourier_schwartzDilate_apply, Rd.LPKernel.isUniformSchwartz_base, Rd.LPKernel.coe_psiS,
+\lean{Rd.fourier_schwartzDilate_apply, Rd.LPKernel.isUniformSchwartz_base,
   Rd.LPKernel.fourier_psiS_zero, Rd.LPKernel.fourier_psiS_succ,
   Rd.LPKernel.sum_range_fourier_psiS, Rd.LPKernel.fourier_kernel_inv_smul_eq_one,
   Rd.LPKernel.fourier_kernel_inv_smul_eq_zero, Rd.LPKernel.norm_lt_of_fourier_psiS_ne_zero,
-  Rd.LPKernel.lt_norm_of_fourier_psiS_succ_ne_zero, Rd.LPKernel.standard_psiS,
-  Rd.LPKernel.standard_distribBlock}
+  Rd.LPKernel.lt_norm_of_fourier_psiS_succ_ne_zero}
 \leanok
-\uses{def:lp-kernel-admissible, lem:fourier-dilate, def:uniform-schwartz, lem:psi-base}
+\uses{def:lp-kernel-admissible, def:lp-kernel-base-bound, lem:fourier-dilate,
+  def:uniform-schwartz}
 Let $K$ be an admissible kernel with $\Phi'$, $a$, $b$. The bases $(G'_j)$ are uniformly Schwartz
 with bounds $A^K$. For every $\xi \in V$, $\widehat{\psi'_0}(\xi) = \widehat{\Phi'}(\xi)$,
 \[
@@ -1339,8 +1419,7 @@ with bounds $A^K$. For every $\xi \in V$, $\widehat{\psi'_0}(\xi) = \widehat{\Ph
   \sum_{j \leq J} \widehat{\psi'_j}(\xi) = \widehat{\Phi'}(2^{-J} \xi)
 \]
 for all $j, J \in \N$. If $\widehat{\psi'_j}(\xi) \neq 0$, then $\|\xi\| < 2^j b$, and if
-$\widehat{\psi'_{j+1}}(\xi) \neq 0$, then $2^j a < \|\xi\|$. For the standard kernel the blocks
-are the blocks $\psi_j$ of \Cref{def:lp-kernels} and $\Delta'_j = \Delta_j$.
+$\widehat{\psi'_{j+1}}(\xi) \neq 0$, then $2^j a < \|\xi\|$.
 \end{lemma}
 
 \begin{proof}
@@ -1348,8 +1427,7 @@ are the blocks $\psi_j$ of \Cref{def:lp-kernels} and $\Delta'_j = \Delta_j$.
 $\widehat{G_c}(\xi) = \widehat G(c^{-1} \xi)$ for $c > 0$ (\Cref{lem:fourier-dilate}), and the
 bases take only two values. The sum telescopes. If $\|\xi\| \geq 2^j b$, both terms of
 $\widehat{\psi'_j}(\xi)$ vanish; if $\|\xi\| \leq 2^j a$, both terms of
-$\widehat{\psi'_{j+1}}(\xi)$ are $1$. For the standard kernel the bases are those of
-\Cref{def:psi-base}.
+$\widehat{\psi'_{j+1}}(\xi)$ are $1$.
 \end{proof}
 
 \begin{lemma}[The finite identity]
@@ -1387,54 +1465,6 @@ fourierMultiplierCLM\_\allowbreak apply} and \texttt{fourierMultiplierCLM\_\allo
 The last claim follows with \Cref{lem:conv-fourier-multiplier}.
 \end{proof}
 
-\begin{definition}[The quasi-norms of an admissible kernel]
-\label{def:lp-kernel-tl-norm}
-\lean{Rd.LPKernel.triebelLizorkinNormDistr, Rd.LPKernel.triebelLizorkinNorm}
-\leanok
-\uses{def:lp-kernel-admissible, def:tl-distr}
-Let $K$ be an admissible kernel, $1 \leq p \leq \infty$, $s \in \R$ and $1 \leq q \leq \infty$.
-For a tempered distribution $u$, $\|u\|_{F^s_{p,q}, K}$ is the quasi-norm of \Cref{def:tl-distr}
-with the blocks $\Delta'_j$ of $K$, and for $f \in L_p(V)$,
-\[
-  \|f\|_{F^s_{p,q}, K} = \Bigl\| x \mapsto \bigl\| (2^{js} |(\psi'_j * f)(x)|)_j
-  \bigr\|_{\ell_q} \Bigr\|_{L_p} .
-\]
-\end{definition}
-
-\begin{lemma}[The quasi-norms of an admissible kernel]
-\label{lem:lp-kernel-tl-norm-basic}
-\lean{Rd.LPKernel.triebelLizorkinNormDistr_le, Rd.LPKernel.triebelLizorkinNormDistr_eq,
-  Rd.LPKernel.le_mul_triebelLizorkinNormDistr,
-  Rd.LPKernel.triebelLizorkinNormDistr_toTemperedDistribution,
-  Rd.LPKernel.standard_triebelLizorkinNormDistr, Rd.LPKernel.standard_triebelLizorkinNorm}
-\leanok
-\uses{def:lp-kernel-tl-norm, lem:tl-distr-eq, thm:tl-distr-lp, lem:lp-kernel-blocks,
-  lem:conv-fourier-multiplier, def:triebel-lizorkin}
-Let $K$ be an admissible kernel, $1 \leq p \leq \infty$, $s \in \R$ and $1 \leq q \leq \infty$.
-\begin{enumerate}
-  \item For every tempered distribution $u$ and every family $(g_j)$ in $L_p(V)$ with
-    $\Delta'_j u = g_j$ for every $j$,
-    $\|u\|_{F^s_{p,q}, K} = \| x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_q} \|_{L_p}$.
-  \item For every tempered distribution $u$, every $X \in [0, \infty]$ and every
-    $C \in (0, \infty]$ such that $X \leq C \| x \mapsto \| (2^{js} |g_j(x)|)_j \|_{\ell_q}
-    \|_{L_p}$ for every family $(g_j)$ in $L_p(V)$ with $\Delta'_j u = g_j$ for every $j$,
-    $X \leq C \|u\|_{F^s_{p,q}, K}$.
-  \item If $p < \infty$, then for every $f \in L_p(V)$ the quasi-norm of the tempered
-    distribution of $f$ is $\|f\|_{F^s_{p,q}, K}$.
-  \item For the standard kernel $K$, every tempered distribution $u$ and every $f \in L_p(V)$,
-    $\|u\|_{F^s_{p,q}, K} = \|u\|_{F^s_{p,q}}$ and $\|f\|_{F^s_{p,q}, K} = \|f\|_{F^s_{p,q}}$.
-\end{enumerate}
-\end{lemma}
-
-\begin{proof}
-\leanok
-(1)--(3) The proofs of \Cref{lem:tl-distr-eq} and \Cref{thm:tl-distr-lp} apply to $\Delta'_j$,
-with \Cref{lem:conv-fourier-multiplier} for the blocks of $f \in L_p(V)$. (4) For the standard
-kernel the blocks are the blocks $\psi_j$ of \Cref{def:lp-kernels} and $\Delta'_j = \Delta_j$
-(\Cref{lem:lp-kernel-blocks}), so both quasi-norms are the expressions of \Cref{def:tl-distr}
-and \Cref{def:triebel-lizorkin}.
-\end{proof}
-
 \begin{lemma}[The pointwise bound]
 \label{lem:lp-kernel-pointwise}
 \lean{Rd.LPKernel.dyadicWeight_mul_enorm_sum_conv_le, Rd.LPKernel.comparisonConst,
@@ -1468,7 +1498,7 @@ $2^{js} \leq 2^{c|s|} 2^{ks}$ (\Cref{lem:window-sums}), and $2^{ks} M|g_k| = M(2
 \lean{Rd.LPKernel.triebelLizorkinNormDistr_le_of_blocks,
   Rd.LPKernel.triebelLizorkinNormDistr_le_mul}
 \leanok
-\uses{lem:lp-kernel-finite-identity, lem:lp-kernel-tl-norm-basic, lem:lp-kernel-pointwise,
+\uses{lem:lp-kernel-finite-identity, lem:tl-distr-eq, lem:lp-kernel-pointwise,
   lem:window-sums, lem:maximal-bounds-mixed-norm, thm:fefferman-stein, lem:conv-fourier-multiplier}
 Let $K$, $K'$ be admissible kernels with $a, b$ and $a', b'$, $1 < p < \infty$,
 $1 < q \leq \infty$, $s$ real, $N > n$ and $c \in \N$ with $b \leq 2^c a'$ and $b' \leq 2^c a$, and
@@ -1498,8 +1528,7 @@ and \Cref{lem:window-sums} give
   \leq C_{K,N,c,s} \, \bigl\| \bigl(M(2^{ks} |g_k|)(x)\bigr)_k \bigr\|_{\ell_q} ,
 \]
 and \Cref{lem:maximal-bounds-mixed-norm} gives the bound. (2) follows from (1) by
-\Cref{lem:lp-kernel-tl-norm-basic} (2), also when the blocks of $u$ for $K'$ are no $L_p$
-functions.
+\Cref{lem:tl-distr-eq}, also when the blocks of $u$ for $K'$ are no $L_p$ functions.
 \end{proof}
 
 \begin{theorem}[Independence of the Littlewood--Paley family]

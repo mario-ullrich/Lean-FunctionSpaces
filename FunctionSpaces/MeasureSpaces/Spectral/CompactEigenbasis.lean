@@ -35,9 +35,6 @@ The construction follows the proof of
 `Analysis/InnerProductSpace/HilbertBasis/Basic.lean`) is copied with its name; TauCeti's theorem
 `ContinuousLinearMap.exists_hilbertBasis_forall_hasEigenvector_ne_zero` (`Spectrum.lean`) is
 restated with its name and proved as a corollary.  Both at commit `463ab293`, Apache-2.0.
-
-A norm identity `‖x‖² = ‖T x‖² + c ∑_i ‖S_i x‖²` for linear maps `T`, `S_i` polarizes to the
-inner products (`inner_eq_of_forall_sq_norm_eq`).
 -/
 
 @[expose] public section
@@ -58,28 +55,6 @@ theorem HilbertBasis.inner_eq_zero_of_forall_inner_eq_zero {K : Submodule 𝕜 E
     simpa only [ContinuousLinearMap.comp_apply, Submodule.coe_subtypeL, Submodule.subtype_apply,
       innerSL_apply_apply, map_smul, hx, smul_zero] using hsum
   exact hzero.unique hasSum_zero
-
-/-- **Polarization of a norm identity**: let `T : E → F` and `S_i : E → G` (`i` in a finite
-index set) be linear maps between inner product spaces over `𝕜 = ℝ` or `ℂ`, and `c` real with
-`‖x‖² = ‖T x‖² + c ∑_i ‖S_i x‖²` for every `x`. Then
-`⟨x, y⟩ = ⟨T x, T y⟩ + c ∑_i ⟨S_i x, S_i y⟩` for all `x, y`, as both sides are given by the
-polarization identity (Mathlib's `inner_eq_sum_norm_sq_div_four`). -/
-theorem inner_eq_of_forall_sq_norm_eq {F G ι : Type*} [Fintype ι]
-    [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
-    [NormedAddCommGroup G] [InnerProductSpace 𝕜 G] (T : E →ₗ[𝕜] F) (S : ι → E →ₗ[𝕜] G) (c : ℝ)
-    (h : ∀ x, ‖x‖ ^ 2 = ‖T x‖ ^ 2 + c * ∑ i, ‖S i x‖ ^ 2) (x y : E) :
-    ⟪x, y⟫_𝕜 = ⟪T x, T y⟫_𝕜 + (c : 𝕜) * ∑ i, ⟪S i x, S i y⟫_𝕜 := by
-  have key : ∀ z, (‖z‖ : 𝕜) ^ 2 = (‖T z‖ : 𝕜) ^ 2 + (c : 𝕜) * ∑ i, (‖S i z‖ : 𝕜) ^ 2 :=
-    fun z => by
-      have hz := congrArg (fun r : ℝ => (r : 𝕜)) (h z)
-      push_cast at hz
-      exact hz
-  rw [inner_eq_sum_norm_sq_div_four x y, inner_eq_sum_norm_sq_div_four (T x) (T y)]
-  simp only [inner_eq_sum_norm_sq_div_four (S _ x) (S _ y)]
-  rw [key, key, key, key]
-  simp only [map_add, map_sub, map_smul, ← Finset.sum_div, Finset.sum_add_distrib,
-    Finset.sum_sub_distrib, ← Finset.sum_mul]
-  ring
 
 namespace ContinuousLinearMap
 

@@ -335,8 +335,8 @@ project, with the decisions behind their form.
   symbol `m` of order `0` there is `C < ∞` such that `m(D) f` is a function `g ∈ L_p(V)` with
   `‖g‖_p ≤ C ‖f‖_p` for every `f ∈ L_p(V)` (`Rd.exists_fourierMultiplier_eq_of_hasSymbolGrowth`;
   the bounded operator `Rd.symbolLp`), a case of Mihlin's theorem, which TauCeti proves for
-  Mihlin's condition with finitely many derivatives. In every dimension a symbol of order `σ` maps
-  `H^{s,p}(V)` into `H^{s-σ,p}(V)` for every real `s`
+  symbols satisfying Mihlin's condition with finitely many derivatives. In every dimension a
+  symbol of order `σ` maps `H^{s,p}(V)` into `H^{s-σ,p}(V)` for every real `s`
   (`TemperedDistribution.MemSobolev.fourierMultiplierCLM_of_hasSymbolGrowth`); hence
   `H^{s,p} ⊆ H^{s',p}` for `s' ≤ s` (`TemperedDistribution.MemSobolev.mono_of_one_lt`),
   `L_p ⊆ H^{s,p}` for `s ≤ 0` (`Rd.memSobolev_bessel_of_nonpos`), `∂_v` maps `H^{s,p}` into

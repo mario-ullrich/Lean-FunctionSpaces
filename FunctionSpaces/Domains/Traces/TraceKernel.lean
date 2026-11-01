@@ -37,7 +37,9 @@ closure of their restrictions in `H^1(Ω)`.
   (`Rd.BoundedLipschitzDomain.memSobolev_indicatorLp_iff_mem_traceKer`), iff the zero extension
   lies in `H̃^1(Ω)`, iff `u ∈ H^1_0(Ω)`.
 * **The quotient and the duals**: `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)` isometrically
-  (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace`), `H̃^1(Ω) ≅ ker γ`
+  (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace`); its content is
+  `ker γ = H^1_0(Ω)`, and the isometry holds by the definition of `H^{1/2}(Γ)` as the orthogonal
+  complement of `ker γ`. Further `H̃^1(Ω) ≅ ker γ`
   (`Rd.BoundedLipschitzDomain.tildeEquivTraceKer`) and `(ker γ)^* ≅ H^{-1}(Ω)`
   (`Rd.BoundedLipschitzDomain.dualTraceKerEquiv`).
 -/
@@ -389,8 +391,11 @@ theorem traceKer_eq_zeroBoundarySpace : Ω.traceKer = zeroBoundarySpace 1 Ω.toO
 with the quotient norm, is isometrically isomorphic to the trace space, the orthogonal complement
 of `ker γ = H^1_0(Ω)` (Mathlib's `Submodule.quotientEquivOrthogonal`,
 `Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`); the class of `u` corresponds to `γ u`
-(`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace_mk`). This is the trace space of
-Hiptmair, Pauly and Schulz for `k = 0`, the classical `H^{1/2}(Γ)`. -/
+(`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace_mk`). The content is
+`ker γ = H^1_0(Ω)`; the isometry holds by the definition of the trace space as the orthogonal
+complement of `ker γ`. This is the trace space of Hiptmair, Pauly and Schulz for `k = 0`; its norm
+is equivalent to the Sobolev–Slobodeckij norm of the classical `H^{1/2}(Γ)`
+(`Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij`). -/
 noncomputable def quotientZeroBoundaryEquivTraceSpace :
     (Ω.SobolevOne ⧸ zeroBoundarySpace 1 Ω.toOpens) ≃ₗᵢ[ℂ] Ω.TraceSpace :=
   (Submodule.quotientEquivOrthogonal (zeroBoundarySpace 1 Ω.toOpens)).trans

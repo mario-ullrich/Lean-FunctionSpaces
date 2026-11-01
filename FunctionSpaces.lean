@@ -390,8 +390,7 @@ manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet example
 * `FunctionSpaces.MeasureSpaces.Spectral.Blocks`: spectral schemes as projection schemes, the
   coefficient characterisation of their approximation spaces and `H^s = A^s_2`.
 * `FunctionSpaces.MeasureSpaces.Spectral.CompactEigenbasis`: the Hilbert basis of eigenvectors of a
-  compact self-adjoint operator, indexed by eigenvalues and bases of the eigenspaces, and the
-  polarization of a norm identity.
+  compact self-adjoint operator, indexed by eigenvalues and bases of the eigenspaces.
 * `FunctionSpaces.MeasureSpaces.Spectral.CompactEmbedding`: compact dense embeddings of Hilbert
   spaces, their eigenvector and singular bases, the spectral scheme with level `⌊σ⁻¹⌋₊`, Jackson
   and Bernstein inequalities, the interpolation spaces `(H, J(V))_{θ,q} = A^θ_q` and `A^s_2` by
@@ -505,11 +504,14 @@ manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet example
   `∑_{j < J} ψ̃_j ⋆ (ψ_j ⋆ f) → f` in `L_p` with the synthesis kernels `ψ̃_j`.
 * `FunctionSpaces.Rd.TriebelLizorkin.TriebelLizorkinDistributions`: convolutions with Schwartz
   kernels as Fourier multipliers on `L_r`, the Littlewood–Paley blocks of tempered distributions
-  and their convergence in `𝓢'`, and the Triebel–Lizorkin quasi-norm of tempered distributions for
-  every real `s`, equal to that of `L_p` on `L_p`.
-* `FunctionSpaces.Rd.TriebelLizorkin.LittlewoodPaleyFamilies`: admissible Littlewood–Paley
-  kernels, the finite Fourier-side identity between the blocks of two kernels, and the
-  equivalence of their Triebel–Lizorkin quasi-norms on tempered distributions and on `L_p`.
+  and their convergence in `𝓢'`, admissible Littlewood–Paley kernels with their blocks, and the
+  Triebel–Lizorkin quasi-norm of tempered distributions for every admissible kernel and every real
+  `s`; for `p < ∞` its value at `f ∈ L_p` is the quasi-norm with the convolutions `ψ'_j ⋆ f`, for
+  the standard kernel the Triebel–Lizorkin quasi-norm of `f`.
+* `FunctionSpaces.Rd.TriebelLizorkin.LittlewoodPaleyFamilies`: the Fourier supports of the
+  blocks of admissible Littlewood–Paley kernels, the finite Fourier-side identity between the
+  blocks of two kernels, and the equivalence of their Triebel–Lizorkin quasi-norms on tempered
+  distributions and on `L_p`.
 
 #### `Rd/SingularIntegrals`: vector-valued singular integrals
 
@@ -807,7 +809,8 @@ manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet example
 #### `Domains/Spectral`: eigenbases of the Laplacian
 
 * `FunctionSpaces.Domains.Spectral.DirichletEigenbasis`: the Dirichlet Laplacian on a bounded
-  open set: the inner product of `H^1(ℝ^d)` by the weak gradient, the compact dense embedding
+  open set: the polarization of a norm identity, the inner product of `H^1(ℝ^d)` by the weak
+  gradient, the compact dense embedding
   `H^1_0(Ω) → L_2(Ω)`, its spectral scheme as the Dirichlet eigenbasis with eigenvalues
   `λ_i = 4π²(σ_i⁻² - 1) ≥ 0`, the weak eigenvalue equation, `H^1_0(Ω)` as the Sobolev space of
   order `1` of the scheme, and `(L_2(Ω), H^1_0(Ω))_{θ,q}` as its approximation spaces.

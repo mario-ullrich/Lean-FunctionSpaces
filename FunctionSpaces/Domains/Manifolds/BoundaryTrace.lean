@@ -28,7 +28,7 @@ pieces are the traces of the pieces of `f` (`Manifold.BesovAtlas.boundaryPiece_b
 for the boundary pieces of every atlas (`Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_atlas`).
 Hence:
 
-* **the trace is bounded**: `Tr_A f ∈ B^s_{p,q}(∂M)`
+* **the trace maps into `B^s_{p,q}(∂M)`**: `Tr_A f ∈ B^s_{p,q}(∂M)`
   (`Manifold.BesovAtlas.memBoundaryBesov_boundaryTrace`);
 * **the trace is onto**: every `g ∈ B^s_{p,q}(∂M)` is the trace of `f = ∑_k θ_k · (E G_k) ∘ κ_k`,
   with the extensions `E G_k` of the boundary pieces of `g`
@@ -371,9 +371,9 @@ theorem boundaryPiece_boundaryTrace_of_atlas (A' : BesovAtlas (𝓡∂ n) M) {L 
   rw [h1, A.boundaryPiece_eq_sum A' i _ x']
   exact Finset.sum_congr rfl fun j _ => (h2 j).symm
 
-/-- **The trace is bounded**: for `s > 0`, `L > s + 1/p` and `f ∈ B^{s+1/p}_{p,q}(M)`, the trace
-`Tr_A f` lies in `B^s_{p,q}(∂M)`: its boundary pieces are the traces of the pieces of `f`, which lie
-in `B^s_{p,q}(H₀)` by the trace theorem of the half-space
+/-- **The trace maps into the boundary space**: for `s > 0`, `1 ≤ q ≤ ∞`, `L > s + 1/p` and
+`f ∈ B^{s+1/p}_{p,q}(M)`, the trace `Tr_A f` lies in `B^s_{p,q}(∂M)`: its boundary pieces are the
+traces of the pieces of `f`, which lie in `B^s_{p,q}(H₀)` by the trace theorem of the half-space
 (`Rd.LipschitzGraph.modNorm_trace_le_flat`). -/
 theorem memBoundaryBesov_boundaryTrace {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
     (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p μ}

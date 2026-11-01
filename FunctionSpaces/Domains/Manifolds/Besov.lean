@@ -412,7 +412,8 @@ end BesovAtlas
 variable (I μ) [T2Space M] [IsManifold I ∞ M]
 
 /-- The **Besov space** `B^s_{p,q}(M)` of a compact manifold with a smooth measure: `f ∈ L_p(μ)`
-with a finite Besov quasi-norm for some (equivalently, every) Besov atlas. -/
+with a finite Besov quasi-norm for a chosen Besov atlas. For `s > 0` and `1 ≤ q ≤ ∞` every Besov
+atlas gives the same space (`Manifold.memBesov_iff`). -/
 def MemBesov (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p μ) : Prop :=
   (Classical.choice (BesovAtlas.nonempty I M)).MemBesov hp s q f
 

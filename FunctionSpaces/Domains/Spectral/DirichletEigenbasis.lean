@@ -16,6 +16,9 @@ and `Ω ⊆ V` a bounded open set. The embedding `H^1_0(Ω) ↪ L_2(Ω)` is a co
 of Hilbert spaces, so its spectral scheme is a Hilbert basis of `L_2(Ω)` of eigenfunctions of the
 Dirichlet Laplacian, in weak form.
 
+* **Polarization**: a norm identity `‖x‖² = ‖T x‖² + c ∑_i ‖S_i x‖²` for linear maps `T`, `S_i`
+  between inner product spaces gives the same identity for the inner products
+  (`inner_eq_of_forall_sq_norm_eq`).
 * **The inner product of `H^1(V)`** is
   `⟨U, W⟩ = ⟨ι U, ι W⟩_2 + (2π)⁻² ∑_k ⟨∂_{b_k} ι U, ∂_{b_k} ι W⟩_2` for every orthonormal basis
   `(b_k)` of `V`, by polarization of the norm identity (`inner_eq_of_forall_sq_norm_eq`,
@@ -42,6 +45,36 @@ Dirichlet Laplacian, in weak form.
 
 open MeasureTheory Filter Topology TopologicalSpace
 open scoped ENNReal Real InnerProductSpace BesselPotentialSpace Distributions
+
+/-! ### Polarization of a norm identity -/
+
+section Polarization
+
+variable {𝕜 E : Type*} [RCLike 𝕜] [NormedAddCommGroup E] [InnerProductSpace 𝕜 E]
+
+/-- **Polarization of a norm identity**: let `T : E → F` and `S_i : E → G` (`i` in a finite
+index set) be linear maps between inner product spaces over `𝕜 = ℝ` or `ℂ`, and `c` real with
+`‖x‖² = ‖T x‖² + c ∑_i ‖S_i x‖²` for every `x`. Then
+`⟨x, y⟩ = ⟨T x, T y⟩ + c ∑_i ⟨S_i x, S_i y⟩` for all `x, y`, as both sides are given by the
+polarization identity (Mathlib's `inner_eq_sum_norm_sq_div_four`). -/
+theorem inner_eq_of_forall_sq_norm_eq {F G ι : Type*} [Fintype ι]
+    [NormedAddCommGroup F] [InnerProductSpace 𝕜 F]
+    [NormedAddCommGroup G] [InnerProductSpace 𝕜 G] (T : E →ₗ[𝕜] F) (S : ι → E →ₗ[𝕜] G) (c : ℝ)
+    (h : ∀ x, ‖x‖ ^ 2 = ‖T x‖ ^ 2 + c * ∑ i, ‖S i x‖ ^ 2) (x y : E) :
+    ⟪x, y⟫_𝕜 = ⟪T x, T y⟫_𝕜 + (c : 𝕜) * ∑ i, ⟪S i x, S i y⟫_𝕜 := by
+  have key : ∀ z, (‖z‖ : 𝕜) ^ 2 = (‖T z‖ : 𝕜) ^ 2 + (c : 𝕜) * ∑ i, (‖S i z‖ : 𝕜) ^ 2 :=
+    fun z => by
+      have hz := congrArg (fun r : ℝ => (r : 𝕜)) (h z)
+      push_cast at hz
+      exact hz
+  rw [inner_eq_sum_norm_sq_div_four x y, inner_eq_sum_norm_sq_div_four (T x) (T y)]
+  simp only [inner_eq_sum_norm_sq_div_four (S _ x) (S _ y)]
+  rw [key, key, key, key]
+  simp only [map_add, map_sub, map_smul, ← Finset.sum_div, Finset.sum_add_distrib,
+    Finset.sum_sub_distrib, ← Finset.sum_mul]
+  ring
+
+end Polarization
 
 namespace Rd
 

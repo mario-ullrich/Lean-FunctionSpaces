@@ -15,7 +15,7 @@ Hörmander's class `S^0_{1,0}`) is a bounded Fourier multiplier on `L_p(V)`: for
 the tempered distribution `m(D) f` is an `L_p` function `g` with `‖g‖_p ≤ C ‖f‖_p`, with an
 existential constant (`Rd.exists_fourierMultiplier_eq_of_hasSymbolGrowth`). The symbols of order
 `0` satisfy Mihlin's condition, so this is a case of Mihlin's theorem; TauCeti proves the theorem
-for Mihlin's condition with finitely many derivatives
+for symbols satisfying Mihlin's condition with finitely many derivatives
 (`TauCeti.exists_fourierMultiplierCLM_eq_and_norm_le_of_norm_iteratedFDeriv_le`).
 
 The proof uses `L_p = F^0_{p,2}`: `f` lies in `F^0_{p,2}` by the square function theorem, `m(D)`

@@ -14,9 +14,13 @@ Nikolskii inequality for the scheme. Spectral schemes in a Hilbert space give th
 `J : V → H` of Hilbert spaces gives such a scheme, from the eigenvectors of `J J†`
 (`CompactDenseEmbedding.spectralScheme`). Orthonormal bases of continuous functions with
 levels (continuous spectral bases), modelled on the eigenfunctions of the
-Laplacian on a compact manifold, enter as a hypothesis. The torus is the first instance
-([The torus](Torus.md)). A filtration gives a projection scheme, whose approximation spaces are
-described by martingale differences. The `L_p` tools are in [Tools from analysis](Analysis.md).
+Laplacian on a compact manifold, enter as a hypothesis. The torus is the concrete instance of
+the Nikolskii theory and of continuous spectral bases ([The torus](Torus.md)): its trigonometric
+polynomials are the scheme with a Nikolskii inequality, and its Fourier basis is the continuous
+spectral basis. The compact dense embeddings have the Dirichlet, Neumann and chart-form
+eigenbases as instances ([Domains, traces and manifolds](DomainsTraces.md)). A filtration
+gives a projection scheme, whose approximation spaces are described by martingale differences.
+The `L_p` tools are in [Tools from analysis](Analysis.md).
 
 ## Main results
 
@@ -99,7 +103,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Sobolev spaces as a hypothesis structure, Sobolev embeddings | ✅ | ✗ | `MeasureSpaces/Sobolev/Embeddings` |
 | Spectral schemes and `L_2` Sobolev spaces, Jackson and Bernstein | ✅ | ✗ | `MeasureSpaces/Spectral/Basic` |
 | Coefficient characterisations of spectral schemes, `H^s = B^s_{2,2}` | ✅ | ✗ | `MeasureSpaces/Spectral/Blocks` |
-| Hilbert bases of eigenvectors of compact self-adjoint operators, and the polarization of a norm identity | ✅ | ✗ | `MeasureSpaces/Spectral/CompactEigenbasis` |
+| Hilbert bases of eigenvectors of compact self-adjoint operators | ✅ | ✗ | `MeasureSpaces/Spectral/CompactEigenbasis` |
 | Compact dense embeddings: singular basis, eigenvalues of `J J†` and the singular value `1`, spectral scheme, Jackson and Bernstein, `(H, J(V))_{θ,q} = A^θ_q`, `A^s_2` by the singular values | ✅ | ✗ | `MeasureSpaces/Spectral/CompactEmbedding` |
 | Continuous spectral bases (hypothesis), `B^s_{2,2} = H^s`, local Weyl bound, Nikolskii for `p ≤ 2`, continuity of `H^s` for `s > D/2` | ✅ | ✗ | `MeasureSpaces/Spectral/ContinuousSpectralBasis`, `MeasureSpaces/Spectral/LocalWeyl` |
 | Conditional expectations on `L_p`, filtration schemes (Haar), martingale-difference characterisation | ✅ | ✗ | `MeasureSpaces/Martingales/Filtration` |

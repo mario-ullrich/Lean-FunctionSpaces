@@ -2,7 +2,8 @@
 
 Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Domains,
 traces and manifolds*, chapters *Lipschitz domains*, *Traces on Lipschitz domains*, *Sobolev
-spaces on domains*, *Eigenbases of the Laplacian* and *Besov spaces on compact manifolds*.
+spaces on domains*, *Eigenbases of the Laplacian*, *Besov spaces on compact manifolds* and
+*Eigenfunction expansions on compact manifolds*.
 
 With `V` and the kernels of [Besov spaces on `ℝ^d`](Rd.md), the Besov spaces of a domain
 `Ω ⊆ V` are described by intrinsic differences on `Ω` and as restrictions of `B^s_{p,q}(V)`, for
@@ -51,10 +52,11 @@ boundary, and the zero extension of `u ∈ H^1(Ω)` lies in `W^1_2(ℝ^d)` iff t
 The kernel of the trace is `H^1_0(Ω)`: mollification converges in `H^1(ℝ^d)`, and mollifiers
 supported in the cone of a chart push the pieces of a function that vanishes outside `Ω` into `Ω`,
 so `H̃^1(Ω)` consists of the functions of `H^1(ℝ^d)` that vanish outside `Ω`; with the zero
-extension this gives `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)` and
-`(ker γ)^* ≅ H^{-1}(Ω)`. On a bounded open set the embedding `H^1_0(Ω) → L_2(Ω)` is compact with
-dense range, and its singular basis gives the eigenbasis of the Dirichlet Laplacian as a spectral
-scheme, with the weak eigenvalue equation; `H^1_0(Ω)` is the Sobolev space of order `1` of this
+extension this gives `ker γ = H^1_0(Ω)`, hence `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)` by the
+definition of `H^{1/2}(Γ)` as the orthogonal complement of `ker γ`, and `(ker γ)^* ≅ H^{-1}(Ω)`.
+On a bounded open set the embedding `H^1_0(Ω) → L_2(Ω)` is compact with dense range, and its
+singular basis gives the eigenbasis of the Dirichlet Laplacian as a spectral scheme, with the weak
+eigenvalue equation; `H^1_0(Ω)` is the Sobolev space of order `1` of this
 scheme, and the real interpolation spaces between `L_2(Ω)` and `H^1_0(Ω)` are its approximation
 spaces. On a bounded Lipschitz domain the same holds for `W^1_2(Ω)`, the graph of the weak
 gradient in `L_2(Ω) × L_2(Ω)^n`: Rellich's theorem through the extension theorem makes
@@ -62,12 +64,12 @@ gradient in `L_2(Ω) × L_2(Ω)^n`: Rellich's theorem through the extension theo
 with the eigenvalue `0` of the constants. There the Besov space `B^θ_{2,q}(Ω)`, `0 < θ < 1`, defined
 by intrinsic differences, is the approximation space of the Neumann eigenbasis; on a bounded open
 set the zero extension maps the approximation spaces of the Dirichlet eigenbasis into
-`B^θ_{2,q}(ℝ^d)`. On every compact manifold, without boundary, with boundary or with corners, the
-chart Sobolev space `H^1_A(M) = B^1_{2,2}(M)` embeds compactly and densely into `L_2(μ)`, and the
-eigenvector basis `e_i = J φ_i` of the embedding is an eigenbasis of the chart form whose
-approximation spaces are `B^θ_{2,q}(M)`, `0 < θ < 1`. The [interface document](FEECInterface.md)
-lists the results for `p = 2` for a FEEC/BEEC library built on this project, with the decisions
-behind their form.
+`B^θ_{2,q}(ℝ^d)`. On every compact manifold of positive dimension, without boundary, with
+boundary or with corners, the chart Sobolev space `H^1_A(M) = B^1_{2,2}(M)` embeds compactly
+and densely into `L_2(μ)`, and the eigenvector basis `e_i = J φ_i` of the embedding is an
+eigenbasis of the chart form whose approximation spaces are `B^θ_{2,q}(M)`, `0 < θ < 1`. The
+[interface document](FEECInterface.md) lists the results for `p = 2` for a FEEC/BEEC library
+built on this project, with the decisions behind their form.
 
 ## Main results
 
@@ -194,15 +196,15 @@ behind their form.
   corners, or `E`), `μ` a smooth measure (in every chart a continuous positive density with
   respect to the Lebesgue measure, `Manifold.IsSmoothMeasure`) and `1 ≤ p < ∞`. A Besov atlas
   consists of finitely many charts `κ_i`, a smooth partition of unity `ψ_i` subordinate to them and
-  cut-offs (`Manifold.BesovAtlas`); every compact manifold has one
+  cut-offs (`Manifold.BesovAtlas`); every compact Hausdorff manifold has one
   (`Manifold.BesovAtlas.nonempty`). Its chart measure
   `μ_A = ∑_i (κ_i⁻¹)_* (ψ_i ∘ κ_i⁻¹ · vol|_{T_i})`, with `T_i = κ_i(e_i.source)` the target of
   the extended chart (`Manifold.BesovAtlas.chartMeasure`), has the density
   `∑_i |det DΦ_i| ψ_i ∘ κ⁻¹` in every chart `κ`, `Φ_i = κ_i ∘ κ⁻¹`, so it is a finite smooth
-  measure (`Manifold.BesovAtlas.isSmoothMeasure_chartMeasure`), and every compact manifold, with or
-  without boundary, carries one (`Manifold.exists_isSmoothMeasure`), for example the sphere
-  (`Manifold.exists_isSmoothMeasure_sphere`). The Besov quasi-norm of a Besov atlas `A` is
-  `‖f‖_{A,r,s,q} = ∑_i N_Ω((ψ_i f) ∘ κ_i⁻¹)` with
+  measure (`Manifold.BesovAtlas.isSmoothMeasure_chartMeasure`), and every compact Hausdorff
+  manifold, with or without boundary, carries one (`Manifold.exists_isSmoothMeasure`), for
+  example the sphere (`Manifold.exists_isSmoothMeasure_sphere`). The Besov quasi-norm of a Besov
+  atlas `A` is `‖f‖_{A,r,s,q} = ∑_i N_Ω((ψ_i f) ∘ κ_i⁻¹)` with
   `N_Ω(G) = ‖G‖_{L_p(Ω)} + ‖(2^(ks) ω_r(G, 2^(-k), Ω)_p)_k‖_{ℓ_q}`, `Ω = range I`
   (`Manifold.BesovAtlas.besovNorm`). For two Besov atlases, `0 < s < r` and `1 ≤ q ≤ ∞` there is
   `C < ∞` with `‖f‖_{A,r,s,q} ≤ C ‖f‖_{A',r,s,q}` for all `f ∈ L_p(μ)`
@@ -246,7 +248,8 @@ behind their form.
   of `B^{s+1/p}_{p,q}(M)`: `g ∈ B^s_{p,q}(∂M)` iff the boundary pieces of `g` agree almost
   everywhere with those of `Tr_A f` for some `f ∈ B^{s+1/p}_{p,q}(M)`
   (`Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace`). For the closure of a smooth
-  bounded domain this is the trace theorem on its boundary for every `s > 0`.
+  bounded domain this is the trace theorem for the Besov spaces of its boundary defined by charts,
+  for every `s > 0`.
 * **Traces on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`,
   boundary balls `B_j` and graph domains `Ω_j` as above, and `(ψ_j)` a smooth resolution of unity on
   `Γ` with `tsupport ψ_j ⊆ B_j` (`Rd.BoundedLipschitzDomain.BoundaryPartition`). A property holds
@@ -599,7 +602,8 @@ behind their form.
   almost everywhere outside `Ω` (`Rd.BoundedLipschitzDomain.mem_tildeSpace_iff`). The map
   sending the class of `u` modulo `H^1_0(Ω)` to `γ u` is an isometric isomorphism
   `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`
-  (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace`), restriction is an isometric
+  (`Rd.BoundedLipschitzDomain.quotientZeroBoundaryEquivTraceSpace`), by `ker γ = H^1_0(Ω)` and the
+  definition of `H^{1/2}(Γ)` as the orthogonal complement of `ker γ`; restriction is an isometric
   isomorphism `H̃^1(Ω) ≅ ker γ` (`Rd.BoundedLipschitzDomain.tildeEquivTraceKer`), and every
   bounded functional `ℓ` on `ker γ` is `u ↦ [W, u]` for exactly one `W ∈ H^{-1}(Ω)` with
   `‖W‖ = ‖ℓ‖` (`Rd.BoundedLipschitzDomain.dualTraceKerEquiv`,
@@ -708,9 +712,9 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Traces in charts: locality, approximation, change of chart, products and their bound, finite sums | ✅ | ✗ | `Domains/Traces/GraphTraceCharts` |
 | Traces on bounded Lipschitz domains: Besov spaces on the boundary, the trace space | ✅ | ✗ | `Domains/Traces/LipschitzBoundaryTrace` |
 | Besov quasi-norms on the boundary: chart pieces, bounded trace and extension for `1 ≤ p < ∞`, independence of the resolution of unity | ✅ | ✗ | `Domains/Traces/BoundaryBesovNorm` |
-| Smooth measures on manifolds, measurability of extended charts on their sources, integrals and `L_p` norms in charts, null sets in charts | ✅ | ✗ | `Domains/Manifolds/SmoothMeasure` |
+| Smooth measures on manifolds (a continuous positive density in every chart), measurability of extended charts on their sources, integrals and `L_p` norms in charts, null sets in charts | ✅ | ✗ | `Domains/Manifolds/SmoothMeasure` |
 | Besov atlases, chart pieces, images and measurable sources of changes of charts, changes of charts with cut-offs, lifts from a chart and their `L_p` bound | ✅ | ✗ | `Domains/Manifolds/BesovAtlas` |
-| Smooth measures exist: the chart measure of a Besov atlas, its density in every chart by the Jacobian determinants of the changes of charts, continuity and positivity of the density, finiteness, every compact manifold with or without boundary carries a finite smooth measure, the sphere as an example without boundary | ✅ | ✗ | `Domains/Manifolds/SmoothMeasureExistence` |
+| Smooth measures exist: the chart measure of a Besov atlas, its density in every chart by the Jacobian determinants of the changes of charts, continuity and positivity of the density, finiteness, every compact Hausdorff manifold with or without boundary carries a finite smooth measure (a continuous positive density in every chart), the sphere as an example without boundary | ✅ | ✗ | `Domains/Manifolds/SmoothMeasureExistence` |
 | Besov spaces on compact manifolds, independence of the atlas and of the order, membership piece by piece, lifts from a chart | ✅ | ✗ | `Domains/Manifolds/Besov` |
 | Flattening of graph domains, the Lipschitz bounds of the flattening and its inverse, the graph in the image of the hyperplane, product and graph coordinates, preservation of the Lebesgue measure for every Lipschitz graph | ✅ | ✗ | `Domains/Lipschitz/GraphStraightening` |
 | Smooth bounded domains as compact manifolds with boundary, Lebesgue measure as smooth measure | ✅ | ✗ | `Domains/Manifolds/SmoothDomain` |
@@ -737,7 +741,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Gauss–Green on Lipschitz graph domains: Fubini in product coordinates, ray integrals, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and surface form, the product rule for line derivatives, and Green's formula `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)` | ✅ | ✗ | `Domains/Sobolev/LipschitzGraphGreen` |
 | Green's formula on bounded Lipschitz domains: integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary, the chart form for every resolution of unity, the outward unit normal as the chart normal and a unit vector almost everywhere on the boundary, `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, the traces from both sides of a graph, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u` vanishes | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainGreen` |
 | The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, smoothing with compact support, cone mollifiers, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)` | ✅ | ✗ | `Domains/Traces/TraceKernel` |
-| The Dirichlet Laplacian on bounded open sets: the inner product of `H^1(ℝ^d)` by the weak gradient, the compact dense embedding `H^1_0(Ω) → L_2(Ω)`, the Dirichlet eigenbasis as a spectral scheme with eigenvalues `λ_i ≥ 0`, the weak eigenvalue equation, `H^1_0(Ω)` as the Sobolev space of order `1` of the scheme, and `(L_2(Ω), H^1_0(Ω))_{θ,q} = A^θ_q` | ✅ | ✗ | `Domains/Spectral/DirichletEigenbasis` |
+| The Dirichlet Laplacian on bounded open sets: the polarization of a norm identity, the inner product of `H^1(ℝ^d)` by the weak gradient, the compact dense embedding `H^1_0(Ω) → L_2(Ω)`, the Dirichlet eigenbasis as a spectral scheme with eigenvalues `λ_i ≥ 0`, the weak eigenvalue equation, `H^1_0(Ω)` as the Sobolev space of order `1` of the scheme, and `(L_2(Ω), H^1_0(Ω))_{θ,q} = A^θ_q` | ✅ | ✗ | `Domains/Spectral/DirichletEigenbasis` |
 | The Neumann Laplacian on bounded Lipschitz domains: `W^1_2(Ω)` as the graph of the weak gradient in `L_2(Ω) × L_2(Ω)^n` and as jets, the dense embedding into `L_2(Ω)` through `H^1_0(Ω)`, Rellich's theorem with bounded `H^1(Ω)` representatives, the Neumann eigenbasis as a spectral scheme with eigenvalues `λ_i = σ_i⁻² - 1 ≥ 0`, among them `0`, the weak eigenvalue equation, `W^1_2(Ω)` as the Sobolev space of order `1` of the scheme, and `(L_2(Ω), W^1_2(Ω))_{θ,q} = A^θ_q` | ✅ | ✗ | `Domains/Spectral/NeumannEigenbasis` |
 | Besov spaces on domains by eigenfunction expansions: differences and moduli of `H^1(ℝ^d)` functions by the gradient, the intrinsic modulus by the K-functional of `(L_2(Ω), W^1_2(Ω))`, `B^θ_{2,q}(Ω)` for `0 < θ < 1` as the approximation space of the Neumann eigenbasis on bounded Lipschitz domains, in dyadic blocks and for `q = 2` by the eigenvalues, and the Dirichlet approximation spaces in `B^θ_{2,q}(ℝ^d)` by zero extension | ✅ | ✗ | `Domains/Spectral/SpectralBesov` |
 | The eigenbasis of the chart form on a compact manifold with or without boundary: the bounded convex piece of each chart, the jets of the pieces in its Neumann space, Rellich's theorem `J = ∑_k L_k E_k J^N_k T_k` compact, dense range by lifts of `H^1(E)` functions, the chart scheme with eigenvalues `λ_i = σ_i⁻² - 1 ≥ 0`, levels `⌊√(1 + λ_i)⌋₊` and finitely many eigenvalues below each bound, the weak eigenvalue equation `a_A(φ_i, w) = λ_i ⟨e_i, J w⟩` with the natural boundary condition, and `H^1(M) = B^1_{2,2}(M)` in the eigenbasis | ✅ | ✗ | `Domains/Spectral/ChartFormEigenbasis` |

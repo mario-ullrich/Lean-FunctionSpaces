@@ -140,7 +140,7 @@ declarations.
   (`Rd.eLpNorm_fwdDiff_schwartz_le`), from `(∫_0^1 φ)² ≤ ∫_0^1 φ²` (`Rd.sq_lintegral_Ioc_le`), and
   the difference `f ↦ f(· + v) - f` as a bounded operator on `L_2` (`Rd.fwdDiffL2`).
 * **Polarization of a norm identity**
-  (`FunctionSpaces/MeasureSpaces/Spectral/CompactEigenbasis.lean`):
+  (`FunctionSpaces/Domains/Spectral/DirichletEigenbasis.lean`):
   for linear maps `T`, `S_i` between inner product spaces over `ℝ` or `ℂ` and a real `c` with
   `‖x‖² = ‖T x‖² + c ∑_i ‖S_i x‖²`, the inner products satisfy
   `⟨x, y⟩ = ⟨T x, T y⟩ + c ∑_i ⟨S_i x, S_i y⟩` (`inner_eq_of_forall_sq_norm_eq`).

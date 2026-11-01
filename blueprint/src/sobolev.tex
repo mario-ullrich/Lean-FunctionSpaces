@@ -15,7 +15,7 @@ embeddings on the torus;
 $H^{s,p} = \TL{s}{p}{2}$ for tempered distributions, every real $s$ and $1 < p < \infty$, and
 Calder\'on's theorem $\Sob{m}{p} = H^{m,p}$;
 \Cref{ch:fourier-multipliers} treats the symbols of order $\sigma$, their Fourier multipliers
-on $\TL{s}{p}{q}$ and $H^{s,p}$, and Mihlin's multiplier theorem.
+on $\TL{s}{p}{q}$ and $H^{s,p}$, and Mihlin's multiplier theorem for symbols of order $0$.
 
 \chapter{Sobolev spaces on \texorpdfstring{$\R^d$}{R\^{}d}}
 \label{ch:sobolev-rd}
@@ -3230,8 +3230,10 @@ $f \in \Besov{m}{p}{\max(p,2)}$ by \Cref{cor:sobolev-besov-sandwich}.
 \end{proof}
 
 For $r < \infty$ the condition $m > n(1/p - 1/r)$ says $1/r > 1/p - m/n$. The critical case
-$1/r = 1/p - m/n$ with $m < n/p$, Sobolev's inequality
-$\|f\|_{r} \lesssim \|f\|_{\Sob{m}{p}}$, is \Cref{thm:critical-sobolev-embedding}.
+$1/r = 1/p - m/n$ with $m < n/p$, Sobolev's inequality in the inhomogeneous form
+$\|f\|_{r} \lesssim \|f\|_{\Sob{m}{p}}$, is \Cref{thm:critical-sobolev-embedding}; the homogeneous
+form for $m = 1$ is the Gagliardo--Nirenberg--Sobolev inequality
+(\Cref{sec:gagliardo-nirenberg-sobolev}).
 
 \section{The critical Sobolev embedding}
 \label{sec:critical-sobolev-embedding}
@@ -5964,10 +5966,10 @@ Fourier multiplier on Schwartz functions and on tempered distributions, as in th
 \Cref{lem:fourier-multiplier-fourier}. The derivative bounds for the powers of the Japanese bracket
 below are mirrored from TauCeti (\texttt{Analysis/\allowbreak SpecialFunctions/\allowbreak
 JapaneseBracket/\allowbreak Deriv.lean}, commit \texttt{b61a90d}, Apache-2.0), where they serve the
-same purpose. TauCeti also proves Mihlin's multiplier theorem on $L_p$ for homogeneous symbols with
-finitely many derivatives, through its own Calder\'on--Zygmund theory; the class $S^0_{1,0}$ lies in
-Mihlin's class. Write $\|G\|_{k,l} = \sup_x \|x\|^k \|D^l G(x)\|$ for the seminorms of a Schwartz
-function $G$.
+same purpose. TauCeti also proves Mihlin's multiplier theorem on $L_p$ for symbols satisfying
+Mihlin's condition with finitely many derivatives, through its own Calder\'on--Zygmund theory;
+the class $S^0_{1,0}$ lies in Mihlin's class. Write $\|G\|_{k,l} = \sup_x \|x\|^k \|D^l G(x)\|$
+for the seminorms of a Schwartz function $G$.
 
 \paragraph{Powers of the Japanese bracket.}
 
@@ -6407,7 +6409,8 @@ $\alpha$ is a bounded Fourier multiplier on $L_p(\R^n)$, $1 < p < \infty$; H\"or
 the condition~\cite[Theorem~2.5]{Hormander1960}, see also~\cite[Theorem~6.2.7]{Grafakos}. Symbols
 of order $0$ satisfy Mihlin's condition, so the theorem below is a case of Mihlin's theorem. Here
 it follows from $L_p = \TL{0}{p}{2}$ and the multiplier theorem on $\TL{0}{p}{2}$. TauCeti proves
-Mihlin's theorem for Mihlin's condition with finitely many derivatives and Hilbert-valued $L_p$
+Mihlin's theorem for symbols satisfying Mihlin's condition with finitely many derivatives and
+Hilbert-valued $L_p$
 (\texttt{Analysis/\allowbreak Fourier/\allowbreak MihlinHormander.lean}, commit
 \texttt{b61a90d}), through its own Calder\'on--Zygmund theory. In this section $n \geq 1$ and
 $1 < p < \infty$.

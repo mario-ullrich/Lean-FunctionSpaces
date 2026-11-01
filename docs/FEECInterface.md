@@ -328,7 +328,8 @@ The Hilbert spaces on an open set `Ω : Opens V`, built inside Mathlib's `H^{s}(
   (`Rd.mem_vanishOn_one_iff`). The restriction `Rd.restrictProj s Ω` is the orthogonal
   projection, of norm at most `1`, and
   `Rd.quotientEquivRestrictionSpace s Ω : (H^{s}(V) ⧸ vanishOn s Ω) ≃ₗᵢ[ℂ] RestrictionSpace s Ω`
-  makes it isometric to the quotient of CWHM, §3.1.4.
+  makes it isometric to the quotient of CWHM, §3.1.4, by the definition as an orthogonal
+  complement.
 * `Rd.restrictL2 Ω : RestrictionSpace 1 Ω →L[ℂ] Lp ℂ 2 (volume.restrict Ω)`, `u ↦ u|_Ω`, is
   injective (`Rd.restrictL2_injective`) with norm at most `1` (`Rd.norm_restrictL2_apply_le`).
 * I.6 for the restriction space, the compactness that Assumption F of Hiptmair, Pauly and
