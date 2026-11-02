@@ -303,8 +303,9 @@ project, with the decisions behind their form.
   `(J_s ψ̃_j) ⋆ g_j` with the blocks `g_j` of `u` (`Rd.distribBlock_besselPotential`), whose
   partial sums converge in `L_p` (`Rd.exists_tendsto_sum_convLp`) to `J_s u`
   (`Rd.eq_of_tendsto_sum_distribBlock`).
-* **Symbols of order `σ`.** A smooth `m` is a symbol of order `σ` (`Rd.HasSymbolGrowth σ m`,
-  Hörmander's class `S^σ_{1,0}`) if `‖D^k m(ξ)‖ ≤ C_k (1 + ‖ξ‖²)^{(σ - k)/2}` for every `k`.
+* **Symbols of order `σ`.** A smooth `m` is a symbol of order `σ` (`Rd.HasSymbolGrowth`,
+  written `Rd.HasSymbolGrowth σ m`; Hörmander's class `S^σ_{1,0}`) if
+  `‖D^k m(ξ)‖ ≤ C_k (1 + ‖ξ‖²)^{(σ - k)/2}` for every `k`.
   Schwartz functions are symbols of every order (`Rd.hasSymbolGrowth_schwartz`), and symbols
   have temperate growth (`Rd.HasSymbolGrowth.hasTemperateGrowth`), so they are Fourier
   multipliers of tempered distributions; orders add under products

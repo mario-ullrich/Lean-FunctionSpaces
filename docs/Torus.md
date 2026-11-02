@@ -62,16 +62,16 @@ the trace theorem.
   trace (`Torus.exists_trace_eq_restrictFace`). The approximants in this proof are the
   de la Vallée Poussin means `V_k f = Θ_{k+n+1} ⋆ f`, near-best both in `L_p` and in the sup
   norm.
-* **Sobolev spaces through weak derivatives.** Call `g ∈ L_2(𝕋^d)` the weak derivative
-  `∂^α f` of `f ∈ L_2(𝕋^d)` if `ĝ(k) = (2πi k)^α f̂(k)` for all `k ∈ ℤ^d`, and let
-  `W^m_2(𝕋^d)` consist of the `f` all of whose weak derivatives of order `|α| ≤ m` lie in
-  `L_2`. Then `f ∈ W^m_2(𝕋^d)` iff `∑_k (1 + max_i |k_i|)^(2m) |f̂(k)|² < ∞`
-  (`Torus.memSobolev_iff`), and for `m ≥ 1`, `W^m_2(𝕋^d) = B^m_{2,2}(𝕋^d)`
-  (`Torus.memSobolev_iff_memBesov`). In every `L_p(𝕋^d)`, `1 ≤ p ≤ ∞`, the same rule
-  `ĝ(m) = σ_v(m) f̂(m)` with `σ_v(m) = ∏_l 2πi ⟪m, v_l⟫` defines weak derivatives `∂^v` along
-  directions `v ∈ (ℝ^d)^k`, tested against trigonometric polynomials
-  (`Torus.HasWeakLineDeriv`). These are the distributional derivatives of the periodic lifts:
-  `g = ∂^v f` iff `g ∘ π = ∂^v (f ∘ π)` in Mathlib's `𝓓'(ℝ^d)` for the quotient map
+* **Sobolev spaces through weak derivatives.** For `1 ≤ p ≤ ∞` call `g ∈ L_p(𝕋^d)` the weak
+  derivative `∂^α f` of `f ∈ L_p(𝕋^d)` if `ĝ(k) = (2πi k)^α f̂(k)` for all `k ∈ ℤ^d`
+  (`Torus.HasWeakDeriv`), and let `W^m_p(𝕋^d)` consist of the `f` all of whose weak derivatives
+  of order `|α| ≤ m` lie in `L_p` (`Torus.MemSobolev`). Then `f ∈ W^m_2(𝕋^d)` iff
+  `∑_k (1 + max_i |k_i|)^(2m) |f̂(k)|² < ∞` (`Torus.memSobolev_iff`), and for `m ≥ 1`,
+  `W^m_2(𝕋^d) = B^m_{2,2}(𝕋^d)` (`Torus.memSobolev_iff_memBesov`). In every `L_p(𝕋^d)`,
+  `1 ≤ p ≤ ∞`, the same rule `ĝ(m) = σ_v(m) f̂(m)` with `σ_v(m) = ∏_l 2πi ⟪m, v_l⟫` defines
+  weak derivatives `∂^v` along directions `v ∈ (ℝ^d)^k`, tested against trigonometric
+  polynomials (`Torus.HasWeakLineDeriv`). These are the distributional derivatives of the
+  periodic lifts: `g = ∂^v f` iff `g ∘ π = ∂^v (f ∘ π)` in Mathlib's `𝓓'(ℝ^d)` for the quotient map
   `π : ℝ^d → 𝕋^d` (`Torus.hasWeakLineDeriv_iff_comp_proj`, `Torus.hasWeakDeriv_iff_comp_proj`,
   `Torus.memSobolev_iff_comp_proj`), through the pairing `h ↦ ∫ φ(x) h(π x) dx` with test
   functions (`Torus.periodicPairing`); classical derivatives of `C^1` lifts are weak derivatives
@@ -83,9 +83,9 @@ the trace theorem.
   directions of order `≤ m` (`Torus.memSobolev_iff_exists_hasWeakLineDeriv`). For `d ≥ 1` and
   `1 < p < ∞`, `W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)` for every `m ∈ ℕ`
   (`Torus.memSobolev_iff_memTriebelLizorkin`), with named constants in both directions
-  (`Torus.triebelLizorkinNorm_le_of_hasWeakLineDeriv`,
-  `Torus.exists_hasWeakLineDeriv_of_memTriebelLizorkin`): the vector-valued singular integrals on
-  the torus act on the derivative kernels of `ℝ^d`. Hence
+  (`Torus.triebelLizorkinNorm_le_of_hasWeakLineDeriv`, `Torus.sobolevToTLConst`,
+  `Torus.exists_hasWeakLineDeriv_of_memTriebelLizorkin`, `Torus.tlToSobolevConst`): the
+  vector-valued singular integrals on the torus act on the derivative kernels of `ℝ^d`. Hence
   `B^m_{p,min(p,2)}(𝕋^d) ⊆ W^m_p(𝕋^d) ⊆ B^m_{p,max(p,2)}(𝕋^d)` for `m ≥ 1`
   (`Torus.memSobolev_of_memBesov`, `Torus.memBesov_of_memSobolev`), `W^m_p(𝕋^d)` is described by
   local means (`Torus.memSobolev_iff_tlLocalMeans`), and with `α = d (1/p - 1/r)` every

@@ -226,7 +226,8 @@ built on this project, with the decisions behind their form.
   differences and as restrictions of `B^s_{p,q}(ℝ^n)` coincide. `Rd.SmoothDomain` carries its
   charts as data; its carriers are exactly the bounded open sets that agree near each boundary
   point with the region above the graph of a function smooth near the origin
-  (`Rd.IsBoundedSmoothDomain`, `Rd.isBoundedSmoothDomain_iff_exists`), and every open ball is one
+  (`Rd.IsBoundedSmoothDomain`, `Rd.isBoundedSmoothDomain_iff_exists`), each such set carries the
+  smooth domain `Rd.SmoothDomain.ofIsBoundedSmoothDomain`, and every open ball is such a set
   (`Rd.SmoothDomain.ball`, with its Besov spaces in `Rd.SmoothDomain.memBesov_ball_iff`).
 * **Besov spaces on the boundary of a compact manifold.** Let `M` be a compact smooth manifold
   with boundary modelled on the half-space `{y ∈ ℝ^n : y_0 ≥ 0}`. The changes of charts map the
@@ -426,6 +427,7 @@ built on this project, with the decisions behind their form.
   injective `τ : H^{1/2}(Γ) → L_2(Γ)` are bounded operators with `γ_{L_2} = τ ∘ γ`, given almost
   everywhere by the boundary trace, and the kernel of `γ_{L_2}` is the trace kernel
   (`Rd.BoundedLipschitzDomain.boundaryTraceL2`, `Rd.BoundedLipschitzDomain.traceL2`,
+  `Rd.BoundedLipschitzDomain.boundaryTraceL2_apply_ae`,
   `Rd.BoundedLipschitzDomain.traceL2_injective`, `Rd.BoundedLipschitzDomain.ker_boundaryTraceL2`);
   every `g ∈ B^{1/2}_{2,2}(Γ)` is `τ t` for some `t`, so `B^{1/2}_{2,2}(Γ) ⊆ L_2(Γ)`
   (`Rd.BoundedLipschitzDomain.exists_traceL2_ae_eq`,
@@ -672,7 +674,8 @@ built on this project, with the decisions behind their form.
   `J = ∑_k L_k E_k J^N_k T_k` through the Neumann embeddings `J^N_k` of the bounded convex pieces
   `D_k = O_I ∩ B(0, R_k + 1)` (`Manifold.BesovAtlas.chartSobolevEmbedding_eq_sum`), so `J` is
   compact (`Manifold.BesovAtlas.isCompactOperator_chartSobolevEmbedding`); its range is dense
-  (`Manifold.BesovAtlas.denseRange_chartSobolevEmbedding`). Its spectral scheme
+  (`Manifold.BesovAtlas.denseRange_chartSobolevEmbedding`), and for a Hausdorff `M` it is
+  `B^1_{2,2}(M)` (`Manifold.BesovAtlas.mem_range_chartSobolevEmbedding_iff`). Its spectral scheme
   (`Manifold.BesovAtlas.chartScheme`) is a Hilbert basis `(e_i)` of `L_2(μ)` with eigenvalues
   `λ_i = σ_i⁻² - 1 ≥ 0` (`Manifold.BesovAtlas.chartEigenvalue_nonneg`), finitely many below each
   bound, and eigenfunctions `φ_i ∈ H^1_A(M)`, `J φ_i = e_i`, with

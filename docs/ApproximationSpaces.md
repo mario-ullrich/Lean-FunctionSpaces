@@ -75,7 +75,8 @@ other blocks instantiate the theory.
   continuous K-norm `(∫_0^∞ (t^(-θ) K(t, f))^q dt/t)^(1/q)` (the essential supremum of
   `t^(-θ) K(t, f)` for `q = ∞`) are equivalent, with explicit
   constants (Bergh–Löfström, Lemma 3.1.3; `ApproximationScheme.kMethodNorm_le_interpNorm`,
-  `.interpNorm_le_kMethodNorm`, `.memInterp_iff_memKMethod`). Hence the grid does not matter
+  `ApproximationScheme.interpNorm_le_kMethodNorm`,
+  `ApproximationScheme.memInterp_iff_memKMethod`). Hence the grid does not matter
   (`ApproximationScheme.memInterp_iff_memInterp_of_pos`), and the representation theorem reads
   `A^s_q = (X, Y)_{s/r, q}` for the continuous K-method
   (`ApproximationScheme.memApprox_iff_memKMethod`).
