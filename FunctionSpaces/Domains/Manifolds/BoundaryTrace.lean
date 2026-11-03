@@ -113,7 +113,7 @@ theorem trace_chartChange_applyLp_of_continuous {L : ℕ} (hL : 1 ≤ L) {s : �
     (fun x _ hx => T.apply_eq_zero_of_notMem _ hx) (h1.mono fun x hx _ => hx)
   have htr2 : Ω.trace hp L G =ᵐ[volume] fun x' => g x' := by
     filter_upwards [Ω.trace_ae_eq_comp_graphMap hp hL hs hq
-      (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq hG).1 hgc hGg] with x' hx'
+      (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq hG).1 hgc hGg] with x' hx'
     rw [hx', Function.comp_apply, Rd.LipschitzGraph.flat_graphMap]
   refine Lp.ext ?_
   filter_upwards [htr1, T'.applyLp_ae convex_univ BesovAtlas.interior_univ_bdry_nonempty
@@ -228,7 +228,7 @@ end Commutation
 order `r` (`Rd.LipschitzGraph.graphExtension` of the flat graph) has a finite
 `B^{s+1/p}_{p,q}`-norm of order `L` and the trace `Tr (E G) = G`
 (`Rd.LipschitzGraph.trace_flatExtension`). -/
-theorem exists_flatExtension (hp : p ≠ ⊤) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s)
+theorem exists_flatGraphExtension (hp : p ≠ ⊤) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s)
     (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {G : Lp ℂ p (volume : Measure (bdry n))}
     (hG : ‖G‖ₑ + lqNorm q (fun k => dyadicWeight s k * Rd.lpModulus p (⌊s⌋₊ + 1) G k) < ⊤) :
@@ -397,7 +397,7 @@ theorem memBoundaryBesov_boundaryTrace {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 
 `g ∈ B^s_{p,q}(∂M)` is the trace of some `f ∈ B^{s+1/p}_{p,q}(M)`, in the sense that the boundary
 pieces of `Tr_A f` and of `g` agree almost everywhere. The function is
 `f = ∑_k θ_k · (E G_k) ∘ κ_k` with the extensions `E G_k` of the boundary pieces of `g`
-(`Manifold.exists_flatExtension`); its pieces are `piece_i f = ∑_k T_{ik} (E G_k)`, whose
+(`Manifold.exists_flatGraphExtension`); its pieces are `piece_i f = ∑_k T_{ik} (E G_k)`, whose
 traces are `∑_k T^∂_{ik} G_k`, the `i`-th boundary piece of `g`. -/
 theorem exists_boundaryTrace_eq {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s)
     (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {g : M → ℂ}
@@ -409,7 +409,7 @@ theorem exists_boundaryTrace_eq {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s)
   set Ω := flatDomain n
   set hΩm := Rd.BesovDomain.measurableSet (range (𝓡∂ n))
   choose G hGae hGfin using hg
-  choose F hFfin hFtr using fun k => exists_flatExtension hp hL hs hsL hq (hGfin k)
+  choose F hFfin hFtr using fun k => exists_flatGraphExtension hp hL hs hsL hq (hGfin k)
   set f := ∑ k, A.chartLiftLp μ hp k (F k)
   have hf : A.MemBesov hp (s + 1 / p.toReal) q f :=
     MemBesov.finsetSum hp A hq _ fun k _ => A.memBesov_chartLiftLp hp k hL1 hσ0 hsL hq (hFfin k)

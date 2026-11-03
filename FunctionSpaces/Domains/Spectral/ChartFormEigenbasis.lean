@@ -353,7 +353,7 @@ Sobolev space, `a_A(u, w) = ∑_{k,j} ∫_{O_I} conj (g_{kj}) g'_{kj}` (Mathlib'
 `MeasureTheory.L2.inner_def`, `RCLike.inner_apply'`). -/
 theorem chartForm_eq_sum_integral (u w : A.chartSobolev μ) :
     A.chartForm μ u w = ∑ ij, ∫ y in interior (range I),
-      conj ((u : A.ValueGradientL2 μ).snd ij y) * (w : A.ValueGradientL2 μ).snd ij y := by
+      conj ((u : A.chartValueGradientL2 μ).snd ij y) * (w : A.chartValueGradientL2 μ).snd ij y := by
   simp only [chartForm, MeasureTheory.L2.inner_def, RCLike.inner_apply']
 
 /-- **The weak eigenvalue equation in integrals**: for every index `i` and every
@@ -364,8 +364,8 @@ theorem chartForm_eq_sum_integral (u w : A.chartSobolev μ) :
 theorem chartForm_eigenfunction_integral (i : (A.chartCompactEmbedding μ).index)
     (w : A.chartSobolev μ) :
     ∑ ij, ∫ y in interior (range I),
-        conj ((A.chartEigenfunction μ i : A.ValueGradientL2 μ).snd ij y) *
-          (w : A.ValueGradientL2 μ).snd ij y =
+        conj ((A.chartEigenfunction μ i : A.chartValueGradientL2 μ).snd ij y) *
+          (w : A.chartValueGradientL2 μ).snd ij y =
       (A.chartEigenvalue μ i : ℂ) *
         ∫ x, conj ((A.chartScheme μ).basis i x) * A.chartSobolevEmbedding μ w x ∂μ := by
   rw [← chartForm_eq_sum_integral, chartForm_eigenfunction, MeasureTheory.L2.inner_def]

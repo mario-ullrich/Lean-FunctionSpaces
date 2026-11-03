@@ -56,9 +56,12 @@ variable {d : ℕ}
 
 /-! ### From slices to the cube -/
 
-/-- **From slices to the cube, on two regions, for all constants**: the statement of
-`Cube.eLpNorm_le_of_slice_le` for all `c, M ∈ [0, ∞]`. -/
-private theorem eLpNorm_le_of_slice_le_core {F G₁ D₁ G₂ D₂ : (Fin d → ℝ) → ℂ} (hF : Measurable F)
+/-- **From slices to the cube, on two regions**: if every slice of `F` in coordinate `i` satisfies
+`‖F_{x,i}‖_{L_p[0,1]} ≤ c ((‖(G₁)_{x,i}‖_{L_p[a₁,b₁]} + M ‖(D₁)_{x,i}‖_{L_p[a₁,b₁]}) + (‖(G₂)_{x,i}‖_{L_p[a₂,b₂]} + M ‖(D₂)_{x,i}‖_{L_p[a₂,b₂]}))`,
+then the same bound holds for the norms on the cube and on the regions `{x_i ∈ [a_ν, b_ν]}`: the
+norms are mixed norms of the slices (`Cube.eLpNorm_cubeVol_eq_slice`,
+`Cube.eLpNorm_regionVol_eq_slice`), and Minkowski's inequality in `L_p` over the point applies. -/
+theorem eLpNorm_le_of_slice_le {F G₁ D₁ G₂ D₂ : (Fin d → ℝ) → ℂ} (hF : Measurable F)
     (hG₁ : Measurable G₁) (hD₁ : Measurable D₁) (hG₂ : Measurable G₂) (hD₂ : Measurable D₂)
     {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d) {a₁ b₁ a₂ b₂ : ℝ} (ha₁ : 0 ≤ a₁)
     (hb₁ : b₁ ≤ 1) (ha₂ : 0 ≤ a₂) (hb₂ : b₂ ≤ 1) {c M : ℝ≥0∞}
@@ -93,38 +96,19 @@ private theorem eLpNorm_le_of_slice_le_core {F G₁ D₁ G₂ D₂ : (Fin d → 
   gcongr
   exact (eLpNorm_add_le hp).trans (add_le_add (eLpNorm_add_le hp) (eLpNorm_add_le hp))
 
-/-- **From slices to the cube, on two regions**: if every slice of `F` in coordinate `i` satisfies
-`‖F_{x,i}‖_{L_p[0,1]} ≤ c ((‖(G₁)_{x,i}‖_{L_p[a₁,b₁]} + M ‖(D₁)_{x,i}‖_{L_p[a₁,b₁]}) + (‖(G₂)_{x,i}‖_{L_p[a₂,b₂]} + M ‖(D₂)_{x,i}‖_{L_p[a₂,b₂]}))`,
-then the same bound holds for the norms on the cube and on the regions `{x_i ∈ [a_ν, b_ν]}`: the
-norms are mixed norms of the slices (`Cube.eLpNorm_cubeVol_eq_slice`,
-`Cube.eLpNorm_regionVol_eq_slice`), and Minkowski's inequality in `L_p` over the point applies. -/
-theorem eLpNorm_le_of_slice_le {F G₁ D₁ G₂ D₂ : (Fin d → ℝ) → ℂ} (hF : Measurable F)
-    (hG₁ : Measurable G₁) (hD₁ : Measurable D₁) (hG₂ : Measurable G₂) (hD₂ : Measurable D₂)
-    {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d) {a₁ b₁ a₂ b₂ : ℝ} (ha₁ : 0 ≤ a₁)
-    (hb₁ : b₁ ≤ 1) (ha₂ : 0 ≤ a₂) (hb₂ : b₂ ≤ 1) {c M : ℝ≥0∞} (_hc : c ≠ ∞) (_hM : M ≠ ∞)
-    (h : ∀ x, eLpNorm (slice F x i) p unitVol ≤
-      c * ((eLpNorm (slice G₁ x i) p (volume.restrict (Icc a₁ b₁)) +
-          M * eLpNorm (slice D₁ x i) p (volume.restrict (Icc a₁ b₁))) +
-        (eLpNorm (slice G₂ x i) p (volume.restrict (Icc a₂ b₂)) +
-          M * eLpNorm (slice D₂ x i) p (volume.restrict (Icc a₂ b₂))))) :
-    eLpNorm F p (cubeVol d) ≤
-      c * ((eLpNorm G₁ p (regionVol d i a₁ b₁) + M * eLpNorm D₁ p (regionVol d i a₁ b₁)) +
-        (eLpNorm G₂ p (regionVol d i a₂ b₂) + M * eLpNorm D₂ p (regionVol d i a₂ b₂))) :=
-  eLpNorm_le_of_slice_le_core hF hG₁ hD₁ hG₂ hD₂ hp hp' i ha₁ hb₁ ha₂ hb₂ h
-
 /-- **From one coordinate to all**: if `‖T u‖_{L_p[0,1]} ≤ C ‖u‖_{L_p[0,1]}` and
 `‖f - T^{(i)} f‖_{L_p(Q)} ≤ B ω_r^{(i)}(f, t)_p` in every coordinate, then
 `‖f - T^{(0)} ⋯ T^{(d-1)} f‖_{L_p(Q)} ≤ (1 + C)^d B ω_r(f, t)_p`, by telescoping
 (`Cube.KernelOp.eLpNorm_sub_foldSlicewise_le`). -/
 theorem KernelOp.eLpNorm_sub_foldSlicewise_le_of_coord {ι : Type*} [Fintype ι] (T : KernelOp ι)
-    {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) {C : ℝ≥0∞} (hC : C ≠ ∞)
+    {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) {C : ℝ≥0∞}
     (hT : ∀ u : ℝ → ℂ, Measurable u → eLpNorm (T.apply u) p unitVol ≤ C * eLpNorm u p unitVol)
     {f : (Fin d → ℝ) → ℂ} (hfb : BddMeas f) {r : ℕ} {B : ℝ≥0∞} {t : ℝ}
     (h : ∀ i, eLpNorm (fun x => f x - T.slicewise i f x) p (cubeVol d) ≤
       B * coordModulus r p i f t) :
     eLpNorm (fun x => f x - T.foldSlicewise (List.finRange d) f x) p (cubeVol d) ≤
       (1 + C) ^ d * B * cubeModulus r p f t := by
-  refine (T.eLpNorm_sub_foldSlicewise_le hp hp' hC hT (List.finRange d) hfb).trans ?_
+  refine (T.eLpNorm_sub_foldSlicewise_le hp hp' hT (List.finRange d) hfb).trans ?_
   rw [List.length_finRange, ← Fin.sum_univ_def]
   calc (1 + C) ^ d * ∑ i, eLpNorm (fun x => f x - T.slicewise i f x) p (cubeVol d)
       ≤ (1 + C) ^ d * ∑ i, B * coordModulus r p i f t :=
@@ -141,7 +125,7 @@ theorem eLpNorm_sub_cubeProj_le_of_coord {f : (Fin d → ℝ) → ℂ} (hfb : Bd
       B * coordModulus r p i f t) :
     eLpNorm (fun x => f x - cubeProj r k f x) p (cubeVol d) ≤
       (1 + ppProjConst r) ^ d * B * cubeModulus r p f t :=
-  (ppKernel r k).eLpNorm_sub_foldSlicewise_le_of_coord hp hp' (ppProjConst_ne_top r)
+  (ppKernel r k).eLpNorm_sub_foldSlicewise_le_of_coord hp hp'
     (fun _ hu => eLpNorm_ppKernel_apply_le hp hp' r k hu) hfb h
 
 /-- **Jackson's estimate in one coordinate from the smoothings**: let `f` be continuous, `r ≥ 1`,
@@ -178,7 +162,7 @@ theorem eLpNorm_sub_slicewise_le_of_smoothing {ι : Type*} [Fintype ι] (T : Ker
   have hfm := hf.measurable
   obtain ⟨G₁, D₁, hG₁, hD₁, h1L, h2L, hTL⟩ := exists_left_cubeSmoothing hf hr hp hp' i hL hwL
   obtain ⟨G₂, D₂, hG₂, hD₂, h1R, h2R, hTR⟩ := exists_right_cubeSmoothing hf hr hp hp' i hL hwL
-  refine (eLpNorm_le_of_slice_le_core (hfm.sub (T.measurable_slicewise hfm i)) (hfm.sub hG₁) hD₁
+  refine (eLpNorm_le_of_slice_le (hfm.sub (T.measurable_slicewise hfm i)) (hfm.sub hG₁) hD₁
     (hfm.sub hG₂) hD₂ hp hp' i (a₁ := 0) (b₁ := w) (a₂ := 1 - w) (b₂ := 1) le_rfl (by linarith)
     (by linarith) le_rfl (c := c) (M := M) fun x => ?_).trans ?_
   · exact (congrArg (eLpNorm · p unitVol) (slice_sub_slicewise T f i x)).trans_le

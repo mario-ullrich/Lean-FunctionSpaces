@@ -368,8 +368,8 @@ theorem tendsto_trace_partialSum (b : LocalMeansBump V) (hp : p ≠ ∞) {L : �
     (happ.eventually (gt_mem_nhds (zero_lt_one : (0 : ℝ≥0∞) < 1)))
   rw [← tendsto_add_atTop_iff_nat J₀]
   exact Ω.tendsto_trace_of_modNorm_sub_le hp L hs hq
-    (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq hF).2
-    (fun J => (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq
+    (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq hF).2
+    (fun J => (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq
       (b.modNorm_partialSum_lt_top hp L (J + J₀) (by positivity) hsL hq F)).2)
     (happ.comp (tendsto_add_atTop_nat J₀))
     (fun J => ((hJ₀ (J + J₀) (Nat.le_add_left J₀ J)).trans ENNReal.one_lt_top).ne)
@@ -395,7 +395,7 @@ theorem trace_ae_eq_trace_comp (Ω₁ Ω₂ : LipschitzGraph V) (hp : p ≠ ∞)
     fun J => b.modNorm_partialSum_lt_top hp L J (by positivity) hsL hq F
   have htr : ∀ (Ω' : LipschitzGraph V) J,
       Ω'.trace hp L (b.partialSum hp L J F) =ᵐ[volume] g J ∘ Ω'.graphMap := fun Ω' J =>
-    Ω'.trace_ae_eq_comp_graphMap hp hL hs hq (Ω'.intrinsicNorm_lt_top_of_modNorm' hp L hq
+    Ω'.trace_ae_eq_comp_graphMap hp hL hs hq (Ω'.intrinsicNorm_lt_top_of_modNorm hp L hq
       (hGfin J)).1 (b.continuous_partialSum_rep hp L J F) (b.partialSum_ae hp L J F)
   obtain ⟨ns, hns, h2⟩ := (tendstoInMeasure_of_tendsto_eLpNorm hp0
     ((Lp.tendsto_Lp_iff_tendsto_eLpNorm' _ _).1
@@ -455,7 +455,7 @@ theorem trace_mulLp_ae (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs :
   have hψfin : ∀ {H : Lp ℂ p (volume : Measure V)}, ‖H‖ₑ + lqNorm q (fun k =>
       dyadicWeight (s + 1 / p.toReal) k * lpModulus p L H k) < ∞ →
         Ω.intrinsicNorm hp L (s + 1 / p.toReal) q (mulLp hψ.continuous hψC H) < ∞ := fun hH =>
-    (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq (modNorm_mulLp_lt_top hp hψ hC hsL hq hH)).2
+    (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq (modNorm_mulLp_lt_top hp hψ hC hsL hq hH)).2
   -- convergence of the traces of the products, from some `J₀` on
   have happ := b.tendsto_modNorm_sub_partialSum hp hL hpinv0 (by linarith) hpL hq hF
   have hMb : Tendsto (fun J => M * (‖F - G J‖ₑ + lqNorm 1 (fun k =>
@@ -476,13 +476,13 @@ theorem trace_mulLp_ae (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs :
   -- the restrictions
   have htrψ : ∀ J, Ω.trace hp L (mulLp hψ.continuous hψC (G J)) =ᵐ[volume]
       (fun x => ψ x * g J x) ∘ Ω.graphMap := fun J =>
-    Ω.trace_ae_eq_comp_graphMap hp hL hs hq (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq
+    Ω.trace_ae_eq_comp_graphMap hp hL hs hq (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq
       (modNorm_mulLp_lt_top hp hψ hC hsL hq (hGfin J))).1
       (hψ.continuous.mul (b.continuous_partialSum_rep hp L J F))
       ((mulLp_apply_ae hψ.continuous hψC (G J)).trans
         ((b.partialSum_ae hp L J F).mono fun x hx => congrArg (ψ x * ·) hx))
   have htr : ∀ J, Ω.trace hp L (G J) =ᵐ[volume] g J ∘ Ω.graphMap := fun J =>
-    Ω.trace_ae_eq_comp_graphMap hp hL hs hq (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq
+    Ω.trace_ae_eq_comp_graphMap hp hL hs hq (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq
       (hGfin J)).1 (b.continuous_partialSum_rep hp L J F) (b.partialSum_ae hp L J F)
   -- subsequences converging almost everywhere
   obtain ⟨ns, hns, h1⟩ := (tendstoInMeasure_of_tendsto_eLpNorm hp0
@@ -522,7 +522,7 @@ theorem exists_modNorm_trace_mulLp_le (hp : p ≠ ∞) {L : ℕ} {s : ℝ} (hs :
   obtain ⟨K, hK, hle⟩ := Ω.modNorm_trace_le hp L hs hs1 hq
   refine ⟨K * multiplierTotal (V := V) hp L (s + 1 / p.toReal) M,
     ENNReal.mul_ne_top hK (multiplierTotal_ne_top hp hsL M), fun F hF => ?_⟩
-  have hX := (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq
+  have hX := (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq
     (modNorm_mulLp_lt_top hp hψ hM hsL hq hF)).1
   rw [mul_assoc]
   exact (hle _ hX).trans (mul_le_mul' le_rfl ((Ω.modNormOn_le_modNorm L _ q rfl).trans
@@ -584,7 +584,7 @@ theorem trace_finsetSum_of_intrinsicNorm (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (h
 
 /-- **The trace of a finite sum** is the sum of the traces, for summands with finite
 `B^{s+1/p}_{p,q}`-norms of order `L` on `V`: these have finite intrinsic quasi-norms
-(`Rd.LipschitzGraph.intrinsicNorm_lt_top_of_modNorm'`), so
+(`Rd.LipschitzGraph.intrinsicNorm_lt_top_of_modNorm`), so
 `Rd.LipschitzGraph.trace_finsetSum_of_intrinsicNorm` applies. -/
 theorem trace_finsetSum (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : ℝ≥0∞} (hq : 1 ≤ q)
     {ι : Type*} (t : Finset ι) {F : ι → Lp ℂ p (volume : Measure V)}
@@ -592,7 +592,7 @@ theorem trace_finsetSum (hp : p ≠ ∞) (L : ℕ) {s : ℝ} (hs : 0 < s) {q : �
       dyadicWeight (s + 1 / p.toReal) k * lpModulus p L (F i) k) < ∞) :
     Ω.trace hp L (∑ i ∈ t, F i) = ∑ i ∈ t, Ω.trace hp L (F i) :=
   Ω.trace_finsetSum_of_intrinsicNorm hp L hs hq t fun i hi =>
-    (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq (hF i hi)).2
+    (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq (hF i hi)).2
 
 end LipschitzGraph
 

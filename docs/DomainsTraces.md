@@ -218,7 +218,7 @@ built on this project, with the decisions behind their form.
   compact smooth manifold with boundary modelled on the half-space `{y : y_0 ≥ 0}`
   (`Rd.SmoothDomain.isManifold`): near the boundary the charts are the straightenings
   `x ↦ A(x - φ(x) e)`, which preserve the Lebesgue measure
-  (`Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz`), so the Lebesgue measure is a
+  (`Rd.LipschitzGraph.measurePreserving_flatten`), so the Lebesgue measure is a
   smooth measure (`Rd.SmoothDomain.isSmoothMeasure_volumeOn`). For `1 ≤ p < ∞`, `0 < s < r` and
   `1 ≤ q ≤ ∞`, `f ∈ L_p(closure Ω)` lies in the Besov space `B^s_{p,q}` of this manifold iff
   `‖f‖_{L_p(Ω)} + ‖(2^(ks) ω_r(f, 2^(-k), Ω)_p)_k‖_{ℓ_q} < ∞`
@@ -486,7 +486,7 @@ built on this project, with the decisions behind their form.
   `Rd.BoundedLipschitzDomain.isBoundaryTrace_unique_of_memWeakSobolev`). The membership
   statements hold in every dimension; for `n = 0`, `F = f` or `F = 0` serves
   (`Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`). The membership statements are the
-  cases `1 < p < ∞` of the theorem by reflection below
+  cases `1 < p` of the theorem by reflection below
   (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`); the bound with
   the constant `C`, and with it Rellich's theorem and the quotient norm, is Rychkov's local
   extension with the local means of the gradient: for a bump with the moment kernel `m` of order
@@ -507,12 +507,12 @@ built on this project, with the decisions behind their form.
   `f ∈ L_p(Ω)` with weak derivatives `g_i = ∂_{e_i} f ∈ L_p(Ω)` on `Ω` agrees almost everywhere on
   `Ω` with some `F ∈ W^1_p(V)` whose weak derivatives `G_i = ∂_{e_i} F` satisfy
   `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`
-  (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le`); hence `f ∈ W^1_p(Ω)` iff `f`
+  (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection`); hence `f ∈ W^1_p(Ω)` iff `f`
   agrees on `Ω` with some `F ∈ W^1_p(V)`, in every dimension
   (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`). On a Lipschitz
   graph domain `Ω = {x : φ(x) < ⟪x, e⟫}` with `M`-Lipschitz `φ`, the flattening
   `F(x) = x - φ(x) e` and its inverse are `(1 + M)`-Lipschitz and preserve Lebesgue measure
-  (`Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz`,
+  (`Rd.LipschitzGraph.measurePreserving_flatten`,
   `Rd.LipschitzGraph.measurePreserving_unflatten`), and the even reflection of `f ∘ F⁻¹` across
   `e^⊥`, composed with `F` (`Rd.LipschitzGraph.reflectionExtension`), is `f` on `Ω`, is weakly
   differentiable on `V` (`Rd.LipschitzGraph.hasWeakLineDeriv_reflectionExtension`) and satisfies

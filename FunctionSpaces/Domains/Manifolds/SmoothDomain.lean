@@ -217,7 +217,7 @@ noncomputable def boundaryStraightener (j : Fin Ω.N) : Ω.Straightener where
     simp only [straighten, unstraighten, LinearIsometryEquiv.symm_apply_apply,
       LipschitzGraph.unflatten_flatten]
   measurePreserving_sigma := (alignTo (Ω.graph j).e).measurePreserving.comp
-    (Ω.graph j).measurePreserving_flatten_of_lipschitz
+    (Ω.graph j).measurePreserving_flatten
   B := ball (Ω.center j) (Ω.radius j)
   isOpen_B := isOpen_ball
   isBounded_B := isBounded_ball

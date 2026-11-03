@@ -546,7 +546,9 @@ theorem integral_conj_psi_mul_detailPieces {g : ℝ → ℂ} (hg : IntegrableOn 
     rw [ppFun_detailPieces g hm ht, e1, e2, mul_comm]
   have hc : (((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * (((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) =
       (((2 : ℝ) ^ k : ℝ) : ℂ) := by
-    rw [← Complex.ofReal_mul, ← Real.rpow_add (by norm_num), add_halves, Real.rpow_natCast]
+    rw [ofReal_two_rpow_half_mul_self]
+    push_cast
+    rfl
   calc ∫ t in Icc (0 : ℝ) 1, conj (psi r i t) * ppFun 1 (twoPieces r (detailPieces r g k m)) t
       = ∫ t in Icc (0 : ℝ) 1, detailFun r g k (t / 2 ^ k + m / 2 ^ k) *
           conj (psi r i (2 ^ k * (t / 2 ^ k + m / 2 ^ k) - m)) := hcongr
@@ -674,14 +676,6 @@ theorem exists_stable : ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ β
           gcongr with i
           exact ENNReal.le_lqNorm hp0 (fun i => ‖β i‖ₑ) i
       _ = _ := by rw [← Finset.mul_sum, mul_comm]
-
-/-- `|2^(k/2)| = 2^(k/2)`, as a dyadic weight. -/
-theorem enorm_two_rpow_half (k : ℕ) :
-    ‖(((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ)‖ₑ = dyadicWeight (1 / 2) k := by
-  rw [← ofReal_norm, Complex.norm_real, Real.norm_eq_abs, abs_of_nonneg (by positivity),
-    ← ENNReal.ofReal_rpow_of_pos (by norm_num), ENNReal.ofReal_ofNat, ENNReal.dyadicWeight]
-  congr 1
-  ring
 
 omit [Fact (1 ≤ p)] in
 /-- **The detail on one interval through the multiwavelets**:

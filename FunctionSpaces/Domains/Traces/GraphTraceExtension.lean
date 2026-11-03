@@ -549,7 +549,7 @@ section TraceExtension
 variable {p : ℝ≥0∞} [Fact (1 ≤ p)]
 
 /-- A finite norm of order `L` on `V` gives a finite intrinsic norm of order `L` on `Ω`. -/
-theorem intrinsicNorm_lt_top_of_modNorm' (hp : p ≠ ∞) (L : ℕ) {σ : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
+theorem intrinsicNorm_lt_top_of_modNorm (hp : p ≠ ∞) (L : ℕ) {σ : ℝ} {q : ℝ≥0∞} (hq : 1 ≤ q)
     {G : Lp ℂ p (volume : Measure V)}
     (hG : ‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p L G k) < ∞) :
     modNormOn Ω.measurableSet_domain L σ q G < ∞ ∧
@@ -557,26 +557,17 @@ theorem intrinsicNorm_lt_top_of_modNorm' (hp : p ≠ ∞) (L : ℕ) {σ : ℝ} {
   have h1 := (Ω.modNormOn_le_modNorm L σ q rfl).trans_lt hG
   exact ⟨h1, Ω.intrinsicNorm_lt_top hp L σ hq h1⟩
 
-/-- A finite norm with moduli of order `2` and smoothness `σ` on `V` gives a finite intrinsic norm
-of order `L ≥ 2` on `Ω` (`Rd.modNorm_order_le`). -/
-theorem intrinsicNorm_lt_top_of_modNorm (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {σ : ℝ} {q : ℝ≥0∞}
-    (hq : 1 ≤ q) {G : Lp ℂ p (volume : Measure V)}
-    (hG : ‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p 2 G k) < ∞) :
-    modNormOn Ω.measurableSet_domain L σ q G < ∞ ∧ Ω.intrinsicNorm hp L σ q G < ∞ :=
-  Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq
-    ((modNorm_order_le hL σ q G).trans_lt (ENNReal.mul_lt_top (by simp) hG))
-
 /-- **The extension has a finite norm of every order `L ≥ 2`**: for `1 ≤ p < ∞`, `0 < s < 1`,
 `1 ≤ q ≤ ∞` and `g ∈ B^s_{p,q}(H)`, the extension of moment order `1` has
 `‖E g‖_p + ‖(2^(k(s+1/p)) ω_L(E g, 2^(-k))_p)_k‖_{ℓ_q} < ∞`
-(`Rd.LipschitzGraph.modNorm_graphExtension_le`, `Rd.modNorm_order_le`). -/
+(`Rd.LipschitzGraph.modNorm_graphExtension_le`, `Rd.modNorm_order_le_of_le`). -/
 theorem modNorm_graphExtension_lt_top (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s)
     (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q) {g : Lp ℂ p (volume : Measure Ω.hyperplane)}
     (hg : ‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 g k) < ∞) :
     ‖Ω.graphExtension hp 1 g‖ₑ + lqNorm q (fun k =>
       dyadicWeight (s + 1 / p.toReal) k * lpModulus p L (Ω.graphExtension hp 1 g) k) < ∞ := by
   obtain ⟨K, hK, hle⟩ := Ω.modNorm_graphExtension_le hp hs hs1 hq
-  exact (modNorm_order_le hL _ q _).trans_lt (ENNReal.mul_lt_top (by simp)
+  exact (modNorm_order_le_of_le hL _ q _).trans_lt (ENNReal.mul_lt_top (by simp)
     ((hle g hg).trans_lt (ENNReal.mul_lt_top hK.lt_top hg)))
 
 /-- **One level of the extension**: for a package of extended atoms of order `r`, `0 < σ < r`,
@@ -628,7 +619,7 @@ theorem trace_sum_traceExtTerm (hp : p ≠ ∞) {L : ℕ} (hL : 1 ≤ L) (Lh : �
     rw [hx1]
     exact Finset.sum_congr rfl fun j _ => hx2 j
   have htr := Ω.trace_ae_eq_comp_graphMap hp hL hs hq
-    (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq hFJ).1 hcont hae
+    (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq hFJ).1 hcont hae
   refine Lp.ext ?_
   filter_upwards [htr, Lp.coeFn_fun_finsetSum (Finset.range (J + 1))
     (fun j => convLp hp (Ω.graphBump.integrable_dual Lh j) (Ω.graphBump.localMean hp Lh j g)),
@@ -720,8 +711,8 @@ theorem trace_graphExtension_of_atoms (hp : p ≠ ∞) {Lh : ℕ} (hLh : 1 ≤ L
     rw [graphExtension, ← hsum.sum_add_tsum_nat_add (J + 1)]
     abel
   have hconv := Ω.tendsto_trace_of_modNorm_sub_le hp L hs hq
-    (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq hF).2
-    (fun J => (Ω.intrinsicNorm_lt_top_of_modNorm' hp L hq (hFJ J)).2) htail
+    (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq hF).2
+    (fun J => (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq (hFJ J)).2) htail
     (fun J => ne_top_of_le_ne_top hhsum (ENNReal.tsum_comp_le_tsum_of_injective
       (add_left_injective (J + 1)) fun j => K1 * ‖Ω.graphBump.localMean hp Lh j g‖ₑ))
     fun J => by
@@ -769,8 +760,8 @@ theorem exists_trace_eq_iff (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ} 
     exact (hle f hf).trans_lt (ENNReal.mul_lt_top hK.lt_top hf)
   · intro hg
     obtain ⟨K, hK, hle⟩ := Ω.modNorm_graphExtension_le hp hs hs1 hq
-    exact ⟨Ω.graphExtension hp 1 g, (Ω.intrinsicNorm_lt_top_of_modNorm hp hL hq
-      ((hle g hg).trans_lt (ENNReal.mul_lt_top hK.lt_top hg))).1,
+    exact ⟨Ω.graphExtension hp 1 g, (Ω.intrinsicNorm_lt_top_of_modNorm hp L hq
+      (Ω.modNorm_graphExtension_lt_top hp hL hs hs1 hq hg)).1,
       Ω.trace_graphExtension hp hL hs hs1 hq hg⟩
 
 end TraceExtension

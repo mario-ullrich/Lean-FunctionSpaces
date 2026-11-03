@@ -98,7 +98,7 @@ theorem exists_approxError_cubeSplineScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p 
     have hS := isCubeSpline_cubeQI hr k hgb
     exact ⟨cubeQI hr k g, ⟨(hS.1.memLp p (cubeVol d)).toLp _,
       mem_cubeSplineScheme_two_pow.2 ⟨_, hS, MemLp.coeFn_toLp _⟩, MemLp.coeFn_toLp _⟩,
-      (qiKernel hr k).eLpNorm_sub_foldSlicewise_le_of_coord hp1 hp hCq (hCqb k) hgb
+      (qiKernel hr k).eLpNorm_sub_foldSlicewise_le_of_coord hp1 hp (hCqb k) hgb
         fun i => hBb g.continuous i hk⟩
 
 end Cube

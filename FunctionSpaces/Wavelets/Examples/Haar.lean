@@ -8,6 +8,7 @@ module
 public import FunctionSpaces.MeasureSpaces.Martingales.Filtration
 public import FunctionSpaces.MeasureSpaces.Martingales.Partition
 public import FunctionSpaces.Domains.Interval.PiecewisePoly
+public import FunctionSpaces.Wavelets.DyadicNormalisation
 public import ApproximationSpaces.Decompositions.Atomic
 public import Mathlib.MeasureTheory.Function.Floor
 public import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
@@ -51,9 +52,10 @@ namespace Haar
 /-- Lebesgue measure on `[0, 1]`, as a measure on `ℝ` (`Interval.unitVol`). -/
 noncomputable abbrev vol : Measure ℝ := Interval.unitVol
 
-/-- `[0, 1]` has measure `1`. -/
-theorem vol_univ : vol univ = 1 := by
-  rw [Measure.restrict_apply_univ, Real.volume_Icc, sub_zero, ENNReal.ofReal_one]
+/-- `[0, 1]` has measure `1`, since `Interval.unitVol` is a probability measure
+(`Interval.isProbabilityMeasure_unitVol`). -/
+theorem vol_univ : vol univ = 1 :=
+  measure_univ
 
 /-- The index `⌊2^j x⌋` of the dyadic interval of level `j` containing `x`. -/
 noncomputable def dyadicIndex (j : ℕ) (x : ℝ) : ℤ := ⌊(2 : ℝ) ^ j * x⌋
@@ -304,10 +306,7 @@ theorem condExpLp_succ_sub_ae_eq (k : ℕ) (f : Lp ℂ p vol) :
     sum_fin_eq_of_ne hx (fun m => haarCoeff f k m * (haarFunction k m x : ℂ))
       fun m hm => by rw [haarFunction_eq_zero (Ne.symm hm), Complex.ofReal_zero, mul_zero],
     haarCoeff_eq hf, setIntegral_dyadicInterval hf k (dyadicIndex k x)]
-  have hc : (((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) * (((2 : ℝ) ^ ((k : ℝ) / 2) : ℝ) : ℂ) =
-      (2 : ℂ) ^ k := by
-    rw [← Complex.ofReal_mul, ← Real.rpow_add (by norm_num), add_halves, Real.rpow_natCast]
-    push_cast; rfl
+  have hc := ofReal_two_rpow_half_mul_self k
   have hn := dyadicIndex_succ_div k x
   rcases (by omega : dyadicIndex (k + 1) x = 2 * dyadicIndex k x ∨
       dyadicIndex (k + 1) x = 2 * dyadicIndex k x + 1) with h | h

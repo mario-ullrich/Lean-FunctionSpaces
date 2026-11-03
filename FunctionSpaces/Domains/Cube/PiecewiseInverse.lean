@@ -45,7 +45,7 @@ the cube and `0 ≤ h ≤ 2^(-j)`,
 Nikolskii constant `K` of the polynomials of degree `< r`. Each slice satisfies the estimate in
 one variable (`Interval.eLpNorm_higherDiff_ppFun_le`). -/
 theorem eLpNorm_cubeDiff_le_of_isCubePP {r j : ℕ} {g : (Fin d → ℝ) → ℂ} (hg : IsCubePP r j g)
-    {K : ℝ≥0∞} (_hK : K ≠ ∞) (hKb : NikolskiiBound p r K) (hp : p ≠ ∞) (i : Fin d) {h : ℝ}
+    {K : ℝ≥0∞} (hKb : NikolskiiBound p r K) (hp : p ≠ ∞) (i : Fin d) {h : ℝ}
     (hh0 : 0 ≤ h) (hh : h ≤ 1 / 2 ^ j) :
     eLpNorm (cubeDiff r h i g) p (diffRegion d r h i) ≤
       2 ^ r * K * (((r * (r + 1) : ℕ) : ℝ≥0∞) * ENNReal.ofReal (2 ^ j * h)) ^ (1 / p.toReal) *
@@ -68,7 +68,7 @@ theorem exists_inverse_cubePPScheme {r : ℕ} (hp : p ≠ ∞) :
   obtain ⟨g, hg, hae⟩ := mem_cubePPScheme_two_pow.1 ha
   refine lpCubeModulus_le_of_coord hp (two_pow_le_ppInverseConst r K) hg.1.1 hae
     fun hjk i h hh0 hh => ?_
-  exact (eLpNorm_cubeDiff_le_of_isCubePP hg hK hKb hp i hh0 (hh.trans (one_div_le_one_div_of_le
+  exact (eLpNorm_cubeDiff_le_of_isCubePP hg hKb hp i hh0 (hh.trans (one_div_le_one_div_of_le
     (by positivity) (pow_le_pow_right₀ (by norm_num) hjk)))).trans
     (le_ppInverseConst_mul hjk K hh _)
 

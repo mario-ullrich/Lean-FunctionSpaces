@@ -2158,8 +2158,9 @@ are the polynomials of degree $< r$.
 
 \begin{definition}[Dyadic piecewise polynomials]
 \label{def:pp-scheme}
-\lean{Interval.unitVol, Interval.ae_mem_Ico_unitVol, Interval.dyadicIco,
-  Interval.measurableSet_dyadicIco, Interval.mem_dyadicIco, Interval.eq_of_mem_dyadicIco,
+\lean{Interval.unitVol, Interval.isProbabilityMeasure_unitVol, Interval.ae_mem_Ico_unitVol,
+  Interval.dyadicIco, Interval.measurableSet_dyadicIco, Interval.mem_dyadicIco,
+  Interval.eq_of_mem_dyadicIco,
   Interval.mem_dyadicIco_floor, Interval.floor_two_pow_succ_div, Interval.ppFun,
   Interval.ppFun_eq_of_mem, Interval.measurable_ppFun, Interval.memLp_ppFun, Interval.ppFun_add,
   Interval.ppFun_const_mul, Interval.polyFun_zero, Interval.ppFun_zero, Interval.ppFun_sum,
@@ -2702,7 +2703,7 @@ moved multiwavelet is a polynomial on each half, so $\int_{I_{k,m}} (P_{k+1} g -
 
 \begin{lemma}[Norms of the details]
 \label{lem:multiwavelet-norms}
-\lean{Interval.lintegral_unit_eq_sum_dyadicIco, Alpert.enorm_two_rpow_half,
+\lean{Interval.lintegral_unit_eq_sum_dyadicIco, enorm_two_rpow_half,
   ENNReal.ofReal_two_pow_eq, Alpert.eLpNorm_detailFun_dyadicIco,
   Alpert.exists_eLpNorm_detailFun_equiv, Alpert.enorm_ppProj_sub}
 \leanok
@@ -3479,7 +3480,7 @@ Fubini arguments in several variables.
 
 \begin{definition}[Cube and slices]
 \label{def:cube}
-\lean{Cube.isProbabilityMeasure_unitVol, Cube.cubeVol, Cube.slice, Cube.measurable_slice,
+\lean{Cube.cubeVol, Cube.slice, Cube.measurable_slice,
   Cube.measurable_slice_uncurry, Cube.slice_update, Cube.regionVol,
   Cube.unitVol_restrict_Icc_of_subset}
 \leanok
@@ -3535,20 +3536,6 @@ first to the indicator of $\{f \neq g\}$. The integral over $R \cap \{x_i \in S\
 identity for $G$ times the indicator of $R \cap \{x_i \in S\}$, since the indicator of $R$ does
 not depend on $x_i$; for $|f|^p$ its $p$-th root is the identity of norms, and the bound follows
 from it by the monotonicity and the homogeneity of the $L_p$ norm.
-\end{proof}
-
-\begin{lemma}[Minkowski's inequality in the form of bounds]
-\label{lem:minkowski-bounds}
-\lean{Cube.lintegral_add_rpow_le, Cube.lintegral_const_mul_rpow_le}
-\leanok
-Let $q \geq 1$ and let $\varphi, \psi$ be measurable functions with values in $[0, \infty]$. If
-$\int \varphi^q \leq a^q$ and $\int \psi^q \leq b^q$, then $\int (\varphi + \psi)^q \leq (a + b)^q$,
-and $\int (c \varphi)^q \leq (c a)^q$ for every $c < \infty$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-Minkowski's inequality for functions with values in $[0, \infty]$.
 \end{proof}
 
 \section{Moduli in the coordinates}
@@ -3769,9 +3756,10 @@ coordinates ends with $S = \{1, \dots, d\}$, where $c$ is constant.
 \lean{Cube.KernelOp.eLpNorm_slicewise_le, Cube.KernelOp.eLpNorm_sub_foldSlicewise_le}
 \leanok
 \uses{def:kernel-op, lem:cube-slices}
-Let $1 \leq p < \infty$ and $C < \infty$ with $\|T u\|_{L_p[0,1]} \leq C \|u\|_{L_p[0,1]}$ for every
-measurable $u$. Then $\|T^{(i)} g\|_{L_p(Q)} \leq C \|g\|_{L_p(Q)}$ for measurable $g$, and for
-bounded measurable $g$ and coordinates $i_1, \dots, i_m$,
+Let $1 \leq p < \infty$ and $C \in [0, \infty]$ with
+$\|T u\|_{L_p[0,1]} \leq C \|u\|_{L_p[0,1]}$ for every measurable $u$. Then
+$\|T^{(i)} g\|_{L_p(Q)} \leq C \|g\|_{L_p(Q)}$ for measurable $g$, and for bounded measurable
+$g$ and coordinates $i_1, \dots, i_m$,
 \[
   \bigl\| g - T^{(i_1)} \cdots T^{(i_m)} g \bigr\|_{L_p(Q)}
   \leq (1 + C)^m \sum_{l=1}^m \|g - T^{(i_l)} g\|_{L_p(Q)} .
@@ -3871,7 +3859,8 @@ combinations expands into a combination of products of the $\varphi_{n,l}$.
   Cube.KernelOp.eLpNorm_sub_foldSlicewise_le_of_coord, Cube.eLpNorm_sub_cubeProj_le_of_coord}
 \leanok
 \uses{lem:cube-slices, lem:cube-two-sided-smoothing, lem:kernel-telescoping}
-Let $1 \leq p < \infty$, $c, M < \infty$, and let $F, G_1, D_1, G_2, D_2$ be measurable on $\R^d$
+Let $1 \leq p < \infty$, $c, M \in [0, \infty]$, and let $F, G_1, D_1, G_2, D_2$ be measurable
+on $\R^d$
 and $[a_\nu, b_\nu] \subseteq [0, 1]$. If for every $x$
 \[
   \|F_{x,i}\|_{L_p[0,1]} \leq c \sum_{\nu = 1}^2 \bigl( \|(G_\nu)_{x,i}\|_{L_p[a_\nu, b_\nu]}
@@ -4855,7 +4844,7 @@ lemma of its own, since it serves the torus as well (\Cref{thm:torus-lp-jackson}
 
 \begin{lemma}[Weighted averages with the Jackson weight]
 \label{lem:jackson-weighted-average}
-\lean{ENNReal.one_add_pow_le_two_pow_mul, Rd.jacksonConst, Rd.jacksonConst_ne_top,
+\lean{one_add_pow_le_two_pow_mul, Rd.jacksonConst, Rd.jacksonConst_ne_top,
   Rd.eLpNorm_integral_lpKernel_mul_le}
 \leanok
 \uses{lem:weighted-jensen, lem:lp-kernels-basic}

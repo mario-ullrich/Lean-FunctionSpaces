@@ -335,7 +335,7 @@ theorem boundaryTrace_eventuallyEq_of_continuous (ψ : Ω.BoundaryPartition) (hp
   refine Ω.eventually_aeBoundary_iff.2 fun j => ?_
   filter_upwards [Ω.boundaryTrace_graphMap ψ hp hL hs hsL hq hF j,
     (Ω.graph j).trace_ae_eq_comp_graphMap hp hL hs hq
-      ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm' hp L hq hF).1 hG hFG] with x' h1 h2 hj
+      ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm hp L hq hF).1 hG hFG] with x' h1 h2 hj
   rw [h1 hj, h2]
   rfl
 
@@ -353,8 +353,8 @@ theorem boundaryTrace_congr (ψ : Ω.BoundaryPartition) (hp : p ≠ ∞) {L : �
     Ω.boundaryTrace ψ hp L F₁ =ᶠ[Ω.aeBoundary] Ω.boundaryTrace ψ hp L F₂ := by
   refine Ω.eventually_aeBoundary_iff.2 fun j => ?_
   have hloc := (Ω.graph j).trace_ae_eq_of_ae_eq hp L hs hq
-    ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm' hp L hq hF₁).2
-    ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm' hp L hq hF₂).2
+    ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm hp L hq hF₁).2
+    ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm hp L hq hF₂).2
     (isOpen_ball : IsOpen (ball (Ω.center j) (Ω.radius j)))
     (h.mono fun x hx hxd hxb => hx (by
       have hx' : x ∈ (Ω.graph j).domain ∩ ball (Ω.center j) (Ω.radius j) := ⟨hxd, hxb⟩
@@ -400,7 +400,7 @@ theorem memBoundaryBesov_boundaryTrace (ψ : Ω.BoundaryPartition) (hp : p ≠ �
     (ψ.hasCompactSupport_toComplex j) L
   have hFj := modNorm_mulLp_lt_top hp (ψ.contDiff_toComplex j) hC hsL hq hF
   obtain ⟨K, hK, hle⟩ := (Ω.graph j).modNorm_trace_le hp L hs hs1 hq
-  have hX := ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm' hp L hq hFj).1
+  have hX := ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm hp L hq hFj).1
   exact ⟨_, Ω.trace_mulLp_ae_boundaryTrace ψ hp hL hs hsL hq hF j hC,
     (hle _ hX).trans_lt (ENNReal.mul_lt_top hK.lt_top hX)⟩
 

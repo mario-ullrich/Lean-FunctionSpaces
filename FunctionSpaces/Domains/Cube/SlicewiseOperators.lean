@@ -558,7 +558,7 @@ theorem isForm_foldSlicewise (l : List (Fin d)) {g : (Fin d → ℝ) → ℂ} (h
 
 /-- **Slicewise bounds**: if `‖T u‖_{L_p[0,1]} ≤ C ‖u‖_{L_p[0,1]}` for all measurable `u`, then
 `‖T^{(i)} g‖_{L_p(Q)} ≤ C ‖g‖_{L_p(Q)}` for measurable `g` with measurable `T^{(i)} g`. -/
-theorem eLpNorm_slicewise_le {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {C : ℝ≥0∞} (_hC : C ≠ ∞)
+theorem eLpNorm_slicewise_le {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {C : ℝ≥0∞}
     (hT : ∀ u : ℝ → ℂ, Measurable u → eLpNorm (T.apply u) p unitVol ≤ C * eLpNorm u p unitVol)
     (i : Fin d) {g : (Fin d → ℝ) → ℂ} (hg : Measurable g)
     (hTg : Measurable (T.slicewise i g)) :
@@ -571,7 +571,6 @@ theorem eLpNorm_slicewise_le {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {
 then `‖g - T^{(l_1)} ⋯ T^{(l_m)} g‖_{L_p(Q)} ≤ (1 + C)^m ∑_{i ∈ l} ‖g - T^{(i)} g‖_{L_p(Q)}` for
 bounded measurable `g`. The step is `g - T^{(i)} h = (g - T^{(i)} g) + T^{(i)} (g - h)`. -/
 theorem eLpNorm_sub_foldSlicewise_le {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) {C : ℝ≥0∞}
-    (hC : C ≠ ∞)
     (hT : ∀ u : ℝ → ℂ, Measurable u → eLpNorm (T.apply u) p unitVol ≤ C * eLpNorm u p unitVol)
     (l : List (Fin d)) {g : (Fin d → ℝ) → ℂ} (hg : BddMeas g) :
     eLpNorm (fun x => g x - T.foldSlicewise l g x) p (cubeVol d) ≤
@@ -591,7 +590,7 @@ theorem eLpNorm_sub_foldSlicewise_le {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p �
       ring
     have h2 : eLpNorm (T.slicewise i fun y => g y - T.foldSlicewise l g y) p (cubeVol d) ≤
         C * eLpNorm (fun y => g y - T.foldSlicewise l g y) p (cubeVol d) :=
-      T.eLpNorm_slicewise_le hp0 hp' hC hT i hgF (T.measurable_slicewise hgF i)
+      T.eLpNorm_slicewise_le hp0 hp' hT i hgF (T.measurable_slicewise hgF i)
     set e := eLpNorm (fun x => g x - T.slicewise i g x) p (cubeVol d)
     set S := (l.map fun i => eLpNorm (fun x => g x - T.slicewise i g x) p (cubeVol d)).sum
     have h1 : 1 ≤ (1 + C) ^ (l.length + 1) := one_le_pow₀ le_self_add

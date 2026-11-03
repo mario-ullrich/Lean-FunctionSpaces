@@ -71,10 +71,12 @@ theorem blockDecompNorm_le {f : X} {g : ℕ → X} (hg : ∀ k, g k ∈ A (2 ^ k
     A.blockDecompNorm s q f ≤ lqNorm q (fun k => dyadicWeight s k * ‖g k‖ₑ) :=
   iInf₂_le_of_le g hg (iInf_le_of_le hf le_rfl)
 
-/-- The partial sums of a block decomposition are approximants: `∑_{j<k} g_j ∈ A (2^k)`. -/
+/-- The partial sums of a block decomposition are approximants: `∑_{j<k} g_j ∈ A (2^k)`, since
+`∑_{j<k} 2^j < 2^k` (Mathlib's `Nat.geomSum_lt`). -/
 theorem sum_range_mem {g : ℕ → X} (hg : ∀ k, g k ∈ A (2 ^ k)) (k : ℕ) :
     ∑ j ∈ range k, g j ∈ A (2 ^ k) :=
-  A.mem_of_le (sum_range_two_pow_lt k).le (sum_mem (range k) fun j _ => hg j)
+  A.mem_of_le (Nat.geomSum_lt le_rfl fun _ hj => mem_range.1 hj).le
+    (sum_mem (range k) fun j _ => hg j)
 
 /-- **A block decomposition controls the approximation norm**: for `s > 0`,
 `‖f‖^dyadic ≤ 2 (1 - 2^(-s))⁻¹ ‖(2^(ks) ‖g_k‖)_k‖_q`. -/

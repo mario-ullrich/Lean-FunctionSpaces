@@ -380,7 +380,7 @@ theorem exists_trace_eq_iff_flat (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {r : 
       ((flat e he).graphBump.localMeansNorm_le hp r s hq g).trans_lt
         (ENNReal.mul_lt_top ((flat e he).graphBump.upperConst_ne_top r s).lt_top hg)
     obtain ⟨K, hK, hle⟩ := modNorm_flatExtension_le_localMeansNorm e he hp r hs hsL hq
-    exact ⟨(flat e he).graphExtension hp r g, ((flat e he).intrinsicNorm_lt_top_of_modNorm' hp L
+    exact ⟨(flat e he).graphExtension hp r g, ((flat e he).intrinsicNorm_lt_top_of_modNorm hp L
       hq ((hle g hX).trans_lt (ENNReal.mul_lt_top hK.lt_top hX))).1,
       trace_flatExtension e he hp hL hr hs hsL hq hX⟩
 

@@ -225,6 +225,7 @@ public import FunctionSpaces.Torus.LpWeakDerivatives
 public import FunctionSpaces.Torus.SobolevTriebelLizorkin
 public import FunctionSpaces.Torus.SobolevEmbedding
 public import FunctionSpaces.Torus.PeriodicDistributions
+public import FunctionSpaces.Wavelets.DyadicNormalisation
 public import FunctionSpaces.Wavelets.Examples.Haar
 public import FunctionSpaces.Wavelets.Examples.HaarBesov
 public import FunctionSpaces.Wavelets.Examples.Multiscale
@@ -1032,6 +1033,9 @@ manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet example
   derivatives of the periodic lifts on `ℝ^d`, and classical derivatives of `C^1` lifts.
 
 ### Wavelets
+
+* `FunctionSpaces.Wavelets.DyadicNormalisation`: the normalising factor `2^(j/2)` of dyadic
+  dilations, its square and its extended norm.
 
 #### `Wavelets/Examples`: Haar wavelets and multiwavelets
 

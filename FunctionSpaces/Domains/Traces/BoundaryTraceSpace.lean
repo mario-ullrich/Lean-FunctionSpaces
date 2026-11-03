@@ -253,7 +253,7 @@ variable (Ω : LipschitzGraph V)
 `s = 1/2`, `p = q = 2` and order `2` (`Rd.modNorm_toL2_lt_top`). -/
 theorem intrinsicNorm_toL2_lt_top (U : H^{1}(V)) :
     Ω.intrinsicNorm two_ne_top 2 (1 / 2 + 1 / (2 : ℝ≥0∞).toReal) 2 (toL2 U) < ∞ :=
-  (Ω.intrinsicNorm_lt_top_of_modNorm' two_ne_top 2 one_le_two (modNorm_toL2_lt_top U)).2
+  (Ω.intrinsicNorm_lt_top_of_modNorm two_ne_top 2 one_le_two (modNorm_toL2_lt_top U)).2
 
 /-- The trace of `H^1(V)` on the graph as a linear map, `U ↦ Tr(ι U)` for the `L_2` function
 `ι U` (`Rd.LipschitzGraph.trace_sub`, `Rd.LipschitzGraph.trace_smul`). -/
@@ -286,7 +286,7 @@ theorem traceH1_ofSchwartz_ae (w : 𝓢(V, ℂ)) :
     (Ω.traceH1 (ofSchwartz 1 w) : Ω.hyperplane → ℂ) =ᵐ[volume] fun x' => w (Ω.graphMap x') := by
   rw [traceH1_apply]
   refine Ω.trace_ae_eq_comp_graphMap two_ne_top (L := 2) one_le_two (s := 1 / 2) (by norm_num)
-    one_le_two (Ω.intrinsicNorm_lt_top_of_modNorm' two_ne_top 2 one_le_two
+    one_le_two (Ω.intrinsicNorm_lt_top_of_modNorm two_ne_top 2 one_le_two
       (modNorm_toL2_lt_top (ofSchwartz 1 w))).1 w.continuous ?_
   rw [toL2_ofSchwartz]
   exact w.coeFn_toLp 2 volume
@@ -372,7 +372,7 @@ domain of every chart `k` is finite (`Rd.modNorm_mulLp_lt_top`, `Rd.modNorm_toL2
 theorem intrinsicNorm_localize_lt_top (j k : Fin Ω.N) (U : H^{1}(V)) :
     (Ω.graph k).intrinsicNorm two_ne_top 2 (1 / 2 + 1 / (2 : ℝ≥0∞).toReal) 2
       (ψ.localize j (toL2 U)) < ∞ :=
-  ((Ω.graph k).intrinsicNorm_lt_top_of_modNorm' two_ne_top 2 one_le_two
+  ((Ω.graph k).intrinsicNorm_lt_top_of_modNorm two_ne_top 2 one_le_two
     (modNorm_mulLp_lt_top two_ne_top (ψ.contDiff_toComplex j)
       (ψ.derivBound_spec j) (by norm_num) one_le_two
       (modNorm_toL2_lt_top U))).2
@@ -550,7 +550,7 @@ theorem boundaryTrace_toL2_sub (ψ : Ω.BoundaryPartition) (U W : H^{1}(V)) :
   refine Ω.eventually_aeBoundary_iff.2 fun j => ?_
   have hG := fun G : H^{1}(V) => Ω.boundaryTrace_graphMap ψ two_ne_top one_le_two (s := 1 / 2)
     (by norm_num) (by norm_num) one_le_two (modNorm_toL2_lt_top G) j
-  have hI := fun G : H^{1}(V) => ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm' two_ne_top 2
+  have hI := fun G : H^{1}(V) => ((Ω.graph j).intrinsicNorm_lt_top_of_modNorm two_ne_top 2
     one_le_two (modNorm_toL2_lt_top G)).2
   have hsub := (Ω.graph j).trace_sub two_ne_top 2 (s := 1 / 2) (by norm_num) one_le_two (hI U)
     (hI W)

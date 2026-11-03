@@ -28,9 +28,9 @@ gives, for `0 ≤ s < r`:
 (`Rd.memApprox_bandScheme_iff`), the three descriptions of `B^s_{p,q}(V)` coincide for `0 < s < r`:
 by approximation with band-limited functions, by Littlewood–Paley blocks, and by differences
 (`Rd.littlewoodPaleyNorm_lt_top_iff_modulus`). Since `ω_{r+l} ≤ 2^l ω_r`
-(`Rd.lpModulus_add_order_le`), the norm with moduli of order `L ≥ 2` is at most `2^(L-2)` times
-the norm with order `2` (`Rd.modNorm_order_le`), and the norm with moduli in `ℓ_1` is countably
-subadditive (`Rd.modNorm_one_tsum_le`).
+(`Rd.lpModulus_add_order_le`), the norm with moduli of order `L ≥ r` is at most `2^(L-r)` times
+the norm with order `r` (`Rd.modNorm_order_le_of_le`), and the norm with moduli in `ℓ_1` is
+countably subadditive (`Rd.modNorm_one_tsum_le`).
 -/
 
 @[expose] public section
@@ -121,13 +121,6 @@ theorem modNorm_order_le_of_le {r L : ℕ} (hrL : r ≤ L) (σ : ℝ) (q : ℝ�
         conv_lhs => rw [hL']
         exact lpModulus_add_order_le r (L - r) G k
     _ = 2 ^ (L - r) * (dyadicWeight σ k * lpModulus p r G k) := by ring
-
-/-- The norm with moduli of order `L ≥ 2` is at most `2^(L-2)` times that with order `2`. -/
-theorem modNorm_order_le {L : ℕ} (hL : 2 ≤ L) (σ : ℝ) (q : ℝ≥0∞)
-    (G : Lp ℂ p (volume : Measure V)) :
-    ‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p L G k) ≤
-      2 ^ (L - 2) * (‖G‖ₑ + lqNorm q (fun k => dyadicWeight σ k * lpModulus p 2 G k)) :=
-  modNorm_order_le_of_le hL σ q G
 
 /-- **The norm with moduli is countably subadditive in `ℓ_1`**: for a summable series in `L_p`
 and `N(G) = ‖G‖ + ‖(2^(kσ) ω_L(G, 2^(-k)))_k‖_{ℓ_1}`, `N(∑ G_i) ≤ ∑_i N(G_i)`, by

@@ -214,7 +214,7 @@ Files `FunctionSpaces/Domains/Sobolev/LipschitzDomainH1.lean`,
   with some `F ∈ W^{1,p}(ℝ^d)` with weak derivatives `G_i = ∂_{e_i} F` and
   `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`. The same holds for every
   `1 ≤ p ≤ ∞`, by reflection across the boundary in flattened coordinates (Evans–Gariepy,
-  Section 4.4): `Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le (hp : 1 ≤ p) :
+  Section 4.4): `Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection (hp : 1 ≤ p) :
   ∃ C, C ≠ ∞ ∧ Rd.ExtendsSobolev p Ω.toOpens Ω.carrier C`, with `[Nontrivial V]`. For every
   `1 ≤ p ≤ ∞` the extension is a bounded linear operator on value–derivative jets, built by
   reflection (`FunctionSpaces/Rd/Sobolev/SobolevJets.lean`,
@@ -237,8 +237,8 @@ Files `FunctionSpaces/Domains/Sobolev/LipschitzDomainH1.lean`,
   (f : V → ℂ) : MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p volume, MemSobolev 1 F ∧
   (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f`, and the direction
   `Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev_of_one_le`, in every dimension
-  (for `d = 0`, `Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`); for `1 < p < ∞` also
-  `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev (hp1) (hp)` and
+  (for `d = 0`, `Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`); for `1 < p` also
+  `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev (hp1)` and
   `Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev`.
 * `H^1(Ω) = W^{1,2}(Ω)`: `Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev
   (f : Lp ℂ 2 volume) : Ω.MemSobolevOn f ↔ MemWeakSobolev Ω.toOpens 1 2 f`, and with the
@@ -1121,7 +1121,7 @@ gives an extension operator as well (`Rd.BoundedLipschitzDomain.exists_sobolevEx
 functions are the extension operators applied to one function
 (`Rd.SobolevExtensionOp.extendsSobolev`): `Rd.BoundedLipschitzDomain.exists_extendsSobolev` lies
 in `FunctionSpaces.Domains.Extension.SobolevExtensionOperator`, the forms for `1 ≤ p ≤ ∞`
-(`Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le`,
+(`Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection`,
 `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`) in
 `FunctionSpaces.Domains.Extension.ReflectionExtensionOperator`, and the consequences of
 Section 4.3 (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`,

@@ -44,6 +44,10 @@ namespace Interval
 /-- Lebesgue measure on `[0, 1]`. -/
 noncomputable abbrev unitVol : Measure ℝ := volume.restrict (Icc (0 : ℝ) 1)
 
+/-- Lebesgue measure on `[0, 1]` is a probability measure. -/
+instance isProbabilityMeasure_unitVol : IsProbabilityMeasure unitVol :=
+  ⟨by simp [unitVol, Real.volume_Icc]⟩
+
 /-- Almost every point of `[0, 1]` lies in `[0, 1)`. -/
 theorem ae_mem_Ico_unitVol : ∀ᵐ x ∂unitVol, x ∈ Ico (0 : ℝ) 1 := by
   rw [unitVol, ← Measure.restrict_congr_set Ico_ae_eq_Icc]

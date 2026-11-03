@@ -6,6 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Analysis.Maximal.DyadicGrid
+public import FunctionSpaces.Wavelets.DyadicNormalisation
 public import Mathlib.MeasureTheory.Measure.Haar.NormedSpace
 
 /-!
@@ -249,13 +250,6 @@ theorem integral_eq_two_pow_mul_integral_comp (g : ℝ → ℂ) (j : ℕ) :
   push_cast
   rw [mul_inv_cancel₀ (pow_ne_zero _ two_ne_zero), one_mul]
 
-/-- `2^(j/2) · 2^(j/2) = 2^j` for the normalising factor of `g_{j,k}`, as complex numbers. -/
-theorem ofReal_two_rpow_half_mul_self (j : ℕ) :
-    (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) * (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) = (2 : ℂ) ^ j := by
-  rw [← Complex.ofReal_mul, ← Real.rpow_add two_pos, add_halves, Real.rpow_natCast]
-  push_cast
-  rfl
-
 /-- **The product of two generators of one level**:
 `g_{j,k}(x) conj g_{j,l}(x) = 2^j g(2^j x - k) conj g(2^j x - l)`, since the factor `2^(j/2)` is
 real. -/
@@ -388,17 +382,10 @@ theorem eLpNorm_comp_two_pow_mul_sub {F : ℝ → ℂ} (hF : AEStronglyMeasurabl
     ← ENNReal.inv_rpow, abs_of_pos (by positivity), ENNReal.ofReal_inv_of_pos (by positivity),
     ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat, ENNReal.toReal_div, ENNReal.toReal_one]
 
-/-- **The normalising factor in extended norm**: `‖2^(j/2)‖ = 2^(j/2)`, written
-`dyadicWeight (1/2) j`. -/
-theorem enorm_two_rpow_half (j : ℕ) :
-    ‖(((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ)‖ₑ = dyadicWeight (1 / 2) j := by
-  rw [← ofReal_norm, Complex.norm_real, Real.norm_of_nonneg (by positivity),
-    ← ENNReal.ofReal_rpow_of_pos two_pos, ENNReal.ofReal_ofNat, dyadicWeight, mul_one_div]
-
 /-- **`L_p` norms of the generators**: for every a.e. strongly measurable `g`, every level `j`,
 position `k` and exponent `p`, `‖g_{j,k}‖_p = 2^(j(1/2 - 1/p)) ‖g‖_p`
 (`Daubechies.eLpNorm_comp_two_pow_mul_sub` and the factor `2^(j/2)`,
-`Daubechies.enorm_two_rpow_half`). In particular
+`enorm_two_rpow_half`). In particular
 `‖g_{j,k}‖_2 = ‖g‖_2`. -/
 theorem eLpNorm_scaledFun (hg : AEStronglyMeasurable g volume) (j : ℕ) (k : ℤ) (p : ℝ≥0∞) :
     eLpNorm (scaledFun g j k) p volume =

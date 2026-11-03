@@ -151,7 +151,7 @@ theorem jacksonConst_ne_top (hp1 : 1 ≤ p) (hp : p ≠ ∞) (r : ℕ) : jackson
     calc ‖lpKernel z‖ * (1 + ‖z‖) ^ ((r : ℝ) * p.toReal)
         ≤ ‖lpKernel z‖ * (2 ^ N * (1 + ‖z‖ ^ N)) := by
           gcongr
-          exact hpow.trans (ENNReal.one_add_pow_le_two_pow_mul (norm_nonneg z) N)
+          exact hpow.trans (one_add_pow_le_two_pow_mul (norm_nonneg z) N)
       _ = 2 ^ N * (‖lpKernel z‖ + ‖z‖ ^ N * ‖lpKernel z‖) := by ring
   exact ENNReal.rpow_ne_top_of_nonneg (by positivity)
     (ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_nonneg (by linarith) h1) h2)

@@ -28,7 +28,7 @@ Over `H = e^⊥` the **product coordinates** `(x', t) ↦ x' + t e` and the **gr
 `Rd.LipschitzGraph.graphEquiv`) preserve the Lebesgue measure, and the inverse flattening is the
 graph coordinates after the inverse of the product coordinates (`Rd.LipschitzGraph.unflatten_eq`).
 So both maps preserve the Lebesgue measure for every Lipschitz graph
-(`Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz`,
+(`Rd.LipschitzGraph.measurePreserving_flatten`,
 `Rd.LipschitzGraph.measurePreserving_unflatten`).
 -/
 
@@ -262,16 +262,9 @@ theorem measurePreserving_unflatten : MeasurePreserving Ω.unflatten volume volu
 /-- **The flattening preserves the Lebesgue measure** for every Lipschitz graph, the inverse of
 `Rd.LipschitzGraph.measurePreserving_unflatten`: it is the product coordinates after the inverse of
 the graph coordinates (`Rd.LipschitzGraph.flatten_eq`). -/
-theorem measurePreserving_flatten_of_lipschitz : MeasurePreserving Ω.flatten volume volume := by
+theorem measurePreserving_flatten : MeasurePreserving Ω.flatten volume volume := by
   rw [flatten_eq]
   exact Ω.measurePreserving_prodEquiv.comp Ω.measurePreserving_graphEquiv.symm
-
-/-- **The flattening preserves the Lebesgue measure for `C^1` graph functions**, the smooth case
-of `Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz`. The smoothness hypothesis is not
-used: the flattening preserves the Lebesgue measure for every Lipschitz graph. -/
-theorem measurePreserving_flatten (_hφ : ContDiff ℝ 1 Ω.phi) :
-    MeasurePreserving Ω.flatten volume volume :=
-  Ω.measurePreserving_flatten_of_lipschitz
 
 end Coordinates
 

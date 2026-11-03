@@ -921,6 +921,8 @@ theorem rpow_mul_rpow_ne_top {a b : ℝ≥0∞} (ha0 : a ≠ 0) (ha : a ≠ ∞)
     (θ : ℝ) : a ^ (1 - θ) * b ^ θ ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_ne_zero ha0 ha) (ENNReal.rpow_ne_top_of_ne_zero hb0 hb)
 
+end ENNReal
+
 /-- `(1 + t)^N ≤ 2^N (1 + t^N)` for `t ≥ 0`, from Mathlib's `add_pow_le`. -/
 theorem one_add_pow_le_two_pow_mul {t : ℝ} (ht : 0 ≤ t) (N : ℕ) :
     (1 + t) ^ N ≤ 2 ^ N * (1 + t ^ N) := by
@@ -930,8 +932,6 @@ theorem one_add_pow_le_two_pow_mul {t : ℝ} (ht : 0 ≤ t) (N : ℕ) :
       gcongr
       · exact one_le_two
       · exact Nat.sub_le N 1
-
-end ENNReal
 
 namespace MeasureTheory
 

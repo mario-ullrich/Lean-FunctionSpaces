@@ -301,7 +301,7 @@ variable (μ) in
 /-- **Values and chart gradients**: the Hilbert space `L_2(μ) × ∏_{(i,j)} L_2(O_I)` of pairs
 `(f, g)`, `i` over the charts and `j < dim E`, with the inner product
 `⟨f, f'⟩_{L_2(μ)} + ∑_{i,j} ⟨g_{ij}, g'_{ij}⟩_{L_2(O_I)}`. -/
-abbrev ValueGradientL2 : Type _ :=
+abbrev chartValueGradientL2 : Type _ :=
   WithLp 2 (Lp ℂ 2 μ × PiLp 2 (fun _ : Fin A.n × Fin (finrank ℝ E) =>
     Lp ℂ 2 (volume.restrict (interior (range I)))))
 
@@ -310,7 +310,7 @@ variable (μ) in
 with `g_{ij} = ∂_{b_j} P_i f` weakly on the open model set `O_I` for the basis
 `b_j = Rd.gridBasis E j`, where `P_i f = (ψ_i f) ∘ κ_i⁻¹`. For manifolds with boundary `O_I` is the
 open half-space (`Manifold.modelInterior_euclideanHalfSpace`). -/
-noncomputable def chartSobolev : Submodule ℂ (A.ValueGradientL2 μ) where
+noncomputable def chartSobolev : Submodule ℂ (A.chartValueGradientL2 μ) where
   carrier := {u | ∀ ij : Fin A.n × Fin (finrank ℝ E), Rd.HasWeakLineDeriv (modelInterior I)
     (fun _ : Fin 1 => Rd.gridBasis E ij.2) (A.pieceLp μ Rd.two_ne_top ij.1 u.fst) (u.snd ij)}
   zero_mem' := fun ij => by
@@ -328,7 +328,7 @@ noncomputable def chartSobolev : Submodule ℂ (A.ValueGradientL2 μ) where
 
 /-- Membership in the chart Sobolev space: `g_{ij} = ∂_{b_j} P_i f` weakly on `O_I` for all
 `i, j`. -/
-theorem mem_chartSobolev {u : A.ValueGradientL2 μ} :
+theorem mem_chartSobolev {u : A.chartValueGradientL2 μ} :
     u ∈ A.chartSobolev μ ↔ ∀ ij : Fin A.n × Fin (finrank ℝ E),
       Rd.HasWeakLineDeriv (modelInterior I) (fun _ : Fin 1 => Rd.gridBasis E ij.2)
         (A.pieceLp μ Rd.two_ne_top ij.1 u.fst) (u.snd ij) :=
@@ -338,7 +338,7 @@ variable (μ) in
 /-- **The chart Sobolev space is closed**: the pieces depend continuously on `f`
 (`Manifold.BesovAtlas.pieceCLM`), and weak derivatives pass to limits in `L_2(O_I)`
 (`Rd.HasWeakLineDeriv.of_tendsto`). -/
-theorem isClosed_chartSobolev : IsClosed (A.chartSobolev μ : Set (A.ValueGradientL2 μ)) := by
+theorem isClosed_chartSobolev : IsClosed (A.chartSobolev μ : Set (A.chartValueGradientL2 μ)) := by
   refine IsSeqClosed.isClosed fun {u u₀} hu hlim ij => ?_
   have h0 : Tendsto (fun n => (u n).fst) atTop (𝓝 u₀.fst) :=
     ((WithLp.fstL 2 ℂ _ _).continuous.tendsto u₀).comp hlim
@@ -364,13 +364,14 @@ variable (μ) in
 `w = (f', g')` in the chart Sobolev space: the sum over the charts of the gradient forms
 `∑_j ∫_{O_I} conj (∂_{b_j} P_i f) · ∂_{b_j} P_i f'`. -/
 noncomputable def chartForm (u w : A.chartSobolev μ) : ℂ :=
-  ∑ ij, ⟪(u : A.ValueGradientL2 μ).snd ij, (w : A.ValueGradientL2 μ).snd ij⟫_ℂ
+  ∑ ij, ⟪(u : A.chartValueGradientL2 μ).snd ij, (w : A.chartValueGradientL2 μ).snd ij⟫_ℂ
 
 /-- **The inner product of the chart Sobolev space**: `⟨u, w⟩ = ⟨f, f'⟩_{L_2(μ)} + a_A(u, w)` for
 `u = (f, g)` and `w = (f', g')`. -/
 theorem inner_chartSobolev (u w : A.chartSobolev μ) :
     ⟪u, w⟫_ℂ =
-      ⟪(u : A.ValueGradientL2 μ).fst, (w : A.ValueGradientL2 μ).fst⟫_ℂ + A.chartForm μ u w := by
+      ⟪(u : A.chartValueGradientL2 μ).fst, (w : A.chartValueGradientL2 μ).fst⟫_ℂ +
+        A.chartForm μ u w := by
   rw [Submodule.coe_inner, WithLp.prod_inner_apply, PiLp.inner_apply]
   rfl
 
@@ -381,23 +382,25 @@ noncomputable def chartSobolevEmbedding : A.chartSobolev μ →L[ℂ] Lp ℂ 2 �
 
 /-- `J u` is the value `f` of `u = (f, g)`. -/
 theorem chartSobolevEmbedding_apply (u : A.chartSobolev μ) :
-    A.chartSobolevEmbedding μ u = (u : A.ValueGradientL2 μ).fst :=
+    A.chartSobolevEmbedding μ u = (u : A.chartValueGradientL2 μ).fst :=
   rfl
 
 /-- The chart Sobolev embedding has norm at most `1`. -/
 theorem norm_chartSobolevEmbedding_le : ‖A.chartSobolevEmbedding μ‖ ≤ 1 :=
   ContinuousLinearMap.opNorm_le_bound _ zero_le_one fun u => by
     rw [one_mul]
-    exact WithLp.norm_fst_le _ (u : A.ValueGradientL2 μ)
+    exact WithLp.norm_fst_le _ (u : A.chartValueGradientL2 μ)
 
 /-- **The chart Sobolev embedding is injective**: the weak derivatives of the pieces are determined
 by `f` (`Rd.HasWeakLineDeriv.unique`). -/
 theorem chartSobolevEmbedding_injective : Function.Injective (A.chartSobolevEmbedding μ) := by
   intro u w h
-  have hs : ∀ ij, (u : A.ValueGradientL2 μ).snd ij = (w : A.ValueGradientL2 μ).snd ij := by
+  have hs : ∀ ij,
+      (u : A.chartValueGradientL2 μ).snd ij = (w : A.chartValueGradientL2 μ).snd ij := by
     intro ij
     have hw := w.2 ij
-    rw [← (show (u : A.ValueGradientL2 μ).fst = (w : A.ValueGradientL2 μ).fst from h)] at hw
+    rw [← (show (u : A.chartValueGradientL2 μ).fst = (w : A.chartValueGradientL2 μ).fst
+      from h)] at hw
     exact Lp.ext ((u.2 ij).unique hw)
   exact Subtype.ext (WithLp.ofLp_injective 2 (Prod.ext h (WithLp.ofLp_injective 2 (funext hs))))
 
@@ -412,7 +415,7 @@ theorem mem_range_chartSobolevEmbedding_iff_forall_piece (f : Lp ℂ 2 μ) :
         (fun _ : Fin 1 => Rd.gridBasis E j) (A.pieceLp μ Rd.two_ne_top i f) (g j) := by
   constructor
   · rintro ⟨u, rfl⟩ i
-    exact ⟨fun j => (u : A.ValueGradientL2 μ).snd (i, j), fun j => u.2 (i, j)⟩
+    exact ⟨fun j => (u : A.chartValueGradientL2 μ).snd (i, j), fun j => u.2 (i, j)⟩
   · intro h
     choose g hg using h
     exact ⟨⟨WithLp.toLp 2 (f, WithLp.toLp 2 fun ij => g ij.1 ij.2), fun ij => hg ij.1 ij.2⟩, rfl⟩

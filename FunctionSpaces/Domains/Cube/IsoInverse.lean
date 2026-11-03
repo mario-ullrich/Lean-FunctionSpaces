@@ -56,7 +56,6 @@ in coordinate `i` satisfy `‖Δ_t^m u‖_{L_p(J(m,t))} ≤ β ‖u‖_{L_p[0,1]
 theorem eLpNorm_cubeDiff_inter_le {F : (Fin d → ℝ) → ℂ} (hF : Measurable F) {p : ℝ≥0∞}
     (hp0 : p ≠ 0) (hp : p ≠ ∞) (m : ℕ) (t : ℝ) (i : Fin d) {R : Set (Fin d → ℝ)}
     (hR : MeasurableSet R) (hRi : ∀ x s, Function.update x i s ∈ R ↔ x ∈ R) {β : ℝ≥0∞}
-    (_hβfin : β ≠ ∞)
     (hβ : ∀ x, eLpNorm (higherDiff m t (slice F x i)) p (volume.restrict (stepRegion m t)) ≤
       β * eLpNorm (slice F x i) p unitVol) :
     eLpNorm (cubeDiff m t i F) p
@@ -133,7 +132,7 @@ theorem eLpNorm_mixedDiff_le (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0∞} 
     obtain ⟨hil, hl'⟩ := List.nodup_cons.1 hl
     rw [mixedDiff_cons, listRegion_cons, List.map_cons, List.prod_cons, mul_assoc]
     refine (eLpNorm_cubeDiff_inter_le (measurable_mixedDiff m h l hf) hp0 hp (m i) (h i) i
-      (measurableSet_listRegion m h l) (update_mem_listRegion_iff m h hil) (hβfin i)
+      (measurableSet_listRegion m h l) (update_mem_listRegion_iff m h hil)
       fun x => hβ _ (slice_mixedDiff_mem V m h hil (hfV i) x) i).trans ?_
     exact mul_le_mul' le_rfl (eLpNorm_mixedDiff_le V hp0 hp m h β hβfin hβ hf hfV l hl')
 

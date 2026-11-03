@@ -226,12 +226,6 @@ theorem sum_range_two_pow_le (N : ℕ) : ∑ j ∈ Finset.range N, (2 : ℝ≥0�
   have h := sum_range_pow_le_pow_mul_inv one_le_two ofNat_ne_top N
   rwa [ENNReal.sub_eq_of_eq_add one_ne_top one_add_one_eq_two.symm, inv_one, mul_one] at h
 
-/-- `1 + 2 + ⋯ + 2^(k-1) < 2^k` in `ℕ`, the strict form of `ENNReal.sum_range_two_pow_le` for
-natural numbers (Mathlib's `Nat.geomSum_lt`). -/
-theorem _root_.ApproximationScheme.sum_range_two_pow_lt (k : ℕ) :
-    ∑ j ∈ Finset.range k, 2 ^ j < 2 ^ k :=
-  Nat.geomSum_lt le_rfl fun _ hj => Finset.mem_range.1 hj
-
 /-- For `a ≠ 0` in `[0, ∞]` there is `j ∈ ℕ` with `2^j a > 1`: Mathlib's
 `ENNReal.exists_nat_mul_gt` gives `n a > 1`, and `n < 2^n`. -/
 theorem exists_one_lt_two_pow_mul {a : ℝ≥0∞} (ha : a ≠ 0) : ∃ j : ℕ, 1 < 2 ^ j * a := by

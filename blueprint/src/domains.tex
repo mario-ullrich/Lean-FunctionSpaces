@@ -2442,7 +2442,6 @@ product and graph coordinates over $H$ write it as a shear along $e$.
   Rd.LipschitzGraph.graphEquiv, Rd.LipschitzGraph.graphEquiv_apply,
   Rd.LipschitzGraph.measurePreserving_graphEquiv, Rd.LipschitzGraph.unflatten_eq,
   Rd.LipschitzGraph.flatten_eq, Rd.LipschitzGraph.measurePreserving_unflatten,
-  Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz,
   Rd.LipschitzGraph.measurePreserving_flatten}
 \leanok
 \uses{def:lipschitz-graph, def:graph-map}
@@ -2959,8 +2958,7 @@ $s + 1/p < 2$; \Cref{lem:moduli-orders} passes to $\omega_L$. This is
 
 \begin{lemma}[Moduli of different orders]
 \label{lem:moduli-orders}
-\lean{Rd.lpModulus_add_order_le, Rd.modNorm_order_le_of_le, Rd.modNorm_order_le,
-  Rd.LipschitzGraph.intrinsicNorm_lt_top_of_modNorm',
+\lean{Rd.lpModulus_add_order_le, Rd.modNorm_order_le_of_le,
   Rd.LipschitzGraph.intrinsicNorm_lt_top_of_modNorm}
 \leanok
 \uses{lem:rd-modulus, lem:intrinsic-upper}
@@ -2972,8 +2970,7 @@ $G \in L_p(V)$,
   \\ \leq 2^{L-r} \bigl(\|G\|_p + \|(2^{k\sigma} \omega_r(G, 2^{-k})_p)_k\|_{\ell_q}\bigr).
 \end{multline*}
 For every $L \in \N$, a finite norm with moduli of order $L$ on $V$ gives a finite intrinsic norm of
-order $L$ on $\Omega$; in particular, for $L \geq 2$, a finite norm with moduli of order $2$ on $V$
-gives a finite intrinsic norm of order $L$ on $\Omega$.
+order $L$ on $\Omega$.
 \end{lemma}
 
 \begin{proof}
@@ -7280,7 +7277,7 @@ $C_j(\sum_i d_i)$ and $1 + \sum_i d_i$.
 
 \begin{theorem}[The extension theorem by reflection]
 \label{thm:reflection-extension}
-\lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev_of_one_le,
+\lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection,
   Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev_of_one_le,
   Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le}
 \leanok
@@ -7416,7 +7413,7 @@ extension operators.
 
 \begin{theorem}[The extension operator by reflection]
 \label{thm:reflection-extension-operator}
-\lean{Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_of_one_le,
+\lean{Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp_reflection,
   Rd.BoundedLipschitzDomain.sobolevExtensionL,
   Rd.BoundedLipschitzDomain.memSobolev_sobolevExtensionL,
   Rd.BoundedLipschitzDomain.sobolevExtensionL_fst_ae_eq,
@@ -11018,7 +11015,7 @@ general $A'$ combine it with \Cref{thm:boundary-atlas-independence}.
 
 \begin{theorem}[The trace theorem on compact manifolds]
 \label{thm:manifold-trace}
-\lean{Manifold.exists_flatExtension, Manifold.BesovAtlas.memBoundaryBesov_boundaryTrace,
+\lean{Manifold.exists_flatGraphExtension, Manifold.BesovAtlas.memBoundaryBesov_boundaryTrace,
   Manifold.BesovAtlas.exists_boundaryTrace_eq,
   Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace}
 \leanok
@@ -11321,7 +11318,7 @@ compact set lies in a ball.
 
 \begin{definition}[The chart Sobolev space]
 \label{def:chart-sobolev}
-\lean{Manifold.BesovAtlas.ValueGradientL2, Manifold.BesovAtlas.chartSobolev,
+\lean{Manifold.BesovAtlas.chartValueGradientL2, Manifold.BesovAtlas.chartSobolev,
   Manifold.BesovAtlas.mem_chartSobolev, Manifold.BesovAtlas.isClosed_chartSobolev,
   Manifold.BesovAtlas.completeSpace_chartSobolev, Manifold.BesovAtlas.chartForm,
   Manifold.BesovAtlas.inner_chartSobolev}

@@ -19,7 +19,7 @@ flattening `F(x) = x - φ(x) e` and its inverse `F⁻¹(y) = y + φ(y) e`.
 * **Flattening** (`Rd.LipschitzGraph.mapsTo_flatten`,
   `Rd.LipschitzGraph.mapsTo_unflatten_inter_ball`): `F` maps `Ω` into the half-space
   `H₊ = {⟪y, e⟫ > 0}` and `F⁻¹` maps `H₊ ∩ B(0, R)` into `Ω ∩ B(0, R')`. Both preserve Lebesgue
-  measure (`Rd.LipschitzGraph.measurePreserving_flatten_of_lipschitz`,
+  measure (`Rd.LipschitzGraph.measurePreserving_flatten`,
   `Rd.LipschitzGraph.measurePreserving_unflatten`).
 * **The extension by reflection** (`Rd.LipschitzGraph.reflectionExtension`): the even reflection
   (`Rd.evenReflection`) of `f ∘ F⁻¹` across `e^⊥`, composed with `F`. It is `f` on `Ω` and
@@ -174,7 +174,7 @@ variable [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V]
 theorem measurePreserving_reflect : MeasurePreserving Ω.reflect volume volume := by
   rw [reflect_eq]
   exact Ω.measurePreserving_unflatten.comp
-    ((measurePreserving_halfSpaceReflection Ω.e).comp Ω.measurePreserving_flatten_of_lipschitz)
+    ((measurePreserving_halfSpaceReflection Ω.e).comp Ω.measurePreserving_flatten)
 
 /-- **The extension by reflection sees only the values on the graph domain**: if `u = u'` almost
 everywhere on the graph domain, then their extensions by reflection agree almost everywhere on
@@ -193,7 +193,7 @@ theorem reflectionExtension_congr_ae {u u' : V → ℂ} (h : u =ᵐ[volume.restr
   have h3 : evenReflection Ω.e (u ∘ Ω.unflatten) =ᵐ[volume]
       evenReflection Ω.e (u' ∘ Ω.unflatten) :=
     h2.add ((measurePreserving_halfSpaceReflection Ω.e).quasiMeasurePreserving.ae_eq_comp h2)
-  exact Ω.measurePreserving_flatten_of_lipschitz.quasiMeasurePreserving.ae_eq_comp h3
+  exact Ω.measurePreserving_flatten.quasiMeasurePreserving.ae_eq_comp h3
 
 end Reflection
 
@@ -400,7 +400,7 @@ theorem hasWeakLineDeriv_reflectionExtension_of_integrableOn {f : V → ℂ}
       (fun w => Ω.integrableOn_flatDeriv_inter_ball hg w)
       (Ω.hasWeakLineDeriv_comp_unflatten hfg) w
   have h := HasWeakLineDeriv.comp_lipschitzWith (O := ⊤) (U := ⊤) (fun k => hE (gridBasis V k))
-    Ω.lipschitzWith_flatten Ω.measurePreserving_flatten_of_lipschitz (fun _ _ => trivial) v
+    Ω.lipschitzWith_flatten Ω.measurePreserving_flatten (fun _ _ => trivial) v
   exact h.congr_ae EventuallyEq.rfl (ae_of_all _ fun x =>
     Ω.sum_inner_mul_indicator_flatDeriv _ _)
 
@@ -422,7 +422,7 @@ measure). -/
 theorem eLpNorm_reflectionExtension_le {p : ℝ≥0∞} (hp : 1 ≤ p) (f : V → ℂ) :
     eLpNorm (Ω.reflectionExtension f) p volume ≤ 2 * eLpNorm f p (volume.restrict Ω.domain) := by
   have h1 := eLpNorm_comp_le_of_mapsTo (h := evenReflection Ω.e (f ∘ Ω.unflatten)) (U := univ)
-    Ω.measurePreserving_flatten_of_lipschitz MeasurableSet.univ (mapsTo_univ _ _) p
+    Ω.measurePreserving_flatten MeasurableSet.univ (mapsTo_univ _ _) p
   rw [Measure.restrict_univ] at h1
   calc eLpNorm (Ω.reflectionExtension f) p volume
       ≤ eLpNorm (evenReflection Ω.e (f ∘ Ω.unflatten)) p volume := h1
@@ -470,7 +470,7 @@ theorem eLpNorm_reflectionDeriv_le {p : ℝ≥0∞} (hp : 1 ≤ p) {f : V → �
   set Ψ : V → ℝ := fun y => (openHalfSpace Ω.e : Set V).indicator S y +
     (openHalfSpace Ω.e : Set V).indicator S (halfSpaceReflection Ω.e y)
   have h1 := eLpNorm_comp_le_of_mapsTo (h := Ψ) (U := univ)
-    Ω.measurePreserving_flatten_of_lipschitz MeasurableSet.univ (mapsTo_univ _ _) p
+    Ω.measurePreserving_flatten MeasurableSet.univ (mapsTo_univ _ _) p
   rw [Measure.restrict_univ] at h1
   calc eLpNorm (Ω.reflectionDeriv g v) p volume
       ≤ eLpNorm (((1 + Ω.M) ^ 2 * ‖v‖) • (Ψ ∘ Ω.flatten)) p volume :=

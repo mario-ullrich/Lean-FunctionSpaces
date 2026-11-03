@@ -198,7 +198,7 @@ theorem one_add_norm_pow_mul_le_schwartz (G : 𝓢(V, ℂ)) (r N : ℕ) (x : V) 
   rw [pow_zero, one_mul] at h0
   calc (1 + ‖x‖) ^ N * ‖iteratedFDeriv ℝ r G x‖
       ≤ 2 ^ N * (1 + ‖x‖ ^ N) * ‖iteratedFDeriv ℝ r G x‖ :=
-        mul_le_mul_of_nonneg_right (ENNReal.one_add_pow_le_two_pow_mul (norm_nonneg x) N)
+        mul_le_mul_of_nonneg_right (one_add_pow_le_two_pow_mul (norm_nonneg x) N)
           (norm_nonneg _)
     _ = 2 ^ N * (‖iteratedFDeriv ℝ r G x‖ + ‖x‖ ^ N * ‖iteratedFDeriv ℝ r G x‖) := by ring
     _ ≤ _ := by gcongr

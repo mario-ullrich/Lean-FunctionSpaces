@@ -44,10 +44,6 @@ namespace Cube
 
 open Interval
 
-/-- Lebesgue measure on `[0, 1]` is a probability measure. -/
-instance isProbabilityMeasure_unitVol : IsProbabilityMeasure unitVol :=
-  ⟨by simp [unitVol, Real.volume_Icc]⟩
-
 /-- On `[a, b] ⊆ [0, 1]`, Lebesgue measure on `[0, 1]` restricted to `[a, b]` is Lebesgue measure
 on `[a, b]`. -/
 theorem unitVol_restrict_Icc_of_subset {a b : ℝ} (ha : 0 ≤ a) (hb : b ≤ 1) :
@@ -243,32 +239,6 @@ theorem eLpNorm_regionVol_eq_slice {f : (Fin d → ℝ) → ℂ} (hf : Measurabl
   have h := eLpNorm_inter_eq_slice hf hp0 hp i MeasurableSet.univ (fun _ _ => Iff.rfl)
     (measurableSet_Icc (a := a) (b := b))
   rwa [univ_inter, Measure.restrict_univ, unitVol_restrict_Icc_of_subset ha hb] at h
-
-/-- **Minkowski's inequality in the form of bounds**: for `q ≥ 1` and measurable
-`φ, ψ : α → [0, ∞]`, `∫ φ^q ≤ a^q` and `∫ ψ^q ≤ b^q` give `∫ (φ + ψ)^q ≤ (a + b)^q`
-(Mathlib's `ENNReal.lintegral_Lp_add_le`). -/
-theorem lintegral_add_rpow_le {α : Type*} [MeasurableSpace α] {μ : Measure α} {q : ℝ}
-    (hq : 1 ≤ q) {φ ψ : α → ℝ≥0∞} (hφ : AEMeasurable φ μ) (hψ : AEMeasurable ψ μ)
-    {a b : ℝ≥0∞} (ha : ∫⁻ x, φ x ^ q ∂μ ≤ a ^ q) (hb : ∫⁻ x, ψ x ^ q ∂μ ≤ b ^ q) :
-    ∫⁻ x, (φ x + ψ x) ^ q ∂μ ≤ (a + b) ^ q := by
-  have hq0 : 0 < q := lt_of_lt_of_le zero_lt_one hq
-  have hroot : ∀ {c : ℝ≥0∞} {F : α → ℝ≥0∞}, ∫⁻ x, F x ^ q ∂μ ≤ c ^ q →
-      (∫⁻ x, F x ^ q ∂μ) ^ (1 / q) ≤ c := fun {c F} h =>
-    (ENNReal.rpow_le_rpow h (by positivity)).trans_eq (by
-      rw [one_div, ENNReal.rpow_rpow_inv hq0.ne'])
-  have h := ENNReal.lintegral_Lp_add_le hφ hψ hq
-  simp only [Pi.add_apply] at h
-  calc ∫⁻ x, (φ x + ψ x) ^ q ∂μ = ((∫⁻ x, (φ x + ψ x) ^ q ∂μ) ^ (1 / q)) ^ q := by
-        rw [one_div, ENNReal.rpow_inv_rpow hq0.ne']
-    _ ≤ (a + b) ^ q := ENNReal.rpow_le_rpow (h.trans (add_le_add (hroot ha) (hroot hb))) hq0.le
-
-/-- Constant multiples in bounds of `∫ φ^q`: `∫ φ^q ≤ a^q` gives `∫ (c φ)^q ≤ (c a)^q`. -/
-theorem lintegral_const_mul_rpow_le {α : Type*} [MeasurableSpace α] {μ : Measure α} {q : ℝ}
-    (hq : 0 ≤ q) {c : ℝ≥0∞} (hc : c ≠ ∞) {φ : α → ℝ≥0∞} {a : ℝ≥0∞}
-    (ha : ∫⁻ x, φ x ^ q ∂μ ≤ a ^ q) : ∫⁻ x, (c * φ x) ^ q ∂μ ≤ (c * a) ^ q := by
-  simp_rw [ENNReal.mul_rpow_of_nonneg _ _ hq]
-  rw [lintegral_const_mul' _ _ (ENNReal.rpow_ne_top_of_nonneg hq hc)]
-  exact mul_le_mul' le_rfl ha
 
 /-- **Slices of almost equal functions**: if `f = g` almost everywhere on the cube, then for
 almost every `x` the slices of `f` and `g` through `x` in coordinate `i` agree almost

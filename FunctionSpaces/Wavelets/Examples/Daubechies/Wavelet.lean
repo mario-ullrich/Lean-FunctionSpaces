@@ -540,7 +540,7 @@ theorem tsum_scaled_mul_scaled_succ (hN : 2 ≤ N) (j : ℕ) (x y : ℝ) :
 
 /-- **Products of generators of level `1`**: `g_{1,n}(x) g_{1,n}(y) = 2 g(2x - n) g(2y - n)` for
 every `g : ℝ → ℂ`, `n ∈ ℤ` and `x, y ∈ ℝ`, since `2^(1/2) 2^(1/2) = 2`
-(`Daubechies.ofReal_two_rpow_half_mul_self`). -/
+(`ofReal_two_rpow_half_mul_self`). -/
 theorem scaledFun_one_mul_scaledFun_one (g : ℝ → ℂ) (n : ℤ) (x y : ℝ) :
     scaledFun g 1 n x * scaledFun g 1 n y = 2 * (g (2 * x - n) * g (2 * y - n)) := by
   have h := ofReal_two_rpow_half_mul_self 1

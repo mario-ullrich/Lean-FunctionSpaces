@@ -57,7 +57,7 @@ and a smooth `ζ` with derivatives bounded by `M` up to order `L`, there is `K <
 `‖ζ E g‖_p + ‖(2^(k(s+1/p)) ω_L(ζ E g, 2^(-k))_p)_k‖_{ℓ_q} ≤
 K (‖g‖_p + ‖(2^(ks) ω_1(g, 2^(-k))_p)_k‖_{ℓ_q})` for every `g ∈ B^s_{p,q}(H)`, with
 `K = M_ζ 2^(L-2) K_E`: the multiplier bound (`Rd.modNorm_mulLp_le`), the change of the order of the
-differences (`Rd.modNorm_order_le`) and the bound of the extension
+differences (`Rd.modNorm_order_le_of_le`) and the bound of the extension
 (`Rd.LipschitzGraph.modNorm_graphExtension_le`). -/
 theorem exists_modNorm_mulLp_graphExtension_le (hp : p ≠ ∞) {L : ℕ} (hL : 2 ≤ L) {s : ℝ}
     (hs : 0 < s) (hs1 : s < 1) {q : ℝ≥0∞} (hq : 1 ≤ q) {ζ : V → ℂ}
@@ -80,7 +80,7 @@ theorem exists_modNorm_mulLp_graphExtension_le (hp : p ≠ ∞) {L : ℕ} (hL : 
     _ ≤ multiplierTotal (V := V) hp L (s + 1 / p.toReal) M *
         (2 ^ (L - 2) * (‖Ω.graphExtension hp 1 g‖ₑ + lqNorm q (fun k =>
           dyadicWeight (s + 1 / p.toReal) k * lpModulus p 2 (Ω.graphExtension hp 1 g) k))) :=
-        mul_le_mul' le_rfl (modNorm_order_le hL _ q _)
+        mul_le_mul' le_rfl (modNorm_order_le_of_le hL _ q _)
     _ ≤ multiplierTotal (V := V) hp L (s + 1 / p.toReal) M * (2 ^ (L - 2) *
         (K * (‖g‖ₑ + lqNorm q (fun k => dyadicWeight s k * lpModulus p 1 g k)))) :=
         mul_le_mul' le_rfl (mul_le_mul' le_rfl (hle g hg))
