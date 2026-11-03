@@ -118,7 +118,7 @@ the differences of order `m_i` and step `h_i` of the functions in `V` are bounde
 step regions, then the mixed difference along a list of distinct coordinates satisfies
 `‖M f‖_{L_p(box)} ≤ (∏_{i ∈ l} β_i) ‖f‖_{L_p(Q)}`. -/
 theorem eLpNorm_mixedDiff_le (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞)
-    (m : Fin d → ℕ) (h : Fin d → ℝ) (β : Fin d → ℝ≥0∞) (hβfin : ∀ i, β i ≠ ∞)
+    (m : Fin d → ℕ) (h : Fin d → ℝ) (β : Fin d → ℝ≥0∞)
     (hβ : ∀ u ∈ V, ∀ i, eLpNorm (higherDiff (m i) (h i) u) p
       (volume.restrict (stepRegion (m i) (h i))) ≤ β i * eLpNorm u p unitVol)
     {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (hfV : ∀ i x, slice f x i ∈ V) :
@@ -134,7 +134,7 @@ theorem eLpNorm_mixedDiff_le (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0∞} 
     refine (eLpNorm_cubeDiff_inter_le (measurable_mixedDiff m h l hf) hp0 hp (m i) (h i) i
       (measurableSet_listRegion m h l) (update_mem_listRegion_iff m h hil)
       fun x => hβ _ (slice_mixedDiff_mem V m h hil (hfV i) x) i).trans ?_
-    exact mul_le_mul' le_rfl (eLpNorm_mixedDiff_le V hp0 hp m h β hβfin hβ hf hfV l hl')
+    exact mul_le_mul' le_rfl (eLpNorm_mixedDiff_le V hp0 hp m h β hβ hf hfV l hl')
 
 /-- **The translated terms**: on the isotropic region the translate of the mixed difference of
 a word `α` by its shift `s_α` stays in the cube, and lands in the box of the mixed difference, so
@@ -173,7 +173,7 @@ and every slice of `f` lies in `V`, then
 `‖Δ_h^r f‖_{L_p(Q_{rh})} ≤ (∑_α ∏_i β(m_i(α), h_i)) ‖f‖_{L_p(Q)}`, summed over the words
 `α : Fin r → Fin d`. -/
 theorem eLpNorm_higherDiff_le_sum (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0∞} (hp1 : 1 ≤ p)
-    (hp : p ≠ ∞) (r : ℕ) (h : Fin d → ℝ) (β : ℕ → ℝ → ℝ≥0∞) (hβfin : ∀ m t, β m t ≠ ∞)
+    (hp : p ≠ ∞) (r : ℕ) (h : Fin d → ℝ) (β : ℕ → ℝ → ℝ≥0∞)
     (hβ : ∀ u ∈ V, ∀ m ≤ r, ∀ i : Fin d, eLpNorm (higherDiff m (h i) u) p
       (volume.restrict (stepRegion m (h i))) ≤ β m (h i) * eLpNorm u p unitVol)
     {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) (hfV : ∀ i x, slice f x i ∈ V) :
@@ -188,7 +188,7 @@ theorem eLpNorm_higherDiff_le_sum (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0
   refine (eLpNorm_sum_le hp1).trans (Finset.sum_le_sum fun α _ => ?_)
   refine (eLpNorm_shift_mixedDiff_le h α hf p).trans ?_
   have hmix := eLpNorm_mixedDiff_le V hp0 hp (count α) h (fun i => β (count α i) (h i))
-    (fun i => hβfin _ _) (fun u hu i => hβ u hu _ (count_le α i) i) hf hfV
+    (fun u hu i => hβ u hu _ (count_le α i) i) hf hfV
     (List.finRange d) (List.nodup_finRange d)
   rwa [← Fin.prod_univ_def] at hmix
 
@@ -210,7 +210,7 @@ theorem prod_rpow_eq_rpow_sum {ι : Type*} (s : Finset ι) (A : ℝ≥0∞) {θ 
 `f` with slices in `V` and `‖h‖_∞ ≤ 2^(-j)`,
 `‖Δ_h^r f‖_{L_p(Q_{rh})} ≤ d^r C^d (2^j ‖h‖_∞)^Θ ‖f‖_{L_p(Q)}`. -/
 theorem eLpNorm_higherDiff_le_of_exponents (V : Submodule ℂ (ℝ → ℂ)) {p : ℝ≥0∞} (hp1 : 1 ≤ p)
-    (hp : p ≠ ∞) (r j : ℕ) {C : ℝ≥0∞} (hC : C ≠ ∞) (θ : ℕ → ℝ) (hθ : ∀ m, 0 ≤ θ m) {Θ : ℝ}
+    (hp : p ≠ ∞) (r j : ℕ) {C : ℝ≥0∞} (θ : ℕ → ℝ) (hθ : ∀ m, 0 ≤ θ m) {Θ : ℝ}
     (hΘ : ∀ m : Fin d → ℕ, ∑ i, m i = r → Θ ≤ ∑ i, θ (m i))
     (hV : ∀ u ∈ V, ∀ m ≤ r, ∀ t : ℝ, |t| ≤ 1 / 2 ^ j →
       eLpNorm (higherDiff m t u) p (volume.restrict (stepRegion m t)) ≤
@@ -230,9 +230,7 @@ theorem eLpNorm_higherDiff_le_of_exponents (V : Submodule ℂ (ℝ → ℂ)) {p 
     rw [le_div_iff₀ hpos] at hh
     linarith
   set β : ℕ → ℝ → ℝ≥0∞ := fun m t => C * ENNReal.ofReal (2 ^ j * |t|) ^ θ m
-  have hβfin : ∀ m t, β m t ≠ ∞ := fun m t =>
-    ENNReal.mul_ne_top hC (ENNReal.rpow_ne_top_of_nonneg (hθ m) ENNReal.ofReal_ne_top)
-  refine (eLpNorm_higherDiff_le_sum V hp1 hp r h β hβfin
+  refine (eLpNorm_higherDiff_le_sum V hp1 hp r h β
     (fun u hu m hm i => hV u hu m hm (h i) ((hhi i).trans hh)) hf hfV).trans ?_
   -- each word contributes at most `C^d A^Θ`
   have hword : ∀ α : Fin r → Fin d, ∏ i, β (count α i) (h i) ≤ C ^ d * A ^ Θ := fun α => by
@@ -263,7 +261,7 @@ lie in `V`, then for every `k`
 at `0` (`Cube.eLpNorm_higherDiff_le_of_exponents` for `k ≥ j`, `Cube.isoModulus_le` for
 `k < j`). -/
 theorem lpIsoModulus_le_of_exponents {p : ℝ≥0∞} [Fact (1 ≤ p)] (V : Submodule ℂ (ℝ → ℂ))
-    (hp : p ≠ ∞) (r : ℕ) {C : ℝ≥0∞} (hC : C ≠ ∞) (θ : ℕ → ℝ) (hθ : ∀ m, 0 ≤ θ m) {Θ : ℝ}
+    (hp : p ≠ ∞) (r : ℕ) {C : ℝ≥0∞} (θ : ℕ → ℝ) (hθ : ∀ m, 0 ≤ θ m) {Θ : ℝ}
     (hΘ0 : 0 ≤ Θ) (hΘ : ∀ m : Fin d → ℕ, ∑ i, m i = r → Θ ≤ ∑ i, θ (m i)) {j : ℕ}
     (hV : ∀ u ∈ V, ∀ m ≤ r, ∀ t : ℝ, |t| ≤ 1 / 2 ^ j →
       eLpNorm (higherDiff m t u) p (volume.restrict (stepRegion m t)) ≤
@@ -280,7 +278,7 @@ theorem lpIsoModulus_le_of_exponents {p : ℝ≥0∞} [Fact (1 ≤ p)] (V : Subm
   refine iSup₂_le fun h hh => ?_
   have hhj : ‖h‖ ≤ 1 / 2 ^ j := hh.trans (one_div_le_one_div_of_le (by positivity)
     (pow_le_pow_right₀ (by norm_num) hjk))
-  exact (eLpNorm_higherDiff_le_of_exponents V Fact.out hp r j hC θ hθ hΘ hV hg hgV
+  exact (eLpNorm_higherDiff_le_of_exponents V Fact.out hp r j θ hθ hΘ hV hg hgV
     hhj).trans (mul_le_mul' (mul_le_mul' le_self_add
       (ENNReal.ofReal_two_pow_mul_rpow_le hjk hh hΘ0)) le_rfl)
 

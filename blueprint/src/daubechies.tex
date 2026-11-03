@@ -3509,10 +3509,9 @@ $y \mapsto F(2^j y)$ is integrable exactly when $F$ is.
 
 \begin{lemma}[Orthonormality at every level]
 \label{lem:daub-generators-orthonormal}
-\lean{ofReal_two_rpow_half_mul_self, Daubechies.scaledFun_mul_conj,
-  Daubechies.integral_scaledFun_mul_conj}
+\lean{Daubechies.scaledFun_mul_conj, Daubechies.integral_scaledFun_mul_conj}
 \leanok
-\uses{def:daub-generators}
+\uses{def:daub-generators, lem:dyadic-normalising-factor}
 Let $\gamma : \R \to \C$ and $j \in \N$. For all $k, l \in \Z$ and $x \in \R$,
 $\gamma_{j,k}(x) \overline{\gamma_{j,l}(x)} = 2^j \gamma(2^j x - k) \overline{\gamma(2^j x - l)}$.
 If the integer translates of $\gamma$ are \emph{orthonormal},
@@ -3590,7 +3589,7 @@ monotone convergence.
   Daubechies.eLpNorm_const_mul_scaledFun, Daubechies.memLp_of_continuous_of_eq_zero,
   Daubechies.one_div_toReal_conjExponent, Daubechies.eLpNorm_scaledFun_conjExponent}
 \leanok
-\uses{def:daub-generators}
+\uses{def:daub-generators, lem:dyadic-normalising-factor}
 Let $F, \gamma : \R \to \C$ be measurable, $j \in \N$, $k \in \Z$, $t \in \R$ and
 $0 < p \leq \infty$. Then $x \mapsto F(2^j x - t)$, $\gamma_{j,k}$ and every expansion
 $\sum_k \lambda_k \gamma_{j,k}$ are measurable, and for every $z \in \C$
@@ -4044,7 +4043,7 @@ inequality. The norms of $\varphi$ are finite (\Cref{prop:daub-scaling-integrabl
 \label{prop:daub-proj-reproduction}
 \lean{Daubechies.projFun_expand, Daubechies.projFun_projFun, Daubechies.projFun_poly}
 \leanok
-\uses{def:daub-proj-fun}
+\uses{def:daub-proj-fun, lem:dyadic-normalising-factor}
 For every Daubechies mask of order $N \geq 2$ and every $j \in \N$:
 \begin{enumerate}
   \item $P_j \bigl(\sum_k \lambda_k \varphi_{j,k}\bigr) = \sum_k \lambda_k \varphi_{j,k}$ for every
@@ -4125,7 +4124,7 @@ continuous functions with compact support.
   Daubechies.tsum_eq_sum_of_scaled_eq_zero, Daubechies.summable_of_scaled_eq_zero,
   Daubechies.card_Icc_ceil_floor_le_two_mul, Daubechies.projFun_sub_eq_tsum}
 \leanok
-\uses{def:daub-proj-fun}
+\uses{def:daub-proj-fun, lem:dyadic-normalising-factor}
 Let $N \geq 2$, $j \in \N$ and $x \in \R$. Then $\varphi_{j,k}(x) = 0$ for every integer $k$
 outside $[\lceil 2^j x - 2N + 1 \rceil, \lfloor 2^j x \rfloor]$, an interval with at most $2N$
 integers, so every series $\sum_{k \in \Z} F_k$ with $F_k = 0$ whenever $\varphi_{j,k}(x) = 0$
@@ -4164,7 +4163,7 @@ functions $f \overline{\varphi_{j,k}}$ are integrable (\Cref{lem:daub-proj-fun-b
   Daubechies.enorm_scaled_mul_integral_sub_le, Daubechies.enorm_projFun_sub_le,
   Daubechies.eLpNorm_sub_projFun_le}
 \leanok
-\uses{def:daub-proj-fun}
+\uses{def:daub-proj-fun, lem:dyadic-normalising-factor}
 Any two points of a support window $W_{j,k}$ have distance at most $(b - a)/2^j$. Let $N \geq 2$,
 $j \in \N$, let $C \geq 0$ with $|\varphi| \leq C$ on $\R$, so that
 $|\varphi_{j,k}| \leq 2^{j/2} C$ for every $k \in \Z$, and let $\eta \geq 0$.
@@ -4546,7 +4545,7 @@ $Q_j f \in L_p(\R)$ by \Cref{lem:daub-expand-coeff}.
 \lean{Daubechies.tsum_scaled_mul_scaled_succ, Daubechies.scaledFun_one_mul_scaledFun_one,
   Daubechies.kernel_succ}
 \leanok
-\uses{def:daub-scaled, def:daub-wavelet}
+\uses{def:daub-scaled, def:daub-wavelet, lem:dyadic-normalising-factor}
 For a Daubechies mask of order $N \geq 2$ and $j \in \N$ let
 $K_j(x, y) = \sum_{k \in \Z} \varphi_{j,k}(x) \varphi_{j,k}(y)$ and
 $K^\psi_j(x, y) = \sum_{k \in \Z} \psi_{j,k}(x) \psi_{j,k}(y)$. Then for all $x, y \in \R$

@@ -28,15 +28,22 @@ pieces are the traces of the pieces of `f` (`Manifold.BesovAtlas.boundaryPiece_b
 for the boundary pieces of every atlas (`Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_atlas`).
 Hence:
 
-* **the trace maps into `B^s_{p,q}(∂M)`**: `Tr_A f ∈ B^s_{p,q}(∂M)`
-  (`Manifold.BesovAtlas.memBoundaryBesov_boundaryTrace`);
+* **the trace is bounded**: the boundary pieces of `Tr_A f` have Besov quasi-norms at most `C`
+  times the Besov quasi-norm of `f` (`Manifold.BesovAtlas.exists_boundaryTrace_norm_le`), so
+  `Tr_A f ∈ B^s_{p,q}(∂M)` (`Manifold.BesovAtlas.memBoundaryBesov_boundaryTrace`);
 * **the trace is onto**: every `g ∈ B^s_{p,q}(∂M)` is the trace of `f = ∑_k θ_k · (E G_k) ∘ κ_k`,
   with the extensions `E G_k` of the boundary pieces of `g`
   (`Manifold.BesovAtlas.exists_boundaryTrace_eq`).
 
 So `B^s_{p,q}(∂M)` is the trace space of `B^{s+1/p}_{p,q}(M)` for every `s > 0`
-(`Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace`). The closure of a smooth bounded
-domain is such a manifold (`Rd.SmoothDomain.isManifold`).
+(`Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace`). For `f` with a continuous
+representative `g`, the boundary pieces of `Tr_A f` are those of `g`: the trace is the restriction
+to the boundary (`Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_continuous`).
+
+The closure of a smooth bounded domain is such a manifold (`Rd.SmoothDomain.isManifold`); there
+both statements hold for the Lebesgue measure
+(`Rd.SmoothDomain.memBoundaryBesov_iff_exists_boundaryTrace`,
+`Rd.SmoothDomain.boundaryPiece_boundaryTrace_of_continuous`).
 -/
 
 @[expose] public section
@@ -371,27 +378,75 @@ theorem boundaryPiece_boundaryTrace_of_atlas (A' : BesovAtlas (𝓡∂ n) M) {L 
   rw [h1, A.boundaryPiece_eq_sum A' i _ x']
   exact Finset.sum_congr rfl fun j _ => (h2 j).symm
 
-/-- **The trace maps into the boundary space**: for `s > 0`, `1 ≤ q ≤ ∞`, `L > s + 1/p` and
-`f ∈ B^{s+1/p}_{p,q}(M)`, the trace `Tr_A f` lies in `B^s_{p,q}(∂M)`: its boundary pieces are the
-traces of the pieces of `f`, which lie in `B^s_{p,q}(H₀)` by the trace theorem of the half-space
-(`Rd.LipschitzGraph.modNorm_trace_le_flat`). -/
-theorem memBoundaryBesov_boundaryTrace {L : ℕ} (hL : 1 ≤ L) {s : ℝ} (hs : 0 < s)
-    (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p μ}
-    (hf : A.MemBesov hp (s + 1 / p.toReal) q f) :
-    A.MemBoundaryBesov p s q (A.boundaryTrace μ hp L f) := by
-  intro k
+/-- **The trace is bounded**: for `s > 0`, `1 ≤ q ≤ ∞` and `L > s + 1/p` there is `C < ∞` such
+that for every `f ∈ B^{s+1/p}_{p,q}(M)` each boundary piece of `Tr_A f` agrees almost everywhere
+with some `G ∈ L_p(H₀)` of Besov quasi-norm
+`‖G‖_p + ‖(2^(js) ω_{⌊s⌋+1}(G, 2^(-j))_p)_j‖_{ℓ_q} ≤ C ‖f‖_{A, L, s+1/p, q}`, with the Besov
+quasi-norm of the atlas with differences of order `L` (`Manifold.BesovAtlas.besovNorm`). `G` is
+the trace of the piece of `f` (`Manifold.BesovAtlas.boundaryPiece_boundaryTrace`), bounded by the
+trace theorem of the half-space (`Rd.LipschitzGraph.modNorm_trace_le_flat`); the piece is one
+term of the sum `‖f‖_{A, L, s+1/p, q}`. -/
+theorem exists_boundaryTrace_norm_le {L : ℕ} {s : ℝ} (hs : 0 < s)
+    (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q) :
+    ∃ C : ℝ≥0∞, C ≠ ⊤ ∧ ∀ f : Lp ℂ p μ, A.MemBesov hp (s + 1 / p.toReal) q f → ∀ k,
+      ∃ G : Lp ℂ p (volume : Measure (bdry n)),
+        (G : bdry n → ℂ) =ᵐ[volume] A.boundaryPiece k (A.boundaryTrace μ hp L f) ∧
+        ‖G‖ₑ + lqNorm q (fun j => dyadicWeight s j * Rd.lpModulus p (⌊s⌋₊ + 1) G j) ≤
+          C * A.besovNorm hp L (s + 1 / p.toReal) q f := by
   have hσ0 : 0 < s + 1 / p.toReal := by positivity
+  have hL : 1 ≤ L := Nat.cast_pos.1 (hσ0.trans hsL)
   have hr : 1 ≤ ⌊s⌋₊ + 1 := Nat.le_add_left 1 _
   have hsr : s < ((⌊s⌋₊ + 1 : ℕ) : ℝ) := by
     push_cast
     exact Nat.lt_floor_add_one s
   obtain ⟨K, hK, hle⟩ := Rd.LipschitzGraph.modNorm_trace_le_flat
     (Rd.e0 : EuclideanSpace ℝ (Fin n)) Rd.norm_e0 hp L hr hs hsr hq
-  have hG : Rd.modNormOn (Rd.BesovDomain.measurableSet (range (𝓡∂ n))) L (s + 1 / p.toReal) q
-      (A.pieceLp μ hp k f) < ⊤ := hf.modNormOn_pieceLp_lt_top hp A hσ0 hsL hq k
+  refine ⟨K, hK, fun f hf k =>
+    ⟨_, (A.boundaryPiece_boundaryTrace μ hp hL hs hsL hq hf k).symm, ?_⟩⟩
+  have hG := hf.modNormOn_pieceLp_lt_top hp A hσ0 hsL hq k
+  have hk := A.modNormOn_pieceLp_le_besovNorm hp L (s + 1 / p.toReal) q f k
+  rw [modNormOn_range_eq] at hG hk
+  exact (hle _ hG).trans (mul_le_mul' le_rfl hk)
+
+/-- **The trace maps into the boundary space**: for `s > 0`, `1 ≤ q ≤ ∞`, `L > s + 1/p` and
+`f ∈ B^{s+1/p}_{p,q}(M)`, the trace `Tr_A f` lies in `B^s_{p,q}(∂M)`: the quasi-norm bound
+`Manifold.BesovAtlas.exists_boundaryTrace_norm_le`, with `‖f‖_{A, L, s+1/p, q} < ∞`
+(`Manifold.BesovAtlas.memBesov_iff_besovNorm_lt_top`). -/
+theorem memBoundaryBesov_boundaryTrace {L : ℕ} {s : ℝ} (hs : 0 < s)
+    (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p μ}
+    (hf : A.MemBesov hp (s + 1 / p.toReal) q f) :
+    A.MemBoundaryBesov p s q (A.boundaryTrace μ hp L f) := by
+  obtain ⟨C, hC, h⟩ := A.exists_boundaryTrace_norm_le μ hp hs hsL hq
+  have hfin := (A.memBesov_iff_besovNorm_lt_top hp (by positivity) hsL hq f).1 hf
+  intro k
+  obtain ⟨G, hG, hle⟩ := h f hf k
+  exact ⟨G, hG, hle.trans_lt (ENNReal.mul_lt_top hC.lt_top hfin)⟩
+
+/-- **The trace of a continuous function is its restriction to the boundary**: for `s > 0`,
+`1 ≤ q ≤ ∞`, `L > s + 1/p` and `f ∈ B^{s+1/p}_{p,q}(M)` with a continuous representative
+`g : M → ℂ`, every boundary piece of `Tr_A f` agrees almost everywhere with the boundary piece of
+`g`, the restriction of `(ψ_k g) ∘ κ_k⁻¹` to `H₀`. The boundary pieces of `Tr_A f` are the traces
+of the pieces of `f` (`Manifold.BesovAtlas.boundaryPiece_boundaryTrace`); the piece
+`(ψ_k g) ∘ κ_k⁻¹` is continuous on the closed half-space and vanishes off a compact set
+(`Manifold.BesovAtlas.continuousOn_piece`), so its trace is its restriction to `H₀`
+(`Rd.trace_ae_eq_of_continuousOn`). -/
+theorem boundaryPiece_boundaryTrace_of_continuous {L : ℕ} {s : ℝ} (hs : 0 < s)
+    (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p μ}
+    (hf : A.MemBesov hp (s + 1 / p.toReal) q f) {g : M → ℂ} (hg : Continuous g)
+    (hfg : (f : M → ℂ) =ᵐ[μ] g) (k : Fin A.n) :
+    A.boundaryPiece k (A.boundaryTrace μ hp L f) =ᵐ[volume] A.boundaryPiece k g := by
+  have hσ0 : 0 < s + 1 / p.toReal := by positivity
+  have hL : 1 ≤ L := Nat.cast_pos.1 (hσ0.trans hsL)
+  have hG := hf.modNormOn_pieceLp_lt_top hp A hσ0 hsL hq k
   rw [modNormOn_range_eq] at hG
-  exact ⟨_, (A.boundaryPiece_boundaryTrace μ hp hL hs hsL hq hf k).symm,
-    (hle _ hG).trans_lt (ENNReal.mul_lt_top hK.lt_top hG)⟩
+  have hpg : A.pieceLp μ hp k f =ᵐ[volume] A.piece k g :=
+    (A.pieceLp_ae μ hp k f).trans
+      (A.piece_ae_eq k (Lp.stronglyMeasurable f) hg.stronglyMeasurable hfg)
+  refine (A.boundaryPiece_boundaryTrace μ hp hL hs hsL hq hf k).trans ?_
+  exact Rd.trace_ae_eq_of_continuousOn Rd.norm_e0 hp hL hs hq hG
+    (by rw [← range_eq_closedHalfSpace]; exact A.continuousOn_piece k hg)
+    (A.isCompact_pieceCarrier k) (fun x _ hx => A.piece_eq_zero_of_notMem k g hx)
+    (hpg.mono fun x hx _ => hx)
 
 /-- **The trace is onto**: for `s > 0` and `L ≥ 2` with `L > s + 1/p`, every
 `g ∈ B^s_{p,q}(∂M)` is the trace of some `f ∈ B^{s+1/p}_{p,q}(M)`, in the sense that the boundary
@@ -449,9 +504,43 @@ theorem memBoundaryBesov_iff_exists_boundaryTrace {L : ℕ} (hL : 2 ≤ L) {s : 
     A.MemBoundaryBesov p s q g ↔ ∃ f : Lp ℂ p μ, A.MemBesov hp (s + 1 / p.toReal) q f ∧
       ∀ i, A.boundaryPiece i (A.boundaryTrace μ hp L f) =ᵐ[volume] A.boundaryPiece i g := by
   refine ⟨A.exists_boundaryTrace_eq μ hp hL hs hsL hq, fun ⟨f, hf, htr⟩ i => ?_⟩
-  obtain ⟨G, hG, hGfin⟩ := A.memBoundaryBesov_boundaryTrace μ hp (by omega) hs hsL hq hf i
+  obtain ⟨G, hG, hGfin⟩ := A.memBoundaryBesov_boundaryTrace μ hp hs hsL hq hf i
   exact ⟨G, hG.trans (htr i), hGfin⟩
 
 end BesovAtlas
 
 end Manifold
+
+/-! ### The boundary of a smooth bounded domain -/
+
+namespace Rd.SmoothDomain
+
+open Manifold
+
+variable {n : ℕ} [NeZero n] (Ω : SmoothDomain n) {p : ℝ≥0∞} [Fact (1 ≤ p)]
+  (A : Manifold.BesovAtlas (𝓡∂ n) (closure Ω.carrier)) (hp : p ≠ ⊤)
+
+/-- **The trace theorem on the boundary of a smooth bounded domain**: for the closure of a smooth
+bounded domain `Ω`, a compact manifold with boundary (`Rd.SmoothDomain.isManifold`) with the
+Lebesgue measure (`Rd.SmoothDomain.volumeOn`), a Besov atlas `A`, `1 ≤ p < ∞`, `s > 0`,
+`1 ≤ q ≤ ∞` and an order `L ≥ 2` with `L > s + 1/p`, the chart-defined space `B^s_{p,q}(∂Ω)` is the
+trace space of `B^{s+1/p}_{p,q}(closure Ω)`
+(`Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace`). -/
+theorem memBoundaryBesov_iff_exists_boundaryTrace {L : ℕ} (hL : 2 ≤ L) {s : ℝ} (hs : 0 < s)
+    (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q) (g : closure Ω.carrier → ℂ) :
+    A.MemBoundaryBesov p s q g ↔ ∃ f : Lp ℂ p Ω.volumeOn, A.MemBesov hp (s + 1 / p.toReal) q f ∧
+      ∀ i, A.boundaryPiece i (A.boundaryTrace Ω.volumeOn hp L f) =ᵐ[volume] A.boundaryPiece i g :=
+  A.memBoundaryBesov_iff_exists_boundaryTrace Ω.volumeOn hp hL hs hsL hq g
+
+/-- **The trace of a continuous function on the closure of a smooth bounded domain** is its
+restriction to the boundary: for `f ∈ B^{s+1/p}_{p,q}(closure Ω)` with a continuous representative
+`g`, `s > 0`, `1 ≤ q ≤ ∞` and `L > s + 1/p`, every boundary piece of `Tr_A f` agrees almost
+everywhere with that of `g` (`Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_continuous`). -/
+theorem boundaryPiece_boundaryTrace_of_continuous {L : ℕ} {s : ℝ} (hs : 0 < s)
+    (hsL : s + 1 / p.toReal < L) {q : ℝ≥0∞} (hq : 1 ≤ q) {f : Lp ℂ p Ω.volumeOn}
+    (hf : A.MemBesov hp (s + 1 / p.toReal) q f) {g : closure Ω.carrier → ℂ} (hg : Continuous g)
+    (hfg : (f : closure Ω.carrier → ℂ) =ᵐ[Ω.volumeOn] g) (k : Fin A.n) :
+    A.boundaryPiece k (A.boundaryTrace Ω.volumeOn hp L f) =ᵐ[volume] A.boundaryPiece k g :=
+  A.boundaryPiece_boundaryTrace_of_continuous Ω.volumeOn hp hs hsL hq hf hg hfg k
+
+end Rd.SmoothDomain

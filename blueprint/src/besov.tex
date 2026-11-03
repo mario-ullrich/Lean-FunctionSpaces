@@ -1695,7 +1695,7 @@ The fibres of measure $0$ are countably many, so their union is a null set.
 \label{def:dyadic-filtration}
 \lean{Haar.vol, Haar.dyadicIndex, Haar.dyadicInterval, Haar.dyadicInterval_eq_Ico,
   Haar.dyadicInterval_eq_union, Haar.vol_dyadicInterval, Haar.dyadicSigma, Haar.dyadicFiltration,
-  Haar.scheme, Haar.vol_univ, Haar.mem_dyadicInterval, Haar.measurable_dyadicIndex,
+  Haar.scheme, Haar.mem_dyadicInterval, Haar.measurable_dyadicIndex,
   Haar.measurableSet_dyadicInterval, Haar.disjoint_dyadicInterval, Haar.dyadicIndex_nonneg,
   Haar.dyadicIndex_lt, Haar.dyadicInterval_natCast, Haar.dyadicInterval_subset,
   Haar.vol_real_dyadicInterval,
@@ -1730,6 +1730,24 @@ In particular $E[f \mid \mathcal{F}_0] = \int_0^1 f$.
 relevant fibres are the intervals $I_{j,n}$, $0 \leq n < 2^j$, of measure $2^{-j}$.
 \end{proof}
 
+\begin{lemma}[The normalising factor $2^{j/2}$]
+\label{lem:dyadic-normalising-factor}
+\lean{ofReal_two_rpow_half_mul_self, enorm_two_rpow_half}
+\leanok
+\uses{def:lq-norm}
+For every $j \in \N$, $2^{j/2} \cdot 2^{j/2} = 2^j$, and the modulus of $2^{j/2}$ as a complex
+number is the dyadic weight $2^{j/2}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$2^{j/2} \cdot 2^{j/2} = 2^{j/2 + j/2} = 2^j$, and $2^{j/2} > 0$.
+\end{proof}
+
+The Haar functions, the multiwavelets of \Cref{sec:multiwavelets} and the Daubechies wavelets
+carry this factor, which makes the dilation $g \mapsto 2^{j/2} g(2^j \cdot)$ an isometry of
+$L_2(\R)$.
+
 \begin{definition}[Haar functions and coefficients]
 \label{def:haar}
 \lean{Haar.haarFunction, Haar.measurable_haarFunction, Haar.haarFunction_eq_zero,
@@ -1750,7 +1768,7 @@ $I_{j,m}$ and has modulus $2^{j/2}$ on $I_{j,m}$. The Haar coefficient of $f \in
 \label{lem:haar-martingale}
 \lean{Haar.sum_fin_eq_of_ne, Haar.setIntegral_dyadicInterval, Haar.condExpLp_succ_sub_ae_eq}
 \leanok
-\uses{lem:dyadic-condexp, def:haar}
+\uses{lem:dyadic-condexp, def:haar, lem:dyadic-normalising-factor}
 For $f \in L_p[0, 1]$ and $k \in \N$,
 \[
   E[f \mid \mathcal{F}_{k+1}] - E[f \mid \mathcal{F}_k]
@@ -2680,7 +2698,7 @@ triangle inequality.
   Alpert.detailPieces, Alpert.ppFun_detailPieces, Alpert.levelOne_detailPieces_mem,
   Alpert.integral_conj_psi_mul_detailPieces, Alpert.ppFun_detailPieces_ae_eq}
 \leanok
-\uses{lem:multiwavelets, lem:loc-proj, thm:pp-proj}
+\uses{lem:multiwavelets, lem:loc-proj, thm:pp-proj, lem:dyadic-normalising-factor}
 Let $g \in L_1[0,1]$, $k \in \N$ and $m < 2^k$. On $I_{k,m}$,
 \[
   P_{k+1} g - P_k g = \sum_{i \leq r} \langle g, \psi_{k,m,i} \rangle \, \psi_{k,m,i}
@@ -2703,11 +2721,11 @@ moved multiwavelet is a polynomial on each half, so $\int_{I_{k,m}} (P_{k+1} g -
 
 \begin{lemma}[Norms of the details]
 \label{lem:multiwavelet-norms}
-\lean{Interval.lintegral_unit_eq_sum_dyadicIco, enorm_two_rpow_half,
-  ENNReal.ofReal_two_pow_eq, Alpert.eLpNorm_detailFun_dyadicIco,
-  Alpert.exists_eLpNorm_detailFun_equiv, Alpert.enorm_ppProj_sub}
+\lean{Interval.lintegral_unit_eq_sum_dyadicIco, ENNReal.ofReal_two_pow_eq,
+  Alpert.eLpNorm_detailFun_dyadicIco, Alpert.exists_eLpNorm_detailFun_equiv,
+  Alpert.enorm_ppProj_sub}
 \leanok
-\uses{lem:multiwavelet-details, lem:multiwavelets}
+\uses{lem:multiwavelet-details, lem:multiwavelets, lem:dyadic-normalising-factor}
 Let $1 \leq p < \infty$. There are $K, M$ with
 \[
   2^{k(1/2 - 1/p)} \bigl\| (\langle g, \psi_{k,m,i} \rangle)_{m,i} \bigr\|_{\ell_p}
@@ -4901,7 +4919,7 @@ $M = \omega_r(f, 2^{-k})_p$ gives the bound.
   Rd.enorm_fwdDiff_schwartz_rpow_le, Rd.lintegral_enorm_fwdDiff_rpow_le,
   Rd.lintegral_enorm_fwdDiff_le, Rd.eLpNorm_fwdDiff_schwartz_le}
 \leanok
-\uses{def:rd-modulus}
+\uses{def:rd-modulus, lem:weighted-jensen}
 For every Schwartz function $G$ on $V$ and all $v, x \in V$,
 \[
   G(x + v) - G(x) = \int_0^1 \partial_v G(x + t v) \, dt
@@ -4926,8 +4944,9 @@ Schwartz function $G$ on $V$ and all $v, x \in V$,
 \leanok
 The identity is the fundamental theorem of calculus along the segment from $x$ to $x + v$; the
 pointwise bound follows. The integral identity is Tonelli's theorem with the translation
-invariance of Lebesgue measure. The interval $(0, 1]$ carries a probability measure, on which the
-$L_1$ norm is at most the $L_p$ norm; with the pointwise bound this gives the bound of
+invariance of Lebesgue measure. The bound $(\int_0^1 \varphi)^p \leq \int_0^1 \varphi^p$ is the
+weighted Jensen inequality of \Cref{lem:weighted-jensen} with the weight $1$; with the pointwise
+bound it gives the bound of
 $|G(x + v) - G(x)|^p$. Integrating it over $x$ and averaging the translates of
 $|\partial_v G|^p$ along the segment gives $\|G(\cdot + v) - G\|_p \leq \|\partial_v G\|_p$.
 \end{proof}

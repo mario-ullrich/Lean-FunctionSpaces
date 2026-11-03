@@ -6360,12 +6360,10 @@ $\Omega$.
 \begin{theorem}[The extension theorem]
 \label{thm:sobolev-extension}
 \lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev,
-  Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton,
-  Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev,
-  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev}
+  Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton}
 \leanok
 \uses{lem:sobolev-patches, thm:pasting-sobolev, lem:bounded-lipschitz-geometry,
-  def:extends-sobolev, lem:weak-derivative-basic}
+  def:extends-sobolev}
 For every bounded Lipschitz domain $\Omega$ in dimension $n \geq 1$ and every $1 < p < \infty$
 there is $C < \infty$ such that for every $f \in L_p(\Omega)$ with weak derivatives
 $g_i = \partial_{e_i} f \in L_p(\Omega)$ on $\Omega$ there are $F \in \Sob{1}{p}(V)$ with $F = f$
@@ -6375,9 +6373,9 @@ with
   \|F\|_p + \sum_{i \in I} \|G_i\|_p \leq C \Bigl(\|f\|_{L_p(\Omega)} + \sum_{i \in I}
   \|g_i\|_{L_p(\Omega)}\Bigr) .
 \]
-For every bounded Lipschitz domain $\Omega$ in $V$ of any dimension, every $1 < p < \infty$ and
-every $f \colon V \to \C$, $f \in \Sob{1}{p}(\Omega)$ if and only if $f = F$ almost everywhere on
-$\Omega$ for some $F \in \Sob{1}{p}(V)$.
+If $V$ has dimension $0$, then for every open set $O \subseteq V$, every $m \in \N$, every
+$1 \leq p \leq \infty$ and every $f \in \Sob{m}{p}(O)$ there is $F \in \Sob{m}{p}(V)$ with $F = f$
+almost everywhere on $O$.
 \end{theorem}
 
 \begin{proof}
@@ -6386,10 +6384,8 @@ By \Cref{lem:bounded-lipschitz-geometry} the boundary is covered by the balls
 $B(c_j, \rho_j - 2\varepsilon)$ for some $\varepsilon > 0$, and the points of $\Omega$ outside
 them have distance more than $2\delta$ from $V \setminus \Omega$ for some $\delta > 0$. These sets
 cover the closure of $\Omega$; \Cref{lem:sobolev-patches} and \Cref{thm:pasting-sobolev} give the
-first claim. For the second, the weak derivatives of $F \in \Sob{1}{p}(V)$ restrict to $\Omega$
-(\Cref{lem:weak-derivative-basic}); conversely the first claim gives $F$ for $n \geq 1$, and for
-$n = 0$ the open set $\Omega$ is empty, where $F = 0$ serves, or all of $V$, where $F = f$
-serves.
+first claim. For $n = 0$ the open set $O$ is empty, where $F = 0$ serves, or all of $V$, where
+$F = f$ serves.
 \end{proof}
 
 The construction gives an extension operator with a finite constant
@@ -6404,7 +6400,7 @@ every order $m$ and $1 < p < \infty$ by the local means of the derivatives of or
 \lean{Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev,
   Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_restrictL2}
 \leanok
-\uses{thm:sobolev-extension, def:sobolev-lipschitz-domain, thm:sobolev-restriction-lipschitz}
+\uses{thm:reflection-extension, def:sobolev-lipschitz-domain, thm:sobolev-restriction-lipschitz}
 For every bounded Lipschitz domain $\Omega$ and every $f \in L_2(V)$, the following are
 equivalent: $f$ lies in the restriction space $H^1(\Omega)$ of
 \Cref{def:sobolev-lipschitz-domain}; $f \in \Sob{1}{2}(\Omega)$; the restriction of $f$ to
@@ -6413,7 +6409,7 @@ $\Omega$ is $u|_\Omega$ for some $u$ in the Hilbert space $H^1(\Omega)$.
 
 \begin{proof}
 \leanok
-\Cref{thm:sobolev-extension} for $p = 2$ and \Cref{thm:sobolev-restriction-lipschitz}.
+\Cref{thm:reflection-extension} for $p = 2$ and \Cref{thm:sobolev-restriction-lipschitz}.
 \end{proof}
 
 \begin{corollary}[The boundary traces of $\Sob{1}{2}(\Omega)$]
@@ -7200,7 +7196,9 @@ $C_j(\sum_i d_i)$ and $1 + \sum_i d_i$.
 \label{thm:reflection-extension}
 \lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection,
   Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev_of_one_le,
-  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le}
+  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le,
+  Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev,
+  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev}
 \leanok
 \uses{lem:reflection-patches, thm:pasting-sobolev, lem:bounded-lipschitz-geometry,
   def:extends-sobolev, lem:weak-derivative-basic, thm:sobolev-extension}
@@ -7215,15 +7213,18 @@ $G_i = \partial_{e_i} F \in L_p(V)$ on $V$ with
 \]
 For every bounded Lipschitz domain $\Omega$ in $V$ of any dimension, every $1 \leq p \leq \infty$
 and every $f \colon V \to \C$, $f \in \Sob{1}{p}(\Omega)$ if and only if $f = F$ almost everywhere
-on $\Omega$ for some $F \in \Sob{1}{p}(V)$.
+on $\Omega$ for some $F \in \Sob{1}{p}(V)$; in particular this holds for every
+$1 < p \leq \infty$.
 \end{theorem}
 
 \begin{proof}
 \leanok
 As for \Cref{thm:sobolev-extension}, with the patches of \Cref{lem:reflection-patches}: they
 cover the closure of $\Omega$ (\Cref{lem:bounded-lipschitz-geometry}), and
-\Cref{thm:pasting-sobolev} pastes them for every $1 \leq p \leq \infty$. For $n = 0$ the argument
-of \Cref{thm:sobolev-extension} holds for every $p$.
+\Cref{thm:pasting-sobolev} pastes them for every $1 \leq p \leq \infty$. For the second claim,
+the weak derivatives of $F \in \Sob{1}{p}(V)$ restrict to $\Omega$
+(\Cref{lem:weak-derivative-basic}); conversely the first claim gives $F$ for $n \geq 1$, and
+\Cref{thm:sobolev-extension} for $n = 0$.
 \end{proof}
 
 \paragraph{The extension operator by reflection.}
@@ -8191,7 +8192,7 @@ $\Omega \cap B(c_j, \rho_j - 2\varepsilon)$ and
 $\{x \in \Omega : \dist(x, V \setminus \Omega) > 2\delta\}$ cover the closure of $\Omega$
 (\Cref{lem:bounded-lipschitz-geometry}); \Cref{lem:higher-patches} and
 \Cref{thm:pasting-sobolev-higher} give the first claim. The second follows from the first as in
-\Cref{thm:sobolev-extension}; for $n = 0$ the argument there holds for every $m$.
+\Cref{thm:reflection-extension}, and from \Cref{thm:sobolev-extension} for $n = 0$.
 \end{proof}
 
 Stein's extension operator gives the theorem for every $1 \leq p \leq \infty$ with one operator
@@ -10321,6 +10322,19 @@ Mathlib's smooth function with support $V$ that equals $1$ exactly on $K$; for $
 $K = \operatorname{tsupport} \psi_i$ and $U = e_i.\mathrm{source}$.
 \end{proof}
 
+\begin{lemma}[Squares of the partition of unity]
+\label{lem:partition-squares}
+\lean{Manifold.BesovAtlas.inv_card_le_sum_sq_psi}
+\leanok
+\uses{def:besov-atlas}
+For every Besov atlas with $N$ charts and every $x \in M$, $\sum_i \psi_i(x)^2 \geq 1/N$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$1 = \bigl(\sum_i \psi_i(x)\bigr)^2 \leq N \sum_i \psi_i(x)^2$ by the Cauchy--Schwarz inequality.
+\end{proof}
+
 \begin{definition}[Chart pieces]
 \label{def:chart-pieces}
 \lean{Manifold.BesovAtlas.piece, Manifold.BesovAtlas.aestronglyMeasurable_piece,
@@ -10336,6 +10350,27 @@ $\kappa_i$ and $0$ elsewhere. It is linear in $g$, depends only on the class of 
 $\mu$-null sets, and $\|(\psi_i g) \circ \kappa_i^{-1}\|_{L_p(E)} \leq C \|g\|_{L_p(\mu)}$; so the
 pieces of $f \in L_p(\mu)$ lie in $L_p(E)$.
 \end{definition}
+
+\begin{lemma}[The carrier of a piece]
+\label{lem:piece-carrier}
+\lean{Manifold.BesovAtlas.pieceCarrier, Manifold.BesovAtlas.isCompact_pieceCarrier,
+  Manifold.BesovAtlas.pieceCarrier_subset_range, Manifold.BesovAtlas.piece_eq_zero_of_notMem,
+  Manifold.BesovAtlas.continuousOn_piece}
+\leanok
+\uses{def:chart-pieces}
+For every chart index $i$, the set $\kappa_i(\operatorname{tsupport} \psi_i)$ is a compact subset
+of $\Omega$, and the piece of every $g \colon M \to \C$ vanishes outside it. For every continuous
+$g \colon M \to \C$ the piece $(\psi_i g) \circ \kappa_i^{-1}$ is continuous on $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The chart is continuous on its source, which contains the compact
+$\operatorname{tsupport} \psi_i$. At $y = \kappa_i(x)$ outside
+$\kappa_i(\operatorname{tsupport} \psi_i)$, $\psi_i(x) = 0$. On the target of $\kappa_i$, a
+neighbourhood within $\Omega$ of each of its points, the piece is the continuous function
+$(\psi_i g) \circ \kappa_i^{-1}$; outside the compact carrier it vanishes on an open set.
+\end{proof}
 
 \begin{lemma}[Changes of charts]
 \label{lem:coord-change}
@@ -10536,8 +10571,9 @@ is a Besov domain, for example to the sphere $S^n$, $n \geq 1$ (\Cref{ex:sphere-
 
 \begin{definition}[The Besov quasi-norm of an atlas]
 \label{def:manifold-besov-norm}
-\lean{Manifold.BesovAtlas.besovNorm, Manifold.BesovAtlas.besovNorm_add_le,
-  Manifold.BesovAtlas.besovNorm_const_smul, Manifold.BesovAtlas.exists_enorm_le_besovNorm}
+\lean{Manifold.BesovAtlas.besovNorm, Manifold.BesovAtlas.modNormOn_pieceLp_le_besovNorm,
+  Manifold.BesovAtlas.besovNorm_add_le, Manifold.BesovAtlas.besovNorm_const_smul,
+  Manifold.BesovAtlas.exists_enorm_le_besovNorm}
 \leanok
 \uses{def:chart-pieces, lem:modnorm-on, lem:chart-integrals}
 For a Besov atlas $A$, $r \in \N$, $s \in \R$ and $1 \leq q \leq \infty$,
@@ -10545,7 +10581,8 @@ For a Besov atlas $A$, $r \in \N$, $s \in \R$ and $1 \leq q \leq \infty$,
   \|f\|_{A, r, s, q} = \sum_i N_\Omega\bigl((\psi_i f) \circ \kappa_i^{-1}\bigr), \\
   N_\Omega(G) = \|G\|_{L_p(\Omega)} + \|(2^{ks} \omega_r(G, 2^{-k}, \Omega)_p)_k\|_{\ell_q} .
 \end{gather*}
-It is subadditive, homogeneous, and $\|f\|_{L_p(\mu)} \leq C \|f\|_{A, r, s, q}$.
+Each term is at most $\|f\|_{A, r, s, q}$. The quasi-norm is subadditive, homogeneous, and
+$\|f\|_{L_p(\mu)} \leq C \|f\|_{A, r, s, q}$.
 \end{definition}
 
 \begin{theorem}[Independence of the atlas]
@@ -10985,13 +11022,22 @@ general $A'$ combine it with \Cref{thm:boundary-atlas-independence}.
 
 \begin{theorem}[The trace theorem on compact manifolds]
 \label{thm:manifold-trace}
-\lean{Manifold.exists_flatGraphExtension, Manifold.BesovAtlas.memBoundaryBesov_boundaryTrace,
-  Manifold.BesovAtlas.exists_boundaryTrace_eq,
+\lean{Manifold.exists_flatGraphExtension, Manifold.BesovAtlas.exists_boundaryTrace_norm_le,
+  Manifold.BesovAtlas.memBoundaryBesov_boundaryTrace, Manifold.BesovAtlas.exists_boundaryTrace_eq,
   Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace}
 \leanok
-\uses{thm:boundary-trace-pieces, thm:trace-every-order, thm:half-space-trace-space, lem:chart-lift}
-Let $1 \leq p < \infty$, $s > 0$, $1 \leq q \leq \infty$ and $L \geq 2$ with $s + 1/p < L$. For
-$f \in \Besov{s+1/p}{p}{q}(M)$, $\operatorname{Tr}_A f \in \Besov{s}{p}{q}(\partial M)$. Every
+\uses{thm:boundary-trace-pieces, thm:trace-every-order, thm:half-space-trace-space, lem:chart-lift,
+  def:manifold-besov-norm}
+Let $1 \leq p < \infty$, $s > 0$, $1 \leq q \leq \infty$ and $L \in \N$ with $s + 1/p < L$. There
+is $C < \infty$ such that for every $f \in \Besov{s+1/p}{p}{q}(M)$ and every chart index $k$ the
+$k$-th boundary piece of $\operatorname{Tr}_A f$ agrees almost everywhere with some
+$G \in L_p(H_0)$ with
+\[
+  \|G\|_p + \|(2^{js} \omega_{\lfloor s \rfloor + 1}(G, 2^{-j})_p)_j\|_{\ell_q}
+  \leq C \, \|f\|_{A, L, s + 1/p, q},
+\]
+the Besov quasi-norm of the atlas with differences of order $L$; in particular
+$\operatorname{Tr}_A f \in \Besov{s}{p}{q}(\partial M)$. If moreover $L \geq 2$, every
 $g \in \Besov{s}{p}{q}(\partial M)$ is the trace of some $f \in \Besov{s+1/p}{p}{q}(M)$: the
 boundary pieces of $\operatorname{Tr}_A f$ and of $g$ agree almost everywhere. So
 $\Besov{s}{p}{q}(\partial M)$ is the trace space of $\Besov{s+1/p}{p}{q}(M)$ for every $s > 0$.
@@ -11000,8 +11046,10 @@ $\Besov{s}{p}{q}(\partial M)$ is the trace space of $\Besov{s+1/p}{p}{q}(M)$ for
 \begin{proof}
 \leanok
 The boundary pieces of $\operatorname{Tr}_A f$ are the traces of the pieces
-(\Cref{thm:boundary-trace-pieces}), which lie in $\Besov{s}{p}{q}(H_0)$
-(\Cref{thm:trace-every-order}). Conversely, the extensions $E G_k$ of moment order
+(\Cref{thm:boundary-trace-pieces}), whose quasi-norms in $\Besov{s}{p}{q}(H_0)$ are at most a
+constant times the quasi-norms of the pieces on the closed half-space
+(\Cref{thm:trace-every-order}); each of these is a term of $\|f\|_{A, L, s + 1/p, q}$.
+Conversely, the extensions $E G_k$ of moment order
 $\lfloor s \rfloor + 1$ of the boundary pieces $G_k$ of $g$ have finite norms and traces $G_k$
 (\Cref{thm:half-space-trace-space}). The pieces of
 $f = \sum_k \theta_k \cdot (E G_k) \circ \kappa_k \in \Besov{s+1/p}{p}{q}(M)$
@@ -11010,11 +11058,56 @@ $f = \sum_k \theta_k \cdot (E G_k) \circ \kappa_k \in \Besov{s+1/p}{p}{q}(M)$
 (\Cref{thm:boundary-atlas-independence}).
 \end{proof}
 
+The trace $\operatorname{Tr}_A$ is defined by charts. On continuous functions it is the
+restriction to the boundary.
+
+\begin{corollary}[Traces of continuous functions]
+\label{cor:manifold-trace-continuous}
+\lean{Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_continuous}
+\leanok
+\uses{thm:boundary-trace-pieces, lem:piece-carrier, lem:trace-continuous-half-space,
+  def:chart-pieces}
+Let $1 \leq p < \infty$, $s > 0$, $1 \leq q \leq \infty$ and $L > s + 1/p$. For every
+$f \in \Besov{s+1/p}{p}{q}(M)$ with a continuous representative $g \colon M \to \C$ and every
+chart index $k$, the $k$-th boundary piece of $\operatorname{Tr}_A f$ agrees almost everywhere on
+$H_0$ with the $k$-th boundary piece of $g$, the restriction of $(\psi_k g) \circ \kappa_k^{-1}$
+to $H_0$.
+\end{corollary}
+
+\begin{proof}
+\leanok
+The boundary piece of $\operatorname{Tr}_A f$ is $\operatorname{Tr}(\text{piece}_k f)$
+(\Cref{thm:boundary-trace-pieces}), and $\text{piece}_k f$ is almost everywhere the piece of $g$
+(\Cref{def:chart-pieces}). This piece is continuous on the closed half-space and vanishes outside
+a compact set (\Cref{lem:piece-carrier}), so its trace is its restriction to $H_0$
+(\Cref{lem:trace-continuous-half-space}).
+\end{proof}
+
 The closure of a smooth bounded domain is a compact manifold with boundary
-(\Cref{thm:smooth-domain-manifold}), so this is the trace theorem for the Besov spaces of its
-boundary defined by charts, for every $s > 0$. The trace $\operatorname{Tr}_A$ is defined by
-charts as well; its relation to the Besov spaces and traces on Lipschitz boundaries of
-\Cref{ch:traces-lipschitz} is a later goal.
+(\Cref{thm:smooth-domain-manifold}), so both results hold there.
+
+\begin{corollary}[The trace theorem on smooth bounded domains]
+\label{cor:smooth-domain-trace}
+\lean{Rd.SmoothDomain.memBoundaryBesov_iff_exists_boundaryTrace,
+  Rd.SmoothDomain.boundaryPiece_boundaryTrace_of_continuous}
+\leanok
+\uses{thm:manifold-trace, cor:manifold-trace-continuous, thm:smooth-domain-manifold}
+Let $\Omega$ be a smooth bounded domain with the Lebesgue measure on $\overline{\Omega}$, $A$ a
+Besov atlas of $\overline{\Omega}$, $1 \leq p < \infty$, $s > 0$, $1 \leq q \leq \infty$ and
+$L \in \N$ with $s + 1/p < L$. If $L \geq 2$, then $\Besov{s}{p}{q}(\partial \Omega)$, defined by
+the charts of $A$, is the trace space of $\Besov{s+1/p}{p}{q}(\overline{\Omega})$. For every
+$f \in \Besov{s+1/p}{p}{q}(\overline{\Omega})$ with a continuous representative $g$ the boundary
+pieces of $\operatorname{Tr}_A f$ and of $g$ agree almost everywhere.
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:manifold-trace} and \Cref{cor:manifold-trace-continuous} for
+$M = \overline{\Omega}$ (\Cref{thm:smooth-domain-manifold}).
+\end{proof}
+
+The relation of these chart-defined spaces and traces to the Besov spaces and traces on Lipschitz
+boundaries of \Cref{ch:traces-lipschitz} is a later goal.
 
 \section{Smooth bounded domains from local graphs}
 \label{sec:smooth-local-graphs}
@@ -11256,13 +11349,11 @@ $\sum_k \psi_k = 1$; the lifts see only classes (\Cref{lem:chart-lift}).
 \label{lem:chart-carriers}
 \lean{Manifold.BesovAtlas.liftCarrier, Manifold.BesovAtlas.isCompact_liftCarrier,
   Manifold.BesovAtlas.liftCarrier_subset_range, Manifold.BesovAtlas.chartLiftLp_eq_of_ae_eq_on,
-  Manifold.BesovAtlas.pieceCarrier, Manifold.BesovAtlas.isCompact_pieceCarrier,
-  Manifold.BesovAtlas.pieceCarrier_subset_range, Manifold.BesovAtlas.piece_eq_zero_of_notMem,
   Manifold.BesovAtlas.pieceLp_eq_zero_off, Manifold.BesovAtlas.pieceRadius,
   Manifold.BesovAtlas.pieceCarrier_subset_ball, Manifold.BesovAtlas.pieceLp_eq_zero_off_ball,
   Manifold.BesovAtlas.exists_pieceLp_eq_zero_off_ball}
 \leanok
-\uses{def:model-interior, lem:chart-integrals, lem:chart-lift-operator}
+\uses{def:model-interior, lem:chart-integrals, lem:chart-lift-operator, lem:piece-carrier}
 Let $1 \leq p < \infty$ and let $k$ and $i$ be chart indices.
 \begin{enumerate}
   \item The set $\kappa_k(\operatorname{tsupport} \theta_k)$ is a compact subset of $\Omega_I$,
@@ -11282,8 +11373,7 @@ Let $1 \leq p < \infty$ and let $k$ and $i$ be chart indices.
 $\operatorname{tsupport} \theta_k$. The points of $\Omega_I \setminus O_I$ form a null set
 (\Cref{def:model-interior}), so by \Cref{lem:chart-integrals} $F(\kappa_k x) = G(\kappa_k x)$ for
 $\mu$-almost every $x \in \operatorname{tsupport} \theta_k$; off this set both lifts vanish.
-(2) At $y = \kappa_i(x)$ outside $\kappa_i(\operatorname{tsupport} \psi_i)$, $\psi_i(x) = 0$. A
-compact set lies in a ball.
+(2) The first two claims are \Cref{lem:piece-carrier}. A compact set lies in a ball.
 \end{proof}
 
 \begin{definition}[The chart Sobolev space]
@@ -11549,11 +11639,12 @@ $L_2$ are the integrals.
 
 Here $g_{kj} = \partial_{b_j} P_k \varphi_i$ weakly on $O_I$, so \Cref{thm:chart-weak-eigen} is the
 weak form of $L_A \varphi_i = \lambda_i \varphi_i$ for the operator $L_A$ of the form $a_A$. The
-form is Hermitian and nonnegative. Two further properties are remarks outside the formalisation:
-the form is local, and its principal part
-$\sum_k \psi_k^2 |\nabla (u \circ \kappa_k^{-1})|^2$, read in the charts, is uniformly elliptic,
-since $\sum_k \psi_k = 1$ and the Cauchy--Schwarz inequality give $\sum_k \psi_k^2 \geq 1/N$ for
-$N$ charts. The test functions $w$ are arbitrary near the boundary of $M$, so the boundary
+form is Hermitian and nonnegative, and it is local, a remark outside the formalisation. Its
+principal part $\sum_k \psi_k^2 |\nabla (u \circ \kappa_k^{-1})|^2$ has weights with
+$\sum_k \psi_k^2 \geq 1/N$ for $N$ charts (\Cref{lem:partition-squares}); together with the
+bounds of the changes of charts on the compact supports, a remark outside the formalisation,
+this makes it uniformly elliptic in the charts.
+The test functions $w$ are arbitrary near the boundary of $M$, so the boundary
 condition is the natural one, as for the Neumann problem (\Cref{thm:neumann-weak-eigen}). The form
 $a_A$ depends on the atlas; the Laplace--Beltrami operator of a Riemannian metric is a later goal.
 

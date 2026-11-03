@@ -255,7 +255,7 @@ theorem exists_inverse_cubePPScheme_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞
     (ENNReal.pow_ne_top (ENNReal.natCast_ne_top d)) (ENNReal.pow_ne_top hC), by simp⟩,
     fun j k a ha => ?_⟩
   obtain ⟨g, hg, hae⟩ := mem_cubePPScheme_two_pow.1 ha
-  exact lpIsoModulus_le_of_exponents (ppSubmodule r j) hp r hC (ppExponent p) ppExponent_nonneg
+  exact lpIsoModulus_le_of_exponents (ppSubmodule r j) hp r (ppExponent p) ppExponent_nonneg
     (by positivity) (fun m hm => le_sum_ppExponent hr m hm) (hCb j) hg.1.1
     (fun i x => hg.slice_mem_ppSubmodule i x) hae
 
@@ -270,7 +270,7 @@ theorem exists_inverse_cubeSplineScheme_iso {r : ℕ} (hr : 1 ≤ r) (hp : p ≠
     (ENNReal.pow_ne_top (ENNReal.natCast_ne_top d)) (ENNReal.pow_ne_top hC), by simp⟩,
     fun j k a ha => ?_⟩
   obtain ⟨g, hg, hae⟩ := mem_cubeSplineScheme_two_pow.1 ha
-  exact lpIsoModulus_le_of_exponents (splineSubmodule r j) hp r hC (splineExponent p r)
+  exact lpIsoModulus_le_of_exponents (splineSubmodule r j) hp r (splineExponent p r)
     (splineExponent_nonneg r) (by positivity) (fun m hm => le_sum_splineExponent hr m hm) (hCb j)
     hg.1.1 (fun i x => hg.slice_mem_splineSubmodule i x) hae
 

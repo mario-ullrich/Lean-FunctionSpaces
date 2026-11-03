@@ -245,12 +245,19 @@ built on this project, with the decisions behind their form.
   trace commutes with the changes of charts
   (`Manifold.trace_chartChange_applyLp`), so for `f ∈ B^{s+1/p}_{p,q}(M)` the boundary pieces of
   `Tr_A f` are the traces of the chart pieces of `f`, for every atlas
-  (`Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_atlas`). `B^s_{p,q}(∂M)` is the trace space
+  (`Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_atlas`). The trace is bounded: there is
+  `C < ∞` such that every boundary piece of `Tr_A f` agrees almost everywhere with some
+  `G ∈ L_p(H₀)` with `‖G‖_p + ‖(2^(js) ω_{⌊s⌋+1}(G, 2^(-j))_p)_j‖_{ℓ_q} ≤ C ‖f‖_{A,L,s+1/p,q}`
+  (`Manifold.BesovAtlas.exists_boundaryTrace_norm_le`). `B^s_{p,q}(∂M)` is the trace space
   of `B^{s+1/p}_{p,q}(M)`: `g ∈ B^s_{p,q}(∂M)` iff the boundary pieces of `g` agree almost
   everywhere with those of `Tr_A f` for some `f ∈ B^{s+1/p}_{p,q}(M)`
-  (`Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace`). For the closure of a smooth
-  bounded domain this is the trace theorem for the Besov spaces of its boundary defined by charts,
-  for every `s > 0`.
+  (`Manifold.BesovAtlas.memBoundaryBesov_iff_exists_boundaryTrace`). If `f` has a continuous
+  representative `g`, the boundary pieces of `Tr_A f` are those of `g`: the trace is the
+  restriction to the boundary (`Manifold.BesovAtlas.boundaryPiece_boundaryTrace_of_continuous`).
+  For the closure of a smooth bounded domain with the Lebesgue measure this is the trace theorem
+  for the Besov spaces of its boundary defined by charts, for every `s > 0`
+  (`Rd.SmoothDomain.memBoundaryBesov_iff_exists_boundaryTrace`,
+  `Rd.SmoothDomain.boundaryPiece_boundaryTrace_of_continuous`).
 * **Traces on bounded Lipschitz domains.** Let `Ω` be a bounded Lipschitz domain with boundary `Γ`,
   boundary balls `B_j` and graph domains `Ω_j` as above, and `(ψ_j)` a smooth resolution of unity on
   `Γ` with `tsupport ψ_j ⊆ B_j` (`Rd.BoundedLipschitzDomain.BoundaryPartition`). A property holds
@@ -681,7 +688,10 @@ built on this project, with the decisions behind their form.
   bound, and eigenfunctions `φ_i ∈ H^1_A(M)`, `J φ_i = e_i`, with
   `a_A(φ_i, w) = λ_i ⟨e_i, J w⟩` for every `w ∈ H^1_A(M)`
   (`Manifold.BesovAtlas.chartForm_eigenfunction`), the weak eigenvalue equation of the chart form
-  with the natural boundary condition. `f ∈ B^1_{2,2}(M)` iff
+  with the natural boundary condition. In the principal part `∑_k ψ_k² |∇(u ∘ κ_k⁻¹)|²` of the
+  chart form the weights satisfy `∑_k ψ_k² ≥ 1/N` for `N` charts
+  (`Manifold.BesovAtlas.inv_card_le_sum_sq_psi`), the coefficient bound behind its uniform
+  ellipticity in the charts. `f ∈ B^1_{2,2}(M)` iff
   `∑_i (1 + ⌊√(1 + λ_i)⌋)² |⟨e_i, f⟩|² < ∞` (`Manifold.BesovAtlas.memBesov_one_two_iff_spectral`).
   For `0 < θ < 1` and `1 ≤ q ≤ ∞`, `f ∈ (L_2(μ), H^1_A(M))_{θ,q}` iff every piece `P_k f` has a
   finite intrinsic quasi-norm on `Ω_I` (`Manifold.BesovAtlas.memKMethod_chartSobolev_iff`), so
@@ -716,14 +726,14 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Traces on bounded Lipschitz domains: Besov spaces on the boundary, the trace space | ✅ | ✗ | `Domains/Traces/LipschitzBoundaryTrace` |
 | Besov quasi-norms on the boundary: chart pieces, bounded trace and extension for `1 ≤ p < ∞`, independence of the resolution of unity | ✅ | ✗ | `Domains/Traces/BoundaryBesovNorm` |
 | Smooth measures on manifolds (a continuous positive density in every chart), measurability of extended charts on their sources, integrals and `L_p` norms in charts, null sets in charts | ✅ | ✗ | `Domains/Manifolds/SmoothMeasure` |
-| Besov atlases, chart pieces, images and measurable sources of changes of charts, changes of charts with cut-offs, lifts from a chart and their `L_p` bound | ✅ | ✗ | `Domains/Manifolds/BesovAtlas` |
+| Besov atlases, `∑_i ψ_i² ≥ 1/N` for the partition of unity, chart pieces with their compact carriers and their continuity on the model range for continuous functions, images and measurable sources of changes of charts, changes of charts with cut-offs, lifts from a chart and their `L_p` bound | ✅ | ✗ | `Domains/Manifolds/BesovAtlas` |
 | Smooth measures exist: the chart measure of a Besov atlas, its density in every chart by the Jacobian determinants of the changes of charts, continuity and positivity of the density, finiteness, every compact Hausdorff manifold with or without boundary carries a finite smooth measure (a continuous positive density in every chart), the sphere as an example without boundary | ✅ | ✗ | `Domains/Manifolds/SmoothMeasureExistence` |
 | Besov spaces on compact manifolds, independence of the atlas and of the order, membership piece by piece, lifts from a chart | ✅ | ✗ | `Domains/Manifolds/Besov` |
 | Flattening of graph domains, the Lipschitz bounds of the flattening and its inverse, the graph in the image of the hyperplane, product and graph coordinates, preservation of the Lebesgue measure for every Lipschitz graph | ✅ | ✗ | `Domains/Lipschitz/GraphStraightening` |
 | Smooth bounded domains as compact manifolds with boundary, Lebesgue measure as smooth measure | ✅ | ✗ | `Domains/Manifolds/SmoothDomain` |
 | Besov spaces of smooth domains by charts equal the intrinsic Besov spaces | ✅ | ✗ | `Domains/Manifolds/SmoothDomainBesov` |
 | Besov spaces on the boundary of a compact manifold, independence of the atlas | ✅ | ✗ | `Domains/Manifolds/BoundaryBesov` |
-| Trace theorem on compact manifolds: commutation with charts, boundedness, trace space | ✅ | ✗ | `Domains/Manifolds/BoundaryTrace` |
+| Trace theorem on compact manifolds: commutation with charts, the quasi-norm bound, trace space, the trace of a continuous function as its restriction, and the closures of smooth bounded domains | ✅ | ✗ | `Domains/Manifolds/BoundaryTrace` |
 | The chart Sobolev space of a compact manifold with or without boundary: the open model set, pieces and lifts as bounded operators, the retract identity `∑_k L_k P_k = id`, the graph space of the weak gradients of the pieces on the open model set, the chart form, the embedding into `L_2(μ)`, and `H^1_A(M) = B^1_{2,2}(M)` for every Besov atlas | ✅ | ✗ | `Domains/Manifolds/ChartSobolev` |
 | `H^1` on bounded Lipschitz domains defined as restrictions of `H^1(ℝ^d)`, by intrinsic differences, the identification with the restriction space, the weak gradient, and the boundary traces, which form `B^{1/2}_{2,2}(Γ)` | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainH1` |
 | The Hilbert spaces `H^s(Ω)`, `H̃^s(Ω)` and `H^s_0(Ω)` on open sets inside Mathlib's `H^s(ℝ^d)`, `H^s(Ω)` as a quotient, Rellich's theorem for `H^1(Ω)`, the restriction of an element agreeing with `u ∈ H^1(Ω)` on `Ω`, the bound of the `H^1` norm by the `W^1_2` norm, the weak derivatives as bounded operators on `H^1(ℝ^d)`, differences and moduli of `H^1(ℝ^d)` functions by the gradient, the density of compactly supported Schwartz functions in `H^s(ℝ^d)`, Schwartz functions with compact support in `Ω` in the span of the test functions, `H̃^s(ℝ^d) = H^s(ℝ^d)`, the isometry `H̃^1(Ω) ≅ H^1_0(Ω)`, and the vanishing of `H̃^1(Ω)` outside `Ω` | ✅ | ✗ | `Domains/Sobolev/SobolevRestrictionSpaces` |

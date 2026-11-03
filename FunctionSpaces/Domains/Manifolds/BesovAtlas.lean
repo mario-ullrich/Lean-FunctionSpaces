@@ -8,6 +8,7 @@ module
 public import FunctionSpaces.Domains.Manifolds.SmoothMeasure
 public import FunctionSpaces.Domains.Lipschitz.HalfSpace
 public import Mathlib.Geometry.Manifold.PartitionOfUnity
+public import Mathlib.Algebra.Order.Chebyshev
 
 /-!
 # Besov atlases
@@ -19,6 +20,12 @@ compact manifold has one (`Manifold.BesovAtlas.nonempty`): finitely many chart s
 Mathlib's smooth partitions of unity are subordinate to them
 (`SmoothPartitionOfUnity.exists_isSubordinate`), and smooth cut-offs exist for every compact set
 inside an open set (`Manifold.exists_contMDiff_eq_one_tsupport_subset`).
+
+The squares of the partition of unity satisfy `∑_i ψ_i² ≥ 1/N` for `N` charts
+(`Manifold.BesovAtlas.inv_card_le_sum_sq_psi`). The **chart piece** `(ψ_i g) ∘ κ_i⁻¹` vanishes
+outside the carrier `κ_i(tsupport ψ_i)`, compact on a compact manifold
+(`Manifold.BesovAtlas.isCompact_pieceCarrier`, `Manifold.BesovAtlas.piece_eq_zero_of_notMem`), and
+is continuous on `range I` for continuous `g` (`Manifold.BesovAtlas.continuousOn_piece`).
 
 A smooth function on `M` read in an extended chart is smooth within the target of the chart
 (`Manifold.contDiffOn_comp_extend_symm`). Conversely, a function `F` on `E` gives the **lift from
@@ -216,9 +223,81 @@ theorem theta_mul_psi (i : Fin A.n) (x : M) : A.theta i x * A.psi i x = A.psi i 
   · rw [A.theta_eq_one i x hx, one_mul]
   · rw [image_eq_zero_of_notMem_tsupport hx, mul_zero]
 
+omit [FiniteDimensional ℝ E] in
+/-- **The squares of the partition of unity are bounded below**: `∑_i ψ_i(x)² ≥ 1/N` at every
+point `x`, for the `N` charts of the atlas, since `1 = (∑_i ψ_i(x))² ≤ N ∑_i ψ_i(x)²` by the
+Cauchy–Schwarz inequality (Mathlib's `sq_sum_le_card_mul_sum_sq`). This is the coefficient bound
+for the principal part `∑_i ψ_i² |∇(u ∘ κ_i⁻¹)|²` of the chart form. -/
+theorem inv_card_le_sum_sq_psi (x : M) : (A.n : ℝ)⁻¹ ≤ ∑ i, A.psi i x ^ 2 := by
+  have h : (∑ i, A.psi i x) ^ 2 ≤ (Finset.univ.card : ℝ) * ∑ i, A.psi i x ^ 2 :=
+    sq_sum_le_card_mul_sum_sq
+  rw [A.sum_psi x, one_pow, Finset.card_univ, Fintype.card_fin] at h
+  have hn : (A.n : ℝ) ≠ 0 := fun h0 => by
+    rw [h0, zero_mul] at h
+    exact absurd h (by norm_num)
+  exact (inv_le_iff_one_le_mul₀' ((Nat.cast_nonneg _).lt_of_ne (Ne.symm hn))).2 h
+
 /-- The **chart piece** `(ψ_i g) ∘ κ_i⁻¹` on the target of `κ_i`, `0` outside. -/
 noncomputable def piece (i : Fin A.n) (g : M → ℂ) : E → ℂ :=
   (A.ext i).target.indicator fun y => (A.psi i ((A.ext i).symm y) : ℂ) * g ((A.ext i).symm y)
+
+/-- **The carrier of the `i`-th piece**: the set `κ_i(tsupport ψ_i) ⊆ range I`, outside which
+the piece `(ψ_i g) ∘ κ_i⁻¹` vanishes; it is compact on a compact manifold. -/
+def pieceCarrier (i : Fin A.n) : Set E :=
+  A.ext i '' tsupport (A.psi i)
+
+omit [FiniteDimensional ℝ E] in
+/-- The carrier of a piece is compact, the image of the compact `tsupport ψ_i` under the chart. -/
+theorem isCompact_pieceCarrier [CompactSpace M] (i : Fin A.n) : IsCompact (A.pieceCarrier i) :=
+  (isClosed_tsupport _).isCompact.image_of_continuousOn ((A.chart i).continuousOn_extend.mono
+    (by rw [OpenPartialHomeomorph.extend_source]; exact A.tsupport_psi_subset i))
+
+omit [FiniteDimensional ℝ E] in
+/-- The carrier of a piece lies in `range I`, since the extended charts take values there. -/
+theorem pieceCarrier_subset_range (i : Fin A.n) : A.pieceCarrier i ⊆ range I := by
+  rintro _ ⟨x, -, rfl⟩
+  exact ⟨A.chart i x, rfl⟩
+
+omit [FiniteDimensional ℝ E] in
+/-- **The piece vanishes off its carrier** (pointwise): `piece_i g (y) = 0` for
+`y ∉ κ_i(tsupport ψ_i)`. -/
+theorem piece_eq_zero_of_notMem (i : Fin A.n) (g : M → ℂ) {y : E} (hy : y ∉ A.pieceCarrier i) :
+    A.piece i g y = 0 := by
+  by_cases hyt : y ∈ (A.ext i).target
+  · have hψ : A.psi i ((A.ext i).symm y) = 0 :=
+      image_eq_zero_of_notMem_tsupport fun h => hy ⟨_, h, (A.ext i).right_inv hyt⟩
+    rw [piece, indicator_of_mem hyt, hψ, Complex.ofReal_zero, zero_mul]
+  · rw [piece, indicator_of_notMem hyt]
+
+omit [FiniteDimensional ℝ E] in
+/-- **Pieces of continuous functions are continuous on the model range**: on a compact manifold,
+for continuous `g : M → ℂ` the piece `(ψ_i g) ∘ κ_i⁻¹`, extended by `0`, is continuous on
+`range I`. Near a point of the carrier it is `(ψ_i g) ∘ κ_i⁻¹` on the target of the extended
+chart, a neighbourhood within `range I` (Mathlib's
+`OpenPartialHomeomorph.extend_target_mem_nhdsWithin`); off the compact carrier it vanishes
+(`Manifold.BesovAtlas.piece_eq_zero_of_notMem`). -/
+theorem continuousOn_piece [CompactSpace M] (i : Fin A.n) {g : M → ℂ} (hg : Continuous g) :
+    ContinuousOn (A.piece i g) (range I) := by
+  intro y _
+  by_cases hyK : y ∈ A.pieceCarrier i
+  · obtain ⟨x, hx, rfl⟩ := hyK
+    have hxs : x ∈ (A.chart i).source := A.tsupport_psi_subset i hx
+    have hU := (A.chart i).extend_target_mem_nhdsWithin (I := I) hxs
+    have hyt : A.ext i x ∈ (A.ext i).target :=
+      (A.ext i).map_source (by rw [OpenPartialHomeomorph.extend_source]; exact hxs)
+    have hcont : ContinuousOn (fun y => (A.psi i ((A.ext i).symm y) : ℂ) * g ((A.ext i).symm y))
+        (A.ext i).target :=
+      (Complex.continuous_ofReal.comp_continuousOn ((A.contMDiff_psi i).continuous.comp_continuousOn
+        (A.chart i).continuousOn_extend_symm)).mul
+          (hg.comp_continuousOn (A.chart i).continuousOn_extend_symm)
+    refine ((hcont _ hyt).mono_of_mem_nhdsWithin hU).congr_of_eventuallyEq ?_ ?_
+    · filter_upwards [hU] with z hz
+      rw [piece, indicator_of_mem hz]
+    · rw [piece, indicator_of_mem hyt]
+  · have hev : A.piece i g =ᶠ[𝓝 y] fun _ => 0 := by
+      filter_upwards [(A.isCompact_pieceCarrier i).isClosed.isOpen_compl.mem_nhds hyK] with z hz
+      exact A.piece_eq_zero_of_notMem i g hz
+    exact (continuousAt_const.congr hev.symm).continuousWithinAt
 
 /-! ### Pieces in `L_p` -/
 

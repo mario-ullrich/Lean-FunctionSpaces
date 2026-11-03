@@ -20,6 +20,9 @@ Besov atlas `A` with charts `κ_i` and partition of unity `ψ_i`, the **Besov qu
 `‖f‖_{A, r, s, q} = ∑_i N_Ω((ψ_i f) ∘ κ_i⁻¹)`,
 `N_Ω(G) = ‖1_Ω G‖_p + ‖(2^(ks) ω_r(G, 2^(-k), Ω)_p)_k‖_{ℓ_q}`.
 
+Each term `N_Ω((ψ_i f) ∘ κ_i⁻¹)` is at most `‖f‖_{A, r, s, q}`
+(`Manifold.BesovAtlas.modNormOn_pieceLp_le_besovNorm`).
+
 **Independence of the atlas** (`Manifold.BesovAtlas.besovNorm_le_besovNorm`): for two Besov
 atlases and `0 < s < r` there is `C < ∞` with `‖f‖_{A} ≤ C ‖f‖_{A'}`. The pieces of `A` are
 finite sums of the pieces of `A'` transported by the changes of charts with cut-offs
@@ -145,6 +148,15 @@ quasi-norms on `range I` of the chart pieces `(ψ_i f) ∘ κ_i⁻¹`, with diff
 noncomputable def besovNorm (r : ℕ) (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p μ) : ℝ≥0∞ :=
   ∑ i, Rd.modNormOn (Rd.BesovDomain.measurableSet (range I)) r s q (A.pieceLp μ hp i f)
 
+/-- **One piece is at most the whole**: the intrinsic quasi-norm of the `i`-th chart piece is at
+most the Besov quasi-norm of the atlas, one term of its sum (Mathlib's `Finset.single_le_sum`). -/
+theorem modNormOn_pieceLp_le_besovNorm (r : ℕ) (s : ℝ) (q : ℝ≥0∞) (f : Lp ℂ p μ) (i : Fin A.n) :
+    Rd.modNormOn (Rd.BesovDomain.measurableSet (range I)) r s q (A.pieceLp μ hp i f) ≤
+      A.besovNorm hp r s q f :=
+  Finset.single_le_sum (f := fun i =>
+    Rd.modNormOn (Rd.BesovDomain.measurableSet (range I)) r s q (A.pieceLp μ hp i f))
+    (fun _ _ => zero_le) (Finset.mem_univ i)
+
 /-- **Independence of the atlas**: for two Besov atlases `A, A'`, `0 < s < r` and `1 ≤ q ≤ ∞`
 there is `C < ∞` with `‖f‖_{A, r, s, q} ≤ C ‖f‖_{A', r, s, q}` for all `f ∈ L_p(μ)`. -/
 theorem besovNorm_le_besovNorm [IsManifold I ∞ M] (A' : BesovAtlas I M) {r : ℕ} (hr : 1 ≤ r)
@@ -267,8 +279,7 @@ theorem memBesov_iff_besovNorm_lt_top {r : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s 
     refine ENNReal.sum_lt_top.2 fun i _ => ?_
     obtain ⟨C, hC, hle⟩ := Rd.BesovDomain.modNormOn_order_le (Ω := Ω) hp hs h1 h2 hq
     have hi : Rd.modNormOn hΩ r₁ s q (A.pieceLp μ hp i f) < ⊤ :=
-      (Finset.single_le_sum (f := fun i => Rd.modNormOn hΩ r₁ s q (A.pieceLp μ hp i f))
-        (fun _ _ => zero_le) (Finset.mem_univ i)).trans_lt hfin
+      (A.modNormOn_pieceLp_le_besovNorm hp r₁ s q f i).trans_lt hfin
     exact (hle _ hi).trans_lt (ENNReal.mul_lt_top hC.lt_top hi)
   exact ⟨hcmp hs1 hsr, hcmp hsr hs1⟩
 
@@ -277,10 +288,8 @@ theorem memBesov_iff_besovNorm_lt_top {r : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s 
 theorem MemBesov.modNormOn_pieceLp_lt_top {r : ℕ} {s : ℝ} (hs : 0 < s) (hsr : s < r) {q : ℝ≥0∞}
     (hq : 1 ≤ q) {f : Lp ℂ p μ} (hf : A.MemBesov hp s q f) (i : Fin A.n) :
     Rd.modNormOn (Rd.BesovDomain.measurableSet (range I)) r s q (A.pieceLp μ hp i f) < ⊤ :=
-  (Finset.single_le_sum (f := fun i =>
-    Rd.modNormOn (Rd.BesovDomain.measurableSet (range I)) r s q (A.pieceLp μ hp i f))
-    (fun _ _ => zero_le) (Finset.mem_univ i)).trans_lt
-      ((A.memBesov_iff_besovNorm_lt_top hp hs hsr hq f).1 hf)
+  (A.modNormOn_pieceLp_le_besovNorm hp r s q f i).trans_lt
+    ((A.memBesov_iff_besovNorm_lt_top hp hs hsr hq f).1 hf)
 
 /-- **`B^s_{p,q}` of an atlas by the pieces**: for `0 < s < r` and `1 ≤ q ≤ ∞`, `f ∈ B^s_{p,q}`
 for the atlas `A` iff every piece `P_i f` has a finite intrinsic quasi-norm of order `r` on

@@ -131,20 +131,15 @@ theorem lintegral_lintegral_Ioc_add_smul {φ : V → ℝ≥0∞} (hφ : Measurab
           ENNReal.ofReal_one, mul_one]
 
 /-- **Jensen's inequality on the unit interval**: `(∫_0^1 φ)^p ≤ ∫_0^1 φ^p` for real `p ≥ 1` and
-measurable `φ ≥ 0`. The interval `(0, 1]` carries a probability measure, on which the `L_1` norm is
-at most the `L_p` norm (Mathlib's `MeasureTheory.eLpNorm'_le_eLpNorm'_of_exponent_le`). -/
+measurable `φ ≥ 0`. This is the weighted Jensen inequality `MeasureTheory.lintegral_mul_rpow_le`
+with the weight `1`, since `(0, 1]` has length `1`. -/
 theorem rpow_lintegral_Ioc_le {p : ℝ} (hp : 1 ≤ p) {φ : ℝ → ℝ≥0∞}
     (hφ : AEMeasurable φ (volume.restrict (Set.Ioc (0 : ℝ) 1))) :
     (∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t) ^ p ≤ ∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t ^ p := by
-  have : IsProbabilityMeasure (volume.restrict (Set.Ioc (0 : ℝ) 1)) :=
-    ⟨by rw [Measure.restrict_apply_univ, Real.volume_Ioc, sub_zero, ENNReal.ofReal_one]⟩
-  have h := eLpNorm'_le_eLpNorm'_of_exponent_le zero_lt_one hp _ hφ.aestronglyMeasurable
-  simp only [eLpNorm', enorm_eq_self, ENNReal.rpow_one, div_one] at h
-  calc (∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t) ^ p
-      ≤ ((∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t ^ p) ^ (1 / p)) ^ p :=
-        ENNReal.rpow_le_rpow h (by linarith)
-    _ = ∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t ^ p := by
-        rw [← ENNReal.rpow_mul, one_div_mul_cancel (by linarith), ENNReal.rpow_one]
+  have h := lintegral_mul_rpow_le (μ := volume.restrict (Set.Ioc (0 : ℝ) 1)) hp
+    (a := fun _ => 1) aemeasurable_const hφ
+  simpa only [one_mul, lintegral_const, Measure.restrict_apply_univ, Real.volume_Ioc, sub_zero,
+    ENNReal.ofReal_one, ENNReal.one_rpow] using h
 
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **A difference by the line derivative, pointwise, in `p`-th powers**: for a Schwartz function

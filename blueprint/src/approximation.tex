@@ -359,9 +359,10 @@ $c, \rho \in [0, \infty]$ and all $n \in \N$:
     elsewhere has $\ell_q$ norm $c$;
   \item if $q < \infty$, the tail $(0, \dots, 0, a_n, a_{n+1}, \dots)$ has the $\ell_q$ norm
     $\|(a_{n+k})_k\|_{\ell_q}$;
-  \item for every $s \in \R$ and all $x, w$ and $a, M, A \in [0, \infty]$ with $x_0 \leq M a$
-    and $x_{k+1} \leq A w_{k+1}$ for every $k$,
-    $\|(2^{ks} x_k)_k\|_{\ell_q} \leq (M + A) \bigl( a + \|(2^{ks} w_k)_k\|_{\ell_q} \bigr)$.
+  \item for every $\sigma \in \R$, all sequences $x, w$ in $[0, \infty]$ and all
+    $c, K_0, K_1 \in [0, \infty]$ with $x_0 \leq K_0 c$ and $x_{k+1} \leq K_1 w_{k+1}$ for every
+    $k$, $\|(2^{k\sigma} x_k)_k\|_{\ell_q} \leq (K_0 + K_1)
+    \bigl( c + \|(2^{k\sigma} w_k)_k\|_{\ell_q} \bigr)$.
 \end{enumerate}
 For every $p \in (0, \infty]$, every finite set $I$, every $B \in [0, \infty]$ and every family
 $(a_i)_{i \in I}$ in $[0, \infty]$ with $a_i \leq B$ for every $i$,
@@ -380,7 +381,7 @@ $\|a\|_{\ell_r}^r \leq M^r$. The fifth is the third applied to $a_0 \delta_0$ an
 and induction on $m$. The sixth is the fourth and the geometric series, the seventh is the
 fourth for a sequence with finitely many nonzero terms, the eighth compares the series of the
 $q$-th powers term by term; the last splits off the first term by the fifth, bounds the others
-by the first two, and drops the first term of $(2^{ks} w_k)_k$. For a finite set $I$ the
+by the first two, and drops the first term of $(2^{k\sigma} w_k)_k$. For a finite set $I$ the
 counting measure of $I$ is $\# I$, so the
 bound by $B$ is Mathlib's \texttt{eLpNorm\_\allowbreak le\_\allowbreak of\_\allowbreak
 ae\_\allowbreak enorm\_\allowbreak bound}; the two identities are the series of $p$-th powers

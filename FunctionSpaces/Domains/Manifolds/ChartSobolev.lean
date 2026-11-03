@@ -231,37 +231,6 @@ theorem chartLiftLp_eq_of_ae_eq_on [Rd.BesovDomain (range I)] (k : Fin A.n)
     · rw [image_eq_zero_of_notMem_tsupport hxt, Complex.ofReal_zero, zero_mul, zero_mul]
   · simp only [chartLift, indicator_of_notMem hxs]
 
-/-- **The carrier of the `i`-th piece**: the compact set `κ_i(tsupport ψ_i) ⊆ range I`, outside
-which the piece `(ψ_i f) ∘ κ_i⁻¹` vanishes. -/
-def pieceCarrier (i : Fin A.n) : Set E :=
-  A.ext i '' tsupport (A.psi i)
-
-omit [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] [MeasurableSpace M]
-  [BorelSpace M] in
-/-- The carrier of a piece is compact. -/
-theorem isCompact_pieceCarrier (i : Fin A.n) : IsCompact (A.pieceCarrier i) :=
-  (isClosed_tsupport _).isCompact.image_of_continuousOn ((A.chart i).continuousOn_extend.mono
-    (by rw [OpenPartialHomeomorph.extend_source]; exact A.tsupport_psi_subset i))
-
-omit [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] [MeasurableSpace M]
-  [BorelSpace M] [CompactSpace M] in
-/-- The carrier of a piece lies in `range I`, since the extended charts take values there. -/
-theorem pieceCarrier_subset_range (i : Fin A.n) : A.pieceCarrier i ⊆ range I := by
-  rintro _ ⟨x, -, rfl⟩
-  exact ⟨A.chart i x, rfl⟩
-
-omit [FiniteDimensional ℝ E] [MeasurableSpace E] [BorelSpace E] [MeasurableSpace M]
-  [BorelSpace M] [CompactSpace M] in
-/-- **The piece vanishes off its carrier** (pointwise): `piece_i g (y) = 0` for
-`y ∉ κ_i(tsupport ψ_i)`. -/
-theorem piece_eq_zero_of_notMem (i : Fin A.n) (g : M → ℂ) {y : E} (hy : y ∉ A.pieceCarrier i) :
-    A.piece i g y = 0 := by
-  by_cases hyt : y ∈ (A.ext i).target
-  · have hψ : A.psi i ((A.ext i).symm y) = 0 :=
-      image_eq_zero_of_notMem_tsupport fun h => hy ⟨_, h, (A.ext i).right_inv hyt⟩
-    rw [piece, indicator_of_mem hyt, hψ, Complex.ofReal_zero, zero_mul]
-  · rw [piece, indicator_of_notMem hyt]
-
 /-- **The piece in `L_p` vanishes off its carrier**: `P_i f = 0` almost everywhere outside the
 compact `κ_i(tsupport ψ_i)`. -/
 theorem pieceLp_eq_zero_off (i : Fin A.n) (f : Lp ℂ p μ) :

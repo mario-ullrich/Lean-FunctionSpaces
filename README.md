@@ -209,7 +209,10 @@ in one description holds in the others, in the stated ranges.
   the chart pieces of a Besov atlas, is the same for every atlas (`Manifold.memBesov_iff`). For
   the eigenbasis of the chart form `a_A(u, w) = ∑_{k,j} ⟨∂_j P_k u, ∂_j P_k w⟩` of an atlas `A`,
   `f ∈ L_2(μ)` lies in `A^θ_q` iff `f ∈ B^θ_{2,q}(M)`
-  (`Manifold.BesovAtlas.memApprox_chartScheme_iff`).
+  (`Manifold.BesovAtlas.memApprox_chartScheme_iff`). In the principal part
+  `∑_k ψ_k² |∇(u ∘ κ_k⁻¹)|²` of the chart form the weights satisfy `∑_k ψ_k² ≥ 1/N` for `N`
+  charts (`Manifold.BesovAtlas.inv_card_le_sum_sq_psi`), the coefficient bound behind its uniform
+  ellipticity in the charts.
 
 ## Organisation
 

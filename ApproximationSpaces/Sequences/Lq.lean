@@ -527,10 +527,8 @@ theorem two_pow_rpow_eq_dyadicWeight (j n : ℕ) (t : ℝ) :
 
 /-- **A weighted `ℓ_q` norm from its first term and a bound of the others**: if `x_0 ≤ M a` and
 `x_{j+1} ≤ A w_{j+1}` for every `j`, then for `1 ≤ q ≤ ∞`
-`‖(2^(js) x_j)_j‖_{ℓ_q} ≤ (M + A) (a + ‖(2^(js) w_j)_j‖_{ℓ_q})`. This is the step from the local
-means to the moduli for the intrinsic and the local quasi-norms
-(`Rd.LipschitzGraph.intrinsicNorm_le` and `Rd.LocalMeansBump.localNormOn_le` in
-`FunctionSpaces`). -/
+`‖(2^(js) x_j)_j‖_{ℓ_q} ≤ (M + A) (a + ‖(2^(js) w_j)_j‖_{ℓ_q})`. The first term splits off
+(`ENNReal.lqNorm_le_head_add_shift`), and the shifted rest is at most `A ‖(2^(js) w_j)_j‖_{ℓ_q}`. -/
 theorem lqNorm_dyadicWeight_le_of_head_of_succ_le {q : ℝ≥0∞} (hq : 1 ≤ q) (s : ℝ)
     (x w : ℕ → ℝ≥0∞) {a M A : ℝ≥0∞} (h0 : x 0 ≤ M * a) (hsucc : ∀ j, x (j + 1) ≤ A * w (j + 1)) :
     lqNorm q (fun j => dyadicWeight s j * x j) ≤

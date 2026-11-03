@@ -52,11 +52,6 @@ namespace Haar
 /-- Lebesgue measure on `[0, 1]`, as a measure on `ℝ` (`Interval.unitVol`). -/
 noncomputable abbrev vol : Measure ℝ := Interval.unitVol
 
-/-- `[0, 1]` has measure `1`, since `Interval.unitVol` is a probability measure
-(`Interval.isProbabilityMeasure_unitVol`). -/
-theorem vol_univ : vol univ = 1 :=
-  measure_univ
-
 /-- The index `⌊2^j x⌋` of the dyadic interval of level `j` containing `x`. -/
 noncomputable def dyadicIndex (j : ℕ) (x : ℝ) : ℤ := ⌊(2 : ℝ) ^ j * x⌋
 
@@ -207,9 +202,9 @@ theorem condExpLp_zero_ae_eq (f : Lp ℂ p vol) :
 theorem enorm_condExpLp_zero (f : Lp ℂ p vol) :
     ‖Lp.condExpLp (dyadicFiltration 0) f‖ₑ = ‖∫ x, f x ∂vol‖ₑ := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
-  have hvol : vol ≠ 0 := Measure.measure_univ_ne_zero.1 (by rw [vol_univ]; exact one_ne_zero)
-  rw [Lp.enorm_def, eLpNorm_congr_ae (condExpLp_zero_ae_eq f), eLpNorm_const _ hp0 hvol, vol_univ,
-    ENNReal.one_rpow, mul_one]
+  rw [Lp.enorm_def, eLpNorm_congr_ae (condExpLp_zero_ae_eq f),
+    eLpNorm_const _ hp0 (IsProbabilityMeasure.ne_zero vol), measure_univ, ENNReal.one_rpow,
+    mul_one]
 
 /-- A sum over the positions of level `j` whose terms vanish away from the index of a point
 `x ∈ [0, 1)` is the term at that index. -/
@@ -431,7 +426,7 @@ theorem toLp_mem_closure (g : ℝ →ᵇ ℂ) :
       ((BoundedContinuousFunction.coeFn_toLp p vol ℝ g).sub (MemLp.coeFn_toLp hmem)))]
     have hb := eLpNorm_le_of_ae_bound (p := p) (g.continuous.aestronglyMeasurable.sub hmeas)
       (C := ε / 2) (by filter_upwards [Interval.ae_mem_Ico_unitVol] with x hx using hj x hx)
-    rw [vol_univ, ENNReal.one_rpow, one_mul] at hb
+    rw [measure_univ, ENNReal.one_rpow, one_mul] at hb
     calc (eLpNorm (⇑g - stepFun g j) p vol).toReal ≤ (ENNReal.ofReal (ε / 2)).toReal :=
           ENNReal.toReal_mono ENNReal.ofReal_ne_top hb
       _ = ε / 2 := ENNReal.toReal_ofReal (by positivity)

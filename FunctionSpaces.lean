@@ -847,9 +847,10 @@ manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet example
 * `FunctionSpaces.Domains.Manifolds.SmoothMeasure`: smooth measures on manifolds, measurability of
   extended charts on their sources, integrals in charts and their comparison with integrals on the
   manifold, and null sets in charts.
-* `FunctionSpaces.Domains.Manifolds.BesovAtlas`: Besov atlases, chart pieces in `L_p`, images and
-  measurable sources of changes of charts, the changes of charts with cut-offs, the pieces of two
-  atlases, and lifts of functions from a chart with their `L_p` bound.
+* `FunctionSpaces.Domains.Manifolds.BesovAtlas`: Besov atlases, `∑_i ψ_i² ≥ 1/N` for the partition
+  of unity, chart pieces with their compact carriers and continuity, chart pieces in `L_p`,
+  images and measurable sources of changes of charts, the changes of charts with cut-offs, the
+  pieces of two atlases, and lifts of functions from a chart with their `L_p` bound.
 * `FunctionSpaces.Domains.Manifolds.SmoothMeasureExistence`: the chart measure of a Besov atlas,
   its density in every chart by the change of variables, and its smoothness and finiteness, so
   every compact manifold, with or without boundary, carries a finite smooth measure; the sphere as
@@ -866,8 +867,9 @@ manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet example
   changes of charts restricted to it, boundary pieces, and the Besov spaces of the boundary of a
   compact manifold with their independence of the atlas.
 * `FunctionSpaces.Domains.Manifolds.BoundaryTrace`: the trace commutes with the changes of charts,
-  the trace on the boundary of a compact manifold, its independence of the atlas, and the trace
-  theorem.
+  the trace on the boundary of a compact manifold, its independence of the atlas, its quasi-norm
+  bound, the trace theorem, the trace of a continuous function as its restriction, and the
+  closures of smooth bounded domains.
 * `FunctionSpaces.Domains.Manifolds.SmoothLocalGraphs`: the usual set-level definition of
   bounded domains with smooth boundary by smooth local graphs, the smooth cut-off of a local graph,
   the smooth domain of a set satisfying the definition and the converse, and the ball as a smooth
