@@ -42,9 +42,7 @@ the sets of the usual definition by local Lipschitz graphs, with the open balls 
 domain has the extension property of Besov domains, and that the closures of convex Lipschitz
 graph domains, the quadrant (the model of manifolds with corners) and the closures of nonempty
 bounded open convex sets, among them closed balls of positive radius and the closed unit cube,
-are Besov domains. \Cref{sec:besov-domain-localisation} decides finiteness of the intrinsic
-quasi-norm on a Besov domain, for functions that vanish outside a ball, on bounded convex pieces;
-its last lemma uses $H^1$ on bounded Lipschitz domains from \Cref{ch:sobolev-domains}.
+are Besov domains.
 
 \section{Lipschitz graph domains}
 
@@ -354,15 +352,10 @@ $-2^{-j} z = 2^{-j} (-z)$ lies in $K$ and has length at most $2^{-(j+1)}$; apply
 \lean{Rd.LipschitzGraph.enorm_cutoff_localMean_zero_le,
   Rd.LipschitzGraph.enorm_cutoff_localMean_succ_le, Rd.LipschitzGraph.intrinsicConst,
   Rd.LipschitzGraph.intrinsicConst_ne_top, Rd.LocalMeansBump.momentConst_ne_top,
-  Rd.LipschitzGraph.intrinsicNorm_le, Rd.LipschitzGraph.intrinsicNorm_lt_top,
-  Rd.lqNorm_dyadicWeight_le_of_head_of_succ_le}
+  Rd.LipschitzGraph.intrinsicNorm_le, Rd.LipschitzGraph.intrinsicNorm_lt_top}
 \leanok
-\uses{lem:cone-steps, lem:support-principle, lem:rd-modulus-on, def:intrinsic-local-means}
-For every $1 \leq q \leq \infty$, every $s \in \R$, all sequences $x, w \geq 0$ and all
-$a, M, A \in [0, \infty]$ with $x_0 \leq M a$ and $x_{j+1} \leq A w_{j+1}$ for every $j \in \N$,
-\[
-  \|(2^{js} x_j)_j\|_{\ell_q} \leq (M + A) \bigl( a + \|(2^{js} w_j)_j\|_{\ell_q} \bigr) .
-\]
+\uses{lem:cone-steps, lem:support-principle, lem:rd-modulus-on, def:intrinsic-local-means,
+  lem:lq-basic}
 Let $1 \leq p < \infty$ and $f \in L_p$. Then
 $\|k_0 * f\|_{L_p(\Omega)} \leq \|m\|_1 \|f\|_{L_p(\Omega)}$ and
 $\|k_{j+1} * f\|_{L_p(\Omega)} \leq 2 \|g\|_1 \, \omega_L(f, 2^{-(j+1)}, \Omega)_p$ for
@@ -379,9 +372,9 @@ $j \in \N$. Hence, for $s \in \R$ and $1 \leq q \leq \infty$,
 $1_\Omega (k_0 * f) = 1_\Omega (k_0 * (1_\Omega f))$ by \Cref{lem:support-principle}. For
 $j \in \N$, $k_{j+1} * f = (f - m_{2^j} * f) - (f - m_{2^{j+1}} * f)$, and \Cref{lem:cone-steps}
 bounds both terms by $\|g\|_1 \, \omega_L(f, 2^{-(j+1)}, \Omega)_p$, since the modulus
-increases in $t$. The $\ell_q$ bound splits off the first term and shifts the others (the
-triangle inequality in $\ell_q$); with $x_j = \|k_j * f\|_{L_p(\Omega)}$,
-$w_j = \omega_L(f, 2^{-j}, \Omega)_p$ and $a = \|f\|_{L_p(\Omega)}$ it gives the last claim.
+increases in $t$. The weighted $\ell_q$ bound of \Cref{lem:lq-basic} with
+$x_j = \|k_j * f\|_{L_p(\Omega)}$, $w_j = \omega_L(f, 2^{-j}, \Omega)_p$ and
+$a = \|f\|_{L_p(\Omega)}$ gives the last claim.
 \end{proof}
 
 \begin{theorem}[Besov spaces on Lipschitz graph domains by intrinsic differences]
@@ -2259,120 +2252,6 @@ the open unit cube (\Cref{lem:unit-cube}), a bounded Lipschitz domain
 (\Cref{cor:unit-cube-lipschitz}).
 \end{proof}
 
-\section{Compactly supported functions on Besov domains}
-\label{sec:besov-domain-localisation}
-
-In this section $\Omega \subseteq V$ is a Besov domain (\Cref{def:besov-domain}): a closed convex
-set with nonempty interior $O = \operatorname{int} \Omega$ and the extension property, and
-$N_U(f)$ is the intrinsic quasi-norm on a measurable set $U$ (\Cref{lem:modnorm-on}). For
-functions that vanish outside a ball, finiteness of $N_\Omega$ is decided on the bounded convex
-pieces $O \cap B(0, R)$. These pieces are bounded Lipschitz domains, on which
-$\Sob{1}{2} = B^1_{2,2}$ (\Cref{thm:sobolev-lipschitz-domain-intrinsic}); so the same holds on
-$O$ for such functions. The chart pieces of functions on compact manifolds vanish outside a ball,
-and \Cref{ch:manifold-eigenbases} applies these results to them.
-
-\begin{lemma}[A Besov domain and its interior]
-\label{lem:besov-domain-interior-ae}
-\lean{Rd.BesovDomain.interior_ae_eq, Rd.BesovDomain.restrict_interior}
-\leanok
-\uses{def:besov-domain}
-For every Besov domain $\Omega$, the interior $O$ agrees with $\Omega$ up to a null set, and the
-Lebesgue measure restricted to $O$ is the Lebesgue measure restricted to $\Omega$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The frontier of the convex set $\Omega$ is a null set (Mathlib's \texttt{Convex.\allowbreak
-addHaar\_\allowbreak frontier}), so $\Omega$ agrees with its interior up to a null set (Mathlib's
-\texttt{interior\_\allowbreak ae\_\allowbreak eq\_\allowbreak of\_\allowbreak null\_\allowbreak
-frontier}).
-\end{proof}
-
-\begin{definition}[The bounded convex pieces]
-\label{def:besov-domain-ball}
-\lean{Rd.BesovDomain.ballDomain, Rd.BesovDomain.carrier_ballDomain,
-  Rd.BesovDomain.toOpens_ballDomain_le, Rd.BesovDomain.ballDomain_subset_interior,
-  Rd.BesovDomain.ballDomain_subset}
-\leanok
-\uses{def:besov-domain, thm:convex-lipschitz}
-For every Besov domain $\Omega$ and every $R \in \R$, the piece $D_R = O \cap B(0, R)$ is the
-bounded Lipschitz domain of the bounded open convex set $O \cap B(0, R)$
-(\Cref{thm:convex-lipschitz}). It satisfies $D_R \subseteq O \subseteq \Omega$.
-\end{definition}
-
-\begin{lemma}[The cutoff identity]
-\label{lem:besov-domain-cutoff}
-\lean{Rd.BesovDomain.mul_ae_eq_of_ballDomain}
-\leanok
-\uses{lem:besov-domain-interior-ae, def:besov-domain-ball}
-Let $\Omega$ be a Besov domain and $R \leq R'$. For all $g, F \in L_p(V)$ with $g = 0$ almost
-everywhere outside $B(0, R)$ and $F = g$ almost everywhere on $D_{R'}$, and every real $\chi$ that
-equals $1$ on $\overline{B}(0, R)$ and has closed support in $B(0, R')$, $\chi F = g$ almost
-everywhere on $\Omega$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-By \Cref{lem:besov-domain-interior-ae} it suffices to check almost every $y \in O$. On
-$D_{R'}$, $\chi F = \chi g$, which is $g$ on $B(0, R)$, where $\chi = 1$, and $0 = g$ outside it.
-Outside $B(0, R')$ both $\chi F$ and $g$ vanish.
-\end{proof}
-
-\begin{lemma}[Localisation on Besov domains]
-\label{lem:besov-domain-localisation}
-\lean{Rd.BesovDomain.modNormOn_lt_top_of_ballDomain, Rd.BesovDomain.modNormOn_lt_top_iff_ballDomain}
-\leanok
-\uses{def:besov-domain-ball, lem:restriction-moduli, thm:bounded-lipschitz-besov-domain,
-  lem:smooth-cutoff-compact, lem:besov-multiplier, lem:besov-domain-cutoff}
-Let $\Omega$ be a Besov domain, $1 \leq p < \infty$, $0 < s < r$, $q \in [1, \infty]$ and
-$R < R'$. For every $g \in L_p(V)$ with $g = 0$ almost everywhere outside $B(0, R)$,
-$N_\Omega(g) < \infty$ if and only if $N_{D_{R'}}(g) < \infty$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-$N_{D_{R'}}(g) \leq N_\Omega(g)$ since $D_{R'} \subseteq \Omega$ (\Cref{lem:restriction-moduli}).
-Conversely, $D_{R'}$ has the extension property (\Cref{thm:bounded-lipschitz-besov-domain}): there
-is $F \in L_p(V)$ with $F = g$ on $D_{R'}$ and finite quasi-norm on $V$. Take a smooth $\chi$ equal
-to $1$ near $\overline{B}(0, R)$ with compact closed support in $B(0, R')$
-(\Cref{lem:smooth-cutoff-compact}). Then $\chi F$ has finite quasi-norm on $V$
-(\Cref{lem:besov-multiplier}) and agrees with $g$ on $\Omega$ (\Cref{lem:besov-domain-cutoff}), so
-$N_\Omega(g) < \infty$ (\Cref{lem:restriction-moduli}).
-\end{proof}
-
-\begin{lemma}[$\Sob{1}{2} = B^1_{2,2}$ for functions vanishing outside a ball]
-\label{lem:besov-domain-weak-gradient}
-\lean{Rd.BesovDomain.exists_hasWeakLineDeriv_of_modNormOn_lt_top,
-  Rd.BesovDomain.modNormOn_lt_top_of_hasWeakLineDeriv,
-  Rd.BesovDomain.exists_hasWeakLineDeriv_iff_modNormOn_lt_top}
-\leanok
-\uses{def:besov-extension-property, thm:sobolev-one-two-besov, lem:weak-derivative-basic,
-  lem:weak-derivative-direction-linear, def:besov-domain-ball, cor:sobolev-extension-two,
-  thm:sobolev-lipschitz-domain-intrinsic, lem:besov-domain-localisation}
-Let $\Omega$ be a Besov domain, $(e_i)_{i \in I}$ the orthonormal basis of
-\Cref{def:dyadic-cubes}, $r \geq 2$ an order, and write
-$N_\Omega(g) = \|g\|_{L_2(\Omega)} + \|(2^k \omega_r(g, 2^{-k}, \Omega)_2)_k\|_{\ell_2}$.
-\begin{enumerate}
-  \item For every $g \in L_2(V)$ with $N_\Omega(g) < \infty$ there are $g_i \in L_2(O)$ with
-    $g_i = \partial_{e_i} g$ weakly on $O$ for every $i \in I$.
-  \item For every $R \in \R$ and every $g \in L_2(V)$ with $g = 0$ almost everywhere outside
-    $B(0, R)$, such $g_i$ exist if and only if $N_\Omega(g) < \infty$.
-\end{enumerate}
-\end{lemma}
-
-\begin{proof}
-\leanok
-(1) The extension property of $\Omega$ (\Cref{def:besov-extension-property}) gives $F \in L_2(V)$
-with $F = g$ on $\Omega$ and finite quasi-norm on $V$, so $F \in \Sob{1}{2}(V)$
-(\Cref{thm:sobolev-one-two-besov}). Its weak derivatives on $V$ are weak derivatives on $O$, and
-there of $g$ (\Cref{lem:weak-derivative-basic}). (2) If the $g_i$ exist, then on the piece
-$D = D_{R+1}$, $g \in \Sob{1}{2}(D)$ (\Cref{lem:weak-derivative-basic},
-\Cref{lem:weak-derivative-direction-linear}), which is the space $H^1(D)$
-(\Cref{cor:sobolev-extension-two}), so $N_D(g) < \infty$
-(\Cref{thm:sobolev-lipschitz-domain-intrinsic}) and $N_\Omega(g) < \infty$
-(\Cref{lem:besov-domain-localisation}). The converse is (1).
-\end{proof}
-
 \chapter{Traces on Lipschitz domains}
 \label{ch:traces-lipschitz}
 
@@ -3841,7 +3720,10 @@ $\Sob{m}{p}$ for every $m$ and $1 < p < \infty$.
 \Cref{sec:lipschitz-graph-green} and
 \Cref{sec:lipschitz-domain-green} prove Gauss--Green on Lipschitz graph domains and Green's
 formula on bounded Lipschitz domains, and \Cref{sec:trace-kernel} proves that the kernel of the
-trace is $H^1_0(\Omega)$.
+trace is $H^1_0(\Omega)$. \Cref{sec:besov-domain-localisation} decides finiteness of the
+intrinsic quasi-norm on a Besov domain, for functions that vanish outside a ball, on bounded
+convex pieces, and with \Cref{sec:lipschitz-domain-h1} identifies $\Sob{1}{2}$ and
+$B^1_{2,2}$ for such functions.
 
 On a bounded Lipschitz domain $\Omega$, the space $H^1(\Omega)$ of this chapter
 (\Cref{sec:lipschitz-domain-h1}) is the space of restrictions of $H^1(V)$, the definition of
@@ -4463,6 +4345,45 @@ $H^s(V)$ onto $L_2(V)$. The cut-offs of a Schwartz function converge to it in th
 Schwartz function with compact support in $\Omega$ is $a + i b$ with real test functions
 $a, b \in \mathcal D(\Omega)$ (\Cref{lem:weak-derivative-complex-test}), so it lies in
 $T^s(\Omega)$; for $\Omega = V$ this gives $\tilde H^s(V) = H^s(V)$.
+\end{proof}
+
+\begin{lemma}[Differences in $H^1(V)$]
+\label{lem:sobolev-one-differences}
+\lean{Rd.norm_fwdDiffL2_toL2_le}
+\leanok
+\uses{lem:difference-operator-l2, def:sobolev-one-to-l2, lem:sobolev-of-schwartz,
+  thm:sobolev-schwartz-dense, lem:sobolev-one-weak-derivative-operator}
+For every $v \in V$ and every $U \in H^1(V)$, with $\Delta_v$ the difference operator on $L_2(V)$ of
+\Cref{lem:difference-operator-l2},
+\[
+  \|\Delta_v \iota U\|_2 \leq 2\pi \|v\| \, \|U\| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For a Schwartz function $G$,
+$\|\Delta_v G\|_2 \leq \|\partial_v G\|_2 \leq 2\pi \|v\| \, \|G\|_{H^1}$
+(\Cref{lem:difference-operator-l2}, \Cref{lem:sobolev-of-schwartz},
+\Cref{lem:sobolev-one-weak-derivative-operator}). Both sides are continuous in $U$, and the
+Schwartz functions are dense in $H^1(V)$ (\Cref{thm:sobolev-schwartz-dense}).
+\end{proof}
+
+\begin{lemma}[The modulus of an $H^1$ function]
+\label{lem:modulus-h1-bound}
+\lean{Rd.lpModulus_one_toL2_le, Rd.lpModulus_toL2_le}
+\leanok
+\uses{lem:sobolev-one-differences, def:rd-modulus, lem:moduli-orders}
+For every order $r \geq 1$, every $U \in H^1(V)$ and every $k \in \N$,
+\[
+  \omega_r(\iota U, 2^{-k})_2 \leq 2^{r-1} \cdot 2\pi \cdot 2^{-k} \|U\| .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $r = 1$ this is \Cref{lem:sobolev-one-differences} with $\|h\| \leq 2^{-k}$, and
+$\omega_{1 + l} \leq 2^l \omega_1$ (\Cref{lem:moduli-orders}).
 \end{proof}
 
 \begin{lemma}[Functions with disjoint supports]
@@ -9445,6 +9366,120 @@ spaces of Hiptmair, Pauly and Schulz \cite{HiptmairPaulySchulz} at $k = 0$ the q
 $H^1(\Omega) / H^1_0(\Omega)$ is the trace space; its norm is equivalent to the
 Sobolev--Slobodeckij norm of the classical $H^{1/2}(\Gamma)$ (\Cref{sec:boundary-slobodeckij}).
 
+\section{Compactly supported functions on Besov domains}
+\label{sec:besov-domain-localisation}
+
+In this section $\Omega \subseteq V$ is a Besov domain (\Cref{def:besov-domain}): a closed convex
+set with nonempty interior $O = \operatorname{int} \Omega$ and the extension property, and
+$N_U(f)$ is the intrinsic quasi-norm on a measurable set $U$ (\Cref{lem:modnorm-on}). For
+functions that vanish outside a ball, finiteness of $N_\Omega$ is decided on the bounded convex
+pieces $O \cap B(0, R)$. These pieces are bounded Lipschitz domains, on which
+$\Sob{1}{2} = B^1_{2,2}$ (\Cref{thm:sobolev-lipschitz-domain-intrinsic}); so the same holds on
+$O$ for such functions. The chart pieces of functions on compact manifolds vanish outside a ball,
+and \Cref{ch:manifold-eigenbases} applies these results to them.
+
+\begin{lemma}[A Besov domain and its interior]
+\label{lem:besov-domain-interior-ae}
+\lean{Rd.BesovDomain.interior_ae_eq, Rd.BesovDomain.restrict_interior}
+\leanok
+\uses{def:besov-domain}
+For every Besov domain $\Omega$, the interior $O$ agrees with $\Omega$ up to a null set, and the
+Lebesgue measure restricted to $O$ is the Lebesgue measure restricted to $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The frontier of the convex set $\Omega$ is a null set (Mathlib's \texttt{Convex.\allowbreak
+addHaar\_\allowbreak frontier}), so $\Omega$ agrees with its interior up to a null set (Mathlib's
+\texttt{interior\_\allowbreak ae\_\allowbreak eq\_\allowbreak of\_\allowbreak null\_\allowbreak
+frontier}).
+\end{proof}
+
+\begin{definition}[The bounded convex pieces]
+\label{def:besov-domain-ball}
+\lean{Rd.BesovDomain.ballDomain, Rd.BesovDomain.carrier_ballDomain,
+  Rd.BesovDomain.toOpens_ballDomain_le, Rd.BesovDomain.ballDomain_subset_interior,
+  Rd.BesovDomain.ballDomain_subset}
+\leanok
+\uses{def:besov-domain, thm:convex-lipschitz}
+For every Besov domain $\Omega$ and every $R \in \R$, the piece $D_R = O \cap B(0, R)$ is the
+bounded Lipschitz domain of the bounded open convex set $O \cap B(0, R)$
+(\Cref{thm:convex-lipschitz}). It satisfies $D_R \subseteq O \subseteq \Omega$.
+\end{definition}
+
+\begin{lemma}[The cutoff identity]
+\label{lem:besov-domain-cutoff}
+\lean{Rd.BesovDomain.mul_ae_eq_of_ballDomain}
+\leanok
+\uses{lem:besov-domain-interior-ae, def:besov-domain-ball}
+Let $\Omega$ be a Besov domain and $R \leq R'$. For all $g, F \in L_p(V)$ with $g = 0$ almost
+everywhere outside $B(0, R)$ and $F = g$ almost everywhere on $D_{R'}$, and every real $\chi$ that
+equals $1$ on $\overline{B}(0, R)$ and has closed support in $B(0, R')$, $\chi F = g$ almost
+everywhere on $\Omega$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:besov-domain-interior-ae} it suffices to check almost every $y \in O$. On
+$D_{R'}$, $\chi F = \chi g$, which is $g$ on $B(0, R)$, where $\chi = 1$, and $0 = g$ outside it.
+Outside $B(0, R')$ both $\chi F$ and $g$ vanish.
+\end{proof}
+
+\begin{lemma}[Localisation on Besov domains]
+\label{lem:besov-domain-localisation}
+\lean{Rd.BesovDomain.modNormOn_lt_top_of_ballDomain, Rd.BesovDomain.modNormOn_lt_top_iff_ballDomain}
+\leanok
+\uses{def:besov-domain-ball, lem:restriction-moduli, thm:bounded-lipschitz-besov-domain,
+  lem:smooth-cutoff-compact, lem:besov-multiplier, lem:besov-domain-cutoff}
+Let $\Omega$ be a Besov domain, $1 \leq p < \infty$, $0 < s < r$, $q \in [1, \infty]$ and
+$R < R'$. For every $g \in L_p(V)$ with $g = 0$ almost everywhere outside $B(0, R)$,
+$N_\Omega(g) < \infty$ if and only if $N_{D_{R'}}(g) < \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$N_{D_{R'}}(g) \leq N_\Omega(g)$ since $D_{R'} \subseteq \Omega$ (\Cref{lem:restriction-moduli}).
+Conversely, $D_{R'}$ has the extension property (\Cref{thm:bounded-lipschitz-besov-domain}): there
+is $F \in L_p(V)$ with $F = g$ on $D_{R'}$ and finite quasi-norm on $V$. Take a smooth $\chi$ equal
+to $1$ near $\overline{B}(0, R)$ with compact closed support in $B(0, R')$
+(\Cref{lem:smooth-cutoff-compact}). Then $\chi F$ has finite quasi-norm on $V$
+(\Cref{lem:besov-multiplier}) and agrees with $g$ on $\Omega$ (\Cref{lem:besov-domain-cutoff}), so
+$N_\Omega(g) < \infty$ (\Cref{lem:restriction-moduli}).
+\end{proof}
+
+\begin{lemma}[$\Sob{1}{2} = B^1_{2,2}$ for functions vanishing outside a ball]
+\label{lem:besov-domain-weak-gradient}
+\lean{Rd.BesovDomain.exists_hasWeakLineDeriv_of_modNormOn_lt_top,
+  Rd.BesovDomain.modNormOn_lt_top_of_hasWeakLineDeriv,
+  Rd.BesovDomain.exists_hasWeakLineDeriv_iff_modNormOn_lt_top}
+\leanok
+\uses{def:besov-extension-property, thm:sobolev-one-two-besov, lem:weak-derivative-basic,
+  lem:weak-derivative-direction-linear, def:besov-domain-ball, cor:sobolev-extension-two,
+  thm:sobolev-lipschitz-domain-intrinsic, lem:besov-domain-localisation}
+Let $\Omega$ be a Besov domain, $(e_i)_{i \in I}$ the orthonormal basis of
+\Cref{def:dyadic-cubes}, $r \geq 2$ an order, and write
+$N_\Omega(g) = \|g\|_{L_2(\Omega)} + \|(2^k \omega_r(g, 2^{-k}, \Omega)_2)_k\|_{\ell_2}$.
+\begin{enumerate}
+  \item For every $g \in L_2(V)$ with $N_\Omega(g) < \infty$ there are $g_i \in L_2(O)$ with
+    $g_i = \partial_{e_i} g$ weakly on $O$ for every $i \in I$.
+  \item For every $R \in \R$ and every $g \in L_2(V)$ with $g = 0$ almost everywhere outside
+    $B(0, R)$, such $g_i$ exist if and only if $N_\Omega(g) < \infty$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) The extension property of $\Omega$ (\Cref{def:besov-extension-property}) gives $F \in L_2(V)$
+with $F = g$ on $\Omega$ and finite quasi-norm on $V$, so $F \in \Sob{1}{2}(V)$
+(\Cref{thm:sobolev-one-two-besov}). Its weak derivatives on $V$ are weak derivatives on $O$, and
+there of $g$ (\Cref{lem:weak-derivative-basic}). (2) If the $g_i$ exist, then on the piece
+$D = D_{R+1}$, $g \in \Sob{1}{2}(D)$ (\Cref{lem:weak-derivative-basic},
+\Cref{lem:weak-derivative-direction-linear}), which is the space $H^1(D)$
+(\Cref{cor:sobolev-extension-two}), so $N_D(g) < \infty$
+(\Cref{thm:sobolev-lipschitz-domain-intrinsic}) and $N_\Omega(g) < \infty$
+(\Cref{lem:besov-domain-localisation}). The converse is (1).
+\end{proof}
+
 \chapter{Eigenbases of the Laplacian}
 \label{ch:laplacian-eigenbases}
 
@@ -9967,71 +10002,6 @@ equivalence of $K$-functionals and moduli of smoothness of Johnen and Scherer
 $(L_2(V), H^1(V))_{\theta, q} = B^\theta_{2,q}(V)$ (\Cref{thm:bessel-potential-interpolate})
 and uses the Besov extension theorem. Throughout, $\iota U$ is the $L_2$ function of
 $U \in H^1(V)$ and $f|_\Omega \in L_2(\Omega)$ the restriction of $f \in L_2(V)$.
-
-\begin{lemma}[Differences of Schwartz functions in $L_2$]
-\label{lem:schwartz-differences-l2}
-\lean{Rd.sq_lintegral_Ioc_le, Rd.enorm_fwdDiff_schwartz_sq_le, Rd.eLpNorm_fwdDiff_schwartz_le}
-\leanok
-\uses{lem:schwartz-differences}
-For every measurable $\varphi \colon (0, 1] \to [0, \infty]$,
-$\bigl(\int_0^1 \varphi\bigr)^2 \leq \int_0^1 \varphi^2$. For every Schwartz function $G$ on $V$
-and all $v, x \in V$,
-\[
-  |G(x + v) - G(x)|^2 \leq \int_0^1 |\partial_v G(x + t v)|^2 \, dt .
-\]
-For every Schwartz function $G$ on $V$ and every $v \in V$,
-$\|G(\cdot + v) - G\|_2 \leq \|\partial_v G\|_2$.
-\end{lemma}
-
-\begin{proof}
-\leanok
-The first inequality is H\"older's inequality with the constant function $1$ on an interval of
-length $1$. With the pointwise bound
-$|G(x + v) - G(x)| \leq \int_0^1 |\partial_v G(x + t v)| \, dt$ of
-\Cref{lem:schwartz-differences} it gives the second. Integrating over $x$ and averaging the
-translates of $|\partial_v G|^2$ along the segment (\Cref{lem:schwartz-differences}) gives the
-last bound.
-\end{proof}
-
-\begin{lemma}[Differences in $H^1(V)$]
-\label{lem:sobolev-one-differences}
-\lean{Rd.fwdDiffL2, Rd.fwdDiffL2_ae_eq, Rd.enorm_fwdDiffL2, Rd.enorm_fwdDiffL2_toLp_le,
-  Rd.norm_fwdDiffL2_toL2_le}
-\leanok
-\uses{lem:schwartz-differences-l2, def:sobolev-one-to-l2, lem:sobolev-of-schwartz,
-  thm:sobolev-schwartz-dense, lem:sobolev-one-weak-derivative-operator}
-For every $v \in V$, $\Delta_v f = f(\cdot + v) - f$ is a bounded linear operator on $L_2(V)$, and
-for every $U \in H^1(V)$,
-\[
-  \|\Delta_v \iota U\|_2 \leq 2\pi \|v\| \, \|U\| .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-$\Delta_v$ is the translation by $v$, an isometry, minus the identity. For a Schwartz function $G$,
-$\|\Delta_v G\|_2 \leq \|\partial_v G\|_2 \leq 2\pi \|v\| \, \|G\|_{H^1}$
-(\Cref{lem:schwartz-differences-l2}, \Cref{lem:sobolev-of-schwartz},
-\Cref{lem:sobolev-one-weak-derivative-operator}). Both sides are continuous in $U$, and the
-Schwartz functions are dense in $H^1(V)$ (\Cref{thm:sobolev-schwartz-dense}).
-\end{proof}
-
-\begin{lemma}[The modulus of an $H^1$ function]
-\label{lem:modulus-h1-bound}
-\lean{Rd.lpModulus_one_toL2_le, Rd.lpModulus_toL2_le}
-\leanok
-\uses{lem:sobolev-one-differences, def:rd-modulus, lem:moduli-orders}
-For every order $r \geq 1$, every $U \in H^1(V)$ and every $k \in \N$,
-\[
-  \omega_r(\iota U, 2^{-k})_2 \leq 2^{r-1} \cdot 2\pi \cdot 2^{-k} \|U\| .
-\]
-\end{lemma}
-
-\begin{proof}
-\leanok
-For $r = 1$ this is \Cref{lem:sobolev-one-differences} with $\|h\| \leq 2^{-k}$, and
-$\omega_{1 + l} \leq 2^l \omega_1$ (\Cref{lem:moduli-orders}).
-\end{proof}
 
 \begin{lemma}[The intrinsic modulus by the $K$-functional]
 \label{lem:modulus-on-k-functional}

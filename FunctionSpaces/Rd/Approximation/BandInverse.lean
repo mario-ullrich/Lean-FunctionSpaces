@@ -18,12 +18,17 @@ inequality and the dilation `Δ_h^r Θ_j = (Δ_{2^j h}^r Θ)_{2^j}` (`Rd.higherD
 
 `‖Δ_h^r a‖_p ≤ ‖Δ_{2^j h}^r Θ‖_1 ‖a‖_p`.
 
-**Differences of Schwartz functions in `L_1`** (`Rd.lintegral_enorm_higherDiff_schwartz_le`):
-`‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1`. The fundamental theorem of calculus along the segment from `x`
-to `x + v` gives `G(x + v) - G(x) = ∫_0^1 ∂_v G(x + t v) dt` (`Rd.fwdDiff_schwartz_eq_integral`),
+**Differences of Schwartz functions in `L_p`** (`Rd.lintegral_enorm_fwdDiff_rpow_le`):
+`‖Δ_v G‖_p ≤ ‖∂_v G‖_p` for `1 ≤ p < ∞`. The fundamental theorem of calculus along the segment
+from `x` to `x + v` gives `G(x + v) - G(x) = ∫_0^1 ∂_v G(x + t v) dt`
+(`Rd.fwdDiff_schwartz_eq_integral`); Jensen's inequality on `(0, 1]` (`Rd.rpow_lintegral_Ioc_le`)
 and Tonelli's theorem with the translation invariance of Lebesgue measure
-(`Rd.lintegral_lintegral_Ioc_add_smul`) gives `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1`
-(`Rd.lintegral_enorm_fwdDiff_le`); differences commute with line derivatives
+(`Rd.lintegral_lintegral_Ioc_add_smul`) give the bound, with the cases `p = 1` and `p = 2`
+(`Rd.lintegral_enorm_fwdDiff_le`, `Rd.eLpNorm_fwdDiff_schwartz_le`). The difference
+`Δ_v f = f(· + v) - f` is a bounded operator on `L_2` (`Rd.fwdDiffL2`).
+
+**Higher differences in `L_1`** (`Rd.lintegral_enorm_higherDiff_schwartz_le`):
+`‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1`. Differences commute with line derivatives
 (`Rd.lineDerivOp_fwdDiffSchwartz`), so induction gives `‖Δ_v^r G‖_1 ≤ ‖∂_v^r G‖_1`, and
 `|∂_v^r G(x)| ≤ ‖v‖^r ‖D^r G(x)‖`. Mathlib's Schwartz space provides the translations, the line
 derivatives `∂_v` and the integrability of all derivatives.
@@ -125,14 +130,104 @@ theorem lintegral_lintegral_Ioc_add_smul {φ : V → ℝ≥0∞} (hφ : Measurab
         rw [lintegral_const, Measure.restrict_apply_univ, Real.volume_Ioc, sub_zero,
           ENNReal.ofReal_one, mul_one]
 
-/-- **A difference is bounded by the line derivative in `L_1`**: `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1`. Integrate
-the pointwise bound `Rd.enorm_fwdDiff_schwartz_le_lintegral` over `x` and use
+/-- **Jensen's inequality on the unit interval**: `(∫_0^1 φ)^p ≤ ∫_0^1 φ^p` for real `p ≥ 1` and
+measurable `φ ≥ 0`. The interval `(0, 1]` carries a probability measure, on which the `L_1` norm is
+at most the `L_p` norm (Mathlib's `MeasureTheory.eLpNorm'_le_eLpNorm'_of_exponent_le`). -/
+theorem rpow_lintegral_Ioc_le {p : ℝ} (hp : 1 ≤ p) {φ : ℝ → ℝ≥0∞}
+    (hφ : AEMeasurable φ (volume.restrict (Set.Ioc (0 : ℝ) 1))) :
+    (∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t) ^ p ≤ ∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t ^ p := by
+  have : IsProbabilityMeasure (volume.restrict (Set.Ioc (0 : ℝ) 1)) :=
+    ⟨by rw [Measure.restrict_apply_univ, Real.volume_Ioc, sub_zero, ENNReal.ofReal_one]⟩
+  have h := eLpNorm'_le_eLpNorm'_of_exponent_le zero_lt_one hp _ hφ.aestronglyMeasurable
+  simp only [eLpNorm', enorm_eq_self, ENNReal.rpow_one, div_one] at h
+  calc (∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t) ^ p
+      ≤ ((∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t ^ p) ^ (1 / p)) ^ p :=
+        ENNReal.rpow_le_rpow h (by linarith)
+    _ = ∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t ^ p := by
+        rw [← ENNReal.rpow_mul, one_div_mul_cancel (by linarith), ENNReal.rpow_one]
+
+omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
+/-- **A difference by the line derivative, pointwise, in `p`-th powers**: for a Schwartz function
+`G` and real `p ≥ 1`, `|G(x + v) - G(x)|^p ≤ ∫_0^1 |∂_v G(x + t v)|^p dt`
+(`Rd.enorm_fwdDiff_schwartz_le_lintegral` and Jensen's inequality `Rd.rpow_lintegral_Ioc_le`). -/
+theorem enorm_fwdDiff_schwartz_rpow_le {p : ℝ} (hp : 1 ≤ p) (v : V) (G : 𝓢(V, ℂ)) (x : V) :
+    ‖fwdDiff v (G : V → ℂ) x‖ₑ ^ p ≤
+      ∫⁻ t in Set.Ioc (0 : ℝ) 1, ‖(∂_{v} G : 𝓢(V, ℂ)) (x + t • v)‖ₑ ^ p := by
+  have hcont : Continuous fun t : ℝ => (∂_{v} G : 𝓢(V, ℂ)) (x + t • v) :=
+    (SchwartzMap.continuous _).comp (continuous_const.add (continuous_id.smul continuous_const))
+  exact (ENNReal.rpow_le_rpow (enorm_fwdDiff_schwartz_le_lintegral v G x) (by linarith)).trans
+    (rpow_lintegral_Ioc_le hp hcont.enorm.aemeasurable)
+
+/-- **A difference is bounded by the line derivative in `L_p`**: for a Schwartz function `G` and
+real `p ≥ 1`, `∫ |Δ_v G|^p ≤ ∫ |∂_v G|^p`, that is `‖Δ_v G‖_p ≤ ‖∂_v G‖_p`. Integrate the
+pointwise bound `Rd.enorm_fwdDiff_schwartz_rpow_le` over `x` and use
 `Rd.lintegral_lintegral_Ioc_add_smul`. -/
+theorem lintegral_enorm_fwdDiff_rpow_le {p : ℝ} (hp : 1 ≤ p) (v : V) (G : 𝓢(V, ℂ)) :
+    ∫⁻ x, ‖fwdDiff v (G : V → ℂ) x‖ₑ ^ p ≤ ∫⁻ x, ‖(∂_{v} G : 𝓢(V, ℂ)) x‖ₑ ^ p :=
+  (lintegral_mono fun x => enorm_fwdDiff_schwartz_rpow_le hp v G x).trans_eq
+    (lintegral_lintegral_Ioc_add_smul (φ := fun y => ‖(∂_{v} G : 𝓢(V, ℂ)) y‖ₑ ^ p)
+      ((SchwartzMap.continuous _).enorm.measurable.pow_const p) v)
+
+/-- **A difference is bounded by the line derivative in `L_1`**: `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1` for a
+Schwartz function `G`, the case `p = 1` of `Rd.lintegral_enorm_fwdDiff_rpow_le`. -/
 theorem lintegral_enorm_fwdDiff_le (v : V) (G : 𝓢(V, ℂ)) :
-    ∫⁻ x, ‖fwdDiff v (G : V → ℂ) x‖ₑ ≤ ∫⁻ x, ‖(∂_{v} G : 𝓢(V, ℂ)) x‖ₑ :=
-  (lintegral_mono fun x => enorm_fwdDiff_schwartz_le_lintegral v G x).trans_eq
-    (lintegral_lintegral_Ioc_add_smul (φ := fun y => ‖(∂_{v} G : 𝓢(V, ℂ)) y‖ₑ)
-      (SchwartzMap.continuous _).enorm.measurable v)
+    ∫⁻ x, ‖fwdDiff v (G : V → ℂ) x‖ₑ ≤ ∫⁻ x, ‖(∂_{v} G : 𝓢(V, ℂ)) x‖ₑ := by
+  simpa using lintegral_enorm_fwdDiff_rpow_le le_rfl v G
+
+/-- **A difference is bounded by the line derivative in `L_2`**: `‖Δ_v G‖_2 ≤ ‖∂_v G‖_2` for a
+Schwartz function `G`, the case `p = 2` of `Rd.lintegral_enorm_fwdDiff_rpow_le` (Mathlib's
+`MeasureTheory.eLpNorm_le_of_lintegral_le` for the `L_2` norm). -/
+theorem eLpNorm_fwdDiff_schwartz_le (v : V) (G : 𝓢(V, ℂ)) :
+    eLpNorm (fwdDiff v (G : V → ℂ)) 2 volume ≤
+      eLpNorm ((∂_{v} G : 𝓢(V, ℂ)) : V → ℂ) 2 volume := by
+  have hm : AEStronglyMeasurable (fwdDiff v (G : V → ℂ)) volume :=
+    ((G.continuous.comp (continuous_id.add continuous_const)).sub G.continuous).aestronglyMeasurable
+  refine eLpNorm_le_of_lintegral_le hm two_ne_zero ENNReal.ofNat_ne_top ?_
+  rw [eLpNorm_rpow_eq (SchwartzMap.continuous _).aestronglyMeasurable two_ne_zero
+    ENNReal.ofNat_ne_top]
+  simpa using lintegral_enorm_fwdDiff_rpow_le one_le_two v G
+
+/-! ### The difference operator on `L_2` -/
+
+variable (V) in
+/-- **The difference operator on `L_2(V)`**: `Δ_v f = f(· + v) - f`, a bounded linear operator,
+the translation by `v` (Mathlib's `MeasureTheory.Lp.compMeasurePreservingₗᵢ`) minus the
+identity. -/
+noncomputable def fwdDiffL2 (v : V) :
+    Lp ℂ 2 (volume : Measure V) →L[ℂ] Lp ℂ 2 (volume : Measure V) :=
+  (Lp.compMeasurePreservingₗᵢ ℂ (· + v)
+    (measurePreserving_add_right volume v)).toContinuousLinearMap - ContinuousLinearMap.id ℂ _
+
+/-- `Δ_v f` is the forward difference `f(· + v) - f` almost everywhere. -/
+theorem fwdDiffL2_ae_eq (v : V) (f : Lp ℂ 2 (volume : Measure V)) :
+    fwdDiffL2 V v f =ᵐ[volume] fwdDiff v (f : V → ℂ) := by
+  have h1 := Lp.coeFn_compMeasurePreserving f (measurePreserving_add_right volume v)
+  have h2 := Lp.coeFn_sub (Lp.compMeasurePreservingₗᵢ ℂ (· + v)
+    (measurePreserving_add_right volume v) f) f
+  filter_upwards [h1, h2] with x hx1 hx2
+  change _ = (f : V → ℂ) (x + v) - f x
+  refine hx2.trans ?_
+  rw [Pi.sub_apply]
+  exact congrArg (· - (f : V → ℂ) x) hx1
+
+/-- `‖Δ_v f‖_2` is the `L_2` norm of the forward difference `f(· + v) - f`
+(`Rd.fwdDiffL2_ae_eq`). -/
+theorem enorm_fwdDiffL2 (v : V) (f : Lp ℂ 2 (volume : Measure V)) :
+    ‖fwdDiffL2 V v f‖ₑ = eLpNorm (fwdDiff v (f : V → ℂ)) 2 volume := by
+  rw [Lp.enorm_def, eLpNorm_congr_ae (fwdDiffL2_ae_eq v f)]
+
+/-- **Differences of Schwartz functions in `L_2(V)`**: `‖Δ_v G‖_2 ≤ ‖∂_v G‖_2`
+(`Rd.eLpNorm_fwdDiff_schwartz_le`). -/
+theorem enorm_fwdDiffL2_toLp_le (v : V) (G : 𝓢(V, ℂ)) :
+    ‖fwdDiffL2 V v (G.toLp 2)‖ₑ ≤ ‖(∂_{v} G : 𝓢(V, ℂ)).toLp 2‖ₑ := by
+  have hG : fwdDiff v ((G.toLp 2 : Lp ℂ 2 (volume : Measure V)) : V → ℂ) =ᵐ[volume]
+      fwdDiff v (G : V → ℂ) :=
+    higherDiff_congr_ae (G.coeFn_toLp 2 volume) 1 v
+  rw [enorm_fwdDiffL2, eLpNorm_congr_ae hG, Lp.enorm_def,
+    eLpNorm_congr_ae ((∂_{v} G : 𝓢(V, ℂ)).coeFn_toLp 2 volume)]
+  exact eLpNorm_fwdDiff_schwartz_le v G
+
+/-! ### Higher differences of Schwartz functions -/
 
 /-- **Differences of order `r` are bounded by line derivatives of order `r` in `L_1`**:
 `‖Δ_v^r G‖_1 ≤ ‖∂_v^r G‖_1`. -/

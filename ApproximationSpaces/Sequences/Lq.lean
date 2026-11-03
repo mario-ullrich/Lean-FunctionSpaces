@@ -31,7 +31,8 @@ The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥
 inclusion `lp.monotone`, without the norm bound), the Cauchy–Schwarz inequality
 `∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for series and for finite sums
 (`ENNReal.lqNorm_one_mul_le`, `ENNReal.sum_mul_le_lqNorm_two_mul`), the splitting off of the
-first term, tails of sequences (`ENNReal.lqNorm_ite_le_eq`), sequences with one nonzero term
+first term, also with dyadic weights (`ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le`), tails
+of sequences (`ENNReal.lqNorm_ite_le_eq`), sequences with one nonzero term
 (`ENNReal.lqNorm_ite_eq`), reindexing along bijections and injections
 (`ENNReal.lqNorm_comp_equiv`, `ENNReal.lqNorm_extend_zero`), the `ℓ_q` norm of the geometric
 sequence for every `q` (`ENNReal.dyadicGeomConst`), and the **dyadic weights**
@@ -523,6 +524,36 @@ theorem two_pow_rpow_eq_dyadicWeight (j n : ℕ) (t : ℝ) :
   congr 1
   push_cast
   ring
+
+/-- **A weighted `ℓ_q` norm from its first term and a bound of the others**: if `x_0 ≤ M a` and
+`x_{j+1} ≤ A w_{j+1}` for every `j`, then for `1 ≤ q ≤ ∞`
+`‖(2^(js) x_j)_j‖_{ℓ_q} ≤ (M + A) (a + ‖(2^(js) w_j)_j‖_{ℓ_q})`. This is the step from the local
+means to the moduli for the intrinsic and the local quasi-norms
+(`Rd.LipschitzGraph.intrinsicNorm_le` and `Rd.LocalMeansBump.localNormOn_le` in
+`FunctionSpaces`). -/
+theorem lqNorm_dyadicWeight_le_of_head_of_succ_le {q : ℝ≥0∞} (hq : 1 ≤ q) (s : ℝ)
+    (x w : ℕ → ℝ≥0∞) {a M A : ℝ≥0∞} (h0 : x 0 ≤ M * a) (hsucc : ∀ j, x (j + 1) ≤ A * w (j + 1)) :
+    lqNorm q (fun j => dyadicWeight s j * x j) ≤
+      (M + A) * (a + lqNorm q (fun j => dyadicWeight s j * w j)) := by
+  set Λ := lqNorm q (fun j => dyadicWeight s j * w j)
+  have htail : lqNorm q (fun j => dyadicWeight s (j + 1) * x (j + 1)) ≤ A * Λ :=
+    calc lqNorm q (fun j => dyadicWeight s (j + 1) * x (j + 1))
+        ≤ lqNorm q (fun j => A * (dyadicWeight s (j + 1) * w (j + 1))) :=
+          lqNorm_mono fun j => (mul_le_mul' le_rfl (hsucc j)).trans_eq (by ring)
+      _ = A * lqNorm q (fun j => dyadicWeight s (j + 1) * w (j + 1)) :=
+          lqNorm_const_mul _ _
+      _ ≤ A * Λ := mul_le_mul' le_rfl (lqNorm_shift_le fun j => dyadicWeight s j * w j)
+  calc lqNorm q (fun j => dyadicWeight s j * x j)
+      ≤ dyadicWeight s 0 * x 0 + lqNorm q (fun j => dyadicWeight s (j + 1) * x (j + 1)) :=
+        lqNorm_le_head_add_shift hq _
+    _ ≤ M * a + A * Λ := by
+        rw [dyadicWeight_zero_right, one_mul]
+        exact add_le_add h0 htail
+    _ ≤ (M + A) * a + (M + A) * Λ := by
+        gcongr
+        · exact le_self_add
+        · exact le_add_self
+    _ = (M + A) * (a + Λ) := by ring
 
 /-! ### Dyadic weights of integer order -/
 

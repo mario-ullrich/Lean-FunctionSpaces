@@ -26,8 +26,8 @@ by the moduli on `Ω` at the same scale, `‖1_Ω (k_j ⋆ f)‖_p ≤ 2 ‖g‖
 `‖(2^(js) ‖1_Ω (k_j ⋆ f)‖_p)_j‖_{ℓ_q} ≤ C (‖f‖_{L_p(Ω)} + ‖(2^(js) ω_L(f, 2^(-j), Ω)_p)_j‖_{ℓ_q})`
 
 (`Rd.LipschitzGraph.intrinsicNorm_le`, by the sequence bound
-`Rd.lqNorm_dyadicWeight_le_of_head_of_succ_le`). The radius `1/2` of the bump matches the scales,
-so the modulus on `Ω` is never dilated.
+`ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le`). The radius `1/2` of the bump matches the
+scales, so the modulus on `Ω` is never dilated.
 
 **Restrictions by intrinsic differences**
 (`Rd.LipschitzGraph.exists_besov_extension_iff_modulusOn`): for `1 ≤ p < ∞`, `0 < s < r` and
@@ -118,35 +118,6 @@ theorem momentConst_ne_top (L : ℕ) :
 
 end LocalMeansBump
 
-/-- **A weighted `ℓ_q` norm from its first term and a bound of the others**: if `x_0 ≤ M a` and
-`x_{j+1} ≤ A w_{j+1}` for every `j`, then for `1 ≤ q ≤ ∞`
-`‖(2^(js) x_j)_j‖_{ℓ_q} ≤ (M + A) (a + ‖(2^(js) w_j)_j‖_{ℓ_q})`. This is the step from the local
-means to the moduli for the intrinsic and the local quasi-norms
-(`Rd.LipschitzGraph.intrinsicNorm_le`, `Rd.LocalMeansBump.localNormOn_le`). -/
-theorem lqNorm_dyadicWeight_le_of_head_of_succ_le {q : ℝ≥0∞} (hq : 1 ≤ q) (s : ℝ)
-    (x w : ℕ → ℝ≥0∞) {a M A : ℝ≥0∞} (h0 : x 0 ≤ M * a) (hsucc : ∀ j, x (j + 1) ≤ A * w (j + 1)) :
-    lqNorm q (fun j => dyadicWeight s j * x j) ≤
-      (M + A) * (a + lqNorm q (fun j => dyadicWeight s j * w j)) := by
-  set Λ := lqNorm q (fun j => dyadicWeight s j * w j)
-  have htail : lqNorm q (fun j => dyadicWeight s (j + 1) * x (j + 1)) ≤ A * Λ :=
-    calc lqNorm q (fun j => dyadicWeight s (j + 1) * x (j + 1))
-        ≤ lqNorm q (fun j => A * (dyadicWeight s (j + 1) * w (j + 1))) :=
-          ENNReal.lqNorm_mono fun j => (mul_le_mul' le_rfl (hsucc j)).trans_eq (by ring)
-      _ = A * lqNorm q (fun j => dyadicWeight s (j + 1) * w (j + 1)) :=
-          ENNReal.lqNorm_const_mul _ _
-      _ ≤ A * Λ := mul_le_mul' le_rfl (ENNReal.lqNorm_shift_le fun j => dyadicWeight s j * w j)
-  calc lqNorm q (fun j => dyadicWeight s j * x j)
-      ≤ dyadicWeight s 0 * x 0 + lqNorm q (fun j => dyadicWeight s (j + 1) * x (j + 1)) :=
-        ENNReal.lqNorm_le_head_add_shift hq _
-    _ ≤ M * a + A * Λ := by
-        rw [ENNReal.dyadicWeight_zero_right, one_mul]
-        exact add_le_add h0 htail
-    _ ≤ (M + A) * a + (M + A) * Λ := by
-        gcongr
-        · exact le_self_add
-        · exact le_add_self
-    _ = (M + A) * (a + Λ) := by ring
-
 namespace LipschitzGraph
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] (Ω : LipschitzGraph V)
@@ -217,12 +188,12 @@ theorem intrinsicConst_ne_top (L : ℕ) : Ω.intrinsicConst L ≠ ∞ :=
 /-- **The intrinsic local means are bounded by the moduli on `Ω`**:
 `‖(2^(js) ‖1_Ω (k_j ⋆ f)‖_p)_j‖_{ℓ_q} ≤
 C (‖f‖_{L_p(Ω)} + ‖(2^(js) ω_L(f, 2^(-j), Ω)_p)_j‖_{ℓ_q})`
-(`Rd.lqNorm_dyadicWeight_le_of_head_of_succ_le`). -/
+(`ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le`). -/
 theorem intrinsicNorm_le (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {q : ℝ≥0∞} (hq : 1 ≤ q)
     (f : Lp ℂ p (volume : Measure V)) :
     Ω.intrinsicNorm hp L s q f ≤ Ω.intrinsicConst L *
       modNormOn Ω.measurableSet_domain L s q f :=
-  lqNorm_dyadicWeight_le_of_head_of_succ_le hq s
+  ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le hq s
     (fun j => ‖Ω.cutoff (Ω.coneBump.localMean hp L j f)‖ₑ) (lpModulusOn p Ω.domain L f)
     (Ω.enorm_cutoff_localMean_zero_le hp L f) fun j => Ω.enorm_cutoff_localMean_succ_le hp L j f
 

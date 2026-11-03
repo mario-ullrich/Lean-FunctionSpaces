@@ -2939,7 +2939,7 @@ $N = n + 1$, integration gives the second. The third follows from
 \label{lem:hormander-short}
 \lean{Rd.lintegral_enorm_dilate_sub_le_mul}
 \leanok
-\uses{lem:gradient-mass, lem:dilate, lem:rd-differences, lem:schwartz-differences}
+\uses{lem:gradient-mass, lem:dilate, lem:rd-differences, lem:schwartz-differences-lp}
 For every Schwartz function $G$, every $j \in \N$ and every $y \in V$,
 \[
   \int_V |G_{2^j}(x - y) - G_{2^j}(x)| \, dx \leq M_G \, 2^j \|y\| .
@@ -2951,7 +2951,7 @@ For every Schwartz function $G$, every $j \in \N$ and every $y \in V$,
 $x \mapsto G_{2^j}(x - y) - G_{2^j}(x)$ is $\Delta_{-y} G_{2^j} = (\Delta_{-2^j y} G)_{2^j}$
 (\Cref{lem:rd-differences}), whose $L_1$ norm is $\|\Delta_{-2^j y} G\|_1$
 (\Cref{lem:dilate}). A difference of a Schwartz function is at most its directional
-derivative in $L_1$ (\Cref{lem:schwartz-differences}), and
+derivative in $L_1$ (\Cref{lem:schwartz-differences-lp}), and
 $\|\partial_{-2^j y} G\|_1 \leq 2^j \|y\| \, M_G$ (\Cref{lem:gradient-mass}).
 \end{proof}
 

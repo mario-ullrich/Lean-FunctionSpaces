@@ -19,14 +19,10 @@ Lebesgue measure, `0 < θ < 1` and `1 ≤ q ≤ ∞`. On a bounded Lipschitz dom
 space `A^θ_q` of the Neumann eigenbasis; on every bounded open set the Dirichlet eigenbasis gives
 one inclusion.
 
-* **Differences in `H^1(V)`**: for the difference operator `Δ_v f = f(· + v) - f` on `L_2(V)`
-  (`Rd.fwdDiffL2`), `‖Δ_v ι U‖_2 ≤ 2π ‖v‖ ‖U‖` for `U ∈ H^1(V)` (`Rd.norm_fwdDiffL2_toL2_le`),
-  first for Schwartz functions by `G(x + v) - G(x) = ∫_0^1 ∂_v G(x + t v) dt`
-  (`Rd.eLpNorm_fwdDiff_schwartz_le`), then by density; hence
-  `ω_r(ι U, 2^(-k))_2 ≤ 2^(r-1) 2π 2^(-k) ‖U‖` for `r ≥ 1` (`Rd.lpModulus_toL2_le`).
 * **The modulus on `Ω` by the K-functional** of `(L_2(Ω), W^1_2(Ω))`:
   `ω_r(f, 2^(-k), Ω)_2 ≤ C K(2^(-k), f|_Ω)`, since every element of `W^1_2(Ω)` extends to
-  `H^1(V)` with a bound (`Rd.BoundedLipschitzDomain.exists_lpModulusOn_le_kFunctional`); so the
+  `H^1(V)` with a bound and `ω_r(ι U, 2^(-k))_2 ≤ 2^(r-1) 2π 2^(-k) ‖U‖` for `U ∈ H^1(V)`
+  (`Rd.lpModulus_toL2_le`, `Rd.BoundedLipschitzDomain.exists_lpModulusOn_le_kFunctional`); so the
   intrinsic quasi-norm is at most `C` times the interpolation norm
   (`Rd.BoundedLipschitzDomain.exists_modNormOn_le_interpNorm`).
 * **The restriction** maps `(L_2(V), H^1(V))_{θ,q} = B^θ_{2,q}(V)` into
@@ -57,138 +53,6 @@ namespace Rd
 
 variable {V : Type*} [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDimensional ℝ V]
   [MeasurableSpace V] [BorelSpace V]
-
-/-! ### Differences in `L_2(V)` by the weak gradient -/
-
-/-- **Cauchy–Schwarz on the unit interval**: `(∫_0^1 φ)² ≤ ∫_0^1 φ²` for measurable `φ ≥ 0`,
-Hölder's inequality with the constant function `1` (Mathlib's
-`ENNReal.lintegral_mul_le_Lp_mul_Lq`). -/
-theorem sq_lintegral_Ioc_le {φ : ℝ → ℝ≥0∞}
-    (hφ : AEMeasurable φ (volume.restrict (Set.Ioc (0 : ℝ) 1))) :
-    (∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t) ^ 2 ≤ ∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t ^ 2 := by
-  have h := ENNReal.lintegral_mul_le_Lp_mul_Lq (volume.restrict (Set.Ioc (0 : ℝ) 1))
-    Real.HolderConjugate.two_two hφ (aemeasurable_const (b := (1 : ℝ≥0∞)))
-  simp only [Pi.mul_apply, mul_one, ENNReal.one_rpow, lintegral_const,
-    Measure.restrict_apply_univ, Real.volume_Ioc, sub_zero, ENNReal.ofReal_one] at h
-  calc (∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t) ^ 2
-      ≤ ((∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t ^ (2 : ℝ)) ^ (1 / 2 : ℝ)) ^ 2 := by gcongr
-    _ = ∫⁻ t in Set.Ioc (0 : ℝ) 1, φ t ^ 2 := by
-        rw [← ENNReal.rpow_natCast, ← ENNReal.rpow_mul]
-        norm_num
-
-omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
-/-- **A difference by the line derivative, pointwise, squared**: for a Schwartz function `G`,
-`|G(x + v) - G(x)|² ≤ ∫_0^1 |∂_v G(x + t v)|² dt`, by
-`Rd.enorm_fwdDiff_schwartz_le_lintegral` and Cauchy–Schwarz (`Rd.sq_lintegral_Ioc_le`). -/
-theorem enorm_fwdDiff_schwartz_sq_le (v : V) (G : 𝓢(V, ℂ)) (x : V) :
-    ‖fwdDiff v (G : V → ℂ) x‖ₑ ^ 2 ≤
-      ∫⁻ t in Set.Ioc (0 : ℝ) 1, ‖(∂_{v} G : 𝓢(V, ℂ)) (x + t • v)‖ₑ ^ 2 := by
-  have hcont : Continuous fun t : ℝ => (∂_{v} G : 𝓢(V, ℂ)) (x + t • v) :=
-    (SchwartzMap.continuous _).comp (continuous_const.add (continuous_id.smul continuous_const))
-  calc ‖fwdDiff v (G : V → ℂ) x‖ₑ ^ 2
-      ≤ (∫⁻ t in Set.Ioc (0 : ℝ) 1, ‖(∂_{v} G : 𝓢(V, ℂ)) (x + t • v)‖ₑ) ^ 2 := by
-        gcongr
-        exact enorm_fwdDiff_schwartz_le_lintegral v G x
-    _ ≤ _ := sq_lintegral_Ioc_le hcont.enorm.aemeasurable
-
-/-- **A difference is bounded by the line derivative in `L_2`**: `‖Δ_v G‖_2 ≤ ‖∂_v G‖_2` for a
-Schwartz function `G`. Integrate `Rd.enorm_fwdDiff_schwartz_sq_le` over `x` and use
-`Rd.lintegral_lintegral_Ioc_add_smul`; the `L_2` form of `Rd.lintegral_enorm_fwdDiff_le`. -/
-theorem eLpNorm_fwdDiff_schwartz_le (v : V) (G : 𝓢(V, ℂ)) :
-    eLpNorm (fwdDiff v (G : V → ℂ)) 2 volume ≤
-      eLpNorm ((∂_{v} G : 𝓢(V, ℂ)) : V → ℂ) 2 volume := by
-  have hint : ∫⁻ x, ‖fwdDiff v (G : V → ℂ) x‖ₑ ^ 2 ≤
-      ∫⁻ x, ‖(∂_{v} G : 𝓢(V, ℂ)) x‖ₑ ^ 2 :=
-    (lintegral_mono fun x => enorm_fwdDiff_schwartz_sq_le v G x).trans_eq
-      (lintegral_lintegral_Ioc_add_smul (φ := fun y => ‖(∂_{v} G : 𝓢(V, ℂ)) y‖ₑ ^ 2)
-        ((SchwartzMap.continuous _).enorm.measurable.pow_const 2) v)
-  have hm : AEStronglyMeasurable (fwdDiff v (G : V → ℂ)) volume :=
-    ((G.continuous.comp (continuous_id.add continuous_const)).sub G.continuous).aestronglyMeasurable
-  refine eLpNorm_le_of_lintegral_le hm two_ne_zero ENNReal.ofNat_ne_top ?_
-  rw [eLpNorm_rpow_eq (SchwartzMap.continuous _).aestronglyMeasurable two_ne_zero
-    ENNReal.ofNat_ne_top]
-  simpa using hint
-
-variable (V) in
-/-- **The difference operator on `L_2(V)`**: `Δ_v f = f(· + v) - f`, a bounded linear operator,
-the translation by `v` (Mathlib's `MeasureTheory.Lp.compMeasurePreservingₗᵢ`) minus the
-identity. -/
-noncomputable def fwdDiffL2 (v : V) :
-    Lp ℂ 2 (volume : Measure V) →L[ℂ] Lp ℂ 2 (volume : Measure V) :=
-  (Lp.compMeasurePreservingₗᵢ ℂ (· + v)
-    (measurePreserving_add_right volume v)).toContinuousLinearMap - ContinuousLinearMap.id ℂ _
-
-/-- `Δ_v f` is the forward difference `f(· + v) - f` almost everywhere. -/
-theorem fwdDiffL2_ae_eq (v : V) (f : Lp ℂ 2 (volume : Measure V)) :
-    fwdDiffL2 V v f =ᵐ[volume] fwdDiff v (f : V → ℂ) := by
-  have h1 := Lp.coeFn_compMeasurePreserving f (measurePreserving_add_right volume v)
-  have h2 := Lp.coeFn_sub (Lp.compMeasurePreservingₗᵢ ℂ (· + v)
-    (measurePreserving_add_right volume v) f) f
-  filter_upwards [h1, h2] with x hx1 hx2
-  change _ = (f : V → ℂ) (x + v) - f x
-  refine hx2.trans ?_
-  rw [Pi.sub_apply]
-  exact congrArg (· - (f : V → ℂ) x) hx1
-
-/-- `‖Δ_v f‖_2` is the `L_2` norm of the forward difference `f(· + v) - f`
-(`Rd.fwdDiffL2_ae_eq`). -/
-theorem enorm_fwdDiffL2 (v : V) (f : Lp ℂ 2 (volume : Measure V)) :
-    ‖fwdDiffL2 V v f‖ₑ = eLpNorm (fwdDiff v (f : V → ℂ)) 2 volume := by
-  rw [Lp.enorm_def, eLpNorm_congr_ae (fwdDiffL2_ae_eq v f)]
-
-/-- **Differences of Schwartz functions in `L_2(V)`**: `‖Δ_v G‖_2 ≤ ‖∂_v G‖_2`
-(`Rd.eLpNorm_fwdDiff_schwartz_le`). -/
-theorem enorm_fwdDiffL2_toLp_le (v : V) (G : 𝓢(V, ℂ)) :
-    ‖fwdDiffL2 V v (G.toLp 2)‖ₑ ≤ ‖(∂_{v} G : 𝓢(V, ℂ)).toLp 2‖ₑ := by
-  have hG : fwdDiff v ((G.toLp 2 : Lp ℂ 2 (volume : Measure V)) : V → ℂ) =ᵐ[volume]
-      fwdDiff v (G : V → ℂ) :=
-    higherDiff_congr_ae (G.coeFn_toLp 2 volume) 1 v
-  rw [enorm_fwdDiffL2, eLpNorm_congr_ae hG, Lp.enorm_def,
-    eLpNorm_congr_ae ((∂_{v} G : 𝓢(V, ℂ)).coeFn_toLp 2 volume)]
-  exact eLpNorm_fwdDiff_schwartz_le v G
-
-/-- **Differences in `H^1(V)`**: `‖Δ_v ι U‖_2 ≤ 2π ‖v‖ ‖U‖` for every `U ∈ H^1(V)`. For a Schwartz
-function `G` this is `‖Δ_v G‖_2 ≤ ‖∂_v G‖_2 ≤ 2π ‖v‖ ‖G‖_{H^1}` (`Rd.enorm_fwdDiffL2_toLp_le`,
-`Rd.norm_weakDerivL2_le`); both sides are continuous in `U`, and the Schwartz functions are dense
-in `H^1(V)` (`Rd.denseRange_ofSchwartz`). -/
-theorem norm_fwdDiffL2_toL2_le (v : V) (U : H^{1}(V)) :
-    ‖fwdDiffL2 V v (toL2 U)‖ ≤ 2 * π * ‖v‖ * ‖U‖ := by
-  refine DenseRange.induction_on (denseRange_ofSchwartz (V := V) 1) U
-    (isClosed_le ((fwdDiffL2 V v).continuous.comp toL2.continuous).norm
-      (continuous_const.mul continuous_norm)) fun w => ?_
-  have h1 : ‖fwdDiffL2 V v (toL2 (ofSchwartz 1 w))‖ ≤ ‖(∂_{v} w : 𝓢(V, ℂ)).toLp 2‖ := by
-    rw [toL2_ofSchwartz, ← toReal_enorm, ← toReal_enorm]
-    exact ENNReal.toReal_mono enorm_ne_top (enorm_fwdDiffL2_toLp_le v w)
-  have h2 : ‖(∂_{v} w : 𝓢(V, ℂ)).toLp 2‖ ≤ 2 * π * ‖v‖ * ‖ofSchwartz 1 w‖ := by
-    rw [← weakDerivL2_ofSchwartz]
-    exact ((weakDerivL2 v).le_opNorm _).trans
-      (mul_le_mul_of_nonneg_right (norm_weakDerivL2_le v) (norm_nonneg _))
-  exact h1.trans h2
-
-/-- **The first-order modulus in `H^1(V)`**: `ω_1(ι U, 2^(-k))_2 ≤ 2π 2^(-k) ‖U‖` for every
-`U ∈ H^1(V)` (`Rd.norm_fwdDiffL2_toL2_le`, and `ENNReal.ofReal_one_div_two_pow_pow` for the
-scale `2^(-k)`). -/
-theorem lpModulus_one_toL2_le (U : H^{1}(V)) (k : ℕ) :
-    lpModulus 2 1 (toL2 U) k ≤ ENNReal.ofReal (2 * π) * dyadicWeight (-1) k * ‖U‖ₑ := by
-  have hk : ENNReal.ofReal (1 / 2 ^ k) = dyadicWeight (-1) k := by
-    simpa using ENNReal.ofReal_one_div_two_pow_pow k 1
-  refine iSup₂_le fun h hh => ?_
-  rw [Function.iterate_one, ← enorm_fwdDiffL2, ← ofReal_norm, ← ofReal_norm,
-    ← hk, ← ENNReal.ofReal_mul (by positivity),
-    ← ENNReal.ofReal_mul (by positivity)]
-  refine ENNReal.ofReal_le_ofReal ((norm_fwdDiffL2_toL2_le h U).trans ?_)
-  gcongr
-
-/-- **The modulus of an `H^1(V)` function**: for every order `r ≥ 1`,
-`ω_r(ι U, 2^(-k))_2 ≤ 2^(r-1) 2π 2^(-k) ‖U‖` for `U ∈ H^1(V)`
-(`Rd.lpModulus_one_toL2_le` and `ω_{1+l} ≤ 2^l ω_1`, `Rd.lpModulus_add_order_le`). -/
-theorem lpModulus_toL2_le {r : ℕ} (hr : 1 ≤ r) (U : H^{1}(V)) (k : ℕ) :
-    lpModulus 2 r (toL2 U) k ≤
-      2 ^ (r - 1) * ENNReal.ofReal (2 * π) * dyadicWeight (-1) k * ‖U‖ₑ := by
-  obtain ⟨l, rfl⟩ := Nat.exists_eq_add_of_le hr
-  rw [Nat.add_sub_cancel_left, mul_assoc, mul_assoc, ← mul_assoc (ENNReal.ofReal (2 * π))]
-  exact (lpModulus_add_order_le 1 l (toL2 U) k).trans
-    (mul_le_mul' le_rfl (lpModulus_one_toL2_le U k))
 
 /-! ### The modulus on a domain and the K-functional of the Neumann couple -/
 
@@ -314,35 +178,20 @@ theorem norm_restrictNeumann_apply_le (U : H^{1}(V)) :
 /-- **The restriction maps `(L_2(V), H^1(V))` into the Neumann couple**: for an open set `O`, if
 `f ∈ L_2(V)` lies in the real interpolation space `(L_2(V), H^1(V))_{θ,q}` of the `L_2` norm and
 the Bessel potential norm (`Rd.lpBesselPotentialCouple 1`), then `f|_O` lies in
-`(L_2(O), W^1_2(O))_{θ,q}`. The restriction has norm at most `1` on `L_2` and maps `U ∈ H^1(V)`
-to the value of `Rd.restrictNeumann O U`, of norm at most `2π ‖U‖`
-(`Rd.norm_restrictNeumann_apply_le`), so the interpolation property of the K-method applies
-(`InterpCouple.MemKMethod.map`). -/
+`(L_2(O), W^1_2(O))_{θ,q}`. The couple is that of the embedding `H^1(V) → L_2(V)`
+(`Rd.ofMap_toL2_eq_lpBesselPotentialCouple`), and the restriction maps `ι U` to the value of
+`Rd.restrictNeumann O U`, so the interpolation property for compatible maps applies
+(`ApproximationScheme.MemKMethod.map`). -/
 theorem memKMethod_neumann_restrict_of_memKMethod {θ : ℝ} {q : ℝ≥0∞}
     {f : Lp ℂ 2 (volume : Measure V)} (hf : (lpBesselPotentialCouple (p := 2) 1).MemKMethod θ q f) :
     (InterpCouple.ofMap ((neumannEmbedding O).restrictScalars ℝ)).MemKMethod θ q
       (LpToLpRestrictCLM V ℂ ℂ volume 2 (O : Set V) f) := by
-  refine InterpCouple.MemKMethod.map (M₀ := 1) (M₁ := ENNReal.ofReal (2 * π))
-    (LpToLpRestrictCLM V ℂ ℂ volume 2 (O : Set V)).toLinearMap.toAddMonoidHom
-    ENNReal.one_ne_top ENNReal.ofReal_ne_top (fun a => ?_) (fun a => ?_) hf
-  · rw [one_mul, InterpCouple.ofMap_norm0, lpBesselPotentialCouple_norm0, ← ofReal_norm,
-      ← ofReal_norm]
-    exact ENNReal.ofReal_le_ofReal (norm_Lp_toLp_restrict_le _ _)
-  · rw [lpBesselPotentialCouple_norm1]
-    by_cases ha : besselPotentialNorm 1 a < ∞
-    · have hS := besselPotentialNorm_lt_top_iff.1 ha
-      have hU : toL2 hS.toBesselPotentialSpace = a :=
-        toL2_eq_of_toDistr_eq _ hS.toBesselPotentialSpace_toDistr.symm
-      rw [besselPotentialNorm_eq_enorm_toBesselPotentialSpace hS]
-      refine (InterpCouple.norm1_ofMap_le (y := restrictNeumann O hS.toBesselPotentialSpace)
-        ?_).trans ?_
-      · exact (neumannEmbedding_restrictNeumann _).trans
-          (congrArg (LpToLpRestrictCLM V ℂ ℂ volume 2 (O : Set V)) hU)
-      · rw [← ofReal_norm, ← ofReal_norm, ← ENNReal.ofReal_mul (by positivity)]
-        exact ENNReal.ofReal_le_ofReal (norm_restrictNeumann_apply_le O _)
-    · rw [not_lt, top_le_iff] at ha
-      rw [ha, ENNReal.mul_top (by simp [Real.pi_pos])]
-      exact le_top
+  rw [← ofMap_toL2_eq_lpBesselPotentialCouple, InterpCouple.memKMethod_ofMap_iff] at hf
+  refine InterpCouple.memKMethod_ofMap_iff.2 (ApproximationScheme.MemKMethod.map
+    ((LpToLpRestrictCLM V ℂ ℂ volume 2 (O : Set V)).restrictScalars ℝ)
+    ((restrictNeumann O).restrictScalars ℝ) ?_ hf)
+  ext1 U
+  exact (neumannEmbedding_restrictNeumann U).symm
 
 namespace BoundedLipschitzDomain
 
@@ -451,30 +300,22 @@ theorem indicatorExtendLp_dirichletEmbedding (w : zeroBoundarySpace 1 Ω) :
 /-- **The zero extension maps the Dirichlet couple into `(L_2(V), H^1(V))`**: for an open set
 `Ω`, if `g ∈ L_2(Ω)` lies in `(L_2(Ω), H^1_0(Ω))_{θ,q}`, then its zero extension lies in the real
 interpolation space `(L_2(V), H^1(V))_{θ,q}` of the `L_2` norm and the Bessel potential norm
-(`Rd.lpBesselPotentialCouple 1`). The zero extension has norm at most `1` on `L_2`
-(`Rd.enorm_indicatorExtendLp_le`) and maps `J w` to `w ∈ H^1(V)` for `w ∈ H^1_0(Ω)`
-(`Rd.indicatorExtendLp_dirichletEmbedding`, `Rd.besselPotentialNorm_eq_enorm`), so the
-interpolation property of the K-method applies with constants `1`
-(`InterpCouple.MemKMethod.map`). -/
+(`Rd.lpBesselPotentialCouple 1`). The couple is that of the embedding `H^1(V) → L_2(V)`
+(`Rd.ofMap_toL2_eq_lpBesselPotentialCouple`), and the zero extension maps `J w` to `ι w` for
+`w ∈ H^1_0(Ω)` (`Rd.indicatorExtendLp_dirichletEmbedding`), so the interpolation property for
+compatible maps applies (`ApproximationScheme.MemKMethod.map`). -/
 theorem memKMethod_indicatorExtendLp_of_memKMethod_dirichlet {θ : ℝ} {q : ℝ≥0∞}
     {g : Lp ℂ 2 (volume.restrict (Ω : Set V))}
     (hg : (InterpCouple.ofMap ((dirichletEmbedding Ω).restrictScalars ℝ)).MemKMethod θ q g) :
     (lpBesselPotentialCouple (p := 2) 1).MemKMethod θ q
       (indicatorExtendLp Ω.isOpen.measurableSet subset_rfl g) := by
-  refine InterpCouple.MemKMethod.map (M₀ := 1) (M₁ := 1)
-    (indicatorExtendLp (p := 2) (μ := volume) Ω.isOpen.measurableSet
-      subset_rfl).toLinearMap.toAddMonoidHom
-    ENNReal.one_ne_top ENNReal.one_ne_top (fun a => ?_) (fun a => ?_) hg
-  · rw [one_mul, lpBesselPotentialCouple_norm0, InterpCouple.ofMap_norm0]
-    exact enorm_indicatorExtendLp_le _ _ a
-  · rw [one_mul, lpBesselPotentialCouple_norm1, InterpCouple.ofMap_norm1]
-    refine le_iInf fun w => ?_
-    obtain ⟨w, rfl⟩ := w
-    change besselPotentialNorm 1
-      (indicatorExtendLp Ω.isOpen.measurableSet subset_rfl (dirichletEmbedding Ω w)) ≤ ‖w‖ₑ
-    rw [indicatorExtendLp_dirichletEmbedding,
-      besselPotentialNorm_eq_enorm _ (toTemperedDistribution_toL2 _)]
-    rfl
+  rw [← ofMap_toL2_eq_lpBesselPotentialCouple]
+  refine InterpCouple.memKMethod_ofMap_iff.2 (ApproximationScheme.MemKMethod.map
+    ((indicatorExtendLp (p := 2) (μ := volume) Ω.isOpen.measurableSet subset_rfl).restrictScalars ℝ)
+    ((((vanishOn 1 Ω)ᗮ.subtypeL).comp (zeroBoundarySpace 1 Ω).subtypeL).restrictScalars ℝ)
+    ?_ (InterpCouple.memKMethod_ofMap_iff.1 hg))
+  ext1 w
+  exact indicatorExtendLp_dirichletEmbedding w
 
 variable [Nontrivial V]
 

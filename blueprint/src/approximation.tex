@@ -341,7 +341,7 @@ smoothness, and a finite set for the coefficients of one level of atoms and wave
   ENNReal.lqNorm_le_sum_range_add_shift, ENNReal.lqNorm_le_lqNorm_one, ENNReal.lqNorm_geometric_le,
   ENNReal.lqNorm_shift_le, ENNReal.lqNorm_eq_sum, ENNReal.lqNorm_le_card_rpow_mul,
   ENNReal.lqNorm_prod_rpow, ENNReal.lqNorm_le_sum_of_eq_zero, ENNReal.lqNorm_ite_eq,
-  ENNReal.lqNorm_ite_le_eq}
+  ENNReal.lqNorm_ite_le_eq, ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le}
 \leanok
 \uses{def:lq-norm}
 Let $1 \leq q \leq r \leq \infty$. For all sequences $a, b$ in $[0, \infty]$, all
@@ -358,7 +358,10 @@ $c, \rho \in [0, \infty]$ and all $n \in \N$:
     $\|a\|_{\ell_q} \leq \sum_{k \in s} a_k$, and the sequence equal to $c$ at $n$ and to $0$
     elsewhere has $\ell_q$ norm $c$;
   \item if $q < \infty$, the tail $(0, \dots, 0, a_n, a_{n+1}, \dots)$ has the $\ell_q$ norm
-    $\|(a_{n+k})_k\|_{\ell_q}$.
+    $\|(a_{n+k})_k\|_{\ell_q}$;
+  \item for every $s \in \R$ and all $x, w$ and $a, M, A \in [0, \infty]$ with $x_0 \leq M a$
+    and $x_{k+1} \leq A w_{k+1}$ for every $k$,
+    $\|(2^{ks} x_k)_k\|_{\ell_q} \leq (M + A) \bigl( a + \|(2^{ks} w_k)_k\|_{\ell_q} \bigr)$.
 \end{enumerate}
 For every $p \in (0, \infty]$, every finite set $I$, every $B \in [0, \infty]$ and every family
 $(a_i)_{i \in I}$ in $[0, \infty]$ with $a_i \leq B$ for every $i$,
@@ -375,8 +378,10 @@ partial sums, followed by the supremum over them. For the fourth put $M = \|a\|_
 then $a_k^r = a_k^{r-q} a_k^q \leq M^{r-q} a_k^q$, and summation gives
 $\|a\|_{\ell_r}^r \leq M^r$. The fifth is the third applied to $a_0 \delta_0$ and the rest,
 and induction on $m$. The sixth is the fourth and the geometric series, the seventh is the
-fourth for a sequence with finitely many nonzero terms, and the last compares the series of the
-$q$-th powers term by term. For a finite set $I$ the counting measure of $I$ is $\# I$, so the
+fourth for a sequence with finitely many nonzero terms, the eighth compares the series of the
+$q$-th powers term by term; the last splits off the first term by the fifth, bounds the others
+by the first two, and drops the first term of $(2^{ks} w_k)_k$. For a finite set $I$ the
+counting measure of $I$ is $\# I$, so the
 bound by $B$ is Mathlib's \texttt{eLpNorm\_\allowbreak le\_\allowbreak of\_\allowbreak
 ae\_\allowbreak enorm\_\allowbreak bound}; the two identities are the series of $p$-th powers
 written as finite sums.

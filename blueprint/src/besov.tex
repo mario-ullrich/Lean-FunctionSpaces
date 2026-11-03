@@ -4894,14 +4894,12 @@ $M = \omega_r(f, 2^{-k})_p$ gives the bound.
 
 \section{The inverse inequality}
 
-\begin{lemma}[Differences of Schwartz functions]
-\label{lem:schwartz-differences}
-\lean{Rd.fwdDiffSchwartz, Rd.coe_fwdDiffSchwartz, Rd.lineDerivOp_fwdDiffSchwartz,
-  Rd.iteratedLineDerivOp_fwdDiffSchwartz, Rd.fwdDiff_schwartz_eq_integral,
-  Rd.enorm_fwdDiff_schwartz_le_lintegral, Rd.lintegral_lintegral_Ioc_add_smul,
-  Rd.lintegral_enorm_fwdDiff_le, Rd.lintegral_enorm_higherDiff_le,
-  Rd.enorm_iteratedLineDerivOp_le, Rd.lintegral_enorm_higherDiff_schwartz_le,
-  Rd.lintegral_enorm_iteratedFDeriv_ne_top}
+\begin{lemma}[Differences of Schwartz functions in $L_p$]
+\label{lem:schwartz-differences-lp}
+\lean{Rd.fwdDiff_schwartz_eq_integral, Rd.enorm_fwdDiff_schwartz_le_lintegral,
+  Rd.lintegral_lintegral_Ioc_add_smul, Rd.rpow_lintegral_Ioc_le,
+  Rd.enorm_fwdDiff_schwartz_rpow_le, Rd.lintegral_enorm_fwdDiff_rpow_le,
+  Rd.lintegral_enorm_fwdDiff_le, Rd.eLpNorm_fwdDiff_schwartz_le}
 \leanok
 \uses{def:rd-modulus}
 For every Schwartz function $G$ on $V$ and all $v, x \in V$,
@@ -4913,8 +4911,36 @@ and
   |G(x + v) - G(x)| \leq \int_0^1 |\partial_v G(x + t v)| \, dt .
 \]
 For every measurable $\varphi \colon V \to [0, \infty]$ and every $v \in V$,
-$\int_V \int_0^1 \varphi(x + t v) \, dt \, dx = \int_V \varphi$. For every Schwartz function $G$
-on $V$, $v \in V$ and $r \in \N$,
+$\int_V \int_0^1 \varphi(x + t v) \, dt \, dx = \int_V \varphi$. For every real $p \geq 1$ and every
+measurable $\varphi \colon (0, 1] \to [0, \infty]$,
+$\bigl(\int_0^1 \varphi\bigr)^p \leq \int_0^1 \varphi^p$. For every real $p \geq 1$, every
+Schwartz function $G$ on $V$ and all $v, x \in V$,
+\[
+  |G(x + v) - G(x)|^p \leq \int_0^1 |\partial_v G(x + t v)|^p \, dt
+  \quad \text{and} \quad
+  \|G(\cdot + v) - G\|_p \leq \|\partial_v G\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The identity is the fundamental theorem of calculus along the segment from $x$ to $x + v$; the
+pointwise bound follows. The integral identity is Tonelli's theorem with the translation
+invariance of Lebesgue measure. The interval $(0, 1]$ carries a probability measure, on which the
+$L_1$ norm is at most the $L_p$ norm; with the pointwise bound this gives the bound of
+$|G(x + v) - G(x)|^p$. Integrating it over $x$ and averaging the translates of
+$|\partial_v G|^p$ along the segment gives $\|G(\cdot + v) - G\|_p \leq \|\partial_v G\|_p$.
+\end{proof}
+
+\begin{lemma}[Higher differences of Schwartz functions]
+\label{lem:schwartz-differences}
+\lean{Rd.fwdDiffSchwartz, Rd.coe_fwdDiffSchwartz, Rd.lineDerivOp_fwdDiffSchwartz,
+  Rd.iteratedLineDerivOp_fwdDiffSchwartz, Rd.lintegral_enorm_higherDiff_le,
+  Rd.enorm_iteratedLineDerivOp_le, Rd.lintegral_enorm_higherDiff_schwartz_le,
+  Rd.lintegral_enorm_iteratedFDeriv_ne_top}
+\leanok
+\uses{lem:schwartz-differences-lp}
+For every Schwartz function $G$ on $V$, $v \in V$ and $r \in \N$,
 \[
   \|\Delta_v^r G\|_1 \leq \|v\|^r \int_V \|D^r G(x)\| \, dx < \infty .
 \]
@@ -4922,12 +4948,25 @@ on $V$, $v \in V$ and $r \in \N$,
 
 \begin{proof}
 \leanok
-The identity is the fundamental theorem of calculus along the segment from $x$ to $x + v$. The
-integral identity is Tonelli's theorem with the translation invariance of Lebesgue measure; with
-the pointwise bound it gives $\|\Delta_v G\|_1 \leq \|\partial_v G\|_1$. The
-difference $\Delta_v$ and the line derivative $\partial_v$ commute and preserve Schwartz
-functions; induction gives $\|\Delta_v^r G\|_1 \leq \|\partial_v^r G\|_1$, and
+The difference $\Delta_v$ and the line derivative $\partial_v$ commute and preserve Schwartz
+functions. With $\|\Delta_v G\|_1 \leq \|\partial_v G\|_1$ (\Cref{lem:schwartz-differences-lp}),
+induction gives $\|\Delta_v^r G\|_1 \leq \|\partial_v^r G\|_1$, and
 $|\partial_v^r G(x)| \leq \|v\|^r \|D^r G(x)\|$.
+\end{proof}
+
+\begin{lemma}[The difference operator on $L_2$]
+\label{lem:difference-operator-l2}
+\lean{Rd.fwdDiffL2, Rd.fwdDiffL2_ae_eq, Rd.enorm_fwdDiffL2, Rd.enorm_fwdDiffL2_toLp_le}
+\leanok
+\uses{lem:schwartz-differences-lp, lem:rd-differences}
+For every $v \in V$, $\Delta_v f = f(\cdot + v) - f$ is a bounded linear operator on $L_2(V)$, and
+$\|\Delta_v G\|_2 \leq \|\partial_v G\|_2$ for every Schwartz function $G$ on $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+$\Delta_v$ is the translation by $v$, an isometry, minus the identity. The bound is
+\Cref{lem:schwartz-differences-lp} with $p = 2$.
 \end{proof}
 
 \begin{theorem}[The inverse inequality for band-limited functions]

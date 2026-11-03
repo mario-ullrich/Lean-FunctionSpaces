@@ -261,7 +261,7 @@ theorem enorm_indicatorLp_localMean_zero_le (hp : p ≠ ∞) {W : Set V} (hW : M
 /-- **The local means on `W` are bounded by the moduli on `T`**:
 `‖(2^(js) ‖1_W (k_j ⋆ f)‖_p)_j‖_{ℓ_q} ≤
 (‖m‖_1 + 2 ‖g‖_1) (‖f‖_p + ‖(2^(js) ω_L(f, 2^(-j), T)_p)_j‖_{ℓ_q})`
-(`Rd.lqNorm_dyadicWeight_le_of_head_of_succ_le`). -/
+(`ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le`). -/
 theorem localNormOn_le (hp : p ≠ ∞) {W T : Set V} (hW : MeasurableSet W) (L : ℕ) (s : ℝ)
     {q : ℝ≥0∞} (hq : 1 ≤ q)
     (hstep : ∀ c : ℝ, 1 ≤ c → ∀ z, b.toFun z ≠ 0 → W ⊆ stepSet T L (-c⁻¹ • z))
@@ -269,7 +269,7 @@ theorem localNormOn_le (hp : p ≠ ∞) {W T : Set V} (hW : MeasurableSet W) (L 
     b.localNormOn hp hW L s q f ≤
       (eLpNorm (momentKernel b.toFun L) 1 volume + 2 * ∫⁻ z, ‖b.toFun z‖ₑ) *
         (‖f‖ₑ + lqNorm q (fun j => dyadicWeight s j * lpModulusOn p T L f j)) :=
-  lqNorm_dyadicWeight_le_of_head_of_succ_le hq s
+  ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le hq s
     (fun j => ‖indicatorLp hW (b.localMean hp L j f)‖ₑ) (lpModulusOn p T L f)
     (b.enorm_indicatorLp_localMean_zero_le hp hW L f)
     fun j => b.enorm_indicatorLp_localMean_succ_le hp hW L j hstep hR f

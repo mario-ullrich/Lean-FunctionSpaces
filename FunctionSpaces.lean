@@ -418,8 +418,8 @@ manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet example
   their scheme.
 * `FunctionSpaces.Rd.Approximation.BandJackson`: the Jackson approximant and Jackson's inequality
   for band-limited approximation.
-* `FunctionSpaces.Rd.Approximation.BandInverse`: differences of Schwartz functions in `L_1` and the
-  inverse inequality for band-limited functions.
+* `FunctionSpaces.Rd.Approximation.BandInverse`: differences of Schwartz functions in `L_p`, the
+  difference operator on `L_2`, and the inverse inequality for band-limited functions.
 
 #### `Rd/LittlewoodPaley`: Littlewood–Paley blocks
 
@@ -783,7 +783,8 @@ manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet example
   and `H^s_0(Ω)` on open sets `Ω ⊆ ℝ^d` for real `s`, built inside Mathlib's `H^s(ℝ^d)`: restriction
   as an orthogonal projection, `H^s(Ω)` as a quotient, elements of `H^1(Ω)` determined by their
   values on `Ω`, the compact embedding `H^1(Ω) → L_2(Ω)` for bounded `Ω`, the weak derivatives
-  `∂_v : H^1(ℝ^d) → L_2(ℝ^d)` as bounded operators, the density of the compactly supported Schwartz
+  `∂_v : H^1(ℝ^d) → L_2(ℝ^d)` as bounded operators, differences and moduli of `H^1(ℝ^d)`
+  functions by the gradient, the density of the compactly supported Schwartz
   functions in `H^s(ℝ^d)`, Schwartz functions with compact support in `Ω` in the span of the test
   functions, `H̃^s(ℝ^d) = H^s(ℝ^d)`, and the isometry `H̃^1(Ω) ≅ H^1_0(Ω)`.
 * `FunctionSpaces.Domains.Sobolev.SobolevDuality`: the Bessel potential of real Schwartz functions
@@ -822,9 +823,8 @@ manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet example
   the Sobolev space of order `1` of the scheme, and `(L_2(Ω), W^1_2(Ω))_{θ,q}` as its
   approximation spaces.
 * `FunctionSpaces.Domains.Spectral.SpectralBesov`: Besov spaces on domains by eigenfunction
-  expansions: differences and moduli of `H^1(ℝ^d)` functions by the gradient, the intrinsic
-  modulus on a domain by the K-functional of `(L_2(Ω), W^1_2(Ω))`, the restriction of
-  `(L_2(ℝ^d), H^1(ℝ^d))` to the Neumann couple, `B^θ_{2,q}(Ω)` for `0 < θ < 1` as the
+  expansions: the intrinsic modulus on a domain by the K-functional of `(L_2(Ω), W^1_2(Ω))`, the
+  restriction of `(L_2(ℝ^d), H^1(ℝ^d))` to the Neumann couple, `B^θ_{2,q}(Ω)` for `0 < θ < 1` as the
   approximation space `A^θ_q` of the Neumann eigenbasis on a bounded Lipschitz domain, in dyadic
   blocks and for `q = 2` by the eigenvalues, and the zero extension of the Dirichlet
   approximation spaces into `B^θ_{2,q}(ℝ^d)` on a bounded open set.

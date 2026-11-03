@@ -43,6 +43,9 @@ and McLean (Chapter 3), and are Hilbert spaces as well.
 * **Schwartz functions are dense**: the Schwartz functions form a dense subspace of every
   `H^s(V)` (`Rd.ofSchwartz`, a continuous linear map, `Rd.denseRange_ofSchwartz`), and so do the
   compactly supported ones (`Rd.dense_ofSchwartz_hasCompactSupport`).
+* **Differences in `H^1(V)`**: `‖Δ_v ι U‖_2 ≤ 2π ‖v‖ ‖U‖` (`Rd.norm_fwdDiffL2_toL2_le`), first
+  for Schwartz functions, then by density; hence `ω_r(ι U, 2^(-k))_2 ≤ 2^(r-1) 2π 2^(-k) ‖U‖`
+  for `r ≥ 1` (`Rd.lpModulus_toL2_le`).
 * **`H̃^s(Ω)` and `H^s_0(Ω)`**: every test function of `Ω` lies in every `H^s(V)` (`Rd.ofTest`),
   and every Schwartz function with compact support in `Ω` lies in the span of the test functions
   (`Rd.ofSchwartz_mem_testSpan`).
@@ -626,6 +629,53 @@ theorem tildeSpace_top : tildeSpace s (⊤ : Opens V) = ⊤ := by
   refine (dense_ofSchwartz_hasCompactSupport s).mono ?_
   rintro _ ⟨w, hw, rfl⟩
   exact ofSchwartz_mem_testSpan s hw (by simp)
+
+/-! ### Differences in `H^1(V)` -/
+
+/-- **Differences in `H^1(V)`**: `‖Δ_v ι U‖_2 ≤ 2π ‖v‖ ‖U‖` for every `U ∈ H^1(V)`, with the
+difference operator `Δ_v` on `L_2(V)` (`Rd.fwdDiffL2`). For a Schwartz function `G` this is
+`‖Δ_v G‖_2 ≤ ‖∂_v G‖_2 ≤ 2π ‖v‖ ‖G‖_{H^1}` (`Rd.enorm_fwdDiffL2_toLp_le`,
+`Rd.norm_weakDerivL2_le`); both sides are continuous in `U`, and the Schwartz functions are dense
+in `H^1(V)` (`Rd.denseRange_ofSchwartz`). -/
+theorem norm_fwdDiffL2_toL2_le (v : V) (U : H^{1}(V)) :
+    ‖fwdDiffL2 V v (toL2 U)‖ ≤ 2 * π * ‖v‖ * ‖U‖ := by
+  refine DenseRange.induction_on (denseRange_ofSchwartz (V := V) 1) U
+    (isClosed_le ((fwdDiffL2 V v).continuous.comp toL2.continuous).norm
+      (continuous_const.mul continuous_norm)) fun w => ?_
+  have h1 : ‖fwdDiffL2 V v (toL2 (ofSchwartz 1 w))‖ ≤ ‖(∂_{v} w : 𝓢(V, ℂ)).toLp 2‖ := by
+    rw [toL2_ofSchwartz, ← toReal_enorm, ← toReal_enorm]
+    exact ENNReal.toReal_mono enorm_ne_top (enorm_fwdDiffL2_toLp_le v w)
+  have h2 : ‖(∂_{v} w : 𝓢(V, ℂ)).toLp 2‖ ≤ 2 * π * ‖v‖ * ‖ofSchwartz 1 w‖ := by
+    rw [← weakDerivL2_ofSchwartz]
+    exact ((weakDerivL2 v).le_opNorm _).trans
+      (mul_le_mul_of_nonneg_right (norm_weakDerivL2_le v) (norm_nonneg _))
+  exact h1.trans h2
+
+/-- **The first-order modulus in `H^1(V)`**: `ω_1(ι U, 2^(-k))_2 ≤ 2π 2^(-k) ‖U‖` for every
+`U ∈ H^1(V)` (`Rd.norm_fwdDiffL2_toL2_le`, and `ENNReal.ofReal_one_div_two_pow_pow` for the
+scale `2^(-k)`). -/
+theorem lpModulus_one_toL2_le (U : H^{1}(V)) (k : ℕ) :
+    lpModulus 2 1 (toL2 U) k ≤
+      ENNReal.ofReal (2 * π) * ENNReal.dyadicWeight (-1) k * ‖U‖ₑ := by
+  have hk : ENNReal.ofReal (1 / 2 ^ k) = ENNReal.dyadicWeight (-1) k := by
+    simpa using ENNReal.ofReal_one_div_two_pow_pow k 1
+  refine iSup₂_le fun h hh => ?_
+  rw [Function.iterate_one, ← enorm_fwdDiffL2, ← ofReal_norm, ← ofReal_norm,
+    ← hk, ← ENNReal.ofReal_mul (by positivity),
+    ← ENNReal.ofReal_mul (by positivity)]
+  refine ENNReal.ofReal_le_ofReal ((norm_fwdDiffL2_toL2_le h U).trans ?_)
+  gcongr
+
+/-- **The modulus of an `H^1(V)` function**: for every order `r ≥ 1`,
+`ω_r(ι U, 2^(-k))_2 ≤ 2^(r-1) 2π 2^(-k) ‖U‖` for `U ∈ H^1(V)`
+(`Rd.lpModulus_one_toL2_le` and `ω_{1+l} ≤ 2^l ω_1`, `Rd.lpModulus_add_order_le`). -/
+theorem lpModulus_toL2_le {r : ℕ} (hr : 1 ≤ r) (U : H^{1}(V)) (k : ℕ) :
+    lpModulus 2 r (toL2 U) k ≤
+      2 ^ (r - 1) * ENNReal.ofReal (2 * π) * ENNReal.dyadicWeight (-1) k * ‖U‖ₑ := by
+  obtain ⟨l, rfl⟩ := Nat.exists_eq_add_of_le hr
+  rw [Nat.add_sub_cancel_left, mul_assoc, mul_assoc, ← mul_assoc (ENNReal.ofReal (2 * π))]
+  exact (lpModulus_add_order_le 1 l (toL2 U) k).trans
+    (mul_le_mul' le_rfl (lpModulus_one_toL2_le U k))
 
 variable (s Ω) in
 /-- **The space `H^s_0(Ω)`**: the closure in `H^s(Ω)` of the restrictions of the test functions

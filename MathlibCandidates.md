@@ -134,11 +134,6 @@ declarations.
   `{i : σ_i ≥ ε}` is finite for every `ε > 0` (`CompactDenseEmbedding.singularBasis`,
   `CompactDenseEmbedding.finite_setOf_le_singularValue`). EllipticPDE has the eigenvalue form,
   `IsCompactOperator.finite_setOf_hasEigenvalue_norm_ge` (`CompactSpectrum.lean`).
-* **Differences by the line derivative in `L_2`**
-  (`FunctionSpaces/Domains/Spectral/SpectralBesov.lean`): for a Schwartz function `G` on a
-  finite-dimensional real inner product space, `‖G(· + v) - G‖_2 ≤ ‖∂_v G‖_2`
-  (`Rd.eLpNorm_fwdDiff_schwartz_le`), from `(∫_0^1 φ)² ≤ ∫_0^1 φ²` (`Rd.sq_lintegral_Ioc_le`), and
-  the difference `f ↦ f(· + v) - f` as a bounded operator on `L_2` (`Rd.fwdDiffL2`).
 * **Polarization of a norm identity**
   (`FunctionSpaces/Domains/Spectral/DirichletEigenbasis.lean`):
   for linear maps `T`, `S_i` between inner product spaces over `ℝ` or `ℂ` and a real `c` with
@@ -224,11 +219,14 @@ declarations.
 * **Extension by zero on `L_p`** (`FunctionSpaces/Analysis/Lp/IndicatorOperator.lean`): for
   measurable `T ⊆ O`, `g ↦ 1_T g` from `Lp ℂ p (μ.restrict O)` to `Lp ℂ p μ` as a continuous
   linear operator of norm at most `1` (`Rd.indicatorExtendLp`; TauCeti has `extendByZeroLpₗᵢ`).
-* **Differences of Schwartz functions in `L_1`**
-  (`FunctionSpaces/Rd/Approximation/BandInverse.lean`): `‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1`
-  (`Rd.lintegral_enorm_higherDiff_schwartz_le`), from `‖Δ_v G‖_1 ≤ ‖∂_v G‖_1`
-  (`Rd.lintegral_enorm_fwdDiff_le`) and the commutation of differences with line derivatives
-  (`Rd.lineDerivOp_fwdDiffSchwartz`).
+* **Differences of Schwartz functions in `L_p`**
+  (`FunctionSpaces/Rd/Approximation/BandInverse.lean`): for a Schwartz function `G` on a
+  finite-dimensional real inner product space and `1 ≤ p < ∞`, `‖G(· + v) - G‖_p ≤ ‖∂_v G‖_p`
+  (`Rd.lintegral_enorm_fwdDiff_rpow_le`), from `(∫_0^1 φ)^p ≤ ∫_0^1 φ^p`
+  (`Rd.rpow_lintegral_Ioc_le`); `‖Δ_v^r G‖_1 ≤ ‖v‖^r ‖D^r G‖_1`
+  (`Rd.lintegral_enorm_higherDiff_schwartz_le`) by the commutation of differences with line
+  derivatives (`Rd.lineDerivOp_fwdDiffSchwartz`); and the difference `f ↦ f(· + v) - f` as a
+  bounded operator on `L_2` (`Rd.fwdDiffL2`).
 * **Bounded overlap in `L_p`** (`FunctionSpaces/Rd/Atoms/AtomSynthesis.lean`): if at every point at
   most `N` of the functions `g_m` are nonzero, then `‖∑_m g_m‖_p^p ≤ N^(p-1) ∑_m ‖g_m‖_p^p`
   (`Rd.eLpNorm_rpow_le_of_overlap`); a set all of whose finite subsets have at most `N` elements is

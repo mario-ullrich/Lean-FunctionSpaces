@@ -125,7 +125,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Band-limited classes on `ℝ^d`, Littlewood–Paley blocks, `A^s_q(band-limited)` characterised by Littlewood–Paley blocks for `s > 0` | ✅ | ✗ | `Rd/Approximation/BandLimited`, `Rd/LittlewoodPaley/LittlewoodPaley` |
 | Differences of convolutions and dilations | ✅ | ✗ | `Rd/Differences/DilatedDifferences` |
 | Jackson's inequality for band-limited approximation | ✅ | ✗ | `Rd/Approximation/BandJackson` |
-| Differences of Schwartz functions in `L_1`, inverse inequality for band-limited functions | ✅ | ✗ | `Rd/Approximation/BandInverse` |
+| Differences of Schwartz functions in `L_p`, the difference operator on `L_2`, inverse inequality for band-limited functions | ✅ | ✗ | `Rd/Approximation/BandInverse` |
 | Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ | ✗ | `Rd/Differences/BesovDifferences` |
 | Sobolev–Slobodeckij norms: the Gagliardo form, its two-sided bounds by first differences with explicit constants, radial integrals of powers, double integrals of sums, `W^{s,p} = B^s_{p,p}` for `0 < s < 1` | ✅ | ✗ | `Rd/Differences/SobolevSlobodeckij` |
 | Besov spaces on `ℝ^d` as interpolation spaces, by approximation, differences and Littlewood–Paley blocks | ✅ | ✗ | `Rd/Interpolation/BesovInterpolation` |
