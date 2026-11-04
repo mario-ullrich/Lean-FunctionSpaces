@@ -223,7 +223,7 @@ interpolation of couples (`Interpolation/`) and decompositions (`Decompositions/
 domains, traces, eigenbases, manifolds) and `Wavelets/`. The block documents in
 [`docs/`](docs/) state every result with its Lean name and list the files; the blueprint gives
 the proofs. [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed, and
-[docs/FEECInterface.md](docs/FEECInterface.md) describes the interface to a FEEC/BEEC library.
+[docs/FEECFoundations.md](docs/FEECFoundations.md) describes what a FEEC/BEEC library can build on.
 
 ## What is left to do
 
