@@ -35,7 +35,7 @@ project for every `1 ≤ p ≤ ∞`.
   `Rd.BoundedLipschitzDomain.exists_extendsSobolev_interior_cutoff`) and from `Ω` with a bound
   (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection`), so `W^1_p(Ω)` is the space of
   restrictions of `W^1_p(V)` in every dimension
-  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`), and the value of
+  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`), and the value of
   every jet of `W^1_p(Ω)` lies in `W^1_p(Ω)`
   (`Rd.BoundedLipschitzDomain.memWeakSobolev_of_mem_weakSobolevJet`).
 -/
@@ -328,7 +328,7 @@ Chapter 9): for a bounded Lipschitz domain `Ω` and `1 ≤ p ≤ ∞`, every `f 
 everywhere on `Ω` with some `F ∈ W^1_p(V)`
 (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection` in dimension `n ≥ 1`,
 `Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton` in dimension `0`). -/
-theorem exists_memSobolev_of_memWeakSobolev_of_one_le (hp : 1 ≤ p) {f : V → ℂ}
+theorem exists_memSobolev_of_memWeakSobolev (hp : 1 ≤ p) {f : V → ℂ}
     (hf : MemWeakSobolev Ω.toOpens 1 p f) :
     ∃ F : Lp ℂ p (volume : Measure V), MemSobolev 1 F ∧
       (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f := by
@@ -341,12 +341,12 @@ theorem exists_memSobolev_of_memWeakSobolev_of_one_le (hp : 1 ≤ p) {f : V → 
 
 /-- **`W^1_p(Ω)` is the space of restrictions of `W^1_p(V)` for `1 ≤ p ≤ ∞`**: for a bounded
 Lipschitz domain `Ω`, `f` lies in `W^1_p(Ω)` iff it agrees almost everywhere on `Ω` with some
-`F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev_of_one_le`; the
+`F ∈ W^1_p(V)` (`Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev`; the
 converse restricts the weak derivatives, `Rd.MemWeakSobolev.mono_set`). -/
-theorem memWeakSobolev_iff_exists_memSobolev_of_one_le (hp : 1 ≤ p) (f : V → ℂ) :
+theorem memWeakSobolev_iff_exists_memSobolev (hp : 1 ≤ p) (f : V → ℂ) :
     MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p (volume : Measure V), MemSobolev 1 F ∧
       (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f := by
-  refine ⟨Ω.exists_memSobolev_of_memWeakSobolev_of_one_le hp, ?_⟩
+  refine ⟨Ω.exists_memSobolev_of_memWeakSobolev hp, ?_⟩
   rintro ⟨F, hF, hFf⟩
   exact (MemWeakSobolev.mono_set hF le_top).congr_ae hFf
 

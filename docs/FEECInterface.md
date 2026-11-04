@@ -233,13 +233,11 @@ Files `FunctionSpaces/Domains/Sobolev/LipschitzDomainH1.lean`,
   as well (`Rd.BoundedLipschitzDomain.exists_sobolevExtensionOp`,
   `FunctionSpaces/Domains/Extension/SobolevExtensionOperator.lean`). The theorem is of first
   order. Membership form, for every `1 ≤ p ≤ ∞`:
-  `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le (hp : 1 ≤ p)
+  `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev (hp : 1 ≤ p)
   (f : V → ℂ) : MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p volume, MemSobolev 1 F ∧
   (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f`, and the direction
-  `Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev_of_one_le`, in every dimension
-  (for `d = 0`, `Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`); for `1 < p` also
-  `Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev (hp1)` and
-  `Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev`.
+  `Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev`, in every dimension
+  (for `d = 0`, `Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`).
 * `H^1(Ω) = W^{1,2}(Ω)`: `Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev
   (f : Lp ℂ 2 volume) : Ω.MemSobolevOn f ↔ MemWeakSobolev Ω.toOpens 1 2 f`, and with the
   Hilbert space of Section 4.5,
@@ -1122,10 +1120,9 @@ functions are the extension operators applied to one function
 (`Rd.SobolevExtensionOp.extendsSobolev`): `Rd.BoundedLipschitzDomain.exists_extendsSobolev` lies
 in `FunctionSpaces.Domains.Extension.SobolevExtensionOperator`, the forms for `1 ≤ p ≤ ∞`
 (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection`,
-`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`) in
+`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`) in
 `FunctionSpaces.Domains.Extension.ReflectionExtensionOperator`, and the consequences of
-Section 4.3 (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`,
-`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`, Rellich, the quotient norm and the
+Section 4.3 (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`, Rellich, the quotient norm and the
 boundary traces of `W^{1,2}(Ω)`) in `FunctionSpaces.Domains.Sobolev.LipschitzDomainW1p`. The
 chosen extension operator is the one by reflection for every `1 ≤ p ≤ ∞`, under the names
 `Rd.BoundedLipschitzDomain.sobolevExtensionL`, `Rd.BoundedLipschitzDomain.exists_extensionL` and

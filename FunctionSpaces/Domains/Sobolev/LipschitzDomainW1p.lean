@@ -12,10 +12,8 @@ public import FunctionSpaces.Domains.Extension.ReflectionExtensionOperator
 
 Let `Ω` be a bounded Lipschitz domain in a finite-dimensional real inner product space `V` of
 dimension `n`. By the extension theorem, every `f ∈ W^1_p(Ω)` (weak derivatives on `Ω`)
-agrees on `Ω` with some `F ∈ W^1_p(V)`: for every `1 ≤ p ≤ ∞` by reflection
-(`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`), here stated for
-`1 < p ≤ ∞` (`Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev`,
-`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`). For `p = 2` this gives:
+agrees on `Ω` with some `F ∈ W^1_p(V)`, for every `1 ≤ p ≤ ∞`, by reflection
+(`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`). For `p = 2` this gives:
 
 * `H^1(Ω) = W^1_2(Ω)`: the restriction space `H^1(Ω)` is the weak-derivative space
   (`Rd.BoundedLipschitzDomain.memSobolevOn_iff_memWeakSobolev`,
@@ -44,33 +42,12 @@ namespace BoundedLipschitzDomain
 
 variable (Ω : BoundedLipschitzDomain V)
 
-/-- **The extension theorem** (H.2; the extension theorem of Calderón and Stein): for a bounded
-Lipschitz domain `Ω` and `1 < p ≤ ∞`, every `f ∈ W^1_p(Ω)` agrees almost everywhere on `Ω` with
-some `F ∈ W^1_p(V)`. This is the case `1 < p` of
-`Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev_of_one_le`; for `1 < p < ∞`,
-Rychkov's extension (`Rd.BoundedLipschitzDomain.exists_extendsSobolev`) gives `F` as well. -/
-theorem exists_memSobolev_of_memWeakSobolev (hp1 : 1 < p)
-    {f : V → ℂ} (hf : MemWeakSobolev Ω.toOpens 1 p f) :
-    ∃ F : Lp ℂ p (volume : Measure V), MemSobolev 1 F ∧
-      (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f :=
-  Ω.exists_memSobolev_of_memWeakSobolev_of_one_le hp1.le hf
-
-/-- **`W^1_p(Ω)` is the space of restrictions of `W^1_p(V)`**: for a bounded Lipschitz domain `Ω`
-and `1 < p ≤ ∞`, `f` lies in `W^1_p(Ω)` iff it agrees almost everywhere on `Ω` with some
-`F ∈ W^1_p(V)`; the case `1 < p` of
-`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`. -/
-theorem memWeakSobolev_iff_exists_memSobolev (hp1 : 1 < p)
-    (f : V → ℂ) :
-    MemWeakSobolev Ω.toOpens 1 p f ↔ ∃ F : Lp ℂ p (volume : Measure V), MemSobolev 1 F ∧
-      (F : V → ℂ) =ᵐ[volume.restrict Ω.carrier] f :=
-  Ω.memWeakSobolev_iff_exists_memSobolev_of_one_le hp1.le f
-
 /-- **`H^1(Ω) = W^1_2(Ω)`** (H.2 for `p = 2`): for a bounded Lipschitz domain `Ω`, `f ∈ L_2(V)`
 lies in the restriction space `H^1(Ω)` iff it lies in the Sobolev space
 `W^1_2(Ω)` of weak derivatives on `Ω`. -/
 theorem memSobolevOn_iff_memWeakSobolev (f : Lp ℂ 2 (volume : Measure V)) :
     Ω.MemSobolevOn f ↔ MemWeakSobolev Ω.toOpens 1 2 f :=
-  (Ω.memWeakSobolev_iff_exists_memSobolev ENNReal.one_lt_two f).symm
+  (Ω.memWeakSobolev_iff_exists_memSobolev one_le_two f).symm
 
 /-- **Rellich's theorem in `W^1_2(Ω)`** (I.6 and H.1 in the weak-derivative form): for a bounded
 Lipschitz domain `Ω` in dimension `n ≥ 1`, every sequence `f_n ∈ L_2(Ω)` with weak derivatives

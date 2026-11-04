@@ -3695,8 +3695,8 @@ is $\infty$ (\Cref{lem:boundary-besov-norm-properties}).
 \label{ch:sobolev-domains}
 
 In this chapter $V$ is a finite-dimensional real inner product space of dimension $n$ with
-Lebesgue measure, and $\Omega \subseteq V$ is open or a bounded Lipschitz domain with boundary
-$\Gamma$, as each section states; weak derivatives, Mathlib's spaces $H^s(V)$ and test functions
+Lebesgue measure, and $\Omega \subseteq V$ is open, a bounded Lipschitz domain with boundary
+$\Gamma$ or a Besov domain, as each section states; weak derivatives, Mathlib's spaces $H^s(V)$ and test functions
 are those of \Cref{ch:sobolev-rd}, the boundary traces those of \Cref{ch:traces-lipschitz}.
 \Cref{sec:lipschitz-domain-h1} restricts $H^1(V)$ to bounded Lipschitz domains, describes the
 restrictions by intrinsic differences, shows that they lie in $\Sob{1}{2}(\Omega)$, and
@@ -7195,8 +7195,6 @@ $C_j(\sum_i d_i)$ and $1 + \sum_i d_i$.
 \begin{theorem}[The extension theorem by reflection]
 \label{thm:reflection-extension}
 \lean{Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection,
-  Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev_of_one_le,
-  Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le,
   Rd.BoundedLipschitzDomain.exists_memSobolev_of_memWeakSobolev,
   Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev}
 \leanok
@@ -7213,8 +7211,7 @@ $G_i = \partial_{e_i} F \in L_p(V)$ on $V$ with
 \]
 For every bounded Lipschitz domain $\Omega$ in $V$ of any dimension, every $1 \leq p \leq \infty$
 and every $f \colon V \to \C$, $f \in \Sob{1}{p}(\Omega)$ if and only if $f = F$ almost everywhere
-on $\Omega$ for some $F \in \Sob{1}{p}(V)$; in particular this holds for every
-$1 < p \leq \infty$.
+on $\Omega$ for some $F \in \Sob{1}{p}(V)$.
 \end{theorem}
 
 \begin{proof}
@@ -11639,11 +11636,11 @@ $L_2$ are the integrals.
 
 Here $g_{kj} = \partial_{b_j} P_k \varphi_i$ weakly on $O_I$, so \Cref{thm:chart-weak-eigen} is the
 weak form of $L_A \varphi_i = \lambda_i \varphi_i$ for the operator $L_A$ of the form $a_A$. The
-form is Hermitian and nonnegative, and it is local, a remark outside the formalisation. Its
-principal part $\sum_k \psi_k^2 |\nabla (u \circ \kappa_k^{-1})|^2$ has weights with
-$\sum_k \psi_k^2 \geq 1/N$ for $N$ charts (\Cref{lem:partition-squares}); together with the
-bounds of the changes of charts on the compact supports, a remark outside the formalisation,
-this makes it uniformly elliptic in the charts.
+form is Hermitian and nonnegative. Its principal part
+$\sum_k (\psi_k \circ \kappa_k^{-1})^2 |\nabla (u \circ \kappa_k^{-1})|^2$ has weights with
+$\sum_k \psi_k^2 \geq 1/N$ for $N$ charts (\Cref{lem:partition-squares}). That the form is
+local, and uniformly elliptic in the charts, which needs in addition the bounds of the changes of
+charts on the compact supports, are remarks outside the formalisation.
 The test functions $w$ are arbitrary near the boundary of $M$, so the boundary
 condition is the natural one, as for the Neumann problem (\Cref{thm:neumann-weak-eigen}). The form
 $a_A$ depends on the atlas; the Laplace--Beltrami operator of a Riemannian metric is a later goal.

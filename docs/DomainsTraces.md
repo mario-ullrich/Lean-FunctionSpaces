@@ -492,9 +492,8 @@ built on this project, with the decisions behind their form.
   (`Rd.BoundedLipschitzDomain.exists_isBoundaryTrace_of_memWeakSobolev`,
   `Rd.BoundedLipschitzDomain.isBoundaryTrace_unique_of_memWeakSobolev`). The membership
   statements hold in every dimension; for `n = 0`, `F = f` or `F = 0` serves
-  (`Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`). The membership statements are the
-  cases `1 < p` of the theorem by reflection below
-  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`); the bound with
+  (`Rd.exists_memSobolev_of_memWeakSobolev_of_subsingleton`). The membership statements hold for
+  every `1 ≤ p ≤ ∞` by the theorem by reflection below; the bound with
   the constant `C`, and with it Rellich's theorem and the quotient norm, is Rychkov's local
   extension with the local means of the gradient: for a bump with the moment kernel `m` of order
   two, `k_{j+1} = 2^{-j} ∑_i ∂_{e_i} (K_i)_{2^j}`
@@ -516,7 +515,7 @@ built on this project, with the decisions behind their form.
   `‖F‖_p + ∑_i ‖G_i‖_p ≤ C (‖f‖_{L_p(Ω)} + ∑_i ‖g_i‖_{L_p(Ω)})`
   (`Rd.BoundedLipschitzDomain.exists_extendsSobolev_reflection`); hence `f ∈ W^1_p(Ω)` iff `f`
   agrees on `Ω` with some `F ∈ W^1_p(V)`, in every dimension
-  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_of_one_le`). On a Lipschitz
+  (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev`). On a Lipschitz
   graph domain `Ω = {x : φ(x) < ⟪x, e⟫}` with `M`-Lipschitz `φ`, the flattening
   `F(x) = x - φ(x) e` and its inverse are `(1 + M)`-Lipschitz and preserve Lebesgue measure
   (`Rd.LipschitzGraph.measurePreserving_flatten`,
@@ -688,9 +687,9 @@ built on this project, with the decisions behind their form.
   bound, and eigenfunctions `φ_i ∈ H^1_A(M)`, `J φ_i = e_i`, with
   `a_A(φ_i, w) = λ_i ⟨e_i, J w⟩` for every `w ∈ H^1_A(M)`
   (`Manifold.BesovAtlas.chartForm_eigenfunction`), the weak eigenvalue equation of the chart form
-  with the natural boundary condition. In the principal part `∑_k ψ_k² |∇(u ∘ κ_k⁻¹)|²` of the
+  with the natural boundary condition. In the principal part `∑_k (ψ_k ∘ κ_k⁻¹)² |∇(u ∘ κ_k⁻¹)|²` of the
   chart form the weights satisfy `∑_k ψ_k² ≥ 1/N` for `N` charts
-  (`Manifold.BesovAtlas.inv_card_le_sum_sq_psi`), the coefficient bound behind its uniform
+  (`Manifold.BesovAtlas.inv_card_le_sum_sq_psi`), a step toward its uniform
   ellipticity in the charts. `f ∈ B^1_{2,2}(M)` iff
   `∑_i (1 + ⌊√(1 + λ_i)⌋)² |⟨e_i, f⟩|² < ∞` (`Manifold.BesovAtlas.memBesov_one_two_iff_spectral`).
   For `0 < θ < 1` and `1 ≤ q ≤ ∞`, `f ∈ (L_2(μ), H^1_A(M))_{θ,q}` iff every piece `P_k f` has a
@@ -750,7 +749,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Linear extensions of functions as extension operators on jets, the patches by reflection as linear extensions, the chosen extension operator for `W^1_p`, `1 ≤ p ≤ ∞`, built by reflection on value–derivative jets, `E u = u` on `Ω`, and from it the extension theorem for `W^1_p` on bounded Lipschitz domains for `1 ≤ p ≤ ∞` with a bound | ✅ | ✗ | `Domains/Extension/ReflectionExtensionOperator` |
 | Weighted dilation averages `∫_a^b w(s) G_{e^s} ds`, their writing as sums of derivatives of order `m` of the higher divergence kernels when the weight has vanishing moments, the smoothed bump with its moment and kernel weights, and the local means kernels of order `L` as sums of derivatives of order `m ≤ L` of the higher divergence kernels, which have mean zero for `m < L` and lie in the reflected cone for bumps supported in `-K` | ✅ | ✗ | `Domains/Extension/HigherDivergenceKernels` |
 | The local means of order `m + 1` of the smoothed bump by the derivatives of order `m`, local means of Triebel–Lizorkin type with smoothness `m` on a set, bounded extensions of order `m` from one patch and by a cutoff, pasting in `W^m_p(ℝ^d)` by the Leibniz rule, and the extension theorem (`W^m_p(Ω)` is the space of restrictions of `W^m_p(ℝ^d)`) on bounded Lipschitz domains for `1 < p < ∞` and every `m`, with a bound | ✅ | ✗ | `Domains/Extension/HigherSobolevExtension` |
-| `W^1_p(Ω)` as the space of restrictions of `W^1_p(ℝ^d)` for `1 < p < ∞` (the extension theorem), and for `p = 2` `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the quotient norm of `H^1(Ω)` and the boundary traces of `W^1_2(Ω)` | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainW1p` |
+| `W^1_p(Ω)` as the space of restrictions of `W^1_p(ℝ^d)` for `1 ≤ p ≤ ∞` (the extension theorem), and for `p = 2` `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the quotient norm of `H^1(Ω)` and the boundary traces of `W^1_2(Ω)` | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainW1p` |
 | Gauss–Green on Lipschitz graph domains: Fubini in product coordinates, ray integrals, the normal weight, `∫_Ω ∂_v g = ∫_Γ g ⟪v, ν⟫ dσ` for compactly supported `C^1` functions in chart and surface form, the product rule for line derivatives, and Green's formula `∫_Ω (∂_v f) g + f ∂_v g = ∫_Γ Tr f · Tr g ⟪v, ν⟫ dσ` for `f, g ∈ W^1_2(ℝ^d)` | ✅ | ✗ | `Domains/Sobolev/LipschitzGraphGreen` |
 | Green's formula on bounded Lipschitz domains: integration by parts in `H^1(ℝ^d)`, resolutions of unity equal to one near the boundary, the chart form for every resolution of unity, the outward unit normal as the chart normal and a unit vector almost everywhere on the boundary, `∫_Ω (∂_v u) w + u ∂_v w = ∫_Γ γ_{L_2} u · γ_{L_2} w ⟪v, ν⟫ dσ` for `u, w ∈ H^1(Ω)`, the traces from both sides of a graph, and the zero extension: `1_Ω u ∈ W^1_2(ℝ^d)` iff the trace of `u` vanishes | ✅ | ✗ | `Domains/Sobolev/LipschitzDomainGreen` |
 | The kernel of the trace: convergence and mollification in `H^1(ℝ^d)`, smoothing with compact support, cone mollifiers, `H̃^1(Ω)` as the functions of `H^1(ℝ^d)` vanishing outside `Ω`, `ker γ = H^1_0(Ω)`, `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)`, `H̃^1(Ω) ≅ ker γ` and `(ker γ)^* ≅ H^{-1}(Ω)` | ✅ | ✗ | `Domains/Traces/TraceKernel` |

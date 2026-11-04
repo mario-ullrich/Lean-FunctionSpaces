@@ -792,7 +792,7 @@ manifolds, intervals and the cube), `Torus`, and `Wavelets` (the wavelet example
   and `H^s(ℝ^d)`, and the duality `(H̃^s(Ω))^* ≅ H^{-s}(Ω)`, `(H^s(Ω))^* ≅ H̃^{-s}(Ω)` and
   `(H^1_0(Ω))^* ≅ H^{-1}(Ω)` on open sets for real `s`.
 * `FunctionSpaces.Domains.Sobolev.LipschitzDomainW1p`: `W^1_p(Ω)` on a bounded Lipschitz domain
-  as the space of restrictions of `W^1_p(ℝ^d)` for `1 < p < ∞` (the extension theorem), and for
+  as the space of restrictions of `W^1_p(ℝ^d)` for `1 ≤ p ≤ ∞` (the extension theorem), and for
   `p = 2`
   `H^1(Ω) = W^1_2(Ω)`, Rellich's theorem in `W^1_2(Ω)`, the equivalence of the quotient norm of
   `H^1(Ω)` with the `W^1_2(Ω)` norm, and the boundary traces of `W^1_2(Ω)`.

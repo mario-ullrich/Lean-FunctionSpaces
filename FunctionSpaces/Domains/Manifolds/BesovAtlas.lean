@@ -226,8 +226,8 @@ theorem theta_mul_psi (i : Fin A.n) (x : M) : A.theta i x * A.psi i x = A.psi i 
 omit [FiniteDimensional ℝ E] in
 /-- **The squares of the partition of unity are bounded below**: `∑_i ψ_i(x)² ≥ 1/N` at every
 point `x`, for the `N` charts of the atlas, since `1 = (∑_i ψ_i(x))² ≤ N ∑_i ψ_i(x)²` by the
-Cauchy–Schwarz inequality (Mathlib's `sq_sum_le_card_mul_sum_sq`). This is the coefficient bound
-for the principal part `∑_i ψ_i² |∇(u ∘ κ_i⁻¹)|²` of the chart form. -/
+Cauchy–Schwarz inequality (Mathlib's `sq_sum_le_card_mul_sum_sq`). This bounds the weights
+of the principal part `∑_i (ψ_i ∘ κ_i⁻¹)² |∇(u ∘ κ_i⁻¹)|²` of the chart form from below. -/
 theorem inv_card_le_sum_sq_psi (x : M) : (A.n : ℝ)⁻¹ ≤ ∑ i, A.psi i x ^ 2 := by
   have h : (∑ i, A.psi i x) ^ 2 ≤ (Finset.univ.card : ℝ) * ∑ i, A.psi i x ^ 2 :=
     sq_sum_le_card_mul_sum_sq
