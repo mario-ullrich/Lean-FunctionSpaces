@@ -10,8 +10,9 @@ identities and kernel identities proved by Fourier inversion lead to the Littlew
 characterisation; Jackson's and Bernstein's inequalities identify the approximation spaces with
 the Besov spaces defined by differences; local means, moment kernels and the reproducing formula
 give the atomic decompositions with regular and smooth atoms; and smooth atoms yield the
-invariance of the Besov spaces under smooth changes of variables with a cut-off. The domains,
-traces and manifolds built on this block are in [Domains, traces and manifolds](DomainsTraces.md),
+invariance of the Besov spaces under smooth changes of variables with a cut-off. The domains
+and traces built on this block are in [Lipschitz domains and traces](DomainsTraces.md), the
+manifolds in [Manifolds and eigenbases](Manifolds.md),
 the mixed smoothness in [Dominating mixed smoothness](MixedSmoothness.md), and the convolution,
 the approximate identities and the Littlewood–Paley kernels in [Tools from analysis](Analysis.md).
 

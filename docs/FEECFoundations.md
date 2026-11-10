@@ -1,7 +1,7 @@
 # Foundations for FEEC and BEEC
 
 Part of [Characterizations of Function Spaces](../README.md). Block documents:
-[Sobolev spaces on `ℝ^d`](SobolevRd.md) and [Domains, traces and manifolds](DomainsTraces.md).
+[Sobolev spaces on `ℝ^d`](SobolevRd.md) and [Lipschitz domains and traces](DomainsTraces.md).
 
 This document is for the authors of the FEEC/BEEC library proposed in *FEEC and BEEC in Lean: a
 proposed proof structure* (version 4, 10 October 2026). It lists what Lean-FunctionSpaces offers

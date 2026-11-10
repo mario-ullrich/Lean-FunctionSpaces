@@ -18,7 +18,7 @@ Laplacian on a compact manifold, enter as a hypothesis. The torus is the concret
 the Nikolskii theory and of continuous spectral bases ([The torus](Torus.md)): its trigonometric
 polynomials are the scheme with a Nikolskii inequality, and its Fourier basis is the continuous
 spectral basis. The compact dense embeddings have the Dirichlet, Neumann and chart-form
-eigenbases as instances ([Domains, traces and manifolds](DomainsTraces.md)). A filtration
+eigenbases as instances ([Manifolds and eigenbases](Manifolds.md)). A filtration
 gives a projection scheme, whose approximation spaces are described by martingale differences.
 The `L_p` tools are in [Tools from analysis](Analysis.md).
 
@@ -69,7 +69,7 @@ The `L_p` tools are in [Tools from analysis](Analysis.md).
   (`CompactDenseEmbedding.memKMethod_iff_memApprox`); for `s > 0`, `f ∈ A^s_2` iff
   `∑_i σ_i^(-2s) |⟨e_i, f⟩|² < ∞` (`CompactDenseEmbedding.memApprox_two_iff`). The Dirichlet and
   Neumann Laplacians and the chart forms of compact manifolds are instances
-  ([Domains, traces and manifolds](DomainsTraces.md)).
+  ([Manifolds and eigenbases](Manifolds.md)).
 * **Spaces with a continuous spectral basis.** Let `μ` be a finite Borel measure on a
   topological space `M`, and `(e_i)` an orthonormal basis of `L_2(μ)` of bounded continuous
   functions with levels `λ(i) ∈ ℕ`, finitely many of each level (`ContinuousSpectralBasis`). The

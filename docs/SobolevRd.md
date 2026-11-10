@@ -19,7 +19,7 @@ With them, `W^m_p = F^m_{p,2}` for `1 < p < ∞`, with named constants in both d
 for `m ≥ 1`, `W^m_p` lies between the Besov spaces `B^m_{p,min(p,2)}` and `B^m_{p,max(p,2)}`.
 The difference of two dilates of a smooth function is a divergence of smooth kernels, with mean
 zero when its first moments vanish; these kernels give the extension theorems on Lipschitz
-domains ([Domains, traces and manifolds](DomainsTraces.md)). The
+domains ([Lipschitz domains and traces](DomainsTraces.md)). The
 Littlewood–Paley blocks are continuous and satisfy the Nikolskii inequality, which gives the
 embeddings of `B^s_{p,q}` into `L_r` for `s > n(1/p - 1/r)` and into bounded continuous functions
 for `s > n/p`, and with `W^m_p ⊆ F^m_{p,2}` the Sobolev embeddings `W^m_p ↪ L_r` and `W^m_p ↪ C_b`,
@@ -49,8 +49,8 @@ smoothness by `σ`, derivatives by `1`, and `H^{s+1,p}` consists of the `u ∈ H
 derivatives lie in `H^{s,p}`.
 
 Sobolev spaces on open sets and on bounded Lipschitz domains, the trace space, the extension
-theorem, Green's formula and the kernel of the trace are in [Domains, traces and
-manifolds](DomainsTraces.md); the vector-valued singular integrals and the square function
+theorem, Green's formula and the kernel of the trace are in [Lipschitz domains and
+traces](DomainsTraces.md); the vector-valued singular integrals and the square function
 theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md). [Foundations for FEEC and
 BEEC](FEECFoundations.md) lists the results a FEEC/BEEC library can build on, what comes next,
 and the decisions behind their form.
