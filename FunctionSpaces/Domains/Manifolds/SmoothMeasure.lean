@@ -240,7 +240,7 @@ theorem exists_eLpNorm_chart_le {e : OpenPartialHomeomorph M H} (he : e ∈ atla
   have hFK : ∀ x ∉ K, ‖G x‖ₑ ^ p.toReal = 0 := fun x hx => by
     rw [hGK x hx, enorm_zero, ENNReal.zero_rpow_of_pos hr]
   obtain ⟨h1, h2⟩ := hcmp _ (hG.enorm.pow_const _) hFK
-  rw [eLpNorm_indicator_eq_eLpNorm_restrict hT,
+  rw [eLpNorm_indicator_eq_eLpNorm_restrict hT.nullMeasurableSet,
     eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (f := fun y => G ((e.extend I).symm y))
       (hG.aestronglyMeasurable.comp_aemeasurable hκ),
     eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hG.aestronglyMeasurable,
@@ -283,7 +283,7 @@ quasi-measure-preserving from `μ|_K` to the Lebesgue measure. For a null set `N
 theorem quasiMeasurePreserving_piecewise_extend [CompactSpace M] {e : OpenPartialHomeomorph M H}
     (he : e ∈ atlas H M) {K : Set M} (hK : IsClosed K) (hKs : K ⊆ e.source)
     [∀ x, Decidable (x ∈ e.source)] :
-    Measure.QuasiMeasurePreserving (e.source.piecewise (e.extend I) fun _ => (0 : E))
+    QuasiMeasurePreserving (e.source.piecewise (e.extend I) fun _ => (0 : E))
       (μ.restrict K) volume := by
   have hκ := measurable_piecewise_extend I e
   refine ⟨hκ, Measure.AbsolutelyContinuous.mk fun N hN hN0 => ?_⟩
@@ -300,7 +300,7 @@ theorem quasiMeasurePreserving_piecewise_extend [CompactSpace M] {e : OpenPartia
 /-- **Null sets in a chart are null on `M`**: for a chart `e` of the atlas, a closed set
 `K ⊆ e.source` and a property `P` of almost every point of `E`, `P (κ x)` holds for `μ`-almost every
 `x ∈ K`, `κ = e.extend I` (`Manifold.IsSmoothMeasure.quasiMeasurePreserving_piecewise_extend` and
-Mathlib's `MeasureTheory.Measure.QuasiMeasurePreserving.ae`). -/
+Mathlib's `MeasureTheory.QuasiMeasurePreserving.ae`). -/
 theorem ae_comp_extend [CompactSpace M] {e : OpenPartialHomeomorph M H} (he : e ∈ atlas H M)
     {K : Set M} (hK : IsClosed K) (hKs : K ⊆ e.source) {P : E → Prop}
     (hP : ∀ᵐ y ∂volume, P y) : ∀ᵐ x ∂μ, x ∈ K → P (e.extend I x) := by

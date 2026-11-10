@@ -174,7 +174,7 @@ theorem eLpNorm_indicator_stepSet_neg [μ.IsAddRightInvariant] (U : Set V) (r : 
 /-- **The modulus on `U` is at most the modulus on `V`**, `ω_r(f, t, U)_p ≤ ω_r(f, t)_p`. -/
 theorem modulusOn_le_modulus {U : Set V} (hU : MeasurableSet U) (r : ℕ) (p : ℝ≥0∞) (f : V → ℂ)
     (t : ℝ) : modulusOn μ U r p f t ≤ modulus μ r p f t :=
-  iSup₂_mono fun h _ => eLpNorm_indicator_le _ (measurableSet_stepSet hU r h)
+  iSup₂_mono fun h _ => eLpNorm_indicator_le _ (measurableSet_stepSet hU r h).nullMeasurableSet
 
 variable [μ.IsAddHaarMeasure]
 
@@ -283,7 +283,8 @@ theorem lpModulusOn_add_le [Fact (1 ≤ p)] (U : Set V) (r : ℕ) (f g : Lp ℂ 
 theorem lpModulusOn_le [Fact (1 ≤ p)] {U : Set V} (hU : MeasurableSet U) (r : ℕ) (f : Lp ℂ p μ)
     (k : ℕ) : lpModulusOn p U r f k ≤ 2 ^ r * ‖f‖ₑ :=
   (modulusOn_le (Lp.aestronglyMeasurable f) hU Fact.out r _).trans
-    (mul_le_mul' le_rfl ((eLpNorm_indicator_le _ hU).trans_eq (Lp.enorm_def f).symm))
+    (mul_le_mul' le_rfl
+      ((eLpNorm_indicator_le _ hU.nullMeasurableSet).trans_eq (Lp.enorm_def f).symm))
 
 /-- **The modulus on `Ω` through a function on `V`**: for a measurable `Ω`, `p ≥ 1` and
 `f, G ∈ L_p`, `ω_r(f, 2^(-k), Ω)_p ≤ 2^r ‖1_Ω (f - G)‖_p + ω_r(G, 2^(-k))_p`. Split

@@ -7,6 +7,7 @@ module
 
 public import FunctionSpaces.Domains.Manifolds.SmoothMeasure
 public import FunctionSpaces.Domains.Lipschitz.HalfSpace
+public import Mathlib.Geometry.Manifold.Algebra.Structures
 public import Mathlib.Geometry.Manifold.PartitionOfUnity
 public import Mathlib.Algebra.Order.Chebyshev
 

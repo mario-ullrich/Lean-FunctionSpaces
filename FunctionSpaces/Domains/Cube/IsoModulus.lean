@@ -153,7 +153,7 @@ theorem eLpNorm_higherDiff_isoRegion_eq (r : ℕ) (p : ℝ≥0∞) (f : (Fin d �
       eLpNorm ((Rd.stepSet (cubeSet d) r h).indicator ((fwdDiff h)^[r] f)) p volume := by
   rw [cubeVol_eq_restrict, Measure.restrict_restrict (measurableSet_isoRegion r h),
     isoRegion_inter_cubeSet, eLpNorm_indicator_eq_eLpNorm_restrict
-      (Rd.measurableSet_stepSet (measurableSet_cubeSet d) r h)]
+      (Rd.measurableSet_stepSet (measurableSet_cubeSet d) r h).nullMeasurableSet]
   rfl
 
 /-- The **isotropic modulus of smoothness** on the cube, the modulus on the set `Q` of
@@ -192,7 +192,8 @@ theorem isoModulus_le {f : (Fin d → ℝ) → ℂ} (hf : Measurable f) {p : ℝ
     (r : ℕ) (t : ℝ) : isoModulus r p f t ≤ 2 ^ r * eLpNorm f p (cubeVol d) := by
   have h := Rd.modulusOn_le (μ := volume) hf.aestronglyMeasurable (measurableSet_cubeSet d) hp
     r t
-  rwa [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_cubeSet d), ← cubeVol_eq_restrict]
+  rwa [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_cubeSet d).nullMeasurableSet,
+    ← cubeVol_eq_restrict]
     at h
 
 /-- **`‖Δ_h^r f‖_{L_p(Q_{rh})} ≤ 2^r ‖f‖_{L_p(Q)}`**, the bound of `Cube.isoModulus_le` at

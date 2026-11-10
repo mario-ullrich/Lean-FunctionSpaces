@@ -81,8 +81,8 @@ theorem eLpNorm_le_of_slice_le {F G₁ D₁ G₂ D₂ : (Fin d → ℝ) → ℂ}
     eLpNorm_regionVol_eq_slice hD₁ hp0 hp' i ha₁ hb₁,
     eLpNorm_regionVol_eq_slice hG₂ hp0 hp' i ha₂ hb₂,
     eLpNorm_regionVol_eq_slice hD₂ hp0 hp' i ha₂ hb₂,
-    ← eLpNorm_const_mul_ennreal M (hm a₁ b₁ hD₁).aemeasurable,
-    ← eLpNorm_const_mul_ennreal M (hm a₂ b₂ hD₂).aemeasurable]
+    ← eLpNorm_const_mul_ennreal (c := M) (hm a₁ b₁ hD₁).aestronglyMeasurable,
+    ← eLpNorm_const_mul_ennreal (c := M) (hm a₂ b₂ hD₂).aestronglyMeasurable]
   refine (eLpNorm_mono_enorm (g := fun x =>
       c * ((eLpNorm (slice G₁ x i) p (volume.restrict (Icc a₁ b₁)) +
           M * eLpNorm (slice D₁ x i) p (volume.restrict (Icc a₁ b₁))) +
@@ -90,9 +90,9 @@ theorem eLpNorm_le_of_slice_le {F G₁ D₁ G₂ D₂ : (Fin d → ℝ) → ℂ}
           M * eLpNorm (slice D₂ x i) p (volume.restrict (Icc a₂ b₂)))))
     (measurable_eLpNorm_slice hF hp0 hp' i _).aestronglyMeasurable
     fun x => by simpa only [enorm_eq_self] using h x).trans ?_
-  refine (eLpNorm_const_mul_ennreal c ?_ p).trans_le ?_
+  refine (eLpNorm_const_mul_ennreal (c := c) ?_).trans_le ?_
   · exact (((hm a₁ b₁ hG₁).add ((hm a₁ b₁ hD₁).const_mul M)).add
-      ((hm a₂ b₂ hG₂).add ((hm a₂ b₂ hD₂).const_mul M))).aemeasurable
+      ((hm a₂ b₂ hG₂).add ((hm a₂ b₂ hD₂).const_mul M))).aestronglyMeasurable
   gcongr
   exact (eLpNorm_add_le hp).trans (add_le_add (eLpNorm_add_le hp) (eLpNorm_add_le hp))
 

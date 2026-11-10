@@ -6,6 +6,7 @@ Authors: Mario Ullrich
 module
 
 public import FunctionSpaces.Domains.Traces.GraphTraceCharts
+public import Mathlib.Topology.MetricSpace.ProperSpace.Lemmas
 
 /-!
 # Traces on the boundary of bounded Lipschitz domains

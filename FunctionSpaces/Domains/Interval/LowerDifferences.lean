@@ -104,7 +104,7 @@ theorem eLpNorm_higherDiff_stepRegion_eq (u : ℝ → ℂ) (p : ℝ≥0∞) (m :
     eLpNorm (higherDiff m t u) p (volume.restrict (stepRegion m t)) =
       eLpNorm (higherDiff m |t| u) p (volume.restrict (Icc 0 (1 - m * |t|))) := by
   rw [stepRegion_eq_stepSet, ← eLpNorm_indicator_eq_eLpNorm_restrict
-      (Rd.measurableSet_stepSet measurableSet_Icc m t),
+      (Rd.measurableSet_stepSet measurableSet_Icc m t).nullMeasurableSet,
     ← eLpNorm_indicator_stepSet_Icc m (abs_nonneg t)]
   rcases le_or_gt 0 t with ht | ht
   · rw [abs_of_nonneg ht]

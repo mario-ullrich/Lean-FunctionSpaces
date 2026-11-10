@@ -258,7 +258,7 @@ theorem eLpNorm_coeffFun_mul_scaled_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 
         eLpNorm f p (volume.restrict W) := by
   have hφ := (continuous_scalingFun m hN).aestronglyMeasurable (μ := volume)
   have hc := enorm_coeffFun_le hφ (fun _ ht => scalingFun_eq_zero m hN ht) hp1 hf j l
-  rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_supportWindow _ _ j l),
+  rw [eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_supportWindow _ _ j l).nullMeasurableSet,
     eLpNorm_scaledFun_conjExponent hφ hp1] at hc
   have hW' : eLpNorm f p (volume.restrict (supportWindow 0 (2 * N - 1) j l)) ≤
       eLpNorm f p (volume.restrict W) :=

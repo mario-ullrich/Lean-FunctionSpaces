@@ -131,7 +131,7 @@ theorem ballMeanDiff_congr_ae {f g : V → ℂ} (hfg : f =ᵐ[volume] g) (L j : 
     intro l
     rcases Nat.eq_zero_or_pos l with rfl | hl
     · exact Eventually.of_forall fun v => by simpa using hx
-    · have hq : Measure.QuasiMeasurePreserving (fun v : V => x + (l : ℝ) • v) volume volume :=
+    · have hq : QuasiMeasurePreserving (fun v : V => x + (l : ℝ) • v) volume volume :=
         (measurePreserving_add_left volume x).quasiMeasurePreserving.comp
           (Measure.quasiMeasurePreserving_smul volume (by positivity : (l : ℝ) ≠ 0))
       exact hq.ae_eq_comp hfg
@@ -1055,7 +1055,7 @@ theorem tlLocalMeansNorm_le_tlDiffNorm (L : ℕ) (hp : p ≠ ∞) {q : ℝ≥0�
         lqNorm q (fun j => dyadicWeight s j * ballMeanDiff L j f x))
       ((b.lqNorm_localMean_shift_le L hp q s f).mono fun x hx => ?_)).trans_eq ?_
     · simpa only [enorm_eq_self] using hx
-    · exact eLpNorm_const_mul_ennreal _ (measurable_lqNorm_ballMeanDiff L s q f).aemeasurable p
+    · exact eLpNorm_const_mul_ennreal (measurable_lqNorm_ballMeanDiff L s q f).aestronglyMeasurable
   calc b.tlLocalMeansNorm L s q f
       ≤ eLpNorm (fun x => ∑ j ∈ Finset.range (⌈b.radius⌉₊ + 1),
           dyadicWeight s j * ‖conv (b.kernel L j) f volume x‖ₑ +

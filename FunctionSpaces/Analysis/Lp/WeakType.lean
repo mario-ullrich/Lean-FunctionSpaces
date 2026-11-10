@@ -20,7 +20,7 @@ statements, together with the lemmas `wnorm_ne_top`, `wnorm'_le_eLpNorm'`, `wnor
 `MemLp.memWLp`, `HasWeakType.memWLp`, `HasStrongType.memLp` and `HasStrongType.hasWeakType` of
 the first file; the distribution function is the Carleson project's `μ {x | t < ‖f x‖ₑ}`. They
 are intended for Mathlib; when Mathlib has them, this file is replaced by the Mathlib import.
-The proofs and docstrings are adapted to Mathlib v4.35.0-rc2 and to this project's conventions.
+The proofs and docstrings are adapted to Mathlib v4.35.0 and to this project's conventions.
 For a function `f : α → ε` into a type with an extended norm `‖·‖ₑ`, such as `ℂ` or `[0, ∞]`:
 
 * the distribution function `MeasureTheory.distribution f t μ = μ {x | t < ‖f x‖ₑ}`, with its

@@ -90,10 +90,11 @@ theorem conv_indicator_eq_mul_sum_of_eq_sum_iteratedLineDerivOp {p : ℝ≥0∞}
   have hcs : ∀ i, HasCompactSupport (schwartzDilate t ht (K i) : V → ℂ) :=
     fun i => by rw [hKc]; exact hasCompactSupport_dilate (hK i) ht
   have hloc : LocallyIntegrable ((T : Set V).indicator f) volume :=
-    ((memLp_indicator_iff_restrict hT).2 hf).locallyIntegrable Fact.out
+    ((memLp_indicator_iff_restrict hT.nullMeasurableSet).2 hf).locallyIntegrable Fact.out
   have hfg' : ∀ i, HasWeakLineDeriv T (u i) ((T : Set V).indicator f)
       ((T : Set V).indicator (g i)) := fun i =>
-    (hfg i).congr_ae (indicator_ae_eq_restrict hT).symm (indicator_ae_eq_restrict hT).symm
+    (hfg i).congr_ae (indicator_ae_eq_restrict hT.nullMeasurableSet).symm
+      (indicator_ae_eq_restrict hT.nullMeasurableSet).symm
   have hstep : ∀ i, conv (dilate t (K i : V → ℂ)) ((T : Set V).indicator (g i)) volume x =
       conv (∂^{u i} (schwartzDilate t ht (K i)) : 𝓢(V, ℂ)) ((T : Set V).indicator f) volume x :=
     fun i => by
@@ -360,7 +361,8 @@ theorem tlLocalNormOn_le_of_pointwise (hp : p ≠ ∞) (L : ℕ) (s : ℝ) {W : 
       ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)) p volume ≤
       c * ∑ i, eLpNorm (fun x => lqNorm 2 (fun j =>
         ‖conv (dilate (2 ^ j) (K i : V → ℂ)) (h i) volume x‖ₑ)) p volume := by
-    rw [eLpNorm_const_mul_ennreal _ (Finset.aemeasurable_fun_sum _ fun i _ => hΛ i)]
+    rw [eLpNorm_const_mul_ennreal
+      (Finset.aemeasurable_fun_sum _ fun i _ => hΛ i).aestronglyMeasurable]
     gcongr
     simpa only [Finset.sum_fn] using eLpNorm_sum_le (p := p) (μ := volume) Fact.out
   have h3 : eLpNorm (fun x => ‖(indicatorLp hW (b.localMean hp L 0 F) : V → ℂ) x‖ₑ) p volume ≤
@@ -420,9 +422,9 @@ theorem eLpNorm_lqNorm_conv_divKernel_le [Nontrivial V] (hp1 : 1 < p) (hp : p �
       czConst V p (meanZeroOverlap (b.divKernel i))
         (4 * familyHormanderConst V fun k l => SchwartzMap.seminorm ℝ k l (b.divKernel i)) *
         eLpNorm g p (volume.restrict T) := by
-  rw [← eLpNorm_indicator_eq_eLpNorm_restrict T.isOpen.measurableSet]
+  rw [← eLpNorm_indicator_eq_eLpNorm_restrict T.isOpen.measurableSet.nullMeasurableSet]
   exact (b.isCZFamily_divKernel i).eLpNorm_lqNorm_conv_le hp1 hp
-    ((memLp_indicator_iff_restrict T.isOpen.measurableSet).2 hg)
+    ((memLp_indicator_iff_restrict T.isOpen.measurableSet.nullMeasurableSet).2 hg)
 
 /-- **The local means of Triebel–Lizorkin type by the gradient**: let `g_i = ∂_{e_i} f` weakly on
 an open set `T` with `f, g_i ∈ L_p(T)`, `1 < p < ∞`, let `x - y ∈ T` for every `x ∈ W`, every level
@@ -442,10 +444,11 @@ theorem tlLocalNormOn_le_of_hasWeakLineDeriv [Nontrivial V] (hp1 : 1 < p) (hp : 
         eLpNorm (g i) p (volume.restrict T) := by
   have hT := T.isOpen.measurableSet
   have hFn : ‖F‖ₑ = eLpNorm f p (volume.restrict T) := by
-    rw [Lp.enorm_def, eLpNorm_congr_ae hF, eLpNorm_indicator_eq_eLpNorm_restrict hT]
+    rw [Lp.enorm_def, eLpNorm_congr_ae hF,
+      eLpNorm_indicator_eq_eLpNorm_restrict hT.nullMeasurableSet]
   refine (b.tlLocalNormOn_le_of_pointwise hp 2 1 hW b.divKernel
     (fun i => (T : Set V).indicator (g i))
-    (fun i => ((memLp_indicator_iff_restrict hT).2 (hg i)).aestronglyMeasurable) 2
+    (fun i => ((memLp_indicator_iff_restrict hT.nullMeasurableSet).2 (hg i)).aestronglyMeasurable) 2
     (fun x hx j => b.dyadicWeight_mul_enorm_conv_kernel_le hf hfg j (hsupp x hx j)) hF).trans ?_
   rw [hFn]
   gcongr with i

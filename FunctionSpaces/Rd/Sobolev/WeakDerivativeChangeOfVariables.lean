@@ -391,7 +391,7 @@ theorem eLpNorm_restrict_eq_inf_of_support_subset {E : Type*} [NormedAddCommGrou
     (hB : Function.support h ⊆ B) (p : ℝ≥0∞) :
     eLpNorm h p (volume.restrict O) = eLpNorm h p (volume.restrict (O ⊓ B : Opens V)) := by
   conv_lhs => rw [← indicator_eq_self.2 hB]
-  rw [eLpNorm_indicator_eq_eLpNorm_restrict B.isOpen.measurableSet,
+  rw [eLpNorm_indicator_eq_eLpNorm_restrict B.isOpen.measurableSet.nullMeasurableSet,
     Measure.restrict_restrict B.isOpen.measurableSet, Opens.coe_inf, inter_comm]
 
 /-- **The `L_p` bound for a cutoff derivative**: if `χ` has closed support in `B`, `|χ| ≤ C` and

@@ -72,7 +72,7 @@ theorem enorm_cellCoef {p : ℝ≥0∞} {g : V → ℂ} (hg : MemLp g p volume) 
   have hfin : dyadicWeight (finrank ℝ V / p.toReal) j *
       eLpNorm ((cell j m).indicator g) p volume ≠ ∞ :=
     ENNReal.mul_ne_top (ENNReal.dyadicWeight_ne_top _ _)
-      (hg.indicator (measurableSet_cell j m)).eLpNorm_ne_top
+      (hg.indicator (measurableSet_cell j m).nullMeasurableSet).eLpNorm_ne_top
   rw [cellCoef, ← ofReal_norm, Complex.norm_real, Real.norm_eq_abs,
     abs_of_nonneg ENNReal.toReal_nonneg, ENNReal.ofReal_toReal hfin]
 
@@ -129,7 +129,7 @@ theorem cellAtom_indicator (p : ℝ≥0∞) (K : V → ℂ) (j : ℕ) (g : V →
 since the cell has finite volume. -/
 theorem memLp_one_indicator_cell {p : ℝ≥0∞} (hp1 : 1 ≤ p) {g : V → ℂ} (hg : MemLp g p volume)
     (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) : MemLp ((cell j m).indicator g) 1 volume :=
-  (hg.indicator (measurableSet_cell j m)).mono_exponent_of_measure_support_ne_top
+  (hg.indicator (measurableSet_cell j m).nullMeasurableSet).mono_exponent_of_measure_support_ne_top
     (fun _ hx => Set.indicator_of_notMem hx g) (volume_cell_ne_top j m) hp1
 
 /-- `λ_{j,m} a_{j,m} = K ⋆ (1_{P_{j,m}} g)` as soon as `1_{P_{j,m}} g ∈ L_p`. -/
@@ -213,14 +213,14 @@ theorem conv_eq_tsum_cellAtom {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V → ℂ}
     (x : V) :
     conv K g volume x = ∑' m, cellCoef p j g m * cellAtom p K j g m x :=
   conv_eq_tsum_cellAtom_of_indicator hp1 hKc hρ hKρ
-    (fun m => hg.indicator (measurableSet_cell j m)) x
+    (fun m => hg.indicator (measurableSet_cell j m).nullMeasurableSet) x
 
 /-- Cell atoms are continuous for a continuous kernel with compact support. -/
 theorem continuous_cellAtom {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V → ℂ} (hKc : Continuous K)
     (hKs : HasCompactSupport K) (hg : MemLp g p volume) (j : ℕ) (m : Fin (finrank ℝ V) → ℤ) :
     Continuous (cellAtom p K j g m) :=
   continuous_const.mul (hKs.continuous_convolution_left (ContinuousLinearMap.mul ℂ ℂ) hKc
-    ((hg.indicator (measurableSet_cell j m)).locallyIntegrable hp1))
+    ((hg.indicator (measurableSet_cell j m).nullMeasurableSet).locallyIntegrable hp1))
 
 /-- Cell atoms vanish outside `B̄(c_{j,m}, (ρ + n) 2^(-j))` if `K` vanishes outside
 `B̄(0, ρ 2^(-j))`. -/
@@ -266,10 +266,10 @@ theorem enorm_inv_cellCoef_mul_conv_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {g : V �
   set e := eLpNorm ((cell j m).indicator g) p volume
   set W := dyadicWeight (finrank ℝ V / p.toReal) j
   set X := ENNReal.ofReal (ρ ^ finrank ℝ V) * volume (ball (0 : V) 1)
-  have he : e ≠ ∞ := (hg.indicator (measurableSet_cell j m)).eLpNorm_ne_top
+  have he : e ≠ ∞ := (hg.indicator (measurableSet_cell j m).nullMeasurableSet).eLpNorm_ne_top
   have he0 : e ≠ 0 := fun he0 => h0 (by simp [cellCoef, e, he0])
   have hconv := enorm_conv_le_of_bound hp1
-    (hg.indicator (measurableSet_cell j m)).aestronglyMeasurable hK' hK'ρ x
+    (hg.indicator (measurableSet_cell j m).nullMeasurableSet).aestronglyMeasurable hK' hK'ρ x
   rw [volume_closedBall_div_two_pow_rpow hρ j ht] at hconv
   have hW : W⁻¹ * dyadicWeight (finrank ℝ V) j *
       dyadicWeight (-(finrank ℝ V * (1 - 1 / p.toReal))) j = 1 := by
@@ -330,7 +330,7 @@ theorem enorm_higherDiff_cellAtom_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : V �
           (cellCoef p j g m)⁻¹ • conv K ((cell j m).indicator g) volume from rfl,
         fwdDiff_iter_const_smul, Pi.smul_apply, smul_eq_mul,
         higherDiff_conv_apply (fun v x => integrable_translate_mul_of_locallyIntegrable hKc hKs
-          ((hg.indicator (measurableSet_cell j m)).locallyIntegrable hp1) v x)]
+          ((hg.indicator (measurableSet_cell j m).nullMeasurableSet).locallyIntegrable hp1) v x)]
     have hsupp : ∀ y, (ρ + r) / 2 ^ j < ‖y‖ → (fwdDiff h)^[r] K y = 0 := fun y hy => by
       rw [higherDiff_apply]
       refine Finset.sum_eq_zero fun l hl => ?_

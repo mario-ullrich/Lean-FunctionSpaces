@@ -235,7 +235,8 @@ theorem IsCZFamily.eLpNorm_sum_conv_le_of_lt_of_measurable [Nontrivial V] (h : I
       have hgp : ∀ j, MemLp (g.1 j) p volume := fun j =>
         memLp_of_lintegral_lqNorm_rpow_ne_top hp0 hp (g.2 j).aestronglyMeasurable hfin
       filter_upwards [ae_all_iff.2 fun j => conv_add_ae hp1.le hp (h.integrable j)
-        ((hgp j).indicator hS) ((hgp j).indicator hS.compl)] with x hx
+        ((hgp j).indicator hS.nullMeasurableSet)
+        ((hgp j).indicator hS.compl.nullMeasurableSet)] with x hx
       simp only [hres g S hS, hres g Sᶜ hS.compl]
       refine le_of_eq_of_le ?_ (enorm_add_le _ _)
       rw [← Finset.sum_add_distrib]

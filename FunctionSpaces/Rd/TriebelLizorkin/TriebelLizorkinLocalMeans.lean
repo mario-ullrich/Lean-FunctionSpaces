@@ -83,8 +83,8 @@ theorem eLpNorm_le_of_le_lqNorm_maximal (hp1 : 1 < p) (hp : p ≠ ∞) {q : ℝ�
         eLpNorm_mono_enorm_ae hF.aestronglyMeasurable (h.mono fun x hx => by
           simpa only [enorm_eq_self] using hx)
     _ = C * eLpNorm (fun x => lqNorm q (fun i => maximal (g i) x)) p volume :=
-        eLpNorm_const_mul_ennreal C
-          (aemeasurable_lqNorm_comp (fun i => (measurable_maximal (g i)).aemeasurable) q) p
+        eLpNorm_const_mul_ennreal (c := C) (aemeasurable_lqNorm_comp
+          (fun i => (measurable_maximal (g i)).aemeasurable) q).aestronglyMeasurable
     _ ≤ C * (feffermanSteinConst V p q *
           eLpNorm (fun x => lqNorm q (fun i => g i x)) p volume) := by
         gcongr

@@ -501,7 +501,7 @@ outside `[a, b]`, let `1 ≤ p`, and let `f` be a.e. strongly measurable. Then
 `‖f conj g_{j,k}‖_1 ≤ ‖1_W f‖_p ‖g_{j,k}‖_{p'}` with the support window
 `W = {x : 2^j x - k ∈ [a, b]}` and the conjugate exponent `p'`. Outside `W` the factor `g_{j,k}`
 vanishes, so `f` may be replaced by `1_W f`; then Hölder's inequality (Mathlib's
-`MeasureTheory.eLpNorm_le_eLpNorm_mul_eLpNorm_of_nnnorm`) applies. -/
+`MeasureTheory.eLpNorm_le_eLpNorm_mul_eLpNorm`) applies. -/
 theorem eLpNorm_mul_conj_scaledFun_le (hg : AEStronglyMeasurable g volume)
     (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) {p : ℝ≥0∞} (hp1 : 1 ≤ p) {f : ℝ → ℂ}
     (hf : AEStronglyMeasurable f volume) (j : ℕ) (k : ℤ) :
@@ -515,7 +515,7 @@ theorem eLpNorm_mul_conj_scaledFun_le (hg : AEStronglyMeasurable g volume)
     by_cases hy : y ∈ supportWindow a b j k
     · rw [Set.indicator_of_mem hy]
     · rw [scaledFun_eq_zero hsupp hy, map_zero, mul_zero, mul_zero]
-  have h := eLpNorm_le_eLpNorm_mul_eLpNorm_of_nnnorm (μ := volume) (p := p)
+  have h := eLpNorm_le_eLpNorm_mul_eLpNorm (μ := volume) (p := p)
     (q := ENNReal.conjExponent p) (r := 1) (fun u v : ℂ => u * conj v) 1
     (continuous_fst.mul (Complex.continuous_conj.comp continuous_snd))
     (hf.indicator (measurableSet_supportWindow a b j k)) (aestronglyMeasurable_scaledFun hg j k)
@@ -560,7 +560,8 @@ theorem lqNorm_le_of_le_eLpNorm_indicator {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp :
           ENNReal.rpow_le_rpow (hd k) hr.le
       _ = B ^ p.toReal * ∫⁻ x in supportWindow a b j k, ‖f x‖ₑ ^ p.toReal := by
           rw [ENNReal.mul_rpow_of_nonneg _ _ hr.le, mul_comm,
-            eLpNorm_indicator_eq_eLpNorm_restrict (measurableSet_supportWindow a b j k),
+            eLpNorm_indicator_eq_eLpNorm_restrict
+              (measurableSet_supportWindow a b j k).nullMeasurableSet,
             eLpNorm_rpow_eq hf.restrict hp0 hp]
   have hsum : ∑' k, d k ^ p.toReal ≤
       B ^ p.toReal * (((⌈b - a⌉₊ + 1 : ℕ) : ℝ≥0∞) * eLpNorm f p volume ^ p.toReal) := by

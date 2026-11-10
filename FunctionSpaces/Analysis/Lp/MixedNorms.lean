@@ -192,7 +192,7 @@ theorem dyadicWeight_mul_enorm_le_eLpNorm_lqNorm {E : Type*} [NormedAddCommGroup
     dyadicWeight s j * ‖h j‖ₑ ≤
       eLpNorm (fun x => lqNorm q (fun i => dyadicWeight s i * ‖h i x‖ₑ)) p μ := by
   rw [Lp.enorm_def, ← eLpNorm_enorm _ (Lp.aestronglyMeasurable (h j)),
-    ← eLpNorm_const_mul_ennreal _ (Lp.aestronglyMeasurable (h j)).enorm]
+    ← eLpNorm_const_mul_ennreal (Lp.aestronglyMeasurable (h j)).enorm.aestronglyMeasurable]
   refine eLpNorm_mono_enorm
     (((Lp.aestronglyMeasurable (h j)).enorm.const_mul _).aestronglyMeasurable) fun x => ?_
   simp only [enorm_eq_self]
@@ -486,7 +486,7 @@ variable {E : Type*} [NormedAddCommGroup E]
 `c ∈ [0, ∞]`, every measurable `v : α → E` with values in a normed group and every `p`. -/
 theorem eLpNorm_const_mul_enorm (c : ℝ≥0∞) {v : α → E} (hv : AEStronglyMeasurable v μ)
     (p : ℝ≥0∞) : eLpNorm (fun x => c * ‖v x‖ₑ) p μ = c * eLpNorm v p μ := by
-  rw [eLpNorm_const_mul_ennreal _ hv.enorm p, eLpNorm_enorm _ hv]
+  rw [eLpNorm_const_mul_ennreal hv.enorm.aestronglyMeasurable, eLpNorm_enorm _ hv]
 
 section Countable
 
@@ -716,7 +716,7 @@ theorem cauchySeq_of_edist_le_lqNorm_ite {E : Type*} [PseudoEMetricSpace E] {S :
 
 /-- **Minkowski's inequality for a pointwise bound**: for `1 ≤ p`, a measurable `B : α → [0, ∞]`
 and measurable `F_i : α → [0, ∞]`, `i ∈ s` finite, the bound `B ≤ c ∑_i F_i` almost everywhere
-gives `‖B‖_p ≤ c ∑_i ‖F_i‖_p` (`MeasureTheory.eLpNorm_const_mul_ennreal`, Mathlib's
+gives `‖B‖_p ≤ c ∑_i ‖F_i‖_p` (Mathlib's `MeasureTheory.eLpNorm_const_mul_ennreal` and
 `eLpNorm_sum_le`). -/
 theorem eLpNorm_le_const_mul_sum_of_ae_le (hp1 : 1 ≤ p) {ι : Type*} (s : Finset ι)
     {B : α → ℝ≥0∞} {F : ι → α → ℝ≥0∞} (hB : AEMeasurable B μ)
@@ -727,7 +727,8 @@ theorem eLpNorm_le_const_mul_sum_of_ae_le (hp1 : 1 ≤ p) {ι : Type*} (s : Fins
         filter_upwards [h] with x hx
         simpa only [enorm_eq_self] using hx
     _ = c * eLpNorm (∑ i ∈ s, F i) p μ := by
-        rw [eLpNorm_const_mul_ennreal _ (Finset.aemeasurable_fun_sum _ hF), Finset.sum_fn]
+        rw [eLpNorm_const_mul_ennreal (Finset.aemeasurable_fun_sum _ hF).aestronglyMeasurable,
+          Finset.sum_fn]
     _ ≤ c * ∑ i ∈ s, eLpNorm (F i) p μ := by
         gcongr
         exact eLpNorm_sum_le hp1
@@ -779,7 +780,7 @@ theorem eLpNorm_lqNorm_eq_const_mul (c : ℝ≥0∞) (hu : ∀ j, AEMeasurable (
     (h : ∀ᵐ x ∂μ, ∀ j, w j x = c * u j x) :
     eLpNorm (fun x => lqNorm q fun j => w j x) p μ =
       c * eLpNorm (fun x => lqNorm q fun j => u j x) p μ := by
-  rw [← eLpNorm_const_mul_ennreal c (aemeasurable_lqNorm_comp hu q) p]
+  rw [← eLpNorm_const_mul_ennreal (c := c) (aemeasurable_lqNorm_comp hu q).aestronglyMeasurable]
   refine eLpNorm_congr_ae ?_
   filter_upwards [h] with x hx
   rw [← ENNReal.lqNorm_const_mul]

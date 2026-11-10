@@ -169,7 +169,8 @@ theorem eLpNorm_tsum_dyadicWeight_enorm_blockFun_le [Nontrivial V] (hp₀₁ : p
           refine (tsum_dyadicWeight_enorm_blockFun_le hp₀ hp₀₁ hp₁ hs f x).trans_eq ?_
           ring
     _ = K * B ^ (1 - θ) * T ^ θ := by
-        rw [eLpNorm_const_mul_ennreal _ ((aemeasurable_lqNorm_blockFun s₀ ∞ f).pow_const θ),
+        rw [eLpNorm_const_mul_ennreal
+            ((aemeasurable_lqNorm_blockFun s₀ ∞ f).pow_const θ).aestronglyMeasurable,
           eLpNorm_rpow_lqNorm_blockFun_eq hp₀0 hp₀ hp₁0 hp₁]
     _ ≤ K * (nikolskiiBlockConst V p₀ ^ (1 - θ) * T ^ (1 - θ)) * T ^ θ := by
         rw [ENNReal.mul_rpow_of_nonneg _ _ (sub_nonneg.2 hθ1.le)]

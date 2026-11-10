@@ -275,7 +275,7 @@ theorem eLpNorm_one_indicator_closedBall_le (h : Lp ℂ 2 (volume : Measure V)) 
     eLpNorm ((closedBall (0 : V) K).indicator h) 1 volume ≤
       volume (closedBall (0 : V) K) ^ (1 / 2 : ℝ) * ‖h‖ₑ := by
   rw [eLpNorm_indicator_eq_eLpNorm_restrict
-    (measurableSet_closedBall : MeasurableSet (closedBall (0 : V) K))]
+    (measurableSet_closedBall : MeasurableSet (closedBall (0 : V) K)).nullMeasurableSet]
   refine (eLpNorm_le_eLpNorm_mul_rpow_measure_univ (q := 2) (by norm_num)
     (Lp.aestronglyMeasurable h).restrict).trans ?_
   rw [Measure.restrict_apply_univ, mul_comm, Lp.enorm_def]

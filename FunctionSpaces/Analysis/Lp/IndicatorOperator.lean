@@ -40,14 +40,14 @@ omit [Fact (1 ≤ p)] in
 /-- `1_s g ∈ L_p` for `g ∈ L_p`. -/
 theorem memLp_indicator_coe {s : Set α} (hs : MeasurableSet s) (g : Lp ℂ p μ) :
     MemLp (s.indicator (g : α → ℂ)) p μ :=
-  (Lp.memLp g).indicator hs
+  (Lp.memLp g).indicator hs.nullMeasurableSet
 
 omit [Fact (1 ≤ p)] in
 /-- `‖1_s g‖_p ≤ ‖g‖_p` for the class of `1_s g`. -/
 theorem norm_toLp_indicator_le {s : Set α} (hs : MeasurableSet s) (g : Lp ℂ p μ) :
     ‖(memLp_indicator_coe hs g).toLp _‖ ≤ ‖g‖ := by
   rw [Lp.norm_toLp, Lp.norm_def]
-  exact ENNReal.toReal_mono (Lp.eLpNorm_ne_top g) (eLpNorm_indicator_le _ hs)
+  exact ENNReal.toReal_mono (Lp.eLpNorm_ne_top g) (eLpNorm_indicator_le _ hs.nullMeasurableSet)
 
 /-- **Multiplication by the indicator of a measurable set** as an operator on `L_p` of norm at
 most `1`. -/
@@ -105,7 +105,7 @@ theorem setIntegral_mul_eq_lpPairing {s : Set α} (hs : MeasurableSet s) (a b : 
 theorem enorm_indicatorLp_le {s : Set α} (hs : MeasurableSet s) (g : Lp ℂ p μ) :
     ‖indicatorLp hs g‖ₑ ≤ ‖g‖ₑ := by
   rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hs g)]
-  exact eLpNorm_indicator_le _ hs
+  exact eLpNorm_indicator_le _ hs.nullMeasurableSet
 
 /-- **The `L_p(μ|_s)` norm as a cut-off norm**: `‖1_s f‖_{L_p(μ)} = ‖f|_s‖_{L_p(μ|_s)}` for a
 measurable `s` (Mathlib's `MeasureTheory.eLpNorm_indicator_eq_eLpNorm_restrict` and
@@ -113,7 +113,8 @@ measurable `s` (Mathlib's `MeasureTheory.eLpNorm_indicator_eq_eLpNorm_restrict` 
 theorem enorm_indicatorLp_eq {s : Set α} (hs : MeasurableSet s) (f : Lp ℂ p μ) :
     ‖indicatorLp hs f‖ₑ = ‖LpToLpRestrictCLM α ℂ ℂ μ p s f‖ₑ := by
   rw [Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (indicatorLp_apply_ae hs f),
-    eLpNorm_indicator_eq_eLpNorm_restrict hs, eLpNorm_congr_ae (LpToLpRestrictCLM_coeFn ℂ s f)]
+    eLpNorm_indicator_eq_eLpNorm_restrict hs.nullMeasurableSet,
+    eLpNorm_congr_ae (LpToLpRestrictCLM_coeFn ℂ s f)]
 
 /-- Two elements of `L_p` have the same restriction `1_s F = 1_s f` to a measurable set `s` iff
 they agree almost everywhere on `s`: Mathlib's `MeasureTheory.ae_eq_restrict_iff_indicator_ae_eq`
@@ -131,7 +132,8 @@ omit [Fact (1 ≤ p)] in
 (Mathlib's `MeasureTheory.memLp_indicator_iff_restrict`). -/
 theorem memLp_indicator_restrict {T O : Set α} (hT : MeasurableSet T) (hTO : T ⊆ O)
     (g : Lp ℂ p (μ.restrict O)) : MemLp (T.indicator (g : α → ℂ)) p μ :=
-  (memLp_indicator_iff_restrict hT).2 ((Lp.memLp g).mono_measure (Measure.restrict_mono hTO le_rfl))
+  (memLp_indicator_iff_restrict hT.nullMeasurableSet).2
+    ((Lp.memLp g).mono_measure (Measure.restrict_mono hTO le_rfl))
 
 omit [Fact (1 ≤ p)] in
 /-- `‖1_T g‖_{L_p(μ)} ≤ ‖g‖_{L_p(μ|_O)}` for `T ⊆ O` (Mathlib's
@@ -139,7 +141,7 @@ omit [Fact (1 ≤ p)] in
 theorem eLpNorm_indicator_restrict_le {T O : Set α} (hT : MeasurableSet T) (hTO : T ⊆ O)
     (g : Lp ℂ p (μ.restrict O)) :
     eLpNorm (T.indicator (g : α → ℂ)) p μ ≤ eLpNorm g p (μ.restrict O) := by
-  rw [eLpNorm_indicator_eq_eLpNorm_restrict hT]
+  rw [eLpNorm_indicator_eq_eLpNorm_restrict hT.nullMeasurableSet]
   exact eLpNorm_mono_measure _ (Measure.restrict_mono hTO le_rfl)
 
 /-- **Extension by zero** from `L_p(μ|_O)` to `L_p(μ)` on a measurable `T ⊆ O`: the operator

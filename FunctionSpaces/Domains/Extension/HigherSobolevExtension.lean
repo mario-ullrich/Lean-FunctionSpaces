@@ -136,9 +136,9 @@ theorem eLpNorm_lqNorm_conv_higherKernel_le [Nontrivial V] (hp1 : 1 < p) (hp : p
       czConst V p (meanZeroOverlap (b.higherKernel L m i))
         (4 * familyHormanderConst V fun k l => SchwartzMap.seminorm ℝ k l (b.higherKernel L m i)) *
         eLpNorm g p (volume.restrict T) := by
-  rw [← eLpNorm_indicator_eq_eLpNorm_restrict T.isOpen.measurableSet]
+  rw [← eLpNorm_indicator_eq_eLpNorm_restrict T.isOpen.measurableSet.nullMeasurableSet]
   exact (b.isCZFamily_higherKernel hmL i).eLpNorm_lqNorm_conv_le hp1 hp
-    ((memLp_indicator_iff_restrict T.isOpen.measurableSet).2 hg)
+    ((memLp_indicator_iff_restrict T.isOpen.measurableSet.nullMeasurableSet).2 hg)
 
 /-- The constant `∑_i C_p(K_i)` of the bound of the local means by the derivatives of order `m`,
 with the constants `C_p(K_i) = Rd.czConst V p B_i H_i` of the Calderón–Zygmund families of the
@@ -178,10 +178,12 @@ theorem tlLocalNormOn_le_of_hasWeakLineDeriv_words [Nontrivial V] (hp1 : 1 < p) 
           eLpNorm (g i) p (volume.restrict T) := by
   have hT := T.isOpen.measurableSet
   have hFn : ‖F‖ₑ = eLpNorm f p (volume.restrict T) := by
-    rw [Lp.enorm_def, eLpNorm_congr_ae hF, eLpNorm_indicator_eq_eLpNorm_restrict hT]
+    rw [Lp.enorm_def, eLpNorm_congr_ae hF,
+      eLpNorm_indicator_eq_eLpNorm_restrict hT.nullMeasurableSet]
   refine (b.dilationSmoothed.tlLocalNormOn_le_of_pointwise hp L m hW (b.higherKernel L m)
     (fun i => (T : Set V).indicator (g i))
-    (fun i => ((memLp_indicator_iff_restrict hT).2 (hg i)).aestronglyMeasurable) (2 ^ m)
+    (fun i => ((memLp_indicator_iff_restrict hT.nullMeasurableSet).2 (hg i)).aestronglyMeasurable)
+      (2 ^ m)
     (fun x hx j => b.dyadicWeight_mul_enorm_conv_kernel_succ_le hmL.le hf hfg j (hsupp x hx j))
     hF).trans ?_
   rw [hFn]
@@ -315,7 +317,7 @@ theorem extendsSobolevOrder_zero [Fact (1 ≤ p)] (O : Opens V) : ExtendsSobolev
   have h0 := hfg 0 le_rfl Fin.elim0
   have hfg0 : f =ᵐ[volume.restrict O] g 0 Fin.elim0 := (hasWeakLineDeriv_fin_zero _ h0.1).unique h0
   have hf : MemLp ((O : Set V).indicator f) p volume :=
-    (memLp_indicator_iff_restrict hO).2 ((hg 0 le_rfl Fin.elim0).ae_eq hfg0.symm)
+    (memLp_indicator_iff_restrict hO.nullMeasurableSet).2 ((hg 0 le_rfl Fin.elim0).ae_eq hfg0.symm)
   refine ⟨(O : Set V).indicator f, fun _ _ => (O : Set V).indicator f, fun k hk w => ?_,
     ae_of_all _ fun x hx => Set.indicator_of_mem hx f, ?_⟩
   · obtain rfl : k = 0 := Nat.le_zero.1 hk
@@ -323,7 +325,7 @@ theorem extendsSobolevOrder_zero [Fact (1 ≤ p)] (O : Opens V) : ExtendsSobolev
       (locallyIntegrableOn_of_memLp Fact.out (by rw [volume_restrict_top]; exact hf))
   · simp only [zero_add, Finset.range_one, Finset.sum_singleton, one_mul]
     refine Finset.sum_le_sum fun w _ => ?_
-    rw [eLpNorm_indicator_eq_eLpNorm_restrict hO, Subsingleton.elim w Fin.elim0,
+    rw [eLpNorm_indicator_eq_eLpNorm_restrict hO.nullMeasurableSet, Subsingleton.elim w Fin.elim0,
       eLpNorm_congr_ae hfg0]
 
 /-- **The value and the derivatives of top order by the norm of `W^m_p`**: for `m ≥ 1`, if
@@ -394,7 +396,7 @@ theorem extendsSobolevOrder [Nontrivial V] (hp1 : 1 < p) (hp : p ≠ ∞) {m : �
   have h0 := hfg 0 (Nat.zero_le m) Fin.elim0
   have hf : MemLp f p (volume.restrict T) :=
     (hg 0 (Nat.zero_le m) Fin.elim0).ae_eq ((hasWeakLineDeriv_fin_zero _ h0.1).unique h0).symm
-  have hf₀ := (memLp_indicator_iff_restrict T.isOpen.measurableSet).2 hf
+  have hf₀ := (memLp_indicator_iff_restrict T.isOpen.measurableSet.nullMeasurableSet).2 hf
   have hY : ∑ k ∈ Finset.range (m + 1), ∑ w : Fin k → Fin (finrank ℝ V),
       eLpNorm (g k w) p (volume.restrict T) ≠ ∞ :=
     ENNReal.sum_ne_top.2 fun k hk => ENNReal.sum_ne_top.2 fun w _ =>

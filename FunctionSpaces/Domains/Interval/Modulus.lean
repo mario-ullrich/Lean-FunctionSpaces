@@ -146,7 +146,8 @@ theorem eLpNorm_indicator_stepSet_Icc (r : ℕ) {h : ℝ} (hh : 0 ≤ h) (p : �
     (f : ℝ → ℂ) :
     eLpNorm ((Rd.stepSet (Icc a b) r h).indicator ((fwdDiff h)^[r] f)) p volume =
       eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) := by
-  rw [stepSet_Icc_of_nonneg r hh, eLpNorm_indicator_eq_eLpNorm_restrict measurableSet_Icc]
+  rw [stepSet_Icc_of_nonneg r hh,
+    eLpNorm_indicator_eq_eLpNorm_restrict measurableSet_Icc.nullMeasurableSet]
   rfl
 
 /-- The **modulus of smoothness of order `r`** on `[a, b]` in `L_p`, the modulus on the set

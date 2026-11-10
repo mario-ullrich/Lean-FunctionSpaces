@@ -356,8 +356,8 @@ theorem eLpNorm_le_of_le_lqNorm_maximal_proj (hp1 : 1 < p) (hp : p ≠ ∞) {q :
           (h.mono fun x hx => by simpa only [enorm_eq_self, Function.comp_apply] using hx)
     _ = C * eLpNorm (fun x => lqNorm q (fun i => Rd.maximal (fun y => g i (proj y)) x)) p
           (volume.restrict (periodBox 0)) :=
-        eLpNorm_const_mul_ennreal C
-          (measurable_lqNorm_comp (fun i => Rd.measurable_maximal _) q).aemeasurable p
+        eLpNorm_const_mul_ennreal (c := C)
+          (measurable_lqNorm_comp (fun i => Rd.measurable_maximal _) q).aestronglyMeasurable
     _ ≤ C * (periodicFSConst d p q * eLpNorm (fun t => lqNorm q (fun i => g i t)) p volume) := by
         gcongr
         exact feffermanStein_periodic hp1 hp hq1 g hg

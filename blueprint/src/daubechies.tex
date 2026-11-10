@@ -1570,7 +1570,7 @@ statements below without integrability hypotheses hold for every $f$.
 \begin{lemma}[Continuity and the uniform bound]
 \label{lem:daub-fourier-continuous}
 \lean{Real.continuous_fourier_of_integrable, Real.continuous_fourierInv_of_integrable,
-  Real.norm_fourier_le_integral_norm, Real.norm_fourierInv_le_integral_norm}
+  Real.norm_fourierInv_le_integral_norm}
 \leanok
 For every integrable $f : \R \to \C$ the functions $\widehat f$ and $\mathcal F^{-1} f$ are
 continuous. For every $f : \R \to \C$ and all $\xi, x \in \R$,
@@ -1584,6 +1584,7 @@ continuous. For every $f : \R \to \C$ and all $\xi, x \in \R$,
 \uses{lem:fourier-conv, lem:fourier-integrable}
 The case $V = \R$ of \Cref{lem:fourier-conv} and \Cref{lem:fourier-integrable}:
 $|e^{-2\pi i x \xi}| = 1$, and dominated convergence with the dominating function $|f|$; the
+bound for $\widehat f$ is Mathlib's \texttt{Real.norm\_fourier\_le\_integral\_norm}, and the
 inverse transform is $\mathcal F^{-1} f(x) = \widehat f(-x)$.
 \end{proof}
 
@@ -5602,7 +5603,7 @@ with multiplicity.
 
 \begin{lemma}[Real polynomials over $\C$]
 \label{lem:daub-real-poly-roots}
-\lean{Multiset.norm_prod, Complex.aeval_ofReal, Polynomial.map_conj_aroots,
+\lean{Complex.aeval_ofReal, Polynomial.map_conj_aroots,
   Polynomial.map_comp_conj_aroots, Polynomial.ofReal_ne_of_mem_aroots,
   Polynomial.aeval_eq_mul_prod_aroots, Polynomial.eval_eq_abs_leadingCoeff_mul_prod_norm}
 \leanok

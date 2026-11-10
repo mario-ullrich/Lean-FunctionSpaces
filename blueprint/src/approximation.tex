@@ -462,7 +462,7 @@ $\ell_q$ norms.
 
 \begin{lemma}[{Homogeneity and powers of $L_p$ norms in $[0, \infty]$}]
 \label{lem:lp-norm-homogeneity}
-\lean{MeasureTheory.eLpNorm_const_mul_ennreal, MeasureTheory.eLpNorm_fun_rpow}
+\lean{MeasureTheory.eLpNorm_fun_rpow}
 \leanok
 For every measure space $(X, \mu)$, every measurable $h : X \to [0, \infty]$, every
 $c \in [0, \infty]$, every $p \in [0, \infty]$ and every $r > 0$,
@@ -474,7 +474,8 @@ $c \in [0, \infty]$, every $p \in [0, \infty]$ and every $r > 0$,
 \begin{proof}
 \leanok
 For $0 < p < \infty$ the norm is $(\int h^p)^{1/p}$, and constants leave the integral; for
-$p = \infty$ the essential supremum is homogeneous. The power rule is Mathlib's
+$p = \infty$ the essential supremum is homogeneous; this is Mathlib's
+\texttt{eLpNorm\_const\_mul\_ennreal}. The power rule is Mathlib's
 \texttt{eLpNorm\_enorm\_rpow}.
 \end{proof}
 

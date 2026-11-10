@@ -165,7 +165,7 @@ git = "https://github.com/mario-ullrich/Lean-FunctionSpaces"
 rev = "<commit>"
 ```
 
-The toolchain is `leanprover/lean4:v4.35.0-rc2`, and Mathlib comes in at the tag `v4.35.0-rc2`.
+The toolchain is `leanprover/lean4:v4.35.0`, and Mathlib comes in at the tag `v4.35.0`.
 `lake exe cache get` fetches the prebuilt Mathlib, `lake build` builds, and
 `import FunctionSpaces` imports everything.
 
@@ -188,10 +188,10 @@ Section 5.2.
 
 In Lean-FunctionSpaces:
 
-* **One version for all libraries (I.0).** Lean-FunctionSpaces is on `v4.35.0-rc2`,
-  Lean-SNumbers on `v4.35.0`, and TauCeti on `v4.36.0-rc2`. The FEEC/BEEC library, Lean-SNumbers
-  and Lean-FunctionSpaces should agree on one version:
-  - `v4.35.0` is the cheapest choice;
+* **One version for all libraries (I.0).** Lean-FunctionSpaces and Lean-SNumbers are on
+  `v4.35.0`, and TauCeti is on `v4.36.0-rc2`. The FEEC/BEEC library should use the same version
+  as the two:
+  - `v4.35.0` needs no change in either library;
   - `v4.36.0` is the choice if the FEEC/BEEC library also uses TauCeti.
 * **Wavelets on `ℝ^d` (I.4, then H.3).** Tensor-product Daubechies wavelets on `ℝ^d`, and the
   description of `B^s_{2,2}(ℝ^d) = H^s(ℝ^d)` by wavelet coefficients. The case `d = 1` is X.4.

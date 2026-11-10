@@ -113,11 +113,11 @@ theorem phiIntegrand_const_mul (a : ℝ≥0∞) (φ : ℝ≥0∞ → ℝ≥0∞)
 
 /-- **Homogeneity of `Φ_{θ,q}`**: `Φ_{θ,q}(a φ) = a Φ_{θ,q}(φ)` for every `a ∈ [0, ∞]` and
 measurable `φ`, by the homogeneity of `L_q` norms of `[0, ∞]`-valued functions
-(`MeasureTheory.eLpNorm_const_mul_ennreal`). -/
+(Mathlib's `MeasureTheory.eLpNorm_const_mul_ennreal`). -/
 theorem phiFunctional_const_mul (a : ℝ≥0∞) (hφ : Measurable φ) :
     phiFunctional θ q (fun t => a * φ t) = a * phiFunctional θ q φ := by
   rw [phiFunctional_eq, phiFunctional_eq, phiIntegrand_const_mul]
-  exact eLpNorm_const_mul_ennreal a (measurable_phiIntegrand_of_measurable hφ).aemeasurable q
+  exact eLpNorm_const_mul_ennreal (measurable_phiIntegrand_of_measurable hφ).aestronglyMeasurable
 
 /-- The integrand of `φ(c ·)` at `t` is the integrand of `c^θ φ` at `c t`:
 `t^(-θ) φ(c t) = (c t)^(-θ) c^θ φ(c t)`, for `0 < c < ∞`. -/

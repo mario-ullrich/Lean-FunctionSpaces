@@ -116,7 +116,7 @@ theorem memLp_ppFun (k : ℕ) (Q : ℕ → ℂ[X]) (p : ℝ≥0∞) : MemLp (ppF
     funext x; rw [ppFun, Finset.sum_apply]
   rw [this]
   exact memLp_finsetSum' _ fun n _ =>
-    (memLp_polyFun (Q n) p 0 1).indicator (measurableSet_dyadicIco k n)
+    (memLp_polyFun (Q n) p 0 1).indicator (measurableSet_dyadicIco k n).nullMeasurableSet
 
 /-- Piecewise polynomials are additive in the pieces. -/
 theorem ppFun_add (k : ℕ) (Q Q' : ℕ → ℂ[X]) :

@@ -583,11 +583,12 @@ theorem locallyIntegrable_indicator_add_indicator_comp_halfSpaceReflection {s : 
     LocallyIntegrable (fun y => s.indicator a y + s.indicator b (halfSpaceReflection e y))
       volume := by
   refine (locallyIntegrable_of_forall_integrableOn_ball 0 fun R =>
-    (integrableOn_indicator_iff hs).2 (ha R)).add
+    (integrableOn_indicator_iff hs.nullMeasurableSet).2 (ha R)).add
       (locallyIntegrable_of_forall_integrableOn_ball 0 fun R => ?_)
   have h := ((measurePreserving_halfSpaceReflection e).integrableOn_comp_preimage
     (halfSpaceReflection e).toHomeomorph.measurableEmbedding
-      (f := s.indicator b) (s := ball 0 R)).2 ((integrableOn_indicator_iff hs).2 (hb R))
+      (f := s.indicator b) (s := ball 0 R)).2
+        ((integrableOn_indicator_iff hs.nullMeasurableSet).2 (hb R))
   rwa [LinearIsometryEquiv.preimage_ball, map_zero] at h
 
 /-- Multipliers of a function on a measurable set `s`: `∫ c 1_s b = ∫_s c b`. -/
@@ -749,7 +750,8 @@ theorem eLpNorm_indicator_add_indicator_comp_halfSpaceReflection_le {E : Type*}
     _ ≤ eLpNorm (s.indicator a) p volume + eLpNorm (s.indicator b) p volume :=
         add_le_add le_rfl hc
     _ = _ := by
-      rw [eLpNorm_indicator_eq_eLpNorm_restrict hs, eLpNorm_indicator_eq_eLpNorm_restrict hs]
+      rw [eLpNorm_indicator_eq_eLpNorm_restrict hs.nullMeasurableSet,
+        eLpNorm_indicator_eq_eLpNorm_restrict hs.nullMeasurableSet]
 
 /-- **The `L_p` norm of the even reflection**: `‖E u‖_{L_p(V)} ≤ 2 ‖u‖_{L_p(H₊)}` for `1 ≤ p`
 (`Rd.eLpNorm_indicator_add_indicator_comp_halfSpaceReflection_le`). -/

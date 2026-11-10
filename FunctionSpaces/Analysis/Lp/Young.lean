@@ -7,6 +7,7 @@ module
 
 public import FunctionSpaces.Analysis.Lp.LintegralForm
 public import Mathlib.Analysis.Convolution
+public import Mathlib.MeasureTheory.Integral.Prod
 
 /-!
 # Young's inequality on measurable groups

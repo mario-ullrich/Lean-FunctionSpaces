@@ -367,7 +367,7 @@ theorem norm_iteratedFDeriv_cellAtom_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {K g : 
   have hKs : HasCompactSupport K := HasCompactSupport.intro (isCompact_closedBall 0 (ρ / 2 ^ j))
     fun y hy => hKρ y (by simpa [mem_closedBall, dist_zero_right, not_le] using hy)
   have hgl : LocallyIntegrable ((cell j m).indicator g) volume :=
-    (hg.indicator (measurableSet_cell j m)).locallyIntegrable hp1
+    (hg.indicator (measurableSet_cell j m).nullMeasurableSet).locallyIntegrable hp1
   refine norm_iteratedFDeriv_const_mul_conv_le hK hKs hgl _ l x (by positivity) fun v => ?_
   set K' : V → ℂ := fun y => iteratedFDeriv ℝ l K y v
   have hK'ρ : ∀ y, ρ / 2 ^ j < ‖y‖ → K' y = 0 := fun y hy => by
@@ -417,7 +417,7 @@ theorem isSmoothAtom_cellAtom {p : ℝ≥0∞} (hp1 : 1 ≤ p) (L K j : ℕ) {g 
     b.dual_eq_zero_of_lt L j hy
   have hKs := b.hasCompactSupport_dual L j
   have hgl : LocallyIntegrable ((cell j m).indicator g) volume :=
-    (hg.indicator (measurableSet_cell j m)).locallyIntegrable hp1
+    (hg.indicator (measurableSet_cell j m).nullMeasurableSet).locallyIntegrable hp1
   have hsmooth : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) (cellAtom p (b.dual L j) j g m) := by
     have := (contDiff_conv (b.contDiff_dual L j) hKs hgl).const_smul (cellCoef p j g m)⁻¹
     exact this

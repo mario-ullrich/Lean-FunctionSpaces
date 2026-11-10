@@ -52,18 +52,6 @@ With the roots `1/a(t)` outside the disk, `Q(t) = 2 - t` (root `t = 2`, `a = 2 -
 open Polynomial
 open scoped ComplexConjugate
 
-namespace Multiset
-
-/-- **The norm of a product over a multiset** is the product of the norms,
-`‖∏_{x ∈ s} x‖ = ∏_{x ∈ s} ‖x‖`, in every seminormed commutative ring whose norm is
-multiplicative with `‖1‖ = 1`, such as `ℝ` and `ℂ` (the multiset form of Mathlib's `norm_prod`
-and `List.norm_prod`). -/
-protected theorem norm_prod {α : Type*} [SeminormedCommRing α] [NormMulClass α] [NormOneClass α]
-    (s : Multiset α) : ‖s.prod‖ = (s.map norm).prod :=
-  map_multiset_prod (normHom : α →*₀ ℝ) s
-
-end Multiset
-
 namespace Complex
 
 /-- For a real polynomial `p` and `x ∈ ℝ`, evaluating `p` at the complex number `x` gives the
@@ -95,7 +83,7 @@ equals `t`), the equation `a² - 2ta + 1 = 0` has a root with `|a| < 1`. Its two
 (`Complex.joukowsky_eq_re_of_norm_eq_one`), so one of them lies in the open unit disk. -/
 theorem exists_joukowsky_root {t : ℂ} (ht : ∀ r ∈ Set.Icc (-1 : ℝ) 1, (r : ℂ) ≠ t) :
     ∃ a : ℂ, ‖a‖ < 1 ∧ a ^ 2 - 2 * t * a + 1 = 0 := by
-  obtain ⟨s, hs⟩ := IsAlgClosed.exists_eq_mul_self (t ^ 2 - 1)
+  obtain ⟨s, hs⟩ := IsAlgClosed.isSquare (t ^ 2 - 1)
   have hne : ∀ a : ℂ, a ^ 2 - 2 * t * a + 1 = 0 → ‖a‖ ≠ 1 := fun a h ha => by
     refine ht a.re ⟨?_, ?_⟩ (joukowsky_eq_re_of_norm_eq_one h ha).symm
     · linarith [neg_abs_le a.re, abs_re_le_norm a]

@@ -180,7 +180,7 @@ theorem measurePreserving_reflect : MeasurePreserving Ω.reflect volume volume :
 everywhere on the graph domain, then their extensions by reflection agree almost everywhere on
 `V`, since the inverse flattening maps `H₊` into the graph domain and the flattening, its inverse
 and `σ` preserve Lebesgue measure (Mathlib's
-`MeasureTheory.Measure.QuasiMeasurePreserving.ae_eq_comp`). -/
+`MeasureTheory.QuasiMeasurePreserving.ae_eq_comp`). -/
 theorem reflectionExtension_congr_ae {u u' : V → ℂ} (h : u =ᵐ[volume.restrict Ω.domain] u') :
     Ω.reflectionExtension u =ᵐ[volume] Ω.reflectionExtension u' := by
   have hH := (openHalfSpace Ω.e).isOpen.measurableSet

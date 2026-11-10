@@ -194,7 +194,8 @@ theorem eLpNorm_inter_le_of_slice_le {F G : (Fin d → ℝ) → ℂ} (hF : Measu
     eLpNorm F p ((cubeVol d).restrict (R ∩ {x | x i ∈ S})) ≤
       C * eLpNorm G p ((cubeVol d).restrict (R ∩ {x | x i ∈ S'})) := by
   rw [eLpNorm_inter_eq_slice hF hp0 hp i hR hRi hS, eLpNorm_inter_eq_slice hG hp0 hp i hR hRi hS',
-    ← eLpNorm_const_mul_ennreal C (measurable_eLpNorm_slice hG hp0 hp i _).aemeasurable]
+    ← eLpNorm_const_mul_ennreal (c := C)
+      (measurable_eLpNorm_slice hG hp0 hp i _).aestronglyMeasurable]
   exact eLpNorm_mono_enorm (measurable_eLpNorm_slice hF hp0 hp i _).aestronglyMeasurable
     fun x => by simpa only [enorm_eq_self] using h x
 

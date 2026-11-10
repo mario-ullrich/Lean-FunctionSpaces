@@ -160,7 +160,7 @@ theorem eLpNorm_le_of_comp_proj_le {p : ℝ≥0∞} (hp1 : 1 ≤ p) {F G : UnitA
 /-- **The quotient map pulls null sets back to null sets**: the period boxes `P_m`, `m ∈ ℤ^d`,
 cover `ℝ^d`, and on each of them `π` preserves measure. -/
 theorem quasiMeasurePreserving_proj :
-    Measure.QuasiMeasurePreserving (proj : EuclideanSpace ℝ d → UnitAddTorus d) volume volume := by
+    QuasiMeasurePreserving (proj : EuclideanSpace ℝ d → UnitAddTorus d) volume volume := by
   refine ⟨measurable_proj, Measure.AbsolutelyContinuous.mk fun s hs h0 => ?_⟩
   rw [Measure.map_apply measurable_proj hs]
   have hcover : proj ⁻¹' s ⊆
@@ -344,7 +344,7 @@ theorem eLpNorm_indicator_tripleBox_comp_proj {ε : Type*} [TopologicalSpace ε]
     (hF : AEStronglyMeasurable F volume) :
     eLpNorm (tripleBox.indicator (F ∘ proj)) p volume =
       3 ^ ((Fintype.card d : ℝ) / p.toReal) * eLpNorm F p volume := by
-  rw [eLpNorm_indicator_eq_eLpNorm_restrict measurableSet_tripleBox,
+  rw [eLpNorm_indicator_eq_eLpNorm_restrict measurableSet_tripleBox.nullMeasurableSet,
     eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp
       (hF.comp_quasiMeasurePreserving quasiMeasurePreserving_proj).restrict,
     eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp hF, Function.comp_def,

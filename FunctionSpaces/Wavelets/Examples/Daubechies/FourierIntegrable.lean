@@ -20,7 +20,7 @@ lemmas of `FunctionSpaces.Analysis.Fourier.LittlewoodPaleyKernels`.
 
 * **Continuity and the uniform bound.** For integrable `f`, `𝓕 f` and `𝓕⁻ f` are continuous
   (`Real.continuous_fourier_of_integrable`), and `‖𝓕 f(ξ)‖ ≤ ∫ ‖f‖`
-  (`Real.norm_fourier_le_integral_norm`).
+  (Mathlib's `Real.norm_fourier_le_integral_norm`).
 * **The value at `0`**: `𝓕 f(0) = ∫ f` for every `f` (`Real.fourier_apply_zero`).
 * **Linearity**: `𝓕[c f] = c 𝓕 f` for every `f` (`Real.fourier_const_mul_apply`) and finite sums
   of integrable functions (`Real.fourier_sum_apply`), each with its `𝓕⁻` version.
@@ -67,12 +67,6 @@ theorem continuous_fourier_of_integrable (hf : Integrable f) : Continuous (𝓕 
 continuous (`Rd.continuous_fourierInv_of_integrable` on `ℝ`). -/
 theorem continuous_fourierInv_of_integrable (hf : Integrable f) : Continuous (𝓕⁻ f) :=
   Rd.continuous_fourierInv_of_integrable hf
-
-/-- The uniform bound `‖𝓕 f(ξ)‖ ≤ ∫ ‖f‖` (`Rd.norm_fourier_le_integral_norm` on `ℝ`). It holds
-for every `f`: if `f` is not integrable, then `𝓕 f(ξ) = 0`, since Lean's integral of a
-non-integrable function is `0`. -/
-theorem norm_fourier_le_integral_norm (f : ℝ → ℂ) (ξ : ℝ) : ‖𝓕 f ξ‖ ≤ ∫ x, ‖f x‖ :=
-  Rd.norm_fourier_le_integral_norm f ξ
 
 /-- The uniform bound `‖𝓕⁻ f(x)‖ ≤ ∫ ‖f‖` for the inverse transform
 (`Rd.norm_fourierInv_le_integral_norm` on `ℝ`). -/

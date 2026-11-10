@@ -347,7 +347,7 @@ theorem eLpNorm_indicator_le_tsum {p : ℝ≥0∞} [Fact (1 ≤ p)] {Ω : Set V}
             Set.indicator_of_notMem hzΩ, add_zero]
       rw [eLpNorm_congr_ae hxy]
       exact eLpNorm_add_le Fact.out)
-    (fun x => by rw [one_mul, Lp.enorm_def]; exact eLpNorm_indicator_le _ hΩ) hF
+    (fun x => by rw [one_mul, Lp.enorm_def]; exact eLpNorm_indicator_le _ hΩ.nullMeasurableSet) hF
 
 /-- **The modulus on `Ω` of a series**: if `∑_{j ≤ J} f_j → F` in `L_p`, then
 `ω_r(F, 2^(-k), Ω)_p ≤ ∑_j ω_r(f_j, 2^(-k), Ω)_p`. -/

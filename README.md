@@ -244,7 +244,7 @@ the proofs. [MathlibCandidates.md](MathlibCandidates.md) lists what could be ups
 ## Building
 
 Requires [`elan`](https://github.com/leanprover/elan); Lean and Mathlib are pinned to
-`v4.35.0-rc2`. Run `lake exe cache get` and then `lake build` from inside this folder, and do not
+`v4.35.0`. Run `lake exe cache get` and then `lake build` from inside this folder, and do not
 run `lake update`, which re-resolves the dependencies. The blueprint follows
 [leanblueprint](https://github.com/PatrickMassot/leanblueprint) (`leanblueprint pdf`,
 `leanblueprint web`). GitHub Actions builds the project and the blueprint on every push, checks

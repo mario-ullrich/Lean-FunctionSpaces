@@ -9,6 +9,7 @@ public import FunctionSpaces.Wavelets.Examples.Daubechies.Mask
 public import Mathlib.Analysis.Normed.Module.MultipliableUniformlyOn
 public import Mathlib.Analysis.SpecialFunctions.Trigonometric.Sinc
 public import Mathlib.Analysis.SpecificLimits.Basic
+public import Mathlib.Topology.Algebra.InfiniteSum.Field
 public import Mathlib.Topology.UniformSpace.UniformApproximation
 
 /-!
