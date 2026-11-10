@@ -4,7 +4,8 @@ This project formalises function spaces of smooth functions in Lean 4 and Mathli
 Triebel–Lizorkin, Sobolev and Bessel potential spaces. Each space has several classical
 descriptions, and the project proves that they define the same space, on `ℝ^d`, the torus,
 intervals and the cube, bounded Lipschitz domains and compact manifolds. Approximation spaces
-give an abstract framework for many of these descriptions. The project contains no `sorry`.
+give an abstract framework for many of these descriptions. The project has about 111 000 lines
+of Lean in 285 files and contains no `sorry`.
 
 * **Blueprint** (a webpage explaining the mathematics):
   <https://mario-ullrich.github.io/Lean-FunctionSpaces/>
@@ -36,6 +37,14 @@ On a domain the descriptions use the values of `f` in the domain (intrinsic diff
 derivatives, eigenfunction expansions) or extensions to `ℝ^d` (restrictions). A compact manifold
 carries its spaces in the charts of an atlas and a smooth measure, that is, a measure with a
 continuous positive density in every chart.
+
+## Why several descriptions
+
+Applications use different descriptions of the same space: finite element methods use weak
+derivatives, wavelet methods use coefficients, approximation theory uses best approximation and
+moduli of smoothness, and harmonic analysis uses Littlewood–Paley blocks. The proof that two
+descriptions agree is often long and technical. With the equivalences above, a statement proved
+in one description holds in the others, in the stated ranges.
 
 ## The map of characterisations
 
@@ -136,17 +145,9 @@ the last two rows it maps `H^1(Ω)` onto the boundary space.
 | bounded open set | `(L_2, H^1_0)_{θ,q}`, approximation by Dirichlet eigenfunctions | `0 < θ < 1` | [Dirichlet eigenfunctions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-dirichlet-eigenbasis.html#cor:dirichlet-interpolation) |
 | bounded Lipschitz domain, `d ≥ 1` | `(L_2, W^1_2)_{θ,q}`, approximation by Neumann eigenfunctions | `0 < θ < 1` | [Neumann eigenfunctions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-neumann-eigenbasis.html#cor:neumann-interpolation) |
 
-## Why several descriptions
-
-Applications use different descriptions of the same space: finite element methods use weak
-derivatives, wavelet methods use coefficients, approximation theory uses best approximation and
-moduli of smoothness, and harmonic analysis uses Littlewood–Paley blocks. The proof that two
-descriptions agree is often long and technical. With the equivalences above, a statement proved
-in one description holds in the others, in the stated ranges.
-
 ## Main results
 
-`V` is a finite-dimensional real inner product space, such as `ℝ^d`, of dimension `n`.
+`V` is a finite-dimensional real inner product space of dimension `d`, such as `ℝ^d`.
 
 * **Approximation spaces are interpolation spaces.** Let `ι : Y → X` be a bounded linear map
   of real normed spaces and `(A_n)` a scheme in `X` with Jackson's inequality
@@ -163,7 +164,7 @@ in one description holds in the others, in the stated ranges.
   `‖f‖_p + ‖(2^(ks) ω_2(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
   `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s+1/2-1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
   (`Daubechies.besov_iff_coeff_d4`).
-* **Sobolev, Bessel potential and Triebel–Lizorkin spaces.** Let `n ≥ 1` and `1 < p < ∞`. Every
+* **Sobolev, Bessel potential and Triebel–Lizorkin spaces.** Let `d ≥ 1` and `1 < p < ∞`. Every
   `f ∈ L_p(V)` has `‖f‖_{F^0_{p,2}} ≤ C ‖f‖_p` and `‖f‖_p ≤ C' ‖f‖_{F^0_{p,2}}`, with finite
   constants depending on `V` and `p` (`Rd.triebelLizorkinNorm_zero_two_le`,
   `Rd.enorm_le_triebelLizorkinNorm_zero_two`). For `m ∈ ℕ`, `f ∈ L_p(V)` lies in `W^m_p(V)` iff
@@ -171,11 +172,11 @@ in one description holds in the others, in the stated ranges.
   (`Rd.memSobolev_iff_memTriebelLizorkin`, `Rd.memSobolev_iff_memSobolev_bessel`). For real `s`,
   a tempered distribution lies in `H^{s,p}(V)` iff it lies in `F^s_{p,2}(V)`
   (`Rd.memSobolev_bessel_iff_memTriebelLizorkinDistr`).
-* **Sobolev embeddings.** Let `n ≥ 1`, `1 < p < ∞`, `m ∈ ℕ` and `f ∈ W^m_p(V)`. If `r < ∞` and
-  `1/r = 1/p - m/n`, then `f` agrees almost everywhere with a function in `L_r(V)`
-  (`Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`); if `m > n/p`, with a bounded continuous function
+* **Sobolev embeddings.** Let `d ≥ 1`, `1 < p < ∞`, `m ∈ ℕ` and `f ∈ W^m_p(V)`. If `r < ∞` and
+  `1/r = 1/p - m/d`, then `f` agrees almost everywhere with a function in `L_r(V)`
+  (`Rd.exists_memLp_ae_eq_of_memSobolev_of_eq`); if `m > d/p`, with a bounded continuous function
   (`Rd.exists_boundedContinuous_ae_eq_of_memSobolev`). For `1 ≤ p < ∞`, `r < ∞`,
-  `1/r = 1/p - 1/n` and `f ∈ W^1_p(V)`, some `u ∈ L_r(V)` equals `f` almost everywhere with
+  `1/r = 1/p - 1/d` and `f ∈ W^1_p(V)`, some `u ∈ L_r(V)` equals `f` almost everywhere with
   `‖u‖_r ≤ C ∑_k ‖∂_k f‖_p`, `C` Mathlib's Gagliardo–Nirenberg–Sobolev constant
   (`Rd.exists_memLp_ae_eq_of_memSobolev_one`).
 * **Bounded Lipschitz domains.** Let `Ω ⊆ V` be a bounded open set that agrees near each
@@ -188,31 +189,29 @@ in one description holds in the others, in the stated ranges.
   `Rd.BoundedLipschitzDomain.exists_besov_extension_le`). For `1 < p < ∞` and every `m`, every
   `f ∈ L_p(Ω)` with weak derivatives of order at most `m` in `L_p(Ω)` agrees on `Ω` with some
   `F ∈ W^m_p(V)` (`Rd.BoundedLipschitzDomain.memWeakSobolev_iff_exists_memSobolev_order`); for
-  `m = 1`, `n ≥ 1` and `1 ≤ p ≤ ∞` a bounded linear operator does this
+  `m = 1`, `d ≥ 1` and `1 ≤ p ≤ ∞` a bounded linear operator does this
   (`Rd.BoundedLipschitzDomain.sobolevExtensionL`).
 * **Traces.** Let `Ω` be as above, with boundary `Γ` and surface measure `σ`, the
-  `(n-1)`-dimensional Hausdorff measure on `Γ`. In the restrictions `H^1(Ω)` of `H^1(V)`, the
+  `(d-1)`-dimensional Hausdorff measure on `Γ`. In the restrictions `H^1(Ω)` of `H^1(V)`, the
   kernel `ker γ` of the boundary trace is `H^1_0(Ω)`, the closure of the restricted test
   functions (`Rd.BoundedLipschitzDomain.traceKer_eq_zeroBoundarySpace`). Let `H^{1/2}(Γ)` be the
   orthogonal complement of `ker γ` in `H^1(Ω)` and `τ` its trace into `L_2(Γ)`. Then `g ∈ L_2(Γ)`
-  is `τ t` for some `t` iff `∫_Γ ∫_Γ |g(x) - g(y)|² / |x - y|^n dσ(x) dσ(y) < ∞`, and `‖t‖²` is
+  is `τ t` for some `t` iff `∫_Γ ∫_Γ |g(x) - g(y)|² / |x - y|^d dσ(x) dσ(y) < ∞`, and `‖t‖²` is
   equivalent to `‖τ t‖²_{L_2(Γ)}` plus this form
   (`Rd.BoundedLipschitzDomain.mem_range_traceL2_iff_slobodeckij`,
   `Rd.BoundedLipschitzDomain.exists_traceL2_norm_equiv_slobodeckij`).
+* **Compact manifolds.** Let `M` be a compact Hausdorff smooth manifold of dimension `d ≥ 1`,
+  without boundary, with boundary or with corners, with a smooth measure `μ`. For `1 ≤ p < ∞`,
+  `s > 0` and `1 ≤ q ≤ ∞`, `B^s_{p,q}(M)`, defined by the chart pieces of a Besov atlas, is the
+  same for every atlas (`Manifold.memBesov_iff`).
 * **Eigenfunction expansions.** For an orthonormal basis of weak eigenfunctions `e_i` with
   eigenvalues `λ_i`, let `A_k` be the span of the `e_i` with `⌊√(1 + λ_i)⌋ < k`, and let
-  `0 < θ < 1`, `1 ≤ q ≤ ∞`. On `Ω` as above, `n ≥ 1`, with the Neumann eigenbasis, `f ∈ L_2(V)`
-  has `f|_Ω ∈ A^θ_q` iff `‖f‖_{L_2(Ω)} + ‖(2^(kθ) ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_q} < ∞`, for every
-  `r ≥ 1` (`Rd.BoundedLipschitzDomain.memApprox_neumannScheme_iff`). Let `M` be a compact
-  Hausdorff smooth manifold of dimension `n ≥ 1`, without boundary, with boundary or with corners,
-  with a smooth measure `μ`. For `1 ≤ p < ∞`, `s > 0` and `1 ≤ q ≤ ∞`, `B^s_{p,q}(M)`, defined by
-  the chart pieces of a Besov atlas, is the same for every atlas (`Manifold.memBesov_iff`). For
-  the eigenbasis of the chart form `a_A(u, w) = ∑_{k,j} ⟨∂_j P_k u, ∂_j P_k w⟩` of an atlas `A`,
-  `f ∈ L_2(μ)` lies in `A^θ_q` iff `f ∈ B^θ_{2,q}(M)`
-  (`Manifold.BesovAtlas.memApprox_chartScheme_iff`). In the principal part
-  `∑_k (ψ_k ∘ κ_k⁻¹)² |∇(u ∘ κ_k⁻¹)|²` of the chart form the weights satisfy `∑_k ψ_k² ≥ 1/N` for `N`
-  charts (`Manifold.BesovAtlas.inv_card_le_sum_sq_psi`), a step toward its uniform
-  ellipticity in the charts.
+  `0 < θ < 1`, `1 ≤ q ≤ ∞`. On a bounded Lipschitz domain `Ω`, `d ≥ 1`, with the Neumann
+  eigenbasis, `f ∈ L_2(V)` has `f|_Ω ∈ A^θ_q` iff
+  `‖f‖_{L_2(Ω)} + ‖(2^(kθ) ω_r(f, 2^(-k), Ω)_2)_k‖_{ℓ_q} < ∞`, for every `r ≥ 1`
+  (`Rd.BoundedLipschitzDomain.memApprox_neumannScheme_iff`). On `M` as above, with the eigenbasis
+  of the chart form `a_A(u, w) = ∑_{k,j} ⟨∂_j P_k u, ∂_j P_k w⟩` of an atlas `A`, `f ∈ L_2(μ)`
+  lies in `A^θ_q` iff `f ∈ B^θ_{2,q}(M)` (`Manifold.BesovAtlas.memApprox_chartScheme_iff`).
 
 ## Organisation
 
@@ -220,10 +219,32 @@ The library `ApproximationSpaces` holds the abstract theory: schemes, the spaces
 interpolation of couples (`Interpolation/`) and decompositions (`Decompositions/`). The library
 `FunctionSpaces` holds the function spaces in folders by setting: `Analysis/`, `MeasureSpaces/`,
 `Rd/` (one folder per characterisation), `Torus/`, `Domains/` (intervals, the cube, Lipschitz
-domains, traces, eigenbases, manifolds) and `Wavelets/`. The block documents in
-[`docs/`](docs/) state every result with its Lean name and list the files; the blueprint gives
-the proofs. [MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed, and
-[docs/FEECFoundations.md](docs/FEECFoundations.md) describes what a FEEC/BEEC library can build on.
+domains, traces, eigenbases, manifolds) and `Wavelets/`. The blueprint gives the proofs. The
+block documents state every result with its Lean name and list the files:
+
+* [Approximation spaces](docs/ApproximationSpaces.md): schemes, `A^s_q`, interpolation,
+  decompositions.
+* [Tools from analysis](docs/Analysis.md): `L_p` tools, convolution, maximal functions.
+* [Besov and Sobolev spaces on measure spaces](docs/MeasureSpaces.md): spaces of a scheme,
+  embeddings.
+* [The torus](docs/Torus.md): trigonometric approximation, moduli, traces, Sobolev spaces.
+* [Intervals, the cube, splines and wavelets](docs/IntervalCube.md): splines, Haar,
+  multiwavelets.
+* [Besov spaces on `ℝ^d`](docs/Rd.md): Littlewood–Paley blocks, differences, local means, atoms.
+* [Daubechies wavelets](docs/Daubechies.md): wavelet coefficients on `ℝ`.
+* [Dominating mixed smoothness](docs/MixedSmoothness.md): mixed differences, hyperbolic crosses.
+* [Triebel–Lizorkin spaces](docs/TriebelLizorkin.md): maximal inequalities, local means, atoms,
+  singular integrals.
+* [Sobolev spaces on `ℝ^d`](docs/SobolevRd.md): weak derivatives, `W^m_p = F^m_{p,2} = H^{m,p}`,
+  embeddings.
+* [Lipschitz domains and traces](docs/DomainsTraces.md): extension, traces, `H^1(Ω)`, Green's
+  formula.
+* [Manifolds and eigenbases](docs/Manifolds.md): compact manifolds, Dirichlet and Neumann
+  eigenfunctions.
+
+[MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed, and
+[Foundations for FEEC and BEEC](docs/FEECFoundations.md) describes what a FEEC/BEEC library can
+build on.
 
 ## What is left to do
 
@@ -253,8 +274,15 @@ that every `\lean{...}` of the blueprint resolves, and publishes both.
 ## AI assistance
 
 The formalisation was written with Claude Code, and Lean checks every statement and proof. The
-mathematical design, the choice of statements and the review of what the proofs say are the
-author's; the column "Human-checked" in the tables of [`docs/`](docs/) records that review.
+mathematical design and the choice of statements are the author's. The author has read all
+statements in broad terms; a detailed check and a second opinion are pending. The column
+"Human-checked" in the tables of the block documents records the detailed check.
+
+## Citing and contact
+
+[CITATION.cff](CITATION.cff) holds the citation data; GitHub shows it under "Cite this
+repository". Questions, corrections and wishes go to the
+[issue tracker](https://github.com/mario-ullrich/Lean-FunctionSpaces/issues).
 
 ## License
 

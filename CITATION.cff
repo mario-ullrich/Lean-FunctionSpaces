@@ -1,0 +1,18 @@
+cff-version: 1.2.0
+message: "If you use this project, please cite it as below."
+title: "Characterizations of Function Spaces in Lean 4 / Mathlib"
+type: software
+authors:
+  - family-names: Ullrich
+    given-names: Mario
+repository-code: "https://github.com/mario-ullrich/Lean-FunctionSpaces"
+url: "https://mario-ullrich.github.io/Lean-FunctionSpaces/"
+license: Apache-2.0
+date-released: 2026-11-10
+keywords:
+  - Lean 4
+  - Mathlib
+  - Besov spaces
+  - Sobolev spaces
+  - Triebel-Lizorkin spaces
+  - approximation spaces
