@@ -42,14 +42,14 @@ namespace BoundedLipschitzDomain
 
 variable (Ω : BoundedLipschitzDomain V)
 
-/-- **`H^1(Ω) = W^1_2(Ω)`** (H.2 for `p = 2`): for a bounded Lipschitz domain `Ω`, `f ∈ L_2(V)`
+/-- **`H^1(Ω) = W^1_2(Ω)`**: for a bounded Lipschitz domain `Ω`, `f ∈ L_2(V)`
 lies in the restriction space `H^1(Ω)` iff it lies in the Sobolev space
 `W^1_2(Ω)` of weak derivatives on `Ω`. -/
 theorem memSobolevOn_iff_memWeakSobolev (f : Lp ℂ 2 (volume : Measure V)) :
     Ω.MemSobolevOn f ↔ MemWeakSobolev Ω.toOpens 1 2 f :=
   (Ω.memWeakSobolev_iff_exists_memSobolev one_le_two f).symm
 
-/-- **Rellich's theorem in `W^1_2(Ω)`** (I.6 and H.1 in the weak-derivative form): for a bounded
+/-- **Rellich's theorem in `W^1_2(Ω)`**, the form with weak derivatives: for a bounded
 Lipschitz domain `Ω` in dimension `n ≥ 1`, every sequence `f_n ∈ L_2(Ω)` with weak derivatives
 `g_{n,i} = ∂_{e_i} f_n ∈ L_2(Ω)` and `‖f_n‖_{L_2(Ω)} + ∑_i ‖g_{n,i}‖_{L_2(Ω)} ≤ M` has a
 subsequence converging in `L_2(Ω)`: the bounded extensions

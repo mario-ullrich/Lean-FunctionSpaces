@@ -852,7 +852,7 @@ theorem norm_restrictProj_of_mem_tildeSpace {U : H^{1}(V)} (hU : U ∈ tildeSpac
 variable (Ω) in
 /-- **Restriction as an isometry of `H̃^1(Ω)` into `H^1(Ω)`**: for every open set `Ω`, the
 restriction `H̃^1(Ω) → H^1(Ω)` as a linear isometry (`Rd.norm_restrictProj_of_mem_tildeSpace`),
-the case `s = 1` of item H.4 of the FEEC/BEEC proposal (`H̃^s(Ω) = H^s_0(Ω)`). -/
+the case `s = 1` of `H̃^s(Ω) = H^s_0(Ω)`. -/
 noncomputable def tildeToRestriction : tildeSpace 1 Ω →ₗᵢ[ℂ] RestrictionSpace 1 Ω where
   toLinearMap := (tildeToRestrictionL 1 Ω).toLinearMap
   norm_map' U := norm_restrictProj_of_mem_tildeSpace U.2
@@ -873,8 +873,8 @@ theorem range_tildeToRestriction :
   exact (IsClosed.submodule_topologicalClosure_eq hc).symm
 
 variable (Ω) in
-/-- **`H̃^1(Ω) ≅ H^1_0(Ω)` isometrically, for every open set `Ω`**: item H.4 of the FEEC/BEEC
-proposal (`H̃^s(Ω) = H^s_0(Ω)`) at `s = 1`, with equal norms. McLean (Theorem 3.33) proves
+/-- **`H̃^1(Ω) ≅ H^1_0(Ω)` isometrically, for every open set `Ω`**: the identity
+`H̃^s(Ω) = H^s_0(Ω)` at `s = 1`, with equal norms. McLean (Theorem 3.33) proves
 `H̃^s(Ω) = H^s_0(Ω)` on Lipschitz domains for `s ≥ 0` with `s - 1/2 ∉ ℤ`, in particular for
 `s = 1`, up to equivalence of norms; for `s = 1` restriction is an isometry of `H̃^1(Ω)` onto
 `H^1_0(Ω)` for every open `Ω` (`Rd.tildeToRestriction`, `Rd.range_tildeToRestriction`, Mathlib's

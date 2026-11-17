@@ -47,9 +47,7 @@ The kernel of the trace is `H^1_0(Ω)`: mollification converges in `H^1(ℝ^d)`,
 supported in the cone of a chart push the pieces of a function that vanishes outside `Ω` into `Ω`,
 so `H̃^1(Ω)` consists of the functions of `H^1(ℝ^d)` that vanish outside `Ω`; with the zero
 extension this gives `ker γ = H^1_0(Ω)`, hence `H^1(Ω) ⧸ H^1_0(Ω) ≅ H^{1/2}(Γ)` by the definition of
-`H^{1/2}(Γ)` as the orthogonal complement of `ker γ`, and `(ker γ)^* ≅ H^{-1}(Ω)`. [Foundations for
-FEEC and BEEC](FEECFoundations.md) lists the results a FEEC/BEEC library can build on, what comes
-next, and the decisions behind their form.
+`H^{1/2}(Γ)` as the orthogonal complement of `ker γ`, and `(ker γ)^* ≅ H^{-1}(Ω)`.
 
 ## Main results
 

@@ -687,7 +687,7 @@ theorem exists_traceSpace_of_memBoundaryBesov (ψ : Ω.BoundaryPartition) {g : V
 /-! ### `H^{-1/2}(Γ)` -/
 
 /-- **The space `H^{-1/2}(Γ)`**: the bounded linear functionals on the trace space `H^{1/2}(Γ)`.
-The normal traces of a FEEC library pair with `H^{1/2}(Γ)` through this space. -/
+Normal traces of vector fields on `Ω` pair with `H^{1/2}(Γ)` through this space. -/
 abbrev DualTraceSpace := StrongDual ℂ Ω.TraceSpace
 
 /-- **Riesz for `H^{-1/2}(Γ)`**: the conjugate-linear isometric isomorphism of `H^{-1/2}(Γ)` onto

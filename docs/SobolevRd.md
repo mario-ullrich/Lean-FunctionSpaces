@@ -51,9 +51,7 @@ derivatives lie in `H^{s,p}`.
 Sobolev spaces on open sets and on bounded Lipschitz domains, the trace space, the extension
 theorem, Green's formula and the kernel of the trace are in [Lipschitz domains and
 traces](DomainsTraces.md); the vector-valued singular integrals and the square function
-theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md). [Foundations for FEEC and
-BEEC](FEECFoundations.md) lists the results a FEEC/BEEC library can build on, what comes next,
-and the decisions behind their form.
+theorem are in [Triebel–Lizorkin spaces](TriebelLizorkin.md).
 
 ## Main results
 

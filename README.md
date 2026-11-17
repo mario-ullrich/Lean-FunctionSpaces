@@ -265,9 +265,7 @@ block documents state every result with its Lean name and list the files:
   decompositions.
 * [Tools from analysis](docs/Analysis.md): `L_p` tools, convolution, maximal functions.
 
-[MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed, and
-[Foundations for FEEC and BEEC](docs/FEECFoundations.md) describes what a FEEC/BEEC library can
-build on.
+[MathlibCandidates.md](MathlibCandidates.md) lists what could be upstreamed.
 
 ## What is left to do
 
