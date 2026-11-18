@@ -105,25 +105,30 @@ or `InterpCouple`.
 ### The spaces `A^s_q` and their dyadic norm
 
 * `ApproximationSpaces.Norm`: Pietsch's quasi-norm `approxNorm` of `A^s_q`, membership
-  `MemApprox`, homogeneity, and the embedding `‖f‖ ≤ ‖f‖_{A^s_q}` (`enorm_le_approxNorm`).
+  `MemApprox`, homogeneity, and the embedding `‖f‖ ≤ ‖f‖_{A^s_q}` for every `q ≠ 0`
+  (`enorm_le_approxNorm`).
 * `ApproximationSpaces.Dyadic`: the equivalent dyadic quasi-norm
-  `‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}`, `approxNormDyadic`, the working norm of all later files.
+  `‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}`, `approxNormDyadic`, the working norm of all later files;
+  the equivalence holds for every `q ∈ (0, ∞]` (`memApprox_iff_approxNormDyadic_lt_top'`).
 * `ApproximationSpaces.Space`: the quasi-triangle inequality and `A^s_q` as a submodule of `X`,
   `approxSpace`.
 
 ### Sequence spaces (`Sequences/`)
 
-* `ApproximationSpaces.Sequences.Lq`: the `ℓ_q` norm `ENNReal.lqNorm` of a sequence in `ℝ≥0∞`,
-  defined as the `L_q` norm for the counting measure, with its monotonicity in `q`, the
-  Cauchy–Schwarz inequality, the dyadic weights `ENNReal.dyadicWeight`, powers of two and
-  products in `[0, ∞]`, and `L_q` norms of functions bounded on pieces.
+* `ApproximationSpaces.Sequences.Lq`: sums of powers in `[0, ∞]` (`ENNReal.rpow_tsum_le_tsum_rpow`),
+  the `ℓ_q` norm `ENNReal.lqNorm` of a sequence in `ℝ≥0∞`, defined as the `L_q` norm for the
+  counting measure, with its monotonicity in `q`, the quasi-triangle inequality for `q < 1`
+  (`ENNReal.lqNorm_add_le'`), the Cauchy–Schwarz inequality, the dyadic weights
+  `ENNReal.dyadicWeight`, powers of two and products in `[0, ∞]`, and `L_q` norms of functions
+  bounded on pieces.
 * `ApproximationSpaces.Sequences.Dyadic`: Cauchy condensation with power weights
   (`ENNReal.tsum_pow_mul_le_dyadic`), three sums over dyadic scales, and the interpolation
   inequality for dyadic suprema (`ENNReal.tsum_dyadicWeight_mul_le_iSup`).
 * `ApproximationSpaces.Sequences.Hardy`: the countable Minkowski inequality, window sums
   (`ENNReal.lqNorm_sum_Icc_le`), the two discrete Hardy inequalities (`ENNReal.hardy_sum_le`,
-  `ENNReal.hardy_tail_le`), almost diagonal sums and their constant
-  `ENNReal.almostDiagonalConst`, shifts on `ℓ_q(ℤ)` and geometric convolutions.
+  `ENNReal.hardy_tail_le`) and their forms for `0 < q ≤ 1` (`ENNReal.hardy_tail_le_of_le_one`),
+  almost diagonal sums and their constant `ENNReal.almostDiagonalConst`, shifts on `ℓ_q(ℤ)` and
+  geometric convolutions.
 
 ### Embeddings, transfer and lifting
 

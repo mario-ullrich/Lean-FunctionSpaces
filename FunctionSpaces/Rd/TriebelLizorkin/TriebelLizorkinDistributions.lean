@@ -354,7 +354,7 @@ theorem triebelLizorkinNormDistr_mono_exponent {s : ℝ} {q r : ℝ≥0∞} (hq 
     (u : 𝓢'(V, ℂ)) :
     K.triebelLizorkinNormDistr p s r u ≤ K.triebelLizorkinNormDistr p s q u :=
   le_iInf₂ fun g hg => (K.triebelLizorkinNormDistr_le hg).trans
-    (eLpNorm_lqNorm_mono_exponent hq hqr fun j =>
+    (eLpNorm_lqNorm_mono_exponent (zero_lt_one.trans_le hq).ne' hqr fun j =>
       (Lp.aestronglyMeasurable (g j)).enorm.const_mul _)
 
 /-- **The quasi-norm increases in `s`**: `‖u‖_{F^s_{p,q}, K} ≤ ‖u‖_{F^t_{p,q}, K}` for `s ≤ t`

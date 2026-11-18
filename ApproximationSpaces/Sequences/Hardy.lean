@@ -34,6 +34,13 @@ Together they bound an **almost diagonal sum**: with `c_{ij} = 2^(-(i-j)L)` for 
 (`almostDiagonalConst`); the same bound holds for every sequence below `C' ∑_j c_{ij} m_j`
 (`lqNorm_le_almostDiagonalConst_mul_of_le`).
 
+For `0 < q ≤ 1` the same three estimates hold with the constants of the `q`-th powers: the
+Hardy inequalities with `γ_{α,q} = (1 - 2^(-αq))^(-1/q)` (`hardy_tail_le_of_le_one`,
+`hardy_sum_le_of_le_one`, with `dyadicGeomConst`) and the almost diagonal sum with
+`almostDiagonalConst (sq) (Lq) ^ (1/q)` (`lqNorm_almostDiagonal_le_of_le_one`). The `q`-th power of
+a sum is at most the sum of the `q`-th powers, so each is the estimate for `ℓ_1` applied to the
+`q`-th powers.
+
 The Minkowski inequalities and monotone convergence hold for families on every countable index
 set.  On `ℤ`, the norm is invariant under shifts (`lqNorm_comp_add_int`), which gives Young's
 inequality for a series of shifts (`lqNorm_tsum_shift_le`) and the two **geometric
@@ -248,6 +255,72 @@ theorem hardy_sum_le (hq : 1 ≤ q) (α : ℝ) (b : ℕ → ℝ≥0∞) :
         simp_rw [dyadicWeight_eq_pow]
         rw [ENNReal.tsum_geometric]
 
+/-! ### Hardy's inequalities for `0 < q ≤ 1` -/
+
+/-- **Hardy's inequality for tails, `0 < q ≤ 1`**:
+`‖(2^(kα) ∑_{i ≥ 0} b (k + i))ₖ‖_q ≤ γ_{α,q} ‖(2^(kα) b k)ₖ‖_q` with
+`γ_{α,q} = (1 - 2^(-αq))^(-1/q)` (`ENNReal.dyadicGeomConst`); for `q = 0` both sides are the
+degenerate value `0`. The `q`-th power of a series is at most the series of the `q`-th powers
+(`ENNReal.rpow_tsum_le_tsum_rpow`), and Hardy's inequality for `ℓ_1` with the exponent `αq`
+(`ENNReal.hardy_tail_le`) bounds the result. -/
+theorem hardy_tail_le_of_le_one (hq1 : q ≤ 1) (α : ℝ) (b : ℕ → ℝ≥0∞) :
+    lqNorm q (fun k => dyadicWeight α k * ∑' i, b (k + i)) ≤
+      dyadicGeomConst α q * lqNorm q (fun k => dyadicWeight α k * b k) := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · simp
+  obtain ⟨hp, hp1⟩ := toReal_mem_Ioc_of_le_one hq0 hq1
+  rw [dyadicGeomConst]
+  refine lqNorm_le_rpow_mul_of_tsum_rpow_le (ne_top_of_le_ne_top one_ne_top hq1) ?_
+  set p := q.toReal
+  calc ∑' k, (dyadicWeight α k * ∑' i, b (k + i)) ^ p
+      ≤ ∑' k, dyadicWeight (α * p) k * ∑' i, (fun j => b j ^ p) (k + i) :=
+        ENNReal.tsum_le_tsum fun k => by
+          rw [mul_rpow_of_nonneg _ _ hp.le, dyadicWeight_rpow]
+          gcongr
+          exact rpow_tsum_le_tsum_rpow _ hp hp1
+    _ = lqNorm 1 (fun k => dyadicWeight (α * p) k * ∑' i, (fun j => b j ^ p) (k + i)) :=
+        (lqNorm_one _).symm
+    _ ≤ (1 - 2 ^ (-(α * p)))⁻¹ * lqNorm 1 (fun k => dyadicWeight (α * p) k * b k ^ p) :=
+        hardy_tail_le le_rfl (α * p) (fun j => b j ^ p)
+    _ = (1 - 2 ^ (-(α * p)))⁻¹ * ∑' k, (dyadicWeight α k * b k) ^ p := by
+        rw [lqNorm_one]
+        congr 1
+        refine tsum_congr fun k => ?_
+        rw [mul_rpow_of_nonneg _ _ hp.le, dyadicWeight_rpow]
+
+/-- **Hardy's inequality for partial sums, `0 < q ≤ 1`**:
+`‖(2^(-kα) ∑_{j ≤ k} b j)ₖ‖_q ≤ γ_{α,q} ‖(2^(-kα) b k)ₖ‖_q` with
+`γ_{α,q} = (1 - 2^(-αq))^(-1/q)` (`ENNReal.dyadicGeomConst`); for `q = 0` both sides are the
+degenerate value `0`. The `q`-th power of a finite sum is at most the sum of the `q`-th powers
+(`ENNReal.rpow_sum_le_sum_rpow`), and Hardy's inequality for `ℓ_1` with the exponent `αq`
+(`ENNReal.hardy_sum_le`) bounds the result. -/
+theorem hardy_sum_le_of_le_one (hq1 : q ≤ 1) (α : ℝ) (b : ℕ → ℝ≥0∞) :
+    lqNorm q (fun k => dyadicWeight (-α) k * ∑ j ∈ range (k + 1), b j) ≤
+      dyadicGeomConst α q * lqNorm q (fun k => dyadicWeight (-α) k * b k) := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · simp
+  obtain ⟨hp, hp1⟩ := toReal_mem_Ioc_of_le_one hq0 hq1
+  rw [dyadicGeomConst]
+  refine lqNorm_le_rpow_mul_of_tsum_rpow_le (ne_top_of_le_ne_top one_ne_top hq1) ?_
+  set p := q.toReal
+  have hw : ∀ k, dyadicWeight (-α) k ^ p = dyadicWeight (-(α * p)) k := fun k => by
+    rw [dyadicWeight_rpow, neg_mul]
+  calc ∑' k, (dyadicWeight (-α) k * ∑ j ∈ range (k + 1), b j) ^ p
+      ≤ ∑' k, dyadicWeight (-(α * p)) k * ∑ j ∈ range (k + 1), b j ^ p :=
+        ENNReal.tsum_le_tsum fun k => by
+          rw [mul_rpow_of_nonneg _ _ hp.le, hw]
+          gcongr
+          exact rpow_sum_le_sum_rpow _ _ hp hp1
+    _ = lqNorm 1 (fun k => dyadicWeight (-(α * p)) k * ∑ j ∈ range (k + 1), b j ^ p) :=
+        (lqNorm_one _).symm
+    _ ≤ (1 - 2 ^ (-(α * p)))⁻¹ * lqNorm 1 (fun k => dyadicWeight (-(α * p)) k * b k ^ p) :=
+        hardy_sum_le le_rfl (α * p) (fun j => b j ^ p)
+    _ = (1 - 2 ^ (-(α * p)))⁻¹ * ∑' k, (dyadicWeight (-α) k * b k) ^ p := by
+        rw [lqNorm_one]
+        congr 1
+        refine tsum_congr fun k => ?_
+        rw [mul_rpow_of_nonneg _ _ hp.le, hw]
+
 /-! ### Almost diagonal sums -/
 
 /-- **An almost diagonal sum in weighted `ℓ_q`**:
@@ -332,6 +405,49 @@ theorem almostDiagonalConst_ne_top {s L : ℝ} (hs : 0 < s) (hsL : s < L) :
     ENNReal.almostDiagonalConst s L ≠ ∞ :=
   add_ne_top.2 ⟨one_sub_two_rpow_neg_inv_ne_top (sub_pos.2 hsL),
     one_sub_two_rpow_neg_inv_ne_top hs⟩
+
+/-- **An almost diagonal sum in weighted `ℓ_q`, `0 < q ≤ 1`**: with `c_{ij} = 2^(-(i-j)L)` for
+`j ≤ i` and `c_{ij} = 1` for `j > i`,
+`‖(2^(is) ∑_j c_{ij} a_j)_i‖_{ℓ_q} ≤ A_{sq,Lq}^(1/q) ‖(2^(js) a_j)_j‖_{ℓ_q}` with
+`A_{s,L} = ENNReal.almostDiagonalConst s L`, finite for `0 < s < L`; for `q = 0` both sides are
+the degenerate value `0`. The `q`-th power of the inner series is at most `∑_j c_{ij}^q a_j^q`
+(`ENNReal.rpow_tsum_le_tsum_rpow`), and `c_{ij}^q` is the coefficient of the exponent `Lq`, so
+the estimate for `ℓ_1` with the exponents `sq` and `Lq` (`ENNReal.lqNorm_almostDiagonal_le`)
+applies to `(a_j^q)_j`. -/
+theorem lqNorm_almostDiagonal_le_of_le_one (hq1 : q ≤ 1) (s L : ℝ) (a : ℕ → ℝ≥0∞) :
+    lqNorm q (fun i => dyadicWeight s i *
+      ∑' j, (if j ≤ i then dyadicWeight (-L) (i - j) else 1) * a j) ≤
+      almostDiagonalConst (s * q.toReal) (L * q.toReal) ^ (1 / q.toReal) *
+        lqNorm q (fun j => dyadicWeight s j * a j) := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · simp
+  obtain ⟨hp, hp1⟩ := toReal_mem_Ioc_of_le_one hq0 hq1
+  refine lqNorm_le_rpow_mul_of_tsum_rpow_le (ne_top_of_le_ne_top one_ne_top hq1) ?_
+  set p := q.toReal
+  have hc : ∀ i j, (if j ≤ i then dyadicWeight (-L) (i - j) else 1) ^ p =
+      if j ≤ i then dyadicWeight (-(L * p)) (i - j) else 1 := fun i j => by
+    split_ifs
+    · rw [dyadicWeight_rpow, neg_mul]
+    · exact one_rpow p
+  calc ∑' i, (dyadicWeight s i * ∑' j, (if j ≤ i then dyadicWeight (-L) (i - j) else 1) * a j) ^ p
+      ≤ ∑' i, dyadicWeight (s * p) i *
+          ∑' j, (if j ≤ i then dyadicWeight (-(L * p)) (i - j) else 1) * a j ^ p :=
+        ENNReal.tsum_le_tsum fun i => by
+          rw [mul_rpow_of_nonneg _ _ hp.le, dyadicWeight_rpow]
+          gcongr
+          refine (rpow_tsum_le_tsum_rpow _ hp hp1).trans_eq (tsum_congr fun j => ?_)
+          rw [mul_rpow_of_nonneg _ _ hp.le, hc]
+    _ = lqNorm 1 (fun i => dyadicWeight (s * p) i *
+          ∑' j, (if j ≤ i then dyadicWeight (-(L * p)) (i - j) else 1) * a j ^ p) :=
+        (lqNorm_one _).symm
+    _ ≤ almostDiagonalConst (s * p) (L * p) *
+          lqNorm 1 (fun j => dyadicWeight (s * p) j * a j ^ p) :=
+        lqNorm_almostDiagonal_le le_rfl (s * p) (L * p) (fun j => a j ^ p)
+    _ = almostDiagonalConst (s * p) (L * p) * ∑' j, (dyadicWeight s j * a j) ^ p := by
+        rw [lqNorm_one]
+        congr 1
+        refine tsum_congr fun j => ?_
+        rw [mul_rpow_of_nonneg _ _ hp.le, dyadicWeight_rpow]
 
 /-- **The almost diagonal step at one point**: if `a_j ≤ C ∑_i c_{ji} m_i` for every `j`, with
 `c_{ji} = 2^(-(j-i)L)` for `i ≤ j` and `c_{ji} = 1` for `i > j`, then for `1 ≤ q ≤ ∞`,

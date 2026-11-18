@@ -121,7 +121,8 @@ theorem norm0_reprCouple_le (f : X) : (A.reprCouple r).norm0 f ≤ 1 * (A.reprCo
 /-- One term of the dyadic quasi-norm of `A^r_∞`: `E_{2^k}(b) ≤ 2^(-kr) ‖b‖_{A^r_∞}`. -/
 theorem approxError_pow_le_dyadicWeight_mul (b : X) (k : ℕ) :
     A.approxError b (2 ^ k) ≤ dyadicWeight (-r) k * A.approxNormDyadic r ∞ b :=
-  (approxError_pow_le (s := r) le_top b k).trans (by gcongr; exact lqNorm_le_approxNormDyadic b)
+  (approxError_pow_le (s := r) ENNReal.top_ne_zero b k).trans
+    (by gcongr; exact lqNorm_le_approxNormDyadic b)
 
 /-- **Jackson's inequality for the couple `(X, A^r_∞)`**: `E_{2^(k+1)}(f) ≤ K(2^(-kr), f)`, since
 `E_{2^(k+1)}(f) ≤ E_{2^k}(f - b) + E_{2^k}(b) ≤ ‖f - b‖ + 2^(-kr) ‖b‖_{A^r_∞}` for every `b`. -/

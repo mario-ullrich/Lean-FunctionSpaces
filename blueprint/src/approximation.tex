@@ -306,7 +306,8 @@ With these, a constant $(1 - 2^{-\alpha})^{-1}$ is finite exactly for $\alpha > 
 \label{def:lq-norm}
 \lean{ENNReal.lqNorm, ENNReal.lqNorm_top, ENNReal.lqNorm_eq_tsum, ENNReal.dyadicWeight,
   ENNReal.aestronglyMeasurable_count, ENNReal.lqNorm_one, ENNReal.one_le_toReal_of_one_le,
-  ENNReal.lqNorm_rpow, ENNReal.lqNorm_two_sq, ENNReal.lqNorm_zero_right, ENNReal.lqNorm_zero_left,
+  ENNReal.toReal_mem_Ioc_of_le_one, ENNReal.lqNorm_rpow, ENNReal.lqNorm_two_sq,
+  ENNReal.lqNorm_zero_right, ENNReal.lqNorm_zero_left,
   ENNReal.dyadicWeight_zero_right, ENNReal.dyadicWeight_zero_left, ENNReal.dyadicWeight_ne_top,
   ENNReal.dyadicWeight_lt_top, ENNReal.dyadicWeight_pos, ENNReal.dyadicWeight_ne_zero,
   ENNReal.dyadicWeight_add, ENNReal.dyadicWeight_add_nat, ENNReal.dyadicWeight_succ,
@@ -370,6 +371,8 @@ $\|a\|_{\ell_p} \leq (\# I)^{1/p} B$, with $1/p = 0$ for $p = \infty$. For every
 $p \in (0, \infty)$ and all finite sets $I$, $M$, $N$, every family $a$ on $I$ has
 $\|a\|_{\ell_p} = (\sum_{i \in I} a_i^p)^{1/p}$, and every family $b$ on $M \times N$ has
 $\|b\|_{\ell_p}^p = \sum_{m \in M} \|(b_{m,n})_{n \in N}\|_{\ell_p}^p$.
+The bound $\|a\|_{\ell_r} \leq \|a\|_{\ell_q}$ of the fourth item and the sequence with one
+nonzero term of the seventh hold for all $0 < q \leq r \leq \infty$.
 \end{lemma}
 
 \begin{proof}
@@ -385,7 +388,9 @@ by the first two, and drops the first term of $(2^{k\sigma} w_k)_k$. For a finit
 counting measure of $I$ is $\# I$, so the
 bound by $B$ is Mathlib's \texttt{eLpNorm\_\allowbreak le\_\allowbreak of\_\allowbreak
 ae\_\allowbreak enorm\_\allowbreak bound}; the two identities are the series of $p$-th powers
-written as finite sums.
+written as finite sums. The proof of $\|a\|_{\ell_r} \leq \|a\|_{\ell_q}$ uses only $q > 0$, and
+the sequence equal to $c$ at $n$ and to $0$ elsewhere has the $\ell_q$ norm $(c^q)^{1/q} = c$ for
+every $q \in (0, \infty)$ and the supremum $c$ for $q = \infty$.
 \end{proof}
 
 The next lemma holds for every $q \in (0, \infty]$, also below $1$, and for families on any
@@ -805,6 +810,117 @@ and $2^{K\theta\delta} Y = 2^{K\theta\delta} Y^\theta Y^{1-\theta}
 This is~\cite[Lemma~2]{JohnsenSickel2007}; the embeddings of
 \Cref{sec:critical-sobolev-embedding} use $q = 1$.
 
+\section{Sequences for \texorpdfstring{$0 < q < 1$}{0 < q < 1}}
+\label{sec:lq-below-one}
+
+For $0 < q < 1$ the $\ell_q$ norm satisfies the triangle inequality only up to a constant.
+Instead, the $q$-th power of a series is at most the series of the $q$-th powers, so each
+estimate of this section is the corresponding estimate for $\ell_1$, applied to the $q$-th powers
+of the terms.
+
+\begin{lemma}[Sums of powers]
+\label{lem:rpow-sum-le}
+\lean{ENNReal.sum_rpow_le_rpow_sum, ENNReal.rpow_sum_rpow_le, ENNReal.rpow_sum_le_sum_rpow,
+  ENNReal.rpow_tsum_le_tsum_rpow}
+\leanok
+For every index set $I$, every finite set $s \subseteq I$ and every family $(f_i)_{i \in I}$ in
+$[0, \infty]$:
+\begin{enumerate}
+  \item if $p \geq 1$, then $\sum_{i \in s} f_i^p \leq \bigl(\sum_{i \in s} f_i\bigr)^p$;
+  \item if $0 < p \leq r$, then
+    $\bigl(\sum_{i \in s} f_i^r\bigr)^{1/r} \leq \bigl(\sum_{i \in s} f_i^p\bigr)^{1/p}$;
+  \item if $0 < p \leq 1$, then $\bigl(\sum_{i \in s} f_i\bigr)^p \leq \sum_{i \in s} f_i^p$ and
+    $\bigl(\sum_{i \in I} f_i\bigr)^p \leq \sum_{i \in I} f_i^p$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+The first claim follows by induction over $s$ from $a^p + b^p \leq (a + b)^p$ (Mathlib's
+\texttt{ENNReal.\allowbreak add\_\allowbreak rpow\_\allowbreak le\_\allowbreak rpow\_\allowbreak
+add}). For the second write $f_i^r = (f_i^p)^{r/p}$ with $r/p \geq 1$ and apply the first. For
+the third, $x \mapsto x^p$ vanishes at $0$ and is subadditive (Mathlib's
+\texttt{ENNReal.\allowbreak rpow\_\allowbreak add\_\allowbreak le\_\allowbreak add\_\allowbreak
+rpow}); a series is the supremum of its finite partial sums, and $x \mapsto x^p$ commutes with
+suprema.
+\end{proof}
+
+The three finite inequalities copy Mathlib pull request~\#44783.
+
+\begin{lemma}[The $\ell_q$ quasi-norm]
+\label{lem:lq-quasi-triangle}
+\lean{ENNReal.lqNorm_add_le', ENNReal.lqNorm_le_head_add_shift',
+  ENNReal.lqNorm_le_rpow_mul_of_tsum_rpow_le,
+  ENNReal.one_le_LpAddConst, ENNReal.two_rpow_one_div_le_two_mul_LpAddConst,
+  ENNReal.rpow_add_rpow_le_LpAddConst_mul}
+\leanok
+\uses{def:lq-norm, lem:lq-basic, lem:lq-reindex}
+For $q \in (0, \infty]$ let $C_q = 2^{1/q - 1}$ for $q < 1$ and $C_q = 1$ for $q \geq 1$. Then
+$C_q \geq 1$ and $2^{1/q} \leq 2 C_q$, with $1/\infty = 0$, and
+$(x^q + y^q)^{1/q} \leq C_q (x + y)$ for all $x, y \in [0, \infty]$ if $q < \infty$. For every
+$q \in (0, \infty]$, all families $a, b$ in $[0, \infty]$ on a countable set and every sequence
+$c$ in $[0, \infty]$,
+\[
+  \|a + b\|_{\ell_q} \leq C_q \bigl(\|a\|_{\ell_q} + \|b\|_{\ell_q}\bigr)
+  \qquad \text{and} \qquad
+  \|c\|_{\ell_q} \leq C_q \bigl(c_0 + \|(c_{k+1})_k\|_{\ell_q}\bigr) .
+\]
+For every $q \in (0, \infty)$, every $C \in [0, \infty]$ and all families $a$, $b$ in
+$[0, \infty]$ on two countable sets with $\sum_i a_i^q \leq C \sum_j b_j^q$,
+$\|a\|_{\ell_q} \leq C^{1/q} \, \|b\|_{\ell_q}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $0 < q < 1$, $1/q - 1 > 0$ gives $C_q \geq 1$, and $2 C_q = 2^{1/q}$; for $q \geq 1$,
+$2^{1/q} \leq 2$. The bound for two numbers is the power mean inequality
+$(u + v)^{t} \leq C_q (u^{t} + v^{t})$ with $t = 1/q$ (Mathlib's
+\texttt{ENNReal.\allowbreak rpow\_\allowbreak add\_\allowbreak le\_\allowbreak mul\_\allowbreak
+rpow\_\allowbreak add\_\allowbreak rpow''}) for $u = x^q$ and $v = y^q$. The quasi-triangle
+inequality is Mathlib's \texttt{eLpNorm\_\allowbreak add\_\allowbreak le'} for the counting
+measure; applied to $c = c_0 \delta_0 + (0, c_1, c_2, \dots)$ it gives the second bound, since the
+first summand has the norm $c_0$ (\Cref{lem:lq-basic}) and the second is $(c_{k+1})_k$ extended
+by zero (\Cref{lem:lq-reindex}). The last claim is
+$\|a\|_{\ell_q} = (\sum_i a_i^q)^{1/q}$.
+\end{proof}
+
+\begin{lemma}[Hardy inequalities for $0 < q \leq 1$]
+\label{lem:hardy-below-one}
+\lean{ENNReal.hardy_tail_le_of_le_one, ENNReal.hardy_sum_le_of_le_one,
+  ENNReal.lqNorm_almostDiagonal_le_of_le_one}
+\leanok
+\uses{lem:hardy, lem:almost-diagonal, lem:rpow-sum-le, lem:lq-quasi-triangle}
+Let $0 < q \leq 1$ and $\alpha, s, L \in \R$, and put
+$\gamma_{\alpha, q} = (1 - 2^{-\alpha q})^{-1/q} \in [0, \infty]$, which is finite exactly for
+$\alpha > 0$. For all sequences $a, b$ in $[0, \infty]$,
+\begin{align*}
+  \Bigl\| \Bigl(2^{k\alpha} \sum_{i=0}^\infty b_{k+i}\Bigr)_k \Bigr\|_{\ell_q}
+  &\leq \gamma_{\alpha, q} \, \|(2^{k\alpha} b_k)_k\|_{\ell_q} , \\
+  \Bigl\| \Bigl(2^{-k\alpha} \sum_{j=0}^{k} b_j\Bigr)_k \Bigr\|_{\ell_q}
+  &\leq \gamma_{\alpha, q} \, \|(2^{-k\alpha} b_k)_k\|_{\ell_q} ,
+\end{align*}
+and, with $c_{ij} = 2^{-(i-j)L}$ for $j \leq i$, $c_{ij} = 1$ for $j > i$ and the constant
+$A_{s,L}$ of \Cref{lem:almost-diagonal},
+\[
+  \Bigl\| \Bigl( 2^{is} \sum_j c_{ij} \, a_j \Bigr)_i \Bigr\|_{\ell_q}
+  \leq A_{sq, Lq}^{1/q} \, \|(2^{js} a_j)_j\|_{\ell_q} ,
+\]
+where $A_{sq, Lq}^{1/q} < \infty$ for $0 < s < L$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:rpow-sum-le},
+$\bigl(2^{k\alpha} \sum_i b_{k+i}\bigr)^q \leq 2^{k\alpha q} \sum_i b_{k+i}^q$. Summing over $k$,
+the first inequality of \Cref{lem:hardy} for $\ell_1$, the exponent $\alpha q$ and the sequence
+$(b_k^q)_k$ bounds the $q$-th power of the left side by
+$(1 - 2^{-\alpha q})^{-1} \sum_k (2^{k\alpha} b_k)^q$, and \Cref{lem:lq-quasi-triangle} takes
+the $q$-th root. The partial sums are handled in the same way. In the almost diagonal sum,
+$\bigl(\sum_j c_{ij} a_j\bigr)^q \leq \sum_j c_{ij}^q a_j^q$, and $c_{ij}^q$ is the coefficient of
+the exponent $Lq$, so \Cref{lem:almost-diagonal} for $\ell_1$, the exponents $sq$ and $Lq$ and the
+sequence $(a_j^q)_j$ applies.
+\end{proof}
+
 \chapter{Approximation spaces}
 \label{ch:approximation-spaces}
 
@@ -819,7 +935,7 @@ from $0$.
   ApproximationScheme.memApprox_iff, ApproximationScheme.MemApprox.approxNorm_ne_top}
 \leanok
 \uses{def:error, def:lq-norm}
-Let $s \in \R$ and $1 \leq q \leq \infty$. For $f \in X$,
+Let $s \in \R$ and $q \in (0, \infty]$. For $f \in X$,
 \[
   \|f\|_{A^s_q} = \bigl\| \bigl((n+1)^{s - 1/q} E_n(f)\bigr)_{n \in \N} \bigr\|_{\ell_q}
   \in [0, \infty],
@@ -839,7 +955,7 @@ $\|f\|_{A^s_q} < \infty$.
   ENNReal.one_le_two_mul_two_rpow, ENNReal.two_rpow_ne_top}
 \leanok
 \uses{def:error, def:lq-norm}
-Let $s \in \R$ and $1 \leq q \leq \infty$. For $f \in X$,
+Let $s \in \R$ and $q \in (0, \infty]$. For $f \in X$,
 \[
   \|f\|^{\mathrm{dy}}_{A^s_q} = \|f\| + \bigl\| \bigl(2^{ks} E_{2^k}(f)\bigr)_{k \in \N}
   \bigr\|_{\ell_q} .
@@ -851,8 +967,48 @@ For every $c \in \R$ and $f \in X$, $\|c f\|^{\mathrm{dy}}_{A^s_q} = |c| \,
 $1 \leq 2^s \leq 2 \cdot 2^s$.
 
 The term $\|f\| = E_0(f)$ is needed because the dyadic sequence starts at $E_1$. The dyadic
-form is the working norm: every later theorem is stated for it, and the next theorem
-transports it to Pietsch's definition.
+form is the working norm: every later theorem is stated for it, and the next lemma transports
+it to Pietsch's definition for every $q \in (0, \infty]$; the theorem after it is the case
+$q \geq 1$.
+
+\begin{lemma}[Dyadic form for every fine index]
+\label{lem:dyadic-norm-below-one}
+\lean{ApproximationScheme.approxNorm_le_approxNormDyadic',
+  ApproximationScheme.approxNormDyadic_le_approxNorm',
+  ApproximationScheme.lqNorm_dyadic_succ_le',
+  ApproximationScheme.memApprox_iff_approxNormDyadic_lt_top',
+  ApproximationScheme.memApprox_iff_lqNorm_dyadic_lt_top'}
+\leanok
+\uses{def:approx-space, def:dyadic-norm, lem:condensation, lem:lq-basic, lem:lq-quasi-triangle}
+Let $s \geq 0$, $q \in (0, \infty]$ and let $C_q$ be the constant of
+\Cref{lem:lq-quasi-triangle}. For every $f \in X$,
+$\|(2^{ks} E_{2^{k+1}}(f))_k\|_{\ell_q} \leq 2 C_q \|f\|_{A^s_q}$, and
+\[
+  \|f\|_{A^s_q} \leq C_q 2^s \, \|f\|^{\mathrm{dy}}_{A^s_q}
+  \qquad \text{and} \qquad
+  \|f\|^{\mathrm{dy}}_{A^s_q} \leq 4 C_q^2 2^s \, \|f\|_{A^s_q} .
+\]
+In particular $f \in A^s_q$ if and only if $\|f\|^{\mathrm{dy}}_{A^s_q} < \infty$, that is, if and
+only if $(2^{ks} E_{2^k}(f))_k \in \ell_q$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:error-basic}
+The term $n = 0$ of Pietsch's sequence is $E_0(f) = \|f\|$, so $\|f\| \leq \|f\|_{A^s_q}$. For
+$q = \infty$, $C_\infty = 1$ and the supremum form of \Cref{lem:condensation} gives the bounds.
+For $q < \infty$ raise both sides to the power $q$:
+$\|f\|_{A^s_q}^q = \sum_n (n+1)^{sq-1} E_n(f)^q$. The errors decrease, so
+\Cref{lem:condensation} with $\gamma = sq - 1$ and $b_n = E_n(f)^q$ compares this series with
+$E_0(f)^q + \sum_k 2^{ksq} E_{2^k}(f)^q$ in both directions. With
+$D = \|(2^{ks} E_{2^k}(f))_k\|_{\ell_q}$ this gives
+$\|f\|_{A^s_q}^q \leq 2^{sq} (\|f\|^q + D^q)$, and $(\|f\|^q + D^q)^{1/q} \leq C_q (\|f\| + D)$
+by \Cref{lem:lq-quasi-triangle}. For the shifted sequence the factor of \Cref{lem:condensation}
+is $2^{\max(1 - sq, 0)} \leq 2 \leq (2 C_q)^q$. For the last bound, split off the first dyadic
+term at the cost $C_q$ (\Cref{lem:lq-quasi-triangle}), use $E_1(f) \leq \|f\| \leq \|f\|_{A^s_q}$
+and $2^{(k+1)s} = 2^s 2^{ks}$, and $1 + C_q + 2 C_q^2 2^s \leq 4 C_q^2 2^s$, since $C_q \geq 1$
+and $2^s \geq 1$.
+\end{proof}
 
 \begin{theorem}[Dyadic form of the quasi-norm]
 \label{thm:dyadic-norm}
@@ -862,7 +1018,7 @@ transports it to Pietsch's definition.
   ApproximationScheme.lqNorm_dyadic_succ_le,
   ApproximationScheme.memApprox_iff_lqNorm_dyadic_lt_top}
 \leanok
-\uses{def:approx-space, def:dyadic-norm, lem:condensation, lem:lq-basic}
+\uses{def:approx-space, def:dyadic-norm}
 Let $s \geq 0$ and $1 \leq q \leq \infty$. For every $f \in X$,
 \[
   \|f\|_{A^s_q} \leq 2^s \, \|f\|^{\mathrm{dy}}_{A^s_q}
@@ -875,14 +1031,8 @@ only if $(2^{ks} E_{2^k}(f))_k \in \ell_q$.
 
 \begin{proof}
 \leanok
-\uses{lem:error-basic}
-For $q < \infty$ raise both sides to the power $q$: $\|f\|_{A^s_q}^q = \sum_n (n+1)^{sq-1}
-E_n(f)^q$. The errors decrease, so \Cref{lem:condensation} with $\gamma = sq - 1$ and
-$b_n = E_n(f)^q$ compares this series with $E_0(f)^q + \sum_k 2^{ksq} E_{2^k}(f)^q$ in both
-directions, and $E_0(f) = \|f\|$. Taking $q$-th roots costs at most the factors stated,
-using $(x + y)^{1/q} \leq x^{1/q} + y^{1/q}$ and, for the second bound,
-$2^{(k+1)s} = 2^s 2^{ks}$ and $E_1(f) \leq \|f\|$. For $q = \infty$ use the supremum form of
-\Cref{lem:condensation}.
+\uses{lem:dyadic-norm-below-one}
+This is the case $C_q = 1$ of \Cref{lem:dyadic-norm-below-one}, since $C_q = 1$ for $q \geq 1$.
 \end{proof}
 
 \begin{proposition}[Linear structure]
@@ -909,7 +1059,8 @@ Let $s \geq 0$ and $1 \leq q \leq \infty$. For all $f, g \in X$, $c \in \R$ and 
   \item $A_m \subseteq A^s_q$;
   \item a scheme with larger sets has smaller quasi-norms and larger approximation spaces.
 \end{enumerate}
-In particular $A^s_q$ is a linear subspace of $X$.
+In particular $A^s_q$ is a linear subspace of $X$. The second item holds for every
+$q \in (0, \infty]$.
 \end{proposition}
 
 \begin{proof}
@@ -936,7 +1087,7 @@ function into $[0, \infty]$, in the way Mathlib treats $L_p$ through \texttt{eLp
 \uses{def:dyadic-norm, lem:error-tendsto}
 Let $s > 0$ and $1 \leq q \leq \infty$. For every $f \in A^s_q$ and $k \in \N$,
 $E_{2^k}(f) \leq 2^{-ks} \|f\|^{\mathrm{dy}}_{A^s_q}$, and $f$ lies in the closure of
-$\bigcup_n A_n$.
+$\bigcup_n A_n$. The bound for $E_{2^k}(f)$ holds for every $q \in (0, \infty]$.
 \end{lemma}
 
 \begin{proof}
@@ -966,6 +1117,7 @@ Let $1 \leq q, r \leq \infty$, let $s, t \in \R$ and $f \in X$.
     $\|f\|_{A^s_r} \leq 2^s \cdot 4 \cdot 2^s \, \|f\|_{A^s_q}$; if $0 \leq t < s$, then
     $\|f\|_{A^t_r} \leq 2^t (1 - 2^{-(s-t)})^{-1} \cdot 4 \cdot 2^s \, \|f\|_{A^s_q}$.
 \end{enumerate}
+The first item holds for all $0 < q \leq r \leq \infty$.
 \end{theorem}
 
 \begin{proof}

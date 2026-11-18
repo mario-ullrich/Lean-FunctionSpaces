@@ -268,7 +268,7 @@ omit [Fact (1 ≤ p)] in
 `1 ≤ q ≤ r ≤ ∞`, since `‖·‖_{ℓ_r} ≤ ‖·‖_{ℓ_q}` at every point. -/
 theorem triebelLizorkinNorm_mono_exponent {s : ℝ} {q r : ℝ≥0∞} (hq : 1 ≤ q) (hqr : q ≤ r)
     (f : Lp ℂ p (volume : Measure V)) : triebelLizorkinNorm s r f ≤ triebelLizorkinNorm s q f :=
-  eLpNorm_lqNorm_mono_exponent hq hqr fun j =>
+  eLpNorm_lqNorm_mono_exponent (zero_lt_one.trans_le hq).ne' hqr fun j =>
     (aestronglyMeasurable_blockFun j f).enorm.const_mul _
 
 omit [Fact (1 ≤ p)] in

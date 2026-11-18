@@ -5,12 +5,24 @@ declarations.
 
 * **`ℓ_q` norms of families in `ℝ≥0∞`** (`ApproximationSpaces/Sequences/Lq.lean`), as the
   `L_q` norm for the counting measure on any countable index set: the norm bound
-  `‖a‖_r ≤ ‖a‖_q` for `1 ≤ q ≤ r` behind `lp.monotone` (`ENNReal.lqNorm_le_lqNorm_of_le`),
-  homogeneity for `ℝ≥0∞` scalars, the finite-index forms (`ENNReal.lqNorm_eq_sum`,
-  `ENNReal.lqNorm_le_card_rpow_mul`, `ENNReal.lqNorm_prod_rpow`), and, on `ℕ`, splitting off the
-  first terms (`ENNReal.lqNorm_le_head_add_shift`, `ENNReal.lqNorm_le_sum_range_add_shift`);
-  reindexing along bijections and injections (`ENNReal.lqNorm_comp_equiv`,
-  `ENNReal.lqNorm_extend_zero`, `ENNReal.lqNorm_comp_le_of_injective`).
+  `‖a‖_r ≤ ‖a‖_q` for `0 < q ≤ r` behind `lp.monotone` (`ENNReal.lqNorm_le_lqNorm_of_le`),
+  homogeneity for `ℝ≥0∞` scalars, the quasi-triangle inequality
+  `‖a + b‖_q ≤ LpAddConst q (‖a‖_q + ‖b‖_q)` for every `q`, the case of the counting measure of
+  Mathlib's `eLpNorm_add_le'` (`ENNReal.lqNorm_add_le'`), the finite-index forms
+  (`ENNReal.lqNorm_eq_sum`, `ENNReal.lqNorm_le_card_rpow_mul`, `ENNReal.lqNorm_prod_rpow`), and,
+  on `ℕ`, splitting off the first terms (`ENNReal.lqNorm_le_head_add_shift`,
+  `ENNReal.lqNorm_le_head_add_shift'`, `ENNReal.lqNorm_le_sum_range_add_shift`); reindexing along
+  bijections and injections (`ENNReal.lqNorm_comp_equiv`, `ENNReal.lqNorm_extend_zero`,
+  `ENNReal.lqNorm_comp_le_of_injective`).
+* **Subadditivity of `x ↦ x^p` for series** (`ApproximationSpaces/Sequences/Lq.lean`): for
+  `0 < p ≤ 1` and every family `f` in `[0, ∞]`, `(∑_i f_i)^p ≤ ∑_i f_i^p`
+  (`ENNReal.rpow_tsum_le_tsum_rpow`), from the finite form of Mathlib PR #44783 by the supremum
+  over partial sums; neither Mathlib nor the PR has the series form.
+* **The constant of the quasi-triangle inequality** (`ApproximationSpaces/Sequences/Lq.lean`):
+  `1 ≤ LpAddConst q` for every `q` (`ENNReal.one_le_LpAddConst`), a companion of Mathlib's
+  `ENNReal.LpAddConst_lt_top` and `ENNReal.LpAddConst_ne_zero`. The Bonn project
+  *MultilinearInterpolation* has the same lemma under the same name, and Carleson uses one, so an
+  upstreaming can be coordinated.
 * **`L_q` norms of functions bounded on pieces** (`ApproximationSpaces/Sequences/Lq.lean`): on any
   measure space, for disjoint measurable pieces of equal measure `c` and `G` between step
   values `a_n` on the pieces, the comparisons `∫ G ≤ c ∑ a_n`, `c ∑ a_n ≤ ∫ G` and their `L_q`
@@ -91,7 +103,9 @@ declarations.
   `ENNReal.dyadicWeight`.
 * **Discrete Hardy inequalities** (`ApproximationSpaces/Sequences/Hardy.lean`):
   `ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`, and the almost diagonal estimate that combines
-  both (`ENNReal.lqNorm_almostDiagonal_le`), with its constant `ENNReal.almostDiagonalConst`.
+  both (`ENNReal.lqNorm_almostDiagonal_le`), with its constant `ENNReal.almostDiagonalConst`, and
+  their forms for `0 < q ≤ 1` (`ENNReal.hardy_tail_le_of_le_one`,
+  `ENNReal.hardy_sum_le_of_le_one`, `ENNReal.lqNorm_almostDiagonal_le_of_le_one`).
 * **The tail of a convergent series** (`ApproximationSpaces/Lift.lean`): in every normed group,
   `∑_i a_i = f` gives `‖f - ∑_{i<n} a_i‖ ≤ ∑_{i ≥ 0} ‖a_{i+n}‖` for every `n`
   (`HasSum.enorm_sub_sum_range_le`).

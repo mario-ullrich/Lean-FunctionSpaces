@@ -34,7 +34,10 @@ other blocks instantiate the theory.
 * **The dyadic quasi-norm.** For `s ≥ 0` and `1 ≤ q ≤ ∞`,
   `‖f‖_{A^s_q} ≤ 2^s (‖f‖ + ‖(2^(ks) E_{2^k}(f))_k‖_{ℓ_q}) ≤ 4 · 4^s ‖f‖_{A^s_q}`
   (`ApproximationScheme.approxNorm_le_approxNormDyadic`,
-  `.approxNormDyadic_le_approxNorm`).
+  `.approxNormDyadic_le_approxNorm`). For `0 < q < 1` the same comparison holds with the extra
+  factors `C_q` and `C_q²`, where `C_q = 2^(1/q - 1)` is the constant of the quasi-triangle
+  inequality in `ℓ_q` (`ApproximationScheme.approxNorm_le_approxNormDyadic'`,
+  `.approxNormDyadic_le_approxNorm'`, `.memApprox_iff_lqNorm_dyadic_lt_top'`).
 * **Linear structure.** For `s ≥ 0` and `1 ≤ q ≤ ∞`, `A^s_q` is a linear subspace of `X`
   containing every `A_n`, `‖f‖ ≤ ‖f‖_{A^s_q}`, and
   `‖f + g‖_{A^s_q} ≤ 8 · 8^s (‖f‖_{A^s_q} + ‖g‖_{A^s_q})`
@@ -185,13 +188,16 @@ other blocks instantiate the theory.
   `⋃ A_n` is dense, then for `s > 0`, `f ∈ A^s_q` iff
   `‖P_1 f‖ + ‖(2^(ks) ‖P_{2^(k+1)} f - P_{2^k} f‖)_k‖_{ℓ_q} < ∞`
   (`ApproximationScheme.ProjectionScheme.memApprox_iff_blockNorm_lt_top`).
-* **Sequence spaces.** For `1 ≤ q ≤ r ≤ ∞` and every sequence `a` in `[0, ∞]`,
-  `‖a‖_{ℓ_r} ≤ ‖a‖_{ℓ_q}` (`ENNReal.lqNorm_le_lqNorm_of_le`), and the norm of a series of
-  sequences is at most the series of the norms (`ENNReal.lqNorm_tsum_le`).
+* **Sequence spaces.** For `0 < q ≤ r ≤ ∞` and every sequence `a` in `[0, ∞]`,
+  `‖a‖_{ℓ_r} ≤ ‖a‖_{ℓ_q}` (`ENNReal.lqNorm_le_lqNorm_of_le`), and for `q ≥ 1` the norm of a
+  series of sequences is at most the series of the norms (`ENNReal.lqNorm_tsum_le`). For
+  `0 < p ≤ 1`, `(∑_i f_i)^p ≤ ∑_i f_i^p` in `[0, ∞]` (`ENNReal.rpow_tsum_le_tsum_rpow`), and for
+  `0 < q < 1`, `‖a + b‖_{ℓ_q} ≤ 2^(1/q - 1) (‖a‖_{ℓ_q} + ‖b‖_{ℓ_q})` (`ENNReal.lqNorm_add_le'`).
 * **Hardy inequalities.** For `α > 0`, `1 ≤ q ≤ ∞` and every sequence `b` in `[0, ∞]`,
   `‖(2^(kα) ∑_{i ≥ 0} b_{k+i})_k‖_{ℓ_q} ≤ (1 - 2^(-α))⁻¹ ‖(2^(kα) b_k)_k‖_{ℓ_q}` and
   `‖(2^(-kα) ∑_{j ≤ k} b_j)_k‖_{ℓ_q} ≤ (1 - 2^(-α))⁻¹ ‖(2^(-kα) b_k)_k‖_{ℓ_q}`
-  (`ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`).
+  (`ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`). For `0 < q ≤ 1` both hold with the constant
+  `(1 - 2^(-αq))^(-1/q)` (`ENNReal.hardy_tail_le_of_le_one`, `ENNReal.hardy_sum_le_of_le_one`).
 * **Interpolation of dyadic suprema** (Brezis–Mironescu). For `σ₁ < σ₀`, `0 < θ < 1` and every
   sequence `a` in `[0, ∞]`,
   `∑_j 2^(j(θσ₀ + (1-θ)σ₁)) a_j ≤ c (sup_j 2^(jσ₀) a_j)^θ (sup_j 2^(jσ₁) a_j)^(1-θ)` with
@@ -212,10 +218,10 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Error of best approximation and its calculus | ✅ | ✗ | `Error` |
 | Linear approximation from a sequence | ✅ | ✗ | `Instances/Span` |
 | `n`-term approximation from a dictionary | ✅ | ✗ | `Instances/NTerm` |
-| `ℓ_q` norms in `ℝ≥0∞`, Minkowski, Cauchy–Schwarz, monotonicity in `q`, tails, sequences with finitely many nonzero terms, reindexing, geometric sequences, dyadic weights, weighted `ℓ_q` norms from the first term and a bound of the others, powers of two, products and quotients in `[0, ∞]`; `L_p` norms of `[0, ∞]`-valued functions: homogeneity, powers, monotone convergence, Minkowski's inequality for series, functions bounded on pieces | ✅ | ✗ | `Sequences/Lq` |
+| Sums of powers in `[0, ∞]`, `ℓ_q` norms in `ℝ≥0∞`, Minkowski, the quasi-triangle inequality for `q < 1`, Cauchy–Schwarz, monotonicity in `q`, tails, sequences with finitely many nonzero terms, reindexing, geometric sequences, dyadic weights, weighted `ℓ_q` norms from the first term and a bound of the others, powers of two, products and quotients in `[0, ∞]`; `L_p` norms of `[0, ∞]`-valued functions: homogeneity, powers, monotone convergence, Minkowski's inequality for series, functions bounded on pieces | ✅ | ✗ | `Sequences/Lq` |
 | Cauchy condensation with power weights, the dyadic sum `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4`, finitely many changed terms, sums over the dyadic scales of an annulus, the interpolation inequality for dyadic suprema (Brezis–Mironescu) | ✅ | ✗ | `Sequences/Dyadic` |
-| Countable Minkowski inequality, monotone convergence and truncations in `ℓ_q`, window sums in `ℓ_q`, discrete Hardy inequalities, almost diagonal sums and their constant, shift invariance and geometric convolutions on `ℤ` | ✅ | ✗ | `Sequences/Hardy` |
-| `A^s_q`, its dyadic quasi-norm and linear structure | ✅ | ✗ | `Norm`, `Dyadic`, `Space` |
+| Countable Minkowski inequality, monotone convergence and truncations in `ℓ_q`, window sums in `ℓ_q`, discrete Hardy inequalities, almost diagonal sums and their constant, the Hardy and almost diagonal bounds for `0 < q ≤ 1`, shift invariance and geometric convolutions on `ℤ` | ✅ | ✗ | `Sequences/Hardy` |
+| `A^s_q` and its dyadic quasi-norm for `q > 0`, linear structure for `q ≥ 1` | ✅ | ✗ | `Norm`, `Dyadic`, `Space` |
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ | ✗ | `Embedding`, `Transfer` |
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ | ✗ | `Lift`, `Nikolskii` |
 | K-functional, real interpolation, representation theorem | ✅ | ✗ | `Interpolation/KFunctional`, `Interpolation/Representation` |

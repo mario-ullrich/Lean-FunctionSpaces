@@ -19,6 +19,8 @@ Pietsch's **approximation space** `A^s_q` consists of the `f ∈ X` with
 In Lean the sequence is indexed from `0` as `((n + 1)^(s - 1/q) E_n(f))_{n ≥ 0}`, the
 quasi-norm is `A.approxNorm s q f`, and membership is `A.MemApprox s q f`.  For `q = ∞` the
 exponent is `s` (in Lean `1 / ∞.toReal = 1 / 0 = 0`), so `‖f‖_{A^s_∞} = sup (n+1)^s E_n(f)`.
+The same formula defines `A^s_q` for `0 < q < 1`, the range of nonlinear approximation; the
+embedding `‖f‖ ≤ ‖f‖_{A^s_q}` holds for every `q ≠ 0`.
 
 **Design.** The quasi-norm takes values in `ℝ≥0∞` and is defined for every `f`; membership is
 finiteness, as for `MeasureTheory.eLpNorm` and `MeasureTheory.MemLp`.  The spaces are only
@@ -99,17 +101,18 @@ theorem MemApprox.smul {f : X} (hf : A.MemApprox s q f) (c : ℝ) : A.MemApprox 
 theorem MemApprox.neg {f : X} (hf : A.MemApprox s q f) : A.MemApprox s q (-f) := by
   simpa using hf.smul (-1)
 
-/-- **The embedding `A^s_q ↪ X`**: `‖f‖ ≤ ‖f‖_{A^s_q}`, from the term `E_0(f) = ‖f‖`. -/
-theorem enorm_le_approxNorm (hq : 1 ≤ q) (f : X) : ‖f‖ₑ ≤ A.approxNorm s q f := by
+/-- **The embedding `A^s_q ↪ X`**: `‖f‖ ≤ ‖f‖_{A^s_q}` for every `q ≠ 0`, also below `1`, from
+the term `E_0(f) = ‖f‖`. -/
+theorem enorm_le_approxNorm (hq0 : q ≠ 0) (f : X) : ‖f‖ₑ ≤ A.approxNorm s q f := by
   have := ENNReal.le_lqNorm (a := fun n => ((n + 1 : ℕ) : ℝ≥0∞) ^ (s - 1 / q.toReal) *
-    A.approxError f n) (zero_lt_one.trans_le hq).ne' 0
+    A.approxError f n) hq0 0
   simp only [zero_add, Nat.cast_one, ENNReal.one_rpow, one_mul, approxError_zero_right] at this
   exact this
 
-/-- For `q ≥ 1`, `‖f‖_{A^s_q} = 0` only for `f = 0`. -/
-theorem approxNorm_eq_zero_iff (hq : 1 ≤ q) {f : X} : A.approxNorm s q f = 0 ↔ f = 0 := by
+/-- For `q ≠ 0`, `‖f‖_{A^s_q} = 0` only for `f = 0`. -/
+theorem approxNorm_eq_zero_iff (hq0 : q ≠ 0) {f : X} : A.approxNorm s q f = 0 ↔ f = 0 := by
   refine ⟨fun h => ?_, fun h => h ▸ approxNorm_zero s q⟩
-  have := enorm_le_approxNorm (A := A) (s := s) hq f
+  have := enorm_le_approxNorm (A := A) (s := s) hq0 f
   rw [h, nonpos_iff_eq_zero, enorm_eq_zero] at this
   exact this
 

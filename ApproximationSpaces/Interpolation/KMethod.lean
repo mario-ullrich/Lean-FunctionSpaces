@@ -456,7 +456,7 @@ theorem lqNorm_discretePhiSeq_le {M : ℝ≥0∞} (hρθ : 0 ≤ ρ * θ) (hM : 
     _ ≤ LpAddConst q * (lqNorm q (extend (fun k : ℕ => -(k : ℤ)) a 0) +
           lqNorm q (extend (fun k : ℕ => (k : ℤ) + 1)
             (fun k => M * dyadicWeight (-(ρ * θ)) k) 0)) :=
-        eLpNorm_add_le' q
+        ENNReal.lqNorm_add_le' q _ _
     _ ≤ LpAddConst q * (lqNorm q a + M * dyadicGeomConst (ρ * θ) q) := by
         rw [ENNReal.lqNorm_extend_zero injective_neg_natCast,
           ENNReal.lqNorm_extend_zero injective_natCast_add_one, ENNReal.lqNorm_const_mul]

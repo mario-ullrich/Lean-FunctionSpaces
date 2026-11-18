@@ -295,7 +295,7 @@ theorem eLpNorm_le_of_forall_enorm_integral_mul_conj_le {p q : ℝ≥0∞} [p.Ho
   have hpt : (fun x => lqNorm 2 fun j => ‖(if j = 0 then v x else 0)‖ₑ) = fun x => ‖v x‖ₑ := by
     funext x
     simp_rw [apply_ite (fun z : ℂ => ‖z‖ₑ), enorm_zero]
-    exact ENNReal.lqNorm_ite_eq one_le_two 0 _
+    exact ENNReal.lqNorm_ite_eq two_ne_zero 0 _
   rwa [hpt, eLpNorm_enorm _ hv.aestronglyMeasurable] at h
 
 end MeasureTheory

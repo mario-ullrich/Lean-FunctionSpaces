@@ -14,7 +14,7 @@ public import Mathlib.Analysis.SpecificLimits.Basic
 /-!
 # `ℓ_q` norms of sequences in `ℝ≥0∞`
 
-For a sequence `a : ℕ → ℝ≥0∞` and `q ∈ [1, ∞]`,
+For a sequence `a : ℕ → ℝ≥0∞` and `q ∈ (0, ∞]`,
 
 `lqNorm q a = (∑ₙ a n ^ q) ^ (1/q)`   for `q < ∞`,   `lqNorm ∞ a = supₙ a n`.
 
@@ -27,8 +27,24 @@ on `ℕ`, so Minkowski's inequality (`MeasureTheory.eLpNorm_add_le`) and monoton
 free from Mathlib.  The alternative, Mathlib's normed space `lp`, would require summability
 proofs for every sequence that enters.
 
+**Sums of powers.** The file opens with the comparison of a sum of powers with the power of the
+sum in `[0, ∞]`: `∑_{i ∈ s} f_i^p ≤ (∑_{i ∈ s} f_i)^p` for `p ≥ 1`, the decrease of
+`(∑_{i ∈ s} f_i^p)^(1/p)` in `p`, and `(∑_{i ∈ s} f_i)^p ≤ ∑_{i ∈ s} f_i^p` for `0 < p ≤ 1`
+(`ENNReal.sum_rpow_le_rpow_sum`, `ENNReal.rpow_sum_rpow_le`, `ENNReal.rpow_sum_le_sum_rpow`).
+These three are a copy of Mathlib PR #44783; delete them when the project's Mathlib has it. The
+series form `(∑_i f_i)^p ≤ ∑_i f_i^p` for `0 < p ≤ 1` (`ENNReal.rpow_tsum_le_tsum_rpow`) bounds
+the `q`-th power of an inner series by the series of the `q`-th powers for `q ≤ 1`, so that
+estimates for `ℓ_1` transfer to `ℓ_q` (`ENNReal.lqNorm_le_rpow_mul_of_tsum_rpow_le`).
+
+**Exponents below `1`.** For `0 < q < 1` the `ℓ_q` norm satisfies only the quasi-triangle
+inequality `‖a + b‖_q ≤ C_q (‖a‖_q + ‖b‖_q)` with Mathlib's constant `C_q = LpAddConst q`
+(`ENNReal.lqNorm_add_le'`, `ENNReal.lqNorm_le_head_add_shift'`); `C_q = 2^(1/q - 1)` for
+`0 < q < 1` and `C_q = 1` otherwise, with `1 ≤ C_q`, `2^(1/q) ≤ 2 C_q` and
+`(x^q + y^q)^(1/q) ≤ C_q (x + y)` (`ENNReal.one_le_LpAddConst`,
+`ENNReal.two_rpow_one_div_le_two_mul_LpAddConst`, `ENNReal.rpow_add_rpow_le_LpAddConst_mul`).
+
 The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥0∞` scalars,
-**monotonicity in `q`** (`lqNorm r a ≤ lqNorm q a` for `1 ≤ q ≤ r`; Mathlib has only the
+**monotonicity in `q`** (`lqNorm r a ≤ lqNorm q a` for `0 < q ≤ r`; Mathlib has only the
 inclusion `lp.monotone`, without the norm bound), the Cauchy–Schwarz inequality
 `∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for series and for finite sums
 (`ENNReal.lqNorm_one_mul_le`, `ENNReal.sum_mul_le_lqNorm_two_mul`), the splitting off of the
@@ -67,6 +83,66 @@ open MeasureTheory Filter
 open scoped ENNReal
 
 namespace ENNReal
+
+/-! ### Sums of powers -/
+
+section PowerSums
+
+variable {ι : Type*}
+
+/-- **Superadditivity of `x ↦ x^p` for `p ≥ 1`**: `∑_{i ∈ s} f_i^p ≤ (∑_{i ∈ s} f_i)^p` for every
+finite set `s` and every family `f` in `[0, ∞]`, by induction over `s` from the case of two terms
+(Mathlib's `ENNReal.add_rpow_le_rpow_add`). -/
+theorem sum_rpow_le_rpow_sum (s : Finset ι) (f : ι → ℝ≥0∞) {p : ℝ} (hp1 : 1 ≤ p) :
+    ∑ i ∈ s, f i ^ p ≤ (∑ i ∈ s, f i) ^ p := by
+  classical
+  induction s using Finset.induction_on with
+  | empty => simp [zero_rpow_of_pos (zero_lt_one.trans_le hp1)]
+  | insert i s hi ih =>
+    rw [Finset.sum_insert hi, Finset.sum_insert hi]
+    exact (add_le_add le_rfl ih).trans (add_rpow_le_rpow_add _ _ hp1)
+
+/-- **The finite `ℓ_p` sums decrease in `p`**:
+`(∑_{i ∈ s} f_i^q)^(1/q) ≤ (∑_{i ∈ s} f_i^p)^(1/p)` for `0 < p ≤ q`, every finite set `s` and every
+family `f` in `[0, ∞]`. Write `f_i^q = (f_i^p)^(q/p)` with `q/p ≥ 1` and apply
+`ENNReal.sum_rpow_le_rpow_sum`; this is the finite form of Mathlib's `ENNReal.rpow_add_rpow_le`. -/
+theorem rpow_sum_rpow_le (s : Finset ι) (f : ι → ℝ≥0∞) {p q : ℝ} (hp_pos : 0 < p) (hpq : p ≤ q) :
+    (∑ i ∈ s, f i ^ q) ^ (1 / q) ≤ (∑ i ∈ s, f i ^ p) ^ (1 / p) := by
+  have hq_pos : 0 < q := hp_pos.trans_le hpq
+  have h_rpow : ∀ i ∈ s, f i ^ q = (f i ^ p) ^ (q / p) := fun i _ => by
+    rw [← ENNReal.rpow_mul, mul_div_cancel₀ _ hp_pos.ne']
+  have h_sum : ∑ i ∈ s, (f i ^ p) ^ (q / p) ≤ (∑ i ∈ s, f i ^ p) ^ (q / p) :=
+    sum_rpow_le_rpow_sum s (fun i => f i ^ p) ((one_le_div hp_pos).2 hpq)
+  rw [Finset.sum_congr rfl h_rpow]
+  calc (∑ i ∈ s, (f i ^ p) ^ (q / p)) ^ (1 / q)
+      ≤ ((∑ i ∈ s, f i ^ p) ^ (q / p)) ^ (1 / q) := rpow_le_rpow h_sum (by positivity)
+    _ = (∑ i ∈ s, f i ^ p) ^ (1 / p) := by
+        rw [← ENNReal.rpow_mul]
+        congr 1
+        field_simp
+
+/-- **Subadditivity of `x ↦ x^p` for `0 < p ≤ 1`**: `(∑_{i ∈ s} f_i)^p ≤ ∑_{i ∈ s} f_i^p` for every
+finite set `s` and every family `f` in `[0, ∞]` (Mathlib's `Finset.le_sum_of_subadditive` for the
+case of two terms, `ENNReal.rpow_add_le_add_rpow`). -/
+theorem rpow_sum_le_sum_rpow (s : Finset ι) (f : ι → ℝ≥0∞) {p : ℝ} (hp_pos : 0 < p)
+    (hp1 : p ≤ 1) : (∑ i ∈ s, f i) ^ p ≤ ∑ i ∈ s, f i ^ p :=
+  Finset.le_sum_of_subadditive (fun x : ℝ≥0∞ => x ^ p) (zero_rpow_of_pos hp_pos).le
+    (fun x y => rpow_add_le_add_rpow x y hp_pos.le hp1) s f
+
+/-- **Subadditivity of `x ↦ x^p` for series**, `0 < p ≤ 1`: `(∑_i f_i)^p ≤ ∑_i f_i^p` for every
+family `f` in `[0, ∞]`. A series is the supremum of its finite partial sums
+(`ENNReal.tsum_eq_iSup_sum`), the power `x ↦ x^p` commutes with suprema
+(`ENNReal.orderIsoRpow`), and `ENNReal.rpow_sum_le_sum_rpow` bounds each partial sum. -/
+theorem rpow_tsum_le_tsum_rpow (f : ι → ℝ≥0∞) {p : ℝ} (hp_pos : 0 < p) (hp1 : p ≤ 1) :
+    (∑' i, f i) ^ p ≤ ∑' i, f i ^ p := by
+  rw [ENNReal.tsum_eq_iSup_sum]
+  calc (⨆ s : Finset ι, ∑ i ∈ s, f i) ^ p = ⨆ s : Finset ι, (∑ i ∈ s, f i) ^ p :=
+        (orderIsoRpow p hp_pos).map_iSup _
+    _ ≤ ⨆ s : Finset ι, ∑ i ∈ s, f i ^ p :=
+        iSup_mono fun s => rpow_sum_le_sum_rpow s f hp_pos hp1
+    _ = ∑' i, f i ^ p := ENNReal.tsum_eq_iSup_sum.symm
+
+end PowerSums
 
 /-- The **`ℓ_q` norm** of a family `a : ι → [0, ∞]`: `(∑_i a_i ^ q) ^ (1/q)` for `q < ∞` and
 `sup_i a_i` for `q = ∞`, defined as the `L_q` norm for the counting measure.  The index set is `ℕ`
@@ -116,6 +192,11 @@ theorem rpow_eq_mul_rpow_sub_one (a : ℝ≥0∞) {r : ℝ} (hr : 1 ≤ r) :
 theorem one_lt_toReal {p : ℝ≥0∞} (hp1 : 1 < p) (hp : p ≠ ∞) : 1 < p.toReal := by
   simpa using (ENNReal.toReal_lt_toReal ENNReal.one_ne_top hp).2 hp1
 
+/-- An exponent `0 < q ≤ 1` in `[0, ∞]` has real value `q.toReal ∈ (0, 1]`. -/
+theorem toReal_mem_Ioc_of_le_one (hq0 : q ≠ 0) (hq1 : q ≤ 1) : q.toReal ∈ Set.Ioc 0 1 :=
+  ⟨ENNReal.toReal_pos hq0 (ne_top_of_le_ne_top one_ne_top hq1),
+    by simpa using ENNReal.toReal_mono one_ne_top hq1⟩
+
 /-- The `q`-th power of the norm is the sum of the `q`-th powers. -/
 theorem lqNorm_rpow (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ι → ℝ≥0∞) :
     lqNorm q a ^ q.toReal = ∑' n, a n ^ q.toReal := by
@@ -154,7 +235,8 @@ omit [Countable ι] [MeasurableSingletonClass ι] in
 theorem lqNorm_zero_right (q : ℝ≥0∞) : lqNorm q (fun _ : ι => (0 : ℝ≥0∞)) = 0 := eLpNorm_fun_zero
 
 /-- The exponent `0` is degenerate: `eLpNorm` assigns it the value `0`.  The statements below
-with a hypothesis `1 ≤ q` need it; the others hold for every `q`. -/
+that hold only for genuine exponents carry a hypothesis `q ≠ 0` or `1 ≤ q`; the others hold for
+every `q`. -/
 @[simp]
 theorem lqNorm_zero_left (a : ι → ℝ≥0∞) : lqNorm 0 a = 0 :=
   eLpNorm_exponent_zero (aestronglyMeasurable_count a)
@@ -173,6 +255,15 @@ omit [Countable ι] [MeasurableSingletonClass ι] in
 theorem lqNorm_add_le (hq : 1 ≤ q) (a b : ι → ℝ≥0∞) :
     lqNorm q (fun n => a n + b n) ≤ lqNorm q a + lqNorm q b :=
   eLpNorm_add_le (f := a) (g := b) hq
+
+omit [Countable ι] [MeasurableSingletonClass ι] in
+/-- **The quasi-triangle inequality** for `ℓ_q`, every `q ∈ [0, ∞]`:
+`‖a + b‖_q ≤ C_q (‖a‖_q + ‖b‖_q)` with Mathlib's constant `C_q = LpAddConst q`, which is
+`2^(1/q - 1)` for `0 < q < 1` and `1` otherwise (`MeasureTheory.eLpNorm_add_le'` for the counting
+measure). -/
+theorem lqNorm_add_le' (q : ℝ≥0∞) (a b : ι → ℝ≥0∞) :
+    lqNorm q (fun n => a n + b n) ≤ LpAddConst q * (lqNorm q a + lqNorm q b) :=
+  eLpNorm_add_le' (f := a) (g := b) q
 
 /-- **Homogeneity**: `‖c a‖_q = c ‖a‖_q` for every `c ∈ ℝ≥0∞`. -/
 theorem lqNorm_const_mul (c : ℝ≥0∞) (a : ι → ℝ≥0∞) :
@@ -202,15 +293,15 @@ theorem lqNorm_lt_top_iff_of_le_mul {a b : ι → ℝ≥0∞} {K M : ℝ≥0∞}
       _ = M * lqNorm q b := lqNorm_const_mul M b
       _ < ∞ := ENNReal.mul_lt_top hM.lt_top h
 
-/-- **Monotonicity in the exponent**: for `1 ≤ q ≤ r`, `‖a‖_r ≤ ‖a‖_q`.  Proof: with
-`M = ‖a‖_q`, each term satisfies `a n ^ r ≤ M ^ (r - q) a n ^ q`; sum over `n`. -/
-theorem lqNorm_le_lqNorm_of_le (hq : 1 ≤ q) (hqr : q ≤ r) (a : ι → ℝ≥0∞) :
+/-- **Monotonicity in the exponent**: for `0 < q ≤ r`, `‖a‖_r ≤ ‖a‖_q`, also for exponents below
+`1`.  Proof: with `M = ‖a‖_q`, each term satisfies `a n ^ r ≤ M ^ (r - q) a n ^ q`; sum over
+`n`. -/
+theorem lqNorm_le_lqNorm_of_le (hq0 : q ≠ 0) (hqr : q ≤ r) (a : ι → ℝ≥0∞) :
     lqNorm r a ≤ lqNorm q a := by
-  have hq0 : q ≠ 0 := (zero_lt_one.trans_le hq).ne'
   rcases eq_or_ne r ∞ with rfl | hr
   · rw [lqNorm_top]; exact iSup_le (le_lqNorm hq0 a)
   have hq' : q ≠ ∞ := ne_top_of_le_ne_top hr hqr
-  have hr0 : r ≠ 0 := (zero_lt_one.trans_le (hq.trans hqr)).ne'
+  have hr0 : r ≠ 0 := ((pos_iff_ne_zero.2 hq0).trans_le hqr).ne'
   set M := lqNorm q a
   set p := q.toReal
   set p' := r.toReal
@@ -231,7 +322,7 @@ theorem lqNorm_le_lqNorm_of_le (hq : 1 ≤ q) (hqr : q ≤ r) (a : ι → ℝ≥
 
 /-- `‖a‖_{ℓ_q} ≤ ‖a‖_{ℓ_1} = ∑_i a_i` for `q ≥ 1`. -/
 theorem lqNorm_le_lqNorm_one (hq : 1 ≤ q) (a : ι → ℝ≥0∞) : lqNorm q a ≤ ∑' n, a n := by
-  simpa [lqNorm_one] using lqNorm_le_lqNorm_of_le le_rfl hq a
+  simpa [lqNorm_one] using lqNorm_le_lqNorm_of_le one_ne_zero hq a
 
 /-- A family that vanishes outside a finite set `s` has `‖a‖_{ℓ_q} ≤ ∑_{i ∈ s} a_i` for
 `q ≥ 1` (`ENNReal.lqNorm_le_lqNorm_one`). -/
@@ -314,6 +405,19 @@ theorem lqNorm_comp_le_of_injective {g : ι → ι'} (hg : Function.Injective g)
   · rw [Function.extend_apply' _ _ _ hn]
     exact zero_le
 
+/-- **Comparing `ℓ_q` norms through the sums of `q`-th powers**: for `q < ∞` and families
+`a`, `b` in `[0, ∞]` on two countable sets, if `∑_i a_i^q ≤ C ∑_j b_j^q`, then
+`‖a‖_{ℓ_q} ≤ C^(1/q) ‖b‖_{ℓ_q}` (for `q = 0` the left side is the degenerate value `0`). For
+`q ≤ 1` the `q`-th power of an inner series is at most the series of the `q`-th powers, so an
+inequality for `ℓ_1` norms transfers to `ℓ_q` this way. -/
+theorem lqNorm_le_rpow_mul_of_tsum_rpow_le (hq : q ≠ ∞) {a : ι → ℝ≥0∞}
+    {b : ι' → ℝ≥0∞} {C : ℝ≥0∞} (h : ∑' i, a i ^ q.toReal ≤ C * ∑' j, b j ^ q.toReal) :
+    lqNorm q a ≤ C ^ (1 / q.toReal) * lqNorm q b := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · simp
+  rw [lqNorm_eq_tsum hq0 hq, lqNorm_eq_tsum hq0 hq, ← mul_rpow_of_nonneg _ _ (by positivity)]
+  exact rpow_le_rpow h (by positivity)
+
 end Generic
 
 /-- Restricting every member of a family to a set `S` restricts its pointwise `ℓ_q` norm:
@@ -332,26 +436,45 @@ variable {q r : ℝ≥0∞} {a b : ℕ → ℝ≥0∞}
 theorem lqNorm_shift_le (a : ℕ → ℝ≥0∞) : lqNorm q (fun n => a (n + 1)) ≤ lqNorm q a :=
   lqNorm_comp_le_of_injective (add_left_injective 1) a
 
-/-- **Splitting off the first term**: `‖a‖_q ≤ a 0 + ‖(a (n + 1))ₙ‖_q`, by Minkowski's
-inequality for `a = (a 0, 0, 0, …) + (0, a 1, a 2, …)`, the second summand being the extension by
-zero of `(a (n + 1))ₙ` along `n ↦ n + 1` (`ENNReal.lqNorm_extend_zero`). -/
-theorem lqNorm_le_head_add_shift (hq : 1 ≤ q) (a : ℕ → ℝ≥0∞) :
-    lqNorm q a ≤ a 0 + lqNorm q (fun n => a (n + 1)) := by
+/-- `‖(…, 0, x, 0, …)‖_{ℓ_q} = x` for a sequence with one nonzero term and every `q ≠ 0`. -/
+theorem lqNorm_ite_eq {q : ℝ≥0∞} (hq0 : q ≠ 0) (j : ℕ) (x : ℝ≥0∞) :
+    lqNorm q (fun i => if i = j then x else 0) = x := by
+  have h : (fun i => if i = j then x else 0) = ({j} : Set ℕ).indicator fun _ => x := by
+    funext i
+    by_cases hi : i = j
+    · rw [Set.indicator_of_mem (Set.mem_singleton_iff.2 hi)]; simp [hi]
+    · rw [Set.indicator_of_notMem (mt Set.mem_singleton_iff.1 hi)]; simp [hi]
+  rw [lqNorm, h, eLpNorm_indicator_const' (measurableSet_singleton j).nullMeasurableSet
+    (by simp) hq0, Measure.count_singleton, ENNReal.one_rpow, mul_one]
+  rfl
+
+/-- **Splitting off the first term, for every exponent**:
+`‖a‖_q ≤ C_q (a 0 + ‖(a (n + 1))ₙ‖_q)` with Mathlib's constant `C_q = LpAddConst q` of the
+quasi-triangle inequality (`ENNReal.lqNorm_add_le'`) for
+`a = (a 0, 0, 0, …) + (0, a 1, a 2, …)`; the second summand is the extension by zero of
+`(a (n + 1))ₙ` along `n ↦ n + 1` (`ENNReal.lqNorm_extend_zero`). -/
+theorem lqNorm_le_head_add_shift' (q : ℝ≥0∞) (a : ℕ → ℝ≥0∞) :
+    lqNorm q a ≤ LpAddConst q * (a 0 + lqNorm q (fun n => a (n + 1))) := by
+  rcases eq_or_ne q 0 with rfl | hq0
+  · simp
   have hab : a = fun n => (if n = 0 then a 0 else 0) +
       Function.extend (· + 1) (fun n => a (n + 1)) 0 n := by
     funext n
     rcases n with _ | n
     · simp
     · simp [(add_left_injective 1).extend_apply (fun n => a (n + 1)) 0 n]
-  calc lqNorm q a ≤ lqNorm q (fun n => if n = 0 then a 0 else 0) +
-        lqNorm q (Function.extend (· + 1) (fun n => a (n + 1)) 0) := by
+  calc lqNorm q a ≤ LpAddConst q * (lqNorm q (fun n => if n = 0 then a 0 else 0) +
+        lqNorm q (Function.extend (· + 1) (fun n => a (n + 1)) 0)) := by
         conv_lhs => rw [hab]
-        exact lqNorm_add_le hq _ _
-    _ ≤ a 0 + lqNorm q (fun n => a (n + 1)) := by
-        rw [lqNorm_extend_zero (add_left_injective 1)]
-        gcongr
-        refine (lqNorm_le_sum_of_eq_zero hq {0} fun n hn => ?_).trans_eq (by simp)
-        simp [Finset.mem_singleton.not.1 hn]
+        exact lqNorm_add_le' q _ _
+    _ = LpAddConst q * (a 0 + lqNorm q (fun n => a (n + 1))) := by
+        rw [lqNorm_extend_zero (add_left_injective 1), lqNorm_ite_eq hq0]
+
+/-- **Splitting off the first term**: `‖a‖_q ≤ a 0 + ‖(a (n + 1))ₙ‖_q` for `1 ≤ q ≤ ∞`, the case
+`LpAddConst q = 1` of `ENNReal.lqNorm_le_head_add_shift'`. -/
+theorem lqNorm_le_head_add_shift (hq : 1 ≤ q) (a : ℕ → ℝ≥0∞) :
+    lqNorm q a ≤ a 0 + lqNorm q (fun n => a (n + 1)) := by
+  simpa [LpAddConst_of_one_le hq] using lqNorm_le_head_add_shift' q a
 
 /-- **Splitting off the first `m` terms**: `‖a‖_q ≤ a 0 + ⋯ + a (m - 1) + ‖(a (n + m))ₙ‖_q`. -/
 theorem lqNorm_le_sum_range_add_shift (hq : 1 ≤ q) (a : ℕ → ℝ≥0∞) (m : ℕ) :
@@ -374,7 +497,8 @@ theorem lqNorm_le_sum_range_add_shift (hq : 1 ≤ q) (a : ℕ → ℝ≥0∞) (m
 for `q = 1`. -/
 theorem lqNorm_geometric_le (hq : 1 ≤ q) (r : ℝ≥0∞) :
     lqNorm q (fun k => r ^ k) ≤ (1 - r)⁻¹ := by
-  calc lqNorm q (fun k => r ^ k) ≤ lqNorm 1 (fun k => r ^ k) := lqNorm_le_lqNorm_of_le le_rfl hq _
+  calc lqNorm q (fun k => r ^ k) ≤ lqNorm 1 (fun k => r ^ k) :=
+        lqNorm_le_lqNorm_of_le one_ne_zero hq _
     _ = (1 - r)⁻¹ := by rw [lqNorm_one, ENNReal.tsum_geometric]
 
 /-! ### Dyadic weights -/
@@ -873,18 +997,6 @@ theorem lqNorm_ite_le_eq {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : 
   refine tsum_congr fun j => ?_
   split_ifs <;> simp [ENNReal.zero_rpow_of_pos hpos]
 
-/-- `‖(…, 0, x, 0, …)‖_{ℓ_q} = x` for a sequence with one nonzero term. -/
-theorem lqNorm_ite_eq {q : ℝ≥0∞} (hq : 1 ≤ q) (j : ℕ) (x : ℝ≥0∞) :
-    lqNorm q (fun i => if i = j then x else 0) = x := by
-  have h : (fun i => if i = j then x else 0) = ({j} : Set ℕ).indicator fun _ => x := by
-    funext i
-    by_cases hi : i = j
-    · rw [Set.indicator_of_mem (Set.mem_singleton_iff.2 hi)]; simp [hi]
-    · rw [Set.indicator_of_notMem (mt Set.mem_singleton_iff.1 hi)]; simp [hi]
-  rw [lqNorm, h, eLpNorm_indicator_const' (measurableSet_singleton j).nullMeasurableSet
-    (by simp) (zero_lt_one.trans_le hq).ne', Measure.count_singleton, ENNReal.one_rpow, mul_one]
-  rfl
-
 /-! ### Products of sums -/
 
 /-- `a x + b y ≤ (a + b)(x + y)` in `[0, ∞]`. -/
@@ -949,6 +1061,50 @@ theorem mul_div_rpow_eq {a b : ℝ≥0∞} (ha0 : a ≠ 0) (ha : a ≠ ∞) (θ 
 theorem rpow_mul_rpow_ne_top {a b : ℝ≥0∞} (ha0 : a ≠ 0) (ha : a ≠ ∞) (hb0 : b ≠ 0) (hb : b ≠ ∞)
     (θ : ℝ) : a ^ (1 - θ) * b ^ θ ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_ne_zero ha0 ha) (ENNReal.rpow_ne_top_of_ne_zero hb0 hb)
+
+/-! ### The constant of the quasi-triangle inequality -/
+
+/-- Mathlib's constant `LpAddConst q` of the quasi-triangle inequality is at least `1`: it is `1`
+outside `(0, 1)` and `2^(1/q - 1)` with `1/q - 1 > 0` inside. -/
+theorem one_le_LpAddConst (q : ℝ≥0∞) : 1 ≤ LpAddConst q := by
+  rw [LpAddConst]
+  split_ifs with h
+  · refine one_le_two_rpow ?_
+    rw [one_div, sub_nonneg, ← ENNReal.toReal_inv, ← ENNReal.toReal_one]
+    exact ENNReal.toReal_mono (by simpa using h.1.ne') (ENNReal.one_le_inv.2 h.2.le)
+  · exact le_rfl
+
+/-- **`2^(1/q)` and the constant of the quasi-triangle inequality**: `2^(1/q) ≤ 2 C_q` for every
+`q`, with Mathlib's constant `C_q = LpAddConst q` (and `1/0 = 1/∞ = 0` for the real value of
+`q`). For `0 < q < 1` both sides are equal, since `C_q = 2^(1/q - 1)`; otherwise `C_q = 1` and
+the left side is at most `2`. -/
+theorem two_rpow_one_div_le_two_mul_LpAddConst (q : ℝ≥0∞) :
+    (2 : ℝ≥0∞) ^ (1 / q.toReal) ≤ 2 * LpAddConst q := by
+  by_cases h : q ∈ Set.Ioo 0 1
+  · rw [LpAddConst, ite_eq_left h]
+    refine le_of_eq ?_
+    calc (2 : ℝ≥0∞) ^ (1 / q.toReal) = 2 ^ (1 : ℝ) * 2 ^ (1 / q.toReal - 1) := by
+          rw [two_rpow_mul_two_rpow, add_sub_cancel]
+      _ = 2 * 2 ^ (1 / q.toReal - 1) := by rw [rpow_one]
+  rw [LpAddConst, ite_eq_right h, mul_one]
+  calc (2 : ℝ≥0∞) ^ (1 / q.toReal) ≤ 2 ^ (1 : ℝ) := by
+        refine rpow_le_rpow_of_exponent_le one_le_two ?_
+        rcases eq_or_ne q 0 with rfl | hq0
+        · simp
+        rcases eq_or_ne q ∞ with rfl | hq
+        · simp
+        have hq1 : 1 ≤ q := not_lt.1 fun h1 => h ⟨pos_iff_ne_zero.2 hq0, h1⟩
+        exact div_le_one_of_le₀ (one_le_toReal_of_one_le hq1 hq) toReal_nonneg
+    _ = 2 := rpow_one 2
+
+/-- **The `ℓ_q` sum of two numbers**: `(x^q + y^q)^(1/q) ≤ C_q (x + y)` for `0 < q < ∞` and all
+`x, y ∈ [0, ∞]`, with Mathlib's constant `C_q = LpAddConst q` (Mathlib's
+`ENNReal.rpow_add_le_mul_rpow_add_rpow''` for `x^q` and `y^q`). -/
+theorem rpow_add_rpow_le_LpAddConst_mul {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q ≠ ∞) (x y : ℝ≥0∞) :
+    (x ^ q.toReal + y ^ q.toReal) ^ (1 / q.toReal) ≤ LpAddConst q * (x + y) := by
+  have hp : q.toReal ≠ 0 := (ENNReal.toReal_pos hq0 hq).ne'
+  have h := rpow_add_le_mul_rpow_add_rpow'' (x ^ q.toReal) (y ^ q.toReal) (p := q)
+  rwa [rpow_rpow_inv hp, rpow_rpow_inv hp, ← one_div] at h
 
 end ENNReal
 

@@ -37,12 +37,12 @@ variable {X : Type*} [NormedAddCommGroup X] [NormedSpace ℝ X]
 variable {A : ApproximationScheme X} {s t : ℝ} {q r : ℝ≥0∞}
 
 /-- **Increasing the fine index**: `‖f‖_{A^s_r} ≤ ‖f‖_{A^s_q}` in the dyadic form, for
-`1 ≤ q ≤ r`. -/
-theorem approxNormDyadic_mono_exponent (hq : 1 ≤ q) (hqr : q ≤ r) (f : X) :
+`0 < q ≤ r`. -/
+theorem approxNormDyadic_mono_exponent (hq0 : q ≠ 0) (hqr : q ≤ r) (f : X) :
     A.approxNormDyadic s r f ≤ A.approxNormDyadic s q f := by
   unfold approxNormDyadic
   gcongr
-  exact ENNReal.lqNorm_le_lqNorm_of_le hq hqr _
+  exact ENNReal.lqNorm_le_lqNorm_of_le hq0 hqr _
 
 /-- Changing the smoothness index multiplies the dyadic terms by `2^(k(t-s))`. -/
 theorem approxSeqDyadic_eq_mul (s t : ℝ) (f : X) (k : ℕ) :
@@ -61,7 +61,7 @@ theorem approxNormDyadic_le_of_lt (hq : 1 ≤ q) (hr : 1 ≤ r) (f : X) :
         ≤ lqNorm r (fun k => D * dyadicWeight (-(s - t)) k) := ENNReal.lqNorm_mono fun k => by
           rw [approxSeqDyadic_eq_mul s t, show t - s = -(s - t) by ring, mul_comm D]
           gcongr
-          exact approxSeqDyadic_le_lqNorm hq f k
+          exact approxSeqDyadic_le_lqNorm (zero_lt_one.trans_le hq).ne' f k
       _ = D * lqNorm r (dyadicWeight (-(s - t))) := ENNReal.lqNorm_const_mul _ _
       _ ≤ D * C := by gcongr; exact ENNReal.lqNorm_dyadicWeight_neg_le hr _
       _ = C * D := mul_comm _ _
@@ -74,7 +74,8 @@ theorem approxNorm_le_of_exponent_le (hq : 1 ≤ q) (hqr : q ≤ r) (hs : 0 ≤ 
     A.approxNorm s r f ≤ 2 ^ s * (4 * 2 ^ s) * A.approxNorm s q f := by
   calc A.approxNorm s r f ≤ 2 ^ s * A.approxNormDyadic s r f :=
         approxNorm_le_approxNormDyadic (hq.trans hqr) hs f
-    _ ≤ 2 ^ s * A.approxNormDyadic s q f := by gcongr; exact approxNormDyadic_mono_exponent hq hqr f
+    _ ≤ 2 ^ s * A.approxNormDyadic s q f := by
+        gcongr; exact approxNormDyadic_mono_exponent (zero_lt_one.trans_le hq).ne' hqr f
     _ ≤ 2 ^ s * (4 * 2 ^ s * A.approxNorm s q f) := by
         gcongr; exact approxNormDyadic_le_approxNorm hq hs f
     _ = _ := by ring
@@ -96,7 +97,7 @@ theorem MemApprox.mono_exponent (hq : 1 ≤ q) (hqr : q ≤ r) (hs : 0 ≤ s) {f
     (hf : A.MemApprox s q f) : A.MemApprox s r f := by
   rw [memApprox_iff_approxNormDyadic_lt_top hq hs] at hf
   rw [memApprox_iff_approxNormDyadic_lt_top (hq.trans hqr) hs]
-  exact (approxNormDyadic_mono_exponent hq hqr f).trans_lt hf
+  exact (approxNormDyadic_mono_exponent (zero_lt_one.trans_le hq).ne' hqr f).trans_lt hf
 
 /-- `A^s_q ⊆ A^t_r` for `0 ≤ t < s` and all `1 ≤ q, r ≤ ∞`. -/
 theorem MemApprox.of_lt (hq : 1 ≤ q) (hr : 1 ≤ r) (ht : 0 ≤ t) (hts : t < s) {f : X}

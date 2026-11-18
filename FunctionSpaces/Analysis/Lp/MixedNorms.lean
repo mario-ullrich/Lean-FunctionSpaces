@@ -453,7 +453,7 @@ theorem eLpNorm_lqNorm_le_lqNorm_min (hp1 : 1 ≤ p) (hp : p ≠ ∞) (hq : 1 �
     refine eLpNorm_mono_enorm_ae (aemeasurable_lqNorm_comp hg q).aestronglyMeasurable
       (Eventually.of_forall fun x => ?_)
     simp only [enorm_eq_self]
-    exact ENNReal.lqNorm_le_lqNorm_of_le hp1 hpq _
+    exact ENNReal.lqNorm_le_lqNorm_of_le (zero_lt_one.trans_le hp1).ne' hpq _
   · rw [min_eq_right hqp]
     exact eLpNorm_lqNorm_le_lqNorm_eLpNorm (zero_lt_one.trans_le hq).ne' hqp hp
 
@@ -472,7 +472,7 @@ theorem lqNorm_max_le_eLpNorm_lqNorm (hp1 : 1 ≤ p) (hp : p ≠ ∞) (hq : 1 �
     refine eLpNorm_mono_enorm_ae (aemeasurable_lqNorm_comp hg p).aestronglyMeasurable
       (Eventually.of_forall fun x => ?_)
     simp only [enorm_eq_self]
-    exact ENNReal.lqNorm_le_lqNorm_of_le hq hqp _
+    exact ENNReal.lqNorm_le_lqNorm_of_le (zero_lt_one.trans_le hq).ne' hqp _
 
 end Countable
 
@@ -793,16 +793,16 @@ theorem eLpNorm_lqNorm_dyadicWeight_zero_left (u : ℕ → α → ℝ≥0∞) :
       eLpNorm (fun x => lqNorm q fun j => u j x) p μ := by
   simp only [ENNReal.dyadicWeight_zero_left, one_mul]
 
-/-- **Mixed norms decrease in `q`**: for `1 ≤ q ≤ r ≤ ∞` and measurable `u_j : α → [0, ∞]`,
+/-- **Mixed norms decrease in `q`**: for `0 < q ≤ r ≤ ∞` and measurable `u_j : α → [0, ∞]`,
 `‖x ↦ ‖(u_j(x))_j‖_{ℓ_r}‖_p ≤ ‖x ↦ ‖(u_j(x))_j‖_{ℓ_q}‖_p`, since `‖·‖_{ℓ_r} ≤ ‖·‖_{ℓ_q}` at
 every point. -/
-theorem eLpNorm_lqNorm_mono_exponent {r : ℝ≥0∞} (hq : 1 ≤ q) (hqr : q ≤ r)
+theorem eLpNorm_lqNorm_mono_exponent {r : ℝ≥0∞} (hq0 : q ≠ 0) (hqr : q ≤ r)
     (hu : ∀ j, AEMeasurable (u j) μ) :
     eLpNorm (fun x => lqNorm r fun j => u j x) p μ ≤
       eLpNorm (fun x => lqNorm q fun j => u j x) p μ :=
   eLpNorm_mono_enorm (aemeasurable_lqNorm_comp hu r).aestronglyMeasurable fun x => by
     simp only [enorm_eq_self]
-    exact ENNReal.lqNorm_le_lqNorm_of_le hq hqr _
+    exact ENNReal.lqNorm_le_lqNorm_of_le hq0 hqr _
 
 /-- **Monotonicity in `s` for dyadic families**: for `s ≤ t` and measurable `u_j : α → [0, ∞]`,
 `‖x ↦ ‖(2^(js) u_j(x))_j‖_{ℓ_q}‖_p ≤ ‖x ↦ ‖(2^(jt) u_j(x))_j‖_{ℓ_q}‖_p`, since

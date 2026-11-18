@@ -525,7 +525,7 @@ theorem modNorm_level_le {p : ℝ≥0∞} [Fact (1 ≤ p)] (hp : p ≠ ∞) {ι 
     · have h0 : levelNorm p (coef' i) = 0 := by
         simp [levelNorm, coef', hij]
       simp [hij, h0]
-  rw [hseq, ENNReal.lqNorm_ite_eq hq]
+  rw [hseq, ENNReal.lqNorm_ite_eq (zero_lt_one.trans_le hq).ne']
 
 /-! ### Atoms from pointwise bounds -/
 
@@ -623,8 +623,8 @@ theorem isRegularAtom_of_pointwise {p : ℝ≥0∞} {σ : ℝ} {r : ℕ} {d : �
 omit [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Smooth atoms**: a smooth function vanishing outside `B̄(c, d 2^(-j))` with
 `‖D^l a‖ ≤ A 2^(jl)` for `l ≤ r` satisfies the pointwise bounds of `Rd.isRegularAtom_of_pointwise`
-with exponent `σ = r` and the constant `2^r A`: `|Δ_h^r a| ≤ A (2^j ‖h‖)^r` by the mean value
-theorem and `|Δ_h^r a| ≤ 2^r A`. -/
+with exponent `σ = r` and the constant `2^r A`: `|Δ_h^r a| ≤ A (2^j ‖h‖)^r` by the
+mean value theorem and `|Δ_h^r a| ≤ 2^r A`. -/
 theorem enorm_higherDiff_le_of_iteratedFDeriv {a : V → ℂ}
     (ha : ContDiff ℝ ((⊤ : ℕ∞) : WithTop ℕ∞) a) {r j : ℕ} {A : ℝ} (hA : 0 ≤ A)
     (hD : ∀ l ≤ r, ∀ x, ‖iteratedFDeriv ℝ l a x‖ ≤ A * 2 ^ (j * l)) (h x : V) :

@@ -932,7 +932,7 @@ theorem enorm_le_tlLocalMeansNorm {L : ℕ} (hL : 1 ≤ L) (hp : p ≠ ∞) {q :
     _ ≤ b.tlLocalMeansNorm L s q f :=
         eLpNorm_mono_enorm (measurable_lqNorm_comp hmeas ∞).aestronglyMeasurable fun x => by
           simp only [enorm_eq_self]
-          exact ENNReal.lqNorm_le_lqNorm_of_le hq le_top _
+          exact ENNReal.lqNorm_le_lqNorm_of_le (zero_lt_one.trans_le hq).ne' le_top _
 
 /-- The constant `2 ‖m‖_1 (1 - 2^(-s))⁻¹ + C A_{s,L} C_{FS}` of the bound of the ball means
 quasi-norm by local means: `‖m‖_1` is the `L_1` norm of the moment kernel,
