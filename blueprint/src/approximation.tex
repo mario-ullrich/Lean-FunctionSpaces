@@ -122,6 +122,7 @@ finite because $0 \in A_n$.
   ApproximationScheme.approxError_eq_zero_of_mem,
   ApproximationScheme.approxError_eq_zero_of_mem_closure,
   ApproximationScheme.approxError_anti_scheme, ApproximationScheme.le_approxError_iff,
+  ApproximationScheme.le_approxError_sq_iff,
   ApproximationScheme.exists_mem_enorm_sub_lt, ApproximationScheme.exists_mem_enorm_sub_le_add,
   ApproximationScheme.le_mul_approxError_of_forall_mem,
   ApproximationScheme.approxError_add_le_pow_succ, ApproximationScheme.approxError_neg,
@@ -142,7 +143,9 @@ $m, n, k \in \N$:
   \item for every $\varepsilon > 0$ there is $a \in A_n$ with
     $\|f - a\| \leq E_n(f) + \varepsilon$;
   \item for all $e \in [0, \infty]$ and $C \in [0, \infty)$ with $e \leq C \|f - a\|$ for
-    every $a \in A_n$, $e \leq C \, E_n(f)$.
+    every $a \in A_n$, $e \leq C \, E_n(f)$;
+  \item for every $r \in [0, \infty]$, $r \leq E_n(f)^2$ if and only if
+    $r \leq \|f - a\|^2$ for every $a \in A_n$.
 \end{enumerate}
 \end{lemma}
 
@@ -154,8 +157,9 @@ $E_k(f + g) \leq \|(f - a) + (g - b)\| \leq \|f - a\| + \|g - b\|$ for all $a \i
 $b \in A_n$, and the infimum over $a$ and $b$ gives the bound. The fifth item is the
 $1$-Lipschitz property of the distance to a set, the sixth holds because the distance to a set
 equals the distance to its closure, the seventh because the infimum over a larger set is
-smaller, and the eighth is the definition of the infimum. For the last, divide by $C$ when
-$C > 0$ and take the infimum over $a$; for $C = 0$ take $a = 0$.
+smaller, and the eighth is the definition of the infimum. For the ninth, divide by $C$ when
+$C > 0$ and take the infimum over $a$; for $C = 0$ take $a = 0$. The last holds because
+squaring preserves the order of $[0, \infty]$.
 \end{proof}
 
 A best approximant, an $a \in A_n$ with $\|f - a\| = E_n(f)$, need not exist, since the sets
@@ -377,10 +381,12 @@ nonzero term of the seventh hold for all $0 < q \leq r \leq \infty$.
 
 \begin{proof}
 \leanok
+\uses{lem:rpow-sum-le}
 The first two items are immediate. The third is Minkowski's inequality for the finite
-partial sums, followed by the supremum over them. For the fourth put $M = \|a\|_{\ell_q}$;
-then $a_k^r = a_k^{r-q} a_k^q \leq M^{r-q} a_k^q$, and summation gives
-$\|a\|_{\ell_r}^r \leq M^r$. The fifth is the third applied to $a_0 \delta_0$ and the rest,
+partial sums, followed by the supremum over them. In the fourth, for $r = \infty$ every $a_k$ is
+at most $\|a\|_{\ell_q}$ by the second item; for $r < \infty$ the bound
+$\|a\|_{\ell_r} \leq \|a\|_{\ell_q}$ is the series form of the second claim of
+\Cref{lem:rpow-sum-le}. The fifth is the third applied to $a_0 \delta_0$ and the rest,
 and induction on $m$. The sixth is the fourth and the geometric series, the seventh is the
 fourth for a sequence with finitely many nonzero terms, the eighth compares the series of the
 $q$-th powers term by term; the last splits off the first term by the fifth, bounds the others
@@ -446,6 +452,28 @@ The second inequality is Hölder's inequality for the counting measure on $I$ (M
 Lp\_\allowbreak mul\_\allowbreak Lq}) with exponents $2$ and $2$; the first holds since every
 term is nonnegative.
 \end{proof}
+
+\begin{lemma}[Parseval's identity in {$[0, \infty]$}]
+\label{lem:l2-norm-sq}
+\lean{lp.enorm_sq_eq_tsum}
+\leanok
+For every index set $I$, every family $(E_i)_{i \in I}$ of normed groups and every
+$x \in \ell_2(I, (E_i)_i)$,
+\[
+  \|x\|^2 = \sum_{i \in I} \|x_i\|^2 ,
+\]
+the series of squares taken in $[0, \infty]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+This is Mathlib's \texttt{lp.\allowbreak norm\_\allowbreak rpow\_\allowbreak eq\_\allowbreak
+tsum} for $p = 2$, a convergent series of nonnegative reals, carried over to $[0, \infty]$.
+\end{proof}
+
+For a Hilbert basis $(e_i)_i$ of a Hilbert space $H$ the coefficient map
+$f \mapsto (\langle e_i, f \rangle)_i$ is an isometry onto $\ell_2(I)$, so
+\Cref{lem:l2-norm-sq} gives $\|f\|^2 = \sum_i |\langle e_i, f \rangle|^2$ in $[0, \infty]$.
 
 \begin{lemma}[Two inequalities in {$[0, \infty]$}]
 \label{lem:sum-of-products-le-product-of-sums}
@@ -658,7 +686,8 @@ test with power weights.
   ENNReal.iSup_pow_mul_le_dyadic, ENNReal.dyadic_le_iSup_pow_mul, ENNReal.sum_range_two_pow_eq,
   ENNReal.rpow_le_rpow_of_nonpos, ENNReal.natCast_two_pow_eq, ENNReal.card_Ico_two_pow,
   ENNReal.natCast_succ_rpow_le, ENNReal.dyadicWeight_le_natCast_succ_rpow,
-  ENNReal.sum_Ico_pow_mul_le, ENNReal.le_sum_Ico_pow_mul}
+  ENNReal.sum_Ico_pow_mul_le, ENNReal.le_sum_Ico_pow_mul, ENNReal.tsum_min_le_dyadic,
+  ENNReal.one_add_sum_range_two_pow, ENNReal.tsum_two_pow_mul_le_two_mul}
 \leanok
 \uses{def:lq-norm}
 Let $b$ be a decreasing sequence in $[0, \infty]$, let $\gamma \in \R$, and put
@@ -678,13 +707,24 @@ and for every $s \geq 0$,
   \qquad
   \sup_k 2^{ks} b_{2^k} \leq \sup_n (n+1)^s b_n .
 \]
+For every $m \in \N$,
+$\sum_{k=0}^\infty \min(b_k, b_{2^m}) \leq 2 \sum_{l=0}^\infty 2^{m+l} b_{2^{m+l}}$, and
+$\sum_{k=0}^\infty 2^k b_{2^k} \leq 2 \sum_{n=0}^\infty b_n$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 Split $\N \setminus \{0\}$ into the blocks $2^k \leq n < 2^{k+1}$ of $2^k$ elements each. On
 the block $k$, $(n+1)^\gamma$ lies between $2^{-\gamma_-} 2^{k\gamma}$ and
-$2^{\gamma_+} 2^{k\gamma}$, and $b_n$ lies between $b_{2^{k+1}}$ and $b_{2^k}$.
+$2^{\gamma_+} 2^{k\gamma}$, and $b_n$ lies between $b_{2^{k+1}}$ and $b_{2^k}$. For the
+capped sequence apply the first claim with $\gamma = 0$ to the decreasing sequence
+$\min(b_k, b_{2^m})$: its terms $k = 0$ and $2^k$, $k < m$, are at most $b_{2^m}$, with total
+weight $1 + \sum_{k < m} 2^k = 2^m$, and $2^m b_{2^m}$ is the first term of the right-hand side.
+For the last claim the blocks $2^k < n \leq 2^{k+1}$ of $2^k$ elements cover $n \geq 2$, and
+$b_n \geq b_{2^{k+1}}$ on the block $k$ (Mathlib's \texttt{Finset.\allowbreak
+sum\_\allowbreak condensed\_\allowbreak le'}); so
+$\sum_k 2^k b_{2^k} = b_1 + 2 \sum_k 2^k b_{2^{k+1}} \leq b_1 + 2 \sum_{n \geq 2} b_n
+\leq 2 \sum_n b_n$.
 \end{proof}
 
 Three sums over dyadic scales serve the vector-valued singular integrals of
@@ -821,14 +861,15 @@ of the terms.
 \begin{lemma}[Sums of powers]
 \label{lem:rpow-sum-le}
 \lean{ENNReal.sum_rpow_le_rpow_sum, ENNReal.rpow_sum_rpow_le, ENNReal.rpow_sum_le_sum_rpow,
-  ENNReal.rpow_tsum_le_tsum_rpow}
+  ENNReal.rpow_tsum_le_tsum_rpow, ENNReal.rpow_tsum_rpow_le}
 \leanok
 For every index set $I$, every finite set $s \subseteq I$ and every family $(f_i)_{i \in I}$ in
 $[0, \infty]$:
 \begin{enumerate}
   \item if $p \geq 1$, then $\sum_{i \in s} f_i^p \leq \bigl(\sum_{i \in s} f_i\bigr)^p$;
   \item if $0 < p \leq r$, then
-    $\bigl(\sum_{i \in s} f_i^r\bigr)^{1/r} \leq \bigl(\sum_{i \in s} f_i^p\bigr)^{1/p}$;
+    $\bigl(\sum_{i \in s} f_i^r\bigr)^{1/r} \leq \bigl(\sum_{i \in s} f_i^p\bigr)^{1/p}$ and
+    $\bigl(\sum_{i \in I} f_i^r\bigr)^{1/r} \leq \bigl(\sum_{i \in I} f_i^p\bigr)^{1/p}$;
   \item if $0 < p \leq 1$, then $\bigl(\sum_{i \in s} f_i\bigr)^p \leq \sum_{i \in s} f_i^p$ and
     $\bigl(\sum_{i \in I} f_i\bigr)^p \leq \sum_{i \in I} f_i^p$.
 \end{enumerate}
@@ -842,7 +883,8 @@ add}). For the second write $f_i^r = (f_i^p)^{r/p}$ with $r/p \geq 1$ and apply 
 the third, $x \mapsto x^p$ vanishes at $0$ and is subadditive (Mathlib's
 \texttt{ENNReal.\allowbreak rpow\_\allowbreak add\_\allowbreak le\_\allowbreak add\_\allowbreak
 rpow}); a series is the supremum of its finite partial sums, and $x \mapsto x^p$ commutes with
-suprema.
+suprema. The series form of the second claim is the series form of the third, applied to the
+family $f_i^r$ with the exponent $p/r \leq 1$.
 \end{proof}
 
 The three finite inequalities copy Mathlib pull request~\#44783.
@@ -4283,7 +4325,7 @@ $|c_i| \leq n^s |\hat a(i)|$.
   SpectralScheme.closure_iUnion_toScheme, SpectralScheme.repr_block, SpectralScheme.enorm_block_sq,
   SpectralScheme.truncate_add, SpectralScheme.truncate_smul, SpectralScheme.norm_truncate_le,
   SpectralScheme.truncateCLM_apply, SpectralScheme.truncate_of_mem,
-  SpectralScheme.projectionScheme_P, SpectralScheme.iUnion_span, SpectralScheme.enorm_sq_eq_tsum}
+  SpectralScheme.projectionScheme_P, SpectralScheme.iUnion_span}
 \leanok
 \uses{def:spectral, def:projection-scheme, def:blocks}
 The truncations $P_n$ form a projection scheme with bound $1$ for the spectral scheme, the
@@ -4297,8 +4339,9 @@ union $\bigcup_n A_n$ is dense in $H$, and for every $k \in \N$ and $f \in H$
 
 \begin{proof}
 \leanok
+\uses{lem:l2-norm-sq}
 Truncation is the orthogonal projection onto $A_n$. The union contains the span of the
-basis, which is dense. The formulas are Parseval's identity.
+basis, which is dense. The formulas are Parseval's identity (\Cref{lem:l2-norm-sq}).
 \end{proof}
 
 \begin{theorem}[Coefficient characterisation]
@@ -4326,6 +4369,223 @@ where $\omega_i = 2^{2ks}$ on the block $2^k \leq \lambda(i) < 2^{k+1}$ and $\om
 for $\lambda(i) = 0$; and $\omega_i \leq (1 + \lambda(i))^{2s} \leq 4^s \omega_i$.
 \end{proof}
 
+
+\section{Nonlinear approximation from a Hilbert basis}
+\label{sec:nterm-hilbert-basis}
+
+Best $n$-term approximation keeps, for each $f$, the $n$ coefficients of largest modulus. Its
+approximation spaces are described by the decreasing rearrangement of the coefficients, a
+sequence that lists their moduli in decreasing order. The definition below and its first
+properties are copied from the Lean project TauCeti~\cite{TauCeti}, with TauCeti's names.
+
+\begin{definition}[Decreasing rearrangement]
+\label{def:decreasing-rearrangement}
+\lean{decreasingRearrangement, decreasingRearrangement_eq_zero_of_not_bddAbove,
+  decreasingRearrangement_nonneg, le_decreasingRearrangement, antitone_decreasingRearrangement,
+  decreasingRearrangement_le_of_card_le, lt_decreasingRearrangement_iff,
+  card_le_of_forall_decreasingRearrangement_lt, finite_setOf_decreasingRearrangement_lt,
+  setOf_lt_decreasingRearrangement, exists_eq_decreasingRearrangement,
+  tendsto_decreasingRearrangement, decreasingRearrangement_mono,
+  decreasingRearrangement_add_le_of_card_le}
+\leanok
+Let $(r_i)_{i \in I}$ be a family of real numbers. Its \emph{decreasing rearrangement} is the
+sequence
+\[
+  r^*_n = \sup\bigl(\{0\} \cup \{a \in \R : a \leq r_i \text{ for } n + 1 \text{ distinct }
+  i \in I\}\bigr), \qquad n \in \N,
+\]
+with $r^*_n = 0$ if the set is unbounded. Call $r$ a \emph{null family} if
+$\{i : |r_i| > t\}$ is finite for every $t > 0$.
+\end{definition}
+
+For a nonnegative null family, $r^*_0 \geq r^*_1 \geq \cdots$ are the entries of $r$ in
+decreasing order, repeated according to their multiplicities and followed by zeros if only
+finitely many entries are positive. In Lean: $r^*$ is nonnegative and decreasing; for
+$a \geq 0$, $a < r^*_n$ if and only if $a < r_i$ for $n + 1$ distinct $i$; at most $n$ entries
+exceed $r^*_n$; if only finitely many entries exceed $a \geq 0$, then
+$\{n : a < r^*_n\} = \{0, \dots, \#\{i : a < r_i\} - 1\}$; positive terms of $r^*$ are entries
+of $r$, and $r^*_n \to 0$. Moreover $s \leq r$ implies $s^* \leq r^*$, and setting at most $N$
+entries to $0$ gives a family $s$ with $r^*_{n+N} \leq s^*_n$.
+
+\begin{lemma}[Rearrangement and sums of powers]
+\label{lem:decreasing-rearrangement-blocks}
+\lean{tsum_ofReal_rpow_eq_lintegral, encard_setOf_lt_decreasingRearrangement,
+  tsum_ofReal_rpow_decreasingRearrangement, succ_mul_rpow_decreasingRearrangement_le,
+  rpow_decreasingRearrangement_le_tsum, tsum_ite_rpow_le_tsum_min,
+  tsum_rpow_decreasingRearrangement_add_le, tsum_rpow_le_decreasingRearrangement,
+  tsum_two_pow_decreasingRearrangement_le, tsum_two_pow_mul_decreasingRearrangement_le_two_mul}
+\leanok
+\uses{def:decreasing-rearrangement, lem:condensation}
+Let $(r_i)_{i \in I}$ be a nonnegative null family and $p > 0$. Then
+\[
+  \sum_{n=0}^\infty (r^*_n)^p = \sum_{i \in I} r_i^p ,
+\]
+so $(n + 1)(r^*_n)^p \leq \sum_i r_i^p$ for every $n$. For every $N \in \N$,
+\[
+  \sum_{i : r_i \leq r^*_N} r_i^p \leq \sum_{k=0}^\infty \min\bigl((r^*_k)^p, (r^*_N)^p\bigr),
+\]
+and for every finite set $\Lambda \subseteq I$ with at most $N$ elements,
+$\sum_{k=0}^\infty (r^*_{k+N})^p \leq \sum_{i \notin \Lambda} r_i^p$. Finally,
+\[
+  \sum_{i \in I} r_i^p \leq (r^*_0)^p + \sum_{l=0}^\infty 2^l (r^*_{2^l})^p
+  \qquad \text{and} \qquad
+  \sum_{l=0}^\infty 2^l (r^*_{2^{l+1}})^p \leq \sum_{i \in I} r_i^p ,
+\]
+and $\sum_{l=0}^\infty 2^l (r^*_{2^l})^p \leq 2 \sum_{i \in I} r_i^p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For a nonnegative family $g$ on any set and $p > 0$, the layer cake formula for the counting
+measure (Mathlib's \texttt{lintegral\_\allowbreak rpow\_\allowbreak eq\_\allowbreak
+lintegral\_\allowbreak meas\_\allowbreak lt\_\allowbreak mul}) gives
+$\sum_a g(a)^p = p \int_0^\infty \#\{a : t < g(a)\} \, t^{p-1} \, dt$. For $t > 0$ only
+finitely many entries of $r$ exceed $t$, and $\{n : t < r^*_n\}$ is the initial segment with
+$\#\{i : t < r_i\}$ elements; so the two layer cake integrals agree, which is the identity.
+The bound $(n + 1)(r^*_n)^p \leq \sum_{k \leq n} (r^*_k)^p$ follows since $r^*$ decreases.
+Setting the entries above $r^*_N$ to $0$ gives a family $s$ with $s \leq r$ and
+$s \leq r^*_N$, hence $s^*_k \leq \min(r^*_k, r^*_N)$, and the identity for $s$ gives the
+first inequality. Setting the entries in $\Lambda$ to $0$ gives a family $s$ with
+$r^*_{k+N} \leq s^*_k$, and the identity for $s$ gives the second. The block inequalities are
+\Cref{lem:condensation} for the decreasing sequence $(r^*_n)^p$, with $\gamma = 0$ for the
+first two and its last claim for the third, together with the identity.
+\end{proof}
+
+Let $(e_i)_{i \in I}$ be a Hilbert basis of the complex Hilbert space $H$, and let
+$\gamma_i(f) = |\hat f(i)|$, $\hat f(i) = \langle e_i, f \rangle$. Then $(\gamma_i(f))_i$ is a
+nonnegative null family, since $\sum_i \gamma_i(f)^2 = \|f\|^2 < \infty$, and
+$\gamma^*_n(f) \leq \|f\|$.
+
+\begin{lemma}[The $n$-term error from a Hilbert basis]
+\label{lem:nterm-error-hilbert}
+\lean{HilbertBasis.coeffDictionary, HilbertBasis.smul_mem_coeffDictionary,
+  HilbertBasis.repr_sum_smul, HilbertBasis.tendsto_norm_repr,
+  HilbertBasis.decreasingRearrangement_norm_repr_le, HilbertBasis.approxError_nTerm_sq_le,
+  HilbertBasis.exists_tsum_ite_le_enorm_sub_sq, HilbertBasis.approxError_nTerm_sq_eq}
+\leanok
+\uses{def:nterm, lem:error-basic, def:decreasing-rearrangement}
+Let $D = \{c \, e_i : i \in I, \ c \in \C\}$ be the \emph{coefficient dictionary} of the basis,
+and let $E_n$ be the errors of the $n$-term scheme of $D$ (\Cref{def:nterm}). For every
+$f \in H$ and $n \in \N$,
+\[
+  E_n(f)^2 = \inf_{\#\Lambda \leq n} \sum_{i \notin \Lambda} |\hat f(i)|^2 ,
+\]
+the infimum over the finite sets $\Lambda \subseteq I$ with at most $n$ elements.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:l2-norm-sq}
+For $\#\Lambda \leq n$ the element $\sum_{i \in \Lambda} \hat f(i) e_i$ is a combination of
+at most $n$ elements of $D$, and by Parseval's identity (\Cref{lem:l2-norm-sq}) its distance
+to $f$ is
+$(\sum_{i \notin \Lambda} |\hat f(i)|^2)^{1/2}$. Conversely, an approximant $a$ is a real
+combination of elements $c_1 e_{i_1}, \dots, c_m e_{i_m}$ of $D$ with $m \leq n$; its
+coefficients vanish off $\Lambda = \{i_1, \dots, i_m\}$, so Parseval's identity gives
+$\|f - a\|^2 \geq \sum_{i \notin \Lambda} |\hat f(i)|^2$.
+\end{proof}
+
+The scheme takes real linear combinations, so the dictionary contains every complex multiple of
+a basis vector.
+
+\begin{lemma}[Tail bounds]
+\label{lem:nterm-tail-bound}
+\lean{HilbertBasis.approxError_nTerm_sq_le_tsum_min,
+  HilbertBasis.tsum_decreasingRearrangement_add_sq_le,
+  HilbertBasis.approxError_nTerm_two_pow_sq_le,
+  HilbertBasis.two_pow_mul_decreasingRearrangement_sq_le, HilbertBasis.approxError_nTerm_le}
+\leanok
+\uses{lem:nterm-error-hilbert, lem:decreasing-rearrangement-blocks, lem:condensation}
+Let $f \in H$ and $\gamma^* = \gamma^*(f)$. For every $N \in \N$,
+\[
+  \sum_{k=0}^\infty (\gamma^*_{k+N})^2 \leq E_N(f)^2 \leq
+  \sum_{k=0}^\infty \min\bigl((\gamma^*_k)^2, (\gamma^*_N)^2\bigr),
+\]
+and for every $m \in \N$,
+\[
+  2^m (\gamma^*_{2^{m+1}})^2 \leq E_{2^m}(f)^2 \leq
+  2 \sum_{l=0}^\infty 2^{m+l} (\gamma^*_{2^{m+l}})^2 .
+\]
+For $0 < \tau \leq 2$, $\theta = 1/\tau - 1/2$ and every $n \in \N$,
+\[
+  E_n(f) \leq (n + 1)^{-\theta} \Bigl(\sum_{i \in I} |\hat f(i)|^\tau\Bigr)^{1/\tau} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The upper bound for $E_N$ takes for $\Lambda$ in \Cref{lem:nterm-error-hilbert} the at most
+$N$ indices with $\gamma_i > \gamma^*_N$ and applies \Cref{lem:decreasing-rearrangement-blocks};
+the lower bound applies \Cref{lem:decreasing-rearrangement-blocks} to every admissible
+$\Lambda$. The dyadic upper bound is \Cref{lem:condensation} for the capped sequence, and the
+dyadic lower bound keeps the $2^m$ terms $k < 2^m$ of the lower bound, each at least
+$(\gamma^*_{2^{m+1}})^2$. For the last bound let $S = \sum_i \gamma_i^\tau$. Since
+$\min(x^2, y^2) \leq x^\tau y^{2-\tau}$, the upper bound gives
+$E_n(f)^2 \leq S \, (\gamma^*_n)^{2-\tau}$, and $(n + 1) (\gamma^*_n)^\tau \leq S$ gives
+$(\gamma^*_n)^{2-\tau} \leq (S/(n + 1))^{(2-\tau)/\tau}$, so
+$E_n(f)^2 \leq (n + 1)^{-2\theta} S^{2/\tau}$.
+\end{proof}
+
+With $S = \sum_i |\hat f(i)|^\tau$ and since $\theta \geq 0$, the last bound gives
+$E_n(f) \leq n^{-\theta} S^{1/\tau}$ for $n \geq 1$ and $\|f\| \leq S^{1/\tau}$ for $n = 0$.
+The error $E_n(f)$ is the tail of the coefficients from the $(n+1)$-th largest one on, so the
+bound, with constant $1$, is Lemma~7.8 in Section~7.4 of the arXiv version (v3)
+of~\cite{DungTemlyakovUllrich}, with $p = \tau$, $q = 2$ and $m = n + 1$, for the rearranged
+coefficients.
+
+\begin{theorem}[Stechkin, DeVore]
+\label{thm:stechkin}
+\lean{HilbertBasis.memApprox_nTerm_iff, HilbertBasis.approxNormDyadic_nTerm_le,
+  HilbertBasis.tsum_repr_rpow_le, HilbertBasis.stechkinConst, HilbertBasis.stechkinConst_ne_top,
+  HilbertBasis.enorm_le_tsum_repr_rpow, HilbertBasis.tsum_approxSeqDyadic_nTerm_rpow_le}
+\leanok
+\uses{lem:nterm-tail-bound, lem:decreasing-rearrangement-blocks, def:dyadic-norm,
+  lem:dyadic-norm-below-one, lem:hardy, lem:rpow-sum-le}
+Let $0 < \tau < 2$ and $\theta = 1/\tau - 1/2$. An element $f \in H$ lies in the
+approximation space $A^\theta_\tau$ of the $n$-term scheme of the coefficient dictionary if
+and only if
+\[
+  \sum_{i \in I} |\langle e_i, f \rangle|^\tau < \infty .
+\]
+More precisely, for the dyadic quasi-norm,
+$\sum_i |\hat f(i)|^\tau \leq 4 \, \|f\|_{A^\theta_\tau}^\tau$ and
+$\|f\|_{A^\theta_\tau} \leq C_\tau (\sum_i |\hat f(i)|^\tau)^{1/\tau}$ with
+$C_\tau = 1 + \bigl(2 \cdot 2^{\tau/2} (1 - 2^{-(1 - \tau/2)})^{-1}\bigr)^{1/\tau}$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Write $S = \sum_i \gamma_i^\tau$ and note $\theta \tau = 1 - \tau/2$. For the upper bound,
+$\|f\| \leq S^{1/\tau}$ by Parseval's identity (\Cref{lem:l2-norm-sq}) and
+\Cref{lem:rpow-sum-le}. The dyadic upper
+bound of \Cref{lem:nterm-tail-bound} and the subadditivity of $x \mapsto x^{\tau/2}$ give
+$E_{2^k}(f)^\tau \leq 2^{\tau/2} \sum_{l \geq 0} v_{k+l}$ with
+$v_j = (2^j (\gamma^*_{2^j})^2)^{\tau/2}$. Hardy's inequality for tails (\Cref{lem:hardy},
+$q = 1$, exponent $1 - \tau/2$) gives
+\[
+  \sum_k 2^{k\theta\tau} E_{2^k}(f)^\tau \leq 2^{\tau/2} (1 - 2^{-(1 - \tau/2)})^{-1}
+  \sum_k 2^{k(1 - \tau/2)} v_k ,
+\]
+and $2^{k(1-\tau/2)} v_k = 2^k (\gamma^*_{2^k})^\tau$, whose sum is at most $2S$ by
+\Cref{lem:decreasing-rearrangement-blocks}. For the lower bound,
+\Cref{lem:decreasing-rearrangement-blocks} gives
+$S \leq (\gamma^*_0)^\tau + (\gamma^*_1)^\tau + \sum_l 2^{l+1} (\gamma^*_{2^{l+1}})^\tau$; the
+first two terms are at most $\|f\|^\tau$, and the dyadic lower bound of
+\Cref{lem:nterm-tail-bound} gives
+$2^{l+1} (\gamma^*_{2^{l+1}})^\tau \leq 2 (2^{l\theta} E_{2^l}(f))^\tau$. The equivalence of
+the dyadic quasi-norm with Pietsch's for every fine index
+(\Cref{lem:dyadic-norm-below-one}) transfers the bounds to membership in $A^\theta_\tau$.
+\end{proof}
+
+Stechkin~\cite{Stechkin1955} proved the case $\tau = 1$, where $A^{1/2}_1$ is the space of
+$f$ with absolutely summable coefficients. For general exponents the sequence form goes back to
+Pietsch~\cite{Pietsch} (Example~1 in \S3.2), see~\cite[Lemma~7.11]{DungTemlyakovUllrich} in
+the numbering of the arXiv version (v3).
+DeVore~\cite[Theorem~4]{DeVore1998} gives it by real interpolation: the coefficient map takes
+$H$ onto $\ell_2$ and the approximation spaces $A^r_\infty$ onto weak $\ell_\rho$ spaces,
+$1/\rho = r + 1/2$. The proof here works with the dyadic blocks of the rearranged
+coefficients directly. The range $\tau < 1$, where $A^\theta_\tau$ is only quasi-normed, is
+included.
 
 \section{Eigenbases of compact self-adjoint operators}
 \label{sec:compact-eigenbasis}

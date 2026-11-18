@@ -122,21 +122,11 @@ theorem repr_block (k : ℕ) (f : H) (i : ι) :
     · simp [h1, h2, not_lt.1 h1]
     · simp [h1, h2]
 
-/-- Parseval in `ℓ²`, in `ℝ≥0∞`: `‖x‖² = ∑ᵢ ‖xᵢ‖²`. -/
-theorem enorm_sq_eq_tsum (x : ℓ²(ι, ℂ)) : ‖x‖ₑ ^ 2 = ∑' i, ‖x i‖ₑ ^ 2 := by
-  have h := lp.norm_rpow_eq_tsum (p := 2) (by norm_num) x
-  simp only [ENNReal.toReal_ofNat, Real.rpow_two] at h
-  rw [← ofReal_norm, ← ENNReal.ofReal_pow (norm_nonneg _), h,
-    ENNReal.ofReal_tsum_of_nonneg (fun _ => by positivity)
-      ((lp.memℓp x).summable (by norm_num) |>.congr fun i => by simp)]
-  congr 1; funext i
-  rw [ENNReal.ofReal_pow (norm_nonneg _), ofReal_norm]
-
 /-- `‖Δ_k f‖² = ∑_{2^k ≤ lvl i < 2^(k+1)} |⟨e_i, f⟩|²`. -/
 theorem enorm_block_sq (k : ℕ) (f : H) :
     ‖S.projectionScheme.block k f‖ₑ ^ 2 = ∑' i,
       if 2 ^ k ≤ S.level i ∧ S.level i < 2 ^ (k + 1) then ‖S.basis.repr f i‖ₑ ^ 2 else 0 := by
-  rw [← S.basis.repr.enorm_map, enorm_sq_eq_tsum]
+  rw [← S.basis.repr.enorm_map, lp.enorm_sq_eq_tsum]
   congr 1; funext i
   rw [repr_block]
   split_ifs <;> simp
@@ -235,7 +225,7 @@ theorem memApprox_two_iff [CompleteSpace H] {s : ℝ} (hs : 0 < s) (f : H) :
           gcongr
           calc ∑' i, (if S.level i = 0 then 1 else 0) * e i ≤ ∑' i, e i :=
                 ENNReal.tsum_le_tsum fun i => by split_ifs <;> simp
-            _ = ‖f‖ₑ ^ 2 := by rw [← S.basis.repr.enorm_map, enorm_sq_eq_tsum]
+            _ = ‖f‖ₑ ^ 2 := by rw [← S.basis.repr.enorm_map, lp.enorm_sq_eq_tsum]
   -- the block norm is finite iff `B` is
   have hblk : S.projectionScheme.blockNorm s 2 f < ∞ ↔ B ≠ ∞ := by
     rw [ProjectionScheme.blockNorm, ENNReal.add_lt_top, and_iff_right enorm_lt_top]

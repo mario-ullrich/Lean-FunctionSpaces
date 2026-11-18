@@ -8,6 +8,7 @@ module
 public import ApproximationSpaces.Sequences.Lq
 public import Mathlib.Algebra.BigOperators.Intervals
 public import Mathlib.Algebra.Order.Ring.GeomSum
+public import Mathlib.Analysis.PSeries
 public import Mathlib.Data.Nat.Log
 
 /-!
@@ -22,9 +23,12 @@ For a **decreasing** sequence `b : ℕ → ℝ≥0∞` and a real exponent `γ`,
   `∑ₖ 2^(k(γ+1)) b (2^(k+1)) ≤ 2^(max (-γ) 0) ∑ₙ (n+1)^γ b n`;
 
 and the analogous statements for suprema, `iSup_pow_mul_le_dyadic` and
-`dyadic_le_iSup_pow_mul`.  The proof splits `ℕ \ {0}` into the dyadic blocks
-`[2^k, 2^(k+1))`, which have `2^k` elements, on which `b` is at most `b (2^k)` and at least
-`b (2^(k+1))`, and on which `(n+1)^γ` is within a factor `2^|γ|` of `2^(kγ)`.
+`dyadic_le_iSup_pow_mul`; for the sequence capped at `b (2^m)`,
+`∑ₖ min(b k, b (2^m)) ≤ 2 ∑_{l ≥ 0} 2^(m+l) b (2^(m+l))` (`tsum_min_le_dyadic`); and
+`∑ₖ 2^k b (2^k) ≤ 2 ∑ₙ b n` (`tsum_two_pow_mul_le_two_mul`).  The proof
+splits `ℕ \ {0}` into the dyadic blocks `[2^k, 2^(k+1))`, which have `2^k` elements, on which
+`b` is at most `b (2^k)` and at least `b (2^(k+1))`, and on which `(n+1)^γ` is within a factor
+`2^|γ|` of `2^(kγ)`.
 
 For `γ = 0` this is Cauchy's condensation test (Mathlib: `ENNReal.le_tsum_condensed`,
 `ENNReal.tsum_condensed_le`).  The weight `(n + 1) ^ γ` is in general increasing, so the
@@ -204,6 +208,67 @@ theorem dyadic_le_iSup_pow_mul {s : ℝ} (hs : 0 ≤ s) :
   calc dyadicWeight s k * b (2 ^ k) ≤ ((2 ^ k + 1 : ℕ) : ℝ≥0∞) ^ s * b (2 ^ k) := by
         rw [← natCast_two_pow_rpow]; gcongr; exact_mod_cast Nat.le_succ _
     _ ≤ _ := le_iSup (fun n => ((n + 1 : ℕ) : ℝ≥0∞) ^ s * b n) (2 ^ k)
+
+/-- `1 + ∑_{j < m} 2^j = 2^m` in `[0, ∞]`, Mathlib's geometric sum `geom_sum_mul_add` for
+`x = 1`. -/
+theorem one_add_sum_range_two_pow (m : ℕ) :
+    1 + ∑ j ∈ range m, (2 : ℝ≥0∞) ^ j = 2 ^ m := by
+  have h := geom_sum_mul_add (1 : ℝ≥0∞) m
+  rw [one_add_one_eq_two, mul_one] at h
+  rw [add_comm, h]
+
+/-- **Condensation of a capped decreasing sequence**: for decreasing `b` and every `m`,
+`∑_k min(b_k, b_{2^m}) ≤ 2 ∑_{l ≥ 0} 2^(m+l) b_{2^(m+l)}`. Cauchy condensation
+(`ENNReal.tsum_pow_mul_le_dyadic` with `γ = 0`) applies to the decreasing sequence
+`min(b_k, b_{2^m})`; its first `m + 1` dyadic terms are at most `b_{2^m}` with total weight
+`1 + ∑_{j < m} 2^j = 2^m`, and the others are at most `2^(m+l) b_{2^(m+l)}`. This bounds the
+tail `∑_{k ≥ 2^m} b_k` together with `2^m b_{2^m}`. -/
+theorem tsum_min_le_dyadic (hb : Antitone b) (m : ℕ) :
+    ∑' k, min (b k) (b (2 ^ m)) ≤ 2 * ∑' l, 2 ^ (m + l) * b (2 ^ (m + l)) := by
+  set T := ∑' l, (2 : ℝ≥0∞) ^ (m + l) * b (2 ^ (m + l))
+  have hd : Antitone fun k => min (b k) (b (2 ^ m)) := fun i j hij => min_le_min (hb hij) le_rfl
+  have hcond := tsum_pow_mul_le_dyadic hd 0
+  simp only [ENNReal.rpow_zero, one_mul, max_self, zero_add, dyadicWeight_eq_pow,
+    ENNReal.rpow_one] at hcond
+  rw [← ENNReal.summable.sum_add_tsum_nat_add' (k := m)
+    (f := fun k => (2 : ℝ≥0∞) ^ k * min (b (2 ^ k)) (b (2 ^ m))), ← add_assoc] at hcond
+  have hhead : min (b 0) (b (2 ^ m)) +
+      ∑ k ∈ range m, 2 ^ k * min (b (2 ^ k)) (b (2 ^ m)) ≤ 2 ^ m * b (2 ^ m) := by
+    calc min (b 0) (b (2 ^ m)) + ∑ k ∈ range m, 2 ^ k * min (b (2 ^ k)) (b (2 ^ m))
+        ≤ b (2 ^ m) + ∑ k ∈ range m, 2 ^ k * b (2 ^ m) := by
+          gcongr
+          · exact min_le_right _ _
+          · exact min_le_right _ _
+      _ = (1 + ∑ k ∈ range m, (2 : ℝ≥0∞) ^ k) * b (2 ^ m) := by rw [add_mul, one_mul, sum_mul]
+      _ = 2 ^ m * b (2 ^ m) := by rw [one_add_sum_range_two_pow]
+  have hT : 2 ^ m * b (2 ^ m) ≤ T := by
+    simpa using ENNReal.le_tsum (f := fun l => (2 : ℝ≥0∞) ^ (m + l) * b (2 ^ (m + l))) 0
+  have htail : ∑' k, 2 ^ (k + m) * min (b (2 ^ (k + m))) (b (2 ^ m)) ≤ T :=
+    ENNReal.tsum_le_tsum fun l => by rw [add_comm l m]; gcongr; exact min_le_left _ _
+  calc ∑' k, min (b k) (b (2 ^ m)) ≤ _ := hcond
+    _ ≤ T + T := add_le_add (hhead.trans hT) htail
+    _ = 2 * T := (two_mul T).symm
+
+/-- **Condensation with constant `2`**: `∑_k 2^k b_{2^k} ≤ 2 ∑_n b_n` for decreasing `b`. The
+term `k = 0` is `b_1`; the block `(2^k, 2^(k+1)]` has `2^k` indices with terms at least
+`b_{2^(k+1)}`, and these blocks cover the indices `n ≥ 2`, so
+`∑_k 2^k b_{2^(k+1)} ≤ ∑_{n ≥ 2} b_n` (Mathlib's `Finset.sum_condensed_le'`). Mathlib's
+`ENNReal.tsum_condensed_le` gives the bound `b_1 + 2 ∑_n b_n`. -/
+theorem tsum_two_pow_mul_le_two_mul (hb : Antitone b) :
+    ∑' k, 2 ^ k * b (2 ^ k) ≤ 2 * ∑' n, b n := by
+  rw [ENNReal.tsum_eq_iSup_nat' (tendsto_add_atTop_nat 1)]
+  refine iSup_le fun K => ?_
+  have hc := Finset.sum_condensed_le' (f := b) (fun _ _ _ h => hb h) K
+  have hK : 1 < 2 ^ K + 1 := Nat.lt_add_of_pos_left (Nat.two_pow_pos K)
+  calc ∑ k ∈ range (K + 1), (2 : ℝ≥0∞) ^ k * b (2 ^ k)
+      = b 1 + 2 * ∑ k ∈ range K, 2 ^ k • b (2 ^ (k + 1)) := by
+        rw [sum_range_succ', mul_sum, add_comm]
+        simp [pow_succ', mul_assoc, nsmul_eq_mul]
+    _ ≤ b 1 + 2 * ∑ n ∈ Ico 2 (2 ^ K + 1), b n := by gcongr
+    _ ≤ 2 * (b 1 + ∑ n ∈ Ico 2 (2 ^ K + 1), b n) := by
+        rw [mul_add]; gcongr; exact le_mul_of_one_le_left' one_le_two
+    _ = 2 * ∑ n ∈ Ico 1 (2 ^ K + 1), b n := by rw [sum_eq_sum_Ico_succ_bot hK]
+    _ ≤ 2 * ∑' n, b n := by gcongr; exact ENNReal.sum_le_tsum _
 
 /-! ### The dyadic sum -/
 

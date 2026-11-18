@@ -8,6 +8,7 @@ module
 public import ApproximationSpaces.Scheme
 public import Mathlib.Analysis.Normed.Module.Ball.Pointwise
 public import Mathlib.Analysis.Normed.Operator.NNNorm
+public import Mathlib.Analysis.SpecialFunctions.Pow.NNReal
 public import Mathlib.Topology.MetricSpace.HausdorffDistance
 
 /-!
@@ -20,7 +21,8 @@ For an approximation scheme `A` in a normed space `X`, the **error of best appro
 
 in Lean `A.approxError f n`, defined as the extended distance `Metric.infEDist f (A n)` with
 values in `ℝ≥0∞`; it is finite (`approxError_ne_top`).  This file collects its calculus:
-`E_0(f) = ‖f‖`, `E_n(f) ≤ ‖f‖`, `E_n` decreases in `n`, `E_n(c f) = |c| E_n(f)`,
+`E_0(f) = ‖f‖`, `E_n(f) ≤ ‖f‖`, `E_n` decreases in `n`, the bounds `r ≤ E_n(f)` and
+`r ≤ E_n(f)²` through all approximants, `E_n(c f) = |c| E_n(f)`,
 `E_{m+n}(f + g) ≤ E_m(f) + E_n(g)`, `E_n(f) ≤ E_n(g) + ‖f - g‖`, `E_n(f) → 0` exactly for `f`
 in the closure of `⋃ A n`, a bounded linear map `T` with `T (A n) ⊆ B n` satisfies
 `E^B_n(T f) ≤ ‖T‖ E^A_n(f)`, and bounds by a subadditive modulus pass from a dense set to all
@@ -96,6 +98,14 @@ theorem approxError_anti_scheme {A' : ApproximationScheme X} (h : ∀ n, A n ⊆
 theorem le_approxError_iff {n : ℕ} {f : X} {r : ℝ≥0∞} :
     r ≤ A.approxError f n ↔ ∀ a ∈ A n, r ≤ ‖f - a‖ₑ := by
   simp only [approxError, Metric.le_infEDist, edist_eq_enorm_sub]
+
+/-- `r ≤ E_n(f)²` iff `r ≤ ‖f - a‖²` for every `a ∈ A_n`. Squaring preserves the order of
+`[0, ∞]` (`ENNReal.rpow_inv_le_iff`), so `le_approxError_iff` applies to `r^(1/2)`. -/
+theorem le_approxError_sq_iff {n : ℕ} {f : X} {r : ℝ≥0∞} :
+    r ≤ A.approxError f n ^ 2 ↔ ∀ a ∈ A n, r ≤ ‖f - a‖ₑ ^ 2 := by
+  have h2 : (0 : ℝ) < 2 := two_pos
+  simp_rw [← ENNReal.rpow_two, ← ENNReal.rpow_inv_le_iff h2]
+  exact le_approxError_iff
 
 /-- If the error is below `r`, some approximant is closer than `r`. -/
 theorem exists_mem_enorm_sub_lt {n : ℕ} {f : X} {r : ℝ≥0∞} (h : A.approxError f n < r) :

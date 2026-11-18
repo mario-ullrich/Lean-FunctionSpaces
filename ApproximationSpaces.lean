@@ -9,12 +9,14 @@ public import ApproximationSpaces.Scheme
 public import ApproximationSpaces.Error
 public import ApproximationSpaces.Instances.Span
 public import ApproximationSpaces.Instances.NTerm
+public import ApproximationSpaces.Instances.NTermHilbertBasis
 public import ApproximationSpaces.Norm
 public import ApproximationSpaces.Dyadic
 public import ApproximationSpaces.Space
 public import ApproximationSpaces.Sequences.Lq
 public import ApproximationSpaces.Sequences.Dyadic
 public import ApproximationSpaces.Sequences.Hardy
+public import ApproximationSpaces.Sequences.Rearrangement
 public import ApproximationSpaces.Embedding
 public import ApproximationSpaces.Transfer
 public import ApproximationSpaces.Lift
@@ -70,17 +72,20 @@ approximation spaces.
 
 **Setting.** Everything here is abstract. The schemes live in real normed spaces, and the
 couples of the interpolation part live on additive commutative groups. No function spaces
-occur, and the only measures are the counting measure behind the `ℓ_q` norms and `dt/t` on
-`(0, ∞)` in the continuous K-method. The library `FunctionSpaces` applies the theory to
-concrete schemes.
+occur, and the only measures are the counting measure behind the `ℓ_q` norms, Lebesgue measure on
+`(0, ∞)` in the layer cake formula for sums, and `dt/t` on `(0, ∞)` in the continuous K-method.
+One concrete scheme is treated here, since it needs only a Hilbert basis: best `n`-term
+approximation, with the theorem of Stechkin and DeVore. The library `FunctionSpaces` applies the
+theory to concrete schemes of functions.
 
 ## Layout
 
 The files at the top level hold the schemes, the spaces `A^s_q` and the theorems about them. The
-subfolders hold the two basic examples of schemes (`Instances`), the sequence spaces
+subfolders hold the basic examples of schemes (`Instances`), the sequence spaces
 (`Sequences`), real interpolation (`Interpolation`) and decompositions (`Decompositions`). Names
-below are relative to the namespace `ApproximationScheme`, except those that start with `ENNReal`
-or `InterpCouple`.
+below are relative to the namespace `ApproximationScheme`, except those that start with `ENNReal`,
+`InterpCouple`, `HilbertBasis` or `lp`, and the decreasing rearrangement, which is in the root
+namespace.
 
 ### The scheme and the error
 
@@ -95,12 +100,18 @@ or `InterpCouple`.
   extension of modulus bounds from a dense set (`approxError_le_of_dense`) and the Lebesgue
   inequality.
 
-### Two examples of schemes (`Instances/`)
+### Examples of schemes (`Instances/`)
 
 * `ApproximationSpaces.Instances.Span`: linear approximation from the first `n` elements of a
   sequence, `ofSpan`. Its errors tend to zero exactly on the closed span.
 * `ApproximationSpaces.Instances.NTerm`: nonlinear `n`-term approximation from a dictionary,
   `nTerm`. Its errors are at most those of `ofSpan` (`approxError_nTerm_le_ofSpan`).
+* `ApproximationSpaces.Instances.NTermHilbertBasis`: best `n`-term approximation from a Hilbert
+  basis of a complex Hilbert space, with the dictionary `HilbertBasis.coeffDictionary` of
+  multiples of the basis vectors: the error as the smallest tail of the coefficients
+  (`HilbertBasis.approxError_nTerm_sq_eq`), tail bounds by the rearranged coefficients, and
+  the theorem of Stechkin and DeVore, `f ∈ A^(1/τ - 1/2)_τ` iff `(⟨e_i, f⟩)_i ∈ ℓ_τ` for
+  `0 < τ < 2` (`HilbertBasis.memApprox_nTerm_iff`).
 
 ### The spaces `A^s_q` and their dyadic norm
 
@@ -119,11 +130,16 @@ or `InterpCouple`.
   the `ℓ_q` norm `ENNReal.lqNorm` of a sequence in `ℝ≥0∞`, defined as the `L_q` norm for the
   counting measure, with its monotonicity in `q`, the quasi-triangle inequality for `q < 1`
   (`ENNReal.lqNorm_add_le'`), the Cauchy–Schwarz inequality, the dyadic weights
-  `ENNReal.dyadicWeight`, powers of two and products in `[0, ∞]`, and `L_q` norms of functions
-  bounded on pieces.
+  `ENNReal.dyadicWeight`, powers of two and products in `[0, ∞]`, `L_q` norms of functions
+  bounded on pieces, and Parseval's identity for `ℓ²` in `ℝ≥0∞` (`lp.enorm_sq_eq_tsum`).
 * `ApproximationSpaces.Sequences.Dyadic`: Cauchy condensation with power weights
-  (`ENNReal.tsum_pow_mul_le_dyadic`), three sums over dyadic scales, and the interpolation
-  inequality for dyadic suprema (`ENNReal.tsum_dyadicWeight_mul_le_iSup`).
+  (`ENNReal.tsum_pow_mul_le_dyadic`) and for capped sequences (`ENNReal.tsum_min_le_dyadic`),
+  three sums over dyadic scales, and the interpolation inequality for dyadic suprema
+  (`ENNReal.tsum_dyadicWeight_mul_le_iSup`).
+* `ApproximationSpaces.Sequences.Rearrangement`: the decreasing rearrangement
+  `decreasingRearrangement` of a nonnegative null family (copied from TauCeti), the layer cake
+  formula for sums, `∑_n (r*_n)^p = ∑_i r_i^p` (`tsum_ofReal_rpow_decreasingRearrangement`), and
+  the block inequalities that compare `∑_i r_i^p` with `∑_l 2^l (r*_{2^l})^p`.
 * `ApproximationSpaces.Sequences.Hardy`: the countable Minkowski inequality, window sums
   (`ENNReal.lqNorm_sum_Icc_le`), the two discrete Hardy inequalities (`ENNReal.hardy_sum_le`,
   `ENNReal.hardy_tail_le`) and their forms for `0 < q ≤ 1` (`ENNReal.hardy_tail_le_of_le_one`),

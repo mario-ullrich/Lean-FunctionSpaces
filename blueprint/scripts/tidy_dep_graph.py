@@ -53,8 +53,11 @@ from pathlib import Path
 
 # The blocks, in the order in which their frames are emitted. Each entry is the frame's title
 # and the chapters it holds; a chapter given as (chapter, [sections]) contributes only those
-# sections. The titles are those of `blueprint/src/content.tex` and of the files it includes
-# with `\input`.
+# sections. A node goes to the first block that names its chapter or its section, so a section
+# listed in an earlier block leaves the rest of its chapter to a later one: the section on
+# n-term approximation from a Hilbert basis stands with the approximation spaces, the rest of
+# the chapter on spectral schemes with the measure spaces. The titles are those of
+# `blueprint/src/content.tex` and of the files it includes with `\input`.
 INTERVALS = "Polynomial approximation on intervals"
 BESOV_RD = r"Besov spaces on \texorpdfstring{$\R^d$}{R\^{}d}"
 SOB = r"Sobolev spaces on \texorpdfstring{$\R^d$}{R\^{}d}"
@@ -62,7 +65,8 @@ BLOCKS: list[tuple[str, list]] = [
     ("Approximation spaces: general theory", [
         "Approximation schemes", "Sequence spaces", "Approximation spaces",
         "Lifting and the Nikolskii transfer theorem",
-        "Interpolation and the representation theorem"]),
+        "Interpolation and the representation theorem",
+        ("Spectral schemes", ["Nonlinear approximation from a Hilbert basis"])]),
     ("Real interpolation of couples", ["Real interpolation of couples"]),
     ("Decompositions, traces and moduli", [
         "Block decompositions and projections", "Traces and intrinsic norms",

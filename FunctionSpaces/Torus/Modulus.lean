@@ -222,7 +222,7 @@ theorem approxError_sq_le_tsum (n : ℕ) (f : Lp ℂ 2 (volume : Measure (UnitAd
   have h1 := (fourierScheme d).projectionScheme.approxError_le_enorm_sub n f
   refine (pow_le_pow_left₀ bot_le h1 2).trans (le_of_eq ?_)
   rw [SpectralScheme.projectionScheme_P, ← mFourierBasis.repr.enorm_map,
-    SpectralScheme.enorm_sq_eq_tsum]
+    lp.enorm_sq_eq_tsum]
   congr 1; funext k
   change ‖(fourierScheme d).basis.repr (f - (fourierScheme d).truncate n f) k‖ₑ ^ 2 = _
   rw [SpectralScheme.repr_sub_truncate]

@@ -9,6 +9,7 @@ public import Mathlib.MeasureTheory.Function.LpSeminorm.Count
 public import Mathlib.MeasureTheory.Function.LpSeminorm.SMul
 public import Mathlib.MeasureTheory.Function.LpSeminorm.TriangleInequality
 public import Mathlib.MeasureTheory.Integral.Lebesgue.Countable
+public import Mathlib.Analysis.Normed.Lp.lpSpace
 public import Mathlib.Analysis.SpecificLimits.Basic
 
 /-!
@@ -34,7 +35,9 @@ sum in `[0, ∞]`: `∑_{i ∈ s} f_i^p ≤ (∑_{i ∈ s} f_i)^p` for `p ≥ 1`
 These three are a copy of Mathlib PR #44783; delete them when the project's Mathlib has it. The
 series form `(∑_i f_i)^p ≤ ∑_i f_i^p` for `0 < p ≤ 1` (`ENNReal.rpow_tsum_le_tsum_rpow`) bounds
 the `q`-th power of an inner series by the series of the `q`-th powers for `q ≤ 1`, so that
-estimates for `ℓ_1` transfer to `ℓ_q` (`ENNReal.lqNorm_le_rpow_mul_of_tsum_rpow_le`).
+estimates for `ℓ_1` transfer to `ℓ_q` (`ENNReal.lqNorm_le_rpow_mul_of_tsum_rpow_le`); it also
+gives the decrease of `(∑_i f_i^p)^(1/p)` in `p` for series over any index set
+(`ENNReal.rpow_tsum_rpow_le`).
 
 **Exponents below `1`.** For `0 < q < 1` the `ℓ_q` norm satisfies only the quasi-triangle
 inequality `‖a + b‖_q ≤ C_q (‖a‖_q + ‖b‖_q)` with Mathlib's constant `C_q = LpAddConst q`
@@ -65,6 +68,10 @@ sequence for every `q` (`ENNReal.dyadicGeomConst`), and the **dyadic weights**
 products by products of sums; further identities and inequalities for products, quotients and
 powers in `[0, ∞]` serve the constants of the K-method and of the trace theorems
 (`ENNReal.mul_div_rpow_eq`, `ENNReal.div_rpow_le_rpow_mul_div_rpow`).
+
+For Mathlib's normed space `ℓ²` the file proves Parseval's identity in `ℝ≥0∞`,
+`‖x‖² = ∑_i ‖x_i‖²` (`lp.enorm_sq_eq_tsum`), which computes norms through the coefficients of a
+Hilbert basis.
 
 For `L_p` norms of functions with values in `[0, ∞]` the file proves the rule for powers inside the
 norm (`MeasureTheory.eLpNorm_fun_rpow`), monotone convergence
@@ -141,6 +148,26 @@ theorem rpow_tsum_le_tsum_rpow (f : ι → ℝ≥0∞) {p : ℝ} (hp_pos : 0 < p
     _ ≤ ⨆ s : Finset ι, ∑ i ∈ s, f i ^ p :=
         iSup_mono fun s => rpow_sum_le_sum_rpow s f hp_pos hp1
     _ = ∑' i, f i ^ p := ENNReal.tsum_eq_iSup_sum.symm
+
+/-- **The `ℓ_p` sums of a series decrease in `p`**: `(∑_i f_i^q)^(1/q) ≤ (∑_i f_i^p)^(1/p)` for
+`0 < p ≤ q` and every family `f` in `[0, ∞]` on any index set, so `‖f‖_{ℓ_q} ≤ ‖f‖_{ℓ_p}`; for a
+countable index set this is `ENNReal.lqNorm_le_lqNorm_of_le`, the same bound for `ENNReal.lqNorm`.
+The subadditivity `ENNReal.rpow_tsum_le_tsum_rpow` with the exponent `p/q ≤ 1`, applied to the
+family `f_i^q`, gives `(∑_i f_i^q)^(p/q) ≤ ∑_i f_i^p`; this is the series form of
+`ENNReal.rpow_sum_rpow_le`. -/
+theorem rpow_tsum_rpow_le (f : ι → ℝ≥0∞) {p q : ℝ} (hp_pos : 0 < p) (hpq : p ≤ q) :
+    (∑' i, f i ^ q) ^ (1 / q) ≤ (∑' i, f i ^ p) ^ (1 / p) := by
+  have hq_pos : 0 < q := hp_pos.trans_le hpq
+  have h := rpow_tsum_le_tsum_rpow (fun i => f i ^ q) (div_pos hp_pos hq_pos)
+    ((div_le_one hq_pos).2 hpq)
+  have hfi : ∀ i, (f i ^ q) ^ (p / q) = f i ^ p := fun i => by
+    rw [← ENNReal.rpow_mul, mul_div_cancel₀ _ hq_pos.ne']
+  simp_rw [hfi] at h
+  calc (∑' i, f i ^ q) ^ (1 / q) = ((∑' i, f i ^ q) ^ (p / q)) ^ (1 / p) := by
+        rw [← ENNReal.rpow_mul]
+        congr 1
+        field_simp
+    _ ≤ (∑' i, f i ^ p) ^ (1 / p) := rpow_le_rpow h (by positivity)
 
 end PowerSums
 
@@ -294,31 +321,16 @@ theorem lqNorm_lt_top_iff_of_le_mul {a b : ι → ℝ≥0∞} {K M : ℝ≥0∞}
       _ < ∞ := ENNReal.mul_lt_top hM.lt_top h
 
 /-- **Monotonicity in the exponent**: for `0 < q ≤ r`, `‖a‖_r ≤ ‖a‖_q`, also for exponents below
-`1`.  Proof: with `M = ‖a‖_q`, each term satisfies `a n ^ r ≤ M ^ (r - q) a n ^ q`; sum over
-`n`. -/
+`1`.  For `r = ∞` every term is at most `‖a‖_q`; for `r < ∞` this is the decrease of the `ℓ_p`
+sums of a series in `p` (`ENNReal.rpow_tsum_rpow_le`). -/
 theorem lqNorm_le_lqNorm_of_le (hq0 : q ≠ 0) (hqr : q ≤ r) (a : ι → ℝ≥0∞) :
     lqNorm r a ≤ lqNorm q a := by
   rcases eq_or_ne r ∞ with rfl | hr
   · rw [lqNorm_top]; exact iSup_le (le_lqNorm hq0 a)
   have hq' : q ≠ ∞ := ne_top_of_le_ne_top hr hqr
   have hr0 : r ≠ 0 := ((pos_iff_ne_zero.2 hq0).trans_le hqr).ne'
-  set M := lqNorm q a
-  set p := q.toReal
-  set p' := r.toReal
-  have hp : 0 < p := ENNReal.toReal_pos hq0 hq'
-  have hp' : 0 < p' := ENNReal.toReal_pos hr0 hr
-  have hpp' : p ≤ p' := ENNReal.toReal_mono hr hqr
-  have key : ∑' n, a n ^ p' ≤ M ^ p' := by
-    calc ∑' n, a n ^ p' = ∑' n, a n ^ (p' - p) * a n ^ p := by
-          congr 1; funext n
-          rw [← ENNReal.rpow_add_of_nonneg _ _ (by linarith) hp.le, sub_add_cancel]
-      _ ≤ ∑' n, M ^ (p' - p) * a n ^ p := by
-          gcongr with n
-          exact le_lqNorm hq0 a n
-      _ = M ^ (p' - p) * M ^ p := by rw [ENNReal.tsum_mul_left, lqNorm_rpow hq0 hq' a]
-      _ = M ^ p' := by rw [← ENNReal.rpow_add_of_nonneg _ _ (by linarith) hp.le, sub_add_cancel]
-  rw [lqNorm_eq_tsum hr0 hr, one_div, ENNReal.rpow_inv_le_iff hp']
-  exact key
+  rw [lqNorm_eq_tsum hr0 hr, lqNorm_eq_tsum hq0 hq']
+  exact rpow_tsum_rpow_le a (ENNReal.toReal_pos hq0 hq') (ENNReal.toReal_mono hr hqr)
 
 /-- `‖a‖_{ℓ_q} ≤ ‖a‖_{ℓ_1} = ∑_i a_i` for `q ≥ 1`. -/
 theorem lqNorm_le_lqNorm_one (hq : 1 ≤ q) (a : ι → ℝ≥0∞) : lqNorm q a ≤ ∑' n, a n := by
@@ -1107,6 +1119,19 @@ theorem rpow_add_rpow_le_LpAddConst_mul {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q
   rwa [rpow_rpow_inv hp, rpow_rpow_inv hp, ← one_div] at h
 
 end ENNReal
+
+/-- **Parseval's identity in `ℝ≥0∞`**: `‖x‖² = ∑_i ‖x_i‖²` for every `x ∈ ℓ²`, the series of
+squares in `[0, ∞]`, from Mathlib's `lp.norm_rpow_eq_tsum` at `p = 2`. Through the coefficient
+map of a Hilbert basis it computes `‖f‖²` as the sum of the squared coefficients. -/
+theorem lp.enorm_sq_eq_tsum {ι : Type*} {E : ι → Type*} [∀ i, NormedAddCommGroup (E i)]
+    (x : lp E 2) : ‖x‖ₑ ^ 2 = ∑' i, ‖x i‖ₑ ^ 2 := by
+  have h := lp.norm_rpow_eq_tsum (p := 2) (by norm_num) x
+  simp only [ENNReal.toReal_ofNat, Real.rpow_two] at h
+  rw [← ofReal_norm, ← ENNReal.ofReal_pow (norm_nonneg _), h,
+    ENNReal.ofReal_tsum_of_nonneg (fun _ => by positivity)
+      ((lp.memℓp x).summable (by norm_num) |>.congr fun i => by simp)]
+  congr 1; funext i
+  rw [ENNReal.ofReal_pow (norm_nonneg _), ofReal_norm]
 
 /-- `(1 + t)^N ≤ 2^N (1 + t^N)` for `t ≥ 0`, from Mathlib's `add_pow_le`. -/
 theorem one_add_pow_le_two_pow_mul {t : ℝ} (ht : 0 ≤ t) (N : ℕ) :

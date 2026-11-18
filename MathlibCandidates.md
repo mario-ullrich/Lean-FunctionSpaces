@@ -17,7 +17,10 @@ declarations.
 * **Subadditivity of `x ↦ x^p` for series** (`ApproximationSpaces/Sequences/Lq.lean`): for
   `0 < p ≤ 1` and every family `f` in `[0, ∞]`, `(∑_i f_i)^p ≤ ∑_i f_i^p`
   (`ENNReal.rpow_tsum_le_tsum_rpow`), from the finite form of Mathlib PR #44783 by the supremum
-  over partial sums; neither Mathlib nor the PR has the series form.
+  over partial sums; neither Mathlib nor the PR has the series form. Its consequence, the
+  decrease of `(∑_i f_i^p)^(1/p)` in `p` for series over any index set
+  (`ENNReal.rpow_tsum_rpow_le`), is the norm bound behind `lp.monotone` without a countability
+  assumption.
 * **The constant of the quasi-triangle inequality** (`ApproximationSpaces/Sequences/Lq.lean`):
   `1 ≤ LpAddConst q` for every `q` (`ENNReal.one_le_LpAddConst`), a companion of Mathlib's
   `ENNReal.LpAddConst_lt_top` and `ENNReal.LpAddConst_ne_zero`. The Bonn project
@@ -84,7 +87,10 @@ declarations.
 * **Weighted Cauchy condensation** (`ApproximationSpaces/Sequences/Dyadic.lean`): for a
   decreasing sequence and a power weight `(n + 1)^γ`, the comparison with the dyadic series
   in both directions (`ENNReal.tsum_pow_mul_le_dyadic`, `ENNReal.dyadic_le_tsum_pow_mul`),
-  generalising `ENNReal.le_tsum_condensed` / `ENNReal.tsum_condensed_le`; and
+  generalising `ENNReal.le_tsum_condensed` / `ENNReal.tsum_condensed_le`, and its form for the
+  sequence capped at `b_{2^m}` (`ENNReal.tsum_min_le_dyadic`); the bound
+  `∑_k 2^k b_{2^k} ≤ 2 ∑_n b_n` (`ENNReal.tsum_two_pow_mul_le_two_mul`), where Mathlib's
+  `ENNReal.tsum_condensed_le` has `b_1 + 2 ∑_n b_n`; and
   `ENNReal.rpow_le_rpow_of_nonpos`, which exists for `ℝ` and `ℝ≥0` but not for `ℝ≥0∞`.
 * **Products and sums in canonically ordered semirings**
   (`ApproximationSpaces/Sequences/Lq.lean`): `a x + b y ≤ (a + b)(x + y)`
@@ -106,6 +112,29 @@ declarations.
   both (`ENNReal.lqNorm_almostDiagonal_le`), with its constant `ENNReal.almostDiagonalConst`, and
   their forms for `0 < q ≤ 1` (`ENNReal.hardy_tail_le_of_le_one`,
   `ENNReal.hardy_sum_le_of_le_one`, `ENNReal.lqNorm_almostDiagonal_le_of_le_one`).
+* **Decreasing rearrangements and the layer cake formula for sums**
+  (`ApproximationSpaces/Sequences/Rearrangement.lean`): for a nonnegative family `g` on any
+  index set and `p > 0`, `∑_a g(a)^p = p ∫_0^∞ #{a : t < g(a)} t^(p-1) dt`
+  (`tsum_ofReal_rpow_eq_lintegral`, Mathlib's layer cake formula for the counting measure), and,
+  for the decreasing rearrangement `r*` of a nonnegative null family, `∑_n (r*_n)^p = ∑_i r_i^p`
+  (`tsum_ofReal_rpow_decreasingRearrangement`). The rearrangement itself is TauCeti's
+  (`TauCeti.decreasingRearrangement`, main `0642eae`), copied with its names, so these are
+  candidates together with TauCeti's file.
+* **Parseval's identity in `ℝ≥0∞`** (`ApproximationSpaces/Sequences/Lq.lean`):
+  `‖x‖² = ∑_i ‖x_i‖²` for every `x ∈ ℓ²` (`lp.enorm_sq_eq_tsum`), next to Mathlib's
+  `lp.norm_rpow_eq_tsum`.
+* **Best `n`-term approximation from a Hilbert basis**
+  (`ApproximationSpaces/Instances/NTermHilbertBasis.lean`): for a Mathlib `HilbertBasis` of a
+  complex Hilbert space, the error of best approximation by combinations of at most `n` basis
+  vectors is the smallest tail of the squared coefficients
+  (`HilbertBasis.approxError_nTerm_sq_eq`), the tail bound
+  `E_n(f) ≤ (n + 1)^(-(1/τ - 1/2)) ‖(⟨e_i, f⟩)_i‖_{ℓ_τ}` for `0 < τ ≤ 2` and every `n ≥ 0`
+  (`HilbertBasis.approxError_nTerm_le`), and the theorem of Stechkin and DeVore,
+  `f ∈ A^(1/τ - 1/2)_τ` iff `(⟨e_i, f⟩)_i ∈ ℓ_τ` for `0 < τ < 2`
+  (`HilbertBasis.memApprox_nTerm_iff`). The statements use the project's
+  approximation schemes (`ApproximationScheme.nTerm`, `ApproximationScheme.MemApprox`), so they
+  are candidates together with that framework; the error formula alone could be stated with
+  `Metric.infEDist`.
 * **The tail of a convergent series** (`ApproximationSpaces/Lift.lean`): in every normed group,
   `∑_i a_i = f` gives `‖f - ∑_{i<n} a_i‖ ≤ ∑_{i ≥ 0} ‖a_{i+n}‖` for every `n`
   (`HasSum.enorm_sub_sum_range_le`).

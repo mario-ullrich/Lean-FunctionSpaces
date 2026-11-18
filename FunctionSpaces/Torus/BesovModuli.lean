@@ -80,7 +80,7 @@ theorem enorm_translate_sub_le_of_mem {n : ℕ} {a : Lp ℂ 2 (volume : Measure 
     (ha : a ∈ (trigScheme d).toLp volume 2 n) (h : UnitAddTorus d) :
     ‖translate h a - a‖ₑ ≤ ENNReal.ofReal (2 * π * Fintype.card d * n * ‖h‖) * ‖a‖ₑ := by
   have hpars : ‖a‖ₑ ^ 2 = ∑' k, ‖mFourierCoeff a k‖ₑ ^ 2 := by
-    rw [← mFourierBasis.repr.enorm_map, SpectralScheme.enorm_sq_eq_tsum]
+    rw [← mFourierBasis.repr.enorm_map, lp.enorm_sq_eq_tsum]
     simp only [mFourierBasis_repr]
   refine (ENNReal.pow_le_pow_left_iff two_ne_zero).1 ?_
   rw [enorm_translate_sub_sq, mul_pow, hpars, ← ENNReal.tsum_mul_left]

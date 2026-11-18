@@ -160,6 +160,9 @@ For a general scheme the project describes `A^s_q`
 * by [block decompositions](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-decompositions.html#thm:block-decomposition), in a Banach space (`s > 0`);
 * by [dyadic blocks of coefficients](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-spectral.html#thm:spectral-coefficients), for a Hilbert basis with
   levels (`s > 0`);
+* by [coefficients in `ℓ_τ`](
+  https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-nterm-hilbert-basis.html#thm:stechkin),
+  for `n`-term approximation from a Hilbert basis (`s = 1/τ - 1/2`, `q = τ`, `0 < τ < 2`);
 * by [martingale differences](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-filtrations.html#thm:martingale), in `L_p` of a filtration with dense union, and
   on `[0, 1]` by [Haar coefficients](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-haar.html#thm:haar) and
   [multiwavelet coefficients](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-multiwavelets.html#thm:multiwavelet-besov) (`s > 0`);
@@ -235,6 +238,11 @@ For a general scheme the project describes `A^s_q`
   `‖y‖ ≤ C n^r ‖a‖`), `n ≥ 1`. For `0 < s < r` and `1 ≤ q ≤ ∞`, `A^s_q = (X, Y)_{s/r,q}` for the
   continuous K-method with `K(t, f) = inf_y (‖f - ι y‖ + t ‖y‖)`
   (`ApproximationScheme.memApprox_iff_memKMethod`).
+* **Nonlinear approximation from an orthonormal basis.** Let `(e_i)_{i ∈ I}` be a Hilbert basis
+  of a complex Hilbert space `H`, and let `A_n` be the set of linear combinations of at most `n`
+  of the vectors `e_i`. For `0 < τ < 2` and `θ = 1/τ - 1/2`, `f ∈ H` lies in the approximation
+  space `A^θ_τ` of `(A_n)` iff `∑_i |⟨e_i, f⟩|^τ < ∞` (Stechkin for `τ = 1`; Pietsch, DeVore in
+  general; `HilbertBasis.memApprox_nTerm_iff`).
 
 ## Organisation
 
@@ -271,7 +279,7 @@ block documents state every result with its Lean name and list the files:
 
 * Interpolation: Lorentz spaces, real Riesz–Thorin, off-diagonal Marcinkiewicz, J- and complex
   method.
-* `n`-term approximation from a Hilbert basis, and the quasi-Banach range `0 < p, q < 1`.
+* The quasi-Banach range `0 < p, q < 1`.
 * Triebel–Lizorkin spaces with `p = 1` or `q = 1`, and ball means and atoms on the torus.
 * Sobolev spaces: Jawerth–Franke with Besov targets, Hardy–Littlewood–Sobolev, Trudinger, Mihlin
   multipliers with finitely many derivatives (Riesz transforms).
@@ -318,6 +326,7 @@ sources. The essential ones:
 * A. P. Calderón, *Lebesgue spaces of differentiable functions and distributions*, Proc. Sympos.
   Pure Math. **4** (1961), 33–49.
 * I. Daubechies, *Ten Lectures on Wavelets*, SIAM, 1992.
+* R. A. DeVore, *Nonlinear approximation*, Acta Numer. **7** (1998), 51–150.
 * R. A. DeVore, G. G. Lorentz, *Constructive Approximation*, Springer-Verlag, 1993.
 * R. A. DeVore, V. A. Popov, *Interpolation of Besov spaces*, Trans. Amer. Math. Soc. **305**
   (1988), 397–414.
@@ -332,6 +341,8 @@ sources. The essential ones:
 * A. Pietsch, *Approximation spaces*, J. Approx. Theory **32** (1981), 115–134.
 * V. S. Rychkov, *On restrictions and extensions of the Besov and Triebel–Lizorkin spaces with
   respect to Lipschitz domains*, J. London Math. Soc. (2) **60** (1999), 237–257.
+* S. B. Stechkin, *On absolute convergence of orthogonal series* (in Russian), Dokl. Akad. Nauk
+  SSSR (N.S.) **102** (1955), 37–40.
 * E. M. Stein, *Singular Integrals and Differentiability Properties of Functions*, Princeton
   University Press, 1970.
 * H. Triebel, *Theory of Function Spaces*, Birkhäuser, 1983.
@@ -348,4 +359,5 @@ Lean projects whose code is mirrored here, with credit:
   as two extended quasi-norms on one group.
 * The Tau Ceti contributors, *TauCeti*, 2026,
   [TauCetiProject/TauCeti](https://github.com/TauCetiProject/TauCeti): eigenbases of compact
-  self-adjoint operators, the Japanese bracket and Mathlib's Bessel potential spaces.
+  self-adjoint operators, the Japanese bracket, Mathlib's Bessel potential spaces and the
+  decreasing rearrangement of null families.

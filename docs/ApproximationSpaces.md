@@ -4,7 +4,8 @@ Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *A
 spaces*, chapters *Approximation schemes*, *Sequence spaces*, *Approximation spaces*, *Lifting
 and the Nikolskii transfer theorem*, *Interpolation and the representation theorem*, *Real
 interpolation of couples*, *Block decompositions and projections*, *Traces and intrinsic norms*
-and *Moduli of smoothness and approximation*.
+and *Moduli of smoothness and approximation*, and the section *Nonlinear approximation from a
+Hilbert basis* of the chapter *Spectral schemes*.
 
 The library `ApproximationSpaces` holds the abstract theory: in a real normed space `X`,
 approximation schemes and the errors of best approximation, the approximation spaces `A^s_q` with
@@ -13,15 +14,17 @@ Nikolskii transfer theorem, the K-functional, the discrete and the continuous K-
 representation of `A^s_q` as a real interpolation space, couples of two extended quasi-norms on
 an abelian group with their K-method, its interpolation property and the reiteration theorem
 (`InterpCouple`), approximation spaces as interpolation spaces of the couple `(X, A^r_∞)`,
-block, projection and atomic decompositions, abstract trace and retract theorems, and the
-comparison with spaces defined by moduli of smoothness (`ModulusData`). A
+block, projection and atomic decompositions, abstract trace and retract theorems, the
+comparison with spaces defined by moduli of smoothness (`ModulusData`), and best `n`-term
+approximation from a Hilbert basis with the theorem of Stechkin and DeVore. A
 smoothness space of order `r` is a Banach space with an injective bounded map into `X` satisfying
 Jackson's and Bernstein's inequalities of order `r` (`ApproximationScheme.JacksonBound`,
 `ApproximationScheme.SmoothnessSpace`, a hypothesis structure whose fields are the embedding, the
 order and Jackson's and Bernstein's inequalities); Sobolev spaces are the motivating examples.
 The schemes live in real normed spaces and the couples on abelian groups; the measures are the
-counting measure behind the `ℓ_q` norms and `dt/t` on `(0, ∞)` of the continuous K-method. The
-other blocks instantiate the theory.
+counting measure behind the `ℓ_q` norms, Lebesgue measure on `(0, ∞)` in the layer cake formula
+for sums, and `dt/t` on `(0, ∞)` of the continuous K-method. The other blocks instantiate the
+theory.
 
 ## Main results
 
@@ -207,6 +210,22 @@ other blocks instantiate the theory.
   (`ApproximationScheme.ofSpan`) and `n`-term approximation from a dictionary
   (`ApproximationScheme.nTerm`) are approximation schemes, and the first has larger errors
   than the second (`ApproximationScheme.approxError_nTerm_le_ofSpan`).
+* **Decreasing rearrangement.** For a family `(r_i)_{i ∈ I}` of nonnegative numbers with only
+  finitely many `r_i > t` for every `t > 0`, the decreasing rearrangement `r*` lists the entries
+  in decreasing order with multiplicities (`decreasingRearrangement`, copied from TauCeti), and
+  `∑_n (r*_n)^p = ∑_i r_i^p` for every `p > 0` (`tsum_ofReal_rpow_decreasingRearrangement`,
+  from the layer cake formula `tsum_ofReal_rpow_eq_lintegral`).
+* **Best `n`-term approximation from a Hilbert basis.** Let `(e_i)` be a Hilbert basis of a
+  complex Hilbert space `H` and `E_n` the errors of `n`-term approximation from the multiples
+  `c e_i`, `c ∈ ℂ`. Then `E_n(f)² = inf_{#Λ ≤ n} ∑_{i ∉ Λ} |⟨e_i, f⟩|²`
+  (`HilbertBasis.approxError_nTerm_sq_eq`), and for `0 < τ ≤ 2`, `θ = 1/τ - 1/2` and every
+  `n ≥ 0`, `E_n(f) ≤ (n + 1)^(-θ) (∑_i |⟨e_i, f⟩|^τ)^(1/τ)`
+  (`HilbertBasis.approxError_nTerm_le`).
+* **The theorem of Stechkin and DeVore.** For `0 < τ < 2` and `θ = 1/τ - 1/2`, `f ∈ H` lies in
+  `A^θ_τ` of `n`-term approximation from the basis iff `∑_i |⟨e_i, f⟩|^τ < ∞`
+  (`HilbertBasis.memApprox_nTerm_iff`), with `∑_i |⟨e_i, f⟩|^τ ≤ 4 ‖f‖_{A^θ_τ}^τ` and
+  `‖f‖_{A^θ_τ} ≤ C_τ (∑_i |⟨e_i, f⟩|^τ)^(1/τ)` for the dyadic quasi-norm `‖·‖_{A^θ_τ}`
+  (`HilbertBasis.tsum_repr_rpow_le`, `HilbertBasis.approxNormDyadic_nTerm_le`).
 
 ## What is formalised
 
@@ -218,8 +237,10 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Error of best approximation and its calculus | ✅ | ✗ | `Error` |
 | Linear approximation from a sequence | ✅ | ✗ | `Instances/Span` |
 | `n`-term approximation from a dictionary | ✅ | ✗ | `Instances/NTerm` |
+| Hilbert-basis `n`-term approximation, Stechkin–DeVore | ✅ | ✗ | `Instances/NTermHilbertBasis` |
 | Sums of powers in `[0, ∞]`, `ℓ_q` norms in `ℝ≥0∞`, Minkowski, the quasi-triangle inequality for `q < 1`, Cauchy–Schwarz, monotonicity in `q`, tails, sequences with finitely many nonzero terms, reindexing, geometric sequences, dyadic weights, weighted `ℓ_q` norms from the first term and a bound of the others, powers of two, products and quotients in `[0, ∞]`; `L_p` norms of `[0, ∞]`-valued functions: homogeneity, powers, monotone convergence, Minkowski's inequality for series, functions bounded on pieces | ✅ | ✗ | `Sequences/Lq` |
 | Cauchy condensation with power weights, the dyadic sum `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4`, finitely many changed terms, sums over the dyadic scales of an annulus, the interpolation inequality for dyadic suprema (Brezis–Mironescu) | ✅ | ✗ | `Sequences/Dyadic` |
+| Decreasing rearrangement, layer cake formula for sums | ✅ | ✗ | `Sequences/Rearrangement` |
 | Countable Minkowski inequality, monotone convergence and truncations in `ℓ_q`, window sums in `ℓ_q`, discrete Hardy inequalities, almost diagonal sums and their constant, the Hardy and almost diagonal bounds for `0 < q ≤ 1`, shift invariance and geometric convolutions on `ℤ` | ✅ | ✗ | `Sequences/Hardy` |
 | `A^s_q` and its dyadic quasi-norm for `q > 0`, linear structure for `q ≥ 1` | ✅ | ✗ | `Norm`, `Dyadic`, `Space` |
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ | ✗ | `Embedding`, `Transfer` |
