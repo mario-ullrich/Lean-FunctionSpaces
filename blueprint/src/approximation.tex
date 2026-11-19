@@ -345,8 +345,9 @@ smoothness, and a finite set for the coefficients of one level of atoms and wave
   ENNReal.lqNorm_le_lqNorm_of_le, ENNReal.lqNorm_le_head_add_shift,
   ENNReal.lqNorm_le_sum_range_add_shift, ENNReal.lqNorm_le_lqNorm_one, ENNReal.lqNorm_geometric_le,
   ENNReal.lqNorm_shift_le, ENNReal.lqNorm_eq_sum, ENNReal.lqNorm_le_card_rpow_mul,
-  ENNReal.lqNorm_prod_rpow, ENNReal.lqNorm_le_sum_of_eq_zero, ENNReal.lqNorm_ite_eq,
-  ENNReal.lqNorm_ite_le_eq, ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le}
+  ENNReal.lqNorm_prod_rpow, ENNReal.lqNorm_lqNorm_rpow, ENNReal.lqNorm_le_sum_of_eq_zero,
+  ENNReal.lqNorm_ite_eq, ENNReal.lqNorm_ite_le_eq,
+  ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le}
 \leanok
 \uses{def:lq-norm}
 Let $1 \leq q \leq r \leq \infty$. For all sequences $a, b$ in $[0, \infty]$, all
@@ -374,7 +375,11 @@ $(a_i)_{i \in I}$ in $[0, \infty]$ with $a_i \leq B$ for every $i$,
 $\|a\|_{\ell_p} \leq (\# I)^{1/p} B$, with $1/p = 0$ for $p = \infty$. For every
 $p \in (0, \infty)$ and all finite sets $I$, $M$, $N$, every family $a$ on $I$ has
 $\|a\|_{\ell_p} = (\sum_{i \in I} a_i^p)^{1/p}$, and every family $b$ on $M \times N$ has
-$\|b\|_{\ell_p}^p = \sum_{m \in M} \|(b_{m,n})_{n \in N}\|_{\ell_p}^p$.
+$\|b\|_{\ell_p}^p = \sum_{m \in M} \|(b_{m,n})_{n \in N}\|_{\ell_p}^p$. For every
+$p \in (0, \infty)$, every countable set $K$ and countable sets $N_k$, $k \in K$, every family
+$(b_{k,n})_{k \in K, n \in N_k}$ in $[0, \infty]$ has
+$\bigl\|\bigl(\|(b_{k,n})_{n \in N_k}\|_{\ell_p}\bigr)_{k \in K}\bigr\|_{\ell_p}^p
+= \sum_{k \in K} \sum_{n \in N_k} b_{k,n}^p$.
 The bound $\|a\|_{\ell_r} \leq \|a\|_{\ell_q}$ of the fourth item and the sequence with one
 nonzero term of the seventh hold for all $0 < q \leq r \leq \infty$.
 \end{lemma}
@@ -393,10 +398,12 @@ $q$-th powers term by term; the last splits off the first term by the fifth, bou
 by the first two, and drops the first term of $(2^{k\sigma} w_k)_k$. For a finite set $I$ the
 counting measure of $I$ is $\# I$, so the
 bound by $B$ is Mathlib's \texttt{eLpNorm\_\allowbreak le\_\allowbreak of\_\allowbreak
-ae\_\allowbreak enorm\_\allowbreak bound}; the two identities are the series of $p$-th powers
-written as finite sums. The proof of $\|a\|_{\ell_r} \leq \|a\|_{\ell_q}$ uses only $q > 0$, and
-the sequence equal to $c$ at $n$ and to $0$ elsewhere has the $\ell_q$ norm $(c^q)^{1/q} = c$ for
-every $q \in (0, \infty)$ and the supremum $c$ for $q = \infty$.
+ae\_\allowbreak enorm\_\allowbreak bound}; the two identities for finite sets are the series of
+$p$-th powers written as finite sums, and the iterated norm is
+$\|a\|_{\ell_p}^p = \sum_i a_i^p$ applied to the outer norm and to each inner norm. The proof
+of $\|a\|_{\ell_r} \leq \|a\|_{\ell_q}$ uses only $q > 0$, and the sequence equal to $c$ at $n$
+and to $0$ elsewhere has the $\ell_q$ norm $(c^q)^{1/q} = c$ for every $q \in (0, \infty)$ and
+the supremum $c$ for $q = \infty$.
 \end{proof}
 
 The next lemma holds for every $q \in (0, \infty]$, also below $1$, and for families on any

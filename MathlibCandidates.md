@@ -9,7 +9,8 @@ declarations.
   homogeneity for `ℝ≥0∞` scalars, the quasi-triangle inequality
   `‖a + b‖_q ≤ LpAddConst q (‖a‖_q + ‖b‖_q)` for every `q`, the case of the counting measure of
   Mathlib's `eLpNorm_add_le'` (`ENNReal.lqNorm_add_le'`), the finite-index forms
-  (`ENNReal.lqNorm_eq_sum`, `ENNReal.lqNorm_le_card_rpow_mul`, `ENNReal.lqNorm_prod_rpow`), and,
+  (`ENNReal.lqNorm_eq_sum`, `ENNReal.lqNorm_le_card_rpow_mul`, `ENNReal.lqNorm_prod_rpow`), the
+  iterated norm `‖(‖a_k‖_q)_k‖_q^q = ∑_k ∑_n a_{k,n}^q` (`ENNReal.lqNorm_lqNorm_rpow`), and,
   on `ℕ`, splitting off the first terms (`ENNReal.lqNorm_le_head_add_shift`,
   `ENNReal.lqNorm_le_head_add_shift'`, `ENNReal.lqNorm_le_sum_range_add_shift`); reindexing along
   bijections and injections (`ENNReal.lqNorm_comp_equiv`, `ENNReal.lqNorm_extend_zero`,
@@ -101,6 +102,11 @@ declarations.
   `∑_{j ∈ ℕ} min(2^j a, (2^j a)⁻¹) ≤ 4` for every `a ∈ [0, ∞]` (`ENNReal.tsum_min_two_pow_le`),
   the sum behind every Hörmander condition for dyadic dilations; the same bound holds for
   `j ∈ ℤ`.
+* **Dyadic blocks of `ℕ`** (`ApproximationSpaces/Sequences/Dyadic.lean`): every `n ≥ 1` is
+  `2^k + i` for exactly one pair with `0 ≤ i < 2^k`, and then `k = ⌊log₂ n⌋`
+  (`Nat.exists_eq_two_pow_add`, `Nat.two_pow_add_eq_iff`, `Nat.log_two_pow_add`); so a series
+  in `[0, ∞]` splits into dyadic blocks, `∑_n g(n) = g(0) + ∑_k ∑_{i<2^k} g(2^k + i)`
+  (`ENNReal.tsum_eq_add_tsum_two_pow_add`), with the finite form `ENNReal.sum_range_two_pow_eq`.
 * **Interpolation of dyadic suprema** (`ApproximationSpaces/Sequences/Dyadic.lean`): the
   Brezis–Mironescu inequality
   `∑_j 2^(j(θσ₀ + (1-θ)σ₁)) a_j ≤ c (sup_j 2^(jσ₀) a_j)^θ (sup_j 2^(jσ₁) a_j)^(1-θ)` for
@@ -159,6 +165,12 @@ declarations.
   (`FunctionSpaces/MeasureSpaces/Martingales/Partition.lean`): for `φ : α → ι` with `ι` countable,
   measurable fibres and a finite measure, `μ[f | MeasurableSpace.comap φ ⊤]` is a.e. the average
   of `f` over the fibre through the point (`MeasureTheory.condExp_comap_ae_eq`).
+* **The Haar basis of `L_2[0, 1]`** (`FunctionSpaces/Wavelets/Examples/HaarBasis.lean`): the Haar
+  functions in breadth-first order, `φ_0 = 1` and `φ_{2^k+i} = h_{k,i}` for `0 ≤ i < 2^k`, as a
+  `HilbertBasis ℕ ℂ (Lp ℂ 2 vol)` (`Haar.haarBasis`), with the coefficients `∫_0^1 f` and
+  `⟨f, h_{k,i}⟩` (`Haar.haarBasis_repr_zero`, `Haar.haarBasis_repr_two_pow_add`). Mathlib has no
+  Haar system; TauCeti has the real, unnormalised Haar functions in the same order as a Schauder
+  basis of `L_p[0, 1]`, `1 ≤ p < ∞` (`TauCeti.unitInterval.haarBasis`).
 * **Hilbert bases of eigenvectors**
   (`FunctionSpaces/MeasureSpaces/Spectral/CompactEigenbasis.lean`): for a symmetric operator such
   that the orthogonal complement of the sum of all eigenspaces is `{0}`, in particular a compact

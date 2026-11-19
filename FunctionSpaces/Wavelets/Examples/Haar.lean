@@ -248,6 +248,14 @@ theorem abs_haarFunction {j : ℕ} {m : ℤ} {x : ℝ} (hx : dyadicIndex j x = m
   · rw [abs_neg]; exact abs_of_pos (by positivity)
   · omega
 
+/-- Haar functions are bounded: `|h_{j,m}| ≤ 2^(j/2)`. -/
+theorem abs_haarFunction_le (j : ℕ) (m : ℤ) (x : ℝ) :
+    |haarFunction j m x| ≤ (2 : ℝ) ^ ((j : ℝ) / 2) := by
+  by_cases hx : dyadicIndex j x = m
+  · exact (abs_haarFunction hx).le
+  · rw [haarFunction_eq_zero hx, abs_zero]
+    positivity
+
 /-- `h_{j,m} f = 2^(j/2) (1_{I_{j+1,2m}} f - 1_{I_{j+1,2m+1}} f)` pointwise. -/
 theorem haarFunction_mul (j : ℕ) (m : ℤ) (f : ℝ → ℂ) (x : ℝ) :
     (haarFunction j m x : ℂ) * f x = (((2 : ℝ) ^ ((j : ℝ) / 2) : ℝ) : ℂ) *
@@ -278,6 +286,12 @@ theorem haarCoeff_eq {f : ℝ → ℂ} (hf : Integrable f vol) (j : ℕ) (m : �
       (hf.indicator (measurableSet_dyadicInterval _ _)),
     integral_indicator (measurableSet_dyadicInterval _ _),
     integral_indicator (measurableSet_dyadicInterval _ _)]
+
+/-- Functions that agree almost everywhere have the same Haar coefficients. -/
+theorem haarCoeff_congr_ae {f g : ℝ → ℂ} (h : f =ᵐ[vol] g) (j : ℕ) (m : ℤ) :
+    haarCoeff f j m = haarCoeff g j m := by
+  unfold haarCoeff
+  exact integral_congr_ae (h.mono fun x hx => by simp only [hx])
 
 /-- The integral over `I_{j,n}` is the sum of the integrals over its two halves. -/
 theorem setIntegral_dyadicInterval {f : ℝ → ℂ} (hf : Integrable f vol) (j : ℕ) (n : ℤ) :

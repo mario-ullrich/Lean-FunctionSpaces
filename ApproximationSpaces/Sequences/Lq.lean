@@ -366,6 +366,15 @@ theorem lqNorm_prod_rpow {M N : Type*} [Fintype M] [Fintype N] [MeasurableSpace 
   refine Finset.sum_congr rfl fun m _ => ?_
   rw [lqNorm_rpow hq0 hq, tsum_fintype]
 
+/-- **Iterated `ℓ_q` norms**: for `0 < q < ∞` and families `a_k` on countable index sets `N_k`,
+`‖(‖a_k‖_{ℓ_q(N_k)})_k‖_{ℓ_q}^q = ∑_k ∑_{n ∈ N_k} a_{k,n}^q`, the `q`-th power of the `ℓ_q` norm
+of the whole family. -/
+theorem lqNorm_lqNorm_rpow {N : ι → Type*} [∀ k, MeasurableSpace (N k)] [∀ k, Countable (N k)]
+    [∀ k, MeasurableSingletonClass (N k)] (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : ∀ k, N k → ℝ≥0∞) :
+    lqNorm q (fun k => lqNorm q (a k)) ^ q.toReal = ∑' k, ∑' n, a k n ^ q.toReal := by
+  rw [lqNorm_rpow hq0 hq]
+  exact tsum_congr fun k => lqNorm_rpow hq0 hq (a k)
+
 /-! ### Reindexing -/
 
 variable {ι' : Type*} [MeasurableSpace ι'] [Countable ι'] [MeasurableSingletonClass ι']

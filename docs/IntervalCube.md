@@ -13,7 +13,9 @@ one coordinate at a time, and the translation algebra `ℂ[ℝ^d]` of
 [Tools from analysis](Analysis.md) relates the isotropic modulus to
 the moduli in the coordinates. The martingale differences of [Besov and Sobolev spaces on measure
 spaces](MeasureSpaces.md) give the Haar characterisation, and multiwavelets refine it to higher
-degree.
+degree. In breadth-first order the Haar functions form a Hilbert basis of `L_2[0, 1]`, and for
+`1 ≤ τ < 2` and `θ = 1/τ - 1/2` best `n`-term approximation from it in `L_2` gives the same
+approximation space `A^θ_τ` as linear Haar approximation in `L_τ`.
 
 ## Main results
 
@@ -126,6 +128,17 @@ degree.
   the scheme of piecewise constants, so for `0 < s < 1/p` the Haar condition is also equivalent
   to `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞` and to its periodic version
   (`Haar.lqNorm_modulus_lt_top_iff_haarCoeff`, `Haar.lqNorm_perModulus_lt_top_iff_haarCoeff`).
+* **The Haar basis and `n`-term approximation.** The functions `φ_0 = 1` and
+  `φ_{2^k+i} = h_{k,i}`, `k ∈ ℕ`, `0 ≤ i < 2^k`, form a Hilbert basis of `L_2[0, 1]`
+  (`Haar.haarBasis`, with the coefficients `Haar.haarBasis_repr_zero`,
+  `Haar.haarBasis_repr_two_pow_add`). For `0 < τ < 2` and `θ = 1/τ - 1/2`, `f ∈ L_2[0, 1]` lies in
+  the approximation space `A^θ_τ` of `n`-term approximation from the multiples `c φ_n` iff
+  `|∫_0^1 f|^τ + ∑_k ∑_{i<2^k} |⟨f, h_{k,i}⟩|^τ < ∞` (`Haar.memApprox_nTerm_iff_haarCoeff`). For
+  `1 ≤ τ < 2` this is the space `A^θ_τ(L_τ[0, 1])` of the Haar scheme
+  (`Haar.memApprox_nTerm_iff_memApprox_scheme`), so it is the Besov condition
+  `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞` and its periodic version
+  (`Haar.memApprox_nTerm_iff_modulus`, `Haar.memApprox_nTerm_iff_perModulus`): the Haar case of
+  the theorem of DeVore, Jawerth and Popov.
 
 ## What is formalised
 
@@ -159,6 +172,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | The normalising factor `2^(j/2)` of dyadic dilations: its square and its extended norm | ✅ | ✗ | `Wavelets/DyadicNormalisation` |
 | Haar system on `[0, 1]`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ | ✗ | `Wavelets/Examples/Haar` |
 | Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarBesov` |
+| The Haar basis of `L_2[0, 1]`, `n`-term approximation | ✅ | ✗ | `Wavelets/Examples/HaarBasis` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

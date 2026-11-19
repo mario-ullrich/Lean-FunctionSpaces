@@ -8,15 +8,16 @@ On `𝕋^d` with its normalised Haar measure, the scheme consists of the trigono
 degree `< n`. They satisfy the Nikolskii inequality, so all the embeddings of [Besov and Sobolev
 spaces on measure spaces](MeasureSpaces.md) hold on `𝕋^d`. For `p = 2` the Fourier coefficients
 describe `B^s_{2,q}`, `H^s` and the Sobolev spaces `W^m_2` of weak derivatives, defined by Fourier
-multipliers. For every `1 ≤ p < ∞` the Besov spaces are described by moduli of smoothness of every
-order: the kernels of `ℝ^d` act on `𝕋^d` by convolution with their periodisations, using Young's
-inequality on measurable groups of [Tools from analysis](Analysis.md) and the band-limited
-approximation of [Besov spaces on `ℝ^d`](Rd.md); the same kernels give smooth Littlewood–Paley
-blocks, which describe the Besov spaces for every `1 ≤ p < ∞`. Weak derivatives in `L_p`,
-`1 ≤ p ≤ ∞`, defined by Fourier coefficients, are the distributional derivatives of the periodic
-lifts on `ℝ^d`; for `1 < p < ∞` they give `W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)`, with the Besov
-sandwich and the Sobolev embeddings. The restriction to a face of `𝕋^(n+1)` is the model case of
-the trace theorem.
+multipliers; for `0 < τ < 2` the `ℓ_τ` norm of the Fourier coefficients describes best `n`-term
+approximation in `L_2`. For every `1 ≤ p < ∞` the Besov spaces are described by moduli of
+smoothness of every order: the kernels of `ℝ^d` act on `𝕋^d` by convolution with their
+periodisations, using Young's inequality on measurable groups of [Tools from
+analysis](Analysis.md) and the band-limited approximation of [Besov spaces on `ℝ^d`](Rd.md); the
+same kernels give smooth Littlewood–Paley blocks, which describe the Besov spaces for every
+`1 ≤ p < ∞`. Weak derivatives in `L_p`, `1 ≤ p ≤ ∞`, defined by Fourier coefficients, are the
+distributional derivatives of the periodic lifts on `ℝ^d`; for `1 < p < ∞` they give
+`W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)`, with the Besov sandwich and the Sobolev embeddings. The
+restriction to a face of `𝕋^(n+1)` is the model case of the trace theorem.
 
 ## Main results
 
@@ -114,6 +115,12 @@ the trace theorem.
   `B^s_{2,2}(𝕋^d) = H^s(𝕋^d)` (`Torus.memBesov_two_two_iff`). The Fourier basis, an eigenbasis
   of the Laplacian, is a continuous spectral basis with the local Weyl bound of dimension `d`
   (`Torus.fourierEigenbasis`, `Torus.localWeylBound_fourierEigenbasis`).
+* **`n`-term trigonometric approximation.** For `0 < τ < 2` and `θ = 1/τ - 1/2`, `f ∈ L_2(𝕋^d)`
+  lies in the approximation space `A^θ_τ` of `n`-term approximation from the multiples `c e_k`
+  of the trigonometric monomials iff `∑_{k ∈ ℤ^d} |f̂(k)|^τ < ∞` (`Torus.memApprox_nTerm_iff`):
+  the theorem of Stechkin and DeVore of [Approximation spaces](ApproximationSpaces.md) for
+  Mathlib's Fourier basis. For `τ = 1` the condition is the absolute convergence of the Fourier
+  series.
 
 ## What is formalised
 
@@ -140,6 +147,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | `W^m_p(𝕋^d) = F^m_{p,2}(𝕋^d)` for `1 < p < ∞`, the Besov sandwich, local means | ✅ | ✗ | `Torus/SobolevTriebelLizorkin` |
 | Embeddings of `W^m_p(𝕋^d)` into `L_r`, `C(𝕋^d)`, `W^k_r(𝕋^d)` | ✅ | ✗ | `Torus/SobolevEmbedding` |
 | Weak and classical derivatives of periodic lifts | ✅ | ✗ | `Torus/PeriodicDistributions` |
+| `n`-term trigonometric approximation, coefficients in `ℓ_τ` | ✅ | ✗ | `Torus/NTermFourier` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

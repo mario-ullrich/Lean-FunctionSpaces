@@ -28,7 +28,10 @@ and the analogous statements for suprema, `iSup_pow_mul_le_dyadic` and
 `∑ₖ 2^k b (2^k) ≤ 2 ∑ₙ b n` (`tsum_two_pow_mul_le_two_mul`).  The proof
 splits `ℕ \ {0}` into the dyadic blocks `[2^k, 2^(k+1))`, which have `2^k` elements, on which
 `b` is at most `b (2^k)` and at least `b (2^(k+1))`, and on which `(n+1)^γ` is within a factor
-`2^|γ|` of `2^(kγ)`.
+`2^|γ|` of `2^(kγ)`. Every `n ≥ 1` is `2^k + i` for exactly one pair with `0 ≤ i < 2^k`
+(`Nat.exists_eq_two_pow_add`, `Nat.two_pow_add_eq_iff`), so a series over `ℕ` is its first term
+plus the sums over these blocks (`tsum_eq_add_tsum_two_pow_add`, with the finite form
+`sum_range_two_pow_eq`).
 
 For `γ = 0` this is Cauchy's condensation test (Mathlib: `ENNReal.le_tsum_condensed`,
 `ENNReal.tsum_condensed_le`).  The weight `(n + 1) ^ γ` is in general increasing, so the
@@ -78,6 +81,51 @@ theorem sum_range_two_pow_eq {M : Type*} [AddCommMonoid M] (g : ℕ → M) (K : 
   | succ K ih =>
     rw [← Finset.sum_range_add_sum_Ico g (Nat.pow_le_pow_right two_pos (Nat.le_succ K)), ih,
       Finset.sum_range_succ, add_assoc]
+
+/-- For `0 ≤ i < 2^k`, `⌊log₂ (2^k + i)⌋ = k`, since `2^k ≤ 2^k + i < 2^(k+1)`. -/
+theorem _root_.Nat.log_two_pow_add {k i : ℕ} (hi : i < 2 ^ k) : Nat.log 2 (2 ^ k + i) = k :=
+  Nat.log_eq_of_pow_le_of_lt_pow (Nat.le_add_right _ _) (by rw [pow_succ, mul_two]; omega)
+
+/-- Every `n ≥ 1` is `2^k + i` with `0 ≤ i < 2^k`, namely for `k = ⌊log₂ n⌋`. -/
+theorem _root_.Nat.exists_eq_two_pow_add {n : ℕ} (hn : n ≠ 0) :
+    ∃ k i, i < 2 ^ k ∧ 2 ^ k + i = n := by
+  have h1 := Nat.pow_log_le_self 2 hn
+  have h2 := Nat.lt_pow_succ_log_self _root_.one_lt_two n
+  rw [pow_succ, mul_two] at h2
+  exact ⟨Nat.log 2 n, n - 2 ^ Nat.log 2 n, by omega, by omega⟩
+
+/-- `2^k + i = 2^l + j` with `i < 2^k` and `j < 2^l` iff `k = l` and `i = j`: the level is
+`⌊log₂ (2^k + i)⌋` (`Nat.log_two_pow_add`). -/
+theorem _root_.Nat.two_pow_add_eq_iff {k l i j : ℕ} (hi : i < 2 ^ k) (hj : j < 2 ^ l) :
+    2 ^ k + i = 2 ^ l + j ↔ k = l ∧ i = j := by
+  constructor
+  · intro h
+    have hkl : k = l := by rw [← Nat.log_two_pow_add hi, h, Nat.log_two_pow_add hj]
+    subst hkl
+    exact ⟨rfl, by omega⟩
+  · rintro ⟨rfl, rfl⟩
+    rfl
+
+/-- **Splitting `ℕ` into dyadic blocks**: `∑_n g(n) = g(0) + ∑_k ∑_{i<2^k} g(2^k + i)` for every
+family `g` in `[0, ∞]`, since `(k, i) ↦ 2^k + i` maps the pairs with `i < 2^k` bijectively onto
+the positive integers. The series form of `ENNReal.sum_range_two_pow_eq`. -/
+theorem tsum_eq_add_tsum_two_pow_add (g : ℕ → ℝ≥0∞) :
+    ∑' n, g n = g 0 + ∑' k, ∑ i : Fin (2 ^ k), g (2 ^ k + i) := by
+  have hinj : Function.Injective fun s : (Σ k, Fin (2 ^ k)) => 2 ^ s.1 + (s.2 : ℕ) := by
+    rintro ⟨k, i⟩ ⟨l, j⟩ h
+    obtain ⟨rfl, h2⟩ := (Nat.two_pow_add_eq_iff i.isLt j.isLt).1 h
+    rw [Fin.ext h2]
+  rw [ENNReal.tsum_eq_add_tsum_ite 0, ← hinj.tsum_eq ?hs, ENNReal.tsum_sigma']
+  · congr 1
+    refine tsum_congr fun k => ?_
+    rw [tsum_fintype]
+    exact Finset.sum_congr rfl fun i _ => ite_eq_right (by positivity)
+  · intro n hn
+    have hn0 : n ≠ 0 := by
+      rintro rfl
+      exact hn (ite_eq_left rfl)
+    obtain ⟨k, i, hi, rfl⟩ := Nat.exists_eq_two_pow_add hn0
+    exact ⟨⟨k, ⟨i, hi⟩⟩, rfl⟩
 
 /-- `2^k = 2^(k · 1)`, the dyadic weight of exponent `1`. -/
 theorem natCast_two_pow_eq (k : ℕ) : ((2 ^ k : ℕ) : ℝ≥0∞) = dyadicWeight 1 k := by

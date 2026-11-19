@@ -142,6 +142,7 @@ spaces it is.
 | `B^s_{p,q}(ℝ^d)` | [band-limited functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-rd-besov-differences.html#thm:rd-besov) (`s > 0`) |
 | `B^s_{p,q}(𝕋^d)` | [trigonometric polynomials](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-torus-lp-moduli.html#thm:torus-lp-moduli) (`s > 0`) |
 | `B^s_{p,q}[0, 1]` | [dyadic splines of order `r`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-spline-jackson-coincidence.html#thm:spline-besov) (`0 < s < r - 1 + 1/p`), [dyadic piecewise polynomials](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-multiwavelets.html#thm:multiwavelet-besov) (`0 < s < 1/p`) |
+| `B^θ_{τ,τ}[0, 1]`, `θ = 1/τ - 1/2` | [`n`-term combinations of Haar functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-haar-coefficients.html#cor:haar-nterm-besov), a nonlinear scheme in `L_2[0, 1]` (`1 ≤ τ < 2`) |
 | `B^s_{p,q}([0, 1]^d)` | [tensor splines of order `r`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-iso-modulus.html#thm:iso-besov) (`0 < s < r - 1 + 1/p`) |
 | `F^s_{p,p}(ℝ^d)`, `F^s_{p,p}(𝕋^d)` | band-limited functions and trigonometric polynomials, since [`F^s_{p,p}(ℝ^d) = B^s_{p,p}(ℝ^d)`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-tl-besov-sandwich.html#thm:tl-besov-sandwich) and [`F^s_{p,p}(𝕋^d) = B^s_{p,p}(𝕋^d)`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-torus-triebel-lizorkin.html#thm:torus-tl-besov-sandwich) (`s > 0`) |
 | `W^{s,p}(ℝ^d)`, Sobolev–Slobodeckij | [band-limited functions, `q = p`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-sobolev-slobodeckij.html#thm:sobolev-slobodeckij-besov) (`0 < s < 1`) |
@@ -242,7 +243,12 @@ For a general scheme the project describes `A^s_q`
   of a complex Hilbert space `H`, and let `A_n` be the set of linear combinations of at most `n`
   of the vectors `e_i`. For `0 < τ < 2` and `θ = 1/τ - 1/2`, `f ∈ H` lies in the approximation
   space `A^θ_τ` of `(A_n)` iff `∑_i |⟨e_i, f⟩|^τ < ∞` (Stechkin for `τ = 1`; Pietsch, DeVore in
-  general; `HilbertBasis.memApprox_nTerm_iff`).
+  general; `HilbertBasis.memApprox_nTerm_iff`). For the Fourier basis of `L_2(𝕋^d)` the
+  condition is `∑_{k ∈ ℤ^d} |f̂(k)|^τ < ∞` (`Torus.memApprox_nTerm_iff`). For the Haar basis
+  `1`, `h_{k,i}` (`0 ≤ i < 2^k`) of `L_2[0, 1]` it is
+  `|∫_0^1 f|^τ + ∑_k ∑_{i<2^k} |⟨f, h_{k,i}⟩|^τ < ∞` (`Haar.memApprox_nTerm_iff_haarCoeff`); for
+  `1 ≤ τ < 2`, `f ∈ A^θ_τ` iff `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞`, that is,
+  iff `f ∈ B^θ_{τ,τ}[0, 1]` (DeVore–Jawerth–Popov; `Haar.memApprox_nTerm_iff_modulus`).
 
 ## Organisation
 
@@ -327,6 +333,8 @@ sources. The essential ones:
   Pure Math. **4** (1961), 33–49.
 * I. Daubechies, *Ten Lectures on Wavelets*, SIAM, 1992.
 * R. A. DeVore, *Nonlinear approximation*, Acta Numer. **7** (1998), 51–150.
+* R. A. DeVore, B. Jawerth, V. A. Popov, *Compression of wavelet decompositions*, Amer. J. Math.
+  **114** (1992), 737–785.
 * R. A. DeVore, G. G. Lorentz, *Constructive Approximation*, Springer-Verlag, 1993.
 * R. A. DeVore, V. A. Popov, *Interpolation of Besov spaces*, Trans. Amer. Math. Soc. **305**
   (1988), 397–414.

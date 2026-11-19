@@ -225,9 +225,11 @@ public import FunctionSpaces.Torus.LpWeakDerivatives
 public import FunctionSpaces.Torus.SobolevTriebelLizorkin
 public import FunctionSpaces.Torus.SobolevEmbedding
 public import FunctionSpaces.Torus.PeriodicDistributions
+public import FunctionSpaces.Torus.NTermFourier
 public import FunctionSpaces.Wavelets.DyadicNormalisation
 public import FunctionSpaces.Wavelets.Examples.Haar
 public import FunctionSpaces.Wavelets.Examples.HaarBesov
+public import FunctionSpaces.Wavelets.Examples.HaarBasis
 public import FunctionSpaces.Wavelets.Examples.Multiscale
 public import FunctionSpaces.Wavelets.Examples.Alpert
 public import FunctionSpaces.Wavelets.Examples.Daubechies.DaubechiesPolynomial

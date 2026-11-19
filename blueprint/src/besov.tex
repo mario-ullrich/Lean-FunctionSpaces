@@ -130,6 +130,9 @@ Descriptions & Range & Result \\
   & \Cref{thm:atomic-synthesis}\newline \Cref{thm:atomic-analysis} \\
 \raggedright Approximation and coefficients in a Hilbert space & $s > 0$
   & \Cref{thm:spectral-coefficients} \\
+\raggedright $n$-term approximation from a Hilbert basis and coefficients in $\ell_\tau$,
+  $q = \tau$
+  & $s = 1/\tau - 1/2$,\newline $0 < \tau < 2$ & \Cref{thm:stechkin} \\
 \raggedright Intrinsic approximation and restrictions, given an extension & $s \geq 0$
   & \Cref{thm:retract} \\
 \hline
@@ -154,6 +157,9 @@ Descriptions & Range & Result \\
   & $0 < s_0 < s_1 < r$ & \Cref{thm:torus-besov-interpolate} \\
 \raggedright Weak derivatives, Fourier coefficients and approximation: $\Sob{m}{2} = H^m = \Besov{m}{2}{2}$
   & $m \geq 1$ & \Cref{thm:weak-sobolev} \\
+\raggedright $n$-term trigonometric approximation in $L_2$ and Fourier coefficients in
+  $\ell_\tau$, $q = \tau$
+  & $s = 1/\tau - 1/2$,\newline $0 < \tau < 2$ & \Cref{cor:torus-nterm} \\
 \hline
 \end{tabular}
 \end{center}
@@ -195,6 +201,9 @@ Descriptions & Range & Result \\
   & \Cref{thm:multiwavelet-besov} \\
 \raggedright Step functions and Haar coefficients & $s > 0$ & \Cref{thm:haar} \\
 \raggedright Haar coefficients and differences of order $1$ & $0 < s < 1/p$ & \Cref{cor:haar-besov} \\
+\raggedright $n$-term Haar approximation in $L_2$ and differences of order $1$ in $L_\tau$,
+  $p = q = \tau$
+  & $s = 1/\tau - 1/2$,\newline $1 \leq \tau < 2$ & \Cref{cor:haar-nterm-besov} \\
 \hline
 \end{tabular}
 \end{center}
@@ -644,6 +653,39 @@ and $\Besov{s}{2}{2}(\T^d) = H^s(\T^d)$.
 \Cref{thm:spectral-coefficients} for the Fourier basis; the only index of level $0$ is
 $k = 0$.
 \end{proof}
+
+\section{\texorpdfstring{$n$}{n}-term trigonometric approximation}
+\label{sec:torus-nterm}
+
+Best $n$-term approximation from the Fourier basis approximates $f \in L_2(\T^d)$ by
+combinations $\sum_{k \in \Lambda} c_k e_k$ of at most $n$ monomials, with the set
+$\Lambda \subseteq \Z^d$ of frequencies chosen for each $f$.
+
+\begin{corollary}[$n$-term trigonometric approximation]
+\label{cor:torus-nterm}
+\lean{Torus.memApprox_nTerm_iff}
+\leanok
+\uses{thm:stechkin}
+Let $0 < \tau < 2$ and $\theta = 1/\tau - 1/2$. Then $f \in L_2(\T^d)$ lies in the
+approximation space $A^\theta_\tau$ of $n$-term approximation from the dictionary
+$\{c \, e_k : k \in \Z^d, \ c \in \C\}$ if and only if
+\[
+  \sum_{k \in \Z^d} |\hat f(k)|^\tau < \infty .
+\]
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:stechkin} for Mathlib's Fourier basis of $L_2(\T^d)$, whose coefficients are
+$\langle e_k, f \rangle = \hat f(k)$.
+\end{proof}
+
+For $\tau = 1$ the condition says that the Fourier series of $f$ converges absolutely, the
+setting of Stechkin~\cite{Stechkin1955}; for $\tau < 1$ it is stronger. Linear approximation by
+the trigonometric polynomials of degree $< n$ leads instead to conditions on the $\ell_2$ norms
+of the dyadic blocks of coefficients ordered by degree, such as $\Besov{s}{2}{q}(\T^d)$ in
+\Cref{thm:torus-coefficients}, and to the weighted $\ell_2$ condition of $H^s(\T^d)$ in
+\Cref{def:torus-sobolev}.
 
 \section{Traces on the torus}
 \label{sec:torus-traces}
@@ -1751,17 +1793,19 @@ $L_2(\R)$.
 \begin{definition}[Haar functions and coefficients]
 \label{def:haar}
 \lean{Haar.haarFunction, Haar.measurable_haarFunction, Haar.haarFunction_eq_zero,
-  Haar.abs_haarFunction, Haar.enorm_haarFunction, Haar.haarFunction_mul, Haar.haarCoeff,
-  Haar.haarCoeff_eq}
+  Haar.abs_haarFunction, Haar.abs_haarFunction_le, Haar.enorm_haarFunction, Haar.haarFunction_mul,
+  Haar.haarCoeff, Haar.haarCoeff_eq, Haar.haarCoeff_congr_ae}
 \leanok
 \uses{def:dyadic-filtration}
 For $j \in \N$ and $m \in \Z$ the Haar function is
 $h_{j,m} = 2^{j/2} (\mathbf{1}_{I_{j+1,2m}} - \mathbf{1}_{I_{j+1,2m+1}})$. It vanishes outside
-$I_{j,m}$ and has modulus $2^{j/2}$ on $I_{j,m}$. The Haar coefficient of $f \in L_1[0, 1]$ is
+$I_{j,m}$ and has modulus $2^{j/2}$ on $I_{j,m}$, so $|h_{j,m}| \leq 2^{j/2}$. The Haar
+coefficient of $f \in L_1[0, 1]$ is
 \[
   \langle f, h_{j,m} \rangle = \int_0^1 h_{j,m} f
-  = 2^{j/2} \Bigl( \int_{I_{j+1,2m}} f - \int_{I_{j+1,2m+1}} f \Bigr) .
+  = 2^{j/2} \Bigl( \int_{I_{j+1,2m}} f - \int_{I_{j+1,2m+1}} f \Bigr) ,
 \]
+and functions that agree almost everywhere on $[0, 1]$ have the same Haar coefficients.
 \end{definition}
 
 \begin{lemma}[Martingale differences are Haar sums]
@@ -1844,6 +1888,101 @@ $E[f \mid \mathcal{F}_0]$ from \Cref{lem:dyadic-condexp}, and
 For $0 < s < 1/p$ this approximation space is the classical Besov space
 $\Besov{s}{p}{q}[0, 1]$; for larger $s$ it is strictly smaller, since the Haar functions are
 discontinuous. The comparison with moduli of smoothness is \Cref{cor:haar-besov}.
+
+\section{The Haar basis and \texorpdfstring{$n$}{n}-term approximation}
+\label{sec:haar-nterm}
+
+In breadth-first order the Haar system is $\varphi_0 = 1$ and $\varphi_{2^k + i} = h_{k,i}$ for
+$k \in \N$ and $0 \leq i < 2^k$; every $n \geq 1$ is $2^k + i$ for exactly one such pair, with
+$k = \lfloor \log_2 n \rfloor$. The Lean project TauCeti~\cite{TauCeti} orders its Haar basis of
+$L_p[0, 1]$, $1 \leq p < \infty$, in the same way.
+
+\begin{proposition}[The Haar basis]
+\label{prop:haar-basis}
+\lean{Haar.haarIndex, Haar.haarIndex_two_pow_add, Nat.log_two_pow_add, Nat.exists_eq_two_pow_add,
+  Nat.two_pow_add_eq_iff, Haar.haarSystem, Haar.haarSystem_zero, Haar.haarSystem_two_pow_add,
+  Haar.measurable_haarSystem, Haar.exists_abs_haarSystem_le, Haar.memLp_haarSystem, Haar.haarVec,
+  Haar.coeFn_haarVec, Haar.inner_haarVec, Haar.dyadicIndex_eq_of_le,
+  Haar.haarFunction_eq_of_dyadicIndex_eq, Haar.haarFunction_ae_eq_zero, Haar.integral_haarFunction,
+  Haar.integral_haarFunction_mul_self, Haar.haarFunction_mul_haarFunction_of_ne,
+  Haar.integral_haarFunction_mul_of_lt, Haar.integral_haarFunction_mul,
+  Haar.integral_haarSystem_mul, Haar.orthonormal_haarVec, Haar.condExpLp_mem_span_haarVec,
+  Haar.iUnion_scheme_subset_span, Haar.span_haarVec_closure_eq_top, Haar.haarBasis,
+  Haar.coe_haarBasis, Haar.haarBasis_repr_apply, Haar.haarBasis_repr_zero,
+  Haar.haarBasis_repr_two_pow_add}
+\leanok
+\uses{def:haar, lem:dyadic-condexp, lem:haar-martingale, lem:haar-density}
+The functions $\varphi_n$, $n \in \N$, form a Hilbert basis of $L_2[0, 1]$. The coefficients of
+$f \in L_2[0, 1]$ in this basis are $\langle \varphi_0, f \rangle = \int_0^1 f$ and
+$\langle \varphi_{2^k + i}, f \rangle = \langle f, h_{k,i} \rangle$.
+\end{proposition}
+
+\begin{proof}
+\leanok
+Let $0 \leq m < 2^k$ and $0 \leq n < 2^j$. The function $h_{j,n}$ has mean zero, since
+$I_{j+1,2n}$ and $I_{j+1,2n+1}$ have the same length, and $h_{j,n}^2 = 2^j$ on $I_{j,n}$ and $0$
+elsewhere, so $\int_0^1 h_{j,n}^2 = 1$. For $k = j$ and $m \neq n$ the supports are disjoint. For
+$k < j$ the function $h_{k,m}$ depends only on the dyadic interval of level $k + 1 \leq j$
+containing the point, so it is constant on $I_{j,n}$, and $\int_0^1 h_{k,m} h_{j,n}$ is this
+constant times $\int_0^1 h_{j,n} = 0$. Hence the $\varphi_n$ are orthonormal. By
+\Cref{lem:dyadic-condexp} and \Cref{lem:haar-martingale},
+\[
+  E[f \mid \mathcal{F}_j] = \Bigl(\int_0^1 f\Bigr) \varphi_0
+  + \sum_{k < j} \sum_{i=0}^{2^k - 1} \langle f, h_{k,i} \rangle \, \varphi_{2^k + i}
+\]
+lies in the span of the $\varphi_n$. Since $E[\,\cdot \mid \mathcal{F}_j]$ fixes the
+$\mathcal{F}_j$-measurable functions, every Haar approximant lies in this span, and
+\Cref{lem:haar-density} with $p = 2$ shows that the span is dense. The coefficients are
+$\int_0^1 \varphi_n f$, since the $\varphi_n$ are real.
+\end{proof}
+
+\begin{theorem}[$n$-term approximation from the Haar basis]
+\label{thm:haar-nterm}
+\lean{Haar.memApprox_nTerm_iff_haarCoeff, Haar.tsum_haarBasis_repr_rpow,
+  ENNReal.tsum_eq_add_tsum_two_pow_add}
+\leanok
+\uses{prop:haar-basis, thm:stechkin}
+Let $0 < \tau < 2$ and $\theta = 1/\tau - 1/2$. Then $f \in L_2[0, 1]$ lies in the
+approximation space $A^\theta_\tau$ of $n$-term approximation from the dictionary
+$\{c \, \varphi_n : n \in \N, \ c \in \C\}$ if and only if
+\[
+  \Bigl| \int_0^1 f \Bigr|^\tau
+  + \sum_{k=0}^\infty \sum_{i=0}^{2^k - 1} |\langle f, h_{k,i} \rangle|^\tau < \infty .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+\Cref{thm:stechkin} for the Haar basis of \Cref{prop:haar-basis}, with the sum over $n \in \N$
+split into the term $n = 0$ and the blocks $2^k \leq n < 2^{k+1}$.
+\end{proof}
+
+DeVore~\cite[\S3.6]{DeVore1998} characterises the rate $n^{-\theta}$, that is,
+$A^\theta_\infty$, by the decay $\gamma_n(f) \leq M n^{-\theta-1/2}$ of the $n$-th largest
+modulus $\gamma_n(f)$ of the Haar coefficients, for every $\theta > 0$. Here, too, the range
+$\tau < 1$, that is, $\theta > 1/2$, is included, by \Cref{thm:stechkin}. For $\tau \geq 1$ the
+condition is the one of \Cref{thm:haar} in $L_\tau$ with $p = q = \tau$ and $s = \theta$, where
+the weight $2^{k(s + 1/2 - 1/p)}$ is $1$.
+
+\begin{theorem}[Nonlinear approximation in $L_2$ and linear approximation in $L_\tau$]
+\label{thm:haar-nterm-linear}
+\lean{Haar.memApprox_nTerm_iff_memApprox_scheme}
+\leanok
+\uses{thm:haar-nterm, thm:haar, lem:lq-basic}
+Let $1 \leq \tau < 2$ and $\theta = 1/\tau - 1/2$. Then $f \in L_2[0, 1]$ lies in the
+approximation space $A^\theta_\tau$ of $n$-term approximation from the Haar basis in
+$L_2[0, 1]$ if and only if it lies in the approximation space $A^\theta_\tau$ of the Haar scheme
+in $L_\tau[0, 1]$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{thm:haar} with $p = q = \tau$ and $s = \theta > 0$ the second condition is
+$|\int_0^1 f| + \|(\|(\langle f, h_{k,i} \rangle)_i\|_{\ell_\tau})_k\|_{\ell_\tau} < \infty$.
+By \Cref{lem:lq-basic} the $\tau$-th power of the second term is
+$\sum_k \sum_i |\langle f, h_{k,i} \rangle|^\tau$, so this is the condition of
+\Cref{thm:haar-nterm}.
+\end{proof}
 
 \chapter{Polynomial approximation on intervals}
 \label{ch:interval}
@@ -2483,6 +2622,7 @@ So $\Besov{s}{p}{q}[0,1] = \Besov{s}{p}{q}(\T)$ for $0 < s < 1/p$: below smoothn
 between the ends of the interval costs nothing.
 
 \section{Haar coefficients}
+\label{sec:haar-coefficients}
 
 \begin{corollary}[Besov spaces through Haar coefficients]
 \label{cor:haar-besov}
@@ -2514,6 +2654,38 @@ $I_{j,n}$, and a function constant on every $I_{j,n}$ is $\mathcal{F}_j$-measura
 gives the first claim. By it, each of the three conditions says $f \in A^s_q$, by
 \Cref{thm:pp-besov}, \Cref{thm:pp-besov-per} and \Cref{thm:haar}.
 \end{proof}
+
+The case of the Haar system and $1 \leq \tau < 2$ of the theorem of DeVore, Jawerth and
+Popov~\cite{DeVoreJawerthPopov} (see also \cite[\S3.6 and Remark~7.6]{DeVore1998}) reads as
+follows.
+
+\begin{corollary}[$n$-term Haar approximation and Besov spaces]
+\label{cor:haar-nterm-besov}
+\lean{Haar.memApprox_nTerm_iff_modulus, Haar.memApprox_nTerm_iff_perModulus}
+\leanok
+\uses{thm:haar-nterm-linear, cor:haar-besov}
+Let $1 \leq \tau < 2$ and $\theta = 1/\tau - 1/2$. For $f \in L_2[0, 1]$ the following are
+equivalent.
+\begin{enumerate}
+  \item $f$ lies in the approximation space $A^\theta_\tau$ of $n$-term approximation from the
+    Haar basis in $L_2[0, 1]$.
+  \item $\|f\|_\tau + \bigl\| \bigl( 2^{k\theta} \omega_1(f, 2^{-k}, [0,1])_\tau \bigr)_k
+    \bigr\|_{\ell_\tau} < \infty$.
+  \item $\|f\|_\tau + \bigl\| \bigl( 2^{k\theta} \omega_1^{\mathrm{per}}(f, 2^{-k})_\tau
+    \bigr)_k \bigr\|_{\ell_\tau} < \infty$.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+\leanok
+\Cref{thm:haar-nterm-linear}, and \Cref{cor:haar-besov} with $p = q = \tau$ and $s = \theta$,
+which applies since $0 < \theta < 1/\tau$.
+\end{proof}
+
+The second condition says $f \in \Besov{\theta}{\tau}{\tau}[0, 1]$: best $n$-term approximation
+in $L_2$ at the rate $n^{-\theta}$, measured in $\ell_\tau$ with $1/\tau = \theta + 1/2$,
+describes this Besov space. For $\tau < 1$ the Besov space lies in the quasi-Banach space
+$L_\tau$, outside the range of \Cref{cor:haar-besov}.
 
 \section{Local projections and multiscale details}
 

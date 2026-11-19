@@ -225,7 +225,9 @@ theory.
   `A^θ_τ` of `n`-term approximation from the basis iff `∑_i |⟨e_i, f⟩|^τ < ∞`
   (`HilbertBasis.memApprox_nTerm_iff`), with `∑_i |⟨e_i, f⟩|^τ ≤ 4 ‖f‖_{A^θ_τ}^τ` and
   `‖f‖_{A^θ_τ} ≤ C_τ (∑_i |⟨e_i, f⟩|^τ)^(1/τ)` for the dyadic quasi-norm `‖·‖_{A^θ_τ}`
-  (`HilbertBasis.tsum_repr_rpow_le`, `HilbertBasis.approxNormDyadic_nTerm_le`).
+  (`HilbertBasis.tsum_repr_rpow_le`, `HilbertBasis.approxNormDyadic_nTerm_le`). The Fourier
+  basis of `L_2(𝕋^d)` and the Haar basis of `L_2[0, 1]` are instances, in [The torus](Torus.md)
+  and [Intervals, the cube, splines and wavelets](IntervalCube.md).
 
 ## What is formalised
 
@@ -238,8 +240,8 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Linear approximation from a sequence | ✅ | ✗ | `Instances/Span` |
 | `n`-term approximation from a dictionary | ✅ | ✗ | `Instances/NTerm` |
 | Hilbert-basis `n`-term approximation, Stechkin–DeVore | ✅ | ✗ | `Instances/NTermHilbertBasis` |
-| Sums of powers in `[0, ∞]`, `ℓ_q` norms in `ℝ≥0∞`, Minkowski, the quasi-triangle inequality for `q < 1`, Cauchy–Schwarz, monotonicity in `q`, tails, sequences with finitely many nonzero terms, reindexing, geometric sequences, dyadic weights, weighted `ℓ_q` norms from the first term and a bound of the others, powers of two, products and quotients in `[0, ∞]`; `L_p` norms of `[0, ∞]`-valued functions: homogeneity, powers, monotone convergence, Minkowski's inequality for series, functions bounded on pieces | ✅ | ✗ | `Sequences/Lq` |
-| Cauchy condensation with power weights, the dyadic sum `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4`, finitely many changed terms, sums over the dyadic scales of an annulus, the interpolation inequality for dyadic suprema (Brezis–Mironescu) | ✅ | ✗ | `Sequences/Dyadic` |
+| Sums of powers in `[0, ∞]`, `ℓ_q` norms in `ℝ≥0∞`, Minkowski, the quasi-triangle inequality for `q < 1`, Cauchy–Schwarz, monotonicity in `q`, tails, sequences with finitely many nonzero terms, reindexing, geometric sequences, dyadic weights, weighted `ℓ_q` norms from the first term and a bound of the others, iterated `ℓ_q` norms, powers of two, products and quotients in `[0, ∞]`; `L_p` norms of `[0, ∞]`-valued functions: homogeneity, powers, monotone convergence, Minkowski's inequality for series, functions bounded on pieces | ✅ | ✗ | `Sequences/Lq` |
+| Cauchy condensation with power weights, `n ≥ 1` written as `2^k + i` with `0 ≤ i < 2^k` and series split into dyadic blocks, the dyadic sum `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4`, finitely many changed terms, sums over the dyadic scales of an annulus, the interpolation inequality for dyadic suprema (Brezis–Mironescu) | ✅ | ✗ | `Sequences/Dyadic` |
 | Decreasing rearrangement, layer cake formula for sums | ✅ | ✗ | `Sequences/Rearrangement` |
 | Countable Minkowski inequality, monotone convergence and truncations in `ℓ_q`, window sums in `ℓ_q`, discrete Hardy inequalities, almost diagonal sums and their constant, the Hardy and almost diagonal bounds for `0 < q ≤ 1`, shift invariance and geometric convolutions on `ℤ` | ✅ | ✗ | `Sequences/Hardy` |
 | `A^s_q` and its dyadic quasi-norm for `q > 0`, linear structure for `q ≥ 1` | ✅ | ✗ | `Norm`, `Dyadic`, `Space` |
