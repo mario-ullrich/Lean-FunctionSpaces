@@ -81,8 +81,9 @@ BLOCKS: list[tuple[str, list]] = [
     ("The torus", ["The torus", "Classical definitions on the torus"]),
     ("The Haar system and multiwavelets", [
         "Filtrations and martingale differences",
-        (INTERVALS, ["Haar coefficients", "Local projections and multiscale details",
-                     "Multiwavelets"])]),
+        (INTERVALS, ["Haar coefficients",
+                     r"Dyadic step functions for \texorpdfstring{$0 < p \leq 1$}{0 < p <= 1}",
+                     "Local projections and multiscale details", "Multiwavelets"])]),
     ("Piecewise polynomials on intervals", [
         (INTERVALS, ["Differences and moduli", "Polynomials on intervals", "Steklov smoothing",
                      "Whitney's inequality", "Dyadic piecewise polynomials",

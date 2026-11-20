@@ -1997,10 +1997,10 @@ on subintervals with Lebesgue measure.
 \begin{definition}[Differences of higher order]
 \label{def:iter-diff}
 \lean{Rd.higherDiff, Rd.higherDiff_def, Rd.measurable_higherDiff, Interval.higherDiff_apply,
-  Interval.higherDiff_zero, Interval.higherDiff_succ, Interval.higherDiff_succ',
-  Interval.higherDiff_add, Interval.higherDiff_sub, Interval.higherDiff_const_mul,
-  Interval.higherDiff_comp_add, Interval.higherDiff_reflect, Interval.enorm_higherDiff_coeff,
-  Interval.enorm_higherDiff_le_of_forall}
+  Interval.higherDiff_eq_sum_smul, Interval.higherDiff_zero, Interval.higherDiff_succ,
+  Interval.higherDiff_succ', Interval.higherDiff_add, Interval.higherDiff_sub,
+  Interval.higherDiff_const_mul, Interval.higherDiff_comp_add, Interval.higherDiff_reflect,
+  Interval.enorm_higherDiff_coeff, Interval.enorm_higherDiff_le_of_forall}
 \leanok
 For $f : \R \to \C$, $r \in \N$ and $h \in \R$ the difference of order $r$ is
 $\Delta_h^r f(x) = \sum_{k=0}^r (-1)^{r-k} \binom{r}{k} f(x + k h)$, the $r$-fold iterate of
@@ -2045,8 +2045,8 @@ $h \geq 0$. The two suprema agree since the steps $h$ and $-h$ give the same nor
 
 \begin{lemma}[Properties of the modulus]
 \label{lem:interval-modulus}
-\lean{Interval.eLpNorm_higherDiff_le_of_forall, Interval.eLpNorm_higherDiff_le, Interval.modulus_le,
-  Interval.modulus_add_le,
+\lean{Interval.eLpNorm_higherDiff_le_of_forall, Interval.eLpNorm_comp_add_mul_le,
+  Interval.eLpNorm_higherDiff_le, Interval.modulus_le, Interval.modulus_add_le,
   Interval.modulus_const_mul, Interval.modulus_polynomial, Interval.eLpNorm_higherDiff_congr_ae,
   Interval.modulus_congr_ae, Interval.eLpNorm_higherDiff_reflect, Interval.modulus_reflect}
 \leanok
@@ -2686,6 +2686,230 @@ The second condition says $f \in \Besov{\theta}{\tau}{\tau}[0, 1]$: best $n$-ter
 in $L_2$ at the rate $n^{-\theta}$, measured in $\ell_\tau$ with $1/\tau = \theta + 1/2$,
 describes this Besov space. For $\tau < 1$ the Besov space lies in the quasi-Banach space
 $L_\tau$, outside the range of \Cref{cor:haar-besov}.
+
+\section{Dyadic step functions for \texorpdfstring{$0 < p \leq 1$}{0 < p <= 1}}
+\label{sec:steps-below-one}
+
+For $0 < p < 1$ the space $L_p[0, 1]$ is a quasi-Banach space: in place of the triangle
+inequality, $\|f + g\|_p^p \leq \|f\|_p^p + \|g\|_p^p$ (\Cref{lem:lp-rho-triangle}). The modulus
+$\omega_r(f, t, [a, b])_p$ is defined for these $p$ by the formula of
+\Cref{def:interval-modulus}. Approximation by dyadic step functions in $L_p[0, 1]$ is described by
+the $E$-functional of a couple (\Cref{sec:e-functional}), and the coincidence theorem for
+$\rho$-normed couples (\Cref{thm:couple-modulus-coincidence}) identifies its approximation spaces
+with a Besov space of the first modulus for every $0 < s < 1/p$, as in
+Oswald~\cite[Theorem~6]{Oswald1980}, \cite[(7)]{Oswald2018}.
+
+\begin{definition}[The couple of dyadic step functions]
+\label{def:step-couple}
+\lean{Haar.stepCouple}
+\leanok
+\uses{def:dyadic-filtration, def:complexity-couple}
+Let $0 < p \leq \infty$ and let $V_j \subseteq L_p[0, 1]$ be the subgroup of the
+$\mathcal{F}_j$-measurable elements, the classes of the step functions on the dyadic intervals
+$I_{j,n}$. The \emph{step couple} in $L_p[0, 1]$ is the couple of the subgroups
+$V_0 \subseteq V_1 \subseteq \cdots$ (\Cref{def:complexity-couple}) with the first norm
+$\|\cdot\|_p$; its spaces $E_{s, q}$ are the approximation spaces of dyadic step functions.
+\end{definition}
+
+The couple uses the group structure and the quasi-norm of $L_p$, which exist for every $p$.
+
+\begin{lemma}[The step couple]
+\label{lem:step-couple}
+\lean{MeasureTheory.Filtration.monotone_lpMeasSubgroup, Haar.eFunctional_stepCouple_two_pow,
+  Haar.mem_lpMeas_of_stepCouple_norm1_le, Haar.stepCouple_eq_complexityCouple,
+  Haar.memEMethod_stepCouple_iff_memApprox}
+\leanok
+\uses{def:step-couple, lem:complexity-couple, def:filtration-scheme,
+  thm:complexity-couple-approx}
+Let $0 < p \leq \infty$. The subgroups $V_j$ increase with $j$. In the step couple an element of
+complexity at most $2^j$ lies in $V_j$, and $E(2^j, f) = \inf_{b \in V_j} \|f - b\|_p$ for every
+$f \in L_p[0, 1]$. For $1 \leq p \leq \infty$ the step couple is the complexity couple of the Haar
+scheme, so for $0 < q \leq \infty$ and $s > 0$, and for $s = 0$ and $q = \infty$, its space
+$E_{s, q}$ is the approximation space $A^s_q$ of the Haar scheme.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $i \leq j$, $\mathcal{F}_i \subseteq \mathcal{F}_j$, so every $\mathcal{F}_i$-measurable
+element is $\mathcal{F}_j$-measurable. The next two claims are (1) and (3) of
+\Cref{lem:complexity-couple}. For $p \geq 1$ the dyadic levels of the subgroups $V_j$ are the sets
+of the filtration scheme (\Cref{def:filtration-scheme}), and \Cref{thm:complexity-couple-approx}
+identifies the spaces.
+\end{proof}
+
+\begin{lemma}[Moduli for $0 < p \leq 1$]
+\label{lem:modulus-below-one}
+\lean{Interval.modulus_add_rpow_le, Interval.eLpNorm_higherDiff_le_of_forall_of_le_one,
+  Interval.eLpNorm_higherDiff_le_of_le_one, Interval.modulus_le_of_le_one,
+  Interval.lpModulus_add_rpow_le, Interval.lpModulus_le_of_le_one}
+\leanok
+\uses{def:iter-diff, def:interval-modulus, lem:interval-modulus, lem:lp-rho-triangle,
+  thm:pp-jackson}
+Let $0 < p \leq 1$, $r \in \N$, $a, b \in \R$ and $t \geq 0$. For $f, g : \R \to \C$
+\[
+  \omega_r(f + g, t, [a, b])_p^p \leq \omega_r(f, t, [a, b])_p^p + \omega_r(g, t, [a, b])_p^p .
+\]
+Let $\mu$ be a measure on $\R$, $h \in \R$ and $B \in [0, \infty]$. If
+$\|f(\cdot + kh)\|_{L_p(\mu)} \leq B$ for $k = 0, \dots, r$, then
+$\|\Delta_h^r f\|_{L_p(\mu)} \leq 2^{r/p} B$. Hence for measurable $f$ and $h \geq 0$,
+$\|\Delta_h^r f\|_{L_p[a, b - rh]} \leq 2^{r/p} \|f\|_{L_p[a, b]}$, and
+$\omega_r(f, t, [a, b])_p \leq 2^{r/p} \|f\|_{L_p[a, b]}$. Both bounds on $\omega_r$ hold for
+$f, g \in L_p[0, 1]$, $[a, b] = [0, 1]$ and $t = 2^{-k}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For each step $h$, \Cref{lem:lp-rho-triangle} gives
+$\|\Delta_h^r (f + g)\|_p^p \leq \|\Delta_h^r f\|_p^p + \|\Delta_h^r g\|_p^p$; take the supremum.
+For the second claim expand $\Delta_h^r f = \sum_{k \leq r} (-1)^{r-k} \binom{r}{k} f(\cdot + kh)$
+(\Cref{def:iter-diff}): the $p$-th power of the quasi-norm is subadditive,
+$\binom{r}{k}^p \leq \binom{r}{k}$, and $\sum_k \binom{r}{k} = 2^r$. On $[a, b - rh]$ each
+translate has norm at most $\|f\|_{L_p[a, b]}$.
+\end{proof}
+
+\begin{lemma}[Jackson's inequality for steps by averaging]
+\label{lem:step-jackson-below-one}
+\lean{MeasureTheory.exists_setLIntegral_enorm_sub_rpow_le, Interval.volume_dyadicIco_eq_inv,
+  Interval.exists_ppFun_lintegral_le, Interval.setLIntegral_dyadicIco_le,
+  Interval.lintegral_indicator_add_eq_eLpNorm, Interval.two_pow_mul_sum_lintegral_le_modulus,
+  Haar.eFunctional_stepCouple_le}
+\leanok
+\uses{def:step-couple, lem:step-couple, def:interval-modulus, lem:rd-modulus-on, def:pp-scheme,
+  lem:pp-bookkeeping, lem:multiwavelet-norms, lem:haar-density, cor:haar-besov, thm:pp-jackson}
+Let $0 < p < \infty$, let $f : \R \to \C$ be measurable and $j \in \N$. There are $c_n \in \C$
+such that the step function $u = \sum_{n < 2^j} c_n \mathbf{1}_{I_{j,n}}$ satisfies
+\[
+  \int_0^1 |f - u|^p \leq 2^j \sum_{n < 2^j} \int_{I_{j,n}} \int_{I_{j,n}} |f(x) - f(y)|^p
+  \, dx \, dy \leq 2 \, \omega_1(f, 2^{-j}, [0, 1])_p^p .
+\]
+Hence $E(2^j, f) \leq 2^{1/p} \omega_1(f, 2^{-j}, [0, 1])_p$ in the step couple for every
+$f \in L_p[0, 1]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+Let $D_n(y) = \int_{I_{j,n}} |f(x) - f(y)|^p \, dx$. Some $y_n \in I_{j,n}$ has $D_n(y_n)$ at most
+the mean $2^j \int_{I_{j,n}} D_n$ of $D_n$ over $I_{j,n}$ (the first moment method, Mathlib's
+\texttt{exists\_\allowbreak le\_\allowbreak setLAverage}); take $c_n = f(y_n)$. For the second
+inequality substitute $x = y + h$: for $x, y \in I_{j,n}$, $|h| < 2^{-j}$ and $x \in [0, 1]$, so
+the sum is at most
+$\int_0^1 \int_{-2^{-j}}^{2^{-j}} \mathbf{1}_{[0, 1]}(y + h) \, |f(y + h) - f(y)|^p \, dh \, dy$.
+After exchanging the integrals, the integral over $y$ is $\|\Delta_h f\|_{L_p([0, 1]_h)}^p \leq
+\omega_1(f, 2^{-j}, [0, 1])_p^p$ for each $h$, and the steps fill an interval of length
+$2 \cdot 2^{-j}$. The step function $u$ is $\mathcal{F}_j$-measurable
+(\Cref{lem:haar-density}, \Cref{cor:haar-besov}), so it lies in $V_j$.
+\end{proof}
+
+The proof averages pointwise and uses Tonelli's theorem, so it holds for every
+$0 < p < \infty$ with the constant $2^{1/p}$.
+
+\begin{lemma}[The inverse inequality for steps, $0 < p \leq 1$]
+\label{lem:step-inverse-below-one}
+\lean{Interval.enorm_higherDiff_one_rpow_le_stripBound, Interval.lintegral_rpow_eq_of_step,
+  Interval.eLpNorm_higherDiff_one_le_of_step, Haar.lpModulus_le_of_mem_lpMeas}
+\leanok
+\uses{def:step-couple, def:pp-scheme, lem:pp-bookkeeping, lem:pp-local, lem:multiwavelet-norms,
+  lem:modulus-below-one, cor:haar-besov, thm:pp-jackson, thm:pp-inverse}
+Let $0 < p \leq 1$ and $j \in \N$, let $u : \R \to \C$ take the value $v_n$ on $I_{j,n}$ for
+every $n \in \N$, with $v_{2^j} = 0$, and let $0 \leq h \leq 2^{-j}$. For $x \geq 0$ in
+$I_{j,n}$, $\Delta_h u(x) = 0$ unless $x$ lies in the strip $[(n+1) 2^{-j} - h, (n+1) 2^{-j})$, and
+there $|\Delta_h u(x)|^p \leq |v_n|^p + |v_{n+1}|^p$. Hence
+\[
+  \|\Delta_h u\|_{L_p[0, 1]} \leq \bigl(2 \cdot 2^j h\bigr)^{1/p} \, \|u\|_{L_p[0, 1]} .
+\]
+Every $a \in V_j$ satisfies, for every $k \in \N$,
+\[
+  \omega_1(a, 2^{-k}, [0, 1])_p \leq 2^{1/p} \, 2^{-\max(k - j, 0)/p} \, \|a\|_p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+In the strip of $I_{j,n}$, $x + h \in I_{j, n+1}$, so $\Delta_h u(x) = v_{n+1} - v_n$ and
+$(\alpha + \beta)^p \leq \alpha^p + \beta^p$; outside it, $x$ and $x + h$ lie in $I_{j,n}$. The
+strip integral of \Cref{lem:pp-local} with $r = 1$, which holds for every $0 < p < \infty$, gives
+$\int_0^1 |\Delta_h u|^p \leq 2 h \sum_{n < 2^j} |v_n|^p$, since each $v_n$ occurs in at most two
+terms, and $\|u\|_{L_p[0, 1]}^p = 2^{-j} \sum_{n < 2^j} |v_n|^p$. For $k < j$ the bound on $a$ is
+$\omega_1(a, t, [0, 1])_p \leq 2^{1/p} \|a\|_p$ (\Cref{lem:modulus-below-one}). For $k \geq j$,
+$a$ agrees almost everywhere on $[0, 1]$ with a step function $u$ of level $j$ that vanishes
+outside $[0, 1)$ (\Cref{cor:haar-besov}), and $2^j h \leq 2^{-(k - j)}$ for $h \leq 2^{-k}$.
+\end{proof}
+
+For $p < 1$ the order $1/p$ exceeds the order $\min(r, r - 1 + 1/p)$ of DeVore and
+Popov~\cite[Theorem~4.8]{DeVorePopovTAMS}, which is $1$ for $r = 1$ and $p \leq 1$: a first
+difference of a step function sees only its jumps.
+
+\begin{theorem}[Dyadic steps and the first modulus for $0 < p \leq 1$]
+\label{thm:steps-besov-below-one}
+\lean{Haar.stepModulusData, Haar.eNormDyadic_stepCouple_lt_top_iff_modulus,
+  Haar.memEMethod_stepCouple_iff_modulus}
+\leanok
+\uses{def:step-couple, lem:step-couple, lem:lp-rho-triangle, lem:complexity-couple,
+  lem:modulus-below-one, lem:step-jackson-below-one, lem:step-inverse-below-one,
+  def:couple-modulus-data, thm:couple-modulus-coincidence}
+Let $0 < p \leq 1$, $0 < q \leq \infty$ and $f \in L_p[0, 1]$. For every $0 \leq s < 1/p$,
+\[
+  \|f\|_p + \bigl\| \bigl( 2^{ks} E(2^k, f) \bigr)_k \bigr\|_{\ell_q} < \infty
+\]
+if and only if
+\[
+  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_1(f, 2^{-k}, [0, 1])_p \bigr)_k \bigr\|_{\ell_q}
+  < \infty .
+\]
+For every $0 < s < 1/p$, $f$ lies in the approximation space $E_{s, q}$ of the step couple if and
+only if the second condition holds.
+\end{theorem}
+
+\begin{proof}
+\leanok
+By \Cref{lem:modulus-below-one}, \Cref{lem:step-jackson-below-one} and
+\Cref{lem:step-inverse-below-one}, $\omega_1(\cdot, 2^{-k}, [0, 1])_p$ is a modulus compatible
+with the step couple of exponent $\rho = p$ and inverse order $\theta = 1/p$
+(\Cref{def:couple-modulus-data}), and only $0$ has complexity below $1$. Apply
+\Cref{thm:couple-modulus-coincidence}.
+\end{proof}
+
+The condition defines the Besov space $B^s_{p,q,1}[0, 1]$ of the first
+modulus~\cite[(7)]{Oswald2018}, \cite[Theorem~6]{Oswald1980}. For $s < 1$ it is the Besov space
+of DeVore and Popov~\cite[(2.4)]{DeVorePopovTAMS} with $r = 1$, whose coincidence
+theorem~\cite[Theorem~5.1]{DeVorePopovTAMS} reaches only $s < 1$ for $r = 1$. For
+$1/p - 1 < s < 1$ and $q < \infty$ it is also the Fourier-analytic Besov space
+$\Besov{s}{p}{q}[0, 1]$~\cite[(2)]{Oswald2018}. For $s > 1$, and for $s = 1$ with $q < \infty$, it
+differs from the space defined by the second modulus: the line $x \mapsto x$ has vanishing second
+modulus and lies outside it (\Cref{lem:steps-line}).
+
+\begin{lemma}[The line]
+\label{lem:steps-line}
+\lean{Interval.modulus_two_id, Haar.idLp, Haar.lpModulus_two_idLp,
+  Interval.le_lintegral_dyadicIco_enorm_sub_rpow, Haar.le_eFunctional_stepCouple_idLp,
+  Haar.not_memEMethod_stepCouple_idLp}
+\leanok
+\uses{lem:interval-modulus, lem:interval-nikolskii, def:pp-scheme, lem:multiwavelet-norms,
+  cor:haar-besov, thm:pp-jackson, def:step-couple, lem:step-couple, lem:complexity-couple,
+  lem:e-method-dyadic, def:lq-norm, lem:lq-basic, lem:dyadic-interpolation,
+  lem:daub-dyadic-scales}
+Let $\ell(x) = x$. Then $\omega_2(\ell, t, [0, 1])_p = 0$ for every $0 < p \leq \infty$ and
+$t \geq 0$. For $0 < p < \infty$ and $j \in \N$, every step function $b$ of level $j$ has
+$\|\ell - b\|_p^p \geq \tfrac12 (2^{-j}/4)^p$, so $E(2^j, \ell) \geq 2^{-1/p} \, 2^{-j}/4$ in the
+step couple. Hence for $0 < p < \infty$, $0 < q \leq \infty$ and $s \geq 1$ with $s > 1$ or
+$q < \infty$, $\ell \notin E_{s, q}$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The second modulus vanishes on polynomials of degree $1$ (\Cref{lem:interval-modulus}). For
+$c \in \C$ at most half of $I_{j,n}$ lies within $2^{-j}/4$ of $\operatorname{Re} c$, so
+$\int_{I_{j,n}} |x - c|^p \, dx \geq (2^{-j}/4)^p \, 2^{-j}/2$; sum over the $2^j$ intervals. By
+\Cref{lem:e-method-dyadic}, $\ell \in E_{s,q}$ would bound the $\ell_q$ norm of
+$2^{ks} E(2^k, \ell) \geq 2^{-1/p} \, 2^{k(s - 1)}/4$ by the finite dyadic norm. For $s > 1$ these
+terms are unbounded (\Cref{lem:dyadic-interpolation}); for $s = 1$ and $q < \infty$ they are
+bounded below by a positive constant, so their $\ell_q$ norm is infinite.
+\end{proof}
+
+On $\R^d$, identifying the approximation spaces of entire functions of exponential type with Besov
+spaces for $0 < p < 1$ rests on Jackson's inequality in $L_p$, $p < 1$
+\cite{StorozhenkoOswald1978, KolomoitsevTikhonov2020}; that identification lies outside this
+project.
 
 \section{Local projections and multiscale details}
 

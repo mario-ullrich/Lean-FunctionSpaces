@@ -81,9 +81,13 @@ declarations.
   any measure space and for all functions with values in an `ESeminormedAddMonoid` with
   continuous addition, at the generality of Mathlib's lemmas (a normed group, or `[0, ∞]`),
   `‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` (`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`), from
-  Mathlib's `inhmgELpNorm_add_le` and `inhmgELpNorm_eq_eLpNorm_pow`. Mathlib states the power
-  form only for `inhmgELpNorm`; for `eLpNorm` it has the bounds with the constant
-  `2^(1/p - 1)`
+  Mathlib's `inhmgELpNorm_add_le` and `inhmgELpNorm_eq_eLpNorm_pow`, and for elements of
+  `Lp E p μ`, whose `NormedAddCommGroup` instance needs `Fact (1 ≤ p)`
+  (`MeasureTheory.Lp.enorm_add_rpow_le_of_le_one`, in
+  `FunctionSpaces/Wavelets/Examples/DyadicStepsQuasiBanach.lean`, beside `‖0‖ₑ = 0` and
+  `‖-f‖ₑ = ‖f‖ₑ` for every `p`, `MeasureTheory.Lp.enorm_zero` and `MeasureTheory.Lp.enorm_neg`,
+  which Mathlib states for `‖·‖` and `‖·‖₊`). Mathlib states the power form only for
+  `inhmgELpNorm`; for `eLpNorm` it has the bounds with the constant `2^(1/p - 1)`
   (`eLpNorm'_add_le_of_le_one`, `eLpNorm_add_le'`).
 * **Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`** (`FunctionSpaces/Analysis/Lp/MixedNorms.lean`):
   Minkowski's integral inequality for `ℓ_u`-valued functions,

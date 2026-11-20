@@ -117,6 +117,14 @@ end Lp
 
 namespace Filtration
 
+omit [Fact (1 ≤ p)] [IsFiniteMeasure μ] in
+/-- **The measurable subgroups of a filtration increase**: for `i ≤ j`, every `ℱ_i`-measurable
+element of `L_p(μ)` is `ℱ_j`-measurable, for every `p` and every ordered index set. -/
+theorem monotone_lpMeasSubgroup {ι : Type*} [Preorder ι] (ℱ : Filtration ι m0) (F : Type*)
+    [NormedAddCommGroup F] : Monotone fun i => lpMeasSubgroup F (ℱ i) p μ := fun _ _ hij _ hf =>
+  mem_lpMeasSubgroup_iff_aestronglyMeasurable.2
+    ((mem_lpMeasSubgroup_iff_aestronglyMeasurable.1 hf).mono (ℱ.mono hij))
+
 variable (ℱ : Filtration ℕ m0)
 
 variable (p μ) in

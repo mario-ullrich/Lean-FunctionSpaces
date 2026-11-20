@@ -408,6 +408,11 @@ theorem volume_dyadicIco (j m : ℕ) : volume (dyadicIco j m) = ENNReal.ofReal (
   congr 1
   ring
 
+/-- `|I_{j,n}| = 2^(-j)`, written as an inverse in `[0, ∞]`. -/
+theorem volume_dyadicIco_eq_inv (j n : ℕ) : volume (dyadicIco j n) = ((2 : ℝ≥0∞) ^ j)⁻¹ := by
+  rw [volume_dyadicIco, one_div, ENNReal.ofReal_inv_of_pos (by positivity),
+    ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat]
+
 /-- **Change of variables** on a dyadic interval:
 `2^j ∫_{I_{j,m}} φ = ∫_0^1 φ(t 2^(-j) + m 2^(-j))`. -/
 theorem integral_dyadicIco_eq (j m : ℕ) (φ : ℝ → ℂ) :

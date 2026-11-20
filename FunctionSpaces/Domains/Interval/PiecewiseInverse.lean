@@ -24,7 +24,9 @@ consecutive pieces (`Interval.floor_add_mul_le`), so each piece is counted at mo
 (`Interval.eLpNorm_le_of_strip`) turns a pointwise bound on the strips into the `L_p` bound
 (`Interval.eLpNorm_higherDiff_le_of_pointwise`);
 the splines of `FunctionSpaces.Domains.Interval.SplineInverse` use it with their own pointwise
-bound. These local estimates hold for every piecewise polynomial on `[0, ∞)`
+bound, and the step functions in `L_p`, `0 < p ≤ 1`, of
+`FunctionSpaces.Wavelets.Examples.DyadicStepsQuasiBanach` with theirs: the strip integral holds
+for every `0 < p < ∞`. These local estimates hold for every piecewise polynomial on `[0, ∞)`
 (`Interval.IsPiecewisePoly`, `Interval.eLpNorm_higherDiff_le_of_isPiecewisePoly`), so they serve
 the periodic extensions of `FunctionSpaces.Domains.Interval.PiecewisePeriodic` as well.
 
@@ -240,17 +242,17 @@ theorem lintegral_stripBound_le (j r : ℕ) (h : ℝ) (c : ℝ≥0∞) (M : ℕ 
           _ = ENNReal.ofReal (r * h) := by rw [Real.volume_Icc]; congr 1; ring
     _ = c * ENNReal.ofReal (r * h) * M n := by ring
 
-/-- **The strip integral**: if `|F|^p` is bounded by `G^p M_n` on the strip of width `rh` left of
-the right end of every dyadic interval `I_{j,n}` and vanishes elsewhere on `S ⊆ [0, 1]`, and
-`∑_{n < 2^j} M_n ≤ (r + 1) B^p`, then `‖F‖_{L_p(S)} ≤ G (rh (r + 1))^(1/p) B`. -/
-theorem eLpNorm_le_of_strip (hp : p ≠ ∞) {F : ℝ → ℂ} {S : Set ℝ} (hS : S ⊆ Icc 0 1)
-    (hF : AEStronglyMeasurable F (volume.restrict S)) {j r : ℕ} {h : ℝ} {G : ℝ≥0∞}
-    {M : ℕ → ℝ≥0∞} {B : ℝ≥0∞}
+omit [Fact (1 ≤ p)] in
+/-- **The strip integral**: for `0 < p < ∞`, if `|F|^p` is bounded by `G^p M_n` on the strip of
+width `rh` left of the right end of every dyadic interval `I_{j,n}` and vanishes elsewhere on
+`S ⊆ [0, 1]`, and `∑_{n < 2^j} M_n ≤ (r + 1) B^p`, then `‖F‖_{L_p(S)} ≤ G (rh (r + 1))^(1/p) B`. -/
+theorem eLpNorm_le_of_strip (hp0 : p ≠ 0) (hp : p ≠ ∞) {F : ℝ → ℂ} {S : Set ℝ}
+    (hS : S ⊆ Icc 0 1) (hF : AEStronglyMeasurable F (volume.restrict S)) {j r : ℕ} {h : ℝ}
+    {G : ℝ≥0∞} {M : ℕ → ℝ≥0∞} {B : ℝ≥0∞}
     (hpt : ∀ᵐ x ∂volume.restrict S, ‖F x‖ₑ ^ p.toReal ≤ stripBound j r h (G ^ p.toReal) M x)
     (hB : ∑ n ∈ Finset.range (2 ^ j), M n ≤ (r + 1) * B ^ p.toReal) :
     eLpNorm F p (volume.restrict S) ≤
       G * (ENNReal.ofReal (r * h) * (r + 1)) ^ (1 / p.toReal) * B := by
-  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   refine eLpNorm_le_of_lintegral_le hF hp0 hp ?_
   calc ∫⁻ x in S, ‖F x‖ₑ ^ p.toReal
@@ -282,7 +284,7 @@ theorem eLpNorm_higherDiff_le_of_pointwise (hp : p ≠ ∞) {r j : ℕ} {u : ℝ
       G * (ENNReal.ofReal (r * h) * (r + 1)) ^ (1 / p.toReal) * B := by
   have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
   have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
-  refine eLpNorm_le_of_strip hp hS (measurable_higherDiff hum r h).aestronglyMeasurable
+  refine eLpNorm_le_of_strip hp0 hp hS (measurable_higherDiff hum r h).aestronglyMeasurable
     (M := fun n => ∑ l ∈ Finset.range (r + 1), localMass p j u (n + l)) ?_ hB
   filter_upwards [hpt, ae_restrict_mem hSm] with x hx hxS
   rw [stripBound]

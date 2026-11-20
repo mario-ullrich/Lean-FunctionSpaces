@@ -31,6 +31,10 @@ that the slices of functions on the cube use it too). The point `1/2` is a knot 
 `k ≥ 1`, which is why `k ≥ 1` in this part of the argument. General `f ∈ L_p` follow by density
 of bounded continuous functions (`Interval.approxError_le_of_continuous`, which serves every scheme
 in `L_p[0, 1]`).
+
+The modulus of elements of `L_p[0, 1]` at the dyadic scales (`Interval.lpModulus`) is defined for
+every `p`; for `0 < p ≤ 1` its `p`-th power is subadditive and it is at most `2^(r/p) ‖f‖_p`
+(`Interval.lpModulus_add_rpow_le`, `Interval.lpModulus_le_of_le_one`).
 -/
 
 @[expose] public section
@@ -314,5 +318,27 @@ theorem exists_approxError_ppScheme_le {r : ℕ} (hr : 1 ≤ r) (hp : p ≠ ∞)
   · rw [pow_zero]
     exact (hWb f).trans (mul_le_mul' le_self_add (lpModulus_anti r f (Nat.zero_le 2)))
   · exact (approxError_ppScheme_le hr hp f hk).trans (mul_le_mul' le_add_self le_rfl)
+
+end Interval
+
+/-! ### The modulus of elements of `L_p[0, 1]` for `0 < p ≤ 1` -/
+
+namespace Interval
+
+variable {p : ℝ≥0∞}
+
+/-- The `p`-th power of the modulus of elements of `L_p[0, 1]`, `0 < p ≤ 1`, at the dyadic scale
+`2^(-k)` is subadditive. -/
+theorem lpModulus_add_rpow_le (hp1 : p ≤ 1) (r : ℕ) (f g : Lp ℂ p unitVol) (k : ℕ) :
+    lpModulus p r (f + g) k ^ p.toReal ≤
+      lpModulus p r f k ^ p.toReal + lpModulus p r g k ^ p.toReal := by
+  rw [lpModulus, modulus_congr_ae (Lp.coeFn_add f g)]
+  exact modulus_add_rpow_le hp1 r 0 1 _ _ _
+
+/-- `ω_r(f, 2^(-k), [0, 1])_p ≤ 2^(r/p) ‖f‖_p` in `L_p[0, 1]`, `0 < p ≤ 1`. -/
+theorem lpModulus_le_of_le_one (hp1 : p ≤ 1) (r : ℕ) (f : Lp ℂ p unitVol) (k : ℕ) :
+    lpModulus p r f k ≤ 2 ^ ((r : ℝ) / p.toReal) * ‖f‖ₑ := by
+  rw [Lp.enorm_def]
+  exact modulus_le_of_le_one (Lp.stronglyMeasurable f).measurable hp1 r 0 1 _
 
 end Interval

@@ -44,6 +44,15 @@ theorem higherDiff_apply (r : ℕ) (h : ℝ) (f : ℝ → ℂ) (x : ℝ) :
   rw [higherDiff_def, Rd.higherDiff_apply]
   simp only [smul_eq_mul]
 
+/-- `Δ_h^r f = ∑_{k=0}^r (-1)^(r-k) C(r,k) f(· + k h)`, as an identity of functions: a sum of
+multiples of translates of `f`. -/
+theorem higherDiff_eq_sum_smul (r : ℕ) (h : ℝ) (f : ℝ → ℂ) :
+    higherDiff r h f =
+      ∑ k ∈ range (r + 1), ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) • fun x => f (x + k * h) := by
+  funext x
+  rw [higherDiff_apply, Finset.sum_apply]
+  rfl
+
 /-- `Δ_h^0 f = f`. -/
 @[simp] theorem higherDiff_zero (h : ℝ) (f : ℝ → ℂ) : higherDiff 0 h f = f := rfl
 

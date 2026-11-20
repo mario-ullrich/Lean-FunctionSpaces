@@ -1000,15 +1000,18 @@ $[0, \infty]$,
 
 \begin{lemma}[Powers of $L_p$ quasi-norms]
 \label{lem:lp-rho-triangle}
-\lean{MeasureTheory.eLpNorm_add_rpow_le_of_le_one, ENNReal.lqNorm_div_fun_rpow}
+\lean{MeasureTheory.eLpNorm_add_rpow_le_of_le_one, MeasureTheory.Lp.enorm_add_rpow_le_of_le_one,
+  MeasureTheory.Lp.enorm_zero, MeasureTheory.Lp.enorm_neg, ENNReal.lqNorm_div_fun_rpow}
 \leanok
 \uses{def:lq-norm, lem:lp-norm-homogeneity}
 Let $\mu$ be a measure on a measurable space $\Omega$ and let $0 < p \leq 1$. For all functions
-$f, g$ on $\Omega$ with values in a normed group or in $[0, \infty]$,
+$f, g$ on $\Omega$ with values in a normed group or in $[0, \infty]$, and for all elements $f, g$
+of $L_p(\mu)$,
 \[
   \|f + g\|_{L_p(\mu)}^p \leq \|f\|_{L_p(\mu)}^p + \|g\|_{L_p(\mu)}^p .
 \]
-For every $r > 0$, every $q \in (0, \infty]$ and every
+For every $0 < p \leq \infty$ the quasi-norm of $L_p(\mu)$ satisfies $\|0\|_{L_p(\mu)} = 0$ and
+$\|-f\|_{L_p(\mu)} = \|f\|_{L_p(\mu)}$. For every $r > 0$, every $q \in (0, \infty]$ and every
 family $a$ in $[0, \infty]$ on a countable set, $\|(a_i^r)_i\|_{\ell_{q/r}} = \|a\|_{\ell_q}^r$,
 with $\infty / r = \infty$.
 \end{lemma}
@@ -1016,7 +1019,8 @@ with $\infty / r = \infty$.
 \begin{proof}
 \leanok
 For $x, y \geq 0$, $(x + y)^p \leq x^p + y^p$, and $\|f\|_{L_p(\mu)}^p = \int \|f\|^p \, d\mu$
-(Mathlib's \texttt{inhmgELpNorm\_\allowbreak add\_\allowbreak le}). The last claim is \Cref{lem:lp-norm-homogeneity} for the
+(Mathlib's \texttt{inhmgELpNorm\_\allowbreak add\_\allowbreak le}); an element of $L_p(\mu)$ has
+the quasi-norm of any representative. The last claim is \Cref{lem:lp-norm-homogeneity} for the
 counting measure.
 \end{proof}
 

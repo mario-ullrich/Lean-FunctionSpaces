@@ -128,6 +128,14 @@ approximation space `A^θ_τ` as linear Haar approximation in `L_τ`.
   the scheme of piecewise constants, so for `0 < s < 1/p` the Haar condition is also equivalent
   to `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞` and to its periodic version
   (`Haar.lqNorm_modulus_lt_top_iff_haarCoeff`, `Haar.lqNorm_perModulus_lt_top_iff_haarCoeff`).
+  For `0 < p ≤ 1`, `0 < q ≤ ∞` and `0 < s < 1/p`, `f` lies in the approximation space of the
+  step functions in the quasi-Banach space `L_p[0, 1]` (the spaces `E_{s,q}` of the couple
+  `Haar.stepCouple`) iff `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`
+  (`Haar.memEMethod_stepCouple_iff_modulus`), by Jackson's inequality by averaging and an inverse
+  inequality of order `1/p` (`Haar.eFunctional_stepCouple_le`, `Haar.lpModulus_le_of_mem_lpMeas`);
+  for `s > 1`, and for `s = 1` with `q < ∞`, this space misses the line `x ↦ x`, whose second
+  modulus vanishes (`Haar.not_memEMethod_stepCouple_idLp`). For `1 ≤ p` the step couple is the
+  complexity couple of the Haar scheme (`Haar.memEMethod_stepCouple_iff_memApprox`).
 * **The Haar basis and `n`-term approximation.** The functions `φ_0 = 1` and
   `φ_{2^k+i} = h_{k,i}`, `k ∈ ℕ`, `0 ≤ i < 2^k`, form a Hilbert basis of `L_2[0, 1]`
   (`Haar.haarBasis`, with the coefficients `Haar.haarBasis_repr_zero`,
@@ -173,6 +181,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Haar system on `[0, 1]`: dyadic conditional expectations, density, Haar coefficient characterisation | ✅ | ✗ | `Wavelets/Examples/Haar` |
 | Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarBesov` |
 | The Haar basis of `L_2[0, 1]`, `n`-term approximation | ✅ | ✗ | `Wavelets/Examples/HaarBasis` |
+| Dyadic step functions in `L_p[0, 1]`, `0 < p ≤ 1`: the step couple, Jackson's inequality by averaging, inverse inequality of order `1/p`, `A^s_q = B^s_{p,q,1}[0, 1]` for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/DyadicStepsQuasiBanach` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

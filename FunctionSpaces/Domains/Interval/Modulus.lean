@@ -25,9 +25,13 @@ is the modulus on the set `[a, b]` of `Rd.modulusOn` (`Interval.modulus`),
 the differences are taken only where all points `x, x + h, …, x + r h` lie in `[a, b]`, and the
 steps `h` and `-h` give the same norm.  It
 increases in `t`, is subadditive and homogeneous in `f`, satisfies
-`ω_r(f, t) ≤ 2^r ‖f‖_{L_p[a,b]}`, vanishes on polynomials of degree `< r`, depends only on the
-class of `f` in `L_p[a, b]` (`Interval.modulus_congr_ae`) and is invariant under the reflection
-`x ↦ a + b - x` (`Interval.modulus_reflect`).
+`ω_r(f, t) ≤ 2^r ‖f‖_{L_p[a,b]}`, vanishes on polynomials of degree `< r`, depends only on
+the class of `f` in `L_p[a, b]` (`Interval.modulus_congr_ae`) and is invariant under the
+reflection `x ↦ a + b - x` (`Interval.modulus_reflect`).
+
+The same formula defines the modulus for `0 < p < 1`. For `0 < p ≤ 1` the `p`-th power of the
+modulus is subadditive and `ω_r(f, t) ≤ 2^(r/p) ‖f‖_{L_p[a,b]}` (`Interval.modulus_add_rpow_le`,
+`Interval.modulus_le_of_le_one`), since the `p`-th power of the `L_p` quasi-norm is subadditive.
 
 All norms are `eLpNorm` on the restriction of Lebesgue measure; the functions are measurable
 functions on `ℝ`, as the representatives of elements of `L_p` are.
@@ -100,12 +104,7 @@ theorem eLpNorm_higherDiff_le_of_forall {f : ℝ → ℂ} {p : ℝ≥0∞} (hp :
     {r : ℕ} {h : ℝ} {B : ℝ≥0∞}
     (hB : ∀ k ∈ Finset.range (r + 1), eLpNorm (fun x => f (x + k * h)) p μ ≤ B) :
     eLpNorm (higherDiff r h f) p μ ≤ 2 ^ r * B := by
-  have hsum : higherDiff r h f = ∑ k ∈ Finset.range (r + 1),
-      ((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) • fun x => f (x + k * h) := by
-    funext x
-    rw [higherDiff_apply, Finset.sum_apply]
-    rfl
-  rw [hsum]
+  rw [higherDiff_eq_sum_smul]
   refine (eLpNorm_sum_le hp).trans ?_
   calc ∑ k ∈ Finset.range (r + 1),
         eLpNorm (((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) • fun x => f (x + k * h)) p μ
@@ -118,15 +117,65 @@ theorem eLpNorm_higherDiff_le_of_forall {f : ℝ → ℂ} {p : ℝ≥0∞} (hp :
         push_cast
         rfl
 
+/-- **Differences in `L_p`, `0 < p ≤ 1`**: if `‖f(· + k h)‖_{L_p(μ)} ≤ B` for `k ≤ r`, then
+`‖Δ_h^r f‖_{L_p(μ)} ≤ 2^(r/p) B`. The `p`-th power of the quasi-norm is subadditive
+(`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`), `C(r, k)^p ≤ C(r, k)` and `∑_k C(r, k) = 2^r`. -/
+theorem eLpNorm_higherDiff_le_of_forall_of_le_one {f : ℝ → ℂ} {p : ℝ≥0∞} (hp0 : p ≠ 0)
+    (hp1 : p ≤ 1) {μ : Measure ℝ} {r : ℕ} {h : ℝ} {B : ℝ≥0∞}
+    (hB : ∀ k ∈ Finset.range (r + 1), eLpNorm (fun x => f (x + k * h)) p μ ≤ B) :
+    eLpNorm (higherDiff r h f) p μ ≤ 2 ^ ((r : ℝ) / p.toReal) * B := by
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 (ne_top_of_le_ne_top ENNReal.one_ne_top hp1)
+  have hq1 : p.toReal ≤ 1 := ENNReal.toReal_le_of_le_ofReal zero_le_one (by simpa using hp1)
+  have hterm : ∀ k ∈ Finset.range (r + 1), eLpNorm (((-1 : ℂ) ^ (r - k) * (r.choose k : ℂ)) •
+      fun x => f (x + k * h)) p μ ^ p.toReal ≤ (r.choose k : ℝ≥0∞) * B ^ p.toReal := by
+    intro k hk
+    have h1 : (1 : ℝ≥0∞) ≤ r.choose k := by
+      exact_mod_cast Nat.choose_pos (Nat.lt_succ_iff.1 (Finset.mem_range.1 hk))
+    have hc : (r.choose k : ℝ≥0∞) ^ p.toReal ≤ r.choose k :=
+      (ENNReal.rpow_le_rpow_of_exponent_le h1 hq1).trans_eq (ENNReal.rpow_one _)
+    rw [eLpNorm_const_smul, enorm_higherDiff_coeff, ENNReal.mul_rpow_of_nonneg _ _ hq.le]
+    exact mul_le_mul' hc (ENNReal.rpow_le_rpow (hB k hk) hq.le)
+  have hpow : eLpNorm (higherDiff r h f) p μ ^ p.toReal ≤
+      (2 ^ ((r : ℝ) / p.toReal) * B) ^ p.toReal := by
+    rw [higherDiff_eq_sum_smul, ENNReal.mul_rpow_of_nonneg _ _ hq.le, ← ENNReal.rpow_mul,
+      div_mul_cancel₀ _ hq.ne', ENNReal.rpow_natCast]
+    refine (Finset.le_sum_of_subadditive (fun g : ℝ → ℂ => eLpNorm g p μ ^ p.toReal)
+      (by simp [ENNReal.zero_rpow_of_pos hq])
+      (fun g g' => eLpNorm_add_rpow_le_of_le_one hp0 hp1 g g') _ _).trans ?_
+    refine (Finset.sum_le_sum hterm).trans_eq ?_
+    rw [← Finset.sum_mul, ← Nat.cast_sum, Nat.sum_range_choose]
+    push_cast
+    rfl
+  exact (ENNReal.rpow_le_rpow_iff hq).1 hpow
+
+/-- **Translates on a shorter interval**: for `h ≥ 0` and `k ≤ r`,
+`‖f(· + k h)‖_{L_p[a, b - rh]} ≤ ‖f‖_{L_p[a, b]}`, since `[a, b - rh] + kh ⊆ [a, b]`. -/
+theorem eLpNorm_comp_add_mul_le {f : ℝ → ℂ} (hf : Measurable f) (p : ℝ≥0∞) {k r : ℕ}
+    (hkr : k ≤ r) {h : ℝ} (hh : 0 ≤ h) (a b : ℝ) :
+    eLpNorm (fun x => f (x + k * h)) p (volume.restrict (Icc a (b - r * h))) ≤
+      eLpNorm f p (volume.restrict (Icc a b)) := by
+  have hkr' : (k : ℝ) ≤ r := by exact_mod_cast hkr
+  rw [eLpNorm_comp_add_Icc hf]
+  exact eLpNorm_Icc_mono f p (by nlinarith) (by nlinarith [mul_le_mul_of_nonneg_right hkr' hh])
+
 /-- **`‖Δ_h^r f‖_{L_p[a, b - rh]} ≤ 2^r ‖f‖_{L_p[a,b]}`** for `h ≥ 0`. -/
 theorem eLpNorm_higherDiff_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ)
     {h : ℝ} (hh : 0 ≤ h) (a b : ℝ) :
     eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) ≤
-      2 ^ r * eLpNorm f p (volume.restrict (Icc a b)) := by
-  refine eLpNorm_higherDiff_le_of_forall hp fun k hk => ?_
-  have hkr : (k : ℝ) ≤ r := by exact_mod_cast Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)
-  rw [eLpNorm_comp_add_Icc hf]
-  exact eLpNorm_Icc_mono f p (by nlinarith) (by nlinarith [mul_le_mul_of_nonneg_right hkr hh])
+      2 ^ r * eLpNorm f p (volume.restrict (Icc a b)) :=
+  eLpNorm_higherDiff_le_of_forall hp fun _ hk =>
+    eLpNorm_comp_add_mul_le hf p (Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)) hh a b
+
+/-- **Differences in `L_p`, `p ≤ 1`, on an interval**: for measurable `f` and `h ≥ 0`,
+`‖Δ_h^r f‖_{L_p[a, b - rh]} ≤ 2^(r/p) ‖f‖_{L_p[a, b]}`; at `p = 0` the left side is `0`. -/
+theorem eLpNorm_higherDiff_le_of_le_one {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp1 : p ≤ 1)
+    (r : ℕ) {h : ℝ} (hh : 0 ≤ h) (a b : ℝ) :
+    eLpNorm (higherDiff r h f) p (volume.restrict (Icc a (b - r * h))) ≤
+      2 ^ ((r : ℝ) / p.toReal) * eLpNorm f p (volume.restrict (Icc a b)) := by
+  rcases eq_or_ne p 0 with rfl | hp0
+  · simp [eLpNorm_exponent_zero (measurable_higherDiff hf r h).aestronglyMeasurable]
+  exact eLpNorm_higherDiff_le_of_forall_of_le_one hp0 hp1 fun _ hk =>
+    eLpNorm_comp_add_mul_le hf p (Nat.lt_succ_iff.1 (Finset.mem_range.1 hk)) hh a b
 
 /-- For `h ≥ 0`, the points `x` with `x, x + h, …, x + rh ∈ [a, b]` form `[a, b - rh]`. -/
 theorem stepSet_Icc_of_nonneg (r : ℕ) {h : ℝ} (hh : 0 ≤ h) (a b : ℝ) :
@@ -189,10 +238,41 @@ theorem modulus_le {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp : 
   rw [modulus_eq_iSup_nonneg]
   exact iSup₂_le fun _ hh => eLpNorm_higherDiff_le hf hp r hh.1 a b
 
+/-- **The modulus is bounded by the quasi-norm for `0 < p ≤ 1`**:
+`ω_r(f, t, [a, b])_p ≤ 2^(r/p) ‖f‖_{L_p[a, b]}`. -/
+theorem modulus_le_of_le_one {f : ℝ → ℂ} (hf : Measurable f) {p : ℝ≥0∞} (hp1 : p ≤ 1) (r : ℕ)
+    (a b t : ℝ) :
+    modulus r p a b f t ≤ 2 ^ ((r : ℝ) / p.toReal) * eLpNorm f p (volume.restrict (Icc a b)) := by
+  rw [modulus_eq_iSup_nonneg]
+  exact iSup₂_le fun _ hh => eLpNorm_higherDiff_le_of_le_one hf hp1 r hh.1 a b
+
 /-- The modulus is subadditive. -/
 theorem modulus_add_le {p : ℝ≥0∞} (hp : 1 ≤ p) (r : ℕ) (a b : ℝ) (f g : ℝ → ℂ) (t : ℝ) :
     modulus r p a b (f + g) t ≤ modulus r p a b f t + modulus r p a b g t :=
   Rd.modulusOn_add_le hp _ r f g t
+
+/-- **The `p`-th power of the modulus is subadditive for `0 < p ≤ 1`**:
+`ω_r(f + g, t, [a, b])_p^p ≤ ω_r(f, t, [a, b])_p^p + ω_r(g, t, [a, b])_p^p`, from the same
+inequality for the `L_p` quasi-norm of each difference
+(`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`). -/
+theorem modulus_add_rpow_le {p : ℝ≥0∞} (hp1 : p ≤ 1) (r : ℕ) (a b : ℝ) (f g : ℝ → ℂ) (t : ℝ) :
+    modulus r p a b (f + g) t ^ p.toReal ≤
+      modulus r p a b f t ^ p.toReal + modulus r p a b g t ^ p.toReal := by
+  rcases eq_or_ne p 0 with rfl | hp0
+  · simp only [ENNReal.toReal_zero, ENNReal.rpow_zero]
+    exact le_self_add
+  have hq : 0 < p.toReal := ENNReal.toReal_pos hp0 (ne_top_of_le_ne_top ENNReal.one_ne_top hp1)
+  set M := modulus r p a b f t ^ p.toReal + modulus r p a b g t ^ p.toReal
+  have key : modulus r p a b (f + g) t ≤ M ^ (1 / p.toReal) := by
+    refine iSup₂_le fun h hh => ?_
+    rw [fwdDiff_iter_add, Set.indicator_add', ← ENNReal.rpow_le_rpow_iff hq, ← ENNReal.rpow_mul,
+      one_div_mul_cancel hq.ne', ENNReal.rpow_one]
+    exact (eLpNorm_add_rpow_le_of_le_one hp0 hp1 _ _).trans (add_le_add
+      (ENNReal.rpow_le_rpow (Rd.eLpNorm_indicator_higherDiff_le_modulusOn hh) hq.le)
+      (ENNReal.rpow_le_rpow (Rd.eLpNorm_indicator_higherDiff_le_modulusOn hh) hq.le))
+  calc modulus r p a b (f + g) t ^ p.toReal ≤ (M ^ (1 / p.toReal)) ^ p.toReal :=
+        ENNReal.rpow_le_rpow key hq.le
+    _ = M := by rw [← ENNReal.rpow_mul, one_div_mul_cancel hq.ne', ENNReal.rpow_one]
 
 /-- The modulus is homogeneous. -/
 theorem modulus_const_mul (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (c : ℂ) (f : ℝ → ℂ) (t : ℝ) :
@@ -208,6 +288,13 @@ theorem modulus_const_mul (r : ℕ) (p : ℝ≥0∞) (a b : ℝ) (c : ℂ) (f : 
 theorem modulus_polynomial {r : ℕ} {P : Polynomial ℂ} (hP : P ∈ Polynomial.degreeLT ℂ r)
     (p : ℝ≥0∞) (a b t : ℝ) : modulus r p a b (fun x => P.eval (x : ℂ)) t = 0 := by
   simp [modulus_eq_iSup_nonneg, higherDiff_polynomial hP]
+
+/-- **The line has vanishing second modulus**: `ω_2(x ↦ x, t, [0, 1])_p = 0` for every `p` and
+`t` (`Interval.modulus_polynomial` with `P = X`, of degree `1 < 2`). -/
+theorem modulus_two_id (p : ℝ≥0∞) (t : ℝ) : modulus 2 p 0 1 (fun x => (x : ℂ)) t = 0 := by
+  simpa using modulus_polynomial (P := Polynomial.X)
+    (Polynomial.mem_degreeLT.2 (Polynomial.degree_X_le.trans_lt (by exact_mod_cast one_lt_two)))
+    p 0 1 t
 
 /-- **Differences depend only on the class in `L_p[a, b]`**: for `h ≥ 0`, functions that agree
 almost everywhere on `[a, b]` have differences of step `h` with the same `L_p` norm on

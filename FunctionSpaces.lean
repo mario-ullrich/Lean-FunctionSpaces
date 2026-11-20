@@ -230,6 +230,7 @@ public import FunctionSpaces.Wavelets.DyadicNormalisation
 public import FunctionSpaces.Wavelets.Examples.Haar
 public import FunctionSpaces.Wavelets.Examples.HaarBesov
 public import FunctionSpaces.Wavelets.Examples.HaarBasis
+public import FunctionSpaces.Wavelets.Examples.DyadicStepsQuasiBanach
 public import FunctionSpaces.Wavelets.Examples.Multiscale
 public import FunctionSpaces.Wavelets.Examples.Alpert
 public import FunctionSpaces.Wavelets.Examples.Daubechies.DaubechiesPolynomial
