@@ -45,6 +45,9 @@ inequality `‖a + b‖_q ≤ C_q (‖a‖_q + ‖b‖_q)` with Mathlib's consta
 `0 < q < 1` and `C_q = 1` otherwise, with `1 ≤ C_q`, `2^(1/q) ≤ 2 C_q` and
 `(x^q + y^q)^(1/q) ≤ C_q (x + y)` (`ENNReal.one_le_LpAddConst`,
 `ENNReal.two_rpow_one_div_le_two_mul_LpAddConst`, `ENNReal.rpow_add_rpow_le_LpAddConst_mul`).
+On any measure space the `p`-th power of the `L_p` quasi-norm, `0 < p ≤ 1`, is subadditive,
+`‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` (`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`), so sums of
+many terms are estimated in the `p`-th power with constant `1`.
 
 The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥0∞` scalars,
 **monotonicity in `q`** (`lqNorm r a ≤ lqNorm q a` for `0 < q ≤ r`; Mathlib has only the
@@ -55,18 +58,23 @@ first term, also with dyadic weights (`ENNReal.lqNorm_dyadicWeight_le_of_head_of
 of sequences (`ENNReal.lqNorm_ite_le_eq`), sequences with one nonzero term
 (`ENNReal.lqNorm_ite_eq`), reindexing along bijections and injections
 (`ENNReal.lqNorm_comp_equiv`, `ENNReal.lqNorm_extend_zero`), the `ℓ_q` norm of the geometric
-sequence for every `q` (`ENNReal.dyadicGeomConst`), and the **dyadic weights**
+sequence for every `q` (`ENNReal.dyadicGeomConst`, which is `1` for `q = ∞`,
+`ENNReal.dyadicGeomConst_top`), and the **dyadic weights**
 `dyadicWeight s k = 2 ^ (k s)` that every approximation space uses, with the identity
 `2^(ks) 2^(-(k-j)σ) = 2^(-k(σ-s)) 2^(jσ)` of almost diagonal estimates
-(`ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub`), the bound `2^{js} ≤ 2^{c|s|} 2^{ks}` for
-`|j - k| ≤ c` (`ENNReal.dyadicWeight_le_of_mem_Icc`), the weights of integer order
-(`ENNReal.dyadicWeight_natCast`), and the powers of two `2^s ≠ ∞`, `1 ≤ 2^s` for `s ≥ 0`
-(`ENNReal.two_rpow_ne_top`, `ENNReal.one_le_two_rpow`) and `(ρ 2^(-j))^b = ρ^b 2^(-jb)`
-(`ENNReal.ofReal_div_two_pow_rpow`).  Two inequalities in `[0, ∞]`,
-`a x + b y ≤ (a + b)(x + y)` and `∑_i a_i b_i ≤ (∑_i a_i)(∑_i b_i)`
-(`ENNReal.mul_add_mul_le_add_mul_add`, `ENNReal.sum_mul_le_sum_mul_sum`), bound sums of
-products by products of sums; further identities and inequalities for products, quotients and
-powers in `[0, ∞]` serve the constants of the K-method and of the trace theorems
+(`ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub`), the bound `2^(-(n-2)θ) ≤ 2^(2θ) 2^(-nθ)` for
+truncated subtraction and `θ ≥ 0` (`ENNReal.dyadicWeight_neg_sub_two_le`), the bound
+`2^{js} ≤ 2^{c|s|} 2^{ks}` for `|j - k| ≤ c` (`ENNReal.dyadicWeight_le_of_mem_Icc`), the weights
+of integer order (`ENNReal.dyadicWeight_natCast`), and the powers of two `2^s ≠ ∞`, `1 ≤ 2^s`
+for `s ≥ 0` (`ENNReal.two_rpow_ne_top`, `ENNReal.one_le_two_rpow`), `2^((k : ℤ) : ℝ) = 2^k`
+(`ENNReal.two_rpow_intCast_natCast`) and `(ρ 2^(-j))^b = ρ^b 2^(-jb)`
+(`ENNReal.ofReal_div_two_pow_rpow`).  Three inequalities in `[0, ∞]`,
+`a x + b y ≤ (a + b)(x + y)`, `∑_i a_i b_i ≤ (∑_i a_i)(∑_i b_i)` and
+`x_0 + ∑_{j<k} x_j ≤ 2 ∑_{j≤k} x_j` (`ENNReal.mul_add_mul_le_add_mul_add`,
+`ENNReal.sum_mul_le_sum_mul_sum`, `ENNReal.add_sum_range_le_two_mul_sum`), bound sums of
+products by products of sums and a sum with a repeated term by twice the sum; further identities
+and inequalities for products, quotients and powers in `[0, ∞]` serve the constants of the
+K-method and of the trace theorems
 (`ENNReal.mul_div_rpow_eq`, `ENNReal.div_rpow_le_rpow_mul_div_rpow`).
 
 For Mathlib's normed space `ℓ²` the file proves Parseval's identity in `ℝ≥0∞`,
@@ -657,10 +665,29 @@ theorem dyadicWeight_anti (hs : s ≤ 0) : Antitone (dyadicWeight s) := fun _ _ 
 theorem one_le_dyadicWeight (hs : 0 ≤ s) (k : ℕ) : 1 ≤ dyadicWeight s k := by
   simpa using dyadicWeight_mono hs (Nat.zero_le k)
 
+/-- `2^(-(n-2)θ) ≤ 2^(2θ) 2^(-nθ)` for truncated subtraction and `θ ≥ 0`. -/
+theorem dyadicWeight_neg_sub_two_le {θ : ℝ} (hθ : 0 ≤ θ) (n : ℕ) :
+    dyadicWeight (-θ) (n - 2) ≤ dyadicWeight θ 2 * dyadicWeight (-θ) n := by
+  rcases le_or_gt 2 n with h | h
+  · obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le h
+    rw [Nat.add_sub_cancel_left, dyadicWeight_add_nat, ← mul_assoc, dyadicWeight_mul_neg_self,
+      one_mul]
+  · calc dyadicWeight (-θ) (n - 2) = 1 := by rw [show n - 2 = 0 by omega]; simp
+      _ ≤ dyadicWeight θ 2 * dyadicWeight (-θ) n := by
+          rw [← dyadicWeight_mul_neg_self θ n]
+          gcongr
+          · exact dyadicWeight_mono hθ (by omega)
+
 /-- `(2 ^ k) ^ s = 2 ^ (k s)`: the dyadic weight is the power weight at the dyadic point. -/
 theorem natCast_two_pow_rpow (s : ℝ) (k : ℕ) :
     ((2 ^ k : ℕ) : ℝ≥0∞) ^ s = dyadicWeight s k := by
   rw [dyadicWeight, ENNReal.rpow_natCast_mul, Nat.cast_pow, Nat.cast_ofNat]
+
+/-- `2^((k : ℤ) : ℝ) = 2^k` in `[0, ∞]` for `k ∈ ℕ`: the real power of `2` with an integer
+exponent `k ≥ 0` is the natural power. -/
+theorem two_rpow_intCast_natCast (k : ℕ) :
+    (2 : ℝ≥0∞) ^ (((k : ℤ) : ℝ)) = ((2 ^ k : ℕ) : ℝ≥0∞) := by
+  rw [Int.cast_natCast, rpow_natCast, Nat.cast_pow, Nat.cast_ofNat]
 
 /-- `(2^(jn))^t = 2^(j n t)`: a power of the volume factor `2^(jn)` is a dyadic weight. -/
 theorem two_pow_rpow_eq_dyadicWeight (j n : ℕ) (t : ℝ) :
@@ -838,6 +865,10 @@ theorem dyadicGeomConst_ne_top {α : ℝ} (hα : 0 < α) (q : ℝ≥0∞) : dyad
     exact one_ne_top
   exact rpow_ne_top_of_nonneg (by positivity)
     (one_sub_two_rpow_neg_inv_ne_top (_root_.mul_pos hα h))
+
+/-- For `q = ∞` the constant `dyadicGeomConst α ∞` is `1`, for every `α`. -/
+theorem dyadicGeomConst_top (α : ℝ) : dyadicGeomConst α ∞ = 1 := by
+  rw [dyadicGeomConst, toReal_top, _root_.div_zero, rpow_zero]
 
 /-- `∑ₖ 2^(-k) = 2`. -/
 theorem tsum_dyadicWeight_neg_one : ∑' k, dyadicWeight (-1) k = 2 := by
@@ -1035,6 +1066,14 @@ theorem sum_mul_le_sum_mul_sum {ι : Type*} (s : Finset ι) (a b : ι → ℝ≥
   exact Finset.sum_le_sum fun i hi => mul_le_mul_right (Finset.single_le_sum
     (fun j _ => zero_le) hi) _
 
+/-- `x_0 + ∑_{j<k} x_j ≤ 2 ∑_{j≤k} x_j` for every sequence `x` in `[0, ∞]`: both summands are at
+most `∑_{j≤k} x_j` (Mathlib's `Finset.single_le_sum`, `Finset.sum_le_sum_of_subset`). -/
+theorem add_sum_range_le_two_mul_sum (x : ℕ → ℝ≥0∞) (k : ℕ) :
+    x 0 + ∑ j ∈ Finset.range k, x j ≤ 2 * ∑ j ∈ Finset.range (k + 1), x j := by
+  rw [two_mul]
+  exact add_le_add (Finset.single_le_sum (fun j _ => zero_le) (Finset.mem_range.2 k.succ_pos))
+    (Finset.sum_le_sum_of_subset (Finset.range_mono k.le_succ))
+
 /-- **Dividing by a smaller power**: if `w ≤ c v` with `0 < c < ∞` and `a ≥ 0`, then
 `u / v^a ≤ c^a (u / w^a)` in `[0, ∞]`. -/
 theorem div_rpow_le_rpow_mul_div_rpow {u v w c : ℝ≥0∞} (hc0 : c ≠ 0) (hct : c ≠ ∞)
@@ -1163,6 +1202,19 @@ measurable (Mathlib's `eLpNorm_enorm_rpow`). -/
 theorem eLpNorm_fun_rpow {g : α → ℝ≥0∞} (hg : AEMeasurable g μ) {r : ℝ} (hr : 0 < r)
     (p : ℝ≥0∞) : eLpNorm (fun x => g x ^ r) p μ = eLpNorm g (p * ENNReal.ofReal r) μ ^ r := by
   simpa only [enorm_eq_self] using eLpNorm_enorm_rpow (p := p) (μ := μ) g hg.aestronglyMeasurable hr
+
+/-- **The `p`-th power of the `L_p` quasi-norm is subadditive for `0 < p ≤ 1`**:
+`‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` on any measure space, for all functions `f`, `g` with values in
+an additive monoid with an extended seminorm and continuous addition, such as a normed group or
+`[0, ∞]`. This is Mathlib's triangle inequality `inhmgELpNorm_add_le` for
+`∫ ‖f‖^p = ‖f‖_p^p` (`inhmgELpNorm_eq_eLpNorm_pow`); the `L_p` quasi-norm itself satisfies only
+`‖f + g‖_p ≤ 2^(1/p - 1) (‖f‖_p + ‖g‖_p)` (`eLpNorm_add_le'`). -/
+theorem eLpNorm_add_rpow_le_of_le_one {ε : Type*} [TopologicalSpace ε] [ESeminormedAddMonoid ε]
+    [ContinuousAdd ε] {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp1 : p ≤ 1) (f g : α → ε) :
+    eLpNorm (f + g) p μ ^ p.toReal ≤ eLpNorm f p μ ^ p.toReal + eLpNorm g p μ ^ p.toReal := by
+  rw [← inhmgELpNorm_eq_eLpNorm_pow hp1 hp0, ← inhmgELpNorm_eq_eLpNorm_pow hp1 hp0,
+    ← inhmgELpNorm_eq_eLpNorm_pow hp1 hp0]
+  exact inhmgELpNorm_add_le
 
 /-- **Monotone convergence for `L_p` norms**: for a directed countable family of measurable
 functions `F_b : α → [0, ∞]`, `‖sup_b F_b‖_p = sup_b ‖F_b‖_p`. For `p < ∞` this is the monotone

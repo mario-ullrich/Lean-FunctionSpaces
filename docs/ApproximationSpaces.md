@@ -16,7 +16,10 @@ an abelian group with their K-method, its interpolation property and the reitera
 (`InterpCouple`), approximation spaces as interpolation spaces of the couple `(X, A^r_∞)`,
 block, projection and atomic decompositions, abstract trace and retract theorems, the
 comparison with spaces defined by moduli of smoothness (`ModulusData`), and best `n`-term
-approximation from a Hilbert basis with the theorem of Stechkin and DeVore. A
+approximation from a Hilbert basis with the theorem of Stechkin and DeVore. The E-functional of a
+couple, the error of best approximation under a bound on the complexity, gives approximation
+spaces on abelian groups with a quasi-norm, such as `L_p` for `0 < p < 1`, and a comparison with
+moduli of smoothness that needs only the subadditivity of a power of the quasi-norm. A
 smoothness space of order `r` is a Banach space with an injective bounded map into `X` satisfying
 Jackson's and Bernstein's inequalities of order `r` (`ApproximationScheme.JacksonBound`,
 `ApproximationScheme.SmoothnessSpace`, a hypothesis structure whose fields are the embedding, the
@@ -161,6 +164,31 @@ theory.
   `s = (1-η)s₀ + ηs₁`; for the couple of `‖·‖` and the classical quasi-norm of `(s₁, q₁)` the
   same holds with `s = ηs₁` (`ApproximationScheme.ModulusData.memKMethod_modCouple_iff`,
   `ApproximationScheme.ModulusData.memKMethod_leftModCouple_iff`).
+* **The E-functional and its approximation spaces.** For a couple `(N₀, N₁)` on an abelian
+  group, with `N₀` the quasi-norm of the errors and `N₁` the complexity, the E-functional is
+  `E(t, u) = inf {N₀(u - b) : N₁(b) ≤ t}` (Bergh–Löfström, Section 7.1;
+  `InterpCouple.eFunctional`). It decreases in `t`, and
+  `E(t + s, u + v)^ρ ≤ E(t, u)^ρ + E(s, v)^ρ` if `N₀^ρ` and `N₁` are subadditive
+  (`InterpCouple.eFunctional_add_rpow_le`). If `N₁(0) = 0` and only `0` has complexity below
+  `1`, then for `α > 0` and `0 < q ≤ ∞`, and for `α = 0` and `q = ∞`, the norm
+  `(∫_0^∞ (t^α E(t, u))^q dt/t)^(1/q)` of `E_{α,q}` (Bergh–Löfström, Definition 7.1.5) is finite
+  iff `N₀(u) + ‖(2^(kα) E(2^k, u))_k‖_{ℓ_q}` is
+  (`InterpCouple.memEMethod_iff_eNormDyadic_lt_top`). For the complexity couple of an
+  approximation scheme, `N₁(b) = min {n : b ∈ A_n}`, `E(n, f) = E_n(f)` and `E_{s,q} = A^s_q`
+  for `s > 0`, `0 < q ≤ ∞`, and for `s = 0`, `q = ∞`
+  (`ApproximationScheme.eFunctional_complexityCouple`,
+  `ApproximationScheme.memEMethod_complexityCouple_iff`).
+* **Moduli of smoothness for `ρ`-normed couples.** Let `N₀(a + b)^ρ ≤ N₀(a)^ρ + N₀(b)^ρ` for
+  some `ρ > 0`, as for `‖·‖_p` with `ρ = p ≤ 1`, let `N₁` be subadditive, let `N₀` and `N₁` be
+  even and vanish at `0`, and let `ω(f, 2^(-k))`
+  satisfy `ω(f + g, ·)^ρ ≤ ω(f, ·)^ρ + ω(g, ·)^ρ`, `ω(f, ·) ≤ C₀ N₀(f)`, the Jackson inequality
+  `E(2^k, f) ≤ C_J ω(f, 2^(-k))` for every `k` and the inverse inequality
+  `ω(a, 2^(-k)) ≤ C_B 2^(-(k-j)θ) N₀(a)` for `N₁(a) ≤ 2^j`. If only `0` has complexity below
+  `1`, then for `0 < s < θ` and `0 < q ≤ ∞`, `f ∈ E_{s,q}` iff
+  `N₀(f) + ‖(2^(ks) ω(f, 2^(-k)))_k‖_{ℓ_q} < ∞`, with equivalent quasi-norms (DeVore–Popov,
+  Trans. Amer. Math. Soc. 305 (1988), proof of Theorem 4.8;
+  `InterpCouple.ModulusData.memEMethod_iff_modNorm_lt_top`). The telescoping sums are estimated
+  in the `ρ`-th power, with Hardy's inequality in `ℓ_{q/ρ}`.
 * **Block decompositions.** In a Banach space, for `s > 0` and `1 ≤ q ≤ ∞`, `f ∈ A^s_q` iff
   `f = ∑_k g_k` with blocks `g_k ∈ A_{2^k}` and `(2^(ks) ‖g_k‖)_k ∈ ℓ_q`; the infimum over
   such decompositions is an equivalent quasi-norm
@@ -196,6 +224,8 @@ theory.
   series of sequences is at most the series of the norms (`ENNReal.lqNorm_tsum_le`). For
   `0 < p ≤ 1`, `(∑_i f_i)^p ≤ ∑_i f_i^p` in `[0, ∞]` (`ENNReal.rpow_tsum_le_tsum_rpow`), and for
   `0 < q < 1`, `‖a + b‖_{ℓ_q} ≤ 2^(1/q - 1) (‖a‖_{ℓ_q} + ‖b‖_{ℓ_q})` (`ENNReal.lqNorm_add_le'`).
+  For `0 < p ≤ 1` and functions `f`, `g` on any measure space,
+  `‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` (`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`).
 * **Hardy inequalities.** For `α > 0`, `1 ≤ q ≤ ∞` and every sequence `b` in `[0, ∞]`,
   `‖(2^(kα) ∑_{i ≥ 0} b_{k+i})_k‖_{ℓ_q} ≤ (1 - 2^(-α))⁻¹ ‖(2^(kα) b_k)_k‖_{ℓ_q}` and
   `‖(2^(-kα) ∑_{j ≤ k} b_j)_k‖_{ℓ_q} ≤ (1 - 2^(-α))⁻¹ ‖(2^(-kα) b_k)_k‖_{ℓ_q}`
@@ -240,10 +270,10 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Linear approximation from a sequence | ✅ | ✗ | `Instances/Span` |
 | `n`-term approximation from a dictionary | ✅ | ✗ | `Instances/NTerm` |
 | Hilbert-basis `n`-term approximation, Stechkin–DeVore | ✅ | ✗ | `Instances/NTermHilbertBasis` |
-| Sums of powers in `[0, ∞]`, `ℓ_q` norms in `ℝ≥0∞`, Minkowski, the quasi-triangle inequality for `q < 1`, Cauchy–Schwarz, monotonicity in `q`, tails, sequences with finitely many nonzero terms, reindexing, geometric sequences, dyadic weights, weighted `ℓ_q` norms from the first term and a bound of the others, iterated `ℓ_q` norms, powers of two, products and quotients in `[0, ∞]`; `L_p` norms of `[0, ∞]`-valued functions: homogeneity, powers, monotone convergence, Minkowski's inequality for series, functions bounded on pieces | ✅ | ✗ | `Sequences/Lq` |
+| Sums of powers in `[0, ∞]`, `ℓ_q` norms in `ℝ≥0∞`, Minkowski, the quasi-triangle inequality for `q < 1`, Cauchy–Schwarz, monotonicity in `q`, tails, sequences with finitely many nonzero terms, reindexing, geometric sequences, dyadic weights, weighted `ℓ_q` norms from the first term and a bound of the others, iterated `ℓ_q` norms, powers of two, products and quotients in `[0, ∞]`; `L_p` norms of `[0, ∞]`-valued functions: homogeneity, powers, monotone convergence, Minkowski's inequality for series, functions bounded on pieces; subadditivity of `‖·‖_p^p` for `0 < p ≤ 1` | ✅ | ✗ | `Sequences/Lq` |
 | Cauchy condensation with power weights, `n ≥ 1` written as `2^k + i` with `0 ≤ i < 2^k` and series split into dyadic blocks, the dyadic sum `∑_j min(2^j a, (2^j a)⁻¹) ≤ 4`, finitely many changed terms, sums over the dyadic scales of an annulus, the interpolation inequality for dyadic suprema (Brezis–Mironescu) | ✅ | ✗ | `Sequences/Dyadic` |
 | Decreasing rearrangement, layer cake formula for sums | ✅ | ✗ | `Sequences/Rearrangement` |
-| Countable Minkowski inequality, monotone convergence and truncations in `ℓ_q`, window sums in `ℓ_q`, discrete Hardy inequalities, almost diagonal sums and their constant, the Hardy and almost diagonal bounds for `0 < q ≤ 1`, shift invariance and geometric convolutions on `ℤ` | ✅ | ✗ | `Sequences/Hardy` |
+| Countable Minkowski inequality, monotone convergence and truncations in `ℓ_q`, window sums in `ℓ_q`, discrete Hardy inequalities, almost diagonal sums and their constant, the Hardy and almost diagonal bounds for `0 < q ≤ 1`, Hardy's inequalities for every exponent, powers inside `ℓ_q` norms, shift invariance and geometric convolutions on `ℤ` | ✅ | ✗ | `Sequences/Hardy` |
 | `A^s_q` and its dyadic quasi-norm for `q > 0`, linear structure for `q ≥ 1` | ✅ | ✗ | `Norm`, `Dyadic`, `Space` |
 | Embeddings `A^s_q ↪ A^t_r` and functoriality | ✅ | ✗ | `Embedding`, `Transfer` |
 | Telescoping lift, Bernstein gives `A^β_1 ↪ Y`, Nikolskii transfer theorem | ✅ | ✗ | `Lift`, `Nikolskii` |
@@ -253,6 +283,8 @@ Paths are relative to `ApproximationSpaces/`, without `.lean`.
 | Dilations of `dt/t`, the interpolation property of the K-method, comparable couples, retracts, compatible maps between couples of bounded linear maps | ✅ | ✗ | `Interpolation/Property` |
 | Couples of K-spaces, Holmstedt's formula, the reiteration theorem and its endpoint cases | ✅ | ✗ | `Interpolation/Reiteration` |
 | Approximation spaces as interpolation spaces `A^s_q = (X, A^r_∞)_{s/r,q}`, reiteration of approximation spaces, the sandwich principle | ✅ | ✗ | `Interpolation/ApproxSpaces` |
+| The E-functional of a couple, the spaces `E_{α,q}` and their dyadic norm, complexity couples, `E_{s,q} = A^s_q` for schemes | ✅ | ✗ | `Interpolation/EFunctional` |
+| Moduli compatible with a `ρ`-normed couple, coincidence of `E_{s,q}` with the classical space | ✅ | ✗ | `Interpolation/EFunctionalModuli` |
 | Moduli compatible with a scheme, coincidence with the classical space, interpolation of the classical spaces | ✅ | ✗ | `Moduli` |
 | Block decompositions, series moved up by a number of levels, projection schemes and dyadic blocks | ✅ | ✗ | `Decompositions/Blocks`, `Decompositions/Projection` |
 | Synthesis with decay, atomic systems, `b^s_{p,q}`, atomic characterisation | ✅ | ✗ | `Decompositions/Synthesis`, `Decompositions/Atomic` |

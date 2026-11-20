@@ -579,6 +579,13 @@ theorem ofReal_mul_log_two_rpow_ne_zero (hρ : 0 < ρ) (q : ℝ≥0∞) :
   (ENNReal.rpow_pos (pos_iff_ne_zero.2 (ofReal_mul_log_two_ne_zero hρ))
     ENNReal.ofReal_ne_top).ne'
 
+/-- The factor `(log 2)^(1/q)` is nonzero: the case `ρ = 1` of
+`ofReal_mul_log_two_rpow_ne_zero`. -/
+theorem ofReal_log_two_rpow_ne_zero (q : ℝ≥0∞) :
+    ENNReal.ofReal (Real.log 2) ^ (1 / q.toReal) ≠ 0 := by
+  have h := ofReal_mul_log_two_rpow_ne_zero (ρ := 1) one_pos q
+  rwa [one_mul] at h
+
 /-- **The discrete version of `Φ_{θ,q}` by the functional, solved for the sequence**: for an
 increasing `φ`, `θ ≥ 0` and `ρ > 0`,
 `‖(2^(-nρθ) φ(2^(nρ)))_{n ∈ ℤ}‖_{ℓ_q} ≤ ((ρ log 2)^(1/q) 2^(-ρθ))⁻¹ Φ_{θ,q}(φ)`
@@ -598,10 +605,9 @@ theorem lqNorm_discretePhiSeq_le_inv_mul_phiFunctional {φ : ℝ≥0∞ → ℝ�
 /-- The factor `((log 2)^(1/q) 2^(-θ))⁻¹` of `InterpCouple.discreteKMethodNorm_le_mul_kMethodNorm`
 is finite. -/
 theorem inv_log_two_rpow_mul_two_rpow_ne_top (θ : ℝ) (q : ℝ≥0∞) :
-    (ENNReal.ofReal (Real.log 2) ^ (1 / q.toReal) * 2 ^ (-θ))⁻¹ ≠ ∞ := by
-  have h := ofReal_mul_log_two_rpow_ne_zero (ρ := 1) one_pos q
-  rw [one_mul] at h
-  exact ENNReal.inv_ne_top.2 (mul_ne_zero h (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne')
+    (ENNReal.ofReal (Real.log 2) ^ (1 / q.toReal) * 2 ^ (-θ))⁻¹ ≠ ∞ :=
+  ENNReal.inv_ne_top.2 (mul_ne_zero (ofReal_log_two_rpow_ne_zero q)
+    (ENNReal.rpow_pos two_pos ENNReal.ofNat_ne_top).ne')
 
 /-- The factor `(log 2)^(1/q) 2^θ` of `InterpCouple.kMethodNorm_le_mul_discreteKMethodNorm` is
 finite. -/

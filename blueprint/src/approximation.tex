@@ -316,10 +316,11 @@ With these, a constant $(1 - 2^{-\alpha})^{-1}$ is finite exactly for $\alpha > 
   ENNReal.dyadicWeight_lt_top, ENNReal.dyadicWeight_pos, ENNReal.dyadicWeight_ne_zero,
   ENNReal.dyadicWeight_add, ENNReal.dyadicWeight_add_nat, ENNReal.dyadicWeight_succ,
   ENNReal.dyadicWeight_neg, ENNReal.dyadicWeight_neg_mul_self, ENNReal.dyadicWeight_mul_neg_self,
-  ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub,
+  ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub, ENNReal.dyadicWeight_neg_sub_two_le,
   ENNReal.dyadicWeight_rpow, ENNReal.dyadicWeight_eq_pow, ENNReal.dyadicWeight_mono,
   ENNReal.dyadicWeight_le_of_le, ENNReal.dyadicWeight_anti, ENNReal.one_le_dyadicWeight,
-  ENNReal.natCast_two_pow_rpow, ENNReal.two_pow_rpow_eq_dyadicWeight,
+  ENNReal.natCast_two_pow_rpow, ENNReal.two_rpow_intCast_natCast,
+  ENNReal.two_pow_rpow_eq_dyadicWeight,
   ENNReal.two_rpow_mul_two_rpow,
   ENNReal.two_rpow_neg_lt_one, ENNReal.one_sub_two_rpow_neg_inv_ne_top,
   ENNReal.two_mul_one_sub_two_rpow_neg_inv_ne_top,
@@ -414,7 +415,7 @@ countable index sets.
 \lean{ENNReal.lqNorm_comp_equiv, ENNReal.lqNorm_extend_zero, ENNReal.lqNorm_comp_le_of_injective,
   ENNReal.dyadicGeomConst, ENNReal.lqNorm_dyadicWeight_neg_eq_dyadicGeomConst,
   ENNReal.lqNorm_dyadicWeight_neg_le_dyadicGeomConst, ENNReal.one_le_dyadicGeomConst,
-  ENNReal.dyadicGeomConst_ne_top}
+  ENNReal.dyadicGeomConst_ne_top, ENNReal.dyadicGeomConst_top}
 \leanok
 \uses{def:lq-norm}
 Let $q \in (0, \infty]$ and let $I, J$ be countable sets. For every family $b$ in $[0, \infty]$
@@ -482,18 +483,22 @@ For a Hilbert basis $(e_i)_i$ of a Hilbert space $H$ the coefficient map
 $f \mapsto (\langle e_i, f \rangle)_i$ is an isometry onto $\ell_2(I)$, so
 \Cref{lem:l2-norm-sq} gives $\|f\|^2 = \sum_i |\langle e_i, f \rangle|^2$ in $[0, \infty]$.
 
-\begin{lemma}[Two inequalities in {$[0, \infty]$}]
+\begin{lemma}[Three inequalities in {$[0, \infty]$}]
 \label{lem:sum-of-products-le-product-of-sums}
-\lean{ENNReal.mul_add_mul_le_add_mul_add, ENNReal.sum_mul_le_sum_mul_sum}
+\lean{ENNReal.mul_add_mul_le_add_mul_add, ENNReal.sum_mul_le_sum_mul_sum,
+  ENNReal.add_sum_range_le_two_mul_sum}
 \leanok
 For all $a, b, x, y \in [0, \infty]$, $a x + b y \leq (a + b)(x + y)$. For every finite set $s$
 and all families $(a_i)_{i \in s}$, $(b_i)_{i \in s}$ in $[0, \infty]$,
-$\sum_{i \in s} a_i b_i \leq \bigl(\sum_{i \in s} a_i\bigr)\bigl(\sum_{i \in s} b_i\bigr)$.
+$\sum_{i \in s} a_i b_i \leq \bigl(\sum_{i \in s} a_i\bigr)\bigl(\sum_{i \in s} b_i\bigr)$. For
+every sequence $x$ in $[0, \infty]$ and every $k \in \N$,
+$x_0 + \sum_{j < k} x_j \leq 2 \sum_{j \leq k} x_j$.
 \end{lemma}
 
 \begin{proof}
 \leanok
 Expand $(a + b)(x + y) = a x + a y + b x + b y$. Each $b_i$ is at most $\sum_{j \in s} b_j$.
+Both $x_0$ and $\sum_{j < k} x_j$ are at most $\sum_{j \leq k} x_j$.
 \end{proof}
 
 The next two lemmas concern $L_p$ norms of functions with values in $[0, \infty]$ on a
@@ -969,6 +974,56 @@ $\bigl(\sum_j c_{ij} a_j\bigr)^q \leq \sum_j c_{ij}^q a_j^q$, and $c_{ij}^q$ is 
 the exponent $Lq$, so \Cref{lem:almost-diagonal} for $\ell_1$, the exponents $sq$ and $Lq$ and the
 sequence $(a_j^q)_j$ applies.
 \end{proof}
+
+\begin{lemma}[Hardy inequalities for every exponent]
+\label{lem:hardy-every-exponent}
+\lean{ENNReal.hardyConst, ENNReal.hardyConst_ne_top, ENNReal.hardy_tail_le',
+  ENNReal.hardy_sum_le'}
+\leanok
+\uses{lem:hardy, lem:hardy-below-one}
+For $\alpha \in \R$ and $q \in (0, \infty]$ let $H_{\alpha, q} = (1 - 2^{-\alpha})^{-1}$ for
+$q \geq 1$ and $H_{\alpha, q} = \gamma_{\alpha, q}$ for $q < 1$, with $\gamma_{\alpha, q}$ as in
+\Cref{lem:hardy-below-one}; $H_{\alpha, q}$ is finite for $\alpha > 0$. For every sequence $b$ in
+$[0, \infty]$,
+\begin{align*}
+  \Bigl\| \Bigl(2^{k\alpha} \sum_{i=0}^\infty b_{k+i}\Bigr)_k \Bigr\|_{\ell_q}
+  &\leq H_{\alpha, q} \, \|(2^{k\alpha} b_k)_k\|_{\ell_q} , \\
+  \Bigl\| \Bigl(2^{-k\alpha} \sum_{j=0}^{k} b_j\Bigr)_k \Bigr\|_{\ell_q}
+  &\leq H_{\alpha, q} \, \|(2^{-k\alpha} b_k)_k\|_{\ell_q} .
+\end{align*}
+\end{lemma}
+
+\begin{proof}
+\leanok
+\Cref{lem:hardy} for $q \geq 1$ and \Cref{lem:hardy-below-one} for $q < 1$.
+\end{proof}
+
+\begin{lemma}[Powers of $L_p$ quasi-norms]
+\label{lem:lp-rho-triangle}
+\lean{MeasureTheory.eLpNorm_add_rpow_le_of_le_one, ENNReal.lqNorm_div_fun_rpow}
+\leanok
+\uses{def:lq-norm, lem:lp-norm-homogeneity}
+Let $\mu$ be a measure on a measurable space $\Omega$ and let $0 < p \leq 1$. For all functions
+$f, g$ on $\Omega$ with values in a normed group or in $[0, \infty]$,
+\[
+  \|f + g\|_{L_p(\mu)}^p \leq \|f\|_{L_p(\mu)}^p + \|g\|_{L_p(\mu)}^p .
+\]
+For every $r > 0$, every $q \in (0, \infty]$ and every
+family $a$ in $[0, \infty]$ on a countable set, $\|(a_i^r)_i\|_{\ell_{q/r}} = \|a\|_{\ell_q}^r$,
+with $\infty / r = \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $x, y \geq 0$, $(x + y)^p \leq x^p + y^p$, and $\|f\|_{L_p(\mu)}^p = \int \|f\|^p \, d\mu$
+(Mathlib's \texttt{inhmgELpNorm\_\allowbreak add\_\allowbreak le}). The last claim is \Cref{lem:lp-norm-homogeneity} for the
+counting measure.
+\end{proof}
+
+The quasi-norm $\|\cdot\|_{L_p}$, $p < 1$, satisfies only
+$\|f + g\|_{L_p} \leq 2^{1/p - 1} \bigl(\|f\|_{L_p} + \|g\|_{L_p}\bigr)$; its $p$-th power is
+subadditive, so sums of unboundedly many terms are estimated in the $p$-th power, where no
+constant accumulates. \Cref{sec:moduli-quasi} uses this with Hardy's inequality in $\ell_{q/p}$.
 
 \chapter{Approximation spaces}
 \label{ch:approximation-spaces}
@@ -1800,6 +1855,7 @@ $n \leq 0$ form a part of the sequence on $\Z$.
 \label{thm:discrete-continuous-k-method}
 \lean{ApproximationScheme.kMethodUpperConst, ApproximationScheme.kMethodUpperConst_ne_top,
   ApproximationScheme.kMethodLowerConst, ApproximationScheme.ofReal_mul_log_two_rpow_ne_zero,
+  ApproximationScheme.ofReal_log_two_rpow_ne_zero,
   ApproximationScheme.kMethodLowerConst_ne_top, ApproximationScheme.kMethodNorm_le_interpNorm,
   ApproximationScheme.interpNorm_le_kMethodNorm,
   ApproximationScheme.memInterp_zero_and_memKMethod_zero,
@@ -1874,6 +1930,9 @@ chapter. The couple of a map $\iota$ gives back the spaces of
 of exponent $\theta$, \Cref{sec:reiteration} proves the reiteration theorem through
 Holmstedt's formula, and \Cref{sec:approximation-spaces-interpolate} identifies the
 approximation spaces of every scheme with interpolation spaces and interpolates between them.
+\Cref{sec:e-functional} sets up the $E$-functional of a couple, the error of best approximation
+under a bound on the complexity, and its approximation spaces; they need no triangle inequality,
+so they serve quasi-normed spaces such as $L_p$ with $p < 1$.
 
 \section{Couples and their \texorpdfstring{$K$}{K}-method}
 \label{sec:couples}
@@ -3280,6 +3339,260 @@ $q'' = \infty$.
 For complete $Y$ this is \Cref{cor:representation-continuous-k-method} with $\theta = s/r$
 once more; that corollary holds for every normed space $Y$.
 
+\section{The \texorpdfstring{$E$}{E}-functional of a couple}
+\label{sec:e-functional}
+
+In a couple $(N_0, N_1)$ of this section, $N_0$ is the quasi-norm in which errors are measured
+and $N_1$ measures the complexity of an approximant, as the number of terms or the level of a
+partition. The $E$-functional is the error of best approximation by elements of complexity at
+most $t$~\cite[Section~7.1]{BerghLofstrom}. Bergh and L\"ofstr\"om put the complexity first:
+their $E(t, a; A_0, A_1)$ is the $E$-functional below for the swapped couple
+$(\|\cdot\|_{A_1}, \|\cdot\|_{A_0})$.
+
+\begin{definition}[$E$-functional]
+\label{def:e-functional}
+\lean{InterpCouple.eFunctional, InterpCouple.eFunctional_le, InterpCouple.le_eFunctional}
+\leanok
+\uses{def:couple}
+For a couple $A = (N_0, N_1)$ on $U$, $t \in [0, \infty]$ and $u \in U$,
+\[
+  E(t, u) = \inf \{ N_0(u - b) : b \in U, \ N_1(b) \leq t \} ,
+\]
+with $E(t, u) = \infty$ if no $b$ has $N_1(b) \leq t$.
+\end{definition}
+
+\begin{lemma}[Properties of the $E$-functional]
+\label{lem:e-functional}
+\lean{InterpCouple.eFunctional_anti, InterpCouple.eFunctional_le_norm0,
+  InterpCouple.eFunctional_zero_right, InterpCouple.norm0_le_eFunctional_of_lt_one,
+  InterpCouple.eFunctional_neg, InterpCouple.exists_norm0_sub_le_eFunctional_add,
+  InterpCouple.eFunctional_add_le_of_le, InterpCouple.eFunctional_add_le,
+  InterpCouple.eFunctional_add_rpow_le}
+\leanok
+\uses{def:e-functional}
+Let $A = (N_0, N_1)$ be a couple on $U$, let $t, s \in [0, \infty]$ and $u, v \in U$.
+\begin{enumerate}
+  \item $E(t, u)$ decreases in $t$. If $N_1(0) = 0$, then $E(t, u) \leq N_0(u)$; if also
+    $N_0(0) = 0$, then $E(t, 0) = 0$. If every $b$ with $N_1(b) < 1$ is $0$, then
+    $N_0(u) \leq E(t, u)$ for every $t < 1$.
+  \item If $N_0$ and $N_1$ are even, then $E(t, -u) = E(t, u)$.
+  \item If $E(t, u) < \infty$, then for every $\varepsilon > 0$ some $b$ with $N_1(b) \leq t$ has
+    $N_0(u - b) \leq E(t, u) + \varepsilon$.
+  \item If $N_0(a + b) \leq C \bigl(N_0(a) + N_0(b)\bigr)$ for all $a, b$ and some $C < \infty$,
+    $N_1(0) = 0$ and $N_1$ is subadditive, then
+    $E(t + s, u + v) \leq C \bigl(E(t, u) + E(s, v)\bigr)$.
+  \item If $N_1$ is subadditive and $N_0(a + b)^\rho \leq N_0(a)^\rho + N_0(b)^\rho$ for all
+    $a, b$ and some $\rho > 0$, then $E(t + s, u + v)^\rho \leq E(t, u)^\rho + E(s, v)^\rho$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) A larger $t$ admits more elements $b$; take $b = 0$ for the bounds by $N_0(u)$, and for
+$t < 1$ the only admissible element is $b = 0$. (2) Substitute $b \mapsto -b$. (3) The infimum is
+finite. For (4) and (5), if $N_1(b) \leq t$ and $N_1(b') \leq s$, then
+$N_1(b + b') \leq t + s$ and $u + v - (b + b') = (u - b) + (v - b')$; take the infimum over $b$
+and $b'$, in (5) after raising to the power $\rho$, which preserves infima. In (4) for $C = 0$,
+$N_0$ vanishes and $b = 0$ is admissible, so both sides are $0$.
+\end{proof}
+
+Part (4) is~\cite[Lemma~7.1.1]{BerghLofstrom} with $c_0 = 1$, the case of a subadditive
+complexity.
+
+\begin{definition}[Approximation spaces of a couple]
+\label{def:e-method}
+\lean{InterpCouple.eMethodNorm, InterpCouple.MemEMethod, InterpCouple.eNormDyadic}
+\leanok
+\uses{def:e-functional, def:continuous-k-method, def:lq-norm}
+Let $A = (N_0, N_1)$ be a couple on $U$, let $\alpha \in \R$ and $q \in (0, \infty]$. For
+$u \in U$,
+\[
+  \|u\|_{\alpha, q; E} = \Phi_{-\alpha, q}\bigl(E(\cdot, u)\bigr)
+  = \Bigl(\int_0^\infty \bigl(t^{\alpha} E(t, u)\bigr)^q \, \frac{dt}{t}\Bigr)^{1/q} ,
+\]
+with the essential supremum of $t^\alpha E(t, u)$ for $q = \infty$, and the \emph{approximation
+space} $E_{\alpha, q}$ consists of the $u$ with
+$\|u\|_{\alpha, q; E} < \infty$. The \emph{dyadic norm} is
+\[
+  \|u\|^{\mathrm{dy}}_{E, \alpha, q} = N_0(u) + \bigl\| \bigl(2^{k\alpha} E(2^k, u)\bigr)_{k \in \N}
+  \bigr\|_{\ell_q} .
+\]
+\end{definition}
+
+This is~\cite[Definition~7.1.5]{BerghLofstrom}.
+
+\begin{lemma}[Decreasing functions on the dyadic grid]
+\label{lem:antitone-phi-functional}
+\lean{ApproximationScheme.phiIntegrand_neg_le_of_antitone,
+  ApproximationScheme.le_phiIntegrand_neg_of_antitone,
+  ApproximationScheme.phiFunctional_neg_le_of_antitone,
+  ApproximationScheme.le_phiFunctional_of_le_on_shifted_pieces,
+  ApproximationScheme.lqNorm_le_phiFunctional_neg_of_antitone,
+  ApproximationScheme.le_phiFunctional_neg_of_le}
+\leanok
+\uses{def:continuous-k-method, lem:bounded-on-pieces, lem:dyadic-pieces, lem:lq-quasi-triangle,
+  lem:lq-reindex}
+Let $\alpha \geq 0$, $q \in (0, \infty]$ and $\varphi : [0, \infty] \to [0, \infty]$, let
+$C_q$ be the constant of \Cref{lem:lq-quasi-triangle}, $\gamma_{\alpha, q}$ that of
+\Cref{lem:lq-reindex}, and $1/\infty = 0$.
+\begin{enumerate}
+  \item If $\varphi$ is decreasing and $\varphi \leq M$, then
+    \[
+      \Phi_{-\alpha, q}(\varphi) \leq (\log 2)^{1/q} \, C_q \bigl(2^\alpha \,
+      \|(2^{k\alpha} \varphi(2^k))_k\|_{\ell_q} + \gamma_{\alpha, q} M\bigr) .
+    \]
+  \item If $\varphi$ is decreasing, then
+    $(\log 2)^{1/q} \, 2^{-\alpha} \, \|(2^{k\alpha} \varphi(2^k))_k\|_{\ell_q} \leq
+    \Phi_{-\alpha, q}(\varphi)$.
+  \item If $M \leq \varphi(t)$ for every $t < 1$, then
+    $(\log 2)^{1/q} \, 2^{-\alpha} M \leq \Phi_{-\alpha, q}(\varphi)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+On $[2^n, 2^{n+1})$, $n \in \Z$, a decreasing $\varphi$ gives
+$2^{n\alpha} \varphi(2^{n+1}) \leq t^\alpha \varphi(t) \leq 2^{(n+1)\alpha} \varphi(2^n)$. For
+(1) the upper bound is $2^\alpha \, 2^{k\alpha} \varphi(2^k)$ for $n = k \geq 0$ and
+$2^{-k\alpha} M$ for $n = -k - 1 < 0$; \Cref{lem:bounded-on-pieces} with the pieces of
+\Cref{lem:dyadic-pieces}, of measure $\log 2$, and the quasi-triangle inequality on $\Z$ give
+the bound. For (2) and (3), a lower bound $a_k$ of $t^\alpha \varphi(t)$ on each piece
+$[2^{k-1}, 2^k)$, $k \in \N$, gives $(\log 2)^{1/q} \|a\|_{\ell_q} \leq
+\Phi_{-\alpha, q}(\varphi)$ by \Cref{lem:bounded-on-pieces}. For (2) the lower bound on the piece
+$n = k - 1$ is $2^{-\alpha} \, 2^{k\alpha} \varphi(2^k)$. For (3) use the piece $[1/2, 1)$
+alone, where $t^\alpha \varphi(t) \geq 2^{-\alpha} M$.
+\end{proof}
+
+\begin{lemma}[The dyadic norm of the approximation spaces]
+\label{lem:e-method-dyadic}
+\lean{InterpCouple.eDyadicUpperConst, InterpCouple.eDyadicUpperConst_ne_top,
+  InterpCouple.eDyadicLowerConst, InterpCouple.eDyadicLowerConst_ne_top,
+  InterpCouple.eMethodNorm_le_eNormDyadic, InterpCouple.eNormDyadic_le_eMethodNorm,
+  InterpCouple.memEMethod_iff_eNormDyadic_lt_top,
+  InterpCouple.eAddConst, InterpCouple.eAddConst_ne_top,
+  InterpCouple.dyadicWeight_succ_mul_eFunctional_add_le, InterpCouple.eNormDyadic_add_le}
+\leanok
+\uses{def:e-method, lem:e-functional, lem:antitone-phi-functional, lem:lq-basic,
+  lem:lq-quasi-triangle}
+Let $A = (N_0, N_1)$ be a couple on $U$, let $\alpha \geq 0$, $q \in (0, \infty]$ and
+$u, v \in U$, with the constants of \Cref{lem:antitone-phi-functional}.
+\begin{enumerate}
+  \item If $N_1(0) = 0$, then $\|u\|_{\alpha, q; E} \leq (\log 2)^{1/q} \, C_q \,
+    (2^\alpha + \gamma_{\alpha, q}) \, \|u\|^{\mathrm{dy}}_{E, \alpha, q}$.
+  \item If every $b$ with $N_1(b) < 1$ is $0$, then
+    $\|u\|^{\mathrm{dy}}_{E, \alpha, q} \leq 2 \cdot 2^\alpha (\log 2)^{-1/q} \,
+    \|u\|_{\alpha, q; E}$.
+  \item Under both hypotheses, if $\alpha > 0$ or $q = \infty$, then $u \in E_{\alpha, q}$ if and
+    only if $\|u\|^{\mathrm{dy}}_{E, \alpha, q} < \infty$.
+  \item If $A$ is quasi-normed with constant $C$ and $N_1$ is subadditive, then for every
+    $s \in \R$,
+    $\|u + v\|^{\mathrm{dy}}_{E, s, q} \leq C \, C_q (2 + 2^s C_q) \bigl(
+    \|u\|^{\mathrm{dy}}_{E, s, q} + \|v\|^{\mathrm{dy}}_{E, s, q}\bigr)$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+$E(\cdot, u)$ decreases (\Cref{lem:e-functional}). For (1) apply (1) of
+\Cref{lem:antitone-phi-functional} with $M = N_0(u)$; for (2) apply its parts (2) and (3), with
+$M = N_0(u)$, since $E(t, u) \geq N_0(u)$ for $t < 1$. The constants are finite for
+$\alpha > 0$, and for $q = \infty$, where $\gamma_{\alpha, \infty} = 1$; this gives (3). For (4),
+$E(2^{k+1}, u + v) \leq C \bigl(E(2^k, u) + E(2^k, v)\bigr)$ by \Cref{lem:e-functional}, since
+$2^{k+1} = 2^k + 2^k$, and
+$2^{(k+1)s} = 2^s 2^{ks}$; split off the term $k = 0$, bounded by $N_0(u + v) \leq C (N_0(u) +
+N_0(v))$, at the cost $C_q$, and use $C_q \geq 1$.
+\end{proof}
+
+Part (4) is~\cite[Lemma~7.1.6]{BerghLofstrom} in dyadic form.
+
+\paragraph{The complexity couple.}
+
+\begin{definition}[Complexity couple]
+\label{def:complexity-couple}
+\lean{InterpCouple.complexity, InterpCouple.complexity_norm0, InterpCouple.dyadicLevels,
+  InterpCouple.ofMonotoneSubgroups, InterpCouple.ofMonotoneSubgroups_norm0,
+  ApproximationScheme.complexityCouple}
+\leanok
+\uses{def:couple, def:scheme}
+Let $N : U \to [0, \infty]$ and let $(S_n)_{n \in \N}$ be subsets of $U$. The \emph{complexity
+couple} is $(N, N_1)$ with $N_1(b) = \inf \{n \in \N : b \in S_n\}$, so $N_1(b) = \infty$ if $b$
+lies in no $S_n$. For an increasing sequence of subgroups $V_0 \subseteq V_1 \subseteq \cdots$ of
+$U$, the \emph{dyadic levels} are $S_0 = \{0\}$ and $S_n = V_{\lfloor \log_2 n \rfloor}$ for
+$n \geq 1$, and the \emph{couple of the subgroups} is the complexity couple of the dyadic levels.
+For an approximation scheme $A$ in $X$, the complexity couple of $A$ is the complexity couple of
+$\|\cdot\|$ and the sets $A_n$.
+\end{definition}
+
+In the couple of the subgroups, $V_j$ consists of the elements of complexity at most $2^j$, as
+in the dyadic scheme of a sequence of subspaces (\Cref{def:comap}).
+
+\begin{lemma}[Properties of the complexity couple]
+\label{lem:complexity-couple}
+\lean{InterpCouple.complexity_norm1_le_of_mem, InterpCouple.mem_of_complexity_norm1_le,
+  InterpCouple.complexity_norm1_le_natCast_iff, InterpCouple.eFunctional_complexity_natCast,
+  InterpCouple.complexity_norm1_zero, InterpCouple.complexity_norm1_neg,
+  InterpCouple.complexity_norm1_add_le, InterpCouple.eq_zero_of_complexity_norm1_lt_one,
+  InterpCouple.dyadicLevels_zero, InterpCouple.dyadicLevels_two_pow,
+  InterpCouple.zero_mem_dyadicLevels, InterpCouple.monotone_dyadicLevels,
+  InterpCouple.neg_mem_dyadicLevels, InterpCouple.dyadicLevels_add_subset,
+  InterpCouple.ofMonotoneSubgroups_norm1_zero, InterpCouple.ofMonotoneSubgroups_norm1_neg,
+  InterpCouple.ofMonotoneSubgroups_norm1_add_le,
+  InterpCouple.eq_zero_of_ofMonotoneSubgroups_norm1_lt_one,
+  InterpCouple.eFunctional_ofMonotoneSubgroups_two_pow,
+  InterpCouple.eFunctional_ofMonotoneSubgroups_sub_of_mem}
+\leanok
+\uses{def:complexity-couple, def:e-functional}
+Let $(N, N_1)$ be the complexity couple of $N$ and sets $S_n$, and let $u \in U$.
+\begin{enumerate}
+  \item If the sets increase, then $N_1(b) \leq n$ if and only if $b \in S_n$, and
+    $E(n, u) = \inf_{b \in S_n} N(u - b)$ for every $n \in \N$.
+  \item If $0 \in S_0$, then $N_1(0) = 0$; if every $S_n$ is symmetric, $N_1$ is even; if
+    $S_m + S_n \subseteq S_{m+n}$ for all $m, n$, then $N_1$ is subadditive; if $S_0 = \{0\}$, then
+    every $b$ with $N_1(b) < 1$ is $0$.
+  \item The dyadic levels of increasing subgroups $V_j$ increase, contain $0$, are symmetric and
+    satisfy $S_m + S_n \subseteq S_{m+n}$; $S_0 = \{0\}$ and $S_{2^j} = V_j$. Hence the couple of
+    the subgroups satisfies all conclusions of (2), $E(2^j, u) = \inf_{b \in V_j} N(u - b)$, and
+    $E(2^j, u - a) = E(2^j, u)$ for every $a \in V_j$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) If $b \notin S_n$, then $b \notin S_m$ for $m \leq n$, so every $m$ with $b \in S_m$ exceeds
+$n$ and $N_1(b) \geq n + 1$. (2) For $a \in S_m$ and $b \in S_n$, $a + b \in S_{m+n}$, so
+$N_1(a + b) \leq m + n$; and $N_1(b) < 1$ means $b \in S_0$. (3) For $1 \leq m \leq n$,
+$\lfloor \log_2 m \rfloor \leq \lfloor \log_2 n \rfloor$ and
+$\lfloor \log_2 m \rfloor, \lfloor \log_2 n \rfloor \leq \lfloor \log_2 (m + n) \rfloor$, and
+subgroups are closed under sums and negatives. The substitution $b \mapsto a + b$ maps $V_j$
+onto itself.
+\end{proof}
+
+\begin{theorem}[The $E$-method for approximation schemes]
+\label{thm:complexity-couple-approx}
+\lean{ApproximationScheme.eFunctional_complexityCouple,
+  ApproximationScheme.eNormDyadic_complexityCouple,
+  ApproximationScheme.memEMethod_complexityCouple_iff}
+\leanok
+\uses{def:complexity-couple, lem:complexity-couple, lem:e-method-dyadic, def:dyadic-norm,
+  lem:dyadic-norm-below-one}
+Let $A$ be an approximation scheme in $X$. For the complexity couple of $A$, $E(n, f) = E_n(f)$
+for every $n \in \N$ and $f \in X$, and the dyadic norm of $E_{s, q}$ is the dyadic quasi-norm
+$\|f\|^{\mathrm{dy}}_{A^s_q}$. Hence $E_{s, q} = A^s_q$ for $s > 0$ and $q \in (0, \infty]$, and
+for $s = 0$ and $q = \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The sets $A_n$ increase, $A_0 = \{0\}$, and (1) of \Cref{lem:complexity-couple} gives
+$E(n, f) = \inf_{a \in A_n} \|f - a\| = E_n(f)$. Then (3) of \Cref{lem:e-method-dyadic} and
+\Cref{lem:dyadic-norm-below-one} give the equality of the spaces.
+\end{proof}
+
+For approximation schemes this is the $E$-method of~\cite[Section~7.1]{BerghLofstrom}; the
+couple needs only an abelian group, so it applies to quasi-normed spaces such as $L_p$ with
+$p < 1$, where \Cref{sec:moduli-quasi} identifies the approximation spaces with classical
+spaces.
+
 \chapter{Block decompositions and projections}
 \label{ch:decompositions}
 
@@ -3794,7 +4107,8 @@ nonlinear on purpose: in parts of the quasi-Banach range no linear extension exi
 Classical function spaces are defined by moduli of smoothness, approximation spaces by errors
 of approximation. A Jackson inequality and an inverse inequality make them coincide. This
 chapter states this once for every scheme; the examples are the trigonometric polynomials, the
-piecewise polynomials, splines and wavelets.
+piecewise polynomials, splines and wavelets. \Cref{sec:moduli-quasi} states the coincidence for
+couples whose first quasi-norm has a subadditive power, as $L_p$ for $p < 1$.
 
 \begin{definition}[Modulus compatible with a scheme]
 \label{def:modulus-data}
@@ -3826,7 +4140,6 @@ constants $C_J$, $C_B$ are known to exist.
 \lean{ApproximationScheme.ModulusData.directConst,
   ApproximationScheme.ModulusData.directConst_ne_top,
   ApproximationScheme.ModulusData.approxNormDyadic_le_modNorm,
-  ApproximationScheme.ModulusData.dyadicWeight_neg_sub_two_le,
   ApproximationScheme.ModulusData.inverseConst, ApproximationScheme.ModulusData.inverseConst_ne_top,
   ApproximationScheme.ModulusData.modulus_le_of_dyadicApprox,
   ApproximationScheme.ModulusData.dyadicWeight_mul_modulus_le_of_dyadicApprox,
@@ -3912,6 +4225,146 @@ and part (1) with $r = s_1$ and the parameter $\eta$, give the equivalence with 
 and with $f \in A^{\eta s_1}_q$. Since $0 < s < \theta$ and $0 < \eta s_1 < \theta$,
 \Cref{thm:modulus-coincidence} gives the equivalence with the classical quasi-norms.
 \end{proof}
+
+\section{Moduli and \texorpdfstring{$\rho$}{rho}-normed couples}
+\label{sec:moduli-quasi}
+
+The proof of \Cref{thm:modulus-coincidence} telescopes near-best approximants over unboundedly
+many levels and uses the triangle inequality at each step; a quasi-triangle inequality with
+constant $C$ would cost $C^k$ at level $k$. In $L_p$, $0 < p < 1$, the $p$-th power of the
+quasi-norm is subadditive (\Cref{lem:lp-rho-triangle}), and DeVore and Popov telescope in that
+power~\cite[(2.3)]{DeVorePopovTAMS}. This section states the coincidence theorem in this form,
+for the $E$-functional of a couple (\Cref{sec:e-functional}).
+
+\begin{definition}[Modulus compatible with a $\rho$-normed couple]
+\label{def:couple-modulus-data}
+\lean{InterpCouple.ModulusData, InterpCouple.ModulusData.ofExists,
+  InterpCouple.ModulusData.modNorm, InterpCouple.ModulusData.modulus_zero,
+  InterpCouple.ModulusData.modulus_sum_rpow_le, InterpCouple.norm0_sub_rpow_le,
+  InterpCouple.norm1_sub_le}
+\leanok
+\uses{def:couple, def:e-functional}
+Let $A = (N_0, N_1)$ be a couple on $U$, let $\rho > 0$ and $\theta \in \R$. A \emph{modulus
+compatible with $A$ of exponent $\rho$ and inverse order $\theta$} is a family
+$\omega(f, k) \in [0, \infty]$, $f \in U$, $k \in \N$, together with constants
+$C_0, C_J, C_B < \infty$ such that for all $a, b, f, g \in U$ and $j, k \in \N$
+\[
+  N_0(0) = 0, \qquad N_0(-a) = N_0(a), \qquad N_0(a + b)^\rho \leq N_0(a)^\rho + N_0(b)^\rho,
+\]
+\[
+  N_1(0) = 0, \qquad N_1(-a) = N_1(a), \qquad N_1(a + b) \leq N_1(a) + N_1(b),
+\]
+\[
+  \omega(f + g, k)^\rho \leq \omega(f, k)^\rho + \omega(g, k)^\rho, \qquad
+  \omega(f, k) \leq C_0 \, N_0(f),
+\]
+\[
+  E(2^k, f) \leq C_J \, \omega(f, k), \qquad
+  \omega(a, k) \leq C_B \, 2^{-(k - j)_+ \theta} N_0(a) \quad (N_1(a) \leq 2^j) .
+\]
+The \emph{classical quasi-norm} is
+$\|f\|^{\omega}_{s,q} = N_0(f) + \|(2^{ks} \omega(f, k))_k\|_{\ell_q}$.
+\end{definition}
+
+Jackson's inequality is asked at every level $k \geq 0$. Then $\omega(0, k) = 0$, and the
+$\rho$-th power of $\omega(\cdot, k)$ is subadditive on finite sums. For every couple with even
+$N_0$ and $N_1$, subadditive $N_0^\rho$ and subadditive $N_1$,
+$N_0(a - b)^\rho \leq N_0(a)^\rho + N_0(b)^\rho$ and $N_1(a - b) \leq N_1(a) + N_1(b)$.
+
+\begin{lemma}[The modulus from near-best elements]
+\label{lem:couple-modulus-telescoping}
+\lean{InterpCouple.ModulusData.modulus_rpow_le_of_norm1_le,
+  InterpCouple.ModulusData.modulus_sub_rpow_le, InterpCouple.ModulusData.modulus_rpow_le,
+  InterpCouple.ModulusData.dyadicWeight_mul_modulus_rpow_le,
+  InterpCouple.ModulusData.lqNorm_rpow_le}
+\leanok
+\uses{def:couple-modulus-data, lem:hardy-every-exponent, lem:lq-quasi-triangle,
+  lem:sum-of-products-le-product-of-sums, def:lq-norm}
+Let $\omega$ be a modulus compatible with $A$ of exponent $\rho$ and inverse order
+$\theta \geq 0$. Let $f \in U$, let $b_j \in U$ with $N_1(b_j) \leq 2^j$, and let $(e_j)_j$ be
+a decreasing sequence in $[0, \infty]$ with $N_0(f - b_j) \leq e_j$ for every $j$ and
+$N_0(f) \leq e_0$. Then for every $k \in \N$
+\[
+  \omega(f, k)^\rho \leq C_0^\rho \, e_k^\rho + 4 \, C_B^\rho \, 4^{\theta\rho}
+  \sum_{j \leq k} 2^{-(k - j)\theta\rho} e_j^\rho ,
+\]
+and for every $s \in \R$ and $r \in (0, \infty]$, with $\alpha = (\theta - s)\rho$, the
+constant $C_r$ of \Cref{lem:lq-quasi-triangle} and $H_{\alpha, r}$ of
+\Cref{lem:hardy-every-exponent},
+\[
+  \bigl\| \bigl( (2^{ks} \omega(f, k))^\rho \bigr)_k \bigr\|_{\ell_r} \leq
+  C_r \bigl(C_0^\rho + 4 \, C_B^\rho \, 4^{\theta\rho} H_{\alpha, r}\bigr)
+  \bigl\| \bigl( (2^{ks} e_k)^\rho \bigr)_k \bigr\|_{\ell_r} .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Write $f = (f - b_k) + b_0 + \sum_{j < k} (b_{j+1} - b_j)$. Here
+$\omega(f - b_k, k) \leq C_0 \, e_k$. The block $b_{j+1} - b_j$ has complexity at most
+$2^{j+1} + 2^j \leq 2^{j+2}$ and
+$N_0(b_{j+1} - b_j)^\rho \leq N_0(f - b_j)^\rho + N_0(f - b_{j+1})^\rho \leq 2 e_j^\rho$, so the
+inverse inequality at level $j + 2$ and $2^{-(k - j - 2)_+\theta\rho} \leq
+4^{\theta\rho} 2^{-(k - j)\theta\rho}$ give
+$\omega(b_{j+1} - b_j, k)^\rho \leq 2 C_B^\rho 4^{\theta\rho} 2^{-(k - j)\theta\rho} e_j^\rho$;
+the same bound holds for $b_0$, at level $0$, since $N_0(b_0)^\rho \leq N_0(f)^\rho +
+N_0(f - b_0)^\rho \leq 2 e_0^\rho$. Sum with the $\rho$-subadditivity of $\omega(\cdot, k)$ and
+use $x_0 + \sum_{j < k} x_j \leq 2 \sum_{j \leq k} x_j$
+(\Cref{lem:sum-of-products-le-product-of-sums}). For the second claim multiply by
+$2^{ks\rho}$: with $x_j = (2^{js} e_j)^\rho$,
+$2^{ks\rho} \, 2^{-(k - j)\theta\rho} e_j^\rho = 2^{-k\alpha} \, 2^{j\alpha} x_j$, and Hardy's
+inequality for partial sums with exponent $\alpha$ (\Cref{lem:hardy-every-exponent}) bounds the
+sum in $\ell_r$ by $H_{\alpha, r} \|x\|_{\ell_r}$; the quasi-triangle inequality joins the two
+terms.
+\end{proof}
+
+\begin{theorem}[Coincidence for $\rho$-normed couples]
+\label{thm:couple-modulus-coincidence}
+\lean{InterpCouple.lqNorm_dyadicWeight_mul_eFunctional_add_le,
+  InterpCouple.ModulusData.inverseConst, InterpCouple.ModulusData.inverseConst_ne_top,
+  InterpCouple.ModulusData.eNormDyadic_le_modNorm,
+  InterpCouple.ModulusData.modNorm_le_eNormDyadic,
+  InterpCouple.ModulusData.eNormDyadic_lt_top_iff,
+  InterpCouple.ModulusData.memEMethod_iff_modNorm_lt_top}
+\leanok
+\uses{def:couple-modulus-data, lem:couple-modulus-telescoping, lem:e-functional,
+  lem:e-method-dyadic, lem:lp-rho-triangle, lem:lq-quasi-triangle, lem:lq-reindex,
+  thm:modulus-coincidence}
+Let $\omega$ be a modulus compatible with $A$ of exponent $\rho$ and inverse order $\theta$, let
+$q \in (0, \infty]$ and $f \in U$, and let $r = q/\rho$. For every $s \in \R$,
+$\|f\|^{\mathrm{dy}}_{E, s, q} \leq \max(1, C_J) \, \|f\|^{\omega}_{s,q}$, and for
+$0 \leq s < \theta$
+\[
+  \|f\|^{\omega}_{s,q} \leq \Bigl(1 + \bigl(C_r (C_0^\rho + 4 \, C_B^\rho \, 4^{\theta\rho}
+  H_{(\theta - s)\rho, r})\bigr)^{1/\rho} C_q (1 + \gamma_{1, q})\Bigr)
+  \|f\|^{\mathrm{dy}}_{E, s, q} ,
+\]
+with the constants of \Cref{lem:couple-modulus-telescoping} and $\gamma_{1, q}$ of
+\Cref{lem:lq-reindex}; the constant is finite. Hence for $0 \leq s < \theta$,
+$\|f\|^{\mathrm{dy}}_{E, s, q} < \infty$ if and only if $\|f\|^{\omega}_{s,q} < \infty$. If
+every $b$ with $N_1(b) < 1$ is $0$, then for $0 < s < \theta$, $f \in E_{s, q}$ if and only if
+$\|f\|^{\omega}_{s,q} < \infty$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+The first bound is Jackson's inequality at every level. For the second we may assume
+$0 < N_0(f) < \infty$: for $N_0(f) = 0$ the modulus of $f$ vanishes. By (1) and (3) of
+\Cref{lem:e-functional} there are $b_k$ with $N_1(b_k) \leq 2^k$ and
+$N_0(f - b_k) \leq e_k = E(2^k, f) + N_0(f) \, 2^{-k(s+1)}$; the $e_k$ decrease and
+$N_0(f) \leq e_0$. \Cref{lem:couple-modulus-telescoping} with $r = q/\rho$ and
+$\|(a_k^\rho)_k\|_{\ell_{q/\rho}} = \|a\|_{\ell_q}^\rho$ (\Cref{lem:lp-rho-triangle}) bound
+$\|(2^{ks} \omega(f, k))_k\|_{\ell_q}$ by $(C_r (\dots))^{1/\rho} \, \|(2^{ks} e_k)_k\|_{\ell_q}$,
+and $\|(2^{ks} e_k)_k\|_{\ell_q} \leq C_q (1 + \gamma_{1, q}) \|f\|^{\mathrm{dy}}_{E, s, q}$
+since $2^{ks} N_0(f) \, 2^{-k(s+1)} = N_0(f) \, 2^{-k}$. The last claim follows with (3) of
+\Cref{lem:e-method-dyadic}.
+\end{proof}
+
+For $0 < p < 1$ the $K$-functional of $L_p$ and the Sobolev space $W^r_p$ on an interval
+vanishes identically~\cite{DitzianHristovIvanov1995}, so it carries no information on
+smoothness, and the representation of the classical spaces as interpolation spaces in
+\Cref{cor:modulus-spaces-interpolate} has no analogue there. The theorem above goes through the
+Jackson and inverse inequalities directly, as in the proof of~\cite[Theorem~4.8]{DeVorePopovTAMS}.
 
 \chapter{Besov spaces and their embeddings}
 \label{ch:besov}

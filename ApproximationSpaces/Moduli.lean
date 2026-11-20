@@ -165,19 +165,6 @@ theorem approxNormDyadic_le_modNorm (hq : 1 ≤ q) (f : X) :
               · exact le_add_self
           _ = (1 + W + M.CJ) * (‖f‖ₑ + L) := by ring
 
-/-- `2^(-(n-2)θ) ≤ 2^(2θ) 2^(-nθ)` for truncated subtraction and `θ ≥ 0`. -/
-theorem dyadicWeight_neg_sub_two_le {θ : ℝ} (hθ : 0 ≤ θ) (n : ℕ) :
-    dyadicWeight (-θ) (n - 2) ≤ dyadicWeight θ 2 * dyadicWeight (-θ) n := by
-  rcases le_or_gt 2 n with h | h
-  · obtain ⟨m, rfl⟩ := Nat.exists_eq_add_of_le h
-    rw [Nat.add_sub_cancel_left, ENNReal.dyadicWeight_add_nat, ← mul_assoc,
-      ENNReal.dyadicWeight_mul_neg_self, one_mul]
-  · calc dyadicWeight (-θ) (n - 2) = 1 := by rw [show n - 2 = 0 by omega]; simp
-      _ ≤ dyadicWeight θ 2 * dyadicWeight (-θ) n := by
-          rw [← ENNReal.dyadicWeight_mul_neg_self θ n]
-          gcongr
-          · exact ENNReal.dyadicWeight_mono hθ (by omega)
-
 /-- The constant of the inverse direction,
 `1 + 3 C₀ + C_B (3 + 6 · 4^θ) (1 - 2^(-(θ-s)))⁻¹`. -/
 noncomputable def inverseConst (s : ℝ) : ℝ≥0∞ :=
@@ -222,7 +209,7 @@ theorem modulus_le_of_dyadicApprox (hθ : 0 ≤ θ) {f : X} {t : ℕ → ℝ≥0
             (2 * (A.approxError f (2 ^ j) + t j)) := by
           gcongr
           · rw [show k - (j + 2) = k - j - 2 by omega]
-            exact dyadicWeight_neg_sub_two_le hθ (k - j)
+            exact ENNReal.dyadicWeight_neg_sub_two_le hθ (k - j)
           · exact D.enorm_sub_succ_le ht j
       _ = _ := by ring
   calc M.modulus f k

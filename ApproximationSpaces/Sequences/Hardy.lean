@@ -39,14 +39,18 @@ Hardy inequalities with `γ_{α,q} = (1 - 2^(-αq))^(-1/q)` (`hardy_tail_le_of_l
 `hardy_sum_le_of_le_one`, with `dyadicGeomConst`) and the almost diagonal sum with
 `almostDiagonalConst (sq) (Lq) ^ (1/q)` (`lqNorm_almostDiagonal_le_of_le_one`). The `q`-th power of
 a sum is at most the sum of the `q`-th powers, so each is the estimate for `ℓ_1` applied to the
-`q`-th powers.
+`q`-th powers. For every exponent `q` both Hardy inequalities hold with the constant
+`hardyConst α q`, which is `(1 - 2^(-α))⁻¹` for `q ≥ 1` and `γ_{α,q}` otherwise
+(`hardy_tail_le'`, `hardy_sum_le'`).
 
 The Minkowski inequalities and monotone convergence hold for families on every countable index
-set.  On `ℤ`, the norm is invariant under shifts (`lqNorm_comp_add_int`), which gives Young's
-inequality for a series of shifts (`lqNorm_tsum_shift_le`) and the two **geometric
-convolutions** `‖(∑_{j ≥ 0} 2^(-(j+1)α) c_{m-(j+1)})_m‖_q ≤ (1 - 2^(-α))⁻¹ ‖c‖_q` and the same
-bound for `(∑_{j ≥ 0} 2^(-jα) c_{m+j})_m` (`lqNorm_tsum_geom_sub_le`, `lqNorm_tsum_geom_add_le`),
-the convolutions behind the reiteration theorem.
+set, and so does the rule for powers inside the norm, `‖(a_i^r)_i‖_{ℓ_{q/r}} = ‖a‖_{ℓ_q}^r` for
+`r > 0` (`lqNorm_fun_rpow`, `lqNorm_div_fun_rpow`).  On `ℤ`, the norm is invariant under shifts
+(`lqNorm_comp_add_int`), which gives Young's inequality for a series of shifts
+(`lqNorm_tsum_shift_le`) and the two **geometric convolutions**
+`‖(∑_{j ≥ 0} 2^(-(j+1)α) c_{m-(j+1)})_m‖_q ≤ (1 - 2^(-α))⁻¹ ‖c‖_q` and the same bound for
+`(∑_{j ≥ 0} 2^(-jα) c_{m+j})_m` (`lqNorm_tsum_geom_sub_le`, `lqNorm_tsum_geom_add_le`), the
+convolutions behind the reiteration theorem.
 -/
 
 @[expose] public section
@@ -83,6 +87,20 @@ sum of the norms (`MeasureTheory.eLpNorm_tsum_le` for the counting measure). -/
 theorem lqNorm_tsum_le (hq : 1 ≤ q) (f : ℕ → κ → ℝ≥0∞) :
     lqNorm q (fun k => ∑' i, f i k) ≤ ∑' i, lqNorm q (f i) :=
   eLpNorm_tsum_le hq
+
+/-- **Powers inside an `ℓ_u` norm**: `‖(a_i^r)_i‖_{ℓ_u} = ‖a‖_{ℓ_{u r}}^r` for `r > 0`
+(`MeasureTheory.eLpNorm_fun_rpow` for the counting measure). -/
+theorem lqNorm_fun_rpow (u : ℝ≥0∞) {r : ℝ} (hr : 0 < r) (a : κ → ℝ≥0∞) :
+    lqNorm u (fun i => a i ^ r) = lqNorm (u * ENNReal.ofReal r) a ^ r :=
+  MeasureTheory.eLpNorm_fun_rpow (measurable_of_countable a).aemeasurable hr u
+
+/-- **Powers inside an `ℓ_q` norm, quotient form**: `‖(a_i^r)_i‖_{ℓ_{q/r}} = ‖a‖_{ℓ_q}^r` for
+every `r > 0` and every exponent `q`, with `∞ / r = ∞`. For `0 < r ≤ 1` the `r`-th powers of a
+sum are subadditive, so estimates in `ℓ_q` for sums of `r`-th powers pass through `ℓ_{q/r}`. -/
+theorem lqNorm_div_fun_rpow {r : ℝ} (hr : 0 < r) (q : ℝ≥0∞) (a : κ → ℝ≥0∞) :
+    lqNorm (q / ENNReal.ofReal r) (fun i => a i ^ r) = lqNorm q a ^ r := by
+  rw [lqNorm_fun_rpow _ hr,
+    ENNReal.div_mul_cancel (ENNReal.ofReal_pos.2 hr).ne' ENNReal.ofReal_ne_top]
 
 end Countable
 
@@ -320,6 +338,43 @@ theorem hardy_sum_le_of_le_one (hq1 : q ≤ 1) (α : ℝ) (b : ℕ → ℝ≥0�
         congr 1
         refine tsum_congr fun k => ?_
         rw [mul_rpow_of_nonneg _ _ hp.le, hw]
+
+/-! ### Hardy's inequalities for every exponent -/
+
+/-- The constant of Hardy's inequalities for every exponent `q`: `(1 - 2^(-α))⁻¹` for
+`1 ≤ q ≤ ∞` (`ENNReal.hardy_tail_le`, `ENNReal.hardy_sum_le`) and
+`γ_{α,q} = (1 - 2^(-αq))^(-1/q)` for `q < 1` (`ENNReal.dyadicGeomConst`). -/
+noncomputable def hardyConst (α : ℝ) (q : ℝ≥0∞) : ℝ≥0∞ :=
+  if 1 ≤ q then (1 - (2 : ℝ≥0∞) ^ (-α))⁻¹ else dyadicGeomConst α q
+
+/-- The constant `hardyConst α q` is finite for `α > 0`. -/
+theorem hardyConst_ne_top {α : ℝ} (hα : 0 < α) (q : ℝ≥0∞) : hardyConst α q ≠ ∞ := by
+  unfold hardyConst
+  split_ifs
+  · exact one_sub_two_rpow_neg_inv_ne_top hα
+  · exact dyadicGeomConst_ne_top hα q
+
+/-- **Hardy's inequality for tails, every exponent**:
+`‖(2^(kα) ∑_{i ≥ 0} b (k + i))ₖ‖_q ≤ hardyConst α q · ‖(2^(kα) b k)ₖ‖_q` for every `q`, by
+`ENNReal.hardy_tail_le` for `q ≥ 1` and `ENNReal.hardy_tail_le_of_le_one` for `q < 1`. -/
+theorem hardy_tail_le' (α : ℝ) (b : ℕ → ℝ≥0∞) :
+    lqNorm q (fun k => dyadicWeight α k * ∑' i, b (k + i)) ≤
+      hardyConst α q * lqNorm q (fun k => dyadicWeight α k * b k) := by
+  unfold hardyConst
+  split_ifs with hq
+  · exact hardy_tail_le hq α b
+  · exact hardy_tail_le_of_le_one (not_le.1 hq).le α b
+
+/-- **Hardy's inequality for partial sums, every exponent**:
+`‖(2^(-kα) ∑_{j ≤ k} b j)ₖ‖_q ≤ hardyConst α q · ‖(2^(-kα) b k)ₖ‖_q` for every `q`, by
+`ENNReal.hardy_sum_le` for `q ≥ 1` and `ENNReal.hardy_sum_le_of_le_one` for `q < 1`. -/
+theorem hardy_sum_le' (α : ℝ) (b : ℕ → ℝ≥0∞) :
+    lqNorm q (fun k => dyadicWeight (-α) k * ∑ j ∈ range (k + 1), b j) ≤
+      hardyConst α q * lqNorm q (fun k => dyadicWeight (-α) k * b k) := by
+  unfold hardyConst
+  split_ifs with hq
+  · exact hardy_sum_le hq α b
+  · exact hardy_sum_le_of_le_one (not_le.1 hq).le α b
 
 /-! ### Almost diagonal sums -/
 

@@ -77,6 +77,14 @@ declarations.
   `ApproximationSpaces/Sequences/Lq.lean`; the counting-measure versions `ENNReal.lqNorm_iSup`
   and `ENNReal.lqNorm_tsum_le` are in `ApproximationSpaces/Sequences/Hardy.lean`. Mathlib has only
   the finite version `eLpNorm_sum_le`.
+* **Subadditivity of `‖·‖_p^p` for `0 < p ≤ 1`** (`ApproximationSpaces/Sequences/Lq.lean`): on
+  any measure space and for all functions with values in an `ESeminormedAddMonoid` with
+  continuous addition, at the generality of Mathlib's lemmas (a normed group, or `[0, ∞]`),
+  `‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` (`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`), from
+  Mathlib's `inhmgELpNorm_add_le` and `inhmgELpNorm_eq_eLpNorm_pow`. Mathlib states the power
+  form only for `inhmgELpNorm`; for `eLpNorm` it has the bounds with the constant
+  `2^(1/p - 1)`
+  (`eLpNorm'_add_le_of_le_one`, `eLpNorm_add_le'`).
 * **Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`** (`FunctionSpaces/Analysis/Lp/MixedNorms.lean`):
   Minkowski's integral inequality for `ℓ_u`-valued functions,
   `‖(∫ g_i)_i‖_{ℓ_u} ≤ ∫ ‖(g_i(x))_i‖_{ℓ_u}` for `1 ≤ u ≤ ∞` (`MeasureTheory.lqNorm_lintegral_le`);

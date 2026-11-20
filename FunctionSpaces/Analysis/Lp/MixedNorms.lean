@@ -165,17 +165,6 @@ theorem lqNorm_dyadicWeight_succ_le_sum {q : ℝ≥0∞} (hq : 1 ≤ q) {m : ℕ
         gcongr
         exact lqNorm_sum_le hq _ _
 
-section Countable
-
-variable {ι : Type*} [Countable ι] [MeasurableSpace ι] [MeasurableSingletonClass ι]
-
-/-- **Powers inside an `ℓ_u` norm**: `‖(a_i^r)_i‖_{ℓ_u} = ‖a‖_{ℓ_{u r}}^r` for `r > 0`. -/
-theorem lqNorm_fun_rpow (u : ℝ≥0∞) {r : ℝ} (hr : 0 < r) (a : ι → ℝ≥0∞) :
-    lqNorm u (fun i => a i ^ r) = lqNorm (u * ENNReal.ofReal r) a ^ r :=
-  MeasureTheory.eLpNorm_fun_rpow (measurable_of_countable a).aemeasurable hr u
-
-end Countable
-
 end ENNReal
 
 namespace MeasureTheory

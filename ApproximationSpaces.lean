@@ -29,6 +29,8 @@ public import ApproximationSpaces.Interpolation.Couple
 public import ApproximationSpaces.Interpolation.Property
 public import ApproximationSpaces.Interpolation.Reiteration
 public import ApproximationSpaces.Interpolation.ApproxSpaces
+public import ApproximationSpaces.Interpolation.EFunctional
+public import ApproximationSpaces.Interpolation.EFunctionalModuli
 public import ApproximationSpaces.Decompositions.Projection
 public import ApproximationSpaces.Decompositions.Blocks
 public import ApproximationSpaces.Decompositions.Synthesis
@@ -84,8 +86,8 @@ The files at the top level hold the schemes, the spaces `A^s_q` and the theorems
 subfolders hold the basic examples of schemes (`Instances`), the sequence spaces
 (`Sequences`), real interpolation (`Interpolation`) and decompositions (`Decompositions`). Names
 below are relative to the namespace `ApproximationScheme`, except those that start with `ENNReal`,
-`InterpCouple`, `HilbertBasis` or `lp`, and the decreasing rearrangement, which is in the root
-namespace.
+`MeasureTheory`, `InterpCouple`, `HilbertBasis` or `lp`, and the decreasing rearrangement, which is
+in the root namespace.
 
 ### The scheme and the error
 
@@ -131,7 +133,9 @@ namespace.
   counting measure, with its monotonicity in `q`, the quasi-triangle inequality for `q < 1`
   (`ENNReal.lqNorm_add_le'`), the Cauchy–Schwarz inequality, the dyadic weights
   `ENNReal.dyadicWeight`, powers of two and products in `[0, ∞]`, `L_q` norms of functions
-  bounded on pieces, and Parseval's identity for `ℓ²` in `ℝ≥0∞` (`lp.enorm_sq_eq_tsum`).
+  bounded on pieces, the subadditivity of `‖·‖_p^p` for `0 < p ≤ 1`
+  (`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`), and Parseval's identity for `ℓ²` in `ℝ≥0∞`
+  (`lp.enorm_sq_eq_tsum`).
 * `ApproximationSpaces.Sequences.Dyadic`: Cauchy condensation with power weights
   (`ENNReal.tsum_pow_mul_le_dyadic`) and for capped sequences (`ENNReal.tsum_min_le_dyadic`),
   three sums over dyadic scales, and the interpolation inequality for dyadic suprema
@@ -142,9 +146,10 @@ namespace.
   the block inequalities that compare `∑_i r_i^p` with `∑_l 2^l (r*_{2^l})^p`.
 * `ApproximationSpaces.Sequences.Hardy`: the countable Minkowski inequality, window sums
   (`ENNReal.lqNorm_sum_Icc_le`), the two discrete Hardy inequalities (`ENNReal.hardy_sum_le`,
-  `ENNReal.hardy_tail_le`) and their forms for `0 < q ≤ 1` (`ENNReal.hardy_tail_le_of_le_one`),
-  almost diagonal sums and their constant `ENNReal.almostDiagonalConst`, shifts on `ℓ_q(ℤ)` and
-  geometric convolutions.
+  `ENNReal.hardy_tail_le`), their forms for `0 < q ≤ 1` (`ENNReal.hardy_tail_le_of_le_one`) and
+  for every exponent (`ENNReal.hardy_sum_le'`), powers inside an `ℓ_q` norm
+  (`ENNReal.lqNorm_fun_rpow`, `ENNReal.lqNorm_div_fun_rpow`), almost diagonal sums and their
+  constant `ENNReal.almostDiagonalConst`, shifts on `ℓ_q(ℤ)` and geometric convolutions.
 
 ### Embeddings, transfer and lifting
 
@@ -185,6 +190,17 @@ namespace.
 * `ApproximationSpaces.Interpolation.ApproxSpaces`: approximation spaces as interpolation
   spaces, `A^s_q = (X, A^r_∞)_{s/r,q}` for every scheme (`memApprox_iff_memKMethod_reprCouple`),
   their reiteration (`memKMethod_approxCouple_iff`) and the sandwich principle.
+* `ApproximationSpaces.Interpolation.EFunctional`: the E-functional
+  `E(t, u) = inf {N₀(u - b) : N₁(b) ≤ t}` of a couple (`InterpCouple.eFunctional`), its
+  approximation spaces `E_{α,q}` (`InterpCouple.eMethodNorm`, `InterpCouple.MemEMethod`) and their
+  dyadic norm `InterpCouple.eNormDyadic` (Bergh–Löfström, Section 7.1), the complexity couple of a
+  sequence of sets and of increasing subgroups (`InterpCouple.ofMonotoneSubgroups`), and
+  `E_{s,q} = A^s_q` for the complexity couple of a scheme
+  (`memEMethod_complexityCouple_iff`).
+* `ApproximationSpaces.Interpolation.EFunctionalModuli`: moduli of smoothness compatible with a
+  couple whose first norm has a subadditive `ρ`-th power (`InterpCouple.ModulusData`), and the
+  coincidence of `E_{s,q}` with the classical space for `0 < s < θ`
+  (`InterpCouple.ModulusData.memEMethod_iff_modNorm_lt_top`), as for `L_p`, `0 < p < 1`.
 
 ### Decompositions (`Decompositions/`)
 
