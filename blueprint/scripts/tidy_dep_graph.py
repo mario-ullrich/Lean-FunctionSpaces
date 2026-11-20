@@ -83,6 +83,7 @@ BLOCKS: list[tuple[str, list]] = [
         "Filtrations and martingale differences",
         (INTERVALS, ["Haar coefficients",
                      r"Dyadic step functions for \texorpdfstring{$0 < p \leq 1$}{0 < p <= 1}",
+                     r"The Haar system for \texorpdfstring{$0 < p \leq 1$}{0 < p <= 1}",
                      "Local projections and multiscale details", "Multiwavelets"])]),
     ("Piecewise polynomials on intervals", [
         (INTERVALS, ["Differences and moduli", "Polynomials on intervals", "Steklov smoothing",

@@ -41,7 +41,9 @@ Hardy inequalities with `γ_{α,q} = (1 - 2^(-αq))^(-1/q)` (`hardy_tail_le_of_l
 a sum is at most the sum of the `q`-th powers, so each is the estimate for `ℓ_1` applied to the
 `q`-th powers. For every exponent `q` both Hardy inequalities hold with the constant
 `hardyConst α q`, which is `(1 - 2^(-α))⁻¹` for `q ≥ 1` and `γ_{α,q}` otherwise
-(`hardy_tail_le'`, `hardy_sum_le'`).
+(`hardy_tail_le'`, `hardy_sum_le'`). Through `ℓ_{q/ρ}` the tail inequality also bounds sequences
+whose `ρ`-th powers are below weighted tails of `ρ`-th powers,
+`x_k^ρ ≤ c ∑_{i ≥ 0} 2^(iβ) y_{k+i}^ρ` (`lqNorm_rpow_le_of_rpow_le_tsum`).
 
 The Minkowski inequalities and monotone convergence hold for families on every countable index
 set, and so does the rule for powers inside the norm, `‖(a_i^r)_i‖_{ℓ_{q/r}} = ‖a‖_{ℓ_q}^r` for
@@ -375,6 +377,46 @@ theorem hardy_sum_le' (α : ℝ) (b : ℕ → ℝ≥0∞) :
   split_ifs with hq
   · exact hardy_sum_le hq α b
   · exact hardy_sum_le_of_le_one (not_le.1 hq).le α b
+
+/-- **A tail inequality in `ℓ_q`, in `ρ`-th powers**: let `ρ > 0`, `β ∈ ℝ` and `c ∈ [0, ∞]`. If
+`x_k^ρ ≤ c ∑_{i ≥ 0} 2^(iβ) y_{k+i}^ρ` for every `k`, then
+`‖(2^(ks) x_k)_k‖_{ℓ_q}^ρ ≤ c H ‖(2^(ks) y_k)_k‖_{ℓ_q}^ρ` with the constant
+`H = hardyConst (sρ - β) (q/ρ)` of Hardy's inequality for tails (`ENNReal.hardy_tail_le'`), which
+is finite for `sρ > β`. The `ρ`-th powers pass through `ℓ_{q/ρ}` (`ENNReal.lqNorm_div_fun_rpow`). -/
+theorem lqNorm_rpow_le_of_rpow_le_tsum {x y : ℕ → ℝ≥0∞} {ρ β : ℝ} {c : ℝ≥0∞} (hρ : 0 < ρ)
+    (h : ∀ k, x k ^ ρ ≤ c * ∑' i, dyadicWeight β i * y (k + i) ^ ρ) (s : ℝ) (q : ℝ≥0∞) :
+    lqNorm q (fun k => dyadicWeight s k * x k) ^ ρ ≤
+      c * hardyConst (s * ρ - β) (q / ENNReal.ofReal ρ) *
+        lqNorm q (fun k => dyadicWeight s k * y k) ^ ρ := by
+  set α := s * ρ - β
+  set r := q / ENNReal.ofReal ρ
+  set b : ℕ → ℝ≥0∞ := fun j => dyadicWeight β j * y j ^ ρ
+  have hw : ∀ k, dyadicWeight (s * ρ) k = dyadicWeight α k * dyadicWeight β k := fun k => by
+    rw [← dyadicWeight_add]
+    congr 1
+    ring
+  have hpt : ∀ k, (dyadicWeight s k * x k) ^ ρ ≤ c * (dyadicWeight α k * ∑' i, b (k + i)) :=
+    fun k => by
+      rw [mul_rpow_of_nonneg _ _ hρ.le, dyadicWeight_rpow]
+      calc dyadicWeight (s * ρ) k * x k ^ ρ
+          ≤ dyadicWeight (s * ρ) k * (c * ∑' i, dyadicWeight β i * y (k + i) ^ ρ) := by
+            gcongr
+            exact h k
+        _ = c * (dyadicWeight α k * ∑' i, b (k + i)) := by
+            simp only [b, ← ENNReal.tsum_mul_left, hw, dyadicWeight_add_nat]
+            exact tsum_congr fun i => by ring
+  rw [← lqNorm_div_fun_rpow hρ, ← lqNorm_div_fun_rpow hρ]
+  calc lqNorm r (fun k => (dyadicWeight s k * x k) ^ ρ)
+      ≤ lqNorm r (fun k => c * (dyadicWeight α k * ∑' i, b (k + i))) := lqNorm_mono hpt
+    _ = c * lqNorm r (fun k => dyadicWeight α k * ∑' i, b (k + i)) := lqNorm_const_mul _ _
+    _ ≤ c * (hardyConst α r * lqNorm r (fun k => dyadicWeight α k * b k)) := by
+        gcongr
+        exact hardy_tail_le' α b
+    _ = c * hardyConst α r * lqNorm r (fun k => (dyadicWeight s k * y k) ^ ρ) := by
+        rw [mul_assoc]
+        congr 3
+        funext k
+        rw [mul_rpow_of_nonneg _ _ hρ.le, dyadicWeight_rpow, hw, mul_assoc]
 
 /-! ### Almost diagonal sums -/
 

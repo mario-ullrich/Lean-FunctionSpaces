@@ -142,7 +142,8 @@ spaces it is.
 | `B^s_{p,q}(ℝ^d)` | [band-limited functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-rd-besov-differences.html#thm:rd-besov) (`s > 0`) |
 | `B^s_{p,q}(𝕋^d)` | [trigonometric polynomials](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-torus-lp-moduli.html#thm:torus-lp-moduli) (`s > 0`) |
 | `B^s_{p,q}[0, 1]` | [dyadic splines of order `r`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-spline-jackson-coincidence.html#thm:spline-besov) (`0 < s < r - 1 + 1/p`), [dyadic piecewise polynomials](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-multiwavelets.html#thm:multiwavelet-besov) (`0 < s < 1/p`) |
-| `B^θ_{τ,τ}[0, 1]`, `θ = 1/τ - 1/2` | [`n`-term combinations of Haar functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-haar-coefficients.html#cor:haar-nterm-besov), a nonlinear scheme in `L_2[0, 1]` (`1 ≤ τ < 2`) |
+| `B^s_{p,q,1}[0, 1]`, `0 < p < 1`, by the first modulus | [dyadic step functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-steps-below-one.html#thm:steps-besov-below-one) (`0 < s < 1/p`) |
+| `B^θ_{τ,τ}[0, 1]`, `θ = 1/τ - 1/2` | [`n`-term combinations of Haar functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-haar-below-one.html#thm:haar-nterm-besov-all), a nonlinear scheme in `L_2[0, 1]` (`2/3 < τ < 2`; for `0 < τ ≤ 2/3` the space of the first modulus) |
 | `B^s_{p,q}([0, 1]^d)` | [tensor splines of order `r`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-iso-modulus.html#thm:iso-besov) (`0 < s < r - 1 + 1/p`) |
 | `F^s_{p,p}(ℝ^d)`, `F^s_{p,p}(𝕋^d)` | band-limited functions and trigonometric polynomials, since [`F^s_{p,p}(ℝ^d) = B^s_{p,p}(ℝ^d)`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-tl-besov-sandwich.html#thm:tl-besov-sandwich) and [`F^s_{p,p}(𝕋^d) = B^s_{p,p}(𝕋^d)`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-torus-triebel-lizorkin.html#thm:torus-tl-besov-sandwich) (`s > 0`) |
 | `W^{s,p}(ℝ^d)`, Sobolev–Slobodeckij | [band-limited functions, `q = p`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-sobolev-slobodeckij.html#thm:sobolev-slobodeckij-besov) (`0 < s < 1`) |
@@ -157,7 +158,8 @@ spaces it is.
 For a general scheme the project describes `A^s_q`
 
 * by a [modulus of smoothness](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-moduli-abstract.html#thm:modulus-coincidence), under Jackson's and an inverse
-  inequality of order `θ` (`0 ≤ s < θ`);
+  inequality of order `θ` (`0 ≤ s < θ`), also in quasi-normed groups, through the E-functional
+  (`InterpCouple.ModulusData.eNormDyadic_lt_top_iff`);
 * by [block decompositions](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-decompositions.html#thm:block-decomposition), in a Banach space (`s > 0`);
 * by [dyadic blocks of coefficients](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-spectral.html#thm:spectral-coefficients), for a Hilbert basis with
   levels (`s > 0`);
@@ -249,6 +251,23 @@ For a general scheme the project describes `A^s_q`
   `|∫_0^1 f|^τ + ∑_k ∑_{i<2^k} |⟨f, h_{k,i}⟩|^τ < ∞` (`Haar.memApprox_nTerm_iff_haarCoeff`); for
   `1 ≤ τ < 2`, `f ∈ A^θ_τ` iff `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞`, that is,
   iff `f ∈ B^θ_{τ,τ}[0, 1]` (DeVore–Jawerth–Popov; `Haar.memApprox_nTerm_iff_modulus`).
+* **Besov spaces for `0 < p < 1` on `[0, 1]`.** Let `0 < p ≤ 1` and `0 < q ≤ ∞`, and let
+  `E_k(f)` be the error of best approximation of `f ∈ L_p[0, 1]` by step functions on the dyadic
+  intervals of length `2^(-k)`. For `0 ≤ s < 1/p`, `‖f‖_p + ‖(2^(ks) E_k(f))_k‖_{ℓ_q} < ∞` iff
+  `‖f‖_p + ‖(2^(ks) ω_1(f, 2^(-k), [0, 1])_p)_k‖_{ℓ_q} < ∞`, that is, iff `f ∈ B^s_{p,q,1}[0, 1]`
+  (`Haar.eNormDyadic_stepCouple_lt_top_iff_modulus`). For `1/p - 1 < s < 1/p`,
+  `f ∈ B^s_{p,q,1}[0, 1]` iff `f ∈ L_1[0, 1]` and
+  `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
+  (`Haar.lqNorm_modulus_lt_top_iff_haarCoeff_of_le_one`), and for `q < ∞` the partial sums of the
+  Haar expansion of `f` converge to `f` in the quasi-norm `‖g‖_p + ‖(2^(ks) E_k(g))_k‖_{ℓ_q}`, and
+  the coefficients of a convergent Haar expansion are unique
+  (`Haar.tendsto_eNormDyadic_sub_haarPartialSum`, `Haar.eq_haarSystemCoeff_of_tendsto`). For
+  `0 < τ < 2` and `θ = 1/τ - 1/2`, `f ∈ L_2[0, 1]` lies in the approximation space `A^θ_τ` of
+  `n`-term approximation from the Haar basis iff
+  `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞`
+  (`Haar.memApprox_nTerm_iff_modulus_of_lt_two`). For `s < 1`, and for `τ > 2/3`, these are the
+  Besov spaces of DeVore–Popov; for `1/p - 1 < s < 1` and `q < ∞` also the Fourier-analytic
+  `B^s_{p,q}[0, 1]` (Oswald).
 
 ## Organisation
 
@@ -285,7 +304,8 @@ block documents state every result with its Lean name and list the files:
 
 * Interpolation: Lorentz spaces, real Riesz–Thorin, off-diagonal Marcinkiewicz, J- and complex
   method.
-* The quasi-Banach range `0 < p, q < 1`.
+* The quasi-Banach range on the torus and on `ℝ^d`, splines of order `r ≥ 2` for `p < 1`, and
+  Triebel–Lizorkin spaces with `p < 1`.
 * Triebel–Lizorkin spaces with `p = 1` or `q = 1`, and ball means and atoms on the torus.
 * Sobolev spaces: Jawerth–Franke with Besov targets, Hardy–Littlewood–Sobolev, Trudinger, Mihlin
   multipliers with finitely many derivatives (Riesz transforms).

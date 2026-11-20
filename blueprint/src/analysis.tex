@@ -902,7 +902,8 @@ Pointwise $2^{js} |h_j(x)| \leq \|(2^{is} |h_i(x)|)_i\|_{\ell_q}$ (\Cref{lem:lq-
 \begin{lemma}[Tails in $L_p(\ell_q)$]
 \label{lem:mixed-norm-tails}
 \lean{MeasureTheory.aemeasurable_lqNorm_ite, MeasureTheory.eLpNorm_lqNorm_ite_le,
-  ENNReal.tendsto_lqNorm_ite_le, MeasureTheory.tendsto_lintegral_lqNorm_ite_le_rpow,
+  ENNReal.tendsto_lqNorm_ite_le, ENNReal.tendsto_zero_of_lqNorm_ne_top,
+  MeasureTheory.tendsto_lintegral_lqNorm_ite_le_rpow,
   MeasureTheory.tendsto_eLpNorm_lqNorm_ite_le}
 \leanok
 \uses{lem:lq-basic, lem:lp-norm-nonnegative}
@@ -916,10 +917,11 @@ $x \mapsto \|(\mathbf 1_P(j) \, g_j(x))_j\|_{\ell_q}$ is measurable and
 Let $0 < p < \infty$ and $0 < q < \infty$. For every sequence $a$ in $[0, \infty]$ with
 $\|a\|_{\ell_q} < \infty$,
 \[
-  \|(0, \dots, 0, a_N, a_{N+1}, \dots)\|_{\ell_q} \to 0 \qquad (N \to \infty) .
+  \|(0, \dots, 0, a_N, a_{N+1}, \dots)\|_{\ell_q} \to 0 \qquad (N \to \infty) ,
 \]
-For every measure space $(X, \mu)$ and all measurable $g_j \colon X \to [0, \infty]$,
-$j \in \N$, with $\bigl\| x \mapsto \|(g_j(x))_j\|_{\ell_q} \bigr\|_p < \infty$, the tails
+and hence $a_N \to 0$. For every measure space $(X, \mu)$ and all measurable
+$g_j \colon X \to [0, \infty]$, $j \in \N$, with
+$\bigl\| x \mapsto \|(g_j(x))_j\|_{\ell_q} \bigr\|_p < \infty$, the tails
 \[
   G_N(x) = \|(0, \dots, 0, g_N(x), g_{N+1}(x), \dots)\|_{\ell_q}
 \]
@@ -934,7 +936,8 @@ satisfy
 Setting terms to zero decreases the $\ell_q$ norm at every point (\Cref{lem:lq-basic}) and hence
 the $L_p$ norm. The $q$-th power of the norm of the tail is $\sum_{k \geq N} a_k^q$
 (\Cref{lem:lq-basic}), the
-tail of a convergent series. The functions $G_N^p$ are at most
+tail of a convergent series, and $a_N$ is at most the norm of the tail from $N$ on. The
+functions $G_N^p$ are at most
 $\|(g_j(x))_j\|_{\ell_q}^p$, which is integrable and hence finite almost everywhere; where it is
 finite, $G_N^p \to 0$ by the first part. Dominated convergence gives $\int G_N^p \to 0$, and
 $\|G_N\|_p = (\int G_N^p)^{1/p}$ (\Cref{lem:lp-norm-nonnegative}).

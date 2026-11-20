@@ -201,9 +201,13 @@ Descriptions & Range & Result \\
   & \Cref{thm:multiwavelet-besov} \\
 \raggedright Step functions and Haar coefficients & $s > 0$ & \Cref{thm:haar} \\
 \raggedright Haar coefficients and differences of order $1$ & $0 < s < 1/p$ & \Cref{cor:haar-besov} \\
+\raggedright Step functions in $L_p$, $0 < p \leq 1$, Haar coefficients and differences of order $1$
+  & $s > 1/p - 1$\newline (differences: $s < 1/p$) & \Cref{thm:haar-below-one}\newline
+  \Cref{cor:haar-besov-below-one} \\
 \raggedright $n$-term Haar approximation in $L_2$ and differences of order $1$ in $L_\tau$,
   $p = q = \tau$
-  & $s = 1/\tau - 1/2$,\newline $1 \leq \tau < 2$ & \Cref{cor:haar-nterm-besov} \\
+  & $s = 1/\tau - 1/2$,\newline $0 < \tau < 2$ & \Cref{cor:haar-nterm-besov}\newline
+  \Cref{thm:haar-nterm-besov-all} \\
 \hline
 \end{tabular}
 \end{center}
@@ -1755,8 +1759,8 @@ filtration scheme.
 
 \begin{lemma}[Dyadic conditional expectations]
 \label{lem:dyadic-condexp}
-\lean{Haar.condExp_dyadic_ae_eq, Haar.condExpLp_dyadic_ae_eq, Haar.condExpLp_zero_ae_eq,
-  Haar.enorm_condExpLp_zero}
+\lean{Haar.condExp_dyadic_ae_eq, Haar.condExpLp_dyadic_ae_eq, Haar.condExp_zero_ae_eq,
+  Haar.condExpLp_zero_ae_eq, Haar.enorm_condExpLp_zero}
 \leanok
 \uses{lem:condexp-partition, def:dyadic-filtration}
 For $f \in L_1[0, 1]$, $j \in \N$ and almost every $x \in [0, 1]$,
@@ -1810,10 +1814,11 @@ and functions that agree almost everywhere on $[0, 1]$ have the same Haar coeffi
 
 \begin{lemma}[Martingale differences are Haar sums]
 \label{lem:haar-martingale}
-\lean{Haar.sum_fin_eq_of_ne, Haar.setIntegral_dyadicInterval, Haar.condExpLp_succ_sub_ae_eq}
+\lean{Haar.sum_fin_eq_of_ne, Haar.setIntegral_dyadicInterval, Haar.condExp_succ_sub_ae_eq,
+  Haar.condExpLp_succ_sub_ae_eq}
 \leanok
 \uses{lem:dyadic-condexp, def:haar, lem:dyadic-normalising-factor}
-For $f \in L_p[0, 1]$ and $k \in \N$,
+For $f \in L_1[0, 1]$ and $k \in \N$,
 \[
   E[f \mid \mathcal{F}_{k+1}] - E[f \mid \mathcal{F}_k]
   = \sum_{m=0}^{2^k - 1} \langle f, h_{k,m} \rangle \, h_{k,m}
@@ -1835,7 +1840,7 @@ $\langle f, h_{k,m} \rangle = 2^{k/2} (a - b)$.
 \lean{Haar.eLpNorm_sum_haar}
 \leanok
 \uses{def:haar}
-Let $1 \leq p < \infty$, $j \in \N$ and $c_0, \dots, c_{2^j - 1} \in \C$. Then
+Let $0 < p < \infty$, $j \in \N$ and $c_0, \dots, c_{2^j - 1} \in \C$. Then
 \[
   \Bigl\| \sum_{m=0}^{2^j - 1} c_m h_{j,m} \Bigr\|_p = 2^{j(1/2 - 1/p)} \|c\|_{\ell_p} .
 \]
@@ -2344,7 +2349,7 @@ $A_n = V_{\lfloor \log_2 n \rfloor}$ for $n \geq 1$.
   Interval.lintegral_Icc_le_sum, Interval.sum_le_lintegral_Icc,
   Interval.lintegral_Icc_eq_dyadicIco, Interval.zero_add_two_pow_mul_eq_one,
   Interval.lintegral_Icc_le_sum_dyadicIco, Interval.sum_lintegral_dyadicIco_le,
-  MeasureTheory.eLpNorm_le_of_lintegral_le}
+  Interval.lintegral_unit_eq_sum_dyadicIco, MeasureTheory.eLpNorm_le_of_lintegral_le}
 \leanok
 \uses{def:pp-scheme}
 For $x \in I_{k,n}$, $\lfloor 2^k x \rfloor = n$. A piecewise polynomial of level $k$ vanishes
@@ -2626,7 +2631,7 @@ between the ends of the interval costs nothing.
 
 \begin{corollary}[Besov spaces through Haar coefficients]
 \label{cor:haar-besov}
-\lean{Haar.polyFun_of_mem_degreeLT_one, Haar.dyadicIndex_eq_floor,
+\lean{Haar.polyFun_of_mem_degreeLT_one, Haar.dyadicIndex_eq_floor, Haar.dyadicIndex_intCast_div,
   Haar.dyadicIndex_natCast_div, Haar.ppFun_ae_eq_stepFun, Haar.ae_eq_ppFun_of_stronglyMeasurable,
   Haar.mem_scheme_of_mem_ppScheme, Haar.mem_ppScheme_of_mem_scheme, Haar.scheme_eq_ppScheme,
   Haar.memApprox_ppScheme_one_iff,
@@ -2685,7 +2690,8 @@ which applies since $0 < \theta < 1/\tau$.
 The second condition says $f \in \Besov{\theta}{\tau}{\tau}[0, 1]$: best $n$-term approximation
 in $L_2$ at the rate $n^{-\theta}$, measured in $\ell_\tau$ with $1/\tau = \theta + 1/2$,
 describes this Besov space. For $\tau < 1$ the Besov space lies in the quasi-Banach space
-$L_\tau$, outside the range of \Cref{cor:haar-besov}.
+$L_\tau$, outside the range of \Cref{cor:haar-besov}; that case is
+\Cref{thm:haar-nterm-besov-all}.
 
 \section{Dyadic step functions for \texorpdfstring{$0 < p \leq 1$}{0 < p <= 1}}
 \label{sec:steps-below-one}
@@ -2775,7 +2781,7 @@ translate has norm at most $\|f\|_{L_p[a, b]}$.
   Haar.eFunctional_stepCouple_le}
 \leanok
 \uses{def:step-couple, lem:step-couple, def:interval-modulus, lem:rd-modulus-on, def:pp-scheme,
-  lem:pp-bookkeeping, lem:multiwavelet-norms, lem:haar-density, cor:haar-besov, thm:pp-jackson}
+  lem:pp-bookkeeping, lem:haar-density, cor:haar-besov, thm:pp-jackson}
 Let $0 < p < \infty$, let $f : \R \to \C$ be measurable and $j \in \N$. There are $c_n \in \C$
 such that the step function $u = \sum_{n < 2^j} c_n \mathbf{1}_{I_{j,n}}$ satisfies
 \[
@@ -2808,7 +2814,7 @@ $0 < p < \infty$ with the constant $2^{1/p}$.
 \lean{Interval.enorm_higherDiff_one_rpow_le_stripBound, Interval.lintegral_rpow_eq_of_step,
   Interval.eLpNorm_higherDiff_one_le_of_step, Haar.lpModulus_le_of_mem_lpMeas}
 \leanok
-\uses{def:step-couple, def:pp-scheme, lem:pp-bookkeeping, lem:pp-local, lem:multiwavelet-norms,
+\uses{def:step-couple, def:pp-scheme, lem:pp-bookkeeping, lem:pp-local,
   lem:modulus-below-one, cor:haar-besov, thm:pp-jackson, thm:pp-inverse}
 Let $0 < p \leq 1$ and $j \in \N$, let $u : \R \to \C$ take the value $v_n$ on $I_{j,n}$ for
 every $n \in \N$, with $v_{2^j} = 0$, and let $0 \leq h \leq 2^{-j}$. For $x \geq 0$ in
@@ -2884,7 +2890,7 @@ modulus and lies outside it (\Cref{lem:steps-line}).
   Interval.le_lintegral_dyadicIco_enorm_sub_rpow, Haar.le_eFunctional_stepCouple_idLp,
   Haar.not_memEMethod_stepCouple_idLp}
 \leanok
-\uses{lem:interval-modulus, lem:interval-nikolskii, def:pp-scheme, lem:multiwavelet-norms,
+\uses{lem:interval-modulus, lem:interval-nikolskii, def:pp-scheme, lem:pp-bookkeeping,
   cor:haar-besov, thm:pp-jackson, def:step-couple, lem:step-couple, lem:complexity-couple,
   lem:e-method-dyadic, def:lq-norm, lem:lq-basic, lem:dyadic-interpolation,
   lem:daub-dyadic-scales}
@@ -2910,6 +2916,429 @@ On $\R^d$, identifying the approximation spaces of entire functions of exponenti
 spaces for $0 < p < 1$ rests on Jackson's inequality in $L_p$, $p < 1$
 \cite{StorozhenkoOswald1978, KolomoitsevTikhonov2020}; that identification lies outside this
 project.
+
+\section{The Haar system for \texorpdfstring{$0 < p \leq 1$}{0 < p <= 1}}
+\label{sec:haar-below-one}
+
+For $s > 1/p - 1$ the approximation spaces of the step couple in $L_p[0, 1]$, $0 < p \leq 1$, lie
+in $L_1[0, 1]$, so Haar coefficients are defined on them, and they describe these spaces. For
+$1/p - 1 < s < 1/p$ this describes $B^s_{p,q,1}[0, 1]$ by Haar coefficients and gives the
+Schauder basis property of the Haar system there, which is due to Oswald~\cite{Oswald1981} (see
+\cite[\S1 and Theorem~1]{Oswald2018}). Throughout, $0 < p \leq 1$, and $E(t, f)$ is the
+$E$-functional of the step couple (\Cref{def:step-couple}).
+
+\begin{lemma}[Fatou's lemma for telescoping sums]
+\label{lem:telescoping-fatou}
+\lean{MeasureTheory.TendstoInMeasure.sub_right, MeasureTheory.eLpNorm_sub_rpow_le_sum,
+  MeasureTheory.eLpNorm_sub_rpow_le_tsum}
+\leanok
+\uses{lem:lp-rho-triangle}
+Let $\mu$ be a measure, $0 < r \leq 1$, and let $u_0, u_1, \dots$ and $g$ be strongly measurable
+functions with values in a normed group such that $u_n \to g$ in measure. Then for every $k \in \N$
+\[
+  \|g - u_k\|_{L_r(\mu)}^r \leq \sum_{i=0}^\infty \|u_{k+i+1} - u_{k+i}\|_{L_r(\mu)}^r .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+By \Cref{lem:lp-rho-triangle}, $\|u_{k+n} - u_k\|_r^r \leq \sum_{i<n} \|u_{k+i+1} - u_{k+i}\|_r^r$
+for every $n$. The functions $u_{k+n} - u_k$ converge in measure to $g - u_k$, and a bound of the
+$L_r$ quasi-norms passes to the limit (Mathlib's
+\texttt{eLpNorm\_\allowbreak le\_\allowbreak of\_\allowbreak tendstoInMeasure}, Fatou's lemma
+along an almost everywhere convergent subsequence).
+\end{proof}
+
+For $r = 1$ this is the triangle inequality for a series in $L_1(\mu)$.
+
+\begin{lemma}[Weighted tails]
+\label{lem:weighted-tails}
+\lean{ENNReal.le_dyadicWeight_neg_mul_lqNorm, ENNReal.tendsto_zero_of_lqNorm_dyadicWeight_ne_top,
+  ENNReal.lqNorm_rpow_le_of_rpow_le_tsum, ENNReal.le_two_rpow_mul_of_rpow_le}
+\leanok
+\uses{def:lq-norm, lem:lq-basic, lem:hardy-every-exponent, lem:lp-rho-triangle}
+Let $q \in (0, \infty]$, $s \in \R$ and let $e$, $x$, $y$ be sequences in $[0, \infty]$.
+\begin{enumerate}
+  \item $e_j \leq 2^{-js} \|(2^{ks} e_k)_k\|_{\ell_q}$ for every $j$; if $s > 0$ and the norm is
+    finite, then $e_j \to 0$.
+  \item Let $\rho > 0$, $\beta \in \R$ and $c \in [0, \infty]$. If
+    $x_k^\rho \leq c \sum_{i \geq 0} 2^{i\beta} y_{k+i}^\rho$ for every $k$, then
+    \[
+      \|(2^{ks} x_k)_k\|_{\ell_q}^\rho \leq c \, H_{s\rho - \beta, q/\rho} \,
+      \|(2^{ks} y_k)_k\|_{\ell_q}^\rho ,
+    \]
+    with $H$ as in \Cref{lem:hardy-every-exponent}.
+  \item For $0 < p < \infty$ and $a, b \in [0, \infty]$, $a^p \leq 2 b^p$ implies
+    $a \leq 2^{1/p} b$.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+\leanok
+(1) $2^{js} e_j$ is one term of the sequence. (2) Multiply by $2^{ks\rho}$: with
+$\alpha = s\rho - \beta$ and $b_j = 2^{j\beta} y_j^\rho$ the right side is
+$c \, 2^{k\alpha} \sum_{i \geq 0} b_{k+i}$, and \Cref{lem:hardy-every-exponent} in
+$\ell_{q/\rho}$ applies, since $\|(z_k^\rho)_k\|_{\ell_{q/\rho}} = \|z\|_{\ell_q}^\rho$
+(\Cref{lem:lp-rho-triangle}).
+\end{proof}
+
+\begin{lemma}[Steps in $L_1$]
+\label{lem:steps-into-l1}
+\lean{Haar.eq_of_dyadicIndex_eq, Haar.memLp_of_stronglyMeasurable_dyadicFiltration,
+  Haar.memLp_of_mem_lpMeas, Haar.mem_lpMeas_of_le, Haar.sum_setLIntegral_dyadicInterval,
+  Haar.setLIntegral_enorm_le_of_dyadicIndex, Haar.eLpNorm_one_le_of_mem_lpMeas}
+\leanok
+\uses{def:dyadic-filtration, lem:condexp-partition, cor:haar-besov, def:pp-scheme,
+  lem:pp-bookkeeping, def:step-couple}
+Let $j \in \N$ and let $G$ be constant on every $I_{j,n}$, $n \in \Z$. Let $S$ be a measurable
+union of such intervals. Then
+\[
+  \int_{S \cap [0, 1]} |G| \leq 2^{j(1/p - 1)} \Bigl( \int_{S \cap [0, 1]} |G|^p \Bigr)^{1/p} .
+\]
+Every $\mathcal{F}_j$-measurable $a \in L_p[0, 1]$ lies in $L_r[0, 1]$ for every $r$, and
+$\|a\|_1 \leq 2^{j(1/p - 1)} \|a\|_p$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+For $x \in S \cap [0, 1)$ the interval $I$ of level $j$ containing $x$ lies in $S$, so
+$|G(x)|^p 2^{-j} = \int_I |G|^p \leq J$ with $J = \int_{S \cap [0, 1]} |G|^p$. Hence
+$|G| = |G|^p |G|^{1-p} \leq |G|^p (2^j J)^{(1-p)/p}$ on $S \cap [0, 1)$; integrate. An
+$\mathcal{F}_j$-measurable function is constant on every $I_{j,n}$
+(\Cref{lem:condexp-partition}), and on $[0, 1]$ it is a step function with $2^j$ values
+(\Cref{cor:haar-besov}).
+\end{proof}
+
+With the values $c_n$ of $a$ on the intervals of level $j$, the last inequality reads
+$2^{-j} \sum_n |c_n| \leq 2^{-j} (\sum_n |c_n|^p)^{1/p}$.
+
+\begin{definition}[Level norms of the Haar expansion]
+\label{def:haar-level-norm}
+\lean{Haar.haarLevelNorm, Haar.haarLevelNorm_congr_ae, Haar.haarLevelNorm_rpow,
+  Haar.haarLevelNorm_eq_eLpNorm}
+\leanok
+\uses{def:haar, lem:haar-martingale, lem:haar-level}
+For $f : \R \to \C$ and $k \in \N$ let
+\[
+  H_k(f) = 2^{k(1/2 - 1/p)} \bigl\| (\langle f, h_{k,m} \rangle)_{0 \leq m < 2^k}
+  \bigr\|_{\ell_p} .
+\]
+It depends only on the class of $f$ in $L_1[0, 1]$, and for integrable $f$,
+$H_k(f) = \|E[f \mid \mathcal{F}_{k+1}] - E[f \mid \mathcal{F}_k]\|_p$.
+\end{definition}
+
+The equality is \Cref{lem:haar-martingale} and \Cref{lem:haar-level}.
+
+\begin{lemma}[Properties of the level norms]
+\label{lem:haar-level-norm}
+\lean{Haar.integrable_haarFunction_mul, Haar.haarCoeff_add, Haar.haarCoeff_sub,
+  Haar.enorm_haarCoeff_le, Haar.haarCoeff_eq_zero_of_dyadicIndex,
+  Haar.haarCoeff_eq_zero_of_mem_lpMeas, Haar.haarLevelNorm_le_lintegral,
+  Haar.haarLevelNorm_add_rpow_le, Haar.haarLevelNorm_le_of_mem_lpMeas,
+  Haar.haarLevelNorm_eq_zero_of_mem_lpMeas}
+\leanok
+\uses{def:haar-level-norm, def:haar, prop:haar-basis, lem:steps-into-l1, def:lq-norm,
+  lem:lq-basic}
+Let $k \in \N$. For every $f$ and $m$,
+$|\langle f, h_{k,m} \rangle| \leq 2^{k/2} \int_{I_{k,m}} |f|$, so
+$H_k(f) \leq 2^k \int_0^1 |f|$. For integrable $f$ and $g$,
+$H_k(f + g)^p \leq H_k(f)^p + H_k(g)^p$. For $j \in \N$ and an $\mathcal{F}_j$-measurable
+$a \in L_p[0, 1]$, $H_k(a) = 0$ if $j \leq k$, and
+\[
+  H_k(a) \leq 2^{(j - k)(1/p - 1)} \|a\|_p \qquad \text{if } k \leq j .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+The Haar function $h_{k,m}$ vanishes outside $I_{k,m}$ and has modulus $2^{k/2}$ on it. The
+coefficients are linear on integrable functions, and $|\alpha + \beta|^p \leq |\alpha|^p +
+|\beta|^p$. A function constant on $I_{k,m}$ has $\langle f, h_{k,m} \rangle = 0$, since
+$h_{k,m}$ has mean zero (\Cref{prop:haar-basis}). For $k \leq j$, \Cref{lem:steps-into-l1} on
+$I_{k,m}$ gives $(\int_{I_{k,m}} |a|)^p \leq 2^{j(1-p)} \int_{I_{k,m}} |a|^p$; summing over $m$,
+\[
+  H_k(a)^p \leq 2^{k(p/2 - 1)} \, 2^{kp/2} \, 2^{j(1-p)} \int_0^1 |a|^p
+  = 2^{(j - k)(1 - p)} \|a\|_p^p .
+\]
+\end{proof}
+
+\begin{lemma}[Near-best steps]
+\label{lem:near-best-steps}
+\lean{Haar.enorm_sub_rpow_le_of_nearBest, Haar.eLpNorm_one_sub_le_of_nearBest,
+  Haar.tendstoInMeasure_of_nearBest, Haar.eLpNorm_one_sub_le_tsum_of_nearBest,
+  Haar.eLpNorm_one_le_of_nearBest, Haar.integrable_of_nearBest,
+  Haar.haarLevelNorm_rpow_le_tsum_of_nearBest, Haar.exists_nearBest_stepCouple,
+  Haar.antitone_eFunctional_stepCouple_add}
+\leanok
+\uses{lem:steps-into-l1, lem:haar-level-norm, lem:telescoping-fatou, lem:weighted-tails,
+  lem:lp-rho-triangle, lem:step-couple, lem:e-functional}
+Let $f \in L_p[0, 1]$ and $s \geq -1$. There are $\mathcal{F}_j$-measurable $b_j \in L_p[0, 1]$
+with $\|f - b_j\|_p \leq e_j = E(2^j, f) + \|f\|_p 2^{-j(s+1)}$, and $e$ decreases. Let
+$b_j$ be $\mathcal{F}_j$-measurable with $\|f - b_j\|_p \leq e_j$ for a decreasing sequence $e$
+with $e_j \to 0$. Then $\|b_{j+1} - b_j\|_p^p \leq 2 e_j^p$, $b_j \to f$ in measure, and for every
+$k$
+\[
+  \|f - b_k\|_1 \leq \sum_{i=0}^\infty 2^{(k+i+1)(1/p - 1)} 2^{1/p} e_{k+i} .
+\]
+If moreover $\|f\|_p \leq e_0$, then
+$\|f\|_1 \leq 2^{1/p} e_0 + \sum_{i \geq 0} 2^{(i+1)(1/p - 1)} 2^{1/p} e_i$. If this series
+converges, then $f$ is integrable and for every $k$
+\[
+  H_k(f)^p \leq \sum_{i=0}^\infty \bigl(2^{(i+1)(1/p - 1)} 2^{1/p} e_{k+i}\bigr)^p .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+Near-best elements exist by \Cref{lem:e-functional}; for $\|f\|_p = 0$ take $b_j = 0$. The
+difference $b_{j+1} - b_j = (f - b_j) - (f - b_{j+1})$ is $\mathcal{F}_{j+1}$-measurable, so
+\Cref{lem:steps-into-l1} bounds its $L_1$ norm, and \Cref{lem:telescoping-fatou} with $r = 1$
+gives the bound of $\|f - b_k\|_1$; at $k = 0$ it shows $f - b_0 \in L_1$, so $f$ is integrable
+when the series converges. For the level norms, telescope
+$b_{k+n} = b_k + \sum_{i<n} (b_{k+i+1} - b_{k+i})$ with $H_k(b_k) = 0$ and
+\Cref{lem:haar-level-norm} for each block, which is $\mathcal{F}_{k+i+1}$-measurable; then
+$H_k(f)^p \leq H_k(f - b_{k+n})^p + H_k(b_{k+n})^p$, and
+$H_k(f - b_{k+n}) \leq 2^k \|f - b_{k+n}\|_1 \to 0$ as $n \to \infty$.
+\end{proof}
+
+\begin{theorem}[The approximation spaces of steps embed into $L_1$]
+\label{thm:besov-into-l1}
+\lean{Haar.tsum_dyadicWeight_succ_mul_le_lqNorm, Haar.stepCoupleEmbedConst,
+  Haar.stepCoupleEmbedConst_ne_top,
+  Haar.pos_of_one_div_sub_one_lt, Haar.eLpNorm_one_le_eNormDyadic,
+  Haar.integrable_of_eNormDyadic_lt_top}
+\leanok
+\uses{lem:near-best-steps, lem:weighted-tails, thm:couple-modulus-coincidence,
+  lem:e-method-dyadic, lem:dyadic-interpolation}
+Let $s > 1/p - 1$ and $q \in (0, \infty]$, and let $\delta = s - (1/p - 1)$. Every
+$f \in L_p[0, 1]$ satisfies
+\[
+  \|f\|_1 \leq C \Bigl( \|f\|_p + \bigl\| \bigl( 2^{ks} E(2^k, f) \bigr)_k \bigr\|_{\ell_q} \Bigr)
+\]
+with $C = 2^{1/p} \bigl(1 + 2^{1/p - 1} (1 - 2^{-\delta})^{-1}\bigr) \, C_q (1 + \gamma_{1,q})$,
+$C_q$ and $\gamma_{1,q}$ as in \Cref{thm:couple-modulus-coincidence}. In particular every element
+of $E_{s,q}$ of the step couple is integrable.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Since $p \leq 1$, $s > 0$. Take the near-best steps of \Cref{lem:near-best-steps}. By
+\Cref{thm:couple-modulus-coincidence},
+$L = \|(2^{ks} e_k)_k\|_{\ell_q} \leq C_q (1 + \gamma_{1,q})$ times the dyadic norm, and by
+\Cref{lem:weighted-tails} $e_j \leq 2^{-js} L$, so $e_j \to 0$ and
+$\sum_i 2^{(i+1)(1/p-1)} 2^{1/p} e_i \leq 2^{1/p} 2^{1/p-1} (1 - 2^{-\delta})^{-1} L$. With
+$e_0 \leq L$, \Cref{lem:near-best-steps} gives the bound.
+\end{proof}
+
+\begin{lemma}[Martingale convergence in $L_1$]
+\label{lem:haar-martingale-l1}
+\lean{Haar.tendsto_eLpNorm_condExp_sub, Haar.ae_eq_zero_of_haarCoeff_eq_zero,
+  Haar.eLpNorm_sub_condExp_rpow_le_tsum, Haar.eFunctional_stepCouple_le_eLpNorm_sub_condExp}
+\leanok
+\uses{def:filtration-scheme, lem:lebesgue, lem:haar-density, lem:dyadic-condexp,
+  lem:haar-martingale, lem:telescoping-fatou, def:haar-level-norm, lem:step-couple,
+  lem:steps-into-l1}
+For integrable $f$, $E[f \mid \mathcal{F}_N] \to f$ in $L_1[0, 1]$. If moreover $\int_0^1 f = 0$
+and $\langle f, h_{k,m} \rangle = 0$ for all $k$ and $0 \leq m < 2^k$, then $f = 0$ almost
+everywhere on $[0, 1]$. For integrable $f$ and every $k$,
+\[
+  \|f - E[f \mid \mathcal{F}_k]\|_p^p \leq \sum_{j=0}^\infty H_{k+j}(f)^p ,
+\]
+and $E(2^k, f) \leq \|f - E[f \mid \mathcal{F}_k]\|_p$ for every $f \in L_p[0, 1]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+The conditional expectations form a projection scheme of bound $1$ in $L_1$
+(\Cref{def:filtration-scheme}) with dense approximants (\Cref{lem:haar-density}), so they converge
+(\Cref{lem:lebesgue}). Under the hypotheses on the coefficients every $E[f \mid \mathcal{F}_N]$
+vanishes, by \Cref{lem:dyadic-condexp} and \Cref{lem:haar-martingale}, so $\|f\|_1 = 0$. The
+convergence in $L_1$ is convergence in measure, and \Cref{lem:telescoping-fatou} with $r = p$
+applies to the martingale differences (\Cref{def:haar-level-norm}). Finally
+$E[f \mid \mathcal{F}_k]$ is $\mathcal{F}_k$-measurable and lies in $L_p$
+(\Cref{lem:steps-into-l1}).
+\end{proof}
+
+\begin{theorem}[Haar coefficients for $0 < p \leq 1$]
+\label{thm:haar-below-one}
+\lean{Haar.dyadicWeight_succ_mul_rpow, Haar.lqNorm_haarLevelNorm_lt_top,
+  Haar.eNormDyadic_lt_top_of_lqNorm_haarLevelNorm, Haar.dyadicWeight_mul_lqNorm_haarCoeff,
+  Haar.memEMethod_stepCouple_iff_haarCoeff}
+\leanok
+\uses{thm:besov-into-l1, lem:near-best-steps, lem:haar-martingale-l1, lem:weighted-tails,
+  lem:e-method-dyadic, def:haar-level-norm, thm:couple-modulus-coincidence}
+Let $s > 1/p - 1$ and $q \in (0, \infty]$. Then $f \in L_p[0, 1]$ lies in the approximation space
+$E_{s,q}$ of the step couple if and only if $f \in L_1[0, 1]$ and
+\[
+  \Bigl| \int_0^1 f \Bigr| + \Bigl\| \Bigl(2^{k(s + 1/2 - 1/p)}
+  \bigl\| (\langle f, h_{k,m} \rangle)_{0 \leq m < 2^k} \bigr\|_{\ell_p} \Bigr)_k
+  \Bigr\|_{\ell_q} < \infty .
+\]
+\end{theorem}
+
+\begin{proof}
+\leanok
+The weighted sequence is $(2^{ks} H_k(f))_k$. If $f \in E_{s,q}$, then $f$ is integrable
+(\Cref{thm:besov-into-l1}), and the near-best steps of \Cref{lem:near-best-steps} give
+$H_k(f)^p \leq 2 \cdot 2^{1-p} \sum_{i \geq 0} 2^{i(1-p)} e_{k+i}^p$; \Cref{lem:weighted-tails}
+with $\rho = p$, $\beta = 1 - p$ and $s p - (1 - p) > 0$, which is $s > 1/p - 1$, bounds
+$\|(2^{ks} H_k(f))_k\|_{\ell_q}$ by $\|(2^{ks} e_k)_k\|_{\ell_q} < \infty$. Conversely, by
+\Cref{lem:haar-martingale-l1}, $E(2^k, f)^p \leq \sum_{j \geq 0} H_{k+j}(f)^p$, and
+\Cref{lem:weighted-tails} with $\beta = 0$ and $s p > 0$ bounds
+$\|(2^{ks} E(2^k, f))_k\|_{\ell_q}$; finally use \Cref{lem:e-method-dyadic}.
+\end{proof}
+
+The condition $s > 1/p - 1$ cannot be dropped: for $0 < s < 1/p - 1$ and $q < \infty$, the space
+$B^s_{p,q,1}[0, 1]$ has a trivial dual~\cite[\S1 and Theorem~1~(i)]{Oswald2018}; the limiting case
+$s = 1/p - 1$ is the subject of~\cite{Oswald2018}.
+
+\begin{corollary}[Besov spaces of the first modulus through Haar coefficients]
+\label{cor:haar-besov-below-one}
+\lean{Haar.lqNorm_modulus_lt_top_iff_haarCoeff_of_le_one}
+\leanok
+\uses{thm:haar-below-one, thm:steps-besov-below-one}
+Let $1/p - 1 < s < 1/p$ and $q \in (0, \infty]$. For $f \in L_p[0, 1]$,
+\[
+  \|f\|_p + \bigl\| \bigl( 2^{ks} \omega_1(f, 2^{-k}, [0,1])_p \bigr)_k \bigr\|_{\ell_q} < \infty
+\]
+if and only if $f \in L_1[0, 1]$ and the Haar condition of \Cref{thm:haar-below-one} holds.
+\end{corollary}
+
+\begin{proof}
+\leanok
+Both conditions say $f \in E_{s,q}$, by \Cref{thm:steps-besov-below-one} and
+\Cref{thm:haar-below-one}.
+\end{proof}
+
+For $p = 1$ and $q \geq 1$ this is also \Cref{cor:haar-besov} with $p = 1$.
+
+\begin{definition}[Haar partial sums]
+\label{def:haar-partial-sums}
+\lean{Haar.haarSystemCoeff, Haar.haarSystemCoeff_zero, Haar.haarSystemCoeff_two_pow_add,
+  Haar.haarSystemCoeff_congr_ae, Haar.haarSystemLp, Haar.coeFn_sum_smul_haarSystemLp,
+  Haar.integrable_haarSystem_mul, Haar.integrable_sum_mul_haarSystem,
+  Haar.haarPartialSum, Haar.coeFn_haarPartialSum, Haar.stronglyMeasurable_haarSystem,
+  Haar.sum_smul_haarSystemLp_mem, Haar.haarPartialSum_mem}
+\leanok
+\uses{prop:haar-basis, def:step-couple}
+With the Haar system $\varphi_0 = 1$, $\varphi_{2^k + i} = h_{k,i}$ of \Cref{prop:haar-basis},
+the coefficients of $f \in L_1[0, 1]$ are $c_n(f) = \int_0^1 \varphi_n f$, so
+$c_0(f) = \int_0^1 f$ and $c_{2^k + i}(f) = \langle f, h_{k,i} \rangle$, and the partial sums are
+$S_N f = \sum_{n < N} c_n(f) \varphi_n \in L_p[0, 1]$. For $N \leq 2^l$ every combination of
+$\varphi_0, \dots, \varphi_{N-1}$ is $\mathcal{F}_l$-measurable.
+\end{definition}
+
+\begin{lemma}[Remainders of Haar partial sums]
+\label{lem:haar-partial-sums}
+\lean{Haar.sum_haarSystem_two_pow_ae_eq, Haar.sum_fin_ite_lt, Haar.sub_sum_haarSystem_ae_eq,
+  Haar.eLpNorm_sum_haar_ite_le, Haar.eLpNorm_sub_sum_haarSystem_rpow_le,
+  Haar.eFunctional_stepCouple_sub_of_mem}
+\leanok
+\uses{def:haar-partial-sums, lem:dyadic-condexp, lem:haar-martingale, lem:haar-level,
+  lem:haar-martingale-l1, def:haar-level-norm, lem:lp-rho-triangle, lem:complexity-couple}
+Let $f$ be integrable, $k \in \N$ and $0 \leq i \leq 2^k$. Then
+$S_{2^k} f = E[f \mid \mathcal{F}_k]$,
+\[
+  f - S_{2^k + i} f = \bigl(f - E[f \mid \mathcal{F}_{k+1}]\bigr) +
+  \sum_{i \leq m < 2^k} \langle f, h_{k,m} \rangle h_{k,m} ,
+\]
+and $\|f - S_{2^k + i} f\|_p^p \leq \sum_{j \geq 0} H_{k+j}(f)^p$. For $f \in L_p[0, 1]$ and
+an $\mathcal{F}_l$-measurable $a \in L_p[0, 1]$, $E(2^l, f - a) = E(2^l, f)$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+By induction on $k$ with \Cref{lem:dyadic-condexp} and \Cref{lem:haar-martingale}. The part of
+the Haar sum of level $k$ has quasi-norm at most $H_k(f)$ (\Cref{lem:haar-level}), and
+$\|f - E[f \mid \mathcal{F}_{k+1}]\|_p^p \leq \sum_{j \geq 1} H_{k+j}(f)^p$
+(\Cref{lem:haar-martingale-l1}). The last claim is (3) of \Cref{lem:complexity-couple}.
+\end{proof}
+
+\begin{theorem}[The Haar system as a Schauder basis for $0 < p \leq 1$]
+\label{thm:haar-schauder-below-one}
+\lean{Haar.eNormDyadic_sub_haarPartialSum_le, Haar.tendsto_dyadicWeight_mul_tsum_haarLevelNorm,
+  Haar.eNormDyadic_sub_haarPartialSum_le_of_le_one, Haar.tendsto_eNormDyadic_sub_haarPartialSum,
+  Haar.exists_enorm_haarSystemCoeff_le, Haar.haarSystemCoeff_sub_sum,
+  Haar.eq_haarSystemCoeff_of_tendsto}
+\leanok
+\uses{lem:haar-partial-sums, thm:haar-below-one, thm:besov-into-l1, lem:weighted-tails,
+  lem:hardy-every-exponent, lem:lq-quasi-triangle, lem:lq-reindex, lem:mixed-norm-tails,
+  lem:e-method-dyadic, prop:haar-basis}
+Let $s > 1/p - 1$ and $0 < q < \infty$, and write
+$\|g\|_{E} = \|g\|_p + \|(2^{ks} E(2^k, g))_k\|_{\ell_q}$. For every $f \in E_{s,q}$,
+$\|f - S_n f\|_E \to 0$. If $a_0, a_1, \dots \in \C$ and
+$\|f - \sum_{n < N} a_n \varphi_n\|_E \to 0$ for some $f \in L_p[0, 1]$, then $a_n = c_n(f)$ for
+every $n$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+Let $2^k \leq n < 2^{k+1}$ and $R = f - S_n f$, and let
+$W_k = 2^{ks} (\sum_{j \geq 0} H_{k+j}(f)^p)^{1/p}$. By \Cref{lem:haar-partial-sums},
+$\|R\|_p \leq W_k$, $E(2^l, R) \leq \|R\|_p$ for $l \leq k$ and $E(2^l, R) = E(2^l, f)$ for
+$l > k$, since $S_n f$ is $\mathcal{F}_{k+1}$-measurable. As
+$\|(2^{ls})_{l \leq k}\|_{\ell_q} \leq 2^{ks} \gamma_{s,q}$ (\Cref{lem:lq-reindex}),
+\[
+  \|R\|_E \leq W_k + C_q \Bigl( \gamma_{s,q} W_k + \bigl\| \bigl( 2^{ls} E(2^l, f)
+  \bigr)_{l > k} \bigr\|_{\ell_q} \Bigr) .
+\]
+By \Cref{thm:haar-below-one} and Hardy's inequality for tails in $\ell_{q/p}$ with the exponent
+$sp$ (\Cref{lem:weighted-tails}), $(W_k)_k \in \ell_q$, so $W_k \to 0$ as $q < \infty$, and
+the tails of the $\ell_q$ norm of $(2^{ls} E(2^l, f))_l$ tend to $0$
+(\Cref{lem:mixed-norm-tails}). For the uniqueness, the
+$L_1$ norm is at most $C \|\cdot\|_E$ (\Cref{thm:besov-into-l1}), $c_i$ is bounded on $L_1$, and
+$c_i(f - \sum_{n<N} a_n \varphi_n) = c_i(f) - a_i$ for $N > i$ by orthonormality.
+\end{proof}
+
+For $1/p - 1 < s < 1/p$ the space $E_{s,q}$ is $B^s_{p,q,1}[0, 1]$
+(\Cref{cor:haar-besov-below-one}), and the theorem is the Schauder basis property of the Haar
+system in it~\cite{Oswald1981}, \cite[Theorem~1]{Oswald2018}. For $1/2 < p < 1$,
+$1/p - 1 < s < 1$ and $q < \infty$ the Haar system is also a Schauder basis of the
+Fourier-analytic $\Besov{s}{p}{q}[0, 1]$~\cite{TriebelHaar1978},
+\cite[Theorem~2]{Oswald2018}; that space is not formalised here.
+
+\begin{theorem}[$n$-term Haar approximation and Besov spaces for $0 < \tau < 2$]
+\label{thm:haar-nterm-besov-all}
+\lean{Haar.ofReal_le_two, Haar.mem_l2_of_tsum_enorm_rpow_ne_top,
+  Haar.memApprox_nTerm_iff_memEMethod, Haar.exists_inclusion_eq_of_memEMethod,
+  Haar.memApprox_nTerm_iff_modulus_of_lt_two}
+\leanok
+\uses{thm:haar-nterm, thm:haar-below-one, lem:haar-martingale-l1, prop:haar-basis,
+  thm:steps-besov-below-one, cor:haar-nterm-besov, lem:lq-basic, lem:inclusion}
+Let $0 < \tau < 2$ and $\theta = 1/\tau - 1/2$.
+\begin{enumerate}
+  \item For $\tau \leq 1$, $f \in L_2[0, 1]$ lies in the approximation space $A^\theta_\tau$ of
+    $n$-term approximation from the Haar basis if and only if its class in $L_\tau[0, 1]$ lies in
+    the approximation space $E_{\theta, \tau}$ of the step couple in $L_\tau[0, 1]$.
+  \item For $\tau \leq 1$, every element of $E_{\theta, \tau}$ is the class of a function in
+    $L_2[0, 1]$.
+  \item $f \in L_2[0, 1]$ lies in $A^\theta_\tau$ if and only if
+    \[
+      \|f\|_\tau + \bigl\| \bigl( 2^{k\theta} \omega_1(f, 2^{-k}, [0,1])_\tau \bigr)_k
+      \bigr\|_{\ell_\tau} < \infty .
+    \]
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+\leanok
+(1) By \Cref{thm:haar-nterm} and \Cref{thm:haar-below-one} with $p = q = \tau$ and $s = \theta$,
+where $\theta > 1/\tau - 1$ and the weight $2^{k(s + 1/2 - 1/p)}$ is $1$, both conditions say
+$\sum_k \sum_i |\langle f, h_{k,i} \rangle|^\tau < \infty$ (\Cref{lem:lq-basic}); $f \in L_2$ is
+integrable. (2) The Haar coefficients of $g \in E_{\theta, \tau}$ lie in
+$\ell_\tau \subseteq \ell_2$, so \Cref{prop:haar-basis} gives $F \in L_2[0, 1]$ with the same
+coefficients; $F - g$ is integrable with vanishing coefficients, so $F = g$ almost everywhere
+(\Cref{lem:haar-martingale-l1}). (3) For $\tau \leq 1$ combine (1) with
+\Cref{thm:steps-besov-below-one}, since $0 < \theta < 1/\tau$; for $1 < \tau < 2$ it is
+\Cref{cor:haar-nterm-besov}.
+\end{proof}
+
+For $\tau \leq 1$, by (1) and (2) the approximation space of $n$-term Haar approximation in
+$L_2$ and the approximation space of steps in $L_\tau$ are equal as sets. For
+$2/3 < \tau < 2$, that is $\theta < 1$, the condition in (3) defines the classical Besov space
+$\Besov{\theta}{\tau}{\tau}[0, 1]$~\cite[\S3.6]{DeVore1998}, and (3) is the Haar case of the
+theorem of DeVore, Jawerth and Popov~\cite{DeVoreJawerthPopov}; for $\tau \leq 2/3$ it is the
+space $B^\theta_{\tau,\tau,1}[0, 1]$ of the first modulus (\Cref{lem:steps-line}).
 
 \section{Local projections and multiscale details}
 
@@ -3117,11 +3546,11 @@ moved multiwavelet is a polynomial on each half, so $\int_{I_{k,m}} (P_{k+1} g -
 
 \begin{lemma}[Norms of the details]
 \label{lem:multiwavelet-norms}
-\lean{Interval.lintegral_unit_eq_sum_dyadicIco, ENNReal.ofReal_two_pow_eq,
-  Alpert.eLpNorm_detailFun_dyadicIco, Alpert.exists_eLpNorm_detailFun_equiv,
-  Alpert.enorm_ppProj_sub}
+\lean{ENNReal.ofReal_two_pow_eq, Alpert.eLpNorm_detailFun_dyadicIco,
+  Alpert.exists_eLpNorm_detailFun_equiv, Alpert.enorm_ppProj_sub}
 \leanok
-\uses{lem:multiwavelet-details, lem:multiwavelets, lem:dyadic-normalising-factor}
+\uses{lem:multiwavelet-details, lem:multiwavelets, lem:dyadic-normalising-factor,
+  lem:pp-bookkeeping}
 Let $1 \leq p < \infty$. There are $K, M$ with
 \[
   2^{k(1/2 - 1/p)} \bigl\| (\langle g, \psi_{k,m,i} \rangle)_{m,i} \bigr\|_{\ell_p}

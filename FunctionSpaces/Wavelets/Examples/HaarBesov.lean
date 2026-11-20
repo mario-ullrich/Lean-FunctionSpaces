@@ -52,9 +52,14 @@ theorem dyadicIndex_eq_floor {j : ℕ} {x : ℝ} (hx : x ∈ Ico (0 : ℝ) 1) :
     dyadicIndex j x = (⌊2 ^ j * x⌋₊ : ℤ) :=
   (Int.natCast_floor_eq_floor (mul_nonneg (by positivity) hx.1)).symm
 
-/-- The dyadic index of a left endpoint `n 2^(-j)` is `n`. -/
+/-- The dyadic index of a left endpoint `m 2^(-j)` is `m`, for `m ∈ ℤ`. -/
+theorem dyadicIndex_intCast_div (j : ℕ) (m : ℤ) : dyadicIndex j ((m : ℝ) / 2 ^ j) = m := by
+  rw [dyadicIndex, mul_div_cancel₀ _ (by positivity), Int.floor_intCast]
+
+/-- The dyadic index of a left endpoint `n 2^(-j)` is `n`, for `n ∈ ℕ`
+(`Haar.dyadicIndex_intCast_div`). -/
 theorem dyadicIndex_natCast_div (j n : ℕ) : dyadicIndex j ((n : ℝ) / 2 ^ j) = n := by
-  rw [dyadicIndex, mul_div_cancel₀ _ (by positivity), Int.floor_natCast]
+  simpa only [Int.cast_natCast] using dyadicIndex_intCast_div j n
 
 /-- A piecewise constant function agrees almost everywhere on `[0, 1]` with its step
 function. -/

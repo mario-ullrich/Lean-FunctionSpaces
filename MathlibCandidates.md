@@ -88,7 +88,14 @@ declarations.
   `‖-f‖ₑ = ‖f‖ₑ` for every `p`, `MeasureTheory.Lp.enorm_zero` and `MeasureTheory.Lp.enorm_neg`,
   which Mathlib states for `‖·‖` and `‖·‖₊`). Mathlib states the power form only for
   `inhmgELpNorm`; for `eLpNorm` it has the bounds with the constant `2^(1/p - 1)`
-  (`eLpNorm'_add_le_of_le_one`, `eLpNorm_add_le'`).
+  (`eLpNorm'_add_le_of_le_one`, `eLpNorm_add_le'`). With it, **Fatou's lemma for telescoping
+  sums**: if `u_n → g` in measure, with a.e. strongly measurable `u_n` with values in a seminormed
+  group, and `0 < r ≤ 1`, then `‖g - u_k‖_r^r ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^r`
+  (`MeasureTheory.eLpNorm_sub_rpow_le_tsum`, from its finite version
+  `MeasureTheory.eLpNorm_sub_rpow_le_sum` in `ApproximationSpaces/Sequences/Lq.lean` and Mathlib's
+  `eLpNorm_le_of_tendstoInMeasure`), and the invariance of convergence in measure under
+  subtracting a function (`MeasureTheory.TendstoInMeasure.sub_right`), both in
+  `FunctionSpaces/Analysis/Lp/MixedNorms.lean`.
 * **Mixed norms `L_p(ℓ_q)` and `ℓ_q(L_p)`** (`FunctionSpaces/Analysis/Lp/MixedNorms.lean`):
   Minkowski's integral inequality for `ℓ_u`-valued functions,
   `‖(∫ g_i)_i‖_{ℓ_u} ≤ ∫ ‖(g_i(x))_i‖_{ℓ_u}` for `1 ≤ u ≤ ∞` (`MeasureTheory.lqNorm_lintegral_le`);

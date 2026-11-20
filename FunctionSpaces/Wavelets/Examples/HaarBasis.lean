@@ -43,7 +43,9 @@ theorems the exponent is `p : ℝ≥0∞` with `1 ≤ p < 2`, as in `Haar.memApp
 `τ = p.toReal`. This is the case of the Haar system and `1 ≤ τ < 2` of the theorem of DeVore,
 Jawerth and Popov (*Compression of wavelet decompositions*, Amer. J. Math. 114, 1992; DeVore,
 *Nonlinear approximation*, Acta Numer. 7, 1998, §3.6 and Remark 7.6). For `τ < 1` the Besov
-space lies in the quasi-Banach space `L_τ`, outside the range of the characterisations here.
+space lies in the quasi-Banach space `L_τ`; that case goes through approximation by steps in
+`L_τ` (`Haar.memApprox_nTerm_iff_modulus_of_lt_two` in
+`FunctionSpaces.Wavelets.Examples.HaarNTermBesov`).
 -/
 
 @[expose] public section

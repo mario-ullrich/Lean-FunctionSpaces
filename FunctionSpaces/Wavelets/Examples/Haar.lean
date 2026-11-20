@@ -185,10 +185,10 @@ theorem condExpLp_dyadic_ae_eq (j : ℕ) (f : Lp ℂ p vol) :
       fun x => ((2 : ℝ) ^ j) • ∫ y in dyadicInterval j (dyadicIndex j x), f y ∂vol :=
   (Lp.coeFn_condExpLp f).trans (condExp_dyadic_ae_eq j ((Lp.memLp f).integrable Fact.out))
 
-/-- `E[f | ℱ_0] = ∫_0^1 f`, a constant. -/
-theorem condExpLp_zero_ae_eq (f : Lp ℂ p vol) :
-    Lp.condExpLp (dyadicFiltration 0) f =ᵐ[vol] fun _ => ∫ x, f x ∂vol := by
-  filter_upwards [condExpLp_dyadic_ae_eq 0 f, Interval.ae_mem_Ico_unitVol] with x h hx
+/-- `E[f | ℱ_0] = ∫_0^1 f`, a constant, for integrable `f`. -/
+theorem condExp_zero_ae_eq {f : ℝ → ℂ} (hf : Integrable f vol) :
+    vol[f | dyadicFiltration 0] =ᵐ[vol] fun _ => ∫ x, f x ∂vol := by
+  filter_upwards [condExp_dyadic_ae_eq 0 hf, Interval.ae_mem_Ico_unitVol] with x h hx
   have h0 : dyadicIndex 0 x = 0 := by
     have h1 := dyadicIndex_nonneg (j := 0) hx
     have h2 := dyadicIndex_lt (j := 0) hx
@@ -197,6 +197,11 @@ theorem condExpLp_zero_ae_eq (f : Lp ℂ p vol) :
   rw [h, pow_zero, one_smul, h0,
     show dyadicInterval 0 0 = Ico 0 1 by rw [dyadicInterval_eq_Ico]; norm_num,
     Measure.restrict_eq_self_of_ae_mem Interval.ae_mem_Ico_unitVol]
+
+/-- `E[f | ℱ_0] = ∫_0^1 f` on `L_p[0, 1]`, `1 ≤ p ≤ ∞` (`Haar.condExp_zero_ae_eq`). -/
+theorem condExpLp_zero_ae_eq (f : Lp ℂ p vol) :
+    Lp.condExpLp (dyadicFiltration 0) f =ᵐ[vol] fun _ => ∫ x, f x ∂vol :=
+  (Lp.coeFn_condExpLp f).trans (condExp_zero_ae_eq ((Lp.memLp f).integrable Fact.out))
 
 /-- `‖E[f | ℱ_0]‖_p = |∫_0^1 f|`. -/
 theorem enorm_condExpLp_zero (f : Lp ℂ p vol) :
@@ -301,17 +306,15 @@ theorem setIntegral_dyadicInterval {f : ℝ → ℂ} (hf : Integrable f vol) (j 
   exact setIntegral_union (disjoint_dyadicInterval _ (by omega))
     (measurableSet_dyadicInterval _ _) hf.integrableOn hf.integrableOn
 
-/-- **Martingale differences are Haar sums**:
-`E[f | ℱ_{k+1}] - E[f | ℱ_k] = ∑_{m < 2^k} ⟨f, h_{k,m}⟩ h_{k,m}`. -/
-theorem condExpLp_succ_sub_ae_eq (k : ℕ) (f : Lp ℂ p vol) :
-    ⇑(Lp.condExpLp (dyadicFiltration (k + 1)) f - Lp.condExpLp (dyadicFiltration k) f) =ᵐ[vol]
+/-- **Martingale differences are Haar sums**: for integrable `f`,
+`E[f | ℱ_{k+1}] - E[f | ℱ_k] = ∑_{m < 2^k} ⟨f, h_{k,m}⟩ h_{k,m}` almost everywhere on `[0, 1]`. -/
+theorem condExp_succ_sub_ae_eq (k : ℕ) {f : ℝ → ℂ} (hf : Integrable f vol) :
+    vol[f | dyadicFiltration (k + 1)] - vol[f | dyadicFiltration k] =ᵐ[vol]
       fun x => ∑ m : Fin (2 ^ k), haarCoeff f k ((m : ℕ) : ℤ) *
         (haarFunction k ((m : ℕ) : ℤ) x : ℂ) := by
-  have hf := (Lp.memLp f).integrable (Fact.out : 1 ≤ p)
-  filter_upwards [Lp.coeFn_sub (Lp.condExpLp (dyadicFiltration (k + 1)) f)
-      (Lp.condExpLp (dyadicFiltration k) f), condExpLp_dyadic_ae_eq (k + 1) f,
-    condExpLp_dyadic_ae_eq k f, Interval.ae_mem_Ico_unitVol] with x h1 h2 h3 hx
-  rw [h1, Pi.sub_apply, h2, h3,
+  filter_upwards [condExp_dyadic_ae_eq (k + 1) hf, condExp_dyadic_ae_eq k hf,
+    Interval.ae_mem_Ico_unitVol] with x h2 h3 hx
+  rw [Pi.sub_apply, h2, h3,
     sum_fin_eq_of_ne hx (fun m => haarCoeff f k m * (haarFunction k m x : ℂ))
       fun m hm => by rw [haarFunction_eq_zero (Ne.symm hm), Complex.ofReal_zero, mul_zero],
     haarCoeff_eq hf, setIntegral_dyadicInterval hf k (dyadicIndex k x)]
@@ -332,6 +335,15 @@ theorem condExpLp_succ_sub_ae_eq (k : ℕ) (f : Lp ℂ p vol) :
     linear_combination (∫ y in dyadicInterval (k + 1) (2 * dyadicIndex k x), f y ∂vol -
       ∫ y in dyadicInterval (k + 1) (2 * dyadicIndex k x + 1), f y ∂vol) * hc
 
+/-- **Martingale differences are Haar sums** in `L_p[0, 1]`, `1 ≤ p ≤ ∞`:
+`E[f | ℱ_{k+1}] - E[f | ℱ_k] = ∑_{m < 2^k} ⟨f, h_{k,m}⟩ h_{k,m}` (`Haar.condExp_succ_sub_ae_eq`). -/
+theorem condExpLp_succ_sub_ae_eq (k : ℕ) (f : Lp ℂ p vol) :
+    ⇑(Lp.condExpLp (dyadicFiltration (k + 1)) f - Lp.condExpLp (dyadicFiltration k) f) =ᵐ[vol]
+      fun x => ∑ m : Fin (2 ^ k), haarCoeff f k ((m : ℕ) : ℤ) *
+        (haarFunction k ((m : ℕ) : ℤ) x : ℂ) :=
+  (Lp.coeFn_sub _ _).trans (((Lp.coeFn_condExpLp f).sub (Lp.coeFn_condExpLp f)).trans
+    (condExp_succ_sub_ae_eq k ((Lp.memLp f).integrable Fact.out)))
+
 /-- `|h_{j,m}| = 2^(j/2)` on `I_{j,m}`, as a dyadic weight in `ℝ≥0∞`. -/
 theorem enorm_haarFunction {j : ℕ} {m : ℤ} {x : ℝ} (hx : dyadicIndex j x = m) :
     ‖(haarFunction j m x : ℂ)‖ₑ = ENNReal.dyadicWeight (1 / 2) j := by
@@ -340,13 +352,13 @@ theorem enorm_haarFunction {j : ℕ} {m : ℤ} {x : ℝ} (hx : dyadicIndex j x =
   congr 1
   ring
 
-/-- **Level-wise norm of Haar sums**: for `1 ≤ p < ∞`,
+omit [Fact (1 ≤ p)] in
+/-- **Level-wise norm of Haar sums**: for `0 < p < ∞`,
 `‖∑_{m < 2^j} c_m h_{j,m}‖_p = 2^(j(1/2 - 1/p)) ‖c‖_{ℓ_p}`, since the Haar functions of one level
 have disjoint supports of measure `2^(-j)` and modulus `2^(j/2)` there. -/
-theorem eLpNorm_sum_haar (hp : p ≠ ∞) (j : ℕ) (c : Fin (2 ^ j) → ℂ) :
+theorem eLpNorm_sum_haar (hp0 : p ≠ 0) (hp : p ≠ ∞) (j : ℕ) (c : Fin (2 ^ j) → ℂ) :
     eLpNorm (fun x => ∑ m : Fin (2 ^ j), c m * (haarFunction j ((m : ℕ) : ℤ) x : ℂ)) p vol =
       ENNReal.dyadicWeight (1 / 2 - 1 / p.toReal) j * ENNReal.lqNorm p (fun m => ‖c m‖ₑ) := by
-  have hp0 : p ≠ 0 := (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne'
   have hr : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
   set r := p.toReal
   set C : ℤ → ℂ := fun m => if h : 0 ≤ m ∧ m < ((2 ^ j : ℕ) : ℤ) then c ⟨m.toNat, by omega⟩ else 0
@@ -473,7 +485,7 @@ theorem memApprox_iff_haarCoeff (hp : p ≠ ∞) {s : ℝ} (hs : 0 < s) {q : ℝ
         ENNReal.lqNorm p (fun m : Fin (2 ^ k) => ‖haarCoeff f k ((m : ℕ) : ℤ)‖ₑ) :=
     fun k => by
       rw [Lp.enorm_def, eLpNorm_congr_ae (condExpLp_succ_sub_ae_eq k f)]
-      exact eLpNorm_sum_haar hp k _
+      exact eLpNorm_sum_haar (lt_of_lt_of_le zero_lt_one (Fact.out : 1 ≤ p)).ne' hp k _
   rw [dyadicFiltration.memApprox_iff_martingale (closure_iUnion_scheme hp) hs hq,
     enorm_condExpLp_zero]
   simp_rw [h, ← mul_assoc, ← ENNReal.dyadicWeight_add]

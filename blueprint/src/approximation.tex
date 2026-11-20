@@ -415,9 +415,10 @@ countable index sets.
 \lean{ENNReal.lqNorm_comp_equiv, ENNReal.lqNorm_extend_zero, ENNReal.lqNorm_comp_le_of_injective,
   ENNReal.dyadicGeomConst, ENNReal.lqNorm_dyadicWeight_neg_eq_dyadicGeomConst,
   ENNReal.lqNorm_dyadicWeight_neg_le_dyadicGeomConst, ENNReal.one_le_dyadicGeomConst,
-  ENNReal.dyadicGeomConst_ne_top, ENNReal.dyadicGeomConst_top}
+  ENNReal.dyadicGeomConst_ne_top, ENNReal.dyadicGeomConst_top,
+  ENNReal.lqNorm_ite_le_dyadicWeight_le}
 \leanok
-\uses{def:lq-norm}
+\uses{def:lq-norm, lem:lq-basic}
 Let $q \in (0, \infty]$ and let $I, J$ be countable sets. For every family $b$ in $[0, \infty]$
 on $J$ and every family $a$ in $[0, \infty]$ on $I$:
 \begin{enumerate}
@@ -429,7 +430,10 @@ on $J$ and every family $a$ in $[0, \infty]$ on $I$:
     $\|(2^{-k\alpha})_{k \in \N}\|_{\ell_q} = \gamma_{\alpha, q}$, where
     $\gamma_{\alpha, q} = (1 - 2^{-\alpha q})^{-1/q}$ for $q < \infty$ and
     $\gamma_{\alpha, \infty} = 1$; moreover $\gamma_{\alpha, q} \geq 1$, and
-    $\gamma_{\alpha, q} < \infty$ for $\alpha > 0$.
+    $\gamma_{\alpha, q} < \infty$ for $\alpha > 0$;
+  \item for every $\alpha \geq 0$ and $k \in \N$,
+    $\|(2^{l\alpha} \mathbf{1}_{l \leq k})_{l \in \N}\|_{\ell_q}
+    \leq 2^{k\alpha} \gamma_{\alpha, q}$.
 \end{enumerate}
 \end{lemma}
 
@@ -437,7 +441,10 @@ on $J$ and every family $a$ in $[0, \infty]$ on $I$:
 \leanok
 In (1) and (2) the sums $\sum b_j^q$ and suprema $\sup b_j$ run over the same values, or over a
 part of them. In (3), $\sum_k 2^{-k\alpha q} = (1 - 2^{-\alpha q})^{-1} \geq 1$ is a geometric
-series, and $\sup_k 2^{-k\alpha} = 1$ is attained at $k = 0$.
+series, and $\sup_k 2^{-k\alpha} = 1$ is attained at $k = 0$. In (4) the sequence is
+$2^{k\alpha} (2^{-(k-l)\alpha} \mathbf{1}_{l \leq k})_l$; reversing $0, \dots, k$ by (1) turns it
+into $2^{k\alpha} (2^{-j\alpha} \mathbf{1}_{j \leq k})_j$, which is at most
+$2^{k\alpha} (2^{-j\alpha})_j$ term by term, and (3) applies.
 \end{proof}
 
 \begin{lemma}[The Cauchy--Schwarz inequality for sequences]
@@ -1001,7 +1008,8 @@ $[0, \infty]$,
 \begin{lemma}[Powers of $L_p$ quasi-norms]
 \label{lem:lp-rho-triangle}
 \lean{MeasureTheory.eLpNorm_add_rpow_le_of_le_one, MeasureTheory.Lp.enorm_add_rpow_le_of_le_one,
-  MeasureTheory.Lp.enorm_zero, MeasureTheory.Lp.enorm_neg, ENNReal.lqNorm_div_fun_rpow}
+  MeasureTheory.Lp.enorm_sub_rpow_le_two_mul, MeasureTheory.Lp.enorm_zero,
+  MeasureTheory.Lp.enorm_neg, ENNReal.lqNorm_div_fun_rpow}
 \leanok
 \uses{def:lq-norm, lem:lp-norm-homogeneity}
 Let $\mu$ be a measure on a measurable space $\Omega$ and let $0 < p \leq 1$. For all functions
@@ -1010,7 +1018,10 @@ of $L_p(\mu)$,
 \[
   \|f + g\|_{L_p(\mu)}^p \leq \|f\|_{L_p(\mu)}^p + \|g\|_{L_p(\mu)}^p .
 \]
-For every $0 < p \leq \infty$ the quasi-norm of $L_p(\mu)$ satisfies $\|0\|_{L_p(\mu)} = 0$ and
+In particular, for elements $f, g, h$ of $L_p(\mu)$ and $e \in [0, \infty]$ with
+$\|f - g\|_{L_p(\mu)} \leq e$ and $\|f - h\|_{L_p(\mu)} \leq e$,
+$\|g - h\|_{L_p(\mu)}^p \leq 2 e^p$. For every $0 < p \leq \infty$ the quasi-norm of $L_p(\mu)$
+satisfies $\|0\|_{L_p(\mu)} = 0$ and
 $\|-f\|_{L_p(\mu)} = \|f\|_{L_p(\mu)}$. For every $r > 0$, every $q \in (0, \infty]$ and every
 family $a$ in $[0, \infty]$ on a countable set, $\|(a_i^r)_i\|_{\ell_{q/r}} = \|a\|_{\ell_q}^r$,
 with $\infty / r = \infty$.

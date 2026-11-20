@@ -47,7 +47,8 @@ inequality `‖a + b‖_q ≤ C_q (‖a‖_q + ‖b‖_q)` with Mathlib's consta
 `ENNReal.two_rpow_one_div_le_two_mul_LpAddConst`, `ENNReal.rpow_add_rpow_le_LpAddConst_mul`).
 On any measure space the `p`-th power of the `L_p` quasi-norm, `0 < p ≤ 1`, is subadditive,
 `‖f + g‖_p^p ≤ ‖f‖_p^p + ‖g‖_p^p` (`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`), so sums of
-many terms are estimated in the `p`-th power with constant `1`.
+many terms are estimated in the `p`-th power with constant `1`, telescoping sums among them
+(`MeasureTheory.eLpNorm_sub_rpow_le_sum`).
 
 The file adds what Mathlib lacks: the explicit formulas, homogeneity for `ℝ≥0∞` scalars,
 **monotonicity in `q`** (`lqNorm r a ≤ lqNorm q a` for `0 < q ≤ r`; Mathlib has only the
@@ -55,11 +56,13 @@ inclusion `lp.monotone`, without the norm bound), the Cauchy–Schwarz inequalit
 `∑_k a_k b_k ≤ ‖a‖_{ℓ_2} ‖b‖_{ℓ_2}` for series and for finite sums
 (`ENNReal.lqNorm_one_mul_le`, `ENNReal.sum_mul_le_lqNorm_two_mul`), the splitting off of the
 first term, also with dyadic weights (`ENNReal.lqNorm_dyadicWeight_le_of_head_of_succ_le`), tails
-of sequences (`ENNReal.lqNorm_ite_le_eq`), sequences with one nonzero term
+of sequences (`ENNReal.lqNorm_ite_le_eq`), which tend to `0` for `q < ∞`
+(`ENNReal.tendsto_lqNorm_ite_le`), sequences with one nonzero term
 (`ENNReal.lqNorm_ite_eq`), reindexing along bijections and injections
 (`ENNReal.lqNorm_comp_equiv`, `ENNReal.lqNorm_extend_zero`), the `ℓ_q` norm of the geometric
 sequence for every `q` (`ENNReal.dyadicGeomConst`, which is `1` for `q = ∞`,
-`ENNReal.dyadicGeomConst_top`), and the **dyadic weights**
+`ENNReal.dyadicGeomConst_top`) and of its reversed initial segments
+(`ENNReal.lqNorm_ite_le_dyadicWeight_le`), and the **dyadic weights**
 `dyadicWeight s k = 2 ^ (k s)` that every approximation space uses, with the identity
 `2^(ks) 2^(-(k-j)σ) = 2^(-k(σ-s)) 2^(jσ)` of almost diagonal estimates
 (`ENNReal.dyadicWeight_mul_dyadicWeight_neg_sub`), the bound `2^(-(n-2)θ) ≤ 2^(2θ) 2^(-nθ)` for
@@ -989,16 +992,32 @@ theorem le_tsum_of_tendsto_sum {E : Type*} [NormedAddCommGroup E] {Q : E → ℝ
     Q f ≤ ∑' j, Q (u j) :=
   le_tsum_of_tendsto_finsetSum (S := fun J => Finset.range (J + 1)) hC hadd hle hu
 
+/-- A term of a sequence by the weighted `ℓ_q` norm: `e_j ≤ 2^(-js) ‖(2^(ks) e_k)_k‖_{ℓ_q}` for
+`q ≠ 0`. -/
+theorem le_dyadicWeight_neg_mul_lqNorm {q : ℝ≥0∞} (hq0 : q ≠ 0) (s : ℝ) (e : ℕ → ℝ≥0∞) (j : ℕ) :
+    e j ≤ dyadicWeight (-s) j * lqNorm q (fun k => dyadicWeight s k * e k) := by
+  calc e j = dyadicWeight (-s) j * (dyadicWeight s j * e j) := by
+        rw [← mul_assoc, dyadicWeight_neg_mul_self, one_mul]
+    _ ≤ _ := by gcongr; exact le_lqNorm hq0 (fun k => dyadicWeight s k * e k) j
+
+/-- **A sequence with finite weighted `ℓ_q` norm tends to `0`**: for `q ≠ 0` and `s > 0`, if
+`‖(2^(ks) e_k)_k‖_{ℓ_q} < ∞`, then `e_j ≤ 2^(-js) ‖(2^(ks) e_k)_k‖_{ℓ_q} → 0`. -/
+theorem tendsto_zero_of_lqNorm_dyadicWeight_ne_top {q : ℝ≥0∞} (hq0 : q ≠ 0) {s : ℝ} (hs : 0 < s)
+    {e : ℕ → ℝ≥0∞} (hL : lqNorm q (fun k => dyadicWeight s k * e k) ≠ ∞) :
+    Tendsto e atTop (nhds 0) := by
+  have h := ENNReal.Tendsto.mul_const
+    (ENNReal.tendsto_pow_atTop_nhds_zero_of_lt_one (two_rpow_neg_lt_one hs)) (Or.inr hL)
+  rw [zero_mul] at h
+  exact tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds h (fun _ => zero_le)
+    fun j => (le_dyadicWeight_neg_mul_lqNorm hq0 s e j).trans_eq (by rw [dyadicWeight_eq_pow])
+
 /-- **Weighted sequences are summable**: `∑_j a_j ≤ (1 - 2^(-s))⁻¹ ‖(2^(js) a_j)_j‖_{ℓ_q}`,
-since `a_j ≤ 2^(-js) ‖(2^(js) a_j)_j‖_{ℓ_q}`. -/
+since `a_j ≤ 2^(-js) ‖(2^(js) a_j)_j‖_{ℓ_q}` (`ENNReal.le_dyadicWeight_neg_mul_lqNorm`). -/
 theorem tsum_le_lqNorm_dyadicWeight {q : ℝ≥0∞} (hq : 1 ≤ q) (s : ℝ) (a : ℕ → ℝ≥0∞) :
     ∑' j, a j ≤ (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * lqNorm q (fun j => dyadicWeight s j * a j) := by
   set X := lqNorm q (fun j => dyadicWeight s j * a j)
-  calc ∑' j, a j ≤ ∑' j, dyadicWeight (-s) j * X := ENNReal.tsum_le_tsum fun j => by
-        calc a j = dyadicWeight (-s) j * (dyadicWeight s j * a j) := by
-              rw [← mul_assoc, dyadicWeight_neg_mul_self, one_mul]
-          _ ≤ dyadicWeight (-s) j * X := mul_le_mul' le_rfl
-              (le_lqNorm (zero_lt_one.trans_le hq).ne' (fun j => dyadicWeight s j * a j) j)
+  calc ∑' j, a j ≤ ∑' j, dyadicWeight (-s) j * X := ENNReal.tsum_le_tsum fun j =>
+        le_dyadicWeight_neg_mul_lqNorm (zero_lt_one.trans_le hq).ne' s a j
     _ = (1 - (2 : ℝ≥0∞) ^ (-s))⁻¹ * X := by
         rw [ENNReal.tsum_mul_right, tsum_dyadicWeight_neg]
 
@@ -1048,6 +1067,66 @@ theorem lqNorm_ite_le_eq {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q ≠ ∞) (a : 
   congr 1
   refine tsum_congr fun j => ?_
   split_ifs <;> simp [ENNReal.zero_rpow_of_pos hpos]
+
+/-- **The tails of a sequence in `ℓ_q` tend to zero**: for `0 < q < ∞` and `‖a‖_{ℓ_q} < ∞`,
+`‖(0, …, 0, a_N, a_{N+1}, …)‖_{ℓ_q} → 0` as `N → ∞`, since the tails `∑_{k ≥ N} a_k^q` of a
+convergent series tend to zero (Mathlib's `ENNReal.tendsto_sum_nat_add`). -/
+theorem tendsto_lqNorm_ite_le {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q ≠ ∞) {a : ℕ → ℝ≥0∞}
+    (ha : lqNorm q a ≠ ∞) :
+    Tendsto (fun N => lqNorm q (fun j => if N ≤ j then a j else 0)) atTop (nhds 0) := by
+  have hpos : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
+  have hsum : ∑' j, a j ^ q.toReal ≠ ∞ := by
+    rw [← lqNorm_rpow hq0 hq]
+    exact ENNReal.rpow_ne_top_of_nonneg hpos.le ha
+  have h := ((ENNReal.continuous_rpow_const (y := 1 / q.toReal)).tendsto 0).comp
+    (ENNReal.tendsto_sum_nat_add _ hsum)
+  rw [ENNReal.zero_rpow_of_pos (one_div_pos.2 hpos)] at h
+  refine h.congr fun N => ?_
+  rw [Function.comp_apply, lqNorm_ite_le_eq hq0 hq, lqNorm_eq_tsum hq0 hq]
+  simp_rw [add_comm N]
+
+/-- **The terms of a sequence in `ℓ_q`, `0 < q < ∞`, tend to `0`**: each term `a_N` is at most
+the `ℓ_q` norm of the tail from `N` on (`ENNReal.tendsto_lqNorm_ite_le`). -/
+theorem tendsto_zero_of_lqNorm_ne_top {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q ≠ ∞) {a : ℕ → ℝ≥0∞}
+    (ha : lqNorm q a ≠ ∞) : Tendsto a atTop (nhds 0) :=
+  tendsto_of_tendsto_of_tendsto_of_le_of_le tendsto_const_nhds (tendsto_lqNorm_ite_le hq0 hq ha)
+    (fun _ => zero_le) fun N =>
+      (ite_eq_left le_rfl).symm.trans_le (le_lqNorm hq0 (fun j => if N ≤ j then a j else 0) N)
+
+/-- **Initial segments of the dyadic weights in `ℓ_q`**: for `s ≥ 0` and `q ≠ 0`,
+`‖(2^(ls) 1_{l ≤ k})_l‖_{ℓ_q} ≤ 2^(ks) γ_{s,q}` with `γ_{s,q} = dyadicGeomConst s q`. Reversing
+`0, …, k` turns the sequence into `2^(ks) (2^(-js) 1_{j ≤ k})_j` (`ENNReal.lqNorm_comp_equiv`),
+whose norm is at most `2^(ks) ‖(2^(-js))_j‖_{ℓ_q}`
+(`ENNReal.lqNorm_dyadicWeight_neg_eq_dyadicGeomConst`). -/
+theorem lqNorm_ite_le_dyadicWeight_le {s : ℝ} (hs : 0 ≤ s) {q : ℝ≥0∞} (hq0 : q ≠ 0) (k : ℕ) :
+    lqNorm q (fun l => if l ≤ k then dyadicWeight s l else 0) ≤
+      dyadicWeight s k * dyadicGeomConst s q := by
+  have hσ : Function.Involutive fun l : ℕ => if l ≤ k then k - l else l := fun l => by
+    dsimp only
+    split_ifs <;> omega
+  set w : ℕ → ℝ≥0∞ := fun j => if j ≤ k then dyadicWeight (-s) j else 0
+  have hpt : ∀ l, (if l ≤ k then dyadicWeight s l else 0) =
+      dyadicWeight s k * (w ∘ Function.Involutive.toPerm _ hσ) l := fun l => by
+    simp only [Function.comp_apply, Function.Involutive.coe_toPerm, w]
+    by_cases hl : l ≤ k
+    · rw [ite_eq_left hl, ite_eq_left hl, ite_eq_left (Nat.sub_le k l)]
+      simp only [dyadicWeight]
+      rw [← ENNReal.rpow_add _ _ two_ne_zero ofNat_ne_top, Nat.cast_sub hl]
+      congr 1
+      ring
+    · rw [ite_eq_right hl, ite_eq_right hl, ite_eq_right hl, mul_zero]
+  calc lqNorm q (fun l => if l ≤ k then dyadicWeight s l else 0)
+      = dyadicWeight s k * lqNorm q (w ∘ Function.Involutive.toPerm _ hσ) := by
+        rw [← lqNorm_const_mul]
+        exact congrArg _ (funext hpt)
+    _ = dyadicWeight s k * lqNorm q w := by rw [lqNorm_comp_equiv]
+    _ ≤ dyadicWeight s k * lqNorm q (dyadicWeight (-s)) := by
+        gcongr
+        exact lqNorm_mono fun j => by
+          simp only [w]
+          split_ifs <;> simp
+    _ = dyadicWeight s k * dyadicGeomConst s q := by
+        rw [lqNorm_dyadicWeight_neg_eq_dyadicGeomConst hs hq0]
 
 /-! ### Products of sums -/
 
@@ -1121,6 +1200,13 @@ theorem mul_div_rpow_eq {a b : ℝ≥0∞} (ha0 : a ≠ 0) (ha : a ≠ ∞) (θ 
 theorem rpow_mul_rpow_ne_top {a b : ℝ≥0∞} (ha0 : a ≠ 0) (ha : a ≠ ∞) (hb0 : b ≠ 0) (hb : b ≠ ∞)
     (θ : ℝ) : a ^ (1 - θ) * b ^ θ ≠ ∞ :=
   ENNReal.mul_ne_top (ENNReal.rpow_ne_top_of_ne_zero ha0 ha) (ENNReal.rpow_ne_top_of_ne_zero hb0 hb)
+
+/-- From `x^p ≤ 2 y^p` to `x ≤ 2^(1/p) y`, for `0 < p < ∞`. -/
+theorem le_two_rpow_mul_of_rpow_le {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {x y : ℝ≥0∞}
+    (h : x ^ p.toReal ≤ 2 * y ^ p.toReal) : x ≤ 2 ^ (1 / p.toReal) * y := by
+  have hρ : 0 < p.toReal := ENNReal.toReal_pos hp0 hp
+  rwa [← ENNReal.rpow_le_rpow_iff hρ, ENNReal.mul_rpow_of_nonneg _ _ hρ.le, ← ENNReal.rpow_mul,
+    one_div_mul_cancel hρ.ne', ENNReal.rpow_one]
 
 /-! ### The constant of the quasi-triangle inequality -/
 
@@ -1215,6 +1301,26 @@ theorem eLpNorm_add_rpow_le_of_le_one {ε : Type*} [TopologicalSpace ε] [ESemin
   rw [← inhmgELpNorm_eq_eLpNorm_pow hp1 hp0, ← inhmgELpNorm_eq_eLpNorm_pow hp1 hp0,
     ← inhmgELpNorm_eq_eLpNorm_pow hp1 hp0]
   exact inhmgELpNorm_add_le
+
+/-- **Telescoping in `L_r`, `0 < r ≤ 1`**:
+`‖u_{k+n} - u_k‖_r^r ≤ ∑_{i<n} ‖u_{k+i+1} - u_{k+i}‖_r^r` for functions with values in a
+seminormed group, since the `r`-th power of the quasi-norm is subadditive
+(`MeasureTheory.eLpNorm_add_rpow_le_of_le_one`). -/
+theorem eLpNorm_sub_rpow_le_sum {E : Type*} [SeminormedAddCommGroup E] {r : ℝ≥0∞}
+    (hr0 : r ≠ 0) (hr1 : r ≤ 1) (u : ℕ → α → E) (k n : ℕ) :
+    eLpNorm (u (k + n) - u k) r μ ^ r.toReal ≤
+      ∑ i ∈ Finset.range n, eLpNorm (u (k + i + 1) - u (k + i)) r μ ^ r.toReal := by
+  have hρ : 0 < r.toReal := ENNReal.toReal_pos hr0 (ne_top_of_le_ne_top ENNReal.one_ne_top hr1)
+  induction n with
+  | zero => simp [ENNReal.zero_rpow_of_pos hρ]
+  | succ n ih =>
+    rw [Finset.sum_range_succ]
+    calc eLpNorm (u (k + (n + 1)) - u k) r μ ^ r.toReal
+        = eLpNorm ((u (k + n + 1) - u (k + n)) + (u (k + n) - u k)) r μ ^ r.toReal := by
+          rw [sub_add_sub_cancel]; rfl
+      _ ≤ eLpNorm (u (k + n + 1) - u (k + n)) r μ ^ r.toReal +
+            eLpNorm (u (k + n) - u k) r μ ^ r.toReal := eLpNorm_add_rpow_le_of_le_one hr0 hr1 _ _
+      _ ≤ _ := by rw [add_comm]; gcongr
 
 /-- **Monotone convergence for `L_p` norms**: for a directed countable family of measurable
 functions `F_b : α → [0, ∞]`, `‖sup_b F_b‖_p = sup_b ‖F_b‖_p`. For `p < ∞` this is the monotone

@@ -38,7 +38,9 @@ Hölder's inequality on finite sets, also for means (`MeasureTheory.lqNorm_laver
 a probability space, with the `L_p` norm on the right (`MeasureTheory.lqNorm_lintegral_le_eLpNorm`).
 Finally, a pointwise bound `u ≤ v + w_J` with `‖w_J‖_p → 0` gives `u ≤ v` almost everywhere
 (`MeasureTheory.ae_le_of_le_add_of_tendsto_eLpNorm`), and a bound `|G_J| ≤ v` almost everywhere
-passes to the limit of `G_J` in `L_p` (`MeasureTheory.ae_enorm_le_of_tendsto_Lp`). Setting
+passes to the limit of `G_J` in `L_p` (`MeasureTheory.ae_enorm_le_of_tendsto_Lp`); for a
+sequence `u_n → g` in measure, Fatou's lemma bounds `‖g - u_k‖_r^r`, `0 < r ≤ 1`, by the series
+`∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^r` (`MeasureTheory.eLpNorm_sub_rpow_le_tsum`). Setting
 terms of a family to zero decreases its mixed norm (`MeasureTheory.eLpNorm_lqNorm_ite_le`,
 `MeasureTheory.eLpNorm_lqNorm_ite_mono`), and one member is bounded by the mixed norm,
 `2^(js) ‖h_j‖_p ≤ ‖ x ↦ ‖(2^(is) |h_i(x)|)_i‖_{ℓ_q} ‖_p`
@@ -79,25 +81,6 @@ open scoped ENNReal
 open ENNReal (lqNorm dyadicWeight)
 
 namespace ENNReal
-
-/-! ### Tails of sequences -/
-
-/-- **The tails of a sequence in `ℓ_q` tend to zero**: for `0 < q < ∞` and `‖a‖_{ℓ_q} < ∞`,
-`‖(0, …, 0, a_N, a_{N+1}, …)‖_{ℓ_q} → 0` as `N → ∞`, since the tails `∑_{k ≥ N} a_k^q` of a
-convergent series tend to zero (Mathlib's `ENNReal.tendsto_sum_nat_add`). -/
-theorem tendsto_lqNorm_ite_le {q : ℝ≥0∞} (hq0 : q ≠ 0) (hq : q ≠ ∞) {a : ℕ → ℝ≥0∞}
-    (ha : lqNorm q a ≠ ∞) :
-    Tendsto (fun N => lqNorm q (fun j => if N ≤ j then a j else 0)) atTop (𝓝 0) := by
-  have hpos : 0 < q.toReal := ENNReal.toReal_pos hq0 hq
-  have hsum : ∑' j, a j ^ q.toReal ≠ ∞ := by
-    rw [← lqNorm_rpow hq0 hq]
-    exact ENNReal.rpow_ne_top_of_nonneg hpos.le ha
-  have h := ((ENNReal.continuous_rpow_const (y := 1 / q.toReal)).tendsto 0).comp
-    (ENNReal.tendsto_sum_nat_add _ hsum)
-  rw [ENNReal.zero_rpow_of_pos (one_div_pos.2 hpos)] at h
-  refine h.congr fun N => ?_
-  rw [Function.comp_apply, lqNorm_ite_le_eq hq0 hq, lqNorm_eq_tsum hq0 hq]
-  simp_rw [add_comm N]
 
 /-! ### Powers in `[0, ∞]` -/
 
@@ -584,6 +567,37 @@ theorem ae_enorm_le_of_tendsto_Lp {E : Type*} [NormedAddCommGroup E] [Fact (1 �
   obtain ⟨ns, -, hns⟩ := (tendstoInMeasure_of_tendsto_Lp hG).exists_seq_tendsto_ae
   filter_upwards [hns, ae_all_iff.2 fun k => h (ns k)] with x hx hk
   exact le_of_tendsto' hx.enorm hk
+
+/-- Convergence in measure is unaffected by subtracting one function from every term and from
+the limit. -/
+theorem TendstoInMeasure.sub_right {E : Type*} [SeminormedAddCommGroup E] {ι : Type*}
+    {l : Filter ι} {u : ι → α → E} {g : α → E} (hu : TendstoInMeasure μ u l g) (c : α → E) :
+    TendstoInMeasure μ (fun n => u n - c) l (g - c) := fun ε hε => by
+  simpa only [Pi.sub_apply, edist_sub_right] using hu ε hε
+
+/-- **Fatou's lemma for telescoping sums in `L_r`, `0 < r ≤ 1`**: if `u_n → g` in measure, with
+almost everywhere strongly measurable `u_n`, then
+`‖g - u_k‖_r^r ≤ ∑_{i ≥ 0} ‖u_{k+i+1} - u_{k+i}‖_r^r`. The finite telescoping sums bound
+`‖u_{k+n} - u_k‖_r^r` (`MeasureTheory.eLpNorm_sub_rpow_le_sum`), and Mathlib's
+`eLpNorm_le_of_tendstoInMeasure` passes the bound to the limit. For `r = 1` this is the triangle
+inequality for a series in `L_1`. -/
+theorem eLpNorm_sub_rpow_le_tsum {E : Type*} [SeminormedAddCommGroup E] {r : ℝ≥0∞}
+    (hr0 : r ≠ 0) (hr1 : r ≤ 1) {u : ℕ → α → E} {g : α → E}
+    (hu : TendstoInMeasure μ u atTop g) (hum : ∀ n, AEStronglyMeasurable (u n) μ) (k : ℕ) :
+    eLpNorm (g - u k) r μ ^ r.toReal ≤
+      ∑' i, eLpNorm (u (k + i + 1) - u (k + i)) r μ ^ r.toReal := by
+  have hρ : 0 < r.toReal := ENNReal.toReal_pos hr0 (ne_top_of_le_ne_top ENNReal.one_ne_top hr1)
+  set S := ∑' i, eLpNorm (u (k + i + 1) - u (k + i)) r μ ^ r.toReal
+  have hk : Tendsto (fun n => k + n) atTop atTop :=
+    tendsto_atTop_mono (fun n => Nat.le_add_left n k) tendsto_id
+  have hlim : TendstoInMeasure μ (fun n => u (k + n) - u k) atTop (g - u k) :=
+    (hu.comp hk).sub_right (u k)
+  have hbound : ∀ n, eLpNorm (u (k + n) - u k) r μ ≤ S ^ r.toReal⁻¹ := fun n =>
+    (ENNReal.le_rpow_inv_iff hρ).2 ((eLpNorm_sub_rpow_le_sum hr0 hr1 u k n).trans
+      (ENNReal.sum_le_tsum _))
+  have h := eLpNorm_le_of_tendstoInMeasure (Eventually.of_forall hbound) hlim
+    fun n => (hum _).sub (hum k)
+  exact (ENNReal.le_rpow_inv_iff hρ).1 h
 
 /-! ### Families with terms set to zero -/
 

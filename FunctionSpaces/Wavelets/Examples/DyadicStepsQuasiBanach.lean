@@ -96,6 +96,21 @@ theorem Lp.enorm_add_rpow_le_of_le_one {E : Type*} [NormedAddCommGroup E] {p : �
   rw [Lp.enorm_def, Lp.enorm_def, Lp.enorm_def, eLpNorm_congr_ae (Lp.coeFn_add f g)]
   exact eLpNorm_add_rpow_le_of_le_one hp0 hp1 _ _
 
+/-- **Two approximants of one element are close**, `p ≤ 1`: if `‖f - g‖_p ≤ e` and
+`‖f - h‖_p ≤ e` in `L_p(μ)`, then `‖g - h‖_p^p ≤ 2 e^p`, since `g - h = (f - h) - (f - g)`
+(`MeasureTheory.Lp.enorm_add_rpow_le_of_le_one`, `MeasureTheory.Lp.enorm_neg`). -/
+theorem Lp.enorm_sub_rpow_le_two_mul {E : Type*} [NormedAddCommGroup E] {p : ℝ≥0∞}
+    (hp1 : p ≤ 1) {f g h : Lp E p μ} {e : ℝ≥0∞} (hg : ‖f - g‖ₑ ≤ e) (hh : ‖f - h‖ₑ ≤ e) :
+    ‖g - h‖ₑ ^ p.toReal ≤ 2 * e ^ p.toReal :=
+  calc ‖g - h‖ₑ ^ p.toReal = ‖(f - h) + -(f - g)‖ₑ ^ p.toReal := by
+        rw [show (f - h) + -(f - g) = g - h by abel]
+    _ ≤ ‖f - h‖ₑ ^ p.toReal + ‖-(f - g)‖ₑ ^ p.toReal := Lp.enorm_add_rpow_le_of_le_one hp1 _ _
+    _ ≤ e ^ p.toReal + e ^ p.toReal := by
+        rw [Lp.enorm_neg]
+        exact add_le_add (ENNReal.rpow_le_rpow hh ENNReal.toReal_nonneg)
+          (ENNReal.rpow_le_rpow hg ENNReal.toReal_nonneg)
+    _ = 2 * e ^ p.toReal := (two_mul _).symm
+
 /-- **A value of `F` approximates `F` on `s` at least as well as the mean of all values** (the
 first moment method, Mathlib's `exists_le_setLAverage`): for measurable `F`, a set `s` of finite
 positive measure and every exponent `r`, some `y ∈ s` has

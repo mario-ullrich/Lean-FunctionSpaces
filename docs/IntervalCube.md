@@ -14,8 +14,9 @@ one coordinate at a time, and the translation algebra `ℂ[ℝ^d]` of
 the moduli in the coordinates. The martingale differences of [Besov and Sobolev spaces on measure
 spaces](MeasureSpaces.md) give the Haar characterisation, and multiwavelets refine it to higher
 degree. In breadth-first order the Haar functions form a Hilbert basis of `L_2[0, 1]`, and for
-`1 ≤ τ < 2` and `θ = 1/τ - 1/2` best `n`-term approximation from it in `L_2` gives the same
-approximation space `A^θ_τ` as linear Haar approximation in `L_τ`.
+`0 < τ < 2` and `θ = 1/τ - 1/2` best `n`-term approximation from it in `L_2` gives the same
+approximation space `A^θ_τ` as approximation by dyadic step functions in `L_τ`, for `τ < 1` in
+the quasi-Banach space `L_τ`.
 
 ## Main results
 
@@ -135,7 +136,17 @@ approximation space `A^θ_τ` as linear Haar approximation in `L_τ`.
   inequality of order `1/p` (`Haar.eFunctional_stepCouple_le`, `Haar.lpModulus_le_of_mem_lpMeas`);
   for `s > 1`, and for `s = 1` with `q < ∞`, this space misses the line `x ↦ x`, whose second
   modulus vanishes (`Haar.not_memEMethod_stepCouple_idLp`). For `1 ≤ p` the step couple is the
-  complexity couple of the Haar scheme (`Haar.memEMethod_stepCouple_iff_memApprox`).
+  complexity couple of the Haar scheme (`Haar.memEMethod_stepCouple_iff_memApprox`). For
+  `0 < p ≤ 1`, `s > 1/p - 1` and `0 < q ≤ ∞` the space `E_{s,q}` embeds into `L_1[0, 1]`
+  (`Haar.eLpNorm_one_le_eNormDyadic`), and `f ∈ E_{s,q}` iff `f ∈ L_1[0, 1]` and
+  `|∫_0^1 f| + ‖(2^(k(s+1/2-1/p)) ‖(⟨f, h_{k,m}⟩)_{m<2^k}‖_{ℓ_p})_k‖_{ℓ_q} < ∞`
+  (`Haar.memEMethod_stepCouple_iff_haarCoeff`); for `1/p - 1 < s < 1/p` this describes
+  `B^s_{p,q,1}[0, 1]` by Haar coefficients (`Haar.lqNorm_modulus_lt_top_iff_haarCoeff_of_le_one`).
+  For `q < ∞` the Haar system is a Schauder basis of `E_{s,q}`: the partial sums converge
+  (`Haar.tendsto_eNormDyadic_sub_haarPartialSum`) and the coefficients are unique
+  (`Haar.eq_haarSystemCoeff_of_tendsto`). The proofs use martingale convergence in `L_1`
+  (`Haar.tendsto_eLpNorm_condExp_sub`) and Fatou's lemma for telescoping sums in `L_r`,
+  `0 < r ≤ 1` (`MeasureTheory.eLpNorm_sub_rpow_le_tsum`).
 * **The Haar basis and `n`-term approximation.** The functions `φ_0 = 1` and
   `φ_{2^k+i} = h_{k,i}`, `k ∈ ℕ`, `0 ≤ i < 2^k`, form a Hilbert basis of `L_2[0, 1]`
   (`Haar.haarBasis`, with the coefficients `Haar.haarBasis_repr_zero`,
@@ -146,7 +157,12 @@ approximation space `A^θ_τ` as linear Haar approximation in `L_τ`.
   (`Haar.memApprox_nTerm_iff_memApprox_scheme`), so it is the Besov condition
   `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞` and its periodic version
   (`Haar.memApprox_nTerm_iff_modulus`, `Haar.memApprox_nTerm_iff_perModulus`): the Haar case of
-  the theorem of DeVore, Jawerth and Popov.
+  the theorem of DeVore, Jawerth and Popov. For `0 < τ ≤ 1` the space `A^θ_τ` is, as a set, the
+  approximation space `E_{θ,τ}` of dyadic steps in `L_τ` (`Haar.memApprox_nTerm_iff_memEMethod`,
+  `Haar.exists_inclusion_eq_of_memEMethod`), and for every `0 < τ < 2`, `f ∈ A^θ_τ` iff
+  `‖f‖_τ + ‖(2^(kθ) ω_1(f, 2^(-k), [0, 1])_τ)_k‖_{ℓ_τ} < ∞`
+  (`Haar.memApprox_nTerm_iff_modulus_of_lt_two`), the classical `B^θ_{τ,τ}[0, 1]` for
+  `2/3 < τ < 2`.
 
 ## What is formalised
 
@@ -182,6 +198,9 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Haar coefficients and Besov spaces on the interval and the circle for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarBesov` |
 | The Haar basis of `L_2[0, 1]`, `n`-term approximation | ✅ | ✗ | `Wavelets/Examples/HaarBasis` |
 | Dyadic step functions in `L_p[0, 1]`, `0 < p ≤ 1`: the step couple, Jackson's inequality by averaging, inverse inequality of order `1/p`, `A^s_q = B^s_{p,q,1}[0, 1]` for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/DyadicStepsQuasiBanach` |
+| The Haar system for `0 < p ≤ 1`: steps in `L_1`, level norms, embedding of `A^s_q(L_p, steps)` into `L_1` for `s > 1/p - 1`, martingale convergence in `L_1`, Haar coefficient characterisation, `B^s_{p,q,1}[0, 1]` by Haar coefficients for `1/p - 1 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/HaarQuasiBanach` |
+| Haar partial sums for `0 < p ≤ 1`: convergence in `A^s_q(L_p, steps)` for `s > 1/p - 1` and `q < ∞`, uniqueness of the coefficients (Schauder basis) | ✅ | ✗ | `Wavelets/Examples/HaarSchauderBasis` |
+| `n`-term Haar approximation in `L_2` for every `0 < τ < 2`: approximation by steps in `L_τ`, `τ ≤ 1`, and the Besov space of the first modulus | ✅ | ✗ | `Wavelets/Examples/HaarNTermBesov` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics
