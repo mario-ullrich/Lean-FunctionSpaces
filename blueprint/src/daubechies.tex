@@ -5904,3 +5904,305 @@ D4, and two masks with the same polynomial are equal. The sign $-$ gives
 $\alpha = (1 - \sqrt 3)/2$ and $\beta = (1 + \sqrt 3)/2$, and then $L$ has the root
 $2 - \sqrt 3$ in the unit disk.
 \end{proof}
+
+\chapter{Tensor Daubechies wavelets on \texorpdfstring{$\R^d$}{R\^{}d}}
+\label{ch:daubechies-rd}
+
+This chapter carries the Daubechies wavelets of \Cref{ch:daubechies} to $\R^d$ by tensor
+products. Throughout, $\R^d$ carries Lebesgue measure and the norm $\|x\| = \max_i |x_i|$, and
+$\varphi$ and $\psi$ are the scaling function and the wavelet of a Daubechies mask of order
+$N \geq 2$. For a set $e \subseteq \{1, \dots, d\}$ of coordinates the tensor generator $\Psi^e$
+is the tensor product with $\psi$ in the coordinates of $e$ and $\varphi$ in the others. The
+function $\Phi = \Psi^\emptyset$ is the tensor scaling function, and the $2^d - 1$ generators with
+$e \neq \emptyset$ are the tensor wavelets of DeVore~\cite[(7.18)]{DeVore1998}.
+
+The generators are the building blocks of a multiresolution analysis of $L_p(\R^d)$. The
+coefficients of a function with respect to the translates $\Phi(\cdot - k)$ and the dilated
+translates $2^{jd/2} \Psi^e(2^j \cdot - k)$, $e \neq \emptyset$, $j \in \N$, $k \in \Z^d$,
+describe its Besov regularity, with the weights $2^{j(s + d/2 - d/p)}$ on the $\ell_p$ norms of
+the wavelet coefficients of level $j$. Triebel~\cite[Theorem~1.20]{Triebel2008} proves this
+characterisation of $\Besov{s}{p}{q}(\R^d)$ for $0 < p, q \leq \infty$ and Daubechies wavelets
+in $C^u$ with $u$ vanishing moments and $u > \max(s, d(1/p - 1)_+ - s)$, and
+Meyer~\cite[Ch.~6, \S 10]{Meyer} for $p \geq 1$. DeVore~\cite[\S 7.3, (7.28) and
+Remark~7.2]{DeVore1998} states it in homogeneous form and with $L_p$-normalised coefficients, for
+$1 \leq p \leq \infty$ if the wavelets lie in $\Besov{\beta}{p}{q}(\R^d)$ for some $\beta > s$
+and have more than $s$ vanishing moments; the change of normalisation \cite[(7.25)]{DeVore1998}
+turns his weights into the ones above. For $s < N$ a Bernstein bound of order $\theta > s$ for
+$\varphi$ gives his first condition, since $\psi$ is a finite combination of the
+$\varphi(2 \cdot - k)$ (\Cref{lem:daub-wavelet-modulus-bound} and
+\Cref{thm:daub-rd-generator-moduli}).
+
+The route of \Cref{thm:daub-besov} carries over to $\R^d$ and goes through Jackson's and
+Bernstein's inequalities for the dilated shift-invariant spaces of $\Phi$ and the general theory
+of approximation spaces (DeVore~\cite[\S 4.3, Theorem~1, and \S 7.1]{DeVore1998}); DeVore and
+Popov~\cite[Theorems~4.5 and~5.1]{DeVorePopovTAMS} take it for dyadic splines on the unit cube
+of $\R^d$. This chapter proves the properties of the generators that the route uses: their
+support, the orthonormality of their integer translates, and bounds for their moduli of
+smoothness (\Cref{sec:daub-rd-generators}). Tensor products of kernels and their integrals are treated in
+\Cref{ch:mixed-smoothness}.
+
+\section{Tensor generators}
+\label{sec:daub-rd-generators}
+
+\begin{definition}[Tensor generators]
+\label{def:daub-rd-generators}
+\lean{Daubechies.tensorGen, Daubechies.tensorGen_apply}
+\leanok
+\uses{def:daub-scaling-function, def:daub-wavelet, def:tensor-kernel}
+Let $\varphi$ and $\psi$ be the scaling function and the wavelet of a Daubechies mask. For
+$e \subseteq \{1, \dots, d\}$ the \emph{tensor generator} is
+\[
+  \Psi^e(x) = \prod_{i \in e} \psi(x_i) \prod_{i \notin e} \varphi(x_i) ,
+  \qquad x \in \R^d .
+\]
+The function $\Phi = \Psi^\emptyset$ is the \emph{tensor scaling function}, and the $\Psi^e$
+with $e \neq \emptyset$ are the \emph{tensor wavelets}.
+\end{definition}
+
+\begin{lemma}[Support and integrability of the generators]
+\label{lem:daub-rd-generator-support}
+\lean{Daubechies.ite_wavelet_scalingFun_eq_zero, Daubechies.tensorGen_eq_zero,
+  Daubechies.continuous_tensorGen, Daubechies.hasCompactSupport_tensorGen,
+  Daubechies.memLp_tensorGen}
+\leanok
+\uses{def:daub-rd-generators}
+Let $N \geq 2$. Then $\varphi$ and $\psi$ vanish outside $[1 - N, 2N - 1]$, and for every
+$e \subseteq \{1, \dots, d\}$ and every $x \in \R^d$ with $x_i \notin [1 - N, 2N - 1]$ for some
+$i$, $\Psi^e(x) = 0$. Every $\Psi^e$ is continuous, has compact support and lies in
+$L_p(\R^d)$ for every $p \in [0, \infty]$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-scaling-support, lem:daub-wavelet-basic, prop:daub-scaling-continuous}
+$\varphi$ vanishes outside $[0, 2N - 1]$ (\Cref{thm:daub-scaling-support}) and $\psi$ outside
+$[1 - N, N]$ (\Cref{lem:daub-wavelet-basic}); both intervals lie in $[1 - N, 2N - 1]$. If $x_i$
+lies outside this interval, the factor of coordinate $i$ vanishes. Products of the continuous
+functions $\varphi$ and $\psi$ (\Cref{prop:daub-scaling-continuous} and
+\Cref{lem:daub-wavelet-basic}) are continuous, and a continuous function with compact support
+lies in every $L_p$.
+\end{proof}
+
+\begin{proposition}[Orthonormality of the tensor generators]
+\label{prop:daub-rd-orthonormal}
+\lean{Daubechies.integral_ite_translate_mul_conj_translate,
+  Daubechies.integral_tensorGen_translate_mul_conj_translate}
+\leanok
+\uses{def:daub-rd-generators}
+Let $N \geq 2$. For all $\gamma, \gamma' \in \{\varphi, \psi\}$ and $k, l \in \Z$,
+$\int_\R \gamma(t - k) \, \overline{\gamma'(t - l)} \, dt$ is $1$ if $\gamma = \gamma'$ and
+$k = l$, and $0$ otherwise. For all $e, e' \subseteq \{1, \dots, d\}$ and $k, l \in \Z^d$,
+\[
+  \int_{\R^d} \Psi^e(x - k) \, \overline{\Psi^{e'}(x - l)} \, dx =
+  \begin{cases} 1 & \text{if } e = e' \text{ and } k = l , \\
+    0 & \text{otherwise.} \end{cases}
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{thm:daub-orthonormal, thm:daub-wavelet-orthonormal, lem:tensor-kernel-fubini}
+In dimension one the cases $\gamma = \gamma'$ are \Cref{thm:daub-orthonormal} and
+\Cref{thm:daub-wavelet-orthonormal}, which also gives
+$\int \psi(t - k) \, \overline{\varphi(t - l)} \, dt = 0$; its conjugate is the case
+$\gamma = \varphi$, $\gamma' = \psi$. By Fubini's theorem (\Cref{lem:tensor-kernel-fubini}) the
+integral over $\R^d$ is the product over the coordinates of the one-dimensional integrals, each
+$0$ or $1$. The product is $1$ if and only if every coordinate lies in both or in neither of
+$e$ and $e'$ and $k_i = l_i$ for every $i$, that is, if $e = e'$ and $k = l$.
+\end{proof}
+
+\paragraph{Modulus bounds of lower orders.}
+The isotropic difference of order $N$ of a tensor product expands into mixed coordinate
+differences of total order $N$ (\Cref{lem:iso-expansion}), so the factors $\varphi$ and $\psi$
+need bounds for their differences of every order $n \leq N$.
+
+\begin{definition}[Modulus bounds]
+\label{def:daub-modulus-bound}
+\lean{Daubechies.ModulusBound, Daubechies.bernsteinBound_iff_modulusBound}
+\leanok
+\uses{def:rd-modulus, def:daub-bernstein-bound}
+Let $g : \R \to \C$, $0 < p \leq \infty$, $\theta \in \R$ and $r \in \N$. The function $g$ has a
+\emph{modulus bound} of order $\theta$ in $L_p$ with differences of order $r$ if there is a
+constant $K < \infty$ with $\omega_r(g, t)_p \leq K t^\theta$ for every $t \in (0, 1]$. A
+Bernstein bound (\Cref{def:daub-bernstein-bound}) is a modulus bound for the scaling function.
+\end{definition}
+
+\begin{lemma}[From dyadic scales to all scales]
+\label{lem:daub-modulus-bound-dyadic}
+\lean{Daubechies.modulusBound_of_dyadic}
+\leanok
+\uses{def:daub-modulus-bound}
+Let $g : \R \to \C$, $0 < p \leq \infty$, $r \in \N$, $\theta \geq 0$ and $B < \infty$, and let
+$\omega_r(g, 2^{-k})_p \leq B \, 2^{-k\theta}$ for every $k \in \N$. Then
+$\omega_r(g, t)_p \leq 2^\theta B \, t^\theta$ for every $t \in (0, 1]$, so $g$ has a modulus
+bound of order $\theta$ in $L_p$ with differences of order $r$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:rd-modulus, lem:daub-dyadic-scales}
+For $t \in (0, 1]$ choose $k \in \N$ with $2^{-k-1} < t \leq 2^{-k}$. The modulus increases in
+$t$ (\Cref{lem:rd-modulus}), and
+$2^{-k\theta} = 2^\theta (2^{-k-1})^\theta \leq 2^\theta t^\theta$
+(\Cref{lem:daub-dyadic-scales}).
+\end{proof}
+
+\begin{lemma}[Modulus bounds of other orders]
+\label{lem:daub-modulus-bound-orders}
+\lean{Daubechies.ModulusBound.of_order}
+\leanok
+\uses{def:daub-modulus-bound}
+Let $1 \leq p < \infty$, $g \in L_p(\R)$, $r, r' \in \N$, and $\theta, \theta' \in \R$ with
+$0 \leq \theta' \leq \theta$ and $\theta' < r'$. If $g$ has a modulus bound of order $\theta$ in
+$L_p$ with differences of order $r$, then $g$ has a modulus bound of order $\theta'$ in $L_p$
+with differences of order $r'$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{thm:rd-besov, lem:daub-modulus-bound-dyadic, lem:daub-dyadic-scales}
+Let $\omega_r(g, t)_p \leq K t^\theta$ for $t \in (0, 1]$. Then
+$2^{k\theta'} \omega_r(g, 2^{-k})_p \leq K \, 2^{-k(\theta - \theta')} \leq K$ for every
+$k \in \N$ (\Cref{lem:daub-dyadic-scales}). Item~3 of \Cref{thm:rd-besov} with $s = \theta'$
+and $q = \infty$ gives a constant $C < \infty$ with
+$\sup_k 2^{k\theta'} \omega_{r'}(g, 2^{-k})_p \leq C (\|g\|_p + K)$, and
+\Cref{lem:daub-modulus-bound-dyadic} passes from the dyadic scales to all $t \in (0, 1]$.
+\end{proof}
+
+\begin{lemma}[Differences of every order]
+\label{lem:daub-modulus-bound-steps}
+\lean{Daubechies.ModulusBound.exists_eLpNorm_le,
+  Daubechies.ModulusBound.exists_eLpNorm_le_orders}
+\leanok
+\uses{def:daub-modulus-bound}
+Let $g : \R \to \C$ have a modulus bound of order $\theta$ in $L_p$ with differences of order
+$r \geq 1$. Then there is $K < \infty$ with $\|\Delta_t^r g\|_p \leq K |t|^\theta$ for every
+$t \in [-1, 1]$. If moreover $1 \leq p < \infty$, $g \in L_p(\R)$, and
+$0 \leq \theta' \leq \theta$ with $\theta' < r$, then there is $A < \infty$ with
+\[
+  \|\Delta_t^n g\|_p \leq A \, |t|^{\theta' n / r}
+  \qquad \text{for every } n \in \{0, \dots, r\} \text{ and every } t \in [-1, 1] .
+\]
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:rd-modulus, lem:daub-modulus-bound-orders}
+For $t \neq 0$ the step $t$ is admissible for the modulus at $|t| \in (0, 1]$
+(\Cref{lem:rd-modulus}), and $\Delta_0^r g = 0$ for $r \geq 1$. For $1 \leq n \leq r$ the
+exponent $\theta' n / r$ lies in $[0, \theta]$ and is smaller than $n$, so
+\Cref{lem:daub-modulus-bound-orders} gives a modulus bound of order $\theta' n / r$ with
+differences of order $n$; for $n = 0$ the bound holds with $\|g\|_p$. Let $A$ be the sum of the
+$r + 1$ constants.
+\end{proof}
+
+\begin{lemma}[Modulus bounds for the wavelet]
+\label{lem:daub-wavelet-modulus-bound}
+\lean{Daubechies.toLp_wavelet_mem_scalingSpace, Daubechies.modulusBound_wavelet}
+\leanok
+\uses{def:daub-modulus-bound, def:daub-bernstein-bound, def:daub-scaling-space,
+  def:daub-wavelet}
+Let $N \geq 2$ and $1 \leq p < \infty$. The wavelet $\psi$ lies in the scaling space $V_1$. If
+the scaling function has a Bernstein bound of order $\theta \geq 0$ in $L_p$ with differences of
+order $r$, then $\psi$ has a modulus bound of order $\theta$ in $L_p$ with differences of
+order $r$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-wavelet-refine, prop:daub-proj-reproduction, thm:daub-bernstein, lem:rd-modulus}
+At $j = k = 0$, \Cref{lem:daub-wavelet-refine} reads $\psi = \sum_n (g_n / \sqrt 2) \varphi_{1,n}$,
+and $P_1$ reproduces expansions of level one (\Cref{prop:daub-proj-reproduction}), so
+$\psi = P_1 \psi \in V_1$. Let $\omega_r(\varphi, t)_p \leq K t^\theta$ for $t \in (0, 1]$. For
+$t \leq \frac12$ Bernstein's inequality (\Cref{thm:daub-bernstein} with $j = 1$) gives
+$\omega_r(\psi, t)_p \leq C_B \, \omega_r(\varphi, 2t)_p \|\psi\|_p
+\leq C_B K (2t)^\theta \|\psi\|_p$. For $\frac12 < t \leq 1$,
+$\omega_r(\psi, t)_p \leq 2^r \|\psi\|_p \leq 2^r (2t)^\theta \|\psi\|_p$
+(\Cref{lem:rd-modulus}). Hence
+$\omega_r(\psi, t)_p \leq 2^\theta (C_B K + 2^r) \|\psi\|_p \, t^\theta$ for $t \in (0, 1]$.
+\end{proof}
+
+\paragraph{Isotropic differences of tensor products.}
+
+\begin{lemma}[Mixed coordinate differences of tensor products]
+\label{lem:tensor-kernel-mixed-differences}
+\lean{Cube.mixedDiff_tensorKernel}
+\leanok
+\uses{lem:iso-expansion, def:tensor-kernel}
+Let $K_1, \dots, K_d : \R \to \C$, $m \in \N^d$ and $h \in \R^d$, and let $l$ be a list of
+distinct coordinates. The mixed coordinate difference of $\otimes K$ along $l$ with the orders
+$m_i$ and the steps $h_i$ (\Cref{lem:iso-expansion}) is $\otimes K'$ with
+$K'_i = \Delta^{m_i}_{h_i} K_i$ for $i$ in $l$ and $K'_i = K_i$ otherwise.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{def:iso-diff, lem:mixed-differences}
+Induction on $l$: the difference in coordinate $i$ is the isotropic difference with step
+$h_i e_i$ (\Cref{def:iso-diff}), which acts on the factor of coordinate $i$ of a tensor product
+(\Cref{lem:mixed-differences}).
+\end{proof}
+
+\begin{proposition}[Isotropic differences of tensor products]
+\label{prop:tensor-kernel-isotropic-differences}
+\lean{Rd.prod_eLpNorm_higherDiff_le, Rd.eLpNorm_higherDiff_tensorKernel_le}
+\leanok
+\uses{def:rd-modulus, def:tensor-kernel}
+Let $1 \leq p < \infty$, $r \in \N$, $A \in [0, \infty]$, let $K_1, \dots, K_d : \R \to \C$ be
+measurable, and let $\theta_0, \theta_1, \dots \geq 0$ with
+\[
+  \|\Delta_t^n K_i\|_p \leq A \, |t|^{\theta_n}
+  \qquad \text{for every } i , \text{ every } n \leq r \text{ and every } t \in [-1, 1] .
+\]
+Then $\prod_i \|\Delta^{n_i}_{h_i} K_i\|_p \leq A^d \|h\|^{\sum_i \theta_{n_i}}$ for every
+$n \in \{0, \dots, r\}^d$ and every $h \in \R^d$ with $\|h\| \leq 1$. If
+$0 \leq \Theta \leq \sum_i \theta_{n_i}$ for every $n \in \N^d$ with $\sum_i n_i = r$, then
+\[
+  \|\Delta_h^r (\otimes K)\|_p \leq d^r A^d \|h\|^\Theta
+  \qquad \text{for every } h \in \R^d \text{ with } \|h\| \leq 1 .
+\]
+\end{proposition}
+
+\begin{proof}
+\leanok
+\uses{lem:iso-expansion, lem:tensor-kernel-mixed-differences, lem:tensor-kernel-fubini,
+  lem:rd-differences, thm:iso-diff-bound}
+Since $|h_i| \leq \|h\| \leq 1$, the factor of coordinate $i$ is at most
+$A \|h\|^{\theta_{n_i}}$, and the product of these powers is $\|h\|^{\sum_i \theta_{n_i}}$
+(\Cref{thm:iso-diff-bound}). The isotropic difference is the sum over the $d^r$ words $\alpha$ of
+the translates $M_{m(\alpha)} (\otimes K)(\cdot + s_\alpha)$ of mixed coordinate differences with
+$\sum_i m_i(\alpha) = r$ and $m_i(\alpha) \leq r$ (\Cref{lem:iso-expansion}). Each
+$M_{m(\alpha)} (\otimes K)$ is the tensor product of the $\Delta^{m_i(\alpha)}_{h_i} K_i$
+(\Cref{lem:tensor-kernel-mixed-differences}), whose $L_p$ norm is
+$\prod_i \|\Delta^{m_i(\alpha)}_{h_i} K_i\|_p$ (\Cref{lem:tensor-kernel-fubini}), also for the
+translate (\Cref{lem:rd-differences}). By the first part and $\|h\| \leq 1$ each word contributes
+at most $A^d \|h\|^\Theta$, and the triangle inequality over the $d^r$ words completes the proof.
+\end{proof}
+
+\begin{theorem}[Moduli of smoothness of the tensor generators]
+\label{thm:daub-rd-generator-moduli}
+\lean{Daubechies.eLpNorm_higherDiff_tensorGen_le}
+\leanok
+\uses{def:daub-rd-generators, def:daub-bernstein-bound}
+Let $N \geq 2$ and $1 \leq p < \infty$, let the scaling function have a Bernstein bound of order
+$\theta$ in $L_p$ with differences of order $N$, and let $0 \leq \theta' \leq \theta$ with
+$\theta' < N$. Then there is $K < \infty$ with
+\[
+  \|\Delta_h^N \Psi^e\|_p \leq K \|h\|^{\theta'}
+\]
+for every $e \subseteq \{1, \dots, d\}$ and every $h \in \R^d$ with $\|h\| \leq 1$.
+\end{theorem}
+
+\begin{proof}
+\leanok
+\uses{lem:daub-wavelet-modulus-bound, lem:daub-modulus-bound-steps,
+  prop:daub-scaling-integrable, lem:daub-wavelet-basic, prop:tensor-kernel-isotropic-differences}
+Both $\varphi$ and $\psi$ lie in $L_p(\R)$ (\Cref{prop:daub-scaling-integrable} and
+\Cref{lem:daub-wavelet-basic}) and have modulus bounds of order $\theta$ with differences of
+order $N$ (\Cref{lem:daub-wavelet-modulus-bound}). So there is $A < \infty$ with
+$\|\Delta_t^n \gamma\|_p \leq A \, |t|^{\theta' n / N}$ for $\gamma \in \{\varphi, \psi\}$,
+$n \leq N$ and $t \in [-1, 1]$ (\Cref{lem:daub-modulus-bound-steps}). For $n \in \N^d$ with
+$\sum_i n_i = N$ the exponents add up to $\theta' \sum_i n_i / N = \theta'$, and
+\Cref{prop:tensor-kernel-isotropic-differences} with $\Theta = \theta'$ gives the bound with
+$K = d^N A^d$.
+\end{proof}

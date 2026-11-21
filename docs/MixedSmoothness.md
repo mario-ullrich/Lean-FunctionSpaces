@@ -42,7 +42,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
-| Tensor kernels on `ℝ^d`: integrals, convolutions, dilations, diagonal changes of variables | ✅ | ✗ | `Rd/MixedSmoothness/TensorKernels` |
+| Tensor kernels on `ℝ^d`: integrals, `L_p` norms, convolutions, dilations, diagonal changes of variables | ✅ | ✗ | `Rd/MixedSmoothness/TensorKernels` |
 | Sequences on `ℕ^d`: `ℓ_q` norms, Schur test, almost diagonal lemma | ✅ | ✗ | `Rd/MixedSmoothness/MixedSequences` |
 | Mixed differences, mixed moduli, the mixed Besov quasi-norm | ✅ | ✗ | `Rd/MixedSmoothness/MixedDifferences` |
 | Averaged mixed differences, bounded polynomials in translations | ✅ | ✗ | `Rd/MixedSmoothness/MixedAveragedDifferences` |

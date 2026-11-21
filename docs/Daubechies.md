@@ -1,12 +1,12 @@
 # Daubechies wavelets
 
 Part of [Characterizations of Function Spaces](../README.md). Blueprint: part *Besov spaces*,
-chapter *Daubechies wavelets*.
+chapters *Daubechies wavelets* and *Tensor Daubechies wavelets on `ℝ^d`*.
 
-The compactly supported orthonormal wavelets of Daubechies on `ℝ`, built from the filter up, and
-the description of `B^s_{p,q}(ℝ)` by their coefficients. A mask of order `N` comes from the
-Fejér–Riesz theorem, the scaling function is the inverse Fourier transform of the infinite
-product of its symbol, and everything about it is proved with the Fourier transform of
+The compactly supported orthonormal wavelets of Daubechies on `ℝ` and `ℝ^d`, built from the
+filter up, and the description of `B^s_{p,q}(ℝ)` by their coefficients. A mask of order `N`
+comes from the Fejér–Riesz theorem, the scaling function is the inverse Fourier transform of the
+infinite product of its symbol, and everything about it is proved with the Fourier transform of
 integrable functions: the refinement equation, the compact support through the cascade
 algorithm, the orthonormality of the translates and the reproduction of polynomials. The
 transfer operator of Eirola and Villemoes gives the Sobolev regularity, the matrix method of
@@ -14,7 +14,9 @@ Daubechies and Lagarias the Hölder exponent of D4. The projections onto the spa
 projection scheme in the sense of [Approximation spaces](ApproximationSpaces.md); Jackson's and
 Bernstein's inequalities identify its approximation spaces with the Besov spaces of
 [Besov spaces on `ℝ^d`](Rd.md), as for the Haar system and the multiwavelets of
-[Intervals, the cube, splines and wavelets](IntervalCube.md).
+[Intervals, the cube, splines and wavelets](IntervalCube.md). On `ℝ^d` the integer translates of
+the tensor products of the scaling function and the wavelet are orthonormal, and the Bernstein
+bounds of the scaling function bound their moduli of smoothness.
 
 ## Main results
 
@@ -77,6 +79,14 @@ Bernstein's inequalities identify its approximation spaces with the Besov spaces
   `0 < s < 3 - log₂ 3` (`Daubechies.besov_iff_coeff_order_three_le_two`), for `2 ≤ p < ∞` and
   `0 < s < 5/2 - log₂ 3 + 1/p` (`Daubechies.besov_iff_coeff_order_three_two_le`), and hence for
   every `1 ≤ p < ∞` and `0 < s < 5/2 - log₂ 3` (`Daubechies.besov_iff_coeff_order_three`).
+* **Tensor generators on `ℝ^d`.** For a set `e` of coordinates let
+  `Ψ^e(x) = ∏_{i ∈ e} ψ(x_i) ∏_{i ∉ e} φ(x_i)` (`Daubechies.tensorGen`). For `N ≥ 2` and
+  `k, l ∈ ℤ^d`, `∫ Ψ^e(x - k) conj Ψ^{e'}(x - l) dx` is `1` if `e = e'` and `k = l`, and `0`
+  otherwise (`Daubechies.integral_tensorGen_translate_mul_conj_translate`). If `φ` has a
+  Bernstein bound of order `θ` in `L_p`, `1 ≤ p < ∞`, with differences of order `N`, and
+  `0 ≤ θ' ≤ θ` with `θ' < N`, then there is `K < ∞` with `‖Δ_h^N Ψ^e‖_p ≤ K ‖h‖^{θ'}` for every
+  `e` and every `h ∈ ℝ^d` with `‖h‖ ≤ 1` in the sup norm
+  (`Daubechies.eLpNorm_higherDiff_tensorGen_le`).
 
 ## What is formalised
 
@@ -97,6 +107,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Expansions, polynomial reproduction, projections, the multiresolution analysis, the wavelet | ✅ | ✗ | `Wavelets/Examples/Daubechies/Expansion`, `Wavelets/Examples/Daubechies/ExpansionScaling`, `Wavelets/Examples/Daubechies/PolynomialReproduction`, `Wavelets/Examples/Daubechies/Projections`, `Wavelets/Examples/Daubechies/Wavelet` |
 | Jackson's and Bernstein's inequalities | ✅ | ✗ | `Wavelets/Examples/Daubechies/JacksonSmoothing`, `Wavelets/Examples/Daubechies/Jackson`, `Wavelets/Examples/Daubechies/Bernstein` |
 | Besov spaces by Daubechies coefficients; D4 and order three | ✅ | ✗ | `Wavelets/Examples/Daubechies/Besov`, `Wavelets/Examples/Daubechies/D4Besov`, `Wavelets/Examples/Daubechies/OrderThree` |
+| Tensor generators on `ℝ^d` and their moduli | ✅ | ✗ | `Wavelets/Examples/Daubechies/TensorWavelets` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

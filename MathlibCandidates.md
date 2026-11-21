@@ -342,6 +342,12 @@ declarations.
   `range_modelWithCornersEuclideanQuadrant`), which is newer than the Mathlib tag of the project.
 * **Tensor products of functions** (`FunctionSpaces/Rd/MixedSmoothness/TensorKernels.lean`): for
   `(⊗K)(x) = ∏_i K_i(x_i)` on `ℝ^d`, `‖⊗K‖_1 = ∏_i ‖K_i‖_1` (`Rd.lintegral_enorm_tensorKernel`),
+  `‖⊗K‖_p = ∏_i ‖K_i‖_p` for `0 < p < ∞` and a.e. strongly measurable `K_i`
+  (`Rd.eLpNorm_tensorKernel`), from the `lintegral` product formula
+  `∫⁻ ∏_i f_i(x_i) dx = ∏_i ∫⁻ f_i` for all a.e. measurable `f_i : ℝ → [0, ∞]`
+  (`Rd.lintegral_fin_nat_prod_volume_eq_prod`; Mathlib has only the Bochner form
+  `integral_fintype_prod_eq_prod`, TauCeti has the general `Measure.pi` form
+  `TauCeti.lintegral_fintype_prod_eq_prod`),
   `(⊗K) ⋆ (⊗K') = ⊗(K_i ⋆ K'_i)` (`Rd.conv_tensorKernel`), and diagonal changes of variables
   `∫ F((a_i z_i)_i) dz = (∏_i a_i)⁻¹ ∫ F` (`Rd.integral_comp_diagMap`).
 * **The Schur test on `ℓ_q`** (`FunctionSpaces/Rd/MixedSmoothness/MixedSequences.lean`): row and

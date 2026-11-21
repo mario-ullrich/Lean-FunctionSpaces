@@ -13,9 +13,12 @@ public import Mathlib.MeasureTheory.Integral.Pi
 
 On `ℝ^d = Fin d → ℝ` with Lebesgue measure, the **tensor product** of one-dimensional kernels
 `K_0, …, K_{d-1} : ℝ → ℂ` is `(⊗K)(x) = ∏_i K_i(x_i)` (`Rd.tensorKernel`). Tensor products of
-integrable kernels are integrable with `∫ ⊗K = ∏_i ∫ K_i` and `‖⊗K‖_1 = ∏_i ‖K_i‖_1` (Fubini,
-Mathlib's `integral_fintype_prod_eq_prod`), and the operations behind the function spaces of
-dominating mixed smoothness act coordinatewise:
+integrable kernels are integrable with `∫ ⊗K = ∏_i ∫ K_i` (Fubini, Mathlib's
+`integral_fintype_prod_eq_prod`). Tonelli's theorem `∫⁻ ∏_i f_i(x_i) dx = ∏_i ∫⁻ f_i` holds for
+all almost everywhere measurable `f_i : ℝ → [0, ∞]` (`Rd.lintegral_fin_nat_prod_volume_eq_prod`)
+and gives `‖⊗K‖_p = ∏_i ‖K_i‖_p` for `0 < p < ∞` and almost everywhere strongly measurable
+kernels (`Rd.eLpNorm_tensorKernel`), in particular `‖⊗K‖_1 = ∏_i ‖K_i‖_1`. The operations behind
+the function spaces of dominating mixed smoothness act coordinatewise:
 
 * convolution, `(⊗K) ⋆ (⊗K') = ⊗(K_i ⋆ K'_i)` (`Rd.conv_tensorKernel`);
 * dilation, `(⊗K)_c = ⊗((K_i)_c)` (`Rd.dilate_tensorKernel`);
@@ -58,29 +61,80 @@ theorem continuous_tensorKernel {K : Fin d → ℝ → ℂ} (hK : ∀ i, Continu
     Continuous (tensorKernel K) :=
   continuous_finsetProd _ fun i _ => (hK i).comp (continuous_apply i)
 
+/-- Tensor products of almost everywhere strongly measurable kernels are almost everywhere strongly
+measurable: each factor `x ↦ K_i(x_i)` is, since the coordinate projections are
+quasi-measure-preserving (Mathlib's `MeasureTheory.Measure.quasiMeasurePreserving_eval`). -/
+theorem aestronglyMeasurable_tensorKernel {K : Fin d → ℝ → ℂ}
+    (hK : ∀ i, AEStronglyMeasurable (K i)) : AEStronglyMeasurable (tensorKernel K) :=
+  Finset.aestronglyMeasurable_fun_prod (f := fun i (x : Fin d → ℝ) => K i (x i)) _ fun i _ =>
+    (hK i).comp_quasiMeasurePreserving (Measure.quasiMeasurePreserving_eval _ i)
+
 /-- **The integral of a tensor product**: `∫ ⊗K = ∏_i ∫ K_i` (Fubini, Mathlib's
 `integral_fintype_prod_eq_prod`). -/
 theorem integral_tensorKernel (K : Fin d → ℝ → ℂ) :
     ∫ x, tensorKernel K x = ∏ i, ∫ t, K i t :=
   integral_fintype_prod_volume_eq_prod (E := fun _ => ℝ) K
 
-/-- **The `L_1` norm of a tensor product**: `‖⊗K‖_1 = ∏_i ‖K_i‖_1`. -/
+/-- **Tonelli's theorem for products of functions of one coordinate**: on `ℝ^d` with Lebesgue
+measure, `∫⁻ ∏_i f_i(x_i) dx = ∏_i ∫⁻ f_i` for all almost everywhere measurable
+`f_i : ℝ → [0, ∞]`. The induction on `d` is the one of Mathlib's `integral_fin_nat_prod_eq_prod`:
+`measurePreserving_piFinSuccAbove` splits off the first coordinate and `lintegral_prod_mul`
+integrates the product of a function of it and a function of the others. TauCeti has the form
+for `Measure.pi` over any finite index type (`TauCeti.lintegral_fintype_prod_eq_prod`). -/
+theorem lintegral_fin_nat_prod_volume_eq_prod {f : Fin d → ℝ → ℝ≥0∞}
+    (hf : ∀ i, AEMeasurable (f i)) :
+    ∫⁻ x : Fin d → ℝ, ∏ i, f i (x i) = ∏ i, ∫⁻ t, f i t := by
+  induction d with
+  | zero => simp [volume_pi]
+  | succ d ih =>
+    calc ∫⁻ x : Fin (d + 1) → ℝ, ∏ i, f i (x i)
+        = ∫⁻ z : ℝ × (Fin d → ℝ), f 0 z.1 * ∏ i : Fin d, f i.succ (z.2 i)
+            ∂((volume : Measure ℝ).prod volume) := by
+          rw [volume_pi, ← ((measurePreserving_piFinSuccAbove
+            (fun _ : Fin (d + 1) => (volume : Measure ℝ)) 0).symm).lintegral_comp_emb
+            (MeasurableEquiv.measurableEmbedding _)]
+          simp only [MeasurableEquiv.piFinSuccAbove_symm_apply, Fin.insertNthEquiv,
+            Fin.prod_univ_succ, Fin.insertNth_zero, Equiv.coe_fn_mk, Fin.cons_succ,
+            Fin.zero_succAbove, cast_eq, Fin.cons_zero]
+          rfl
+      _ = (∫⁻ t, f 0 t) * ∫⁻ y : Fin d → ℝ, ∏ i, f i.succ (y i) :=
+          lintegral_prod_mul (f := f 0) (g := fun y : Fin d → ℝ => ∏ i, f i.succ (y i)) (hf 0)
+            (Finset.aemeasurable_fun_prod _ fun i _ =>
+              (hf i.succ).comp_quasiMeasurePreserving (Measure.quasiMeasurePreserving_eval _ i))
+      _ = ∏ i, ∫⁻ t, f i t := by
+          rw [ih fun i => hf i.succ]
+          exact (Fin.prod_univ_succ fun i => ∫⁻ t, f i t).symm
+
+/-- **The `L_1` norm of a tensor product**: `‖⊗K‖_1 = ∏_i ‖K_i‖_1`, Tonelli's theorem
+`Rd.lintegral_fin_nat_prod_volume_eq_prod` for `f_i = |K_i|`. -/
 theorem lintegral_enorm_tensorKernel {K : Fin d → ℝ → ℂ} (hK : ∀ i, Integrable (K i)) :
     ∫⁻ x, ‖tensorKernel K x‖ₑ = ∏ i, ∫⁻ t, ‖K i t‖ₑ := by
-  rw [← ofReal_integral_norm_eq_lintegral_enorm (integrable_tensorKernel hK)]
-  simp_rw [← ofReal_integral_norm_eq_lintegral_enorm (hK _)]
-  rw [← ENNReal.ofReal_prod_of_nonneg fun i _ => integral_nonneg fun _ => norm_nonneg _]
-  congr 1
-  simp only [tensorKernel, norm_prod]
-  exact integral_fintype_prod_volume_eq_prod (E := fun _ => ℝ) (fun i t => ‖K i t‖)
+  have h : ∀ x : Fin d → ℝ, ‖tensorKernel K x‖ₑ = ∏ i, ‖K i (x i)‖ₑ := fun x => by
+    simp [tensorKernel_apply, enorm_eq_nnnorm, nnnorm_prod]
+  simp_rw [h]
+  exact lintegral_fin_nat_prod_volume_eq_prod fun i => (hK i).aestronglyMeasurable.enorm
 
-/-- `‖⊗K‖_1 = ∏_i ‖K_i‖_1` with `eLpNorm`. -/
+/-- **The `L_p` norm of a tensor product**: `‖⊗K‖_p = ∏_i ‖K_i‖_p` for `0 < p < ∞` and almost
+everywhere strongly measurable kernels, since `‖⊗K‖_p^p = ∫ ∏_i |K_i(x_i)|^p dx = ∏_i ‖K_i‖_p^p`
+(`Rd.lintegral_fin_nat_prod_volume_eq_prod`). -/
+theorem eLpNorm_tensorKernel {p : ℝ≥0∞} (hp0 : p ≠ 0) (hp : p ≠ ∞) {K : Fin d → ℝ → ℂ}
+    (hK : ∀ i, AEStronglyMeasurable (K i)) :
+    eLpNorm (tensorKernel K) p volume = ∏ i, eLpNorm (K i) p volume := by
+  rw [eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (aestronglyMeasurable_tensorKernel hK),
+    Finset.prod_congr rfl fun i _ => eLpNorm_eq_lintegral_rpow_enorm_toReal hp0 hp (hK i),
+    ENNReal.prod_rpow_of_nonneg (by positivity)]
+  congr 1
+  have h : ∀ x : Fin d → ℝ, ‖tensorKernel K x‖ₑ ^ p.toReal = ∏ i, ‖K i (x i)‖ₑ ^ p.toReal :=
+    fun x => by
+      rw [ENNReal.prod_rpow_of_nonneg ENNReal.toReal_nonneg, tensorKernel_apply]
+      simp [enorm_eq_nnnorm, nnnorm_prod]
+  simp_rw [h]
+  exact lintegral_fin_nat_prod_volume_eq_prod fun i => (hK i).enorm.pow_const _
+
+/-- `‖⊗K‖_1 = ∏_i ‖K_i‖_1` with `eLpNorm`, the case `p = 1` of `Rd.eLpNorm_tensorKernel`. -/
 theorem eLpNorm_tensorKernel_one {K : Fin d → ℝ → ℂ} (hK : ∀ i, Integrable (K i)) :
-    eLpNorm (tensorKernel K) 1 volume = ∏ i, eLpNorm (K i) 1 volume := by
-  rw [eLpNorm_one_eq_lintegral_enorm (integrable_tensorKernel hK).aestronglyMeasurable,
-    lintegral_enorm_tensorKernel hK]
-  exact Finset.prod_congr rfl fun i _ =>
-    (eLpNorm_one_eq_lintegral_enorm (hK i).aestronglyMeasurable).symm
+    eLpNorm (tensorKernel K) 1 volume = ∏ i, eLpNorm (K i) 1 volume :=
+  eLpNorm_tensorKernel one_ne_zero ENNReal.one_ne_top fun i => (hK i).aestronglyMeasurable
 
 /-- **Convolution of tensor products**: `(⊗K) ⋆ (⊗K') = ⊗(K_i ⋆ K'_i)` (Fubini). -/
 theorem conv_tensorKernel (K K' : Fin d → ℝ → ℂ) :

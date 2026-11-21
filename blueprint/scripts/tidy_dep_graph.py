@@ -107,7 +107,9 @@ BLOCKS: list[tuple[str, list]] = [
         (BESOV_RD, ["Pointwise multipliers", "Atoms", "Atomic decompositions"])]),
     ("Smooth atoms and changes of variables", [
         (BESOV_RD, ["Smooth atoms", "Invariance under changes of variables"])]),
-    ("Daubechies wavelets", ["Daubechies wavelets"]),
+    ("Daubechies wavelets", [
+        "Daubechies wavelets",
+        r"Tensor Daubechies wavelets on \texorpdfstring{$\R^d$}{R\^{}d}"]),
     ("Dominating mixed smoothness", [
         r"Dominating mixed smoothness on \texorpdfstring{$\R^d$}{R\^{}d}"]),
     ("Triebel–Lizorkin spaces", ["Triebel--Lizorkin spaces"]),

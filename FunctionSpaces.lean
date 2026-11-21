@@ -266,6 +266,7 @@ public import FunctionSpaces.Wavelets.Examples.Daubechies.Bernstein
 public import FunctionSpaces.Wavelets.Examples.Daubechies.Besov
 public import FunctionSpaces.Wavelets.Examples.Daubechies.D4Besov
 public import FunctionSpaces.Wavelets.Examples.Daubechies.OrderThree
+public import FunctionSpaces.Wavelets.Examples.Daubechies.TensorWavelets
 
 /-!
 # Characterizations of function spaces
