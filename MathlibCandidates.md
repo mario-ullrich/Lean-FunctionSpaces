@@ -262,7 +262,16 @@ declarations.
   (`Rd.modulus_mul_le`), and `Δ_h^r (K ⋆ f) = (Δ_h^r K) ⋆ f` almost everywhere
   (`Rd.higherDiff_conv_ae`); the modulus on a subset `U`, with the differences restricted to the
   points `x` with `x, …, x + rh ∈ U` (`Rd.modulusOn`,
-  `FunctionSpaces/Analysis/Differences/DomainModuli.lean`).
+  `FunctionSpaces/Analysis/Differences/DomainModuli.lean`); `ω_r(f, t)_p → 0` as `t → 0` for
+  `f ∈ L_p`, `1 ≤ p < ∞` (`Rd.tendsto_modulus`,
+  `FunctionSpaces/Rd/Differences/DilatedDifferences.lean`); `Δ_h^r (f ∘ e) = (Δ_{e h}^r f) ∘ e`
+  for every additive map `e` (`Rd.higherDiff_comp_addHom`, `Differences.lean`) and
+  `ω_r(f ∘ e, t)_p ≤ ω_r(f, ‖e‖ t)_p` for a measure preserving continuous linear map `e`
+  (`Rd.modulus_comp_le`, `FunctionSpaces/Analysis/Differences/LinearEquivModuli.lean`).
+* **Composition with measure preserving maps in `L_p`**
+  (`FunctionSpaces/Analysis/Differences/LinearEquivModuli.lean`): `‖g ∘ f‖_p = ‖g‖_p` in
+  `[0, ∞]` for a measure preserving `f` (`MeasureTheory.Lp.enorm_compMeasurePreserving`). Mathlib
+  has only the real-valued form `MeasureTheory.Lp.norm_compMeasurePreserving`.
 * **Sobolev–Slobodeckij norms** (`FunctionSpaces/Rd/Differences/SobolevSlobodeckij.lean`):
   Mathlib has no fractional Sobolev spaces. The Gagliardo form
   `∫∫ |f(y) - f(x)|^p / |y - x|^(n+sp) dy dx` on a finite-dimensional inner product space
@@ -362,6 +371,12 @@ declarations.
   column sums at most `A` give `‖(∑_k w(m, k) b_k)_m‖_{ℓ_q} ≤ A ‖b‖_{ℓ_q}` for `1 ≤ q ≤ ∞`
   (`Rd.lqNorm_schur_le`), for countable index sets; `∑_k ∏_i f_i(k_i) ≤ ∏_i ∑_j f_i(j)` on `ℕ^d`
   (`Rd.tsum_prod_le_prod_tsum`).
+* **Sums of products of finitely supported factors**
+  (`FunctionSpaces/Rd/MixedSmoothness/MixedSequences.lean`): for a finite index type `ι` and
+  `F_i : κ → R` vanishing outside finite sets, `∑' k : ι → κ, ∏ i, F i (k i) =
+  ∏ i, ∑' n, F i n` in every commutative topological semiring (`Rd.tsum_prod_eq_prod_tsum`), from
+  `Finset.prod_univ_sum`; Mathlib has the finite form and the two-factor product formula
+  `Summable.tsum_mul_tsum`, but no `tsum` over function types `ι → κ`.
 * **The layer cake formula for `[0, ∞]`-valued functions**
   (`FunctionSpaces/Analysis/Lp/LayerCake.lean`): `∫ F^p dν = p ∫_0^∞ ν{F > t} t^(p-1) dt` for
   `p > 0`, every measure and every a.e. measurable `F : α → [0, ∞]`

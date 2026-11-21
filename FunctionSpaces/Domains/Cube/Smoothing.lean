@@ -5,6 +5,7 @@ Authors: Mario Ullrich
 -/
 module
 
+public import FunctionSpaces.Domains.Cube.IsoDifferences
 public import FunctionSpaces.Domains.Cube.Modulus
 public import FunctionSpaces.Domains.Interval.Taylor
 
@@ -23,8 +24,12 @@ variable (`Interval.smooth`). For continuous `f` its two identities hold pointwi
 
 Minkowski's inequality for averages on the cube (`Interval.eLpNorm_avgStepIter_le`, for any point
 space) and the derivative bound for any measure (`Interval.eLpNorm_sum_smoothCoeff_smul_le`) then
-bound both by the coordinate modulus, with the supremum over the steps outside the integral over
-the cube (`Cube.eLpNorm_sub_cubeSmooth_le`, `Cube.eLpNorm_cubeSmoothDeriv_le`). With `δ = L / r²`
+bound both by the coordinate differences with steps `0 ≤ h ≤ rδ`, for every measure
+(`Cube.eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le`). On the cube this is the coordinate modulus,
+with the supremum over the steps outside the integral over the cube
+(`Cube.eLpNorm_sub_cubeSmooth_le`, `Cube.eLpNorm_cubeSmoothDeriv_le`); on `ℝ^d` it is the
+isotropic modulus of smoothness (`Cube.eLpNorm_sub_cubeSmooth_le_modulus`,
+`Cube.eLpNorm_cubeSmoothDeriv_le_modulus`). With `δ = L / r²`
 this gives smoothings on the regions `{x_i ≤ w}` and, by the reflection `x_i ↦ 1 - x_i`
 (`Cube.coordModulus_reflect`), `{x_i ≥ 1 - w}`, `w + L ≤ 1`, whose slices have Taylor polynomials
 on all intervals (`Cube.exists_left_cubeSmoothing`, `Cube.exists_right_cubeSmoothing`), with the
@@ -165,23 +170,38 @@ theorem eLpNorm_cubeDiff_regionVol_le {f : (Fin d → ℝ) → ℂ} {r : ℕ} {�
   exact (eLpNorm_mono_measure _ (Measure.restrict_mono hsub le_rfl)).trans
     (eLpNorm_cubeDiff_le_coordModulus ⟨h0, hh⟩)
 
-/-- **The smoothing is close to `f`**: on `{x_i ≤ w}` with `w + r² δ ≤ 1`,
-`‖f - S^{(i)}_δ f‖_p ≤ ω_r^{(i)}(f, rδ)_p`. -/
-theorem eLpNorm_sub_cubeSmooth_le {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
-    (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d) {w : ℝ}
-    (hwb : w + r * (r * δ) ≤ 1) :
-    eLpNorm (fun x => f x - cubeSmooth r δ i f x) p (regionVol d i 0 w) ≤
-      coordModulus r p i f (r * δ) := by
+/-- **The smoothing is close to `f`, for every measure**: let `f` be continuous, `r ∈ ℕ`,
+`δ > 0`, `1 ≤ p < ∞`, `μ` an s-finite measure on `ℝ^d`, and let
+`‖Δ^r_{h e_i} f‖_{L_p(μ)} ≤ B` for every step `0 ≤ h ≤ rδ`. Then
+`‖f - S^{(i)}_δ f‖_{L_p(μ)} ≤ B`: the difference is `(-1)^r` times an average of these
+coordinate differences (`Cube.sub_cubeSmooth_eq`), and Minkowski's inequality for averages
+(`Interval.eLpNorm_avgStepIter_le`) bounds it by the largest of their norms. -/
+theorem eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le {f : (Fin d → ℝ) → ℂ} (hf : Continuous f)
+    (r : ℕ) {δ : ℝ} (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d)
+    (μ : Measure (Fin d → ℝ)) [SFinite μ] {B : ℝ≥0∞}
+    (hB : ∀ h, 0 ≤ h → h ≤ r * δ → eLpNorm (cubeDiff r h i f) p μ ≤ B) :
+    eLpNorm (fun x => f x - cubeSmooth r δ i f x) p μ ≤ B := by
   have heq : (fun x => f x - cubeSmooth r δ i f x) =
       ((-1 : ℂ) ^ r) • avgStepIter r δ (fun h y => cubeDiff r h i f y) 0 := by
     funext x
     rw [sub_cubeSmooth_eq hf r hδ.ne' i x]
     rfl
   rw [heq, eLpNorm_const_smul, enorm_pow, enorm_neg, enorm_one, one_pow, one_mul]
-  refine (eLpNorm_avgStepIter_le (continuous_cubeDiff_uncurry hf r i) hδ hp hp' _ r 0).trans ?_
+  refine (eLpNorm_avgStepIter_le (continuous_cubeDiff_uncurry hf r i) hδ hp hp' μ r 0).trans ?_
   refine iSup₂_le fun h hh => ?_
   rw [zero_add] at hh
-  exact eLpNorm_cubeDiff_regionVol_le hwb hh.1 hh.2
+  exact hB h hh.1 hh.2
+
+/-- **The smoothing is close to `f`**: on `{x_i ≤ w}` with `w + r² δ ≤ 1`,
+`‖f - S^{(i)}_δ f‖_p ≤ ω_r^{(i)}(f, rδ)_p` (`Cube.eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le` with
+`Cube.eLpNorm_cubeDiff_regionVol_le`). -/
+theorem eLpNorm_sub_cubeSmooth_le {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ) {δ : ℝ}
+    (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d) {w : ℝ}
+    (hwb : w + r * (r * δ) ≤ 1) :
+    eLpNorm (fun x => f x - cubeSmooth r δ i f x) p (regionVol d i 0 w) ≤
+      coordModulus r p i f (r * δ) :=
+  eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le hf r hδ hp hp' i (regionVol d i 0 w) fun _ h0 hh =>
+    eLpNorm_cubeDiff_regionVol_le hwb h0 hh
 
 /-- **The derivative of the smoothing**: on `{x_i ≤ w}` with `w + r² δ ≤ 1`,
 `‖∂_i^r S^{(i)}_δ f‖_p ≤ 2^r δ^(-r) ω_r^{(i)}(f, rδ)_p`. -/
@@ -192,6 +212,32 @@ theorem eLpNorm_cubeSmoothDeriv_le {f : (Fin d → ℝ) → ℂ} (hf : Continuou
   rw [cubeSmoothDeriv_eq_sum_smul hf r δ i]
   exact eLpNorm_sum_smoothCoeff_smul_le (D := fun h => cubeDiff r h i f) hδ hp
     fun h h0 hh => eLpNorm_cubeDiff_regionVol_le hwb h0 hh
+
+/-! ### Bounds on `ℝ^d` by the isotropic modulus -/
+
+/-- **The smoothing in one coordinate is close to `f` on `ℝ^d`**: for continuous
+`f : ℝ^d → ℂ`, `r ∈ ℕ`, `δ > 0`, `1 ≤ p < ∞` and every coordinate `i`,
+`‖f - S^{(i)}_δ f‖_{L_p(ℝ^d)} ≤ ω_r(f, rδ)_p` with the isotropic modulus of smoothness of `ℝ^d`
+(sup norm): `Cube.eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le` for Lebesgue measure, with
+`Cube.eLpNorm_cubeDiff_le_modulus` for the coordinate differences. -/
+theorem eLpNorm_sub_cubeSmooth_le_modulus {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ)
+    {δ : ℝ} (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (hp' : p ≠ ∞) (i : Fin d) :
+    eLpNorm (fun x => f x - cubeSmooth r δ i f x) p volume ≤ Rd.modulus volume r p f (r * δ) :=
+  eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le hf r hδ hp hp' i volume fun _ h0 hh =>
+    eLpNorm_cubeDiff_le_modulus (by rw [abs_of_nonneg h0]; exact hh)
+
+/-- **The derivative of the smoothing in one coordinate on `ℝ^d`**: for continuous
+`f : ℝ^d → ℂ`, `r ∈ ℕ`, `δ > 0`, `1 ≤ p ≤ ∞` and every coordinate `i`,
+`‖∂_i^r S^{(i)}_δ f‖_{L_p(ℝ^d)} ≤ 2^r δ^(-r) ω_r(f, rδ)_p`: the derivative is the combination
+`∑_{k=1}^r (-1)^(k+1) C(r,k) (kδ)^(-r) Δ^r_{kδ e_i} f` (`Cube.cubeSmoothDeriv_eq_sum_smul`), and
+`Interval.eLpNorm_sum_smoothCoeff_smul_le` with `Cube.eLpNorm_cubeDiff_le_modulus` bounds it. -/
+theorem eLpNorm_cubeSmoothDeriv_le_modulus {f : (Fin d → ℝ) → ℂ} (hf : Continuous f) (r : ℕ)
+    {δ : ℝ} (hδ : 0 < δ) {p : ℝ≥0∞} (hp : 1 ≤ p) (i : Fin d) :
+    eLpNorm (cubeSmoothDeriv r δ i f) p volume ≤
+      2 ^ r * (ENNReal.ofReal δ)⁻¹ ^ r * Rd.modulus volume r p f (r * δ) := by
+  rw [cubeSmoothDeriv_eq_sum_smul hf r δ i]
+  exact eLpNorm_sum_smoothCoeff_smul_le (D := fun h => cubeDiff r h i f) hδ hp
+    fun h h0 hh => eLpNorm_cubeDiff_le_modulus (by rw [abs_of_nonneg h0]; exact hh)
 
 /-! ### Smoothings on the two ends of a coordinate -/
 

@@ -21,6 +21,10 @@ matrix `w` are at most `A`, then `‖(∑_k w(m, k) b_k)_m‖_{ℓ_q} ≤ A ‖b
 weighted Jensen inequality `(∑_k w b)^q ≤ (∑_k w)^(q-1) ∑_k w b^q`
 (`MeasureTheory.lintegral_mul_rpow_le` for the counting measure).
 
+**Sums of products**: `∑_k ∏_i f_i(k_i) ≤ ∏_i ∑_j f_i(j)` on `ℕ^d` (`Rd.tsum_prod_le_prod_tsum`),
+with equality for factors that vanish outside finite sets, on every finite product of index sets
+and with values in every commutative topological semiring (`Rd.tsum_prod_eq_prod_tsum`).
+
 **The almost diagonal lemma on `ℕ^d`** (`Rd.lqNorm_almostDiagonal_pi_le`): with the coefficients
 `c(i, j) = 2^(-(i-j)L)` for `j ≤ i` and `1` for `j > i` (`Rd.almostDiagCoeff`) and `0 < s < L`,
 
@@ -112,6 +116,19 @@ theorem tsum_prod_le_prod_tsum (f : Fin d → ℕ → ℝ≥0∞) :
         Finset.sum_le_sum_of_subset hsub
     _ = ∏ i, ∑ j ∈ Finset.range (N + 1), f i j := (Finset.prod_univ_sum _ _).symm
     _ ≤ ∏ i, ∑' j, f i j := Finset.prod_le_prod fun i _ => ENNReal.sum_le_tsum _
+
+/-- **Sums of products of finitely supported factors**: let `F_i : κ → R`, `i ∈ ι` finite, vanish
+outside finite sets `T_i`. Then `∑_{k : ι → κ} ∏_i F_i(k_i) = ∏_i ∑_n F_i(n)`; both sides are
+finite sums, over `∏_i T_i` and over the `T_i` (Mathlib's `Finset.prod_univ_sum`). -/
+theorem tsum_prod_eq_prod_tsum {ι κ R : Type*} [Fintype ι] [CommSemiring R] [TopologicalSpace R]
+    {F : ι → κ → R} {T : ι → Finset κ} (hF : ∀ i n, n ∉ T i → F i n = 0) :
+    ∑' k : ι → κ, ∏ i, F i (k i) = ∏ i, ∑' n, F i n := by
+  classical
+  have hk : ∀ k ∉ Fintype.piFinset T, ∏ i, F i (k i) = 0 := fun k hk => by
+    obtain ⟨i, hi⟩ := not_forall.1 fun h => hk (Fintype.mem_piFinset.2 h)
+    exact Finset.prod_eq_zero (Finset.mem_univ i) (hF i _ hi)
+  rw [tsum_eq_sum hk, ← Finset.prod_univ_sum]
+  exact Finset.prod_congr rfl fun i _ => (tsum_eq_sum fun n hn => hF i n hn).symm
 
 /-! ### The almost diagonal lemma -/
 

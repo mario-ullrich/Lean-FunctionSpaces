@@ -14,9 +14,9 @@ public import Mathlib.MeasureTheory.Measure.Haar.InnerProductSpace
 # Volume and nesting of dyadic cubes
 
 The dyadic cube `Q_{k,m} = {x : ⌊2^k x_i⌋ = m_i for all i}` of level `k ∈ ℤ` (`Rd.zcell`) is a
-box in the coordinates of `Rd.gridBasis` (`Rd.zcell_eq_preimage`) and has the volume `2^(-kn)`
-(`Rd.volume_zcell`). Cubes are **nested**: each cube of level `k + 1` lies in its parent of
-level `k` (`Rd.zcell_succ_subset_cubeParent`), so two cubes are nested or disjoint
+box in the coordinates of the grid (`Rd.gridCoord`, `Rd.zcell_eq_preimage`) and has the
+volume `2^(-kn)` (`Rd.volume_zcell`). Cubes are **nested**: each cube of level `k + 1` lies in its
+parent of level `k` (`Rd.zcell_succ_subset_cubeParent`), so two cubes are nested or disjoint
 (`Rd.zcell_subset_or_disjoint`).
 
 **Lebesgue differentiation along cubes**: for a locally integrable `F`, the averages of `F` over
@@ -43,26 +43,26 @@ section Measure
 variable [MeasurableSpace V] [BorelSpace V]
 
 omit [MeasurableSpace V] [BorelSpace V] in
-/-- In coordinates, the cube `Q_{k,m}` is the box `∏_i [m_i 2^(-k), (m_i + 1) 2^(-k))`. -/
+/-- In the coordinates of the grid (`Rd.gridCoord`), the cube `Q_{k,m}` is the box
+`∏_i [m_i 2^(-k), (m_i + 1) 2^(-k))`. -/
 theorem zcell_eq_preimage (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
-    zcell k m = (fun x : V => WithLp.ofLp ((gridBasis V).repr x)) ⁻¹'
+    zcell k m = gridCoord V ⁻¹'
       Set.pi univ (fun i => Ico ((m i : ℝ) / 2 ^ k) (((m i : ℝ) + 1) / 2 ^ k)) := by
   have hpos : (0 : ℝ) < 2 ^ k := by positivity
   ext x
   simp only [zcell, zcellIndex, mem_ofPred_eq, mem_preimage, mem_univ_pi, mem_Ico, funext_iff,
-    Int.floor_eq_iff, div_le_iff₀ hpos, lt_div_iff₀ hpos]
+    Int.floor_eq_iff, div_le_iff₀ hpos, lt_div_iff₀ hpos, gridCoord_apply]
   refine forall_congr' fun i => ?_
   rw [mul_comm ((gridBasis V).repr x i)]
 
-/-- **The volume of a cube**: `|Q_{k,m}| = 2^(-kn)`. -/
+/-- **The volume of a cube**: `|Q_{k,m}| = 2^(-kn)`, since the coordinates of the grid preserve
+Lebesgue measure (`Rd.measurePreserving_gridCoord`). -/
 theorem volume_zcell (k : ℤ) (m : Fin (finrank ℝ V) → ℤ) :
     volume (zcell (V := V) k m) = ENNReal.ofReal ((2 : ℝ) ^ k)⁻¹ ^ finrank ℝ V := by
-  have hmp : MeasurePreserving (fun x : V => WithLp.ofLp ((gridBasis V).repr x)) volume volume :=
-    (PiLp.volume_preserving_ofLp _).comp (gridBasis V).measurePreserving_repr
   have hlen : ∀ i, ((m i : ℝ) + 1) / 2 ^ k - m i / 2 ^ k = ((2 : ℝ) ^ k)⁻¹ := fun i => by
     field_simp
     ring
-  rw [zcell_eq_preimage, hmp.measure_preimage
+  rw [zcell_eq_preimage, measurePreserving_gridCoord.measure_preimage
     (MeasurableSet.univ_pi fun _ => measurableSet_Ico).nullMeasurableSet, Real.volume_pi_Ico]
   simp only [hlen, Finset.prod_const, Finset.card_univ, Fintype.card_fin]
 

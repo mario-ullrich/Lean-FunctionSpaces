@@ -124,7 +124,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Result | Lean | Human-checked | Files |
 |---|---|---|---|
 | Band-limited classes on `ℝ^d`, Littlewood–Paley blocks, `A^s_q(band-limited)` characterised by Littlewood–Paley blocks for `s > 0` | ✅ | ✗ | `Rd/Approximation/BandLimited`, `Rd/LittlewoodPaley/LittlewoodPaley` |
-| Differences of convolutions and dilations | ✅ | ✗ | `Rd/Differences/DilatedDifferences` |
+| Differences of convolutions and dilations; the modulus of smoothness of an `L_p` function tends to zero | ✅ | ✗ | `Rd/Differences/DilatedDifferences` |
 | Jackson's inequality for band-limited approximation | ✅ | ✗ | `Rd/Approximation/BandJackson` |
 | Differences of Schwartz functions in `L_p`, the difference operator on `L_2`, inverse inequality for band-limited functions | ✅ | ✗ | `Rd/Approximation/BandInverse` |
 | Besov spaces on `ℝ^d`: approximation, Littlewood–Paley blocks and differences agree for `0 < s < r` | ✅ | ✗ | `Rd/Differences/BesovDifferences` |

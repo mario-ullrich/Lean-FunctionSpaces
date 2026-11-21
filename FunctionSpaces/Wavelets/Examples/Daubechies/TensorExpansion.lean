@@ -21,7 +21,8 @@ and the coefficients
 This is the `d`-dimensional form of `FunctionSpaces.Wavelets.Examples.Daubechies.Expansion`; one
 family serves the tensor scaling function `Φ` (`ι` with one element) and the `2^d - 1` tensor
 wavelets alike (`Daubechies.tensorGen`). For a tensor product the dilated and translated copy is
-the tensor product of the one-dimensional ones (`Daubechies.tensorScaled_tensorKernel`).
+the tensor product of the one-dimensional ones (`Daubechies.tensorScaled_tensorKernel`), so that
+`Φ_{j,k}(x) = ∏_i φ_{j,k_i}(x_i)` (`Daubechies.tensorScaled_tensorGen_empty`).
 
 * **Finitely many terms.** `G_{ν,j,k}` vanishes outside the window
   `{x : 2^j x_i - k_i ∈ [a, b] for all i}` (`Daubechies.tensorWindow`), and the positions of the
@@ -39,9 +40,13 @@ the tensor product of the one-dimensional ones (`Daubechies.tensorScaled_tensorK
   (`Daubechies.memLp_of_continuous_of_exists_notMem`).
 * **Orthonormality and coefficient recovery.** `∫ G_{ν,j,k} conj G_{ν',j,l}` equals the inner
   product of the integer translates `G_ν(· - k)` and `G_{ν'}(· - l)` at every level
-  (`Daubechies.integral_tensorScaled_mul_conj`). If the generators are continuous and these
-  translates are orthonormal, then `⟨∑ c_{ν',l} G_{ν',j,l}, G_{ν,j,k}⟩ = c_{ν,k}` for every
-  coefficient family `c` (`Daubechies.tensorCoeff_tensorExpand`).
+  (`Daubechies.integral_tensorScaled_mul_conj`), so for continuous generators a coefficient of an
+  expansion is a finite combination of these inner products
+  (`Daubechies.tensorCoeff_tensorExpand_eq_sum`). If the translates are orthonormal, then
+  `⟨∑ c_{ν',l} G_{ν',j,l}, G_{ν,j,k}⟩ = c_{ν,k}` for every coefficient family `c`
+  (`Daubechies.tensorCoeff_tensorExpand`); if they are orthogonal to the translates of a second
+  family `G'_μ`, then `⟨∑ c_{ν,l} G_{ν,j,l}, G'_{μ,j,k}⟩ = 0`
+  (`Daubechies.tensorCoeff_tensorExpand_eq_zero`).
 * **Stability.** For `1 ≤ p < ∞`, with the overlap number `L = |ι| M^d` and the conjugate exponent
   `p'`, the upper estimate
   `‖∑ c_{ν,k} G_{ν,j,k}‖_p ≤ L^(1 - 1/p) B 2^(jd(1/2 - 1/p)) ‖c‖_{ℓ_p}` for `‖G_ν‖_p ≤ B`
@@ -112,6 +117,14 @@ theorem tensorScaled_tensorKernel (K : Fin d → ℝ → ℂ) (j : ℕ) (k : Fin
   funext x
   simp only [tensorScaled, Rd.tensorKernel_apply, scaledFun, Finset.prod_mul_distrib,
     Finset.prod_const, Finset.card_univ, Fintype.card_fin, two_pow_smul_sub_apply]
+
+/-- **The tensor scaling function at level `j`**: for a Daubechies mask, `Φ = Ψ^∅` satisfies
+`Φ_{j,k}(x) = ∏_i φ_{j,k_i}(x_i)` for every level `j`, position `k ∈ ℤ^d` and `x ∈ ℝ^d`
+(`Daubechies.tensorScaled_tensorKernel`). -/
+theorem tensorScaled_tensorGen_empty {N : ℕ} (m : Mask N) (j : ℕ) (k : Fin d → ℤ)
+    (x : Fin d → ℝ) : tensorScaled (tensorGen m ∅) j k x = ∏ i, scaled m j (k i) (x i) := by
+  rw [tensorGen, tensorScaled_tensorKernel, Rd.tensorKernel_apply]
+  simp only [Finset.notMem_empty, ↓reduceIte]
 
 /-- **The window of a generator**: the set `{x : 2^j x_i - k_i ∈ [a, b] for all i}`, the product
 of the one-dimensional support windows (`Daubechies.supportWindow`), outside which `g_{j,k}`
@@ -446,14 +459,44 @@ theorem aestronglyMeasurable_tensorExpand (hG : ∀ ν, AEStronglyMeasurable (G 
   AEStronglyMeasurable.tsum fun νk =>
     (aestronglyMeasurable_tensorScaled (hG νk.1) j νk.2).const_mul (c νk)
 
+/-- **Coefficients of an expansion with respect to a second family**: let the generators `G_ν`,
+`ν ∈ ι`, and `G'_μ`, `μ ∈ ι'`, be continuous and vanish outside `[a, b]^d`. Then for every level
+`j`, every coefficient family `c` and every `(μ, k)`, the coefficient
+`⟨∑ c_{ν,l} G_{ν,j,l}, G'_{μ,j,k}⟩` is the finite sum of
+`c_{ν,l} ∫ G_ν(x - l) conj G'_μ(x - k) dx` over all `ν` and the positions `l` with
+`|l_i - k_i| ≤ ⌈b - a⌉`. Only these terms meet `G'_{μ,j,k}`
+(`Daubechies.tensorScaled_mul_conj_eq_zero`), and the inner products at level `j` are those at
+level `0` (`Daubechies.integral_tensorScaled_mul_conj`). -/
+theorem tensorCoeff_tensorExpand_eq_sum {ι' : Type*} {G' : ι' → (Fin d → ℝ) → ℂ}
+    (hG : ∀ ν, Continuous (G ν)) (hG' : ∀ μ, Continuous (G' μ))
+    (hsupp : ∀ ν x, (∃ i, x i ∉ Set.Icc a b) → G ν x = 0)
+    (hsupp' : ∀ μ x, (∃ i, x i ∉ Set.Icc a b) → G' μ x = 0)
+    (j : ℕ) (c : ι × (Fin d → ℤ) → ℂ) (μ : ι') (k : Fin d → ℤ) :
+    tensorCoeff G' j (tensorExpand G j c) (μ, k) = ∑ νl ∈ Finset.univ ×ˢ
+        (Fintype.piFinset fun i => Finset.Icc (k i - ⌈b - a⌉₊) (k i + ⌈b - a⌉₊)),
+      c νl * ∫ x, G νl.1 (x - fun i => (νl.2 i : ℝ)) * conj (G' μ (x - fun i => (k i : ℝ))) := by
+  set s : Finset (ι × (Fin d → ℤ)) := Finset.univ ×ˢ
+    Fintype.piFinset fun i => Finset.Icc (k i - ⌈b - a⌉₊) (k i + ⌈b - a⌉₊)
+  have h : ∀ y, tensorExpand G j c y * conj (tensorScaled (G' μ) j k y) =
+      ∑ νl ∈ s, c νl * (tensorScaled (G νl.1) j νl.2 y * conj (tensorScaled (G' μ) j k y)) :=
+    fun y => by
+      rw [tensorExpand, ← tsum_mul_right]
+      refine (tsum_eq_sum fun νl hνl => ?_).trans
+        (Finset.sum_congr rfl fun νl _ => mul_assoc _ _ _)
+      rw [mul_assoc, tensorScaled_mul_conj_eq_zero (hsupp νl.1) (hsupp' μ)
+        (fun hl => hνl (Finset.mem_product.2 ⟨Finset.mem_univ _, hl⟩)), mul_zero]
+  rw [tensorCoeff]
+  simp_rw [h]
+  rw [integral_finsetSum _ fun νl _ =>
+    (integrable_tensorScaled_mul_conj (hG νl.1) (hG' μ) (hsupp νl.1) j k νl.2).const_mul _]
+  simp_rw [integral_const_mul, integral_tensorScaled_mul_conj]
+
 /-- **Coefficient recovery**: let every `G_ν` be continuous and vanish outside `[a, b]^d`, and let
 the integer translates be orthonormal,
 `∫ G_ν(x - k) conj G_{ν'}(x - l) dx = 1` if `ν = ν'` and `k = l`, and `0` otherwise. Then for
 every level `j`, every coefficient family `c` and every `(ν, k)`,
-`⟨∑ c_{ν',l} G_{ν',j,l}, G_{ν,j,k}⟩ = c_{ν,k}`. Only the positions `l` with
-`|l_i - k_i| ≤ ⌈b - a⌉` contribute to the integrand (`Daubechies.tensorScaled_mul_conj_eq_zero`),
-and the inner products at level `j` are those at level `0`
-(`Daubechies.integral_tensorScaled_mul_conj`). -/
+`⟨∑ c_{ν',l} G_{ν',j,l}, G_{ν,j,k}⟩ = c_{ν,k}`: of the finite sum of
+`Daubechies.tensorCoeff_tensorExpand_eq_sum` only the term `(ν', l) = (ν, k)` remains. -/
 theorem tensorCoeff_tensorExpand [DecidableEq ι] (hG : ∀ ν, Continuous (G ν))
     (hsupp : ∀ ν x, (∃ i, x i ∉ Set.Icc a b) → G ν x = 0)
     (horth : ∀ ν ν' (k l : Fin d → ℤ),
@@ -462,28 +505,32 @@ theorem tensorCoeff_tensorExpand [DecidableEq ι] (hG : ∀ ν, Continuous (G ν
     (j : ℕ) (c : ι × (Fin d → ℤ) → ℂ) (νk : ι × (Fin d → ℤ)) :
     tensorCoeff G j (tensorExpand G j c) νk = c νk := by
   obtain ⟨ν, k⟩ := νk
-  set s : Finset (ι × (Fin d → ℤ)) := Finset.univ ×ˢ
-    Fintype.piFinset fun i => Finset.Icc (k i - ⌈b - a⌉₊) (k i + ⌈b - a⌉₊)
-  have h : ∀ y, tensorExpand G j c y * conj (tensorScaled (G ν) j k y) =
-      ∑ νl ∈ s, c νl * (tensorScaled (G νl.1) j νl.2 y * conj (tensorScaled (G ν) j k y)) :=
-    fun y => by
-      rw [tensorExpand, ← tsum_mul_right]
-      refine (tsum_eq_sum fun νl hνl => ?_).trans
-        (Finset.sum_congr rfl fun νl _ => mul_assoc _ _ _)
-      rw [mul_assoc, tensorScaled_mul_conj_eq_zero (hsupp νl.1) (hsupp ν)
-        (fun hl => hνl (Finset.mem_product.2 ⟨Finset.mem_univ _, hl⟩)), mul_zero]
   have hcond : ∀ νl : ι × (Fin d → ℤ), (νl.1 = ν ∧ νl.2 = k) ↔ νl = (ν, k) := fun νl => by
     rw [Prod.ext_iff]
-  rw [tensorCoeff]
-  simp_rw [h]
-  rw [integral_finsetSum _ fun νl _ =>
-    (integrable_tensorScaled_mul_conj (hG νl.1) (hG ν) (hsupp νl.1) j k νl.2).const_mul _]
-  simp_rw [integral_const_mul, integral_tensorScaled_mul_conj, horth, hcond, mul_ite, mul_one,
-    mul_zero]
+  rw [tensorCoeff_tensorExpand_eq_sum hG hG hsupp hsupp j c ν k]
+  simp_rw [horth, hcond, mul_ite, mul_one, mul_zero]
   exact Finset.sum_ite_eq_of_mem' _ _ _ (Finset.mem_product.2 ⟨Finset.mem_univ _,
     Fintype.mem_piFinset.2 fun i => Finset.mem_Icc.2
       ⟨by change k i - (⌈b - a⌉₊ : ℤ) ≤ k i; omega,
         by change k i ≤ k i + (⌈b - a⌉₊ : ℤ); omega⟩⟩)
+
+/-- **Coefficients of an expansion in an orthogonal family**: let the generators `G_ν`, `ν ∈ ι`,
+and `G'_μ`, `μ ∈ ι'`, be continuous and vanish outside `[a, b]^d`, and let every integer
+translate of every `G_ν` be orthogonal to every integer translate of every `G'_μ`. Then the
+coefficients `⟨∑ c_{ν,l} G_{ν,j,l}, G'_{μ,j,k}⟩` of every expansion of level `j` in the `G_ν`
+with respect to the `G'_μ` vanish: every term of the finite sum of
+`Daubechies.tensorCoeff_tensorExpand_eq_sum` vanishes. -/
+theorem tensorCoeff_tensorExpand_eq_zero {ι' : Type*} {G' : ι' → (Fin d → ℝ) → ℂ}
+    (hG : ∀ ν, Continuous (G ν)) (hG' : ∀ μ, Continuous (G' μ))
+    (hsupp : ∀ ν x, (∃ i, x i ∉ Set.Icc a b) → G ν x = 0)
+    (hsupp' : ∀ μ x, (∃ i, x i ∉ Set.Icc a b) → G' μ x = 0)
+    (horth : ∀ ν μ (k l : Fin d → ℤ),
+      ∫ x, G ν (x - fun i => (k i : ℝ)) * conj (G' μ (x - fun i => (l i : ℝ))) = 0)
+    (j : ℕ) (c : ι × (Fin d → ℤ) → ℂ) (μk : ι' × (Fin d → ℤ)) :
+    tensorCoeff G' j (tensorExpand G j c) μk = 0 := by
+  obtain ⟨μ, k⟩ := μk
+  rw [tensorCoeff_tensorExpand_eq_sum hG hG' hsupp hsupp' j c μ k]
+  simp_rw [horth, mul_zero, Finset.sum_const_zero]
 
 /-! ### The coefficient estimate -/
 
@@ -784,6 +831,20 @@ theorem integrable_mul_conj_tensorScaled {g : (Fin d → ℝ) → ℂ} (hg : Con
   exact hf.integrable_mul (q := ENNReal.conjExponent p)
     ((Complex.continuous_conj.comp (continuous_tensorScaled hg j k)).memLp_of_hasCompactSupport
       ((hasCompactSupport_tensorScaled hsupp j k).comp_left (map_zero _)))
+
+omit [Fintype ι] in
+/-- **The coefficient integrands of locally integrable functions are integrable**: if `g` is
+continuous and vanishes outside `[a, b]^d` and `f` is locally integrable, then
+`y ↦ f(y) conj g_{j,k}(y)` is integrable, since `g_{j,k}` is continuous with compact support
+(Mathlib's `MeasureTheory.LocallyIntegrable.integrable_smul_right_of_hasCompactSupport`). -/
+theorem integrable_mul_conj_tensorScaled_of_locallyIntegrable {g : (Fin d → ℝ) → ℂ}
+    (hg : Continuous g) (hsupp : ∀ x, (∃ i, x i ∉ Set.Icc a b) → g x = 0)
+    {f : (Fin d → ℝ) → ℂ} (hf : LocallyIntegrable f volume) (j : ℕ) (k : Fin d → ℤ) :
+    Integrable fun y => f y * conj (tensorScaled g j k y) := by
+  have h := hf.integrable_smul_right_of_hasCompactSupport
+    (Complex.continuous_conj.comp (continuous_tensorScaled hg j k))
+    ((hasCompactSupport_tensorScaled hsupp j k).comp_left (map_zero _))
+  simpa only [smul_eq_mul, Function.comp_apply] using h
 
 omit [Fintype ι] in
 /-- **The coefficients are additive in `f`**:

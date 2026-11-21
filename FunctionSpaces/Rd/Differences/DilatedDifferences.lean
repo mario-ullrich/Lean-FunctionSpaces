@@ -16,12 +16,16 @@ everywhere for an integrable `K` and `f ∈ L_p` (`Rd.higherDiff_conv_ae`), poin
 the convolutions with the translates of `K` converge absolutely (`Rd.higherDiff_conv_apply`), and
 `Δ_h^r (Φ_c) = (Δ_{ch}^r Φ)_c` (`Rd.higherDiff_dilate`).  Young's inequality then bounds the modulus
 of a convolution by the `L_1` norms of the differences of the kernel (`Rd.lpModulus_convLp_le`).
+
+Since translation is continuous in `L_p`, `1 ≤ p < ∞`, the modulus of smoothness of every
+`f ∈ L_p` tends to zero with the scale: `ω_r(f, t)_p → 0` as `t → 0` for `r ≥ 1`
+(`Rd.tendsto_modulus`, `Rd.tendsto_lpModulus`).
 -/
 
 @[expose] public section
 
 open MeasureTheory Filter
-open scoped ENNReal
+open scoped ENNReal Topology
 
 namespace Rd
 
@@ -80,6 +84,50 @@ theorem lpModulus_convLp_le (hp : p ≠ ∞) {K : V → ℂ} (hK : Integrable K 
   rw [eLpNorm_congr_ae (higherDiff_conv_ae Fact.out hp hK (Lp.memLp h) r v), Lp.enorm_def]
   exact (eLpNorm_conv_le Fact.out hp (integrable_higherDiff hK r v).aestronglyMeasurable
     (Lp.aestronglyMeasurable h)).trans (by gcongr; exact hB v hv)
+
+/-! ### Moduli of smoothness at small scales -/
+
+/-- **The modulus of smoothness tends to zero**: for `1 ≤ p < ∞`, every additive Haar measure
+`μ`, every order `r ≥ 1` and every `f ∈ L_p(μ)`, `ω_r(f, t)_p → 0` as `t → 0`. For `‖h‖ ≤ t`,
+`‖Δ_h^r f‖_p ≤ 2^(r-1) ‖Δ_h f‖_p` (`Rd.eLpNorm_higherDiff_le` for `Δ_h f`), and
+`‖Δ_h f‖_p = ‖f(· + h) - f‖_p` is small for small `h`, since translation is continuous in `L_p`
+(`Rd.continuous_eLpNorm_comp_sub_sub`). -/
+theorem tendsto_modulus (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) {f : V → ℂ} (hf : MemLp f p μ) :
+    Tendsto (modulus μ r p f) (𝓝 0) (𝓝 0) := by
+  obtain ⟨r, rfl⟩ : ∃ r', r = r' + 1 := ⟨r - 1, by omega⟩
+  have hc := (continuous_eLpNorm_comp_sub_sub (μ := μ) hp hf).tendsto 0
+  simp only [sub_zero, sub_self, eLpNorm_fun_zero] at hc
+  rw [ENNReal.tendsto_nhds_zero] at hc ⊢
+  intro ε hε
+  have h2 : (2 : ℝ≥0∞) ^ r ≠ 0 := pow_ne_zero _ two_ne_zero
+  have h2' : (2 : ℝ≥0∞) ^ r ≠ ∞ := ENNReal.pow_ne_top ENNReal.ofNat_ne_top
+  obtain ⟨δ, hδ, hball⟩ :=
+    Metric.eventually_nhds_iff.1 (hc (ε / 2 ^ r) (ENNReal.div_pos hε.ne' h2'))
+  refine Metric.eventually_nhds_iff.2 ⟨δ, hδ, fun t ht => iSup₂_le fun h hh => ?_⟩
+  have hht : dist (-h) 0 < δ := by
+    rw [dist_zero_right, norm_neg]
+    rw [Real.dist_eq, sub_zero] at ht
+    exact hh.trans_lt ((le_abs_self t).trans_lt ht)
+  have h1 := hball hht
+  rw [show (fun x => f (x - -h) - f x) = fwdDiff h f by
+    funext x; rw [fwdDiff, sub_neg_eq_add]] at h1
+  rw [Function.iterate_succ_apply]
+  calc eLpNorm ((fwdDiff h)^[r] (fwdDiff h f)) p μ
+      ≤ 2 ^ r * eLpNorm (fwdDiff h f) p μ :=
+        eLpNorm_higherDiff_le (aestronglyMeasurable_higherDiff hf.aestronglyMeasurable 1 h)
+          Fact.out r h
+    _ ≤ 2 ^ r * (ε / 2 ^ r) := by gcongr
+    _ = ε := ENNReal.mul_div_cancel h2 h2'
+
+/-- **The dyadic moduli tend to zero**: for `1 ≤ p < ∞`, every order `r ≥ 1` and every
+`f ∈ L_p(μ)`, `ω_r(f, 2^(-k))_p → 0` as `k → ∞` (`Rd.tendsto_modulus`, since `2^(-k) → 0`). -/
+theorem tendsto_lpModulus (hp : p ≠ ∞) {r : ℕ} (hr : 1 ≤ r) (f : Lp ℂ p μ) :
+    Tendsto (lpModulus p r f) atTop (𝓝 0) := by
+  have h2 : Tendsto (fun k : ℕ => (1 : ℝ) / 2 ^ k) atTop (𝓝 0) := by
+    simpa only [one_div, inv_pow] using
+      tendsto_pow_atTop_nhds_zero_of_lt_one (by norm_num : (0 : ℝ) ≤ 2⁻¹)
+        (by norm_num : (2 : ℝ)⁻¹ < 1)
+  exact (tendsto_modulus hp hr (Lp.memLp f)).comp h2
 
 end Rd
 

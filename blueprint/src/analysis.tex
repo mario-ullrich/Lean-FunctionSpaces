@@ -1048,6 +1048,25 @@ index $(\lfloor 2^k x_i \rfloor)_i$. For every $k \in \Z$ and every $m \in \Z^n$
 $Q_{k,m}$ is measurable.
 \end{definition}
 
+\begin{lemma}[The coordinates of the grid]
+\label{lem:grid-coordinates}
+\lean{Rd.gridCoord, Rd.gridCoord_apply, Rd.measurePreserving_gridCoord,
+  Rd.measurePreserving_gridCoord_symm}
+\leanok
+\uses{def:dyadic-cubes}
+The map $x \mapsto (x_i)_{i=1}^n$ is a continuous linear bijection of $V$ onto $\R^n$, where
+$\R^n$ carries the norm $\max_i |y_i|$, and it carries Lebesgue measure on $V$ to Lebesgue
+measure on $\R^n$; its inverse carries Lebesgue measure on $\R^n$ to Lebesgue measure on $V$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+It is the coordinate map of the orthonormal basis $(b_i)$, a linear isometry onto the Euclidean
+space $\R^n$, followed by the identity of $\R^n$ with the maximum norm; both are linear bijections
+of finite-dimensional spaces, hence continuous. The coordinates of an orthonormal basis preserve
+Lebesgue measure, and Lebesgue measure on $\R^n$ does not depend on the norm.
+\end{proof}
+
 \begin{lemma}[Size, partition and volume of cubes]
 \label{lem:dyadic-cubes}
 \lean{Rd.abs_repr_le_norm, Rd.repr_sub_zcellCenter, Rd.abs_repr_sub_zcellCenter_le,
@@ -1071,6 +1090,7 @@ cover $V$.
 
 \begin{proof}
 \leanok
+\uses{lem:grid-coordinates}
 A coordinate of $y$ is the inner product with a unit vector, so it is at most $\|y\|$ by the
 Cauchy--Schwarz inequality. The $i$-th coordinate of $x - c_{k,m}$ is
 $x_i - (m_i + 1/2) 2^{-k} = (2^k x_i - m_i - 1/2) 2^{-k}$. On $Q_{k,m}$,
@@ -1082,7 +1102,7 @@ the ball has coordinates within less than $2^{-k}/2$ of $(m_i + 1/2) 2^{-k}$, so
 $\lfloor 2^k x_i \rfloor = m_i$. The description as a set of inequalities is
 $\lfloor t \rfloor = m_i \iff m_i \leq t < m_i + 1$; in the coordinates of the basis the cube is
 therefore the box $\prod_i [m_i 2^{-k}, (m_i + 1) 2^{-k})$, and the coordinate map $V \to \R^n$
-preserves the volume (Mathlib's \texttt{OrthonormalBasis.measurePreserving\_repr}).
+preserves the volume (\Cref{lem:grid-coordinates}).
 \end{proof}
 
 \begin{lemma}[Nesting of cubes]

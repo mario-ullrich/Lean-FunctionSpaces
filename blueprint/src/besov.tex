@@ -286,6 +286,35 @@ Descriptions & Range & Result \\
 \end{tabular}
 \end{center}
 
+\paragraph{The space $\R^n$ with tensor Daubechies wavelets.} The scheme consists of the spans
+$V_j$ of the functions $\Phi(2^j \cdot - k)$, $k \in \Z^n$, for the tensor product $\Phi$ of $n$
+copies of the scaling function $\varphi$ of a Daubechies mask of order $N \geq 2$; the
+coefficients are those of $\Phi$ and of the $2^n - 1$ tensor wavelets. Here $\R^n$ carries the
+maximum norm, the differences are of order $N$, and $\theta$ is the order of a bound
+$\omega_N(\varphi, t)_p \leq K t^\theta$.
+\begin{center}
+\small
+\begin{tabular}{p{0.4\textwidth}p{0.25\textwidth}p{0.22\textwidth}}
+\hline
+Descriptions & Range & Result \\
+\hline
+\raggedright Tensor Daubechies approximation and differences of order $N$
+  & $0 \leq s < \min(\theta, N)$ & \Cref{thm:daub-rd-approx-modulus} \\
+\raggedright Tensor Daubechies approximation and wavelet coefficients & $s > 0$
+  & \Cref{thm:daub-rd-approx-coeff} \\
+\raggedright Wavelet coefficients and differences of order $N$ & $0 < s < \min(\theta, N)$
+  & \Cref{thm:daub-rd-besov} \\
+\raggedright Wavelet coefficients in the coordinates of the dyadic grid and differences, on
+  every inner product space & $0 < s < \min(\theta, N)$ & \Cref{thm:daub-rd-besov-grid} \\
+\raggedright Wavelet coefficients and differences, masks of order three; D4
+  & $0 < s < \frac{5}{2} - \log_2 3$; $0 < s < 2 - \log_2(1 + \sqrt{3})$
+  & \Cref{cor:daub-rd-besov-orders} \\
+\raggedright $H^s$ and wavelet coefficients, $p = q = 2$; masks of order three
+  & $0 < s < \min(\theta, N)$; $0 < s < 3 - \log_2 3$ & \Cref{cor:daub-rd-sobolev} \\
+\hline
+\end{tabular}
+\end{center}
+
 \paragraph{Domains in $\R^n$.} Restrictions are taken from the functions on $\R^n$ with a
 finite quasi-norm of the same kind.
 \begin{center}
@@ -4460,13 +4489,15 @@ $k < j$.
   Cube.cubeSmooth, Cube.cubeSmoothDeriv, Cube.slice_cubeSmooth, Cube.slice_cubeSmoothDeriv,
   Cube.sub_cubeSmooth_eq, Cube.cubeSmoothDeriv_eq, Cube.continuous_cubeSmooth,
   Cube.cubeSmoothDeriv_eq_sum_smul, Cube.continuous_cubeSmoothDeriv,
-  Cube.eLpNorm_cubeDiff_regionVol_le, Cube.eLpNorm_sub_cubeSmooth_le,
-  Cube.eLpNorm_cubeSmoothDeriv_le}
+  Cube.eLpNorm_sub_cubeSmooth_le_of_cubeDiff_le, Cube.eLpNorm_cubeDiff_regionVol_le,
+  Cube.eLpNorm_sub_cubeSmooth_le, Cube.eLpNorm_cubeSmoothDeriv_le}
 \leanok
 \uses{thm:steklov-smoothing, lem:minkowski-avg, def:cube-modulus}
 Let $f$ be continuous on $\R^d$, $r \in \N$, $\delta > 0$, and let
 $S^{(i)}_\delta f(x) = S_\delta f_{x,i}(x_i)$ with the smoothing $S_\delta$ of
-\Cref{thm:steklov-smoothing}. For $1 \leq p < \infty$ and $w + r^2 \delta \leq 1$,
+\Cref{thm:steklov-smoothing}. Let $1 \leq p < \infty$. For every s-finite measure $\mu$ on
+$\R^d$ and every $B \in [0, \infty]$ with $\|\Delta^r_{h e_i} f\|_{L_p(\mu)} \leq B$ for all
+$0 \leq h \leq r\delta$, $\|f - S^{(i)}_\delta f\|_{L_p(\mu)} \leq B$. For $w + r^2 \delta \leq 1$,
 \begin{gather*}
   \|f - S^{(i)}_\delta f\|_{L_p(Q_i[0, w])} \leq \omega_r^{(i)}(f, r\delta)_p , \\
   \|\partial_i^r S^{(i)}_\delta f\|_{L_p(Q_i[0, w])} \leq 2^r \delta^{-r} \omega_r^{(i)}(f, r\delta)_p .
@@ -4482,9 +4513,10 @@ average over $v \in [0, \delta]^r$ of $\Delta^r_{(v_1 + \cdots + v_r) e_i} f$, a
   = \sum_{k=1}^r (-1)^{k+1} \binom{r}{k} (k\delta)^{-r} \Delta^r_{k\delta e_i} f ,
 \]
 with the averages over the steps only. \Cref{lem:minkowski-avg} with
-the point space $\R^d$ and the cube measure on $Q_i[0, w]$ bounds the average by
-$\sup_h \|\Delta^r_{h e_i} f\|_{L_p(Q_i[0, w])}$, and $Q_i[0, w] \subseteq Q_i[0, 1 - rh]$ for
-$h \leq r \delta$. The derivative bound of \Cref{thm:steklov-smoothing}, for the cube measure on
+the point space $\R^d$ and the measure $\mu$ bounds the average by
+$\sup_h \|\Delta^r_{h e_i} f\|_{L_p(\mu)} \leq B$. For the cube measure on $Q_i[0, w]$,
+$Q_i[0, w] \subseteq Q_i[0, 1 - rh]$ for $h \leq r \delta$. The derivative bound of
+\Cref{thm:steklov-smoothing}, for the cube measure on
 $Q_i[0, w]$ and $D_h = \Delta^r_{h e_i} f$, bounds the derivative.
 \end{proof}
 
@@ -5435,6 +5467,61 @@ $\omega_r(K * h, 2^{-k})_p \leq B \, \|h\|_p$ for every $h \in L_p$.
 \leanok
 $\Delta_v^r (K * h) = (\Delta_v^r K) * h$ almost everywhere by \Cref{lem:rd-differences}, and
 Young's inequality gives $\|\Delta_v^r (K * h)\|_p \leq \|\Delta_v^r K\|_1 \|h\|_p$.
+\end{proof}
+
+\begin{lemma}[The modulus at small scales]
+\label{lem:modulus-to-zero}
+\lean{Rd.tendsto_modulus, Rd.tendsto_lpModulus}
+\leanok
+\uses{def:rd-modulus}
+Let $1 \leq p < \infty$, $r \geq 1$, let $\mu$ be an additive Haar measure on $V$ and
+$f \in L_p(\mu)$. Then $\omega_r(f, t)_p \to 0$ as $t \to 0$; in particular
+$\omega_r(f, 2^{-k})_p \to 0$ as $k \to \infty$.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:rd-differences, lem:translation-continuity}
+For $\|h\| \leq t$, part (2) of \Cref{lem:rd-differences} applied to $\Delta_h f$ gives
+$\|\Delta_h^r f\|_p \leq 2^{r-1} \|\Delta_h f\|_p = 2^{r-1} \|f(\cdot + h) - f\|_p$. Translation is
+continuous in $L_p$ (\Cref{lem:translation-continuity}), so for every $\varepsilon > 0$ there is
+$\delta > 0$ with $\|f(\cdot + h) - f\|_p \leq 2^{1-r} \varepsilon$ for $\|h\| < \delta$, and then
+$\omega_r(f, t)_p \leq \varepsilon$ for $|t| < \delta$.
+\end{proof}
+
+\begin{lemma}[Moduli under linear changes of variables]
+\label{lem:modulus-linear-equiv}
+\lean{Rd.higherDiff_comp_addHom, Rd.modulus_comp_le, Rd.lpModulus_compMeasurePreserving_le,
+  MeasureTheory.Lp.enorm_compMeasurePreserving, Rd.modNorm_compMeasurePreserving_le,
+  Rd.modNorm_compMeasurePreserving_lt_top_iff}
+\leanok
+\uses{def:rd-modulus}
+Let $V$ and $W$ be finite-dimensional real normed spaces with additive Haar measures $\mu$ and
+$\nu$, and let $e : V \to W$ be linear and continuous with $\nu(B) = \mu(e^{-1}(B))$ for every
+Borel set $B$. For every $f : W \to \C$ and $r \in \N$,
+$\Delta_h^r (f \circ e) = (\Delta_{e h}^r f) \circ e$ for every $h \in V$, and for measurable $f$,
+every exponent $p$ and every $t$, $\omega_r(f \circ e, t)_p \leq \omega_r(f, \|e\| t)_p$. Let
+$1 \leq p \leq \infty$, $s \in \R$, $1 \leq q \leq \infty$ and $F \in L_p(\nu)$. Then
+$\|F \circ e\|_{L_p(\mu)} = \|F\|_{L_p(\nu)}$ and
+\begin{align*}
+  &\|F \circ e\|_p
+    + \bigl\|\bigl(2^{ks} \omega_r(F \circ e, 2^{-k})_p\bigr)_{k \in \N}\bigr\|_{\ell_q} \\
+  &\qquad \leq (1 + \|e\|)^r \Bigl(\|F\|_p
+    + \bigl\|\bigl(2^{ks} \omega_r(F, 2^{-k})_p\bigr)_{k \in \N}\bigr\|_{\ell_q}\Bigr) .
+\end{align*}
+If $e$ is bijective, the two quasi-norms are finite together.
+\end{lemma}
+
+\begin{proof}
+\leanok
+\uses{lem:rd-modulus}
+The identity for differences follows by induction on $r$ from $e(x + h) = e x + e h$. Since $e$
+carries $\mu$ to $\nu$, $\|G \circ e\|_{L_p(\mu)} = \|G\|_{L_p(\nu)}$ for every measurable $G$, so
+$\|\Delta_h^r (f \circ e)\|_p = \|\Delta_{e h}^r f\|_p \leq \omega_r(f, \|e\| t)_p$ for
+$\|h\| \leq t$, as $\|e h\| \leq \|e\| \|h\|$. By \Cref{lem:rd-modulus},
+$\omega_r(F, \|e\| 2^{-k})_p \leq (1 + \|e\|)^r \omega_r(F, 2^{-k})_p$, and
+$(1 + \|e\|)^r \geq 1$. For bijective $e$ the inverse $e^{-1}$ carries $\nu$ to $\mu$ and
+$(F \circ e) \circ e^{-1} = F$, so the bound for $e^{-1}$ gives the converse.
 \end{proof}
 
 \section{Moduli of smoothness on subsets}

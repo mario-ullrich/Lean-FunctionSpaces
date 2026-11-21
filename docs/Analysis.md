@@ -11,12 +11,12 @@ This block holds the folder `FunctionSpaces/Analysis/`, whose files import only 
 continuous functions on finite measure spaces, Young's inequality on measurable groups, mixed
 norms `L_p(ℓ_q)` and `ℓ_q(L_p)` on every measure space, weak type, the layer cake formula,
 Marcinkiewicz interpolation, `L_p` norms by duality and `L_p` norms on `ℝ^d` through slices in
-one coordinate; differences on additive monoids, the translation algebra and moduli of
-smoothness on subsets; convolution, approximate identities, the Littlewood–Paley kernels and
-test functions on `ℝ^d`; dyadic cubes and cells, the Hardy–Littlewood maximal function, the
-Calderón–Zygmund decomposition, also for functions with values in a normed space, and the
-Fefferman–Stein inequality. The `L_p` norms are handled through integrals of powers
-(`MeasureTheory.eLpNorm_rpow_eq`).
+one coordinate; differences on additive monoids, the translation algebra, moduli of
+smoothness on subsets and under linear changes of variables; convolution, approximate
+identities, the Littlewood–Paley kernels and test functions on `ℝ^d`; dyadic cubes and cells,
+the Hardy–Littlewood maximal function, the Calderón–Zygmund decomposition, also for functions
+with values in a normed space, and the Fefferman–Stein inequality. The `L_p` norms are handled
+through integrals of powers (`MeasureTheory.eLpNorm_rpow_eq`).
 
 ## Main results
 
@@ -89,15 +89,16 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Chebyshev's inequality with a power and at half height, the level sets of a split function, the parts of a function above and below a level, two Tonelli steps on s-finite measure spaces, integrals of powers from bounds at every level, and Marcinkiewicz interpolation between weak type `(1,1)` and strong type `(2,2)` with an explicit constant, for operators on an abstract input type and in the terms of the Carleson project | ✅ | ✗ | `Analysis/Lp/Marcinkiewicz` |
 | `L_p` and `L_p(ℓ_2)` norms by duality for `1 < p < ∞` through the norming family, Hölder's inequality for `[0, ∞]`-valued functions in `L_p` norms, and families in `L_p` vanishing outside a finite set | ✅ | ✗ | `Analysis/Lp/NormingFamily` |
 | `L_p` norms on `ℝ^d` through slices in one coordinate: integrating out a coordinate, `L_p` norms as mixed norms of slices, bounds through slices | ✅ | ✗ | `Analysis/Lp/CoordinateSlices` |
-| Differences `higherDiff` on any additive monoid, steps of either sign; the modulus of smoothness on `ℝ^d`, its homogeneity, dilation of the scale | ✅ | ✗ | `Analysis/Differences/Differences` |
+| Differences `higherDiff` on any additive monoid, steps of either sign, under additive maps; the modulus of smoothness on `ℝ^d`, its homogeneity, dilation of the scale | ✅ | ✗ | `Analysis/Differences/Differences` |
 | Translation algebra of an additive monoid, differences as its powers | ✅ | ✗ | `Analysis/Differences/TranslationAlgebra` |
 | Moduli of smoothness on subsets of `ℝ^d`, restrictions by intrinsic differences, sets equal up to null sets, the intrinsic quasi-norm | ✅ | ✗ | `Analysis/Differences/DomainModuli` |
+| Moduli of smoothness and Besov quasi-norms under measure preserving linear changes of variables | ✅ | ✗ | `Analysis/Differences/LinearEquivModuli` |
 | Convolution with integrable kernels on `ℝ^d`: Young's inequality, pointwise bounds, associativity, operators on `L_p` | ✅ | ✗ | `Analysis/Fourier/Convolution` |
 | Changes of scale `x ↦ r x` in integrals, dilations, their supports, `L_1` norms and first moments, continuity of translation, approximate identities in `L_p(ℝ^d)` | ✅ | ✗ | `Analysis/Fourier/ApproxIdentity` |
 | The Fourier transform of integrable functions (continuity, `L_1` bounds, convolutions, multiplication formula, conjugation, Lipschitz bound for band-limited inverse transforms); Littlewood–Paley kernels: smooth cut-offs, dilation formula for `𝓕`, the kernels on the frequency side with `|𝓕ψ_j| ≤ 1`, telescoping sums and at most two blocks at every frequency, kernel identities by Fourier inversion | ✅ | ✗ | `Analysis/Fourier/LittlewoodPaleyKernels` |
 | Test functions as Schwartz functions and compactly supported complex Schwartz functions as complex test functions, commuting directional derivatives, the transpose formula for distributions and tempered distributions; cut-offs of Schwartz functions converge in the Schwartz space (smooth compactly supported functions are dense), tempered distributions determined by test functions | ✅ | ✗ | `Analysis/Fourier/SchwartzCutoff` |
 | Volume and nesting of the dyadic cubes, Lebesgue differentiation along them | ✅ | ✗ | `Analysis/Maximal/DyadicCubes` |
-| Dyadic cubes of every level and dyadic cells of `ℝ^d`: partition, counting of their centres, bounded overlap | ✅ | ✗ | `Analysis/Maximal/DyadicGrid` |
+| Dyadic cubes of every level and dyadic cells of `ℝ^d`: the coordinates of the grid as a measure preserving linear equivalence with `Fin n → ℝ`, partition, counting of their centres, bounded overlap | ✅ | ✗ | `Analysis/Maximal/DyadicGrid` |
 | Hardy–Littlewood maximal function: volumes of dyadic balls, measurability, convolutions with kernels under radial majorants, weighted weak type `(1,1)` and weighted strong type, the maximal theorem | ✅ | ✗ | `Analysis/Maximal/HardyLittlewoodMaximal` |
 | The Calderón–Zygmund decomposition on dyadic cubes, norms of means of vector-valued functions | ✅ | ✗ | `Analysis/Maximal/CalderonZygmund` |
 | The signed Calderón–Zygmund decomposition of functions with values in a normed space and of families: good parts bounded by `2^n t` with `∫ ‖·‖² ≤ 2^n t ∫ ‖f‖`, bad pieces with mean zero on their cubes and total mass at most `2 ∫ ‖f‖` | ✅ | ✗ | `Analysis/Maximal/CalderonZygmundSigned` |

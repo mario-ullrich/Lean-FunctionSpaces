@@ -185,7 +185,7 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Density of piecewise polynomials, multiscale characterisation of `A^s_q` and of `B^s_{p,q}` for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/Multiscale` |
 | Multiwavelets (orthonormal, `r` vanishing moments), stability, coefficient characterisation of `A^s_q` and of `B^s_{p,q}` for `0 < s < 1/p` | ✅ | ✗ | `Wavelets/Examples/Alpert` |
 | The cube `[0, 1]^d`: slices, integration through slices, moduli in the coordinates | ✅ | ✗ | `Domains/Cube/Basic`, `Domains/Cube/Modulus` |
-| Steklov smoothing in one coordinate near both ends of the cube | ✅ | ✗ | `Domains/Cube/Smoothing` |
+| Steklov smoothing in one coordinate near both ends of the cube and on `ℝ^d` | ✅ | ✗ | `Domains/Cube/Smoothing` |
 | Kernel operators of finite rank on slices, their forms, tensor products, telescoping over the coordinates | ✅ | ✗ | `Domains/Cube/SlicewiseOperators` |
 | Piecewise polynomials on the cube: tensor projection, tensor-product description, Whitney, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < 1/p` | ✅ | ✗ | `Domains/Cube/PiecewisePoly`, `Domains/Cube/PiecewiseJackson`, `Domains/Cube/PiecewiseInverse` |
 | Tensor splines on the cube: quasi-interpolant as a kernel operator, tensor-product description, Jackson and inverse inequalities, `A^s_q = B^s_{p,q}([0, 1]^d)` for `0 < s < r - 1 + 1/p` | ✅ | ✗ | `Domains/Cube/Splines`, `Domains/Cube/SplineJackson`, `Domains/Cube/SplineInverse` |

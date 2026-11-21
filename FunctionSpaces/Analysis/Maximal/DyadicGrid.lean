@@ -20,6 +20,10 @@ partition `V` (`Rd.zcell_disjoint`, `Rd.iUnion_zcell`). The centre `c_{k,m}` has
 (`Rd.norm_sub_zcellCenter_le`), so the cube lies between the balls of radii `2^(-k)/2` and
 `n 2^(-k)` around its centre (`Rd.ball_subset_zcell`, `Rd.zcell_subset_closedBall`).
 
+The coordinates `x ↦ (⟪b_i, x⟫)_i` form a continuous linear equivalence of `V` with `Fin n → ℝ`
+(`Rd.gridCoord`) that preserves Lebesgue measure in both directions
+(`Rd.measurePreserving_gridCoord`, `Rd.measurePreserving_gridCoord_symm`).
+
 The **dyadic cells** `P_{j,m}` of level `j ∈ ℕ` are the cubes of natural level (`Rd.cell`,
 `Rd.cellIndex`, `Rd.cellCenter`, `Rd.zcell_natCast`), and their lemmas are the cases `k = j` of
 those for cubes. **Counting**: at most `(2ρ + 2)^n` centres of level `j` lie in a ball of radius
@@ -44,7 +48,34 @@ variable (V : Type*) [NormedAddCommGroup V] [InnerProductSpace ℝ V] [FiniteDim
 noncomputable abbrev gridBasis : OrthonormalBasis (Fin (finrank ℝ V)) ℝ V :=
   stdOrthonormalBasis ℝ V
 
+/-- **The coordinates of the dyadic grid**: `x ↦ (⟪b_i, x⟫)_i` for the orthonormal basis
+`b = Rd.gridBasis V`, a continuous linear equivalence of `V` with `ℝ^n = Fin n → ℝ`,
+`n = dim V`, where `ℝ^n` carries the sup norm. It is the coordinate map `(Rd.gridBasis V).repr`
+into `EuclideanSpace ℝ (Fin n)` followed by Mathlib's identification `EuclideanSpace.equiv` of
+the Euclidean space with `Fin n → ℝ`. -/
+noncomputable def gridCoord : V ≃L[ℝ] (Fin (finrank ℝ V) → ℝ) :=
+  (gridBasis V).repr.toContinuousLinearEquiv.trans (EuclideanSpace.equiv (Fin (finrank ℝ V)) ℝ)
+
 variable {V}
+
+/-- The coordinates of the grid are those of the basis: `(gridCoord V x)_i = ⟪b_i, x⟫`. -/
+theorem gridCoord_apply (x : V) (i : Fin (finrank ℝ V)) :
+    gridCoord V x i = (gridBasis V).repr x i := rfl
+
+/-- **The coordinates of the grid preserve Lebesgue measure**: the coordinates of an orthonormal
+basis map the volume of `V` to that of `EuclideanSpace ℝ (Fin n)` (Mathlib's
+`OrthonormalBasis.measurePreserving_repr`), and the identification with `Fin n → ℝ` preserves
+volume (Mathlib's `PiLp.volume_preserving_ofLp`). -/
+theorem measurePreserving_gridCoord [MeasurableSpace V] [BorelSpace V] :
+    MeasurePreserving (gridCoord V) volume volume :=
+  (PiLp.volume_preserving_ofLp (Fin (finrank ℝ V))).comp (gridBasis V).measurePreserving_repr
+
+/-- **The inverse coordinates preserve Lebesgue measure**: `(Rd.gridCoord V)⁻¹` maps the volume
+of `Fin n → ℝ` to that of `V` (`Rd.measurePreserving_gridCoord` and Mathlib's
+`MeasureTheory.MeasurePreserving.symm`). -/
+theorem measurePreserving_gridCoord_symm [MeasurableSpace V] [BorelSpace V] :
+    MeasurePreserving (gridCoord V).symm volume volume :=
+  MeasurePreserving.symm (gridCoord V).toHomeomorph.toMeasurableEquiv measurePreserving_gridCoord
 
 /-! ### Dyadic cubes of every level -/
 

@@ -21,6 +21,7 @@ public import FunctionSpaces.Analysis.Lp.CoordinateSlices
 public import FunctionSpaces.Analysis.Differences.TranslationAlgebra
 public import FunctionSpaces.Analysis.Differences.Differences
 public import FunctionSpaces.Analysis.Differences.DomainModuli
+public import FunctionSpaces.Analysis.Differences.LinearEquivModuli
 public import FunctionSpaces.Analysis.Fourier.Convolution
 public import FunctionSpaces.Analysis.Fourier.ApproxIdentity
 public import FunctionSpaces.Analysis.Fourier.LittlewoodPaleyKernels
@@ -269,6 +270,10 @@ public import FunctionSpaces.Wavelets.Examples.Daubechies.D4Besov
 public import FunctionSpaces.Wavelets.Examples.Daubechies.OrderThree
 public import FunctionSpaces.Wavelets.Examples.Daubechies.TensorWavelets
 public import FunctionSpaces.Wavelets.Examples.Daubechies.TensorExpansion
+public import FunctionSpaces.Wavelets.Examples.Daubechies.TensorProjections
+public import FunctionSpaces.Wavelets.Examples.Daubechies.SlicewiseProjections
+public import FunctionSpaces.Wavelets.Examples.Daubechies.TensorJackson
+public import FunctionSpaces.Wavelets.Examples.Daubechies.TensorBesov
 
 /-!
 # Characterizations of function spaces

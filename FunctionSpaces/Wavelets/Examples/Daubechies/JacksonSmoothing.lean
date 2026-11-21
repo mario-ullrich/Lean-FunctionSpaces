@@ -108,11 +108,18 @@ theorem eLpNorm_sub_smooth_le_dyadic {f : ℝ → ℂ} (hf : Continuous f) {N : 
   have h := eLpNorm_sub_smooth_le_modulus hf N hδ hp hp'
   rwa [hNδ] at h
 
+/-- **The dyadic step `δ = 1/(N 2^j)`**: for `N ≥ 1`, `δ^(-N) = N^N 2^(jN)` in `[0, ∞]`. -/
+theorem ofReal_one_div_mul_two_pow_inv_pow {N : ℕ} (hN : 0 < N) (j : ℕ) :
+    (ENNReal.ofReal (1 / (N * 2 ^ j)))⁻¹ ^ N = (N : ℝ≥0∞) ^ N * 2 ^ (j * N) := by
+  rw [← ENNReal.ofReal_inv_of_pos (by positivity), one_div, inv_inv,
+    ENNReal.ofReal_mul (Nat.cast_nonneg N), ENNReal.ofReal_natCast,
+    ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat, mul_pow, ← pow_mul]
+
 /-- **The derivative of the smoothing at a dyadic scale**: for continuous `f : ℝ → ℂ`, `N ≥ 1`,
 `j ∈ ℕ`, `1 ≤ p ≤ ∞` and the step `δ = 1/(N 2^j)`,
 `‖(S_δ f)^(N)‖_{L_p(ℝ)} ≤ 2^N N^N 2^(jN) ω_N(f, 2^(-j))_p`.
 This is `eLpNorm_iteratedDeriv_smooth_le_modulus` with `r = N`, since `δ^(-N) = N^N 2^(jN)`
-and `Nδ = 2^(-j)`. -/
+(`Daubechies.ofReal_one_div_mul_two_pow_inv_pow`) and `Nδ = 2^(-j)`. -/
 theorem eLpNorm_iteratedDeriv_smooth_le_dyadic {f : ℝ → ℂ} (hf : Continuous f) {N : ℕ}
     (hN : 0 < N) (j : ℕ) {p : ℝ≥0∞} (hp : 1 ≤ p) :
     eLpNorm (iteratedDeriv N (Interval.smooth N (1 / (N * 2 ^ j)) f)) p volume ≤
@@ -120,12 +127,8 @@ theorem eLpNorm_iteratedDeriv_smooth_le_dyadic {f : ℝ → ℂ} (hf : Continuou
   have hN' : (0 : ℝ) < N := by exact_mod_cast hN
   have hδ : (0 : ℝ) < 1 / (N * 2 ^ j) := div_pos one_pos (mul_pos hN' (pow_pos two_pos j))
   have hNδ : (N : ℝ) * (1 / (N * 2 ^ j)) = 1 / 2 ^ j := by field_simp
-  have hinv : (ENNReal.ofReal (1 / (N * 2 ^ j)))⁻¹ ^ N = (N : ℝ≥0∞) ^ N * 2 ^ (j * N) := by
-    rw [← ENNReal.ofReal_inv_of_pos hδ, one_div, inv_inv, ENNReal.ofReal_mul hN'.le,
-      ENNReal.ofReal_natCast, ENNReal.ofReal_pow zero_le_two, ENNReal.ofReal_ofNat, mul_pow,
-      ← pow_mul]
   have h := eLpNorm_iteratedDeriv_smooth_le_modulus hf N hδ hp
-  rwa [hinv, hNδ, ← mul_assoc] at h
+  rwa [ofReal_one_div_mul_two_pow_inv_pow hN j, hNδ, ← mul_assoc] at h
 
 /-! ### `L_p` membership -/
 

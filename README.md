@@ -8,7 +8,7 @@ space is also identified with an approximation space: the functions whose error 
 approximation by a fixed scheme (band-limited functions, trigonometric polynomials, splines,
 wavelets, eigenfunctions) decays at a given rate. This form makes the general methods of
 approximation theory available, such as interpolation, embeddings, decompositions and traces,
-and it is the form numerical analysis needs. The project has about 111 000 lines of Lean in 285
+and it is the form numerical analysis needs. The project has about 120 000 lines of Lean in 303
 files and contains no `sorry`.
 
 * **Blueprint** (a webpage explaining the mathematics):
@@ -31,7 +31,7 @@ distributions `u` with `(1 - Δ)^{s/2} u ∈ L_p`.
 
 The spaces are studied in these settings:
 
-* `ℝ^d`, and `ℝ` for the Daubechies wavelets;
+* `ℝ^d`, with the Daubechies wavelets on `ℝ` and their tensor products on `ℝ^d`;
 * the torus `𝕋^d`;
 * the interval `[0, 1]` and the cube `[0, 1]^d`;
 * Lipschitz graph domains, bounded Lipschitz domains and bounded smooth domains in `ℝ^d`;
@@ -81,7 +81,7 @@ and how they differ.
 | dyadic blocks of Fourier coefficients | [`𝕋^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/ch-torus.html#thm:torus-coefficients) (`p = 2`) |
 | local means | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-rd-local-means.html#thm:local-means) (`0 < s < L`) |
 | atoms with coefficients in `b^s_{p,q}` | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-rd-atomic-decompositions.html#thm:atomic-characterisation) (`0 < s < L`) |
-| wavelet coefficients | [`ℝ`, Daubechies D4](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-daubechies-besov-coefficients.html#thm:daub-besov-d4) (`0 < s < 2 - log₂(1 + √3)`), [`[0, 1]`, multiwavelets](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-multiwavelets.html#thm:multiwavelet-besov) (`0 < s < 1/p`) |
+| wavelet coefficients | [`ℝ`, Daubechies D4](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-daubechies-besov-coefficients.html#thm:daub-besov-d4) (`0 < s < 2 - log₂(1 + √3)`), [`ℝ^d`, tensor Daubechies](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-daub-rd-besov.html#thm:daub-rd-besov) (`0 < s < min(θ, N)`), [`[0, 1]`, multiwavelets](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-multiwavelets.html#thm:multiwavelet-besov) (`0 < s < 1/p`) |
 | the Gagliardo form, `W^{s,p} = B^s_{p,p}` | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-sobolev-slobodeckij.html#thm:sobolev-slobodeckij-besov) (`0 < s < 1`) |
 | real interpolation of two difference spaces | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-rd-besov-interpolation.html#thm:rd-besov-interpolate) (`0 < s₀ < s₁ < r`) |
 | chart pieces | [bounded smooth domains](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-smooth-domain-charts.html#thm:smooth-domain-besov), [compact manifolds, any two Besov atlases](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-manifold-besov.html#def:manifold-besov) |
@@ -124,6 +124,7 @@ unless an entry says otherwise.
 | Littlewood–Paley blocks: `H^{s,p} = F^s_{p,2}` | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-bessel-potential-distributions.html#thm:bessel-triebel-lizorkin-distr) (`s ∈ ℝ`), [`ℝ^d`, `p = 2`, and `H^s = B^s_{2,2}` for `s > 0`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-sobolev-two-littlewood-paley.html#cor:sobolev-two-besov) (`s ≥ 0`) |
 | derivatives: `u ∈ H^{s+1,p}` iff `u` and every `∂_v u` lie in `H^{s,p}` | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-bessel-potential-multipliers.html#thm:bessel-potential-derivatives) (`s ∈ ℝ`) |
 | real interpolation: `(H^{s₀,p}, H^{s₁,p})_{η,q} = B^{(1-η)s₀+ηs₁}_{p,q}` | [`ℝ^d`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-bessel-potential-interpolation.html#thm:bessel-potential-interpolate) (`0 < s₀ < s₁`) |
+| tensor Daubechies wavelet coefficients | [`ℝ^d`, `p = 2`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-daub-rd-besov.html#cor:daub-rd-sobolev) (`0 < s < 3 - log₂ 3` for masks of order three) |
 
 **Traces.** The trace maps `B^{s+1/p}_{p,q}` of the domain onto `B^s_{p,q}` of the boundary, and
 `H^1(Ω)` onto a space on the boundary `Γ`. The rows describe the space on the boundary.
@@ -139,7 +140,7 @@ spaces it is.
 
 | Space | Approximation space of |
 |---|---|
-| `B^s_{p,q}(ℝ^d)` | [band-limited functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-rd-besov-differences.html#thm:rd-besov) (`s > 0`) |
+| `B^s_{p,q}(ℝ^d)` | [band-limited functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-rd-besov-differences.html#thm:rd-besov) (`s > 0`), [tensor Daubechies scaling spaces](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-daub-rd-besov.html#thm:daub-rd-approx-modulus) (`0 < s < min(θ, N)`) |
 | `B^s_{p,q}(𝕋^d)` | [trigonometric polynomials](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-torus-lp-moduli.html#thm:torus-lp-moduli) (`s > 0`) |
 | `B^s_{p,q}[0, 1]` | [dyadic splines of order `r`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-spline-jackson-coincidence.html#thm:spline-besov) (`0 < s < r - 1 + 1/p`), [dyadic piecewise polynomials](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-multiwavelets.html#thm:multiwavelet-besov) (`0 < s < 1/p`) |
 | `B^s_{p,q,1}[0, 1]`, `0 < p < 1`, by the first modulus | [dyadic step functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-steps-below-one.html#thm:steps-besov-below-one) (`0 < s < 1/p`) |
@@ -187,6 +188,17 @@ For a general scheme the project describes `A^s_q`
   `‖f‖_p + ‖(2^(ks) ω_2(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
   `‖(⟨f, φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s+1/2-1/p)) ‖(⟨f, ψ_{j,k}⟩)_k‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
   (`Daubechies.besov_iff_coeff_d4`).
+* **Tensor Daubechies wavelets on `ℝ^d`.** Let `φ`, `ψ` be the scaling function and wavelet of a
+  mask of order `N ≥ 2` with `ω_N(φ, t)_p ≤ K t^θ` for `0 < t ≤ 1`, `Φ = φ ⊗ ⋯ ⊗ φ` and, for
+  nonempty `e ⊆ {1, …, d}`, `Ψ^e` the tensor product with `ψ` in the coordinates of `e` and `φ`
+  in the others; let `1 ≤ p < ∞`, `1 ≤ q ≤ ∞` and `0 < s < min(θ, N)` (every such `θ` is at most
+  `N`). Then `f ∈ L_p(ℝ^d)`, with the maximum norm on `ℝ^d`, has
+  `‖f‖_p + ‖(2^(ks) ω_N(f, 2^(-k))_p)_k‖_{ℓ_q} < ∞` iff
+  `‖(⟨f, Φ(· - k)⟩)_k‖_{ℓ_p} + ‖(2^(j(s+d/2-d/p)) ‖(⟨f, Ψ^e_{j,k}⟩)_{e,k}‖_{ℓ_p})_j‖_{ℓ_q} < ∞`
+  (`Daubechies.tensor_besov_iff_coeff`). For masks of order three and `0 < s < 3 - log₂ 3`,
+  `u ∈ H^s(V)` iff `u` is an `L_2` function with
+  `∑_k |⟨u, Φ(· - k)⟩|² + ∑_j 2^(2js) ∑_{e,k} |⟨u, Ψ^e_{j,k}⟩|² < ∞` in the coordinates of a
+  fixed orthonormal basis (`Daubechies.memSobolev_two_iff_tensorCoeff_order_three`).
 * **Sobolev, Bessel potential and Triebel–Lizorkin spaces.** Let `d ≥ 1` and `1 < p < ∞`. Every
   `f ∈ L_p(V)` has `‖f‖_{F^0_{p,2}} ≤ C ‖f‖_p` and `‖f‖_p ≤ C' ‖f‖_{F^0_{p,2}}`, with finite
   constants depending on `V` and `p` (`Rd.triebelLizorkinNorm_zero_two_le`,
@@ -279,8 +291,8 @@ domains, traces, eigenbases, manifolds) and `Wavelets/`. The blueprint gives the
 block documents state every result with its Lean name and list the files:
 
 * [Besov spaces on `ℝ^d`](docs/Rd.md): Littlewood–Paley blocks, differences, local means, atoms.
-* [Daubechies wavelets](docs/Daubechies.md): wavelet coefficients on `ℝ`, tensor generators and
-  expansions on `ℝ^d`.
+* [Daubechies wavelets](docs/Daubechies.md): wavelet coefficients on `ℝ` and `ℝ^d`, `H^s` by
+  tensor wavelets.
 * [Dominating mixed smoothness](docs/MixedSmoothness.md): mixed differences, hyperbolic crosses.
 * [The torus](docs/Torus.md): trigonometric approximation, moduli, traces, Sobolev spaces.
 * [Intervals, the cube, splines and wavelets](docs/IntervalCube.md): splines, Haar,
@@ -311,8 +323,7 @@ block documents state every result with its Lean name and list the files:
 * Sobolev spaces: Jawerth–Franke with Besov targets, Hardy–Littlewood–Sobolev, Trudinger, Mihlin
   multipliers with finitely many derivatives (Riesz transforms).
 * Manifolds with corners: the cube as an example, traces on faces, products of models.
-* Higher smoothness: Marchaud's inequality, splines on domains, sharp Daubechies exponents,
-  tensor wavelets.
+* Higher smoothness: Marchaud's inequality, splines on domains, sharp Daubechies exponents.
 * Extension operators for `W^m_p` of every order, and Stein's universal operator.
 * Eigenbases: elliptic regularity, the local Weyl law, spectral `B^s_{p,q}` for `p ≠ 2` or
   `s ≥ 1`, the two-sided description of the Dirichlet approximation spaces, and the

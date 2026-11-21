@@ -27,7 +27,8 @@ The file is generic in `g`, so that it serves the scaling function `φ` (support
   every point lies in at most `M = ⌈b - a⌉ + 1` windows of one level
   (`Daubechies.card_le_of_forall_mem_supportWindow`). Hence every expansion is a finite sum at
   each point (`Daubechies.expand_eq_sum`), continuous if `g` is continuous
-  (`Daubechies.continuous_expand`), and a.e. strongly measurable if `g` is
+  (`Daubechies.continuous_expand`), even jointly in the coefficients and the point
+  (`Daubechies.continuous_expand_uncurry`), and a.e. strongly measurable if `g` is
   (`Daubechies.aestronglyMeasurable_expand`).
 * **Orthonormality and coefficient recovery.** The generators of level `0` are the integer
   translates `g(· - k)` (`Daubechies.scaledFun_zero`). If these are orthonormal, then so are the
@@ -56,7 +57,8 @@ The file is generic in `g`, so that it serves the scaling function `φ` (support
   `‖∑_k ⟨f, g_{j,k}⟩ g_{j,k}‖_p ≤ C C' ‖f‖_p` uniformly in the level
   (`Daubechies.eLpNorm_expand_coeffFun_le`). Expansions are linear in the coefficients and the
   coefficients are linear in `f` (`Daubechies.expand_add`, `Daubechies.expand_const_mul`,
-  `Daubechies.coeffFun_add`, `Daubechies.coeffFun_const_mul`).
+  `Daubechies.coeffFun_add`, `Daubechies.coeffFun_const_mul`), also on finite combinations
+  (`Daubechies.coeffFun_sum_mul`).
 -/
 
 @[expose] public section
@@ -231,6 +233,12 @@ theorem continuous_scaledFun (hg : Continuous g) (j : ℕ) (k : ℤ) :
     Continuous (scaledFun g j k) :=
   continuous_const.mul (hg.comp ((continuous_const.mul continuous_id).sub continuous_const))
 
+/-- **Real generators have real copies**: if `conj g(t) = g(t)` for every `t`, then
+`conj g_{j,k}(x) = g_{j,k}(x)`, since the factor `2^(j/2)` is real. -/
+theorem conj_scaledFun (hg : ∀ t, conj (g t) = g t) (j : ℕ) (k : ℤ) (x : ℝ) :
+    conj (scaledFun g j k x) = scaledFun g j k x := by
+  rw [scaledFun, map_mul, Complex.conj_ofReal, hg]
+
 /-- **The generators of level `0` are the integer translates**: `g_{0,k}(x) = g(x - k)` for every
 `g : ℝ → ℂ`, `k ∈ ℤ` and `x ∈ ℝ`, since `2^0 = 1`. -/
 theorem scaledFun_zero (g : ℝ → ℂ) (k : ℤ) (x : ℝ) : scaledFun g 0 k x = g (x - k) := by
@@ -298,25 +306,37 @@ theorem summable_expand (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (j : ℕ) (c : 
   summable_of_ne_finset_zero (s := Finset.Icc ⌈2 ^ j * x - b⌉ ⌊2 ^ j * x - a⌋) fun _ hk => by
     rw [scaledFun_eq_zero hsupp (fun hx => hk (mem_Icc_ceil_floor hx)), mul_zero]
 
-/-- **Expansions are continuous**: if `g` is continuous and vanishes outside `[a, b]`, then
-`x ↦ ∑_k c_k g_{j,k}(x)` is continuous for every level `j` and all coefficients `c`. Near a point
-`x`, at all `y` with `|2^j y - 2^j x| < 1`, the expansion is the same finite sum over
-`⌈2^j x - b - 1⌉ ≤ k ≤ ⌊2^j x - a + 1⌋`, a continuous function. -/
-theorem continuous_expand (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (j : ℕ)
-    (c : ℤ → ℂ) : Continuous (expand g j c) := by
-  refine continuous_iff_continuousAt.2 fun x => ?_
-  have hU : ∀ᶠ y in 𝓝 x, (2 : ℝ) ^ j * y ∈ Set.Ioo ((2 : ℝ) ^ j * x - 1) (2 ^ j * x + 1) :=
-    (continuous_const_mul ((2 : ℝ) ^ j)).continuousAt.preimage_mem_nhds
-      (Ioo_mem_nhds (by linarith) (by linarith))
-  have hev : (fun y => ∑ k ∈ Finset.Icc ⌈2 ^ j * x - (b + 1)⌉ ⌊2 ^ j * x - (a - 1)⌋,
-      c k * scaledFun g j k y) =ᶠ[𝓝 x] expand g j c := by
-    filter_upwards [hU] with y hy
+/-- **Expansions are jointly continuous in the coefficients and the point**: if `g` is continuous
+and vanishes outside `[a, b]`, then `(c, x) ↦ ∑_k c_k g_{j,k}(x)` is continuous on
+`(ℤ → ℂ) × ℝ`, with the product topology on the coefficient sequences. Near `(c, x)`, at all
+`(c', y)` with `|2^j y - 2^j x| < 1`, the expansion is the same finite sum over
+`⌈2^j x - b - 1⌉ ≤ k ≤ ⌊2^j x - a + 1⌋`, continuous in `(c', y)`. -/
+theorem continuous_expand_uncurry (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0)
+    (j : ℕ) : Continuous fun q : (ℤ → ℂ) × ℝ => expand g j q.1 q.2 := by
+  refine continuous_iff_continuousAt.2 fun q => ?_
+  have hU : ∀ᶠ q' in 𝓝 q,
+      (2 : ℝ) ^ j * q'.2 ∈ Set.Ioo ((2 : ℝ) ^ j * q.2 - 1) (2 ^ j * q.2 + 1) :=
+    ((continuous_const_mul ((2 : ℝ) ^ j)).comp continuous_snd).continuousAt.preimage_mem_nhds
+      (Ioo_mem_nhds (show (2 : ℝ) ^ j * q.2 - 1 < (2 : ℝ) ^ j * q.2 by linarith)
+        (show (2 : ℝ) ^ j * q.2 < 2 ^ j * q.2 + 1 by linarith))
+  have hev : (fun q' : (ℤ → ℂ) × ℝ => ∑ k ∈ Finset.Icc ⌈2 ^ j * q.2 - (b + 1)⌉
+      ⌊2 ^ j * q.2 - (a - 1)⌋, q'.1 k * scaledFun g j k q'.2) =ᶠ[𝓝 q]
+      fun q' => expand g j q'.1 q'.2 := by
+    filter_upwards [hU] with q' hy
     refine (tsum_eq_sum fun k hk => ?_).symm
     refine by_contra fun h => hk (mem_Icc_ceil_floor ?_)
     have hmem := mem_supportWindow_of_scaledFun_ne_zero hsupp (right_ne_zero_of_mul h)
     exact ⟨by linarith [hmem.1, hy.2], by linarith [hmem.2, hy.1]⟩
-  exact ((continuous_finsetSum _ fun k _ =>
-    continuous_const.mul (continuous_scaledFun hg j k)).continuousAt).congr hev
+  exact ((continuous_finsetSum _ fun k _ => ((continuous_apply k).comp continuous_fst).mul
+    ((continuous_scaledFun hg j k).comp continuous_snd)).continuousAt).congr hev
+
+/-- **Expansions are continuous**: if `g` is continuous and vanishes outside `[a, b]`, then
+`x ↦ ∑_k c_k g_{j,k}(x)` is continuous for every level `j` and all coefficients `c`, the
+restriction of the jointly continuous map `(c, x) ↦ ∑_k c_k g_{j,k}(x)`
+(`Daubechies.continuous_expand_uncurry`). -/
+theorem continuous_expand (hg : Continuous g) (hsupp : ∀ x ∉ Set.Icc a b, g x = 0) (j : ℕ)
+    (c : ℤ → ℂ) : Continuous (expand g j c) :=
+  (continuous_expand_uncurry hg hsupp j).comp (continuous_const.prodMk continuous_id)
 
 /-! ### Orthonormality at every level -/
 
@@ -776,6 +796,21 @@ theorem coeffFun_const_mul (z : ℂ) (f : ℝ → ℂ) (j : ℕ) (k : ℤ) :
     coeffFun g j (fun y => z * f y) k = z * coeffFun g j f k := by
   simp only [coeffFun, mul_assoc]
   exact integral_const_mul z _
+
+/-- **Coefficients of finite combinations**: for a finite set `s`, functions `F_k : ℝ → ℂ` and
+numbers `c_k`, `k ∈ s`, `⟨∑_k c_k F_k, g_{j,n}⟩ = ∑_k c_k ⟨F_k, g_{j,n}⟩` if every
+`F_k conj g_{j,n}` is integrable (Mathlib's `MeasureTheory.integral_finsetSum`). -/
+theorem coeffFun_sum_mul {ι : Type*} (s : Finset ι) {F : ι → ℝ → ℂ} (c : ι → ℂ) {j : ℕ} {n : ℤ}
+    (hF : ∀ k ∈ s, Integrable fun t => F k t * conj (scaledFun g j n t)) :
+    coeffFun g j (fun t => ∑ k ∈ s, F k t * c k) n = ∑ k ∈ s, coeffFun g j (F k) n * c k := by
+  simp only [coeffFun, Finset.sum_mul]
+  rw [integral_finsetSum s fun k hk => ((hF k hk).mul_const (c k)).congr
+    (Eventually.of_forall fun t => by simp only; ring)]
+  refine Finset.sum_congr rfl fun k _ => ?_
+  rw [← integral_mul_const]
+  congr 1
+  funext t
+  ring
 
 end Generic
 

@@ -360,6 +360,29 @@ theorem jacksonConst_ne_top (hN : 2 ≤ N) (p : ℝ≥0∞) : jacksonConst m p �
       (ENNReal.mul_ne_top (ENNReal.pow_ne_top ENNReal.ofNat_ne_top)
         (ENNReal.pow_ne_top (ENNReal.natCast_ne_top N)))⟩
 
+/-- **Combining the two bounds of Jackson's inequality**: for all `A, B, ω ∈ [0, ∞]` and every
+level `j`, if `A ≤ ω` and `B ≤ 2^N N^N 2^(jN) ω`, then
+`(1 + C) A + C_S 2^(-jN) B ≤ C_J ω` with `C = projConst m p`, `C_S = smoothJacksonConst m p` and
+`C_J = jacksonConst m p`: the factors `2^(-jN)` and `2^(jN)` cancel. -/
+theorem add_le_jacksonConst_mul {p A B ω : ℝ≥0∞} (j : ℕ) (hA : A ≤ ω)
+    (hB : B ≤ 2 ^ N * (N : ℝ≥0∞) ^ N * 2 ^ (j * N) * ω) :
+    (1 + ENNReal.ofReal (projConst m p)) * A + smoothJacksonConst m p * (2 ^ (j * N))⁻¹ * B ≤
+      jacksonConst m p * ω := by
+  have h0 : (2 : ℝ≥0∞) ^ (j * N) ≠ 0 := pow_ne_zero _ two_ne_zero
+  have htop : (2 : ℝ≥0∞) ^ (j * N) ≠ ∞ := ENNReal.pow_ne_top ENNReal.ofNat_ne_top
+  calc (1 + ENNReal.ofReal (projConst m p)) * A + smoothJacksonConst m p * (2 ^ (j * N))⁻¹ * B
+      ≤ (1 + ENNReal.ofReal (projConst m p)) * ω +
+        smoothJacksonConst m p * (2 ^ (j * N))⁻¹ *
+          (2 ^ N * (N : ℝ≥0∞) ^ N * 2 ^ (j * N) * ω) := by
+        gcongr
+    _ = (1 + ENNReal.ofReal (projConst m p)) * ω +
+        smoothJacksonConst m p * (2 ^ N * (N : ℝ≥0∞) ^ N) * ω *
+          ((2 ^ (j * N))⁻¹ * 2 ^ (j * N)) := by
+        ring
+    _ = jacksonConst m p * ω := by
+        rw [ENNReal.inv_mul_cancel h0 htop, mul_one, jacksonConst]
+        ring
+
 /-- **Jackson's inequality for continuous functions**: for `N ≥ 2`, `1 ≤ p < ∞`, every continuous
 `f : ℝ → ℂ` and every level `j`,
 `‖f - P_j f‖_p ≤ C_J ω_N(f, 2^(-j))_p` with `C_J = jacksonConst m p` and the modulus of
@@ -369,36 +392,18 @@ Steklov smoothing `S = S_δ f` at the step `δ = 1/(N 2^j)`, which lies in `C^N`
 (`Daubechies.eLpNorm_sub_smooth_le_dyadic`), `‖S^(N)‖_p ≤ 2^N N^N 2^(jN) ω_N(f, 2^(-j))_p`
 (`Daubechies.eLpNorm_iteratedDeriv_smooth_le_dyadic`), hence
 `‖S - P_j S‖_p ≤ C_S 2^N N^N ω_N(f, 2^(-j))_p` (`Daubechies.eLpNorm_sub_projFun_le_of_contDiff`),
-and `Daubechies.eLpNorm_sub_projFun_le_add` combines the two bounds. The inequality holds in
-`[0, ∞]` for every continuous `f`. -/
+and `Daubechies.eLpNorm_sub_projFun_le_add` with `Daubechies.add_le_jacksonConst_mul` combines
+the two bounds. The inequality holds in `[0, ∞]` for every continuous `f`. -/
 theorem eLpNorm_sub_projFun_le_modulus (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞)
     {f : ℝ → ℂ} (hf : Continuous f) (j : ℕ) :
     eLpNorm (fun x => f x - projFun m j f x) p volume ≤
       jacksonConst m p * Rd.modulus volume N p f (1 / 2 ^ j) := by
   have hS := Interval.contDiff_smooth hf N (1 / (N * 2 ^ j))
-  have h0 : (2 : ℝ≥0∞) ^ (j * N) ≠ 0 := pow_ne_zero _ two_ne_zero
-  have htop : (2 : ℝ≥0∞) ^ (j * N) ≠ ∞ := ENNReal.pow_ne_top ENNReal.ofNat_ne_top
-  calc eLpNorm (fun x => f x - projFun m j f x) p volume
-      ≤ (1 + ENNReal.ofReal (projConst m p)) *
-          eLpNorm (fun x => f x - Interval.smooth N (1 / (N * 2 ^ j)) f x) p volume +
-        eLpNorm (fun x => Interval.smooth N (1 / (N * 2 ^ j)) f x -
-          projFun m j (Interval.smooth N (1 / (N * 2 ^ j)) f) x) p volume :=
-        eLpNorm_sub_projFun_le_add m hN hp1 hp hf.locallyIntegrable
-          hS.continuous.locallyIntegrable j
-    _ ≤ (1 + ENNReal.ofReal (projConst m p)) * Rd.modulus volume N p f (1 / 2 ^ j) +
-        smoothJacksonConst m p * (2 ^ (j * N))⁻¹ *
-          (2 ^ N * (N : ℝ≥0∞) ^ N * 2 ^ (j * N) * Rd.modulus volume N p f (1 / 2 ^ j)) := by
-        gcongr
-        · exact eLpNorm_sub_smooth_le_dyadic hf (by omega) j hp1 hp
-        · exact (eLpNorm_sub_projFun_le_of_contDiff m hN hp1 hp hS j).trans (by
-            gcongr
-            exact eLpNorm_iteratedDeriv_smooth_le_dyadic hf (by omega) j hp1)
-    _ = (1 + ENNReal.ofReal (projConst m p)) * Rd.modulus volume N p f (1 / 2 ^ j) +
-        smoothJacksonConst m p * (2 ^ N * (N : ℝ≥0∞) ^ N) *
-          Rd.modulus volume N p f (1 / 2 ^ j) * ((2 ^ (j * N))⁻¹ * 2 ^ (j * N)) := by ring
-    _ = jacksonConst m p * Rd.modulus volume N p f (1 / 2 ^ j) := by
-        rw [ENNReal.inv_mul_cancel h0 htop, mul_one, jacksonConst]
-        ring
+  refine (eLpNorm_sub_projFun_le_add m hN hp1 hp hf.locallyIntegrable
+    hS.continuous.locallyIntegrable j).trans ((add_le_add le_rfl
+      (eLpNorm_sub_projFun_le_of_contDiff m hN hp1 hp hS j)).trans ?_)
+  exact add_le_jacksonConst_mul m j (eLpNorm_sub_smooth_le_dyadic hf (by omega) j hp1 hp)
+    (eLpNorm_iteratedDeriv_smooth_le_dyadic hf (by omega) j hp1)
 
 /-! ### Jackson's inequality on `L_p` -/
 

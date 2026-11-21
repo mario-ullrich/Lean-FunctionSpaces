@@ -14,7 +14,9 @@ public import FunctionSpaces.Analysis.Differences.TranslationAlgebra
 The **isotropic difference** of order `r` with step `h ∈ ℝ^d`,
 `Δ_h^r f(x) = ∑_k (-1)^(r-k) C(r,k) f(x + kh)` (`Rd.higherDiff`, `Cube.higherDiff_apply`), moves all
 coordinates at once; with the step `t e_i` it is the difference in coordinate `i`
-(`Cube.higherDiff_single`). The translation algebra `ℂ[ℝ^d]` of
+(`Cube.higherDiff_single`), so the isotropic modulus of smoothness of `ℝ^d` (sup norm) bounds the
+coordinate differences with `|t| ≤ s` at scale `s` (`Cube.eLpNorm_cubeDiff_le_modulus`). The
+translation algebra `ℂ[ℝ^d]` of
 `FunctionSpaces.Analysis.Differences.TranslationAlgebra` expands it into differences in single
 coordinates: the element `(δ_{h_i e_i} - 1)^m` acts by the coordinate difference `Δ^m_{h_i e_i}`
 (`Cube.diffAct_coordElem_pow`), a product of such elements along a list of coordinates by the mixed
@@ -67,6 +69,15 @@ theorem higherDiff_single (r : ℕ) (i : Fin d) (t : ℝ) (f : (Fin d → ℝ) �
   · subst hc
     simp
   · simp [hc]
+
+/-- **Coordinate differences are bounded by the isotropic modulus**: for `|h| ≤ t`,
+`‖Δ^r_{h e_i} f‖_{L_p(ℝ^d)} ≤ ω_r(f, t)_p`, since the coordinate difference is the isotropic
+difference with step `h e_i` (`Cube.higherDiff_single`) and `‖h e_i‖ = |h|` in the sup norm. -/
+theorem eLpNorm_cubeDiff_le_modulus {r : ℕ} {p : ℝ≥0∞} {f : (Fin d → ℝ) → ℂ} {i : Fin d}
+    {h t : ℝ} (hh : |h| ≤ t) :
+    eLpNorm (cubeDiff r h i f) p volume ≤ Rd.modulus volume r p f t := by
+  rw [← higherDiff_single]
+  exact Rd.eLpNorm_higherDiff_le_modulus (by rwa [Pi.norm_single, Real.norm_eq_abs])
 
 /-! ### Mixed coordinate differences -/
 

@@ -33,7 +33,8 @@ depends only on the class of `f` modulo null sets (`Rd.modulus_congr_ae`).
 **Dilating the step** (`Rd.modulus_mul_le`): `ω_r(f, c t)_p ≤ (1 + c)^r ω_r(f, t)_p` for
 `c, t ≥ 0`. For an integer `m ≥ 1`, `Δ_{mh} = ∑_{i<m} τ_{ih} Δ_h` with the translations
 `τ_a g = g(· + a)` (`Rd.fwdDiff_nsmul`), translations commute with differences
-(`Rd.higherDiff_comp_add`), and translations keep `L_p` norms, so
+(`Rd.higherDiff_comp_add`; more generally `Δ_h^r (f ∘ e) = (Δ_{e h}^r f) ∘ e` for every additive
+map `e`, `Rd.higherDiff_comp_addHom`), and translations keep `L_p` norms, so
 `‖Δ_{mh}^r f‖_p ≤ m^r ‖Δ_h^r f‖_p` (`Rd.eLpNorm_higherDiff_nsmul_higherDiff_le`). The two steps,
 from steps `m h'` to the scale `m t` and from integers to real dilations
 (`Rd.modulus_nat_mul_le_of_forall_exists_nsmul`, `Rd.modulus_mul_le_of_nat_mul_le`), hold on
@@ -123,6 +124,19 @@ omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpa
 theorem higherDiff_comp_add (r : ℕ) (h c : V) (f : V → ℂ) :
     (fwdDiff h)^[r] (fun x => f (x + c)) = fun x => (fwdDiff h)^[r] f (x + c) :=
   funext fun x => fwdDiff_iter_comp_add h f c r x
+
+/-- **Differences under additive maps**: for every additive map `e : U → W` between additive
+monoids, every order `r`, step `h ∈ U` and `f : W → ℂ`, `Δ_h^r (f ∘ e) = (Δ_{e h}^r f) ∘ e`,
+since `e (x + h) = e x + e h`. -/
+theorem higherDiff_comp_addHom {U W F : Type*} [AddCommMonoid U] [AddCommMonoid W]
+    [FunLike F U W] [AddHomClass F U W] (e : F) (r : ℕ) (h : U) (f : W → ℂ) :
+    (fwdDiff h)^[r] (f ∘ e) = ((fwdDiff (e h))^[r] f) ∘ e := by
+  induction r with
+  | zero => rfl
+  | succ r ih =>
+    rw [Function.iterate_succ_apply', Function.iterate_succ_apply', ih]
+    funext x
+    simp only [fwdDiff, Function.comp_apply, map_add]
 
 omit [NormedSpace ℝ V] [FiniteDimensional ℝ V] [MeasurableSpace V] [BorelSpace V] in
 /-- **Differences with a multiple step telescope**: `Δ_{mh} f = ∑_{i<m} (Δ_h f)(· + i h)`. -/
