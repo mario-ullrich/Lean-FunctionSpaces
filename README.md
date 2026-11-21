@@ -8,7 +8,7 @@ space is also identified with an approximation space: the functions whose error 
 approximation by a fixed scheme (band-limited functions, trigonometric polynomials, splines,
 wavelets, eigenfunctions) decays at a given rate. This form makes the general methods of
 approximation theory available, such as interpolation, embeddings, decompositions and traces,
-and it is the form numerical analysis needs. The project has about 120 000 lines of Lean in 303
+and it is the form numerical analysis needs. The project has about 121 000 lines of Lean in 304
 files and contains no `sorry`.
 
 * **Blueprint** (a webpage explaining the mathematics):
@@ -145,6 +145,7 @@ spaces it is.
 | `B^s_{p,q}[0, 1]` | [dyadic splines of order `r`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-spline-jackson-coincidence.html#thm:spline-besov) (`0 < s < r - 1 + 1/p`), [dyadic piecewise polynomials](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-multiwavelets.html#thm:multiwavelet-besov) (`0 < s < 1/p`) |
 | `B^s_{p,q,1}[0, 1]`, `0 < p < 1`, by the first modulus | [dyadic step functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-steps-below-one.html#thm:steps-besov-below-one) (`0 < s < 1/p`) |
 | `B^θ_{τ,τ}[0, 1]`, `θ = 1/τ - 1/2` | [`n`-term combinations of Haar functions](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-haar-below-one.html#thm:haar-nterm-besov-all), a nonlinear scheme in `L_2[0, 1]` (`2/3 < τ < 2`; for `0 < τ ≤ 2/3` the space of the first modulus) |
+| `B^{d(1/τ - 1/2)}_{τ,τ}(ℝ^d) ∩ L_2(ℝ^d)` | [`n`-term combinations of tensor Daubechies wavelets](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-daub-rd-basis.html#cor:daub-rd-nterm), a nonlinear scheme in `L_2(ℝ^d)` (`1 ≤ τ < 2`, `d(1/τ - 1/2) < min(θ, N)`) |
 | `B^s_{p,q}([0, 1]^d)` | [tensor splines of order `r`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-iso-modulus.html#thm:iso-besov) (`0 < s < r - 1 + 1/p`) |
 | `F^s_{p,p}(ℝ^d)`, `F^s_{p,p}(𝕋^d)` | band-limited functions and trigonometric polynomials, since [`F^s_{p,p}(ℝ^d) = B^s_{p,p}(ℝ^d)`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-tl-besov-sandwich.html#thm:tl-besov-sandwich) and [`F^s_{p,p}(𝕋^d) = B^s_{p,p}(𝕋^d)`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-torus-triebel-lizorkin.html#thm:torus-tl-besov-sandwich) (`s > 0`) |
 | `W^{s,p}(ℝ^d)`, Sobolev–Slobodeckij | [band-limited functions, `q = p`](https://mario-ullrich.github.io/Lean-FunctionSpaces/sec-sobolev-slobodeckij.html#thm:sobolev-slobodeckij-besov) (`0 < s < 1`) |
@@ -198,7 +199,13 @@ For a general scheme the project describes `A^s_q`
   (`Daubechies.tensor_besov_iff_coeff`). For masks of order three and `0 < s < 3 - log₂ 3`,
   `u ∈ H^s(V)` iff `u` is an `L_2` function with
   `∑_k |⟨u, Φ(· - k)⟩|² + ∑_j 2^(2js) ∑_{e,k} |⟨u, Ψ^e_{j,k}⟩|² < ∞` in the coordinates of a
-  fixed orthonormal basis (`Daubechies.memSobolev_two_iff_tensorCoeff_order_three`).
+  fixed orthonormal basis (`Daubechies.memSobolev_two_iff_tensorCoeff_order_three`). The
+  functions `Φ(· - k)` and `Ψ^e_{j,k}` form a Hilbert basis of `L_2(ℝ^d)`
+  (`Daubechies.tensorWaveletBasis`). Let `1 ≤ τ < 2` and `0 < α = d(1/τ - 1/2) < min(θ, N)`,
+  with `θ` as above for `p = τ`. Then `f ∈ L_2(ℝ^d)` lies in the approximation space
+  `A^{1/τ - 1/2}_τ` of `n`-term approximation from this basis iff `f ∈ L_τ(ℝ^d)` and
+  `‖f‖_τ + ‖(2^(kα) ω_N(f, 2^(-k))_τ)_k‖_{ℓ_τ} < ∞`, that is, iff `f ∈ B^α_{τ,τ}(ℝ^d)`
+  (`Daubechies.memApprox_nTerm_tensorWaveletBasis_iff`).
 * **Sobolev, Bessel potential and Triebel–Lizorkin spaces.** Let `d ≥ 1` and `1 < p < ∞`. Every
   `f ∈ L_p(V)` has `‖f‖_{F^0_{p,2}} ≤ C ‖f‖_p` and `‖f‖_p ≤ C' ‖f‖_{F^0_{p,2}}`, with finite
   constants depending on `V` and `p` (`Rd.triebelLizorkinNorm_zero_two_le`,
@@ -292,7 +299,7 @@ block documents state every result with its Lean name and list the files:
 
 * [Besov spaces on `ℝ^d`](docs/Rd.md): Littlewood–Paley blocks, differences, local means, atoms.
 * [Daubechies wavelets](docs/Daubechies.md): wavelet coefficients on `ℝ` and `ℝ^d`, `H^s` by
-  tensor wavelets.
+  tensor wavelets, the tensor wavelet basis of `L_2(ℝ^d)` and `n`-term approximation.
 * [Dominating mixed smoothness](docs/MixedSmoothness.md): mixed differences, hyperbolic crosses.
 * [The torus](docs/Torus.md): trigonometric approximation, moduli, traces, Sobolev spaces.
 * [Intervals, the cube, splines and wavelets](docs/IntervalCube.md): splines, Haar,

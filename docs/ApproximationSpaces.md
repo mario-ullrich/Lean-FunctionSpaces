@@ -256,8 +256,10 @@ theory.
   (`HilbertBasis.memApprox_nTerm_iff`), with `∑_i |⟨e_i, f⟩|^τ ≤ 4 ‖f‖_{A^θ_τ}^τ` and
   `‖f‖_{A^θ_τ} ≤ C_τ (∑_i |⟨e_i, f⟩|^τ)^(1/τ)` for the dyadic quasi-norm `‖·‖_{A^θ_τ}`
   (`HilbertBasis.tsum_repr_rpow_le`, `HilbertBasis.approxNormDyadic_nTerm_le`). The Fourier
-  basis of `L_2(𝕋^d)` and the Haar basis of `L_2[0, 1]` are instances, in [The torus](Torus.md)
-  and [Intervals, the cube, splines and wavelets](IntervalCube.md).
+  basis of `L_2(𝕋^d)`, the Haar basis of `L_2[0, 1]` and the tensor Daubechies wavelet basis of
+  `L_2(ℝ^d)` are instances, in [The torus](Torus.md),
+  [Intervals, the cube, splines and wavelets](IntervalCube.md) and
+  [Daubechies wavelets](Daubechies.md).
 
 ## What is formalised
 

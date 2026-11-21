@@ -46,7 +46,9 @@ the tensor product of the one-dimensional ones (`Daubechies.tensorScaled_tensorK
   `⟨∑ c_{ν',l} G_{ν',j,l}, G_{ν,j,k}⟩ = c_{ν,k}` for every coefficient family `c`
   (`Daubechies.tensorCoeff_tensorExpand`); if they are orthogonal to the translates of a second
   family `G'_μ`, then `⟨∑ c_{ν,l} G_{ν,j,l}, G'_{μ,j,k}⟩ = 0`
-  (`Daubechies.tensorCoeff_tensorExpand_eq_zero`).
+  (`Daubechies.tensorCoeff_tensorExpand_eq_zero`). The expansion of the coefficient family that
+  is `1` at `(ν, k)` and `0` elsewhere is `G_{ν,j,k}` (`Daubechies.tensorExpand_single`), and the
+  expansion of the zero family is `0` (`Daubechies.tensorExpand_zero`).
 * **Stability.** For `1 ≤ p < ∞`, with the overlap number `L = |ι| M^d` and the conjugate exponent
   `p'`, the upper estimate
   `‖∑ c_{ν,k} G_{ν,j,k}‖_p ≤ L^(1 - 1/p) B 2^(jd(1/2 - 1/p)) ‖c‖_{ℓ_p}` for `‖G_ν‖_p ≤ B`
@@ -809,6 +811,24 @@ theorem tensorExpand_const_mul (j : ℕ) (z : ℂ) (c : ι × (Fin d → ℤ) �
     tensorExpand G j (fun νk => z * c νk) x = z * tensorExpand G j c x := by
   simp only [tensorExpand, mul_assoc]
   exact tsum_mul_left
+
+omit [Fintype ι] in
+/-- **The expansion of the zero coefficients is zero**: for every level `j`, the expansion of the
+coefficient family that is `0` everywhere vanishes at every point; every term of the sum is `0`
+(Mathlib's `tsum_zero`). -/
+theorem tensorExpand_zero (j : ℕ) : tensorExpand G j 0 = 0 := by
+  funext x
+  simp [tensorExpand]
+
+omit [Fintype ι] in
+/-- **The expansion of a single coefficient**: for every level `j` and every `(ν, k)`, the
+expansion of the coefficient family that is `1` at `(ν, k)` and `0` elsewhere is the generator
+`G_{ν,j,k}` itself; only one term of the sum is nonzero (Mathlib's `tsum_eq_single`). -/
+theorem tensorExpand_single [DecidableEq ι] (j : ℕ) (νk : ι × (Fin d → ℤ)) :
+    tensorExpand G j (Pi.single νk 1) = tensorScaled (G νk.1) j νk.2 := by
+  funext x
+  rw [tensorExpand, tsum_eq_single νk fun μk hμk => by rw [Pi.single_eq_of_ne hμk, zero_mul],
+    Pi.single_eq_same, one_mul]
 
 omit [Fintype ι] in
 /-- **The coefficients depend only on the class of `f` almost everywhere**: if `f = f'` almost

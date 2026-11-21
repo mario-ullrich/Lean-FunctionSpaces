@@ -24,7 +24,9 @@ projections of one variable, applied in one coordinate, satisfy Jackson's inequa
 isotropic modulus of smoothness of `ℝ^d`. Applied in all coordinates they map continuous functions
 into the scaling spaces, which gives Jackson's inequality on `ℝ^d`, and as on `ℝ` the Besov spaces
 on `ℝ^d` and on every finite-dimensional inner product space, and `H^s`, are described by the
-coefficients of the tensor wavelets.
+coefficients of the tensor wavelets. The translates of the tensor scaling function and the tensor
+wavelets of all levels form a Hilbert basis of `L_2(ℝ^d)`, in which `H^s` is a weighted `ℓ_2` and
+`n`-term approximation is described by the Besov spaces `B^{d(1/τ - 1/2)}_{τ,τ}(ℝ^d)`.
 
 ## Main results
 
@@ -163,6 +165,26 @@ coefficients of the tensor wavelets.
   (`Daubechies.memSobolev_two_iff_tensorCoeff`); for masks of order three this holds for
   `0 < s < 3 - log₂ 3 ≈ 1.415`, which covers `H^1`
   (`Daubechies.memSobolev_two_iff_tensorCoeff_order_three`).
+* **The tensor wavelet basis of `L_2(ℝ^d)`.** For `N ≥ 2` the functions `Φ(· - k)`, `k ∈ ℤ^d`,
+  and `Ψ^e_{j,k}`, `j ∈ ℕ`, `e ≠ ∅`, `k ∈ ℤ^d`, form a Hilbert basis of `L_2(ℝ^d)` whose
+  coefficients are `⟨f, Φ(· - k)⟩` and `⟨f, Ψ^e_{j,k}⟩` (`Daubechies.tensorWaveletBasis`,
+  `Daubechies.tensorWaveletBasis_repr_inl`, `Daubechies.tensorWaveletBasis_repr_inr`); an
+  `f ∈ L_p(ℝ^d)`, `1 ≤ p < ∞`, with all coefficients zero is zero
+  (`Daubechies.eq_zero_of_tensorCoeff_eq_zero`). With the weights `w_i = 1` at the scaling
+  functions and `w_i = 2^(js)` at the wavelets of level `j`, `u ∈ H^s(V)` iff `u` is an
+  `f ∈ L_2(V)` with `∑_i (w_i |⟨f, b_i⟩|)² < ∞` in grid coordinates, under the hypotheses of
+  `H^s` by coefficients (`Daubechies.memSobolev_two_iff_weighted`,
+  `Daubechies.memSobolev_two_iff_weighted_order_three`). For `s > 0`, `1 ≤ p < ∞` and
+  `1 ≤ r < ∞`, every `f ∈ L_r(ℝ^d)` with finite coefficient quasi-norm in `L_p` lies in `L_p`
+  (`Daubechies.memLp_of_tensorCoeffNorm_lt_top`).
+* **`n`-term approximation from the tensor wavelet basis.** For `0 < τ < 2` and
+  `θ = 1/τ - 1/2`, an `f ∈ L_2(ℝ^d)` lies in the approximation space `A^θ_τ` of `n`-term
+  approximation from the basis iff
+  `‖(⟨f, Φ(· - k)⟩)_k‖_{ℓ_τ} + ‖(‖(⟨f, Ψ^e_{j,k}⟩)_{e,k}‖_{ℓ_τ})_j‖_{ℓ_τ} < ∞`
+  (`Daubechies.memApprox_nTerm_tensorWaveletBasis_iff_coeff`). For `d ≥ 1`, `1 ≤ τ < 2` and
+  `α = dθ < min(θ_B, N)`, where `θ_B` is the order of a Bernstein bound of `φ` in `L_τ`, this
+  holds iff `f ∈ L_τ(ℝ^d)` and `‖f‖_τ + ‖(2^(kα) ω_N(f, 2^(-k))_τ)_k‖_{ℓ_τ} < ∞`, that is,
+  `A^θ_τ = B^α_{τ,τ}(ℝ^d) ∩ L_2(ℝ^d)` (`Daubechies.memApprox_nTerm_tensorWaveletBasis_iff`).
 
 ## What is formalised
 
@@ -185,10 +207,11 @@ Paths are relative to `FunctionSpaces/`, without `.lean`.
 | Besov spaces by Daubechies coefficients; D4 and order three | ✅ | ✗ | `Wavelets/Examples/Daubechies/Besov`, `Wavelets/Examples/Daubechies/D4Besov`, `Wavelets/Examples/Daubechies/OrderThree` |
 | Tensor generators on `ℝ^d` and their moduli | ✅ | ✗ | `Wavelets/Examples/Daubechies/TensorWavelets` |
 | Expansions on `ℝ^d`: windows and overlap, stability, coefficient recovery, Bernstein's inequality | ✅ | ✗ | `Wavelets/Examples/Daubechies/TensorExpansion` |
-| The multiresolution analysis on `ℝ^d`: kernels, the block identity, scaling spaces, norms of the blocks, the inverse inequality | ✅ | ✗ | `Wavelets/Examples/Daubechies/TensorProjections` |
+| The multiresolution analysis on `ℝ^d`: kernels, the block identity, the levels, scaling spaces, norms of the blocks, the inverse inequality | ✅ | ✗ | `Wavelets/Examples/Daubechies/TensorProjections` |
 | Jackson's inequality in one coordinate | ✅ | ✗ | `Wavelets/Examples/Daubechies/SlicewiseProjections` |
 | Jackson's inequality on `ℝ^d`: projections in all coordinates, their range, density of the scaling spaces | ✅ | ✗ | `Wavelets/Examples/Daubechies/TensorJackson` |
 | Besov spaces on `ℝ^d` and on inner product spaces, and `H^s`, by tensor wavelet coefficients | ✅ | ✗ | `Wavelets/Examples/Daubechies/TensorBesov` |
+| The tensor wavelet basis of `L_2(ℝ^d)`, `H^s` as a weighted `ℓ_2`, synthesis in `L_p`, `n`-term approximation | ✅ | ✗ | `Wavelets/Examples/Daubechies/TensorWaveletBasis` |
 
 Lean: ✅ proved without `sorry` · 🟡 stated, proof still `sorry` · ⬜ planned, not yet stated.
 Human-checked: ✅ mathematics and documentation both reviewed by the author · 🧮 mathematics

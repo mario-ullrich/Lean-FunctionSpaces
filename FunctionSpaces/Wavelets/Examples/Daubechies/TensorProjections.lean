@@ -41,7 +41,15 @@ and the **wavelet part of level `j`** is `Q_j f = ∑_{e ≠ ∅} ∑_k ⟨f, Ψ
   (`Daubechies.tensorProj_succ_sub_tensorProj`).
   The wavelet coefficients of level `j` of an expansion in the `Φ_{j,k}` vanish
   (`Daubechies.tensorCoeff_tensorExpand_eq_zero`), so `P_{j+1} P_j = P_j`
-  (`Daubechies.tensorProjFun_succ_tensorProjFun`).
+  (`Daubechies.tensorProjFun_succ_tensorProjFun`), and `P_{j+1}` reproduces the expansions in
+  the `Ψ^e_{j,k}` (`Daubechies.tensorProjFun_succ_tensorExpand_wavelet`). In particular
+  `P_j Φ_{j,k} = Φ_{j,k}` and `P_{j+1} Ψ^e_{j,k} = Ψ^e_{j,k}`
+  (`Daubechies.tensorProjFun_tensorScaled_tensorGen_empty`,
+  `Daubechies.tensorProjFun_succ_tensorScaled_tensorGen`). If `P_i g = g`, then
+  `P_j g = g` for all `j ≥ i` (`Daubechies.tensorProjFun_eq_self_of_le`), so the wavelet
+  coefficients of `g` of every level `j ≥ i` vanish
+  (`Daubechies.tensorCoeff_tensorWaveletFamily_eq_zero_of_le`); and
+  `P_J f = P_0 f + ∑_{j<J} Q_j f` (`Daubechies.tensorProjFun_eq_add_sum`).
 * **Projections and scaling spaces.** On `L_p`, `1 ≤ p < ∞`, the `P_j` are bounded operators,
   uniformly in `j` (`Daubechies.norm_tensorProj_le`), with `P_j P_j = P_j`; their ranges, the
   **scaling spaces** `V_j` (`Daubechies.tensorScalingSpace`), increase with `j`. They form the
@@ -50,7 +58,10 @@ and the **wavelet part of level `j`** is `Q_j f = ∑_{e ≠ ∅} ∑_k ⟨f, Ψ
 * **Norms of the blocks.** `‖P_{j+1} f - P_j f‖_p` is comparable with
   `2^(jd(1/2 - 1/p)) ‖(⟨f, Ψ^e_{j,k}⟩)_{e,k}‖_{ℓ_p}` uniformly in `j`
   (`Daubechies.enorm_tensorBlock_equiv`), and `‖P_0 f‖_p` with `‖(⟨f, Φ(· - k)⟩)_k‖_{ℓ_p}`
-  (`Daubechies.enorm_tensorProj_zero_equiv`), by the stability of the expansions.
+  (`Daubechies.enorm_tensorProj_zero_equiv`), by the stability of the expansions. The upper
+  bounds `‖Q_j f‖_p ≤ C 2^(jd(1/2 - 1/p)) ‖(⟨f, Ψ^e_{j,k}⟩)_{e,k}‖_{ℓ_p}` and
+  `‖P_0 f‖_p ≤ C_0 ‖(⟨f, Φ(· - k)⟩)_k‖_{ℓ_p}` hold for every `f : ℝ^d → ℂ`
+  (`Daubechies.eLpNorm_tensorDetailFun_le`, `Daubechies.eLpNorm_tensorProjFun_zero_le`).
 * **The inverse inequality.** If `‖Δ_h^N Φ‖_p ≤ K ‖h‖^θ` for `‖h‖ ≤ 1`, then
   `ω_N(a, 2^(-k))_p ≤ C K 2^(-(k-j)θ) ‖a‖_p` for every `a ∈ V_j` and `k ≥ j`
   (`Daubechies.lpModulus_le_of_mem_tensorScalingSpace`), from Bernstein's inequality for
@@ -273,6 +284,16 @@ theorem integral_tensorScalingFamily_translate_wavelet (hN : 2 ≤ N) (ν : Unit
   rw [integral_tensorGen_translate_mul_conj_translate m hN ∅ e.1 k l]
   exact ite_eq_right_iff.2 fun h => absurd h.1.symm e.2.ne_empty
 
+/-- **The wavelet family is orthogonal to the scaling family**: for `N ≥ 2`, every integer
+translate of every `Ψ^e`, `e ≠ ∅`, is orthogonal to every integer translate of `Φ`
+(`Daubechies.integral_tensorGen_translate_mul_conj_translate`, since `e ≠ ∅`). -/
+theorem integral_tensorWaveletFamily_translate_scaling (hN : 2 ≤ N)
+    (e : {e : Finset (Fin d) // e.Nonempty}) (ν : Unit) (k l : Fin d → ℤ) :
+    ∫ x, tensorWaveletFamily m d e (x - fun i => (k i : ℝ)) *
+        conj (tensorScalingFamily m d ν (x - fun i => (l i : ℝ))) = 0 := by
+  rw [integral_tensorGen_translate_mul_conj_translate m hN e.1 ∅ k l]
+  exact ite_eq_right_iff.2 fun h => absurd h.1 e.2.ne_empty
+
 /-- **The kernel identity**: for `N ≥ 2`, every level `j` and all `x, y ∈ ℝ^d`, the kernel of the
 scaling family of level `j + 1` is the kernel of the scaling family of level `j` plus the kernel
 of the wavelet family of level `j` (`Daubechies.tsum_tensorGen_empty_mul_conj_succ`, with the
@@ -359,6 +380,16 @@ theorem tensorProjFun_tensorExpand (hN : 2 ≤ N) (j : ℕ) (c : Unit × (Fin d 
       (fun _ _ hx => tensorGen_eq_zero m hN ∅ hx)
       (integral_tensorScalingFamily_translate_mul_conj_translate m hN) j c)]
 
+/-- **`P_j` fixes the scaling functions of level `j`**: `P_j Φ_{j,k} = Φ_{j,k}` for `N ≥ 2`, every
+level `j` and every `k`. The function `Φ_{j,k}` is the expansion of a single coefficient
+(`Daubechies.tensorExpand_single`), and `P_j` reproduces these expansions
+(`Daubechies.tensorProjFun_tensorExpand`). -/
+theorem tensorProjFun_tensorScaled_tensorGen_empty (hN : 2 ≤ N) (j : ℕ) (k : Fin d → ℤ) :
+    tensorProjFun m j (tensorScaled (tensorGen m ∅) j k) = tensorScaled (tensorGen m ∅) j k := by
+  have h := tensorProjFun_tensorExpand m hN j (Pi.single ((), k) 1)
+  rw [tensorExpand_single] at h
+  exact h
+
 /-- **The pointwise projection is idempotent**: `P_j (P_j f) = P_j f` for `N ≥ 2`
 (`Daubechies.tensorProjFun_tensorExpand`). -/
 theorem tensorProjFun_tensorProjFun (hN : 2 ≤ N) (j : ℕ) (f : (Fin d → ℝ) → ℂ) :
@@ -413,6 +444,84 @@ theorem tensorProjFun_succ_tensorProjFun (hN : 2 ≤ N) (j : ℕ) (f : (Fin d �
       funext (tensorCoeff_tensorProjFun_eq_zero m hN j f)]
   simp [tensorExpand]
 
+/-- **The wavelet expansions of level `j` lie in `V_{j+1}`**: for `N ≥ 2`, every level `j` and all
+coefficients `c`, `P_{j+1} (∑ c_{e,k} Ψ^e_{j,k}) = ∑ c_{e,k} Ψ^e_{j,k}` at every point. By the
+block identity (`Daubechies.tensorProjFun_succ_eq_add`) for the continuous expansion `g`,
+`P_{j+1} g = P_j g + Q_j g`; the scaling coefficients of level `j` of `g` vanish, since the
+two families are orthogonal (`Daubechies.tensorCoeff_tensorExpand_eq_zero`,
+`Daubechies.integral_tensorWaveletFamily_translate_scaling`), and its wavelet coefficients are
+the `c_{e,k}` (`Daubechies.tensorCoeff_tensorExpand`). -/
+theorem tensorProjFun_succ_tensorExpand_wavelet (hN : 2 ≤ N) (j : ℕ)
+    (c : {e : Finset (Fin d) // e.Nonempty} × (Fin d → ℤ) → ℂ) :
+    tensorProjFun m (j + 1) (tensorExpand (tensorWaveletFamily m d) j c) =
+      tensorExpand (tensorWaveletFamily m d) j c := by
+  have hψ : ∀ e x, (∃ i, x i ∉ Set.Icc (1 - N : ℝ) (2 * N - 1)) →
+      tensorWaveletFamily m d e x = 0 := fun e _ hx => tensorGen_eq_zero m hN e.1 hx
+  have hψc : ∀ e, Continuous (tensorWaveletFamily m d e) := fun e => continuous_tensorGen m hN e.1
+  have h0 : tensorCoeff (tensorScalingFamily m d) j (tensorExpand (tensorWaveletFamily m d) j c) =
+      fun _ => 0 :=
+    funext (tensorCoeff_tensorExpand_eq_zero (G := tensorWaveletFamily m d)
+      (G' := tensorScalingFamily m d) (a := 1 - N) (b := 2 * N - 1) hψc
+      (fun _ => continuous_tensorGen m hN ∅) hψ (fun _ _ hx => tensorGen_eq_zero m hN ∅ hx)
+      (integral_tensorWaveletFamily_translate_scaling m hN) j c)
+  have h1 : tensorCoeff (tensorWaveletFamily m d) j (tensorExpand (tensorWaveletFamily m d) j c) =
+      c :=
+    funext (tensorCoeff_tensorExpand hψc hψ
+      (integral_tensorWaveletFamily_translate_mul_conj_translate m hN) j c)
+  funext x
+  rw [tensorProjFun_succ_eq_add m hN (continuous_tensorExpand hψc hψ j c).locallyIntegrable,
+    tensorProjFun, tensorDetailFun, h0, h1]
+  simp [tensorExpand]
+
+/-- **`P_{j+1}` fixes the wavelets of level `j`**: `P_{j+1} Ψ^e_{j,k} = Ψ^e_{j,k}` for `N ≥ 2`,
+every `e ≠ ∅`, every level `j` and every `k`. The function `Ψ^e_{j,k}` is the expansion of a
+single coefficient (`Daubechies.tensorExpand_single`), and `P_{j+1}` reproduces the wavelet
+expansions of level `j` (`Daubechies.tensorProjFun_succ_tensorExpand_wavelet`). -/
+theorem tensorProjFun_succ_tensorScaled_tensorGen (hN : 2 ≤ N)
+    (e : {e : Finset (Fin d) // e.Nonempty}) (j : ℕ) (k : Fin d → ℤ) :
+    tensorProjFun m (j + 1) (tensorScaled (tensorGen m e.1) j k) =
+      tensorScaled (tensorGen m e.1) j k := by
+  have h := tensorProjFun_succ_tensorExpand_wavelet m hN j (Pi.single (e, k) 1)
+  rw [tensorExpand_single] at h
+  exact h
+
+/-- **The projections fix the functions of lower levels**: for `N ≥ 2`, if `P_i g = g`, then
+`P_j g = g` for every `j ≥ i`, by induction with `P_{j+1} (P_j g) = P_j g`
+(`Daubechies.tensorProjFun_succ_tensorProjFun`). -/
+theorem tensorProjFun_eq_self_of_le (hN : 2 ≤ N) {g : (Fin d → ℝ) → ℂ} {i j : ℕ}
+    (hg : tensorProjFun m i g = g) (hij : i ≤ j) : tensorProjFun m j g = g := by
+  induction j, hij using Nat.le_induction with
+  | base => exact hg
+  | succ j _ ih =>
+    calc tensorProjFun m (j + 1) g = tensorProjFun m (j + 1) (tensorProjFun m j g) := by
+          rw [ih]
+      _ = g := by rw [tensorProjFun_succ_tensorProjFun m hN, ih]
+
+/-- **The wavelet coefficients of the functions of lower levels vanish**: for `N ≥ 2`, if
+`P_i g = g` and `i ≤ j`, then `⟨g, Ψ^e_{j,k}⟩ = 0` for every `e ≠ ∅` and `k`, since `g = P_j g`
+(`Daubechies.tensorProjFun_eq_self_of_le`) and the wavelet coefficients of level `j` of `P_j g`
+vanish (`Daubechies.tensorCoeff_tensorProjFun_eq_zero`). -/
+theorem tensorCoeff_tensorWaveletFamily_eq_zero_of_le (hN : 2 ≤ N) {g : (Fin d → ℝ) → ℂ}
+    {i j : ℕ} (hg : tensorProjFun m i g = g) (hij : i ≤ j)
+    (ek : {e : Finset (Fin d) // e.Nonempty} × (Fin d → ℤ)) :
+    tensorCoeff (tensorWaveletFamily m d) j g ek = 0 := by
+  have h := tensorCoeff_tensorProjFun_eq_zero m hN j g ek
+  rwa [tensorProjFun_eq_self_of_le m hN hg hij] at h
+
+/-- **The projection as a sum of wavelet parts**: for `N ≥ 2`, every locally integrable `f` and
+every level `J`, `P_J f = P_0 f + ∑_{j<J} Q_j f`, by induction from the block identity
+(`Daubechies.tensorProjFun_succ_eq_add`). -/
+theorem tensorProjFun_eq_add_sum (hN : 2 ≤ N) {f : (Fin d → ℝ) → ℂ}
+    (hf : LocallyIntegrable f volume) (J : ℕ) :
+    tensorProjFun m J f = tensorProjFun m 0 f + ∑ j ∈ Finset.range J, tensorDetailFun m j f := by
+  induction J with
+  | zero => simp
+  | succ J ih =>
+    funext x
+    rw [tensorProjFun_succ_eq_add m hN hf, ih, Finset.sum_range_succ]
+    simp only [Pi.add_apply, Finset.sum_apply]
+    ring
+
 /-! ### Bounds -/
 
 /-- **The bound of the projections on `ℝ^d`**: the real number `C C'` with the constants
@@ -463,6 +572,46 @@ theorem memLp_tensorDetailFun (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (h
   memLp_tensorExpand_tensorCoeff (G := tensorWaveletFamily m d) (a := 1 - N) (b := 2 * N - 1)
     (fun e => continuous_tensorGen m hN e.1)
     (fun e _ hx => tensorGen_eq_zero m hN e.1 hx) hp1 hp hf j
+
+/-- **The projection of level `0` through the scaling coefficients**: for `N ≥ 2`, `1 ≤ p < ∞`
+and every `f : ℝ^d → ℂ`, `‖P_0 f‖_p ≤ C_0 ‖(⟨f, Φ(· - k)⟩)_k‖_{ℓ_p}` with the constant `C_0` of
+the upper estimate of the scaling family (`Daubechies.eLpNorm_tensorExpand_le`,
+`Daubechies.tensorExpandConst`), where the weight of level `0` is `1` and the index set
+`Unit × ℤ^d` is identified with `ℤ^d` (`ENNReal.lqNorm_comp_equiv`). -/
+theorem eLpNorm_tensorProjFun_zero_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞)
+    (f : (Fin d → ℝ) → ℂ) :
+    eLpNorm (tensorProjFun m 0 f) p volume ≤
+      tensorExpandConst (tensorScalingFamily m d) (1 - N) (2 * N - 1) p *
+        lqNorm p (fun k : Fin d → ℤ => ‖tensorCoeff (tensorScalingFamily m d) 0 f ((), k)‖ₑ) := by
+  have hl : lqNorm p (fun k : Fin d → ℤ => ‖tensorCoeff (tensorScalingFamily m d) 0 f ((), k)‖ₑ) =
+      lqNorm p (fun νk => ‖tensorCoeff (tensorScalingFamily m d) 0 f νk‖ₑ) :=
+    ENNReal.lqNorm_comp_equiv (Equiv.punitProd (Fin d → ℤ)).symm
+      (fun νk => ‖tensorCoeff (tensorScalingFamily m d) 0 f νk‖ₑ)
+  rw [hl]
+  refine (eLpNorm_tensorExpand_le (G := tensorScalingFamily m d) (a := 1 - N) (b := 2 * N - 1)
+    (fun _ => (continuous_tensorGen m hN ∅).aestronglyMeasurable)
+    (fun _ _ hx => tensorGen_eq_zero m hN ∅ hx) hp1 hp
+    (fun ν => le_iSup (fun ν => eLpNorm (tensorScalingFamily m d ν) p volume) ν) 0
+    _).trans_eq ?_
+  rw [tensorExpandConst, ENNReal.dyadicWeight_zero_right, mul_one]
+
+/-- **The wavelet part of level `j` through the wavelet coefficients**: for `N ≥ 2`, `1 ≤ p < ∞`,
+every `f : ℝ^d → ℂ` and every level `j`,
+`‖Q_j f‖_p ≤ C 2^(jd(1/2 - 1/p)) ‖(⟨f, Ψ^e_{j,k}⟩)_{e,k}‖_{ℓ_p}` with the constant `C` of the
+upper estimate of the wavelet family (`Daubechies.eLpNorm_tensorExpand_le`,
+`Daubechies.tensorExpandConst`). -/
+theorem eLpNorm_tensorDetailFun_le (hN : 2 ≤ N) {p : ℝ≥0∞} (hp1 : 1 ≤ p) (hp : p ≠ ∞) (j : ℕ)
+    (f : (Fin d → ℝ) → ℂ) :
+    eLpNorm (tensorDetailFun m j f) p volume ≤
+      tensorExpandConst (tensorWaveletFamily m d) (1 - N) (2 * N - 1) p *
+        (dyadicWeight (d * (1 / 2 - 1 / p.toReal)) j *
+          lqNorm p (fun ek => ‖tensorCoeff (tensorWaveletFamily m d) j f ek‖ₑ)) := by
+  refine (eLpNorm_tensorExpand_le (G := tensorWaveletFamily m d) (a := 1 - N) (b := 2 * N - 1)
+    (fun e => (continuous_tensorGen m hN e.1).aestronglyMeasurable)
+    (fun e _ hx => tensorGen_eq_zero m hN e.1 hx) hp1 hp
+    (fun e => le_iSup (fun e => eLpNorm (tensorWaveletFamily m d e) p volume) e) j _).trans_eq ?_
+  rw [tensorExpandConst]
+  ring
 
 end Families
 
@@ -639,8 +788,9 @@ there are constants `K, M < ∞` such that for every `f ∈ L_p(ℝ^d)` and ever
 `‖P_{j+1} f - P_j f‖_p ≤ M 2^(jd(1/2 - 1/p)) ‖(⟨f, Ψ^e_{j,k}⟩)_{e,k}‖_{ℓ_p}`. The block is the
 expansion of the wavelet coefficients (`Daubechies.enorm_tensorProj_succ_sub_tensorProj`), so
 lower stability (`Daubechies.lqNorm_le_eLpNorm_tensorExpand`, with the orthonormality of the
-wavelet family) and upper stability (`Daubechies.eLpNorm_tensorExpand_le`) give the constants
-`K = Daubechies.tensorCoeffConst` and `M = Daubechies.tensorExpandConst` of the wavelet family. -/
+wavelet family) and upper stability (`Daubechies.eLpNorm_tensorDetailFun_le`) give the
+constants `K = Daubechies.tensorCoeffConst` and `M = Daubechies.tensorExpandConst` of the wavelet
+family. -/
 theorem enorm_tensorBlock_equiv (hN : 2 ≤ N) (hp : p ≠ ∞) :
     ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ (f : Lp ℂ p (volume : Measure (Fin d → ℝ))) (j : ℕ),
       dyadicWeight (d * (1 / 2 - 1 / p.toReal)) j *
@@ -660,19 +810,14 @@ theorem enorm_tensorBlock_equiv (hN : 2 ≤ N) (hp : p ≠ ∞) :
       (fun e _ hx => tensorGen_eq_zero m hN e.1 hx)
       (integral_tensorWaveletFamily_translate_mul_conj_translate m hN) Fact.out hp j _
   · rw [enorm_tensorProj_succ_sub_tensorProj]
-    refine (eLpNorm_tensorExpand_le (G := tensorWaveletFamily m d) (a := 1 - N) (b := 2 * N - 1)
-      (fun e => (continuous_tensorGen m hN e.1).aestronglyMeasurable)
-      (fun e _ hx => tensorGen_eq_zero m hN e.1 hx) Fact.out hp
-      (fun e => le_iSup (fun e => eLpNorm (tensorWaveletFamily m d e) p volume) e) j _).trans_eq ?_
-    rw [tensorExpandConst]
-    ring
+    exact eLpNorm_tensorDetailFun_le m hN Fact.out hp j f
 
 /-- **The norm of the projection of level `0` through the scaling coefficients**: for `N ≥ 2` and
 `1 ≤ p < ∞` there are constants `K, M < ∞` with `‖(⟨f, Φ(· - k)⟩)_k‖_{ℓ_p} ≤ K ‖P_0 f‖_p` and
 `‖P_0 f‖_p ≤ M ‖(⟨f, Φ(· - k)⟩)_k‖_{ℓ_p}` for every `f ∈ L_p(ℝ^d)`: the stability of the
 expansions in the scaling family at level `0` (`Daubechies.lqNorm_le_eLpNorm_tensorExpand`,
-`Daubechies.eLpNorm_tensorExpand_le`), with the index set `Unit × ℤ^d` identified with `ℤ^d`
-(`ENNReal.lqNorm_comp_equiv`). -/
+`Daubechies.eLpNorm_tensorProjFun_zero_le`), with the index set `Unit × ℤ^d` identified with
+`ℤ^d` (`ENNReal.lqNorm_comp_equiv`). -/
 theorem enorm_tensorProj_zero_equiv (hN : 2 ≤ N) (hp : p ≠ ∞) :
     ∃ K M : ℝ≥0∞, K ≠ ∞ ∧ M ≠ ∞ ∧ ∀ f : Lp ℂ p (volume : Measure (Fin d → ℝ)),
       lqNorm p (fun k : Fin d → ℤ => ‖tensorCoeff (tensorScalingFamily m d) 0 f ((), k)‖ₑ) ≤
@@ -684,27 +829,22 @@ theorem enorm_tensorProj_zero_equiv (hN : 2 ≤ N) (hp : p ≠ ∞) :
     tensorExpandConst (tensorScalingFamily m d) (1 - N) (2 * N - 1) p,
     tensorCoeffConst_ne_top _ _ fun _ => memLp_tensorGen m hN ∅ _,
     tensorExpandConst_ne_top _ _ Fact.out fun _ => memLp_tensorGen m hN ∅ p, fun f => ?_⟩
+  have he : ‖tensorProj m p d hN hp 0 f‖ₑ = eLpNorm (tensorProjFun m 0 f) p volume := by
+    rw [Lp.enorm_def, eLpNorm_congr_ae (tensorProj_apply_ae m hN hp 0 f)]
+  rw [he]
+  refine ⟨?_, eLpNorm_tensorProjFun_zero_le m hN Fact.out hp f⟩
   have hl : lqNorm p (fun k : Fin d → ℤ => ‖tensorCoeff (tensorScalingFamily m d) 0 f ((), k)‖ₑ) =
       lqNorm p (fun νk => ‖tensorCoeff (tensorScalingFamily m d) 0 f νk‖ₑ) :=
     ENNReal.lqNorm_comp_equiv (Equiv.punitProd (Fin d → ℤ)).symm
       (fun νk => ‖tensorCoeff (tensorScalingFamily m d) 0 f νk‖ₑ)
-  have he : ‖tensorProj m p d hN hp 0 f‖ₑ = eLpNorm (tensorProjFun m 0 f) p volume := by
-    rw [Lp.enorm_def, eLpNorm_congr_ae (tensorProj_apply_ae m hN hp 0 f)]
-  rw [hl, he]
-  constructor
-  · have h := lqNorm_le_eLpNorm_tensorExpand (G := tensorScalingFamily m d) (a := 1 - N)
-      (b := 2 * N - 1) (fun _ => continuous_tensorGen m hN ∅)
-      (fun _ _ hx => tensorGen_eq_zero m hN ∅ hx)
-      (integral_tensorScalingFamily_translate_mul_conj_translate m hN) Fact.out hp 0
-      (tensorCoeff (tensorScalingFamily m d) 0 f)
-    rw [ENNReal.dyadicWeight_zero_right, one_mul] at h
-    exact h
-  · refine (eLpNorm_tensorExpand_le (G := tensorScalingFamily m d) (a := 1 - N) (b := 2 * N - 1)
-      (fun _ => (continuous_tensorGen m hN ∅).aestronglyMeasurable)
-      (fun _ _ hx => tensorGen_eq_zero m hN ∅ hx) Fact.out hp
-      (fun ν => le_iSup (fun ν => eLpNorm (tensorScalingFamily m d ν) p volume) ν) 0
-      _).trans_eq ?_
-    rw [tensorExpandConst, ENNReal.dyadicWeight_zero_right, mul_one]
+  have h := lqNorm_le_eLpNorm_tensorExpand (G := tensorScalingFamily m d) (a := 1 - N)
+    (b := 2 * N - 1) (fun _ => continuous_tensorGen m hN ∅)
+    (fun _ _ hx => tensorGen_eq_zero m hN ∅ hx)
+    (integral_tensorScalingFamily_translate_mul_conj_translate m hN) Fact.out hp 0
+    (tensorCoeff (tensorScalingFamily m d) 0 f)
+  rw [ENNReal.dyadicWeight_zero_right, one_mul] at h
+  rw [hl]
+  exact h
 
 /-! ### The inverse inequality -/
 

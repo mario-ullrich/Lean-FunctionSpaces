@@ -274,6 +274,7 @@ public import FunctionSpaces.Wavelets.Examples.Daubechies.TensorProjections
 public import FunctionSpaces.Wavelets.Examples.Daubechies.SlicewiseProjections
 public import FunctionSpaces.Wavelets.Examples.Daubechies.TensorJackson
 public import FunctionSpaces.Wavelets.Examples.Daubechies.TensorBesov
+public import FunctionSpaces.Wavelets.Examples.Daubechies.TensorWaveletBasis
 
 /-!
 # Characterizations of function spaces
